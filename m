@@ -1,52 +1,37 @@
-Return-Path: <danny.schweizer@proofnet.de>
-From: Danny Schweizer <danny.schweizer@proofnet.de>
-To: marcel@holtmann.org
-Cc: linux-bluetooth@vger.kernel.org,
-	Danny Schweizer <danny.schweizer@proofnet.de>
-Subject: [PATCH] Do not filter multicast addresses by default
-Date: Mon,  7 Dec 2015 11:31:53 +0100
-Message-Id: <1449484313-11782-1-git-send-email-danny.schweizer@proofnet.de>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 9.1 \(3096.5\))
+Subject: Re: [PATCH v2] Bluetooth: btintel: Create common Intel Version Read function
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1449415114-30029-1-git-send-email-loic.poulain@intel.com>
+Date: Sun, 6 Dec 2015 17:37:08 -1000
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <D3B3D47E-A140-4DEA-B132-84051D64A9FE@holtmann.org>
+References: <1449415114-30029-1-git-send-email-loic.poulain@intel.com>
+To: Loic Poulain <loic.poulain@intel.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-A Linux PC is connected with another device over Bluetooth PAN using a BNEP interface.
+Hi Loic,
 
-Whenever a packet is tried to be sent over the BNEP interface, the function "bnep_net_xmit()" in "net/bluetooth/bnep/netdev.c" is called. This function calls "bnep_net_mc_filter()", which checks (if the destination address is multicast) if the address is set in a certain multicast filter (&s->mc_filter). If it is not, then it is not sent out.
+> The Intel Version Read command is used to retrieve information
+> about hardware and firmware version/revision of Intel Bluetooth
+> controllers. This is an Intel generic command used in USB and
+> UART drivers.
+> 
+> Signed-off-by: Loic Poulain <loic.poulain@intel.com>
+> ---
+> v2: Fix typo in inline declaration
+> 
+> drivers/bluetooth/btintel.c   | 25 ++++++++++++++
+> drivers/bluetooth/btintel.h   |  7 ++++
+> drivers/bluetooth/btusb.c     | 80 +++++++++++++------------------------------
+> drivers/bluetooth/hci_intel.c | 46 ++++++-------------------
+> 4 files changed, 66 insertions(+), 92 deletions(-)
 
-This filter is only changed in two other functions, found in net/bluetooth/bnep/core.c": in "bnep_ctrl_set_mc_filter()", which is only called if a message of type "BNEP_FILTER_MULTI_ADDR_SET" is received. Otherwise, it is set in "bnep_add_connection()", where it is set to a default value which only adds the broadcast address to the filter:
+patch has been applied to bluetooth-next tree.
 
-set_bit(bnep_mc_hash(dev->broadcast), (ulong *) &s->mc_filter);
+Regards
 
-To sum up, if the BNEP interface does not receive any message of type "BNEP_FILTER_MULTI_ADDR_SET", it will not send out any messages with multicast destination addresses except for broadcast.
+Marcel
 
-However, in the BNEP specification (page 27 in http://grouper.ieee.org/groups/802/15/Bluetooth/BNEP.pdf), it is said that per default, all multicast addresses should not be filtered, i.e. the BNEP interface should be able to send packets with any multicast destination address.
-
-It seems that the default case is wrong: the multicast filter should not block almost all multicast addresses, but should not filter out any.
-
-This leads to the problem that e.g. Neighbor Solicitation messages sent with Bluetooth PAN over the BNEP interface to a multicast destination address other than broadcast are blocked and not sent out.
-
-Therefore, in the default case, we set the mc_filter to ~0LL to not filter out any multicast addresses.
----
- net/bluetooth/bnep/core.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
-
-diff --git a/net/bluetooth/bnep/core.c b/net/bluetooth/bnep/core.c
-index 1641367..8e02289 100644
---- a/net/bluetooth/bnep/core.c
-+++ b/net/bluetooth/bnep/core.c
-@@ -608,8 +608,12 @@ int bnep_add_connection(struct bnep_connadd_req *req, struct socket *sock)
- 	s->msg.msg_flags = MSG_NOSIGNAL;
- 
- #ifdef CONFIG_BT_BNEP_MC_FILTER
--	/* Set default mc filter */
--	set_bit(bnep_mc_hash(dev->broadcast), (ulong *) &s->mc_filter);
-+	/* 
-+	 * Set default mc filter to not filter out any mc addresses
-+	 * as defined in the BNEP specification (revision 0.95a)
-+	 * http://grouper.ieee.org/groups/802/15/Bluetooth/BNEP.pdf
-+	 */
-+	s->mc_filter = ~0LL;
- #endif
- 
- #ifdef CONFIG_BT_BNEP_PROTO_FILTER
--- 
-2.1.4
