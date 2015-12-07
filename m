@@ -1,169 +1,52 @@
-Return-Path: <stefan@osg.samsung.com>
-Subject: Re: [PATCH] drivers/net/ieee802154/adf7242: Driver for ADF7242 MAC
- IEEE802154
-To: michael.hennerich@analog.com, alex.aring@gmail.com, marcel@holtmann.org
-References: <1449220149-14096-1-git-send-email-michael.hennerich@analog.com>
- <566181E6.9070306@osg.samsung.com>
-Cc: linux-wpan@vger.kernel.org, linux-bluetooth@vger.kernel.org
-From: Stefan Schmidt <stefan@osg.samsung.com>
-Message-ID: <56657561.70305@osg.samsung.com>
-Date: Mon, 7 Dec 2015 13:02:41 +0100
-MIME-Version: 1.0
-In-Reply-To: <566181E6.9070306@osg.samsung.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Return-Path: <danny.schweizer@proofnet.de>
+From: Danny Schweizer <danny.schweizer@proofnet.de>
+To: marcel@holtmann.org
+Cc: linux-bluetooth@vger.kernel.org,
+	Danny Schweizer <danny.schweizer@proofnet.de>
+Subject: [PATCH] Do not filter multicast addresses by default
+Date: Mon,  7 Dec 2015 11:31:53 +0100
+Message-Id: <1449484313-11782-1-git-send-email-danny.schweizer@proofnet.de>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello.
+A Linux PC is connected with another device over Bluetooth PAN using a BNEP interface.
 
-I found some time at the weekend hooking it up on my raspberry pi.
+Whenever a packet is tried to be sent over the BNEP interface, the function "bnep_net_xmit()" in "net/bluetooth/bnep/netdev.c" is called. This function calls "bnep_net_mc_filter()", which checks (if the destination address is multicast) if the address is set in a certain multicast filter (&s->mc_filter). If it is not, then it is not sent out.
 
-On 04/12/15 13:07, Stefan Schmidt wrote:
-> Hello.
->
-> On 04/12/15 10:09, michael.hennerich@analog.com wrote:
->
->> The ADF7242 requires an add-on firmware for the automatic IEEE 802.15.4
->> operating modes. The firmware file is currently made available on the
->> ADF7242 wiki page here [1]
->
-> Just being curious here. Is there any way to get the firmware source 
-> and/or compile your own? Its the first hardware for IEEE 802.15.4 I 
-> have seen that have a special firmware for this which triggers my 
-> curiosity. :)
->
-> Anyway, this has not that much to do with the driver review here as it 
-> can obviously go in with the binary firmware. We just need to make 
-> sure to also bring the firmware into the linux-firmware repo in time.
->
->> [1] 
->> http://wiki.analog.com/resources/tools-software/linux-drivers/networking-mac802154/adf7242
+This filter is only changed in two other functions, found in net/bluetooth/bnep/core.c": in "bnep_ctrl_set_mc_filter()", which is only called if a message of type "BNEP_FILTER_MULTI_ADDR_SET" is received. Otherwise, it is set in "bnep_add_connection()", where it is set to a default value which only adds the broadcast address to the filter:
 
-There are two firmware zip files listed:
-ram_lab_7242_2_0_ieee15dot4_full_r5.zip 
-<https://wiki.analog.com/_media/resources/tools-software/linux-drivers/networking-mac802154/ram_lab_7242_2_0_ieee15dot4_full_r5.zip>
-rom_ram_7242_2_0_ieee15dot4_full_r3.zip 
-<https://wiki.analog.com/_media/resources/tools-software/linux-drivers/networking-mac802154/rom_ram_7242_2_0_ieee15dot4_full_r3.zip>
+set_bit(bnep_mc_hash(dev->broadcast), (ulong *) &s->mc_filter);
 
-Both contain a adf7242_firmware.bin file but also some different data 
-file. Which one is the correct one here? Some explanation would be helpful.
+To sum up, if the BNEP interface does not receive any message of type "BNEP_FILTER_MULTI_ADDR_SET", it will not send out any messages with multicast destination addresses except for broadcast.
 
+However, in the BNEP specification (page 27 in http://grouper.ieee.org/groups/802/15/Bluetooth/BNEP.pdf), it is said that per default, all multicast addresses should not be filtered, i.e. the BNEP interface should be able to send packets with any multicast destination address.
 
->> [2] 
->> http://sourceforge.net/p/linux-zigbee/kernel/ci/devel/tree/drivers/ieee802154/adf7242.c
->>
->> Signed-off-by: Michael Hennerich <michael.hennerich@analog.com>
->> ---
->>   .../devicetree/bindings/net/ieee802154/adf7242.txt |   18 +
->>   drivers/net/ieee802154/Kconfig                     |    5 +
->>   drivers/net/ieee802154/Makefile                    |    1 +
->>   drivers/net/ieee802154/adf7242.c                   | 1183 
->> ++++++++++++++++++++
->>   4 files changed, 1207 insertions(+)
->>   create mode 100644 
->> Documentation/devicetree/bindings/net/ieee802154/adf7242.txt
->>   create mode 100644 drivers/net/ieee802154/adf7242.c
->>
->> diff --git 
->> a/Documentation/devicetree/bindings/net/ieee802154/adf7242.txt 
->> b/Documentation/devicetree/bindings/net/ieee802154/adf7242.txt
->> new file mode 100644
->> index 0000000..dea5124
->> --- /dev/null
->> +++ b/Documentation/devicetree/bindings/net/ieee802154/adf7242.txt
->> @@ -0,0 +1,18 @@
->> +* ADF7242 IEEE 802.15.4 *
->> +
->> +Required properties:
->> +  - compatible:        should be "adi,adf7242"
->> +  - spi-max-frequency:    maximal bus speed (12.5 MHz)
->> +  - reg:        the chipselect index
->> +  - interrupts:        the interrupt generated by the device via pin 
->> IRQ1.
->> +            IRQ_TYPE_LEVEL_HIGH (4) or IRQ_TYPE_EDGE_FALLING (1)
+It seems that the default case is wrong: the multicast filter should not block almost all multicast addresses, but should not filter out any.
 
+This leads to the problem that e.g. Neighbor Solicitation messages sent with Bluetooth PAN over the BNEP interface to a multicast destination address other than broadcast are blocked and not sent out.
 
-IRQ1 would be pin7 on the interface connector, right? I'm using this one 
-but I have trouble when transmitting
+Therefore, in the default case, we set the mc_filter to ~0LL to not filter out any multicast addresses.
+---
+ net/bluetooth/bnep/core.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-adf7242 spi32766.0: Error xmit: Retry count exceeded Status=0x3
-
-and I was wondering if this comes from trouble setting the IRQ up 
-correctly. The driver comes up fine, loads the firmware and I can 
-configure it with iwpan. Device tree config looks like this, which is 
-the same SPI port and IRQ I successfully use for two other transceivers:
-
-&spi {
-     status = "okay";
-     adf7242@0 {
-         compatible = "adi,adf7242";
-         spi-max-frequency = <6000000>;
-         reg = <0>;
-         interrupts = <23 4>;
-         interrupt-parent = <&gpio>;
-     };
-};
-
-
->
->
->> diff --git a/drivers/net/ieee802154/Makefile 
->> b/drivers/net/ieee802154/Makefile
->> index cf1d2a6..3a923d3 100644
->> --- a/drivers/net/ieee802154/Makefile
->> +++ b/drivers/net/ieee802154/Makefile
->> @@ -3,3 +3,4 @@ obj-$(CONFIG_IEEE802154_AT86RF230) += at86rf230.o
->>   obj-$(CONFIG_IEEE802154_MRF24J40) += mrf24j40.o
->>   obj-$(CONFIG_IEEE802154_CC2520) += cc2520.o
->>   obj-$(CONFIG_IEEE802154_ATUSB) += atusb.o
->> +obj-$(CONFIG_IEEE802154_ADF7242) += adf7242.o
->> diff --git a/drivers/net/ieee802154/adf7242.c 
->> b/drivers/net/ieee802154/adf7242.c
->> new file mode 100644
->> index 0000000..48268b1
->> --- /dev/null
->> +++ b/drivers/net/ieee802154/adf7242.c
->> @@ -0,0 +1,1183 @@
->> +/*
->> + * Analog Devices ADF7242 Low-Power IEEE 802.15.4 Transceiver
->> + *
->> + * Copyright 2009-2015 Analog Devices Inc.
->> + *
->
-> Personally I like having a link to the actual data sheet inside the 
-> driver header. This makes only sense if it is a stable URI.
->
-
-The one I found and looking at is this one:
-http://www.analog.com/media/en/technical-documentation/data-sheets/ADF7242.pdf
-
-
->> +static int adf7242_hw_init(struct adf7242_local *lp)
->> +{
->> +    int ret;
->> +    const struct firmware *fw;
->> +
->> +    adf7242_cmd(lp, CMD_RC_RESET);
->> +    adf7242_cmd(lp, CMD_RC_IDLE);
->> +
->> +    /* get ADF7242 addon firmware
->> +     * build this driver as module
->
-> Hmm, this brings up the question if the firmware is also fetched if 
-> the driver is built into the kernel directly?
-
-Let me answer this myself here. If you build everything into the kernel 
-you might run into trouble when the drivers is initialised before the fs 
-system is up. That way the driver has no access to the fs and is unable 
-to load the firmware. You can either switch this driver to a module or 
-you can supply the kernel with the needed firmware during compile so it 
-will be inside the kernel binary. Copy the file into the firmware 
-directory inside your kernel tree and use these options:
-
-CONFIG_EXTRA_FIRMWARE="adf7242_firmware.bin"
-CONFIG_EXTRA_FIRMWARE_DIR="firmware"
-
-That way the firmware loading worked for me for a kernel with everything 
-build into big blob.
-
-regards
-Stefan Schmidt
+diff --git a/net/bluetooth/bnep/core.c b/net/bluetooth/bnep/core.c
+index 1641367..8e02289 100644
+--- a/net/bluetooth/bnep/core.c
++++ b/net/bluetooth/bnep/core.c
+@@ -608,8 +608,12 @@ int bnep_add_connection(struct bnep_connadd_req *req, struct socket *sock)
+ 	s->msg.msg_flags = MSG_NOSIGNAL;
+ 
+ #ifdef CONFIG_BT_BNEP_MC_FILTER
+-	/* Set default mc filter */
+-	set_bit(bnep_mc_hash(dev->broadcast), (ulong *) &s->mc_filter);
++	/* 
++	 * Set default mc filter to not filter out any mc addresses
++	 * as defined in the BNEP specification (revision 0.95a)
++	 * http://grouper.ieee.org/groups/802/15/Bluetooth/BNEP.pdf
++	 */
++	s->mc_filter = ~0LL;
+ #endif
+ 
+ #ifdef CONFIG_BT_BNEP_PROTO_FILTER
+-- 
+2.1.4
