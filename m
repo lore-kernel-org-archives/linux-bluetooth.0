@@ -1,109 +1,71 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Steve Abner <pheonix.sja@att.net>
-Subject: Re: bluez iphone connection
-To: linux-bluetooth@vger.kernel.org
-References: <5662D1DF.4000601@att.net>
- <CABBYNZ+ZtsMcnq2gaGcBeqcAXOCtwsRh9+wC0Y3qv_OV8XL8gA@mail.gmail.com>
-Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Message-ID: <56664C25.8040308@att.net>
-Date: Mon, 7 Dec 2015 22:19:01 -0500
+Return-Path: <johan.hedberg@gmail.com>
+Date: Mon, 7 Dec 2015 20:02:34 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Danny Schweizer <danny.schweizer@proofnet.de>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Do not filter multicast addresses by default
+Message-ID: <20151207180234.GA17653@t440s>
+References: <1449484313-11782-1-git-send-email-danny.schweizer@proofnet.de>
+ <E1BA2ECA-099C-43FF-830F-DD65CCA6963B@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZ+ZtsMcnq2gaGcBeqcAXOCtwsRh9+wC0Y3qv_OV8XL8gA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <E1BA2ECA-099C-43FF-830F-DD65CCA6963B@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi,
 
+On Mon, Dec 07, 2015, Marcel Holtmann wrote:
+> > A Linux PC is connected with another device over Bluetooth PAN using a BNEP interface.
+> > 
+> > Whenever a packet is tried to be sent over the BNEP interface, the function "bnep_net_xmit()" in "net/bluetooth/bnep/netdev.c" is called. This function calls "bnep_net_mc_filter()", which checks (if the destination address is multicast) if the address is set in a certain multicast filter (&s->mc_filter). If it is not, then it is not sent out.
+> > 
+> > This filter is only changed in two other functions, found in net/bluetooth/bnep/core.c": in "bnep_ctrl_set_mc_filter()", which is only called if a message of type "BNEP_FILTER_MULTI_ADDR_SET" is received. Otherwise, it is set in "bnep_add_connection()", where it is set to a default value which only adds the broadcast address to the filter:
+> > 
+> > set_bit(bnep_mc_hash(dev->broadcast), (ulong *) &s->mc_filter);
+> > 
+> > To sum up, if the BNEP interface does not receive any message of type "BNEP_FILTER_MULTI_ADDR_SET", it will not send out any messages with multicast destination addresses except for broadcast.
+> > 
+> > However, in the BNEP specification (page 27 in http://grouper.ieee.org/groups/802/15/Bluetooth/BNEP.pdf), it is said that per default, all multicast addresses should not be filtered, i.e. the BNEP interface should be able to send packets with any multicast destination address.
+> > 
+> > It seems that the default case is wrong: the multicast filter should not block almost all multicast addresses, but should not filter out any.
+> > 
+> > This leads to the problem that e.g. Neighbor Solicitation messages sent with Bluetooth PAN over the BNEP interface to a multicast destination address other than broadcast are blocked and not sent out.
+> > 
+> > Therefore, in the default case, we set the mc_filter to ~0LL to not filter out any multicast addresses.
+> > ---
+> > net/bluetooth/bnep/core.c | 8 ++++++--
+> > 1 file changed, 6 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/net/bluetooth/bnep/core.c b/net/bluetooth/bnep/core.c
+> > index 1641367..8e02289 100644
+> > --- a/net/bluetooth/bnep/core.c
+> > +++ b/net/bluetooth/bnep/core.c
+> > @@ -608,8 +608,12 @@ int bnep_add_connection(struct bnep_connadd_req *req, struct socket *sock)
+> > 	s->msg.msg_flags = MSG_NOSIGNAL;
+> > 
+> > #ifdef CONFIG_BT_BNEP_MC_FILTER
+> > -	/* Set default mc filter */
+> > -	set_bit(bnep_mc_hash(dev->broadcast), (ulong *) &s->mc_filter);
+> > +	/* 
+> > +	 * Set default mc filter to not filter out any mc addresses
+> > +	 * as defined in the BNEP specification (revision 0.95a)
+> > +	 * http://grouper.ieee.org/groups/802/15/Bluetooth/BNEP.pdf
+> > +	 */
+> > +	s->mc_filter = ~0LL;
+> > #endif
+> > 
+> 
+> Applying: Do not filter multicast addresses by default
+> /data/kernel/maintainer-bluetooth-next/.git/rebase-apply/patch:15: trailing whitespace.
+> 	/* 
+> fatal: 1 line adds whitespace errors.
+> Patch failed at 0001 Do not filter multicast addresses by default
+> 
+> And please prefix the subject line with Bluetooth:
 
-On 12/07/2015 09:24 AM, Luiz Augusto von Dentz wrote:
-> What kind of setup is this, can you use a different adapter per
-> system, Bluetooth pair work in relation to the adapter address so the
-> iPhone has no idea you are switching between systems.
-One computer, two operating systems, one common controller. I really like
-the idea that the phone or trackpad shouldn't care about switching systems.
-Problem I have is Bluez has to set pairing, not user, so one system sets 
-with
-pin of xxxx, other with yyyy, device seems to say machine A, so I'll except
-pin xxxx, but not yyyy. So copy xxxx to replace yyyy. If bluez asked for pin
-then could tell it instead of copy it, but copy easier then remembering 
-hundreds
-of pins.
->> >   Both systems I get:
->> >Bluetooth: Unexpected continuation frame (len 0)
->> >connect error: Too many levels of symbolic links (40)
-> Im afraid there is something wrong which the way you copy pairing
-> details from one system to the other, anyway it is probably not
-> recommended to do that in the first place.
-This only occurs with iphone, not a trackpad. So copying the pin should
-not be an issue. The pin is encoded, don't know by which crypto method.
-Plus, one way, phone to pc works, pc to phone doesn't.
->> >   Honestly forget which applies to connection from pc to phone, vs. phone to
->> >pc.
->> >If someone could direct me to documentation, which I cant find through web
->> >searching,
->> >or answer this, I'd be thankful. Hopefully, an automated process for end
->> >users to simply connect to devices, would be nice.
-> There is plenty of example on how to pair, gnome has done that if you
-> need a graphical interface and bluetoothctl is also capable of doing
-> it, but Im afraid the problem with your setup so I suggest you use a
-> different adapter per system if possible or mount the same partition
-> in the place of /var/lib/bluetooth so the system are synchronized when
-> you reboot/
-   ArchLinux normally has most info, debian not too bad, one guy's 
-article helped me
-to create a systemd service, based on his BT keyboard issues.
-   And I don't see why one controller must be dedicated per OS.
-   Binding to one partition, not an option. When LFS moves to another 
-machine
-it will never see that partition. At which time it will be a different 
-controller, but I am
-not at that development stage. I assume same hostname, yet different 
-controller will
-provide a new connection slot on phone, thereby not creating an issue of 
-pins. This
-would be a different /var/lib/bluetooth/<controller>/<same.MAC>/info.
+There's also a missing Signed-off-by and the lines should be wrapped at
+some 74 characters (right now it's basically a single line per
+paragraph).
 
-But all said, this points to bluez. I haven't even asked about its other 
-issues.
-Both systems:
-    Failed to obtain handles for "Service Changed" characteristic
-One with multiple:
-    Not enough free handles to register service
-
-Was just working out connecting. I have gotten it to where I can switch 
-between OSes
-and connect by phone issuing the connect command. Both are accompanied by:
-
-Bluetooth: Unexpected continuation frame (len 0)
-
-The ubuntu can issue, through graphical means (and NetworkManager), 
-connection.
-The LFS system, no graphical yet, just fb/gpu terminal, can not issue 
-connection.
-Bluetoothctl has the "info", trusted, paired, etc, but refuses to 
-connect. I have connected
-by "remove", restart phone and computer, issue new pin. Of course the 
-means that ubuntu
-will no longer work until I re-pair, new pin, which without the copy 
-means I must, remove,
-reboot, re-pair the LFS, and around I go.
-   Now if someone knows exact sequence of connection of a paired device 
-using either
-hcitool or bluetoothctl this would be helpful. I've tried agent on, 
-pairable on, discoverable on,
-pair <mac>, (already paired it complains), connect <mac>, different 
-sequences of those
-commands.
-   Some is new, just added in sound today (so not researched yet):
-bluetoothd[269]: a2dp-source profile connect failed for 
-70:3E:AC:50:D8:89: Protocol not available
-kernel: Bluetooth: Unexpected continuation frame (len 0)
-bluetoothd[269]: Can't open input device: No such file or directory (2)
-bluetoothd[269]: AVRCP: failed to init uinput for 70:3E:AC:50:D8:89
-bluetoothd[269]: Invalid folder length
-   I am by no means an expert, but logically and process of elimination 
-don't point
-to pin, nor the concept of one controller per OS, thou broadcom might 
-like that idea.
-A missing module, a support library maybe?
-Steve
+Johan
