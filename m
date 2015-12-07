@@ -1,74 +1,88 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <alex.aring@gmail.com>
+Date: Mon, 7 Dec 2015 15:12:44 +0100
+From: Alexander Aring <alex.aring@gmail.com>
+To: Michael Hennerich <michael.hennerich@analog.com>
+Cc: Stefan Schmidt <stefan@osg.samsung.com>, marcel@holtmann.org,
+	linux-wpan@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	chrisfriedt@gmail.com
+Subject: Re: [PATCH] drivers/net/ieee802154/adf7242: Driver for ADF7242 MAC
+ IEEE802154
+Message-ID: <20151207141239.GC20826@omega>
+References: <1449220149-14096-1-git-send-email-michael.hennerich@analog.com>
+ <566181E6.9070306@osg.samsung.com>
+ <56657561.70305@osg.samsung.com>
+ <56657926.5070604@analog.com>
+ <20151207132506.GA20826@omega>
+ <56658AE5.9010209@analog.com>
 MIME-Version: 1.0
-In-Reply-To: <5662D1DF.4000601@att.net>
-References: <5662D1DF.4000601@att.net>
-Date: Mon, 7 Dec 2015 16:24:40 +0200
-Message-ID: <CABBYNZ+ZtsMcnq2gaGcBeqcAXOCtwsRh9+wC0Y3qv_OV8XL8gA@mail.gmail.com>
-Subject: Re: bluez iphone connection
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Steve Abner <pheonix.sja@att.net>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <56658AE5.9010209@analog.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Steve,
+On Mon, Dec 07, 2015 at 02:34:29PM +0100, Michael Hennerich wrote:
+...
+> >Stefan, maybe you testing with the ATUSB firmware which going _not_
+> >into RX_AACK_ON. This was one of my lastest changes according to the
+> >ATUSB firmware. Please check that, otherwise the atusb doesn't send
+> >ack frames if ackrequest bit is set after receiving.
+> 
+> I was wondering where can I buy the ATUSB?
+> On the pulster page I can't find it.
+> 
 
-On Sat, Dec 5, 2015 at 2:00 PM, Steve Abner <pheonix.sja@att.net> wrote:
-> Hi, I'm end user on both ubuntu 15.10, and LFS with kdbus,systemd-227,4.2
-> kernel.
-> I've connected both systems to iphone, but with big song and dance. First
-> connected
-> to ubuntu, worked. Boot into LFS, use bluetoothctl, finally get it to
-> connect.  Go back to
-> ubuntu, must delete, use bluetoothctl remove, start process over, finally
-> get connected.
-> Boot LFS, cp over "info" as have done with trackpad. This cp is only work
-> around I've found
-> so that you dont have to reset and start from scratch when rebooting. But I
-> didn't
-> try to remove iphone and restart whole 30 min connection process on LFS. Go
-> back
-> to ubuntu and it just refuses to connect, did not request new pairing on
-> purpose, that's why
-> didn't attempt dance on LFS.
+They are all out of stock, everywhere. I cc Werner maybe he will bring
+back the atusb again. He do his stuff all open source and a possible
+solution would be a Kickstarter project.
 
-What kind of setup is this, can you use a different adapter per
-system, Bluetooth pair work in relation to the adapter address so the
-iPhone has no idea you are switching between systems.
+Another option would be:
 
->   Both systems I get:
-> Bluetooth: Unexpected continuation frame (len 0)
-> connect error: Too many levels of symbolic links (40)
+ - Produce your own atusb
+ - I know that "Christopher Friedt" produced some, maybe he will give/sell
+   some. :-) I cc'ed him here.
+ - use the experimental firmware [1] on RZUSBStick [0] support. Basics
+   functionality only and not stable such atusb. I ported the firmware
+   to this stick, it can be used by atusb driver. The transceiver is a
+   different -> at86rf230... and this transceiver we also doesn't
+   support by the at86rf230 because it's too different and a huge
+   errata.
 
-Im afraid there is something wrong which the way you copy pairing
-details from one system to the other, anyway it is probably not
-recommended to do that in the first place.
+> In general why is the framework not requesting ACKs on all non broadcast
+> DATA frames?
+> 
+> There is an option if turned on - it'll also request ACks on broadcasts...
 
->   Honestly forget which applies to connection from pc to phone, vs. phone to
-> pc.
-> If someone could direct me to documentation, which I cant find through web
-> searching,
-> or answer this, I'd be thankful. Hopefully, an automated process for end
-> users to simply connect to devices, would be nice.
+I suppose you use the af802154 socket family. I didn't touched the code
+and this socket family is full of bugs. We need a replacement for that.
 
-There is plenty of example on how to pair, gnome has done that if you
-need a graphical interface and bluetoothctl is also capable of doing
-it, but Im afraid the problem with your setup so I suggest you use a
-different adapter per system if possible or mount the same partition
-in the place of /var/lib/bluetooth so the system are synchronized when
-you reboot/
+The socket code which I was working is AF_PACKET.
 
->   Apologies if wrong list, but only one that I found on bluetooth, linux.
-> Steve
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
-> in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+In case of AF_PACKET:
+
+ dgram sockets: extended address and intra_pan communciaton only. The
+                AF_PACKET UAPI doesn't offer more address information.
+		We do a mapping to this currently, other option would be
+		to disable DGRAM on AF_PACKET. It's not possible to send
+		broadcast frames with that.
+		If you need that, something similar like af802154 should
+		be available, but it's currently broken.
+
+ raw sockets:   You can build the mac frame inside userspace with
+                complete control fc and address settings. We don't check
+		this frame if it's valid. This is not a bug.
 
 
+and 6LoWPAN:
 
--- 
-Luiz Augusto von Dentz
+6LoWPAN doesn't do that, the check should be at [2]. If it's currently
+broken at your side?
+
+- Alex
+
+[0] http://www.atmel.com/tools/RZUSBSTICK.aspx
+[1] http://alex.my-webspace.org/firmwares/rzusb.bin
+    Note: This is temprorary website, I know wpan.cakelab.org is down
+    currently and I working already to a DNS solution to redirect
+    wpan.cakelab.org -> /alex.my-webspace.org . At the moment it looks
+    like the provide has bugs inside his DNS web-frontend configuration
+    page. ;-)
+[2] http://lxr.free-electrons.com/source/net/ieee802154/6lowpan/tx.c#L220
