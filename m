@@ -3,139 +3,103 @@ Reply-To: <michael.hennerich@analog.com>
 Subject: Re: [PATCH] drivers/net/ieee802154/adf7242: Driver for ADF7242 MAC
  IEEE802154
 References: <1449220149-14096-1-git-send-email-michael.hennerich@analog.com>
- <566181E6.9070306@osg.samsung.com> <56657FCA.9000502@analog.com>
- <20151207135312.GB20826@omega>
+ <566181E6.9070306@osg.samsung.com> <56657561.70305@osg.samsung.com>
+ <56657926.5070604@analog.com> <20151207132506.GA20826@omega>
+ <56658AE5.9010209@analog.com> <20151207141239.GC20826@omega>
 To: Alexander Aring <alex.aring@gmail.com>
 CC: Stefan Schmidt <stefan@osg.samsung.com>, <marcel@holtmann.org>,
-	<linux-wpan@vger.kernel.org>, <linux-bluetooth@vger.kernel.org>
+	<linux-wpan@vger.kernel.org>, <linux-bluetooth@vger.kernel.org>,
+	<chrisfriedt@gmail.com>
 From: Michael Hennerich <michael.hennerich@analog.com>
-Message-ID: <56669828.3060606@analog.com>
-Date: Tue, 8 Dec 2015 09:43:20 +0100
+Message-ID: <56668FCF.3070206@analog.com>
+Date: Tue, 8 Dec 2015 09:07:43 +0100
 MIME-Version: 1.0
-In-Reply-To: <20151207135312.GB20826@omega>
+In-Reply-To: <20151207141239.GC20826@omega>
 Content-Type: text/plain; charset="utf-8"; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 12/07/2015 02:53 PM, Alexander Aring wrote:
-> Hi,
->
-> On Mon, Dec 07, 2015 at 01:47:06PM +0100, Michael Hennerich wrote:
+On 12/07/2015 03:12 PM, Alexander Aring wrote:
+> On Mon, Dec 07, 2015 at 02:34:29PM +0100, Michael Hennerich wrote:
 > ...
->>>> +static struct ieee802154_ops adf7242_ops = {
->>>> +    .owner = THIS_MODULE,
->>>> +    .xmit_sync = adf7242_xmit,
->>>> +    .ed = adf7242_ed,
->>>> +    .set_channel = adf7242_channel,
->>>> +    .set_hw_addr_filt = adf7242_set_hw_addr_filt,
->>>> +    .start = adf7242_start,
->>>> +    .stop = adf7242_stop,
->>>> +    .set_csma_params = adf7242_set_csma_params,
->>>> +    .set_frame_retries = adf7242_set_frame_retries,
->>>> +    .set_txpower = adf7242_set_txpower,
->>>> +    .set_promiscuous_mode = adf7242_set_promiscuous_mode,
->>>> +    .set_cca_ed_level = adf7242_set_cca_ed_level,
->>>
->>> Nice to see so many callbacks implemented. The only things I see missing
->>> is xmit_async, set_lbt and set_cca_mode. I would not make it a
->>> requirements to get these hooked up before merging this patch but we
->>> should consider it as todo items.
+>>> Stefan, maybe you testing with the ATUSB firmware which going _not_
+>>> into RX_AACK_ON. This was one of my lastest changes according to the
+>>> ATUSB firmware. Please check that, otherwise the atusb doesn't send
+>>> ack frames if ackrequest bit is set after receiving.
 >>
->> The part only supports CCA mode Energy above threshold.
->> Not sure what this LBT mode does on the AT86RFxxx driver.
->
-> This is for sub 1Ghz regulations in some country (Japan/Europe) area,
-> there CSMA/CA accoridng 802.15.4 isn't allowed at sub 1-Ghz, that's why
-> they introduced LBT.
->
-> That reminds me to work on a regulator db, again. :-)
->
-> Nevertheless it should not related to 2.4 Ghz global ISM band, so far I
-> know.
->
->> The ADF7242 only supports CSMA-CA and not some other listen before talk
->> flavour. The only oher option is to turn CSMA-CA completly off.
->
-> Another thing for ToDo list, add support for turning CSMA-CA handling
-> complete off, many transceiver has such option.
->
-> There exists ways currently to turn off CSMA handling only by choosing
-> the right backoff exponents, 802.15.4 writes:
->
-> Note that if macMinBE is set to zero, collision avoidance will be
-> disabled during the first iteration of this algorithm.
-
-First iteration only? And I think that is for slotted operation.
-I wouldn't overload MinBe with an option to disable CSMA-CA.
-Maybe add a new command?
-
-
->
-> Okay then another ToDo for wpan-tools would be to make a nice printout
-> that CSMA is disabled if "macMinBE is set to zero".
->
->> I'm also not sure if we need to supprot the async mode, while the sync mode
->> is working. For me the async mode looks like it tries to workaround some HW
->> access issues.
+>> I was wondering where can I buy the ATUSB?
+>> On the pulster page I can't find it.
 >>
 >
-> We came to the conclusion that "sync" callback is a workaround that
-> people can use spi_sync. :-)
+> They are all out of stock, everywhere. I cc Werner maybe he will bring
+> back the atusb again. He do his stuff all open source and a possible
+> solution would be a Kickstarter project.
+>
+> Another option would be:
+>
+>   - Produce your own atusb
+>   - I know that "Christopher Friedt" produced some, maybe he will give/sell
+>     some. :-) I cc'ed him here.
+>   - use the experimental firmware [1] on RZUSBStick [0] support. Basics
+>     functionality only and not stable such atusb. I ported the firmware
+>     to this stick, it can be used by atusb driver. The transceiver is a
+>     different -> at86rf230... and this transceiver we also doesn't
+>     support by the at86rf230 because it's too different and a huge
+>     errata.
 
-Hmmm - I don't quite understand.
-
-The difference is that xmit_sync blocks until the packet is transmitted, 
-while async returns immediately.
-spi_sync can be only used from context that can sleep. While spi_async
-runs it's own queue and provides a completion callback.
-
-These radios can only do one thing at the time. And in both cases there 
-are queues that are being stopped while the radio driver is busy doing 
-something.
-
-So the only thing is the IF down/up issue?
-
-The ADF7242 would actually return an error if the packet wasn’t sent
-or ACKed by the receiver. It's still looks like this information
-isn’t being used anywhere.
-
-Not a big deal - but in addition received ACKs (that would potentially 
-indicate that the packet was successfully delivered) cause warnings and 
-are completely dropped as well.
+Would be nice to have a USB MAC8021511.
+Guess I need to wait for the next lot being produced.
 
 
 >
-> Ununfortunately the nfc subsystem works also which such sync callback.
+>> In general why is the framework not requesting ACKs on all non broadcast
+>> DATA frames?
+>>
+>> There is an option if turned on - it'll also request ACks on broadcasts...
 >
-> Currently working of sync xmit:
+> I suppose you use the af802154 socket family. I didn't touched the code
+> and this socket family is full of bugs. We need a replacement for that.
 >
->   - ieee802154_tx (softirq context, might_sleep() will fail).
->      - set parameters schedule workqueue /* queue_work(...) */
->        /* sleeping phase */ <-- we lost the context of ieee802154_tx, the
->                                 locks are not held anymore. Others
->                                 netdev_ops are possible.
->   - ieee802154_xmit_worker will be scheduled <--- Does this still
->   						 working if a stop
-> 						 callback was running
-> 						 inside the
-> 						 "sleeping phase"?
->      - /* sleeping: wait for completion */ when tx complete is triggered
->                                            irq triggered.
+> The socket code which I was working is AF_PACKET.
 >
-> With async:
+> In case of AF_PACKET:
 >
-> The context of ieee802154_tx will be held until the driver "xmit_async"
-> callback is done. This callback should call spi_async which cannot be
-> interrupted until the "last" complete callback is done.
+>   dgram sockets: extended address and intra_pan communciaton only. The
+>                  AF_PACKET UAPI doesn't offer more address information.
+> 		We do a mapping to this currently, other option would be
+> 		to disable DGRAM on AF_PACKET. It's not possible to send
+> 		broadcast frames with that.
+> 		If you need that, something similar like af802154 should
+> 		be available, but it's currently broken.
 >
-> Then a stop callback can occur at the time where the hardware "actually"
-> transmit the frame. This is a complete async process, there is no "wait
-> for completion" anymore. The complete replacement would be
-> "ieee802154_xmit_complete".
+>   raw sockets:   You can build the mac frame inside userspace with
+>                  complete control fc and address settings. We don't check
+> 		this frame if it's valid. This is not a bug.
 >
-> Drivers should also disable/enable the tx/rx irq's when doing stop/start,
-> if possible.
+>
+> and 6LoWPAN:
+>
+> 6LoWPAN doesn't do that, the check should be at [2]. If it's currently
+> broken at your side?
+
+Maybe - I still use the lowpan-tools.
+And it locks like ACKs must be enabled via 
+NL802154_CMD_SET_ACKREQ_DEFAULT, which lowpan-tools doesn't do.
+Wondering why it's not by default enabled...
+So I patched my kernel, probably in the wrong place.
+
+
+
 >
 > - Alex
+>
+> [0] http://www.atmel.com/tools/RZUSBSTICK.aspx
+> [1] http://alex.my-webspace.org/firmwares/rzusb.bin
+>      Note: This is temprorary website, I know wpan.cakelab.org is down
+>      currently and I working already to a DNS solution to redirect
+>      wpan.cakelab.org -> /alex.my-webspace.org . At the moment it looks
+>      like the provide has bugs inside his DNS web-frontend configuration
+>      page. ;-)
+> [2] http://lxr.free-electrons.com/source/net/ieee802154/6lowpan/tx.c#L220
 >
 
 
