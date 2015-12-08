@@ -1,65 +1,109 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Hsin-Yu Chao <hychao@chromium.org>
+From: Steve Abner <pheonix.sja@att.net>
+Subject: Re: bluez iphone connection
 To: linux-bluetooth@vger.kernel.org
-Cc: luiz.dentz@gmail.com, Hsin-Yu Chao <hychao@chromium.org>
-Subject: [PATCH] audio/a2dp - Fix unbalanced setup ref/unref
-Date: Tue,  8 Dec 2015 14:53:37 +0800
-Message-Id: <1449557617-3413-1-git-send-email-hychao@chromium.org>
+References: <5662D1DF.4000601@att.net>
+ <CABBYNZ+ZtsMcnq2gaGcBeqcAXOCtwsRh9+wC0Y3qv_OV8XL8gA@mail.gmail.com>
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Message-ID: <56664C25.8040308@att.net>
+Date: Mon, 7 Dec 2015 22:19:01 -0500
+MIME-Version: 1.0
+In-Reply-To: <CABBYNZ+ZtsMcnq2gaGcBeqcAXOCtwsRh9+wC0Y3qv_OV8XL8gA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-A crash was observed with backtrace below at setup_unref() inside
-a2dp_cancel(). Evidence is showing that this crash occurred after
-commit 33b447d where additional setup_unref() is being called.
-Remove a suspious setup_unref() call in 0889e24 which might be
-the cause to this crash.
 
-(libc-2.19.so -abort.c:89 ) abort
-(libc-2.19.so -libc_fatal.c:175 ) __libc_message
-(libc-2.19.so -malloc.c:4991 ) malloc_printerr
-(libc-2.19.so -malloc.c:3837 ) _int_free
-(bluetoothd -a2dp.c:2150 ) a2dp_cancel
-(bluetoothd -transport.c:231 ) media_owner_remove
-(bluetoothd -transport.c:244 ) media_transport_remove_owner
-(bluetoothd -transport.c:734 ) media_transport_free
-(bluetoothd -object.c:658 ) remove_interface
-(bluetoothd -object.c:1382 ) g_dbus_unregister_interface
-(bluetoothd -transport.c:182 ) media_transport_destroy
-(bluetoothd -media.c:246 ) clear_endpoint
-(bluetoothd -media.c:468 ) release_endpoint
-(bluetoothd -media.c:1879 ) path_free
-(bluetoothd -object.c:658 ) remove_interface
-(bluetoothd -object.c:1382 ) g_dbus_unregister_interface
-(libglib-2.0.so.0.3400.3 -gslist.c:894 ) g_slist_foreach
-(bluetoothd -adapter.c:4171 ) adapter_remove
-(bluetoothd -adapter.c:7453 ) index_removed
-(bluetoothd -queue.c:251 ) queue_foreach
-(bluetoothd -mgmt.c:280 ) can_read_data
-(bluetoothd -io-glib.c:170 ) watch_callback
-(libglib-2.0.so.0.3400.3 -gmain.c:2715 ) g_main_context_dispatch
-(libglib-2.0.so.0.3400.3 -gmain.c:3290 ) g_main_context_iterate
-(libglib-2.0.so.0.3400.3 -gmain.c:3484 ) g_main_loop_run
-(bluetoothd -main.c:661 ) main
-(libc-2.19.so -libc-start.c:292 ) __libc_start_main
 
-Signed-off-by: Hsin-Yu Chao <hychao@chromium.org>
----
- profiles/audio/a2dp.c | 2 --
- 1 file changed, 2 deletions(-)
+On 12/07/2015 09:24 AM, Luiz Augusto von Dentz wrote:
+> What kind of setup is this, can you use a different adapter per
+> system, Bluetooth pair work in relation to the adapter address so the
+> iPhone has no idea you are switching between systems.
+One computer, two operating systems, one common controller. I really like
+the idea that the phone or trackpad shouldn't care about switching systems.
+Problem I have is Bluez has to set pairing, not user, so one system sets 
+with
+pin of xxxx, other with yyyy, device seems to say machine A, so I'll except
+pin xxxx, but not yyyy. So copy xxxx to replace yyyy. If bluez asked for pin
+then could tell it instead of copy it, but copy easier then remembering 
+hundreds
+of pins.
+>> >   Both systems I get:
+>> >Bluetooth: Unexpected continuation frame (len 0)
+>> >connect error: Too many levels of symbolic links (40)
+> Im afraid there is something wrong which the way you copy pairing
+> details from one system to the other, anyway it is probably not
+> recommended to do that in the first place.
+This only occurs with iphone, not a trackpad. So copying the pin should
+not be an issue. The pin is encoded, don't know by which crypto method.
+Plus, one way, phone to pc works, pc to phone doesn't.
+>> >   Honestly forget which applies to connection from pc to phone, vs. phone to
+>> >pc.
+>> >If someone could direct me to documentation, which I cant find through web
+>> >searching,
+>> >or answer this, I'd be thankful. Hopefully, an automated process for end
+>> >users to simply connect to devices, would be nice.
+> There is plenty of example on how to pair, gnome has done that if you
+> need a graphical interface and bluetoothctl is also capable of doing
+> it, but Im afraid the problem with your setup so I suggest you use a
+> different adapter per system if possible or mount the same partition
+> in the place of /var/lib/bluetooth so the system are synchronized when
+> you reboot/
+   ArchLinux normally has most info, debian not too bad, one guy's 
+article helped me
+to create a systemd service, based on his BT keyboard issues.
+   And I don't see why one controller must be dedicated per OS.
+   Binding to one partition, not an option. When LFS moves to another 
+machine
+it will never see that partition. At which time it will be a different 
+controller, but I am
+not at that development stage. I assume same hostname, yet different 
+controller will
+provide a new connection slot on phone, thereby not creating an issue of 
+pins. This
+would be a different /var/lib/bluetooth/<controller>/<same.MAC>/info.
 
-diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
-index 82e75bf..63c9366 100644
---- a/profiles/audio/a2dp.c
-+++ b/profiles/audio/a2dp.c
-@@ -450,8 +450,6 @@ done:
- 		setup->err = NULL;
- 	}
- 
--	setup_unref(setup);
--
- 	return FALSE;
- }
- 
--- 
-2.1.2
+But all said, this points to bluez. I haven't even asked about its other 
+issues.
+Both systems:
+    Failed to obtain handles for "Service Changed" characteristic
+One with multiple:
+    Not enough free handles to register service
 
+Was just working out connecting. I have gotten it to where I can switch 
+between OSes
+and connect by phone issuing the connect command. Both are accompanied by:
+
+Bluetooth: Unexpected continuation frame (len 0)
+
+The ubuntu can issue, through graphical means (and NetworkManager), 
+connection.
+The LFS system, no graphical yet, just fb/gpu terminal, can not issue 
+connection.
+Bluetoothctl has the "info", trusted, paired, etc, but refuses to 
+connect. I have connected
+by "remove", restart phone and computer, issue new pin. Of course the 
+means that ubuntu
+will no longer work until I re-pair, new pin, which without the copy 
+means I must, remove,
+reboot, re-pair the LFS, and around I go.
+   Now if someone knows exact sequence of connection of a paired device 
+using either
+hcitool or bluetoothctl this would be helpful. I've tried agent on, 
+pairable on, discoverable on,
+pair <mac>, (already paired it complains), connect <mac>, different 
+sequences of those
+commands.
+   Some is new, just added in sound today (so not researched yet):
+bluetoothd[269]: a2dp-source profile connect failed for 
+70:3E:AC:50:D8:89: Protocol not available
+kernel: Bluetooth: Unexpected continuation frame (len 0)
+bluetoothd[269]: Can't open input device: No such file or directory (2)
+bluetoothd[269]: AVRCP: failed to init uinput for 70:3E:AC:50:D8:89
+bluetoothd[269]: Invalid folder length
+   I am by no means an expert, but logically and process of elimination 
+don't point
+to pin, nor the concept of one controller per OS, thou broadcom might 
+like that idea.
+A missing module, a support library maybe?
+Steve
