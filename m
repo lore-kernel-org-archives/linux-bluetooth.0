@@ -3,73 +3,49 @@ Reply-To: <michael.hennerich@analog.com>
 Subject: Re: [PATCH v2] drivers/net/ieee802154/adf7242: Driver for ADF7242 MAC
  IEEE802154
 References: <1449575525-23259-1-git-send-email-michael.hennerich@analog.com>
- <5666DD06.1080005@osg.samsung.com> <5666E3BE.60808@osg.samsung.com>
+ <5666E986.8070105@osg.samsung.com>
 To: Stefan Schmidt <stefan@osg.samsung.com>, <alex.aring@gmail.com>,
 	<stefan@datenfreihafen.org>, <marcel@holtmann.org>
 CC: <linux-wpan@vger.kernel.org>, <linux-bluetooth@vger.kernel.org>
 From: Michael Hennerich <michael.hennerich@analog.com>
-Message-ID: <5666EFB5.2040706@analog.com>
-Date: Tue, 8 Dec 2015 15:56:53 +0100
+Message-ID: <5666ECF7.1000707@analog.com>
+Date: Tue, 8 Dec 2015 15:45:11 +0100
 MIME-Version: 1.0
-In-Reply-To: <5666E3BE.60808@osg.samsung.com>
+In-Reply-To: <5666E986.8070105@osg.samsung.com>
 Content-Type: text/plain; charset="utf-8"; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 12/08/2015 03:05 PM, Stefan Schmidt wrote:
+On 12/08/2015 03:30 PM, Stefan Schmidt wrote:
+> Hello.
 >
+> One last thing, hopefully. :)
 >
-> On 08/12/15 14:37, Stefan Schmidt wrote:
->> Hello.
->>
->> On 08/12/15 12:52, michael.hennerich@analog.com wrote:
+> On 08/12/15 12:52, michael.hennerich@analog.com wrote:
+>
+> [snip]
+>> +
+>> +    dev_info(&spi->dev, "mac802154 IRQ-%d registered\n", spi->irq);
+>> +
+>> +    return ret;
+>> +
+>> +    ieee802154_unregister_hw(lp->hw);
+>
+> The function call after return will never be called. Guess you want to
+> make sure the error handling is correct here.
 
 
->>> +++ b/drivers/net/ieee802154/adf7242.c
->>> @@ -0,0 +1,1251 @@
->>> +/*
->>> + * Analog Devices ADF7242 Low-Power IEEE 802.15.4 Transceiver
->>> + *
->>> + * Copyright 2009-2015 Analog Devices Inc.
->>> + *
->>> + * Licensed under the GPL-2 or later.
->>> + *
->>> + * http://www.analog.com/ADF7242
->>> + */
->>> +
->>> +#include <linux/kernel.h>
->>> +#include <linux/module.h>
->>> +#include <linux/interrupt.h>
->>> +#include <linux/delay.h>
->>> +#include <linux/mutex.h>
->>> +#include <linux/workqueue.h>
->>> +#include <linux/spinlock.h>
->>> +#include <linux/firmware.h>
->>> +#include <linux/spi/spi.h>
->>> +#include <linux/skbuff.h>
->>> +#include <linux/of.h>
->>> +#include <linux/irq.h>
->>> +#include <linux/delay.h>
->>> +#include <linux/debugfs.h>
->>> +#include <linux/ieee802154.h>
->>> +#include <net/mac802154.h>
->>> +#include <net/cfg802154.h>
->>> +
->>> +#define FIRMWARE "adf7242_firmware.bin"
->>> +#define MAX_POLL_LOOPS 200
->>
->> You increased the MAX_POLL_LOOPS to 200 from 50 here since the last
->> version. Any reason for it?
+Yeah - this line can be removed completely.
+Thanks for pointing out.
 
-Hi Stefan,
 
-Two reasons.
-I added a wait for RC_STATUS_PHY_RDY at the top of the threaded ISR 
-handler. Depending on the state it may now poll a little bit longer. 
-Typical loop counts I've seen were around 20-30.
-The platform I'm currently testing with requires a FPGA bitsream rebuild 
-to change the SPI clock rate. In case SPI clock moved to the fast end 50 
-loops might not be sufficient anymore.
-I then added 100% on top of it to be on the safe side.
+
+>> +err_hw_init:
+>> +    mutex_destroy(&lp->bmux);
+>> +    ieee802154_free_hw(lp->hw);
+>
+> regards
+> Stefan Schmidt
+
 
 -- 
 Greetings,
