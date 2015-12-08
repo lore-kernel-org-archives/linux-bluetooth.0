@@ -1,114 +1,65 @@
-Return-Path: <Michael.Hennerich@analog.com>
-Reply-To: <michael.hennerich@analog.com>
-Subject: Re: [PATCH] drivers/net/ieee802154/adf7242: Driver for ADF7242 MAC
- IEEE802154
-References: <1449220149-14096-1-git-send-email-michael.hennerich@analog.com>
- <566181E6.9070306@osg.samsung.com> <56657561.70305@osg.samsung.com>
- <56657926.5070604@analog.com> <20151207132506.GA20826@omega>
- <56658AE5.9010209@analog.com> <20151207141239.GC20826@omega>
-To: Alexander Aring <alex.aring@gmail.com>
-CC: Stefan Schmidt <stefan@osg.samsung.com>, <marcel@holtmann.org>,
-	<linux-wpan@vger.kernel.org>, <linux-bluetooth@vger.kernel.org>,
-	<chrisfriedt@gmail.com>
-From: Michael Hennerich <michael.hennerich@analog.com>
-Message-ID: <56668FCF.3070206@analog.com>
-Date: Tue, 8 Dec 2015 09:07:43 +0100
-MIME-Version: 1.0
-In-Reply-To: <20151207141239.GC20826@omega>
-Content-Type: text/plain; charset="utf-8"; format=flowed
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Hsin-Yu Chao <hychao@chromium.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: luiz.dentz@gmail.com, Hsin-Yu Chao <hychao@chromium.org>
+Subject: [PATCH] audio/a2dp - Fix unbalanced setup ref/unref
+Date: Tue,  8 Dec 2015 14:53:37 +0800
+Message-Id: <1449557617-3413-1-git-send-email-hychao@chromium.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 12/07/2015 03:12 PM, Alexander Aring wrote:
-> On Mon, Dec 07, 2015 at 02:34:29PM +0100, Michael Hennerich wrote:
-> ...
->>> Stefan, maybe you testing with the ATUSB firmware which going _not_
->>> into RX_AACK_ON. This was one of my lastest changes according to the
->>> ATUSB firmware. Please check that, otherwise the atusb doesn't send
->>> ack frames if ackrequest bit is set after receiving.
->>
->> I was wondering where can I buy the ATUSB?
->> On the pulster page I can't find it.
->>
->
-> They are all out of stock, everywhere. I cc Werner maybe he will bring
-> back the atusb again. He do his stuff all open source and a possible
-> solution would be a Kickstarter project.
->
-> Another option would be:
->
->   - Produce your own atusb
->   - I know that "Christopher Friedt" produced some, maybe he will give/sell
->     some. :-) I cc'ed him here.
->   - use the experimental firmware [1] on RZUSBStick [0] support. Basics
->     functionality only and not stable such atusb. I ported the firmware
->     to this stick, it can be used by atusb driver. The transceiver is a
->     different -> at86rf230... and this transceiver we also doesn't
->     support by the at86rf230 because it's too different and a huge
->     errata.
+A crash was observed with backtrace below at setup_unref() inside
+a2dp_cancel(). Evidence is showing that this crash occurred after
+commit 33b447d where additional setup_unref() is being called.
+Remove a suspious setup_unref() call in 0889e24 which might be
+the cause to this crash.
 
-Would be nice to have a USB MAC8021511.
-Guess I need to wait for the next lot being produced.
+(libc-2.19.so -abort.c:89 ) abort
+(libc-2.19.so -libc_fatal.c:175 ) __libc_message
+(libc-2.19.so -malloc.c:4991 ) malloc_printerr
+(libc-2.19.so -malloc.c:3837 ) _int_free
+(bluetoothd -a2dp.c:2150 ) a2dp_cancel
+(bluetoothd -transport.c:231 ) media_owner_remove
+(bluetoothd -transport.c:244 ) media_transport_remove_owner
+(bluetoothd -transport.c:734 ) media_transport_free
+(bluetoothd -object.c:658 ) remove_interface
+(bluetoothd -object.c:1382 ) g_dbus_unregister_interface
+(bluetoothd -transport.c:182 ) media_transport_destroy
+(bluetoothd -media.c:246 ) clear_endpoint
+(bluetoothd -media.c:468 ) release_endpoint
+(bluetoothd -media.c:1879 ) path_free
+(bluetoothd -object.c:658 ) remove_interface
+(bluetoothd -object.c:1382 ) g_dbus_unregister_interface
+(libglib-2.0.so.0.3400.3 -gslist.c:894 ) g_slist_foreach
+(bluetoothd -adapter.c:4171 ) adapter_remove
+(bluetoothd -adapter.c:7453 ) index_removed
+(bluetoothd -queue.c:251 ) queue_foreach
+(bluetoothd -mgmt.c:280 ) can_read_data
+(bluetoothd -io-glib.c:170 ) watch_callback
+(libglib-2.0.so.0.3400.3 -gmain.c:2715 ) g_main_context_dispatch
+(libglib-2.0.so.0.3400.3 -gmain.c:3290 ) g_main_context_iterate
+(libglib-2.0.so.0.3400.3 -gmain.c:3484 ) g_main_loop_run
+(bluetoothd -main.c:661 ) main
+(libc-2.19.so -libc-start.c:292 ) __libc_start_main
 
+Signed-off-by: Hsin-Yu Chao <hychao@chromium.org>
+---
+ profiles/audio/a2dp.c | 2 --
+ 1 file changed, 2 deletions(-)
 
->
->> In general why is the framework not requesting ACKs on all non broadcast
->> DATA frames?
->>
->> There is an option if turned on - it'll also request ACks on broadcasts...
->
-> I suppose you use the af802154 socket family. I didn't touched the code
-> and this socket family is full of bugs. We need a replacement for that.
->
-> The socket code which I was working is AF_PACKET.
->
-> In case of AF_PACKET:
->
->   dgram sockets: extended address and intra_pan communciaton only. The
->                  AF_PACKET UAPI doesn't offer more address information.
-> 		We do a mapping to this currently, other option would be
-> 		to disable DGRAM on AF_PACKET. It's not possible to send
-> 		broadcast frames with that.
-> 		If you need that, something similar like af802154 should
-> 		be available, but it's currently broken.
->
->   raw sockets:   You can build the mac frame inside userspace with
->                  complete control fc and address settings. We don't check
-> 		this frame if it's valid. This is not a bug.
->
->
-> and 6LoWPAN:
->
-> 6LoWPAN doesn't do that, the check should be at [2]. If it's currently
-> broken at your side?
-
-Maybe - I still use the lowpan-tools.
-And it locks like ACKs must be enabled via 
-NL802154_CMD_SET_ACKREQ_DEFAULT, which lowpan-tools doesn't do.
-Wondering why it's not by default enabled...
-So I patched my kernel, probably in the wrong place.
-
-
-
->
-> - Alex
->
-> [0] http://www.atmel.com/tools/RZUSBSTICK.aspx
-> [1] http://alex.my-webspace.org/firmwares/rzusb.bin
->      Note: This is temprorary website, I know wpan.cakelab.org is down
->      currently and I working already to a DNS solution to redirect
->      wpan.cakelab.org -> /alex.my-webspace.org . At the moment it looks
->      like the provide has bugs inside his DNS web-frontend configuration
->      page. ;-)
-> [2] http://lxr.free-electrons.com/source/net/ieee802154/6lowpan/tx.c#L220
->
-
-
+diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
+index 82e75bf..63c9366 100644
+--- a/profiles/audio/a2dp.c
++++ b/profiles/audio/a2dp.c
+@@ -450,8 +450,6 @@ done:
+ 		setup->err = NULL;
+ 	}
+ 
+-	setup_unref(setup);
+-
+ 	return FALSE;
+ }
+ 
 -- 
-Greetings,
-Michael
+2.1.2
 
---
-Analog Devices GmbH      Wilhelm-Wagenfeld-Str. 6      80807 Muenchen
-Sitz der Gesellschaft: Muenchen; Registergericht: Muenchen HRB 40368;
-Geschaeftsfuehrer:Dr.Carsten Suckrow, Thomas Wessel, William A. Martin,
-Margaret Seif
