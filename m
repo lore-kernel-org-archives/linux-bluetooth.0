@@ -1,69 +1,147 @@
-Return-Path: <lauro@polilinux.com.br>
-To: Marcel Holtmann <marcel@holtmann.org>
-Subject: [PATCH] Bluetooth: Add USB ID 13D3:3487 to ath3k
+Return-Path: <alex.aring@gmail.com>
+Date: Wed, 9 Dec 2015 11:31:30 +0100
+From: Alexander Aring <alex.aring@gmail.com>
+To: Michael Hennerich <michael.hennerich@analog.com>
+Cc: Stefan Schmidt <stefan@osg.samsung.com>, marcel@holtmann.org,
+	linux-wpan@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	chrisfriedt@gmail.com
+Subject: Re: [PATCH] drivers/net/ieee802154/adf7242: Driver for ADF7242 MAC
+ IEEE802154
+Message-ID: <20151209103124.GA1036@omega>
+References: <1449220149-14096-1-git-send-email-michael.hennerich@analog.com>
+ <566181E6.9070306@osg.samsung.com>
+ <56657561.70305@osg.samsung.com>
+ <56657926.5070604@analog.com>
+ <20151207132506.GA20826@omega>
+ <56658AE5.9010209@analog.com>
+ <20151207141239.GC20826@omega>
+ <56668FCF.3070206@analog.com>
+ <20151208155332.GA766@omega>
+ <5666FF07.6050706@analog.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Date: Wed, 09 Dec 2015 11:51:55 -0200
-From: lauro@polilinux.com.br
-Cc: linux-bluetooth@vger.kernel.org
-Message-ID: <44c3bb67d7b1acc9c9ed8a9df1c37d72@polilinux.com.br>
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <5666FF07.6050706@analog.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add hw id to ath3k usb device list and btusb blacklist.
+Hi,
 
-T:  Bus=01 Lev=01 Prnt=01 Port=08 Cnt=02 Dev#=  4 Spd=12  MxCh= 0
-D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=13d3 ProdID=3487 Rev=00.02
-C:  #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
-I:  If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+On Tue, Dec 08, 2015 at 05:02:15PM +0100, Michael Hennerich wrote:
+> On 12/08/2015 04:53 PM, Alexander Aring wrote:
+> >Hi,
+> >
+> >On Tue, Dec 08, 2015 at 09:07:43AM +0100, Michael Hennerich wrote:
+> >>On 12/07/2015 03:12 PM, Alexander Aring wrote:
+> >>>On Mon, Dec 07, 2015 at 02:34:29PM +0100, Michael Hennerich wrote:
+> >>>...
+> >>>>>Stefan, maybe you testing with the ATUSB firmware which going _not_
+> >>>>>into RX_AACK_ON. This was one of my lastest changes according to the
+> >>>>>ATUSB firmware. Please check that, otherwise the atusb doesn't send
+> >>>>>ack frames if ackrequest bit is set after receiving.
+> >>>>
+> >>>>I was wondering where can I buy the ATUSB?
+> >>>>On the pulster page I can't find it.
+> >>>>
+> >>>
+> >>>They are all out of stock, everywhere. I cc Werner maybe he will bring
+> >>>back the atusb again. He do his stuff all open source and a possible
+> >>>solution would be a Kickstarter project.
+> >>>
+> >>>Another option would be:
+> >>>
+> >>>  - Produce your own atusb
+> >>>  - I know that "Christopher Friedt" produced some, maybe he will give/sell
+> >>>    some. :-) I cc'ed him here.
+> >>>  - use the experimental firmware [1] on RZUSBStick [0] support. Basics
+> >>>    functionality only and not stable such atusb. I ported the firmware
+> >>>    to this stick, it can be used by atusb driver. The transceiver is a
+> >>>    different -> at86rf230... and this transceiver we also doesn't
+> >>>    support by the at86rf230 because it's too different and a huge
+> >>>    errata.
+> >>
+> >>Would be nice to have a USB MAC8021511.
+> >>Guess I need to wait for the next lot being produced.
+> >>
+> >>
+> >
+> >ok. The RZUSBSTICK is still available but very poor state.
+> >
+> >>>
+> >>>>In general why is the framework not requesting ACKs on all non broadcast
+> >>>>DATA frames?
+> >>>>
+> >>>>There is an option if turned on - it'll also request ACks on broadcasts...
+> >>>
+> >>>I suppose you use the af802154 socket family. I didn't touched the code
+> >>>and this socket family is full of bugs. We need a replacement for that.
+> >>>
+> >>>The socket code which I was working is AF_PACKET.
+> >>>
+> >>>In case of AF_PACKET:
+> >>>
+> >>>  dgram sockets: extended address and intra_pan communciaton only. The
+> >>>                 AF_PACKET UAPI doesn't offer more address information.
+> >>>		We do a mapping to this currently, other option would be
+> >>>		to disable DGRAM on AF_PACKET. It's not possible to send
+> >>>		broadcast frames with that.
+> >>>		If you need that, something similar like af802154 should
+> >>>		be available, but it's currently broken.
+> >>>
+> >>>  raw sockets:   You can build the mac frame inside userspace with
+> >>>                 complete control fc and address settings. We don't check
+> >>>		this frame if it's valid. This is not a bug.
+> >>>
+> >>>
+> >>>and 6LoWPAN:
+> >>>
+> >>>6LoWPAN doesn't do that, the check should be at [2]. If it's currently
+> >>>broken at your side?
+> >>
+> >>Maybe - I still use the lowpan-tools.
+> >>And it locks like ACKs must be enabled via NL802154_CMD_SET_ACKREQ_DEFAULT,
+> >>which lowpan-tools doesn't do.
+> >>Wondering why it's not by default enabled...
+> >>So I patched my kernel, probably in the wrong place.
+> >>
+> >
+> >The lowpan-tools are deprecated. The official website is back (from what
+> >I recovered), you can get wpan-tools at [0].
+> >
+> >The ackreq_default is false by default (which indicates no ARET
+> >handling/no ackrequest bit is set) because this requires that the other
+> >side can deal with ack handling. Otherwise the node will get the frame 3
+> >times.
+> >
+> >The conclusion is to set the ack handling default to false, if you know
+> >your network can do ack handling then you can turn it on with the
+> >wpan-tools.
+> >
+> >Do you think we should enable it by default and if there are non IEEE
+> >802.15.4 valid nodes around which doesn't support ACK handling we should
+> >simple ignore that?
+> 
+> I thought that ACK handling is mandatory for 802.15.4.
 
-Requires these firmwares:
-ar3k/AthrBT_0x11020100.dfu and ar3k/ramps_0x11020100_40.dfu
-Firmwares are available in linux-firmware.
+It is, otherwise some MLME-ops would not functional. The _open_ _source_
+reality outside looks different. There are of course nodes which doesn't
+support ack handling (I have some contiki nodes with cc2520, but so far
+I know contiki also handles dataframes with 6LoWPAN only).
 
-Device found in a laptop ASUS model N552VW. It's an Atheros AR9462 chip.
+I also didn't saw any OS implementation for MLME-ops :( I know the Xbee [0]
+transceiver which is a "kind" of HardMAC transceiver. MLME-ops can be
+triggered by right "AT-FOO" uart command.
 
-Signed-off-by: Lauro Costa <lauro@polilinux.com.br>
----
-  drivers/bluetooth/ath3k.c | 2 ++
-  drivers/bluetooth/btusb.c | 1 +
-  2 files changed, 3 insertions(+)
+I know that Christopher Friedt want to have some MLME features inside
+the kernel and already worked on some parts for scanning.
 
-diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
-index fa893c3..9ad37e1 100644
---- a/drivers/bluetooth/ath3k.c
-+++ b/drivers/bluetooth/ath3k.c
-@@ -118,6 +118,7 @@ static const struct usb_device_id ath3k_table[] = {
-  	{ USB_DEVICE(0x13d3, 0x3423) },
-  	{ USB_DEVICE(0x13d3, 0x3432) },
-  	{ USB_DEVICE(0x13d3, 0x3474) },
-+	{ USB_DEVICE(0x13d3, 0x3487) },
+> So if there are non compliant IEEE802154 nodes around we can turn it off.
+> 
+> Either way is fine with me.
+> 
 
-  	/* Atheros AR5BBU12 with sflash firmware */
-  	{ USB_DEVICE(0x0489, 0xE02C) },
-@@ -180,6 +181,7 @@ static const struct usb_device_id ath3k_blist_tbl[] 
-= {
-  	{ USB_DEVICE(0x13d3, 0x3423), .driver_info = BTUSB_ATH3012 },
-  	{ USB_DEVICE(0x13d3, 0x3432), .driver_info = BTUSB_ATH3012 },
-  	{ USB_DEVICE(0x13d3, 0x3474), .driver_info = BTUSB_ATH3012 },
-+	{ USB_DEVICE(0x13d3, 0x3487), .driver_info = BTUSB_ATH3012 },
+Okay. It's one simple switch to change it. I would wait here for Stefans
+opinion about that.
 
-  	/* Atheros AR5BBU22 with sflash firmware */
-  	{ USB_DEVICE(0x0489, 0xE036), .driver_info = BTUSB_ATH3012 },
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index a191e31..c2e3278 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -232,6 +232,7 @@ static const struct usb_device_id blacklist_table[] 
-= {
-  	{ USB_DEVICE(0x13d3, 0x3423), .driver_info = BTUSB_ATH3012 },
-  	{ USB_DEVICE(0x13d3, 0x3432), .driver_info = BTUSB_ATH3012 },
-  	{ USB_DEVICE(0x13d3, 0x3474), .driver_info = BTUSB_ATH3012 },
-+	{ USB_DEVICE(0x13d3, 0x3487), .driver_info = BTUSB_ATH3012 },
 
-  	/* Atheros AR5BBU12 with sflash firmware */
-  	{ USB_DEVICE(0x0489, 0xe02c), .driver_info = BTUSB_IGNORE },
--- 
-1.9.0
+- Alex
+
+[0] https://www.sparkfun.com/datasheets/Wireless/Zigbee/XBee-Datasheet.pdf
