@@ -1,70 +1,62 @@
-Return-Path: <linux-wpan-owner@vger.kernel.org>
-From: Alexander Aring <alex.aring@gmail.com>
-To: linux-wpan@vger.kernel.org
-Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-	kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCH bluetooth-next 00/10] 6lowpan: pending patches
-Date: Wed,  9 Dec 2015 22:17:06 +0100
-Message-Id: <1449695836-13937-1-git-send-email-alex.aring@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-wpan-owner@vger.kernel.org
+Return-Path: <connman-bounces@lists.01.org>
+Message-ID: <1449690002.8498.5.camel@linux.intel.com>
+Subject: Re: [PATCH] gdbus: Move typedefs for interwork with strict compilers
+From: Patrik Flykt <Patrik.Flykt@linux.intel.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Date: Wed, 09 Dec 2015 21:40:02 +0200
+In-Reply-To: <20151209102412.GA16103@t440s.lan>
+References: <1449590942-19235-1-git-send-email-patrik.flykt@linux.intel.com>
+ <20151209102412.GA16103@t440s.lan>
+Mime-Version: 1.0
+Cc: connman@lists.01.org, linux-bluetooth@vger.kernel.org,
+ Grant Erickson <marathon96@gmail.com>
+List-Unsubscribe: <https://lists.01.org/mailman/options/connman>,
+ <mailto:connman-request@lists.01.org?subject=unsubscribe>
+List-Archive: <http://lists.01.org/pipermail/connman/>
+List-Post: <mailto:connman@lists.01.org>
+List-Help: <mailto:connman-request@lists.01.org?subject=help>
+List-Subscribe: <https://lists.01.org/mailman/listinfo/connman>,
+ <mailto:connman-request@lists.01.org?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
+Errors-To: connman-bounces@lists.01.org
+Sender: "connman" <connman-bounces@lists.01.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
 
-these are the current pending patches for 6lowpan based on bluetooth-next.
-It contains the following new features:
- - per interface debugfs support, useful to add settings to offers a
-   fast/simple userspace api for debugging.
- - register of available NHC compression by IANA, see [0].
- - Adding "ipv6_addr_prefix_copy" functionality for upcoming IPHC stateful
-   compression.
+	Hi,
 
-- Alex
+On Wed, 2015-12-09 at 12:24 +0200, Johan Hedberg wrote:
+> Hi Patrik,
+> 
+> On Tue, Dec 08, 2015, Patrik Flykt wrote:
+> > Move enumeration type defintions AFTER the enumerations themselves are declared
+> > and defined such that the header works with strict compilers.
+> > 
+> > This occurs when building a plugin, compiled with C++, and occurs on all of:
+> > 
+> > arm-none-linux-gnueabi-g++ (Sourcery G++ Lite 2010q1-202) 4.4.1
+> > arm-poky-linux-gnueabi-g++ (GCC) 4.8.2
+> > g++ (Ubuntu 4.8.4-2ubuntu1~14.04) 4.8.4
+> > ---
+> > 
+> > 	Hi,
+> > 
+> > This patch came up on the ConnMan mailing list, applies to Bluez too.
+> > 
+> > The patch is rebased to latest upstream and commit message amended with
+> > more information.
+> 
+> Applied. Thanks.
+> 
+> Johan
 
-[0] https://www.iana.org/assignments/_6lowpan-parameters/_6lowpan-parameters.xhtml#lowpan_nhc
+Thanks. ConnMan ./gdbus is now in sync with Bluez.
 
-Alexander Aring (3):
-  6lowpan: add lowpan dev register helpers
-  6lowpan: add debugfs support
-  ipv6: add ipv6_addr_prefix_copy
+Cheers,
 
-Stefan Schmidt (7):
-  6lowpan: clarify Kconfig entries for upcoming GHC support
-  6lowpan: add nhc module for GHC hop-by-hopextension header detection
-  6lowpan: add nhc module for GHC UDP detection
-  6lowpan: add nhc module for GHC ICMPv6 detection
-  6lowpan: add nhc module for GHC destination extension header detection
-  6lowpan: add nhc module for GHC fragmentation extension header
-    detection
-  6lowpan: add nhc module for GHC routing extension header detection
+	Patrik
 
- include/net/6lowpan.h           | 10 ++++++-
- include/net/ipv6.h              | 15 +++++++++++
- net/6lowpan/6lowpan_i.h         | 28 +++++++++++++++++++
- net/6lowpan/Kconfig             | 47 ++++++++++++++++++++++++++++++--
- net/6lowpan/Makefile            |  9 +++++++
- net/6lowpan/core.c              | 59 +++++++++++++++++++++++++++++++++++++++--
- net/6lowpan/debugfs.c           | 53 ++++++++++++++++++++++++++++++++++++
- net/6lowpan/nhc_ghc_ext_dest.c  | 27 +++++++++++++++++++
- net/6lowpan/nhc_ghc_ext_frag.c  | 28 +++++++++++++++++++
- net/6lowpan/nhc_ghc_ext_hop.c   | 27 +++++++++++++++++++
- net/6lowpan/nhc_ghc_ext_route.c | 27 +++++++++++++++++++
- net/6lowpan/nhc_ghc_icmpv6.c    | 27 +++++++++++++++++++
- net/6lowpan/nhc_ghc_udp.c       | 27 +++++++++++++++++++
- net/bluetooth/6lowpan.c         |  8 +++---
- net/ieee802154/6lowpan/core.c   |  6 ++---
- 15 files changed, 384 insertions(+), 14 deletions(-)
- create mode 100644 net/6lowpan/6lowpan_i.h
- create mode 100644 net/6lowpan/debugfs.c
- create mode 100644 net/6lowpan/nhc_ghc_ext_dest.c
- create mode 100644 net/6lowpan/nhc_ghc_ext_frag.c
- create mode 100644 net/6lowpan/nhc_ghc_ext_hop.c
- create mode 100644 net/6lowpan/nhc_ghc_ext_route.c
- create mode 100644 net/6lowpan/nhc_ghc_icmpv6.c
- create mode 100644 net/6lowpan/nhc_ghc_udp.c
-
--- 
-2.6.1
-
+_______________________________________________
+connman mailing list
+connman@lists.01.org
+https://lists.01.org/mailman/listinfo/connman
