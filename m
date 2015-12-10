@@ -1,35 +1,26 @@
-Return-Path: <john@metanate.com>
-Date: Thu, 10 Dec 2015 11:08:39 +0000
-From: John Keeping <john@metanate.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Marcel Holtmann <marcel@holtmann.org>
-Subject: Re: [PATCH 0/2] Install btattach with "make install"
-Message-ID: <20151210110839.1eb744e2.john@metanate.com>
-In-Reply-To: <1449052500-10755-1-git-send-email-john@metanate.com>
-References: <1449052500-10755-1-git-send-email-john@metanate.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Return-Path: <davem@davemloft.net>
+Date: Wed, 09 Dec 2015 22:12:18 -0500 (EST)
+Message-Id: <20151209.221218.725611825764529098.davem@davemloft.net>
+To: marcel@holtmann.org
+Cc: alex.aring@gmail.com, linux-wpan@vger.kernel.org,
+ linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+ kernel@pengutronix.de, kuznet@ms2.inr.ac.ru, jmorris@namei.org,
+ yoshfuji@linux-ipv6.org, kaber@trash.net
+Subject: Re: [PATCH bluetooth-next 10/10] ipv6: add ipv6_addr_prefix_copy
+From: David Miller <davem@davemloft.net>
+In-Reply-To: <64AE99C3-E5EB-47D8-9B0A-FA5B35E93CB2@holtmann.org>
+References: <1449697591-15991-1-git-send-email-alex.aring@gmail.com>
+	<1449697591-15991-11-git-send-email-alex.aring@gmail.com>
+	<64AE99C3-E5EB-47D8-9B0A-FA5B35E93CB2@holtmann.org>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed,  2 Dec 2015 10:34:58 +0000, John Keeping wrote:
+From: Marcel Holtmann <marcel@holtmann.org>
+Date: Wed, 9 Dec 2015 14:28:38 -1000
 
-> Following a discussion last week [1], it seems that btattach should be
-> used in preference to hciattach when possible.  This series adds a
-> manual page for it and updates the makefile so that btattach is
-> installed via the standard mechanism.
-> 
-> For now, btattach is still marked as experimental so it wil only be
-> built and installed when experimental features are enabled.
-> 
-> [1] http://article.gmane.org/gmane.linux.bluez.kernel/65807
+> if there are no objections, I would like to take this change through the bluetooth-next tree.
 
-Ping?  Does anyone have any feedback on this?
+No problem:
 
-> John Keeping (2):
->   tools/btattach: add manual page
->   tools/btattach: install during "make install"
-> 
->  Makefile.tools   |  8 +++++++-
->  tools/btattach.1 | 53 +++++++++++++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 60 insertions(+), 1 deletion(-)
->  create mode 100644 tools/btattach.1
+Acked-by: David S. Miller <davem@davemloft.net>
