@@ -1,34 +1,76 @@
-Return-Path: <johan.hedberg@gmail.com>
-Date: Thu, 10 Dec 2015 21:27:27 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: John Keeping <john@metanate.com>
-Cc: linux-bluetooth@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>
-Subject: Re: [PATCH 0/2] Install btattach with "make install"
-Message-ID: <20151210192727.GA3541@t440s>
-References: <1449052500-10755-1-git-send-email-john@metanate.com>
- <20151210110839.1eb744e2.john@metanate.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20151210110839.1eb744e2.john@metanate.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [RFC BlueZ] doc/gatt-api: Make proper use of ObjectManager
+Date: Thu, 10 Dec 2015 16:53:00 -0200
+Message-Id: <1449773580-21594-1-git-send-email-luiz.dentz@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi John,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Thu, Dec 10, 2015, John Keeping wrote:
-> > Following a discussion last week [1], it seems that btattach should be
-> > used in preference to hciattach when possible.  This series adds a
-> > manual page for it and updates the makefile so that btattach is
-> > installed via the standard mechanism.
-> > 
-> > For now, btattach is still marked as experimental so it wil only be
-> > built and installed when experimental features are enabled.
-> > 
-> > [1] http://article.gmane.org/gmane.linux.bluez.kernel/65807
-> 
-> Ping?  Does anyone have any feedback on this?
+ObjectManager path shall not contain other intefaces in its root path, only
+child objects shall be included with many bindings following this.
 
-Sorry for the delay. Both patches look good and have now been applied to
-bluez.git. Thanks.
+Due to this limitation and also the fact that application might actually
+have a single ObjectManager path so all services can be registered at
+once.
+---
+ doc/gatt-api.txt | 17 ++++++++---------
+ 1 file changed, 8 insertions(+), 9 deletions(-)
 
+diff --git a/doc/gatt-api.txt b/doc/gatt-api.txt
+index d832c73..f1940ba 100644
+--- a/doc/gatt-api.txt
++++ b/doc/gatt-api.txt
+@@ -270,9 +270,9 @@ must be available on the root service path. An example application hierarchy
+ containing two separate GATT services may look like this:
+ 
+ -> /com/example
++  |   - org.freedesktop.DBus.ObjectManager
+   |
+   -> /com/example/service0
+-  | |   - org.freedesktop.DBus.ObjectManager
+   | |   - org.freedesktop.DBus.Properties
+   | |   - org.bluez.GattService1
+   | |
+@@ -289,7 +289,6 @@ containing two separate GATT services may look like this:
+   |       - org.bluez.GattDescriptor1
+   |
+   -> /com/example/service1
+-    |   - org.freedesktop.DBus.ObjectManager
+     |   - org.freedesktop.DBus.Properties
+     |   - org.bluez.GattService1
+     |
+@@ -309,21 +308,21 @@ Service		org.bluez
+ Interface	org.bluez.GattManager1 [Experimental]
+ Object path	[variable prefix]/{hci0,hci1,...}
+ 
+-Methods		void RegisterService(object service, dict options)
++Methods		void RegisterApplication(object application, dict options)
+ 
+-			Registers a local GATT service hierarchy as described
++			Registers a local GATT services hierarchy as described
+ 			above.
+ 
+-			"service" object path together with the D-Bus system
+-			bus connection ID define the identification of the
+-			application registering a GATT based service.
++			The application object path together with the D-Bus
++			system bus connection ID define the identification of
++			the application registering a GATT based service.
+ 
+ 			Possible errors: org.bluez.Error.InvalidArguments
+ 					 org.bluez.Error.AlreadyExists
+ 
+-		void UnregisterService(object service)
++		void UnregisterApplication(object application)
+ 
+-			This unregisters the service that has been
++			This unregisters the services that has been
+ 			previously registered. The object path parameter
+ 			must match the same value that has been used
+ 			on registration.
+-- 
+2.4.3
 
-Johan
