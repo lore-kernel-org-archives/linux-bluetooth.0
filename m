@@ -1,74 +1,45 @@
-Return-Path: <danny.schweizer@proofnet.de>
-From: Danny Schweizer <danny.schweizer@proofnet.de>
-To: marcel@holtmann.org
-Cc: linux-bluetooth@vger.kernel.org,
-	Danny Schweizer <danny.schweizer@proofnet.de>
-Subject: [PATCH] Bluetooth: Do not filter multicast addresses by default
-Date: Fri, 11 Dec 2015 10:04:54 +0100
-Message-Id: <1449824694-2238-1-git-send-email-danny.schweizer@proofnet.de>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+MIME-Version: 1.0
+Date: Fri, 11 Dec 2015 13:18:51 +0530
+Message-ID: <CAKafyqo9fvjW8iYWTm86-BL5gr54Rgjwp6kXwAhZoHei4oPLXA@mail.gmail.com>
+Subject: Re-connection over reboot Failing - Auth Failure
+From: Prabhu Chawandi <foss.chaws@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-A Linux PC is connected with another device over Bluetooth PAN using a
-BNEP interface.
+Hi All,
 
-Whenever a packet is tried to be sent over the BNEP interface, the
-function "bnep_net_xmit()" in "net/bluetooth/bnep/netdev.c" is called.
-This function calls "bnep_net_mc_filter()", which checks (if the
-destination address is multicast) if the address is set in a certain
-multicast filter (&s->mc_filter). If it is not, then it is not sent out.
+  I am logitek K803 bluetooth smart keyboard. I was using it with my
+system. I did hibernate then I was seeing that KBD was not connected
+back.
 
-This filter is only changed in two other functions, found in
-net/bluetooth/bnep/core.c": in "bnep_ctrl_set_mc_filter()", which is
-only called if a message of type "BNEP_FILTER_MULTI_ADDR_SET" is
-received. Otherwise, it is set in "bnep_add_connection()", where it is
-set to a default value which only adds the broadcast address to the
-filter:
+When I cleaned bluetooth cashe /var/lib and reconnected, started
+working fine. is it the case the cache is corrupted ?
 
-set_bit(bnep_mc_hash(dev->broadcast), (ulong *) &s->mc_filter);
 
-To sum up, if the BNEP interface does not receive any message of type
-"BNEP_FILTER_MULTI_ADDR_SET", it will not send out any messages with
-multicast destination addresses except for broadcast.
 
-However, in the BNEP specification (page 27 in
-http://grouper.ieee.org/groups/802/15/Bluetooth/BNEP.pdf), it is said
-that per default, all multicast addresses should not be filtered, i.e.
-the BNEP interface should be able to send packets with any multicast
-destination address.
-
-It seems that the default case is wrong: the multicast filter should not
-block almost all multicast addresses, but should not filter out any.
-
-This leads to the problem that e.g. Neighbor Solicitation messages sent
-with Bluetooth PAN over the BNEP interface to a multicast destination
-address other than broadcast are blocked and not sent out.
-
-Therefore, in the default case, we set the mc_filter to ~0LL to not
-filter out any multicast addresses.
-
-Signed-off-by: Danny Schweizer <danny.schweizer@proofnet.de>
----
- net/bluetooth/bnep/core.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
-
-diff --git a/net/bluetooth/bnep/core.c b/net/bluetooth/bnep/core.c
-index 1641367..ccc57f4f 100644
---- a/net/bluetooth/bnep/core.c
-+++ b/net/bluetooth/bnep/core.c
-@@ -608,8 +608,12 @@ int bnep_add_connection(struct bnep_connadd_req *req, struct socket *sock)
- 	s->msg.msg_flags = MSG_NOSIGNAL;
- 
- #ifdef CONFIG_BT_BNEP_MC_FILTER
--	/* Set default mc filter */
--	set_bit(bnep_mc_hash(dev->broadcast), (ulong *) &s->mc_filter);
-+	/*
-+	 * Set default mc filter to not filter out any mc addresses
-+	 * as defined in the BNEP specification (revision 0.95a)
-+	 * http://grouper.ieee.org/groups/802/15/Bluetooth/BNEP.pdf
-+	 */
-+	s->mc_filter = ~0LL;
- #endif
- 
- #ifdef CONFIG_BT_BNEP_PROTO_FILTER
--- 
-2.1.4
+ HCI Event: Command Status (0x0f) plen 4
+    LE Create Connection (0x08|0x000d) status 0x00 ncmd 1
+> HCI Event: LE Meta Event (0x3e) plen 19
+    LE Connection Complete
+      status 0x00 handle 47, role master
+      bdaddr 01:07:5B:00:15:10 (Public)
+< HCI Command: LE Start Encryption (0x08|0x0019) plen 28
+> HCI Event: Command Status (0x0f) plen 4
+    LE Start Encryption (0x08|0x0019) status 0x00 ncmd 1
+> HCI Event: Encrypt Change (0x08) plen 4
+    status 0x06 handle 47 encrypt 0x00
+    Error: PIN or Key Missing
+< HCI Command: Disconnect (0x01|0x0006) plen 3
+    handle 47 reason 0x05
+    Reason: Authentication Failure
+> HCI Event: Command Status (0x0f) plen 4
+    Disconnect (0x01|0x0006) status 0x00 ncmd 1
+> HCI Event: Disconn Complete (0x05) plen 4
+    status 0x00 handle 47 reason 0x16
+    Reason: Connection Terminated by Local Host
+< HCI Command: LE Set Scan Parameters (0x08|0x000b) plen 7
+    type 0x01 (active)
+    interval 11.250ms window 11.250ms
