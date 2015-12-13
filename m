@@ -1,69 +1,54 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: bugzilla-daemon@bugzilla.kernel.org
+Message-ID: <1449991256.8150.3.camel@gmail.com>
+Subject: Re: Lenovo keyboard
+From: Berend De Schouwer <berend.de.schouwer@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 109321] New: ASUS T100TA Bluetooth stopped working
-Date: Mon, 14 Dec 2015 01:36:06 +0000
-Message-ID: <bug-109321-62941@https.bugzilla.kernel.org/>
+Date: Sun, 13 Dec 2015 09:20:56 +0200
+In-Reply-To: <CA+RPYyX5b=QGdym1V0pFrU5kT_4HbTPeJF8piheUcp9MnOSYdQ@mail.gmail.com>
+References: <CA+RPYyX5b=QGdym1V0pFrU5kT_4HbTPeJF8piheUcp9MnOSYdQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-MIME-Version: 1.0
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-https://bugzilla.kernel.org/show_bug.cgi?id=109321
+On Sat, 2015-12-12 at 17:06 +0100, chris wrote:
+> Dear list,
+> 
+> I've been consistently using a lenovo bluetooth keyboard since
+> Bluez4.
+> Since a recent (a month ago or so) upgrade (debian/stretch) it
+> doesn't
+> connect anymore.
+> Neither does a Jabra Stealth earpiece which was doing fine a month
+> ago.
+> 
+> Even when it says conneced: yes, it isn't actually connected:
+> the led of the keyboard indicates it isn't connected and there is no
+> input.
 
-            Bug ID: 109321
-           Summary: ASUS T100TA Bluetooth stopped working
-           Product: Drivers
-           Version: 2.5
-    Kernel Version: 4.4-rc4
-          Hardware: All
-                OS: Linux
-              Tree: Mainline
-            Status: NEW
-          Severity: normal
-          Priority: P1
-         Component: Bluetooth
-          Assignee: linux-bluetooth@vger.kernel.org
-          Reporter: bloften80@gmail.com
-        Regression: No
+I've got similar symptoms with 4 different bluetooth keyboards.  One
+Logitech, one Apple, one Kanex and one Astrum.
 
-Hello
+Pairing works, input fails.
 
-since kernel 4.2.3 the bluetooth on ASUS t100TA stopped working 
+At the same time, the kernel loops:
+[ 1449.370904] Bluetooth: hci0 ACL packet for unknown connection handle
+2
+[ 1455.734779] Bluetooth: hci0 ACL packet for unknown connection handle
+3
+[ 1461.731976] Bluetooth: hci0 ACL packet for unknown connection handle
+4
+[ 1468.037014] Bluetooth: hci0 ACL packet for unknown connection handle
+5
+[ 1474.005517] Bluetooth: hci0 ACL packet for unknown connection handle
+6
+[ 1479.972716] Bluetooth: hci0 ACL packet for unknown connection handle
+7
+[ 1491.066637] Bluetooth: hci0 ACL packet for unknown connection handle
+8
 
-can no longer initialize it using hciattach /dev/ttyS4 bcm43xx command it
-always times out it also registers different in dmesg
 
- 80860F0A:00: ttyS4 at MMIO 0x9094d000 (irq = 191, base_baud = 2764800) is a
-16550A
-[    5.629222] Bluetooth: Core ver 2.21
-[    5.629287] NET: Registered protocol family 31
-[    5.629291] Bluetooth: HCI device and connection manager initialized
-[    5.629299] Bluetooth: HCI socket layer initialized
-[    5.629305] Bluetooth: L2CAP socket layer initialized
-[    5.629318] Bluetooth: SCO socket layer initialized
-[    5.643749] Bluetooth: HCI UART driver ver 2.3
-[    5.643757] Bluetooth: HCI UART protocol H4 registered
-[    5.643760] Bluetooth: HCI UART protocol BCSP registered
-[    5.643763] Bluetooth: HCI UART protocol LL registered
-[    5.643765] Bluetooth: HCI UART protocol ATH3K registered
-[    5.643768] Bluetooth: HCI UART protocol Three-wire (H5) registered
-[    5.643853] Bluetooth: HCI UART protocol Intel registered
-[    5.657970] hci_bcm BCM2E39:00: BCM irq: 192
-[    5.658046] Bluetooth: BCM2E39:00: Asus T100TA: Overwriting IRQ polarity to
-active low
-[    5.658051] hci_bcm BCM2E39:00: BCM2E39:00 device registered.
-[    5.658224] Bluetooth: HCI UART protocol BCM registered
+Eventually a working handle is found.
 
-not sure if this is a bug in the kernel driver or if something was changed
-BlueZ and not updated in the bcm driver
+The Logitech is ancient, but the others are relatively new.
 
-also it no longer registers with rfkill which i think was changed
-
-let me know if you need any more information
-
-thanks
-
--- 
-You are receiving this mail because:
-You are the assignee for the bug.
