@@ -1,62 +1,69 @@
-Return-Path: <netdev-owner@vger.kernel.org>
-From: Alexander Aring <alex.aring@gmail.com>
-To: linux-wpan@vger.kernel.org
-Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-	kernel@pengutronix.de, mcr@sandelman.ca, lukasz.duda@nordicsemi.no,
-	martin.gergeleit@hs-rm.de, Alexander Aring <alex.aring@gmail.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
-	James Morris <jmorris@namei.org>,
-	Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
-	Patrick McHardy <kaber@trash.net>
-Subject: [RFCv4 bluetooth-next 2/2] ipv6: add 6co as icmpv6 userspace option
-Date: Mon, 14 Dec 2015 15:00:54 +0100
-Message-Id: <1450101654-22633-3-git-send-email-alex.aring@gmail.com>
-In-Reply-To: <1450101654-22633-1-git-send-email-alex.aring@gmail.com>
-References: <1450101654-22633-1-git-send-email-alex.aring@gmail.com>
-Sender: netdev-owner@vger.kernel.org
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: bugzilla-daemon@bugzilla.kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [Bug 109321] New: ASUS T100TA Bluetooth stopped working
+Date: Mon, 14 Dec 2015 01:36:06 +0000
+Message-ID: <bug-109321-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds the 6LoWPAN Context Option (6CO) as userspace option to
-processing such options inside RA messages in userspace.
+https://bugzilla.kernel.org/show_bug.cgi?id=109321
 
-Cc: David S. Miller <davem@davemloft.net>
-Cc: Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>
-Cc: James Morris <jmorris@namei.org>
-Cc: Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>
-Cc: Patrick McHardy <kaber@trash.net>
-Signed-off-by: Alexander Aring <alex.aring@gmail.com>
----
- include/net/ndisc.h | 1 +
- net/ipv6/ndisc.c    | 3 ++-
- 2 files changed, 3 insertions(+), 1 deletion(-)
+            Bug ID: 109321
+           Summary: ASUS T100TA Bluetooth stopped working
+           Product: Drivers
+           Version: 2.5
+    Kernel Version: 4.4-rc4
+          Hardware: All
+                OS: Linux
+              Tree: Mainline
+            Status: NEW
+          Severity: normal
+          Priority: P1
+         Component: Bluetooth
+          Assignee: linux-bluetooth@vger.kernel.org
+          Reporter: bloften80@gmail.com
+        Regression: No
 
-diff --git a/include/net/ndisc.h b/include/net/ndisc.h
-index 2d8edaa..944258d 100644
---- a/include/net/ndisc.h
-+++ b/include/net/ndisc.h
-@@ -35,6 +35,7 @@ enum {
- 	ND_OPT_ROUTE_INFO = 24,		/* RFC4191 */
- 	ND_OPT_RDNSS = 25,		/* RFC5006 */
- 	ND_OPT_DNSSL = 31,		/* RFC6106 */
-+	ND_OPT_6CO = 34,		/* RFC6775 */
- 	__ND_OPT_MAX
- };
- 
-diff --git a/net/ipv6/ndisc.c b/net/ipv6/ndisc.c
-index d6161e1..bed154e 100644
---- a/net/ipv6/ndisc.c
-+++ b/net/ipv6/ndisc.c
-@@ -188,7 +188,8 @@ static struct nd_opt_hdr *ndisc_next_option(struct nd_opt_hdr *cur,
- static inline int ndisc_is_useropt(struct nd_opt_hdr *opt)
- {
- 	return opt->nd_opt_type == ND_OPT_RDNSS ||
--		opt->nd_opt_type == ND_OPT_DNSSL;
-+		opt->nd_opt_type == ND_OPT_DNSSL ||
-+		opt->nd_opt_type == ND_OPT_6CO;
- }
- 
- static struct nd_opt_hdr *ndisc_next_useropt(struct nd_opt_hdr *cur,
+Hello
+
+since kernel 4.2.3 the bluetooth on ASUS t100TA stopped working 
+
+can no longer initialize it using hciattach /dev/ttyS4 bcm43xx command it
+always times out it also registers different in dmesg
+
+ 80860F0A:00: ttyS4 at MMIO 0x9094d000 (irq = 191, base_baud = 2764800) is a
+16550A
+[    5.629222] Bluetooth: Core ver 2.21
+[    5.629287] NET: Registered protocol family 31
+[    5.629291] Bluetooth: HCI device and connection manager initialized
+[    5.629299] Bluetooth: HCI socket layer initialized
+[    5.629305] Bluetooth: L2CAP socket layer initialized
+[    5.629318] Bluetooth: SCO socket layer initialized
+[    5.643749] Bluetooth: HCI UART driver ver 2.3
+[    5.643757] Bluetooth: HCI UART protocol H4 registered
+[    5.643760] Bluetooth: HCI UART protocol BCSP registered
+[    5.643763] Bluetooth: HCI UART protocol LL registered
+[    5.643765] Bluetooth: HCI UART protocol ATH3K registered
+[    5.643768] Bluetooth: HCI UART protocol Three-wire (H5) registered
+[    5.643853] Bluetooth: HCI UART protocol Intel registered
+[    5.657970] hci_bcm BCM2E39:00: BCM irq: 192
+[    5.658046] Bluetooth: BCM2E39:00: Asus T100TA: Overwriting IRQ polarity to
+active low
+[    5.658051] hci_bcm BCM2E39:00: BCM2E39:00 device registered.
+[    5.658224] Bluetooth: HCI UART protocol BCM registered
+
+not sure if this is a bug in the kernel driver or if something was changed
+BlueZ and not updated in the bcm driver
+
+also it no longer registers with rfkill which i think was changed
+
+let me know if you need any more information
+
+thanks
+
 -- 
-2.6.1
-
+You are receiving this mail because:
+You are the assignee for the bug.
