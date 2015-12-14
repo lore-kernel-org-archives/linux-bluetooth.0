@@ -1,83 +1,31 @@
-Return-Path: <linux-wpan-owner@vger.kernel.org>
-From: Alexander Aring <alex.aring@gmail.com>
-To: linux-wpan@vger.kernel.org
-Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-	kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
-	James Morris <jmorris@namei.org>,
-	Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
-	Patrick McHardy <kaber@trash.net>
-Subject: [PATCH net-next] ipv6: addrconf: drop ieee802154 specific things
-Date: Mon, 14 Dec 2015 20:55:22 +0100
-Message-Id: <1450122922-3174-1-git-send-email-alex.aring@gmail.com>
-Sender: linux-wpan-owner@vger.kernel.org
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: "An, Tedd" <tedd.an@intel.com>
+To: Bryant M <acutiator@outlook.com>
+CC: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Subject: Re: Linux bluetooth firmware for the 7260
+Date: Mon, 14 Dec 2015 18:05:12 +0000
+Message-ID: <0B2397EF-8EA4-4840-8C70-802E9C2BF4BA@intel.com>
+References: <BY1PR10MB0309D1BE08625017EB5FC388BEED0@BY1PR10MB0309.namprd10.prod.outlook.com>
+In-Reply-To: <BY1PR10MB0309D1BE08625017EB5FC388BEED0@BY1PR10MB0309.namprd10.prod.outlook.com>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch removes ARPHRD_IEEE802154 from addrconf handling. In the
-earlier days of 802.15.4 6LoWPAN, the interface type was ARPHRD_IEEE802154
-which introduced several issues, because 802.15.4 interfaces used the
-same type.
-
-Since commit 965e613d299c ("ieee802154: 6lowpan: fix ARPHRD to
-ARPHRD_6LOWPAN") we use ARPHRD_6LOWPAN for 6LoWPAN interfaces. This
-patch will remove ARPHRD_IEEE802154 which is currently deadcode, because
-ARPHRD_IEEE802154 doesn't reach the minimum 1280 MTU of IPv6.
-
-Also we use 6LoWPAN EUI64 specific defines instead using link-layer
-constanst from 802.15.4 link-layer header.
-
-Cc: David S. Miller <davem@davemloft.net>
-Cc: Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>
-Cc: James Morris <jmorris@namei.org>
-Cc: Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>
-Cc: Patrick McHardy <kaber@trash.net>
-Signed-off-by: Alexander Aring <alex.aring@gmail.com>
----
- net/ipv6/addrconf.c | 8 +++-----
- 1 file changed, 3 insertions(+), 5 deletions(-)
-
-diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
-index 5e9111d..7082fb7 100644
---- a/net/ipv6/addrconf.c
-+++ b/net/ipv6/addrconf.c
-@@ -70,7 +70,7 @@
- #include <net/sock.h>
- #include <net/snmp.h>
- 
--#include <net/af_ieee802154.h>
-+#include <net/6lowpan.h>
- #include <net/firewire.h>
- #include <net/ipv6.h>
- #include <net/protocol.h>
-@@ -1947,9 +1947,9 @@ static void addrconf_leave_anycast(struct inet6_ifaddr *ifp)
- 
- static int addrconf_ifid_eui64(u8 *eui, struct net_device *dev)
- {
--	if (dev->addr_len != IEEE802154_ADDR_LEN)
-+	if (dev->addr_len != EUI64_ADDR_LEN)
- 		return -1;
--	memcpy(eui, dev->dev_addr, 8);
-+	memcpy(eui, dev->dev_addr, EUI64_ADDR_LEN);
- 	eui[0] ^= 2;
- 	return 0;
- }
-@@ -2041,7 +2041,6 @@ static int ipv6_generate_eui64(u8 *eui, struct net_device *dev)
- 	case ARPHRD_IPGRE:
- 		return addrconf_ifid_gre(eui, dev);
- 	case ARPHRD_6LOWPAN:
--	case ARPHRD_IEEE802154:
- 		return addrconf_ifid_eui64(eui, dev);
- 	case ARPHRD_IEEE1394:
- 		return addrconf_ifid_ieee1394(eui, dev);
-@@ -3066,7 +3065,6 @@ static void addrconf_dev_config(struct net_device *dev)
- 	    (dev->type != ARPHRD_FDDI) &&
- 	    (dev->type != ARPHRD_ARCNET) &&
- 	    (dev->type != ARPHRD_INFINIBAND) &&
--	    (dev->type != ARPHRD_IEEE802154) &&
- 	    (dev->type != ARPHRD_IEEE1394) &&
- 	    (dev->type != ARPHRD_TUNNEL6) &&
- 	    (dev->type != ARPHRD_6LOWPAN)) {
--- 
-2.6.1
-
+SGkgQnJ5YW50LA0KDQpUaGF04oCZcyB0aGUgcHJlLXByb2R1Y3Rpb24gc2FtcGxlIGFuZCB3ZSBk
+b27igJl0IHN1cHBvcnQgaXQuDQoNClJlZ2FyZHMsDQpUZWRkDQoNCg0KRnJvbTogQnJ5YW50IE0g
+PGFjdXRpYXRvckBvdXRsb29rLmNvbTxtYWlsdG86YWN1dGlhdG9yQG91dGxvb2suY29tPj4NCkRh
+dGU6IE1vbmRheSwgRGVjZW1iZXIgMTQsIDIwMTUgYXQgNzo1OSBBTQ0KVG86IFRlZGQgQW4gPHRl
+ZGQuYW5AaW50ZWwuY29tPG1haWx0bzp0ZWRkLmFuQGludGVsLmNvbT4+DQpTdWJqZWN0OiBMaW51
+eCBibHVldG9vdGggZmlybXdhcmUgZm9yIHRoZSA3MjYwDQoNCkkndmUgYmVlbiB0cnlpbmcgdG8g
+Z2V0IHRoZSBibHVldG9vdGggd29ya2luZyBmb3IgbXkgNzI2MCB3aWZpIGNhcmQgYW5kIHRoZXJl
+IHNlZW1zIHRvIGJlIGEgZmlybXdhcmUgcHJvYmxlbS4gSSBzYXcgdGhhdCB5b3UganVzdCBjb21t
+aXR0ZWQgYW4gdXBkYXRlIGZvciB0aGUgNzI2NSAoMTQwNmVjMTEyNDIzYzhmNzBkNTAzZDNjZDQ0
+YzZmOGUxNDdmN2FjMzxodHRwOi8vZ2l0Lmtlcm5lbC5vcmcvY2dpdC9saW51eC9rZXJuZWwvZ2l0
+L2Zpcm13YXJlL2xpbnV4LWZpcm13YXJlLmdpdC9jb21taXQvP2lkPTE0MDZlYzExMjQyM2M4Zjcw
+ZDUwM2QzY2Q0NGM2ZjhlMTQ3ZjdhYzM+KSBhbmQgSSB3YXMgd29uZGVyaW5nIGlmIHRoZXJlJ3Mg
+YSBmb3J0aGNvbWluZyBmaXJtd2FyZSByZWxlYXNlIGZvciB0aGUgNzI2MCB0aGF0IHdpbGwgZml4
+IHRoaXMgKHRoZSBkcml2ZXIgd2FudHMgdG8gbG9hZCBpbnRlbC9pYnQtaHctMzcuNy4xMC1mdy0x
+LjgwLjEuMjkuYy5ic2VxKS4NCg0KSSdtIHJ1bm5pbmcgRmVkb3JhIGFuZCB0cmFja2luZyB0aGlz
+IGluOiBodHRwczovL2J1Z3ppbGxhLnJlZGhhdC5jb20vc2hvd19idWcuY2dpP2lkPTEyNDE1OTQN
+Cg==
