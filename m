@@ -1,33 +1,42 @@
 Return-Path: <netdev-owner@vger.kernel.org>
-Date: Mon, 14 Dec 2015 16:23:52 -0500 (EST)
-Message-Id: <20151214.162352.2171571188988498415.davem@davemloft.net>
-To: johan.hedberg@gmail.com
-Cc: netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Subject: Re: pull request: bluetooth-next 2015-12-11
+Date: Mon, 14 Dec 2015 16:11:04 -0500 (EST)
+Message-Id: <20151214.161104.51809961792932420.davem@davemloft.net>
+To: alex.aring@gmail.com
+Cc: linux-wpan@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org, kernel@pengutronix.de,
+	kuznet@ms2.inr.ac.ru, jmorris@namei.org, yoshfuji@linux-ipv6.org,
+	kaber@trash.net
+Subject: Re: [PATCH net-next] ipv6: addrconf: drop ieee802154 specific
+ things
 From: David Miller <davem@davemloft.net>
-In-Reply-To: <20151211202059.GA19118@t440s.P-661HNU-F1>
-References: <20151211201611.GA17376@t440s.P-661HNU-F1>
-	<20151211202059.GA19118@t440s.P-661HNU-F1>
+In-Reply-To: <1450122922-3174-1-git-send-email-alex.aring@gmail.com>
+References: <1450122922-3174-1-git-send-email-alex.aring@gmail.com>
 Mime-Version: 1.0
 Content-Type: Text/Plain; charset=us-ascii
 Sender: netdev-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@gmail.com>
-Date: Fri, 11 Dec 2015 22:20:59 +0200
+From: Alexander Aring <alex.aring@gmail.com>
+Date: Mon, 14 Dec 2015 20:55:22 +0100
 
-> (resending since I forgot to sign the previous one)
+> This patch removes ARPHRD_IEEE802154 from addrconf handling. In the
+> earlier days of 802.15.4 6LoWPAN, the interface type was ARPHRD_IEEE802154
+> which introduced several issues, because 802.15.4 interfaces used the
+> same type.
 > 
-> Here's another set of Bluetooth & 802.15.4 patches for the 4.5 kernel:
+> Since commit 965e613d299c ("ieee802154: 6lowpan: fix ARPHRD to
+> ARPHRD_6LOWPAN") we use ARPHRD_6LOWPAN for 6LoWPAN interfaces. This
+> patch will remove ARPHRD_IEEE802154 which is currently deadcode, because
+> ARPHRD_IEEE802154 doesn't reach the minimum 1280 MTU of IPv6.
 > 
->  - 6LoWPAN debugfs support
->  - New 802.15.4 driver for ADF7242 MAC IEEE802154
->  - Initial code for 6LoWPAN Generic Header Compression (GHC) support
->  - Refactor Bluetooth LE scan & advertising behind dedicated workqueue
->  - Cleanups to Bluetooth H:5 HCI driver
->  - Support for Toshiba Broadcom based Bluetooth controllers
->  - Use continuous scanning when establishing Bluetooth LE connections
+> Also we use 6LoWPAN EUI64 specific defines instead using link-layer
+> constanst from 802.15.4 link-layer header.
 > 
-> Please let me know if there are any issues pulling. Thanks.
+> Cc: David S. Miller <davem@davemloft.net>
+> Cc: Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>
+> Cc: James Morris <jmorris@namei.org>
+> Cc: Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>
+> Cc: Patrick McHardy <kaber@trash.net>
+> Signed-off-by: Alexander Aring <alex.aring@gmail.com>
 
-Pulled, thanks Johan.
+Applied, thank you.
