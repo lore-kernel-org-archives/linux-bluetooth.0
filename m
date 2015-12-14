@@ -1,31 +1,71 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: "An, Tedd" <tedd.an@intel.com>
-To: Bryant M <acutiator@outlook.com>
-CC: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Subject: Re: Linux bluetooth firmware for the 7260
-Date: Mon, 14 Dec 2015 18:05:12 +0000
-Message-ID: <0B2397EF-8EA4-4840-8C70-802E9C2BF4BA@intel.com>
-References: <BY1PR10MB0309D1BE08625017EB5FC388BEED0@BY1PR10MB0309.namprd10.prod.outlook.com>
-In-Reply-To: <BY1PR10MB0309D1BE08625017EB5FC388BEED0@BY1PR10MB0309.namprd10.prod.outlook.com>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <maxtram95@gmail.com>
+From: maxtram95@gmail.com
+To: linux-bluetooth@vger.kernel.org
+Cc: Maxim Mikityanskiy <maxtram95@gmail.com>,
+	Marcel Holtmann <marcel@holtmann.org>
+Subject: [PATCH] sbc: don't try to initialize sbc parameters if no data was decoded
+Date: Mon, 14 Dec 2015 19:27:41 +0200
+Message-Id: <1450114061-19629-1-git-send-email-maxtram95@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgQnJ5YW50LA0KDQpUaGF04oCZcyB0aGUgcHJlLXByb2R1Y3Rpb24gc2FtcGxlIGFuZCB3ZSBk
-b27igJl0IHN1cHBvcnQgaXQuDQoNClJlZ2FyZHMsDQpUZWRkDQoNCg0KRnJvbTogQnJ5YW50IE0g
-PGFjdXRpYXRvckBvdXRsb29rLmNvbTxtYWlsdG86YWN1dGlhdG9yQG91dGxvb2suY29tPj4NCkRh
-dGU6IE1vbmRheSwgRGVjZW1iZXIgMTQsIDIwMTUgYXQgNzo1OSBBTQ0KVG86IFRlZGQgQW4gPHRl
-ZGQuYW5AaW50ZWwuY29tPG1haWx0bzp0ZWRkLmFuQGludGVsLmNvbT4+DQpTdWJqZWN0OiBMaW51
-eCBibHVldG9vdGggZmlybXdhcmUgZm9yIHRoZSA3MjYwDQoNCkkndmUgYmVlbiB0cnlpbmcgdG8g
-Z2V0IHRoZSBibHVldG9vdGggd29ya2luZyBmb3IgbXkgNzI2MCB3aWZpIGNhcmQgYW5kIHRoZXJl
-IHNlZW1zIHRvIGJlIGEgZmlybXdhcmUgcHJvYmxlbS4gSSBzYXcgdGhhdCB5b3UganVzdCBjb21t
-aXR0ZWQgYW4gdXBkYXRlIGZvciB0aGUgNzI2NSAoMTQwNmVjMTEyNDIzYzhmNzBkNTAzZDNjZDQ0
-YzZmOGUxNDdmN2FjMzxodHRwOi8vZ2l0Lmtlcm5lbC5vcmcvY2dpdC9saW51eC9rZXJuZWwvZ2l0
-L2Zpcm13YXJlL2xpbnV4LWZpcm13YXJlLmdpdC9jb21taXQvP2lkPTE0MDZlYzExMjQyM2M4Zjcw
-ZDUwM2QzY2Q0NGM2ZjhlMTQ3ZjdhYzM+KSBhbmQgSSB3YXMgd29uZGVyaW5nIGlmIHRoZXJlJ3Mg
-YSBmb3J0aGNvbWluZyBmaXJtd2FyZSByZWxlYXNlIGZvciB0aGUgNzI2MCB0aGF0IHdpbGwgZml4
-IHRoaXMgKHRoZSBkcml2ZXIgd2FudHMgdG8gbG9hZCBpbnRlbC9pYnQtaHctMzcuNy4xMC1mdy0x
-LjgwLjEuMjkuYy5ic2VxKS4NCg0KSSdtIHJ1bm5pbmcgRmVkb3JhIGFuZCB0cmFja2luZyB0aGlz
-IGluOiBodHRwczovL2J1Z3ppbGxhLnJlZGhhdC5jb20vc2hvd19idWcuY2dpP2lkPTEyNDE1OTQN
-Cg==
+From: Maxim Mikityanskiy <maxtram95@gmail.com>
+
+If the first data chunk passed to sbc_decode was not long enough and
+didn't contain full SBC packet, don't try to initialize codec parameters
+with random values.
+
+Signed-off-by: Maxim Mikityanskiy <maxtram95@gmail.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>
+---
+The patch is for SBC library located at https://git.kernel.org/cgit/bluetooth/sbc.git/
+
+ sbc/sbc.c | 34 ++++++++++++++++++----------------
+ 1 file changed, 18 insertions(+), 16 deletions(-)
+
+diff --git a/sbc/sbc.c b/sbc/sbc.c
+index 606f11c..7da476b 100644
+--- a/sbc/sbc.c
++++ b/sbc/sbc.c
+@@ -1222,22 +1222,24 @@ SBC_EXPORT ssize_t sbc_decode(sbc_t *sbc, const void *input, size_t input_len,
+ 
+ 	framelen = priv->unpack_frame(input, &priv->frame, input_len);
+ 
+-	if (!priv->init) {
+-		sbc_decoder_init(&priv->dec_state, &priv->frame);
+-		priv->init = true;
+-
+-		sbc->frequency = priv->frame.frequency;
+-		sbc->mode = priv->frame.mode;
+-		sbc->subbands = priv->frame.subband_mode;
+-		sbc->blocks = priv->frame.block_mode;
+-		sbc->allocation = priv->frame.allocation;
+-		sbc->bitpool = priv->frame.bitpool;
+-
+-		priv->frame.codesize = sbc_get_codesize(sbc);
+-		priv->frame.length = framelen;
+-	} else if (priv->frame.bitpool != sbc->bitpool) {
+-		priv->frame.length = framelen;
+-		sbc->bitpool = priv->frame.bitpool;
++	if (framelen >= 0) {
++		if (!priv->init) {
++			sbc_decoder_init(&priv->dec_state, &priv->frame);
++			priv->init = true;
++
++			sbc->frequency = priv->frame.frequency;
++			sbc->mode = priv->frame.mode;
++			sbc->subbands = priv->frame.subband_mode;
++			sbc->blocks = priv->frame.block_mode;
++			sbc->allocation = priv->frame.allocation;
++			sbc->bitpool = priv->frame.bitpool;
++
++			priv->frame.codesize = sbc_get_codesize(sbc);
++			priv->frame.length = framelen;
++		} else if (priv->frame.bitpool != sbc->bitpool) {
++			priv->frame.length = framelen;
++			sbc->bitpool = priv->frame.bitpool;
++		}
+ 	}
+ 
+ 	if (!output)
+-- 
+2.5.4 (Apple Git-61)
