@@ -1,101 +1,58 @@
-Return-Path: <luiz.dentz@gmail.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Subject: Re: [Bug 109321] New: ASUS T100TA Bluetooth stopped working
+To: linux-bluetooth@vger.kernel.org
+References: <bug-109321-62941@https.bugzilla.kernel.org/>
+Cc: bugzilla-daemon@bugzilla.kernel.org
+From: Frederic Danis <frederic.danis@linux.intel.com>
+Message-ID: <567041AE.5060001@linux.intel.com>
+Date: Tue, 15 Dec 2015 17:37:02 +0100
 MIME-Version: 1.0
-In-Reply-To: <1450114061-19629-1-git-send-email-maxtram95@gmail.com>
-References: <1450114061-19629-1-git-send-email-maxtram95@gmail.com>
-Date: Tue, 15 Dec 2015 14:51:50 -0200
-Message-ID: <CABBYNZJ=BoxT2gCXBG8fLPHmMEUnxUtgEhkR8jDT==yrEFyY2w@mail.gmail.com>
-Subject: Re: [PATCH] sbc: don't try to initialize sbc parameters if no data
- was decoded
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: maxtram95@gmail.com
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>, Marcel Holtmann <marcel@holtmann.org>
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <bug-109321-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Maxim,
+Hello,
 
-On Mon, Dec 14, 2015 at 3:27 PM,  <maxtram95@gmail.com> wrote:
-> From: Maxim Mikityanskiy <maxtram95@gmail.com>
+On 14/12/2015 02:36, bugzilla-daemon@bugzilla.kernel.org wrote:
+> Hello
 >
-> If the first data chunk passed to sbc_decode was not long enough and
-> didn't contain full SBC packet, don't try to initialize codec parameters
-> with random values.
+> since kernel 4.2.3 the bluetooth on ASUS t100TA stopped working
 >
-> Signed-off-by: Maxim Mikityanskiy <maxtram95@gmail.com>
-> Cc: Marcel Holtmann <marcel@holtmann.org>
-> ---
-> The patch is for SBC library located at https://git.kernel.org/cgit/bluetooth/sbc.git/
-
-We don't use Signed-off-by in userspace.
-
+> can no longer initialize it using hciattach /dev/ttyS4 bcm43xx command it
+> always times out it also registers different in dmesg
 >
->  sbc/sbc.c | 34 ++++++++++++++++++----------------
->  1 file changed, 18 insertions(+), 16 deletions(-)
+>   80860F0A:00: ttyS4 at MMIO 0x9094d000 (irq = 191, base_baud = 2764800) is a
+> 16550A
+> [    5.629222] Bluetooth: Core ver 2.21
+> [    5.629287] NET: Registered protocol family 31
+> [    5.629291] Bluetooth: HCI device and connection manager initialized
+> [    5.629299] Bluetooth: HCI socket layer initialized
+> [    5.629305] Bluetooth: L2CAP socket layer initialized
+> [    5.629318] Bluetooth: SCO socket layer initialized
+> [    5.643749] Bluetooth: HCI UART driver ver 2.3
+> [    5.643757] Bluetooth: HCI UART protocol H4 registered
+> [    5.643760] Bluetooth: HCI UART protocol BCSP registered
+> [    5.643763] Bluetooth: HCI UART protocol LL registered
+> [    5.643765] Bluetooth: HCI UART protocol ATH3K registered
+> [    5.643768] Bluetooth: HCI UART protocol Three-wire (H5) registered
+> [    5.643853] Bluetooth: HCI UART protocol Intel registered
+> [    5.657970] hci_bcm BCM2E39:00: BCM irq: 192
+> [    5.658046] Bluetooth: BCM2E39:00: Asus T100TA: Overwriting IRQ polarity to
+> active low
+> [    5.658051] hci_bcm BCM2E39:00: BCM2E39:00 device registered.
+> [    5.658224] Bluetooth: HCI UART protocol BCM registered
 >
-> diff --git a/sbc/sbc.c b/sbc/sbc.c
-> index 606f11c..7da476b 100644
-> --- a/sbc/sbc.c
-> +++ b/sbc/sbc.c
-> @@ -1222,22 +1222,24 @@ SBC_EXPORT ssize_t sbc_decode(sbc_t *sbc, const void *input, size_t input_len,
+> not sure if this is a bug in the kernel driver or if something was changed
+> BlueZ and not updated in the bcm driver
 >
->         framelen = priv->unpack_frame(input, &priv->frame, input_len);
->
-> -       if (!priv->init) {
-> -               sbc_decoder_init(&priv->dec_state, &priv->frame);
-> -               priv->init = true;
-> -
-> -               sbc->frequency = priv->frame.frequency;
-> -               sbc->mode = priv->frame.mode;
-> -               sbc->subbands = priv->frame.subband_mode;
-> -               sbc->blocks = priv->frame.block_mode;
-> -               sbc->allocation = priv->frame.allocation;
-> -               sbc->bitpool = priv->frame.bitpool;
-> -
-> -               priv->frame.codesize = sbc_get_codesize(sbc);
-> -               priv->frame.length = framelen;
-> -       } else if (priv->frame.bitpool != sbc->bitpool) {
-> -               priv->frame.length = framelen;
-> -               sbc->bitpool = priv->frame.bitpool;
-> +       if (framelen >= 0) {
-> +               if (!priv->init) {
-> +                       sbc_decoder_init(&priv->dec_state, &priv->frame);
-> +                       priv->init = true;
-> +
-> +                       sbc->frequency = priv->frame.frequency;
-> +                       sbc->mode = priv->frame.mode;
-> +                       sbc->subbands = priv->frame.subband_mode;
-> +                       sbc->blocks = priv->frame.block_mode;
-> +                       sbc->allocation = priv->frame.allocation;
-> +                       sbc->bitpool = priv->frame.bitpool;
-> +
-> +                       priv->frame.codesize = sbc_get_codesize(sbc);
-> +                       priv->frame.length = framelen;
-> +               } else if (priv->frame.bitpool != sbc->bitpool) {
-> +                       priv->frame.length = framelen;
-> +                       sbc->bitpool = priv->frame.bitpool;
-> +               }
+> also it no longer registers with rfkill which i think was changed
 
-Im fine with the change but I would prefix that you check the framelen
-separately e.g.:
+Bluetooth BCM chipset is no more managed by rfkill and hciattach.
+You should use btattach to register it (BlueZ >= 5.31):
+	btattach --bredr /dev/ttyS4 -P bcm
+then (you should change the device address):
+	btmgmt public-addr "43:24:b3:01:02:03"
 
-if (framelen < 0) {
-  return framelen;
-}
+Hope this helps
 
-There is probably no use to continue if unpack_frame has failed.
-
->         }
->
->         if (!output)
-> --
-> 2.5.4 (Apple Git-61)
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-
--- 
-Luiz Augusto von Dentz
