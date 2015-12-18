@@ -3,20 +3,35 @@ MIME-Version: 1.0
 In-Reply-To: <38CECA18-9BB8-4480-BA0F-027B87AB7A85@gmail.com>
 References: <1450426763-17753-1-git-send-email-gowtham.ab@samsung.com>
 	<38CECA18-9BB8-4480-BA0F-027B87AB7A85@gmail.com>
-Date: Fri, 18 Dec 2015 22:52:59 +0530
-Message-ID: <CADLK-zEQH4LiXZwwUUdj4FTqmJhm4-m7vhadR5q2XEQ66OUg7g@mail.gmail.com>
+Date: Fri, 18 Dec 2015 11:57:56 -0500
+Message-ID: <CAMPA5gc7v=fX4vuZP_DVx-thJh5XLMBZO5dyqWvGgS30ogu3VA@mail.gmail.com>
 Subject: Re: ARM SBC as a BLE Peripheral
-From: Gowtham Anandha Babu <gowbabuar@gmail.com>
+From: Joshua Kramer <joskra42.list@gmail.com>
 To: Travis Griggs <travisgriggs@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Travis,
+Hi Travis-
 
-On 18 December 2015 at 21:51, Travis Griggs <travisgriggs@gmail.com> wrote:
->
+By far, the easiest way to accomplish what you're trying to do is to
+use Node.js and a library called Bleno.  If you are inexperienced,
+it's easier to use Bleno to do what you're trying to do; and if you
+need to control a C application, then you'd have to do some kind of
+IPC between your Bluetooth communications app and your main app.
+
+Having said that, there is a platform that will be much more friendly
+to what you are doing (at least as far as Bluetooth is concerned).
+Check out the Intel Edison.  Using tools provided for free by Intel,
+you can have a BLE peripheral set up on an Edison in around an hour or
+so.  They have comprehensive examples on how to do this.  You can
+expect to pay around $60 for an Edison and a breakout board that is
+required for its operation.
+
+--JK
+
+On Fri, Dec 18, 2015 at 11:21 AM, Travis Griggs <travisgriggs@gmail.com> wrote:
 > I hope this question isn’t completely out of order here… I’ve been lurking for a week or so, and it seems the list is mostly patch submission/discussion.
 >
 > I’m working with a small Linux ARM SBC (similar to a Raspberry Pi), trying to set it up as a BLE peripheral. I’m running Debian Jessie, and build 5.36 of the bluez stack.
@@ -30,23 +45,6 @@ On 18 December 2015 at 21:51, Travis Griggs <travisgriggs@gmail.com> wrote:
 > 2) There’s a C library. So write a C program that cross compiles for the ARM, including the ARM headers for the bluez stuff. I have not seen a rigorous reference document for these APIs. I’m assuming it’s “use the source Luke”.
 >
 > 3) There’s a dbus interface. I appear to have dbus running on my device. But I have zero experience with interfacing with dbus, and I have yet to find any overview of what the bluez-dbus protocols look like. Would this be more general to weld a python3 script to though?
->
-
-I am not that much familiar with embedded. But I tried below things in Ubuntu.
-There are few python scripts in bluez git tree which is using DBus interface.
-https://git.kernel.org/cgit/bluetooth/bluez.git/tree/test/example-gatt-server
-https://git.kernel.org/cgit/bluetooth/bluez.git/tree/test/example-advertisement
-
-1) Run bluetoothd with experimental flag enabled (# sudo ./src/bluetoothd -ndE).
-2) Run the above mentioned script.
-3) # ./test/example-gatt-server -- it exposes 3 services.
-4) # ./test/example-advertisement -- it will advertise a sample data.
-5) Finally you can capture these via your phone app.
-
-You can edit those python scripts to meet your needs.
-
-This is very basic information. Let others comment on this.
-
 >
 > I get that I’ve got some learning to do, I’m looking for some guidance on which of the 3 above to bite off. I’d hate to spend a bunch of time figuring out #2 and then get told “oh, that’s the old way of doing it, you should have gone the other route.”
 >
@@ -63,9 +61,3 @@ This is very basic information. Let others comment on this.
 > To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
 > the body of a message to majordomo@vger.kernel.org
 > More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-
-
--- 
-Gowtham.A
