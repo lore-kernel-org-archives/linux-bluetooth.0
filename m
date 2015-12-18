@@ -1,26 +1,33 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 9.2 \(3112\))
-Subject: Re: [PATCH v1] lib: Update company identifiers
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1450431098-22338-1-git-send-email-gowtham.ab@samsung.com>
-Date: Fri, 18 Dec 2015 15:50:21 +0100
-Cc: linux-bluetooth@vger.kernel.org, bharat.panda@samsung.com
-Message-Id: <53B3B1D3-81F4-48E3-98BE-85907DECB443@holtmann.org>
-References: <1450431098-22338-1-git-send-email-gowtham.ab@samsung.com>
-To: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+From: Luka Karinja <luka.karinja@gmail.com>
+Subject: [PATCH] Bluetooth: hci_bcm: Add BCM2E65 ACPI ID
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <567404F4.5080807@gmail.com>
+Date: Fri, 18 Dec 2015 14:07:00 +0100
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gowtham,
+Add BCM2E65 device in acpi_device_id table. Used on Asus T100TAF.
 
-> ---
-> lib/bluetooth.c | 112 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-> 1 file changed, 112 insertions(+)
+Signed-off-by: Luka Karinja <luka.karinja@gmail.com>
+---
+  drivers/bluetooth/hci_bcm.c | 1 +
+  1 file changed, 1 insertion(+)
 
-don't bother sending these. This is automated and done before every release.
-
-Regards
-
-Marcel
+diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
+index 835bfab..372f7bc 100644
+--- a/drivers/bluetooth/hci_bcm.c
++++ b/drivers/bluetooth/hci_bcm.c
+@@ -546,6 +546,7 @@ static const struct hci_uart_proto bcm_proto = {
+  #ifdef CONFIG_ACPI
+  static const struct acpi_device_id bcm_acpi_match[] = {
+  	{ "BCM2E39", 0 },
++	{ "BCM2E65", 0 },
+  	{ "BCM2E67", 0 },
+  	{ },
+  };
+-- 
+1.9.1
 
