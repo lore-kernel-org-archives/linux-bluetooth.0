@@ -5,9 +5,9 @@ From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: bharat.panda@samsung.com,
 	Gowtham Anandha Babu <gowtham.ab@samsung.com>
-Subject: [PATCH v1] lib: Update company identifiers
-Date: Fri, 18 Dec 2015 15:01:38 +0530
-Message-id: <1450431098-22338-1-git-send-email-gowtham.ab@samsung.com>
+Subject: [PATCH] lib: Update company identifiers
+Date: Fri, 18 Dec 2015 13:49:23 +0530
+Message-id: <1450426763-17753-1-git-send-email-gowtham.ab@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
@@ -16,7 +16,7 @@ List-ID: <linux-bluetooth.vger.kernel.org>
  1 file changed, 112 insertions(+)
 
 diff --git a/lib/bluetooth.c b/lib/bluetooth.c
-index d48d844..d6e71a2 100644
+index d48d844..dad37fa 100644
 --- a/lib/bluetooth.c
 +++ b/lib/bluetooth.c
 @@ -1635,6 +1635,118 @@ const char *bt_compidtostr(int compid)
@@ -90,7 +90,7 @@ index d48d844..d6e71a2 100644
 +	case 719:
 +		return "Anima";
 +	case 720:
-+		return "3M";
++		return "3M":
 +	case 721:
 +		return "Empatica Srl";
 +	case 722:
@@ -108,7 +108,7 @@ index d48d844..d6e71a2 100644
 +	case 728:
 +		return "Neosfar";
 +	case 729:
-+		return "Fliegl Agrartechnik GmbH";
++		return "Fliegl Agrartechnik GmbH":
 +	case 730:
 +		return "Gilvader";
 +	case 731:
