@@ -1,77 +1,70 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Date: Sun, 20 Dec 2015 03:18:04 +0800
-From: John Munroe <munddr@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <etPan.5675ad6c.5a2be03b.9abd@guardian>
-Subject: Issue with gatt_discover_primary()
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <CADLK-zEQH4LiXZwwUUdj4FTqmJhm4-m7vhadR5q2XEQ66OUg7g@mail.gmail.com>
+References: <1450426763-17753-1-git-send-email-gowtham.ab@samsung.com>
+	<38CECA18-9BB8-4480-BA0F-027B87AB7A85@gmail.com>
+	<CADLK-zEQH4LiXZwwUUdj4FTqmJhm4-m7vhadR5q2XEQ66OUg7g@mail.gmail.com>
+Date: Sat, 19 Dec 2015 17:03:41 +0000
+Message-ID: <CAAu3APbKSoUu7HbVLKtoBd6KjoQrt=82yRm3a70FrW6RR0hEAQ@mail.gmail.com>
+Subject: Re: ARM SBC as a BLE Peripheral
+From: Barry Byford <31baz66@gmail.com>
+To: Bluez mailing list <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi all,
+Hello Travis,
 
-I'm using bluez on a GATT client (PC) and TI's SimpleBLEPeripheral code on a GATT server (PCB). The PCB's UUID is:
+On 18 December 2015 at 17:22, Gowtham Anandha Babu <gowbabuar@gmail.com> wrote:
+> Hi Travis,
+>
+> On 18 December 2015 at 21:51, Travis Griggs <travisgriggs@gmail.com> wrote:
+>> I’m working with a small Linux ARM SBC (similar to a Raspberry Pi), trying to set it up as a BLE peripheral.
+>> I’m running Debian Jessie, and build 5.36 of the bluez stack.
+I'm trying to do a similar thing with a Raspberry Pi. Although right
+now I'm making more progress with the RPi in the central role rather
+than a peripheral.
 
-0000fff0-0000-1000-8000-00805f9b34fb
-
-Using bluez, I have the following
-
-
-static GAttrib *attrib = NULL;
-...
-static void cmd_primary(int argcp, char **argvp)
-{
-    bt_uuid_t uuid;
-
-    if (conn_state != STATE_CONNECTED) {
-        resp_error(err_BAD_STATE);
-        return;
-    }
-
-    if (argcp == 1) {
-        gatt_discover_primary(attrib, NULL, primary_all_cb, NULL);
-        return;
-    }
-
-    if (bt_string_to_uuid(&uuid, argvp[1]) < 0) {
-        resp_error(err_BAD_PARAM);
-        return;
-    }
-
-    gatt_discover_primary(attrib, &uuid, primary_by_uuid_cb, NULL);
-}
-
-static void primary_by_uuid_cb(uint8_t status, GSList *ranges, void *user_data)
-{
-    GSList *l;
-
-    if (status) {
-        resp_error(err_COMM_ERR); // Todo: status
-        return;
-    }
-
-    resp_begin(rsp_DISCOVERY);
-    for (l = ranges; l; l = l->next) {
-        struct att_range *range = l->data;
-        send_uint(tag_RANGE_START, range->start);
-        send_uint(tag_RANGE_END, range->end);
-    }
-    resp_end();
-}
+>> I *think* I’ve discerned that there may be 3 different ways I could do this?
+>> 1) Just use the hcitool/hciconfig command line tools.
+>> 2) There’s a C library. So write a C program that cross compiles for the ARM, including the ARM headers for the bluez stuff.
+>> 3) There’s a dbus interface. I appear to have dbus running on my device.
+I'm currently exploring your option number 3 using Python as I want to
+take advantage to the numerous Python libraries for RPi peripherals.
 
 
-After successfully connecting to the PCB, running
+> I am not that much familiar with embedded. But I tried below things in Ubuntu.
+> There are few python scripts in bluez git tree which is using DBus interface.
+> https://git.kernel.org/cgit/bluetooth/bluez.git/tree/test/example-gatt-server
+> https://git.kernel.org/cgit/bluetooth/bluez.git/tree/test/example-advertisement
+>
+> 1) Run bluetoothd with experimental flag enabled (# sudo ./src/bluetoothd -ndE).
+> 2) Run the above mentioned script.
+> 3) # ./test/example-gatt-server -- it exposes 3 services.
+> 4) # ./test/example-advertisement -- it will advertise a sample data.
+> 5) Finally you can capture these via your phone app.
+>
+> You can edit those python scripts to meet your needs.
+>
+> This is very basic information. Let others comment on this.
+I would agree with Gowtham that this is a good approach or at least
+the one I'm following.
 
-cmd_primary(2, (char *[]){"svcs", "0000fff0-0000-1000-0000-000000000000”}) 
+DBus and GObject are new to me and I found the following stackoverflow
+article helpful:
+http://stackoverflow.com/questions/33428804/role-of-mainloops-event-loops-in-dbus-service
 
-leads the callback primary_by_uuid_cb() to be called with the parameter ‘ranges' being NULL. If the service is recognised, ‘ranges' shouldn't be NULL - correct?
+The goal of my experiments is to get an open source library so school
+children can easily code things like:
+https://youtu.be/1ZvFdX5bA8k so if you do get something that you can
+share I'd be interested.
 
-If that's the case, does anyone know why the service is not found (or why ‘ranges' is NULL if it shouldn't be)?
+Another idea you might want to explore is using the CLI client,
+bluetoothctl. There are a few bits about it around and I've done a
+short video of my experiments:
+https://youtu.be/fEx2V5y-Egk
 
-Any help will be appreciated.
+I hope some of that helps.
 
-
-Thanks
-
-John
+Regards,
+Barry
