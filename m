@@ -7,46 +7,35 @@ Cc: gustavo@padovan.org,
 	linux-bluetooth@vger.kernel.org,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v3 RESEND] bluetooth:Fix locking issues in the function l2cap_connect_cfm
-Date: Sun, 20 Dec 2015 02:35:40 -0500
-Message-Id: <1450596940-18318-1-git-send-email-xerofoify@gmail.com>
+Subject: [PATCH RESEND] bluetooth:Fix concurrent access issue in the function chan_close_cb
+Date: Sun, 20 Dec 2015 02:30:59 -0500
+Message-Id: <1450596659-18054-1-git-send-email-xerofoify@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This fixes a locking issue in the function l2cap_connect_cfm for
-not locking the mutex lock for channels on the l2cap_conn structure
-pointer conn before calling __l2cap_get_chan_by_dcid as all callers
-need to lock and unlock this mutex before calling this function due
-to issues with either concurrent users or race conditions arising
-if this mutex is not locked before these calls.
-v3 Fix double locking of mutex lock on goto next label to instead correctly
-unlock the channel mutex
-v2 Remove unneeded mutex_unlock for channels as the unlock was due early
-for adding correct protection for all functions that have requirements
-for this mutex lock needing to be locked before calling them.
+This fixes a concurrent access issue in the function chan_close_cb
+by not locking and unlocking around the function peer_lockup_chan
+by use of the function locking pair rcu_read_lock/unlock in order
+to have actual protection from concurrent threads of execution when
+calling this particular function in the function chan_close_cb.
+
 Signed-off-by: Nicholas Krause <xerofoify@gmail.com>
 ---
- net/bluetooth/l2cap_core.c | 2 ++
+ net/bluetooth/6lowpan.c | 2 ++
  1 file changed, 2 insertions(+)
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 45fffa4..20d3909 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -7285,6 +7285,7 @@ static void l2cap_connect_cfm(struct hci_conn *hcon, u8 status)
- 		struct l2cap_chan *chan, *next;
+diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
+index 2fb7b30..7fc20cb 100644
+--- a/net/bluetooth/6lowpan.c
++++ b/net/bluetooth/6lowpan.c
+@@ -955,7 +955,9 @@ static void chan_close_cb(struct l2cap_chan *chan)
  
- 		/* Client fixed channels should override server ones */
-+		mutex_lock(&conn->chan_lock);
- 		if (__l2cap_get_chan_by_dcid(conn, pchan->scid))
- 			goto next;
- 
-@@ -7301,6 +7302,7 @@ static void l2cap_connect_cfm(struct hci_conn *hcon, u8 status)
- 
- 		l2cap_chan_unlock(pchan);
- next:
-+		mutex_unlock(&conn->chan_lock);
- 		next = l2cap_global_fixed_chan(pchan, hcon);
- 		l2cap_chan_put(pchan);
- 		pchan = next;
+ 	list_for_each_entry_rcu(entry, &bt_6lowpan_devices, list) {
+ 		dev = lowpan_dev(entry->netdev);
++		rcu_read_lock();
+ 		peer = __peer_lookup_chan(dev, chan);
++		rcu_read_unlock();
+ 		if (peer) {
+ 			last = peer_del(dev, peer);
+ 			err = 0;
 -- 
 2.1.4
