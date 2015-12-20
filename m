@@ -1,35 +1,48 @@
-Return-Path: <linux-wpan-owner@vger.kernel.org>
+Return-Path: <linux-kernel-owner@vger.kernel.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 9.2 \(3112\))
-Subject: Re: [PATCH bluetooth-next] 6lowpan: fix debugfs interface entry name
+Subject: Re: [PATCH] bluetooth:Fix variable assignment for internal function returns in the function l2cap_bredr_sig_cmd
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1450178735-1572-1-git-send-email-alex.aring@gmail.com>
-Date: Sun, 20 Dec 2015 08:22:04 +0100
-Cc: linux-wpan@vger.kernel.org,
-	BlueZ development <linux-bluetooth@vger.kernel.org>,
-	netdev@vger.kernel.org, kernel@pengutronix.de,
-	lukasz.duda@nordicsemi.no
-Message-Id: <60F184F1-1E10-4D0E-92F8-C778E6FF8386@holtmann.org>
-References: <1450178735-1572-1-git-send-email-alex.aring@gmail.com>
-To: Alexander Aring <alex.aring@gmail.com>
-Sender: linux-wpan-owner@vger.kernel.org
+In-Reply-To: <1450498347-20994-1-git-send-email-xerofoify@gmail.com>
+Date: Sun, 20 Dec 2015 08:18:01 +0100
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Message-Id: <AF8B86E6-AD47-4548-BDB4-68851C8BD5BD@holtmann.org>
+References: <1450498347-20994-1-git-send-email-xerofoify@gmail.com>
+To: Nicholas Krause <xerofoify@gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alex,
+Hi Nick,
 
-> This patches moves the debugfs interface related register after
-> netdevice register. The function lowpan_dev_debugfs_init will use
-> "dev->name" which can be before register_netdevice a format string.
-> The function register_netdevice will evaluate the format string if
-> necessary and replace "dev->name" to the real interface name.
+> This makes all internal functions that can return a error code to
+> properly signal this to the caller of the function l2cap_bredr_sig_cmd
+> by making their return value equal to the variable err before returning
+> to the caller of the function l2cap_bredr_sig_cmd with this value
+> as to allow us to correctly signal when a failure has occurred when
+> this particular function is called.
 > 
-> Reported-by: Lukasz Duda <lukasz.duda@nordicsemi.no>
-> Signed-off-by: Alexander Aring <alex.aring@gmail.com>
+> Signed-off-by: Nicholas Krause <xerofoify@gmail.com>
 > ---
-> net/6lowpan/core.c | 6 +++---
-> 1 file changed, 3 insertions(+), 3 deletions(-)
+> net/bluetooth/l2cap_core.c | 8 ++++----
+> 1 file changed, 4 insertions(+), 4 deletions(-)
+> 
+> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> index 7c65ee2..488eebe 100644
+> --- a/net/bluetooth/l2cap_core.c
+> +++ b/net/bluetooth/l2cap_core.c
+> @@ -5319,7 +5319,7 @@ static inline int l2cap_bredr_sig_cmd(struct l2cap_conn *conn,
+> 
+> 	switch (cmd->code) {
+> 	case L2CAP_COMMAND_REJ:
+> -		l2cap_command_rej(conn, cmd, cmd_len, data);
+> +		err = l2cap_command_rej(conn, cmd, cmd_len, data);
+> 		break;
 
-patch has been applied to bluetooth-next tree.
+this patch is wrong. Please try to understand on how L2CAP works and look up what the caller of l2cap_bredr_sig_cmd does with the return code. Responses can not cause another command reject.
 
 Regards
 
