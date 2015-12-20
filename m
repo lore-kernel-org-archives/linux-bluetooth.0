@@ -1,33 +1,52 @@
-Return-Path: <luka.karinja@gmail.com>
-From: Luka Karinja <luka.karinja@gmail.com>
-Subject: [PATCH v2] Bluetooth: hci_bcm: Add BCM2E65 ACPI ID
-To: linux-bluetooth@vger.kernel.org
-Cc: Marcel Holtmann <marcel@holtmann.org>,
- Frederic Danis <frederic.danis@linux.intel.com>
-Message-ID: <56769547.5020706@gmail.com>
-Date: Sun, 20 Dec 2015 12:47:19 +0100
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
+Return-Path: <xerofoify@gmail.com>
+From: Nicholas Krause <xerofoify@gmail.com>
+To: marcel@holtmann.org
+Cc: gustavo@padovan.org,
+	johan.hedberg@gmail.com,
+	davem@davemloft.net,
+	linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v3 RESEND] bluetooth:Fix locking issues in the function l2cap_connect_cfm
+Date: Sun, 20 Dec 2015 02:35:40 -0500
+Message-Id: <1450596940-18318-1-git-send-email-xerofoify@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add BCM2E65 device in acpi_device_id table used on Asus T100TAF.
-
-Signed-off-by: Luka Karinja <luka.karinja@gmail.com>
+This fixes a locking issue in the function l2cap_connect_cfm for
+not locking the mutex lock for channels on the l2cap_conn structure
+pointer conn before calling __l2cap_get_chan_by_dcid as all callers
+need to lock and unlock this mutex before calling this function due
+to issues with either concurrent users or race conditions arising
+if this mutex is not locked before these calls.
+v3 Fix double locking of mutex lock on goto next label to instead correctly
+unlock the channel mutex
+v2 Remove unneeded mutex_unlock for channels as the unlock was due early
+for adding correct protection for all functions that have requirements
+for this mutex lock needing to be locked before calling them.
+Signed-off-by: Nicholas Krause <xerofoify@gmail.com>
 ---
-  drivers/bluetooth/hci_bcm.c | 1 +
-  1 file changed, 1 insertion(+)
+ net/bluetooth/l2cap_core.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
-index 3eed35e..5c7c696 100644
---- a/drivers/bluetooth/hci_bcm.c
-+++ b/drivers/bluetooth/hci_bcm.c
-@@ -815,6 +815,7 @@ static const struct hci_uart_proto bcm_proto = {
-  #ifdef CONFIG_ACPI
-  static const struct acpi_device_id bcm_acpi_match[] = {
-      { "BCM2E39", 0 },
-+    { "BCM2E65", 0 },
-      { "BCM2E67", 0 },
-      { },
-  };
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 45fffa4..20d3909 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -7285,6 +7285,7 @@ static void l2cap_connect_cfm(struct hci_conn *hcon, u8 status)
+ 		struct l2cap_chan *chan, *next;
+ 
+ 		/* Client fixed channels should override server ones */
++		mutex_lock(&conn->chan_lock);
+ 		if (__l2cap_get_chan_by_dcid(conn, pchan->scid))
+ 			goto next;
+ 
+@@ -7301,6 +7302,7 @@ static void l2cap_connect_cfm(struct hci_conn *hcon, u8 status)
+ 
+ 		l2cap_chan_unlock(pchan);
+ next:
++		mutex_unlock(&conn->chan_lock);
+ 		next = l2cap_global_fixed_chan(pchan, hcon);
+ 		l2cap_chan_put(pchan);
+ 		pchan = next;
 -- 
-2.6.4
+2.1.4
