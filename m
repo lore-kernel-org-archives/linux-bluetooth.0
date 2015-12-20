@@ -1,41 +1,29 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Date: Mon, 21 Dec 2015 15:46:07 +0100
-From: Martin =?utf-8?Q?Kj=C3=A6r_J=C3=B8rgensen?= <mkj@gotu.dk>
-To: linux-bluetooth@vger.kernel.org
-Subject: DS4 issues
-Message-ID: <20151221144607.GA18773@mkjlap.gotu.dk>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 9.2 \(3112\))
+Subject: Re: [PATCH v3] Bluetooth: hci_bcm: Add BCM2E65 ACPI ID
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1450614966-3682-1-git-send-email-luka.karinja@gmail.com>
+Date: Sun, 20 Dec 2015 14:16:04 +0100
+Cc: linux-bluetooth@vger.kernel.org, frederic.danis@linux.intel.com
+Message-Id: <85C25A43-E9C5-42C4-9153-BCC275BE0E1B@holtmann.org>
+References: <1450614966-3682-1-git-send-email-luka.karinja@gmail.com>
+To: Luka Karinja <luka.karinja@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Is there any "full" support for a Sony DualShock 4 in the bluez/kernel
-stack?
+Hi Luka,
 
-The one I own works perfectly when using USB cable.
+> Add BCM2E65 device in acpi_device_id table used on Asus T100TAF.
+> 
+> Signed-off-by: Luka Karinja <luka.karinja@gmail.com>
+> ---
+> drivers/bluetooth/hci_bcm.c | 1 +
+> 1 file changed, 1 insertion(+)
 
-When using bluetooth it gets recognized as a somewhat generic
-Bluetooth Wireless Controller. Pairing it up with my system seems to
-work as it creates a joystick device (/dev/input/js0) but when testing
-it with jstest, only the touchpad on the DS4 triggers two of the
-axis. None of the buttons or sticks reacts in jstest.
-Pairing it with the usual bluetoothctl makes the DS4 LED dimmed blue
-light.
+patch has been applied to bluetooth-next tree.
 
-I know of the ds4drv project and have used it to connect my DS4, but
-it seems a big buggy and I was hoping it was or will be merged into
-bluez/kernel, making it superfluous.
+Regards
 
-Using the DS4 makes the LED brighter than using ordinary bluetoothctl,
-perhaps because ds4drv knows how to intruct the LED.
-Even if my DS4 is almost next to my bluetooth radio device, the ds4drv
-reports "Signal strength low (29/40/38) reports"
-Testing with jstest seems to trigger all buttons and axises. The
-touchpad itself as a button triggers, but touching the pad doesnt trigger
-anything.
-In some games the digital keys on the left doesnt get recognized, even
-if they get triggered by jstest and other programs like Steam
-recognizes them.
-
-
+Marcel
 
