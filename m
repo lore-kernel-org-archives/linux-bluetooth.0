@@ -1,35 +1,41 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Date: Mon, 21 Dec 2015 15:46:07 +0100
+From: Martin =?utf-8?Q?Kj=C3=A6r_J=C3=B8rgensen?= <mkj@gotu.dk>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv3 3/5] btproxy: Fix possible string overflow
-Date: Tue, 22 Dec 2015 15:32:25 +0200
-Message-Id: <1450791147-13224-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1450791147-13224-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1448551424-18448-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1450791147-13224-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: DS4 issues
+Message-ID: <20151221144607.GA18773@mkjlap.gotu.dk>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Is there any "full" support for a Sony DualShock 4 in the bluez/kernel
+stack?
 
-Follow common practice when copying to fixed size buffer.
----
- tools/btproxy.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+The one I own works perfectly when using USB cable.
 
-diff --git a/tools/btproxy.c b/tools/btproxy.c
-index 1a3eb5e..ee4dadd 100644
---- a/tools/btproxy.c
-+++ b/tools/btproxy.c
-@@ -657,7 +657,7 @@ static int open_unix(const char *path)
- 
- 	memset(&addr, 0, sizeof(addr));
- 	addr.sun_family = AF_UNIX;
--	strcpy(addr.sun_path, path);
-+	strncpy(addr.sun_path, path, sizeof(addr.sun_path));
- 
- 	if (bind(fd, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
- 		perror("Failed to bind Unix server socket");
--- 
-2.5.0
+When using bluetooth it gets recognized as a somewhat generic
+Bluetooth Wireless Controller. Pairing it up with my system seems to
+work as it creates a joystick device (/dev/input/js0) but when testing
+it with jstest, only the touchpad on the DS4 triggers two of the
+axis. None of the buttons or sticks reacts in jstest.
+Pairing it with the usual bluetoothctl makes the DS4 LED dimmed blue
+light.
+
+I know of the ds4drv project and have used it to connect my DS4, but
+it seems a big buggy and I was hoping it was or will be merged into
+bluez/kernel, making it superfluous.
+
+Using the DS4 makes the LED brighter than using ordinary bluetoothctl,
+perhaps because ds4drv knows how to intruct the LED.
+Even if my DS4 is almost next to my bluetooth radio device, the ds4drv
+reports "Signal strength low (29/40/38) reports"
+Testing with jstest seems to trigger all buttons and axises. The
+touchpad itself as a button triggers, but touching the pad doesnt trigger
+anything.
+In some games the digital keys on the left doesnt get recognized, even
+if they get triggered by jstest and other programs like Steam
+recognizes them.
+
+
 
