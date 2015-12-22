@@ -1,36 +1,59 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Syam Sidhardhan <s.syam@samsung.com>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: syamsidhardh@gmail.com, Syam Sidhardhan <s.syam@samsung.com>
-Subject: [PATCH 1/3] Bluetooth: bcm203x: Remove redundant error message
-Date: Tue, 22 Dec 2015 19:30:18 +0530
-Message-id: <1450792820-15352-1-git-send-email-s.syam@samsung.com>
+Subject: [PATCHv3 4/5] btproxy: Simplify Bluetooth proxy
+Date: Tue, 22 Dec 2015 15:32:26 +0200
+Message-Id: <1450791147-13224-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1450791147-13224-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1448551424-18448-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1450791147-13224-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-devm_kzalloc prints its own OOM message upon failure.
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Signed-off-by: Syam Sidhardhan <s.syam@samsung.com>
+At the moment every time we use btproxy we have to down Bluetooth
+device. This is very unhandy especially when connection to proxy ends
+and other connections always fail. Add HCIDEVDOWN ioctl before binding
+to user channel.
 ---
- drivers/bluetooth/bcm203x.c |    4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+ tools/btproxy.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-diff --git a/drivers/bluetooth/bcm203x.c b/drivers/bluetooth/bcm203x.c
-index 364f82b..5b0ef7b 100644
---- a/drivers/bluetooth/bcm203x.c
-+++ b/drivers/bluetooth/bcm203x.c
-@@ -178,10 +178,8 @@ static int bcm203x_probe(struct usb_interface *intf, const struct usb_device_id
- 		return -ENODEV;
+diff --git a/tools/btproxy.c b/tools/btproxy.c
+index ee4dadd..02ae53d 100644
+--- a/tools/btproxy.c
++++ b/tools/btproxy.c
+@@ -39,6 +39,7 @@
+ #include <termios.h>
+ #include <sys/stat.h>
+ #include <sys/socket.h>
++#include <sys/ioctl.h>
+ #include <sys/un.h>
  
- 	data = devm_kzalloc(&intf->dev, sizeof(*data), GFP_KERNEL);
--	if (!data) {
--		BT_ERR("Can't allocate memory for data structure");
-+	if (!data)
- 		return -ENOMEM;
--	}
+ #include <netdb.h>
+@@ -50,6 +51,8 @@
+ #include "monitor/bt.h"
+ #include "h5.h"
  
- 	data->udev  = udev;
- 	data->state = BCM203X_LOAD_MINIDRV;
++#define HCIDEVDOWN	_IOW('H', 202, int)
++
+ #define HCI_BREDR	0x00
+ #define HCI_AMP		0x01
+ 
+@@ -576,6 +579,12 @@ static int open_channel(uint16_t index)
+ 		return -1;
+ 	}
+ 
++	if (ioctl(fd, HCIDEVDOWN, hci_index) < 0) {
++		close(fd);
++		perror("Failed to down hci device");
++		return -1;
++	}
++
+ 	memset(&addr, 0, sizeof(addr));
+ 	addr.hci_family = AF_BLUETOOTH;
+ 	addr.hci_dev = index;
 -- 
-1.7.9.5
+2.5.0
 
