@@ -1,45 +1,93 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: bugzilla-daemon@bugzilla.kernel.org
-To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 100461] No BCM43341 uart support on T100TAF
-Date: Tue, 29 Dec 2015 16:04:15 +0000
-Message-ID: <bug-100461-62941-exF5QC1Knq@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-100461-62941@https.bugzilla.kernel.org/>
-References: <bug-100461-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
+Return-Path: <root@marvell.com>
+From: Amitkumar Karwar <akarwar@marvell.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: <marcel@holtmann.org>, Chin-Ran Lo <crlo@marvell.com>,
+        Amitkumar Karwar
+	<akarwar@marvell.com>
+Subject: [PATCH] Bluetooth: btmrvl: fix hung task warning dump
+Date: Tue, 29 Dec 2015 04:26:33 -0800
+Message-ID: <1451391993-31195-1-git-send-email-akarwar@marvell.com>
 MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-https://bugzilla.kernel.org/show_bug.cgi?id=100461
+From: Chin-Ran Lo <crlo@marvell.com>
 
-Jose <jose@gardiazabal.com> changed:
+It's been observed that when bluetooth driver fails to
+activate the firmware, below hung task warning dump is
+displayed after 120 seconds.
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |jose@gardiazabal.com
+[   36.461022] Bluetooth: vendor=0x2df, device=0x912e, class=255, fn=2
+[   56.512128] Bluetooth: FW failed to be active in time!
+[   56.517264] Bluetooth: Downloading firmware failed!
+[  240.252176] INFO: task kworker/3:2:129 blocked for more than 120 seconds.
+[  240.258931]       Not tainted 3.18.0 #254
+[  240.262972] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+[  240.270751] kworker/3:2     D ffffffc000205760     0   129      2 0x00000000
+[  240.277825] Workqueue: events request_firmware_work_func
+[  240.283134] Call trace:
+[  240.285581] [<ffffffc000205760>] __switch_to+0x80/0x8c
+[  240.290693] [<ffffffc00088dae0>] __schedule+0x540/0x7b8
+[  240.295921] [<ffffffc00088ddd0>] schedule+0x78/0x84
+[  240.300764] [<ffffffc0006dfd48>] __mmc_claim_host+0xe8/0x1c8
+[  240.306395] [<ffffffc0006edd6c>] sdio_claim_host+0x74/0x84
+[  240.311840] [<ffffffbffc163d08>] 0xffffffbffc163d08
+[  240.316685] [<ffffffbffc165104>] 0xffffffbffc165104
+[  240.321524] [<ffffffbffc130cf8>] mwifiex_dnld_fw+0x98/0x110 [mwifiex]
+[  240.327918] [<ffffffbffc12ee88>] mwifiex_remove_card+0x2c4/0x5fc [mwifiex]
+[  240.334741] [<ffffffc000596780>] request_firmware_work_func+0x44/0x80
+[  240.341127] [<ffffffc00023b934>] process_one_work+0x2ec/0x50c
+[  240.346831] [<ffffffc00023c6a0>] worker_thread+0x350/0x470
+[  240.352272] [<ffffffc0002419bc>] kthread+0xf0/0xfc
+[  240.357019] 2 locks held by kworker/3:2/129:
+[  240.361248]  #0:  ("events"){.+.+.+}, at: [<ffffffc00023b840>] process_one_work+0x1f8/0x50c
+[  240.369562]  #1:  ((&fw_work->work)){+.+.+.}, at: [<ffffffc00023b840>] process_one_work+0x1f8/0x50c
+[  240.378589]   task                        PC stack   pid father
+[  240.384501] kworker/1:1     D ffffffc000205760     0    40      2 0x00000000
+[  240.391524] Workqueue: events mtk_atomic_work
+[  240.395884] Call trace:
+[  240.398317] [<ffffffc000205760>] __switch_to+0x80/0x8c
+[  240.403448] [<ffffffc00027279c>] lock_acquire+0x128/0x164
+[  240.408821] kworker/3:2     D ffffffc000205760     0   129      2 0x00000000
+[  240.415867] Workqueue: events request_firmware_work_func
+[  240.421138] Call trace:
+[  240.423589] [<ffffffc000205760>] __switch_to+0x80/0x8c
+[  240.428688] [<ffffffc00088dae0>] __schedule+0x540/0x7b8
+[  240.433886] [<ffffffc00088ddd0>] schedule+0x78/0x84
+[  240.438732] [<ffffffc0006dfd48>] __mmc_claim_host+0xe8/0x1c8
+[  240.444361] [<ffffffc0006edd6c>] sdio_claim_host+0x74/0x84
+[  240.449801] [<ffffffbffc163d08>] 0xffffffbffc163d08
+[  240.454649] [<ffffffbffc165104>] 0xffffffbffc165104
+[  240.459486] [<ffffffbffc130cf8>] mwifiex_dnld_fw+0x98/0x110 [mwifiex]
+[  240.465882] [<ffffffbffc12ee88>] mwifiex_remove_card+0x2c4/0x5fc [mwifiex]
+[  240.472705] [<ffffffc000596780>] request_firmware_work_func+0x44/0x80
+[  240.479090] [<ffffffc00023b934>] process_one_work+0x2ec/0x50c
+[  240.484794] [<ffffffc00023c6a0>] worker_thread+0x350/0x470
+[  240.490231] [<ffffffc0002419bc>] kthread+0xf0/0xfc
 
---- Comment #5 from Jose <jose@gardiazabal.com> ---
-Dear all,
-I followed your instructions to make the bluetooth adapter on my T100 CHI work,
-with just minor changes.
-- The first one, the model to add in bcm_acpi_match (hci_bcm.c) is BCM2E71.
-- To obtain the correct firmware, I downloaded the Windows 8 drivers from Asus,
-executed them in Windows, and I took the file named
-BCM4324B3_002.004.006.0130.0131.hcd, and copied it to /lib/firmware/brcm as
-BCM4324B3.hcd (it worked in the first attempt, but there are other
-BCM4324B3*.hcd files that I didn't try).
-- The command I needed to run was "btattach --bredr /dev/ttyS1 -P bcm", using
-bluez 5.37 (from yesterday).
-I think it makes sense to add the extra device to hci_bcm.c, but I'm not sure
-how to submit the patch, maybe some of you can help me?
+This patch adds missing sdio_release_host() call so that wlan driver
+thread can claim sdio host.
 
-Thanks for all the info!
+Fixes: 4863e4cc31d647e1 ("Bluetooth: btmrvl: release sdio bus after firmware is up")
+Signed-off-by: Chin-Ran Lo <crlo@marvell.com>
+Signed-off-by: Amitkumar Karwar <akarwar@marvell.com>
+---
+ drivers/bluetooth/btmrvl_sdio.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-Jose
-
-I hope you can also include
-
+diff --git a/drivers/bluetooth/btmrvl_sdio.c b/drivers/bluetooth/btmrvl_sdio.c
+index d3a4acd..73a1c27 100644
+--- a/drivers/bluetooth/btmrvl_sdio.c
++++ b/drivers/bluetooth/btmrvl_sdio.c
+@@ -1112,7 +1112,8 @@ static int btmrvl_sdio_download_fw(struct btmrvl_sdio_card *card)
+ 	 */
+ 	if (btmrvl_sdio_verify_fw_download(card, pollnum)) {
+ 		BT_ERR("FW failed to be active in time!");
+-		return -ETIMEDOUT;
++		ret = -ETIMEDOUT;
++		goto done;
+ 	}
+ 
+ 	sdio_release_host(card->func);
 -- 
-You are receiving this mail because:
-You are the assignee for the bug.
+1.8.1.4
