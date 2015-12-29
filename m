@@ -1,66 +1,45 @@
-Return-Path: <xerofoify@gmail.com>
-From: Nicholas Krause <xerofoify@gmail.com>
-To: marcel@holtmann.org
-Cc: gustavo@padovan.org,
-	johan.hedberg@gmail.com,
-	davem@davemloft.net,
-	dh.herrmann@gmail.com,
-	tedd.an@intel.com,
-	linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH RESEND] bluetooth:hicp:Fix error handling in the function hidp_connection_del
-Date: Tue, 29 Dec 2015 15:55:49 -0500
-Message-Id: <1451422549-22071-1-git-send-email-xerofoify@gmail.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: bugzilla-daemon@bugzilla.kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [Bug 100461] No BCM43341 uart support on T100TAF
+Date: Tue, 29 Dec 2015 16:04:15 +0000
+Message-ID: <bug-100461-62941-exF5QC1Knq@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-100461-62941@https.bugzilla.kernel.org/>
+References: <bug-100461-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This fixes error handling in the function hidp_connection_del to
-properly check if the internal call to hidp_send_ctrl_message has
-failed by returning a error code and if so immediately return this
-error code to the caller of hidp_connection_del to signal that a
-failed call has occurred that needs to be handled by this function's
-caller.
+https://bugzilla.kernel.org/show_bug.cgi?id=100461
 
-Signed-off-by: Nicholas Krause <xerofoify@gmail.com>
----
- net/bluetooth/hidp/core.c | 17 ++++++++++-------
- 1 file changed, 10 insertions(+), 7 deletions(-)
+Jose <jose@gardiazabal.com> changed:
 
-diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
-index f1a117f..13aa6d0 100644
---- a/net/bluetooth/hidp/core.c
-+++ b/net/bluetooth/hidp/core.c
-@@ -1360,6 +1360,7 @@ int hidp_connection_del(struct hidp_conndel_req *req)
- {
- 	u32 valid_flags = BIT(HIDP_VIRTUAL_CABLE_UNPLUG);
- 	struct hidp_session *session;
-+	int err;
- 
- 	if (req->flags & ~valid_flags)
- 		return -EINVAL;
-@@ -1368,14 +1369,16 @@ int hidp_connection_del(struct hidp_conndel_req *req)
- 	if (!session)
- 		return -ENOENT;
- 
--	if (req->flags & BIT(HIDP_VIRTUAL_CABLE_UNPLUG))
--		hidp_send_ctrl_message(session,
--				       HIDP_TRANS_HID_CONTROL |
--				         HIDP_CTRL_VIRTUAL_CABLE_UNPLUG,
--				       NULL, 0);
--	else
-+	if (req->flags & BIT(HIDP_VIRTUAL_CABLE_UNPLUG)) {
-+		err = hidp_send_ctrl_message(session,
-+					     HIDP_TRANS_HID_CONTROL |
-+					     HIDP_CTRL_VIRTUAL_CABLE_UNPLUG,
-+					     NULL, 0);
-+		if (err)
-+			return err;
-+	} else {
- 		l2cap_unregister_user(session->conn, &session->user);
--
-+	}
- 	hidp_session_put(session);
- 
- 	return 0;
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |jose@gardiazabal.com
+
+--- Comment #5 from Jose <jose@gardiazabal.com> ---
+Dear all,
+I followed your instructions to make the bluetooth adapter on my T100 CHI work,
+with just minor changes.
+- The first one, the model to add in bcm_acpi_match (hci_bcm.c) is BCM2E71.
+- To obtain the correct firmware, I downloaded the Windows 8 drivers from Asus,
+executed them in Windows, and I took the file named
+BCM4324B3_002.004.006.0130.0131.hcd, and copied it to /lib/firmware/brcm as
+BCM4324B3.hcd (it worked in the first attempt, but there are other
+BCM4324B3*.hcd files that I didn't try).
+- The command I needed to run was "btattach --bredr /dev/ttyS1 -P bcm", using
+bluez 5.37 (from yesterday).
+I think it makes sense to add the extra device to hci_bcm.c, but I'm not sure
+how to submit the patch, maybe some of you can help me?
+
+Thanks for all the info!
+
+Jose
+
+I hope you can also include
+
 -- 
-2.1.4
+You are receiving this mail because:
+You are the assignee for the bug.
