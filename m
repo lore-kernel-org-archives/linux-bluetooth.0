@@ -1,53 +1,20 @@
-Return-Path: <xerofoify@gmail.com>
-From: Nicholas Krause <xerofoify@gmail.com>
-To: marcel@holtmann.org
-Cc: gustavo@padovan.org,
-	johan.hedberg@gmail.com,
-	davem@davemloft.net,
-	linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH RESEND] bluetooth:Fix return statement in the function load_link_keys
-Date: Wed, 30 Dec 2015 23:29:27 -0500
-Message-Id: <1451536167-32366-1-git-send-email-xerofoify@gmail.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+To: linux-bluetooth@vger.kernel.org
+From: Biman Paul <biman.innovative@gmail.com>
+Subject: Configure two MAS instance for MAP in bluez
+Message-ID: <5683FF9E.6080404@gmail.com>
+Date: Wed, 30 Dec 2015 21:30:30 +0530
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This fixes the final return statement in the function load_link_keys
-to properly return the internal call to mgmt_cmd_complete return
-value rather then zero to properly indicate when the function
-load_link_keys fails due to a internal failed call to the function
-mgmt_cmd_complete.
+I need to configure two MAS instance:
+1. MAS-0: For SMS
+2. MAS-1: For Email
 
-Signed-off-by: Nicholas Krause <xerofoify@gmail.com>
----
- net/bluetooth/mgmt.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+Please let me know if this is currently supported in bluez.
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 92720f3..52b039a 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -2954,6 +2954,7 @@ static int load_link_keys(struct sock *sk, struct hci_dev *hdev, void *data,
- 	u16 key_count, expected_len;
- 	bool changed;
- 	int i;
-+	int err;
- 
- 	BT_DBG("request for %s", hdev->name);
- 
-@@ -3020,11 +3021,11 @@ static int load_link_keys(struct sock *sk, struct hci_dev *hdev, void *data,
- 				 key->type, key->pin_len, NULL);
- 	}
- 
--	mgmt_cmd_complete(sk, hdev->id, MGMT_OP_LOAD_LINK_KEYS, 0, NULL, 0);
-+	err = mgmt_cmd_complete(sk, hdev->id, MGMT_OP_LOAD_LINK_KEYS, 0, NULL, 0);
- 
- 	hci_dev_unlock(hdev);
- 
--	return 0;
-+	return err;
- }
- 
- static int device_unpaired(struct hci_dev *hdev, bdaddr_t *bdaddr,
--- 
-2.1.4
+If supported then please guide the steps to configure.
+If not supported then please advise on implementation.
+
