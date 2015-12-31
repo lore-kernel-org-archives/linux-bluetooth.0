@@ -1,52 +1,376 @@
-Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-From: =?UTF-8?Q?Cl=C3=A9ment_de_l=27Hamaide?=
-	<clement.delhamaide@gmail.com>
-Date: Sun, 1 Nov 2015 01:55:02 +0100
-Message-ID: <CAG4Y7escv=GDSCJ2=3+L21Fc=O+oEzGGJ_h77W2-2Vkykys=Nw@mail.gmail.com>
-Subject: Re: ath3k Bluetooth adapter not loading: [0cf3:3004] Atheros
- Communications, Inc. AR3012 Bluetooth 4.0
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 9.2 \(3112\))
+Subject: Re: [PATCH] bluetooth: core: RfC - add basic LED triggers
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <5685741F.9070904@gmail.com>
+Date: Thu, 31 Dec 2015 10:54:28 -0800
+Cc: Johan Hedberg <johan.hedberg@gmail.com>,
+	linux-bluetooth@vger.kernel.org,
+	Johannes Berg <johannes.berg@intel.com>
+Message-Id: <80515F05-B075-40C3-86E1-3E900EAE5058@holtmann.org>
+References: <5685741F.9070904@gmail.com>
+To: Heiner Kallweit <hkallweit1@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi all,
+Hi Heiner,
 
-This is my first mail in this list, I've subscribed this list
-because I own a MSI GS60 laptop with QCA6174 chipset (Wifi+Bluetooth)
-where Bluetooth doesn't work.
+> In the bluetooth subsystem I miss the option to use LEDs to indicate
+> the status. This patch is based on the LED triggers in mac80211 and
+> adds two basic LED triggers (powered up, device connected) plus
+> a config option to enable the BT LED triggers.
+> 
+> It works fine on my system however I don't know the bluetooth stack
+> in too much detail and therefore appreciate any comment.
+> 
+> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+> ---
+> include/net/bluetooth/hci_core.h |   7 +++
+> net/bluetooth/Kconfig            |   9 +++
+> net/bluetooth/Makefile           |   1 +
+> net/bluetooth/hci_core.c         |   8 +++
+> net/bluetooth/hci_event.c        |   3 +
+> net/bluetooth/led.c              | 126 +++++++++++++++++++++++++++++++++++++++
+> net/bluetooth/led.h              |  32 ++++++++++
+> 7 files changed, 186 insertions(+)
+> create mode 100644 net/bluetooth/led.c
+> create mode 100644 net/bluetooth/led.h
+> 
+> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+> index c95e032..e47f05c 100644
+> --- a/include/net/bluetooth/hci_core.h
+> +++ b/include/net/bluetooth/hci_core.h
+> @@ -25,6 +25,7 @@
+> #ifndef __HCI_CORE_H
+> #define __HCI_CORE_H
+> 
+> +#include <linux/leds.h>
+> #include <net/bluetooth/hci.h>
+> #include <net/bluetooth/hci_sock.h>
+> 
+> @@ -395,6 +396,12 @@ struct hci_dev {
+> 	struct delayed_work	rpa_expired;
+> 	bdaddr_t		rpa;
+> 
+> +#ifdef CONFIG_BT_LEDS
+> +	struct led_trigger assoc_led, radio_led;
+> +	atomic_t assoc_led_active, radio_led_active;
+> +	atomic_t assoc_led_cnt, radio_led_cnt;
+> +#endif
+> +
 
-I am in the very same bug than the one reported by Sumit (same dmesg report)
-and it's now solved by applying the following patch:
+not a big fan of these kind of assignments. Keep them separate on each line.
 
+Also we might just want to start using a sub-struct and move that all to leds.[ch]. I wonder if we can do some magic compiler trick of avoid the ifdef here.
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index b6aceaf..884dbe5 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -199,7 +199,6 @@ static const struct usb_device_id blacklist_table[] = {
-        { USB_DEVICE(0x0930, 0x0227), .driver_info = BTUSB_ATH3012 },
-        { USB_DEVICE(0x0b05, 0x17d0), .driver_info = BTUSB_ATH3012 },
-        { USB_DEVICE(0x0cf3, 0x0036), .driver_info = BTUSB_ATH3012 },
--       { USB_DEVICE(0x0cf3, 0x3004), .driver_info = BTUSB_ATH3012 },
-        { USB_DEVICE(0x0cf3, 0x3008), .driver_info = BTUSB_ATH3012 },
-        { USB_DEVICE(0x0cf3, 0x311d), .driver_info = BTUSB_ATH3012 },
-        { USB_DEVICE(0x0cf3, 0x311e), .driver_info = BTUSB_ATH3012 },
-@@ -230,6 +229,7 @@ static const struct usb_device_id blacklist_table[] = {
-        { USB_DEVICE(0x0cf3, 0xe007), .driver_info = BTUSB_QCA_ROME },
-        { USB_DEVICE(0x0cf3, 0xe300), .driver_info = BTUSB_QCA_ROME },
-        { USB_DEVICE(0x0cf3, 0xe360), .driver_info = BTUSB_QCA_ROME },
-+       { USB_DEVICE(0x0cf3, 0x3004), .driver_info = BTUSB_QCA_ROME },
+> 	int (*open)(struct hci_dev *hdev);
+> 	int (*close)(struct hci_dev *hdev);
+> 	int (*flush)(struct hci_dev *hdev);
+> diff --git a/net/bluetooth/Kconfig b/net/bluetooth/Kconfig
+> index 95d1a66..cba56c7 100644
+> --- a/net/bluetooth/Kconfig
+> +++ b/net/bluetooth/Kconfig
+> @@ -69,6 +69,15 @@ config BT_6LOWPAN
+> 	help
+> 	  IPv6 compression over Bluetooth Low Energy.
+> 
+> +config BT_LEDS
+> +	bool "Enable LED triggers"
+> +	depends on BT
+> +	depends on LEDS_CLASS
+> +	select LEDS_TRIGGERS
+> +	help
+> +	 This option selects a few LED triggers for different
+> +	 Bluetooth events.
 
-        /* Broadcom BCM2035 */
-        { USB_DEVICE(0x0a5c, 0x2009), .driver_info = BTUSB_BCM92035 },
+Not sure if the diff is messing this up, but just in case, two spaces extra indentation for the help text body.
 
+> +
+> config BT_SELFTEST
+> 	bool "Bluetooth self testing support"
+> 	depends on BT && DEBUG_KERNEL
+> diff --git a/net/bluetooth/Makefile b/net/bluetooth/Makefile
+> index 2b15ae8..98d8988 100644
+> --- a/net/bluetooth/Makefile
+> +++ b/net/bluetooth/Makefile
+> @@ -17,6 +17,7 @@ bluetooth-y := af_bluetooth.o hci_core.o hci_conn.o hci_event.o mgmt.o \
+> 
+> bluetooth-$(CONFIG_BT_BREDR) += sco.o
+> bluetooth-$(CONFIG_BT_HS) += a2mp.o amp.o
+> +bluetooth-$(CONFIG_BT_LEDS) += led.o
 
-After a fresh kernel compilation and reboot, my Bluetooth [0cf3:3004]
-is now working as expected.
+I would use plural leds.c here.
 
-I hope my feedback will help the bluetooth community to commit this patch.
+> bluetooth-$(CONFIG_BT_DEBUGFS) += hci_debugfs.o
+> bluetooth-$(CONFIG_BT_SELFTEST) += selftest.o
+> 
+> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> index 47bcef7..63a4229 100644
+> --- a/net/bluetooth/hci_core.c
+> +++ b/net/bluetooth/hci_core.c
+> @@ -40,6 +40,7 @@
+> #include "hci_request.h"
+> #include "hci_debugfs.h"
+> #include "smp.h"
+> +#include "led.h"
+> 
+> static void hci_rx_work(struct work_struct *work);
+> static void hci_cmd_work(struct work_struct *work);
+> @@ -1395,6 +1396,7 @@ static int hci_dev_do_open(struct hci_dev *hdev)
+> 		hci_dev_set_flag(hdev, HCI_RPA_EXPIRED);
+> 		set_bit(HCI_UP, &hdev->flags);
+> 		hci_sock_dev_event(hdev, HCI_DEV_UP);
+> +		hci_led_radio(hdev, true);
+> 		if (!hci_dev_test_flag(hdev, HCI_SETUP) &&
+> 		    !hci_dev_test_flag(hdev, HCI_CONFIG) &&
+> 		    !hci_dev_test_flag(hdev, HCI_UNCONFIGURED) &&
+> @@ -1532,6 +1534,8 @@ int hci_dev_do_close(struct hci_dev *hdev)
+> 		return 0;
+> 	}
+> 
+> +	hci_led_radio(hdev, false);
+> +
+> 	/* Flush RX and TX works */
+> 	flush_work(&hdev->tx_work);
+> 	flush_work(&hdev->rx_work);
+> @@ -3067,6 +3071,8 @@ int hci_register_dev(struct hci_dev *hdev)
+> 	if (error < 0)
+> 		goto err_wqueue;
+> 
+> +	hci_led_init(hdev);
+> +
+> 	hdev->rfkill = rfkill_alloc(hdev->name, &hdev->dev,
+> 				    RFKILL_TYPE_BLUETOOTH, &hci_rfkill_ops,
+> 				    hdev);
+> @@ -3128,6 +3134,8 @@ void hci_unregister_dev(struct hci_dev *hdev)
+> 
+> 	id = hdev->id;
+> 
+> +	hci_led_exit(hdev);
+> +
+> 	write_lock(&hci_dev_list_lock);
+> 	list_del(&hdev->list);
+> 	write_unlock(&hci_dev_list_lock);
+> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> index 7554da5..e5545c3 100644
+> --- a/net/bluetooth/hci_event.c
+> +++ b/net/bluetooth/hci_event.c
+> @@ -35,6 +35,7 @@
+> #include "a2mp.h"
+> #include "amp.h"
+> #include "smp.h"
+> +#include "led.h"
+> 
+> #define ZERO_KEY "\x00\x00\x00\x00\x00\x00\x00\x00" \
+> 		 "\x00\x00\x00\x00\x00\x00\x00\x00"
+> @@ -5239,6 +5240,7 @@ void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb)
+> 
+> 	case HCI_EV_CONN_COMPLETE:
+> 		hci_conn_complete_evt(hdev, skb);
+> +		hci_led_assoc(hdev, true);
+> 		break;
+> 
+> 	case HCI_EV_CONN_REQUEST:
+> @@ -5246,6 +5248,7 @@ void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb)
+> 		break;
+> 
+> 	case HCI_EV_DISCONN_COMPLETE:
+> +		hci_led_assoc(hdev, false);
+> 		hci_disconn_complete_evt(hdev, skb);
+> 		break;
 
-Regards,
-Clément
+This is actually a really bad idea. It will only account for BR/EDR and in case of LE it will only catch the disconnect event. Which will lead to the WARN_ON with your atomic counter. Not to mention that also for SCO/eSCO links you get the same imbalance as well.
+
+You need to hook this up into hci_conn handling that actually represents logical connections.
+
+I think this makes also pretty clear that assoc is a pretty bad word in the Bluetooth world. It has no meaning for BR/EDR or LE operation. You want a connection state LED.
+
+Now the question becomes if you actually want a connection state LED or an actual activity LED. For BR/EDR you have the controller be discovering devices or being actually in a connection or both. For LE you have discovery as well (active scanning) and being in a connection state. However you have additionally background auto-connection (passive scanning) and also advertising.
+
+Thinking this further through, you could actually be a lot more detailed in the LE world. Here you have scanning state, advertising state and connection state (maybe also initiating state). With the concept of multiple instances of the state machine, you could have a separate LED for each of these.
+
+The radio on/off trigger is simple and I most likely would just start with that one, but for the "assoc" trigger this needs a bit more thinking since Bluetooth does work different than WiFi.
+
+> 
+> diff --git a/net/bluetooth/led.c b/net/bluetooth/led.c
+> new file mode 100644
+> index 0000000..420633c
+> --- /dev/null
+> +++ b/net/bluetooth/led.c
+> @@ -0,0 +1,126 @@
+> +/*
+> + * Copyright 2015, Heiner Kallweit <hkallweit1@gmail.com>
+> + * This code is based on the MAC80211 LED code.
+> + * Original author: Johannes Berg <johannes.berg@intel.com>
+> + *
+> + * This program is free software; you can redistribute it and/or modify
+> + * it under the terms of the GNU General Public License version 2 as
+> + * published by the Free Software Foundation.
+> + */
+> +
+> +#include <net/bluetooth/bluetooth.h>
+> +#include <net/bluetooth/hci_core.h>
+> +
+> +#include "led.h"
+> +
+> +#define cdev_to_hdev(cdev, name) container_of(cdev->trigger, \
+> +					      struct hci_dev, \
+> +					      name)
+> +
+> +void hci_led_assoc(struct hci_dev *hdev, bool associated)
+> +{
+> +	int cnt;
+> +
+> +	if (associated)
+> +		cnt = atomic_inc_return(&hdev->assoc_led_cnt);
+> +	else
+> +		cnt = atomic_dec_return(&hdev->assoc_led_cnt);
+> +
+> +	WARN_ON(cnt < 0);
+> +
+> +	if (!atomic_read(&hdev->assoc_led_active))
+> +		return;
+> +
+> +	led_trigger_event(&hdev->assoc_led,
+> +			  cnt ? LED_FULL : LED_OFF);
+> +}
+> +
+> +void hci_led_radio(struct hci_dev *hdev, bool enabled)
+> +{
+> +	int cnt;
+> +
+> +	if (enabled)
+> +		cnt = atomic_inc_return(&hdev->radio_led_cnt);
+> +	else
+> +		cnt = atomic_dec_return(&hdev->radio_led_cnt);
+> +
+> +	WARN_ON(cnt < 0);
+> +
+> +	if (!atomic_read(&hdev->radio_led_active))
+> +		return;
+> +
+> +	led_trigger_event(&hdev->radio_led,
+> +			  cnt ? LED_FULL : LED_OFF);
+> +}
+> +
+> +static void hci_assoc_led_activate(struct led_classdev *led_cdev)
+> +{
+> +	struct hci_dev *hdev = cdev_to_hdev(led_cdev, assoc_led);
+> +	int cnt = atomic_read(&hdev->assoc_led_cnt);
+> +
+> +	atomic_inc(&hdev->assoc_led_active);
+> +
+> +	led_trigger_event(&hdev->assoc_led, cnt ? LED_FULL : LED_OFF);
+> +}
+
+Why is this so complicated with the LED active handling? Isn't that something the LED class should actually take care of for us. What is the point in repeating that over and over again. Actually all of this should most likely have some sort of "simple cumulative LED" version that does that.
+
+> +
+> +static void hci_assoc_led_deactivate(struct led_classdev *led_cdev)
+> +{
+> +	struct hci_dev *hdev = cdev_to_hdev(led_cdev, assoc_led);
+> +
+> +	atomic_dec(&hdev->assoc_led_active);
+> +}
+> +
+> +static void hci_radio_led_activate(struct led_classdev *led_cdev)
+> +{
+> +	struct hci_dev *hdev = cdev_to_hdev(led_cdev, radio_led);
+> +	int cnt = atomic_read(&hdev->radio_led_cnt);
+> +
+> +	atomic_inc(&hdev->radio_led_active);
+> +
+> +	led_trigger_event(&hdev->radio_led, cnt ? LED_FULL : LED_OFF);
+> +}
+> +
+> +static void hci_radio_led_deactivate(struct led_classdev *led_cdev)
+> +{
+> +	struct hci_dev *hdev = cdev_to_hdev(led_cdev, radio_led);
+> +
+> +	atomic_dec(&hdev->radio_led_active);
+> +}
+> +
+> +void hci_led_init(struct hci_dev *hdev)
+> +{
+> +	/* initialize assoc_led */
+> +	atomic_set(&hdev->assoc_led_cnt, 0);
+> +	atomic_set(&hdev->assoc_led_active, 0);
+> +	hdev->assoc_led.activate = hci_assoc_led_activate;
+> +	hdev->assoc_led.deactivate = hci_assoc_led_deactivate;
+> +	hdev->assoc_led.name = devm_kasprintf(&hdev->dev, GFP_KERNEL,
+> +					      "%s-assoc", hdev->name);
+> +	if (hdev->assoc_led.name &&
+> +	    led_trigger_register(&hdev->assoc_led)) {
+> +		devm_kfree(&hdev->dev, (void *)hdev->assoc_led.name);
+> +		hdev->assoc_led.name = NULL;
+> +	}
+> +
+> +	/* initialize radio_led */
+> +	atomic_set(&hdev->radio_led_cnt, 0);
+> +	atomic_set(&hdev->radio_led_active, 0);
+> +	hdev->radio_led.activate = hci_radio_led_activate;
+> +	hdev->radio_led.deactivate = hci_radio_led_deactivate;
+> +	hdev->radio_led.name = devm_kasprintf(&hdev->dev, GFP_KERNEL,
+> +					      "%s-radio", hdev->name);
+> +	if (hdev->radio_led.name &&
+> +	    led_trigger_register(&hdev->radio_led)) {
+> +		devm_kfree(&hdev->dev, (void *)hdev->radio_led.name);
+> +		hdev->radio_led.name = NULL;
+> +	}
+> +}
+
+Now also the real question is if you just want a per controller LEDs or also some global LED that combines that status of all controllers attached to the system.
+
+> +
+> +void hci_led_exit(struct hci_dev *hdev)
+> +{
+> +	if (hdev->assoc_led.name)
+> +		led_trigger_unregister(&hdev->assoc_led);
+> +	if (hdev->radio_led.name)
+> +		led_trigger_unregister(&hdev->radio_led);
+> +}
+> +
+> diff --git a/net/bluetooth/led.h b/net/bluetooth/led.h
+> new file mode 100644
+> index 0000000..a607292
+> --- /dev/null
+> +++ b/net/bluetooth/led.h
+> @@ -0,0 +1,32 @@
+> +/*
+> + * Copyright 2015, Heiner Kallweit <hkallweit1@gmail.com>
+> + * This code is based on the MAC80211 LED code.
+> + * Original author: Johannes Berg <johannes.berg@intel.com>
+> + *
+> + * This program is free software; you can redistribute it and/or modify
+> + * it under the terms of the GNU General Public License version 2 as
+> + * published by the Free Software Foundation.
+> + */
+> +
+> +#ifdef CONFIG_BT_LEDS
+> +void hci_led_assoc(struct hci_dev *hdev, bool associated);
+> +void hci_led_radio(struct hci_dev *hdev, bool enabled);
+> +void hci_led_init(struct hci_dev *hdev);
+> +void hci_led_exit(struct hci_dev *hdev);
+> +#else
+> +static inline void hci_led_assoc(struct hci_dev *hdev, bool associated)
+> +{
+> +}
+> +
+> +static inline void hci_led_radio(struct hci_dev *hdev, bool enabled)
+> +{
+> +}
+> +
+> +static inline void hci_led_init(struct hci_dev *hdev)
+> +{
+> +}
+> +
+> +static inline void hci_led_exit(struct hci_dev *hdev)
+> +{
+> +}
+> +#endif
+
+Regards
+
+Marcel
+
