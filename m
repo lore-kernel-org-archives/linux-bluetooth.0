@@ -1,42 +1,43 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <5683FF9E.6080404@gmail.com>
-References: <5683FF9E.6080404@gmail.com>
-Date: Mon, 4 Jan 2016 12:09:04 -0200
-Message-ID: <CABBYNZLdu2h3Sj1AC_A2Ez_-Ro0+GbfA7cMQ1O=+vhMbkMOyqw@mail.gmail.com>
-Subject: Re: Configure two MAS instance for MAP in bluez
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Biman Paul <biman.innovative@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <heikki.krogerus@linux.intel.com>
+From: Heikki Krogerus <heikki.krogerus@linux.intel.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 2/2] Bluetooth: hci_bcm: new ACPI IDs
+Date: Mon,  4 Jan 2016 14:23:22 +0200
+Message-Id: <1451910202-42401-3-git-send-email-heikki.krogerus@linux.intel.com>
+In-Reply-To: <1451910202-42401-1-git-send-email-heikki.krogerus@linux.intel.com>
+References: <1451910202-42401-1-git-send-email-heikki.krogerus@linux.intel.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Paul,
+These are used at least by Acer with BCM43241.
 
-On Wed, Dec 30, 2015 at 2:00 PM, Biman Paul <biman.innovative@gmail.com> wrote:
-> I need to configure two MAS instance:
-> 1. MAS-0: For SMS
-> 2. MAS-1: For Email
+Signed-off-by: Heikki Krogerus <heikki.krogerus@linux.intel.com>
+---
+ drivers/bluetooth/hci_bcm.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-Currently this is no supported by the server implementation, we
-actually have been discussing to change the way we exchange the data
-with the system so instead of having built-in backends implementing
-the message.h header (build time dependency) we would like to have
-D-Bus agent concept (run time dependency), that way it wold be much
-simpler to implement multiple instances.
-
-> Please let me know if this is currently supported in bluez.
->
-> If supported then please guide the steps to configure.
-> If not supported then please advise on implementation.
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-
+diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
+index abf13a7..5f3de18 100644
+--- a/drivers/bluetooth/hci_bcm.c
++++ b/drivers/bluetooth/hci_bcm.c
+@@ -816,11 +816,14 @@ static const struct hci_uart_proto bcm_proto = {
+ static const struct acpi_device_id bcm_acpi_match[] = {
+ 	{ "BCM2E1A", 0 },
+ 	{ "BCM2E39", 0 },
++	{ "BCM2E3A", 0 },
+ 	{ "BCM2E3D", 0 },
++	{ "BCM2E3F", 0 },
+ 	{ "BCM2E40", 0 },
+ 	{ "BCM2E64", 0 },
+ 	{ "BCM2E65", 0 },
+ 	{ "BCM2E67", 0 },
++	{ "BCM2E7B", 0 },
+ 	{ },
+ };
+ MODULE_DEVICE_TABLE(acpi, bcm_acpi_match);
 -- 
-Luiz Augusto von Dentz
+2.6.4
