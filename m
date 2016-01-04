@@ -1,72 +1,37 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CAG=SMqaQik3OAVKHsto5oSBkpX-vNft-X61HBuLKP00502k=bA@mail.gmail.com>
-References: <CAG=SMqaQik3OAVKHsto5oSBkpX-vNft-X61HBuLKP00502k=bA@mail.gmail.com>
-Date: Mon, 4 Jan 2016 12:21:55 -0200
-Message-ID: <CABBYNZ+jW-SFKvzxUp-WuHSmuhW8eKpfVOZFmisPMqJkDmVtoQ@mail.gmail.com>
-Subject: Re: bluetoothd aborted
+In-Reply-To: <CAMib2GZCAOHfBv=SZrVWaPEHZV6WDkoct03TPqtjyvAcHwoeqQ@mail.gmail.com>
+References: <CAMib2GZCAOHfBv=SZrVWaPEHZV6WDkoct03TPqtjyvAcHwoeqQ@mail.gmail.com>
+Date: Mon, 4 Jan 2016 12:14:00 -0200
+Message-ID: <CABBYNZJfMFewZUgjAfNTNasoLGWgm=LYdmzvfSLOEwRWoXbrxA@mail.gmail.com>
+Subject: Re: How to bind any linux media player to simple-player script?
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Fabian Bergmark <fabian.bergmark@gmail.com>
+To: Kyle Shneider <shneiderkyle@gmail.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Fabian,
+Hi Kyle,
 
-On Fri, Dec 25, 2015 at 6:46 PM, Fabian Bergmark
-<fabian.bergmark@gmail.com> wrote:
-> I (rarely) get segfaults or aborts while running bluetoothd with the
-> -nEd command line arguments. I'm running commit 1b9e48f4c2b98e
+On Sat, Dec 26, 2015 at 1:18 PM, Kyle Shneider <shneiderkyle@gmail.com> wrote:
+> I'm testing a2dp profile. bluetoothd gets commands from connected
+> device, but there are no audio.
+> As i get it, reading code of simple-player, you should either pass
+> actual player's path as argument of simple-player script of change
+> hardcoded /test/player to actual player's path... something like that,
+> correct me if i'm wrong. Binded player should have mpris interface,
+> like /org/mpris/MediaPlayer2/rhythmbox
+> But all linux players use session bus, and in our case we work with
+> org.bluez on system bus. So how to properly bind any linux media
+> player to simple-player script.
 
-Looks like you are not using 5.37 yet, although it seems it does
-includes all the fixes done in GATT.
-
-> If I can provide more useful information let me know. Here are the last lines:
->
-> bluetoothd[3623]: src/gatt-client.c:btd_gatt_client_ready() GATT client ready
-> bluetoothd[3623]: src/gatt-client.c:create_services() Exporting
-> objects for GATT services: 80:E4:DA:70:08:9E
-> bluetoothd[3623]: src/adapter.c:new_conn_param() hci0
-> 80:E4:DA:70:08:9E (1) min 0x0012 max 0x0024 latency 0x0004 timeout
-> 0x0064
-> bluetoothd[3623]: src/adapter.c:store_conn_param()
-> bluetoothd[3623]: src/device.c:gatt_debug() Registered handler for
-> "Service Changed": 3
-> bluetoothd[3623]: src/adapter.c:dev_disconnected() Device
-> 80:E4:DA:70:08:9E disconnected, reason 1
-> bluetoothd[3623]: src/adapter.c:adapter_remove_connection()
-> bluetoothd[3623]: plugins/policy.c:disconnect_cb() reason 1
-> bluetoothd[3623]: src/adapter.c:bonding_attempt_complete() hci0 bdaddr
-> 80:E4:DA:70:08:9E type 1 status 0xe
-> bluetoothd[3623]: src/device.c:device_bonding_complete() bonding (nil)
-> status 0x0e
-> bluetoothd[3623]: src/device.c:device_bonding_failed() status 14
-> bluetoothd[3623]: src/adapter.c:resume_discovery()
-> bluetoothd[3623]: src/device.c:att_disconnected_cb()
-> bluetoothd[3623]: src/device.c:att_disconnected_cb() Connection timed out (110)
-> bluetoothd[3623]: src/gatt-client.c:btd_gatt_client_disconnected()
-> Device disconnected. Cleaning up.
-> bluetoothd[3623]: attrib/gattrib.c:g_attrib_unref() 0x1454f30: g_attrib_unref=0
-> bluetoothd[3623]: src/adapter.c:connected_callback() hci0 device
-> 80:E4:DA:70:08:9E connected eir_len 31
-> bluetoothd[3623]: src/gatt-client.c:notify_client_unref() owner :1.2735
-> bluetoothd[3623]: src/gatt-client.c:notify_client_free() owner :1.2735
-> bluetoothd[3623]: src/gatt-database.c:connect_cb() New incoming LE ATT
-> connection
-> bluetoothd[3623]: attrib/gattrib.c:g_attrib_ref() 0x1454f30: g_attrib_ref=1
-> bluetoothd[3623]: src/gatt-client.c:btd_gatt_client_connected() Device
-> connected.
-> bluetoothd[3623]: src/gatt-client.c:register_notify() Re-register
-> subscribed notification client
-> bluetoothd: src/shared/gatt-client.c:2962:
-> bt_gatt_client_unregister_notify: Assertion
-> `notify_data->chrc->notify_count > 0' failed.
-
-Looks like something is not quite right, does the notification gets
-enabled properly while connected? Btw, is this device available on the
-market?
-
+If you have control over the player you may want to register directly
+using the media interface, if you just want to bind an existing player
+then you can use tools/mpris-proxy tool, it will detect MPRIS
+compatible players and register them, but as the name suggests it will
+proxy messages back and forth so it is not recommended for production,
+it is just a testing tool.
 
 -- 
 Luiz Augusto von Dentz
