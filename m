@@ -1,39 +1,72 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-Date: Mon, 4 Jan 2016 11:16:03 -0700
-Message-ID: <CAASrBQ=XtvLXLp7xJuUN7pfN6ZN3sEZGU-6LtBhz-isdmpujxQ@mail.gmail.com>
-Subject: Failed to obtain handles for "Service Changed" characteristic, etc.
-From: Mark Rages <markrages@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 9.2 \(3112\))
+Subject: Re: Powered property and rfkill
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1451921293.8726.9.camel@hadess.net>
+Date: Mon, 4 Jan 2016 10:11:23 -0800
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <4D4B98FB-85B1-45D3-B445-205920C5C781@holtmann.org>
+References: <1451921293.8726.9.camel@hadess.net>
+To: Bastien Nocera <hadess@hadess.net>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Bastien,
 
-I'm trying to use git bluetoothd in Ubuntu.  When I start it I get the
-following errors:
+> I was wondering the reasoning behind the recent changes in rfkill
+> handling for hci interfaces, in particular the addition
+> of MGMT_STATUS_RFKILLED as an error message.
+> 
+> Before those changes (for which I couldn't find an initial kernel side
+> commit), the Powered state of the adapter was tied to its rfkill
+> status.
 
-root@qountdown:~/src/bluez/src# ./bluetoothd -En
-bluetoothd[23921]: Bluetooth daemon 5.37
-bluetoothd[23921]: Starting SDP server
-bluetoothd[23921]: Bluetooth management interface 1.6 initialized
-bluetoothd[23921]: Failed to obtain handles for "Service Changed" characteristic
-bluetoothd[23921]: Not enough free handles to register service
-bluetoothd[23921]: Error adding Link Loss service
-bluetoothd[23921]: Not enough free handles to register service
-bluetoothd[23921]: Not enough free handles to register service
-bluetoothd[23921]: Not enough free handles to register service
-bluetoothd[23921]: Current Time Service could not be registered
-bluetoothd[23921]: gatt-time-server: Input/output error (5)
-bluetoothd[23921]: Not enough free handles to register service
-bluetoothd[23921]: Not enough free handles to register service
-bluetoothd[23921]: Failed to read advertising features: Unknown Command (0x01)
-bluetoothd[23921]: hci0 Load Connection Parameters failed: Unknown
-Command (0x01)
+actually RFKILL was never tied to the controller's power state. Neither via mgmt nor via the old legacy ioctl that do the hciconfig hci0 up. We also have an ERFKILL errno error code introduced for RFKILL a long time ago. It is a special error code that you would get when trying to hciconfig hci0 up or even ifconfig wlan0 up (in case of WiFi).
 
-Where should I look to diagnose these?
--- 
-Regards,
-Mark
-markrages@gmail
+RFKILL does two things, a) force an interface down in case it is up and you RFKILL block it, b) return an error when you try to bring up a blocked interface.
+
+It always worked this way. The MGMT_STATUS_RFKILLED is just the mgmt error status equivalent of ERFKILL.
+
+> When a soft rfkilled device showed up, which was to be the default
+> adapter, bluetoothd would remember that it was powered, and unrfkill
+> it. If the state was unpowered, or it had been rfkilled, GNOME's
+> Bluetooth panel would set Powered to true, un-rfkill'ing the adapter.
+
+I do not remember that automatic un-rfkilling from within bluetoothd. Maybe Johan and Luiz remember something in this area.
+
+> In 99% of cases, this meant that plugging in a Bluetooth adapter would
+> work out of the box.
+> 
+> Now, bluetoothd doesn't remember the power state, and the rfkill isn't
+> tied to the Powered state. Calling to set the Power state will fail
+> with the "Blocked" error, and we're expecting something else to unset
+> the adapter's rfkill status.
+
+My feeling is that you are running into the case where something changed in the RFKILL subsystem or how systemd started to interact with RFKILL. I have seen the cases where it boots up with a soft-blocked state, but I never really tried to analyze the case.
+
+The automatic power and remembering of powered state has been removed since BlueZ 5.0, but recently we have introduced the AutoEnable main.conf option in case you prefer to always power on your adapters during early boot. This helps for cases where Bluetooth needs to be up before an user logged in, but it also means that no agent is available. So choose that option wisely.
+
+> What did the developers making those changes hope that would unrfkill
+> and power up the adapter when plugged in?
+> 
+> Note that this might be a side-effect of the machine I'm using which
+> has 2 layers of Bluetooth rfkill:
+> $ rfkill list bluetooth
+> 0: tpacpi_bluetooth_sw: Bluetooth
+> 	Soft blocked: no
+> 	Hard blocked: no
+> 4: hci0: Bluetooth
+> 	Soft blocked: yes
+> 	Hard blocked: no
+> 
+> hci0 won't be visible if tpacpi_bluetooth_sw is soft-killed. The work-
+> around I have planned is to wait for "hci*" to appear if the Bluetooth
+> rfkill we unset doesn't start with "chi".
+
+That is the Thinkpad specific platform RFKILL switch that kills the power to the USB device. Some platforms have this switches. They are owned by the platform or ACPI. The hci0 is the one represented by the Bluetooth subsystem.
+
+Regards
+
+Marcel
+
