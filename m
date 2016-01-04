@@ -1,54 +1,72 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Message-ID: <1451921293.8726.9.camel@hadess.net>
-Subject: Powered property and rfkill
-From: Bastien Nocera <hadess@hadess.net>
-To: linux-bluetooth@vger.kernel.org
-Date: Mon, 04 Jan 2016 16:28:13 +0100
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+MIME-Version: 1.0
+In-Reply-To: <CAG=SMqaQik3OAVKHsto5oSBkpX-vNft-X61HBuLKP00502k=bA@mail.gmail.com>
+References: <CAG=SMqaQik3OAVKHsto5oSBkpX-vNft-X61HBuLKP00502k=bA@mail.gmail.com>
+Date: Mon, 4 Jan 2016 12:21:55 -0200
+Message-ID: <CABBYNZ+jW-SFKvzxUp-WuHSmuhW8eKpfVOZFmisPMqJkDmVtoQ@mail.gmail.com>
+Subject: Re: bluetoothd aborted
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Fabian Bergmark <fabian.bergmark@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hey,
+Hi Fabian,
 
-I was wondering the reasoning behind the recent changes in rfkill
-handling for hci interfaces, in particular the addition
-of MGMT_STATUS_RFKILLED as an error message.
+On Fri, Dec 25, 2015 at 6:46 PM, Fabian Bergmark
+<fabian.bergmark@gmail.com> wrote:
+> I (rarely) get segfaults or aborts while running bluetoothd with the
+> -nEd command line arguments. I'm running commit 1b9e48f4c2b98e
 
-Before those changes (for which I couldn't find an initial kernel side
-commit), the Powered state of the adapter was tied to its rfkill
-status.
+Looks like you are not using 5.37 yet, although it seems it does
+includes all the fixes done in GATT.
 
-When a soft rfkilled device showed up, which was to be the default
-adapter, bluetoothd would remember that it was powered, and unrfkill
-it. If the state was unpowered, or it had been rfkilled, GNOME's
-Bluetooth panel would set Powered to true, un-rfkill'ing the adapter.
+> If I can provide more useful information let me know. Here are the last lines:
+>
+> bluetoothd[3623]: src/gatt-client.c:btd_gatt_client_ready() GATT client ready
+> bluetoothd[3623]: src/gatt-client.c:create_services() Exporting
+> objects for GATT services: 80:E4:DA:70:08:9E
+> bluetoothd[3623]: src/adapter.c:new_conn_param() hci0
+> 80:E4:DA:70:08:9E (1) min 0x0012 max 0x0024 latency 0x0004 timeout
+> 0x0064
+> bluetoothd[3623]: src/adapter.c:store_conn_param()
+> bluetoothd[3623]: src/device.c:gatt_debug() Registered handler for
+> "Service Changed": 3
+> bluetoothd[3623]: src/adapter.c:dev_disconnected() Device
+> 80:E4:DA:70:08:9E disconnected, reason 1
+> bluetoothd[3623]: src/adapter.c:adapter_remove_connection()
+> bluetoothd[3623]: plugins/policy.c:disconnect_cb() reason 1
+> bluetoothd[3623]: src/adapter.c:bonding_attempt_complete() hci0 bdaddr
+> 80:E4:DA:70:08:9E type 1 status 0xe
+> bluetoothd[3623]: src/device.c:device_bonding_complete() bonding (nil)
+> status 0x0e
+> bluetoothd[3623]: src/device.c:device_bonding_failed() status 14
+> bluetoothd[3623]: src/adapter.c:resume_discovery()
+> bluetoothd[3623]: src/device.c:att_disconnected_cb()
+> bluetoothd[3623]: src/device.c:att_disconnected_cb() Connection timed out (110)
+> bluetoothd[3623]: src/gatt-client.c:btd_gatt_client_disconnected()
+> Device disconnected. Cleaning up.
+> bluetoothd[3623]: attrib/gattrib.c:g_attrib_unref() 0x1454f30: g_attrib_unref=0
+> bluetoothd[3623]: src/adapter.c:connected_callback() hci0 device
+> 80:E4:DA:70:08:9E connected eir_len 31
+> bluetoothd[3623]: src/gatt-client.c:notify_client_unref() owner :1.2735
+> bluetoothd[3623]: src/gatt-client.c:notify_client_free() owner :1.2735
+> bluetoothd[3623]: src/gatt-database.c:connect_cb() New incoming LE ATT
+> connection
+> bluetoothd[3623]: attrib/gattrib.c:g_attrib_ref() 0x1454f30: g_attrib_ref=1
+> bluetoothd[3623]: src/gatt-client.c:btd_gatt_client_connected() Device
+> connected.
+> bluetoothd[3623]: src/gatt-client.c:register_notify() Re-register
+> subscribed notification client
+> bluetoothd: src/shared/gatt-client.c:2962:
+> bt_gatt_client_unregister_notify: Assertion
+> `notify_data->chrc->notify_count > 0' failed.
 
-In 99% of cases, this meant that plugging in a Bluetooth adapter would
-work out of the box.
+Looks like something is not quite right, does the notification gets
+enabled properly while connected? Btw, is this device available on the
+market?
 
-Now, bluetoothd doesn't remember the power state, and the rfkill isn't
-tied to the Powered state. Calling to set the Power state will fail
-with the "Blocked" error, and we're expecting something else to unset
-the adapter's rfkill status.
 
-What did the developers making those changes hope that would unrfkill
-and power up the adapter when plugged in?
-
-Note that this might be a side-effect of the machine I'm using which
-has 2 layers of Bluetooth rfkill:
-$ rfkill list bluetooth
-0: tpacpi_bluetooth_sw: Bluetooth
-	Soft blocked: no
-	Hard blocked: no
-4: hci0: Bluetooth
-	Soft blocked: yes
-	Hard blocked: no
-
-hci0 won't be visible if tpacpi_bluetooth_sw is soft-killed. The work-
-around I have planned is to wait for "hci*" to appear if the Bluetooth
-rfkill we unset doesn't start with "hci".
-
-Any better ideas?
-
-Cheers
+-- 
+Luiz Augusto von Dentz
