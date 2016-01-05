@@ -1,9 +1,9 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 2/2] Bluetooth: Add support for Start Limited Discovery command
-Date: Tue,  5 Jan 2016 13:19:32 +0200
-Message-Id: <1451992772-4971-3-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH v2 1/2] Bluetooth: Change eir_has_data_type() to more generic eir_get_data()
+Date: Tue,  5 Jan 2016 13:19:31 +0200
+Message-Id: <1451992772-4971-2-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1451992772-4971-1-git-send-email-johan.hedberg@gmail.com>
 References: <1451992772-4971-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,197 +11,104 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-This patch implements the mgmt Start Limited Discovery command. Most
-of existing Start Discovery code is reused since the only difference
-is the presence of a 'limited' flag as part of the discovery state.
+To make the EIR parsing helper more general purpose, make it return
+the found data and its length rather than just saying whether the data
+was present or not.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- include/net/bluetooth/hci_core.h |  1 +
- include/net/bluetooth/mgmt.h     |  2 ++
- net/bluetooth/hci_request.c      | 11 ++++++---
- net/bluetooth/mgmt.c             | 53 +++++++++++++++++++++++++++++++++-------
- 4 files changed, 55 insertions(+), 12 deletions(-)
+ include/net/bluetooth/hci_core.h | 30 ++++++++++++++++++++----------
+ net/bluetooth/hci_event.c        |  6 +++---
+ net/bluetooth/mgmt.c             |  3 ++-
+ 3 files changed, 25 insertions(+), 14 deletions(-)
 
 diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 372e2a7c4ada..d4f82edb5cff 100644
+index c95e0326c41a..372e2a7c4ada 100644
 --- a/include/net/bluetooth/hci_core.h
 +++ b/include/net/bluetooth/hci_core.h
-@@ -77,6 +77,7 @@ struct discovery_state {
- 	u8			last_adv_data_len;
- 	bool			report_invalid_rssi;
- 	bool			result_filtering;
-+	bool			limited;
- 	s8			rssi;
- 	u16			uuid_count;
- 	u8			(*uuids)[16];
-diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-index af17774c9416..ea73e0826aa7 100644
---- a/include/net/bluetooth/mgmt.h
-+++ b/include/net/bluetooth/mgmt.h
-@@ -584,6 +584,8 @@ struct mgmt_rp_get_adv_size_info {
- 	__u8	max_scan_rsp_len;
- } __packed;
+@@ -1283,31 +1283,41 @@ static inline void hci_role_switch_cfm(struct hci_conn *conn, __u8 status,
+ 	mutex_unlock(&hci_cb_list_lock);
+ }
  
-+#define MGMT_OP_START_LIMITED_DISCOVERY	0x0041
-+
- #define MGMT_EV_CMD_COMPLETE		0x0001
- struct mgmt_ev_cmd_complete {
- 	__le16	opcode;
-diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
-index 9997c31ef987..794299c4673a 100644
---- a/net/bluetooth/hci_request.c
-+++ b/net/bluetooth/hci_request.c
-@@ -1737,8 +1737,8 @@ static int le_scan_disable(struct hci_request *req, unsigned long opt)
- static int bredr_inquiry(struct hci_request *req, unsigned long opt)
+-static inline bool eir_has_data_type(u8 *data, size_t data_len, u8 type)
++static inline void *eir_get_data(u8 *eir, size_t eir_len, u8 type,
++				 size_t *data_len)
  {
- 	u8 length = opt;
--	/* General inquiry access code (GIAC) */
--	u8 lap[3] = { 0x33, 0x8b, 0x9e };
-+	u8 giac[3] = { 0x33, 0x8b, 0x9e };
-+	u8 liac[3] = { 0x00, 0x8b, 0x9e };
- 	struct hci_cp_inquiry cp;
+ 	size_t parsed = 0;
  
- 	BT_DBG("%s", req->hdev->name);
-@@ -1748,7 +1748,12 @@ static int bredr_inquiry(struct hci_request *req, unsigned long opt)
- 	hci_dev_unlock(req->hdev);
+-	if (data_len < 2)
+-		return false;
++	if (eir_len < 2)
++		return NULL;
  
- 	memset(&cp, 0, sizeof(cp));
--	memcpy(&cp.lap, lap, sizeof(cp.lap));
+-	while (parsed < data_len - 1) {
+-		u8 field_len = data[0];
++	while (parsed < eir_len - 1) {
++		u8 field_len = eir[0];
+ 
+ 		if (field_len == 0)
+ 			break;
+ 
+ 		parsed += field_len + 1;
+ 
+-		if (parsed > data_len)
++		if (parsed > eir_len)
+ 			break;
+ 
+-		if (data[1] == type)
+-			return true;
++		if (eir[1] != type) {
++			eir += field_len + 1;
++			continue;
++		}
 +
-+	if (req->hdev->discovery.limited)
-+		memcpy(&cp.lap, liac, sizeof(cp.lap));
-+	else
-+		memcpy(&cp.lap, giac, sizeof(cp.lap));
-+
- 	cp.length = length;
++		/* Zero length data */
++		if (field_len == 1)
++			return NULL;
  
- 	hci_req_add(req, HCI_OP_INQUIRY, sizeof(cp), &cp);
+-		data += field_len + 1;
++		if (data_len)
++			*data_len = field_len - 1;
++
++		return &eir[2];
+ 	}
+ 
+-	return false;
++	return NULL;
+ }
+ 
+ static inline bool hci_bdaddr_is_rpa(bdaddr_t *bdaddr, u8 addr_type)
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 7554da5b7a8f..c162af5d16bf 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -3833,9 +3833,9 @@ static void hci_extended_inquiry_result_evt(struct hci_dev *hdev,
+ 		data.ssp_mode		= 0x01;
+ 
+ 		if (hci_dev_test_flag(hdev, HCI_MGMT))
+-			name_known = eir_has_data_type(info->data,
+-						       sizeof(info->data),
+-						       EIR_NAME_COMPLETE);
++			name_known = eir_get_data(info->data,
++						  sizeof(info->data),
++						  EIR_NAME_COMPLETE, NULL);
+ 		else
+ 			name_known = true;
+ 
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 3297a4ecc05e..5a5089cb6570 100644
+index 621f6fdd0dd1..3297a4ecc05e 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -103,6 +103,7 @@ static const u16 mgmt_commands[] = {
- 	MGMT_OP_ADD_ADVERTISING,
- 	MGMT_OP_REMOVE_ADVERTISING,
- 	MGMT_OP_GET_ADV_SIZE_INFO,
-+	MGMT_OP_START_LIMITED_DISCOVERY,
- };
+@@ -7266,7 +7266,8 @@ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+ 		/* Copy EIR or advertising data into event */
+ 		memcpy(ev->eir, eir, eir_len);
  
- static const u16 mgmt_events[] = {
-@@ -3283,6 +3284,9 @@ void mgmt_start_discovery_complete(struct hci_dev *hdev, u8 status)
- 	if (!cmd)
- 		cmd = pending_find(MGMT_OP_START_SERVICE_DISCOVERY, hdev);
+-	if (dev_class && !eir_has_data_type(ev->eir, eir_len, EIR_CLASS_OF_DEV))
++	if (dev_class && !eir_get_data(ev->eir, eir_len, EIR_CLASS_OF_DEV,
++				       NULL))
+ 		eir_len = eir_append_data(ev->eir, eir_len, EIR_CLASS_OF_DEV,
+ 					  dev_class, 3);
  
-+	if (!cmd)
-+		cmd = pending_find(MGMT_OP_START_LIMITED_DISCOVERY, hdev);
-+
- 	if (cmd) {
- 		cmd->cmd_complete(cmd, mgmt_status(status));
- 		mgmt_pending_remove(cmd);
-@@ -3318,8 +3322,8 @@ static bool discovery_type_is_valid(struct hci_dev *hdev, uint8_t type,
- 	return true;
- }
- 
--static int start_discovery(struct sock *sk, struct hci_dev *hdev,
--			   void *data, u16 len)
-+static int start_discovery_internal(struct sock *sk, struct hci_dev *hdev,
-+				    u16 op, void *data, u16 len)
- {
- 	struct mgmt_cp_start_discovery *cp = data;
- 	struct mgmt_pending_cmd *cmd;
-@@ -3331,7 +3335,7 @@ static int start_discovery(struct sock *sk, struct hci_dev *hdev,
- 	hci_dev_lock(hdev);
- 
- 	if (!hdev_is_powered(hdev)) {
--		err = mgmt_cmd_complete(sk, hdev->id, MGMT_OP_START_DISCOVERY,
-+		err = mgmt_cmd_complete(sk, hdev->id, op,
- 					MGMT_STATUS_NOT_POWERED,
- 					&cp->type, sizeof(cp->type));
- 		goto failed;
-@@ -3339,15 +3343,14 @@ static int start_discovery(struct sock *sk, struct hci_dev *hdev,
- 
- 	if (hdev->discovery.state != DISCOVERY_STOPPED ||
- 	    hci_dev_test_flag(hdev, HCI_PERIODIC_INQ)) {
--		err = mgmt_cmd_complete(sk, hdev->id, MGMT_OP_START_DISCOVERY,
--					MGMT_STATUS_BUSY, &cp->type,
--					sizeof(cp->type));
-+		err = mgmt_cmd_complete(sk, hdev->id, op, MGMT_STATUS_BUSY,
-+					&cp->type, sizeof(cp->type));
- 		goto failed;
- 	}
- 
- 	if (!discovery_type_is_valid(hdev, cp->type, &status)) {
--		err = mgmt_cmd_complete(sk, hdev->id, MGMT_OP_START_DISCOVERY,
--					status, &cp->type, sizeof(cp->type));
-+		err = mgmt_cmd_complete(sk, hdev->id, op, status,
-+					&cp->type, sizeof(cp->type));
- 		goto failed;
- 	}
- 
-@@ -3358,8 +3361,12 @@ static int start_discovery(struct sock *sk, struct hci_dev *hdev,
- 
- 	hdev->discovery.type = cp->type;
- 	hdev->discovery.report_invalid_rssi = false;
-+	if (op == MGMT_OP_START_LIMITED_DISCOVERY)
-+		hdev->discovery.limited = true;
-+	else
-+		hdev->discovery.limited = false;
- 
--	cmd = mgmt_pending_add(sk, MGMT_OP_START_DISCOVERY, hdev, data, len);
-+	cmd = mgmt_pending_add(sk, op, hdev, data, len);
- 	if (!cmd) {
- 		err = -ENOMEM;
- 		goto failed;
-@@ -3376,6 +3383,21 @@ failed:
- 	return err;
- }
- 
-+static int start_discovery(struct sock *sk, struct hci_dev *hdev,
-+			   void *data, u16 len)
-+{
-+	return start_discovery_internal(sk, hdev, MGMT_OP_START_DISCOVERY,
-+					data, len);
-+}
-+
-+static int start_limited_discovery(struct sock *sk, struct hci_dev *hdev,
-+				   void *data, u16 len)
-+{
-+	return start_discovery_internal(sk, hdev,
-+					MGMT_OP_START_LIMITED_DISCOVERY,
-+					data, len);
-+}
-+
- static int service_discovery_cmd_complete(struct mgmt_pending_cmd *cmd,
- 					  u8 status)
- {
-@@ -6313,6 +6335,7 @@ static const struct hci_mgmt_handler mgmt_handlers[] = {
- 						HCI_MGMT_VAR_LEN },
- 	{ remove_advertising,	   MGMT_REMOVE_ADVERTISING_SIZE },
- 	{ get_adv_size_info,       MGMT_GET_ADV_SIZE_INFO_SIZE },
-+	{ start_limited_discovery, MGMT_START_DISCOVERY_SIZE },
- };
- 
- void mgmt_index_added(struct hci_dev *hdev)
-@@ -7237,6 +7260,18 @@ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
- 			return;
- 	}
- 
-+	if (hdev->discovery.limited) {
-+		/* Check for limited discoverable bit */
-+		if (dev_class) {
-+			if (!(dev_class[1] & 0x20))
-+				return;
-+		} else {
-+			u8 *flags = eir_get_data(eir, eir_len, EIR_FLAGS, NULL);
-+			if (!flags || !(flags[0] & LE_AD_LIMITED))
-+				return;
-+		}
-+	}
-+
- 	/* Make sure that the buffer is big enough. The 5 extra bytes
- 	 * are for the potential CoD field.
- 	 */
 -- 
 2.5.0
 
