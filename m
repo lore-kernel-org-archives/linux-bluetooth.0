@@ -1,82 +1,18 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: "Stanbro, Matthew A." <matthew.a.stanbro@hp.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Creating BLE Server application with BlueZ
+Date: Tue, 5 Jan 2016 18:36:41 +0000
+Message-ID: <TU4PR84MB031993F9D5F95A651BCFBC65CDF30@TU4PR84MB0319.NAMPRD84.PROD.OUTLOOK.COM>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZ+jW-SFKvzxUp-WuHSmuhW8eKpfVOZFmisPMqJkDmVtoQ@mail.gmail.com>
-References: <CAG=SMqaQik3OAVKHsto5oSBkpX-vNft-X61HBuLKP00502k=bA@mail.gmail.com>
-	<CABBYNZ+jW-SFKvzxUp-WuHSmuhW8eKpfVOZFmisPMqJkDmVtoQ@mail.gmail.com>
-Date: Tue, 5 Jan 2016 11:40:37 -0800
-Message-ID: <CAG=SMqbAY18VXXwZqhTPo5Hojjhqg=nF=4XgSsaHAMtunv5zeQ@mail.gmail.com>
-Subject: Re: bluetoothd aborted
-From: Fabian Bergmark <fabian.bergmark@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The product is available on the market, but we haven't released SDKs
-for linux yet, only iOS and Android. (https://flic.io)
+Hello Everyone,
 
-This bug happens when I cause the device to connect and disconnect
-repeatedly by keeping it on the brink of it's range. I guess that the
-device often disconnects before notification can be started. Tell me
-if I can provide more details.
+I am new to working with BlueZ and I am trying to get a handle on how to create a BLE service and add characteristics. Looking around the web I can find quite a bit of information about using BlueZ as a BLE client for connecting to other BLE devices to read/write attributes, but I am struggling to find anything which helps explain creating a BLE service and dealing with advertising. Can anyone point me to a resource for learning to work with the BlueZ C api for creating/starting/stopping services, adding/modifying characteristics, starting/stopping/modifying advertisments? Thanks in advance for any help you can offer.
 
-2016-01-04 6:21 GMT-08:00 Luiz Augusto von Dentz <luiz.dentz@gmail.com>:
-> Hi Fabian,
->
-> On Fri, Dec 25, 2015 at 6:46 PM, Fabian Bergmark
-> <fabian.bergmark@gmail.com> wrote:
->> I (rarely) get segfaults or aborts while running bluetoothd with the
->> -nEd command line arguments. I'm running commit 1b9e48f4c2b98e
->
-> Looks like you are not using 5.37 yet, although it seems it does
-> includes all the fixes done in GATT.
->
->> If I can provide more useful information let me know. Here are the last lines:
->>
->> bluetoothd[3623]: src/gatt-client.c:btd_gatt_client_ready() GATT client ready
->> bluetoothd[3623]: src/gatt-client.c:create_services() Exporting
->> objects for GATT services: 80:E4:DA:70:08:9E
->> bluetoothd[3623]: src/adapter.c:new_conn_param() hci0
->> 80:E4:DA:70:08:9E (1) min 0x0012 max 0x0024 latency 0x0004 timeout
->> 0x0064
->> bluetoothd[3623]: src/adapter.c:store_conn_param()
->> bluetoothd[3623]: src/device.c:gatt_debug() Registered handler for
->> "Service Changed": 3
->> bluetoothd[3623]: src/adapter.c:dev_disconnected() Device
->> 80:E4:DA:70:08:9E disconnected, reason 1
->> bluetoothd[3623]: src/adapter.c:adapter_remove_connection()
->> bluetoothd[3623]: plugins/policy.c:disconnect_cb() reason 1
->> bluetoothd[3623]: src/adapter.c:bonding_attempt_complete() hci0 bdaddr
->> 80:E4:DA:70:08:9E type 1 status 0xe
->> bluetoothd[3623]: src/device.c:device_bonding_complete() bonding (nil)
->> status 0x0e
->> bluetoothd[3623]: src/device.c:device_bonding_failed() status 14
->> bluetoothd[3623]: src/adapter.c:resume_discovery()
->> bluetoothd[3623]: src/device.c:att_disconnected_cb()
->> bluetoothd[3623]: src/device.c:att_disconnected_cb() Connection timed out (110)
->> bluetoothd[3623]: src/gatt-client.c:btd_gatt_client_disconnected()
->> Device disconnected. Cleaning up.
->> bluetoothd[3623]: attrib/gattrib.c:g_attrib_unref() 0x1454f30: g_attrib_unref=0
->> bluetoothd[3623]: src/adapter.c:connected_callback() hci0 device
->> 80:E4:DA:70:08:9E connected eir_len 31
->> bluetoothd[3623]: src/gatt-client.c:notify_client_unref() owner :1.2735
->> bluetoothd[3623]: src/gatt-client.c:notify_client_free() owner :1.2735
->> bluetoothd[3623]: src/gatt-database.c:connect_cb() New incoming LE ATT
->> connection
->> bluetoothd[3623]: attrib/gattrib.c:g_attrib_ref() 0x1454f30: g_attrib_ref=1
->> bluetoothd[3623]: src/gatt-client.c:btd_gatt_client_connected() Device
->> connected.
->> bluetoothd[3623]: src/gatt-client.c:register_notify() Re-register
->> subscribed notification client
->> bluetoothd: src/shared/gatt-client.c:2962:
->> bt_gatt_client_unregister_notify: Assertion
->> `notify_data->chrc->notify_count > 0' failed.
->
-> Looks like something is not quite right, does the notification gets
-> enabled properly while connected? Btw, is this device available on the
-> market?
->
->
-> --
-> Luiz Augusto von Dentz
+Best,
+-Matthew Stanbro 
+
