@@ -1,120 +1,234 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=windows-1252
 Mime-Version: 1.0 (Mac OS X Mail 9.2 \(3112\))
-Subject: Re: Powered property and rfkill
+Subject: Re: [PATCH v2] bluetooth: core: RfC - add basic LED triggers
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1451952088.8726.23.camel@hadess.net>
-Date: Mon, 4 Jan 2016 23:07:10 -0800
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <6F22FCA1-16B6-4D4F-B147-1945039BFECD@holtmann.org>
-References: <1451921293.8726.9.camel@hadess.net> <4D4B98FB-85B1-45D3-B445-205920C5C781@holtmann.org> <1451952088.8726.23.camel@hadess.net>
-To: Bastien Nocera <hadess@hadess.net>
+In-Reply-To: <568B67A5.9010502@gmail.com>
+Date: Mon, 4 Jan 2016 23:03:25 -0800
+Cc: Johan Hedberg <johan.hedberg@gmail.com>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>,
+	Johannes Berg <johannes.berg@intel.com>
+Message-Id: <29FC8A44-BB30-4DAF-A9FE-4DB6A7273479@holtmann.org>
+References: <5686A7E5.7010901@gmail.com> <117829AF-2B60-4455-BD8D-476912396D77@holtmann.org> <568AE316.4030707@gmail.com> <46CEB4CF-16CD-401C-8A88-DB19B4AA1DB4@holtmann.org> <568B67A5.9010502@gmail.com>
+To: Heiner Kallweit <hkallweit1@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bastien,
+Hi Heiner,
 
->>> I was wondering the reasoning behind the recent changes in rfkill
->>> handling for hci interfaces, in particular the addition
->>> of MGMT_STATUS_RFKILLED as an error message.
+>>>>> In the bluetooth subsystem I miss the option to use LEDs to indicate
+>>>>> the status. This patch is based on the LED triggers in mac80211 and
+>>>>> adds two basic LED triggers (powered up, device connected) plus
+>>>>> a config option to enable the BT LED triggers.
+>>>>> 
+>>>>> It works fine on my system however I don't know the bluetooth stack
+>>>>> in too much detail and therefore appreciate any comment.
+>>>>> 
+>>>>> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+>>>>> ---
+>>>>> v2:
+>>>>> - completely rewrote the code to be as generic as possible and minimize
+>>>>> the changes to struct hci_dev
+>>>>> - make the details of the LED triggers opaque to struct hci_dev
+>>>>> - avoid using ifdef CONFIG_BT_LEDS in hci_core.h
+>>>>> - start with the radio trigger only
+>>>>> - factor out the generic basic led trigger code to facilitate adding
+>>>>> further basic LED triggers
+>>>>> - fix indentation in Kconfig
+>>>>> - rename led.[ch] to leds.[ch]
+>>>>> ---
+>>>>> include/net/bluetooth/hci_core.h |  3 ++
+>>>>> net/bluetooth/Kconfig            |  9 ++++
+>>>>> net/bluetooth/Makefile           |  1 +
+>>>>> net/bluetooth/hci_core.c         |  8 ++++
+>>>>> net/bluetooth/leds.c             | 99 ++++++++++++++++++++++++++++++++++++++++
+>>>>> net/bluetooth/leds.h             | 17 +++++++
+>>>>> 6 files changed, 137 insertions(+)
+>>>>> create mode 100644 net/bluetooth/leds.c
+>>>>> create mode 100644 net/bluetooth/leds.h
+>>>>> 
+>>>>> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+>>>>> index c95e032..4ffec8b 100644
+>>>>> --- a/include/net/bluetooth/hci_core.h
+>>>>> +++ b/include/net/bluetooth/hci_core.h
+>>>>> @@ -25,6 +25,7 @@
+>>>>> #ifndef __HCI_CORE_H
+>>>>> #define __HCI_CORE_H
+>>>>> 
+>>>>> +#include <linux/leds.h>
+>>>>> #include <net/bluetooth/hci.h>
+>>>>> #include <net/bluetooth/hci_sock.h>
+>>>>> 
+>>>>> @@ -395,6 +396,8 @@ struct hci_dev {
+>>>>> 	struct delayed_work	rpa_expired;
+>>>>> 	bdaddr_t		rpa;
+>>>>> 
+>>>>> +	struct led_trigger *radio_led;
+>>>>> +
+>>>> 
+>>>> I wonder if this one might not be better named power_led instead.
+>>>> 
+>>> OK
 >>> 
->>> Before those changes (for which I couldn't find an initial kernel
->>> side
->>> commit), the Powered state of the adapter was tied to its rfkill
->>> status.
+>>>>> 	int (*open)(struct hci_dev *hdev);
+>>>>> 	int (*close)(struct hci_dev *hdev);
+>>>>> 	int (*flush)(struct hci_dev *hdev);
+>>>>> diff --git a/net/bluetooth/Kconfig b/net/bluetooth/Kconfig
+>>>>> index 95d1a66..06c31b9 100644
+>>>>> --- a/net/bluetooth/Kconfig
+>>>>> +++ b/net/bluetooth/Kconfig
+>>>>> @@ -69,6 +69,15 @@ config BT_6LOWPAN
+>>>>> 	help
+>>>>> 	  IPv6 compression over Bluetooth Low Energy.
+>>>>> 
+>>>>> +config BT_LEDS
+>>>>> +	bool "Enable LED triggers"
+>>>>> +	depends on BT
+>>>>> +	depends on LEDS_CLASS
+>>>>> +	select LEDS_TRIGGERS
+>>>>> +	help
+>>>>> +	  This option selects a few LED triggers for different
+>>>>> +	  Bluetooth events.
+>>>>> +
+>>>>> config BT_SELFTEST
+>>>>> 	bool "Bluetooth self testing support"
+>>>>> 	depends on BT && DEBUG_KERNEL
+>>>>> diff --git a/net/bluetooth/Makefile b/net/bluetooth/Makefile
+>>>>> index 2b15ae8..b3ff12e 100644
+>>>>> --- a/net/bluetooth/Makefile
+>>>>> +++ b/net/bluetooth/Makefile
+>>>>> @@ -17,6 +17,7 @@ bluetooth-y := af_bluetooth.o hci_core.o hci_conn.o hci_event.o mgmt.o \
+>>>>> 
+>>>>> bluetooth-$(CONFIG_BT_BREDR) += sco.o
+>>>>> bluetooth-$(CONFIG_BT_HS) += a2mp.o amp.o
+>>>>> +bluetooth-$(CONFIG_BT_LEDS) += leds.o
+>>>>> bluetooth-$(CONFIG_BT_DEBUGFS) += hci_debugfs.o
+>>>>> bluetooth-$(CONFIG_BT_SELFTEST) += selftest.o
+>>>>> 
+>>>>> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+>>>>> index 47bcef7..f472b1d 100644
+>>>>> --- a/net/bluetooth/hci_core.c
+>>>>> +++ b/net/bluetooth/hci_core.c
+>>>>> @@ -40,6 +40,7 @@
+>>>>> #include "hci_request.h"
+>>>>> #include "hci_debugfs.h"
+>>>>> #include "smp.h"
+>>>>> +#include "leds.h"
+>>>>> 
+>>>>> static void hci_rx_work(struct work_struct *work);
+>>>>> static void hci_cmd_work(struct work_struct *work);
+>>>>> @@ -1395,6 +1396,7 @@ static int hci_dev_do_open(struct hci_dev *hdev)
+>>>>> 		hci_dev_set_flag(hdev, HCI_RPA_EXPIRED);
+>>>>> 		set_bit(HCI_UP, &hdev->flags);
+>>>>> 		hci_sock_dev_event(hdev, HCI_DEV_UP);
+>>>>> +		hci_led_radio(hdev, true);
+>>>> 
+>>>> Lets name this hci_leds_* etc.
+>>>> 
+>>>> And we might want to consider not using the word radio since we never really have used that word anywhere else in the subsystem.
+>>>> 
+>>> Then let's use the word power here too (e.g. hci_leds_powered).
 >> 
->> actually RFKILL was never tied to the controller's power state.
->> Neither via mgmt nor via the old legacy ioctl that do the hciconfig
->> hci0 up. We also have an ERFKILL errno error code introduced for
->> RFKILL a long time ago. It is a special error code that you would get
->> when trying to hciconfig hci0 up or even ifconfig wlan0 up (in case
->> of WiFi).
+>> I am not 100% sure that is the best name either, but it has at least better meaning than radio.
 >> 
->> RFKILL does two things, a) force an interface down in case it is up
->> and you RFKILL block it, b) return an error when you try to bring up
->> a blocked interface.
->> 
->> It always worked this way. The MGMT_STATUS_RFKILLED is just the mgmt
->> error status equivalent of ERFKILL.
-> 
-> OK.
-> 
->>> When a soft rfkilled device showed up, which was to be the default
->>> adapter, bluetoothd would remember that it was powered, and
->>> unrfkill
->>> it. If the state was unpowered, or it had been rfkilled, GNOME's
->>> Bluetooth panel would set Powered to true, un-rfkill'ing the
->>> adapter.
->> 
->> I do not remember that automatic un-rfkilling from within bluetoothd.
->> Maybe Johan and Luiz remember something in this area.
->> 
->>> In 99% of cases, this meant that plugging in a Bluetooth adapter
->>> would
->>> work out of the box.
+> Hmm, maybe hci_leds_ispowered ?
+
+That is more like a query that should return true/false. Maybe hci_leds_update_powered.
+
 >>> 
->>> Now, bluetoothd doesn't remember the power state, and the rfkill
->>> isn't
->>> tied to the Powered state. Calling to set the Power state will fail
->>> with the "Blocked" error, and we're expecting something else to
->>> unset
->>> the adapter's rfkill status.
+>>>>> 		if (!hci_dev_test_flag(hdev, HCI_SETUP) &&
+>>>>> 		    !hci_dev_test_flag(hdev, HCI_CONFIG) &&
+>>>>> 		    !hci_dev_test_flag(hdev, HCI_UNCONFIGURED) &&
+>>>>> @@ -1532,6 +1534,8 @@ int hci_dev_do_close(struct hci_dev *hdev)
+>>>>> 		return 0;
+>>>>> 	}
+>>>>> 
+>>>>> +	hci_led_radio(hdev, false);
+>>>>> +
+>>>>> 	/* Flush RX and TX works */
+>>>>> 	flush_work(&hdev->tx_work);
+>>>>> 	flush_work(&hdev->rx_work);
+>>>>> @@ -3067,6 +3071,8 @@ int hci_register_dev(struct hci_dev *hdev)
+>>>>> 	if (error < 0)
+>>>>> 		goto err_wqueue;
+>>>>> 
+>>>>> +	hci_led_init(hdev);
+>>>>> +
+>>>>> 	hdev->rfkill = rfkill_alloc(hdev->name, &hdev->dev,
+>>>>> 				    RFKILL_TYPE_BLUETOOTH, &hci_rfkill_ops,
+>>>>> 				    hdev);
+>>>>> @@ -3128,6 +3134,8 @@ void hci_unregister_dev(struct hci_dev *hdev)
+>>>>> 
+>>>>> 	id = hdev->id;
+>>>>> 
+>>>>> +	hci_led_exit(hdev);
+>>>>> +
+>>>>> 	write_lock(&hci_dev_list_lock);
+>>>>> 	list_del(&hdev->list);
+>>>>> 	write_unlock(&hci_dev_list_lock);
+>>>>> diff --git a/net/bluetooth/leds.c b/net/bluetooth/leds.c
+>>>>> new file mode 100644
+>>>>> index 0000000..377f643
+>>>>> --- /dev/null
+>>>>> +++ b/net/bluetooth/leds.c
+>>>>> @@ -0,0 +1,99 @@
+>>>>> +/*
+>>>>> + * Copyright 2015, Heiner Kallweit <hkallweit1@gmail.com>
+>>>>> + *
+>>>>> + * This program is free software; you can redistribute it and/or modify
+>>>>> + * it under the terms of the GNU General Public License version 2 as
+>>>>> + * published by the Free Software Foundation.
+>>>>> + */
+>>>>> +
+>>>>> +#include <net/bluetooth/bluetooth.h>
+>>>>> +#include <net/bluetooth/hci_core.h>
+>>>>> +
+>>>>> +#include "leds.h"
+>>>>> +
+>>>>> +struct hci_basic_led_trigger {
+>>>>> +	struct led_trigger	led_trigger;
+>>>>> +	atomic_t		cnt;
+>>>>> +};
+>>>>> +
+>>>>> +#define to_hci_basic_led_trigger(arg) container_of(arg, \
+>>>>> +					struct hci_basic_led_trigger, \
+>>>>> +					led_trigger)
+>>>>> +
+>>>>> +static void hci_basic_led(struct led_trigger *trig, bool inc)
+>>>>> +{
+>>>>> +	struct hci_basic_led_trigger *htrig;
+>>>>> +	int cnt;
+>>>>> +
+>>>>> +	if (!trig)
+>>>>> +		return;
+>>>>> +
+>>>>> +	htrig = to_hci_basic_led_trigger(trig);
+>>>>> +
+>>>>> +	if (inc)
+>>>>> +		cnt = atomic_inc_return(&htrig->cnt);
+>>>>> +	else
+>>>>> +		cnt = atomic_dec_return(&htrig->cnt);
+>>>>> +
+>>>>> +	WARN_ON(cnt < 0);
+>>>>> +
+>>>>> +	led_trigger_event(trig, cnt ? LED_FULL : LED_OFF);
+>>>>> +}
+>>>> 
+>>>> Explain to me the reason for the counter? The Bluetooth subsystem is already guaranteeing the state of HCI_UP to be 100% synchronized. If have one case where it gets set and another where it gets unset. Meaning your counter will do 0 -> 1 and then 1 -> 0.
+>>>> 
+>>> Indeed the counter is not needed in this particular case.
+>>> My intention was to make this basic led class more generic so that it can be re-used for triggers
+>>> (to be added later) based on use cases like "at least one connection" where counting may be needed.
 >> 
->> My feeling is that you are running into the case where something
->> changed in the RFKILL subsystem or how systemd started to interact
->> with RFKILL. I have seen the cases where it boots up with a soft-
->> blocked state, but I never really tried to analyze the case.
-> 
-> That's a more likely problem, yes. Removing the Bluetooth files
-> in /var/lib/systemd/rfkill/*:bluetooth seems to solve the problem.
-> 
-> I'll still need to find a way to avoid those inconsistent state
-> problems.
-
-I was never a fan of systemd trying to mess with RFKILL states. If you are not connection manager, you really have not enough information about how to deal with RFKILL switches.
-
-What I think is the problem that systemd might better really only handle platform RFKILL switches and starts ignoring the ones that come from Bluetooth subsystem as part of the HCI controller.
-
->> The automatic power and remembering of powered state has been removed
->> since BlueZ 5.0, but recently we have introduced the AutoEnable
->> main.conf option in case you prefer to always power on your adapters
->> during early boot. This helps for cases where Bluetooth needs to be
->> up before an user logged in, but it also means that no agent is
->> available. So choose that option wisely.
-> 
-> I was wondering whether changes around this were responsible for the
-> problem.
-> 
->>> What did the developers making those changes hope that would
->>> unrfkill
->>> and power up the adapter when plugged in?
->>> 
->>> Note that this might be a side-effect of the machine I'm using
->>> which
->>> has 2 layers of Bluetooth rfkill:
->>> $ rfkill list bluetooth
->>> 0: tpacpi_bluetooth_sw: Bluetooth
->>> 	Soft blocked: no
->>> 	Hard blocked: no
->>> 4: hci0: Bluetooth
->>> 	Soft blocked: yes
->>> 	Hard blocked: no
->>> 
->>> hci0 won't be visible if tpacpi_bluetooth_sw is soft-killed. The
->>> work-
->>> around I have planned is to wait for "hci*" to appear if the
->>> Bluetooth
->>> rfkill we unset doesn't start with "chi".
+>> Actually it isn't needed there either. We have a hci_conn_hash that does the counting for you already. You pretty much just have to sum it up correctly and you know the correct state of your led.
 >> 
->> That is the Thinkpad specific platform RFKILL switch that kills the
->> power to the USB device. Some platforms have this switches. They are
->> owned by the platform or ACPI. The hci0 is the one represented by the
->> Bluetooth subsystem.
-> 
-> Right, knew that, but was wondering whether the layering of rfkills, in
-> addition to other changes, might have been the reason why this broke.
+> OK. We just might have one remaining issue: When the trigger gets activated, how to find out whether hci currently is powered or not?
+> We can use the counter (as is) or we could store hdev in our trigger class and use hdev_is_powered(hdev) from within the activate callback.
+> Would you prefer the latter approach?
 
-I do not recall any change in the subsystem that have caused this. So most likely this is systemd messing up things.
+Do not intermix some functions that are designed for the mgmt with low-level transport related handling. If you are adding the LED trigger where you currently do, then this is test_bit(HCI_UP, &hdev->flags).
+
+Using hdev_is_powered would interact with the HCI_AUTO_OFF capability. And that is really not what you want. You better map it simple to the low-level transport that is HCI_UP flag. If you want to map it to the mgmt view of powered controllers, then that is a lot of more work. Especially since you then have to also deal with configured vs unconfigured controllers. And we also have raw mode and HCI User Channel which do not show in mgmt API.
 
 Regards
 
