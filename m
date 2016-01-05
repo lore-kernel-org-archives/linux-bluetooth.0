@@ -1,76 +1,40 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/4] doc/gatt-api: Make proper use of ObjectManager
-Date: Tue,  5 Jan 2016 14:54:35 -0300
-Message-Id: <1452016478-17221-1-git-send-email-luiz.dentz@gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 9.2 \(3112\))
+Subject: Re: [PATCH v2 0/2] Bluetooth: Add support for Start Limited Discovery
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1451992772-4971-1-git-send-email-johan.hedberg@gmail.com>
+Date: Tue, 5 Jan 2016 08:05:07 -0800
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <AA8A134E-4957-4A48-8030-49CBDD2F8FF0@holtmann.org>
+References: <1451992772-4971-1-git-send-email-johan.hedberg@gmail.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Johan,
 
-ObjectManager path shall not contain other intefaces in its root path, only
-child objects shall be included with many bindings following this.
+> These two patches implement support for the Start Limited Discovery mgmt
+> command (that's been specified a long time ago but no-one picked up the
+> task to implement it so far).
+> 
+> Johan
+> 
+> ---
+> Johan Hedberg (2):
+>      Bluetooth: Change eir_has_data_type() to more generic eir_get_data()
+>      Bluetooth: Add support for Start Limited Discovery command
+> 
+> include/net/bluetooth/hci_core.h | 31 +++++++++++++++-------
+> include/net/bluetooth/mgmt.h     |  2 ++
+> net/bluetooth/hci_event.c        |  6 ++---
+> net/bluetooth/hci_request.c	  | 11 +++++---
+> net/bluetooth/mgmt.c             | 56 ++++++++++++++++++++++++++++++++-------
+> 5 files changed, 80 insertions(+), 26 deletions(-)
 
-Due to this limitation and also the fact that application might actually
-have a single ObjectManager path so all services can be registered at
-once.
----
- doc/gatt-api.txt | 17 ++++++++---------
- 1 file changed, 8 insertions(+), 9 deletions(-)
+both patches have been applied to bluetooth-next tree.
 
-diff --git a/doc/gatt-api.txt b/doc/gatt-api.txt
-index d832c73..f1940ba 100644
---- a/doc/gatt-api.txt
-+++ b/doc/gatt-api.txt
-@@ -270,9 +270,9 @@ must be available on the root service path. An example application hierarchy
- containing two separate GATT services may look like this:
- 
- -> /com/example
-+  |   - org.freedesktop.DBus.ObjectManager
-   |
-   -> /com/example/service0
--  | |   - org.freedesktop.DBus.ObjectManager
-   | |   - org.freedesktop.DBus.Properties
-   | |   - org.bluez.GattService1
-   | |
-@@ -289,7 +289,6 @@ containing two separate GATT services may look like this:
-   |       - org.bluez.GattDescriptor1
-   |
-   -> /com/example/service1
--    |   - org.freedesktop.DBus.ObjectManager
-     |   - org.freedesktop.DBus.Properties
-     |   - org.bluez.GattService1
-     |
-@@ -309,21 +308,21 @@ Service		org.bluez
- Interface	org.bluez.GattManager1 [Experimental]
- Object path	[variable prefix]/{hci0,hci1,...}
- 
--Methods		void RegisterService(object service, dict options)
-+Methods		void RegisterApplication(object application, dict options)
- 
--			Registers a local GATT service hierarchy as described
-+			Registers a local GATT services hierarchy as described
- 			above.
- 
--			"service" object path together with the D-Bus system
--			bus connection ID define the identification of the
--			application registering a GATT based service.
-+			The application object path together with the D-Bus
-+			system bus connection ID define the identification of
-+			the application registering a GATT based service.
- 
- 			Possible errors: org.bluez.Error.InvalidArguments
- 					 org.bluez.Error.AlreadyExists
- 
--		void UnregisterService(object service)
-+		void UnregisterApplication(object application)
- 
--			This unregisters the service that has been
-+			This unregisters the services that has been
- 			previously registered. The object path parameter
- 			must match the same value that has been used
- 			on registration.
--- 
-2.4.3
+Regards
+
+Marcel
 
