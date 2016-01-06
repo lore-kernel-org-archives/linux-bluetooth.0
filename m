@@ -1,31 +1,29 @@
-Return-Path: <linux-kernel-owner@vger.kernel.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 9.2 \(3112\))
-Subject: Re: [PATCH 1/2] Bluetooth: btmrvl: max out host sleep parameter 'gap'
+Subject: Re: [PATCH v2] Bluetooth: avoid rebuilding hci_sock all the time
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1452090878-19586-1-git-send-email-akarwar@marvell.com>
-Date: Wed, 6 Jan 2016 07:24:08 -0800
-Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Chin-Ran Lo <crlo@marvell.com>
-Message-Id: <F723F721-CF7F-4417-BF6F-5D6A260BC7F6@holtmann.org>
-References: <1452090878-19586-1-git-send-email-akarwar@marvell.com>
-To: Amitkumar Karwar <akarwar@marvell.com>
-Sender: linux-kernel-owner@vger.kernel.org
+In-Reply-To: <1452087520-29599-1-git-send-email-johannes@sipsolutions.net>
+Date: Wed, 6 Jan 2016 07:22:06 -0800
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+	Johannes Berg <johannes.berg@intel.com>
+Message-Id: <5E2EA838-CED6-437D-9464-1FAA5183FFA3@holtmann.org>
+References: <1452087520-29599-1-git-send-email-johannes@sipsolutions.net>
+To: Johannes Berg <johannes@sipsolutions.net>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Amitkumar,
+Hi Johannes,
 
-> For gpio=0xff (wake up host through SDIO interface) case,
-> gap=0xff means no delay (same as gap=0) for incoming data packet
-> to be sent to host after host sleep is activated.
-> Change it to the maximum delay to reduce the chance that RX
-> interrupt could be delivered while host controller suspends.
+> Instead, allow using string formatting with send_monitor_note()
+> and access init_utsname().
 > 
-> Signed-off-by: Chin-Ran Lo <crlo@marvell.com>
-> Signed-off-by: Amitkumar Karwar <akarwar@marvell.com>
+> Signed-off-by: Johannes Berg <johannes.berg@intel.com>
 > ---
-> drivers/bluetooth/btmrvl_main.c | 2 +-
-> 1 file changed, 1 insertion(+), 1 deletion(-)
+> net/bluetooth/hci_sock.c | 28 ++++++++++++++++++----------
+> 1 file changed, 18 insertions(+), 10 deletions(-)
 
 patch has been applied to bluetooth-next tree.
 
