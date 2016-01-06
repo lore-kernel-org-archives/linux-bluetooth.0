@@ -1,63 +1,114 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <root@marvell.com>
+From: Amitkumar Karwar <akarwar@marvell.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: <linux-kernel@vger.kernel.org>, <marcel@holtmann.org>,
+        Chin-Ran Lo
+	<crlo@marvell.com>,
+        Amitkumar Karwar <akarwar@marvell.com>
+Subject: [PATCH 2/2] Bluetooth: btmrvl: don't send data to firmware while processing suspend
+Date: Wed, 6 Jan 2016 06:34:38 -0800
+Message-ID: <1452090878-19586-2-git-send-email-akarwar@marvell.com>
+In-Reply-To: <1452090878-19586-1-git-send-email-akarwar@marvell.com>
+References: <1452090878-19586-1-git-send-email-akarwar@marvell.com>
 MIME-Version: 1.0
-In-Reply-To: <CAASrBQ=XtvLXLp7xJuUN7pfN6ZN3sEZGU-6LtBhz-isdmpujxQ@mail.gmail.com>
-References: <CAASrBQ=XtvLXLp7xJuUN7pfN6ZN3sEZGU-6LtBhz-isdmpujxQ@mail.gmail.com>
-Date: Wed, 6 Jan 2016 11:37:10 -0300
-Message-ID: <CABBYNZJP3n8w9e2xzuA_cLYdk-9nPXTFMkxrZcpdhQaP=B5JbQ@mail.gmail.com>
-Subject: Re: Failed to obtain handles for "Service Changed" characteristic, etc.
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Mark Rages <markrages@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mark,
+From: Chin-Ran Lo <crlo@marvell.com>
 
-On Mon, Jan 4, 2016 at 3:16 PM, Mark Rages <markrages@gmail.com> wrote:
-> Hi,
->
-> I'm trying to use git bluetoothd in Ubuntu.  When I start it I get the
-> following errors:
->
-> root@qountdown:~/src/bluez/src# ./bluetoothd -En
-> bluetoothd[23921]: Bluetooth daemon 5.37
-> bluetoothd[23921]: Starting SDP server
-> bluetoothd[23921]: Bluetooth management interface 1.6 initialized
-> bluetoothd[23921]: Failed to obtain handles for "Service Changed" characteristic
-> bluetoothd[23921]: Not enough free handles to register service
-> bluetoothd[23921]: Error adding Link Loss service
-> bluetoothd[23921]: Not enough free handles to register service
-> bluetoothd[23921]: Not enough free handles to register service
-> bluetoothd[23921]: Not enough free handles to register service
-> bluetoothd[23921]: Current Time Service could not be registered
-> bluetoothd[23921]: gatt-time-server: Input/output error (5)
-> bluetoothd[23921]: Not enough free handles to register service
-> bluetoothd[23921]: Not enough free handles to register service
+Usually when driver sends data to firmware it receives TX_DONE
+(DN_LD_HOST_INT_STATUS) interrupt from firmware right away.
+It's also observed that some times the fireware could delay
+sending DN_LD_HOST_INT_STATUS interrupt. If driver sends data to
+firmware during suspend processing and the TX_DONE interrupt is
+delayed, it may come back at wrong time when SDIO host driver is
+in the middle of suspending.
 
-These are plugins using deprecated API, we should be disable/removing
-them in favor or external support via GATT D-Bus APIs.
+Block any data from stack while suspending. Also skip sending
+data that are already in driver tx_queue.
 
-> bluetoothd[23921]: Failed to read advertising features: Unknown Command (0x01)
-> bluetoothd[23921]: hci0 Load Connection Parameters failed: Unknown
-> Command (0x01)
+Don't purge the skb queue on suspend to avoid intermittent music
+after system resumes from S3.
 
-These are more serious, it seems your kernel is too old and does not
-support the command above which are quite important if you plan to
-support peripheral role.
+Signed-off-by: Chin-Ran Lo <crlo@marvell.com>
+Signed-off-by: Amitkumar Karwar <akarwar@marvell.com>
+---
+ drivers/bluetooth/btmrvl_drv.h  |  1 +
+ drivers/bluetooth/btmrvl_main.c | 11 +++++++++--
+ drivers/bluetooth/btmrvl_sdio.c |  3 ++-
+ 3 files changed, 12 insertions(+), 3 deletions(-)
 
->
-> Where should I look to diagnose these?
-> --
-> Regards,
-> Mark
-> markrages@gmail
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-
+diff --git a/drivers/bluetooth/btmrvl_drv.h b/drivers/bluetooth/btmrvl_drv.h
+index 27a9aac..0590473 100644
+--- a/drivers/bluetooth/btmrvl_drv.h
++++ b/drivers/bluetooth/btmrvl_drv.h
+@@ -89,6 +89,7 @@ struct btmrvl_adapter {
+ 	wait_queue_head_t event_hs_wait_q;
+ 	u8 cmd_complete;
+ 	bool is_suspended;
++	bool is_suspending;
+ };
+ 
+ struct btmrvl_private {
+diff --git a/drivers/bluetooth/btmrvl_main.c b/drivers/bluetooth/btmrvl_main.c
+index b2a567b..f25a825 100644
+--- a/drivers/bluetooth/btmrvl_main.c
++++ b/drivers/bluetooth/btmrvl_main.c
+@@ -436,6 +436,11 @@ static int btmrvl_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
+ 
+ 	BT_DBG("type=%d, len=%d", hci_skb_pkt_type(skb), skb->len);
+ 
++	if (priv->adapter->is_suspending || priv->adapter->is_suspended) {
++		BT_ERR("%s: Device is suspending or suspended", __func__);
++		return -EBUSY;
++	}
++
+ 	switch (hci_skb_pkt_type(skb)) {
+ 	case HCI_COMMAND_PKT:
+ 		hdev->stat.cmd_tx++;
+@@ -452,7 +457,8 @@ static int btmrvl_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
+ 
+ 	skb_queue_tail(&priv->adapter->tx_queue, skb);
+ 
+-	wake_up_interruptible(&priv->main_thread.wait_q);
++	if (!priv->adapter->is_suspended)
++		wake_up_interruptible(&priv->main_thread.wait_q);
+ 
+ 	return 0;
+ }
+@@ -643,7 +649,8 @@ static int btmrvl_service_main_thread(void *data)
+ 		if (adapter->ps_state == PS_SLEEP)
+ 			continue;
+ 
+-		if (!priv->btmrvl_dev.tx_dnld_rdy)
++		if (!priv->btmrvl_dev.tx_dnld_rdy ||
++		    priv->adapter->is_suspended)
+ 			continue;
+ 
+ 		skb = skb_dequeue(&adapter->tx_queue);
+diff --git a/drivers/bluetooth/btmrvl_sdio.c b/drivers/bluetooth/btmrvl_sdio.c
+index 73a1c27..6ed8acf 100644
+--- a/drivers/bluetooth/btmrvl_sdio.c
++++ b/drivers/bluetooth/btmrvl_sdio.c
+@@ -1545,10 +1545,10 @@ static int btmrvl_sdio_suspend(struct device *dev)
+ 	}
+ 
+ 	priv = card->priv;
++	priv->adapter->is_suspending = true;
+ 	hcidev = priv->btmrvl_dev.hcidev;
+ 	BT_DBG("%s: SDIO suspend", hcidev->name);
+ 	hci_suspend_dev(hcidev);
+-	skb_queue_purge(&priv->adapter->tx_queue);
+ 
+ 	if (priv->adapter->hs_state != HS_ACTIVATED) {
+ 		if (btmrvl_enable_hs(priv)) {
+@@ -1557,6 +1557,7 @@ static int btmrvl_sdio_suspend(struct device *dev)
+ 		}
+ 	}
+ 
++	priv->adapter->is_suspending = false;
+ 	priv->adapter->is_suspended = true;
+ 
+ 	/* We will keep the power when hs enabled successfully */
 -- 
-Luiz Augusto von Dentz
+1.8.1.4
