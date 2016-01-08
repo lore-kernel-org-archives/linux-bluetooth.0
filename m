@@ -1,20 +1,82 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Date: Fri, 08 Jan 2016 13:17:51 -0500 (EST)
-Message-Id: <20160108.131751.759607274077785520.davem@davemloft.net>
-To: johan.hedberg@gmail.com
-Cc: netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Subject: Re: pull request: bluetooth-next 2016-01-08
-From: David Miller <davem@davemloft.net>
-In-Reply-To: <20160108104622.GA20780@t440s.lan>
-References: <20160108104622.GA20780@t440s.lan>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <dh.herrmann@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <1451422549-22071-1-git-send-email-xerofoify@gmail.com>
+References: <1451422549-22071-1-git-send-email-xerofoify@gmail.com>
+Date: Fri, 8 Jan 2016 13:16:13 +0100
+Message-ID: <CANq1E4R7TtQ2ckSF3GYHMoDihCfDKO5EX8kQGHH=VB9xrdhtjQ@mail.gmail.com>
+Subject: Re: [PATCH RESEND] bluetooth:hicp:Fix error handling in the function hidp_connection_del
+From: David Herrmann <dh.herrmann@gmail.com>
+To: Nicholas Krause <xerofoify@gmail.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, "Gustavo F. Padovan" <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>, "David S. Miller" <davem@davemloft.net>, tedd.an@intel.com,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>, netdev <netdev@vger.kernel.org>,
+	linux-kernel <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@gmail.com>
-Date: Fri, 8 Jan 2016 12:46:22 +0200
+Hi
 
-> Here's one more bluetooth-next pull request for the 4.5 kernel:
+On Tue, Dec 29, 2015 at 9:55 PM, Nicholas Krause <xerofoify@gmail.com> wrote:
+> This fixes error handling in the function hidp_connection_del to
+> properly check if the internal call to hidp_send_ctrl_message has
+> failed by returning a error code and if so immediately return this
+> error code to the caller of hidp_connection_del to signal that a
+> failed call has occurred that needs to be handled by this function's
+> caller.
+>
+> Signed-off-by: Nicholas Krause <xerofoify@gmail.com>
+> ---
+>  net/bluetooth/hidp/core.c | 17 ++++++++++-------
+>  1 file changed, 10 insertions(+), 7 deletions(-)
+>
+> diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
+> index f1a117f..13aa6d0 100644
+> --- a/net/bluetooth/hidp/core.c
+> +++ b/net/bluetooth/hidp/core.c
+> @@ -1360,6 +1360,7 @@ int hidp_connection_del(struct hidp_conndel_req *req)
+>  {
+>         u32 valid_flags = BIT(HIDP_VIRTUAL_CABLE_UNPLUG);
+>         struct hidp_session *session;
+> +       int err;
+>
+>         if (req->flags & ~valid_flags)
+>                 return -EINVAL;
+> @@ -1368,14 +1369,16 @@ int hidp_connection_del(struct hidp_conndel_req *req)
+>         if (!session)
+>                 return -ENOENT;
+>
+> -       if (req->flags & BIT(HIDP_VIRTUAL_CABLE_UNPLUG))
+> -               hidp_send_ctrl_message(session,
+> -                                      HIDP_TRANS_HID_CONTROL |
+> -                                        HIDP_CTRL_VIRTUAL_CABLE_UNPLUG,
+> -                                      NULL, 0);
+> -       else
+> +       if (req->flags & BIT(HIDP_VIRTUAL_CABLE_UNPLUG)) {
+> +               err = hidp_send_ctrl_message(session,
+> +                                            HIDP_TRANS_HID_CONTROL |
+> +                                            HIDP_CTRL_VIRTUAL_CABLE_UNPLUG,
+> +                                            NULL, 0);
+> +               if (err)
+> +                       return err;
 
-Pulled, thanks Johan.
+This leaks a reference to 'session'.
+
+> +       } else {
+>                 l2cap_unregister_user(session->conn, &session->user);
+> -
+> +       }
+>         hidp_session_put(session);
+
+I'm not very convinced that this is a good idea. Transmission is
+handled async, hence all you catch here is OOM. Nothing interesting
+can be returned, and there's nothing sane the caller can do to handle
+the error. I'd keep the code as is.
+
+Thanks
+David
+
+>
+>         return 0;
+> --
+> 2.1.4
+>
