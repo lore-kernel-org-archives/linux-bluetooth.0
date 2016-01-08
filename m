@@ -1,106 +1,286 @@
-Return-Path: <netdev-owner@vger.kernel.org>
-Date: Fri, 8 Jan 2016 12:46:22 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Subject: pull request: bluetooth-next 2016-01-08
-Message-ID: <20160108104622.GA20780@t440s.lan>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="zYM0uCDKw75PZbzx"
-Sender: netdev-owner@vger.kernel.org
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 9.2 \(3112\))
+Subject: Re: [PATCH v3] bluetooth: core: RfC - add basic LED triggers
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <568C2B0F.8010103@gmail.com>
+Date: Thu, 7 Jan 2016 17:39:04 -0800
+Cc: Johan Hedberg <johan.hedberg@gmail.com>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>
+Message-Id: <37351A53-0BFB-439E-B0CB-E77E5F0E6553@holtmann.org>
+References: <568C2B0F.8010103@gmail.com>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Heiner,
 
---zYM0uCDKw75PZbzx
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+please use a proper subject line.
 
-Hi Dave,
+> In the bluetooth subsystem I miss the option to use LEDs to indicate
+> the status. This patch is loosely based on the LED triggers in mac80211
+> and adds a basic LED trigger (powered up) plus a config option to
+> enable the BT LED triggers.
+> 
+> It works fine on my system however I don't know the bluetooth stack
+> in too much detail and therefore appreciate any comment.
 
-Here's one more bluetooth-next pull request for the 4.5 kernel:
+And I need a useful commit message. This is not suitable.
 
- - Support for CRC check and promiscuous mode for CC2520
- - Fixes to btmrvl driver
- - New ACPI IDs for hci_bcm driver
- - Limited Discovery support for the Bluetooth mgmt interface
- - Minor other cleanups here and there
+> 
+> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+> ---
+> v2:
+> - completely rewrote the code to be as generic as possible and minimize
+>  the changes to struct hci_dev
+> - make the details of the LED triggers opaque to struct hci_dev
+> - avoid using ifdef CONFIG_BT_LEDS in hci_core.h
+> - start with the radio trigger only
+> - factor out the generic basic led trigger code to facilitate adding
+>  further basic LED triggers
+> - fix indentation in Kconfig
+> - rename led.[ch] to leds.[ch]
+> v3:
+> - use term power instead of radio
+> - rename hci_led_ to hci_leds_
+> - remove the counter
+> - use IS_ENABLED for checking the config option
+> ---
+> include/net/bluetooth/hci_core.h |  3 ++
+> net/bluetooth/Kconfig            |  9 +++++
+> net/bluetooth/Makefile           |  1 +
+> net/bluetooth/hci_core.c         |  8 ++++
+> net/bluetooth/leds.c             | 83 ++++++++++++++++++++++++++++++++++++++++
+> net/bluetooth/leds.h             | 18 +++++++++
+> 6 files changed, 122 insertions(+)
+> create mode 100644 net/bluetooth/leds.c
+> create mode 100644 net/bluetooth/leds.h
+> 
+> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+> index c95e032..0f084b4 100644
+> --- a/include/net/bluetooth/hci_core.h
+> +++ b/include/net/bluetooth/hci_core.h
+> @@ -25,6 +25,7 @@
+> #ifndef __HCI_CORE_H
+> #define __HCI_CORE_H
+> 
+> +#include <linux/leds.h>
+> #include <net/bluetooth/hci.h>
+> #include <net/bluetooth/hci_sock.h>
+> 
+> @@ -395,6 +396,8 @@ struct hci_dev {
+> 	struct delayed_work	rpa_expired;
+> 	bdaddr_t		rpa;
+> 
+> +	struct led_trigger	*power_led;
+> +
+> 	int (*open)(struct hci_dev *hdev);
+> 	int (*close)(struct hci_dev *hdev);
+> 	int (*flush)(struct hci_dev *hdev);
+> diff --git a/net/bluetooth/Kconfig b/net/bluetooth/Kconfig
+> index 95d1a66..06c31b9 100644
+> --- a/net/bluetooth/Kconfig
+> +++ b/net/bluetooth/Kconfig
+> @@ -69,6 +69,15 @@ config BT_6LOWPAN
+> 	help
+> 	  IPv6 compression over Bluetooth Low Energy.
+> 
+> +config BT_LEDS
+> +	bool "Enable LED triggers"
+> +	depends on BT
+> +	depends on LEDS_CLASS
+> +	select LEDS_TRIGGERS
+> +	help
+> +	  This option selects a few LED triggers for different
+> +	  Bluetooth events.
+> +
+> config BT_SELFTEST
+> 	bool "Bluetooth self testing support"
+> 	depends on BT && DEBUG_KERNEL
+> diff --git a/net/bluetooth/Makefile b/net/bluetooth/Makefile
+> index 2b15ae8..b3ff12e 100644
+> --- a/net/bluetooth/Makefile
+> +++ b/net/bluetooth/Makefile
+> @@ -17,6 +17,7 @@ bluetooth-y := af_bluetooth.o hci_core.o hci_conn.o hci_event.o mgmt.o \
+> 
+> bluetooth-$(CONFIG_BT_BREDR) += sco.o
+> bluetooth-$(CONFIG_BT_HS) += a2mp.o amp.o
+> +bluetooth-$(CONFIG_BT_LEDS) += leds.o
+> bluetooth-$(CONFIG_BT_DEBUGFS) += hci_debugfs.o
+> bluetooth-$(CONFIG_BT_SELFTEST) += selftest.o
+> 
+> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> index 47bcef7..06f603a 100644
+> --- a/net/bluetooth/hci_core.c
+> +++ b/net/bluetooth/hci_core.c
+> @@ -40,6 +40,7 @@
+> #include "hci_request.h"
+> #include "hci_debugfs.h"
+> #include "smp.h"
+> +#include "leds.h"
+> 
+> static void hci_rx_work(struct work_struct *work);
+> static void hci_cmd_work(struct work_struct *work);
+> @@ -1395,6 +1396,7 @@ static int hci_dev_do_open(struct hci_dev *hdev)
+> 		hci_dev_set_flag(hdev, HCI_RPA_EXPIRED);
+> 		set_bit(HCI_UP, &hdev->flags);
+> 		hci_sock_dev_event(hdev, HCI_DEV_UP);
+> +		hci_leds_update_powered(hdev, true);
+> 		if (!hci_dev_test_flag(hdev, HCI_SETUP) &&
+> 		    !hci_dev_test_flag(hdev, HCI_CONFIG) &&
+> 		    !hci_dev_test_flag(hdev, HCI_UNCONFIGURED) &&
+> @@ -1532,6 +1534,8 @@ int hci_dev_do_close(struct hci_dev *hdev)
+> 		return 0;
+> 	}
+> 
+> +	hci_leds_update_powered(hdev, false);
+> +
+> 	/* Flush RX and TX works */
+> 	flush_work(&hdev->tx_work);
+> 	flush_work(&hdev->rx_work);
+> @@ -3067,6 +3071,8 @@ int hci_register_dev(struct hci_dev *hdev)
+> 	if (error < 0)
+> 		goto err_wqueue;
+> 
+> +	hci_leds_init(hdev);
+> +
+> 	hdev->rfkill = rfkill_alloc(hdev->name, &hdev->dev,
+> 				    RFKILL_TYPE_BLUETOOTH, &hci_rfkill_ops,
+> 				    hdev);
+> @@ -3128,6 +3134,8 @@ void hci_unregister_dev(struct hci_dev *hdev)
+> 
+> 	id = hdev->id;
+> 
+> +	hci_leds_exit(hdev);
+> +
+> 	write_lock(&hci_dev_list_lock);
+> 	list_del(&hdev->list);
+> 	write_unlock(&hci_dev_list_lock);
+> diff --git a/net/bluetooth/leds.c b/net/bluetooth/leds.c
+> new file mode 100644
+> index 0000000..9172c53
+> --- /dev/null
+> +++ b/net/bluetooth/leds.c
+> @@ -0,0 +1,83 @@
+> +/*
+> + * Copyright 2015, Heiner Kallweit <hkallweit1@gmail.com>
+> + *
+> + * This program is free software; you can redistribute it and/or modify
+> + * it under the terms of the GNU General Public License version 2 as
+> + * published by the Free Software Foundation.
+> + */
+> +
+> +#include <net/bluetooth/bluetooth.h>
+> +#include <net/bluetooth/hci_core.h>
+> +
+> +#include "leds.h"
+> +
+> +struct hci_basic_led_trigger {
+> +	struct led_trigger	led_trigger;
+> +	struct hci_dev		*hdev;
+> +};
+> +
+> +#define to_hci_basic_led_trigger(arg) container_of(arg, \
+> +			struct hci_basic_led_trigger, led_trigger)
+> +
+> +void hci_leds_update_powered(struct hci_dev *hdev, bool enabled)
+> +{
+> +	if (hdev->power_led)
+> +		led_trigger_event(hdev->power_led,
+> +				  enabled ? LED_FULL : LED_OFF);
+> +}
+> +
+> +static void hci_power_led_activate(struct led_classdev *led_cdev)
 
-Please let me know if there are any issues pulling. Thanks.
+Since this function is local to this file, maybe shortening to power_activate is enough.
 
-Johan
+> +{
+> +	struct hci_basic_led_trigger *htrig;
+> +	bool powered;
+> +
+> +	htrig = to_hci_basic_led_trigger(led_cdev->trigger);
+> +	powered = test_bit(HCI_UP, &htrig->hdev->flags);
+> +
+> +	led_trigger_event(led_cdev->trigger, powered ? LED_FULL : LED_OFF);
+> +}
+> +
+> +static struct led_trigger *hci_basic_led_allocate(struct hci_dev *hdev,
+> +			void (*activate)(struct led_classdev *led_cdev),
+> +			const char *name)
 
----
-The following changes since commit c07f30ad68053181b3e8a0e65b0630e12e844f91:
+Same here. I think using led_alloc_basic is enough.
 
-  Merge git://git.kernel.org/pub/scm/linux/kernel/git/davem/net (2015-12-31 18:20:10 -0500)
+> +{
+> +	struct hci_basic_led_trigger *htrig;
+> +
+> +	htrig =	devm_kzalloc(&hdev->dev, sizeof(*htrig), GFP_KERNEL);
+> +	if (!htrig)
+> +		return NULL;
+> +
+> +	htrig->hdev = hdev;
+> +	htrig->led_trigger.activate = activate;
+> +	htrig->led_trigger.name = devm_kasprintf(&hdev->dev, GFP_KERNEL,
+> +						 "%s-%s", hdev->name,
+> +						 name);
+> +	if (!htrig->led_trigger.name)
+> +		goto err_alloc;
+> +
+> +	if (led_trigger_register(&htrig->led_trigger))
+> +		goto err_register;
+> +
+> +	return &htrig->led_trigger;
+> +
+> +err_register:
+> +	devm_kfree(&hdev->dev, (void *)htrig->led_trigger.name);
+> +err_alloc:
+> +	devm_kfree(&hdev->dev, htrig);
+> +	return NULL;
+> +}
+> +
+> +void hci_leds_init(struct hci_dev *hdev)
+> +{
+> +	/* initialize power_led */
+> +	hdev->power_led = hci_basic_led_allocate(hdev,
+> +						 hci_power_led_activate,
+> +						 "power");
+> +}
+> +
+> +void hci_leds_exit(struct hci_dev *hdev)
+> +{
+> +	if (hdev->power_led)
+> +		led_trigger_unregister(hdev->power_led);
+> +}
+> +
 
-are available in the git repository at:
+You have an extra empty line at the end of the file. Please remove that.
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git for-upstream
+> diff --git a/net/bluetooth/leds.h b/net/bluetooth/leds.h
+> new file mode 100644
+> index 0000000..068261a
+> --- /dev/null
+> +++ b/net/bluetooth/leds.h
+> @@ -0,0 +1,18 @@
+> +/*
+> + * Copyright 2015, Heiner Kallweit <hkallweit1@gmail.com>
+> + *
+> + * This program is free software; you can redistribute it and/or modify
+> + * it under the terms of the GNU General Public License version 2 as
+> + * published by the Free Software Foundation.
+> + */
+> +
+> +#if IS_ENABLED(CONFIG_BT_LEDS)
+> +void hci_leds_update_powered(struct hci_dev *hdev, bool enabled);
+> +void hci_leds_init(struct hci_dev *hdev);
+> +void hci_leds_exit(struct hci_dev *hdev);
+> +#else
+> +static inline void hci_leds_update_powered(struct hci_dev *hdev,
+> +					   bool enabled) {}
+> +static inline void hci_leds_init(struct hci_dev *hdev) {}
+> +static inline void hci_leds_exit(struct hci_dev *hdev) {}
+> +#endif
 
-for you to fetch changes up to 8cf60cf238ce1bea38593321e6ea8561fc32e38d:
+Regards
 
-  Bluetooth: btmrvl: don't send data to firmware while processing suspend (2016-01-06 16:37:14 +0100)
+Marcel
 
-----------------------------------------------------------------
-Brad Campbell (1):
-      ieee802154: cc2520: Check CRC & add promiscuous
 
-Chin-Ran Lo (3):
-      Bluetooth: btmrvl: fix hung task warning dump
-      Bluetooth: btmrvl: max out host sleep parameter 'gap'
-      Bluetooth: btmrvl: don't send data to firmware while processing suspend
-
-Heikki Krogerus (2):
-      Bluetooth: hci_bcm: move all Broadcom ACPI IDs to BCM HCI driver
-      Bluetooth: hci_bcm: new ACPI IDs
-
-Johan Hedberg (2):
-      Bluetooth: Change eir_has_data_type() to more generic eir_get_data()
-      Bluetooth: Add support for Start Limited Discovery command
-
-Johannes Berg (1):
-      Bluetooth: avoid rebuilding hci_sock all the time
-
-Julia Lawall (1):
-      mac802154: constify ieee802154_llsec_ops structure
-
- drivers/bluetooth/btmrvl_drv.h   |   1 +
- drivers/bluetooth/btmrvl_main.c  |  13 +++-
- drivers/bluetooth/btmrvl_sdio.c  |   6 +-
- drivers/bluetooth/hci_bcm.c      |   7 ++
- drivers/net/ieee802154/cc2520.c  | 145 ++++++++++++++++++++++++++++++++------
- include/net/bluetooth/hci_core.h |  31 +++++---
- include/net/bluetooth/mgmt.h     |   2 +
- include/net/ieee802154_netdev.h  |   2 +-
- net/bluetooth/hci_event.c        |   6 +-
- net/bluetooth/hci_request.c      |  11 ++-
- net/bluetooth/hci_sock.c         |  27 ++++---
- net/bluetooth/mgmt.c             |  56 ++++++++++++---
- net/mac802154/mac_cmd.c          |   2 +-
- net/rfkill/rfkill-gpio.c         |   4 --
- 14 files changed, 244 insertions(+), 69 deletions(-)
-
---zYM0uCDKw75PZbzx
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
-
-iQIcBAEBAgAGBQJWj5N9AAoJECQj9vv5qNQSHMAP/jOp4VuDbbc37iW1VR7Uk1PQ
-iLQe0ROrZPG/lfec4B69e5gUAVjDgDopkVVgF2UGiJ0eiS9Y0AopyVokDjWpjLuv
-+uYVWEXk0V9Jfj19///w6W2y4b1+460OIZqWPplIwbvz4IaOIDW/qOu7i7dC2oO8
-tkr+LbUL3rSj9xsWjOOALpI34VxGwn/qgfp0BPLEX8UUPHzvgyxfrrd535mToYMB
-KG/BddgsnYptGSaRLsMuhOmng1KjOGFE+uW83OeHJwLMoFWNtb9Cn5nVKE8fq9Z4
-zyV35ymaxbNpU7YLX9JmoNRlIU8oXUI0EVTdedyc9b2ba+wZosBJ1EiAVvpWjcPb
-TfVj9mwuznf4rBregHbBlM3NaRpgWOP0sRjSsu7L15Zuj/mpG5Zi9J+W++7Ev/RA
-dau4kbDV/hdO7B8/FfK+Ne5HMH0VFJCsJMV9fAq91DeCIDpQUUx4rQpKkpU5JXii
-zhVKrVtIAoOimX68ue2CJnMrAScXeifvD6PiEJYj4ZQfgl20tj0f8xBe5F0ytfh6
-rjljxejvvrIC5TKYKXWFRpkSfNqYg/9Z4zvOCGZ2o62WKFfxpGKmrXToeuK8VxZu
-UNV7A8pKXqzoRmjFkgE93hpQ1aCXLkJquDbrqB029SYN9KTp3BUQ6U5Cr7gQL+l5
-zhkCQ0TRVJQCY0vuMvGL
-=tIh/
------END PGP SIGNATURE-----
-
---zYM0uCDKw75PZbzx--
