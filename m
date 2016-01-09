@@ -1,48 +1,43 @@
-Return-Path: <sasha.levin@oracle.com>
-To: marcel@holtmann.org, gustavo@padovan.org, johan.hedberg@gmail.com,
-        davem@davemloft.net
-Cc: linux-bluetooth@vger.kernel.org,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-From: Sasha Levin <sasha.levin@oracle.com>
-Subject: Bluetooth: WARNING: CPU: 1 PID: 25657 at include/net/sock.h:586
- bt_sock_unlink+0x1c7/0x220()
-Message-ID: <5692B746.4050007@oracle.com>
-Date: Sun, 10 Jan 2016 14:55:50 -0500
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: bugzilla-daemon@bugzilla.kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [Bug 100461] No BCM43341 uart support on T100TAF
+Date: Sat, 09 Jan 2016 10:45:29 +0000
+Message-ID: <bug-100461-62941-hdytYhY1lt@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-100461-62941@https.bugzilla.kernel.org/>
+References: <bug-100461-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi all,
+https://bugzilla.kernel.org/show_bug.cgi?id=100461
 
-While fuzzing with trinity inside a KVM tools guest, running the latest -next
-kernel, I've hit the following warning:
+--- Comment #8 from Weiwu Zhang <zhangweiwu@realss.com> ---
+(In reply to jbMacAZ from comment #7)
+> I had the same result. The solution is to move the BCM4324B.hcd file up 1
+> folder from /lib/firmware/brcm/ to /lib/firmware/  I don't understand why
+> that would matter, so YMMV.
 
-[ 1153.249127] WARNING: CPU: 1 PID: 25657 at include/net/sock.h:586 bt_sock_unlink+0x1c7/0x220()
-[ 1153.250162] Modules linked in:
-[ 1153.250996] CPU: 1 PID: 25657 Comm: trinity-c223 Tainted: G        W       4.4.0-rc8-next-20160108-sasha-00024-gaaecb9a #2780
-[ 1153.252551]  1ffff100184f5f00 0000000015bfc733 ffff8800c27af880 ffffffff8301a182
-[ 1153.253594]  0000000041b58ab3 ffffffff8e1b3838 ffffffff8301a0b7 0000000015bfc733
-[ 1153.254857]  ffffffff8177f4c7 0000000015bfc733 ffff8801d16eb000 0000000000000001
-[ 1153.272107] Call Trace:
-[ 1153.272568] dump_stack (lib/dump_stack.c:52)
-[ 1153.274909] warn_slowpath_common (kernel/panic.c:484)
-[ 1153.276544] warn_slowpath_null (kernel/panic.c:518)
-[ 1153.277341] bt_sock_unlink (./arch/x86/include/asm/atomic.h:103 include/net/sock.h:577 include/net/sock.h:587 net/bluetooth/af_bluetooth.c:148)
-[ 1153.280581] hidp_sock_release (include/net/sock.h:1546 net/bluetooth/hidp/sock.c:43)
-[ 1153.281435] sock_release (net/socket.c:573)
-[ 1153.282145] sock_close (net/socket.c:1025)
-[ 1153.282874] __fput (fs/file_table.c:209)
-[ 1153.283581] ____fput (fs/file_table.c:245)
-[ 1153.296361] task_work_run (kernel/task_work.c:117 (discriminator 1))
-[ 1153.297090] do_exit (kernel/exit.c:749)
-[ 1153.302756] do_group_exit (kernel/exit.c:862)
-[ 1153.303523] get_signal (kernel/signal.c:2307)
-[ 1153.307151] do_signal (arch/x86/kernel/signal.c:781)
-[ 1153.322592] exit_to_usermode_loop (arch/x86/entry/common.c:249)
-[ 1153.323416] syscall_return_slowpath (./arch/x86/include/asm/jump_label.h:35 include/linux/context_tracking_state.h:30 include/linux/context_tracking.h:24 arch/x86/entry/common.c:284 arch/x86/entry/common.c:344)
-[ 1153.324276] int_ret_from_sys_call (arch/x86/entry/entry_64.S:282)
+It's amazing! Yes, you are right! In my case, simply moving it to /lib/firmware
+made the last 3 bytes of BD address change from 00-00-00 to 00:1F:AC.
 
+It's so unreasonable!
 
-Thanks,
-Sasha
+> The btattach still won't return, but the BD Address from hciconfig is real
+> and it is possible to pair bt devices. 
+
+In my case btattach runs (although it doesn't fork to background like the
+tutorial suggested). If I enable bluetooth ($ sudo hciconfig hci1 up) I can
+scan devices.
+
+To connect and pair devices, the bluetooth shipped with Ubuntu 15.10 won't
+work. blueman (launch with blueman-manager)'s "add new device" wizard works for
+me.
+
+It's the first time I got bluetooth mouse working since I bought the computer
+one year ago.
+
+-- 
+You are receiving this mail because:
+You are the assignee for the bug.
