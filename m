@@ -1,39 +1,53 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <20160108222608.GU152924@redhat.com>
-References: <20160108222608.GU152924@redhat.com>
-Date: Sun, 10 Jan 2016 19:13:56 -0300
-Message-ID: <CABBYNZ+bpQQH6XhM20d62wy5Y-PWw_Vq7_jhriHFmmLvJVHtAg@mail.gmail.com>
-Subject: Re: example GATT code to talk with a sensortag
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Don Zickus <dzickus@redhat.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <linux-wpan-owner@vger.kernel.org>
+From: Alexander Aring <alex.aring@gmail.com>
+To: linux-wpan@vger.kernel.org
+Cc: linux-bluetooth@vger.kernel.org, kernel@pengutronix.de,
+	mcr@sandelman.ca, lukasz.duda@nordicsemi.no,
+	Alexander Aring <alex.aring@gmail.com>
+Subject: [PATCH bluetooth-next 2/2] ieee802154: 6lowpan: fix return of netdev notifier
+Date: Sun, 10 Jan 2016 21:50:25 +0100
+Message-Id: <1452459025-13884-3-git-send-email-alex.aring@gmail.com>
+In-Reply-To: <1452459025-13884-1-git-send-email-alex.aring@gmail.com>
+References: <1452459025-13884-1-git-send-email-alex.aring@gmail.com>
+Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Don,
+This patch fixed the return value of netdev notifier. If the command is
+a don't care a NOTIFY_DONE should be returned. If the command matched a
+NOTIFY_OK should be returned.
 
-On Fri, Jan 8, 2016 at 7:26 PM, Don Zickus <dzickus@redhat.com> wrote:
-> Hi,
->
-> Sorry for the newbie question.  I stumbled upon a TI sensortag and was able
-> to communicate with it using the gatttool.  Now I am trying to figure out
-> how to build an app around that.  Googling has shown me lots of examples of
-> folks using expect scripts (around the gatttool).
->
-> I was hoping for something in C or python.  Is there an example
-> program/script around that I can copy and expand to get me started?
->
-> Thanks!
->
-> Cheers,
-> Don
+Signed-off-by: Alexander Aring <alex.aring@gmail.com>
+---
+ net/ieee802154/6lowpan/core.c | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
 
-bluetoothctl has some generic support for GATT attributes, in addition
-we have some examples in python under test/example-gatt-client and
-test/example-gatt-server.
-
-
+diff --git a/net/ieee802154/6lowpan/core.c b/net/ieee802154/6lowpan/core.c
+index 737c87a..0023c90 100644
+--- a/net/ieee802154/6lowpan/core.c
++++ b/net/ieee802154/6lowpan/core.c
+@@ -207,7 +207,7 @@ static int lowpan_device_event(struct notifier_block *unused,
+ 	struct net_device *wdev = netdev_notifier_info_to_dev(ptr);
+ 
+ 	if (wdev->type != ARPHRD_IEEE802154)
+-		goto out;
++		return NOTIFY_DONE;
+ 
+ 	switch (event) {
+ 	case NETDEV_UNREGISTER:
+@@ -219,11 +219,10 @@ static int lowpan_device_event(struct notifier_block *unused,
+ 			lowpan_dellink(wdev->ieee802154_ptr->lowpan_dev, NULL);
+ 		break;
+ 	default:
+-		break;
++		return NOTIFY_DONE;
+ 	}
+ 
+-out:
+-	return NOTIFY_DONE;
++	return NOTIFY_OK;
+ }
+ 
+ static struct notifier_block lowpan_dev_notifier = {
 -- 
-Luiz Augusto von Dentz
+2.6.1
+
