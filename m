@@ -1,68 +1,48 @@
-Return-Path: <linux-wpan-owner@vger.kernel.org>
-From: Alexander Aring <alex.aring@gmail.com>
-To: linux-wpan@vger.kernel.org
-Cc: linux-bluetooth@vger.kernel.org, kernel@pengutronix.de,
-	mcr@sandelman.ca, lukasz.duda@nordicsemi.no,
-	Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCH bluetooth-next 0/2] 6lowpan: stateful compression support
-Date: Sun, 10 Jan 2016 21:50:23 +0100
-Message-Id: <1452459025-13884-1-git-send-email-alex.aring@gmail.com>
-Sender: linux-wpan-owner@vger.kernel.org
+Return-Path: <sasha.levin@oracle.com>
+To: marcel@holtmann.org, gustavo@padovan.org, johan.hedberg@gmail.com,
+        davem@davemloft.net
+Cc: linux-bluetooth@vger.kernel.org,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+From: Sasha Levin <sasha.levin@oracle.com>
+Subject: Bluetooth: WARNING: CPU: 1 PID: 25657 at include/net/sock.h:586
+ bt_sock_unlink+0x1c7/0x220()
+Message-ID: <5692B746.4050007@oracle.com>
+Date: Sun, 10 Jan 2016 14:55:50 -0500
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi all,
 
-this contains at first some small fix for the netdev notifier which I deteced
-while hacking 6lowpan stateful compression support.
+While fuzzing with trinity inside a KVM tools guest, running the latest -next
+kernel, I've hit the following warning:
 
-I rework the debugfs entry for the stateful compression. Now each context entry
-for a 6LoWPAN contains has his own subdirectory (named as his CID value).
-In this subdirectories there exists the following files for manipulating the
-context entry:
-
- - active: If the context belongs to the table or not.
- - compression: the compression flag according rfc6775.
- - prefix: ipv6 prefix in xxxx:xxxx:....:xxxx form.
- - prefix_lenght: the length of the ipv6 prefix.
-
-This offers a setting per property instead doing remember the full context and
-doing echo "$FULL_CONTEXT_INFORMATION" > ctx_table.
-
-These file should be prepared to move into the sysfs directory when it seems to
-running fine.
-
-There exist one file "show" inside $LOWPAN_IFACE/contexts/. This file is for
-a "pretty-printout" for the current context table. I use the same format-string
-like RIOT-OS, example:
-
-cid|prefix                                     |C
--------------------------------------------------
-  0|                                 2001::/64 |1
-  1|                                2001::1/128|1
-  2|                                2001::5/128|1
-  7|                                 2002::/64 |1
+[ 1153.249127] WARNING: CPU: 1 PID: 25657 at include/net/sock.h:586 bt_sock_unlink+0x1c7/0x220()
+[ 1153.250162] Modules linked in:
+[ 1153.250996] CPU: 1 PID: 25657 Comm: trinity-c223 Tainted: G        W       4.4.0-rc8-next-20160108-sasha-00024-gaaecb9a #2780
+[ 1153.252551]  1ffff100184f5f00 0000000015bfc733 ffff8800c27af880 ffffffff8301a182
+[ 1153.253594]  0000000041b58ab3 ffffffff8e1b3838 ffffffff8301a0b7 0000000015bfc733
+[ 1153.254857]  ffffffff8177f4c7 0000000015bfc733 ffff8801d16eb000 0000000000000001
+[ 1153.272107] Call Trace:
+[ 1153.272568] dump_stack (lib/dump_stack.c:52)
+[ 1153.274909] warn_slowpath_common (kernel/panic.c:484)
+[ 1153.276544] warn_slowpath_null (kernel/panic.c:518)
+[ 1153.277341] bt_sock_unlink (./arch/x86/include/asm/atomic.h:103 include/net/sock.h:577 include/net/sock.h:587 net/bluetooth/af_bluetooth.c:148)
+[ 1153.280581] hidp_sock_release (include/net/sock.h:1546 net/bluetooth/hidp/sock.c:43)
+[ 1153.281435] sock_release (net/socket.c:573)
+[ 1153.282145] sock_close (net/socket.c:1025)
+[ 1153.282874] __fput (fs/file_table.c:209)
+[ 1153.283581] ____fput (fs/file_table.c:245)
+[ 1153.296361] task_work_run (kernel/task_work.c:117 (discriminator 1))
+[ 1153.297090] do_exit (kernel/exit.c:749)
+[ 1153.302756] do_group_exit (kernel/exit.c:862)
+[ 1153.303523] get_signal (kernel/signal.c:2307)
+[ 1153.307151] do_signal (arch/x86/kernel/signal.c:781)
+[ 1153.322592] exit_to_usermode_loop (arch/x86/entry/common.c:249)
+[ 1153.323416] syscall_return_slowpath (./arch/x86/include/asm/jump_label.h:35 include/linux/context_tracking_state.h:30 include/linux/context_tracking.h:24 arch/x86/entry/common.c:284 arch/x86/entry/common.c:344)
+[ 1153.324276] int_ret_from_sys_call (arch/x86/entry/entry_64.S:282)
 
 
-difference here is that RIOT shows the lifetime, but I currently see no sense to
-handle the lifetime in kernelspace.
-
-Also I added support to clean the context table when doing a "ifdown". The reason
-is that IPv6 interface will also drop all address information while doing a
-ifdown and a 6LoWPAN should not use previous context information after ifup again.
-
-- Alex
-
-Alexander Aring (2):
-  6lowpan: iphc: add support for stateful compression
-  ieee802154: 6lowpan: fix return of netdev notifier
-
- include/net/6lowpan.h         |  31 ++++
- net/6lowpan/core.c            |  39 +++-
- net/6lowpan/debugfs.c         | 247 +++++++++++++++++++++++++
- net/6lowpan/iphc.c            | 420 ++++++++++++++++++++++++++++++++++++------
- net/ieee802154/6lowpan/core.c |   7 +-
- 5 files changed, 682 insertions(+), 62 deletions(-)
-
--- 
-2.6.1
-
+Thanks,
+Sasha
