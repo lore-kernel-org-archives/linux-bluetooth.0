@@ -1,57 +1,61 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Message-ID: <1452537920.4584.16.camel@hadess.net>
-Subject: Re: example GATT code to talk with a sensortag
-From: Bastien Nocera <hadess@hadess.net>
-To: Don Zickus <dzickus@redhat.com>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Mon, 11 Jan 2016 19:45:20 +0100
-In-Reply-To: <20160111145735.GW152924@redhat.com>
+MIME-Version: 1.0
+In-Reply-To: <20160111181454.GZ152924@redhat.com>
 References: <20160108222608.GU152924@redhat.com>
-	 <CABBYNZ+bpQQH6XhM20d62wy5Y-PWw_Vq7_jhriHFmmLvJVHtAg@mail.gmail.com>
-	 <20160111145735.GW152924@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+	<CABBYNZ+bpQQH6XhM20d62wy5Y-PWw_Vq7_jhriHFmmLvJVHtAg@mail.gmail.com>
+	<20160111181454.GZ152924@redhat.com>
+Date: Mon, 11 Jan 2016 15:43:40 -0300
+Message-ID: <CABBYNZ+9ETX4zxBWvZL_G6_8WXND0W4rGVPj+6YKyrCOzuUUhQ@mail.gmail.com>
+Subject: Re: example GATT code to talk with a sensortag
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Don Zickus <dzickus@redhat.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, 2016-01-11 at 09:57 -0500, Don Zickus wrote:
-> On Sun, Jan 10, 2016 at 07:13:56PM -0300, Luiz Augusto von Dentz
-> wrote:
-> > Hi Don,
-> > 
-> > On Fri, Jan 8, 2016 at 7:26 PM, Don Zickus <dzickus@redhat.com>
-> > wrote:
-> > > Hi,
-> > > 
-> > > Sorry for the newbie question.  I stumbled upon a TI sensortag
-> > > and was able
-> > > to communicate with it using the gatttool.  Now I am trying to
-> > > figure out
-> > > how to build an app around that.  Googling has shown me lots of
-> > > examples of
-> > > folks using expect scripts (around the gatttool).
-> > > 
-> > > I was hoping for something in C or python.  Is there an example
-> > > program/script around that I can copy and expand to get me
-> > > started?
-> > > 
-> > > Thanks!
-> > > 
-> > > Cheers,
-> > > Don
-> > 
-> > bluetoothctl has some generic support for GATT attributes, in
-> > addition
-> > we have some examples in python under test/example-gatt-client and
-> > test/example-gatt-server.
-> 
-> Hi Luis,
-> 
-> Perfect, thanks!!
+Hi Don,
 
-Let me know how far you manage to get. I have one such device from
-"Proximo" which I was hoping to be able to use.
+On Mon, Jan 11, 2016 at 3:14 PM, Don Zickus <dzickus@redhat.com> wrote:
+> On Sun, Jan 10, 2016 at 07:13:56PM -0300, Luiz Augusto von Dentz wrote:
+>> Hi Don,
+>>
+>> On Fri, Jan 8, 2016 at 7:26 PM, Don Zickus <dzickus@redhat.com> wrote:
+>> > Hi,
+>> >
+>> > Sorry for the newbie question.  I stumbled upon a TI sensortag and was able
+>> > to communicate with it using the gatttool.  Now I am trying to figure out
+>> > how to build an app around that.  Googling has shown me lots of examples of
+>> > folks using expect scripts (around the gatttool).
+>> >
+>> > I was hoping for something in C or python.  Is there an example
+>> > program/script around that I can copy and expand to get me started?
+>> >
+>> > Thanks!
+>> >
+>> > Cheers,
+>> > Don
+>>
+>> bluetoothctl has some generic support for GATT attributes, in addition
+>> we have some examples in python under test/example-gatt-client and
+>> test/example-gatt-server.
+>
+> Hi Luiz,
+>
+> Hmm, the example program complains about no such interface 'org.bluez.GattService1'.
+>
+> Originally I thought that was a generic bluez interface but now I am
+> wondering if that was specific to the example program.
+>
+> Any tip on what the expected interface should be (so I know what to add)?
+>
+> (by the way, I am using bluez-5.36 if that helps)
 
-Cheers
 
+You will need to pass -E to bluetoothd to enable the experimental
+intefaces, btw there is a recent change to GATT server/peripheral so I
+suggest you try with the current version on git.
+
+
+-- 
+Luiz Augusto von Dentz
