@@ -1,34 +1,167 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <TU4PR84MB031993F9D5F95A651BCFBC65CDF30@TU4PR84MB0319.NAMPRD84.PROD.OUTLOOK.COM>
-References: <TU4PR84MB031993F9D5F95A651BCFBC65CDF30@TU4PR84MB0319.NAMPRD84.PROD.OUTLOOK.COM>
-Date: Mon, 11 Jan 2016 12:10:16 -0300
-Message-ID: <CABBYNZJeK9==T5JxWk3rjiaMtkcPhn9=aDUMB8fNwWzeXLFtWw@mail.gmail.com>
-Subject: Re: Creating BLE Server application with BlueZ
+In-Reply-To: <CABBYNZJBiyovwU1u0M+gKDyv1bPdV-Auy9yXTzy5hkU+Eg00fg@mail.gmail.com>
+References: <1449229003-7193-1-git-send-email-eu@felipetonello.com>
+	<1449229003-7193-3-git-send-email-eu@felipetonello.com>
+	<CABBYNZLqg11LNfdWLP3eax3YjTmEzH+k+YHs+p10cEbPywD47g@mail.gmail.com>
+	<5661A6E3.3040801@felipetonello.com>
+	<CABBYNZJBiyovwU1u0M+gKDyv1bPdV-Auy9yXTzy5hkU+Eg00fg@mail.gmail.com>
+Date: Mon, 11 Jan 2016 12:01:43 -0300
+Message-ID: <CABBYNZ+ejvLRz6HAq9WoQAnvyfmzOF18pMXjLO1jXVjL3QN06g@mail.gmail.com>
+Subject: Re: [PATCH 2/2] core/service: fix connection and disconnection state handling
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: "Stanbro, Matthew A." <matthew.a.stanbro@hp.com>
+To: Felipe Ferreri Tonello <eu@felipetonello.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Matthew,
+Hi Felipe,
 
-On Tue, Jan 5, 2016 at 3:36 PM, Stanbro, Matthew A.
-<matthew.a.stanbro@hp.com> wrote:
-> Hello Everyone,
+On Fri, Dec 11, 2015 at 7:52 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi Felipe,
 >
-> I am new to working with BlueZ and I am trying to get a handle on how to create a BLE service and add characteristics. Looking around the web I can find quite a bit of information about using BlueZ as a BLE client for connecting to other BLE devices to read/write attributes, but I am struggling to find anything which helps explain creating a BLE service and dealing with advertising. Can anyone point me to a resource for learning to work with the BlueZ C api for creating/starting/stopping services, adding/modifying characteristics, starting/stopping/modifying advertisments? Thanks in advance for any help you can offer.
+> On Fri, Dec 4, 2015 at 12:44 PM, Felipe Ferreri Tonello
+> <eu@felipetonello.com> wrote:
+>> Hi Luiz,
+>>
+>> On 12/04/2015 01:02 PM, Luiz Augusto von Dentz wrote:
+>>> Hi Felipe,
+>>>
+>>> On Fri, Dec 4, 2015 at 1:36 PM, Felipe F. Tonello <eu@felipetonello.com> wrote:
+>>>> Service state was not been update correctly if a profile didn't implement
+>>>> state changes itself. This patch makes sure that states will be always
+>>>> properly update, even if a profile doesn't implement itself.
+>>>>
+>>>> As a side effect, this fix a bug causing a profile's accept function not to be
+>>>> called on a connection after a disconnection.
+>>>> ---
+>>>>  src/service.c | 43 ++++++++++++++++++++++---------------------
+>>>>  1 file changed, 22 insertions(+), 21 deletions(-)
+>>>>
+>>>> diff --git a/src/service.c b/src/service.c
+>>>> index f7912f5..85694a5 100644
+>>>> --- a/src/service.c
+>>>> +++ b/src/service.c
+>>>> @@ -219,9 +219,6 @@ int btd_service_connect(struct btd_service *service)
+>>>>         char addr[18];
+>>>>         int err;
+>>>>
+>>>> -       if (!profile->connect)
+>>>> -               return -ENOTSUP;
+>>>> -
+>>>>         switch (service->state) {
+>>>>         case BTD_SERVICE_STATE_UNAVAILABLE:
+>>>>                 return -EINVAL;
+>>>> @@ -235,15 +232,21 @@ int btd_service_connect(struct btd_service *service)
+>>>>                 return -EBUSY;
+>>>>         }
+>>>>
+>>>> +       change_state(service, BTD_SERVICE_STATE_CONNECTING, 0);
+>>>> +
+>>>> +       if (!profile->connect) {
+>>>> +               btd_service_connecting_complete(service, 0);
+>>>
+>>> Hmm, I wonder if the will actually work properly since
+>>> btd_service_connecting_complete will set the state to connected if
+>>> error is 0 but it is not actually connected. Actually if accept is to
+>>> be called connect should not be called.
+>>
+>> Well, at least on my tests it works fine. How come it is not actually
+>> connected? This function is called when a connection happens.
+>>
+>> Why can't we call both? A profile will not install both callbacks
+>> anyway. But I think the states should be updated anyway, because that is
+>> the root cause of all problems here.
+>>
+>> The main objective of this patch is to update the states.
+>
+> Well perhaps we should set connected if accept succeed, or the plugin
+> has to call btd_service_connecting_complete like when
+> btd_service_connect is called I guess this makes more sense since the
+> profile may have to do a few things before it is considered connected
+> so it would work similarly for both incoming or outgoing connections.
+>
+>>>
+>>>> +               return -ENOTSUP;
+>>>> +       }
+>>>> +
+>>>>         err = profile->connect(service);
+>>>> -       if (err == 0) {
+>>>> -               change_state(service, BTD_SERVICE_STATE_CONNECTING, 0);
+>>>> -               return 0;
+>>>> +       if (err < 0) {
+>>>> +               ba2str(device_get_address(service->device), addr);
+>>>> +               error("%s profile connect failed for %s: %s", profile->name, addr,
+>>>> +                     strerror(-err));
+>>>>         }
+>>>>
+>>>> -       ba2str(device_get_address(service->device), addr);
+>>>> -       error("%s profile connect failed for %s: %s", profile->name, addr,
+>>>> -                                                               strerror(-err));
+>>>> +       btd_service_connecting_complete(service, err);
+>>>>
+>>>>         return err;
+>>>>  }
+>>>> @@ -254,9 +257,6 @@ int btd_service_disconnect(struct btd_service *service)
+>>>>         char addr[18];
+>>>>         int err;
+>>>>
+>>>> -       if (!profile->disconnect)
+>>>> -               return -ENOTSUP;
+>>>> -
+>>>>         switch (service->state) {
+>>>>         case BTD_SERVICE_STATE_UNAVAILABLE:
+>>>>                 return -EINVAL;
+>>>> @@ -270,18 +270,19 @@ int btd_service_disconnect(struct btd_service *service)
+>>>>
+>>>>         change_state(service, BTD_SERVICE_STATE_DISCONNECTING, 0);
+>>>>
+>>>> -       err = profile->disconnect(service);
+>>>> -       if (err == 0)
+>>>> -               return 0;
+>>>> -
+>>>> -       if (err == -ENOTCONN) {
+>>>> +       if (!profile->disconnect) {
+>>>>                 btd_service_disconnecting_complete(service, 0);
+>>>> -               return 0;
+>>>
+>>> This I think was actually correct, because if the profile don't
+>>> implement .disconnect we still can disconnect when ACL is dropped but
+>>> contrary to connect I think we can return 0 since the state will
+>>> actually be correct.
+>>
+>> Like I mentioned before, the problem was that the state was not been
+>> updated. It shouldn't be the job for the profile to do it so.
+>>
+>> This makes sure that we update the service->state correctly regardless
+>> of profile's disconnect existence.
+>>
+>>>
+>>>> +               return -ENOTSUP;
+>>>>         }
+>>>>
+>>>> -       ba2str(device_get_address(service->device), addr);
+>>>> -       error("%s profile disconnect failed for %s: %s", profile->name, addr,
+>>>> -                                                               strerror(-err));
+>>>> +       err = profile->disconnect(service);
+>>>> +       if (err == -ENOTCONN) {
+>>>> +               err = 0;
+>>>> +       } else if (err < 0) {
+>>>> +               ba2str(device_get_address(service->device), addr);
+>>>> +               error("%s profile disconnect failed for %s: %s", profile->name, addr,
+>>>> +                     strerror(-err));
+>>>> +       }
+>>>>
+>>>>         btd_service_disconnecting_complete(service, err);
+>>>>
+>>
+>> Felipe
 
-Currently there is no sample in C but the plan is to add some support
-to bluetoothctl to do that, in the meantime you can check the examples
-in python under test/example-gatt-server and test/example-advertising.
-Alternatively you can create a plugin and link it directly with the
-daemon so that you can use BlueZ C API, but this is only recommended
-if you need low level access or there is security implication/special
-access necessary for the services you want to add.
-
-
+Are you still working in this, I was planning to convert HoG to
+actually use accept callback and remove attio to make sure this works
+properly.
 
 -- 
 Luiz Augusto von Dentz
