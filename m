@@ -1,28 +1,29 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 Subject: Re: GATT service object required in D-Bus ObjectManager result
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Jonas Holmberg <jonas.holmberg@axis.com>,
-	Ryan Kuester <rkuester@insymbols.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 References: <20151129020402.GB1912@lodi.internal.kspace.net>
  <565BF7B0.2020905@ubnt.com> <565BFE44.4060706@axis.com>
  <20151130075934.GA15562@t440s.lan>
  <CABBYNZ+Gx19ucU8tHZ9Xj8-PXyjGX6Y=pkghbsM+nbWr1suVdA@mail.gmail.com>
  <CABBYNZJrB9+xrs2KeioC+YGX8661nYEFTgyKRTFUJJCtPQF7nw@mail.gmail.com>
-From: Andrejs Hanins <andrejs.hanins@ubnt.com>
-Message-ID: <56937E7B.2070707@ubnt.com>
-Date: Mon, 11 Jan 2016 12:05:47 +0200
+Cc: Jonas Holmberg <jonashg@axis.com>,
+	Andrejs Hanins <andrejs.hanins@ubnt.com>,
+	Ryan Kuester <rkuester@insymbols.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+From: Jonas Holmberg <jonas.holmberg@axis.com>
+Message-ID: <56936D9B.2010806@axis.com>
+Date: Mon, 11 Jan 2016 09:53:47 +0100
 MIME-Version: 1.0
 In-Reply-To: <CABBYNZJrB9+xrs2KeioC+YGX8661nYEFTgyKRTFUJJCtPQF7nw@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi
+Hi,
 
-On 01/11/2016 12:22 AM, Luiz Augusto von Dentz wrote:
+On 01/10/2016 11:22 PM, Luiz Augusto von Dentz wrote:
 > Hi,
->
+> 
 > On Mon, Nov 30, 2015 at 6:12 AM, Luiz Augusto von Dentz
 > <luiz.dentz@gmail.com> wrote:
 >> Hi,
@@ -60,13 +61,16 @@ On 01/11/2016 12:22 AM, Luiz Augusto von Dentz wrote:
 >>>>>> Does the expectation that the service object appear in the
 >>>>>> GetManagedObjects result look like a disagreement with the D-Bus
 >>>>>> standard to anyone else?
+>>>>>
 >>>>> The same to me. I'm using Glib/Glibmm to export GATT services and
 >>>>> Glib D-Bus code asserts in debug mode when object path matches
 >>>>> with object manager path. I'm currently blindly ignoring this, cause
 >>>>> it doesn't seems to cause any functionality problems in release code.
+>>>>
 >>>> I was also bitten by that assert. I assumed it was a bug  so I wrote a
 >>>> bug report about it: https://bugzilla.gnome.org/show_bug.cgi?id=758393
 >>>> But after this discussion I'm not sure if it is a bug.
+>>>
 >>> It appears to be a bug in the BlueZ implementation and D-Bus API. It
 >>> was already discussed many months ago, but no one seems to have
 >>> submitted patches to fix it:
@@ -74,6 +78,7 @@ On 01/11/2016 12:22 AM, Luiz Augusto von Dentz wrote:
 >>> http://comments.gmane.org/gmane.linux.bluez.kernel/63291
 >>> https://bugs.freedesktop.org/show_bug.cgi?id=91283
 >>> https://github.com/systemd/systemd/issues/525#issuecomment-126746787
+>>
 >> Yep, I guess we lost track of it in the mailing list but we should
 >> definitely fix it. One idea that comes to me is to change the
 >> RegisterService to RegisterApplication and then have all its services
@@ -133,8 +138,12 @@ On 01/11/2016 12:22 AM, Luiz Augusto von Dentz wrote:
 >>                         previously registered. The object path parameter
 >>                         must match the same value that has been used
 >>                         on registration.
+> 
 > Any comments to the patches Ive sent upstream, Id like to push them
 > which will result in breaking the current (experimental) API so I hope
 > it doesn't take anyone by surprise.
->
-I've tested the patches and they work good for me, I can now register GATT services (and they work well) one level down the D-Bus Object Manager, Glib doesn't assert anymore.
+> 
+
+It looks fine to me fwiw.
+
+/J
