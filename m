@@ -1,61 +1,28 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <20160111181454.GZ152924@redhat.com>
-References: <20160108222608.GU152924@redhat.com>
-	<CABBYNZ+bpQQH6XhM20d62wy5Y-PWw_Vq7_jhriHFmmLvJVHtAg@mail.gmail.com>
-	<20160111181454.GZ152924@redhat.com>
-Date: Mon, 11 Jan 2016 15:43:40 -0300
-Message-ID: <CABBYNZ+9ETX4zxBWvZL_G6_8WXND0W4rGVPj+6YKyrCOzuUUhQ@mail.gmail.com>
-Subject: Re: example GATT code to talk with a sensortag
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Don Zickus <dzickus@redhat.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Travis Griggs <travisgriggs@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Subject: example-gatt-server question/clarification
+Message-Id: <D8B1E315-F4CE-461E-B3A2-0A61ADB29599@gmail.com>
+Date: Mon, 11 Jan 2016 10:38:41 -0800
+To: linux-bluetooth@vger.kernel.org
+Mime-Version: 1.0 (Mac OS X Mail 9.2 \(3112\))
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Don,
+Having played with the example-gatt-server code, I have two basic questions that I need some help/clarification with:
 
-On Mon, Jan 11, 2016 at 3:14 PM, Don Zickus <dzickus@redhat.com> wrote:
-> On Sun, Jan 10, 2016 at 07:13:56PM -0300, Luiz Augusto von Dentz wrote:
->> Hi Don,
->>
->> On Fri, Jan 8, 2016 at 7:26 PM, Don Zickus <dzickus@redhat.com> wrote:
->> > Hi,
->> >
->> > Sorry for the newbie question.  I stumbled upon a TI sensortag and was able
->> > to communicate with it using the gatttool.  Now I am trying to figure out
->> > how to build an app around that.  Googling has shown me lots of examples of
->> > folks using expect scripts (around the gatttool).
->> >
->> > I was hoping for something in C or python.  Is there an example
->> > program/script around that I can copy and expand to get me started?
->> >
->> > Thanks!
->> >
->> > Cheers,
->> > Don
->>
->> bluetoothctl has some generic support for GATT attributes, in addition
->> we have some examples in python under test/example-gatt-client and
->> test/example-gatt-server.
->
-> Hi Luiz,
->
-> Hmm, the example program complains about no such interface 'org.bluez.GattService1'.
->
-> Originally I thought that was a generic bluez interface but now I am
-> wondering if that was specific to the example program.
->
-> Any tip on what the expected interface should be (so I know what to add)?
->
-> (by the way, I am using bluez-5.36 if that helps)
+1) I am writing a custom service with a single characteristic. Do *I* need to add any of my own descriptor stuff? Or is the basics handled by the library. The example is ambiguous because the interfaces to the stock attributes (e.g. heart rate, etc), do NOT add any descriptors. But the Test* variants, which are the only custom attributes in the example, does add a descriptor or two. So I’m left wondering is the purpose that these were added because A) you have to add descriptors for your own custom characteristics or B) because the example is demonstrating/testing additional things that you *could* do with additional descriptors.
 
+2) In all WriteValue() implementations found in the code, a self.method() is never invoked. self.state might be adjusted/updated, but never is a method called. Is this just the way it turned out, or are there actual reasons not to do that? I’m finding that a pattern like:
 
-You will need to pass -E to bluetoothd to enable the experimental
-intefaces, btw there is a recent change to GATT server/peripheral so I
-suggest you try with the current version on git.
+    class MySubclass(Characteristic):
 
+        def myOwnMethod(self):
+            print(“Hello World”)
 
--- 
-Luiz Augusto von Dentz
+        def WriteValue(self, value):
+            self.myOwnMethod()
+
+seems to stop at the invocation of myOwnMethod. I don’t know if this is a dbus call back issue or something else.
+
+TIA
