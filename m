@@ -1,44 +1,64 @@
-Return-Path: <xerofoify@gmail.com>
-From: Nicholas Krause <xerofoify@gmail.com>
-To: marcel@holtmann.org
-Cc: gustavo@padovan.org,
-	johan.hedberg@gmail.com,
-	davem@davemloft.net,
-	linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH RESEND] bluetooth:Fix error handling in the function aes_cmac
-Date: Mon, 11 Jan 2016 18:05:40 -0500
-Message-Id: <1452553540-25028-1-git-send-email-xerofoify@gmail.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Date: Mon, 11 Jan 2016 17:22:07 -0500
+From: Don Zickus <dzickus@redhat.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: example GATT code to talk with a sensortag
+Message-ID: <20160111222207.GE152924@redhat.com>
+References: <20160108222608.GU152924@redhat.com>
+ <CABBYNZ+bpQQH6XhM20d62wy5Y-PWw_Vq7_jhriHFmmLvJVHtAg@mail.gmail.com>
+ <20160111181454.GZ152924@redhat.com>
+ <CABBYNZ+9ETX4zxBWvZL_G6_8WXND0W4rGVPj+6YKyrCOzuUUhQ@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CABBYNZ+9ETX4zxBWvZL_G6_8WXND0W4rGVPj+6YKyrCOzuUUhQ@mail.gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This fixes error handling in the function aes_cmac by properly
-checking if the call to the function crypto_hast_init failed by
-returning a error code and if so tell the user with BT_ERR that
-the crypto hash table initialization failed before returning the
-error code to signal to the caller of this particular function
-that their call of aes_cmac has failed.
+On Mon, Jan 11, 2016 at 03:43:40PM -0300, Luiz Augusto von Dentz wrote:
+> Hi Don,
+> 
+> 
+> You will need to pass -E to bluetoothd to enable the experimental
+> intefaces, btw there is a recent change to GATT server/peripheral so I
+> suggest you try with the current version on git.
 
-Signed-off-by: Nicholas Krause <xerofoify@gmail.com>
----
- net/bluetooth/smp.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+Hi Luiz,
 
-diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index ad82324..2f73bf9 100644
---- a/net/bluetooth/smp.c
-+++ b/net/bluetooth/smp.c
-@@ -184,7 +184,11 @@ static int aes_cmac(struct crypto_hash *tfm, const u8 k[16], const u8 *m,
- 	desc.tfm = tfm;
- 	desc.flags = 0;
- 
--	crypto_hash_init(&desc);
-+	err = crypto_hash_init(&desc);
-+	if (err) {
-+		BT_ERR("crypto hash init failed: %d", err);
-+		return err;
-+	}
- 
- 	/* Swap key and message from LSB to MSB */
- 	swap_buf(k, tmp, 16);
--- 
-2.1.4
+I passed the -E and compiled and installed the latest git version of bluez
+
+commit e81aeaea21db84042ee0c30159290ca56d250111
+Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Date:   Wed Jan 6 12:20:45 2016 -0300
+
+I installed d-feet to help me with the d-bus interfaces as I was struggling
+with that.  With the -E option I now see 'GattManager1' pop up under
+'/org/bluez/hci0'.
+
+I guess I was expecting to see a 'GattService1' and 'GattCharacteristic1',
+but I don't.
+
+I tried poking the 'GetAll' interfaces under my device
+'/org/bluez/hci0/dev_XXXXXX' using 'org.bluez.Device1' as my interface.
+That got me some device info but my UUIDs were empty [].  I tried using the
+'Connect' Method in the same interface but that didn't seem to change
+anything.
+
+I am scratching my head trying to understand how this works.  Looking
+through the documentation in the bluez tree it appears I need a gatt-server
+that provides 'GattServices1'?  Did I read that wrong?
+
+Again, my goal was to simply read temperature data out of my sensor.  I know
+the UUID and the handle (from my successful use of the gatttool), I just
+don't know how to connect to the DBus correctly??? to get the same info.
+
+Perhaps I falsely assumed that if gatttool can get it, then there was an
+interface that I can use to get the same info.
+
+I apologize for all the newbie questions.  And thank you for your patience
+and help so far.
+
+Cheers,
+Don
+
+
