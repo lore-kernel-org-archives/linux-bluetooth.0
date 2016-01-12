@@ -1,34 +1,28 @@
-Return-Path: <bhumirks@gmail.com>
-From: Bhumika Goyal <bhumirks@gmail.com>
-To: marcel@holtmann.org
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	gustavo@padovan.org,
-	johan.hedberg@gmail.com,
-	Bhumika Goyal <bhumirks@gmail.com>
-Subject: [PATCH] drivers:bluetooth:ath3k:fixed a blank line after declaration issue
-Date: Tue, 12 Jan 2016 22:10:15 +0530
-Message-Id: <1452616815-8283-1-git-send-email-bhumirks@gmail.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+MIME-Version: 1.0
+Date: Tue, 12 Jan 2016 08:47:57 -0700
+Message-ID: <CAFNSOgXbN9wFY8h4K3Db7dzoj+wrN35KB1LbPT2HMRspvNK9+w@mail.gmail.com>
+Subject: Jaybird X2 headset pairs, but won't "connect"
+From: Ian Douglas <ian.douglas@iandouglas.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Fixed a coding style issue.Added a blank link after declaration.
+Hi folks,
 
-Signed-off-by: Bhumika Goyal <bhumirks@gmail.com>
----
- drivers/bluetooth/ath3k.c | 1 +
- 1 file changed, 1 insertion(+)
+I've asked this a few times on IRC but never saw any answers. I've got
+lots of information posted at the following URL:
 
-diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
-index fa893c3..ebd641b 100644
---- a/drivers/bluetooth/ath3k.c
-+++ b/drivers/bluetooth/ath3k.c
-@@ -497,6 +497,7 @@ static int ath3k_probe(struct usb_interface *intf,
- 	/* match device ID in ath3k blacklist table */
- 	if (!id->driver_info) {
- 		const struct usb_device_id *match;
-+
- 		match = usb_match_id(intf, ath3k_blist_tbl);
- 		if (match)
- 			id = match;
--- 
-1.9.1
+https://askubuntu.com/questions/717341/15-10-broadcom-bcm4352-jaybird-x2-headset-pairing-problem
+
+In a nutshell, my Jaybird X2 bluetooth headset will pair with Ubuntu
+15.10 but will not "connect". I suspect that my headset needs a PIN of
+0000 but I only get an option to send a random PIN when connecting.
+
+Is it better to use the APT installation of bluez 5.35 on Ubuntu
+15.10, or should I remove it and manually install bluez 5.37 (or newer
+if it's updated since I last looked) ?
+
+Thanks,
+Ian
