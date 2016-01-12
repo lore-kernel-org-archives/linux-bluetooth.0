@@ -1,55 +1,34 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Date: Tue, 12 Jan 2016 14:18:18 -0500
-From: Kyle McMartin <kyle@infradead.org>
-To: Tedd Ho-Jeong An <tedd.an@intel.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	linux-firmware@kernel.org
-Subject: Re: [PATCH v2] linux-firmware: Update firmware patch for Intel
- Bluetooth 7265 (D1)
-Message-ID: <20160112191818.GM32062@merlin.infradead.org>
-References: <20160111171645.2631d5d2@fedora-linux-22.shared>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20160111171645.2631d5d2@fedora-linux-22.shared>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <bhumirks@gmail.com>
+From: Bhumika Goyal <bhumirks@gmail.com>
+To: marcel@holtmann.org
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	gustavo@padovan.org,
+	johan.hedberg@gmail.com,
+	Bhumika Goyal <bhumirks@gmail.com>
+Subject: [PATCH] drivers:bluetooth:ath3k:fixed a blank line after declaration issue
+Date: Tue, 12 Jan 2016 22:10:15 +0530
+Message-Id: <1452616815-8283-1-git-send-email-bhumirks@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Jan 11, 2016 at 05:16:45PM -0800, Tedd Ho-Jeong An wrote:
-> From: Tedd Ho-Jeong An <tedd.an@intel.com>
-> 
-> This patch updates the firmware patch for Intel Bluetooth 7265 (D1)
-> Also, this device is known as Intel StP D1
-> 
-> StP D1 FW Patch Version: 13
-> 
-> Release Version: 18.15
-> 
-> Signed-off-by: Tedd Ho-Jeong An <tedd.an@intel.com>
+Fixed a coding style issue.Added a blank link after declaration.
 
-Applied. Although I had to fix up the git diff hunk for the binary file
-again, it looks like it got line wrapped and some newlines got zapped?
+Signed-off-by: Bhumika Goyal <bhumirks@gmail.com>
+---
+ drivers/bluetooth/ath3k.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-regards, --Kyle
-
-> ---
->  WHENCE                                     |   2 +-
->  intel/ibt-hw-37.8.10-fw-22.50.19.14.f.bseq | Bin 13239 -> 30307 bytes
->  2 files changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/WHENCE b/WHENCE
-> index 5112709..74d55de 100644
-> --- a/WHENCE
-> +++ b/WHENCE
-> @@ -2650,7 +2650,7 @@ Version: BT_StonePeak_C0_REL_55_0001
->  File: intel/ibt-hw-37.8.10-fw-1.10.3.11.e.bseq
->  Version: BT_StonePeak_D0_REL_32_0002
->  File: intel/ibt-hw-37.8.10-fw-22.50.19.14.f.bseq
-> -Version: STP_D1_REL_9
-> +Version: STP_D1_REL_13
->  File: intel/ibt-11-5.ddc
->  Version: LnP/SfP_REL0190
->  File: intel/ibt-11-5.sfi
-> diff --git a/intel/ibt-hw-37.8.10-fw-22.50.19.14.f.bseq
-> b/intel/ibt-hw-37.8.10-fw-22.50.19.14.f.bseq index
-> 8c5ab79a9e1a560a231f26b1624b174df42cf366..11625aa5a0dad00be26fd74123a1389b77b59452
-> 100644 GIT binary patch literal 30307
+diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
+index fa893c3..ebd641b 100644
+--- a/drivers/bluetooth/ath3k.c
++++ b/drivers/bluetooth/ath3k.c
+@@ -497,6 +497,7 @@ static int ath3k_probe(struct usb_interface *intf,
+ 	/* match device ID in ath3k blacklist table */
+ 	if (!id->driver_info) {
+ 		const struct usb_device_id *match;
++
+ 		match = usb_match_id(intf, ath3k_blist_tbl);
+ 		if (match)
+ 			id = match;
+-- 
+1.9.1
