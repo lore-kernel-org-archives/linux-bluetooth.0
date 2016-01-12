@@ -1,94 +1,55 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Date: Tue, 12 Jan 2016 14:18:18 -0500
+From: Kyle McMartin <kyle@infradead.org>
+To: Tedd Ho-Jeong An <tedd.an@intel.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	linux-firmware@kernel.org
+Subject: Re: [PATCH v2] linux-firmware: Update firmware patch for Intel
+ Bluetooth 7265 (D1)
+Message-ID: <20160112191818.GM32062@merlin.infradead.org>
+References: <20160111171645.2631d5d2@fedora-linux-22.shared>
 MIME-Version: 1.0
-In-Reply-To: <20160111222207.GE152924@redhat.com>
-References: <20160108222608.GU152924@redhat.com>
-	<CABBYNZ+bpQQH6XhM20d62wy5Y-PWw_Vq7_jhriHFmmLvJVHtAg@mail.gmail.com>
-	<20160111181454.GZ152924@redhat.com>
-	<CABBYNZ+9ETX4zxBWvZL_G6_8WXND0W4rGVPj+6YKyrCOzuUUhQ@mail.gmail.com>
-	<20160111222207.GE152924@redhat.com>
-Date: Tue, 12 Jan 2016 22:52:47 +0100
-Message-ID: <CAExxLLBApkDFsPE_xbbcsQPq7CMs3a+iM7uSyM3yQzHyf3Fa0Q@mail.gmail.com>
-Subject: Re: example GATT code to talk with a sensortag
-From: =?UTF-8?Q?=C5=81ukasz_Rymanowski?= <lukasz.rymanowski@codecoup.pl>
-To: Don Zickus <dzickus@redhat.com>
-Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20160111171645.2631d5d2@fedora-linux-22.shared>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Don,
+On Mon, Jan 11, 2016 at 05:16:45PM -0800, Tedd Ho-Jeong An wrote:
+> From: Tedd Ho-Jeong An <tedd.an@intel.com>
+> 
+> This patch updates the firmware patch for Intel Bluetooth 7265 (D1)
+> Also, this device is known as Intel StP D1
+> 
+> StP D1 FW Patch Version: 13
+> 
+> Release Version: 18.15
+> 
+> Signed-off-by: Tedd Ho-Jeong An <tedd.an@intel.com>
 
-On 11 January 2016 at 23:22, Don Zickus <dzickus@redhat.com> wrote:
-> On Mon, Jan 11, 2016 at 03:43:40PM -0300, Luiz Augusto von Dentz wrote:
->> Hi Don,
->>
->>
->> You will need to pass -E to bluetoothd to enable the experimental
->> intefaces, btw there is a recent change to GATT server/peripheral so I
->> suggest you try with the current version on git.
->
-> Hi Luiz,
->
-> I passed the -E and compiled and installed the latest git version of bluez
->
-> commit e81aeaea21db84042ee0c30159290ca56d250111
-> Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> Date:   Wed Jan 6 12:20:45 2016 -0300
->
-> I installed d-feet to help me with the d-bus interfaces as I was struggling
-> with that.  With the -E option I now see 'GattManager1' pop up under
-> '/org/bluez/hci0'.
->
-> I guess I was expecting to see a 'GattService1' and 'GattCharacteristic1',
-> but I don't.
->
+Applied. Although I had to fix up the git diff hunk for the binary file
+again, it looks like it got line wrapped and some newlines got zapped?
 
-Start discovery from org.bluez.Adapter1. After that find device object
-of your device. Then connect to this device form org.bluez.Device1.
-Once connected GattServices and GattCharacteristincs should be visible for you.
+regards, --Kyle
 
-All this you can do with d-feet of course.
-
-Also, run btmon so you can see HCI traffic. In case it still does not
-work, you can
-try shate btmon log here.
-
-
-> I tried poking the 'GetAll' interfaces under my device
-> '/org/bluez/hci0/dev_XXXXXX' using 'org.bluez.Device1' as my interface.
-> That got me some device info but my UUIDs were empty [].  I tried using the
-> 'Connect' Method in the same interface but that didn't seem to change
-> anything.
->
-> I am scratching my head trying to understand how this works.  Looking
-> through the documentation in the bluez tree it appears I need a gatt-server
-> that provides 'GattServices1'?  Did I read that wrong?
->
-> Again, my goal was to simply read temperature data out of my sensor.  I know
-> the UUID and the handle (from my successful use of the gatttool), I just
-> don't know how to connect to the DBus correctly??? to get the same info.
->
-> Perhaps I falsely assumed that if gatttool can get it, then there was an
-> interface that I can use to get the same info.
->
-> I apologize for all the newbie questions.  And thank you for your patience
-> and help so far.
->
-> Cheers,
-> Don
->
-
-BR
-Lukasz
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-
--- 
-BR / Pozdrawiam
-Łukasz
+> ---
+>  WHENCE                                     |   2 +-
+>  intel/ibt-hw-37.8.10-fw-22.50.19.14.f.bseq | Bin 13239 -> 30307 bytes
+>  2 files changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/WHENCE b/WHENCE
+> index 5112709..74d55de 100644
+> --- a/WHENCE
+> +++ b/WHENCE
+> @@ -2650,7 +2650,7 @@ Version: BT_StonePeak_C0_REL_55_0001
+>  File: intel/ibt-hw-37.8.10-fw-1.10.3.11.e.bseq
+>  Version: BT_StonePeak_D0_REL_32_0002
+>  File: intel/ibt-hw-37.8.10-fw-22.50.19.14.f.bseq
+> -Version: STP_D1_REL_9
+> +Version: STP_D1_REL_13
+>  File: intel/ibt-11-5.ddc
+>  Version: LnP/SfP_REL0190
+>  File: intel/ibt-11-5.sfi
+> diff --git a/intel/ibt-hw-37.8.10-fw-22.50.19.14.f.bseq
+> b/intel/ibt-hw-37.8.10-fw-22.50.19.14.f.bseq index
+> 8c5ab79a9e1a560a231f26b1624b174df42cf366..11625aa5a0dad00be26fd74123a1389b77b59452
+> 100644 GIT binary patch literal 30307
