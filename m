@@ -1,12 +1,11 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Date: Mon, 11 Jan 2016 17:16:45 -0800
+Date: Mon, 11 Jan 2016 17:11:37 -0800
 From: Tedd Ho-Jeong An <tedd.an@intel.com>
 To: "linux-firmware@kernel.org" <linux-firmware@kernel.org>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
 	Tedd Ho-Jeong An <tedd.an@intel.com>
-Subject: [PATCH v2] linux-firmware: Update firmware patch for Intel
- Bluetooth 7265 (D1)
-Message-ID: <20160111171645.2631d5d2@fedora-linux-22.shared>
+Subject: linux-firmware: Update firmware patch for Intel Bluetooth 7265 (D1)
+Message-ID: <20160111171137.40afb450@fedora-linux-22.shared>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -20,8 +19,6 @@ Also, this device is known as Intel StP D1
 StP D1 FW Patch Version: 13
 
 Release Version: 18.15
-
-Signed-off-by: Tedd Ho-Jeong An <tedd.an@intel.com>
 ---
  WHENCE                                     |   2 +-
  intel/ibt-hw-37.8.10-fw-22.50.19.14.f.bseq | Bin 13239 -> 30307 bytes
