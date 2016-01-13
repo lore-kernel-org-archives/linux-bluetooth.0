@@ -1,52 +1,90 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Lukasz Duda <lukasz.duda@nordicsemi.no>
+From: Glenn Ruben Bakke <glenn.ruben.bakke@nordicsemi.no>
 To: <alex.aring@gmail.com>
-CC: <linux-bluetooth@vger.kernel.org>,
-	<glenn.ruben.bakke@nordicsemi.no>
-Subject: [PATCH] Bluetooth: 6lowpan: Fix handling of uncompressed IPv6 packets
-Date: Wed, 13 Jan 2016 16:57:48 +0100
-Message-ID: <1452700668-4241-1-git-send-email-lukasz.duda@nordicsemi.no>
+CC: <linux-bluetooth@vger.kernel.org>, <lukasz.duda@nordicsemi.no>
+Subject: [PATCH] Bluetooth: 6lowpan: Fix kernel NULL pointer dereferences
+Date: Wed, 13 Jan 2016 16:41:42 +0100
+Message-ID: <1452699702-3986-1-git-send-email-glenn.ruben.bakke@nordicsemi.no>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch fixes incorrect handling of the 6lowpan packets that contain
-uncompressed IPv6 header.
+The fixes provided in this patch assigns a valid net_device structure to
+skb before dispatching it for further processing.
 
-RFC4944 specifies a special dispatch for 6lowpan to carry uncompressed
-IPv6 header. This dispatch (1 byte long) has to be removed during
-reception and skb data pointer has to be moved. To correctly point in
-the beginning of the IPv6 header the dispatch byte has to be pulled off
-before packet can be processed by netif_rx_in().
+Scenario #1:
+============
 
-Test scenario: IPv6 packets are not correctly interpreted by the network
-layer when IPv6 header is not compressed (e.g. ICMPv6 Echo Reply is not
-propagated correctly to the ICMPv6 layer because the extra byte will make
-the header look corrupted).
+Bluetooth 6lowpan receives an uncompressed IPv6 header, and dispatches it
+to netif. The following error occurs:
 
-Similar approach is done for IEEE 802.15.4.
+Null pointer dereference error #1 crash log:
 
-Signed-off-by: Lukasz Duda <lukasz.duda@nordicsemi.no>
+[  845.854013] BUG: unable to handle kernel NULL pointer dereference at
+               0000000000000048
+[  845.855785] IP: [<ffffffff816e3d36>] enqueue_to_backlog+0x56/0x240
+...
+[  845.909459] Call Trace:
+[  845.911678]  [<ffffffff816e3f64>] netif_rx_internal+0x44/0xf0
+
+The first modification fixes the NULL pointer dereference error by
+assigning dev to the local_skb in order to set a valid net_device before
+processing the skb by netif_rx_ni().
+
+Scenario #2:
+============
+
+Bluetooth 6lowpan receives an UDP compressed message which needs further
+decompression by nhc_udp. The following error occurs:
+
+Null pointer dereference error #2 crash log:
+
+[   63.295149] BUG: unable to handle kernel NULL pointer dereference at
+               0000000000000840
+[   63.295931] IP: [<ffffffffc0559540>] udp_uncompress+0x320/0x626
+               [nhc_udp]
+
+The second modification fixes the NULL pointer dereference error by
+assigning dev to the local_skb in the case of a udp compressed packet.
+The 6lowpan udp_uncompress function expects that the net_device is set in
+the skb when checking lltype.
+
 Signed-off-by: Glenn Ruben Bakke <glenn.ruben.bakke@nordicsemi.no>
+Signed-off-by: Lukasz Duda <lukasz.duda@nordicsemi.no>
 ---
- net/bluetooth/6lowpan.c | 3 +++
- 1 file changed, 3 insertions(+)
+ net/bluetooth/6lowpan.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
 diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
-index d040365..350f379 100644
+index d040365..58e1b3c 100644
 --- a/net/bluetooth/6lowpan.c
 +++ b/net/bluetooth/6lowpan.c
-@@ -307,6 +307,9 @@ static int recv_pkt(struct sk_buff *skb, struct net_device *dev,
+@@ -317,6 +317,7 @@ static int recv_pkt(struct sk_buff *skb, struct net_device *dev,
  
- 	/* check that it's our buffer */
- 	if (lowpan_is_ipv6(*skb_network_header(skb))) {
-+		/* Pull off the 1-byte of 6lowpan header. */
-+		skb_pull(skb, 1);
+ 		local_skb->protocol = htons(ETH_P_IPV6);
+ 		local_skb->pkt_type = PACKET_HOST;
++		local_skb->dev = dev;
+ 
+ 		skb_set_transport_header(local_skb, sizeof(struct ipv6hdr));
+ 
+@@ -335,6 +336,8 @@ static int recv_pkt(struct sk_buff *skb, struct net_device *dev,
+ 		if (!local_skb)
+ 			goto drop;
+ 
++		local_skb->dev = dev;
 +
- 		/* Copy the packet so that the IPv6 header is
- 		 * properly aligned.
- 		 */
+ 		ret = iphc_decompress(local_skb, dev, chan);
+ 		if (ret < 0) {
+ 			kfree_skb(local_skb);
+@@ -343,7 +346,6 @@ static int recv_pkt(struct sk_buff *skb, struct net_device *dev,
+ 
+ 		local_skb->protocol = htons(ETH_P_IPV6);
+ 		local_skb->pkt_type = PACKET_HOST;
+-		local_skb->dev = dev;
+ 
+ 		if (give_skb_to_upper(local_skb, dev)
+ 				!= NET_RX_SUCCESS) {
 -- 
 2.5.0
 
