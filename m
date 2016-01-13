@@ -1,59 +1,112 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Message-ID: <1452726452.1830.3.camel@redhat.com>
-Subject: bluetoothd crash when registering advertisement
-From: Nathaniel McCallum <npmccallum@redhat.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Wed, 13 Jan 2016 18:07:32 -0500
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+MIME-Version: 1.0
+In-Reply-To: <20160113150640.GH127976@redhat.com>
+References: <20160108222608.GU152924@redhat.com>
+	<CABBYNZ+bpQQH6XhM20d62wy5Y-PWw_Vq7_jhriHFmmLvJVHtAg@mail.gmail.com>
+	<20160111181454.GZ152924@redhat.com>
+	<CABBYNZ+9ETX4zxBWvZL_G6_8WXND0W4rGVPj+6YKyrCOzuUUhQ@mail.gmail.com>
+	<20160111222207.GE152924@redhat.com>
+	<CAExxLLBApkDFsPE_xbbcsQPq7CMs3a+iM7uSyM3yQzHyf3Fa0Q@mail.gmail.com>
+	<20160113150640.GH127976@redhat.com>
+Date: Wed, 13 Jan 2016 22:44:02 +0100
+Message-ID: <CAExxLLBo+Aytnztc1BhMjExeThZiG_NDey1JQq37+eknsBv3HA@mail.gmail.com>
+Subject: Re: example GATT code to talk with a sensortag
+From: =?UTF-8?Q?=C5=81ukasz_Rymanowski?= <lukasz.rymanowski@codecoup.pl>
+To: Don Zickus <dzickus@redhat.com>
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I added advertisement support to my application today:
-https://git.fedorahosted.org/cgit/jelling/linux.git/commit/?id=e04016c8
-b7f0d406b39573863cf7d5e15dac53ed
+Hi Don,
 
-When registering the advertisement with bluez, bluetoothd crashes:
-#0  0x00007f1f01ce6618 in __GI_raise (sig=sig@entry=6) at
-../sysdeps/unix/sysv/linux/raise.c:54
-#1  0x00007f1f01ce821a in __GI_abort () at abort.c:89
-#2  0x00007f1f024bc894 in _dbus_abort () at ../../dbus/dbus-
-sysdeps.c:91
-#3  0x00007f1f024b331e in _dbus_warn_check_failed (
-    format=0x7f1f024c2d10 "arguments to %s() were incorrect, assertion
-\"%s\" failed in file %s line %d.\nThis is normally a bug in some
-application using the D-Bus library.\n") at ../../dbus/dbus-
-internals.c:275
-#4  0x00007f1f024a6c94 in dbus_message_new_method_return
-(method_call=<optimized out>) at ../../dbus/dbus-message.c:1378
-#5  0x00005609802d0c6b in add_adverting_complete (status=0 '\000',
-ad=0x560980d0a490) at src/advertising.c:413
-#6  add_advertising_callback (status=0 '\000', length=<optimized out>,
-param=<optimized out>, user_data=0x560980d0a490) at
-src/advertising.c:441
-#7  0x000056098030af96 in request_complete (mgmt=mgmt@entry=0x560980d04
-470, status=<optimized out>, opcode=opcode@entry=62, index=index@entry=
-0, length=length@entry=1, 
-    param=0x560980d044f9) at src/shared/mgmt.c:261
-#8  0x000056098030ba5c in can_read_data (io=<optimized out>,
-user_data=0x560980d04470) at src/shared/mgmt.c:353
-#9  0x0000560980317765 in watch_callback (channel=<optimized out>,
-cond=<optimized out>, user_data=<optimized out>) at src/shared/io-
-glib.c:170
-#10 0x00007f1f0271e0aa in g_main_dispatch (context=0x560980cf1e80) at
-gmain.c:3154
-#11 g_main_context_dispatch (context=context@entry=0x560980cf1e80) at
-gmain.c:3769
-#12 0x00007f1f0271e440 in g_main_context_iterate
-(context=0x560980cf1e80, block=block@entry=1, dispatch=dispatch@entry=1
-, self=<optimized out>) at gmain.c:3840
-#13 0x00007f1f0271e762 in g_main_loop_run (loop=0x560980cf1df0) at
-gmain.c:4034
-#14 0x0000560980290f0d in main (argc=1, argv=0x7ffe09da1ed8) at
-src/main.c:687
+On 13 January 2016 at 16:06, Don Zickus <dzickus@redhat.com> wrote:
+> On Tue, Jan 12, 2016 at 10:52:47PM +0100, Łukasz Rymanowski wrote:
+>> Hi Don,
+>>
+>> On 11 January 2016 at 23:22, Don Zickus <dzickus@redhat.com> wrote:
+>> > On Mon, Jan 11, 2016 at 03:43:40PM -0300, Luiz Augusto von Dentz wrote:
+>> >> Hi Don,
+>> >>
+>> >>
+>> >> You will need to pass -E to bluetoothd to enable the experimental
+>> >> intefaces, btw there is a recent change to GATT server/peripheral so I
+>> >> suggest you try with the current version on git.
+>> >
+>> > Hi Luiz,
+>> >
+>> > I passed the -E and compiled and installed the latest git version of bluez
+>> >
+>> > commit e81aeaea21db84042ee0c30159290ca56d250111
+>> > Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>> > Date:   Wed Jan 6 12:20:45 2016 -0300
+>> >
+>> > I installed d-feet to help me with the d-bus interfaces as I was struggling
+>> > with that.  With the -E option I now see 'GattManager1' pop up under
+>> > '/org/bluez/hci0'.
+>> >
+>> > I guess I was expecting to see a 'GattService1' and 'GattCharacteristic1',
+>> > but I don't.
+>> >
+>
+> Hi Łukasz,
+>
+> Thanks for the feedback!
+>
+>>
+>> Start discovery from org.bluez.Adapter1. After that find device object
+>> of your device. Then connect to this device form org.bluez.Device1.
+>> Once connected GattServices and GattCharacteristincs should be visible for you.
+>>
+>> All this you can do with d-feet of course.
+>
+> So, I tried your suggestions from within d-feet and made good progress, but
+> I don't think I am quite there yet.  Here is what I did inside d-feet:
+>
+> Under /org/bluez/hci0 -> Interfaces -> org.bluez.Adapter1 -> Methods ->
+> StartDiscovery  --> double clicked and 'executed' this
+>
+> Under /org/bluez/hci0/dev_XXXXX -> Interfaces -> org.bluez.Device1 ->
+> Methods -> Connect --> double clicked and 'executed' this
+>
+> Under /org/bluez/hci0/dev_XXXX -> Interfaces ->
+> org.freedesktop.DBus.Properties -> GetAll ---> double clicked, entered
+> '"org.bluez.Device1"' and 'executed' this
+>     ---> received  valid UUIDs, GattServices, etc as output
+>
+> Thank you!
+>
+>
+> I did _not_ see GattCharacteristic1 in the output, nor do I see either
+> GattService or GattCharacteristic1 show up as an interface in either
+> /org/bluez/hci0/dev_XXXXX or /org/bluez/hci0.
+>
+>
+> Did I miss a step or misunderstand your suggestion?
 
-As this was my first attempt at implementing advertisement support, I
-may be doing something wrong. If I am, your tips are appreciated!
-However, in any case, bluez shouldn't crash.
+You got it well.
+To be more clear.
+If your bluetoothd runs with -E option and you connect to BLE device
+which expose any GATT services, after connect you should see new
+objects paths. Smth like this:
 
-Nathaniel
+a) /org/bluez/hci0/dev_XXXXX/servicexxxx
+b) /org/bluez/hci0/dev_XXXXX/servicexxxx/charyyyy
+c) /org/bluez/hci0/dev_XXXXX/servicexxxx/charzzzz
+
+etc.
+
+Inside a) you should see GattService1 and inside b) and c) GattCharacteristic1
+
+Just make sure -E is there and if still not work, provide btmon.log
+
+>
+>
+> Cheers,
+> Don
+
+
+-- 
+BR / Pozdrawiam
+Łukasz
