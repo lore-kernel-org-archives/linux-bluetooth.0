@@ -1,56 +1,58 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Adam Moore <adam.moore@savantsystems.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Adam Moore <adam.moore@savantsystems.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH] gatt-database: allow GattService anywhere in
- ObjectManager tree
-Date: Thu, 14 Jan 2016 23:14:43 +0000
-Message-ID: <D2BD6A0B.1A9FF%adam.moore@savant.com>
-References: <1438364565-24642-1-git-send-email-adam.moore@savantsystems.com>
- <CABBYNZLWpbr36dvPP-QsSTtMjW=zZqU7ZfK7KW8SohBeeTtvbg@mail.gmail.com>
- <D1EE7DB0.B607%adam.moore@savant.com>
- <CABBYNZLjRXHYqrRYn0Z7+i9Az0B6oFxxyD1Gt9yrHOMk7O3h_g@mail.gmail.com>
-In-Reply-To: <CABBYNZLjRXHYqrRYn0Z7+i9Az0B6oFxxyD1Gt9yrHOMk7O3h_g@mail.gmail.com>
-Content-Type: text/plain; charset="euc-kr"
+Date: Thu, 14 Jan 2016 17:03:47 -0500
+From: Don Zickus <dzickus@redhat.com>
+To: =?utf-8?Q?=C5=81ukasz?= Rymanowski <lukasz.rymanowski@codecoup.pl>
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: example GATT code to talk with a sensortag
+Message-ID: <20160114220347.GK127976@redhat.com>
+References: <20160108222608.GU152924@redhat.com>
+ <CABBYNZ+bpQQH6XhM20d62wy5Y-PWw_Vq7_jhriHFmmLvJVHtAg@mail.gmail.com>
+ <20160111181454.GZ152924@redhat.com>
+ <CABBYNZ+9ETX4zxBWvZL_G6_8WXND0W4rGVPj+6YKyrCOzuUUhQ@mail.gmail.com>
+ <20160111222207.GE152924@redhat.com>
+ <CAExxLLBApkDFsPE_xbbcsQPq7CMs3a+iM7uSyM3yQzHyf3Fa0Q@mail.gmail.com>
+ <20160113150640.GH127976@redhat.com>
+ <CAExxLLBo+Aytnztc1BhMjExeThZiG_NDey1JQq37+eknsBv3HA@mail.gmail.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <CAExxLLBo+Aytnztc1BhMjExeThZiG_NDey1JQq37+eknsBv3HA@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-DQoNCk9uIDEvMTAvMTYsIDI6MzcgUE0sICJMdWl6IEF1Z3VzdG8gdm9uIERlbnR6IiA8bHVpei5k
-ZW50ekBnbWFpbC5jb20+IHdyb3RlOg0KDQo+SGkgQWRhbSwNCj4NCj4+IEhpIEx1aXosDQo+Pg0K
-Pj4gWW91IGFyZSByaWdodCAtIHRob3VnaCBJIHN0aWxsIGxpa2UgdGhlIGluaXRpYWwgZGVzaWdu
-IG9mIGhhdmluZyBvbmUNCj4+IHNlcnZpY2UgcGVyIE9iamVjdE1hbmFnZXIsIGFzIGl0IG1ha2Vz
-IGl0IGVhc2llciB0byBjbGVhbnVwIG9yIHJlc3RhcnQNCj4+KG9yDQo+PiBELUJ1cyBleHBvcnQv
-dW5leHBvcnQpIGFuIGluZGl2aWR1YWwgc2VydmljZSBhdCB0aGUgT2JqZWN0TWFuYWdlciBBUEkN
-Cj4+IGxldmVsLg0KPj4NCj4+IEkgb25seSBhZGRlZCB0aGUgcG9pbnRlciB0byBtYW5hZ2VyX3Bh
-dGggYmVjYXVzZSBpdCB3YXMgYmV0dGVyIHRvIHRlc3QNCj4+IHRoYXQgZm9yIHRoYXQgcHJlZml4
-IHRoYW4gaXQgd2FzIHRvIG5vdCBkbyBhbnkgY2hlY2tpbmcuICBJIGNvdWxkbqn2dCBkbw0KPj4g
-dGhlIHN0cm9uZ2VyIHRlc3QgZm9yIHRoZSBHYXR0U2VydmljZSBwYXRoIGJlY2F1c2UgdGhlcmUg
-aXMgbm8NCj4+Z3VhcmFudGVlZA0KPj4gb3JkZXIgdG8gdGhlIHByb3h5IGNhbGxiYWNrcy4NCj4N
-Cj5QbGVhc2UgY2hlY2sgdGhlIHBhdGNoLXNldCBJdmUgc2VudCBsYXN0IHdlZWssIHRoZSBpZGVh
-IGlzIHRoYXQgeW91DQo+d291bGQgcmVnaXN0ZXIgdGhlIGFwcGxpY2F0aW9uIG9ubHkgb25jZSwg
-bGF0ZXIgb24gd2UgbWlnaHQgaW1wbGVtZW50DQo+c3VwcG9ydCBmb3IgSW50ZXJmYWNlc0FkZGVk
-L0ludGVyZmFjZXNSZW1vdmVkIGFsbG93aW5nIHNlcnZpY2VzIHRvIGJlDQo+YWRkZWQvcmVtb3Zl
-ZCB3aXRob3V0IGhhdmluZyB0byB1bnJlZ2lzdGVyaW5nIGFuZCByZWdpc3RlcmluZyBhZ2Fpbi4N
-Cg0KVGhhbmtzIHZlcnkgbXVjaCwgTHVpeiEgIExvb2tzIGdvb2QgLSBJIHRyaWVkIGFsaWduaW5n
-IG15IGFwcGxpY2F0aW9uIHRvDQp0aGUgbmV3IEFQSSBhbmQgaXQgd29ya3MgZmluZSBhZnRlciBy
-ZW1vdmluZyBteSB3b3JrYXJvdW5kIHBhdGNoLg0KDQoNCj4NCj4+IEhvdyBzdHJpY3QgZG8geW91
-IHRoaW5rIHdlIG5lZWQgdG8gYmUgaGVyZSBpbiB2YWxpZGF0aW5nIHRoZQ0KPj5wYXJlbnQvY2hp
-bGQNCj4+IHJlbGF0aW9uc2hpcHMgaW4gdGhlIG9iamVjdCB0cmVlPw0KPg0KPlJpZ2h0IG5vdyBp
-dCBleHBlY3RzIHRoZSBvYmplY3RzIHRvIGFwcGVhciBpbiBvcmRlciwgc2VydmljZSAtPg0KPmNo
-YXJhY3RlcmlzdGljIC0+IGRlc2NyaXB0b3IsIHNvIHRoYXQgd2UgY2FuIGVzdGFibGlzaGVkIHBy
-b3Blcg0KPnJlbGF0aW9uc2hpcCBiZXR3ZWVuIHRoZSBvYmplY3RzLiBJIGRpZCBub3QgYWRkIGFu
-eSBjaGVjayBmb3IgbXVsdGlwbGUNCj5hcHBsaWNhdGlvbnMgd2l0aGluIHRoZSBzYW1lIGNvbm5l
-Y3Rpb24gaWQgZXhjZXB0IGlmIGl0IGlzIHRoZSB2ZXJ5DQo+c2FtZSBvYmplY3QgcGF0aCBnaXZl
-biBmb3IgdGhlIG9iamVjdCBtYW5hZ2VyLg0KDQoNClN0YXRlbWVudCBvZiBDb25maWRlbnRpYWxp
-dHkNCg0KVGhlIGNvbnRlbnRzIG9mIHRoaXMgZS1tYWlsIG1lc3NhZ2UgYW5kIGFueSBhdHRhY2ht
-ZW50cyBhcmUgY29uZmlkZW50aWFsIGFuZCBhcmUgaW50ZW5kZWQgc29sZWx5IGZvciB0aGUgYWRk
-cmVzc2VlLiBUaGUgaW5mb3JtYXRpb24gbWF5IGFsc28gYmUgbGVnYWxseSBwcml2aWxlZ2VkLiBU
-aGlzIHRyYW5zbWlzc2lvbiBpcyBzZW50IGluIHRydXN0LCBhbmQgdGhlIHNvbGUgcHVycG9zZSBv
-ZiBkZWxpdmVyeSB0byB0aGUgaW50ZW5kZWQgcmVjaXBpZW50LiBJZiB5b3UgaGF2ZSByZWNlaXZl
-ZCB0aGlzIHRyYW5zbWlzc2lvbiBpbiBlcnJvciwgYW55IHVzZSwgcmVwcm9kdWN0aW9uIG9yIGRp
-c3NlbWluYXRpb24gb2YgdGhpcyB0cmFuc21pc3Npb24gaXMgc3RyaWN0bHkgcHJvaGliaXRlZC4g
-SWYgeW91IGFyZSBub3QgdGhlIGludGVuZGVkIHJlY2lwaWVudCwgcGxlYXNlIGltbWVkaWF0ZWx5
-IG5vdGlmeSB0aGUgc2VuZGVyIGJ5IHJlcGx5IGUtbWFpbCBvciBhdCA1MDguNjgzLjI1MDAgYW5k
-IGRlbGV0ZSB0aGlzIG1lc3NhZ2UgYW5kIGl0cyBhdHRhY2htZW50cywgaWYgYW55Lg0KDQo=
+On Wed, Jan 13, 2016 at 10:44:02PM +0100, Łukasz Rymanowski wrote:
+> > Thank you!
+> >
+> >
+> > I did _not_ see GattCharacteristic1 in the output, nor do I see either
+> > GattService or GattCharacteristic1 show up as an interface in either
+> > /org/bluez/hci0/dev_XXXXX or /org/bluez/hci0.
+> >
+> >
+> > Did I miss a step or misunderstand your suggestion?
+> 
+> You got it well.
+> To be more clear.
+> If your bluetoothd runs with -E option and you connect to BLE device
+> which expose any GATT services, after connect you should see new
+> objects paths. Smth like this:
+> 
+> a) /org/bluez/hci0/dev_XXXXX/servicexxxx
+> b) /org/bluez/hci0/dev_XXXXX/servicexxxx/charyyyy
+> c) /org/bluez/hci0/dev_XXXXX/servicexxxx/charzzzz
+> 
+> etc.
+> 
+> Inside a) you should see GattService1 and inside b) and c) GattCharacteristic1
+> 
+> Just make sure -E is there and if still not work, provide btmon.log
+
+Some days are better than others.  After rebooting yesterday, my bluetooth
+device stopped working... so while I am excited to test your suggestion, I
+am stuck trying to make it work again.  So I apologize if my response comes
+later.  I do appreciate the tips and patience!
+
+Hopefully tomorrow things will work again.. :-/
+
+Cheers,
+Don
