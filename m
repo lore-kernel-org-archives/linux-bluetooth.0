@@ -1,36 +1,56 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Adam Moore <adam.moore@savantsystems.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: LE Reverse Service Discovery
-Date: Fri, 15 Jan 2016 01:41:10 +0000
-Message-ID: <D2BD8E35.1AB78%adam.moore@savant.com>
-Content-Type: text/plain; charset="iso-8859-1"
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Adam Moore <adam.moore@savantsystems.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH] gatt-database: allow GattService anywhere in
+ ObjectManager tree
+Date: Thu, 14 Jan 2016 23:14:43 +0000
+Message-ID: <D2BD6A0B.1A9FF%adam.moore@savant.com>
+References: <1438364565-24642-1-git-send-email-adam.moore@savantsystems.com>
+ <CABBYNZLWpbr36dvPP-QsSTtMjW=zZqU7ZfK7KW8SohBeeTtvbg@mail.gmail.com>
+ <D1EE7DB0.B607%adam.moore@savant.com>
+ <CABBYNZLjRXHYqrRYn0Z7+i9Az0B6oFxxyD1Gt9yrHOMk7O3h_g@mail.gmail.com>
+In-Reply-To: <CABBYNZLjRXHYqrRYn0Z7+i9Az0B6oFxxyD1Gt9yrHOMk7O3h_g@mail.gmail.com>
+Content-Type: text/plain; charset="euc-kr"
 MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I¹ve noticed that since around BlueZ 5.27, GATT client functionality is
-enabled for all devices.
-
->From a LE Peripheral's perspective, this results in unconditional reverse
-service discovery of a Central's GATT services.
-
-It seems like this will not always be necessary depending on the use case,
-and disabling GATT client functionality should save energy and time.  My
-iPhone, for example, has about 8 services that my Peripheral doesn¹t care
-about.
-
-I¹m considering making an attempt to disable this, as the BT spec says
-GATT clients are optional for LE peripherals. (BT 4.2, Vol 3, Part C,
-Table 15.1), but I first would like to ask if anyone has any insight on
-why it may be desirable to keep the client functionality enabled.
-
-Thanks!
-Adam
-
-
-
-Statement of Confidentiality
-
-The contents of this e-mail message and any attachments are confidential and are intended solely for the addressee. The information may also be legally privileged. This transmission is sent in trust, and the sole purpose of delivery to the intended recipient. If you have received this transmission in error, any use, reproduction or dissemination of this transmission is strictly prohibited. If you are not the intended recipient, please immediately notify the sender by reply e-mail or at 508.683.2500 and delete this message and its attachments, if any.
-
+DQoNCk9uIDEvMTAvMTYsIDI6MzcgUE0sICJMdWl6IEF1Z3VzdG8gdm9uIERlbnR6IiA8bHVpei5k
+ZW50ekBnbWFpbC5jb20+IHdyb3RlOg0KDQo+SGkgQWRhbSwNCj4NCj4+IEhpIEx1aXosDQo+Pg0K
+Pj4gWW91IGFyZSByaWdodCAtIHRob3VnaCBJIHN0aWxsIGxpa2UgdGhlIGluaXRpYWwgZGVzaWdu
+IG9mIGhhdmluZyBvbmUNCj4+IHNlcnZpY2UgcGVyIE9iamVjdE1hbmFnZXIsIGFzIGl0IG1ha2Vz
+IGl0IGVhc2llciB0byBjbGVhbnVwIG9yIHJlc3RhcnQNCj4+KG9yDQo+PiBELUJ1cyBleHBvcnQv
+dW5leHBvcnQpIGFuIGluZGl2aWR1YWwgc2VydmljZSBhdCB0aGUgT2JqZWN0TWFuYWdlciBBUEkN
+Cj4+IGxldmVsLg0KPj4NCj4+IEkgb25seSBhZGRlZCB0aGUgcG9pbnRlciB0byBtYW5hZ2VyX3Bh
+dGggYmVjYXVzZSBpdCB3YXMgYmV0dGVyIHRvIHRlc3QNCj4+IHRoYXQgZm9yIHRoYXQgcHJlZml4
+IHRoYW4gaXQgd2FzIHRvIG5vdCBkbyBhbnkgY2hlY2tpbmcuICBJIGNvdWxkbqn2dCBkbw0KPj4g
+dGhlIHN0cm9uZ2VyIHRlc3QgZm9yIHRoZSBHYXR0U2VydmljZSBwYXRoIGJlY2F1c2UgdGhlcmUg
+aXMgbm8NCj4+Z3VhcmFudGVlZA0KPj4gb3JkZXIgdG8gdGhlIHByb3h5IGNhbGxiYWNrcy4NCj4N
+Cj5QbGVhc2UgY2hlY2sgdGhlIHBhdGNoLXNldCBJdmUgc2VudCBsYXN0IHdlZWssIHRoZSBpZGVh
+IGlzIHRoYXQgeW91DQo+d291bGQgcmVnaXN0ZXIgdGhlIGFwcGxpY2F0aW9uIG9ubHkgb25jZSwg
+bGF0ZXIgb24gd2UgbWlnaHQgaW1wbGVtZW50DQo+c3VwcG9ydCBmb3IgSW50ZXJmYWNlc0FkZGVk
+L0ludGVyZmFjZXNSZW1vdmVkIGFsbG93aW5nIHNlcnZpY2VzIHRvIGJlDQo+YWRkZWQvcmVtb3Zl
+ZCB3aXRob3V0IGhhdmluZyB0byB1bnJlZ2lzdGVyaW5nIGFuZCByZWdpc3RlcmluZyBhZ2Fpbi4N
+Cg0KVGhhbmtzIHZlcnkgbXVjaCwgTHVpeiEgIExvb2tzIGdvb2QgLSBJIHRyaWVkIGFsaWduaW5n
+IG15IGFwcGxpY2F0aW9uIHRvDQp0aGUgbmV3IEFQSSBhbmQgaXQgd29ya3MgZmluZSBhZnRlciBy
+ZW1vdmluZyBteSB3b3JrYXJvdW5kIHBhdGNoLg0KDQoNCj4NCj4+IEhvdyBzdHJpY3QgZG8geW91
+IHRoaW5rIHdlIG5lZWQgdG8gYmUgaGVyZSBpbiB2YWxpZGF0aW5nIHRoZQ0KPj5wYXJlbnQvY2hp
+bGQNCj4+IHJlbGF0aW9uc2hpcHMgaW4gdGhlIG9iamVjdCB0cmVlPw0KPg0KPlJpZ2h0IG5vdyBp
+dCBleHBlY3RzIHRoZSBvYmplY3RzIHRvIGFwcGVhciBpbiBvcmRlciwgc2VydmljZSAtPg0KPmNo
+YXJhY3RlcmlzdGljIC0+IGRlc2NyaXB0b3IsIHNvIHRoYXQgd2UgY2FuIGVzdGFibGlzaGVkIHBy
+b3Blcg0KPnJlbGF0aW9uc2hpcCBiZXR3ZWVuIHRoZSBvYmplY3RzLiBJIGRpZCBub3QgYWRkIGFu
+eSBjaGVjayBmb3IgbXVsdGlwbGUNCj5hcHBsaWNhdGlvbnMgd2l0aGluIHRoZSBzYW1lIGNvbm5l
+Y3Rpb24gaWQgZXhjZXB0IGlmIGl0IGlzIHRoZSB2ZXJ5DQo+c2FtZSBvYmplY3QgcGF0aCBnaXZl
+biBmb3IgdGhlIG9iamVjdCBtYW5hZ2VyLg0KDQoNClN0YXRlbWVudCBvZiBDb25maWRlbnRpYWxp
+dHkNCg0KVGhlIGNvbnRlbnRzIG9mIHRoaXMgZS1tYWlsIG1lc3NhZ2UgYW5kIGFueSBhdHRhY2ht
+ZW50cyBhcmUgY29uZmlkZW50aWFsIGFuZCBhcmUgaW50ZW5kZWQgc29sZWx5IGZvciB0aGUgYWRk
+cmVzc2VlLiBUaGUgaW5mb3JtYXRpb24gbWF5IGFsc28gYmUgbGVnYWxseSBwcml2aWxlZ2VkLiBU
+aGlzIHRyYW5zbWlzc2lvbiBpcyBzZW50IGluIHRydXN0LCBhbmQgdGhlIHNvbGUgcHVycG9zZSBv
+ZiBkZWxpdmVyeSB0byB0aGUgaW50ZW5kZWQgcmVjaXBpZW50LiBJZiB5b3UgaGF2ZSByZWNlaXZl
+ZCB0aGlzIHRyYW5zbWlzc2lvbiBpbiBlcnJvciwgYW55IHVzZSwgcmVwcm9kdWN0aW9uIG9yIGRp
+c3NlbWluYXRpb24gb2YgdGhpcyB0cmFuc21pc3Npb24gaXMgc3RyaWN0bHkgcHJvaGliaXRlZC4g
+SWYgeW91IGFyZSBub3QgdGhlIGludGVuZGVkIHJlY2lwaWVudCwgcGxlYXNlIGltbWVkaWF0ZWx5
+IG5vdGlmeSB0aGUgc2VuZGVyIGJ5IHJlcGx5IGUtbWFpbCBvciBhdCA1MDguNjgzLjI1MDAgYW5k
+IGRlbGV0ZSB0aGlzIG1lc3NhZ2UgYW5kIGl0cyBhdHRhY2htZW50cywgaWYgYW55Lg0KDQo=
