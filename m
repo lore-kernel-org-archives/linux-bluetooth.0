@@ -1,58 +1,101 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Date: Thu, 14 Jan 2016 17:03:47 -0500
-From: Don Zickus <dzickus@redhat.com>
-To: =?utf-8?Q?=C5=81ukasz?= Rymanowski <lukasz.rymanowski@codecoup.pl>
-Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: example GATT code to talk with a sensortag
-Message-ID: <20160114220347.GK127976@redhat.com>
-References: <20160108222608.GU152924@redhat.com>
- <CABBYNZ+bpQQH6XhM20d62wy5Y-PWw_Vq7_jhriHFmmLvJVHtAg@mail.gmail.com>
- <20160111181454.GZ152924@redhat.com>
- <CABBYNZ+9ETX4zxBWvZL_G6_8WXND0W4rGVPj+6YKyrCOzuUUhQ@mail.gmail.com>
- <20160111222207.GE152924@redhat.com>
- <CAExxLLBApkDFsPE_xbbcsQPq7CMs3a+iM7uSyM3yQzHyf3Fa0Q@mail.gmail.com>
- <20160113150640.GH127976@redhat.com>
- <CAExxLLBo+Aytnztc1BhMjExeThZiG_NDey1JQq37+eknsBv3HA@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <CAExxLLBo+Aytnztc1BhMjExeThZiG_NDey1JQq37+eknsBv3HA@mail.gmail.com>
+Message-ID: <1452793643.1830.16.camel@redhat.com>
+Subject: Re: bluetoothd crash when registering advertisement
+From: Nathaniel McCallum <npmccallum@redhat.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Thu, 14 Jan 2016 12:47:23 -0500
+In-Reply-To: <CABBYNZK024x77WYqiCrjX7GXXPU46zjNFhhhmrVd-y-XK4gWmw@mail.gmail.com>
+References: <1452726452.1830.3.camel@redhat.com>
+	 <CABBYNZK024x77WYqiCrjX7GXXPU46zjNFhhhmrVd-y-XK4gWmw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, Jan 13, 2016 at 10:44:02PM +0100, Łukasz Rymanowski wrote:
-> > Thank you!
-> >
-> >
-> > I did _not_ see GattCharacteristic1 in the output, nor do I see either
-> > GattService or GattCharacteristic1 show up as an interface in either
-> > /org/bluez/hci0/dev_XXXXX or /org/bluez/hci0.
-> >
-> >
-> > Did I miss a step or misunderstand your suggestion?
+On Thu, 2016-01-14 at 13:02 -0300, Luiz Augusto von Dentz wrote:
+> Hi Nathaniel,
 > 
-> You got it well.
-> To be more clear.
-> If your bluetoothd runs with -E option and you connect to BLE device
-> which expose any GATT services, after connect you should see new
-> objects paths. Smth like this:
+> On Wed, Jan 13, 2016 at 8:07 PM, Nathaniel McCallum
+> <npmccallum@redhat.com> wrote:
+> > I added advertisement support to my application today:
+> > https://git.fedorahosted.org/cgit/jelling/linux.git/commit/?id=e040
+> > 16c8
+> > b7f0d406b39573863cf7d5e15dac53ed
+> > 
+> > When registering the advertisement with bluez, bluetoothd crashes:
+> > #0  0x00007f1f01ce6618 in __GI_raise (sig=sig@entry=6) at
+> > ../sysdeps/unix/sysv/linux/raise.c:54
+> > #1  0x00007f1f01ce821a in __GI_abort () at abort.c:89
+> > #2  0x00007f1f024bc894 in _dbus_abort () at ../../dbus/dbus-
+> > sysdeps.c:91
+> > #3  0x00007f1f024b331e in _dbus_warn_check_failed (
+> >     format=0x7f1f024c2d10 "arguments to %s() were incorrect,
+> > assertion
+> > \"%s\" failed in file %s line %d.\nThis is normally a bug in some
+> > application using the D-Bus library.\n") at ../../dbus/dbus-
+> > internals.c:275
 > 
-> a) /org/bluez/hci0/dev_XXXXX/servicexxxx
-> b) /org/bluez/hci0/dev_XXXXX/servicexxxx/charyyyy
-> c) /org/bluez/hci0/dev_XXXXX/servicexxxx/charzzzz
-> 
-> etc.
-> 
-> Inside a) you should see GattService1 and inside b) and c) GattCharacteristic1
-> 
-> Just make sure -E is there and if still not work, provide btmon.log
+> Is your application still connected to D-Bus when that happens?
 
-Some days are better than others.  After rebooting yesterday, my bluetooth
-device stopped working... so while I am excited to test your suggestion, I
-am stuck trying to make it work again.  So I apologize if my response comes
-later.  I do appreciate the tips and patience!
+Yes. Restarting bluez results in the same crash happening again as my
+app sees the new interface and attempts to register again.
 
-Hopefully tomorrow things will work again.. :-/
+> > As this was my first attempt at implementing advertisement support,
+> > I
+> > may be doing something wrong. If I am, your tips are appreciated!
+> > However, in any case, bluez shouldn't crash.
+> 
+> We will definitely have to fix the crash but it would help if you
+> share more information, like how your application is implemented and
+> have access to bluetoothd logs before it crashes.
 
-Cheers,
-Don
+The entire application is a trivial, one file open source daemon. Feel
+free to look at it. Here is an overview in pseudo-code (function names
+correspond to the real functions):
+
+on_bt_iface(conn, iface) {
+  if (iface_has_adv_man(iface)) {
+    dbus_call(conn, iface, "RegisterAdvertisement", "/");
+  }
+}
+
+main() {
+  conn = dbus_connect();
+  make_advertisement_object(conn, "/");
+  listen_for_bluetooth_interfaces(conn, on_bt_iface);
+  main_loop();
+}
+
+My app never destroys its advertisement object or dbus connection. The
+process runs this way until it is killed.
+
+The bluetoothd logs are:
+
+Jan 14 12:45:21 localhost.localdomain bluetoothd[13745]:
+src/advertising.c:parse_advertising_service_uuids() Adding ServiceUUID:
+B670003C-0079-465C-9BA7-6C0539CCD67F
+Jan 14 12:45:21 localhost.localdomain bluetoothd[13745]:
+src/advertising.c:refresh_advertisement() Refreshing advertisement: /
+Jan 14 12:45:21 localhost.localdomain bluetoothd[13745]:
+src/advertising.c:parse_advertising_service_uuids() Adding ServiceUUID:
+B670003C-0079-465C-9BA7-6C0539CCD67F
+Jan 14 12:45:21 localhost.localdomain bluetoothd[13745]:
+src/advertising.c:refresh_advertisement() Refreshing advertisement: /
+Jan 14 12:45:21 localhost.localdomain bluetoothd[13745]:
+src/advertising.c:add_advertising_callback() Advertisement registered:
+/
+Jan 14 12:45:21 localhost.localdomain bluetoothd[13745]: process 13745:
+arguments to dbus_message_new_method_return() were incorrect, assertion
+"method_call != NULL" failed in file ../../dbus/dbus-message.c line
+1378.
+Jan 14 12:45:21 localhost.localdomain bluetoothd[13745]: This is
+normally a bug in some application using the D-Bus library.
+Jan 14 12:45:21 localhost.localdomain bluetoothd[13745]: D-Bus not
+built with -rdynamic so unable to print a backtrace
+Jan 14 12:45:21 localhost.localdomain systemd[1]: bluetooth.service:
+Main process exited, code=dumped, status=6/ABRT
+Jan 14 12:45:21 localhost.localdomain systemd[1]: bluetooth.service:
+Unit entered failed state.
+Jan 14 12:45:21 localhost.localdomain systemd[1]: bluetooth.service:
+Failed with result 'core-dump'.
