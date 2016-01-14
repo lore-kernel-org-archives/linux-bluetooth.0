@@ -1,47 +1,71 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <1452726452.1830.3.camel@redhat.com>
-References: <1452726452.1830.3.camel@redhat.com>
-Date: Thu, 14 Jan 2016 13:02:32 -0300
-Message-ID: <CABBYNZK024x77WYqiCrjX7GXXPU46zjNFhhhmrVd-y-XK4gWmw@mail.gmail.com>
-Subject: Re: bluetoothd crash when registering advertisement
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Nathaniel McCallum <npmccallum@redhat.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Message-ID: <1452767430.3292.8.camel@linux.intel.com>
+Subject: Re: [PATCH] Bluetooth: 6lowpan: Fix handling of uncompressed IPv6
+ packets
+From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+To: Lukasz Duda <lukasz.duda@nordicsemi.no>, alex.aring@gmail.com
+Cc: linux-bluetooth@vger.kernel.org, glenn.ruben.bakke@nordicsemi.no
+Date: Thu, 14 Jan 2016 12:30:30 +0200
+In-Reply-To: <1452700668-4241-1-git-send-email-lukasz.duda@nordicsemi.no>
+References: <1452700668-4241-1-git-send-email-lukasz.duda@nordicsemi.no>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Nathaniel,
+Hi,
 
-On Wed, Jan 13, 2016 at 8:07 PM, Nathaniel McCallum
-<npmccallum@redhat.com> wrote:
-> I added advertisement support to my application today:
-> https://git.fedorahosted.org/cgit/jelling/linux.git/commit/?id=e04016c8
-> b7f0d406b39573863cf7d5e15dac53ed
->
-> When registering the advertisement with bluez, bluetoothd crashes:
-> #0  0x00007f1f01ce6618 in __GI_raise (sig=sig@entry=6) at
-> ../sysdeps/unix/sysv/linux/raise.c:54
-> #1  0x00007f1f01ce821a in __GI_abort () at abort.c:89
-> #2  0x00007f1f024bc894 in _dbus_abort () at ../../dbus/dbus-
-> sysdeps.c:91
-> #3  0x00007f1f024b331e in _dbus_warn_check_failed (
->     format=0x7f1f024c2d10 "arguments to %s() were incorrect, assertion
-> \"%s\" failed in file %s line %d.\nThis is normally a bug in some
-> application using the D-Bus library.\n") at ../../dbus/dbus-
-> internals.c:275
+good catch.
 
-Is your application still connected to D-Bus when that happens?
-
-> As this was my first attempt at implementing advertisement support, I
-> may be doing something wrong. If I am, your tips are appreciated!
-> However, in any case, bluez shouldn't crash.
-
-We will definitely have to fix the crash but it would help if you
-share more information, like how your application is implemented and
-have access to bluetoothd logs before it crashes.
+Acked-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
 
 
--- 
-Luiz Augusto von Dentz
+On Wed, 2016-01-13 at 16:57 +0100, Lukasz Duda wrote:
+> This patch fixes incorrect handling of the 6lowpan packets that
+> contain
+> uncompressed IPv6 header.
+> 
+> RFC4944 specifies a special dispatch for 6lowpan to carry
+> uncompressed
+> IPv6 header. This dispatch (1 byte long) has to be removed during
+> reception and skb data pointer has to be moved. To correctly point in
+> the beginning of the IPv6 header the dispatch byte has to be pulled
+> off
+> before packet can be processed by netif_rx_in().
+> 
+> Test scenario: IPv6 packets are not correctly interpreted by the
+> network
+> layer when IPv6 header is not compressed (e.g. ICMPv6 Echo Reply is
+> not
+> propagated correctly to the ICMPv6 layer because the extra byte will
+> make
+> the header look corrupted).
+> 
+> Similar approach is done for IEEE 802.15.4.
+> 
+> Signed-off-by: Lukasz Duda <lukasz.duda@nordicsemi.no>
+> Signed-off-by: Glenn Ruben Bakke <glenn.ruben.bakke@nordicsemi.no>
+> ---
+>  net/bluetooth/6lowpan.c | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
+> index d040365..350f379 100644
+> --- a/net/bluetooth/6lowpan.c
+> +++ b/net/bluetooth/6lowpan.c
+> @@ -307,6 +307,9 @@ static int recv_pkt(struct sk_buff *skb, struct
+> net_device *dev,
+>  
+>  	/* check that it's our buffer */
+>  	if (lowpan_is_ipv6(*skb_network_header(skb))) {
+> +		/* Pull off the 1-byte of 6lowpan header. */
+> +		skb_pull(skb, 1);
+> +
+>  		/* Copy the packet so that the IPv6 header is
+>  		 * properly aligned.
+>  		 */
+
+
+Cheers,
+Jukka
+
