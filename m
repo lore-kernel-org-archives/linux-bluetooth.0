@@ -1,75 +1,62 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: "Kasper Markus (ETAS-PSC/ECE1)" <Markus.Kasper@escrypt.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: AW: DBUS GATT API via gio - Parsing results of GetManagedObjects
- fails
-Date: Fri, 15 Jan 2016 15:10:39 +0000
-Message-ID: <c898b94683c04612a41f8a9890e61778@FE-MBX1011.de.bosch.com>
-References: <6b9433067232482188eacf03ac09d44e@FE-MBX1011.de.bosch.com>
- <CABBYNZ+dGC5mv_AyNeHE4GD4NvkcxOByh0Gz5Fj_HvgZKEHA5A@mail.gmail.com>
-In-Reply-To: <CABBYNZ+dGC5mv_AyNeHE4GD4NvkcxOByh0Gz5Fj_HvgZKEHA5A@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
+Return-Path: <linux-wpan-owner@vger.kernel.org>
+Subject: Re: [PATCH bluetooth-next 2/2] ieee802154: 6lowpan: fix return of
+ netdev notifier
+To: Alexander Aring <alex.aring@gmail.com>, linux-wpan@vger.kernel.org
+References: <1452459025-13884-1-git-send-email-alex.aring@gmail.com>
+ <1452459025-13884-3-git-send-email-alex.aring@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, kernel@pengutronix.de,
+	mcr@sandelman.ca, lukasz.duda@nordicsemi.no
+From: Stefan Schmidt <stefan@osg.samsung.com>
+Message-ID: <569904B9.7080908@osg.samsung.com>
+Date: Fri, 15 Jan 2016 15:39:53 +0100
 MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1452459025-13884-3-git-send-email-alex.aring@gmail.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgTHVpeiwNCg0KdGhhbmtzIGZvciB5b3VyIG91dHN0YW5kaW5nIHJlc3BvbnNlIHRpbWVzIGZv
-ciBhbGwgdGhlc2UgR0FUVCANCmlzc3VlcyBwb3BwaW5nIHVwIG9uIHRoZSBsaXN0Lg0KDQo+IGZy
-b206IEx1aXogQXVndXN0byB2b24gRGVudHogW21haWx0bzpsdWl6LmRlbnR6QGdtYWlsLmNvbV0N
-Cj4gPE1hcmt1cy5LYXNwZXJAZXNjcnlwdC5jb20+IHdyb3RlOg0KPiA+IGJ1dCBpbnN0ZWFkIChm
-b3Igd2hhdGV2ZXIgcmVhc29uKQ0KPiA+IGluIHNvbWUgb3RoZXIgb3JkZXIuIEluIG15IGNhc2Ug
-SSBnZXQgdGhlIG9yZGVyIC4uLg0KPiANCj4gSSBiZXQgdGhpcyBpcyBiZWNhdXNlIG9mIHRoZSB1
-c2Ugb2YgaGFzaCB0YWJsZSBieSB5b3VyIGJpbmRpbmcsIHRoaXMgd291bGQgYmUNCj4gZmluZSBp
-ZiB0aGUgb2JqZWN0cyBkb24ndCBoYXZlIGEgcmVsYXRpb25zaGlwIGJldHdlZW4gdGhlbXNlbHZl
-cy4NCg0KQW4gaW50ZXJuYWwgaGFzaCB0YWJsZSBhcyByb290IGNhdXNlIHdvdWxkIG1ha2Ugc2Vu
-c2UgdG8gbWUuIA0KDQo+ID4gSSBhbHNvIGRpZG7igJl0IHRlc3Qg4oCcc2h1ZmZsaW5n4oCdIG9i
-amVjdHMgd2l0aGluIHRoZSBQeXRob24gZXhhbXBsZS1nYXR0LXNlcnZlciwNCj4gYnV0IHRoaXMg
-c2hvdWxkIG1vc3QgbGlrZWx5IGJlIHRoZSBmYXN0ZXN0IHdheSB0byByZXByb2R1Y2UgdGhlIHBy
-b2JsZW0gYW5kDQo+IHRlc3Qgc29sdXRpb25zLg0KPiANCj4gSSBhY3R1YWxseSBoYWQgdG8gZml4
-IHRoaXMgd2l0aCB1c2Ugb2YgT3JkZXJlZERpY3QgdG8gbWFrZSBzdXJlIHRoZSBvcmRlciBvZg0K
-PiBvYmplY3RzIGlzIG1haW50YWluZWQgc28gd2UgY2FuIHBhcnNlIGluIGEgc2luZ2xlIHBhc3Mg
-dGhlIG9iamVjdHMuDQoNCkkgc29tZWhvdyBleHBlY3RlZCBzb21ldGhpbmcgbGlrZSB0aGlzIHdo
-ZW4gSSBub3RpY2VkIHRoZSBPcmRlcmVkRGljdCA9KS4NCg0KPiA+IEF0IHRoZSBlbmQgb2YgdGhl
-IGRheSBmb3IgYmVzdCBpbnRlcm9wZXJhYmlsaXR5IEkgc3VnZ2VzdCB0byBhdm9pZCByZWx5aW5n
-IG9uDQo+IHRoZSBvcmRlciBvZiB0aGUgR2V0TWFuYWdlZE9iamVjdHMgcmVwbHkgaW4gYmx1ZXos
-IGJ1dCBpbnN0ZWFkIGFpbSBmb3IgYQ0KPiByb2J1c3QgcGFyc2luZy4NCj4gDQo+IEl0IGlzIGEg
-Yml0IHJpZGljdWxvdXMgc2luY2UgaXQgaXMgcHJvYmFibHkgZWFzaWVyIHRvIGltcGxlbWVudCB3
-aXRoIGEgbGlzdCBhbmQNCj4gbWFpbnRhaW4gdGhlIG9yZGVyIGFzIHNlZW4gaW4gSW50ZXJmYWNl
-QWRkZWQsIGJ1dCBJIGhhdmUgdG8gYWdyZWUgdGhhdCB3ZQ0KPiBjYW4ndCByZWx5IG9uIHRoZSBw
-ZWVyIHRvIG1ha2UgdGhpcyBlYXNpZXIgZm9yIHVzLg0KDQpXZWxsLCB0aGlzIHdvdWxkbid0IGJl
-IGEgcHJvYmxlbSBhdCBhbGwgaWYgdGhpcyB3b3VsZG4ndCBpbXBseSB0aGF0IHVzZXJzIGhhdmUg
-dG8gDQphZGFwdCB0aGVpciBEQlVTIGxpYnMgZm9yIGludGVyb3BlcmFiaWxpdHkuIFRoZSBsYXp5
-IGZpeCB3b3VsZCBiZSBjbGFyaWZ5aW5nIHRoZSANCkFQSSBkb2MgYW5kIGxlYXZpbmcgdGhlIHdv
-cmsgdG8gdGhlIHBlZXIuIA0KDQo+IFllcCwgd2Ugd2lsbCBoYXZlIHRvIHN0b3JlIHRoZSBwcm94
-aWVzIGFuZCBsYXRlciBwcm9jZXNzIHRoZW0gb24gcmVhZHksIHNvIGl0DQo+IGJlY29tZXMgYSBs
-aXR0bGUgbW9yZSBjb21wbGV4Lg0KDQpBcyBhIHdvcmthcm91bmQgKG9yIGxhdGVyIHBhdGNoKSBJ
-J2QgY3VycmVudGx5IGdvIGZvciANCg0KMS4gQWRhcHQgcHJveHlfYWRkZWRfY2IgdG8gZmlsbCBh
-IGxpc3Qgb3IgcXVldWUNCjIuIEFkYXB0IGFwcCBzdHJ1Y3QgdG8gcHJvdmlkZSB0aGlzIGxpc3Qg
-b3IgcXVldWUgZGF0YSBzdHJ1Y3R1cmUNCjMuIHdyaXRlIGEgbmV3IGZ1bmN0aW9uIGZvciBpdGVy
-YXRpbmcgdGhyZWUgdGltZXMqIG92ZXIgdGhpcyBsaXN0IHRvIGNyZWF0ZSANCiAgMSkgc2Vydmlj
-ZXMgDQogIDIpIGNoYXJhY3RlcmlzdGljcyANCiAgMykgZGVzY3JpcHRvcnMgDQp1c2luZyB0aGUg
-Zm9ybWVyIGNvZGUgb2YgcHJveHlfYWRkZWRfY2INCjQuIGNhbGwgdGhpcyBmdW5jdGlvbiBmcm9t
-IHdpdGhpbiBjbGllbnRfcmVhZHlfY2INCg0KKkFsdGVybmF0aXZlbHkgb25lIGNvdWxkIGFkZCAz
-IGNhdGVnb3JpemVkIGxpc3RzIGFuZCBpdGVyYXRlIG9ubHkgb25jZS4gDQpTb21laG93IEkgZmVs
-bCBib3RoIHNvbHV0aW9ucyBhcmUgYSBiaXQgdWdseSwgYnV0IHdpbGwgd29yay4NCg0KRG9lcyB0
-aGlzIG1ha2Ugc2Vuc2UgdG8geW91LCBvciBkbyB5b3UgaGF2ZSBhIG1vcmUgDQpFbGVnYW50IGFw
-cHJvYWNoL3NvbWUgYWRkaXRpb24vaGludCB3aHkgdGhpcyBtaWdodCB0dXJuIG91dCB0byBmYWls
-Pw0KDQo+IE1vc3QgSVBDIGFyZSBhc3luY2hyb25vdXMsIGFjdHVhbGx5IHRoZSBmYWN0IHRoYXQg
-eW91IG5vdGljZSBpdCBhbmQgbGVhcm4gaXMNCj4gcHJvYmFibHkgbXVjaCBtb3JlIHZhbHVhYmxl
-IHRoYW4gaXQgc2ltcGxlIG1hZ2ljYWxseSB3b3JraW5nIHNpbmNlIHRoZSBsYXRlcg0KPiB3b3Vs
-ZCBtZWFuIHRoZSBJUEMgbGlicmFyeSBpcyBjcmVhdGluZyBhIHRocmVhZCBiZWhpbmQgeW91ciBi
-YWNrIHdoaWNoIGNhbg0KPiBjYXVzZSBhIGxvdCBtb3JlIHByb2JsZW1zIGZvciB5b3UuDQoNCllv
-dSBkZWZpbml0ZWx5IGhhdmUgYSBwb2ludCBoZXJlLg0KIA0KPiBELUJ1cyBoYXMgaW50ZWdlcnMg
-YnV0IG5vdCBlbnVtcyBhcyB0aGUgZG9jdW1lbnQgc2VlbXMgdG8gc3VnZ2VzdCwgQw0KPiBlbnVt
-cyBhcmUgaW50ZWdlcnMgYnV0IHlvdSBjYW4gYXNzb2NpYXRlIHdpdGggYSBzeW1ib2wgYXQgbGVh
-c3QsIGJlc2lkZXMgaXQgaXMNCj4gYSBsb3QgZWFzaWVyIHRvIHVuZGVyc3RhbmQgYSBzdHJpbmcg
-dGhhbiBpbnRlZ2VycyB3aXRoIHRoaW5ncyBsaWtlIGQtZmVldCBhbmQNCj4gZGJ1cy1tb25pdG9y
-Lg0KDQpUaGlzIGlzIGEgdG90YWxseSB2YWxpZCBhcmd1bWVudCB0b3dhcmRzIHVzaW5nIHN0cmlu
-Z3MgZHVyaW5nIGRlc2lnbi9kZWJ1Zy4gDQpOZXZlcnRoZWxlc3MgIHdpdGggcmVzcGVjdCB0byBw
-ZXJmb3JtYW5jZSAodGhpbmtpbmcgYWJvdXQgZW1iZWRkZWQgDQphcHBsaWNhdGlvbnMpIHN0cmlu
-ZyBwYXJzaW5nIHRoaXMgbWlnaHQgbWFrZSBhIGRpZmZlcmVuY2UuIE9idmlvdXNseSB0aGUgDQpH
-QVRUIEFQSSBpc24ndCBhIHByaW1lIGV4YW1wbGUgd2hlbiBhcmd1aW5nIGFib3V0IHBlcmZvcm1h
-bmNlIGFzIGl0IA0KaXMgbm90IGNhbGxlZCB2ZXJ5IGZyZXF1ZW50bHkgYW5kIHRodXMgc2hvdWxk
-bid0IG1ha2UgYW55IGRpZmZlcmVuY2UuIA0KDQpUaGFua3MgZm9yIHlvdXIgaGVscC4NCk1hcmt1
-cw0KDQo+IC0tDQo+IEx1aXogQXVndXN0byB2b24gRGVudHoNCg0K
+Hello.
+
+On 10/01/16 21:50, Alexander Aring wrote:
+> This patch fixed the return value of netdev notifier. If the command is
+> a don't care a NOTIFY_DONE should be returned. If the command matched a
+> NOTIFY_OK should be returned.
+>
+> Signed-off-by: Alexander Aring <alex.aring@gmail.com>
+> ---
+>   net/ieee802154/6lowpan/core.c | 7 +++----
+>   1 file changed, 3 insertions(+), 4 deletions(-)
+>
+> diff --git a/net/ieee802154/6lowpan/core.c b/net/ieee802154/6lowpan/core.c
+> index 737c87a..0023c90 100644
+> --- a/net/ieee802154/6lowpan/core.c
+> +++ b/net/ieee802154/6lowpan/core.c
+> @@ -207,7 +207,7 @@ static int lowpan_device_event(struct notifier_block *unused,
+>   	struct net_device *wdev = netdev_notifier_info_to_dev(ptr);
+>   
+>   	if (wdev->type != ARPHRD_IEEE802154)
+> -		goto out;
+> +		return NOTIFY_DONE;
+>   
+>   	switch (event) {
+>   	case NETDEV_UNREGISTER:
+> @@ -219,11 +219,10 @@ static int lowpan_device_event(struct notifier_block *unused,
+>   			lowpan_dellink(wdev->ieee802154_ptr->lowpan_dev, NULL);
+>   		break;
+>   	default:
+> -		break;
+> +		return NOTIFY_DONE;
+>   	}
+>   
+> -out:
+> -	return NOTIFY_DONE;
+> +	return NOTIFY_OK;
+>   }
+>   
+>   static struct notifier_block lowpan_dev_notifier = {
+
+Reviewed-by: Stefan Schmidt <stefan@osg.samsung.com>
+
+regards
+Stefan Schmidt
+
