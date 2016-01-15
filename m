@@ -1,46 +1,62 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: "Kasper Markus (ETAS-PSC/ECE1)" <Markus.Kasper@escrypt.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: DBUS GATT API via gio - Parsing results of GetManagedObjects fails  
+Date: Fri, 15 Jan 2016 12:24:42 +0000
+Message-ID: <6b9433067232482188eacf03ac09d44e@FE-MBX1011.de.bosch.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <D2BD8E35.1AB78%adam.moore@savant.com>
-References: <D2BD8E35.1AB78%adam.moore@savant.com>
-Date: Fri, 15 Jan 2016 10:32:40 -0300
-Message-ID: <CABBYNZJpn6RFweF4GigtzRV1bdy6Nv+BNA3FbW4D9xe6CYdoLA@mail.gmail.com>
-Subject: Re: LE Reverse Service Discovery
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Adam Moore <adam.moore@savantsystems.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Adam,
-
-On Thu, Jan 14, 2016 at 10:41 PM, Adam Moore
-<adam.moore@savantsystems.com> wrote:
-> Iıve noticed that since around BlueZ 5.27, GATT client functionality is
-> enabled for all devices.
->
-> From a LE Peripheral's perspective, this results in unconditional reverse
-> service discovery of a Central's GATT services.
->
-> It seems like this will not always be necessary depending on the use case,
-> and disabling GATT client functionality should save energy and time.  My
-> iPhone, for example, has about 8 services that my Peripheral doesnıt care
-> about.
-
-This is only considerable for the very first time you connect, after
-that Read By Group should return matching cached services so no extra
-commands would be needed.
-
-> Iım considering making an attempt to disable this, as the BT spec says
-> GATT clients are optional for LE peripherals. (BT 4.2, Vol 3, Part C,
-> Table 15.1), but I first would like to ask if anyone has any insight on
-> why it may be desirable to keep the client functionality enabled.
-
-There are important services behind GATT, such as GAP and DIS, that
-are relevant even for a peripheral. We could perhaps disable the
-discovery if there are no drivers available to probe, but currently we
-have no means to detect if the driver UUID is GATT or not.
-
-
--- 
-Luiz Augusto von Dentz
+SGksDQoNCml0IHNlZW1zIEnigJhtIGFtb25nIHRoZSBmaXJzdCB1c2VycyBvdXQgdGhlcmUgdXNp
+bmcgdGhlIGRidXMgQVBJIGZvciBpbXBsZW1lbnRpbmcgYSBHQVRUIHNlcnZlciB2aWEgQyAmIGdp
+byAmIGdkYnVzLWNvZGVnZW4uIA0KU28gZmlyc3QgdGhhbmtzIHRvIEx1aXogZm9yIHRoZSByZWNl
+bnQgcGF0Y2ggYW5kIHRoZSBuZXcgZ3JlYXQgUmVnaXN0ZXJBcHAgQVBJLCB3aGljaCBzb2x2ZWQg
+c29tZSB0cm91YmxlIHdpdGggZ2lvIGFuZCB0aGUgY29udHJhZGljdGluZyBoaWVyYXJjaHkgcmVx
+dWlyZW1lbnRzIGZvciB0aGUgT2JqZWN0TWFuYWdlci4NCu+DqAlJ4oCZbSB1c2luZyBhIHJhdGhl
+ciByZWNlbnQgY2hlY2tvdXQgb2YgdGhlIGdpdC4NClVuZm9ydHVuYXRlbHkgSSByYW4gaW50byBh
+bm90aGVyIHByb2JsZW0gd2l0aCBkYnVzIGluY29tcGF0aWJpbGl0aWVzOiBXaGVuIHJlZ2lzdGVy
+aW5nIGFuIGFwcGxpY2F0aW9uIHRoZSBnZGJ1cy9jbGllbnQuYyBwYXJzZXMgdGhlIGludGVyZmFj
+ZXMgYW5kIGFkZHMgcHJveGllcyBiYXNlZCBvbiB0aGUgcmVzdWx0cyBvZiBhIEdldE1hbmFnZWRP
+YmplY3RzIGNhbGwuICANCg0KV2hhdCBoYXBwZW5zIGZvciBtZSBpcyB0aGF0IHRoZSBnaW8gaW1w
+bGVtZW50YXRpb24gZG9lcyBub3QgcmV0dXJuIHRoZSBvYmplY3RzIGluIHRoZSBvcmRlciBJIGFk
+ZGVkIHRoZW0sIGJ1dCBpbnN0ZWFkIChmb3Igd2hhdGV2ZXIgcmVhc29uKSBpbiBzb21lIG90aGVy
+IG9yZGVyLiBJbiBteSBjYXNlIEkgZ2V0IHRoZSBvcmRlciANCg0Kc2VydmljZTAvY2hhcjANCnNl
+cnZpY2UwDQpzZXJ2aWNlMC9jaGFyMQ0KDQpJbnN0ZWFkIG9mIA0KDQpzZXJ2aWNlMA0Kc2Vydmlj
+ZTAvY2hhcjANCnNlcnZpY2UwL2NoYXIxLg0KDQpXaGVuIHBhcnNpbmcvYWRkaW5nIGludGVyZmFj
+ZXMgdGhlIG9yZGVyIG9mIHRoZSBvYmplY3RzIHJldHVybmVkIGZyb20gdGhlIEdldE1hbmFnZWRP
+YmplY3RzIGNhbGwgaXMgcHJlc2VydmVkLiBUaHVzIGluc3RlYWQgb2YgZmlyc3QgYWRkaW5nIHRo
+ZSBzZXJ2aWNlIGFuZCB0aGVuIGFkZGluZyB0aGUgY2hhcmFjdGVyaXN0aWNzLCANCnRoZSBjdXJy
+ZW50IGltcGxlbWVudGF0aW9uIHN0YXJ0cyBhZGRpbmcgYSBjaGFyYWN0ZXJpc3RpYyBhbmQgdGhl
+biBmYWlscyByZWdpc3RlcmluZyB0aGUgc2VydmVyIGJlY2F1c2UgdGhlIGNvcnJlc3BvbmRpbmcg
+c2VydmljZSBpcyBzdGlsbCBtaXNzaW5nLiBJIGV4cGVjdCBzaW1pbGFyIGlzc3VlcyB3aXRoIOKA
+nG91dCBvZiBvcmRlcuKAnSBkZXNjcmlwdG9ycywgYnV0IGRpZCBub3QgdGVzdCBpdC4NCkkgYWxz
+byBkaWRu4oCZdCB0ZXN0IOKAnHNodWZmbGluZ+KAnSBvYmplY3RzIHdpdGhpbiB0aGUgUHl0aG9u
+IGV4YW1wbGUtZ2F0dC1zZXJ2ZXIsIGJ1dCB0aGlzIHNob3VsZCBtb3N0IGxpa2VseSBiZSB0aGUg
+ZmFzdGVzdCB3YXkgdG8gcmVwcm9kdWNlIHRoZSBwcm9ibGVtIGFuZCB0ZXN0IHNvbHV0aW9ucy4N
+CkF0IHRoZSBlbmQgb2YgdGhlIGRheSBmb3IgYmVzdCBpbnRlcm9wZXJhYmlsaXR5IEkgc3VnZ2Vz
+dCB0byBhdm9pZCByZWx5aW5nIG9uIHRoZSBvcmRlciBvZiB0aGUgR2V0TWFuYWdlZE9iamVjdHMg
+cmVwbHkgaW4gYmx1ZXosIGJ1dCBpbnN0ZWFkIGFpbSBmb3IgYSByb2J1c3QgcGFyc2luZy4gDQoN
+CknigJltIGFjdHVhbGx5IG5vdCBzdXJlIHdoYXQgd291bGQgYmUgdGhlIGJlc3QgcGxhY2UgYW5k
+IG1ldGhvZCB0byBmaXggdGhpcy4gUGF0Y2hpbmcgd2l0aGluIGdkYnVzL2NsaWVudC5jIHdvdWxk
+IGJlIHF1aXRlIGVhc3ksIGJ1dCBJIHRoaW5rIHRoZSBkYnVzIGltcGxlbWVudGF0aW9uIHNob3Vs
+ZG7igJl0IGNhcmUgYWJvdXQgYXBwbGljYXRpb24gcmVxdWlyZW1lbnRzLiBGaXhpbmcgd2l0aGlu
+IHRoZSBnYXR0LWRhdGFiYXNlLmMgd291bGQgbW9zdCBsaWtlbHkgYmUgYSBiaXQgY2xlYW5lciwg
+YnV0IHJlcXVpcmVzIChhdCBsZWFzdCBhdCBhIGZpcnN0IGdsYW5jZSkgbW92aW5nIHRvd2FyZHMg
+c29tZSBhcHByb2FjaCB3aGVyZSB3ZSBmaXJzdCByZWdpc3RlciBhbGwgaW50ZXJmYWNlcyBhbmQg
+aWdub3JlIGFsbCBlcnJvcnMsIGFuZCB0aGVuIGRvIGEgY29uc2lzdGVuY3kgY2hlY2sgb2YgdGhl
+IGhpZXJhcmNoeSBhZnRlcndhcmRzLCB3aGVuIGFsbCBpcyBkb25lLg0KDQpBbm90aGVyIHNtYWxs
+ZXIgaXNzdWUgSSBzdHVtYmxlZCB1cG9uIGlzIHRoZSByZXF1aXJlbWVudCB0byBjYWxsIFJlZ2lz
+dGVyQXBwbGljYXRpb24gYXN5bmNocm9ub3VzbHkgdG8gYWxsb3cgZm9yIGFuc3dlcmluZyB0aGUg
+Y2FsbHMgdG8gdGhlIG9iamVjdCBtYW5hZ2VyLiBXaGlsZSB0aGlzIG1pZ2h0IGJlIGEgbmF0dXJh
+bCB0aGluZyBmb3IgZXhwZXJpZW5jZWQgREJVUyBkZXZlbG9wZXJzIEkgZmVlbCBpdCB3b3VsZCBo
+ZWxwIGJlZ2lubmVycyB0byBtZW50aW9uIHRoaXMgd2l0aGluIHRoZSBkb2NzICg9IGl0IHdvdWxk
+IGhhdmUgc2F2ZWQgbWUgc29tZSBob3VycyBvZiBkZWJ1Z2dpbmcpLiANCg0KVGhhbmtzIGZvciB5
+b3VyIGdyZWF0IGVmZm9ydHMgb24gbWFpbnRhaW5pbmcgYW5kIGV4dGVuZGluZyBCbHVlei4NCg0K
+QnR3OiBpcyB0aGVyZSBhIGdvb2QgbW90aXZhdGlvbiBmb3IgdXNpbmcgc3RyaW5ncyBpbnN0ZWFk
+IG9mIGludGVyZ2Vycy9lbnVtcyB3aXRoaW4gdGhlIERCVVMgQVBJIChlLmcuIGZsYWdzKT8gSSBy
+ZWNlbnRseSByZWFkIGh0dHA6Ly9kYnVzLmZyZWVkZXNrdG9wLm9yZy9kb2MvZGJ1cy1hcGktZGVz
+aWduLmh0bWwgYW5kIHdvdWxkIGxvdmUgdG8gc2VlIHNvbWUgb2YgdGhlIHN1Z2dlc3Rpb25zIGJl
+aW5nIG1hcHBlZCB0byB0aGUgQVBJIGJlZm9yZSBpdCBsZWF2ZXMgZXhwZXJpbWVudGFsIHN0YXR1
+cy4NCg0KQ2hlZXJzLA0KTWFya3VzDQoNCg0K
