@@ -1,41 +1,18 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-Date: Sun, 17 Jan 2016 11:42:04 +0200
-Message-ID: <CAPGkfYGEjsnkxJS7sM8JjUeZc0nHmsEb42ypx-Mc70+Z4bcvig@mail.gmail.com>
-Subject: Possibly Bug in recent Bluez
-From: Andrey Aleksandrovich <andrey.aleksandrovich@googlemail.com>
+From: Travis Griggs <travisgriggs@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Subject: Could example-gatt-server and example-advertisement be folded into one?
+Message-Id: <5B92EB78-6761-4617-9186-CC5040532A91@gmail.com>
+Date: Fri, 15 Jan 2016 17:10:34 -0800
 To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Mime-Version: 1.0 (Mac OS X Mail 9.2 \(3112\))
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi, I have Gentoo Linux, KDE on laptop with Bluetooth.
-And I find out that it doesn't working after some time ago.
+Subject mostly asks it all. I’m not asking whether the bluez distributed examples could be folded into one.
 
-# dmesg | grep 4-1.5
-[  475.204004] usb 4-1.5: New USB device found, idVendor=8086, idProduct=0189
-[  475.204014] usb 4-1.5: New USB device strings: Mfr=0, Product=0,
-SerialNumber=0
+I have been able able to build a working BLE interface to my Linux SBC using python to operate as a peripheral. I worked from these two files. Is there any reason I couldn’t weld the two files together into one? Or do they need to be run as two separate processes with two separate mainloops?
 
-# lsusb | grep 009
-Bus 004 Device 009: ID 8086:0189 Intel Corp.
+I’m really hoping to get any answer, my last few questions went unanswered (which happens), but I’ve begun to wonder if my emails are getting through.
 
-# cat /var/log/everything/current | grep bluetoothd
-Jan 16 18:52:51 [bluetoothd] Bluetooth daemon 5.37
-Jan 16 18:52:51 [bluetoothd] Starting SDP server
-Jan 16 18:52:51 [bluetoothd] Bluetooth management interface 1.9 initialized
-Jan 16 18:52:51 [bluetoothd] Failed to obtain handles for "Service
-Changed" characteristic
-Jan 16 18:52:51 [bluetoothd] Not enough free handles to register service
-Jan 16 18:52:51 [bluetoothd] Error adding Link Loss service
-Jan 16 18:52:51 [bluetoothd] Not enough free handles to register service
-Jan 16 18:52:51 [bluetoothd] Current Time Service could not be registered
-Jan 16 18:52:51 [bluetoothd] gatt-time-server: Input/output error (5)
-Jan 16 18:52:51 [bluetoothd] Not enough free handles to register service
-Jan 16 18:52:51 [bluetoothd] Sap driver initialization failed.
-Jan 16 18:52:51 [bluetoothd] sap-server: Operation not permitted (1)
-
-It doesn't affect only me, here is some links:
-https://bugzilla.redhat.com/show_bug.cgi?id=1259827
-https://bugs.gentoo.org/show_bug.cgi?id=566004
-https://bugs.launchpad.net/ubuntu/+source/bluez/+bug/1499858
+I’ll try to publish my example somewhere soon, for the benefit of all.
