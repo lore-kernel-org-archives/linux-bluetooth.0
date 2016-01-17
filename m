@@ -1,31 +1,32 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Szymon Janc <ext.szymon.janc@tieto.com>
-To: Andrey Aleksandrovich <andrey.aleksandrovich@googlemail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: Possibly Bug in recent Bluez
-Date: Mon, 18 Jan 2016 12:40:40 +0100
-Message-ID: <1557825.6tL2oa3vnP@leonov>
+MIME-Version: 1.0
 In-Reply-To: <CAPGkfYGEjsnkxJS7sM8JjUeZc0nHmsEb42ypx-Mc70+Z4bcvig@mail.gmail.com>
 References: <CAPGkfYGEjsnkxJS7sM8JjUeZc0nHmsEb42ypx-Mc70+Z4bcvig@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Date: Sun, 17 Jan 2016 14:56:43 +0200
+Message-ID: <CABBYNZ+chGP5_o4tMtarOLUW1nk1YrMHiW-SUr3+EPu=tQJVrg@mail.gmail.com>
+Subject: Re: Possibly Bug in recent Bluez
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Andrey Aleksandrovich <andrey.aleksandrovich@googlemail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Andrey,
 
-On Sunday 17 of January 2016 11:42:04 Andrey Aleksandrovich wrote:
+On Sun, Jan 17, 2016 at 11:42 AM, Andrey Aleksandrovich
+<andrey.aleksandrovich@googlemail.com> wrote:
 > Hi, I have Gentoo Linux, KDE on laptop with Bluetooth.
 > And I find out that it doesn't working after some time ago.
-> 
+>
 > # dmesg | grep 4-1.5
-> [  475.204004] usb 4-1.5: New USB device found, idVendor=8086,
-> idProduct=0189 [  475.204014] usb 4-1.5: New USB device strings: Mfr=0,
-> Product=0, SerialNumber=0
-> 
+> [  475.204004] usb 4-1.5: New USB device found, idVendor=8086, idProduct=0189
+> [  475.204014] usb 4-1.5: New USB device strings: Mfr=0, Product=0,
+> SerialNumber=0
+>
 > # lsusb | grep 009
 > Bus 004 Device 009: ID 8086:0189 Intel Corp.
-> 
+>
 > # cat /var/log/everything/current | grep bluetoothd
 > Jan 16 18:52:51 [bluetoothd] Bluetooth daemon 5.37
 > Jan 16 18:52:51 [bluetoothd] Starting SDP server
@@ -40,20 +41,15 @@ On Sunday 17 of January 2016 11:42:04 Andrey Aleksandrovich wrote:
 > Jan 16 18:52:51 [bluetoothd] Not enough free handles to register service
 > Jan 16 18:52:51 [bluetoothd] Sap driver initialization failed.
 > Jan 16 18:52:51 [bluetoothd] sap-server: Operation not permitted (1)
-
-At least sap-server plugin shouldn't be enabled at all (unless you run it on 
-supported platform ie STE u8500, which you most likely don't). So this is a 
-(quite common it seems) packaging bug.
- 
+>
 > It doesn't affect only me, here is some links:
 > https://bugzilla.redhat.com/show_bug.cgi?id=1259827
 > https://bugs.gentoo.org/show_bug.cgi?id=566004
 > https://bugs.launchpad.net/ubuntu/+source/bluez/+bug/1499858
 > --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
-> in the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+These are deprecated plugins, we will probably be reworking/removing
+them shortly.
 
 -- 
-BR
-Szymon Janc
+Luiz Augusto von Dentz
