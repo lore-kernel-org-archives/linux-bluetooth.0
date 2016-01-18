@@ -1,38 +1,65 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain; charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 9.2 \(3112\))
-Subject: Re: Could example-gatt-server and example-advertisement be folded into one?
-From: Travis Griggs <travisgriggs@gmail.com>
-In-Reply-To: <CABBYNZJd+fdjLnUTfoeFK515shuG=ncPncRo9joYSoY910hktw@mail.gmail.com>
-Date: Mon, 18 Jan 2016 10:32:57 -0800
-Message-Id: <47E3D55F-711F-40D0-B9EB-61EABF4752B0@gmail.com>
-References: <5B92EB78-6761-4617-9186-CC5040532A91@gmail.com> <CABBYNZJd+fdjLnUTfoeFK515shuG=ncPncRo9joYSoY910hktw@mail.gmail.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+From: Szymon Janc <ext.szymon.janc@tieto.com>
+To: Andrey Aleksandrovich <andrey.aleksandrovich@googlemail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: Possibly Bug in recent Bluez
+Date: Mon, 18 Jan 2016 16:03:31 +0100
+Message-ID: <3174796.fSnHrpqxly@leonov>
+In-Reply-To: <1557825.6tL2oa3vnP@leonov>
+References: <CAPGkfYGEjsnkxJS7sM8JjUeZc0nHmsEb42ypx-Mc70+Z4bcvig@mail.gmail.com> <1557825.6tL2oa3vnP@leonov>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi,
 
-> On Jan 17, 2016, at 4:54 AM, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
+On Monday 18 of January 2016 12:40:40 Szymon Janc wrote:
+> Hi,
 > 
-> Hi Travis,
+> On Sunday 17 of January 2016 11:42:04 Andrey Aleksandrovich wrote:
+> > Hi, I have Gentoo Linux, KDE on laptop with Bluetooth.
+> > And I find out that it doesn't working after some time ago.
+> > 
+> > # dmesg | grep 4-1.5
+> > [  475.204004] usb 4-1.5: New USB device found, idVendor=8086,
+> > idProduct=0189 [  475.204014] usb 4-1.5: New USB device strings: Mfr=0,
+> > Product=0, SerialNumber=0
+> > 
+> > # lsusb | grep 009
+> > Bus 004 Device 009: ID 8086:0189 Intel Corp.
+> > 
+> > # cat /var/log/everything/current | grep bluetoothd
+> > Jan 16 18:52:51 [bluetoothd] Bluetooth daemon 5.37
+> > Jan 16 18:52:51 [bluetoothd] Starting SDP server
+> > Jan 16 18:52:51 [bluetoothd] Bluetooth management interface 1.9
+> > initialized
+> > Jan 16 18:52:51 [bluetoothd] Failed to obtain handles for "Service
+> > Changed" characteristic
+> > Jan 16 18:52:51 [bluetoothd] Not enough free handles to register service
+> > Jan 16 18:52:51 [bluetoothd] Error adding Link Loss service
+> > Jan 16 18:52:51 [bluetoothd] Not enough free handles to register service
+> > Jan 16 18:52:51 [bluetoothd] Current Time Service could not be registered
+> > Jan 16 18:52:51 [bluetoothd] gatt-time-server: Input/output error (5)
+> > Jan 16 18:52:51 [bluetoothd] Not enough free handles to register service
+> > Jan 16 18:52:51 [bluetoothd] Sap driver initialization failed.
+> > Jan 16 18:52:51 [bluetoothd] sap-server: Operation not permitted (1)
 > 
-> On Sat, Jan 16, 2016 at 3:10 AM, Travis Griggs <travisgriggs@gmail.com> wrote:
->> Subject mostly asks it all. I’m not asking whether the bluez distributed examples could be folded into one.
->> 
->> I have been able able to build a working BLE interface to my Linux SBC using python to operate as a peripheral. I worked from these two files. Is there any reason I couldn’t weld the two files together into one? Or do they need to be run as two separate processes with two separate mainloops?
->> 
->> I’m really hoping to get any answer, my last few questions went unanswered (which happens), but I’ve begun to wonder if my emails are getting through.
-> 
-> I guess they were done separately just exercise their interfaces, note
-> that you may not want to advertise in the beginning or actually stop
-> advertise if something else happen, e.g. sensor is no longer active,
-> that is why the interfaces are separated. Also note these are just
-> examples, we don't expect anyone using this code in production.
+> At least sap-server plugin shouldn't be enabled at all (unless you run it on
+> supported platform ie STE u8500, which you most likely don't). So this is a
+> (quite common it seems) packaging bug.
 
-Thanks for the reply Luiz. I’ll experiment with refactoring them/merging them some.
+Ahh, it looks like this is enabled by common 'experimental flag.
 
-Can you help me understand your comment about “don’t expect anyone using this code in production.”?
+> > It doesn't affect only me, here is some links:
+> > https://bugzilla.redhat.com/show_bug.cgi?id=1259827
+> > https://bugs.gentoo.org/show_bug.cgi?id=566004
+> > https://bugs.launchpad.net/ubuntu/+source/bluez/+bug/1499858
+> > --
+> > To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
+> > in the body of a message to majordomo@vger.kernel.org
+> > More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-I’m trying to build a device based on an ARM SBC running Debian Linux, that acts as a control point for a guy with a BLE enabled phone. So as long as it’s powered, I want someone to be able to walk up to it and fire up my BLE app on their device and control the things the device does. Based on response from an earlier email, I took the example-gatt-server and example-advertise, made copies, and started modifying/refactoring etc, based on the idea that this was a good starting point to learn how the encouraged method was to write such an app. In some small way, my hope is to use my code in some sort of limited production in the future. In your opinion, am I on the right track? Or does your comment mean I should be doing something different? My own application code on the device is written in python3.
-
-Thanks!
+-- 
+BR
+Szymon Janc
