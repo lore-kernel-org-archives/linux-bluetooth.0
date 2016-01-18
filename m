@@ -1,99 +1,38 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Date: Mon, 18 Jan 2016 17:29:07 -0500
-From: Don Zickus <dzickus@redhat.com>
-To: =?utf-8?Q?=C5=81ukasz?= Rymanowski <lukasz.rymanowski@codecoup.pl>
-Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: example GATT code to talk with a sensortag
-Message-ID: <20160118222907.GA127976@redhat.com>
-References: <20160108222608.GU152924@redhat.com>
- <CABBYNZ+bpQQH6XhM20d62wy5Y-PWw_Vq7_jhriHFmmLvJVHtAg@mail.gmail.com>
- <20160111181454.GZ152924@redhat.com>
- <CABBYNZ+9ETX4zxBWvZL_G6_8WXND0W4rGVPj+6YKyrCOzuUUhQ@mail.gmail.com>
- <20160111222207.GE152924@redhat.com>
- <CAExxLLBApkDFsPE_xbbcsQPq7CMs3a+iM7uSyM3yQzHyf3Fa0Q@mail.gmail.com>
- <20160113150640.GH127976@redhat.com>
- <CAExxLLBo+Aytnztc1BhMjExeThZiG_NDey1JQq37+eknsBv3HA@mail.gmail.com>
-MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-In-Reply-To: <CAExxLLBo+Aytnztc1BhMjExeThZiG_NDey1JQq37+eknsBv3HA@mail.gmail.com>
+Mime-Version: 1.0 (Mac OS X Mail 9.2 \(3112\))
+Subject: Re: Could example-gatt-server and example-advertisement be folded into one?
+From: Travis Griggs <travisgriggs@gmail.com>
+In-Reply-To: <CABBYNZJd+fdjLnUTfoeFK515shuG=ncPncRo9joYSoY910hktw@mail.gmail.com>
+Date: Mon, 18 Jan 2016 10:32:57 -0800
+Message-Id: <47E3D55F-711F-40D0-B9EB-61EABF4752B0@gmail.com>
+References: <5B92EB78-6761-4617-9186-CC5040532A91@gmail.com> <CABBYNZJd+fdjLnUTfoeFK515shuG=ncPncRo9joYSoY910hktw@mail.gmail.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, Jan 13, 2016 at 10:44:02PM +0100, Łukasz Rymanowski wrote:
-> Hi Don,
-> > Did I miss a step or misunderstand your suggestion?
+
+> On Jan 17, 2016, at 4:54 AM, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
 > 
-> You got it well.
-> To be more clear.
-> If your bluetoothd runs with -E option and you connect to BLE device
-> which expose any GATT services, after connect you should see new
-> objects paths. Smth like this:
+> Hi Travis,
 > 
-> a) /org/bluez/hci0/dev_XXXXX/servicexxxx
-> b) /org/bluez/hci0/dev_XXXXX/servicexxxx/charyyyy
-> c) /org/bluez/hci0/dev_XXXXX/servicexxxx/charzzzz
+> On Sat, Jan 16, 2016 at 3:10 AM, Travis Griggs <travisgriggs@gmail.com> wrote:
+>> Subject mostly asks it all. I’m not asking whether the bluez distributed examples could be folded into one.
+>> 
+>> I have been able able to build a working BLE interface to my Linux SBC using python to operate as a peripheral. I worked from these two files. Is there any reason I couldn’t weld the two files together into one? Or do they need to be run as two separate processes with two separate mainloops?
+>> 
+>> I’m really hoping to get any answer, my last few questions went unanswered (which happens), but I’ve begun to wonder if my emails are getting through.
 > 
-> etc.
-> 
-> Inside a) you should see GattService1 and inside b) and c) GattCharacteristic1
-> 
-> Just make sure -E is there and if still not work, provide btmon.log
+> I guess they were done separately just exercise their interfaces, note
+> that you may not want to advertise in the beginning or actually stop
+> advertise if something else happen, e.g. sensor is no longer active,
+> that is why the interfaces are separated. Also note these are just
+> examples, we don't expect anyone using this code in production.
 
-Hi Łukasz,
+Thanks for the reply Luiz. I’ll experiment with refactoring them/merging them some.
 
-Sorry to bother you again.  I am trying to turn what I learned from d-feet
-into something for python.  I can get UUIDs from the GetAll() command, but
-no GattService info.  I then noticed the device is not connected.  So I
-tried connecting it using the Connect() command.  It keeps timing out.
+Can you help me understand your comment about “don’t expect anyone using this code in production.”?
 
-There isn't much fomr btmon, but it looks useful so I attached it below.
-Help?
+I’m trying to build a device based on an ARM SBC running Debian Linux, that acts as a control point for a guy with a BLE enabled phone. So as long as it’s powered, I want someone to be able to walk up to it and fire up my BLE app on their device and control the things the device does. Based on response from an earlier email, I took the example-gatt-server and example-advertise, made copies, and started modifying/refactoring etc, based on the idea that this was a good starting point to learn how the encouraged method was to write such an app. In some small way, my hope is to use my code in some sort of limited production in the future. In your opinion, am I on the right track? Or does your comment mean I should be doing something different? My own application code on the device is written in python3.
 
-I tried doing this under bluetootctl too and had some strange timeout
-requests.  When I execute 'connect xx:xx:xx', it seems to connect, start
-dumping info, then disconnects with an error/timeout.
-
-Cheers,
-Don
-
-python snippet..
-
-    service = bus.get_object(BLUEZ_SERVICE_NAME, "/org/bluez/hci0/dev_68_C9_0B_06_FA_8A")
-    service.Connect(dbus_interface="org.bluez.Device1")
-    service_props = service.GetAll("org.bluez.Device1", dbus_interface=DBUS_PROP_IFACE)
-
-
-btmon output
-
-
-< HCI Command: LE Set Scan Parameters (0x08|0x000b) plen 7 [hci0] 374.345329
-        Type: Passive (0x00)
-        Interval: 60.000 msec (0x0060)
-        Window: 30.000 msec (0x0030)
-        Own address type: Public (0x00)
-        Filter policy: Ignore not in white list (0x01)
-> HCI Event: Command Complete (0x0e) plen 4  [hci0] 374.346096
-      LE Set Scan Parameters (0x08|0x000b) ncmd 1
-        Status: Success (0x00)
-< HCI Command: LE Set Scan Enable (0x08|0x000c) plen 2 [hci0] 374.346190
-        Scanning: Enabled (0x01)
-        Filter duplicates: Enabled (0x01)
-> HCI Event: Command Complete (0x0e) plen 4  [hci0] 374.347102
-      LE Set Scan Enable (0x08|0x000c) ncmd 1
-        Status: Success (0x00)
-< HCI Command: LE Set Scan Enable (0x08|0x000c) plen 2 [hci0] 414.345224
-        Scanning: Disabled (0x00)
-        Filter duplicates: Disabled (0x00)
-> HCI Event: Command Complete (0x0e) plen 4  [hci0] 414.347154
-      LE Set Scan Enable (0x08|0x000c) ncmd 1
-        Status: Success (0x00)
-
-python failure message:
-
-
-Did not receive a reply. Possible causes include: the remote application did
-not send a reply, the message bus security policy blocked the reply, the
-reply timeout expired, or the network connection was broken.
-
-
+Thanks!
