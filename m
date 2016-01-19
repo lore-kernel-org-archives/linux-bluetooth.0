@@ -1,48 +1,34 @@
-Return-Path: <johan.hedberg@gmail.com>
-Date: Tue, 19 Jan 2016 14:04:04 +0100
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Fugang Duan <b38611@freescale.com>
-Cc: gustavo@padovan.org, marcel@holtmann.org,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: add hdev check to avoid passing null pointer
-Message-ID: <20160119130404.GA27411@t440s.ice.intel.com>
-References: <1453199661-7918-1-git-send-email-b38611@freescale.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1453199661-7918-1-git-send-email-b38611@freescale.com>
+Date: Tue, 19 Jan 2016 20:06:46 +0800
+Message-ID: <CANyK0Sk1y1Sv=RCh+Zp3dRWtSi3AXc=_63PYU_nSOqD3bJ=2Jg@mail.gmail.com>
+Subject: Question about AVRCP and MediaPlayer API
+From: Hsin-yu Chao <hychao@chromium.org>
+To: BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Fuang,
+Hi,
+I am working on AVRCP for Chromium OS using MediaPlayer dbus API and
+noticed a problem while testing the media buttons on various BT
+speaker/headsets. In profile/audio/avrcp.c there is a check for
+supported feature before an avrcp_player is created:
 
-On Tue, Jan 19, 2016, Fugang Duan wrote:
-> Function hci_mgmt_cmd() may pass hdev with null pointer to hci_mgmt_handler->func()
-> like below code:
-> 	err = handler->func(sk, hdev, cp, len);
-> 
-> Add hdev check to avoid passing null pointer.
-> 
-> Signed-off-by: Fugang Duan <B38611@freescale.com>
-> ---
->  net/bluetooth/hci_sock.c | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
-> index 1298d72..7fdfc80 100644
-> --- a/net/bluetooth/hci_sock.c
-> +++ b/net/bluetooth/hci_sock.c
-> @@ -1186,6 +1186,8 @@ static int hci_mgmt_cmd(struct hci_mgmt_chan *chan, struct sock *sk,
->  
->  	if (hdev && chan->hdev_init)
->  		chan->hdev_init(sk, hdev);
-> +	else if (!hdev)
-> +		goto done;
->  
->  	cp = buf + sizeof(*hdr);
+/* Only create player if category 1 is supported */
+if (!(controller->features & AVRCP_FEATURE_CATEGORY_1))
+        return;
 
-Nack. There are handlers which are not hci-dev specific, such as reading
-version number, supported commands, or the index list. There's a special
-flag HCI_MGMT_NO_HDEV that handlers can set to say that they expect to
-be called without a hdev. The code in hci_mgmt_cmd() already makes sure
-that any handler that doesn't set it will not be called with NULL hdev.
+The SDP record of my BT speaker has feature ==
+AVRCP_FEATURE_CATEGORY_2 (monitor/amplifier). My understanding is that
+this feature is associated with volume changed event and
+SetAbsoluteVolume command.
+But with this check, volume changed events are unable to pass up to
+registered player app in my case. I tried commented out these few
+lines and rebuild bluetoothd, after that volume change events works
+perfect.
 
-Johan
+What is the reason to create player only when it supports category 1 feature?
+
+Thanks,
+Hsin-yu
