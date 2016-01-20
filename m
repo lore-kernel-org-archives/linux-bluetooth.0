@@ -1,37 +1,52 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Ad Zeevaarders <ad.zeevaarders@veynex.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Enabling indications/notifications results in wrong sequence of
- events.
-Date: Wed, 20 Jan 2016 13:32:56 +0000
-Message-ID: <AM3PR01MB2118217F9817B710F197FACF9C20@AM3PR01MB211.eurprd01.prod.exchangelabs.com>
-Content-Type: text/plain; charset=US-ASCII
 MIME-Version: 1.0
+In-Reply-To: <CANyK0Sk1y1Sv=RCh+Zp3dRWtSi3AXc=_63PYU_nSOqD3bJ=2Jg@mail.gmail.com>
+References: <CANyK0Sk1y1Sv=RCh+Zp3dRWtSi3AXc=_63PYU_nSOqD3bJ=2Jg@mail.gmail.com>
+Date: Wed, 20 Jan 2016 17:59:12 +0200
+Message-ID: <CABBYNZKhFZbjP9Ybnj79RTuKKf+1NXH9xJxmAQNDwuZOKPgi0A@mail.gmail.com>
+Subject: Re: Question about AVRCP and MediaPlayer API
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Hsin-yu Chao <hychao@chromium.org>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Hsin-yu,
+
+On Tue, Jan 19, 2016 at 2:06 PM, Hsin-yu Chao <hychao@chromium.org> wrote:
+> Hi,
+> I am working on AVRCP for Chromium OS using MediaPlayer dbus API and
+> noticed a problem while testing the media buttons on various BT
+> speaker/headsets. In profile/audio/avrcp.c there is a check for
+> supported feature before an avrcp_player is created:
+>
+> /* Only create player if category 1 is supported */
+> if (!(controller->features & AVRCP_FEATURE_CATEGORY_1))
+>         return;
+
+Category 1 is player category thus why we check it.
+
+> The SDP record of my BT speaker has feature ==
+> AVRCP_FEATURE_CATEGORY_2 (monitor/amplifier). My understanding is that
+> this feature is associated with volume changed event and
+> SetAbsoluteVolume command.
+
+And GetCapabilities as well since otherwise we cannot subscribe to
+volume changes.
+
+> But with this check, volume changed events are unable to pass up to
+> registered player app in my case. I tried commented out these few
+> lines and rebuild bluetoothd, after that volume change events works
+> perfect.
+>
+> What is the reason to create player only when it supports category 1 feature?
+
+I don't recall now but I guess all the headset we encountered had this
+feature bit set, note that this is the category of a target record but
+perhaps it is valid after all. Btw, is this a BT Speaker of yours a
+device on the market already?
 
 
-Hello everyone,
-
-When using some code from btgatt-client.c for a project of mine, I found that when enabling a value indication/notification on a certain characteristic of a peripheral device I have (Blood pressure meter) the order of events is not linear. I'm using the MGMT API in combination with l2cap sockets and am using btgatt-client.c and btmgmt.c as references. At first I thought it was a problem with my own code, but running the vanilla btgatt-client I found out that:
-
-When enabling notifications, two callbacks are given to the bt_gatt_register_notify method, one to report back if the notification succeeded, and the other one to catch values emitted by the peripheral. The expected order of the callbacks being called is 
-1. Notifications/indications success
-2. Value A received 
-3.Value B received and so on. 
-
-However, the order is actually: 
-
-1. Value A received
-2. Notifications/indications success
-3. Value A received again
-4. Value B received and so on.
-
-My own program starts notifications as soon as GATT Service Discovery is completed. (It calls a StartNotifications method from within that callback actually) and that is also why normal use of btgatt-client does not surface this possible bug; after GATT Service Discovery is completed the user will be prompted for a command again. When I changed some code in btgatt-client.c to immediately start notifications on a characteristic as soon as the GATT Service Discovery completed callback or "ready_cb" was called it exhibited the behavior.
-
-I hope I have been clear and readers will be able to reproduce the error, please let me know what you think.
-
-Thanks for your time and best regards,
-
-Ad Zeevaarders
+-- 
+Luiz Augusto von Dentz
