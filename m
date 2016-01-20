@@ -1,40 +1,63 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain; charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 9.2 \(3112\))
-Subject: Re: Preferred way to set name of device?
-From: Travis Griggs <travisgriggs@gmail.com>
-In-Reply-To: <CAPyD+=AmV4ZeA4+kvyA4RiA_HkWKEir5MfXzt7R3AoPEvRhx5A@mail.gmail.com>
-Date: Wed, 20 Jan 2016 12:00:38 -0800
-Message-Id: <E7C6ACF6-B4A4-4B85-AAC0-0AB257E84D80@gmail.com>
-References: <75A0596B-E431-46F2-8906-E14839E46A57@gmail.com> <CAPyD+=AmV4ZeA4+kvyA4RiA_HkWKEir5MfXzt7R3AoPEvRhx5A@mail.gmail.com>
-To: linux-bluetooth@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <AM3PR01MB2118217F9817B710F197FACF9C20@AM3PR01MB211.eurprd01.prod.exchangelabs.com>
+References: <AM3PR01MB2118217F9817B710F197FACF9C20@AM3PR01MB211.eurprd01.prod.exchangelabs.com>
+Date: Wed, 20 Jan 2016 20:10:48 +0200
+Message-ID: <CABBYNZJQa5XWLF7ahTgwQk8JNw6Hvcs6GuWRMXj_zLGNYCONKA@mail.gmail.com>
+Subject: Re: Enabling indications/notifications results in wrong sequence of events.
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Ad Zeevaarders <ad.zeevaarders@veynex.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi,
 
-> On Jan 19, 2016, at 2:33 PM, Othman, Ossama <ossama.othman@intel.com> wrote:
-> 
-> Hi,
-> 
-> On Tue, Jan 19, 2016 at 11:39 AM, Travis Griggs <travisgriggs@gmail.com> wrote:
->> I’m intersted in setting the name of my device, when I’m acting as a BLE Peripheral. I see at least two, maybe three, ways to do it:
->> 
->> 1) Set the `Name=` line near the top of /etc/bluetooth/main.conf
->> 2) Use hciconfig hc0 name FooBar
->> 3) Maybe something with the dbus interface?
->> 
->> So I’m curious which is the preferred/idiomatic way? In particular for my use case as a BLE Peripheral.
->> 
->> I’ve discovered the following issues already:
->> 
->> 1) If I use main.conf, that will be tricky, because I’d like to set the name based on dynamic information computed by the device in startup (serial number from an attached piece of equipment). So I’d have to modify the file after I have gotten that information, and then restart the service. Not undoable, but far from elegant.
->> 2) Though hciconfig will show back the name set, it doesn’t seem to actually show up when I scan.
->> 3) Not sure how I figure out what the dbus interface is. Is this documented anywhere? Or does one just explore and guess with tools? Maybe it’s too early in the experimental phase to really document?
-> 
-> I'm not sure of the preferred way, but I believe the D-Bus interface
-> you want is the "Alias" property in the org.bluez.Adapter1 interace:
-> 
-> http://git.kernel.org/cgit/bluetooth/bluez.git/tree/doc/adapter-api.txt#n119
+On Wed, Jan 20, 2016 at 3:32 PM, Ad Zeevaarders
+<ad.zeevaarders@veynex.com> wrote:
+>
+>
+> Hello everyone,
+>
+> When using some code from btgatt-client.c for a project of mine, I found that when enabling a value indication/notification on a certain characteristic of a peripheral device I have (Blood pressure meter) the order of events is not linear. I'm using the MGMT API in combination with l2cap sockets and am using btgatt-client.c and btmgmt.c as references. At first I thought it was a problem with my own code, but running the vanilla btgatt-client I found out that:
+>
+> When enabling notifications, two callbacks are given to the bt_gatt_register_notify method, one to report back if the notification succeeded, and the other one to catch values emitted by the peripheral. The expected order of the callbacks being called is
+> 1. Notifications/indications success
+> 2. Value A received
+> 3.Value B received and so on.
+>
+> However, the order is actually:
+>
+> 1. Value A received
+> 2. Notifications/indications success
+> 3. Value A received again
+> 4. Value B received and so on.
 
-It helped a lot, thank you. And now I have a link to all of the other DBus api descriptions too.
+Do you have the HCI trace to back this up, I wouldn't be surprise the
+value arrive before the notification response, in which we can
+probably just assume the write to CCC succeeded anyway.
 
+> My own program starts notifications as soon as GATT Service Discovery is completed. (It calls a StartNotifications method from within that callback actually) and that is also why normal use of btgatt-client does not surface this possible bug; after GATT Service Discovery is completed the user will be prompted for a command again. When I changed some code in btgatt-client.c to immediately start notifications on a characteristic as soon as the GATT Service Discovery completed callback or "ready_cb" was called it exhibited the behavior.
+
+You mean you start notifying before the CCC is written? Well that
+explain the sequence above, I guess then it makes sense to assume CCC
+write has been accepted otherwise if we don't invoke the callback the
+value would be lost. Also note in practice 'blind' notifies might be
+discarded so this would just consume power transmitting data that the
+remote don't care.
+
+>
+> I hope I have been clear and readers will be able to reproduce the error, please let me know what you think.
+>
+> Thanks for your time and best regards,
+>
+> Ad Zeevaarders--
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
+-- 
+Luiz Augusto von Dentz
