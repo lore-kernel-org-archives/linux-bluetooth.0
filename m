@@ -1,42 +1,54 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 9.2 \(3112\))
-Subject: Re: Bluetooth Qualcomm Atheros QCA9565 / AR9565 [168c:0036] not recognized
+Subject: Re: Possibly Bug in recent Bluez
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <56970229.4020703@live.com>
-Date: Thu, 21 Jan 2016 12:16:55 +0100
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Message-Id: <1556EAE0-AC3B-4FA3-88AD-A1DDED950664@holtmann.org>
-References: <56970229.4020703@live.com>
-To: Leonardo Marques Rodrigues <leo.mrodrigues@live.com>
+In-Reply-To: <3174796.fSnHrpqxly@leonov>
+Date: Thu, 21 Jan 2016 12:14:55 +0100
+Cc: Andrey Aleksandrovich <andrey.aleksandrovich@googlemail.com>,
+	linux-bluetooth@vger.kernel.org
+Message-Id: <88234527-FE7E-44D6-A57F-29927CBF6340@holtmann.org>
+References: <CAPGkfYGEjsnkxJS7sM8JjUeZc0nHmsEb42ypx-Mc70+Z4bcvig@mail.gmail.com> <1557825.6tL2oa3vnP@leonov> <3174796.fSnHrpqxly@leonov>
+To: Szymon Janc <ext.szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Leonardo,
+Hi Szymon,
 
-> I have installed Ubuntu 14.04 on my Acer Aspire E5-573G, and the bluetooth was not recognized, but wifi is working perfectly. I make tests from  kernel 3.19 - 4.4-rc8 and this occurred on all tests.
+>>> Hi, I have Gentoo Linux, KDE on laptop with Bluetooth.
+>>> And I find out that it doesn't working after some time ago.
+>>> 
+>>> # dmesg | grep 4-1.5
+>>> [  475.204004] usb 4-1.5: New USB device found, idVendor=8086,
+>>> idProduct=0189 [  475.204014] usb 4-1.5: New USB device strings: Mfr=0,
+>>> Product=0, SerialNumber=0
+>>> 
+>>> # lsusb | grep 009
+>>> Bus 004 Device 009: ID 8086:0189 Intel Corp.
+>>> 
+>>> # cat /var/log/everything/current | grep bluetoothd
+>>> Jan 16 18:52:51 [bluetoothd] Bluetooth daemon 5.37
+>>> Jan 16 18:52:51 [bluetoothd] Starting SDP server
+>>> Jan 16 18:52:51 [bluetoothd] Bluetooth management interface 1.9
+>>> initialized
+>>> Jan 16 18:52:51 [bluetoothd] Failed to obtain handles for "Service
+>>> Changed" characteristic
+>>> Jan 16 18:52:51 [bluetoothd] Not enough free handles to register service
+>>> Jan 16 18:52:51 [bluetoothd] Error adding Link Loss service
+>>> Jan 16 18:52:51 [bluetoothd] Not enough free handles to register service
+>>> Jan 16 18:52:51 [bluetoothd] Current Time Service could not be registered
+>>> Jan 16 18:52:51 [bluetoothd] gatt-time-server: Input/output error (5)
+>>> Jan 16 18:52:51 [bluetoothd] Not enough free handles to register service
+>>> Jan 16 18:52:51 [bluetoothd] Sap driver initialization failed.
+>>> Jan 16 18:52:51 [bluetoothd] sap-server: Operation not permitted (1)
+>> 
+>> At least sap-server plugin shouldn't be enabled at all (unless you run it on
+>> supported platform ie STE u8500, which you most likely don't). So this is a
+>> (quite common it seems) packaging bug.
 > 
-> I did a bug report on  https://bugs.launchpad.net/ubuntu/+source/linux/+bug/1532267 and I was instructed to report here.
-> 
-> Thank you for your attention.
-> 
-> Below I send some results:
-> 
-> --------------------------------------------------------------------------------------------------------
-> cat /proc/version:
-> 
-> Linux version 4.4.0-040400-generic (kernel@gomeisa) (gcc version 5.2.1 20151010 (Ubuntu 5.2.1-22ubuntu2) ) #201601101930 SMP Mon Jan 11 00:32:41 UTC 2016
-> 
-> --------------------------------------------------------------------------------------------------------
-> 
-> sh ver_linux:
-> 
-> If some fields are empty or look unusual you may have an old version.
-> Compare to the current minimal requirements in Documentation/Changes.
->  
-> Linux thor 4.4.0-040400-generic #201601101930 SMP Mon Jan 11 00:32:41 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+> Ahh, it looks like this is enabled by common 'experimental flag.
 
-so where is this module support to sit on in the first place. PCI, USB, SDIO or UART?
+is anybody using this feature any more? Or can we just get rid of it?
 
 Regards
 
