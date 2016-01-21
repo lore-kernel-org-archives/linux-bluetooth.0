@@ -1,38 +1,33 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 9.2 \(3112\))
-Subject: Re: Preferred way to set name of device?
+Subject: Re: Creating a separate event node for each device composite
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <75A0596B-E431-46F2-8906-E14839E46A57@gmail.com>
-Date: Thu, 21 Jan 2016 12:07:41 +0100
+In-Reply-To: <CAKafyqrZNx9RPznO3Skon3hzV=AnXSuP4v0nucuS2mESpxdoEw@mail.gmail.com>
+Date: Thu, 21 Jan 2016 12:05:40 +0100
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <39D83547-62A5-4FF2-B260-DFCFB7F08A38@holtmann.org>
-References: <75A0596B-E431-46F2-8906-E14839E46A57@gmail.com>
-To: Travis Griggs <travisgriggs@gmail.com>
+Message-Id: <08F5A725-03E6-4A4B-BE5D-0820AA520C03@holtmann.org>
+References: <CAKafyqrZNx9RPznO3Skon3hzV=AnXSuP4v0nucuS2mESpxdoEw@mail.gmail.com>
+To: Prabhu Chawandi <foss.chaws@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Travis,
+Hi Prabhu,
 
-> I’m intersted in setting the name of my device, when I’m acting as a BLE Peripheral. I see at least two, maybe three, ways to do it:
+>  Is it possible to make Linux to create a separate /dev/input/eventX
+> node for all the device composited ?
 > 
-> 1) Set the `Name=` line near the top of /etc/bluetooth/main.conf
-> 2) Use hciconfig hc0 name FooBar
-> 3) Maybe something with the dbus interface?
+> Example: if my device is supporting Mouse, KBD and Consumer
 > 
-> So I’m curious which is the preferred/idiomatic way? In particular for my use case as a BLE Peripheral.
+> if I want to create three event nodes for each, like /dev/input/event1
+> /dev/input/event2 /dev/input/event3.
 > 
-> I’ve discovered the following issues already:
-> 
-> 1) If I use main.conf, that will be tricky, because I’d like to set the name based on dynamic information computed by the device in startup (serial number from an attached piece of equipment). So I’d have to modify the file after I have gotten that information, and then restart the service. Not undoable, but far from elegant.
-> 2) Though hciconfig will show back the name set, it doesn’t seem to actually show up when I scan.
-> 3) Not sure how I figure out what the dbus interface is. Is this documented anywhere? Or does one just explore and guess with tools? Maybe it’s too early in the experimental phase to really document?
+> is it allowed in BT HIDP ? Please help me to understand..
 
-if you are actually more into the BLE space, then the LE Advertising D-Bus API is something you might want to look into. With a recent kernel and recent BlueZ, you can build your own advertising reports and include more dynamic naming if you want to.
-
-Otherwise there is also a plugin mechanism for setting the device name. That is a preferred one and for example on a system running systemd-hostnamed it will take the device name from there. You could write your own plugin.
+that is more a question for linux-input since it is HID related. Bluetooth is just transporting the HID reports. It is not interpreting them or creating the actually input devices.
 
 Regards
 
 Marcel
+
 
