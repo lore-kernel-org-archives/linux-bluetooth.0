@@ -1,33 +1,25 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 9.2 \(3112\))
-Subject: Re: Creating a separate event node for each device composite
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CAKafyqrZNx9RPznO3Skon3hzV=AnXSuP4v0nucuS2mESpxdoEw@mail.gmail.com>
-Date: Thu, 21 Jan 2016 12:05:40 +0100
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <08F5A725-03E6-4A4B-BE5D-0820AA520C03@holtmann.org>
-References: <CAKafyqrZNx9RPznO3Skon3hzV=AnXSuP4v0nucuS2mESpxdoEw@mail.gmail.com>
-To: Prabhu Chawandi <foss.chaws@gmail.com>
+MIME-Version: 1.0
+Date: Thu, 21 Jan 2016 16:33:58 +0530
+Message-ID: <CAKafyqrZNx9RPznO3Skon3hzV=AnXSuP4v0nucuS2mESpxdoEw@mail.gmail.com>
+Subject: Creating a separate event node for each device composite
+From: Prabhu Chawandi <foss.chaws@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Prabhu,
+Hi,
 
->  Is it possible to make Linux to create a separate /dev/input/eventX
-> node for all the device composited ?
-> 
-> Example: if my device is supporting Mouse, KBD and Consumer
-> 
-> if I want to create three event nodes for each, like /dev/input/event1
-> /dev/input/event2 /dev/input/event3.
-> 
-> is it allowed in BT HIDP ? Please help me to understand..
+  Is it possible to make Linux to create a separate /dev/input/eventX
+node for all the device composited ?
 
-that is more a question for linux-input since it is HID related. Bluetooth is just transporting the HID reports. It is not interpreting them or creating the actually input devices.
+Example: if my device is supporting Mouse, KBD and Consumer
 
-Regards
+if I want to create three event nodes for each, like /dev/input/event1
+/dev/input/event2 /dev/input/event3.
 
-Marcel
+is it allowed in BT HIDP ? Please help me to understand..
 
-
+thanks in advance.
+Prabhu Chawandi
