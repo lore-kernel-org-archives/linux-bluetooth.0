@@ -1,45 +1,36 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Mime-Version: 1.0 (Mac OS X Mail 9.2 \(3112\))
-Subject: Re: [BUG] Btattach, ioctl fails to set flags from 32-bit user space to 64-bit
+Subject: Re: Preferred way to set name of device?
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CAA+NYvTV6WybKuO71Gehm6L2-vjsqVhmu5VjEQCfqFaWi1TU6Q@mail.gmail.com>
-Date: Thu, 21 Jan 2016 12:12:46 +0100
+In-Reply-To: <75A0596B-E431-46F2-8906-E14839E46A57@gmail.com>
+Date: Thu, 21 Jan 2016 12:07:41 +0100
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <C72941BE-7F8A-4CD7-900E-5E8E6E42FD63@holtmann.org>
-References: <CAA+NYvTV6WybKuO71Gehm6L2-vjsqVhmu5VjEQCfqFaWi1TU6Q@mail.gmail.com>
-To: Jaap Jan Meijer <jjmeijer88@gmail.com>
+Message-Id: <39D83547-62A5-4FF2-B260-DFCFB7F08A38@holtmann.org>
+References: <75A0596B-E431-46F2-8906-E14839E46A57@gmail.com>
+To: Travis Griggs <travisgriggs@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jaap,
+Hi Travis,
 
-> WIth Btattach, ioctl fails to set flags from 32-bit user space to 64-bit
-> kernel. ioctl fails with ENOTTY.
+> I’m intersted in setting the name of my device, when I’m acting as a BLE Peripheral. I see at least two, maybe three, ways to do it:
 > 
-> static int attach_proto(const char *path, unsigned int proto,
-> unsigned int flags)
-> {
-> int fd, dev_id;
+> 1) Set the `Name=` line near the top of /etc/bluetooth/main.conf
+> 2) Use hciconfig hc0 name FooBar
+> 3) Maybe something with the dbus interface?
 > 
-> fd = open_serial(path);
-> if (fd < 0)
-> return -1;
+> So I’m curious which is the preferred/idiomatic way? In particular for my use case as a BLE Peripheral.
 > 
-> if (ioctl(fd, HCIUARTSETFLAGS, flags) < 0) {
-> perror("Failed to set flags");
-> close(fd);
-> return -1;
-> }
-> .....
+> I’ve discovered the following issues already:
+> 
+> 1) If I use main.conf, that will be tricky, because I’d like to set the name based on dynamic information computed by the device in startup (serial number from an attached piece of equipment). So I’d have to modify the file after I have gotten that information, and then restart the service. Not undoable, but far from elegant.
+> 2) Though hciconfig will show back the name set, it doesn’t seem to actually show up when I scan.
+> 3) Not sure how I figure out what the dbus interface is. Is this documented anywhere? Or does one just explore and guess with tools? Maybe it’s too early in the experimental phase to really document?
 
-I am a little bit lost on how you get ENOTTY. The only way I can see this happening if the kernel falls through towards n_tty_ioctl_helper and that means that cmd is messed up.
+if you are actually more into the BLE space, then the LE Advertising D-Bus API is something you might want to look into. With a recent kernel and recent BlueZ, you can build your own advertising reports and include more dynamic naming if you want to.
 
-If you go into drivers/bluetooth/hci_ldisc.c and add this line
-
-	hci_uart_ldisc.compat_ioctl = hci_uart_tty_ioctl;
-
-it might fix it. It is a guess right now until you figure out where the ENOTTY is coming from.
+Otherwise there is also a plugin mechanism for setting the device name. That is a preferred one and for example on a system running systemd-hostnamed it will take the device name from there. You could write your own plugin.
 
 Regards
 
