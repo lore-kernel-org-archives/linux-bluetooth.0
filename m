@@ -1,67 +1,54 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <CANyK0S=Yr8TD+db7k4Yr2rRYAYofhDnZajYr6jZt+zzzLBwSxw@mail.gmail.com>
-References: <CANyK0Sk1y1Sv=RCh+Zp3dRWtSi3AXc=_63PYU_nSOqD3bJ=2Jg@mail.gmail.com>
-	<CABBYNZKhFZbjP9Ybnj79RTuKKf+1NXH9xJxmAQNDwuZOKPgi0A@mail.gmail.com>
-	<CANyK0S=Yr8TD+db7k4Yr2rRYAYofhDnZajYr6jZt+zzzLBwSxw@mail.gmail.com>
-Date: Thu, 21 Jan 2016 13:29:03 +0200
-Message-ID: <CABBYNZKXTeHxwThOmZgadMo6JEB0GRYKCs3LV9LpiQH6yPRbdA@mail.gmail.com>
-Subject: Re: Question about AVRCP and MediaPlayer API
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Hsin-yu Chao <hychao@chromium.org>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <netdev-owner@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 9.2 \(3112\))
+Subject: Re: Bluetooth: WARNING: CPU: 1 PID: 25657 at include/net/sock.h:586 bt_sock_unlink+0x1c7/0x220()
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <5692B746.4050007@oracle.com>
+Date: Thu, 21 Jan 2016 12:19:58 +0100
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-bluetooth@vger.kernel.org,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	LKML <linux-kernel@vger.kernel.org>
+Message-Id: <90527994-751A-4BA4-93D4-63CEE4C40E6E@holtmann.org>
+References: <5692B746.4050007@oracle.com>
+To: Sasha Levin <sasha.levin@oracle.com>
+Sender: netdev-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Hsin-yu,
+Hi Sasha,
 
-On Thu, Jan 21, 2016 at 9:52 AM, Hsin-yu Chao <hychao@chromium.org> wrote:
-> Hi Luiz,
-> Thanks for the comments. I am testing with this UE-mini Boom speaker.
-> http://the-gadgeteer.com/2013/11/22/ue-mini-boom-portable-bluetooth-speaker-review/
->
-> This BT speaker has two buttons 'Volume Up' and 'Volume Down', but
-> lack of player related buttons, like next/prev track,
-> shuffle/play/pause.  I think that is why it advertised to support only
-> category 2 feature.
+> While fuzzing with trinity inside a KVM tools guest, running the latest -next
+> kernel, I've hit the following warning:
+> 
+> [ 1153.249127] WARNING: CPU: 1 PID: 25657 at include/net/sock.h:586 bt_sock_unlink+0x1c7/0x220()
+> [ 1153.250162] Modules linked in:
+> [ 1153.250996] CPU: 1 PID: 25657 Comm: trinity-c223 Tainted: G        W       4.4.0-rc8-next-20160108-sasha-00024-gaaecb9a #2780
+> [ 1153.252551]  1ffff100184f5f00 0000000015bfc733 ffff8800c27af880 ffffffff8301a182
+> [ 1153.253594]  0000000041b58ab3 ffffffff8e1b3838 ffffffff8301a0b7 0000000015bfc733
+> [ 1153.254857]  ffffffff8177f4c7 0000000015bfc733 ffff8801d16eb000 0000000000000001
+> [ 1153.272107] Call Trace:
+> [ 1153.272568] dump_stack (lib/dump_stack.c:52)
+> [ 1153.274909] warn_slowpath_common (kernel/panic.c:484)
+> [ 1153.276544] warn_slowpath_null (kernel/panic.c:518)
+> [ 1153.277341] bt_sock_unlink (./arch/x86/include/asm/atomic.h:103 include/net/sock.h:577 include/net/sock.h:587 net/bluetooth/af_bluetooth.c:148)
+> [ 1153.280581] hidp_sock_release (include/net/sock.h:1546 net/bluetooth/hidp/sock.c:43)
+> [ 1153.281435] sock_release (net/socket.c:573)
+> [ 1153.282145] sock_close (net/socket.c:1025)
+> [ 1153.282874] __fput (fs/file_table.c:209)
+> [ 1153.283581] ____fput (fs/file_table.c:245)
+> [ 1153.296361] task_work_run (kernel/task_work.c:117 (discriminator 1))
+> [ 1153.297090] do_exit (kernel/exit.c:749)
+> [ 1153.302756] do_group_exit (kernel/exit.c:862)
+> [ 1153.303523] get_signal (kernel/signal.c:2307)
+> [ 1153.307151] do_signal (arch/x86/kernel/signal.c:781)
+> [ 1153.322592] exit_to_usermode_loop (arch/x86/entry/common.c:249)
+> [ 1153.323416] syscall_return_slowpath (./arch/x86/include/asm/jump_label.h:35 include/linux/context_tracking_state.h:30 include/linux/context_tracking.h:24 arch/x86/entry/common.c:284 arch/x86/entry/common.c:344)
+> [ 1153.324276] int_ret_from_sys_call (arch/x86/entry/entry_64.S:282)
 
-Yep, this might explain why we haven't seem this before.
+do you have a trinity command line that will reproduce this?
 
-> Looking at audio/avrcp.c, set_volume is one of the avrcp_player_cb
-> callback functions, plus that avrcp_volume_changed() checks for the
-> existence of an avrcp_player struct before handling the event. Seems
-> that avrcp_player structure is designed to cover both category 1 and
-> category 2 features. Maybe we should change the condition to if
-> (!(controller->features & (AVRCP_FEATURE_CATEGORY_1 |
-> AVRCP_FEATURE_CATEGORY_2))) instead?  So that the set volume cmd and
-> volume change event can work correctly on those peripherals who has
-> volume button only.
+Regards
 
-Yep, this might work, we could also create the player object but not
-the D-Bus interface which I think for the original idea so application
-would not have the false impression there is a player in the other end
-so something like this should work:
-
-diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
-index 7b60012..076766d 100644
---- a/profiles/audio/avrcp.c
-+++ b/profiles/audio/avrcp.c
-@@ -3843,12 +3843,11 @@ static void controller_init(struct avrcp *session)
-        btd_service_connecting_complete(service, 0);
-
-        /* Only create player if category 1 is supported */
--       if (!(controller->features & AVRCP_FEATURE_CATEGORY_1))
--               return;
--
--       player = create_ct_player(session, 0);
--       if (player == NULL)
--               return;
-+       if (controller->features & AVRCP_FEATURE_CATEGORY_1) {
-+               player = create_ct_player(session, 0);
-+               if (player == NULL)
-+                       return;
-+       }
-
-        if (controller->version < 0x0103)
-                return;
+Marcel
