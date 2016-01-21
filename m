@@ -1,33 +1,62 @@
 Return-Path: <jjmeijer88@gmail.com>
-From: "J.J. Meijer" <jjmeijer88@gmail.com>
-To: marcel@holtmann.org
-Cc: linux-bluetooth@vger.kernel.org,
-	meijjaa <jjmeijer88@gmail.com>
-Subject: [PATCH] Fix failing ioctl set flags from x86 user space to x64 kernel
-Date: Thu, 21 Jan 2016 22:38:38 +0100
-Message-Id: <1453412318-31325-1-git-send-email-jjmeijer88@gmail.com>
-In-Reply-To: <[BUG] Btattach, ioctl fails to set flags from 32-bit user space to 64-bit>
-References: <[BUG] Btattach, ioctl fails to set flags from 32-bit user space to 64-bit>
+MIME-Version: 1.0
+In-Reply-To: <C72941BE-7F8A-4CD7-900E-5E8E6E42FD63@holtmann.org>
+References: <CAA+NYvTV6WybKuO71Gehm6L2-vjsqVhmu5VjEQCfqFaWi1TU6Q@mail.gmail.com>
+ <C72941BE-7F8A-4CD7-900E-5E8E6E42FD63@holtmann.org>
+From: Jaap Jan Meijer <jjmeijer88@gmail.com>
+Date: Thu, 21 Jan 2016 22:38:04 +0100
+Message-ID: <CAA+NYvRGebocnnYjdy2wLQkqsPT+WiNUE4trOS0zbL547Uar-w@mail.gmail.com>
+Subject: Re: [BUG] Btattach, ioctl fails to set flags from 32-bit user space
+ to 64-bit
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: meijjaa <jjmeijer88@gmail.com>
+Hi Marcel,
 
-Signed-off-by: meijjaa <jjmeijer88@gmail.com>
----
- drivers/bluetooth/hci_ldisc.c | 1 +
- 1 file changed, 1 insertion(+)
+Thank you, that was very good guess work. Btattach is now able to
+attach by bcm43241 in the mixed arch situation. Should I supply a
+patch or will you just add it? I'll will send-email a patch anyway.
 
-diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
-index 96bcec5..c0eeda0 100644
---- a/drivers/bluetooth/hci_ldisc.c
-+++ b/drivers/bluetooth/hci_ldisc.c
-@@ -774,6 +774,7 @@ static int __init hci_uart_init(void)
- 	hci_uart_ldisc.read		= hci_uart_tty_read;
- 	hci_uart_ldisc.write		= hci_uart_tty_write;
- 	hci_uart_ldisc.ioctl		= hci_uart_tty_ioctl;
-+	hci_uart_ldisc.compat_ioctl	= hci_uart_tty_ioctl;
- 	hci_uart_ldisc.poll		= hci_uart_tty_poll;
- 	hci_uart_ldisc.receive_buf	= hci_uart_tty_receive;
- 	hci_uart_ldisc.write_wakeup	= hci_uart_tty_wakeup;
--- 
-2.7.0
+Kind regards,
+
+J.J.
+
+
+
+
+2016-01-21 12:12 GMT+01:00 Marcel Holtmann <marcel@holtmann.org>:
+> Hi Jaap,
+>
+>> WIth Btattach, ioctl fails to set flags from 32-bit user space to 64-bit
+>> kernel. ioctl fails with ENOTTY.
+>>
+>> static int attach_proto(const char *path, unsigned int proto,
+>> unsigned int flags)
+>> {
+>> int fd, dev_id;
+>>
+>> fd = open_serial(path);
+>> if (fd < 0)
+>> return -1;
+>>
+>> if (ioctl(fd, HCIUARTSETFLAGS, flags) < 0) {
+>> perror("Failed to set flags");
+>> close(fd);
+>> return -1;
+>> }
+>> .....
+>
+> I am a little bit lost on how you get ENOTTY. The only way I can see this happening if the kernel falls through towards n_tty_ioctl_helper and that means that cmd is messed up.
+>
+> If you go into drivers/bluetooth/hci_ldisc.c and add this line
+>
+>         hci_uart_ldisc.compat_ioctl = hci_uart_tty_ioctl;
+>
+> it might fix it. It is a guess right now until you figure out where the ENOTTY is coming from.
+>
+> Regards
+>
+> Marcel
+>
