@@ -1,53 +1,43 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Subject: Re: PS3 controller (SIXAXIS) never gets into "IdleTimeout"
-To: Antonio Ospite <ao2@ao2.it>
-References: <569E872A.2010302@mailbox.org>
- <20160119234026.0db2304963ec8bfc99665ff1@ao2.it>
-Cc: linux-bluetooth@vger.kernel.org
-From: Manuel Reimer <manuel.reimer@mailbox.org>
-Message-ID: <56A24FAF.3000203@mailbox.org>
-Date: Fri, 22 Jan 2016 16:50:07 +0100
+From: "Kasper Markus (ETAS-PSC/ECE1)" <Markus.Kasper@escrypt.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: AW: [BUG] LEAdvertisingManager suffers from ObjectManager hierarchy
+Date: Fri, 22 Jan 2016 15:43:43 +0000
+Message-ID: <241284aa107e466995c0821e4b015afd@FE-MBX1011.de.bosch.com>
+References: <938d66c7e3ba4933912f948240b2669f@FE-MBX1011.de.bosch.com>
+ <CABBYNZ+VyakQoiYV6=DkPux9ZCOB58BHRJGXU07UpxjzcJJr+Q@mail.gmail.com>
+In-Reply-To: <CABBYNZ+VyakQoiYV6=DkPux9ZCOB58BHRJGXU07UpxjzcJJr+Q@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <20160119234026.0db2304963ec8bfc99665ff1@ao2.it>
-Content-Type: text/plain; charset=windows-1252; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 01/19/2016 11:40 PM, Antonio Ospite wrote:
->> Seems like the controller keeps sending axis information even if the
->> axis aren't touched at all.
->>
->
-> IIRC this is because the controller has a lot of axes and they end up in
-> the multi touch range (ABS_MT_*) which apparently sends event
-> continuously.
->
-> I remember I did some experiments about remapping the axes to a more
-> meaningful setup and there were some improvements but that work
-> depended on some experimental changes to the linux input layer from
-> David Herrmann (the ABS2 proposal) and I do not know if the latter ever
-> reached mainline. This is a linux-input topic BTW.
-
-I guess that those are just the numbers, used by Sony, directly sent 
-out, right?
-
-> If you disconnect the device from bluez (either from an applet or from
-> command line) the sixaxis should turn off.
->
-> JFYI a possible hardware way is to keep pushed the PS button for some
-> seconds, this also should turn the sixaxis off.
-
-Both ways work. Thank you.
-
-Just to be sure if this is not another linux-input topic:
-
-If I first connect my PS3 controller via bluetooth, then all LEDs are 
-turned off after some flashing. I think a better default configuration 
-would be to set the first LED to be on. If all are off it is not obvious 
-that the controller is turned on...
-
-Thanks in advance
-
-Best regards,
-
-Manuel
+SGkgTHVpeiwNCg0KDQo+IC0tLS0tVXJzcHLDvG5nbGljaGUgTmFjaHJpY2h0LS0tLS0NCj4gVm9u
+OiBMdWl6IEF1Z3VzdG8gdm9uIERlbnR6IFttYWlsdG86bHVpei5kZW50ekBnbWFpbC5jb21dDQo+
+IEhpIE1hcmt1cywNCj4gDQo+IE9uIFRodSwgSmFuIDIxLCAyMDE2IGF0IDU6NTMgUE0sIEthc3Bl
+ciBNYXJrdXMgKEVUQVMtUFNDL0VDRTEpDQo+IDxNYXJrdXMuS2FzcGVyQGVzY3J5cHQuY29tPiB3
+cm90ZToNCj4gQWN0dWFsbHkgTEVBZHZlcnRpc2VtZW50TWFuYWdlcjEuUmVnaXN0ZXJBZHZlcnRp
+c2VtZW50IGRvZXMgbm8gYWN0dWFsbHkNCj4gcmVxdWlyZSBPYmplY3RNYW5hZ2VyLCBzbyB0aGUg
+Zm9sbG93aW5nIHNoYWxsIHByb2JhYmx5IHdvcms6DQo+IA0KPiBpZmYgLS1naXQgYS9zcmMvYWR2
+ZXJ0aXNpbmcuYyBiL3NyYy9hZHZlcnRpc2luZy5jIGluZGV4IDU5YzhjM2QuLjRiODdkNDIgMTAw
+NjQ0DQo+IC0tLSBhL3NyYy9hZHZlcnRpc2luZy5jDQo+ICsrKyBiL3NyYy9hZHZlcnRpc2luZy5j
+DQo+IEBAIC01OTEsNyArNTkxLDcgQEAgc3RhdGljIHN0cnVjdCBhZHZlcnRpc2VtZW50DQo+ICph
+ZHZlcnRpc2VtZW50X2NyZWF0ZShEQnVzQ29ubmVjdGlvbiAqY29ubiwNCj4gICAgICAgICAgICAg
+ICAgIHJldHVybiBOVUxMOw0KPiANCj4gICAgICAgICBhZCA9IG5ldzAoc3RydWN0IGFkdmVydGlz
+ZW1lbnQsIDEpOw0KPiAtICAgICAgIGFkLT5jbGllbnQgPSBnX2RidXNfY2xpZW50X25ld19mdWxs
+KGNvbm4sIHNlbmRlciwgcGF0aCwgcGF0aCk7DQo+ICsgICAgICAgYWQtPmNsaWVudCA9IGdfZGJ1
+c19jbGllbnRfbmV3X2Z1bGwoY29ubiwgc2VuZGVyLCBwYXRoLCBOVUxMKTsNCj4gICAgICAgICBp
+ZiAoIWFkLT5jbGllbnQpDQo+ICAgICAgICAgICAgICAgICBnb3RvIGZhaWw7DQpJIHRyaWVkIHRo
+aXMgc29sdXRpb24gLS0+IHdvcmtzIGxpa2UgYSBjaGFybS4gUHJldmlvdXNseSBJIGZpeGVkIGl0
+IGJ5IGFkYXB0aW5nIHRoZSBhcGkgdG8gdGFrZSBwYXRoIGFuZCByb290cGF0aCAoPSBvYmouIE1h
+bmFnZXIgcGF0aCkgYW5kIHRoZW4gYWRkZWQgcm9vdHBhdGggYXMgdGhlIGZvdXJ0aCBwYXJhbWV0
+ZXIgdG8gdGhlIGNhbGwgYWJvdmUuDQpCdXQgeW91ciBmaXggaXMgb2J2aW91c2x5IG11Y2ggc2lt
+cGxlci4gV2lsbCB5b3UgY29tbWl0IGl0PyBZb3UnZCBtb3N0IGxpa2VseSBiZSBtdWNoIGZhc3Rl
+ciB0aGFuIEkgYW0uIA0KDQo+ID4gUmUgY29udHJpYnV0aW5nOg0KVGhhbmtzIGZvciBjbGVhcmlu
+ZyB0aGlzIHVwLiBUaGUgcGFydCBpbiAiSEFDS0lORyIgZGlkbid0IG1lbnRpb24gYm90aCAodXNl
+ciAmIGtlcm5lbCkgYW5kIEkgbWlzc2VkIHRoZSBjbGVhbmVyIHN0YXRlbWVudCB3aXRoaW4gdGhl
+IG1haW50YWluZXJzIGd1aWRlbGluZXMuDQo+ID4gRXNwZWNpYWxseSwgdGhlICJob3cvd2hlcmUg
+dG8gY29tbWl0L3NlbmQ/IiBpcyBub3QgcmVhbGx5IGNsZWFyIHRvIG1lLg0KV2hhdCBJIHJlYWQg
+aXM6IHNlbmQgcGF0Y2hlcyBmb3JtYXR0ZWQgYXMgdGV4dCB0byB0aGlzIGxpc3QgKGkuZS4gb3V0
+cHV0IG9mIGRpZmYgLU51cnApLg0KDQpUaGFua3MgYWdhaW4sDQpNYXJrdXMNCg0KDQo=
