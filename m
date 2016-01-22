@@ -2,8 +2,8 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
 Subject: [PATCH] Bluetooth: hci_ldisc: Add support for compat_ioctl handling
-Date: Fri, 22 Jan 2016 14:36:00 +0100
-Message-Id: <1453469760-37045-1-git-send-email-marcel@holtmann.org>
+Date: Fri, 22 Jan 2016 14:35:47 +0100
+Message-Id: <1453469747-36973-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
