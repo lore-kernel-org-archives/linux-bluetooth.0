@@ -1,43 +1,39 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: "Kasper Markus (ETAS-PSC/ECE1)" <Markus.Kasper@escrypt.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: AW: [BUG] LEAdvertisingManager suffers from ObjectManager hierarchy
-Date: Fri, 22 Jan 2016 15:43:43 +0000
-Message-ID: <241284aa107e466995c0821e4b015afd@FE-MBX1011.de.bosch.com>
-References: <938d66c7e3ba4933912f948240b2669f@FE-MBX1011.de.bosch.com>
- <CABBYNZ+VyakQoiYV6=DkPux9ZCOB58BHRJGXU07UpxjzcJJr+Q@mail.gmail.com>
-In-Reply-To: <CABBYNZ+VyakQoiYV6=DkPux9ZCOB58BHRJGXU07UpxjzcJJr+Q@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 3/3] audio/avrcp: Don't print an error if folder length is 0
+Date: Fri, 22 Jan 2016 17:14:28 +0200
+Message-Id: <1453475668-4609-3-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1453475668-4609-1-git-send-email-luiz.dentz@gmail.com>
+References: <1453475668-4609-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgTHVpeiwNCg0KDQo+IC0tLS0tVXJzcHLDvG5nbGljaGUgTmFjaHJpY2h0LS0tLS0NCj4gVm9u
-OiBMdWl6IEF1Z3VzdG8gdm9uIERlbnR6IFttYWlsdG86bHVpei5kZW50ekBnbWFpbC5jb21dDQo+
-IEhpIE1hcmt1cywNCj4gDQo+IE9uIFRodSwgSmFuIDIxLCAyMDE2IGF0IDU6NTMgUE0sIEthc3Bl
-ciBNYXJrdXMgKEVUQVMtUFNDL0VDRTEpDQo+IDxNYXJrdXMuS2FzcGVyQGVzY3J5cHQuY29tPiB3
-cm90ZToNCj4gQWN0dWFsbHkgTEVBZHZlcnRpc2VtZW50TWFuYWdlcjEuUmVnaXN0ZXJBZHZlcnRp
-c2VtZW50IGRvZXMgbm8gYWN0dWFsbHkNCj4gcmVxdWlyZSBPYmplY3RNYW5hZ2VyLCBzbyB0aGUg
-Zm9sbG93aW5nIHNoYWxsIHByb2JhYmx5IHdvcms6DQo+IA0KPiBpZmYgLS1naXQgYS9zcmMvYWR2
-ZXJ0aXNpbmcuYyBiL3NyYy9hZHZlcnRpc2luZy5jIGluZGV4IDU5YzhjM2QuLjRiODdkNDIgMTAw
-NjQ0DQo+IC0tLSBhL3NyYy9hZHZlcnRpc2luZy5jDQo+ICsrKyBiL3NyYy9hZHZlcnRpc2luZy5j
-DQo+IEBAIC01OTEsNyArNTkxLDcgQEAgc3RhdGljIHN0cnVjdCBhZHZlcnRpc2VtZW50DQo+ICph
-ZHZlcnRpc2VtZW50X2NyZWF0ZShEQnVzQ29ubmVjdGlvbiAqY29ubiwNCj4gICAgICAgICAgICAg
-ICAgIHJldHVybiBOVUxMOw0KPiANCj4gICAgICAgICBhZCA9IG5ldzAoc3RydWN0IGFkdmVydGlz
-ZW1lbnQsIDEpOw0KPiAtICAgICAgIGFkLT5jbGllbnQgPSBnX2RidXNfY2xpZW50X25ld19mdWxs
-KGNvbm4sIHNlbmRlciwgcGF0aCwgcGF0aCk7DQo+ICsgICAgICAgYWQtPmNsaWVudCA9IGdfZGJ1
-c19jbGllbnRfbmV3X2Z1bGwoY29ubiwgc2VuZGVyLCBwYXRoLCBOVUxMKTsNCj4gICAgICAgICBp
-ZiAoIWFkLT5jbGllbnQpDQo+ICAgICAgICAgICAgICAgICBnb3RvIGZhaWw7DQpJIHRyaWVkIHRo
-aXMgc29sdXRpb24gLS0+IHdvcmtzIGxpa2UgYSBjaGFybS4gUHJldmlvdXNseSBJIGZpeGVkIGl0
-IGJ5IGFkYXB0aW5nIHRoZSBhcGkgdG8gdGFrZSBwYXRoIGFuZCByb290cGF0aCAoPSBvYmouIE1h
-bmFnZXIgcGF0aCkgYW5kIHRoZW4gYWRkZWQgcm9vdHBhdGggYXMgdGhlIGZvdXJ0aCBwYXJhbWV0
-ZXIgdG8gdGhlIGNhbGwgYWJvdmUuDQpCdXQgeW91ciBmaXggaXMgb2J2aW91c2x5IG11Y2ggc2lt
-cGxlci4gV2lsbCB5b3UgY29tbWl0IGl0PyBZb3UnZCBtb3N0IGxpa2VseSBiZSBtdWNoIGZhc3Rl
-ciB0aGFuIEkgYW0uIA0KDQo+ID4gUmUgY29udHJpYnV0aW5nOg0KVGhhbmtzIGZvciBjbGVhcmlu
-ZyB0aGlzIHVwLiBUaGUgcGFydCBpbiAiSEFDS0lORyIgZGlkbid0IG1lbnRpb24gYm90aCAodXNl
-ciAmIGtlcm5lbCkgYW5kIEkgbWlzc2VkIHRoZSBjbGVhbmVyIHN0YXRlbWVudCB3aXRoaW4gdGhl
-IG1haW50YWluZXJzIGd1aWRlbGluZXMuDQo+ID4gRXNwZWNpYWxseSwgdGhlICJob3cvd2hlcmUg
-dG8gY29tbWl0L3NlbmQ/IiBpcyBub3QgcmVhbGx5IGNsZWFyIHRvIG1lLg0KV2hhdCBJIHJlYWQg
-aXM6IHNlbmQgcGF0Y2hlcyBmb3JtYXR0ZWQgYXMgdGV4dCB0byB0aGlzIGxpc3QgKGkuZS4gb3V0
-cHV0IG9mIGRpZmYgLU51cnApLg0KDQpUaGFua3MgYWdhaW4sDQpNYXJrdXMNCg0KDQo=
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+
+Some stacks, for instance iOS, does actually send 0 as folder length
+so just ignore if that happens since that means only means the folder
+doesn't have a name.
+---
+ profiles/audio/avrcp.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
+index 076766d..787643c 100644
+--- a/profiles/audio/avrcp.c
++++ b/profiles/audio/avrcp.c
+@@ -2655,8 +2655,10 @@ static gboolean avrcp_set_browsed_player_rsp(struct avctp *conn,
+ 		uint8_t len;
+ 
+ 		len = pdu->params[i++];
++		if (!len)
++			continue;
+ 
+-		if (i + len > operand_count || len == 0) {
++		if (i + len > operand_count) {
+ 			error("Invalid folder length");
+ 			break;
+ 		}
+-- 
+2.5.0
+
