@@ -1,48 +1,49 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-From: =?UTF-8?Q?Fran=C3=A7ois_Beaufort?= <beaufort.francois@gmail.com>
-Date: Fri, 22 Jan 2016 15:21:45 +0100
-Message-ID: <CAEZxfGO7N0FykMj2bm9jpX9JSYreJF+O_3BUFMAgxq2Dn5=dNw@mail.gmail.com>
-Subject: [PATCH] Updated bluetoothctl command to remove all devices
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 9.2 \(3112\))
+Subject: Re: [PATCH] Add missing ACPI ID for bcm43241, used in HP Omni10
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1453391122-25226-1-git-send-email-jjmeijer88@gmail.com>
+Date: Fri, 22 Jan 2016 14:42:33 +0100
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <FD3D2636-B096-45F8-A4E2-4E48B2293F42@holtmann.org>
+References: <Re: [PATCH] Another ACPI ID for bcm43241> <1453391122-25226-1-git-send-email-jjmeijer88@gmail.com>
+To: "J.J. Meijer" <jjmeijer88@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-As discussed on IRC, removing all devices will be easier thanks to
-"remove *" in bluetoothctl.
+Hi,
 
----
- client/main.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+please provide a commit message. You need subject line and commit message body. Make it more verbose on which machine this is enabling. If you have ACPI debug output or other information, please include it as well.
 
-diff --git a/client/main.c b/client/main.c
-index b695744..1361e80 100644
---- a/client/main.c
-+++ b/client/main.c
-@@ -1317,6 +1317,7 @@ static void remove_device_setup(DBusMessageIter
-*iter, void *user_data)
- static void cmd_remove(const char *arg)
- {
-  GDBusProxy *proxy;
-+ GList *list;
-  char *path;
+> On Jan 21, 2016, at 16:45, J.J. Meijer <jjmeijer88@gmail.com> wrote:
+> 
+> From: meijjaa <jjmeijer88@gmail.com>
+> 
+> Signed-off-by: meijjaa <jjmeijer88@gmail.com>
 
-  if (!arg || !strlen(arg)) {
-@@ -1327,6 +1328,14 @@ static void cmd_remove(const char *arg)
-  if (check_default_ctrl() == FALSE)
-  return;
+You might want to fix your .gitconfig to have proper name and email information in your commits.
 
-+ if (strcmp(arg, "*") == 0) {
-+ for (list = g_list_first(dev_list); list; list = g_list_next(list)) {
-+ GDBusProxy *proxy = list->data;
-+ cmd_remove(g_dbus_proxy_get_path(proxy));
-+ }
-+ return;
-+ }
-+
-  proxy = find_proxy_by_address(dev_list, arg);
-  if (!proxy) {
-  rl_printf("Device %s not available\n", arg);
--- 
-2.7.0
+> ---
+> drivers/bluetooth/hci_bcm.c | 1 +
+> 1 file changed, 1 insertion(+)
+> 
+> diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
+> index 4797c5c..48dbf51 100644
+> --- a/drivers/bluetooth/hci_bcm.c
+> +++ b/drivers/bluetooth/hci_bcm.c
+> @@ -820,6 +820,7 @@ static const struct acpi_device_id bcm_acpi_match[] = {
+>  	{ "BCM2E3D", 0 },
+> 	{ "BCM2E3F", 0 },
+>  	{ "BCM2E40", 0 },
+> +	{ "BCM2E54", 0 },
+>  	{ "BCM2E64", 0 },
+>  	{ "BCM2E65", 0 },
+>  	{ "BCM2E67", 0 },
+
+I was not able to apply the patch. Please make sure it is against bluetooth-next tree.
+
+Regards
+
+Marcel
+
