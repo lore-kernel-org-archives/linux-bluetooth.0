@@ -1,47 +1,24 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 9.2 \(3112\))
-Subject: Re: [PATCH] Add missing ACPI ID for bcm43241, used in HP Omni10
+Subject: Re: [BUG] Btattach, ioctl fails to set flags from 32-bit user space to 64-bit
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1453391122-25226-1-git-send-email-jjmeijer88@gmail.com>
-Date: Fri, 22 Jan 2016 14:42:33 +0100
+In-Reply-To: <CAA+NYvRGebocnnYjdy2wLQkqsPT+WiNUE4trOS0zbL547Uar-w@mail.gmail.com>
+Date: Fri, 22 Jan 2016 14:38:20 +0100
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <FD3D2636-B096-45F8-A4E2-4E48B2293F42@holtmann.org>
-References: <Re: [PATCH] Another ACPI ID for bcm43241> <1453391122-25226-1-git-send-email-jjmeijer88@gmail.com>
-To: "J.J. Meijer" <jjmeijer88@gmail.com>
+Message-Id: <E49EE6B1-CAEC-43D1-9B95-82EA592F628B@holtmann.org>
+References: <CAA+NYvTV6WybKuO71Gehm6L2-vjsqVhmu5VjEQCfqFaWi1TU6Q@mail.gmail.com> <C72941BE-7F8A-4CD7-900E-5E8E6E42FD63@holtmann.org> <CAA+NYvRGebocnnYjdy2wLQkqsPT+WiNUE4trOS0zbL547Uar-w@mail.gmail.com>
+To: Jaap Jan Meijer <jjmeijer88@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Jaap,
 
-please provide a commit message. You need subject line and commit message body. Make it more verbose on which machine this is enabling. If you have ACPI debug output or other information, please include it as well.
+> Thank you, that was very good guess work. Btattach is now able to
+> attach by bcm43241 in the mixed arch situation. Should I supply a
+> patch or will you just add it? I'll will send-email a patch anyway.
 
-> On Jan 21, 2016, at 16:45, J.J. Meijer <jjmeijer88@gmail.com> wrote:
-> 
-> From: meijjaa <jjmeijer88@gmail.com>
-> 
-> Signed-off-by: meijjaa <jjmeijer88@gmail.com>
-
-You might want to fix your .gitconfig to have proper name and email information in your commits.
-
-> ---
-> drivers/bluetooth/hci_bcm.c | 1 +
-> 1 file changed, 1 insertion(+)
-> 
-> diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
-> index 4797c5c..48dbf51 100644
-> --- a/drivers/bluetooth/hci_bcm.c
-> +++ b/drivers/bluetooth/hci_bcm.c
-> @@ -820,6 +820,7 @@ static const struct acpi_device_id bcm_acpi_match[] = {
->  	{ "BCM2E3D", 0 },
-> 	{ "BCM2E3F", 0 },
->  	{ "BCM2E40", 0 },
-> +	{ "BCM2E54", 0 },
->  	{ "BCM2E64", 0 },
->  	{ "BCM2E65", 0 },
->  	{ "BCM2E67", 0 },
-
-I was not able to apply the patch. Please make sure it is against bluetooth-next tree.
+I just send a patch that should be more correct on all platforms. Can you try that one out please.
 
 Regards
 
