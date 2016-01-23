@@ -1,43 +1,66 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Date: Sat, 23 Jan 2016 12:27:07 +0000
+Date: Sat, 23 Jan 2016 12:25:36 +0000
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Lukasz Duda <lukasz.duda@nordicsemi.no>
+To: Glenn Ruben Bakke <glenn.ruben.bakke@nordicsemi.no>
 Cc: alex.aring@gmail.com, linux-bluetooth@vger.kernel.org,
-	glenn.ruben.bakke@nordicsemi.no
-Subject: Re: [PATCH] Bluetooth: 6lowpan: Fix handling of uncompressed IPv6
- packets
-Message-ID: <20160123122707.GB16166@t440s>
-References: <1452700668-4241-1-git-send-email-lukasz.duda@nordicsemi.no>
+	lukasz.duda@nordicsemi.no
+Subject: Re: [PATCH] Bluetooth: 6lowpan: Fix kernel NULL pointer dereferences
+Message-ID: <20160123122536.GA16166@t440s>
+References: <1452699702-3986-1-git-send-email-glenn.ruben.bakke@nordicsemi.no>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1452700668-4241-1-git-send-email-lukasz.duda@nordicsemi.no>
+In-Reply-To: <1452699702-3986-1-git-send-email-glenn.ruben.bakke@nordicsemi.no>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lukasz,
+Hi Glenn,
 
-On Wed, Jan 13, 2016, Lukasz Duda wrote:
-> This patch fixes incorrect handling of the 6lowpan packets that contain
-> uncompressed IPv6 header.
+On Wed, Jan 13, 2016, Glenn Ruben Bakke wrote:
+> The fixes provided in this patch assigns a valid net_device structure to
+> skb before dispatching it for further processing.
 > 
-> RFC4944 specifies a special dispatch for 6lowpan to carry uncompressed
-> IPv6 header. This dispatch (1 byte long) has to be removed during
-> reception and skb data pointer has to be moved. To correctly point in
-> the beginning of the IPv6 header the dispatch byte has to be pulled off
-> before packet can be processed by netif_rx_in().
+> Scenario #1:
+> ============
 > 
-> Test scenario: IPv6 packets are not correctly interpreted by the network
-> layer when IPv6 header is not compressed (e.g. ICMPv6 Echo Reply is not
-> propagated correctly to the ICMPv6 layer because the extra byte will make
-> the header look corrupted).
+> Bluetooth 6lowpan receives an uncompressed IPv6 header, and dispatches it
+> to netif. The following error occurs:
 > 
-> Similar approach is done for IEEE 802.15.4.
+> Null pointer dereference error #1 crash log:
 > 
-> Signed-off-by: Lukasz Duda <lukasz.duda@nordicsemi.no>
+> [  845.854013] BUG: unable to handle kernel NULL pointer dereference at
+>                0000000000000048
+> [  845.855785] IP: [<ffffffff816e3d36>] enqueue_to_backlog+0x56/0x240
+> ...
+> [  845.909459] Call Trace:
+> [  845.911678]  [<ffffffff816e3f64>] netif_rx_internal+0x44/0xf0
+> 
+> The first modification fixes the NULL pointer dereference error by
+> assigning dev to the local_skb in order to set a valid net_device before
+> processing the skb by netif_rx_ni().
+> 
+> Scenario #2:
+> ============
+> 
+> Bluetooth 6lowpan receives an UDP compressed message which needs further
+> decompression by nhc_udp. The following error occurs:
+> 
+> Null pointer dereference error #2 crash log:
+> 
+> [   63.295149] BUG: unable to handle kernel NULL pointer dereference at
+>                0000000000000840
+> [   63.295931] IP: [<ffffffffc0559540>] udp_uncompress+0x320/0x626
+>                [nhc_udp]
+> 
+> The second modification fixes the NULL pointer dereference error by
+> assigning dev to the local_skb in the case of a udp compressed packet.
+> The 6lowpan udp_uncompress function expects that the net_device is set in
+> the skb when checking lltype.
+> 
 > Signed-off-by: Glenn Ruben Bakke <glenn.ruben.bakke@nordicsemi.no>
+> Signed-off-by: Lukasz Duda <lukasz.duda@nordicsemi.no>
 > ---
->  net/bluetooth/6lowpan.c | 3 +++
->  1 file changed, 3 insertions(+)
+>  net/bluetooth/6lowpan.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
 
 Applied to bluetooth.git. Thanks.
 
