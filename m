@@ -1,251 +1,43 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Andrzej Kaczmarek <andrzej.kaczmarek@codecoup.pl>
-To: linux-bluetooth@vger.kernel.org
-Cc: Andrzej Kaczmarek <andrzej.kaczmarek@codecoup.pl>
-Subject: [PATCH] shared/gatt-client: Make read_long_value more robust
-Date: Sun, 24 Jan 2016 20:43:34 +0100
-Message-Id: <1453664614-16485-1-git-send-email-andrzej.kaczmarek@codecoup.pl>
 MIME-Version: 1.0
+Date: Sun, 24 Jan 2016 22:30:21 +0800
+Message-ID: <CAGybJz_hOTULCDDEPXg_nT0bcoqZXGmxujCU3mfEnRkLUVToYw@mail.gmail.com>
+Subject: Need help with convert bluez BLE configure file to windows
+From: yangxuan he <yangxuan8282@gmail.com>
+To: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Using "Read Blob Request" on attributes shorter than ATT_MTU - 3 may
-return "Attribute Not Long" error on some values, but at the same time
-it's ok to read this attribute using "Read Request".
+It seems like that bluez and windows BLE(Bluetooth Low Energy)
+configure file contain different value.
+How can I convert them. I would like to sync use my bluetooth mouse on
+linux and windows.
+example format post below:
 
-Since using "Read Blob Request" as first request when reading long
-characteristic value starting with offset 0 is optional, this patch
-changes read_long_value to start with "Read Request" whenever possible
-to remove need for caller to take care of such error.
-
-Core v4.2, part F, section 1.3.4.4.5:
-If the attribute value has a fixed length that is less than or equal to
-(ATT_MTU - 3) octets in length, then an Error Response can be sent with
-the error code «Attribute Not Long».
+bluez BLE configure file:
 ---
- src/shared/gatt-client.c | 24 +++++++++++----
- unit/test-gatt.c         | 78 ++++++++++++++++++++++++------------------------
- 2 files changed, 57 insertions(+), 45 deletions(-)
+BREDR=false
+AddressType=2
+Name=Designer Mouse
+Timestamp=1453647431
+LocalCSRK=4156C09EE5A30E515C2B58200CDBC2E2
+LocalCSRKAuthenticated=false
+LongTermKey=DA1B4408FF8F418867772D5E43CB0026
+LongTermKeyType=0
+LongTermKeyEncSize=16
+LongTermKeyEDiv=23907
+LongTermKeyRand=7996339405254297788
+Services=0000181200001000800000805F9B34FB;0000180F00001000800000805F9B34FB;0000180A00001000800000805F9B34FB;0000180100001000800000805F9B34FB;0000180000001000800000805F9B34FB;
 
-diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
-index 06ac763..d6b3ad0 100644
---- a/src/shared/gatt-client.c
-+++ b/src/shared/gatt-client.c
-@@ -2156,7 +2156,9 @@ static void read_long_cb(uint8_t opcode, const void *pdu,
- 		goto done;
- 	}
- 
--	if (opcode != BT_ATT_OP_READ_BLOB_RSP || (!pdu && length)) {
-+	if ((!op->offset && opcode != BT_ATT_OP_READ_RSP)
-+			|| (op->offset && opcode != BT_ATT_OP_READ_BLOB_RSP)
-+			|| (!pdu && length)) {
- 		success = false;
- 		goto done;
- 	}
-@@ -2209,7 +2211,9 @@ unsigned int bt_gatt_client_read_long_value(struct bt_gatt_client *client,
- {
- 	struct request *req;
- 	struct read_long_op *op;
-+	uint8_t att_op;
- 	uint8_t pdu[4];
-+	uint16_t pdu_len;
- 
- 	if (!client)
- 		return 0;
-@@ -2233,12 +2237,20 @@ unsigned int bt_gatt_client_read_long_value(struct bt_gatt_client *client,
- 	req->destroy = destroy_read_long_op;
- 
- 	put_le16(value_handle, pdu);
--	put_le16(offset, pdu + 2);
-+	pdu_len = sizeof(value_handle);
-+
-+	if (op->offset) {
-+		att_op = BT_ATT_OP_READ_BLOB_REQ;
-+		pdu_len += sizeof(op->offset);
-+
-+		put_le16(op->offset, pdu + 2);
-+	} else {
-+		att_op = BT_ATT_OP_READ_REQ;
-+	}
-+
-+	req->att_id = bt_att_send(client->att, att_op, pdu, pdu_len,
-+					read_long_cb, req, request_unref);
- 
--	req->att_id = bt_att_send(client->att, BT_ATT_OP_READ_BLOB_REQ,
--							pdu, sizeof(pdu),
--							read_long_cb, req,
--							request_unref);
- 	if (!req->att_id) {
- 		op->destroy = NULL;
- 		request_unref(req);
-diff --git a/unit/test-gatt.c b/unit/test-gatt.c
-index 326a32c..944bfba 100644
---- a/unit/test-gatt.c
-+++ b/unit/test-gatt.c
-@@ -2892,14 +2892,14 @@ int main(int argc, char *argv[])
- 	define_test_client("/TP/GAR/CL/BV-04-C", test_client, service_db_1,
- 			&test_long_read_1,
- 			SERVICE_DATA_1_PDUS,
--			raw_pdu(0x0c, 0x03, 0x00, 0x00, 0x00),
--			raw_pdu(0x0d, 0x01, 0x02, 0x03));
-+			raw_pdu(0x0a, 0x03, 0x00),
-+			raw_pdu(0x0b, 0x01, 0x02, 0x03));
- 
- 	define_test_client("/TP/GAR/CL/BV-04-C/512B", test_client, service_db_1,
- 			&test_long_read_2,
- 			SERVICE_DATA_1_PDUS,
--			raw_pdu(0x0c, 0x03, 0x00, 0x00, 0x00),
--			raw_pdu(0x0d, 0xff, 0xff, 0xff, 0xff,
-+			raw_pdu(0x0a, 0x03, 0x00),
-+			raw_pdu(0x0b, 0xff, 0xff, 0xff, 0xff,
- 				0xff, 0xff, 0xff, 0xff, 0xff,
- 				0xff, 0xff, 0xff, 0xff, 0xff,
- 				0xff, 0xff, 0xff, 0xff, 0xff,
-@@ -3014,46 +3014,46 @@ int main(int argc, char *argv[])
- 	define_test_client("/TP/GAR/CL/BI-12-C", test_client, service_db_1,
- 			&test_long_read_3,
- 			SERVICE_DATA_1_PDUS,
--			raw_pdu(0x0c, 0x03, 0x00, 0x00, 0x00),
--			raw_pdu(0x01, 0x0c, 0x03, 0x00, 0x02));
-+			raw_pdu(0x0a, 0x03, 0x00),
-+			raw_pdu(0x01, 0x0a, 0x03, 0x00, 0x02));
- 
- 	define_test_client("/TP/GAR/CL/BI-13-C", test_client, service_db_1,
- 			&test_long_read_4,
- 			SERVICE_DATA_1_PDUS,
--			raw_pdu(0x0c, 0x03, 0x00, 0x00, 0x00),
--			raw_pdu(0x01, 0x0c, 0x03, 0x00, 0x07));
-+			raw_pdu(0x0a, 0x03, 0x00),
-+			raw_pdu(0x01, 0x0a, 0x03, 0x00, 0x07));
- 
- 	define_test_client("/TP/GAR/CL/BI-14-C", test_client, service_db_1,
- 			&test_long_read_5,
- 			SERVICE_DATA_1_PDUS,
--			raw_pdu(0x0c, 0x00, 0x00, 0x00, 0x00),
--			raw_pdu(0x01, 0x0c, 0x00, 0x00, 0x01));
-+			raw_pdu(0x0a, 0x00, 0x00),
-+			raw_pdu(0x01, 0x0a, 0x00, 0x00, 0x01));
- 
- 	define_test_client("/TP/GAR/CL/BI-15-C", test_client, service_db_1,
- 			&test_long_read_6,
- 			SERVICE_DATA_1_PDUS,
--			raw_pdu(0x0c, 0x03, 0x00, 0x00, 0x00),
--			raw_pdu(0x01, 0x0c, 0x03, 0x00, 0x08));
-+			raw_pdu(0x0a, 0x03, 0x00),
-+			raw_pdu(0x01, 0x0a, 0x03, 0x00, 0x08));
- 
- 	define_test_client("/TP/GAR/CL/BI-16-C", test_client, service_db_1,
- 			&test_long_read_7,
- 			SERVICE_DATA_1_PDUS,
--			raw_pdu(0x0c, 0x03, 0x00, 0x00, 0x00),
--			raw_pdu(0x01, 0x0c, 0x03, 0x00, 0x05));
-+			raw_pdu(0x0a, 0x03, 0x00),
-+			raw_pdu(0x01, 0x0a, 0x03, 0x00, 0x05));
- 
- 	define_test_client("/TP/GAR/CL/BI-16-C/auto", test_client, service_db_1,
- 			&test_long_read_1,
- 			SERVICE_DATA_1_PDUS,
--			raw_pdu(0x0c, 0x03, 0x00, 0x00, 0x00),
--			raw_pdu(0x01, 0x0c, 0x03, 0x00, 0x05),
--			raw_pdu(0x0c, 0x03, 0x00, 0x00, 0x00),
-+			raw_pdu(0x0a, 0x03, 0x00),
-+			raw_pdu(0x01, 0x0a, 0x03, 0x00, 0x05),
-+			raw_pdu(0x0a, 0x03, 0x00),
- 			raw_pdu(0x0d, 0x01, 0x02, 0x03));
- 
- 	define_test_client("/TP/GAR/CL/BI-17-C", test_client, service_db_1,
- 			&test_long_read_8,
- 			SERVICE_DATA_1_PDUS,
--			raw_pdu(0x0c, 0x03, 0x00, 0x00, 0x00),
--			raw_pdu(0x01, 0x0c, 0x03, 0x00, 0x0c));
-+			raw_pdu(0x0a, 0x03, 0x00),
-+			raw_pdu(0x01, 0x0a, 0x03, 0x00, 0x0c));
- 
- 	define_test_client("/TP/GAR/CL/BI-18-C", test_client, service_db_1,
- 			&test_multiple_read_2,
-@@ -3299,14 +3299,14 @@ int main(int argc, char *argv[])
- 	define_test_client("/TP/GAR/CL/BV-07-C", test_client, service_db_1,
- 			&test_long_read_9,
- 			SERVICE_DATA_1_PDUS,
--			raw_pdu(0x0c, 0x04, 0x00, 0x00, 0x00),
--			raw_pdu(0x0d, 0x01, 0x02, 0x03));
-+			raw_pdu(0x0a, 0x04, 0x00),
-+			raw_pdu(0x0b, 0x01, 0x02, 0x03));
- 
- 	define_test_client("/TP/GAR/CL/BV-07-C/512B", test_client, service_db_1,
- 			&test_long_read_10,
- 			SERVICE_DATA_1_PDUS,
--			raw_pdu(0x0c, 0x04, 0x00, 0x00, 0x00),
--			raw_pdu(0x0d, 0xff, 0xff, 0xff, 0xff,
-+			raw_pdu(0x0a, 0x04, 0x00),
-+			raw_pdu(0x0b, 0xff, 0xff, 0xff, 0xff,
- 				0xff, 0xff, 0xff, 0xff, 0xff,
- 				0xff, 0xff, 0xff, 0xff, 0xff,
- 				0xff, 0xff, 0xff, 0xff, 0xff,
-@@ -3415,46 +3415,46 @@ int main(int argc, char *argv[])
- 	define_test_client("/TP/GAR/CL/BI-28-C", test_client, service_db_1,
- 			&test_long_read_11,
- 			SERVICE_DATA_1_PDUS,
--			raw_pdu(0x0c, 0x04, 0x00, 0x00, 0x00),
--			raw_pdu(0x01, 0x0c, 0x04, 0x00, 0x02));
-+			raw_pdu(0x0a, 0x04, 0x00),
-+			raw_pdu(0x01, 0x0a, 0x04, 0x00, 0x02));
- 
- 	define_test_client("/TP/GAR/CL/BI-29-C", test_client, service_db_1,
- 			&test_long_read_12,
- 			SERVICE_DATA_1_PDUS,
--			raw_pdu(0x0c, 0x04, 0x00, 0x00, 0x00),
--			raw_pdu(0x01, 0x0c, 0x04, 0x00, 0x07));
-+			raw_pdu(0x0a, 0x04, 0x00),
-+			raw_pdu(0x01, 0x0a, 0x04, 0x00, 0x07));
- 
- 	define_test_client("/TP/GAR/CL/BI-30-C", test_client, service_db_1,
- 			&test_long_read_5,
- 			SERVICE_DATA_1_PDUS,
--			raw_pdu(0x0c, 0x00, 0x00, 0x00, 0x00),
--			raw_pdu(0x01, 0x0c, 0x00, 0x00, 0x01));
-+			raw_pdu(0x0a, 0x00, 0x00),
-+			raw_pdu(0x01, 0x0a, 0x00, 0x00, 0x01));
- 
- 	define_test_client("/TP/GAR/CL/BI-31-C", test_client, service_db_1,
- 			&test_long_read_13,
- 			SERVICE_DATA_1_PDUS,
--			raw_pdu(0x0c, 0x04, 0x00, 0x00, 0x00),
--			raw_pdu(0x01, 0x0c, 0x04, 0x00, 0x08));
-+			raw_pdu(0x0a, 0x04, 0x00),
-+			raw_pdu(0x01, 0x0a, 0x04, 0x00, 0x08));
- 
- 	define_test_client("/TP/GAR/CL/BI-32-C", test_client, service_db_1,
- 			&test_long_read_14,
- 			SERVICE_DATA_1_PDUS,
--			raw_pdu(0x0c, 0x04, 0x00, 0x00, 0x00),
--			raw_pdu(0x01, 0x0c, 0x04, 0x00, 0x05));
-+			raw_pdu(0x0a, 0x04, 0x00),
-+			raw_pdu(0x01, 0x0a, 0x04, 0x00, 0x05));
- 
- 	define_test_client("/TP/GAR/CL/BI-32-C/auto", test_client, service_db_1,
- 			&test_long_read_9,
- 			SERVICE_DATA_1_PDUS,
--			raw_pdu(0x0c, 0x04, 0x00, 0x00, 0x00),
--			raw_pdu(0x01, 0x0c, 0x04, 0x00, 0x05),
--			raw_pdu(0x0c, 0x04, 0x00, 0x00, 0x00),
--			raw_pdu(0x0d, 0x01, 0x02, 0x03));
-+			raw_pdu(0x0a, 0x04, 0x00),
-+			raw_pdu(0x01, 0x0a, 0x04, 0x00, 0x05),
-+			raw_pdu(0x0a, 0x04, 0x00),
-+			raw_pdu(0x0b, 0x01, 0x02, 0x03));
- 
- 	define_test_client("/TP/GAR/CL/BI-33-C", test_client, service_db_1,
- 			&test_long_read_15,
- 			SERVICE_DATA_1_PDUS,
--			raw_pdu(0x0c, 0x04, 0x00, 0x00, 0x00),
--			raw_pdu(0x01, 0x0c, 0x04, 0x00, 0x0c));
-+			raw_pdu(0x0a, 0x04, 0x00),
-+			raw_pdu(0x01, 0x0a, 0x04, 0x00, 0x0c));
- 
- 	define_test_client("/TP/GAR/CL/BI-34-C", test_client, service_db_1,
- 			&test_read_12,
--- 
-2.6.2
 
+windows:
+---
+AddressType 1
+AuthReq 1
+CSRK E8A035AC27868E5C6A2859ED3D9611A8
+EDIV d05b
+ERand f611ea5f4fc22b6a
+IRK BF02C85F86E086666546ECF9CB1C41D9
+KeyLength 0
+LTK 5091C321B95B35030E40486F3188095A
