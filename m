@@ -1,34 +1,43 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <keyrings-owner@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 9.2 \(3112\))
+Subject: Re: [PATCH 15/26] Bluetooth: Use skcipher and hash
 From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Add missing COMPATIBLE_IOCTL for UART line discipline
-Date: Mon, 25 Jan 2016 08:44:03 +0100
-Message-Id: <1453707843-92704-1-git-send-email-marcel@holtmann.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <E1aNKYo-0008Dp-5h@gondolin.me.apana.org.au>
+Date: Mon, 25 Jan 2016 07:48:46 +0100
+Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Network Development <netdev@vger.kernel.org>,
+	devel@driverdev.osuosl.org, dm-devel@redhat.com,
+	linux-wireless <linux-wireless@vger.kernel.org>,
+	linux-cifs@vger.kernel.org, ecryptfs@vger.kernel.org,
+	linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
+	linux-nfs@vger.kernel.org, keyrings@vger.kernel.org,
+	BlueZ development <linux-bluetooth@vger.kernel.org>,
+	ceph-devel@vger.kernel.org, linux-wpan@vger.kernel.org,
+	linux-afs@lists.infradead.org, drbd-dev@lists.linbit.com,
+	open-iscsi@googlegroups.com
+Message-Id: <B35B9E9E-DA6B-4AAD-B1EF-2DE778645CAC@holtmann.org>
+References: <20160124131021.GA31153@gondor.apana.org.au> <E1aNKYo-0008Dp-5h@gondolin.me.apana.org.au>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Sender: keyrings-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The HCIUARTGETDEVICE, HCIUARTSETFLAGS and HCIUARTGETFLAGS ioctl are
-missing the COMPATIBLE_IOCTL declaration.
+Hi Herbert,
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
----
- fs/compat_ioctl.c | 3 +++
- 1 file changed, 3 insertions(+)
+> This patch replaces uses of blkcipher with skcipher and the long
+> obsolete hash interface with shash.
+> 
+> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-diff --git a/fs/compat_ioctl.c b/fs/compat_ioctl.c
-index a5b8eb69a8f4..6402eaf8ab95 100644
---- a/fs/compat_ioctl.c
-+++ b/fs/compat_ioctl.c
-@@ -1261,6 +1261,9 @@ COMPATIBLE_IOCTL(HCIUNBLOCKADDR)
- COMPATIBLE_IOCTL(HCIINQUIRY)
- COMPATIBLE_IOCTL(HCIUARTSETPROTO)
- COMPATIBLE_IOCTL(HCIUARTGETPROTO)
-+COMPATIBLE_IOCTL(HCIUARTGETDEVICE)
-+COMPATIBLE_IOCTL(HCIUARTSETFLAGS)
-+COMPATIBLE_IOCTL(HCIUARTGETFLAGS)
- COMPATIBLE_IOCTL(RFCOMMCREATEDEV)
- COMPATIBLE_IOCTL(RFCOMMRELEASEDEV)
- COMPATIBLE_IOCTL(RFCOMMGETDEVLIST)
--- 
-2.5.0
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
+
+> ---
+> 
+> net/bluetooth/smp.c |  135 ++++++++++++++++++++++++----------------------------
+> 1 file changed, 63 insertions(+), 72 deletions(-)
+
+Regards
+
+Marcel
 
