@@ -1,166 +1,46 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: "Kasper Markus (ETAS-PSC/ECE1)" <Markus.Kasper@escrypt.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: AW: [BUG] LEAdvertisingManager suffers from ObjectManager hierarchy
+Date: Mon, 25 Jan 2016 13:26:27 +0000
+Message-ID: <6565841ab237430197c4fcffd6496dd0@FE-MBX1011.de.bosch.com>
+References: <938d66c7e3ba4933912f948240b2669f@FE-MBX1011.de.bosch.com>
+	<CABBYNZ+VyakQoiYV6=DkPux9ZCOB58BHRJGXU07UpxjzcJJr+Q@mail.gmail.com>
+	<241284aa107e466995c0821e4b015afd@FE-MBX1011.de.bosch.com>
+ <CABBYNZJcppMX8g7PXpVRd7hpg=4ogpWBkLYZR9YbON-Y1H67bA@mail.gmail.com>
+In-Reply-To: <CABBYNZJcppMX8g7PXpVRd7hpg=4ogpWBkLYZR9YbON-Y1H67bA@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-From: =?UTF-8?Q?Fran=C3=A7ois_Beaufort?= <beaufort.francois@gmail.com>
-Date: Mon, 25 Jan 2016 16:23:24 +0100
-Message-ID: <CAEZxfGMJZva2Rmfm4P8D+zTnY7RbvaaA-e3R3SxoLycuD9D==A@mail.gmail.com>
-Subject: Two connect failed...
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I fail to understand what is happening here and I would appreciate your help.
-I'm able to see my nearby device (NRF51822DK) with the "scan on" command.
-However when calling "connect F1:6F:DE:EC:F1:D6" from bluetoothctl, I
-get a "connect failed" error...
-And from times to times, it magically works... meaning it gets a
-connect failed but eventually create a connection with a single
-"connect" command by the way.
-
-Here's a btmon trace below.
-
-Bluetooth monitor ver 5.35
-= New Index: A4:17:31:78:A6:04 (BR/EDR,USB,hci0)
-                                                     [hci0] 0.753884
-
-
-< HCI Command: LE Set Scan Parameters (0x08|0x000b) plen 7
-                                                    [hci0] 22.180529
-        Type: Passive (0x00)
-        Interval: 60.000 msec (0x0060)
-        Window: 30.000 msec (0x0030)
-        Own address type: Public (0x00)
-        Filter policy: Ignore not in white list (0x01)
-> HCI Event: Command Complete (0x0e) plen 4                                                                                [hci0] 22.181008
-      LE Set Scan Parameters (0x08|0x000b) ncmd 1
-        Status: Success (0x00)
-< HCI Command: LE Set Scan Enable (0x08|0x000c) plen 2
-                                                    [hci0] 22.181041
-        Scanning: Enabled (0x01)
-        Filter duplicates: Enabled (0x01)
-> HCI Event: Command Complete (0x0e) plen 4                                                                                [hci0] 22.182008
-      LE Set Scan Enable (0x08|0x000c) ncmd 1
-        Status: Success (0x00)
-> HCI Event: LE Meta Event (0x3e) plen 36                                                                                  [hci0] 22.264099
-      LE Advertising Report (0x02)
-        Num reports: 1
-        Event type: Connectable undirected - ADV_IND (0x00)
-        Address type: Random (0x01)
-        Address: F1:6F:DE:EC:F1:D6 (Static)
-        Data length: 24
-        Flags: 0x05
-          LE Limited Discoverable Mode
-          BR/EDR Not Supported
-        Name (complete): Espruino NRF51822DK
-        RSSI: -49 dBm (0xcf)
-< HCI Command: LE Set Scan Enable (0x08|0x000c) plen 2
-                                                    [hci0] 22.264224
-        Scanning: Disabled (0x00)
-        Filter duplicates: Disabled (0x00)
-> HCI Event: Command Complete (0x0e) plen 4                                                                                [hci0] 22.265029
-      LE Set Scan Enable (0x08|0x000c) ncmd 1
-        Status: Success (0x00)
-< HCI Command: LE Create Connection (0x08|0x000d) plen 25
-                                                    [hci0] 22.265139
-        Scan interval: 60.000 msec (0x0060)
-        Scan window: 30.000 msec (0x0030)
-        Filter policy: White list is not used (0x00)
-        Peer address type: Random (0x01)
-        Peer address: F1:6F:DE:EC:F1:D6 (Static)
-        Own address type: Public (0x00)
-        Min connection interval: 50.00 msec (0x0028)
-        Max connection interval: 70.00 msec (0x0038)
-        Connection latency: 0x0000
-        Supervision timeout: 420 msec (0x002a)
-        Min connection length: 0.000 msec (0x0000)
-        Max connection length: 0.000 msec (0x0000)
-> HCI Event: Command Status (0x0f) plen 4                                                                                  [hci0] 22.266017
-      LE Create Connection (0x08|0x000d) ncmd 1
-        Status: Success (0x00)
-< HCI Command: LE Create Connection Cancel (0x08|0x000e) plen 0
-                                                    [hci0] 24.269467
-> HCI Event: Command Complete (0x0e) plen 4                                                                                [hci0] 24.271009
-      LE Create Connection Cancel (0x08|0x000e) ncmd 1
-        Status: Success (0x00)
-> HCI Event: LE Meta Event (0x3e) plen 19                                                                                  [hci0] 24.272993
-      LE Connection Complete (0x01)
-        Status: Unknown Connection Identifier (0x02)
-        Handle: 32
-        Role: Master (0x00)
-        Peer address type: Random (0x01)
-        Peer address: F1:6F:DE:EC:F1:D6 (Static)
-        Connection interval: 67.50 msec (0x0036)
-        Connection latency: 0.00 msec (0x0000)
-        Supervision timeout: 420 msec (0x002a)
-        Master clock accuracy: 0x00
-@ Connect Failed: F1:6F:DE:EC:F1:D6 (2) status 0x02
-< HCI Command: LE Set Scan Parameters (0x08|0x000b) plen 7
-                                                    [hci0] 24.282482
-        Type: Passive (0x00)
-        Interval: 60.000 msec (0x0060)
-        Window: 30.000 msec (0x0030)
-        Own address type: Public (0x00)
-        Filter policy: Ignore not in white list (0x01)
-> HCI Event: Command Complete (0x0e) plen 4                                                                                [hci0] 24.282992
-      LE Set Scan Parameters (0x08|0x000b) ncmd 1
-        Status: Success (0x00)
-< HCI Command: LE Set Scan Enable (0x08|0x000c) plen 2
-                                                    [hci0] 24.283021
-        Scanning: Enabled (0x01)
-        Filter duplicates: Enabled (0x01)
-> HCI Event: Command Complete (0x0e) plen 4                                                                                [hci0] 24.283990
-      LE Set Scan Enable (0x08|0x000c) ncmd 1
-        Status: Success (0x00)
-> HCI Event: LE Meta Event (0x3e) plen 36                                                                                  [hci0] 26.283994
-      LE Advertising Report (0x02)
-        Num reports: 1
-        Event type: Connectable undirected - ADV_IND (0x00)
-        Address type: Random (0x01)
-        Address: F1:6F:DE:EC:F1:D6 (Static)
-        Data length: 24
-        Flags: 0x05
-          LE Limited Discoverable Mode
-          BR/EDR Not Supported
-        Name (complete): Espruino NRF51822DK
-        RSSI: -46 dBm (0xd2)
-< HCI Command: LE Set Scan Enable (0x08|0x000c) plen 2
-                                                    [hci0] 26.284088
-        Scanning: Disabled (0x00)
-        Filter duplicates: Disabled (0x00)
-> HCI Event: Command Complete (0x0e) plen 4                                                                                [hci0] 26.284989
-      LE Set Scan Enable (0x08|0x000c) ncmd 1
-        Status: Success (0x00)
-< HCI Command: LE Create Connection (0x08|0x000d) plen 25
-                                                    [hci0] 26.285068
-        Scan interval: 60.000 msec (0x0060)
-        Scan window: 30.000 msec (0x0030)
-        Filter policy: White list is not used (0x00)
-        Peer address type: Random (0x01)
-        Peer address: F1:6F:DE:EC:F1:D6 (Static)
-        Own address type: Public (0x00)
-        Min connection interval: 50.00 msec (0x0028)
-        Max connection interval: 70.00 msec (0x0038)
-        Connection latency: 0x0000
-        Supervision timeout: 420 msec (0x002a)
-        Min connection length: 0.000 msec (0x0000)
-        Max connection length: 0.000 msec (0x0000)
-> HCI Event: Command Status (0x0f) plen 4                                                                                  [hci0] 26.285982
-      LE Create Connection (0x08|0x000d) ncmd 1
-        Status: Success (0x00)
-< HCI Command: LE Create Connection Cancel (0x08|0x000e) plen 0
-                                                    [hci0] 28.289490
-> HCI Event: Command Complete (0x0e) plen 4                                                                                [hci0] 28.290991
-      LE Create Connection Cancel (0x08|0x000e) ncmd 1
-        Status: Success (0x00)
-> HCI Event: LE Meta Event (0x3e) plen 19                                                                                  [hci0] 28.292966
-      LE Connection Complete (0x01)
-        Status: Unknown Connection Identifier (0x02)
-        Handle: 32
-        Role: Master (0x00)
-        Peer address type: Random (0x01)
-        Peer address: F1:6F:DE:EC:F1:D6 (Static)
-        Connection interval: 67.50 msec (0x0036)
-        Connection latency: 0.00 msec (0x0000)
-        Supervision timeout: 420 msec (0x002a)
-        Master clock accuracy: 0x00
-@ Connect Failed: F1:6F:DE:EC:F1:D6 (2) status 0x02
+SGkgTHVpeiwNCg0KPiBWb246IEx1aXogQXVndXN0byB2b24gRGVudHogW21haWx0bzpsdWl6LmRl
+bnR6QGdtYWlsLmNvbV0NCj4gDQo+IEkgd2FzIGFib3V0IHRvIGNvbW1pdCB0aGlzIGJ1dCB0aGVu
+IEkgcmVhbGl6ZSB0aGUgY29kZSB1bmRlciB0ZXN0L2V4YW1wbGUtDQo+IGFkdmVydGlzaW5nIGRv
+ZXMgbm90IGFjdHVhbGx5IHVzZXMgT2JqZWN0TWFuYWdlciBhbmQgc3RpbGwgd29ya3MsIHNvIGV2
+ZW4NCj4gdGhvdWdoIEdldE1hbmFnZWRPYmplY3RzIGRvZXMgcmV0dXJuIGFuIGVycm9yIHRoZSBj
+b2RlIHNlZW1zIHRvIGNvcGUNCj4gd2l0aCBpdCBqdXN0IGZpbmUgc28gSW0gbm90IHN1cmUgd2hh
+dCBleGFjdGx5IGlzIHlvdXIgYnVnPw0KDQpJIHJldmVydGVkIGFsbCBjaGFuZ2VzIHRvIGFkdmVy
+dGlzaW5nIGNvZGUgdG8gdmVyaWZ5IGFuZCBhZ3JlZTogYXMgeW91IGNsYWltZWQgLS0+IGl0IHdv
+cmtzLiANCkknbSByZWFsbHkgbm90IGFibGUgdG8gcmVwcm9kdWNlIHdoYXQgd2VudCB3cm9uZyBh
+bnltb3JlLiBBZnRlciBwbGF5aW5nIGEgYml0IHdpdGggdGhlIGNoYW5nZXMgSSByZWNlbnRseSBt
+YWRlLCBteSBndWVzcyBpcyB0aGUgZXJyb3Igd2FzIGR1ZSB0byBzb21lIG90aGVyIGJ1ZyBpbiBt
+eSBjb2RlLg0KV2hlbiByZXBvcnRpbmcgYXMgYSBidWcgSSBvYnNlcnZlZCAiZmFpbGVkIHRvIHBh
+cnNlIGFkdmVydGlzaW5nIiBlcnJvcnMgb24gdGhlIGRidXMgYW5kIHBhcnNpbmcgcHJvYmxlbXMg
+Zm9yICJUeXBlIiB3aXRoaW4gYmx1ZXRvb3RoZCdzIGRlYnVnIG91dHB1dCB3aGVuIHJlZ2lzdGVy
+aW5nIGFkdmVydGlzaW5nIHVzaW5nIHRoZSBvYmplY3RtYW5hZ2VyJ3MgcGF0aC4NCk9uIHRoZSBv
+dGhlciBoYW5kIHdoZW4gYWR2ZXJ0aXNpbmcgdXNpbmcgdGhlIExFQWR2ZXJ0aXNlbWVudDEgcGF0
+aCBJIGdvdCBhbm90aGVyIGJ1bmNoIG9mIGVycm9ycy4gVGhvc2UgYm9pbGVkIGRvd24gdG8gc29t
+ZXRoaW5nICJubyBjb25uZWN0aW9uIi1pc2ggDQpmcm9tIG15IGRpZmZlcmVudCBkYnVzLXByb3hp
+ZXMgKGluY2x1ZGluZyB0aGUgd29ya2luZyBHQVRUTWFuYWdlcjEpIHRoYXQgb2NjdXJyZWQgb25s
+eSB3aGVuIEkgbWFkZSB0aGUgY2FsbCB0byBSZWdpc3RlckFkdmVydGlzZW1lbnQuIA0KDQpNeSBn
+dWVzcyBpcyBzb21lIGZsYXdlZCBkYXRhL2NvZGUgd2l0aGluIG15IHRlc3QtYWR2ZXJ0aXNlbWVu
+dCBhbmQgSSBtb3N0IGxpa2VseSBjbGVhbmVkIGl0IHNvbWV3aGVyZSBpbiB0aGUgcHJvY2VzcyBv
+ZiBwYXRjaGluZyB0aGUgImV2aWwiIHBhcnQgb2YgdGhlIGFkdmVydGlzaW5nLmMgDQpSZXNwb25z
+aWJsZSBmb3IgdGhlIG9ic2VydmVkIGRidXMgZXJyb3JzLiBBcyBteSBwcm9ibGVtcyB3ZXJlIGdv
+bmUgYWZ0ZXIgcGF0Y2hpbmcgdGhlIGJsdWVaIHBhcnQsIEkgb2J2aW91c2x5IGdvdCBvbiB0aGUg
+d3JvbmcgdHJhY2suDQpJJ20gc29ycnkgZm9yIHRoZSBjb25mdXNpb24uIA0KDQpJIHRoaW5rIHlv
+dSBzaG91bGQgY29tbWl0IHRoZSBwYXRjaCBhbnl3YXksIGV2ZW4gaWYgaXQncyBub3cgImp1c3Qi
+IGEgbWlub3IgaW1wcm92ZW1lbnQgdG93YXJkcyBjbGVhbmVyIGNvZGUgaW5zdGVhZCBvZiBhIGJ1
+Z2ZpeC4gDQoNClRoYW5rcywNCk1hcmt1cw0KDQo=
