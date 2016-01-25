@@ -1,46 +1,63 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: "Kasper Markus (ETAS-PSC/ECE1)" <Markus.Kasper@escrypt.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: AW: [BUG] LEAdvertisingManager suffers from ObjectManager hierarchy
-Date: Mon, 25 Jan 2016 13:26:27 +0000
-Message-ID: <6565841ab237430197c4fcffd6496dd0@FE-MBX1011.de.bosch.com>
+MIME-Version: 1.0
+In-Reply-To: <241284aa107e466995c0821e4b015afd@FE-MBX1011.de.bosch.com>
 References: <938d66c7e3ba4933912f948240b2669f@FE-MBX1011.de.bosch.com>
 	<CABBYNZ+VyakQoiYV6=DkPux9ZCOB58BHRJGXU07UpxjzcJJr+Q@mail.gmail.com>
 	<241284aa107e466995c0821e4b015afd@FE-MBX1011.de.bosch.com>
- <CABBYNZJcppMX8g7PXpVRd7hpg=4ogpWBkLYZR9YbON-Y1H67bA@mail.gmail.com>
-In-Reply-To: <CABBYNZJcppMX8g7PXpVRd7hpg=4ogpWBkLYZR9YbON-Y1H67bA@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
+Date: Mon, 25 Jan 2016 13:54:12 +0200
+Message-ID: <CABBYNZJcppMX8g7PXpVRd7hpg=4ogpWBkLYZR9YbON-Y1H67bA@mail.gmail.com>
+Subject: Re: [BUG] LEAdvertisingManager suffers from ObjectManager hierarchy
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: "Kasper Markus (ETAS-PSC/ECE1)" <Markus.Kasper@escrypt.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgTHVpeiwNCg0KPiBWb246IEx1aXogQXVndXN0byB2b24gRGVudHogW21haWx0bzpsdWl6LmRl
-bnR6QGdtYWlsLmNvbV0NCj4gDQo+IEkgd2FzIGFib3V0IHRvIGNvbW1pdCB0aGlzIGJ1dCB0aGVu
-IEkgcmVhbGl6ZSB0aGUgY29kZSB1bmRlciB0ZXN0L2V4YW1wbGUtDQo+IGFkdmVydGlzaW5nIGRv
-ZXMgbm90IGFjdHVhbGx5IHVzZXMgT2JqZWN0TWFuYWdlciBhbmQgc3RpbGwgd29ya3MsIHNvIGV2
-ZW4NCj4gdGhvdWdoIEdldE1hbmFnZWRPYmplY3RzIGRvZXMgcmV0dXJuIGFuIGVycm9yIHRoZSBj
-b2RlIHNlZW1zIHRvIGNvcGUNCj4gd2l0aCBpdCBqdXN0IGZpbmUgc28gSW0gbm90IHN1cmUgd2hh
-dCBleGFjdGx5IGlzIHlvdXIgYnVnPw0KDQpJIHJldmVydGVkIGFsbCBjaGFuZ2VzIHRvIGFkdmVy
-dGlzaW5nIGNvZGUgdG8gdmVyaWZ5IGFuZCBhZ3JlZTogYXMgeW91IGNsYWltZWQgLS0+IGl0IHdv
-cmtzLiANCkknbSByZWFsbHkgbm90IGFibGUgdG8gcmVwcm9kdWNlIHdoYXQgd2VudCB3cm9uZyBh
-bnltb3JlLiBBZnRlciBwbGF5aW5nIGEgYml0IHdpdGggdGhlIGNoYW5nZXMgSSByZWNlbnRseSBt
-YWRlLCBteSBndWVzcyBpcyB0aGUgZXJyb3Igd2FzIGR1ZSB0byBzb21lIG90aGVyIGJ1ZyBpbiBt
-eSBjb2RlLg0KV2hlbiByZXBvcnRpbmcgYXMgYSBidWcgSSBvYnNlcnZlZCAiZmFpbGVkIHRvIHBh
-cnNlIGFkdmVydGlzaW5nIiBlcnJvcnMgb24gdGhlIGRidXMgYW5kIHBhcnNpbmcgcHJvYmxlbXMg
-Zm9yICJUeXBlIiB3aXRoaW4gYmx1ZXRvb3RoZCdzIGRlYnVnIG91dHB1dCB3aGVuIHJlZ2lzdGVy
-aW5nIGFkdmVydGlzaW5nIHVzaW5nIHRoZSBvYmplY3RtYW5hZ2VyJ3MgcGF0aC4NCk9uIHRoZSBv
-dGhlciBoYW5kIHdoZW4gYWR2ZXJ0aXNpbmcgdXNpbmcgdGhlIExFQWR2ZXJ0aXNlbWVudDEgcGF0
-aCBJIGdvdCBhbm90aGVyIGJ1bmNoIG9mIGVycm9ycy4gVGhvc2UgYm9pbGVkIGRvd24gdG8gc29t
-ZXRoaW5nICJubyBjb25uZWN0aW9uIi1pc2ggDQpmcm9tIG15IGRpZmZlcmVudCBkYnVzLXByb3hp
-ZXMgKGluY2x1ZGluZyB0aGUgd29ya2luZyBHQVRUTWFuYWdlcjEpIHRoYXQgb2NjdXJyZWQgb25s
-eSB3aGVuIEkgbWFkZSB0aGUgY2FsbCB0byBSZWdpc3RlckFkdmVydGlzZW1lbnQuIA0KDQpNeSBn
-dWVzcyBpcyBzb21lIGZsYXdlZCBkYXRhL2NvZGUgd2l0aGluIG15IHRlc3QtYWR2ZXJ0aXNlbWVu
-dCBhbmQgSSBtb3N0IGxpa2VseSBjbGVhbmVkIGl0IHNvbWV3aGVyZSBpbiB0aGUgcHJvY2VzcyBv
-ZiBwYXRjaGluZyB0aGUgImV2aWwiIHBhcnQgb2YgdGhlIGFkdmVydGlzaW5nLmMgDQpSZXNwb25z
-aWJsZSBmb3IgdGhlIG9ic2VydmVkIGRidXMgZXJyb3JzLiBBcyBteSBwcm9ibGVtcyB3ZXJlIGdv
-bmUgYWZ0ZXIgcGF0Y2hpbmcgdGhlIGJsdWVaIHBhcnQsIEkgb2J2aW91c2x5IGdvdCBvbiB0aGUg
-d3JvbmcgdHJhY2suDQpJJ20gc29ycnkgZm9yIHRoZSBjb25mdXNpb24uIA0KDQpJIHRoaW5rIHlv
-dSBzaG91bGQgY29tbWl0IHRoZSBwYXRjaCBhbnl3YXksIGV2ZW4gaWYgaXQncyBub3cgImp1c3Qi
-IGEgbWlub3IgaW1wcm92ZW1lbnQgdG93YXJkcyBjbGVhbmVyIGNvZGUgaW5zdGVhZCBvZiBhIGJ1
-Z2ZpeC4gDQoNClRoYW5rcywNCk1hcmt1cw0KDQo=
+Hi Markus,
+
+On Fri, Jan 22, 2016 at 5:43 PM, Kasper Markus (ETAS-PSC/ECE1)
+<Markus.Kasper@escrypt.com> wrote:
+> Hi Luiz,
+>
+>
+>> -----Ursprüngliche Nachricht-----
+>> Von: Luiz Augusto von Dentz [mailto:luiz.dentz@gmail.com]
+>> Hi Markus,
+>>
+>> On Thu, Jan 21, 2016 at 5:53 PM, Kasper Markus (ETAS-PSC/ECE1)
+>> <Markus.Kasper@escrypt.com> wrote:
+>> Actually LEAdvertisementManager1.RegisterAdvertisement does no actually
+>> require ObjectManager, so the following shall probably work:
+>>
+>> iff --git a/src/advertising.c b/src/advertising.c index 59c8c3d..4b87d42 100644
+>> --- a/src/advertising.c
+>> +++ b/src/advertising.c
+>> @@ -591,7 +591,7 @@ static struct advertisement
+>> *advertisement_create(DBusConnection *conn,
+>>                 return NULL;
+>>
+>>         ad = new0(struct advertisement, 1);
+>> -       ad->client = g_dbus_client_new_full(conn, sender, path, path);
+>> +       ad->client = g_dbus_client_new_full(conn, sender, path, NULL);
+>>         if (!ad->client)
+>>                 goto fail;
+> I tried this solution --> works like a charm. Previously I fixed it by adapting the api to take path and rootpath (= obj. Manager path) and then added rootpath as the fourth parameter to the call above.
+> But your fix is obviously much simpler. Will you commit it? You'd most likely be much faster than I am.
+
+I was about to commit this but then I realize the code under
+test/example-advertising does not actually uses ObjectManager and
+still works, so even though GetManagedObjects does return an error the
+code seems to cope with it just fine so Im not sure what exactly is
+your bug?
+
+>
+>> > Re contributing:
+> Thanks for clearing this up. The part in "HACKING" didn't mention both (user & kernel) and I missed the cleaner statement within the maintainers guidelines.
+>> > Especially, the "how/where to commit/send?" is not really clear to me.
+> What I read is: send patches formatted as text to this list (i.e. output of diff -Nurp).
+
+The easiest method is to use git format-patch followed by git send-email.
+
+-- 
+Luiz Augusto von Dentz
