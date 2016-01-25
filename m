@@ -1,28 +1,34 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 9.2 \(3112\))
-Subject: Re: [BUG] Btattach, ioctl fails to set flags from 32-bit user space to 64-bit
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <E49EE6B1-CAEC-43D1-9B95-82EA592F628B@holtmann.org>
-Date: Mon, 25 Jan 2016 08:55:11 +0100
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <18D7713A-8106-4B08-B49E-29102CEB3803@holtmann.org>
-References: <CAA+NYvTV6WybKuO71Gehm6L2-vjsqVhmu5VjEQCfqFaWi1TU6Q@mail.gmail.com> <C72941BE-7F8A-4CD7-900E-5E8E6E42FD63@holtmann.org> <CAA+NYvRGebocnnYjdy2wLQkqsPT+WiNUE4trOS0zbL547Uar-w@mail.gmail.com> <E49EE6B1-CAEC-43D1-9B95-82EA592F628B@holtmann.org>
-To: Jaap Jan Meijer <jjmeijer88@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Add missing COMPATIBLE_IOCTL for UART line discipline
+Date: Mon, 25 Jan 2016 08:44:03 +0100
+Message-Id: <1453707843-92704-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jaap,
+The HCIUARTGETDEVICE, HCIUARTSETFLAGS and HCIUARTGETFLAGS ioctl are
+missing the COMPATIBLE_IOCTL declaration.
 
->> Thank you, that was very good guess work. Btattach is now able to
->> attach by bcm43241 in the mixed arch situation. Should I supply a
->> patch or will you just add it? I'll will send-email a patch anyway.
-> 
-> I just send a patch that should be more correct on all platforms. Can you try that one out please.
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ fs/compat_ioctl.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-actually it might be just some missing COMPATIBLE_IOCTL declarations. I just send a patch for that. The patch is correct by itself, but it might actually fix your issue and no .compat_ioctl is needed.
-
-Regards
-
-Marcel
+diff --git a/fs/compat_ioctl.c b/fs/compat_ioctl.c
+index a5b8eb69a8f4..6402eaf8ab95 100644
+--- a/fs/compat_ioctl.c
++++ b/fs/compat_ioctl.c
+@@ -1261,6 +1261,9 @@ COMPATIBLE_IOCTL(HCIUNBLOCKADDR)
+ COMPATIBLE_IOCTL(HCIINQUIRY)
+ COMPATIBLE_IOCTL(HCIUARTSETPROTO)
+ COMPATIBLE_IOCTL(HCIUARTGETPROTO)
++COMPATIBLE_IOCTL(HCIUARTGETDEVICE)
++COMPATIBLE_IOCTL(HCIUARTSETFLAGS)
++COMPATIBLE_IOCTL(HCIUARTGETFLAGS)
+ COMPATIBLE_IOCTL(RFCOMMCREATEDEV)
+ COMPATIBLE_IOCTL(RFCOMMRELEASEDEV)
+ COMPATIBLE_IOCTL(RFCOMMGETDEVLIST)
+-- 
+2.5.0
 
