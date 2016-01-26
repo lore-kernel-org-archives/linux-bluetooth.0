@@ -1,87 +1,105 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Jon Hoffman <Jon.Hoffman@myfuelmaster.com>
-To: Jon Hoffman <Jon.Hoffman@myfuelmaster.com>,
-	"'Luiz Augusto von Dentz'" <luiz.dentz@gmail.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Tue, 26 Jan 2016 12:46:59 -0500
-Subject: RE: Bluetooth Smart 5LoWPAN connection between two devices
-Message-ID: <3916CF28FA2C014B862815C318D03FF5A0A7493AB2@Courier.syntech.org>
-References: <3916CF28FA2C014B862815C318D03FF5A0A7493AAF@Courier.syntech.org>
- <CABBYNZJ3DqnNGKGoRZiGGpNSH5r=9FuH6BLeNsjavsgFdZ4=xw@mail.gmail.com>
- <3916CF28FA2C014B862815C318D03FF5A0A7493AB0@Courier.syntech.org>
-In-Reply-To: <3916CF28FA2C014B862815C318D03FF5A0A7493AB0@Courier.syntech.org>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2] Bluetooth: Fix incorrect removing of IRKs
+Date: Tue, 26 Jan 2016 12:19:50 -0500
+Message-Id: <1453828790-32357-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SSBmb3Jnb3QgdG8gbWVudGlvbiBiZWxvdywgdGhhdCBJIGFsc28gaGF2ZSBmdWxsIFdpcmVzaGFy
-ayBkdW1wcyBvZiBib3RoIHRoZSBCbHVlWiA0ICg2TG9XUEFOIGNvbm5lY3Rpb24gd29ya3MpIGFu
-ZCB0aGUgQmx1ZVogNSAoNkxvV1BBTiBjb25uZWN0aW9uIGRvZXNuJ3Qgd29yaykgaWYgYW55b25l
-IHdhbnRzIHRvIHNlZSB0aGVtLiAgSSBwZXJzb25hbGx5IGRvIG5vdCBrbm93IGVub3VnaCBhYm91
-dCB0aGUgaW50ZXJuYWxzIG9mIHRoZSBwcm90b2NvbHMgdG8gcGljayBvdXQgd2hlcmUgdGhlIGlz
-c3VlIGlzLg0KDQpUaGFua3MsDQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJv
-bTogbGludXgtYmx1ZXRvb3RoLW93bmVyQHZnZXIua2VybmVsLm9yZyBbbWFpbHRvOmxpbnV4LWJs
-dWV0b290aC0NCj4gb3duZXJAdmdlci5rZXJuZWwub3JnXSBPbiBCZWhhbGYgT2YgSm9uIEhvZmZt
-YW4NCj4gU2VudDogVHVlc2RheSwgSmFudWFyeSAyNiwgMjAxNiAxMDoxOSBBTQ0KPiBUbzogJ0x1
-aXogQXVndXN0byB2b24gRGVudHonIDxsdWl6LmRlbnR6QGdtYWlsLmNvbT4NCj4gQ2M6IGxpbnV4
-LWJsdWV0b290aEB2Z2VyLmtlcm5lbC5vcmcNCj4gU3ViamVjdDogUkU6IEJsdWV0b290aCBTbWFy
-dCA1TG9XUEFOIGNvbm5lY3Rpb24gYmV0d2VlbiB0d28gZGV2aWNlcw0KPiANCj4gSGVsbG8sDQo+
-IFRoYW5rIHlvdSBmb3IgdGhlIHJlcGx5DQo+IA0KPiA+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0t
-LS0tDQo+ID4gRnJvbTogTHVpeiBBdWd1c3RvIHZvbiBEZW50eiBbbWFpbHRvOmx1aXouZGVudHpA
-Z21haWwuY29tXQ0KPiA+IFNlbnQ6IFR1ZXNkYXksIEphbnVhcnkgMjYsIDIwMTYgNDo0MSBBTQ0K
-PiA+IFRvOiBKb24gSG9mZm1hbiA8Sm9uLkhvZmZtYW5AbXlmdWVsbWFzdGVyLmNvbT4NCj4gPiBD
-YzogbGludXgtYmx1ZXRvb3RoQHZnZXIua2VybmVsLm9yZw0KPiA+IFN1YmplY3Q6IFJlOiBCbHVl
-dG9vdGggU21hcnQgNUxvV1BBTiBjb25uZWN0aW9uIGJldHdlZW4gdHdvIGRldmljZXMNCj4gPg0K
-PiA+IEhpIEpvbiwNCj4gPg0KPiA+IE9uIE1vbiwgSmFuIDI1LCAyMDE2IGF0IDc6NTMgUE0sIEpv
-biBIb2ZmbWFuDQo+ID4gPEpvbi5Ib2ZmbWFuQG15ZnVlbG1hc3Rlci5jb20+IHdyb3RlOg0KPiA+
-ID4gSSBkbyBub3Qgd2FudCB0byB1c2UgQmx1ZXogNC5YWCBzbyBJIGFtIGF0dGVtcHRpbmcgdG8g
-Z2V0IHRoaXMgdG8NCj4gPiA+IHdvcmsgd2l0aCBCbHVleiA1IG9uIGJvdGggdGhlIG1hc3RlciBh
-bmQgc2xhdmUuICBJIGhhdmUgdHJpZWQgdGhlDQo+ID4gPiBmb2xsb3dpbmcgY29tbWFuZHMgb24g
-Ym90aCB0aGUgUmFzcGJlcnJ5IFBpIHdpdGggQmx1ZXogNS4yMyBhbmQNCj4gPiA+IEZlZG9yYSAy
-MyB3aXRoIEJsdWV6IDUuMzUNCj4gPg0KPiA+IEJsdWVaIDQgaXMgdG9vIG9sZCB0byBzdXBwb3J0
-LCBpZiB5b3Ugd2FudCBzb21lIHN1cHBvcnQgZnJvbSB0aGUNCj4gPiBjb21tdW5pdHkganVzdCBz
-dGljayB3aXRoIEJsdWVaIDUuDQo+ID4NCj4gDQo+IE91ciBnb2FsIGlzIHRvIGdldCBCbHVleiA1
-IHdvcmtpbmcuICBTaW5jZSBJIGFtIGhhdmluZyBpc3N1ZXMgd2l0aCBCbHVleiA1LCBJDQo+IHRy
-aWVkIHVzaW5nIFVidW50dSAxNCB3aXRoIEJsdWV6IDQgdG8gc2VlIGlmIGl0IHdvdWxkIHdvcmsg
-KHRvIHJ1bGUgb3V0DQo+IGhhcmR3YXJlIGlzc3VlcykuICBJIGhhdmUgYWxzbyB0cmllZCBVYnVu
-dHUgMTUgd2l0aCBCbHVleiA1LjIzIGJ1dCBJIGFtDQo+IGV4cGVyaWVuY2luZyB0aGUgc2FtZSBp
-c3N1ZXMgYXMgd2l0aCBGZWRvcmEgMjMgKEJsdWV6IDUuMzUpIGFuZCBSYXNwYmlhbg0KPiAoQmx1
-ZXggNS4yMykuDQo+IA0KPiA+ID4NCj4gPiA+IFNsYXZlIChSYXNwYmVycnkgUGkgQmx1ZXogNS4y
-MyBvciBGZWRvcmEgMjMgQmx1ZXogNS4zNSk6DQo+ID4gPiAgICAgICAgI25lZWQgcm9vdCBhY2Nl
-c3MNCj4gPiA+ICAgICAgICBzdWRvIHN1DQo+ID4gPg0KPiA+ID4gICAgICAgICNlbmFibGUgNmxv
-d3BhbiBvdmVyIEJsdWV0b290aCBsZQ0KPiA+ID4gICAgICAgIGVjaG8gMSA+IC9zeXMva2VybmVs
-L2RlYnVnL2JsdWV0b290aC82bG93cGFuX2VuYWJsZWQNCj4gPiA+DQo+ID4gPiAgICAgICAgI3N0
-YXJ0IGFkdmVydGlzaW5nIEJsdWV0b290aCBMRSBzZXJ2aWNlDQo+ID4gPiAgICAgICAgaGNpY29u
-ZmlnIGhjaTAgbGVhZHYNCj4gPg0KPiA+IFRoZXJlIGlzIGEgYnVpbHQtaW4gRC1CdXMgaW50ZXJm
-YWNlIHRvIGFkdmVydGlzZSB1c2luZyBibHVldG9vdGhkLCBvcg0KPiA+IGlmIHlvdSBwcmVmZXIg
-bG93IGxldmVsIHRoZW4gdXNlIGJ0bWdtdC4NCj4gDQo+IEkgYW0gbm90IGZhbWlsaWFyIHdpdGgg
-Qmx1ZXogRC1CdXMgaW50ZXJmYWNlIGJ1dCBJIGNhbiBnaXZlIGl0IGEgdHJ5IGlmIHlvdSB0aGlu
-ayBJDQo+IG1pZ2h0IGdldCBkaWZmZXJlbnQgcmVzdWx0cy4gIE15IHByZWZlcmVuY2Ugd291bGQg
-YmUgdG8gZ2V0IGFuIE9TIGxldmVsDQo+IGNvbm5lY3Rpb24gd29ya2luZyBmb3IgdGhlIHByb29m
-IG9mIGNvbmNlcHQgc2ltaWxhciB0byBob3cgdGhlIEJsdWV6IDQNCj4gd29ya2VkLg0KPiANCj4g
-Pg0KPiA+ID4gbWFzdGVyIChSYXNwYmVycnkgUGkgQmx1ZXogNS4yMyBvciBGZWRvcmEgMjMgQmx1
-ZXogNS4zNSk6DQo+ID4gPiAgICAgICAgICNuZWVkIHJvb3QgYWNjZXNzDQo+ID4gPiAgICAgICAg
-IHN1ZG8gc3UNCj4gPiA+DQo+ID4gPiAgICAgICAgICNlbmFibGUgNmxvd3BhbiBvdmVyIEJsdWV0
-b290aCBsZQ0KPiA+ID4gICAgICAgICBlY2hvIDEgPiAvc3lzL2tlcm5lbC9kZWJ1Zy9ibHVldG9v
-dGgvNmxvd3Bhbl9lbmFibGUNCj4gPiA+DQo+ID4gPiAgICAgICAgICNlc3RhYmxpc2ggbGUgY29u
-bmVjdGlvbiB0byBtYXN0ZXINCj4gPiA+ICAgICAgICAgaGNpdG9vbCBsZWNjIDVDOkYzOjcwOlhY
-OlhYOlhYDQo+ID4gPg0KPiA+ID4gICAgICAgICBlY2hvICJjb25uZWN0IDVDOkYzOjcwOlhYOlhY
-OlhYIDEiID4NCj4gPiA+IC9zeXMva2VybmVsL2RlYnVnL2JsdWV0b290aC82bG93cGFuX2NvbnRy
-b2wNCj4gPg0KPiA+IFRoaXMgYWN0dWFsbHkgd29ya3MgZm9yIG1lIHNvIHBlcmhhcHMgdGhlcmUg
-aXMgc29tZXRoaW5nIGVsc2UgZ29pbmcNCj4gPiBvbiwgeW91IGNhbiB0cnkgZW5hYmxpbmcgZHlu
-YW1pYyBkZWJ1ZyBpbiB5b3VyIGtlcm5lbCBhcyB3ZWxsIGFzDQo+ID4gY2hlY2tpbmcgdGhlIEhD
-SSB0cmFjZSwgcGVyaGFwcyB0aGUgTDJDQVAgY2hhbm5lbCBkb2Vzbid0IGNvbm5lY3Qgb3INCj4g
-c29tZXRoaW5nIGxpa2UgdGhhdC4NCj4gPg0KPiA+DQo+IA0KPiBJIGRvIGhhdmUgYSBoY2lkdW1w
-IGZpbGUgYnV0IEkgZGlkIG5vdCB3YW50IHRvIHNlbmQgaXQgdG8gdGhlIGVudGlyZSBlLW1haWwN
-Cj4gZ3JvdXAuICBJZiBhbnlvbmUgd291bGQgbGlrZSB0byBzZWUgaXQgSSBjYW4gZm9yd2FyZCBp
-dCB0byB0aGVtIGluZGl2aWR1YWxseS4NCj4gV2hlbiB5b3UgZ290IGl0IHRvIHdvcmssIHdlcmUg
-eW91IHVzaW5nIGEgc3RhbmRhcmQgb3V0IG9mIHRoZSBib3gNCj4gZGlzdHJpYnV0aW9uIChVYnVu
-dHUsIEZlZG9yYS4uLikgb3IgZGlkIHlvdSBidWlsZCBhIGN1c3RvbSBLZXJuZWwgb3IgY29tcGls
-ZQ0KPiBCbHVleiB5b3Vyc2VsZj8gIEkgYW0gY3VycmVudGx5IHVzaW5nIG91dCBvZiB0aGUgYm94
-IGRpc3RyaWJ1dGlvbnMuICBJZiBJIG5lZWQgdG8NCj4gYnVpbGQgYSBjdXN0b20ga2VybmVsIG9y
-IEJsdWV6IGZyb20gc291cmNlLCBJIGFtIGZpbmUgd2l0aCB0aGF0Lg0KPiANCj4gPiAtLQ0KPiA+
-IEx1aXogQXVndXN0byB2b24gRGVudHoNCj4gDQo+IFRoYW5rcyBhZ2FpbiBmb3IgdGhlIHJlcGx5
-LA0KPiBKb24NCj4gTiAgICAgciAgeSAgIGIgWCAgx6d2IF4gKd66ey5uICsgICAgeyBuWyAgIC0g
-KSAgIHcqamcgICAeICAgICDdomovICAgeiDeliAgMiDemSAgICYgKd+hIGEgIH8gIB4gRyAgIGgg
-Dw0KPiBqOit2ICAgdyDZpQ0K
+From: Johan Hedberg <johan.hedberg@intel.com>
+
+The commit cad20c278085d893ebd616cd20c0747a8e9d53c7 was supposed to
+fix handling of devices first using public addresses and then
+switching to RPAs after pairing. Unfortunately it missed a couple of
+key places in the code.
+
+1. When evaluating which devices should be removed from the existing
+white list we also need to consider whether we have an IRK for them or
+not, i.e. a call to hci_find_irk_by_addr() is needed.
+
+2. In smp_notify_keys() we should not be requiring the knowledge of
+the RPA, but should simply keep the IRK around if the other conditions
+require it.
+
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+Cc: stable@vger.kernel.org # 4.4+
+---
+ net/bluetooth/hci_request.c | 28 ++++++++++++++++++----------
+ net/bluetooth/smp.c         | 16 ----------------
+ 2 files changed, 18 insertions(+), 26 deletions(-)
+
+diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
+index 41b5f3813f02..998568a73d79 100644
+--- a/net/bluetooth/hci_request.c
++++ b/net/bluetooth/hci_request.c
+@@ -688,21 +688,29 @@ static u8 update_white_list(struct hci_request *req)
+ 	 * command to remove it from the controller.
+ 	 */
+ 	list_for_each_entry(b, &hdev->le_white_list, list) {
+-		struct hci_cp_le_del_from_white_list cp;
++		/* If the device not found in pend_le_conns or
++		 * pend_le_reports remove it from the whitelist.
++		 */
++		if (!hci_pend_le_action_lookup(&hdev->pend_le_conns,
++					       &b->bdaddr, b->bdaddr_type) &&
++		    !hci_pend_le_action_lookup(&hdev->pend_le_reports,
++					       &b->bdaddr, b->bdaddr_type)) {
++			struct hci_cp_le_del_from_white_list cp;
++
++			cp.bdaddr_type = b->bdaddr_type;
++			bacpy(&cp.bdaddr, &b->bdaddr);
+ 
+-		if (hci_pend_le_action_lookup(&hdev->pend_le_conns,
+-					      &b->bdaddr, b->bdaddr_type) ||
+-		    hci_pend_le_action_lookup(&hdev->pend_le_reports,
+-					      &b->bdaddr, b->bdaddr_type)) {
+-			white_list_entries++;
++			hci_req_add(req, HCI_OP_LE_DEL_FROM_WHITE_LIST,
++				    sizeof(cp), &cp);
+ 			continue;
+ 		}
+ 
+-		cp.bdaddr_type = b->bdaddr_type;
+-		bacpy(&cp.bdaddr, &b->bdaddr);
++		if (hci_find_irk_by_addr(hdev, &b->bdaddr, b->bdaddr_type)) {
++			/* White list can not be used with RPAs */
++			return 0x00;
++		}
+ 
+-		hci_req_add(req, HCI_OP_LE_DEL_FROM_WHITE_LIST,
+-			    sizeof(cp), &cp);
++		white_list_entries++;
+ 	}
+ 
+ 	/* Since all no longer valid white list entries have been
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index ffed8a1d4f27..4b175df35184 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -1072,22 +1072,6 @@ static void smp_notify_keys(struct l2cap_conn *conn)
+ 			hcon->dst_type = smp->remote_irk->addr_type;
+ 			queue_work(hdev->workqueue, &conn->id_addr_update_work);
+ 		}
+-
+-		/* When receiving an indentity resolving key for
+-		 * a remote device that does not use a resolvable
+-		 * private address, just remove the key so that
+-		 * it is possible to use the controller white
+-		 * list for scanning.
+-		 *
+-		 * Userspace will have been told to not store
+-		 * this key at this point. So it is safe to
+-		 * just remove it.
+-		 */
+-		if (!bacmp(&smp->remote_irk->rpa, BDADDR_ANY)) {
+-			list_del_rcu(&smp->remote_irk->list);
+-			kfree_rcu(smp->remote_irk, rcu);
+-			smp->remote_irk = NULL;
+-		}
+ 	}
+ 
+ 	if (smp->csrk) {
+-- 
+2.5.0
+
