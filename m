@@ -1,68 +1,105 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/3] Bluetooth: L2CAP: Introduce proper defines for PSM ranges
-Date: Tue, 26 Jan 2016 17:19:09 -0500
-Message-Id: <1453846751-5925-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH v3] Bluetooth: Fix incorrect removing of IRKs
+Date: Tue, 26 Jan 2016 14:31:31 -0500
+Message-Id: <1453836691-10342-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-Having proper defines makes the code a bit readable, it also avoids
-duplicating hard-coded values since these are also needed when
-auto-allocating PSM values (in a subsequent patch).
+The commit cad20c278085d893ebd616cd20c0747a8e9d53c7 was supposed to
+fix handling of devices first using public addresses and then
+switching to RPAs after pairing. Unfortunately it missed a couple of
+key places in the code.
+
+1. When evaluating which devices should be removed from the existing
+white list we also need to consider whether we have an IRK for them or
+not, i.e. a call to hci_find_irk_by_addr() is needed.
+
+2. In smp_notify_keys() we should not be requiring the knowledge of
+the RPA, but should simply keep the IRK around if the other conditions
+require it.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+Cc: stable@vger.kernel.org # 4.4+
 ---
- include/net/bluetooth/l2cap.h | 6 ++++++
- net/bluetooth/l2cap_sock.c    | 6 +++---
- 2 files changed, 9 insertions(+), 3 deletions(-)
+ net/bluetooth/hci_request.c | 28 ++++++++++++++++++----------
+ net/bluetooth/smp.c         | 16 ----------------
+ 2 files changed, 18 insertions(+), 26 deletions(-)
 
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index 52899291f401..5ee3c689c863 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -252,6 +252,12 @@ struct l2cap_conn_rsp {
- #define L2CAP_PSM_3DSP		0x0021
- #define L2CAP_PSM_IPSP		0x0023 /* 6LoWPAN */
- 
-+#define L2CAP_PSM_DYN_START	0x1001
-+#define L2CAP_PSM_DYN_END	0xffff
-+#define L2CAP_PSM_AUTO_END	0x10ff
-+#define L2CAP_PSM_LE_DYN_START  0x0080
-+#define L2CAP_PSM_LE_DYN_END	0x00ff
+diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
+index 41b5f3813f02..c78ee2dc9323 100644
+--- a/net/bluetooth/hci_request.c
++++ b/net/bluetooth/hci_request.c
+@@ -688,21 +688,29 @@ static u8 update_white_list(struct hci_request *req)
+ 	 * command to remove it from the controller.
+ 	 */
+ 	list_for_each_entry(b, &hdev->le_white_list, list) {
+-		struct hci_cp_le_del_from_white_list cp;
++		/* If the device is neither in pend_le_conns nor
++		 * pend_le_reports then remove it from the whitelist.
++		 */
++		if (!hci_pend_le_action_lookup(&hdev->pend_le_conns,
++					       &b->bdaddr, b->bdaddr_type) &&
++		    !hci_pend_le_action_lookup(&hdev->pend_le_reports,
++					       &b->bdaddr, b->bdaddr_type)) {
++			struct hci_cp_le_del_from_white_list cp;
 +
- /* channel identifier */
- #define L2CAP_CID_SIGNALING	0x0001
- #define L2CAP_CID_CONN_LESS	0x0002
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index 1bb551527044..f401592e5837 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -58,7 +58,7 @@ static int l2cap_validate_bredr_psm(u16 psm)
- 		return -EINVAL;
++			cp.bdaddr_type = b->bdaddr_type;
++			bacpy(&cp.bdaddr, &b->bdaddr);
  
- 	/* Restrict usage of well-known PSMs */
--	if (psm < 0x1001 && !capable(CAP_NET_BIND_SERVICE))
-+	if (psm < L2CAP_PSM_DYN_START && !capable(CAP_NET_BIND_SERVICE))
- 		return -EACCES;
+-		if (hci_pend_le_action_lookup(&hdev->pend_le_conns,
+-					      &b->bdaddr, b->bdaddr_type) ||
+-		    hci_pend_le_action_lookup(&hdev->pend_le_reports,
+-					      &b->bdaddr, b->bdaddr_type)) {
+-			white_list_entries++;
++			hci_req_add(req, HCI_OP_LE_DEL_FROM_WHITE_LIST,
++				    sizeof(cp), &cp);
+ 			continue;
+ 		}
  
- 	return 0;
-@@ -67,11 +67,11 @@ static int l2cap_validate_bredr_psm(u16 psm)
- static int l2cap_validate_le_psm(u16 psm)
- {
- 	/* Valid LE_PSM ranges are defined only until 0x00ff */
--	if (psm > 0x00ff)
-+	if (psm > L2CAP_PSM_LE_DYN_END)
- 		return -EINVAL;
+-		cp.bdaddr_type = b->bdaddr_type;
+-		bacpy(&cp.bdaddr, &b->bdaddr);
++		if (hci_find_irk_by_addr(hdev, &b->bdaddr, b->bdaddr_type)) {
++			/* White list can not be used with RPAs */
++			return 0x00;
++		}
  
- 	/* Restrict fixed, SIG assigned PSM values to CAP_NET_BIND_SERVICE */
--	if (psm <= 0x007f && !capable(CAP_NET_BIND_SERVICE))
-+	if (psm < L2CAP_PSM_LE_DYN_START && !capable(CAP_NET_BIND_SERVICE))
- 		return -EACCES;
+-		hci_req_add(req, HCI_OP_LE_DEL_FROM_WHITE_LIST,
+-			    sizeof(cp), &cp);
++		white_list_entries++;
+ 	}
  
- 	return 0;
+ 	/* Since all no longer valid white list entries have been
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index ffed8a1d4f27..4b175df35184 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -1072,22 +1072,6 @@ static void smp_notify_keys(struct l2cap_conn *conn)
+ 			hcon->dst_type = smp->remote_irk->addr_type;
+ 			queue_work(hdev->workqueue, &conn->id_addr_update_work);
+ 		}
+-
+-		/* When receiving an indentity resolving key for
+-		 * a remote device that does not use a resolvable
+-		 * private address, just remove the key so that
+-		 * it is possible to use the controller white
+-		 * list for scanning.
+-		 *
+-		 * Userspace will have been told to not store
+-		 * this key at this point. So it is safe to
+-		 * just remove it.
+-		 */
+-		if (!bacmp(&smp->remote_irk->rpa, BDADDR_ANY)) {
+-			list_del_rcu(&smp->remote_irk->list);
+-			kfree_rcu(smp->remote_irk, rcu);
+-			smp->remote_irk = NULL;
+-		}
+ 	}
+ 
+ 	if (smp->csrk) {
 -- 
 2.5.0
 
