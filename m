@@ -1,52 +1,68 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/3] Bluetooth: L2CAP: Fix auto-allocating LE PSM values
-Date: Tue, 26 Jan 2016 17:19:10 -0500
-Message-Id: <1453846751-5925-2-git-send-email-johan.hedberg@gmail.com>
-In-Reply-To: <1453846751-5925-1-git-send-email-johan.hedberg@gmail.com>
-References: <1453846751-5925-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 1/3] Bluetooth: L2CAP: Introduce proper defines for PSM ranges
+Date: Tue, 26 Jan 2016 17:19:09 -0500
+Message-Id: <1453846751-5925-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-The LE dynamic PSM range is different from BR/EDR (0x0080 - 0x00ff)
-and doesn't have requirements relating to parity, so separate checks
-are needed.
+Having proper defines makes the code a bit readable, it also avoids
+duplicating hard-coded values since these are also needed when
+auto-allocating PSM values (in a subsequent patch).
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/l2cap_core.c | 14 ++++++++++++--
- 1 file changed, 12 insertions(+), 2 deletions(-)
+ include/net/bluetooth/l2cap.h | 6 ++++++
+ net/bluetooth/l2cap_sock.c    | 6 +++---
+ 2 files changed, 9 insertions(+), 3 deletions(-)
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 39a5149f3010..eb4f5f24cbe3 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -197,10 +197,20 @@ int l2cap_add_psm(struct l2cap_chan *chan, bdaddr_t *src, __le16 psm)
- 		chan->sport = psm;
- 		err = 0;
- 	} else {
--		u16 p;
-+		u16 p, start, end, incr;
-+
-+		if (chan->src_type == BDADDR_BREDR) {
-+			start = L2CAP_PSM_DYN_START;
-+			end = L2CAP_PSM_AUTO_END;
-+			incr = 2;
-+		} else {
-+			start = L2CAP_PSM_LE_DYN_START;
-+			end = L2CAP_PSM_LE_DYN_END;
-+			incr = 1;
-+		}
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index 52899291f401..5ee3c689c863 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -252,6 +252,12 @@ struct l2cap_conn_rsp {
+ #define L2CAP_PSM_3DSP		0x0021
+ #define L2CAP_PSM_IPSP		0x0023 /* 6LoWPAN */
  
- 		err = -EINVAL;
--		for (p = 0x1001; p < 0x1100; p += 2)
-+		for (p = start; p <= end; p += incr)
- 			if (!__l2cap_global_chan_by_addr(cpu_to_le16(p), src)) {
- 				chan->psm   = cpu_to_le16(p);
- 				chan->sport = cpu_to_le16(p);
++#define L2CAP_PSM_DYN_START	0x1001
++#define L2CAP_PSM_DYN_END	0xffff
++#define L2CAP_PSM_AUTO_END	0x10ff
++#define L2CAP_PSM_LE_DYN_START  0x0080
++#define L2CAP_PSM_LE_DYN_END	0x00ff
++
+ /* channel identifier */
+ #define L2CAP_CID_SIGNALING	0x0001
+ #define L2CAP_CID_CONN_LESS	0x0002
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index 1bb551527044..f401592e5837 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -58,7 +58,7 @@ static int l2cap_validate_bredr_psm(u16 psm)
+ 		return -EINVAL;
+ 
+ 	/* Restrict usage of well-known PSMs */
+-	if (psm < 0x1001 && !capable(CAP_NET_BIND_SERVICE))
++	if (psm < L2CAP_PSM_DYN_START && !capable(CAP_NET_BIND_SERVICE))
+ 		return -EACCES;
+ 
+ 	return 0;
+@@ -67,11 +67,11 @@ static int l2cap_validate_bredr_psm(u16 psm)
+ static int l2cap_validate_le_psm(u16 psm)
+ {
+ 	/* Valid LE_PSM ranges are defined only until 0x00ff */
+-	if (psm > 0x00ff)
++	if (psm > L2CAP_PSM_LE_DYN_END)
+ 		return -EINVAL;
+ 
+ 	/* Restrict fixed, SIG assigned PSM values to CAP_NET_BIND_SERVICE */
+-	if (psm <= 0x007f && !capable(CAP_NET_BIND_SERVICE))
++	if (psm < L2CAP_PSM_LE_DYN_START && !capable(CAP_NET_BIND_SERVICE))
+ 		return -EACCES;
+ 
+ 	return 0;
 -- 
 2.5.0
 
