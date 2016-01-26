@@ -1,210 +1,131 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <CAD0=r8zoEbgP_XhA6j7Jz2RJ0jUNVirQL74vfqPX7dRtziWyOA@mail.gmail.com>
-References: <CAEZxfGMJZva2Rmfm4P8D+zTnY7RbvaaA-e3R3SxoLycuD9D==A@mail.gmail.com>
- <CAD0=r8zoEbgP_XhA6j7Jz2RJ0jUNVirQL74vfqPX7dRtziWyOA@mail.gmail.com>
-From: =?UTF-8?Q?Fran=C3=A7ois_Beaufort?= <beaufort.francois@gmail.com>
-Date: Tue, 26 Jan 2016 10:17:47 +0100
-Message-ID: <CAEZxfGOmyVm2-LsdjcYK8LXaQ7TFnBJCmKt3wXtPkurepDR-OA@mail.gmail.com>
-Subject: Re: Two connect failed...
-To: Jakub Pawlowski <jpawlowski@google.com>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Date: Tue, 26 Jan 2016 05:18:55 +0100
+From: YuGiOhJCJ Mailing-List <yugiohjcj-mailinglist@laposte.net>
+To: linux-bluetooth@vger.kernel.org
+Subject: Failed to connect: org.bluez.Error.Failed
+Message-Id: <20160126051855.3d0d281422f094677417c66b@laposte.net>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Reducing APP_ADV_INTERVAL to 400 (instead of 1600) makes the "LE
-Create Connection" work every single time now.
+Hello,
 
-Hopefully with bluetooth-next update in Chrome OS
-(https://code.google.com/p/chromium/issues/detail?id=576577#c20) and
-especially https://git.kernel.org/cgit/linux/kernel/git/bluetooth/bluetooth-next.git/commit/?id=2f99536a5b34d5b0f54723067d68f6cef3f0fdc6,
-we won't have to set a smaller Advertising Interval as it reduces
-battery's life.
+I try to connect my bluetooth headset.
 
-Do you maybe have another recommendation while it reaches Stable channel?
+Firstly, I start the bluetooth daemon:
+$ sudo /usr/libexec/bluetooth/bluetoothd
 
-On Mon, Jan 25, 2016 at 5:52 PM, Jakub Pawlowski <jpawlowski@google.com> wrote:
-> I'm at UPF right now, will look at it tonight.
-> Have you updated firmware on DK to latest one ?
->
-> On Mon, Jan 25, 2016 at 7:23 AM, François Beaufort
-> <beaufort.francois@gmail.com> wrote:
->>
->> I fail to understand what is happening here and I would appreciate your
->> help.
->> I'm able to see my nearby device (NRF51822DK) with the "scan on" command.
->> However when calling "connect F1:6F:DE:EC:F1:D6" from bluetoothctl, I
->> get a "connect failed" error...
->> And from times to times, it magically works... meaning it gets a
->> connect failed but eventually create a connection with a single
->> "connect" command by the way.
->>
->> Here's a btmon trace below.
->>
->> Bluetooth monitor ver 5.35
->> = New Index: A4:17:31:78:A6:04 (BR/EDR,USB,hci0)
->>                                                      [hci0] 0.753884
->>
->>
->> < HCI Command: LE Set Scan Parameters (0x08|0x000b) plen 7
->>                                                     [hci0] 22.180529
->>         Type: Passive (0x00)
->>         Interval: 60.000 msec (0x0060)
->>         Window: 30.000 msec (0x0030)
->>         Own address type: Public (0x00)
->>         Filter policy: Ignore not in white list (0x01)
->> > HCI Event: Command Complete (0x0e) plen 4
->> > [hci0] 22.181008
->>       LE Set Scan Parameters (0x08|0x000b) ncmd 1
->>         Status: Success (0x00)
->> < HCI Command: LE Set Scan Enable (0x08|0x000c) plen 2
->>                                                     [hci0] 22.181041
->>         Scanning: Enabled (0x01)
->>         Filter duplicates: Enabled (0x01)
->> > HCI Event: Command Complete (0x0e) plen 4
->> > [hci0] 22.182008
->>       LE Set Scan Enable (0x08|0x000c) ncmd 1
->>         Status: Success (0x00)
->> > HCI Event: LE Meta Event (0x3e) plen 36
->> > [hci0] 22.264099
->>       LE Advertising Report (0x02)
->>         Num reports: 1
->>         Event type: Connectable undirected - ADV_IND (0x00)
->>         Address type: Random (0x01)
->>         Address: F1:6F:DE:EC:F1:D6 (Static)
->>         Data length: 24
->>         Flags: 0x05
->>           LE Limited Discoverable Mode
->>           BR/EDR Not Supported
->>         Name (complete): Espruino NRF51822DK
->>         RSSI: -49 dBm (0xcf)
->> < HCI Command: LE Set Scan Enable (0x08|0x000c) plen 2
->>                                                     [hci0] 22.264224
->>         Scanning: Disabled (0x00)
->>         Filter duplicates: Disabled (0x00)
->> > HCI Event: Command Complete (0x0e) plen 4
->> > [hci0] 22.265029
->>       LE Set Scan Enable (0x08|0x000c) ncmd 1
->>         Status: Success (0x00)
->> < HCI Command: LE Create Connection (0x08|0x000d) plen 25
->>                                                     [hci0] 22.265139
->>         Scan interval: 60.000 msec (0x0060)
->>         Scan window: 30.000 msec (0x0030)
->>         Filter policy: White list is not used (0x00)
->>         Peer address type: Random (0x01)
->>         Peer address: F1:6F:DE:EC:F1:D6 (Static)
->>         Own address type: Public (0x00)
->>         Min connection interval: 50.00 msec (0x0028)
->>         Max connection interval: 70.00 msec (0x0038)
->>         Connection latency: 0x0000
->>         Supervision timeout: 420 msec (0x002a)
->>         Min connection length: 0.000 msec (0x0000)
->>         Max connection length: 0.000 msec (0x0000)
->> > HCI Event: Command Status (0x0f) plen 4
->> > [hci0] 22.266017
->>       LE Create Connection (0x08|0x000d) ncmd 1
->>         Status: Success (0x00)
->> < HCI Command: LE Create Connection Cancel (0x08|0x000e) plen 0
->>                                                     [hci0] 24.269467
->> > HCI Event: Command Complete (0x0e) plen 4
->> > [hci0] 24.271009
->>       LE Create Connection Cancel (0x08|0x000e) ncmd 1
->>         Status: Success (0x00)
->> > HCI Event: LE Meta Event (0x3e) plen 19
->> > [hci0] 24.272993
->>       LE Connection Complete (0x01)
->>         Status: Unknown Connection Identifier (0x02)
->>         Handle: 32
->>         Role: Master (0x00)
->>         Peer address type: Random (0x01)
->>         Peer address: F1:6F:DE:EC:F1:D6 (Static)
->>         Connection interval: 67.50 msec (0x0036)
->>         Connection latency: 0.00 msec (0x0000)
->>         Supervision timeout: 420 msec (0x002a)
->>         Master clock accuracy: 0x00
->> @ Connect Failed: F1:6F:DE:EC:F1:D6 (2) status 0x02
->> < HCI Command: LE Set Scan Parameters (0x08|0x000b) plen 7
->>                                                     [hci0] 24.282482
->>         Type: Passive (0x00)
->>         Interval: 60.000 msec (0x0060)
->>         Window: 30.000 msec (0x0030)
->>         Own address type: Public (0x00)
->>         Filter policy: Ignore not in white list (0x01)
->> > HCI Event: Command Complete (0x0e) plen 4
->> > [hci0] 24.282992
->>       LE Set Scan Parameters (0x08|0x000b) ncmd 1
->>         Status: Success (0x00)
->> < HCI Command: LE Set Scan Enable (0x08|0x000c) plen 2
->>                                                     [hci0] 24.283021
->>         Scanning: Enabled (0x01)
->>         Filter duplicates: Enabled (0x01)
->> > HCI Event: Command Complete (0x0e) plen 4
->> > [hci0] 24.283990
->>       LE Set Scan Enable (0x08|0x000c) ncmd 1
->>         Status: Success (0x00)
->> > HCI Event: LE Meta Event (0x3e) plen 36
->> > [hci0] 26.283994
->>       LE Advertising Report (0x02)
->>         Num reports: 1
->>         Event type: Connectable undirected - ADV_IND (0x00)
->>         Address type: Random (0x01)
->>         Address: F1:6F:DE:EC:F1:D6 (Static)
->>         Data length: 24
->>         Flags: 0x05
->>           LE Limited Discoverable Mode
->>           BR/EDR Not Supported
->>         Name (complete): Espruino NRF51822DK
->>         RSSI: -46 dBm (0xd2)
->> < HCI Command: LE Set Scan Enable (0x08|0x000c) plen 2
->>                                                     [hci0] 26.284088
->>         Scanning: Disabled (0x00)
->>         Filter duplicates: Disabled (0x00)
->> > HCI Event: Command Complete (0x0e) plen 4
->> > [hci0] 26.284989
->>       LE Set Scan Enable (0x08|0x000c) ncmd 1
->>         Status: Success (0x00)
->> < HCI Command: LE Create Connection (0x08|0x000d) plen 25
->>                                                     [hci0] 26.285068
->>         Scan interval: 60.000 msec (0x0060)
->>         Scan window: 30.000 msec (0x0030)
->>         Filter policy: White list is not used (0x00)
->>         Peer address type: Random (0x01)
->>         Peer address: F1:6F:DE:EC:F1:D6 (Static)
->>         Own address type: Public (0x00)
->>         Min connection interval: 50.00 msec (0x0028)
->>         Max connection interval: 70.00 msec (0x0038)
->>         Connection latency: 0x0000
->>         Supervision timeout: 420 msec (0x002a)
->>         Min connection length: 0.000 msec (0x0000)
->>         Max connection length: 0.000 msec (0x0000)
->> > HCI Event: Command Status (0x0f) plen 4
->> > [hci0] 26.285982
->>       LE Create Connection (0x08|0x000d) ncmd 1
->>         Status: Success (0x00)
->> < HCI Command: LE Create Connection Cancel (0x08|0x000e) plen 0
->>                                                     [hci0] 28.289490
->> > HCI Event: Command Complete (0x0e) plen 4
->> > [hci0] 28.290991
->>       LE Create Connection Cancel (0x08|0x000e) ncmd 1
->>         Status: Success (0x00)
->> > HCI Event: LE Meta Event (0x3e) plen 19
->> > [hci0] 28.292966
->>       LE Connection Complete (0x01)
->>         Status: Unknown Connection Identifier (0x02)
->>         Handle: 32
->>         Role: Master (0x00)
->>         Peer address type: Random (0x01)
->>         Peer address: F1:6F:DE:EC:F1:D6 (Static)
->>         Connection interval: 67.50 msec (0x0036)
->>         Connection latency: 0.00 msec (0x0000)
->>         Supervision timeout: 420 msec (0x002a)
->>         Master clock accuracy: 0x00
->> @ Connect Failed: F1:6F:DE:EC:F1:D6 (2) status 0x02
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
->> in
->> the body of a message to majordomo@vger.kernel.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
->
+Why I run bluetoothd with sudo?
+Because otherwise, it fails:
+$ /usr/libexec/bluetooth/bluetoothd 
+D-Bus setup failed: Connection ":1.175" is not allowed to own the service "org.bluez" due to security policies in the configuration file
+
+Secondly, I connect the bluetooth headset:
+$ bluetoothctl 
+[bluetooth]# 
+spierre@desktop:~$ sudo bluetoothctl 
+[NEW] Controller 00:60:57:33:62:AE BlueZ 5.37 [default]
+[NEW] Device 00:22:37:34:9A:56 Philips SHB9150BK
+[bluetooth]# power on
+[CHG] Controller 00:60:57:33:62:AE Class: 0x000104
+Changing power on succeeded
+[CHG] Controller 00:60:57:33:62:AE Powered: yes
+[bluetooth]# agent on
+Agent registered
+[bluetooth]# pair 00:22:37:34:9A:56
+Attempting to pair with 00:22:37:34:9A:56
+Failed to pair: org.bluez.Error.AlreadyExists
+[bluetooth]# connect 00:22:37:34:9A:56
+Attempting to connect to 00:22:37:34:9A:56
+Failed to connect: org.bluez.Error.Failed
+
+Why I run bluetoothctl with sudo?
+Because otherwise, it hangs then I need to do Ctrl+C:
+$ bluetoothctl 
+[bluetooth]#
+
+Why there is a failure please?
+Do you think that the "native headsets" option should be set to "yes" instead of "no" in my pulseaudio-8.0 configuration*?
+
+Thank you.
+Best regards.
+
+I am using on Slackware 14.1:
+- bluez-5.37 (configured with the following options: --prefix=/usr --disable-systemd)
+- pulseaudio-8.0* (configured with the following options: --prefix=/usr --sysconfdir=/etc --enable-bluez5)
+- sbc-1.3 (configured with the following options: --prefix=/usr)
+- alsa-lib-1.1.0 (configured with the following options: --prefix=/usr)
+- alsa-oss-1.0.28 (configured with the following options: --prefix=/usr)
+- alsa-plugins-1.1.0 (configured with the following options: --prefix=/usr)
+- alsa-utils-1.1.0 (configured with the following options: --prefix=/usr)
+
+* details for the pulseaudio-8.0 configuration:
+ ---{ pulseaudio 8.0 }---
+
+    prefix:                        /usr
+    sysconfdir:                    /etc
+    localstatedir:                 ${prefix}/var
+    modlibexecdir:                 ${exec_prefix}/lib/pulse-8.0/modules
+    System Runtime Path:           /usr/var/run/pulse
+    System State Path:             /usr/var/lib/pulse
+    System Config Path:            /usr/var/lib/pulse
+    Zsh completions directory:     ${datarootdir}/zsh/site-functions
+    Bash completions directory:    ${datarootdir}/bash-completion/completions
+    Compiler:                      gcc -std=gnu99
+    CFLAGS:                        -g -O2 -Wall -W -Wextra -pipe -Wno-long-long -Wno-overlength-strings -Wunsafe-loop-optimizations -Wundef -Wformat=2 -Wlogical-op -Wsign-compare -Wformat-security -Wmissing-include-dirs -Wformat-nonliteral -Wpointer-arith -Winit-self -Wdeclaration-after-statement -Wfloat-equal -Wmissing-prototypes -Wredundant-decls -Wmissing-declarations -Wmissing-noreturn -Wshadow -Wendif-labels -Wcast-align -Wstrict-aliasing -Wwrite-strings -Wno-unused-parameter -ffast-math -fno-common -fdiagnostics-show-option
+    CPPFLAGS:                      -DFASTPATH -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=2
+    LIBS:                          -lgdbm -lcap -lpthread -lrt -ldl -lm 
+
+    Enable X11:                    yes
+    Enable OSS Output:             yes
+    Enable OSS Wrapper:            yes
+    Enable EsounD:                 yes
+    Enable Alsa:                   yes
+    Enable CoreAudio:              no
+    Enable Solaris:                no
+    Enable WaveOut:                no
+    Enable GLib 2.0:               yes
+    Enable Gtk+ 3.0:               yes
+    Enable GConf:                  yes
+    Enable Avahi:                  no
+    Enable Jack:                   no
+    Enable Async DNS:              no
+    Enable LIRC:                   no
+    Enable Xen PV driver:          no
+    Enable D-Bus:                  yes
+      Enable BlueZ 4:              yes
+      Enable BlueZ 5:              yes
+        Enable ofono headsets:     yes
+        Enable native headsets:    no
+    Enable udev:                   yes
+      Enable HAL->udev compat:     yes
+    Enable systemd
+      Daemon (Socket Activation):  no
+      Login (Session Tracking):    no
+      Journal (Logging):           no
+    Enable TCP Wrappers:           no
+    Enable libsamplerate:          no
+    Enable IPv6:                   yes
+    Enable OpenSSL (for Airtunes): yes
+    Enable fftw:                   yes
+    Enable orc:                    yes
+    Enable Adrian echo canceller:  yes
+    Enable speex (resampler, AEC): yes
+    Enable soxr (resampler):       yes
+    Enable WebRTC echo canceller:  no
+    Enable gcov coverage:          no
+    Enable unit tests:             no
+    Database
+      tdb:                         no
+      gdbm:                        yes
+      simple database:             no
+
+    System User:                   pulse
+    System Group:                  pulse
+    Access Group:                  pulse-access
+    Enable per-user EsounD socket: yes
+    Force preopen:                 no
+    Preopened modules:             all
+
+    Legacy Database Entry Support: yes
