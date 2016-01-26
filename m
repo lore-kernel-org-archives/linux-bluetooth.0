@@ -1,57 +1,210 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <3916CF28FA2C014B862815C318D03FF5A0A7493AAF@Courier.syntech.org>
-References: <3916CF28FA2C014B862815C318D03FF5A0A7493AAF@Courier.syntech.org>
-Date: Tue, 26 Jan 2016 11:41:27 +0200
-Message-ID: <CABBYNZJ3DqnNGKGoRZiGGpNSH5r=9FuH6BLeNsjavsgFdZ4=xw@mail.gmail.com>
-Subject: Re: Bluetooth Smart 5LoWPAN connection between two devices
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Jon Hoffman <Jon.Hoffman@myfuelmaster.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <CAD0=r8zoEbgP_XhA6j7Jz2RJ0jUNVirQL74vfqPX7dRtziWyOA@mail.gmail.com>
+References: <CAEZxfGMJZva2Rmfm4P8D+zTnY7RbvaaA-e3R3SxoLycuD9D==A@mail.gmail.com>
+ <CAD0=r8zoEbgP_XhA6j7Jz2RJ0jUNVirQL74vfqPX7dRtziWyOA@mail.gmail.com>
+From: =?UTF-8?Q?Fran=C3=A7ois_Beaufort?= <beaufort.francois@gmail.com>
+Date: Tue, 26 Jan 2016 10:17:47 +0100
+Message-ID: <CAEZxfGOmyVm2-LsdjcYK8LXaQ7TFnBJCmKt3wXtPkurepDR-OA@mail.gmail.com>
+Subject: Re: Two connect failed...
+To: Jakub Pawlowski <jpawlowski@google.com>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jon,
+Reducing APP_ADV_INTERVAL to 400 (instead of 1600) makes the "LE
+Create Connection" work every single time now.
 
-On Mon, Jan 25, 2016 at 7:53 PM, Jon Hoffman
-<Jon.Hoffman@myfuelmaster.com> wrote:
-> I do not want to use Bluez 4.XX so I am attempting to get this to work with Bluez 5 on both the master and slave.  I have tried the following commands on both the Raspberry Pi with Bluez 5.23 and Fedora 23 with Bluez 5.35
+Hopefully with bluetooth-next update in Chrome OS
+(https://code.google.com/p/chromium/issues/detail?id=576577#c20) and
+especially https://git.kernel.org/cgit/linux/kernel/git/bluetooth/bluetooth-next.git/commit/?id=2f99536a5b34d5b0f54723067d68f6cef3f0fdc6,
+we won't have to set a smaller Advertising Interval as it reduces
+battery's life.
 
-BlueZ 4 is too old to support, if you want some support from the
-community just stick with BlueZ 5.
+Do you maybe have another recommendation while it reaches Stable channel?
 
+On Mon, Jan 25, 2016 at 5:52 PM, Jakub Pawlowski <jpawlowski@google.com> wrote:
+> I'm at UPF right now, will look at it tonight.
+> Have you updated firmware on DK to latest one ?
 >
-> Slave (Raspberry Pi Bluez 5.23 or Fedora 23 Bluez 5.35):
->        #need root access
->        sudo su
+> On Mon, Jan 25, 2016 at 7:23 AM, François Beaufort
+> <beaufort.francois@gmail.com> wrote:
+>>
+>> I fail to understand what is happening here and I would appreciate your
+>> help.
+>> I'm able to see my nearby device (NRF51822DK) with the "scan on" command.
+>> However when calling "connect F1:6F:DE:EC:F1:D6" from bluetoothctl, I
+>> get a "connect failed" error...
+>> And from times to times, it magically works... meaning it gets a
+>> connect failed but eventually create a connection with a single
+>> "connect" command by the way.
+>>
+>> Here's a btmon trace below.
+>>
+>> Bluetooth monitor ver 5.35
+>> = New Index: A4:17:31:78:A6:04 (BR/EDR,USB,hci0)
+>>                                                      [hci0] 0.753884
+>>
+>>
+>> < HCI Command: LE Set Scan Parameters (0x08|0x000b) plen 7
+>>                                                     [hci0] 22.180529
+>>         Type: Passive (0x00)
+>>         Interval: 60.000 msec (0x0060)
+>>         Window: 30.000 msec (0x0030)
+>>         Own address type: Public (0x00)
+>>         Filter policy: Ignore not in white list (0x01)
+>> > HCI Event: Command Complete (0x0e) plen 4
+>> > [hci0] 22.181008
+>>       LE Set Scan Parameters (0x08|0x000b) ncmd 1
+>>         Status: Success (0x00)
+>> < HCI Command: LE Set Scan Enable (0x08|0x000c) plen 2
+>>                                                     [hci0] 22.181041
+>>         Scanning: Enabled (0x01)
+>>         Filter duplicates: Enabled (0x01)
+>> > HCI Event: Command Complete (0x0e) plen 4
+>> > [hci0] 22.182008
+>>       LE Set Scan Enable (0x08|0x000c) ncmd 1
+>>         Status: Success (0x00)
+>> > HCI Event: LE Meta Event (0x3e) plen 36
+>> > [hci0] 22.264099
+>>       LE Advertising Report (0x02)
+>>         Num reports: 1
+>>         Event type: Connectable undirected - ADV_IND (0x00)
+>>         Address type: Random (0x01)
+>>         Address: F1:6F:DE:EC:F1:D6 (Static)
+>>         Data length: 24
+>>         Flags: 0x05
+>>           LE Limited Discoverable Mode
+>>           BR/EDR Not Supported
+>>         Name (complete): Espruino NRF51822DK
+>>         RSSI: -49 dBm (0xcf)
+>> < HCI Command: LE Set Scan Enable (0x08|0x000c) plen 2
+>>                                                     [hci0] 22.264224
+>>         Scanning: Disabled (0x00)
+>>         Filter duplicates: Disabled (0x00)
+>> > HCI Event: Command Complete (0x0e) plen 4
+>> > [hci0] 22.265029
+>>       LE Set Scan Enable (0x08|0x000c) ncmd 1
+>>         Status: Success (0x00)
+>> < HCI Command: LE Create Connection (0x08|0x000d) plen 25
+>>                                                     [hci0] 22.265139
+>>         Scan interval: 60.000 msec (0x0060)
+>>         Scan window: 30.000 msec (0x0030)
+>>         Filter policy: White list is not used (0x00)
+>>         Peer address type: Random (0x01)
+>>         Peer address: F1:6F:DE:EC:F1:D6 (Static)
+>>         Own address type: Public (0x00)
+>>         Min connection interval: 50.00 msec (0x0028)
+>>         Max connection interval: 70.00 msec (0x0038)
+>>         Connection latency: 0x0000
+>>         Supervision timeout: 420 msec (0x002a)
+>>         Min connection length: 0.000 msec (0x0000)
+>>         Max connection length: 0.000 msec (0x0000)
+>> > HCI Event: Command Status (0x0f) plen 4
+>> > [hci0] 22.266017
+>>       LE Create Connection (0x08|0x000d) ncmd 1
+>>         Status: Success (0x00)
+>> < HCI Command: LE Create Connection Cancel (0x08|0x000e) plen 0
+>>                                                     [hci0] 24.269467
+>> > HCI Event: Command Complete (0x0e) plen 4
+>> > [hci0] 24.271009
+>>       LE Create Connection Cancel (0x08|0x000e) ncmd 1
+>>         Status: Success (0x00)
+>> > HCI Event: LE Meta Event (0x3e) plen 19
+>> > [hci0] 24.272993
+>>       LE Connection Complete (0x01)
+>>         Status: Unknown Connection Identifier (0x02)
+>>         Handle: 32
+>>         Role: Master (0x00)
+>>         Peer address type: Random (0x01)
+>>         Peer address: F1:6F:DE:EC:F1:D6 (Static)
+>>         Connection interval: 67.50 msec (0x0036)
+>>         Connection latency: 0.00 msec (0x0000)
+>>         Supervision timeout: 420 msec (0x002a)
+>>         Master clock accuracy: 0x00
+>> @ Connect Failed: F1:6F:DE:EC:F1:D6 (2) status 0x02
+>> < HCI Command: LE Set Scan Parameters (0x08|0x000b) plen 7
+>>                                                     [hci0] 24.282482
+>>         Type: Passive (0x00)
+>>         Interval: 60.000 msec (0x0060)
+>>         Window: 30.000 msec (0x0030)
+>>         Own address type: Public (0x00)
+>>         Filter policy: Ignore not in white list (0x01)
+>> > HCI Event: Command Complete (0x0e) plen 4
+>> > [hci0] 24.282992
+>>       LE Set Scan Parameters (0x08|0x000b) ncmd 1
+>>         Status: Success (0x00)
+>> < HCI Command: LE Set Scan Enable (0x08|0x000c) plen 2
+>>                                                     [hci0] 24.283021
+>>         Scanning: Enabled (0x01)
+>>         Filter duplicates: Enabled (0x01)
+>> > HCI Event: Command Complete (0x0e) plen 4
+>> > [hci0] 24.283990
+>>       LE Set Scan Enable (0x08|0x000c) ncmd 1
+>>         Status: Success (0x00)
+>> > HCI Event: LE Meta Event (0x3e) plen 36
+>> > [hci0] 26.283994
+>>       LE Advertising Report (0x02)
+>>         Num reports: 1
+>>         Event type: Connectable undirected - ADV_IND (0x00)
+>>         Address type: Random (0x01)
+>>         Address: F1:6F:DE:EC:F1:D6 (Static)
+>>         Data length: 24
+>>         Flags: 0x05
+>>           LE Limited Discoverable Mode
+>>           BR/EDR Not Supported
+>>         Name (complete): Espruino NRF51822DK
+>>         RSSI: -46 dBm (0xd2)
+>> < HCI Command: LE Set Scan Enable (0x08|0x000c) plen 2
+>>                                                     [hci0] 26.284088
+>>         Scanning: Disabled (0x00)
+>>         Filter duplicates: Disabled (0x00)
+>> > HCI Event: Command Complete (0x0e) plen 4
+>> > [hci0] 26.284989
+>>       LE Set Scan Enable (0x08|0x000c) ncmd 1
+>>         Status: Success (0x00)
+>> < HCI Command: LE Create Connection (0x08|0x000d) plen 25
+>>                                                     [hci0] 26.285068
+>>         Scan interval: 60.000 msec (0x0060)
+>>         Scan window: 30.000 msec (0x0030)
+>>         Filter policy: White list is not used (0x00)
+>>         Peer address type: Random (0x01)
+>>         Peer address: F1:6F:DE:EC:F1:D6 (Static)
+>>         Own address type: Public (0x00)
+>>         Min connection interval: 50.00 msec (0x0028)
+>>         Max connection interval: 70.00 msec (0x0038)
+>>         Connection latency: 0x0000
+>>         Supervision timeout: 420 msec (0x002a)
+>>         Min connection length: 0.000 msec (0x0000)
+>>         Max connection length: 0.000 msec (0x0000)
+>> > HCI Event: Command Status (0x0f) plen 4
+>> > [hci0] 26.285982
+>>       LE Create Connection (0x08|0x000d) ncmd 1
+>>         Status: Success (0x00)
+>> < HCI Command: LE Create Connection Cancel (0x08|0x000e) plen 0
+>>                                                     [hci0] 28.289490
+>> > HCI Event: Command Complete (0x0e) plen 4
+>> > [hci0] 28.290991
+>>       LE Create Connection Cancel (0x08|0x000e) ncmd 1
+>>         Status: Success (0x00)
+>> > HCI Event: LE Meta Event (0x3e) plen 19
+>> > [hci0] 28.292966
+>>       LE Connection Complete (0x01)
+>>         Status: Unknown Connection Identifier (0x02)
+>>         Handle: 32
+>>         Role: Master (0x00)
+>>         Peer address type: Random (0x01)
+>>         Peer address: F1:6F:DE:EC:F1:D6 (Static)
+>>         Connection interval: 67.50 msec (0x0036)
+>>         Connection latency: 0.00 msec (0x0000)
+>>         Supervision timeout: 420 msec (0x002a)
+>>         Master clock accuracy: 0x00
+>> @ Connect Failed: F1:6F:DE:EC:F1:D6 (2) status 0x02
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
+>> in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 >
->        #enable 6lowpan over Bluetooth le
->        echo 1 > /sys/kernel/debug/bluetooth/6lowpan_enabled
 >
->        #start advertising Bluetooth LE service
->        hciconfig hci0 leadv
-
-There is a built-in D-Bus interface to advertise using bluetoothd, or
-if you prefer low level then use btmgmt.
-
-> master (Raspberry Pi Bluez 5.23 or Fedora 23 Bluez 5.35):
->         #need root access
->         sudo su
->
->         #enable 6lowpan over Bluetooth le
->         echo 1 > /sys/kernel/debug/bluetooth/6lowpan_enable
->
->         #establish le connection to master
->         hcitool lecc 5C:F3:70:XX:XX:XX
->
->         echo "connect 5C:F3:70:XX:XX:XX 1" > /sys/kernel/debug/bluetooth/6lowpan_control
-
-This actually works for me so perhaps there is something else going
-on, you can try enabling dynamic debug in your kernel as well as
-checking the HCI trace, perhaps the L2CAP channel doesn't connect or
-something like that.
-
-
--- 
-Luiz Augusto von Dentz
