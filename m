@@ -1,68 +1,73 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Jon Hoffman <Jon.Hoffman@myfuelmaster.com>
-To: "'Luiz Augusto von Dentz'" <luiz.dentz@gmail.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Tue, 26 Jan 2016 10:18:41 -0500
-Subject: RE: Bluetooth Smart 5LoWPAN connection between two devices
-Message-ID: <3916CF28FA2C014B862815C318D03FF5A0A7493AB0@Courier.syntech.org>
-References: <3916CF28FA2C014B862815C318D03FF5A0A7493AAF@Courier.syntech.org>
- <CABBYNZJ3DqnNGKGoRZiGGpNSH5r=9FuH6BLeNsjavsgFdZ4=xw@mail.gmail.com>
-In-Reply-To: <CABBYNZJ3DqnNGKGoRZiGGpNSH5r=9FuH6BLeNsjavsgFdZ4=xw@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
+Return-Path: <dvyukov@google.com>
 MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <CACT4Y+ax7zMOxe+kd4tw5Xdbvt=qPdBhXGO0j7qJwdn5tsfNNg@mail.gmail.com>
+References: <CACT4Y+ax7zMOxe+kd4tw5Xdbvt=qPdBhXGO0j7qJwdn5tsfNNg@mail.gmail.com>
+From: Dmitry Vyukov <dvyukov@google.com>
+Date: Tue, 26 Jan 2016 13:29:22 +0100
+Message-ID: <CACT4Y+bmD+t0NaqiVYdfpELHzPcOOf6GvUE6+Df_sEgxh6inpw@mail.gmail.com>
+Subject: Re: net/bluetooth: workqueue destruction WARNING in hci_unregister_dev
+To: Marcel Holtmann <marcel@holtmann.org>, Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>, "David S. Miller" <davem@davemloft.net>,
+	linux-bluetooth@vger.kernel.org, netdev <netdev@vger.kernel.org>,
+	LKML <linux-kernel@vger.kernel.org>
+Cc: syzkaller <syzkaller@googlegroups.com>, Kostya Serebryany <kcc@google.com>,
+	Alexander Potapenko <glider@google.com>, Sasha Levin <sasha.levin@oracle.com>,
+	Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGVsbG8sDQpUaGFuayB5b3UgZm9yIHRoZSByZXBseQ0KDQo+IC0tLS0tT3JpZ2luYWwgTWVzc2Fn
-ZS0tLS0tDQo+IEZyb206IEx1aXogQXVndXN0byB2b24gRGVudHogW21haWx0bzpsdWl6LmRlbnR6
-QGdtYWlsLmNvbV0NCj4gU2VudDogVHVlc2RheSwgSmFudWFyeSAyNiwgMjAxNiA0OjQxIEFNDQo+
-IFRvOiBKb24gSG9mZm1hbiA8Sm9uLkhvZmZtYW5AbXlmdWVsbWFzdGVyLmNvbT4NCj4gQ2M6IGxp
-bnV4LWJsdWV0b290aEB2Z2VyLmtlcm5lbC5vcmcNCj4gU3ViamVjdDogUmU6IEJsdWV0b290aCBT
-bWFydCA1TG9XUEFOIGNvbm5lY3Rpb24gYmV0d2VlbiB0d28gZGV2aWNlcw0KPiANCj4gSGkgSm9u
-LA0KPiANCj4gT24gTW9uLCBKYW4gMjUsIDIwMTYgYXQgNzo1MyBQTSwgSm9uIEhvZmZtYW4NCj4g
-PEpvbi5Ib2ZmbWFuQG15ZnVlbG1hc3Rlci5jb20+IHdyb3RlOg0KPiA+IEkgZG8gbm90IHdhbnQg
-dG8gdXNlIEJsdWV6IDQuWFggc28gSSBhbSBhdHRlbXB0aW5nIHRvIGdldCB0aGlzIHRvIHdvcmsN
-Cj4gPiB3aXRoIEJsdWV6IDUgb24gYm90aCB0aGUgbWFzdGVyIGFuZCBzbGF2ZS4gIEkgaGF2ZSB0
-cmllZCB0aGUgZm9sbG93aW5nDQo+ID4gY29tbWFuZHMgb24gYm90aCB0aGUgUmFzcGJlcnJ5IFBp
-IHdpdGggQmx1ZXogNS4yMyBhbmQgRmVkb3JhIDIzIHdpdGgNCj4gPiBCbHVleiA1LjM1DQo+IA0K
-PiBCbHVlWiA0IGlzIHRvbyBvbGQgdG8gc3VwcG9ydCwgaWYgeW91IHdhbnQgc29tZSBzdXBwb3J0
-IGZyb20gdGhlIGNvbW11bml0eQ0KPiBqdXN0IHN0aWNrIHdpdGggQmx1ZVogNS4NCj4gDQoNCk91
-ciBnb2FsIGlzIHRvIGdldCBCbHVleiA1IHdvcmtpbmcuICBTaW5jZSBJIGFtIGhhdmluZyBpc3N1
-ZXMgd2l0aCBCbHVleiA1LCBJIHRyaWVkIHVzaW5nIFVidW50dSAxNCB3aXRoIEJsdWV6IDQgdG8g
-c2VlIGlmIGl0IHdvdWxkIHdvcmsgKHRvIHJ1bGUgb3V0IGhhcmR3YXJlIGlzc3VlcykuICBJIGhh
-dmUgYWxzbyB0cmllZCBVYnVudHUgMTUgd2l0aCBCbHVleiA1LjIzIGJ1dCBJIGFtIGV4cGVyaWVu
-Y2luZyB0aGUgc2FtZSBpc3N1ZXMgYXMgd2l0aCBGZWRvcmEgMjMgKEJsdWV6IDUuMzUpIGFuZCBS
-YXNwYmlhbiAoQmx1ZXggNS4yMykuDQoNCj4gPg0KPiA+IFNsYXZlIChSYXNwYmVycnkgUGkgQmx1
-ZXogNS4yMyBvciBGZWRvcmEgMjMgQmx1ZXogNS4zNSk6DQo+ID4gICAgICAgICNuZWVkIHJvb3Qg
-YWNjZXNzDQo+ID4gICAgICAgIHN1ZG8gc3UNCj4gPg0KPiA+ICAgICAgICAjZW5hYmxlIDZsb3dw
-YW4gb3ZlciBCbHVldG9vdGggbGUNCj4gPiAgICAgICAgZWNobyAxID4gL3N5cy9rZXJuZWwvZGVi
-dWcvYmx1ZXRvb3RoLzZsb3dwYW5fZW5hYmxlZA0KPiA+DQo+ID4gICAgICAgICNzdGFydCBhZHZl
-cnRpc2luZyBCbHVldG9vdGggTEUgc2VydmljZQ0KPiA+ICAgICAgICBoY2ljb25maWcgaGNpMCBs
-ZWFkdg0KPiANCj4gVGhlcmUgaXMgYSBidWlsdC1pbiBELUJ1cyBpbnRlcmZhY2UgdG8gYWR2ZXJ0
-aXNlIHVzaW5nIGJsdWV0b290aGQsIG9yIGlmIHlvdQ0KPiBwcmVmZXIgbG93IGxldmVsIHRoZW4g
-dXNlIGJ0bWdtdC4NCg0KSSBhbSBub3QgZmFtaWxpYXIgd2l0aCBCbHVleiBELUJ1cyBpbnRlcmZh
-Y2UgYnV0IEkgY2FuIGdpdmUgaXQgYSB0cnkgaWYgeW91IHRoaW5rIEkgbWlnaHQgZ2V0IGRpZmZl
-cmVudCByZXN1bHRzLiAgTXkgcHJlZmVyZW5jZSB3b3VsZCBiZSB0byBnZXQgYW4gT1MgbGV2ZWwg
-Y29ubmVjdGlvbiB3b3JraW5nIGZvciB0aGUgcHJvb2Ygb2YgY29uY2VwdCBzaW1pbGFyIHRvIGhv
-dyB0aGUgQmx1ZXogNCB3b3JrZWQuIA0KDQo+IA0KPiA+IG1hc3RlciAoUmFzcGJlcnJ5IFBpIEJs
-dWV6IDUuMjMgb3IgRmVkb3JhIDIzIEJsdWV6IDUuMzUpOg0KPiA+ICAgICAgICAgI25lZWQgcm9v
-dCBhY2Nlc3MNCj4gPiAgICAgICAgIHN1ZG8gc3UNCj4gPg0KPiA+ICAgICAgICAgI2VuYWJsZSA2
-bG93cGFuIG92ZXIgQmx1ZXRvb3RoIGxlDQo+ID4gICAgICAgICBlY2hvIDEgPiAvc3lzL2tlcm5l
-bC9kZWJ1Zy9ibHVldG9vdGgvNmxvd3Bhbl9lbmFibGUNCj4gPg0KPiA+ICAgICAgICAgI2VzdGFi
-bGlzaCBsZSBjb25uZWN0aW9uIHRvIG1hc3Rlcg0KPiA+ICAgICAgICAgaGNpdG9vbCBsZWNjIDVD
-OkYzOjcwOlhYOlhYOlhYDQo+ID4NCj4gPiAgICAgICAgIGVjaG8gImNvbm5lY3QgNUM6RjM6NzA6
-WFg6WFg6WFggMSIgPg0KPiA+IC9zeXMva2VybmVsL2RlYnVnL2JsdWV0b290aC82bG93cGFuX2Nv
-bnRyb2wNCj4gDQo+IFRoaXMgYWN0dWFsbHkgd29ya3MgZm9yIG1lIHNvIHBlcmhhcHMgdGhlcmUg
-aXMgc29tZXRoaW5nIGVsc2UgZ29pbmcgb24sIHlvdQ0KPiBjYW4gdHJ5IGVuYWJsaW5nIGR5bmFt
-aWMgZGVidWcgaW4geW91ciBrZXJuZWwgYXMgd2VsbCBhcyBjaGVja2luZyB0aGUgSENJDQo+IHRy
-YWNlLCBwZXJoYXBzIHRoZSBMMkNBUCBjaGFubmVsIGRvZXNuJ3QgY29ubmVjdCBvciBzb21ldGhp
-bmcgbGlrZSB0aGF0Lg0KPiANCj4gDQoNCkkgZG8gaGF2ZSBhIGhjaWR1bXAgZmlsZSBidXQgSSBk
-aWQgbm90IHdhbnQgdG8gc2VuZCBpdCB0byB0aGUgZW50aXJlIGUtbWFpbCBncm91cC4gIElmIGFu
-eW9uZSB3b3VsZCBsaWtlIHRvIHNlZSBpdCBJIGNhbiBmb3J3YXJkIGl0IHRvIHRoZW0gaW5kaXZp
-ZHVhbGx5Lg0KV2hlbiB5b3UgZ290IGl0IHRvIHdvcmssIHdlcmUgeW91IHVzaW5nIGEgc3RhbmRh
-cmQgb3V0IG9mIHRoZSBib3ggZGlzdHJpYnV0aW9uIChVYnVudHUsIEZlZG9yYS4uLikgb3IgZGlk
-IHlvdSBidWlsZCBhIGN1c3RvbSBLZXJuZWwgb3IgY29tcGlsZSBCbHVleiB5b3Vyc2VsZj8gIEkg
-YW0gY3VycmVudGx5IHVzaW5nIG91dCBvZiB0aGUgYm94IGRpc3RyaWJ1dGlvbnMuICBJZiBJIG5l
-ZWQgdG8gYnVpbGQgYSBjdXN0b20ga2VybmVsIG9yIEJsdWV6IGZyb20gc291cmNlLCBJIGFtIGZp
-bmUgd2l0aCB0aGF0LiAgDQoNCj4gLS0NCj4gTHVpeiBBdWd1c3RvIHZvbiBEZW50eg0KDQpUaGFu
-a3MgYWdhaW4gZm9yIHRoZSByZXBseSwNCkpvbg0K
+On Tue, Jan 26, 2016 at 12:53 PM, Dmitry Vyukov <dvyukov@google.com> wrote:
+> Hello,
+>
+> I've hit the following warning while running syzkaller fuzzer:
+>
+> ------------[ cut here ]------------
+> WARNING: CPU: 2 PID: 17409 at kernel/workqueue.c:3968
+> destroy_workqueue+0x172/0x550()
+> Modules linked in:
+> CPU: 2 PID: 17409 Comm: syz-executor Not tainted 4.5.0-rc1+ #283
+> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS Bochs 01/01/2011
+>  00000000ffffffff ffff88003665f8a0 ffffffff8299a06d 0000000000000000
+>  ffff88003599c740 ffffffff8643f0c0 ffff88003665f8e0 ffffffff8134fcf9
+>  ffffffff8139d4c2 ffffffff8643f0c0 0000000000000f80 ffff8800630c5ae8
+> Call Trace:
+>  [<     inline     >] __dump_stack lib/dump_stack.c:15
+>  [<ffffffff8299a06d>] dump_stack+0x6f/0xa2 lib/dump_stack.c:50
+>  [<ffffffff8134fcf9>] warn_slowpath_common+0xd9/0x140 kernel/panic.c:482
+>  [<ffffffff8134ff29>] warn_slowpath_null+0x29/0x30 kernel/panic.c:515
+>  [<ffffffff8139d4c2>] destroy_workqueue+0x172/0x550 kernel/workqueue.c:3968
+>  [<ffffffff85a714a4>] hci_unregister_dev+0x264/0x700
+> net/bluetooth/hci_core.c:3162
+>  [<ffffffff84595ce6>] vhci_release+0x76/0xe0 drivers/bluetooth/hci_vhci.c:341
+>  [<ffffffff817b2376>] __fput+0x236/0x780 fs/file_table.c:208
+>  [<ffffffff817b2945>] ____fput+0x15/0x20 fs/file_table.c:244
+>  [<ffffffff813ad760>] task_work_run+0x170/0x210 kernel/task_work.c:115
+>  [<     inline     >] exit_task_work include/linux/task_work.h:21
+>  [<ffffffff81358da5>] do_exit+0x8b5/0x2c60 kernel/exit.c:748
+>  [<ffffffff8135b2c8>] do_group_exit+0x108/0x330 kernel/exit.c:878
+>  [<ffffffff8137e434>] get_signal+0x5e4/0x14f0 kernel/signal.c:2307
+>  [<ffffffff811a1db3>] do_signal+0x83/0x1c90 arch/x86/kernel/signal.c:712
+>  [<ffffffff81006685>] exit_to_usermode_loop+0x1a5/0x210
+> arch/x86/entry/common.c:247
+>  [<     inline     >] prepare_exit_to_usermode arch/x86/entry/common.c:282
+>  [<ffffffff810084ea>] syscall_return_slowpath+0x2ba/0x340
+> arch/x86/entry/common.c:344
+>  [<ffffffff863597a2>] int_ret_from_sys_call+0x25/0x9f
+> arch/x86/entry/entry_64.S:281
+> ---[ end trace f627386faee7426f ]---
+>
+> Unfortunately I cannot reproduce it in a controlled environment, but
+> I've hit it twice in different VMs. So maybe if you see something
+> obvious there. Is it possible that something is submitted into the
+> workqueue between it is drained and destroyed in hci_unregister_dev?
+>
+> On commit 92e963f50fc74041b5e9e744c330dca48e04f08d (Jan 24).
+
+
+Wait, I was able to reproduce it by running the following program in a
+parallel loop for several hours:
+https://gist.githubusercontent.com/dvyukov/c15675af95e599fe6631/raw/c34117b54d0352f5df4f572d4151a94557780a9b/gistfile1.txt
+I think that you just need to open /dev/vhci, because the program does
+not seem to do anything useful with the descriptor.
+Machine died, full log is here:
+https://gist.githubusercontent.com/dvyukov/4584d70c2b4bee7ca875/raw/3794fb9f4c8e0fb2f91261a66725b042b5de4e0f/gistfile1.txt
