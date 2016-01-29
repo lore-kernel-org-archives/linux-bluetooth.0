@@ -1,24 +1,36 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Jon Hoffman <Jon.Hoffman@myfuelmaster.com>
-To: "'Luiz Augusto von Dentz'" <luiz.dentz@gmail.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Fri, 29 Jan 2016 12:20:35 -0500
-Subject: RE: Bluetooth Smart 5LoWPAN connection between two devices
-Message-ID: <3916CF28FA2C014B862815C318D03FF5A0A7493AC5@Courier.syntech.org>
-References: <3916CF28FA2C014B862815C318D03FF5A0A7493AAF@Courier.syntech.org>
- <CABBYNZJ3DqnNGKGoRZiGGpNSH5r=9FuH6BLeNsjavsgFdZ4=xw@mail.gmail.com>
- <3916CF28FA2C014B862815C318D03FF5A0A7493AB0@Courier.syntech.org>
- <3916CF28FA2C014B862815C318D03FF5A0A7493AB2@Courier.syntech.org>
-In-Reply-To: <3916CF28FA2C014B862815C318D03FF5A0A7493AB2@Courier.syntech.org>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <mika.westerberg@linux.intel.com>
+From: Mika Westerberg <mika.westerberg@linux.intel.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Leif Liddy <leif.liddy@gmail.com>,
+	Mika Westerberg <mika.westerberg@linux.intel.com>,
+	linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: hci_bcm: Add BCM2E7C ACPI ID
+Date: Fri, 29 Jan 2016 16:53:27 +0200
+Message-Id: <1454079207-126388-1-git-send-email-mika.westerberg@linux.intel.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SSBqdXN0IHNvbHZlZCB0aGlzIGJhc2VkIG9uIEx1aXogQXVndXN0byB2b24gRGVudHogdGhhdCBp
-dCB3YXMgd29ya2luZyBmb3IgaGltLg0KDQpUaGUgcHJvYmxlbSB3YXMgd2l0aCB0aGUga2VybmVs
-LiBJIGluc3RhbGxlZCBVYnVudHUgMTUgYW5kIGRvd25sb2FkZWQgdGhlIHNvdXJjZSBmb3IgdGhl
-IDQuNCBrZXJuZWwsIGNvbmZpZ3VyZWQgaXQgYW5kIGJ1aWx0IGEgbmV3IGtlcm5lbC4gT25jZSB0
-aGUgbmV3IGtlcm5lbCB3YXMgaW4gcGxhY2UgZXZlcnl0aGluZyB3b3JrZWQgZ3JlYXQuIE5vdCBz
-dXJlIGlmIGl0IHdhcyB0aGUgcGF0Y2ggbGV2ZWwgb2YgdGhlIGtlcm5lbCBvciB0aGUgY29uZmln
-dXJhdGlvbiBidXQgaXQgaXMgbm93IHdvcmtpbmcuDQoNClRoYW5rcy4NCkpvbg0K
+Recent macbooks (early 2015) with BCM43241 use this ACPI ID. Add it to the
+list of supported devices.
+
+Reported-by: Leif Liddy <leif.liddy@gmail.com>
+Signed-off-by: Mika Westerberg <mika.westerberg@linux.intel.com>
+---
+ drivers/bluetooth/hci_bcm.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
+index 5f3de181e744..ce00a8045058 100644
+--- a/drivers/bluetooth/hci_bcm.c
++++ b/drivers/bluetooth/hci_bcm.c
+@@ -824,6 +824,7 @@ static const struct acpi_device_id bcm_acpi_match[] = {
+ 	{ "BCM2E65", 0 },
+ 	{ "BCM2E67", 0 },
+ 	{ "BCM2E7B", 0 },
++	{ "BCM2E7C", 0 },
+ 	{ },
+ };
+ MODULE_DEVICE_TABLE(acpi, bcm_acpi_match);
+-- 
+2.7.0.rc3
