@@ -1,86 +1,527 @@
-Return-Path: <jjmeijer88@gmail.com>
-MIME-Version: 1.0
-References: <1453707843-92704-1-git-send-email-marcel@holtmann.org>
- <20160127154921.GA13196@t440s> <CAA+NYvQ35ZoSRy8dEfctXWpfkAN4NuckFnMobdcwjW4hS7ei0g@mail.gmail.com>
- <EB5B11A1-B0CC-4C3D-92F3-689BA44D158F@holtmann.org>
-In-Reply-To: <EB5B11A1-B0CC-4C3D-92F3-689BA44D158F@holtmann.org>
-From: Jaap Jan Meijer <jjmeijer88@gmail.com>
-Date: Fri, 29 Jan 2016 11:40:26 +0000
-Message-ID: <CAA+NYvRJst_d2Tim6DsmmQKX2CNf1MMSiZVUCgJj-7SONXKqrQ@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: Add missing COMPATIBLE_IOCTL for UART line discipline
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: multipart/alternative; boundary=001a113fbaf6ed73f8052a7780c2
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 9.2 \(3112\))
+Subject: Re: [PATCH] hciattach: Add support for Marvell Bluetooth device
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1453906359-13314-1-git-send-email-akarwar@marvell.com>
+Date: Fri, 29 Jan 2016 12:19:55 +0100
+Cc: linux-bluetooth@vger.kernel.org, Cathy Luo <cluo@marvell.com>,
+	Nishant Sarmukadam <nishants@marvell.com>,
+	Ganapathi Bhat <gbhat@marvell.com>
+Message-Id: <D0F8D775-5B3A-49C4-AE19-CB82D991666E@holtmann.org>
+References: <1453906359-13314-1-git-send-email-akarwar@marvell.com>
+To: Amitkumar Karwar <akarwar@marvell.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---001a113fbaf6ed73f8052a7780c2
-Content-Type: text/plain; charset=UTF-8
+Hi Amitkumar,
 
-Hi Marcel,
+> This patch enables the Marvell Bluetooth device (UART sku)
+> over the H4 protocol. It configures the baudrate and download
+> firmware to bring up the device.
+> 
+> Command syntax: hciattach /dev/ttyUSB0 marvell
+> 
+> Make sure to place the marvell_hci_uart.conf file in
+> /lib/firmware/mrvl/
+> 
+> This file should contain below info:
+> HELPER_FILE_PATH=<full path of helper binary>
+> FIRMWARE_FILE_PATH=<full path of firmware binary>
+> FIRMWARE_DOWNLOAD_BAUD_RATE=<firmware download baud rate>
+> 
+> Signed-off-by: Ganapathi Bhat <gbhat@marvell.com>
+> Signed-off-by: Amitkumar Karwar <akarwar@marvell.com>
+> ---
+> Makefile.tools            |   1 +
+> android/Android.mk        |   1 +
+> tools/hciattach.c         |   9 ++
+> tools/hciattach.h         |   1 +
+> tools/hciattach_marvell.c | 377 ++++++++++++++++++++++++++++++++++++++++++++++
+> 5 files changed, 389 insertions(+)
+> create mode 100644 tools/hciattach_marvell.c
+> 
+> diff --git a/Makefile.tools b/Makefile.tools
+> index e79b53b..c5daad0 100644
+> --- a/Makefile.tools
+> +++ b/Makefile.tools
+> @@ -163,6 +163,7 @@ tools_hciattach_SOURCES = tools/hciattach.c tools/hciattach.h \
+> 						tools/hciattach_ath3k.c \
+> 						tools/hciattach_qualcomm.c \
+> 						tools/hciattach_intel.c \
+> +						tools/hciattach_marvell.c \
+> 						tools/hciattach_bcm43xx.c
+> tools_hciattach_LDADD = lib/libbluetooth-internal.la
+> 
+> diff --git a/android/Android.mk b/android/Android.mk
+> index 38ef4aa..3133756 100644
+> --- a/android/Android.mk
+> +++ b/android/Android.mk
+> @@ -697,6 +697,7 @@ LOCAL_SRC_FILES := \
+> 	bluez/tools/hciattach_ath3k.c \
+> 	bluez/tools/hciattach_qualcomm.c \
+> 	bluez/tools/hciattach_intel.c \
+> +	bluez/tools/hciattach_marvell.c \
+> 	bluez/tools/hciattach_bcm43xx.c \
+> 	bluez/lib/bluetooth.c \
+> 	bluez/lib/hci.c \
+> diff --git a/tools/hciattach.c b/tools/hciattach.c
+> index 59a76a7..2fa3d3d 100644
+> --- a/tools/hciattach.c
+> +++ b/tools/hciattach.c
+> @@ -332,6 +332,11 @@ static int bcm43xx(int fd, struct uart_t *u, struct termios *ti)
+> 	return bcm43xx_init(fd, u->init_speed, u->speed, ti, u->bdaddr);
+> }
+> 
+> +static int marvell(int fd, struct uart_t *u, struct termios *ti)
+> +{
+> +	return marvell_init(fd, ti);
+> +}
+> +
+> static int read_check(int fd, void *buf, int count)
+> {
+> 	int res;
+> @@ -1163,6 +1168,10 @@ struct uart_t uart[] = {
+> 	{ "amp",	0x0000, 0x0000, HCI_UART_H4, 115200, 115200,
+> 			AMP_DEV, DISABLE_PM, NULL, NULL, NULL },
+> 
+> +	/* Marvell Bluetooth Module */
+> +	{ "marvell",      0x0000, 0x0000, HCI_UART_H4,   115200, 115200,
+> +			0, DISABLE_PM, NULL, marvell, NULL },
+> +
 
-At the moment I can only tell you that the error was the same without the
-second patch.
+lets keep "amp" the last entry and move the new one earlier. And please keep the indentation similar to the other entries.
 
-But those might have bin incremental builds, I think. I will check again
-with proper builds and see if I can get some debugging going.
+> 	{ NULL, 0 }
+> };
+> 
+> diff --git a/tools/hciattach.h b/tools/hciattach.h
+> index 4279a33..56cce53 100644
+> --- a/tools/hciattach.h
+> +++ b/tools/hciattach.h
+> @@ -64,5 +64,6 @@ int ath3k_init(int fd, int speed, int init_speed, char *bdaddr,
+> int ath3k_post(int fd, int pm);
+> int qualcomm_init(int fd, int speed, struct termios *ti, const char *bdaddr);
+> int intel_init(int fd, int init_speed, int *speed, struct termios *ti);
+> +int marvell_init(int portid, struct termios *ti);
 
-Kind regards,
+If portid is a fd, then call it like that.
 
-J.J.
+> int bcm43xx_init(int fd, int def_speed, int speed, struct termios *ti,
+> 		const char *bdaddr);
+> diff --git a/tools/hciattach_marvell.c b/tools/hciattach_marvell.c
+> new file mode 100644
+> index 0000000..91ab9fd
+> --- /dev/null
+> +++ b/tools/hciattach_marvell.c
+> @@ -0,0 +1,377 @@
+> +/**
+> + * BlueZ - Bluetooth protocol stack for Linux
+> + *
+> + * Copyright (C) 2016, Marvell International Ltd.
+> + *
+> + * This software file (the "File") is distributed by Marvell International
+> + * Ltd. under the terms of the GNU General Public License Version 2, June 1991
+> + * (the "License").  You may use, redistribute and/or modify this File in
+> + * accordance with the terms and conditions of the License, a copy of which
+> + * is available at
+> + * http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt.
+> + *
+> + * THE FILE IS DISTRIBUTED AS-IS, WITHOUT WARRANTY OF ANY KIND, AND THE
+> + * IMPLIED WARRANTIES OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE
+> + * ARE EXPRESSLY DISCLAIMED.  The License provides additional details about
+> + * this warranty disclaimer.
+> + **/
 
+Please do not deviate with the copyright notice or its style.
 
+This is also missing HAVE_CONFIG_H inclusion.
 
-Op vr 29 jan. 2016 11:44 schreef Marcel Holtmann <marcel@holtmann.org>:
+> +#include <stdio.h>
+> +#include <stdlib.h>
+> +#include <stdbool.h>
+> +#include <memory.h>
+> +#include <termios.h>
+> +#include <sys/ioctl.h>
+> +#include <sys/stat.h>
+> +#include <unistd.h>
+> +#include <time.h>
+> +#include "bluetooth.h"
 
-> Hi Jaap,
->
-> > Could you please also add
-> > "[PATCH] Bluetooth: hci_ldisc: Add support for compat_ioctl handling"
-> > to get proper ioctl compat functionality?
-> >
-> > Many thanks in advance,
->
-> are you sure that is really needed? I do wonder why we need that. At least
-> with COMPATIBLE_IOCTL the error message should actually change. Can you
-> trace how far we get in the code path.
->
-> Regards
->
-> Marcel
->
->
+this needs to be lib/bluetooth.h
 
---001a113fbaf6ed73f8052a7780c2
-Content-Type: text/html; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+> +#include "hciattach.h"
+> +
+> +#define CONFIG_FILE     "/lib/firmware/mrvl/marvell_hci_uart.conf"
 
-<div dir=3D"ltr">Hi Marcel,</div><span>
-</span><p dir=3D"ltr">At the moment I can only tell you that the error was =
-the same without the second patch.</p><p dir=3D"ltr">But those might have b=
-in incremental builds, I think. I will check again with proper builds and s=
-ee if I can get some debugging going.</p><p dir=3D"ltr">Kind regards,</p><p=
- dir=3D"ltr">J.J.</p><p dir=3D"ltr"><br></p><span>
-</span><br><div class=3D"gmail_quote"><div dir=3D"ltr">Op vr 29 jan. 2016 1=
-1:44 schreef=C2=A0Marcel Holtmann &lt;<a href=3D"mailto:marcel@holtmann.org=
-" target=3D"_blank">marcel@holtmann.org</a>&gt;:<br></div></div><div class=
-=3D"gmail_quote"><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8=
-ex;border-left:1px #ccc solid;padding-left:1ex">Hi Jaap,<br>
-<br>
-&gt; Could you please also add<br>
-&gt; &quot;[PATCH] Bluetooth: hci_ldisc: Add support for compat_ioctl handl=
-ing&quot;<br>
-&gt; to get proper ioctl compat functionality?<br>
-&gt;<br>
-&gt; Many thanks in advance,<br>
-<br>
-are you sure that is really needed? I do wonder why we need that. At least =
-with COMPATIBLE_IOCTL the error message should actually change. Can you tra=
-ce how far we get in the code path.<br>
-<br>
-Regards<br>
-<br>
-Marcel<br>
-<br>
-</blockquote></div>
+I highly doubt such a file belong in /lib/firmware/.
 
---001a113fbaf6ed73f8052a7780c2--
+How does one look like anyway?
+
+> +#define HELPER_TAG      "HELPER_FILE_PATH"
+> +#define FIRMWARE_TAG    "FIRMWARE_FILE_PATH"
+> +#define BAUDRATE_TAG    "FIRMWARE_DOWNLOAD_BAUD_RATE"
+> +#define MAX_BYTES       0xFFFF
+> +#define MAX_RETRY       50
+> +
+> +struct file_data {
+> +	FILE *file_ptr;
+> +	char name[FILENAME_MAX];
+> +	int size;
+> +	int sent;
+> +	unsigned char buf[MAX_BYTES];
+> +	speed_t speed;
+> +};
+> +
+> +/* Write characters to the port specified by portid */
+> +static int write_chars(int portid, unsigned char *buf, unsigned int len)
+> +{
+> +	if (write(portid, buf, len) == len)
+> +		return true;
+> +	else
+> +		return false;
+> +}
+
+Should be bool return value. And same thing, it is called fd.
+
+> +
+> +/* Busy wait until device sends a '0xa5' or '0xaa' */
+> +static int  wait_for_header(int portid, unsigned char *header)
+
+Double spaces.
+
+> +{
+> +	int ret = false;
+> +	unsigned short retry = 0;
+> +
+> +	while (retry < MAX_RETRY) {
+> +		if (read(portid, header, 1) == 1) {
+> +			(*header) &= 0xFF;
+> +
+> +			if (((*header) == 0xa5) || ((*header) == 0xaa)) {
+> +				ret = true;
+> +				break;
+> +			}
+> +
+> +			retry++;
+> +			usleep(1000);
+> +		}
+> +	}
+> +
+> +	return ret;
+> +}
+> +
+> +/* This function waits to receive the 2 byte length */
+> +static int  wait_for_len(int portid, unsigned short *len)
+
+Double spaces and call it a fd.
+
+> +{
+> +	int ret;
+> +
+> +	ret = read(portid, len, 2);
+> +
+> +	return ret;
+> +}
+
+return read() would work just fine.
+
+> +
+> +/* This function sends bytes to the device */
+> +static int send_bytes(int portid, struct file_data *file,
+> +		      unsigned short next_len)
+> +{
+> +	/* Check if LSB of length is 1 */
+> +	if (next_len & 0x1) {
+> +		/* The CRC did not match at the other end.
+> +		 * That's why the request to re-send.
+> +		 * Since we already have the previous packet's bytes
+> +		 * in buffer, we can just resend the same.
+> +		 * Note: Do not clear the buffer
+> +		 * next_len &= ~1;
+> +		 */
+> +		if (!(write_chars(portid, file->buf, next_len))) {
+> +			fprintf(stderr, "Error re-sedning bytes\n");
+> +			return false;
+> +		}
+> +	} else {
+> +		unsigned short bytes_read = 0;
+> +
+> +		/* The length requested by the Helper is equal to the Block
+> +		 * sizes used while creating the FW.bin. The usual
+> +		 * block sizes are 128, 256, 512.
+> +		 * next_len % 16 == 0. This means the previous packet
+> +		 * was error free (CRC ok) or this is the first packet received.
+> +		 * We can clear the byte_buffer and populate fresh data.
+> +		 */
+> +		memset(file->buf, 0, sizeof(file->buf));
+> +		bytes_read = fread(file->buf, 1, next_len, file->file_ptr);
+> +		if (bytes_read != next_len) {
+> +			fprintf(stderr,
+> +				"fread error:Mismatch in Bytes Read\n");
+> +			return false;
+> +		}
+> +
+> +		if (!(write_chars(portid, file->buf, next_len))) {
+> +			fprintf(stderr, "Error sedning bytes\n");
+> +			return false;
+> +		}
+> +
+> +		file->sent += bytes_read;
+> +	}
+> +
+> +	return true;
+> +}
+
+bool return value.
+
+> +
+> +static int marvell_load_file(int portid, struct file_data *file)
+> +{
+> +	unsigned char ack = 0x5a;
+> +	unsigned char nack = 0xbf;
+> +	unsigned char header;
+> +	unsigned short next_len = 0, len, len_comp;
+> +	int ret = true;
+> +
+> +	file->file_ptr = fopen(file->name, "rb");
+> +	if (!file->file_ptr) {
+> +		fprintf(stderr, "Couldn't open file : %s\n", file->name);
+> +		ret = false;
+> +		goto done;
+> +	}
+> +
+> +	/* Expecting a packet with 0xa5 start followed by 4 byte Length */
+> +	while (true) {
+> +		if (!wait_for_header(portid, &header)) {
+> +			fprintf(stderr, "Wait for header error\n");
+> +			ret = false;
+> +			break;
+> +		}
+> +
+> +		wait_for_len(portid, &len);
+> +
+> +		wait_for_len(portid, &len_comp);
+> +
+> +		/* All 1's */
+> +		if ((len ^ len_comp) == 0xFFFF) {
+> +			/* Successful. Send back the ack */
+> +			next_len = len;
+> +			if (len != 0) {
+> +				if (!(write_chars(portid, &ack, 1))) {
+> +					fprintf(stderr, "Error sedning ACK\n");
+> +					ret = false;
+> +					break;
+> +				}
+> +			}
+> +
+> +			if (header == 0xaa) {
+> +				/* We received the Chip Id and Rev Num that the
+> +				 * helper intended to send. Ignore the received
+> +				 * Chip Id, Rev Num and proceed to Download.
+> +				 */
+> +				continue;
+> +			}
+> +		} else {
+> +			/* Failure due to mismatch */
+> +			if (!(write_chars(portid, &nack, 1))) {
+> +				fprintf(stderr, "Error sedning NACK\n");
+> +				ret = false;
+> +				break;
+> +			}
+> +
+> +			continue;
+> +		}
+> +
+> +		/* If the Length requested is 0, download is complete */
+> +		if (next_len == 0) {
+> +			if (!(write_chars(portid, &ack, 1))) {
+> +				fprintf(stderr, "Error sedning final ACK\n");
+> +				ret = false;
+> +				break;
+> +			}
+> +			fprintf(stdout,
+> +				"File Successfully downloaded:%6d:%6d\n",
+> +				file->size, file->size);
+> +			ret = true;
+> +			break;
+> +		}
+> +		if (!(send_bytes(portid, file, next_len))) {
+> +			ret = false;
+> +			break;
+> +		}
+> +		fprintf(stdout, "File downloaded: %8d:%8d\r",
+> +			file->sent, file->size);
+> +	}
+> +
+> +done:
+> +	fprintf(stdout, "\n");
+> +	fclose(file->file_ptr);
+> +
+> +	return ret;
+> +}
+> +
+> +static int get_config_value(char *tag, char *tag_value)
+> +{
+> +	int ret = true;
+> +	char line[100];
+> +	FILE *cfg_file_ptr = NULL;
+> +	char *label, *value;
+> +
+> +	cfg_file_ptr = fopen(CONFIG_FILE, "r");
+> +
+> +	if (!cfg_file_ptr) {
+> +		fprintf(stderr, "Couldn't open file : %s\n", CONFIG_FILE);
+> +		ret = false;
+> +		goto done;
+> +	}
+> +
+> +	while (fgets(line, sizeof(line), cfg_file_ptr)) {
+> +		label = strtok(line, "=\n");
+> +		value = strtok(NULL, "=\n");
+> +
+> +		if (label && value) {
+> +			if (strcmp(label, tag) == 0)
+> +				strncpy(tag_value, value, FILENAME_MAX);
+> +		}
+> +	}
+> +
+> +done:
+> +	fclose(cfg_file_ptr);
+> +	return ret;
+> +}
+> +
+> +static int prepare_file(struct file_data *file, char *tag,
+> +			unsigned char flow_ctl)
+> +{
+> +	int ret = true;
+> +	char speed[FILENAME_MAX];
+> +	struct stat st;
+> +
+> +	if (!get_config_value(tag, file->name)) {
+> +		fprintf(stderr, "Could not get config value:%s", tag);
+> +		ret = false;
+> +		goto done;
+> +	}
+> +
+> +	if (flow_ctl) {
+> +		if (!get_config_value(BAUDRATE_TAG, speed)) {
+> +			fprintf(stderr, "Could not get config value:%s",
+> +				BAUDRATE_TAG);
+> +			ret = false;
+> +			goto done;
+> +		} else {
+> +			file->speed = atoi(speed);
+> +		}
+> +	}
+> +
+> +	if (stat(file->name, &st) == -1) {
+> +		fprintf(stderr, "File error: %s\n", file->name);
+> +		ret = false;
+> +		goto done;
+> +	}
+> +
+> +	file->size = st.st_size;
+> +
+> +done:
+> +	return ret;
+> +}
+> +
+> +static int set_termios(int fd, struct termios *ti, unsigned char flow_ctl,
+> +		       speed_t baud_rate)
+> +{
+> +	tcflush(fd, TCIOFLUSH);
+> +
+> +	if (tcgetattr(fd, ti) < 0) {
+> +		fprintf(stderr, "Can't get port settings");
+> +		return false;
+> +	}
+> +
+> +	cfmakeraw(ti);
+> +
+> +	ti->c_cflag |= CLOCAL;
+> +
+> +	if (flow_ctl)
+> +		ti->c_cflag |= CRTSCTS;
+> +
+> +	if (tcsetattr(fd, TCSANOW, ti) < 0) {
+> +		fprintf(stderr, "Can't set port settings");
+> +		return false;
+> +	}
+> +
+> +	/* Set baudrate */
+> +	if (cfsetospeed(ti, baud_rate) < 0) {
+> +		fprintf(stderr, "Can't set baud rate");
+> +		return false;
+> +	}
+> +
+> +	if (tcsetattr(fd, TCSANOW, ti) < 0) {
+> +		fprintf(stderr, "Can't set port settings");
+> +		return false;
+> +	}
+> +
+> +	return true;
+> +}
+> +
+> +/**
+> + * An entry point for Marvell specific initialization
+> + */
+> +int marvell_init(int portid, struct termios *ti)
+> +{
+> +	int ret = true;
+> +	int arg;
+> +	struct file_data helper_file;
+> +	struct file_data firmware_file;
+> +
+> +	if (ioctl(portid, TIOCMGET, &arg) < 0) {
+> +		fprintf(stderr, "cannot get TIOCMGET");
+> +		ret = -1;
+> +		goto done;
+> +	}
+> +
+> +	if (arg & TIOCM_CTS) {
+> +		fprintf(stderr, "Firmware already loaded..");
+> +		goto done;
+> +	}
+> +
+> +	memset(&helper_file, 0, sizeof(struct file_data));
+> +	if (!prepare_file(&helper_file, HELPER_TAG, false)) {
+> +		fprintf(stderr, "Failed to prepare helper file\n");
+> +		ret = -1;
+> +		goto done;
+> +	}
+> +
+> +	if (!marvell_load_file(portid, &helper_file)) {
+> +		fprintf(stderr, "Helper download failed\n");
+> +		ret = -1;
+> +		goto done;
+> +	}
+> +
+> +	memset(&firmware_file, 0, sizeof(struct file_data));
+> +	if (!prepare_file(&firmware_file, FIRMWARE_TAG, true)) {
+> +		fprintf(stderr, "Failed to prepare file firmware file\n");
+> +		ret = -1;
+> +		goto done;
+> +	}
+> +
+> +	if (!set_termios(portid, ti, true, uart_speed(firmware_file.speed))) {
+> +		fprintf(stderr, "Failed to set port settings\n");
+> +		ret = -1;
+> +		goto done;
+> +	}
+> +
+> +	if (!marvell_load_file(portid, &firmware_file)) {
+> +		fprintf(stderr, "Firmware download failed\n");
+> +		ret = -1;
+> +		goto done;
+> +	}
+> +
+> +	fprintf(stdout, "\n");
+> +done:
+> +	return ret;
+> +}
+
+Regards
+
+Marcel
+
