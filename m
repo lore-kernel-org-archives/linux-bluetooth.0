@@ -1,44 +1,38 @@
-Return-Path: <linux-wpan-owner@vger.kernel.org>
-Subject: Re: [RFC bluetooth-next] 6lowpan: move reciving handling to generic
-To: Alexander Aring <aar@pengutronix.de>, linux-wpan@vger.kernel.org
-References: <1453927574-5074-1-git-send-email-aar@pengutronix.de>
-Cc: linux-bluetooth@vger.kernel.org, kernel@pengutronix.de,
-	jukka.rissanen@linux.intel.com
-From: Stefan Schmidt <stefan@osg.samsung.com>
-Message-ID: <56AB7411.3000700@osg.samsung.com>
-Date: Fri, 29 Jan 2016 15:15:45 +0100
+Return-Path: <beaufort.francois@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <1453927574-5074-1-git-send-email-aar@pengutronix.de>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Sender: linux-wpan-owner@vger.kernel.org
+In-Reply-To: <CC3EE005-1971-4FA6-8C44-BD5FDDA01ED0@holtmann.org>
+References: <CAEZxfGMJZva2Rmfm4P8D+zTnY7RbvaaA-e3R3SxoLycuD9D==A@mail.gmail.com>
+ <CAD0=r8zoEbgP_XhA6j7Jz2RJ0jUNVirQL74vfqPX7dRtziWyOA@mail.gmail.com>
+ <CAEZxfGOmyVm2-LsdjcYK8LXaQ7TFnBJCmKt3wXtPkurepDR-OA@mail.gmail.com> <CC3EE005-1971-4FA6-8C44-BD5FDDA01ED0@holtmann.org>
+From: =?UTF-8?Q?Fran=C3=A7ois_Beaufort?= <beaufort.francois@gmail.com>
+Date: Fri, 29 Jan 2016 13:56:08 +0100
+Message-ID: <CAEZxfGO63XEdkW6KFCSjn6XfF=hAUWgYJ62vwF+Sgpc6Uc6sDA@mail.gmail.com>
+Subject: Re: Two connect failed...
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Jakub Pawlowski <jpawlowski@google.com>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello.
+Thank you Marcel!
 
-On 27/01/16 21:46, Alexander Aring wrote:
-> This patch moves 6lowpan receive handling into 6lowpan generic. I
-> introduced some callback ops to make some link-layer specific handling.
+On Fri, Jan 29, 2016 at 12:07 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Francois,
 >
-> Signed-off-by: Alexander Aring <aar@pengutronix.de>
-> ---
-> Hi,
+>> Reducing APP_ADV_INTERVAL to 400 (instead of 1600) makes the "LE
+>> Create Connection" work every single time now.
+>>
+>> Hopefully with bluetooth-next update in Chrome OS
+>> (https://code.google.com/p/chromium/issues/detail?id=576577#c20) and
+>> especially https://git.kernel.org/cgit/linux/kernel/git/bluetooth/bluetooth-next.git/commit/?id=2f99536a5b34d5b0f54723067d68f6cef3f0fdc6,
+>> we won't have to set a smaller Advertising Interval as it reduces
+>> battery's life.
+>>
+>> Do you maybe have another recommendation while it reaches Stable channel?
 >
-> this patch is a draft to talking about to move the receive handling
-> and evaluation of 6LoWPAN dispatches into net/6lowpan instead that
-> every 6lowpan specific link-layer implementation will do that on his
-> own.
+> I highly doubt there is anything else that can be done. I would cherry pick that single patch and backport it into the Chrome OS kernel.
 >
-> I added some callbacks for receive handling, other solutions would
-> be to add runtime decisions into net/6lowpan/rx.c by eval the
-> interface type.
+> Regards
 >
-> Any comments are welcome. It's not perfect yet and it can be still
-> improved at some places, if we really like to go that way.
-
-The first questions that comes to mind is why rx only and not tx?
-This would also allow the fragment handling to move into the generic 
-part. I'm aware that bluetooth is not using it but other 6LoWPAN 
-adaptation layers do and it part of the RFC4944.
-
-regards
-Stefan Schmidt
+> Marcel
+>
