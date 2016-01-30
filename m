@@ -1,28 +1,40 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: bugzilla-daemon@bugzilla.kernel.org
-To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 73081] Fail to setup Bluetooth on Dell Venue 11 Pro
-Date: Sat, 30 Jan 2016 15:41:20 +0000
-Message-ID: <bug-73081-62941-ZOPsxGsRhR@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-73081-62941@https.bugzilla.kernel.org/>
-References: <bug-73081-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
+Return-Path: <jjmeijer88@gmail.com>
 MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <EB5B11A1-B0CC-4C3D-92F3-689BA44D158F@holtmann.org>
+References: <1453707843-92704-1-git-send-email-marcel@holtmann.org>
+ <20160127154921.GA13196@t440s> <CAA+NYvQ35ZoSRy8dEfctXWpfkAN4NuckFnMobdcwjW4hS7ei0g@mail.gmail.com>
+ <EB5B11A1-B0CC-4C3D-92F3-689BA44D158F@holtmann.org>
+From: Jaap Jan Meijer <jjmeijer88@gmail.com>
+Date: Sat, 30 Jan 2016 16:00:55 +0100
+Message-ID: <CAA+NYvS2nkSP=Qxx4yBv1cqYzDpgv4oR+dW+dD___gWcgyyNjQ@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: Add missing COMPATIBLE_IOCTL for UART line discipline
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-https://bugzilla.kernel.org/show_bug.cgi?id=73081
+Hi Marcel,
 
-Jianlong Liu <lvlrdka22@gmail.com> changed:
+After doing a proper build it indeed was not necessary to apply the
+second patch. Sorry about that, lesson learned.
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |lvlrdka22@gmail.com
 
---- Comment #2 from Jianlong Liu <lvlrdka22@gmail.com> ---
-Same here, not working on Venue 8 Pro. Adding the ACPI ID doesn't result in
-anything.
+Regards,
 
--- 
-You are receiving this mail because:
-You are the assignee for the bug.
+J.J.
+
+2016-01-29 11:44 GMT+01:00 Marcel Holtmann <marcel@holtmann.org>:
+> Hi Jaap,
+>
+>> Could you please also add
+>> "[PATCH] Bluetooth: hci_ldisc: Add support for compat_ioctl handling"
+>> to get proper ioctl compat functionality?
+>>
+>> Many thanks in advance,
+>
+> are you sure that is really needed? I do wonder why we need that. At least with COMPATIBLE_IOCTL the error message should actually change. Can you trace how far we get in the code path.
+>
+> Regards
+>
+> Marcel
+>
