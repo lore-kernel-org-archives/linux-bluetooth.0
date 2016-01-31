@@ -1,51 +1,109 @@
-Return-Path: <johan.hedberg@gmail.com>
-Date: Tue, 1 Dec 2015 10:41:07 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: =?iso-8859-1?Q?Fran=E7ois?= Beaufort <beaufort.francois@gmail.com>,
-	Szymon Janc <szymon.janc@codecoup.pl>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: Unknown Connection Identifier
-Message-ID: <20151201084107.GA11107@t440s.lan>
-References: <CAEZxfGPTxwUZzU+3XSV-uiN+DMz+hyOKiiZfgF+oD6pp=-XiOA@mail.gmail.com>
- <AAC95ACC-36E4-4618-8F49-53F78AE93AA6@holtmann.org>
- <2045332.GytFuFKTvp@ix>
- <CAEZxfGOdyZat1evKm0Jfwg=knuigGdfK_wVqS8NG=zFAY3aRXg@mail.gmail.com>
- <2DBBB005-93A7-47ED-8E88-1D6B92ACCC07@holtmann.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <2DBBB005-93A7-47ED-8E88-1D6B92ACCC07@holtmann.org>
+In-Reply-To: <CABBYNZK97OFQVs88JKUyKpv80PNGd+dcep-xGNWq8v0ZN86LWQ@mail.gmail.com>
+References: <1453664614-16485-1-git-send-email-andrzej.kaczmarek@codecoup.pl> <CABBYNZK97OFQVs88JKUyKpv80PNGd+dcep-xGNWq8v0ZN86LWQ@mail.gmail.com>
+From: Andrzej Kaczmarek <andrzej.kaczmarek@codecoup.pl>
+Date: Sun, 31 Jan 2016 21:58:56 +0100
+Message-ID: <CADAkoF7EKtFH_weaGOJmoBHt3OS44_nDPgv_6=KEbocxzKJX5Q@mail.gmail.com>
+Subject: Re: [PATCH] shared/gatt-client: Make read_long_value more robust
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Luiz,
 
-On Tue, Nov 24, 2015, Marcel Holtmann wrote:
-> >> HCI Event: Command Complete (0x0e) plen 4                                           [hci0] 17.672048
-> >      LE Create Connection Cancel (0x08|0x000e) ncmd 1
-> >        Status: Success (0x00)
-> >> HCI Event: LE Meta Event (0x3e) plen 19                                             [hci0] 17.674036
-> >      LE Connection Complete (0x01)
-> >        Status: Unknown Connection Identifier (0x02)
-> >        Handle: 32
-> >        Role: Master (0x00)
-> >        Peer address type: Public (0x00)
-> >        Peer address: 88:0F:10:9D:EB:42 (OUI 88-0F-10)
-> >        Connection interval: 67.50 msec (0x0036)
-> >        Connection latency: 0.00 msec (0x0000)
-> >        Supervision timeout: 420 msec (0x002a)
-> >        Master clock accuracy: 0x00
-> > @ Connect Failed: 88:0F:10:9D:EB:42 (1) status 0x02
-> 
-> This one still needs to be fixed. It is a bug. The implementation is
-> too naive. The unknown connection identifier is actually the success
-> case for LE Create Connection Cancel command. And since we keep trying
-> until the connection timeout hits, this is not an error at this point.
 
-I think we need to differentiate between explicit connection requests
-(L2CAP socket connect()) and Add Device based connections. For the
-former we probably do want the Connect Failed since that's consistent
-with the behavior you see when operating the L2CAP socket. For the
-latter where we just go back to trying again, so the event doesn't
-really describe what's going on.
+On Mon, Jan 25, 2016 at 10:36 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi Andrzej,
+>
+> On Sun, Jan 24, 2016 at 9:43 PM, Andrzej Kaczmarek
+> <andrzej.kaczmarek@codecoup.pl> wrote:
+>> Using "Read Blob Request" on attributes shorter than ATT_MTU - 3 may
+>> return "Attribute Not Long" error on some values, but at the same time
+>> it's ok to read this attribute using "Read Request".
+>>
+>> Since using "Read Blob Request" as first request when reading long
+>> characteristic value starting with offset 0 is optional, this patch
+>> changes read_long_value to start with "Read Request" whenever possible
+>> to remove need for caller to take care of such error.
+>>
+>> Core v4.2, part F, section 1.3.4.4.5:
+>> If the attribute value has a fixed length that is less than or equal to
+>> (ATT_MTU - 3) octets in length, then an Error Response can be sent with
+>> the error code «Attribute Not Long».
+>
+> Include the spec details as comments to the code.
 
-Johan
+Ok, will send v2 soon.
+
+>
+>> ---
+>>  src/shared/gatt-client.c | 24 +++++++++++----
+>>  unit/test-gatt.c         | 78 ++++++++++++++++++++++++------------------------
+>>  2 files changed, 57 insertions(+), 45 deletions(-)
+>>
+>> diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
+>> index 06ac763..d6b3ad0 100644
+>> --- a/src/shared/gatt-client.c
+>> +++ b/src/shared/gatt-client.c
+>> @@ -2156,7 +2156,9 @@ static void read_long_cb(uint8_t opcode, const void *pdu,
+>>                 goto done;
+>>         }
+>>
+>> -       if (opcode != BT_ATT_OP_READ_BLOB_RSP || (!pdu && length)) {
+>> +       if ((!op->offset && opcode != BT_ATT_OP_READ_RSP)
+>> +                       || (op->offset && opcode != BT_ATT_OP_READ_BLOB_RSP)
+>> +                       || (!pdu && length)) {
+>>                 success = false;
+>>                 goto done;
+>>         }
+>> @@ -2209,7 +2211,9 @@ unsigned int bt_gatt_client_read_long_value(struct bt_gatt_client *client,
+>>  {
+>>         struct request *req;
+>>         struct read_long_op *op;
+>> +       uint8_t att_op;
+>>         uint8_t pdu[4];
+>> +       uint16_t pdu_len;
+>>
+>>         if (!client)
+>>                 return 0;
+>> @@ -2233,12 +2237,20 @@ unsigned int bt_gatt_client_read_long_value(struct bt_gatt_client *client,
+>>         req->destroy = destroy_read_long_op;
+>>
+>>         put_le16(value_handle, pdu);
+>> -       put_le16(offset, pdu + 2);
+>> +       pdu_len = sizeof(value_handle);
+>> +
+>> +       if (op->offset) {
+>> +               att_op = BT_ATT_OP_READ_BLOB_REQ;
+>> +               pdu_len += sizeof(op->offset);
+>> +
+>> +               put_le16(op->offset, pdu + 2);
+>> +       } else {
+>> +               att_op = BT_ATT_OP_READ_REQ;
+>> +       }
+>> +
+>> +       req->att_id = bt_att_send(client->att, att_op, pdu, pdu_len,
+>> +                                       read_long_cb, req, request_unref);
+>>
+>> -       req->att_id = bt_att_send(client->att, BT_ATT_OP_READ_BLOB_REQ,
+>> -                                                       pdu, sizeof(pdu),
+>> -                                                       read_long_cb, req,
+>> -                                                       request_unref);
+>>         if (!req->att_id) {
+>>                 op->destroy = NULL;
+>>                 request_unref(req);
+>
+> Btw, have you validate this with testing spec and PTS? It seems to
+> right thing to do but we need to make sure either the spec or PTS
+> don't expect Read Blob to be used.
+
+Test spec allows both Read Request and Read Blob Request for reading
+first chunk in all testcases for long write and iirc PTS also handles
+this properly.
+
+BR,
+Andrzej
