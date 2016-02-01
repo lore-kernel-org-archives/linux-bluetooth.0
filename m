@@ -1,104 +1,263 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Subject: Re: [RFC bluetooth-next] 6lowpan: move reciving handling to generic
-To: Stefan Schmidt <stefan@osg.samsung.com>, linux-wpan@vger.kernel.org
-References: <1453927574-5074-1-git-send-email-aar@pengutronix.de>
- <56AB7411.3000700@osg.samsung.com>
-Cc: linux-bluetooth@vger.kernel.org, kernel@pengutronix.de,
-	jukka.rissanen@linux.intel.com
-From: Alexander Aring <aar@pengutronix.de>
-Message-ID: <56AF2F08.2030603@pengutronix.de>
-Date: Mon, 1 Feb 2016 11:10:16 +0100
+From: Andrzej Kaczmarek <andrzej.kaczmarek@codecoup.pl>
+To: linux-bluetooth@vger.kernel.org
+Cc: Andrzej Kaczmarek <andrzej.kaczmarek@codecoup.pl>
+Subject: [PATCH v2] shared/gatt-client: Make read_long_value more robust
+Date: Mon,  1 Feb 2016 07:24:17 +0100
+Message-Id: <1454307857-5337-1-git-send-email-andrzej.kaczmarek@codecoup.pl>
 MIME-Version: 1.0
-In-Reply-To: <56AB7411.3000700@osg.samsung.com>
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Stefan,
+Using "Read Blob Request" on attributes shorter than ATT_MTU - 3 may
+return "Attribute Not Long" error on some values, but at the same time
+it's ok to read this attribute using "Read Request".
 
-Am 01/29/2016 um 03:15 PM schrieb Stefan Schmidt:
-> Hello.
->
-> On 27/01/16 21:46, Alexander Aring wrote:
->> This patch moves 6lowpan receive handling into 6lowpan generic. I
->> introduced some callback ops to make some link-layer specific handling.
->>
->> Signed-off-by: Alexander Aring <aar@pengutronix.de>
->> ---
->> Hi,
->>
->> this patch is a draft to talking about to move the receive handling
->> and evaluation of 6LoWPAN dispatches into net/6lowpan instead that
->> every 6lowpan specific link-layer implementation will do that on his
->> own.
->>
->> I added some callbacks for receive handling, other solutions would
->> be to add runtime decisions into net/6lowpan/rx.c by eval the
->> interface type.
->>
->> Any comments are welcome. It's not perfect yet and it can be still
->> improved at some places, if we really like to go that way.
->
-> The first questions that comes to mind is why rx only and not tx?
+Since using "Read Blob Request" as first request when reading long
+characteristic value starting with offset 0 is optional, this patch
+changes read_long_value to start with "Read Request" whenever possible
+to remove need for caller to take care of such error.
 
-because I think the rx handling is "easier" to do this now, because I did the
-receiving handling rework and "in my opinion" - it looks well.
+Core v4.2, part F, section 1.3.4.4.5:
+If the attribute value has a fixed length that is less than or equal to
+(ATT_MTU - 3) octets in length, then an Error Response can be sent with
+the error code «Attribute Not Long».
+---
+ src/shared/gatt-client.c | 36 ++++++++++++++++++----
+ unit/test-gatt.c         | 78 ++++++++++++++++++++++++------------------------
+ 2 files changed, 69 insertions(+), 45 deletions(-)
 
-For transmit part we need some other framwork to handle the dispatch
-generation well.
+diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
+index 06ac763..5c95a62 100644
+--- a/src/shared/gatt-client.c
++++ b/src/shared/gatt-client.c
+@@ -2156,7 +2156,9 @@ static void read_long_cb(uint8_t opcode, const void *pdu,
+ 		goto done;
+ 	}
+ 
+-	if (opcode != BT_ATT_OP_READ_BLOB_RSP || (!pdu && length)) {
++	if ((!op->offset && opcode != BT_ATT_OP_READ_RSP)
++			|| (op->offset && opcode != BT_ATT_OP_READ_BLOB_RSP)
++			|| (!pdu && length)) {
+ 		success = false;
+ 		goto done;
+ 	}
+@@ -2209,7 +2211,9 @@ unsigned int bt_gatt_client_read_long_value(struct bt_gatt_client *client,
+ {
+ 	struct request *req;
+ 	struct read_long_op *op;
++	uint8_t att_op;
+ 	uint8_t pdu[4];
++	uint16_t pdu_len;
+ 
+ 	if (!client)
+ 		return 0;
+@@ -2233,12 +2237,32 @@ unsigned int bt_gatt_client_read_long_value(struct bt_gatt_client *client,
+ 	req->destroy = destroy_read_long_op;
+ 
+ 	put_le16(value_handle, pdu);
+-	put_le16(offset, pdu + 2);
++	pdu_len = sizeof(value_handle);
++
++	/*
++	 * Core v4.2, part F, section 1.3.4.4.5:
++	 * If the attribute value has a fixed length that is less than or equal
++	 * to (ATT_MTU - 3) octets in length, then an Error Response can be sent
++	 * with the error code «Attribute Not Long».
++	 *
++	 * To remove need for caller to handle "Attribute Not Long" error when
++	 * reading characteristics with short values, use Read Request for
++	 * reading first part of characteristics value instead of Read Blob
++	 * Request. Both are allowed in this case.
++	 */
++
++	if (op->offset) {
++		att_op = BT_ATT_OP_READ_BLOB_REQ;
++		pdu_len += sizeof(op->offset);
++
++		put_le16(op->offset, pdu + 2);
++	} else {
++		att_op = BT_ATT_OP_READ_REQ;
++	}
++
++	req->att_id = bt_att_send(client->att, att_op, pdu, pdu_len,
++					read_long_cb, req, request_unref);
+ 
+-	req->att_id = bt_att_send(client->att, BT_ATT_OP_READ_BLOB_REQ,
+-							pdu, sizeof(pdu),
+-							read_long_cb, req,
+-							request_unref);
+ 	if (!req->att_id) {
+ 		op->destroy = NULL;
+ 		request_unref(req);
+diff --git a/unit/test-gatt.c b/unit/test-gatt.c
+index 326a32c..944bfba 100644
+--- a/unit/test-gatt.c
++++ b/unit/test-gatt.c
+@@ -2892,14 +2892,14 @@ int main(int argc, char *argv[])
+ 	define_test_client("/TP/GAR/CL/BV-04-C", test_client, service_db_1,
+ 			&test_long_read_1,
+ 			SERVICE_DATA_1_PDUS,
+-			raw_pdu(0x0c, 0x03, 0x00, 0x00, 0x00),
+-			raw_pdu(0x0d, 0x01, 0x02, 0x03));
++			raw_pdu(0x0a, 0x03, 0x00),
++			raw_pdu(0x0b, 0x01, 0x02, 0x03));
+ 
+ 	define_test_client("/TP/GAR/CL/BV-04-C/512B", test_client, service_db_1,
+ 			&test_long_read_2,
+ 			SERVICE_DATA_1_PDUS,
+-			raw_pdu(0x0c, 0x03, 0x00, 0x00, 0x00),
+-			raw_pdu(0x0d, 0xff, 0xff, 0xff, 0xff,
++			raw_pdu(0x0a, 0x03, 0x00),
++			raw_pdu(0x0b, 0xff, 0xff, 0xff, 0xff,
+ 				0xff, 0xff, 0xff, 0xff, 0xff,
+ 				0xff, 0xff, 0xff, 0xff, 0xff,
+ 				0xff, 0xff, 0xff, 0xff, 0xff,
+@@ -3014,46 +3014,46 @@ int main(int argc, char *argv[])
+ 	define_test_client("/TP/GAR/CL/BI-12-C", test_client, service_db_1,
+ 			&test_long_read_3,
+ 			SERVICE_DATA_1_PDUS,
+-			raw_pdu(0x0c, 0x03, 0x00, 0x00, 0x00),
+-			raw_pdu(0x01, 0x0c, 0x03, 0x00, 0x02));
++			raw_pdu(0x0a, 0x03, 0x00),
++			raw_pdu(0x01, 0x0a, 0x03, 0x00, 0x02));
+ 
+ 	define_test_client("/TP/GAR/CL/BI-13-C", test_client, service_db_1,
+ 			&test_long_read_4,
+ 			SERVICE_DATA_1_PDUS,
+-			raw_pdu(0x0c, 0x03, 0x00, 0x00, 0x00),
+-			raw_pdu(0x01, 0x0c, 0x03, 0x00, 0x07));
++			raw_pdu(0x0a, 0x03, 0x00),
++			raw_pdu(0x01, 0x0a, 0x03, 0x00, 0x07));
+ 
+ 	define_test_client("/TP/GAR/CL/BI-14-C", test_client, service_db_1,
+ 			&test_long_read_5,
+ 			SERVICE_DATA_1_PDUS,
+-			raw_pdu(0x0c, 0x00, 0x00, 0x00, 0x00),
+-			raw_pdu(0x01, 0x0c, 0x00, 0x00, 0x01));
++			raw_pdu(0x0a, 0x00, 0x00),
++			raw_pdu(0x01, 0x0a, 0x00, 0x00, 0x01));
+ 
+ 	define_test_client("/TP/GAR/CL/BI-15-C", test_client, service_db_1,
+ 			&test_long_read_6,
+ 			SERVICE_DATA_1_PDUS,
+-			raw_pdu(0x0c, 0x03, 0x00, 0x00, 0x00),
+-			raw_pdu(0x01, 0x0c, 0x03, 0x00, 0x08));
++			raw_pdu(0x0a, 0x03, 0x00),
++			raw_pdu(0x01, 0x0a, 0x03, 0x00, 0x08));
+ 
+ 	define_test_client("/TP/GAR/CL/BI-16-C", test_client, service_db_1,
+ 			&test_long_read_7,
+ 			SERVICE_DATA_1_PDUS,
+-			raw_pdu(0x0c, 0x03, 0x00, 0x00, 0x00),
+-			raw_pdu(0x01, 0x0c, 0x03, 0x00, 0x05));
++			raw_pdu(0x0a, 0x03, 0x00),
++			raw_pdu(0x01, 0x0a, 0x03, 0x00, 0x05));
+ 
+ 	define_test_client("/TP/GAR/CL/BI-16-C/auto", test_client, service_db_1,
+ 			&test_long_read_1,
+ 			SERVICE_DATA_1_PDUS,
+-			raw_pdu(0x0c, 0x03, 0x00, 0x00, 0x00),
+-			raw_pdu(0x01, 0x0c, 0x03, 0x00, 0x05),
+-			raw_pdu(0x0c, 0x03, 0x00, 0x00, 0x00),
++			raw_pdu(0x0a, 0x03, 0x00),
++			raw_pdu(0x01, 0x0a, 0x03, 0x00, 0x05),
++			raw_pdu(0x0a, 0x03, 0x00),
+ 			raw_pdu(0x0d, 0x01, 0x02, 0x03));
+ 
+ 	define_test_client("/TP/GAR/CL/BI-17-C", test_client, service_db_1,
+ 			&test_long_read_8,
+ 			SERVICE_DATA_1_PDUS,
+-			raw_pdu(0x0c, 0x03, 0x00, 0x00, 0x00),
+-			raw_pdu(0x01, 0x0c, 0x03, 0x00, 0x0c));
++			raw_pdu(0x0a, 0x03, 0x00),
++			raw_pdu(0x01, 0x0a, 0x03, 0x00, 0x0c));
+ 
+ 	define_test_client("/TP/GAR/CL/BI-18-C", test_client, service_db_1,
+ 			&test_multiple_read_2,
+@@ -3299,14 +3299,14 @@ int main(int argc, char *argv[])
+ 	define_test_client("/TP/GAR/CL/BV-07-C", test_client, service_db_1,
+ 			&test_long_read_9,
+ 			SERVICE_DATA_1_PDUS,
+-			raw_pdu(0x0c, 0x04, 0x00, 0x00, 0x00),
+-			raw_pdu(0x0d, 0x01, 0x02, 0x03));
++			raw_pdu(0x0a, 0x04, 0x00),
++			raw_pdu(0x0b, 0x01, 0x02, 0x03));
+ 
+ 	define_test_client("/TP/GAR/CL/BV-07-C/512B", test_client, service_db_1,
+ 			&test_long_read_10,
+ 			SERVICE_DATA_1_PDUS,
+-			raw_pdu(0x0c, 0x04, 0x00, 0x00, 0x00),
+-			raw_pdu(0x0d, 0xff, 0xff, 0xff, 0xff,
++			raw_pdu(0x0a, 0x04, 0x00),
++			raw_pdu(0x0b, 0xff, 0xff, 0xff, 0xff,
+ 				0xff, 0xff, 0xff, 0xff, 0xff,
+ 				0xff, 0xff, 0xff, 0xff, 0xff,
+ 				0xff, 0xff, 0xff, 0xff, 0xff,
+@@ -3415,46 +3415,46 @@ int main(int argc, char *argv[])
+ 	define_test_client("/TP/GAR/CL/BI-28-C", test_client, service_db_1,
+ 			&test_long_read_11,
+ 			SERVICE_DATA_1_PDUS,
+-			raw_pdu(0x0c, 0x04, 0x00, 0x00, 0x00),
+-			raw_pdu(0x01, 0x0c, 0x04, 0x00, 0x02));
++			raw_pdu(0x0a, 0x04, 0x00),
++			raw_pdu(0x01, 0x0a, 0x04, 0x00, 0x02));
+ 
+ 	define_test_client("/TP/GAR/CL/BI-29-C", test_client, service_db_1,
+ 			&test_long_read_12,
+ 			SERVICE_DATA_1_PDUS,
+-			raw_pdu(0x0c, 0x04, 0x00, 0x00, 0x00),
+-			raw_pdu(0x01, 0x0c, 0x04, 0x00, 0x07));
++			raw_pdu(0x0a, 0x04, 0x00),
++			raw_pdu(0x01, 0x0a, 0x04, 0x00, 0x07));
+ 
+ 	define_test_client("/TP/GAR/CL/BI-30-C", test_client, service_db_1,
+ 			&test_long_read_5,
+ 			SERVICE_DATA_1_PDUS,
+-			raw_pdu(0x0c, 0x00, 0x00, 0x00, 0x00),
+-			raw_pdu(0x01, 0x0c, 0x00, 0x00, 0x01));
++			raw_pdu(0x0a, 0x00, 0x00),
++			raw_pdu(0x01, 0x0a, 0x00, 0x00, 0x01));
+ 
+ 	define_test_client("/TP/GAR/CL/BI-31-C", test_client, service_db_1,
+ 			&test_long_read_13,
+ 			SERVICE_DATA_1_PDUS,
+-			raw_pdu(0x0c, 0x04, 0x00, 0x00, 0x00),
+-			raw_pdu(0x01, 0x0c, 0x04, 0x00, 0x08));
++			raw_pdu(0x0a, 0x04, 0x00),
++			raw_pdu(0x01, 0x0a, 0x04, 0x00, 0x08));
+ 
+ 	define_test_client("/TP/GAR/CL/BI-32-C", test_client, service_db_1,
+ 			&test_long_read_14,
+ 			SERVICE_DATA_1_PDUS,
+-			raw_pdu(0x0c, 0x04, 0x00, 0x00, 0x00),
+-			raw_pdu(0x01, 0x0c, 0x04, 0x00, 0x05));
++			raw_pdu(0x0a, 0x04, 0x00),
++			raw_pdu(0x01, 0x0a, 0x04, 0x00, 0x05));
+ 
+ 	define_test_client("/TP/GAR/CL/BI-32-C/auto", test_client, service_db_1,
+ 			&test_long_read_9,
+ 			SERVICE_DATA_1_PDUS,
+-			raw_pdu(0x0c, 0x04, 0x00, 0x00, 0x00),
+-			raw_pdu(0x01, 0x0c, 0x04, 0x00, 0x05),
+-			raw_pdu(0x0c, 0x04, 0x00, 0x00, 0x00),
+-			raw_pdu(0x0d, 0x01, 0x02, 0x03));
++			raw_pdu(0x0a, 0x04, 0x00),
++			raw_pdu(0x01, 0x0a, 0x04, 0x00, 0x05),
++			raw_pdu(0x0a, 0x04, 0x00),
++			raw_pdu(0x0b, 0x01, 0x02, 0x03));
+ 
+ 	define_test_client("/TP/GAR/CL/BI-33-C", test_client, service_db_1,
+ 			&test_long_read_15,
+ 			SERVICE_DATA_1_PDUS,
+-			raw_pdu(0x0c, 0x04, 0x00, 0x00, 0x00),
+-			raw_pdu(0x01, 0x0c, 0x04, 0x00, 0x0c));
++			raw_pdu(0x0a, 0x04, 0x00),
++			raw_pdu(0x01, 0x0a, 0x04, 0x00, 0x0c));
+ 
+ 	define_test_client("/TP/GAR/CL/BI-34-C", test_client, service_db_1,
+ 			&test_read_12,
+-- 
+2.6.2
 
-I think we need something for transmit handling also a "6lowpan" socket
-interface. What we have in 6lowpan is:
-
-1. We getting IPv6 packets and need to do some adaptation: That's what
-    we currently use for IPHC and FRAG1, FRAGN.
-
-2. Some parts which has nothing to do with IPv6 (I suppose), like the other
-    dispatch values, e.g. MESH. I didn't saw any implementation of that yet and
-    RFC which describes that "more".
-
-We currently do "1." part only, but doing transmit to net/6lowpan we should
-be able to think about other "dispatch values" which doesn't fit to "1.".
-
-But currently I suppose that there are dispatches for 6LoWPAN which are not
-"indicated" by some IPv6 Header only. -> That's why we need some
-socket-interface stuff.
-
-> This would also allow the fragment handling to move into the generic part. I'm aware that bluetooth is not using it but other 6LoWPAN adaptation layers do and it part of the RFC4944.
->
-
-Okay, I also thought about that.
-
-1. Currently I did a lot of stuff with callbacks... in my opinion it's hard to
-    understand how it works then and confuses more.
-
-To move the fragment handling into "net/6lowpan" there are some linklayers
-like btle which don't use that and moving this part to "net/6lowpan" will
-blow-up the 6lowpan module if somebody wants "btle" support only.
-
-I think what we need is handling the dispatch headers like NHC - per module.
-So we have 6lowpan.ko and 6lowpan-frag.ko, 6lowpan-iphc.ko, etc.
-
-While interface registration we can auto-load modules which are necessary for
-doing 6lowpan stuff for $LINK_LAYER, e.g.:
-
- - 802.15.4: 6lowpan.ko 6lowpan-iphc.ko 6lowpan-frag.ko
- - BTLE: 6lowpan.ko 6lowpan-iphc.ko
-
-This will helps also for kernel-tinyfication, also for MESH it's needed when using
-the socket-interface for that and then we can load the handling for that as module.
-Also auto-loading when reciving MESH header.
-
-In short:
-
-I think I let there only one callback, this callback ist to parse the mac-address from skb,
-which sounds like something which need to be implemented as callback.
-All other callbacks can be removed and indicated by "registering lowpan interface".
-
-Then also I will try to have the "per-dispatch module idea". And moving ALL dispatch
-handlers into "net/6lowpan" and have some registering "lowpan_iphc_module" macro
-to have each implementation in one file.
-
-This all sounds like a good idea for me, but is really big work. :-)
-
-- Alex
