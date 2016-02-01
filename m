@@ -1,37 +1,31 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 2/4] core/gatt-client: Fix not being able to cancel notifications
-Date: Mon,  1 Feb 2016 16:13:20 +0200
-Message-Id: <1454336002-4954-2-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1454336002-4954-1-git-send-email-luiz.dentz@gmail.com>
-References: <1454336002-4954-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 1/4] shared/gatt-client: Fix not resetting request id
+Date: Mon,  1 Feb 2016 16:13:19 +0200
+Message-Id: <1454336002-4954-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-While the notification is still in process notifying flag wont be set but
-it shall still be possible to cancel it otherwise the client has to wait
-until the remote respond which can take a lot of time (up to 30 seconds).
+The request id shall be reset to 0 after bt_att_cancel has been called.
 ---
- src/gatt-client.c | 3 ---
- 1 file changed, 3 deletions(-)
+ src/shared/gatt-client.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/src/gatt-client.c b/src/gatt-client.c
-index 39f6646..b4ca3b6 100644
---- a/src/gatt-client.c
-+++ b/src/gatt-client.c
-@@ -1205,9 +1205,6 @@ static DBusMessage *characteristic_stop_notify(DBusConnection *conn,
- 	const char *sender = dbus_message_get_sender(msg);
- 	struct notify_client *client;
+diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
+index 06ac763..5fd0208 100644
+--- a/src/shared/gatt-client.c
++++ b/src/shared/gatt-client.c
+@@ -1581,6 +1581,7 @@ static void complete_unregister_notify(void *data)
+ 	 */
+ 	if (notify_data->att_id) {
+ 		bt_att_cancel(notify_data->client->att, notify_data->att_id);
++		notify_data->att_id = 0;
+ 		goto done;
+ 	}
  
--	if (!chrc->notifying)
--		return btd_error_failed(msg, "Not notifying");
--
- 	client = queue_remove_if(chrc->notify_clients, match_notify_sender,
- 							(void *) sender);
- 	if (!client)
 -- 
 2.5.0
 
