@@ -1,56 +1,66 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Date: Wed, 3 Feb 2016 10:54:40 -0500
-From: Kyle McMartin <kyle@infradead.org>
-To: Tedd Ho-Jeong An <tedd.an@intel.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	linux-firmware@kernel.org
-Subject: Re: [PATCH 2/3] linux-firmware: Update firmware patch for Intel
- Bluetooth 7260 (B5/B6)
-Message-ID: <20160203155440.GA8399@merlin.infradead.org>
-References: <20160129161908.7e7f0d81@fedora-linux-22.shared>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20160129161908.7e7f0d81@fedora-linux-22.shared>
+In-Reply-To: <5F431791-D0DC-4BC2-8233-5EB4B464EC0A@high-mobility.com>
+References: <5F431791-D0DC-4BC2-8233-5EB4B464EC0A@high-mobility.com>
+Date: Wed, 3 Feb 2016 17:38:35 +0200
+Message-ID: <CABBYNZJcFSx4c6P+QHQZyLnb29K6+jwODK+Lg=_XvOtH3_dqKQ@mail.gmail.com>
+Subject: Re: Write response for GATT WriteValue() method
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: =?UTF-8?Q?T=C3=B5nis_Tiganik?= <ttiganik@high-mobility.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, Jan 29, 2016 at 04:19:08PM -0800, Tedd Ho-Jeong An wrote:
-> From: Tedd Ho-Jeong An <tedd.an@intel.com>
-> 
-> This patch updates the firmware patch for Intel Bluetooth 7260 (B5/B6)
-> also known as Intel WP2 B5 and WP1 B6.
-> 
-> Patch Version: 37
-> 
-> Release Version: 18.15
-> 
-> Signed-off-by: Tedd Ho-Jeong An <tedd.an@intel.com>
-> ---
->  WHENCE                                   |   4 ++--
->  intel/ibt-hw-37.7.10-fw-1.0.1.2d.d.bseq  | Bin 21161 -> 21908 bytes
->  intel/ibt-hw-37.7.10-fw-1.80.1.2d.d.bseq | Bin 20997 -> 21727 bytes
->  3 files changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/WHENCE b/WHENCE
-> index ee8569d..e418b92 100644
-> --- a/WHENCE
-> +++ b/WHENCE
-> @@ -2663,9 +2663,9 @@ Version: WP_1303_02_patch_0.0.83.1
->  File: intel/ibt-hw-37.7.10-fw-1.0.2.3.d.bseq
->  Version: WP_1303_02_patch_0.0.83.1
->  File: intel/ibt-hw-37.7.10-fw-1.80.1.2d.d.bseq
-> -Version: WP_1345_01_patch_0.0.34.1
-> +Version: BT_WilkinsPeak_B5_REL_37_0001
->  File: intel/ibt-hw-37.7.10-fw-1.0.1.2d.d.bseq
-> -Version: WP_1345_01_patch_0.0.34.1
-> +Version: BT_WilkinsPeak_B5_REL_37_0001
->  File: intel/ibt-hw-37.8.bseq
->  Version: 1339_02.00
->  File: intel/ibt-hw-37.8.10-fw-1.10.2.27.d.bseq
+Hi Tõnis,
 
-Should this be BT_WilkinsPeak_B6_REL_37_0001 on the second addition?
+On Wed, Feb 3, 2016 at 1:07 PM, Tõnis Tiganik
+<ttiganik@high-mobility.com> wrote:
+> Hello,
+> we are currently implementing communication between two BLE devices. We are sending chunks of data so we need to know when the other device is ready for the next chunks.
+>
+> We have impemented the writing of the data with DBUS API. It looks like this:
+>
+> message_var = g_variant_new_fixed_array(G_VARIANT_TYPE_BYTE, data, length, sizeof(char));
+> g_dbus_proxy_call_sync(write_characteristic, "WriteValue”, g_variant_new_tuple(&message_var, 1), G_DBUS_CALL_FLAGS_NONE, -1, NULL, &error);
+>
+> The write succeeds, the other device receives the data. However, it is not clear for us how to detect that the other device actually read the data(Write response).
 
-I've applied it anyway, I'll fix it up later if you say so. Ditto
-with the B3/B3 in the 3/3 patch?
+What do you mean by read the data? The data needs to be written if you
+use WriteValue, and the write response should only be sent once that
+is complete otherwise you will be out of sync.
 
-regards, --Kyle
+> So the first question is: How do we detect the GattCharacteristic1.WriteValue() response?
+
+Unless you are writing to an attribute with  Write Without Response
+property the reply is already the confirmation that the value has been
+written. We even use Prepare + Execute write if reliable write is
+supported.
+
+>
+> This is the blocking issue for us currently but I have some other questions about the problems that I image could arise in the future:
+>
+> How do we send a notification about a successful read on a characteristic value? (the writing of the chunks goes both ways)
+
+Is this a peripheral, for notifications you need a CCC characteristic,
+there is an example of that under test/example-gatt-server. If this is
+just a read command than the remote will receive the read response you
+don't need another notification.
+
+> Do we get a notification of some sort when a Device goes out of range?
+
+Yes you will get a signal PropertiesChanged for the Connected property.
+
+> Thanks,
+> Tõnis
+>
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
+-- 
+Luiz Augusto von Dentz
