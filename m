@@ -2,44 +2,29 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Syam Sidhardhan <s.syam@samsung.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: syamsidhardh@gmail.com, Syam Sidhardhan <s.syam@samsung.com>
-Subject: [PATCH 1/1] adapter: Fix memory leak
-Date: Wed, 03 Feb 2016 20:28:43 +0530
-Message-id: <1454511523-2128-1-git-send-email-s.syam@samsung.com>
+Subject: [PATCH 1/1] obexd: client: Fix memory leaks
+Date: Wed, 03 Feb 2016 19:52:46 +0530
+Message-id: <1454509366-19496-1-git-send-email-s.syam@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-if strlen(str) < 32 then there is a memory leak.
+We have to free the allocated memory for data and its members.
 ---
- src/adapter.c |    5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ obexd/client/session.c |    1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/src/adapter.c b/src/adapter.c
-index b184eed..f4fbf82 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -3091,12 +3091,12 @@ static GSList *get_ltk_info(GKeyFile *key_file, const char *peer,
- static struct irk_info *get_irk_info(GKeyFile *key_file, const char *peer,
- 							uint8_t bdaddr_type)
- {
--	struct irk_info *irk;
-+	struct irk_info *irk = NULL;
- 	char *str;
+diff --git a/obexd/client/session.c b/obexd/client/session.c
+index ef998f9..5f981bf 100644
+--- a/obexd/client/session.c
++++ b/obexd/client/session.c
+@@ -1179,6 +1179,7 @@ guint obc_session_setpath(struct obc_session *session, const char *path,
+ 	if (!data->remaining || !data->remaining[0]) {
+ 		error("obc_session_setpath: invalid path %s", path);
+ 		g_set_error(err, OBEX_IO_ERROR, -EINVAL, "Invalid argument");
++		setpath_data_free(data);
+ 		return 0;
+ 	}
  
- 	str = g_key_file_get_string(key_file, "IdentityResolvingKey", "Key", NULL);
- 	if (!str || strlen(str) < 32)
--		return NULL;
-+		goto failed;
- 
- 	irk = g_new0(struct irk_info, 1);
- 
-@@ -3108,6 +3108,7 @@ static struct irk_info *get_irk_info(GKeyFile *key_file, const char *peer,
- 	else
- 		str2buf(&str[0], irk->val, sizeof(irk->val));
- 
-+failed:
- 	g_free(str);
- 
- 	return irk;
 -- 
 1.7.9.5
 
