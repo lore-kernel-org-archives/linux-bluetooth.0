@@ -1,30 +1,33 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Syam Sidhardhan <s.syam@samsung.com>
+From: =?utf-8?Q?T=C3=B5nis_Tiganik?= <ttiganik@high-mobility.com>
+Content-Type: text/plain; charset=utf-8
+Subject: Write response for GATT WriteValue() method
+Message-Id: <5F431791-D0DC-4BC2-8233-5EB4B464EC0A@high-mobility.com>
+Date: Wed, 3 Feb 2016 13:07:08 +0200
 To: linux-bluetooth@vger.kernel.org
-Cc: syamsidhardh@gmail.com, Syam Sidhardhan <s.syam@samsung.com>
-Subject: [PATCH 1/1] obexd: client: Fix memory leaks
-Date: Wed, 03 Feb 2016 19:52:46 +0530
-Message-id: <1454509366-19496-1-git-send-email-s.syam@samsung.com>
+Mime-Version: 1.0 (Mac OS X Mail 9.2 \(3112\))
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-We have to free the allocated memory for data and its members.
----
- obexd/client/session.c |    1 +
- 1 file changed, 1 insertion(+)
+Hello, 
+we are currently implementing communication between two BLE devices. We are sending chunks of data so we need to know when the other device is ready for the next chunks.
 
-diff --git a/obexd/client/session.c b/obexd/client/session.c
-index ef998f9..5f981bf 100644
---- a/obexd/client/session.c
-+++ b/obexd/client/session.c
-@@ -1179,6 +1179,7 @@ guint obc_session_setpath(struct obc_session *session, const char *path,
- 	if (!data->remaining || !data->remaining[0]) {
- 		error("obc_session_setpath: invalid path %s", path);
- 		g_set_error(err, OBEX_IO_ERROR, -EINVAL, "Invalid argument");
-+		setpath_data_free(data);
- 		return 0;
- 	}
- 
--- 
-1.7.9.5
+We have impemented the writing of the data with DBUS API. It looks like this:
+
+message_var = g_variant_new_fixed_array(G_VARIANT_TYPE_BYTE, data, length, sizeof(char));
+g_dbus_proxy_call_sync(write_characteristic, "WriteValue”, g_variant_new_tuple(&message_var, 1), G_DBUS_CALL_FLAGS_NONE, -1, NULL, &error);
+
+The write succeeds, the other device receives the data. However, it is not clear for us how to detect that the other device actually read the data(Write response).
+
+So the first question is: How do we detect the GattCharacteristic1.WriteValue() response?
+
+
+This is the blocking issue for us currently but I have some other questions about the problems that I image could arise in the future:
+
+How do we send a notification about a successful read on a characteristic value? (the writing of the chunks goes both ways)
+Do we get a notification of some sort when a Device goes out of range?
+
+Thanks,
+Tõnis
+
 
