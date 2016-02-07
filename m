@@ -1,33 +1,44 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-To: linux-bluetooth@vger.kernel.org
-From: Yunchuan Geng <yunchuan.geng@nomovok.com>
-Subject: Browsing SMS on iPhone via bluez MAP
-Message-ID: <56B85F6A.3050602@nomovok.com>
-Date: Mon, 8 Feb 2016 11:27:06 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <1454336002-4954-1-git-send-email-luiz.dentz@gmail.com>
+References: <1454336002-4954-1-git-send-email-luiz.dentz@gmail.com>
+Date: Sun, 7 Feb 2016 18:01:35 +0200
+Message-ID: <CABBYNZ+ON=U+gkW1aXPUT4cb+pe+udAwmYSwb9ngO3rYqvM9jQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/4] shared/gatt-client: Fix not resetting request id
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello,
+Hi,
 
+On Mon, Feb 1, 2016 at 4:13 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> The request id shall be reset to 0 after bt_att_cancel has been called.
+> ---
+>  src/shared/gatt-client.c | 1 +
+>  1 file changed, 1 insertion(+)
+>
+> diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
+> index 06ac763..5fd0208 100644
+> --- a/src/shared/gatt-client.c
+> +++ b/src/shared/gatt-client.c
+> @@ -1581,6 +1581,7 @@ static void complete_unregister_notify(void *data)
+>          */
+>         if (notify_data->att_id) {
+>                 bt_att_cancel(notify_data->client->att, notify_data->att_id);
+> +               notify_data->att_id = 0;
+>                 goto done;
+>         }
+>
+> --
+> 2.5.0
+>
 
-Trying to use bluez5(5.37) map implementation to browse SMS on iphone. 
-But turned out it return empty message by 
-org.bluez.obex.MessageAccess1.ListMessages API, although there does 
-exist sms on iphone under the folder I intend to access. While I can get 
-some feedback from an android phone on the same condition.
+Pushed.
 
-iOS implementation guide says sending SMS(uploading) is prohibited but 
-it does not say anything about browsing. It is mandatory in MAP 
-specification so I take it as supported by default. Am I wrong?
-
-I suspect it is the iphone side's problem but can not confirm it because 
-I do not know the detail spec of iOS regarding bluetooth. If any one 
-here make success about browsing SMS on iphone? By the way, I am using 
-iphone4 with 7.1.2.
-
-Anyone could help is appreciated.
-
-Thanks
--Yunchuan
+-- 
+Luiz Augusto von Dentz
