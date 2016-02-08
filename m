@@ -1,37 +1,213 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <linux-kernel-owner@vger.kernel.org>
+From: Amitkumar Karwar <akarwar@marvell.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Nishant Sarmukadam <nishants@marvell.com>, <wnhuang@chromium.com>,
+	<devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	Xinming Hu <huxm@marvell.com>,
+	Amitkumar Karwar <akarwar@marvell.com>
+Subject: [PATCH v3 1/2] bluetooth: btmrvl: register platform specific driver
+Date: Mon, 8 Feb 2016 02:27:10 -0800
+Message-ID: <1454927231-17662-1-git-send-email-akarwar@marvell.com>
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZJT5=LMZHecjKYJNVvMn-F4LgJuanqRv6Xoy2sCmsH5qA@mail.gmail.com>
-References: <CAAu3APaeS_7xnuTW_JgdJKkAcfY1x4zU=3VxTkSHqEZYsSkY_A@mail.gmail.com>
-	<CABBYNZJT5=LMZHecjKYJNVvMn-F4LgJuanqRv6Xoy2sCmsH5qA@mail.gmail.com>
-Date: Mon, 8 Feb 2016 12:22:49 +0000
-Message-ID: <CAAu3APbR=nBzNpZhPNC3ga0de1OTm9kgOyhh+9GcE465LatCtA@mail.gmail.com>
-Subject: Re: Error 133 (0x85): GATT ERROR
-From: Barry Byford <31baz66@gmail.com>
-To: Bluez mailing list <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello Luiz,
+From: Xinming Hu <huxm@marvell.com>
 
-On 8 February 2016 at 10:13, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi Barry,
->
-> On Sat, Feb 6, 2016 at 10:30 PM, Barry Byford <31baz66@gmail.com> wrote:
->> Any suggestions as to what is wrong?
-> Perhaps if you can take the HCI and bluetoothd it should help to see
-> where is the problem.
-I think you are suggesting I take a look at the logs. A good
-suggestion although a couple of newbie questions about this.
-My assumption is I would start bluetoothd with '-nEd' to get the
-information from that. Correct?
-How do I get the log information from HCI?
+Platform device and driver provide easy way to
+interact with device-tree-enabled system.
 
+This patch registers platform driver and reorganise
+existing device tree specific code.
 
-> Btw, it could be that Android is attempting to
-> connect over BR/EDR or did you configure your adapter to as BLE only?
-Is it possible to do this with the DBus API?
+Signed-off-by: Xinming Hu <huxm@marvell.com>
+Signed-off-by: Amitkumar Karwar <akarwar@marvell.com>
+---
+v3: Add NULL check for 'btmrvl_plt_dev'
+---
+ Documentation/devicetree/bindings/btmrvl.txt |  8 ++--
+ drivers/bluetooth/Makefile                   |  1 +
+ drivers/bluetooth/btmrvl_drv.h               | 16 ++++++++
+ drivers/bluetooth/btmrvl_main.c              |  8 +++-
+ drivers/bluetooth/btmrvl_platform.c          | 60 ++++++++++++++++++++++++++++
+ 5 files changed, 88 insertions(+), 5 deletions(-)
+ create mode 100644 drivers/bluetooth/btmrvl_platform.c
 
-Thanks,
-Barry
+diff --git a/Documentation/devicetree/bindings/btmrvl.txt b/Documentation/devicetree/bindings/btmrvl.txt
+index 58f964b..25b804b 100644
+--- a/Documentation/devicetree/bindings/btmrvl.txt
++++ b/Documentation/devicetree/bindings/btmrvl.txt
+@@ -3,7 +3,7 @@ btmrvl
+ 
+ Required properties:
+ 
+-  - compatible : must be "btmrvl,cfgdata"
++  - compatible : must be "marvell,btmrvl"
+ 
+ Optional properties:
+ 
+@@ -15,11 +15,11 @@ Optional properties:
+ 
+ Example:
+ 
+-GPIO pin 13 is configured as a wakeup source and GAP is set to 100 msecs
+-in below example.
++GPIO pin 13 and gap 100ms are configured for host wakeup, calibration
++data is also available in below example.
+ 
+ btmrvl {
+-	compatible = "btmrvl,cfgdata";
++	compatible = "marvell,btmrvl";
+ 
+ 	btmrvl,cal-data = /bits/ 8 <
+ 		0x37 0x01 0x1c 0x00 0xff 0xff 0xff 0xff 0x01 0x7f 0x04 0x02
+diff --git a/drivers/bluetooth/Makefile b/drivers/bluetooth/Makefile
+index 07c9cf3..9bc3828 100644
+--- a/drivers/bluetooth/Makefile
++++ b/drivers/bluetooth/Makefile
+@@ -25,6 +25,7 @@ obj-$(CONFIG_BT_RTL)		+= btrtl.o
+ obj-$(CONFIG_BT_QCA)		+= btqca.o
+ 
+ btmrvl-y			:= btmrvl_main.o
++btmrvl-y			+= btmrvl_platform.o
+ btmrvl-$(CONFIG_DEBUG_FS)	+= btmrvl_debugfs.o
+ 
+ hci_uart-y				:= hci_ldisc.o
+diff --git a/drivers/bluetooth/btmrvl_drv.h b/drivers/bluetooth/btmrvl_drv.h
+index 0590473..de6309b 100644
+--- a/drivers/bluetooth/btmrvl_drv.h
++++ b/drivers/bluetooth/btmrvl_drv.h
+@@ -22,8 +22,22 @@
+ #include <linux/kthread.h>
+ #include <linux/bitops.h>
+ #include <linux/slab.h>
++#include <linux/err.h>
++#include <linux/gpio.h>
++#include <linux/gfp.h>
++#include <linux/interrupt.h>
++#include <linux/io.h>
++#include <linux/kernel.h>
++#include <linux/module.h>
++#include <linux/of.h>
++#include <linux/of_gpio.h>
++#include <linux/of_platform.h>
++#include <linux/platform_device.h>
++#include <linux/pm_runtime.h>
+ #include <net/bluetooth/bluetooth.h>
+ 
++extern struct platform_device *btmrvl_plt_dev;
++
+ #define BTM_HEADER_LEN			4
+ #define BTM_UPLD_SIZE			2312
+ 
+@@ -174,6 +188,8 @@ int btmrvl_enable_ps(struct btmrvl_private *priv);
+ int btmrvl_prepare_command(struct btmrvl_private *priv);
+ int btmrvl_enable_hs(struct btmrvl_private *priv);
+ void btmrvl_firmware_dump(struct btmrvl_private *priv);
++int btmrvl_platform_drv_init(void);
++void btmrvl_platform_drv_exit(void);
+ 
+ #ifdef CONFIG_DEBUG_FS
+ void btmrvl_debugfs_init(struct hci_dev *hdev);
+diff --git a/drivers/bluetooth/btmrvl_main.c b/drivers/bluetooth/btmrvl_main.c
+index f25a825..34a0b61 100644
+--- a/drivers/bluetooth/btmrvl_main.c
++++ b/drivers/bluetooth/btmrvl_main.c
+@@ -514,7 +514,9 @@ static int btmrvl_check_device_tree(struct btmrvl_private *priv)
+ 	int ret;
+ 	u32 val;
+ 
+-	for_each_compatible_node(dt_node, NULL, "btmrvl,cfgdata") {
++	dt_node = btmrvl_plt_dev ?
++			btmrvl_plt_dev->dev.of_node : NULL;
++	if (dt_node) {
+ 		ret = of_property_read_u32(dt_node, "btmrvl,gpio-gap", &val);
+ 		if (!ret)
+ 			priv->btmrvl_dev.gpio_gap = val;
+@@ -733,6 +735,8 @@ struct btmrvl_private *btmrvl_add_card(void *card)
+ 		goto err_adapter;
+ 	}
+ 
++	btmrvl_platform_drv_init();
++
+ 	btmrvl_init_adapter(priv);
+ 
+ 	BT_DBG("Starting kthread...");
+@@ -776,6 +780,8 @@ int btmrvl_remove_card(struct btmrvl_private *priv)
+ 	btmrvl_debugfs_remove(hdev);
+ #endif
+ 
++	btmrvl_platform_drv_exit();
++
+ 	hci_unregister_dev(hdev);
+ 
+ 	hci_free_dev(hdev);
+diff --git a/drivers/bluetooth/btmrvl_platform.c b/drivers/bluetooth/btmrvl_platform.c
+new file mode 100644
+index 0000000..4e91d27
+--- /dev/null
++++ b/drivers/bluetooth/btmrvl_platform.c
+@@ -0,0 +1,60 @@
++/* Marvell Bluetooth driver: platform specific driver
++ *
++ * Copyright (C) 2015, Marvell International Ltd.
++ *
++ * This software file (the "File") is distributed by Marvell International
++ * Ltd. under the terms of the GNU General Public License Version 2, June 1991
++ * (the "License").  You may use, redistribute and/or modify this File in
++ * accordance with the terms and conditions of the License, a copy of which
++ * is available on the worldwide web at
++ * http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt.
++ *
++ * THE FILE IS DISTRIBUTED AS-IS, WITHOUT WARRANTY OF ANY KIND, AND THE
++ * IMPLIED WARRANTIES OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE
++ * ARE EXPRESSLY DISCLAIMED.  The License provides additional details about
++ * this warranty disclaimer.
++ */
++
++#include "btmrvl_drv.h"
++
++struct platform_device *btmrvl_plt_dev;
++
++static int btmrvl_plt_probe(struct platform_device *pdev)
++{
++	btmrvl_plt_dev = pdev;
++	return 0;
++}
++
++static int btmrvl_plt_remove(struct platform_device *pdev)
++{
++	btmrvl_plt_dev = NULL;
++	return 0;
++}
++
++static const struct of_device_id btmrvl_dt_match[] = {
++	{
++		.compatible = "marvell,btmrvl",
++	},
++	{},
++};
++
++MODULE_DEVICE_TABLE(of, btmrvl_dt_match);
++
++static struct platform_driver btmrvl_platform_driver = {
++	.probe		= btmrvl_plt_probe,
++	.remove		= btmrvl_plt_remove,
++	.driver = {
++		.name	= "btmrvl_plt",
++		.of_match_table = btmrvl_dt_match,
++	}
++};
++
++int btmrvl_platform_drv_init(void)
++{
++	return platform_driver_register(&btmrvl_platform_driver);
++}
++
++void btmrvl_platform_drv_exit(void)
++{
++	platform_driver_unregister(&btmrvl_platform_driver);
++}
+-- 
+1.8.1.4
