@@ -1,52 +1,73 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <linux-kernel-owner@vger.kernel.org>
+Date: Mon, 8 Feb 2016 16:05:09 -0600
+From: Rob Herring <robh@kernel.org>
+To: Amitkumar Karwar <akarwar@marvell.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Nishant Sarmukadam <nishants@marvell.com>,
+	wnhuang@chromium.com, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Xinming Hu <huxm@marvell.com>
+Subject: Re: [PATCH v3 1/2] bluetooth: btmrvl: register platform specific
+ driver
+Message-ID: <20160208220509.GA20229@rob-hp-laptop>
+References: <1454927231-17662-1-git-send-email-akarwar@marvell.com>
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZJT5=LMZHecjKYJNVvMn-F4LgJuanqRv6Xoy2sCmsH5qA@mail.gmail.com>
-References: <CAAu3APaeS_7xnuTW_JgdJKkAcfY1x4zU=3VxTkSHqEZYsSkY_A@mail.gmail.com>
-	<CABBYNZJT5=LMZHecjKYJNVvMn-F4LgJuanqRv6Xoy2sCmsH5qA@mail.gmail.com>
-Date: Mon, 8 Feb 2016 22:08:30 +0000
-Message-ID: <CAAu3APagY3WKx=9kjHx7oAtOhy1b_cPiJ-HAgvzCPmFPbanodw@mail.gmail.com>
-Subject: Re: Error 133 (0x85): GATT ERROR
-From: Barry Byford <31baz66@gmail.com>
-To: Bluez mailing list <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1454927231-17662-1-git-send-email-akarwar@marvell.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello Luiz,
+On Mon, Feb 08, 2016 at 02:27:10AM -0800, Amitkumar Karwar wrote:
+> From: Xinming Hu <huxm@marvell.com>
+> 
+> Platform device and driver provide easy way to
+> interact with device-tree-enabled system.
+> 
+> This patch registers platform driver and reorganise
+> existing device tree specific code.
+> 
+> Signed-off-by: Xinming Hu <huxm@marvell.com>
+> Signed-off-by: Amitkumar Karwar <akarwar@marvell.com>
+> ---
+> v3: Add NULL check for 'btmrvl_plt_dev'
+> ---
+>  Documentation/devicetree/bindings/btmrvl.txt |  8 ++--
 
-On 8 February 2016 at 10:13, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi Barry,
->
-> On Sat, Feb 6, 2016 at 10:30 PM, Barry Byford <31baz66@gmail.com> wrote:
->> Hello,
-[snip]
->> The code I have running can be found at:
->> https://github.com/ukBaz/python-bluezero/blob/master/examples/battery_service.py
-[snip]
->> On the Nordic nRF Master Control Panel (BLE) app I can see in the log
->> 'Error 133 (0x85): GATT ERROR)'
-[snip]
-> Perhaps if you can take the HCI and bluetoothd it should help to see
-> where is the problem. Btw, it could be that Android is attempting to
-> connect over BR/EDR or did you configure your adapter to as BLE only?
+This needs to move somewhere else.
 
-If I do a hcidump when I try to connect from my phone I get the following:
+>  drivers/bluetooth/Makefile                   |  1 +
+>  drivers/bluetooth/btmrvl_drv.h               | 16 ++++++++
+>  drivers/bluetooth/btmrvl_main.c              |  8 +++-
+>  drivers/bluetooth/btmrvl_platform.c          | 60 ++++++++++++++++++++++++++++
+>  5 files changed, 88 insertions(+), 5 deletions(-)
+>  create mode 100644 drivers/bluetooth/btmrvl_platform.c
+> 
+> diff --git a/Documentation/devicetree/bindings/btmrvl.txt b/Documentation/devicetree/bindings/btmrvl.txt
+> index 58f964b..25b804b 100644
+> --- a/Documentation/devicetree/bindings/btmrvl.txt
+> +++ b/Documentation/devicetree/bindings/btmrvl.txt
+> @@ -3,7 +3,7 @@ btmrvl
+>  
+>  Required properties:
+>  
+> -  - compatible : must be "btmrvl,cfgdata"
+> +  - compatible : must be "marvell,btmrvl"
 
-- HCI Event: Connect Request (0x04) plen 10
-    bdaddr xx:xx:xx:xx:xx:xx class 0x5a020c type ACL
-- HCI Event: Command Status (0x0f) plen 4
-    Reject Connection Request (0x01|0x000a) status 0x00 ncmd 1
-- HCI Event: Connect Complete (0x03) plen 11
-    status 0x0f handle 65 bdaddr xx:xx:xx:xx:xx:xx type ACL encrypt 0x00
-    Error: Connection Rejected due to Unacceptable BD_ADDR
+While the new name is less worse than the old one, I'm not inclined to 
+take any changes for this binding because it is problematic. Given you 
+don't care this is an incompatible change, then the binding can be 
+completely redone.
 
-According to my phone the code on the Raspberry Pi is advertising with
-only the 'LE General Discoverable Mode' flag set. The 'BR/EDR not
-Supported' is not set.
-I've looked at the DBus API documentation again and it is not obvious
-that I can change this setting on the advertisement. Am I missing
-something?
+It should reflect the actual chip name (e.g. sd8???) and be a child node 
+of its connection to the host (a UART). See UART slave discussions.
 
-Thanks,
-Barry
+>  
+>  Optional properties:
+>  
+> @@ -15,11 +15,11 @@ Optional properties:
+>  
+>  Example:
+>  
+> -GPIO pin 13 is configured as a wakeup source and GAP is set to 100 msecs
+> -in below example.
+> +GPIO pin 13 and gap 100ms are configured for host wakeup, calibration
+> +data is also available in below example.
