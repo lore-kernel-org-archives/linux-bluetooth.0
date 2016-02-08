@@ -1,78 +1,37 @@
-Return-Path: <chris2553@googlemail.com>
-Subject: Re: 4.5 Regression - mouse not working after resume from suspend
-To: linux-bluetooth@vger.kernel.org, marcel@holtmann.org
-References: <56B5B0C3.6050208@googlemail.com>
- <56B5DB29.9040208@googlemail.com> <56B5F2B1.5010000@googlemail.com>
- <20160206143300.GA18790@t440s.P-661HNU-F1> <56B61000.6060008@googlemail.com>
-From: Chris Clayton <chris2553@googlemail.com>
-Message-ID: <56B8E428.1020507@googlemail.com>
-Date: Mon, 8 Feb 2016 18:53:28 +0000
-MIME-Version: 1.0
-In-Reply-To: <56B61000.6060008@googlemail.com>
-Content-Type: text/plain; charset=windows-1252
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Date: Mon, 08 Feb 2016 15:02:34 +0000 (GMT)
+From: SYAM SIDHARDHAN <s.syam@samsung.com>
+Subject: Re: [PATCH 1/1] adapter: Fix memory leak
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Cc: "syamsidhardh@gmail.com" <syamsidhardh@gmail.com>
+Reply-to: s.syam@samsung.com
+MIME-version: 1.0
+Content-type: text/plain; charset=windows-1252
+MIME-version: 1.0
+Message-id: <523397950.738031454943754387.JavaMail.weblogic@epmlwas06a>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+DQpIaSwNCi0tLS0tLS0gT3JpZ2luYWwgTWVzc2FnZSAtLS0tLS0tDQpTZW5kZXIgOiBTWUFNIFNJ
+REhBUkRIQU48cy5zeWFtQHNhbXN1bmcuY29tPiAuL1NlbmlvciBDaGllZiBFbmdpbmVlci9TUkkt
+QmFuZ2Fsb3JlLVN5c3RlbSAmIENvbm5lY3Rpdml0eS9TYW1zdW5nIEVsZWN0cm9uaWNzDQpEYXRl
+IDogRmViIDAzLCAyMDE2IDIwOjI4IChHTVQrMDU6MzApDQpUaXRsZSA6IFtQQVRDSCAxLzFdIGFk
+YXB0ZXI6IEZpeCBtZW1vcnkgbGVhaw0KDQppZiBzdHJsZW4oc3RyKSA8IDMyIHRoZW4gdGhlcmUg
+aXMgYSBtZW1vcnkgbGVhay4NCi0tLQ0Kc3JjL2FkYXB0ZXIuYyB8ICAgIDUgKysrLS0NCjEgZmls
+ZSBjaGFuZ2VkLCAzIGluc2VydGlvbnMoKyksIDIgZGVsZXRpb25zKC0pDQoNCmRpZmYgLS1naXQg
+YS9zcmMvYWRhcHRlci5jIGIvc3JjL2FkYXB0ZXIuYw0KaW5kZXggYjE4NGVlZC4uZjRmYmY4MiAx
+MDA2NDQNCi0tLSBhL3NyYy9hZGFwdGVyLmMNCisrKyBiL3NyYy9hZGFwdGVyLmMNCkBAIC0zMDkx
+LDEyICszMDkxLDEyIEBAIHN0YXRpYyBHU0xpc3QgKmdldF9sdGtfaW5mbyhHS2V5RmlsZSAqa2V5
+X2ZpbGUsIGNvbnN0IGNoYXIgKnBlZXIsDQpzdGF0aWMgc3RydWN0IGlya19pbmZvICpnZXRfaXJr
+X2luZm8oR0tleUZpbGUgKmtleV9maWxlLCBjb25zdCBjaGFyICpwZWVyLA0KdWludDhfdCBiZGFk
+ZHJfdHlwZSkNCnsNCi0gc3RydWN0IGlya19pbmZvICppcms7DQorIHN0cnVjdCBpcmtfaW5mbyAq
+aXJrID0gTlVMTDsNCmNoYXIgKnN0cjsNCg0Kc3RyID0gZ19rZXlfZmlsZV9nZXRfc3RyaW5nKGtl
+eV9maWxlLCAiSWRlbnRpdHlSZXNvbHZpbmdLZXkiLCAiS2V5IiwgTlVMTCk7DQppZiAoIXN0ciB8
+fCBzdHJsZW4oc3RyKSA8IDMyKQ0KLSByZXR1cm4gTlVMTDsNCisgZ290byBmYWlsZWQ7DQoNCmly
+ayA9IGdfbmV3MChzdHJ1Y3QgaXJrX2luZm8sIDEpOw0KDQpAQCAtMzEwOCw2ICszMTA4LDcgQEAg
+c3RhdGljIHN0cnVjdCBpcmtfaW5mbyAqZ2V0X2lya19pbmZvKEdLZXlGaWxlICprZXlfZmlsZSwg
+Y29uc3QgY2hhciAqcGVlciwNCmVsc2UNCnN0cjJidWYoJnN0clswXSwgaXJrLT52YWwsIHNpemVv
+ZihpcmstPnZhbCkpOw0KDQorZmFpbGVkOg0KZ19mcmVlKHN0cik7DQoNCnJldHVybiBpcms7DQot
+LSANCjEuNy45LjUNCg0KUGluZw==
 
 
-On 06/02/16 15:23, Chris Clayton wrote:
-> Hi Johan,
-> 
-
-[snip]
-
->>  - Do you see any errors from bluetoothd when you suspend/resume?
-> 
-
-With a bit more experimenting, I find that I can re-activate the mouse by stopping and restarting bluetoothd.
-
-The bluetooth-related messages (in /var/log/daemon.log) that are caused by the suspend to ram, resume and restarting the
-daemon are:
-
-Feb  8 18:50:17 laptop bluetoothd[4266]: Endpoint unregistered: sender=:1.34 path=/MediaEndpoint/A2DPSource
-Feb  8 18:50:17 laptop bluetoothd[4266]: Endpoint unregistered: sender=:1.34 path=/MediaEndpoint/A2DPSink
-Feb  8 18:50:18 laptop bluetoothd[4266]: Failed to obtain handles for "Service Changed" characteristic
-Feb  8 18:50:18 laptop bluetoothd[4266]: Endpoint registered: sender=:1.34 path=/MediaEndpoint/A2DPSource
-Feb  8 18:50:18 laptop bluetoothd[4266]: Endpoint registered: sender=:1.34 path=/MediaEndpoint/A2DPSink
-Feb  8 18:50:31 laptop bluetoothd[4266]: Terminating
-Feb  8 18:50:31 laptop bluetoothd[4266]: Endpoint unregistered: sender=:1.34 path=/MediaEndpoint/A2DPSource
-Feb  8 18:50:31 laptop bluetoothd[4266]: Endpoint unregistered: sender=:1.34 path=/MediaEndpoint/A2DPSink
-Feb  8 18:50:31 laptop bluetoothd[4266]: Stopping SDP server
-Feb  8 18:50:31 laptop bluetoothd[4266]: Exit
-Feb  8 18:50:32 laptop bluetoothd[4564]: Bluetooth daemon 5.37
-Feb  8 18:50:32 laptop bluetoothd[4564]: Starting SDP server
-Feb  8 18:50:32 laptop bluetoothd[4564]: Bluetooth management interface 1.11 initialized
-Feb  8 18:50:32 laptop bluetoothd[4564]: Failed to obtain handles for "Service Changed" characteristic
-Feb  8 18:50:32 laptop bluetoothd[4564]: Endpoint registered: sender=:1.34 path=/MediaEndpoint/A2DPSource
-Feb  8 18:50:32 laptop bluetoothd[4564]: Endpoint registered: sender=:1.34 path=/MediaEndpoint/A2DPSink
-Feb  8 18:50:33 laptop dbus[817]: [system] Activating service name='org.blueman.Mechanism' (using servicehelper)
-Feb  8 18:50:33 laptop blueman-mechanism: Starting blueman-mechanism
-Feb  8 18:50:33 laptop dbus[817]: [system] Successfully activated service 'org.blueman.Mechanism'
-Feb  8 18:50:33 laptop blueman-mechanism: loading Network
-Feb  8 18:50:33 laptop blueman-mechanism: loading Rfcomm
-Feb  8 18:50:33 laptop blueman-mechanism: loading Ppp
-Feb  8 18:50:33 laptop blueman-mechanism: loading RfKill
-
-
-Maybe that will help diagnose the problem.
-
-
-> Feb  6 15:06:24 laptop bluetoothd[888]: Endpoint unregistered: sender=:1.37 path=/MediaEndpoint/A2DPSource
-> Feb  6 15:06:24 laptop bluetoothd[888]: Endpoint unregistered: sender=:1.37 path=/MediaEndpoint/A2DPSink
-> Feb  6 15:06:25 laptop bluetoothd[888]: Failed to obtain handles for "Service Changed" characteristic
-> Feb  6 15:06:25 laptop bluetoothd[888]: Endpoint registered: sender=:1.37 path=/MediaEndpoint/A2DPSource
-> Feb  6 15:06:25 laptop bluetoothd[888]: Endpoint registered: sender=:1.37 path=/MediaEndpoint/A2DPSink
-> 
->>  - Could you provide the HCI log from btmon for what happens when you
->>    suspend/resume (just keep btmon running over this time)
-> 
-> That log's a bit long, so I've attached it.
-> 
-> Hope this helps. Thanks
-> 
-> Chris
->>
->> Thanks.
->>
->> Johan
->>
