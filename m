@@ -1,82 +1,78 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Subject: Re: Browsing SMS on iPhone via bluez MAP
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-References: <56B85F6A.3050602@nomovok.com>
- <CABBYNZLcXdAqk+VNbMGC1-a1uu4NwjNAFK9yHpDL823FT9N5mg@mail.gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-From: Yunchuan Geng <yunchuan.geng@nomovok.com>
-Message-ID: <56B90069.6020405@nomovok.com>
-Date: Mon, 8 Feb 2016 22:54:01 +0200
+Return-Path: <chris2553@googlemail.com>
+Subject: Re: 4.5 Regression - mouse not working after resume from suspend
+To: linux-bluetooth@vger.kernel.org, marcel@holtmann.org
+References: <56B5B0C3.6050208@googlemail.com>
+ <56B5DB29.9040208@googlemail.com> <56B5F2B1.5010000@googlemail.com>
+ <20160206143300.GA18790@t440s.P-661HNU-F1> <56B61000.6060008@googlemail.com>
+From: Chris Clayton <chris2553@googlemail.com>
+Message-ID: <56B8E428.1020507@googlemail.com>
+Date: Mon, 8 Feb 2016 18:53:28 +0000
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZLcXdAqk+VNbMGC1-a1uu4NwjNAFK9yHpDL823FT9N5mg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <56B61000.6060008@googlemail.com>
+Content-Type: text/plain; charset=windows-1252
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi, Luiz
-
-Thanks for the responding. That is also what I guess the fact should be.
-
-According to the following mail list from app, it only successfully 
-implement
-notification and able to retrieve message by the handle notification 
-returned,
-not mentioned browsing.
-
-http://lists.apple.com/archives/bluetooth-dev/2013/Feb/msg00016.html
-
-And according to this document, it requires notification, prohibit 
-message sending
-but say nothing about browsing.
-
-https://developer.apple.com/hardwaredrivers/BluetoothDesignGuidelines.pdf
-
-The above is a proof to your (and also my) guess to some extent. But 
-since apple will
-never disclosure their technical details, neither maintain an clear bug 
-report or
-something like, only claim that MAP is supported for iphone4 and later. 
-So have to seek
-help here to see if someone has the same issue I have.
-
-BTW, Have you tried message Notification on iphone? I think bluez does 
-not support
-it yet, doesn't it?
+Hi,
 
 
-Yunchuan
+On 06/02/16 15:23, Chris Clayton wrote:
+> Hi Johan,
+> 
+
+[snip]
+
+>>  - Do you see any errors from bluetoothd when you suspend/resume?
+> 
+
+With a bit more experimenting, I find that I can re-activate the mouse by stopping and restarting bluetoothd.
+
+The bluetooth-related messages (in /var/log/daemon.log) that are caused by the suspend to ram, resume and restarting the
+daemon are:
+
+Feb  8 18:50:17 laptop bluetoothd[4266]: Endpoint unregistered: sender=:1.34 path=/MediaEndpoint/A2DPSource
+Feb  8 18:50:17 laptop bluetoothd[4266]: Endpoint unregistered: sender=:1.34 path=/MediaEndpoint/A2DPSink
+Feb  8 18:50:18 laptop bluetoothd[4266]: Failed to obtain handles for "Service Changed" characteristic
+Feb  8 18:50:18 laptop bluetoothd[4266]: Endpoint registered: sender=:1.34 path=/MediaEndpoint/A2DPSource
+Feb  8 18:50:18 laptop bluetoothd[4266]: Endpoint registered: sender=:1.34 path=/MediaEndpoint/A2DPSink
+Feb  8 18:50:31 laptop bluetoothd[4266]: Terminating
+Feb  8 18:50:31 laptop bluetoothd[4266]: Endpoint unregistered: sender=:1.34 path=/MediaEndpoint/A2DPSource
+Feb  8 18:50:31 laptop bluetoothd[4266]: Endpoint unregistered: sender=:1.34 path=/MediaEndpoint/A2DPSink
+Feb  8 18:50:31 laptop bluetoothd[4266]: Stopping SDP server
+Feb  8 18:50:31 laptop bluetoothd[4266]: Exit
+Feb  8 18:50:32 laptop bluetoothd[4564]: Bluetooth daemon 5.37
+Feb  8 18:50:32 laptop bluetoothd[4564]: Starting SDP server
+Feb  8 18:50:32 laptop bluetoothd[4564]: Bluetooth management interface 1.11 initialized
+Feb  8 18:50:32 laptop bluetoothd[4564]: Failed to obtain handles for "Service Changed" characteristic
+Feb  8 18:50:32 laptop bluetoothd[4564]: Endpoint registered: sender=:1.34 path=/MediaEndpoint/A2DPSource
+Feb  8 18:50:32 laptop bluetoothd[4564]: Endpoint registered: sender=:1.34 path=/MediaEndpoint/A2DPSink
+Feb  8 18:50:33 laptop dbus[817]: [system] Activating service name='org.blueman.Mechanism' (using servicehelper)
+Feb  8 18:50:33 laptop blueman-mechanism: Starting blueman-mechanism
+Feb  8 18:50:33 laptop dbus[817]: [system] Successfully activated service 'org.blueman.Mechanism'
+Feb  8 18:50:33 laptop blueman-mechanism: loading Network
+Feb  8 18:50:33 laptop blueman-mechanism: loading Rfcomm
+Feb  8 18:50:33 laptop blueman-mechanism: loading Ppp
+Feb  8 18:50:33 laptop blueman-mechanism: loading RfKill
 
 
-On 08.02.2016 16:02, Luiz Augusto von Dentz wrote:
-> Hi Yunchuan,
->
-> On Mon, Feb 8, 2016 at 11:27 AM, Yunchuan Geng
-> <yunchuan.geng@nomovok.com> wrote:
->> Hello,
+Maybe that will help diagnose the problem.
+
+
+> Feb  6 15:06:24 laptop bluetoothd[888]: Endpoint unregistered: sender=:1.37 path=/MediaEndpoint/A2DPSource
+> Feb  6 15:06:24 laptop bluetoothd[888]: Endpoint unregistered: sender=:1.37 path=/MediaEndpoint/A2DPSink
+> Feb  6 15:06:25 laptop bluetoothd[888]: Failed to obtain handles for "Service Changed" characteristic
+> Feb  6 15:06:25 laptop bluetoothd[888]: Endpoint registered: sender=:1.37 path=/MediaEndpoint/A2DPSource
+> Feb  6 15:06:25 laptop bluetoothd[888]: Endpoint registered: sender=:1.37 path=/MediaEndpoint/A2DPSink
+> 
+>>  - Could you provide the HCI log from btmon for what happens when you
+>>    suspend/resume (just keep btmon running over this time)
+> 
+> That log's a bit long, so I've attached it.
+> 
+> Hope this helps. Thanks
+> 
+> Chris
 >>
+>> Thanks.
 >>
->> Trying to use bluez5(5.37) map implementation to browse SMS on iphone. But
->> turned out it return empty message by
->> org.bluez.obex.MessageAccess1.ListMessages API, although there does exist
->> sms on iphone under the folder I intend to access. While I can get some
->> feedback from an android phone on the same condition.
+>> Johan
 >>
->> iOS implementation guide says sending SMS(uploading) is prohibited but it
->> does not say anything about browsing. It is mandatory in MAP specification
->> so I take it as supported by default. Am I wrong?
->>
->> I suspect it is the iphone side's problem but can not confirm it because I
->> do not know the detail spec of iOS regarding bluetooth. If any one here make
->> success about browsing SMS on iphone? By the way, I am using iphone4 with
->> 7.1.2.
->>
->> Anyone could help is appreciated.
-> If I recall this correctly the only feature the iOS implements is
-> notification, it has never returned any of the existing messages for
-> me. Btw, even if browsing is mandatory if they do in fact return
-> without any error I guess they pass the qualification since only the
-> command is subject to the specification not the contents, but it is
-> worth checking if the test specification don't require some item to be
-> included in the response.
->
-
