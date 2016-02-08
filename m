@@ -1,73 +1,82 @@
-Return-Path: <linux-kernel-owner@vger.kernel.org>
-Date: Mon, 8 Feb 2016 16:05:09 -0600
-From: Rob Herring <robh@kernel.org>
-To: Amitkumar Karwar <akarwar@marvell.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Nishant Sarmukadam <nishants@marvell.com>,
-	wnhuang@chromium.com, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Xinming Hu <huxm@marvell.com>
-Subject: Re: [PATCH v3 1/2] bluetooth: btmrvl: register platform specific
- driver
-Message-ID: <20160208220509.GA20229@rob-hp-laptop>
-References: <1454927231-17662-1-git-send-email-akarwar@marvell.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Subject: Re: Browsing SMS on iPhone via bluez MAP
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+References: <56B85F6A.3050602@nomovok.com>
+ <CABBYNZLcXdAqk+VNbMGC1-a1uu4NwjNAFK9yHpDL823FT9N5mg@mail.gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+From: Yunchuan Geng <yunchuan.geng@nomovok.com>
+Message-ID: <56B90069.6020405@nomovok.com>
+Date: Mon, 8 Feb 2016 22:54:01 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1454927231-17662-1-git-send-email-akarwar@marvell.com>
-Sender: linux-kernel-owner@vger.kernel.org
+In-Reply-To: <CABBYNZLcXdAqk+VNbMGC1-a1uu4NwjNAFK9yHpDL823FT9N5mg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Feb 08, 2016 at 02:27:10AM -0800, Amitkumar Karwar wrote:
-> From: Xinming Hu <huxm@marvell.com>
-> 
-> Platform device and driver provide easy way to
-> interact with device-tree-enabled system.
-> 
-> This patch registers platform driver and reorganise
-> existing device tree specific code.
-> 
-> Signed-off-by: Xinming Hu <huxm@marvell.com>
-> Signed-off-by: Amitkumar Karwar <akarwar@marvell.com>
-> ---
-> v3: Add NULL check for 'btmrvl_plt_dev'
-> ---
->  Documentation/devicetree/bindings/btmrvl.txt |  8 ++--
+Hi, Luiz
 
-This needs to move somewhere else.
+Thanks for the responding. That is also what I guess the fact should be.
 
->  drivers/bluetooth/Makefile                   |  1 +
->  drivers/bluetooth/btmrvl_drv.h               | 16 ++++++++
->  drivers/bluetooth/btmrvl_main.c              |  8 +++-
->  drivers/bluetooth/btmrvl_platform.c          | 60 ++++++++++++++++++++++++++++
->  5 files changed, 88 insertions(+), 5 deletions(-)
->  create mode 100644 drivers/bluetooth/btmrvl_platform.c
-> 
-> diff --git a/Documentation/devicetree/bindings/btmrvl.txt b/Documentation/devicetree/bindings/btmrvl.txt
-> index 58f964b..25b804b 100644
-> --- a/Documentation/devicetree/bindings/btmrvl.txt
-> +++ b/Documentation/devicetree/bindings/btmrvl.txt
-> @@ -3,7 +3,7 @@ btmrvl
->  
->  Required properties:
->  
-> -  - compatible : must be "btmrvl,cfgdata"
-> +  - compatible : must be "marvell,btmrvl"
+According to the following mail list from app, it only successfully 
+implement
+notification and able to retrieve message by the handle notification 
+returned,
+not mentioned browsing.
 
-While the new name is less worse than the old one, I'm not inclined to 
-take any changes for this binding because it is problematic. Given you 
-don't care this is an incompatible change, then the binding can be 
-completely redone.
+http://lists.apple.com/archives/bluetooth-dev/2013/Feb/msg00016.html
 
-It should reflect the actual chip name (e.g. sd8???) and be a child node 
-of its connection to the host (a UART). See UART slave discussions.
+And according to this document, it requires notification, prohibit 
+message sending
+but say nothing about browsing.
 
->  
->  Optional properties:
->  
-> @@ -15,11 +15,11 @@ Optional properties:
->  
->  Example:
->  
-> -GPIO pin 13 is configured as a wakeup source and GAP is set to 100 msecs
-> -in below example.
-> +GPIO pin 13 and gap 100ms are configured for host wakeup, calibration
-> +data is also available in below example.
+https://developer.apple.com/hardwaredrivers/BluetoothDesignGuidelines.pdf
+
+The above is a proof to your (and also my) guess to some extent. But 
+since apple will
+never disclosure their technical details, neither maintain an clear bug 
+report or
+something like, only claim that MAP is supported for iphone4 and later. 
+So have to seek
+help here to see if someone has the same issue I have.
+
+BTW, Have you tried message Notification on iphone? I think bluez does 
+not support
+it yet, doesn't it?
+
+
+Yunchuan
+
+
+On 08.02.2016 16:02, Luiz Augusto von Dentz wrote:
+> Hi Yunchuan,
+>
+> On Mon, Feb 8, 2016 at 11:27 AM, Yunchuan Geng
+> <yunchuan.geng@nomovok.com> wrote:
+>> Hello,
+>>
+>>
+>> Trying to use bluez5(5.37) map implementation to browse SMS on iphone. But
+>> turned out it return empty message by
+>> org.bluez.obex.MessageAccess1.ListMessages API, although there does exist
+>> sms on iphone under the folder I intend to access. While I can get some
+>> feedback from an android phone on the same condition.
+>>
+>> iOS implementation guide says sending SMS(uploading) is prohibited but it
+>> does not say anything about browsing. It is mandatory in MAP specification
+>> so I take it as supported by default. Am I wrong?
+>>
+>> I suspect it is the iphone side's problem but can not confirm it because I
+>> do not know the detail spec of iOS regarding bluetooth. If any one here make
+>> success about browsing SMS on iphone? By the way, I am using iphone4 with
+>> 7.1.2.
+>>
+>> Anyone could help is appreciated.
+> If I recall this correctly the only feature the iOS implements is
+> notification, it has never returned any of the existing messages for
+> me. Btw, even if browsing is mandatory if they do in fact return
+> without any error I guess they pass the qualification since only the
+> command is subject to the specification not the contents, but it is
+> worth checking if the test specification don't require some item to be
+> included in the response.
+>
+
