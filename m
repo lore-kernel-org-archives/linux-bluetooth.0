@@ -1,48 +1,60 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CAAMmcSSVJ_mgKjhOWO5Y_Y0FhBRefT+bFshf3hcg2Wtoe5K-qg@mail.gmail.com>
-References: <CAAMmcSSVJ_mgKjhOWO5Y_Y0FhBRefT+bFshf3hcg2Wtoe5K-qg@mail.gmail.com>
-Date: Wed, 10 Feb 2016 13:08:20 +0200
-Message-ID: <CABBYNZK0MYD6qedxBOwAD3f1-G-jUhFS2jNvF4H6Qpg=VtmVsA@mail.gmail.com>
-Subject: Re: GATT server
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: =?UTF-8?Q?Mikl=C3=B3s_Fazekas?= <mfazekas@szemafor.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <10106988.mHUPtLp52x@leonov>
+References: <CAAu3APaeS_7xnuTW_JgdJKkAcfY1x4zU=3VxTkSHqEZYsSkY_A@mail.gmail.com>
+	<D2DE79F2.1BDF6%adam.moore@savant.com>
+	<CAAu3APbwKOBrWbqjrWJ9oCJ_tzNHau9ne4A36_MQgcbsyB30cQ@mail.gmail.com>
+	<10106988.mHUPtLp52x@leonov>
+Date: Tue, 9 Feb 2016 22:02:54 +0000
+Message-ID: <CAAu3APZ+idS4xiAn7UxP=9ynB-dgBHqpmYKaDup5vo_-2As+aQ@mail.gmail.com>
+Subject: Re: Error 133 (0x85): GATT ERROR
+From: Barry Byford <31baz66@gmail.com>
+To: Bluez mailing list <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Miklós,
+Hello Szymon,
 
+On 9 February 2016 at 09:03, Szymon Janc <ext.szymon.janc@tieto.com> wrote:
+> Hi Barry,
+>
+> On Tuesday 09 of February 2016 08:00:52 Barry Byford wrote:
+>
+>  <snip>
+>
+>> >>According to my phone the code on the Raspberry Pi is advertising with
+>> >>only the 'LE General Discoverable Mode' flag set. The 'BR/EDR not
+>> >>Supported' is not set.
+>> >>I've looked at the DBus API documentation again and it is not obvious
+>> >>that I can change this setting on the advertisement. Am I missing
+>> >>something?
+>> >>
+>> > Have you tried setting ControllerMode = le in bluez¹s main.conf?  If set,
+>> > bluetoothd will explicitly enable le and disable br/edr in the kernel via
+>> > the management interface, and that should set advertising flags
+>> > appropriately.  There does not appear to be a DBus API, probably because
+>> > this is more of a static setting.
+>>
+>> Thanks for the suggestion. I've added that setting to the
+>> /etc/bluetooth/main.conf and when the Raspberry Pi advertises it now
+>> has the 'BR/EDR Not supported' flag set.
+>> Now when I try to connect from my phone it fails with the same error
+>> message on my phone although in the hcidump and bluetoothd logs
+>> nothing appears when the phone tries to connect.
+>>
+>> Thanks again for the suggestion.
+>
+> If this is Android phone with 4.0 BT (no 4.1/4.2 features) then you need to
+> unpair the device and toggle phone BT off/on. Otherwise Bluedroid stack cache
+> info that your device is dual mode and tries to connect over BR/EDR.
+>
+Good suggestion!
 
+The modification to main.conf and resetting the phone has allowed me
+to access the services on my phone the raspberry pi is advertising.
 
-On Tue, Feb 9, 2016 at 11:03 PM, Miklós Fazekas <mfazekas@szemafor.com> wrote:
-> Hi
->
-> I'm trying to develop a GATT server with bluez on a raspberry to
-> communicate with iOS via BLE.
->
-> I've managed to get one working with bluez 5.28 based on
-> plugins/gatt-example.c (gatt_service_add). But i have some weird
-> issues when sending more 70 bytes in a packet to iOS devices - not
-> always but sometimes.
->
-> So i try to upgrade bluez to investigate on the latest version. My
-> understanding is that while the plugins/gatt_service_add is still in
-> 5.37 repo, and they compile fine, they are now depreacted, and dbus is
-> the replacement.
->
-> I'm a dbus newby. I configured/running with experimental. Moreover
-> python example (../test/example-gatt-server) seems to work fine. But
-> running C example (tools/gatt-service) gives me this error:
->
->    RegisterService: Method "RegisterService" with signature "oa{sv}"
-> on interface "org.bluez.GattManager1" doesn't exist
->
-> But my limited dbus fu on python showed this signature for the method.
-> Does the example tools/gatt-service works? Can anyone give me pointer
-> to figure out the RegisterService issue above?
+Thanks for your help.
 
-The API has changed to RegisterApplication, apparently I forgot to
-update all the tools, I will fix it asap. Btw, do you have any logs
-regarding the iOS problem?
+Regards,
+Barry
