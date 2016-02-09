@@ -1,60 +1,70 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <10106988.mHUPtLp52x@leonov>
-References: <CAAu3APaeS_7xnuTW_JgdJKkAcfY1x4zU=3VxTkSHqEZYsSkY_A@mail.gmail.com>
-	<D2DE79F2.1BDF6%adam.moore@savant.com>
-	<CAAu3APbwKOBrWbqjrWJ9oCJ_tzNHau9ne4A36_MQgcbsyB30cQ@mail.gmail.com>
-	<10106988.mHUPtLp52x@leonov>
-Date: Tue, 9 Feb 2016 22:02:54 +0000
-Message-ID: <CAAu3APZ+idS4xiAn7UxP=9ynB-dgBHqpmYKaDup5vo_-2As+aQ@mail.gmail.com>
-Subject: Re: Error 133 (0x85): GATT ERROR
-From: Barry Byford <31baz66@gmail.com>
-To: Bluez mailing list <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <hanipouspilot@gmail.com>
+From: Dmitry Tunin <hanipouspilot@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-firmware@kernel.org,
+	dams.38@hotmail.fr,
+	Dmitry Tunin <hanipouspilot@gmail.com>,
+	stable@vger.kernel.org
+Subject: [PATCH] Bluetooth: Add new AR3012 ID 0489:e095
+Date: Wed, 10 Feb 2016 00:49:11 +0300
+Message-Id: <1455054551-3884-1-git-send-email-hanipouspilot@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello Szymon,
+T: Bus=01 Lev=01 Prnt=01 Port=04 Cnt=02 Dev#= 3 Spd=12 MxCh= 0
+D: Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs= 1
+P: Vendor=0489 ProdID=e095 Rev=00.01
+C: #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
+I: If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+I: If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
 
-On 9 February 2016 at 09:03, Szymon Janc <ext.szymon.janc@tieto.com> wrote:
-> Hi Barry,
->
-> On Tuesday 09 of February 2016 08:00:52 Barry Byford wrote:
->
->  <snip>
->
->> >>According to my phone the code on the Raspberry Pi is advertising with
->> >>only the 'LE General Discoverable Mode' flag set. The 'BR/EDR not
->> >>Supported' is not set.
->> >>I've looked at the DBus API documentation again and it is not obvious
->> >>that I can change this setting on the advertisement. Am I missing
->> >>something?
->> >>
->> > Have you tried setting ControllerMode = le in bluez¹s main.conf?  If set,
->> > bluetoothd will explicitly enable le and disable br/edr in the kernel via
->> > the management interface, and that should set advertising flags
->> > appropriately.  There does not appear to be a DBus API, probably because
->> > this is more of a static setting.
->>
->> Thanks for the suggestion. I've added that setting to the
->> /etc/bluetooth/main.conf and when the Raspberry Pi advertises it now
->> has the 'BR/EDR Not supported' flag set.
->> Now when I try to connect from my phone it fails with the same error
->> message on my phone although in the hcidump and bluetoothd logs
->> nothing appears when the phone tries to connect.
->>
->> Thanks again for the suggestion.
->
-> If this is Android phone with 4.0 BT (no 4.1/4.2 features) then you need to
-> unpair the device and toggle phone BT off/on. Otherwise Bluedroid stack cache
-> info that your device is dual mode and tries to connect over BR/EDR.
->
-Good suggestion!
+This device requires ar3k/AthrBT_0x31010100.dfu and
+ar3k/ramps_0x31010100_40.dfu firmware files that are not in
+linux-firmware yet.
 
-The modification to main.conf and resetting the phone has allowed me
-to access the services on my phone the raspberry pi is advertising.
+BugLink: https://bugs.launchpad.net/bugs/1542944
 
-Thanks for your help.
+Signed-off-by: Dmitry Tunin <hanipouspilot@gmail.com>
+Cc: stable@vger.kernel.org
+---
+ drivers/bluetooth/ath3k.c | 2 ++
+ drivers/bluetooth/btusb.c | 1 +
+ 2 files changed, 3 insertions(+)
 
-Regards,
-Barry
+diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
+index ebd641b..8472010 100644
+--- a/drivers/bluetooth/ath3k.c
++++ b/drivers/bluetooth/ath3k.c
+@@ -82,6 +82,7 @@ static const struct usb_device_id ath3k_table[] = {
+ 	{ USB_DEVICE(0x0489, 0xe05f) },
+ 	{ USB_DEVICE(0x0489, 0xe076) },
+ 	{ USB_DEVICE(0x0489, 0xe078) },
++	{ USB_DEVICE(0x0489, 0xe095) },
+ 	{ USB_DEVICE(0x04c5, 0x1330) },
+ 	{ USB_DEVICE(0x04CA, 0x3004) },
+ 	{ USB_DEVICE(0x04CA, 0x3005) },
+@@ -144,6 +145,7 @@ static const struct usb_device_id ath3k_blist_tbl[] = {
+ 	{ USB_DEVICE(0x0489, 0xe05f), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0489, 0xe076), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0489, 0xe078), .driver_info = BTUSB_ATH3012 },
++	{ USB_DEVICE(0x0489, 0xe095), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x04c5, 0x1330), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x04ca, 0x3004), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x04ca, 0x3005), .driver_info = BTUSB_ATH3012 },
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index a191e31..f4b8d08 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -196,6 +196,7 @@ static const struct usb_device_id blacklist_table[] = {
+ 	{ USB_DEVICE(0x0489, 0xe05f), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0489, 0xe076), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0489, 0xe078), .driver_info = BTUSB_ATH3012 },
++	{ USB_DEVICE(0x0489, 0xe095), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x04c5, 0x1330), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x04ca, 0x3004), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x04ca, 0x3005), .driver_info = BTUSB_ATH3012 },
+-- 
+1.9.1
