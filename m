@@ -1,211 +1,128 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Jon Hoffman <Jon.Hoffman@myfuelmaster.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Tue, 9 Feb 2016 13:17:56 -0500
+Subject: Bluetooth PAN Connection - NAP and GN
+Message-ID: <3916CF28FA2C014B862815C318D03FF5A0A7493B03@Courier.syntech.org>
+Content-Type: text/plain; charset="iso-8859-1"
 MIME-Version: 1.0
-Date: Tue, 9 Feb 2016 22:03:56 +0100
-Message-ID: <CAAMmcSSVJ_mgKjhOWO5Y_Y0FhBRefT+bFshf3hcg2Wtoe5K-qg@mail.gmail.com>
-Subject: GATT server
-From: =?UTF-8?Q?Mikl=C3=B3s_Fazekas?= <mfazekas@szemafor.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi
+Hello,
+I am hoping that someone on this list can tell me what I am doing wrong or at least point me in the right direction.
 
-I'm trying to develop a GATT server with bluez on a raspberry to
-communicate with iOS via BLE.
+As part of a number of proof-of-concepts, I am trying to setup a PAN between two devices.  For this particular proof-of-concepts I am trying to setup a Bluetooth Legacy connection.  I have successfully setup this connection using the NAP scenario however we are not looking to route anything outside of connection.  Since we do not want to route (security also says we need to disable routing) we would prefer to use either a GN (Group Ad-Hoc Network) or a PANU-PANU connection however I have been unable to get this to work.   
 
-I've managed to get one working with bluez 5.28 based on
-plugins/gatt-example.c (gatt_service_add). But i have some weird
-issues when sending more 70 bytes in a packet to iOS devices - not
-always but sometimes.
+My slave device (where the server is being setup at) is running the Linux kernel 4.4 (also tried it on a 4.1.13 kernel) with Bluez 5.35 (tried it with 5.23 on the 4.1.13 kernel).  I have tried three master devices (device making the connection) and have the same issue with all three.  They are:
+  -Linux kernel 4.1.13 with bluez 5.23 using blueman as the UI
+  -Windows 10
+  -iOS 9.2.1
 
-So i try to upgrade bluez to investigate on the latest version. My
-understanding is that while the plugins/gatt_service_add is still in
-5.37 repo, and they compile fine, they are now depreacted, and dbus is
-the replacement.
+I have run hcidump to see what is going on during the pairing/connection of the NAP connection and also the GN connection to see what is different.  Below are sniplets of what I am seeing.  For the NAP connection I am seeing this:
 
-I'm a dbus newby. I configured/running with experimental. Moreover
-python example (../test/example-gatt-server) seems to work fine. But
-running C example (tools/gatt-service) gives me this error:
+information about the NAP from the hcidump
+           record #6
+              aid 0x0000 (SrvRecHndl)
+                 uint 0x10007
+              aid 0x0001 (SrvClassIDList)
+                 < uuid-16 0x1116 (NAP) >
+              aid 0x0004 (ProtocolDescList)
+                 < < uuid-16 0x0100 (L2CAP) uint 0xf > <
+                 uuid-16 0x000f (BNEP) uint 0x100 < uint 0x800 uint 0x806 > > >
+              aid 0x0005 (BrwGrpList)
+                 < uuid-16 0x1002 (PubBrwsGrp) >
+              aid 0x0006 (LangBaseAttrIDList)
+                 < uint 0x656e uint 0x6a uint 0x100 >
+              aid 0x0009 (BTProfileDescList)
+                 < < uuid-16 0x1116 (NAP) uint 0x100 > >
+              aid 0x0100 (SrvName)
+                 str "Network service"
+              aid 0x0101 (SrvDesc)
+                 str "Network service"
+              aid 0x030a (SecurityDescription)
+                 uint 0x1
+              aid 0x030b (NetAccessType)
+                 uint 0xfffe
+              aid 0x030c (MaxNetAccessRate)
+                 uint 0x0  
 
-   RegisterService: Method "RegisterService" with signature "oa{sv}"
-on interface "org.bluez.GattManager1" doesn't exist
+Then for the actual connection attempt I see this:
 
-But my limited dbus fu on python showed this signature for the method.
-Does the example tools/gatt-service works? Can anyone give me pointer
-to figure out the RegisterService issue above?
+> ACL data: handle 11 flags 0x02 dlen 12
+    L2CAP(s): Connect req: psm 15 scid 0x0041
+< ACL data: handle 11 flags 0x00 dlen 16
+    L2CAP(s): Connect rsp: dcid 0x0041 scid 0x0041 result 1 status 2
+      Connection pending - Authorization pending
+< ACL data: handle 11 flags 0x00 dlen 16
+    L2CAP(s): Connect rsp: dcid 0x0041 scid 0x0041 result 0 status 0
+      Connection successful
 
+And after this my connection is established and all is well.  For the GN network this is what I am seeing beginning with the information about the GN.
+
+           record #6
+              aid 0x0000 (SrvRecHndl)
+                 uint 0x10007
+              aid 0x0001 (SrvClassIDList)
+                 < uuid-16 0x1117 (GN) >
+              aid 0x0004 (ProtocolDescList)
+                 < < uuid-16 0x0100 (L2CAP) uint 0xf > <
+                 uuid-16 0x000f (BNEP) uint 0x100 < uint 0x800 uint 0x806 > > >
+              aid 0x0005 (BrwGrpList)
+                 < uuid-16 0x1002 (PubBrwsGrp) >
+              aid 0x0006 (LangBaseAttrIDList)
+                 < uint 0x656e uint 0x6a uint 0x100 >
+              aid 0x0009 (BTProfileDescList)
+                 < < uuid-16 0x1117 (GN) uint 0x100 > >
+              aid 0x0100 (SrvName)
+                 str "Network service"
+              aid 0x0101 (SrvDesc)
+                 str "Network service"
+              aid 0x030a (SecurityDescription)
+                 uint 0x1
+
+and when the connection is made I see this: 
+
+> ACL data: handle 11 flags 0x02 dlen 12
+    L2CAP(s): Connect req: psm 15 scid 0x0041
+< ACL data: handle 11 flags 0x00 dlen 16
+    L2CAP(s): Connect rsp: dcid 0x0041 scid 0x0041 result 1 status 2
+      Connection pending - Authorization pending
+< ACL data: handle 11 flags 0x00 dlen 16
+    L2CAP(s): Connect rsp: dcid 0x0041 scid 0x0041 result 3 status 0
+      Connection refused - security block
+
+Since the issue is obviously a security block I have tried to figure out how to disable the security.  I have ran hciconfig with the noauth and noencrypt options but those do not seem to help.  I have also use bluetoothctl to trust the devices which worked to get the NAP working.  I have done a lot of reading but I have been unable to find much on the GN or PANU options.  Here is what I do to setup the server:
+
+        echo "Setting up routing"
+        /etc/init.d/radvd restart
+
+        echo "setting up bridge"
+        brctl addbr pan0
+        brctl setfd pan0 0
+        brctl stp pan0 off
+
+        echo "setting pan0 local IP address"
+        ifconfig pan0 192.168.3.2 
+        ifconfig pan0 inet6 add fd00::5ef3:70ff:xxxx:xxxx/64
+        ip link set pan0 up
+
+        echo "starting bt-network server"
+        #bt-network -d -s nap pan0 
+        bt-network -d -s gn pan0 
+        sleep 1
+
+        #echo "starting dhcp server"
+        /etc/init.d/dnsmasq restart 
+        sleep 1
+
+        echo " "
+
+I enable the bt-network line for the particular connection I am trying to setup.
+I know I am probably just missing something pretty easy but I have been chasing this for a few days now and I cannot seem to find what I am missing.  Any suggestions or ideas of where to look would be appreciated.
 Thanks,
-MiklÃ³s
+
+ Jon
 
 
-http://permalink.gmane.org/gmane.linux.bluez.kernel/55510
-Linux raspberrypi 4.1.13-v7+
 
-
-When running the python example:
-
-sudo ../test/example-gatt-server
-GetManagedObjects
-GetManagedObjects
-GetManagedObjects
-GATT service registered
-GATT service registered
-GATT service registered
-
-
-And in bluetoothd log i see services registered:
-
-Feb 09 20:44:13 raspberrypi bluetoothd[353]:
-src/gatt-database.c:client_ready_cb() GATT service registered:
-/org/bluez/example/service2
-
-sudo dbus-monitor --system
-
-signal sender=org.freedesktop.DBus -> dest=:1.19 serial=2
-path=/org/freedesktop/DBus; interface=org.freedesktop.DBus;
-member=NameAcquired
-   string ":1.19"
-signal sender=org.freedesktop.DBus -> dest=(null destination)
-serial=54 path=/org/freedesktop/DBus; interface=org.freedesktop.DBus;
-member=NameOwnerChanged
-   string ":1.20"
-   string ""
-   string ":1.20"
-signal sender=:1.2 -> dest=(null destination) serial=297
-path=/org/bluez/hci0; interface=org.freedesktop.DBus.Properties;
-member=PropertiesChanged
-   string "org.bluez.Adapter1"
-   array [
-      dict entry(
-         string "UUIDs"
-         variant             array [
-               string "00001801-0000-1000-8000-00805f9b34fb"
-               string "00001200-0000-1000-8000-00805f9b34fb"
-               string "00001800-0000-1000-8000-00805f9b34fb"
-               string "0000180d-0000-1000-8000-00805f9b34fb"
-            ]
-      )
-   ]
-   array [
-   ]
-
-For the C program i see this in dbus monitor:
-
-signal sender=org.freedesktop.DBus -> dest=:1.22 serial=2
-path=/org/freedesktop/DBus; interface=org.freedesktop.DBus;
-member=NameAcquired
-
-   string ":1.22"
-
-signal sender=org.freedesktop.DBus -> dest=(null destination)
-serial=59 path=/org/freedesktop/DBus; interface=org.freedesktop.DBus;
-member=NameOwnerChanged
-
-   string ":1.23"
-
-   string ""
-
-   string ":1.23"
-
-signal sender=:1.23 -> dest=(null destination) serial=6 path=/;
-interface=org.freedesktop.DBus.ObjectManager; member=InterfacesAdded
-
-   object path "/service1"
-   array [
-      dict entry(
-         string "org.freedesktop.DBus.Introspectable"
-         array [
-         ]
-      )
-
-      dict entry(
-         string "org.bluez.GattService1"
-         array [
-            dict entry(
-               string "UUID"
-               variant                   string
-"00001802-0000-1000-8000-00805f9b34fb"
-            )
-         ]
-      )
-
-      dict entry(
-         string "org.freedesktop.DBus.Properties"
-         array [
-         ]
-      )
-   ]
-
-signal sender=:1.23 -> dest=(null destination) serial=7 path=/;
-interface=org.freedesktop.DBus.ObjectManager; member=InterfacesAdded
-   object path "/service1/characteristic1"
-   array [
-      dict entry(
-         string "org.freedesktop.DBus.Introspectable"
-         array [
-         ]
-      )
-      dict entry(
-         string "org.bluez.GattCharacteristic1"
-         array [
-            dict entry(
-               string "UUID"
-               variant                   string
-"00002a06-0000-1000-8000-00805f9b34fb"
-            )
-            dict entry(
-               string "Value"
-               variant                   array of bytes [
-                     00
-                  ]
-            )
-            dict entry(
-               string "Flags"
-               variant                   array [
-                     string "write-without-response"
-                  ]
-            )
-         ]
-      )
-
-      dict entry(
-         string "org.freedesktop.DBus.Properties"
-         array [
-         ]
-      )
-   ]
-
-signal sender=:1.23 -> dest=(null destination) serial=8 path=/;
-interface=org.freedesktop.DBus.ObjectManager; member=InterfacesAdded
-
-   object path "/service1/characteristic1/descriptor2"
-   array [
-      dict entry(
-         string "org.freedesktop.DBus.Introspectable"
-         array [
-         ]
-      )
-
-      dict entry(
-         string "org.bluez.GattDescriptor1"
-         array [
-            dict entry(
-               string "UUID"
-               variant                   string
-"8260c653-1a54-426b-9e36-e84c238bc669"
-            )
-
-            dict entry(
-               string "Value"
-               variant                   array [
-                  ]
-            )
-         ]
-      )
-      dict entry(
-         string "org.freedesktop.DBus.Properties"
-         array [
-         ]
-      )
- ]
