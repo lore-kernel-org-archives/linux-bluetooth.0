@@ -1,128 +1,49 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Jon Hoffman <Jon.Hoffman@myfuelmaster.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Tue, 9 Feb 2016 13:17:56 -0500
-Subject: Bluetooth PAN Connection - NAP and GN
-Message-ID: <3916CF28FA2C014B862815C318D03FF5A0A7493B03@Courier.syntech.org>
-Content-Type: text/plain; charset="iso-8859-1"
+From: Szymon Janc <ext.szymon.janc@tieto.com>
+To: Barry Byford <31baz66@gmail.com>
+Cc: Bluez mailing list <linux-bluetooth@vger.kernel.org>
+Subject: Re: Error 133 (0x85): GATT ERROR
+Date: Tue, 09 Feb 2016 10:03:53 +0100
+Message-ID: <10106988.mHUPtLp52x@leonov>
+In-Reply-To: <CAAu3APbwKOBrWbqjrWJ9oCJ_tzNHau9ne4A36_MQgcbsyB30cQ@mail.gmail.com>
+References: <CAAu3APaeS_7xnuTW_JgdJKkAcfY1x4zU=3VxTkSHqEZYsSkY_A@mail.gmail.com> <D2DE79F2.1BDF6%adam.moore@savant.com> <CAAu3APbwKOBrWbqjrWJ9oCJ_tzNHau9ne4A36_MQgcbsyB30cQ@mail.gmail.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello,
-I am hoping that someone on this list can tell me what I am doing wrong or at least point me in the right direction.
+Hi Barry,
 
-As part of a number of proof-of-concepts, I am trying to setup a PAN between two devices.  For this particular proof-of-concepts I am trying to setup a Bluetooth Legacy connection.  I have successfully setup this connection using the NAP scenario however we are not looking to route anything outside of connection.  Since we do not want to route (security also says we need to disable routing) we would prefer to use either a GN (Group Ad-Hoc Network) or a PANU-PANU connection however I have been unable to get this to work.   
+On Tuesday 09 of February 2016 08:00:52 Barry Byford wrote:
 
-My slave device (where the server is being setup at) is running the Linux kernel 4.4 (also tried it on a 4.1.13 kernel) with Bluez 5.35 (tried it with 5.23 on the 4.1.13 kernel).  I have tried three master devices (device making the connection) and have the same issue with all three.  They are:
-  -Linux kernel 4.1.13 with bluez 5.23 using blueman as the UI
-  -Windows 10
-  -iOS 9.2.1
+ <snip>
 
-I have run hcidump to see what is going on during the pairing/connection of the NAP connection and also the GN connection to see what is different.  Below are sniplets of what I am seeing.  For the NAP connection I am seeing this:
+> >>According to my phone the code on the Raspberry Pi is advertising with
+> >>only the 'LE General Discoverable Mode' flag set. The 'BR/EDR not
+> >>Supported' is not set.
+> >>I've looked at the DBus API documentation again and it is not obvious
+> >>that I can change this setting on the advertisement. Am I missing
+> >>something?
+> >>
+> > Have you tried setting ControllerMode = le in bluez¹s main.conf?  If set,
+> > bluetoothd will explicitly enable le and disable br/edr in the kernel via
+> > the management interface, and that should set advertising flags
+> > appropriately.  There does not appear to be a DBus API, probably because
+> > this is more of a static setting.
+> 
+> Thanks for the suggestion. I've added that setting to the
+> /etc/bluetooth/main.conf and when the Raspberry Pi advertises it now
+> has the 'BR/EDR Not supported' flag set.
+> Now when I try to connect from my phone it fails with the same error
+> message on my phone although in the hcidump and bluetoothd logs
+> nothing appears when the phone tries to connect.
+> 
+> Thanks again for the suggestion.
 
-information about the NAP from the hcidump
-           record #6
-              aid 0x0000 (SrvRecHndl)
-                 uint 0x10007
-              aid 0x0001 (SrvClassIDList)
-                 < uuid-16 0x1116 (NAP) >
-              aid 0x0004 (ProtocolDescList)
-                 < < uuid-16 0x0100 (L2CAP) uint 0xf > <
-                 uuid-16 0x000f (BNEP) uint 0x100 < uint 0x800 uint 0x806 > > >
-              aid 0x0005 (BrwGrpList)
-                 < uuid-16 0x1002 (PubBrwsGrp) >
-              aid 0x0006 (LangBaseAttrIDList)
-                 < uint 0x656e uint 0x6a uint 0x100 >
-              aid 0x0009 (BTProfileDescList)
-                 < < uuid-16 0x1116 (NAP) uint 0x100 > >
-              aid 0x0100 (SrvName)
-                 str "Network service"
-              aid 0x0101 (SrvDesc)
-                 str "Network service"
-              aid 0x030a (SecurityDescription)
-                 uint 0x1
-              aid 0x030b (NetAccessType)
-                 uint 0xfffe
-              aid 0x030c (MaxNetAccessRate)
-                 uint 0x0  
+If this is Android phone with 4.0 BT (no 4.1/4.2 features) then you need to 
+unpair the device and toggle phone BT off/on. Otherwise Bluedroid stack cache 
+info that your device is dual mode and tries to connect over BR/EDR.
 
-Then for the actual connection attempt I see this:
-
-> ACL data: handle 11 flags 0x02 dlen 12
-    L2CAP(s): Connect req: psm 15 scid 0x0041
-< ACL data: handle 11 flags 0x00 dlen 16
-    L2CAP(s): Connect rsp: dcid 0x0041 scid 0x0041 result 1 status 2
-      Connection pending - Authorization pending
-< ACL data: handle 11 flags 0x00 dlen 16
-    L2CAP(s): Connect rsp: dcid 0x0041 scid 0x0041 result 0 status 0
-      Connection successful
-
-And after this my connection is established and all is well.  For the GN network this is what I am seeing beginning with the information about the GN.
-
-           record #6
-              aid 0x0000 (SrvRecHndl)
-                 uint 0x10007
-              aid 0x0001 (SrvClassIDList)
-                 < uuid-16 0x1117 (GN) >
-              aid 0x0004 (ProtocolDescList)
-                 < < uuid-16 0x0100 (L2CAP) uint 0xf > <
-                 uuid-16 0x000f (BNEP) uint 0x100 < uint 0x800 uint 0x806 > > >
-              aid 0x0005 (BrwGrpList)
-                 < uuid-16 0x1002 (PubBrwsGrp) >
-              aid 0x0006 (LangBaseAttrIDList)
-                 < uint 0x656e uint 0x6a uint 0x100 >
-              aid 0x0009 (BTProfileDescList)
-                 < < uuid-16 0x1117 (GN) uint 0x100 > >
-              aid 0x0100 (SrvName)
-                 str "Network service"
-              aid 0x0101 (SrvDesc)
-                 str "Network service"
-              aid 0x030a (SecurityDescription)
-                 uint 0x1
-
-and when the connection is made I see this: 
-
-> ACL data: handle 11 flags 0x02 dlen 12
-    L2CAP(s): Connect req: psm 15 scid 0x0041
-< ACL data: handle 11 flags 0x00 dlen 16
-    L2CAP(s): Connect rsp: dcid 0x0041 scid 0x0041 result 1 status 2
-      Connection pending - Authorization pending
-< ACL data: handle 11 flags 0x00 dlen 16
-    L2CAP(s): Connect rsp: dcid 0x0041 scid 0x0041 result 3 status 0
-      Connection refused - security block
-
-Since the issue is obviously a security block I have tried to figure out how to disable the security.  I have ran hciconfig with the noauth and noencrypt options but those do not seem to help.  I have also use bluetoothctl to trust the devices which worked to get the NAP working.  I have done a lot of reading but I have been unable to find much on the GN or PANU options.  Here is what I do to setup the server:
-
-        echo "Setting up routing"
-        /etc/init.d/radvd restart
-
-        echo "setting up bridge"
-        brctl addbr pan0
-        brctl setfd pan0 0
-        brctl stp pan0 off
-
-        echo "setting pan0 local IP address"
-        ifconfig pan0 192.168.3.2 
-        ifconfig pan0 inet6 add fd00::5ef3:70ff:xxxx:xxxx/64
-        ip link set pan0 up
-
-        echo "starting bt-network server"
-        #bt-network -d -s nap pan0 
-        bt-network -d -s gn pan0 
-        sleep 1
-
-        #echo "starting dhcp server"
-        /etc/init.d/dnsmasq restart 
-        sleep 1
-
-        echo " "
-
-I enable the bt-network line for the particular connection I am trying to setup.
-I know I am probably just missing something pretty easy but I have been chasing this for a few days now and I cannot seem to find what I am missing.  Any suggestions or ideas of where to look would be appreciated.
-Thanks,
-
- Jon
-
-
-
+-- 
+BR
+Szymon Janc
