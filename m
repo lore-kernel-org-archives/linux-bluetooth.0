@@ -1,46 +1,45 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Petri Gynther <pgynther@google.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: marcel@holtmann.org, johan.hedberg@intel.com,
-	Petri Gynther <pgynther@google.com>
-Subject: [PATCH] Bluetooth: btbcm: Fix handling of firmware not found
-Date: Wed, 10 Feb 2016 12:00:46 -0800
-Message-Id: <1455134446-70401-1-git-send-email-pgynther@google.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <a.s.protopopov@gmail.com>
+From: Anton Protopopov <a.s.protopopov@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Anton Protopopov <a.s.protopopov@gmail.com>
+Subject: [PATCH] Bluetooth: hci_intel: Fix a wrong comparison
+Date: Wed, 10 Feb 2016 12:22:54 -0500
+Message-Id: <1455124974-27428-1-git-send-email-a.s.protopopov@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If the call to request_firmware() fails in btbcm_setup_patchram(),
-the BCM chip will be operating with its default firmware.
+A return value of the intel_wait_booting() function compared with
+a constant ETIMEDOUT instead of -ETIMEDOUT.
 
-In this case, btbcm_setup_patchram() should not return immediately
-but instead should skip to btbcm_check_bdaddr() and quirk setup.
-
-Signed-off-by: Petri Gynther <pgynther@google.com>
+Signed-off-by: Anton Protopopov <a.s.protopopov@gmail.com>
 ---
- drivers/bluetooth/btbcm.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ drivers/bluetooth/hci_intel.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
-index 0b69794..7d82b1a 100644
---- a/drivers/bluetooth/btbcm.c
-+++ b/drivers/bluetooth/btbcm.c
-@@ -467,7 +467,7 @@ int btbcm_setup_patchram(struct hci_dev *hdev)
- 	err = request_firmware(&fw, fw_name, &hdev->dev);
- 	if (err < 0) {
- 		BT_INFO("%s: BCM: Patch %s not found", hdev->name, fw_name);
--		return 0;
-+		goto check_bdaddr;
- 	}
+diff --git a/drivers/bluetooth/hci_intel.c b/drivers/bluetooth/hci_intel.c
+index 3d63ea3..91d6051 100644
+--- a/drivers/bluetooth/hci_intel.c
++++ b/drivers/bluetooth/hci_intel.c
+@@ -488,7 +488,7 @@ static int intel_set_baudrate(struct hci_uart *hu, unsigned int speed)
+ 	clear_bit(STATE_BOOTING, &intel->flags);
  
- 	btbcm_patchram(hdev, fw);
-@@ -501,6 +501,7 @@ int btbcm_setup_patchram(struct hci_dev *hdev)
- 	BT_INFO("%s: %s", hdev->name, (char *)(skb->data + 1));
- 	kfree_skb(skb);
+ 	/* In case of timeout, try to continue anyway */
+-	if (err && err != ETIMEDOUT)
++	if (err && err != -ETIMEDOUT)
+ 		return err;
  
-+check_bdaddr:
- 	btbcm_check_bdaddr(hdev);
+ 	bt_dev_info(hdev, "Change controller speed to %d", speed);
+@@ -581,7 +581,7 @@ static int intel_setup(struct hci_uart *hu)
+ 	clear_bit(STATE_BOOTING, &intel->flags);
  
- 	set_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks);
+ 	/* In case of timeout, try to continue anyway */
+-	if (err && err != ETIMEDOUT)
++	if (err && err != -ETIMEDOUT)
+ 		return err;
+ 
+ 	set_bit(STATE_BOOTLOADER, &intel->flags);
 -- 
-2.7.0.rc3.207.g0ac5344
-
+2.6.5
