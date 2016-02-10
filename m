@@ -1,201 +1,127 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 2/2] tools/gatt-service: Add missing properties
-Date: Wed, 10 Feb 2016 14:36:33 +0200
-Message-Id: <1455107793-23010-2-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1455107793-23010-1-git-send-email-luiz.dentz@gmail.com>
-References: <1455107793-23010-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 1/2] tools/gatt-service: Fix using RegisterService
+Date: Wed, 10 Feb 2016 14:36:32 +0200
+Message-Id: <1455107793-23010-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds the missing properties necessary to be able to register.
+RegisterService no longer exists as it was replaced with
+RegisterApplication, also the path being used is wrong since GattManager
+interface is available per adapter path.
 ---
- tools/gatt-service.c | 77 ++++++++++++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 72 insertions(+), 5 deletions(-)
+ tools/gatt-service.c | 63 +++++++++++++++++++++++-----------------------------
+ 1 file changed, 28 insertions(+), 35 deletions(-)
 
 diff --git a/tools/gatt-service.c b/tools/gatt-service.c
-index 74f934e..80980f7 100644
+index 9baa9e1..74f934e 100644
 --- a/tools/gatt-service.c
 +++ b/tools/gatt-service.c
-@@ -55,6 +55,7 @@ static GSList *services;
- static DBusConnection *connection;
- 
- struct characteristic {
-+	char *service;
- 	char *uuid;
- 	char *path;
- 	uint8_t *value;
-@@ -63,10 +64,12 @@ struct characteristic {
- };
- 
- struct descriptor {
-+	struct characteristic *chr;
- 	char *uuid;
- 	char *path;
- 	uint8_t *value;
- 	int vlen;
-+	const char **props;
- };
- 
- /*
-@@ -75,6 +78,7 @@ struct descriptor {
-  * property of the GattCharacteristic1.
-  */
- static const char *ias_alert_level_props[] = { "write-without-response", NULL };
-+static const char *desc_props[] = { "read", "write", NULL };
- 
- static gboolean desc_get_uuid(const GDBusPropertyTable *property,
- 					DBusMessageIter *iter, void *user_data)
-@@ -86,6 +90,17 @@ static gboolean desc_get_uuid(const GDBusPropertyTable *property,
- 	return TRUE;
+@@ -372,63 +372,55 @@ static void create_services()
+ 	printf("Registered service: %s\n", service_path);
  }
  
-+static gboolean desc_get_characteristic(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *user_data)
-+{
-+	struct descriptor *desc = user_data;
-+
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_OBJECT_PATH,
-+						&desc->chr->path);
-+
-+	return TRUE;
-+}
-+
- static gboolean desc_get_value(const GDBusPropertyTable *property,
- 					DBusMessageIter *iter, void *user_data)
+-static void register_external_service_reply(DBusPendingCall *call,
+-							void *user_data)
++static void register_app_reply(DBusMessage *reply, void *user_data)
  {
-@@ -131,9 +146,30 @@ static void desc_set_value(const GDBusPropertyTable *property,
+-	DBusMessage *reply = dbus_pending_call_steal_reply(call);
+ 	DBusError derr;
  
+ 	dbus_error_init(&derr);
+ 	dbus_set_error_from_message(&derr, reply);
+ 
+ 	if (dbus_error_is_set(&derr))
+-		printf("RegisterService: %s\n", derr.message);
++		printf("RegisterApplication: %s\n", derr.message);
+ 	else
+-		printf("RegisterService: OK\n");
++		printf("RegisterApplication: OK\n");
+ 
+-	dbus_message_unref(reply);
+ 	dbus_error_free(&derr);
  }
  
-+static gboolean desc_get_props(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *data)
-+{
-+	struct descriptor *desc = data;
-+	DBusMessageIter array;
-+	int i;
-+
-+	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
-+					DBUS_TYPE_STRING_AS_STRING, &array);
-+
-+	for (i = 0; desc->props[i]; i++)
-+		dbus_message_iter_append_basic(&array,
-+					DBUS_TYPE_STRING, &desc->props[i]);
-+
-+	dbus_message_iter_close_container(iter, &array);
-+
-+	return TRUE;
-+}
-+
- static const GDBusPropertyTable desc_properties[] = {
--	{ "UUID",		"s",	desc_get_uuid },
--	{ "Value",		"ay",	desc_get_value, desc_set_value, NULL },
-+	{ "UUID",		"s", desc_get_uuid },
-+	{ "Characteristic",	"o", desc_get_characteristic },
-+	{ "Value",		"ay", desc_get_value, desc_set_value, NULL },
-+	{ "Flags",		"as", desc_get_props, NULL, NULL },
- 	{ }
- };
- 
-@@ -147,6 +183,17 @@ static gboolean chr_get_uuid(const GDBusPropertyTable *property,
- 	return TRUE;
- }
- 
-+static gboolean chr_get_service(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *user_data)
-+{
-+	struct characteristic *chr = user_data;
-+
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_OBJECT_PATH,
-+							&chr->service);
-+
-+	return TRUE;
-+}
-+
- static gboolean chr_get_value(const GDBusPropertyTable *property,
- 					DBusMessageIter *iter, void *user_data)
+-static void register_external_service(gpointer a, gpointer b)
++static void register_app_setup(DBusMessageIter *iter, void *user_data)
  {
-@@ -217,12 +264,25 @@ static void chr_set_value(const GDBusPropertyTable *property,
- }
+-	DBusConnection *conn = b;
+-	const char *path = a;
+-	DBusMessage *msg;
+-	DBusPendingCall *call;
+-	DBusMessageIter iter, dict;
+-
+-	msg = dbus_message_new_method_call("org.bluez", "/org/bluez",
+-					GATT_MGR_IFACE, "RegisterService");
+-	if (!msg) {
+-		printf("Couldn't allocate D-Bus message\n");
+-		return;
+-	}
++	const char *path = "/";
++	DBusMessageIter dict;
  
- static const GDBusPropertyTable chr_properties[] = {
--	{ "UUID",	"s",	chr_get_uuid },
--	{ "Value", "ay", chr_get_value, chr_set_value, NULL },
--	{ "Flags", "as", chr_get_props, NULL, NULL },
-+	{ "UUID",	"s", chr_get_uuid },
-+	{ "Service",	"o", chr_get_service },
-+	{ "Value",	"ay", chr_get_value, chr_set_value, NULL },
-+	{ "Flags",	"as", chr_get_props, NULL, NULL },
- 	{ }
- };
+-	dbus_message_iter_init_append(msg, &iter);
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_OBJECT_PATH, &path);
  
-+static gboolean service_get_primary(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *user_data)
-+{
-+	dbus_bool_t primary = TRUE;
-+
-+	printf("Get Primary: %s\n", primary ? "True" : "False");
-+
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_BOOLEAN, &primary);
-+
-+	return TRUE;
+-	dbus_message_iter_append_basic(&iter, DBUS_TYPE_OBJECT_PATH, &path);
+-
+-	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY, "{sv}", &dict);
++	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY, "{sv}", &dict);
+ 
+ 	/* TODO: Add options dictionary */
+ 
+-	dbus_message_iter_close_container(&iter, &dict);
++	dbus_message_iter_close_container(iter, &dict);
 +}
-+
- static gboolean service_get_uuid(const GDBusPropertyTable *property,
- 					DBusMessageIter *iter, void *user_data)
- {
-@@ -256,6 +316,7 @@ static gboolean service_exist_includes(const GDBusPropertyTable *property,
+ 
+-	if (!g_dbus_send_message_with_reply(conn, msg, &call, -1)) {
+-		dbus_message_unref(msg);
++static void register_app(GDBusProxy *proxy)
++{
++	if (!g_dbus_proxy_method_call(proxy, "RegisterApplication",
++					register_app_setup, register_app_reply,
++					NULL, NULL)) {
++		printf("Unable to call RegisterApplication\n");
+ 		return;
+ 	}
+-
+-	dbus_pending_call_set_notify(call, register_external_service_reply,
+-								NULL, NULL);
+-
+-	dbus_pending_call_unref(call);
  }
  
- static const GDBusPropertyTable service_properties[] = {
-+	{ "Primary", "b", service_get_primary },
- 	{ "UUID", "s", service_get_uuid },
- 	{ "Includes", "ao", service_get_includes, NULL,
- 					service_exist_includes },
-@@ -267,6 +328,7 @@ static void chr_iface_destroy(gpointer user_data)
- 	struct characteristic *chr = user_data;
- 
- 	g_free(chr->uuid);
-+	g_free(chr->service);
- 	g_free(chr->value);
- 	g_free(chr->path);
- 	g_free(chr);
-@@ -286,6 +348,7 @@ static gboolean register_characteristic(const char *chr_uuid,
- 						const uint8_t *value, int vlen,
- 						const char **props,
- 						const char *desc_uuid,
-+						const char **desc_props,
- 						const char *service_path)
+-static void connect_handler(DBusConnection *conn, void *user_data)
++static void proxy_added_cb(GDBusProxy *proxy, void *user_data)
  {
- 	struct characteristic *chr;
-@@ -297,6 +360,7 @@ static gboolean register_characteristic(const char *chr_uuid,
- 	chr->value = g_memdup(value, vlen);
- 	chr->vlen = vlen;
- 	chr->props = props;
-+	chr->service = g_strdup(service_path);
- 	chr->path = g_strdup_printf("%s/characteristic%d", service_path, id++);
+-	g_slist_foreach(services, register_external_service, conn);
++	const char *iface;
++
++	iface = g_dbus_proxy_get_interface(proxy);
++
++	if (g_strcmp0(iface, GATT_MGR_IFACE))
++		return;
++
++	register_app(proxy);
+ }
  
- 	if (!g_dbus_register_interface(connection, chr->path, GATT_CHR_IFACE,
-@@ -312,6 +376,8 @@ static gboolean register_characteristic(const char *chr_uuid,
+ static gboolean signal_handler(GIOChannel *channel, GIOCondition cond,
+@@ -520,9 +512,10 @@ int main(int argc, char *argv[])
  
- 	desc = g_new0(struct descriptor, 1);
- 	desc->uuid = g_strdup(desc_uuid);
-+	desc->chr = chr;
-+	desc->props = desc_props;
- 	desc->path = g_strdup_printf("%s/descriptor%d", chr->path, id++);
+ 	create_services();
  
- 	if (!g_dbus_register_interface(connection, desc->path,
-@@ -360,6 +426,7 @@ static void create_services()
- 						&level, sizeof(level),
- 						ias_alert_level_props,
- 						READ_WRITE_DESCRIPTOR_UUID,
-+						desc_props,
- 						service_path)) {
- 		printf("Couldn't register Alert Level characteristic (IAS)\n");
- 		g_dbus_unregister_interface(connection, service_path,
+-	client = g_dbus_client_new(connection, "org.bluez", "/org/bluez");
++	client = g_dbus_client_new(connection, "org.bluez", "/");
+ 
+-	g_dbus_client_set_connect_watch(client, connect_handler, NULL);
++	g_dbus_client_set_proxy_handlers(client, proxy_added_cb, NULL, NULL,
++									NULL);
+ 
+ 	g_main_loop_run(main_loop);
+ 
 -- 
 2.5.0
 
