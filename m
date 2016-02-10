@@ -1,65 +1,48 @@
-Return-Path: <hanipouspilot@gmail.com>
-From: Dmitry Tunin <hanipouspilot@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Dmitry Tunin <hanipouspilot@gmail.com>,
-	stable@vger.kernel.org
-Subject: [PATCH] Add new AR3012 ID 13d3:3395
-Date: Wed, 10 Feb 2016 15:33:17 +0300
-Message-Id: <1455107597-24481-1-git-send-email-hanipouspilot@gmail.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+MIME-Version: 1.0
+In-Reply-To: <CAAMmcSSVJ_mgKjhOWO5Y_Y0FhBRefT+bFshf3hcg2Wtoe5K-qg@mail.gmail.com>
+References: <CAAMmcSSVJ_mgKjhOWO5Y_Y0FhBRefT+bFshf3hcg2Wtoe5K-qg@mail.gmail.com>
+Date: Wed, 10 Feb 2016 13:08:20 +0200
+Message-ID: <CABBYNZK0MYD6qedxBOwAD3f1-G-jUhFS2jNvF4H6Qpg=VtmVsA@mail.gmail.com>
+Subject: Re: GATT server
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: =?UTF-8?Q?Mikl=C3=B3s_Fazekas?= <mfazekas@szemafor.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-T: Bus=03 Lev=02 Prnt=02 Port=00 Cnt=01 Dev#= 3 Spd=12 MxCh= 0
-D: Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs= 1
-P: Vendor=13d3 ProdID=3395 Rev=00.01
-C: #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
-I: If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-I: If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+Hi Miklós,
 
-BugLink: https://bugs.launchpad.net/bugs/1542564
 
-Reported-and-tested-by: Christopher Simerly <kilikopela29@gmail.com>
-Signed-off-by: Dmitry Tunin <hanipouspilot@gmail.com>
-Cc: stable@vger.kernel.org
----
- drivers/bluetooth/ath3k.c | 2 ++
- drivers/bluetooth/btusb.c | 1 +
- 2 files changed, 3 insertions(+)
 
-diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
-index ebd641b..3532a77 100644
---- a/drivers/bluetooth/ath3k.c
-+++ b/drivers/bluetooth/ath3k.c
-@@ -113,6 +113,7 @@ static const struct usb_device_id ath3k_table[] = {
- 	{ USB_DEVICE(0x13d3, 0x3362) },
- 	{ USB_DEVICE(0x13d3, 0x3375) },
- 	{ USB_DEVICE(0x13d3, 0x3393) },
-+	{ USB_DEVICE(0x13d3, 0x3395) },
- 	{ USB_DEVICE(0x13d3, 0x3402) },
- 	{ USB_DEVICE(0x13d3, 0x3408) },
- 	{ USB_DEVICE(0x13d3, 0x3423) },
-@@ -175,6 +176,7 @@ static const struct usb_device_id ath3k_blist_tbl[] = {
- 	{ USB_DEVICE(0x13d3, 0x3362), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x13d3, 0x3375), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x13d3, 0x3393), .driver_info = BTUSB_ATH3012 },
-+	{ USB_DEVICE(0x13d3, 0x3395), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x13d3, 0x3402), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x13d3, 0x3408), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x13d3, 0x3423), .driver_info = BTUSB_ATH3012 },
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index a191e31..ab6328c 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -227,6 +227,7 @@ static const struct usb_device_id blacklist_table[] = {
- 	{ USB_DEVICE(0x13d3, 0x3362), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x13d3, 0x3375), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x13d3, 0x3393), .driver_info = BTUSB_ATH3012 },
-+	{ USB_DEVICE(0x13d3, 0x3395), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x13d3, 0x3402), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x13d3, 0x3408), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x13d3, 0x3423), .driver_info = BTUSB_ATH3012 },
--- 
-1.9.1
+On Tue, Feb 9, 2016 at 11:03 PM, Miklós Fazekas <mfazekas@szemafor.com> wrote:
+> Hi
+>
+> I'm trying to develop a GATT server with bluez on a raspberry to
+> communicate with iOS via BLE.
+>
+> I've managed to get one working with bluez 5.28 based on
+> plugins/gatt-example.c (gatt_service_add). But i have some weird
+> issues when sending more 70 bytes in a packet to iOS devices - not
+> always but sometimes.
+>
+> So i try to upgrade bluez to investigate on the latest version. My
+> understanding is that while the plugins/gatt_service_add is still in
+> 5.37 repo, and they compile fine, they are now depreacted, and dbus is
+> the replacement.
+>
+> I'm a dbus newby. I configured/running with experimental. Moreover
+> python example (../test/example-gatt-server) seems to work fine. But
+> running C example (tools/gatt-service) gives me this error:
+>
+>    RegisterService: Method "RegisterService" with signature "oa{sv}"
+> on interface "org.bluez.GattManager1" doesn't exist
+>
+> But my limited dbus fu on python showed this signature for the method.
+> Does the example tools/gatt-service works? Can anyone give me pointer
+> to figure out the RegisterService issue above?
+
+The API has changed to RegisterApplication, apparently I forgot to
+update all the tools, I will fix it asap. Btw, do you have any logs
+regarding the iOS problem?
