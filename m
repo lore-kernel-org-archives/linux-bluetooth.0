@@ -1,147 +1,305 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Jon Hoffman <Jon.Hoffman@myfuelmaster.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Thu, 11 Feb 2016 09:12:59 -0500
-Subject: RE: Bluetooth PAN Connection - NAP and GN
-Message-ID: <3916CF28FA2C014B862815C318D03FF5A0A7493B18@Courier.syntech.org>
-References: <3916CF28FA2C014B862815C318D03FF5A0A7493B03@Courier.syntech.org>
- <20160210133708.GA26024@vps217108.ovh.net>
-In-Reply-To: <20160210133708.GA26024@vps217108.ovh.net>
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 3/3] tools/gatt-service: Add missing methods
+Date: Thu, 11 Feb 2016 13:44:41 +0200
+Message-Id: <1455191081-24550-3-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1455191081-24550-1-git-send-email-luiz.dentz@gmail.com>
+References: <1455191081-24550-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+
+This adds the missing methods of GattCharacteristic and GattDescriptor
+interfaces.
+---
+ tools/gatt-service.c | 185 ++++++++++++++++++++++++++++++++++++++++++---------
+ 1 file changed, 153 insertions(+), 32 deletions(-)
+
+diff --git a/tools/gatt-service.c b/tools/gatt-service.c
+index 80980f7..329d1af 100644
+--- a/tools/gatt-service.c
++++ b/tools/gatt-service.c
+@@ -101,14 +101,10 @@ static gboolean desc_get_characteristic(const GDBusPropertyTable *property,
+ 	return TRUE;
+ }
  
-> 
-> Hi Jon,
-> 
-> Unfortunately, I have no answer to your problem, but I would like to back
-> you up on this issue, since I ran into the exact same problem a few month
-> ago, and didn't make any progress since.
-> 
-> I remember looking at the test-pan script packaged with blueZ, and
-> modifying it to make it work with the GN role, but unsuccessfully.
-> 
-> Here is the mail I sent at the time :
-> http://permalink.gmane.org/gmane.linux.bluez.kernel/64144
-> 
-> I hope someone can help us on this issue,
-> 
-> Thanks,
-> 
-> Maxime
+-static gboolean desc_get_value(const GDBusPropertyTable *property,
+-					DBusMessageIter *iter, void *user_data)
++static bool desc_read(struct descriptor *desc, DBusMessageIter *iter)
+ {
+-	struct descriptor *desc = user_data;
+ 	DBusMessageIter array;
+ 
+-	printf("Descriptor(%s): Get(\"Value\")\n", desc->uuid);
+-
+ 	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
+ 					DBUS_TYPE_BYTE_AS_STRING, &array);
+ 
+@@ -118,20 +114,25 @@ static gboolean desc_get_value(const GDBusPropertyTable *property,
+ 
+ 	dbus_message_iter_close_container(iter, &array);
+ 
+-	return TRUE;
++	return true;
+ }
+ 
+-static void desc_set_value(const GDBusPropertyTable *property,
+-				DBusMessageIter *iter,
+-				GDBusPendingPropertySet id, void *user_data)
++static gboolean desc_get_value(const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *user_data)
+ {
+ 	struct descriptor *desc = user_data;
++
++	printf("Descriptor(%s): Get(\"Value\")\n", desc->uuid);
++
++	return desc_read(desc, iter);
++}
++
++static void desc_write(struct descriptor *desc, DBusMessageIter *iter)
++{
+ 	DBusMessageIter array;
+ 	const uint8_t *value;
+ 	int vlen;
+ 
+-	printf("Descriptor(%s): Set(\"Value\", ...)\n", desc->uuid);
+-
+ 	dbus_message_iter_recurse(iter, &array);
+ 	dbus_message_iter_get_fixed_array(&array, &value, &vlen);
+ 
+@@ -139,11 +140,21 @@ static void desc_set_value(const GDBusPropertyTable *property,
+ 	desc->value = g_memdup(value, vlen);
+ 	desc->vlen = vlen;
+ 
+-	g_dbus_pending_property_success(id);
+-
+ 	g_dbus_emit_property_changed(connection, desc->path,
+ 					GATT_DESCRIPTOR_IFACE, "Value");
++}
++
++static void desc_set_value(const GDBusPropertyTable *property,
++				DBusMessageIter *iter,
++				GDBusPendingPropertySet id, void *user_data)
++{
++	struct descriptor *desc = user_data;
++
++	printf("Descriptor(%s): Set(\"Value\", ...)\n", desc->uuid);
+ 
++	desc_write(desc, iter);
++
++	g_dbus_pending_property_success(id);
+ }
+ 
+ static gboolean desc_get_props(const GDBusPropertyTable *property,
+@@ -194,14 +205,10 @@ static gboolean chr_get_service(const GDBusPropertyTable *property,
+ 	return TRUE;
+ }
+ 
+-static gboolean chr_get_value(const GDBusPropertyTable *property,
+-					DBusMessageIter *iter, void *user_data)
++static bool chr_read(struct characteristic *chr, DBusMessageIter *iter)
+ {
+-	struct characteristic *chr = user_data;
+ 	DBusMessageIter array;
+ 
+-	printf("Characteristic(%s): Get(\"Value\")\n", chr->uuid);
+-
+ 	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
+ 					DBUS_TYPE_BYTE_AS_STRING, &array);
+ 
+@@ -210,7 +217,17 @@ static gboolean chr_get_value(const GDBusPropertyTable *property,
+ 
+ 	dbus_message_iter_close_container(iter, &array);
+ 
+-	return TRUE;
++	return true;
++}
++
++static gboolean chr_get_value(const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *user_data)
++{
++	struct characteristic *chr = user_data;
++
++	printf("Characteristic(%s): Get(\"Value\")\n", chr->uuid);
++
++	return chr_read(chr, iter);
+ }
+ 
+ static gboolean chr_get_props(const GDBusPropertyTable *property,
+@@ -232,14 +249,28 @@ static gboolean chr_get_props(const GDBusPropertyTable *property,
+ 	return TRUE;
+ }
+ 
++static void chr_write(struct characteristic *chr, DBusMessageIter *iter)
++{
++	DBusMessageIter array;
++	uint8_t *value;
++	int len;
++
++	dbus_message_iter_recurse(iter, &array);
++	dbus_message_iter_get_fixed_array(&array, &value, &len);
++
++	g_free(chr->value);
++	chr->value = g_memdup(value, len);
++	chr->vlen = len;
++
++	g_dbus_emit_property_changed(connection, chr->path, GATT_CHR_IFACE,
++								"Value");
++}
++
+ static void chr_set_value(const GDBusPropertyTable *property,
+ 				DBusMessageIter *iter,
+ 				GDBusPendingPropertySet id, void *user_data)
+ {
+ 	struct characteristic *chr = user_data;
+-	DBusMessageIter array;
+-	uint8_t *value;
+-	int len;
+ 
+ 	printf("Characteristic(%s): Set('Value', ...)\n", chr->uuid);
+ 
+@@ -251,16 +282,9 @@ static void chr_set_value(const GDBusPropertyTable *property,
+ 		return;
+ 	}
+ 
+-	dbus_message_iter_recurse(iter, &array);
+-	dbus_message_iter_get_fixed_array(&array, &value, &len);
+-
+-	g_free(chr->value);
+-	chr->value = g_memdup(value, len);
+-	chr->vlen = len;
++	chr_write(chr, iter);
+ 
+ 	g_dbus_pending_property_success(id);
+-	g_dbus_emit_property_changed(connection, chr->path,
+-						GATT_CHR_IFACE, "Value");
+ }
+ 
+ static const GDBusPropertyTable chr_properties[] = {
+@@ -344,6 +368,103 @@ static void desc_iface_destroy(gpointer user_data)
+ 	g_free(desc);
+ }
+ 
++static DBusMessage *chr_read_value(DBusConnection *conn, DBusMessage *msg,
++							void *user_data)
++{
++	struct characteristic *chr = user_data;
++	DBusMessage *reply;
++	DBusMessageIter iter;
++
++	reply = dbus_message_new_method_return(msg);
++	if (!reply)
++		return g_dbus_create_error(msg, DBUS_ERROR_NO_MEMORY,
++							"No Memory");
++
++	dbus_message_iter_init_append(reply, &iter);
++
++	chr_read(chr, &iter);
++
++	return reply;
++}
++
++static DBusMessage *chr_write_value(DBusConnection *conn, DBusMessage *msg,
++							void *user_data)
++{
++	struct characteristic *chr = user_data;
++	DBusMessageIter iter;
++
++	dbus_message_iter_init(msg, &iter);
++
++	chr_write(chr, &iter);
++
++	return dbus_message_new_method_return(msg);
++}
++
++static DBusMessage *chr_start_notify(DBusConnection *conn, DBusMessage *msg,
++							void *user_data)
++{
++	return g_dbus_create_error(msg, DBUS_ERROR_NOT_SUPPORTED,
++							"Not Supported");
++}
++
++static DBusMessage *chr_stop_notify(DBusConnection *conn, DBusMessage *msg,
++							void *user_data)
++{
++	return g_dbus_create_error(msg, DBUS_ERROR_NOT_SUPPORTED,
++							"Not Supported");
++}
++
++static const GDBusMethodTable chr_methods[] = {
++	{ GDBUS_ASYNC_METHOD("ReadValue", NULL, GDBUS_ARGS({ "value", "ay" }),
++						chr_read_value) },
++	{ GDBUS_ASYNC_METHOD("WriteValue", GDBUS_ARGS({ "value", "ay" }),
++						NULL, chr_write_value) },
++	{ GDBUS_ASYNC_METHOD("StartNotify", NULL, NULL, chr_start_notify) },
++	{ GDBUS_METHOD("StopNotify", NULL, NULL, chr_stop_notify) },
++	{ }
++};
++
++static DBusMessage *desc_read_value(DBusConnection *conn, DBusMessage *msg,
++							void *user_data)
++{
++	struct descriptor *desc = user_data;
++	DBusMessage *reply;
++	DBusMessageIter iter;
++
++	reply = dbus_message_new_method_return(msg);
++	if (!reply)
++		return g_dbus_create_error(msg, DBUS_ERROR_NO_MEMORY,
++							"No Memory");
++
++	dbus_message_iter_init_append(reply, &iter);
++
++	desc_read(desc, &iter);
++
++	return reply;
++}
++
++static DBusMessage *desc_write_value(DBusConnection *conn, DBusMessage *msg,
++							void *user_data)
++{
++	struct descriptor *desc = user_data;
++	DBusMessageIter iter;
++
++	dbus_message_iter_init(msg, &iter);
++
++	desc_write(desc, &iter);
++
++	return dbus_message_new_method_return(msg);
++}
++
++static const GDBusMethodTable desc_methods[] = {
++	{ GDBUS_ASYNC_METHOD("ReadValue", NULL, GDBUS_ARGS({ "value", "ay" }),
++						desc_read_value) },
++	{ GDBUS_ASYNC_METHOD("WriteValue", GDBUS_ARGS({ "value", "ay" }),
++						NULL,
++						desc_write_value) },
++	{ }
++};
++
+ static gboolean register_characteristic(const char *chr_uuid,
+ 						const uint8_t *value, int vlen,
+ 						const char **props,
+@@ -364,7 +485,7 @@ static gboolean register_characteristic(const char *chr_uuid,
+ 	chr->path = g_strdup_printf("%s/characteristic%d", service_path, id++);
+ 
+ 	if (!g_dbus_register_interface(connection, chr->path, GATT_CHR_IFACE,
+-					NULL, NULL, chr_properties,
++					chr_methods, NULL, chr_properties,
+ 					chr, chr_iface_destroy)) {
+ 		printf("Couldn't register characteristic interface\n");
+ 		chr_iface_destroy(chr);
+@@ -382,7 +503,7 @@ static gboolean register_characteristic(const char *chr_uuid,
+ 
+ 	if (!g_dbus_register_interface(connection, desc->path,
+ 					GATT_DESCRIPTOR_IFACE,
+-					NULL, NULL, desc_properties,
++					desc_methods, NULL, desc_properties,
+ 					desc, desc_iface_destroy)) {
+ 		printf("Couldn't register descriptor interface\n");
+ 		g_dbus_unregister_interface(connection, chr->path,
+-- 
+2.5.0
 
-Based on Maxime's reply to my original e-mail (http://article.gmane.org/gmane.linux.bluez.kernel/66582/)   I decided to try the test scripts rather than bt-network even though it appeared that Maxime could not get it to work (something else to try).  I took the test-nap and changed it to the following (trying to get a Group Network working rather than a NAP):
-
-    #!/usr/bin/python3
-    from optparse import OptionParser, make_option
-    import sys 
-    import time
-    import dbus
-    import bluezutils
-    import dbus.mainloop.glib
-    try:
-          from gi.repository import GObject
-    except ImportError:
-    import gobject as GObject
-
-    bus = dbus.SystemBus()
-
-    option_list = [
-		make_option("-i", "--device", action="store",
-				type="string", dest="dev_id"),
-		]
-    parser = OptionParser(option_list=option_list)
-
-    (options, args) = parser.parse_args()
-
-    adapter_path = bluezutils.find_adapter(options.dev_id).object_path
-    server = dbus.Interface(bus.get_object("org.bluez", adapter_path),
-						"org.bluez.NetworkServer1")
-
-    service = "gn"
-
-    if (len(args) < 1):
-	bridge = "pan0"
-    else:
-	bridge = args[0]
-
-    dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
-    mainloop = GObject.MainLoop()
-
-    server.Register(service, bridge)
-    print("Server for %s registered for %s" % (service, bridge))
-    print("Press CTRL-C to disconnect")
-    mainloop.run()
-
-I then took the test-network script and ran it on the master like this:
-        ./test-network 5C:F3:70:XX:XX:XX gn
-
-But still received the same security block error.  Here are the lines form the HCI dump again:
-
-    > ACL data: handle 11 flags 0x02 dlen 12
-        L2CAP(s): Connect req: psm 15 scid 0x0041
-    < ACL data: handle 11 flags 0x00 dlen 16
-        L2CAP(s): Connect rsp: dcid 0x0041 scid 0x0041 result 1 status 2
-            Connection pending - Authorization pending
-     < ACL data: handle 11 flags 0x00 dlen 16
-         L2CAP(s): Connect rsp: dcid 0x0041 scid 0x0041 result 3 status 0
-             Connection refused - security block
-
-I did change the /etc/dbus-1/system.d/bluetooth.conf file thinking that might be the issue.  Here is the configuration file after I changed it:
-     <!-- This configuration file specifies the required security policies
-          for Bluetooth core daemon to work. -->
-
-     <!DOCTYPE busconfig PUBLIC "-//freedesktop//DTD D-BUS Bus Configuration 1.0//EN"
-          "http://www.freedesktop.org/standards/dbus/1.0/busconfig.dtd">
-     <busconfig>
-
-      <!-- ../system.conf have denied everything, so we just punch some holes -->
-
-       <policy user="root">
-              <allow own="org.bluez"/>
-              <allow send_destination="org.bluez"/>
-              <allow send_interface="org.bluez.Agent1"/>
-              <allow send_interface="org.bluez.MediaEndpoint1"/>
-              <allow send_interface="org.bluez.MediaPlayer1"/>
-              <allow send_interface="org.bluez.Network1"/>
-              <allow send_interface="org.bluez.NetworkServer1"/>
-             <allow send_interface="org.bluez.ThermometerWatcher1"/>
-             <allow send_interface="org.bluez.AlertAgent1"/>
-             <allow send_interface="org.bluez.Profile1"/>
-             <allow send_interface="org.bluez.HeartRateWatcher1"/>
-             <allow send_interface="org.bluez.CyclingSpeedWatcher1"/>
-             <allow send_interface="org.bluez.GattCharacteristic1"/>
-             <allow send_interface="org.bluez.GattDescriptor1"/>
-             <allow send_interface="org.freedesktop.DBus.ObjectManager"/>
-             <allow send_interface="org.freedesktop.DBus.Properties"/>
-       </policy>
-
-       <!-- allow users of bluetooth group to communicate -->
-       <policy group="bluetooth">
-               <allow send_destination="org.bluez"/>
-        </policy>
-
-       <policy at_console="true">
-               <allow send_destination="org.bluez"/>
-        </policy>
-
-        <!-- allow users of lp group (printing subsystem) to 
-               communicate with bluetoothd -->
-         <policy group="lp">
-                  <allow send_destination="org.bluez"/>
-         </policy>
-
-        <policy context="default">
-                  <allow send_destination="org.bluez"/>
-         </policy>
-
-     </busconfig>
-
-But even changing the bluetooth.conf file did not help.  Still getting the security block error.
-This works perfectly if I try to connect with the NAP scenario but I keep getting the security block error when I connect with the GN scenario and I really need the GN scenario working since I do not want routing.   Is this a bug with bluez?  It does seem that others are having the same issue by Maxime's reply and I also ran across this in stack overflow:  http://stackoverflow.com/questions/32520581/bluez-pan-gn-server-connection-refused-when-nap-server-is-down  
-Any help or advice would be appreciated.
-Thanks,
-
-Jon
