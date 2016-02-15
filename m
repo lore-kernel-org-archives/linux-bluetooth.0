@@ -1,42 +1,53 @@
-Return-Path: <wnhuang@chromium.org>
-From: Wei-Ning Huang <wnhuang@chromium.org>
-To: Linux Bluetooth <linux-bluetooth@vger.kernel.org>
-Cc: LKML <linux-kernel@vger.kernel.org>,
-	johan.hedberg@intel.com,
-	snanda@chromium.org,
-	djkurtz@chromium.org,
-	Wei-Ning Huang <wnhuang@chromium.org>,
-	marcel@holtmann.org,
-	gustavo@padovan.org,
-	johan.hedberg@gmail.com,
-	davem@davemloft.net,
-	netdev@vger.kernel.org
-Subject: [PATCH] Bluetooth: hci_core: cancel power off delayed work properly
-Date: Mon, 15 Feb 2016 17:09:51 +0800
-Message-Id: <1455527391-13622-1-git-send-email-wnhuang@google.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Date: Mon, 15 Feb 2016 09:17:27 +0100
+From: Maxime Chevallier <chevalliersebmax@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: mgmt API, need some help for my use-case
+Message-ID: <20160215081727.GA8190@vps217108.ovh.net>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Wei-Ning Huang <wnhuang@chromium.org>
+Hi everyone,
 
-When the HCI_AUTO_OFF flag is cleared, the power_off delayed work need
-to be cancel or HCI will be powered off even if it's managed.
+I would like to discuss a use-case that I encountered on my project, and
+for which I cannot find a right way to do it with mgmt API.
 
-Signed-off-by: Wei-Ning Huang <wnhuang@chromium.org>
----
- net/bluetooth/hci_core.c | 1 +
- 1 file changed, 1 insertion(+)
+I have a controller, the 88W8887 that I need to set in 'wakeup host' mode.
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 47bcef7..f42305a 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -2017,6 +2017,7 @@ static void hci_power_on(struct work_struct *work)
- 	if (test_bit(HCI_UP, &hdev->flags) &&
- 	    hci_dev_test_flag(hdev, HCI_MGMT) &&
- 	    hci_dev_test_and_clear_flag(hdev, HCI_AUTO_OFF)) {
-+		cancel_delayed_work(&hdev->power_off);
- 		hci_req_sync_lock(hdev);
- 		err = __hci_req_hci_power_on(hdev);
- 		hci_req_sync_unlock(hdev);
--- 
-2.7.0.rc3.207.g0ac5344
+I put my host in suspend-to-mem, and the controller toggles a GPIO to wake
+it up under certain circumstances, including a Low Energy connection.
+
+To do that, I need to :
+	- configure precisely my advertising intervals, to be in low duty
+	  cycle advertising, with a long interval between advertisements
+	- configure the filter policy, to only process connection
+	  requests from whitelisted devices ( we want only whitelisted
+	  devices to be able to wakeup our system ).
+
+I previously did that with the HCI lib in my C program, and submitted a
+patch to the hci lib, to add the le_set_advertising_parameters to the lib.
+
+I used the following HCI commands :
+	- LE clear whitelist ( OCF 0x0010 )
+	- LE Add device to whitelist ( OCF 0x0011 )
+	- LE Set advertising parameters ( OCF 0x0006 )
+	- LE Set advertise enable ( OCF 0x000A )
+
+It turns out this is not the right approach, Johan Hedberg explained to me
+on IRC that the hci lib was not intended to be used by external programs.
+
+Therefore, I'm looking for a way to do it using the mgmt API, but I can't
+find a way to :
+	- Manipulate the whitelist
+	- Configure advertising intervals
+	- Configure the filter policy
+
+If I missed something in the mgmt API that would allow me to do that, please
+point it to me. If these are some missing features, I am willing to spend some
+time working on it.
+
+Thanks in advance,
+
+Maxime Chevallier
