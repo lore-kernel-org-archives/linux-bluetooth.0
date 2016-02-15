@@ -1,231 +1,149 @@
-Return-Path: <linux-kernel-owner@vger.kernel.org>
-From: Amitkumar Karwar <akarwar@marvell.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Nishant Sarmukadam <nishants@marvell.com>, <wnhuang@chromium.com>,
-	<devicetree@vger.kernel.org>, Cathy Luo <cluo@marvell.com>,
-	<linux-kernel@vger.kernel.org>, Xinming Hu <huxm@marvell.com>,
-	Amitkumar Karwar <akarwar@marvell.com>
-Subject: [PATCH v4 1/3] mwifiex: register platform specific driver
-Date: Tue, 16 Feb 2016 01:14:37 -0800
-Message-ID: <1455614079-4263-1-git-send-email-akarwar@marvell.com>
+Return-Path: <chris2553@googlemail.com>
+Subject: Re: 4.5 Regression - mouse not working after resume from suspend
+To: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
+ johan.hedberg@intel.com
+References: <56B5B0C3.6050208@googlemail.com>
+ <56B5DB29.9040208@googlemail.com> <56B5F2B1.5010000@googlemail.com>
+ <20160206143300.GA18790@t440s.P-661HNU-F1> <56B61000.6060008@googlemail.com>
+From: Chris Clayton <chris2553@googlemail.com>
+Message-ID: <56C26202.4070101@googlemail.com>
+Date: Mon, 15 Feb 2016 23:40:50 +0000
 MIME-Version: 1.0
-Content-Type: text/plain
-Sender: linux-kernel-owner@vger.kernel.org
+In-Reply-To: <56B61000.6060008@googlemail.com>
+Content-Type: text/plain; charset=windows-1252
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Xinming Hu <huxm@marvell.com>
+Hi,
 
-Platform device and driver provides easy way to interact with
-device-tree-enabled system.
+Is there anything else I can do to help diagnose this regression.
 
-This patch registers platform driver and reorganise existing device
-tree specific code. Corresponding device tree binding file is also
-created.
+To summarise my BT mouse does not work after resuming from suspend to disk or ram. IT works perfectly in earlier 4.4,
+4.3 and 4.2 kernels. I bisected and found the first bad commit is:
 
-Signed-off-by: Xinming Hu <huxm@marvell.com>
-Signed-off-by: Amitkumar Karwar <akarwar@marvell.com>
----
-v3: Don't update adapter->dt_node if mwifiex_plt_dev is NULL
-v4: Corrected the 'name' and 'compatible' property names.(Arnd Bergmann and Rob
-    Herring)
-    Patch description wraped in 72 columns(Rob Herring)
-    Moved DT binding file to bindings/net/wireless/(Rob Herring)
----
- .../bindings/net/wireless/marvell-sd8xxx.txt       | 29 +++++++++++
- drivers/net/wireless/marvell/mwifiex/Makefile      |  1 +
- drivers/net/wireless/marvell/mwifiex/main.c        |  2 +
- drivers/net/wireless/marvell/mwifiex/main.h        | 14 +++++
- .../net/wireless/marvell/mwifiex/platform_drv.c    | 59 ++++++++++++++++++++++
- drivers/net/wireless/marvell/mwifiex/sta_cmd.c     |  4 +-
- 6 files changed, 107 insertions(+), 2 deletions(-)
- create mode 100644 Documentation/devicetree/bindings/net/wireless/marvell-sd8xxx.txt
- create mode 100644 drivers/net/wireless/marvell/mwifiex/platform_drv.c
+2ff13894cfb877cb3d02d96a8402202f0a6f3efd is the first bad commit
+commit 2ff13894cfb877cb3d02d96a8402202f0a6f3efd
+Author: Johan Hedberg <johan.hedberg@intel.com>
+Date:   Wed Nov 25 16:15:44 2015 +0200
 
-diff --git a/Documentation/devicetree/bindings/net/wireless/marvell-sd8xxx.txt b/Documentation/devicetree/bindings/net/wireless/marvell-sd8xxx.txt
-new file mode 100644
-index 0000000..f7671ae
---- /dev/null
-+++ b/Documentation/devicetree/bindings/net/wireless/marvell-sd8xxx.txt
-@@ -0,0 +1,29 @@
-+Marvell Sd8xxx Wireless devices
-+------
-+
-+Required properties:
-+
-+  - name : must be "wlan"
-+  - compatible : must be "marvell,sd8xxx"
-+
-+Optional properties:
-+
-+  - marvell,caldata* : A series of properties with marvell,caldata prefix,
-+  		      represent Calibration data downloaded to the device during
-+		      initialization. This is an array of unsigned values.
-+
-+
-+Example:
-+
-+Tx power limit calibration data is configured in below example.
-+The calibration data is an array of unsigned values, the length
-+can vary between hw versions.
-+
-+wlan {
-+	compatible = "marvell,sd8xxx";
-+
-+	marvell,caldata_00_txpwrlimit_2g_cfg_set = /bits/ 8 <
-+0x01 0x00 0x06 0x00 0x08 0x02 0x89 0x01 ...>;
-+
-+};
-+
-diff --git a/drivers/net/wireless/marvell/mwifiex/Makefile b/drivers/net/wireless/marvell/mwifiex/Makefile
-index fdfd9bf..1444fd1 100644
---- a/drivers/net/wireless/marvell/mwifiex/Makefile
-+++ b/drivers/net/wireless/marvell/mwifiex/Makefile
-@@ -42,6 +42,7 @@ mwifiex-y += cfg80211.o
- mwifiex-y += ethtool.o
- mwifiex-y += 11h.o
- mwifiex-y += tdls.o
-+mwifiex-y += platform_drv.o
- mwifiex-$(CONFIG_DEBUG_FS) += debugfs.o
- obj-$(CONFIG_MWIFIEX) += mwifiex.o
- 
-diff --git a/drivers/net/wireless/marvell/mwifiex/main.c b/drivers/net/wireless/marvell/mwifiex/main.c
-index 3cfa946..b93ae69 100644
---- a/drivers/net/wireless/marvell/mwifiex/main.c
-+++ b/drivers/net/wireless/marvell/mwifiex/main.c
-@@ -1538,6 +1538,7 @@ EXPORT_SYMBOL_GPL(_mwifiex_dbg);
- static int
- mwifiex_init_module(void)
- {
-+	mwifiex_platform_drv_init();
- #ifdef CONFIG_DEBUG_FS
- 	mwifiex_debugfs_init();
- #endif
-@@ -1552,6 +1553,7 @@ mwifiex_init_module(void)
- static void
- mwifiex_cleanup_module(void)
- {
-+	mwifiex_platform_drv_exit();
- #ifdef CONFIG_DEBUG_FS
- 	mwifiex_debugfs_remove();
- #endif
-diff --git a/drivers/net/wireless/marvell/mwifiex/main.h b/drivers/net/wireless/marvell/mwifiex/main.h
-index aea7aee..464d79f 100644
---- a/drivers/net/wireless/marvell/mwifiex/main.h
-+++ b/drivers/net/wireless/marvell/mwifiex/main.h
-@@ -37,6 +37,16 @@
- #include <linux/idr.h>
- #include <linux/inetdevice.h>
- #include <linux/devcoredump.h>
-+#include <linux/err.h>
-+#include <linux/gpio.h>
-+#include <linux/gfp.h>
-+#include <linux/interrupt.h>
-+#include <linux/io.h>
-+#include <linux/of_gpio.h>
-+#include <linux/of_platform.h>
-+#include <linux/platform_device.h>
-+#include <linux/pm_runtime.h>
-+#include <linux/slab.h>
- 
- #include "decl.h"
- #include "ioctl.h"
-@@ -47,6 +57,7 @@
- #include "sdio.h"
- 
- extern const char driver_version[];
-+extern struct platform_device *mwifiex_plt_dev;
- 
- struct mwifiex_adapter;
- struct mwifiex_private;
-@@ -1597,6 +1608,9 @@ void mwifiex_process_multi_chan_event(struct mwifiex_private *priv,
- 				      struct sk_buff *event_skb);
- void mwifiex_multi_chan_resync(struct mwifiex_adapter *adapter);
- 
-+int mwifiex_platform_drv_init(void);
-+void mwifiex_platform_drv_exit(void);
-+
- #ifdef CONFIG_DEBUG_FS
- void mwifiex_debugfs_init(void);
- void mwifiex_debugfs_remove(void);
-diff --git a/drivers/net/wireless/marvell/mwifiex/platform_drv.c b/drivers/net/wireless/marvell/mwifiex/platform_drv.c
-new file mode 100644
-index 0000000..5fd5d80
---- /dev/null
-+++ b/drivers/net/wireless/marvell/mwifiex/platform_drv.c
-@@ -0,0 +1,59 @@
-+/* Marvell wireless LAN device driver: platform specific driver
-+ *
-+ * Copyright (C) 2015, Marvell International Ltd.
-+ *
-+ * This software file (the "File") is distributed by Marvell International
-+ * Ltd. under the terms of the GNU General Public License Version 2, June 1991
-+ * (the "License").  You may use, redistribute and/or modify this File in
-+ * accordance with the terms and conditions of the License, a copy of which
-+ * is available on the worldwide web at
-+ * http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt.
-+ *
-+ * THE FILE IS DISTRIBUTED AS-IS, WITHOUT WARRANTY OF ANY KIND, AND THE
-+ * IMPLIED WARRANTIES OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE
-+ * ARE EXPRESSLY DISCLAIMED.  The License provides additional details about
-+ * this warranty disclaimer.
-+ */
-+#include "main.h"
-+
-+struct platform_device *mwifiex_plt_dev;
-+
-+static int mwifiex_plt_probe(struct platform_device *pdev)
-+{
-+	mwifiex_plt_dev = pdev;
-+	return 0;
-+}
-+
-+static int mwifiex_plt_remove(struct platform_device *pdev)
-+{
-+	mwifiex_plt_dev = NULL;
-+	return 0;
-+}
-+
-+static const struct of_device_id mwifiex_dt_match[] = {
-+	{
-+		.compatible = "marvell,sd8xxx",
-+	},
-+	{},
-+};
-+
-+MODULE_DEVICE_TABLE(of, mwifiex_dt_match);
-+
-+static struct platform_driver mwifiex_platform_driver = {
-+	.probe		= mwifiex_plt_probe,
-+	.remove		= mwifiex_plt_remove,
-+	.driver = {
-+		.name	= "mwifiex_plt",
-+		.of_match_table = mwifiex_dt_match,
-+	}
-+};
-+
-+int mwifiex_platform_drv_init(void)
-+{
-+	return platform_driver_register(&mwifiex_platform_driver);
-+}
-+
-+void mwifiex_platform_drv_exit(void)
-+{
-+	platform_driver_unregister(&mwifiex_platform_driver);
-+}
-diff --git a/drivers/net/wireless/marvell/mwifiex/sta_cmd.c b/drivers/net/wireless/marvell/mwifiex/sta_cmd.c
-index 30f1526..238fe4f 100644
---- a/drivers/net/wireless/marvell/mwifiex/sta_cmd.c
-+++ b/drivers/net/wireless/marvell/mwifiex/sta_cmd.c
-@@ -2154,8 +2154,8 @@ int mwifiex_sta_init_cmd(struct mwifiex_private *priv, u8 first_sta, bool init)
- 		 * The cal-data can be read from device tree and/or
- 		 * a configuration file and downloaded to firmware.
- 		 */
--		adapter->dt_node =
--				of_find_node_by_name(NULL, "marvell_cfgdata");
-+		adapter->dt_node = mwifiex_plt_dev ?
-+				mwifiex_plt_dev->dev.of_node : NULL;
- 		if (adapter->dt_node) {
- 			ret = mwifiex_dnld_dt_cfgdata(priv, adapter->dt_node,
- 						      "marvell,caldata");
--- 
-1.8.1.4
+    Bluetooth: Perform HCI update for power on synchronously
+
+Johan requested additional information, which I provided. Checking the archive at marc.info, it seems the mail didn't
+make it to the mailing list. Maybe it exceeded a size limit, I don't know. Anyway I copied the mail to Johan and Marcel.
+
+A bit more experimentation revealed that I can reactivate the mouse if I restart the bluetooth daemon after the machine
+resumes.
+
+Please let me know if I can provide anything else.
+
+Thanks
+
+Chris
+
+On 06/02/16 15:23, Chris Clayton wrote:
+> Hi Johan,
+> 
+> The information you requested has been captured from v4.5-rc2-340-g5af9c2e and is included below.
+> 
+> On 06/02/16 14:33, Johan Hedberg wrote:
+>> Hi Chris,
+>>
+>> On Sat, Feb 06, 2016, Chris Clayton wrote:
+>>> On 06/02/16 11:38, Chris Clayton wrote:
+>>>> On 06/02/16 08:37, Chris Clayton wrote:
+>>>>> There seems to be a regression in resuming my laptop from a suspend
+>>>>> to RAM or disk. The symptom is that my bluetooth
+>>>>> mouse doesn't work after the resume. The kernel is built after a
+>>>>> pull of Linus' tree this morning (v4.5-rc2-340-g5af9c2e).
+>>>>>
+>>>>> Attached is the output from dmesg showing the boot, suspend (to
+>>>>> RAM) and resume. You'll see that during the resume,
+>>>>> error -517 is being reported for some devices. Suspend/resume has worked perfectly with a 4.[234].x kernels.
+>>>>>
+>>>>> I'll start a bisection, but thought I'd give a heads up in case
+>>>>> someone can see the problem before I get done with the
+>>>>> bisect.
+>>>>
+>>>> The bisection ended up at:
+>>>>
+>>>> 2ff13894cfb877cb3d02d96a8402202f0a6f3efd is the first bad commit
+>>>> commit 2ff13894cfb877cb3d02d96a8402202f0a6f3efd
+>>>> Author: Johan Hedberg <johan.hedberg@intel.com>
+>>>> Date:   Wed Nov 25 16:15:44 2015 +0200
+>>>>
+>>>>     Bluetooth: Perform HCI update for power on synchronously
+>>>>
+>>>>     The request to update HCI during power on is always coming either from
+>>>>     hdev->req_workqueue or through an ioctl, so it's safe to use
+>>>>     hci_req_sync for it. This way we also eliminate potential races with
+>>>>     incoming mgmt commands or other actions while powering on.
+>>>>
+>>>>     Part of this refactoring is the splitting of mgmt_powered() into
+>>>>     mgmt_power_on() and __mgmt_power_off() functions. The main reason is
+>>>>     the different requirements as far as hdev locking is concerned, as
+>>>>     highlighted with the __ prefix of the power off API.
+>>>>
+>>>>     Since the power on in the case of clearing the AUTO_OFF flag cannot be
+>>>>     done synchronously in the set_powered mgmt handler, the hci_power_on
+>>>>     work callback is extended to cover this (which also simplifies the
+>>>>     set_powered helper a lot).
+>>>>
+>>>>     Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+>>>>     Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+>>>>
+>>>> :040000 040000 a093d0be66f39f99c33a6a4725b2330ca9b41d03 a1eff79cec3ee7208e5aa200ab5069726bbeea8e M      include
+>>>> :040000 040000 d2d122193b33d45fcb9c2bc69f2024487a7528a0 0036e1ec2e125f2432cfd420b5f79ca133ec34f7 M      net
+>>>
+>>> I've just built a kernel at bf943cbf76ecd3b9838a80d5e08777b0f4ccc665
+>>> (the commit prior to the one the bisect landed on)
+>>> and my BT mouse works fine after a suspend/resume. With a kernel built
+>>> at 2ff13894cfb877cb3d02d96a8402202f0a6f3efd, the mouse does not work
+>>> after resume.
+>>
+>> I've moved the thread over to the linux-bluetooth list, since that's where
+>> Bluetooth issues are primarily discussed. You had already removed the dmesg
+>> output by the time you added me to the thread so I'll copy the relevant
+>> (Bluetooth related) parts here that I found in the online archives:
+>>
+>> [    5.314851] Bluetooth: hci0: read Intel version: 3707100180012d0d1a
+>> [    5.315569] Bluetooth: hci0: Intel device is already patched. patch num: 1a
+>> [   61.566028] Bluetooth: HIDP socket layer initialized
+>> [   61.566498] hid-generic 0005:0A5C:0001.0001: unknown main item tag 0x0
+>> [   61.566540] input: Bluetooth 3.0 mouse as /devices/pci0000:00/0000:00:14.0/usb3/3-7/3-7:1.0/bluetooth/hci0/hci0:256/0005:0A5C:0001.0001/input/input15
+>> [   61.566644] hid-generic 0005:0A5C:0001.0001: input: BLUETOOTH HID v1.29 Mouse [Bluetooth 3.0 mouse] on 80:19:34:5a:67:51
+>> [  122.711385] Bluetooth: hci0: read Intel version: 3707100180012d0d00
+>> [  122.744439] Bluetooth: hci0: Intel Bluetooth firmware file: intel/ibt-hw-37.7.10-fw-1.80.1.2d.d.bseq
+>> [  122.895434] Bluetooth: hci0: Intel Bluetooth firmware patch completed and activated
+>>
+>> There's some more information needed to investigate this further:
+>>
+>>  - What's the state of Bluetooth on your machine after resume? If you do
+>>    "hciconfig" does it show hci0 as being "UP"? Does it show "PSCAN"
+>>    being enabled? (assuming your mouse is a BR/EDR one)
+> 
+> hci0:   Type: BR/EDR  Bus: USB
+>         BD Address: 80:19:34:5A:67:51  ACL MTU: 1021:5  SCO MTU: 96:6
+>         DOWN
+>         RX bytes:1139 acl:0 sco:0 events:122 errors:0
+>         TX bytes:17708 acl:0 sco:0 commands:121 errors:0
+> 
+>>  - Do you see any errors from bluetoothd when you suspend/resume?
+> 
+> Feb  6 15:06:24 laptop bluetoothd[888]: Endpoint unregistered: sender=:1.37 path=/MediaEndpoint/A2DPSource
+> Feb  6 15:06:24 laptop bluetoothd[888]: Endpoint unregistered: sender=:1.37 path=/MediaEndpoint/A2DPSink
+> Feb  6 15:06:25 laptop bluetoothd[888]: Failed to obtain handles for "Service Changed" characteristic
+> Feb  6 15:06:25 laptop bluetoothd[888]: Endpoint registered: sender=:1.37 path=/MediaEndpoint/A2DPSource
+> Feb  6 15:06:25 laptop bluetoothd[888]: Endpoint registered: sender=:1.37 path=/MediaEndpoint/A2DPSink
+> 
+>>  - Could you provide the HCI log from btmon for what happens when you
+>>    suspend/resume (just keep btmon running over this time)
+> 
+> That log's a bit long, so I've attached it.
+> 
+> Hope this helps. Thanks
+> 
+> Chris
+>>
+>> Thanks.
+>>
+>> Johan
+>>
