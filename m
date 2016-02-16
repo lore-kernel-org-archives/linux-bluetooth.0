@@ -1,135 +1,124 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <linux-kernel-owner@vger.kernel.org>
 From: Amitkumar Karwar <akarwar@marvell.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Nishant Sarmukadam <nishants@marvell.com>, <wnhuang@chromium.com>,
-	<devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	Xinming Hu <huxm@marvell.com>,
+	<devicetree@vger.kernel.org>, Cathy Luo <cluo@marvell.com>,
+	<linux-kernel@vger.kernel.org>, Xinming Hu <huxm@marvell.com>,
 	Amitkumar Karwar <akarwar@marvell.com>
-Subject: [PATCH v4 2/2] bluetooth: btmrvl: parse host wakeup configuration from device tree
-Date: Tue, 16 Feb 2016 01:55:55 -0800
-Message-ID: <1455616555-4729-2-git-send-email-akarwar@marvell.com>
-In-Reply-To: <1455616555-4729-1-git-send-email-akarwar@marvell.com>
-References: <1455616555-4729-1-git-send-email-akarwar@marvell.com>
+Subject: [PATCH v4 3/3] mwifiex: parse host wakeup configuration from device
+Date: Tue, 16 Feb 2016 01:14:39 -0800
+Message-ID: <1455614079-4263-3-git-send-email-akarwar@marvell.com>
+In-Reply-To: <1455614079-4263-1-git-send-email-akarwar@marvell.com>
+References: <1455614079-4263-1-git-send-email-akarwar@marvell.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Sender: linux-bluetooth-owner@vger.kernel.org
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Xinming Hu <huxm@marvell.com>
 
-This patch implements a framework for board specific wakeup.
+This patch implement a framework for board specific wakeup.
 driver parse irq/gpio number from device tree, corresponding
 resources will be allocated, and used for host suspend/resume.
-Device tree binding file is also updated in the patch.
+driver private binding file is also updated in the patch.
 
 Signed-off-by: Xinming Hu <huxm@marvell.com>
 Signed-off-by: Amitkumar Karwar <akarwar@marvell.com>
 ---
-v2: Fixed build error reported by kbuild test robot
-drivers/bluetooth/btmrvl_platform.c:141:22: error:
-'btmrvl_plt_pm_ops' undeclared here (not in a function)
+v4: Replaced #ifdef with __maybe_unused(Arnd Bergmann)
 ---
- .../devicetree/bindings/net/marvell-bt-sd8xxx.txt  | 17 +++-
- drivers/bluetooth/btmrvl_platform.c                | 91 ++++++++++++++++++++++
- 2 files changed, 106 insertions(+), 2 deletions(-)
+ .../bindings/net/wireless/marvell-sd8xxx.txt       | 10 +++
+ .../net/wireless/marvell/mwifiex/platform_drv.c    | 91 ++++++++++++++++++++++
+ 2 files changed, 101 insertions(+)
 
-diff --git a/Documentation/devicetree/bindings/net/marvell-bt-sd8xxx.txt b/Documentation/devicetree/bindings/net/marvell-bt-sd8xxx.txt
-index 516b636..fdc87c4 100644
---- a/Documentation/devicetree/bindings/net/marvell-bt-sd8xxx.txt
-+++ b/Documentation/devicetree/bindings/net/marvell-bt-sd8xxx.txt
-@@ -12,11 +12,19 @@ Optional properties:
- 
-   - btmrvl,gpio-gap : gpio and gap (in msecs) combination to be
- 		      configured.
+diff --git a/Documentation/devicetree/bindings/net/wireless/marvell-sd8xxx.txt b/Documentation/devicetree/bindings/net/wireless/marvell-sd8xxx.txt
+index c337fab..50138fd 100644
+--- a/Documentation/devicetree/bindings/net/wireless/marvell-sd8xxx.txt
++++ b/Documentation/devicetree/bindings/net/wireless/marvell-sd8xxx.txt
+@@ -14,6 +14,11 @@ Optional properties:
+   - marvell,wakeup-gpios : Chip's wakeup gpio pin number. This needs to be downloaded
+ 			to to firmware. Chip notifies wifi wakeup signal to SOC
+ 			through this pin.
 +  - interrupt-parent: phandle of the parent interrupt controller
 +  - interrupts : interrupt number to the cpu
-+  - gpios: specify GPIO respectively. gpio here is board specific pin.
-+	   while above gpio-gap represents the device side pin used to
-+	   wakeup host.
++  - gpios: specify SOC's wakeup GPIO
 +  - pinctrl-names : a pinctrl state named "default" must be defined
 +  - pinctrl-0 : pin control group to be used for this controller
  
  Example:
  
--GPIO pin 13 and gap 100ms are configured for host wakeup, calibration
--data is also available in below example.
-+GPIO pin 119 and gap 100ms are configured for host wakeup,
-+pin 13 is configured so that firmware can wakeup host using this device side
-+pin, calibration data is also available in below example.
- 
- bluetooth {
- 	compatible = "marvell,bt-sd8xxx";
-@@ -26,4 +34,9 @@ bluetooth {
- 		0x00 0x00 0xba 0xce 0xc0 0xc6 0x2d 0x00 0x00 0x00 0x00 0x00
- 		0x00 0x00 0xf0 0x00>;
- 	btmrvl,gpio-gap = <0x0d64>;
+@@ -27,5 +32,10 @@ wlan {
+ 	marvell,caldata_00_txpwrlimit_2g_cfg_set = /bits/ 8 <
+ 0x01 0x00 0x06 0x00 0x08 0x02 0x89 0x01 ...>;
+ 	marvell,wakeup-gpios = <3>;
 +	interrupt-parent = <&pio>;
-+	interrupts = <119 IRQ_TYPE_LEVEL_LOW>;
-+	gpios = <&pio 119 GPIO_ACTIVE_HIGH>;
++	interrupts = <38 IRQ_TYPE_LEVEL_LOW>;
++	gpios = <&pio 38 GPIO_ACTIVE_HIGH>;
 +	pinctrl-names = "default";
 +	pinctrl-0 = <&wake_pins>;
  };
-diff --git a/drivers/bluetooth/btmrvl_platform.c b/drivers/bluetooth/btmrvl_platform.c
-index d2305dd..c9a353c 100644
---- a/drivers/bluetooth/btmrvl_platform.c
-+++ b/drivers/bluetooth/btmrvl_platform.c
-@@ -19,9 +19,63 @@
  
- struct platform_device *btmrvl_plt_dev;
+diff --git a/drivers/net/wireless/marvell/mwifiex/platform_drv.c b/drivers/net/wireless/marvell/mwifiex/platform_drv.c
+index 5fd5d80..5ae7dc0 100644
+--- a/drivers/net/wireless/marvell/mwifiex/platform_drv.c
++++ b/drivers/net/wireless/marvell/mwifiex/platform_drv.c
+@@ -18,9 +18,63 @@
  
-+struct btmrvl_wake_dev {
-+	struct device	*dev;
-+	int		irq_bt;
-+	bool		wake_by_bt;
+ struct platform_device *mwifiex_plt_dev;
+ 
++struct mwifiex_wake_dev {
++	struct device *dev;
++	int irq_wifi;
++	bool wake_by_wifi;
 +};
 +
-+static irqreturn_t btmrvl_wake_irq_bt(int irq, void *priv)
++static irqreturn_t mwifiex_wake_irq_wifi(int irq, void *priv)
 +{
-+	struct btmrvl_wake_dev *ctx = priv;
++	struct mwifiex_wake_dev *ctx = priv;
 +
-+	if (ctx->irq_bt >= 0) {
-+		ctx->wake_by_bt = true;
-+		disable_irq_nosync(ctx->irq_bt);
++	if (ctx->irq_wifi >= 0) {
++		ctx->wake_by_wifi = true;
++		disable_irq_nosync(ctx->irq_wifi);
 +	}
 +
 +	return IRQ_HANDLED;
 +}
 +
- static int btmrvl_plt_probe(struct platform_device *pdev)
+ static int mwifiex_plt_probe(struct platform_device *pdev)
  {
 +	int ret;
-+	struct btmrvl_wake_dev *ctx;
++	struct mwifiex_wake_dev *ctx;
 +	int gpio;
 +
- 	btmrvl_plt_dev = pdev;
+ 	mwifiex_plt_dev = pdev;
 +
 +	ctx = devm_kzalloc(&pdev->dev, sizeof(*ctx), GFP_KERNEL);
 +	if (!ctx)
 +		return -ENOMEM;
 +
 +	ctx->dev = &pdev->dev;
-+	ctx->irq_bt = platform_get_irq(pdev, 0);
-+	if (ctx->irq_bt < 0)
-+		dev_err(&pdev->dev, "Failed to get irq_bt\n");
++	ctx->irq_wifi = platform_get_irq(pdev, 0);
++	if (ctx->irq_wifi < 0)
++		dev_err(&pdev->dev, "Failed to get irq_wifi\n");
 +
 +	gpio = of_get_gpio(pdev->dev.of_node, 0);
 +	if (gpio_is_valid(gpio))
 +		gpio_direction_input(gpio);
 +	else
-+		dev_err(&pdev->dev, "gpio bt is invalid\n");
++		dev_err(&pdev->dev, "gpio wifi is invalid\n");
 +
-+	if (ctx->irq_bt >= 0) {
-+		ret = devm_request_irq(&pdev->dev, ctx->irq_bt,
-+				       btmrvl_wake_irq_bt,
++	if (ctx->irq_wifi >= 0) {
++		ret = devm_request_irq(&pdev->dev, ctx->irq_wifi,
++				       mwifiex_wake_irq_wifi,
 +				       IRQF_TRIGGER_LOW,
-+				       "bt_wake", ctx);
++				       "wifi_wake", ctx);
 +		if (ret) {
 +			dev_err(&pdev->dev,
-+				"Failed to request irq_bt %d (%d)\n",
-+				ctx->irq_bt, ret);
++				"Failed to request irq_wifi %d (%d)\n",
++				ctx->irq_wifi, ret);
 +			return -EINVAL;
 +		}
-+		disable_irq(ctx->irq_bt);
++		disable_irq(ctx->irq_wifi);
 +	}
 +
 +	platform_set_drvdata(pdev, ctx);
@@ -137,19 +126,19 @@ index d2305dd..c9a353c 100644
  	return 0;
  }
  
-@@ -31,6 +85,42 @@ static int btmrvl_plt_remove(struct platform_device *pdev)
+@@ -30,6 +84,42 @@ static int mwifiex_plt_remove(struct platform_device *pdev)
  	return 0;
  }
  
-+static int __maybe_unused btmrvl_plt_suspend(struct device *dev)
++static int __maybe_unused mwifiex_plt_suspend(struct device *dev)
 +{
-+	struct btmrvl_wake_dev *ctx = dev_get_drvdata(dev);
++	struct mwifiex_wake_dev *ctx = dev_get_drvdata(dev);
 +	int ret;
 +
-+	if (ctx->irq_bt >= 0) {
-+		ctx->wake_by_bt = false;
-+		enable_irq(ctx->irq_bt);
-+		ret = enable_irq_wake(ctx->irq_bt);
++	if (ctx->irq_wifi >= 0) {
++		ctx->wake_by_wifi = false;
++		enable_irq(ctx->irq_wifi);
++		ret = enable_irq_wake(ctx->irq_wifi);
 +		if (ret)
 +			return ret;
 +	}
@@ -157,15 +146,15 @@ index d2305dd..c9a353c 100644
 +	return 0;
 +}
 +
-+static int __maybe_unused btmrvl_plt_resume(struct device *dev)
++static int __maybe_unused mwifiex_plt_resume(struct device *dev)
 +{
-+	struct btmrvl_wake_dev *ctx = dev_get_drvdata(dev);
++	struct mwifiex_wake_dev *ctx = dev_get_drvdata(dev);
 +	int ret;
 +
-+	if (ctx->irq_bt >= 0) {
-+		ret = disable_irq_wake(ctx->irq_bt);
-+		if (!ctx->wake_by_bt)
-+			disable_irq(ctx->irq_bt);
++	if (ctx->irq_wifi >= 0) {
++		ret = disable_irq_wake(ctx->irq_wifi);
++		if (!ctx->wake_by_wifi)
++			disable_irq(ctx->irq_wifi);
 +		if (ret)
 +			return ret;
 +	}
@@ -173,21 +162,20 @@ index d2305dd..c9a353c 100644
 +	return 0;
 +}
 +
-+static const struct dev_pm_ops btmrvl_plt_pm_ops = {
-+	SET_SYSTEM_SLEEP_PM_OPS(btmrvl_plt_suspend, btmrvl_plt_resume)
++static const struct dev_pm_ops mwifiex_plt_pm_ops = {
++	SET_SYSTEM_SLEEP_PM_OPS(mwifiex_plt_suspend, mwifiex_plt_resume)
 +};
 +
- static const struct of_device_id btmrvl_dt_match[] = {
+ static const struct of_device_id mwifiex_dt_match[] = {
  	{
- 		.compatible = "marvell,bt-sd8xxx",
-@@ -46,6 +136,7 @@ static struct platform_driver btmrvl_platform_driver = {
+ 		.compatible = "marvell,sd8xxx",
+@@ -45,6 +135,7 @@ static struct platform_driver mwifiex_platform_driver = {
  	.driver = {
- 		.name	= "btmrvl_plt",
- 		.of_match_table = btmrvl_dt_match,
-+		.pm             = &btmrvl_plt_pm_ops,
+ 		.name	= "mwifiex_plt",
+ 		.of_match_table = mwifiex_dt_match,
++		.pm = &mwifiex_plt_pm_ops,
  	}
  };
  
 -- 
 1.8.1.4
-
