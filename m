@@ -1,52 +1,78 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <maxime.chevallier@openwide.fr>
+Date: Wed, 17 Feb 2016 10:18:26 +0100
+From: Chevallier Maxime <maxime.chevallier@openwide.fr>
+To: linux-bluetooth@vger.kernel.org, marcel@holtmann.org
+Subject: [RFC][PATCH 1/1 v2] mgmt : Add Set Advertising Parameters command
+Message-ID: <20160217091826.GA12061@vps217108.ovh.net>
 MIME-Version: 1.0
-In-Reply-To: <1455539442-31843-1-git-send-email-luiz.dentz@gmail.com>
-References: <1455539442-31843-1-git-send-email-luiz.dentz@gmail.com>
-Date: Wed, 17 Feb 2016 12:32:12 +0200
-Message-ID: <CABBYNZLTehRbB-Un2DuRJy_1uiwk8YeFvZZBJHJANHC7iW2zJQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/5] shared/gatt-client: Add debug log if
- characteristic cannot be added
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+---
+ doc/mgmt-api.txt | 51 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 51 insertions(+)
 
-On Mon, Feb 15, 2016 at 2:30 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> If gatt_db_service_insert_characteristic fails print an error for the
-> handle.
-> ---
->  src/shared/gatt-client.c | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
->
-> diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
-> index 20c195a..8486b09 100644
-> --- a/src/shared/gatt-client.c
-> +++ b/src/shared/gatt-client.c
-> @@ -588,8 +588,12 @@ static bool discover_descs(struct discovery_op *op, bool *discovering)
->                                                         chrc_data->properties,
->                                                         NULL, NULL, NULL);
->
-> -               if (!attr)
-> +               if (!attr) {
-> +                       util_debug(client->debug_callback, client->debug_data,
-> +                               "Failed to insert characteristic at 0x%04x",
-> +                               chrc_data->value_handle);
->                         goto failed;
-> +               }
->
->                 if (gatt_db_attribute_get_handle(attr) !=
->                                                         chrc_data->value_handle)
-> --
-> 2.5.0
-
-Applied.
-
-
+diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
+index 731a088..d46b28c 100644
+--- a/doc/mgmt-api.txt
++++ b/doc/mgmt-api.txt
+@@ -2801,6 +2801,57 @@ Start Limited Discovery Command
+ 				Invalid Index
+ 
+ 
++Set Advertising Parameters Command
++==================================
++
++	Command Code:		0x0042
++	Controller Index:	<controller id>
++	Command Parameters:	Adv_Interval_Min (2 Octets)
++					Adv_Interval_Max (2 Octets)
++	Return Parameters:
++
++	This command is used to set Advertising Parameters.
++
++	This command sets global advertising parameters that will be
++	applied on advertisings started both with the Set Advertising
++	and the Add Advertising commands.
++
++	The Adv_Interval_Min parameter and Adv_Interval_Max are
++	lower and upper bounds for the controller to issue advertising
++	packets. The exact momet the packet is actually issued is up to
++	the controller.
++
++	The Adv_Interval_Min and Adv_Interval_Max are expressed in units
++	so that : Time ( milliseconds ) = N x 0.625.
++
++	Their default value is 0x0080 (1.28s).
++
++	Both Adv_Interval_Min and Adv_Interval_Max must be within the
++	range [ 0x0020 0x4000 ] (20 ms to 10.24 s).
++
++	Adv_Interval_Min must be less or equal than Adv_Interval_Max.
++
++	If advertisement is not connectable, that is if Set Advertising
++	is set with Advertising 0x01 and we are set as not connectable,
++	then Adv_Interval_Min and Adv_Interval_Max parameters must not
++	be less than 0x00A0 (100 ms). If this is the case, these
++	parameters are restored to their default value until we are
++	connectable again.
++
++	A pre-requisite is that LE is already enabled, otherwise this
++	command will return a "rejected" response.
++
++	This command can be used when the controller is not powered and
++	all settings will be programmed once powered.
++
++	This command generates a Command Complete event on success or a
++	Command Status event on failure.
++
++	Possible errors:	Rejected
++				Invalid Parameters
++				Invalid Index
++
++
+ Command Complete Event
+ ======================
+ 
 -- 
-Luiz Augusto von Dentz
+2.1.4
