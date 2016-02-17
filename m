@@ -1,65 +1,102 @@
-Return-Path: <linux-wpan-owner@vger.kernel.org>
-From: Alexander Aring <aar@pengutronix.de>
-To: linux-wpan@vger.kernel.org
-Cc: linux-bluetooth@vger.kernel.org, reubenhwk@gmail.com, s@mlng.net,
-	Alexander Aring <aar@pengutronix.de>
-Subject: [RFC radvd 0/2] 6lowpan: pending radvd patches
-Date: Wed, 17 Feb 2016 10:14:13 +0100
-Message-Id: <1455700455-5319-1-git-send-email-aar@pengutronix.de>
-Sender: linux-wpan-owner@vger.kernel.org
+Return-Path: <maxime.chevallier@openwide.fr>
+Date: Wed, 17 Feb 2016 08:25:35 +0100
+From: Maxime Chevallier <maxime.chevallier@openwide.fr>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>
+Subject: Re: [RFC][PATCH] Add Set Advertising Parameters command
+Message-ID: <20160217072535.GA11822@vps217108.ovh.net>
+References: <20160216130927.GA10374@vps217108.ovh.net>
+ <D9C33327-2669-4135-9DAA-2109B457B021@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <D9C33327-2669-4135-9DAA-2109B457B021@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi all,
+On Tue, Feb 16, 2016 at 10:11:22AM -0800, Marcel Holtmann wrote:
+> Hi Chevallier,
+> 
+> > ---
+> > doc/mgmt-api.txt | 67 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+> > 1 file changed, 67 insertions(+)
+> > 
+> > diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
+> > index 731a088..4b842fd 100644
+> > --- a/doc/mgmt-api.txt
+> > +++ b/doc/mgmt-api.txt
+> > @@ -2596,6 +2596,7 @@ Add Advertising Command
+> > 		4	Add TX Power field to Adv_Data
+> > 		5	Add Appearance field to Scan_Rsp
+> > 		6	Add Local Name in Scan_Rsp
+> > +		7	Pending Parameters
+> > 
+> > 	When the connectable flag is set, then the controller will use
+> > 	undirected connectable advertising. The value of the connectable
+> > @@ -2623,6 +2624,12 @@ Add Advertising Command
+> > 	supported to provide less air traffic for devices implementing
+> > 	broadcaster role.
+> > 
+> > +	If the Pending Parameters flag is set, the Advertising Instance
+> > +	will only be queued when the Set Advertising Parameters command
+> > +	is issued, with the correct Instance identifier. If the next
+> > +	command is not a Set Advertising Parameters commmand, the current
+> > +	Advertising Instance is cancelled.
+> > +
+> 
+> this is an API design, I prefer to not support. It is really complicated and does not feel like a clean design.
 
-this patch series are my latest version for support 6CO in radvd.
-Somebody wants to bring these patches into radvd upstream, see [0].
+I agree, this was sloppy design.
 
-Nevertheless, I don't have any time to working on this currently so I want
-to broadcast somehow my latest state. If there are no issues for radvd
-maintainer, then this is great. :-)
+> 
+> > 	The Duration parameter configures the length of an Instance. The
+> > 	value is in seconds.
+> > 
+> > @@ -2680,6 +2687,66 @@ Add Advertising Command
+> > 				Invalid Index
+> > 
+> > 
+> > +Set Advertising Parameters Command
+> > +==================================
+> > +
+> > +	Command Code:		0x003f
+> > +	Controller Index:	<controller id>
+> > +	Command Parameters:	Instance (1 Octet)
+> > +				Adv_Interval_min (2 Octets)
+> > +				Adv_Interval_max (2 Octets)
+> > +	Return Parameters:
+> > +
+> > +	This command is used to set advertising parameters for a Bluetooth
+> > +	Low Energy controller.
+> > +
+> > +	This command can be used to configure global advertising parameters
+> > +	that will be applied for advertising issued by the Set Advertising
+> > +	command.
+> > +
+> > +	This command can also be used to configure single Advertising
+> > +	Instances. In that case, the parameters applied for the Advertising
+> > +	Instance will override global Advertising Parameters when the
+> > +	Adversiting Instance is running.
+> > +
+> > +	When configuring an Advertising Instance, the Instance must have
+> > +	been added with the flag "Pending parameters". The Advertising
+> > +	Instance will be added to queue only when the Set Advertising
+> > +	Parameters will be issued.
+> > +
+> > +	The Instance parameter designates what we want to configure.
+> > +	If the Instance parameter is 0, the Advertising Parameters apply
+> > +	globally, for both the advertising issued with the Set Adverting
+> > +	and the Advertising Instances issued with Add Averting.
+> 
+> I wonder if we actually want to include the Instance parameter at all here. I mean, why not just have some global setting for advertising parameters and just run with it.
+> 
+> However would fine grained per instance setting actually help you? If you have an instance with a higher interval it will consume the extra power.
+> 
+> And honestly if we ever really need super fine grained control, then I rather design an Add Enhanced Advertising command after we figured out what we really want. Especially looking forward on the next Bluetooth specification, I prefer not to lock myself in at this point in time.
+> 
+> So if we want to add a global Set Advertising Parameters similar to Set Scan Parameters then I am fine with that, but anything more complex seems not the right solution at this point.
 
-Maybe somebody can also work on the ToDo's like C=0 handling at first and
-then have some "mechanism" to switch to C=1.
-
-How to setup:
-
-Nodes which sends RA messages need to setup 6CO before.
-This is the "lowpanco" field in the configuration.
-
-All others nodes need to run radvd as well, but processing RA messages only.
-To setup their 6CO fields, when receiving RA messages.
-
-This can be done by a simple configuration with one entry for 6lowpan
-interfaces with "AdvSendAdvert off;".
-
-IMPORTANT NOTE:
-
-This requires the patch which is not mainline yet, to set 6CO option fields
-as userspace option. Otherwise the kernel will filter it. See [1]. As well,
-you need the pending patches on the list for stateful compression, see [2].
-
-- Alex
-
-[0] https://github.com/reubenhwk/radvd/issues/50#issuecomment-183329181
-[1] http://www.spinics.net/lists/linux-wpan/msg03364.html
-[2] http://www.spinics.net/lists/linux-wpan/msg03453.html
-
-Alexander Aring (2):
-  device-linux: replace ARPHRD_IEEE802154 to ARPHRD_6LOWPAN
-  radvd: rework 6CO handling
-
- defaults.h      |   3 ++
- device-bsd44.c  |  24 ++++++++++
- device-linux.c  |  43 +++++++++++++++--
- gram.y          |  72 ++++++++++++++++++++++------
- pathnames.h     |   4 ++
- privsep-linux.c | 142 +++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- process.c       |  44 ++++++++++++++++++
- radvd.h         |  18 ++++++-
- scanner.l       |   2 +-
- send.c          |  32 ++++++++-----
- 10 files changed, 352 insertions(+), 32 deletions(-)
-
--- 
-2.7.1
-
+I'm fine with the 'global configuration' approach for my particular use-case.
+Your proposal of expanding later-on with an 'Enhanced' version of Add
+Advertising seems cleaner, and as you said I don't really need this anyway.
+I'll send a patch with my proposal for a Set Advertising Parameters,
+that should look like Set Scan Parameters.
