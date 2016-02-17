@@ -1,71 +1,65 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <linux-wpan-owner@vger.kernel.org>
 From: Alexander Aring <aar@pengutronix.de>
 To: linux-wpan@vger.kernel.org
 Cc: linux-bluetooth@vger.kernel.org, reubenhwk@gmail.com, s@mlng.net,
 	Alexander Aring <aar@pengutronix.de>
-Subject: [RFC radvd 1/2] device-linux: replace ARPHRD_IEEE802154 to ARPHRD_6LOWPAN
-Date: Wed, 17 Feb 2016 10:14:14 +0100
-Message-Id: <1455700455-5319-2-git-send-email-aar@pengutronix.de>
-In-Reply-To: <1455700455-5319-1-git-send-email-aar@pengutronix.de>
-References: <1455700455-5319-1-git-send-email-aar@pengutronix.de>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Subject: [RFC radvd 0/2] 6lowpan: pending radvd patches
+Date: Wed, 17 Feb 2016 10:14:13 +0100
+Message-Id: <1455700455-5319-1-git-send-email-aar@pengutronix.de>
+Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch changes the ARPHRD_IEEE802154 to ARPHRD_6LOWPAN. The IEEE
-802.15.4 6lowpan module changed the ARPHRD_IEEE802154 type to
-ARPHRD_6LOWPAN. Nowadays it's use ARPHRD_6LOWPAN which is also used by
-BTLE 6LoWPAN. Both interfaces uses an EUI64 address and the handling to
-get the link-layer address should be the same.
+Hi all,
 
-There is no backward compatibility for 802.15.4 6LoWPAN before we
-changed the ARPHRD. Anyway if somebody wants that it should be patched
-manually. When the ARPHRD was ARPHRD_IEEE802154 the 802.15.4 6lowpan was
-anyway in a somehow unusable state.
+this patch series are my latest version for support 6CO in radvd.
+Somebody wants to bring these patches into radvd upstream, see [0].
 
-Signed-off-by: Alexander Aring <aar@pengutronix.de>
----
- device-linux.c | 11 ++++++++---
- 1 file changed, 8 insertions(+), 3 deletions(-)
+Nevertheless, I don't have any time to working on this currently so I want
+to broadcast somehow my latest state. If there are no issues for radvd
+maintainer, then this is great. :-)
 
-diff --git a/device-linux.c b/device-linux.c
-index de83f2e..7301927 100644
---- a/device-linux.c
-+++ b/device-linux.c
-@@ -22,6 +22,10 @@
- #define IPV6_ADDR_LINKLOCAL   0x0020U
- #endif
- 
-+#ifndef ARPHRD_6LOWPAN
-+#define ARPHRD_6LOWPAN	825	/* IPv6 over LoWPAN */
-+#endif
-+
- static char const *hwstr(unsigned short sa_family);
- 
- /*
-@@ -79,12 +83,10 @@ int update_device_info(int sock, struct Interface *iface)
- 		iface->sllao.if_maxmtu = -1;
- 		break;
- #endif				/* ARPHDR_ARCNET */
--#ifdef ARPHRD_IEEE802154
--	case ARPHRD_IEEE802154:
-+	case ARPHRD_6LOWPAN:
- 		iface->sllao.if_hwaddr_len = 64;
- 		iface->sllao.if_prefix_len = 64;
- 		break;
--#endif
- 	default:
- 		iface->sllao.if_hwaddr_len = -1;
- 		iface->sllao.if_prefix_len = -1;
-@@ -382,6 +384,9 @@ static char const *hwstr(unsigned short sa_family)
- 		rc = "ARPHRD_IEEE802154_PHY";
- 		break;
- #endif
-+	case ARPHRD_6LOWPAN:
-+		rc = "ARPHRD_6LOWPAN";
-+		break;
- 	case ARPHRD_VOID:
- 		rc = "ARPHRD_VOID";
- 		break;
+Maybe somebody can also work on the ToDo's like C=0 handling at first and
+then have some "mechanism" to switch to C=1.
+
+How to setup:
+
+Nodes which sends RA messages need to setup 6CO before.
+This is the "lowpanco" field in the configuration.
+
+All others nodes need to run radvd as well, but processing RA messages only.
+To setup their 6CO fields, when receiving RA messages.
+
+This can be done by a simple configuration with one entry for 6lowpan
+interfaces with "AdvSendAdvert off;".
+
+IMPORTANT NOTE:
+
+This requires the patch which is not mainline yet, to set 6CO option fields
+as userspace option. Otherwise the kernel will filter it. See [1]. As well,
+you need the pending patches on the list for stateful compression, see [2].
+
+- Alex
+
+[0] https://github.com/reubenhwk/radvd/issues/50#issuecomment-183329181
+[1] http://www.spinics.net/lists/linux-wpan/msg03364.html
+[2] http://www.spinics.net/lists/linux-wpan/msg03453.html
+
+Alexander Aring (2):
+  device-linux: replace ARPHRD_IEEE802154 to ARPHRD_6LOWPAN
+  radvd: rework 6CO handling
+
+ defaults.h      |   3 ++
+ device-bsd44.c  |  24 ++++++++++
+ device-linux.c  |  43 +++++++++++++++--
+ gram.y          |  72 ++++++++++++++++++++++------
+ pathnames.h     |   4 ++
+ privsep-linux.c | 142 +++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ process.c       |  44 ++++++++++++++++++
+ radvd.h         |  18 ++++++-
+ scanner.l       |   2 +-
+ send.c          |  32 ++++++++-----
+ 10 files changed, 352 insertions(+), 32 deletions(-)
+
 -- 
 2.7.1
 
