@@ -1,5 +1,5 @@
 Return-Path: <linux-kernel-owner@vger.kernel.org>
-Date: Thu, 18 Feb 2016 08:38:03 -0600
+Date: Thu, 18 Feb 2016 08:37:54 -0600
 From: Rob Herring <robh@kernel.org>
 To: Amitkumar Karwar <akarwar@marvell.com>
 Cc: linux-bluetooth@vger.kernel.org,
@@ -7,85 +7,62 @@ Cc: linux-bluetooth@vger.kernel.org,
 	wnhuang@chromium.com, devicetree@vger.kernel.org,
 	Cathy Luo <cluo@marvell.com>, linux-kernel@vger.kernel.org,
 	Xinming Hu <huxm@marvell.com>
-Subject: Re: [PATCH v4 1/3] mwifiex: register platform specific driver
-Message-ID: <20160218143803.GX9654@rob-hp-laptop>
+Subject: Re: [PATCH v4 3/3] mwifiex: parse host wakeup configuration from
+ device
+Message-ID: <20160218143754.GV9654@rob-hp-laptop>
 References: <1455614079-4263-1-git-send-email-akarwar@marvell.com>
+ <1455614079-4263-3-git-send-email-akarwar@marvell.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1455614079-4263-1-git-send-email-akarwar@marvell.com>
+In-Reply-To: <1455614079-4263-3-git-send-email-akarwar@marvell.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, Feb 16, 2016 at 01:14:37AM -0800, Amitkumar Karwar wrote:
+On Tue, Feb 16, 2016 at 01:14:39AM -0800, Amitkumar Karwar wrote:
 > From: Xinming Hu <huxm@marvell.com>
 > 
-> Platform device and driver provides easy way to interact with
-> device-tree-enabled system.
-> 
-> This patch registers platform driver and reorganise existing device
-> tree specific code. Corresponding device tree binding file is also
-> created.
+> This patch implement a framework for board specific wakeup.
+> driver parse irq/gpio number from device tree, corresponding
+> resources will be allocated, and used for host suspend/resume.
+> driver private binding file is also updated in the patch.
 > 
 > Signed-off-by: Xinming Hu <huxm@marvell.com>
 > Signed-off-by: Amitkumar Karwar <akarwar@marvell.com>
 > ---
-> v3: Don't update adapter->dt_node if mwifiex_plt_dev is NULL
-> v4: Corrected the 'name' and 'compatible' property names.(Arnd Bergmann and Rob
->     Herring)
->     Patch description wraped in 72 columns(Rob Herring)
->     Moved DT binding file to bindings/net/wireless/(Rob Herring)
+> v4: Replaced #ifdef with __maybe_unused(Arnd Bergmann)
 > ---
->  .../bindings/net/wireless/marvell-sd8xxx.txt       | 29 +++++++++++
-
-Again, one patch for all the binding changes.
-
->  drivers/net/wireless/marvell/mwifiex/Makefile      |  1 +
->  drivers/net/wireless/marvell/mwifiex/main.c        |  2 +
->  drivers/net/wireless/marvell/mwifiex/main.h        | 14 +++++
->  .../net/wireless/marvell/mwifiex/platform_drv.c    | 59 ++++++++++++++++++++++
->  drivers/net/wireless/marvell/mwifiex/sta_cmd.c     |  4 +-
->  6 files changed, 107 insertions(+), 2 deletions(-)
->  create mode 100644 Documentation/devicetree/bindings/net/wireless/marvell-sd8xxx.txt
->  create mode 100644 drivers/net/wireless/marvell/mwifiex/platform_drv.c
+>  .../bindings/net/wireless/marvell-sd8xxx.txt       | 10 +++
+>  .../net/wireless/marvell/mwifiex/platform_drv.c    | 91 ++++++++++++++++++++++
+>  2 files changed, 101 insertions(+)
 > 
 > diff --git a/Documentation/devicetree/bindings/net/wireless/marvell-sd8xxx.txt b/Documentation/devicetree/bindings/net/wireless/marvell-sd8xxx.txt
-> new file mode 100644
-> index 0000000..f7671ae
-> --- /dev/null
+> index c337fab..50138fd 100644
+> --- a/Documentation/devicetree/bindings/net/wireless/marvell-sd8xxx.txt
 > +++ b/Documentation/devicetree/bindings/net/wireless/marvell-sd8xxx.txt
-> @@ -0,0 +1,29 @@
-> +Marvell Sd8xxx Wireless devices
-> +------
-> +
-> +Required properties:
-> +
-> +  - name : must be "wlan"
-> +  - compatible : must be "marvell,sd8xxx"
+> @@ -14,6 +14,11 @@ Optional properties:
+>    - marvell,wakeup-gpios : Chip's wakeup gpio pin number. This needs to be downloaded
+>  			to to firmware. Chip notifies wifi wakeup signal to SOC
+>  			through this pin.
+> +  - interrupt-parent: phandle of the parent interrupt controller
+> +  - interrupts : interrupt number to the cpu
+> +  - gpios: specify SOC's wakeup GPIO
 
-No wildcards as Arnd mentioned.
+If you define the GPIO line as an interrupt, you shouldn't need it to be 
+as GPIO too. Same on the BT side.
 
-> +
-> +Optional properties:
-> +
-> +  - marvell,caldata* : A series of properties with marvell,caldata prefix,
-> +  		      represent Calibration data downloaded to the device during
-> +		      initialization. This is an array of unsigned values.
-> +
-> +
-> +Example:
-> +
-> +Tx power limit calibration data is configured in below example.
-> +The calibration data is an array of unsigned values, the length
-> +can vary between hw versions.
-> +
-> +wlan {
-
-This also needs to be specified as a subnode of the SDIO controller.
-
-> +	compatible = "marvell,sd8xxx";
-> +
-> +	marvell,caldata_00_txpwrlimit_2g_cfg_set = /bits/ 8 <
-> +0x01 0x00 0x06 0x00 0x08 0x02 0x89 0x01 ...>;
-> +
-> +};
-> +
+> +  - pinctrl-names : a pinctrl state named "default" must be defined
+> +  - pinctrl-0 : pin control group to be used for this controller
+>  
+>  Example:
+>  
+> @@ -27,5 +32,10 @@ wlan {
+>  	marvell,caldata_00_txpwrlimit_2g_cfg_set = /bits/ 8 <
+>  0x01 0x00 0x06 0x00 0x08 0x02 0x89 0x01 ...>;
+>  	marvell,wakeup-gpios = <3>;
+> +	interrupt-parent = <&pio>;
+> +	interrupts = <38 IRQ_TYPE_LEVEL_LOW>;
+> +	gpios = <&pio 38 GPIO_ACTIVE_HIGH>;
+> +	pinctrl-names = "default";
+> +	pinctrl-0 = <&wake_pins>;
+>  };
+>  
