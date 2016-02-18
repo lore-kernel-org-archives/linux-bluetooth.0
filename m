@@ -1,5 +1,5 @@
 Return-Path: <linux-kernel-owner@vger.kernel.org>
-Date: Thu, 18 Feb 2016 08:37:57 -0600
+Date: Thu, 18 Feb 2016 08:38:03 -0600
 From: Rob Herring <robh@kernel.org>
 To: Amitkumar Karwar <akarwar@marvell.com>
 Cc: linux-bluetooth@vger.kernel.org,
@@ -7,47 +7,85 @@ Cc: linux-bluetooth@vger.kernel.org,
 	wnhuang@chromium.com, devicetree@vger.kernel.org,
 	Cathy Luo <cluo@marvell.com>, linux-kernel@vger.kernel.org,
 	Xinming Hu <huxm@marvell.com>
-Subject: Re: [PATCH v4 2/3] mwifiex: parse chip specific gpio from device tree
-Message-ID: <20160218143757.GW9654@rob-hp-laptop>
+Subject: Re: [PATCH v4 1/3] mwifiex: register platform specific driver
+Message-ID: <20160218143803.GX9654@rob-hp-laptop>
 References: <1455614079-4263-1-git-send-email-akarwar@marvell.com>
- <1455614079-4263-2-git-send-email-akarwar@marvell.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1455614079-4263-2-git-send-email-akarwar@marvell.com>
+In-Reply-To: <1455614079-4263-1-git-send-email-akarwar@marvell.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, Feb 16, 2016 at 01:14:38AM -0800, Amitkumar Karwar wrote:
+On Tue, Feb 16, 2016 at 01:14:37AM -0800, Amitkumar Karwar wrote:
 > From: Xinming Hu <huxm@marvell.com>
 > 
-> This patch parse chip specific gpio parameter from device
-> tree. Corresponding binding file is also updated.
+> Platform device and driver provides easy way to interact with
+> device-tree-enabled system.
+> 
+> This patch registers platform driver and reorganise existing device
+> tree specific code. Corresponding device tree binding file is also
+> created.
 > 
 > Signed-off-by: Xinming Hu <huxm@marvell.com>
 > Signed-off-by: Amitkumar Karwar <akarwar@marvell.com>
 > ---
-> v4: Renamed "mwifiex,chip-gpio" to "marvell,wakeup-gpios"(Rob Herring/
->     Arnd Bergmann)
+> v3: Don't update adapter->dt_node if mwifiex_plt_dev is NULL
+> v4: Corrected the 'name' and 'compatible' property names.(Arnd Bergmann and Rob
+>     Herring)
+>     Patch description wraped in 72 columns(Rob Herring)
+>     Moved DT binding file to bindings/net/wireless/(Rob Herring)
 > ---
->  .../devicetree/bindings/net/wireless/marvell-sd8xxx.txt          | 6 ++++--
+>  .../bindings/net/wireless/marvell-sd8xxx.txt       | 29 +++++++++++
 
-Combine this with the DT change in the next patch.
+Again, one patch for all the binding changes.
 
->  drivers/net/wireless/marvell/mwifiex/sta_cmd.c                   | 9 +++++++++
->  2 files changed, 13 insertions(+), 2 deletions(-)
+>  drivers/net/wireless/marvell/mwifiex/Makefile      |  1 +
+>  drivers/net/wireless/marvell/mwifiex/main.c        |  2 +
+>  drivers/net/wireless/marvell/mwifiex/main.h        | 14 +++++
+>  .../net/wireless/marvell/mwifiex/platform_drv.c    | 59 ++++++++++++++++++++++
+>  drivers/net/wireless/marvell/mwifiex/sta_cmd.c     |  4 +-
+>  6 files changed, 107 insertions(+), 2 deletions(-)
+>  create mode 100644 Documentation/devicetree/bindings/net/wireless/marvell-sd8xxx.txt
+>  create mode 100644 drivers/net/wireless/marvell/mwifiex/platform_drv.c
 > 
 > diff --git a/Documentation/devicetree/bindings/net/wireless/marvell-sd8xxx.txt b/Documentation/devicetree/bindings/net/wireless/marvell-sd8xxx.txt
-> index f7671ae..c337fab 100644
-> --- a/Documentation/devicetree/bindings/net/wireless/marvell-sd8xxx.txt
+> new file mode 100644
+> index 0000000..f7671ae
+> --- /dev/null
 > +++ b/Documentation/devicetree/bindings/net/wireless/marvell-sd8xxx.txt
-> @@ -11,7 +11,9 @@ Optional properties:
->    - marvell,caldata* : A series of properties with marvell,caldata prefix,
->    		      represent Calibration data downloaded to the device during
->  		      initialization. This is an array of unsigned values.
-> -
-> +  - marvell,wakeup-gpios : Chip's wakeup gpio pin number. This needs to be downloaded
-> +			to to firmware. Chip notifies wifi wakeup signal to SOC
-> +			through this pin.
+> @@ -0,0 +1,29 @@
+> +Marvell Sd8xxx Wireless devices
+> +------
+> +
+> +Required properties:
+> +
+> +  - name : must be "wlan"
+> +  - compatible : must be "marvell,sd8xxx"
 
-This is still confusing that it is not a GPIO from the host. I'd suggest 
-"marvell,wakeup-pin"
+No wildcards as Arnd mentioned.
+
+> +
+> +Optional properties:
+> +
+> +  - marvell,caldata* : A series of properties with marvell,caldata prefix,
+> +  		      represent Calibration data downloaded to the device during
+> +		      initialization. This is an array of unsigned values.
+> +
+> +
+> +Example:
+> +
+> +Tx power limit calibration data is configured in below example.
+> +The calibration data is an array of unsigned values, the length
+> +can vary between hw versions.
+> +
+> +wlan {
+
+This also needs to be specified as a subnode of the SDIO controller.
+
+> +	compatible = "marvell,sd8xxx";
+> +
+> +	marvell,caldata_00_txpwrlimit_2g_cfg_set = /bits/ 8 <
+> +0x01 0x00 0x06 0x00 0x08 0x02 0x89 0x01 ...>;
+> +
+> +};
+> +
