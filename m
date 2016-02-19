@@ -1,43 +1,56 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Subject: =?UTF-8?Q?Re:_Documentation_f=c3=bcr_bluetooth_low_energy?=
-To: linux-bluetooth@vger.kernel.org
-References: <56C5938F.6070504@rie.eu>
-From: =?UTF-8?Q?J=c3=bcrgen_Benjamin_Ronshausen?= <b.r@rie.eu>
-Message-ID: <56C6E696.6030803@rie.eu>
-Date: Fri, 19 Feb 2016 10:55:34 +0100
+Return-Path: <pgynther@google.com>
 MIME-Version: 1.0
-In-Reply-To: <56C5938F.6070504@rie.eu>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1455134446-70401-1-git-send-email-pgynther@google.com>
+References: <1455134446-70401-1-git-send-email-pgynther@google.com>
+Date: Thu, 18 Feb 2016 21:31:14 -0800
+Message-ID: <CAGXr9JFoDZP1iaoJX49pY21aXHJRrbygxvJ8Kaq_d2Q0qMkuSQ@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: btbcm: Fix handling of firmware not found
+From: Petri Gynther <pgynther@google.com>
+To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@intel.com>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Am 18.02.2016 um 10:49 schrieb Jürgen Benjamin Ronshausen:
-> Hello,
+On Wed, Feb 10, 2016 at 12:00 PM, Petri Gynther <pgynther@google.com> wrote:
 >
-> i am working with Bluez 4.96, kernel 3.2 on embedded ARM and i try to
-> figure bluetooth low energy out.
+> If the call to request_firmware() fails in btbcm_setup_patchram(),
+> the BCM chip will be operating with its default firmware.
 >
-> I looked at the code behind hcitool lescan. I wonder is there a
-> documentation for the low energy commands?
+> In this case, btbcm_setup_patchram() should not return immediately
+> but instead should skip to btbcm_check_bdaddr() and quirk setup.
 >
-> I want to know when beacons are around.
+> Signed-off-by: Petri Gynther <pgynther@google.com>
+> ---
+>  drivers/bluetooth/btbcm.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 >
-> My understandig is open bluetooth socket, specify scan parameters,
-> enable scan, set filter for socket and then poll the socket.
+> diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
+> index 0b69794..7d82b1a 100644
+> --- a/drivers/bluetooth/btbcm.c
+> +++ b/drivers/bluetooth/btbcm.c
+> @@ -467,7 +467,7 @@ int btbcm_setup_patchram(struct hci_dev *hdev)
+>         err = request_firmware(&fw, fw_name, &hdev->dev);
+>         if (err < 0) {
+>                 BT_INFO("%s: BCM: Patch %s not found", hdev->name, fw_name);
+> -               return 0;
+> +               goto check_bdaddr;
+>         }
 >
-> And if i want the signal quality i have to connect to the beacon first.
+>         btbcm_patchram(hdev, fw);
+> @@ -501,6 +501,7 @@ int btbcm_setup_patchram(struct hci_dev *hdev)
+>         BT_INFO("%s: %s", hdev->name, (char *)(skb->data + 1));
+>         kfree_skb(skb);
 >
-> Can someone point me to the docs, so i can educate myself please.
+> +check_bdaddr:
+>         btbcm_check_bdaddr(hdev);
 >
-> Thanks
->
-> Regards
->
-> Benjamin
+>         set_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks);
 > --
-> To unsubscribe from this list: send the line "unsubscribe
-> linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> 2.7.0.rc3.207.g0ac5344
+>
 
-Found it Bluetooth 4.0 core specs and so on
+Any comments?
+
+BCM BT controllers can operate with their default firmware if newer
+firmware is not available in the system, so btbcm_setup_patchram()
+should take the same actions whether the firmware got updated or not.
