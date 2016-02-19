@@ -1,57 +1,67 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 9.2 \(3112\))
-Subject: Re: [PATCH] Bluetooth: btbcm: Fix handling of firmware not found
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1455134446-70401-1-git-send-email-pgynther@google.com>
-Date: Fri, 19 Feb 2016 16:55:22 -0800
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>,
-	Johan Hedberg <johan.hedberg@intel.com>
-Message-Id: <D8912AC0-4457-468D-B65C-2A1D8F03ACD7@holtmann.org>
-References: <1455134446-70401-1-git-send-email-pgynther@google.com>
-To: Petri Gynther <pgynther@google.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <dianders@chromium.org>
+From: Douglas Anderson <dianders@chromium.org>
+To: Johan Hedberg <johan.hedberg@intel.com>,
+	Marcel Holtmann <marcel@holtmann.org>
+Cc: Douglas Anderson <dianders@chromium.org>,
+	gustavo@padovan.org,
+	johan.hedberg@gmail.com,
+	davem@davemloft.net,
+	linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] Bluetooth: hci_core: Avoid mixing up req_complete and req_complete_skb
+Date: Fri, 19 Feb 2016 14:25:21 -0800
+Message-Id: <1455920722-20892-1-git-send-email-dianders@chromium.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Petri,
+In commit 44d271377479 ("Bluetooth: Compress the size of struct
+hci_ctrl") we squashed down the size of the structure by using a union
+with the assumption that all users would use the flag to determine
+whether we had a req_complete or a req_complete_skb.
 
-> If the call to request_firmware() fails in btbcm_setup_patchram(),
-> the BCM chip will be operating with its default firmware.
-> 
-> In this case, btbcm_setup_patchram() should not return immediately
-> but instead should skip to btbcm_check_bdaddr() and quirk setup.
-> 
-> Signed-off-by: Petri Gynther <pgynther@google.com>
-> ---
-> drivers/bluetooth/btbcm.c | 3 ++-
-> 1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
-> index 0b69794..7d82b1a 100644
-> --- a/drivers/bluetooth/btbcm.c
-> +++ b/drivers/bluetooth/btbcm.c
-> @@ -467,7 +467,7 @@ int btbcm_setup_patchram(struct hci_dev *hdev)
-> 	err = request_firmware(&fw, fw_name, &hdev->dev);
-> 	if (err < 0) {
-> 		BT_INFO("%s: BCM: Patch %s not found", hdev->name, fw_name);
-> -		return 0;
-> +		goto check_bdaddr;
-> 	}
-> 
-> 	btbcm_patchram(hdev, fw);
-> @@ -501,6 +501,7 @@ int btbcm_setup_patchram(struct hci_dev *hdev)
-> 	BT_INFO("%s: %s", hdev->name, (char *)(skb->data + 1));
-> 	kfree_skb(skb);
-> 
-> +check_bdaddr:
+Unfortunately we had a case in hci_req_cmd_complete() where we weren't
+looking at the flag.  This can result in a situation where we might be
+storing a hci_req_complete_skb_t in a hci_req_complete_t variable, or
+vice versa.
 
-lets just call this label "done". I think using check_bdaddr might be a bit of misleading labeling here. Since we actually want it to run all success test including the duplicate filter setting.
+During some testing I found at least one case where the function
+hci_req_sync_complete() was called improperly because the kernel thought
+that it didn't require an SKB.  Looking through the stack in kgdb I
+found that it was called by hci_event_packet() and that
+hci_event_packet() had both of its locals "req_complete" and
+"req_complete_skb" pointing to the same place: both to
+hci_req_sync_complete().
 
-> 	btbcm_check_bdaddr(hdev);
-> 
-> 	set_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks);
+Let's make sure we always check the flag.
 
-Regards
+For more details on debugging done, see <http://crbug.com/588288>.
 
-Marcel
+Fixes: 44d271377479 ("Bluetooth: Compress the size of struct hci_ctrl")
+Signed-off-by: Douglas Anderson <dianders@chromium.org>
+---
+Testing was done on a Chrome OS device on kernel 3.14 w/
+bluetooth-next backports.  Since I couldn't reliably reproduce the
+problem, I simply confirmed that existing functionality worked.
 
+ net/bluetooth/hci_core.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 541760fe53d4..9c0a6830ff92 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -4118,8 +4118,10 @@ void hci_req_cmd_complete(struct hci_dev *hdev, u16 opcode, u8 status,
+ 			break;
+ 		}
+ 
+-		*req_complete = bt_cb(skb)->hci.req_complete;
+-		*req_complete_skb = bt_cb(skb)->hci.req_complete_skb;
++		if (bt_cb(skb)->hci.req_flags & HCI_REQ_SKB)
++			*req_complete_skb = bt_cb(skb)->hci.req_complete_skb;
++		else
++			*req_complete = bt_cb(skb)->hci.req_complete;
+ 		kfree_skb(skb);
+ 	}
+ 	spin_unlock_irqrestore(&hdev->cmd_q.lock, flags);
+-- 
+2.7.0.rc3.207.g0ac5344
