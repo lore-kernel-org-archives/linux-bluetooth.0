@@ -1,67 +1,50 @@
-Return-Path: <dianders@chromium.org>
-From: Douglas Anderson <dianders@chromium.org>
-To: Johan Hedberg <johan.hedberg@intel.com>,
-	Marcel Holtmann <marcel@holtmann.org>
-Cc: Douglas Anderson <dianders@chromium.org>,
-	gustavo@padovan.org,
-	johan.hedberg@gmail.com,
-	davem@davemloft.net,
-	linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] Bluetooth: hci_core: Avoid mixing up req_complete and req_complete_skb
-Date: Fri, 19 Feb 2016 14:25:21 -0800
-Message-Id: <1455920722-20892-1-git-send-email-dianders@chromium.org>
+Return-Path: <jirislaby@gmail.com>
+Subject: Re: net/bluetooth: workqueue destruction WARNING in
+ hci_unregister_dev
+To: Tejun Heo <tj@kernel.org>, Dmitry Vyukov <dvyukov@google.com>
+References: <CACT4Y+ax7zMOxe+kd4tw5Xdbvt=qPdBhXGO0j7qJwdn5tsfNNg@mail.gmail.com>
+ <56C5CE85.6090808@suse.cz>
+ <CACT4Y+bVXfY=wBZ+08rq16tHFw9s3YDrE_LCS=to-GF70AffRQ@mail.gmail.com>
+ <20160218174427.GG13177@mtj.duckdns.org> <56C6EC62.8080107@suse.cz>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+ Gustavo Padovan <gustavo@padovan.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, linux-bluetooth@vger.kernel.org,
+ netdev <netdev@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>,
+ syzkaller <syzkaller@googlegroups.com>, Kostya Serebryany <kcc@google.com>,
+ Alexander Potapenko <glider@google.com>, Sasha Levin
+ <sasha.levin@oracle.com>, Eric Dumazet <edumazet@google.com>,
+ Takashi Iwai <tiwai@suse.com>
+From: Jiri Slaby <jslaby@suse.cz>
+Message-ID: <56C70618.3010902@suse.cz>
+Date: Fri, 19 Feb 2016 13:10:00 +0100
+MIME-Version: 1.0
+In-Reply-To: <56C6EC62.8080107@suse.cz>
+Content-Type: text/plain; charset=windows-1252
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-In commit 44d271377479 ("Bluetooth: Compress the size of struct
-hci_ctrl") we squashed down the size of the structure by using a union
-with the assumption that all users would use the flag to determine
-whether we had a req_complete or a req_complete_skb.
+On 02/19/2016, 11:20 AM, Jiri Slaby wrote:
+> On 02/18/2016, 06:44 PM, Tejun Heo wrote:
+>> Hello,
+>>
+>> Can you please do the followings?
+>>
+>> 1. Remove WQ_MEM_RECLAIM from the affected workqueue and see whether
+>>    the problem is reproducible.  WQ_MEM_RECLAIM on anything bluetooth
+>>    doesn't make sense btw.  Why is it there?
+>>
+>> 2. If WQ_MEM_RECLAIM makes the issue go away, see whether the attached
+>>    patch works too.
+> 
+> Hello,
+> 
+> 1. didn't help, the problem persists. So I haven't applied the patch from 2.
 
-Unfortunately we had a case in hci_req_cmd_complete() where we weren't
-looking at the flag.  This can result in a situation where we might be
-storing a hci_req_complete_skb_t in a hci_req_complete_t variable, or
-vice versa.
+FWIW I dumped more info about the wq:
+wq->name='hci0' pwq=ffff8800390d7600 wq->dfl_pwq=ffff8800390d5200
+pwq->refcnt=2 pwq->nr_active=0 delayed_works: <nothing>
 
-During some testing I found at least one case where the function
-hci_req_sync_complete() was called improperly because the kernel thought
-that it didn't require an SKB.  Looking through the stack in kgdb I
-found that it was called by hci_event_packet() and that
-hci_event_packet() had both of its locals "req_complete" and
-"req_complete_skb" pointing to the same place: both to
-hci_req_sync_complete().
-
-Let's make sure we always check the flag.
-
-For more details on debugging done, see <http://crbug.com/588288>.
-
-Fixes: 44d271377479 ("Bluetooth: Compress the size of struct hci_ctrl")
-Signed-off-by: Douglas Anderson <dianders@chromium.org>
----
-Testing was done on a Chrome OS device on kernel 3.14 w/
-bluetooth-next backports.  Since I couldn't reliably reproduce the
-problem, I simply confirmed that existing functionality worked.
-
- net/bluetooth/hci_core.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
-
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 541760fe53d4..9c0a6830ff92 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -4118,8 +4118,10 @@ void hci_req_cmd_complete(struct hci_dev *hdev, u16 opcode, u8 status,
- 			break;
- 		}
- 
--		*req_complete = bt_cb(skb)->hci.req_complete;
--		*req_complete_skb = bt_cb(skb)->hci.req_complete_skb;
-+		if (bt_cb(skb)->hci.req_flags & HCI_REQ_SKB)
-+			*req_complete_skb = bt_cb(skb)->hci.req_complete_skb;
-+		else
-+			*req_complete = bt_cb(skb)->hci.req_complete;
- 		kfree_skb(skb);
- 	}
- 	spin_unlock_irqrestore(&hdev->cmd_q.lock, flags);
+> thanks,
 -- 
-2.7.0.rc3.207.g0ac5344
+js
+suse labs
