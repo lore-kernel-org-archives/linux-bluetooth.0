@@ -1,53 +1,27 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 9.2 \(3112\))
-Subject: Re: [PATCH] Bluetooth: btbcm: Fix handling of firmware not found
+Subject: Re: [PATCH] Bluetooth: hci_bcm: Add new ACPI ID for bcm43241
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <D8912AC0-4457-468D-B65C-2A1D8F03ACD7@holtmann.org>
-Date: Fri, 19 Feb 2016 17:16:49 -0800
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>,
-	Johan Hedberg <johan.hedberg@intel.com>
-Message-Id: <6843E05B-32FC-47C1-B34A-75D87C969E37@holtmann.org>
-References: <1455134446-70401-1-git-send-email-pgynther@google.com> <D8912AC0-4457-468D-B65C-2A1D8F03ACD7@holtmann.org>
-To: Petri Gynther <pgynther@google.com>
+In-Reply-To: <1454366875-32259-1-git-send-email-jjmeijer88@gmail.com>
+Date: Fri, 19 Feb 2016 17:17:01 -0800
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <B11B5210-E4F1-4E58-A9E2-C8DCF74386AA@holtmann.org>
+References: <[PATCH] Another ACPI ID for bcm43241> <1454366875-32259-1-git-send-email-jjmeijer88@gmail.com>
+To: "J.J. Meijer" <jjmeijer88@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Petri,
+Hi,
 
->> If the call to request_firmware() fails in btbcm_setup_patchram(),
->> the BCM chip will be operating with its default firmware.
->> 
->> In this case, btbcm_setup_patchram() should not return immediately
->> but instead should skip to btbcm_check_bdaddr() and quirk setup.
->> 
->> Signed-off-by: Petri Gynther <pgynther@google.com>
->> ---
->> drivers/bluetooth/btbcm.c | 3 ++-
->> 1 file changed, 2 insertions(+), 1 deletion(-)
->> 
->> diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
->> index 0b69794..7d82b1a 100644
->> --- a/drivers/bluetooth/btbcm.c
->> +++ b/drivers/bluetooth/btbcm.c
->> @@ -467,7 +467,7 @@ int btbcm_setup_patchram(struct hci_dev *hdev)
->> 	err = request_firmware(&fw, fw_name, &hdev->dev);
->> 	if (err < 0) {
->> 		BT_INFO("%s: BCM: Patch %s not found", hdev->name, fw_name);
->> -		return 0;
->> +		goto check_bdaddr;
->> 	}
->> 
->> 	btbcm_patchram(hdev, fw);
->> @@ -501,6 +501,7 @@ int btbcm_setup_patchram(struct hci_dev *hdev)
->> 	BT_INFO("%s: %s", hdev->name, (char *)(skb->data + 1));
->> 	kfree_skb(skb);
->> 
->> +check_bdaddr:
+> This ACPI ID is used at least by HP for their Omni 10 5600eg tablet.
 > 
-> lets just call this label "done". I think using check_bdaddr might be a bit of misleading labeling here. Since we actually want it to run all success test including the duplicate filter setting.
+> Signed-off-by: meijjaa <jjmeijer88@gmail.com>
+> ---
+> drivers/bluetooth/hci_bcm.c | 1 +
+> 1 file changed, 1 insertion(+)
 
-actually I just did an inline edit of the patch to change the label name and applied the patch. There is really no point in you wasting time to respin it.
+your patch has been applied to bluetooth-next tree.
 
 Regards
 
