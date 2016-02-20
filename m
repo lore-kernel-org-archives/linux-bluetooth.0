@@ -1,58 +1,221 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 9.2 \(3112\))
-Subject: Re: [PATCH] Bluetooth: hci_core: Avoid mixing up req_complete and req_complete_skb
+Subject: Re: [RFC] doc: Add Management Interface IPSP API definitions
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1455920722-20892-1-git-send-email-dianders@chromium.org>
-Date: Sat, 20 Feb 2016 00:00:08 -0800
-Cc: Johan Hedberg <johan.hedberg@intel.com>,
-	"Gustavo F. Padovan" <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>,
-	Network Development <netdev@vger.kernel.org>,
-	linux-kernel@vger.kernel.org
-Message-Id: <CD3AFCBA-7C0C-46EF-B282-A1AE0FF9C6EE@holtmann.org>
-References: <1455920722-20892-1-git-send-email-dianders@chromium.org>
-To: Douglas Anderson <dianders@chromium.org>
+In-Reply-To: <1455797845-27533-1-git-send-email-patrik.flykt@linux.intel.com>
+Date: Fri, 19 Feb 2016 23:59:13 -0800
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <08B4C3A1-DC90-4D77-B4B0-B15AC0CF05F4@holtmann.org>
+References: <1455797845-27533-1-git-send-email-patrik.flykt@linux.intel.com>
+To: Patrik Flykt <Patrik.Flykt@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Douglas,
+Hi Patrik,
 
-> In commit 44d271377479 ("Bluetooth: Compress the size of struct
-> hci_ctrl") we squashed down the size of the structure by using a union
-> with the assumption that all users would use the flag to determine
-> whether we had a req_complete or a req_complete_skb.
+> Here is an update on the 6lowpan Network Management API posted by Johan
+> June last year. The proposed Network Management API has now been merged
+> into the existing Bluetooth Management API with only the 6lowpan
+> specific commands and events added and updated according to comments,
+> including a rename to IPSP.
 > 
-> Unfortunately we had a case in hci_req_cmd_complete() where we weren't
-> looking at the flag.  This can result in a situation where we might be
-> storing a hci_req_complete_skb_t in a hci_req_complete_t variable, or
-> vice versa.
+> The interface index has been set to 4 octets for those commands that added
+> one. In the kernel it seems 'int' is used, so some further figuring out
+> is perhaps needed - or then I just missed something.
 > 
-> During some testing I found at least one case where the function
-> hci_req_sync_complete() was called improperly because the kernel thought
-> that it didn't require an SKB.  Looking through the stack in kgdb I
-> found that it was called by hci_event_packet() and that
-> hci_event_packet() had both of its locals "req_complete" and
-> "req_complete_skb" pointing to the same place: both to
-> hci_req_sync_complete().
 > 
-> Let's make sure we always check the flag.
+> Cheers,
 > 
-> For more details on debugging done, see <http://crbug.com/588288>.
+> 	Patrik
 > 
-> Fixes: 44d271377479 ("Bluetooth: Compress the size of struct hci_ctrl")
-> Signed-off-by: Douglas Anderson <dianders@chromium.org>
-> ---
-> Testing was done on a Chrome OS device on kernel 3.14 w/
-> bluetooth-next backports.  Since I couldn't reliably reproduce the
-> problem, I simply confirmed that existing functionality worked.
+> doc/doc.txt      |   0
+> doc/mgmt-api.txt | 145 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+> 2 files changed, 145 insertions(+)
+> create mode 100644 doc/doc.txt
 > 
-> net/bluetooth/hci_core.c | 6 ++++--
-> 1 file changed, 4 insertions(+), 2 deletions(-)
+> diff --git a/doc/doc.txt b/doc/doc.txt
+> new file mode 100644
+> index 0000000..e69de29
+> diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
+> index 731a088..34d1736 100644
+> --- a/doc/mgmt-api.txt
+> +++ b/doc/mgmt-api.txt
+> @@ -2801,6 +2801,114 @@ Start Limited Discovery Command
+> 				Invalid Index
+> 
+> 
+> +Connect IPSP Command
+> +====================
+> +
+> +	Command Code:		0x0042
+> +	Controller Index:	<controller id>
+> +	Command Parameters:	Address (6 Octets)
+> +				Address_Type (1 Octet)
+> +	Return Parameters:	Interface Index (4 Octets)
+> +				Address (6 Octets)
+> +				Address_Type (1 Octet)
 
-patch has been applied to bluetooth-stable tree.
+I think you really want to swap this. Address + Type first and then Interface Index.
+
+> +
+> +	This command is used to connect to a remote IPSP Node.
+> +
+> +	Possible values for the Address_Type parameter:
+> +		1	LE Public
+> +		2	LE Random
+> +
+> +	This command generates a Command Complete event on success
+> +	or failure.
+> +
+> +	Possible errors:	Busy
+> +				Refused
+> +				Invalid Parameters
+> +				Not Powered
+> +				Invalid Index
+> +				Already Connected
+> +
+> +
+> +Disconnect IPSP Command
+> +=======================
+> +
+> +	Command Code:		0x0043
+> +	Controller Index:	<controller id>
+> +	Command Parameters:	Address (6 Octets)
+> +				Address_Type (1 Octet)
+> +	Return Parameters:	Address (6 Octets)
+> +				Address_Type (1 Octet)
+> +
+> +	This command is used to disconnect from a remote IPSP device.
+> +
+> +	Possible values for the Address_Type parameter:
+> +		1	LE Public
+> +		2	LE Random
+
+I actually prefer that we list 0 value as reserved like we have done for the other LE only commands.
+
+In addition we might want to make clear that these commands are only supported if LE is actually enabled first.
+
+> +
+> +	This command generates a Command Complete event on success
+> +	or failure.
+> +
+> +	Possible errors:	Busy
+> +				Not Connected
+> +				Invalid Parameters
+> +				Not Powered
+> +				Invalid Index
+> +
+> +
+> +Get IPSP Connections Command
+> +============================
+> +
+> +	Command Code:		0x0044
+> +	Controller Index:	<controller id>
+> +	Command Parameters:
+> +	Return Parameters:	Interface Index (4 Octets)
+> +				Connection_Count (2 Octets)
+> +				Address1 {
+> +					Address (6 Octets)
+> +					Address_Type (1 Octet)
+> +				}
+> +				Address2 { }
+> +				...
+
+I would normally assume that the Get Connections one comes before the Connect / Disconnect commands.
+
+> +
+> +	This command is used to retrieve a list of currently connected
+> +	IPSP devices.
+> +
+> +	Possible values for the Address_Type parameter:
+> +		1	LE Public
+> +		2	LE Random
+> +
+> +	For devices using resolvable random addresses with a known
+> +	identity resolving key, the Address and Address_Type will
+> +	contain the identity information.
+> +
+> +	This command can only be used when the controller is powered.
+> +
+> +	This command generates a Command Complete event on success or
+> +	a Command Status event on failure.
+> +
+> +	Possible errors:	Invalid Parameters
+> +				Not Powered
+> +				Invalid Index
+> +
+> +
+> +Enable IPSP Server Command
+> +==========================
+> +
+> +	Command Code:		0x0045
+> +	Controller Index:	<controller id>
+> +	Command Parameters:	Enable (1 Octet)
+> +	Return Parameters:
+
+Not a big fan of the command name. We never used the Enable Something term.
+
+> +
+> +	This command is used start a IPSP Server (Node rols) on a
+> +	specified controller.
+> +
+> +	This command generates a Command Complete event on success or
+> +	a Command Status event on failure.
+> +
+> +	Possible errors:	Busy
+> +				Invalid Index
+> +
+> +
+> Command Complete Event
+> ======================
+> 
+> @@ -3645,3 +3753,40 @@ Advertising Removed Event
+> 
+> 	The event will only be sent to management sockets other than the
+> 	one through which the command was sent.
+> +
+> +
+> +IPSP Connected Event
+> +====================
+> +
+> +	Event Code:		0x0025
+> +	Controller Index:	<controller id>
+> +	Event Parameters:	Interface Index (4 Octets)
+> +				Address (6 Octets)
+> +				Address_Type (1 Octet)
+
+Same here. I think they are in the wrong order.
+
+> +
+> +	This event indicates that a successful IPSP connection has
+> +	been created to the remote device.
+> +
+> +	For devices using resolvable random addresses with a known
+> +	identity resolving key, the Address and Address_Type will
+> +	contain the identity information.
+> +
+> +
+> +IPSP Disconnected Event
+> +=======================
+> +
+> +	Event Code:		0x0026
+> +	Controller Index:	<controller id>
+> +	Event Parameters:	Address (6 Octets)
+> +				Address_Type (1 Octet)
+> +
+> +	This event indicates that the IPSP connection was lost to a
+> +	remote device.
+> +
+> +	Possible values for the Address_Type parameter:
+> +		1	LE Public
+> +		2	LE Random
+> +
+> +	For devices using resolvable random addresses with a known
+> +	identity resolving key, the Address and Address_Type will
+> +	contain the identity information.
+
+I am not a huge fan of the IPSP in the commands and events. Can we find something better?
 
 Regards
 
