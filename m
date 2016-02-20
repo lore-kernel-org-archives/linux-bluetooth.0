@@ -1,59 +1,59 @@
-Return-Path: <johan.hedberg@gmail.com>
-Date: Sat, 20 Feb 2016 09:04:30 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Douglas Anderson <dianders@chromium.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>, gustavo@padovan.org,
-	davem@davemloft.net, linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: hci_core: Avoid mixing up req_complete and
- req_complete_skb
-Message-ID: <20160220070430.GA28199@t440s.ger.corp.intel.com>
-References: <1455920722-20892-1-git-send-email-dianders@chromium.org>
+Return-Path: <pgynther@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1455920722-20892-1-git-send-email-dianders@chromium.org>
+In-Reply-To: <6843E05B-32FC-47C1-B34A-75D87C969E37@holtmann.org>
+References: <1455134446-70401-1-git-send-email-pgynther@google.com>
+	<D8912AC0-4457-468D-B65C-2A1D8F03ACD7@holtmann.org>
+	<6843E05B-32FC-47C1-B34A-75D87C969E37@holtmann.org>
+Date: Fri, 19 Feb 2016 17:40:24 -0800
+Message-ID: <CAGXr9JHQpyJyHeFc9r4CG0meGu_S+qSECfwn3Lkc0AHLo_UefQ@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: btbcm: Fix handling of firmware not found
+From: Petri Gynther <pgynther@google.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>,
+	Johan Hedberg <johan.hedberg@intel.com>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Douglas,
+On Fri, Feb 19, 2016 at 5:16 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Petri,
+>
+>>> If the call to request_firmware() fails in btbcm_setup_patchram(),
+>>> the BCM chip will be operating with its default firmware.
+>>>
+>>> In this case, btbcm_setup_patchram() should not return immediately
+>>> but instead should skip to btbcm_check_bdaddr() and quirk setup.
+>>>
+>>> Signed-off-by: Petri Gynther <pgynther@google.com>
+>>> ---
+>>> drivers/bluetooth/btbcm.c | 3 ++-
+>>> 1 file changed, 2 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
+>>> index 0b69794..7d82b1a 100644
+>>> --- a/drivers/bluetooth/btbcm.c
+>>> +++ b/drivers/bluetooth/btbcm.c
+>>> @@ -467,7 +467,7 @@ int btbcm_setup_patchram(struct hci_dev *hdev)
+>>>      err = request_firmware(&fw, fw_name, &hdev->dev);
+>>>      if (err < 0) {
+>>>              BT_INFO("%s: BCM: Patch %s not found", hdev->name, fw_name);
+>>> -            return 0;
+>>> +            goto check_bdaddr;
+>>>      }
+>>>
+>>>      btbcm_patchram(hdev, fw);
+>>> @@ -501,6 +501,7 @@ int btbcm_setup_patchram(struct hci_dev *hdev)
+>>>      BT_INFO("%s: %s", hdev->name, (char *)(skb->data + 1));
+>>>      kfree_skb(skb);
+>>>
+>>> +check_bdaddr:
+>>
+>> lets just call this label "done". I think using check_bdaddr might be a bit of misleading labeling here. Since we actually want it to run all success test including the duplicate filter setting.
+>
+> actually I just did an inline edit of the patch to change the label name and applied the patch. There is really no point in you wasting time to respin it.
+>
+> Regards
+>
+> Marcel
+>
 
-On Fri, Feb 19, 2016, Douglas Anderson wrote:
-> In commit 44d271377479 ("Bluetooth: Compress the size of struct
-> hci_ctrl") we squashed down the size of the structure by using a union
-> with the assumption that all users would use the flag to determine
-> whether we had a req_complete or a req_complete_skb.
-> 
-> Unfortunately we had a case in hci_req_cmd_complete() where we weren't
-> looking at the flag.  This can result in a situation where we might be
-> storing a hci_req_complete_skb_t in a hci_req_complete_t variable, or
-> vice versa.
-> 
-> During some testing I found at least one case where the function
-> hci_req_sync_complete() was called improperly because the kernel thought
-> that it didn't require an SKB.  Looking through the stack in kgdb I
-> found that it was called by hci_event_packet() and that
-> hci_event_packet() had both of its locals "req_complete" and
-> "req_complete_skb" pointing to the same place: both to
-> hci_req_sync_complete().
-> 
-> Let's make sure we always check the flag.
-> 
-> For more details on debugging done, see <http://crbug.com/588288>.
-> 
-> Fixes: 44d271377479 ("Bluetooth: Compress the size of struct hci_ctrl")
-> Signed-off-by: Douglas Anderson <dianders@chromium.org>
-> ---
-> Testing was done on a Chrome OS device on kernel 3.14 w/
-> bluetooth-next backports.  Since I couldn't reliably reproduce the
-> problem, I simply confirmed that existing functionality worked.
-> 
->  net/bluetooth/hci_core.c | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
-
-Good catch.
-
-Acked-by: Johan Hedberg <johan.hedberg@intel.com>
-
-Marcel, I think we want to send this through our stable tree to 4.5-rc
-(where the patch introducing the bug is).
-
-Johan
+The patch applied to bluetooth-next looks good. Thanks.
