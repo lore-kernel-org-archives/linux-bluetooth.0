@@ -1,27 +1,32 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 9.2 \(3112\))
-Subject: Re: [PATCH] Bluetooth: hci_bcm: Add new ACPI ID for bcm43241
+Subject: Re: [PATCH] Bluetooth: btbcm: Fix handling of firmware not found
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1454366875-32259-1-git-send-email-jjmeijer88@gmail.com>
-Date: Fri, 19 Feb 2016 17:17:01 -0800
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <B11B5210-E4F1-4E58-A9E2-C8DCF74386AA@holtmann.org>
-References: <[PATCH] Another ACPI ID for bcm43241> <1454366875-32259-1-git-send-email-jjmeijer88@gmail.com>
-To: "J.J. Meijer" <jjmeijer88@gmail.com>
+In-Reply-To: <1455134446-70401-1-git-send-email-pgynther@google.com>
+Date: Fri, 19 Feb 2016 17:16:10 -0800
+Cc: linux-bluetooth@vger.kernel.org,
+	Johan Hedberg <johan.hedberg@intel.com>
+Message-Id: <98BC9B26-451D-48B7-AE82-DE985270584D@holtmann.org>
+References: <1455134446-70401-1-git-send-email-pgynther@google.com>
+To: Petri Gynther <pgynther@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Petri,
 
-> This ACPI ID is used at least by HP for their Omni 10 5600eg tablet.
+> If the call to request_firmware() fails in btbcm_setup_patchram(),
+> the BCM chip will be operating with its default firmware.
 > 
-> Signed-off-by: meijjaa <jjmeijer88@gmail.com>
+> In this case, btbcm_setup_patchram() should not return immediately
+> but instead should skip to btbcm_check_bdaddr() and quirk setup.
+> 
+> Signed-off-by: Petri Gynther <pgynther@google.com>
 > ---
-> drivers/bluetooth/hci_bcm.c | 1 +
-> 1 file changed, 1 insertion(+)
+> drivers/bluetooth/btbcm.c | 3 ++-
+> 1 file changed, 2 insertions(+), 1 deletion(-)
 
-your patch has been applied to bluetooth-next tree.
+patch has been applied to bluetooth-next tree.
 
 Regards
 
