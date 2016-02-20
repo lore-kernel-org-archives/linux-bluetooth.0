@@ -1,36 +1,34 @@
-Return-Path: <tore@fud.no>
-Date: Sat, 20 Feb 2016 18:12:59 +0100
-From: Tore Anderson <tore@fud.no>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Gustavo Padovan
- <gustavo@padovan.org>, linux-bluetooth@vger.kernel.org
-Subject: PROBLEM: Bluetooth mouse not working after resume since commit
- 2ff1389
-Message-ID: <20160220181259.1e28f8da@envy.w5.y.home>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Return-Path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 9.2 \(3112\))
+Subject: Re: [PATCH] Bluetooth: hci_core: cancel power off delayed work properly
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1455527391-13622-1-git-send-email-wnhuang@google.com>
+Date: Sat, 20 Feb 2016 00:12:23 -0800
+Cc: Linux Bluetooth <linux-bluetooth@vger.kernel.org>,
+	LKML <linux-kernel@vger.kernel.org>,
+	Johan Hedberg <johan.hedberg@intel.com>, snanda@chromium.org,
+	djkurtz@chromium.org, "Gustavo F. Padovan" <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org
+Message-Id: <B2631016-F0BA-4938-BAA3-66456FA99EDD@holtmann.org>
+References: <1455527391-13622-1-git-send-email-wnhuang@google.com>
+To: Wei-Ning Huang <wnhuang@chromium.org>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Starting with commit 2ff1389, =C2=ABPerform HCI update for power on
-synchronously=C2=BB, my Logitech M555b bluetooth mouse no longer works after
-resuming the system from suspend. The devices is handled by Blueman, and
-after resuming from suspend the white lines/triangles inside the
-systray icon doesn't turn green even though I move the mouse around.
-(The lines turning green normally indicates that a device is active.)
+Hi Wei-Ning,
 
-In order to revive it, I need to manually disable and then re-enable
-bluetooth, at which point it will re-connects fine.
+> When the HCI_AUTO_OFF flag is cleared, the power_off delayed work need
+> to be cancel or HCI will be powered off even if it's managed.
+> 
+> Signed-off-by: Wei-Ning Huang <wnhuang@chromium.org>
+> ---
+> net/bluetooth/hci_core.c | 1 +
+> 1 file changed, 1 insertion(+)
 
-I've also noticed that I need to press Blueman's =C2=ABTurn Bluetooth Off=
-=C2=BB
-menu selection twice for it to take effect (so that Blueman's systray
-icon gets overlayed with a little red X symbol). This only happens once
-after each resume from suspend - after having been through one
-off-off-on cycle, bluetooth will turn off normally on the first attempt
-(until the next suspend/resume cycle). It also turns off normally on
-the first attempt after the initial boot-up. This "double-off after
-resume" behaviour also first occurred with commit 2ff1389.
+patch has been applied to bluetooth-next tree.
 
-Let me know if there's any other information I can provide.
+Regards
 
-Tore
+Marcel
