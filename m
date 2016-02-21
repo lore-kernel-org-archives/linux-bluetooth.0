@@ -1,54 +1,56 @@
-Return-Path: <tore@fud.no>
-Date: Sun, 21 Feb 2016 12:13:22 +0100
-From: Tore Anderson <tore@fud.no>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Gustavo Padovan
- <gustavo@padovan.org>, linux-bluetooth@vger.kernel.org
+Return-Path: <johan.hedberg@gmail.com>
+Date: Sun, 21 Feb 2016 09:02:26 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Tore Anderson <tore@fud.no>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	linux-bluetooth@vger.kernel.org
 Subject: Re: PROBLEM: Bluetooth mouse not working after resume since commit
  2ff1389
-Message-ID: <20160221121322.6a19b1d4@envy.w5.y.home>
-In-Reply-To: <20160221070226.GA12780@t440s.P-661HNU-F1>
+Message-ID: <20160221070226.GA12780@t440s.P-661HNU-F1>
 References: <20160220181259.1e28f8da@envy.w5.y.home>
-	<20160220182339.GA1648@t440s.P-661HNU-F1>
-	<20160220182919.GA2620@t440s.P-661HNU-F1>
-	<20160220213028.35760428@envy.w5.y.home>
-	<20160221070226.GA12780@t440s.P-661HNU-F1>
+ <20160220182339.GA1648@t440s.P-661HNU-F1>
+ <20160220182919.GA2620@t440s.P-661HNU-F1>
+ <20160220213028.35760428@envy.w5.y.home>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20160220213028.35760428@envy.w5.y.home>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Good morning,
+Hi Tore,
 
-* Johan Hedberg
+On Sat, Feb 20, 2016, Tore Anderson wrote:
+> I uploaded debug files to http://filebin.net/pfmb8043cx :
 
-> You could have also used src/main.conf from the BlueZ tree as a
-> starting point and removed the '#' from the AutoEnable line:
+Thanks.
+
+> - kernel-debug-messages.$KVER.txt: kernel output (journalctl -k), after
+>   having written "module bluetooth +p" to
+>   the /sys/kernel/debug/dynamic_debug/control file.
+
+These are unfortunately not very useful without function information
+since most functions log very similar things. Could you do +pf instead
+of +p and try to get these again? To avoid any unnecessary noise, start
+the logs right before suspending and stop them right after resuming (I
+hope this is how the other logs were taken).
+
+> > Another thing to try in addition to disabling blueman: Add
+> > AutoEnable=true under the [Policy] section
+> > in /etc/bluetooth/main.conf. It might make a difference assuming that
+> > your Bluetooth adapter gets detached and reattached to the USB bus
+> > when you suspend/resume.
 > 
-> https://git.kernel.org/cgit/bluetooth/bluez.git/plain/src/main.conf
-> 
-> Are you sure that you restarted bluetoothd after this change? And
-> you've got a BlueZ version greater than 5.35 (where the feature was
-> introduced)?
+> This made no difference. Note that I had to create that file and its
+> containing directory anew, it didn't already exist on my Fedora 23
+> system.
 
-I've got version 5.36, and I had rebooted the system from scratch. I
-experimented a bit more, though, and I found out that with
-AutoEnable=true (and blueman uninstalled), my system behaves exactly
-the same as it did with blueman, that is:
+You could have also used src/main.conf from the BlueZ tree as a starting
+point and removed the '#' from the AutoEnable line:
 
-- with a pre-2ff1389 kernel: the mouse is auto-enabled and works fine
-  after bootup and resume from suspend.
-- with a post-2ff1389 kernel: the mouse is auto-enabled and works fine
-  after bootup, but stops working after resume from suspend (until
-  "hciconfig hci0 up" is issued manually).
+https://git.kernel.org/cgit/bluetooth/bluez.git/plain/src/main.conf
 
-That means we can exclude blueman as a potential cause of the problem,
-so I left it uninstalled when I generated the new debug files with +pf,
-which you can find here: http://filebin.net/wf9edcjbju
+Are you sure that you restarted bluetoothd after this change? And you've
+got a BlueZ version greater than 5.35 (where the feature was
+introduced)?
 
-I added a new file too: hciconfig_hci0.$KVER.txt. This shows the
-output of "while sleep .5; do hciconfig hci0; done | ts %H:%M:%.S". I
-noticed something that seems highly relevant, namely that with the
-post-2ff1389 kernel, the hci0 state changes to DOWN a couple of seconds
-after resuming. This does not happen with the pre-2ff1389 kernel.
-
-Tore
+Johan
