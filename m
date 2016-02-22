@@ -1,151 +1,208 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Date: Tue, 23 Feb 2016 14:44:20 +1300
-From: Kurt McAlpine <kurt@linux.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Fixed scripts to run with python 3
-Message-ID: <20160223014420.GA6471@kurtmc.Eroad.local>
+Return-Path: <luiz.dentz@gmail.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="FL5UXtIhxfXey3p5"
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1456146169.17625.70.camel@linux.intel.com>
+References: <1455797845-27533-1-git-send-email-patrik.flykt@linux.intel.com>
+	<08B4C3A1-DC90-4D77-B4B0-B15AC0CF05F4@holtmann.org>
+	<1456146169.17625.70.camel@linux.intel.com>
+Date: Mon, 22 Feb 2016 15:42:17 +0200
+Message-ID: <CABBYNZJxTEitC_41ZCmneTz7TNzoYqSkhxirJapHANjWVcPh=g@mail.gmail.com>
+Subject: Re: [RFC] doc: Add Management Interface IPSP API definitions
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Patrik Flykt <Patrik.Flykt@linux.intel.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Patrik, Marcel,
 
---FL5UXtIhxfXey3p5
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+On Mon, Feb 22, 2016 at 3:02 PM, Patrik Flykt
+<Patrik.Flykt@linux.intel.com> wrote:
+>
+>         Hi,
+>
+> On Fri, 2016-02-19 at 23:59 -0800, Marcel Holtmann wrote:
+>> > +Connect IPSP Command
+>> > +====================
+>> > +
+>> > +   Command Code:           0x0042
+>> > +   Controller Index:       <controller id>
+>> > +   Command Parameters:     Address (6 Octets)
+>> > +                           Address_Type (1 Octet)
+>> > +   Return Parameters:      Interface Index (4 Octets)
+>> > +                           Address (6 Octets)
+>> > +                           Address_Type (1 Octet)
+>>
+>> I think you really want to swap this. Address + Type first and then
+>> Interface Index.
+>
+> Ok.
+>
+>> > +   This command is used to connect to a remote IPSP Node.
+>> > +
+>> > +   Possible values for the Address_Type parameter:
+>> > +           1       LE Public
+>> > +           2       LE Random
+>> > +
+>> > +   This command generates a Command Complete event on success
+>> > +   or failure.
+>> > +
+>> > +   Possible errors:        Busy
+>> > +                           Refused
+>> > +                           Invalid Parameters
+>> > +                           Not Powered
+>> > +                           Invalid Index
+>> > +                           Already Connected
+>> > +
+>> > +
+>> > +Disconnect IPSP Command
+>> > +=======================
+>> > +
+>> > +   Command Code:           0x0043
+>> > +   Controller Index:       <controller id>
+>> > +   Command Parameters:     Address (6 Octets)
+>> > +                           Address_Type (1 Octet)
+>> > +   Return Parameters:      Address (6 Octets)
+>> > +                           Address_Type (1 Octet)
+>> > +
+>> > +   This command is used to disconnect from a remote IPSP device.
+>> > +
+>> > +   Possible values for the Address_Type parameter:
+>> > +           1       LE Public
+>> > +           2       LE Random
+>>
+>> I actually prefer that we list 0 value as reserved like we have done
+>> for the other LE only commands.
+>>
+>> In addition we might want to make clear that these commands are only
+>> supported if LE is actually enabled first.
+>
+> Ok.
+>
+>> > +Get IPSP Connections Command
+>> > +============================
+>> > +
+>> > +   Command Code:           0x0044
+>> > +   Controller Index:       <controller id>
+>> > +   Command Parameters:
+>> > +   Return Parameters:      Interface Index (4 Octets)
+>> > +                           Connection_Count (2 Octets)
+>> > +                           Address1 {
+>> > +                                   Address (6 Octets)
+>> > +                                   Address_Type (1 Octet)
+>> > +                           }
+>> > +                           Address2 { }
+>> > +                           ...
+>>
+>> I would normally assume that the Get Connections one comes before the
+>> Connect / Disconnect commands.
+>
+> Swapped order here.
+>
+>> > +
+>> > +   This command is used to retrieve a list of currently connected
+>> > +   IPSP devices.
+>> > +
+>> > +   Possible values for the Address_Type parameter:
+>> > +           1       LE Public
+>> > +           2       LE Random
+>> > +
+>> > +   For devices using resolvable random addresses with a known
+>> > +   identity resolving key, the Address and Address_Type will
+>> > +   contain the identity information.
+>> > +
+>> > +   This command can only be used when the controller is powered.
+>> > +
+>> > +   This command generates a Command Complete event on success or
+>> > +   a Command Status event on failure.
+>> > +
+>> > +   Possible errors:        Invalid Parameters
+>> > +                           Not Powered
+>> > +                           Invalid Index
+>> > +
+>> > +
+>> > +Enable IPSP Server Command
+>> > +==========================
+>> > +
+>> > +   Command Code:           0x0045
+>> > +   Controller Index:       <controller id>
+>> > +   Command Parameters:     Enable (1 Octet)
+>> > +   Return Parameters:
+>>
+>> Not a big fan of the command name. We never used the Enable Something
+>> term.
+>
+> Is 'Set IPSP Node Role Command' ok?
 
-Hello,
+Btw what exactly is this command suppose to do? Just add a listening
+channel or does it actually enables advertising? How do we actually
+hook with the agent to authorize incoming connections? Perhaps it
+actually a better idea to use the L2CAP socket API for this and make
+bluetoothd listen on PSM 35 like we do for other sockets, once the
+connection is authorized then we can have a mgmt command to add it to
+the network interface, actually this may as well replace the
+Connect/Disconnect commands with Add/Remove client so the connection
+phase is actually handled by bluetoothd.
 
-I created a patch to fix example-gatt-server and example-gatt-client
-since they used a mix of python 2 and 3 syntax.
+>
+>> > +IPSP Connected Event
+>> > +====================
+>> > +
+>> > +   Event Code:             0x0025
+>> > +   Controller Index:       <controller id>
+>> > +   Event Parameters:       Interface Index (4 Octets)
+>> > +                           Address (6 Octets)
+>> > +                           Address_Type (1 Octet)
+>>
+>> Same here. I think they are in the wrong order.
+>
+> Ok.
+>
+>> > +IPSP Disconnected Event
+>> > +=======================
+>> > +
+>> > +   Event Code:             0x0026
+>> > +   Controller Index:       <controller id>
+>> > +   Event Parameters:       Address (6 Octets)
+>> > +                           Address_Type (1 Octet)
+>> > +
+>> > +   This event indicates that the IPSP connection was lost to a
+>> > +   remote device.
+>> > +
+>> > +   Possible values for the Address_Type parameter:
+>> > +           1       LE Public
+>> > +           2       LE Random
+>> > +
+>> > +   For devices using resolvable random addresses with a known
+>> > +   identity resolving key, the Address and Address_Type will
+>> > +   contain the identity information.
+>>
+>> I am not a huge fan of the IPSP in the commands and events. Can we
+>> find something better?
+>
+> There was a discussion on naming in "Re: [RFC v3] doc: Add initial
+> Network Management API definition" on the mailing list last June that
+> ended a bit inconclusive. Meanwhile RFC 7668 has gravitated towards
+> using "6LowPAN techniques" to describe how IPv6 is transported over
+> BTLE, but the RFC itself is called "IPv6 over BLUETOOTH(R) Low Energy".
+>
+> Then again include/net/bluetooth/l2cap.h defines a value called
+> L2CAP_PSM_IPSP.
+>
+> Shall we continue using 6lowpan as before in RFC v3?
+>
+>
+> Cheers,
+>
+>         Patrik
+>
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-	Kurt
 
---FL5UXtIhxfXey3p5
-Content-Type: text/x-diff; charset=us-ascii
-Content-Disposition: attachment; filename="0001-Fixed-scripts-to-run-with-python-3.patch"
 
-Subject: [PATCH] Fixed scripts to run with python 3
-
-Fix up syntax problems so that this code actually runs.
-
----
- test/example-gatt-client | 13 ++++++++-----
- test/example-gatt-server | 20 ++++++++++++--------
- 2 files changed, 20 insertions(+), 13 deletions(-)
-
-diff --git a/test/example-gatt-client b/test/example-gatt-client
-index 724a45d..5a02505 100755
---- a/test/example-gatt-client
-+++ b/test/example-gatt-client
-@@ -1,8 +1,11 @@
--#!/usr/bin/python
-+#!/usr/bin/env python3
- 
- import argparse
- import dbus
--import gobject
-+try:
-+  from gi.repository import GObject
-+except ImportError:
-+  import gobject as GObject
- import sys
- 
- from dbus.mainloop.glib import DBusGMainLoop
-@@ -195,7 +198,7 @@ def main():
-     global bus
-     bus = dbus.SystemBus()
-     global mainloop
--    mainloop = gobject.MainLoop()
-+    mainloop = GObject.MainLoop()
- 
-     om = dbus.Interface(bus.get_object(BLUEZ_SERVICE_NAME, '/'), DBUS_OM_IFACE)
-     om.connect_to_signal('InterfacesRemoved', interfaces_removed_cb)
-@@ -204,10 +207,10 @@ def main():
-         if not process_hr_service(service_path):
-             sys.exit(1)
-     except dbus.DBusException as e:
--        print e.message
-+        print(e)
-         sys.exit(1)
- 
--    print 'Heart Rate Service ready'
-+    print('Heart Rate Service ready')
- 
-     start_client()
- 
-diff --git a/test/example-gatt-server b/test/example-gatt-server
-index 67dee1a..f2ddb2b 100755
---- a/test/example-gatt-server
-+++ b/test/example-gatt-server
-@@ -1,4 +1,4 @@
--#!/usr/bin/python
-+#!/usr/bin/env python3
- 
- import dbus
- import dbus.exceptions
-@@ -6,7 +6,11 @@ import dbus.mainloop.glib
- import dbus.service
- 
- import array
--import gobject
-+try:
-+  from gi.repository import GObject
-+except ImportError:
-+  import gobject as GObject
-+import sys
- 
- from random import randint
- from collections import OrderedDict
-@@ -285,7 +289,7 @@ class HeartRateMeasurementChrc(Characteristic):
-         if not self.notifying:
-             return
- 
--        gobject.timeout_add(1000, self.hr_msrmt_cb)
-+        GObject.timeout_add(1000, self.hr_msrmt_cb)
- 
-     def StartNotify(self):
-         if self.notifying:
-@@ -372,7 +376,7 @@ class BatteryLevelCharacteristic(Characteristic):
-                 service)
-         self.notifying = False
-         self.battery_lvl = 100
--        gobject.timeout_add(5000, self.drain_battery)
-+        GObject.timeout_add(5000, self.drain_battery)
- 
-     def notify_battery_level(self):
-         if not self.notifying:
-@@ -480,7 +484,7 @@ class CharacteristicUserDescriptionDescriptor(Descriptor):
- 
-     def __init__(self, bus, index, characteristic):
-         self.writable = 'writable-auxiliaries' in characteristic.flags
--        self.value = array.array('B', 'This is a characteristic for testing')
-+        self.value = array.array('B', b'This is a characteristic for testing')
-         self.value = self.value.tolist()
-         Descriptor.__init__(
-                 self, bus, index,
-@@ -555,8 +559,8 @@ def find_adapter(bus):
-                                DBUS_OM_IFACE)
-     objects = remote_om.GetManagedObjects()
- 
--    for o, props in objects.iteritems():
--        if props.has_key(GATT_MANAGER_IFACE):
-+    for o, props in objects.items():
-+        if GATT_MANAGER_IFACE in props.keys():
-             return o
- 
-     return None
-@@ -579,7 +583,7 @@ def main():
- 
-     app = Application(bus)
- 
--    mainloop = gobject.MainLoop()
-+    mainloop = GObject.MainLoop()
- 
-     service_manager.RegisterApplication(app.get_path(), {},
-                                     reply_handler=register_app_cb,
 -- 
-2.7.1
-
-
---FL5UXtIhxfXey3p5--
+Luiz Augusto von Dentz
