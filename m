@@ -1,122 +1,128 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Date: Thu, 25 Feb 2016 17:09:56 +1300
 From: Kurt McAlpine <kurt@linux.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: simple-agent troubleshooting/debugging
-Message-ID: <20160225040956.GA16677@kurtmc.Eroad.local>
-MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="dDRMvlgZJXvWKvBx"
+Cc: luiz.dentz@gmail.com, Kurt McAlpine <kurt@linux.com>
+Subject: [PATCH] Fixed scripts to run with python 3
+Date: Thu, 25 Feb 2016 08:46:46 +1300
+Message-Id: <1456343206-4122-1-git-send-email-kurt@linux.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+---
+ test/example-gatt-client | 13 ++++++++-----
+ test/example-gatt-server | 20 ++++++++++++--------
+ 2 files changed, 20 insertions(+), 13 deletions(-)
 
---dDRMvlgZJXvWKvBx
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+diff --git a/test/example-gatt-client b/test/example-gatt-client
+index 724a45d..5a02505 100755
+--- a/test/example-gatt-client
++++ b/test/example-gatt-client
+@@ -1,8 +1,11 @@
+-#!/usr/bin/python
++#!/usr/bin/env python3
+ 
+ import argparse
+ import dbus
+-import gobject
++try:
++  from gi.repository import GObject
++except ImportError:
++  import gobject as GObject
+ import sys
+ 
+ from dbus.mainloop.glib import DBusGMainLoop
+@@ -195,7 +198,7 @@ def main():
+     global bus
+     bus = dbus.SystemBus()
+     global mainloop
+-    mainloop = gobject.MainLoop()
++    mainloop = GObject.MainLoop()
+ 
+     om = dbus.Interface(bus.get_object(BLUEZ_SERVICE_NAME, '/'), DBUS_OM_IFACE)
+     om.connect_to_signal('InterfacesRemoved', interfaces_removed_cb)
+@@ -204,10 +207,10 @@ def main():
+         if not process_hr_service(service_path):
+             sys.exit(1)
+     except dbus.DBusException as e:
+-        print e.message
++        print(e)
+         sys.exit(1)
+ 
+-    print 'Heart Rate Service ready'
++    print('Heart Rate Service ready')
+ 
+     start_client()
+ 
+diff --git a/test/example-gatt-server b/test/example-gatt-server
+index 67dee1a..f2ddb2b 100755
+--- a/test/example-gatt-server
++++ b/test/example-gatt-server
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python
++#!/usr/bin/env python3
+ 
+ import dbus
+ import dbus.exceptions
+@@ -6,7 +6,11 @@ import dbus.mainloop.glib
+ import dbus.service
+ 
+ import array
+-import gobject
++try:
++  from gi.repository import GObject
++except ImportError:
++  import gobject as GObject
++import sys
+ 
+ from random import randint
+ from collections import OrderedDict
+@@ -285,7 +289,7 @@ class HeartRateMeasurementChrc(Characteristic):
+         if not self.notifying:
+             return
+ 
+-        gobject.timeout_add(1000, self.hr_msrmt_cb)
++        GObject.timeout_add(1000, self.hr_msrmt_cb)
+ 
+     def StartNotify(self):
+         if self.notifying:
+@@ -372,7 +376,7 @@ class BatteryLevelCharacteristic(Characteristic):
+                 service)
+         self.notifying = False
+         self.battery_lvl = 100
+-        gobject.timeout_add(5000, self.drain_battery)
++        GObject.timeout_add(5000, self.drain_battery)
+ 
+     def notify_battery_level(self):
+         if not self.notifying:
+@@ -480,7 +484,7 @@ class CharacteristicUserDescriptionDescriptor(Descriptor):
+ 
+     def __init__(self, bus, index, characteristic):
+         self.writable = 'writable-auxiliaries' in characteristic.flags
+-        self.value = array.array('B', 'This is a characteristic for testing')
++        self.value = array.array('B', b'This is a characteristic for testing')
+         self.value = self.value.tolist()
+         Descriptor.__init__(
+                 self, bus, index,
+@@ -555,8 +559,8 @@ def find_adapter(bus):
+                                DBUS_OM_IFACE)
+     objects = remote_om.GetManagedObjects()
+ 
+-    for o, props in objects.iteritems():
+-        if props.has_key(GATT_MANAGER_IFACE):
++    for o, props in objects.items():
++        if GATT_MANAGER_IFACE in props.keys():
+             return o
+ 
+     return None
+@@ -579,7 +583,7 @@ def main():
+ 
+     app = Application(bus)
+ 
+-    mainloop = gobject.MainLoop()
++    mainloop = GObject.MainLoop()
+ 
+     service_manager.RegisterApplication(app.get_path(), {},
+                                     reply_handler=register_app_cb,
+-- 
+2.7.1
 
-Hi,
-
-I am having trouble running one the the examples from the bluez repo.
-Specifically simple-agent.
-
-I have compiled and installed bluez at commit e074cc1, and I am running Linux
-4.5 rc5 at commit 6dc390a.
-
-To get my bluetooth device ready I ran the following commands:
-
-sudo tools/btmgmt -i hci0 power off
-sudo tools/btmgmt -i hci0 le on
-sudo tools/btmgmt -i hci0 connectable on
-sudo tools/btmgmt -i hci0 bredr off
-sudo tools/btmgmt -i hci0 name "TEST"
-sudo tools/btmgmt -i hci0 advertising on
-sudo tools/btmgmt -i hci0 power on
-
-then ran the example:
-
-test/simple-agent
-
-But when I pair my mobile phone with my laptop the simple-agent script does not
-ask me for a PIN. It just stays at "Agent registered".
-
-I have attached a copy of the bluetoothd log, just in case I have made
-some sort of configuration mistake. bluetoothd was stared with the -E
-flag.
-
-Have I made an obvious mistake, can someone point me in the correct
-direction to start debugging my issue?
-
-Thanks,
-Kurt
-
---dDRMvlgZJXvWKvBx
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: attachment; filename="systemd-output.txt"
-
-Feb 25 16:43:43 kurtmc systemd[1]: Starting Bluetooth service...
-Feb 25 16:43:43 kurtmc bluetoothd[446]: Bluetooth daemon 5.37
-Feb 25 16:43:43 kurtmc systemd[1]: Started Bluetooth service.
-Feb 25 16:43:43 kurtmc bluetoothd[446]: Starting SDP server
-Feb 25 16:43:43 kurtmc bluetoothd[446]: Can't load plugin description: /usr/lib/bluetooth/plugins/bluetooth.default.so: undefined symbol: bluetooth_plugin_desc
-Feb 25 16:43:43 kurtmc bluetoothd[446]: Can't load plugin description: /usr/lib/bluetooth/plugins/audio.a2dp.default.so: undefined symbol: bluetooth_plugin_desc
-Feb 25 16:43:43 kurtmc bluetoothd[446]: Can't load plugin /usr/lib/bluetooth/plugins/audio.sco.default.so: /usr/lib/bluetooth/plugins/audio.sco.default.so: undefined symbol: str2bt_bdaddr_t
-Feb 25 16:43:43 kurtmc bluetoothd[446]: Bluetooth management interface 1.11 initialized
-Feb 25 16:43:43 kurtmc bluetoothd[446]: Failed to obtain handles for "Service Changed" characteristic
-Feb 25 16:43:43 kurtmc bluetoothd[446]: Not enough free handles to register service
-Feb 25 16:43:43 kurtmc bluetoothd[446]: Error adding Link Loss service
-Feb 25 16:43:43 kurtmc bluetoothd[446]: Not enough free handles to register service
-Feb 25 16:43:43 kurtmc bluetoothd[446]: Not enough free handles to register service
-Feb 25 16:43:43 kurtmc bluetoothd[446]: Not enough free handles to register service
-Feb 25 16:43:43 kurtmc bluetoothd[446]: Not enough free handles to register service
-Feb 25 16:43:43 kurtmc bluetoothd[446]: Current Time Service could not be registered
-Feb 25 16:43:43 kurtmc bluetoothd[446]: gatt-time-server: Input/output error (5)
-Feb 25 16:43:43 kurtmc bluetoothd[446]: Not enough free handles to register service
-Feb 25 16:43:43 kurtmc bluetoothd[446]: Not enough free handles to register service
-Feb 25 16:43:43 kurtmc bluetoothd[446]: Sap driver initialization failed.
-Feb 25 16:43:43 kurtmc bluetoothd[446]: sap-server: Operation not permitted (1)
-Feb 25 16:48:21 kurtmc systemd[1]: Stopping Bluetooth service...
-Feb 25 16:48:21 kurtmc bluetoothd[446]: Terminating
-Feb 25 16:48:21 kurtmc systemd[1]: Stopped Bluetooth service.
-Feb 25 16:48:21 kurtmc systemd[1]: Starting Bluetooth service...
-Feb 25 16:48:21 kurtmc systemd[1]: bluetooth.service: Main process exited, code=exited, status=203/EXEC
-Feb 25 16:48:21 kurtmc systemd[1]: Failed to start Bluetooth service.
-Feb 25 16:48:21 kurtmc systemd[1]: bluetooth.service: Unit entered failed state.
-Feb 25 16:48:21 kurtmc systemd[1]: bluetooth.service: Failed with result 'exit-code'.
-Feb 25 16:48:32 kurtmc systemd[1]: Stopped Bluetooth service.
-Feb 25 16:48:32 kurtmc systemd[1]: Starting Bluetooth service...
-Feb 25 16:48:32 kurtmc bluetoothd[15624]: Bluetooth daemon 5.37
-Feb 25 16:48:32 kurtmc bluetoothd[15624]: D-Bus setup failed: Connection ":1.47" is not allowed to own the service "org.bluez" due to security policies in the configuration file
-Feb 25 16:48:32 kurtmc systemd[1]: bluetooth.service: Main process exited, code=exited, status=1/FAILURE
-Feb 25 16:48:32 kurtmc systemd[1]: Failed to start Bluetooth service.
-Feb 25 16:48:32 kurtmc systemd[1]: bluetooth.service: Unit entered failed state.
-Feb 25 16:48:32 kurtmc systemd[1]: bluetooth.service: Failed with result 'exit-code'.
-Feb 25 16:49:07 kurtmc systemd[1]: Starting Bluetooth service...
-Feb 25 16:49:07 kurtmc bluetoothd[15655]: Bluetooth daemon 5.37
-Feb 25 16:49:07 kurtmc bluetoothd[15655]: D-Bus setup failed: Connection ":1.50" is not allowed to own the service "org.bluez" due to security policies in the configuration file
-Feb 25 16:49:07 kurtmc systemd[1]: bluetooth.service: Main process exited, code=exited, status=1/FAILURE
-Feb 25 16:49:07 kurtmc systemd[1]: Failed to start Bluetooth service.
-Feb 25 16:49:07 kurtmc systemd[1]: bluetooth.service: Unit entered failed state.
-Feb 25 16:49:07 kurtmc systemd[1]: bluetooth.service: Failed with result 'exit-code'.
-Feb 25 16:52:17 kurtmc systemd[1]: Stopped Bluetooth service.
-Feb 25 16:52:17 kurtmc systemd[1]: Starting Bluetooth service...
-Feb 25 16:52:17 kurtmc bluetoothd[16236]: Bluetooth daemon 5.37
-Feb 25 16:52:17 kurtmc systemd[1]: Started Bluetooth service.
-Feb 25 16:52:17 kurtmc bluetoothd[16236]: Starting SDP server
-Feb 25 16:52:17 kurtmc bluetoothd[16236]: Bluetooth management interface 1.11 initialized
-Feb 25 16:52:17 kurtmc bluetoothd[16236]: Failed to obtain handles for "Service Changed" characteristic
-Feb 25 16:52:17 kurtmc bluetoothd[16236]: Not enough free handles to register service
-Feb 25 16:52:17 kurtmc bluetoothd[16236]: gatt-example-adapter-driver: Input/output error (5)
-Feb 25 16:52:17 kurtmc bluetoothd[16236]: Not enough free handles to register service
-Feb 25 16:52:17 kurtmc bluetoothd[16236]: Error adding Link Loss service
-Feb 25 16:52:17 kurtmc bluetoothd[16236]: Not enough free handles to register service
-Feb 25 16:52:17 kurtmc bluetoothd[16236]: Not enough free handles to register service
-Feb 25 16:52:17 kurtmc bluetoothd[16236]: Not enough free handles to register service
-Feb 25 16:52:17 kurtmc bluetoothd[16236]: Current Time Service could not be registered
-Feb 25 16:52:17 kurtmc bluetoothd[16236]: gatt-time-server: Input/output error (5)
-Feb 25 16:52:17 kurtmc bluetoothd[16236]: Not enough free handles to register service
-Feb 25 16:52:17 kurtmc bluetoothd[16236]: Not enough free handles to register service
-Feb 25 16:52:17 kurtmc bluetoothd[16236]: Can't listen at channel 8.
-Feb 25 16:52:17 kurtmc bluetoothd[16236]: sap-server: Operation not permitted (1)
-
-
---dDRMvlgZJXvWKvBx--
