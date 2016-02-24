@@ -1,34 +1,28 @@
-Return-Path: <linux-wpan-owner@vger.kernel.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 9.2 \(3112\))
-Subject: Re: [PATCH] 6lowpan: fix error checking code
+Subject: Re: [PATCH bluetooth-next] 6lowpan: iphc: fix stateful multicast compression
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1456302733-7053-1-git-send-email-a.hajda@samsung.com>
-Date: Wed, 24 Feb 2016 07:16:48 -0800
-Cc: Alexander Aring <aar@pengutronix.de>,
-	Jukka Rissanen <jukka.rissanen@linux.intel.com>,
-	linux-wpan@vger.kernel.org,
-	Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Message-Id: <DED11411-B9A6-49B8-9C5D-E4483A9B77AF@holtmann.org>
-References: <1456302733-7053-1-git-send-email-a.hajda@samsung.com>
-To: Andrzej Hajda <a.hajda@samsung.com>
-Sender: linux-wpan-owner@vger.kernel.org
+In-Reply-To: <1456311663-11438-1-git-send-email-aar@pengutronix.de>
+Date: Wed, 24 Feb 2016 07:16:40 -0800
+Cc: linux-wpan@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	kernel@pengutronix.de
+Message-Id: <1DF53D6E-353F-4CE2-A47F-7CC626D18733@holtmann.org>
+References: <1456311663-11438-1-git-send-email-aar@pengutronix.de>
+To: Alexander Aring <aar@pengutronix.de>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Alex,
 
-> Bool variable 'fail' is always non-negative, it indicates an error if it
-> is true.
+> In case of multicast address we need to set always the LOWPAN_IPHC_M bit
+> and if a destination context identifier was found for a multicast
+> address then we need to set the LOWPAN_IPHC_DAC as well.
 > 
-> The problem has been detected using coccinelle script
-> scripts/coccinelle/tests/unsigned_lesser_than_zero.cocci
-> 
-> Signed-off-by: Andrzej Hajda <a.hajda@samsung.com>
+> Signed-off-by: Alexander Aring <aar@pengutronix.de>
 > ---
-> net/6lowpan/iphc.c | 2 +-
-> 1 file changed, 1 insertion(+), 1 deletion(-)
+> net/6lowpan/iphc.c | 3 ++-
+> 1 file changed, 2 insertions(+), 1 deletion(-)
 
 patch has been applied to bluetooth-next tree.
 
