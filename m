@@ -1,128 +1,43 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Kurt McAlpine <kurt@linux.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: luiz.dentz@gmail.com, Kurt McAlpine <kurt@linux.com>
-Subject: [PATCH] Fixed scripts to run with python 3
-Date: Thu, 25 Feb 2016 08:46:46 +1300
-Message-Id: <1456343206-4122-1-git-send-email-kurt@linux.com>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 9.2 \(3112\))
+Subject: Re: [PATCH v2] Bluetooth: hci_uart: Add Intel/AG6xx support
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1456134483-29815-1-git-send-email-loic.poulain@intel.com>
+Date: Wed, 24 Feb 2016 07:54:00 -0800
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <4F6CCC11-D01D-4BAD-B2DB-FD89C7C5BEEC@holtmann.org>
+References: <1456134483-29815-1-git-send-email-loic.poulain@intel.com>
+To: Loic Poulain <loic.poulain@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- test/example-gatt-client | 13 ++++++++-----
- test/example-gatt-server | 20 ++++++++++++--------
- 2 files changed, 20 insertions(+), 13 deletions(-)
+Hi Loic,
 
-diff --git a/test/example-gatt-client b/test/example-gatt-client
-index 724a45d..5a02505 100755
---- a/test/example-gatt-client
-+++ b/test/example-gatt-client
-@@ -1,8 +1,11 @@
--#!/usr/bin/python
-+#!/usr/bin/env python3
- 
- import argparse
- import dbus
--import gobject
-+try:
-+  from gi.repository import GObject
-+except ImportError:
-+  import gobject as GObject
- import sys
- 
- from dbus.mainloop.glib import DBusGMainLoop
-@@ -195,7 +198,7 @@ def main():
-     global bus
-     bus = dbus.SystemBus()
-     global mainloop
--    mainloop = gobject.MainLoop()
-+    mainloop = GObject.MainLoop()
- 
-     om = dbus.Interface(bus.get_object(BLUEZ_SERVICE_NAME, '/'), DBUS_OM_IFACE)
-     om.connect_to_signal('InterfacesRemoved', interfaces_removed_cb)
-@@ -204,10 +207,10 @@ def main():
-         if not process_hr_service(service_path):
-             sys.exit(1)
-     except dbus.DBusException as e:
--        print e.message
-+        print(e)
-         sys.exit(1)
- 
--    print 'Heart Rate Service ready'
-+    print('Heart Rate Service ready')
- 
-     start_client()
- 
-diff --git a/test/example-gatt-server b/test/example-gatt-server
-index 67dee1a..f2ddb2b 100755
---- a/test/example-gatt-server
-+++ b/test/example-gatt-server
-@@ -1,4 +1,4 @@
--#!/usr/bin/python
-+#!/usr/bin/env python3
- 
- import dbus
- import dbus.exceptions
-@@ -6,7 +6,11 @@ import dbus.mainloop.glib
- import dbus.service
- 
- import array
--import gobject
-+try:
-+  from gi.repository import GObject
-+except ImportError:
-+  import gobject as GObject
-+import sys
- 
- from random import randint
- from collections import OrderedDict
-@@ -285,7 +289,7 @@ class HeartRateMeasurementChrc(Characteristic):
-         if not self.notifying:
-             return
- 
--        gobject.timeout_add(1000, self.hr_msrmt_cb)
-+        GObject.timeout_add(1000, self.hr_msrmt_cb)
- 
-     def StartNotify(self):
-         if self.notifying:
-@@ -372,7 +376,7 @@ class BatteryLevelCharacteristic(Characteristic):
-                 service)
-         self.notifying = False
-         self.battery_lvl = 100
--        gobject.timeout_add(5000, self.drain_battery)
-+        GObject.timeout_add(5000, self.drain_battery)
- 
-     def notify_battery_level(self):
-         if not self.notifying:
-@@ -480,7 +484,7 @@ class CharacteristicUserDescriptionDescriptor(Descriptor):
- 
-     def __init__(self, bus, index, characteristic):
-         self.writable = 'writable-auxiliaries' in characteristic.flags
--        self.value = array.array('B', 'This is a characteristic for testing')
-+        self.value = array.array('B', b'This is a characteristic for testing')
-         self.value = self.value.tolist()
-         Descriptor.__init__(
-                 self, bus, index,
-@@ -555,8 +559,8 @@ def find_adapter(bus):
-                                DBUS_OM_IFACE)
-     objects = remote_om.GetManagedObjects()
- 
--    for o, props in objects.iteritems():
--        if props.has_key(GATT_MANAGER_IFACE):
-+    for o, props in objects.items():
-+        if GATT_MANAGER_IFACE in props.keys():
-             return o
- 
-     return None
-@@ -579,7 +583,7 @@ def main():
- 
-     app = Application(bus)
- 
--    mainloop = gobject.MainLoop()
-+    mainloop = GObject.MainLoop()
- 
-     service_manager.RegisterApplication(app.get_path(), {},
-                                     reply_handler=register_app_cb,
--- 
-2.7.1
+> This driver implements support for iBT2.1 Bluetooth controller embedded
+> in the AG620 communication combo. The controller needs to be configured
+> with bddata and can be patched with a binary patch file (pbn).
+> These operations are performed in manufacturing mode.
+> 
+> Signed-off-by: Loic Poulain <loic.poulain@intel.com>
+> ---
+> v2: Add PBN file description
+>     Convert le PBN addr and plen before usage
+>     Remove firmware fallback, we need full hw/fw ids
+> 
+> drivers/bluetooth/Kconfig     |  11 ++
+> drivers/bluetooth/Makefile    |   1 +
+> drivers/bluetooth/hci_ag6xx.c | 326 ++++++++++++++++++++++++++++++++++++++++++
+> drivers/bluetooth/hci_ldisc.c |   6 +
+> drivers/bluetooth/hci_uart.h  |   8 +-
+> 5 files changed, 351 insertions(+), 1 deletion(-)
+> create mode 100644 drivers/bluetooth/hci_ag6xx.c
+
+patch has been applied to bluetooth-next tree.
+
+However please send an additional patch to work in the check for the default Intel BD_ADDR so that we have the quirk for missing public address set correctly.
+
+Regards
+
+Marcel
 
