@@ -1,125 +1,42 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Date: Wed, 24 Feb 2016 09:35:50 +0100
-From: Chevallier Maxime <maxime.chevallier@openwide.fr>
-To: linux-bluetooth@vger.kernel.org, johan.hedberg@gmail.com
-Subject: [PATCH] tools/btgatt-client : fix write-value byte parsing
-Message-ID: <20160224083550.GA28122@vps217108.ovh.net>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <linux-wpan-owner@vger.kernel.org>
+From: Andrzej Hajda <a.hajda@samsung.com>
+To: Alexander Aring <aar@pengutronix.de>,
+	Jukka Rissanen <jukka.rissanen@linux.intel.com>,
+	linux-wpan@vger.kernel.org
+Cc: Andrzej Hajda <a.hajda@samsung.com>,
+	Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] 6lowpan: fix error checking code
+Date: Wed, 24 Feb 2016 09:32:13 +0100
+Message-id: <1456302733-7053-1-git-send-email-a.hajda@samsung.com>
+Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-write-value, write-long-value and write-prepare were parsing
-bytes using strtol with base '0' and restraining wtring size to
-be exactly 2, forbidding to write values over 99. The string length
-is no more checked, we instead check that the parsed value is in the
-correct range.
----
- tools/btgatt-client.c | 41 +++++++++++++----------------------------
- 1 file changed, 13 insertions(+), 28 deletions(-)
+Bool variable 'fail' is always non-negative, it indicates an error if it
+is true.
 
-diff --git a/tools/btgatt-client.c b/tools/btgatt-client.c
-index 0f6a1bd..3a0ec62 100644
---- a/tools/btgatt-client.c
-+++ b/tools/btgatt-client.c
-@@ -658,7 +658,7 @@ static void write_cb(bool success, uint8_t att_ecode, void *user_data)
+The problem has been detected using coccinelle script
+scripts/coccinelle/tests/unsigned_lesser_than_zero.cocci
+
+Signed-off-by: Andrzej Hajda <a.hajda@samsung.com>
+---
+ net/6lowpan/iphc.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/net/6lowpan/iphc.c b/net/6lowpan/iphc.c
+index d2a565c..0fe954f 100644
+--- a/net/6lowpan/iphc.c
++++ b/net/6lowpan/iphc.c
+@@ -482,7 +482,7 @@ static int lowpan_uncompress_multicast_ctx_daddr(struct sk_buff *skb,
+ 	ipaddr->s6_addr[0] = 0xFF;
+ 	fail = lowpan_fetch_skb(skb, &ipaddr->s6_addr[1], 2);
+ 	fail |= lowpan_fetch_skb(skb, &ipaddr->s6_addr[12], 4);
+-	if (fail < 0)
++	if (fail)
+ 		return -EIO;
  
- static void cmd_write_value(struct client *cli, char *cmd_str)
- {
--	int opt, i;
-+	int opt, i, val;
- 	char *argvbuf[516];
- 	char **argv = argvbuf;
- 	int argc = 1;
-@@ -726,19 +726,14 @@ static void cmd_write_value(struct client *cli, char *cmd_str)
- 		}
- 
- 		for (i = 1; i < argc; i++) {
--			if (strlen(argv[i]) != 2) {
--				printf("Invalid value byte: %s\n",
--								argv[i]);
--				goto done;
--			}
--
--			value[i-1] = strtol(argv[i], &endptr, 0);
-+			val = strtol(argv[i], &endptr, 0);
- 			if (endptr == argv[i] || *endptr != '\0'
--							|| errno == ERANGE) {
-+							|| errno == ERANGE || val < 0 || val > 255) {
- 				printf("Invalid value byte: %s\n",
- 								argv[i]);
- 				goto done;
- 			}
-+			value[i-1] = val;
- 		}
- 	}
- 
-@@ -793,7 +788,7 @@ static void write_long_cb(bool success, bool reliable_error, uint8_t att_ecode,
- 
- static void cmd_write_long_value(struct client *cli, char *cmd_str)
- {
--	int opt, i;
-+	int opt, i, val;
- 	char *argvbuf[516];
- 	char **argv = argvbuf;
- 	int argc = 1;
-@@ -865,21 +860,15 @@ static void cmd_write_long_value(struct client *cli, char *cmd_str)
- 		}
- 
- 		for (i = 2; i < argc; i++) {
--			if (strlen(argv[i]) != 2) {
--				printf("Invalid value byte: %s\n",
--								argv[i]);
--				free(value);
--				return;
--			}
--
--			value[i-2] = strtol(argv[i], &endptr, 0);
-+			val = strtol(argv[i], &endptr, 0);
- 			if (endptr == argv[i] || *endptr != '\0'
--							|| errno == ERANGE) {
-+							|| errno == ERANGE || val < 0 || val > 255) {
- 				printf("Invalid value byte: %s\n",
- 								argv[i]);
- 				free(value);
- 				return;
- 			}
-+			value[i-2] = val;
- 		}
- 	}
- 
-@@ -909,7 +898,7 @@ static struct option write_prepare_options[] = {
- 
- static void cmd_write_prepare(struct client *cli, char *cmd_str)
- {
--	int opt, i;
-+	int opt, i, val;
- 	char *argvbuf[516];
- 	char **argv = argvbuf;
- 	int argc = 0;
-@@ -1002,18 +991,14 @@ static void cmd_write_prepare(struct client *cli, char *cmd_str)
- 	}
- 
- 	for (i = 2; i < argc; i++) {
--		if (strlen(argv[i]) != 2) {
--			printf("Invalid value byte: %s\n", argv[i]);
--			free(value);
--			return;
--		}
--
--		value[i-2] = strtol(argv[i], &endptr, 0);
--		if (endptr == argv[i] || *endptr != '\0' || errno == ERANGE) {
-+		val = strtol(argv[i], &endptr, 0);
-+		if (endptr == argv[i] || *endptr != '\0' || errno == ERANGE
-+													|| val < 0 || val > 255) {
- 			printf("Invalid value byte: %s\n", argv[i]);
- 			free(value);
- 			return;
- 		}
-+		value[i-2] = val;
- 	}
- 
- done:
+ 	/* take prefix_len and network prefix from the context */
 -- 
-2.1.4
+1.9.1
 
