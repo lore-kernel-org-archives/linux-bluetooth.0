@@ -1,42 +1,35 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <aar@pengutronix.de>
+Subject: Re: [PATCH] 6lowpan: fix error checking code
+To: Andrzej Hajda <a.hajda@samsung.com>
+References: <1456302733-7053-1-git-send-email-a.hajda@samsung.com>
+Cc: Jukka Rissanen <jukka.rissanen@linux.intel.com>,
+ linux-wpan@vger.kernel.org,
+ Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+ Marek Szyprowski <m.szyprowski@samsung.com>,
+ linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+ marcel@holtmann.org
 From: Alexander Aring <aar@pengutronix.de>
-To: linux-wpan@vger.kernel.org
-Cc: linux-bluetooth@vger.kernel.org, kernel@pengutronix.de,
-	Alexander Aring <aar@pengutronix.de>
-Subject: [PATCH bluetooth-next] 6lowpan: iphc: fix stateful multicast compression
-Date: Wed, 24 Feb 2016 12:01:03 +0100
-Message-Id: <1456311663-11438-1-git-send-email-aar@pengutronix.de>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <56CD88A6.5020904@pengutronix.de>
+Date: Wed, 24 Feb 2016 11:40:38 +0100
+MIME-Version: 1.0
+In-Reply-To: <1456302733-7053-1-git-send-email-a.hajda@samsung.com>
+Content-Type: text/plain; charset=iso-8859-15
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-In case of multicast address we need to set always the LOWPAN_IPHC_M bit
-and if a destination context identifier was found for a multicast
-address then we need to set the LOWPAN_IPHC_DAC as well.
+Hi,
 
-Signed-off-by: Alexander Aring <aar@pengutronix.de>
----
- net/6lowpan/iphc.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Am 02/24/2016 um 09:32 AM schrieb Andrzej Hajda:
+> Bool variable 'fail' is always non-negative, it indicates an error if it
+> is true.
+>
+> The problem has been detected using coccinelle script
+> scripts/coccinelle/tests/unsigned_lesser_than_zero.cocci
+>
+> Signed-off-by: Andrzej Hajda <a.hajda@samsung.com>
 
-diff --git a/net/6lowpan/iphc.c b/net/6lowpan/iphc.c
-index 0fe954f..06287ac 100644
---- a/net/6lowpan/iphc.c
-+++ b/net/6lowpan/iphc.c
-@@ -1118,12 +1118,13 @@ int lowpan_header_compress(struct sk_buff *skb, const struct net_device *dev,
- 	/* destination address compression */
- 	if (ipv6_daddr_type & IPV6_ADDR_MULTICAST) {
- 		pr_debug("destination address is multicast: ");
-+		iphc1 |= LOWPAN_IPHC_M;
- 		if (dci) {
- 			iphc1 |= lowpan_iphc_mcast_ctx_addr_compress(&hc_ptr,
- 								     &dci_entry,
- 								     &hdr->daddr);
-+			iphc1 |= LOWPAN_IPHC_DAC;
- 		} else {
--			iphc1 |= LOWPAN_IPHC_M;
- 			iphc1 |= lowpan_iphc_mcast_addr_compress(&hc_ptr,
- 								 &hdr->daddr);
- 		}
--- 
-2.7.1
+Acked-by: Alexander Aring <aar@pengutronix.de>
 
+Marcel, can you please apply this patch on bluetooth-next?
+Thanks.
+
+- Alex
