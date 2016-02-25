@@ -1,127 +1,42 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Matthias Schmidt <Matthias.Schmidt@netpioneer.de>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Connection refused - PSM not supported
+Date: Thu, 25 Feb 2016 11:51:11 +0000
+Message-ID: <3C44B1A8-A9C9-43A9-84C5-C6220705C1B7@netpioneer.de>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <CAEZxfGNwmoDTvgR3azQSKYOANe=Dn427UynjrR427Y1kjmPniQ@mail.gmail.com>
-References: <CAEZxfGNt6FPXpk0SQLCxke49M4PVcP5t-JSEnB9S+AXCi0HJgw@mail.gmail.com>
- <CABBYNZJiuQXVGm3AFbSU23mEQB_vEN5D0QFkcZJw=FFdU9Zztw@mail.gmail.com>
- <CAEZxfGNq6DWz_0Rp+_hr0KWwUBkN_gg0tpQssn+ZUnuDv6nhSw@mail.gmail.com>
- <CAEZxfGNRUGHOuLGpVa5NqVi4zvCTMFwNrTqpE2ysLq6_uCoCCg@mail.gmail.com>
- <CAEZxfGOtnPsBRJzKPNLt0cMn+DRo5NExw=NTF60JKSPQgCAiGQ@mail.gmail.com>
- <CABBYNZK4P2XPGiMks35yTqhqP5WfHbuCKJ4dVan+j8oQHugPbw@mail.gmail.com>
- <CABBYNZLR2w2Q9mdH_u4y59YTYghPUFwgDkFcnJ34YF+8wfTsdQ@mail.gmail.com> <CAEZxfGNwmoDTvgR3azQSKYOANe=Dn427UynjrR427Y1kjmPniQ@mail.gmail.com>
-From: =?UTF-8?Q?Fran=C3=A7ois_Beaufort?= <beaufort.francois@gmail.com>
-Date: Thu, 25 Feb 2016 14:59:07 +0100
-Message-ID: <CAEZxfGNXA2hEM19ogKCDDuUqtfmc43=7O+3JTetPqn6KvU98Dw@mail.gmail.com>
-Subject: Re: What does mean "GattServices is nil" ?
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Here's an interesting bit, I've tried with Chromebook Pixel 2013 and
-Chromebook Pixel 2015 (different chipsets) and the results are
-differents
-
-Chromebook Pixel 2013 fails to get GATT Services:
-http://pastebin.com/raw/gsi63kWg
-Chromebook Pixel 2015 can discover all of them: http://pastebin.com/raw/z5vr0B3P
-
-Does that make some kind of sense?
-
-On Wed, Feb 17, 2016 at 6:12 PM, François Beaufort
-<beaufort.francois@gmail.com> wrote:
-> I didn't have a chance to try your patches sadly.
-> Feel free to push them as it will still be valuable for sure.
->
-> On Tue, Feb 16, 2016 at 12:49 PM, Luiz Augusto von Dentz
-> <luiz.dentz@gmail.com> wrote:
->> Hi François,
->>
->> On Mon, Feb 15, 2016 at 2:32 PM, Luiz Augusto von Dentz
->> <luiz.dentz@gmail.com> wrote:
->>> Hi François,
->>>
->>> On Mon, Feb 15, 2016 at 12:20 PM, François Beaufort
->>> <beaufort.francois@gmail.com> wrote:
->>>> And here are my bluetoothd logs when enabling debug mode:
->>>> http://pastebin.com/raw/WjRVrMk5
->>>>
->>>> bluetoothd[21655]: src/device.c:device_connect_le() Connection attempt
->>>> to: F1:6F:DE:EC:F1:D6
->>>> bluetoothd[21655]: src/adapter.c:connect_failed_callback() hci0
->>>> F1:6F:DE:EC:F1:D6 status 2
->>>> bluetoothd[21655]: plugins/policy.c:conn_fail_cb() status 2
->>>> bluetoothd[21655]: src/adapter.c:bonding_attempt_complete() hci0
->>>> bdaddr F1:6F:DE:EC:F1:D6 type 2 status 0x2
->>>> bluetoothd[21655]: src/device.c:device_bonding_complete() bonding
->>>> (nil) status 0x02
->>>> bluetoothd[21655]: src/device.c:device_bonding_failed() status 2
->>>> bluetoothd[21655]: src/adapter.c:resume_discovery()
->>>> bluetoothd[21655]: src/device.c:att_connect_cb() connect error:
->>>> Transport endpoint is not connected (107)
->>>> bluetoothd[21655]: src/adapter.c:connected_callback() hci0 device
->>>> F1:6F:DE:EC:F1:D6 connected eir_len 24
->>>> bluetoothd[21655]: attrib/gattrib.c:g_attrib_ref() 0x7f3ccfe929b0:
->>>> g_attrib_ref=1
->>>> bluetoothd[21655]: src/device.c:load_gatt_db() Restoring
->>>> F1:6F:DE:EC:F1:D6 gatt database from file
->>>> bluetoothd[21655]: src/device.c:load_service() loading service:
->>>> 0x0001, end: 0x0007, uuid: 1800
->>>> bluetoothd[21655]: src/device.c:load_service() loading service:
->>>> 0x0008, end: 0x000b, uuid: 00001801-0000-1000-8000-00805f9b34fb
->>>> bluetoothd[21655]: src/device.c:load_service() loading service:
->>>> 0x0012, end: 0x0019, uuid: 0000180d-0000-1000-8000-00805f9b34fb
->>>> bluetoothd[21655]: src/device.c:load_service() loading service:
->>>> 0x001a, end: 0xffff, uuid: 0000180a-0000-1000-8000-00805f9b34fb
->>>> bluetoothd[21655]: src/device.c:load_chrc() loading characteristic
->>>> handle: 0x0002, value handle: 0x0003, properties 0x000a uuid: 2a00
->>>> bluetoothd[21655]: src/device.c:load_chrc() loading characteristic
->>>> handle: 0x0004, value handle: 0x0005, properties 0x0002 uuid: 2a01
->>>> bluetoothd[21655]: src/device.c:load_chrc() loading characteristic
->>>> handle: 0x0006, value handle: 0x0007, properties 0x0002 uuid: 2a04
->>>> bluetoothd[21655]: src/device.c:load_chrc() loading characteristic
->>>> handle: 0x0009, value handle: 0x000a, properties 0x0020 uuid:
->>>> 00002a05-0000-1000-8000-00805f9b34fb
->>>> bluetoothd[21655]: src/device.c:load_chrc() loading characteristic
->>>> handle: 0x000a, value handle: 0x000b, properties 0x0010 uuid:
->>>> 6e400003-b5a3-f393-e0a9-e50e24dcca9e
->>>> bluetoothd[21655]: saving characteristic to db failed
->>>> bluetoothd[21655]: Unable to load gatt db from file for F1:6F:DE:EC:F1:D6
->>>> bluetoothd[21655]: src/gatt-client.c:btd_gatt_client_connected()
->>>> Device connected.
->>>> bluetoothd[21655]: src/device.c:att_browse_cb() ATT connection successful
->>>> bluetoothd[21655]: src/device.c:gatt_debug() MTU exchange complete, with MTU: 23
->>>> bluetoothd[21655]: src/device.c:gatt_debug() Primary services found: 5
->>>> bluetoothd[21655]: src/device.c:gatt_debug() start: 0x0001, end:
->>>> 0x0007, uuid: 00001800-0000-1000-8000-00805f9b34fb
->>>> bluetoothd[21655]: src/device.c:gatt_debug() start: 0x0008, end:
->>>> 0x000b, uuid: 00001801-0000-1000-8000-00805f9b34fb
->>>> bluetoothd[21655]: src/device.c:gatt_debug() start: 0x000c, end:
->>>> 0x0011, uuid: 00001530-1212-efde-1523-785feabcd123
->>>> bluetoothd[21655]: src/device.c:gatt_debug() start: 0x0012, end:
->>>> 0x0019, uuid: 0000180d-0000-1000-8000-00805f9b34fb
->>>> bluetoothd[21655]: src/device.c:gatt_debug() start: 0x001a, end:
->>>> 0xffff, uuid: 0000180a-0000-1000-8000-00805f9b34fb
->>>> bluetoothd[21655]: src/device.c:gatt_debug() Secondary service
->>>> discovery failed. ATT ECODE: 0x0a
->>>> bluetoothd[21655]: src/device.c:gatt_debug() Characteristics found: 1
->>>> bluetoothd[21655]: src/device.c:gatt_debug() start: 0x0009, end:
->>>> 0x000b, value: 0x000a, props: 0x20, uuid: 00002a05-0000-1
->>>> bluetoothd[21655]: src/device.c:gatt_debug() Failed to initialize gatt-client
->>>> bluetoothd[21655]: src/device.c:gatt_client_ready_cb() status: failed, error: 10
->>>> bluetoothd[21655]: src/device.c:device_svc_resolved()
->>>> /org/bluez/hci0/dev_F1_6F_DE_EC_F1_D6 err -5
->>>> bluetoothd[21655]: src/device.c:gatt_service_removed() start: 0x0001,
->>>> end: 0x0007
->>>
->>> It turns out it was the cache malfunctioning, it does clear the cache
->>> properly before storing the services when it changed so you would end
->>> up with new and old services which obviously does not work as the
->>> ranges tend to overlap.
->>
->> Have you tried my patches? I will probably push them today if you don't object.
->>
->>
->>
->> --
->> Luiz Augusto von Dentz
+SGkgKiwNCg0KSeKAmW0gdHJ5aW5nIHdpdGggYSBOZXh1cyA0ICggQW5kcm9pZCA1LjEuMSApIFBo
+b25lIHVzaW5nIEJsdWVwaXhlbOKAmXMgQkxFU2Nhbm5lciB0byBicm93c2UgdGhlIFNlcnZpY2Vz
+L0NoYXJhdGVyaXN0aWNzIHByb3ZpZGVkIGJ5IEJsdWV6IDUuMzcgLyBBUk0gYW5kDQpvdXIgb3du
+IFB5dGhvbi9EQlVTIENvZGUuDQoNCkFsYXMsIGkgZG9u4oCZdCBnZXQgYW55IGluZm9ybWF0aW9u
+IGRpc3BsYXllZC4NCg0KVHdvIHRoaW5ncyB3aGljaCBwb3AgaW50byBteSBleWVzIHdoaWxlIHJl
+YWRpbmcgdGhyb3VnIHRoZSBkdW1wIGFyZToNCg0KDQphKSBBIGNvbm5lY3QgcmVxdWVzdCB1c2lu
+ZyB0aGUgUFNNKDEpIG9mIFNEUCBnZXTigJlzIHR1cm5lZCBkb3duOiANCg0KPiBBQ0wgZGF0YTog
+aGFuZGxlIDEgZmxhZ3MgMHgwMiBkbGVuIDEyDQogICAgTDJDQVAocyk6IENvbm5lY3QgcmVxOiBw
+c20gMSBzY2lkIDB4MDA0NA0KDQo8IEFDTCBkYXRhOiBoYW5kbGUgMSBmbGFncyAweDAwIGRsZW4g
+MTYNCiAgICBMMkNBUChzKTogQ29ubmVjdCByc3A6IGRjaWQgMHgwMDAwIHNjaWQgMHgwMDQ0IHJl
+c3VsdCAyIHN0YXR1cyAwDQogICAgICBDb25uZWN0aW9uIHJlZnVzZWQgLSBQU00gbm90IHN1cHBv
+cnRlZA0KDQpiKSBUaGUgTmV4dXMgcmVmdXNlcyB0byByYWlzZSB0aGUgTVRVIHRvIDUxNzoNCg0K
+PCBBQ0wgZGF0YTogaGFuZGxlIDEgZmxhZ3MgMHgwMCBkbGVuIDcNCiAgICBMMkNBUChkKTogY2lk
+IDB4MDA0MiBsZW4gMyBbcHNtIDMxXQ0KICAgICAgQVRUOiBNVFUgcmVxICgweDAyKQ0KICAgICAg
+ICBjbGllbnQgcnggbXR1IDUxNw0KDQo+IEFDTCBkYXRhOiBoYW5kbGUgMSBmbGFncyAweDAyIGRs
+ZW4gOQ0KICAgIEwyQ0FQKGQpOiBjaWQgMHgwMDQwIGxlbiA1IFtwc20gMzFdDQogICAgICBBVFQ6
+IEVycm9yICgweDAxKQ0KICAgICAgICBFcnJvcjogUmVxdWVzdCBub3Qgc3VwcG9ydGVkICg2KQ0K
+ICAgICAgICBNVFUgcmVxICgweDAyKSBvbiBoYW5kbGUgMHgwMDAwDQoNCkFjY29yZGluZyB0byBt
+eSBpbnRlcnByZXRhdGlvbiBvZiB0aGUgc3BlYyB0aGlzIGNvdWxkIGhhcHBlbiBhbmQgc2hvdWxk
+IG5vdCBjYXVzZSB0aGUgY29ubmVjdGlvbiB0byBmYWlsLg0KDQpDYW4gc29tZW9uZSBleHBsYWlu
+IHRoZSDigJ5QU00gbm90IHN1cHBvcnRlZOKAnCBiZWhhdmlvdXIgYW5kIHdoeSB3ZSBkb27igJl0
+IHNlZSB0aGUgc2VydmljZXM/IE90aGVyIENsaWVudHMsIGVzcGVjaWFsbHkgSU9TIHdvcmsgZmlu
+ZSBoZXJlLg0KDQpjaGVlcnMsDQoNCk1hdHRoaWFzDQoNCg0KTWF0dGhpYXMgU2NobWlkdA0KU2Vu
+aW9yIEFyY2hpdGVjdA0KDQpkaXZhLWUgS2FybHNydWhlDQpMdWR3aWctRXJoYXJkLUFsbGVlIDIw
+LCA3NjEzMSBLYXJsc3J1aGUsIERldXRzY2hsYW5kDQpUOiArNDkgNzIxIDkyMDYwIDgyMg0KTTog
+KzQ5IDE3NSAyNjk0MjEzDQptYXR0aGlhcy5zY2htaWR0QGRpdmEtZS5jb20NCnd3dy5kaXZhLWUu
+Y29tIGZvbGxvdyB1czogdHdpdHRlciwgZmFjZWJvb2ssIExpbmtlZEluLCBYaW5nDQoNCi0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0NCmRpdmEtZSB8IE5l
+dHBpb25lZXIgR21iSCANCkx1ZHdpZy1FcmhhcmQtQWxsZWUgMjAsIDc2MTMxIEthcmxzcnVoZQ0K
+SFJCOiAxMDc1MjEgSGFuZGVsc3JlZ2lzdGVyIE1hbm5oZWltDQpHZXNjaMOkZnRzZsO8aHJ1bmc6
+IE1hcmNlbCBGdWhsbWFubiwgU3RlZmFuIE3DpHJrbGUsIEF4ZWwgSmFobg0KDQo=
