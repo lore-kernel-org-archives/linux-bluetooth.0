@@ -1,41 +1,51 @@
-Return-Path: <loic.poulain@intel.com>
-From: Loic Poulain <loic.poulain@intel.com>
-To: marcel@holtmann.org
-Cc: linux-bluetooth@vger.kernel.org,
-	Loic Poulain <loic.poulain@intel.com>
-Subject: [PATCH] tools: Add identifier for Intel AG6XX UART devices
-Date: Thu, 25 Feb 2016 17:03:07 +0100
-Message-Id: <1456416187-10525-1-git-send-email-loic.poulain@intel.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Date: Thu, 25 Feb 2016 16:57:44 +0100
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Matthias Schmidt <Matthias.Schmidt@netpioneer.de>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: Connection refused - PSM not supported
+Message-ID: <20160225155744.GA8073@t440s.nuernbergmesse.de>
+References: <3C44B1A8-A9C9-43A9-84C5-C6220705C1B7@netpioneer.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <3C44B1A8-A9C9-43A9-84C5-C6220705C1B7@netpioneer.de>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- tools/btattach.c  | 1 +
- tools/hciattach.h | 1 +
- 2 files changed, 2 insertions(+)
+Hi Matthias,
 
-diff --git a/tools/btattach.c b/tools/btattach.c
-index a025bb0..ddf8105 100644
---- a/tools/btattach.c
-+++ b/tools/btattach.c
-@@ -214,6 +214,7 @@ static const struct {
- 	{ "intel", HCI_UART_INTEL },
- 	{ "bcm",   HCI_UART_BCM   },
- 	{ "qca",   HCI_UART_QCA   },
-+	{ "ag6xx", HCI_UART_AG6XX },
- 	{ }
- };
- 
-diff --git a/tools/hciattach.h b/tools/hciattach.h
-index 4279a33..3d25f59 100644
---- a/tools/hciattach.h
-+++ b/tools/hciattach.h
-@@ -42,6 +42,7 @@
- #define HCI_UART_INTEL	6
- #define HCI_UART_BCM	7
- #define HCI_UART_QCA	8
-+#define HCI_UART_AG6XX	9
- 
- #define HCI_UART_RAW_DEVICE	0
- #define HCI_UART_RESET_ON_INIT	1
--- 
-1.9.1
+On Thu, Feb 25, 2016, Matthias Schmidt wrote:
+> I’m trying with a Nexus 4 ( Android 5.1.1 ) Phone using Bluepixel’s
+> BLEScanner to browse the Services/Charateristics provided by Bluez
+> 5.37 / ARM and
+> our own Python/DBUS Code.
+> 
+> Alas, i don’t get any information displayed.
+> 
+> Two things which pop into my eyes while reading throug the dump are:
+> 
+> a) A connect request using the PSM(1) of SDP get’s turned down:
+
+SDP is a BR/EDR protocol. It doesn't exist for LE (which I assume
+you're using since you say you use something called BLEScanner). So
+that's why you get PSM not supported.
+
+> b) The Nexus refuses to raise the MTU to 517:
+> 
+> < ACL data: handle 1 flags 0x00 dlen 7
+>     L2CAP(d): cid 0x0042 len 3 [psm 31]
+>       ATT: MTU req (0x02)
+>         client rx mtu 517
+> > ACL data: handle 1 flags 0x02 dlen 9
+>     L2CAP(d): cid 0x0040 len 5 [psm 31]
+>       ATT: Error (0x01)
+>         Error: Request not supported (6)
+>         MTU req (0x02) on handle 0x0000
+> 
+> According to my interpretation of the spec this could happen and
+> should not cause the connection to fail.
+
+How is it failing? A disconnection isn't necessarily a failure - it
+could just be a timeout happening.
+
+Johan
