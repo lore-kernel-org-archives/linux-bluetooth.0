@@ -1,45 +1,41 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Date: Fri, 26 Feb 2016 00:29:21 +0300
-From: Dan Carpenter <dan.carpenter@oracle.com>
-To: aar@pengutronix.de
-Cc: linux-bluetooth@vger.kernel.org
-Subject: re: 6lowpan: iphc: add support for stateful compression
-Message-ID: <20160225212921.GA439@mwanda>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <loic.poulain@intel.com>
+From: Loic Poulain <loic.poulain@intel.com>
+To: marcel@holtmann.org
+Cc: linux-bluetooth@vger.kernel.org,
+	Loic Poulain <loic.poulain@intel.com>
+Subject: [PATCH] tools: Add identifier for Intel AG6XX UART devices
+Date: Thu, 25 Feb 2016 17:03:07 +0100
+Message-Id: <1456416187-10525-1-git-send-email-loic.poulain@intel.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello Alexander Aring,
+---
+ tools/btattach.c  | 1 +
+ tools/hciattach.h | 1 +
+ 2 files changed, 2 insertions(+)
 
-The patch 5609c185f24d: "6lowpan: iphc: add support for stateful
-compression" from Feb 22, 2016, leads to the following static checker
-warning:
-
-	net/6lowpan/iphc.c:815 lowpan_compress_ctx_addr()
-	warn: signedness bug returning '(-22)'
-
-net/6lowpan/iphc.c
-   812          }
-   813  
-   814          WARN_ON_ONCE("context found but no address mode matched\n");
-
-This isn't correct.  WARN_ON_ONCE() takes a condition argument, not a
-string.  It should be:
-
-	WARN_ONCE(1, "context found but no address mode matched\n");
-
-   815          return -EINVAL;
-                ^^^^^^^^^^^^^^
-This is a u8 function and none of the callers check for error.
-
-   816  out:
-   817  
-   818          if (sam)
-   819                  return lowpan_iphc_dam_to_sam_value[dam];
-   820          else
-   821                  return dam;
-   822  }
-
-regards,
-dan carpenter
+diff --git a/tools/btattach.c b/tools/btattach.c
+index a025bb0..ddf8105 100644
+--- a/tools/btattach.c
++++ b/tools/btattach.c
+@@ -214,6 +214,7 @@ static const struct {
+ 	{ "intel", HCI_UART_INTEL },
+ 	{ "bcm",   HCI_UART_BCM   },
+ 	{ "qca",   HCI_UART_QCA   },
++	{ "ag6xx", HCI_UART_AG6XX },
+ 	{ }
+ };
+ 
+diff --git a/tools/hciattach.h b/tools/hciattach.h
+index 4279a33..3d25f59 100644
+--- a/tools/hciattach.h
++++ b/tools/hciattach.h
+@@ -42,6 +42,7 @@
+ #define HCI_UART_INTEL	6
+ #define HCI_UART_BCM	7
+ #define HCI_UART_QCA	8
++#define HCI_UART_AG6XX	9
+ 
+ #define HCI_UART_RAW_DEVICE	0
+ #define HCI_UART_RESET_ON_INIT	1
+-- 
+1.9.1
