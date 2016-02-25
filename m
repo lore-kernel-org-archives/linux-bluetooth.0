@@ -1,40 +1,45 @@
-Return-Path: <linux-wpan-owner@vger.kernel.org>
-From: Alexander Aring <aar@pengutronix.de>
-To: linux-wpan@vger.kernel.org
-Cc: linux-bluetooth@vger.kernel.org, kernel@pengutronix.de,
-	dan.carpenter@oracle.com, Alexander Aring <aar@pengutronix.de>
-Subject: [PATCH bluetooth-next] 6lowpan: iphc: fix invalid case handling
-Date: Fri, 26 Feb 2016 09:06:07 +0100
-Message-Id: <1456473967-26721-1-git-send-email-aar@pengutronix.de>
-Sender: linux-wpan-owner@vger.kernel.org
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Date: Fri, 26 Feb 2016 00:29:21 +0300
+From: Dan Carpenter <dan.carpenter@oracle.com>
+To: aar@pengutronix.de
+Cc: linux-bluetooth@vger.kernel.org
+Subject: re: 6lowpan: iphc: add support for stateful compression
+Message-ID: <20160225212921.GA439@mwanda>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch fixes the return value in a case which should never occur.
-Instead returning "-EINVAL" we return LOWPAN_IPHC_DAM_00 which is
-invalid on context based addresses. Also change the WARN_ON_ONCE to
-WARN_ONCE which was suggested by Dan Carpenter.
+Hello Alexander Aring,
 
-Reported-by: Dan Carpenter <dan.carpenter@oracle.com>
-Signed-off-by: Alexander Aring <aar@pengutronix.de>
----
- net/6lowpan/iphc.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+The patch 5609c185f24d: "6lowpan: iphc: add support for stateful
+compression" from Feb 22, 2016, leads to the following static checker
+warning:
 
-diff --git a/net/6lowpan/iphc.c b/net/6lowpan/iphc.c
-index 06287ac..7217251 100644
---- a/net/6lowpan/iphc.c
-+++ b/net/6lowpan/iphc.c
-@@ -811,8 +811,8 @@ static u8 lowpan_compress_ctx_addr(u8 **hc_ptr, const struct in6_addr *ipaddr,
- 		goto out;
- 	}
- 
--	WARN_ON_ONCE("context found but no address mode matched\n");
--	return -EINVAL;
-+	WARN_ONCE(1, "context found but no address mode matched\n");
-+	return LOWPAN_IPHC_DAM_00;
- out:
- 
- 	if (sam)
--- 
-2.7.1
+	net/6lowpan/iphc.c:815 lowpan_compress_ctx_addr()
+	warn: signedness bug returning '(-22)'
 
+net/6lowpan/iphc.c
+   812          }
+   813  
+   814          WARN_ON_ONCE("context found but no address mode matched\n");
+
+This isn't correct.  WARN_ON_ONCE() takes a condition argument, not a
+string.  It should be:
+
+	WARN_ONCE(1, "context found but no address mode matched\n");
+
+   815          return -EINVAL;
+                ^^^^^^^^^^^^^^
+This is a u8 function and none of the callers check for error.
+
+   816  out:
+   817  
+   818          if (sam)
+   819                  return lowpan_iphc_dam_to_sam_value[dam];
+   820          else
+   821                  return dam;
+   822  }
+
+regards,
+dan carpenter
