@@ -1,140 +1,137 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <1456343206-4122-1-git-send-email-kurt@linux.com>
-References: <1456343206-4122-1-git-send-email-kurt@linux.com>
-Date: Fri, 26 Feb 2016 14:03:02 +0200
-Message-ID: <CABBYNZJ0zpSsXhzOztSm+fkOGukwm6p05Rvxs796SLrOdLVqxQ@mail.gmail.com>
-Subject: Re: [PATCH] Fixed scripts to run with python 3
+In-Reply-To: <20160224092945.GA28224@vps217108.ovh.net>
+References: <20160224092945.GA28224@vps217108.ovh.net>
+Date: Fri, 26 Feb 2016 14:02:27 +0200
+Message-ID: <CABBYNZ+szGiPnPONO3_3x4w_qGDVUhWb65QO6Pxorf0Wv+n4Eg@mail.gmail.com>
+Subject: Re: [PATCH v2] tools/btgatt-client : fix write-value byte parsing
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Kurt McAlpine <kurt@linux.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+To: Chevallier Maxime <maxime.chevallier@openwide.fr>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
 
-On Wed, Feb 24, 2016 at 9:46 PM, Kurt McAlpine <kurt@linux.com> wrote:
+On Wed, Feb 24, 2016 at 11:29 AM, Chevallier Maxime
+<maxime.chevallier@openwide.fr> wrote:
+> write-value, write-long-value and write-prepare were parsing
+> bytes using strtol with base '0' and restraining wtring size to
+> be exactly 2, forbidding to write values over 99. The string length
+> is no more checked, we instead check that the parsed value is in the
+> correct range.
 > ---
->  test/example-gatt-client | 13 ++++++++-----
->  test/example-gatt-server | 20 ++++++++++++--------
->  2 files changed, 20 insertions(+), 13 deletions(-)
+>  tools/btgatt-client.c | 41 +++++++++++++----------------------------
+>  1 file changed, 13 insertions(+), 28 deletions(-)
 >
-> diff --git a/test/example-gatt-client b/test/example-gatt-client
-> index 724a45d..5a02505 100755
-> --- a/test/example-gatt-client
-> +++ b/test/example-gatt-client
-> @@ -1,8 +1,11 @@
-> -#!/usr/bin/python
-> +#!/usr/bin/env python3
+> diff --git a/tools/btgatt-client.c b/tools/btgatt-client.c
+> index 0f6a1bd..2153bec 100644
+> --- a/tools/btgatt-client.c
+> +++ b/tools/btgatt-client.c
+> @@ -658,7 +658,7 @@ static void write_cb(bool success, uint8_t att_ecode, void *user_data)
 >
->  import argparse
->  import dbus
-> -import gobject
-> +try:
-> +  from gi.repository import GObject
-> +except ImportError:
-> +  import gobject as GObject
->  import sys
+>  static void cmd_write_value(struct client *cli, char *cmd_str)
+>  {
+> -       int opt, i;
+> +       int opt, i, val;
+>         char *argvbuf[516];
+>         char **argv = argvbuf;
+>         int argc = 1;
+> @@ -726,19 +726,14 @@ static void cmd_write_value(struct client *cli, char *cmd_str)
+>                 }
 >
->  from dbus.mainloop.glib import DBusGMainLoop
-> @@ -195,7 +198,7 @@ def main():
->      global bus
->      bus = dbus.SystemBus()
->      global mainloop
-> -    mainloop = gobject.MainLoop()
-> +    mainloop = GObject.MainLoop()
+>                 for (i = 1; i < argc; i++) {
+> -                       if (strlen(argv[i]) != 2) {
+> -                               printf("Invalid value byte: %s\n",
+> -                                                               argv[i]);
+> -                               goto done;
+> -                       }
+> -
+> -                       value[i-1] = strtol(argv[i], &endptr, 0);
+> +                       val = strtol(argv[i], &endptr, 0);
+>                         if (endptr == argv[i] || *endptr != '\0'
+> -                                                       || errno == ERANGE) {
+> +                               || errno == ERANGE || val < 0 || val > 255) {
+>                                 printf("Invalid value byte: %s\n",
+>                                                                 argv[i]);
+>                                 goto done;
+>                         }
+> +                       value[i-1] = val;
+>                 }
+>         }
 >
->      om = dbus.Interface(bus.get_object(BLUEZ_SERVICE_NAME, '/'), DBUS_OM_IFACE)
->      om.connect_to_signal('InterfacesRemoved', interfaces_removed_cb)
-> @@ -204,10 +207,10 @@ def main():
->          if not process_hr_service(service_path):
->              sys.exit(1)
->      except dbus.DBusException as e:
-> -        print e.message
-> +        print(e)
->          sys.exit(1)
+> @@ -793,7 +788,7 @@ static void write_long_cb(bool success, bool reliable_error, uint8_t att_ecode,
 >
-> -    print 'Heart Rate Service ready'
-> +    print('Heart Rate Service ready')
+>  static void cmd_write_long_value(struct client *cli, char *cmd_str)
+>  {
+> -       int opt, i;
+> +       int opt, i, val;
+>         char *argvbuf[516];
+>         char **argv = argvbuf;
+>         int argc = 1;
+> @@ -865,21 +860,15 @@ static void cmd_write_long_value(struct client *cli, char *cmd_str)
+>                 }
 >
->      start_client()
+>                 for (i = 2; i < argc; i++) {
+> -                       if (strlen(argv[i]) != 2) {
+> -                               printf("Invalid value byte: %s\n",
+> -                                                               argv[i]);
+> -                               free(value);
+> -                               return;
+> -                       }
+> -
+> -                       value[i-2] = strtol(argv[i], &endptr, 0);
+> +                       val = strtol(argv[i], &endptr, 0);
+>                         if (endptr == argv[i] || *endptr != '\0'
+> -                                                       || errno == ERANGE) {
+> +                               || errno == ERANGE || val < 0 || val > 255) {
+>                                 printf("Invalid value byte: %s\n",
+>                                                                 argv[i]);
+>                                 free(value);
+>                                 return;
+>                         }
+> +                       value[i-2] = val;
+>                 }
+>         }
 >
-> diff --git a/test/example-gatt-server b/test/example-gatt-server
-> index 67dee1a..f2ddb2b 100755
-> --- a/test/example-gatt-server
-> +++ b/test/example-gatt-server
-> @@ -1,4 +1,4 @@
-> -#!/usr/bin/python
-> +#!/usr/bin/env python3
+> @@ -909,7 +898,7 @@ static struct option write_prepare_options[] = {
 >
->  import dbus
->  import dbus.exceptions
-> @@ -6,7 +6,11 @@ import dbus.mainloop.glib
->  import dbus.service
+>  static void cmd_write_prepare(struct client *cli, char *cmd_str)
+>  {
+> -       int opt, i;
+> +       int opt, i, val;
+>         char *argvbuf[516];
+>         char **argv = argvbuf;
+>         int argc = 0;
+> @@ -1002,18 +991,14 @@ static void cmd_write_prepare(struct client *cli, char *cmd_str)
+>         }
 >
->  import array
-> -import gobject
-> +try:
-> +  from gi.repository import GObject
-> +except ImportError:
-> +  import gobject as GObject
-> +import sys
+>         for (i = 2; i < argc; i++) {
+> -               if (strlen(argv[i]) != 2) {
+> -                       printf("Invalid value byte: %s\n", argv[i]);
+> -                       free(value);
+> -                       return;
+> -               }
+> -
+> -               value[i-2] = strtol(argv[i], &endptr, 0);
+> -               if (endptr == argv[i] || *endptr != '\0' || errno == ERANGE) {
+> +               val = strtol(argv[i], &endptr, 0);
+> +               if (endptr == argv[i] || *endptr != '\0' || errno == ERANGE
+> +                                               || val < 0 || val > 255) {
+>                         printf("Invalid value byte: %s\n", argv[i]);
+>                         free(value);
+>                         return;
+>                 }
+> +               value[i-2] = val;
+>         }
 >
->  from random import randint
->  from collections import OrderedDict
-> @@ -285,7 +289,7 @@ class HeartRateMeasurementChrc(Characteristic):
->          if not self.notifying:
->              return
->
-> -        gobject.timeout_add(1000, self.hr_msrmt_cb)
-> +        GObject.timeout_add(1000, self.hr_msrmt_cb)
->
->      def StartNotify(self):
->          if self.notifying:
-> @@ -372,7 +376,7 @@ class BatteryLevelCharacteristic(Characteristic):
->                  service)
->          self.notifying = False
->          self.battery_lvl = 100
-> -        gobject.timeout_add(5000, self.drain_battery)
-> +        GObject.timeout_add(5000, self.drain_battery)
->
->      def notify_battery_level(self):
->          if not self.notifying:
-> @@ -480,7 +484,7 @@ class CharacteristicUserDescriptionDescriptor(Descriptor):
->
->      def __init__(self, bus, index, characteristic):
->          self.writable = 'writable-auxiliaries' in characteristic.flags
-> -        self.value = array.array('B', 'This is a characteristic for testing')
-> +        self.value = array.array('B', b'This is a characteristic for testing')
->          self.value = self.value.tolist()
->          Descriptor.__init__(
->                  self, bus, index,
-> @@ -555,8 +559,8 @@ def find_adapter(bus):
->                                 DBUS_OM_IFACE)
->      objects = remote_om.GetManagedObjects()
->
-> -    for o, props in objects.iteritems():
-> -        if props.has_key(GATT_MANAGER_IFACE):
-> +    for o, props in objects.items():
-> +        if GATT_MANAGER_IFACE in props.keys():
->              return o
->
->      return None
-> @@ -579,7 +583,7 @@ def main():
->
->      app = Application(bus)
->
-> -    mainloop = gobject.MainLoop()
-> +    mainloop = GObject.MainLoop()
->
->      service_manager.RegisterApplication(app.get_path(), {},
->                                      reply_handler=register_app_cb,
+>  done:
 > --
-> 2.7.1
+> 2.1.4
 
 Applied, thanks.
-
 
 
 -- 
