@@ -1,163 +1,52 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <CAEZxfGPm+KHjHFfRw4L5PLEQ3EMJ=z9waq5bvuaDcz8JHMHo3w@mail.gmail.com>
-References: <CAEZxfGNt6FPXpk0SQLCxke49M4PVcP5t-JSEnB9S+AXCi0HJgw@mail.gmail.com>
- <CABBYNZJiuQXVGm3AFbSU23mEQB_vEN5D0QFkcZJw=FFdU9Zztw@mail.gmail.com>
- <CAEZxfGNq6DWz_0Rp+_hr0KWwUBkN_gg0tpQssn+ZUnuDv6nhSw@mail.gmail.com>
- <CAEZxfGNRUGHOuLGpVa5NqVi4zvCTMFwNrTqpE2ysLq6_uCoCCg@mail.gmail.com>
- <CAEZxfGOtnPsBRJzKPNLt0cMn+DRo5NExw=NTF60JKSPQgCAiGQ@mail.gmail.com>
- <CABBYNZK4P2XPGiMks35yTqhqP5WfHbuCKJ4dVan+j8oQHugPbw@mail.gmail.com>
- <CABBYNZLR2w2Q9mdH_u4y59YTYghPUFwgDkFcnJ34YF+8wfTsdQ@mail.gmail.com>
- <CAEZxfGNwmoDTvgR3azQSKYOANe=Dn427UynjrR427Y1kjmPniQ@mail.gmail.com>
- <CAEZxfGNXA2hEM19ogKCDDuUqtfmc43=7O+3JTetPqn6KvU98Dw@mail.gmail.com>
- <CABBYNZJBzGXSGjLX4dzKE_EC7uphLHQrxWQJ-ChEVHNifKe3Dw@mail.gmail.com>
- <CAEZxfGNQiqmE4hA+R=a5y8Sk21M6kyK-pj5RBzX-rSGvHMMGzg@mail.gmail.com> <CAEZxfGPm+KHjHFfRw4L5PLEQ3EMJ=z9waq5bvuaDcz8JHMHo3w@mail.gmail.com>
-From: =?UTF-8?Q?Fran=C3=A7ois_Beaufort?= <beaufort.francois@gmail.com>
-Date: Fri, 26 Feb 2016 15:59:41 +0100
-Message-ID: <CAEZxfGMRwb4bKO5ZTy3JMz-TxQf3PLs6ZKWobTdnHLHf2c5d3A@mail.gmail.com>
-Subject: Re: What does mean "GattServices is nil" ?
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <xerofoify@gmail.com>
+From: Nicholas Krause <xerofoify@gmail.com>
+To: marcel@holtmann.org
+Cc: gustavo@padovan.org,
+	johan.hedberg@gmail.com,
+	davem@davemloft.net,
+	linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v3 RESEND] bluetooth:Fix locking issues in the function l2cap_connect_cfm
+Date: Fri, 26 Feb 2016 09:16:45 -0500
+Message-Id: <1456496205-6015-1-git-send-email-xerofoify@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-After updating to your last patch
-(http://git.kernel.org/cgit/bluetooth/bluez.git/commit/?id=d205d58b285542f845d59cab24793de7c12f4aca),
-here's what I'm seeing now: http://pastebin.com/raw/4CXw36A5
-As you can see, list-attributes doesn't list all attributes anymore ;)
+This fixes a locking issue in the function l2cap_connect_cfm for
+not locking the mutex lock for channels on the l2cap_conn structure
+pointer conn before calling __l2cap_get_chan_by_dcid as all callers
+need to lock and unlock this mutex before calling this function due
+to issues with either concurrent users or race conditions arising
+if this mutex is not locked before these calls.
+v3 Fix double locking of mutex lock on goto next label to instead correctly
+unlock the channel mutex
+v2 Remove unneeded mutex_unlock for channels as the unlock was due early
+for adding correct protection for all functions that have requirements
+for this mutex lock needing to be locked before calling them.
+Signed-off-by: Nicholas Krause <xerofoify@gmail.com>
+---
+ net/bluetooth/l2cap_core.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-On Thu, Feb 25, 2016 at 3:33 PM, François Beaufort
-<beaufort.francois@gmail.com> wrote:
-> And here's the diff which shows that more services are discovered
-> somehow: https://www.diffchecker.com/m20m9ga1
->
-> On Thu, Feb 25, 2016 at 3:29 PM, François Beaufort
-> <beaufort.francois@gmail.com> wrote:
->> Here are bluetoothd logs for Pixel 2015 (working):
->> http://pastebin.com/raw/uShisSPw
->> And here are the ones for the Pixel 2013 (failing):
->> http://pastebin.com/raw/4arEF8qu
->>
->> On Thu, Feb 25, 2016 at 3:03 PM, Luiz Augusto von Dentz
->> <luiz.dentz@gmail.com> wrote:
->>> Hi François,
->>>
->>>
->>> On Thu, Feb 25, 2016 at 3:59 PM, François Beaufort
->>> <beaufort.francois@gmail.com> wrote:
->>>> Here's an interesting bit, I've tried with Chromebook Pixel 2013 and
->>>> Chromebook Pixel 2015 (different chipsets) and the results are
->>>> differents
->>>>
->>>> Chromebook Pixel 2013 fails to get GATT Services:
->>>> http://pastebin.com/raw/gsi63kWg
->>>
->>> Perhaps something else is affecting that, do you have the bluetoothd logs?
->>>
->>>> Chromebook Pixel 2015 can discover all of them: http://pastebin.com/raw/z5vr0B3P
->>>>
->>>> Does that make some kind of sense?
->>>>
->>>> On Wed, Feb 17, 2016 at 6:12 PM, François Beaufort
->>>> <beaufort.francois@gmail.com> wrote:
->>>>> I didn't have a chance to try your patches sadly.
->>>>> Feel free to push them as it will still be valuable for sure.
->>>>>
->>>>> On Tue, Feb 16, 2016 at 12:49 PM, Luiz Augusto von Dentz
->>>>> <luiz.dentz@gmail.com> wrote:
->>>>>> Hi François,
->>>>>>
->>>>>> On Mon, Feb 15, 2016 at 2:32 PM, Luiz Augusto von Dentz
->>>>>> <luiz.dentz@gmail.com> wrote:
->>>>>>> Hi François,
->>>>>>>
->>>>>>> On Mon, Feb 15, 2016 at 12:20 PM, François Beaufort
->>>>>>> <beaufort.francois@gmail.com> wrote:
->>>>>>>> And here are my bluetoothd logs when enabling debug mode:
->>>>>>>> http://pastebin.com/raw/WjRVrMk5
->>>>>>>>
->>>>>>>> bluetoothd[21655]: src/device.c:device_connect_le() Connection attempt
->>>>>>>> to: F1:6F:DE:EC:F1:D6
->>>>>>>> bluetoothd[21655]: src/adapter.c:connect_failed_callback() hci0
->>>>>>>> F1:6F:DE:EC:F1:D6 status 2
->>>>>>>> bluetoothd[21655]: plugins/policy.c:conn_fail_cb() status 2
->>>>>>>> bluetoothd[21655]: src/adapter.c:bonding_attempt_complete() hci0
->>>>>>>> bdaddr F1:6F:DE:EC:F1:D6 type 2 status 0x2
->>>>>>>> bluetoothd[21655]: src/device.c:device_bonding_complete() bonding
->>>>>>>> (nil) status 0x02
->>>>>>>> bluetoothd[21655]: src/device.c:device_bonding_failed() status 2
->>>>>>>> bluetoothd[21655]: src/adapter.c:resume_discovery()
->>>>>>>> bluetoothd[21655]: src/device.c:att_connect_cb() connect error:
->>>>>>>> Transport endpoint is not connected (107)
->>>>>>>> bluetoothd[21655]: src/adapter.c:connected_callback() hci0 device
->>>>>>>> F1:6F:DE:EC:F1:D6 connected eir_len 24
->>>>>>>> bluetoothd[21655]: attrib/gattrib.c:g_attrib_ref() 0x7f3ccfe929b0:
->>>>>>>> g_attrib_ref=1
->>>>>>>> bluetoothd[21655]: src/device.c:load_gatt_db() Restoring
->>>>>>>> F1:6F:DE:EC:F1:D6 gatt database from file
->>>>>>>> bluetoothd[21655]: src/device.c:load_service() loading service:
->>>>>>>> 0x0001, end: 0x0007, uuid: 1800
->>>>>>>> bluetoothd[21655]: src/device.c:load_service() loading service:
->>>>>>>> 0x0008, end: 0x000b, uuid: 00001801-0000-1000-8000-00805f9b34fb
->>>>>>>> bluetoothd[21655]: src/device.c:load_service() loading service:
->>>>>>>> 0x0012, end: 0x0019, uuid: 0000180d-0000-1000-8000-00805f9b34fb
->>>>>>>> bluetoothd[21655]: src/device.c:load_service() loading service:
->>>>>>>> 0x001a, end: 0xffff, uuid: 0000180a-0000-1000-8000-00805f9b34fb
->>>>>>>> bluetoothd[21655]: src/device.c:load_chrc() loading characteristic
->>>>>>>> handle: 0x0002, value handle: 0x0003, properties 0x000a uuid: 2a00
->>>>>>>> bluetoothd[21655]: src/device.c:load_chrc() loading characteristic
->>>>>>>> handle: 0x0004, value handle: 0x0005, properties 0x0002 uuid: 2a01
->>>>>>>> bluetoothd[21655]: src/device.c:load_chrc() loading characteristic
->>>>>>>> handle: 0x0006, value handle: 0x0007, properties 0x0002 uuid: 2a04
->>>>>>>> bluetoothd[21655]: src/device.c:load_chrc() loading characteristic
->>>>>>>> handle: 0x0009, value handle: 0x000a, properties 0x0020 uuid:
->>>>>>>> 00002a05-0000-1000-8000-00805f9b34fb
->>>>>>>> bluetoothd[21655]: src/device.c:load_chrc() loading characteristic
->>>>>>>> handle: 0x000a, value handle: 0x000b, properties 0x0010 uuid:
->>>>>>>> 6e400003-b5a3-f393-e0a9-e50e24dcca9e
->>>>>>>> bluetoothd[21655]: saving characteristic to db failed
->>>>>>>> bluetoothd[21655]: Unable to load gatt db from file for F1:6F:DE:EC:F1:D6
->>>>>>>> bluetoothd[21655]: src/gatt-client.c:btd_gatt_client_connected()
->>>>>>>> Device connected.
->>>>>>>> bluetoothd[21655]: src/device.c:att_browse_cb() ATT connection successful
->>>>>>>> bluetoothd[21655]: src/device.c:gatt_debug() MTU exchange complete, with MTU: 23
->>>>>>>> bluetoothd[21655]: src/device.c:gatt_debug() Primary services found: 5
->>>>>>>> bluetoothd[21655]: src/device.c:gatt_debug() start: 0x0001, end:
->>>>>>>> 0x0007, uuid: 00001800-0000-1000-8000-00805f9b34fb
->>>>>>>> bluetoothd[21655]: src/device.c:gatt_debug() start: 0x0008, end:
->>>>>>>> 0x000b, uuid: 00001801-0000-1000-8000-00805f9b34fb
->>>>>>>> bluetoothd[21655]: src/device.c:gatt_debug() start: 0x000c, end:
->>>>>>>> 0x0011, uuid: 00001530-1212-efde-1523-785feabcd123
->>>>>>>> bluetoothd[21655]: src/device.c:gatt_debug() start: 0x0012, end:
->>>>>>>> 0x0019, uuid: 0000180d-0000-1000-8000-00805f9b34fb
->>>>>>>> bluetoothd[21655]: src/device.c:gatt_debug() start: 0x001a, end:
->>>>>>>> 0xffff, uuid: 0000180a-0000-1000-8000-00805f9b34fb
->>>>>>>> bluetoothd[21655]: src/device.c:gatt_debug() Secondary service
->>>>>>>> discovery failed. ATT ECODE: 0x0a
->>>>>>>> bluetoothd[21655]: src/device.c:gatt_debug() Characteristics found: 1
->>>>>>>> bluetoothd[21655]: src/device.c:gatt_debug() start: 0x0009, end:
->>>>>>>> 0x000b, value: 0x000a, props: 0x20, uuid: 00002a05-0000-1
->>>>>>>> bluetoothd[21655]: src/device.c:gatt_debug() Failed to initialize gatt-client
->>>>>>>> bluetoothd[21655]: src/device.c:gatt_client_ready_cb() status: failed, error: 10
->>>>>>>> bluetoothd[21655]: src/device.c:device_svc_resolved()
->>>>>>>> /org/bluez/hci0/dev_F1_6F_DE_EC_F1_D6 err -5
->>>>>>>> bluetoothd[21655]: src/device.c:gatt_service_removed() start: 0x0001,
->>>>>>>> end: 0x0007
->>>>>>>
->>>>>>> It turns out it was the cache malfunctioning, it does clear the cache
->>>>>>> properly before storing the services when it changed so you would end
->>>>>>> up with new and old services which obviously does not work as the
->>>>>>> ranges tend to overlap.
->>>>>>
->>>>>> Have you tried my patches? I will probably push them today if you don't object.
->>>>>>
->>>>>>
->>>>>>
->>>>>> --
->>>>>> Luiz Augusto von Dentz
->>>
->>>
->>>
->>> --
->>> Luiz Augusto von Dentz
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 45fffa4..20d3909 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -7285,6 +7285,7 @@ static void l2cap_connect_cfm(struct hci_conn *hcon, u8 status)
+ 		struct l2cap_chan *chan, *next;
+ 
+ 		/* Client fixed channels should override server ones */
++		mutex_lock(&conn->chan_lock);
+ 		if (__l2cap_get_chan_by_dcid(conn, pchan->scid))
+ 			goto next;
+ 
+@@ -7301,6 +7302,7 @@ static void l2cap_connect_cfm(struct hci_conn *hcon, u8 status)
+ 
+ 		l2cap_chan_unlock(pchan);
+ next:
++		mutex_unlock(&conn->chan_lock);
+ 		next = l2cap_global_fixed_chan(pchan, hcon);
+ 		l2cap_chan_put(pchan);
+ 		pchan = next;
+-- 
+2.1.4
