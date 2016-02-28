@@ -1,38 +1,53 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <CD162F8F-68B5-42BD-AC1B-76DC1E1B80AE@cd-jackson.com>
-References: <CD162F8F-68B5-42BD-AC1B-76DC1E1B80AE@cd-jackson.com>
-Date: Sun, 28 Feb 2016 20:53:38 +0000
-Message-ID: <CAAu3APZc0zsrLoSchuOo4B4cx=rzhsXBVGm8O7gS9c9VptnofQ@mail.gmail.com>
-Subject: Re: Receiving BLE advertisements over DBus
-From: Barry Byford <31baz66@gmail.com>
-To: Bluez mailing list <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Marcel Holtmann <marcel@holtmann.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: hci_uart: Add diag and address support for Intel/AG6xx
+Date: Sun, 28 Feb 2016 21:25:19 +0100
+Message-Id: <1456691119-64405-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello Chris,
+The AG6xx devices behave similar to Wilkens Peak and Stone Peak and with
+that it is needed to check for Intel default address. In addition it is
+possible to enable vendor events and diag support.
 
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ drivers/bluetooth/hci_ag6xx.c | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
 
-On 27 February 2016 at 00:08, Chris Jackson <chris@cd-jackson.com> wrote:
-> Is it possible to receive BLE advertisements over the DBus interface - if so, how?
->
-> I suspect that the answer is that it’s not currently possible - is there any plans to add such support?  It seems that this is something that is becoming more necessary as the number of devices sending data in the discovery packet increases…
->
-> Any information on this would be appreciated - if necessary I’d be happy to look at implementing something if the BlueZ architects can comment on a recommended approach.
->
-> Thanks
-> Chris--
+diff --git a/drivers/bluetooth/hci_ag6xx.c b/drivers/bluetooth/hci_ag6xx.c
+index ea65c2d089ed..6923d17a022f 100644
+--- a/drivers/bluetooth/hci_ag6xx.c
++++ b/drivers/bluetooth/hci_ag6xx.c
+@@ -174,6 +174,9 @@ static int ag6xx_setup(struct hci_uart *hu)
+ 	bool patched = false;
+ 	int err;
+ 
++	hu->hdev->set_diag = btintel_set_diag;
++	hu->hdev->set_bdaddr = btintel_set_bdaddr;
++
+ 	err = btintel_enter_mfg(hdev);
+ 	if (err)
+ 		return err;
+@@ -298,8 +301,16 @@ patch:
+ complete:
+ 	/* Exit manufacturing mode and reset */
+ 	err = btintel_exit_mfg(hdev, true, patched);
++	if (err)
++		return err;
+ 
+-	return err;
++	/* Set the event mask for Intel specific vendor events. This enables
++	 * a few extra events that are useful during general operation.
++	 */
++	btintel_set_event_mask_mfg(hdev, false);
++
++	btintel_check_bdaddr(hdev);
++	return 0;
+ }
+ 
+ static const struct hci_uart_proto ag6xx_proto = {
+-- 
+2.5.0
 
-Are you talking about getting the data from beacons that are doing
-non-connectable advertising?
-I'm sure Johan will correct me if I'm wrong but I think this is what
-he has recently fixed.
-I believe there have been a problem with this in 5.37 and before.
-Although this should now be fixed by this commit:
-http://git.kernel.org/cgit/bluetooth/bluez.git/commit/?id=43657d77037302268b6ef02724c66eda416cf3e7
-The beacons in tools have also been corrected:
-http://git.kernel.org/cgit/bluetooth/bluez.git/commit/?id=42d1c2f0ba790e8a2050d5fcf8b45e0c563776ef
-
-Regards,
-Barry
