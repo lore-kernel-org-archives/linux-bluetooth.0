@@ -1,139 +1,81 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Message-ID: <56D37BAC.6090907@intel.com>
+Date: Sun, 28 Feb 2016 23:58:52 +0100
+From: Loic Poulain <loic.poulain@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <1456492899-23174-1-git-send-email-luiz.dentz@gmail.com>
-References: <1456492899-23174-1-git-send-email-luiz.dentz@gmail.com>
-Date: Mon, 29 Feb 2016 11:21:09 +0200
-Message-ID: <CABBYNZKDGp1e_4SVN_kTASksO=i5azJheBWRWHRzzeBo=Tq4Sw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] shared/gatt-client: Fix not clearing database after discovery
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+To: =?windows-1252?Q?J=E9r=F4me_de_Bretagne?=
+	<jerome.debretagne@gmail.com>
+CC: linux-bluetooth@vger.kernel.org
+Subject: Re: Broadcom BCM4324(1) rev B5 chipset - Bluetooth support in Linux
+ Kernel 4.x ?
+References: <CA+kEDGEHfsODon6aOdLU86E9c0Lfs-4bo=ycEZz3MdEa1qLrKw@mail.gmail.com>	<56CAD20D.4080609@broadcom.com>	<CA+kEDGFX31qxxDsFYR-vdcb1UhH65xoZ0sxKcY9xFxC_J=GNfQ@mail.gmail.com>	<56D35080.1010003@intel.com> <CA+kEDGHbzH9VPRUaz5-JPsU5kHTDk8UwGGmt94rGVXiG1KY-Ow@mail.gmail.com>
+In-Reply-To: <CA+kEDGHbzH9VPRUaz5-JPsU5kHTDk8UwGGmt94rGVXiG1KY-Ow@mail.gmail.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Jerome,
 
-On Fri, Feb 26, 2016 at 3:21 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> The database cache needs to be in sync with discovery so once a discovery
-> complete handles after that last attribute found shall be cleared.
-> ---
->  src/shared/gatt-client.c | 39 +++++++++++++++++++++++++++++----------
->  1 file changed, 29 insertions(+), 10 deletions(-)
->
-> diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
-> index 292e6ec..b255175 100644
-> --- a/src/shared/gatt-client.c
-> +++ b/src/shared/gatt-client.c
-> @@ -362,6 +362,7 @@ struct discovery_op {
->         bool success;
->         uint16_t start;
->         uint16_t end;
-> +       uint16_t last;
->         int ref_count;
->         discovery_op_complete_func_t complete_func;
->         discovery_op_fail_func_t failure_func;
-> @@ -375,6 +376,21 @@ static void discovery_op_free(struct discovery_op *op)
->         free(op);
->  }
->
-> +static void discovery_op_complete(struct discovery_op *op, bool success,
-> +                                                               uint8_t err)
-> +{
-> +       /* Reset remaining range */
-> +       if (success) {
-> +               if (op->last != UINT16_MAX)
-> +                       gatt_db_clear_range(op->client->db, op->last + 1,
-> +                                                               UINT16_MAX);
-> +       } else
-> +               gatt_db_clear(op->client->db);
-> +
-> +       op->success = success;
-> +       op->complete_func(op, success, err);
-> +}
-> +
->  static struct discovery_op *discovery_op_create(struct bt_gatt_client *client,
->                                 uint16_t start, uint16_t end,
->                                 discovery_op_complete_func_t complete_func,
-> @@ -550,8 +566,7 @@ next:
->         discovery_op_unref(op);
->
->  failed:
-> -       op->success = false;
-> -       op->complete_func(op, false, att_ecode);
-> +       discovery_op_complete(op, false, att_ecode);
->  }
->
->  struct chrc {
-> @@ -725,8 +740,7 @@ failed:
->         success = false;
->
->  done:
-> -       op->success = success;
-> -       op->complete_func(op, success, att_ecode);
-> +       discovery_op_complete(op, success, att_ecode);
->  }
->
->  static void discover_chrcs_cb(bool success, uint8_t att_ecode,
-> @@ -832,8 +846,7 @@ failed:
->         success = false;
->
->  done:
-> -       op->success = success;
-> -       op->complete_func(op, success, att_ecode);
-> +       discovery_op_complete(op, success, att_ecode);
->  }
->
->  static void discover_secondary_cb(bool success, uint8_t att_ecode,
-> @@ -901,6 +914,10 @@ static void discover_secondary_cb(bool success, uint8_t att_ecode,
->                 /* Skip if service already active */
->                 if (!gatt_db_service_get_active(attr))
->                         queue_push_tail(op->pending_svcs, attr);
-> +
-> +               /* Update last handle */
-> +               if (end > op->last)
-> +                       op->last = end;
->         }
->
->  next:
-> @@ -938,8 +955,7 @@ next:
->         discovery_op_unref(op);
->
->  done:
-> -       op->success = success;
-> -       op->complete_func(op, success, att_ecode);
-> +       discovery_op_complete(op, success, att_ecode);
->  }
->
->  static void discover_primary_cb(bool success, uint8_t att_ecode,
-> @@ -1005,6 +1021,10 @@ static void discover_primary_cb(bool success, uint8_t att_ecode,
->                 /* Skip if service already active */
->                 if (!gatt_db_service_get_active(attr))
->                         queue_push_tail(op->pending_svcs, attr);
-> +
-> +               /* Update last handle */
-> +               if (end > op->last)
-> +                       op->last = end;
->         }
->
->  secondary:
-> @@ -1032,8 +1052,7 @@ secondary:
->         success = false;
->
->  done:
-> -       op->success = success;
-> -       op->complete_func(op, success, att_ecode);
-> +       discovery_op_complete(op, success, att_ecode);
->  }
->
->  static void notify_client_ready(struct bt_gatt_client *client, bool success,
-> --
-> 2.5.0
+>>> I've just taken a look at the data listed by the ACPI subsystem on
+>>> this tablet:
+>>>
+>>>      $ ls /sys/bus/acpi/devices/BCM* -d1
+>>>      /sys/bus/acpi/devices/BCM2E3C:00
+>>>      /sys/bus/acpi/devices/BCM2E55:00
+>>
+>> Usually, Broadcom BT controller is described in the ACPI table.
+>> You can retrieve your ACPI table at /sys/firmware/acpi/tables/DSDT and
+>> decompile it with iasl.
+>> You should have a Bluetooth node (BTHX):
+>> Device (BTH1)
+>>              {
+>>                  Name (_HID, "BCM...")
+>>
+>> With some gpio/irq resources. (0: wakeup, 1: power-, 2:host-wakeup).
+>>
+>> Check in your acpi table if one of them matches a bluetooth node.
+> Both of them are matching a Bluetooth node it seems to me, with BTH0
+> and BTH1 entries respectively. I've attached the original DSDT ACPI
+> table (dsdt.dat) and the decompiled version (dsdt.dsl). Any useful
+> information in there?
 
-Applied.
+from your DSDT:
+BTH0 _STA  (status) method returns 0x00 meaning that this device is not 
+present.
+BTH1 _STA method returns 0x0F meaning that this device is present.
 
+So your BT controller is BTH1 (BCM2E55).
+
+The ACPI table for this BTH1 looks good (1 irq + 2 gpios ) so it should 
+be compatible with hci_bcm.
+
+>> Second step is to attach the device, but you need to find the correct tty to
+>> use.
+>> If your ACPI table is correct, BCM acpi device should appear as a child of a
+>> tty device in sysfs.
+>> The physical_node symlink in your device directory (sys/bus/acpi...) gives
+>> you the hierarchical path.
+> Before applying any patches to hci_bcm.c , BCM2E55 has already the
+> following hierarchical path:
+>
+>     /sys/bus/acpi/devices/BCM2E55:00$ ls -l physical_node
+>     lrwxrwxrwx 1 root root 0 févr. 28 21:45 physical_node ->
+> ../../../../platform/80860F0A:00/BCM2E55:00
+80860F0A is the UART controller (8250_dw), looks good.
+So you should also find BCM2E55 id into:
+/sys/class/ttyS*/device/
+
+> while BCM2E3C has none:
+>
+>     sys/bus/acpi/devices/BCM2E3C:00$ ls
+>     hid  modalias  path  power  status  subsystem  uevent
+
+Yes because BCM2E3C is not enabled.
+
+Regards,
+Loic
 
 -- 
-Luiz Augusto von Dentz
+Intel Open Source Technology Center
+http://oss.intel.com/
+
