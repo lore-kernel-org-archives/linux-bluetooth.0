@@ -1,57 +1,139 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Amitkumar Karwar <akarwar@marvell.com>
-To: Rob Herring <robh@kernel.org>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Nishant Sarmukadam <nishants@marvell.com>,
-	"wnhuang@chromium.com" <wnhuang@chromium.com>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-	Cathy Luo <cluo@marvell.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	Xinming Hu <huxm@marvell.com>
-Subject: RE: [PATCH v4 1/3] mwifiex: register platform specific driver
-Date: Mon, 29 Feb 2016 14:04:44 +0000
-Message-ID: <6e3955140c3d46e0ab3094432ae941ec@SC-EXCH04.marvell.com>
-References: <1455614079-4263-1-git-send-email-akarwar@marvell.com>
- <20160218143803.GX9654@rob-hp-laptop>
-In-Reply-To: <20160218143803.GX9654@rob-hp-laptop>
-Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
+In-Reply-To: <1456492899-23174-1-git-send-email-luiz.dentz@gmail.com>
+References: <1456492899-23174-1-git-send-email-luiz.dentz@gmail.com>
+Date: Mon, 29 Feb 2016 11:21:09 +0200
+Message-ID: <CABBYNZKDGp1e_4SVN_kTASksO=i5azJheBWRWHRzzeBo=Tq4Sw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] shared/gatt-client: Fix not clearing database after discovery
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Rob,
+Hi,
 
-> From: Rob Herring [mailto:robh@kernel.org]
-> Sent: Thursday, February 18, 2016 8:08 PM
-> To: Amitkumar Karwar
-> Cc: linux-bluetooth@vger.kernel.org; Nishant Sarmukadam;
-> wnhuang@chromium.com; devicetree@vger.kernel.org; Cathy Luo; linux-
-> kernel@vger.kernel.org; Xinming Hu
-> Subject: Re: [PATCH v4 1/3] mwifiex: register platform specific driver
-> 
-> On Tue, Feb 16, 2016 at 01:14:37AM -0800, Amitkumar Karwar wrote:
-> > From: Xinming Hu <huxm@marvell.com>
-> >
-> > Platform device and driver provides easy way to interact with
-> > device-tree-enabled system.
-> >
-> > This patch registers platform driver and reorganise existing device
-> > tree specific code. Corresponding device tree binding file is also
-> > created.
-> >
-> > Signed-off-by: Xinming Hu <huxm@marvell.com>
-> > Signed-off-by: Amitkumar Karwar <akarwar@marvell.com>
-> > ---
-> > v3: Don't update adapter->dt_node if mwifiex_plt_dev is NULL
-> > v4: Corrected the 'name' and 'compatible' property names.(Arnd
-> Bergmann and Rob
-> >     Herring)
-> >     Patch description wraped in 72 columns(Rob Herring)
-> >     Moved DT binding file to bindings/net/wireless/(Rob Herring)
-> > ---
+On Fri, Feb 26, 2016 at 3:21 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> The database cache needs to be in sync with discovery so once a discovery
+> complete handles after that last attribute found shall be cleared.
+> ---
+>  src/shared/gatt-client.c | 39 +++++++++++++++++++++++++++++----------
+>  1 file changed, 29 insertions(+), 10 deletions(-)
+>
+> diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
+> index 292e6ec..b255175 100644
+> --- a/src/shared/gatt-client.c
+> +++ b/src/shared/gatt-client.c
+> @@ -362,6 +362,7 @@ struct discovery_op {
+>         bool success;
+>         uint16_t start;
+>         uint16_t end;
+> +       uint16_t last;
+>         int ref_count;
+>         discovery_op_complete_func_t complete_func;
+>         discovery_op_fail_func_t failure_func;
+> @@ -375,6 +376,21 @@ static void discovery_op_free(struct discovery_op *op)
+>         free(op);
+>  }
+>
+> +static void discovery_op_complete(struct discovery_op *op, bool success,
+> +                                                               uint8_t err)
+> +{
+> +       /* Reset remaining range */
+> +       if (success) {
+> +               if (op->last != UINT16_MAX)
+> +                       gatt_db_clear_range(op->client->db, op->last + 1,
+> +                                                               UINT16_MAX);
+> +       } else
+> +               gatt_db_clear(op->client->db);
+> +
+> +       op->success = success;
+> +       op->complete_func(op, success, err);
+> +}
+> +
+>  static struct discovery_op *discovery_op_create(struct bt_gatt_client *client,
+>                                 uint16_t start, uint16_t end,
+>                                 discovery_op_complete_func_t complete_func,
+> @@ -550,8 +566,7 @@ next:
+>         discovery_op_unref(op);
+>
+>  failed:
+> -       op->success = false;
+> -       op->complete_func(op, false, att_ecode);
+> +       discovery_op_complete(op, false, att_ecode);
+>  }
+>
+>  struct chrc {
+> @@ -725,8 +740,7 @@ failed:
+>         success = false;
+>
+>  done:
+> -       op->success = success;
+> -       op->complete_func(op, success, att_ecode);
+> +       discovery_op_complete(op, success, att_ecode);
+>  }
+>
+>  static void discover_chrcs_cb(bool success, uint8_t att_ecode,
+> @@ -832,8 +846,7 @@ failed:
+>         success = false;
+>
+>  done:
+> -       op->success = success;
+> -       op->complete_func(op, success, att_ecode);
+> +       discovery_op_complete(op, success, att_ecode);
+>  }
+>
+>  static void discover_secondary_cb(bool success, uint8_t att_ecode,
+> @@ -901,6 +914,10 @@ static void discover_secondary_cb(bool success, uint8_t att_ecode,
+>                 /* Skip if service already active */
+>                 if (!gatt_db_service_get_active(attr))
+>                         queue_push_tail(op->pending_svcs, attr);
+> +
+> +               /* Update last handle */
+> +               if (end > op->last)
+> +                       op->last = end;
+>         }
+>
+>  next:
+> @@ -938,8 +955,7 @@ next:
+>         discovery_op_unref(op);
+>
+>  done:
+> -       op->success = success;
+> -       op->complete_func(op, success, att_ecode);
+> +       discovery_op_complete(op, success, att_ecode);
+>  }
+>
+>  static void discover_primary_cb(bool success, uint8_t att_ecode,
+> @@ -1005,6 +1021,10 @@ static void discover_primary_cb(bool success, uint8_t att_ecode,
+>                 /* Skip if service already active */
+>                 if (!gatt_db_service_get_active(attr))
+>                         queue_push_tail(op->pending_svcs, attr);
+> +
+> +               /* Update last handle */
+> +               if (end > op->last)
+> +                       op->last = end;
+>         }
+>
+>  secondary:
+> @@ -1032,8 +1052,7 @@ secondary:
+>         success = false;
+>
+>  done:
+> -       op->success = success;
+> -       op->complete_func(op, success, att_ecode);
+> +       discovery_op_complete(op, success, att_ecode);
+>  }
+>
+>  static void notify_client_ready(struct bt_gatt_client *client, bool success,
+> --
+> 2.5.0
 
-Thanks for reviewing mwifiex and btmrvl patch series.
-We are working on a updated version which will address your review comments.
+Applied.
 
-Regards,
-Amitkumar
+
+-- 
+Luiz Augusto von Dentz
