@@ -1,29 +1,39 @@
-Return-Path: <johan.hedberg@gmail.com>
-Date: Mon, 29 Feb 2016 19:26:30 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: hci_uart: Add diag and address support for
- Intel/AG6xx
-Message-ID: <20160229172630.GA27513@t440s.P-661HNU-F1>
-References: <1456691119-64405-1-git-send-email-marcel@holtmann.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1456691119-64405-1-git-send-email-marcel@holtmann.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ] core/gatt-client: Fix printing errors if experimental is disabled
+Date: Mon, 29 Feb 2016 17:28:59 +0200
+Message-Id: <1456759739-22626-1-git-send-email-luiz.dentz@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Sun, Feb 28, 2016, Marcel Holtmann wrote:
-> The AG6xx devices behave similar to Wilkens Peak and Stone Peak and with
-> that it is needed to check for Intel default address. In addition it is
-> possible to enable vendor events and diag support.
-> 
-> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-> ---
->  drivers/bluetooth/hci_ag6xx.c | 13 ++++++++++++-
->  1 file changed, 12 insertions(+), 1 deletion(-)
+If experimental flag is not set don't attempt to create any objects since
+it will cause error that are hard to guess such as bellow:
 
-Applied to bluetooth-next. Thanks.
+bluetoothd[6539]: Unable to register GATT service with handle 0x000c for device
+---
+ src/gatt-client.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-Johan
+diff --git a/src/gatt-client.c b/src/gatt-client.c
+index b4ca3b6..dd76a36 100644
+--- a/src/gatt-client.c
++++ b/src/gatt-client.c
+@@ -1688,6 +1688,12 @@ static void export_service(struct gatt_db_attribute *attr, void *user_data)
+ 
+ static void create_services(struct btd_gatt_client *client)
+ {
++	/* Don't attempt to create any objects if experimental is disabled */
++	if (!(g_dbus_get_flags() & G_DBUS_FLAG_ENABLE_EXPERIMENTAL)) {
++		info("GATT service objects disabled");
++		return;
++	}
++
+ 	DBG("Exporting objects for GATT services: %s", client->devaddr);
+ 
+ 	gatt_db_foreach_service(client->db, NULL, export_service, client);
+-- 
+2.5.0
+
