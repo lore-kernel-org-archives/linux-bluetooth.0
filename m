@@ -1,86 +1,247 @@
-Return-Path: <akarwar@marvell.com>
-From: Amitkumar Karwar <akarwar@marvell.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: BlueZ development <linux-bluetooth@vger.kernel.org>,
-        Nishant Sarmukadam
-	<nishants@marvell.com>,
-        "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>,
-        Cathy Luo <cluo@marvell.com>, Ganapathi Bhat
-	<gbhat@marvell.com>
-Subject: RE: [PATCH v2] Bluetooth: hci_uart: Support firmware download for
- Marvell
-Date: Tue, 1 Mar 2016 17:08:38 +0000
-Message-ID: <b7d52fc731a14f28b207ccf4470f6a43@SC-EXCH04.marvell.com>
-References: <1455627233-6928-1-git-send-email-akarwar@marvell.com>
- <273F0F9E-5E5C-4F21-A503-027A83B7F61E@holtmann.org>
-In-Reply-To: <273F0F9E-5E5C-4F21-A503-027A83B7F61E@holtmann.org>
-Content-Type: multipart/mixed;
-	boundary="_002_b7d52fc731a14f28b207ccf4470f6a43SCEXCH04marvellcom_"
-MIME-Version: 1.0
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 9.2 \(3112\))
+Subject: Re: [RFC v2] doc: Add Management Interface network API definitions
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1456484926-978-1-git-send-email-patrik.flykt@linux.intel.com>
+Date: Tue, 1 Mar 2016 08:51:45 -0800
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <EBF2E6B2-2086-4573-ACAF-75B7F8768F76@holtmann.org>
+References: <1456484926-978-1-git-send-email-patrik.flykt@linux.intel.com>
+To: Patrik Flykt <Patrik.Flykt@linux.intel.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---_002_b7d52fc731a14f28b207ccf4470f6a43SCEXCH04marvellcom_
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+Hi Patrik,
 
-Hi Marcel,
+> To make the commands more generic, IPSP has been renamed Network. In order
+> to be more generic, a network role has been added to the commands rather
+> than have a specific command for role setting. With this more networking
+> than just 6LowPAN can be handled in the future; whether 1 octet is enough
+> to handle possible future roles OR'ed together remains to be seen and
+> comments on the subject are appreciated.
+> 
+> Handling incoming connection authorization is another topic to discuss
+> with an initial proposal already on the mailing list. I'd be glad to update
+> this RFC with the outcome of that discussion.
+> 
+> 
+>     Patrik
+> 
+> doc/doc.txt      |   0
+> doc/mgmt-api.txt | 172 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+> 2 files changed, 172 insertions(+)
+> create mode 100644 doc/doc.txt
+> 
+> diff --git a/doc/doc.txt b/doc/doc.txt
+> new file mode 100644
+> index 0000000..e69de29
+> diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
+> index 731a088..060b751 100644
+> --- a/doc/mgmt-api.txt
+> +++ b/doc/mgmt-api.txt
+> @@ -2801,6 +2801,127 @@ Start Limited Discovery Command
+> 				Invalid Index
+> 
+> 
+> +Get Networks Command
+> +====================
+> +
+> +	Command Code:		0x0042
+> +	Controller Index:	<controller id>
+> +	Command Parameters:
+> +	Return Parameters:	Interface Index (4 Octets)
+> +				Connection_Count (2 Octets)
+> +				Address1 {
+> +					Address (6 Octets)
+> +					Address_Type (1 Octet)
+> +					Network_Role (1 Octet)
+> +				}
+> +				Address2 { }
+> +				...
+> +
 
-> > +
-> > +	kfree(skb);
-> > +	BT_INFO("leave dnld_fw\n");
-> > +
-> > +	return ret;
-> > +}
->=20
-> I think it would help if you explain on how the firmware download for
-> your UART devices work. I have the feeling we need a bit better core
-> handling in this case and not end up hacking it in this way.
->=20
-> > +
+so if we want to extend this to BNEP eventually, then the interface index needs to be per Network block (and it is Network1 and not Address1).
 
-I have explained our firmware download mechanism in attached text file.
-I will shortly send V3 patch which address your review comments. Let me kno=
-w if you have any suggestions.
+I know that this means for multiple IPSP networks, the interface index would repeat since there is really only one, but I think that is something the application can easily figure out.
 
-Regards,
-Amit
+> +	This command is used to retrieve a list of BTLE network
+> +	connections. A pre-requisite is that LE is already
+> +	enabled, otherwise this command will return a "rejected"
+> +	response.
+> +
+> +	Possible values for the Address_Type parameter:
+> +		0	Reserved
+> +		1	LE Public
+> +		2	LE Random
+> +
+> +	Possible values for the Network_Role parameter:
+> +		0	Reserved
+> +		1	6LoWPAN Node
+> +		2	6LoWPAN Router
 
---_002_b7d52fc731a14f28b207ccf4470f6a43SCEXCH04marvellcom_
-Content-Type: text/plain; name="Marvell_UART_FW_download.txt"
-Content-Description: Marvell_UART_FW_download.txt
-Content-Disposition: attachment; filename="Marvell_UART_FW_download.txt";
-	size=1592; creation-date="Tue, 01 Mar 2016 15:47:40 GMT";
-	modification-date="Tue, 01 Mar 2016 15:47:40 GMT"
-Content-Transfer-Encoding: base64
+I wonder if here we actually want to call it IPSP Node instead. I only dislike IPSP in the command name. In parameters it seems fine.
 
-RmlybXdhcmUgZG93bmxvYWQgd29ya3Mgb24gdGhlIGZlZWRiYWNrIG1lY2hhbmlzbSBiZXR3ZWVu
-CmRyaXZlciBhbmQgdGhlIGRldmljZS4gRm9yIGV2ZXJ5IGNodW5rIG9mIGZpcm13YXJlIGRvd25s
-b2FkZWQsCnRoZSBkZXZpY2Ugd2lsbCBzZW5kIGFuIEFDSyBhbmQgYXBwZW5kIHRoZSBuZXh0IGxl
-bmd0aCAoaW4gYnl0ZXMpCnRvIGJlIGRvd25sb2FkZWQuIERyaXZlciB3aWxsIGRlY29kZSB0aGlz
-IGluZm8gYW5kIGRvd25sb2FkIGJ5dGVzCmFjY29yZGluZ2x5LgoKT24gcG93ZXIgb24sIHRoZSBk
-ZXZpY2Ugc3RhcnRzIHNlbmRpbmcgYmVsb3cgaGVhcnRiZWF0IHNlcXVlbmNlOgoKaGVhcnRiZWF0
-ICg1IGJ5dGVzKSA6IHxIRFJ8WFh8WFh8WFh8WFh8CgpIRFIgMHhBNTogSGVhZGVyIGluZGljYXRp
-bmcgQUNLCgpJZiBIRFIgaXMgQUNLKDB4QTUpIHRoZW4gcmVzdCBvZiB0aGUgYnl0ZXMgYXJlIGRl
-Y29kZWQgYXMgYmVsb3c6Cgp8MHhBNXxMMXxMMnxDTDF8Q0wyfAoKTDEgOiBMU0Igb2YgbGVuZ3Ro
-IG9mIHRoZSBmaXJtd2FyZSBieXRlcyB0byBiZSBzZW50IGZyb20gdGhlIGhvc3QKTDIgOiBNU0Ig
-b2YgbGVuZ3RoIG9mIHRoZSBmaXJtd2FyZSBieXRlcyB0byBiZSBzZW50IGZyb20gdGhlIGhvc3QK
-Q0wxOiBDb21wbGVtZW50IG9mIEwxCkNMMjogQ29tcGxlbWVudCBvZiBMMgoKRHJpdmVyIHdpbGwg
-ZGVjb2RlIHRoZSBsZW5ndGggZnJvbSBhYm92ZSBzZXF1ZW5jZSBhbmQgZG93bmxvYWQgCmJ5dGVz
-IGFjY29yZGluZ2x5LiBEZXZpY2Ugd2lsbCBhY2tub3dsZWRnZSB0aGUgc2FtZSBhbmQgYXBwZW5k
-CmxlbnRoIHRvIGJlIGRvd25sb2FkZWQgaW4gbmV4dCB0cmFuc21pc3Npb24uCgpIRFIgMHhBQTog
-SGVhZGVyIGluZGljYXRpbmcgY2hpcCBpZCBhbmQgcmV2aXNpb24KSWYgSERSIGlzIGNoaXAgaW5m
-bygweEFBKSB0aGVuIHJlc3Qgb2YgdGhlIGJ5dGVzIGFyZSBkZWNvZGVkIGFzIGJlbG93OgoKfDB4
-QTV8Q0hJUF9JRHxDSElQX1JFVnxDQ0hJUF9JRHxDQ0hJUF9SRVZ8CgpDSElQIElEICA6IElkIG9m
-IHRoZSBjaGlwCkNISVBfUkVWIDogQ2hpcCByZXZpc2lvbgpDQ0hJUF9JRCA6IENvbXBsZW1lbnQg
-b2YgY2hpcCBpZApDQ0hJUF9SRVY6IENvbXBsZW1lbnQgb2YgY2hpcCByZXZpc2lvbgoKVGhlIGRl
-dmljZSB3aWxsIHN0YXJ0IHNlbmRpbmcgYWJvdmUgMHhBQSBzZXF1ZW5jZSBvbmNlIGhlbHBlcgpm
-aWxlIGdldHMgZG93bmxvYWRlZC4gSGVscGVyIGZpbGUgaXMgbmVlZGVkIHRvIG1ha2UgZGV2aWNl
-Cndvcmsgd2l0aCBoaWdoZXIgYmF1ZCByYXRlLgoKQWZ0ZXIgZG93bmxvZGluZyB0aGUgaGVscGVy
-LCBkcml2ZXIgd2lsbCBjaGFuZ2UgdGhlIGJhdWRyYXRlCmluIGRldmljZSBhbmQgc3RhcnQgZG93
-bmxvYWRpbmcgdGhlIGZpcm13YXJlLiBUaGlzIHJlZHVjZXMgdGhlCnRpbWUgbmVlZGVkIHRvIGRv
-d25sb2FkIHRoZSBmaXJtd2FyZS4gRm9yIGVhY2ggYmF1ZCByYXRlIHRoZXJlCmV4aXN0cyBkaWZm
-ZXJlbnQgaGVscGVyIGZpbGVzLiBJbiB0aGUgZ2l2ZW4gcGF0Y2ggd2UgYXJlCnVzaW5nIGhlbHBl
-ciBmaWxlIHdoaWNoIGVuYWJsZWQgZmlybXdhcmUgZG93bmxvYWQgaW4gM01CIHNwZWVkLgo=
+And do we need to differentiate between Node and Router here. I think that at some point Johan and discussed that the application (aka bluetoothd) is responsible for adding advertising instances. I wonder if we consider this more like Add Device were we punch a whole for allowing incoming connections. Keep in mind there is an extra thread ongoing about adding Add Device Type == 0x03 for exactly that case.
 
---_002_b7d52fc731a14f28b207ccf4470f6a43SCEXCH04marvellcom_--
+> +
+> +	For devices using resolvable random addresses with a known
+> +	identity resolving key, the Address and Address_Type will
+> +	contain the identity information.
+> +
+> +	This command can only be used when the controller is powered.
+> +
+> +	This command generates a Command Complete event on success or
+> +	a Command Status event on failure.
+> +
+> +	Possible errors:	Invalid Parameters
+> +				Not Powered
+> +				Invalid Index
+> +
+> +
+> +Add Network Command
+> +===================
+> +
+> +	Command Code:		0x0043
+> +	Controller Index:	<controller id>
+> +	Command Parameters:	Address (6 Octets)
+> +				Address_Type (1 Octet)
+> +				Network_Role (1 Octet)
+> +	Return Parameters:	Address (6 Octets)
+> +				Address_Type (1 Octet)
+> +				Network_Role (1 Octet)
+> +				Interface Index (4 Octets)
+> +
+> +	This command is used to connect to establish a network connection
+> +	to a remote BTLE node. A pre-requisite is that LE is already
+> +	enabled, otherwise this command will return a "rejected"
+> +	response.
+
+Do we really care if LE is enabled. I mean to some level it is implicit since you give an LE address. On the other hand, we could just let it program anything it wants. It just never gets executed if LE gets disabled.
+
+The reason I am saying this is that we do not define what happens to all these networks if you later on disable LE. We would have to send events to notify about changes.
+
+Refusing LE based entries for a BR/EDR only controller is fine, but if the controller is LE capable we might need to be careful.
+
+> +
+> +	Possible values for the Address_Type parameter:
+> +		0	Reserved
+> +		1	LE Public
+> +		2	LE Random
+> +
+> +	Possible values for the Network_Role parameter:
+> +		0	Reserved
+> +		1	6LoWPAN Node
+> +		2	6LoWPAN Router
+> +
+> +	This command generates a Command Complete event on success
+> +	or failure.
+> +
+> +	Possible errors:	Busy
+> +				Refused
+> +				Invalid Parameters
+> +				Not Powered
+> +				Invalid Index
+> +				Already Connected
+> +
+> +
+> +Remove Network Command
+> +======================
+> +
+> +	Command Code:		0x0044
+> +	Controller Index:	<controller id>
+> +	Command Parameters:	Address (6 Octets)
+> +				Address_Type (1 Octet)
+> +				Network_Role (1 Octet)
+> +	Return Parameters:	Address (6 Octets)
+> +				Address_Type (1 Octet)
+> +				Network_Role (1 Octet)
+> +
+> +	This command is used to disconnect a network connection from a
+> +	remote BTLE node. A pre-requisite is that LE is already
+> +	enabled, otherwise this command will return a "rejected"
+> +	response.
+> +
+> +	Possible values for the Address_Type parameter:
+> +		0	Reserved
+> +		1	LE Public
+> +		2	LE Random
+> +
+> +	Possible values for the Network_Role parameter:
+> +		0	Reserved
+> +		1	6LoWPAN Node
+> +		2	6LoWPAN Router
+> +
+> +	This command generates a Command Complete event on success
+> +	or failure.
+> +
+> +	Possible errors:	Busy
+> +				Not Connected
+> +				Invalid Parameters
+> +				Not Powered
+> +				Invalid Index
+> +
+> +
+> Command Complete Event
+> ======================
+> 
+> @@ -3645,3 +3766,54 @@ Advertising Removed Event
+> 
+> 	The event will only be sent to management sockets other than the
+> 	one through which the command was sent.
+> +
+> +
+> +Network Added Event
+> +===================
+> +
+> +	Event Code:		0x0025
+> +	Controller Index:	<controller id>
+> +	Event Parameters:	Address (6 Octets)
+> +				Address_Type (1 Octet)
+> +				Network_Role (1 Octet)
+> +				Interface Index (4 Octets)
+> +
+> +	This event indicates that a network connection to a remote
+> +	BTLE node has been established successfully.
+> +
+> +	Possible values for the Address_Type parameter:
+> +		1	LE Public
+> +		2	LE Random
+> +
+> +	Possible values for the Network_Role parameter:
+> +		1	6LoWPAN Node
+> +		2	6LoWPAN Router
+> +
+> +	For devices using resolvable random addresses with a known
+> +	identity resolving key, the Address and Address_Type will
+> +	contain the identity information.
+> +
+> +
+> +Network Removed Event
+> +=====================
+> +
+> +	Event Code:		0x0026
+> +	Controller Index:	<controller id>
+> +	Event Parameters:	Address (6 Octets)
+> +				Address_Type (1 Octet)
+> +				Network_Role (1 Octet)
+> +
+> +	This event indicates that the BTLE network connection to a remote
+> +	node has been lost.
+> +
+> +	Possible values for the Address_Type parameter:
+> +		1	LE Public
+> +		2	LE Random
+> +
+> +	Possible values for the Network_Role parameter:
+> +		1	6LoWPAN Node
+> +		2	6LoWPAN Router
+> +
+> +	For devices using resolvable random addresses with a known
+> +	identity resolving key, the Address and Address_Type will
+> +	contain the identity information.
+
+Regards
+
+Marcel
+
