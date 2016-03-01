@@ -1,61 +1,50 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-To: linux-bluetooth@vger.kernel.org
-From: Manuel Reimer <mail+linux-bluetooth@m-reimer.de>
-Subject: How to get bluetooth HID reports?
-Message-ID: <56D5E099.3070304@m-reimer.de>
-Date: Tue, 1 Mar 2016 19:34:01 +0100
+Return-Path: <linux-kernel-owner@vger.kernel.org>
+From: Amitkumar Karwar <akarwar@marvell.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Cathy Luo <cluo@marvell.com>, <linux-kernel@vger.kernel.org>,
+	Nishant Sarmukadam <nishants@marvell.com>,
+	Ganapathi Bhat <gbhat@marvell.com>
+Subject: [PATCH BlueZ v3] tools/btattach: add marvell support
+Date: Tue, 1 Mar 2016 09:14:26 -0800
+Message-ID: <1456852466-14391-1-git-send-email-akarwar@marvell.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello,
+From: Ganapathi Bhat <gbhat@marvell.com>
 
-I got stuck with trying to read data from a bluetooth HID device.
+User needs to issue below command for Marvell devices
+btattach -P marvell -B /dev/ttyUSB#
 
-Is there some trick when doing this?
+---
+ tools/btattach.c  | 1 +
+ tools/hciattach.h | 1 +
+ 2 files changed, 2 insertions(+)
 
-Short snippet of my code:
-
-
-
-// allocate a socket
-int int_socket = socket(AF_BLUETOOTH, SOCK_SEQPACKET, BTPROTO_L2CAP);
-int ctl_socket = socket(AF_BLUETOOTH, SOCK_SEQPACKET, BTPROTO_L2CAP);
-
-// set the connection parameters
-addr.l2_family = AF_BLUETOOTH;
-str2ba( dest, &addr.l2_bdaddr );
-
-// connect to server
-addr.l2_psm = htobs(L2CAP_PSM_HIDP_INTR);
-status = connect(int_socket, (struct sockaddr *)&addr, sizeof(addr));
-if (status != 0) {
-   printf("Error connect int_socket\n");
-   exit(1);
-}
-addr.l2_psm = htobs(L2CAP_PSM_HIDP_CTRL);
-status = connect(ctl_socket, (struct sockaddr *)&addr, sizeof(addr));
-if (status != 0) {
-   printf("Error connect ctl_socket\n");
-   exit(1);
-}
-
-// get a message
-char buf[100] = { 0 };
-int bytes_read = recv(int_socket, buf, sizeof(buf), 0);
-if( bytes_read > 0 ) {
-   printf("received [%s]\n", buf);
-}
-
-
-
-I get connected somehow and I am actually able to do interaction on the 
-"control socket" (writing and reading), but the "recv" at the "interrupt 
-socket" just hangs forever and I don't know how to debug...
-
-Thanks for every help.
-
-Best regards,
-
-Manuel
+diff --git a/tools/btattach.c b/tools/btattach.c
+index a025bb0..7807e9f 100644
+--- a/tools/btattach.c
++++ b/tools/btattach.c
+@@ -214,6 +214,7 @@ static const struct {
+ 	{ "intel", HCI_UART_INTEL },
+ 	{ "bcm",   HCI_UART_BCM   },
+ 	{ "qca",   HCI_UART_QCA   },
++	{ "marvell", HCI_UART_MRVL   },
+ 	{ }
+ };
+ 
+diff --git a/tools/hciattach.h b/tools/hciattach.h
+index 4279a33..e109c3e 100644
+--- a/tools/hciattach.h
++++ b/tools/hciattach.h
+@@ -42,6 +42,7 @@
+ #define HCI_UART_INTEL	6
+ #define HCI_UART_BCM	7
+ #define HCI_UART_QCA	8
++#define HCI_UART_MRVL	10
+ 
+ #define HCI_UART_RAW_DEVICE	0
+ #define HCI_UART_RESET_ON_INIT	1
+-- 
+1.9.1
