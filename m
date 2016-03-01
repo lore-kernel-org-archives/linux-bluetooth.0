@@ -5,8 +5,10 @@ CC: Cathy Luo <cluo@marvell.com>, <linux-kernel@vger.kernel.org>,
 	Nishant Sarmukadam <nishants@marvell.com>,
 	Ganapathi Bhat <gbhat@marvell.com>
 Subject: [PATCH BlueZ v3] tools/btattach: add marvell support
-Date: Tue, 1 Mar 2016 09:14:26 -0800
-Message-ID: <1456852466-14391-1-git-send-email-akarwar@marvell.com>
+Date: Tue, 1 Mar 2016 09:08:29 -0800
+Message-ID: <1456852109-14298-2-git-send-email-akarwar@marvell.com>
+In-Reply-To: <1456852109-14298-1-git-send-email-akarwar@marvell.com>
+References: <1456852109-14298-1-git-send-email-akarwar@marvell.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-kernel-owner@vger.kernel.org
