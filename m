@@ -1,50 +1,48 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <CAEZxfGPvzMVj++anQKY_6RREvmyT-vBnWqYpRiHJVvKKKb3YsQ@mail.gmail.com>
-References: <CAEZxfGPvzMVj++anQKY_6RREvmyT-vBnWqYpRiHJVvKKKb3YsQ@mail.gmail.com>
-Date: Wed, 2 Mar 2016 15:31:04 +0200
-Message-ID: <CABBYNZK35diyf=VMGikSJ79+qR=8F5adLt=ddkaOPv3f2x-Ksg@mail.gmail.com>
-Subject: Re: Write should return error if device is disconnected while
- expecting a response
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: =?UTF-8?Q?Fran=C3=A7ois_Beaufort?= <beaufort.francois@gmail.com>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: josephsih@chromium.org
+To: linux-bluetooth@vger.kernel.org
+Cc: luiz.von.dentz@intel.com
+Subject: [PATCH] shared/att: change security as needed
+Date: Wed,  2 Mar 2016 21:28:39 +0800
+Message-Id: <1456925319-16594-1-git-send-email-josephsih@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi François,
+From: Joseph Hwang <josephsih@chromium.org>
 
-On Wed, Mar 2, 2016 at 9:31 AM, François Beaufort
-<beaufort.francois@gmail.com> wrote:
-> When writing to a characteristic and that a disconnection happens
-> before getting a write (error) response, BlueZ should inform that
-> write operation failed.
-> See my real example logs below:
->
-> [DFU_Test:/service000c/char000d]# write 01 04
-> Attempting to write /org/bluez/hci0/dev_F1_6F_DE_EC_F1_D6/service000c/char000d
->
->
->
-> < ACL Data TX: Handle 32 flags 0x00 dlen 9
->                                                    [hci0] 5.066808
->       ATT: Write Request (0x12) len 4
->         Handle: 0x000e
->           Data: 0104
->> HCI Event: Number of Completed Packets (0x13) plen 5                                                                    [hci0] 5.106370
->         Num handles: 1
->         Handle: 32
->         Count: 1
->> HCI Event: Vendor (0xff) plen 7                                                                                         [hci0] 5.579396
->         82 12 95 40 10 36 59                             ...@.6Y
->> HCI Event: Disconnect Complete (0x05) plen 4                                                                            [hci0] 5.580376
->         Status: Success (0x00)
->         Handle: 32
->         Reason: Connection Timeout (0x08)
-> @ Device Disconnected: F1:6F:DE:EC:F1:D6 (2) reason 1
+When pairing with a BLE keyboard, bluetoothd suffers from
+authentication errors as follows:
 
-Interesting, does bluetoothctl print anything after this?
+ERR bluetoothd[1103]: Report Map read failed:
+                    Attribute requires authentication before read/write
+ERR bluetoothd[1103]: Protocol Mode characteristic read failed:
+                    Attribute requires authentication before read/write
+ERR bluetoothd[1103]: HID Information read failed:
+                    Attribute requires authentication before read/write
 
+This is because the original security level is BT_ATT_SECURITY_LOW,
+while BT_ATT_SECURITY_HIGH is required for pairing. This patch enables
+the security elevation so that handle_error_rsp() could push the
+operation back to request queue properly.
+
+---
+ src/shared/att.c | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/src/shared/att.c b/src/shared/att.c
+index 3a84783..331fae7 100644
+--- a/src/shared/att.c
++++ b/src/shared/att.c
+@@ -574,9 +574,6 @@ static bool change_security(struct bt_att *att, uint8_t ecode)
+ 	int security;
+ 
+ 	security = bt_att_get_security(att);
+-	if (security != BT_ATT_SECURITY_AUTO)
+-		return false;
+-
+ 	if (ecode == BT_ATT_ERROR_INSUFFICIENT_ENCRYPTION &&
+ 					security < BT_ATT_SECURITY_MEDIUM)
+ 		security = BT_ATT_SECURITY_MEDIUM;
 -- 
-Luiz Augusto von Dentz
+2.7.0.rc3.207.g0ac5344
+
