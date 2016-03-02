@@ -1,48 +1,39 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: josephsih@chromium.org
+MIME-Version: 1.0
+Date: Wed, 2 Mar 2016 13:20:57 +0000
+Message-ID: <CAJgpifs7FyA5o+6BTQ1S8wv8fVhSXCWbzUrDvOqFrz8KqyMc8w@mail.gmail.com>
+Subject: Writing an out of the tree new GATT service (for Debian stable):
+ plugin or DBus?
+From: Olivier Martin <olivier.martin.fr@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: luiz.von.dentz@intel.com
-Subject: [PATCH] shared/att: change security as needed
-Date: Wed,  2 Mar 2016 21:28:39 +0800
-Message-Id: <1456925319-16594-1-git-send-email-josephsih@chromium.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Joseph Hwang <josephsih@chromium.org>
+Hello all,
+I am looking at writing a new GATT (server) service for my Linux-based
+bluetooth device using Bluez.
+My device use Debian stable (Jessie) that uses Bluez v5.23.
+Ideally, I would like to build my GATT service out of the Bluez tree.
+As far as I understand I have two solutions:
 
-When pairing with a BLE keyboard, bluetoothd suffers from
-authentication errors as follows:
+Solution A) Stay with Bluez v5.23 and write a plugin. I managed to
+build `plugins/gatt-example.c` out of the tree. But when `bluetoothd`
+loads the plugin, it fails to find the symbol `attrib_db_update`. I am
+wondering if it is due to the fact `shared/gatt-server` has not been
+added to v5.23 (https://git.kernel.org/cgit/bluetooth/bluez.git/tree/src/shared?h=5.23).
+And in this case it would not be possible to have a GATT service out
+of the tree for this Bluez version.
 
-ERR bluetoothd[1103]: Report Map read failed:
-                    Attribute requires authentication before read/write
-ERR bluetoothd[1103]: Protocol Mode characteristic read failed:
-                    Attribute requires authentication before read/write
-ERR bluetoothd[1103]: HID Information read failed:
-                    Attribute requires authentication before read/write
+Solution B) Moving to the latest Bluez version and use the GATT server
+D-BUS API. But it means I need to remove and replace Bluez on my
+stable Debian. I understand this solution is the long term solution
+but it might take a while before the Linux distributions used this
+version of Bluez.
 
-This is because the original security level is BT_ATT_SECURITY_LOW,
-while BT_ATT_SECURITY_HIGH is required for pairing. This patch enables
-the security elevation so that handle_error_rsp() could push the
-operation back to request queue properly.
+So, is it possible to have an out of the tree plugin with v5.23? I saw
+`sixaxis` plugin. But this plugin does not manipulate GATT services
+and characteristics.
 
----
- src/shared/att.c | 3 ---
- 1 file changed, 3 deletions(-)
-
-diff --git a/src/shared/att.c b/src/shared/att.c
-index 3a84783..331fae7 100644
---- a/src/shared/att.c
-+++ b/src/shared/att.c
-@@ -574,9 +574,6 @@ static bool change_security(struct bt_att *att, uint8_t ecode)
- 	int security;
- 
- 	security = bt_att_get_security(att);
--	if (security != BT_ATT_SECURITY_AUTO)
--		return false;
--
- 	if (ecode == BT_ATT_ERROR_INSUFFICIENT_ENCRYPTION &&
- 					security < BT_ATT_SECURITY_MEDIUM)
- 		security = BT_ATT_SECURITY_MEDIUM;
--- 
-2.7.0.rc3.207.g0ac5344
-
+Thanks,
+Olivier
