@@ -1,94 +1,48 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Subject: How to detach device from "hidp"? (was: How to get bluetooth HID
- reports?)
-To: linux-bluetooth@vger.kernel.org
-References: <56D5E099.3070304@m-reimer.de>
-From: Manuel Reimer <mail+linux-bluetooth@m-reimer.de>
-Message-ID: <56D727F9.1020005@m-reimer.de>
-Date: Wed, 2 Mar 2016 18:50:49 +0100
+Return-Path: <htejun@gmail.com>
+Sender: Tejun Heo <htejun@gmail.com>
+Date: Wed, 2 Mar 2016 10:45:07 -0500
+From: Tejun Heo <tj@kernel.org>
+To: Jiri Slaby <jslaby@suse.cz>
+Cc: Dmitry Vyukov <dvyukov@google.com>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-bluetooth@vger.kernel.org, netdev <netdev@vger.kernel.org>,
+	LKML <linux-kernel@vger.kernel.org>,
+	syzkaller <syzkaller@googlegroups.com>,
+	Kostya Serebryany <kcc@google.com>,
+	Alexander Potapenko <glider@google.com>,
+	Sasha Levin <sasha.levin@oracle.com>,
+	Eric Dumazet <edumazet@google.com>, Takashi Iwai <tiwai@suse.com>
+Subject: Re: net/bluetooth: workqueue destruction WARNING in
+ hci_unregister_dev
+Message-ID: <20160302154507.GC4282@mtj.duckdns.org>
+References: <CACT4Y+ax7zMOxe+kd4tw5Xdbvt=qPdBhXGO0j7qJwdn5tsfNNg@mail.gmail.com>
+ <56C5CE85.6090808@suse.cz>
+ <CACT4Y+bVXfY=wBZ+08rq16tHFw9s3YDrE_LCS=to-GF70AffRQ@mail.gmail.com>
+ <20160218174427.GG13177@mtj.duckdns.org>
+ <56C6EC62.8080107@suse.cz>
+ <56C70618.3010902@suse.cz>
 MIME-Version: 1.0
-In-Reply-To: <56D5E099.3070304@m-reimer.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <56C70618.3010902@suse.cz>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello,
+Hello, Jiri.
 
-after some more hours of trying, I got my first HID report.
+On Fri, Feb 19, 2016 at 01:10:00PM +0100, Jiri Slaby wrote:
+> > 1. didn't help, the problem persists. So I haven't applied the patch from 2.
+> 
+> FWIW I dumped more info about the wq:
+> wq->name='hci0' pwq=ffff8800390d7600 wq->dfl_pwq=ffff8800390d5200
+> pwq->refcnt=2 pwq->nr_active=0 delayed_works: <nothing>
 
-I had to blacklist the hidp module. For me this means: The device can be 
-accessed only once and so far "hidp" was faster and the device was no 
-longer available for my software.
+Can you please print out the same info for all pwq's during shutdown?
+It looks like we're leaking pwq refcnt but I can't spot a place where
+that could happen on an empty pwq.
 
-As completely blacklisting hidp is not the solution, I want to use, it 
-would be nice if someone could tell me how to detach a device from hidp.
+Thanks.
 
-In theory I need something like the "detach kernel driver" in libusb.
-
-Maybe it even is possible to talk to hidp? Is it possible to 
-send/receive directly through hidp, so I don't have to use "raw socket 
-communication"?
-
-Thank you very much in advance.
-
-Best regards,
-
-Manuel
-
-On 03/01/2016 07:34 PM, Manuel Reimer wrote:
-> Hello,
->
-> I got stuck with trying to read data from a bluetooth HID device.
->
-> Is there some trick when doing this?
->
-> Short snippet of my code:
->
->
->
-> // allocate a socket
-> int int_socket = socket(AF_BLUETOOTH, SOCK_SEQPACKET, BTPROTO_L2CAP);
-> int ctl_socket = socket(AF_BLUETOOTH, SOCK_SEQPACKET, BTPROTO_L2CAP);
->
-> // set the connection parameters
-> addr.l2_family = AF_BLUETOOTH;
-> str2ba( dest, &addr.l2_bdaddr );
->
-> // connect to server
-> addr.l2_psm = htobs(L2CAP_PSM_HIDP_INTR);
-> status = connect(int_socket, (struct sockaddr *)&addr, sizeof(addr));
-> if (status != 0) {
->    printf("Error connect int_socket\n");
->    exit(1);
-> }
-> addr.l2_psm = htobs(L2CAP_PSM_HIDP_CTRL);
-> status = connect(ctl_socket, (struct sockaddr *)&addr, sizeof(addr));
-> if (status != 0) {
->    printf("Error connect ctl_socket\n");
->    exit(1);
-> }
->
-> // get a message
-> char buf[100] = { 0 };
-> int bytes_read = recv(int_socket, buf, sizeof(buf), 0);
-> if( bytes_read > 0 ) {
->    printf("received [%s]\n", buf);
-> }
->
->
->
-> I get connected somehow and I am actually able to do interaction on the
-> "control socket" (writing and reading), but the "recv" at the "interrupt
-> socket" just hangs forever and I don't know how to debug...
->
-> Thanks for every help.
->
-> Best regards,
->
-> Manuel
-> --
-> To unsubscribe from this list: send the line "unsubscribe
-> linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
+-- 
+tejun
