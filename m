@@ -1,71 +1,26 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Szymon Janc <ext.szymon.janc@tieto.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Olivier Martin <olivier.martin.fr@gmail.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: Writing an out of the tree new GATT service (for Debian stable): plugin or DBus?
-Date: Wed, 02 Mar 2016 15:34:20 +0100
-Message-ID: <11039254.T5CGnodsWr@leonov>
-In-Reply-To: <CABBYNZKSpFw4arsZFA=jGNq1Q7svVzzAemHD31dfempWMqHxog@mail.gmail.com>
-References: <CAJgpifs7FyA5o+6BTQ1S8wv8fVhSXCWbzUrDvOqFrz8KqyMc8w@mail.gmail.com> <CABBYNZKSpFw4arsZFA=jGNq1Q7svVzzAemHD31dfempWMqHxog@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+In-Reply-To: <CAHFy41-4o+01KSTB1G-FKRLu2Ym9-QBtqhEeWPV0EsR1bWLtvw@mail.gmail.com>
+References: <1456925319-16594-1-git-send-email-josephsih@chromium.org>
+	<CABBYNZ+jSLy_YaK99Ov_E2M68yU0xZUxp9t+0cnUFp1sDEaKDA@mail.gmail.com>
+	<CABBYNZ+eLxZXkMLuupfBGDthDmuLwKr5Z0tP+sXrmxnL6JTdUg@mail.gmail.com>
+	<CAHFy41-4o+01KSTB1G-FKRLu2Ym9-QBtqhEeWPV0EsR1bWLtvw@mail.gmail.com>
+Date: Wed, 2 Mar 2016 16:20:21 +0200
+Message-ID: <CABBYNZJuS3zHhqf=nr=Zqb6HO=3eaaDUZH=855HsLGL62=JBbQ@mail.gmail.com>
+Subject: Re: [PATCH] shared/att: change security as needed
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Joseph Hwang <josephsih@google.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Luiz Augusto Von Dentz <luiz.von.dentz@intel.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Joseph,
 
-On Wednesday 02 of March 2016 16:18:22 Luiz Augusto von Dentz wrote:
-> Hi Olivier,
-> 
-> On Wed, Mar 2, 2016 at 3:20 PM, Olivier Martin
-> 
-> <olivier.martin.fr@gmail.com> wrote:
-> > Hello all,
-> > I am looking at writing a new GATT (server) service for my Linux-based
-> > bluetooth device using Bluez.
-> > My device use Debian stable (Jessie) that uses Bluez v5.23.
-> > Ideally, I would like to build my GATT service out of the Bluez tree.
-> > As far as I understand I have two solutions:
-> > 
-> > Solution A) Stay with Bluez v5.23 and write a plugin. I managed to
-> > build `plugins/gatt-example.c` out of the tree. But when `bluetoothd`
-> > loads the plugin, it fails to find the symbol `attrib_db_update`. I am
-> > wondering if it is due to the fact `shared/gatt-server` has not been
-> > added to v5.23
-> > (https://git.kernel.org/cgit/bluetooth/bluez.git/tree/src/shared?h=5.23).
-> > And in this case it would not be possible to have a GATT service out of
-> > the tree for this Bluez version.
-> 
-> It depends on the level of control you want to have, if you need extra
-> permissions and low level of access than perhaps building as a plugin
-> is probably a good idea. BlueZ daemon works kind similar to the
-> kernel, the internal API may change so building out of the tree will
-> never be very stable, and you still have to comply to GPL.
-> 
-> > Solution B) Moving to the latest Bluez version and use the GATT server
-> > D-BUS API. But it means I need to remove and replace Bluez on my
-> > stable Debian. I understand this solution is the long term solution
-> > but it might take a while before the Linux distributions used this
-> > version of Bluez.
-> 
-> If more people like you starting using this features it might become
-> stable faster, thus we encourage people to go with this solution. Btw,
-> you can disable the BlueZ from your distro and just run BlueZ from
-> source without overwriting anything from your distro.
-> 
-> > So, is it possible to have an out of the tree plugin with v5.23? I saw
-> > `sixaxis` plugin. But this plugin does not manipulate GATT services
-> > and characteristics.
-> 
-> Possible, yes, but it is not recommended, but you can try to create a
-> external plugin that is build within the source tree so that we keep
-> it working as we change the internal APIs.
+On Wed, Mar 2, 2016 at 4:17 PM, Joseph Hwang <josephsih@google.com> wrote:
+> Hi Luiz:
+>
+>   Thank you for your comments. I will fix, verify, and re-submit the patch.
 
-External plugins (like sixaxis) are able to use only btd_* (plus few
-exceptions) functions. If you want to use other symbols you would have
-to go with builtin plugin.
-
--- 
-BR
-Szymon Janc
+Ive sent a patch for this actually.
