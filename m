@@ -1,53 +1,37 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <1456759739-22626-1-git-send-email-luiz.dentz@gmail.com>
-References: <1456759739-22626-1-git-send-email-luiz.dentz@gmail.com>
-Date: Wed, 2 Mar 2016 12:53:46 +0200
-Message-ID: <CABBYNZLaz7VDV9FVBHYAx6ux9X7wyaDpExTmbUR=5AOPkKkjzA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] core/gatt-client: Fix printing errors if
- experimental is disabled
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+From: =?UTF-8?Q?Fran=C3=A7ois_Beaufort?= <beaufort.francois@gmail.com>
+Date: Wed, 2 Mar 2016 08:31:58 +0100
+Message-ID: <CAEZxfGPvzMVj++anQKY_6RREvmyT-vBnWqYpRiHJVvKKKb3YsQ@mail.gmail.com>
+Subject: Write should return error if device is disconnected while expecting a response
+To: BlueZ development <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+When writing to a characteristic and that a disconnection happens
+before getting a write (error) response, BlueZ should inform that
+write operation failed.
+See my real example logs below:
 
-On Mon, Feb 29, 2016 at 5:28 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> If experimental flag is not set don't attempt to create any objects since
-> it will cause error that are hard to guess such as bellow:
->
-> bluetoothd[6539]: Unable to register GATT service with handle 0x000c for device
-> ---
->  src/gatt-client.c | 6 ++++++
->  1 file changed, 6 insertions(+)
->
-> diff --git a/src/gatt-client.c b/src/gatt-client.c
-> index b4ca3b6..dd76a36 100644
-> --- a/src/gatt-client.c
-> +++ b/src/gatt-client.c
-> @@ -1688,6 +1688,12 @@ static void export_service(struct gatt_db_attribute *attr, void *user_data)
->
->  static void create_services(struct btd_gatt_client *client)
->  {
-> +       /* Don't attempt to create any objects if experimental is disabled */
-> +       if (!(g_dbus_get_flags() & G_DBUS_FLAG_ENABLE_EXPERIMENTAL)) {
-> +               info("GATT service objects disabled");
-> +               return;
-> +       }
-> +
->         DBG("Exporting objects for GATT services: %s", client->devaddr);
->
->         gatt_db_foreach_service(client->db, NULL, export_service, client);
-> --
-> 2.5.0
-
-Applied.
+[DFU_Test:/service000c/char000d]# write 01 04
+Attempting to write /org/bluez/hci0/dev_F1_6F_DE_EC_F1_D6/service000c/char000d
 
 
--- 
-Luiz Augusto von Dentz
+
+< ACL Data TX: Handle 32 flags 0x00 dlen 9
+                                                   [hci0] 5.066808
+      ATT: Write Request (0x12) len 4
+        Handle: 0x000e
+          Data: 0104
+> HCI Event: Number of Completed Packets (0x13) plen 5                                                                    [hci0] 5.106370
+        Num handles: 1
+        Handle: 32
+        Count: 1
+> HCI Event: Vendor (0xff) plen 7                                                                                         [hci0] 5.579396
+        82 12 95 40 10 36 59                             ...@.6Y
+> HCI Event: Disconnect Complete (0x05) plen 4                                                                            [hci0] 5.580376
+        Status: Success (0x00)
+        Handle: 32
+        Reason: Connection Timeout (0x08)
+@ Device Disconnected: F1:6F:DE:EC:F1:D6 (2) reason 1
