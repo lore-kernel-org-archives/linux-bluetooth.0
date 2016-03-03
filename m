@@ -1,38 +1,60 @@
-Return-Path: <tore@fud.no>
-Date: Thu, 3 Mar 2016 21:44:19 +0100
-From: Tore Anderson <tore@fud.no>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Gustavo Padovan
- <gustavo@padovan.org>, linux-bluetooth@vger.kernel.org
-Subject: Re: PROBLEM: Bluetooth mouse not working after resume since commit
- 2ff1389
-Message-ID: <20160303214419.6ac7558a@envy.w5.y.home>
-In-Reply-To: <20160303084229.GA15622@t440s.ger.corp.intel.com>
-References: <20160220181259.1e28f8da@envy.w5.y.home>
-	<20160220182339.GA1648@t440s.P-661HNU-F1>
-	<20160220182919.GA2620@t440s.P-661HNU-F1>
-	<20160220213028.35760428@envy.w5.y.home>
-	<20160221070226.GA12780@t440s.P-661HNU-F1>
-	<20160221121322.6a19b1d4@envy.w5.y.home>
-	<20160303085116.0567712b@echo.ms.redpill-linpro.com>
-	<20160303084229.GA15622@t440s.ger.corp.intel.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <CAHrp-j9a6FK4cRbJ_2Dm=0Pcqrp1Ez_czbNzMeQkKy6E=CqJfA@mail.gmail.com>
+References: <CAHrp-j-pSj5kymb95W7dKPgqcq8eyvf_QzuwK2zaziDcOErTaA@mail.gmail.com>
+	<CAHrp-j9Ovv1MoFiChU8EmKardboBo2G5QZQTKTRm+4yHfX-5gw@mail.gmail.com>
+	<CABBYNZKb3h9d6FMGxewhS=WyZ25t9BcRDzrYaNVM=CcJzDkMEA@mail.gmail.com>
+	<20160302204223.GA18853@kurtmc.Eroad.local>
+	<CAHrp-j9a6FK4cRbJ_2Dm=0Pcqrp1Ez_czbNzMeQkKy6E=CqJfA@mail.gmail.com>
+Date: Thu, 3 Mar 2016 18:31:23 +0200
+Message-ID: <CABBYNZ+BODoiZvGZxEfM5kaNH+kDUqxp+6KfgkxGOhOHrgjZ4A@mail.gmail.com>
+Subject: Re: GATT server example issues in BlueZ
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Ivan Deviatkin <devyatkin.ivan@gmail.com>
+Cc: Kurt McAlpine <kurt@linux.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-* Johan Hedberg
+Hi Ivan,
 
-> One thing you could still try is use an even newer kernel, such as the
-> bluetooth-next tree or the latest 4.5-rc release, and see if the issue
-> still persists.
+On Thu, Mar 3, 2016 at 1:24 PM, Ivan Deviatkin <devyatkin.ivan@gmail.com> wrote:
+> Hi Kurt,
+>
+>> On 2 March 2016 at 21:42, Kurt McAlpine <kurt@linux.com> wrote:
+>> Hi Luiz,
+>>
+>> I too am having some with BlueZ 5.37 from git (I pulled today).
+>>
+>> I do see this but my android device cannot discover the GATT service within the
+>> app. It is possible to pair with it, but not discover the services or even the
+>> device within the app.
+>>
+>> I've tired "Bluetooth LE Scanner" and nRF Master Control Panel"
+>>
+>> Ivan if you have any success with this could you let me know how you did it?
+>
+>    Unfortunately I have cloned BlueZ today too and have exactly the
+> same issues as you.
+>    I believe some more investigation and fixes are required to make it work.
+>
 
-I did with fresh git pulls:
+After removing the device, turn off/on the bluetooth, discover the
+device using Android UI and then connecting using nRF master, or
+whatever else since this apparently is bluedroid fault, this is the
+outcome http://ix.io/oMm
 
-bluetooth-next @ 9dbadc0: Works
-linux (torvalds) @ f983cd3: Broken
+It does connects, we do start sending responses but as soon as we send
+any ATT request ourselves Bluedroid just seems unable to send any
+request anymore. The spec is quite clear that we can send request as
+well regardless if we are the peripheral or not, perhaps we can
+disable our discovery when acting as a peripheral but not all profiles
+have the GAP Peripheral must be the GATT server only and it is too bad
+the test specification actually don't test this because now there are
+probably a ton of Android devices just broken in this regard.
 
-If you'd like I can try to bisect it this weekend to figure out exactly
-where it got fixed, if not I'll just content myself with the knowledge
-that it'll probably get fixed in the mainline kernel eventually.
 
-Tore
+
+-- 
+Luiz Augusto von Dentz
