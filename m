@@ -1,28 +1,38 @@
-Return-Path: <netdev-owner@vger.kernel.org>
-Date: Thu, 03 Mar 2016 16:27:58 -0500 (EST)
-Message-Id: <20160303.162758.867744371077918325.davem@davemloft.net>
-To: johan.hedberg@gmail.com
-Cc: netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Subject: Re: pull request: bluetooth-next 2016-03-01
-From: David Miller <davem@davemloft.net>
-In-Reply-To: <20160301072002.GA24640@t440s.lan>
-References: <20160301072002.GA24640@t440s.lan>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Sender: netdev-owner@vger.kernel.org
+Return-Path: <tore@fud.no>
+Date: Thu, 3 Mar 2016 21:44:19 +0100
+From: Tore Anderson <tore@fud.no>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Gustavo Padovan
+ <gustavo@padovan.org>, linux-bluetooth@vger.kernel.org
+Subject: Re: PROBLEM: Bluetooth mouse not working after resume since commit
+ 2ff1389
+Message-ID: <20160303214419.6ac7558a@envy.w5.y.home>
+In-Reply-To: <20160303084229.GA15622@t440s.ger.corp.intel.com>
+References: <20160220181259.1e28f8da@envy.w5.y.home>
+	<20160220182339.GA1648@t440s.P-661HNU-F1>
+	<20160220182919.GA2620@t440s.P-661HNU-F1>
+	<20160220213028.35760428@envy.w5.y.home>
+	<20160221070226.GA12780@t440s.P-661HNU-F1>
+	<20160221121322.6a19b1d4@envy.w5.y.home>
+	<20160303085116.0567712b@echo.ms.redpill-linpro.com>
+	<20160303084229.GA15622@t440s.ger.corp.intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@gmail.com>
-Date: Tue, 1 Mar 2016 09:20:02 +0200
+* Johan Hedberg
 
-> Here's our main set of Bluetooth & 802.15.4 patches for the 4.6 kernel.
-> 
->  - New Bluetooth HCI driver for Intel/AG6xx controllers
->  - New Broadcom ACPI IDs
->  - LED trigger support for indicating Bluetooth powered state
->  - Various fixes in mac802154, 6lowpan and related drivers
->  - New USB IDs for AR3012 Bluetooth controllers
-> 
-> Please let me know if there are any issues pulling. Thanks.
+> One thing you could still try is use an even newer kernel, such as the
+> bluetooth-next tree or the latest 4.5-rc release, and see if the issue
+> still persists.
 
-Pulled, thanks Johan.
+I did with fresh git pulls:
+
+bluetooth-next @ 9dbadc0: Works
+linux (torvalds) @ f983cd3: Broken
+
+If you'd like I can try to bisect it this weekend to figure out exactly
+where it got fixed, if not I'll just content myself with the knowledge
+that it'll probably get fixed in the mainline kernel eventually.
+
+Tore
