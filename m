@@ -1,49 +1,39 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] shared/gatt-client: Fix not detecting BT_ATT_SECURITY_AUTO
-Date: Thu,  3 Mar 2016 13:46:46 +0200
-Message-Id: <1457005606-13728-1-git-send-email-luiz.dentz@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <20160302204223.GA18853@kurtmc.Eroad.local>
+References: <CAHrp-j-pSj5kymb95W7dKPgqcq8eyvf_QzuwK2zaziDcOErTaA@mail.gmail.com>
+	<CAHrp-j9Ovv1MoFiChU8EmKardboBo2G5QZQTKTRm+4yHfX-5gw@mail.gmail.com>
+	<CABBYNZKb3h9d6FMGxewhS=WyZ25t9BcRDzrYaNVM=CcJzDkMEA@mail.gmail.com>
+	<20160302204223.GA18853@kurtmc.Eroad.local>
+Date: Thu, 3 Mar 2016 12:24:01 +0100
+Message-ID: <CAHrp-j9a6FK4cRbJ_2Dm=0Pcqrp1Ez_czbNzMeQkKy6E=CqJfA@mail.gmail.com>
+Subject: Re: GATT server example issues in BlueZ
+From: Ivan Deviatkin <devyatkin.ivan@gmail.com>
+To: Kurt McAlpine <kurt@linux.com>
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Kurt,
 
-Using bt_gatt_security cannot detect if BT_ATT_SECURITY_AUTO is enabled
-since it actually checks the current level when operating over L2CAP, so
-instead use io_sec_level internal field to detect the security level in
-which ATT is supposed to be operating.
----
- src/shared/att.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+> On 2 March 2016 at 21:42, Kurt McAlpine <kurt@linux.com> wrote:
+> Hi Luiz,
+>
+> I too am having some with BlueZ 5.37 from git (I pulled today).
+>
+> I do see this but my android device cannot discover the GATT service within the
+> app. It is possible to pair with it, but not discover the services or even the
+> device within the app.
+>
+> I've tired "Bluetooth LE Scanner" and nRF Master Control Panel"
+>
+> Ivan if you have any success with this could you let me know how you did it?
 
-diff --git a/src/shared/att.c b/src/shared/att.c
-index 3a84783..7b20757 100644
---- a/src/shared/att.c
-+++ b/src/shared/att.c
-@@ -573,10 +573,11 @@ static bool change_security(struct bt_att *att, uint8_t ecode)
- {
- 	int security;
- 
--	security = bt_att_get_security(att);
--	if (security != BT_ATT_SECURITY_AUTO)
-+	if (att->io_sec_level != BT_ATT_SECURITY_AUTO)
- 		return false;
- 
-+	security = bt_att_get_security(att);
-+
- 	if (ecode == BT_ATT_ERROR_INSUFFICIENT_ENCRYPTION &&
- 					security < BT_ATT_SECURITY_MEDIUM)
- 		security = BT_ATT_SECURITY_MEDIUM;
-@@ -979,7 +980,7 @@ struct bt_att *bt_att_new(int fd, bool ext_signed)
- 
- 	att->io_on_l2cap = is_io_l2cap_based(att->fd);
- 	if (!att->io_on_l2cap)
--		att->io_sec_level = BT_SECURITY_LOW;
-+		att->io_sec_level = BT_ATT_SECURITY_LOW;
- 
- 	return bt_att_ref(att);
- 
--- 
-2.5.0
+   Unfortunately I have cloned BlueZ today too and have exactly the
+same issues as you.
+   I believe some more investigation and fixes are required to make it work.
 
+BR,
+Ivan
