@@ -1,286 +1,50 @@
-Return-Path: <Patrik.Flykt@linux.intel.com>
-Message-ID: <1456997155.4503.99.camel@linux.intel.com>
-Subject: Re: [RFC v2] doc: Add Management Interface network API definitions
-From: Patrik Flykt <Patrik.Flykt@linux.intel.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Thu, 03 Mar 2016 11:25:55 +0200
-In-Reply-To: <EBF2E6B2-2086-4573-ACAF-75B7F8768F76@holtmann.org>
-References: <1456484926-978-1-git-send-email-patrik.flykt@linux.intel.com>
-	 <EBF2E6B2-2086-4573-ACAF-75B7F8768F76@holtmann.org>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Return-Path: <jirislaby@gmail.com>
+Subject: Re: net/bluetooth: workqueue destruction WARNING in
+ hci_unregister_dev
+To: Tejun Heo <tj@kernel.org>
+References: <CACT4Y+ax7zMOxe+kd4tw5Xdbvt=qPdBhXGO0j7qJwdn5tsfNNg@mail.gmail.com>
+ <56C5CE85.6090808@suse.cz>
+ <CACT4Y+bVXfY=wBZ+08rq16tHFw9s3YDrE_LCS=to-GF70AffRQ@mail.gmail.com>
+ <20160218174427.GG13177@mtj.duckdns.org> <56C6EC62.8080107@suse.cz>
+ <56C70618.3010902@suse.cz> <20160302154507.GC4282@mtj.duckdns.org>
+Cc: Dmitry Vyukov <dvyukov@google.com>, Marcel Holtmann
+ <marcel@holtmann.org>, Gustavo Padovan <gustavo@padovan.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, linux-bluetooth@vger.kernel.org,
+ netdev <netdev@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>,
+ syzkaller <syzkaller@googlegroups.com>, Kostya Serebryany <kcc@google.com>,
+ Alexander Potapenko <glider@google.com>, Sasha Levin
+ <sasha.levin@oracle.com>, Eric Dumazet <edumazet@google.com>,
+ Takashi Iwai <tiwai@suse.com>
+From: Jiri Slaby <jslaby@suse.cz>
+Message-ID: <56D7FFE1.90900@suse.cz>
+Date: Thu, 3 Mar 2016 10:12:01 +0100
+MIME-Version: 1.0
+In-Reply-To: <20160302154507.GC4282@mtj.duckdns.org>
+Content-Type: text/plain; charset=windows-1252
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi,
 
-	Hi,
+On 03/02/2016, 04:45 PM, Tejun Heo wrote:
+> On Fri, Feb 19, 2016 at 01:10:00PM +0100, Jiri Slaby wrote:
+>>> 1. didn't help, the problem persists. So I haven't applied the patch from 2.
+>>
+>> FWIW I dumped more info about the wq:
+>> wq->name='hci0' pwq=ffff8800390d7600 wq->dfl_pwq=ffff8800390d5200
+>> pwq->refcnt=2 pwq->nr_active=0 delayed_works: <nothing>
+> 
+> Can you please print out the same info for all pwq's during shutdown?
+> It looks like we're leaking pwq refcnt but I can't spot a place where
+> that could happen on an empty pwq.
 
-On Tue, 2016-03-01 at 08:51 -0800, Marcel Holtmann wrote:
-> Hi Patrik,
-> 
-> > To make the commands more generic, IPSP has been renamed Network. In order
-> > to be more generic, a network role has been added to the commands rather
-> > than have a specific command for role setting. With this more networking
-> > than just 6LowPAN can be handled in the future; whether 1 octet is enough
-> > to handle possible future roles OR'ed together remains to be seen and
-> > comments on the subject are appreciated.
-> > 
-> > Handling incoming connection authorization is another topic to discuss
-> > with an initial proposal already on the mailing list. I'd be glad to update
-> > this RFC with the outcome of that discussion.
-> > 
-> > 
-> >     Patrik
-> > 
-> > doc/doc.txt      |   0
-> > doc/mgmt-api.txt | 172 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
-> > 2 files changed, 172 insertions(+)
-> > create mode 100644 doc/doc.txt
-> > 
-> > diff --git a/doc/doc.txt b/doc/doc.txt
-> > new file mode 100644
-> > index 0000000..e69de29
-> > diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
-> > index 731a088..060b751 100644
-> > --- a/doc/mgmt-api.txt
-> > +++ b/doc/mgmt-api.txt
-> > @@ -2801,6 +2801,127 @@ Start Limited Discovery Command
-> > 				Invalid Index
-> > 
-> > 
-> > +Get Networks Command
-> > +====================
-> > +
-> > +	Command Code:		0x0042
-> > +	Controller Index:	<controller id>
-> > +	Command Parameters:
-> > +	Return Parameters:	Interface Index (4 Octets)
-> > +				Connection_Count (2 Octets)
-> > +				Address1 {
-> > +					Address (6 Octets)
-> > +					Address_Type (1 Octet)
-> > +					Network_Role (1 Octet)
-> > +				}
-> > +				Address2 { }
-> > +				...
-> > +
-> 
-> so if we want to extend this to BNEP eventually, then the interface
-> index needs to be per Network block (and it is Network1 and not
-> Address1).
-> 
-> I know that this means for multiple IPSP networks, the interface index
-> would repeat since there is really only one, but I think that is
-> something the application can easily figure out.
+I have not done that yet, but today, I see:
+destroy_workqueue: name='req_hci0' pwq=ffff88002f590300
+wq->dfl_pwq=ffff88002f591e00 pwq->refcnt=2 pwq->nr_active=0 delayed_works:
+   pwq 12: cpus=0-1 node=0 flags=0x4 nice=-20 active=0/1
+     in-flight: 18568:wq_barrier_func
 
-Let's do that.
-
-> > +	This command is used to retrieve a list of BTLE network
-> > +	connections. A pre-requisite is that LE is already
-> > +	enabled, otherwise this command will return a "rejected"
-> > +	response.
-> > +
-> > +	Possible values for the Address_Type parameter:
-> > +		0	Reserved
-> > +		1	LE Public
-> > +		2	LE Random
-> > +
-> > +	Possible values for the Network_Role parameter:
-> > +		0	Reserved
-> > +		1	6LoWPAN Node
-> > +		2	6LoWPAN Router
-> 
-> I wonder if here we actually want to call it IPSP Node instead. I only
-> dislike IPSP in the command name. In parameters it seems fine.
-> 
-> And do we need to differentiate between Node and Router here. I think
-> that at some point Johan and discussed that the application (aka
-> bluetoothd) is responsible for adding advertising instances. I wonder
-> if we consider this more like Add Device were we punch a whole for
-> allowing incoming connections. Keep in mind there is an extra thread
-> ongoing about adding Add Device Type == 0x03 for exactly that case.
-
-At first I thought a network role would come in handy, but it does not
-actually produce any value here. It's simpler to just implement the
-Add/Remove Network commands and rely on the application knowing what it
-is doing. I'll remove the Network_Role.
-
-If only whitelisted or non-blacklisted nodes are allowed to connect, no
-further authorization signalling on new incoming connections is
-necessary. Looks simple, except that Add Device with type 0x03
-whitelisting needs also to be implemented by somebody, right?
-
-> > +
-> > +	For devices using resolvable random addresses with a known
-> > +	identity resolving key, the Address and Address_Type will
-> > +	contain the identity information.
-> > +
-> > +	This command can only be used when the controller is powered.
-> > +
-> > +	This command generates a Command Complete event on success or
-> > +	a Command Status event on failure.
-> > +
-> > +	Possible errors:	Invalid Parameters
-> > +				Not Powered
-> > +				Invalid Index
-> > +
-> > +
-> > +Add Network Command
-> > +===================
-> > +
-> > +	Command Code:		0x0043
-> > +	Controller Index:	<controller id>
-> > +	Command Parameters:	Address (6 Octets)
-> > +				Address_Type (1 Octet)
-> > +				Network_Role (1 Octet)
-> > +	Return Parameters:	Address (6 Octets)
-> > +				Address_Type (1 Octet)
-> > +				Network_Role (1 Octet)
-> > +				Interface Index (4 Octets)
-> > +
-> > +	This command is used to connect to establish a network connection
-> > +	to a remote BTLE node. A pre-requisite is that LE is already
-> > +	enabled, otherwise this command will return a "rejected"
-> > +	response.
-> 
-> Do we really care if LE is enabled. I mean to some level it is
-> implicit since you give an LE address. On the other hand, we could
-> just let it program anything it wants. It just never gets executed if
-> LE gets disabled.
-> 
-> The reason I am saying this is that we do not define what happens to
-> all these networks if you later on disable LE. We would have to send
-> events to notify about changes.
-> 
-> Refusing LE based entries for a BR/EDR only controller is fine, but if
-> the controller is LE capable we might need to be careful.
-
-Again it's easier for everybody if only the LE capability of the
-controller is checked. I will remove the text about LE being enabled.
-
-> > +
-> > +	Possible values for the Address_Type parameter:
-> > +		0	Reserved
-> > +		1	LE Public
-> > +		2	LE Random
-> > +
-> > +	Possible values for the Network_Role parameter:
-> > +		0	Reserved
-> > +		1	6LoWPAN Node
-> > +		2	6LoWPAN Router
-> > +
-> > +	This command generates a Command Complete event on success
-> > +	or failure.
-> > +
-> > +	Possible errors:	Busy
-> > +				Refused
-> > +				Invalid Parameters
-> > +				Not Powered
-> > +				Invalid Index
-> > +				Already Connected
-> > +
-> > +
-> > +Remove Network Command
-> > +======================
-> > +
-> > +	Command Code:		0x0044
-> > +	Controller Index:	<controller id>
-> > +	Command Parameters:	Address (6 Octets)
-> > +				Address_Type (1 Octet)
-> > +				Network_Role (1 Octet)
-> > +	Return Parameters:	Address (6 Octets)
-> > +				Address_Type (1 Octet)
-> > +				Network_Role (1 Octet)
-> > +
-> > +	This command is used to disconnect a network connection from a
-> > +	remote BTLE node. A pre-requisite is that LE is already
-> > +	enabled, otherwise this command will return a "rejected"
-> > +	response.
-> > +
-> > +	Possible values for the Address_Type parameter:
-> > +		0	Reserved
-> > +		1	LE Public
-> > +		2	LE Random
-> > +
-> > +	Possible values for the Network_Role parameter:
-> > +		0	Reserved
-> > +		1	6LoWPAN Node
-> > +		2	6LoWPAN Router
-> > +
-> > +	This command generates a Command Complete event on success
-> > +	or failure.
-> > +
-> > +	Possible errors:	Busy
-> > +				Not Connected
-> > +				Invalid Parameters
-> > +				Not Powered
-> > +				Invalid Index
-> > +
-> > +
-> > Command Complete Event
-> > ======================
-> > 
-> > @@ -3645,3 +3766,54 @@ Advertising Removed Event
-> > 
-> > 	The event will only be sent to management sockets other than the
-> > 	one through which the command was sent.
-> > +
-> > +
-> > +Network Added Event
-> > +===================
-> > +
-> > +	Event Code:		0x0025
-> > +	Controller Index:	<controller id>
-> > +	Event Parameters:	Address (6 Octets)
-> > +				Address_Type (1 Octet)
-> > +				Network_Role (1 Octet)
-> > +				Interface Index (4 Octets)
-> > +
-> > +	This event indicates that a network connection to a remote
-> > +	BTLE node has been established successfully.
-> > +
-> > +	Possible values for the Address_Type parameter:
-> > +		1	LE Public
-> > +		2	LE Random
-> > +
-> > +	Possible values for the Network_Role parameter:
-> > +		1	6LoWPAN Node
-> > +		2	6LoWPAN Router
-> > +
-> > +	For devices using resolvable random addresses with a known
-> > +	identity resolving key, the Address and Address_Type will
-> > +	contain the identity information.
-> > +
-> > +
-> > +Network Removed Event
-> > +=====================
-> > +
-> > +	Event Code:		0x0026
-> > +	Controller Index:	<controller id>
-> > +	Event Parameters:	Address (6 Octets)
-> > +				Address_Type (1 Octet)
-> > +				Network_Role (1 Octet)
-> > +
-> > +	This event indicates that the BTLE network connection to a remote
-> > +	node has been lost.
-> > +
-> > +	Possible values for the Address_Type parameter:
-> > +		1	LE Public
-> > +		2	LE Random
-> > +
-> > +	Possible values for the Network_Role parameter:
-> > +		1	6LoWPAN Node
-> > +		2	6LoWPAN Router
-> > +
-> > +	For devices using resolvable random addresses with a known
-> > +	identity resolving key, the Address and Address_Type will
-> > +	contain the identity information.
-> 
-> Regards
-> 
-> Marcel
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+thanks,
+-- 
+js
+suse labs
