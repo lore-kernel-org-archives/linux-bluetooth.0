@@ -1,50 +1,40 @@
-Return-Path: <linux-kernel-owner@vger.kernel.org>
-From: Amitkumar Karwar <akarwar@marvell.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Cathy Luo <cluo@marvell.com>, <linux-kernel@vger.kernel.org>,
-	Nishant Sarmukadam <nishants@marvell.com>,
-	Ganapathi Bhat <gbhat@marvell.com>
-Subject: [PATCH BlueZ v4] tools/btattach: add marvell support
-Date: Thu, 3 Mar 2016 03:56:39 -0800
-Message-ID: <1457006200-8132-1-git-send-email-akarwar@marvell.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Sender: linux-kernel-owner@vger.kernel.org
+In-Reply-To: <CAHFy418JQ=TW2ZRsSPFe5BFidgnq-kBiempYv=9TviX8uPN-VQ@mail.gmail.com>
+References: <1456925319-16594-1-git-send-email-josephsih@chromium.org>
+	<CABBYNZ+jSLy_YaK99Ov_E2M68yU0xZUxp9t+0cnUFp1sDEaKDA@mail.gmail.com>
+	<CABBYNZ+eLxZXkMLuupfBGDthDmuLwKr5Z0tP+sXrmxnL6JTdUg@mail.gmail.com>
+	<CAHFy41-4o+01KSTB1G-FKRLu2Ym9-QBtqhEeWPV0EsR1bWLtvw@mail.gmail.com>
+	<CABBYNZJuS3zHhqf=nr=Zqb6HO=3eaaDUZH=855HsLGL62=JBbQ@mail.gmail.com>
+	<CAHFy418JQ=TW2ZRsSPFe5BFidgnq-kBiempYv=9TviX8uPN-VQ@mail.gmail.com>
+Date: Thu, 3 Mar 2016 13:55:28 +0200
+Message-ID: <CABBYNZ+w04trQ8fR5Ey6ZejdBvZk1fDM-Lctjdt0Bjoq3CTtNQ@mail.gmail.com>
+Subject: Re: [PATCH] shared/att: change security as needed
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Joseph Hwang <josephsih@google.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Luiz Augusto Von Dentz <luiz.von.dentz@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Ganapathi Bhat <gbhat@marvell.com>
+Hi Joseph,
 
-User needs to issue below command for Marvell devices
-btattach -P marvell -B /dev/ttyUSB#
+On Thu, Mar 3, 2016 at 12:45 PM, Joseph Hwang <josephsih@google.com> wrote:
+> Hi Luiz:
+>
+>   I try to apply your one-liner locally.
+>
+> +       bt_att_set_security(dev->att, BT_ATT_SECURITY_AUTO);
+>
+>   However, bt_att_set_security() failed  in device_attach_att() in
+> src/device.c. It cannot set BT_ATT_SECURITY_AUTO successfully here.
+>
+>   But bt_att_set_security() would succeed in change_security() in
+> src/shared/att.c as in my patch.
 
----
- tools/btattach.c  | 1 +
- tools/hciattach.h | 1 +
- 2 files changed, 2 insertions(+)
+No top posting in the mailing list, respond inline. Btw, Ive sent a
+new patch about this.
 
-diff --git a/tools/btattach.c b/tools/btattach.c
-index a025bb0..7807e9f 100644
---- a/tools/btattach.c
-+++ b/tools/btattach.c
-@@ -214,6 +214,7 @@ static const struct {
- 	{ "intel", HCI_UART_INTEL },
- 	{ "bcm",   HCI_UART_BCM   },
- 	{ "qca",   HCI_UART_QCA   },
-+	{ "marvell", HCI_UART_MRVL   },
- 	{ }
- };
- 
-diff --git a/tools/hciattach.h b/tools/hciattach.h
-index 4279a33..e109c3e 100644
---- a/tools/hciattach.h
-+++ b/tools/hciattach.h
-@@ -42,6 +42,7 @@
- #define HCI_UART_INTEL	6
- #define HCI_UART_BCM	7
- #define HCI_UART_QCA	8
-+#define HCI_UART_MRVL	10
- 
- #define HCI_UART_RAW_DEVICE	0
- #define HCI_UART_RESET_ON_INIT	1
 -- 
-1.9.1
+Luiz Augusto von Dentz
