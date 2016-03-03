@@ -1,40 +1,49 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <CAHFy418JQ=TW2ZRsSPFe5BFidgnq-kBiempYv=9TviX8uPN-VQ@mail.gmail.com>
-References: <1456925319-16594-1-git-send-email-josephsih@chromium.org>
-	<CABBYNZ+jSLy_YaK99Ov_E2M68yU0xZUxp9t+0cnUFp1sDEaKDA@mail.gmail.com>
-	<CABBYNZ+eLxZXkMLuupfBGDthDmuLwKr5Z0tP+sXrmxnL6JTdUg@mail.gmail.com>
-	<CAHFy41-4o+01KSTB1G-FKRLu2Ym9-QBtqhEeWPV0EsR1bWLtvw@mail.gmail.com>
-	<CABBYNZJuS3zHhqf=nr=Zqb6HO=3eaaDUZH=855HsLGL62=JBbQ@mail.gmail.com>
-	<CAHFy418JQ=TW2ZRsSPFe5BFidgnq-kBiempYv=9TviX8uPN-VQ@mail.gmail.com>
-Date: Thu, 3 Mar 2016 13:55:28 +0200
-Message-ID: <CABBYNZ+w04trQ8fR5Ey6ZejdBvZk1fDM-Lctjdt0Bjoq3CTtNQ@mail.gmail.com>
-Subject: Re: [PATCH] shared/att: change security as needed
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Joseph Hwang <josephsih@google.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Luiz Augusto Von Dentz <luiz.von.dentz@intel.com>
-Content-Type: text/plain; charset=UTF-8
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ] shared/gatt-client: Fix not detecting BT_ATT_SECURITY_AUTO
+Date: Thu,  3 Mar 2016 13:46:46 +0200
+Message-Id: <1457005606-13728-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Joseph,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Thu, Mar 3, 2016 at 12:45 PM, Joseph Hwang <josephsih@google.com> wrote:
-> Hi Luiz:
->
->   I try to apply your one-liner locally.
->
-> +       bt_att_set_security(dev->att, BT_ATT_SECURITY_AUTO);
->
->   However, bt_att_set_security() failed  in device_attach_att() in
-> src/device.c. It cannot set BT_ATT_SECURITY_AUTO successfully here.
->
->   But bt_att_set_security() would succeed in change_security() in
-> src/shared/att.c as in my patch.
+Using bt_gatt_security cannot detect if BT_ATT_SECURITY_AUTO is enabled
+since it actually checks the current level when operating over L2CAP, so
+instead use io_sec_level internal field to detect the security level in
+which ATT is supposed to be operating.
+---
+ src/shared/att.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-No top posting in the mailing list, respond inline. Btw, Ive sent a
-new patch about this.
-
+diff --git a/src/shared/att.c b/src/shared/att.c
+index 3a84783..7b20757 100644
+--- a/src/shared/att.c
++++ b/src/shared/att.c
+@@ -573,10 +573,11 @@ static bool change_security(struct bt_att *att, uint8_t ecode)
+ {
+ 	int security;
+ 
+-	security = bt_att_get_security(att);
+-	if (security != BT_ATT_SECURITY_AUTO)
++	if (att->io_sec_level != BT_ATT_SECURITY_AUTO)
+ 		return false;
+ 
++	security = bt_att_get_security(att);
++
+ 	if (ecode == BT_ATT_ERROR_INSUFFICIENT_ENCRYPTION &&
+ 					security < BT_ATT_SECURITY_MEDIUM)
+ 		security = BT_ATT_SECURITY_MEDIUM;
+@@ -979,7 +980,7 @@ struct bt_att *bt_att_new(int fd, bool ext_signed)
+ 
+ 	att->io_on_l2cap = is_io_l2cap_based(att->fd);
+ 	if (!att->io_on_l2cap)
+-		att->io_sec_level = BT_SECURITY_LOW;
++		att->io_sec_level = BT_ATT_SECURITY_LOW;
+ 
+ 	return bt_att_ref(att);
+ 
 -- 
-Luiz Augusto von Dentz
+2.5.0
+
