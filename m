@@ -1,159 +1,286 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <20160302204223.GA18853@kurtmc.Eroad.local>
-References: <CAHrp-j-pSj5kymb95W7dKPgqcq8eyvf_QzuwK2zaziDcOErTaA@mail.gmail.com>
-	<CAHrp-j9Ovv1MoFiChU8EmKardboBo2G5QZQTKTRm+4yHfX-5gw@mail.gmail.com>
-	<CABBYNZKb3h9d6FMGxewhS=WyZ25t9BcRDzrYaNVM=CcJzDkMEA@mail.gmail.com>
-	<20160302204223.GA18853@kurtmc.Eroad.local>
-Date: Thu, 3 Mar 2016 11:34:04 +0200
-Message-ID: <CABBYNZLnvwa5Xa=cg1eNdppJHynPj+HZChrmVAS52HCk49zmTw@mail.gmail.com>
-Subject: Re: GATT server example issues in BlueZ
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Kurt McAlpine <kurt@linux.com>
-Cc: Ivan Deviatkin <devyatkin.ivan@gmail.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <Patrik.Flykt@linux.intel.com>
+Message-ID: <1456997155.4503.99.camel@linux.intel.com>
+Subject: Re: [RFC v2] doc: Add Management Interface network API definitions
+From: Patrik Flykt <Patrik.Flykt@linux.intel.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Thu, 03 Mar 2016 11:25:55 +0200
+In-Reply-To: <EBF2E6B2-2086-4573-ACAF-75B7F8768F76@holtmann.org>
+References: <1456484926-978-1-git-send-email-patrik.flykt@linux.intel.com>
+	 <EBF2E6B2-2086-4573-ACAF-75B7F8768F76@holtmann.org>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Kurt, Ivan,
 
-On Wed, Mar 2, 2016 at 10:42 PM, Kurt McAlpine <kurt@linux.com> wrote:
-> Hi Luiz,
->
-> I too am having some with BlueZ 5.37 from git (I pulled today).
->
-> On Wed, Mar 02, 2016 at 03:50:50PM +0200, Luiz Augusto von Dentz wrote:
->> Hi Ivan,
->>
->> On Wed, Mar 2, 2016 at 1:16 PM, Ivan Deviatkin <devyatkin.ivan@gmail.com> wrote:
->> >     Additionally I have checked python example "example-gatt-server"
->> > from \tests - it reports that GATT server is running but in bluetoothd
->> > logs still the same issue.
->>
->> So you don't see something like this:
->>
->>
->> ./example-gatt-server
->> GetManagedObjects
->> GATT application registered
->>
->> bluetoothd[16205]: src/gatt-database.c:manager_register_app()
->> Registering application: :1.603:/
->> bluetoothd[16205]: src/gatt-database.c:proxy_added_cb() Object added:
->> path: /org/bluez/example/service0, iface: org.bluez.GattService1
->> bluetoothd[16205]: src/gatt-database.c:proxy_added_cb() Object added:
->> path: /org/bluez/example/service0/char0, iface:
->> org.bluez.GattCharacteristic1
->> bluetoothd[16205]: src/gatt-database.c:proxy_added_cb() Object added:
->> path: /org/bluez/example/service0/char1, iface:
->> org.bluez.GattCharacteristic1
->> bluetoothd[16205]: src/gatt-database.c:proxy_added_cb() Object added:
->> path: /org/bluez/example/service0/char2, iface:
->> org.bluez.GattCharacteristic1
->> bluetoothd[16205]: src/gatt-database.c:proxy_added_cb() Object added:
->> path: /org/bluez/example/service1, iface: org.bluez.GattService1
->> bluetoothd[16205]: src/gatt-database.c:proxy_added_cb() Object added:
->> path: /org/bluez/example/service1/char0, iface:
->> org.bluez.GattCharacteristic1
->> bluetoothd[16205]: src/gatt-database.c:proxy_added_cb() Object added:
->> path: /org/bluez/example/service2, iface: org.bluez.GattService1
->> bluetoothd[16205]: src/gatt-database.c:proxy_added_cb() Object added:
->> path: /org/bluez/example/service2/char0, iface:
->> org.bluez.GattCharacteristic1
->> bluetoothd[16205]: src/gatt-database.c:proxy_added_cb() Object added:
->> path: /org/bluez/example/service2/char0/desc0, iface:
->> org.bluez.GattDescriptor1
->> bluetoothd[16205]: src/gatt-database.c:proxy_added_cb() Object added:
->> path: /org/bluez/example/service2/char0/desc1, iface:
->> org.bluez.GattDescriptor1
->> bluetoothd[16205]: src/gatt-database.c:proxy_added_cb() Object added:
->> path: /org/bluez/example/service2/char1, iface:
->> org.bluez.GattCharacteristic1
->> bluetoothd[16205]: src/gatt-database.c:proxy_added_cb() Object added:
->> path: /org/bluez/example/service2/char1/desc2, iface:
->> org.bluez.GattDescriptor1
->> bluetoothd[16205]: src/gatt-database.c:proxy_added_cb() Object added:
->> path: /org/bluez/example/service2/char1/desc3, iface:
->> org.bluez.GattDescriptor1
->> bluetoothd[16205]: src/gatt-database.c:database_add_ccc() Created CCC
->> entry for characteristic
->> bluetoothd[16205]: src/gatt-database.c:gatt_db_service_added() GATT
->> Service added to local database
->> bluetoothd[16205]: src/gatt-database.c:database_add_ccc() Created CCC
->> entry for characteristic
->> bluetoothd[16205]: src/gatt-database.c:gatt_db_service_added() GATT
->> Service added to local database
->> bluetoothd[16205]: src/gatt-database.c:cep_write_cb() Stored CEP value
->> in the database
->> bluetoothd[16205]: src/gatt-database.c:database_add_cep() Created CEP
->> entry for characteristic
->> bluetoothd[16205]: src/gatt-database.c:cep_write_cb() Stored CEP value
->> in the database
->> bluetoothd[16205]: src/gatt-database.c:database_add_cep() Created CEP
->> entry for characteristic
->> bluetoothd[16205]: src/gatt-database.c:gatt_db_service_added() GATT
->> Service added to local database
->> bluetoothd[16205]: src/gatt-database.c:client_ready_cb() GATT
->> application registered: :1.603:/
->
-> I do see this but my android device cannot discover the GATT service within the
-> app. It is possible to pair with it, but not discover the services or even the
-> device within the app.
->
-> I've tired "Bluetooth LE Scanner" and nRF Master Control Panel"
->
-> Ivan if you have any success with this could you let me know how you did it?
+	Hi,
 
-Do you guys remember that you have to advertise to be able to connect:
+On Tue, 2016-03-01 at 08:51 -0800, Marcel Holtmann wrote:
+> Hi Patrik,
+> 
+> > To make the commands more generic, IPSP has been renamed Network. In order
+> > to be more generic, a network role has been added to the commands rather
+> > than have a specific command for role setting. With this more networking
+> > than just 6LowPAN can be handled in the future; whether 1 octet is enough
+> > to handle possible future roles OR'ed together remains to be seen and
+> > comments on the subject are appreciated.
+> > 
+> > Handling incoming connection authorization is another topic to discuss
+> > with an initial proposal already on the mailing list. I'd be glad to update
+> > this RFC with the outcome of that discussion.
+> > 
+> > 
+> >     Patrik
+> > 
+> > doc/doc.txt      |   0
+> > doc/mgmt-api.txt | 172 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+> > 2 files changed, 172 insertions(+)
+> > create mode 100644 doc/doc.txt
+> > 
+> > diff --git a/doc/doc.txt b/doc/doc.txt
+> > new file mode 100644
+> > index 0000000..e69de29
+> > diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
+> > index 731a088..060b751 100644
+> > --- a/doc/mgmt-api.txt
+> > +++ b/doc/mgmt-api.txt
+> > @@ -2801,6 +2801,127 @@ Start Limited Discovery Command
+> > 				Invalid Index
+> > 
+> > 
+> > +Get Networks Command
+> > +====================
+> > +
+> > +	Command Code:		0x0042
+> > +	Controller Index:	<controller id>
+> > +	Command Parameters:
+> > +	Return Parameters:	Interface Index (4 Octets)
+> > +				Connection_Count (2 Octets)
+> > +				Address1 {
+> > +					Address (6 Octets)
+> > +					Address_Type (1 Octet)
+> > +					Network_Role (1 Octet)
+> > +				}
+> > +				Address2 { }
+> > +				...
+> > +
+> 
+> so if we want to extend this to BNEP eventually, then the interface
+> index needs to be per Network block (and it is Network1 and not
+> Address1).
+> 
+> I know that this means for multiple IPSP networks, the interface index
+> would repeat since there is really only one, but I think that is
+> something the application can easily figure out.
 
-< HCI Command: LE Set Advertising Data (0x08|0x0008) plen 32
-            [hci0] 686245.066488
-        Length: 30
-        Flags: 0x06
-          LE General Discoverable Mode
-          BR/EDR Not Supported
-        16-bit Service UUIDs (complete): 2 entries
-          Heart Rate (0x180d)
-          Battery Service (0x180f)
-        Company: internal use (65535)
-          Data: 0001020304
-        Service Data (UUID 0x9999): 0001020304
-        TX power: 9 dBm
-> HCI Event: Command Complete (0x0e) plen 4                                        [hci0] 686245.139564
-      LE Set Advertising Data (0x08|0x0008) ncmd 1
-        Status: Success (0x00)
-< HCI Command: LE Set Scan Response Data (0x08|0x0009) plen 32
-            [hci0] 686245.139585
-        Length: 0
-> HCI Event: Command Complete (0x0e) plen 4                                        [hci0] 686245.140582
-      LE Set Scan Response Data (0x08|0x0009) ncmd 1
-        Status: Success (0x00)
-< HCI Command: LE Set Advertising Parameters (0x08|0x0006) plen 15
-            [hci0] 686245.140628
-        Min advertising interval: 1280.000 msec (0x0800)
-        Max advertising interval: 1280.000 msec (0x0800)
-        Type: Connectable undirected - ADV_IND (0x00)
-        Own address type: Public (0x00)
-        Direct address type: Public (0x00)
-        Direct address: 00:00:00:00:00:00 (OUI 00-00-00)
-        Channel map: 37, 38, 39 (0x07)
-        Filter policy: Allow Scan Request from Any, Allow Connect
-Request from Any (0x00)
-> HCI Event: Command Complete (0x0e) plen 4                                        [hci0] 686245.141553
-      LE Set Advertising Parameters (0x08|0x0006) ncmd 1
-        Status: Success (0x00)
-< HCI Command: LE Set Advertise Enable (0x08|0x000a) plen 1
-            [hci0] 686245.141563
-        Advertising: Enabled (0x01)
-> HCI Event: Command Complete (0x0e) plen 4                                        [hci0] 686245.142554
-      LE Set Advertise Enable (0x08|0x000a) ncmd 2
-        Status: Success (0x00)
+Let's do that.
 
-Even with this I couldn't manage to connect using Android, even though
-it can find it but there is nothing set as a name (possible a bug in
-our end), if I do enable BR/EDR than it attempts to connect over it
-(priceless!) instead of LE where it got the advertisement.
+> > +	This command is used to retrieve a list of BTLE network
+> > +	connections. A pre-requisite is that LE is already
+> > +	enabled, otherwise this command will return a "rejected"
+> > +	response.
+> > +
+> > +	Possible values for the Address_Type parameter:
+> > +		0	Reserved
+> > +		1	LE Public
+> > +		2	LE Random
+> > +
+> > +	Possible values for the Network_Role parameter:
+> > +		0	Reserved
+> > +		1	6LoWPAN Node
+> > +		2	6LoWPAN Router
+> 
+> I wonder if here we actually want to call it IPSP Node instead. I only
+> dislike IPSP in the command name. In parameters it seems fine.
+> 
+> And do we need to differentiate between Node and Router here. I think
+> that at some point Johan and discussed that the application (aka
+> bluetoothd) is responsible for adding advertising instances. I wonder
+> if we consider this more like Add Device were we punch a whole for
+> allowing incoming connections. Keep in mind there is an extra thread
+> ongoing about adding Add Device Type == 0x03 for exactly that case.
 
--- 
-Luiz Augusto von Dentz
+At first I thought a network role would come in handy, but it does not
+actually produce any value here. It's simpler to just implement the
+Add/Remove Network commands and rely on the application knowing what it
+is doing. I'll remove the Network_Role.
+
+If only whitelisted or non-blacklisted nodes are allowed to connect, no
+further authorization signalling on new incoming connections is
+necessary. Looks simple, except that Add Device with type 0x03
+whitelisting needs also to be implemented by somebody, right?
+
+> > +
+> > +	For devices using resolvable random addresses with a known
+> > +	identity resolving key, the Address and Address_Type will
+> > +	contain the identity information.
+> > +
+> > +	This command can only be used when the controller is powered.
+> > +
+> > +	This command generates a Command Complete event on success or
+> > +	a Command Status event on failure.
+> > +
+> > +	Possible errors:	Invalid Parameters
+> > +				Not Powered
+> > +				Invalid Index
+> > +
+> > +
+> > +Add Network Command
+> > +===================
+> > +
+> > +	Command Code:		0x0043
+> > +	Controller Index:	<controller id>
+> > +	Command Parameters:	Address (6 Octets)
+> > +				Address_Type (1 Octet)
+> > +				Network_Role (1 Octet)
+> > +	Return Parameters:	Address (6 Octets)
+> > +				Address_Type (1 Octet)
+> > +				Network_Role (1 Octet)
+> > +				Interface Index (4 Octets)
+> > +
+> > +	This command is used to connect to establish a network connection
+> > +	to a remote BTLE node. A pre-requisite is that LE is already
+> > +	enabled, otherwise this command will return a "rejected"
+> > +	response.
+> 
+> Do we really care if LE is enabled. I mean to some level it is
+> implicit since you give an LE address. On the other hand, we could
+> just let it program anything it wants. It just never gets executed if
+> LE gets disabled.
+> 
+> The reason I am saying this is that we do not define what happens to
+> all these networks if you later on disable LE. We would have to send
+> events to notify about changes.
+> 
+> Refusing LE based entries for a BR/EDR only controller is fine, but if
+> the controller is LE capable we might need to be careful.
+
+Again it's easier for everybody if only the LE capability of the
+controller is checked. I will remove the text about LE being enabled.
+
+> > +
+> > +	Possible values for the Address_Type parameter:
+> > +		0	Reserved
+> > +		1	LE Public
+> > +		2	LE Random
+> > +
+> > +	Possible values for the Network_Role parameter:
+> > +		0	Reserved
+> > +		1	6LoWPAN Node
+> > +		2	6LoWPAN Router
+> > +
+> > +	This command generates a Command Complete event on success
+> > +	or failure.
+> > +
+> > +	Possible errors:	Busy
+> > +				Refused
+> > +				Invalid Parameters
+> > +				Not Powered
+> > +				Invalid Index
+> > +				Already Connected
+> > +
+> > +
+> > +Remove Network Command
+> > +======================
+> > +
+> > +	Command Code:		0x0044
+> > +	Controller Index:	<controller id>
+> > +	Command Parameters:	Address (6 Octets)
+> > +				Address_Type (1 Octet)
+> > +				Network_Role (1 Octet)
+> > +	Return Parameters:	Address (6 Octets)
+> > +				Address_Type (1 Octet)
+> > +				Network_Role (1 Octet)
+> > +
+> > +	This command is used to disconnect a network connection from a
+> > +	remote BTLE node. A pre-requisite is that LE is already
+> > +	enabled, otherwise this command will return a "rejected"
+> > +	response.
+> > +
+> > +	Possible values for the Address_Type parameter:
+> > +		0	Reserved
+> > +		1	LE Public
+> > +		2	LE Random
+> > +
+> > +	Possible values for the Network_Role parameter:
+> > +		0	Reserved
+> > +		1	6LoWPAN Node
+> > +		2	6LoWPAN Router
+> > +
+> > +	This command generates a Command Complete event on success
+> > +	or failure.
+> > +
+> > +	Possible errors:	Busy
+> > +				Not Connected
+> > +				Invalid Parameters
+> > +				Not Powered
+> > +				Invalid Index
+> > +
+> > +
+> > Command Complete Event
+> > ======================
+> > 
+> > @@ -3645,3 +3766,54 @@ Advertising Removed Event
+> > 
+> > 	The event will only be sent to management sockets other than the
+> > 	one through which the command was sent.
+> > +
+> > +
+> > +Network Added Event
+> > +===================
+> > +
+> > +	Event Code:		0x0025
+> > +	Controller Index:	<controller id>
+> > +	Event Parameters:	Address (6 Octets)
+> > +				Address_Type (1 Octet)
+> > +				Network_Role (1 Octet)
+> > +				Interface Index (4 Octets)
+> > +
+> > +	This event indicates that a network connection to a remote
+> > +	BTLE node has been established successfully.
+> > +
+> > +	Possible values for the Address_Type parameter:
+> > +		1	LE Public
+> > +		2	LE Random
+> > +
+> > +	Possible values for the Network_Role parameter:
+> > +		1	6LoWPAN Node
+> > +		2	6LoWPAN Router
+> > +
+> > +	For devices using resolvable random addresses with a known
+> > +	identity resolving key, the Address and Address_Type will
+> > +	contain the identity information.
+> > +
+> > +
+> > +Network Removed Event
+> > +=====================
+> > +
+> > +	Event Code:		0x0026
+> > +	Controller Index:	<controller id>
+> > +	Event Parameters:	Address (6 Octets)
+> > +				Address_Type (1 Octet)
+> > +				Network_Role (1 Octet)
+> > +
+> > +	This event indicates that the BTLE network connection to a remote
+> > +	node has been lost.
+> > +
+> > +	Possible values for the Address_Type parameter:
+> > +		1	LE Public
+> > +		2	LE Random
+> > +
+> > +	Possible values for the Network_Role parameter:
+> > +		1	6LoWPAN Node
+> > +		2	6LoWPAN Router
+> > +
+> > +	For devices using resolvable random addresses with a known
+> > +	identity resolving key, the Address and Address_Type will
+> > +	contain the identity information.
+> 
+> Regards
+> 
+> Marcel
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
