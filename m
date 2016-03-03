@@ -1,64 +1,28 @@
-Return-Path: <hanipouspilot@gmail.com>
-From: Dmitry Tunin <hanipouspilot@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Dmitry Tunin <hanipouspilot@gmail.com>,
-	stable@vger.kernel.org
-Subject: [PATCH] Bluetooth: btusb: Add a new AR3012 ID 13d3:3472
-Date: Fri,  4 Mar 2016 01:32:19 +0300
-Message-Id: <1457044339-2447-1-git-send-email-hanipouspilot@gmail.com>
+Return-Path: <netdev-owner@vger.kernel.org>
+Date: Thu, 03 Mar 2016 16:27:58 -0500 (EST)
+Message-Id: <20160303.162758.867744371077918325.davem@davemloft.net>
+To: johan.hedberg@gmail.com
+Cc: netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Subject: Re: pull request: bluetooth-next 2016-03-01
+From: David Miller <davem@davemloft.net>
+In-Reply-To: <20160301072002.GA24640@t440s.lan>
+References: <20160301072002.GA24640@t440s.lan>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Sender: netdev-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-T: Bus=01 Lev=01 Prnt=01 Port=04 Cnt=01 Dev#= 4 Spd=12 MxCh= 0
-D: Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs= 1
-P: Vendor=13d3 ProdID=3472 Rev=00.01
-C: #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
-I: If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-I: If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+From: Johan Hedberg <johan.hedberg@gmail.com>
+Date: Tue, 1 Mar 2016 09:20:02 +0200
 
-BugLink: https://bugs.launchpad.net/bugs/1552925
+> Here's our main set of Bluetooth & 802.15.4 patches for the 4.6 kernel.
+> 
+>  - New Bluetooth HCI driver for Intel/AG6xx controllers
+>  - New Broadcom ACPI IDs
+>  - LED trigger support for indicating Bluetooth powered state
+>  - Various fixes in mac802154, 6lowpan and related drivers
+>  - New USB IDs for AR3012 Bluetooth controllers
+> 
+> Please let me know if there are any issues pulling. Thanks.
 
-Signed-off-by: Dmitry Tunin <hanipouspilot@gmail.com>
-Cc: stable@vger.kernel.org
----
- drivers/bluetooth/ath3k.c | 2 ++
- drivers/bluetooth/btusb.c | 1 +
- 2 files changed, 3 insertions(+)
-
-diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
-index 9374738..47ca4b3 100644
---- a/drivers/bluetooth/ath3k.c
-+++ b/drivers/bluetooth/ath3k.c
-@@ -120,6 +120,7 @@ static const struct usb_device_id ath3k_table[] = {
- 	{ USB_DEVICE(0x13d3, 0x3408) },
- 	{ USB_DEVICE(0x13d3, 0x3423) },
- 	{ USB_DEVICE(0x13d3, 0x3432) },
-+	{ USB_DEVICE(0x13d3, 0x3472) },
- 	{ USB_DEVICE(0x13d3, 0x3474) },
- 
- 	/* Atheros AR5BBU12 with sflash firmware */
-@@ -185,6 +186,7 @@ static const struct usb_device_id ath3k_blist_tbl[] = {
- 	{ USB_DEVICE(0x13d3, 0x3408), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x13d3, 0x3423), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x13d3, 0x3432), .driver_info = BTUSB_ATH3012 },
-+	{ USB_DEVICE(0x13d3, 0x3472), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x13d3, 0x3474), .driver_info = BTUSB_ATH3012 },
- 
- 	/* Atheros AR5BBU22 with sflash firmware */
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 97f3bba..0d4e372 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -234,6 +234,7 @@ static const struct usb_device_id blacklist_table[] = {
- 	{ USB_DEVICE(0x13d3, 0x3408), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x13d3, 0x3423), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x13d3, 0x3432), .driver_info = BTUSB_ATH3012 },
-+	{ USB_DEVICE(0x13d3, 0x3472), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x13d3, 0x3474), .driver_info = BTUSB_ATH3012 },
- 
- 	/* Atheros AR5BBU12 with sflash firmware */
--- 
-1.9.1
+Pulled, thanks Johan.
