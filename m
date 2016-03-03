@@ -1,66 +1,30 @@
-Return-Path: <tore@fud.no>
-Date: Thu, 3 Mar 2016 08:51:16 +0100
-From: Tore Anderson <tore@fud.no>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Gustavo Padovan
- <gustavo@padovan.org>, linux-bluetooth@vger.kernel.org
-Subject: Re: PROBLEM: Bluetooth mouse not working after resume since commit
- 2ff1389
-Message-ID: <20160303085116.0567712b@echo.ms.redpill-linpro.com>
-In-Reply-To: <20160221121322.6a19b1d4@envy.w5.y.home>
-References: <20160220181259.1e28f8da@envy.w5.y.home>
-	<20160220182339.GA1648@t440s.P-661HNU-F1>
-	<20160220182919.GA2620@t440s.P-661HNU-F1>
-	<20160220213028.35760428@envy.w5.y.home>
-	<20160221070226.GA12780@t440s.P-661HNU-F1>
-	<20160221121322.6a19b1d4@envy.w5.y.home>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Content-Type: text/plain; charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 9.2 \(3112\))
+Subject: Re: [PATCH] Bluetooth: hci_bcm: Add BCM2E55 ACPI ID used in Lenovo ThinkPad Tablet 8
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1456965988-7706-1-git-send-email-jerome.debretagne@gmail.com>
+Date: Wed, 2 Mar 2016 18:02:27 -0800
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <198F9296-EADF-476D-808C-F5C5B6FD54EF@holtmann.org>
+References: <1456965988-7706-1-git-send-email-jerome.debretagne@gmail.com>
+To: =?utf-8?Q?J=C3=A9r=C3=B4me_de_Bretagne?=
+	<jerome.debretagne@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-* Tore Anderson <tore@fud.no>
+Hi Jerome,
 
-> * Johan Hedberg
+> Lenovo ThinkPad Tablet 8 with BCM43241 rev B5 chipset uses the BCM2E55 ACPI ID for Bluetooth. Add it to the list of supported devices.
 > 
-> > You could have also used src/main.conf from the BlueZ tree as a
-> > starting point and removed the '#' from the AutoEnable line:
-> > 
-> > https://git.kernel.org/cgit/bluetooth/bluez.git/plain/src/main.conf
-> > 
-> > Are you sure that you restarted bluetoothd after this change? And
-> > you've got a BlueZ version greater than 5.35 (where the feature was
-> > introduced)?  
-> 
-> I've got version 5.36, and I had rebooted the system from scratch. I
-> experimented a bit more, though, and I found out that with
-> AutoEnable=true (and blueman uninstalled), my system behaves exactly
-> the same as it did with blueman, that is:
-> 
-> - with a pre-2ff1389 kernel: the mouse is auto-enabled and works fine
->   after bootup and resume from suspend.
-> - with a post-2ff1389 kernel: the mouse is auto-enabled and works fine
->   after bootup, but stops working after resume from suspend (until
->   "hciconfig hci0 up" is issued manually).
-> 
-> That means we can exclude blueman as a potential cause of the problem,
-> so I left it uninstalled when I generated the new debug files with +pf,
-> which you can find here: http://filebin.net/wf9edcjbju
-> 
-> I added a new file too: hciconfig_hci0.$KVER.txt. This shows the
-> output of "while sleep .5; do hciconfig hci0; done | ts %H:%M:%.S". I
-> noticed something that seems highly relevant, namely that with the
-> post-2ff1389 kernel, the hci0 state changes to DOWN a couple of seconds
-> after resuming. This does not happen with the pre-2ff1389 kernel.
+> Signed-off-by: Jérôme de Bretagne <jerome.debretagne@gmail.com>
+> ---
+> drivers/bluetooth/hci_bcm.c | 1 +
+> 1 file changed, 1 insertion(+)
 
-Hi Johan,
+patch has been applied to bluetooth-next tree.
 
-I thought I'd just ping you quickly about this issue - did you get a
-chance to look at the log files, and if so did you figure out what's
-going on?
+Regards
 
-If on the other hand you don't have time to look into the issue, let me
-know if I should file this issue in the kernel.org bugzilla (or
-anywhere else) so as to avoid it being forgotten about (also note that
-the logs will be expired from filebin.net after a couple of weeks).
+Marcel
 
-Tore
