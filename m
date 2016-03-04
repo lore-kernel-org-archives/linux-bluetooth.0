@@ -1,116 +1,134 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Patrik Flykt <patrik.flykt@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC 3/5] l2cap: Pass hci_dev to l2cap_chan_connect()
-Date: Fri,  4 Mar 2016 13:40:42 +0200
-Message-Id: <1457091644-21536-4-git-send-email-patrik.flykt@linux.intel.com>
+Subject: [RFC 1/5] bluetooth: Merge Bluetooth 6lowpan functionality to bluetooth module
+Date: Fri,  4 Mar 2016 13:40:40 +0200
+Message-Id: <1457091644-21536-2-git-send-email-patrik.flykt@linux.intel.com>
 In-Reply-To: <1457091644-21536-1-git-send-email-patrik.flykt@linux.intel.com>
 References: <1457091644-21536-1-git-send-email-patrik.flykt@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Since the Bluetooth Management Interface already associates
-commands with a hci_dev, pass the hci_dev when calling
-l2cap_chan_connect(). This indicates which specific hci_dev to
-use for the l2cap connection and will be useful when connecting
-or disconnecting Bluetooth IPSP.
-
-Modify the existing code to do a hci_dev lookup before calling
-connect.
+The bluetooth_6lowpan.ko module functionality is compiled into the
+bluetooth module and a new header file 6lowpan.h is created. Kconfig
+and Makefile are updated accordingly. 6lowpan init and exit functions
+are called from the bluetooth module.
 
 Signed-off-by: Patrik Flykt <patrik.flykt@linux.intel.com>
 ---
- include/net/bluetooth/l2cap.h | 4 ++--
- net/bluetooth/6lowpan.c       | 4 +++-
- net/bluetooth/l2cap_core.c    | 6 ++----
- net/bluetooth/l2cap_sock.c    | 5 ++++-
- 4 files changed, 11 insertions(+), 8 deletions(-)
+ net/bluetooth/6lowpan.c      | 12 ++----------
+ net/bluetooth/Kconfig        |  2 +-
+ net/bluetooth/Makefile       |  4 +---
+ net/bluetooth/af_bluetooth.c | 11 +++++++++++
+ 4 files changed, 15 insertions(+), 14 deletions(-)
 
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index 5ee3c68..b65ca60 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -926,8 +926,8 @@ int l2cap_add_scid(struct l2cap_chan *chan,  __u16 scid);
- 
- struct l2cap_chan *l2cap_chan_create(void);
- void l2cap_chan_close(struct l2cap_chan *chan, int reason);
--int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
--		       bdaddr_t *dst, u8 dst_type);
-+int l2cap_chan_connect(struct l2cap_chan *chan, struct hci_dev *hdev,
-+			__le16 psm, u16 cid, bdaddr_t *dst, u8 dst_type);
- int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len);
- void l2cap_chan_busy(struct l2cap_chan *chan, int busy);
- int l2cap_chan_check_security(struct l2cap_chan *chan, bool initiator);
 diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
-index 198e158..a582a736 100644
+index 8a4cc2f..b675448 100644
 --- a/net/bluetooth/6lowpan.c
 +++ b/net/bluetooth/6lowpan.c
-@@ -1113,6 +1113,7 @@ static inline __u8 bdaddr_type(__u8 type)
+@@ -1387,7 +1387,7 @@ static struct notifier_block bt_6lowpan_dev_notifier = {
+ 	.notifier_call = device_event,
+ };
  
- static int bt_6lowpan_connect(bdaddr_t *addr, u8 dst_type)
+-static int __init bt_6lowpan_init(void)
++int bt_6lowpan_init(void)
  {
-+	struct hci_dev *hdev;
- 	struct l2cap_chan *chan;
- 	int err;
- 
-@@ -1122,7 +1123,8 @@ static int bt_6lowpan_connect(bdaddr_t *addr, u8 dst_type)
- 
- 	chan->ops = &bt_6lowpan_chan_ops;
- 
--	err = l2cap_chan_connect(chan, cpu_to_le16(L2CAP_PSM_IPSP), 0,
-+	hdev = hci_get_route(addr, NULL);
-+	err = l2cap_chan_connect(chan, hdev, cpu_to_le16(L2CAP_PSM_IPSP), 0,
- 				 addr, dst_type);
- 
- 	BT_DBG("chan %p err %d", chan, err);
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index eb4f5f2..8a87a0d 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -7041,18 +7041,16 @@ static bool is_valid_psm(u16 psm, u8 dst_type) {
- 	return ((psm & 0x0101) == 0x0001);
+ 	lowpan_enable_debugfs = debugfs_create_file("6lowpan_enable", 0644,
+ 						    bt_debugfs, NULL,
+@@ -1399,7 +1399,7 @@ static int __init bt_6lowpan_init(void)
+ 	return register_netdevice_notifier(&bt_6lowpan_dev_notifier);
  }
  
--int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
--		       bdaddr_t *dst, u8 dst_type)
-+int l2cap_chan_connect(struct l2cap_chan *chan, struct hci_dev *hdev,
-+			__le16 psm, u16 cid, bdaddr_t *dst, u8 dst_type)
+-static void __exit bt_6lowpan_exit(void)
++void bt_6lowpan_exit(void)
  {
- 	struct l2cap_conn *conn;
- 	struct hci_conn *hcon;
--	struct hci_dev *hdev;
- 	int err;
+ 	debugfs_remove(lowpan_enable_debugfs);
+ 	debugfs_remove(lowpan_control_debugfs);
+@@ -1413,11 +1413,3 @@ static void __exit bt_6lowpan_exit(void)
  
- 	BT_DBG("%pMR -> %pMR (type %u) psm 0x%2.2x", &chan->src, dst,
- 	       dst_type, __le16_to_cpu(psm));
+ 	unregister_netdevice_notifier(&bt_6lowpan_dev_notifier);
+ }
+-
+-module_init(bt_6lowpan_init);
+-module_exit(bt_6lowpan_exit);
+-
+-MODULE_AUTHOR("Jukka Rissanen <jukka.rissanen@linux.intel.com>");
+-MODULE_DESCRIPTION("Bluetooth 6LoWPAN");
+-MODULE_VERSION(VERSION);
+-MODULE_LICENSE("GPL");
+diff --git a/net/bluetooth/Kconfig b/net/bluetooth/Kconfig
+index 06c31b9..5f29659 100644
+--- a/net/bluetooth/Kconfig
++++ b/net/bluetooth/Kconfig
+@@ -64,7 +64,7 @@ config BT_LE
+ 	default y
  
--	hdev = hci_get_route(dst, &chan->src);
- 	if (!hdev)
- 		return -EHOSTUNREACH;
+ config BT_6LOWPAN
+-	tristate "Bluetooth 6LoWPAN support"
++	bool "Bluetooth 6LoWPAN support"
+ 	depends on BT_LE && 6LOWPAN
+ 	help
+ 	  IPv6 compression over Bluetooth Low Energy.
+diff --git a/net/bluetooth/Makefile b/net/bluetooth/Makefile
+index b3ff12e..57b02ba 100644
+--- a/net/bluetooth/Makefile
++++ b/net/bluetooth/Makefile
+@@ -7,9 +7,6 @@ obj-$(CONFIG_BT_RFCOMM)	+= rfcomm/
+ obj-$(CONFIG_BT_BNEP)	+= bnep/
+ obj-$(CONFIG_BT_CMTP)	+= cmtp/
+ obj-$(CONFIG_BT_HIDP)	+= hidp/
+-obj-$(CONFIG_BT_6LOWPAN) += bluetooth_6lowpan.o
+-
+-bluetooth_6lowpan-y := 6lowpan.o
  
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index e4cae72..abcb508 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -176,6 +176,7 @@ static int l2cap_sock_connect(struct socket *sock, struct sockaddr *addr,
- 	struct sock *sk = sock->sk;
- 	struct l2cap_chan *chan = l2cap_pi(sk)->chan;
- 	struct sockaddr_l2 la;
-+	struct hci_dev *hdev;
- 	int len, err = 0;
+ bluetooth-y := af_bluetooth.o hci_core.o hci_conn.o hci_event.o mgmt.o \
+ 	hci_sock.o hci_sysfs.o l2cap_core.o l2cap_sock.o smp.o lib.o \
+@@ -18,6 +15,7 @@ bluetooth-y := af_bluetooth.o hci_core.o hci_conn.o hci_event.o mgmt.o \
+ bluetooth-$(CONFIG_BT_BREDR) += sco.o
+ bluetooth-$(CONFIG_BT_HS) += a2mp.o amp.o
+ bluetooth-$(CONFIG_BT_LEDS) += leds.o
++bluetooth-$(CONFIG_BT_6LOWPAN) += 6lowpan.o
+ bluetooth-$(CONFIG_BT_DEBUGFS) += hci_debugfs.o
+ bluetooth-$(CONFIG_BT_SELFTEST) += selftest.o
  
- 	BT_DBG("sk %p", sk);
-@@ -233,7 +234,9 @@ static int l2cap_sock_connect(struct socket *sock, struct sockaddr *addr,
- 	if (chan->psm && bdaddr_type_is_le(chan->src_type))
- 		chan->mode = L2CAP_MODE_LE_FLOWCTL;
+diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
+index 955eda9..571a324 100644
+--- a/net/bluetooth/af_bluetooth.c
++++ b/net/bluetooth/af_bluetooth.c
+@@ -29,6 +29,7 @@
+ #include <asm/ioctls.h>
  
--	err = l2cap_chan_connect(chan, la.l2_psm, __le16_to_cpu(la.l2_cid),
-+	hdev = hci_get_route(&la.l2_bdaddr, &chan->src);
-+	err = l2cap_chan_connect(chan, hdev, la.l2_psm,
-+				 __le16_to_cpu(la.l2_cid),
- 				 &la.l2_bdaddr, la.l2_bdaddr_type);
- 	if (err)
- 		return err;
+ #include <net/bluetooth/bluetooth.h>
++#include <net/bluetooth/6lowpan.h>
+ #include <linux/proc_fs.h>
+ 
+ #include "selftest.h"
+@@ -747,8 +748,16 @@ static int __init bt_init(void)
+ 		goto sock_err;
+ 	}
+ 
++	err = bt_6lowpan_init();
++	if (err < 0) {
++		sco_exit();
++		l2cap_exit();
++		goto sock_err;
++	}
++
+ 	err = mgmt_init();
+ 	if (err < 0) {
++		bt_6lowpan_exit();
+ 		sco_exit();
+ 		l2cap_exit();
+ 		goto sock_err;
+@@ -770,6 +779,8 @@ static void __exit bt_exit(void)
+ {
+ 	mgmt_exit();
+ 
++	bt_6lowpan_exit();
++
+ 	sco_exit();
+ 
+ 	l2cap_exit();
 -- 
 2.1.4
 
