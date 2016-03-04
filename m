@@ -1,47 +1,175 @@
-Return-Path: <tore@fud.no>
-Date: Sat, 5 Mar 2016 10:09:00 +0100
-From: Tore Anderson <tore@fud.no>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Gustavo Padovan
- <gustavo@padovan.org>, linux-bluetooth@vger.kernel.org
-Subject: Re: PROBLEM: Bluetooth mouse not working after resume since commit
- 2ff1389
-Message-ID: <20160305100900.0b097304@envy.w5.y.home>
-In-Reply-To: <20160304065406.GA17899@t440s.P-661HNU-F1>
-References: <20160220181259.1e28f8da@envy.w5.y.home>
-	<20160220182339.GA1648@t440s.P-661HNU-F1>
-	<20160220182919.GA2620@t440s.P-661HNU-F1>
-	<20160220213028.35760428@envy.w5.y.home>
-	<20160221070226.GA12780@t440s.P-661HNU-F1>
-	<20160221121322.6a19b1d4@envy.w5.y.home>
-	<20160303085116.0567712b@echo.ms.redpill-linpro.com>
-	<20160303084229.GA15622@t440s.ger.corp.intel.com>
-	<20160303214419.6ac7558a@envy.w5.y.home>
-	<20160304065406.GA17899@t440s.P-661HNU-F1>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Olivier Martin <olivier@labapart.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: olivier.martin.fr@gmail.com, Olivier Martin <olivier@labapart.com>
+Subject: [PATCH v2] gatt-database: Fix GATT object ordering
+Date: Fri,  4 Mar 2016 16:50:11 +0000
+Message-Id: <1457110211-2702-1-git-send-email-olivier@labapart.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+There is no guarantee the objects returned by GetManagedObjects
+are ordered in the required order which is Service, Characteristic
+Descriptor due to their respective dependencies.
 
-> It's a relief to hear that the issue seems to be fixed, but it would
-> indeed be good to get to the bottom of this and understand what
-> exactly fixed it, since I can't right now remember any recent patches
-> that would have influenced this behavior (who knows - maybe it's
-> something external to the Bluetooth subsystem).
+This change ensures the objects are processed in the correct order.
+---
+ src/gatt-database.c | 105 +++++++++++++++++++++++++++++++++++++---------------
+ 1 file changed, 75 insertions(+), 30 deletions(-)
 
-It got fixed by:
+diff --git a/src/gatt-database.c b/src/gatt-database.c
+index d906e2b..93e4ddb 100644
+--- a/src/gatt-database.c
++++ b/src/gatt-database.c
+@@ -89,6 +89,7 @@ struct gatt_app {
+ 	GDBusClient *client;
+ 	bool failed;
+ 	struct queue *services;
++	struct queue *proxies;
+ };
+ 
+ struct external_service {
+@@ -365,6 +366,7 @@ static void app_free(void *data)
+ 	struct gatt_app *app = data;
+ 
+ 	queue_destroy(app->services, service_free);
++	queue_destroy(app->proxies, NULL);
+ 
+ 	if (app->client) {
+ 		g_dbus_client_set_disconnect_watch(app->client, NULL, NULL);
+@@ -1428,39 +1430,12 @@ static void proxy_added_cb(GDBusProxy *proxy, void *user_data)
+ 	if (app->failed)
+ 		return;
+ 
++	queue_push_tail(app->proxies, proxy);
++
+ 	iface = g_dbus_proxy_get_interface(proxy);
+ 	path = g_dbus_proxy_get_path(proxy);
+ 
+-	if (g_strcmp0(iface, GATT_SERVICE_IFACE) == 0) {
+-		struct external_service *service;
+-
+-		service = create_service(app, proxy, path);
+-		if (!service) {
+-			app->failed = true;
+-			return;
+-		}
+-	} else if (g_strcmp0(iface, GATT_CHRC_IFACE) == 0) {
+-		struct external_chrc *chrc;
+-
+-		chrc = chrc_create(app, proxy, path);
+-		if (!chrc) {
+-			app->failed = true;
+-			return;
+-		}
+-	} else if (g_strcmp0(iface, GATT_DESC_IFACE) == 0) {
+-		struct external_desc *desc;
+-
+-		desc = desc_create(app, proxy);
+-		if (!desc) {
+-			app->failed = true;
+-			return;
+-		}
+-	} else {
+-		DBG("Ignoring unrelated interface: %s", iface);
+-		return;
+-	}
+-
+-	DBG("Object added: path: %s, iface: %s", path, iface);
++	DBG("Object received: %s, iface: %s", path, iface);
+ }
+ 
+ static void proxy_removed_cb(GDBusProxy *proxy, void *user_data)
+@@ -2139,12 +2114,81 @@ static bool database_add_app(struct gatt_app *app)
+ 	return true;
+ }
+ 
++void register_service(void *data, void *user_data)
++{
++	struct gatt_app *app = user_data;
++	GDBusProxy *proxy = data;
++	const char *iface = g_dbus_proxy_get_interface(proxy);
++	const char *path = g_dbus_proxy_get_path(proxy);
++
++	if (g_strcmp0(iface, GATT_SERVICE_IFACE) == 0) {
++		struct external_service *service;
++
++		service = create_service(app, proxy, path);
++		if (!service) {
++			app->failed = true;
++			return;
++		}
++	}
++}
++
++void register_characteristic(void *data, void *user_data)
++{
++	struct gatt_app *app = user_data;
++	GDBusProxy *proxy = data;
++	const char *iface = g_dbus_proxy_get_interface(proxy);
++	const char *path = g_dbus_proxy_get_path(proxy);
++
++	if (g_strcmp0(iface, GATT_CHRC_IFACE) == 0) {
++		struct external_chrc *chrc;
++
++		chrc = chrc_create(app, proxy, path);
++		if (!chrc) {
++			app->failed = true;
++			return;
++		}
++	}
++}
++
++void register_descriptor(void *data, void *user_data)
++{
++	struct gatt_app *app = user_data;
++	GDBusProxy *proxy = data;
++	const char *iface = g_dbus_proxy_get_interface(proxy);
++	const char *path = g_dbus_proxy_get_path(proxy);
++
++	if (g_strcmp0(iface, GATT_DESC_IFACE) == 0) {
++		struct external_desc *desc;
++
++		desc = desc_create(app, proxy);
++		if (!desc) {
++			app->failed = true;
++			return;
++		}
++	}
++}
++
+ static void client_ready_cb(GDBusClient *client, void *user_data)
+ {
+ 	struct gatt_app *app = user_data;
+ 	DBusMessage *reply;
+ 	bool fail = false;
+ 
++	/*
++	 * Process received objects
++	 */
++	if (queue_isempty(app->proxies)) {
++		error("No object received");
++		fail = true;
++		reply = btd_error_failed(app->reg,
++					"No object received");
++		goto reply;
++	}
++
++	queue_foreach(app->proxies, register_service, app);
++	queue_foreach(app->proxies, register_characteristic, app);
++	queue_foreach(app->proxies, register_descriptor, app);
++
+ 	if (!app->services || app->failed) {
+ 		error("No valid external GATT objects found");
+ 		fail = true;
+@@ -2198,6 +2242,7 @@ static struct gatt_app *create_app(DBusConnection *conn, DBusMessage *msg,
+ 		goto fail;
+ 
+ 	app->services = queue_new();
++	app->proxies = queue_new();
+ 	app->reg = dbus_message_ref(msg);
+ 
+ 	g_dbus_client_set_disconnect_watch(app->client, client_disconnect_cb,
+-- 
+2.1.4
 
-commit d82142a8b1338e6a4339920863423379c27b0b16
-Author: Wei-Ning Huang <wnhuang@chromium.org>
-Date:   Mon Feb 15 17:09:51 2016 +0800
-
-    Bluetooth: hci_core: cancel power off delayed work properly
-
-    When the HCI_AUTO_OFF flag is cleared, the power_off delayed work need
-    to be cancel or HCI will be powered off even if it's managed.
-
-    Signed-off-by: Wei-Ning Huang <wnhuang@chromium.org>
-    Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-
-Tore
