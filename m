@@ -1,35 +1,33 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Patrik Flykt <patrik.flykt@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC 4/5] bluetooth: Implement Add Network Management API command
-Date: Fri,  4 Mar 2016 13:40:43 +0200
-Message-Id: <1457091644-21536-5-git-send-email-patrik.flykt@linux.intel.com>
+Subject: [RFC 5/5] bluetooth: Implement Remove Network Management API command
+Date: Fri,  4 Mar 2016 13:40:44 +0200
+Message-Id: <1457091644-21536-6-git-send-email-patrik.flykt@linux.intel.com>
 In-Reply-To: <1457091644-21536-1-git-send-email-patrik.flykt@linux.intel.com>
 References: <1457091644-21536-1-git-send-email-patrik.flykt@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Queue Add Network Management API command and initiate a L2CAP connect
-to the destination. Reply to the command in the l2cap_ops ready callback
-when the channel is successfully created and inidcate failure in both
-l2cap_ops close and state callbacks when an error is indicated.
+Queue Remove Network Management API command and disconnect the L2CAP
+channel. Once the channel has been removed, reply to the command in
+l2cap_ops close callback. On error reply with a failure in the
+l2cap_ops status callback.
 
-On success add the remote peer to the internal data structures and create
-the network interface as before. Remove the debugfs implementation doing
-the same thing.
+Remove the remaining part of the debugfs code handling the control
+file.
 
-The MGMT_OP_ADD_NETWORK command is defined as:
+The MGMT_OP_REMOVE_NETWORK command is defined as:
 
-       Command Code:           0x0043
+       Command Code:           0x0044
        Controller Index:       <controller id>
        Command Parameters:     Address (6 Octets)
                                Address_Type (1 Octet)
        Return Parameters:      Address (6 Octets)
                                Address_Type (1 Octet)
-                               Interface Index (4 Octets)
 
-       This command is used to connect to establish a network connection
-       to a remote BTLE node. A pre-requisite is that LE is already
+       This command is used to disconnect a network connection from a
+       remote BTLE node. A pre-requisite is that LE is already
        enabled, otherwise this command will return a "rejected"
        response.
 
@@ -42,22 +40,20 @@ The MGMT_OP_ADD_NETWORK command is defined as:
        or failure.
 
        Possible errors:        Busy
-                               Refused
+                               Not Connected
                                Invalid Parameters
                                Not Powered
                                Invalid Index
-                               Already Connected
 
-The MGMT_EV_NETWORK_ADDED event is defined as:
+The MGMT_EV_NETWORK_REMOVED event is defined as:
 
-       Event Code:             0x0025
+       Event Code:             0x0026
        Controller Index:       <controller id>
        Event Parameters:       Address (6 Octets)
                                Address_Type (1 Octet)
-                               Interface Index (4 Octets)
 
-       This event indicates that a network connection to a remote
-       BTLE node has been established successfully.
+       This event indicates that the BTLE network connection to a remote
+       node has been lost.
 
        Possible values for the Address_Type parameter:
                1       LE Public
@@ -67,89 +63,57 @@ The MGMT_EV_NETWORK_ADDED event is defined as:
        identity resolving key, the Address and Address_Type will
        contain the identity information.
 ---
- include/net/bluetooth/mgmt.h |  16 ++++
- net/bluetooth/6lowpan.c      | 205 ++++++++++++++++++++++++++++++++-----------
+ include/net/bluetooth/mgmt.h |  14 ++++
+ net/bluetooth/6lowpan.c      | 174 ++++++++++++++++++++++---------------------
  net/bluetooth/mgmt.c         |   3 +
- 3 files changed, 172 insertions(+), 52 deletions(-)
+ 3 files changed, 106 insertions(+), 85 deletions(-)
 
 diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-index 813224b..f6bc80f 100644
+index f6bc80f..62d0583 100644
 --- a/include/net/bluetooth/mgmt.h
 +++ b/include/net/bluetooth/mgmt.h
-@@ -596,6 +596,16 @@ struct mgmt_rp_network {
+@@ -606,6 +606,15 @@ struct mgmt_rp_add_network {
  	int ifindex;
  } __packed;
  
-+#define MGMT_OP_ADD_NETWORK             0x0043
-+#define MGMT_ADD_NETWORK_SIZE           7
-+struct mgmt_cp_add_network {
++#define MGMT_OP_REMOVE_NETWORK          0x0044
++#define MGMT_REMOVE_NETWORK_SIZE        7
++struct mgmt_cp_remove_network {
 +	struct mgmt_addr_info dst;
 +} __packed;
-+struct mgmt_rp_add_network {
++struct mgmt_rp_remove_network {
 +	struct mgmt_addr_info dst;
-+	int ifindex;
 +} __packed;
 +
  #define MGMT_EV_CMD_COMPLETE		0x0001
  struct mgmt_ev_cmd_complete {
  	__le16	opcode;
-@@ -809,3 +819,9 @@ struct mgmt_ev_advertising_added {
- struct mgmt_ev_advertising_removed {
- 	__u8    instance;
+@@ -825,3 +834,8 @@ struct mgmt_ev_network_added {
+ 	struct mgmt_addr_info dst;
+ 	int ifindex;
  } __packed;
 +
-+#define MGMT_EV_NETWORK_ADDED           0x0025
-+struct mgmt_ev_network_added {
++#define MGMT_EV_NETWORK_REMOVED         0x0026
++struct mgmt_ev_network_removed {
 +	struct mgmt_addr_info dst;
-+	int ifindex;
 +} __packed;
 diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
-index a582a736..9f12eb1 100644
+index 9f12eb1..f62ac14 100644
 --- a/net/bluetooth/6lowpan.c
 +++ b/net/bluetooth/6lowpan.c
-@@ -258,6 +258,36 @@ static struct lowpan_dev *lookup_dev(struct l2cap_conn *conn)
- 	return dev;
+@@ -33,7 +33,6 @@
+ #define VERSION "0.1"
+ 
+ static struct dentry *lowpan_enable_debugfs;
+-static struct dentry *lowpan_control_debugfs;
+ 
+ #define IFACE_NAME_TEMPLATE "bt%d"
+ 
+@@ -929,6 +928,46 @@ static void cmd_add_network_complete(struct l2cap_chan *chan, int status,
+ 		mgmt_pending_remove(cmd);
  }
  
-+static struct lowpan_peer *lookup_bdaddr(struct hci_dev *hdev, bdaddr_t *dst,
-+					u8 dst_type)
-+{
-+	struct lowpan_dev *dev;
-+	struct lowpan_peer *peer, *target = NULL;
-+
-+	rcu_read_lock();
-+
-+	list_for_each_entry_rcu(dev, &bt_6lowpan_devices, list) {
-+		if (dev->hdev != hdev)
-+			continue;
-+
-+		list_for_each_entry_rcu(peer, &dev->peers, list) {
-+			if(!peer->chan)
-+				continue;
-+
-+			if (!bacmp(dst, &peer->chan->dst) &&
-+					dst_type == peer->chan->dst_type) {
-+				target = peer;
-+				goto rcu_unlock;
-+			}
-+		}
-+	}
-+
-+rcu_unlock:
-+	rcu_read_unlock();
-+
-+	return target;
-+}
-+
- static int give_skb_to_upper(struct sk_buff *skb, struct net_device *dev)
- {
- 	struct sk_buff *skb_cp;
-@@ -854,6 +884,51 @@ out:
- 	return err;
- }
- 
-+static void cmd_add_network_complete(struct l2cap_chan *chan, int status,
-+				int ifindex)
++static void cmd_remove_network_complete(struct l2cap_chan *chan, int status)
 +{
 +	struct hci_dev *hdev;
 +	struct mgmt_pending_cmd *cmd;
@@ -161,15 +125,12 @@ index a582a736..9f12eb1 100644
 +		return;
 +	}
 +
-+	cmd = mgmt_pending_find(HCI_CHANNEL_CONTROL, MGMT_OP_ADD_NETWORK,
++	cmd = mgmt_pending_find(HCI_CHANNEL_CONTROL, MGMT_OP_REMOVE_NETWORK,
 +				hdev);
-+	BT_DBG("cmd %p status %d state %d", cmd, status, chan->state);
-+
 +	if (cmd) {
-+		struct mgmt_cp_add_network *cp = cmd->param;
-+		struct mgmt_rp_add_network rp;
++		struct mgmt_cp_remove_network *cp = cmd->param;
++		struct mgmt_rp_remove_network rp;
 +
-+		rp.ifindex = ifindex;
 +		bacpy(&rp.dst.bdaddr, &cp->dst.bdaddr);
 +		rp.dst.type = cp->dst.type;
 +
@@ -177,14 +138,13 @@ index a582a736..9f12eb1 100644
 +				status, &rp, sizeof(rp));
 +	}
 +
-+	if (status == MGMT_STATUS_SUCCESS && chan->state == BT_CONNECTED) {
-+		struct mgmt_ev_network_added ep;
++	if (status == MGMT_STATUS_SUCCESS && chan->state == BT_DISCONN) {
++		struct mgmt_ev_network_removed ep;
 +
-+		ep.ifindex = ifindex;
 +		bacpy(&ep.dst.bdaddr, &chan->dst);
 +		ep.dst.type = chan->dst_type;
 +
-+		mgmt_send_event(MGMT_EV_NETWORK_ADDED, hdev,
++		mgmt_send_event(MGMT_EV_NETWORK_REMOVED, hdev,
 +				HCI_CHANNEL_CONTROL, &ep, sizeof(ep),
 +				HCI_SOCK_TRUSTED, cmd? cmd->sk: NULL);
 +	}
@@ -196,207 +156,220 @@ index a582a736..9f12eb1 100644
  static inline void chan_ready_cb(struct l2cap_chan *chan)
  {
  	struct lowpan_dev *dev;
-@@ -874,6 +949,9 @@ static inline void chan_ready_cb(struct l2cap_chan *chan)
- 
- 	add_peer_chan(chan, dev);
- 	ifup(dev->netdev);
-+
-+	cmd_add_network_complete(chan, MGMT_STATUS_SUCCESS,
-+				dev->netdev->ifindex);
- }
- 
- static inline struct l2cap_chan *chan_new_conn_cb(struct l2cap_chan *pchan)
-@@ -921,6 +999,8 @@ static void chan_close_cb(struct l2cap_chan *chan)
- 		remove = false;
+@@ -1000,6 +1039,7 @@ static void chan_close_cb(struct l2cap_chan *chan)
  	}
  
-+	cmd_add_network_complete(chan, MGMT_STATUS_CONNECT_FAILED, 0);
-+
+ 	cmd_add_network_complete(chan, MGMT_STATUS_CONNECT_FAILED, 0);
++	cmd_remove_network_complete(chan, MGMT_STATUS_SUCCESS);
+ 
  	spin_lock(&devices_lock);
  
- 	list_for_each_entry_rcu(entry, &bt_6lowpan_devices, list) {
-@@ -962,6 +1042,10 @@ static void chan_state_change_cb(struct l2cap_chan *chan, int state, int err)
- {
- 	BT_DBG("chan %p conn %p state %s err %d", chan, chan->conn,
- 	       state_to_string(state), err);
-+
-+	if (err < 0) {
-+		cmd_add_network_complete(chan, MGMT_STATUS_CONNECT_FAILED, 0);
-+	}
+@@ -1045,6 +1085,7 @@ static void chan_state_change_cb(struct l2cap_chan *chan, int state, int err)
+ 
+ 	if (err < 0) {
+ 		cmd_add_network_complete(chan, MGMT_STATUS_CONNECT_FAILED, 0);
++		cmd_remove_network_complete(chan, MGMT_STATUS_CONNECT_FAILED);
+ 	}
  }
  
- static struct sk_buff *chan_alloc_skb_cb(struct l2cap_chan *chan,
-@@ -1103,34 +1187,86 @@ unlock:
+@@ -1270,21 +1311,60 @@ unlock:
  	return err;
  }
  
--static inline __u8 bdaddr_type(__u8 type)
--{
--	if (type == ADDR_LE_DEV_PUBLIC)
--		return BDADDR_LE_PUBLIC;
--	else
--		return BDADDR_LE_RANDOM;
--}
--
--static int bt_6lowpan_connect(bdaddr_t *addr, u8 dst_type)
-+int bt_6lowpan_add_network(struct sock *sk, struct hci_dev *hdev,
+-static int bt_6lowpan_disconnect(struct l2cap_conn *conn, u8 dst_type)
++int bt_6lowpan_remove_network(struct sock *sk, struct hci_dev *hdev,
 +			void *data, u16 data_len)
  {
--	struct hci_dev *hdev;
--	struct l2cap_chan *chan;
-+	struct mgmt_cp_add_network *cp = data;
-+	struct mgmt_rp_add_network rp;
++	struct mgmt_cp_remove_network *cp = data;
++	int err = 0;
+ 	struct lowpan_peer *peer;
 +	struct mgmt_pending_cmd *cmd;
- 	int err;
-+        struct l2cap_chan *chan;
-+
-+	BT_DBG("add network hdev %p data %p data len %d",
+ 
+-	BT_DBG("conn %p dst type %d", conn, dst_type);
++	BT_DBG("remove network hdev %p data %p data len %d",
 +		hdev, data, data_len);
-+
-+	rp.ifindex = 0;
-+	bacpy(&rp.dst.bdaddr, &cp->dst.bdaddr);
-+	rp.dst.type = cp->dst.type;
-+
-+	if (!lmp_le_capable(hdev))
-+		return mgmt_cmd_complete(sk, hdev->id, MGMT_OP_ADD_NETWORK,
-+					MGMT_STATUS_NOT_SUPPORTED, &rp,
-+					sizeof(rp));
-+
-+	if (!bdaddr_type_is_le(cp->dst.type))
-+		return mgmt_cmd_complete(sk, hdev->id, MGMT_OP_ADD_NETWORK,
-+					MGMT_STATUS_NOT_SUPPORTED, &rp,
-+					sizeof(rp));
-+
+ 
+-	peer = lookup_peer(conn);
+-	if (!peer)
+-		return -ENOENT;
++	if (!lmp_le_capable(hdev)) {
++		err = mgmt_cmd_complete(sk, hdev->id, MGMT_OP_REMOVE_NETWORK,
++					MGMT_STATUS_NOT_SUPPORTED, cp,
++					sizeof(*cp));
++		goto failed;
++	}
+ 
+-	BT_DBG("peer %p chan %p", peer, peer->chan);
++	if (!bdaddr_type_is_le(cp->dst.type)) {
++		err = mgmt_cmd_complete(sk, hdev->id, MGMT_OP_REMOVE_NETWORK,
++					MGMT_STATUS_INVALID_PARAMS, cp,
++					sizeof(*cp));
++		goto failed;
++	}
+ 
+-	l2cap_chan_close(peer->chan, ENOENT);
 +	hci_dev_lock(hdev);
-+	if (mgmt_pending_find(HCI_CHANNEL_CONTROL, MGMT_OP_ADD_NETWORK,
+ 
+-	return 0;
++	if (mgmt_pending_find(HCI_CHANNEL_CONTROL, MGMT_OP_REMOVE_NETWORK,
 +				hdev)) {
-+		err = mgmt_cmd_status(sk, hdev->id, MGMT_OP_ADD_NETWORK,
++		err = mgmt_cmd_status(sk, hdev->id, MGMT_OP_REMOVE_NETWORK,
 +				MGMT_STATUS_BUSY);
 +		goto unlock;
 +	}
 +
-+	if (lookup_bdaddr(hdev, &rp.dst.bdaddr, rp.dst.type)) {
-+		err = mgmt_cmd_complete(sk, hdev->id, MGMT_OP_ADD_NETWORK,
-+					MGMT_STATUS_ALREADY_CONNECTED,
-+					&rp, sizeof(rp));
++	peer = lookup_bdaddr(hdev, &cp->dst.bdaddr, cp->dst.type);
++	if (!peer) {
++		err = mgmt_cmd_complete(sk, hdev->id, MGMT_OP_REMOVE_NETWORK,
++					MGMT_STATUS_FAILED,
++					cp, sizeof(*cp));
 +		goto unlock;
 +	}
 +
-+	cmd = mgmt_pending_add(sk, MGMT_OP_ADD_NETWORK, hdev, data, data_len);
-+	if (!cmd) {
++	cmd = mgmt_pending_add(sk, MGMT_OP_REMOVE_NETWORK, hdev,
++			data, data_len);
++	if (!cmd)
 +		err = -ENOMEM;
-+		goto unlock;
-+	}
- 
- 	chan = chan_create();
--	if (!chan)
--		return -EINVAL;
-+	if (!chan) {
-+		err = mgmt_cmd_complete(sk, hdev->id, MGMT_OP_ADD_NETWORK,
-+					MGMT_STATUS_NO_RESOURCES,
-+					&rp, sizeof(rp));
-+		goto pending_remove;
-+	}
- 
- 	chan->ops = &bt_6lowpan_chan_ops;
- 
--	hdev = hci_get_route(addr, NULL);
-+	hci_dev_unlock(hdev);
 +
- 	err = l2cap_chan_connect(chan, hdev, cpu_to_le16(L2CAP_PSM_IPSP), 0,
--				 addr, dst_type);
-+				&cp->dst.bdaddr, cp->dst.type);
- 
--	BT_DBG("chan %p err %d", chan, err);
--	if (err < 0)
-+	if (err < 0) {
- 		l2cap_chan_put(chan);
- 
-+		hci_dev_lock(hdev);
-+		err = mgmt_cmd_complete(sk, hdev->id, MGMT_OP_ADD_NETWORK,
-+					MGMT_STATUS_REJECTED,
-+					&rp, sizeof(rp));
-+		goto pending_remove;
-+	}
-+
-+	return err;
-+
-+pending_remove:
-+	mgmt_pending_remove(cmd);
++	l2cap_chan_close(peer->chan, 0);
 +
 +unlock:
 +	hci_dev_unlock(hdev);
 +
- 	return err;
++failed:
++	return err;
  }
  
-@@ -1326,41 +1462,6 @@ static ssize_t lowpan_control_write(struct file *fp,
+ static struct l2cap_chan *bt_6lowpan_listen(void)
+@@ -1318,40 +1398,6 @@ static struct l2cap_chan *bt_6lowpan_listen(void)
+ 	return chan;
+ }
  
- 	buf[buf_size] = '\0';
+-static int get_l2cap_conn(char *buf, bdaddr_t *addr, u8 *addr_type,
+-			  struct l2cap_conn **conn)
+-{
+-	struct hci_conn *hcon;
+-	struct hci_dev *hdev;
+-	bdaddr_t *src = BDADDR_ANY;
+-	int n;
+-
+-	n = sscanf(buf, "%hhx:%hhx:%hhx:%hhx:%hhx:%hhx %hhu",
+-		   &addr->b[5], &addr->b[4], &addr->b[3],
+-		   &addr->b[2], &addr->b[1], &addr->b[0],
+-		   addr_type);
+-
+-	if (n < 7)
+-		return -EINVAL;
+-
+-	hdev = hci_get_route(addr, src);
+-	if (!hdev)
+-		return -ENOENT;
+-
+-	hci_dev_lock(hdev);
+-	hcon = hci_conn_hash_lookup_le(hdev, addr, *addr_type);
+-	hci_dev_unlock(hdev);
+-
+-	if (!hcon)
+-		return -ENOENT;
+-
+-	*conn = (struct l2cap_conn *)hcon->l2cap_data;
+-
+-	BT_DBG("conn %p dst %pMR type %d", *conn, &hcon->dst, hcon->dst_type);
+-
+-	return 0;
+-}
+-
+ static void disconnect_all_peers(void)
+ {
+ 	struct lowpan_dev *entry;
+@@ -1445,44 +1491,6 @@ static int lowpan_enable_get(void *data, u64 *val)
+ DEFINE_SIMPLE_ATTRIBUTE(lowpan_enable_fops, lowpan_enable_get,
+ 			lowpan_enable_set, "%llu\n");
  
--	if (memcmp(buf, "connect ", 8) == 0) {
--		ret = get_l2cap_conn(&buf[8], &addr, &addr_type, &conn);
--		if (ret == -EINVAL)
+-static ssize_t lowpan_control_write(struct file *fp,
+-				    const char __user *user_buffer,
+-				    size_t count,
+-				    loff_t *position)
+-{
+-	char buf[32];
+-	size_t buf_size = min(count, sizeof(buf) - 1);
+-	int ret;
+-	bdaddr_t addr;
+-	u8 addr_type;
+-	struct l2cap_conn *conn = NULL;
+-
+-	if (copy_from_user(buf, user_buffer, buf_size))
+-		return -EFAULT;
+-
+-	buf[buf_size] = '\0';
+-
+-	if (memcmp(buf, "disconnect ", 11) == 0) {
+-		ret = get_l2cap_conn(&buf[11], &addr, &addr_type, &conn);
+-		if (ret < 0)
 -			return ret;
 -
--		if (listen_chan) {
--			l2cap_chan_close(listen_chan, 0);
--			l2cap_chan_put(listen_chan);
--			listen_chan = NULL;
--		}
--
--		if (conn) {
--			struct lowpan_peer *peer;
--
--			if (!is_bt_6lowpan(conn->hcon))
--				return -EINVAL;
--
--			peer = lookup_peer(conn);
--			if (peer) {
--				BT_DBG("6LoWPAN connection already exists");
--				return -EALREADY;
--			}
--
--			BT_DBG("conn %p dst %pMR type %d user %d", conn,
--			       &conn->hcon->dst, conn->hcon->dst_type,
--			       addr_type);
--		}
--
--		ret = bt_6lowpan_connect(&addr, addr_type);
+-		ret = bt_6lowpan_disconnect(conn, addr_type);
 -		if (ret < 0)
 -			return ret;
 -
 -		return count;
 -	}
 -
- 	if (memcmp(buf, "disconnect ", 11) == 0) {
- 		ret = get_l2cap_conn(&buf[11], &addr, &addr_type, &conn);
- 		if (ret < 0)
+-	return count;
+-}
+-
+-static const struct file_operations lowpan_control_fops = {
+-	.write		= lowpan_control_write,
+-	.llseek		= seq_lseek,
+-	.release	= single_release,
+-};
+-
+ static void disconnect_devices(void)
+ {
+ 	struct lowpan_dev *entry, *tmp, *new_dev;
+@@ -1555,9 +1563,6 @@ int bt_6lowpan_init(void)
+ 	lowpan_enable_debugfs = debugfs_create_file("6lowpan_enable", 0644,
+ 						    bt_debugfs, NULL,
+ 						    &lowpan_enable_fops);
+-	lowpan_control_debugfs = debugfs_create_file("6lowpan_control", 0644,
+-						     bt_debugfs, NULL,
+-						     &lowpan_control_fops);
+ 
+ 	return register_netdevice_notifier(&bt_6lowpan_dev_notifier);
+ }
+@@ -1565,7 +1570,6 @@ int bt_6lowpan_init(void)
+ void bt_6lowpan_exit(void)
+ {
+ 	debugfs_remove(lowpan_enable_debugfs);
+-	debugfs_remove(lowpan_control_debugfs);
+ 
+ 	if (listen_chan) {
+ 		l2cap_chan_close(listen_chan, 0);
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 722cc17..2c2824e 100644
+index 2c2824e..909c723 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -106,6 +106,7 @@ static const u16 mgmt_commands[] = {
- 	MGMT_OP_GET_ADV_SIZE_INFO,
+@@ -107,6 +107,7 @@ static const u16 mgmt_commands[] = {
  	MGMT_OP_START_LIMITED_DISCOVERY,
  	MGMT_OP_GET_NETWORKS,
-+	MGMT_OP_ADD_NETWORK,
+ 	MGMT_OP_ADD_NETWORK,
++	MGMT_OP_REMOVE_NETWORK,
  };
  
  static const u16 mgmt_events[] = {
-@@ -143,6 +144,7 @@ static const u16 mgmt_events[] = {
- 	MGMT_EV_LOCAL_OOB_DATA_UPDATED,
+@@ -145,6 +146,7 @@ static const u16 mgmt_events[] = {
  	MGMT_EV_ADVERTISING_ADDED,
  	MGMT_EV_ADVERTISING_REMOVED,
-+	MGMT_EV_NETWORK_ADDED,
+ 	MGMT_EV_NETWORK_ADDED,
++	MGMT_EV_NETWORK_REMOVED,
  };
  
  static const u16 mgmt_untrusted_commands[] = {
-@@ -6339,6 +6341,7 @@ static const struct hci_mgmt_handler mgmt_handlers[] = {
- 	{ get_adv_size_info,       MGMT_GET_ADV_SIZE_INFO_SIZE },
+@@ -6342,6 +6344,7 @@ static const struct hci_mgmt_handler mgmt_handlers[] = {
  	{ start_limited_discovery, MGMT_START_DISCOVERY_SIZE },
  	{ bt_6lowpan_get_networks, MGMT_GET_NETWORKS_SIZE },
-+	{ bt_6lowpan_add_network,  MGMT_ADD_NETWORK_SIZE },
+ 	{ bt_6lowpan_add_network,  MGMT_ADD_NETWORK_SIZE },
++	{ bt_6lowpan_remove_network, MGMT_REMOVE_NETWORK_SIZE },
  };
  
  void mgmt_index_added(struct hci_dev *hdev)
