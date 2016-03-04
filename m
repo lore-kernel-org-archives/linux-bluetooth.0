@@ -1,35 +1,420 @@
-Return-Path: <linux-wpan-owner@vger.kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 9.2 \(3112\))
-Subject: Re: [PATCH bluetooth-next 2/2] 6lowpan: debugfs: add missing static
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1457082621-20194-2-git-send-email-aar@pengutronix.de>
-Date: Fri, 4 Mar 2016 09:10:53 -0800
-Cc: linux-wpan@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	kernel@pengutronix.de
-Message-Id: <41AFC737-11D2-4C89-A918-13F8AC60C35A@holtmann.org>
-References: <1457082621-20194-1-git-send-email-aar@pengutronix.de> <1457082621-20194-2-git-send-email-aar@pengutronix.de>
-To: Alexander Aring <aar@pengutronix.de>
-Sender: linux-wpan-owner@vger.kernel.org
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+MIME-Version: 1.0
+In-Reply-To: <1457106781-8566-2-git-send-email-szymon.janc@codecoup.pl>
+References: <1457106781-8566-1-git-send-email-szymon.janc@codecoup.pl>
+	<1457106781-8566-2-git-send-email-szymon.janc@codecoup.pl>
+Date: Fri, 4 Mar 2016 18:29:05 +0200
+Message-ID: <CABBYNZJsnQ-SrpKCWJBOr6ujdfvsc3AJWttBznWk7T0LvBoysg@mail.gmail.com>
+Subject: Re: [RFC] doc: Add DeviceClassic1 and DeviceSmart1 interfaces
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Szymon Janc <szymon.janc@codecoup.pl>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alex,
+Hi Szymon,
 
-> This patch solves the sparse warning:
-> 
-> net/6lowpan/debugfs.c:164:30: warning: symbol 'lowpan_ctx_pfx_fops' was
-> not declared. Should it be static?
-> net/6lowpan/debugfs.c:241:30: warning: symbol 'lowpan_context_fops' was
-> not declared. Should it be static?
-> 
-> Signed-off-by: Alexander Aring <aar@pengutronix.de>
+On Fri, Mar 4, 2016 at 5:53 PM, Szymon Janc <szymon.janc@codecoup.pl> wrote:
+> This interfaces will provide per tranport capabilities of remote
+> devices. Eventually leading to deprecation of Device1 interface.
 > ---
-> net/6lowpan/debugfs.c | 4 ++--
-> 1 file changed, 2 insertions(+), 2 deletions(-)
+>  doc/device-classic-api.txt | 203 +++++++++++++++++++++++++++++++++++++++++++++
+>  doc/device-smart-api.txt   | 164 ++++++++++++++++++++++++++++++++++++
+>  2 files changed, 367 insertions(+)
+>  create mode 100644 doc/device-classic-api.txt
+>  create mode 100644 doc/device-smart-api.txt
+>
+> diff --git a/doc/device-classic-api.txt b/doc/device-classic-api.txt
+> new file mode 100644
+> index 0000000..c76ba5f
+> --- /dev/null
+> +++ b/doc/device-classic-api.txt
+> @@ -0,0 +1,203 @@
+> +BlueZ D-Bus Classic Device API description
+> +*****************************************
+> +
+> +
+> +Device hierarchy
+> +================
+> +
+> +Service                org.bluez
+> +Interface      org.bluez.DeviceClassic1 [Experimental]
+> +Object path    [variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX
+> +
+> +Methods                void Connect()
+> +
+> +                       This is a generic method to connect any profiles
+> +                       the remote device supports that can be connected
+> +                       to and have been flagged as auto-connectable on
+> +                       our side. If only subset of profiles is already
+> +                       connected it will try to connect currently disconnected
+> +                       ones.
+> +
+> +                       If at least one profile was connected successfully this
+> +                       method will indicate success.
+> +
+> +                       Possible errors: org.bluez.Error.NotReady
+> +                                        org.bluez.Error.Failed
+> +                                        org.bluez.Error.InProgress
+> +                                        org.bluez.Error.AlreadyConnected
+> +
+> +               void Disconnect()
+> +
+> +                       This method gracefully disconnects all connected
+> +                       profiles and then terminates low-level BR/EDR ACL
+> +                       connection.
+> +
+> +                       ACL connection will be terminated even if some profiles
+> +                       were not disconnected properly e.g. due to misbehaving
+> +                       device.
+> +
+> +                       This method can be also used to cancel a preceding
+> +                       Connect call before a reply to it has been received.
+> +
+> +                       Possible errors: org.bluez.Error.NotConnected
+> +
+> +               void ConnectProfile(string uuid)
+> +
+> +                       This method connects a specific profile of this
+> +                       device. The UUID provided is the remote service
+> +                       UUID for the profile.
+> +
+> +                       Possible errors: org.bluez.Error.Failed
+> +                                        org.bluez.Error.InProgress
+> +                                        org.bluez.Error.InvalidArguments
+> +                                        org.bluez.Error.NotAvailable
+> +                                        org.bluez.Error.NotReady
+> +
+> +               void DisconnectProfile(string uuid)
+> +
+> +                       This method disconnects a specific profile of
+> +                       this device. The profile needs to be registered
+> +                       client profile.
+> +
+> +                       There is no connection tracking for a profile, so
+> +                       as long as the profile is registered this will always
+> +                       succeed.
+> +
+> +                       Possible errors: org.bluez.Error.Failed
+> +                                        org.bluez.Error.InProgress
+> +                                        org.bluez.Error.InvalidArguments
+> +                                        org.bluez.Error.NotSupported
+> +
+> +               void Pair()
+> +
+> +                       This method will connect to the remote device,
+> +                       initiate pairing and then retrieve all SDP records.
+> +
+> +                       If the application has registered its own agent,
+> +                       then that specific agent will be used. Otherwise
+> +                       it will use the default agent.
+> +
+> +                       Only for applications like a pairing wizard it
+> +                       would make sense to have its own agent. In almost
+> +                       all other cases the default agent will handle
+> +                       this just fine.
+> +
+> +                       In case there is no application agent and also
+> +                       no default agent present, this method will fail.
+> +
+> +                       Possible errors: org.bluez.Error.InvalidArguments
+> +                                        org.bluez.Error.Failed
+> +                                        org.bluez.Error.AlreadyExists
+> +                                        org.bluez.Error.AuthenticationCanceled
+> +                                        org.bluez.Error.AuthenticationFailed
+> +                                        org.bluez.Error.AuthenticationRejected
+> +                                        org.bluez.Error.AuthenticationTimeout
+> +                                        org.bluez.Error.ConnectionAttemptFailed
+> +
+> +               void CancelPairing()
+> +
+> +                       This method can be used to cancel a pairing
+> +                       operation initiated by the Pair method.
+> +
+> +                       Possible errors: org.bluez.Error.DoesNotExist
+> +                                        org.bluez.Error.Failed
+> +
+> +Properties     string Address [readonly]
+> +
+> +                       The Bluetooth device address of the remote device.
+> +
+> +               string Name [readonly, optional]
+> +
+> +                       The Bluetooth remote name. This value can not be
+> +                       changed. Use the Alias property instead.
+> +
+> +                       This value is only present for completeness. It is
+> +                       better to always use the Alias property when
+> +                       displaying the devices name.
+> +
+> +                       If the Alias property is unset, it will reflect
+> +                       this value which makes it more convenient.
+> +
+> +               string Icon [readonly, optional]
+> +
+> +                       Proposed icon name according to the freedesktop.org
+> +                       icon naming specification.
+> +
+> +               uint32 Class [readonly, optional]
+> +
+> +                       The Bluetooth class of device of the remote device.
+> +
+> +               array{string} UUIDs [readonly, optional]
+> +
+> +                       List of 128-bit UUIDs that represents the available
+> +                       remote services.
+> +
+> +               boolean Paired [readonly]
+> +
+> +                       Indicates if the remote device is paired.
+> +
+> +               boolean Connected [readonly]
+> +
+> +                       Indicates if the remote device is currently connected.
+> +
+> +               boolean Trusted [readwrite]
+> +
+> +                       Indicates if the remote is seen as trusted. This
+> +                       setting can be changed by the application.
+> +
+> +               boolean Blocked [readwrite]
+> +
+> +                       If set to true any incoming connections from the
+> +                       device will be immediately rejected. Any device
+> +                       drivers will also be removed and no new ones will
+> +                       be probed as long as the device is blocked.
+> +
+> +               string Alias [readwrite]
+> +
+> +                       The name alias for the remote device. The alias can
+> +                       be used to have a different friendly name for the
+> +                       remote device.
+> +
+> +                       In case no alias is set, it will return the remote
+> +                       device name. Setting an empty string as alias will
+> +                       convert it back to the remote device name.
+> +
+> +                       When resetting the alias with an empty string, the
+> +                       property will default back to the remote name.
+> +
+> +               object Adapter [readonly]
+> +
+> +                       The object path of the adapter the device belongs to.
+> +
+> +               boolean LegacyPairing [readonly]
+> +
+> +                       Set to true if the device only supports the pre-2.1
+> +                       pairing mechanism. This property is useful during
+> +                       device discovery to anticipate whether legacy or
+> +                       simple pairing will occur if pairing is initiated.
+> +
+> +                       Note that this property can exhibit false-positives
+> +                       in the case of Bluetooth 2.1 (or newer) devices that
+> +                       have disabled Extended Inquiry Response support.
+> +
+> +               string Modalias [readonly, optional]
+> +
+> +                       Remote Device ID information in modalias format
+> +                       used by the kernel and udev.
+> +
+> +               int16 RSSI [readonly, optional]
+> +
+> +                       Received Signal Strength Indicator of the remote
+> +                       device (inquiry).
+> +
+> +               int16 TxPower [readonly, optional, experimental]
+> +
+> +                       Advertised transmitted power level (inquiry).
+> +
+> +               array{object} GattServices [readonly, optional]
+> +
+> +                       List of GATT service object paths. Each referenced
+> +                       object exports the org.bluez.GattService1 interface and
+> +                       represents a remote GATT service. This property will be
+> +                       updated once all remote GATT services of this device
+> +                       have been discovered and exported over D-Bus.
+> diff --git a/doc/device-smart-api.txt b/doc/device-smart-api.txt
+> new file mode 100644
+> index 0000000..ce4849d
+> --- /dev/null
+> +++ b/doc/device-smart-api.txt
+> @@ -0,0 +1,164 @@
+> +BlueZ D-Bus Smart Device API description
+> +****************************************
+> +
+> +
+> +Device hierarchy
+> +================
+> +
+> +Service                org.bluez
+> +Interface      org.bluez.DeviceSmart1 [Experimental]
+> +Object path    [variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX
+> +
+> +Methods                void Connect()
+> +
+> +                       This is a generic method to connect low-level LE ACL
+> +                       and then (if needed) retrieve all GATT primary services.
+> +
+> +                       Possible errors: org.bluez.Error.NotReady
+> +                                        org.bluez.Error.Failed
+> +                                        org.bluez.Error.InProgress
+> +                                        org.bluez.Error.AlreadyConnected
+> +
+> +               void Disconnect()
+> +
+> +                       This method terminates low-level LE ACL connection.
+> +
+> +                       This method can be also used to cancel a preceding
+> +                       Connect call before a reply to it has been received.
+> +
+> +                       Possible errors: org.bluez.Error.NotConnected
+> +
+> +               void Pair()
+> +
+> +                       This method will connect to the remote device,
+> +                       initiate pairing and then retrieve all GATT primary
+> +                       services.
+> +
+> +                       If the application has registered its own agent,
+> +                       then that specific agent will be used. Otherwise
+> +                       it will use the default agent.
+> +
+> +                       Only for applications like a pairing wizard it
+> +                       would make sense to have its own agent. In almost
+> +                       all other cases the default agent will handle
+> +                       this just fine.
+> +
+> +                       In case there is no application agent and also
+> +                       no default agent present, this method will fail.
+> +
+> +                       Possible errors: org.bluez.Error.InvalidArguments
+> +                                        org.bluez.Error.Failed
+> +                                        org.bluez.Error.AlreadyExists
+> +                                        org.bluez.Error.AuthenticationCanceled
+> +                                        org.bluez.Error.AuthenticationFailed
+> +                                        org.bluez.Error.AuthenticationRejected
+> +                                        org.bluez.Error.AuthenticationTimeout
+> +                                        org.bluez.Error.ConnectionAttemptFailed
+> +
+> +               void CancelPairing()
+> +
+> +                       This method can be used to cancel a pairing
+> +                       operation initiated by the Pair method.
+> +
+> +                       Possible errors: org.bluez.Error.DoesNotExist
+> +                                        org.bluez.Error.Failed
+> +
+> +Properties     string Address [readonly]
+> +
+> +                       The Bluetooth device address of the remote device.
+> +
+> +               string Name [readonly, optional]
+> +
+> +                       The Bluetooth remote name. This value can not be
+> +                       changed. Use the Alias property instead.
+> +
+> +                       This value is only present for completeness. It is
+> +                       better to always use the Alias property when
+> +                       displaying the devices name.
+> +
+> +                       If the Alias property is unset, it will reflect
+> +                       this value which makes it more convenient.
+> +
+> +               string Icon [readonly, optional]
+> +
+> +                       Proposed icon name according to the freedesktop.org
+> +                       icon naming specification.
+> +
+> +               uint16 Appearance [readonly, optional]
+> +
+> +                       External appearance of device, as found on GAP service.
+> +
+> +               array{string} UUIDs [readonly, optional]
+> +
+> +                       List of 128-bit UUIDs that represents the available
+> +                       remote services.
+> +
+> +               boolean Paired [readonly]
+> +
+> +                       Indicates if the remote device is paired.
+> +
+> +               boolean Connected [readonly]
+> +
+> +                       Indicates if the remote device is currently connected.
+> +
+> +               boolean Trusted [readwrite]
+> +
+> +                       Indicates if the remote is seen as trusted. This
+> +                       setting can be changed by the application.
+> +
+> +               boolean Blocked [readwrite]
+> +
+> +                       If set to true any incoming connections from the
+> +                       device will be immediately rejected. Any device
+> +                       drivers will also be removed and no new ones will
+> +                       be probed as long as the device is blocked.
+> +
+> +               string Alias [readwrite]
+> +
+> +                       The name alias for the remote device. The alias can
+> +                       be used to have a different friendly name for the
+> +                       remote device.
+> +
+> +                       In case no alias is set, it will return the remote
+> +                       device name. Setting an empty string as alias will
+> +                       convert it back to the remote device name.
+> +
+> +                       When resetting the alias with an empty string, the
+> +                       property will default back to the remote name.
+> +
+> +               object Adapter [readonly]
+> +
+> +                       The object path of the adapter the device belongs to.
+> +
+> +               string Modalias [readonly, optional]
+> +
+> +                       Remote Device Information information in modalias format
+> +                       used by the kernel and udev.
+> +
+> +               int16 RSSI [readonly, optional]
+> +
+> +                       Received Signal Strength Indicator of the remote
+> +                       device (advertising).
+> +
+> +               int16 TxPower [readonly, optional, experimental]
+> +
+> +                       Advertised transmitted power level (advertising).
+> +
+> +               dict ManufacturerData [readonly, optional]
+> +
+> +                       Manufacturer specific advertisement data. Keys are
+> +                       16 bits Manufacturer ID followed by its byte array
+> +                       value.
+> +
+> +               dict ServiceData [readonly, optional]
+> +
+> +                       Service advertisement data. Keys are the UUIDs in
+> +                       string format followed by its byte array value.
 
-patch has been applied to bluetooth-next tree.
+We were actually thinking in having the Advertisement Data somewhere
+else (e.g. Beacon1) since it may not be connectable thus it doesn't
+give the impression that it is a peripheral.
 
-Regards
+> +               array{object} GattServices [readonly, optional]
+> +
+> +                       List of GATT service object paths. Each referenced
+> +                       object exports the org.bluez.GattService1 interface and
+> +                       represents a remote GATT service. This property will be
+> +                       updated once all remote GATT services of this device
+> +                       have been discovered and exported over D-Bus.
+> --
+> 2.6.2
 
-Marcel
+Overall this probably make sense, it is much clearer that it is in
+fact 2 different technologies behind the same address so the Name,
+etc, maybe complete different. That being said we will probably have
+to do some changes to the storage to cope with this.
 
+-- 
+Luiz Augusto von Dentz
