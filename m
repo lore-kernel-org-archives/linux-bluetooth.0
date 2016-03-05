@@ -1,80 +1,83 @@
-Return-Path: <jerome.debretagne@gmail.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <56D37BAC.6090907@intel.com>
-References: <CA+kEDGEHfsODon6aOdLU86E9c0Lfs-4bo=ycEZz3MdEa1qLrKw@mail.gmail.com>
- <56CAD20D.4080609@broadcom.com> <CA+kEDGFX31qxxDsFYR-vdcb1UhH65xoZ0sxKcY9xFxC_J=GNfQ@mail.gmail.com>
- <56D35080.1010003@intel.com> <CA+kEDGHbzH9VPRUaz5-JPsU5kHTDk8UwGGmt94rGVXiG1KY-Ow@mail.gmail.com>
- <56D37BAC.6090907@intel.com>
-From: =?UTF-8?B?SsOpcsO0bWUgZGUgQnJldGFnbmU=?= <jerome.debretagne@gmail.com>
-Date: Sun, 6 Mar 2016 14:22:44 +0100
-Message-ID: <CA+kEDGHz=V+BBxbnQDDKwNgLUFjj_9p85DepRSqArRJUzbyusQ@mail.gmail.com>
-Subject: Re: Broadcom BCM4324(1) rev B5 chipset - Bluetooth support in Linux
- Kernel 4.x ?
-To: Loic Poulain <loic.poulain@intel.com>, Ilya Faenson <ilya.faenson@broadcom.com>,
-	linux-bluetooth@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>
-Content-Type: text/plain; charset=UTF-8
+Date: Sun, 6 Mar 2016 02:16:50 +0300
+Message-ID: <CAAo+LNOnDtHYjfLAQXj3Tgqiibd+oyKJP9109TfoGaDuAbmgag@mail.gmail.com>
+Subject: Re: BTLE pairing sequence problem
+From: Andrew - <hidefromkgb@gmail.com>
+To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Content-Type: multipart/mixed; boundary=089e0102fc423299b4052d556dbf
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+--089e0102fc423299b4052d556dbf
+Content-Type: text/plain; charset=UTF-8
 
-> So your BT controller is BTH1 (BCM2E55).
-> The ACPI table for this BTH1 looks good (1 irq + 2 gpios ) so it should b=
-e
-> compatible with hci_bcm.
+> why don't you look at the source code. We have a smp_c1() in net/bluetooth/smp.c in \
+> the kernel (including actual test vectors). And there is also bt_crypto_c1() in \
+> src/shared/crypto.c in BlueZ userspace.
 
-I can confirm that it is compatible with hci_bcm; Bluetooth is indeed
-fully working using the bluetooth-next tree on the ThinkPad Tablet 8.
-Thanks again Marcel to have applied the patch and Loic to have helped
-me find the right ACPI ID.
+Shame on me, but static analysis of the kernel code has never been a
+strong point of mine.
+So, the only built-in test case for smp_c1() that I found is called
+test_c1(), and it contains the very case described in the standard.
 
-Maybe this is a naive question about ACPI ID, and not specific to
-Broadcom by the way: could there be a more generic way to gather ACPI
-IDs used by new devices and add them to the kernel on a regular basis?
-They seem to be added almost one by one mainly upon user reports when
-looking at the mailing list. So Bluetooth doesn't work out-of-the-box
-on some systems which would be compatible otherwise, especially the
-less popular ones. Is there no existing driver list to re-use perhaps?
+As for userspace tools, I found out that they yield same results as my
+code (and the former kernel code, apparently): see the attached source
+file. When the second, real-life test case is commented out,
+everything is ok.
+Unfortunately, none of the uses of bt_crypto_c1() explain why calling
+it with inputs set to legitimate values and exact packet captures does
+not produce the captured result. Everything seems to comply, and I`m
+sure that the problem is some insanely subtle detail I fail to
+understand.
 
+> And on a side note, the PDUs from pairing request / response need to fed into c1 as \
+> they are received over the air. Meaning you can not mask out bits and then feed it \
+> in. That has been clarified in an erratum and especially important for LE Secure \
+> Connections (which Linux does support).
 
-> Now, you can run btattach (bluez tool):
-> $ btattach -B /dev/ttySX -P bcm
+Exactly as I do, actually.
+Or do I? Are these request/response packet dumps I got on my capture
+the ones that have to be put into _pres and _preq variables from the
+code attached?
 
-Indeed, it is working fine with ttyS1 and the correct binary firmware
-stored at /lib/firmware/brcm/BCM.hcd:
+--089e0102fc423299b4052d556dbf
+Content-Type: text/x-csrc; charset=US-ASCII; name="btle.c"
+Content-Disposition: attachment; filename="btle.c"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: file0
 
-   # btattach -B /dev/ttyS1 -P bcm
-   Attaching BR/EDR controller to /dev/ttyS1
-   Switched line discipline from 0 to 15
-   Device index 0 attached
-
-Finally, is btattach the only command recommended and supported moving
-forward, or should hciattach work as well with that specific
-chipset/tablet (as a transition until most Linux distros switch to
-btattach)?
-
-Regards,
-J=C3=A9r=C3=B4me
-
-
-P.S. for information if it can be useful to someone else:
-
-> And check that hci0 has been created
-> $ hciconfig
-
-$ hciconfig -a
-hci0:    Type: BR/EDR  Bus: UART
-    BD Address: B0:10:41:B8:16:6C  ACL MTU: 1021:8  SCO MTU: 64:1
-    UP RUNNING
-    RX bytes:110596 acl:4422 sco:0 events:328 errors:0
-    TX bytes:35333 acl:36 sco:0 commands:273 errors:0
-    Features: 0xbf 0xfe 0xcf 0xfe 0xdb 0xff 0x7b 0x87
-    Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-    Link policy: RSWITCH SNIFF
-    Link mode: SLAVE ACCEPT
-    Name: 'thinkpad8'
-    Class: 0x10011c
-    Service Classes: Object Transfer
-    Device Class: Computer, Unknown (reserved) minor device class
-    HCI Version: 4.0 (0x6)  Revision: 0x3492
-    LMP Version: 4.0 (0x6)  Subversion: 0x4606
-    Manufacturer: Broadcom Corporation (15)
+I2luY2x1ZGUgPHN0ZGlvLmg+CiNpbmNsdWRlICJzcmMvc2hhcmVkL3V0aWwuaCIKI2luY2x1ZGUg
+InNyYy9zaGFyZWQvY3J5cHRvLmgiCgppbnQgbWFpbigpIHsKICAgIHVpbnQ4X3QgcmV0blsxNl0g
+PSB7fSwgY29uZlsxNl0gPSB7fSwgX21yYW5kWzE2XSA9IHt9OwogICAgdWludDhfdCBfcHJlcVs3
+XSA9IHt9LCBfcHJlc1s3XSA9IHt9OwogICAgdWludDhfdCBfaWFbNl0gPSB7fSwgX3JhWzZdID0g
+e307CiAgICB1aW50OF90IF9pYXQgPSAwLCBfcmF0ID0gMDsKICAgIHVpbnQzMl90IF9jb2RlID0g
+MDsKCiAgICAvLy8gZXhhbXBsZSBmcm9tIHN0YW5kYXJkOgogICAgX2NvZGUgPSAwMDAwMDA7CiAg
+ICBfaWF0ID0gMHgwMTsKICAgIF9yYXQgPSAweDAwOwogICAgbWVtY3B5KCZfaWEsICJceEE2XHhB
+NVx4QTRceEEzXHhBMlx4QTEiLCBzaXplb2YoX2lhKSk7IC8vLyBzdHIyYmEoIkExOkEyOkEzOkE0
+OkE1OkE2IiwgJik7CiAgICBtZW1jcHkoJl9yYSwgIlx4QjZceEI1XHhCNFx4QjNceEIyXHhCMSIs
+IHNpemVvZihfcmEpKTsgLy8vIHN0cjJiYSgiQjE6QjI6QjM6QjQ6QjU6QjYiLCAmKTsKICAgIG1l
+bWNweSgmX3ByZXEsICJceDAxXHgwMVx4MDBceDAwXHgxMFx4MDdceDA3Iiwgc2l6ZW9mKF9wcmVx
+KSk7CiAgICBtZW1jcHkoJl9wcmVzLCAiXHgwMlx4MDNceDAwXHgwMFx4MDhceDAwXHgwNSIsIHNp
+emVvZihfcHJlcykpOwogICAgbWVtY3B5KF9tcmFuZCwgIlx4RTBceDJFXHg3MFx4QzZceDRFXHgy
+N1x4ODhceDYzXHgwRVx4NkZceEFEXHg1Nlx4MjFceEQ1XHg4M1x4NTciLCBzaXplb2YoX21yYW5k
+KSk7CiAgICBtZW1jcHkoY29uZiwgIlx4ODZceDNCXHhGMVx4QkVceEM1XHg0RFx4QTdceEQyXHhF
+QVx4ODhceDg5XHg4N1x4RUZceDNGXHgxRVx4MUUiLCBzaXplb2YoY29uZikpOwoKLy8qICAvLy8g
+cmVhbCBleGFtcGxlOgogICAgX2NvZGUgPSA0MTUxODg7CiAgICBfaWF0ID0gMHgwMTsKICAgIF9y
+YXQgPSAweDAxOwogICAgbWVtY3B5KCZfaWEsICJceEM0XHgzMFx4MTlceDNBXHg1QVx4MzAiLCBz
+aXplb2YoX2lhKSk7IC8vLyBzdHIyYmEoIjMwOjVBOjNBOjE5OjMwOkM0IiwgJik7CiAgICBtZW1j
+cHkoJl9yYSwgIlx4QjlceDk3XHgyRFx4NUJceEMzXHhDMSIsIHNpemVvZihfcmEpKTsgLy8vIHN0
+cjJiYSgiQzE6QzM6NUI6MkQ6OTc6QjkiLCAmKTsKICAgIG1lbWNweSgmX3ByZXEsICJceDAxXHgw
+MVx4MDBceDA1XHgxMFx4MDdceDA3Iiwgc2l6ZW9mKF9wcmVxKSk7CiAgICBtZW1jcHkoJl9wcmVz
+LCAiXHgwMlx4MDJceDAwXHgwNVx4MTBceDA2XHgwMyIsIHNpemVvZihfcHJlcykpOwogICAgbWVt
+Y3B5KF9tcmFuZCwgIlx4REJceDdBXHg0OFx4RDlceEM1XHgxRlx4NzZceDQzXHg5Q1x4RTRceDAw
+XHg1Nlx4ODRceEY0XHhFN1x4MUIiLCBzaXplb2YoX21yYW5kKSk7CiAgICBtZW1jcHkoY29uZiwg
+Ilx4RUZceERDXHgxQ1x4NjNceEFGXHg4Qlx4OTdceDFEXHhGQ1x4MzVceDFGXHgxRFx4MjZceDIx
+XHg2MFx4RkMiLCBzaXplb2YoY29uZikpOwovLyovCgogICAgdWludDhfdCBrWzE2XSA9IHt9OwoK
+ICAgIHB1dF9sZTMyKF9jb2RlLCBrKTsKICAgIGJ0X2NyeXB0b19jMShidF9jcnlwdG9fbmV3KCks
+IGssIF9tcmFuZCwgJl9wcmVzLCAmX3ByZXEsIF9pYXQsICZfaWEsIF9yYXQsICZfcmEsIHJldG4p
+OwogICAgdXRpbF9oZXhkdW1wKCdcbicsIHJldG4sIHNpemVvZihyZXRuKSwgcHJpbnRmLCAwKTsK
+ICAgIHV0aWxfaGV4ZHVtcCgnXG4nLCBjb25mLCBzaXplb2YoY29uZiksIHByaW50ZiwgMCk7CiAg
+ICBwcmludGYoIlxuXG4gJXMhXG4iLCAobWVtY21wKHJldG4sIGNvbmYsIHNpemVvZihyZXRuKSkp
+PyAiRkFJTCIgOiAiUEFTUyIpOwogICAgcmV0dXJuIDA7Cn0K
+--089e0102fc423299b4052d556dbf--
