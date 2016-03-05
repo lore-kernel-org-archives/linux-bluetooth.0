@@ -1,96 +1,47 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Subject: Re: Bluetooth connection hangs after some retries (reset
- required/possible?)
-To: linux-bluetooth@vger.kernel.org
-References: <56D9A545.7070200@m-reimer.de>
-From: Manuel Reimer <mail+linux-bluetooth@m-reimer.de>
-Message-ID: <56DAB409.60401@m-reimer.de>
-Date: Sat, 5 Mar 2016 11:25:13 +0100
+Return-Path: <tore@fud.no>
+Date: Sat, 5 Mar 2016 10:09:00 +0100
+From: Tore Anderson <tore@fud.no>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Gustavo Padovan
+ <gustavo@padovan.org>, linux-bluetooth@vger.kernel.org
+Subject: Re: PROBLEM: Bluetooth mouse not working after resume since commit
+ 2ff1389
+Message-ID: <20160305100900.0b097304@envy.w5.y.home>
+In-Reply-To: <20160304065406.GA17899@t440s.P-661HNU-F1>
+References: <20160220181259.1e28f8da@envy.w5.y.home>
+	<20160220182339.GA1648@t440s.P-661HNU-F1>
+	<20160220182919.GA2620@t440s.P-661HNU-F1>
+	<20160220213028.35760428@envy.w5.y.home>
+	<20160221070226.GA12780@t440s.P-661HNU-F1>
+	<20160221121322.6a19b1d4@envy.w5.y.home>
+	<20160303085116.0567712b@echo.ms.redpill-linpro.com>
+	<20160303084229.GA15622@t440s.ger.corp.intel.com>
+	<20160303214419.6ac7558a@envy.w5.y.home>
+	<20160304065406.GA17899@t440s.P-661HNU-F1>
 MIME-Version: 1.0
-In-Reply-To: <56D9A545.7070200@m-reimer.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 03/04/2016 04:09 PM, Manuel Reimer wrote:
-> Hello,
->
-> I'm still doing my first steps with bluetooth on Linux...
->
-> I'm trying to get HID reports of a bluetooth game controller (PS4
-> gamepad). The relevant lines:
->
-> char dest[18] = "XX:XX:XX:XX:XX:XX";
-> int int_socket = socket(AF_BLUETOOTH, SOCK_SEQPACKET, BTPROTO_L2CAP);
-> struct sockaddr_l2 addr = { 0 };
-> addr.l2_family = AF_BLUETOOTH;
-> str2ba( dest, &addr.l2_bdaddr );
-> addr.l2_psm = htobs(L2CAP_PSM_HIDP_INTR);
-> connect(int_socket, (struct sockaddr *)&addr, sizeof(addr));
-> char buf[79] = { 0 };
-> int bytes_read;
-> bytes_read = recv(int_socket, buf, sizeof(buf), 0);
-> while(1) {
->    if( bytes_read > 0 ) {
->      printf("received [%s]\n", buf);
->    }
-> }
->
-> Yes, I do proper initialization and yes, my "real code" has error handling.
->
-> If I run this code for the first time (currently I have the "hidp"
-> module blacklisted to get sure I'm really the first user of the device),
-> then everything works as expected. Initialization is done and lines are
-> running through console.
->
-> Sometimes I'm able to Ctrl+C and restart *once* but it never is possible
-> to do a third try. If I do so, then the "read" just hangs forever. This
-> also happens if I disconnect the bluetooth device and reconnect it. I
-> have to "systemctl restart bluetooth" in this case to get a new chance.
->
-> What is happening here? For me it seems like the bluetooth daemon
-> "somehow" does some kind of "deadlocking". Maybe the controller keeps
-> sending and noone takes the messages which causes the daemon to deadlock?
->
-> How to get around this? Is it actually possible to get this stable? Is
-> there, for example, some command, I can send, so whatever hangs here is
-> reset?
->
-> Thank you for every answer...
->
-> Best regards,
->
-> Manuel
-> --
-> To unsubscribe from this list: send the line "unsubscribe
-> linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Hi Johan,
 
+> It's a relief to hear that the issue seems to be fixed, but it would
+> indeed be good to get to the bottom of this and understand what
+> exactly fixed it, since I can't right now remember any recent patches
+> that would have influenced this behavior (who knows - maybe it's
+> something external to the Bluetooth subsystem).
 
+It got fixed by:
 
+commit d82142a8b1338e6a4339920863423379c27b0b16
+Author: Wei-Ning Huang <wnhuang@chromium.org>
+Date:   Mon Feb 15 17:09:51 2016 +0800
 
-I did a few more tries.
+    Bluetooth: hci_core: cancel power off delayed work properly
 
-This is a "hcidump -x" of one connection from usermode. It sends out one 
-report (setting the LEDs on the controller) and successfully receives 10 
-HID reports. For whatever reason I don't see all 10 in the hcidump output...
+    When the HCI_AUTO_OFF flag is cleared, the power_off delayed work need
+    to be cancel or HCI will be powered off even if it's managed.
 
-http://pastebin.com/50g2nMWF
+    Signed-off-by: Wei-Ning Huang <wnhuang@chromium.org>
+    Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 
-And this one is a dump of the "deadlocked" case:
-
-http://pastebin.com/QKWp8E2G
-
-In general both logs look much more "dirty" as a dump created with the 
-kernel module (hidp) attached...
-
-Any help would be very welcome. Maybe someone can at least point me to a 
-different mailing list where someone may know how to do "stable usermode 
-bluetooth programming"?
-
-Thank you very much in advance.
-
-Best regards,
-
-Manuel
+Tore
