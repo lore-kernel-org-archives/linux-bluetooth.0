@@ -1,59 +1,31 @@
-Return-Path: <loic.poulain@intel.com>
-Message-ID: <56DD4CEF.3070300@intel.com>
-Date: Mon, 07 Mar 2016 10:42:07 +0100
-From: Loic Poulain <loic.poulain@intel.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+From: Mike <mailinglists@in-box.at>
+Subject: Using bluez 5.37 with Raspberry Pi 3
+Message-ID: <56DCA644.5070806@in-box.at>
+Date: Sun, 6 Mar 2016 22:51:00 +0100
 MIME-Version: 1.0
-To: =?UTF-8?B?SsOpcsO0bWUgZGUgQnJldGFnbmU=?=
- <jerome.debretagne@gmail.com>, Ilya Faenson <ilya.faenson@broadcom.com>,
- linux-bluetooth@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>
-Subject: Re: Broadcom BCM4324(1) rev B5 chipset - Bluetooth support in Linux
- Kernel 4.x ?
-References: <CA+kEDGEHfsODon6aOdLU86E9c0Lfs-4bo=ycEZz3MdEa1qLrKw@mail.gmail.com> <56CAD20D.4080609@broadcom.com> <CA+kEDGFX31qxxDsFYR-vdcb1UhH65xoZ0sxKcY9xFxC_J=GNfQ@mail.gmail.com> <56D35080.1010003@intel.com> <CA+kEDGHbzH9VPRUaz5-JPsU5kHTDk8UwGGmt94rGVXiG1KY-Ow@mail.gmail.com> <56D37BAC.6090907@intel.com> <CA+kEDGHz=V+BBxbnQDDKwNgLUFjj_9p85DepRSqArRJUzbyusQ@mail.gmail.com>
-In-Reply-To: <CA+kEDGHz=V+BBxbnQDDKwNgLUFjj_9p85DepRSqArRJUzbyusQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=utf-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jerome,
+Hi all,
 
-> Maybe this is a naive question about ACPI ID, and not specific to
-> Broadcom by the way: could there be a more generic way to gather ACPI
-> IDs used by new devices and add them to the kernel on a regular basis?
-> They seem to be added almost one by one mainly upon user reports when
-> looking at the mailing list. So Bluetooth doesn't work out-of-the-box
-> on some systems which would be compatible otherwise, especially the
-> less popular ones. Is there no existing driver list to re-use perhaps?
+I tried using bluez 5.37 and compiled it from source. I found that when
+hciattach is used, it obviously refers to the wrong firmware directory
+when using the BCM43xx chipset. Which is /etc/firmware and should be
+/lib/firmware.
 
-New ACPI ID means that this is a different hardware. So it needs to be
-tested before being added into the driver supported list. An already
-supported hardware should keep the same ACPI ID, making it work out-of
-the-box.
+I was wondering and downloaded the source of bluez from the distribution
+package and took a look at hciattach_bcm43xx.c and found that it was not
+patched. And I couldn't find any other definition of FIRMWARE_DIR, that
+would point to /lib/firmware.
 
-Since this driver is pretty new, this is not surprising that some IDs
-are regularly added. This is a good thing. Meaning that people use this
-driver and that Broadcom controllers keep good compatibility across
-hardware versions.
+So how was it done? Since the distribution package of bluez loads the
+firmware from /lib/firmware. And then, how can I solve this? Do I have
+to patch/change the source code before compiling, or is there a
+configure switch (couldn't find something with --help), or would you
+suggest to put a symbolic link in /etc/firmware?
 
-> Indeed, it is working fine with ttyS1 and the correct binary firmware
-> stored at /lib/firmware/brcm/BCM.hcd:
->
->     # btattach -B /dev/ttyS1 -P bcm
->     Attaching BR/EDR controller to /dev/ttyS1
->     Switched line discipline from 0 to 15
->     Device index 0 attached
->
-> Finally, is btattach the only command recommended and supported moving
-> forward, or should hciattach work as well with that specific
-> chipset/tablet (as a transition until most Linux distros switch to
-> btattach)?
-
-Absolutely, think btattach is the only recommended way.
-Even if you can make it work with hciattach by adding device entry with
-correct protocol ID, it is not recommended since hciattach is dedicated
-to user-space initialisation (old-way) and code is pretty deprecated.
-
-Regards,
-Loic
-
--- 
-Intel Open Source Technology Center
-http://oss.intel.com/
+Best regards
+Mike
