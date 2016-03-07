@@ -1,51 +1,107 @@
-Return-Path: <xerofoify@gmail.com>
-From: Nicholas Krause <xerofoify@gmail.com>
-To: marcel@holtmann.org
-Cc: gustavo@padovan.org,
-	johan.hedberg@gmail.com,
-	davem@davemloft.net,
-	linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH v3 RESEND] bluetooth:Fix locking issues in the function l2cap_connect_cfm
-Date: Mon,  7 Mar 2016 17:59:54 -0500
-Message-Id: <1457391594-23534-1-git-send-email-xerofoify@gmail.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Cody P Schafer <dev@codyps.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Cody P Schafer <dev@codyps.com>
+Subject: [PATCH BlueZ] uuid: fix 1 byte stack overflow
+Date: Mon,  7 Mar 2016 16:01:23 -0500
+Message-Id: <1457384483-19894-1-git-send-email-dev@codyps.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This fixes a locking issue in the function l2cap_connect_cfm for
-not locking the mutex lock for channels on the l2cap_conn structure
-pointer conn before calling __l2cap_get_chan_by_dcid as all callers
-need to lock and unlock this mutex before calling this function due
-to issues with either concurrent users or race conditions arising
-if this mutex is not locked before these calls.
-v3 Fix double locking of mutex lock on goto next label to instead correctly
-unlock the channel mutex
-v2 Remove unneeded mutex_unlock for channels as the unlock was due early
-for adding correct protection for all functions that have requirements
-for this mutex lock needing to be locked before calling them.
-Signed-off-by: Nicholas Krause <xerofoify@gmail.com>
----
- net/bluetooth/l2cap_core.c | 2 ++
- 1 file changed, 2 insertions(+)
+scanf requires that '[' convertion specifiers have enough room for all
+characters in the string, _plus a terminating null byte_. We were
+previously not providing room for the terminating null byte.
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 45fffa4..20d3909 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -7285,6 +7285,7 @@ static void l2cap_connect_cfm(struct hci_conn *hcon, u8 status)
- 		struct l2cap_chan *chan, *next;
+This was detected by AddressSanitizer:
+
+==15036==ERROR: AddressSanitizer: stack-buffer-overflow on address 0x7ffe4e774401 at pc 0x7fd33f572c98 bp 0x7ffe4e774270 sp 0x7ffe4e7739f8
+WRITE of size 2 at 0x7ffe4e774401 thread T0
+    #0 0x7fd33f572c97 in scanf_common /build/gcc-multilib/src/gcc-5-20160209/libsanitizer/sanitizer_common/sanitizer_common_interceptors_format.inc:340
+    #1 0x7fd33f5739ea in __interceptor_vsscanf /build/gcc-multilib/src/gcc-5-20160209/libsanitizer/sanitizer_common/sanitizer_common_interceptors.inc:769
+    #2 0x7fd33f573b49 in __interceptor_sscanf /build/gcc-multilib/src/gcc-5-20160209/libsanitizer/sanitizer_common/sanitizer_common_interceptors.inc:793
+    #3 0x650db5 in is_base_uuid128 lib/uuid.c:191
+    #4 0x65196e in bt_string_to_uuid lib/uuid.c:267
+    #5 0x56f28e in parse_uuid src/gatt-database.c:1473
+    #6 0x5729e0 in database_add_service src/gatt-database.c:2053
+    #7 0x57329f in database_add_app src/gatt-database.c:2106
+    #8 0x573adc in client_ready_cb src/gatt-database.c:2211
+    #9 0x6695fd in get_managed_objects_reply gdbus/client.c:1097
+    #10 0x7fd33efd5391  (/usr/lib/libdbus-1.so.3+0x13391)
+    #11 0x7fd33efd8db0 in dbus_connection_dispatch (/usr/lib/libdbus-1.so.3+0x16db0)
+    #12 0x651ecd in message_dispatch gdbus/mainloop.c:72
+    #13 0x7fd33f25cc39 in g_main_context_dispatch (/usr/lib/libglib-2.0.so.0+0x49c39)
+    #14 0x7fd33f25cfdf  (/usr/lib/libglib-2.0.so.0+0x49fdf)
+    #15 0x7fd33f25d301 in g_main_loop_run (/usr/lib/libglib-2.0.so.0+0x4a301)
+    #16 0x54b7d1 in main src/main.c:687
+    #17 0x7fd33d90870f in __libc_start_main (/usr/lib/libc.so.6+0x2070f)
+    #18 0x40bba8 in _start (/home/cody/g/bluez/src/bluetoothd+0x40bba8)
+
+Address 0x7ffe4e774401 is located in stack of thread T0 at offset 33 in frame
+    #0 0x650ccd in is_base_uuid128 lib/uuid.c:184
+
+  This frame has 2 object(s):
+    [32, 33) 'dummy' <== Memory access at offset 33 overflows this variable
+    [96, 98) 'uuid'
+HINT: this may be a false positive if your program uses some custom stack unwind mechanism or swapcontext
+      (longjmp and C++ exceptions *are* supported)
+SUMMARY: AddressSanitizer: stack-buffer-overflow /build/gcc-multilib/src/gcc-5-20160209/libsanitizer/sanitizer_common/sanitizer_common_interceptors_format.inc:340 scanf_common
+Shadow bytes around the buggy address:
+  0x100049ce6830: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x100049ce6840: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x100049ce6850: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x100049ce6860: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x100049ce6870: 00 00 00 00 00 00 00 00 00 00 00 00 f1 f1 f1 f1
+=>0x100049ce6880:[01]f4 f4 f4 f2 f2 f2 f2 02 f4 f4 f4 f3 f3 f3 f3
+  0x100049ce6890: 00 00 00 00 00 00 00 00 00 00 00 00 f1 f1 f1 f1
+  0x100049ce68a0: 00 f4 f4 f4 f2 f2 f2 f2 00 00 04 f4 f2 f2 f2 f2
+  0x100049ce68b0: 00 00 00 00 00 00 00 00 00 f4 f4 f4 f3 f3 f3 f3
+  0x100049ce68c0: 00 00 00 00 00 00 00 00 00 00 00 00 f1 f1 f1 f1
+  0x100049ce68d0: 01 f4 f4 f4 f2 f2 f2 f2 00 00 04 f4 f3 f3 f3 f3
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           00
+  Partially addressable: 01 02 03 04 05 06 07
+  Heap left redzone:       fa
+  Heap right redzone:      fb
+  Freed heap region:       fd
+  Stack left redzone:      f1
+  Stack mid redzone:       f2
+  Stack right redzone:     f3
+  Stack partial redzone:   f4
+  Stack after return:      f5
+  Stack use after scope:   f8
+  Global redzone:          f9
+  Global init order:       f6
+  Poisoned by user:        f7
+  Container overflow:      fc
+  Array cookie:            ac
+  Intra object redzone:    bb
+  ASan internal:           fe
+==15036==ABORTING
+---
+ lib/uuid.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/lib/uuid.c b/lib/uuid.c
+index 20b67d0..ac071fa 100644
+--- a/lib/uuid.c
++++ b/lib/uuid.c
+@@ -183,14 +183,14 @@ static inline int is_uuid128(const char *string)
+ static inline int is_base_uuid128(const char *string)
+ {
+ 	uint16_t uuid;
+-	char dummy;
++	char dummy[2];
  
- 		/* Client fixed channels should override server ones */
-+		mutex_lock(&conn->chan_lock);
- 		if (__l2cap_get_chan_by_dcid(conn, pchan->scid))
- 			goto next;
+ 	if (!is_uuid128(string))
+ 		return 0;
  
-@@ -7301,6 +7302,7 @@ static void l2cap_connect_cfm(struct hci_conn *hcon, u8 status)
+ 	return sscanf(string,
+ 		"0000%04hx-0000-1000-8000-00805%1[fF]9%1[bB]34%1[fF]%1[bB]",
+-		&uuid, &dummy, &dummy, &dummy, &dummy) == 5;
++		&uuid, dummy, dummy, dummy, dummy) == 5;
+ }
  
- 		l2cap_chan_unlock(pchan);
- next:
-+		mutex_unlock(&conn->chan_lock);
- 		next = l2cap_global_fixed_chan(pchan, hcon);
- 		l2cap_chan_put(pchan);
- 		pchan = next;
+ static inline int is_uuid32(const char *string)
 -- 
-2.1.4
+2.7.2
+
