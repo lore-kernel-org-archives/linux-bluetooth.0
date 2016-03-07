@@ -1,29 +1,34 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Message-ID: <56DDD109.5040701@prudentl.com>
+Date: Mon, 07 Mar 2016 14:05:45 -0500
+From: Ron Harding <ron@prudentl.com>
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZKGwKEztXu1nV9cPNSNek66cAuMju=+Eaksu6YgFLt3gA@mail.gmail.com>
-References: <CAAo+LNOnDtHYjfLAQXj3Tgqiibd+oyKJP9109TfoGaDuAbmgag@mail.gmail.com>
-	<CABBYNZLqxCSN6cViGY07e44C40i4Puvi7PqJtqhM6kDXWj_qaw@mail.gmail.com>
-	<CAAo+LNPfXuE9+E2V3q5+m154GXTKuC6sbMVcuNWOB6K97vkytg@mail.gmail.com>
-	<CAAo+LNMHzRLY0v_bZHYRqwSNiED74dmoovbisBOapuM=vB+WSg@mail.gmail.com>
-	<CABBYNZKGwKEztXu1nV9cPNSNek66cAuMju=+Eaksu6YgFLt3gA@mail.gmail.com>
-Date: Mon, 7 Mar 2016 22:06:40 +0300
-Message-ID: <CAAo+LNPUiKFLXKGrCMF8XghTonOMvJAomzy9jLGdJEkmzjWagA@mail.gmail.com>
-Subject: Re: BTLE pairing sequence problem
-From: Andrew - <hidefromkgb@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: Bluez LE: Unable to get readings from LE devices
+In-Reply-To: CABBYNZJ=smBb3mjvidmx+0FNqx6OLHpt-jzOcCKuO91hxdg-VQ@mail.gmail.com
+Content-Type: text/plain; charset=utf-8; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-> I think your problem start way before then
+> 'No bonding' is used when the device is performing a
+> Secure Simple Pairing procedure, but does not intend to retain the link key
+> after the physical link is disconnected.
+>
+> I would keep the policy of not redoing the pairing automatically in
+> case of missing link key error but perhaps the agent shall be called
+> in such case and then depending on the response start a new pairing,
+> so we keep this policy in the agent. Nevertheless it is still a good
+> idea to set the "No bonding' value in case you want to avoid this
+> extra steps while reconnecting.
 
-Fair enough. There was an udev rule that enabled my bluetooth module
-manually, circumventing the standard procedure (suggested on Arch Wiki
-several years ago, obsolete by now).
-So now the rule`s gone so pairing and encryption complete
-successfully. First victory!
+Your explanation of how the "PIN or Key Missing" status could arise matches what I thought might be happening.
 
-However, there`s still no input from the keyboard. Even after the
-connection was estabilished properly, Wireshark is silent when I press
-keys on the keyboard.
+But I'm having trouble figuring out how to implement your suggested fix.  I know "No Bonding" is one of the values
+that can be specified in the AuthReq field of a pairing request.  But I don't see how I, as a user of BlueZ, can
+tell it to do so.  There doesn't seem to be anything in either org.bluez.Device1 or org.bluez.Agent1 for it.
+
+I think maybe you're suggesting that the LE device it should be specifying "No Bonding".  If it's not going to
+store the Link Key, then indeed it probably should.  But unfortunately we can't change that: we don't make the device.
+
+- Ron
+
