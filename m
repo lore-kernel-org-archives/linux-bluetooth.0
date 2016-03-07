@@ -1,43 +1,29 @@
-Return-Path: <linux-wpan-owner@vger.kernel.org>
-From: Alexander Aring <aar@pengutronix.de>
-To: linux-wpan@vger.kernel.org
-Cc: linux-bluetooth@vger.kernel.org, kernel@pengutronix.de,
-	Alexander Aring <aar@pengutronix.de>
-Subject: [PATCH bluetooth-next] 6lowpan: iphc: fix SAM/DAM bit comment
-Date: Mon,  7 Mar 2016 20:07:31 +0100
-Message-Id: <1457377651-13274-1-git-send-email-aar@pengutronix.de>
-Sender: linux-wpan-owner@vger.kernel.org
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+MIME-Version: 1.0
+In-Reply-To: <CABBYNZKGwKEztXu1nV9cPNSNek66cAuMju=+Eaksu6YgFLt3gA@mail.gmail.com>
+References: <CAAo+LNOnDtHYjfLAQXj3Tgqiibd+oyKJP9109TfoGaDuAbmgag@mail.gmail.com>
+	<CABBYNZLqxCSN6cViGY07e44C40i4Puvi7PqJtqhM6kDXWj_qaw@mail.gmail.com>
+	<CAAo+LNPfXuE9+E2V3q5+m154GXTKuC6sbMVcuNWOB6K97vkytg@mail.gmail.com>
+	<CAAo+LNMHzRLY0v_bZHYRqwSNiED74dmoovbisBOapuM=vB+WSg@mail.gmail.com>
+	<CABBYNZKGwKEztXu1nV9cPNSNek66cAuMju=+Eaksu6YgFLt3gA@mail.gmail.com>
+Date: Mon, 7 Mar 2016 22:06:40 +0300
+Message-ID: <CAAo+LNPUiKFLXKGrCMF8XghTonOMvJAomzy9jLGdJEkmzjWagA@mail.gmail.com>
+Subject: Re: BTLE pairing sequence problem
+From: Andrew - <hidefromkgb@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch fixes the comments for SAM/DAM value.
+> I think your problem start way before then
 
-Signed-off-by: Alexander Aring <aar@pengutronix.de>
----
- net/6lowpan/iphc.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Fair enough. There was an udev rule that enabled my bluetooth module
+manually, circumventing the standard procedure (suggested on Arch Wiki
+several years ago, obsolete by now).
+So now the rule`s gone so pairing and encryption complete
+successfully. First victory!
 
-diff --git a/net/6lowpan/iphc.c b/net/6lowpan/iphc.c
-index 7217251..99bb22a 100644
---- a/net/6lowpan/iphc.c
-+++ b/net/6lowpan/iphc.c
-@@ -788,7 +788,7 @@ static u8 lowpan_compress_ctx_addr(u8 **hc_ptr, const struct in6_addr *ipaddr,
- 	}
- 
- 	memset(&tmp, 0, sizeof(tmp));
--	/* check for SAM/DAM = 01 */
-+	/* check for SAM/DAM = 10 */
- 	tmp.s6_addr[11] = 0xFF;
- 	tmp.s6_addr[12] = 0xFE;
- 	memcpy(&tmp.s6_addr[14], &ipaddr->s6_addr[14], 2);
-@@ -801,7 +801,7 @@ static u8 lowpan_compress_ctx_addr(u8 **hc_ptr, const struct in6_addr *ipaddr,
- 	}
- 
- 	memset(&tmp, 0, sizeof(tmp));
--	/* check for SAM/DAM = 10, should always match */
-+	/* check for SAM/DAM = 01, should always match */
- 	memcpy(&tmp.s6_addr[8], &ipaddr->s6_addr[8], 8);
- 	/* context information are always used */
- 	ipv6_addr_prefix_copy(&tmp, &ctx->pfx, ctx->plen);
--- 
-2.7.2
-
+However, there`s still no input from the keyboard. Even after the
+connection was estabilished properly, Wireshark is silent when I press
+keys on the keyboard.
