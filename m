@@ -1,44 +1,51 @@
-Return-Path: <wnhuang@chromium.org>
-From: Wei-Ning Huang <wnhuang@chromium.org>
-To: Linux Bluetooth <linux-bluetooth@vger.kernel.org>
-Cc: LKML <linux-kernel@vger.kernel.org>,
-	snanda@chromium.org,
-	djkurtz@chromium.org,
-	akarwar@marvell.com,
-	Wei-Ning Huang <wnhuang@chromium.org>,
-	Wei-Ning Huang <wnhuang@google.com>,
-	marcel@holtmann.org,
-	gustavo@padovan.org,
-	johan.hedberg@gmail.com
-Subject: [PATCH] Bluetooth: btmrvl_sdio: fix firmware activation failure
-Date: Tue,  8 Mar 2016 11:40:06 +0800
-Message-Id: <1457408407-39841-1-git-send-email-wnhuang@google.com>
+Return-Path: <xerofoify@gmail.com>
+From: Nicholas Krause <xerofoify@gmail.com>
+To: marcel@holtmann.org
+Cc: gustavo@padovan.org,
+	johan.hedberg@gmail.com,
+	davem@davemloft.net,
+	linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH v3 RESEND] bluetooth:Fix locking issues in the function l2cap_connect_cfm
+Date: Mon,  7 Mar 2016 17:59:54 -0500
+Message-Id: <1457391594-23534-1-git-send-email-xerofoify@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Wei-Ning Huang <wnhuang@chromium.org>
-
-In some case, the btmrvl_sdio firmware would fail to active within the
-polling time. Increase the polling interval to 100 msec to fix the
-issue.
-
-Signed-off-by: Wei-Ning Huang <wnhuang@chromium.org>
-Signed-off-by: Wei-Ning Huang <wnhuang@google.com>
+This fixes a locking issue in the function l2cap_connect_cfm for
+not locking the mutex lock for channels on the l2cap_conn structure
+pointer conn before calling __l2cap_get_chan_by_dcid as all callers
+need to lock and unlock this mutex before calling this function due
+to issues with either concurrent users or race conditions arising
+if this mutex is not locked before these calls.
+v3 Fix double locking of mutex lock on goto next label to instead correctly
+unlock the channel mutex
+v2 Remove unneeded mutex_unlock for channels as the unlock was due early
+for adding correct protection for all functions that have requirements
+for this mutex lock needing to be locked before calling them.
+Signed-off-by: Nicholas Krause <xerofoify@gmail.com>
 ---
- drivers/bluetooth/btmrvl_sdio.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ net/bluetooth/l2cap_core.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/drivers/bluetooth/btmrvl_sdio.c b/drivers/bluetooth/btmrvl_sdio.c
-index 6ed8acf..c6ef248 100644
---- a/drivers/bluetooth/btmrvl_sdio.c
-+++ b/drivers/bluetooth/btmrvl_sdio.c
-@@ -371,7 +371,7 @@ static int btmrvl_sdio_verify_fw_download(struct btmrvl_sdio_card *card,
- 		if (firmwarestat == FIRMWARE_READY)
- 			return 0;
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 45fffa4..20d3909 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -7285,6 +7285,7 @@ static void l2cap_connect_cfm(struct hci_conn *hcon, u8 status)
+ 		struct l2cap_chan *chan, *next;
  
--		msleep(10);
-+		msleep(100);
- 	}
+ 		/* Client fixed channels should override server ones */
++		mutex_lock(&conn->chan_lock);
+ 		if (__l2cap_get_chan_by_dcid(conn, pchan->scid))
+ 			goto next;
  
- 	return -ETIMEDOUT;
+@@ -7301,6 +7302,7 @@ static void l2cap_connect_cfm(struct hci_conn *hcon, u8 status)
+ 
+ 		l2cap_chan_unlock(pchan);
+ next:
++		mutex_unlock(&conn->chan_lock);
+ 		next = l2cap_global_fixed_chan(pchan, hcon);
+ 		l2cap_chan_put(pchan);
+ 		pchan = next;
 -- 
-2.7.0.rc3.207.g0ac5344
+2.1.4
