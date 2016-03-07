@@ -1,209 +1,61 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <1457110211-2702-1-git-send-email-olivier@labapart.com>
-References: <1457110211-2702-1-git-send-email-olivier@labapart.com>
-Date: Mon, 7 Mar 2016 17:10:14 +0200
-Message-ID: <CABBYNZ+rBAhNKDtjVS6GCehK-7ok+xAu6QxQFUsMhOPC29aCPQ@mail.gmail.com>
-Subject: Re: [PATCH v2] gatt-database: Fix GATT object ordering
+In-Reply-To: <CAAo+LNMHzRLY0v_bZHYRqwSNiED74dmoovbisBOapuM=vB+WSg@mail.gmail.com>
+References: <CAAo+LNOnDtHYjfLAQXj3Tgqiibd+oyKJP9109TfoGaDuAbmgag@mail.gmail.com>
+	<CABBYNZLqxCSN6cViGY07e44C40i4Puvi7PqJtqhM6kDXWj_qaw@mail.gmail.com>
+	<CAAo+LNPfXuE9+E2V3q5+m154GXTKuC6sbMVcuNWOB6K97vkytg@mail.gmail.com>
+	<CAAo+LNMHzRLY0v_bZHYRqwSNiED74dmoovbisBOapuM=vB+WSg@mail.gmail.com>
+Date: Mon, 7 Mar 2016 17:07:00 +0200
+Message-ID: <CABBYNZKGwKEztXu1nV9cPNSNek66cAuMju=+Eaksu6YgFLt3gA@mail.gmail.com>
+Subject: Re: BTLE pairing sequence problem
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Olivier Martin <olivier@labapart.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Olivier Martin <olivier.martin.fr@gmail.com>
+To: Andrew - <hidefromkgb@gmail.com>
+Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Olivier,
+Hi Andrew,
 
-On Fri, Mar 4, 2016 at 6:50 PM, Olivier Martin <olivier@labapart.com> wrote:
-> There is no guarantee the objects returned by GetManagedObjects
-> are ordered in the required order which is Service, Characteristic
-> Descriptor due to their respective dependencies.
+On Mon, Mar 7, 2016 at 4:27 PM, Andrew - <hidefromkgb@gmail.com> wrote:
+>> I don't remember having any problems pairing the Designer Keyboard, how did you actually connected to it?
+> $ bluetoothctl
+> [NEW] Controller 00:08:CA:E7:CD:35 UX31E [default]
+> [NEW] Device E8:12:16:14:E0:20 Designer Mouse
+> [NEW] Device C1:C3:5B:2E:97:B9 Designer Keyboard
+> [bluetooth]# agent DisplayYesNo
+> Agent registered
+> [bluetooth]# default-agent
+> Default agent request successful
+> [bluetooth]# pair C1:C3:5B:2E:97:B9
+> Attempting to pair with C1:C3:5B:2E:97:B9
+> [CHG] Device C1:C3:5B:2E:97:B9 Connected: yes
+> [Designer Keyboard]# connect C1:C3:5B:2E:97:B9
+> Attempting to connect to C1:C3:5B:2E:97:B9
+> Connection successful
+> [bluetooth]#
 >
-> This change ensures the objects are processed in the correct order.
-> ---
->  src/gatt-database.c | 105 +++++++++++++++++++++++++++++++++++++---------------
->  1 file changed, 75 insertions(+), 30 deletions(-)
+> And that`s pretty much the end. The «Ready to connect» LED still
+> flashes and no input can be retrieved from the keyboard.
 >
-> diff --git a/src/gatt-database.c b/src/gatt-database.c
-> index d906e2b..93e4ddb 100644
-> --- a/src/gatt-database.c
-> +++ b/src/gatt-database.c
-> @@ -89,6 +89,7 @@ struct gatt_app {
->         GDBusClient *client;
->         bool failed;
->         struct queue *services;
-> +       struct queue *proxies;
->  };
->
->  struct external_service {
-> @@ -365,6 +366,7 @@ static void app_free(void *data)
->         struct gatt_app *app = data;
->
->         queue_destroy(app->services, service_free);
-> +       queue_destroy(app->proxies, NULL);
->
->         if (app->client) {
->                 g_dbus_client_set_disconnect_watch(app->client, NULL, NULL);
-> @@ -1428,39 +1430,12 @@ static void proxy_added_cb(GDBusProxy *proxy, void *user_data)
->         if (app->failed)
->                 return;
->
-> +       queue_push_tail(app->proxies, proxy);
-> +
->         iface = g_dbus_proxy_get_interface(proxy);
->         path = g_dbus_proxy_get_path(proxy);
->
-> -       if (g_strcmp0(iface, GATT_SERVICE_IFACE) == 0) {
-> -               struct external_service *service;
-> -
-> -               service = create_service(app, proxy, path);
-> -               if (!service) {
-> -                       app->failed = true;
-> -                       return;
-> -               }
-> -       } else if (g_strcmp0(iface, GATT_CHRC_IFACE) == 0) {
-> -               struct external_chrc *chrc;
-> -
-> -               chrc = chrc_create(app, proxy, path);
-> -               if (!chrc) {
-> -                       app->failed = true;
-> -                       return;
-> -               }
-> -       } else if (g_strcmp0(iface, GATT_DESC_IFACE) == 0) {
-> -               struct external_desc *desc;
-> -
-> -               desc = desc_create(app, proxy);
-> -               if (!desc) {
-> -                       app->failed = true;
-> -                       return;
-> -               }
-> -       } else {
-> -               DBG("Ignoring unrelated interface: %s", iface);
-> -               return;
-> -       }
-> -
-> -       DBG("Object added: path: %s, iface: %s", path, iface);
-> +       DBG("Object received: %s, iface: %s", path, iface);
->  }
->
->  static void proxy_removed_cb(GDBusProxy *proxy, void *user_data)
-> @@ -2139,12 +2114,81 @@ static bool database_add_app(struct gatt_app *app)
->         return true;
->  }
->
-> +void register_service(void *data, void *user_data)
-> +{
-> +       struct gatt_app *app = user_data;
-> +       GDBusProxy *proxy = data;
-> +       const char *iface = g_dbus_proxy_get_interface(proxy);
-> +       const char *path = g_dbus_proxy_get_path(proxy);
-> +
-> +       if (g_strcmp0(iface, GATT_SERVICE_IFACE) == 0) {
-> +               struct external_service *service;
-> +
-> +               service = create_service(app, proxy, path);
-> +               if (!service) {
-> +                       app->failed = true;
-> +                       return;
-> +               }
-> +       }
-> +}
-> +
-> +void register_characteristic(void *data, void *user_data)
-> +{
-> +       struct gatt_app *app = user_data;
-> +       GDBusProxy *proxy = data;
-> +       const char *iface = g_dbus_proxy_get_interface(proxy);
-> +       const char *path = g_dbus_proxy_get_path(proxy);
-> +
-> +       if (g_strcmp0(iface, GATT_CHRC_IFACE) == 0) {
-> +               struct external_chrc *chrc;
-> +
-> +               chrc = chrc_create(app, proxy, path);
-> +               if (!chrc) {
-> +                       app->failed = true;
-> +                       return;
-> +               }
-> +       }
-> +}
-> +
-> +void register_descriptor(void *data, void *user_data)
-> +{
-> +       struct gatt_app *app = user_data;
-> +       GDBusProxy *proxy = data;
-> +       const char *iface = g_dbus_proxy_get_interface(proxy);
-> +       const char *path = g_dbus_proxy_get_path(proxy);
-> +
-> +       if (g_strcmp0(iface, GATT_DESC_IFACE) == 0) {
-> +               struct external_desc *desc;
-> +
-> +               desc = desc_create(app, proxy);
-> +               if (!desc) {
-> +                       app->failed = true;
-> +                       return;
-> +               }
-> +       }
-> +}
-> +
->  static void client_ready_cb(GDBusClient *client, void *user_data)
->  {
->         struct gatt_app *app = user_data;
->         DBusMessage *reply;
->         bool fail = false;
->
-> +       /*
-> +        * Process received objects
-> +        */
-> +       if (queue_isempty(app->proxies)) {
-> +               error("No object received");
-> +               fail = true;
-> +               reply = btd_error_failed(app->reg,
-> +                                       "No object received");
-> +               goto reply;
-> +       }
-> +
-> +       queue_foreach(app->proxies, register_service, app);
-> +       queue_foreach(app->proxies, register_characteristic, app);
-> +       queue_foreach(app->proxies, register_descriptor, app);
-> +
->         if (!app->services || app->failed) {
->                 error("No valid external GATT objects found");
->                 fail = true;
-> @@ -2198,6 +2242,7 @@ static struct gatt_app *create_app(DBusConnection *conn, DBusMessage *msg,
->                 goto fail;
->
->         app->services = queue_new();
-> +       app->proxies = queue_new();
->         app->reg = dbus_message_ref(msg);
->
->         g_dbus_client_set_disconnect_watch(app->client, client_disconnect_cb,
-> --
-> 2.1.4
+> dmesg shows its usual line:
+> [180261.398350] Bluetooth: SMP security requested but not available
 
-Applied, thanks.
+I think your problem start way before then, checking the logs this is
+where that check got introduced:
 
-I had to fix a couple of things:
+Bluetooth: Fix NULL pointer dereference in smp_conn_security
+The l2cap_conn->smp pointer may be NULL for various valid reasons where SMP has
+failed to initialize properly. One such scenario is when crypto support is
+missing, another when the adapter has been powered on through a legacy method.
+The smp_conn_security() function should have the appropriate check for this
+situation to avoid NULL pointer dereferences.
 
-src/gatt-database.c:2117:6: error: no previous declaration for
-‘register_service’ [-Werror=missing-declarations]
- void register_service(void *data, void *user_data)
-      ^
-src/gatt-database.c:2135:6: error: no previous declaration for
-‘register_characteristic’ [-Werror=missing-declarations]
- void register_characteristic(void *data, void *user_data)
-      ^
-src/gatt-database.c:2153:6: error: no previous declaration for
-‘register_descriptor’ [-Werror=missing-declarations]
- void register_descriptor(void *data, void *user_data)
-      ^
-src/gatt-database.c: In function ‘register_descriptor’:
-src/gatt-database.c:2158:14: error: unused variable ‘path’
-[-Werror=unused-variable]
-  const char *path = g_dbus_proxy_get_path(proxy);
-              ^
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+Cc: stable@vger.kernel.org # 4.0+
 
-Please next time make sure such errors are fixed before submitting a patch.
+Perhaps you are missing the crypto support?
 
 -- 
 Luiz Augusto von Dentz
