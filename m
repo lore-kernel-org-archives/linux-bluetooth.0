@@ -1,37 +1,44 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <B1E75638-E1BA-4E30-88CE-9E6FBC6BCE1F@numberfour.eu>
-References: <B1E75638-E1BA-4E30-88CE-9E6FBC6BCE1F@numberfour.eu>
-Date: Tue, 8 Mar 2016 10:34:10 +0200
-Message-ID: <CABBYNZL9FK-nMVCm0jvr=BPcgsCfMGhimJPyOq5pyXG08sV+HA@mail.gmail.com>
-Subject: Re: BlueZ 5.37 experimental D-Bus GattCharacteristic1.WriteValue
- results in BT_ATT_ERROR_UNLIKELY
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Sven Harmstorf <sven.harmstorf@numberfour.eu>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <wnhuang@chromium.org>
+From: Wei-Ning Huang <wnhuang@chromium.org>
+To: Linux Bluetooth <linux-bluetooth@vger.kernel.org>
+Cc: LKML <linux-kernel@vger.kernel.org>,
+	snanda@chromium.org,
+	djkurtz@chromium.org,
+	akarwar@marvell.com,
+	Wei-Ning Huang <wnhuang@chromium.org>,
+	Wei-Ning Huang <wnhuang@google.com>,
+	marcel@holtmann.org,
+	gustavo@padovan.org,
+	johan.hedberg@gmail.com
+Subject: [PATCH] Bluetooth: btmrvl_sdio: fix firmware activation failure
+Date: Tue,  8 Mar 2016 11:40:06 +0800
+Message-Id: <1457408407-39841-1-git-send-email-wnhuang@google.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Sven,
+From: Wei-Ning Huang <wnhuang@chromium.org>
 
-On Mon, Mar 7, 2016 at 7:50 PM, Sven Harmstorf
-<sven.harmstorf@numberfour.eu> wrote:
-> Hello,
->
-> I am running BlueZ 5.37 on Linux kernel 4.1.6 with an Atheros AR3012 adapter configured to advertise a service using the experimental D-Bus GATT API on a Freescale i.MX6 Quad (ARMv7l).
->
-> The advertising is working fine (verified this via Nordic’s Android App 'nRF Master Control Panel‘).
-> Connecting and discovering services/characteristics is also working without any issues.
->
-> One of the characteristics has the property "flags" set to ["write-without-response“, "notify“].
-> Centrals should write their data quickly without the need to wait for a response (accepting the potential data loss) and get value changes only via notification. Explicit read is not supported.
->
-> When a central sends multiple writes of 1-20 bytes in a row, only the first write succeeds. Any following writes fail in src/shared/gatt-server.c:786. As a result of this, only a few writes happen to be sent as a signal on the D-Bus.
+In some case, the btmrvl_sdio firmware would fail to active within the
+polling time. Increase the polling interval to 100 msec to fix the
+issue.
 
-Actually there is a simple fix for this which is to use no reply
-messages, it perhaps was the intention given the lack of queuing of
-bt_gatt_server, for regular write this should never happen.
+Signed-off-by: Wei-Ning Huang <wnhuang@chromium.org>
+Signed-off-by: Wei-Ning Huang <wnhuang@google.com>
+---
+ drivers/bluetooth/btmrvl_sdio.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
+diff --git a/drivers/bluetooth/btmrvl_sdio.c b/drivers/bluetooth/btmrvl_sdio.c
+index 6ed8acf..c6ef248 100644
+--- a/drivers/bluetooth/btmrvl_sdio.c
++++ b/drivers/bluetooth/btmrvl_sdio.c
+@@ -371,7 +371,7 @@ static int btmrvl_sdio_verify_fw_download(struct btmrvl_sdio_card *card,
+ 		if (firmwarestat == FIRMWARE_READY)
+ 			return 0;
+ 
+-		msleep(10);
++		msleep(100);
+ 	}
+ 
+ 	return -ETIMEDOUT;
 -- 
-Luiz Augusto von Dentz
+2.7.0.rc3.207.g0ac5344
