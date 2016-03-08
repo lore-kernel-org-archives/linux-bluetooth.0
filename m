@@ -1,60 +1,38 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <56DDD109.5040701@prudentl.com>
-References: <56DDD109.5040701@prudentl.com>
-Date: Tue, 8 Mar 2016 14:58:43 +0200
-Message-ID: <CABBYNZ+fRtaXrnpw9G87So5ar_W8zWac9SJpebTcsRPuddp2zw@mail.gmail.com>
-Subject: Re: Bluez LE: Unable to get readings from LE devices
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Ron Harding <ron@prudentl.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: =?utf-8?Q?T=C3=B5nis_Tiganik?= <ttiganik@high-mobility.com>
+Content-Type: text/plain; charset=utf-8
+Subject: ConnectProfile for faster service discovery.
+Message-Id: <9D4EB9A8-6F3A-47EE-842C-1049DEC1A5B2@high-mobility.com>
+Date: Tue, 8 Mar 2016 13:15:04 +0200
+To: linux-bluetooth@vger.kernel.org
+Mime-Version: 1.0 (Mac OS X Mail 9.2 \(3112\))
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ron,
+Hello, we have implemented our application using BlueZ and DBUS.
 
-On Mon, Mar 7, 2016 at 9:05 PM, Ron Harding <ron@prudentl.com> wrote:
->> 'No bonding' is used when the device is performing a
->> Secure Simple Pairing procedure, but does not intend to retain the link
->> key
->> after the physical link is disconnected.
->>
->> I would keep the policy of not redoing the pairing automatically in
->> case of missing link key error but perhaps the agent shall be called
->> in such case and then depending on the response start a new pairing,
->> so we keep this policy in the agent. Nevertheless it is still a good
->> idea to set the "No bonding' value in case you want to avoid this
->> extra steps while reconnecting.
->
->
-> Your explanation of how the "PIN or Key Missing" status could arise matches
-> what I thought might be happening.
->
-> But I'm having trouble figuring out how to implement your suggested fix.  I
-> know "No Bonding" is one of the values
-> that can be specified in the AuthReq field of a pairing request.  But I
-> don't see how I, as a user of BlueZ, can
-> tell it to do so.  There doesn't seem to be anything in either
-> org.bluez.Device1 or org.bluez.Agent1 for it.
->
-> I think maybe you're suggesting that the LE device it should be specifying
-> "No Bonding".  If it's not going to
-> store the Link Key, then indeed it probably should.  But unfortunately we
-> can't change that: we don't make the device.
+All is working rather well but the service/characteristics discovery is slow after Connecting to the device. Our guess is that this is because all of the services are discovered automatically in the connection process and for instance iPhone has a lot of services extra that we are not interested in. For other platforms(iOS, BlueSDK), optional service discovery is supported and it seems to work faster.
 
-In that case we would have to expose the 'No Bonding' setting somehow,
-we do have that already as bondable flag which you can set via MGMT
-command, but perhaps you only want to set when pairing with a certain
-device to force it not store the link keys which would probably
-involving changing APIs. Then again the ideal solution would be for
-the LE peripheral to actually tell its capabilities properly.
+After looking into some threads and the device-api.txt it seems ConnectProfile() should be the method to use. However, when connecting to our UUID with the following:
 
-In the other hand perhaps we should focus on "PIN or Key Missing"
-which is something that can happen when one of the sides remove the
-link key locally which is much more common, perhaps starting a new
-pairing and having the user agent to accept/reject the new pairing
-would be a better fix for this problem.
+GVariant *UUIDString = g_variant_new("s", "713d0100-503e-4c75-ba94-3148f18d941e");
+reply = g_dbus_proxy_call_sync(device_proxy, "ConnectProfile", g_variant_new_tuple(&UUIDString, 1),
+                                           G_DBUS_CALL_FLAGS_NONE, -1, NULL, &error);
 
--- 
-Luiz Augusto von Dentz
+the call repeatedly fails with:
+
+GDBus.Error:org.bluez.Error.Failed: Host is down
+
+We know the UUID exists because it is in the Device property UUIDs if we use the normal Connect method that discovers all the services automatically.
+
+Is it possible to connect and only discover the services that our application is interested in? 
+Could it be faster than the normal Connect() method?
+
+
+Im also wondering if there is a signal or some other mechanism to detect when a disconnected but advertising peripheral leaves the central's proximity?
+
+
+Thanks, 
+Tõnis
+
+
