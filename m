@@ -1,78 +1,67 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 2/2] core/gatt-database: Don't always wait for response
-Date: Tue,  8 Mar 2016 15:18:51 +0200
-Message-Id: <1457443131-17895-2-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1457443131-17895-1-git-send-email-luiz.dentz@gmail.com>
-References: <1457443131-17895-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 1/2] gdbus/client: Use g_dbus_send_message if callback is not set
+Date: Tue,  8 Mar 2016 15:18:50 +0200
+Message-Id: <1457443131-17895-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-If the characterist has set BT_GATT_CHRC_PROP_WRITE_WITHOUT_RESP it means
-it won't reply to WriteValue and even if it does other Write Commands
-can be outstanding which would be blocked waiting the reply of the
-previous message.
+If the user don't set a function it means it doesn't care about the reply
+so g_dbus_send_message can be used.
 ---
- src/gatt-database.c | 36 ++++++++++++++++++++++++++++++++++++
- 1 file changed, 36 insertions(+)
+ gdbus/client.c | 26 ++++++++++++++------------
+ 1 file changed, 14 insertions(+), 12 deletions(-)
 
-diff --git a/src/gatt-database.c b/src/gatt-database.c
-index 5244a9d..b8da955 100644
---- a/src/gatt-database.c
-+++ b/src/gatt-database.c
-@@ -1965,6 +1965,36 @@ static void chrc_read_cb(struct gatt_db_attribute *attrib,
- 	send_read(attrib, chrc->proxy, chrc->pending_reads, id);
- }
+diff --git a/gdbus/client.c b/gdbus/client.c
+index 068e778..a011e19 100644
+--- a/gdbus/client.c
++++ b/gdbus/client.c
+@@ -853,28 +853,30 @@ gboolean g_dbus_proxy_method_call(GDBusProxy *proxy, const char *method,
+ 	if (client == NULL)
+ 		return FALSE;
  
-+static void write_without_response_setup_cb(DBusMessageIter *iter,
-+							void *user_data)
-+{
-+	struct iovec *iov = user_data;
-+	DBusMessageIter array;
-+
-+	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY, "y", &array);
-+	dbus_message_iter_append_fixed_array(&array, DBUS_TYPE_BYTE,
-+						&iov->iov_base, iov->iov_len);
-+	dbus_message_iter_close_container(iter, &array);
-+}
-+
-+static void send_write_without_response(struct gatt_db_attribute *attrib,
-+					GDBusProxy *proxy, unsigned int id,
-+					const uint8_t *value, size_t len)
-+{
-+	struct iovec iov;
-+	uint8_t ecode = 0;
-+
-+	iov.iov_base = (uint8_t *) value;
-+	iov.iov_len = len;
-+
-+	if (!g_dbus_proxy_method_call(proxy, "WriteValue",
-+					write_without_response_setup_cb,
-+					NULL, &iov, NULL))
-+		ecode = BT_ATT_ERROR_UNLIKELY;
-+
-+	gatt_db_attribute_write_result(attrib, id, ecode);
-+}
-+
- static void chrc_write_cb(struct gatt_db_attribute *attrib,
- 					unsigned int id, uint16_t offset,
- 					const uint8_t *value, size_t len,
-@@ -1978,6 +2008,12 @@ static void chrc_write_cb(struct gatt_db_attribute *attrib,
- 		return;
+-	data = g_try_new0(struct method_call_data, 1);
+-	if (data == NULL)
+-		return FALSE;
+-
+-	data->function = function;
+-	data->user_data = user_data;
+-	data->destroy = destroy;
+-
+ 	msg = dbus_message_new_method_call(client->service_name,
+ 				proxy->obj_path, proxy->interface, method);
+-	if (msg == NULL) {
+-		g_free(data);
++	if (msg == NULL)
+ 		return FALSE;
+-	}
+ 
+ 	if (setup) {
+ 		DBusMessageIter iter;
+ 
+ 		dbus_message_iter_init_append(msg, &iter);
+-		setup(&iter, data->user_data);
++		setup(&iter, user_data);
  	}
  
-+	if (chrc->props & BT_GATT_CHRC_PROP_WRITE_WITHOUT_RESP) {
-+		send_write_without_response(attrib, chrc->proxy, id, value,
-+									len);
-+		return;
-+	}
++	if (!function)
++		return g_dbus_send_message(client->dbus_conn, msg);
 +
- 	send_write(attrib, chrc->proxy, chrc->pending_writes, id, value, len);
- }
- 
++	data = g_try_new0(struct method_call_data, 1);
++	if (data == NULL)
++		return FALSE;
++
++	data->function = function;
++	data->user_data = user_data;
++	data->destroy = destroy;
++
++
+ 	if (g_dbus_send_message_with_reply(client->dbus_conn, msg,
+ 					&call, METHOD_CALL_TIMEOUT) == FALSE) {
+ 		dbus_message_unref(msg);
 -- 
 2.5.0
 
