@@ -1,56 +1,122 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <9D4EB9A8-6F3A-47EE-842C-1049DEC1A5B2@high-mobility.com>
-References: <9D4EB9A8-6F3A-47EE-842C-1049DEC1A5B2@high-mobility.com>
-Date: Tue, 8 Mar 2016 16:38:29 +0200
-Message-ID: <CABBYNZLxPy4kUwhNX94q3s1bLsEPMd+TN-QigMs8cozk8yWAuw@mail.gmail.com>
-Subject: Re: ConnectProfile for faster service discovery.
+In-Reply-To: <1457384483-19894-1-git-send-email-dev@codyps.com>
+References: <1457384483-19894-1-git-send-email-dev@codyps.com>
+Date: Tue, 8 Mar 2016 16:20:45 +0200
+Message-ID: <CABBYNZK9AerksXPwTu7EXpL_BUbQ64JHiHMTdDWLk6cHvRQDSA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] uuid: fix 1 byte stack overflow
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: =?UTF-8?Q?T=C3=B5nis_Tiganik?= <ttiganik@high-mobility.com>
+To: Cody P Schafer <dev@codyps.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Tõnis,
+Hi Cody,
 
-On Tue, Mar 8, 2016 at 1:15 PM, Tõnis Tiganik
-<ttiganik@high-mobility.com> wrote:
-> Hello, we have implemented our application using BlueZ and DBUS.
+On Mon, Mar 7, 2016 at 11:01 PM, Cody P Schafer <dev@codyps.com> wrote:
+> scanf requires that '[' convertion specifiers have enough room for all
+> characters in the string, _plus a terminating null byte_. We were
+> previously not providing room for the terminating null byte.
 >
-> All is working rather well but the service/characteristics discovery is slow after Connecting to the device. Our guess is that this is because all of the services are discovered automatically in the connection process and for instance iPhone has a lot of services extra that we are not interested in. For other platforms(iOS, BlueSDK), optional service discovery is supported and it seems to work faster.
+> This was detected by AddressSanitizer:
 >
-> After looking into some threads and the device-api.txt it seems ConnectProfile() should be the method to use. However, when connecting to our UUID with the following:
+> ==15036==ERROR: AddressSanitizer: stack-buffer-overflow on address 0x7ffe4e774401 at pc 0x7fd33f572c98 bp 0x7ffe4e774270 sp 0x7ffe4e7739f8
+> WRITE of size 2 at 0x7ffe4e774401 thread T0
+>     #0 0x7fd33f572c97 in scanf_common /build/gcc-multilib/src/gcc-5-20160209/libsanitizer/sanitizer_common/sanitizer_common_interceptors_format.inc:340
+>     #1 0x7fd33f5739ea in __interceptor_vsscanf /build/gcc-multilib/src/gcc-5-20160209/libsanitizer/sanitizer_common/sanitizer_common_interceptors.inc:769
+>     #2 0x7fd33f573b49 in __interceptor_sscanf /build/gcc-multilib/src/gcc-5-20160209/libsanitizer/sanitizer_common/sanitizer_common_interceptors.inc:793
+>     #3 0x650db5 in is_base_uuid128 lib/uuid.c:191
+>     #4 0x65196e in bt_string_to_uuid lib/uuid.c:267
+>     #5 0x56f28e in parse_uuid src/gatt-database.c:1473
+>     #6 0x5729e0 in database_add_service src/gatt-database.c:2053
+>     #7 0x57329f in database_add_app src/gatt-database.c:2106
+>     #8 0x573adc in client_ready_cb src/gatt-database.c:2211
+>     #9 0x6695fd in get_managed_objects_reply gdbus/client.c:1097
+>     #10 0x7fd33efd5391  (/usr/lib/libdbus-1.so.3+0x13391)
+>     #11 0x7fd33efd8db0 in dbus_connection_dispatch (/usr/lib/libdbus-1.so.3+0x16db0)
+>     #12 0x651ecd in message_dispatch gdbus/mainloop.c:72
+>     #13 0x7fd33f25cc39 in g_main_context_dispatch (/usr/lib/libglib-2.0.so.0+0x49c39)
+>     #14 0x7fd33f25cfdf  (/usr/lib/libglib-2.0.so.0+0x49fdf)
+>     #15 0x7fd33f25d301 in g_main_loop_run (/usr/lib/libglib-2.0.so.0+0x4a301)
+>     #16 0x54b7d1 in main src/main.c:687
+>     #17 0x7fd33d90870f in __libc_start_main (/usr/lib/libc.so.6+0x2070f)
+>     #18 0x40bba8 in _start (/home/cody/g/bluez/src/bluetoothd+0x40bba8)
 >
-> GVariant *UUIDString = g_variant_new("s", "713d0100-503e-4c75-ba94-3148f18d941e");
-> reply = g_dbus_proxy_call_sync(device_proxy, "ConnectProfile", g_variant_new_tuple(&UUIDString, 1),
->                                            G_DBUS_CALL_FLAGS_NONE, -1, NULL, &error);
+> Address 0x7ffe4e774401 is located in stack of thread T0 at offset 33 in frame
+>     #0 0x650ccd in is_base_uuid128 lib/uuid.c:184
 >
-> the call repeatedly fails with:
+>   This frame has 2 object(s):
+>     [32, 33) 'dummy' <== Memory access at offset 33 overflows this variable
+>     [96, 98) 'uuid'
+> HINT: this may be a false positive if your program uses some custom stack unwind mechanism or swapcontext
+>       (longjmp and C++ exceptions *are* supported)
+> SUMMARY: AddressSanitizer: stack-buffer-overflow /build/gcc-multilib/src/gcc-5-20160209/libsanitizer/sanitizer_common/sanitizer_common_interceptors_format.inc:340 scanf_common
+> Shadow bytes around the buggy address:
+>   0x100049ce6830: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+>   0x100049ce6840: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+>   0x100049ce6850: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+>   0x100049ce6860: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+>   0x100049ce6870: 00 00 00 00 00 00 00 00 00 00 00 00 f1 f1 f1 f1
+> =>0x100049ce6880:[01]f4 f4 f4 f2 f2 f2 f2 02 f4 f4 f4 f3 f3 f3 f3
+>   0x100049ce6890: 00 00 00 00 00 00 00 00 00 00 00 00 f1 f1 f1 f1
+>   0x100049ce68a0: 00 f4 f4 f4 f2 f2 f2 f2 00 00 04 f4 f2 f2 f2 f2
+>   0x100049ce68b0: 00 00 00 00 00 00 00 00 00 f4 f4 f4 f3 f3 f3 f3
+>   0x100049ce68c0: 00 00 00 00 00 00 00 00 00 00 00 00 f1 f1 f1 f1
+>   0x100049ce68d0: 01 f4 f4 f4 f2 f2 f2 f2 00 00 04 f4 f3 f3 f3 f3
+> Shadow byte legend (one shadow byte represents 8 application bytes):
+>   Addressable:           00
+>   Partially addressable: 01 02 03 04 05 06 07
+>   Heap left redzone:       fa
+>   Heap right redzone:      fb
+>   Freed heap region:       fd
+>   Stack left redzone:      f1
+>   Stack mid redzone:       f2
+>   Stack right redzone:     f3
+>   Stack partial redzone:   f4
+>   Stack after return:      f5
+>   Stack use after scope:   f8
+>   Global redzone:          f9
+>   Global init order:       f6
+>   Poisoned by user:        f7
+>   Container overflow:      fc
+>   Array cookie:            ac
+>   Intra object redzone:    bb
+>   ASan internal:           fe
+> ==15036==ABORTING
+> ---
+>  lib/uuid.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 >
-> GDBus.Error:org.bluez.Error.Failed: Host is down
+> diff --git a/lib/uuid.c b/lib/uuid.c
+> index 20b67d0..ac071fa 100644
+> --- a/lib/uuid.c
+> +++ b/lib/uuid.c
+> @@ -183,14 +183,14 @@ static inline int is_uuid128(const char *string)
+>  static inline int is_base_uuid128(const char *string)
+>  {
+>         uint16_t uuid;
+> -       char dummy;
+> +       char dummy[2];
 >
-> We know the UUID exists because it is in the Device property UUIDs if we use the normal Connect method that discovers all the services automatically.
+>         if (!is_uuid128(string))
+>                 return 0;
 >
-> Is it possible to connect and only discover the services that our application is interested in?
-> Could it be faster than the normal Connect() method?
+>         return sscanf(string,
+>                 "0000%04hx-0000-1000-8000-00805%1[fF]9%1[bB]34%1[fF]%1[bB]",
+> -               &uuid, &dummy, &dummy, &dummy, &dummy) == 5;
+> +               &uuid, dummy, dummy, dummy, dummy) == 5;
+>  }
+>
+>  static inline int is_uuid32(const char *string)
+> --
+> 2.7.2
 
-Currently we build a cache the very first time you connect to the
-device then subsequent connects will just check if there are any
-services have changed but that is actually quite fast if nothing has
-changed, this mechanism is present for a while but perhaps you have a
-dated version that don't have this implemented yet.
-
->
-> Im also wondering if there is a signal or some other mechanism to detect when a disconnected but advertising peripheral leaves the central's proximity?
-
-Well perhaps you want a mechanism to detect if was a link-loss or just
-a regular disconnection initiated by the remote, this is not necessary
-in LE since you can program the kernel to do passive scanning for you
-and reconnect as soon it finds the peripheral is advertising.
-bluetoothd will actually attempt to set this up if your kernel support
-it (requires 3.17 or later).
-
+Interesting it seems this has been broken for a while although
+valgrind could not detect this invalid access, or perhaps we don't
+really execute this code with unit tests. Anyway we could possible add
+this tool to be run with make check but I could not find any match for
+AddressSanitizer in fedora at least.
 
 -- 
 Luiz Augusto von Dentz
