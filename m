@@ -1,67 +1,60 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+MIME-Version: 1.0
+In-Reply-To: <56DDD109.5040701@prudentl.com>
+References: <56DDD109.5040701@prudentl.com>
+Date: Tue, 8 Mar 2016 14:58:43 +0200
+Message-ID: <CABBYNZ+fRtaXrnpw9G87So5ar_W8zWac9SJpebTcsRPuddp2zw@mail.gmail.com>
+Subject: Re: Bluez LE: Unable to get readings from LE devices
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/2] gdbus/client: Use g_dbus_send_message if callback is not set
-Date: Tue,  8 Mar 2016 15:18:50 +0200
-Message-Id: <1457443131-17895-1-git-send-email-luiz.dentz@gmail.com>
+To: Ron Harding <ron@prudentl.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Ron,
 
-If the user don't set a function it means it doesn't care about the reply
-so g_dbus_send_message can be used.
----
- gdbus/client.c | 26 ++++++++++++++------------
- 1 file changed, 14 insertions(+), 12 deletions(-)
+On Mon, Mar 7, 2016 at 9:05 PM, Ron Harding <ron@prudentl.com> wrote:
+>> 'No bonding' is used when the device is performing a
+>> Secure Simple Pairing procedure, but does not intend to retain the link
+>> key
+>> after the physical link is disconnected.
+>>
+>> I would keep the policy of not redoing the pairing automatically in
+>> case of missing link key error but perhaps the agent shall be called
+>> in such case and then depending on the response start a new pairing,
+>> so we keep this policy in the agent. Nevertheless it is still a good
+>> idea to set the "No bonding' value in case you want to avoid this
+>> extra steps while reconnecting.
+>
+>
+> Your explanation of how the "PIN or Key Missing" status could arise matches
+> what I thought might be happening.
+>
+> But I'm having trouble figuring out how to implement your suggested fix.  I
+> know "No Bonding" is one of the values
+> that can be specified in the AuthReq field of a pairing request.  But I
+> don't see how I, as a user of BlueZ, can
+> tell it to do so.  There doesn't seem to be anything in either
+> org.bluez.Device1 or org.bluez.Agent1 for it.
+>
+> I think maybe you're suggesting that the LE device it should be specifying
+> "No Bonding".  If it's not going to
+> store the Link Key, then indeed it probably should.  But unfortunately we
+> can't change that: we don't make the device.
 
-diff --git a/gdbus/client.c b/gdbus/client.c
-index 068e778..a011e19 100644
---- a/gdbus/client.c
-+++ b/gdbus/client.c
-@@ -853,28 +853,30 @@ gboolean g_dbus_proxy_method_call(GDBusProxy *proxy, const char *method,
- 	if (client == NULL)
- 		return FALSE;
- 
--	data = g_try_new0(struct method_call_data, 1);
--	if (data == NULL)
--		return FALSE;
--
--	data->function = function;
--	data->user_data = user_data;
--	data->destroy = destroy;
--
- 	msg = dbus_message_new_method_call(client->service_name,
- 				proxy->obj_path, proxy->interface, method);
--	if (msg == NULL) {
--		g_free(data);
-+	if (msg == NULL)
- 		return FALSE;
--	}
- 
- 	if (setup) {
- 		DBusMessageIter iter;
- 
- 		dbus_message_iter_init_append(msg, &iter);
--		setup(&iter, data->user_data);
-+		setup(&iter, user_data);
- 	}
- 
-+	if (!function)
-+		return g_dbus_send_message(client->dbus_conn, msg);
-+
-+	data = g_try_new0(struct method_call_data, 1);
-+	if (data == NULL)
-+		return FALSE;
-+
-+	data->function = function;
-+	data->user_data = user_data;
-+	data->destroy = destroy;
-+
-+
- 	if (g_dbus_send_message_with_reply(client->dbus_conn, msg,
- 					&call, METHOD_CALL_TIMEOUT) == FALSE) {
- 		dbus_message_unref(msg);
+In that case we would have to expose the 'No Bonding' setting somehow,
+we do have that already as bondable flag which you can set via MGMT
+command, but perhaps you only want to set when pairing with a certain
+device to force it not store the link keys which would probably
+involving changing APIs. Then again the ideal solution would be for
+the LE peripheral to actually tell its capabilities properly.
+
+In the other hand perhaps we should focus on "PIN or Key Missing"
+which is something that can happen when one of the sides remove the
+link key locally which is much more common, perhaps starting a new
+pairing and having the user agent to accept/reject the new pairing
+would be a better fix for this problem.
+
 -- 
-2.5.0
-
+Luiz Augusto von Dentz
