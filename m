@@ -1,59 +1,77 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] shared/att: Fix not notifying the callback
-Date: Tue,  8 Mar 2016 16:08:05 +0200
-Message-Id: <1457446085-21426-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 2/2] core/gatt-database: Don't always wait for response
+Date: Tue,  8 Mar 2016 15:18:51 +0200
+Message-Id: <1457443131-17895-2-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1457443131-17895-1-git-send-email-luiz.dentz@gmail.com>
+References: <1457443131-17895-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This makes sure that all request callback are called with
-BT_ATT_OP_ERROR_RSP in case the link is dropped so they can propagate
-the error back to the caller.
+If the characterist has set BT_GATT_CHRC_PROP_WRITE_WITHOUT_RESP it means
+it won't reply to WriteValue and even if it does other Write Commands
+can be outstanding which would be blocked waiting the reply of the
+previous message.
 ---
- src/shared/att.c | 21 ++++++++++++++++++++-
- 1 file changed, 20 insertions(+), 1 deletion(-)
+ src/gatt-database.c | 36 ++++++++++++++++++++++++++++++++++++
+ 1 file changed, 36 insertions(+)
 
-diff --git a/src/shared/att.c b/src/shared/att.c
-index 7b20757..a29c100 100644
---- a/src/shared/att.c
-+++ b/src/shared/att.c
-@@ -535,6 +535,16 @@ static void disconn_handler(void *data, void *user_data)
- 		disconn->callback(err, disconn->user_data);
+diff --git a/src/gatt-database.c b/src/gatt-database.c
+index 5244a9d..b8da955 100644
+--- a/src/gatt-database.c
++++ b/src/gatt-database.c
+@@ -1965,6 +1965,36 @@ static void chrc_read_cb(struct gatt_db_attribute *attrib,
+ 	send_read(attrib, chrc->proxy, chrc->pending_reads, id);
  }
  
-+static void disc_att_send_op(void *data)
++static void write_without_response_setup_cb(DBusMessageIter *iter,
++							void *user_data)
 +{
-+	struct att_send_op *op = data;
++	struct iovec *iov = user_data;
++	DBusMessageIter array;
 +
-+	if (op->callback)
-+		op->callback(BT_ATT_OP_ERROR_RSP, NULL, 0, op->user_data);
-+
-+	destroy_att_send_op(op);
++	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY, "y", &array);
++	dbus_message_iter_append_fixed_array(&array, DBUS_TYPE_BYTE,
++						&iov->iov_base, iov->iov_len);
++	dbus_message_iter_close_container(iter, &array);
 +}
 +
- static bool disconnect_cb(struct io *io, void *user_data)
- {
- 	struct bt_att *att = user_data;
-@@ -557,7 +567,16 @@ static bool disconnect_cb(struct io *io, void *user_data)
- 	io_destroy(att->io);
- 	att->io = NULL;
- 
--	bt_att_cancel_all(att);
-+	/* Notify request callbacks */
-+	queue_remove_all(att->req_queue, NULL, NULL, disc_att_send_op);
-+	queue_remove_all(att->ind_queue, NULL, NULL, disc_att_send_op);
-+	queue_remove_all(att->write_queue, NULL, NULL, disc_att_send_op);
++static void send_write_without_response(struct gatt_db_attribute *attrib,
++					GDBusProxy *proxy, unsigned int id,
++					const uint8_t *value, size_t len)
++{
++	struct iovec iov;
++	uint8_t ecode = 0;
 +
-+	if (att->pending_req)
-+		disc_att_send_op(att->pending_req);
++	iov.iov_base = (uint8_t *) value;
++	iov.iov_len = len;
 +
-+	if (att->pending_ind)
-+		disc_att_send_op(att->pending_ind);
++	if (!g_dbus_proxy_method_call(proxy, "WriteValue",
++					write_without_response_setup_cb,
++					NULL, &iov, NULL))
++		ecode = BT_ATT_ERROR_UNLIKELY;
++
++	gatt_db_attribute_write_result(attrib, id, ecode);
++}
++
+ static void chrc_write_cb(struct gatt_db_attribute *attrib,
+ 					unsigned int id, uint16_t offset,
+ 					const uint8_t *value, size_t len,
+@@ -1978,6 +2008,12 @@ static void chrc_write_cb(struct gatt_db_attribute *attrib,
+ 		return;
+ 	}
  
- 	bt_att_ref(att);
++	if (chrc->props & BT_GATT_CHRC_PROP_WRITE_WITHOUT_RESP) {
++		send_write_without_response(attrib, chrc->proxy, id, value,
++									len);
++		return;
++	}
++
+ 	send_write(attrib, chrc->proxy, chrc->pending_writes, id, value, len);
+ }
  
 -- 
 2.5.0
