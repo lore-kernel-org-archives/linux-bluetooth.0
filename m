@@ -1,19 +1,30 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-From: =?UTF-8?Q?Fran=C3=A7ois_Beaufort?= <beaufort.francois@gmail.com>
-Date: Wed, 9 Mar 2016 17:42:17 +0100
-Message-ID: <CAEZxfGPBv4YJwMEMVSeJQmy5fwzgd6ANpwBUXeZeiv2Pox865Q@mail.gmail.com>
-Subject: Feature Request: Clean the cache upon device disconnection
-To: BlueZ development <linux-bluetooth@vger.kernel.org>,
-	ortuno@google.com
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 9.2 \(3112\))
+Subject: Re: [PATCH] Bluetooth: Increment management interface revision
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1457538744-3445-1-git-send-email-johan.hedberg@gmail.com>
+Date: Wed, 9 Mar 2016 07:54:44 -0800
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <E7267FCB-BCD9-4768-8886-886009DD620C@holtmann.org>
+References: <1457538744-3445-1-git-send-email-johan.hedberg@gmail.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-As we've discovered recently
-(https://github.com/thegecko/web-bluetooth-dfu/issues/12#issuecomment-194348474),
-it looks like BlueZ trunk doesn't clean/update its cache upon device
-disconnection.
+Hi Johan,
 
-Is this on purpose?
-If not, can it be fixed?
+> Increment the mgmt revision due to the recently added limited
+> privacy mode.
+> 
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> ---
+> net/bluetooth/mgmt.c | 2 +-
+> 1 file changed, 1 insertion(+), 1 deletion(-)
+
+patch has been applied to bluetooth-next tree.
+
+Regards
+
+Marcel
+
