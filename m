@@ -1,38 +1,35 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 9.2 \(3112\))
-Subject: Re: [PATCH v2 3/3] Bluetooth: Add support for limited privacy mode
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1457537434-32250-3-git-send-email-johan.hedberg@gmail.com>
-Date: Wed, 9 Mar 2016 07:53:53 -0800
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <DCD3EA2E-461B-4F87-A730-AADEDFA26EB6@holtmann.org>
-References: <1457537434-32250-1-git-send-email-johan.hedberg@gmail.com> <1457537434-32250-3-git-send-email-johan.hedberg@gmail.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Increment management interface revision
+Date: Wed,  9 Mar 2016 17:52:24 +0200
+Message-Id: <1457538744-3445-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-> Introduce a limited privacy mode indicated by value 0x02 to the mgmt
-> Set Privacy command.
-> 
-> With value 0x02 the kernel will use privacy mode with a resolvable
-> private address. In case the controller is bondable and discoverable
-> the identity address will be used.
-> 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> ---
-> include/net/bluetooth/hci.h |  1 +
-> net/bluetooth/hci_conn.c    | 13 ++++++++++--
-> net/bluetooth/hci_request.c | 51 +++++++++++++++++++++++++++++++++++++++------
-> net/bluetooth/hci_request.h |  2 +-
-> net/bluetooth/mgmt.c        | 20 ++++++++++++++++--
-> 5 files changed, 76 insertions(+), 11 deletions(-)
+Increment the mgmt revision due to the recently added limited
+privacy mode.
 
-all 3 patches have been applied to bluetooth-next tree.
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ net/bluetooth/mgmt.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Regards
-
-Marcel
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 2ca355519d79..c856fb65812c 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -38,7 +38,7 @@
+ #include "mgmt_util.h"
+ 
+ #define MGMT_VERSION	1
+-#define MGMT_REVISION	11
++#define MGMT_REVISION	12
+ 
+ static const u16 mgmt_commands[] = {
+ 	MGMT_OP_READ_INDEX_LIST,
+-- 
+2.5.0
 
