@@ -1,191 +1,290 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <CAExxLLASt8XG35wPH1XeWVm4PUZ3V9Jdxz-nhgNmD5+YPdQ0+w@mail.gmail.com>
-References: <1457094267-5925-1-git-send-email-luiz.dentz@gmail.com>
-	<1457094267-5925-2-git-send-email-luiz.dentz@gmail.com>
-	<CAExxLLC4moiHCOtWo+L+d9R=M1K_tVsvB4GRCbjGCAeswz3Gtg@mail.gmail.com>
-	<CABBYNZLYzkL8x7rVfrO9tO=xqfKScbOWU=NVhVdy4cgKuxBbJw@mail.gmail.com>
-	<CAExxLLASt8XG35wPH1XeWVm4PUZ3V9Jdxz-nhgNmD5+YPdQ0+w@mail.gmail.com>
-Date: Wed, 9 Mar 2016 14:13:49 +0200
-Message-ID: <CABBYNZ+RbMV3=wovooRXv8yXQmROyT5TSMUy-F_4OouNjPrzLw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 2/2] core/device: Don't set MTU when acting as a peripheral
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: =?UTF-8?Q?=C5=81ukasz_Rymanowski?= <lukasz.rymanowski@codecoup.pl>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Add support for limited privacy mode
+Date: Wed,  9 Mar 2016 13:22:25 +0200
+Message-Id: <1457522545-30785-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lukasz,
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-On Fri, Mar 4, 2016 at 5:46 PM, Łukasz Rymanowski
-<lukasz.rymanowski@codecoup.pl> wrote:
-> Hi Luiz,
->
-> On 4 March 2016 at 14:12, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
->> Hi Łukasz,
->>
->> On Fri, Mar 4, 2016 at 2:51 PM, Łukasz Rymanowski
->> <lukasz.rymanowski@codecoup.pl> wrote:
->>> Hi Luiz,
->>>
->>> On 4 March 2016 at 13:24, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
->>>> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->>>>
->>>> Some Android versions don't seem to cope well with the fact that the
->>>> peripheral can actually set a MTU thus leave the MTU as the default.
->>>
->>> Just tested that and for me connection with Android works OK even BlueZ
->>> started Exchange MTU procedure. Tested on Android 5 and 6.
->>>
->>> I saw once the issue that Android could not retrieve services after
->>> connection to BlueZ
->>> but from the logs it looked like BlueZ start search for primary
->>> services  and Android not.
->>> If Android make to sent search request for primary services first then
->>> it was fine.
->>>
->>> Maybe Android don't like BlueZ to start search primary if Android is
->>> initiator? But this is their bug
->>> BTW. I saw it on Android 5 not yet on 6.
->>
->> With 4.4 it actually made a difference.
->>
->>>
->>>> ---
->>>>  src/attrib-server.c | 2 +-
->>>>  src/device.c        | 8 +++++---
->>>>  src/device.h        | 2 +-
->>>>  src/gatt-database.c | 2 +-
->>>>  4 files changed, 8 insertions(+), 6 deletions(-)
->>>>
->>>> diff --git a/src/attrib-server.c b/src/attrib-server.c
->>>> index 4439c27..e92ca5c 100644
->>>> --- a/src/attrib-server.c
->>>> +++ b/src/attrib-server.c
->>>> @@ -1281,7 +1281,7 @@ static void connect_event(GIOChannel *io, GError *gerr, void *user_data)
->>>>         if (!device)
->>>>                 return;
->>>>
->>>> -       device_attach_att(device, io);
->>>> +       device_attach_att(device, io, false);
->>>>  }
->>>>
->>>>  static gboolean register_core_services(struct gatt_server *server)
->>>> diff --git a/src/device.c b/src/device.c
->>>> index 14e850e..b4bc593 100644
->>>> --- a/src/device.c
->>>> +++ b/src/device.c
->>>> @@ -4664,7 +4664,7 @@ static bool remote_counter(uint32_t *sign_cnt, void *user_data)
->>>>         return true;
->>>>  }
->>>>
->>>> -bool device_attach_att(struct btd_device *dev, GIOChannel *io)
->>>> +bool device_attach_att(struct btd_device *dev, GIOChannel *io, bool initiator)
->>>>  {
->>>>         GError *gerr = NULL;
->>>>         GAttrib *attrib;
->>>> @@ -4699,7 +4699,9 @@ bool device_attach_att(struct btd_device *dev, GIOChannel *io)
->>>>                 }
->>>>         }
->>>>
->>>> -       dev->att_mtu = MIN(mtu, BT_ATT_MAX_LE_MTU);
->>>> +       /* Only attempt to set MTU if initiator/central */
->>>
->>> Keep in mind that MTU echange procedure is bonded to Client/Server
->>> role not central/peripheral.
->>
->> Well actually is not either GAP or GATT role related since both side
->> are in fact allowed to do that, so this is just a workaround.
->
-> According to spec Exchange MTU procedure can be started by Client or
-> devices supporting Client/Server role.
-> BlueZ always acts as client/server this is why you can always start
-> this procedure.
-> It is really not related to central/peripheral.
+Introduce a limited privacy mode indicated by value 0x02 to the mgmt
+Set Privacy command.
 
-Well the working of client/server role seems very odd to say the
-least, why the use of client and server role if they could always be
-both, but it doesn't change the fact that either side can send MTU
-Exchange.
+With value 0x02 the kernel will use privacy mode with a resolvable
+private address. In case the controller is bondable and discoverable
+the identity address will be used. Also, when not previously paired,
+connections will be established with the identity address.
 
->>
->>>
->>>> +       dev->att_mtu = initiator ? MIN(mtu, BT_ATT_MAX_LE_MTU) :
->>>> +                                                       BT_ATT_DEFAULT_LE_MTU;
->>>>         attrib = g_attrib_new(io, dev->att_mtu, false);
->>>>         if (!attrib) {
->>>>                 error("Unable to create new GAttrib instance");
->>>> @@ -4768,7 +4770,7 @@ static void att_connect_cb(GIOChannel *io, GError *gerr, gpointer user_data)
->>>>                 goto done;
->>>>         }
->>>>
->>>> -       if (!device_attach_att(device, io))
->>>> +       if (!device_attach_att(device, io, true))
->>>>                 goto done;
->>>>
->>>>         if (attcb->success)
->>>> diff --git a/src/device.h b/src/device.h
->>>> index db10827..5c01ed0 100644
->>>> --- a/src/device.h
->>>> +++ b/src/device.h
->>>> @@ -72,7 +72,7 @@ struct bt_gatt_client *btd_device_get_gatt_client(struct btd_device *device);
->>>>  struct bt_gatt_server *btd_device_get_gatt_server(struct btd_device *device);
->>>>  void btd_device_gatt_set_service_changed(struct btd_device *device,
->>>>                                                 uint16_t start, uint16_t end);
->>>> -bool device_attach_att(struct btd_device *dev, GIOChannel *io);
->>>> +bool device_attach_att(struct btd_device *dev, GIOChannel *io, bool initiator);
->>>>  void btd_device_add_uuid(struct btd_device *device, const char *uuid);
->>>>  void device_add_eir_uuids(struct btd_device *dev, GSList *uuids);
->>>>  void device_set_manufacturer_data(struct btd_device *dev, GSList *list);
->>>> diff --git a/src/gatt-database.c b/src/gatt-database.c
->>>> index d906e2b..4df4a16 100644
->>>> --- a/src/gatt-database.c
->>>> +++ b/src/gatt-database.c
->>>> @@ -499,7 +499,7 @@ static void connect_cb(GIOChannel *io, GError *gerr, gpointer user_data)
->>>>         if (!device)
->>>>                 return;
->>>>
->>>> -       device_attach_att(device, io);
->>>> +       device_attach_att(device, io, false);
->>>
->>> Not sure if it works when you use white list for autoconnect because
->>> iirc we got this callback when BlueZ is initiator
->>> then. But still initiator or not, the important thing is if we act as
->>> client or server.
->>
->> Probably not,
->
-> I just run the test:
->
-> 1) add device to autoconnect list.
-> 2) Simulate disconnect by power off.
-> 3) After then power on device and wait until auto connect do its job:
->
-> I got this:
->
-> Mar  4 16:30:36 t450s bluetoothd[31211]:
-> src/adapter.c:connected_callback() hci0 device XX:XX:XX:XX:XX:XX
-> connected eir_len 14
-> Mar  4 16:30:36 t450s bluetoothd[31211]:
-> src/gatt-database.c:connect_cb() New incoming LE ATT connection
->
-> That means that with this patch after reconnect a default MTU will be
-> used unless remote device starts
-> exchange MTU procedure.
->
-> I will have to add more logic to detect how it got
->> connected, maybe we can actually check who is the master so that the
->> master should be the one controlling the MTU.
->>
->
-> Maybe we can do exchange MTU later after discovery ? For discovery
-> default MTU should be enough.
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ include/net/bluetooth/hci.h |  1 +
+ net/bluetooth/hci_conn.c    | 31 ++++++++++++++++++++++----
+ net/bluetooth/hci_request.c | 54 ++++++++++++++++++++++++++++++++++++++++-----
+ net/bluetooth/hci_request.h |  2 +-
+ net/bluetooth/mgmt.c        | 20 +++++++++++++++--
+ 5 files changed, 95 insertions(+), 13 deletions(-)
 
-Well we still need to detect the role to do that anyway, and I
-wouldn't bother with MTU request being the slave since the MTU shall
-be symmetric:
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 339ea57be423..5d38d980b89d 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -233,6 +233,7 @@ enum {
+ 	HCI_SC_ENABLED,
+ 	HCI_SC_ONLY,
+ 	HCI_PRIVACY,
++	HCI_LIMITED_PRIVACY,
+ 	HCI_RPA_EXPIRED,
+ 	HCI_RPA_RESOLVING,
+ 	HCI_HS_ENABLED,
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 32575b49f4a0..85e46fd9c50b 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -719,6 +719,27 @@ done:
+ 	hci_dev_unlock(hdev);
+ }
+ 
++static bool conn_use_rpa(struct hci_conn *conn)
++{
++	struct hci_dev *hdev = conn->hdev;
++
++	/* If privacy is not enabled don't use RPA */
++	if (!hci_dev_test_flag(hdev, HCI_PRIVACY))
++		return false;
++
++	/* If privacy is enabled in the basic mode use RPA */
++	if (!hci_dev_test_flag(hdev, HCI_LIMITED_PRIVACY))
++		return true;
++
++	/* If the limited privacy mode is enabled use an RPA only if
++	 * we're already paired.
++	 */
++	if (hci_find_ltk(hdev, &conn->dst, conn->dst_type, conn->role))
++		return true;
++
++	return false;
++}
++
+ static void hci_req_add_le_create_conn(struct hci_request *req,
+ 				       struct hci_conn *conn)
+ {
+@@ -726,14 +747,15 @@ static void hci_req_add_le_create_conn(struct hci_request *req,
+ 	struct hci_dev *hdev = conn->hdev;
+ 	u8 own_addr_type;
+ 
+-	memset(&cp, 0, sizeof(cp));
+-
+ 	/* Update random address, but set require_privacy to false so
+ 	 * that we never connect with an non-resolvable address.
+ 	 */
+-	if (hci_update_random_address(req, false, &own_addr_type))
++	if (hci_update_random_address(req, false, conn_use_rpa(conn),
++				      &own_addr_type))
+ 		return;
+ 
++	memset(&cp, 0, sizeof(cp));
++
+ 	/* Set window to be the same value as the interval to enable
+ 	 * continuous scanning.
+ 	 */
+@@ -774,7 +796,8 @@ static void hci_req_directed_advertising(struct hci_request *req,
+ 	/* Set require_privacy to false so that the remote device has a
+ 	 * chance of identifying us.
+ 	 */
+-	if (hci_update_random_address(req, false, &own_addr_type) < 0)
++	if (hci_update_random_address(req, false, conn_use_rpa(conn),
++				      &own_addr_type) < 0)
+ 		return;
+ 
+ 	memset(&cp, 0, sizeof(cp));
+diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
+index c78ee2dc9323..95a545ca9dbc 100644
+--- a/net/bluetooth/hci_request.c
++++ b/net/bluetooth/hci_request.c
+@@ -771,6 +771,11 @@ static u8 update_white_list(struct hci_request *req)
+ 	return 0x01;
+ }
+ 
++static bool scan_use_rpa(struct hci_dev *hdev)
++{
++	return hci_dev_test_flag(hdev, HCI_PRIVACY);
++}
++
+ void hci_req_add_le_passive_scan(struct hci_request *req)
+ {
+ 	struct hci_cp_le_set_scan_param param_cp;
+@@ -785,7 +790,8 @@ void hci_req_add_le_passive_scan(struct hci_request *req)
+ 	 * advertising with our address will be correctly reported
+ 	 * by the controller.
+ 	 */
+-	if (hci_update_random_address(req, false, &own_addr_type))
++	if (hci_update_random_address(req, false, scan_use_rpa(hdev),
++				      &own_addr_type))
+ 		return;
+ 
+ 	/* Adding or removing entries from the white list must
+@@ -866,6 +872,9 @@ static u32 get_adv_instance_flags(struct hci_dev *hdev, u8 instance)
+ 		if (hci_dev_test_flag(hdev, HCI_ADVERTISING_CONNECTABLE))
+ 			flags |= MGMT_ADV_FLAG_CONNECTABLE;
+ 
++		if (hci_dev_test_flag(hdev, HCI_DISCOVERABLE))
++			flags |= MGMT_ADV_FLAG_DISCOV;
++
+ 		return flags;
+ 	}
+ 
+@@ -878,6 +887,29 @@ static u32 get_adv_instance_flags(struct hci_dev *hdev, u8 instance)
+ 	return adv_instance->flags;
+ }
+ 
++static bool adv_use_rpa(struct hci_dev *hdev, uint32_t flags)
++{
++	/* If privacy is not enabled don't use RPA */
++	if (!hci_dev_test_flag(hdev, HCI_PRIVACY))
++		return false;
++
++	/* If basic privacy mode is enabled use RPA */
++	if (!hci_dev_test_flag(hdev, HCI_LIMITED_PRIVACY))
++		return true;
++
++	/* If limited privacy mode is enabled don't use RPA if we're
++	 * both discoverable and bondable.
++	 */
++	if ((flags & MGMT_ADV_FLAG_DISCOV) &&
++	    hci_dev_test_flag(hdev, HCI_BONDABLE))
++		return false;
++
++	/* We're neither bondable nor discoverable in the limited
++	 * privacy mode, therefore use RPA.
++	 */
++	return true;
++}
++
+ void __hci_req_enable_advertising(struct hci_request *req)
+ {
+ 	struct hci_dev *hdev = req->hdev;
+@@ -911,7 +943,9 @@ void __hci_req_enable_advertising(struct hci_request *req)
+ 	 * advertising is used. In that case it is fine to use a
+ 	 * non-resolvable private address.
+ 	 */
+-	if (hci_update_random_address(req, !connectable, &own_addr_type) < 0)
++	if (hci_update_random_address(req, !connectable,
++				      adv_use_rpa(hdev, flags),
++				      &own_addr_type) < 0)
+ 		return;
+ 
+ 	memset(&cp, 0, sizeof(cp));
+@@ -1325,7 +1359,7 @@ static void set_random_addr(struct hci_request *req, bdaddr_t *rpa)
+ }
+ 
+ int hci_update_random_address(struct hci_request *req, bool require_privacy,
+-			      u8 *own_addr_type)
++			      bool use_rpa, u8 *own_addr_type)
+ {
+ 	struct hci_dev *hdev = req->hdev;
+ 	int err;
+@@ -1334,7 +1368,7 @@ int hci_update_random_address(struct hci_request *req, bool require_privacy,
+ 	 * current RPA has expired or there is something else than
+ 	 * the current RPA in use, then generate a new one.
+ 	 */
+-	if (hci_dev_test_flag(hdev, HCI_PRIVACY)) {
++	if (use_rpa) {
+ 		int to;
+ 
+ 		*own_addr_type = ADDR_LE_DEV_RANDOM;
+@@ -1596,9 +1630,16 @@ static int discoverable_update(struct hci_request *req, unsigned long opt)
+ 	/* Advertising instances don't use the global discoverable setting, so
+ 	 * only update AD if advertising was enabled using Set Advertising.
+ 	 */
+-	if (hci_dev_test_flag(hdev, HCI_ADVERTISING))
++	if (hci_dev_test_flag(hdev, HCI_ADVERTISING)) {
+ 		__hci_req_update_adv_data(req, 0x00);
+ 
++		/* Discoverable mode affects the local advertising
++		 * address in limited privacy mode.
++		 */
++		if (hci_dev_test_flag(hdev, HCI_LIMITED_PRIVACY))
++			__hci_req_enable_advertising(req);
++	}
++
+ 	hci_dev_unlock(hdev);
+ 
+ 	return 0;
+@@ -1941,7 +1982,8 @@ static int active_scan(struct hci_request *req, unsigned long opt)
+ 	 * address (when privacy feature has been enabled) or non-resolvable
+ 	 * private address.
+ 	 */
+-	err = hci_update_random_address(req, true, &own_addr_type);
++	err = hci_update_random_address(req, true, scan_use_rpa(hdev),
++					&own_addr_type);
+ 	if (err < 0)
+ 		own_addr_type = ADDR_LE_DEV_PUBLIC;
+ 
+diff --git a/net/bluetooth/hci_request.h b/net/bluetooth/hci_request.h
+index 64ff8c040d50..b2d044bdc732 100644
+--- a/net/bluetooth/hci_request.h
++++ b/net/bluetooth/hci_request.h
+@@ -89,7 +89,7 @@ static inline void hci_req_update_scan(struct hci_dev *hdev)
+ void __hci_req_update_scan(struct hci_request *req);
+ 
+ int hci_update_random_address(struct hci_request *req, bool require_privacy,
+-			      u8 *own_addr_type);
++			      bool use_rpa, u8 *own_addr_type);
+ 
+ int hci_abort_conn(struct hci_conn *conn, u8 reason);
+ void __hci_abort_conn(struct hci_request *req, struct hci_conn *conn,
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 5a5089cb6570..2ca355519d79 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -1382,8 +1382,19 @@ static int set_bondable(struct sock *sk, struct hci_dev *hdev, void *data,
+ 	if (err < 0)
+ 		goto unlock;
+ 
+-	if (changed)
++	if (changed) {
++		/* In limited privacy mode the change of bondable mode
++		 * may affect the local advertising address.
++		 */
++		if (hdev_is_powered(hdev) &&
++		    hci_dev_test_flag(hdev, HCI_ADVERTISING) &&
++		    hci_dev_test_flag(hdev, HCI_DISCOVERABLE) &&
++		    hci_dev_test_flag(hdev, HCI_LIMITED_PRIVACY))
++			queue_work(hdev->req_workqueue,
++				   &hdev->discoverable_update);
++
+ 		err = new_settings(hdev, sk);
++	}
+ 
+ unlock:
+ 	hci_dev_unlock(hdev);
+@@ -4423,7 +4434,7 @@ static int set_privacy(struct sock *sk, struct hci_dev *hdev, void *cp_data,
+ 		return mgmt_cmd_status(sk, hdev->id, MGMT_OP_SET_PRIVACY,
+ 				       MGMT_STATUS_NOT_SUPPORTED);
+ 
+-	if (cp->privacy != 0x00 && cp->privacy != 0x01)
++	if (cp->privacy != 0x00 && cp->privacy != 0x01 && cp->privacy != 0x02)
+ 		return mgmt_cmd_status(sk, hdev->id, MGMT_OP_SET_PRIVACY,
+ 				       MGMT_STATUS_INVALID_PARAMS);
+ 
+@@ -4442,10 +4453,15 @@ static int set_privacy(struct sock *sk, struct hci_dev *hdev, void *cp_data,
+ 		changed = !hci_dev_test_and_set_flag(hdev, HCI_PRIVACY);
+ 		memcpy(hdev->irk, cp->irk, sizeof(hdev->irk));
+ 		hci_dev_set_flag(hdev, HCI_RPA_EXPIRED);
++		if (cp->privacy == 0x02)
++			hci_dev_set_flag(hdev, HCI_LIMITED_PRIVACY);
++		else
++			hci_dev_clear_flag(hdev, HCI_LIMITED_PRIVACY);
+ 	} else {
+ 		changed = hci_dev_test_and_clear_flag(hdev, HCI_PRIVACY);
+ 		memset(hdev->irk, 0, sizeof(hdev->irk));
+ 		hci_dev_clear_flag(hdev, HCI_RPA_EXPIRED);
++		hci_dev_clear_flag(hdev, HCI_LIMITED_PRIVACY);
+ 	}
+ 
+ 	err = send_settings_rsp(sk, MGMT_OP_SET_PRIVACY, hdev);
+-- 
+2.5.0
 
-BLUETOOTH SPECIFICATION Version 4.2 [Vol 3, Part F] page 484:
-1. A device's Exchange MTU Request shall contain the same MTU as the
-device's Exchange MTU Response (i.e. the MTU shall be symmetric).
