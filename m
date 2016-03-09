@@ -1,10 +1,11 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <1457446085-21426-1-git-send-email-luiz.dentz@gmail.com>
-References: <1457446085-21426-1-git-send-email-luiz.dentz@gmail.com>
-Date: Wed, 9 Mar 2016 12:51:33 +0200
-Message-ID: <CABBYNZ+wzEijbxwhurxRQ_N6rynsgb2RnMaTaJwpiZvvRZxHew@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] shared/att: Fix not notifying the callback
+In-Reply-To: <1457443131-17895-1-git-send-email-luiz.dentz@gmail.com>
+References: <1457443131-17895-1-git-send-email-luiz.dentz@gmail.com>
+Date: Wed, 9 Mar 2016 12:51:15 +0200
+Message-ID: <CABBYNZL5h0cuJbSWB3ub4Tpi8w9V=ZAAiurjwuQFf6uQj0vpWA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/2] gdbus/client: Use g_dbus_send_message if
+ callback is not set
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
@@ -13,56 +14,63 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
 
-On Tue, Mar 8, 2016 at 4:08 PM, Luiz Augusto von Dentz
+On Tue, Mar 8, 2016 at 3:18 PM, Luiz Augusto von Dentz
 <luiz.dentz@gmail.com> wrote:
 > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 >
-> This makes sure that all request callback are called with
-> BT_ATT_OP_ERROR_RSP in case the link is dropped so they can propagate
-> the error back to the caller.
+> If the user don't set a function it means it doesn't care about the reply
+> so g_dbus_send_message can be used.
 > ---
->  src/shared/att.c | 21 ++++++++++++++++++++-
->  1 file changed, 20 insertions(+), 1 deletion(-)
+>  gdbus/client.c | 26 ++++++++++++++------------
+>  1 file changed, 14 insertions(+), 12 deletions(-)
 >
-> diff --git a/src/shared/att.c b/src/shared/att.c
-> index 7b20757..a29c100 100644
-> --- a/src/shared/att.c
-> +++ b/src/shared/att.c
-> @@ -535,6 +535,16 @@ static void disconn_handler(void *data, void *user_data)
->                 disconn->callback(err, disconn->user_data);
->  }
+> diff --git a/gdbus/client.c b/gdbus/client.c
+> index 068e778..a011e19 100644
+> --- a/gdbus/client.c
+> +++ b/gdbus/client.c
+> @@ -853,28 +853,30 @@ gboolean g_dbus_proxy_method_call(GDBusProxy *proxy, const char *method,
+>         if (client == NULL)
+>                 return FALSE;
 >
-> +static void disc_att_send_op(void *data)
-> +{
-> +       struct att_send_op *op = data;
-> +
-> +       if (op->callback)
-> +               op->callback(BT_ATT_OP_ERROR_RSP, NULL, 0, op->user_data);
-> +
-> +       destroy_att_send_op(op);
-> +}
-> +
->  static bool disconnect_cb(struct io *io, void *user_data)
->  {
->         struct bt_att *att = user_data;
-> @@ -557,7 +567,16 @@ static bool disconnect_cb(struct io *io, void *user_data)
->         io_destroy(att->io);
->         att->io = NULL;
+> -       data = g_try_new0(struct method_call_data, 1);
+> -       if (data == NULL)
+> -               return FALSE;
+> -
+> -       data->function = function;
+> -       data->user_data = user_data;
+> -       data->destroy = destroy;
+> -
+>         msg = dbus_message_new_method_call(client->service_name,
+>                                 proxy->obj_path, proxy->interface, method);
+> -       if (msg == NULL) {
+> -               g_free(data);
+> +       if (msg == NULL)
+>                 return FALSE;
+> -       }
 >
-> -       bt_att_cancel_all(att);
-> +       /* Notify request callbacks */
-> +       queue_remove_all(att->req_queue, NULL, NULL, disc_att_send_op);
-> +       queue_remove_all(att->ind_queue, NULL, NULL, disc_att_send_op);
-> +       queue_remove_all(att->write_queue, NULL, NULL, disc_att_send_op);
-> +
-> +       if (att->pending_req)
-> +               disc_att_send_op(att->pending_req);
-> +
-> +       if (att->pending_ind)
-> +               disc_att_send_op(att->pending_ind);
+>         if (setup) {
+>                 DBusMessageIter iter;
 >
->         bt_att_ref(att);
+>                 dbus_message_iter_init_append(msg, &iter);
+> -               setup(&iter, data->user_data);
+> +               setup(&iter, user_data);
+>         }
 >
+> +       if (!function)
+> +               return g_dbus_send_message(client->dbus_conn, msg);
+> +
+> +       data = g_try_new0(struct method_call_data, 1);
+> +       if (data == NULL)
+> +               return FALSE;
+> +
+> +       data->function = function;
+> +       data->user_data = user_data;
+> +       data->destroy = destroy;
+> +
+> +
+>         if (g_dbus_send_message_with_reply(client->dbus_conn, msg,
+>                                         &call, METHOD_CALL_TIMEOUT) == FALSE) {
+>                 dbus_message_unref(msg);
 > --
 > 2.5.0
 
