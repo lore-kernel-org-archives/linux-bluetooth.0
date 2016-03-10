@@ -1,70 +1,63 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <1457559367-5626-1-git-send-email-bimanpaul@yahoo.co.in>
-References: <1457559367-5626-1-git-send-email-bimanpaul@yahoo.co.in>
-Date: Thu, 10 Mar 2016 11:12:46 +0200
-Message-ID: <CABBYNZK2WcZOyUJ7E5bNHNXuZw+6Y2Nfar9bHn75ViVjt_MLdg@mail.gmail.com>
-Subject: Re: [PATCH 1/1] parser/sdp: parse MAS Instance ID and Message Type
+In-Reply-To: <CABBYNZ+uYqOi7uYNGL6tJkJ5D2Cz=cOxCN5QbpLx1+Z7gC2Jxg@mail.gmail.com>
+References: <CAEZxfGPBv4YJwMEMVSeJQmy5fwzgd6ANpwBUXeZeiv2Pox865Q@mail.gmail.com>
+	<CABBYNZ+uYqOi7uYNGL6tJkJ5D2Cz=cOxCN5QbpLx1+Z7gC2Jxg@mail.gmail.com>
+Date: Thu, 10 Mar 2016 11:11:04 +0200
+Message-ID: <CABBYNZJkLuSo4hAuNMJN3yKXQtx77BnTsEWvPfOQsXR9puCcqw@mail.gmail.com>
+Subject: Re: Feature Request: Clean the cache upon device disconnection
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Biman Paul <bimanpaul@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Biman Paul <biman.paul@samsung.com>
+To: =?UTF-8?Q?Fran=C3=A7ois_Beaufort?= <beaufort.francois@gmail.com>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>,
+	=?UTF-8?Q?Giovanni_Ortu=C3=B1o?= <ortuno@google.com>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Paul,
+Hi François,
 
-On Wed, Mar 9, 2016 at 11:36 PM, Biman Paul <bimanpaul@gmail.com> wrote:
-> From: Biman Paul <biman.paul@samsung.com>
+On Wed, Mar 9, 2016 at 10:47 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi François,
 >
-> Parsing Support added in SDP record:
-> 1. MAS Instance ID in MAP
-> 2. Message Types supported by MAS
+> On Wed, Mar 9, 2016 at 6:42 PM, François Beaufort
+> <beaufort.francois@gmail.com> wrote:
+>> As we've discovered recently
+>> (https://github.com/thegecko/web-bluetooth-dfu/issues/12#issuecomment-194348474),
+>> it looks like BlueZ trunk doesn't clean/update its cache upon device
+>> disconnection.
+>>
+>> Is this on purpose?
+>> If not, can it be fixed?
+>
+> I actually need more info, we do check if the cache is valid on every
+> reconnection, can someone provide the HCI trace of the issue perhaps
+> it is not using the fixes for the cache that have been merged
+> upstream.
 
+There at least 2 important fixes to the cache that where applied upstream:
 
-Can you please add the output of these changes, btw these parses are
-deprecated in favor of monitor so perhaps you would want to add these
-changes there as well.
+Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Date:   Mon Feb 15 14:14:31 2016 +0200
 
-> ---
->  tools/parser/sdp.c |    3 +++
->  tools/parser/sdp.h |    3 +++
->  2 files changed, 6 insertions(+)
->
-> diff --git a/tools/parser/sdp.c b/tools/parser/sdp.c
-> index dba9a36..1f8d6c5 100644
-> --- a/tools/parser/sdp.c
-> +++ b/tools/parser/sdp.c
-> @@ -211,6 +211,9 @@ static sdp_attr_id_nam_lookup_table_t sdp_attr_id_nam_lookup_table[] = {
->         { SDP_ATTR_ID_SUPPORTED_FUNCTIONS,               "SuppFunctions"      }, /* Imaging */
->         { SDP_ATTR_ID_TOTAL_IMAGING_DATA_CAPACITY,       "SuppTotalCapacity"  }, /* Imaging */
->         { SDP_ATTR_ID_SUPPORTED_REPOSITORIES,            "SuppRepositories"   }, /* PBAP */
-> +       { SDP_ATTR_ID_MAS_INSTANCE_ID,                   "MASInstanceID"      }, /* MAS ID */
-> +       { SDP_ATTR_ID_MAP_SUPPORTED_TYPES,               "SupportedMessageTypes" }, /* Message Types */
->  };
->
->  #define SDP_ATTR_ID_NAM_LOOKUP_TABLE_SIZE \
-> diff --git a/tools/parser/sdp.h b/tools/parser/sdp.h
-> index ed55a23..130da3f 100644
-> --- a/tools/parser/sdp.h
-> +++ b/tools/parser/sdp.h
-> @@ -157,5 +157,8 @@
->  #define SDP_ATTR_ID_SUPPORTED_FUNCTIONS                0x0312 /* Imaging */
->  #define SDP_ATTR_ID_TOTAL_IMAGING_DATA_CAPACITY        0x0313 /* Imaging */
->  #define SDP_ATTR_ID_SUPPORTED_REPOSITORIES             0x0314 /* PBAP */
-> +#define SDP_ATTR_ID_MAS_INSTANCE_ID                    0x0315 /* MAS ID */
-> +#define SDP_ATTR_ID_MAP_SUPPORTED_TYPES                0x0316 /* Message Types */
->
->  #endif /* __SDP_H */
-> --
-> 1.7.9.5
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+    core/device: Fix not clearing Attributes before storing
 
+    This can leave the storage in a bad state if device start changing its
+    attributes the old one are never removed as the code reloads them with
+    g_key_file_load_from_file.
+
+commit e3c14b2627ed8fd6277a72761539cb54111fc205
+Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Date:   Mon Feb 15 13:44:27 2016 +0200
+
+    core/device: Fix not reseting database if attributes cannot be loaded
+
+    If one or more attributes cannot be loaded it means the database is
+    probably in a bad state so just clear it so the attributes can be
+    discovered again.
+
+If you don't have them it is probably not going to work since the
+device appears to be changing its database while win DFU mode.
 
 
 -- 
