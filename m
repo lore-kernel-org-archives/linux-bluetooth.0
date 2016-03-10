@@ -1,41 +1,63 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CAExxLLD+Z4rVRhXqU0MYFKTvOeq09_=-C55fWF9oXdY=mUowTA@mail.gmail.com>
-References: <1457094267-5925-1-git-send-email-luiz.dentz@gmail.com>
-	<1457094267-5925-2-git-send-email-luiz.dentz@gmail.com>
-	<CAExxLLC4moiHCOtWo+L+d9R=M1K_tVsvB4GRCbjGCAeswz3Gtg@mail.gmail.com>
-	<CABBYNZLYzkL8x7rVfrO9tO=xqfKScbOWU=NVhVdy4cgKuxBbJw@mail.gmail.com>
-	<CAExxLLASt8XG35wPH1XeWVm4PUZ3V9Jdxz-nhgNmD5+YPdQ0+w@mail.gmail.com>
-	<CABBYNZ+RbMV3=wovooRXv8yXQmROyT5TSMUy-F_4OouNjPrzLw@mail.gmail.com>
-	<CAExxLLDU=U1V9E-Q1dge5nTC_K7T5P9gWabDFQUXgBE3Md4-kA@mail.gmail.com>
-	<CABBYNZ+gLweEjUit-MEbNQkOFNRytRdmi-qqPepSsJHoGd8tVA@mail.gmail.com>
-	<CAExxLLD+Z4rVRhXqU0MYFKTvOeq09_=-C55fWF9oXdY=mUowTA@mail.gmail.com>
-Date: Thu, 10 Mar 2016 11:35:23 +0200
-Message-ID: <CABBYNZKNkEFO7uAsH55Un47esqezPV-acTiqE1NFMfNXFWKj2Q@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 2/2] core/device: Don't set MTU when acting as a peripheral
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: =?UTF-8?Q?=C5=81ukasz_Rymanowski?= <lukasz.rymanowski@codecoup.pl>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <CAEZxfGMJRTPAQsD8Fxgm_GGGmHMpJ-wo7ZVtYTDCiHdsF1LE7A@mail.gmail.com>
+References: <CAEZxfGPvzMVj++anQKY_6RREvmyT-vBnWqYpRiHJVvKKKb3YsQ@mail.gmail.com>
+ <CABBYNZK35diyf=VMGikSJ79+qR=8F5adLt=ddkaOPv3f2x-Ksg@mail.gmail.com>
+ <CAEZxfGPZOj+uHQde5Lzb3G9HyF-vvDR8R29BatccKkOMkcwGSg@mail.gmail.com>
+ <CAEZxfGN7-kDF6GzLYpx0tsXXiEnq1W2zCVEo2am9PX8a7Hdm=w@mail.gmail.com>
+ <CAEZxfGM7mpnCP8tM9Mr1OR3EVG_0RoNCCrR+Wv593E0ZQCNM7g@mail.gmail.com>
+ <CABBYNZJnkazKAD-c4EWrx-schmHTkb1Qumq1LVcQMG7iq_8PoA@mail.gmail.com>
+ <CABBYNZJ_6z6Mym2o2L8Vx3fGqv62Rf3d=T51rYJLEcoTvj6OdA@mail.gmail.com> <CAEZxfGMJRTPAQsD8Fxgm_GGGmHMpJ-wo7ZVtYTDCiHdsF1LE7A@mail.gmail.com>
+From: =?UTF-8?Q?Fran=C3=A7ois_Beaufort?= <beaufort.francois@gmail.com>
+Date: Thu, 10 Mar 2016 10:27:04 +0100
+Message-ID: <CAEZxfGNJRX30mC9sC=HoA+4Dq+CHjBmXix2wuYG8Wcr4+hW0+Q@mail.gmail.com>
+Subject: Re: Write should return error if device is disconnected while
+ expecting a response
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lukasz,
+And I've just tried with latest trunk and it works perfectly!
+Thank you Luiz!
 
-On Thu, Mar 10, 2016 at 11:17 AM, Łukasz Rymanowski
-<lukasz.rymanowski@codecoup.pl> wrote:
->> Not only we cannot be configured as server, but even if we do the
->> roles are only relevant for PTS because otherwise there is no way to
->> tell the roles of the remote device.
+
+[DFU_Test:/service000c/char000d]# write 01 04
+Attempting to write /org/bluez/hci0/dev_F1_6F_DE_EC_F1_D6/service000c/char000d
+[CHG] Device F1:6F:DE:EC:F1:D6 Connected: no
+Failed to write: org.bluez.Error.Failed
+
+On Wed, Mar 9, 2016 at 1:17 PM, François Beaufort
+<beaufort.francois@gmail.com> wrote:
+> Thank you so much Luiz,
+> I'm going to test this tomorrow.
 >
-> If device sends request that means it is a Client. If not that means
-> it is a Server.
-
-Well if it send it can be a Client/Server as well, btw some systems
-including Android appear to have support to send Exchange MTU at any
-point so detecting a server only pretty hard, besides our current
-design split Server and Client functionality so waiting to see if
-anything has been received before starting sending anything is not so
-trivial and we had still to choose an arbitrary timeout to wait for
-detecting the role but if both are based on BlueZ this would just
-delay each other.
+> In the mean time, which patches should be applied now if we want to
+> fix this in Chrome OS BlueZ?
+>
+> On Wed, Mar 9, 2016 at 11:53 AM, Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+>> Hi François,
+>>
+>> On Mon, Mar 7, 2016 at 5:54 PM, Luiz Augusto von Dentz
+>> <luiz.dentz@gmail.com> wrote:
+>>> Hi François,
+>>>
+>>> On Mon, Mar 7, 2016 at 5:36 PM, François Beaufort
+>>> <beaufort.francois@gmail.com> wrote:
+>>>> (gentle ping)
+>>>>
+>>>> On Thu, Mar 3, 2016 at 10:46 AM, François Beaufort
+>>>> <beaufort.francois@gmail.com> wrote:
+>>>>> Since I'm expecting a response and device gets disconnected, I should
+>>>>> get a write error don't you think?
+>>>
+>>> Yes, it should probably return and error so the client is not left
+>>> hanging. I will investigate how this can be fixed.
+>>
+>> This should be fixed upstream, it will be part of 5.38 which should be
+>> coming out soon.
+>>
+>> --
+>> Luiz Augusto von Dentz
