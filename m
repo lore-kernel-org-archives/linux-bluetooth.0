@@ -1,162 +1,91 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+MIME-Version: 1.0
+In-Reply-To: <DE03A908-C3D3-4467-AB9F-3CD11C2539C7@gmail.com>
+References: <4590C4C4-A8DB-4318-97E9-9489E1E00257@gmail.com>
+	<CABBYNZLzhTX8rJOzadn0+-WM1+Rr5WZvqQPFtzu46EyFEpj_yg@mail.gmail.com>
+	<DE03A908-C3D3-4467-AB9F-3CD11C2539C7@gmail.com>
+Date: Thu, 10 Mar 2016 16:28:32 +0200
+Message-ID: <CABBYNZKCr53JJGVjPq65_aH8vp3LfCpymPmPPpZ_NwPosWFHSA@mail.gmail.com>
+Subject: Re: No Connected=false event on iPhone app kill.
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [RFC BlueZ] doc/device-api: Replace GattServices with Discovering property
-Date: Thu, 10 Mar 2016 18:16:44 +0200
-Message-Id: <1457626604-5656-1-git-send-email-luiz.dentz@gmail.com>
+To: =?UTF-8?Q?T=C3=B5nis_Tiganik?= <ttiganik@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Tõnis,
 
-GattServices is not really doing was it was meant to do which was to
-track progress of service discovery since it only worked for the very
-first time a device is connected but since we no longer remove the
-attributes an application would have the false impression the service are
-all resolved by the time it reconnects when in fact the service may have
-changed.
+On Thu, Mar 10, 2016 at 4:18 PM, Tõnis Tiganik <ttiganik@gmail.com> wrote:
+> Hi Luiz
+>
+>> On 10 Mar 2016, at 14:00, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
+>>
+>> Hi Tõnis,
+>>
+>> On Thu, Mar 10, 2016 at 12:43 PM, Tõnis Tiganik <ttiganik@gmail.com> wrote:
+>>> Hello,
+>>>
+>>> We have an iPhone app that is acting as a peripheral and bluez connects to it.
+>>>
+>>> We do not receive properties changed signal from dbus that you would expect on device disconnection (Device.Connected = false) if we kill the iPhone app. We know the iPhone disconnects from bluez because the bluetooth icon goes from black to grey on the iPhone. We receive the connected=false signal if we turn the bluetooth off on the iPhone(keep the app alive) - in that case everything works correctly.
+>>
+>> Check the HCI traces if we don't receive a HCI Disconnect command then
+>> it is probably not disconnecting, btw I would imagine it perhaps
+>> wouldn't disconnect because there could be other users to GATT/ATT not
+>> just the app, in that case you would have to force a disconnect
+>> somehow. This btw matches the behavior of BlueZ as peripheral, if the
+>> app unregister its services (or is close by the user) the only thing
+>> that will happen is a service changed indication telling these
+>> services are no longer available, thus the central can know what has
+>> happened and take actions such as disconnecting if there are no
+>> profiles in use.
+>
+> I checked the HCI traces, it looks to me there is a Disconnect command both when I set the bluetooth off and kill the app. I dont know if this should be the case but reasons for command and event are different (0x13 and 0x16)
+>
+>          < HCI Command: Disconnect (0x01|0x0006) plen 3
+>              handle 64 reason 0x13
+>              Reason: Remote User Terminated Connection
+>          > HCI Event: Command Status (0x0f) plen 4
+>              Disconnect (0x01|0x0006) status 0x00 ncmd 1
+>          > HCI Event: Disconn Complete (0x05) plen 4
+>              status 0x00 handle 64 reason 0x16
+>              Reason: Connection Terminated by Local Host
 
-Futhermore object tracking like it is doing has been obsolete by
-ObjectManager so this propose to replace the service discovery tracking
-with a boolean property which works both with SDP as well as GATT
-discovery.
----
- doc/device-api.txt |  9 +++------
- src/device.c       | 58 +++++++++++-------------------------------------------
- 2 files changed, 14 insertions(+), 53 deletions(-)
+This is actually initiated by BlueZ according to the logs, and we do
+receive a Disconnect Complete so at this point it should be
+disconnected. Is there something printed in bluetoothd logs?
 
-diff --git a/doc/device-api.txt b/doc/device-api.txt
-index a8076a2..9e58664 100644
---- a/doc/device-api.txt
-+++ b/doc/device-api.txt
-@@ -212,10 +212,7 @@ Properties	string Address [readonly]
- 			Service advertisement data. Keys are the UUIDs in
- 			string format followed by its byte array value.
- 
--		array{object} GattServices [readonly, optional]
-+		bool Discovering [readonly, optional, experimental]
- 
--			List of GATT service object paths. Each referenced
--			object exports the org.bluez.GattService1 interface and
--			represents a remote GATT service. This property will be
--			updated once all remote GATT services of this device
--			have been discovered and exported over D-Bus.
-+			Indicate whether or not service discovery is in
-+			progress.
-diff --git a/src/device.c b/src/device.c
-index 14e850e..4e49652 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -238,7 +238,6 @@ struct btd_device {
- 	 * attribute cache support can be built.
- 	 */
- 	struct gatt_db *db;			/* GATT db cache */
--	bool gatt_cache_used;			/* true if discovery skipped */
- 	struct bt_gatt_client *client;		/* GATT client instance */
- 	struct bt_gatt_server *server;		/* GATT server instance */
- 
-@@ -534,6 +533,9 @@ static void browse_request_free(struct browse_req *req)
- 	if (req->records)
- 		sdp_list_free(req->records, (sdp_free_func_t) sdp_record_free);
- 
-+	g_dbus_emit_property_changed(dbus_conn, req->device->path,
-+					DEVICE_INTERFACE, "Discovering");
-+
- 	g_free(req);
- }
- 
-@@ -949,38 +951,13 @@ static gboolean dev_property_exists_tx_power(const GDBusPropertyTable *property,
- 	return TRUE;
- }
- 
--static void append_service_path(const char *path, void *user_data)
--{
--	DBusMessageIter *array = user_data;
--
--	dbus_message_iter_append_basic(array, DBUS_TYPE_OBJECT_PATH, &path);
--}
--
--static gboolean dev_property_get_gatt_services(
--					const GDBusPropertyTable *property,
-+static gboolean dev_property_get_discovering(const GDBusPropertyTable *property,
- 					DBusMessageIter *iter, void *data)
- {
--	struct btd_device *dev = data;
--	DBusMessageIter array;
--
--	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY, "o", &array);
--
--	btd_gatt_client_foreach_service(dev->client_dbus, append_service_path,
--									&array);
--
--	dbus_message_iter_close_container(iter, &array);
--
--	return TRUE;
--}
--
--static gboolean dev_property_exists_gatt_services(
--					const GDBusPropertyTable *property,
--					void *data)
--{
--	struct btd_device *dev = data;
-+	struct btd_device *device = data;
-+	gboolean val = device->browse ? true : false;
- 
--	if (!dev->client || !bt_gatt_client_is_ready(dev->client))
--		return FALSE;
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_BOOLEAN, &val);
- 
- 	return TRUE;
- }
-@@ -2533,8 +2510,7 @@ static const GDBusPropertyTable device_properties[] = {
- 	{ "TxPower", "n", dev_property_get_tx_power, NULL,
- 					dev_property_exists_tx_power,
- 					G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
--	{ "GattServices", "ao", dev_property_get_gatt_services, NULL,
--					dev_property_exists_gatt_services,
-+	{ "Discovering", "b", dev_property_get_discovering, NULL, NULL,
- 					G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
- 
- 	{ }
-@@ -4550,19 +4526,6 @@ static void gatt_client_ready_cb(bool success, uint8_t att_ecode,
- 	register_gatt_services(device);
- 
- 	btd_gatt_client_ready(device->client_dbus);
--
--	/*
--	 * Update the GattServices property. Do this asynchronously since this
--	 * should happen after the "Characteristics" and "Descriptors"
--	 * properties of all services have been asynchronously updated by
--	 * btd_gatt_client.
--	 *
--	 * Service discovery will be skipped and exported objects won't change
--	 * if the attribute cache was populated when bt_gatt_client gets
--	 * initialized, so no need to to send this signal if that's the case.
--	 */
--	if (!device->gatt_cache_used)
--		g_idle_add(gatt_services_changed, device);
- }
- 
- static void gatt_client_service_changed(uint16_t start_handle,
-@@ -4615,8 +4578,6 @@ static void gatt_client_init(struct btd_device *device)
- 		return;
- 	}
- 
--	device->gatt_cache_used = !gatt_db_isempty(device->db);
--
- 	btd_gatt_client_connected(device->client_dbus);
- }
- 
-@@ -4914,6 +4875,9 @@ static struct browse_req *browse_request_new(struct btd_device *device,
- 
- 	device->browse = req;
- 
-+	g_dbus_emit_property_changed(dbus_conn, device->path,
-+					DEVICE_INTERFACE, "Discovering");
-+
- 	if (!msg)
- 		return req;
- 
+> The traces are here:
+> http://pastebin.com/7ZwF5wkp
+>
+>>
+>>> What is weird is that we receive object-removed signal for all of the bluez dbus stack, even for instance /org/bluez and /org/bluez/hci0. org.bluez also disappears from d-feet.
+>>
+>> That sounds like the adapter has been removed, perhaps it is a driver
+>> problem after all. Check the logs with btmon it should tell if that
+>> has happened.
+>
+> It does not look like the adapter gets removed. I tried to remove the adapter manually and look for similar trace on iPhone app kill but did not find any.
+>
+>>>
+>>> After this if we open the iPhone app and start broadcasting again, the bluez app does not work. If we restart the bluez app everything works as before.
+>>
+>> Probably the adapter is no longer available.
+>>
+>>> Do you have any idea why we do not receive connected = false signal if we kill our connected iPhone app?
+>>>
+>>> Why does the bluez lose its dbus interface if we kill our connected iPhone app?
+>>
+>> See the above explanation.
+>>
+>> --
+>> Luiz Augusto von Dentz
+>
+> Tõnis
+>
+
+
+
 -- 
-2.5.0
-
+Luiz Augusto von Dentz
