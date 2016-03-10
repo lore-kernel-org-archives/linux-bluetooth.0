@@ -1,58 +1,72 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <4446282.74ti4cqF2s@leonov>
-References: <1457094267-5925-1-git-send-email-luiz.dentz@gmail.com>
-	<CAExxLLD+Z4rVRhXqU0MYFKTvOeq09_=-C55fWF9oXdY=mUowTA@mail.gmail.com>
-	<CABBYNZKNkEFO7uAsH55Un47esqezPV-acTiqE1NFMfNXFWKj2Q@mail.gmail.com>
-	<4446282.74ti4cqF2s@leonov>
-Date: Thu, 10 Mar 2016 12:26:53 +0200
-Message-ID: <CABBYNZ+RUsTRfEdH-TByrmphna+DhvSZw8bi6_KunVXKfrsW_A@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 2/2] core/device: Don't set MTU when acting as a peripheral
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Szymon Janc <ext.szymon.janc@tieto.com>
-Cc: =?UTF-8?Q?=C5=81ukasz_Rymanowski?= <lukasz.rymanowski@codecoup.pl>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <CABBYNZJkLuSo4hAuNMJN3yKXQtx77BnTsEWvPfOQsXR9puCcqw@mail.gmail.com>
+References: <CAEZxfGPBv4YJwMEMVSeJQmy5fwzgd6ANpwBUXeZeiv2Pox865Q@mail.gmail.com>
+ <CABBYNZ+uYqOi7uYNGL6tJkJ5D2Cz=cOxCN5QbpLx1+Z7gC2Jxg@mail.gmail.com> <CABBYNZJkLuSo4hAuNMJN3yKXQtx77BnTsEWvPfOQsXR9puCcqw@mail.gmail.com>
+From: =?UTF-8?Q?Fran=C3=A7ois_Beaufort?= <beaufort.francois@gmail.com>
+Date: Thu, 10 Mar 2016 11:15:18 +0100
+Message-ID: <CAEZxfGM-bzd07TOGG-v27SdDiZTPduDzQw-k6tFxtg5EnR7VLg@mail.gmail.com>
+Subject: Re: Feature Request: Clean the cache upon device disconnection
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>,
+	=?UTF-8?Q?Giovanni_Ortu=C3=B1o?= <ortuno@google.com>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Here are failing bluetoothd and hcidump logs with BlueZ at commit
+c8a81f43921cf417e270f3b6e0b0118cbc27a58d
 
-On Thu, Mar 10, 2016 at 11:42 AM, Szymon Janc <ext.szymon.janc@tieto.com> wrote:
-> Hi Luiz,
+http://pastebin.com/raw/i416k6aw
+http://pastebin.com/raw/5dC9dFiP
+
+On Thu, Mar 10, 2016 at 10:11 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi François,
 >
-> On Thursday 10 of March 2016 11:35:23 Luiz Augusto von Dentz wrote:
->> Hi Lukasz,
+> On Wed, Mar 9, 2016 at 10:47 PM, Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+>> Hi François,
 >>
->> On Thu, Mar 10, 2016 at 11:17 AM, Łukasz Rymanowski
+>> On Wed, Mar 9, 2016 at 6:42 PM, François Beaufort
+>> <beaufort.francois@gmail.com> wrote:
+>>> As we've discovered recently
+>>> (https://github.com/thegecko/web-bluetooth-dfu/issues/12#issuecomment-194348474),
+>>> it looks like BlueZ trunk doesn't clean/update its cache upon device
+>>> disconnection.
+>>>
+>>> Is this on purpose?
+>>> If not, can it be fixed?
 >>
->> <lukasz.rymanowski@codecoup.pl> wrote:
->> >> Not only we cannot be configured as server, but even if we do the
->> >> roles are only relevant for PTS because otherwise there is no way to
->> >> tell the roles of the remote device.
->> >
->> > If device sends request that means it is a Client. If not that means
->> > it is a Server.
->>
->> Well if it send it can be a Client/Server as well, btw some systems
->> including Android appear to have support to send Exchange MTU at any
->> point so detecting a server only pretty hard, besides our current
->> design split Server and Client functionality so waiting to see if
->> anything has been received before starting sending anything is not so
->> trivial and we had still to choose an arbitrary timeout to wait for
->> detecting the role but if both are based on BlueZ this would just
->> delay each other.
+>> I actually need more info, we do check if the cache is valid on every
+>> reconnection, can someone provide the HCI trace of the issue perhaps
+>> it is not using the fixes for the cache that have been merged
+>> upstream.
 >
-> Maybe we could simply delay MTU exchange until we are done with discovery?
-> For discovery we shouldn't need larger MTU. And if in the meantime remote
-> initiates MTU exchange we can skip MTU exchange from our side.
-
-Actually discovery is where it makes most of the difference for
-devices with big databases which delays quite a lot the first
-connection (sometimes more than 10 seconds to discover everything). We
-do have a cache to mitigate that in the subsequent connections, but I
-wouldn't like to receive complains again that discovery takes too long
-because the MTU was not changed.
-
--- 
-Luiz Augusto von Dentz
+> There at least 2 important fixes to the cache that where applied upstream:
+>
+> Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> Date:   Mon Feb 15 14:14:31 2016 +0200
+>
+>     core/device: Fix not clearing Attributes before storing
+>
+>     This can leave the storage in a bad state if device start changing its
+>     attributes the old one are never removed as the code reloads them with
+>     g_key_file_load_from_file.
+>
+> commit e3c14b2627ed8fd6277a72761539cb54111fc205
+> Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> Date:   Mon Feb 15 13:44:27 2016 +0200
+>
+>     core/device: Fix not reseting database if attributes cannot be loaded
+>
+>     If one or more attributes cannot be loaded it means the database is
+>     probably in a bad state so just clear it so the attributes can be
+>     discovered again.
+>
+> If you don't have them it is probably not going to work since the
+> device appears to be changing its database while win DFU mode.
+>
+>
+> --
+> Luiz Augusto von Dentz
