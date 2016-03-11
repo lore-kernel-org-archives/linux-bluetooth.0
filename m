@@ -1,152 +1,119 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CAExxLLDo44eLdFnM_mmbdiWoPK-Y16K48W=79gSCLT0K5p2i6w@mail.gmail.com>
-References: <1448622711-17562-1-git-send-email-lukasz.rymanowski@codecoup.pl>
-	<1448622711-17562-2-git-send-email-lukasz.rymanowski@codecoup.pl>
-	<CABBYNZKk=RZERiZfD02mtW7sZg2G+R1cOHBfT9BU8CETHJcPyw@mail.gmail.com>
-	<CAExxLLDo44eLdFnM_mmbdiWoPK-Y16K48W=79gSCLT0K5p2i6w@mail.gmail.com>
-Date: Fri, 11 Mar 2016 14:27:39 +0100
-Message-ID: <CAExxLLATiPgHr_nFvF5vpZei84pCKihYmB+Q5oaX6A4p+2Fe_g@mail.gmail.com>
-Subject: Re: [PATCH v2 01/11] unit/test-gatt: Fix long write testcases
-From: =?UTF-8?Q?=C5=81ukasz_Rymanowski?= <lukasz.rymanowski@codecoup.pl>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+In-Reply-To: <CADAkoF5TF8SvxP3sQpbQ2Pwo7fKYQDvvN2jPgfD3538Vt-Bf_g@mail.gmail.com>
+References: <1457626604-5656-1-git-send-email-luiz.dentz@gmail.com>
+	<CADAkoF5psaM7eAgjMZGbq4Q-Kx_SDEbEn9MtQM8Mj9+g+ow0Aw@mail.gmail.com>
+	<CABBYNZ+Wx+dWGJ8PJGBXbsXt5U9PT_EVfLJkv8EOJNCj7AgK5g@mail.gmail.com>
+	<CADAkoF5TF8SvxP3sQpbQ2Pwo7fKYQDvvN2jPgfD3538Vt-Bf_g@mail.gmail.com>
+Date: Fri, 11 Mar 2016 15:08:22 +0200
+Message-ID: <CABBYNZLDRMzUM8_XkiORdxLe-8jkzn=tLQD_z+SDWZi8-8iwtw@mail.gmail.com>
+Subject: Re: [RFC BlueZ] doc/device-api: Replace GattServices with Discovering property
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Andrzej Kaczmarek <andrzej.kaczmarek@codecoup.pl>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Andrzej,
 
-On 3 December 2015 at 22:08, Łukasz Rymanowski
-<lukasz.rymanowski@codecoup.pl> wrote:
+On Fri, Mar 11, 2016 at 2:24 PM, Andrzej Kaczmarek
+<andrzej.kaczmarek@codecoup.pl> wrote:
 > Hi Luiz,
 >
-> On Thu, Dec 3, 2015 at 10:27 AM, Luiz Augusto von Dentz
+>
+> On Fri, Mar 11, 2016 at 12:23 PM, Luiz Augusto von Dentz
 > <luiz.dentz@gmail.com> wrote:
+>> Hi Andrzej,
 >>
->> Hi Łukasz,
+>> On Fri, Mar 11, 2016 at 1:05 PM, Andrzej Kaczmarek
+>> <andrzej.kaczmarek@codecoup.pl> wrote:
+>>> Hi Luiz,
+>>>
+>>> On Thu, Mar 10, 2016 at 5:16 PM, Luiz Augusto von Dentz
+>>> <luiz.dentz@gmail.com> wrote:
+>>>> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>>>>
+>>>> GattServices is not really doing was it was meant to do which was to
+>>>> track progress of service discovery since it only worked for the very
+>>>> first time a device is connected but since we no longer remove the
+>>>> attributes an application would have the false impression the service are
+>>>> all resolved by the time it reconnects when in fact the service may have
+>>>> changed.
+>>>>
+>>>> Futhermore object tracking like it is doing has been obsolete by
+>>>> ObjectManager so this propose to replace the service discovery tracking
+>>>> with a boolean property which works both with SDP as well as GATT
+>>>> discovery.
+>>>> ---
+>>>>  doc/device-api.txt |  9 +++------
+>>>>  src/device.c       | 58 +++++++++++-------------------------------------------
+>>>>  2 files changed, 14 insertions(+), 53 deletions(-)
+>>>>
+>>>> diff --git a/doc/device-api.txt b/doc/device-api.txt
+>>>> index a8076a2..9e58664 100644
+>>>> --- a/doc/device-api.txt
+>>>> +++ b/doc/device-api.txt
+>>>> @@ -212,10 +212,7 @@ Properties string Address [readonly]
+>>>>                         Service advertisement data. Keys are the UUIDs in
+>>>>                         string format followed by its byte array value.
+>>>>
+>>>> -               array{object} GattServices [readonly, optional]
+>>>> +               bool Discovering [readonly, optional, experimental]
+>>>
+>>> It's not optional - there's no exists method (which is fine).
 >>
->> On Fri, Nov 27, 2015 at 1:11 PM, Łukasz Rymanowski
->> <lukasz.rymanowski@codecoup.pl> wrote:
->> > Idea of long write is that each part of data is continuation
->> > of previous one. There shall be not gaps in the offsets between.
->> >
->> > If there are gaps in offset then we have reliable write rather than
->> > long write
+>> Indeed, I will fix it.
 >>
->> The patch looks fine what I did not understand is what different it
->> makes if it is a reliable write or a long write, to me all long writes
->> are in fact reliable write since it does use prepare + execute, the
->> fact that only one handle is written doesn't change anything.
+>>> I think a better name for this would be "Discovered" which has initial
+>>> value of false (once device is connected) and then changes to true
+>>> (once services are ready, either from cache or an actual discovery).
+>>> It could also change back to false once re-discovery due to Service
+>>> Changed is in progress which I think is also fine.
+>>>
+>>> With "Discovering" the problem is still that once "Connected" changes
+>>> to true, reading "Discovering" will return false so you don't quite
+>>> know whether discovery already finished or has not yet started.
+>>> Application would need to wait for complete sequence to be sure:
+>>> Connected=false, Discovering=false
+>>> Connected=true, Discovering=false
+>>> Connected=false, Discovering=true
+>>> Connected=false, Discovering=false
+>>>
+>>> With "Discovered" this is not a problem since sequence is as follows:
+>>> Connected=false, Discovered=false
+>>> Connected=true, Discovered=false
+>>> Connected=true, Discovered=true
 >>
+>> I was actually thinking in using the same terminology we used in the
+>> source code such as ResolvingServices, but changing to Discovered
+>> don't actually fix the problem since you may still end up with
+>> Connected=true, Discovered=true but the flag can still change to
+>> Discovered=false. Anyway Im currently discussing about this changes
+>> makes sense in Web Bluetooth, because Service Changed may come in
+>> later on and there is no API to push the services added/removed to the
+>> application.
 >
-> These testes are for Long write and there is a difference between Long Write and
-> Reliable Write even those two use prepare/execute writes. This can be
-> found in the
-> BT Spec Chapter 3 Part G, 4.9.4  and 4.9.5
->
-> Basically those procedure belongs to GATT and our gatt server should
-> understand that.
->
-> If we are going to not expose prepare/execute wirtes to application,
-> then this is GATT server which should
-> recognize procedure and prepare data to be written to application.
-> i.e. for long write do aggregation of all
-> prepare writes, we can not just write part of data as this would cause
-> some unexpected behavior.
->
-> We also need this change, because following patches will start to test
-> for characteristic extended properties
-> descriptor and do not allow reliable write on characteristics which
-> does not have property for this.
-> Note that for Long Write we don't need this descriptor property, so
-> these test cases would fail then.
->
-> Also, note that there is Long Write procedure for descriptors but
-> there is no Reliable Write procedure for
-> descriptors, so we definitely cannot treat long and prepare as the same one.
->
->
-Was my explanation clear enough?
+> When Service Changed is received, BlueZ removes old objects and then
+> adds new ones. And once there's change to Discovered=false it means
+> device in its current state is not fully discovered, e.g. there's
+> re-discovery due to Service Changed in this case which makes sense to
+> me. So what's the problem here?
 
-Just getting back to this work and we have some outstanding patches in
-this patchset
-which should be OK to apply.
+If that was the case, again this is for Web Bluetooth, we wouldn't
+need to notify this at all because the application would receive the
+updates directly, but since the Web Bluetooth is not designed in this
+way you just get the current services if anything is updated later it
+causes this problem where the services get updated but the application
+don't realize it has happened. So it is all about when the application
+actually list the objects, again Im talking about Web Bluetooth
+applications, if by the time it calls getPrimaryServices the discovery
+is active there is a chance it will return outdated services.
+Essentially it is a polling API.
 
->> > ---
->> >  unit/test-gatt.c | 16 ++++++++--------
->> >  1 file changed, 8 insertions(+), 8 deletions(-)
->> >
->> > diff --git a/unit/test-gatt.c b/unit/test-gatt.c
->> > index 326a32c..70b6de5 100644
->> > --- a/unit/test-gatt.c
->> > +++ b/unit/test-gatt.c
->> > @@ -3852,8 +3852,8 @@ int main(int argc, char *argv[])
->> >                         raw_pdu(0x17, 0x03, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff,
->> >                                 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
->> >                                 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff),
->> > -                       raw_pdu(0x16, 0x03, 0x00, 0x3f, 0x00, 0xff),
->> > -                       raw_pdu(0x17, 0x03, 0x00, 0x3f, 0x00, 0xff),
->> > +                       raw_pdu(0x16, 0x03, 0x00, 0x12, 0x00, 0xff),
->> > +                       raw_pdu(0x17, 0x03, 0x00, 0x12, 0x00, 0xff),
->> >                         raw_pdu(0x18, 0x01),
->> >                         raw_pdu(0x19));
->> >
->> > @@ -3866,8 +3866,8 @@ int main(int argc, char *argv[])
->> >                         raw_pdu(0x17, 0x82, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff,
->> >                                 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
->> >                                 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff),
->> > -                       raw_pdu(0x16, 0x82, 0x00, 0x3f, 0x00, 0xff),
->> > -                       raw_pdu(0x17, 0x82, 0x00, 0x3f, 0x00, 0xff),
->> > +                       raw_pdu(0x16, 0x82, 0x00, 0x12, 0x00, 0xff),
->> > +                       raw_pdu(0x17, 0x82, 0x00, 0x12, 0x00, 0xff),
->> >                         raw_pdu(0x18, 0x01),
->> >                         raw_pdu(0x19));
->> >
->> > @@ -4374,8 +4374,8 @@ int main(int argc, char *argv[])
->> >                         raw_pdu(0x17, 0x04, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff,
->> >                                 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
->> >                                 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff),
->> > -                       raw_pdu(0x16, 0x04, 0x00, 0x3f, 0x00, 0xff),
->> > -                       raw_pdu(0x17, 0x04, 0x00, 0x3f, 0x00, 0xff),
->> > +                       raw_pdu(0x16, 0x04, 0x00, 0x12, 0x00, 0xff),
->> > +                       raw_pdu(0x17, 0x04, 0x00, 0x12, 0x00, 0xff),
->> >                         raw_pdu(0x18, 0x01),
->> >                         raw_pdu(0x19));
->> >
->> > @@ -4388,8 +4388,8 @@ int main(int argc, char *argv[])
->> >                         raw_pdu(0x17, 0x83, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff,
->> >                                 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
->> >                                 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff),
->> > -                       raw_pdu(0x16, 0x83, 0x00, 0x3f, 0x00, 0xff),
->> > -                       raw_pdu(0x17, 0x83, 0x00, 0x3f, 0x00, 0xff),
->> > +                       raw_pdu(0x16, 0x83, 0x00, 0x12, 0x00, 0xff),
->> > +                       raw_pdu(0x17, 0x83, 0x00, 0x12, 0x00, 0xff),
->> >                         raw_pdu(0x18, 0x01),
->> >                         raw_pdu(0x19));
->> >
->> > --
->> > 2.5.0
->> >
->> > --
->> > To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->> > the body of a message to majordomo@vger.kernel.org
->> > More majordomo info at  http://vger.kernel.org/majordomo-info.html
->>
->>
->>
->> --
->> Luiz Augusto von Dentz
->
->
->
->
-> --
-> BR / Pozdrawiam
-> Łukasz
+You can read more about this issue here:
 
-
+https://github.com/thegecko/web-bluetooth-dfu/issues/12#issuecomment-194973956
 
 -- 
-BR / Pozdrawiam
-Łukasz
+Luiz Augusto von Dentz
