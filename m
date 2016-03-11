@@ -1,102 +1,75 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <CADAkoF5psaM7eAgjMZGbq4Q-Kx_SDEbEn9MtQM8Mj9+g+ow0Aw@mail.gmail.com>
-References: <1457626604-5656-1-git-send-email-luiz.dentz@gmail.com>
-	<CADAkoF5psaM7eAgjMZGbq4Q-Kx_SDEbEn9MtQM8Mj9+g+ow0Aw@mail.gmail.com>
-Date: Fri, 11 Mar 2016 13:23:26 +0200
-Message-ID: <CABBYNZ+Wx+dWGJ8PJGBXbsXt5U9PT_EVfLJkv8EOJNCj7AgK5g@mail.gmail.com>
-Subject: Re: [RFC BlueZ] doc/device-api: Replace GattServices with Discovering property
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Andrzej Kaczmarek <andrzej.kaczmarek@codecoup.pl>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <loic.poulain@intel.com>
+From: Loic Poulain <loic.poulain@intel.com>
+To: marcel@holtmann.org
+Cc: linux-bluetooth@vger.kernel.org,
+	Loic Poulain <loic.poulain@intel.com>
+Subject: [PATCH] Bluetooth: hci_ldisc: Fix null pointer derefence in case of early data
+Date: Fri, 11 Mar 2016 12:19:26 +0100
+Message-Id: <1457695166-16467-1-git-send-email-loic.poulain@intel.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrzej,
+HCI_UART_PROTO_SET flag is set before hci_uart_set_proto call. If we
+receive data from tty layer during this procedure, proto pointer may
+not be assigned yet, leading to null pointer dereference in rx method
+hci_uart_tty_receive.
 
-On Fri, Mar 11, 2016 at 1:05 PM, Andrzej Kaczmarek
-<andrzej.kaczmarek@codecoup.pl> wrote:
-> Hi Luiz,
->
-> On Thu, Mar 10, 2016 at 5:16 PM, Luiz Augusto von Dentz
-> <luiz.dentz@gmail.com> wrote:
->> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->>
->> GattServices is not really doing was it was meant to do which was to
->> track progress of service discovery since it only worked for the very
->> first time a device is connected but since we no longer remove the
->> attributes an application would have the false impression the service are
->> all resolved by the time it reconnects when in fact the service may have
->> changed.
->>
->> Futhermore object tracking like it is doing has been obsolete by
->> ObjectManager so this propose to replace the service discovery tracking
->> with a boolean property which works both with SDP as well as GATT
->> discovery.
->> ---
->>  doc/device-api.txt |  9 +++------
->>  src/device.c       | 58 +++++++++++-------------------------------------------
->>  2 files changed, 14 insertions(+), 53 deletions(-)
->>
->> diff --git a/doc/device-api.txt b/doc/device-api.txt
->> index a8076a2..9e58664 100644
->> --- a/doc/device-api.txt
->> +++ b/doc/device-api.txt
->> @@ -212,10 +212,7 @@ Properties string Address [readonly]
->>                         Service advertisement data. Keys are the UUIDs in
->>                         string format followed by its byte array value.
->>
->> -               array{object} GattServices [readonly, optional]
->> +               bool Discovering [readonly, optional, experimental]
->
-> It's not optional - there's no exists method (which is fine).
+This patch fixes this by setting the HCI_UART_PROTO_SET flag once proto
+is fully initialized and introduces HCI_UART_PROTO_BUSY flag to avoid
+concurrent call to set_proto. We could have fixed this with a mutex as
+well.
 
-Indeed, I will fix it.
+Signed-off-by: Loic Poulain <loic.poulain@intel.com>
+---
+ drivers/bluetooth/hci_ldisc.c | 16 +++++++++-------
+ drivers/bluetooth/hci_uart.h  |  1 +
+ 2 files changed, 10 insertions(+), 7 deletions(-)
 
-> I think a better name for this would be "Discovered" which has initial
-> value of false (once device is connected) and then changes to true
-> (once services are ready, either from cache or an actual discovery).
-> It could also change back to false once re-discovery due to Service
-> Changed is in progress which I think is also fine.
->
-> With "Discovering" the problem is still that once "Connected" changes
-> to true, reading "Discovering" will return false so you don't quite
-> know whether discovery already finished or has not yet started.
-> Application would need to wait for complete sequence to be sure:
-> Connected=false, Discovering=false
-> Connected=true, Discovering=false
-> Connected=false, Discovering=true
-> Connected=false, Discovering=false
->
-> With "Discovered" this is not a problem since sequence is as follows:
-> Connected=false, Discovered=false
-> Connected=true, Discovered=false
-> Connected=true, Discovered=true
-
-I was actually thinking in using the same terminology we used in the
-source code such as ResolvingServices, but changing to Discovered
-don't actually fix the problem since you may still end up with
-Connected=true, Discovered=true but the flag can still change to
-Discovered=false. Anyway Im currently discussing about this changes
-makes sense in Web Bluetooth, because Service Changed may come in
-later on and there is no API to push the services added/removed to the
-application.
-
->> -                       List of GATT service object paths. Each referenced
->> -                       object exports the org.bluez.GattService1 interface and
->> -                       represents a remote GATT service. This property will be
->> -                       updated once all remote GATT services of this device
->> -                       have been discovered and exported over D-Bus.
->> +                       Indicate whether or not service discovery is in
->> +                       progress.
->
-> <snip>
->
-> BR,
-> Andrzej
-
-
-
+diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
+index c00168a..fab2641 100644
+--- a/drivers/bluetooth/hci_ldisc.c
++++ b/drivers/bluetooth/hci_ldisc.c
+@@ -638,6 +638,7 @@ static int hci_uart_set_proto(struct hci_uart *hu, int id)
+ 		return err;
+ 
+ 	hu->proto = p;
++	set_bit(HCI_UART_PROTO_SET, &hu->flags);
+ 
+ 	err = hci_uart_register_dev(hu);
+ 	if (err) {
+@@ -692,14 +693,15 @@ static int hci_uart_tty_ioctl(struct tty_struct *tty, struct file *file,
+ 
+ 	switch (cmd) {
+ 	case HCIUARTSETPROTO:
+-		if (!test_and_set_bit(HCI_UART_PROTO_SET, &hu->flags)) {
+-			err = hci_uart_set_proto(hu, arg);
+-			if (err) {
+-				clear_bit(HCI_UART_PROTO_SET, &hu->flags);
+-				return err;
+-			}
+-		} else
++		if (test_and_set_bit(HCI_UART_PROTO_BUSY, &hu->flags))
+ 			return -EBUSY;
++		if (test_bit(HCI_UART_PROTO_SET, &hu->flags))
++			err = -EBUSY;
++		else
++			err = hci_uart_set_proto(hu, arg);
++		clear_bit(HCI_UART_PROTO_BUSY, &hu->flags);
++		if (err)
++			return err;
+ 		break;
+ 
+ 	case HCIUARTGETPROTO:
+diff --git a/drivers/bluetooth/hci_uart.h b/drivers/bluetooth/hci_uart.h
+index 4814ff0..1a97fa9 100644
+--- a/drivers/bluetooth/hci_uart.h
++++ b/drivers/bluetooth/hci_uart.h
+@@ -95,6 +95,7 @@ struct hci_uart {
+ /* HCI_UART proto flag bits */
+ #define HCI_UART_PROTO_SET	0
+ #define HCI_UART_REGISTERED	1
++#define HCI_UART_PROTO_BUSY	2
+ 
+ /* TX states  */
+ #define HCI_UART_SENDING	1
 -- 
-Luiz Augusto von Dentz
+1.9.1
