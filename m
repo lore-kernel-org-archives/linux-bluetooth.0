@@ -1,142 +1,102 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <7179C825-19A2-4A6E-8BA3-F08CEA87C8E5@high-mobility.com>
-References: <9D4EB9A8-6F3A-47EE-842C-1049DEC1A5B2@high-mobility.com>
-	<CABBYNZLxPy4kUwhNX94q3s1bLsEPMd+TN-QigMs8cozk8yWAuw@mail.gmail.com>
-	<EEBB0B2D-94A2-4B9D-A719-E6F5CF012159@high-mobility.com>
-	<CABBYNZK0_80a-ShTOmO--XEPD346AyC1zEtVUX06oGsyV21x_Q@mail.gmail.com>
-	<7179C825-19A2-4A6E-8BA3-F08CEA87C8E5@high-mobility.com>
-Date: Fri, 11 Mar 2016 13:45:43 +0200
-Message-ID: <CABBYNZ+qPLf5rXZvve7U84VuJka2CMCu2JMBmC_okD6zAjgjng@mail.gmail.com>
-Subject: Re: ConnectProfile for faster service discovery.
+In-Reply-To: <CADAkoF5psaM7eAgjMZGbq4Q-Kx_SDEbEn9MtQM8Mj9+g+ow0Aw@mail.gmail.com>
+References: <1457626604-5656-1-git-send-email-luiz.dentz@gmail.com>
+	<CADAkoF5psaM7eAgjMZGbq4Q-Kx_SDEbEn9MtQM8Mj9+g+ow0Aw@mail.gmail.com>
+Date: Fri, 11 Mar 2016 13:23:26 +0200
+Message-ID: <CABBYNZ+Wx+dWGJ8PJGBXbsXt5U9PT_EVfLJkv8EOJNCj7AgK5g@mail.gmail.com>
+Subject: Re: [RFC BlueZ] doc/device-api: Replace GattServices with Discovering property
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: =?UTF-8?Q?T=C3=B5nis_Tiganik?= <ttiganik@high-mobility.com>
+To: Andrzej Kaczmarek <andrzej.kaczmarek@codecoup.pl>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Tõnis,
+Hi Andrzej,
 
-On Fri, Mar 11, 2016 at 1:01 PM, Tõnis Tiganik
-<ttiganik@high-mobility.com> wrote:
-> Hi Luiz
+On Fri, Mar 11, 2016 at 1:05 PM, Andrzej Kaczmarek
+<andrzej.kaczmarek@codecoup.pl> wrote:
+> Hi Luiz,
 >
->> On 09 Mar 2016, at 12:38, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
+> On Thu, Mar 10, 2016 at 5:16 PM, Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+>> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 >>
->> Hi Tõnis,
+>> GattServices is not really doing was it was meant to do which was to
+>> track progress of service discovery since it only worked for the very
+>> first time a device is connected but since we no longer remove the
+>> attributes an application would have the false impression the service are
+>> all resolved by the time it reconnects when in fact the service may have
+>> changed.
 >>
->> On Wed, Mar 9, 2016 at 11:54 AM, Tõnis Tiganik
->> <ttiganik@high-mobility.com> wrote:
->>> Hi Luiz, thanks for the reply
->>>
->>>
->>>> On 08 Mar 2016, at 16:38, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
->>>>
->>>> Hi Tõnis,
->>>>
->>>> On Tue, Mar 8, 2016 at 1:15 PM, Tõnis Tiganik
->>>> <ttiganik@high-mobility.com> wrote:
->>>>> Hello, we have implemented our application using BlueZ and DBUS.
->>>>>
->>>>> All is working rather well but the service/characteristics discovery is slow after Connecting to the device. Our guess is that this is because all of the services are discovered automatically in the connection process and for instance iPhone has a lot of services extra that we are not interested in. For other platforms(iOS, BlueSDK), optional service discovery is supported and it seems to work faster.
->>>>>
->>>>> After looking into some threads and the device-api.txt it seems ConnectProfile() should be the method to use. However, when connecting to our UUID with the following:
->>>>>
->>>>> GVariant *UUIDString = g_variant_new("s", "713d0100-503e-4c75-ba94-3148f18d941e");
->>>>> reply = g_dbus_proxy_call_sync(device_proxy, "ConnectProfile", g_variant_new_tuple(&UUIDString, 1),
->>>>>                                          G_DBUS_CALL_FLAGS_NONE, -1, NULL, &error);
->>>>>
->>>>> the call repeatedly fails with:
->>>>>
->>>>> GDBus.Error:org.bluez.Error.Failed: Host is down
->>>>>
->>>>> We know the UUID exists because it is in the Device property UUIDs if we use the normal Connect method that discovers all the services automatically.
->>>>>
->>>>> Is it possible to connect and only discover the services that our application is interested in?
->>>>> Could it be faster than the normal Connect() method?
->>>>
->>>> Currently we build a cache the very first time you connect to the
->>>> device then subsequent connects will just check if there are any
->>>> services have changed but that is actually quite fast if nothing has
->>>> changed, this mechanism is present for a while but perhaps you have a
->>>> dated version that don't have this implemented yet.
->>>
->>> I’m using blueZ 5.35.
->>> Actually our application currently removes the device (RemoveDevice) after disconnecting. We do this to get the object-added signal the next time the device comes into proximity, so the application knows when to connect to it again.
+>> Futhermore object tracking like it is doing has been obsolete by
+>> ObjectManager so this propose to replace the service discovery tracking
+>> with a boolean property which works both with SDP as well as GATT
+>> discovery.
+>> ---
+>>  doc/device-api.txt |  9 +++------
+>>  src/device.c       | 58 +++++++++++-------------------------------------------
+>>  2 files changed, 14 insertions(+), 53 deletions(-)
 >>
->> For that we do have passive scanning, but in order for that to work
->> you need to stop removing the device since that clear the device from
->> the list of passive scan.
+>> diff --git a/doc/device-api.txt b/doc/device-api.txt
+>> index a8076a2..9e58664 100644
+>> --- a/doc/device-api.txt
+>> +++ b/doc/device-api.txt
+>> @@ -212,10 +212,7 @@ Properties string Address [readonly]
+>>                         Service advertisement data. Keys are the UUIDs in
+>>                         string format followed by its byte array value.
 >>
->>> We also do this to clear out the previous DBUS object, because on disconnect we change the MAC address of the device and because of this BlueZ creates a new Device object. We change the MAC for privacy concerns.
->>
->> If you are using Bluetooth privacy (RPAs) the kernel will actually
->> resolve the identity address, so you don't need to remove the device
->> because of that, if you are not doing RPA and just changing using a
->> static address I would recommend you to stop doing that because that
->> wont work with passive scanning since it will be interpreted as a
->> different device.
+>> -               array{object} GattServices [readonly, optional]
+>> +               bool Discovering [readonly, optional, experimental]
 >
-> Actually we do not change the mac ourselves, iOS does it for us at some point. Im not sure the identity address resolving works for us though.
->
-> What we did to test the address resolving:
->
-> * Remove all device interfaces from dbus for a clean sheet.
-> * Start broadcasting with the device, let our bluez app connect to it. After this in d-feet we see our device(dev_AA) and its services.
-> * Switch the BLE off on the device (simulate out of range event).
-> * Switch the BLE on - start advertising again.
-> * Observe that a new device is created in d-feet(dev_BB) and the previous interface dev_AA is not removed. The mac address has changed from AA to BB.
-> * Our app now connects to the “new" device dev_BB and discovers all of the services again.
+> It's not optional - there's no exists method (which is fine).
 
-Interesting, perhaps you forgot to pair in order for the resolving to
-work since we need the irk to do that.
+Indeed, I will fix it.
 
-> This is why we remove the device on disconnect - so we dont get these duplicate interfaces.
+> I think a better name for this would be "Discovered" which has initial
+> value of false (once device is connected) and then changes to true
+> (once services are ready, either from cache or an actual discovery).
+> It could also change back to false once re-discovery due to Service
+> Changed is in progress which I think is also fine.
 >
-> Is the address resolving supposed to work with our use-case? If so then what might be the reason that we get duplicate entries for the same device?
+> With "Discovering" the problem is still that once "Connected" changes
+> to true, reading "Discovering" will return false so you don't quite
+> know whether discovery already finished or has not yet started.
+> Application would need to wait for complete sequence to be sure:
+> Connected=false, Discovering=false
+> Connected=true, Discovering=false
+> Connected=false, Discovering=true
+> Connected=false, Discovering=false
 >
->>
->>> So I guess for this reason the services aren’t cached? Could there be another way to discover only the service we are interested in, without the initial caching?
->>
->> Not without changing the API, but I would be against since it enables
->> doing this short of misuse of the APIs and not taking advance of
->> passive scanning and RPAs which the kernel is already doing for a
->> while.
->>
->>>>>
->>>>> Im also wondering if there is a signal or some other mechanism to detect when a disconnected but advertising peripheral leaves the central's proximity?
->>>>
->>>> Well perhaps you want a mechanism to detect if was a link-loss or just
->>>> a regular disconnection initiated by the remote, this is not necessary
->>>> in LE since you can program the kernel to do passive scanning for you
->>>> and reconnect as soon it finds the peripheral is advertising.
->>>> bluetoothd will actually attempt to set this up if your kernel support
->>>> it (requires 3.17 or later).
->>>
->>>
->>> $  uname -r
->>> 4.2.0-30-generic
->>>
->>> Im guessing this does not work for us because we do the RemoveDevice on disconnect, so kernel does not reconnect automatically.
->>>
->>> We need a mechanism to detect when a disconnected device leaves the proximity eg when the peripheral advertisements stop. It would actually be preferred if we would receive all the advertisement packages(for RSSI for example).
->>
->> Don't you get disconnected when that happen? Can't you infer that
->> whenever the device is disconnected it is out of range?
->>
->>> I have tried to move the device away from the computer but I do not receive the properties changed signal for RSSI - Im thinking if we would receive 0 for this we would know the device has leaved the proximity.
->>
->> Well if it is out of range we wont receive any signals from it, our do
->> you mean that we would fake a RSSI for all devices out of ranges, I
->> really fail to see what the value in this if you just want to be able
->> to reconnect as soon as the device start to advertise. If you want to
->> do proper proximity then I suggest you go with proximity profile.
->
-> Thanks, I did not notice there exists a proximity profile (proximity-api.txt ?). I will try it out.
+> With "Discovered" this is not a problem since sequence is as follows:
+> Connected=false, Discovered=false
+> Connected=true, Discovered=false
+> Connected=true, Discovered=true
 
-Well I meant that you could implement one using D-Bus API, the plugin
-is actually deprecated so don't use that.
+I was actually thinking in using the same terminology we used in the
+source code such as ResolvingServices, but changing to Discovered
+don't actually fix the problem since you may still end up with
+Connected=true, Discovered=true but the flag can still change to
+Discovered=false. Anyway Im currently discussing about this changes
+makes sense in Web Bluetooth, because Service Changed may come in
+later on and there is no API to push the services added/removed to the
+application.
+
+>> -                       List of GATT service object paths. Each referenced
+>> -                       object exports the org.bluez.GattService1 interface and
+>> -                       represents a remote GATT service. This property will be
+>> -                       updated once all remote GATT services of this device
+>> -                       have been discovered and exported over D-Bus.
+>> +                       Indicate whether or not service discovery is in
+>> +                       progress.
+>
+> <snip>
+>
+> BR,
+> Andrzej
+
+
 
 -- 
 Luiz Augusto von Dentz
