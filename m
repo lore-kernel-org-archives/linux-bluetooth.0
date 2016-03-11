@@ -1,35 +1,40 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Date: Fri, 11 Mar 2016 13:00:16 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 2/2] Bluetooth: Fix potential buffer overflow with Add
- Advertising
-Message-ID: <20160311110016.GA5291@t440s>
-References: <1457682993-18470-1-git-send-email-johan.hedberg@gmail.com>
- <1457682993-18470-2-git-send-email-johan.hedberg@gmail.com>
+Return-Path: <szymon.janc@codecoup.pl>
+From: Szymon Janc <szymon.janc@codecoup.pl>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [RFC] doc: Add DeviceClassic1 and DeviceSmart1 interfaces
+Date: Fri, 11 Mar 2016 10:56:10 +0100
+Message-ID: <1953352.ZcJQUXlYx9@ix>
+In-Reply-To: <CABBYNZKK6eCVouvsQMGfQdYA-6RY02O05q7yMsjtHfPL1kBu7A@mail.gmail.com>
+References: <1457106781-8566-1-git-send-email-szymon.janc@codecoup.pl> <799E44F0-0095-4281-9850-5A5A53C3D413@holtmann.org> <CABBYNZKK6eCVouvsQMGfQdYA-6RY02O05q7yMsjtHfPL1kBu7A@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1457682993-18470-2-git-send-email-johan.hedberg@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Marcel, Luiz,
 
-On Fri, Mar 11, 2016, Johan Hedberg wrote:
-> The Add Advertising command handler does the appropriate checks for
-> the AD and Scan Response data, however fails to take into account the
-> general length of the mgmt command itself, which could lead to
-> potential buffer overflows. This patch adds the necessary check that
-> the mgmt command length is consistent with the given ad and scan_rsp
-> lengths.
+On Sunday 06 March 2016 16:34:53 Luiz Augusto von Dentz wrote:
+> Hi Marcel,
 > 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> ---
->  net/bluetooth/mgmt.c | 4 ++++
->  1 file changed, 4 insertions(+)
+> On Fri, Mar 4, 2016 at 7:32 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
+> > Hi Szymon,
+> > 
+> >> This interfaces will provide per tranport capabilities of remote
+> >> devices. Eventually leading to deprecation of Device1 interface.
+> > 
+> > so I not like the naming DeviceClassic1 and DeviceSmart1 at all. Nobody
+> > uses these terms widely that they are easily recognizable and can be
+> > associated. I also do not want to follow Bluetooth SIG marketing and logo
+> > terms. They might change and then we are stuck with it.
+> IMO they are better than LE and BR/EDR, but perhaps you have something
+> better in mind. Btw, this does bring the question if we should do
+> something similar to the Adapter interface, although there are a
+> little less conflicts because there more LE specific interfaces.
 
-For the record, this one probably deserves a Cc: stable tag. It should
-cleanly apply to 4.5 and with a little bit of fixing to 4.4 as well
-(which might be more important as that's a long term support release).
+DeviceLE1 and DeviceBR{EDR}1 ?
 
-Johan
+Or maybe Device2 (that would be BREDR only) and DeviceLE1 ? 
+
+-- 
+pozdrawiam
+Szymon Janc
