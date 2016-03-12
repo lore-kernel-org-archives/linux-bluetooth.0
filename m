@@ -1,54 +1,111 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Amitkumar Karwar <akarwar@marvell.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-CC: Cathy Luo <cluo@marvell.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	Nishant Sarmukadam <nishants@marvell.com>,
-	Ganapathi Bhat <gbhat@marvell.com>
-Subject: RE: [PATCH v4] Bluetooth: hci_uart: Support firmware download for
- Marvell
-Date: Mon, 14 Mar 2016 06:32:24 +0000
-Message-ID: <169b736d643e43598eceaad3adbdfe6d@SC-EXCH04.marvell.com>
-References: <1457006200-8132-1-git-send-email-akarwar@marvell.com>
- <1457006200-8132-2-git-send-email-akarwar@marvell.com>
-In-Reply-To: <1457006200-8132-2-git-send-email-akarwar@marvell.com>
-Content-Type: text/plain; charset="us-ascii"
+Return-Path: <netdev-owner@vger.kernel.org>
+Date: Sat, 12 Mar 2016 08:39:34 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Subject: pull request: bluetooth-next 2016-03-12
+Message-ID: <20160312063934.GA21940@t440s.P-661HNU-F1>
 MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="RnlQjJ0d97Da+TV1"
+Sender: netdev-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
 
-Do you have any comments for this patch?
-Please let us know if you have any more suggestions for the improvements.
+--RnlQjJ0d97Da+TV1
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> From: Amitkumar Karwar [mailto:akarwar@marvell.com]
-> Sent: Thursday, March 03, 2016 5:27 PM
-> To: linux-bluetooth@vger.kernel.org
-> Cc: Cathy Luo; linux-kernel@vger.kernel.org; Nishant Sarmukadam;
-> Ganapathi Bhat; Amitkumar Karwar
-> Subject: [PATCH v4] Bluetooth: hci_uart: Support firmware download for
-> Marvell
-> 
-> From: Ganapathi Bhat <gbhat@marvell.com>
-> 
-> This patch implement firmware download feature for Marvell Bluetooth
-> devices. If firmware is already downloaded, it will skip downloading.
-> 
-> Signed-off-by: Ganapathi Bhat <gbhat@marvell.com>
-> Signed-off-by: Amitkumar Karwar <akarwar@marvell.com>
-> ---
-> v2: Fixed compilation warning reported by kbuild test robot
-> v3: Addressed review comments from Marcel Holtmann
->     a) Removed vendor specific code from hci_ldisc.c
->     b) Get rid of static forward declaration
->     c) Removed unnecessary heavy nesting
->     d) Git rid of module parameter and global variables
->     e) Add logic to pick right firmware image
-> v4: Addresses review comments from Alan
->     a) Use existing kernel helper APIs instead of writing own.
->     b) Replace mdelay() with msleep()
-> ---
+Hi Dave,
 
-Regards,
-Amitkumar
+Here's the last bluetooth-next pull request for the 4.6 kernel.
+
+ - New USB ID for AR3012 in btusb
+ - New BCM2E55 ACPI ID
+ - Buffer overflow fix for the Add Advertising command
+ - Support for a new Bluetooth LE limited privacy mode
+ - Fix for firmware activation in btmrvl_sdio
+ - Cleanups to mac802154 & 6lowpan code
+
+Please let me know if there are any issues pulling. Thanks.
+
+Johan
+
+---
+The following changes since commit 798fee48035f0c5fc6787767ff9e27de7e1a4fbb:
+
+  Merge tag 'linux-can-next-for-4.6-20160310' of git://git.kernel.org/pub/s=
+cm/linux/kernel/git/mkl/linux-can-next (2016-03-10 12:41:33 -0500)
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.gi=
+t for-upstream
+
+for you to fetch changes up to 6a0e78072c2ae7b20b14e0249d8108441ea928d2:
+
+  Bluetooth: Fix potential buffer overflow with Add Advertising (2016-03-11=
+ 16:28:43 +0100)
+
+----------------------------------------------------------------
+Alexander Aring (3):
+      mac802154: use put and get unaligned functions
+      6lowpan: debugfs: add missing static
+      6lowpan: iphc: fix SAM/DAM bit comment
+
+Dmitry Tunin (1):
+      Bluetooth: btusb: Add a new AR3012 ID 13d3:3472
+
+Johan Hedberg (6):
+      Bluetooth: Move memset closer to where it's needed
+      Bluetooth: Fix adding discoverable to adv instance flags
+      Bluetooth: Add support for limited privacy mode
+      Bluetooth: Increment management interface revision
+      Bluetooth: Fix setting correct flags in AD
+      Bluetooth: Fix potential buffer overflow with Add Advertising
+
+J=E9r=F4me de Bretagne (1):
+      Bluetooth: hci_bcm: Add BCM2E55 ACPI ID used in Lenovo ThinkPad Table=
+t 8
+
+Wei-Ning Huang (1):
+      Bluetooth: btmrvl_sdio: fix firmware activation failure
+
+ drivers/bluetooth/ath3k.c       |  2 ++
+ drivers/bluetooth/btmrvl_sdio.c |  2 +-
+ drivers/bluetooth/btusb.c       |  1 +
+ drivers/bluetooth/hci_bcm.c     |  1 +
+ include/net/bluetooth/hci.h     |  1 +
+ include/net/mac802154.h         | 10 +++----
+ net/6lowpan/debugfs.c           |  4 +--
+ net/6lowpan/iphc.c              |  4 +--
+ net/bluetooth/hci_conn.c        | 17 +++++++++---
+ net/bluetooth/hci_request.c     | 56 +++++++++++++++++++++++++++++++++++--=
+---
+ net/bluetooth/hci_request.h     |  2 +-
+ net/bluetooth/mgmt.c            | 26 ++++++++++++++++---
+ 12 files changed, 102 insertions(+), 24 deletions(-)
+
+--RnlQjJ0d97Da+TV1
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBAgAGBQJW47mmAAoJECQj9vv5qNQSeB0P/RzjaBzgkTEfyvaXv8+pmX9E
+ceI+iMaEqraNTugCzQebMLuk0RJf6pJngmAPlV9XLzoYULWDxsWK6J1izVMYuSG8
+CLSo2M82kpWCemzwk/3/Ymm332aUr/OHLjfP7SrcSJ6J62lvVEc0QdCbICjF0iZM
+yNBO5Ikm+wB00pt3gU4NvoceUrqdonDX8XlnSg6NLGx9CxVPHeRKwF4wQKPsqE4b
+MMv39zqIJ6RLCYUeggvDY42/NGeM+3Hvta2MUqLDM7PVIXAd8lXJrucfGvmpGCjR
+dUZJjCTGqXVBzFH8xxLGlmyKrzQH6mdBW9K7dkdRxIO+hecstzonHbYEQxo8STh5
+8mr/zqJo/xRNqH2G2d8/WJom2sIi4EQHvBNQi7gmpYa9bQE7UJE8DoiLf/LAjR7r
++vlI/P5nE5aW/KTNY9KjV/x+xL/+C2CJfjewL9IFemfJgUr6KixlwxRntRlu0SJ4
+V7oMBr/4MC/kR/Hff8PEMmUItAmSxmE1axQklXemF7tXFGPlGX73BLSSygQbGtzq
+vkQGK3mO67qwuVhRtxE8OaK+JgBTjMuNRtOQqiJnk3FEneu4Cm11UhZEa83e4ut7
++wUP/GPk1CQdsupfBgEiG12wJDOaJJySqLj+Al+m0Dgvp8nehLXbx+MFvsF9EnVg
+ICGuWe1MrPG+Qk+hDvC3
+=tWko
+-----END PGP SIGNATURE-----
+
+--RnlQjJ0d97Da+TV1--
