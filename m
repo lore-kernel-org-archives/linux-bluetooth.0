@@ -1,29 +1,51 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Date: Mon, 14 Mar 2016 15:45:15 -0400 (EDT)
-Message-Id: <20160314.154515.964895601642982742.davem@davemloft.net>
-To: johan.hedberg@gmail.com
-Cc: netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Subject: Re: pull request: bluetooth-next 2016-03-12
-From: David Miller <davem@davemloft.net>
-In-Reply-To: <20160312063934.GA21940@t440s.P-661HNU-F1>
-References: <20160312063934.GA21940@t440s.P-661HNU-F1>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
+MIME-Version: 1.0
+In-Reply-To: <CADAkoF799PaJwxDfgpH+d02xvofZGDLFGq_X=drdb2sEHremvQ@mail.gmail.com>
+References: <1457706745-14511-1-git-send-email-luiz.dentz@gmail.com>
+	<CABBYNZL-bw24z_RNAskRTpfzRjcuOjO2a8Pxccmj1qt2ner1Ng@mail.gmail.com>
+	<CADAkoF799PaJwxDfgpH+d02xvofZGDLFGq_X=drdb2sEHremvQ@mail.gmail.com>
+Date: Mon, 14 Mar 2016 21:09:55 +0200
+Message-ID: <CABBYNZLFKhx2Bcg5XeMcE9XQzHBwmT61+zHdcQ2RHwyE8sVjkw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] doc/device-api: Replace GattServices with
+ ServicesDiscovered property
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Andrzej Kaczmarek <andrzej.kaczmarek@codecoup.pl>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@gmail.com>
-Date: Sat, 12 Mar 2016 08:39:34 +0200
+Hi Andrzej,
 
-> Here's the last bluetooth-next pull request for the 4.6 kernel.
-> 
->  - New USB ID for AR3012 in btusb
->  - New BCM2E55 ACPI ID
->  - Buffer overflow fix for the Add Advertising command
->  - Support for a new Bluetooth LE limited privacy mode
->  - Fix for firmware activation in btmrvl_sdio
->  - Cleanups to mac802154 & 6lowpan code
-> 
-> Please let me know if there are any issues pulling. Thanks.
+On Mon, Mar 14, 2016 at 8:17 PM, Andrzej Kaczmarek
+<andrzej.kaczmarek@codecoup.pl> wrote:
+> Hi Luiz,
+>
+> On Mon, Mar 14, 2016 at 3:15 PM, Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+>> Hi,
+>>
+>> On Fri, Mar 11, 2016 at 4:32 PM, Luiz Augusto von Dentz
+>> <luiz.dentz@gmail.com> wrote:
+>>> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>>>
+>>> GattServices is not really doing was it was meant to do which was to
+>>> track progress of service discovery since it only worked for the very
+>>> first time a device is connected but since we no longer remove the
+>>> attributes an application would have the false impression the service are
+>>> all resolved by the time it reconnects when in fact the service may have
+>>> changed.
+>>>
+>>> Furthermore object tracking like it is doing has been obsolete by
+>>> ObjectManager so this propose to replace the service discovery tracking
+>>> with a boolean property which works both with SDP as well as GATT
+>>> discovery.
+>
+> I'm just curious - do you also plan to remove
+> org.bluez.GattService1.Characteristics and
+> org.bluez.GattCharacteristic1.Descriptors?
 
-Pulled, thanks Johan.
+I guess we should remove them as well, at least I don't any reason to keep them.
+
+-- 
+Luiz Augusto von Dentz
