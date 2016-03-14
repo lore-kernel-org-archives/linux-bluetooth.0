@@ -1,91 +1,110 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 2/2] core/gatt-client: Use of bt_gatt_client_clone
-Date: Mon, 14 Mar 2016 17:02:29 +0200
-Message-Id: <1457967749-24963-2-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1457967749-24963-1-git-send-email-luiz.dentz@gmail.com>
-References: <1457967749-24963-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 1/2] shared/gatt-client: Add bt_gatt_client_clone
+Date: Mon, 14 Mar 2016 17:02:28 +0200
+Message-Id: <1457967749-24963-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This uses bt_gatt_client_clone to track pending requests and cancel
-them if bt_gatt_client_unref is called.
+This adds bt_gatt_client_clone which can clone existing client skipping
+the discovery phase and creating separate queues so that all requests
+done using the clone can be cancelled separately.
 ---
- src/gatt-client.c | 44 +-------------------------------------------
- 1 file changed, 1 insertion(+), 43 deletions(-)
+ src/shared/gatt-client.c | 51 ++++++++++++++++++++++++++++++++++++++----------
+ src/shared/gatt-client.h |  1 +
+ 2 files changed, 42 insertions(+), 10 deletions(-)
 
-diff --git a/src/gatt-client.c b/src/gatt-client.c
-index dd76a36..a03df1f 100644
---- a/src/gatt-client.c
-+++ b/src/gatt-client.c
-@@ -1792,7 +1792,7 @@ void btd_gatt_client_connected(struct btd_gatt_client *client)
- 	DBG("Device connected.");
- 
- 	bt_gatt_client_unref(client->gatt);
--	client->gatt = bt_gatt_client_ref(gatt);
-+	client->gatt = bt_gatt_client_clone(gatt);
- 
- 	/*
- 	 * Services have already been created before. Re-enable notifications
-@@ -1843,47 +1843,6 @@ static void clear_notify_id(void *data, void *user_data)
- 	client->notify_id = 0;
+diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
+index 45acf7b..7fa0b1d 100644
+--- a/src/shared/gatt-client.c
++++ b/src/shared/gatt-client.c
+@@ -1720,15 +1720,11 @@ static void att_disconnect_cb(int err, void *user_data)
+ 		notify_client_ready(client, false, 0);
  }
  
--static void cancel_desc_ops(void *data, void *user_data)
--{
--	struct descriptor *desc = data;
--	struct bt_gatt_client *gatt = user_data;
--
--	if (desc->read_id) {
--		bt_gatt_client_cancel(gatt, desc->read_id);
--		desc->read_id = 0;
--	}
--
--	if (desc->write_id) {
--		bt_gatt_client_cancel(gatt, desc->write_id);
--		desc->write_id = 0;
--	}
--}
--
--static void cancel_chrc_ops(void *data, void *user_data)
--{
--	struct characteristic *chrc = data;
--	struct bt_gatt_client *gatt = user_data;
--
--	if (chrc->read_id) {
--		bt_gatt_client_cancel(gatt, chrc->read_id);
--		chrc->read_id = 0;
--	}
--
--	if (chrc->write_id) {
--		bt_gatt_client_cancel(gatt, chrc->write_id);
--		chrc->write_id = 0;
--	}
--
--	queue_foreach(chrc->descs, cancel_desc_ops, user_data);
--}
--
--static void cancel_ops(void *data, void *user_data)
--{
--	struct service *service = data;
--
--	queue_foreach(service->chrcs, cancel_chrc_ops, user_data);
--}
--
- void btd_gatt_client_disconnected(struct btd_gatt_client *client)
+-struct bt_gatt_client *bt_gatt_client_new(struct gatt_db *db,
+-							struct bt_att *att,
+-							uint16_t mtu)
++static struct bt_gatt_client *gatt_client_new(struct gatt_db *db,
++							struct bt_att *att)
  {
- 	if (!client || !client->gatt)
-@@ -1897,7 +1856,6 @@ void btd_gatt_client_disconnected(struct btd_gatt_client *client)
- 	 * done.
- 	 */
- 	queue_foreach(client->all_notify_clients, clear_notify_id, NULL);
--	queue_foreach(client->services, cancel_ops, client->gatt);
+ 	struct bt_gatt_client *client;
  
- 	bt_gatt_client_unref(client->gatt);
- 	client->gatt = NULL;
+-	if (!att || !db)
+-		return NULL;
+-
+ 	client = new0(struct bt_gatt_client, 1);
+ 	client->disc_id = bt_att_register_disconnect(att, att_disconnect_cb,
+ 								client, NULL);
+@@ -1754,14 +1750,49 @@ struct bt_gatt_client *bt_gatt_client_new(struct gatt_db *db,
+ 	client->att = bt_att_ref(att);
+ 	client->db = gatt_db_ref(db);
+ 
+-	if (!gatt_client_init(client, mtu))
+-		goto fail;
+-
+-	return bt_gatt_client_ref(client);
++	return client;
+ 
+ fail:
+ 	bt_gatt_client_free(client);
+ 	return NULL;
++
++}
++
++struct bt_gatt_client *bt_gatt_client_new(struct gatt_db *db,
++							struct bt_att *att,
++							uint16_t mtu)
++{
++	struct bt_gatt_client *client;
++
++	if (!att || !db)
++		return NULL;
++
++	client = gatt_client_new(db, att);
++	if (!client)
++		return NULL;
++
++	if (!gatt_client_init(client, mtu)) {
++		bt_gatt_client_free(client);
++		return NULL;
++	}
++
++	return bt_gatt_client_ref(client);
++}
++
++struct bt_gatt_client *bt_gatt_client_clone(struct bt_gatt_client *client)
++{
++	struct bt_gatt_client *clone;
++
++	if (!client || !client->ready)
++		return NULL;
++
++	clone = gatt_client_new(client->db, client->att);
++	if (!clone)
++		return NULL;
++
++	clone->ready = client->ready;
++
++	return bt_gatt_client_ref(clone);
+ }
+ 
+ struct bt_gatt_client *bt_gatt_client_ref(struct bt_gatt_client *client)
+diff --git a/src/shared/gatt-client.h b/src/shared/gatt-client.h
+index befa43f..aceb570 100644
+--- a/src/shared/gatt-client.h
++++ b/src/shared/gatt-client.h
+@@ -32,6 +32,7 @@ struct bt_gatt_client;
+ struct bt_gatt_client *bt_gatt_client_new(struct gatt_db *db,
+ 							struct bt_att *att,
+ 							uint16_t mtu);
++struct bt_gatt_client *bt_gatt_client_clone(struct bt_gatt_client *client);
+ 
+ struct bt_gatt_client *bt_gatt_client_ref(struct bt_gatt_client *client);
+ void bt_gatt_client_unref(struct bt_gatt_client *client);
 -- 
 2.5.0
 
