@@ -1,85 +1,75 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Subject: Re: [PATCH bluetooth-next] 6lowpan: iphc: fix handling of link-local
+ compression
+To: Alexander Aring <aar@pengutronix.de>, linux-wpan@vger.kernel.org
+References: <1458132761-24055-1-git-send-email-aar@pengutronix.de>
+Cc: linux-bluetooth@vger.kernel.org, kernel@pengutronix.de,
+	jukka.rissanen@linux.intel.com
+From: Stefan Schmidt <stefan@osg.samsung.com>
+Message-ID: <56E97F4E.2020201@osg.samsung.com>
+Date: Wed, 16 Mar 2016 16:44:14 +0100
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZ+4r+YTJByojL8QBCtWnUFeojqOoKkiOBycJFrfCdWz=g@mail.gmail.com>
-References: <CAASrBQ=Wd1Jdp1GHEzjPrZ=-nZocAo9qx05pvsMsz0T6Btc95Q@mail.gmail.com>
-	<CABBYNZ+4r+YTJByojL8QBCtWnUFeojqOoKkiOBycJFrfCdWz=g@mail.gmail.com>
-Date: Wed, 16 Mar 2016 15:02:08 -0600
-Message-ID: <CAASrBQmixu2USeLXSsR3vaSWUujra=Ky1TcXTyMUgsr4GR9_Jw@mail.gmail.com>
-Subject: Re: setting indication on GattCharacteristic1 interface
-From: Mark Rages <markrages@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <1458132761-24055-1-git-send-email-aar@pengutronix.de>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-It seems to work to treat indication as notify.
+Hello.
 
-But sometimes bluetoothd is crashing:
+On 16/03/16 13:52, Alexander Aring wrote:
+> This patch fixes handling in case of link-local address compression. A
+> IPv6 link-local address is defined as fe80::/10 prefix which is also
+> what ipv6_addr_type checks for link-local addresses.
+>
+> But IPHC compression for link-local addresses are for fe80::/64 types
+> only. This patch adds additional checks for zero padded bits in case of
+> link-local address compression to match on a fe80::/64 address only.
+>
+> Signed-off-by: Alexander Aring <aar@pengutronix.de>
+> ---
+>   net/6lowpan/iphc.c | 11 +++++++++--
+>   1 file changed, 9 insertions(+), 2 deletions(-)
+>
+> diff --git a/net/6lowpan/iphc.c b/net/6lowpan/iphc.c
+> index 99bb22a..68c80f3 100644
+> --- a/net/6lowpan/iphc.c
+> +++ b/net/6lowpan/iphc.c
+> @@ -148,6 +148,11 @@
+>   	 (((a)->s6_addr16[6]) == 0) &&		\
+>   	 (((a)->s6_addr[14]) == 0))
+>   
+> +#define lowpan_is_linklocal_zero_padded(a)	\
+> +	(!(hdr->saddr.s6_addr[1] & 0x3f) &&	\
+> +	 !hdr->saddr.s6_addr16[1] &&		\
+> +	 !hdr->saddr.s6_addr32[1])
+> +
+>   #define LOWPAN_IPHC_CID_DCI(cid)	(cid & 0x0f)
+>   #define LOWPAN_IPHC_CID_SCI(cid)	((cid & 0xf0) >> 4)
+>   
+> @@ -1101,7 +1106,8 @@ int lowpan_header_compress(struct sk_buff *skb, const struct net_device *dev,
+>   							  true);
+>   			iphc1 |= LOWPAN_IPHC_SAC;
+>   		} else {
+> -			if (ipv6_saddr_type & IPV6_ADDR_LINKLOCAL) {
+> +			if (ipv6_saddr_type & IPV6_ADDR_LINKLOCAL &&
+> +			    lowpan_is_linklocal_zero_padded(hdr->saddr)) {
+>   				iphc1 |= lowpan_compress_addr_64(&hc_ptr,
+>   								 &hdr->saddr,
+>   								 saddr, true);
+> @@ -1135,7 +1141,8 @@ int lowpan_header_compress(struct sk_buff *skb, const struct net_device *dev,
+>   							  false);
+>   			iphc1 |= LOWPAN_IPHC_DAC;
+>   		} else {
+> -			if (ipv6_daddr_type & IPV6_ADDR_LINKLOCAL) {
+> +			if (ipv6_daddr_type & IPV6_ADDR_LINKLOCAL &&
+> +			    lowpan_is_linklocal_zero_padded(hdr->daddr)) {
+>   				iphc1 |= lowpan_compress_addr_64(&hc_ptr,
+>   								 &hdr->daddr,
+>   								 daddr, false);
 
-Program received signal SIGSEGV, Segmentation fault.
-register_notify_cb (att_ecode=0, user_data=0x7b1d60) at src/gatt-client.c:1114
-1114        if (!chrc->notifying) {
-(gdb) bt
-#0  register_notify_cb (att_ecode=0, user_data=0x7b1d60)
-    at src/gatt-client.c:1114
-#1  0x000000000049c97d in complete_notify_request (data=0x719a60)
-    at src/shared/gatt-client.c:1137
-#2  enable_ccc_callback (opcode=<optimized out>, pdu=<optimized out>,
-    length=<optimized out>, user_data=0x719a60)
-    at src/shared/gatt-client.c:1219
-#3  0x00000000004998da in handle_rsp (pdu_len=<optimized out>,
-    pdu=0x7b1af1 "\022\020", opcode=19 '\023', att=0x7b1db0)
-    at src/shared/att.c:697
-#4  can_read_data (io=<optimized out>, user_data=0x7b1db0)
-    at src/shared/att.c:869
-#5  0x00000000004a2245 in watch_callback (channel=<optimized out>,
-    cond=<optimized out>, user_data=<optimized out>)
-    at src/shared/io-glib.c:170
-#6  0x00007ffff7b1ace5 in g_main_context_dispatch ()
-   from /lib/x86_64-linux-gnu/libglib-2.0.so.0
-#7  0x00007ffff7b1b048 in ?? () from /lib/x86_64-linux-gnu/libglib-2.0.so.0
-#8  0x00007ffff7b1b30a in g_main_loop_run ()
-   from /lib/x86_64-linux-gnu/libglib-2.0.so.0
-#9  0x000000000040b674 in main (argc=1, argv=0x7fffffffe638) at src/main.c:687
+Nicely spotted.
 
-On Wed, Mar 16, 2016 at 6:03 AM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi Mark,
->
-> On Wed, Mar 16, 2016 at 12:59 AM, Mark Rages <markrages@gmail.com> wrote:
->> Hi,
->>
->> The GattCharacteristic1 d-bus interface has methods for StartNotify
->> and StopNotify.
->>
->> But I don't see corresponding methods for requesting Indications
->>
->> Is there a way to do this?  Should I write to the CCCD directly?  How
->> do the indications arrive on the d-bus?
->
-> Indicate would probably need to be a method since it does require a
-> reply, but for now you can just treat it as a notification whereas
-> BlueZ will be responsible for confirming so nothing else need to be
-> done by the application. The code can actually distinguished between
-> the 2:
->
-> /* Try to enable notifications and/or indications based on
-> * whatever the characteristic supports.
-> */
-> if (notify_data->chrc->properties & BT_GATT_CHRC_PROP_NOTIFY)
-> pdu[2] = 0x01;
->
-> if (notify_data->chrc->properties & BT_GATT_CHRC_PROP_INDICATE)
-> pdu[2] |= 0x02;
->
->
-> --
-> Luiz Augusto von Dentz
+Reviewed-by: Stefan Schmidt <stefan@osg.samsung.com>
 
-
-
--- 
-Regards,
-Mark
-markrages@gmail
+regards
+Stefan Schmidt
