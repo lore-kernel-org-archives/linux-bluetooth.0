@@ -1,64 +1,45 @@
-Return-Path: <linux-wpan-owner@vger.kernel.org>
-From: Alexander Aring <aar@pengutronix.de>
-To: linux-wpan@vger.kernel.org
-Cc: linux-bluetooth@vger.kernel.org, kernel@pengutronix.de,
-	jukka.rissanen@linux.intel.com,
-	Alexander Aring <aar@pengutronix.de>
-Subject: [PATCH bluetooth-next] 6lowpan: iphc: fix handling of link-local compression
-Date: Wed, 16 Mar 2016 13:52:41 +0100
-Message-Id: <1458132761-24055-1-git-send-email-aar@pengutronix.de>
-Sender: linux-wpan-owner@vger.kernel.org
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+MIME-Version: 1.0
+In-Reply-To: <CAASrBQ=Wd1Jdp1GHEzjPrZ=-nZocAo9qx05pvsMsz0T6Btc95Q@mail.gmail.com>
+References: <CAASrBQ=Wd1Jdp1GHEzjPrZ=-nZocAo9qx05pvsMsz0T6Btc95Q@mail.gmail.com>
+Date: Wed, 16 Mar 2016 14:03:14 +0200
+Message-ID: <CABBYNZ+4r+YTJByojL8QBCtWnUFeojqOoKkiOBycJFrfCdWz=g@mail.gmail.com>
+Subject: Re: setting indication on GattCharacteristic1 interface
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Mark Rages <markrages@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch fixes handling in case of link-local address compression. A
-IPv6 link-local address is defined as fe80::/10 prefix which is also
-what ipv6_addr_type checks for link-local addresses.
+Hi Mark,
 
-But IPHC compression for link-local addresses are for fe80::/64 types
-only. This patch adds additional checks for zero padded bits in case of
-link-local address compression to match on a fe80::/64 address only.
+On Wed, Mar 16, 2016 at 12:59 AM, Mark Rages <markrages@gmail.com> wrote:
+> Hi,
+>
+> The GattCharacteristic1 d-bus interface has methods for StartNotify
+> and StopNotify.
+>
+> But I don't see corresponding methods for requesting Indications
+>
+> Is there a way to do this?  Should I write to the CCCD directly?  How
+> do the indications arrive on the d-bus?
 
-Signed-off-by: Alexander Aring <aar@pengutronix.de>
----
- net/6lowpan/iphc.c | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
+Indicate would probably need to be a method since it does require a
+reply, but for now you can just treat it as a notification whereas
+BlueZ will be responsible for confirming so nothing else need to be
+done by the application. The code can actually distinguished between
+the 2:
 
-diff --git a/net/6lowpan/iphc.c b/net/6lowpan/iphc.c
-index 99bb22a..68c80f3 100644
---- a/net/6lowpan/iphc.c
-+++ b/net/6lowpan/iphc.c
-@@ -148,6 +148,11 @@
- 	 (((a)->s6_addr16[6]) == 0) &&		\
- 	 (((a)->s6_addr[14]) == 0))
- 
-+#define lowpan_is_linklocal_zero_padded(a)	\
-+	(!(hdr->saddr.s6_addr[1] & 0x3f) &&	\
-+	 !hdr->saddr.s6_addr16[1] &&		\
-+	 !hdr->saddr.s6_addr32[1])
-+
- #define LOWPAN_IPHC_CID_DCI(cid)	(cid & 0x0f)
- #define LOWPAN_IPHC_CID_SCI(cid)	((cid & 0xf0) >> 4)
- 
-@@ -1101,7 +1106,8 @@ int lowpan_header_compress(struct sk_buff *skb, const struct net_device *dev,
- 							  true);
- 			iphc1 |= LOWPAN_IPHC_SAC;
- 		} else {
--			if (ipv6_saddr_type & IPV6_ADDR_LINKLOCAL) {
-+			if (ipv6_saddr_type & IPV6_ADDR_LINKLOCAL &&
-+			    lowpan_is_linklocal_zero_padded(hdr->saddr)) {
- 				iphc1 |= lowpan_compress_addr_64(&hc_ptr,
- 								 &hdr->saddr,
- 								 saddr, true);
-@@ -1135,7 +1141,8 @@ int lowpan_header_compress(struct sk_buff *skb, const struct net_device *dev,
- 							  false);
- 			iphc1 |= LOWPAN_IPHC_DAC;
- 		} else {
--			if (ipv6_daddr_type & IPV6_ADDR_LINKLOCAL) {
-+			if (ipv6_daddr_type & IPV6_ADDR_LINKLOCAL &&
-+			    lowpan_is_linklocal_zero_padded(hdr->daddr)) {
- 				iphc1 |= lowpan_compress_addr_64(&hc_ptr,
- 								 &hdr->daddr,
- 								 daddr, false);
+/* Try to enable notifications and/or indications based on
+* whatever the characteristic supports.
+*/
+if (notify_data->chrc->properties & BT_GATT_CHRC_PROP_NOTIFY)
+pdu[2] = 0x01;
+
+if (notify_data->chrc->properties & BT_GATT_CHRC_PROP_INDICATE)
+pdu[2] |= 0x02;
+
+
 -- 
-2.7.3
-
+Luiz Augusto von Dentz
