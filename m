@@ -1,98 +1,64 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/2] shared/gatt-client: Don't remove notification handlers
-Date: Wed, 16 Mar 2016 15:17:24 +0200
-Message-Id: <1458134245-23277-1-git-send-email-luiz.dentz@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <linux-wpan-owner@vger.kernel.org>
+From: Alexander Aring <aar@pengutronix.de>
+To: linux-wpan@vger.kernel.org
+Cc: linux-bluetooth@vger.kernel.org, kernel@pengutronix.de,
+	jukka.rissanen@linux.intel.com,
+	Alexander Aring <aar@pengutronix.de>
+Subject: [PATCH bluetooth-next] 6lowpan: iphc: fix handling of link-local compression
+Date: Wed, 16 Mar 2016 13:52:41 +0100
+Message-Id: <1458132761-24055-1-git-send-email-aar@pengutronix.de>
+Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+This patch fixes handling in case of link-local address compression. A
+IPv6 link-local address is defined as fe80::/10 prefix which is also
+what ipv6_addr_type checks for link-local addresses.
 
-The notification handlers shall not be removed automatically when service
-changed is received and the handle is in range. The user should be able to
-decide whether to keep the registration or not since it will get events of
-the service changed via gatt_db.
+But IPHC compression for link-local addresses are for fe80::/64 types
+only. This patch adds additional checks for zero padded bits in case of
+link-local address compression to match on a fe80::/64 address only.
+
+Signed-off-by: Alexander Aring <aar@pengutronix.de>
 ---
- src/shared/gatt-client.c | 51 ------------------------------------------------
- 1 file changed, 51 deletions(-)
+ net/6lowpan/iphc.c | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
 
-diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
-index 7fa0b1d..37c219b 100644
---- a/src/shared/gatt-client.c
-+++ b/src/shared/gatt-client.c
-@@ -291,25 +291,6 @@ struct handle_range {
- 	uint16_t end;
- };
+diff --git a/net/6lowpan/iphc.c b/net/6lowpan/iphc.c
+index 99bb22a..68c80f3 100644
+--- a/net/6lowpan/iphc.c
++++ b/net/6lowpan/iphc.c
+@@ -148,6 +148,11 @@
+ 	 (((a)->s6_addr16[6]) == 0) &&		\
+ 	 (((a)->s6_addr[14]) == 0))
  
--static bool match_notify_data_handle_range(const void *a, const void *b)
--{
--	const struct notify_data *notify_data = a;
--	struct notify_chrc *chrc = notify_data->chrc;
--	const struct handle_range *range = b;
--
--	return chrc->value_handle >= range->start &&
--					chrc->value_handle <= range->end;
--}
--
--static bool match_notify_chrc_handle_range(const void *a, const void *b)
--{
--	const struct notify_chrc *chrc = a;
--	const struct handle_range *range = b;
--
--	return chrc->value_handle >= range->start &&
--					chrc->value_handle <= range->end;
--}
--
- static void notify_data_cleanup(void *data)
- {
- 	struct notify_data *notify_data = data;
-@@ -320,32 +301,6 @@ static void notify_data_cleanup(void *data)
- 	notify_data_unref(notify_data);
- }
++#define lowpan_is_linklocal_zero_padded(a)	\
++	(!(hdr->saddr.s6_addr[1] & 0x3f) &&	\
++	 !hdr->saddr.s6_addr16[1] &&		\
++	 !hdr->saddr.s6_addr32[1])
++
+ #define LOWPAN_IPHC_CID_DCI(cid)	(cid & 0x0f)
+ #define LOWPAN_IPHC_CID_SCI(cid)	((cid & 0xf0) >> 4)
  
--static void gatt_client_remove_all_notify_in_range(
--				struct bt_gatt_client *client,
--				uint16_t start_handle, uint16_t end_handle)
--{
--	struct handle_range range;
--
--	range.start = start_handle;
--	range.end = end_handle;
--
--	queue_remove_all(client->notify_list, match_notify_data_handle_range,
--						&range, notify_data_cleanup);
--}
--
--static void gatt_client_remove_notify_chrcs_in_range(
--				struct bt_gatt_client *client,
--				uint16_t start_handle, uint16_t end_handle)
--{
--	struct handle_range range;
--
--	range.start = start_handle;
--	range.end = end_handle;
--
--	queue_remove_all(client->notify_chrcs, match_notify_chrc_handle_range,
--						&range, notify_chrc_free);
--}
--
- struct discovery_op;
- 
- typedef void (*discovery_op_complete_func_t)(struct discovery_op *op,
-@@ -1426,12 +1381,6 @@ static void process_service_changed(struct bt_gatt_client *client,
- 	if (start_handle == 0x0001 && end_handle == 0xffff)
- 		goto discover;
- 
--	/* Invalidate and remove all effected notify callbacks */
--	gatt_client_remove_all_notify_in_range(client, start_handle,
--								end_handle);
--	gatt_client_remove_notify_chrcs_in_range(client, start_handle,
--								end_handle);
--
- 	/* Remove all services that overlap the modified range since we'll
- 	 * rediscover them
- 	 */
+@@ -1101,7 +1106,8 @@ int lowpan_header_compress(struct sk_buff *skb, const struct net_device *dev,
+ 							  true);
+ 			iphc1 |= LOWPAN_IPHC_SAC;
+ 		} else {
+-			if (ipv6_saddr_type & IPV6_ADDR_LINKLOCAL) {
++			if (ipv6_saddr_type & IPV6_ADDR_LINKLOCAL &&
++			    lowpan_is_linklocal_zero_padded(hdr->saddr)) {
+ 				iphc1 |= lowpan_compress_addr_64(&hc_ptr,
+ 								 &hdr->saddr,
+ 								 saddr, true);
+@@ -1135,7 +1141,8 @@ int lowpan_header_compress(struct sk_buff *skb, const struct net_device *dev,
+ 							  false);
+ 			iphc1 |= LOWPAN_IPHC_DAC;
+ 		} else {
+-			if (ipv6_daddr_type & IPV6_ADDR_LINKLOCAL) {
++			if (ipv6_daddr_type & IPV6_ADDR_LINKLOCAL &&
++			    lowpan_is_linklocal_zero_padded(hdr->daddr)) {
+ 				iphc1 |= lowpan_compress_addr_64(&hc_ptr,
+ 								 &hdr->daddr,
+ 								 daddr, false);
 -- 
-2.5.0
+2.7.3
 
