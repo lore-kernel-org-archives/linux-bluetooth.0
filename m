@@ -1,42 +1,111 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZK94wg-AM=QVT4+R=hWCWGf81t877qPi+vSLv8tA2_0Xg@mail.gmail.com>
-References: <CAASrBQ=Wd1Jdp1GHEzjPrZ=-nZocAo9qx05pvsMsz0T6Btc95Q@mail.gmail.com>
-	<CABBYNZ+4r+YTJByojL8QBCtWnUFeojqOoKkiOBycJFrfCdWz=g@mail.gmail.com>
-	<CAASrBQmixu2USeLXSsR3vaSWUujra=Ky1TcXTyMUgsr4GR9_Jw@mail.gmail.com>
-	<CAASrBQnKW-zcVy=8ncXay9USaMT4czqqKp1Gp_PHkDAOQ2fWag@mail.gmail.com>
-	<CABBYNZK94wg-AM=QVT4+R=hWCWGf81t877qPi+vSLv8tA2_0Xg@mail.gmail.com>
-Date: Thu, 17 Mar 2016 13:59:44 -0600
-Message-ID: <CAASrBQk2TPshzkE74unr20CdckxNr2QbMc7SGbF7tw0h6Y-DTg@mail.gmail.com>
-Subject: Re: setting indication on GattCharacteristic1 interface
-From: Mark Rages <markrages@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <1458134245-23277-1-git-send-email-luiz.dentz@gmail.com>
+References: <1458134245-23277-1-git-send-email-luiz.dentz@gmail.com>
+Date: Thu, 17 Mar 2016 19:36:57 +0200
+Message-ID: <CABBYNZJBi86b0D=ZqKawfu+sT3-yeeLQM1384esQPJBzH2ogsg@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/2] shared/gatt-client: Don't remove notification handlers
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, Mar 17, 2016 at 1:51 AM, Luiz Augusto von Dentz
+Hi,
+
+On Wed, Mar 16, 2016 at 3:17 PM, Luiz Augusto von Dentz
 <luiz.dentz@gmail.com> wrote:
-> Hi Mark,
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 >
-> On Wed, Mar 16, 2016 at 11:16 PM, Mark Rages <markrages@gmail.com> wrote:
->> Maybe this is more helpful. This time it failed on an assertion:
+> The notification handlers shall not be removed automatically when service
+> changed is received and the handle is in range. The user should be able to
+> decide whether to keep the registration or not since it will get events of
+> the service changed via gatt_db.
+> ---
+>  src/shared/gatt-client.c | 51 ------------------------------------------------
+>  1 file changed, 51 deletions(-)
 >
-> Those seems to be different issues.
+> diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
+> index 7fa0b1d..37c219b 100644
+> --- a/src/shared/gatt-client.c
+> +++ b/src/shared/gatt-client.c
+> @@ -291,25 +291,6 @@ struct handle_range {
+>         uint16_t end;
+>  };
 >
->> bluetoothd: src/shared/gatt-client.c:1593: disable_ccc_callback:
->> Assertion `notify_data->chrc->ccc_write_id' failed.
+> -static bool match_notify_data_handle_range(const void *a, const void *b)
+> -{
+> -       const struct notify_data *notify_data = a;
+> -       struct notify_chrc *chrc = notify_data->chrc;
+> -       const struct handle_range *range = b;
+> -
+> -       return chrc->value_handle >= range->start &&
+> -                                       chrc->value_handle <= range->end;
+> -}
+> -
+> -static bool match_notify_chrc_handle_range(const void *a, const void *b)
+> -{
+> -       const struct notify_chrc *chrc = a;
+> -       const struct handle_range *range = b;
+> -
+> -       return chrc->value_handle >= range->start &&
+> -                                       chrc->value_handle <= range->end;
+> -}
+> -
+>  static void notify_data_cleanup(void *data)
+>  {
+>         struct notify_data *notify_data = data;
+> @@ -320,32 +301,6 @@ static void notify_data_cleanup(void *data)
+>         notify_data_unref(notify_data);
+>  }
 >
-> Do you have the trace before this? btw, what version are you using?
+> -static void gatt_client_remove_all_notify_in_range(
+> -                               struct bt_gatt_client *client,
+> -                               uint16_t start_handle, uint16_t end_handle)
+> -{
+> -       struct handle_range range;
+> -
+> -       range.start = start_handle;
+> -       range.end = end_handle;
+> -
+> -       queue_remove_all(client->notify_list, match_notify_data_handle_range,
+> -                                               &range, notify_data_cleanup);
+> -}
+> -
+> -static void gatt_client_remove_notify_chrcs_in_range(
+> -                               struct bt_gatt_client *client,
+> -                               uint16_t start_handle, uint16_t end_handle)
+> -{
+> -       struct handle_range range;
+> -
+> -       range.start = start_handle;
+> -       range.end = end_handle;
+> -
+> -       queue_remove_all(client->notify_chrcs, match_notify_chrc_handle_range,
+> -                                               &range, notify_chrc_free);
+> -}
+> -
+>  struct discovery_op;
+>
+>  typedef void (*discovery_op_complete_func_t)(struct discovery_op *op,
+> @@ -1426,12 +1381,6 @@ static void process_service_changed(struct bt_gatt_client *client,
+>         if (start_handle == 0x0001 && end_handle == 0xffff)
+>                 goto discover;
+>
+> -       /* Invalidate and remove all effected notify callbacks */
+> -       gatt_client_remove_all_notify_in_range(client, start_handle,
+> -                                                               end_handle);
+> -       gatt_client_remove_notify_chrcs_in_range(client, start_handle,
+> -                                                               end_handle);
+> -
+>         /* Remove all services that overlap the modified range since we'll
+>          * rediscover them
+>          */
+> --
+> 2.5.0
 
-You mean the btmon trace?  I don't have it, sorry.  I will keep it
-running in case it happens again.
+Applied.
 
-I am using bluetoothd from git pull from yesterday.  And I tried again
-with the two patches from yesterday that seemed to be possibly
-related, same result.
 
-Regards,
-Mark
-markrages@gmail
+-- 
+Luiz Augusto von Dentz
