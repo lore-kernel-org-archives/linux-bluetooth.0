@@ -1,149 +1,192 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CAASrBQnKW-zcVy=8ncXay9USaMT4czqqKp1Gp_PHkDAOQ2fWag@mail.gmail.com>
-References: <CAASrBQ=Wd1Jdp1GHEzjPrZ=-nZocAo9qx05pvsMsz0T6Btc95Q@mail.gmail.com>
-	<CABBYNZ+4r+YTJByojL8QBCtWnUFeojqOoKkiOBycJFrfCdWz=g@mail.gmail.com>
-	<CAASrBQmixu2USeLXSsR3vaSWUujra=Ky1TcXTyMUgsr4GR9_Jw@mail.gmail.com>
-	<CAASrBQnKW-zcVy=8ncXay9USaMT4czqqKp1Gp_PHkDAOQ2fWag@mail.gmail.com>
-Date: Thu, 17 Mar 2016 09:51:40 +0200
-Message-ID: <CABBYNZK94wg-AM=QVT4+R=hWCWGf81t877qPi+vSLv8tA2_0Xg@mail.gmail.com>
-Subject: Re: setting indication on GattCharacteristic1 interface
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Mark Rages <markrages@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Thu, 17 Mar 2016 14:47:43 +1000
+Message-ID: <CAPcThSGtpatfJmrW7Gw-Wm+=LG83th7wOJwCDxP5vxqqk=tK5Q@mail.gmail.com>
+Subject: aplay failed on bluetooth audio with bluez 4.101
+From: Qingtao Cao <qingtao.cao.au@gmail.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mark,
+Hi Community,
 
-On Wed, Mar 16, 2016 at 11:16 PM, Mark Rages <markrages@gmail.com> wrote:
-> Maybe this is more helpful. This time it failed on an assertion:
+I run into a bluetooth headset issue with bluez 4.101. After a
+successful pairing and connection, I failed to play a .wav file
+through the bluetooth headset by aplay. I have been searching around
+for a couple days and looked at bluez 4.101 source code to ensure the
+audio.conf settings make sense but still clueless.
 
-Those seems to be different issues.
+My laptop is Ubuntu 15.04 with bluez 4.101-ubuntu25 (kernel:
+3.19.0-25-generic), the target embedded uses yocto "dizzy" release
+with bluez 4.101 as well (kernel: 3.4). On both laptop and target
+machine the libasound-module-bluez has been installed properly.
 
-> bluetoothd: src/shared/gatt-client.c:1593: disable_ccc_callback:
-> Assertion `notify_data->chrc->ccc_write_id' failed.
+My settings are:
 
-Do you have the trace before this? btw, what version are you using?
+1. /etc/bluetooth/main.conf
+The default one, in particular, Class=0x00100
 
-> Program received signal SIGABRT, Aborted.
-> 0x00007ffff70f2cc9 in __GI_raise (sig=sig@entry=6)
->     at ../nptl/sysdeps/unix/sysv/linux/raise.c:56
-> 56    ../nptl/sysdeps/unix/sysv/linux/raise.c: No such file or directory.
-> (gdb) bt
-> #0  0x00007ffff70f2cc9 in __GI_raise (sig=sig@entry=6)
->     at ../nptl/sysdeps/unix/sysv/linux/raise.c:56
-> #1  0x00007ffff70f60d8 in __GI_abort () at abort.c:89
-> #2  0x00007ffff70ebb86 in __assert_fail_base (
->     fmt=0x7ffff723c830 "%s%s%s:%u: %s%sAssertion `%s' failed.\n%n",
->     assertion=assertion@entry=0x4cb8f8 "notify_data->chrc->ccc_write_id",
->     file=file@entry=0x4cbb8e "src/shared/gatt-client.c", line=line@entry=1593,
->     function=function@entry=0x4cbbd0 <__PRETTY_FUNCTION__.5821>
-> "disable_ccc_callback") at assert.c:92
-> #3  0x00007ffff70ebc32 in __GI___assert_fail (
->     assertion=assertion@entry=0x4cb8f8 "notify_data->chrc->ccc_write_id",
->     file=file@entry=0x4cbb8e "src/shared/gatt-client.c", line=line@entry=1593,
->     function=function@entry=0x4cbbd0 <__PRETTY_FUNCTION__.5821>
-> "disable_ccc_callback") at assert.c:101
-> #4  0x000000000049ba8b in disable_ccc_callback (opcode=<optimized out>,
->     pdu=<optimized out>, length=<optimized out>, user_data=0x7213d0)
->     at src/shared/gatt-client.c:1593
-> #5  0x00000000004998da in handle_rsp (pdu_len=<optimized out>,
->     pdu=0x71d8a1 "\022\020", opcode=19 '\023', att=0x71cb20)
->     at src/shared/att.c:697
-> #6  can_read_data (io=<optimized out>, user_data=0x71cb20)
->     at src/shared/att.c:869
-> #7  0x00000000004a2245 in watch_callback (channel=<optimized out>,
->     cond=<optimized out>, user_data=<optimized out>)
->     at src/shared/io-glib.c:170
-> #8  0x00007ffff7b1ace5 in g_main_context_dispatch ()
->    from /lib/x86_64-linux-gnu/libglib-2.0.so.0
-> #9  0x00007ffff7b1b048 in ?? () from /lib/x86_64-linux-gnu/libglib-2.0.so.0
-> #10 0x00007ffff7b1b30a in g_main_loop_run ()
->    from /lib/x86_64-linux-gnu/libglib-2.0.so.0
-> #11 0x000000000040b674 in main (argc=1, argv=0x7fffffffe638) at src/main.c:687
->
-> On Wed, Mar 16, 2016 at 3:02 PM, Mark Rages <markrages@gmail.com> wrote:
->> It seems to work to treat indication as notify.
->>
->> But sometimes bluetoothd is crashing:
->>
->> Program received signal SIGSEGV, Segmentation fault.
->> register_notify_cb (att_ecode=0, user_data=0x7b1d60) at src/gatt-client.c:1114
->> 1114        if (!chrc->notifying) {
->> (gdb) bt
->> #0  register_notify_cb (att_ecode=0, user_data=0x7b1d60)
->>     at src/gatt-client.c:1114
->> #1  0x000000000049c97d in complete_notify_request (data=0x719a60)
->>     at src/shared/gatt-client.c:1137
->> #2  enable_ccc_callback (opcode=<optimized out>, pdu=<optimized out>,
->>     length=<optimized out>, user_data=0x719a60)
->>     at src/shared/gatt-client.c:1219
->> #3  0x00000000004998da in handle_rsp (pdu_len=<optimized out>,
->>     pdu=0x7b1af1 "\022\020", opcode=19 '\023', att=0x7b1db0)
->>     at src/shared/att.c:697
->> #4  can_read_data (io=<optimized out>, user_data=0x7b1db0)
->>     at src/shared/att.c:869
->> #5  0x00000000004a2245 in watch_callback (channel=<optimized out>,
->>     cond=<optimized out>, user_data=<optimized out>)
->>     at src/shared/io-glib.c:170
->> #6  0x00007ffff7b1ace5 in g_main_context_dispatch ()
->>    from /lib/x86_64-linux-gnu/libglib-2.0.so.0
->> #7  0x00007ffff7b1b048 in ?? () from /lib/x86_64-linux-gnu/libglib-2.0.so.0
->> #8  0x00007ffff7b1b30a in g_main_loop_run ()
->>    from /lib/x86_64-linux-gnu/libglib-2.0.so.0
->> #9  0x000000000040b674 in main (argc=1, argv=0x7fffffffe638) at src/main.c:687
->>
->> On Wed, Mar 16, 2016 at 6:03 AM, Luiz Augusto von Dentz
->> <luiz.dentz@gmail.com> wrote:
->>> Hi Mark,
->>>
->>> On Wed, Mar 16, 2016 at 12:59 AM, Mark Rages <markrages@gmail.com> wrote:
->>>> Hi,
->>>>
->>>> The GattCharacteristic1 d-bus interface has methods for StartNotify
->>>> and StopNotify.
->>>>
->>>> But I don't see corresponding methods for requesting Indications
->>>>
->>>> Is there a way to do this?  Should I write to the CCCD directly?  How
->>>> do the indications arrive on the d-bus?
->>>
->>> Indicate would probably need to be a method since it does require a
->>> reply, but for now you can just treat it as a notification whereas
->>> BlueZ will be responsible for confirming so nothing else need to be
->>> done by the application. The code can actually distinguished between
->>> the 2:
->>>
->>> /* Try to enable notifications and/or indications based on
->>> * whatever the characteristic supports.
->>> */
->>> if (notify_data->chrc->properties & BT_GATT_CHRC_PROP_NOTIFY)
->>> pdu[2] = 0x01;
->>>
->>> if (notify_data->chrc->properties & BT_GATT_CHRC_PROP_INDICATE)
->>> pdu[2] |= 0x02;
->>>
->>>
->>> --
->>> Luiz Augusto von Dentz
->>
->>
->>
->> --
->> Regards,
->> Mark
->> markrages@gmail
->
->
->
-> --
-> Regards,
-> Mark
-> markrages@gmail
+2. /etc/bluetooth/audio.conf
+
+    [General]
+    Enable=Socket
+
+    [Headset]
+    HFP=true
+    MaxConnected=1
+    FastConnectable=false
+
+    [A2DP]
+    SBCSources=1
+    SBCSinks=1
+    MPEG12Sources=1
+    MPEG12Sinks=1
+
+3. ~/.asoundrc
+    pcm.btheadset {
+        type plug
+        slave {
+            pcm {
+                type bluetooth
+                device "1C:48:F9:AD:19:EE"
+                profile "auto"
+            }
+        }
+
+        hint {
+            show on
+            description "BT Headset"
+        }
+    }
+
+    ctl.btheadset {
+        type bluetooth
+    }
+
+where I have hardcoded the bdaddr of my bluetooth headset.
+
+4. My bluetooth headset has been paired and connected successfully:
+
+$ hcitool con
+Connections:
+    < eSCO 1C:48:F9:AD:19:EE handle 70 state 1 lm MASTER
+    < ACL 1C:48:F9:AD:19:EE handle 69 state 1 lm MASTER AUTH ENCRYPT
 
 
+5. On my laptop, I can play through bluetooth headset with mplayer successfully:
 
--- 
-Luiz Augusto von Dentz
+    $ mplayer -ao alsa:device=btheadset /usr/share/sounds/alsa/Front_Center.wav
+
+    MPlayer2 2.0-728-g2c378c7-4 (C) 2000-2012 MPlayer Team
+    Cannot open file '/home/harry/.mplayer/input.conf': No such file
+or directory
+    Failed to open /home/harry/.mplayer/input.conf.
+    Cannot open file '/etc/mplayer/input.conf': No such file or directory
+    Failed to open /etc/mplayer/input.conf.
+
+    Playing /usr/share/sounds/alsa/Front_Center.wav.
+    Detected file format: WAV / WAVE (Waveform Audio) (libavformat)
+    [lavf] stream 0: audio (pcm_s16le), -aid 0
+    Load subtitles in /usr/share/sounds/alsa/
+    Selected audio codec: Uncompressed PCM [pcm]
+    AUDIO: 48000 Hz, 1 ch, s16le, 768.0 kbit/100.00% (ratio: 96000->96000)
+    AO: [alsa] 8000Hz 1ch s16le (2 bytes per sample)
+    Video: no video
+    Starting playback...
+    A:   1.4 (01.4) of 1.4 (01.4)  0.1%
+
+    Exiting... (End of file)
+
+
+6. However, on my laptop, play with aplay failed:
+
+    $ aplay -D btheadset /usr/share/sounds/alsa/Front_Center.wav
+
+    Playing WAVE '/usr/share/sounds/alsa/Front_Center.wav' : Signed 16
+bit Little Endian, Rate 48000 Hz,         Mono
+    ^CAborted by signal Interrupt...
+
+All I got is constant beeeeep noises and I have to press Ctrl^C to terminate it.
+
+7. On my target machine, the rootfs is provided by "dizzy" yocto
+release also with bluez 4.101. I have modified main.conf to define
+"Class=0x5A020C" (or simply 0x000200) and audio.conf to enable
+"SCORouting=PCM".
+
+8. On my target machine, the same aplay command failed as well. But it
+doesn't output any sound, no constant beep noise. Only when I
+terminated it could I hear a short beep sound.
+
+
+Given that mplayer works on bluetooth headset, I thought the bridging
+from alsa to bluez works. However, why aplay failed? On my target
+there is only aplay now and it's difficult to add mplay, so I would
+have to make aplay work with bluetooth audio.
+
+Any comments are much appreciated!
+
+Cheers,
+Harry
+
+
+P.S.
+
+The following is the "bluetoothd -d -n" result during "aplay -D btheadset ...":
+
+bluetoothd[9490]: audio/unix.c:server_cb() Accepted new client
+connection on unix socket (fd=33)
+bluetoothd[9490]: audio/unix.c:client_cb() Audio API: BT_REQUEST <-
+BT_GET_CAPABILITIES
+bluetoothd[9490]: audio/unix.c:unix_ipc_sendmsg() Audio API:
+BT_RESPONSE -> BT_GET_CAPABILITIES
+bluetoothd[9490]: audio/unix.c:client_cb() Audio API: BT_REQUEST <- BT_OPEN
+bluetoothd[9490]: audio/unix.c:handle_sco_open() open sco - object=ANY
+source=ANY destination=1C:48:F9:AD:19:EE lock=write
+bluetoothd[9490]: audio/unix.c:unix_ipc_sendmsg() Audio API:
+BT_RESPONSE -> BT_OPEN
+bluetoothd[9490]: audio/unix.c:client_cb() Audio API: BT_REQUEST <-
+BT_SET_CONFIGURATION
+bluetoothd[9490]: audio/unix.c:unix_ipc_sendmsg() Audio API:
+BT_RESPONSE -> BT_SET_CONFIGURATION
+bluetoothd[9490]: audio/unix.c:client_cb() Audio API: BT_REQUEST <-
+BT_START_STREAM
+bluetoothd[9490]: audio/headset.c:headset_set_state() State changed
+/org/bluez/9490/hci1/dev_1C_48_F9_AD_19_EE: HEADSET_STATE_CONNECTED ->
+HEADSET_STATE_PLAY_IN_PROGRESS
+bluetoothd[9490]: audio/media.c:headset_state_changed()
+bluetoothd[9490]: audio/media.c:headset_state_changed()
+bluetoothd[9490]: audio/headset.c:sco_connect_cb() SCO socket opened
+for headset /org/bluez/9490/hci1/dev_1C_48_F9_AD_19_EE
+bluetoothd[9490]: audio/headset.c:sco_connect_cb() SCO fd=35
+bluetoothd[9490]: audio/unix.c:unix_ipc_sendmsg() Audio API:
+BT_RESPONSE -> BT_START_STREAM
+bluetoothd[9490]: audio/unix.c:unix_ipc_sendmsg() Audio API:
+BT_INDICATION -> BT_NEW_STREAM
+bluetoothd[9490]: audio/headset.c:headset_set_state() State changed
+/org/bluez/9490/hci1/dev_1C_48_F9_AD_19_EE:
+HEADSET_STATE_PLAY_IN_PROGRESS -> HEADSET_STATE_PLAYING
+bluetoothd[9490]: audio/media.c:headset_state_changed()
+bluetoothd[9490]: audio/media.c:headset_state_changed()
+bluetoothd[9490]: audio/transport.c:media_transport_acquire()
+Transport /org/bluez/9490/hci1/dev_1C_48_F9_AD_19_EE/fd0: read lock
+acquired
+bluetoothd[9490]: audio/transport.c:media_transport_acquire()
+Transport /org/bluez/9490/hci1/dev_1C_48_F9_AD_19_EE/fd0: write lock
+acquired
+bluetoothd[9490]: audio/transport.c:media_owner_create() Owner
+created: sender=:1.309 accesstype=rw
+bluetoothd[9490]: audio/transport.c:media_transport_release()
+Transport /org/bluez/9490/hci1/dev_1C_48_F9_AD_19_EE/fd0: read lock
+released
+bluetoothd[9490]: audio/transport.c:media_transport_release()
+Transport /org/bluez/9490/hci1/dev_1C_48_F9_AD_19_EE/fd0: write lock
+released
+bluetoothd[9490]: audio/transport.c:media_owner_free() Owner :1.309
+bluetoothd[9490]: audio/unix.c:client_cb() Unix client disconnected (fd=33)
+bluetoothd[9490]: audio/headset.c:headset_set_state() State changed
+/org/bluez/9490/hci1/dev_1C_48_F9_AD_19_EE: HEADSET_STATE_PLAYING ->
+HEADSET_STATE_CONNECTED
+bluetoothd[9490]: audio/media.c:headset_state_changed()
+bluetoothd[9490]: audio/media.c:headset_state_changed()
+bluetoothd[9490]: audio/unix.c:client_free() client_free(0x7f59b52e54b0)
