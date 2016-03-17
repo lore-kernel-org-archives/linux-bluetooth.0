@@ -1,81 +1,319 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 9.2 \(3112\))
-Subject: Re: No Connected=false event on iPhone app kill.
-From: =?utf-8?Q?T=C3=B5nis_Tiganik?= <ttiganik@gmail.com>
-In-Reply-To: <CABBYNZ+D5NcZUQQ+RjM1HK5Dp5KB0V7Q3qeh8JWnCSgy4Lw++Q@mail.gmail.com>
-Date: Thu, 17 Mar 2016 15:37:53 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <4E13A8D7-3D62-44C5-9B1F-A1788BFE8C4F@gmail.com>
-References: <4590C4C4-A8DB-4318-97E9-9489E1E00257@gmail.com> <CABBYNZLzhTX8rJOzadn0+-WM1+Rr5WZvqQPFtzu46EyFEpj_yg@mail.gmail.com> <DE03A908-C3D3-4467-AB9F-3CD11C2539C7@gmail.com> <CABBYNZKCr53JJGVjPq65_aH8vp3LfCpymPmPPpZ_NwPosWFHSA@mail.gmail.com> <48839EC2-6A8E-4110-8224-229ACCAC5854@gmail.com> <CABBYNZK1G+M-ge+XdBGpwKXw+w6Hau4E3Xc+-KyMr7BDRL1-ug@mail.gmail.com> <55A7F9E2-32E1-4618-8E8A-CEC75F464025@gmail.com> <CABBYNZLEvn4Gw2=ukc8o+WZoaQ13FZSm5cX3xoczGC2D5g1Y0g@mail.gmail.com> <CABBYNZJxdzs620LZCAqSEuC4p3goa1=m=Jmh2erxY66NmDFoVg@mail.gmail.com> <C3C308DE-48EE-4A57-8CC7-7B230D0BF6D8@gmail.com> <CABBYNZ+FYuUp+Bt-BKs96U04HF-kw1ugvujPSCpvgVzdh3wH8A@mail.gmail.com> <CABBYNZ+D5NcZUQQ+RjM1HK5Dp5KB0V7Q3qeh8JWnCSgy4Lw++Q@mail.gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <jirislaby@gmail.com>
+Subject: Re: net/bluetooth: workqueue destruction WARNING in
+ hci_unregister_dev
+To: Tejun Heo <tj@kernel.org>
+References: <CACT4Y+ax7zMOxe+kd4tw5Xdbvt=qPdBhXGO0j7qJwdn5tsfNNg@mail.gmail.com>
+ <56C5CE85.6090808@suse.cz>
+ <CACT4Y+bVXfY=wBZ+08rq16tHFw9s3YDrE_LCS=to-GF70AffRQ@mail.gmail.com>
+ <20160218174427.GG13177@mtj.duckdns.org> <56C6EC62.8080107@suse.cz>
+ <56C70618.3010902@suse.cz> <20160302154507.GC4282@mtj.duckdns.org>
+ <56D7FFE1.90900@suse.cz> <20160311171205.GB24046@htj.duckdns.org>
+Cc: Dmitry Vyukov <dvyukov@google.com>, Marcel Holtmann
+ <marcel@holtmann.org>, Gustavo Padovan <gustavo@padovan.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, linux-bluetooth@vger.kernel.org,
+ netdev <netdev@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>,
+ syzkaller <syzkaller@googlegroups.com>, Kostya Serebryany <kcc@google.com>,
+ Alexander Potapenko <glider@google.com>, Sasha Levin
+ <sasha.levin@oracle.com>, Eric Dumazet <edumazet@google.com>,
+ Takashi Iwai <tiwai@suse.com>
+From: Jiri Slaby <jslaby@suse.cz>
+Message-ID: <56EA9C4D.2080803@suse.cz>
+Date: Thu, 17 Mar 2016 13:00:13 +0100
+MIME-Version: 1.0
+In-Reply-To: <20160311171205.GB24046@htj.duckdns.org>
+Content-Type: multipart/mixed;
+ boundary="------------060805040801090200020406"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+This is a multi-part message in MIME format.
+--------------060805040801090200020406
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
 
-> On 17 Mar 2016, at 13:22, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
+Hello,
+
+On 03/11/2016, 06:12 PM, Tejun Heo wrote:
+> On Thu, Mar 03, 2016 at 10:12:01AM +0100, Jiri Slaby wrote:
+>> On 03/02/2016, 04:45 PM, Tejun Heo wrote:
+>>> On Fri, Feb 19, 2016 at 01:10:00PM +0100, Jiri Slaby wrote:
+>>>>> 1. didn't help, the problem persists. So I haven't applied the patch from 2.
+>>>>
+>>>> FWIW I dumped more info about the wq:
+>>>> wq->name='hci0' pwq=ffff8800390d7600 wq->dfl_pwq=ffff8800390d5200
+>>>> pwq->refcnt=2 pwq->nr_active=0 delayed_works: <nothing>
+>>>
+>>> Can you please print out the same info for all pwq's during shutdown?
+>>> It looks like we're leaking pwq refcnt but I can't spot a place where
+>>> that could happen on an empty pwq.
+>>
+>> I have not done that yet, but today, I see:
+>> destroy_workqueue: name='req_hci0' pwq=ffff88002f590300
+>> wq->dfl_pwq=ffff88002f591e00 pwq->refcnt=2 pwq->nr_active=0 delayed_works:
+>>    pwq 12: cpus=0-1 node=0 flags=0x4 nice=-20 active=0/1
+>>      in-flight: 18568:wq_barrier_func
 > 
-> Hi Tonis,
-> 
-> On Thu, Mar 17, 2016 at 1:20 PM, Luiz Augusto von Dentz
-> <luiz.dentz@gmail.com> wrote:
-> 
->>> I tried the patches and they did not seem to work unfortunately.
->>> 
->>> here are the valgrind and btmon logs:
->>> patch 1: http://pastebin.com/raw/pKbLtBAw
->>> patch 2: http://pastebin.com/raw/sW68M3vK
-> 
-> Btw, if you are seeing gatt_client_remove_all_notify_in_range in the
-> trace that is probably because the version you are running is not
-> patched as the first patch removes it, so something is not right with
-> your setup.
-> 
->>> Since this is the first time for me to apply patches, maybe its good to verify my patching/building process?
->>> 
->>> $ git clone git://git.kernel.org/pub/scm/bluetooth/bluez.git
->>> $ checkout 5.37 commit
->> 
->> No need to checkou 5.37, we want to check the result using the
->> upstream version so it can be added to 5.38
->> 
->>> 
->>> store the 2 patches in .patch files
->>> 
->>> $ git apply patch1.patch
->> 
->> This is correct.
->> 
->>> rebuild the blueZ with:
->>> 
->>> $ ./configure --enable-experimental && make
->>> $ make install && ln -svf ../libexec/bluetooth/bluetoothd /usr/sbin
->>> $ install -v -dm755 /etc/bluetooth && install -v -m644 src/main.conf /etc/bluetooth/main.conf
->>> 
->>> run the bluetooth again
->>> $ sudo /usr/sbin/bluetoothd -E -d
->>> 
->>> verify that it still crashes and try to apply the patch2 as well (without cloning the repo again e.g keeping the patch1 changes)
->> 
->> Just apply the 2 together, and take a look at HACKING how to build and
->> run from the source tree since you probably don't want to replace the
->> BlueZ that is coming with your distro.
-> 
+> So, this means that there's flush_work() racing against workqueue
+> destruction, which can't be safe. :(
 
-Thanks for pointing me to the HACKING file. I think I managed to use the latest blueZ with the patches this time.
+But I cannot trigger the WARN_ONs in the attached patch, so I am
+confused how this can happen :(. (While I am still seeing the destroy
+WARNINGs.)
 
-I do not observe the crash anymore and I get the connected=false signal. The only problem now is that this signal(and bluetooth disconnect on iPhone side) happens after ~15s. This is a bit slow for us and I will try to find a solution to indicate it a bit faster.
+BTW. what did you mean by dumping the states at shutdown? Is it still
+relevant?
 
-These are the g-properties-changed for my Device after killing the iPhone app.
-{'UUIDs', <@as []>} : {'ServicesResolved', <false>} : {'Connected', <false>}
+thanks,
+-- 
+js
+suse labs
 
+--------------060805040801090200020406
+Content-Type: text/x-patch;
+ name="vhci_debug.patch"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+ filename="vhci_debug.patch"
 
-Thanks again, I really appreciate the quick replies from you!
+---
+ include/linux/workqueue.h        |    1 +
+ include/net/bluetooth/hci_core.h |    5 +++++
+ kernel/reboot.c                  |    1 +
+ kernel/workqueue.c               |   34 +++++++++++++++++++++++++++++++---
+ net/bluetooth/hci_core.c         |   39 +++++++++++++++++++++++++++++++++++----
+ 5 files changed, 73 insertions(+), 7 deletions(-)
 
+--- a/include/linux/workqueue.h
++++ b/include/linux/workqueue.h
+@@ -312,6 +312,7 @@ enum {
+ 	__WQ_DRAINING		= 1 << 16, /* internal: workqueue is draining */
+ 	__WQ_ORDERED		= 1 << 17, /* internal: workqueue is ordered */
+ 	__WQ_LEGACY		= 1 << 18, /* internal: create*_workqueue() */
++	__WQ_DESTROYING		= 1 << 19,
+ 
+ 	WQ_MAX_ACTIVE		= 512,	  /* I like 512, better ideas? */
+ 	WQ_MAX_UNBOUND_PER_CPU	= 4,	  /* 4 * #cpus for unbound wq */
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -312,6 +312,11 @@ struct hci_dev {
+ 
+ 	struct workqueue_struct	*workqueue;
+ 	struct workqueue_struct	*req_workqueue;
++#define HCI_WQ_A	0
++#define HCI_WQ_D	1
++#define HCI_WQR_A	8
++#define HCI_WQR_D	9
++	unsigned long		wq_status;
+ 
+ 	struct work_struct	power_on;
+ 	struct delayed_work	power_off;
+--- a/kernel/reboot.c
++++ b/kernel/reboot.c
+@@ -231,6 +231,7 @@ static void kernel_shutdown_prepare(enum
+ 		(state == SYSTEM_HALT) ? SYS_HALT : SYS_POWER_OFF, NULL);
+ 	system_state = state;
+ 	usermodehelper_disable();
++	show_workqueue_state();
+ 	device_shutdown();
+ }
+ /**
+--- a/kernel/workqueue.c
++++ b/kernel/workqueue.c
+@@ -1366,6 +1366,9 @@ static void __queue_work(int cpu, struct
+ 	unsigned int work_flags;
+ 	unsigned int req_cpu = cpu;
+ 
++	if (WARN_ON(wq->flags & __WQ_DESTROYING))
++		return;
++
+ 	/*
+ 	 * While a work item is PENDING && off queue, a task trying to
+ 	 * steal the PENDING will busy-loop waiting for it to either get
+@@ -2804,6 +2807,9 @@ static bool start_flush_work(struct work
+ 		pwq = worker->current_pwq;
+ 	}
+ 
++	if (WARN_ON(pwq->wq->flags & __WQ_DESTROYING))
++		return false;
++
+ 	check_flush_dependency(pwq->wq, work);
+ 
+ 	insert_wq_barrier(pwq, barr, work, worker);
+@@ -2821,6 +2827,8 @@ static bool start_flush_work(struct work
+ 		lock_map_acquire_read(&pwq->wq->lockdep_map);
+ 	lock_map_release(&pwq->wq->lockdep_map);
+ 
++	WARN_ON(pwq->wq->flags & __WQ_DESTROYING);
++
+ 	return true;
+ already_gone:
+ 	spin_unlock_irq(&pool->lock);
+@@ -3998,6 +4006,8 @@ err_destroy:
+ }
+ EXPORT_SYMBOL_GPL(__alloc_workqueue_key);
+ 
++static void show_pwq(struct pool_workqueue *pwq);
++
+ /**
+  * destroy_workqueue - safely terminate a workqueue
+  * @wq: target workqueue
+@@ -4010,6 +4020,7 @@ void destroy_workqueue(struct workqueue_
+ 	int node;
+ 
+ 	/* drain it before proceeding with destruction */
++	wq->flags |= __WQ_DESTROYING;
+ 	drain_workqueue(wq);
+ 
+ 	/* sanity checks */
+@@ -4024,9 +4035,26 @@ void destroy_workqueue(struct workqueue_
+ 			}
+ 		}
+ 
+-		if (WARN_ON((pwq != wq->dfl_pwq) && (pwq->refcnt > 1)) ||
+-		    WARN_ON(pwq->nr_active) ||
+-		    WARN_ON(!list_empty(&pwq->delayed_works))) {
++		if ((pwq != wq->dfl_pwq) && (pwq->refcnt > 1)) {
++			pr_info("%s: name='%s' pwq=%p wq->dfl_pwq=%p pwq->refcnt=%d pwq->nr_active=%d delayed_works:",
++					__func__, wq->name, pwq, wq->dfl_pwq,
++					pwq->refcnt, pwq->nr_active);
++
++			show_pwq(pwq);
++
++			mutex_unlock(&wq->mutex);
++			WARN_ON(1);
++			return;
++		}
++
++		if (WARN_ON(pwq->nr_active)) {
++			pr_info("%s: %ps\n", __func__, wq);
++			mutex_unlock(&wq->mutex);
++			return;
++		}
++
++		if (WARN_ON(!list_empty(&pwq->delayed_works))) {
++			pr_info("%s: %ps\n", __func__, wq);
+ 			mutex_unlock(&wq->mutex);
+ 			return;
+ 		}
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1471,7 +1471,11 @@ int hci_dev_open(__u16 dev)
+ 	 * has finished. This means that error conditions like RFKILL
+ 	 * or no valid public or static random address apply.
+ 	 */
++	WARN_ON(test_bit(HCI_WQR_D, &hdev->wq_status));
++	WARN_ON(!test_bit(HCI_WQR_A, &hdev->wq_status));
+ 	flush_workqueue(hdev->req_workqueue);
++	WARN_ON(test_bit(HCI_WQR_D, &hdev->wq_status));
++	WARN_ON(!test_bit(HCI_WQR_A, &hdev->wq_status));
+ 
+ 	/* For controllers not using the management interface and that
+ 	 * are brought up using legacy ioctl, set the HCI_BONDABLE bit
+@@ -2467,6 +2471,8 @@ static void hci_cmd_timeout(struct work_
+ 	struct hci_dev *hdev = container_of(work, struct hci_dev,
+ 					    cmd_timer.work);
+ 
++	if (WARN_ON(hci_dev_test_flag(hdev, HCI_UNREGISTER)))
++		return;
+ 	if (hdev->sent_cmd) {
+ 		struct hci_command_hdr *sent = (void *) hdev->sent_cmd->data;
+ 		u16 opcode = __le16_to_cpu(sent->opcode);
+@@ -3043,15 +3049,17 @@ int hci_register_dev(struct hci_dev *hde
+ 
+ 	BT_DBG("%p name %s bus %d", hdev, hdev->name, hdev->bus);
+ 
+-	hdev->workqueue = alloc_workqueue("%s", WQ_HIGHPRI | WQ_UNBOUND |
+-					  WQ_MEM_RECLAIM, 1, hdev->name);
++	hdev->workqueue = alloc_workqueue("%s", WQ_HIGHPRI | WQ_UNBOUND
++					  , 1, hdev->name);
++	set_bit(HCI_WQ_A, &hdev->wq_status);
+ 	if (!hdev->workqueue) {
+ 		error = -ENOMEM;
+ 		goto err;
+ 	}
+ 
+-	hdev->req_workqueue = alloc_workqueue("%s", WQ_HIGHPRI | WQ_UNBOUND |
+-					      WQ_MEM_RECLAIM, 1, hdev->name);
++	hdev->req_workqueue = alloc_workqueue("req_%s", WQ_HIGHPRI | WQ_UNBOUND
++					      , 1, hdev->name);
++	set_bit(HCI_WQR_A, &hdev->wq_status);
+ 	if (!hdev->req_workqueue) {
+ 		destroy_workqueue(hdev->workqueue);
+ 		error = -ENOMEM;
+@@ -3108,8 +3116,12 @@ int hci_register_dev(struct hci_dev *hde
+ 	return id;
+ 
+ err_wqueue:
++	set_bit(HCI_WQ_D, &hdev->wq_status);
+ 	destroy_workqueue(hdev->workqueue);
++	clear_bit(HCI_WQ_A, &hdev->wq_status);
++	set_bit(HCI_WQR_D, &hdev->wq_status);
+ 	destroy_workqueue(hdev->req_workqueue);
++	clear_bit(HCI_WQR_A, &hdev->wq_status);
+ err:
+ 	ida_simple_remove(&hci_index_ida, hdev->id);
+ 
+@@ -3160,7 +3172,9 @@ void hci_unregister_dev(struct hci_dev *
+ 	debugfs_remove_recursive(hdev->debugfs);
+ 
+ 	destroy_workqueue(hdev->workqueue);
++	set_bit(HCI_WQR_D, &hdev->wq_status);
+ 	destroy_workqueue(hdev->req_workqueue);
++	clear_bit(HCI_WQR_A, &hdev->wq_status);
+ 
+ 	hci_dev_lock(hdev);
+ 	hci_bdaddr_list_clear(&hdev->blacklist);
+@@ -3225,6 +3239,11 @@ int hci_recv_frame(struct hci_dev *hdev,
+ 		return -ENXIO;
+ 	}
+ 
++	if (WARN_ON(hci_dev_test_flag(hdev, HCI_UNREGISTER))) {
++		kfree_skb(skb);
++		return -ENXIO;
++	}
++
+ 	if (hci_skb_pkt_type(skb) != HCI_EVENT_PKT &&
+ 	    hci_skb_pkt_type(skb) != HCI_ACLDATA_PKT &&
+ 	    hci_skb_pkt_type(skb) != HCI_SCODATA_PKT) {
+@@ -3248,6 +3267,9 @@ EXPORT_SYMBOL(hci_recv_frame);
+ /* Receive diagnostic message from HCI drivers */
+ int hci_recv_diag(struct hci_dev *hdev, struct sk_buff *skb)
+ {
++	if (WARN_ON(hci_dev_test_flag(hdev, HCI_UNREGISTER)))
++		return -ENXIO;
++
+ 	/* Mark as diagnostic packet */
+ 	hci_skb_pkt_type(skb) = HCI_DIAG_PKT;
+ 
+@@ -3326,6 +3348,9 @@ int hci_send_cmd(struct hci_dev *hdev, _
+ {
+ 	struct sk_buff *skb;
+ 
++	if (WARN_ON(hci_dev_test_flag(hdev, HCI_UNREGISTER)))
++		return -ENXIO;
++
+ 	BT_DBG("%s opcode 0x%4.4x plen %d", hdev->name, opcode, plen);
+ 
+ 	skb = hci_prepare_cmd(hdev, opcode, plen, param);
+@@ -3461,6 +3486,9 @@ void hci_send_acl(struct hci_chan *chan,
+ {
+ 	struct hci_dev *hdev = chan->conn->hdev;
+ 
++	if (WARN_ON(hci_dev_test_flag(hdev, HCI_UNREGISTER)))
++		return;
++
+ 	BT_DBG("%s chan %p flags 0x%4.4x", hdev->name, chan, flags);
+ 
+ 	hci_queue_acl(chan, &chan->data_q, skb, flags);
+@@ -3474,6 +3502,9 @@ void hci_send_sco(struct hci_conn *conn,
+ 	struct hci_dev *hdev = conn->hdev;
+ 	struct hci_sco_hdr hdr;
+ 
++	if (WARN_ON(hci_dev_test_flag(hdev, HCI_UNREGISTER)))
++		return;
++
+ 	BT_DBG("%s len %d", hdev->name, skb->len);
+ 
+ 	hdr.handle = cpu_to_le16(conn->handle);
 
-> 
-> 
-> -- 
-> Luiz Augusto von Dentz
-
+--------------060805040801090200020406--
