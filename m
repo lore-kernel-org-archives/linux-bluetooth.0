@@ -1,142 +1,115 @@
-Return-Path: <linux-kernel-owner@vger.kernel.org>
-From: Amitkumar Karwar <akarwar@marvell.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Cathy Luo <cluo@marvell.com>, <linux-kernel@vger.kernel.org>,
-	Nishant Sarmukadam <nishants@marvell.com>,
-	<devicetree@vger.kernel.org>,
-	Wei-Ning Huang <wnhuang@chromium.org>,
-	Xinming Hu <huxm@marvell.com>,
-	Amitkumar Karwar <akarwar@marvell.com>
-Subject: [PATCH v5 1/2] dt: bindings: add MARVELL's bt-sd8xxx wireless device
-Date: Fri, 18 Mar 2016 04:04:43 -0700
-Message-ID: <1458299084-31976-1-git-send-email-akarwar@marvell.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Szymon Janc <szymon.janc@codecoup.pl>
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] unit/test-crypto: Add test based on sample data from errata 4243
+Date: Fri, 18 Mar 2016 11:04:21 +0100
+Message-ID: <6541356.FQnDKjrX7J@ix>
+In-Reply-To: <1457713058-5671-1-git-send-email-szymon.janc@codecoup.pl>
+References: <1457713058-5671-1-git-send-email-szymon.janc@codecoup.pl>
 MIME-Version: 1.0
-Content-Type: text/plain
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Xinming Hu <huxm@marvell.com>
+On Friday 11 March 2016 17:17:38 Szymon Janc wrote:
+> ---
+>  unit/test-crypto.c | 39 ++++++++++++++++++++++++++++++++++-----
+>  1 file changed, 34 insertions(+), 5 deletions(-)
+> 
+> diff --git a/unit/test-crypto.c b/unit/test-crypto.c
+> index 5fb1c64..8d65707 100644
+> --- a/unit/test-crypto.c
+> +++ b/unit/test-crypto.c
+> @@ -38,6 +38,8 @@ struct test_data {
+>  	const uint8_t *msg;
+>  	uint16_t msg_len;
+>  	const uint8_t *t;
+> +	const uint8_t *key;
+> +	uint32_t cnt;
+>  };
+> 
+>  static const uint8_t key[] = {
+> @@ -54,7 +56,8 @@ static const uint8_t t_msg_1[] = {
+>  static const struct test_data test_data_1 = {
+>  	.msg = msg_1,
+>  	.msg_len = 0,
+> -	.t = t_msg_1
+> +	.t = t_msg_1,
+> +	.key = key,
+>  };
+> 
+>  static const uint8_t msg_2[] = {
+> @@ -70,7 +73,8 @@ static const uint8_t t_msg_2[] = {
+>  static const struct test_data test_data_2 = {
+>  	.msg = msg_2,
+>  	.msg_len = 16,
+> -	.t = t_msg_2
+> +	.t = t_msg_2,
+> +	.key = key,
+>  };
+> 
+>  static const uint8_t msg_3[] = {
+> @@ -87,7 +91,8 @@ static const uint8_t t_msg_3[12] = {
+>  static const struct test_data test_data_3 = {
+>  	.msg = msg_3,
+>  	.msg_len = 40,
+> -	.t = t_msg_3
+> +	.t = t_msg_3,
+> +	.key = key,
+>  };
+> 
+>  static const uint8_t msg_4[] = {
+> @@ -106,7 +111,30 @@ static const uint8_t t_msg_4[12] = {
+>  static const struct test_data test_data_4 = {
+>  	.msg = msg_4,
+>  	.msg_len = 64,
+> -	.t = t_msg_4
+> +	.t = t_msg_4,
+> +	.key = key,
+> +};
+> +
+> +static const uint8_t msg_5[] = {
+> +		0xd2, 0x12, 0x00, 0x13, 0x37
+> +};
+> +
+> +static const uint8_t key_5[] = {
+> +		0x50, 0x5E, 0x42, 0xDF, 0x96, 0x91, 0xEC, 0x72, 0xD3, 0x1F,
+> +		0xCD, 0xFB, 0xEB, 0x64, 0x1B, 0x61
+> +};
+> +
+> +static const uint8_t t_msg_5[] = {
+> +		0x01, 0x00, 0x00, 0x00, 0xF1, 0x87, 0x1E, 0x93, 0x3C, 0x90,
+> +		0x0F, 0xf2
+> +};
+> +
+> +static const struct test_data test_data_5 = {
+> +	.msg = msg_5,
+> +	.msg_len = sizeof(msg_5),
+> +	.t = t_msg_5,
+> +	.cnt = 1,
+> +	.key = key_5,
+>  };
+> 
+>  static void print_debug(const char *str, void *user_data)
+> @@ -130,7 +158,7 @@ static void test_sign(gconstpointer data)
+>  	const struct test_data *d = data;
+> 
+>  	memset(t, 0, 12);
+> -	if (!bt_crypto_sign_att(crypto, key, d->msg, d->msg_len, 0, t))
+> +	if (!bt_crypto_sign_att(crypto, d->key, d->msg, d->msg_len, d->cnt, t))
+>  		g_assert(true);
+> 
+>  	tester_debug("Result T:");
+> @@ -157,6 +185,7 @@ int main(int argc, char *argv[])
+>  	tester_add("/crypto/sign_att_2", &test_data_2, NULL, test_sign, NULL);
+>  	tester_add("/crypto/sign_att_3", &test_data_3, NULL, test_sign, NULL);
+>  	tester_add("/crypto/sign_att_4", &test_data_4, NULL, test_sign, NULL);
+> +	tester_add("/crypto/sign_att_5", &test_data_5, NULL, test_sign, NULL);
+> 
+>  	exit_status = tester_run();
 
-Add device tree binding documentation for MARVELL's bluetooth sdio
-(sd8897 and sd8997) chip.
+Applied.
 
-Signed-off-by: Xinming Hu <huxm@marvell.com>
-Signed-off-by: Amitkumar Karwar <akarwar@marvell.com>
----
-Listing changelist for both 1/2 and 2/2 here
-v2: Fixed build error reported by kbuild test robot
-drivers/bluetooth/btmrvl_platform.c:141:22: error:
-'btmrvl_plt_pm_ops' undeclared here (not in a function)
-
-v3: Add NULL check for 'btmrvl_plt_dev'
-
-v4: Moved the bindings file to bindings/net/
-    Corrected the name of 'name' and 'compatible' properties(Rob Herring)
-
-v5: Comments for wlan patches were applicable here as well. Like all binding
-    changes in single file, specifying node as a child of SDIO controller.
----
- Documentation/devicetree/bindings/btmrvl.txt       | 29 ------------
- .../devicetree/bindings/net/marvell-bt-sd8xxx.txt  | 55 ++++++++++++++++++++++
- 2 files changed, 55 insertions(+), 29 deletions(-)
- delete mode 100644 Documentation/devicetree/bindings/btmrvl.txt
- create mode 100644 Documentation/devicetree/bindings/net/marvell-bt-sd8xxx.txt
-
-diff --git a/Documentation/devicetree/bindings/btmrvl.txt b/Documentation/devicetree/bindings/btmrvl.txt
-deleted file mode 100644
-index 58f964b..0000000
---- a/Documentation/devicetree/bindings/btmrvl.txt
-+++ /dev/null
-@@ -1,29 +0,0 @@
--btmrvl
--------
--
--Required properties:
--
--  - compatible : must be "btmrvl,cfgdata"
--
--Optional properties:
--
--  - btmrvl,cal-data : Calibration data downloaded to the device during
--		      initialization. This is an array of 28 values(u8).
--
--  - btmrvl,gpio-gap : gpio and gap (in msecs) combination to be
--		      configured.
--
--Example:
--
--GPIO pin 13 is configured as a wakeup source and GAP is set to 100 msecs
--in below example.
--
--btmrvl {
--	compatible = "btmrvl,cfgdata";
--
--	btmrvl,cal-data = /bits/ 8 <
--		0x37 0x01 0x1c 0x00 0xff 0xff 0xff 0xff 0x01 0x7f 0x04 0x02
--		0x00 0x00 0xba 0xce 0xc0 0xc6 0x2d 0x00 0x00 0x00 0x00 0x00
--		0x00 0x00 0xf0 0x00>;
--	btmrvl,gpio-gap = <0x0d64>;
--};
-diff --git a/Documentation/devicetree/bindings/net/marvell-bt-sd8xxx.txt b/Documentation/devicetree/bindings/net/marvell-bt-sd8xxx.txt
-new file mode 100644
-index 0000000..b031431
---- /dev/null
-+++ b/Documentation/devicetree/bindings/net/marvell-bt-sd8xxx.txt
-@@ -0,0 +1,55 @@
-+Marvell 8897/8997 (sd8897/sd8997) bluetooth SDIO devices
-+------
-+
-+Required properties:
-+
-+  - compatible : should be one of the following:
-+	* "marvell,bt-sd8897"
-+	* "marvell,bt-sd8997"
-+
-+Optional properties:
-+
-+  - btmrvl,cal-data : Calibration data downloaded to the device during
-+		      initialization. This is an array of 28 values(u8).
-+
-+  - btmrvl,wakeuppin-gap : wakeup pin and gap (in msecs) combination to be
-+		      configured to firmware. 'wakeuppin' is a wakeup pin number
-+		      of bluetooth chip. 'gap' is a wakeup latency of a host platform.
-+		      This is needed to work chip's sleep feature as expected.
-+  - interrupt-parent: phandle of the parent interrupt controller
-+  - interrupts : interrupt pin number to the cpu. driver will request an irq based on
-+  		 this interrupt number. during system suspend, the irq will be enabled
-+  		 as system wakeup source, so that the bluetooth chip can wakeup host
-+  		 platform under certain condition. during system resume, the irq will
-+  		 be disabled to make sure unnecessary interrupt is not received.
-+
-+Example:
-+
-+IRQ pin 119 is used as system wakeup source interrupt.
-+wakeuppin 13 and gap 100ms are configured so that firmware can wakeup host
-+using this device side pin and wakeup latency.
-+calibration data is also available in below example.
-+
-+&mmc3 {
-+	status = "okay";
-+	vmmc-supply = <&wlan_en_reg>;
-+	bus-width = <4>;
-+	cap-power-off-card;
-+	keep-power-in-suspend;
-+
-+	#address-cells = <1>;
-+	#size-cells = <0>;
-+	btmrvl: btmrvl@3 {
-+		compatible = "marvell,bt-sd8897";
-+		reg = <2>;
-+		interrupt-parent = <&pio>;
-+		interrupts = <119 IRQ_TYPE_LEVEL_LOW>;
-+
-+		btmrvl,cal-data = /bits/ 8 <
-+			0x37 0x01 0x1c 0x00 0xff 0xff 0xff 0xff 0x01 0x7f 0x04 0x02
-+			0x00 0x00 0xba 0xce 0xc0 0xc6 0x2d 0x00 0x00 0x00 0x00 0x00
-+			0x00 0x00 0xf0 0x00>;
-+		btmrvl,wakeuppin-gap = <0x0d64>;
-+	};
-+};
-+
 -- 
-1.8.1.4
+pozdrawiam
+Szymon Janc
