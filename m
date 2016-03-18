@@ -4,42 +4,70 @@ From: =?UTF-8?q?=C5=81ukasz=20Rymanowski?=
 To: linux-bluetooth@vger.kernel.org
 Cc: =?UTF-8?q?=C5=81ukasz=20Rymanowski?=
 	<lukasz.rymanowski@codecoup.pl>
-Subject: [PATCH v3 5/9] shared/gatt-server: Fix handle error on execute write
-Date: Fri, 18 Mar 2016 14:08:14 +0100
-Message-Id: <1458306498-28151-6-git-send-email-lukasz.rymanowski@codecoup.pl>
+Subject: [PATCH v3 1/9] unit/test-gatt: Fix long write testcases
+Date: Fri, 18 Mar 2016 14:08:10 +0100
+Message-Id: <1458306498-28151-2-git-send-email-lukasz.rymanowski@codecoup.pl>
 In-Reply-To: <1458306498-28151-1-git-send-email-lukasz.rymanowski@codecoup.pl>
 References: <1458306498-28151-1-git-send-email-lukasz.rymanowski@codecoup.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If there is an error during execute write we should drop all
-outstanding prep_write data. This patch fix that.
----
- src/shared/gatt-server.c | 5 +++++
- 1 file changed, 5 insertions(+)
+Idea of long write is that each part of data is continuation
+of previous one. There shall be not gaps in the offsets between.
 
-diff --git a/src/shared/gatt-server.c b/src/shared/gatt-server.c
-index ba668e3..c41273a 100644
---- a/src/shared/gatt-server.c
-+++ b/src/shared/gatt-server.c
-@@ -1204,6 +1204,9 @@ static void exec_next_prep_write(struct bt_gatt_server *server,
- 	err = BT_ATT_ERROR_UNLIKELY;
+If there are gaps in offset then we have reliable write rather than
+long write
+---
+ unit/test-gatt.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/unit/test-gatt.c b/unit/test-gatt.c
+index 944bfba..dfa9fa4 100644
+--- a/unit/test-gatt.c
++++ b/unit/test-gatt.c
+@@ -3852,8 +3852,8 @@ int main(int argc, char *argv[])
+ 			raw_pdu(0x17, 0x03, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff,
+ 				0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+ 				0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff),
+-			raw_pdu(0x16, 0x03, 0x00, 0x3f, 0x00, 0xff),
+-			raw_pdu(0x17, 0x03, 0x00, 0x3f, 0x00, 0xff),
++			raw_pdu(0x16, 0x03, 0x00, 0x12, 0x00, 0xff),
++			raw_pdu(0x17, 0x03, 0x00, 0x12, 0x00, 0xff),
+ 			raw_pdu(0x18, 0x01),
+ 			raw_pdu(0x19));
  
- error:
-+	queue_remove_all(server->prep_queue, NULL, NULL,
-+						prep_write_data_destroy);
-+
- 	bt_att_send_error_rsp(server->att, BT_ATT_OP_EXEC_WRITE_REQ,
- 								ehandle, err);
- }
-@@ -1248,6 +1251,8 @@ static void exec_write_cb(uint8_t opcode, const void *pdu,
- 	return;
+@@ -3866,8 +3866,8 @@ int main(int argc, char *argv[])
+ 			raw_pdu(0x17, 0x82, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff,
+ 				0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+ 				0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff),
+-			raw_pdu(0x16, 0x82, 0x00, 0x3f, 0x00, 0xff),
+-			raw_pdu(0x17, 0x82, 0x00, 0x3f, 0x00, 0xff),
++			raw_pdu(0x16, 0x82, 0x00, 0x12, 0x00, 0xff),
++			raw_pdu(0x17, 0x82, 0x00, 0x12, 0x00, 0xff),
+ 			raw_pdu(0x18, 0x01),
+ 			raw_pdu(0x19));
  
- error:
-+	queue_remove_all(server->prep_queue, NULL, NULL,
-+						prep_write_data_destroy);
- 	bt_att_send_error_rsp(server->att, opcode, 0, ecode);
- }
+@@ -4374,8 +4374,8 @@ int main(int argc, char *argv[])
+ 			raw_pdu(0x17, 0x04, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff,
+ 				0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+ 				0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff),
+-			raw_pdu(0x16, 0x04, 0x00, 0x3f, 0x00, 0xff),
+-			raw_pdu(0x17, 0x04, 0x00, 0x3f, 0x00, 0xff),
++			raw_pdu(0x16, 0x04, 0x00, 0x12, 0x00, 0xff),
++			raw_pdu(0x17, 0x04, 0x00, 0x12, 0x00, 0xff),
+ 			raw_pdu(0x18, 0x01),
+ 			raw_pdu(0x19));
+ 
+@@ -4388,8 +4388,8 @@ int main(int argc, char *argv[])
+ 			raw_pdu(0x17, 0x83, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff,
+ 				0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+ 				0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff),
+-			raw_pdu(0x16, 0x83, 0x00, 0x3f, 0x00, 0xff),
+-			raw_pdu(0x17, 0x83, 0x00, 0x3f, 0x00, 0xff),
++			raw_pdu(0x16, 0x83, 0x00, 0x12, 0x00, 0xff),
++			raw_pdu(0x17, 0x83, 0x00, 0x12, 0x00, 0xff),
+ 			raw_pdu(0x18, 0x01),
+ 			raw_pdu(0x19));
  
 -- 
 2.5.0
