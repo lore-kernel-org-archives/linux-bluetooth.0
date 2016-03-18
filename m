@@ -1,188 +1,177 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Subject: Re: Questing regarding Broadcom Module
-To: =?UTF-8?Q?Fr=c3=a9d=c3=a9ric_Danis?= <frederic.danis.oss@gmail.com>,
-	Andreas Stahl <tcm.home@gmx.de>,
-	Frederic Danis <frederic.danis@linux.intel.com>
-References: <56DEA34C.5000909@gmx.de>
- <CAF7Mx6ozJ_GfhJqQn5VFWLXFpDKOhiDsTQc-mSHioH=-asyd8g@mail.gmail.com>
- <56E1197A.1050205@gmx.de> <56E13C80.70009@broadcom.com>
- <56E1932B.9030108@linux.intel.com> <56E1DFDF.1000405@gmx.de>
- <56EBAB95.5030101@gmail.com>
-Cc: brcm80211-dev-list <brcm80211-dev-list@broadcom.com>,
-	linux-bluetooth@vger.kernel.org
-From: Arend Van Spriel <arend.vanspriel@broadcom.com>
-Message-ID: <56EBCB6C.2040403@broadcom.com>
-Date: Fri, 18 Mar 2016 10:33:32 +0100
 MIME-Version: 1.0
-In-Reply-To: <56EBAB95.5030101@gmail.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <1457280149.2961.1.camel@salo.salonseutu.fi>
+References: <1457280149.2961.1.camel@salo.salonseutu.fi>
+From: Jay Aurabind <jay.aurabind@gmail.com>
+Date: Fri, 18 Mar 2016 14:03:48 +0530
+Message-ID: <CAOsEZojMfGLEKvAvfn5M3d7rSNLa9P5=60bXuf9=cMtA3f0g1w@mail.gmail.com>
+Subject: Re: hci connection problem
+To: Kari Lehtinen <karit.lehtinen@salo.salonseutu.fi>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-+ bt mailing list
+On 6 March 2016 at 21:32, Kari Lehtinen
+<karit.lehtinen@salo.salonseutu.fi> wrote:
+> Hello,
+>
+> I'm using bluez 5.36 in Fedora 23 and try to make a hci connection to
+> Nokia E5 or Adeunis ARF-BTC2 BT module from my desktop. The connection
+> attempts fail. I start with 'hcitool scan' and get a correct response
+> from both. To check the status I also run 'hcitool name <addr>' and,
+> again, get a correct response from both. When running 'hcitool info
+> <addr>' as a root I also get good responses that I assume to be valid.
+> However, running 'hcitool cc <addr>' does not succeed. I get no error
+> message but when checking with 'hcitool rssi <addr>' I get the response
+> "No connection" in both cases. Then, I switch to bluetoothctl and run
+> successfully the commands scan and info. But again, when trying to
+> connect I don't succeed. The response I get is the following:
+>
+>  [bluetooth]# connect 04:A8:2A:17:A8:18
+> Attempting to connect to 04:A8:2A:17:A8:18
+> [CHG] Device 04:A8:2A:17:A8:18 Connected: yes
+> Failed to connect: org.bluez.Error.Failed
+> [CHG] Device 04:A8:2A:17:A8:18 Connected: no
+> [CHG] Device 04:A8:2A:17:A8:18 Connected: yes
+> [CHG] Device 04:A8:2A:17:A8:18 Connected: no
+>
+> So, somehow it promises but eventually fails. I have checked with 'ps
+> -e' that both bluetoothd and dbus-daemon are up and the result is
+> positive. Also, I checked with systemctl the status of
+> bluetooth.service and it seems to be OK as well although there seems to
+> be one failure that may tell something, I'm not sure:
+>
+> ------------------------
+>
+> bluetooth.service - Bluetooth service
+>    Loaded: loaded (/usr/lib/systemd/system/bluetooth.service; enabled;
+> vendor preset: enabled)
+>    Active: active (running) since Sun 2016-02-28 18:53:18 EET; 5s ago
+>      Docs: man:bluetoothd(8)
+>  Main PID: 4332 (bluetoothd)
+>    Status: "Running"
+>    CGroup: /system.slice/bluetooth.service
+>            └─4332 /usr/libexec/bluetooth/bluetoothd
+>
+> Feb 28 18:53:18 Alpha60 systemd[1]: Starting Bluetooth service...
+> Feb 28 18:53:18 Alpha60 bluetoothd[4332]: Bluetooth daemon 5.36
+> Feb 28 18:53:18 Alpha60 systemd[1]: Started Bluetooth service.
+> Feb 28 18:53:18 Alpha60 bluetoothd[4332]: Starting SDP server
+> Feb 28 18:53:18 Alpha60 bluetoothd[4332]: Bluetooth management
+> interface 1.10 initialized
+> Feb 28 18:53:18 Alpha60 bluetoothd[4332]: Failed to obtain handles for
+> "Service Changed" characteristic
+> Feb 28 18:53:18 Alpha60 bluetoothd[4332]: Endpoint registered:
+> sender=:1.50 path=/MediaEndpoint/A2DPSource
+> Feb 28 18:53:18 Alpha60 bluetoothd[4332]: Endpoint registered:
+> sender=:1.50 path=/MediaEndpoint/A2DPSink
+>
+> -------------------
+>
+> This is an example of hcidump data of one of those hcitool cc <addr>-
+> trials:
+>
+> -------------------
+>
+> < HCI Command: Create Connection (0x01|0x0005) plen 13
+>     bdaddr 00:18:B2:03:15:ED ptype 0xcc18 rswitch 0x01 clkoffset 0x0000
+>     Packet type: DM1 DM3 DM5 DH1 DH3 DH5
+>> HCI Event: Command Status (0x0f) plen 4
+>     Create Connection (0x01|0x0005) status 0x00 ncmd 1
+>> HCI Event: Connect Complete (0x03) plen 11
+>     status 0x00 handle 71 bdaddr 00:18:B2:03:15:ED type ACL encrypt
+> 0x00
+> < HCI Command: Read Remote Supported Features (0x01|0x001b) plen 2
+>     handle 71
+>> HCI Event: Command Status (0x0f) plen 4
+>     Read Remote Supported Features (0x01|0x001b) status 0x00 ncmd 0
+>> HCI Event: Page Scan Repetition Mode Change (0x20) plen 7
+>     bdaddr 00:18:B2:03:15:ED mode 1
+>> HCI Event: Max Slots Change (0x1b) plen 3
+>     handle 71 slots 5
+>> HCI Event: Command Status (0x0f) plen 4
+>     Unknown (0x00|0x0000) status 0x00 ncmd 1
+>> HCI Event: Read Remote Supported Features (0x0b) plen 11
+>     status 0x00 handle 71
+>     Features: 0xff 0xff 0x8f 0xfe 0x9b 0xff 0x59 0x87
+> < HCI Command: Read Remote Extended Features (0x01|0x001c) plen 3
+>     handle 71 page 1
+>> HCI Event: Command Status (0x0f) plen 4
+>     Read Remote Extended Features (0x01|0x001c) status 0x00 ncmd 1
+>> HCI Event: Read Remote Extended Features (0x23) plen 13
+>     status 0x00 handle 71 page 1 max 1
+>     Features: 0x01 0x00 0x00 0x00 0x00 0x00 0x00 0x00
+> < HCI Command: Remote Name Request (0x01|0x0019) plen 10
+>     bdaddr 00:18:B2:03:15:ED mode 2 clkoffset 0x0000
+> < ACL data: handle 71 flags 0x00 dlen 10
+>     L2CAP(s): Info req: type 2
+>> HCI Event: Number of Completed Packets (0x13) plen 5
+>     handle 71 packets 1
+>> HCI Event: Command Status (0x0f) plen 4
+>     Remote Name Request (0x01|0x0019) status 0x00 ncmd 1
+>> ACL data: handle 71 flags 0x02 dlen 16
+>     L2CAP(s): Info rsp: type 2 result 0
+>       Extended feature mask 0x0228
+>         Enhanced Retransmission mode
+>         FCS Option
+>         Unicast Connectless Data Reception
+>> HCI Event: Remote Name Req Complete (0x07) plen 255
+>     status 0x00 bdaddr 00:18:B2:03:15:ED name 'Serial Port Device'
+> < HCI Command: Disconnect (0x01|0x0006) plen 3
+>     handle 71 reason 0x13
+>     Reason: Remote User Terminated Connection
+>> HCI Event: Command Status (0x0f) plen 4
+>     Disconnect (0x01|0x0006) status 0x00 ncmd 1
+>> HCI Event: Disconn Complete (0x05) plen 4
+>     status 0x00 handle 71 reason 0x16
+>     Reason: Connection Terminated by Local Host
+>
+> ------------------------
+>
+> Again, it seems to succeed but eventually fails. In fact, even the
+> Bluetooth connection sign appears in the upper right corner of the
+> display for a while.
+>
+>
+> I have browsed through some of the archives to find similarities with
+> my problem, especially regarding configuration stuff but haven't so far
+> found anything that might solve my problem. Do you have any advice how
+> to proceed with this issue?
 
-On 18-3-2016 8:17, Frédéric Danis wrote:
-> Hello Andreas,
-> 
-> Can you send kernel logs with debug info from hci_uart module (adding
-> 'dyndbg="module hci_uart +pf"' to kernel command line, see
-> Documentation/dynamic-debug-howto.txt) ?
 
-Wondering whether this module does runtime pm. Could you try with rpm
-disabled.
+Bump!
 
-Regards,
-Arend
+I'm also having a similar issue trying to connect to my fedora 23
+system to a new HID device I'm creating.
 
-> Regards
-> 
-> Fred
-> 
-> Le 10/03/2016 21:58, Andreas Stahl a écrit :
->> Hi Fred,
->>
->> I am actually using BlueZ. It works pretty well. I have even debugged
->> the HCI commands being sent and the messages being received, however I
->> can't find a pattern what makes the module completely unresponsive.
->>
->> Especially the sudden interrupt when just performing A2DP Streaming
->> towards Bluetooth headphones. It just simply stops working.
->>
->> Regarding the other situation with pairing during A2DP streaming: This
->> doesn't always fail. It never fails when you don't A2DP stream. The
->> error shows itself at random and sometimes when you pair and then
->> remove the keyboard (which includes disconnecting it) while performing
->> A2DP streaming.
->>
->> I tried looking at the hci package with hcidump as well as debugging
->> the kernel module directly. I still think it is the module itself that
->> fails. Using another broadcom module from another project, which
->> doesn't integrate wifi (not the desired case), works in all cases with
->> the same software and kernel drivers. I need to look up which module
->> it is that works just fine. Sadly my task is to get this specific one
->> running.
->>
->> Some additional data about the system:
->>
->> * Linux kernel 3.4.36 (patched with backported bluetooth drivers from
->> 4.3.x kernel)
->> * ARM Platform
->> * Latest BlueZ 5.37
->>
->> I also have tested the old BCM Module as well as the Wifi/BT
->> Combination module in another system with similar setup, however a
->> newer kernel and I get the same results: The older Module works, the
->> one that needs to be implemented (BCM43569) does not.
->>
->> Are there any debug outputs you can get from the bluetooth side
->> somehow? UART pins maybe that would show if the module has some kind
->> of fault or crash in this situation? I just don't see this error in
->> user- or kernel space anymore.
->>
->> Any advice is welcome to tackle this one.
->>
->> Best Regards,
->> Andreas Stahl
->>
->>
->>
->> Am 10.03.2016 um 16:30 schrieb Frederic Danis:
->>> + Frederic's personal OSS email
->>>
->>> Do you use btattach or hciattach with your BT module ?
->>>
->>> Regards
->>>
->>> Fred
->>>
->>> On 10/03/2016 10:21, Arend Van Spriel wrote:
->>>> + Frederic
->>>>
->>>> On 10-3-2016 7:51, Andreas Stahl wrote:
->>>>> Hello,
->>>>>
->>>>> thank you for your response. That lets me hope a little since
->>>>> trying out
->>>>> different firmware didn't change in the behavior of the module.
->>>>>
->>>>> When the module doesn't react anymore, wifi still works. Reloading the
->>>>> kernel driver doesn't help at all. It also complains about timeouts
->>>>> when
->>>>> detecting the bluetooth part.
->>>> Let's get a bit more information:
->>>>
->>>> - what platform are you using?
->>>> - what kernel version are you using?
->>>> - what bluez user-space version are you using?
->>>>
->>>> I think Intel uses bcm43340 so maybe they can give you pointers as they
->>>> worked on bt part.
->>>>
->>>> Regards,
->>>> Arend
->>>>
->>>>> Is there a source where I could find and existing patch for the
->>>>> bluetooth rom? Maybe the bluetooth part of the chip is also
->>>>> available as
->>>>> a stand alone chip which might already have a patch?
->>>>>
->>>>> Best Regards,
->>>>> Andreas Stahl
->>>>>
->>>>>
->>>>>
->>>>> On 03/08/2016 03:16 PM, Arend Van Spriel wrote:
->>>>>> Op 8 mrt. 2016 11:02 schreef "Andreas Stahl"
->>>>>> <<mailto:tcm.home@gmx.de>tcm.home@gmx.de>:
->>>>>>> Hello,
->>>>>>>
->>>>>>> sorry to disturb you. I saw that you are active in the open source
->>>>>> projects regarding broadcom products, especially wireless drivers.
->>>>>>> I am using a BCM43569 chip in linux for a project, which integrates
->>>>>> wifi and bluetooth capabilities. The module replaces a previous
->>>>>> combination of two distinct modules providing wifi and bluetooth
->>>>>> capabilities.
->>>>>>> Despite initial problems, the drivers work fine now with the module.
->>>>>> However it seems like the module "crashes" in certain use cases. In
->>>>>> Detail the hci commands on bluetooth start timing out. Bluetooth is
->>>>>> without operation, however wifi seems to stay in tact.
->>>>>>> Only a reset of the devices revives the bluetooth capabilities.
->>>>>>>
->>>>>>> In my test case I start an A2DP-Sink session (connecting to
->>>>>> bluetooth headphones) and then pair a bluetooth keyboard. In a good
->>>>>> bit of cases, during pairing or removing the pairing halts all
->>>>>> bluetooth operations.
->>>>>>> Since I can only see the kernel driver complaining about hci
->>>>>> timeouts, I am grasping for straws here trying to find a solution.
->>>>>>
->>>>>> Admittedly my BT knowledge is very limited so I would be grasping
->>>>>> straws on a trimmed lawn.
->>>>>>
->>>>>>> The same situation doesn't seem to happen with another broadcom
->>>>>> bluetooth module (without wifi integration) with the same kernel
->>>>>> code,
->>>>>> however for this project I need the combination module.
->>>>>>> Sorry for the information overload, but do you know any way to help
->>>>>> or is there somebody who could assist in support?
->>>>>>
->>>>>> No idea. Will forward your email.
->>>>>>
->>>>>>> Is there a way to get debug output from the chip? Does the loaded
->>>>>> firmware also include the bluetooth implementation?
->>>>>>
->>>>>> BT runs from ROM, but that can be patched. It is not part of wifi
->>>>>> firmware.
->>>>>>
->>>>>>> Again, thank you in advance for any advice you can give and sorry
->>>>>> for disturbing you. If you are the wrong person to ask, let me know
->>>>>> and I won't contact you again.
->>>>>>
->>>>>> For wifi driver questions I am (one of) the right person(s).
->>>>>>
->>>>>> Gr. AvS
->>>>>>> Best Regards,
->>>>>>> Andreas Stahl
->>>
->>>
->>
-> 
+In my case also, like OP reported, bluetoothctl tries to pair, but
+eventually it disconnects.
+
+I have added an HIDdevice SDP record on my little device, and from my
+linux machine, I can see it advertising as an HIDD. I believe its
+during L2CAP connection configuration its failing I think mostly its
+because of some errors on the device side, but how can I get more info
+from my linux machine about this failure ?
+
+Any suggestions would be very helpful!
+
+
+--
+
+Thanks in advance!
+Aurabindo
+>
+> Regards,
+> Kari Lehtinen
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
+-- 
+
+Thanks and Regards,
+Aurabindo J
