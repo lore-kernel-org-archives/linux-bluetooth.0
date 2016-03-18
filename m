@@ -1,63 +1,51 @@
-Return-Path: <htejun@gmail.com>
-Sender: Tejun Heo <htejun@gmail.com>
-Date: Fri, 18 Mar 2016 16:52:31 -0400
-From: Tejun Heo <tj@kernel.org>
-To: Jiri Slaby <jslaby@suse.cz>
-Cc: Dmitry Vyukov <dvyukov@google.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-bluetooth@vger.kernel.org, netdev <netdev@vger.kernel.org>,
-	LKML <linux-kernel@vger.kernel.org>,
-	syzkaller <syzkaller@googlegroups.com>,
-	Kostya Serebryany <kcc@google.com>,
-	Alexander Potapenko <glider@google.com>,
-	Sasha Levin <sasha.levin@oracle.com>,
-	Eric Dumazet <edumazet@google.com>, Takashi Iwai <tiwai@suse.com>
-Subject: Re: net/bluetooth: workqueue destruction WARNING in
- hci_unregister_dev
-Message-ID: <20160318205231.GO20028@mtj.duckdns.org>
-References: <CACT4Y+ax7zMOxe+kd4tw5Xdbvt=qPdBhXGO0j7qJwdn5tsfNNg@mail.gmail.com>
- <56C5CE85.6090808@suse.cz>
- <CACT4Y+bVXfY=wBZ+08rq16tHFw9s3YDrE_LCS=to-GF70AffRQ@mail.gmail.com>
- <20160218174427.GG13177@mtj.duckdns.org>
- <56C6EC62.8080107@suse.cz>
- <56C70618.3010902@suse.cz>
- <20160302154507.GC4282@mtj.duckdns.org>
- <56D7FFE1.90900@suse.cz>
- <20160311171205.GB24046@htj.duckdns.org>
- <56EA9C4D.2080803@suse.cz>
+Return-Path: <jirislaby@gmail.com>
+Subject: Re: bluetooth: use-after-free in vhci_send_frame
+To: Marcel Holtmann <marcel@holtmann.org>, Dmitry Vyukov <dvyukov@google.com>
+References: <CACT4Y+beTdUrUdwb1Drri=eFx5Cb9b4bT7uoyBMXHvxjvDxsVw@mail.gmail.com>
+ <CACT4Y+YcwPCUYmc96Pq5ReZes4O64HdMqSGzmZJjvah7bqjTMQ@mail.gmail.com>
+ <56DDAC0F.7060500@suse.cz>
+ <8FB90CCF-CB45-44C9-BF62-CFEE2B2B7CC5@holtmann.org>
+ <CACT4Y+Y25MbZ9nvfTuW9imKV9B9-cpfZGK8orXuVwE6d_f4zQA@mail.gmail.com>
+ <054BECDB-E7C1-4241-B298-FED0CEE6F3B2@holtmann.org>
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>,
+ linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+ LKML <linux-kernel@vger.kernel.org>, syzkaller <syzkaller@googlegroups.com>,
+ Kostya Serebryany <kcc@google.com>, Alexander Potapenko <glider@google.com>,
+ Sasha Levin <sasha.levin@oracle.com>
+From: Jiri Slaby <jslaby@suse.cz>
+Message-ID: <56EC33D5.40008@suse.cz>
+Date: Fri, 18 Mar 2016 17:59:01 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <56EA9C4D.2080803@suse.cz>
+In-Reply-To: <054BECDB-E7C1-4241-B298-FED0CEE6F3B2@holtmann.org>
+Content-Type: text/plain; charset=windows-1252
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello, Jiri.
+On 03/08/2016, 07:32 PM, Marcel Holtmann wrote:
+> that means very little to me actually. So is the real issue caused by opening /dev/vhci or is that theoretical one via some internal kernel compile time feature.
 
-On Thu, Mar 17, 2016 at 01:00:13PM +0100, Jiri Slaby wrote:
-> >> I have not done that yet, but today, I see:
-> >> destroy_workqueue: name='req_hci0' pwq=ffff88002f590300
-> >> wq->dfl_pwq=ffff88002f591e00 pwq->refcnt=2 pwq->nr_active=0 delayed_works:
-> >>    pwq 12: cpus=0-1 node=0 flags=0x4 nice=-20 active=0/1
-> >>      in-flight: 18568:wq_barrier_func
-> > 
-> > So, this means that there's flush_work() racing against workqueue
-> > destruction, which can't be safe. :(
-> 
-> But I cannot trigger the WARN_ONs in the attached patch, so I am
-> confused how this can happen :(. (While I am still seeing the destroy
-> WARNINGs.)
+Hi, what do you think about this one?
 
-So, no operations should be in progress when destroy_workqueue() is
-called.  If somebody was flushing a work item, the flush call must
-have returned before destroy_workqueue() was invoked, which doesn't
-seem to be the case here.  Can you trigger BUG_ON() or sysrq-t when
-the above triggers?  There must be a task which is flushing a work
-item there and it shouldn't be difficult to pinpoint what's going on
-from it.
+--- a/drivers/bluetooth/hci_vhci.c
++++ b/drivers/bluetooth/hci_vhci.c
+@@ -196,6 +196,11 @@ static inline ssize_t vhci_get_user(stru
 
-Thanks.
+                cancel_delayed_work_sync(&data->open_timeout);
 
++               if (data->hdev) {
++                       kfree_skb(skb);
++                       return -EBADFD;
++               }
++
+                opcode = *((__u8 *) skb->data);
+                skb_pull(skb, 1);
+
+
+open_timeout could be in progress (raced with us) and _sync cancel
+waited for vhci_create_device to actually finish and create the device
+the second time.
+
+thanks,
 -- 
-tejun
+js
+suse labs
