@@ -7,9 +7,11 @@ CC: Cathy Luo <cluo@marvell.com>, <linux-kernel@vger.kernel.org>,
 	Wei-Ning Huang <wnhuang@chromium.org>,
 	Xinming Hu <huxm@marvell.com>,
 	Amitkumar Karwar <akarwar@marvell.com>
-Subject: [PATCH v5 2/2] btmrvl: add platform specific wakeup interrupt support
-Date: Fri, 18 Mar 2016 04:06:37 -0700
-Message-ID: <1458299197-32030-1-git-send-email-akarwar@marvell.com>
+Subject: [PATCH 2/2] btmrvl: add platform specific wakeup interrupt support
+Date: Fri, 18 Mar 2016 04:04:44 -0700
+Message-ID: <1458299084-31976-2-git-send-email-akarwar@marvell.com>
+In-Reply-To: <1458299084-31976-1-git-send-email-akarwar@marvell.com>
+References: <1458299084-31976-1-git-send-email-akarwar@marvell.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
