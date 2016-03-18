@@ -4,141 +4,121 @@ From: =?UTF-8?q?=C5=81ukasz=20Rymanowski?=
 To: linux-bluetooth@vger.kernel.org
 Cc: =?UTF-8?q?=C5=81ukasz=20Rymanowski?=
 	<lukasz.rymanowski@codecoup.pl>
-Subject: [PATCH v3 8/9] shared/gatt-db: Add API to get extended prop
-Date: Fri, 18 Mar 2016 14:08:17 +0100
-Message-Id: <1458306498-28151-9-git-send-email-lukasz.rymanowski@codecoup.pl>
+Subject: [PATCH v3 9/9] shared/gatt-server: Check for ext. charact. prop. on reliable session
+Date: Fri, 18 Mar 2016 14:08:18 +0100
+Message-Id: <1458306498-28151-10-git-send-email-lukasz.rymanowski@codecoup.pl>
 In-Reply-To: <1458306498-28151-1-git-send-email-lukasz.rymanowski@codecoup.pl>
 References: <1458306498-28151-1-git-send-email-lukasz.rymanowski@codecoup.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds way to get extended properties from
-characteristic extended property descriptor
+With this patch we make sure that reliable session is done on
+characteristics which does support it.
 ---
- src/shared/gatt-db.c | 62 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- src/shared/gatt-db.h |  4 ++++
- unit/test-gatt.c     | 14 ++++++++++++
- 3 files changed, 80 insertions(+)
+ src/shared/gatt-server.c | 48 +++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 47 insertions(+), 1 deletion(-)
 
-diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
-index cc49458..1a1704b 100644
---- a/src/shared/gatt-db.c
-+++ b/src/shared/gatt-db.c
-@@ -52,6 +52,8 @@ static const bt_uuid_t characteristic_uuid = { .type = BT_UUID16,
- 					.value.u16 = GATT_CHARAC_UUID };
- static const bt_uuid_t included_service_uuid = { .type = BT_UUID16,
- 					.value.u16 = GATT_INCLUDE_UUID };
-+static const bt_uuid_t ext_desc_uuid = { .type = BT_UUID16,
-+				.value.u16 = GATT_CHARAC_EXT_PROPER_UUID };
+diff --git a/src/shared/gatt-server.c b/src/shared/gatt-server.c
+index 7a0c92f..bf06274 100644
+--- a/src/shared/gatt-server.c
++++ b/src/shared/gatt-server.c
+@@ -72,6 +72,8 @@ struct prep_write_data {
+ 	uint16_t handle;
+ 	uint16_t offset;
+ 	uint16_t length;
++
++	bool reliable_supported;
+ };
  
- struct gatt_db {
- 	int ref_count;
-@@ -1456,6 +1458,66 @@ bool gatt_db_attribute_get_service_data(const struct gatt_db_attribute *attrib,
- 	return le_to_uuid(decl->value, decl->value_len, uuid);
+ static void prep_write_data_destroy(void *user_data)
+@@ -1088,6 +1090,22 @@ error:
+ 	bt_att_send_error_rsp(server->att, opcode, 0, ecode);
  }
  
-+struct ext_prop_data {
-+	bool present;
-+	uint8_t prop;
-+};
-+
-+static void set_ext_prop_data(struct gatt_db_attribute *attrib,
-+						int err, const uint8_t *value,
-+						size_t length, void *user_data)
++static bool is_reliable_supported(const struct bt_gatt_server  *server,
++							uint16_t handle)
 +{
-+	struct ext_prop_data *ext_prop_data = user_data;
++	struct gatt_db_attribute *attr;
++	uint8_t ext_prop;
 +
-+	if (err || (length != sizeof(uint8_t)))
-+		return;
-+
-+	ext_prop_data->prop = value[0];
-+}
-+
-+static void check_reliable_supported(struct gatt_db_attribute *attrib,
-+							void *user_data)
-+{
-+	struct ext_prop_data *ext_prop_data = user_data;
-+
-+	if (ext_prop_data->present)
-+		return;
-+
-+	if (bt_uuid_cmp(&ext_desc_uuid, &attrib->uuid))
-+		return;
-+
-+	ext_prop_data->present = true;
-+	ext_prop_data->prop = gatt_db_attribute_read(attrib, 0,
-+						BT_ATT_OP_READ_REQ, NULL,
-+						set_ext_prop_data, user_data);
-+}
-+
-+bool gatt_db_attribute_get_characteristic_extended_prop(
-+					const struct gatt_db_attribute *attrib,
-+					uint8_t *ext_prop)
-+{
-+	struct ext_prop_data ext_prop_data;
-+
-+	if (!attrib)
++	attr = gatt_db_get_attribute(server->db, handle);
++	if (!attr)
 +		return false;
 +
-+	if (bt_uuid_cmp(&characteristic_uuid, &attrib->uuid))
++	if (!gatt_db_attribute_get_characteristic_extended_prop(attr, &ext_prop))
 +		return false;
 +
-+	memset(&ext_prop_data, 0, sizeof(ext_prop_data));
++	return (ext_prop & BT_GATT_CHRC_EXT_PROP_RELIABLE_WRITE);
++}
 +
+ static bool create_and_store_prep_data(struct bt_gatt_server *server,
+ 						uint16_t handle, uint16_t offset,
+ 						uint16_t length, uint8_t *value)
+@@ -1109,6 +1127,12 @@ static bool create_and_store_prep_data(struct bt_gatt_server *server,
+ 	prep_data->handle = handle;
+ 	prep_data->offset = offset;
+ 
 +	/*
-+	 * Cast needed for foreach function. We do not change attrib during
-+	 * this call
++	 * Handle is the value handle. We need characteristic declariation
++	 * handle which in BlueZ is handle_value -1
 +	 */
-+	gatt_db_service_foreach_desc((struct gatt_db_attribute *) attrib,
-+						check_reliable_supported,
-+						&ext_prop_data);
++	prep_data->reliable_supported =  is_reliable_supported( server,
++								handle -1);
+ 	queue_push_tail(server->prep_queue, prep_data);
+ 
+ 	return true;
+@@ -1285,6 +1309,14 @@ error:
+ 								ehandle, err);
+ }
+ 
++static bool find_no_reliable_characteristic(const void *data,
++						const void *match_data)
++{
++	const struct prep_write_data *prep_data = data;
 +
-+	*ext_prop = ext_prop_data.prop;
-+	return ext_prop_data.present;
++	return !prep_data->reliable_supported;
 +}
 +
- bool gatt_db_attribute_get_char_data(const struct gatt_db_attribute *attrib,
- 							uint16_t *handle,
- 							uint16_t *value_handle,
-diff --git a/src/shared/gatt-db.h b/src/shared/gatt-db.h
-index 96cceb9..0cb713e 100644
---- a/src/shared/gatt-db.h
-+++ b/src/shared/gatt-db.h
-@@ -195,6 +195,10 @@ bool gatt_db_attribute_get_service_data(const struct gatt_db_attribute *attrib,
- 							bool *primary,
- 							bt_uuid_t *uuid);
+ static void exec_write_cb(uint8_t opcode, const void *pdu,
+ 					uint16_t length, void *user_data)
+ {
+@@ -1292,6 +1324,7 @@ static void exec_write_cb(uint8_t opcode, const void *pdu,
+ 	uint8_t flags;
+ 	uint8_t ecode;
+ 	bool write;
++	uint16_t ehandle = 0;
  
-+bool gatt_db_attribute_get_characteristic_extended_prop(
-+					const struct gatt_db_attribute *attrib,
-+					uint8_t *ext_prop);
-+
- bool gatt_db_attribute_get_char_data(const struct gatt_db_attribute *attrib,
- 							uint16_t *handle,
- 							uint16_t *value_handle,
-diff --git a/unit/test-gatt.c b/unit/test-gatt.c
-index 0912348..85e4d75 100644
---- a/unit/test-gatt.c
-+++ b/unit/test-gatt.c
-@@ -4434,5 +4434,19 @@ int main(int argc, char *argv[])
- 				0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff),
- 			raw_pdu(0x01, 0x16, 0x04, 0x00, 0x03));
+ 	if (length != 1) {
+ 		ecode = BT_ATT_ERROR_INVALID_PDU;
+@@ -1320,6 +1353,19 @@ static void exec_write_cb(uint8_t opcode, const void *pdu,
+ 		return;
+ 	}
  
-+	define_test_server("/robustness/no-reliable-characteristic", test_server,
-+			ts_large_db_1, NULL,
-+			raw_pdu(0x03, 0x00, 0x02),
-+			raw_pdu(0x16, 0x82, 0x00, 0x00, 0x00, 0x01, 0x02, 0x03),
-+			raw_pdu(0x17, 0x82, 0x00, 0x00, 0x00, 0x01, 0x02, 0x03),
-+			raw_pdu(0x16, 0x25, 0x00, 0x00, 0x00, 0x01, 0x02, 0x03),
-+			raw_pdu(0x17, 0x25, 0x00, 0x00, 0x00, 0x01, 0x02, 0x03),
-+			raw_pdu(0x16, 0x82, 0x00, 0x03, 0x00, 0x04, 0x05, 0x06),
-+			raw_pdu(0x17, 0x82, 0x00, 0x03, 0x00, 0x04, 0x05, 0x06),
-+			raw_pdu(0x16, 0x25, 0x00, 0x03, 0x00, 0x04, 0x05, 0x06),
-+			raw_pdu(0x17, 0x25, 0x00, 0x03, 0x00, 0x04, 0x05, 0x06),
-+			raw_pdu(0x18, 0x01),
-+			raw_pdu(0x01, 0x18, 0x25, 0x00, 0x06));
++	/* If there is more than one prep request, we are in reliable session */
++	if (queue_length(server->prep_queue) > 1) {
++		struct prep_write_data *prep_data;
 +
- 	return tester_run();
++		prep_data = queue_find(server->prep_queue,
++					find_no_reliable_characteristic, NULL);
++		if (prep_data) {
++			ecode = BT_ATT_ERROR_REQUEST_NOT_SUPPORTED;
++			ehandle = prep_data->handle;
++			goto error;
++		}
++	}
++
+ 	exec_next_prep_write(server, 0, 0);
+ 
+ 	return;
+@@ -1327,7 +1373,7 @@ static void exec_write_cb(uint8_t opcode, const void *pdu,
+ error:
+ 	queue_remove_all(server->prep_queue, NULL, NULL,
+ 						prep_write_data_destroy);
+-	bt_att_send_error_rsp(server->att, opcode, 0, ecode);
++	bt_att_send_error_rsp(server->att, opcode, ehandle, ecode);
  }
+ 
+ static void exchange_mtu_cb(uint8_t opcode, const void *pdu,
 -- 
 2.5.0
 
