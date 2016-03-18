@@ -1,33 +1,63 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Date: Fri, 18 Mar 2016 20:48:48 -0700
-From: Mike Ryan <mikeryan@lacklustre.net>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] tools: make parse_companies.pl more forgiving of weird HTML
-Message-ID: <20160319034848.GO22136@lacklustre.net>
+Return-Path: <htejun@gmail.com>
+Sender: Tejun Heo <htejun@gmail.com>
+Date: Fri, 18 Mar 2016 16:52:31 -0400
+From: Tejun Heo <tj@kernel.org>
+To: Jiri Slaby <jslaby@suse.cz>
+Cc: Dmitry Vyukov <dvyukov@google.com>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-bluetooth@vger.kernel.org, netdev <netdev@vger.kernel.org>,
+	LKML <linux-kernel@vger.kernel.org>,
+	syzkaller <syzkaller@googlegroups.com>,
+	Kostya Serebryany <kcc@google.com>,
+	Alexander Potapenko <glider@google.com>,
+	Sasha Levin <sasha.levin@oracle.com>,
+	Eric Dumazet <edumazet@google.com>, Takashi Iwai <tiwai@suse.com>
+Subject: Re: net/bluetooth: workqueue destruction WARNING in
+ hci_unregister_dev
+Message-ID: <20160318205231.GO20028@mtj.duckdns.org>
+References: <CACT4Y+ax7zMOxe+kd4tw5Xdbvt=qPdBhXGO0j7qJwdn5tsfNNg@mail.gmail.com>
+ <56C5CE85.6090808@suse.cz>
+ <CACT4Y+bVXfY=wBZ+08rq16tHFw9s3YDrE_LCS=to-GF70AffRQ@mail.gmail.com>
+ <20160218174427.GG13177@mtj.duckdns.org>
+ <56C6EC62.8080107@suse.cz>
+ <56C70618.3010902@suse.cz>
+ <20160302154507.GC4282@mtj.duckdns.org>
+ <56D7FFE1.90900@suse.cz>
+ <20160311171205.GB24046@htj.duckdns.org>
+ <56EA9C4D.2080803@suse.cz>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <56EA9C4D.2080803@suse.cz>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Several company identifier lines do not end in a </td> but rather <br/>
-followed by newline followed by </td>. This dirty hack is more forgiving
-of HTML weirdnesses in the SIGs company identifiers page.
----
- tools/parse_companies.pl | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Hello, Jiri.
 
-diff --git a/tools/parse_companies.pl b/tools/parse_companies.pl
-index 6dc358e..1746222 100755
---- a/tools/parse_companies.pl
-+++ b/tools/parse_companies.pl
-@@ -45,7 +45,7 @@ while (<>) {
-         $next_is_name = 1;
- 
-     # next <td> should be company name
--    } elsif ($next_is_name && m|\<td.*\>(.*)\</td\>|) {
-+    } elsif ($next_is_name && m|\<td.*\>(.*)\<|) {
-         my $name = uri_decode($1);
-         $name =~ s/^\s+//g; # kill leading
-         $name =~ s/\s+$//g; # and trailing space
+On Thu, Mar 17, 2016 at 01:00:13PM +0100, Jiri Slaby wrote:
+> >> I have not done that yet, but today, I see:
+> >> destroy_workqueue: name='req_hci0' pwq=ffff88002f590300
+> >> wq->dfl_pwq=ffff88002f591e00 pwq->refcnt=2 pwq->nr_active=0 delayed_works:
+> >>    pwq 12: cpus=0-1 node=0 flags=0x4 nice=-20 active=0/1
+> >>      in-flight: 18568:wq_barrier_func
+> > 
+> > So, this means that there's flush_work() racing against workqueue
+> > destruction, which can't be safe. :(
+> 
+> But I cannot trigger the WARN_ONs in the attached patch, so I am
+> confused how this can happen :(. (While I am still seeing the destroy
+> WARNINGs.)
+
+So, no operations should be in progress when destroy_workqueue() is
+called.  If somebody was flushing a work item, the flush call must
+have returned before destroy_workqueue() was invoked, which doesn't
+seem to be the case here.  Can you trigger BUG_ON() or sysrq-t when
+the above triggers?  There must be a task which is flushing a work
+item there and it shouldn't be difficult to pinpoint what's going on
+from it.
+
+Thanks.
+
 -- 
-2.1.4
+tejun
