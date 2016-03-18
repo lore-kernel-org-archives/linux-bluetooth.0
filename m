@@ -4,121 +4,139 @@ From: =?UTF-8?q?=C5=81ukasz=20Rymanowski?=
 To: linux-bluetooth@vger.kernel.org
 Cc: =?UTF-8?q?=C5=81ukasz=20Rymanowski?=
 	<lukasz.rymanowski@codecoup.pl>
-Subject: [PATCH v3 9/9] shared/gatt-server: Check for ext. charact. prop. on reliable session
-Date: Fri, 18 Mar 2016 14:08:18 +0100
-Message-Id: <1458306498-28151-10-git-send-email-lukasz.rymanowski@codecoup.pl>
+Subject: [PATCH v3 7/9] shared/gatt-server: Support for reliable session nested with long
+Date: Fri, 18 Mar 2016 14:08:16 +0100
+Message-Id: <1458306498-28151-8-git-send-email-lukasz.rymanowski@codecoup.pl>
 In-Reply-To: <1458306498-28151-1-git-send-email-lukasz.rymanowski@codecoup.pl>
 References: <1458306498-28151-1-git-send-email-lukasz.rymanowski@codecoup.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-With this patch we make sure that reliable session is done on
-characteristics which does support it.
+With this patch it is possible to do reliable session to one
+characteristic nested with long write.
+
+We assume that long write as consequtive prep writes with continous
+offsets. Otherwise we treat it as single reliable write.
+
+Note: Long write can be started from non 0 offset as well
+
+With this patch we support following scenarios:
+
+e.g. 1:
+(a) prep_write: handle 1, offset 0, value_len 10
+(b) prep_write: handle 1, offset 5, value_len 5
+(c) prep_write: handle 1, offset 10, value_len 6
+
+Will result with:
+
+(a) exec_write: handle 1, offset 0, value_len 10
+(b + c) exec_write: handle 1, offset 10, value_len 11
+
+e.g. 2:
+(a) prep_write: handle 1, offset 0, value_len 10
+(b) prep_write: handle 1, offset 5, value_len 3
+(c) prep_write: handle 1, offset 10, value_len 6
+
+Will result with:
+
+(a) exec_write: handle 1, offset 0, value_len 10
+(b) exec_write: handle 1, offset 5, value_len 3
+(c) exec_write: handle 1, offset 10, value_len 6
 ---
- src/shared/gatt-server.c | 48 +++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 47 insertions(+), 1 deletion(-)
+ src/shared/gatt-server.c | 49 ++++++++++++++++++++++++++++++++----------------
+ 1 file changed, 33 insertions(+), 16 deletions(-)
 
 diff --git a/src/shared/gatt-server.c b/src/shared/gatt-server.c
-index 7a0c92f..bf06274 100644
+index 0904336..7a0c92f 100644
 --- a/src/shared/gatt-server.c
 +++ b/src/shared/gatt-server.c
-@@ -72,6 +72,8 @@ struct prep_write_data {
- 	uint16_t handle;
- 	uint16_t offset;
- 	uint16_t length;
-+
-+	bool reliable_supported;
- };
- 
- static void prep_write_data_destroy(void *user_data)
-@@ -1088,6 +1090,22 @@ error:
+@@ -1088,13 +1088,6 @@ error:
  	bt_att_send_error_rsp(server->att, opcode, 0, ecode);
  }
  
-+static bool is_reliable_supported(const struct bt_gatt_server  *server,
-+							uint16_t handle)
-+{
-+	struct gatt_db_attribute *attr;
-+	uint8_t ext_prop;
-+
-+	attr = gatt_db_get_attribute(server->db, handle);
-+	if (!attr)
-+		return false;
-+
-+	if (!gatt_db_attribute_get_characteristic_extended_prop(attr, &ext_prop))
-+		return false;
-+
-+	return (ext_prop & BT_GATT_CHRC_EXT_PROP_RELIABLE_WRITE);
-+}
-+
+-static bool match_attribute_handle(const void *data, const void *match_data)
+-{
+-	const struct prep_write_data *prep_data = data;
+-
+-	return prep_data->handle == PTR_TO_UINT(match_data);
+-}
+-
  static bool create_and_store_prep_data(struct bt_gatt_server *server,
  						uint16_t handle, uint16_t offset,
  						uint16_t length, uint8_t *value)
-@@ -1109,6 +1127,12 @@ static bool create_and_store_prep_data(struct bt_gatt_server *server,
- 	prep_data->handle = handle;
- 	prep_data->offset = offset;
- 
-+	/*
-+	 * Handle is the value handle. We need characteristic declariation
-+	 * handle which in BlueZ is handle_value -1
-+	 */
-+	prep_data->reliable_supported =  is_reliable_supported( server,
-+								handle -1);
- 	queue_push_tail(server->prep_queue, prep_data);
- 
+@@ -1145,16 +1138,40 @@ static bool make_aggregation_of_long_write_data(struct bt_gatt_server *server,
  	return true;
-@@ -1285,6 +1309,14 @@ error:
- 								ehandle, err);
  }
  
-+static bool find_no_reliable_characteristic(const void *data,
-+						const void *match_data)
-+{
-+	const struct prep_write_data *prep_data = data;
++struct prep_match_data {
++	uint16_t handle;
++	uint16_t offset;
++	struct prep_write_data *p;
++};
 +
-+	return !prep_data->reliable_supported;
++static void match_prep_data(void *data, void *user_data)
++{
++	struct prep_write_data *prep_data = data;
++	struct prep_match_data *s = user_data;
++
++	if (prep_data->handle != s->handle)
++		return;
++
++	/*
++	 * We are looking for last prepare write for given handle
++	 * with offset we could assume that it is long write
++	 */
++	if (prep_data->offset + prep_data->length == s->offset)
++		s->p = prep_data;
++	else
++		s->p = NULL;
 +}
 +
- static void exec_write_cb(uint8_t opcode, const void *pdu,
+ static void prep_write_cb(uint8_t opcode, const void *pdu,
  					uint16_t length, void *user_data)
  {
-@@ -1292,6 +1324,7 @@ static void exec_write_cb(uint8_t opcode, const void *pdu,
- 	uint8_t flags;
+ 	struct bt_gatt_server *server = user_data;
+-	struct prep_write_data *prep_data = NULL;
+ 	uint16_t handle = 0;
+ 	uint16_t offset;
+ 	struct gatt_db_attribute *attr;
  	uint8_t ecode;
- 	bool write;
-+	uint16_t ehandle = 0;
+ 	bool success;
++	struct prep_match_data match_data;
  
- 	if (length != 1) {
+ 	if (length < 4) {
  		ecode = BT_ATT_ERROR_INVALID_PDU;
-@@ -1320,6 +1353,19 @@ static void exec_write_cb(uint8_t opcode, const void *pdu,
- 		return;
- 	}
+@@ -1184,12 +1201,15 @@ static void prep_write_cb(uint8_t opcode, const void *pdu,
+ 	if (ecode)
+ 		goto error;
  
-+	/* If there is more than one prep request, we are in reliable session */
-+	if (queue_length(server->prep_queue) > 1) {
-+		struct prep_write_data *prep_data;
-+
-+		prep_data = queue_find(server->prep_queue,
-+					find_no_reliable_characteristic, NULL);
-+		if (prep_data) {
-+			ecode = BT_ATT_ERROR_REQUEST_NOT_SUPPORTED;
-+			ehandle = prep_data->handle;
-+			goto error;
-+		}
-+	}
-+
- 	exec_next_prep_write(server, 0, 0);
+-	prep_data = queue_find(server->prep_queue, match_attribute_handle,
+-							UINT_TO_PTR(handle));
++	match_data.handle = handle;
++	match_data.offset = offset;
++	match_data.p = NULL;
  
+-	if (prep_data && offset == prep_data->length + prep_data->offset)
+-		success = make_aggregation_of_long_write_data(server, prep_data,
+-							handle, length - 4,
++	queue_foreach(server->prep_queue, match_prep_data, &match_data);
++	if (match_data.p)
++		success = make_aggregation_of_long_write_data(server,
++							match_data.p,
++							handle,length - 4,
+ 							&((uint8_t *) pdu)[4]);
+ 	else
+ 		success = create_and_store_prep_data(server, handle, offset,
+@@ -1205,9 +1225,6 @@ static void prep_write_cb(uint8_t opcode, const void *pdu,
  	return;
-@@ -1327,7 +1373,7 @@ static void exec_write_cb(uint8_t opcode, const void *pdu,
- error:
- 	queue_remove_all(server->prep_queue, NULL, NULL,
- 						prep_write_data_destroy);
--	bt_att_send_error_rsp(server->att, opcode, 0, ecode);
-+	bt_att_send_error_rsp(server->att, opcode, ehandle, ecode);
- }
  
- static void exchange_mtu_cb(uint8_t opcode, const void *pdu,
+ error:
+-	if (prep_data)
+-		prep_write_data_destroy(prep_data);
+-
+ 	bt_att_send_error_rsp(server->att, opcode, handle, ecode);
+ 
+ }
 -- 
 2.5.0
 
