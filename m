@@ -6,49 +6,56 @@ Cc: linux-kernel@vger.kernel.org,
 	Marcel Holtmann <marcel@holtmann.org>,
 	Gustavo Padovan <gustavo@padovan.org>,
 	linux-bluetooth@vger.kernel.org,
+	Dmitry Vyukov <dvyukov@google.com>,
 	"stable 3 . 13+" <stable@vger.kernel.org>
-Subject: [PATCH] Bluetooth: purge unhandled skbs
-Date: Sat, 19 Mar 2016 11:49:43 +0100
-Message-Id: <1458384583-10005-1-git-send-email-jslaby@suse.cz>
+Subject: [PATCH v2] Bluetooth: vhci, fix open_timeout vs. hdev race
+Date: Sat, 19 Mar 2016 11:05:18 +0100
+Message-Id: <1458381918-7886-1-git-send-email-jslaby@suse.cz>
+In-Reply-To: <1458380852-7533-1-git-send-email-jslaby@suse.cz>
+References: <1458380852-7533-1-git-send-email-jslaby@suse.cz>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The write handler allocates skbs and queues them into data->readq.
-Read side should read them, if there is any. If there is none, skbs
-should be dropped by hdev->flush. But this happens only if the device
-is HCI_UP, i.e. hdev->power_on work was triggered already. When it was
-not, skbs stay allocated in the queue when /dev/vhci is closed. So
-purge the queue in ->release.
+Both vhci_get_user and vhci_release race with open_timeout work. They
+both contain cancel_delayed_work_sync, but do not test whether the
+work actually created hdev or not. Since the work can be in progress
+and _sync will wait for finishing it, we can have data->hdev allocated
+when cancel_delayed_work_sync returns. But the call sites do 'if
+(data->hdev)' *before* cancel_delayed_work_sync.
 
-Program to reproduce:
+As a result:
+* vhci_get_user allocates a second hdev and puts it into
+  data->hdev. The former is leaked.
+* vhci_release does not release data->hdev properly as it thinks there
+  is none.
+
+Fix both cases by moving the actual test *after* the call to
+cancel_delayed_work_sync.
+
+This can be hit by this program:
 	#include <err.h>
 	#include <fcntl.h>
 	#include <stdio.h>
+	#include <stdlib.h>
+	#include <time.h>
 	#include <unistd.h>
 
 	#include <sys/stat.h>
 	#include <sys/types.h>
-	#include <sys/uio.h>
 
-	int main()
+	int main(int argc, char **argv)
 	{
-		char buf[] = { 0xff, 0 };
-		struct iovec iov = {
-			.iov_base = buf,
-			.iov_len = sizeof(buf),
-		};
 		int fd;
 
+		srand(time(NULL));
+
 		while (1) {
+			const int delta = (rand() % 200 - 100) * 100;
+
 			fd = open("/dev/vhci", O_RDWR);
 			if (fd < 0)
 				err(1, "open");
 
-			usleep(50);
-
-			if (writev(fd, &iov, 1) < 0)
-				err(1, "writev");
-
-			usleep(50);
+			usleep(1000000 + delta);
 
 			close(fd);
 		}
@@ -56,18 +63,67 @@ Program to reproduce:
 		return 0;
 	}
 
-Result:
-kmemleak: 4609 new suspected memory leaks
-unreferenced object 0xffff88059f4d5440 (size 232):
-  comm "vhci", pid 1084, jiffies 4294912542 (age 37569.296s)
-  hex dump (first 32 bytes):
-    20 f0 23 87 05 88 ff ff 20 f0 23 87 05 88 ff ff   .#..... .#.....
-    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-  backtrace:
+And the result is:
+BUG: KASAN: use-after-free in skb_queue_tail+0x13e/0x150 at addr ffff88006b0c1228
+Read of size 8 by task kworker/u13:1/32068
+=============================================================================
+BUG kmalloc-192 (Tainted: G            E     ): kasan: bad access detected
+-----------------------------------------------------------------------------
+
+Disabling lock debugging due to kernel taint
+INFO: Allocated in vhci_open+0x50/0x330 [hci_vhci] age=260 cpu=3 pid=32040
 ...
-    [<ffffffff81ece010>] __alloc_skb+0x0/0x5a0
-    [<ffffffffa021886c>] vhci_create_device+0x5c/0x580 [hci_vhci]
-    [<ffffffffa0219436>] vhci_write+0x306/0x4c8 [hci_vhci]
+	kmem_cache_alloc_trace+0x150/0x190
+	vhci_open+0x50/0x330 [hci_vhci]
+	misc_open+0x35b/0x4e0
+	chrdev_open+0x23b/0x510
+...
+INFO: Freed in vhci_release+0xa4/0xd0 [hci_vhci] age=9 cpu=2 pid=32040
+...
+	__slab_free+0x204/0x310
+	vhci_release+0xa4/0xd0 [hci_vhci]
+...
+INFO: Slab 0xffffea0001ac3000 objects=16 used=13 fp=0xffff88006b0c1e00 flags=0x5fffff80004080
+INFO: Object 0xffff88006b0c1200 @offset=4608 fp=0xffff88006b0c0600
+Bytes b4 ffff88006b0c11f0: 09 df 00 00 01 00 00 00 00 00 00 00 00 00 00 00  ................
+Object ffff88006b0c1200: 00 06 0c 6b 00 88 ff ff 00 00 00 00 00 00 00 00  ...k............
+Object ffff88006b0c1210: 10 12 0c 6b 00 88 ff ff 10 12 0c 6b 00 88 ff ff  ...k.......k....
+Object ffff88006b0c1220: c0 46 c2 6b 00 88 ff ff c0 46 c2 6b 00 88 ff ff  .F.k.....F.k....
+Object ffff88006b0c1230: 01 00 00 00 01 00 00 00 e0 ff ff ff 0f 00 00 00  ................
+Object ffff88006b0c1240: 40 12 0c 6b 00 88 ff ff 40 12 0c 6b 00 88 ff ff  @..k....@..k....
+Object ffff88006b0c1250: 50 0d 6e a0 ff ff ff ff 00 02 00 00 00 00 ad de  P.n.............
+Object ffff88006b0c1260: 00 00 00 00 00 00 00 00 ab 62 02 00 01 00 00 00  .........b......
+Object ffff88006b0c1270: 90 b9 19 81 ff ff ff ff 38 12 0c 6b 00 88 ff ff  ........8..k....
+Object ffff88006b0c1280: 03 00 20 00 ff ff ff ff ff ff ff ff 00 00 00 00  .. .............
+Object ffff88006b0c1290: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+Object ffff88006b0c12a0: 00 00 00 00 00 00 00 00 00 80 cd 3d 00 88 ff ff  ...........=....
+Object ffff88006b0c12b0: 00 20 00 00 00 00 00 00 00 00 00 00 00 00 00 00  . ..............
+Redzone ffff88006b0c12c0: bb bb bb bb bb bb bb bb                          ........
+Padding ffff88006b0c13f8: 00 00 00 00 00 00 00 00                          ........
+CPU: 3 PID: 32068 Comm: kworker/u13:1 Tainted: G    B       E      4.4.6-0-default #1
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.8.1-0-g4adadbd-20151112_172657-sheep25 04/01/2014
+Workqueue: hci0 hci_cmd_work [bluetooth]
+ 00000000ffffffff ffffffff81926cfa ffff88006be37c68 ffff88006bc27180
+ ffff88006b0c1200 ffff88006b0c1234 ffffffff81577993 ffffffff82489320
+ ffff88006bc24240 0000000000000046 ffff88006a100000 000000026e51eb80
+Call Trace:
+...
+ [<ffffffff81ec8ebe>] ? skb_queue_tail+0x13e/0x150
+ [<ffffffffa06e027c>] ? vhci_send_frame+0xac/0x100 [hci_vhci]
+ [<ffffffffa0c61268>] ? hci_send_frame+0x188/0x320 [bluetooth]
+ [<ffffffffa0c61515>] ? hci_cmd_work+0x115/0x310 [bluetooth]
+ [<ffffffff811a1375>] ? process_one_work+0x815/0x1340
+ [<ffffffff811a1f85>] ? worker_thread+0xe5/0x11f0
+ [<ffffffff811a1ea0>] ? process_one_work+0x1340/0x1340
+ [<ffffffff811b3c68>] ? kthread+0x1c8/0x230
+...
+Memory state around the buggy address:
+ ffff88006b0c1100: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+ ffff88006b0c1180: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+>ffff88006b0c1200: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+                                  ^
+ ffff88006b0c1280: fb fb fb fb fb fb fb fb fc fc fc fc fc fc fc fc
+ ffff88006b0c1300: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
 
 Fixes: 23424c0d31 (Bluetooth: Add support creating virtual AMP controllers)
 Signed-off-by: Jiri Slaby <jslaby@suse.cz>
@@ -75,22 +131,47 @@ Cc: Marcel Holtmann <marcel@holtmann.org>
 Cc: Gustavo Padovan <gustavo@padovan.org>
 Cc: Johan Hedberg <johan.hedberg@gmail.com>
 Cc: <linux-bluetooth@vger.kernel.org>
+Cc: Dmitry Vyukov <dvyukov@google.com>
 Cc: stable 3.13+ <stable@vger.kernel.org>
 ---
- drivers/bluetooth/hci_vhci.c | 1 +
- 1 file changed, 1 insertion(+)
+[v2] describe the symptoms and cleaner program
+
+ drivers/bluetooth/hci_vhci.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
 diff --git a/drivers/bluetooth/hci_vhci.c b/drivers/bluetooth/hci_vhci.c
-index 3ec580e38c17..f67ea1c090cb 100644
+index 7287d774e107..f67ea1c090cb 100644
 --- a/drivers/bluetooth/hci_vhci.c
 +++ b/drivers/bluetooth/hci_vhci.c
-@@ -344,6 +344,7 @@ static int vhci_release(struct inode *inode, struct file *file)
+@@ -189,13 +189,13 @@ static inline ssize_t vhci_get_user(struct vhci_data *data,
+ 		break;
+ 
+ 	case HCI_VENDOR_PKT:
++		cancel_delayed_work_sync(&data->open_timeout);
++
+ 		if (data->hdev) {
+ 			kfree_skb(skb);
+ 			return -EBADFD;
+ 		}
+ 
+-		cancel_delayed_work_sync(&data->open_timeout);
+-
+ 		opcode = *((__u8 *) skb->data);
+ 		skb_pull(skb, 1);
+ 
+@@ -333,10 +333,12 @@ static int vhci_open(struct inode *inode, struct file *file)
+ static int vhci_release(struct inode *inode, struct file *file)
+ {
+ 	struct vhci_data *data = file->private_data;
+-	struct hci_dev *hdev = data->hdev;
++	struct hci_dev *hdev;
+ 
+ 	cancel_delayed_work_sync(&data->open_timeout);
+ 
++	hdev = data->hdev;
++
+ 	if (hdev) {
+ 		hci_unregister_dev(hdev);
  		hci_free_dev(hdev);
- 	}
- 
-+	skb_queue_purge(&data->readq);
- 	file->private_data = NULL;
- 	kfree(data);
- 
 -- 
 2.7.4
