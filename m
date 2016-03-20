@@ -1,29 +1,35 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 9.2 \(3112\))
-Subject: Re: [PATCH] tools: make parse_companies.pl more forgiving of weird HTML
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20160319034848.GO22136@lacklustre.net>
-Date: Sat, 19 Mar 2016 20:18:15 -0700
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <282D49E3-1332-4A5D-B4C3-97F75E3E0184@holtmann.org>
-References: <20160319034848.GO22136@lacklustre.net>
-To: Mike Ryan <mikeryan@lacklustre.net>
+MIME-Version: 1.0
+Date: Sat, 19 Mar 2016 20:34:33 -0600
+Message-ID: <CAASrBQkO4oNjR9j+Yz6CcmjhDChkABwKHR_-hgZoQCcTPnaWPA@mail.gmail.com>
+Subject: Crash in src/gatt-client.c (was Re: setting indication on
+ GattCharacteristic1 interface)
+From: Mark Rages <markrages@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mike,
+bluetoothd crashes when I attempt to close the connection and
+reconnect through d-bus interface.
 
-> Several company identifier lines do not end in a </td> but rather <br/>
-> followed by newline followed by </td>. This dirty hack is more forgiving
-> of HTML weirdnesses in the SIGs company identifiers page.
-> ---
-> tools/parse_companies.pl | 2 +-
-> 1 file changed, 1 insertion(+), 1 deletion(-)
+bluez @ 4d7b1d2b347423a7a79647e51b31744f3e044612
 
-patch has been applied.
+I've put the trace and btmon log here:
 
-Regards
+https://www.dropbox.com/sh/ddo9kuux9lixj4l/AAB-dWv3aZhfi27KXMMBkoHxa?dl=0
 
-Marcel
+And here is the script that reliably triggers it.  It is an
+implementation of the Nordic Semiconductor nRF51 DFU bootloader.
+Unfortunately you need appropriate nRF51 hardware to duplicate this.
 
+https://github.com/markrages/ble/blob/master/example_dfu.py
+
+If there's any more information that would be useful, please let me
+know, preferably with the exact command-line to gather the
+information.
+
+Regards,
+Mark
+markrages@gmail
