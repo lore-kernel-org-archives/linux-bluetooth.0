@@ -1,33 +1,48 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+MIME-Version: 1.0
+In-Reply-To: <CAASrBQkO4oNjR9j+Yz6CcmjhDChkABwKHR_-hgZoQCcTPnaWPA@mail.gmail.com>
+References: <CAASrBQkO4oNjR9j+Yz6CcmjhDChkABwKHR_-hgZoQCcTPnaWPA@mail.gmail.com>
+Date: Mon, 21 Mar 2016 16:42:14 +0200
+Message-ID: <CABBYNZJJZG7guG9h8Gvp75ONbO1WO=6EKpc7E1cfG-y-CgA0FA@mail.gmail.com>
+Subject: Re: Crash in src/gatt-client.c (was Re: setting indication on
+ GattCharacteristic1 interface)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/2] shared/gatt-client: Make it possible to clone non-ready clients
-Date: Mon, 21 Mar 2016 17:45:40 +0200
-Message-Id: <1458575141-3808-1-git-send-email-luiz.dentz@gmail.com>
+To: Mark Rages <markrages@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Mark,
 
-This is necessary in order to be possible to send commands while the
-discovery is in progress.
----
- src/shared/gatt-client.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On Sun, Mar 20, 2016 at 4:34 AM, Mark Rages <markrages@gmail.com> wrote:
+> bluetoothd crashes when I attempt to close the connection and
+> reconnect through d-bus interface.
+>
+> bluez @ 4d7b1d2b347423a7a79647e51b31744f3e044612
+>
+> I've put the trace and btmon log here:
+>
+> https://www.dropbox.com/sh/ddo9kuux9lixj4l/AAB-dWv3aZhfi27KXMMBkoHxa?dl=0
 
-diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
-index 1dd6b22..8fa66ae 100644
---- a/src/shared/gatt-client.c
-+++ b/src/shared/gatt-client.c
-@@ -1722,7 +1722,7 @@ struct bt_gatt_client *bt_gatt_client_clone(struct bt_gatt_client *client)
- {
- 	struct bt_gatt_client *clone;
- 
--	if (!client || !client->ready)
-+	if (!client)
- 		return NULL;
- 
- 	clone = gatt_client_new(client->db, client->att);
+The crash should now be fixed upstream, thanks for the logs.
+
+>
+> And here is the script that reliably triggers it.  It is an
+> implementation of the Nordic Semiconductor nRF51 DFU bootloader.
+> Unfortunately you need appropriate nRF51 hardware to duplicate this.
+>
+> https://github.com/markrages/ble/blob/master/example_dfu.py
+>
+> If there's any more information that would be useful, please let me
+> know, preferably with the exact command-line to gather the
+> information.
+>
+> Regards,
+> Mark
+> markrages@gmail
+
+
+
 -- 
-2.5.0
-
+Luiz Augusto von Dentz
