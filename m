@@ -1,78 +1,124 @@
-Return-Path: <jirislaby@gmail.com>
-Subject: Re: net/bluetooth: workqueue destruction WARNING in
- hci_unregister_dev
-To: Tejun Heo <tj@kernel.org>
-References: <CACT4Y+ax7zMOxe+kd4tw5Xdbvt=qPdBhXGO0j7qJwdn5tsfNNg@mail.gmail.com>
- <56C5CE85.6090808@suse.cz>
- <CACT4Y+bVXfY=wBZ+08rq16tHFw9s3YDrE_LCS=to-GF70AffRQ@mail.gmail.com>
- <20160218174427.GG13177@mtj.duckdns.org> <56C6EC62.8080107@suse.cz>
- <56C70618.3010902@suse.cz> <20160302154507.GC4282@mtj.duckdns.org>
- <56D7FFE1.90900@suse.cz> <20160311171205.GB24046@htj.duckdns.org>
- <56EA9C4D.2080803@suse.cz> <20160318205231.GO20028@mtj.duckdns.org>
-Cc: Dmitry Vyukov <dvyukov@google.com>, Marcel Holtmann
- <marcel@holtmann.org>, Gustavo Padovan <gustavo@padovan.org>,
- Johan Hedberg <johan.hedberg@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, linux-bluetooth@vger.kernel.org,
- netdev <netdev@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>,
- syzkaller <syzkaller@googlegroups.com>, Kostya Serebryany <kcc@google.com>,
- Alexander Potapenko <glider@google.com>, Sasha Levin
- <sasha.levin@oracle.com>, Eric Dumazet <edumazet@google.com>,
- Takashi Iwai <tiwai@suse.com>
-From: Jiri Slaby <jslaby@suse.cz>
-Message-ID: <56F01A1C.40208@suse.cz>
-Date: Mon, 21 Mar 2016 16:58:20 +0100
-MIME-Version: 1.0
-In-Reply-To: <20160318205231.GO20028@mtj.duckdns.org>
-Content-Type: text/plain; charset=windows-1252
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 2/2] shared/gatt-client: Forward events from parent to clones
+Date: Mon, 21 Mar 2016 17:45:41 +0200
+Message-Id: <1458575141-3808-2-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1458575141-3808-1-git-send-email-luiz.dentz@gmail.com>
+References: <1458575141-3808-1-git-send-email-luiz.dentz@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On 03/18/2016, 09:52 PM, Tejun Heo wrote:
-> On Thu, Mar 17, 2016 at 01:00:13PM +0100, Jiri Slaby wrote:
->>>> I have not done that yet, but today, I see:
->>>> destroy_workqueue: name='req_hci0' pwq=ffff88002f590300
->>>> wq->dfl_pwq=ffff88002f591e00 pwq->refcnt=2 pwq->nr_active=0 delayed_works:
->>>>    pwq 12: cpus=0-1 node=0 flags=0x4 nice=-20 active=0/1
->>>>      in-flight: 18568:wq_barrier_func
->>>
->>> So, this means that there's flush_work() racing against workqueue
->>> destruction, which can't be safe. :(
->>
->> But I cannot trigger the WARN_ONs in the attached patch, so I am
->> confused how this can happen :(. (While I am still seeing the destroy
->> WARNINGs.)
-> 
-> So, no operations should be in progress when destroy_workqueue() is
-> called.  If somebody was flushing a work item, the flush call must
-> have returned before destroy_workqueue() was invoked, which doesn't
-> seem to be the case here.  Can you trigger BUG_ON() or sysrq-t when
-> the above triggers?  There must be a task which is flushing a work
-> item there and it shouldn't be difficult to pinpoint what's going on
-> from it.
+Some events such as ready and service changed shall be forward to clones
+since the clones may have set callbacks as well.
+---
+ src/shared/gatt-client.c | 38 ++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 38 insertions(+)
 
-The output of sysrq-t is here (> 200k), but I cannot see anything
-suspicious in it:
-http://www.fi.muni.cz/~xslaby/sklad/panics/jctl.txt
-
-This is what the code does now:
-+               if ((pwq != wq->dfl_pwq) && (pwq->refcnt > 1)) {
-+                       pr_info("%s: name='%s' pwq=%p wq->dfl_pwq=%p
-pwq->refcnt=%d pwq->nr_active=%d delayed_works:",
-+                                       __func__, wq->name, pwq,
-wq->dfl_pwq,
-+                                       pwq->refcnt, pwq->nr_active);
+diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
+index 8fa66ae..0c7bd97 100644
+--- a/src/shared/gatt-client.c
++++ b/src/shared/gatt-client.c
+@@ -55,6 +55,9 @@ struct bt_gatt_client {
+ 	struct bt_att *att;
+ 	int ref_count;
+ 
++	struct bt_gatt_client *parent;
++	struct queue *clones;
 +
-+                       show_pwq(pwq);
+ 	bt_gatt_client_callback_t ready_callback;
+ 	bt_gatt_client_destroy_func_t ready_destroy;
+ 	void *ready_data;
+@@ -1013,12 +1016,23 @@ done:
+ static void notify_client_ready(struct bt_gatt_client *client, bool success,
+ 							uint8_t att_ecode)
+ {
++	const struct queue_entry *entry;
 +
-+                       mutex_unlock(&wq->mutex);
-+                       show_state();
-+                       show_workqueue_state();
-+                       WARN_ON(1);
-+                       return;
-+               }
-
-thanks,
+ 	if (!client->ready_callback || client->ready)
+ 		return;
+ 
+ 	bt_gatt_client_ref(client);
+ 	client->ready = success;
+ 	client->ready_callback(success, att_ecode, client->ready_data);
++
++	/* Notify clones */
++	for (entry = queue_get_entries(client->clones); entry;
++							entry = entry->next) {
++		struct bt_gatt_client *clone = entry->data;
++
++		notify_client_ready(clone, success, att_ecode);
++	}
++
+ 	bt_gatt_client_unref(client);
+ }
+ 
+@@ -1332,6 +1346,7 @@ static void service_changed_complete(struct discovery_op *op, bool success,
+ 	struct service_changed_op *next_sc_op;
+ 	uint16_t start_handle = op->start;
+ 	uint16_t end_handle = op->end;
++	const struct queue_entry *entry;
+ 
+ 	client->in_svc_chngd = false;
+ 
+@@ -1348,6 +1363,16 @@ static void service_changed_complete(struct discovery_op *op, bool success,
+ 		client->svc_chngd_callback(start_handle, end_handle,
+ 							client->svc_chngd_data);
+ 
++	/* Notify clones */
++	for (entry = queue_get_entries(client->clones); entry;
++							entry = entry->next) {
++		struct bt_gatt_client *clone = entry->data;
++
++		if (clone->svc_chngd_callback)
++			clone->svc_chngd_callback(start_handle, end_handle,
++							clone->svc_chngd_data);
++	}
++
+ 	/* Process any queued events */
+ 	next_sc_op = queue_pop_head(client->svc_chngd_queue);
+ 	if (next_sc_op) {
+@@ -1634,11 +1659,17 @@ static void bt_gatt_client_free(struct bt_gatt_client *client)
+ 
+ 	gatt_db_unref(client->db);
+ 
++	queue_destroy(client->clones, NULL);
+ 	queue_destroy(client->svc_chngd_queue, free);
+ 	queue_destroy(client->long_write_queue, request_unref);
+ 	queue_destroy(client->notify_chrcs, notify_chrc_free);
+ 	queue_destroy(client->pending_requests, request_unref);
+ 
++	if (client->parent) {
++		queue_remove(client->parent->clones, client);
++		bt_gatt_client_unref(client->parent);
++	}
++
+ 	free(client);
+ }
+ 
+@@ -1670,6 +1701,7 @@ static struct bt_gatt_client *gatt_client_new(struct gatt_db *db,
+ 	if (!client->disc_id)
+ 		goto fail;
+ 
++	client->clones = queue_new();
+ 	client->long_write_queue = queue_new();
+ 	client->svc_chngd_queue = queue_new();
+ 	client->notify_list = queue_new();
+@@ -1729,6 +1761,12 @@ struct bt_gatt_client *bt_gatt_client_clone(struct bt_gatt_client *client)
+ 	if (!clone)
+ 		return NULL;
+ 
++	queue_push_tail(client->clones, clone);
++
++	/* Reference the parent since the clones depend on it to propagate
++	 * service changed and ready callbacks.
++	 */
++	clone->parent = bt_gatt_client_ref(client);
+ 	clone->ready = client->ready;
+ 
+ 	return bt_gatt_client_ref(clone);
 -- 
-js
-suse labs
+2.5.0
+
