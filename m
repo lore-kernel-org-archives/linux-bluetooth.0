@@ -1,83 +1,149 @@
-Return-Path: <dvyukov@google.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <56F0FDCE.1040701@suse.cz>
-References: <CACT4Y+ax7zMOxe+kd4tw5Xdbvt=qPdBhXGO0j7qJwdn5tsfNNg@mail.gmail.com>
- <56C5CE85.6090808@suse.cz> <CACT4Y+bVXfY=wBZ+08rq16tHFw9s3YDrE_LCS=to-GF70AffRQ@mail.gmail.com>
- <20160218174427.GG13177@mtj.duckdns.org> <56C6EC62.8080107@suse.cz>
- <56C70618.3010902@suse.cz> <20160302154507.GC4282@mtj.duckdns.org>
- <56D7FFE1.90900@suse.cz> <20160311171205.GB24046@htj.duckdns.org>
- <56EA9C4D.2080803@suse.cz> <20160318205231.GO20028@mtj.duckdns.org>
- <56F01A1C.40208@suse.cz> <56F0FDCE.1040701@suse.cz>
-From: Dmitry Vyukov <dvyukov@google.com>
-Date: Tue, 22 Mar 2016 13:32:09 +0100
-Message-ID: <CACT4Y+b+9Ubsbfs58nHAraG+7iXRBkrn=XyCTPDJLike7w-mjQ@mail.gmail.com>
-Subject: Re: net/bluetooth: workqueue destruction WARNING in hci_unregister_dev
-To: Jiri Slaby <jslaby@suse.cz>
-Cc: Tejun Heo <tj@kernel.org>, Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>, Johan Hedberg <johan.hedberg@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>, linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-	netdev <netdev@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>,
-	syzkaller <syzkaller@googlegroups.com>, Kostya Serebryany <kcc@google.com>,
-	Alexander Potapenko <glider@google.com>, Sasha Levin <sasha.levin@oracle.com>,
-	Eric Dumazet <edumazet@google.com>, Takashi Iwai <tiwai@suse.com>
+In-Reply-To: <13BCED30230BDE4A95185615BD0E58144C982E5A@GDC00215.swatchgroup.net>
+References: <13BCED30230BDE4A95185615BD0E58144C982E5A@GDC00215.swatchgroup.net>
+Date: Tue, 22 Mar 2016 14:32:03 +0200
+Message-ID: <CABBYNZ+vmMKzZGAwUFHqRDAfB+kWmsvdi7koJhGsT4Xr=LiC3g@mail.gmail.com>
+Subject: Re: Regression? Missing D-Bus GATT characteristics with version 5.38
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: "Hoover, David" <DHoover@asulab.ch>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, Mar 22, 2016 at 9:09 AM, Jiri Slaby <jslaby@suse.cz> wrote:
-> On 03/21/2016, 04:58 PM, Jiri Slaby wrote:
->> Hello,
->>
->> On 03/18/2016, 09:52 PM, Tejun Heo wrote:
->>> On Thu, Mar 17, 2016 at 01:00:13PM +0100, Jiri Slaby wrote:
->>>>>> I have not done that yet, but today, I see:
->>>>>> destroy_workqueue: name='req_hci0' pwq=ffff88002f590300
->>>>>> wq->dfl_pwq=ffff88002f591e00 pwq->refcnt=2 pwq->nr_active=0 delayed_works:
->>>>>>    pwq 12: cpus=0-1 node=0 flags=0x4 nice=-20 active=0/1
->>>>>>      in-flight: 18568:wq_barrier_func
->>>>>
->>>>> So, this means that there's flush_work() racing against workqueue
->>>>> destruction, which can't be safe. :(
->>>>
->>>> But I cannot trigger the WARN_ONs in the attached patch, so I am
->>>> confused how this can happen :(. (While I am still seeing the destroy
->>>> WARNINGs.)
->>>
->>> So, no operations should be in progress when destroy_workqueue() is
->>> called.  If somebody was flushing a work item, the flush call must
->>> have returned before destroy_workqueue() was invoked, which doesn't
->>> seem to be the case here.  Can you trigger BUG_ON() or sysrq-t when
->>> the above triggers?  There must be a task which is flushing a work
->>> item there and it shouldn't be difficult to pinpoint what's going on
->>> from it.
->>
->> The output of sysrq-t is here (> 200k), but I cannot see anything
->> suspicious in it:
->> http://www.fi.muni.cz/~xslaby/sklad/panics/jctl.txt
->
-> Hmm, so I seem I cannot reproduce with this hunk:
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -3139,10 +3139,10 @@ void hci_unregister_dev(struct hci_dev *hdev)
->         list_del(&hdev->list);
->         write_unlock(&hci_dev_list_lock);
->
-> -       hci_dev_do_close(hdev);
-> -
->         cancel_work_sync(&hdev->power_on);
->
-> +       hci_dev_do_close(hdev);
-> +
->         if (!test_bit(HCI_INIT, &hdev->flags) &&
->             !hci_dev_test_flag(hdev, HCI_SETUP) &&
->             !hci_dev_test_flag(hdev, HCI_CONFIG)) {
->
->
->
-> I cannot explain why though. I do not see how it matters in this
-> particular case...
->
-> Dmitry, could you apply it too? But I don't know how often you see the
-> warning.
+Hi David,
 
-I've seen it only several times in several months, so I don't it will
-be helpful.
+On Tue, Mar 22, 2016 at 12:33 PM, Hoover, David <DHoover@asulab.ch> wrote:
+> Hi,
+>
+> With the Feb 29 commit (8e493e8416e5525042b8b4a34eb2b7084725438b) I am able
+> to see BLE device services and query their characteristics, but with version
+> 5.38, this no longer works for me.
+>
+> This breaks test/example-gatt-client. Any idea? I can perform additional
+> tests if necessary.
+>
+> For both checkouts I compiled with:
+>
+> ./configure --prefix=/share/bluez --enable-maintainer-mode
+> --enable-backtrace --enable-test --enable-debug --disable-optimization
+> --enable-experimental --sysconfdir=/share/bluez/etc --disable-udev
+> --disable-systemd
+>
+> Thanks,
+>
+> David
+>
+>
+> Example (8e493e8416e5525042b8b4a34eb2b7084725438b):
+>
+> dhoover@debian82:~/git/bluez/bluez/test$ qdbus --system org.bluez
+> /
+> /org
+> /org/bluez
+> /org/bluez/hci0
+> /org/bluez/hci0/dev_12_34_50_12_34_52
+> /org/bluez/hci0/dev_12_34_50_12_34_52/service0001
+> /org/bluez/hci0/dev_12_34_50_12_34_52/service0001/char0002
+> /org/bluez/hci0/dev_12_34_50_12_34_52/service0001/char0004
+> /org/bluez/hci0/dev_12_34_50_12_34_52/service0001/char0006
+> /org/bluez/hci0/dev_12_34_50_12_34_52/service0008
+> /org/bluez/hci0/dev_12_34_50_12_34_52/service0009
+> /org/bluez/hci0/dev_12_34_50_12_34_52/service0009/char000a
+> /org/bluez/hci0/dev_12_34_50_12_34_52/service0009/char000a/desc000c
+> /org/bluez/hci0/dev_12_34_50_12_34_52/service0009/char000d
+> /org/bluez/hci0/dev_12_34_50_12_34_52/service0009/char000f
+> /org/bluez/hci0/dev_12_34_50_12_34_52/service0011
+> /org/bluez/hci0/dev_12_34_50_12_34_52/service0011/char0012
+> /org/bluez/hci0/dev_12_34_50_12_34_52/service0011/char0014
+> /org/bluez/hci0/dev_12_34_50_12_34_52/service0011/char0016
+> /org/bluez/hci0/dev_12_34_50_12_34_52/service0018
+> /org/bluez/hci0/dev_12_34_50_12_34_52/service0018/char0019
+> /org/bluez/hci0/dev_12_34_50_12_34_52/service0018/char0019/desc001b
+> /org/bluez/hci0/dev_12_34_50_12_34_52/service0018/char0019/desc001c
+>
+> dhoover@debian82:~/git/bluez/bluez/test$ qdbus --system org.bluez
+> /org/bluez/hci0/dev_12_34_50_12_34_52/service0009
+> org.freedesktop.DBus.Properties.GetAll org.bluez.GattService1
+> Characteristics: qdbus: I don't know how to display an argument of type
+> 'ao', run with --literal.
+> Device:
+> Primary: true
+> UUID: 0000180d-0000-1000-8000-00805f9b34fb
+>
+> dhoover@debian82:~/git/bluez/bluez/test$ qdbus --literal --system org.bluez
+> /org/bluez/hci0/dev_12_34_50_12_34_52/service0009
+> org.freedesktop.DBus.Properties.GetAll org.bluez.GattService1
+> [Argument: a{sv} {"UUID" = [Variant(QString):
+> "0000180d-0000-1000-8000-00805f9b34fb"], "Device" = [Variant: [ObjectPath:
+> /org/bluez/hci0/dev_12_34_50_12_34_52]], "Primary" = [Variant(bool): true],
+> "Characteristics" = [Variant: [Argument: ao {[ObjectPath:
+> /org/bluez/hci0/dev_12_34_50_12_34_52/service0009/char000a], [ObjectPath:
+> /org/bluez/hci0/dev_12_34_50_12_34_52/service0009/char000d], [ObjectPath:
+> /org/bluez/hci0/dev_12_34_50_12_34_52/service0009/char000f]}]]}]
+>
+> dhoover@debian82:~/git/bluez/bluez/test$ ./example-gatt-client
+> /org/bluez/hci0/dev_12_34_50_12_34_52/service0009
+> Heart Rate Service ready
+> Body sensor location value: Chest
+> HR Measurement notifications enabled
+> New HR Measurement
+>                 HR: 108
+>                 Sensor Contact status: no contact detected
+>                 Energy Expended: 20
+>
+> Example (ver 5.38):
+>
+> dhoover@debian82:~/git/bluez/bluez/test$ qdbus --system org.bluez
+> /
+> /org
+> /org/bluez
+> /org/bluez/hci0
+> /org/bluez/hci0/dev_12_34_50_12_34_52
+> /org/bluez/hci0/dev_12_34_50_12_34_52/service0001
+> /org/bluez/hci0/dev_12_34_50_12_34_52/service0001/char0002
+> /org/bluez/hci0/dev_12_34_50_12_34_52/service0001/char0004
+> /org/bluez/hci0/dev_12_34_50_12_34_52/service0001/char0006
+> /org/bluez/hci0/dev_12_34_50_12_34_52/service0008
+> /org/bluez/hci0/dev_12_34_50_12_34_52/service0009
+> /org/bluez/hci0/dev_12_34_50_12_34_52/service0009/char000a
+> /org/bluez/hci0/dev_12_34_50_12_34_52/service0009/char000a/desc000c
+> /org/bluez/hci0/dev_12_34_50_12_34_52/service0009/char000d
+> /org/bluez/hci0/dev_12_34_50_12_34_52/service0009/char000f
+> /org/bluez/hci0/dev_12_34_50_12_34_52/service0011
+> /org/bluez/hci0/dev_12_34_50_12_34_52/service0011/char0012
+> /org/bluez/hci0/dev_12_34_50_12_34_52/service0011/char0014
+> /org/bluez/hci0/dev_12_34_50_12_34_52/service0011/char0016
+> /org/bluez/hci0/dev_12_34_50_12_34_52/service0018
+> /org/bluez/hci0/dev_12_34_50_12_34_52/service0018/char0019
+> /org/bluez/hci0/dev_12_34_50_12_34_52/service0018/char0019/desc001b
+> /org/bluez/hci0/dev_12_34_50_12_34_52/service0018/char0019/desc001c
+> /org/bluez/hci0/dev_D0_33_11_3A_D4_71
+> /org/bluez/hci0/dev_EE_34_56_78_9A_BC
+>
+> dhoover@debian82:~/git/bluez/bluez/test$ qdbus --system org.bluez
+> /org/bluez/hci0/dev_12_34_50_12_34_52/service0009
+> org.freedesktop.DBus.Properties.GetAll org.bluez.GattService1
+> Device:
+> Primary: true
+> UUID: 0000180d-0000-1000-8000-00805f9b34fb
+>
+> dhoover@debian82:~/git/bluez/bluez/test$ ./example-gatt-client
+> /org/bluez/hci0/dev_12_34_50_12_34_52/service0009
+> Traceback (most recent call last):
+>   File "./example-gatt-client", line 221, in <module>
+>     main()
+>   File "./example-gatt-client", line 207, in main
+>     if not process_hr_service(service_path):
+>   File "./example-gatt-client", line 167, in process_hr_service
+>     chrc_paths = service_props['Characteristics']
+> KeyError: 'Characteristics'
+
+GattService1 no longer has the property Characteristic, this is
+actually on purpose since the objects shall be enumerated with use of
+ObjectManager, I will fix example-gatt-client in the meantime you can
+use bluetoothctl.
+
+-- 
+Luiz Augusto von Dentz
