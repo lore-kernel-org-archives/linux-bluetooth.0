@@ -1,36 +1,50 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <jirislaby@gmail.com>
+Subject: Re: [PATCH v2] Bluetooth: vhci, fix open_timeout vs. hdev race
+To: Takashi Iwai <tiwai@suse.de>
+References: <1458380852-7533-1-git-send-email-jslaby@suse.cz>
+ <1458381918-7886-1-git-send-email-jslaby@suse.cz>
+ <s5hio0e4np7.wl-tiwai@suse.de>
+Cc: johan.hedberg@gmail.com, linux-kernel@vger.kernel.org,
+ Marcel Holtmann <marcel@holtmann.org>, Gustavo Padovan
+ <gustavo@padovan.org>, linux-bluetooth@vger.kernel.org,
+ Dmitry Vyukov <dvyukov@google.com>, "stable 3 . 13+" <stable@vger.kernel.org>
+From: Jiri Slaby <jslaby@suse.cz>
+Message-ID: <56F16A2C.6080303@suse.cz>
+Date: Tue, 22 Mar 2016 16:52:12 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
-Date: Tue, 22 Mar 2016 17:58:35 +0100
-From: Oscar C <oscar-listas@naiandei.net>
-To: <szymon.janc@gmail.com>, <linux-bluetooth@vger.kernel.org>
-Subject: sixaxis: Improved support for DualShock 3 clones not working
- (undefined symbol)
-Message-ID: <c1557d88bcf8b0d4fe64f76569c66396@naiandei.net>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <s5hio0e4np7.wl-tiwai@suse.de>
+Content-Type: text/plain; charset=windows-1252
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Szymon,
+On 03/22/2016, 03:00 PM, Takashi Iwai wrote:
+> int main()
+> {
+> 	int i;
+> 	long fd;
+>         pthread_t th[32];
+> 
+> 	fd = open("/dev/vhci", O_RDWR);
+> 	if (fd < 0)
+> 		err(1, "open");
+>         for (i = 0; i < 32; i++)
+> 		pthread_create(&th[i], 0, test, (void*)fd);
+>         for (i = 0; i < 32; i++)
+> 		pthread_join(th[i], NULL);
+> 	return 0;
+> }
+> ================================================================
+> 
+> For fixing these, we need a proper mutex protection.  A patch like
+> below seems helping, at least for the test case above.
 
-I tried the patches sent to the list on June 2015 regarding the DS 
-clones made by ShanWan. That patches are necessary because the DualSock 
-clones do not work with the current sixaxis plugin.
+I didn't fix this and kept it simple as I believe concurrent accesses
+from a single opener are not allowed by design. But if we want to
+support this, we of course need locking like this.
 
-They compiles ok, but when I try to run the daemon it fails because a 
-symbol can not be found. Of course, the same code but without the 
-patches applied works fine (but the gamepad does not work).
+Anyway, I would appreciate any input from the BT fellows. There are more
+races like this, apparently.
 
-Any idea on how to solve this? Thanks!
-
-
-gardenia:/root # /usr/lib/bluetooth/bluetoothd -n -d 9
-bluetoothd[5943]: Bluetooth daemon 5.37
-bluetoothd[5943]: Starting SDP server
-bluetoothd[5943]: Can't load plugin 
-/usr/lib/bluetooth/plugins/sixaxis.so: 
-/usr/lib/bluetooth/plugins/sixaxis.so: undefined symbol: sdp_data_alloc
-bluetoothd[5943]: Bluetooth management interface 1.6 initialized
-
---
-Cheers,
+thanks,
+-- 
+js
+suse labs
