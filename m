@@ -1,26 +1,36 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Mo Reina <urban.yoga.journeys@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: BlueZ 5.38 continuously disconnects bluetooth headset 
-Message-ID: <878u19lmqj.fsf@gmail.com>
-Date: Wed, 23 Mar 2016 15:42:00 +0900
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=UTF-8;
+ format=flowed
+Date: Tue, 22 Mar 2016 17:58:35 +0100
+From: Oscar C <oscar-listas@naiandei.net>
+To: <szymon.janc@gmail.com>, <linux-bluetooth@vger.kernel.org>
+Subject: sixaxis: Improved support for DualShock 3 clones not working
+ (undefined symbol)
+Message-ID: <c1557d88bcf8b0d4fe64f76569c66396@naiandei.net>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Szymon,
 
-I just wanted to report that after upgrading to BlueZ 5.38 yesterday my
-bluetooth headset (Beats Wireless) disconnects after connecting for 1
-second.
+I tried the patches sent to the list on June 2015 regarding the DS 
+clones made by ShanWan. That patches are necessary because the DualSock 
+clones do not work with the current sixaxis plugin.
 
-Downgrading back to BlueZ 5.37 resolves this issue.
+They compiles ok, but when I try to run the daemon it fails because a 
+symbol can not be found. Of course, the same code but without the 
+patches applied works fine (but the gamepad does not work).
 
- My system: Linux x1 4.4.5-1-ARCH #1 SMP PREEMPT Thu Mar 10 07:38:19 CET
-2016 x86_64 GNU/Linux
+Any idea on how to solve this? Thanks!
 
-I'd like to be cc'ed the replies to this email please.
 
-Thanks
+gardenia:/root # /usr/lib/bluetooth/bluetoothd -n -d 9
+bluetoothd[5943]: Bluetooth daemon 5.37
+bluetoothd[5943]: Starting SDP server
+bluetoothd[5943]: Can't load plugin 
+/usr/lib/bluetooth/plugins/sixaxis.so: 
+/usr/lib/bluetooth/plugins/sixaxis.so: undefined symbol: sdp_data_alloc
+bluetoothd[5943]: Bluetooth management interface 1.6 initialized
 
+--
+Cheers,
