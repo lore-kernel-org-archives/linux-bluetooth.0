@@ -1,36 +1,56 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <878u19lmqj.fsf@gmail.com>
-References: <878u19lmqj.fsf@gmail.com>
-Date: Wed, 23 Mar 2016 15:35:54 +0200
-Message-ID: <CABBYNZLRf4fMhhGQR_6TSpJGS1EuuBpY=tu5QDMb0Y+mgiwa3g@mail.gmail.com>
-Subject: Re: BlueZ 5.38 continuously disconnects bluetooth headset
+In-Reply-To: <1458661459-4529-1-git-send-email-luiz.dentz@gmail.com>
+References: <1458661459-4529-1-git-send-email-luiz.dentz@gmail.com>
+Date: Wed, 23 Mar 2016 15:33:43 +0200
+Message-ID: <CABBYNZJ-rFjXmaSJaoDDY6u4qiYESRKq+juCRavQXknR5S0SnA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] audio/avrcp: Fix crash when connecting to controllers
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Mo Reina <urban.yoga.journeys@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
 
-On Wed, Mar 23, 2016 at 8:42 AM, Mo Reina <urban.yoga.journeys@gmail.com> wrote:
-> Hi,
+On Tue, Mar 22, 2016 at 5:44 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 >
-> I just wanted to report that after upgrading to BlueZ 5.38 yesterday my
-> bluetooth headset (Beats Wireless) disconnects after connecting for 1
-> second.
+> Patch 70fdb77d0af137aa859f267da976f610cd9bbbd2 has actually caused the
+> following regression since no player is set:
 >
-> Downgrading back to BlueZ 5.37 resolves this issue.
+> Invalid read of size 8
+>   at 0x435B8E: avrcp_player_value_rsp (avrcp.c:2150)
+>   by 0x42FB83: control_response (avctp.c:831)
+>   by 0x42FB83: session_cb (avctp.c:996)
+>   by 0x50C8E39: g_main_context_dispatch (in /usr/lib64/libglib-2.0.so.0.4600.2)
+>   by 0x50C91CF: ??? (in /usr/lib64/libglib-2.0.so.0.4600.2)
+>   by 0x50C94F1: g_main_loop_run (in /usr/lib64/libglib-2.0.so.0.4600.2)
+>   by 0x40C258: main (main.c:687)
+> Address 0x58 is not stack'd, malloc'd or (recently) free'd
+> ---
+>  profiles/audio/avrcp.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >
->  My system: Linux x1 4.4.5-1-ARCH #1 SMP PREEMPT Thu Mar 10 07:38:19 CET
-> 2016 x86_64 GNU/Linux
+> diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
+> index 787643c..0c6279a 100644
+> --- a/profiles/audio/avrcp.c
+> +++ b/profiles/audio/avrcp.c
+> @@ -3656,7 +3656,7 @@ static gboolean avrcp_get_capabilities_resp(struct avctp *conn,
+>                 }
+>         }
 >
-> I'd like to be cc'ed the replies to this email please.
+> -       if (!session->controller)
+> +       if (!session->controller || !session->controller->player)
+>                 return FALSE;
+>
+>         if (!(events & (1 << AVRCP_EVENT_SETTINGS_CHANGED)))
+> --
+> 2.5.0
 
-I just pushed a patch that should fix connecting to A2DP/AVRCP
-headsets, we will probably have another release coming out with this
-fix if there is nothing else that has regressed.
+Applied.
+
 
 -- 
 Luiz Augusto von Dentz
