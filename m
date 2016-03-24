@@ -1,96 +1,70 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <E92610C73D6DE84EB154DC52F5ECCE541D71727A@S0MSMAIL111.arc.local>
-References: <CAFah_xDfwqU3pGMoJ_fUwN=ZqwMGJrGp4Ynj-+wNjzF67oD75g@mail.gmail.com>
-	<CABBYNZLZYoingyodYn3XpBy0ci3Qy1vNz1zRk6kdZB4DGGgx2A@mail.gmail.com>
-	<E92610C73D6DE84EB154DC52F5ECCE541D71727A@S0MSMAIL111.arc.local>
-Date: Thu, 24 Mar 2016 15:02:37 +0200
-Message-ID: <CABBYNZ+tGDgXRPjrnEU4h2qDmd0dbrDLH7Zm9NHVyFoCVSe65A@mail.gmail.com>
-Subject: Re: Raspberry Pi 3: BLE via Java?
+In-Reply-To: <CANyK0SkeUPLsS-XTZpiSSN8c6dh6-V44sJXFv2ZDi9Kk0dZ-Hw@mail.gmail.com>
+References: <1449557617-3413-1-git-send-email-hychao@chromium.org>
+	<CABBYNZK-0g8Q4u8UCEuPic7sxXYnT0yP7S0vn+643Pa24Kze_w@mail.gmail.com>
+	<CANyK0SnnkH5xyhCCCGuZBySHA88517nijyb=3Q8M_6E5mCe6Kw@mail.gmail.com>
+	<CANyK0Sm+Ard+-xoKopoYG-OSuSUxDVmA+DrpkiggMFBF9g94Vw@mail.gmail.com>
+	<CABBYNZK8CTh2LAQvg+CDtwRFzaUsfCj+U9ODWP6BGDsgpOk7UQ@mail.gmail.com>
+	<CABBYNZLJ2WWeOLwn8XPkYaRBA9dZ9zhgF5xuehChXXxcZt4TdA@mail.gmail.com>
+	<CANyK0SkeUPLsS-XTZpiSSN8c6dh6-V44sJXFv2ZDi9Kk0dZ-Hw@mail.gmail.com>
+Date: Thu, 24 Mar 2016 14:43:32 +0200
+Message-ID: <CABBYNZJ2RtG7gJzp0jNGBNHEo9pdr7eEeNx9Noa+WDs06rOc4A@mail.gmail.com>
+Subject: Re: [PATCH] audio/a2dp - Fix unbalanced setup ref/unref
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Kropf Johannes <Johannes.Kropf@ait.ac.at>
-Cc: PV Subramanian <pvs@visybl.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+To: Hsin-yu Chao <hychao@chromium.org>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johannes,
+Hi Hsin-yu,
 
-On Thu, Mar 24, 2016 at 2:53 PM, Kropf Johannes
-<Johannes.Kropf@ait.ac.at> wrote:
-> Hi,
->
-> I was using BLE also on the Raspberry 2 with Java before, using a USB Bluetooth dongle.
-> However, what you need is the Java dbus API which maps the DBUS objects to Java objects.
->
-> It is available in the Linux repos:
-> sudo apt-get install libdbus-java
->
-> If you need help let me now, can provide you some source code as well if wanted.
+On Thu, Mar 24, 2016 at 12:58 PM, Hsin-yu Chao <hychao@chromium.org> wrote:
+> Hi Luiz,
+> I suppose you mean the plugin/policy.c and yes we are using it. We got
+> reports about this crash from end user, however the crash rate is low
+> and not happening for me either. Since BT adapters are built-in for
+> almost all Chromebooks, I don't think the 'adapter removal' should
+> happen except cases that there's any problem in driver/FW.
 
-No top-posting in this mailing list please.
+That seems to be the reason in the first trace:
 
->
-> However, I have problems using the newest versions of bluez 5.37 and 5.38 with ble hci devices like a weighing scale. The devices do not connect anymore automatically when paired.
+(bluetoothd -adapter.c:4171 ) adapter_remove
+(bluetoothd -adapter.c:7453 ) index_removed
 
-Automatically reconnecting can be done via plugin or RegisterProfile:
+> I spent some time look at this backtrace and check code around the
+> path of a2dp_cancel() -> avdtp_abort().
+> The crash happens in a2dp_cancel() where the setup_unref() is called,
+> seems because of the a2dp_setup pointer is already freed. My first
+> guess is that code from avdtp_abort() somehow decreases the
+> a2dp_setup's refcount to zero.
+> Function avdtp_abort() could return cancel_request(session,
+> ECANCELED); if session->req is non-null. And depending on the
+> req->signal_id, corresponding callback function in a2dp.c(e.g
+> reconf_cfm) got called, and eventually called setup_cb_free() and
+> setup_unref() so that the associated a2dp_setup object got free'd.
+>
+> However these calls to setup_cb_free() shouldn't be blamed, because
+> the refcount has always been increased earlier when each a2dp_setup_cb
+> is allocated. And that makes me guess there's unbalanced manipulation
+> of a2dp_setup's refcount elsewhere.
 
-https://git.kernel.org/cgit/bluetooth/bluez.git/tree/doc/gatt-api.txt
+Yep, that is always protected by a reference so it should be causing a problem.
 
->
->
-> JOHANNES KROPF
-> Health & Environment Department
-> Biomedical Systems
->
-> AIT Austrian Institute of Technology GmbH
-> Viktor Kaplan Straße 2  |  2700 Wiener Neustadt  |  Austria
-> T +43(0) 50550-4845  |  M +43(0) 664 235 1732  |  F +43(0) 50550-4803
-> johannes.kropf@ait.ac.at |  http://www.ait.ac.at
->
-> FN: 115980 i HG Wien  |  UID: ATU14703506
-> www.ait.ac.at/Email-Disclaimer
->
-> ________________________________________
-> Von: linux-bluetooth-owner@vger.kernel.org [linux-bluetooth-owner@vger.kernel.org]&quot; im Auftrag von &quot;Luiz Augusto von Dentz [luiz.dentz@gmail.com]
-> Gesendet: Dienstag, 15. März 2016 10:07
-> An: PV Subramanian
-> Cc: linux-bluetooth@vger.kernel.org
-> Betreff: Re: Raspberry Pi 3: BLE via Java?
->
-> Hi,
->
-> On Tue, Mar 15, 2016 at 2:05 AM, PV Subramanian <pvs@visybl.com> wrote:
->> Hello: Just got my new Raspberry Pi 3, and confirmed BLE is working
->> (sudo hcitool lescan)
->
-> hcitool is deprecated, either use bluetoothctl or btmgmt to scan.
->
->> How can one access BlueZ via Java, to enable applications?
->
-> There exists Java bindings for D-Bus, so you can probably use
-> bluetoothd, otherwise you will probably need to implement the
-> something to talk to the mgmt interface in java.
->
->> Thanks
->>
->> PVS
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->> the body of a message to majordomo@vger.kernel.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
->
->
-> --
-> Luiz Augusto von Dentz
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> I checked other places where an a2dp_setup is ref/unref'ed, and there
+> are a few places I don't understand.
+>  - a2dp.c: transport_cb() has a setup_unref() call which decreases the
+> refcont of a2dp_setup. But it's not clear to me why this call is
+> needed.
+>  - a2dp.c: open_ind() has a2dp_setup_get() call which increases the
+> refcount of a2dp_setup, while this a2dp_setup pointer is not assigned
+> to new place.
 
+They are related, open_ind will reference the setup while the
+transport channel is being connected which is why there is a call to
+setup_unref in the transport_cb.
 
+> Could you share with me any idea or hint?
 
--- 
-Luiz Augusto von Dentz
+Did you check my patches?
