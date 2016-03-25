@@ -1,130 +1,204 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Szymon Janc <szymon.janc@codecoup.pl>
-To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@codecoup.pl>
-Subject: [PATCH] audio/avdtp: Fix crash on outgoing connection failure
-Date: Fri, 25 Mar 2016 16:11:33 +0100
-Message-Id: <1458918693-19655-1-git-send-email-szymon.janc@codecoup.pl>
+MIME-Version: 1.0
+In-Reply-To: <CABBYNZJ=htc4KkmnzznUicBAtFxtXnnRgLMcMknZ6mtSqnvHMQ@mail.gmail.com>
+References: <1458306498-28151-1-git-send-email-lukasz.rymanowski@codecoup.pl>
+	<1458306498-28151-7-git-send-email-lukasz.rymanowski@codecoup.pl>
+	<CABBYNZJ=htc4KkmnzznUicBAtFxtXnnRgLMcMknZ6mtSqnvHMQ@mail.gmail.com>
+Date: Fri, 25 Mar 2016 15:15:27 +0100
+Message-ID: <CAExxLLCVsTvBuGf1WKPX=Rarsv7VBLY-AmeVb6eQokajzSs00A@mail.gmail.com>
+Subject: Re: [PATCH v3 6/9] shared/gatt-server: Add support for long write
+From: =?UTF-8?Q?=C5=81ukasz_Rymanowski?= <lukasz.rymanowski@codecoup.pl>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This fix double free if outgoing connection failed. This was due to
-connection_lost() being called from avdtp_unref which could result
-in another call to connection_lost when session ref is already 0.
+Hi Luiz,
 
-Fix this in similar way pairing agent is handled: takes extra reference
-before calling callbacks and unref it before exit. Then only unref is
-suppose to free session.
+On 22 March 2016 at 16:03, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
+> Hi Lukasz,
+>
+> On Fri, Mar 18, 2016 at 3:08 PM, Łukasz Rymanowski
+> <lukasz.rymanowski@codecoup.pl> wrote:
+>> With this patch long write and nested long write reliable is supported.
+>> GATT server is responsible now to do aggregation of prep write data
+>> for long write session.
+>> Note: We consider long write as the consequtive prepare writes with
+>> continues offsets.
+>>
+>> E.g. 1
+>>
+>> prep_write: handle 1, offset 0, value_len 10
+>> prep_write: handle 2, offset 0, value_len 10
+>> prep_write: handle 1, offset 10, value_len 10
+>> prep_write: handle 2, offset 10, value_len 10
+>>
+>> Will result with following calles to app:
+>>
+>> exec_write: handle 1: offset 0, value_len 20
+>> exec_write: handle 2: offset 0, value_len 20
+>
+> We should not alter the sequence if the remote is writing in that way
+> we should honor it, so the aggregation shall only be done as long as
+> the remote don't nest anything in between at that point you should
+> stop aggregating and add a new item to the queue.
 
-connect error: Host is down (112)
-profiles/audio/avdtp.c:connection_lost() Disconnected from 00:0C:8A:FB:D4:16
-profiles/audio/a2dp.c:discover_cb() err 0xfff000240
-profiles/audio/avdtp.c:avdtp_unref() 0x85a88f0: ref=1
-src/service.c:change_state() 0x7f7c710: device 00:0C:8A:FB:D4:16 profile
-    a2dp-sink state changed: connecting -> disconnected (-11)
-src/device.c:device_profile_connected() a2dp-sink Resource temporarily
-    unavailable (11)
-src/device.c:device_profile_connected() returning response to :1.37
-profiles/audio/a2dp.c:setup_unref() 0x85b0380: ref=0
-profiles/audio/a2dp.c:setup_free() 0x85b0380
-profiles/audio/avdtp.c:avdtp_unref() 0x85a88f0: ref=0
-profiles/audio/avdtp.c:connection_lost() Disconnected from 00:0C:8A:FB:D4:16
-profiles/audio/a2dp.c:discover_cb() err 0xfff000170
-profiles/audio/sink.c:sink_set_state() State changed  /org/bluez/hci0/
-    dev_00_0C_8A_FB_D4_16: SINK_STATE_CONNECTING -> SINK_STATE_DISCONNECTED
-profiles/audio/a2dp.c:channel_remove() chan 0x85a8780
-profiles/audio/avdtp.c:avdtp_free() 0x85a88f0
- Invalid free() / delete / delete[] / realloc()
-    at 0x4C29CF0: free (vg_replace_malloc.c:530)
-    by 0x50CE5ED: g_free (in /usr/lib64/libglib-2.0.so.0.4600.2)
-    by 0x4177E3: finalize_discovery (avdtp.c:1039)
-    by 0x41789A: connection_lost (avdtp.c:1114)
-    by 0x41A7FD: avdtp_connect_cb (avdtp.c:2339)
-    by 0x44CBFB: connect_cb (btio.c:232)
-    by 0x50C8E39: g_main_context_dispatch (in /usr/lib64/libglib-2.0.so.0.4600.2)
-    by 0x50C91CF: ??? (in /usr/lib64/libglib-2.0.so.0.4600.2)
-    by 0x50C94F1: g_main_loop_run (in /usr/lib64/libglib-2.0.so.0.4600.2)
-    by 0x40B7B7: main (main.c:687)
-  Address 0x85b4c30 is 0 bytes inside a block of size 24 free'd
-    at 0x4C29CF0: free (vg_replace_malloc.c:530)
-    by 0x50CE5ED: g_free (in /usr/lib64/libglib-2.0.so.0.4600.2)
-    by 0x4177E3: finalize_discovery (avdtp.c:1039)
-    by 0x41789A: connection_lost (avdtp.c:1114)
-    by 0x413EE2: setup_free (a2dp.c:163)
-    by 0x413EE2: setup_unref (a2dp.c:178)
-    by 0x413F5F: setup_cb_free (a2dp.c:201)
-    by 0x41638D: finalize_discover (a2dp.c:346)
-    by 0x41638D: discover_cb (a2dp.c:1855)
-    by 0x4177DB: finalize_discovery (avdtp.c:1037)
-    by 0x41789A: connection_lost (avdtp.c:1114)
-    by 0x41A7FD: avdtp_connect_cb (avdtp.c:2339)
-    by 0x44CBFB: connect_cb (btio.c:232)
-    by 0x50C8E39: g_main_context_dispatch (in /usr/lib64/libglib-2.0.so.0.4600.2)
-  Block was alloc'd at
-    at 0x4C2A988: calloc (vg_replace_malloc.c:711)
-    by 0x50CE530: g_malloc0 (in /usr/lib64/libglib-2.0.so.0.4600.2)
-    by 0x4190FB: avdtp_discover (avdtp.c:3186)
-    by 0x416C19: a2dp_discover (a2dp.c:1872)
-    by 0x413642: sink_setup_stream (sink.c:265)
-    by 0x4136C4: sink_connect (sink.c:294)
-    by 0x470165: btd_service_connect (service.c:238)
-    by 0x47583C: connect_next.isra.18 (device.c:1455)
-    by 0x478500: connect_profiles (device.c:1710)
-    by 0x48EC4A: process_message.isra.5 (object.c:259)
-    by 0x53DD1A2: ??? (in /usr/lib64/libdbus-1.so.3.14.6)
-    by 0x53CE733: dbus_connection_dispatch (in /usr/lib64/libdbus-1.so.3.14.6)
----
- profiles/audio/avdtp.c | 21 +++++++++++++--------
- 1 file changed, 13 insertions(+), 8 deletions(-)
+Fair enough
 
-diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
-index 4f663d4..4f51b0d 100644
---- a/profiles/audio/avdtp.c
-+++ b/profiles/audio/avdtp.c
-@@ -1105,6 +1105,8 @@ static void connection_lost(struct avdtp *session, int err)
- {
- 	char address[18];
- 
-+	session = avdtp_ref(session);
-+
- 	ba2str(device_get_address(session->device), address);
- 	DBG("Disconnected from %s", address);
- 
-@@ -1115,10 +1117,7 @@ static void connection_lost(struct avdtp *session, int err)
- 
- 	avdtp_set_state(session, AVDTP_SESSION_STATE_DISCONNECTED);
- 
--	if (session->ref > 0)
--		return;
--
--	avdtp_free(session);
-+	avdtp_unref(session);
- }
- 
- static gboolean disconnect_timeout(gpointer user_data)
-@@ -1171,12 +1170,18 @@ void avdtp_unref(struct avdtp *session)
- 	if (session->ref > 0)
- 		return;
- 
--	if (session->state == AVDTP_SESSION_STATE_CONNECTED) {
-+	switch(session->state) {
-+	case AVDTP_SESSION_STATE_CONNECTED:
- 		set_disconnect_timer(session);
--		return;
-+		break;
-+	case AVDTP_SESSION_STATE_CONNECTING:
-+		connection_lost(session, ECONNABORTED);
-+		break;
-+	case AVDTP_SESSION_STATE_DISCONNECTED:
-+	default:
-+		avdtp_free(session);
-+		break;
- 	}
--
--	connection_lost(session, ECONNABORTED);
- }
- 
- struct avdtp *avdtp_ref(struct avdtp *session)
+Perhaps you just
+> detect if the prepare was for for the last handle and the offset start
+> from the last point then just append otherwise create a new item.
+>
+
+Yes, we can peek tail on the prepare queue and check only that one.
+Actually with this approach patch 07/09 is most likely not needed.
+
+>>
+>> E.g. 2
+>>
+>> prep_write: handle 1, offset 0, value_len 10
+>> prep_write: handle 1, offset 2, value_len 5
+>> prep_write: handle 2, offset 0, value_len 10
+>> prep_write: handle 2, offset 4, value_len 5
+>>
+>> Will result with following calles to app:
+>>
+>> exec_write: handle 1: offset 0, value_len 10
+>> exec_write: handle 1: offset 2, value_len 5
+>> exec_write: handle 2: offset 0, value_len 10
+>> exec_write: handle 2: offset 4, value_len 5
+>> ---
+>>  src/shared/gatt-server.c | 85 ++++++++++++++++++++++++++++++++++++++++--------
+>>  1 file changed, 71 insertions(+), 14 deletions(-)
+>>
+>> diff --git a/src/shared/gatt-server.c b/src/shared/gatt-server.c
+>> index c41273a..0904336 100644
+>> --- a/src/shared/gatt-server.c
+>> +++ b/src/shared/gatt-server.c
+>> @@ -1088,6 +1088,63 @@ error:
+>>         bt_att_send_error_rsp(server->att, opcode, 0, ecode);
+>>  }
+>>
+>> +static bool match_attribute_handle(const void *data, const void *match_data)
+>> +{
+>> +       const struct prep_write_data *prep_data = data;
+>> +
+>> +       return prep_data->handle == PTR_TO_UINT(match_data);
+>> +}
+>> +
+>> +static bool create_and_store_prep_data(struct bt_gatt_server *server,
+>> +                                               uint16_t handle, uint16_t offset,
+>> +                                               uint16_t length, uint8_t *value)
+>> +{
+>> +       struct prep_write_data *prep_data;
+>> +
+>> +       prep_data = new0(struct prep_write_data, 1);
+>> +       prep_data->length = length;
+>> +       if (prep_data->length) {
+>> +               prep_data->value = malloc(prep_data->length);
+>> +               if (!prep_data->value) {
+>> +                       return false;
+>> +               }
+>> +
+>> +               memcpy(prep_data->value, value, prep_data->length);
+>> +       }
+>> +
+>> +       prep_data->server = server;
+>> +       prep_data->handle = handle;
+>> +       prep_data->offset = offset;
+>> +
+>> +       queue_push_tail(server->prep_queue, prep_data);
+>> +
+>> +       return true;
+>> +}
+>> +
+>> +static bool make_aggregation_of_long_write_data(struct bt_gatt_server *server,
+>> +                                       struct prep_write_data *prep_data,
+>> +                                       uint16_t handle, uint16_t length,
+>> +                                       uint8_t *value)
+>> +{
+>> +       uint8_t *buf;
+>> +       uint16_t new_len;
+>> +
+>> +       new_len = prep_data->length + length;
+>> +
+>> +       buf = malloc(new_len);
+>> +       if (!buf)
+>> +               return false;
+>> +
+>> +       memcpy(buf, prep_data->value, prep_data->length);
+>> +       memcpy(buf + prep_data->length, value, length);
+>> +
+>> +       free(prep_data->value);
+>> +       prep_data->value = buf;
+>> +       prep_data->length = new_len;
+>> +
+>> +       return true;
+>> +}
+>> +
+>>  static void prep_write_cb(uint8_t opcode, const void *pdu,
+>>                                         uint16_t length, void *user_data)
+>>  {
+>> @@ -1097,6 +1154,7 @@ static void prep_write_cb(uint8_t opcode, const void *pdu,
+>>         uint16_t offset;
+>>         struct gatt_db_attribute *attr;
+>>         uint8_t ecode;
+>> +       bool success;
+>>
+>>         if (length < 4) {
+>>                 ecode = BT_ATT_ERROR_INVALID_PDU;
+>> @@ -1126,22 +1184,21 @@ static void prep_write_cb(uint8_t opcode, const void *pdu,
+>>         if (ecode)
+>>                 goto error;
+>>
+>> -       prep_data = new0(struct prep_write_data, 1);
+>> -       prep_data->length = length - 4;
+>> -       if (prep_data->length) {
+>> -               prep_data->value = malloc(prep_data->length);
+>> -               if (!prep_data->value) {
+>> -                       ecode = BT_ATT_ERROR_INSUFFICIENT_RESOURCES;
+>> -                       goto error;
+>> -               }
+>> -       }
+>> +       prep_data = queue_find(server->prep_queue, match_attribute_handle,
+>> +                                                       UINT_TO_PTR(handle));
+>>
+>> -       prep_data->server = server;
+>> -       prep_data->handle = handle;
+>> -       prep_data->offset = offset;
+>> -       memcpy(prep_data->value, pdu + 4, prep_data->length);
+>> +       if (prep_data && offset == prep_data->length + prep_data->offset)
+>> +               success = make_aggregation_of_long_write_data(server, prep_data,
+>> +                                                       handle, length - 4,
+>> +                                                       &((uint8_t *) pdu)[4]);
+>> +       else
+>> +               success = create_and_store_prep_data(server, handle, offset,
+>> +                                       length - 4, &((uint8_t *) pdu)[4]);
+>>
+>> -       queue_push_tail(server->prep_queue, prep_data);
+>> +       if (!success) {
+>> +               ecode = BT_ATT_ERROR_INSUFFICIENT_RESOURCES;
+>> +               goto error;
+>> +       }
+>>
+>>         bt_att_send(server->att, BT_ATT_OP_PREP_WRITE_RSP, pdu, length, NULL,
+>>                                                                 NULL, NULL);
+>> --
+>> 2.5.0
+>>
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
+>
+>
+> --
+> Luiz Augusto von Dentz
+
+
+
 -- 
-2.6.2
-
+BR / Pozdrawiam
+Łukasz
