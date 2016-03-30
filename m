@@ -1,29 +1,124 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <71D63FC5-0A59-48E2-ACF5-F28768A232D9@gmail.com>
-References: <C6A28C41-E0ED-4070-A66F-F32C1B657D8F@gmail.com>
-	<71D63FC5-0A59-48E2-ACF5-F28768A232D9@gmail.com>
-Date: Thu, 31 Mar 2016 10:51:41 +0300
-Message-ID: <CABBYNZJVX7V7R-Ck-xQcDXER=CZTYou3kTQ42Q-_kRwu=BU6CQ@mail.gmail.com>
-Subject: Re: good dbus command line tool for embedded exploration of the ble api?
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Travis Griggs <travisgriggs@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: =?UTF-8?q?=C5=81ukasz=20Rymanowski?=
+	<lukasz.rymanowski@codecoup.pl>
+To: linux-bluetooth@vger.kernel.org
+Cc: =?UTF-8?q?=C5=81ukasz=20Rymanowski?=
+	<lukasz.rymanowski@codecoup.pl>
+Subject: [PATCH v4 3/3] shared/gatt-server: Check for ext. charact. prop. on reliable session
+Date: Wed, 30 Mar 2016 23:01:31 +0200
+Message-Id: <1459371691-26216-4-git-send-email-lukasz.rymanowski@codecoup.pl>
+In-Reply-To: <1459371691-26216-1-git-send-email-lukasz.rymanowski@codecoup.pl>
+References: <1459371691-26216-1-git-send-email-lukasz.rymanowski@codecoup.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Travis,
+With this patch we make sure that reliable session is done on
+characteristics which does support it.
+---
+ src/shared/gatt-server.c | 48 +++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 47 insertions(+), 1 deletion(-)
 
-On Fri, Mar 25, 2016 at 10:09 PM, Travis Griggs <travisgriggs@gmail.com> wrote:
->
->> On Mar 24, 2016, at 5:04 PM, Travis Griggs <travisgriggs@gmail.com> wrote:
->>
->> I just started transitioning from 5.37 to 5.38. 2 or so months ago, I had gotten an Arm single board computer acting as a peripheral based on copying/guesswork from how example-advertise and example-gatt-server work. I’m trying to resurrect that work. But one thing I think I need to understand better is how dbus works. I’m looking for some kind of command line tool that I can use in this environment to explore the bus layout and get a feel for how it all fits together. Does someone have a good recommendation, preferably something that’s available as debian (jessie) package. I had seen a reference to qdbus, but it looks like it would drag in the entire Qt framework. If there was something for python(3) that explained the jst of dbus and how to explore it with python, I could just use that, but the python dbus docs I’ve found haven’t done a lot to help me.  Thanks for any hints, tips, etc.
->
-> I thought I’d report that I did find mdbus2. Which is very light on dependencies. It can send show the topology and send messages. But I’m not sure how to make it access properties. And I did discover dbus-monitor thanks to Barry Byford, which seems to be good for watching traffic, though I couldn’t figure out to how to use it to explore what was there.--
-
-Have you tried d-feet?
-
+diff --git a/src/shared/gatt-server.c b/src/shared/gatt-server.c
+index ae079b1..8b2e884 100644
+--- a/src/shared/gatt-server.c
++++ b/src/shared/gatt-server.c
+@@ -72,6 +72,8 @@ struct prep_write_data {
+ 	uint16_t handle;
+ 	uint16_t offset;
+ 	uint16_t length;
++
++	bool reliable_supported;
+ };
+ 
+ static void prep_write_data_destroy(void *user_data)
+@@ -1088,6 +1090,22 @@ error:
+ 	bt_att_send_error_rsp(server->att, opcode, 0, ecode);
+ }
+ 
++static bool is_reliable_supported(const struct bt_gatt_server  *server,
++							uint16_t handle)
++{
++	struct gatt_db_attribute *attr;
++	uint8_t ext_prop;
++
++	attr = gatt_db_get_attribute(server->db, handle);
++	if (!attr)
++		return false;
++
++	if (!gatt_db_attribute_get_characteristic_extended_prop(attr, &ext_prop))
++		return false;
++
++	return (ext_prop & BT_GATT_CHRC_EXT_PROP_RELIABLE_WRITE);
++}
++
+ static bool create_and_store_prep_data(struct bt_gatt_server *server,
+ 						uint16_t handle, uint16_t offset,
+ 						uint16_t length, uint8_t *value)
+@@ -1109,6 +1127,12 @@ static bool create_and_store_prep_data(struct bt_gatt_server *server,
+ 	prep_data->handle = handle;
+ 	prep_data->offset = offset;
+ 
++	/*
++	 * Handle is the value handle. We need characteristic declariation
++	 * handle which in BlueZ is handle_value -1
++	 */
++	prep_data->reliable_supported = is_reliable_supported(server,
++								handle - 1);
+ 	queue_push_tail(server->prep_queue, prep_data);
+ 
+ 	return true;
+@@ -1262,6 +1286,14 @@ error:
+ 								ehandle, err);
+ }
+ 
++static bool find_no_reliable_characteristic(const void *data,
++						const void *match_data)
++{
++	const struct prep_write_data *prep_data = data;
++
++	return !prep_data->reliable_supported;
++}
++
+ static void exec_write_cb(uint8_t opcode, const void *pdu,
+ 					uint16_t length, void *user_data)
+ {
+@@ -1269,6 +1301,7 @@ static void exec_write_cb(uint8_t opcode, const void *pdu,
+ 	uint8_t flags;
+ 	uint8_t ecode;
+ 	bool write;
++	uint16_t ehandle = 0;
+ 
+ 	if (length != 1) {
+ 		ecode = BT_ATT_ERROR_INVALID_PDU;
+@@ -1297,6 +1330,19 @@ static void exec_write_cb(uint8_t opcode, const void *pdu,
+ 		return;
+ 	}
+ 
++	/* If there is more than one prep request, we are in reliable session */
++	if (queue_length(server->prep_queue) > 1) {
++		struct prep_write_data *prep_data;
++
++		prep_data = queue_find(server->prep_queue,
++					find_no_reliable_characteristic, NULL);
++		if (prep_data) {
++			ecode = BT_ATT_ERROR_REQUEST_NOT_SUPPORTED;
++			ehandle = prep_data->handle;
++			goto error;
++		}
++	}
++
+ 	exec_next_prep_write(server, 0, 0);
+ 
+ 	return;
+@@ -1304,7 +1350,7 @@ static void exec_write_cb(uint8_t opcode, const void *pdu,
+ error:
+ 	queue_remove_all(server->prep_queue, NULL, NULL,
+ 						prep_write_data_destroy);
+-	bt_att_send_error_rsp(server->att, opcode, 0, ecode);
++	bt_att_send_error_rsp(server->att, opcode, ehandle, ecode);
+ }
+ 
+ static void exchange_mtu_cb(uint8_t opcode, const void *pdu,
 -- 
-Luiz Augusto von Dentz
+2.5.0
+
