@@ -1,47 +1,40 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: =?UTF-8?q?=C5=81ukasz=20Rymanowski?=
-	<lukasz.rymanowski@codecoup.pl>
+From: bugzilla-daemon@bugzilla.kernel.org
 To: linux-bluetooth@vger.kernel.org
-Cc: =?UTF-8?q?=C5=81ukasz=20Rymanowski?=
-	<lukasz.rymanowski@codecoup.pl>
-Subject: [PATCH v4 0/3] shared/gatt: Couple fixes and improvements
-Date: Wed, 30 Mar 2016 23:01:28 +0200
-Message-Id: <1459371691-26216-1-git-send-email-lukasz.rymanowski@codecoup.pl>
+Subject: [Bug 86931] hid-generic 0005:099A:0500.0001: unknown main item tag
+ 0x0
+Date: Wed, 30 Mar 2016 17:53:32 +0000
+Message-ID: <bug-86931-62941-JPM4P7Z2yj@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-86931-62941@https.bugzilla.kernel.org/>
+References: <bug-86931-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I've back to work on making Android gatt to make use of shared/gatt.
-Here is couple of fixes I've done to shared code when doing this work.
+https://bugzilla.kernel.org/show_bug.cgi?id=86931
 
-Android gatt still needs testing but will be available sooner or later
+jbMacAZ <jbmacbrodie@yahoo.com> changed:
 
-v2:
- - fix test-gatt for long write seesion testes
- - prepare test-gatt test to support other changes
- - do aggregation of prep writes for long write session
- - support reliable nested long write
- - start to look into characteristic extended prop for reliable session
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |jbmacbrodie@yahoo.com
 
-v3:
- - rebase
- - remove patch adding notification type - that one needs to be reworked
+--- Comment #3 from jbMacAZ <jbmacbrodie@yahoo.com> ---
+Bluetooth behavior was good in ubuntu 15.10 - bluez5.35, blueman device manager
+and kernel 4.3.6.  I use a bt mouse and OEM bt keydock (Asus T100-CHI)
 
-v4:
- - Fix according to Luiz comment
+Starting with 4.4 thru 4.6-rc1-next*, I have to open blueman's device manager
+to search for devices after idle timeouts.  I also need to leave the device
+manager dialogue open/minimized to prevent rapid loss of connection.  Device
+pairing is remembered, but manually searching is difficult when the pointing
+devices stop working.  My test setup has a usb mouse as a workaround.
 
-Łukasz Rymanowski (3):
-  shared/gatt-server: Add support for long write
-  shared/gatt-db: Add API to get extended prop
-  shared/gatt-server: Check for ext. charact. prop. on reliable session
-
- src/shared/gatt-db.c     |  62 +++++++++++++++++++++++
- src/shared/gatt-db.h     |   4 ++
- src/shared/gatt-server.c | 127 +++++++++++++++++++++++++++++++++++++++++------
- unit/test-gatt.c         |  14 ++++++
- 4 files changed, 192 insertions(+), 15 deletions(-)
+dmesg has "unknown main item tag 0x0" after each idle timeout".  If I move
+mouse during boot, it will auto-connect, but it then suffers a rapid timeout
+soon after booting.  See dmesg posted at #114561.  It looks like something is
+incrementing the bluetooth input assignment # when anything times out.
 
 -- 
-2.5.0
-
+You are receiving this mail because:
+You are the assignee for the bug.
