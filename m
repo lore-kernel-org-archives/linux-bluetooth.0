@@ -4,141 +4,165 @@ From: =?UTF-8?q?=C5=81ukasz=20Rymanowski?=
 To: linux-bluetooth@vger.kernel.org
 Cc: =?UTF-8?q?=C5=81ukasz=20Rymanowski?=
 	<lukasz.rymanowski@codecoup.pl>
-Subject: [PATCH v4 2/3] shared/gatt-db: Add API to get extended prop
-Date: Wed, 30 Mar 2016 23:01:30 +0200
-Message-Id: <1459371691-26216-3-git-send-email-lukasz.rymanowski@codecoup.pl>
+Subject: [PATCH v4 1/3] shared/gatt-server: Add support for long write
+Date: Wed, 30 Mar 2016 23:01:29 +0200
+Message-Id: <1459371691-26216-2-git-send-email-lukasz.rymanowski@codecoup.pl>
 In-Reply-To: <1459371691-26216-1-git-send-email-lukasz.rymanowski@codecoup.pl>
 References: <1459371691-26216-1-git-send-email-lukasz.rymanowski@codecoup.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds way to get extended properties from
-characteristic extended property descriptor
----
- src/shared/gatt-db.c | 62 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- src/shared/gatt-db.h |  4 ++++
- unit/test-gatt.c     | 14 ++++++++++++
- 3 files changed, 80 insertions(+)
+With this patch long write and nested long write reliable is supported.
+GATT server is responsible now to do aggregation of prep write data
+for long write session.
+Note: We consider long write as the consequtive prepare writes with
+continues offsets.
 
-diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
-index cc49458..1a1704b 100644
---- a/src/shared/gatt-db.c
-+++ b/src/shared/gatt-db.c
-@@ -52,6 +52,8 @@ static const bt_uuid_t characteristic_uuid = { .type = BT_UUID16,
- 					.value.u16 = GATT_CHARAC_UUID };
- static const bt_uuid_t included_service_uuid = { .type = BT_UUID16,
- 					.value.u16 = GATT_INCLUDE_UUID };
-+static const bt_uuid_t ext_desc_uuid = { .type = BT_UUID16,
-+				.value.u16 = GATT_CHARAC_EXT_PROPER_UUID };
- 
- struct gatt_db {
- 	int ref_count;
-@@ -1456,6 +1458,66 @@ bool gatt_db_attribute_get_service_data(const struct gatt_db_attribute *attrib,
- 	return le_to_uuid(decl->value, decl->value_len, uuid);
+E.g. 1
+
+prep_write: handle 1, offset 0, value_len 10
+prep_write: handle 1, offset 10, value_len 10
+prep_write: handle 2, offset 0, value_len 10
+prep_write: handle 2, offset 10, value_len 10
+
+Will result with following calles to app:
+
+exec_write: handle 1: offset 0, value_len 20
+exec_write: handle 2: offset 0, value_len 20
+
+E.g. 2
+
+prep_write: handle 1, offset 0, value_len 10
+prep_write: handle 1, offset 2, value_len 5
+prep_write: handle 2, offset 0, value_len 10
+prep_write: handle 2, offset 4, value_len 5
+
+Will result with following calles to app:
+
+exec_write: handle 1: offset 0, value_len 10
+exec_write: handle 1: offset 2, value_len 5
+exec_write: handle 2: offset 0, value_len 10
+exec_write: handle 2: offset 4, value_len 5
+
+E.g. 3
+prep_write: handle 1, offset 0, value_len 10
+prep_write: handle 1, offset 5, value_len 5
+prep_write: handle 1, offset 10, value_len 6
+
+will result with following calles to app:
+
+exec_write: handle 1, offset 0, value 10
+exec_write: handle 1, offset 5, value 11
+---
+ src/shared/gatt-server.c | 79 +++++++++++++++++++++++++++++++++++++++---------
+ 1 file changed, 65 insertions(+), 14 deletions(-)
+
+diff --git a/src/shared/gatt-server.c b/src/shared/gatt-server.c
+index c41273a..ae079b1 100644
+--- a/src/shared/gatt-server.c
++++ b/src/shared/gatt-server.c
+@@ -1088,6 +1088,56 @@ error:
+ 	bt_att_send_error_rsp(server->att, opcode, 0, ecode);
  }
  
-+struct ext_prop_data {
-+	bool present;
-+	uint8_t prop;
-+};
-+
-+static void set_ext_prop_data(struct gatt_db_attribute *attrib,
-+						int err, const uint8_t *value,
-+						size_t length, void *user_data)
++static bool create_and_store_prep_data(struct bt_gatt_server *server,
++						uint16_t handle, uint16_t offset,
++						uint16_t length, uint8_t *value)
 +{
-+	struct ext_prop_data *ext_prop_data = user_data;
++	struct prep_write_data *prep_data;
 +
-+	if (err || (length != sizeof(uint8_t)))
-+		return;
++	prep_data = new0(struct prep_write_data, 1);
++	prep_data->length = length;
++	if (prep_data->length) {
++		prep_data->value = malloc(prep_data->length);
++		if (!prep_data->value) {
++			return false;
++		}
 +
-+	ext_prop_data->prop = value[0];
++		memcpy(prep_data->value, value, prep_data->length);
++	}
++
++	prep_data->server = server;
++	prep_data->handle = handle;
++	prep_data->offset = offset;
++
++	queue_push_tail(server->prep_queue, prep_data);
++
++	return true;
 +}
 +
-+static void check_reliable_supported(struct gatt_db_attribute *attrib,
-+							void *user_data)
++static bool make_aggregation_of_long_write_data(struct bt_gatt_server *server,
++					struct prep_write_data *prep_data,
++					uint16_t handle, uint16_t length,
++					uint8_t *value)
 +{
-+	struct ext_prop_data *ext_prop_data = user_data;
++	uint8_t *buf;
++	uint16_t new_len;
 +
-+	if (ext_prop_data->present)
-+		return;
++	new_len = prep_data->length + length;
 +
-+	if (bt_uuid_cmp(&ext_desc_uuid, &attrib->uuid))
-+		return;
-+
-+	ext_prop_data->present = true;
-+	ext_prop_data->prop = gatt_db_attribute_read(attrib, 0,
-+						BT_ATT_OP_READ_REQ, NULL,
-+						set_ext_prop_data, user_data);
-+}
-+
-+bool gatt_db_attribute_get_characteristic_extended_prop(
-+					const struct gatt_db_attribute *attrib,
-+					uint8_t *ext_prop)
-+{
-+	struct ext_prop_data ext_prop_data;
-+
-+	if (!attrib)
++	buf = malloc(new_len);
++	if (!buf)
 +		return false;
 +
-+	if (bt_uuid_cmp(&characteristic_uuid, &attrib->uuid))
-+		return false;
++	memcpy(buf, prep_data->value, prep_data->length);
++	memcpy(buf + prep_data->length, value, length);
 +
-+	memset(&ext_prop_data, 0, sizeof(ext_prop_data));
++	free(prep_data->value);
++	prep_data->value = buf;
++	prep_data->length = new_len;
 +
-+	/*
-+	 * Cast needed for foreach function. We do not change attrib during
-+	 * this call
-+	 */
-+	gatt_db_service_foreach_desc((struct gatt_db_attribute *) attrib,
-+						check_reliable_supported,
-+						&ext_prop_data);
-+
-+	*ext_prop = ext_prop_data.prop;
-+	return ext_prop_data.present;
++	return true;
 +}
 +
- bool gatt_db_attribute_get_char_data(const struct gatt_db_attribute *attrib,
- 							uint16_t *handle,
- 							uint16_t *value_handle,
-diff --git a/src/shared/gatt-db.h b/src/shared/gatt-db.h
-index 96cceb9..0cb713e 100644
---- a/src/shared/gatt-db.h
-+++ b/src/shared/gatt-db.h
-@@ -195,6 +195,10 @@ bool gatt_db_attribute_get_service_data(const struct gatt_db_attribute *attrib,
- 							bool *primary,
- 							bt_uuid_t *uuid);
+ static void prep_write_cb(uint8_t opcode, const void *pdu,
+ 					uint16_t length, void *user_data)
+ {
+@@ -1097,6 +1147,7 @@ static void prep_write_cb(uint8_t opcode, const void *pdu,
+ 	uint16_t offset;
+ 	struct gatt_db_attribute *attr;
+ 	uint8_t ecode;
++	bool success;
  
-+bool gatt_db_attribute_get_characteristic_extended_prop(
-+					const struct gatt_db_attribute *attrib,
-+					uint8_t *ext_prop);
-+
- bool gatt_db_attribute_get_char_data(const struct gatt_db_attribute *attrib,
- 							uint16_t *handle,
- 							uint16_t *value_handle,
-diff --git a/unit/test-gatt.c b/unit/test-gatt.c
-index 0912348..85e4d75 100644
---- a/unit/test-gatt.c
-+++ b/unit/test-gatt.c
-@@ -4434,5 +4434,19 @@ int main(int argc, char *argv[])
- 				0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff),
- 			raw_pdu(0x01, 0x16, 0x04, 0x00, 0x03));
+ 	if (length < 4) {
+ 		ecode = BT_ATT_ERROR_INVALID_PDU;
+@@ -1126,22 +1177,22 @@ static void prep_write_cb(uint8_t opcode, const void *pdu,
+ 	if (ecode)
+ 		goto error;
  
-+	define_test_server("/robustness/no-reliable-characteristic", test_server,
-+			ts_large_db_1, NULL,
-+			raw_pdu(0x03, 0x00, 0x02),
-+			raw_pdu(0x16, 0x82, 0x00, 0x00, 0x00, 0x01, 0x02, 0x03),
-+			raw_pdu(0x17, 0x82, 0x00, 0x00, 0x00, 0x01, 0x02, 0x03),
-+			raw_pdu(0x16, 0x25, 0x00, 0x00, 0x00, 0x01, 0x02, 0x03),
-+			raw_pdu(0x17, 0x25, 0x00, 0x00, 0x00, 0x01, 0x02, 0x03),
-+			raw_pdu(0x16, 0x82, 0x00, 0x03, 0x00, 0x04, 0x05, 0x06),
-+			raw_pdu(0x17, 0x82, 0x00, 0x03, 0x00, 0x04, 0x05, 0x06),
-+			raw_pdu(0x16, 0x25, 0x00, 0x03, 0x00, 0x04, 0x05, 0x06),
-+			raw_pdu(0x17, 0x25, 0x00, 0x03, 0x00, 0x04, 0x05, 0x06),
-+			raw_pdu(0x18, 0x01),
-+			raw_pdu(0x01, 0x18, 0x25, 0x00, 0x06));
-+
- 	return tester_run();
- }
+-	prep_data = new0(struct prep_write_data, 1);
+-	prep_data->length = length - 4;
+-	if (prep_data->length) {
+-		prep_data->value = malloc(prep_data->length);
+-		if (!prep_data->value) {
+-			ecode = BT_ATT_ERROR_INSUFFICIENT_RESOURCES;
+-			goto error;
+-		}
+-	}
++	/* Now lets check if prep write is a continuation of long write */
++	prep_data = queue_peek_tail(server->prep_queue);
+ 
+-	prep_data->server = server;
+-	prep_data->handle = handle;
+-	prep_data->offset = offset;
+-	memcpy(prep_data->value, pdu + 4, prep_data->length);
++	if (prep_data && (prep_data->handle == handle) &&
++			(offset == prep_data->length + prep_data->offset))
++		success = make_aggregation_of_long_write_data(server, prep_data,
++							handle, length - 4,
++							&((uint8_t *) pdu)[4]);
++	else
++		success = create_and_store_prep_data(server, handle, offset,
++					length - 4, &((uint8_t *) pdu)[4]);
+ 
+-	queue_push_tail(server->prep_queue, prep_data);
++	if (!success) {
++		ecode = BT_ATT_ERROR_INSUFFICIENT_RESOURCES;
++		goto error;
++	}
+ 
+ 	bt_att_send(server->att, BT_ATT_OP_PREP_WRITE_RSP, pdu, length, NULL,
+ 								NULL, NULL);
 -- 
 2.5.0
 
