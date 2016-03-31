@@ -1,12 +1,11 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <5651FA03-C997-4DA3-B6F1-5AF85BCDC270@gmail.com>
-References: <F0CC57E5-9193-483D-A2DF-33254216E6AD@gmail.com>
-	<CFBCE3E1-9F51-4C87-A4BF-0D8B01C737B4@gmail.com>
-	<5651FA03-C997-4DA3-B6F1-5AF85BCDC270@gmail.com>
-Date: Thu, 31 Mar 2016 11:12:16 +0300
-Message-ID: <CABBYNZJ7Mro+RAQ-QMYWc8=tTbw1tvU4Xwqg9Q6vzMeUs9f4CQ@mail.gmail.com>
-Subject: Re: Async mismatch?
+In-Reply-To: <71D63FC5-0A59-48E2-ACF5-F28768A232D9@gmail.com>
+References: <C6A28C41-E0ED-4070-A66F-F32C1B657D8F@gmail.com>
+	<71D63FC5-0A59-48E2-ACF5-F28768A232D9@gmail.com>
+Date: Thu, 31 Mar 2016 10:51:41 +0300
+Message-ID: <CABBYNZJVX7V7R-Ck-xQcDXER=CZTYou3kTQ42Q-_kRwu=BU6CQ@mail.gmail.com>
+Subject: Re: good dbus command line tool for embedded exploration of the ble api?
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: Travis Griggs <travisgriggs@gmail.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
@@ -16,43 +15,15 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Travis,
 
-On Tue, Mar 29, 2016 at 2:38 AM, Travis Griggs <travisgriggs@gmail.com> wrote:
-> As I try to “read the source” to figure out why my python dbus callbacks aren’t working as expected, I noted that the C source code refers to a GDBUS_EXPERIMENTAL_ASYNC_METHOD for the WriteValue method.
+On Fri, Mar 25, 2016 at 10:09 PM, Travis Griggs <travisgriggs@gmail.com> wrote:
 >
-> I also noticed when I looked at the documentation for the @dbus.service.method decorator, that one of the arguments is an async callback. It seemed odd to me that it wasn’t being set. Is this a funny coincidence, two different meanings of the async word, or would it explain why these two variants of a WriteValue behavior differently:
+>> On Mar 24, 2016, at 5:04 PM, Travis Griggs <travisgriggs@gmail.com> wrote:
+>>
+>> I just started transitioning from 5.37 to 5.38. 2 or so months ago, I had gotten an Arm single board computer acting as a peripheral based on copying/guesswork from how example-advertise and example-gatt-server work. I’m trying to resurrect that work. But one thing I think I need to understand better is how dbus works. I’m looking for some kind of command line tool that I can use in this environment to explore the bus layout and get a feel for how it all fits together. Does someone have a good recommendation, preferably something that’s available as debian (jessie) package. I had seen a reference to qdbus, but it looks like it would drag in the entire Qt framework. If there was something for python(3) that explained the jst of dbus and how to explore it with python, I could just use that, but the python dbus docs I’ve found haven’t done a lot to help me.  Thanks for any hints, tips, etc.
 >
-> 1)       def WriteValue(self, value):
->                 print(value)
->                 seq = bytes(0 + x for x in value)
->                 myOtherModule.myFunction(seq)
->                 print("dispatched”)
->
->  only prints
->
-> dbus.Array([dbus.Byte(1), dbus.Byte(2), dbus.Byte(3), dbus.Byte(4), dbus.Byte(5), dbus.Byte(6), dbus.Byte(7), dbus.Byte(8)], signature=dbus.Signature('y’))
+> I thought I’d report that I did find mdbus2. Which is very light on dependencies. It can send show the topology and send messages. But I’m not sure how to make it access properties. And I did discover dbus-monitor thanks to Barry Byford, which seems to be good for watching traffic, though I couldn’t figure out to how to use it to explore what was there.--
 
-Perhaps it is blocking in your function for some reason?
-
->
-> But 2)  def WriteValue(self, value):
->                 print(value)
->                 seq = bytes(0 + x for x in value)
->              #    myOtherModule.myFunction(seq) <<— COMMENTED OUT
->                 print("dispatched”)
->
-> now prints
->
-> dbus.Array([dbus.Byte(1), dbus.Byte(2), dbus.Byte(3), dbus.Byte(4), dbus.Byte(5), dbus.Byte(6), dbus.Byte(7), dbus.Byte(8)], signature=dbus.Signature('y’))
-> dispatched
->
-> (it finished).
->
-> I wondered if it was a timeout thing, but it appears that the timeout is set at 300 seconds? Which seems really long, I note that dbus appears to have a default timeout if you just pass -1 here, why not use that?--
-
-The timeout is local to the caller so it makes no difference to the
-receiving end since the timeout is not send within the message, and
-yes the daemon uses the default timeout before giving up so I suppose
-the 300 seconds is not related to bluetoothd.
+Have you tried d-feet?
 
 -- 
 Luiz Augusto von Dentz
