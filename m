@@ -1,67 +1,190 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Message-ID: <1459443653.22297.7.camel@intelfx.name>
-Subject: Fallout from commit 70fdb77 "audio/avrcp: Fix not always requesting
- capabilities"
-From: Ivan Shapovalov <intelfx@intelfx.name>
-Reply-To: intelfx@intelfx.name
-To: linux-bluetooth@vger.kernel.org
-Cc: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Date: Thu, 31 Mar 2016 20:00:53 +0300
-Content-Type: multipart/signed; micalg="pgp-sha512";
-	protocol="application/pgp-signature"; boundary="=-lGXOPKPlJyTgoDFxbJnK"
-Mime-Version: 1.0
+MIME-Version: 1.0
+In-Reply-To: <1459371691-26216-2-git-send-email-lukasz.rymanowski@codecoup.pl>
+References: <1459371691-26216-1-git-send-email-lukasz.rymanowski@codecoup.pl>
+	<1459371691-26216-2-git-send-email-lukasz.rymanowski@codecoup.pl>
+Date: Thu, 31 Mar 2016 16:51:26 +0300
+Message-ID: <CABBYNZ+mZnc9FraiHVmpC042e01yS2u8m8smT1S94f8ROy1hsw@mail.gmail.com>
+Subject: Re: [PATCH v4 1/3] shared/gatt-server: Add support for long write
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: =?UTF-8?Q?=C5=81ukasz_Rymanowski?= <lukasz.rymanowski@codecoup.pl>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Łukasz,
 
---=-lGXOPKPlJyTgoDFxbJnK
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+On Thu, Mar 31, 2016 at 12:01 AM, Łukasz Rymanowski
+<lukasz.rymanowski@codecoup.pl> wrote:
+> With this patch long write and nested long write reliable is supported.
+> GATT server is responsible now to do aggregation of prep write data
+> for long write session.
+> Note: We consider long write as the consequtive prepare writes with
+> continues offsets.
+>
+> E.g. 1
+>
+> prep_write: handle 1, offset 0, value_len 10
+> prep_write: handle 1, offset 10, value_len 10
+> prep_write: handle 2, offset 0, value_len 10
+> prep_write: handle 2, offset 10, value_len 10
+>
+> Will result with following calles to app:
+>
+> exec_write: handle 1: offset 0, value_len 20
+> exec_write: handle 2: offset 0, value_len 20
+>
+> E.g. 2
+>
+> prep_write: handle 1, offset 0, value_len 10
+> prep_write: handle 1, offset 2, value_len 5
+> prep_write: handle 2, offset 0, value_len 10
+> prep_write: handle 2, offset 4, value_len 5
+>
+> Will result with following calles to app:
+>
+> exec_write: handle 1: offset 0, value_len 10
+> exec_write: handle 1: offset 2, value_len 5
+> exec_write: handle 2: offset 0, value_len 10
+> exec_write: handle 2: offset 4, value_len 5
+>
+> E.g. 3
+> prep_write: handle 1, offset 0, value_len 10
+> prep_write: handle 1, offset 5, value_len 5
+> prep_write: handle 1, offset 10, value_len 6
+>
+> will result with following calles to app:
+>
+> exec_write: handle 1, offset 0, value 10
+> exec_write: handle 1, offset 5, value 11
+> ---
+>  src/shared/gatt-server.c | 79 +++++++++++++++++++++++++++++++++++++++---------
+>  1 file changed, 65 insertions(+), 14 deletions(-)
+>
+> diff --git a/src/shared/gatt-server.c b/src/shared/gatt-server.c
+> index c41273a..ae079b1 100644
+> --- a/src/shared/gatt-server.c
+> +++ b/src/shared/gatt-server.c
+> @@ -1088,6 +1088,56 @@ error:
+>         bt_att_send_error_rsp(server->att, opcode, 0, ecode);
+>  }
+>
+> +static bool create_and_store_prep_data(struct bt_gatt_server *server,
+> +                                               uint16_t handle, uint16_t offset,
+> +                                               uint16_t length, uint8_t *value)
+> +{
+> +       struct prep_write_data *prep_data;
+> +
+> +       prep_data = new0(struct prep_write_data, 1);
+> +       prep_data->length = length;
+> +       if (prep_data->length) {
+> +               prep_data->value = malloc(prep_data->length);
+> +               if (!prep_data->value) {
+> +                       return false;
+> +               }
+> +
+> +               memcpy(prep_data->value, value, prep_data->length);
+> +       }
+> +
+> +       prep_data->server = server;
+> +       prep_data->handle = handle;
+> +       prep_data->offset = offset;
+> +
+> +       queue_push_tail(server->prep_queue, prep_data);
+> +
+> +       return true;
+> +}
+> +
+> +static bool make_aggregation_of_long_write_data(struct bt_gatt_server *server,
+> +                                       struct prep_write_data *prep_data,
+> +                                       uint16_t handle, uint16_t length,
+> +                                       uint8_t *value)
+> +{
+> +       uint8_t *buf;
+> +       uint16_t new_len;
+> +
+> +       new_len = prep_data->length + length;
+> +
+> +       buf = malloc(new_len);
+> +       if (!buf)
+> +               return false;
+> +
+> +       memcpy(buf, prep_data->value, prep_data->length);
+> +       memcpy(buf + prep_data->length, value, length);
 
-Hello,
+I think we could use realloc here instead of copying like this.
 
-The commit 70fdb7 "audio/avrcp: Fix not always requesting capabilities"
-introduced a series of bugs where the code thinks that session-
->controller->player cannot be NULL, but in fact it can be so. The first
-one was fixed in 177d27 "audio/avrcp: Fix crash when connecting to controll=
-ers", but there remain multiple code pathes via avrcp_register_notification=
-() -> callback -> avrcp_handle_event() -> avrcp_{status,track,playback_pos,=
-settings,uids}_changed() where session->controller->player may be dereferen=
-ced.
+> +
+> +       free(prep_data->value);
+> +       prep_data->value = buf;
+> +       prep_data->length = new_len;
+> +
+> +       return true;
+> +}
+> +
+>  static void prep_write_cb(uint8_t opcode, const void *pdu,
+>                                         uint16_t length, void *user_data)
+>  {
+> @@ -1097,6 +1147,7 @@ static void prep_write_cb(uint8_t opcode, const void *pdu,
+>         uint16_t offset;
+>         struct gatt_db_attribute *attr;
+>         uint8_t ecode;
+> +       bool success;
+>
+>         if (length < 4) {
+>                 ecode = BT_ATT_ERROR_INVALID_PDU;
+> @@ -1126,22 +1177,22 @@ static void prep_write_cb(uint8_t opcode, const void *pdu,
+>         if (ecode)
+>                 goto error;
+>
+> -       prep_data = new0(struct prep_write_data, 1);
+> -       prep_data->length = length - 4;
+> -       if (prep_data->length) {
+> -               prep_data->value = malloc(prep_data->length);
+> -               if (!prep_data->value) {
+> -                       ecode = BT_ATT_ERROR_INSUFFICIENT_RESOURCES;
+> -                       goto error;
+> -               }
+> -       }
+> +       /* Now lets check if prep write is a continuation of long write */
+> +       prep_data = queue_peek_tail(server->prep_queue);
+>
+> -       prep_data->server = server;
+> -       prep_data->handle = handle;
+> -       prep_data->offset = offset;
+> -       memcpy(prep_data->value, pdu + 4, prep_data->length);
+> +       if (prep_data && (prep_data->handle == handle) &&
+> +                       (offset == prep_data->length + prep_data->offset))
+> +               success = make_aggregation_of_long_write_data(server, prep_data,
+> +                                                       handle, length - 4,
+> +                                                       &((uint8_t *) pdu)[4]);
+> +       else
+> +               success = create_and_store_prep_data(server, handle, offset,
+> +                                       length - 4, &((uint8_t *) pdu)[4]);
 
-I'm unsure how to fix that properly (either not register notifications,
-or ignore specific callbacks if s->c->player is NULL), so I'm just
-reporting this.
+I would prefer if this would actually be done in a separate function,
+store_prep_data which should be able to detect if the data shall be
+appended or if a new item should be created.
 
-Ref.:=C2=A0https://bugs.archlinux.org/task/48644
+>
+> -       queue_push_tail(server->prep_queue, prep_data);
+> +       if (!success) {
+> +               ecode = BT_ATT_ERROR_INSUFFICIENT_RESOURCES;
+> +               goto error;
+> +       }
+>
+>         bt_att_send(server->att, BT_ATT_OP_PREP_WRITE_RSP, pdu, length, NULL,
+>                                                                 NULL, NULL);
+> --
+> 2.5.0
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
---=20
-Ivan Shapovalov / intelfx /
 
 
-Please Cc: me on replies as I'm not subscribed to the list.
---=-lGXOPKPlJyTgoDFxbJnK
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
-Content-Transfer-Encoding: 7bit
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQIcBAABCgAGBQJW/VfFAAoJEHveF8jk4w6ddgMP/1yfcCMuPnLtNRueStT08JTg
-WqFGYQollGmi8DvVxymEol1twB8F+A0rAJPxxNdxjIpooAWg/M2JmevdVNED+8b0
-2uSslwKwo1OoF0gJKciiE2Po0D4WKTIaDAFbNYB5p0oWq9KzGPqSiC8aIDho/OS8
-PZ7M1WebaWH6C1TEXpOHIwmJp3ZTZrr/ibKYjkXKAQJMYNxab4h4nLHmg6odG6YT
-qArqH3lwq2U5gr5jLIPp3cXGfrJaoMU7EN8j9oQzAbeEz3/Oshu1EEV7H+ehBuw9
-j4qb4nzgE5c8HM/69u9z4UwXmfWP/pUs8uutKz0e5LCT47Co70qrKBuEH8RZ74f2
-7SA5hB1Yk4RG7WUCcgnFUSwzoW58wuDBfFeCrZa26WtTUafsTXyHBe/HlcbcNDvf
-4/iy34W8Oselukt4q99YKCQD/ovzC0VPIXCX++DDATfjUDg91gvszFlJj7K8Bs55
-EUNvSlP3UAwa29CY6oxDMnEEe8xQeLYA1j1znAWeDM8IDD6SICAmM146PLaaG0FM
-msLTtJ5SP0CWa67rJKr58R1MqkVdMXWCdfISYvuZYMCPxPBty9KnAHLmGhlBbLFm
-cEttk9Yaz6V91I4kxQGknzNrrTsHcok3OohOscDfCRnMJ8PAl3B4ewcCFwjTdtip
-0ZY28dZsNyuTK8JlwDwW
-=QQEt
------END PGP SIGNATURE-----
-
---=-lGXOPKPlJyTgoDFxbJnK--
-
+-- 
+Luiz Augusto von Dentz
