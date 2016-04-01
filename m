@@ -1,10 +1,10 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <1458811870-7213-1-git-send-email-luiz.dentz@gmail.com>
-References: <1458811870-7213-1-git-send-email-luiz.dentz@gmail.com>
-Date: Fri, 1 Apr 2016 15:03:07 +0300
-Message-ID: <CABBYNZJN6jn5Frm59VaJy1qxhYLpeWxreRon+x_qNv=qmf6DFg@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] build: Make old GATT plugins deprecated
+In-Reply-To: <1459498306-17672-1-git-send-email-luiz.dentz@gmail.com>
+References: <1459498306-17672-1-git-send-email-luiz.dentz@gmail.com>
+Date: Fri, 1 Apr 2016 15:02:46 +0300
+Message-ID: <CABBYNZJTAxJWt73Tseb_S=X_8-nBVxKjvQ0LjLiu20YvVvjQxg@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] audio/avrcp: Fix registering to player events
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
@@ -13,48 +13,32 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
 
-On Thu, Mar 24, 2016 at 11:31 AM, Luiz Augusto von Dentz
+On Fri, Apr 1, 2016 at 11:11 AM, Luiz Augusto von Dentz
 <luiz.dentz@gmail.com> wrote:
 > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 >
-> This disables building plugins that are no longer supported by the core
-> since the transition to gatt-db. In the future these plugins will have to
-> be ported to use gatt-db or be removed if the profile can be implemented
-> using the GATT D-Bus APIs.
+> If controller does not have a player skip registering to events which
+> requires a player.
 > ---
->  Makefile.plugins | 2 +-
->  configure.ac     | 5 +++++
->  2 files changed, 6 insertions(+), 1 deletion(-)
+>  profiles/audio/avrcp.c | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
 >
-> diff --git a/Makefile.plugins b/Makefile.plugins
-> index f85b642..8a3605c 100644
-> --- a/Makefile.plugins
-> +++ b/Makefile.plugins
-> @@ -87,7 +87,7 @@ builtin_sources += profiles/scanparam/scan.c
->  builtin_modules += deviceinfo
->  builtin_sources += profiles/deviceinfo/deviceinfo.c
->
-> -if EXPERIMENTAL
-> +if DEPRECATED
->  builtin_modules += alert
->  builtin_sources += profiles/alert/server.c
->
-> diff --git a/configure.ac b/configure.ac
-> index bf40126..1679a47 100644
-> --- a/configure.ac
-> +++ b/configure.ac
-> @@ -247,6 +247,11 @@ AC_ARG_ENABLE(experimental, AC_HELP_STRING([--enable-experimental],
->                                         [enable_experimental=${enableval}])
->  AM_CONDITIONAL(EXPERIMENTAL, test "${enable_experimental}" = "yes")
->
-> +AC_ARG_ENABLE(deprecated, AC_HELP_STRING([--enable-deprecated],
-> +                       [enable deprecated plugins (BLE services, ...)]),
-> +                                       [enable_deprecated=${enableval}])
-> +AM_CONDITIONAL(DEPRECATED, test "${enable_deprecated}" = "yes")
-> +
->  AC_ARG_ENABLE(sixaxis, AC_HELP_STRING([--enable-sixaxis],
->                 [enable sixaxis plugin]), [enable_sixaxis=${enableval}])
->  AM_CONDITIONAL(SIXAXIS, test "${enable_sixaxis}" = "yes" &&
+> diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
+> index 0c6279a..37bc291 100644
+> --- a/profiles/audio/avrcp.c
+> +++ b/profiles/audio/avrcp.c
+> @@ -3647,8 +3647,9 @@ static gboolean avrcp_get_capabilities_resp(struct avctp *conn,
+>                 case AVRCP_EVENT_ADDRESSED_PLAYER_CHANGED:
+>                 case AVRCP_EVENT_UIDS_CHANGED:
+>                 case AVRCP_EVENT_AVAILABLE_PLAYERS_CHANGED:
+> -                       /* These events above are controller specific */
+> -                       if (!session->controller)
+> +                       /* These events above requires a player */
+> +                       if (!session->controller ||
+> +                                               !session->controller->player)
+>                                 break;
+>                 case AVRCP_EVENT_VOLUME_CHANGED:
+>                         avrcp_register_notification(session, event);
 > --
 > 2.5.0
 
