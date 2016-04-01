@@ -1,48 +1,47 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Szymon Janc <szymon.janc@codecoup.pl>
 To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@codecoup.pl>
-Subject: [PATCH] input/hog: Fix crash if uhid is not enabled
-Date: Fri,  1 Apr 2016 21:58:29 +0200
-Message-Id: <1459540709-2058-1-git-send-email-szymon.janc@codecoup.pl>
+From: Egbert van der Wal <ewal@pointpro.nl>
+Subject: Configuring a Bluetooth PAN server: can't find docs
+Message-ID: <56FE6EFA.5060406@pointpro.nl>
+Date: Fri, 1 Apr 2016 14:52:10 +0200
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If /dev/uhid is not present bt_hog_new_default() returns NULL.
-This was resulting in NULL pointer dereference in attio_connected_cb.
----
- profiles/input/hog.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+Hi,
 
-diff --git a/profiles/input/hog.c b/profiles/input/hog.c
-index 4dba83f..a934c62 100644
---- a/profiles/input/hog.c
-+++ b/profiles/input/hog.c
-@@ -107,8 +107,13 @@ static struct hog_device *hog_device_new(struct btd_device *device,
- 							product, version);
- 
- 	dev = new0(struct hog_device, 1);
--	dev->device = btd_device_ref(device);
- 	dev->hog = bt_hog_new_default(name, vendor, product, version, prim);
-+	if (!dev->hog) {
-+		free(dev);
-+		return NULL;
-+	}
-+
-+	dev->device = btd_device_ref(device);
- 
- 	/*
- 	 * TODO: Remove attio callback and use .accept once using
-@@ -189,6 +194,9 @@ static int hog_probe(struct btd_service *service)
- 			continue;
- 
- 		dev = hog_device_new(device, prim);
-+		if (!dev)
-+			break;
-+
- 		btd_service_set_user_data(service, dev);
- 		return 0;
- 	}
--- 
-2.6.2
+Short story: I'd really like to RTFM, but in all of my online quests I 
+can't find where it is. Where can I find documentation about bluez, 
+configuration files and pand?
+
+With a bit more information: I'm trying to configure a device (Odroid 
+XU4 running Ubuntu 14.04, using Bluez 4.101) to accept PAN-connections. 
+Doing this I want to provide the connecting user with a web interface to 
+perform some configuration tasks (such as connecting to a wifi).
+
+The resulting connection will not provide internet access and will only 
+be used to expose access to an internal IP address (e.g. 10.0.0.1). I 
+want the device to basically accept any pairing request using a fixed, 
+pre-configured pin-code.
+
+I've been trying to get this working for a while now using various 
+howto's but it seems to me that each and every one of them uses a 
+different way to configure Bluez, probably resulting from a different 
+version. I basically tried all of them and none seem to work (due to 
+missing / invalid commands or missing / ignored configuration files).
+
+I couldn't find any documentation on bluez.org itself. The bluetoothd 
+man-page refers to a man-page of /etc/bluetooth/main.conf that doesn't 
+seem to exist, and the contents of /etc/bluetooth/main.conf also seem to 
+be ignored so I'm quite stuck here.
+
+Any pointers to any type of documentation that covers my version of 
+bluez and the steps to set this up would be highly appreciated.
+
+Thanks in advance!
+
+Regards,
+
+Egbert
 
