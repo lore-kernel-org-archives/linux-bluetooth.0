@@ -1,46 +1,33 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-From: Yunchuan Geng <yunchuan.geng@nomovok.com>
-Subject: property changes emited but not captured, why?::
-Message-ID: <57025247.3080709@nomovok.com>
-Date: Mon, 4 Apr 2016 14:38:47 +0300
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
+From: Loic Poulain <loic.poulain@intel.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Loic Poulain <loic.poulain@intel.com>
+Subject: [PATCH] Bluetooth: hci_bcm: Add BCM2E71 ACPI ID
+Date: Mon,  4 Apr 2016 11:31:12 +0200
+Message-Id: <1459762272-12977-1-git-send-email-loic.poulain@intel.com>
+To: unlisted-recipients:; (no To-header on input)
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+This ID is used at least by Asus T100-CHI.
 
-I am testing map-client python script from bluez-5.30. Everything works 
-fine, except that I found I can not capture the properties change signal,
-which I confirmed from log did been emitted from parse_subject function 
-in obexd/client/map.c
+Signed-off-by: Loic Poulain <loic.poulain@intel.com>
+---
+ drivers/bluetooth/hci_bcm.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-In order to check if the signal is captured in python script or not, I 
-have patched the script like this. But have not catch any signal the 
-parse_subject
-function has emitted.
-
-Could anyone tell me why and how to correctly capture property changes 
-emitted by g_dbus_emit_property_changed function.
-
-
-Yunchuan
-
-=====Patch=====
-diff --git a/test/map-client b/test/map-client
-index b9695da..634b91a 100755
---- a/test/map-client
-+++ b/test/map-client
-@@ -118,6 +119,9 @@ class MapClient:
-                 mainloop.quit()
-
-         def properties_changed(self, interface, properties, 
-invalidated, path):
-+                print(properties)
-+                print(interface)
-+                print(path)
-                 req = self.props.get(path)
-                 if req == None:
-                         return
+diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
+index d8881dc..1c97eda 100644
+--- a/drivers/bluetooth/hci_bcm.c
++++ b/drivers/bluetooth/hci_bcm.c
+@@ -825,6 +825,7 @@ static const struct acpi_device_id bcm_acpi_match[] = {
+ 	{ "BCM2E64", 0 },
+ 	{ "BCM2E65", 0 },
+ 	{ "BCM2E67", 0 },
++	{ "BCM2E71", 0 },
+ 	{ "BCM2E7B", 0 },
+ 	{ "BCM2E7C", 0 },
+ 	{ },
+-- 
+1.9.1
 
