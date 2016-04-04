@@ -1,83 +1,163 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Subject: Re: property changes emited but not captured, why?::
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-References: <57025247.3080709@nomovok.com>
- <CABBYNZ+AxeD1SJ7DV1=FWGT_269nwbpksyXmkseAU-evcdS-RA@mail.gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-From: Yunchuan Geng <yunchuan.geng@nomovok.com>
-Message-ID: <5702B94A.8020003@nomovok.com>
-Date: Mon, 4 Apr 2016 21:58:18 +0300
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZ+AxeD1SJ7DV1=FWGT_269nwbpksyXmkseAU-evcdS-RA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <1459628809-32348-3-git-send-email-lukasz.rymanowski@codecoup.pl>
+References: <1459628809-32348-1-git-send-email-lukasz.rymanowski@codecoup.pl>
+	<1459628809-32348-3-git-send-email-lukasz.rymanowski@codecoup.pl>
+Date: Mon, 4 Apr 2016 16:18:45 +0300
+Message-ID: <CABBYNZL_mQK_+4ieoq+N0PgU=J5=HCL0hLgs5s9aEGEVUizLCg@mail.gmail.com>
+Subject: Re: [PATCH v5 2/3] shared/gatt-db: Add API to get extended prop
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: =?UTF-8?Q?=C5=81ukasz_Rymanowski?= <lukasz.rymanowski@codecoup.pl>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi, Luiz
+Hi Łukasz,
 
-Thanks for the comments.
-
-The idea is to verify the bluez use case in python. ultimately Qt 
-application will be deployed.
-I am expecting a notification by signal from bluez about property changes.
-
-What do you means about subscribing to the signal properly? Basically I 
-just test what ever
-comes with bluez, not modify anything which make change, Only those 
-print for debug purpose.
-
-I am trying to add debug message in g_dbus_emit_property_changed 
-function to see what
-is wrong, but did not found the message printed anywhere(I am using 
-ubuntu with self compiled bluez5).
-
-Any suggestion about enable/check debug message in 
-g_dbus_emit_property_changed would also help.
-
-
-Best regards,
-Yunchuan
-
-On 04.04.2016 16:04, Luiz Augusto von Dentz wrote:
-> Hi Yunchuan,
+On Sat, Apr 2, 2016 at 11:26 PM, Łukasz Rymanowski
+<lukasz.rymanowski@codecoup.pl> wrote:
+> This patch adds way to get extended properties from
+> characteristic extended property descriptor
+> ---
+>  src/shared/gatt-db.c | 62 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  src/shared/gatt-db.h |  4 ++++
+>  unit/test-gatt.c     | 14 ++++++++++++
+>  3 files changed, 80 insertions(+)
 >
-> On Mon, Apr 4, 2016 at 2:38 PM, Yunchuan Geng <yunchuan.geng@nomovok.com> wrote:
->> Hi,
->>
->> I am testing map-client python script from bluez-5.30. Everything works
->> fine, except that I found I can not capture the properties change signal,
->> which I confirmed from log did been emitted from parse_subject function in
->> obexd/client/map.c
->>
->> In order to check if the signal is captured in python script or not, I have
->> patched the script like this. But have not catch any signal the
->> parse_subject
->> function has emitted.
->>
->> Could anyone tell me why and how to correctly capture property changes
->> emitted by g_dbus_emit_property_changed function.
->>
->>
->> Yunchuan
->>
->> =====Patch=====
->> diff --git a/test/map-client b/test/map-client
->> index b9695da..634b91a 100755
->> --- a/test/map-client
->> +++ b/test/map-client
->> @@ -118,6 +119,9 @@ class MapClient:
->>                  mainloop.quit()
->>
->>          def properties_changed(self, interface, properties, invalidated,
->> path):
->> +                print(properties)
->> +                print(interface)
->> +                print(path)
->>                  req = self.props.get(path)
->>                  if req == None:
->>                          return
->>
-> Have you tried using obexctl or the idea is to use python? I guess it
-> is perhaps not subscribing to the signal properly.
+> diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
+> index cc49458..1a1704b 100644
+> --- a/src/shared/gatt-db.c
+> +++ b/src/shared/gatt-db.c
+> @@ -52,6 +52,8 @@ static const bt_uuid_t characteristic_uuid = { .type = BT_UUID16,
+>                                         .value.u16 = GATT_CHARAC_UUID };
+>  static const bt_uuid_t included_service_uuid = { .type = BT_UUID16,
+>                                         .value.u16 = GATT_INCLUDE_UUID };
+> +static const bt_uuid_t ext_desc_uuid = { .type = BT_UUID16,
+> +                               .value.u16 = GATT_CHARAC_EXT_PROPER_UUID };
 >
+>  struct gatt_db {
+>         int ref_count;
+> @@ -1456,6 +1458,66 @@ bool gatt_db_attribute_get_service_data(const struct gatt_db_attribute *attrib,
+>         return le_to_uuid(decl->value, decl->value_len, uuid);
+>  }
+>
+> +struct ext_prop_data {
+> +       bool present;
+> +       uint8_t prop;
+> +};
+> +
+> +static void set_ext_prop_data(struct gatt_db_attribute *attrib,
+> +                                               int err, const uint8_t *value,
+> +                                               size_t length, void *user_data)
+> +{
+> +       struct ext_prop_data *ext_prop_data = user_data;
+> +
+> +       if (err || (length != sizeof(uint8_t)))
+> +               return;
+> +
+> +       ext_prop_data->prop = value[0];
+> +}
+> +
+> +static void check_reliable_supported(struct gatt_db_attribute *attrib,
+> +                                                       void *user_data)
+> +{
+> +       struct ext_prop_data *ext_prop_data = user_data;
+> +
+> +       if (ext_prop_data->present)
+> +               return;
+> +
+> +       if (bt_uuid_cmp(&ext_desc_uuid, &attrib->uuid))
+> +               return;
+> +
+> +       ext_prop_data->present = true;
+> +       ext_prop_data->prop = gatt_db_attribute_read(attrib, 0,
+> +                                               BT_ATT_OP_READ_REQ, NULL,
+> +                                               set_ext_prop_data, user_data);
+> +}
+> +
+> +bool gatt_db_attribute_get_characteristic_extended_prop(
+> +                                       const struct gatt_db_attribute *attrib,
+> +                                       uint8_t *ext_prop)
+> +{
+> +       struct ext_prop_data ext_prop_data;
+> +
+> +       if (!attrib)
+> +               return false;
+> +
+> +       if (bt_uuid_cmp(&characteristic_uuid, &attrib->uuid))
+> +               return false;
+> +
+> +       memset(&ext_prop_data, 0, sizeof(ext_prop_data));
+> +
+> +       /*
+> +        * Cast needed for foreach function. We do not change attrib during
+> +        * this call
+> +        */
+> +       gatt_db_service_foreach_desc((struct gatt_db_attribute *) attrib,
+> +                                               check_reliable_supported,
+> +                                               &ext_prop_data);
+> +
+> +       *ext_prop = ext_prop_data.prop;
+> +       return ext_prop_data.present;
+> +}
+> +
+>  bool gatt_db_attribute_get_char_data(const struct gatt_db_attribute *attrib,
+>                                                         uint16_t *handle,
+>                                                         uint16_t *value_handle,
+> diff --git a/src/shared/gatt-db.h b/src/shared/gatt-db.h
+> index 96cceb9..0cb713e 100644
+> --- a/src/shared/gatt-db.h
+> +++ b/src/shared/gatt-db.h
+> @@ -195,6 +195,10 @@ bool gatt_db_attribute_get_service_data(const struct gatt_db_attribute *attrib,
+>                                                         bool *primary,
+>                                                         bt_uuid_t *uuid);
+>
+> +bool gatt_db_attribute_get_characteristic_extended_prop(
+> +                                       const struct gatt_db_attribute *attrib,
+> +                                       uint8_t *ext_prop);
+> +
 
+I wonder if it wouldn't be a better idea to extend
+gatt_db_attribute_get_char_data to return it there along with the
+other properties?
+
+>  bool gatt_db_attribute_get_char_data(const struct gatt_db_attribute *attrib,
+>                                                         uint16_t *handle,
+>                                                         uint16_t *value_handle,
+> diff --git a/unit/test-gatt.c b/unit/test-gatt.c
+> index 0912348..85e4d75 100644
+> --- a/unit/test-gatt.c
+> +++ b/unit/test-gatt.c
+> @@ -4434,5 +4434,19 @@ int main(int argc, char *argv[])
+>                                 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff),
+>                         raw_pdu(0x01, 0x16, 0x04, 0x00, 0x03));
+>
+> +       define_test_server("/robustness/no-reliable-characteristic", test_server,
+> +                       ts_large_db_1, NULL,
+> +                       raw_pdu(0x03, 0x00, 0x02),
+> +                       raw_pdu(0x16, 0x82, 0x00, 0x00, 0x00, 0x01, 0x02, 0x03),
+> +                       raw_pdu(0x17, 0x82, 0x00, 0x00, 0x00, 0x01, 0x02, 0x03),
+> +                       raw_pdu(0x16, 0x25, 0x00, 0x00, 0x00, 0x01, 0x02, 0x03),
+> +                       raw_pdu(0x17, 0x25, 0x00, 0x00, 0x00, 0x01, 0x02, 0x03),
+> +                       raw_pdu(0x16, 0x82, 0x00, 0x03, 0x00, 0x04, 0x05, 0x06),
+> +                       raw_pdu(0x17, 0x82, 0x00, 0x03, 0x00, 0x04, 0x05, 0x06),
+> +                       raw_pdu(0x16, 0x25, 0x00, 0x03, 0x00, 0x04, 0x05, 0x06),
+> +                       raw_pdu(0x17, 0x25, 0x00, 0x03, 0x00, 0x04, 0x05, 0x06),
+> +                       raw_pdu(0x18, 0x01),
+> +                       raw_pdu(0x01, 0x18, 0x25, 0x00, 0x06));
+> +
+>         return tester_run();
+>  }
+> --
+> 2.5.0
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
+-- 
+Luiz Augusto von Dentz
