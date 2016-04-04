@@ -1,33 +1,102 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Loic Poulain <loic.poulain@intel.com>
+To: marcel@holtmann.org, johan.hedberg@gmail.com, gustavo@padovan.org
 Cc: linux-bluetooth@vger.kernel.org,
 	Loic Poulain <loic.poulain@intel.com>
-Subject: [PATCH] Bluetooth: hci_bcm: Add BCM2E71 ACPI ID
-Date: Mon,  4 Apr 2016 11:31:12 +0200
-Message-Id: <1459762272-12977-1-git-send-email-loic.poulain@intel.com>
-To: unlisted-recipients:; (no To-header on input)
+Subject: [PATCH v2][RESEND] Bluetooth: hci_ldisc: Fix null pointer derefence in case of early data
+Date: Mon,  4 Apr 2016 10:48:13 +0200
+Message-Id: <1459759693-5687-1-git-send-email-loic.poulain@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This ID is used at least by Asus T100-CHI.
+HCI_UART_PROTO_SET flag is set before hci_uart_set_proto call. If we
+receive data from tty layer during this procedure, proto pointer may
+not be assigned yet, leading to null pointer dereference in rx method
+hci_uart_tty_receive.
+
+This patch fixes this issue by introducing HCI_UART_PROTO_READY flag in
+order to avoid any proto operation before proto opening and assignment.
 
 Signed-off-by: Loic Poulain <loic.poulain@intel.com>
 ---
- drivers/bluetooth/hci_bcm.c | 1 +
- 1 file changed, 1 insertion(+)
+ v2: Use PROTO_READY instead of overloading PROTO_SET ioctl.
 
-diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
-index d8881dc..1c97eda 100644
---- a/drivers/bluetooth/hci_bcm.c
-+++ b/drivers/bluetooth/hci_bcm.c
-@@ -825,6 +825,7 @@ static const struct acpi_device_id bcm_acpi_match[] = {
- 	{ "BCM2E64", 0 },
- 	{ "BCM2E65", 0 },
- 	{ "BCM2E67", 0 },
-+	{ "BCM2E71", 0 },
- 	{ "BCM2E7B", 0 },
- 	{ "BCM2E7C", 0 },
- 	{ },
+ drivers/bluetooth/hci_ldisc.c | 11 +++++++----
+ drivers/bluetooth/hci_uart.h  |  1 +
+ 2 files changed, 8 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
+index c00168a..49b3e1e 100644
+--- a/drivers/bluetooth/hci_ldisc.c
++++ b/drivers/bluetooth/hci_ldisc.c
+@@ -227,7 +227,7 @@ static int hci_uart_flush(struct hci_dev *hdev)
+ 	tty_ldisc_flush(tty);
+ 	tty_driver_flush_buffer(tty);
+ 
+-	if (test_bit(HCI_UART_PROTO_SET, &hu->flags))
++	if (test_bit(HCI_UART_PROTO_READY, &hu->flags))
+ 		hu->proto->flush(hu);
+ 
+ 	return 0;
+@@ -492,7 +492,7 @@ static void hci_uart_tty_close(struct tty_struct *tty)
+ 
+ 	cancel_work_sync(&hu->write_work);
+ 
+-	if (test_and_clear_bit(HCI_UART_PROTO_SET, &hu->flags)) {
++	if (test_and_clear_bit(HCI_UART_PROTO_READY, &hu->flags)) {
+ 		if (hdev) {
+ 			if (test_bit(HCI_UART_REGISTERED, &hu->flags))
+ 				hci_unregister_dev(hdev);
+@@ -500,6 +500,7 @@ static void hci_uart_tty_close(struct tty_struct *tty)
+ 		}
+ 		hu->proto->close(hu);
+ 	}
++	clear_bit(HCI_UART_PROTO_SET, &hu->flags);
+ 
+ 	kfree(hu);
+ }
+@@ -526,7 +527,7 @@ static void hci_uart_tty_wakeup(struct tty_struct *tty)
+ 	if (tty != hu->tty)
+ 		return;
+ 
+-	if (test_bit(HCI_UART_PROTO_SET, &hu->flags))
++	if (test_bit(HCI_UART_PROTO_READY, &hu->flags))
+ 		hci_uart_tx_wakeup(hu);
+ }
+ 
+@@ -550,7 +551,7 @@ static void hci_uart_tty_receive(struct tty_struct *tty, const u8 *data,
+ 	if (!hu || tty != hu->tty)
+ 		return;
+ 
+-	if (!test_bit(HCI_UART_PROTO_SET, &hu->flags))
++	if (!test_bit(HCI_UART_PROTO_READY, &hu->flags))
+ 		return;
+ 
+ 	/* It does not need a lock here as it is already protected by a mutex in
+@@ -638,9 +639,11 @@ static int hci_uart_set_proto(struct hci_uart *hu, int id)
+ 		return err;
+ 
+ 	hu->proto = p;
++	set_bit(HCI_UART_PROTO_READY, &hu->flags);
+ 
+ 	err = hci_uart_register_dev(hu);
+ 	if (err) {
++		clear_bit(HCI_UART_PROTO_READY, &hu->flags);
+ 		p->close(hu);
+ 		return err;
+ 	}
+diff --git a/drivers/bluetooth/hci_uart.h b/drivers/bluetooth/hci_uart.h
+index 4814ff0..839bad1 100644
+--- a/drivers/bluetooth/hci_uart.h
++++ b/drivers/bluetooth/hci_uart.h
+@@ -95,6 +95,7 @@ struct hci_uart {
+ /* HCI_UART proto flag bits */
+ #define HCI_UART_PROTO_SET	0
+ #define HCI_UART_REGISTERED	1
++#define HCI_UART_PROTO_READY	2
+ 
+ /* TX states  */
+ #define HCI_UART_SENDING	1
 -- 
 1.9.1
 
