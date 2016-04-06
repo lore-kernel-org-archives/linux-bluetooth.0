@@ -1,60 +1,49 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: =?UTF-8?q?Martin=20Hundeb=C3=B8ll?= <mnhu@prevas.dk>
-To: <linux-bluetooth@vger.kernel.org>
-CC: =?UTF-8?q?Martin=20Hundeb=C3=B8ll?= <mnhu@prevas.dk>
-Subject: [PATCH BlueZ] hciattach: add fixed delay between brf actions for texas devices
-Date: Thu, 7 Apr 2016 08:47:25 +0200
-Message-ID: <1460011645-28754-1-git-send-email-mnhu@prevas.dk>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Fix setting NO_BREDR advertising flag
+Date: Wed,  6 Apr 2016 13:09:05 +0300
+Message-Id: <1459937345-30236-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add a small delay between doing brf action to avoid stalling the device
-and thus failing initialization.
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-This is tested with wl1835 on a custom mx28 board running mainline
-linux-4.4
+If we're dealing with a single-mode controller or BR/EDR is disable
+for a dual-mode one, the NO_BREDR flag needs to be unconditionally
+present in the advertising data. This patch moves it out from behind
+an extra condition to be always set in the create_instance_adv_data()
+function if BR/EDR is disabled.
 
-Without the delay, hciattach fails like this:
-
-~ # ./hciattach ttyAPP1 texas 3000000 flow
-Found a Texas Instruments' chip!
-Firmware file : /lib/firmware/ti-connectivity/TIInit_11.8.32.bts
-Sending script to serial device
-Loaded BTS script version 1
-texas: changing baud rate to 3000000, flow control to 1
-Initialization timed out.
-CCCCCCCCCCCCCCCCCCWRCWRCCWRCSCCCWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRW
-RWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWR
-WRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRW
-RWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRCWRCWRCWRCWRCCCCCCWRCWRCCCCCCCCCCWRWRW
-RWRWRWRWRWRCCCCCCCCCCCCCCCCCWRCCCCCCWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRW
-RWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWR
-WRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRW
-RWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRCCCCCWRWRW
-RWRWRCCCCCWRCWRCWRCWRCWRCWRCWRCWRCWRCWRCWRCWRCWRCWRCWRCWRCWRCWRCWRCWRCWRC
-WRCWRCCCWRCCCCCCCCCCCCCCCCCCCCCCCCCCW
-
-Signed-off-by: Martin Hundebøll <mnhu@prevas.dk>
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- tools/hciattach_ti.c | 3 +++
- 1 file changed, 3 insertions(+)
+ net/bluetooth/hci_request.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/tools/hciattach_ti.c b/tools/hciattach_ti.c
-index 828dd61..1935781 100644
---- a/tools/hciattach_ti.c
-+++ b/tools/hciattach_ti.c
-@@ -345,6 +345,9 @@ static int brf_do_action(uint16_t brf_type, uint8_t *brf_action, long brf_size,
- 		break;
- 	}
+diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
+index 6e125d76df0d..c045b3c54768 100644
+--- a/net/bluetooth/hci_request.c
++++ b/net/bluetooth/hci_request.c
+@@ -1065,6 +1065,9 @@ static u8 create_instance_adv_data(struct hci_dev *hdev, u8 instance, u8 *ptr)
+ 	if (instance_flags & MGMT_ADV_FLAG_LIMITED_DISCOV)
+ 		flags |= LE_AD_LIMITED;
  
-+	/* sleep here to avoid overwhelming the device leading to a timeout */
-+	usleep(1000);
++	if (!hci_dev_test_flag(hdev, HCI_BREDR_ENABLED))
++		flags |= LE_AD_NO_BREDR;
 +
- 	return ret;
- }
+ 	if (flags || (instance_flags & MGMT_ADV_FLAG_MANAGED_FLAGS)) {
+ 		/* If a discovery flag wasn't provided, simply use the global
+ 		 * settings.
+@@ -1072,9 +1075,6 @@ static u8 create_instance_adv_data(struct hci_dev *hdev, u8 instance, u8 *ptr)
+ 		if (!flags)
+ 			flags |= mgmt_get_adv_discov_flags(hdev);
  
+-		if (!hci_dev_test_flag(hdev, HCI_BREDR_ENABLED))
+-			flags |= LE_AD_NO_BREDR;
+-
+ 		/* If flags would still be empty, then there is no need to
+ 		 * include the "Flags" AD field".
+ 		 */
 -- 
-2.8.0
+2.5.5
 
