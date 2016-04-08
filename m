@@ -1,27 +1,31 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
-Subject: Re: [PATCH] Bluetooth: hci_bcm: Add BCM2E71 ACPI ID
+Subject: Re: [PATCH] Bluetooth: Fix setting NO_BREDR advertising flag
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1459762272-12977-1-git-send-email-loic.poulain@intel.com>
-Date: Fri, 8 Apr 2016 09:55:11 -0700
+In-Reply-To: <1459937345-30236-1-git-send-email-johan.hedberg@gmail.com>
+Date: Fri, 8 Apr 2016 09:53:02 -0700
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <734AAE50-DD98-4688-B09E-CC3D5C332914@holtmann.org>
-References: <1459762272-12977-1-git-send-email-loic.poulain@intel.com>
-To: Loic Poulain <loic.poulain@intel.com>
+Message-Id: <4B32DABE-7947-4047-9025-99B6FB3443F3@holtmann.org>
+References: <1459937345-30236-1-git-send-email-johan.hedberg@gmail.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Loic,
+Hi Johan,
 
-> This ID is used at least by Asus T100-CHI.
+> If we're dealing with a single-mode controller or BR/EDR is disable
+> for a dual-mode one, the NO_BREDR flag needs to be unconditionally
+> present in the advertising data. This patch moves it out from behind
+> an extra condition to be always set in the create_instance_adv_data()
+> function if BR/EDR is disabled.
 > 
-> Signed-off-by: Loic Poulain <loic.poulain@intel.com>
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 > ---
-> drivers/bluetooth/hci_bcm.c | 1 +
-> 1 file changed, 1 insertion(+)
+> net/bluetooth/hci_request.c | 6 +++---
+> 1 file changed, 3 insertions(+), 3 deletions(-)
 
-patch has been applied to bluetooth-next tree.
+patch has been applied bluetooth-next tree.
 
 Regards
 
