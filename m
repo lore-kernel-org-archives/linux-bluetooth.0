@@ -3,19 +3,19 @@ MIME-Version: 1.0
 In-Reply-To: <CABBYNZ+HcHyuMt_z2cQwBNo6ygVLxqE7_+jE0oCMaLavq85wfA@mail.gmail.com>
 References: <CAArnnE4WkLUfS5J1A3PCHJjR886rOiGe=rEhn_qfTY2B6Dw46A@mail.gmail.com>
 	<CABBYNZ+HcHyuMt_z2cQwBNo6ygVLxqE7_+jE0oCMaLavq85wfA@mail.gmail.com>
-Date: Fri, 8 Apr 2016 05:53:38 +0100
-Message-ID: <CAAu3APZBDeO1ytNhaZJmTVNsuscdQDCU-vXvwVHVvg9FrJ8xtg@mail.gmail.com>
+Date: Fri, 8 Apr 2016 11:54:56 +0900
+Message-ID: <CAArnnE44bm52w6MWSNvXB0fR5PZhfC3z52Kn1ms7iPZe5bOcuA@mail.gmail.com>
 Subject: Re: Not shown registered gatt services on an android 5.1.1
-From: Barry Byford <31baz66@gmail.com>
-To: Bluez mailing list <linux-bluetooth@vger.kernel.org>
+From: Hyuntak Lee <pphdev12@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello Luiz,
+Hi Luiz,
 
-
-On 7 April 2016 at 13:17, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
+2016-04-07 21:17 GMT+09:00 Luiz Augusto von Dentz <luiz.dentz@gmail.com>:
 > Hi Tak,
 >
 > On Thu, Apr 7, 2016 at 2:20 PM, Hyuntak Lee <pphdev12@gmail.com> wrote:
@@ -142,34 +142,36 @@ On 7 April 2016 at 13:17, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
 > Androids).
 >
 
-I'm seeing the same issue of an Android phone that will not connect to a
-Bluez (5.38) gatt server running on a Raspberry Pi.
-An iPhone 4S (ios 9.3.1) will connect as will another Raspberry Pi using
-bluetoothctl (5.36).
-The phone that will not connect is a Google Nexus 5x (Android 6.0.1)
+Thanks for your reply.
 
-I'm use nRF Master Control Panel app on both iPhone and Android.
-The log file from Android is:
+As a result, Android still cannot find primary services.
+I compared a bluez-5.39 source with
+http://www.spinics.net/lists/linux-bluetooth/msg66498.html
+It seemed not applied to 5.39. so, I edited a source and recompiled
+and try again.
 
-nRF Master Control Panel, 2016-04-07
-No name (00:02:5B:03:E3:E3)
-V21:34:19.768Connecting to 00:02:5B:03:E3:E3...
-D21:34:19.777gatt = device.connectGatt(autoConnect = false)
-D21:34:24.943[Callback] Connection state changed with status: 133 and new
-state: DISCONNECTED (0)
-E21:34:24.955Error 133 (0x85): GATT ERROR
-I21:34:24.969Disconnected
-D21:34:24.981gatt.close()
+Logs:
+bluetoothd[18338]: src/gatt-client.c:btd_gatt_client_connected()
+Device connected.
+bluetoothd[18338]: src/device.c:load_gatt_db() Restoring
+30:75:12:94:47:D5 gatt database from file
+bluetoothd[18338]: No cache for 30:75:12:94:47:D5
+bluetoothd[18338]: src/device.c:gatt_debug() Primary services found: 2
+bluetoothd[18338]: src/device.c:gatt_debug() start: 0x0001, end:
+0x0005, uuid: 00001801-0000-1000-8000-00805f9b34fb
+bluetoothd[18338]: src/device.c:gatt_debug() start: 0x0014, end:
+0xffff, uuid: 00001800-0000-1000-8000-00805f9b34fb
+bluetoothd[18338]: src/device.c:gatt_debug() Secondary service
+discovery failed. ATT ECODE: 0x10
 
-I've tried adding the patch you suggested above and I still see the same in
-the phones log file.
+Log is changed, do not show 'MTU Exchange failed. ATT ECODE: 0x06' message.
+But, still not discover all primary services. Not shown a log message
+like this "Read By Grp Type - start: 0x0001 end: 0xffff"
 
-The error message on the phone is the same as I have had before and has been
-solved previously by adding  'ControllerMode = le' in main.conf. History of
-that discussion is at:
- http://marc.info/?l=linux-bluetooth&m=145505537711496&w=2
+Can you advice me?
 
-Since moving to 5.38 modifying the main.conf no longer seems to fix the issue.
+Best Regards,
+Tak
 
 
 >> bluetoothd[2976]: src/device.c:gatt_debug() Primary services found: 2
@@ -196,7 +198,3 @@ Since moving to 5.38 modifying the main.conf no longer seems to fix the issue.
 >
 > --
 > Luiz Augusto von Dentz
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
