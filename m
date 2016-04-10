@@ -1,160 +1,91 @@
-Return-Path: <akarwar@marvell.com>
-From: Amitkumar Karwar <akarwar@marvell.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Nishant Sarmukadam <nishants@marvell.com>,
-        "wnhuang@chromium.com"
-	<wnhuang@chromium.com>,
-        "devicetree@vger.kernel.org"
-	<devicetree@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>,
-        Xinming Hu <huxm@marvell.com>
-Subject: RE: [PATCH v6 2/2] btmrvl: add platform specific wakeup interrupt
- support
-Date: Mon, 11 Apr 2016 04:38:40 +0000
-Message-ID: <171a54de45594926857b1bc3d76ea253@SC-EXCH04.marvell.com>
-References: <1459344056-5234-1-git-send-email-akarwar@marvell.com>
- <1459344056-5234-2-git-send-email-akarwar@marvell.com>
- <B99FD549-3D36-4A89-83F3-E4170ADE1336@holtmann.org>
-In-Reply-To: <B99FD549-3D36-4A89-83F3-E4170ADE1336@holtmann.org>
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Message-ID: <1460323112.1800.59.camel@perches.com>
+Subject: Re: [PATCH] Bluetooth: Deinline large functions
+From: Joe Perches <joe@perches.com>
+To: Denys Vlasenko <vda.linux@googlemail.com>
+Cc: Denys Vlasenko <dvlasenk@redhat.com>,
+	Johan Hedberg <johan.hedberg@intel.com>,
+	linux-bluetooth@vger.kernel.org,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Date: Sun, 10 Apr 2016 14:18:32 -0700
+In-Reply-To: <CAK1hOcNRcesGqMUb6Tt5VY2gw93o_Fo9OV41HP3WRnpvT7D4Lg@mail.gmail.com>
+References: <1460305444-14159-1-git-send-email-dvlasenk@redhat.com>
+	 <1460307544.1800.53.camel@perches.com>
+	 <CAK1hOcNRcesGqMUb6Tt5VY2gw93o_Fo9OV41HP3WRnpvT7D4Lg@mail.gmail.com>
+Content-Type: text/plain; charset="ISO-8859-1"
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+On Sun, 2016-04-10 at 19:18 +0200, Denys Vlasenko wrote:
+> On Sun, Apr 10, 2016 at 6:59 PM, Joe Perches <joe@perches.com> wrote:
+> > 
+> > On Sun, 2016-04-10 at 18:24 +0200, Denys Vlasenko wrote:
+> > > 
+> > > Fastest existing Bluetooth standard's top speed is 2.4 MB/s.
+> > > It is way off from being CPU limited, no need to squeeze
+> > > last few cycles by excessive inlining.
+> > > 
+> > > This patch delinlines the following functions:
+> > > 
+> > > hci_conn_hash_lookup_handle: 345 bytes, 39 calls
+> > > hci_conn_hash_lookup_ba: 372 bytes, 36 calls
+> > > hci_conn_hash_lookup_le: 382 bytes, 8 calls
+> > > hci_conn_hash_lookup_state: 356 bytes, 3 calls
+> > > hci_lookup_le_connect: 378 bytes, 7 calls
+> > > hci_conn_drop: 186 bytes, 30 calls
+> > > hci_connect_cfm: 121 bytes, 15 calls
+> > > hci_disconn_cfm: 121 bytes, 2 calls
+> > > hci_auth_cfm: 156 bytes, 2 calls
+> > > hci_encrypt_cfm: 156 bytes, 3 calls
+> > > 
+> > > Size reduction is about 40k:
+> > > 
+> > >     text     data      bss       dec     hex filename
+> > > 95943139 20860256 35991552 152794947 91b7743 vmlinux_before
+> > > 95903714 20860256 35991552 152755522 91add42 vmlinux
+> > Hello Denys
+> > 
+> > While removing unnecessary inlines is generally a
+> > good thing, for extremely low power embedded systems
+> > like a coin-battery operated bicycle computer or a
+> > heart rate monitor, this might cause a throughput
+> > reduction.
+> Todays CPUs can push several GB/s over, say, Ethernet.
+> BT is 2.4 MB/s, tops.
+> Therefore total CPU time spent preparing BT I/O must be
+> in the 0.1% ballpark. (Meaning, if we would have a magical
+> infinitely fast CPU, throughput would possibly increase
+> by about 0.1%). How much do you think this deinlining patch
+> can possibly hurt here?
 
-> From: Marcel Holtmann [mailto:marcel@holtmann.org]
-> Sent: Friday, April 08, 2016 10:40 PM
-> To: Amitkumar Karwar
-> Cc: linux-bluetooth@vger.kernel.org; Nishant Sarmukadam;
-> wnhuang@chromium.com; devicetree@vger.kernel.org; linux-
-> kernel@vger.kernel.org; Xinming Hu
-> Subject: Re: [PATCH v6 2/2] btmrvl: add platform specific wakeup
-> interrupt support
->=20
-> Hi Amitkumar,
->=20
-> > On some arm-based platforms, we need to configure platform specific
-> > parameters by device tree node and we need define our node as a child
-> > node of parent SDIO host controller.
-> > This patch parses these parameters from device tree. It includes
-> > calibration data download to firmware, wakeup pin configured to
-> > firmware, and soc specific wakeup interrupt pin.
-> >
-> > Signed-off-by: Xinming Hu <huxm@marvell.com>
-> > Signed-off-by: Amitkumar Karwar <akarwar@marvell.com>
-> > ---
-> > drivers/bluetooth/btmrvl_drv.h  | 11 ++++++
-> > drivers/bluetooth/btmrvl_main.c | 33 +++++++++--------
-> > drivers/bluetooth/btmrvl_sdio.c | 79
-> > +++++++++++++++++++++++++++++++++++++++++
-> > drivers/bluetooth/btmrvl_sdio.h |  6 ++++
-> > 4 files changed, 115 insertions(+), 14 deletions(-)
-> >
-> > diff --git a/drivers/bluetooth/btmrvl_drv.h
-> > b/drivers/bluetooth/btmrvl_drv.h index 0590473..f742384 100644
-> > --- a/drivers/bluetooth/btmrvl_drv.h
-> > +++ b/drivers/bluetooth/btmrvl_drv.h
-> > @@ -23,6 +23,17 @@
-> > #include <linux/bitops.h>
-> > #include <linux/slab.h>
-> > #include <net/bluetooth/bluetooth.h>
-> > +#include <linux/err.h>
-> > +#include <linux/gpio.h>
-> > +#include <linux/gfp.h>
-> > +#include <linux/interrupt.h>
-> > +#include <linux/io.h>
-> > +#include <linux/of_gpio.h>
-> > +#include <linux/of_platform.h>
-> > +#include <linux/platform_device.h>
-> > +#include <linux/pm_runtime.h>
-> > +#include <linux/slab.h>
-> > +#include <linux/of_irq.h>
-> >
-> > #define BTM_HEADER_LEN			4
-> > #define BTM_UPLD_SIZE			2312
-> > diff --git a/drivers/bluetooth/btmrvl_main.c
-> > b/drivers/bluetooth/btmrvl_main.c index f25a825..25343ef 100644
-> > --- a/drivers/bluetooth/btmrvl_main.c
-> > +++ b/drivers/bluetooth/btmrvl_main.c
-> > @@ -510,34 +510,39 @@ static int btmrvl_download_cal_data(struct
-> > btmrvl_private *priv, static int btmrvl_check_device_tree(struct
-> > btmrvl_private *priv) {
-> > 	struct device_node *dt_node;
-> > +	struct btmrvl_sdio_card *card =3D priv->btmrvl_dev.card;
-> > 	u8 cal_data[BT_CAL_HDR_LEN + BT_CAL_DATA_SIZE];
-> > -	int ret;
-> > -	u32 val;
-> > +	int ret =3D 0;
-> > +	u16 gpio, gap;
-> > +
-> > +	if (card->plt_of_node) {
-> > +		dt_node =3D card->plt_of_node;
-> > +		ret =3D of_property_read_u16(dt_node, "btmrvl,wakeup-pin",
-> > +					   &gpio);
-> > +		if (ret)
-> > +			gpio =3D (priv->btmrvl_dev.gpio_gap & 0xff00) >> 8;
-> > +
-> > +		ret =3D of_property_read_u16(dt_node, "btmrvl,wakeup-gap",
-> > +					   &gap);
-> > +		if (ret)
-> > +			gap =3D (u8)(priv->btmrvl_dev.gpio_gap & 0x00ff);
-> >
-> > -	for_each_compatible_node(dt_node, NULL, "btmrvl,cfgdata") {
-> > -		ret =3D of_property_read_u32(dt_node, "btmrvl,gpio-gap",
-> &val);
-> > -		if (!ret)
-> > -			priv->btmrvl_dev.gpio_gap =3D val;
-> > +		priv->btmrvl_dev.gpio_gap =3D (gpio << 8) + gap;
-> >
-> > 		ret =3D of_property_read_u8_array(dt_node, "btmrvl,cal-data",
-> > 						cal_data + BT_CAL_HDR_LEN,
-> > 						BT_CAL_DATA_SIZE);
-> > -		if (ret) {
-> > -			of_node_put(dt_node);
-> > +		if (ret)
-> > 			return ret;
-> > -		}
-> >
-> > 		BT_DBG("Use cal data from device tree");
-> > 		ret =3D btmrvl_download_cal_data(priv, cal_data,
-> > 					       BT_CAL_DATA_SIZE);
-> > -		if (ret) {
-> > +		if (ret)
-> > 			BT_ERR("Fail to download calibrate data");
-> > -			of_node_put(dt_node);
-> > -			return ret;
-> > -		}
-> > 	}
-> >
-> > -	return 0;
-> > +	return ret;
-> > }
-> >
-> > static int btmrvl_setup(struct hci_dev *hdev) diff --git
-> > a/drivers/bluetooth/btmrvl_sdio.c b/drivers/bluetooth/btmrvl_sdio.c
-> > index 6ed8acf..c714040 100644
-> > --- a/drivers/bluetooth/btmrvl_sdio.c
-> > +++ b/drivers/bluetooth/btmrvl_sdio.c
-> > @@ -52,6 +52,68 @@ static struct memory_type_mapping
-> mem_type_mapping_tbl[] =3D {
-> > 	{"EXTLAST", NULL, 0, 0xFE},
-> > };
-> >
-> > +static const struct of_device_id btmrvl_sdio_of_match_table[] =3D {
-> > +	{ .compatible =3D "marvell,sd8897-bt" },
-> > +	{ .compatible =3D "marvell,sd8997-bt" },
-> > +	{ }
-> > +};
->=20
-> is this agreed upon by the DT maintainer? I only want to merge this
-> patch if we have agreement.
->=20
+Today's extremely low power ARM chips that run
+at a couple dozen MHz
+cannot push gigabit speeds.
 
-Please hold on for this patch. Rob Herring had suggested to use Linux kerne=
-l's generic wake irq handling. We found out it's not suitable for us. We wi=
-ll discuss it with Rob.
+> > Can you please also show the size decrease when done
+> > with a defconfig with bluetooth support?
+> > 
+> > And for these types of patches in general, please
+> > add a defconfig size reduction to the commit message.
+> Okay, will do in the future.
+> 
+> > 
+> > This is an x86-64 defconfig with bluetooth with and
+> > without this patch:
+> > 
+> > $ size vmlinux.defconfig.*
+> >    text    data     bss     dec     hex filename
+> > 10214414        4313816 1097728 15625958         ee6ee6 vmlinux.defconfig.new
+> > 10224014        4313816 1097728 15635558         ee9466 vmlinux.defconfig.old
+> > 
+> > ~10k total
+> Looks good, right?
 
-Regards,
-Amitkumar
+Size reductions are generally good.
+
+The one function that might be appropriate to leave inline
+is perhaps hci_conn_hash_lookup_handle.  Dunno.
+
+It's be good to test though.
+
