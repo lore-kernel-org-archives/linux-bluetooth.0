@@ -1,30 +1,29 @@
-Return-Path: <linux-kernel-owner@vger.kernel.org>
-Message-ID: <570D1D9A.6030808@redhat.com>
-Date: Tue, 12 Apr 2016 18:08:58 +0200
-From: Denys Vlasenko <dvlasenk@redhat.com>
-MIME-Version: 1.0
-To: Joe Perches <joe@perches.com>,
-	Johan Hedberg <johan.hedberg@intel.com>
-CC: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] Bluetooth: Deinline large functions
-References: <1460399665-19626-1-git-send-email-dvlasenk@redhat.com> <1460433018.2507.1.camel@perches.com>
-In-Reply-To: <1460433018.2507.1.camel@perches.com>
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-kernel-owner@vger.kernel.org
+Return-Path: <netdev-owner@vger.kernel.org>
+Date: Tue, 12 Apr 2016 11:58:16 -0400 (EDT)
+Message-Id: <20160412.115816.674950615229727734.davem@davemloft.net>
+To: johan.hedberg@gmail.com
+Cc: netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Subject: Re: pull request: bluetooth-next 2016-04-12
+From: David Miller <davem@davemloft.net>
+In-Reply-To: <20160412080815.GA17516@t440s>
+References: <20160412080815.GA17516@t440s>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Sender: netdev-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 04/12/2016 05:50 AM, Joe Perches wrote:
-> On Mon, 2016-04-11 at 20:34 +0200, Denys Vlasenko wrote:
->> Fastest existing Bluetooth standard's top speed is 2.4 MB/s.
->> It is way off from being CPU limited, no need to squeeze
->> last few cycles by excessive inlining.
->>
->> Size reduction is about 40k:
->>
->>     text     data      bss       dec     hex filename
->> 95943139 20860256 35991552 152794947 91b7743 vmlinux_before
->> 95903714 20860256 35991552 152755522 91add42 vmlinux
-> 
-> defconfig?
+From: Johan Hedberg <johan.hedberg@gmail.com>
+Date: Tue, 12 Apr 2016 11:08:15 +0300
 
-In defconfig, CONFIG_BT is not set, so there will be no change
+> Here's a set of Bluetooth & 802.15.4 patches intended for the 4.7 kernel:
+> 
+>  - Fix for race condition in vhci driver
+>  - Memory leak fix for ieee802154/adf7242 driver
+>  - Improvements to deal with single-mode (LE-only) Bluetooth controllers
+>  - Fix for allowing the BT_SECURITY_FIPS security level
+>  - New BCM2E71 ACPI ID
+>  - NULL pointer dereference fix fox hci_ldisc driver
+> 
+> Let me know if there are any issues pulling. Thanks.
+
+Pulled, thanks Johan.
