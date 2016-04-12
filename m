@@ -1,72 +1,121 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Amitkumar Karwar <akarwar@marvell.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-CC: Ganapathi Bhat <gbhat@marvell.com>
-Subject: RE: [PATCH v7] Bluetooth: hci_uart: Support firmware download for
- Marvell
-Date: Tue, 12 Apr 2016 14:57:52 +0000
-Message-ID: <dbff88372c89421b9568ad3d32aa283d@SC-EXCH04.marvell.com>
-References: <1459845266-2771-1-git-send-email-akarwar@marvell.com>
-In-Reply-To: <1459845266-2771-1-git-send-email-akarwar@marvell.com>
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v3] core/device: Fix breakage of Bluetooth pairing
+Date: Tue, 12 Apr 2016 11:48:27 +0300
+Message-Id: <1460450907-25723-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+From: Jakub Pawlowski <jpawlowski@chromium.org>
 
-> From: Amitkumar Karwar [mailto:akarwar@marvell.com]
-> Sent: Tuesday, April 05, 2016 2:04 PM
-> To: linux-bluetooth@vger.kernel.org
-> Cc: linux-kernel@vger.kernel.org; Ganapathi Bhat; Amitkumar Karwar
-> Subject: [PATCH v7] Bluetooth: hci_uart: Support firmware download for
-> Marvell
-> 
-> From: Ganapathi Bhat <gbhat@marvell.com>
-> 
-> This patch implement firmware download feature for Marvell Bluetooth
-> devices. If firmware is already downloaded, it will skip downloading.
-> 
-> Signed-off-by: Ganapathi Bhat <gbhat@marvell.com>
-> Signed-off-by: Amitkumar Karwar <akarwar@marvell.com>
-> ---
-> v2: Fixed compilation warning reported by kbuild test robot
-> v3: Addressed review comments from Marcel Holtmann
->     a) Removed vendor specific code from hci_ldisc.c
->     b) Get rid of static forward declaration
->     c) Removed unnecessary heavy nesting
->     d) Git rid of module parameter and global variables
->     e) Add logic to pick right firmware image
-> v4: Addresses review comments from Alan
->     a) Use existing kernel helper APIs instead of writing own.
->     b) Replace mdelay() with msleep()
-> v5: Addresses review comments from Loic Poulain
->     a) Use bt_dev_err/warn/dbg helpers insted of BT_ERR/WARN/DBG
->     b) Used static functions where required and removed forward
-> delcarations
->     c) Edited comments for the function hci_uart_recv_data
->     d) Made HCI_UART_DNLD_FW flag a part of driver private data
-> v6: Addresses review comments from Loic Poulain
->     a) Used skb instead of array to store firmware data during download
->     b) Used hci_uart_tx_wakeup and enqueued packets instead of tty write
->     c) Used GFP_KERNEL instead of GFP_ATOMIC
-> v7: Edited Kconfig to add dependency for BT_HCIUART_H4. The change
-> resolves
->     errors reported by kbuild test robot.
-> ---
->  drivers/bluetooth/Kconfig     |  11 +
->  drivers/bluetooth/Makefile    |   1 +
->  drivers/bluetooth/btmrvl.h    |  43 ++++
->  drivers/bluetooth/hci_ldisc.c |   6 +
->  drivers/bluetooth/hci_mrvl.c  | 568
-> ++++++++++++++++++++++++++++++++++++++++++
->  drivers/bluetooth/hci_uart.h  |   8 +-
->  6 files changed, 636 insertions(+), 1 deletion(-)  create mode 100644
-> drivers/bluetooth/btmrvl.h  create mode 100644
-> drivers/bluetooth/hci_mrvl.c
-> 
+This patch converts old propertis containing list of services available
+on remote devices. Without that previously paired devices, i.e.
+keyboards, will not work properly.
+---
+v2: Convert the old entries to Services deleting the entries in the process
+v3: Save the contents on file
+ src/device.c | 73 +++++++++++++++++++++++++++++++++++++++++++++++-------------
+ 1 file changed, 58 insertions(+), 15 deletions(-)
 
-Could you please take this patch if there are no further comments/suggestions?
+diff --git a/src/device.c b/src/device.c
+index 0d46eba..14ddc6b 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -2697,6 +2697,61 @@ fail:
+ 	return NULL;
+ }
+ 
++static void load_services(struct btd_device *device, char **uuids)
++{
++	char **uuid;
++
++	for (uuid = uuids; *uuid; uuid++) {
++		if (g_slist_find_custom(device->uuids, *uuid, bt_uuid_strcmp))
++			continue;
++
++		device->uuids = g_slist_insert_sorted(device->uuids,
++							g_strdup(*uuid),
++							bt_uuid_strcmp);
++	}
++
++	g_strfreev(uuids);
++}
++
++static void convert_info(struct btd_device *device, GKeyFile *key_file)
++{
++	char filename[PATH_MAX];
++	char adapter_addr[18];
++	char device_addr[18];
++	char **uuids;
++	char *str;
++	gsize length = 0;
++
++	/* Load device profile list from legacy properties */
++	uuids = g_key_file_get_string_list(key_file, "General", "SDPServices",
++								NULL, NULL);
++	if (uuids)
++		load_services(device, uuids);
++
++	uuids = g_key_file_get_string_list(key_file, "General", "GATTServices",
++								NULL, NULL);
++	if (uuids)
++		load_services(device, uuids);
++
++	if (!device->uuids)
++		return;
++
++	/* Remove old entries so they are not loaded again */
++	g_key_file_remove_key(key_file, "General", "SDPServices", NULL);
++	g_key_file_remove_key(key_file, "General", "GATTServices", NULL);
++
++	ba2str(btd_adapter_get_address(device->adapter), adapter_addr);
++	ba2str(&device->bdaddr, device_addr);
++	snprintf(filename, PATH_MAX, STORAGEDIR "/%s/%s/info", adapter_addr,
++			device_addr);
++
++	str = g_key_file_to_data(key_file, &length, NULL);
++	g_file_set_contents(filename, str, length, NULL);
++	g_free(str);
++
++	store_device_info(device);
++}
++
+ static void load_info(struct btd_device *device, const char *local,
+ 			const char *peer, GKeyFile *key_file)
+ {
+@@ -2793,21 +2848,7 @@ next:
+ 	uuids = g_key_file_get_string_list(key_file, "General", "Services",
+ 						NULL, NULL);
+ 	if (uuids) {
+-		char **uuid;
+-
+-		for (uuid = uuids; *uuid; uuid++) {
+-			GSList *match;
+-
+-			match = g_slist_find_custom(device->uuids, *uuid,
+-							bt_uuid_strcmp);
+-			if (match)
+-				continue;
+-
+-			device->uuids = g_slist_insert_sorted(device->uuids,
+-								g_strdup(*uuid),
+-								bt_uuid_strcmp);
+-		}
+-		g_strfreev(uuids);
++		load_services(device, uuids);
+ 
+ 		/* Discovered services restored from storage */
+ 		device->bredr_state.svc_resolved = true;
+@@ -3528,6 +3569,8 @@ struct btd_device *device_create_from_storage(struct btd_adapter *adapter,
+ 	src = btd_adapter_get_address(adapter);
+ 	ba2str(src, srcaddr);
+ 
++	convert_info(device, key_file);
++
+ 	load_info(device, srcaddr, address, key_file);
+ 	load_att_info(device, srcaddr, address);
+ 
+-- 
+2.5.0
 
-Regards,
-Amitkumar
