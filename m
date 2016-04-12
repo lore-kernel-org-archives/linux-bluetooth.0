@@ -1,29 +1,72 @@
-Return-Path: <netdev-owner@vger.kernel.org>
-Date: Tue, 12 Apr 2016 11:58:16 -0400 (EDT)
-Message-Id: <20160412.115816.674950615229727734.davem@davemloft.net>
-To: johan.hedberg@gmail.com
-Cc: netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Subject: Re: pull request: bluetooth-next 2016-04-12
-From: David Miller <davem@davemloft.net>
-In-Reply-To: <20160412080815.GA17516@t440s>
-References: <20160412080815.GA17516@t440s>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Sender: netdev-owner@vger.kernel.org
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Amitkumar Karwar <akarwar@marvell.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+CC: Ganapathi Bhat <gbhat@marvell.com>
+Subject: RE: [PATCH v7] Bluetooth: hci_uart: Support firmware download for
+ Marvell
+Date: Tue, 12 Apr 2016 14:57:52 +0000
+Message-ID: <dbff88372c89421b9568ad3d32aa283d@SC-EXCH04.marvell.com>
+References: <1459845266-2771-1-git-send-email-akarwar@marvell.com>
+In-Reply-To: <1459845266-2771-1-git-send-email-akarwar@marvell.com>
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@gmail.com>
-Date: Tue, 12 Apr 2016 11:08:15 +0300
+Hi Marcel,
 
-> Here's a set of Bluetooth & 802.15.4 patches intended for the 4.7 kernel:
+> From: Amitkumar Karwar [mailto:akarwar@marvell.com]
+> Sent: Tuesday, April 05, 2016 2:04 PM
+> To: linux-bluetooth@vger.kernel.org
+> Cc: linux-kernel@vger.kernel.org; Ganapathi Bhat; Amitkumar Karwar
+> Subject: [PATCH v7] Bluetooth: hci_uart: Support firmware download for
+> Marvell
 > 
->  - Fix for race condition in vhci driver
->  - Memory leak fix for ieee802154/adf7242 driver
->  - Improvements to deal with single-mode (LE-only) Bluetooth controllers
->  - Fix for allowing the BT_SECURITY_FIPS security level
->  - New BCM2E71 ACPI ID
->  - NULL pointer dereference fix fox hci_ldisc driver
+> From: Ganapathi Bhat <gbhat@marvell.com>
 > 
-> Let me know if there are any issues pulling. Thanks.
+> This patch implement firmware download feature for Marvell Bluetooth
+> devices. If firmware is already downloaded, it will skip downloading.
+> 
+> Signed-off-by: Ganapathi Bhat <gbhat@marvell.com>
+> Signed-off-by: Amitkumar Karwar <akarwar@marvell.com>
+> ---
+> v2: Fixed compilation warning reported by kbuild test robot
+> v3: Addressed review comments from Marcel Holtmann
+>     a) Removed vendor specific code from hci_ldisc.c
+>     b) Get rid of static forward declaration
+>     c) Removed unnecessary heavy nesting
+>     d) Git rid of module parameter and global variables
+>     e) Add logic to pick right firmware image
+> v4: Addresses review comments from Alan
+>     a) Use existing kernel helper APIs instead of writing own.
+>     b) Replace mdelay() with msleep()
+> v5: Addresses review comments from Loic Poulain
+>     a) Use bt_dev_err/warn/dbg helpers insted of BT_ERR/WARN/DBG
+>     b) Used static functions where required and removed forward
+> delcarations
+>     c) Edited comments for the function hci_uart_recv_data
+>     d) Made HCI_UART_DNLD_FW flag a part of driver private data
+> v6: Addresses review comments from Loic Poulain
+>     a) Used skb instead of array to store firmware data during download
+>     b) Used hci_uart_tx_wakeup and enqueued packets instead of tty write
+>     c) Used GFP_KERNEL instead of GFP_ATOMIC
+> v7: Edited Kconfig to add dependency for BT_HCIUART_H4. The change
+> resolves
+>     errors reported by kbuild test robot.
+> ---
+>  drivers/bluetooth/Kconfig     |  11 +
+>  drivers/bluetooth/Makefile    |   1 +
+>  drivers/bluetooth/btmrvl.h    |  43 ++++
+>  drivers/bluetooth/hci_ldisc.c |   6 +
+>  drivers/bluetooth/hci_mrvl.c  | 568
+> ++++++++++++++++++++++++++++++++++++++++++
+>  drivers/bluetooth/hci_uart.h  |   8 +-
+>  6 files changed, 636 insertions(+), 1 deletion(-)  create mode 100644
+> drivers/bluetooth/btmrvl.h  create mode 100644
+> drivers/bluetooth/hci_mrvl.c
+> 
 
-Pulled, thanks Johan.
+Could you please take this patch if there are no further comments/suggestions?
+
+Regards,
+Amitkumar
