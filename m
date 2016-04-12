@@ -1,56 +1,76 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Message-ID: <570D22DD.2010109@redhat.com>
-Date: Tue, 12 Apr 2016 18:31:25 +0200
-From: Denys Vlasenko <dvlasenk@redhat.com>
-MIME-Version: 1.0
-To: Joe Perches <joe@perches.com>,
-	Johan Hedberg <johan.hedberg@intel.com>
-CC: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] Bluetooth: Deinline large functions
-References: <1460399665-19626-1-git-send-email-dvlasenk@redhat.com>	 <1460433018.2507.1.camel@perches.com> <570D1D9A.6030808@redhat.com> <1460477690.2507.5.camel@perches.com>
-In-Reply-To: <1460477690.2507.5.camel@perches.com>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
+Subject: Re: [PATCH v7] Bluetooth: hci_uart: Support firmware download for Marvell
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <dbff88372c89421b9568ad3d32aa283d@SC-EXCH04.marvell.com>
+Date: Tue, 12 Apr 2016 18:17:44 +0200
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Ganapathi Bhat <gbhat@marvell.com>
+Message-Id: <DEE89AB2-038B-4C0D-A06C-0A72351DD2EC@holtmann.org>
+References: <1459845266-2771-1-git-send-email-akarwar@marvell.com> <dbff88372c89421b9568ad3d32aa283d@SC-EXCH04.marvell.com>
+To: Amitkumar Karwar <akarwar@marvell.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 04/12/2016 06:14 PM, Joe Perches wrote:
-> On Tue, 2016-04-12 at 18:08 +0200, Denys Vlasenko wrote:
->> On 04/12/2016 05:50 AM, Joe Perches wrote:
->>>
->>> On Mon, 2016-04-11 at 20:34 +0200, Denys Vlasenko wrote:
->>>>
->>>> Fastest existing Bluetooth standard's top speed is 2.4 MB/s.
->>>> It is way off from being CPU limited, no need to squeeze
->>>> last few cycles by excessive inlining.
->>>>
->>>> Size reduction is about 40k:
->>>>
->>>>     text     data      bss       dec     hex filename
->>>> 95943139 20860256 35991552 152794947 91b7743 vmlinux_before
->>>> 95903714 20860256 35991552 152755522 91add42 vmlinux
->>> defconfig?
->> In defconfig, CONFIG_BT is not set, so there will be no change
+Hi Amitkumar,
+
+>> From: Amitkumar Karwar [mailto:akarwar@marvell.com]
+>> Sent: Tuesday, April 05, 2016 2:04 PM
+>> To: linux-bluetooth@vger.kernel.org
+>> Cc: linux-kernel@vger.kernel.org; Ganapathi Bhat; Amitkumar Karwar
+>> Subject: [PATCH v7] Bluetooth: hci_uart: Support firmware download for
+>> Marvell
+>> 
+>> From: Ganapathi Bhat <gbhat@marvell.com>
+>> 
+>> This patch implement firmware download feature for Marvell Bluetooth
+>> devices. If firmware is already downloaded, it will skip downloading.
+>> 
+>> Signed-off-by: Ganapathi Bhat <gbhat@marvell.com>
+>> Signed-off-by: Amitkumar Karwar <akarwar@marvell.com>
+>> ---
+>> v2: Fixed compilation warning reported by kbuild test robot
+>> v3: Addressed review comments from Marcel Holtmann
+>>    a) Removed vendor specific code from hci_ldisc.c
+>>    b) Get rid of static forward declaration
+>>    c) Removed unnecessary heavy nesting
+>>    d) Git rid of module parameter and global variables
+>>    e) Add logic to pick right firmware image
+>> v4: Addresses review comments from Alan
+>>    a) Use existing kernel helper APIs instead of writing own.
+>>    b) Replace mdelay() with msleep()
+>> v5: Addresses review comments from Loic Poulain
+>>    a) Use bt_dev_err/warn/dbg helpers insted of BT_ERR/WARN/DBG
+>>    b) Used static functions where required and removed forward
+>> delcarations
+>>    c) Edited comments for the function hci_uart_recv_data
+>>    d) Made HCI_UART_DNLD_FW flag a part of driver private data
+>> v6: Addresses review comments from Loic Poulain
+>>    a) Used skb instead of array to store firmware data during download
+>>    b) Used hci_uart_tx_wakeup and enqueued packets instead of tty write
+>>    c) Used GFP_KERNEL instead of GFP_ATOMIC
+>> v7: Edited Kconfig to add dependency for BT_HCIUART_H4. The change
+>> resolves
+>>    errors reported by kbuild test robot.
+>> ---
+>> drivers/bluetooth/Kconfig     |  11 +
+>> drivers/bluetooth/Makefile    |   1 +
+>> drivers/bluetooth/btmrvl.h    |  43 ++++
+>> drivers/bluetooth/hci_ldisc.c |   6 +
+>> drivers/bluetooth/hci_mrvl.c  | 568
+>> ++++++++++++++++++++++++++++++++++++++++++
+>> drivers/bluetooth/hci_uart.h  |   8 +-
+>> 6 files changed, 636 insertions(+), 1 deletion(-)  create mode 100644
+>> drivers/bluetooth/btmrvl.h  create mode 100644
+>> drivers/bluetooth/hci_mrvl.c
+>> 
 > 
-> Which is why I set it in the defconfig size I sent.
+> Could you please take this patch if there are no further comments/suggestions?
 
-I deleted "# CONFIG_BT is not set" in my .config,
-then reran "make oldconfig" and answered "yes" to all questions.
+didn't I see a kbot build warning for this version as well? Or was that the previous version?
 
-The result is:
+Regards
 
-    text    data     bss      dec    hex filename
-10587382 4369552 1097728 16054662 f4f986 vmlinux_before
-10575926 4369552 1097728 16043206 f4ccc6 vmlinux
+Marcel
 
-> Also, you haven't responded at all to any performance decrease
-> by uninline for low power/low frequency SOC embedded uses.
-
-I think the performance will be the same, since BT
-is a quite slow protocol as it is, it is unlikely to be CPU bound
-(or more precisely, you'd need something like 10 MHz CPU
-to be CPU bound with BT).
-
-The lowest power device with BT I have is a smartphone,
-a Samsung S5 mini with quad-core 1.4 GHz Exynos 3 CPU.
-It will be 2 years old soon.
-This is what passes for "low power devices" these days.
