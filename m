@@ -1,121 +1,106 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v3] core/device: Fix breakage of Bluetooth pairing
-Date: Tue, 12 Apr 2016 11:48:27 +0300
-Message-Id: <1460450907-25723-1-git-send-email-luiz.dentz@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <netdev-owner@vger.kernel.org>
+Date: Tue, 12 Apr 2016 11:08:15 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Subject: pull request: bluetooth-next 2016-04-12
+Message-ID: <20160412080815.GA17516@t440s>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="Q68bSM7Ycu6FN28Q"
+Sender: netdev-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Jakub Pawlowski <jpawlowski@chromium.org>
 
-This patch converts old propertis containing list of services available
-on remote devices. Without that previously paired devices, i.e.
-keyboards, will not work properly.
----
-v2: Convert the old entries to Services deleting the entries in the process
-v3: Save the contents on file
- src/device.c | 73 +++++++++++++++++++++++++++++++++++++++++++++++-------------
- 1 file changed, 58 insertions(+), 15 deletions(-)
+--Q68bSM7Ycu6FN28Q
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-diff --git a/src/device.c b/src/device.c
-index 0d46eba..14ddc6b 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -2697,6 +2697,61 @@ fail:
- 	return NULL;
- }
- 
-+static void load_services(struct btd_device *device, char **uuids)
-+{
-+	char **uuid;
-+
-+	for (uuid = uuids; *uuid; uuid++) {
-+		if (g_slist_find_custom(device->uuids, *uuid, bt_uuid_strcmp))
-+			continue;
-+
-+		device->uuids = g_slist_insert_sorted(device->uuids,
-+							g_strdup(*uuid),
-+							bt_uuid_strcmp);
-+	}
-+
-+	g_strfreev(uuids);
-+}
-+
-+static void convert_info(struct btd_device *device, GKeyFile *key_file)
-+{
-+	char filename[PATH_MAX];
-+	char adapter_addr[18];
-+	char device_addr[18];
-+	char **uuids;
-+	char *str;
-+	gsize length = 0;
-+
-+	/* Load device profile list from legacy properties */
-+	uuids = g_key_file_get_string_list(key_file, "General", "SDPServices",
-+								NULL, NULL);
-+	if (uuids)
-+		load_services(device, uuids);
-+
-+	uuids = g_key_file_get_string_list(key_file, "General", "GATTServices",
-+								NULL, NULL);
-+	if (uuids)
-+		load_services(device, uuids);
-+
-+	if (!device->uuids)
-+		return;
-+
-+	/* Remove old entries so they are not loaded again */
-+	g_key_file_remove_key(key_file, "General", "SDPServices", NULL);
-+	g_key_file_remove_key(key_file, "General", "GATTServices", NULL);
-+
-+	ba2str(btd_adapter_get_address(device->adapter), adapter_addr);
-+	ba2str(&device->bdaddr, device_addr);
-+	snprintf(filename, PATH_MAX, STORAGEDIR "/%s/%s/info", adapter_addr,
-+			device_addr);
-+
-+	str = g_key_file_to_data(key_file, &length, NULL);
-+	g_file_set_contents(filename, str, length, NULL);
-+	g_free(str);
-+
-+	store_device_info(device);
-+}
-+
- static void load_info(struct btd_device *device, const char *local,
- 			const char *peer, GKeyFile *key_file)
- {
-@@ -2793,21 +2848,7 @@ next:
- 	uuids = g_key_file_get_string_list(key_file, "General", "Services",
- 						NULL, NULL);
- 	if (uuids) {
--		char **uuid;
--
--		for (uuid = uuids; *uuid; uuid++) {
--			GSList *match;
--
--			match = g_slist_find_custom(device->uuids, *uuid,
--							bt_uuid_strcmp);
--			if (match)
--				continue;
--
--			device->uuids = g_slist_insert_sorted(device->uuids,
--								g_strdup(*uuid),
--								bt_uuid_strcmp);
--		}
--		g_strfreev(uuids);
-+		load_services(device, uuids);
- 
- 		/* Discovered services restored from storage */
- 		device->bredr_state.svc_resolved = true;
-@@ -3528,6 +3569,8 @@ struct btd_device *device_create_from_storage(struct btd_adapter *adapter,
- 	src = btd_adapter_get_address(adapter);
- 	ba2str(src, srcaddr);
- 
-+	convert_info(device, key_file);
-+
- 	load_info(device, srcaddr, address, key_file);
- 	load_att_info(device, srcaddr, address);
- 
--- 
-2.5.0
+Hi Dave,
 
+Here's a set of Bluetooth & 802.15.4 patches intended for the 4.7 kernel:
+
+ - Fix for race condition in vhci driver
+ - Memory leak fix for ieee802154/adf7242 driver
+ - Improvements to deal with single-mode (LE-only) Bluetooth controllers
+ - Fix for allowing the BT_SECURITY_FIPS security level
+ - New BCM2E71 ACPI ID
+ - NULL pointer dereference fix fox hci_ldisc driver
+
+Let me know if there are any issues pulling. Thanks.
+
+Johan
+
+----
+The following changes since commit 9ef280c6c28f0c01aa9d909263ad47c796713a8e:
+
+  irda: sh_irda: remove driver (2016-04-04 16:24:13 -0400)
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git for-upstream
+
+for you to fetch changes up to 8805eea2494a2837983bc4aaaf6842c89666ec25:
+
+  Bluetooth: hci_bcsp: fix code style (2016-04-08 23:01:36 +0200)
+
+----------------------------------------------------------------
+Alexander Aring (1):
+      6lowpan: iphc: fix handling of link-local compression
+
+Jiri Slaby (2):
+      Bluetooth: vhci: fix open_timeout vs. hdev race
+      Bluetooth: vhci: purge unhandled skbs
+
+Johan Hedberg (2):
+      Bluetooth: Fix setting NO_BREDR advertising flag
+      Bluetooth: Ignore unknown advertising packet types
+
+Loic Poulain (2):
+      Bluetooth: hci_bcm: Add BCM2E71 ACPI ID
+      Bluetooth: hci_ldisc: Fix null pointer derefence in case of early data
+
+Maxim Zhukov (1):
+      Bluetooth: hci_bcsp: fix code style
+
+Patrik Flykt (1):
+      Bluetooth: Allow setting BT_SECURITY_FIPS with setsockopt
+
+Sudip Mukherjee (1):
+      ieee802154/adf7242: fix memory leak of firmware
+
+ drivers/bluetooth/hci_bcm.c      |  1 +
+ drivers/bluetooth/hci_bcsp.c     | 57 +++++++++++++++++++++++++++++++--------------------------
+ drivers/bluetooth/hci_ldisc.c    | 11 +++++++----
+ drivers/bluetooth/hci_uart.h     |  1 +
+ drivers/bluetooth/hci_vhci.c     |  9 ++++++---
+ drivers/net/ieee802154/adf7242.c |  2 ++
+ net/6lowpan/iphc.c               | 11 +++++++++--
+ net/bluetooth/hci_event.c        | 13 +++++++++++++
+ net/bluetooth/hci_request.c      |  6 +++---
+ net/bluetooth/l2cap_sock.c       |  2 +-
+ 10 files changed, 74 insertions(+), 39 deletions(-)
+
+
+--Q68bSM7Ycu6FN28Q
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBAgAGBQJXDKzvAAoJECQj9vv5qNQS1P8QAK+6mw7f5n9M6zNchFYuCsA2
+KzFc2jmGUbIsw31ZKCyps0eQpUe01RWuM67wnvjBdRaOjVI+82l3QKdHU8A7xmo8
+RIkEoKpMIXwpN6R5W9DOvT/LVEvttMmMl4nHdpUWWKyDXLII4DSpdDmw+CSqn7gk
+7zvypSHVh8JSKkbySciTS82CqeveaU93peY6OovnzBU+nIQn3ru+mrZ3mx9H45t0
+hu/gfECJTQmTtG31iWH6KH+8NSTcx5BILiXSJl4Rsk07+l2xRQDKQdylUylXIi2o
+n7lpoaxVI5hVP1SQUr47t56nZZwIOLEWc2qE0MLQVs2PJ8kMSC43ZETkb9yFDPGm
+G3bp3RmCXoyYrQApVx3TMBsViJjJw0JbqaK784M+BqQNgOu0e2w1dEZ52rRiyirs
+Y0Vy7dQKtYGefb16//g78af9LaY4Tv+DqSfE7YkccVg/OZAVkVQ0FpJhF3WUIk5Z
+9mO8nlgus1wTHKki9IHVVxU+b3vUQxx4XQUOxj2oNb7xV/nfMTB0AwD9PvrqZXAw
+NyOoCBBUfQok3VUfEEjRrBTKolemCMt0zvlDWYChouBJpfsWGhZ4bD6+pRFJREZj
+u4g2kdZAvlQWzPKk0IZM6d44dZtIZB6tWhu+B+VF8syxTNhwed7oIHDSIzfRpjCA
+2DHcZW/Qp7tKF/Crvey0
+=Lq87
+-----END PGP SIGNATURE-----
+
+--Q68bSM7Ycu6FN28Q--
