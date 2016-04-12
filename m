@@ -1,29 +1,30 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Date: Tue, 12 Apr 2016 00:03:25 -0400
-From: Kyle McMartin <kyle@infradead.org>
-To: Tedd Ho-Jeong An <tedd.an@intel.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	linux-firmware@kernel.org
-Subject: Re: [PATCH] linux-firmware: Update firmware patch for Intel
- Bluetooth 7265 (D1)
-Message-ID: <20160412040325.GC27777@merlin.infradead.org>
-References: <20160408145535.32135aee@fedora-linux-22.shared>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20160408145535.32135aee@fedora-linux-22.shared>
+Message-ID: <1460433018.2507.1.camel@perches.com>
+Subject: Re: [PATCH v2] Bluetooth: Deinline large functions
+From: Joe Perches <joe@perches.com>
+To: Denys Vlasenko <dvlasenk@redhat.com>,
+	Johan Hedberg <johan.hedberg@intel.com>
+Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Date: Mon, 11 Apr 2016 20:50:18 -0700
+In-Reply-To: <1460399665-19626-1-git-send-email-dvlasenk@redhat.com>
+References: <1460399665-19626-1-git-send-email-dvlasenk@redhat.com>
+Content-Type: text/plain; charset="ISO-8859-1"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, Apr 08, 2016 at 02:55:35PM -0700, Tedd Ho-Jeong An wrote:
-> From: Tedd Ho-Jeong An <tedd.an@intel.com>
-> 
-> This patch updates the firmware patch for Intel Bluetooth 7265 (D1)
-> Also, this device is known as Intel StP D1
-> 
-> StP D1 FW Patch Version: 18
-> 
-> Release Version: 18.16
-> 
-> Signed-off-by: Tedd Ho-Jeong An <tedd.an@intel.com>
+On Mon, 2016-04-11 at 20:34 +0200, Denys Vlasenko wrote:
+> Fastest existing Bluetooth standard's top speed is 2.4 MB/s.
+> It is way off from being CPU limited, no need to squeeze
+> last few cycles by excessive inlining.
 
-Applied, thanks Tedd.
+defconfig?
+
+
+Size reduction is about 40k:
+> 
+>     text     data      bss       dec     hex filename
+> 95943139 20860256 35991552 152794947 91b7743 vmlinux_before
+> 95903714 20860256 35991552 152755522 91add42 vmlinux
+> 
+
