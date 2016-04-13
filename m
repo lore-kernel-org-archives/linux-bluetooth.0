@@ -4,108 +4,35 @@ From: =?UTF-8?q?=C5=81ukasz=20Rymanowski?=
 To: linux-bluetooth@vger.kernel.org
 Cc: =?UTF-8?q?=C5=81ukasz=20Rymanowski?=
 	<lukasz.rymanowski@codecoup.pl>
-Subject: [PATCH BlueZ v6 2/5] test-gatt: Fix characteristic properties
-Date: Wed, 13 Apr 2016 23:09:54 +0200
-Message-Id: <1460581797-3541-3-git-send-email-lukasz.rymanowski@codecoup.pl>
+Subject: [PATCH BlueZ v6 1/5] btgatt-server: Fix GATT device name properties
+Date: Wed, 13 Apr 2016 23:09:53 +0200
+Message-Id: <1460581797-3541-2-git-send-email-lukasz.rymanowski@codecoup.pl>
 In-Reply-To: <1460581797-3541-1-git-send-email-lukasz.rymanowski@codecoup.pl>
 References: <1460581797-3541-1-git-send-email-lukasz.rymanowski@codecoup.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch fixes characteristic property for those characteristics
-which contains extended characteristic properties descriptor.
+Since GATT device name characteristic has extended characteristic
+property descriptor, that should be set in properties as well.
+This patch fixes that.
 ---
- unit/test-gatt.c | 21 ++++++++++++---------
- 1 file changed, 12 insertions(+), 9 deletions(-)
+ tools/btgatt-server.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/unit/test-gatt.c b/unit/test-gatt.c
-index 0912348..126a59f 100644
---- a/unit/test-gatt.c
-+++ b/unit/test-gatt.c
-@@ -257,7 +257,7 @@ struct context {
- 		raw_pdu(0x09, 0x07, 0x12, 0xf0, 0x02, 0x13, 0xf0, 0x00,	\
- 			0x2a),						\
- 		raw_pdu(0x08, 0x13, 0xf0, 0x18, 0xf0, 0x03, 0x28),	\
--		raw_pdu(0x09, 0x15, 0x14, 0xf0, 0x02, 0x15, 0xf0, 0xef,	\
-+		raw_pdu(0x09, 0x15, 0x14, 0xf0, 0x82, 0x15, 0xf0, 0xef,	\
- 			0xcd, 0xab, 0x89, 0x67, 0x45, 0x23, 0x01, 0x00,	\
- 			0x00, 0x00, 0x00, 0x09, 0xB0, 0x00, 0x00),	\
- 		raw_pdu(0x08, 0x15, 0xf0, 0x18, 0xf0, 0x03, 0x28),	\
-@@ -268,7 +268,7 @@ struct context {
- 		raw_pdu(0x04, 0x16, 0xf0, 0x16, 0xf0),			\
- 		raw_pdu(0x05, 0x01, 0x16, 0xf0, 0x00, 0x29),		\
- 		raw_pdu(0x08, 0x01, 0x00, 0x10, 0x00, 0x03, 0x28),	\
--		raw_pdu(0x09, 0x07, 0x02, 0x00, 0x32, 0x03, 0x00, 0x29,	\
-+		raw_pdu(0x09, 0x07, 0x02, 0x00, 0xb2, 0x03, 0x00, 0x29,	\
- 			0x2a),						\
- 		raw_pdu(0x08, 0x03, 0x00, 0x10, 0x00, 0x03, 0x28),	\
- 		raw_pdu(0x01, 0x08, 0x03, 0x00, 0x0a)
-@@ -1556,7 +1556,8 @@ static struct gatt_db *make_test_spec_small_db(void)
- 						BT_ATT_PERM_WRITE,
- 						BT_GATT_CHRC_PROP_READ |
- 						BT_GATT_CHRC_PROP_NOTIFY |
--						BT_GATT_CHRC_PROP_INDICATE,
-+						BT_GATT_CHRC_PROP_INDICATE |
-+						BT_GATT_CHRC_PROP_EXT_PROP,
- 						"BlueZ"),
- 		DESCRIPTOR(GATT_CLIENT_CHARAC_CFG_UUID, BT_ATT_PERM_READ |
- 						BT_ATT_PERM_WRITE, 0x00, 0x00),
-@@ -1572,7 +1573,8 @@ static struct gatt_db *make_test_spec_small_db(void)
- 							"BlueZ Unit Tester"),
- 		CHARACTERISTIC(0000B009-0000-0000-0123-456789abcdef,
+diff --git a/tools/btgatt-server.c b/tools/btgatt-server.c
+index 292b584..099db8a 100644
+--- a/tools/btgatt-server.c
++++ b/tools/btgatt-server.c
+@@ -419,7 +419,8 @@ static void populate_gap_service(struct server *server)
+ 	bt_uuid16_create(&uuid, GATT_CHARAC_DEVICE_NAME);
+ 	gatt_db_service_add_characteristic(service, &uuid,
  					BT_ATT_PERM_READ | BT_ATT_PERM_WRITE,
--					BT_GATT_CHRC_PROP_READ, 0x09),
+-					BT_GATT_CHRC_PROP_READ,
 +					BT_GATT_CHRC_PROP_READ |
-+					BT_GATT_CHRC_PROP_EXT_PROP, 0x09),
- 		DESCRIPTOR(GATT_CHARAC_EXT_PROPER_UUID, BT_ATT_PERM_READ, 0x01,
- 									0x00),
- 		CHARACTERISTIC(GATT_CHARAC_APPEARANCE, BT_ATT_PERM_READ,
-@@ -1617,7 +1619,8 @@ static struct gatt_db *make_test_spec_large_db_1(void)
- 		PRIMARY_SERVICE(0x0080, "a00b", 7),
- 		CHARACTERISTIC(0xb008, BT_ATT_PERM_READ | BT_ATT_PERM_WRITE,
- 					BT_GATT_CHRC_PROP_READ |
--					BT_GATT_CHRC_PROP_WRITE,
-+					BT_GATT_CHRC_PROP_WRITE |
 +					BT_GATT_CHRC_PROP_EXT_PROP,
- 					0x08),
- 		DESCRIPTOR(0xb015, BT_ATT_PERM_READ | BT_ATT_PERM_WRITE, 0x01),
- 		DESCRIPTOR(0xb016, BT_ATT_PERM_READ | BT_ATT_PERM_WRITE, 0x02),
-@@ -2546,7 +2549,7 @@ int main(int argc, char *argv[])
- 			raw_pdu(0x09, 0x07, 0x12, 0xf0, 0x02, 0x13, 0xf0, 0x00,
- 					0x2a),
- 			raw_pdu(0x08, 0x13, 0xf0, 0x18, 0xf0, 0x03, 0x28),
--			raw_pdu(0x09, 0x15, 0x14, 0xf0, 0x02, 0x15, 0xf0, 0xef,
-+			raw_pdu(0x09, 0x15, 0x14, 0xf0, 0x82, 0x15, 0xf0, 0xef,
- 					0xcd, 0xab, 0x89, 0x67, 0x45, 0x23,
- 					0x01, 0x00, 0x00, 0x00, 0x00, 0x09,
- 					0xb0, 0x00, 0x00),
-@@ -2560,7 +2563,7 @@ int main(int argc, char *argv[])
- 			ts_small_db, NULL,
- 			raw_pdu(0x03, 0x00, 0x02),
- 			raw_pdu(0x08, 0x01, 0x00, 0x0f, 0x00, 0x03, 0x28),
--			raw_pdu(0x09, 0x07, 0x02, 0x00, 0x32, 0x03, 0x00, 0x29,
-+			raw_pdu(0x09, 0x07, 0x02, 0x00, 0xb2, 0x03, 0x00, 0x29,
- 					0x2a),
- 			raw_pdu(0x08, 0x03, 0x00, 0x0f, 0x00, 0x03, 0x28),
- 			raw_pdu(0x01, 0x08, 0x03, 0x00, 0x0a));
-@@ -2599,7 +2602,7 @@ int main(int argc, char *argv[])
- 			raw_pdu(0x09, 0x07, 0x12, 0xf0, 0x02, 0x13, 0xf0, 0x00,
- 					0x2a),
- 			raw_pdu(0x08, 0x13, 0xf0, 0x17, 0xf0, 0x03, 0x28),
--			raw_pdu(0x09, 0x15, 0x14, 0xf0, 0x02, 0x15, 0xf0, 0xef,
-+			raw_pdu(0x09, 0x15, 0x14, 0xf0, 0x82, 0x15, 0xf0, 0xef,
- 					0xcd, 0xab, 0x89, 0x67, 0x45, 0x23,
- 					0x01, 0x00, 0x00, 0x00, 0x00, 0x09,
- 					0xb0, 0x00, 0x00),
-@@ -2613,7 +2616,7 @@ int main(int argc, char *argv[])
- 			ts_small_db, NULL,
- 			raw_pdu(0x03, 0x00, 0x02),
- 			raw_pdu(0x08, 0x01, 0x00, 0x0f, 0x00, 0x03, 0x28),
--			raw_pdu(0x09, 0x07, 0x02, 0x00, 0x32, 0x03, 0x00, 0x29,
-+			raw_pdu(0x09, 0x07, 0x02, 0x00, 0xb2, 0x03, 0x00, 0x29,
- 					0x2a),
- 			raw_pdu(0x08, 0x03, 0x00, 0x0f, 0x00, 0x03, 0x28),
- 			raw_pdu(0x01, 0x08, 0x03, 0x00, 0x0a));
+ 					gap_device_name_read_cb,
+ 					gap_device_name_write_cb,
+ 					server);
 -- 
 2.5.0
 
