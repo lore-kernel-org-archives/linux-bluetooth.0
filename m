@@ -4,207 +4,148 @@ From: =?UTF-8?q?=C5=81ukasz=20Rymanowski?=
 To: linux-bluetooth@vger.kernel.org
 Cc: =?UTF-8?q?=C5=81ukasz=20Rymanowski?=
 	<lukasz.rymanowski@codecoup.pl>
-Subject: [PATCH BlueZ v6 5/5] gatt-client: Read extended props on service discovery
-Date: Wed, 13 Apr 2016 23:09:57 +0200
-Message-Id: <1460581797-3541-6-git-send-email-lukasz.rymanowski@codecoup.pl>
+Subject: [PATCH BlueZ v6 4/5] shared/gatt-server Check for ext. charact. prop. on reliable session
+Date: Wed, 13 Apr 2016 23:09:56 +0200
+Message-Id: <1460581797-3541-5-git-send-email-lukasz.rymanowski@codecoup.pl>
 In-Reply-To: <1460581797-3541-1-git-send-email-lukasz.rymanowski@codecoup.pl>
 References: <1460581797-3541-1-git-send-email-lukasz.rymanowski@codecoup.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Now once extended props can be taken with characteristic data
-we need to makes sure that after discovery correct value is in
-database.
-
-With this patch, value of all the extended properties descriptors
-are read during discovery just after discover of descriptors
+With this patch we make sure that reliable session is done on
+characteristics which does support it.
 ---
- src/shared/gatt-client.c | 114 +++++++++++++++++++++++++++++++++++++++++++++++
- unit/test-gatt.c         |   2 +
- 2 files changed, 116 insertions(+)
+ src/shared/gatt-server.c | 50 +++++++++++++++++++++++++++++++++++++++++++++++-
+ unit/test-gatt.c         | 14 ++++++++++++++
+ 2 files changed, 63 insertions(+), 1 deletion(-)
 
-diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
-index ff49be1..84689f6 100644
---- a/src/shared/gatt-client.c
-+++ b/src/shared/gatt-client.c
-@@ -316,6 +316,7 @@ struct discovery_op {
- 	struct queue *pending_svcs;
- 	struct queue *pending_chrcs;
- 	struct queue *svcs;
-+	struct queue *ext_prop_desc;
- 	struct gatt_db_attribute *cur_svc;
- 	bool success;
- 	uint16_t start;
-@@ -331,6 +332,7 @@ static void discovery_op_free(struct discovery_op *op)
- 	queue_destroy(op->pending_svcs, NULL);
- 	queue_destroy(op->pending_chrcs, free);
- 	queue_destroy(op->svcs, NULL);
-+	queue_destroy(op->ext_prop_desc, NULL);
- 	free(op);
+diff --git a/src/shared/gatt-server.c b/src/shared/gatt-server.c
+index f1fca92..123d9c1 100644
+--- a/src/shared/gatt-server.c
++++ b/src/shared/gatt-server.c
+@@ -72,6 +72,8 @@ struct prep_write_data {
+ 	uint16_t handle;
+ 	uint16_t offset;
+ 	uint16_t length;
++
++	bool reliable_supported;
+ };
+ 
+ static void prep_write_data_destroy(void *user_data)
+@@ -1111,6 +1113,23 @@ static bool append_prep_data(struct prep_write_data *prep_data, uint16_t handle,
+ 	return true;
  }
  
-@@ -360,6 +362,7 @@ static struct discovery_op *discovery_op_create(struct bt_gatt_client *client,
- 	op->pending_svcs = queue_new();
- 	op->pending_chrcs = queue_new();
- 	op->svcs = queue_new();
-+	op->ext_prop_desc = queue_new();
- 	op->client = client;
- 	op->complete_func = complete_func;
- 	op->failure_func = failure_func;
-@@ -604,6 +607,107 @@ failed:
- 	return false;
- }
- 
-+static void ext_prop_write_cb(struct gatt_db_attribute *attrib,
-+						int err, void *user_data)
++static bool is_reliable_write_supported(const struct bt_gatt_server  *server,
++							uint16_t handle)
 +{
-+	struct bt_gatt_client *client = user_data;
-+
-+	util_debug(client->debug_callback, client->debug_data,
-+						"Value set status: %d", err);
-+}
-+
-+static void ext_prop_read_cb(bool success, uint8_t att_ecode,
-+					const uint8_t *value, uint16_t length,
-+					void *user_data);
-+
-+static bool read_ext_prop_desc(struct discovery_op *op)
-+{
-+	struct bt_gatt_client *client = op->client;
-+	uint16_t handle;
 +	struct gatt_db_attribute *attr;
++	uint16_t ext_prop;
 +
-+	attr = queue_peek_head(op->ext_prop_desc);
++	attr = gatt_db_get_attribute(server->db, handle);
 +	if (!attr)
 +		return false;
 +
-+	handle = gatt_db_attribute_get_handle(attr);
-+	bt_gatt_client_read_value(client, handle, ext_prop_read_cb,
-+							discovery_op_ref(op),
-+							discovery_op_unref);
++	if (!gatt_db_attribute_get_char_data(attr, NULL, NULL, NULL, &ext_prop,
++									NULL))
++		return false;
 +
-+	return true;
++	return (ext_prop & BT_GATT_CHRC_EXT_PROP_RELIABLE_WRITE);
 +}
 +
-+static void ext_prop_read_cb(bool success, uint8_t att_ecode,
-+					const uint8_t *value, uint16_t length,
-+					void *user_data)
+ static bool prep_data_new(struct bt_gatt_server *server,
+ 					uint16_t handle, uint16_t offset,
+ 					uint16_t length, uint8_t *value)
+@@ -1128,6 +1147,13 @@ static bool prep_data_new(struct bt_gatt_server *server,
+ 	prep_data->handle = handle;
+ 	prep_data->offset = offset;
+ 
++	/*
++	 * Handle is the value handle. We need characteristic declaration
++	 * handle which in BlueZ is handle_value -1
++	 */
++	prep_data->reliable_supported = is_reliable_write_supported(server,
++								handle - 1);
++
+ 	queue_push_tail(server->prep_queue, prep_data);
+ 
+ 	return true;
+@@ -1258,6 +1284,14 @@ error:
+ 								ehandle, err);
+ }
+ 
++static bool find_no_reliable_characteristic(const void *data,
++						const void *match_data)
 +{
-+	struct discovery_op *op = user_data;
-+	struct bt_gatt_client *client = op->client;
-+	bool discovering;
-+	struct gatt_db_attribute *desc_attr = NULL;
-+	struct gatt_db_attribute *next_srv;
-+	uint16_t start, end;
++	const struct prep_write_data *prep_data = data;
 +
-+	util_debug(client->debug_callback, client->debug_data,
-+				"Ext. prop value: 0x%04x", (uint16_t)value[0]);
-+
-+	desc_attr = queue_pop_head(op->ext_prop_desc);
-+	if (!desc_attr)
-+		goto failed;
-+
-+	if (!gatt_db_attribute_write(desc_attr, 0, value, length, 0, NULL,
-+						ext_prop_write_cb, client))
-+		goto failed;
-+
-+	/* Any other descriptor to read? */
-+	if (read_ext_prop_desc(op))
-+		return;
-+
-+	/* Continue with discovery */
-+	do {
-+		if (!discover_descs(op, &discovering))
-+			goto failed;
-+
-+		if (discovering)
-+			return;
-+
-+		/* Done with the current service */
-+		gatt_db_service_set_active(op->cur_svc, true);
-+
-+		next_srv = queue_pop_head(op->svcs);
-+		if (!next_srv)
-+			goto done;
-+
-+		if (!gatt_db_attribute_get_service_handles(next_srv, &start,
-+									&end))
-+			goto failed;
-+
-+	} while (start == end);
-+
-+	/* Move on to the next service */
-+	op->cur_svc = next_srv;
-+
-+	client->discovery_req = bt_gatt_discover_characteristics(client->att,
-+							start, end,
-+							discover_chrcs_cb,
-+							discovery_op_ref(op),
-+							discovery_op_unref);
-+	if (client->discovery_req)
-+		return;
-+
-+	util_debug(client->debug_callback, client->debug_data,
-+				"Failed to start characteristic discovery");
-+
-+	discovery_op_unref(op);
-+
-+failed:
-+	success = false;
-+
-+done:
-+	discovery_op_complete(op, success, att_ecode);
++	return !prep_data->reliable_supported;
 +}
 +
- static void discover_descs_cb(bool success, uint8_t att_ecode,
- 						struct bt_gatt_result *result,
- 						void *user_data)
-@@ -618,6 +722,7 @@ static void discover_descs_cb(bool success, uint8_t att_ecode,
- 	char uuid_str[MAX_LEN_UUID_STR];
- 	unsigned int desc_count;
- 	bool discovering;
-+	bt_uuid_t ext_prop_uuid;
+ static void exec_write_cb(uint8_t opcode, const void *pdu,
+ 					uint16_t length, void *user_data)
+ {
+@@ -1265,6 +1299,7 @@ static void exec_write_cb(uint8_t opcode, const void *pdu,
+ 	uint8_t flags;
+ 	uint8_t ecode;
+ 	bool write;
++	uint16_t ehandle = 0;
  
- 	discovery_req_clear(client);
- 
-@@ -640,6 +745,8 @@ static void discover_descs_cb(bool success, uint8_t att_ecode,
- 	util_debug(client->debug_callback, client->debug_data,
- 					"Descriptors found: %u", desc_count);
- 
-+	bt_uuid16_create(&ext_prop_uuid, GATT_CHARAC_EXT_PROPER_UUID);
-+
- 	while (bt_gatt_iter_next_descriptor(&iter, &handle, u128.data)) {
- 		bt_uuid128_create(&uuid, u128);
- 
-@@ -657,8 +764,15 @@ static void discover_descs_cb(bool success, uint8_t att_ecode,
- 
- 		if (gatt_db_attribute_get_handle(attr) != handle)
- 			goto failed;
-+
-+		if (!bt_uuid_cmp(&ext_prop_uuid, &uuid))
-+			queue_push_tail(op->ext_prop_desc, attr);
+ 	if (length != 1) {
+ 		ecode = BT_ATT_ERROR_INVALID_PDU;
+@@ -1293,6 +1328,19 @@ static void exec_write_cb(uint8_t opcode, const void *pdu,
+ 		return;
  	}
  
-+	/* If we got extended prop descriptor, lets read it right away */
-+	if (read_ext_prop_desc(op))
-+		return;
++	/* If there is more than one prep request, we are in reliable session */
++	if (queue_length(server->prep_queue) > 1) {
++		struct prep_write_data *prep_data;
 +
- next:
- 	if (!discover_descs(op, &discovering))
- 		goto failed;
++		prep_data = queue_find(server->prep_queue,
++					find_no_reliable_characteristic, NULL);
++		if (prep_data) {
++			ecode = BT_ATT_ERROR_REQUEST_NOT_SUPPORTED;
++			ehandle = prep_data->handle;
++			goto error;
++		}
++	}
++
+ 	exec_next_prep_write(server, 0, 0);
+ 
+ 	return;
+@@ -1300,7 +1348,7 @@ static void exec_write_cb(uint8_t opcode, const void *pdu,
+ error:
+ 	queue_remove_all(server->prep_queue, NULL, NULL,
+ 						prep_write_data_destroy);
+-	bt_att_send_error_rsp(server->att, opcode, 0, ecode);
++	bt_att_send_error_rsp(server->att, opcode, ehandle, ecode);
+ }
+ 
+ static void exchange_mtu_cb(uint8_t opcode, const void *pdu,
 diff --git a/unit/test-gatt.c b/unit/test-gatt.c
-index 6e4dcee..8129719 100644
+index 03925e9..6e4dcee 100644
 --- a/unit/test-gatt.c
 +++ b/unit/test-gatt.c
-@@ -267,6 +267,8 @@ struct context {
- 		raw_pdu(0x01, 0x08, 0x18, 0xf0, 0x0a),			\
- 		raw_pdu(0x04, 0x16, 0xf0, 0x16, 0xf0),			\
- 		raw_pdu(0x05, 0x01, 0x16, 0xf0, 0x00, 0x29),		\
-+		raw_pdu(0x0a, 0x16, 0xf0),				\
-+		raw_pdu(0x0b, 0x01, 0x00),				\
- 		raw_pdu(0x08, 0x01, 0x00, 0x10, 0x00, 0x03, 0x28),	\
- 		raw_pdu(0x09, 0x07, 0x02, 0x00, 0xb2, 0x03, 0x00, 0x29,	\
- 			0x2a),						\
+@@ -4437,5 +4437,19 @@ int main(int argc, char *argv[])
+ 				0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff),
+ 			raw_pdu(0x01, 0x16, 0x04, 0x00, 0x03));
+ 
++	define_test_server("/robustness/no-reliable-characteristic",
++			test_server, ts_large_db_1, NULL,
++			raw_pdu(0x03, 0x00, 0x02),
++			raw_pdu(0x16, 0x82, 0x00, 0x00, 0x00, 0x01, 0x02, 0x03),
++			raw_pdu(0x17, 0x82, 0x00, 0x00, 0x00, 0x01, 0x02, 0x03),
++			raw_pdu(0x16, 0x25, 0x00, 0x00, 0x00, 0x01, 0x02, 0x03),
++			raw_pdu(0x17, 0x25, 0x00, 0x00, 0x00, 0x01, 0x02, 0x03),
++			raw_pdu(0x16, 0x82, 0x00, 0x03, 0x00, 0x04, 0x05, 0x06),
++			raw_pdu(0x17, 0x82, 0x00, 0x03, 0x00, 0x04, 0x05, 0x06),
++			raw_pdu(0x16, 0x25, 0x00, 0x03, 0x00, 0x04, 0x05, 0x06),
++			raw_pdu(0x17, 0x25, 0x00, 0x03, 0x00, 0x04, 0x05, 0x06),
++			raw_pdu(0x18, 0x01),
++			raw_pdu(0x01, 0x18, 0x25, 0x00, 0x06));
++
+ 	return tester_run();
+ }
 -- 
 2.5.0
 
