@@ -4,148 +4,289 @@ From: =?UTF-8?q?=C5=81ukasz=20Rymanowski?=
 To: linux-bluetooth@vger.kernel.org
 Cc: =?UTF-8?q?=C5=81ukasz=20Rymanowski?=
 	<lukasz.rymanowski@codecoup.pl>
-Subject: [PATCH BlueZ v6 4/5] shared/gatt-server Check for ext. charact. prop. on reliable session
-Date: Wed, 13 Apr 2016 23:09:56 +0200
-Message-Id: <1460581797-3541-5-git-send-email-lukasz.rymanowski@codecoup.pl>
+Subject: [PATCH BlueZ v6 3/5] shared/gatt-db: Extend gatt_db_attribute_get_char_data with ext. prop
+Date: Wed, 13 Apr 2016 23:09:55 +0200
+Message-Id: <1460581797-3541-4-git-send-email-lukasz.rymanowski@codecoup.pl>
 In-Reply-To: <1460581797-3541-1-git-send-email-lukasz.rymanowski@codecoup.pl>
 References: <1460581797-3541-1-git-send-email-lukasz.rymanowski@codecoup.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-With this patch we make sure that reliable session is done on
-characteristics which does support it.
+This patch adds way to get extended properties from characteristic
+extended property descriptor
 ---
- src/shared/gatt-server.c | 50 +++++++++++++++++++++++++++++++++++++++++++++++-
- unit/test-gatt.c         | 14 ++++++++++++++
- 2 files changed, 63 insertions(+), 1 deletion(-)
+ profiles/deviceinfo/deviceinfo.c |  2 +-
+ profiles/gap/gas.c               |  2 +-
+ profiles/scanparam/scan.c        |  2 +-
+ src/device.c                     |  2 +-
+ src/gatt-client.c                |  3 +-
+ src/shared/gatt-client.c         |  6 ++--
+ src/shared/gatt-db.c             | 63 ++++++++++++++++++++++++++++++++++++++++
+ src/shared/gatt-db.h             |  1 +
+ tools/btgatt-client.c            |  8 +++--
+ tools/btgatt-server.c            |  8 +++--
+ unit/test-gatt.c                 |  4 +--
+ 11 files changed, 85 insertions(+), 16 deletions(-)
 
-diff --git a/src/shared/gatt-server.c b/src/shared/gatt-server.c
-index f1fca92..123d9c1 100644
---- a/src/shared/gatt-server.c
-+++ b/src/shared/gatt-server.c
-@@ -72,6 +72,8 @@ struct prep_write_data {
- 	uint16_t handle;
- 	uint16_t offset;
- 	uint16_t length;
-+
-+	bool reliable_supported;
- };
+diff --git a/profiles/deviceinfo/deviceinfo.c b/profiles/deviceinfo/deviceinfo.c
+index d1f51a0..0c48f00 100644
+--- a/profiles/deviceinfo/deviceinfo.c
++++ b/profiles/deviceinfo/deviceinfo.c
+@@ -88,7 +88,7 @@ static void handle_characteristic(struct gatt_db_attribute *attr,
+ 	bt_string_to_uuid(&pnpid_uuid, PNPID_UUID);
  
- static void prep_write_data_destroy(void *user_data)
-@@ -1111,6 +1113,23 @@ static bool append_prep_data(struct prep_write_data *prep_data, uint16_t handle,
- 	return true;
- }
- 
-+static bool is_reliable_write_supported(const struct bt_gatt_server  *server,
-+							uint16_t handle)
-+{
-+	struct gatt_db_attribute *attr;
-+	uint16_t ext_prop;
-+
-+	attr = gatt_db_get_attribute(server->db, handle);
-+	if (!attr)
-+		return false;
-+
-+	if (!gatt_db_attribute_get_char_data(attr, NULL, NULL, NULL, &ext_prop,
-+									NULL))
-+		return false;
-+
-+	return (ext_prop & BT_GATT_CHRC_EXT_PROP_RELIABLE_WRITE);
-+}
-+
- static bool prep_data_new(struct bt_gatt_server *server,
- 					uint16_t handle, uint16_t offset,
- 					uint16_t length, uint8_t *value)
-@@ -1128,6 +1147,13 @@ static bool prep_data_new(struct bt_gatt_server *server,
- 	prep_data->handle = handle;
- 	prep_data->offset = offset;
- 
-+	/*
-+	 * Handle is the value handle. We need characteristic declaration
-+	 * handle which in BlueZ is handle_value -1
-+	 */
-+	prep_data->reliable_supported = is_reliable_write_supported(server,
-+								handle - 1);
-+
- 	queue_push_tail(server->prep_queue, prep_data);
- 
- 	return true;
-@@ -1258,6 +1284,14 @@ error:
- 								ehandle, err);
- }
- 
-+static bool find_no_reliable_characteristic(const void *data,
-+						const void *match_data)
-+{
-+	const struct prep_write_data *prep_data = data;
-+
-+	return !prep_data->reliable_supported;
-+}
-+
- static void exec_write_cb(uint8_t opcode, const void *pdu,
- 					uint16_t length, void *user_data)
- {
-@@ -1265,6 +1299,7 @@ static void exec_write_cb(uint8_t opcode, const void *pdu,
- 	uint8_t flags;
- 	uint8_t ecode;
- 	bool write;
-+	uint16_t ehandle = 0;
- 
- 	if (length != 1) {
- 		ecode = BT_ATT_ERROR_INVALID_PDU;
-@@ -1293,6 +1328,19 @@ static void exec_write_cb(uint8_t opcode, const void *pdu,
+ 	if (!gatt_db_attribute_get_char_data(attr, NULL, &value_handle, NULL,
+-								&uuid)) {
++								NULL, &uuid)) {
+ 		error("Failed to obtain characteristic data");
  		return;
  	}
+diff --git a/profiles/gap/gas.c b/profiles/gap/gas.c
+index 877c4fd..35b996c 100644
+--- a/profiles/gap/gas.c
++++ b/profiles/gap/gas.c
+@@ -181,7 +181,7 @@ static void handle_characteristic(struct gatt_db_attribute *attr,
+ 	bt_uuid_t uuid;
  
-+	/* If there is more than one prep request, we are in reliable session */
-+	if (queue_length(server->prep_queue) > 1) {
-+		struct prep_write_data *prep_data;
-+
-+		prep_data = queue_find(server->prep_queue,
-+					find_no_reliable_characteristic, NULL);
-+		if (prep_data) {
-+			ecode = BT_ATT_ERROR_REQUEST_NOT_SUPPORTED;
-+			ehandle = prep_data->handle;
-+			goto error;
-+		}
-+	}
-+
- 	exec_next_prep_write(server, 0, 0);
+ 	if (!gatt_db_attribute_get_char_data(attr, NULL, &value_handle, NULL,
+-								&uuid)) {
++								NULL, &uuid)) {
+ 		error("Failed to obtain characteristic data");
+ 		return;
+ 	}
+diff --git a/profiles/scanparam/scan.c b/profiles/scanparam/scan.c
+index 4015b3f..d3ca762 100644
+--- a/profiles/scanparam/scan.c
++++ b/profiles/scanparam/scan.c
+@@ -140,7 +140,7 @@ static void handle_characteristic(struct gatt_db_attribute *attr,
+ 	bt_uuid_t uuid, scan_interval_wind_uuid, scan_refresh_uuid;
  
- 	return;
-@@ -1300,7 +1348,7 @@ static void exec_write_cb(uint8_t opcode, const void *pdu,
- error:
- 	queue_remove_all(server->prep_queue, NULL, NULL,
- 						prep_write_data_destroy);
--	bt_att_send_error_rsp(server->att, opcode, 0, ecode);
-+	bt_att_send_error_rsp(server->att, opcode, ehandle, ecode);
+ 	if (!gatt_db_attribute_get_char_data(attr, NULL, &value_handle, NULL,
+-								&uuid)) {
++								NULL, &uuid)) {
+ 		error("Failed to obtain characteristic data");
+ 		return;
+ 	}
+diff --git a/src/device.c b/src/device.c
+index 0d46eba..cd82ef2 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -1987,7 +1987,7 @@ static void store_chrc(struct gatt_db_attribute *attr, void *user_data)
+ 	bt_uuid_t uuid;
+ 
+ 	if (!gatt_db_attribute_get_char_data(attr, &handle_num, &value_handle,
+-							&properties, &uuid)) {
++						&properties, NULL, &uuid)) {
+ 		warn("Error storing characteristic - can't get data");
+ 		return;
+ 	}
+diff --git a/src/gatt-client.c b/src/gatt-client.c
+index 52add1d..ebb7b35 100644
+--- a/src/gatt-client.c
++++ b/src/gatt-client.c
+@@ -1283,7 +1283,8 @@ static struct characteristic *characteristic_create(
+ 
+ 	gatt_db_attribute_get_char_data(attr, &chrc->handle,
+ 							&chrc->value_handle,
+-							&chrc->props, &uuid);
++							&chrc->props, NULL,
++							&uuid);
+ 
+ 	chrc->attr = gatt_db_get_attribute(service->client->db,
+ 							chrc->value_handle);
+diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
+index 34b6cc7..ff49be1 100644
+--- a/src/shared/gatt-client.c
++++ b/src/shared/gatt-client.c
+@@ -243,9 +243,9 @@ static struct notify_chrc *notify_chrc_create(struct bt_gatt_client *client,
+ 	if (bt_uuid_cmp(&uuid, gatt_db_attribute_get_type(attr)))
+ 		return NULL;
+ 
+-	if (!gatt_db_attribute_get_char_data(attr, NULL, NULL,
+-							&properties, NULL))
+-			return NULL;
++	if (!gatt_db_attribute_get_char_data(attr, NULL, NULL, &properties,
++								NULL, NULL))
++		return NULL;
+ 
+ 	chrc = new0(struct notify_chrc, 1);
+ 
+diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
+index cc49458..513451f 100644
+--- a/src/shared/gatt-db.c
++++ b/src/shared/gatt-db.c
+@@ -52,6 +52,8 @@ static const bt_uuid_t characteristic_uuid = { .type = BT_UUID16,
+ 					.value.u16 = GATT_CHARAC_UUID };
+ static const bt_uuid_t included_service_uuid = { .type = BT_UUID16,
+ 					.value.u16 = GATT_INCLUDE_UUID };
++static const bt_uuid_t ext_desc_uuid = { .type = BT_UUID16,
++				.value.u16 = GATT_CHARAC_EXT_PROPER_UUID };
+ 
+ struct gatt_db {
+ 	int ref_count;
+@@ -1456,10 +1458,68 @@ bool gatt_db_attribute_get_service_data(const struct gatt_db_attribute *attrib,
+ 	return le_to_uuid(decl->value, decl->value_len, uuid);
  }
  
- static void exchange_mtu_cb(uint8_t opcode, const void *pdu,
++static void read_ext_prop_value(struct gatt_db_attribute *attrib,
++						int err, const uint8_t *value,
++						size_t length, void *user_data)
++{
++	uint16_t *ext_prop = user_data;
++
++	if (err || (length != sizeof(uint16_t)))
++		return;
++
++	*ext_prop = (uint16_t) value[0];
++}
++
++static void read_ext_prop(struct gatt_db_attribute *attrib,
++							void *user_data)
++{
++	uint16_t *ext_prop = user_data;
++
++	/*
++	 * If ext_prop is set that means extended properties descriptor
++	 * has been already found
++	 */
++	if (*ext_prop != 0)
++		return;
++
++	if (bt_uuid_cmp(&ext_desc_uuid, &attrib->uuid))
++		return;
++
++	gatt_db_attribute_read(attrib, 0, BT_ATT_OP_READ_REQ, NULL,
++						read_ext_prop_value, ext_prop);
++}
++
++static uint8_t get_char_extended_prop(const struct gatt_db_attribute *attrib)
++{
++	uint16_t ext_prop;
++
++	if (!attrib)
++		return 0;
++
++	if (bt_uuid_cmp(&characteristic_uuid, &attrib->uuid))
++		return 0;
++
++	/* Check properties first */
++	if (!(attrib->value[0] & BT_GATT_CHRC_PROP_EXT_PROP))
++		return 0;
++
++	ext_prop = 0;
++
++	/*
++	 * Cast needed for foreach function. We do not change attrib during
++	 * this call
++	 */
++	gatt_db_service_foreach_desc((struct gatt_db_attribute *) attrib,
++						read_ext_prop, &ext_prop);
++
++	return ext_prop;
++}
++
+ bool gatt_db_attribute_get_char_data(const struct gatt_db_attribute *attrib,
+ 							uint16_t *handle,
+ 							uint16_t *value_handle,
+ 							uint8_t *properties,
++							uint16_t *ext_prop,
+ 							bt_uuid_t *uuid)
+ {
+ 	if (!attrib)
+@@ -1484,6 +1544,9 @@ bool gatt_db_attribute_get_char_data(const struct gatt_db_attribute *attrib,
+ 	if (properties)
+ 		*properties = attrib->value[0];
+ 
++	if (ext_prop)
++		*ext_prop = get_char_extended_prop(attrib);
++
+ 	if (value_handle)
+ 		*value_handle = get_le16(attrib->value + 1);
+ 
+diff --git a/src/shared/gatt-db.h b/src/shared/gatt-db.h
+index 96cceb9..134ec63 100644
+--- a/src/shared/gatt-db.h
++++ b/src/shared/gatt-db.h
+@@ -199,6 +199,7 @@ bool gatt_db_attribute_get_char_data(const struct gatt_db_attribute *attrib,
+ 							uint16_t *handle,
+ 							uint16_t *value_handle,
+ 							uint8_t *properties,
++							uint16_t *ext_prop,
+ 							bt_uuid_t *uuid);
+ 
+ bool gatt_db_attribute_get_incl_data(const struct gatt_db_attribute *attrib,
+diff --git a/tools/btgatt-client.c b/tools/btgatt-client.c
+index 2153bec..4c8c9dd 100644
+--- a/tools/btgatt-client.c
++++ b/tools/btgatt-client.c
+@@ -297,18 +297,20 @@ static void print_chrc(struct gatt_db_attribute *attr, void *user_data)
+ {
+ 	uint16_t handle, value_handle;
+ 	uint8_t properties;
++	uint16_t ext_prop;
+ 	bt_uuid_t uuid;
+ 
+ 	if (!gatt_db_attribute_get_char_data(attr, &handle,
+ 								&value_handle,
+ 								&properties,
++								&ext_prop,
+ 								&uuid))
+ 		return;
+ 
+ 	printf("\t  " COLOR_YELLOW "charac" COLOR_OFF
+-					" - start: 0x%04x, value: 0x%04x, "
+-					"props: 0x%02x, uuid: ",
+-					handle, value_handle, properties);
++				" - start: 0x%04x, value: 0x%04x, "
++				"props: 0x%02x, ext_props: 0x%04x, uuid: ",
++				handle, value_handle, properties, ext_prop);
+ 	print_uuid(&uuid);
+ 
+ 	gatt_db_service_foreach_desc(attr, print_desc, NULL);
+diff --git a/tools/btgatt-server.c b/tools/btgatt-server.c
+index 099db8a..fadaff2 100644
+--- a/tools/btgatt-server.c
++++ b/tools/btgatt-server.c
+@@ -932,18 +932,20 @@ static void print_chrc(struct gatt_db_attribute *attr, void *user_data)
+ {
+ 	uint16_t handle, value_handle;
+ 	uint8_t properties;
++	uint16_t ext_prop;
+ 	bt_uuid_t uuid;
+ 
+ 	if (!gatt_db_attribute_get_char_data(attr, &handle,
+ 								&value_handle,
+ 								&properties,
++								&ext_prop,
+ 								&uuid))
+ 		return;
+ 
+ 	printf("\t  " COLOR_YELLOW "charac" COLOR_OFF
+-					" - start: 0x%04x, value: 0x%04x, "
+-					"props: 0x%02x, uuid: ",
+-					handle, value_handle, properties);
++				" - start: 0x%04x, value: 0x%04x, "
++				"props: 0x%02x, ext_prop: 0x%04x, uuid: ",
++				handle, value_handle, properties, ext_prop);
+ 	print_uuid(&uuid);
+ 
+ 	gatt_db_service_foreach_desc(attr, print_desc, NULL);
 diff --git a/unit/test-gatt.c b/unit/test-gatt.c
-index 03925e9..6e4dcee 100644
+index 126a59f..03925e9 100644
 --- a/unit/test-gatt.c
 +++ b/unit/test-gatt.c
-@@ -4437,5 +4437,19 @@ int main(int argc, char *argv[])
- 				0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff),
- 			raw_pdu(0x01, 0x16, 0x04, 0x00, 0x03));
+@@ -526,9 +526,9 @@ static bool matching_char_data(struct gatt_db_attribute *a,
+ 	bt_uuid_t a_uuid, b_uuid;
  
-+	define_test_server("/robustness/no-reliable-characteristic",
-+			test_server, ts_large_db_1, NULL,
-+			raw_pdu(0x03, 0x00, 0x02),
-+			raw_pdu(0x16, 0x82, 0x00, 0x00, 0x00, 0x01, 0x02, 0x03),
-+			raw_pdu(0x17, 0x82, 0x00, 0x00, 0x00, 0x01, 0x02, 0x03),
-+			raw_pdu(0x16, 0x25, 0x00, 0x00, 0x00, 0x01, 0x02, 0x03),
-+			raw_pdu(0x17, 0x25, 0x00, 0x00, 0x00, 0x01, 0x02, 0x03),
-+			raw_pdu(0x16, 0x82, 0x00, 0x03, 0x00, 0x04, 0x05, 0x06),
-+			raw_pdu(0x17, 0x82, 0x00, 0x03, 0x00, 0x04, 0x05, 0x06),
-+			raw_pdu(0x16, 0x25, 0x00, 0x03, 0x00, 0x04, 0x05, 0x06),
-+			raw_pdu(0x17, 0x25, 0x00, 0x03, 0x00, 0x04, 0x05, 0x06),
-+			raw_pdu(0x18, 0x01),
-+			raw_pdu(0x01, 0x18, 0x25, 0x00, 0x06));
-+
- 	return tester_run();
- }
+ 	gatt_db_attribute_get_char_data(a, &a_handle, &a_value_handle,
+-							&a_properties, &a_uuid);
++						&a_properties, NULL, &a_uuid);
+ 	gatt_db_attribute_get_char_data(b, &b_handle, &b_value_handle,
+-							&b_properties, &b_uuid);
++						&b_properties, NULL, &b_uuid);
+ 
+ 	return a_handle == b_handle && a_value_handle == b_value_handle &&
+ 						a_properties == b_properties &&
 -- 
 2.5.0
 
