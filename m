@@ -1,206 +1,91 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-Date: Fri, 15 Apr 2016 15:48:41 +0900
-Message-ID: <CANOVzkvjtOHnF0ZLTU5w2ivH-nFDPdF47jcufo0Jh30UyF0P7g@mail.gmail.com>
-Subject: Re: Not shown registered gatt services on an android 5.1.1
-From: King so <sok02074@gmail.com>
-To: pphdev12@gmail.com
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <tiwai@suse.de>
+From: Takashi Iwai <tiwai@suse.de>
+To: linux-bluetooth@vger.kernel.org
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Jiri Slaby <jslaby@suse.cz>,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] Bluetooth: vhci: Fix race at creating hci device
+Date: Thu, 14 Apr 2016 17:32:19 +0200
+Message-Id: <1460647939-15637-1-git-send-email-tiwai@suse.de>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Tak,
+hci_vhci driver creates a hci device object dynamically upon each
+HCI_VENDOR_PKT write.  Although it checks the already created object
+and returns an error, it's still racy and may build multiple hci_dev
+objects concurrently when parallel writes are performed, as the device
+tracks only a single hci_dev object.
 
-I also have the same problem. (Central is iPhone, Peripheral is Raspberry pi)
+This patch introduces a mutex to protect against the concurrent device
+creations.
 
-Did you resolve it?
+Cc: <stable@vger.kernel.org>
+Signed-off-by: Takashi Iwai <tiwai@suse.de>
+---
+ drivers/bluetooth/hci_vhci.c | 22 ++++++++++++++++------
+ 1 file changed, 16 insertions(+), 6 deletions(-)
 
-Thanks for your time
-
-2016-04-08 11:54 GMT+09:00 Hyuntak Lee <pphdev12@gmail.com>:
-> Hi Luiz,
->
-> 2016-04-07 21:17 GMT+09:00 Luiz Augusto von Dentz <luiz.dentz@gmail.com>:
->> Hi Tak,
->>
->> On Thu, Apr 7, 2016 at 2:20 PM, Hyuntak Lee <pphdev12@gmail.com> wrote:
->>> Dears,
->>>
->>> I am testing a gatt server with iphone and android.
->>> iPhone is working nicely, but unfortunately andorid cannot retrive
->>> registered GATT services.
->>> I tested with a bluez-5.39/test/example-gatt-server file.
->>> Can you advice me?
->>>
->>> My step is below:
->>>
->>> * Peripheral env
->>> ** Bluez 5.39
->>> ** Linux Kernel 3.18
->>> ** BT Dongle: NEXT-204BT(CSR 4.0)
->>>
->>> * Central env
->>> ** Android 5.1.1 and iOS 9.3.1
->>> ** Test app: nRF MCP
->>>
->>> * Build configure
->>> ./configure --prefix=/usr     \
->>>             --sysconfdir=/etc    \
->>>             --localstatedir=/var \
->>>             --enable-library      \
->>>             --enable-experimental \
->>>             --disable-systemd
->>>
->>> * STEP
->>> 1. Executes a bluetooth daemon:
->>> $ bluetoothd -ndE
->>>
->>> 2. Register gatt services
->>> $ python bluez-5.39/test/example-gatt-server
->>> For register service(Heart Rate, Battery Service)
->>>
->>> 3. To advertising and pairing:
->>> $ hciconfig hci0 reset
->>> $ hciconfig hci0 pscan;   # PSCAN need to pair with android
->>> $ hcitool -i hci0 cmd 0x08 0x000a 00;
->>> $ hcitool -i hci0 cmd 0x08 0x0008 03 02 0a 0a 00 00 00 00 00 00 00 00
->>> 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00;
->>> $ hcitool -i hci0 cmd 0x08 0x000a 01;
->>>
->>> 4. connect to gatt server
->>> 4.1 with iOS 9.3.1
->>> Retrieved list
->>> - Heart Rate (UUID: 0x180D)
->>> - Battery Service (UUID: 0x180F)
->>>
->>> 4.2 with android 5.1.1
->>> Retrieved list
->>> - Generic Attribute(UUID: 0x1801)
->>> - Generic Access(UUID: 0x1800)
->>>
->>>
->>>
->>> Only android don't get registerted services.
->>> I founded different part of bluetoothd log in the case of iphone and
->>> android. I hope these are helpful to you.
->>>
->>> Logs of iOS case:
->>>
->>> bluetoothd[2976]: src/gatt-database.c:connect_cb() New incoming LE ATT
->>> connection
->>> bluetoothd[2976]: attrib/gattrib.c:g_attrib_ref() 0x1e53230: g_attrib_ref=1
->>> bluetoothd[2976]: src/gatt-client.c:btd_gatt_client_connected() Device
->>> connected.
->>> bluetoothd[2976]: src/device.c:load_gatt_db() Restoring
->>> 57:92:97:B5:A8:C4 gatt database from file
->>> bluetoothd[2976]: No cache for 57:92:97:B5:A8:C4
->>> bluetoothd[2976]: src/device.c:gatt_debug() MTU exchange complete, with MTU: 158
->>> bluetoothd[2976]: src/device.c:gatt_debug() Read By Grp Type - start:
->>> 0x0001 end: 0xffff
->>> bluetoothd[2976]: src/device.c:gatt_debug() Read By Grp Type - start:
->>> 0x0021 end: 0xffff
->>> bluetoothd[2976]: src/device.c:gatt_debug() Read By Type - start:
->>> 0x0006 end: 0x0009
->>> bluetoothd[2976]: src/device.c:gatt_debug() Find Info - start: 0x0009
->>> end: 0x0009
->>> bluetoothd[2976]: src/device.c:gatt_debug() Write Req - handle: 0x0009
->>> bluetoothd[2976]: src/gatt-database.c:gatt_ccc_write_cb() CCC write
->>> called for handle: 0x0009
->>> bluetoothd[2976]: src/device.c:gatt_debug() Primary services found: 8
->>> bluetoothd[2976]: src/device.c:gatt_debug() start: 0x0001, end:
->>> 0x0005, uuid: 00001800-0000-1000-8000-00805f9b34fb
->>> bluetoothd[2976]: src/device.c:gatt_debug() start: 0x0006, end:
->>> 0x0009, uuid: 00001801-0000-1000-8000-00805f9b34fb
->>> bluetoothd[2976]: src/device.c:gatt_debug() start: 0x000a, end:
->>> 0x000e, uuid: d0611e78-bbb4-4591-a5f8-487910ae4366
->>> bluetoothd[2976]: src/device.c:gatt_debug() start: 0x000f, end:
->>> 0x0012, uuid: 0000180f-0000-1000-8000-00805f9b34fb
->>> bluetoothd[2976]: src/device.c:gatt_debug() start: 0x0013, end:
->>> 0x0018, uuid: 00001805-0000-1000-8000-00805f9b34fb
->>> bluetoothd[2976]: src/device.c:gatt_debug() start: 0x0019, end:
->>> 0x001d, uuid: 0000180a-0000-1000-8000-00805f9b34fb
->>> bluetoothd[2976]: src/device.c:gatt_debug() start: 0x001e, end:
->>> 0x0027, uuid: 7905f431-b5ce-4e99-a40f-4b1e122d00d0
->>> bluetoothd[2976]: src/device.c:gatt_debug() start: 0x0028, end:
->>> 0x0033, uuid: 89d3502b-0f36-433a-8ef4-c502ad55f8dc
->>> bluetoothd[2976]: src/device.c:gatt_debug() Secondary service
->>> discovery failed. ATT ECODE: 0x0a
->>>
->>> Logs of android case:
->>>
->>> bluetoothd[2976]: src/gatt-database.c:connect_cb() New incoming LE ATT
->>> connection
->>> bluetoothd[2976]: attrib/gattrib.c:g_attrib_ref() 0x1e35fe8: g_attrib_ref=1
->>> bluetoothd[2976]: src/gatt-client.c:btd_gatt_client_connected() Device
->>> connected.
->>> bluetoothd[2976]: src/device.c:load_gatt_db() Restoring
->>> 30:75:12:94:47:D5 gatt database from file
->>> bluetoothd[2976]: No cache for 30:75:12:94:47:D5
->>> bluetoothd[2976]: src/device.c:gatt_debug() MTU Exchange failed. ATT ECODE: 0x06
->>
->> We did have some problems with Android up to 4.4 when Android would
->> stop sending any request when it gets a MTU Exchange but this has been
->> working with 5.1 and later so Im not sure if this is related. You can
->> check if that is the case with the following patch:
->> http://www.spinics.net/lists/linux-bluetooth/msg66498.html (I end up
->> abandoning it since it was supposed to work with more recent
->> Androids).
->>
->
-> Thanks for your reply.
->
-> As a result, Android still cannot find primary services.
-> I compared a bluez-5.39 source with
-> http://www.spinics.net/lists/linux-bluetooth/msg66498.html
-> It seemed not applied to 5.39. so, I edited a source and recompiled
-> and try again.
->
-> Logs:
-> bluetoothd[18338]: src/gatt-client.c:btd_gatt_client_connected()
-> Device connected.
-> bluetoothd[18338]: src/device.c:load_gatt_db() Restoring
-> 30:75:12:94:47:D5 gatt database from file
-> bluetoothd[18338]: No cache for 30:75:12:94:47:D5
-> bluetoothd[18338]: src/device.c:gatt_debug() Primary services found: 2
-> bluetoothd[18338]: src/device.c:gatt_debug() start: 0x0001, end:
-> 0x0005, uuid: 00001801-0000-1000-8000-00805f9b34fb
-> bluetoothd[18338]: src/device.c:gatt_debug() start: 0x0014, end:
-> 0xffff, uuid: 00001800-0000-1000-8000-00805f9b34fb
-> bluetoothd[18338]: src/device.c:gatt_debug() Secondary service
-> discovery failed. ATT ECODE: 0x10
->
-> Log is changed, do not show 'MTU Exchange failed. ATT ECODE: 0x06' message.
-> But, still not discover all primary services. Not shown a log message
-> like this "Read By Grp Type - start: 0x0001 end: 0xffff"
->
-> Can you advice me?
->
-> Best Regards,
-> Tak
->
->
->>> bluetoothd[2976]: src/device.c:gatt_debug() Primary services found: 2
->>> bluetoothd[2976]: src/device.c:gatt_debug() start: 0x0001, end:
->>> 0x0005, uuid: 00001801-0000-1000-8000-00805f9b34fb
->>> bluetoothd[2976]: src/device.c:gatt_debug() start: 0x0014, end:
->>> 0xffff, uuid: 00001800-0000-1000-8000-00805f9b34fb
->>> bluetoothd[2976]: src/device.c:gatt_debug() Secondary service
->>> discovery failed. ATT ECODE: 0x10
->>>
->>>
->>> It looks like if request is from an android, cannot find primary services.
->>> How can I use a GATT service with an android?
->>> Pls advise me.
->>>
->>> Best Regards,
->>> Tak
->>> --
->>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->>> the body of a message to majordomo@vger.kernel.org
->>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->>
->>
->>
->> --
->> Luiz Augusto von Dentz
+diff --git a/drivers/bluetooth/hci_vhci.c b/drivers/bluetooth/hci_vhci.c
+index f67ea1c090cb..39230f30f544 100644
+--- a/drivers/bluetooth/hci_vhci.c
++++ b/drivers/bluetooth/hci_vhci.c
+@@ -50,6 +50,7 @@ struct vhci_data {
+ 	wait_queue_head_t read_wait;
+ 	struct sk_buff_head readq;
+ 
++	struct mutex open_mutex;
+ 	struct delayed_work open_timeout;
+ };
+ 
+@@ -87,7 +88,7 @@ static int vhci_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
+ 	return 0;
+ }
+ 
+-static int vhci_create_device(struct vhci_data *data, __u8 opcode)
++static int __vhci_create_device(struct vhci_data *data, __u8 opcode)
+ {
+ 	struct hci_dev *hdev;
+ 	struct sk_buff *skb;
+@@ -151,6 +152,19 @@ static int vhci_create_device(struct vhci_data *data, __u8 opcode)
+ 	return 0;
+ }
+ 
++static int vhci_create_device(struct vhci_data *data, __u8 opcode)
++{
++	int err;
++
++	mutex_lock(&data->open_mutex);
++	if (data->hdev)
++		err = -EBADFD;
++	else
++		err = __vhci_create_device(data, opcode);
++	mutex_unlock(&data->open_mutex);
++	return err;
++}
++
+ static inline ssize_t vhci_get_user(struct vhci_data *data,
+ 				    struct iov_iter *from)
+ {
+@@ -191,11 +205,6 @@ static inline ssize_t vhci_get_user(struct vhci_data *data,
+ 	case HCI_VENDOR_PKT:
+ 		cancel_delayed_work_sync(&data->open_timeout);
+ 
+-		if (data->hdev) {
+-			kfree_skb(skb);
+-			return -EBADFD;
+-		}
+-
+ 		opcode = *((__u8 *) skb->data);
+ 		skb_pull(skb, 1);
+ 
+@@ -320,6 +329,7 @@ static int vhci_open(struct inode *inode, struct file *file)
+ 	skb_queue_head_init(&data->readq);
+ 	init_waitqueue_head(&data->read_wait);
+ 
++	mutex_init(&data->open_mutex);
+ 	INIT_DELAYED_WORK(&data->open_timeout, vhci_open_timeout);
+ 
+ 	file->private_data = data;
+-- 
+2.8.1
