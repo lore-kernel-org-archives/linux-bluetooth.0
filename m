@@ -1,26 +1,46 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-To: linux-bluetooth@vger.kernel.org
-From: Stjepan Horvat <stjepan.horvat@swissinnolab.com>
-Subject: gatttool --char-write not working from CLI
-Message-ID: <5710B6D9.3050607@swissinnolab.com>
-Date: Fri, 15 Apr 2016 11:39:37 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <1460117928-9998-1-git-send-email-luiz.dentz@gmail.com>
+References: <1460117928-9998-1-git-send-email-luiz.dentz@gmail.com>
+Date: Fri, 15 Apr 2016 11:32:40 +0300
+Message-ID: <CABBYNZJZxMfQTup1Tq-HjFMeW0vQ+i_w+u3JP4KSTxwZ1RtfmA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] systemd: Enable ProtectHome and ProtectSystem options
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi guys.
-I have been using gatttool few days now.
-It is very great. However i have found a BUG.
+Hi,
 
-When i use:
-gatttool -I => connect => char-write-req => WORKS
-gatttool --char-write-req => WORKS
-gatttool -I => connect => char-write-cmd => WORKS
-gatttool --char-write => DOES NOT WORK
+On Fri, Apr 8, 2016 at 3:18 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> These options protect from unintended access to the filesystem see
+> SYSTEMD.EXEC(5) for mode detail.
+> ---
+>  src/bluetooth.service.in | 2 ++
+>  1 file changed, 2 insertions(+)
+>
+> diff --git a/src/bluetooth.service.in b/src/bluetooth.service.in
+> index 83e4732..f799f65 100644
+> --- a/src/bluetooth.service.in
+> +++ b/src/bluetooth.service.in
+> @@ -12,6 +12,8 @@ NotifyAccess=main
+>  #Restart=on-failure
+>  CapabilityBoundingSet=CAP_NET_ADMIN CAP_NET_BIND_SERVICE
+>  LimitNPROC=1
+> +ProtectHome=true
+> +ProtectSystem=full
+>
+>  [Install]
+>  WantedBy=bluetooth.target
+> --
+> 2.5.0
 
-is there a reason that the same command has a diferent name in CLI and 
-Interactive mode?
-What happens is that when i try to execute --char-write from CLI it hangs.
+Applied.
 
-Thanks.
+
+-- 
+Luiz Augusto von Dentz
