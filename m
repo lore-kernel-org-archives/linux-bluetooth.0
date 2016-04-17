@@ -1,107 +1,55 @@
-Return-Path: <akarwar@marvell.com>
-From: Amitkumar Karwar <akarwar@marvell.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Ganapathi Bhat <gbhat@marvell.com>
-Subject: RE: [PATCH v7] Bluetooth: hci_uart: Support firmware download for
- Marvell
-Date: Mon, 18 Apr 2016 10:51:48 +0000
-Message-ID: <cccc8d3fb57844bebb8cd93d9578122f@SC-EXCH04.marvell.com>
-References: <1459845266-2771-1-git-send-email-akarwar@marvell.com>
- <dbff88372c89421b9568ad3d32aa283d@SC-EXCH04.marvell.com>
- <DEE89AB2-038B-4C0D-A06C-0A72351DD2EC@holtmann.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Stuart Little <Stuart.Little@leotel-software.co.uk>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: gatttool unable to connect to LE device, connection refused (111)
+Date: Sun, 17 Apr 2016 16:15:07 +0000
+Message-ID: <b34adead8bf54247ba80dd74ecee1d26@EX2013.leotel.co.uk>
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi,
+  Using linux kernel 4.2.8 or 4.3.4 I have been unable to connect to BLE devices using either gatttool or our app, which worked on an earlier kernel but had reliability issues so we have been updating to later kernel and rootfs.
 
-> From: Amitkumar Karwar
-> Sent: Tuesday, April 12, 2016 10:23 PM
-> To: 'Marcel Holtmann'
-> Cc: linux-bluetooth@vger.kernel.org; Ganapathi Bhat
-> Subject: RE: [PATCH v7] Bluetooth: hci_uart: Support firmware download
-> for Marvell
->=20
-> Hi Marcel,
->=20
-> > From: Marcel Holtmann [mailto:marcel@holtmann.org]
-> > Sent: Tuesday, April 12, 2016 9:48 PM
-> > To: Amitkumar Karwar
-> > Cc: linux-bluetooth@vger.kernel.org; Ganapathi Bhat
-> > Subject: Re: [PATCH v7] Bluetooth: hci_uart: Support firmware download
-> > for Marvell
-> >
-> > Hi Amitkumar,
-> >
-> > >> From: Amitkumar Karwar [mailto:akarwar@marvell.com]
-> > >> Sent: Tuesday, April 05, 2016 2:04 PM
-> > >> To: linux-bluetooth@vger.kernel.org
-> > >> Cc: linux-kernel@vger.kernel.org; Ganapathi Bhat; Amitkumar Karwar
-> > >> Subject: [PATCH v7] Bluetooth: hci_uart: Support firmware download
-> > >> for Marvell
-> > >>
-> > >> From: Ganapathi Bhat <gbhat@marvell.com>
-> > >>
-> > >> This patch implement firmware download feature for Marvell
-> > >> Bluetooth devices. If firmware is already downloaded, it will skip
-> downloading.
-> > >>
-> > >> Signed-off-by: Ganapathi Bhat <gbhat@marvell.com>
-> > >> Signed-off-by: Amitkumar Karwar <akarwar@marvell.com>
-> > >> ---
-> > >> v2: Fixed compilation warning reported by kbuild test robot
-> > >> v3: Addressed review comments from Marcel Holtmann
-> > >>    a) Removed vendor specific code from hci_ldisc.c
-> > >>    b) Get rid of static forward declaration
-> > >>    c) Removed unnecessary heavy nesting
-> > >>    d) Git rid of module parameter and global variables
-> > >>    e) Add logic to pick right firmware image
-> > >> v4: Addresses review comments from Alan
-> > >>    a) Use existing kernel helper APIs instead of writing own.
-> > >>    b) Replace mdelay() with msleep()
-> > >> v5: Addresses review comments from Loic Poulain
-> > >>    a) Use bt_dev_err/warn/dbg helpers insted of BT_ERR/WARN/DBG
-> > >>    b) Used static functions where required and removed forward
-> > >> delcarations
-> > >>    c) Edited comments for the function hci_uart_recv_data
-> > >>    d) Made HCI_UART_DNLD_FW flag a part of driver private data
-> > >> v6: Addresses review comments from Loic Poulain
-> > >>    a) Used skb instead of array to store firmware data during
-> > download
-> > >>    b) Used hci_uart_tx_wakeup and enqueued packets instead of tty
-> > write
-> > >>    c) Used GFP_KERNEL instead of GFP_ATOMIC
-> > >> v7: Edited Kconfig to add dependency for BT_HCIUART_H4. The change
-> > >> resolves
-> > >>    errors reported by kbuild test robot.
-> > >> ---
-> > >> drivers/bluetooth/Kconfig     |  11 +
-> > >> drivers/bluetooth/Makefile    |   1 +
-> > >> drivers/bluetooth/btmrvl.h    |  43 ++++
-> > >> drivers/bluetooth/hci_ldisc.c |   6 +
-> > >> drivers/bluetooth/hci_mrvl.c  | 568
-> > >> ++++++++++++++++++++++++++++++++++++++++++
-> > >> drivers/bluetooth/hci_uart.h  |   8 +-
-> > >> 6 files changed, 636 insertions(+), 1 deletion(-)  create mode
-> > >> 100644 drivers/bluetooth/btmrvl.h  create mode 100644
-> > >> drivers/bluetooth/hci_mrvl.c
-> > >>
-> > >
-> > > Could you please take this patch if there are no further
-> > comments/suggestions?
-> >
-> > didn't I see a kbot build warning for this version as well? Or was
-> > that the previous version?
-> >
->=20
-> Last kbot build warning was for V6 patch. It has been fixed in this
-> version.
-> https://lkml.org/lkml/2016/4/2/102
->=20
+hciconfig  shows 
 
-The warning had got fixed in latest version. Please let me know if there ar=
-e any issues merging the patch.
+hci0:   Type: BR/EDR  Bus: UART
+        BD Address: 78:A5:04:31:3C:4B  ACL MTU: 1021:6  SCO MTU: 180:4
+        UP RUNNING
+        RX bytes:24625 acl:0 sco:0 events:733 errors:0
+        TX bytes:481 acl:0 sco:0 commands:43 errors:0
 
-Regards,
-Amitkumar
+Hcitool lescan:-
+
+LE Scan ...
+DA:61:22:17:65:E8 (unknown)
+DA:61:22:17:65:E8 (unknown)
+C3:9B:9C:19:F8:49 (unknown)
+C3:9B:9C:19:F8:49 (unknown)
+
+The application scan also receives beacons, however when an attempt to connect is made either via the app or gatttool I always get connection refused (111).
+
+systemctl | grep Bluetooth
+
+sys-devices-virtual-bluetooth-hci0-rfkill0.device            loaded active plugged   /sys/devices/virtual/bluetooth/hci0/rfkill0
+sys-devices-virtual-bluetooth-hci0.device                         loaded active plugged   /sys/devices/virtual/bluetooth/hci0
+sys-subsystem-bluetooth-devices-hci0.device                loaded active plugged   /sys/subsystem/bluetooth/devices/hci0
+bluetooth.service                                                                         loaded active running   Bluetooth service
+bluetooth.target                                                                           loaded active active    Bluetooth
+
+bluetoothctl howver shows No default controller availalble.
+
+
+One post suggested that bluez does not support BLE without a configuration change using btmgmt le on, but that fails 
+"Set Low Energy for hci0 failed with status 0x11 (Invalid Index)", presumably as bluetoothd has no controller.
+
+Any pointers as to what I am missing (bluetooth newbie)
+
+Thanks,
+  Stu
+
+
+ 
+
+
