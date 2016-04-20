@@ -1,69 +1,432 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Francois Beaufort <beaufort.francois@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] Recognize Eddystone Configuration Service UUIDs
-Date: Wed, 20 Apr 2016 11:16:13 +0200
-Message-Id: <1461143773-17833-2-git-send-email-beaufort.francois@gmail.com>
-In-Reply-To: <1461143773-17833-1-git-send-email-beaufort.francois@gmail.com>
-References: <1461143773-17833-1-git-send-email-beaufort.francois@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <aar@pengutronix.de>
+From: Alexander Aring <aar@pengutronix.de>
+To: linux-wpan@vger.kernel.org
+Cc: kernel@pengutronix.de,
+	marcel@holtmann.org,
+	jukka.rissanen@linux.intel.com,
+	hannes@stressinduktion.org,
+	stefan@osg.samsung.com,
+	mcr@sandelman.ca,
+	werner@almesberger.net,
+	linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Alexander Aring <aar@pengutronix.de>
+Subject: [PATCHv2 bluetooth-next 10/10] 6lowpan: add support for 802.15.4 short addr handling
+Date: Wed, 20 Apr 2016 10:19:42 +0200
+Message-Id: <1461140382-4784-11-git-send-email-aar@pengutronix.de>
+In-Reply-To: <1461140382-4784-1-git-send-email-aar@pengutronix.de>
+References: <1461140382-4784-1-git-send-email-aar@pengutronix.de>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- monitor/uuid.c | 26 ++++++++++++++++++++++++++
- 1 file changed, 26 insertions(+)
+This patch adds necessary handling for use the short address for
+802.15.4 6lowpan. It contains support for IPHC address compression
+and new matching algorithmn to decide which link layer address will be
+used for 802.15.4 frame.
 
-diff --git a/monitor/uuid.c b/monitor/uuid.c
-index 54adb0d..6c60a67 100644
---- a/monitor/uuid.c
-+++ b/monitor/uuid.c
-@@ -540,6 +540,26 @@ static struct {
- 	{ }
+Signed-off-by: Alexander Aring <aar@pengutronix.de>
+---
+ net/6lowpan/iphc.c          | 167 ++++++++++++++++++++++++++++++++++++--------
+ net/ieee802154/6lowpan/tx.c | 107 ++++++++++++++--------------
+ 2 files changed, 189 insertions(+), 85 deletions(-)
+
+diff --git a/net/6lowpan/iphc.c b/net/6lowpan/iphc.c
+index 8501dd5..aca38dc 100644
+--- a/net/6lowpan/iphc.c
++++ b/net/6lowpan/iphc.c
+@@ -761,22 +761,75 @@ static const u8 lowpan_iphc_dam_to_sam_value[] = {
+ 	[LOWPAN_IPHC_DAM_11] = LOWPAN_IPHC_SAM_11,
  };
  
-+static struct {
-+	const char *uuid;
-+	const char *str;
-+} uuid128_table[] = {
-+	{ "a3c87500-8ed3-4bdf-8a39-a01bebede295", "Eddystone Configuration Service"	},
-+	{ "a3c87501-8ed3-4bdf-8a39-a01bebede295", "Capabilities"			},
-+	{ "a3c87502-8ed3-4bdf-8a39-a01bebede295", "Active Slot"				},
-+	{ "a3c87503-8ed3-4bdf-8a39-a01bebede295", "Advertising Interval"		},
-+	{ "a3c87504-8ed3-4bdf-8a39-a01bebede295", "Radio Tx Power"			},
-+	{ "a3c87505-8ed3-4bdf-8a39-a01bebede295", "(Advanced) Advertised Tx Power"	},
-+	{ "a3c87506-8ed3-4bdf-8a39-a01bebede295", "Lock State"				},
-+	{ "a3c87507-8ed3-4bdf-8a39-a01bebede295", "Unlock"				},
-+	{ "a3c87508-8ed3-4bdf-8a39-a01bebede295", "Public ECDH Key"			},
-+	{ "a3c87509-8ed3-4bdf-8a39-a01bebede295", "EID Identity Key"			},
-+	{ "a3c8750a-8ed3-4bdf-8a39-a01bebede295", "ADV Slot Data"			},
-+	{ "a3c8750b-8ed3-4bdf-8a39-a01bebede295", "(Advanced) Factory reset"		},
-+	{ "a3c8750c-8ed3-4bdf-8a39-a01bebede295", "(Advanced) Remain Connectable"	},
-+	{ NULL, NULL }
-+};
+-static u8 lowpan_compress_ctx_addr(u8 **hc_ptr, const struct in6_addr *ipaddr,
++static inline bool
++lowpan_iphc_compress_ctx_802154_lladdr(const struct in6_addr *ipaddr,
++				       const struct lowpan_iphc_ctx *ctx,
++				       const void *lladdr)
++{
++	const struct ieee802154_addr *addr = lladdr;
++	unsigned char extended_addr[EUI64_ADDR_LEN];
++	struct in6_addr tmp = {};
++	bool lladdr_compress = false;
 +
- const char *uuid16_to_str(uint16_t uuid)
- {
- 	int i;
-@@ -567,6 +587,7 @@ const char *uuid128_to_str(const unsigned char *uuid)
- 
- const char *uuidstr_to_str(const char *uuid)
- {
-+	int i;
- 	uint32_t val;
- 
- 	if (!uuid)
-@@ -575,6 +596,11 @@ const char *uuidstr_to_str(const char *uuid)
- 	if (strlen(uuid) != 36)
- 		return NULL;
- 
-+	for (i = 0; uuid128_table[i].str; i++) {
-+		if (strcasecmp(uuid128_table[i].uuid, uuid) == 0)
-+			return uuid128_table[i].str;
++	switch (addr->mode) {
++	case IEEE802154_ADDR_LONG:
++		ieee802154_le64_to_be64(&extended_addr, &addr->extended_addr);
++		/* check for SAM/DAM = 11 */
++		memcpy(&tmp.s6_addr[8], &extended_addr, EUI64_ADDR_LEN);
++		/* second bit-flip (Universe/Local) is done according RFC2464 */
++		tmp.s6_addr[8] ^= 0x02;
++		/* context information are always used */
++		ipv6_addr_prefix_copy(&tmp, &ctx->pfx, ctx->plen);
++		if (ipv6_addr_equal(&tmp, ipaddr))
++			lladdr_compress = true;
++		break;
++	case IEEE802154_ADDR_SHORT:
++		tmp.s6_addr[11] = 0xFF;
++		tmp.s6_addr[12] = 0xFE;
++		ieee802154_le16_to_be16(&tmp.s6_addr16[7],
++					&addr->short_addr);
++		/* context information are always used */
++		ipv6_addr_prefix_copy(&tmp, &ctx->pfx, ctx->plen);
++		if (ipv6_addr_equal(&tmp, ipaddr))
++			lladdr_compress = true;
++		break;
++	default:
++		/* should never handled and filtered by 802154 6lowpan */
++		WARN_ON_ONCE(1);
++		break;
 +	}
 +
- 	if (strncasecmp(uuid + 8, "-0000-1000-8000-00805f9b34fb", 28))
- 		return "Vendor specific";
++	return lladdr_compress;
++}
++
++static u8 lowpan_compress_ctx_addr(u8 **hc_ptr, const struct net_device *dev,
++				   const struct in6_addr *ipaddr,
+ 				   const struct lowpan_iphc_ctx *ctx,
+ 				   const unsigned char *lladdr, bool sam)
+ {
+ 	struct in6_addr tmp = {};
+ 	u8 dam;
  
+-	/* check for SAM/DAM = 11 */
+-	memcpy(&tmp.s6_addr[8], lladdr, 8);
+-	/* second bit-flip (Universe/Local) is done according RFC2464 */
+-	tmp.s6_addr[8] ^= 0x02;
+-	/* context information are always used */
+-	ipv6_addr_prefix_copy(&tmp, &ctx->pfx, ctx->plen);
+-	if (ipv6_addr_equal(&tmp, ipaddr)) {
+-		dam = LOWPAN_IPHC_DAM_11;
+-		goto out;
++	switch (lowpan_dev(dev)->lltype) {
++	case LOWPAN_LLTYPE_IEEE802154:
++		if (lowpan_iphc_compress_ctx_802154_lladdr(ipaddr, ctx,
++							   lladdr)) {
++			dam = LOWPAN_IPHC_DAM_11;
++			goto out;
++		}
++		break;
++	default:
++		/* check for SAM/DAM = 11 */
++		memcpy(&tmp.s6_addr[8], lladdr, EUI64_ADDR_LEN);
++		/* second bit-flip (Universe/Local) is done according RFC2464 */
++		tmp.s6_addr[8] ^= 0x02;
++		/* context information are always used */
++		ipv6_addr_prefix_copy(&tmp, &ctx->pfx, ctx->plen);
++		if (ipv6_addr_equal(&tmp, ipaddr)) {
++			dam = LOWPAN_IPHC_DAM_11;
++			goto out;
++		}
++		break;
+ 	}
+ 
+ 	memset(&tmp, 0, sizeof(tmp));
+@@ -813,28 +866,85 @@ out:
+ 		return dam;
+ }
+ 
+-static u8 lowpan_compress_addr_64(u8 **hc_ptr, const struct in6_addr *ipaddr,
++static inline bool
++lowpan_iphc_compress_802154_lladdr(const struct in6_addr *ipaddr,
++				   const void *lladdr)
++{
++	const struct ieee802154_addr *addr = lladdr;
++	unsigned char extended_addr[EUI64_ADDR_LEN];
++	struct in6_addr tmp = {};
++	bool lladdr_compress = false;
++
++	switch (addr->mode) {
++	case IEEE802154_ADDR_LONG:
++		ieee802154_le64_to_be64(&extended_addr, &addr->extended_addr);
++		if (is_addr_mac_addr_based(ipaddr, extended_addr))
++			lladdr_compress = true;
++		break;
++	case IEEE802154_ADDR_SHORT:
++		/* fe:80::ff:fe00:XXXX
++		 *                \__/
++		 *             short_addr
++		 *
++		 * Universe/Local bit is zero.
++		 */
++		tmp.s6_addr[0] = 0xFE;
++		tmp.s6_addr[1] = 0x80;
++		tmp.s6_addr[11] = 0xFF;
++		tmp.s6_addr[12] = 0xFE;
++		ieee802154_le16_to_be16(&tmp.s6_addr16[7],
++					&addr->short_addr);
++		if (ipv6_addr_equal(&tmp, ipaddr))
++			lladdr_compress = true;
++		break;
++	default:
++		/* should never handled and filtered by 802154 6lowpan */
++		WARN_ON_ONCE(1);
++		break;
++	}
++
++	return lladdr_compress;
++}
++
++static u8 lowpan_compress_addr_64(u8 **hc_ptr, const struct net_device *dev,
++				  const struct in6_addr *ipaddr,
+ 				  const unsigned char *lladdr, bool sam)
+ {
+-	u8 dam = LOWPAN_IPHC_DAM_00;
++	u8 dam = LOWPAN_IPHC_DAM_01;
+ 
+-	if (is_addr_mac_addr_based(ipaddr, lladdr)) {
+-		dam = LOWPAN_IPHC_DAM_11; /* 0-bits */
+-		pr_debug("address compression 0 bits\n");
+-	} else if (lowpan_is_iid_16_bit_compressable(ipaddr)) {
++	switch (lowpan_dev(dev)->lltype) {
++	case LOWPAN_LLTYPE_IEEE802154:
++		if (lowpan_iphc_compress_802154_lladdr(ipaddr, lladdr)) {
++			dam = LOWPAN_IPHC_DAM_11; /* 0-bits */
++			pr_debug("address compression 0 bits\n");
++			goto out;
++		}
++		break;
++	default:
++		if (is_addr_mac_addr_based(ipaddr, lladdr)) {
++			dam = LOWPAN_IPHC_DAM_11; /* 0-bits */
++			pr_debug("address compression 0 bits\n");
++			goto out;
++		}
++		break;
++	}
++
++	if (lowpan_is_iid_16_bit_compressable(ipaddr)) {
+ 		/* compress IID to 16 bits xxxx::XXXX */
+ 		lowpan_push_hc_data(hc_ptr, &ipaddr->s6_addr16[7], 2);
+ 		dam = LOWPAN_IPHC_DAM_10; /* 16-bits */
+ 		raw_dump_inline(NULL, "Compressed ipv6 addr is (16 bits)",
+ 				*hc_ptr - 2, 2);
+-	} else {
+-		/* do not compress IID => xxxx::IID */
+-		lowpan_push_hc_data(hc_ptr, &ipaddr->s6_addr16[4], 8);
+-		dam = LOWPAN_IPHC_DAM_01; /* 64-bits */
+-		raw_dump_inline(NULL, "Compressed ipv6 addr is (64 bits)",
+-				*hc_ptr - 8, 8);
++		goto out;
+ 	}
+ 
++	/* do not compress IID => xxxx::IID */
++	lowpan_push_hc_data(hc_ptr, &ipaddr->s6_addr16[4], 8);
++	raw_dump_inline(NULL, "Compressed ipv6 addr is (64 bits)",
++			*hc_ptr - 8, 8);
++
++out:
++
+ 	if (sam)
+ 		return lowpan_iphc_dam_to_sam_value[dam];
+ 	else
+@@ -1013,9 +1123,6 @@ int lowpan_header_compress(struct sk_buff *skb, const struct net_device *dev,
+ 	iphc0 = LOWPAN_DISPATCH_IPHC;
+ 	iphc1 = 0;
+ 
+-	raw_dump_inline(__func__, "saddr", saddr, EUI64_ADDR_LEN);
+-	raw_dump_inline(__func__, "daddr", daddr, EUI64_ADDR_LEN);
+-
+ 	raw_dump_table(__func__, "sending raw skb network uncompressed packet",
+ 		       skb->data, skb->len);
+ 
+@@ -1088,14 +1195,15 @@ int lowpan_header_compress(struct sk_buff *skb, const struct net_device *dev,
+ 		iphc1 |= LOWPAN_IPHC_SAC;
+ 	} else {
+ 		if (sci) {
+-			iphc1 |= lowpan_compress_ctx_addr(&hc_ptr, &hdr->saddr,
++			iphc1 |= lowpan_compress_ctx_addr(&hc_ptr, dev,
++							  &hdr->saddr,
+ 							  &sci_entry, saddr,
+ 							  true);
+ 			iphc1 |= LOWPAN_IPHC_SAC;
+ 		} else {
+ 			if (ipv6_saddr_type & IPV6_ADDR_LINKLOCAL &&
+ 			    lowpan_is_linklocal_zero_padded(hdr->saddr)) {
+-				iphc1 |= lowpan_compress_addr_64(&hc_ptr,
++				iphc1 |= lowpan_compress_addr_64(&hc_ptr, dev,
+ 								 &hdr->saddr,
+ 								 saddr, true);
+ 				pr_debug("source address unicast link-local %pI6c iphc1 0x%02x\n",
+@@ -1123,14 +1231,15 @@ int lowpan_header_compress(struct sk_buff *skb, const struct net_device *dev,
+ 		}
+ 	} else {
+ 		if (dci) {
+-			iphc1 |= lowpan_compress_ctx_addr(&hc_ptr, &hdr->daddr,
++			iphc1 |= lowpan_compress_ctx_addr(&hc_ptr, dev,
++							  &hdr->daddr,
+ 							  &dci_entry, daddr,
+ 							  false);
+ 			iphc1 |= LOWPAN_IPHC_DAC;
+ 		} else {
+ 			if (ipv6_daddr_type & IPV6_ADDR_LINKLOCAL &&
+ 			    lowpan_is_linklocal_zero_padded(hdr->daddr)) {
+-				iphc1 |= lowpan_compress_addr_64(&hc_ptr,
++				iphc1 |= lowpan_compress_addr_64(&hc_ptr, dev,
+ 								 &hdr->daddr,
+ 								 daddr, false);
+ 				pr_debug("dest address unicast link-local %pI6c iphc1 0x%02x\n",
+diff --git a/net/ieee802154/6lowpan/tx.c b/net/ieee802154/6lowpan/tx.c
+index e459afd..88c9d16 100644
+--- a/net/ieee802154/6lowpan/tx.c
++++ b/net/ieee802154/6lowpan/tx.c
+@@ -9,6 +9,7 @@
+  */
+ 
+ #include <net/6lowpan.h>
++#include <net/ndisc.h>
+ #include <net/ieee802154_netdev.h>
+ #include <net/mac802154.h>
+ 
+@@ -17,19 +18,9 @@
+ #define LOWPAN_FRAG1_HEAD_SIZE	0x4
+ #define LOWPAN_FRAGN_HEAD_SIZE	0x5
+ 
+-/* don't save pan id, it's intra pan */
+-struct lowpan_addr {
+-	u8 mode;
+-	union {
+-		/* IPv6 needs big endian here */
+-		__be64 extended_addr;
+-		__be16 short_addr;
+-	} u;
+-};
+-
+ struct lowpan_addr_info {
+-	struct lowpan_addr daddr;
+-	struct lowpan_addr saddr;
++	struct ieee802154_addr daddr;
++	struct ieee802154_addr saddr;
+ };
+ 
+ static inline struct
+@@ -48,12 +39,14 @@ lowpan_addr_info *lowpan_skb_priv(const struct sk_buff *skb)
+  * RAW/DGRAM sockets.
+  */
+ int lowpan_header_create(struct sk_buff *skb, struct net_device *ldev,
+-			 unsigned short type, const void *_daddr,
+-			 const void *_saddr, unsigned int len)
++			 unsigned short type, const void *daddr,
++			 const void *saddr, unsigned int len)
+ {
+-	const u8 *saddr = _saddr;
+-	const u8 *daddr = _daddr;
+-	struct lowpan_addr_info *info;
++	struct wpan_dev *wpan_dev = lowpan_802154_dev(ldev)->wdev->ieee802154_ptr;
++	struct lowpan_addr_info *info = lowpan_skb_priv(skb);
++	struct lowpan_802154_neigh *llneigh = NULL;
++	const struct ipv6hdr *hdr = ipv6_hdr(skb);
++	struct neighbour *n;
+ 
+ 	/* TODO:
+ 	 * if this package isn't ipv6 one, where should it be routed?
+@@ -61,21 +54,44 @@ int lowpan_header_create(struct sk_buff *skb, struct net_device *ldev,
+ 	if (type != ETH_P_IPV6)
+ 		return 0;
+ 
+-	if (!saddr)
+-		saddr = ldev->dev_addr;
++	/* intra-pan communication */
++	info->saddr.pan_id = wpan_dev->pan_id;
++	info->daddr.pan_id = info->saddr.pan_id;
+ 
+-	raw_dump_inline(__func__, "saddr", (unsigned char *)saddr, 8);
+-	raw_dump_inline(__func__, "daddr", (unsigned char *)daddr, 8);
++	if (!memcmp(daddr, ldev->broadcast, EUI64_ADDR_LEN)) {
++		info->daddr.short_addr = cpu_to_le16(IEEE802154_ADDR_BROADCAST);
++		info->daddr.mode = IEEE802154_ADDR_SHORT;
++	} else {
++		n = neigh_lookup(&nd_tbl, &hdr->daddr, ldev);
++		if (n)
++			llneigh = lowpan_802154_neigh(neighbour_priv(n));
++
++		if (llneigh &&
++		    ieee802154_is_valid_src_short_addr(llneigh->short_addr)) {
++			info->daddr.mode = IEEE802154_ADDR_SHORT;
++			info->daddr.short_addr = llneigh->short_addr;
++		} else {
++			info->daddr.mode = IEEE802154_ADDR_LONG;
++			ieee802154_be64_to_le64(&info->daddr.extended_addr,
++						daddr);
++		}
+ 
+-	info = lowpan_skb_priv(skb);
++		if (n)
++			neigh_release(n);
++	}
+ 
+-	/* TODO: Currently we only support extended_addr */
+-	info->daddr.mode = IEEE802154_ADDR_LONG;
+-	memcpy(&info->daddr.u.extended_addr, daddr,
+-	       sizeof(info->daddr.u.extended_addr));
+-	info->saddr.mode = IEEE802154_ADDR_LONG;
+-	memcpy(&info->saddr.u.extended_addr, saddr,
+-	       sizeof(info->daddr.u.extended_addr));
++	if (!saddr) {
++		if (ieee802154_is_valid_src_short_addr(wpan_dev->short_addr)) {
++			info->saddr.mode = IEEE802154_ADDR_SHORT;
++			info->saddr.short_addr = wpan_dev->short_addr;
++		} else {
++			info->saddr.mode = IEEE802154_ADDR_LONG;
++			info->saddr.extended_addr = wpan_dev->extended_addr;
++		}
++	} else {
++		info->saddr.mode = IEEE802154_ADDR_LONG;
++		ieee802154_be64_to_le64(&info->saddr.extended_addr, saddr);
++	}
+ 
+ 	return 0;
+ }
+@@ -209,47 +225,26 @@ static int lowpan_header(struct sk_buff *skb, struct net_device *ldev,
+ 			 u16 *dgram_size, u16 *dgram_offset)
+ {
+ 	struct wpan_dev *wpan_dev = lowpan_802154_dev(ldev)->wdev->ieee802154_ptr;
+-	struct ieee802154_addr sa, da;
+ 	struct ieee802154_mac_cb *cb = mac_cb_init(skb);
+ 	struct lowpan_addr_info info;
+-	void *daddr, *saddr;
+ 
+ 	memcpy(&info, lowpan_skb_priv(skb), sizeof(info));
+ 
+-	/* TODO: Currently we only support extended_addr */
+-	daddr = &info.daddr.u.extended_addr;
+-	saddr = &info.saddr.u.extended_addr;
+-
+ 	*dgram_size = skb->len;
+-	lowpan_header_compress(skb, ldev, daddr, saddr);
++	lowpan_header_compress(skb, ldev, &info.daddr, &info.saddr);
+ 	/* dgram_offset = (saved bytes after compression) + lowpan header len */
+ 	*dgram_offset = (*dgram_size - skb->len) + skb_network_header_len(skb);
+ 
+ 	cb->type = IEEE802154_FC_TYPE_DATA;
+ 
+-	/* prepare wpan address data */
+-	sa.mode = IEEE802154_ADDR_LONG;
+-	sa.pan_id = wpan_dev->pan_id;
+-	sa.extended_addr = ieee802154_devaddr_from_raw(saddr);
+-
+-	/* intra-PAN communications */
+-	da.pan_id = sa.pan_id;
+-
+-	/* if the destination address is the broadcast address, use the
+-	 * corresponding short address
+-	 */
+-	if (!memcmp(daddr, ldev->broadcast, EUI64_ADDR_LEN)) {
+-		da.mode = IEEE802154_ADDR_SHORT;
+-		da.short_addr = cpu_to_le16(IEEE802154_ADDR_BROADCAST);
++	if (info.daddr.mode == IEEE802154_ADDR_SHORT &&
++	    ieee802154_is_broadcast_short_addr(info.daddr.short_addr))
+ 		cb->ackreq = false;
+-	} else {
+-		da.mode = IEEE802154_ADDR_LONG;
+-		da.extended_addr = ieee802154_devaddr_from_raw(daddr);
++	else
+ 		cb->ackreq = wpan_dev->ackreq;
+-	}
+ 
+-	return wpan_dev_hard_header(skb, lowpan_802154_dev(ldev)->wdev, &da,
+-				    &sa, 0);
++	return wpan_dev_hard_header(skb, lowpan_802154_dev(ldev)->wdev,
++				    &info.daddr, &info.saddr, 0);
+ }
+ 
+ netdev_tx_t lowpan_xmit(struct sk_buff *skb, struct net_device *ldev)
 -- 
-2.7.0
-
+2.8.0
