@@ -1,23 +1,31 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-To: linux-wpan@vger.kernel.org
-From: Alexander Aring <aar@pengutronix.de>
-Subject: radvd 6lowpan branch created
-Cc: linux-bluetooth@vger.kernel.org, reubenhwk@gmail.com
-Message-ID: <7408558c-a0d1-0bde-5a9c-28c3ba2e76aa@pengutronix.de>
-Date: Thu, 21 Apr 2016 12:57:04 +0200
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+From: Francois Beaufort <beaufort.francois@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ] Fix bluez build break by initializing variable.
+Date: Thu, 21 Apr 2016 10:18:49 +0200
+Message-Id: <1461226729-17372-2-git-send-email-beaufort.francois@gmail.com>
+In-Reply-To: <1461226729-17372-1-git-send-email-beaufort.francois@gmail.com>
+References: <1461226729-17372-1-git-send-email-beaufort.francois@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+---
+ profiles/audio/avrcp.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-I added a radvd fork at linux-wpan github [0]. I pushed a 6lowpan branch
-with my radvd changes which we can hopefully bring upstream some day.
+diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
+index 37bc291..70c184b 100644
+--- a/profiles/audio/avrcp.c
++++ b/profiles/audio/avrcp.c
+@@ -3112,7 +3112,7 @@ static gboolean avrcp_get_total_numberofitems_rsp(struct avctp *conn,
+ 	struct avrcp *session = user_data;
+ 	struct avrcp_player *player = session->controller->player;
+ 	struct media_player *mp = player->user_data;
+-	uint32_t num_of_items;
++	uint32_t num_of_items = 0;
+ 
+ 	if (pdu == NULL)
+ 		return -ETIMEDOUT;
+-- 
+2.7.0
 
-I cc radvd maintainer here, do you see any issues to get _basic_ radvd
-6lowpan/6CO support into upstream?
-
-- Alex
-
-[0] https://github.com/linux-wpan/radvd/tree/6lowpan
