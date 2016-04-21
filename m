@@ -1,41 +1,165 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: mkj@gotu.dk (Martin =?utf-8?Q?Kj=C3=A6r_J=C3=B8rgensen?=)
-To: Frank Praznik <frank.praznik@gmail.com>
-Cc: Antonio Ospite <ao2@ao2.it>, linux-bluetooth@vger.kernel.org
-Subject: Re: DS4 issues
-References: <20151221144607.GA18773@mkjlap.gotu.dk>
-	<20151228101822.03253569407ac9dfe4ea15be@ao2.it>
-	<0F6173F5-CF72-47E8-BB6B-44200F75EB6E@gmail.com>
-	<20151228164042.GA20182@mkjlap.gotu.dk>
-	<20151230110944.GA11559@mkjlap.gotu.dk>
-	<7A34E2B1-A42C-4162-80FC-F2C9E8796F67@gmail.com>
-	<87k2m7602c.fsf@gotu.dk>
-Date: Thu, 21 Apr 2016 18:15:26 +0200
-In-Reply-To: <87k2m7602c.fsf@gotu.dk> ("Martin \=\?utf-8\?Q\?Kj\=C3\=A6r_J\=C3\=B8\?\=
- \=\?utf-8\?Q\?rgensen\=22's\?\= message of
-	"Sun, 14 Feb 2016 11:47:07 +0100")
-Message-ID: <877ffrq6ox.fsf@gotu.dk>
+Date: Thu, 21 Apr 2016 09:36:12 -0500
+From: Rob Herring <robh@kernel.org>
+To: Amitkumar Karwar <akarwar@marvell.com>
+Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+	devicetree@vger.kernel.org, Wei-Ning Huang <wnhuang@chromium.org>,
+	Xinming Hu <huxm@marvell.com>
+Subject: Re: [PATCH v7 1/2] dt: bindings: add MARVELL's bt-sd8xxx wireless
+ device
+Message-ID: <20160421143612.GA19427@rob-hp-laptop>
+References: <1460982230-1470-1-git-send-email-akarwar@marvell.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1460982230-1470-1-git-send-email-akarwar@marvell.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+On Mon, Apr 18, 2016 at 05:23:49AM -0700, Amitkumar Karwar wrote:
+> From: Xinming Hu <huxm@marvell.com>
+> 
+> Add device tree binding documentation for MARVELL's bluetooth sdio
+> (sd8897 and sd8997) chip.
+> 
+> Signed-off-by: Xinming Hu <huxm@marvell.com>
+> Signed-off-by: Amitkumar Karwar <akarwar@marvell.com>
+> ---
+> Listing changelist for both 1/2 and 2/2 here
+> v2: Fixed build error reported by kbuild test robot
+> drivers/bluetooth/btmrvl_platform.c:141:22: error:
+> 'btmrvl_plt_pm_ops' undeclared here (not in a function)
+> 
+> v3: Add NULL check for 'btmrvl_plt_dev'
+> 
+> v4: Moved the bindings file to bindings/net/
+>     Corrected the name of 'name' and 'compatible' properties(Rob Herring)
+> 
+> v5: Comments for wlan patches were applicable here as well. Like all binding
+>     changes in single file, specifying node as a child of SDIO controller.
+> 
+> v6: a)Use <chip>-bt order for compatible attribute(Rob Herring)
+>     b)Split wakeuppin-gap to wakeup-pin and wakeup-gap(Rob Herring) 
+>     c)Use sdio function number for both the unit address and reg(Rob Herring)
+> 
+> v7: a)Use suggested vendor name and generic node name(Rob Herring)
+> ---
+>  Documentation/devicetree/bindings/btmrvl.txt       | 29 -----------
+>  .../devicetree/bindings/net/marvell-bt-sd8xxx.txt  | 57 ++++++++++++++++++++++
+>  2 files changed, 57 insertions(+), 29 deletions(-)
+>  delete mode 100644 Documentation/devicetree/bindings/btmrvl.txt
+>  create mode 100644 Documentation/devicetree/bindings/net/marvell-bt-sd8xxx.txt
+> 
+> diff --git a/Documentation/devicetree/bindings/btmrvl.txt b/Documentation/devicetree/bindings/btmrvl.txt
+> deleted file mode 100644
+> index 58f964b..0000000
+> --- a/Documentation/devicetree/bindings/btmrvl.txt
+> +++ /dev/null
+> @@ -1,29 +0,0 @@
+> -btmrvl
+> -------
+> -
+> -Required properties:
+> -
+> -  - compatible : must be "btmrvl,cfgdata"
+> -
+> -Optional properties:
+> -
+> -  - btmrvl,cal-data : Calibration data downloaded to the device during
+> -		      initialization. This is an array of 28 values(u8).
+> -
+> -  - btmrvl,gpio-gap : gpio and gap (in msecs) combination to be
+> -		      configured.
+> -
+> -Example:
+> -
+> -GPIO pin 13 is configured as a wakeup source and GAP is set to 100 msecs
+> -in below example.
+> -
+> -btmrvl {
+> -	compatible = "btmrvl,cfgdata";
+> -
+> -	btmrvl,cal-data = /bits/ 8 <
+> -		0x37 0x01 0x1c 0x00 0xff 0xff 0xff 0xff 0x01 0x7f 0x04 0x02
+> -		0x00 0x00 0xba 0xce 0xc0 0xc6 0x2d 0x00 0x00 0x00 0x00 0x00
+> -		0x00 0x00 0xf0 0x00>;
+> -	btmrvl,gpio-gap = <0x0d64>;
+> -};
+> diff --git a/Documentation/devicetree/bindings/net/marvell-bt-sd8xxx.txt b/Documentation/devicetree/bindings/net/marvell-bt-sd8xxx.txt
+> new file mode 100644
+> index 0000000..17f8470
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/net/marvell-bt-sd8xxx.txt
+> @@ -0,0 +1,57 @@
+> +Marvell 8897/8997 (sd8897/sd8997) bluetooth SDIO devices
+> +------
+> +
+> +Required properties:
+> +
+> +  - compatible : should be one of the following:
+> +	* "marvell,sd8897-bt"
+> +	* "marvell,sd8997-bt"
+> +
+> +Optional properties:
+> +
+> +  - marvell,cal-data : Calibration data downloaded to the device during
+> +		      initialization. This is an array of 28 values(u8).
+> +
+> +  - btmrvl,wakeup-pin : 'wakeup-pin' represents wakeup pin number of the bluetooth
+> +		      chip. firmware will use the pin to wakeup host system.
+> +  - btmrvl,wakeup-gap-msec : wakeup gap represents wakeup latency of the host platform.
+> +		      The value will be configured to firmware. This is needed to work
+> +		      chip's sleep feature as expected.
 
-I've now upgraded my Debian Testing machine to kernel 4.5.1. It seems to
-have fixed my first issue. The controller now binds, gets recognized
-and I can test it with jstest and use it in programs :-)
+These should be marvell, not btmrvl.
 
-However, it's not recognized as a DS4 controller, so programs that
-would automatically map keys and buttons according to controller now
-requires manual mapping.
+Also, -ms is the standard unit rather than -msec as defined in 
+Documentation/devicetree/bindings/property-units.txt.
 
-Upon turning my DS4 controller on, dmesg produces this:
+> +  - interrupt-parent: phandle of the parent interrupt controller
+> +  - interrupts : interrupt pin number to the cpu. Driver will request an irq based on
+> +		 this interrupt number. During system suspend, the irq will be enabled
+> +		 so that the bluetooth chip can wakeup host platform under certain
+> +		 condition. During system resume, the irq will be disabled to make sure
+> +		 unnecessary interrupt is not received.
+> +
+> +Example:
+> +
+> +IRQ pin 119 is used as system wakeup source interrupt.
+> +wakeup pin 13 and gap 100ms are configured so that firmware can wakeup host
+> +using this device side pin and wakeup latency.
+> +calibration data is also available in below example.
+> +
+> +&mmc3 {
+> +	status = "okay";
+> +	vmmc-supply = <&wlan_en_reg>;
+> +	bus-width = <4>;
+> +	cap-power-off-card;
+> +	keep-power-in-suspend;
+> +
+> +	#address-cells = <1>;
+> +	#size-cells = <0>;
+> +	btmrvl: bluetooth@2 {
+> +		compatible = "marvell,sd8897-bt";
+> +		reg = <2>;
+> +		interrupt-parent = <&pio>;
+> +		interrupts = <119 IRQ_TYPE_LEVEL_LOW>;
+> +
+> +		btmrvl,cal-data = /bits/ 8 <
+> +			0x37 0x01 0x1c 0x00 0xff 0xff 0xff 0xff 0x01 0x7f 0x04 0x02
+> +			0x00 0x00 0xba 0xce 0xc0 0xc6 0x2d 0x00 0x00 0x00 0x00 0x00
+> +			0x00 0x00 0xf0 0x00>;
+> +		btmrvl,wakeup-pin = <0x0d>;
+> +		btmrvl,wakeup-gap-msec = <0x64>;
 
-[ 4469.637467] sony 0005:054C:05C4.0009: Using modified Dualshock 4 Bluetooth report descriptor
-[ 4469.638626] input: Wireless Controller as /devices/pci0000:00/0000:00:14.0/usb1/1-7/1-7:1.0/bluetooth/hci0/hci0:256/0005:054C:05C4.0009/input/input27
-[ 4469.639080] sony 0005:054C:05C4.0009: input,hidraw5: BLUETOOTH HID v1.00 Gamepad [Wireless Controller] on 28:b2:bd:94:0c:4f
+These are wrong too.
 
-... which is different from when using USB cabel. Again, when using
-cabel the controller works perfectly.
-
-Any suggestions to this?
+> +	};
+> +};
+> +
+> -- 
+> 1.8.1.4
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe devicetree" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
