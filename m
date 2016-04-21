@@ -1,45 +1,41 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: mkj@gotu.dk (Martin =?utf-8?Q?Kj=C3=A6r_J=C3=B8rgensen?=)
+To: Frank Praznik <frank.praznik@gmail.com>
+Cc: Antonio Ospite <ao2@ao2.it>, linux-bluetooth@vger.kernel.org
+Subject: Re: DS4 issues
+References: <20151221144607.GA18773@mkjlap.gotu.dk>
+	<20151228101822.03253569407ac9dfe4ea15be@ao2.it>
+	<0F6173F5-CF72-47E8-BB6B-44200F75EB6E@gmail.com>
+	<20151228164042.GA20182@mkjlap.gotu.dk>
+	<20151230110944.GA11559@mkjlap.gotu.dk>
+	<7A34E2B1-A42C-4162-80FC-F2C9E8796F67@gmail.com>
+	<87k2m7602c.fsf@gotu.dk>
+Date: Thu, 21 Apr 2016 18:15:26 +0200
+In-Reply-To: <87k2m7602c.fsf@gotu.dk> ("Martin \=\?utf-8\?Q\?Kj\=C3\=A6r_J\=C3\=B8\?\=
+ \=\?utf-8\?Q\?rgensen\=22's\?\= message of
+	"Sun, 14 Feb 2016 11:47:07 +0100")
+Message-ID: <877ffrq6ox.fsf@gotu.dk>
 MIME-Version: 1.0
-From: Jay Aurabind <jay.aurabind@gmail.com>
-Date: Fri, 22 Apr 2016 11:44:46 +0530
-Message-ID: <CAOsEZogjvtwKq9ojZva=T9WtovomWhbezVCKZs=oBNFfjixsVQ@mail.gmail.com>
-Subject: [Help] HIDP connection info error.
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
 
-I'm trying to communicate to my custom HID device. I initiated a
-connection from my laptop to my device, and I see the following in the
-debug log:
+I've now upgraded my Debian Testing machine to kernel 4.5.1. It seems to
+have fixed my first issue. The controller now binds, gets recognized
+and I can test it with jstest and use it in programs :-)
 
-Can't get HIDP connection info
+However, it's not recognized as a DS4 controller, so programs that
+would automatically map keys and buttons according to controller now
+requires manual mapping.
 
-I traced this to profiles/input/device.c Line 798, to function
-ioctl_is_connected
+Upon turning my DS4 controller on, dmesg produces this:
 
+[ 4469.637467] sony 0005:054C:05C4.0009: Using modified Dualshock 4 Bluetooth report descriptor
+[ 4469.638626] input: Wireless Controller as /devices/pci0000:00/0000:00:14.0/usb1/1-7/1-7:1.0/bluetooth/hci0/hci0:256/0005:054C:05C4.0009/input/input27
+[ 4469.639080] sony 0005:054C:05C4.0009: input,hidraw5: BLUETOOTH HID v1.00 Gamepad [Wireless Controller] on 28:b2:bd:94:0c:4f
 
-if (ioctl(ctl, HIDPGETCONNINFO, &ci) < 0) {
-                error("Can't get HIDP connection info");
-                close(ctl);
-                return false;
-}
+... which is different from when using USB cabel. Again, when using
+cabel the controller works perfectly.
 
-
-Can somebody please tell me what this failure means? Obviously my
-there is something wrong with my device (its getting an L2CAP
-configuration error, looks like my laptop is asking for an MTU close
-to 8k bytes). So I want to know where things are going wrong. I
-suspect my HID descriptors/SDP records are messed up, but I would like
-to know what part of it is wrong.
-
-I could not find any information relating to this ioctl either. man
-ioctl_list doent seem to contain a number 211 (HIDPGETCONNINFO).
-Please give some suggestions on how to debug this problem.
-
--- 
-
-Thanks and Regards,
-Aurabindo J
+Any suggestions to this?
