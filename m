@@ -1,29 +1,29 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
-Subject: Re: [PATCH v2] Bluetooth: Add defines for SPI and I2C
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1461329965-12553-1-git-send-email-johan.hedberg@gmail.com>
-Date: Fri, 22 Apr 2016 15:03:04 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <0219198C-D502-4432-8C17-A6F5B8DDFF7F@holtmann.org>
-References: <1461329965-12553-1-git-send-email-johan.hedberg@gmail.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
+From: Freek de Kruijf <f.de.kruijf@gmail.com>
+To: Maillist Bluetooth <linux-bluetooth@vger.kernel.org>
+Subject: Bluetooth device causes system crash
+Date: Fri, 22 Apr 2016 15:02:39 +0200
+Message-ID: <1979712.ub1I3X9q6o@eik132.beelaertsict.nl>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+I have a bluetooth device:
 
-> Extend the set of possible HCI bus types with SPI and I2C.
-> 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> ---
-> include/net/bluetooth/hci.h | 2 ++
-> 1 file changed, 2 insertions(+)
+ID 0cf3:3005 Atheros Communications, Inc. AR3011 Bluetooth
 
-patch has been applied to bluetooth-next tree.
+in a Rasberry Pi 1B.
 
-Regards
+It reads each 5 minutes some information from a device with a bluetooth 
+interface. Almost daily the system halts and only a power down / power up 
+makes the system run again. I tested the system without this device and it 
+stays on; only the bluetooth dongle removed.
 
-Marcel
+Any idea how to solve this problem?
+
+-- 
+fr.gr.
+
+Freek de Kruijf
 
