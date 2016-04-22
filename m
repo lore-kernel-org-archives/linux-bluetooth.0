@@ -1,42 +1,45 @@
-Return-Path: <dan.carpenter@oracle.com>
-Date: Fri, 22 Apr 2016 13:02:55 +0300
-From: Dan Carpenter <dan.carpenter@oracle.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Gustavo Padovan <gustavo@padovan.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kernel-janitors@vger.kernel.org
-Subject: [patch] Bluetooth: ath3k: Silence uninitialized variable warning
-Message-ID: <20160422100255.GE11398@mwanda>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+From: Jay Aurabind <jay.aurabind@gmail.com>
+Date: Fri, 22 Apr 2016 11:44:46 +0530
+Message-ID: <CAOsEZogjvtwKq9ojZva=T9WtovomWhbezVCKZs=oBNFfjixsVQ@mail.gmail.com>
+Subject: [Help] HIDP connection info error.
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-We could print an uninitialized value in the error message.
+Hi,
 
-Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+I'm trying to communicate to my custom HID device. I initiated a
+connection from my laptop to my device, and I see the following in the
+debug log:
 
-diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
-index 47ca4b3..641c2d1 100644
---- a/drivers/bluetooth/ath3k.c
-+++ b/drivers/bluetooth/ath3k.c
-@@ -206,7 +206,8 @@ static int ath3k_load_firmware(struct usb_device *udev,
- 				const struct firmware *firmware)
- {
- 	u8 *send_buf;
--	int err, pipe, len, size, sent = 0;
-+	int len = 0;
-+	int err, pipe, size, sent = 0;
- 	int count = firmware->size;
- 
- 	BT_DBG("udev %p", udev);
-@@ -302,7 +303,8 @@ static int ath3k_load_fwfile(struct usb_device *udev,
- 		const struct firmware *firmware)
- {
- 	u8 *send_buf;
--	int err, pipe, len, size, count, sent = 0;
-+	int len = 0;
-+	int err, pipe, size, count, sent = 0;
- 	int ret;
- 
- 	count = firmware->size;
+Can't get HIDP connection info
+
+I traced this to profiles/input/device.c Line 798, to function
+ioctl_is_connected
+
+
+if (ioctl(ctl, HIDPGETCONNINFO, &ci) < 0) {
+                error("Can't get HIDP connection info");
+                close(ctl);
+                return false;
+}
+
+
+Can somebody please tell me what this failure means? Obviously my
+there is something wrong with my device (its getting an L2CAP
+configuration error, looks like my laptop is asking for an MTU close
+to 8k bytes). So I want to know where things are going wrong. I
+suspect my HID descriptors/SDP records are messed up, but I would like
+to know what part of it is wrong.
+
+I could not find any information relating to this ioctl either. man
+ioctl_list doent seem to contain a number 211 (HIDPGETCONNINFO).
+Please give some suggestions on how to debug this problem.
+
+-- 
+
+Thanks and Regards,
+Aurabindo J
