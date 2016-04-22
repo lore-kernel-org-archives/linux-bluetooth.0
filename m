@@ -1,47 +1,29 @@
-Return-Path: <akarwar@marvell.com>
-From: Amitkumar Karwar <akarwar@marvell.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: Linux Bluetooth <linux-bluetooth@vger.kernel.org>,
-        LKML
-	<linux-kernel@vger.kernel.org>,
-        Ganapathi Bhat <gbhat@marvell.com>, Cathy Luo
-	<cluo@marvell.com>
-Subject: RE: [PATCH v7] Bluetooth: hci_uart: Support firmware download for
- Marvell
-Date: Fri, 22 Apr 2016 11:24:00 +0000
-Message-ID: <2119fc93636742459899d50f2c1fcb8d@SC-EXCH04.marvell.com>
-References: <1459845266-2771-1-git-send-email-akarwar@marvell.com>
- <2A69CC2B-1FC2-4148-8564-38335A87CCD7@holtmann.org>
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
+Subject: Re: [patch] Bluetooth: ath3k: Silence uninitialized variable warning
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20160422100255.GE11398@mwanda>
+Date: Fri, 22 Apr 2016 12:42:57 +0200
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Linux Bluetooth <linux-bluetooth@vger.kernel.org>,
+	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
+Message-Id: <9EEFA3DF-768C-4EE7-BC92-1FCBC81EAE8A@holtmann.org>
+References: <20160422100255.GE11398@mwanda>
+To: Dan Carpenter <dan.carpenter@oracle.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Dan,
 
->=20
-> > > +
-> > > +static int mrvl_setup(struct hci_uart *hu) {
-> > > +	struct mrvl_data *mrvl =3D hu->priv;
-> > > +
-> > > +	mrvl_init_fw_data(hu);
-> > > +	set_bit(HCI_UART_DNLD_FW, &mrvl->flags);
-> > > +
-> > > +	return hci_uart_dnld_fw(hu);
-> > > +}
-> >
-> > So this is clearly the wrong spot. When ->setup is called it is
-> > expected that HCI is ready. You are misusing it here.
-> >
->=20
-> Sure. We will move this to mrvl_open() where HCI is not yet initialized.
+> We could print an uninitialized value in the error message.
+> 
+> Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
 
-We tried moving firmware download to mrvl_open(), but it's not feasible. "h=
-u->proto" is not yet initialized at that time. So when the data/ack is rece=
-ived during firmware download, we can't have Marvell specific handling. Als=
-o, I can see other vendor's (broadcomm, Intel) have done firmware download =
-in setup handler.
+patch has been applied to bluetooth-next tree.
 
-I will send V8 patch shortly. Please check.
+Regards
 
-Regards,
-Amitkumar
+Marcel
+
