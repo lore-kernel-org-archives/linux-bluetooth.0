@@ -1,79 +1,68 @@
-Return-Path: <akarwar@marvell.com>
-From: Amitkumar Karwar <akarwar@marvell.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: Linux Bluetooth <linux-bluetooth@vger.kernel.org>,
-        LKML
-	<linux-kernel@vger.kernel.org>,
-        Ganapathi Bhat <gbhat@marvell.com>, Cathy Luo
-	<cluo@marvell.com>,
-        Nishant Sarmukadam <nishants@marvell.com>
-Subject: RE: [PATCH v7] Bluetooth: hci_uart: Support firmware download for
- Marvell
-Date: Fri, 22 Apr 2016 15:01:52 +0000
-Message-ID: <3f9ff7c183624e568e60681c86bcfdfd@SC-EXCH04.marvell.com>
-References: <1459845266-2771-1-git-send-email-akarwar@marvell.com>
- <2A69CC2B-1FC2-4148-8564-38335A87CCD7@holtmann.org>
- <2119fc93636742459899d50f2c1fcb8d@SC-EXCH04.marvell.com>
- <E16A47DE-611D-4C65-B407-1D78280308B4@holtmann.org>
-In-Reply-To: <E16A47DE-611D-4C65-B407-1D78280308B4@holtmann.org>
-Content-Type: text/plain; charset="us-ascii"
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
+In-Reply-To: <CABBYNZKGyPX8kycqdEWUYx8Obeq4n9e2hPcY+nCtEFZNjEitSA@mail.gmail.com>
+References: <CAEZxfGMCA_A1RQVmxr6DWgweD5Qg6e34F-09Ws=stLpV=YU5=w@mail.gmail.com>
+ <20160419172500.GA16645@t440s.P-661HNU-F1> <CAEZxfGNTYECk57B=32V8W-AKHFXQZH+5d916gsn2Ke8QEt8yzQ@mail.gmail.com>
+ <CAEZxfGMzoHXK6K26g2n7p=a_i+fEdHT5SKRXdd4b7o8M=HBShw@mail.gmail.com> <CABBYNZKGyPX8kycqdEWUYx8Obeq4n9e2hPcY+nCtEFZNjEitSA@mail.gmail.com>
+From: =?UTF-8?Q?Fran=C3=A7ois_Beaufort?= <beaufort.francois@gmail.com>
+Date: Fri, 22 Apr 2016 16:26:31 +0200
+Message-ID: <CAEZxfGPRobpx9+PFFrJbEmY+CS+8p6xH2SQXSmC2bf3M76Rg7Q@mail.gmail.com>
+Subject: Re: Add Eddystone GATT Config Service to known UUIDs
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Thank you!
+I've just sent http://permalink.gmane.org/gmane.linux.bluez.kernel/67370
+for review.
 
-> From: Marcel Holtmann [mailto:marcel@holtmann.org]
-> Sent: Friday, April 22, 2016 6:19 PM
-> To: Amitkumar Karwar
-> Cc: Linux Bluetooth; LKML; Ganapathi Bhat; Cathy Luo
-> Subject: Re: [PATCH v7] Bluetooth: hci_uart: Support firmware download
-> for Marvell
->=20
-> Hi Amitkumar,
->=20
-> >>>> +
-> >>>> +static int mrvl_setup(struct hci_uart *hu) {
-> >>>> +	struct mrvl_data *mrvl =3D hu->priv;
-> >>>> +
-> >>>> +	mrvl_init_fw_data(hu);
-> >>>> +	set_bit(HCI_UART_DNLD_FW, &mrvl->flags);
-> >>>> +
-> >>>> +	return hci_uart_dnld_fw(hu);
-> >>>> +}
-> >>>
-> >>> So this is clearly the wrong spot. When ->setup is called it is
-> >>> expected that HCI is ready. You are misusing it here.
-> >>>
-> >>
-> >> Sure. We will move this to mrvl_open() where HCI is not yet
-> initialized.
-> >
-> > We tried moving firmware download to mrvl_open(), but it's not
-> feasible. "hu->proto" is not yet initialized at that time. So when the
-> data/ack is received during firmware download, we can't have Marvell
-> specific handling. Also, I can see other vendor's (broadcomm, Intel)
-> have done firmware download in setup handler.
->=20
-> firmware download in ->setup() is fine as long as it uses HCI commands.
-> If it does not use HCI commands, then we need to come up with something
-> new.
->=20
-> The problem here is that for all intense and purposes once ->setup() is
-> called, then assumption is that you are in an HCI capable transport and
-> it is ready.
->=20
-
-We have maintained a flag(in mrvl->flags) which remains on until firmware d=
-ownload gets completed. We drop HCI frames in "->enqueue" if firmware downl=
-oad is in progress. I don't see any possible issues if firmware download is=
- included in ->setup().
-
-request_firmware() API expects a device pointer (hdev->dev). We won't get v=
-alid pointer until HCI is ready.
-Also, we are downloading firmware data chunks through normal Tx path(schedu=
-ling hu->write_work etc) where hdev comes into picture.
-
-Let me know your thoughts.
-
-Regards,
-Amitkumar
+On Wed, Apr 20, 2016 at 10:00 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi François,
+>
+> On Wed, Apr 20, 2016 at 9:49 AM, François Beaufort
+> <beaufort.francois@gmail.com> wrote:
+>> Regarding my initial request, can someone point to me where to start
+>> if I wanted to code that?
+>
+> https://git.kernel.org/cgit/bluetooth/bluez.git/tree/monitor/uuid.c
+> you might need to add a table for known UUID 128 bits so
+> uuidstr_to_str don't return "Vendor specific" instead it lookup by
+> string.
+>
+>> On Tue, Apr 19, 2016 at 8:09 PM, François Beaufort
+>> <beaufort.francois@gmail.com> wrote:
+>>> For info, I've asked this question at
+>>> https://github.com/google/eddystone/issues/138
+>>> Let's see what they say.
+>>>
+>>> On Tue, Apr 19, 2016 at 7:25 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+>>>> Hi François,
+>>>>
+>>>> On Tue, Apr 19, 2016, François Beaufort wrote:
+>>>>> I'd love to see the new Eddystone Configuration GATT Service
+>>>>> (https://github.com/google/eddystone/tree/master/configuration-service)
+>>>>> being recognized by BlueZ.
+>>>>> Could you guys make this happen?
+>>>>
+>>>> That'd indeed be nice! I'm not volunteering, but I do have a question
+>>>> about this part:
+>>>>
+>>>> "Where not explicitly stated, data written and read is defined in terms
+>>>> of big-endian arrays of signed bytes."
+>>>>
+>>>> Why on earth big-endian? GATT, like most other Bluetooth protocols, is
+>>>> little-endian. Can this still be fixed?
+>>>>
+>>>> Johan
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
+>
+>
+> --
+> Luiz Augusto von Dentz
