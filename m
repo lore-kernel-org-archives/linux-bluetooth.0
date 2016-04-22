@@ -1,68 +1,83 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <CABBYNZKGyPX8kycqdEWUYx8Obeq4n9e2hPcY+nCtEFZNjEitSA@mail.gmail.com>
-References: <CAEZxfGMCA_A1RQVmxr6DWgweD5Qg6e34F-09Ws=stLpV=YU5=w@mail.gmail.com>
- <20160419172500.GA16645@t440s.P-661HNU-F1> <CAEZxfGNTYECk57B=32V8W-AKHFXQZH+5d916gsn2Ke8QEt8yzQ@mail.gmail.com>
- <CAEZxfGMzoHXK6K26g2n7p=a_i+fEdHT5SKRXdd4b7o8M=HBShw@mail.gmail.com> <CABBYNZKGyPX8kycqdEWUYx8Obeq4n9e2hPcY+nCtEFZNjEitSA@mail.gmail.com>
-From: =?UTF-8?Q?Fran=C3=A7ois_Beaufort?= <beaufort.francois@gmail.com>
-Date: Fri, 22 Apr 2016 16:26:31 +0200
-Message-ID: <CAEZxfGPRobpx9+PFFrJbEmY+CS+8p6xH2SQXSmC2bf3M76Rg7Q@mail.gmail.com>
-Subject: Re: Add Eddystone GATT Config Service to known UUIDs
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Francois Beaufort <beaufort.francois@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ] Recognize Eddystone Configuration Service UUIDs
+Date: Fri, 22 Apr 2016 16:20:04 +0200
+Message-Id: <1461334804-14901-2-git-send-email-beaufort.francois@gmail.com>
+In-Reply-To: <1461334804-14901-1-git-send-email-beaufort.francois@gmail.com>
+References: <1461334804-14901-1-git-send-email-beaufort.francois@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Thank you!
-I've just sent http://permalink.gmane.org/gmane.linux.bluez.kernel/67370
-for review.
+---
+ monitor/uuid.c | 33 ++++++++++++++++++++++++++++++++-
+ 1 file changed, 32 insertions(+), 1 deletion(-)
 
-On Wed, Apr 20, 2016 at 10:00 AM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi François,
->
-> On Wed, Apr 20, 2016 at 9:49 AM, François Beaufort
-> <beaufort.francois@gmail.com> wrote:
->> Regarding my initial request, can someone point to me where to start
->> if I wanted to code that?
->
-> https://git.kernel.org/cgit/bluetooth/bluez.git/tree/monitor/uuid.c
-> you might need to add a table for known UUID 128 bits so
-> uuidstr_to_str don't return "Vendor specific" instead it lookup by
-> string.
->
->> On Tue, Apr 19, 2016 at 8:09 PM, François Beaufort
->> <beaufort.francois@gmail.com> wrote:
->>> For info, I've asked this question at
->>> https://github.com/google/eddystone/issues/138
->>> Let's see what they say.
->>>
->>> On Tue, Apr 19, 2016 at 7:25 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
->>>> Hi François,
->>>>
->>>> On Tue, Apr 19, 2016, François Beaufort wrote:
->>>>> I'd love to see the new Eddystone Configuration GATT Service
->>>>> (https://github.com/google/eddystone/tree/master/configuration-service)
->>>>> being recognized by BlueZ.
->>>>> Could you guys make this happen?
->>>>
->>>> That'd indeed be nice! I'm not volunteering, but I do have a question
->>>> about this part:
->>>>
->>>> "Where not explicitly stated, data written and read is defined in terms
->>>> of big-endian arrays of signed bytes."
->>>>
->>>> Why on earth big-endian? GATT, like most other Bluetooth protocols, is
->>>> little-endian. Can this still be fixed?
->>>>
->>>> Johan
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->> the body of a message to majordomo@vger.kernel.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
->
->
-> --
-> Luiz Augusto von Dentz
+diff --git a/monitor/uuid.c b/monitor/uuid.c
+index 54adb0d..1ceaa6f 100644
+--- a/monitor/uuid.c
++++ b/monitor/uuid.c
+@@ -31,7 +31,7 @@
+ 
+ #include "uuid.h"
+ 
+-static struct {
++static const struct {
+ 	uint16_t uuid;
+ 	const char *str;
+ } uuid16_table[] = {
+@@ -540,6 +540,31 @@ static struct {
+ 	{ }
+ };
+ 
++static const struct {
++	const char *uuid;
++	const char *str;
++} uuid128_table[] = {
++	{ "a3c87500-8ed3-4bdf-8a39-a01bebede295",
++		"Eddystone Configuration Service"			},
++	{ "a3c87501-8ed3-4bdf-8a39-a01bebede295", "Capabilities"	},
++	{ "a3c87502-8ed3-4bdf-8a39-a01bebede295", "Active Slot"		},
++	{ "a3c87503-8ed3-4bdf-8a39-a01bebede295",
++		"Advertising Interval"					},
++	{ "a3c87504-8ed3-4bdf-8a39-a01bebede295", "Radio Tx Power"	},
++	{ "a3c87505-8ed3-4bdf-8a39-a01bebede295",
++		"(Advanced) Advertised Tx Power"			},
++	{ "a3c87506-8ed3-4bdf-8a39-a01bebede295", "Lock State"		},
++	{ "a3c87507-8ed3-4bdf-8a39-a01bebede295", "Unlock"		},
++	{ "a3c87508-8ed3-4bdf-8a39-a01bebede295", "Public ECDH Key"	},
++	{ "a3c87509-8ed3-4bdf-8a39-a01bebede295", "EID Identity Key"	},
++	{ "a3c8750a-8ed3-4bdf-8a39-a01bebede295", "ADV Slot Data"	},
++	{ "a3c8750b-8ed3-4bdf-8a39-a01bebede295",
++		"(Advanced) Factory reset"				},
++	{ "a3c8750c-8ed3-4bdf-8a39-a01bebede295",
++		"(Advanced) Remain Connectable"				},
++	{ }
++};
++
+ const char *uuid16_to_str(uint16_t uuid)
+ {
+ 	int i;
+@@ -568,6 +593,7 @@ const char *uuid128_to_str(const unsigned char *uuid)
+ const char *uuidstr_to_str(const char *uuid)
+ {
+ 	uint32_t val;
++	int i;
+ 
+ 	if (!uuid)
+ 		return NULL;
+@@ -575,6 +601,11 @@ const char *uuidstr_to_str(const char *uuid)
+ 	if (strlen(uuid) != 36)
+ 		return NULL;
+ 
++	for (i = 0; uuid128_table[i].str; i++) {
++		if (strcasecmp(uuid128_table[i].uuid, uuid) == 0)
++			return uuid128_table[i].str;
++	}
++
+ 	if (strncasecmp(uuid + 8, "-0000-1000-8000-00805f9b34fb", 28))
+ 		return "Vendor specific";
+ 
+-- 
+2.7.0
+
