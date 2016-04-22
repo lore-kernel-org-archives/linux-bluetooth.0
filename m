@@ -1,128 +1,78 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+MIME-Version: 1.0
+In-Reply-To: <1460581797-3541-1-git-send-email-lukasz.rymanowski@codecoup.pl>
+References: <1460581797-3541-1-git-send-email-lukasz.rymanowski@codecoup.pl>
+Date: Fri, 22 Apr 2016 14:36:55 +0300
+Message-ID: <CABBYNZL41DSrdKvWUwZR0-eZd+ad+UdKSoeUzRtzwuMWU7a6KA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v6 0/5] Couple fixes and improvements
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/4] core/gatt-client: Don't read extended properties
-Date: Fri, 22 Apr 2016 14:42:34 +0300
-Message-Id: <1461325357-4013-1-git-send-email-luiz.dentz@gmail.com>
+To: =?UTF-8?Q?=C5=81ukasz_Rymanowski?= <lukasz.rymanowski@codecoup.pl>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Łukasz,
 
-Extended properties are already read and stored in the database and can be
-retrieved with gatt_db_attribute_get_char_data.
----
- src/gatt-client.c | 55 +++----------------------------------------------------
- 1 file changed, 3 insertions(+), 52 deletions(-)
+On Thu, Apr 14, 2016 at 12:09 AM, Łukasz Rymanowski
+<lukasz.rymanowski@codecoup.pl> wrote:
+> I've back to work on making Android gatt to make use of shared/gatt.
+> Here is couple of fixes I've done to shared code when doing this work.
+>
+> Android gatt still needs testing but will be available sooner or later
+>
+> v2:
+>  - fix test-gatt for long write seesion testes
+>  - prepare test-gatt test to support other changes
+>  - do aggregation of prep writes for long write session
+>  - support reliable nested long write
+>  - start to look into characteristic extended prop for reliable session
+>
+> v3:
+>  - rebase
+>  - remove patch adding notification type - that one needs to be reworked
+>
+> v4:
+>  - Fix according to Luiz comment
+>
+> v5:
+>  - Fix additional Luiz comments
+>
+> v6:
+>  - move getting extended properties to gatt_db_attribute_get_char_data instead
+> of separate API
+>  - added patch which read extended characteristic propertis descriptors
+>    during discovery session when acting as gatt-client. This is needed so
+>    the call of gatt_db_attribute_get_char_data will return correct ext_prop value.
+>  - Added patch fixing charcteristic properties in btgatt-server and test-gatt
+>
+>
+> Łukasz Rymanowski (5):
+>   btgatt-server: Fix GATT device name properties
+>   test-gatt: Fix characteristic properties
+>   shared/gatt-db: Extend gatt_db_attribute_get_char_data with ext. prop
+>   shared/gatt-server Check for ext. charact. prop. on reliable session
+>   gatt-client: Read extended props on service discovery
+>
+>  profiles/deviceinfo/deviceinfo.c |   2 +-
+>  profiles/gap/gas.c               |   2 +-
+>  profiles/scanparam/scan.c        |   2 +-
+>  src/device.c                     |   2 +-
+>  src/gatt-client.c                |   3 +-
+>  src/shared/gatt-client.c         | 120 ++++++++++++++++++++++++++++++++++++++-
+>  src/shared/gatt-db.c             |  63 ++++++++++++++++++++
+>  src/shared/gatt-db.h             |   1 +
+>  src/shared/gatt-server.c         |  50 +++++++++++++++-
+>  tools/btgatt-client.c            |   8 ++-
+>  tools/btgatt-server.c            |  11 ++--
+>  unit/test-gatt.c                 |  41 +++++++++----
+>  12 files changed, 278 insertions(+), 27 deletions(-)
+>
+> --
+> 2.5.0
 
-diff --git a/src/gatt-client.c b/src/gatt-client.c
-index ebb7b35..16a1f6c 100644
---- a/src/gatt-client.c
-+++ b/src/gatt-client.c
-@@ -71,7 +71,6 @@ struct service {
- 	bt_uuid_t uuid;
- 	char *path;
- 	struct queue *chrcs;
--	struct queue *pending_ext_props;
- };
- 
- struct characteristic {
-@@ -1283,7 +1282,8 @@ static struct characteristic *characteristic_create(
- 
- 	gatt_db_attribute_get_char_data(attr, &chrc->handle,
- 							&chrc->value_handle,
--							&chrc->props, NULL,
-+							&chrc->props,
-+							&chrc->ext_props,
- 							&uuid);
- 
- 	chrc->attr = gatt_db_get_attribute(service->client->db,
-@@ -1398,7 +1398,6 @@ static void service_free(void *data)
- 	struct service *service = data;
- 
- 	queue_destroy(service->chrcs, NULL);  /* List should be empty here */
--	queue_destroy(service->pending_ext_props, NULL);
- 	g_free(service->path);
- 	free(service);
- }
-@@ -1412,7 +1411,6 @@ static struct service *service_create(struct gatt_db_attribute *attr,
- 
- 	service = new0(struct service, 1);
- 	service->chrcs = queue_new();
--	service->pending_ext_props = queue_new();
- 	service->client = client;
- 
- 	gatt_db_attribute_get_service_data(attr, &service->start_handle,
-@@ -1484,44 +1482,6 @@ static void export_desc(struct gatt_db_attribute *attr, void *user_data)
- 	queue_push_tail(charac->descs, desc);
- }
- 
--static void read_ext_props_cb(bool success, uint8_t att_ecode,
--					const uint8_t *value, uint16_t length,
--					void *user_data)
--{
--	struct characteristic *chrc = user_data;
--	struct service *service = chrc->service;
--
--	if (!success) {
--		error("Failed to obtain extended properties - error: 0x%02x",
--								att_ecode);
--		return;
--	}
--
--	if (!value || length != 2) {
--		error("Malformed extended properties value");
--		return;
--	}
--
--	chrc->ext_props = get_le16(value);
--	if (chrc->ext_props)
--		g_dbus_emit_property_changed(btd_get_dbus_connection(),
--						chrc->path,
--						GATT_CHARACTERISTIC_IFACE,
--						"Flags");
--
--	queue_remove(service->pending_ext_props, chrc);
--}
--
--static void read_ext_props(void *data, void *user_data)
--{
--	struct characteristic *chrc = data;
--
--	bt_gatt_client_read_value(chrc->service->client->gatt,
--							chrc->ext_props_handle,
--							read_ext_props_cb,
--							chrc, NULL);
--}
--
- static bool create_descriptors(struct gatt_db_attribute *attr,
- 					struct characteristic *charac)
- {
-@@ -1555,9 +1515,6 @@ static void export_char(struct gatt_db_attribute *attr, void *user_data)
- 
- 	queue_push_tail(service->chrcs, charac);
- 
--	if (charac->ext_props_handle)
--		queue_push_tail(service->pending_ext_props, charac);
--
- 	return;
- 
- fail:
-@@ -1574,13 +1531,7 @@ static bool create_characteristics(struct gatt_db_attribute *attr,
- 
- 	gatt_db_service_foreach_char(attr, export_char, &data);
- 
--	if (data.failed)
--		return false;
--
--	/* Obtain extended properties */
--	queue_foreach(service->pending_ext_props, read_ext_props, NULL);
--
--	return true;
-+	return !data.failed;
- }
- 
- static void export_service(struct gatt_db_attribute *attr, void *user_data)
+Applied, thanks.
+
+
 -- 
-2.5.5
-
+Luiz Augusto von Dentz
