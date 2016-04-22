@@ -1,35 +1,30 @@
-Return-Path: <afzal.mohd.ma@gmail.com>
-Date: Sat, 23 Apr 2016 12:17:45 +0530
-From: Afzal Mohammed <afzal.mohd.ma@gmail.com>
-To: Dan Carpenter <dan.carpenter@oracle.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-	kernel-janitors@vger.kernel.org
-Subject: Re: [patch] Bluetooth: ath3k: Silence uninitialized variable warning
-Message-ID: <20160423064745.GA4826@afzalpc>
-References: <20160422100255.GE11398@mwanda>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20160422100255.GE11398@mwanda>
+Date: Fri, 22 Apr 2016 23:06:46 +0200
+Message-ID: <CAE7O3TfO7a4gBVxVOC6T1OTgBU93SLvR3r2wbU19k2iyx_c_gQ@mail.gmail.com>
+Subject: Plantronics Voayger Focus UC (B825-M) - microphone not working
+From: "Olausson, Bjoern" <contactme@olausson.de>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hello to everyone in the linux-bluetooth list,
 
-On Fri, Apr 22, 2016 at 01:02:55PM +0300, Dan Carpenter wrote:
+I recently bought a Plantronics Voyager Focus UC B825-M Headset and
+connected it to my Linux Desktop via the USB-Dongle which worked
+perfectly fine.
 
-> -	int err, pipe, len, size, count, sent = 0;
-> +	int len = 0;
-> +	int err, pipe, size, count, sent = 0;
+I then connected it to my Laptop via the built in BlueTooth adapter
+(Intel I218-V ->
+idVendor  0x8087 Intel Corp.). The Headset is recognized as a Playback
+only device (at least in KDE I can't select the "PLT Focus" under
+recording devices).
 
-Is there any particular reason to avoid more than 1 variable
-initialization in definition on a single line ?, like,
+The device is listed as "HFP/HSP" and "A2DP sink".
 
-	int err, pipe, size, count, sent = 0, len = 0;
+Has anyone experience with this device or any advice how to get the
+recording part to work?
 
-have observed that none of your uninitialized variable warning fixes
-does as mentioned above.
-
-Regards
-afzal
+Thanks and kind regards,
+Bjoern
