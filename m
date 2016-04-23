@@ -1,41 +1,35 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <afzal.mohd.ma@gmail.com>
+Date: Sat, 23 Apr 2016 12:17:45 +0530
+From: Afzal Mohammed <afzal.mohd.ma@gmail.com>
+To: Dan Carpenter <dan.carpenter@oracle.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kernel-janitors@vger.kernel.org
+Subject: Re: [patch] Bluetooth: ath3k: Silence uninitialized variable warning
+Message-ID: <20160423064745.GA4826@afzalpc>
+References: <20160422100255.GE11398@mwanda>
 MIME-Version: 1.0
-Date: Sat, 23 Apr 2016 10:19:31 +0300
-Message-ID: <CADrC6Gxef2A=EsVLxG-izD4xBKvrBW85wOzybuZCrr-OL52VSw@mail.gmail.com>
-Subject: bluez dbus ble connection problem when a filter is set
-From: =?UTF-8?B?SGFra8SxIEfDtsOnZW/En2x1?= <hakki@bir618.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20160422100255.GE11398@mwanda>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi All,
+Hi,
 
-raspberry pi 3
-bluez v5.39
-testing platform client/bluetoothctl
+On Fri, Apr 22, 2016 at 01:02:55PM +0300, Dan Carpenter wrote:
 
-I have a ble peripheral device advertising a custom uuid.
-Within bluetoothctl when I try to connect to it after a filter is set,
-one third of the time I get an error.
-There is no problem if no filter is set, turning scanning off before
-the connect command does not help.
+> -	int err, pipe, len, size, count, sent = 0;
+> +	int len = 0;
+> +	int err, pipe, size, count, sent = 0;
 
-Here is an example flow within bluetoothctl
+Is there any particular reason to avoid more than 1 variable
+initialization in definition on a single line ?, like,
 
-[bluetooth]# set-scan-filter-uuids f655b638-fead-4268-b07c-e5d79d09b22b
-SetDiscoveryFilter success
-[bluetooth]# scan on
-Discovery started
-[CHG] Controller B8:27:EB:37:3F:CD Discovering: yes
-[NEW] Device CF:05:30:F2:6F:5E CF-05-30-F2-6F-5E
-[bluetooth]# connect CF:05:30:F2:6F:5E
-Attempting to connect to CF:05:30:F2:6F:5E
-[CHG] Device CF:05:30:F2:6F:5E Connected: yes
-Failed to connect: org.bluez.Error.Failed
-[CHG] Device CF:05:30:F2:6F:5E Connected: no
+	int err, pipe, size, count, sent = 0, len = 0;
 
+have observed that none of your uninitialized variable warning fixes
+does as mentioned above.
 
-Any ideas? Thanks in advance, cheers
-
-hakkig
+Regards
+afzal
