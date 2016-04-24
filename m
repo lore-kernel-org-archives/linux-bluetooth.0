@@ -1,54 +1,81 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Subject: Re: Configuring a Bluetooth PAN server: can't find docs
+To: linux-bluetooth@vger.kernel.org
+References: <56FE6EFA.5060406@pointpro.nl>
+ <CABBYNZL37HmNtchJQGkOccgwGFa6Cp-igPOGvjrJRKzELSkqCA@mail.gmail.com>
+From: Egbert van der Wal <ewal@pointpro.nl>
+Message-ID: <571C8611.7060306@pointpro.nl>
+Date: Sun, 24 Apr 2016 10:38:41 +0200
 MIME-Version: 1.0
-In-Reply-To: <CAOsEZogjvtwKq9ojZva=T9WtovomWhbezVCKZs=oBNFfjixsVQ@mail.gmail.com>
-References: <CAOsEZogjvtwKq9ojZva=T9WtovomWhbezVCKZs=oBNFfjixsVQ@mail.gmail.com>
-Date: Mon, 25 Apr 2016 11:31:00 +0300
-Message-ID: <CABBYNZKeux81k4hN+QRSiNsSXoZymKPwc5YaEjo1iLes2YGe6Q@mail.gmail.com>
-Subject: Re: [Help] HIDP connection info error.
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Jay Aurabind <jay.aurabind@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <CABBYNZL37HmNtchJQGkOccgwGFa6Cp-igPOGvjrJRKzELSkqCA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jay,
+Op 05-04-16 om 17:03 schreef Luiz Augusto von Dentz:
+> Hi Egbert,
+>
+> On Fri, Apr 1, 2016 at 3:52 PM, Egbert van der Wal <ewal@pointpro.nl> wrote:
+>> Hi,
+>>
+>> Short story: I'd really like to RTFM, but in all of my online quests I can't
+>> find where it is. Where can I find documentation about bluez, configuration
+>> files and pand?
+>>
+>> With a bit more information: I'm trying to configure a device (Odroid XU4
+>> running Ubuntu 14.04, using Bluez 4.101) to accept PAN-connections. Doing
+>> this I want to provide the connecting user with a web interface to perform
+>> some configuration tasks (such as connecting to a wifi).
+> Unfortunately 4.101 is a bit too old and I guess even NetworkManager
+> does support that.
+>
+>> The resulting connection will not provide internet access and will only be
+>> used to expose access to an internal IP address (e.g. 10.0.0.1). I want the
+>> device to basically accept any pairing request using a fixed, pre-configured
+>> pin-code.
+>>
+>> I've been trying to get this working for a while now using various howto's
+>> but it seems to me that each and every one of them uses a different way to
+>> configure Bluez, probably resulting from a different version. I basically
+>> tried all of them and none seem to work (due to missing / invalid commands
+>> or missing / ignored configuration files).
+> Have you tried connman tethering? https://01.org/connman/documentation
+>
+>> I couldn't find any documentation on bluez.org itself. The bluetoothd
+>> man-page refers to a man-page of /etc/bluetooth/main.conf that doesn't seem
+>> to exist, and the contents of /etc/bluetooth/main.conf also seem to be
+>> ignored so I'm quite stuck here.
+> https://git.kernel.org/cgit/bluetooth/bluez.git/tree/doc/network-api.txt
+>
+>> Any pointers to any type of documentation that covers my version of bluez
+>> and the steps to set this up would be highly appreciated.
+> Create a bridge and pass it to org.bluez.NetworkServer1.Register, the
+> process need to remain connected to D-Bus otherwise it will be
+> unregistered, but other than that it should be really simple.
+>
 
-On Fri, Apr 22, 2016 at 9:14 AM, Jay Aurabind <jay.aurabind@gmail.com> wrote:
-> Hi,
->
-> I'm trying to communicate to my custom HID device. I initiated a
-> connection from my laptop to my device, and I see the following in the
-> debug log:
->
-> Can't get HIDP connection info
->
-> I traced this to profiles/input/device.c Line 798, to function
-> ioctl_is_connected
->
->
-> if (ioctl(ctl, HIDPGETCONNINFO, &ci) < 0) {
->                 error("Can't get HIDP connection info");
->                 close(ctl);
->                 return false;
-> }
->
->
-> Can somebody please tell me what this failure means? Obviously my
-> there is something wrong with my device (its getting an L2CAP
-> configuration error, looks like my laptop is asking for an MTU close
-> to 8k bytes). So I want to know where things are going wrong. I
-> suspect my HID descriptors/SDP records are messed up, but I would like
-> to know what part of it is wrong.
->
-> I could not find any information relating to this ioctl either. man
-> ioctl_list doent seem to contain a number 211 (HIDPGETCONNINFO).
-> Please give some suggestions on how to debug this problem.
+Hi Luiz,
 
-Do you have the logs? For the HID descriptor you can check with
-something like this: http://eleccelerator.com/usbdescreqparser/  (just
-input your descriptor there to see if makes sense)
+Thank you for the suggestion. The link you provided is a link to an API, 
+not a link to documentation for the entire package and how all parts 
+interoperate, including the available software utilities. Am I correct 
+in concluding that such documentation does not exist, from an official 
+source?
 
+Anyway, I have been able to collect several bits and pieces from more 
+forums and now have been able to create a Bluetooth NAP using the 
+bt-network tool. The name of that tool was basically was I was looking 
+for, combined with some documentation on how to set up the bridge that 
+it works with.
 
--- 
-Luiz Augusto von Dentz
+BlueZ 4.101 is the latest version available on Ubuntu 14.04, the most 
+recent LTS distribution of Ubuntu until a couple of days ago, so in that 
+sense, it really isn't that old. And it turns out that NetworkManager is 
+able to interface with BlueZ 4.101 on the other end fine in order to 
+connect to the NAP.
+
+Again, thanks for the help. I've been able to achieve what I attempted.
+
+Kind regards,
+
+Egbert van der Wal
