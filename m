@@ -1,48 +1,88 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
-Subject: Re: [PATCH] Bluetooth: 6lowpan: Fix memory corruption of ipv6 destination address
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1461341171-2951-1-git-send-email-glennrubenbakke@nordicsemi.no>
-Date: Tue, 26 Apr 2016 08:08:48 +0900
-Cc: Linux Bluetooth <linux-bluetooth@vger.kernel.org>,
-	Jukka Rissanen <jukka.rissanen@linux.intel.com>,
-	Glenn Ruben Bakke <glenn.ruben.bakke@nordicsemi.no>
-Message-Id: <3652E85C-C347-44D3-98B6-2CF7F2A508DD@holtmann.org>
-References: <1461341171-2951-1-git-send-email-glennrubenbakke@nordicsemi.no>
-To: Glenn Ruben Bakke <glennrubenbakke@nordicsemi.no>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	"Olausson, Bjoern" <contactme@olausson.de>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <CAE7O3Te+eEQTYb5adnQ6pVMw88XsDTL-KStKcLa=EUzdc92pgQ@mail.gmail.com>
+References: <CAE7O3TfO7a4gBVxVOC6T1OTgBU93SLvR3r2wbU19k2iyx_c_gQ@mail.gmail.com>
+        <CABBYNZJ2TmxrCy6+Oi+6Wv+MG-WYL5UTtPUmj-t=5NbHkYWt6Q@mail.gmail.com>,
+        <CAE7O3Te+eEQTYb5adnQ6pVMw88XsDTL-KStKcLa=EUzdc92pgQ@mail.gmail.com>
+From: "mattes" <blue@mykmk.com>
+Subject: Re: Plantronics Voayger Focus UC (B825-M) - microphone not working
+Date: Mon, 25 Apr 2016 12:44:06 -0500
+Content-Type: text/plain; charset=UTF-8; format=fixed
+MIME-Version: 1.0
+Message-id: <21d6d090c47fd6a0c9f1d09d193e6616@mykmk.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Glenn,
+Bjoern,
 
-> The memcpy of ipv6 header destination address to the skb control block
-> (sbk->cb) in header_create() results in currupted memory when bt_xmit()
-> is issued. The skb->cb is "released" in the return of header_create()
-> making room for lower layer to minipulate the skb->cb.
-> 
-> The value retrieved in bt_xmit is not persistent across header creation
-> and sending, and the lower layer will overwrite portions of skb->cb,
-> making the copied destination address wrong.
-> 
-> The memory corruption will lead to non-working multicast as the first 4
-> bytes of the copied destination address is replaced by a value that
-> resolves into a non-multicast prefix.
-> 
-> The issue has also been observed in kernel 4.5.
-> 
-> This fix removes the dependency on the skb control block between header
-> creation and send, by moving the destination address memcpy to the send
-> function path (setup_create, which is called from bt_xmit).
-> 
-> Signed-off-by: Glenn Ruben Bakke <glenn.ruben.bakke@nordicsemi.no>
-> ---
-> net/bluetooth/6lowpan.c | 11 ++++-------
-> 1 file changed, 4 insertions(+), 7 deletions(-)
+I had mine working just fine (using Fedora 21) no problem.
+I actually turned the Mic off, since it did not allow the headset to go in
+battery save mode, due to audio streamed towards the host.
 
-patch has been applied to bluetooth-next tree.
+I used pulseaudio volume control (pavucontrol) to adjust the audio profile.
+Click the Configuration tab, select 'analog stereo Output and Input' for your
+headset. That should enable the mic.
 
-Regards
+mattes
 
-Marcel
+
+On Mon, 25 Apr 2016 19:25:40 +0200 "Olausson, Bjoern" <contactme@olausson.de>
+wrote
+
+> Hello Luiz,
+> 
+> thanks for the suggestion. According to the manual, the Headset should
+> be able to connect to two devices simultaneously and pair with max 8
+> devices overall.
+> 
+> I tested you suggestion and did disconnect the headset from my Desktop
+> and re-paired it to my Laptop. Nothing changed. Could have been so
+> easy :)
+> 
+> Anything else I could test?
+> 
+> Greetings,
+> Bjoern
+> 
+> 
+> On Mon, Apr 25, 2016 at 11:08 AM, Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+> > Hi Bjoern,
+> >
+> > On Sat, Apr 23, 2016 at 12:06 AM, Olausson, Bjoern
+> > <contactme@olausson.de> wrote:
+> >> Hello to everyone in the linux-bluetooth list,
+> >>
+> >> I recently bought a Plantronics Voyager Focus UC B825-M Headset and
+> >> connected it to my Linux Desktop via the USB-Dongle which worked
+> >> perfectly fine.
+> >>
+> >> I then connected it to my Laptop via the built in BlueTooth adapter
+> >> (Intel I218-V ->
+> >> idVendor  0x8087 Intel Corp.). The Headset is recognized as a Playback
+> >> only device (at least in KDE I can't select the "PLT Focus" under
+> >> recording devices).
+> >
+> > Is the device still configured to connect to the Desktop? Perhaps you
+> > have to reset it so it only connects to the laptop otherwise it might
+> > not attempt to do HFP/HSP since that is usually limited to one, on
+> > A2DP there could be multiple endpoints thus you are still able to
+> > connect.
+> >
+> >> The device is listed as "HFP/HSP" and "A2DP sink".
+> >>
+> >> Has anyone experience with this device or any advice how to get the
+> >> recording part to work?
+> >
+> >
+> >
+> > --
+> > Luiz Augusto von Dentz
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
 
