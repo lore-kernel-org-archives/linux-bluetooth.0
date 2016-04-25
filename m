@@ -1,95 +1,54 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <1461334804-14901-2-git-send-email-beaufort.francois@gmail.com>
-References: <1461334804-14901-1-git-send-email-beaufort.francois@gmail.com>
-	<1461334804-14901-2-git-send-email-beaufort.francois@gmail.com>
-Date: Mon, 25 Apr 2016 12:03:10 +0300
-Message-ID: <CABBYNZ+T1fFBOpxj7n_pVd-OBDsApJ817z9Htcwf8ys6q3=qkw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] Recognize Eddystone Configuration Service UUIDs
+In-Reply-To: <CAOsEZogjvtwKq9ojZva=T9WtovomWhbezVCKZs=oBNFfjixsVQ@mail.gmail.com>
+References: <CAOsEZogjvtwKq9ojZva=T9WtovomWhbezVCKZs=oBNFfjixsVQ@mail.gmail.com>
+Date: Mon, 25 Apr 2016 11:31:00 +0300
+Message-ID: <CABBYNZKeux81k4hN+QRSiNsSXoZymKPwc5YaEjo1iLes2YGe6Q@mail.gmail.com>
+Subject: Re: [Help] HIDP connection info error.
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Francois Beaufort <beaufort.francois@gmail.com>
+To: Jay Aurabind <jay.aurabind@gmail.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Francois,
+Hi Jay,
 
-On Fri, Apr 22, 2016 at 5:20 PM, Francois Beaufort
-<beaufort.francois@gmail.com> wrote:
-> ---
->  monitor/uuid.c | 33 ++++++++++++++++++++++++++++++++-
->  1 file changed, 32 insertions(+), 1 deletion(-)
+On Fri, Apr 22, 2016 at 9:14 AM, Jay Aurabind <jay.aurabind@gmail.com> wrote:
+> Hi,
 >
-> diff --git a/monitor/uuid.c b/monitor/uuid.c
-> index 54adb0d..1ceaa6f 100644
-> --- a/monitor/uuid.c
-> +++ b/monitor/uuid.c
-> @@ -31,7 +31,7 @@
+> I'm trying to communicate to my custom HID device. I initiated a
+> connection from my laptop to my device, and I see the following in the
+> debug log:
 >
->  #include "uuid.h"
+> Can't get HIDP connection info
 >
-> -static struct {
-> +static const struct {
->         uint16_t uuid;
->         const char *str;
->  } uuid16_table[] = {
-> @@ -540,6 +540,31 @@ static struct {
->         { }
->  };
+> I traced this to profiles/input/device.c Line 798, to function
+> ioctl_is_connected
 >
-> +static const struct {
-> +       const char *uuid;
-> +       const char *str;
-> +} uuid128_table[] = {
-> +       { "a3c87500-8ed3-4bdf-8a39-a01bebede295",
-> +               "Eddystone Configuration Service"                       },
-> +       { "a3c87501-8ed3-4bdf-8a39-a01bebede295", "Capabilities"        },
-> +       { "a3c87502-8ed3-4bdf-8a39-a01bebede295", "Active Slot"         },
-> +       { "a3c87503-8ed3-4bdf-8a39-a01bebede295",
-> +               "Advertising Interval"                                  },
-> +       { "a3c87504-8ed3-4bdf-8a39-a01bebede295", "Radio Tx Power"      },
-> +       { "a3c87505-8ed3-4bdf-8a39-a01bebede295",
-> +               "(Advanced) Advertised Tx Power"                        },
-> +       { "a3c87506-8ed3-4bdf-8a39-a01bebede295", "Lock State"          },
-> +       { "a3c87507-8ed3-4bdf-8a39-a01bebede295", "Unlock"              },
-> +       { "a3c87508-8ed3-4bdf-8a39-a01bebede295", "Public ECDH Key"     },
-> +       { "a3c87509-8ed3-4bdf-8a39-a01bebede295", "EID Identity Key"    },
-> +       { "a3c8750a-8ed3-4bdf-8a39-a01bebede295", "ADV Slot Data"       },
-> +       { "a3c8750b-8ed3-4bdf-8a39-a01bebede295",
-> +               "(Advanced) Factory reset"                              },
-> +       { "a3c8750c-8ed3-4bdf-8a39-a01bebede295",
-> +               "(Advanced) Remain Connectable"                         },
-> +       { }
-> +};
-> +
->  const char *uuid16_to_str(uint16_t uuid)
->  {
->         int i;
-> @@ -568,6 +593,7 @@ const char *uuid128_to_str(const unsigned char *uuid)
->  const char *uuidstr_to_str(const char *uuid)
->  {
->         uint32_t val;
-> +       int i;
 >
->         if (!uuid)
->                 return NULL;
-> @@ -575,6 +601,11 @@ const char *uuidstr_to_str(const char *uuid)
->         if (strlen(uuid) != 36)
->                 return NULL;
+> if (ioctl(ctl, HIDPGETCONNINFO, &ci) < 0) {
+>                 error("Can't get HIDP connection info");
+>                 close(ctl);
+>                 return false;
+> }
 >
-> +       for (i = 0; uuid128_table[i].str; i++) {
-> +               if (strcasecmp(uuid128_table[i].uuid, uuid) == 0)
-> +                       return uuid128_table[i].str;
-> +       }
-> +
->         if (strncasecmp(uuid + 8, "-0000-1000-8000-00805f9b34fb", 28))
->                 return "Vendor specific";
 >
-> --
-> 2.7.0
+> Can somebody please tell me what this failure means? Obviously my
+> there is something wrong with my device (its getting an L2CAP
+> configuration error, looks like my laptop is asking for an MTU close
+> to 8k bytes). So I want to know where things are going wrong. I
+> suspect my HID descriptors/SDP records are messed up, but I would like
+> to know what part of it is wrong.
+>
+> I could not find any information relating to this ioctl either. man
+> ioctl_list doent seem to contain a number 211 (HIDPGETCONNINFO).
+> Please give some suggestions on how to debug this problem.
 
-Applied, thanks.
+Do you have the logs? For the HID descriptor you can check with
+something like this: http://eleccelerator.com/usbdescreqparser/  (just
+input your descriptor there to see if makes sense)
+
 
 -- 
 Luiz Augusto von Dentz
