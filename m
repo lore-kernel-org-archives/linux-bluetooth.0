@@ -1,45 +1,95 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CAE7O3TfO7a4gBVxVOC6T1OTgBU93SLvR3r2wbU19k2iyx_c_gQ@mail.gmail.com>
-References: <CAE7O3TfO7a4gBVxVOC6T1OTgBU93SLvR3r2wbU19k2iyx_c_gQ@mail.gmail.com>
-Date: Mon, 25 Apr 2016 12:08:23 +0300
-Message-ID: <CABBYNZJ2TmxrCy6+Oi+6Wv+MG-WYL5UTtPUmj-t=5NbHkYWt6Q@mail.gmail.com>
-Subject: Re: Plantronics Voayger Focus UC (B825-M) - microphone not working
+In-Reply-To: <1461334804-14901-2-git-send-email-beaufort.francois@gmail.com>
+References: <1461334804-14901-1-git-send-email-beaufort.francois@gmail.com>
+	<1461334804-14901-2-git-send-email-beaufort.francois@gmail.com>
+Date: Mon, 25 Apr 2016 12:03:10 +0300
+Message-ID: <CABBYNZ+T1fFBOpxj7n_pVd-OBDsApJ817z9Htcwf8ys6q3=qkw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] Recognize Eddystone Configuration Service UUIDs
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: "Olausson, Bjoern" <contactme@olausson.de>
+To: Francois Beaufort <beaufort.francois@gmail.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bjoern,
+Hi Francois,
 
-On Sat, Apr 23, 2016 at 12:06 AM, Olausson, Bjoern
-<contactme@olausson.de> wrote:
-> Hello to everyone in the linux-bluetooth list,
+On Fri, Apr 22, 2016 at 5:20 PM, Francois Beaufort
+<beaufort.francois@gmail.com> wrote:
+> ---
+>  monitor/uuid.c | 33 ++++++++++++++++++++++++++++++++-
+>  1 file changed, 32 insertions(+), 1 deletion(-)
 >
-> I recently bought a Plantronics Voyager Focus UC B825-M Headset and
-> connected it to my Linux Desktop via the USB-Dongle which worked
-> perfectly fine.
+> diff --git a/monitor/uuid.c b/monitor/uuid.c
+> index 54adb0d..1ceaa6f 100644
+> --- a/monitor/uuid.c
+> +++ b/monitor/uuid.c
+> @@ -31,7 +31,7 @@
 >
-> I then connected it to my Laptop via the built in BlueTooth adapter
-> (Intel I218-V ->
-> idVendor  0x8087 Intel Corp.). The Headset is recognized as a Playback
-> only device (at least in KDE I can't select the "PLT Focus" under
-> recording devices).
-
-Is the device still configured to connect to the Desktop? Perhaps you
-have to reset it so it only connects to the laptop otherwise it might
-not attempt to do HFP/HSP since that is usually limited to one, on
-A2DP there could be multiple endpoints thus you are still able to
-connect.
-
-> The device is listed as "HFP/HSP" and "A2DP sink".
+>  #include "uuid.h"
 >
-> Has anyone experience with this device or any advice how to get the
-> recording part to work?
+> -static struct {
+> +static const struct {
+>         uint16_t uuid;
+>         const char *str;
+>  } uuid16_table[] = {
+> @@ -540,6 +540,31 @@ static struct {
+>         { }
+>  };
+>
+> +static const struct {
+> +       const char *uuid;
+> +       const char *str;
+> +} uuid128_table[] = {
+> +       { "a3c87500-8ed3-4bdf-8a39-a01bebede295",
+> +               "Eddystone Configuration Service"                       },
+> +       { "a3c87501-8ed3-4bdf-8a39-a01bebede295", "Capabilities"        },
+> +       { "a3c87502-8ed3-4bdf-8a39-a01bebede295", "Active Slot"         },
+> +       { "a3c87503-8ed3-4bdf-8a39-a01bebede295",
+> +               "Advertising Interval"                                  },
+> +       { "a3c87504-8ed3-4bdf-8a39-a01bebede295", "Radio Tx Power"      },
+> +       { "a3c87505-8ed3-4bdf-8a39-a01bebede295",
+> +               "(Advanced) Advertised Tx Power"                        },
+> +       { "a3c87506-8ed3-4bdf-8a39-a01bebede295", "Lock State"          },
+> +       { "a3c87507-8ed3-4bdf-8a39-a01bebede295", "Unlock"              },
+> +       { "a3c87508-8ed3-4bdf-8a39-a01bebede295", "Public ECDH Key"     },
+> +       { "a3c87509-8ed3-4bdf-8a39-a01bebede295", "EID Identity Key"    },
+> +       { "a3c8750a-8ed3-4bdf-8a39-a01bebede295", "ADV Slot Data"       },
+> +       { "a3c8750b-8ed3-4bdf-8a39-a01bebede295",
+> +               "(Advanced) Factory reset"                              },
+> +       { "a3c8750c-8ed3-4bdf-8a39-a01bebede295",
+> +               "(Advanced) Remain Connectable"                         },
+> +       { }
+> +};
+> +
+>  const char *uuid16_to_str(uint16_t uuid)
+>  {
+>         int i;
+> @@ -568,6 +593,7 @@ const char *uuid128_to_str(const unsigned char *uuid)
+>  const char *uuidstr_to_str(const char *uuid)
+>  {
+>         uint32_t val;
+> +       int i;
+>
+>         if (!uuid)
+>                 return NULL;
+> @@ -575,6 +601,11 @@ const char *uuidstr_to_str(const char *uuid)
+>         if (strlen(uuid) != 36)
+>                 return NULL;
+>
+> +       for (i = 0; uuid128_table[i].str; i++) {
+> +               if (strcasecmp(uuid128_table[i].uuid, uuid) == 0)
+> +                       return uuid128_table[i].str;
+> +       }
+> +
+>         if (strncasecmp(uuid + 8, "-0000-1000-8000-00805f9b34fb", 28))
+>                 return "Vendor specific";
+>
+> --
+> 2.7.0
 
-
+Applied, thanks.
 
 -- 
 Luiz Augusto von Dentz
