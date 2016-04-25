@@ -1,82 +1,54 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <CABBYNZKeux81k4hN+QRSiNsSXoZymKPwc5YaEjo1iLes2YGe6Q@mail.gmail.com>
-References: <CAOsEZogjvtwKq9ojZva=T9WtovomWhbezVCKZs=oBNFfjixsVQ@mail.gmail.com>
- <CABBYNZKeux81k4hN+QRSiNsSXoZymKPwc5YaEjo1iLes2YGe6Q@mail.gmail.com>
-From: Jay Aurabind <jay.aurabind@gmail.com>
-Date: Mon, 25 Apr 2016 14:56:02 +0530
-Message-ID: <CAOsEZogG0-2xYQyPKmwYxmjwRCmt7XYc=pJah94b5Uv9oQtWnQ@mail.gmail.com>
-Subject: Re: [Help] HIDP connection info error.
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <jukka.rissanen@linux.intel.com>
+Message-ID: <1461576282.28077.39.camel@linux.intel.com>
+Subject: Re: [PATCH] Bluetooth: 6lowpan: Fix memory corruption of ipv6
+ destination address
+From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+To: Glenn Ruben Bakke <glennrubenbakke@nordicsemi.no>, marcel@holtmann.org
+Cc: linux-bluetooth@vger.kernel.org, Glenn Ruben Bakke
+	 <glenn.ruben.bakke@nordicsemi.no>
+Date: Mon, 25 Apr 2016 12:24:42 +0300
+In-Reply-To: <1461341171-2951-1-git-send-email-glennrubenbakke@nordicsemi.no>
+References: <1461341171-2951-1-git-send-email-glennrubenbakke@nordicsemi.no>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 25 April 2016 at 14:01, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
-> Hi Jay,
->
-> On Fri, Apr 22, 2016 at 9:14 AM, Jay Aurabind <jay.aurabind@gmail.com> wrote:
->> Hi,
->>
->> I'm trying to communicate to my custom HID device. I initiated a
->> connection from my laptop to my device, and I see the following in the
->> debug log:
->>
->> Can't get HIDP connection info
->>
->> I traced this to profiles/input/device.c Line 798, to function
->> ioctl_is_connected
->>
->>
->> if (ioctl(ctl, HIDPGETCONNINFO, &ci) < 0) {
->>                 error("Can't get HIDP connection info");
->>                 close(ctl);
->>                 return false;
->> }
->>
->>
->> Can somebody please tell me what this failure means? Obviously my
->> there is something wrong with my device (its getting an L2CAP
->> configuration error, looks like my laptop is asking for an MTU close
->> to 8k bytes). So I want to know where things are going wrong. I
->> suspect my HID descriptors/SDP records are messed up, but I would like
->> to know what part of it is wrong.
->>
->> I could not find any information relating to this ioctl either. man
->> ioctl_list doent seem to contain a number 211 (HIDPGETCONNINFO).
->> Please give some suggestions on how to debug this problem.
->
-> Do you have the logs? For the HID descriptor you can check with
-> something like this: http://eleccelerator.com/usbdescreqparser/  (just
-> input your descriptor there to see if makes sense)
->
->
-> --
-> Luiz Augusto von Dentz
+Hi Glenn,
+
+nice fix and it makes sense.
+
+Acked-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
 
 
-Thank you for the response Luiz! That website is quite useful!
+On Fri, 2016-04-22 at 18:06 +0200, Glenn Ruben Bakke wrote:
+> The memcpy of ipv6 header destination address to the skb control
+> block
+> (sbk->cb) in header_create() results in currupted memory when
+> bt_xmit()
+> is issued. The skb->cb is "released" in the return of header_create()
+> making room for lower layer to minipulate the skb->cb.
+> 
+> The value retrieved in bt_xmit is not persistent across header
+> creation
+> and sending, and the lower layer will overwrite portions of skb->cb,
+> making the copied destination address wrong.
+> 
+> The memory corruption will lead to non-working multicast as the first
+> 4
+> bytes of the copied destination address is replaced by a value that
+> resolves into a non-multicast prefix.
+> 
+> The issue has also been observed in kernel 4.5.
+> 
+> This fix removes the dependency on the skb control block between
+> header
+> creation and send, by moving the destination address memcpy to the
+> send
+> function path (setup_create, which is called from bt_xmit).
+> 
+> Signed-off-by: Glenn Ruben Bakke <glenn.ruben.bakke@nordicsemi.no>
+> ---
 
-And yes, my hid descriptor list is indeed sane, as it can parse it and
-gave me a comment for each line. So it should be fine. I took a look
-at my bluetoothd host logs, and I see it complaining about
-missing/invalid HIDDescriptorList as well.
 
-https://paste.gnome.org/phx8vh4x5
-
-Output of sdptool browse --raw is at https://paste.gnome.org/pjfdrnfid#line-38
-
-I definitely need to fix my SDP records, but is it possible to know in
-detail what specific attributes its mentioning about ? For example,
-one line in my log is "sdp_extract_attr: Unknown data descriptor :
-0x2d terminating", how can I know when it came across that 0x2d  so
-that I can go poke in my device's code to find what I'm doing wrong?
-
-
-Thanks in advance!
-
-
--- 
-Regards,
-Aurabindo J
+Cheers,
+Jukka
