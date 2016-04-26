@@ -1,92 +1,88 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC BlueZ 2/2] doc/gatt-api: Merge RegisterProfile with RegisterApplication
-Date: Tue, 26 Apr 2016 13:49:08 +0300
-Message-Id: <1461667748-8617-2-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1461667748-8617-1-git-send-email-luiz.dentz@gmail.com>
-References: <1461667748-8617-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [RFC BlueZ 1/2] doc/gatt-api: Add flags dictionary to ReadValue/WriteValue
+Date: Tue, 26 Apr 2016 13:49:07 +0300
+Message-Id: <1461667748-8617-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Since RegisterApplication makes use of ObjectManager it is also possible
-to verify the existance of GattProfile objects unifying the API for both
-services (GATT server) and profiles (GATT client).
+This adds the possibility to pass an offset to these operations, and
+also in the server case to give the device object.
 ---
- doc/gatt-api.txt | 37 +++++++++----------------------------
- 1 file changed, 9 insertions(+), 28 deletions(-)
+ doc/gatt-api.txt | 20 ++++++++++++++++----
+ 1 file changed, 16 insertions(+), 4 deletions(-)
 
 diff --git a/doc/gatt-api.txt b/doc/gatt-api.txt
-index 36984e5..2d3b906 100644
+index ad2ab16..36984e5 100644
 --- a/doc/gatt-api.txt
 +++ b/doc/gatt-api.txt
-@@ -218,8 +218,8 @@ Properties	string UUID [read-only]
- 				"encrypt-authenticated-read"
- 				"encrypt-authenticated-write"
+@@ -61,23 +61,29 @@ Service		org.bluez
+ Interface	org.bluez.GattCharacteristic1 [Experimental]
+ Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX/serviceXX/charYYYY
  
--Profile hierarcy
--================
-+GATT Profile hierarcy
-+=====================
+-Methods		array{byte} ReadValue()
++Methods		array{byte} ReadValue(dict flags)
  
- Local profile (GATT client) instance. By registering this type of object
- an application effectively indicates support for a specific GATT profile
-@@ -238,6 +238,10 @@ Methods		void Release()
- 			profile, because when this method gets called it has
- 			already been unregistered.
+ 			Issues a request to read the value of the
+ 			characteristic and returns the value if the
+ 			operation was successful.
  
-+Properties	array{string} UUIDs [read-only]
++			Possible flags: "offset": uint16 offset (optional)
++					"device": Object Device (Server only)
 +
-+			128-bit GATT service UUIDs.
+ 			Possible Errors: org.bluez.Error.Failed
+ 					 org.bluez.Error.InProgress
+ 					 org.bluez.Error.NotPermitted
+ 					 org.bluez.Error.NotAuthorized
+ 					 org.bluez.Error.NotSupported
+ 
+-		void WriteValue(array{byte} value)
++		void WriteValue(array{byte} value, dict flags)
+ 
+ 			Issues a request to write the value of the
+ 			characteristic.
+ 
++			Possible flags: "offset": Start offset (optional)
++					"device": Device path (Server only)
 +
+ 			Possible Errors: org.bluez.Error.Failed
+ 					 org.bluez.Error.InProgress
+ 					 org.bluez.Error.NotPermitted
+@@ -154,23 +160,29 @@ Service		org.bluez
+ Interface	org.bluez.GattDescriptor1 [Experimental]
+ Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX/serviceXX/charYYYY/descriptorZZZ
  
- GATT Manager hierarchy
- ======================
-@@ -306,11 +310,12 @@ Object path	[variable prefix]/{hci0,hci1,...}
- Methods		void RegisterApplication(object application, dict options)
+-Methods		array{byte} ReadValue()
++Methods		array{byte} ReadValue(dict flags)
  
- 			Registers a local GATT services hierarchy as described
--			above.
-+			above (GATT Server) and/or GATT profiles (GATT Client).
+ 			Issues a request to read the value of the
+ 			characteristic and returns the value if the
+ 			operation was successful.
  
- 			The application object path together with the D-Bus
- 			system bus connection ID define the identification of
--			the application registering a GATT based service.
-+			the application registering a GATT based
-+			service or profile.
++			Possible flags: "offset": uint16 offset (optional)
++					"device": Object Device (Server only)
++
+ 			Possible Errors: org.bluez.Error.Failed
+ 					 org.bluez.Error.InProgress
+ 					 org.bluez.Error.NotPermitted
+ 					 org.bluez.Error.NotAuthorized
+ 					 org.bluez.Error.NotSupported
  
- 			Possible errors: org.bluez.Error.InvalidArguments
- 					 org.bluez.Error.AlreadyExists
-@@ -324,27 +329,3 @@ Methods		void RegisterApplication(object application, dict options)
+-		void WriteValue(array{byte} value)
++		void WriteValue(array{byte} value, dict flags)
  
- 			Possible errors: org.bluez.Error.InvalidArguments
- 					 org.bluez.Error.DoesNotExist
--
--		void RegisterProfile(object profile, array{string} UUIDs,
--				     dict options)
--
--			Registers a GATT (client role) profile exported
--			under interface GattProfile1. The array of UUIDs
--			specifies the mandatory set of remote service
--			UUIDs that should all be available for the
--			remote device to match this profile. Matching
--			devices will be added to the auto-connection
--			list and connected whenever available.
--
--			Possible errors: org.bluez.Error.InvalidArguments
--					 org.bluez.Error.AlreadyExists
--
--		void UnregisterProfile(object profile)
--
--			This unregisters the profile that has been
--			previously registered. The object path parameter
--			must match the same value that has been used
--			on registration.
--
--			Possible errors: org.bluez.Error.InvalidArguments
--					 org.bluez.Error.DoesNotExist
+ 			Issues a request to write the value of the
+ 			characteristic.
+ 
++			Possible flags: "offset": uint16 offset (optional)
++					"device": Object Device (Server only)
++
+ 			Possible Errors: org.bluez.Error.Failed
+ 					 org.bluez.Error.InProgress
+ 					 org.bluez.Error.NotPermitted
 -- 
 2.5.5
 
