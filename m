@@ -1,150 +1,92 @@
-Return-Path: <linux-kernel-owner@vger.kernel.org>
-From: Amitkumar Karwar <akarwar@marvell.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <linux-kernel@vger.kernel.org>, <devicetree@vger.kernel.org>,
-	Wei-Ning Huang <wnhuang@chromium.org>,
-	Xinming Hu <huxm@marvell.com>,
-	Amitkumar Karwar <akarwar@marvell.com>
-Subject: [PATCH v8 1/2] dt: bindings: add MARVELL's bt-sd8xxx wireless device
-Date: Tue, 26 Apr 2016 06:57:26 -0700
-Message-ID: <1461679047-22631-1-git-send-email-akarwar@marvell.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Sender: linux-kernel-owner@vger.kernel.org
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [RFC BlueZ 2/2] doc/gatt-api: Merge RegisterProfile with RegisterApplication
+Date: Tue, 26 Apr 2016 13:49:08 +0300
+Message-Id: <1461667748-8617-2-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1461667748-8617-1-git-send-email-luiz.dentz@gmail.com>
+References: <1461667748-8617-1-git-send-email-luiz.dentz@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Xinming Hu <huxm@marvell.com>
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Add device tree binding documentation for MARVELL's bluetooth sdio
-(sd8897 and sd8997) chip.
-
-Signed-off-by: Xinming Hu <huxm@marvell.com>
-Signed-off-by: Amitkumar Karwar <akarwar@marvell.com>
+Since RegisterApplication makes use of ObjectManager it is also possible
+to verify the existance of GattProfile objects unifying the API for both
+services (GATT server) and profiles (GATT client).
 ---
-Listing changelist for both 1/2 and 2/2 here
-v2: Fixed build error reported by kbuild test robot
-drivers/bluetooth/btmrvl_platform.c:141:22: error:
-'btmrvl_plt_pm_ops' undeclared here (not in a function)
+ doc/gatt-api.txt | 37 +++++++++----------------------------
+ 1 file changed, 9 insertions(+), 28 deletions(-)
 
-v3: Add NULL check for 'btmrvl_plt_dev'
-
-v4: Moved the bindings file to bindings/net/
-    Corrected the name of 'name' and 'compatible' properties(Rob Herring)
-
-v5: Comments for wlan patches were applicable here as well. Like all binding
-    changes in single file, specifying node as a child of SDIO controller.
-
-v6: a)Use <chip>-bt order for compatible attribute(Rob Herring)
-    b)Split wakeuppin-gap to wakeup-pin and wakeup-gap(Rob Herring) 
-    c)Use sdio function number for both the unit address and reg(Rob Herring)
-
-v7: a)Use suggested vendor name and generic node name(Rob Herring)
-v8: a)Nodes are renamed as per suggestions from Rob Herring
-      btmrvl,* -> marvell,*
-      "wakeup-gap-msec" -> "wakeup-gap-ms"
----
- Documentation/devicetree/bindings/btmrvl.txt       | 29 -----------
- .../devicetree/bindings/net/marvell-bt-sd8xxx.txt  | 56 ++++++++++++++++++++++
- 2 files changed, 56 insertions(+), 29 deletions(-)
- delete mode 100644 Documentation/devicetree/bindings/btmrvl.txt
- create mode 100644 Documentation/devicetree/bindings/net/marvell-bt-sd8xxx.txt
-
-diff --git a/Documentation/devicetree/bindings/btmrvl.txt b/Documentation/devicetree/bindings/btmrvl.txt
-deleted file mode 100644
-index 58f964b..0000000
---- a/Documentation/devicetree/bindings/btmrvl.txt
-+++ /dev/null
-@@ -1,29 +0,0 @@
--btmrvl
--------
+diff --git a/doc/gatt-api.txt b/doc/gatt-api.txt
+index 36984e5..2d3b906 100644
+--- a/doc/gatt-api.txt
++++ b/doc/gatt-api.txt
+@@ -218,8 +218,8 @@ Properties	string UUID [read-only]
+ 				"encrypt-authenticated-read"
+ 				"encrypt-authenticated-write"
+ 
+-Profile hierarcy
+-================
++GATT Profile hierarcy
++=====================
+ 
+ Local profile (GATT client) instance. By registering this type of object
+ an application effectively indicates support for a specific GATT profile
+@@ -238,6 +238,10 @@ Methods		void Release()
+ 			profile, because when this method gets called it has
+ 			already been unregistered.
+ 
++Properties	array{string} UUIDs [read-only]
++
++			128-bit GATT service UUIDs.
++
+ 
+ GATT Manager hierarchy
+ ======================
+@@ -306,11 +310,12 @@ Object path	[variable prefix]/{hci0,hci1,...}
+ Methods		void RegisterApplication(object application, dict options)
+ 
+ 			Registers a local GATT services hierarchy as described
+-			above.
++			above (GATT Server) and/or GATT profiles (GATT Client).
+ 
+ 			The application object path together with the D-Bus
+ 			system bus connection ID define the identification of
+-			the application registering a GATT based service.
++			the application registering a GATT based
++			service or profile.
+ 
+ 			Possible errors: org.bluez.Error.InvalidArguments
+ 					 org.bluez.Error.AlreadyExists
+@@ -324,27 +329,3 @@ Methods		void RegisterApplication(object application, dict options)
+ 
+ 			Possible errors: org.bluez.Error.InvalidArguments
+ 					 org.bluez.Error.DoesNotExist
 -
--Required properties:
+-		void RegisterProfile(object profile, array{string} UUIDs,
+-				     dict options)
 -
--  - compatible : must be "btmrvl,cfgdata"
+-			Registers a GATT (client role) profile exported
+-			under interface GattProfile1. The array of UUIDs
+-			specifies the mandatory set of remote service
+-			UUIDs that should all be available for the
+-			remote device to match this profile. Matching
+-			devices will be added to the auto-connection
+-			list and connected whenever available.
 -
--Optional properties:
+-			Possible errors: org.bluez.Error.InvalidArguments
+-					 org.bluez.Error.AlreadyExists
 -
--  - btmrvl,cal-data : Calibration data downloaded to the device during
--		      initialization. This is an array of 28 values(u8).
+-		void UnregisterProfile(object profile)
 -
--  - btmrvl,gpio-gap : gpio and gap (in msecs) combination to be
--		      configured.
+-			This unregisters the profile that has been
+-			previously registered. The object path parameter
+-			must match the same value that has been used
+-			on registration.
 -
--Example:
--
--GPIO pin 13 is configured as a wakeup source and GAP is set to 100 msecs
--in below example.
--
--btmrvl {
--	compatible = "btmrvl,cfgdata";
--
--	btmrvl,cal-data = /bits/ 8 <
--		0x37 0x01 0x1c 0x00 0xff 0xff 0xff 0xff 0x01 0x7f 0x04 0x02
--		0x00 0x00 0xba 0xce 0xc0 0xc6 0x2d 0x00 0x00 0x00 0x00 0x00
--		0x00 0x00 0xf0 0x00>;
--	btmrvl,gpio-gap = <0x0d64>;
--};
-diff --git a/Documentation/devicetree/bindings/net/marvell-bt-sd8xxx.txt b/Documentation/devicetree/bindings/net/marvell-bt-sd8xxx.txt
-new file mode 100644
-index 0000000..14aa6cf
---- /dev/null
-+++ b/Documentation/devicetree/bindings/net/marvell-bt-sd8xxx.txt
-@@ -0,0 +1,56 @@
-+Marvell 8897/8997 (sd8897/sd8997) bluetooth SDIO devices
-+------
-+
-+Required properties:
-+
-+  - compatible : should be one of the following:
-+	* "marvell,sd8897-bt"
-+	* "marvell,sd8997-bt"
-+
-+Optional properties:
-+
-+  - marvell,cal-data: Calibration data downloaded to the device during
-+		      initialization. This is an array of 28 values(u8).
-+
-+  - marvell,wakeup-pin: It represents wakeup pin number of the bluetooth chip.
-+		        firmware will use the pin to wakeup host system.
-+  - marvell,wakeup-gap-ms: wakeup gap represents wakeup latency of the host
-+		      platform. The value will be configured to firmware. This
-+		      is needed to work chip's sleep feature as expected.
-+  - interrupt-parent: phandle of the parent interrupt controller
-+  - interrupts : interrupt pin number to the cpu. Driver will request an irq based
-+		 on this interrupt number. During system suspend, the irq will be
-+		 enabled so that the bluetooth chip can wakeup host platform under
-+		 certain condition. During system resume, the irq will be disabled
-+		 to make sure unnecessary interrupt is not received.
-+
-+Example:
-+
-+IRQ pin 119 is used as system wakeup source interrupt.
-+wakeup pin 13 and gap 100ms are configured so that firmware can wakeup host
-+using this device side pin and wakeup latency.
-+calibration data is also available in below example.
-+
-+&mmc3 {
-+	status = "okay";
-+	vmmc-supply = <&wlan_en_reg>;
-+	bus-width = <4>;
-+	cap-power-off-card;
-+	keep-power-in-suspend;
-+
-+	#address-cells = <1>;
-+	#size-cells = <0>;
-+	btmrvl: bluetooth@2 {
-+		compatible = "marvell,sd8897-bt";
-+		reg = <2>;
-+		interrupt-parent = <&pio>;
-+		interrupts = <119 IRQ_TYPE_LEVEL_LOW>;
-+
-+		marvell,cal-data = /bits/ 8 <
-+			0x37 0x01 0x1c 0x00 0xff 0xff 0xff 0xff 0x01 0x7f 0x04 0x02
-+			0x00 0x00 0xba 0xce 0xc0 0xc6 0x2d 0x00 0x00 0x00 0x00 0x00
-+			0x00 0x00 0xf0 0x00>;
-+		marvell,wakeup-pin = <0x0d>;
-+		marvell,wakeup-gap-ms = <0x64>;
-+	};
-+};
+-			Possible errors: org.bluez.Error.InvalidArguments
+-					 org.bluez.Error.DoesNotExist
 -- 
-1.8.1.4
+2.5.5
+
