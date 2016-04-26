@@ -2,98 +2,91 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Szymon Janc <szymon.janc@codecoup.pl>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@codecoup.pl>
-Subject: [PATCH 2/2] monitor: Display all events type in analyze
-Date: Tue, 26 Apr 2016 22:52:13 +0200
-Message-Id: <1461703933-18073-2-git-send-email-szymon.janc@codecoup.pl>
-In-Reply-To: <1461703933-18073-1-git-send-email-szymon.janc@codecoup.pl>
-References: <1461703933-18073-1-git-send-email-szymon.janc@codecoup.pl>
+Subject: [PATCH 1/2] monitor: Add support for analyzing index info
+Date: Tue, 26 Apr 2016 22:52:12 +0200
+Message-Id: <1461703933-18073-1-git-send-email-szymon.janc@codecoup.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This add support for counting all event types in analyze.
+Will now show vendor name if it was provided in snoop file.
 ---
- monitor/analyze.c | 51 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 51 insertions(+)
+ monitor/analyze.c | 30 +++++++++++++++++++++++++++++-
+ 1 file changed, 29 insertions(+), 1 deletion(-)
 
 diff --git a/monitor/analyze.c b/monitor/analyze.c
-index 197c7f9..94f0c57 100644
+index 0f2d19a..197c7f9 100644
 --- a/monitor/analyze.c
 +++ b/monitor/analyze.c
-@@ -47,6 +47,9 @@ struct hci_dev {
+@@ -29,6 +29,8 @@
+ #include <stdio.h>
+ #include <string.h>
+ 
++#include "lib/bluetooth.h"
++
+ #include "src/shared/util.h"
+ #include "src/shared/queue.h"
+ #include "src/shared/btsnoop.h"
+@@ -45,6 +47,7 @@ struct hci_dev {
  	unsigned long num_evt;
  	unsigned long num_acl;
  	unsigned long num_sco;
-+	unsigned long vendor_diag;
-+	unsigned long system_note;
-+	unsigned long user_log;
- 	uint16_t manufacturer;
++	uint16_t manufacturer;
  };
  
-@@ -82,6 +85,9 @@ static void dev_destroy(void *data)
+ static struct queue *dev_list;
+@@ -67,9 +70,14 @@ static void dev_destroy(void *data)
+ 	}
+ 
+ 	printf("Found %s controller with index %u\n", str, dev->index);
+-	printf("  BD_ADDR %2.2X:%2.2X:%2.2X:%2.2X:%2.2X:%2.2X\n",
++	printf("  BD_ADDR %2.2X:%2.2X:%2.2X:%2.2X:%2.2X:%2.2X",
+ 			dev->bdaddr[5], dev->bdaddr[4], dev->bdaddr[3],
+ 			dev->bdaddr[2], dev->bdaddr[1], dev->bdaddr[0]);
++	if (dev->manufacturer != 0xffff)
++		printf(" (%s)", bt_compidtostr(dev->manufacturer));
++	printf("\n");
++
++
+ 	printf("  %lu commands\n", dev->num_cmd);
  	printf("  %lu events\n", dev->num_evt);
  	printf("  %lu ACL packets\n", dev->num_acl);
- 	printf("  %lu SCO packets\n", dev->num_sco);
-+	printf("  %lu vendor diagnostics\n", dev->vendor_diag);
-+	printf("  %lu system notes\n", dev->system_note);
-+	printf("  %lu user logs\n", dev->user_log);
- 	printf("\n");
+@@ -90,6 +98,7 @@ static struct hci_dev *dev_alloc(uint16_t index)
+ 	}
  
- 	free(dev);
-@@ -276,6 +282,42 @@ static void info_index(struct timeval *tv, uint16_t index,
- 	dev->manufacturer = hdr->manufacturer;
+ 	dev->index = index;
++	dev->manufacturer = 0xffff;
+ 
+ 	return dev;
+ }
+@@ -251,6 +260,22 @@ static void sco_pkt(struct timeval *tv, uint16_t index,
+ 	dev->num_sco++;
  }
  
-+static void vendor_diag(struct timeval *tv, uint16_t index,
++static void info_index(struct timeval *tv, uint16_t index,
 +					const void *data, uint16_t size)
 +{
++	const struct btsnoop_opcode_index_info *hdr = data;
 +	struct hci_dev *dev;
++
++	data += sizeof(*hdr);
++	size -= sizeof(*hdr);
 +
 +	dev = dev_lookup(index);
 +	if (!dev)
 +		return;
 +
-+	dev->vendor_diag++;
-+}
-+
-+static void system_note(struct timeval *tv, uint16_t index,
-+					const void *data, uint16_t size)
-+{
-+	struct hci_dev *dev;
-+
-+	dev = dev_lookup(index);
-+	if (!dev)
-+		return;
-+
-+	dev->system_note++;
-+}
-+
-+static void user_log(struct timeval *tv, uint16_t index,
-+					const void *data, uint16_t size)
-+{
-+	struct hci_dev *dev;
-+
-+	dev = dev_lookup(index);
-+	if (!dev)
-+		return;
-+
-+	dev->user_log++;
++	dev->manufacturer = hdr->manufacturer;
 +}
 +
  void analyze_trace(const char *path)
  {
  	struct btsnoop *btsnoop_file;
-@@ -340,6 +382,15 @@ void analyze_trace(const char *path)
- 		case BTSNOOP_OPCODE_INDEX_INFO:
- 			info_index(&tv, index, buf, pktlen);
+@@ -312,6 +337,9 @@ void analyze_trace(const char *path)
+ 		case BTSNOOP_OPCODE_OPEN_INDEX:
+ 		case BTSNOOP_OPCODE_CLOSE_INDEX:
  			break;
-+		case BTSNOOP_OPCODE_VENDOR_DIAG:
-+			vendor_diag(&tv, index, buf, pktlen);
-+			break;
-+		case BTSNOOP_OPCODE_SYSTEM_NOTE:
-+			system_note(&tv, index, buf, pktlen);
-+			break;
-+		case BTSNOOP_OPCODE_USER_LOGGING:
-+			user_log(&tv, index, buf, pktlen);
++		case BTSNOOP_OPCODE_INDEX_INFO:
++			info_index(&tv, index, buf, pktlen);
 +			break;
  		default:
  			fprintf(stderr, "Wrong opcode %u\n", opcode);
