@@ -1,254 +1,150 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <linux-kernel-owner@vger.kernel.org>
 From: Amitkumar Karwar <akarwar@marvell.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: <linux-kernel@vger.kernel.org>, <devicetree@vger.kernel.org>,
 	Wei-Ning Huang <wnhuang@chromium.org>,
 	Xinming Hu <huxm@marvell.com>,
 	Amitkumar Karwar <akarwar@marvell.com>
-Subject: [PATCH v8 2/2] btmrvl: add platform specific wakeup interrupt support
-Date: Tue, 26 Apr 2016 06:57:27 -0700
-Message-ID: <1461679047-22631-2-git-send-email-akarwar@marvell.com>
-In-Reply-To: <1461679047-22631-1-git-send-email-akarwar@marvell.com>
-References: <1461679047-22631-1-git-send-email-akarwar@marvell.com>
+Subject: [PATCH v8 1/2] dt: bindings: add MARVELL's bt-sd8xxx wireless device
+Date: Tue, 26 Apr 2016 06:57:26 -0700
+Message-ID: <1461679047-22631-1-git-send-email-akarwar@marvell.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Sender: linux-bluetooth-owner@vger.kernel.org
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Xinming Hu <huxm@marvell.com>
 
-On some arm-based platforms, we need to configure platform specific
-parameters by device tree node and also define our node as a child
-node of parent SDIO host controller.
-This patch parses these parameters from device tree. It includes
-calibration data download to firmware, wakeup pin configured to firmware,
-and soc specific wake up gpio, which will be set as wakeup interrupt pin.
+Add device tree binding documentation for MARVELL's bluetooth sdio
+(sd8897 and sd8997) chip.
 
 Signed-off-by: Xinming Hu <huxm@marvell.com>
 Signed-off-by: Amitkumar Karwar <akarwar@marvell.com>
 ---
- drivers/bluetooth/btmrvl_drv.h  | 11 ++++++
- drivers/bluetooth/btmrvl_main.c | 35 ++++++++++--------
- drivers/bluetooth/btmrvl_sdio.c | 79 +++++++++++++++++++++++++++++++++++++++++
- drivers/bluetooth/btmrvl_sdio.h |  6 ++++
- 4 files changed, 116 insertions(+), 15 deletions(-)
+Listing changelist for both 1/2 and 2/2 here
+v2: Fixed build error reported by kbuild test robot
+drivers/bluetooth/btmrvl_platform.c:141:22: error:
+'btmrvl_plt_pm_ops' undeclared here (not in a function)
 
-diff --git a/drivers/bluetooth/btmrvl_drv.h b/drivers/bluetooth/btmrvl_drv.h
-index 0590473..f742384 100644
---- a/drivers/bluetooth/btmrvl_drv.h
-+++ b/drivers/bluetooth/btmrvl_drv.h
-@@ -23,6 +23,17 @@
- #include <linux/bitops.h>
- #include <linux/slab.h>
- #include <net/bluetooth/bluetooth.h>
-+#include <linux/err.h>
-+#include <linux/gpio.h>
-+#include <linux/gfp.h>
-+#include <linux/interrupt.h>
-+#include <linux/io.h>
-+#include <linux/of_gpio.h>
-+#include <linux/of_platform.h>
-+#include <linux/platform_device.h>
-+#include <linux/pm_runtime.h>
-+#include <linux/slab.h>
-+#include <linux/of_irq.h>
- 
- #define BTM_HEADER_LEN			4
- #define BTM_UPLD_SIZE			2312
-diff --git a/drivers/bluetooth/btmrvl_main.c b/drivers/bluetooth/btmrvl_main.c
-index f25a825..7ad8d61 100644
---- a/drivers/bluetooth/btmrvl_main.c
-+++ b/drivers/bluetooth/btmrvl_main.c
-@@ -510,34 +510,39 @@ static int btmrvl_download_cal_data(struct btmrvl_private *priv,
- static int btmrvl_check_device_tree(struct btmrvl_private *priv)
- {
- 	struct device_node *dt_node;
-+	struct btmrvl_sdio_card *card = priv->btmrvl_dev.card;
- 	u8 cal_data[BT_CAL_HDR_LEN + BT_CAL_DATA_SIZE];
--	int ret;
--	u32 val;
-+	int ret = 0;
-+	u16 gpio, gap;
+v3: Add NULL check for 'btmrvl_plt_dev'
+
+v4: Moved the bindings file to bindings/net/
+    Corrected the name of 'name' and 'compatible' properties(Rob Herring)
+
+v5: Comments for wlan patches were applicable here as well. Like all binding
+    changes in single file, specifying node as a child of SDIO controller.
+
+v6: a)Use <chip>-bt order for compatible attribute(Rob Herring)
+    b)Split wakeuppin-gap to wakeup-pin and wakeup-gap(Rob Herring) 
+    c)Use sdio function number for both the unit address and reg(Rob Herring)
+
+v7: a)Use suggested vendor name and generic node name(Rob Herring)
+v8: a)Nodes are renamed as per suggestions from Rob Herring
+      btmrvl,* -> marvell,*
+      "wakeup-gap-msec" -> "wakeup-gap-ms"
+---
+ Documentation/devicetree/bindings/btmrvl.txt       | 29 -----------
+ .../devicetree/bindings/net/marvell-bt-sd8xxx.txt  | 56 ++++++++++++++++++++++
+ 2 files changed, 56 insertions(+), 29 deletions(-)
+ delete mode 100644 Documentation/devicetree/bindings/btmrvl.txt
+ create mode 100644 Documentation/devicetree/bindings/net/marvell-bt-sd8xxx.txt
+
+diff --git a/Documentation/devicetree/bindings/btmrvl.txt b/Documentation/devicetree/bindings/btmrvl.txt
+deleted file mode 100644
+index 58f964b..0000000
+--- a/Documentation/devicetree/bindings/btmrvl.txt
++++ /dev/null
+@@ -1,29 +0,0 @@
+-btmrvl
+-------
+-
+-Required properties:
+-
+-  - compatible : must be "btmrvl,cfgdata"
+-
+-Optional properties:
+-
+-  - btmrvl,cal-data : Calibration data downloaded to the device during
+-		      initialization. This is an array of 28 values(u8).
+-
+-  - btmrvl,gpio-gap : gpio and gap (in msecs) combination to be
+-		      configured.
+-
+-Example:
+-
+-GPIO pin 13 is configured as a wakeup source and GAP is set to 100 msecs
+-in below example.
+-
+-btmrvl {
+-	compatible = "btmrvl,cfgdata";
+-
+-	btmrvl,cal-data = /bits/ 8 <
+-		0x37 0x01 0x1c 0x00 0xff 0xff 0xff 0xff 0x01 0x7f 0x04 0x02
+-		0x00 0x00 0xba 0xce 0xc0 0xc6 0x2d 0x00 0x00 0x00 0x00 0x00
+-		0x00 0x00 0xf0 0x00>;
+-	btmrvl,gpio-gap = <0x0d64>;
+-};
+diff --git a/Documentation/devicetree/bindings/net/marvell-bt-sd8xxx.txt b/Documentation/devicetree/bindings/net/marvell-bt-sd8xxx.txt
+new file mode 100644
+index 0000000..14aa6cf
+--- /dev/null
++++ b/Documentation/devicetree/bindings/net/marvell-bt-sd8xxx.txt
+@@ -0,0 +1,56 @@
++Marvell 8897/8997 (sd8897/sd8997) bluetooth SDIO devices
++------
 +
-+	if (card->plt_of_node) {
-+		dt_node = card->plt_of_node;
-+		ret = of_property_read_u16(dt_node, "marvell,wakeup-pin",
-+					   &gpio);
-+		if (ret)
-+			gpio = (priv->btmrvl_dev.gpio_gap & 0xff00) >> 8;
++Required properties:
 +
-+		ret = of_property_read_u16(dt_node, "marvell,wakeup-gap-ms",
-+					   &gap);
-+		if (ret)
-+			gap = (u8)(priv->btmrvl_dev.gpio_gap & 0x00ff);
- 
--	for_each_compatible_node(dt_node, NULL, "btmrvl,cfgdata") {
--		ret = of_property_read_u32(dt_node, "btmrvl,gpio-gap", &val);
--		if (!ret)
--			priv->btmrvl_dev.gpio_gap = val;
-+		priv->btmrvl_dev.gpio_gap = (gpio << 8) + gap;
- 
--		ret = of_property_read_u8_array(dt_node, "btmrvl,cal-data",
-+		ret = of_property_read_u8_array(dt_node, "marvell,cal-data",
- 						cal_data + BT_CAL_HDR_LEN,
- 						BT_CAL_DATA_SIZE);
--		if (ret) {
--			of_node_put(dt_node);
-+		if (ret)
- 			return ret;
--		}
- 
- 		BT_DBG("Use cal data from device tree");
- 		ret = btmrvl_download_cal_data(priv, cal_data,
- 					       BT_CAL_DATA_SIZE);
--		if (ret) {
-+		if (ret)
- 			BT_ERR("Fail to download calibrate data");
--			of_node_put(dt_node);
--			return ret;
--		}
- 	}
- 
--	return 0;
-+	return ret;
- }
- 
- static int btmrvl_setup(struct hci_dev *hdev)
-diff --git a/drivers/bluetooth/btmrvl_sdio.c b/drivers/bluetooth/btmrvl_sdio.c
-index c6ef248..4961318 100644
---- a/drivers/bluetooth/btmrvl_sdio.c
-+++ b/drivers/bluetooth/btmrvl_sdio.c
-@@ -52,6 +52,68 @@ static struct memory_type_mapping mem_type_mapping_tbl[] = {
- 	{"EXTLAST", NULL, 0, 0xFE},
- };
- 
-+static const struct of_device_id btmrvl_sdio_of_match_table[] = {
-+	{ .compatible = "marvell,sd8897-bt" },
-+	{ .compatible = "marvell,sd8997-bt" },
-+	{ }
++  - compatible : should be one of the following:
++	* "marvell,sd8897-bt"
++	* "marvell,sd8997-bt"
++
++Optional properties:
++
++  - marvell,cal-data: Calibration data downloaded to the device during
++		      initialization. This is an array of 28 values(u8).
++
++  - marvell,wakeup-pin: It represents wakeup pin number of the bluetooth chip.
++		        firmware will use the pin to wakeup host system.
++  - marvell,wakeup-gap-ms: wakeup gap represents wakeup latency of the host
++		      platform. The value will be configured to firmware. This
++		      is needed to work chip's sleep feature as expected.
++  - interrupt-parent: phandle of the parent interrupt controller
++  - interrupts : interrupt pin number to the cpu. Driver will request an irq based
++		 on this interrupt number. During system suspend, the irq will be
++		 enabled so that the bluetooth chip can wakeup host platform under
++		 certain condition. During system resume, the irq will be disabled
++		 to make sure unnecessary interrupt is not received.
++
++Example:
++
++IRQ pin 119 is used as system wakeup source interrupt.
++wakeup pin 13 and gap 100ms are configured so that firmware can wakeup host
++using this device side pin and wakeup latency.
++calibration data is also available in below example.
++
++&mmc3 {
++	status = "okay";
++	vmmc-supply = <&wlan_en_reg>;
++	bus-width = <4>;
++	cap-power-off-card;
++	keep-power-in-suspend;
++
++	#address-cells = <1>;
++	#size-cells = <0>;
++	btmrvl: bluetooth@2 {
++		compatible = "marvell,sd8897-bt";
++		reg = <2>;
++		interrupt-parent = <&pio>;
++		interrupts = <119 IRQ_TYPE_LEVEL_LOW>;
++
++		marvell,cal-data = /bits/ 8 <
++			0x37 0x01 0x1c 0x00 0xff 0xff 0xff 0xff 0x01 0x7f 0x04 0x02
++			0x00 0x00 0xba 0xce 0xc0 0xc6 0x2d 0x00 0x00 0x00 0x00 0x00
++			0x00 0x00 0xf0 0x00>;
++		marvell,wakeup-pin = <0x0d>;
++		marvell,wakeup-gap-ms = <0x64>;
++	};
 +};
-+
-+static irqreturn_t btmrvl_wake_irq_bt(int irq, void *priv)
-+{
-+	struct btmrvl_plt_wake_cfg *cfg = priv;
-+
-+	if (cfg->irq_bt >= 0) {
-+		pr_info("%s: wake by bt", __func__);
-+		cfg->wake_by_bt = true;
-+		disable_irq_nosync(irq);
-+	}
-+
-+	return IRQ_HANDLED;
-+}
-+
-+/* This function parses device tree node using mmc subnode devicetree API.
-+ * The device node is saved in card->plt_of_node.
-+ * If the device tree node exists and includes interrupts attributes, this
-+ * function will request platform specific wakeup interrupt.
-+ */
-+static int btmrvl_sdio_probe_of(struct device *dev,
-+				struct btmrvl_sdio_card *card)
-+{
-+	struct btmrvl_plt_wake_cfg *cfg;
-+	int ret;
-+
-+	if (!dev->of_node ||
-+	    !of_match_node(btmrvl_sdio_of_match_table, dev->of_node)) {
-+		pr_err("sdio platform data not available");
-+		return -1;
-+	}
-+
-+	card->plt_of_node = dev->of_node;
-+
-+	card->plt_wake_cfg = devm_kzalloc(dev, sizeof(*card->plt_wake_cfg),
-+					  GFP_KERNEL);
-+	cfg = card->plt_wake_cfg;
-+	if (cfg && card->plt_of_node) {
-+		cfg->irq_bt = irq_of_parse_and_map(card->plt_of_node, 0);
-+		if (!cfg->irq_bt) {
-+			dev_err(dev, "fail to parse irq_bt from device tree");
-+		} else {
-+			ret = devm_request_irq(dev, cfg->irq_bt,
-+					       btmrvl_wake_irq_bt,
-+					       IRQF_TRIGGER_LOW,
-+					       "bt_wake", cfg);
-+			if (ret) {
-+				dev_err(dev,
-+					"Failed to request irq_bt %d (%d)\n",
-+					cfg->irq_bt, ret);
-+			}
-+			disable_irq(cfg->irq_bt);
-+		}
-+	}
-+
-+	return 0;
-+}
-+
- /* The btmrvl_sdio_remove() callback function is called
-  * when user removes this module from kernel space or ejects
-  * the card from the slot. The driver handles these 2 cases
-@@ -1464,6 +1526,9 @@ static int btmrvl_sdio_probe(struct sdio_func *func,
- 
- 	btmrvl_sdio_enable_host_int(card);
- 
-+	/* Device tree node parsing and platform specific configuration*/
-+	btmrvl_sdio_probe_of(&func->dev, card);
-+
- 	priv = btmrvl_add_card(card);
- 	if (!priv) {
- 		BT_ERR("Initializing card failed!");
-@@ -1544,6 +1609,13 @@ static int btmrvl_sdio_suspend(struct device *dev)
- 		return 0;
- 	}
- 
-+	/* Enable platform specific wakeup interrupt */
-+	if (card->plt_wake_cfg && card->plt_wake_cfg->irq_bt >= 0) {
-+		card->plt_wake_cfg->wake_by_bt = false;
-+		enable_irq(card->plt_wake_cfg->irq_bt);
-+		enable_irq_wake(card->plt_wake_cfg->irq_bt);
-+	}
-+
- 	priv = card->priv;
- 	priv->adapter->is_suspending = true;
- 	hcidev = priv->btmrvl_dev.hcidev;
-@@ -1606,6 +1678,13 @@ static int btmrvl_sdio_resume(struct device *dev)
- 	BT_DBG("%s: SDIO resume", hcidev->name);
- 	hci_resume_dev(hcidev);
- 
-+	/* Disable platform specific wakeup interrupt */
-+	if (card->plt_wake_cfg && card->plt_wake_cfg->irq_bt >= 0) {
-+		disable_irq_wake(card->plt_wake_cfg->irq_bt);
-+		if (!card->plt_wake_cfg->wake_by_bt)
-+			disable_irq(card->plt_wake_cfg->irq_bt);
-+	}
-+
- 	return 0;
- }
- 
-diff --git a/drivers/bluetooth/btmrvl_sdio.h b/drivers/bluetooth/btmrvl_sdio.h
-index 1a3bd06..3a522d2 100644
---- a/drivers/bluetooth/btmrvl_sdio.h
-+++ b/drivers/bluetooth/btmrvl_sdio.h
-@@ -62,6 +62,10 @@
- 
- #define FIRMWARE_READY				0xfedc
- 
-+struct btmrvl_plt_wake_cfg {
-+	int irq_bt;
-+	bool wake_by_bt;
-+};
- 
- struct btmrvl_sdio_card_reg {
- 	u8 cfg;
-@@ -97,6 +101,8 @@ struct btmrvl_sdio_card {
- 	u16 sd_blksz_fw_dl;
- 	u8 rx_unit;
- 	struct btmrvl_private *priv;
-+	struct device_node *plt_of_node;
-+	struct btmrvl_plt_wake_cfg *plt_wake_cfg;
- };
- 
- struct btmrvl_sdio_device {
 -- 
 1.8.1.4
-
