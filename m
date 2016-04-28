@@ -1,141 +1,57 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <linux-kernel-owner@vger.kernel.org>
+Date: Thu, 28 Apr 2016 15:50:14 -0500
+From: Rob Herring <robh@kernel.org>
+To: Amitkumar Karwar <akarwar@marvell.com>
+Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+	devicetree@vger.kernel.org, Wei-Ning Huang <wnhuang@chromium.org>,
+	Xinming Hu <huxm@marvell.com>
+Subject: Re: [PATCH v8 1/2] dt: bindings: add MARVELL's bt-sd8xxx wireless
+ device
+Message-ID: <20160428205014.GA4893@rob-hp-laptop>
+References: <1461679047-22631-1-git-send-email-akarwar@marvell.com>
 MIME-Version: 1.0
-In-Reply-To: <1461325357-4013-1-git-send-email-luiz.dentz@gmail.com>
-References: <1461325357-4013-1-git-send-email-luiz.dentz@gmail.com>
-Date: Fri, 29 Apr 2016 13:07:48 +0300
-Message-ID: <CABBYNZJRcBVyJYn3AaqnzCkXhOF2OZgJNjcigiLxbmXd3HwUFg@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/4] core/gatt-client: Don't read extended properties
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1461679047-22631-1-git-send-email-akarwar@marvell.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
-
-On Fri, Apr 22, 2016 at 2:42 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> Extended properties are already read and stored in the database and can be
-> retrieved with gatt_db_attribute_get_char_data.
+On Tue, Apr 26, 2016 at 06:57:26AM -0700, Amitkumar Karwar wrote:
+> From: Xinming Hu <huxm@marvell.com>
+> 
+> Add device tree binding documentation for MARVELL's bluetooth sdio
+> (sd8897 and sd8997) chip.
+> 
+> Signed-off-by: Xinming Hu <huxm@marvell.com>
+> Signed-off-by: Amitkumar Karwar <akarwar@marvell.com>
 > ---
->  src/gatt-client.c | 55 +++----------------------------------------------------
->  1 file changed, 3 insertions(+), 52 deletions(-)
->
-> diff --git a/src/gatt-client.c b/src/gatt-client.c
-> index ebb7b35..16a1f6c 100644
-> --- a/src/gatt-client.c
-> +++ b/src/gatt-client.c
-> @@ -71,7 +71,6 @@ struct service {
->         bt_uuid_t uuid;
->         char *path;
->         struct queue *chrcs;
-> -       struct queue *pending_ext_props;
->  };
->
->  struct characteristic {
-> @@ -1283,7 +1282,8 @@ static struct characteristic *characteristic_create(
->
->         gatt_db_attribute_get_char_data(attr, &chrc->handle,
->                                                         &chrc->value_handle,
-> -                                                       &chrc->props, NULL,
-> +                                                       &chrc->props,
-> +                                                       &chrc->ext_props,
->                                                         &uuid);
->
->         chrc->attr = gatt_db_get_attribute(service->client->db,
-> @@ -1398,7 +1398,6 @@ static void service_free(void *data)
->         struct service *service = data;
->
->         queue_destroy(service->chrcs, NULL);  /* List should be empty here */
-> -       queue_destroy(service->pending_ext_props, NULL);
->         g_free(service->path);
->         free(service);
->  }
-> @@ -1412,7 +1411,6 @@ static struct service *service_create(struct gatt_db_attribute *attr,
->
->         service = new0(struct service, 1);
->         service->chrcs = queue_new();
-> -       service->pending_ext_props = queue_new();
->         service->client = client;
->
->         gatt_db_attribute_get_service_data(attr, &service->start_handle,
-> @@ -1484,44 +1482,6 @@ static void export_desc(struct gatt_db_attribute *attr, void *user_data)
->         queue_push_tail(charac->descs, desc);
->  }
->
-> -static void read_ext_props_cb(bool success, uint8_t att_ecode,
-> -                                       const uint8_t *value, uint16_t length,
-> -                                       void *user_data)
-> -{
-> -       struct characteristic *chrc = user_data;
-> -       struct service *service = chrc->service;
-> -
-> -       if (!success) {
-> -               error("Failed to obtain extended properties - error: 0x%02x",
-> -                                                               att_ecode);
-> -               return;
-> -       }
-> -
-> -       if (!value || length != 2) {
-> -               error("Malformed extended properties value");
-> -               return;
-> -       }
-> -
-> -       chrc->ext_props = get_le16(value);
-> -       if (chrc->ext_props)
-> -               g_dbus_emit_property_changed(btd_get_dbus_connection(),
-> -                                               chrc->path,
-> -                                               GATT_CHARACTERISTIC_IFACE,
-> -                                               "Flags");
-> -
-> -       queue_remove(service->pending_ext_props, chrc);
-> -}
-> -
-> -static void read_ext_props(void *data, void *user_data)
-> -{
-> -       struct characteristic *chrc = data;
-> -
-> -       bt_gatt_client_read_value(chrc->service->client->gatt,
-> -                                                       chrc->ext_props_handle,
-> -                                                       read_ext_props_cb,
-> -                                                       chrc, NULL);
-> -}
-> -
->  static bool create_descriptors(struct gatt_db_attribute *attr,
->                                         struct characteristic *charac)
->  {
-> @@ -1555,9 +1515,6 @@ static void export_char(struct gatt_db_attribute *attr, void *user_data)
->
->         queue_push_tail(service->chrcs, charac);
->
-> -       if (charac->ext_props_handle)
-> -               queue_push_tail(service->pending_ext_props, charac);
-> -
->         return;
->
->  fail:
-> @@ -1574,13 +1531,7 @@ static bool create_characteristics(struct gatt_db_attribute *attr,
->
->         gatt_db_service_foreach_char(attr, export_char, &data);
->
-> -       if (data.failed)
-> -               return false;
-> -
-> -       /* Obtain extended properties */
-> -       queue_foreach(service->pending_ext_props, read_ext_props, NULL);
-> -
-> -       return true;
-> +       return !data.failed;
->  }
->
->  static void export_service(struct gatt_db_attribute *attr, void *user_data)
-> --
-> 2.5.5
+> Listing changelist for both 1/2 and 2/2 here
+> v2: Fixed build error reported by kbuild test robot
+> drivers/bluetooth/btmrvl_platform.c:141:22: error:
+> 'btmrvl_plt_pm_ops' undeclared here (not in a function)
+> 
+> v3: Add NULL check for 'btmrvl_plt_dev'
+> 
+> v4: Moved the bindings file to bindings/net/
+>     Corrected the name of 'name' and 'compatible' properties(Rob Herring)
+> 
+> v5: Comments for wlan patches were applicable here as well. Like all binding
+>     changes in single file, specifying node as a child of SDIO controller.
+> 
+> v6: a)Use <chip>-bt order for compatible attribute(Rob Herring)
+>     b)Split wakeuppin-gap to wakeup-pin and wakeup-gap(Rob Herring) 
+>     c)Use sdio function number for both the unit address and reg(Rob Herring)
+> 
+> v7: a)Use suggested vendor name and generic node name(Rob Herring)
+> v8: a)Nodes are renamed as per suggestions from Rob Herring
+>       btmrvl,* -> marvell,*
+>       "wakeup-gap-msec" -> "wakeup-gap-ms"
+> ---
+>  Documentation/devicetree/bindings/btmrvl.txt       | 29 -----------
+>  .../devicetree/bindings/net/marvell-bt-sd8xxx.txt  | 56 ++++++++++++++++++++++
+>  2 files changed, 56 insertions(+), 29 deletions(-)
+>  delete mode 100644 Documentation/devicetree/bindings/btmrvl.txt
+>  create mode 100644 Documentation/devicetree/bindings/net/marvell-bt-sd8xxx.txt
 
-Applied.
+Thanks for getting this old binding fixed.
 
-
--- 
-Luiz Augusto von Dentz
+Acked-by: Rob Herring <robh@kernel.org>
