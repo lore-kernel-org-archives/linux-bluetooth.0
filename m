@@ -1,57 +1,49 @@
-Return-Path: <linux-kernel-owner@vger.kernel.org>
-Date: Thu, 28 Apr 2016 15:50:14 -0500
-From: Rob Herring <robh@kernel.org>
-To: Amitkumar Karwar <akarwar@marvell.com>
-Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-	devicetree@vger.kernel.org, Wei-Ning Huang <wnhuang@chromium.org>,
-	Xinming Hu <huxm@marvell.com>
-Subject: Re: [PATCH v8 1/2] dt: bindings: add MARVELL's bt-sd8xxx wireless
- device
-Message-ID: <20160428205014.GA4893@rob-hp-laptop>
-References: <1461679047-22631-1-git-send-email-akarwar@marvell.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1461679047-22631-1-git-send-email-akarwar@marvell.com>
-Sender: linux-kernel-owner@vger.kernel.org
+Return-Path: <loic.poulain@intel.com>
+From: Loic Poulain <loic.poulain@intel.com>
+To: marcel@holtmann.org,
+	johan.hedberg@gmail.com
+Cc: heikki.krogerus@linux.intel.com,
+	linux-bluetooth@vger.kernel.org,
+	Loic Poulain <loic.poulain@intel.com>
+Subject: [PATCH] Bluetooth: hci_intel: Fix null gpio desc pointer dereference
+Date: Thu, 28 Apr 2016 18:48:25 +0200
+Message-Id: <1461862105-23970-1-git-send-email-loic.poulain@intel.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, Apr 26, 2016 at 06:57:26AM -0700, Amitkumar Karwar wrote:
-> From: Xinming Hu <huxm@marvell.com>
-> 
-> Add device tree binding documentation for MARVELL's bluetooth sdio
-> (sd8897 and sd8997) chip.
-> 
-> Signed-off-by: Xinming Hu <huxm@marvell.com>
-> Signed-off-by: Amitkumar Karwar <akarwar@marvell.com>
-> ---
-> Listing changelist for both 1/2 and 2/2 here
-> v2: Fixed build error reported by kbuild test robot
-> drivers/bluetooth/btmrvl_platform.c:141:22: error:
-> 'btmrvl_plt_pm_ops' undeclared here (not in a function)
-> 
-> v3: Add NULL check for 'btmrvl_plt_dev'
-> 
-> v4: Moved the bindings file to bindings/net/
->     Corrected the name of 'name' and 'compatible' properties(Rob Herring)
-> 
-> v5: Comments for wlan patches were applicable here as well. Like all binding
->     changes in single file, specifying node as a child of SDIO controller.
-> 
-> v6: a)Use <chip>-bt order for compatible attribute(Rob Herring)
->     b)Split wakeuppin-gap to wakeup-pin and wakeup-gap(Rob Herring) 
->     c)Use sdio function number for both the unit address and reg(Rob Herring)
-> 
-> v7: a)Use suggested vendor name and generic node name(Rob Herring)
-> v8: a)Nodes are renamed as per suggestions from Rob Herring
->       btmrvl,* -> marvell,*
->       "wakeup-gap-msec" -> "wakeup-gap-ms"
-> ---
->  Documentation/devicetree/bindings/btmrvl.txt       | 29 -----------
->  .../devicetree/bindings/net/marvell-bt-sd8xxx.txt  | 56 ++++++++++++++++++++++
->  2 files changed, 56 insertions(+), 29 deletions(-)
->  delete mode 100644 Documentation/devicetree/bindings/btmrvl.txt
->  create mode 100644 Documentation/devicetree/bindings/net/marvell-bt-sd8xxx.txt
+gpiod_get_optional can return either ERR_PTR or NULL pointer.
+NULL case is not tested and then dereferenced later in desc_to_gpio.
+Fix this by using non optional version which returns ERR_PTR in any
+error case (this is not an optional gpio).
+Use the same non optional version for the host-wake gpio.
 
-Thanks for getting this old binding fixed.
+Signed-off-by: Loic Poulain <loic.poulain@intel.com>
+---
+ drivers/bluetooth/hci_intel.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
-Acked-by: Rob Herring <robh@kernel.org>
+diff --git a/drivers/bluetooth/hci_intel.c b/drivers/bluetooth/hci_intel.c
+index 91d6051..f6f2b01 100644
+--- a/drivers/bluetooth/hci_intel.c
++++ b/drivers/bluetooth/hci_intel.c
+@@ -1210,8 +1210,7 @@ static int intel_probe(struct platform_device *pdev)
+ 
+ 	idev->pdev = pdev;
+ 
+-	idev->reset = devm_gpiod_get_optional(&pdev->dev, "reset",
+-					      GPIOD_OUT_LOW);
++	idev->reset = devm_gpiod_get(&pdev->dev, "reset", GPIOD_OUT_LOW);
+ 	if (IS_ERR(idev->reset)) {
+ 		dev_err(&pdev->dev, "Unable to retrieve gpio\n");
+ 		return PTR_ERR(idev->reset);
+@@ -1223,8 +1222,7 @@ static int intel_probe(struct platform_device *pdev)
+ 
+ 		dev_err(&pdev->dev, "No IRQ, falling back to gpio-irq\n");
+ 
+-		host_wake = devm_gpiod_get_optional(&pdev->dev, "host-wake",
+-						    GPIOD_IN);
++		host_wake = devm_gpiod_get(&pdev->dev, "host-wake", GPIOD_IN);
+ 		if (IS_ERR(host_wake)) {
+ 			dev_err(&pdev->dev, "Unable to retrieve IRQ\n");
+ 			goto no_irq;
+-- 
+1.9.1
