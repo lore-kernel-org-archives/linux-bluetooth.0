@@ -1,49 +1,51 @@
-Return-Path: <loic.poulain@intel.com>
-From: Loic Poulain <loic.poulain@intel.com>
-To: marcel@holtmann.org,
-	johan.hedberg@gmail.com
-Cc: heikki.krogerus@linux.intel.com,
-	linux-bluetooth@vger.kernel.org,
-	Loic Poulain <loic.poulain@intel.com>
-Subject: [PATCH] Bluetooth: hci_intel: Fix null gpio desc pointer dereference
-Date: Thu, 28 Apr 2016 18:48:25 +0200
-Message-Id: <1461862105-23970-1-git-send-email-loic.poulain@intel.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Subject: Re: hci_intel problem
+To: Heikki Krogerus <heikki.krogerus@linux.intel.com>
+References: <20160428135028.GB13659@kuha.fi.intel.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	linux-bluetooth@vger.kernel.org
+From: lpoulain <loic.poulain@intel.com>
+Message-ID: <572234A8.4090308@intel.com>
+Date: Thu, 28 Apr 2016 18:04:56 +0200
+MIME-Version: 1.0
+In-Reply-To: <20160428135028.GB13659@kuha.fi.intel.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-gpiod_get_optional can return either ERR_PTR or NULL pointer.
-NULL case is not tested and then dereferenced later in desc_to_gpio.
-Fix this by using non optional version which returns ERR_PTR in any
-error case (this is not an optional gpio).
-Use the same non optional version for the host-wake gpio.
+Hi Heikki,
 
-Signed-off-by: Loic Poulain <loic.poulain@intel.com>
----
- drivers/bluetooth/hci_intel.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+> Hi Loic,
+>
+> Commit 765ea3abd116 ("Bluetooth: hci_intel: Retrieve host-wake IRQ")
+> seems to create a little regression:
+>
+> [    2.734749] hci_intel INT33E1:00: No corresponding irq for gpio
+> [    2.736426] BUG: unable to handle kernel NULL pointer dereference at           (null)
+> [    2.738631] IP: [<ffffffff8132bee1>] desc_to_gpio+0x1/0x20
+>
+> I think it's usually ill-advised to convert the gpio descriptors to
+> numbers unless there is a real need for it. Maybe you can just fix the
+> dev_info() back to way it was.
+>
 
-diff --git a/drivers/bluetooth/hci_intel.c b/drivers/bluetooth/hci_intel.c
-index 91d6051..f6f2b01 100644
---- a/drivers/bluetooth/hci_intel.c
-+++ b/drivers/bluetooth/hci_intel.c
-@@ -1210,8 +1210,7 @@ static int intel_probe(struct platform_device *pdev)
- 
- 	idev->pdev = pdev;
- 
--	idev->reset = devm_gpiod_get_optional(&pdev->dev, "reset",
--					      GPIOD_OUT_LOW);
-+	idev->reset = devm_gpiod_get(&pdev->dev, "reset", GPIOD_OUT_LOW);
- 	if (IS_ERR(idev->reset)) {
- 		dev_err(&pdev->dev, "Unable to retrieve gpio\n");
- 		return PTR_ERR(idev->reset);
-@@ -1223,8 +1222,7 @@ static int intel_probe(struct platform_device *pdev)
- 
- 		dev_err(&pdev->dev, "No IRQ, falling back to gpio-irq\n");
- 
--		host_wake = devm_gpiod_get_optional(&pdev->dev, "host-wake",
--						    GPIOD_IN);
-+		host_wake = devm_gpiod_get(&pdev->dev, "host-wake", GPIOD_IN);
- 		if (IS_ERR(host_wake)) {
- 			dev_err(&pdev->dev, "Unable to retrieve IRQ\n");
- 			goto no_irq;
--- 
-1.9.1
+Thanks for the catch, I'm going to fix this and only display the desc 
+address per your advice.
+
+Root cause is the null pointer deref of the reset desc in:
+desc_to_gpio(idev->reset)
+
+However I already test this value earlier in the function with:
+
+idev->reset = devm_gpiod_get_optional(&pdev->dev, "reset", GPIOD_OUT_LOW);
+if (IS_ERR(idev->reset)) {
+         dev_err(&pdev->dev, "Unable to retrieve gpio\n");
+         return PTR_ERR(idev->reset);
+}
+
+Problem is that devm_gpiod_get_optional can return either a ERR_PTR or 
+NULL pointer.
+I don't manage the NULL case, need to fix it as well.
+
+Regards,
+Loic
