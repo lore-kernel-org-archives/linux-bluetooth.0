@@ -1,33 +1,55 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-Date: Thu, 28 Apr 2016 16:43:58 +0900
-Message-ID: <CAArnnE5VYZT7eG591qkBtOd8tL_NAr2H3vYCGNDFiCpVRA6ghg@mail.gmail.com>
-Subject: How to use BLE with kernel 3.4?
-From: Hyuntak Lee <pphdev12@gmail.com>
-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <CABBYNZJGcppzwCEWWpoKxt2ci7UBOzTYY03cxGqzysVm1+BtNA@mail.gmail.com>
+References: <1461744108-21366-1-git-send-email-beaufort.francois@gmail.com>
+ <1461744108-21366-2-git-send-email-beaufort.francois@gmail.com> <CABBYNZJGcppzwCEWWpoKxt2ci7UBOzTYY03cxGqzysVm1+BtNA@mail.gmail.com>
+From: =?UTF-8?Q?Fran=C3=A7ois_Beaufort?= <beaufort.francois@gmail.com>
+Date: Thu, 28 Apr 2016 08:59:57 +0200
+Message-ID: <CAEZxfGMZZu0yoCSKj9RnROoPjccDFKg0k4Ni+L6kuEK=20sM7g@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] Set RSSI_THRESHOLD to 2
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I’m working on an embedded board of allwinner.
-I try to use BLE to communicate with mobile or other BLE peripheral devices.
-But kernel version of provided allwinner is ‘3.4’.
-I already know BlueZ5 BLE supports at least kernel 3.5 version, and
-‘LEAdvertisingManager1’ is 4.1 and later versions support only.
-I would much prefer to use bluez, but the embedded system kernel
-version is too low.
+I believe Chromium team uses a RSSI threshold as low as possible (2)
+for two reasons:
+- They were experimenting with RSSI for proximity.
+- So that they can surface accurate values to JavaScript since Bluez
+notifies Chrome right away when the RSSI changes
 
-Do you have any plan for supporting the embedded system?
-Almost embedded systems are low kernel version.
-
-At this point, I can consider two options
-
-1. Try to backports for updating Linux BT subsystem of kernel 4.1 and
-later. And try to BLE with the most recent bluez.
-2. Find and try another BLE stack implementations
-
-Please give me some advice or an opinion.
-Thank you for your consideration.
-
-Best regards,
-Tak
+On Wed, Apr 27, 2016 at 10:47 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi Francois,
+>
+> On Wed, Apr 27, 2016 at 11:01 AM, Francois Beaufort
+> <beaufort.francois@gmail.com> wrote:
+>> ---
+>>  src/device.c | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/src/device.c b/src/device.c
+>> index 5269ee8..1caeee7 100644
+>> --- a/src/device.c
+>> +++ b/src/device.c
+>> @@ -85,7 +85,7 @@
+>>  #define MIN(a, b) ((a) < (b) ? (a) : (b))
+>>  #endif
+>>
+>> -#define RSSI_THRESHOLD         8
+>> +#define RSSI_THRESHOLD         2
+>>
+>>  #define GATT_PRIM_SVC_UUID_STR "2800"
+>>  #define GATT_SND_SVC_UUID_STR  "2801"
+>> --
+>> 2.7.0
+>
+> Do you guys have any numbers here?  This will probably spam more the
+> bus with the same device being notified more often, also some
+> controllers may not sense that small variation on RSSI or employ some
+> filter for duplicated values although HCI inquiry don't seem to
+> support that.
+>
+> --
+> Luiz Augusto von Dentz
