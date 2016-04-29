@@ -1,74 +1,164 @@
-Return-Path: <Julia.Lawall@lip6.fr>
-From: Julia Lawall <Julia.Lawall@lip6.fr>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: kernel-janitors@vger.kernel.org,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] Bluetooth: Use hci_conn_hash_lookup_le
-Date: Fri, 29 Apr 2016 21:22:39 +0200
-Message-Id: <1461957760-753-1-git-send-email-Julia.Lawall@lip6.fr>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+MIME-Version: 1.0
+In-Reply-To: <d3bd8be1e8eeb1d15bd80ca76fcd864d@mykmk.com>
+References: <CAE7O3TfO7a4gBVxVOC6T1OTgBU93SLvR3r2wbU19k2iyx_c_gQ@mail.gmail.com>
+	<CABBYNZJ2TmxrCy6+Oi+6Wv+MG-WYL5UTtPUmj-t=5NbHkYWt6Q@mail.gmail.com>
+	<CAE7O3Te+eEQTYb5adnQ6pVMw88XsDTL-KStKcLa=EUzdc92pgQ@mail.gmail.com>
+	<21d6d090c47fd6a0c9f1d09d193e6616@mykmk.com>
+	<CAE7O3TfszraLOJvr+HST-VSP=h18Rn-C7=KZJ7MOHxdctKFQ7A@mail.gmail.com>
+	<d3bd8be1e8eeb1d15bd80ca76fcd864d@mykmk.com>
+Date: Fri, 29 Apr 2016 17:29:15 +0200
+Message-ID: <CAE7O3Tf_Zg7iFso7GXWxikQTnOqLUTd9t9yJf_Ds5quxpz8Y-Q@mail.gmail.com>
+Subject: Re: Plantronics Voayger Focus UC (B825-M) - microphone not working
+From: "Olausson, Bjoern" <contactme@olausson.de>
+To: mattes <blue@mykmk.com>
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Use the function hci_conn_hash_lookup_le that integrates type testing for
-looking up LE connections.  See the patch 1b51c7b6 that introduced this
-function for more details.
+Hello Mattes,
 
-The semantic patch that (sort of) fixes this problem is as follows:
-(http://coccinelle.lip6.fr/)
+the bluetooth dongle works fine for me. But I rather would like to be
+able to connect it to my laptop with the build in bluetooth.
 
-// <smpl>
-@@
-expression hdev,addr;
-symbol UNKNOWN;
-@@
+But appart from that nothing you described worked for me. I only see
+it as output device, but never as input device.
 
--       hci_conn_hash_lookup_ba(hdev, LE_LINK, addr)
-+       hci_conn_hash_lookup_le(hdev, addr, UNKNOWN)
-// </smpl>
+I am using BLuez 5.37 and pulseaudio 8.9 on Gentoo.
 
-UNKNOWN has to be replaced by the address type from the usage context.  In
-the second case, a subsequent test on the address type is removed also.
+Other BT device seem to work - or lets say worked, I have to try it
+again with another headset if I find it...
 
-Signed-off-by: Julia Lawall <Julia.Lawall@lip6.fr>
+Greetings,
+Bjoern
 
----
 
-This was done by analogy with f5ad4ff and from the explanation in
-1b51c7b6.  It is not tested, and I don't really know if it is correct.
-
- net/bluetooth/mgmt.c |    8 +++-----
- 1 file changed, 3 insertions(+), 5 deletions(-)
-
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 9e4b931..5a61245 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -4773,7 +4773,8 @@ static int get_conn_info(struct sock *sk, struct hci_dev *hdev, void *data,
- 		conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK,
- 					       &cp->addr.bdaddr);
- 	else
--		conn = hci_conn_hash_lookup_ba(hdev, LE_LINK, &cp->addr.bdaddr);
-+		conn = hci_conn_hash_lookup_le(hdev, &cp->addr.bdaddr,
-+					       cp->addr.type);
- 
- 	if (!conn || conn->state != BT_CONNECTED) {
- 		err = mgmt_cmd_complete(sk, hdev->id, MGMT_OP_GET_CONN_INFO,
-@@ -5009,13 +5010,10 @@ static bool is_connected(struct hci_dev *hdev, bdaddr_t *addr, u8 type)
- {
- 	struct hci_conn *conn;
- 
--	conn = hci_conn_hash_lookup_ba(hdev, LE_LINK, addr);
-+	conn = hci_conn_hash_lookup_le(hdev, addr, type);
- 	if (!conn)
- 		return false;
- 
--	if (conn->dst_type != type)
--		return false;
--
- 	if (conn->state != BT_CONNECTED)
- 		return false;
- 
+On Tue, Apr 26, 2016 at 10:17 PM, mattes <blue@mykmk.com> wrote:
+> Bjoern,
+>
+> for recording with the PLT Voyager Focus you should select
+>   * Headset Head Unit (HSP/HFP)    in pavucontrol -> configuration
+>
+> then start a recording app. e.g. audacity or arecord, select/configure
+> pulseaudio as audio input.  Back in pavucontrol you can now select the
+> recording tab and you will see your app running there. Here select your desired
+> audio input.
+>
+> PS:  just tried mine with my current setup. I know it was working and one
+> point. Though many 'yum updates' later, it is failing to configure and
+> connecting with the correct profile.
+>
+> Not sure if this now a pulseaudio issue or bluez.
+> I am running bluez-5.29-2 with pulseaudio-6.0.4 on Fedora 21.
+>
+> the syslog reports the following:
+>  bluetoothd[704]: connect error" connection refused (111)
+>  bluetoothd[704]: can't store name for private addressed device
+> /org/bluez/hci0/dev_4c_bb_58_b1_93_3f
+>
+> Have you tried the USB bluetooth dongle (bt600) that comes with the headset?
+> That still works for me for just fine for playback and recordings.
+>
+> mattes
+>
+>
+>
+>
+>
+> On Tue, 26 Apr 2016 21:16:31 +0200 "Olausson, Bjoern" <contactme@olausson.de>
+> wrote
+>
+>> Hello Mattes,
+>>
+>> that option is missing in my pavucontrol. I can only select between
+>>
+>> * Headset Head Unit (HSP/HFP)
+>> * High Fidelety Playback (A2DP Sink)
+>> * Off
+>>
+>> What version of Bluez is Fedora 12 using?
+>>
+>> Greetings,
+>> Bjoern
+>>
+>>
+>> On Mon, Apr 25, 2016 at 7:44 PM, mattes <blue@mykmk.com> wrote:
+>> > Bjoern,
+>> >
+>> > I had mine working just fine (using Fedora 21) no problem.
+>> > I actually turned the Mic off, since it did not allow the headset to go in
+>> > battery save mode, due to audio streamed towards the host.
+>> >
+>> > I used pulseaudio volume control (pavucontrol) to adjust the audio profile.
+>> > Click the Configuration tab, select 'analog stereo Output and Input' for
+>> > your headset. That should enable the mic.
+>> >
+>> > mattes
+>> >
+>> >
+>> > On Mon, 25 Apr 2016 19:25:40 +0200 "Olausson, Bjoern"
+>> > <contactme@olausson.de> wrote
+>> >
+>> >> Hello Luiz,
+>> >>
+>> >> thanks for the suggestion. According to the manual, the Headset should
+>> >> be able to connect to two devices simultaneously and pair with max 8
+>> >> devices overall.
+>> >>
+>> >> I tested you suggestion and did disconnect the headset from my Desktop
+>> >> and re-paired it to my Laptop. Nothing changed. Could have been so
+>> >> easy :)
+>> >>
+>> >> Anything else I could test?
+>> >>
+>> >> Greetings,
+>> >> Bjoern
+>> >>
+>> >>
+>> >> On Mon, Apr 25, 2016 at 11:08 AM, Luiz Augusto von Dentz
+>> >> <luiz.dentz@gmail.com> wrote:
+>> >> > Hi Bjoern,
+>> >> >
+>> >> > On Sat, Apr 23, 2016 at 12:06 AM, Olausson, Bjoern
+>> >> > <contactme@olausson.de> wrote:
+>> >> >> Hello to everyone in the linux-bluetooth list,
+>> >> >>
+>> >> >> I recently bought a Plantronics Voyager Focus UC B825-M Headset and
+>> >> >> connected it to my Linux Desktop via the USB-Dongle which worked
+>> >> >> perfectly fine.
+>> >> >>
+>> >> >> I then connected it to my Laptop via the built in BlueTooth adapter
+>> >> >> (Intel I218-V ->
+>> >> >> idVendor  0x8087 Intel Corp.). The Headset is recognized as a Playback
+>> >> >> only device (at least in KDE I can't select the "PLT Focus" under
+>> >> >> recording devices).
+>> >> >
+>> >> > Is the device still configured to connect to the Desktop? Perhaps you
+>> >> > have to reset it so it only connects to the laptop otherwise it might
+>> >> > not attempt to do HFP/HSP since that is usually limited to one, on
+>> >> > A2DP there could be multiple endpoints thus you are still able to
+>> >> > connect.
+>> >> >
+>> >> >> The device is listed as "HFP/HSP" and "A2DP sink".
+>> >> >>
+>> >> >> Has anyone experience with this device or any advice how to get the
+>> >> >> recording part to work?
+>> >> >
+>> >> >
+>> >> >
+>> >> > --
+>> >> > Luiz Augusto von Dentz
+>> >> --
+>> >> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
+>> >> in the body of a message to majordomo@vger.kernel.org
+>> >> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>> >
+>> >
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
+>
