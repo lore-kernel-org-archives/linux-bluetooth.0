@@ -1,164 +1,73 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [RFC v2 BlueZ 2/3] doc/gatt-api: Merge RegisterProfile with RegisterApplication
+In-Reply-To: <1461926313-5629-2-git-send-email-luiz.dentz@gmail.com>
+References: <1461926313-5629-1-git-send-email-luiz.dentz@gmail.com> <1461926313-5629-2-git-send-email-luiz.dentz@gmail.com>
+Date: Fri, 29 Apr 2016 11:01:06 -0300
+Message-ID: <87fuu4fra5.fsf@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <d3bd8be1e8eeb1d15bd80ca76fcd864d@mykmk.com>
-References: <CAE7O3TfO7a4gBVxVOC6T1OTgBU93SLvR3r2wbU19k2iyx_c_gQ@mail.gmail.com>
-	<CABBYNZJ2TmxrCy6+Oi+6Wv+MG-WYL5UTtPUmj-t=5NbHkYWt6Q@mail.gmail.com>
-	<CAE7O3Te+eEQTYb5adnQ6pVMw88XsDTL-KStKcLa=EUzdc92pgQ@mail.gmail.com>
-	<21d6d090c47fd6a0c9f1d09d193e6616@mykmk.com>
-	<CAE7O3TfszraLOJvr+HST-VSP=h18Rn-C7=KZJ7MOHxdctKFQ7A@mail.gmail.com>
-	<d3bd8be1e8eeb1d15bd80ca76fcd864d@mykmk.com>
-Date: Fri, 29 Apr 2016 17:29:15 +0200
-Message-ID: <CAE7O3Tf_Zg7iFso7GXWxikQTnOqLUTd9t9yJf_Ds5quxpz8Y-Q@mail.gmail.com>
-Subject: Re: Plantronics Voayger Focus UC (B825-M) - microphone not working
-From: "Olausson, Bjoern" <contactme@olausson.de>
-To: mattes <blue@mykmk.com>
-Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello Mattes,
+Hi Luiz,
 
-the bluetooth dongle works fine for me. But I rather would like to be
-able to connect it to my laptop with the build in bluetooth.
+Luiz Augusto von Dentz <luiz.dentz@gmail.com> writes:
 
-But appart from that nothing you described worked for me. I only see
-it as output device, but never as input device.
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> Since RegisterApplication makes use of ObjectManager it is also possible
+> to verify the existance of GattProfile objects unifying the API for both
+> services (GATT server) and profiles (GATT client).
+> ---
+>  doc/gatt-api.txt | 37 +++++++++----------------------------
+>  1 file changed, 9 insertions(+), 28 deletions(-)
+>
+> diff --git a/doc/gatt-api.txt b/doc/gatt-api.txt
+> index 683b1b7..9404986 100644
+> --- a/doc/gatt-api.txt
+> +++ b/doc/gatt-api.txt
+> @@ -218,8 +218,8 @@ Properties	string UUID [read-only]
+>  				"encrypt-authenticated-read"
+>  				"encrypt-authenticated-write"
+>
+> -Profile hierarcy
+> -================
+> +GATT Profile hierarcy
+> +=====================
+>
+>  Local profile (GATT client) instance. By registering this type of object
+>  an application effectively indicates support for a specific GATT profile
+> @@ -238,6 +238,10 @@ Methods		void Release()
+>  			profile, because when this method gets called it has
+>  			already been unregistered.
+>
+> +Properties	array{string} UUIDs [read-only]
+> +
+> +			128-bit GATT service UUIDs.
+> +
+>
+>  GATT Manager hierarchy
+>  ======================
+> @@ -306,11 +310,12 @@ Object path	[variable prefix]/{hci0,hci1,...}
+>  Methods		void RegisterApplication(object application, dict options)
+>
+>  			Registers a local GATT services hierarchy as described
+> -			above.
+> +			above (GATT Server) and/or GATT profiles (GATT Client).
+>
+>  			The application object path together with the D-Bus
+>  			system bus connection ID define the identification of
+> -			the application registering a GATT based service.
+> +			the application registering a GATT based
+> +			service or profile.
 
-I am using BLuez 5.37 and pulseaudio 8.9 on Gentoo.
-
-Other BT device seem to work - or lets say worked, I have to try it
-again with another headset if I find it...
-
-Greetings,
-Bjoern
+I guess that updating the '/com/example' example above with a profile
+case will go a long way making this clearer.
 
 
-On Tue, Apr 26, 2016 at 10:17 PM, mattes <blue@mykmk.com> wrote:
-> Bjoern,
->
-> for recording with the PLT Voyager Focus you should select
->   * Headset Head Unit (HSP/HFP)    in pavucontrol -> configuration
->
-> then start a recording app. e.g. audacity or arecord, select/configure
-> pulseaudio as audio input.  Back in pavucontrol you can now select the
-> recording tab and you will see your app running there. Here select your desired
-> audio input.
->
-> PS:  just tried mine with my current setup. I know it was working and one
-> point. Though many 'yum updates' later, it is failing to configure and
-> connecting with the correct profile.
->
-> Not sure if this now a pulseaudio issue or bluez.
-> I am running bluez-5.29-2 with pulseaudio-6.0.4 on Fedora 21.
->
-> the syslog reports the following:
->  bluetoothd[704]: connect error" connection refused (111)
->  bluetoothd[704]: can't store name for private addressed device
-> /org/bluez/hci0/dev_4c_bb_58_b1_93_3f
->
-> Have you tried the USB bluetooth dongle (bt600) that comes with the headset?
-> That still works for me for just fine for playback and recordings.
->
-> mattes
->
->
->
->
->
-> On Tue, 26 Apr 2016 21:16:31 +0200 "Olausson, Bjoern" <contactme@olausson.de>
-> wrote
->
->> Hello Mattes,
->>
->> that option is missing in my pavucontrol. I can only select between
->>
->> * Headset Head Unit (HSP/HFP)
->> * High Fidelety Playback (A2DP Sink)
->> * Off
->>
->> What version of Bluez is Fedora 12 using?
->>
->> Greetings,
->> Bjoern
->>
->>
->> On Mon, Apr 25, 2016 at 7:44 PM, mattes <blue@mykmk.com> wrote:
->> > Bjoern,
->> >
->> > I had mine working just fine (using Fedora 21) no problem.
->> > I actually turned the Mic off, since it did not allow the headset to go in
->> > battery save mode, due to audio streamed towards the host.
->> >
->> > I used pulseaudio volume control (pavucontrol) to adjust the audio profile.
->> > Click the Configuration tab, select 'analog stereo Output and Input' for
->> > your headset. That should enable the mic.
->> >
->> > mattes
->> >
->> >
->> > On Mon, 25 Apr 2016 19:25:40 +0200 "Olausson, Bjoern"
->> > <contactme@olausson.de> wrote
->> >
->> >> Hello Luiz,
->> >>
->> >> thanks for the suggestion. According to the manual, the Headset should
->> >> be able to connect to two devices simultaneously and pair with max 8
->> >> devices overall.
->> >>
->> >> I tested you suggestion and did disconnect the headset from my Desktop
->> >> and re-paired it to my Laptop. Nothing changed. Could have been so
->> >> easy :)
->> >>
->> >> Anything else I could test?
->> >>
->> >> Greetings,
->> >> Bjoern
->> >>
->> >>
->> >> On Mon, Apr 25, 2016 at 11:08 AM, Luiz Augusto von Dentz
->> >> <luiz.dentz@gmail.com> wrote:
->> >> > Hi Bjoern,
->> >> >
->> >> > On Sat, Apr 23, 2016 at 12:06 AM, Olausson, Bjoern
->> >> > <contactme@olausson.de> wrote:
->> >> >> Hello to everyone in the linux-bluetooth list,
->> >> >>
->> >> >> I recently bought a Plantronics Voyager Focus UC B825-M Headset and
->> >> >> connected it to my Linux Desktop via the USB-Dongle which worked
->> >> >> perfectly fine.
->> >> >>
->> >> >> I then connected it to my Laptop via the built in BlueTooth adapter
->> >> >> (Intel I218-V ->
->> >> >> idVendor  0x8087 Intel Corp.). The Headset is recognized as a Playback
->> >> >> only device (at least in KDE I can't select the "PLT Focus" under
->> >> >> recording devices).
->> >> >
->> >> > Is the device still configured to connect to the Desktop? Perhaps you
->> >> > have to reset it so it only connects to the laptop otherwise it might
->> >> > not attempt to do HFP/HSP since that is usually limited to one, on
->> >> > A2DP there could be multiple endpoints thus you are still able to
->> >> > connect.
->> >> >
->> >> >> The device is listed as "HFP/HSP" and "A2DP sink".
->> >> >>
->> >> >> Has anyone experience with this device or any advice how to get the
->> >> >> recording part to work?
->> >> >
->> >> >
->> >> >
->> >> > --
->> >> > Luiz Augusto von Dentz
->> >> --
->> >> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
->> >> in the body of a message to majordomo@vger.kernel.org
->> >> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->> >
->> >
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->> the body of a message to majordomo@vger.kernel.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
->
+Cheers,
+--
+Vinicius
