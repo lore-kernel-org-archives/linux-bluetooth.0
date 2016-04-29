@@ -1,73 +1,65 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Vinicius Costa Gomes <vinicius.gomes@intel.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+Date: Fri, 29 Apr 2016 16:51:10 +0300
+From: Heikki Krogerus <heikki.krogerus@linux.intel.com>
+To: Loic Poulain <loic.poulain@intel.com>
+Cc: marcel@holtmann.org, johan.hedberg@gmail.com,
 	linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC v2 BlueZ 2/3] doc/gatt-api: Merge RegisterProfile with RegisterApplication
-In-Reply-To: <1461926313-5629-2-git-send-email-luiz.dentz@gmail.com>
-References: <1461926313-5629-1-git-send-email-luiz.dentz@gmail.com> <1461926313-5629-2-git-send-email-luiz.dentz@gmail.com>
-Date: Fri, 29 Apr 2016 11:01:06 -0300
-Message-ID: <87fuu4fra5.fsf@intel.com>
+Subject: Re: [PATCH] Bluetooth: hci_intel: Fix null gpio desc pointer
+ dereference
+Message-ID: <20160429135110.GB31177@kuha.fi.intel.com>
+References: <1461862105-23970-1-git-send-email-loic.poulain@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1461862105-23970-1-git-send-email-loic.poulain@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi,
 
-Luiz Augusto von Dentz <luiz.dentz@gmail.com> writes:
+On Thu, Apr 28, 2016 at 06:48:25PM +0200, Loic Poulain wrote:
+> gpiod_get_optional can return either ERR_PTR or NULL pointer.
+> NULL case is not tested and then dereferenced later in desc_to_gpio.
+> Fix this by using non optional version which returns ERR_PTR in any
+> error case (this is not an optional gpio).
+> Use the same non optional version for the host-wake gpio.
 
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> Since RegisterApplication makes use of ObjectManager it is also possible
-> to verify the existance of GattProfile objects unifying the API for both
-> services (GATT server) and profiles (GATT client).
+So shouldn't there be:
+
+Fixes: 765ea3abd116 ("Bluetooth: hci_intel: Retrieve host-wake IRQ")
+
+> Signed-off-by: Loic Poulain <loic.poulain@intel.com>
 > ---
->  doc/gatt-api.txt | 37 +++++++++----------------------------
->  1 file changed, 9 insertions(+), 28 deletions(-)
->
-> diff --git a/doc/gatt-api.txt b/doc/gatt-api.txt
-> index 683b1b7..9404986 100644
-> --- a/doc/gatt-api.txt
-> +++ b/doc/gatt-api.txt
-> @@ -218,8 +218,8 @@ Properties	string UUID [read-only]
->  				"encrypt-authenticated-read"
->  				"encrypt-authenticated-write"
->
-> -Profile hierarcy
-> -================
-> +GATT Profile hierarcy
-> +=====================
->
->  Local profile (GATT client) instance. By registering this type of object
->  an application effectively indicates support for a specific GATT profile
-> @@ -238,6 +238,10 @@ Methods		void Release()
->  			profile, because when this method gets called it has
->  			already been unregistered.
->
-> +Properties	array{string} UUIDs [read-only]
-> +
-> +			128-bit GATT service UUIDs.
-> +
->
->  GATT Manager hierarchy
->  ======================
-> @@ -306,11 +310,12 @@ Object path	[variable prefix]/{hci0,hci1,...}
->  Methods		void RegisterApplication(object application, dict options)
->
->  			Registers a local GATT services hierarchy as described
-> -			above.
-> +			above (GATT Server) and/or GATT profiles (GATT Client).
->
->  			The application object path together with the D-Bus
->  			system bus connection ID define the identification of
-> -			the application registering a GATT based service.
-> +			the application registering a GATT based
-> +			service or profile.
+>  drivers/bluetooth/hci_intel.c | 6 ++----
+>  1 file changed, 2 insertions(+), 4 deletions(-)
+> 
+> diff --git a/drivers/bluetooth/hci_intel.c b/drivers/bluetooth/hci_intel.c
+> index 91d6051..f6f2b01 100644
+> --- a/drivers/bluetooth/hci_intel.c
+> +++ b/drivers/bluetooth/hci_intel.c
+> @@ -1210,8 +1210,7 @@ static int intel_probe(struct platform_device *pdev)
+>  
+>  	idev->pdev = pdev;
+>  
+> -	idev->reset = devm_gpiod_get_optional(&pdev->dev, "reset",
+> -					      GPIOD_OUT_LOW);
+> +	idev->reset = devm_gpiod_get(&pdev->dev, "reset", GPIOD_OUT_LOW);
+>  	if (IS_ERR(idev->reset)) {
+>  		dev_err(&pdev->dev, "Unable to retrieve gpio\n");
+>  		return PTR_ERR(idev->reset);
+> @@ -1223,8 +1222,7 @@ static int intel_probe(struct platform_device *pdev)
+>  
+>  		dev_err(&pdev->dev, "No IRQ, falling back to gpio-irq\n");
+>  
+> -		host_wake = devm_gpiod_get_optional(&pdev->dev, "host-wake",
+> -						    GPIOD_IN);
+> +		host_wake = devm_gpiod_get(&pdev->dev, "host-wake", GPIOD_IN);
+>  		if (IS_ERR(host_wake)) {
+>  			dev_err(&pdev->dev, "Unable to retrieve IRQ\n");
+>  			goto no_irq;
+> -- 
+> 1.9.1
 
-I guess that updating the '/com/example' example above with a profile
-case will go a long way making this clearer.
+Thanks,
 
-
-Cheers,
---
-Vinicius
+-- 
+heikki
