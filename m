@@ -1,102 +1,99 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Vinicius Costa Gomes <vcgomes@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Vinicius Costa Gomes <vcgomes@gmail.com>
-Subject: [RFC BlueZ] device: Fix emitting properties in the wrong order
-Date: Mon,  2 May 2016 16:02:33 -0300
-Message-Id: <1462215753-32348-1-git-send-email-vcgomes@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <hannes@stressinduktion.org>
+Subject: Re: [PATCHv2 bluetooth-next 01/10] 6lowpan: add private neighbour
+ data
+To: Alexander Aring <aar@pengutronix.de>, linux-wpan@vger.kernel.org
+References: <1461140382-4784-1-git-send-email-aar@pengutronix.de>
+ <1461140382-4784-2-git-send-email-aar@pengutronix.de>
+Cc: kernel@pengutronix.de, marcel@holtmann.org,
+ jukka.rissanen@linux.intel.com, stefan@osg.samsung.com, mcr@sandelman.ca,
+ werner@almesberger.net, linux-bluetooth@vger.kernel.org,
+ netdev@vger.kernel.org, "David S . Miller" <davem@davemloft.net>
+From: Hannes Frederic Sowa <hannes@stressinduktion.org>
+Message-ID: <c7717a50-7818-f409-1fb4-35e1ec5ebde0@stressinduktion.org>
+Date: Mon, 2 May 2016 20:59:13 +0200
+MIME-Version: 1.0
+In-Reply-To: <1461140382-4784-2-git-send-email-aar@pengutronix.de>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This makes the org.bluez.Device1 UUIDs property to be emitted as soon as
-possible, so the ServicesResolved property is only emitted after all
-D-Bus objects representing attributes are added to the bus.
+Hello,
 
-The problem happens because the g_idle'r that actually emits the signals
-are unique per D-Bus object, so when multiple properties are emitted
-their ordering on the bus will be based on the first signal for each
-object.
+On 20.04.2016 10:19, Alexander Aring wrote:
+> This patch will introduce a 6lowpan neighbour private data. Like the
+> interface private data we handle private data for generic 6lowpan and
+> for link-layer specific 6lowpan.
+> 
+> The current first use case if to save the short address for a 802.15.4
+> 6lowpan neighbour.
+> 
+> Cc: David S. Miller <davem@davemloft.net>
+> Signed-off-by: Alexander Aring <aar@pengutronix.de>
+> ---
+>  include/linux/netdevice.h     |  3 +--
+>  include/net/6lowpan.h         | 24 ++++++++++++++++++++++++
+>  net/bluetooth/6lowpan.c       |  2 ++
+>  net/ieee802154/6lowpan/core.c | 12 ++++++++++++
+>  4 files changed, 39 insertions(+), 2 deletions(-)
+> 
+> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+> index 166402a..0052c42 100644
+> --- a/include/linux/netdevice.h
+> +++ b/include/linux/netdevice.h
+> @@ -1487,8 +1487,7 @@ enum netdev_priv_flags {
+>   * 	@perm_addr:		Permanent hw address
+>   * 	@addr_assign_type:	Hw address assignment type
+>   * 	@addr_len:		Hardware address length
+> - * 	@neigh_priv_len;	Used in neigh_alloc(),
+> - * 				initialized only in atm/clip.c
+> + *	@neigh_priv_len;	Used in neigh_alloc()
+>   * 	@dev_id:		Used to differentiate devices that share
+>   * 				the same link layer address
+>   * 	@dev_port:		Used to differentiate devices that share
+> diff --git a/include/net/6lowpan.h b/include/net/6lowpan.h
+> index da84cf9..61c6517 100644
+> --- a/include/net/6lowpan.h
+> +++ b/include/net/6lowpan.h
+> @@ -98,6 +98,9 @@ static inline bool lowpan_is_iphc(u8 dispatch)
+>  #define LOWPAN_PRIV_SIZE(llpriv_size)	\
+>  	(sizeof(struct lowpan_dev) + llpriv_size)
+>  
+> +#define LOWPAN_NEIGH_PRIV_SIZE(llneigh_priv_size)	\
+> +	(sizeof(struct lowpan_neigh) + llneigh_priv_size)
+> +
+>  enum lowpan_lltypes {
+>  	LOWPAN_LLTYPE_BTLE,
+>  	LOWPAN_LLTYPE_IEEE802154,
+> @@ -141,6 +144,27 @@ struct lowpan_dev {
+>  	u8 priv[0] __aligned(sizeof(void *));
+>  };
+>  
+> +struct lowpan_neigh {
+> +	/* 6LoWPAN neigh private data */
+> +	/* must be last */
+> +	u8 priv[0] __aligned(sizeof(void *));
 
-In this case, the 'UUIDs' property was scheduled earlier in the mainloop
-iteration, then GATT related objects, then the ServicesResolved
-property, as the UUIDs and ServicesResolved properties belong to the
-same object, they would be emitted together.
+Are you sure this declaration is correct? You take its size above, which
+should result in zero. Looks a little bit strange. :)
 
-With this patch the UUIDs property is emitted as soon as possible, and
-the ordering is kept.
----
+> +};
+> +
+> +struct lowpan_802154_neigh {
+> +	__le16 short_addr;
+> +};
+> +
+> +static inline struct lowpan_neigh *lowpan_neigh(void *neigh_priv)
+> +{
+> +	return neigh_priv;
+> +}
+> +
+> +static inline
+> +struct lowpan_802154_neigh *lowpan_802154_neigh(void *neigh_priv)
+> +{
+> +	return (struct lowpan_802154_neigh *)lowpan_neigh(neigh_priv)->priv;
+> +}
 
-This is more like an RFC, as there is a bug: the UUIDs property is
-emitted multiple times with the same value.
+Can't you remove lowpan_neigh completely and just use 802154_neigh at
+this point?
 
-
- src/device.c | 25 +++++++++++++++----------
- 1 file changed, 15 insertions(+), 10 deletions(-)
-
-diff --git a/src/device.c b/src/device.c
-index b004f43..8558dcf 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -1547,8 +1547,9 @@ void device_add_eir_uuids(struct btd_device *dev, GSList *uuids)
- 	}
-
- 	if (added)
--		g_dbus_emit_property_changed(dbus_conn, dev->path,
--						DEVICE_INTERFACE, "UUIDs");
-+		g_dbus_emit_property_changed_full(dbus_conn, dev->path,
-+				DEVICE_INTERFACE, "UUIDs",
-+				G_DBUS_PROPERTY_CHANGED_FLAG_FLUSH);
- }
-
- static void add_manufacturer_data(void *data, void *user_data)
-@@ -3292,8 +3293,9 @@ static void device_add_uuids(struct btd_device *device, GSList *uuids)
- 	}
-
- 	if (changed)
--		g_dbus_emit_property_changed(dbus_conn, device->path,
--						DEVICE_INTERFACE, "UUIDs");
-+		g_dbus_emit_property_changed_full(dbus_conn, device->path,
-+				DEVICE_INTERFACE, "UUIDs",
-+				G_DBUS_PROPERTY_CHANGED_FLAG_FLUSH);
- }
-
- static bool device_match_profile(struct btd_device *device,
-@@ -3510,8 +3512,9 @@ static void gatt_service_removed(struct gatt_db_attribute *attr,
-
- 		g_free(l->data);
- 		device->uuids = g_slist_delete_link(device->uuids, l);
--		g_dbus_emit_property_changed(dbus_conn, device->path,
--						DEVICE_INTERFACE, "UUIDs");
-+		g_dbus_emit_property_changed_full(dbus_conn, device->path,
-+					DEVICE_INTERFACE, "UUIDs",
-+					G_DBUS_PROPERTY_CHANGED_FLAG_FLUSH);
- 	}
-
- 	g_free(prim);
-@@ -4464,8 +4467,9 @@ static void search_cb(sdp_list_t *recs, int err, gpointer user_data)
- 	device_probe_profiles(device, req->profiles_added);
-
- 	/* Propagate services changes */
--	g_dbus_emit_property_changed(dbus_conn, req->device->path,
--						DEVICE_INTERFACE, "UUIDs");
-+	g_dbus_emit_property_changed_full(dbus_conn, req->device->path,
-+					  DEVICE_INTERFACE, "UUIDs",
-+					  G_DBUS_PROPERTY_CHANGED_FLAG_FLUSH);
-
- send_reply:
- 	device_svc_resolved(device, BDADDR_BREDR, err);
-@@ -5923,8 +5927,9 @@ void btd_device_add_uuid(struct btd_device *device, const char *uuid)
-
- 	store_device_info(device);
-
--	g_dbus_emit_property_changed(dbus_conn, device->path,
--						DEVICE_INTERFACE, "UUIDs");
-+	g_dbus_emit_property_changed_full(dbus_conn, device->path,
-+					DEVICE_INTERFACE, "UUIDs",
-+					G_DBUS_PROPERTY_CHANGED_FLAG_FLUSH);
- }
-
- static sdp_list_t *read_device_records(struct btd_device *device)
---
-2.8.1
-
+Bye,
+Hannes
