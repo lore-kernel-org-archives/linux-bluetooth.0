@@ -1,37 +1,54 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <1462215753-32348-1-git-send-email-vcgomes@gmail.com>
-References: <1462215753-32348-1-git-send-email-vcgomes@gmail.com>
-Date: Tue, 3 May 2016 11:55:19 -0300
-Message-ID: <CAM4ayVBp4iqkqZvfFR7zcRiP-bKHJ3zkA5hJdQaTkvpLaUeHuw@mail.gmail.com>
-Subject: Re: [RFC BlueZ] device: Fix emitting properties in the wrong order
-From: =?UTF-8?Q?Vin=C3=ADcius_Costa_Gomes?= <vcgomes@gmail.com>
-To: BlueZ development <linux-bluetooth@vger.kernel.org>
-Cc: Vinicius Costa Gomes <vcgomes@gmail.com>
+Date: Tue, 3 May 2016 22:36:37 +0900
+Message-ID: <CAArnnE5hhFgnJGvd76Bb2z9pDizqHp0WieFnUSPQoKnNbZZpYg@mail.gmail.com>
+Subject: Please advice me to use LEAdvertisingManager1 by backport
+From: Hyuntak Lee <pphdev12@gmail.com>
+To: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Dears,
 
-On Mon, May 2, 2016 at 4:02 PM, Vinicius Costa Gomes <vcgomes@gmail.com> wrote:
-> This makes the org.bluez.Device1 UUIDs property to be emitted as soon as
-> possible, so the ServicesResolved property is only emitted after all
-> D-Bus objects representing attributes are added to the bus.
->
-> The problem happens because the g_idle'r that actually emits the signals
-> are unique per D-Bus object, so when multiple properties are emitted
-> their ordering on the bus will be based on the first signal for each
-> object.
->
-> In this case, the 'UUIDs' property was scheduled earlier in the mainloop
-> iteration, then GATT related objects, then the ServicesResolved
-> property, as the UUIDs and ServicesResolved properties belong to the
-> same object, they would be emitted together.
->
-> With this patch the UUIDs property is emitted as soon as possible, and
-> the ordering is kept.
+I'm trying to backport a latest bluetooth subsystem to 3.4 kernel to
+use the BLE and LEAdvertisingManager1.
+I think backport is success, but 'LEAdvertisingManager1 interface not
+found' error still occured.
 
-After thinking a little more about this, I came up with a version that
-solves this by tweaking the gdbus behaviour.
-I will send it a in a few moments, please take a look.
+My step is below:
+
+###To compile old kernel
+$ export ARCH=arm
+$ export CROSS_COMPILE=$CCPREFIX
+$ cd $KERNEL_SRC
+KERNEL_SRC$ make defconfig
+KERNEL_SRC$ make
+KERNEL_SRC$ make INSTALL_MOD_PATH=$OUTPUT install
+###To backport
+$ export KLIB=$KERNEL_SRC
+$ export KLIB_BUILD=$OUTPUT
+$ wget http://www.kernel.org/pub/linux/kernel/projects/backports/stable/v4.1.1/backports-4.1.1-1.tar.xz
+$ unxz backports-4.1.1-1.tar.xz
+$ tar xfp backports-4.1.1-1.tar
+$ cd backports-4.1.1-1
+backports-4.1.1-1$ echo "CPTCFG_BT=m
+> CPTCFG_BT_RFCOMM=m
+> CPTCFG_BT_BNEP=m
+> CPTCFG_BT_BNEP_MC_FILTER=y
+> CPTCFG_BT_BNEP_PROTO_FILTER=y" > defconfigs/bluetooth
+backports-4.1.1-1$ make defconfig-bluetooth
+backports-4.1.1-1$ make
+backports-4.1.1-1$ make install
+### replaces a existed kernel with $KERNEL_SRC/arch/arm/boot/zImage
+### replaces a existed /lib/modules with $OUTPUT/lib/modules
+### and execute command 'depmod -a' and reboot
+### After reboot, excute test/example-advertisement
+### output message is 'LEAdvertisingManager1 interface not found'
+
+Am I missing some configuration or doing wrong step?
+or cannot use 'LEAdvertisingManager1' by backport?
+Please advise me.
+
+Best regards,
+tak
