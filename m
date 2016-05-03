@@ -1,74 +1,93 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-To: linux-bluetooth@vger.kernel.org
-From: Joe Glancy <joe.t.glancy@gmail.com>
-Subject: DBUS API error "Not paired" when attempting to read GATT
- characteristic
-Message-ID: <5728C5DA.7000703@gmail.com>
-Date: Tue, 3 May 2016 16:38:02 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <1462287391-5140-1-git-send-email-vcgomes@gmail.com>
+References: <1462287391-5140-1-git-send-email-vcgomes@gmail.com>
+Date: Tue, 3 May 2016 18:25:17 +0300
+Message-ID: <CABBYNZJUg7JdDuphStvb-n1_q9ssKVVRsx4z4X_e=mondtaOoA@mail.gmail.com>
+Subject: Re: [PATCH] gdbus: Fix the ordering of signals
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Vinicius Costa Gomes <vcgomes@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello all.
+Hi Vinicius,
 
-I was wondering whether someone could possibly help shine some light on 
-an issue I'm having.
+On Tue, May 3, 2016 at 5:56 PM, Vinicius Costa Gomes <vcgomes@gmail.com> wrote:
+> Consider the following example:
+>
+> /foo
+>   properties: "A", "B"
+>
+> /bar
+>   properties: "C", "D"
+>
+> If during a given mainloop iteration, property "A" of object '/foo' is
+> changed, then properties "C" and "D" of '/bar', lastly "B" of '/foo',
+> the current code will emit the PropertiesChanged signals in following
+> order: "A", "B", "C", "D".
+>
+> This may confuse applications that have a dependency on the order of
+> those signals.
+>
+> This fixes the ordering, so in the example, the order becomes:
+> "C", "D", "A", B". This is considered not to be a problem, as
+> applications may use the flag G_DBUS_PROPERTY_CHANGED_FLAG_FLUSH, so
+> property changed signals are emitted as soon as possible.
+>
+> The solution is for each object, to reschedule the signals everytime a
+> signal is emitted.
 
-Here's the setup:
-  - Ubuntu 16.04 w/Bluez 5.37 (from the official repos, experimental 
-mode enabled)
-  - BBC micro:bit
-  - "hciconfig -a hci0":
-hci0:	Type: BR/EDR  Bus: USB
-	BD Address: XX:XX:XX:XX:XX:XX  ACL MTU: 1022:8  SCO MTU: 183:5
-	UP RUNNING PSCAN
-	RX bytes:718 acl:0 sco:0 events:54 errors:0
-	TX bytes:3731 acl:0 sco:0 commands:54 errors:0
-	Features: 0xff 0xfe 0x0d 0xfe 0xd8 0x7f 0x7b 0x8f
-	Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-	Link policy: RSWITCH HOLD SNIFF
-	Link mode: SLAVE ACCEPT
-	Name: 'Io'
-	Class: 0x4c010c
-	Service Classes: Rendering, Capturing, Telephony
-	Device Class: Computer, Laptop
-	HCI Version: 4.1 (0x7)  Revision: 0x3101
-	LMP Version: 4.1 (0x7)  Subversion: 0x1
-	Manufacturer: Atheros Communications, Inc. (69)
+So any changes actually pushes the object to last in the idle queue. I
+guess this is fine provided we don't have more problems with this
+ordering, this is a bit unfortunate side effect of grouping it seems,
+otherwise we would have to emit several more signals to keep the order
+the same. We might also keep some documentation about this design
+choice though, making clear that in case the object update shall not
+be put to last then G_DBUS_PROPERTY_CHANGED_FLAG_FLUSH shall be used.
 
-What I am trying to do:
-  - Read some bytes from a characteristic on the micro:bit through 
-BlueZ's DBUS API using a Python script and the dbus module
+> ---
+>  gdbus/object.c | 9 +++++++--
+>  1 file changed, 7 insertions(+), 2 deletions(-)
+>
+> diff --git a/gdbus/object.c b/gdbus/object.c
+> index a220101..fc94e5e 100644
+> --- a/gdbus/object.c
+> +++ b/gdbus/object.c
+> @@ -635,11 +635,16 @@ static gboolean g_dbus_args_have_signature(const GDBusArgInfo *args,
+>
+>  static void add_pending(struct generic_data *data)
+>  {
+> -       if (data->process_id > 0)
+> -               return;
+> +       guint old_id = data->process_id;
 
-The error I am getting:
-  - "org.bluez.Error.NotPermitted: Not paired"
+Actually why didn't you just replace the return with
+g_source_remove(data->process_id)? I guess that should be enough to
+force it last since g_idle_add should probably be using a list and
+appending the data it should be enough to move it back after others.
 
-I have paired the micro:bit both from the normal Ubuntu Bluetooth 
-settings menu, and I have also paired it with the bluetoothctl tool, 
-each on separate occasions. Both reported that the pair was successful 
-(no pin was required however, compared to when I pair the micro:bit to 
-my phone I do need the pin), however when I tried running my script 
-(which does not check whether the device is paired or connected: this is 
-performed by the user, and I can verify that both the Ubuntu settings 
-and bluetoothctl reported it as both paired and connected), I get the 
-afore mentioned error ("org.bluez.Error.NotPermitted: Not paired").
+>         data->process_id = g_idle_add(process_changes, data);
+>
+> +       if (old_id > 0) {
+> +               /* If there was an old idler, remove it. */
+> +               g_source_remove(old_id);
+> +               return;
+> +       }
+> +
+>         pending = g_slist_append(pending, data);
+>  }
+>
+> --
+> 2.8.1
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-Is this, therefore, an error with my program (I have spent hours 
-checking it and cannot find any errors)? Or a possible bug with BlueZ? 
-There are very few resources online for this kind of thing so I ended up 
-resorting to the Bluetooth mailing list - please notify me if this is 
-the wrong kind of stuff to be asking.
 
-The micro:bit is the only LE device which has ever connected to this 
-(laptop) computer, and the characteristic (and its service) which I am 
-reading from do both exist as DBUS objects. My grasp of the DBUS system 
-is rather rudimentary, and so far has just been gained from BlueZ examples.
 
-I have checked using the DBUS API to make sure that the device is both 
-paired and connected - both said yes, but, as previously said I get an 
-error (more specifically, an exception is thrown when I try to call 
-"<DBUS interface to characteristic>.ReadValue()").
-
-Is this my doing, or an issue with something out of my control? Any help 
-will be appreciated :)
+-- 
+Luiz Augusto von Dentz
