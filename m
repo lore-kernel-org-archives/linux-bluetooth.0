@@ -1,146 +1,87 @@
-Return-Path: <stefan@osg.samsung.com>
-From: Stefan Schmidt <stefan@osg.samsung.com>
-Subject: Re: [PATCHv2 bluetooth-next 01/10] 6lowpan: add private neighbour
- data
-To: Alexander Aring <aar@pengutronix.de>, linux-wpan@vger.kernel.org
-References: <1461140382-4784-1-git-send-email-aar@pengutronix.de>
- <1461140382-4784-2-git-send-email-aar@pengutronix.de>
-Cc: kernel@pengutronix.de, marcel@holtmann.org,
- jukka.rissanen@linux.intel.com, hannes@stressinduktion.org,
- mcr@sandelman.ca, werner@almesberger.net, linux-bluetooth@vger.kernel.org,
- netdev@vger.kernel.org, "David S . Miller" <davem@davemloft.net>
-Message-ID: <5728EB00.3030405@osg.samsung.com>
-Date: Tue, 3 May 2016 20:16:32 +0200
-MIME-Version: 1.0
-In-Reply-To: <1461140382-4784-2-git-send-email-aar@pengutronix.de>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Vinicius Costa Gomes <vcgomes@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Vinicius Costa Gomes <vcgomes@gmail.com>
+Subject: [PATCH BlueZ v2] gdbus: Fix the ordering of signals
+Date: Tue,  3 May 2016 14:56:27 -0300
+Message-Id: <1462298187-21905-1-git-send-email-vcgomes@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello.
+Consider the following example:
 
-On 20/04/16 10:19, Alexander Aring wrote:
-> This patch will introduce a 6lowpan neighbour private data. Like the
-> interface private data we handle private data for generic 6lowpan and
-> for link-layer specific 6lowpan.
->
-> The current first use case if to save the short address for a 802.15.4
-> 6lowpan neighbour.
->
-> Cc: David S. Miller<davem@davemloft.net>
-> Signed-off-by: Alexander Aring<aar@pengutronix.de>
-> ---
->   include/linux/netdevice.h     |  3 +--
->   include/net/6lowpan.h         | 24 ++++++++++++++++++++++++
->   net/bluetooth/6lowpan.c       |  2 ++
->   net/ieee802154/6lowpan/core.c | 12 ++++++++++++
->   4 files changed, 39 insertions(+), 2 deletions(-)
->
-> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-> index 166402a..0052c42 100644
-> --- a/include/linux/netdevice.h
-> +++ b/include/linux/netdevice.h
-> @@ -1487,8 +1487,7 @@ enum netdev_priv_flags {
->    * 	@perm_addr:		Permanent hw address
->    * 	@addr_assign_type:	Hw address assignment type
->    * 	@addr_len:		Hardware address length
-> - * 	@neigh_priv_len;	Used in neigh_alloc(),
-> - * 				initialized only in atm/clip.c
-> + *	@neigh_priv_len;	Used in neigh_alloc()
->    * 	@dev_id:		Used to differentiate devices that share
->    * 				the same link layer address
->    * 	@dev_port:		Used to differentiate devices that share
-> diff --git a/include/net/6lowpan.h b/include/net/6lowpan.h
-> index da84cf9..61c6517 100644
-> --- a/include/net/6lowpan.h
-> +++ b/include/net/6lowpan.h
-> @@ -98,6 +98,9 @@ static inline bool lowpan_is_iphc(u8 dispatch)
->   #define LOWPAN_PRIV_SIZE(llpriv_size)	\
->   	(sizeof(struct lowpan_dev) + llpriv_size)
->   
-> +#define LOWPAN_NEIGH_PRIV_SIZE(llneigh_priv_size)	\
-> +	(sizeof(struct lowpan_neigh) + llneigh_priv_size)
-> +
->   enum lowpan_lltypes {
->   	LOWPAN_LLTYPE_BTLE,
->   	LOWPAN_LLTYPE_IEEE802154,
-> @@ -141,6 +144,27 @@ struct lowpan_dev {
->   	u8 priv[0] __aligned(sizeof(void *));
->   };
->   
-> +struct lowpan_neigh {
-> +	/* 6LoWPAN neigh private data */
-> +	/* must be last */
-> +	u8 priv[0] __aligned(sizeof(void *));
-> +};
-> +
-> +struct lowpan_802154_neigh {
-> +	__le16 short_addr;
-> +};
-> +
-> +static inline struct lowpan_neigh *lowpan_neigh(void *neigh_priv)
-> +{
-> +	return neigh_priv;
-> +}
-> +
-> +static inline
-> +struct lowpan_802154_neigh *lowpan_802154_neigh(void *neigh_priv)
-> +{
-> +	return (struct lowpan_802154_neigh *)lowpan_neigh(neigh_priv)->priv;
-> +}
-> +
->   static inline
->   struct lowpan_dev *lowpan_dev(const struct net_device *dev)
->   {
-> diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
-> index 38e82dd..b7c4efa 100644
-> --- a/net/bluetooth/6lowpan.c
-> +++ b/net/bluetooth/6lowpan.c
-> @@ -833,6 +833,8 @@ static int setup_netdev(struct l2cap_chan *chan, struct lowpan_btle_dev **dev)
->   	list_add_rcu(&(*dev)->list, &bt_6lowpan_devices);
->   	spin_unlock(&devices_lock);
->   
-> +	netdev->neigh_priv_len = LOWPAN_NEIGH_PRIV_SIZE(0);
-> +
->   	err = lowpan_register_netdev(netdev, LOWPAN_LLTYPE_BTLE);
->   	if (err < 0) {
->   		BT_INFO("register_netdev failed %d", err);
-> diff --git a/net/ieee802154/6lowpan/core.c b/net/ieee802154/6lowpan/core.c
-> index dd085db..3162632 100644
-> --- a/net/ieee802154/6lowpan/core.c
-> +++ b/net/ieee802154/6lowpan/core.c
-> @@ -92,11 +92,21 @@ static int lowpan_stop(struct net_device *dev)
->   	return 0;
->   }
->   
-> +static int lowpan_neigh_construct(struct neighbour *n)
-> +{
-> +	struct lowpan_802154_neigh *neigh = lowpan_802154_neigh(neighbour_priv(n));
-> +
-> +	/* default no short_addr is available for a neighbour */
-> +	neigh->short_addr = cpu_to_le16(IEEE802154_ADDR_SHORT_UNSPEC);
-> +	return 0;
-> +}
-> +
->   static const struct net_device_ops lowpan_netdev_ops = {
->   	.ndo_init		= lowpan_dev_init,
->   	.ndo_start_xmit		= lowpan_xmit,
->   	.ndo_open		= lowpan_open,
->   	.ndo_stop		= lowpan_stop,
-> +	.ndo_neigh_construct    = lowpan_neigh_construct,
->   };
->   
->   static void lowpan_setup(struct net_device *ldev)
-> @@ -161,6 +171,8 @@ static int lowpan_newlink(struct net *src_net, struct net_device *ldev,
->   				wdev->needed_headroom;
->   	ldev->needed_tailroom = wdev->needed_tailroom;
->   
-> +	ldev->neigh_priv_len = LOWPAN_NEIGH_PRIV_SIZE(sizeof(struct lowpan_802154_neigh));
-> +
->   	ret = lowpan_register_netdevice(ldev, LOWPAN_LLTYPE_IEEE802154);
->   	if (ret < 0) {
->   		dev_put(wdev);
+/foo
+  properties: "A", "B"
 
-Reviewed-by: Stefan Schmidt<stefan@osg.samsung.com>
+/bar
+  properties: "C", "D"
 
-regards
-Stefan Schmidt
+If during a given mainloop iteration, property "A" of object '/foo' is
+changed, then properties "C" and "D" of '/bar', lastly "B" of '/foo',
+the current code will emit the PropertiesChanged signals in following
+order: "A", "B", "C", "D".
+
+This may confuse applications that have a dependency on the order of
+those signals.
+
+This fixes the ordering, so in the example, the order becomes:
+"C", "D", "A", B". This is considered not to be a problem, as
+applications may use the flag G_DBUS_PROPERTY_CHANGED_FLAG_FLUSH, so
+property changed signals are emitted as soon as possible.
+
+The solution is for each object, to reschedule the signals every time a
+signal is emitted.
+---
+ gdbus/gdbus.h  |  9 +++++++++
+ gdbus/object.c | 12 ++++++++++--
+ 2 files changed, 19 insertions(+), 2 deletions(-)
+
+diff --git a/gdbus/gdbus.h b/gdbus/gdbus.h
+index 69fbc10..e37385f 100644
+--- a/gdbus/gdbus.h
++++ b/gdbus/gdbus.h
+@@ -302,6 +302,15 @@ void g_dbus_pending_property_error_valist(GDBusPendingReply id,
+ 			const char *name, const char *format, va_list args);
+ void g_dbus_pending_property_error(GDBusPendingReply id, const char *name,
+ 						const char *format, ...);
++
++/*
++ * Note that when multiple properties for a given object path are changed
++ * in the same mainloop iteration, they will be grouped with the last
++ * property changed. If this behaviour is undesired, use
++ * g_dbus_emit_property_changed_full() with the
++ * G_DBUS_PROPERTY_CHANGED_FLAG_FLUSH flag, causing the signal to ignore
++ * any grouping.
++ */
+ void g_dbus_emit_property_changed(DBusConnection *connection,
+ 				const char *path, const char *interface,
+ 				const char *name);
+diff --git a/gdbus/object.c b/gdbus/object.c
+index a220101..afb4587 100644
+--- a/gdbus/object.c
++++ b/gdbus/object.c
+@@ -635,11 +635,19 @@ static gboolean g_dbus_args_have_signature(const GDBusArgInfo *args,
+ 
+ static void add_pending(struct generic_data *data)
+ {
+-	if (data->process_id > 0)
+-		return;
++	guint old_id = data->process_id;
+ 
+ 	data->process_id = g_idle_add(process_changes, data);
+ 
++	if (old_id > 0) {
++		/*
++		 * If the element already had an old idler, remove the old one,
++		 * no need to re-add it to the pending list.
++		 */
++		g_source_remove(old_id);
++		return;
++	}
++
+ 	pending = g_slist_append(pending, data);
+ }
+ 
+-- 
+2.8.1
+
