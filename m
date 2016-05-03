@@ -1,10 +1,10 @@
 Return-Path: <stefan@osg.samsung.com>
 From: Stefan Schmidt <stefan@osg.samsung.com>
-Subject: Re: [PATCHv2 bluetooth-next 06/10] ndisc: add addr_len parameter to
- ndisc_fill_addr_option
+Subject: Re: [PATCHv2 bluetooth-next 05/10] ndisc: add addr_len parameter to
+ ndisc_opt_addr_data
 To: Alexander Aring <aar@pengutronix.de>, linux-wpan@vger.kernel.org
 References: <1461140382-4784-1-git-send-email-aar@pengutronix.de>
- <1461140382-4784-7-git-send-email-aar@pengutronix.de>
+ <1461140382-4784-6-git-send-email-aar@pengutronix.de>
 Cc: kernel@pengutronix.de, marcel@holtmann.org,
  jukka.rissanen@linux.intel.com, hannes@stressinduktion.org,
  mcr@sandelman.ca, werner@almesberger.net, linux-bluetooth@vger.kernel.org,
@@ -12,10 +12,10 @@ Cc: kernel@pengutronix.de, marcel@holtmann.org,
  Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>, James Morris <jmorris@namei.org>,
  Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
  Patrick McHardy <kaber@trash.net>
-Message-ID: <5728EB34.6040506@osg.samsung.com>
-Date: Tue, 3 May 2016 20:17:24 +0200
+Message-ID: <5728EB2A.4060001@osg.samsung.com>
+Date: Tue, 3 May 2016 20:17:14 +0200
 MIME-Version: 1.0
-In-Reply-To: <1461140382-4784-7-git-send-email-aar@pengutronix.de>
+In-Reply-To: <1461140382-4784-6-git-send-email-aar@pengutronix.de>
 Content-Type: text/plain; charset=windows-1252; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
@@ -23,7 +23,7 @@ Hello.
 
 On 20/04/16 10:19, Alexander Aring wrote:
 > This patch makes the address length as argument for the
-> ndisc_fill_addr_option function. This is necessary to handle addresses
+> ndisc_opt_addr_data function. This is necessary to handle addresses
 > which don't use dev->addr_len as address length.
 >
 > Cc: David S. Miller<davem@davemloft.net>
@@ -33,65 +33,87 @@ On 20/04/16 10:19, Alexander Aring wrote:
 > Cc: Patrick McHardy<kaber@trash.net>
 > Signed-off-by: Alexander Aring<aar@pengutronix.de>
 > ---
->   net/ipv6/ndisc.c | 15 ++++++++-------
->   1 file changed, 8 insertions(+), 7 deletions(-)
+>   include/net/ndisc.h |  5 +++--
+>   net/ipv6/ndisc.c    | 11 +++++++----
+>   net/ipv6/route.c    |  2 +-
+>   3 files changed, 11 insertions(+), 7 deletions(-)
 >
+> diff --git a/include/net/ndisc.h b/include/net/ndisc.h
+> index ef43e88..aac868e 100644
+> --- a/include/net/ndisc.h
+> +++ b/include/net/ndisc.h
+> @@ -134,12 +134,13 @@ static inline int ndisc_opt_addr_space(struct net_device *dev,
+>   }
+>   
+>   static inline u8 *ndisc_opt_addr_data(struct nd_opt_hdr *p,
+> -				      struct net_device *dev)
+> +				      struct net_device *dev,
+> +				      unsigned char addr_len)
+>   {
+>   	u8 *lladdr = (u8 *)(p + 1);
+>   	int lladdrlen = p->nd_opt_len << 3;
+>   	int prepad = ndisc_addr_option_pad(dev->type);
+> -	if (lladdrlen != ndisc_opt_addr_space(dev, dev->addr_len))
+> +	if (lladdrlen != ndisc_opt_addr_space(dev, addr_len))
+>   		return NULL;
+>   	return lladdr + prepad;
+>   }
 > diff --git a/net/ipv6/ndisc.c b/net/ipv6/ndisc.c
-> index 4e91d5e..176c7c4 100644
+> index 69e20e3..4e91d5e 100644
 > --- a/net/ipv6/ndisc.c
 > +++ b/net/ipv6/ndisc.c
-> @@ -150,11 +150,11 @@ struct neigh_table nd_tbl = {
->   };
->   EXPORT_SYMBOL_GPL(nd_tbl);
+> @@ -744,7 +744,8 @@ static void ndisc_recv_ns(struct sk_buff *skb)
+>   	}
 >   
-> -static void ndisc_fill_addr_option(struct sk_buff *skb, int type, void *data)
-> +static void ndisc_fill_addr_option(struct sk_buff *skb, int type, void *data,
-> +				   int data_len)
->   {
->   	int pad   = ndisc_addr_option_pad(skb->dev->type);
-> -	int data_len = skb->dev->addr_len;
-> -	int space = ndisc_opt_addr_space(skb->dev, skb->dev->addr_len);
-> +	int space = ndisc_opt_addr_space(skb->dev, data_len);
->   	u8 *opt = skb_put(skb, space);
+>   	if (ndopts.nd_opts_src_lladdr) {
+> -		lladdr = ndisc_opt_addr_data(ndopts.nd_opts_src_lladdr, dev);
+> +		lladdr = ndisc_opt_addr_data(ndopts.nd_opts_src_lladdr, dev,
+> +					     dev->addr_len);
+>   		if (!lladdr) {
+>   			ND_PRINTK(2, warn,
+>   				  "NS: invalid link-layer address length\n");
+> @@ -916,7 +917,8 @@ static void ndisc_recv_na(struct sk_buff *skb)
+>   		return;
+>   	}
+>   	if (ndopts.nd_opts_tgt_lladdr) {
+> -		lladdr = ndisc_opt_addr_data(ndopts.nd_opts_tgt_lladdr, dev);
+> +		lladdr = ndisc_opt_addr_data(ndopts.nd_opts_tgt_lladdr, dev,
+> +					     dev->addr_len);
+>   		if (!lladdr) {
+>   			ND_PRINTK(2, warn,
+>   				  "NA: invalid link-layer address length\n");
+> @@ -1024,7 +1026,7 @@ static void ndisc_recv_rs(struct sk_buff *skb)
 >   
->   	opt[0] = type;
-> @@ -528,7 +528,7 @@ void ndisc_send_na(struct net_device *dev, const struct in6_addr *daddr,
->   
->   	if (inc_opt)
->   		ndisc_fill_addr_option(skb, ND_OPT_TARGET_LL_ADDR,
-> -				       dev->dev_addr);
-> +				       dev->dev_addr, dev->addr_len);
->   
->   
->   	ndisc_send_skb(skb, daddr, src_addr);
-> @@ -590,7 +590,7 @@ void ndisc_send_ns(struct net_device *dev, const struct in6_addr *solicit,
->   
->   	if (inc_opt)
->   		ndisc_fill_addr_option(skb, ND_OPT_SOURCE_LL_ADDR,
-> -				       dev->dev_addr);
-> +				       dev->dev_addr, dev->addr_len);
->   
->   	ndisc_send_skb(skb, daddr, saddr);
->   }
-> @@ -641,7 +641,7 @@ void ndisc_send_rs(struct net_device *dev, const struct in6_addr *saddr,
->   
->   	if (send_sllao)
->   		ndisc_fill_addr_option(skb, ND_OPT_SOURCE_LL_ADDR,
-> -				       dev->dev_addr);
-> +				       dev->dev_addr, dev->addr_len);
->   
->   	ndisc_send_skb(skb, daddr, saddr);
->   }
-> @@ -1597,7 +1597,8 @@ void ndisc_send_redirect(struct sk_buff *skb, const struct in6_addr *target)
->   	 */
->   
->   	if (ha)
-> -		ndisc_fill_addr_option(buff, ND_OPT_TARGET_LL_ADDR, ha);
-> +		ndisc_fill_addr_option(buff, ND_OPT_TARGET_LL_ADDR, ha,
-> +				       dev->addr_len);
->   
->   	/*
->   	 *	build redirect option and copy skb over to the new packet.
+>   	if (ndopts.nd_opts_src_lladdr) {
+>   		lladdr = ndisc_opt_addr_data(ndopts.nd_opts_src_lladdr,
+> -					     skb->dev);
+> +					     skb->dev, skb->dev->addr_len);
+>   		if (!lladdr)
+>   			goto out;
+>   	}
+> @@ -1322,7 +1324,8 @@ skip_linkparms:
+>   		u8 *lladdr = NULL;
+>   		if (ndopts.nd_opts_src_lladdr) {
+>   			lladdr = ndisc_opt_addr_data(ndopts.nd_opts_src_lladdr,
+> -						     skb->dev);
+> +						     skb->dev,
+> +						     skb->dev->addr_len);
+>   			if (!lladdr) {
+>   				ND_PRINTK(2, warn,
+>   					  "RA: invalid link-layer address length\n");
+> diff --git a/net/ipv6/route.c b/net/ipv6/route.c
+> index ed44663..cc180b3 100644
+> --- a/net/ipv6/route.c
+> +++ b/net/ipv6/route.c
+> @@ -2157,7 +2157,7 @@ static void rt6_do_redirect(struct dst_entry *dst, struct sock *sk, struct sk_bu
+>   	lladdr = NULL;
+>   	if (ndopts.nd_opts_tgt_lladdr) {
+>   		lladdr = ndisc_opt_addr_data(ndopts.nd_opts_tgt_lladdr,
+> -					     skb->dev);
+> +					     skb->dev, skb->dev->addr_len);
+>   		if (!lladdr) {
+>   			net_dbg_ratelimited("rt6_redirect: invalid link-layer address length\n");
+>   			return;
 
 Reviewed-by: Stefan Schmidt<stefan@osg.samsung.com>
 
