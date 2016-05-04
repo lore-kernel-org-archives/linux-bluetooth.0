@@ -1,105 +1,141 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <aar@pengutronix.de>
+Subject: Re: [PATCHv2 bluetooth-next 01/10] 6lowpan: add private neighbour
+ data
+To: Hannes Frederic Sowa <hannes@stressinduktion.org>,
+ linux-wpan@vger.kernel.org
+References: <1461140382-4784-1-git-send-email-aar@pengutronix.de>
+ <1461140382-4784-2-git-send-email-aar@pengutronix.de>
+ <c7717a50-7818-f409-1fb4-35e1ec5ebde0@stressinduktion.org>
+Cc: kernel@pengutronix.de, marcel@holtmann.org,
+ jukka.rissanen@linux.intel.com, stefan@osg.samsung.com, mcr@sandelman.ca,
+ werner@almesberger.net, linux-bluetooth@vger.kernel.org,
+ netdev@vger.kernel.org, "David S . Miller" <davem@davemloft.net>
+From: Alexander Aring <aar@pengutronix.de>
+Message-ID: <3c0b16a2-71ba-5c99-ea59-77b535353491@pengutronix.de>
+Date: Wed, 4 May 2016 12:43:54 +0200
 MIME-Version: 1.0
-In-Reply-To: <5728C5DA.7000703@gmail.com>
-References: <5728C5DA.7000703@gmail.com>
-Date: Wed, 4 May 2016 14:03:42 +0300
-Message-ID: <CABBYNZLiv7uY-i3W+TcieskEQqrxC6Y0pUkFatDSqL_wrsnHpg@mail.gmail.com>
-Subject: Re: DBUS API error "Not paired" when attempting to read GATT characteristic
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Joe Glancy <joe.t.glancy@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <c7717a50-7818-f409-1fb4-35e1ec5ebde0@stressinduktion.org>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Joe,
 
-On Tue, May 3, 2016 at 6:38 PM, Joe Glancy <joe.t.glancy@gmail.com> wrote:
-> Hello all.
->
-> I was wondering whether someone could possibly help shine some light on an
-> issue I'm having.
->
-> Here's the setup:
->  - Ubuntu 16.04 w/Bluez 5.37 (from the official repos, experimental mode
-> enabled)
->  - BBC micro:bit
->  - "hciconfig -a hci0":
-> hci0:   Type: BR/EDR  Bus: USB
->         BD Address: XX:XX:XX:XX:XX:XX  ACL MTU: 1022:8  SCO MTU: 183:5
->         UP RUNNING PSCAN
->         RX bytes:718 acl:0 sco:0 events:54 errors:0
->         TX bytes:3731 acl:0 sco:0 commands:54 errors:0
->         Features: 0xff 0xfe 0x0d 0xfe 0xd8 0x7f 0x7b 0x8f
->         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
->         Link policy: RSWITCH HOLD SNIFF
->         Link mode: SLAVE ACCEPT
->         Name: 'Io'
->         Class: 0x4c010c
->         Service Classes: Rendering, Capturing, Telephony
->         Device Class: Computer, Laptop
->         HCI Version: 4.1 (0x7)  Revision: 0x3101
->         LMP Version: 4.1 (0x7)  Subversion: 0x1
->         Manufacturer: Atheros Communications, Inc. (69)
->
-> What I am trying to do:
->  - Read some bytes from a characteristic on the micro:bit through BlueZ's
-> DBUS API using a Python script and the dbus module
->
-> The error I am getting:
->  - "org.bluez.Error.NotPermitted: Not paired"
->
-> I have paired the micro:bit both from the normal Ubuntu Bluetooth settings
-> menu, and I have also paired it with the bluetoothctl tool, each on separate
-> occasions. Both reported that the pair was successful (no pin was required
-> however, compared to when I pair the micro:bit to my phone I do need the
-> pin), however when I tried running my script (which does not check whether
-> the device is paired or connected: this is performed by the user, and I can
-> verify that both the Ubuntu settings and bluetoothctl reported it as both
-> paired and connected), I get the afore mentioned error
-> ("org.bluez.Error.NotPermitted: Not paired").
+Hi,
 
-case BT_ATT_ERROR_AUTHENTICATION:
-case BT_ATT_ERROR_INSUFFICIENT_ENCRYPTION:
-case BT_ATT_ERROR_INSUFFICIENT_ENCRYPTION_KEY_SIZE:
-return btd_error_not_permitted(msg, "Not paired");
+On 05/02/2016 08:59 PM, Hannes Frederic Sowa wrote:
+> Hello,
+> 
+> On 20.04.2016 10:19, Alexander Aring wrote:
+>> This patch will introduce a 6lowpan neighbour private data. Like the
+>> interface private data we handle private data for generic 6lowpan and
+>> for link-layer specific 6lowpan.
+>>
+>> The current first use case if to save the short address for a 802.15.4
+>> 6lowpan neighbour.
+>>
+>> Cc: David S. Miller <davem@davemloft.net>
+>> Signed-off-by: Alexander Aring <aar@pengutronix.de>
+>> ---
+>>  include/linux/netdevice.h     |  3 +--
+>>  include/net/6lowpan.h         | 24 ++++++++++++++++++++++++
+>>  net/bluetooth/6lowpan.c       |  2 ++
+>>  net/ieee802154/6lowpan/core.c | 12 ++++++++++++
+>>  4 files changed, 39 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+>> index 166402a..0052c42 100644
+>> --- a/include/linux/netdevice.h
+>> +++ b/include/linux/netdevice.h
+>> @@ -1487,8 +1487,7 @@ enum netdev_priv_flags {
+>>   * 	@perm_addr:		Permanent hw address
+>>   * 	@addr_assign_type:	Hw address assignment type
+>>   * 	@addr_len:		Hardware address length
+>> - * 	@neigh_priv_len;	Used in neigh_alloc(),
+>> - * 				initialized only in atm/clip.c
+>> + *	@neigh_priv_len;	Used in neigh_alloc()
+>>   * 	@dev_id:		Used to differentiate devices that share
+>>   * 				the same link layer address
+>>   * 	@dev_port:		Used to differentiate devices that share
+>> diff --git a/include/net/6lowpan.h b/include/net/6lowpan.h
+>> index da84cf9..61c6517 100644
+>> --- a/include/net/6lowpan.h
+>> +++ b/include/net/6lowpan.h
+>> @@ -98,6 +98,9 @@ static inline bool lowpan_is_iphc(u8 dispatch)
+>>  #define LOWPAN_PRIV_SIZE(llpriv_size)	\
+>>  	(sizeof(struct lowpan_dev) + llpriv_size)
+>>  
+>> +#define LOWPAN_NEIGH_PRIV_SIZE(llneigh_priv_size)	\
+>> +	(sizeof(struct lowpan_neigh) + llneigh_priv_size)
+>> +
+>>  enum lowpan_lltypes {
+>>  	LOWPAN_LLTYPE_BTLE,
+>>  	LOWPAN_LLTYPE_IEEE802154,
+>> @@ -141,6 +144,27 @@ struct lowpan_dev {
+>>  	u8 priv[0] __aligned(sizeof(void *));
+>>  };
+>>  
+>> +struct lowpan_neigh {
+>> +	/* 6LoWPAN neigh private data */
+>> +	/* must be last */
+>> +	u8 priv[0] __aligned(sizeof(void *));
+> 
+> Are you sure this declaration is correct? You take its size above, which
+> should result in zero. Looks a little bit strange. :)
+> 
 
-So any of these errors could be causing the problem, perhaps it is the
-device that requires higher security.
+I think yes it's correct, but I will remove it.
 
-> Is this, therefore, an error with my program (I have spent hours checking it
-> and cannot find any errors)? Or a possible bug with BlueZ? There are very
-> few resources online for this kind of thing so I ended up resorting to the
-> Bluetooth mailing list - please notify me if this is the wrong kind of stuff
-> to be asking.
->
-> The micro:bit is the only LE device which has ever connected to this
-> (laptop) computer, and the characteristic (and its service) which I am
-> reading from do both exist as DBUS objects. My grasp of the DBUS system is
-> rather rudimentary, and so far has just been gained from BlueZ examples.
->
-> I have checked using the DBUS API to make sure that the device is both
-> paired and connected - both said yes, but, as previously said I get an error
-> (more specifically, an exception is thrown when I try to call "<DBUS
-> interface to characteristic>.ReadValue()").
+The basic idea here is to introduce a 6LoWPAN neighbour private data and
+Link-Layer specific neighbour private data.
 
-How you are actually testing this, perhaps you should try using bluetoothctl:
+Example:
 
-> agent on
-> default-agent
-> pair <address>
-> select-attribute <object>
-> read
+6LoWPAN neighbour data:
 
-> Is this my doing, or an issue with something out of my control? Any help
-> will be appreciated :)
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
-> in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+The GHC capability, 6LoWPAN contains some compression methods, also for
+several Next Header (UDP, IPv6 extension headers, ...). So far I
+understand each neighbour can tell which compression method it supports
+by a special option field, see [0].
 
+Such data doesn't depends on Link-Layer and is the same for all 6LoWPAN
+over FOO standards.
 
+6LoWPAN Link-Layer specific neighbour data:
 
--- 
-Luiz Augusto von Dentz
+Like the short address handling in case of 6LoWPAN over 802.15.4.
+
+>> +};
+>> +
+>> +struct lowpan_802154_neigh {
+>> +	__le16 short_addr;
+>> +};
+>> +
+>> +static inline struct lowpan_neigh *lowpan_neigh(void *neigh_priv)
+>> +{
+>> +	return neigh_priv;
+>> +}
+>> +
+>> +static inline
+>> +struct lowpan_802154_neigh *lowpan_802154_neigh(void *neigh_priv)
+>> +{
+>> +	return (struct lowpan_802154_neigh *)lowpan_neigh(neigh_priv)->priv;
+>> +}
+> 
+> Can't you remove lowpan_neigh completely and just use 802154_neigh at
+> this point?
+
+Yes, I remove it. I think to introduce such layer for 6LoWPAN neighbour
+data, we can still introduce it later when we have an use-case. Also with
+a better foo_ops structure so we have something like this:
+
+6lowpan interface:
+ - .ndo_neigh_construct
+   - "doing 6lowpan stuff"
+     - .ndo_ll_neigh_construct
+       - "doing ll 6lowpan stuff"
+
+and ".ndo_ll_neigh_construct" differs in case of 6lowpan ll
+implementation (802.15.4 or BTLE currently).
+
+- Alex
+
+[0] https://tools.ietf.org/html/rfc7400#section-3.3
