@@ -1,150 +1,59 @@
-Return-Path: <salvatore.benedetto@intel.com>
-From: Salvatore Benedetto <salvatore.benedetto@intel.com>
-To: herbert@gondor.apana.org.au,
-	gustavo@padovan.org,
-	linux-bluetooth@vger.kernel.org
-Cc: salvatore.benedetto@intel.com,
-	linux-crypto@vger.kernel.org,
-	marcel@holtmann.org,
-	johan.hedberg@gmail.com
-Subject: [PATCH] Bluetooth: convert smp module to crypto kpp API
-Date: Thu,  5 May 2016 10:22:46 +0100
-Message-Id: <1462440166-94042-1-git-send-email-salvatore.benedetto@intel.com>
+Return-Path: <akarwar@marvell.com>
+From: Amitkumar Karwar <akarwar@marvell.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Ganapathi Bhat
+	<gbhat@marvell.com>
+Subject: RE: [PATCH v9 3/3] Bluetooth: hci_uart: Support firmware download for
+ Marvell
+Date: Wed, 4 May 2016 14:40:10 +0000
+Message-ID: <7a96f0ab0acb4b97a4590ba037cc8dd2@SC-EXCH04.marvell.com>
+References: <1461925478-31851-1-git-send-email-akarwar@marvell.com>
+ <1461925478-31851-3-git-send-email-akarwar@marvell.com>
+ <D3B4A169-777A-4235-B3C9-EBFA2117CE3D@holtmann.org>
+In-Reply-To: <D3B4A169-777A-4235-B3C9-EBFA2117CE3D@holtmann.org>
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch has *not* been tested as I don't have the hardware.
-It's purpose is to show how to use the kpp API.
+Hi Marcel,
 
-Based on https://patchwork.kernel.org/patch/9022371/
+Thanks for your comments.
+We are working to resolve them.
 
-Signed-off-by: Salvatore Benedetto <salvatore.benedetto@intel.com>
----
- net/bluetooth/smp.c | 99 ++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 98 insertions(+), 1 deletion(-)
+> > +
+> > +/* Receive data */
+> > +static int mrvl_recv(struct hci_uart *hu, const void *data, int
+> > +count) {
+> > +	struct mrvl_data *mrvl =3D hu->priv;
+> > +
+> > +	if (test_bit(HCI_UART_DNLD_FW, &mrvl->flags)) {
+> > +		mrvl->fwdata->skb =3D mrvl_process_fw_data(hu, mrvl->fwdata-
+> >skb,
+> > +							 (u8 *)data, count);
+> > +		if (IS_ERR(mrvl->fwdata->skb)) {
+> > +			int err =3D PTR_ERR(mrvl->fwdata->skb);
+> > +
+> > +			bt_dev_err(hu->hdev,
+> > +				   "Receive firmware data failed (%d)", err);
+> > +			mrvl->fwdata->skb =3D NULL;
+> > +			return err;
+> > +		}
+> > +		return 0;
+> > +	}
+>=20
+> So I really want to get rid of this part in the driver ->recv should be
+> kept compartmentalized between before HCI is ready and when HCI is
+> ready.
+>=20
 
-diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index 50976a6..25844a2 100644
---- a/net/bluetooth/smp.c
-+++ b/net/bluetooth/smp.c
-@@ -25,6 +25,8 @@
- #include <crypto/b128ops.h>
- #include <crypto/hash.h>
- #include <crypto/skcipher.h>
-+#include <crypto/kpp.h>
-+#include <crypto/ecdh.h>
- 
- #include <net/bluetooth/bluetooth.h>
- #include <net/bluetooth/hci_core.h>
-@@ -2591,6 +2593,101 @@ static u8 sc_select_method(struct smp_chan *smp)
- 	return method;
- }
- 
-+struct ecdh_completion {
-+	struct completion completion;
-+	int err;
-+};
-+
-+static void ecdh_complete(struct crypto_async_request *req, int err)
-+{
-+	struct ecdh_completion *res = req->data;
-+
-+	if (err == -EINPROGRESS)
-+		return;
-+
-+	res->err = err;
-+	complete(&res->completion);
-+}
-+
-+static inline void swap_digits(u64 *in, u64 *out, unsigned int ndigits)
-+{
-+	int i;
-+
-+	for (i = 0; i < ndigits; i++)
-+		out[i] = __swab64(in[ndigits - 1 - i]);
-+}
-+
-+static bool compute_ecdh_shared_secret(const u8 public_key[64],
-+				       const u8 private_key[32], u8 secret[32])
-+{
-+	struct crypto_kpp *tfm;
-+	struct kpp_request *req;
-+	struct ecdh_params p;
-+	struct ecdh_completion result;
-+	struct scatterlist src, dst;
-+	u8 tmp[64];
-+	int err = -ENOMEM;
-+
-+	tfm = crypto_alloc_kpp("ecdh", CRYPTO_ALG_INTERNAL, 0);
-+	if (IS_ERR(tfm)) {
-+		pr_err("alg: kpp: Failed to load tfm for kpp: %ld\n",
-+		       PTR_ERR(tfm));
-+		return false;
-+	}
-+
-+	req = kpp_request_alloc(tfm, GFP_KERNEL);
-+	if (!req)
-+		goto free_kpp;
-+
-+	init_completion(&result.completion);
-+
-+	/* Set curve_id */
-+	p.curve_id = ECC_CURVE_NIST_P256;
-+	err = crypto_kpp_set_params(tfm, (void *)&p, sizeof(p));
-+	if (err)
-+		goto free_req;
-+
-+	/* Security Manager Protocol holds digits in litte-endian order
-+	 * while ECC API expect big-endian data
-+	 */
-+	swap_digits((u64 *)private_key, (u64 *)tmp, 4);
-+
-+	/* Set A private Key */
-+	err = crypto_kpp_set_secret(tfm, (void *)tmp, 32);
-+	if (err)
-+		goto free_all;
-+
-+	swap_digits((u64 *)public_key, (u64 *)tmp, 4); /* x */
-+	swap_digits((u64 *)&public_key[32], (u64 *)&tmp[32], 4); /* y */
-+
-+	sg_init_one(&src, tmp, 64);
-+	sg_init_one(&dst, secret, 32);
-+	kpp_request_set_input(req, &src, 64);
-+	kpp_request_set_output(req, &dst, 32);
-+	kpp_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
-+				 ecdh_complete, &result);
-+	err = crypto_kpp_compute_shared_secret(req);
-+	if (err == -EINPROGRESS) {
-+		wait_for_completion(&result.completion);
-+		err = result.err;
-+	}
-+	if (err < 0) {
-+		pr_err("alg: ecdh: compute shard secret test failed. err %d\n",
-+		       err);
-+		goto free_all;
-+	}
-+
-+	swap_digits((u64 *)secret, (u64 *)tmp, 4);
-+	memcpy(secret, tmp, 32);
-+
-+free_all:
-+free_req:
-+	kpp_request_free(req);
-+free_kpp:
-+	crypto_free_kpp(tfm);
-+	return (err == 0);
-+}
-+
- static int smp_cmd_public_key(struct l2cap_conn *conn, struct sk_buff *skb)
- {
- 	struct smp_cmd_public_key *key = (void *) skb->data;
-@@ -2630,7 +2727,7 @@ static int smp_cmd_public_key(struct l2cap_conn *conn, struct sk_buff *skb)
- 	SMP_DBG("Remote Public Key X: %32phN", smp->remote_pk);
- 	SMP_DBG("Remote Public Key Y: %32phN", smp->remote_pk + 32);
- 
--	if (!ecdh_shared_secret(smp->remote_pk, smp->local_sk, smp->dhkey))
-+	if (!compute_ecdh_shared_secret(smp->remote_pk, smp->local_sk, smp->dhkey))
- 		return SMP_UNSPECIFIED;
- 
- 	SMP_DBG("DHKey %32phN", smp->dhkey);
--- 
-1.9.1
+We already have HCI_UART_REGISTERED bit in "hu->flags". I think, we can use=
+ it to know if HCI is ready or not.
+We will define two recv handlers. "->recv" and "->recv_for_prepare"
+
+OR let us know if you want us to use single "->recv" and have code under "i=
+f (HCI_UART_REGISTERED)" and "else" in our handler.
+
+Regards,
+Amitkumar
