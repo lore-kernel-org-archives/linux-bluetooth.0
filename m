@@ -1,401 +1,105 @@
-Return-Path: <linux-wpan-owner@vger.kernel.org>
-From: Stefan Schmidt <stefan@osg.samsung.com>
-Subject: Re: [PATCHv2 bluetooth-next 07/10] ipv6: introduce neighbour
- discovery ops
-To: Alexander Aring <aar@pengutronix.de>, linux-wpan@vger.kernel.org
-References: <1461140382-4784-1-git-send-email-aar@pengutronix.de>
- <1461140382-4784-8-git-send-email-aar@pengutronix.de>
-Cc: kernel@pengutronix.de, marcel@holtmann.org,
-	jukka.rissanen@linux.intel.com, hannes@stressinduktion.org,
-	mcr@sandelman.ca, werner@almesberger.net,
-	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-	"David S . Miller" <davem@davemloft.net>,
-	Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
-	James Morris <jmorris@namei.org>,
-	Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
-	Patrick McHardy <kaber@trash.net>
-Message-ID: <5729E9AB.5000301@osg.samsung.com>
-Date: Wed, 4 May 2016 14:23:07 +0200
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <1461140382-4784-8-git-send-email-aar@pengutronix.de>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Sender: linux-wpan-owner@vger.kernel.org
+In-Reply-To: <5728C5DA.7000703@gmail.com>
+References: <5728C5DA.7000703@gmail.com>
+Date: Wed, 4 May 2016 14:03:42 +0300
+Message-ID: <CABBYNZLiv7uY-i3W+TcieskEQqrxC6Y0pUkFatDSqL_wrsnHpg@mail.gmail.com>
+Subject: Re: DBUS API error "Not paired" when attempting to read GATT characteristic
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Joe Glancy <joe.t.glancy@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello.
+Hi Joe,
 
-On 20/04/16 10:19, Alexander Aring wrote:
-> This patch introduces neighbour discovery ops callback structure. The
-> structure contains at first receive and transmit handling for NS/NA and
-> userspace option field functionality.
+On Tue, May 3, 2016 at 6:38 PM, Joe Glancy <joe.t.glancy@gmail.com> wrote:
+> Hello all.
 >
-> These callback offers 6lowpan different handling, such as 802.15.4 short
-> address handling or RFC6775 (Neighbor Discovery Optimization for IPv6 over
-> 6LoWPANs).
+> I was wondering whether someone could possibly help shine some light on an
+> issue I'm having.
 >
-> Cc: David S. Miller<davem@davemloft.net>
-> Cc: Alexey Kuznetsov<kuznet@ms2.inr.ac.ru>
-> Cc: James Morris<jmorris@namei.org>
-> Cc: Hideaki YOSHIFUJI<yoshfuji@linux-ipv6.org>
-> Cc: Patrick McHardy<kaber@trash.net>
-> Signed-off-by: Alexander Aring<aar@pengutronix.de>
-> ---
->   include/linux/netdevice.h |  3 ++
->   include/net/ndisc.h       | 96 +++++++++++++++++++++++++++++++++++++++++++----
->   net/ipv6/addrconf.c       |  1 +
->   net/ipv6/ndisc.c          | 71 ++++++++++++++++++++++++-----------
->   net/ipv6/route.c          |  2 +-
->   5 files changed, 144 insertions(+), 29 deletions(-)
+> Here's the setup:
+>  - Ubuntu 16.04 w/Bluez 5.37 (from the official repos, experimental mode
+> enabled)
+>  - BBC micro:bit
+>  - "hciconfig -a hci0":
+> hci0:   Type: BR/EDR  Bus: USB
+>         BD Address: XX:XX:XX:XX:XX:XX  ACL MTU: 1022:8  SCO MTU: 183:5
+>         UP RUNNING PSCAN
+>         RX bytes:718 acl:0 sco:0 events:54 errors:0
+>         TX bytes:3731 acl:0 sco:0 commands:54 errors:0
+>         Features: 0xff 0xfe 0x0d 0xfe 0xd8 0x7f 0x7b 0x8f
+>         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+>         Link policy: RSWITCH HOLD SNIFF
+>         Link mode: SLAVE ACCEPT
+>         Name: 'Io'
+>         Class: 0x4c010c
+>         Service Classes: Rendering, Capturing, Telephony
+>         Device Class: Computer, Laptop
+>         HCI Version: 4.1 (0x7)  Revision: 0x3101
+>         LMP Version: 4.1 (0x7)  Subversion: 0x1
+>         Manufacturer: Atheros Communications, Inc. (69)
 >
-> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-> index 0052c42..bc60033 100644
-> --- a/include/linux/netdevice.h
-> +++ b/include/linux/netdevice.h
-> @@ -1677,6 +1677,9 @@ struct net_device {
->   #ifdef CONFIG_NET_L3_MASTER_DEV
->   	const struct l3mdev_ops	*l3mdev_ops;
->   #endif
-> +#if IS_ENABLED(CONFIG_IPV6)
-> +	const struct ndisc_ops *ndisc_ops;
-> +#endif
->   
->   	const struct header_ops *header_ops;
->   
-> diff --git a/include/net/ndisc.h b/include/net/ndisc.h
-> index aac868e..14ed016 100644
-> --- a/include/net/ndisc.h
-> +++ b/include/net/ndisc.h
-> @@ -110,7 +110,8 @@ struct ndisc_options {
->   
->   #define NDISC_OPT_SPACE(len) (((len)+2+7)&~7)
->   
-> -struct ndisc_options *ndisc_parse_options(u8 *opt, int opt_len,
-> +struct ndisc_options *ndisc_parse_options(const struct net_device *dev,
-> +					  u8 *opt, int opt_len,
->   					  struct ndisc_options *ndopts);
->   
->   /*
-> @@ -173,6 +174,93 @@ static inline struct neighbour *__ipv6_neigh_lookup(struct net_device *dev, cons
->   	return n;
->   }
->   
-> +static inline int __ip6_ndisc_is_useropt(struct nd_opt_hdr *opt)
+> What I am trying to do:
+>  - Read some bytes from a characteristic on the micro:bit through BlueZ's
+> DBUS API using a Python script and the dbus module
+>
+> The error I am getting:
+>  - "org.bluez.Error.NotPermitted: Not paired"
+>
+> I have paired the micro:bit both from the normal Ubuntu Bluetooth settings
+> menu, and I have also paired it with the bluetoothctl tool, each on separate
+> occasions. Both reported that the pair was successful (no pin was required
+> however, compared to when I pair the micro:bit to my phone I do need the
+> pin), however when I tried running my script (which does not check whether
+> the device is paired or connected: this is performed by the user, and I can
+> verify that both the Ubuntu settings and bluetoothctl reported it as both
+> paired and connected), I get the afore mentioned error
+> ("org.bluez.Error.NotPermitted: Not paired").
 
-Name it __ipv6... instead of __ip6...?
-> +{
-> +	return opt->nd_opt_type == ND_OPT_RDNSS ||
-> +		opt->nd_opt_type == ND_OPT_DNSSL;
-> +}
-> +
-> +#if IS_ENABLED(CONFIG_IPV6)
-> +struct ndisc_ops {
-> +	int	(*is_useropt)(struct nd_opt_hdr *opt);
-> +	void	(*send_na)(struct net_device *dev,
-> +			   const struct in6_addr *daddr,
-> +			   const struct in6_addr *solicited_addr,
-> +			   bool router, bool solicited,
-> +			   bool override, bool inc_opt);
-> +	void	(*recv_na)(struct sk_buff *skb);
-> +	void	(*send_ns)(struct net_device *dev,
-> +			   const struct in6_addr *solicit,
-> +			   const struct in6_addr *daddr,
-> +			   const struct in6_addr *saddr);
-> +	void	(*recv_ns)(struct sk_buff *skb);
-> +};
-> +
-> +static inline int ndisc_is_useropt(const struct net_device *dev,
-> +				   struct nd_opt_hdr *opt)
-> +{
-> +	if (likely(dev->ndisc_ops->is_useropt))
-> +		return dev->ndisc_ops->is_useropt(opt);
-> +	else
-> +		return 0;
-> +}
-> +
-> +static inline void ndisc_send_na(struct net_device *dev,
-> +				 const struct in6_addr *daddr,
-> +				 const struct in6_addr *solicited_addr,
-> +				 bool router, bool solicited, bool override,
-> +				 bool inc_opt)
-> +{
-> +	if (likely(dev->ndisc_ops->send_na))
-> +		dev->ndisc_ops->send_na(dev, daddr, solicited_addr, router,
-> +					solicited, override, inc_opt);
-> +}
-> +
-> +static inline void ndisc_recv_na(struct sk_buff *skb)
-> +{
-> +	if (likely(skb->dev->ndisc_ops->recv_na))
-> +		skb->dev->ndisc_ops->recv_na(skb);
-> +}
-> +
-> +static inline void ndisc_send_ns(struct net_device *dev,
-> +				 const struct in6_addr *solicit,
-> +				 const struct in6_addr *daddr,
-> +				 const struct in6_addr *saddr)
-> +{
-> +	if (likely(dev->ndisc_ops->send_ns))
-> +		dev->ndisc_ops->send_ns(dev, solicit, daddr, saddr);
-> +}
-> +
-> +static inline void ndisc_recv_ns(struct sk_buff *skb)
-> +{
-> +	if (likely(skb->dev->ndisc_ops->recv_ns))
-> +		skb->dev->ndisc_ops->recv_ns(skb);
-> +}
-> +#else
-> +static inline int ndisc_is_useropt(const struct net_device *dev,
-> +				   struct nd_opt_hdr *opt)
-> +{
-> +	return 0;
-> +}
-> +
-> +static inline void ndisc_send_na(struct net_device *dev,
-> +				 const struct in6_addr *daddr,
-> +				 const struct in6_addr *solicited_addr,
-> +				 bool router, bool solicited, bool override,
-> +				 bool inc_opt) { }
-> +
-> +static inline void ndisc_recv_na(struct sk_buff *skb) { }
-> +
-> +static inline void ndisc_send_ns(struct net_device *dev,
-> +				 const struct in6_addr *solicit,
-> +				 const struct in6_addr *daddr,
-> +				 const struct in6_addr *saddr) { }
-> +
-> +static inline void ndisc_recv_ns(struct sk_buff *skb) { }
-> +#endif
-> +
-> +void ip6_register_ndisc_ops(struct net_device *dev);
-> +
->   int ndisc_init(void);
->   int ndisc_late_init(void);
->   
-> @@ -181,14 +269,8 @@ void ndisc_cleanup(void);
->   
->   int ndisc_rcv(struct sk_buff *skb);
->   
-> -void ndisc_send_ns(struct net_device *dev, const struct in6_addr *solicit,
-> -		   const struct in6_addr *daddr, const struct in6_addr *saddr);
-> -
->   void ndisc_send_rs(struct net_device *dev,
->   		   const struct in6_addr *saddr, const struct in6_addr *daddr);
-> -void ndisc_send_na(struct net_device *dev, const struct in6_addr *daddr,
-> -		   const struct in6_addr *solicited_addr,
-> -		   bool router, bool solicited, bool override, bool inc_opt);
->   
->   void ndisc_send_redirect(struct sk_buff *skb, const struct in6_addr *target);
->   
-> diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
-> index 54e18c2..a2ef04b 100644
-> --- a/net/ipv6/addrconf.c
-> +++ b/net/ipv6/addrconf.c
-> @@ -3266,6 +3266,7 @@ static int addrconf_notify(struct notifier_block *this, unsigned long event,
->   			idev = ipv6_add_dev(dev);
->   			if (IS_ERR(idev))
->   				return notifier_from_errno(PTR_ERR(idev));
-> +			ip6_register_ndisc_ops(dev);
->   		}
->   		break;
->   
-> diff --git a/net/ipv6/ndisc.c b/net/ipv6/ndisc.c
-> index 176c7c4..297080a 100644
-> --- a/net/ipv6/ndisc.c
-> +++ b/net/ipv6/ndisc.c
-> @@ -185,24 +185,25 @@ static struct nd_opt_hdr *ndisc_next_option(struct nd_opt_hdr *cur,
->   	return cur <= end && cur->nd_opt_type == type ? cur : NULL;
->   }
->   
-> -static inline int ndisc_is_useropt(struct nd_opt_hdr *opt)
-> +static inline int ip6_ndisc_is_useropt(struct nd_opt_hdr *opt)
->   {
-> -	return opt->nd_opt_type == ND_OPT_RDNSS ||
-> -		opt->nd_opt_type == ND_OPT_DNSSL;
-> +	return __ip6_ndisc_is_useropt(opt);
+case BT_ATT_ERROR_AUTHENTICATION:
+case BT_ATT_ERROR_INSUFFICIENT_ENCRYPTION:
+case BT_ATT_ERROR_INSUFFICIENT_ENCRYPTION_KEY_SIZE:
+return btd_error_not_permitted(msg, "Not paired");
 
-Why putting this check into a different function? It looks like a not 
-needed redirection.
->   }
->   
-> -static struct nd_opt_hdr *ndisc_next_useropt(struct nd_opt_hdr *cur,
-> +static struct nd_opt_hdr *ndisc_next_useropt(const struct net_device *dev,
-> +					     struct nd_opt_hdr *cur,
->   					     struct nd_opt_hdr *end)
->   {
->   	if (!cur || !end || cur >= end)
->   		return NULL;
->   	do {
->   		cur = ((void *)cur) + (cur->nd_opt_len << 3);
-> -	} while (cur < end && !ndisc_is_useropt(cur));
-> -	return cur <= end && ndisc_is_useropt(cur) ? cur : NULL;
-> +	} while (cur < end && !ndisc_is_useropt(dev, cur));
-> +	return cur <= end && ndisc_is_useropt(dev, cur) ? cur : NULL;
->   }
->   
-> -struct ndisc_options *ndisc_parse_options(u8 *opt, int opt_len,
-> +struct ndisc_options *ndisc_parse_options(const struct net_device *dev,
-> +					  u8 *opt, int opt_len,
->   					  struct ndisc_options *ndopts)
->   {
->   	struct nd_opt_hdr *nd_opt = (struct nd_opt_hdr *)opt;
-> @@ -243,7 +244,7 @@ struct ndisc_options *ndisc_parse_options(u8 *opt, int opt_len,
->   			break;
->   #endif
->   		default:
-> -			if (ndisc_is_useropt(nd_opt)) {
-> +			if (ndisc_is_useropt(dev, nd_opt)) {
->   				ndopts->nd_useropts_end = nd_opt;
->   				if (!ndopts->nd_useropts)
->   					ndopts->nd_useropts = nd_opt;
-> @@ -479,9 +480,11 @@ static void ndisc_send_skb(struct sk_buff *skb,
->   	rcu_read_unlock();
->   }
->   
-> -void ndisc_send_na(struct net_device *dev, const struct in6_addr *daddr,
-> -		   const struct in6_addr *solicited_addr,
-> -		   bool router, bool solicited, bool override, bool inc_opt)
-> +static void ip6_ndisc_send_na(struct net_device *dev,
-> +			      const struct in6_addr *daddr,
-> +			      const struct in6_addr *solicited_addr,
-> +			      bool router, bool solicited, bool override,
-> +			      bool inc_opt)
->   {
->   	struct sk_buff *skb;
->   	struct in6_addr tmpaddr;
-> @@ -555,8 +558,10 @@ static void ndisc_send_unsol_na(struct net_device *dev)
->   	in6_dev_put(idev);
->   }
->   
-> -void ndisc_send_ns(struct net_device *dev, const struct in6_addr *solicit,
-> -		   const struct in6_addr *daddr, const struct in6_addr *saddr)
-> +static void ip6_ndisc_send_ns(struct net_device *dev,
-> +			      const struct in6_addr *solicit,
-> +			      const struct in6_addr *daddr,
-> +			      const struct in6_addr *saddr)
->   {
->   	struct sk_buff *skb;
->   	struct in6_addr addr_buf;
-> @@ -702,7 +707,7 @@ static int pndisc_is_router(const void *pkey,
->   	return ret;
->   }
->   
-> -static void ndisc_recv_ns(struct sk_buff *skb)
-> +static void ip6_ndisc_recv_ns(struct sk_buff *skb)
->   {
->   	struct nd_msg *msg = (struct nd_msg *)skb_transport_header(skb);
->   	const struct in6_addr *saddr = &ipv6_hdr(skb)->saddr;
-> @@ -738,7 +743,7 @@ static void ndisc_recv_ns(struct sk_buff *skb)
->   		return;
->   	}
->   
-> -	if (!ndisc_parse_options(msg->opt, ndoptlen, &ndopts)) {
-> +	if (!ndisc_parse_options(dev, msg->opt, ndoptlen, &ndopts)) {
->   		ND_PRINTK(2, warn, "NS: invalid ND options\n");
->   		return;
->   	}
-> @@ -874,7 +879,7 @@ out:
->   		in6_dev_put(idev);
->   }
->   
-> -static void ndisc_recv_na(struct sk_buff *skb)
-> +static void ip6_ndisc_recv_na(struct sk_buff *skb)
->   {
->   	struct nd_msg *msg = (struct nd_msg *)skb_transport_header(skb);
->   	struct in6_addr *saddr = &ipv6_hdr(skb)->saddr;
-> @@ -912,7 +917,7 @@ static void ndisc_recv_na(struct sk_buff *skb)
->   	    idev->cnf.drop_unsolicited_na)
->   		return;
->   
-> -	if (!ndisc_parse_options(msg->opt, ndoptlen, &ndopts)) {
-> +	if (!ndisc_parse_options(dev, msg->opt, ndoptlen, &ndopts)) {
->   		ND_PRINTK(2, warn, "NS: invalid ND option\n");
->   		return;
->   	}
-> @@ -1019,7 +1024,7 @@ static void ndisc_recv_rs(struct sk_buff *skb)
->   		goto out;
->   
->   	/* Parse ND options */
-> -	if (!ndisc_parse_options(rs_msg->opt, ndoptlen, &ndopts)) {
-> +	if (!ndisc_parse_options(skb->dev, rs_msg->opt, ndoptlen, &ndopts)) {
->   		ND_PRINTK(2, notice, "NS: invalid ND option, ignored\n");
->   		goto out;
->   	}
-> @@ -1137,7 +1142,7 @@ static void ndisc_router_discovery(struct sk_buff *skb)
->   		return;
->   	}
->   
-> -	if (!ndisc_parse_options(opt, optlen, &ndopts)) {
-> +	if (!ndisc_parse_options(skb->dev, opt, optlen, &ndopts)) {
->   		ND_PRINTK(2, warn, "RA: invalid ND options\n");
->   		return;
->   	}
-> @@ -1424,7 +1429,8 @@ skip_routeinfo:
->   		struct nd_opt_hdr *p;
->   		for (p = ndopts.nd_useropts;
->   		     p;
-> -		     p = ndisc_next_useropt(p, ndopts.nd_useropts_end)) {
-> +		     p = ndisc_next_useropt(skb->dev, p,
-> +					    ndopts.nd_useropts_end)) {
->   			ndisc_ra_useropt(skb, p);
->   		}
->   	}
-> @@ -1462,7 +1468,7 @@ static void ndisc_redirect_rcv(struct sk_buff *skb)
->   		return;
->   	}
->   
-> -	if (!ndisc_parse_options(msg->opt, ndoptlen, &ndopts))
-> +	if (!ndisc_parse_options(skb->dev, msg->opt, ndoptlen, &ndopts))
->   		return;
->   
->   	if (!ndopts.nd_opts_rh) {
-> @@ -1783,6 +1789,29 @@ int ndisc_ifinfo_sysctl_change(struct ctl_table *ctl, int write, void __user *bu
->   
->   #endif
->   
-> +static const struct ndisc_ops ip6_ndisc_ops = {
-> +	.is_useropt = ip6_ndisc_is_useropt,
-> +	.send_na = ip6_ndisc_send_na,
-> +	.recv_na = ip6_ndisc_recv_na,
-> +	.send_ns = ip6_ndisc_send_ns,
-> +	.recv_ns = ip6_ndisc_recv_ns,
+So any of these errors could be causing the problem, perhaps it is the
+device that requires higher security.
 
-Here I would also think ipv6 as prefix would be nicer.
+> Is this, therefore, an error with my program (I have spent hours checking it
+> and cannot find any errors)? Or a possible bug with BlueZ? There are very
+> few resources online for this kind of thing so I ended up resorting to the
+> Bluetooth mailing list - please notify me if this is the wrong kind of stuff
+> to be asking.
+>
+> The micro:bit is the only LE device which has ever connected to this
+> (laptop) computer, and the characteristic (and its service) which I am
+> reading from do both exist as DBUS objects. My grasp of the DBUS system is
+> rather rudimentary, and so far has just been gained from BlueZ examples.
+>
+> I have checked using the DBUS API to make sure that the device is both
+> paired and connected - both said yes, but, as previously said I get an error
+> (more specifically, an exception is thrown when I try to call "<DBUS
+> interface to characteristic>.ReadValue()").
 
-> +};
-> +
-> +void ip6_register_ndisc_ops(struct net_device *dev)
-> +{
-> +	switch (dev->type) {
-> +	default:
-> +		if (dev->ndisc_ops) {
-> +			ND_PRINTK(2, warn,
-> +				  "%s: ndisc_ops already defined for interface type=%d\n",
-> +				  __func__, dev->type);
-> +		} else {
-> +			dev->ndisc_ops = &ip6_ndisc_ops;
-> +		}
-> +		break;
-> +	}
-> +}
-> +
->   static int __net_init ndisc_net_init(struct net *net)
->   {
->   	struct ipv6_pinfo *np;
-> diff --git a/net/ipv6/route.c b/net/ipv6/route.c
-> index cc180b3..5fa276d 100644
-> --- a/net/ipv6/route.c
-> +++ b/net/ipv6/route.c
-> @@ -2149,7 +2149,7 @@ static void rt6_do_redirect(struct dst_entry *dst, struct sock *sk, struct sk_bu
->   	 *	first-hop router for the specified ICMP Destination Address.
->   	 */
->   
-> -	if (!ndisc_parse_options(msg->opt, optlen, &ndopts)) {
-> +	if (!ndisc_parse_options(skb->dev, msg->opt, optlen, &ndopts)) {
->   		net_dbg_ratelimited("rt6_redirect: invalid ND options\n");
->   		return;
->   	}
+How you are actually testing this, perhaps you should try using bluetoothctl:
 
-Reviewed-by: Stefan Schmidt<stefan@osg.samsung.com>
+> agent on
+> default-agent
+> pair <address>
+> select-attribute <object>
+> read
 
-regards
-Stefan Schmidt
+> Is this my doing, or an issue with something out of my control? Any help
+> will be appreciated :)
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
+> in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
+-- 
+Luiz Augusto von Dentz
