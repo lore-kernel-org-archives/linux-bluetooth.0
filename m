@@ -1,72 +1,34 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Date: Thu, 5 May 2016 13:01:15 -0700
-From: Tedd Ho-Jeong An <tedd.an@intel.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Cc: Tedd Ho-Jeong An <tedd.an@intel.com>
-Subject: [PATCH] Bluetooth: Add support for Intel Bluetooth device 8265
- [8087:0a2b]
-Message-ID: <20160505130115.506a4d13@fedora-linux-22.shared>
+Subject: Re: DBUS API error "Not paired" when attempting to read GATT
+ characteristic
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+References: <5728C5DA.7000703@gmail.com>
+ <CABBYNZLiv7uY-i3W+TcieskEQqrxC6Y0pUkFatDSqL_wrsnHpg@mail.gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+From: Joe Glancy <joe.t.glancy@gmail.com>
+Message-ID: <572B7FC7.7020502@gmail.com>
+Date: Thu, 5 May 2016 18:15:51 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <CABBYNZLiv7uY-i3W+TcieskEQqrxC6Y0pUkFatDSqL_wrsnHpg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Tedd Ho-Jeong An <tedd.an@intel.com>
+Hello Luiz,
 
-This patch adds support for Intel Bluetooth device 8265 also known
-as Windstorm Peak (WsP).
+> How you are actually testing this, perhaps you should try using bluetoothctl:
+>
+>> agent on
+>> default-agent
+>> pair <address>
 
-T:  Bus=01 Lev=01 Prnt=01 Port=01 Cnt=02 Dev#=  6 Spd=12   MxCh= 0
-D:  Ver= 2.00 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=8087 ProdID=0a2b Rev= 0.10
-C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
-I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=81(I) Atr=03(Int.) MxPS=  64 Ivl=1ms
-E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+Unfortunately, with the above `agent` commands the device does not pair, 
+and instead hangs. The btmon logs for the following three scenarios are 
+available at 
+https://gist.github.com/JoeGlancy/a5486660f2f59c627b6da32c810927f9:
 
-Signed-off-by: Tedd Ho-Jeong An <tedd.an@intel.com>
----
- drivers/bluetooth/btusb.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 0d4e372..4763e8c 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -2001,12 +2001,12 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
- 		return -EINVAL;
- 	}
- 
--	/* At the moment only the hardware variant iBT 3.0 (LnP/SfP) is
-+	/* At the moment only the hardware variant iBT 3.0 (LnP/SfP/WsP) is
- 	 * supported by this firmware loading method. This check has been
- 	 * put in place to ensure correct forward compatibility options
- 	 * when newer hardware variants come along.
- 	 */
--	if (ver.hw_variant != 0x0b) {
-+	if ((ver.hw_variant != 0x0b) && (ver.hw_variant != 0x0c)) {
- 		BT_ERR("%s: Unsupported Intel hardware variant (%u)",
- 		       hdev->name, ver.hw_variant);
- 		return -EINVAL;
--- 
-2.4.11
-
+  - pairing the device through Ubuntu's default Bluetooth manager
+  - pairing the device through bluetoothctl without issuing the above 
+`agent on`/`default-agent` commands
+  - pairing the device through bluetoothctl, issuing the above `agent 
+on`/`default-agent` commands before issuing the pair command.
