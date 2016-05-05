@@ -1,75 +1,150 @@
-Return-Path: <linux-kernel-owner@vger.kernel.org>
-From: Amitkumar Karwar <akarwar@marvell.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <linux-kernel@vger.kernel.org>, Ganapathi Bhat <gbhat@marvell.com>,
-	Amitkumar Karwar <akarwar@marvell.com>
-Subject: [PATCH v10 1/3] Bluetooth: hci_uart: add prepare callbacks to hci_uart_proto structure.
-Date: Thu, 5 May 2016 08:08:20 -0700
-Message-ID: <1462460902-25439-1-git-send-email-akarwar@marvell.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Sender: linux-kernel-owner@vger.kernel.org
+Return-Path: <salvatore.benedetto@intel.com>
+From: Salvatore Benedetto <salvatore.benedetto@intel.com>
+To: herbert@gondor.apana.org.au,
+	gustavo@padovan.org,
+	linux-bluetooth@vger.kernel.org
+Cc: salvatore.benedetto@intel.com,
+	linux-crypto@vger.kernel.org,
+	marcel@holtmann.org,
+	johan.hedberg@gmail.com
+Subject: [PATCH] Bluetooth: convert smp module to crypto kpp API
+Date: Thu,  5 May 2016 10:22:46 +0100
+Message-Id: <1462440166-94042-1-git-send-email-salvatore.benedetto@intel.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Ganapathi Bhat <gbhat@marvell.com>
+This patch has *not* been tested as I don't have the hardware.
+It's purpose is to show how to use the kpp API.
 
-The new callback is used to prepare the device before HCI becomes
-ready. One can use this to download firmware if the download process
-doesn't use HCI commands. Also recv_for_prepare callback is
-introduced for receiving data from devices during prepare phase.
+Based on https://patchwork.kernel.org/patch/9022371/
 
-Signed-off-by: Ganapathi Bhat <gbhat@marvell.com>
-Signed-off-by: Amitkumar Karwar <akarwar@marvell.com>
+Signed-off-by: Salvatore Benedetto <salvatore.benedetto@intel.com>
 ---
- drivers/bluetooth/hci_ldisc.c | 11 ++++++++++-
- drivers/bluetooth/hci_uart.h  |  3 +++
- 2 files changed, 13 insertions(+), 1 deletion(-)
+ net/bluetooth/smp.c | 99 ++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 98 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
-index 49b3e1e..b4ee682 100644
---- a/drivers/bluetooth/hci_ldisc.c
-+++ b/drivers/bluetooth/hci_ldisc.c
-@@ -551,8 +551,11 @@ static void hci_uart_tty_receive(struct tty_struct *tty, const u8 *data,
- 	if (!hu || tty != hu->tty)
- 		return;
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index 50976a6..25844a2 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -25,6 +25,8 @@
+ #include <crypto/b128ops.h>
+ #include <crypto/hash.h>
+ #include <crypto/skcipher.h>
++#include <crypto/kpp.h>
++#include <crypto/ecdh.h>
  
--	if (!test_bit(HCI_UART_PROTO_READY, &hu->flags))
-+	if (!test_bit(HCI_UART_PROTO_READY, &hu->flags)) {
-+		if (hu->proto->recv_for_prepare)
-+			hu->proto->recv_for_prepare(hu, data, count);
- 		return;
-+	}
+ #include <net/bluetooth/bluetooth.h>
+ #include <net/bluetooth/hci_core.h>
+@@ -2591,6 +2593,101 @@ static u8 sc_select_method(struct smp_chan *smp)
+ 	return method;
+ }
  
- 	/* It does not need a lock here as it is already protected by a mutex in
- 	 * tty caller
-@@ -639,6 +642,12 @@ static int hci_uart_set_proto(struct hci_uart *hu, int id)
- 		return err;
- 
- 	hu->proto = p;
-+	if (p->prepare) {
-+		err = p->prepare(hu);
-+		if (err)
-+			return err;
++struct ecdh_completion {
++	struct completion completion;
++	int err;
++};
++
++static void ecdh_complete(struct crypto_async_request *req, int err)
++{
++	struct ecdh_completion *res = req->data;
++
++	if (err == -EINPROGRESS)
++		return;
++
++	res->err = err;
++	complete(&res->completion);
++}
++
++static inline void swap_digits(u64 *in, u64 *out, unsigned int ndigits)
++{
++	int i;
++
++	for (i = 0; i < ndigits; i++)
++		out[i] = __swab64(in[ndigits - 1 - i]);
++}
++
++static bool compute_ecdh_shared_secret(const u8 public_key[64],
++				       const u8 private_key[32], u8 secret[32])
++{
++	struct crypto_kpp *tfm;
++	struct kpp_request *req;
++	struct ecdh_params p;
++	struct ecdh_completion result;
++	struct scatterlist src, dst;
++	u8 tmp[64];
++	int err = -ENOMEM;
++
++	tfm = crypto_alloc_kpp("ecdh", CRYPTO_ALG_INTERNAL, 0);
++	if (IS_ERR(tfm)) {
++		pr_err("alg: kpp: Failed to load tfm for kpp: %ld\n",
++		       PTR_ERR(tfm));
++		return false;
 +	}
 +
- 	set_bit(HCI_UART_PROTO_READY, &hu->flags);
++	req = kpp_request_alloc(tfm, GFP_KERNEL);
++	if (!req)
++		goto free_kpp;
++
++	init_completion(&result.completion);
++
++	/* Set curve_id */
++	p.curve_id = ECC_CURVE_NIST_P256;
++	err = crypto_kpp_set_params(tfm, (void *)&p, sizeof(p));
++	if (err)
++		goto free_req;
++
++	/* Security Manager Protocol holds digits in litte-endian order
++	 * while ECC API expect big-endian data
++	 */
++	swap_digits((u64 *)private_key, (u64 *)tmp, 4);
++
++	/* Set A private Key */
++	err = crypto_kpp_set_secret(tfm, (void *)tmp, 32);
++	if (err)
++		goto free_all;
++
++	swap_digits((u64 *)public_key, (u64 *)tmp, 4); /* x */
++	swap_digits((u64 *)&public_key[32], (u64 *)&tmp[32], 4); /* y */
++
++	sg_init_one(&src, tmp, 64);
++	sg_init_one(&dst, secret, 32);
++	kpp_request_set_input(req, &src, 64);
++	kpp_request_set_output(req, &dst, 32);
++	kpp_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
++				 ecdh_complete, &result);
++	err = crypto_kpp_compute_shared_secret(req);
++	if (err == -EINPROGRESS) {
++		wait_for_completion(&result.completion);
++		err = result.err;
++	}
++	if (err < 0) {
++		pr_err("alg: ecdh: compute shard secret test failed. err %d\n",
++		       err);
++		goto free_all;
++	}
++
++	swap_digits((u64 *)secret, (u64 *)tmp, 4);
++	memcpy(secret, tmp, 32);
++
++free_all:
++free_req:
++	kpp_request_free(req);
++free_kpp:
++	crypto_free_kpp(tfm);
++	return (err == 0);
++}
++
+ static int smp_cmd_public_key(struct l2cap_conn *conn, struct sk_buff *skb)
+ {
+ 	struct smp_cmd_public_key *key = (void *) skb->data;
+@@ -2630,7 +2727,7 @@ static int smp_cmd_public_key(struct l2cap_conn *conn, struct sk_buff *skb)
+ 	SMP_DBG("Remote Public Key X: %32phN", smp->remote_pk);
+ 	SMP_DBG("Remote Public Key Y: %32phN", smp->remote_pk + 32);
  
- 	err = hci_uart_register_dev(hu);
-diff --git a/drivers/bluetooth/hci_uart.h b/drivers/bluetooth/hci_uart.h
-index 839bad1..17ba3b4 100644
---- a/drivers/bluetooth/hci_uart.h
-+++ b/drivers/bluetooth/hci_uart.h
-@@ -67,8 +67,11 @@ struct hci_uart_proto {
- 	int (*close)(struct hci_uart *hu);
- 	int (*flush)(struct hci_uart *hu);
- 	int (*setup)(struct hci_uart *hu);
-+	int (*prepare)(struct hci_uart *hu);
- 	int (*set_baudrate)(struct hci_uart *hu, unsigned int speed);
- 	int (*recv)(struct hci_uart *hu, const void *data, int len);
-+	int (*recv_for_prepare)(struct hci_uart *hu, const void *data,
-+				int len);
- 	int (*enqueue)(struct hci_uart *hu, struct sk_buff *skb);
- 	struct sk_buff *(*dequeue)(struct hci_uart *hu);
- };
+-	if (!ecdh_shared_secret(smp->remote_pk, smp->local_sk, smp->dhkey))
++	if (!compute_ecdh_shared_secret(smp->remote_pk, smp->local_sk, smp->dhkey))
+ 		return SMP_UNSPECIFIED;
+ 
+ 	SMP_DBG("DHKey %32phN", smp->dhkey);
 -- 
-1.8.1.4
+1.9.1
