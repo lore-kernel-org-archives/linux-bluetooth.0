@@ -1,34 +1,30 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Subject: Re: DBUS API error "Not paired" when attempting to read GATT
- characteristic
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-References: <5728C5DA.7000703@gmail.com>
- <CABBYNZLiv7uY-i3W+TcieskEQqrxC6Y0pUkFatDSqL_wrsnHpg@mail.gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-From: Joe Glancy <joe.t.glancy@gmail.com>
-Message-ID: <572B7FC7.7020502@gmail.com>
-Date: Thu, 5 May 2016 18:15:51 +0100
-MIME-Version: 1.0
-In-Reply-To: <CABBYNZLiv7uY-i3W+TcieskEQqrxC6Y0pUkFatDSqL_wrsnHpg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <linux-crypto-owner@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
+Subject: Re: [PATCH] Bluetooth: convert smp module to crypto kpp API
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1462440166-94042-1-git-send-email-salvatore.benedetto@intel.com>
+Date: Thu, 5 May 2016 08:51:00 -0700
+Cc: herbert@gondor.apana.org.au,
+	"Gustavo F. Padovan" <gustavo@padovan.org>,
+	linux-bluetooth@vger.kernel.org, linux-crypto@vger.kernel.org,
+	Johan Hedberg <johan.hedberg@gmail.com>
+Message-Id: <0CBA8F3F-333C-4E22-B1B9-6FC8734513A7@holtmann.org>
+References: <1462440166-94042-1-git-send-email-salvatore.benedetto@intel.com>
+To: Salvatore Benedetto <salvatore.benedetto@intel.com>
+Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello Luiz,
+Hi Salvatore,
 
-> How you are actually testing this, perhaps you should try using bluetoothctl:
->
->> agent on
->> default-agent
->> pair <address>
+> This patch has *not* been tested as I don't have the hardware.
+> It's purpose is to show how to use the kpp API.
+> 
+> Based on https://patchwork.kernel.org/patch/9022371/
 
-Unfortunately, with the above `agent` commands the device does not pair, 
-and instead hangs. The btmon logs for the following three scenarios are 
-available at 
-https://gist.github.com/JoeGlancy/a5486660f2f59c627b6da32c810927f9:
+actually you should be able to verify this without hardware. The BlueZ userspace package contains tools/mgmt-tester and tools/smp-tester which should both exercise most of the Bluetooth Security Manager (SMP) pieces.
 
-  - pairing the device through Ubuntu's default Bluetooth manager
-  - pairing the device through bluetoothctl without issuing the above 
-`agent on`/`default-agent` commands
-  - pairing the device through bluetoothctl, issuing the above `agent 
-on`/`default-agent` commands before issuing the pair command.
+Regards
+
+Marcel
+
