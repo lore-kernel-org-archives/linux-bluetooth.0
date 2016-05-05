@@ -1,57 +1,29 @@
 Return-Path: <linux-kernel-owner@vger.kernel.org>
-From: Amitkumar Karwar <akarwar@marvell.com>
-To: One Thousand Gnomes <gnomes@lxorguk.ukuu.org.uk>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	Ganapathi Bhat <gbhat@marvell.com>,
-	Cathy Luo <cluo@marvell.com>
-Subject: RE: [PATCH v10 1/3] Bluetooth: hci_uart: add prepare callbacks to
- hci_uart_proto structure.
-Date: Thu, 5 May 2016 15:27:42 +0000
-Message-ID: <55b348bd1f384dfaac8d8850127df018@SC-EXCH04.marvell.com>
+Date: Thu, 5 May 2016 16:22:38 +0100
+From: One Thousand Gnomes <gnomes@lxorguk.ukuu.org.uk>
+To: Amitkumar Karwar <akarwar@marvell.com>
+Cc: <linux-bluetooth@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	Ganapathi Bhat <gbhat@marvell.com>
+Subject: Re: [PATCH v10 3/3] Bluetooth: hci_uart: Support firmware download
+ for Marvell
+Message-ID: <20160505162238.44f7ed6d@lxorguk.ukuu.org.uk>
+In-Reply-To: <1462460902-25439-3-git-send-email-akarwar@marvell.com>
 References: <1462460902-25439-1-git-send-email-akarwar@marvell.com>
- <20160505161906.14267bd0@lxorguk.ukuu.org.uk>
-In-Reply-To: <20160505161906.14267bd0@lxorguk.ukuu.org.uk>
-Content-Type: text/plain; charset="us-ascii"
+	<1462460902-25439-3-git-send-email-akarwar@marvell.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alan,
+> +/* Send ACK/NAK to the device */
+> +static void mrvl_send_ack(struct hci_uart *hu, unsigned char ack)
+> +{
+> +	struct tty_struct *tty = hu->tty;
+> +
+> +	tty->ops->write(tty, &ack, sizeof(ack));
+> +}
 
-> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
-> owner@vger.kernel.org] On Behalf Of One Thousand Gnomes
-> Sent: Thursday, May 05, 2016 8:49 PM
-> To: Amitkumar Karwar
-> Cc: linux-bluetooth@vger.kernel.org; linux-kernel@vger.kernel.org;
-> Ganapathi Bhat
-> Subject: Re: [PATCH v10 1/3] Bluetooth: hci_uart: add prepare callbacks
-> to hci_uart_proto structure.
-> 
-> On Thu, 5 May 2016 08:08:20 -0700
-> Amitkumar Karwar <akarwar@marvell.com> wrote:
-> 
-> > From: Ganapathi Bhat <gbhat@marvell.com>
-> >
-> > The new callback is used to prepare the device before HCI becomes
-> > ready. One can use this to download firmware if the download process
-> > doesn't use HCI commands. Also recv_for_prepare callback is introduced
-> > for receiving data from devices during prepare phase.
-> 
-> If your device is not speaking HCI protocol then instead of hackig up
-> the HCI ldisc would it not make more sense to have a tiny ldisc for your
-> firmware loader instead of adding crap to the fast paths of what is
-> currently a clean properly separated out interface ?
-> 
+You don't know if the device has a write method, and it should be locked.
+This should go via your ldisc not directly.
 
-Below is the code change. It won't add any overhead for existing receive path. 
-
--       if (!test_bit(HCI_UART_PROTO_READY, &hu->flags))
-+       if (!test_bit(HCI_UART_PROTO_READY, &hu->flags)) {
-+               if (hu->proto->recv_for_prepare)
-+                       hu->proto->recv_for_prepare(hu, data, count);
-                return;
-+       }
-
-Regards,
-Amitkumar
+Alan
