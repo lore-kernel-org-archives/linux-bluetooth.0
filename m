@@ -1,35 +1,48 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
-Subject: Re: connect() returning EINPROGRESS
+Subject: Re: Bluez 5.39 Secure Connection (SC) and uncompliant devices
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CAGup35xNHnGOeB2KT9n0oUBetqRJVygmHbNZBaNqu9HXw+98nA@mail.gmail.com>
-Date: Fri, 6 May 2016 09:09:16 -0700
+In-Reply-To: <CAE-M4kpe3S-9Gedm_dHU+D2YMhWGbBEjm59sYB77pDjsEVkC4w@mail.gmail.com>
+Date: Fri, 6 May 2016 09:08:01 -0700
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <ED3CFF35-4B10-403E-B435-4DD69A5DFB90@holtmann.org>
-References: <CAGup35xNHnGOeB2KT9n0oUBetqRJVygmHbNZBaNqu9HXw+98nA@mail.gmail.com>
-To: Allan Hessenflow <allan@flynixie.com>
+Message-Id: <2323BDE3-075A-443F-B8E7-777753EE43FE@holtmann.org>
+References: <CAE-M4kpe3S-9Gedm_dHU+D2YMhWGbBEjm59sYB77pDjsEVkC4w@mail.gmail.com>
+To: Roberto Pierpaoli <roberto@iooota.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Allan,
+Hi Roberto,
 
-> I have a tool that was developed with bluez 4.101 and it works fine
-> there.  Now I'm trying to get it to run on a different machine with
-> bluez 5.37 and it is failing.  It communicates with a BLE device.  It
-> first listens to advertising packets until it sees the device it is
-> looking for, then does an hci_le_create_conn().  That much appears to
-> work fine.  It creates a bluetooth socket, binds it (to BDADDR_ANY),
-> and does a setsockopt() to set BT_SECURITY to BT_SECURITY_LOW.  All of
-> that returns success.  Finally it does a connect().  That goes away
-> for quite a while (I haven't timed it, something on the order of a
-> minute) and then returns non-zero with errno set to EINPROGRESS.  I
-> didn't explicitly set the socket to non-blocking and it certainly
-> doesn't appear to be some implicitly set characteristic since it takes
-> so long to return, so I don't know what EINPROGRESS could mean in this
-> case.  Can anyone tell what I'm doing wrong?
+> Environment:
+> 
+> - linux kernel 4.2.0 i686
+> - Ubuntu 15.10 distribution
+> - Bluez 5.39 compiled from source (--enable-experimental --enable-library)
+> 
+> I'm trying to pair my Broadcom BCM20702A0 dongle with the BLE device
+> "Xiaomi MiBand".
+> 
+> I've figured out that the MiBand does not support the following pairing request:
+> 
+>> Authentication requirement: Bonding, MITM, **SC**, No Keypresses (0x0d)
+> 
+> 
+> The response is the following:
+> 
+>>> ACL Data RX: Handle 32 flags 0x02 dlen 6
+>>      SMP: Pairing Failed (0x05) len 1
+>>        Reason: Invalid parameters (0x0a)
+> 
+> 
+> The problem seems to reside in the "SC" requirement: I've found
+> someone sharing the same problem on the Chromium Project's tracking
+> system ==> https://bugs.chromium.org/p/chromium/issues/detail?id=522965
+> 
+> Is it possible to loosen the requirements in the request (expecially
+> "SC"), so that it won't be rejected by the MiBand device?
 
-do you have a dead simple proof-of-concept that can show this issue. I do not recall any of this issue. Have you tried it with the latest bluetooth-next kernel?
+the only way is to turn Secure Connections off. However the peripheral is clearly not spec compliant since the spec text is 100% clear that unknown auth requirements bits are required to be ignored on reception. There are even qualification test cases for this if I remember correctly.
 
 Regards
 
