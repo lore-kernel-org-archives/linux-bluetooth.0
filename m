@@ -1,91 +1,62 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Vinicius Costa Gomes <vinicius.gomes@intel.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+To: =?utf-8?B?SGFra8SxIEfDtsOnZW/En2x1?= <hakki@bir618.com>,
 	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ 1/4] doc/gatt-api: Add options dictionary to ReadValue/WriteValue
-In-Reply-To: <1462561862-500-1-git-send-email-luiz.dentz@gmail.com>
-References: <1462561862-500-1-git-send-email-luiz.dentz@gmail.com>
-Date: Fri, 06 May 2016 19:18:20 -0300
-Message-ID: <87zis2espf.fsf@intel.com>
+Subject: Re: bluez dbus ble connection problem when a filter is set
+In-Reply-To: <CADrC6Gxef2A=EsVLxG-izD4xBKvrBW85wOzybuZCrr-OL52VSw@mail.gmail.com>
+References: <CADrC6Gxef2A=EsVLxG-izD4xBKvrBW85wOzybuZCrr-OL52VSw@mail.gmail.com>
+Date: Fri, 06 May 2016 18:54:05 -0300
+Message-ID: <8737pug8ea.fsf@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=utf-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Luiz Augusto von Dentz <luiz.dentz@gmail.com> writes:
+Hi hakkig,
 
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> This adds the possibility to pass an offset to these operations, and
-> also in the server case to give the device object.
-> ---
->  doc/gatt-api.txt    |  20 ++++--
->  src/gatt-client.c   | 135 +++++++++++++++++++++++++++++----------
->  src/gatt-database.c | 177 +++++++++++++++++++++++++++++++++++++---------------
->  3 files changed, 245 insertions(+), 87 deletions(-)
->
-> diff --git a/doc/gatt-api.txt b/doc/gatt-api.txt
-> index ad2ab16..683b1b7 100644
-> --- a/doc/gatt-api.txt
-> +++ b/doc/gatt-api.txt
-> @@ -61,23 +61,29 @@ Service		org.bluez
->  Interface	org.bluez.GattCharacteristic1 [Experimental]
->  Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX/serviceXX/charYYYY
->
-> -Methods		array{byte} ReadValue()
-> +Methods		array{byte} ReadValue(dict options)
->
->  			Issues a request to read the value of the
->  			characteristic and returns the value if the
->  			operation was successful.
->
-> +			Possible options: "offset": uint16 offset
-> +					  "device": Object Device (Server only)
-> +
+Hakkı Göçeoğlu <hakki@bir618.com> writes:
 
-[...]
+> Hi All,
+>
+> raspberry pi 3
+> bluez v5.39
+> testing platform client/bluetoothctl
+
+Which kernel version are you running?
 
 >
-> +static int parse_options(DBusMessage *msg, uint16_t *offset)
-> +{
-> +	DBusMessageIter args, flags;
-> +
-> +	if (!dbus_message_iter_init(msg, &args))
-> +		return -EINVAL;
-> +
-> +	if (dbus_message_iter_get_arg_type(&args) != DBUS_TYPE_ARRAY)
-> +		return -EINVAL;
-> +
-> +	dbus_message_iter_recurse(&args, &flags);
-> +	if (dbus_message_iter_get_arg_type(&flags) != DBUS_TYPE_DICT_ENTRY)
-> +		return -EINVAL;
-> +
+> I have a ble peripheral device advertising a custom uuid.
+> Within bluetoothctl when I try to connect to it after a filter is set,
+> one third of the time I get an error.
+> There is no problem if no filter is set, turning scanning off before
+> the connect command does not help.
+>
+> Here is an example flow within bluetoothctl
+>
+> [bluetooth]# set-scan-filter-uuids f655b638-fead-4268-b07c-e5d79d09b22b
+> SetDiscoveryFilter success
+> [bluetooth]# scan on
+> Discovery started
+> [CHG] Controller B8:27:EB:37:3F:CD Discovering: yes
+> [NEW] Device CF:05:30:F2:6F:5E CF-05-30-F2-6F-5E
+> [bluetooth]# connect CF:05:30:F2:6F:5E
+> Attempting to connect to CF:05:30:F2:6F:5E
+> [CHG] Device CF:05:30:F2:6F:5E Connected: yes
+> Failed to connect: org.bluez.Error.Failed
+> [CHG] Device CF:05:30:F2:6F:5E Connected: no
 
-I would think that from the documentation, "Possible options", that providing
-the offset would be optional. I don't think much is gained making this mandatory.
+I couldn't reproduce this, can you provide the btmon output when this
+happens?
 
-> +	while (dbus_message_iter_get_arg_type(&flags) == DBUS_TYPE_DICT_ENTRY) {
-> +		const char *key;
-> +		DBusMessageIter value, entry;
-> +		int var;
-> +
-> +		dbus_message_iter_recurse(&flags, &entry);
-> +		dbus_message_iter_get_basic(&entry, &key);
-> +
-> +		dbus_message_iter_next(&entry);
-> +		dbus_message_iter_recurse(&entry, &value);
-> +
-> +		var = dbus_message_iter_get_arg_type(&value);
-> +		if (strcasecmp(key, "offset") == 0) {
-> +			if (var != DBUS_TYPE_UINT16)
-> +				return -EINVAL;
-> +			dbus_message_iter_get_basic(&value, offset);
-> +		}
-> +	}
-> +
-> +	return 0;
-> +}
-> +
+>
+>
+> Any ideas? Thanks in advance, cheers
+>
+> hakkig
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
 
 Cheers,
