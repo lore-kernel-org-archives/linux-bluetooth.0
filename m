@@ -1,105 +1,93 @@
-Return-Path: <hannes@stressinduktion.org>
-Subject: Re: [PATCHv2 bluetooth-next 04/10] ndisc: add addr_len parameter to
- ndisc_opt_addr_space
-To: Alexander Aring <aar@pengutronix.de>, linux-wpan@vger.kernel.org
-References: <1461140382-4784-1-git-send-email-aar@pengutronix.de>
- <1461140382-4784-5-git-send-email-aar@pengutronix.de>
- <109698cb-18ae-abdb-34a5-1db5a2e8dc6b@stressinduktion.org>
- <800c5c08-c2c8-3b44-d457-cdcf6374f280@pengutronix.de>
-Cc: kernel@pengutronix.de, marcel@holtmann.org,
- jukka.rissanen@linux.intel.com, stefan@osg.samsung.com, mcr@sandelman.ca,
- werner@almesberger.net, linux-bluetooth@vger.kernel.org,
- netdev@vger.kernel.org, "David S . Miller" <davem@davemloft.net>,
- Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>, James Morris <jmorris@namei.org>,
- Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
- Patrick McHardy <kaber@trash.net>
-From: Hannes Frederic Sowa <hannes@stressinduktion.org>
-Message-ID: <240084aa-2751-6f24-c07b-662b19a74475@stressinduktion.org>
-Date: Sat, 7 May 2016 00:23:20 +0200
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ 1/4] doc/gatt-api: Add options dictionary to ReadValue/WriteValue
+In-Reply-To: <1462561862-500-1-git-send-email-luiz.dentz@gmail.com>
+References: <1462561862-500-1-git-send-email-luiz.dentz@gmail.com>
+Date: Fri, 06 May 2016 19:18:20 -0300
+Message-ID: <87zis2espf.fsf@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <800c5c08-c2c8-3b44-d457-cdcf6374f280@pengutronix.de>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 04.05.2016 14:30, Alexander Aring wrote:
-> Hi,
-> 
-> On 05/02/2016 09:37 PM, Hannes Frederic Sowa wrote:
->> On 20.04.2016 10:19, Alexander Aring wrote:
->>> This patch makes the address length as argument for the
->>> ndisc_opt_addr_space function. This is necessary to handle addresses
->>> which don't use dev->addr_len as address length.
->>
->> Would it make sense for patch 4, 5 and 6 to add the operation to ndisc_ops?
->>
-> 
-> not sure if I understand this question right,
-> 
-> We have now the ndisc_ops where we can could change the send/recv of
-> NS/NA, also is_useropt (for add 6CO RA is userspace option field).
-> 
-> In case of 802.15.4 we have two MAC addresses with different length:
-> 
->  - extended address - 8 bytes => EUI64
->  - short address - 2 bytes
-> 
-> Now [0] describes how to make the source/target address option for
-> NS/NA/RS/RA/... to deal with both addresses.
-> 
-> The short address is a special case in 802.15.4 and not always
-> available. If available we add both addresses as option field in
-> NS/NA (RS/RA will follow in future, but currently NS/NA only).
-> 
-> At this point the understanding of [0] differs in 6LoWPAN
-> implementations.
-> 
-> Some people handles it like:
-> 
-> Handle the short address/extended address in XOR case of 6LoWPAN
-> interface. The interface has as MAC address the extended XOR short (if
-> available), depends on setting.
-> 
-> Then dev->addr_len is 8 XOR 2.
-> 
-> Other people (inclusive me) handle it like:
-> 
-> Handle the short/extended address in case of OR, but never short address
-> alone. The interface can be accessed by extended address or short
-> address and each neighbour stores both information.
-> 
-> The case "short address never alone" means that the extended address is
-> always available and MUST be there.
-> 
-> Furthermore, depends on L3 addressing it could be useful to have the
-> possibility to decide if using or short OR extended address as L2 address
-> for do better compressing stuff.
-> 
+Luiz Augusto von Dentz <luiz.dentz@gmail.com> writes:
+
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> This adds the possibility to pass an offset to these operations, and
+> also in the server case to give the device object.
 > ---
-> 
-> I implement it as OR case, so we add both addresses when short address
-> is available. Also we drop NS/NA when the short address is given only,
-> in theory we could also react on this and store a "dummy" 0x00..00
-> address for extended address then.
-> 
-> Not sure how it need to be handled correctly, for now I implemented how
-> I understand it.
-> 
-> In case of the OR case, we need to add two option fields for the
-> address, extended and short. This is why I do the calculation stuff more
-> accessible with different address lengths, so we can use 8 or 2 and not
-> dev->addr_len which stores always the 802.15.4 EUI64 address length.
-> 
-> And the answer would be, no it makes no sense because we need to call
-> these functions with 8 (dev->addr_len) and 2 (if short addr is
-> available).
+>  doc/gatt-api.txt    |  20 ++++--
+>  src/gatt-client.c   | 135 +++++++++++++++++++++++++++++----------
+>  src/gatt-database.c | 177 +++++++++++++++++++++++++++++++++++++---------------
+>  3 files changed, 245 insertions(+), 87 deletions(-)
+>
+> diff --git a/doc/gatt-api.txt b/doc/gatt-api.txt
+> index ad2ab16..683b1b7 100644
+> --- a/doc/gatt-api.txt
+> +++ b/doc/gatt-api.txt
+> @@ -61,23 +61,29 @@ Service		org.bluez
+>  Interface	org.bluez.GattCharacteristic1 [Experimental]
+>  Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX/serviceXX/charYYYY
+>
+> -Methods		array{byte} ReadValue()
+> +Methods		array{byte} ReadValue(dict options)
+>
+>  			Issues a request to read the value of the
+>  			characteristic and returns the value if the
+>  			operation was successful.
+>
+> +			Possible options: "offset": uint16 offset
+> +					  "device": Object Device (Server only)
+> +
 
-I had to understand the usage in patch 9. It seems you are right, the
-decision cannot be done based on the protocol alone but based on the
-context, so we need to pass in different lengths based on the context.
-Thanks for your explanation.
+[...]
 
-I would still suggest to not use net_device as an argument but just the
-type and length to keep the API cleaner, but this is not a strong opinion.
+>
+> +static int parse_options(DBusMessage *msg, uint16_t *offset)
+> +{
+> +	DBusMessageIter args, flags;
+> +
+> +	if (!dbus_message_iter_init(msg, &args))
+> +		return -EINVAL;
+> +
+> +	if (dbus_message_iter_get_arg_type(&args) != DBUS_TYPE_ARRAY)
+> +		return -EINVAL;
+> +
+> +	dbus_message_iter_recurse(&args, &flags);
+> +	if (dbus_message_iter_get_arg_type(&flags) != DBUS_TYPE_DICT_ENTRY)
+> +		return -EINVAL;
+> +
 
-Thanks,
-Hannes
+I would think that from the documentation, "Possible options", that providing
+the offset would be optional. I don't think much is gained making this mandatory.
+
+> +	while (dbus_message_iter_get_arg_type(&flags) == DBUS_TYPE_DICT_ENTRY) {
+> +		const char *key;
+> +		DBusMessageIter value, entry;
+> +		int var;
+> +
+> +		dbus_message_iter_recurse(&flags, &entry);
+> +		dbus_message_iter_get_basic(&entry, &key);
+> +
+> +		dbus_message_iter_next(&entry);
+> +		dbus_message_iter_recurse(&entry, &value);
+> +
+> +		var = dbus_message_iter_get_arg_type(&value);
+> +		if (strcasecmp(key, "offset") == 0) {
+> +			if (var != DBUS_TYPE_UINT16)
+> +				return -EINVAL;
+> +			dbus_message_iter_get_basic(&value, offset);
+> +		}
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+
+
+Cheers,
+--
+Vinicius
