@@ -1,95 +1,99 @@
-Return-Path: <netdev-owner@vger.kernel.org>
-Subject: Re: [PATCHv2 bluetooth-next 02/10] 6lowpan: add 802.15.4 short addr
- slaac
-To: Stefan Schmidt <stefan@osg.samsung.com>, linux-wpan@vger.kernel.org
-References: <1461140382-4784-1-git-send-email-aar@pengutronix.de>
- <1461140382-4784-3-git-send-email-aar@pengutronix.de>
- <5728EB0A.5080108@osg.samsung.com>
-Cc: kernel@pengutronix.de, marcel@holtmann.org,
-	jukka.rissanen@linux.intel.com, hannes@stressinduktion.org,
-	mcr@sandelman.ca, werner@almesberger.net,
-	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-	"David S . Miller" <davem@davemloft.net>,
-	Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
-	James Morris <jmorris@namei.org>,
-	Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
-	Patrick McHardy <kaber@trash.net>
-From: Alexander Aring <aar@pengutronix.de>
-Message-ID: <042eb448-5f56-eaca-5c51-1386cc50edb6@pengutronix.de>
-Date: Fri, 6 May 2016 11:26:21 +0200
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <5728EB0A.5080108@osg.samsung.com>
-Content-Type: text/plain; charset=windows-1252
-Sender: netdev-owner@vger.kernel.org
+In-Reply-To: <1462298187-21905-1-git-send-email-vcgomes@gmail.com>
+References: <1462298187-21905-1-git-send-email-vcgomes@gmail.com>
+Date: Fri, 6 May 2016 12:04:13 +0300
+Message-ID: <CABBYNZ+=i9kT9xhwVSuFWcjkAAsi80BNcDjYwH4+FDe=oBx0+w@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v2] gdbus: Fix the ordering of signals
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Vinicius Costa Gomes <vcgomes@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Vinicius,
 
-Hi,
+On Tue, May 3, 2016 at 8:56 PM, Vinicius Costa Gomes <vcgomes@gmail.com> wrote:
+> Consider the following example:
+>
+> /foo
+>   properties: "A", "B"
+>
+> /bar
+>   properties: "C", "D"
+>
+> If during a given mainloop iteration, property "A" of object '/foo' is
+> changed, then properties "C" and "D" of '/bar', lastly "B" of '/foo',
+> the current code will emit the PropertiesChanged signals in following
+> order: "A", "B", "C", "D".
+>
+> This may confuse applications that have a dependency on the order of
+> those signals.
+>
+> This fixes the ordering, so in the example, the order becomes:
+> "C", "D", "A", B". This is considered not to be a problem, as
+> applications may use the flag G_DBUS_PROPERTY_CHANGED_FLAG_FLUSH, so
+> property changed signals are emitted as soon as possible.
+>
+> The solution is for each object, to reschedule the signals every time a
+> signal is emitted.
+> ---
+>  gdbus/gdbus.h  |  9 +++++++++
+>  gdbus/object.c | 12 ++++++++++--
+>  2 files changed, 19 insertions(+), 2 deletions(-)
+>
+> diff --git a/gdbus/gdbus.h b/gdbus/gdbus.h
+> index 69fbc10..e37385f 100644
+> --- a/gdbus/gdbus.h
+> +++ b/gdbus/gdbus.h
+> @@ -302,6 +302,15 @@ void g_dbus_pending_property_error_valist(GDBusPendingReply id,
+>                         const char *name, const char *format, va_list args);
+>  void g_dbus_pending_property_error(GDBusPendingReply id, const char *name,
+>                                                 const char *format, ...);
+> +
+> +/*
+> + * Note that when multiple properties for a given object path are changed
+> + * in the same mainloop iteration, they will be grouped with the last
+> + * property changed. If this behaviour is undesired, use
+> + * g_dbus_emit_property_changed_full() with the
+> + * G_DBUS_PROPERTY_CHANGED_FLAG_FLUSH flag, causing the signal to ignore
+> + * any grouping.
+> + */
+>  void g_dbus_emit_property_changed(DBusConnection *connection,
+>                                 const char *path, const char *interface,
+>                                 const char *name);
+> diff --git a/gdbus/object.c b/gdbus/object.c
+> index a220101..afb4587 100644
+> --- a/gdbus/object.c
+> +++ b/gdbus/object.c
+> @@ -635,11 +635,19 @@ static gboolean g_dbus_args_have_signature(const GDBusArgInfo *args,
+>
+>  static void add_pending(struct generic_data *data)
+>  {
+> -       if (data->process_id > 0)
+> -               return;
+> +       guint old_id = data->process_id;
+>
+>         data->process_id = g_idle_add(process_changes, data);
+>
+> +       if (old_id > 0) {
+> +               /*
+> +                * If the element already had an old idler, remove the old one,
+> +                * no need to re-add it to the pending list.
+> +                */
+> +               g_source_remove(old_id);
+> +               return;
+> +       }
+> +
+>         pending = g_slist_append(pending, data);
+>  }
+>
+> --
+> 2.8.1
 
-On 05/03/2016 08:16 PM, Stefan Schmidt wrote:
-> Hello.
-> 
-> On 20/04/16 10:19, Alexander Aring wrote:
->> This patch adds the autoconfiguration if a valid 802.15.4 short address
->> is available for 802.15.4 6LoWPAN interfaces.
->>
->> Cc: David S. Miller<davem@davemloft.net>
->> Cc: Alexey Kuznetsov<kuznet@ms2.inr.ac.ru>
->> Cc: James Morris<jmorris@namei.org>
->> Cc: Hideaki YOSHIFUJI<yoshfuji@linux-ipv6.org>
->> Cc: Patrick McHardy<kaber@trash.net>
->> Signed-off-by: Alexander Aring<aar@pengutronix.de>
->> ---
->>   include/net/addrconf.h |  3 +++
->>   net/6lowpan/core.c     | 46 ++++++++++++++++++++++++++++++++++++++++++++++
->>   net/ipv6/addrconf.c    |  5 +++--
->>   3 files changed, 52 insertions(+), 2 deletions(-)
->>
->> diff --git a/include/net/addrconf.h b/include/net/addrconf.h
->> index 730d856..b1774eb 100644
->> --- a/include/net/addrconf.h
->> +++ b/include/net/addrconf.h
->> @@ -94,6 +94,9 @@ int ipv6_rcv_saddr_equal(const struct sock *sk, const struct sock *sk2,
->>   void addrconf_join_solict(struct net_device *dev, const struct in6_addr *addr);
->>   void addrconf_leave_solict(struct inet6_dev *idev, const struct in6_addr *addr);
->>   +void addrconf_add_linklocal(struct inet6_dev *idev,
->> +                const struct in6_addr *addr, u32 flags);
->> +
->>   static inline int addrconf_ifid_eui48(u8 *eui, struct net_device *dev)
->>   {
->>       if (dev->addr_len != ETH_ALEN)
->> diff --git a/net/6lowpan/core.c b/net/6lowpan/core.c
->> index 7a240b3..fbae31e 100644
->> --- a/net/6lowpan/core.c
->> +++ b/net/6lowpan/core.c
->> @@ -14,6 +14,7 @@
->>   #include <linux/module.h>
->>     #include <net/6lowpan.h>
->> +#include <net/addrconf.h>
->>     #include "6lowpan_i.h"
->>   @@ -72,16 +73,61 @@ void lowpan_unregister_netdev(struct net_device *dev)
->>   }
->>   EXPORT_SYMBOL(lowpan_unregister_netdev);
->>   +static int addrconf_ifid_802154_6lowpan(u8 *eui, struct net_device *dev)
->> +{
->> +    struct wpan_dev *wpan_dev = lowpan_802154_dev(dev)->wdev->ieee802154_ptr;
->> +
->> +    /* Set short_addr autoconfiguration if short_addr is present only */
->> +    if (!ieee802154_is_valid_src_short_addr(wpan_dev->short_addr))
->> +        return -1;
-> 
-> -EINVAL instead of -1?
-> 
+Applied, thanks
 
-The ipv6 implementation do that for the "dev->addr" slaac the same here.
-I think the reason is because here, if this fails for any reason then
-this is simple not an error, we just don't add a link-local for short
-addr slaac here and don't abort completely the CHANGE/UP of interface.
 
-IPv6 also use "-1" return value only if parsing fails, I would to see
-that also for iphc stuff where we mixed a lot of "-EIO" and "-EINVAL",
-anyway nobody will really care about that return value.
-
-It just means: 0 parsing successful and -1 parsing failed.
-
-- Alex
+-- 
+Luiz Augusto von Dentz
