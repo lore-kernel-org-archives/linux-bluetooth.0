@@ -1,35 +1,76 @@
-Return-Path: <tedd.an@intel.com>
-Date: Fri, 6 May 2016 11:53:51 -0700
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Date: Fri, 6 May 2016 11:53:46 -0700
 From: Tedd Ho-Jeong An <tedd.an@intel.com>
 To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Tedd Ho-Jeong An
- <tedd.an@intel.com>
-Subject: [PATCH BlueZ] tools/bluemoon: Add hardware variant for Intel
- Bluetooth 8265
-Message-ID: <20160506115351.239acf97@fedora-linux-22.shared>
+Cc: Tedd Ho-Jeong An <tedd.an@intel.com>,
+	Marcel Holtmann <marcel@holtmann.org>
+Subject: [PATCH v2] Bluetooth: Add support for Intel Bluetooth device 8265
+ [8087:0a2b]
+Message-ID: <20160506115346.4fa61b21@fedora-linux-22.shared>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Tedd Ho-Jeong An <tedd.an@intel.com>
 
-This patch adds support for HW variant for Intel Bluetooth 8265
-also known as Windstorm Peak (WsP).
----
- tools/bluemoon.c | 1 +
- 1 file changed, 1 insertion(+)
+This patch adds support for Intel Bluetooth device 8265 also known
+as Windstorm Peak (WsP).
 
-diff --git a/tools/bluemoon.c b/tools/bluemoon.c
-index 650ab0c..5fc6269 100644
---- a/tools/bluemoon.c
-+++ b/tools/bluemoon.c
-@@ -620,6 +620,7 @@ static const struct {
- 	{ 0x09, "iBT 1.5 (AG610)"	},
- 	{ 0x0a, "iBT 2.1 (AG620)"	},
- 	{ 0x0b, "iBT 3.0 (LnP)"		},
-+	{ 0x0c, "iBT 3.0 (WsP)"		},
- 	{ }
- };
+T:  Bus=01 Lev=01 Prnt=01 Port=01 Cnt=02 Dev#=  6 Spd=12   MxCh= 0
+D:  Ver= 2.00 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=8087 ProdID=0a2b Rev= 0.10
+C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
+I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=81(I) Atr=03(Int.) MxPS=  64 Ivl=1ms
+E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+Signed-off-by: Tedd Ho-Jeong An <tedd.an@intel.com>
+---
+ drivers/bluetooth/btusb.c | 11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 0d4e372..f5f8431 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -2001,12 +2001,13 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
+ 		return -EINVAL;
+ 	}
  
+-	/* At the moment only the hardware variant iBT 3.0 (LnP/SfP) is
+-	 * supported by this firmware loading method. This check has been
+-	 * put in place to ensure correct forward compatibility options
+-	 * when newer hardware variants come along.
++	/* At the moment the iBT 3.0 hardware variants 0x0b(LnP/SfP)
++	 * and 0x0c(WsP) are supported by this firmware loading method.
++	 *
++	 * This check has been put in place to ensure correct forward
++	 * compatibility options when newer hardware variants come along.
+ 	 */
+-	if (ver.hw_variant != 0x0b) {
++	if (ver.hw_variant != 0x0b && ver.hw_variant != 0x0c) {
+ 		BT_ERR("%s: Unsupported Intel hardware variant (%u)",
+ 		       hdev->name, ver.hw_variant);
+ 		return -EINVAL;
 -- 
 2.4.3
+
