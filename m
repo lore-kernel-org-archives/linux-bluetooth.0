@@ -1,76 +1,105 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <hannes@stressinduktion.org>
+Subject: Re: [PATCHv2 bluetooth-next 04/10] ndisc: add addr_len parameter to
+ ndisc_opt_addr_space
+To: Alexander Aring <aar@pengutronix.de>, linux-wpan@vger.kernel.org
+References: <1461140382-4784-1-git-send-email-aar@pengutronix.de>
+ <1461140382-4784-5-git-send-email-aar@pengutronix.de>
+ <109698cb-18ae-abdb-34a5-1db5a2e8dc6b@stressinduktion.org>
+ <800c5c08-c2c8-3b44-d457-cdcf6374f280@pengutronix.de>
+Cc: kernel@pengutronix.de, marcel@holtmann.org,
+ jukka.rissanen@linux.intel.com, stefan@osg.samsung.com, mcr@sandelman.ca,
+ werner@almesberger.net, linux-bluetooth@vger.kernel.org,
+ netdev@vger.kernel.org, "David S . Miller" <davem@davemloft.net>,
+ Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>, James Morris <jmorris@namei.org>,
+ Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
+ Patrick McHardy <kaber@trash.net>
+From: Hannes Frederic Sowa <hannes@stressinduktion.org>
+Message-ID: <240084aa-2751-6f24-c07b-662b19a74475@stressinduktion.org>
+Date: Sat, 7 May 2016 00:23:20 +0200
 MIME-Version: 1.0
-In-Reply-To: <8737pug8ea.fsf@intel.com>
-References: <CADrC6Gxef2A=EsVLxG-izD4xBKvrBW85wOzybuZCrr-OL52VSw@mail.gmail.com>
-	<8737pug8ea.fsf@intel.com>
-Date: Sat, 7 May 2016 07:58:43 +0300
-Message-ID: <CADrC6GwdZ7n9jnOvxiOF890yVDL_S5hjCXFrs6gkDt9KT9T2pg@mail.gmail.com>
-Subject: Re: bluez dbus ble connection problem when a filter is set
-From: =?UTF-8?B?SGFra8SxIEfDtsOnZW/En2x1?= <hakki@bir618.com>
-To: Vinicius Costa Gomes <vinicius.gomes@intel.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <800c5c08-c2c8-3b44-d457-cdcf6374f280@pengutronix.de>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+On 04.05.2016 14:30, Alexander Aring wrote:
+> Hi,
+> 
+> On 05/02/2016 09:37 PM, Hannes Frederic Sowa wrote:
+>> On 20.04.2016 10:19, Alexander Aring wrote:
+>>> This patch makes the address length as argument for the
+>>> ndisc_opt_addr_space function. This is necessary to handle addresses
+>>> which don't use dev->addr_len as address length.
+>>
+>> Would it make sense for patch 4, 5 and 6 to add the operation to ndisc_ops?
+>>
+> 
+> not sure if I understand this question right,
+> 
+> We have now the ndisc_ops where we can could change the send/recv of
+> NS/NA, also is_useropt (for add 6CO RA is userspace option field).
+> 
+> In case of 802.15.4 we have two MAC addresses with different length:
+> 
+>  - extended address - 8 bytes => EUI64
+>  - short address - 2 bytes
+> 
+> Now [0] describes how to make the source/target address option for
+> NS/NA/RS/RA/... to deal with both addresses.
+> 
+> The short address is a special case in 802.15.4 and not always
+> available. If available we add both addresses as option field in
+> NS/NA (RS/RA will follow in future, but currently NS/NA only).
+> 
+> At this point the understanding of [0] differs in 6LoWPAN
+> implementations.
+> 
+> Some people handles it like:
+> 
+> Handle the short address/extended address in XOR case of 6LoWPAN
+> interface. The interface has as MAC address the extended XOR short (if
+> available), depends on setting.
+> 
+> Then dev->addr_len is 8 XOR 2.
+> 
+> Other people (inclusive me) handle it like:
+> 
+> Handle the short/extended address in case of OR, but never short address
+> alone. The interface can be accessed by extended address or short
+> address and each neighbour stores both information.
+> 
+> The case "short address never alone" means that the extended address is
+> always available and MUST be there.
+> 
+> Furthermore, depends on L3 addressing it could be useful to have the
+> possibility to decide if using or short OR extended address as L2 address
+> for do better compressing stuff.
+> 
+> ---
+> 
+> I implement it as OR case, so we add both addresses when short address
+> is available. Also we drop NS/NA when the short address is given only,
+> in theory we could also react on this and store a "dummy" 0x00..00
+> address for extended address then.
+> 
+> Not sure how it need to be handled correctly, for now I implemented how
+> I understand it.
+> 
+> In case of the OR case, we need to add two option fields for the
+> address, extended and short. This is why I do the calculation stuff more
+> accessible with different address lengths, so we can use 8 or 2 and not
+> dev->addr_len which stores always the 802.15.4 EUI64 address length.
+> 
+> And the answer would be, no it makes no sense because we need to call
+> these functions with 8 (dev->addr_len) and 2 (if short addr is
+> available).
 
-pi@raspberrypi:~ $ uname -a
+I had to understand the usage in patch 9. It seems you are right, the
+decision cannot be done based on the protocol alone but based on the
+context, so we need to pass in different lengths based on the context.
+Thanks for your explanation.
 
-Linux raspberrypi 4.1.19-v7+ #858 SMP Tue Mar 15 15:56:00 GMT 2016
-armv7l GNU/Linux
+I would still suggest to not use net_device as an argument but just the
+type and length to keep the API cleaner, but this is not a strong opinion.
 
-would you need additional info?
-
-On Sat, May 7, 2016 at 12:54 AM, Vinicius Costa Gomes
-<vinicius.gomes@intel.com> wrote:
-> Hi hakkig,
->
-> Hakkı Göçeoğlu <hakki@bir618.com> writes:
->
->> Hi All,
->>
->> raspberry pi 3
->> bluez v5.39
->> testing platform client/bluetoothctl
->
-> Which kernel version are you running?
->
->>
->> I have a ble peripheral device advertising a custom uuid.
->> Within bluetoothctl when I try to connect to it after a filter is set,
->> one third of the time I get an error.
->> There is no problem if no filter is set, turning scanning off before
->> the connect command does not help.
->>
->> Here is an example flow within bluetoothctl
->>
->> [bluetooth]# set-scan-filter-uuids f655b638-fead-4268-b07c-e5d79d09b22b
->> SetDiscoveryFilter success
->> [bluetooth]# scan on
->> Discovery started
->> [CHG] Controller B8:27:EB:37:3F:CD Discovering: yes
->> [NEW] Device CF:05:30:F2:6F:5E CF-05-30-F2-6F-5E
->> [bluetooth]# connect CF:05:30:F2:6F:5E
->> Attempting to connect to CF:05:30:F2:6F:5E
->> [CHG] Device CF:05:30:F2:6F:5E Connected: yes
->> Failed to connect: org.bluez.Error.Failed
->> [CHG] Device CF:05:30:F2:6F:5E Connected: no
->
-> I couldn't reproduce this, can you provide the btmon output when this
-> happens?
->
->>
->>
->> Any ideas? Thanks in advance, cheers
->>
->> hakkig
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->> the body of a message to majordomo@vger.kernel.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
->
-> Cheers,
-> --
-> Vinicius
+Thanks,
+Hannes
