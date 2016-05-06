@@ -1,50 +1,53 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
-Subject: Re: Bluez 5.39 Secure Connection (SC) and uncompliant devices
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CAE-M4kpe3S-9Gedm_dHU+D2YMhWGbBEjm59sYB77pDjsEVkC4w@mail.gmail.com>
-Date: Fri, 6 May 2016 09:08:01 -0700
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <2323BDE3-075A-443F-B8E7-777753EE43FE@holtmann.org>
-References: <CAE-M4kpe3S-9Gedm_dHU+D2YMhWGbBEjm59sYB77pDjsEVkC4w@mail.gmail.com>
-To: Roberto Pierpaoli <roberto@iooota.com>
+From: Amitkumar Karwar <akarwar@marvell.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: <linux-kernel@vger.kernel.org>, Ganapathi Bhat <gbhat@marvell.com>,
+	Amitkumar Karwar <akarwar@marvell.com>
+Subject: [PATCH v11 2/3] Bluetooth: hci_uart: check if hdev is present before using it
+Date: Fri, 6 May 2016 08:31:53 -0700
+Message-ID: <1462548714-7971-2-git-send-email-akarwar@marvell.com>
+In-Reply-To: <1462548714-7971-1-git-send-email-akarwar@marvell.com>
+References: <1462548714-7971-1-git-send-email-akarwar@marvell.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Roberto,
+From: Ganapathi Bhat <gbhat@marvell.com>
 
-> Environment:
-> 
-> - linux kernel 4.2.0 i686
-> - Ubuntu 15.10 distribution
-> - Bluez 5.39 compiled from source (--enable-experimental --enable-library)
-> 
-> I'm trying to pair my Broadcom BCM20702A0 dongle with the BLE device
-> "Xiaomi MiBand".
-> 
-> I've figured out that the MiBand does not support the following pairing request:
-> 
->> Authentication requirement: Bonding, MITM, **SC**, No Keypresses (0x0d)
-> 
-> 
-> The response is the following:
-> 
->>> ACL Data RX: Handle 32 flags 0x02 dlen 6
->>      SMP: Pairing Failed (0x05) len 1
->>        Reason: Invalid parameters (0x0a)
-> 
-> 
-> The problem seems to reside in the "SC" requirement: I've found
-> someone sharing the same problem on the Chromium Project's tracking
-> system ==> https://bugs.chromium.org/p/chromium/issues/detail?id=522965
-> 
-> Is it possible to loosen the requirements in the request (expecially
-> "SC"), so that it won't be rejected by the MiBand device?
+The hdev struct might not have initialized in protocol receive handler.
+This patch adds necessary checks.
 
-the only way is to turn Secure Connections off. However the peripheral is clearly not spec compliant since the spec text is 100% clear that unknown auth requirements bits are required to be ignored on reception. There are even qualification test cases for this if I remember correctly.
+Signed-off-by: Ganapathi Bhat <gbhat@marvell.com>
+Signed-off-by: Amitkumar Karwar <akarwar@marvell.com>
+---
+ drivers/bluetooth/hci_ldisc.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-Regards
-
-Marcel
+diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
+index b4ee682..047e786 100644
+--- a/drivers/bluetooth/hci_ldisc.c
++++ b/drivers/bluetooth/hci_ldisc.c
+@@ -154,7 +154,9 @@ restart:
+ 
+ 		set_bit(TTY_DO_WRITE_WAKEUP, &tty->flags);
+ 		len = tty->ops->write(tty, skb->data, skb->len);
+-		hdev->stat.byte_tx += len;
++
++		if (hdev)
++			hdev->stat.byte_tx += len;
+ 
+ 		skb_pull(skb, len);
+ 		if (skb->len) {
+@@ -349,7 +351,7 @@ void hci_uart_set_baudrate(struct hci_uart *hu, unsigned int speed)
+ 	/* tty_set_termios() return not checked as it is always 0 */
+ 	tty_set_termios(tty, &ktermios);
+ 
+-	BT_DBG("%s: New tty speeds: %d/%d", hu->hdev->name,
++	BT_DBG("%s: New tty speeds: %d/%d", hu->hdev ? hu->hdev->name : "",
+ 	       tty->termios.c_ispeed, tty->termios.c_ospeed);
+ }
+ 
+-- 
+1.8.1.4
 
