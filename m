@@ -1,106 +1,222 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <allan@flynixie.com>
 MIME-Version: 1.0
-In-Reply-To: <87zis2espf.fsf@intel.com>
-References: <1462561862-500-1-git-send-email-luiz.dentz@gmail.com>
-	<87zis2espf.fsf@intel.com>
-Date: Sat, 7 May 2016 10:21:07 +0300
-Message-ID: <CABBYNZ+g+aHGEe-NDVgtzsHQ0N+4YEgkF9MvoQX_hXSsmjgpdg@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/4] doc/gatt-api: Add options dictionary to ReadValue/WriteValue
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Vinicius Costa Gomes <vinicius.gomes@intel.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <ED3CFF35-4B10-403E-B435-4DD69A5DFB90@holtmann.org>
+References: <CAGup35xNHnGOeB2KT9n0oUBetqRJVygmHbNZBaNqu9HXw+98nA@mail.gmail.com>
+	<ED3CFF35-4B10-403E-B435-4DD69A5DFB90@holtmann.org>
+Date: Fri, 6 May 2016 22:30:17 -0700
+Message-ID: <CAGup35y4ZjSR4QfxvKCG7q2bHv3cH8HLkiHuciP1zpp9-WN4cw@mail.gmail.com>
+Subject: Re: connect() returning EINPROGRESS
+From: Allan Hessenflow <allan@flynixie.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: multipart/mixed; boundary=94eb2c083bc0ec35c5053239de57
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Vinicius,
+--94eb2c083bc0ec35c5053239de57
+Content-Type: text/plain; charset=UTF-8
 
-On Sat, May 7, 2016 at 1:18 AM, Vinicius Costa Gomes
-<vinicius.gomes@intel.com> wrote:
-> Luiz Augusto von Dentz <luiz.dentz@gmail.com> writes:
->
->> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->>
->> This adds the possibility to pass an offset to these operations, and
->> also in the server case to give the device object.
->> ---
->>  doc/gatt-api.txt    |  20 ++++--
->>  src/gatt-client.c   | 135 +++++++++++++++++++++++++++++----------
->>  src/gatt-database.c | 177 +++++++++++++++++++++++++++++++++++++---------------
->>  3 files changed, 245 insertions(+), 87 deletions(-)
->>
->> diff --git a/doc/gatt-api.txt b/doc/gatt-api.txt
->> index ad2ab16..683b1b7 100644
->> --- a/doc/gatt-api.txt
->> +++ b/doc/gatt-api.txt
->> @@ -61,23 +61,29 @@ Service           org.bluez
->>  Interface    org.bluez.GattCharacteristic1 [Experimental]
->>  Object path  [variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX/serviceXX/charYYYY
->>
->> -Methods              array{byte} ReadValue()
->> +Methods              array{byte} ReadValue(dict options)
->>
->>                       Issues a request to read the value of the
->>                       characteristic and returns the value if the
->>                       operation was successful.
->>
->> +                     Possible options: "offset": uint16 offset
->> +                                       "device": Object Device (Server only)
->> +
->
-> [...]
->
->>
->> +static int parse_options(DBusMessage *msg, uint16_t *offset)
->> +{
->> +     DBusMessageIter args, flags;
->> +
->> +     if (!dbus_message_iter_init(msg, &args))
->> +             return -EINVAL;
->> +
->> +     if (dbus_message_iter_get_arg_type(&args) != DBUS_TYPE_ARRAY)
->> +             return -EINVAL;
->> +
->> +     dbus_message_iter_recurse(&args, &flags);
->> +     if (dbus_message_iter_get_arg_type(&flags) != DBUS_TYPE_DICT_ENTRY)
->> +             return -EINVAL;
->> +
->
-> I would think that from the documentation, "Possible options", that providing
-> the offset would be optional. I don't think much is gained making this mandatory.
+Hi Marcel,
 
-I guess you are referring to empty array, so yes we should probably
-drop the check for dict entry so it can be empty since it is optional.
+> do you have a dead simple proof-of-concept that can show this issue. I do not recall any of this issue. Have you tried it with the latest bluetooth-next kernel?
 
->> +     while (dbus_message_iter_get_arg_type(&flags) == DBUS_TYPE_DICT_ENTRY) {
->> +             const char *key;
->> +             DBusMessageIter value, entry;
->> +             int var;
->> +
->> +             dbus_message_iter_recurse(&flags, &entry);
->> +             dbus_message_iter_get_basic(&entry, &key);
->> +
->> +             dbus_message_iter_next(&entry);
->> +             dbus_message_iter_recurse(&entry, &value);
->> +
->> +             var = dbus_message_iter_get_arg_type(&value);
->> +             if (strcasecmp(key, "offset") == 0) {
->> +                     if (var != DBUS_TYPE_UINT16)
->> +                             return -EINVAL;
->> +                     dbus_message_iter_get_basic(&value, offset);
->> +             }
->> +     }
->> +
->> +     return 0;
->> +}
->> +
->
->
-> Cheers,
-> --
-> Vinicius
+I have only tried it with bluez 5.37 under kernel "4.4.0-21-generic #37-Ubuntu
+SMP Mon Apr 18 18:33:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux", and
+bluez 4.101 under kernel "3.13.0-85-generic #129-Ubuntu SMP Thu Mar 17
+20:50:41 UTC 2016 i686 i686 i686 GNU/Linux".
 
+I have created a test that I think is reasonably close to being as simple as
+possible for showing the issue (or possible issue, I could certainly have some
+misunderstanding of part of the API that just happens to not cause a problem
+with the older bluez).  I have attached the test code, although it
+finds and opens
+a custom device which of course you won't have.  Probably modifying it to find
+some other connectable device would show the same issue but I haven't tried
+so can't say that for certain.
+
+The output of the test code with bluez 4.101 is:
+found device
+hci_le_create_connn okay
+Connected
+
+And the output with bluez 5.37 is:
+found device
+hci_le_create_connn okay
+attconnect failed errno 115: Operation now in progress
+
+That last line, showing that attconnect failed, takes something on the order
+of a minute to appear.
+
+
+All of this came up when my client wanted to replicate a test system and
+attempted to do so starting with a current ubuntu install.  They ended up
+just installing an older ubuntu instead so they don't need this fixed.  This
+also means I no longer have the bluez 5.37 install that showed the problem
+since an older one has been installed over it, but if there's something
+specific to look at I'll attempt to recreate that test when time permits.
+
+allan
 
 
 -- 
-Luiz Augusto von Dentz
+Allan Hessenflow            allan@flynixie.com
+
+--94eb2c083bc0ec35c5053239de57
+Content-Type: text/x-csrc; charset=US-ASCII; name="blueztest.c"
+Content-Disposition: attachment; filename="blueztest.c"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_inwpk9ku0
+
+LyogYmx1ZXp0ZXN0LmMgKi8KCgojaW5jbHVkZSA8c3RkaW8uaD4KI2luY2x1ZGUgPHN0ZGxpYi5o
+PgojaW5jbHVkZSA8c3RkaW50Lmg+CiNpbmNsdWRlIDxzdGRib29sLmg+CiNpbmNsdWRlIDx1bmlz
+dGQuaD4KI2luY2x1ZGUgPGVycm5vLmg+CiNpbmNsdWRlIDxibHVldG9vdGgvYmx1ZXRvb3RoLmg+
+CiNpbmNsdWRlIDxibHVldG9vdGgvaGNpLmg+CiNpbmNsdWRlIDxibHVldG9vdGgvaGNpX2xpYi5o
+PgojaW5jbHVkZSA8Ymx1ZXRvb3RoL2wyY2FwLmg+CgoKCiNkZWZpbmUgTklYSUVfTkFNRSAgICAg
+ICAgICAgICAgIk5peGllX0VuZ3JfQSIKCgojZGVmaW5lIEVJUl9GTEFHUyAgICAgICAgICAgICAg
+IDB4MDEKI2RlZmluZSBFSVJfVVVJRDE2X1NPTUUgICAgICAgICAweDAyCiNkZWZpbmUgRUlSX1VV
+SUQxNl9BTEwgICAgICAgICAgMHgwMwojZGVmaW5lIEVJUl9OQU1FX1NIT1JUICAgICAgICAgIDB4
+MDgKI2RlZmluZSBFSVJfTkFNRV9DT01QTEVURSAgICAgICAweDA5CgoKc3RhdGljIGNvbnN0IGNo
+YXIgdXNhZ2VbXSA9CiAgICAidXNhZ2U6ICVzIFstajxkZXY+XVxuIgogICAgIiAgICAtaTxpZm51
+bT4gICAgICB1c2UgaW50ZXJmYWNlIGhjaTxpZm51bT5cbiIKICAgIDsKCgoKaW50IG1haW4oaW50
+IGFyZ2MsIGNoYXIgKmFyZ3ZbXSkgewogICAgaW50IHJlc3VsdDsKICAgIGludCBoY2lJbnRlcmZh
+Y2U7CiAgICBpbnQgaGNpZmQ7CiAgICB1aW50MTZfdCBoYW5kbGU7CiAgICBpbnQgYXR0U29jazsK
+ICAgIHN0cnVjdCBoY2lfZmlsdGVyIGZpbHRlcjsKICAgIHN0cnVjdCBzb2NrYWRkcl9sMiBzcmMs
+IGRzdDsKICAgIHN0cnVjdCBidF9zZWN1cml0eSBidHNlYzsKICAgIHVpbnQ4X3QgZGV2QmRBZGRy
+VHlwZTsKICAgIGJkYWRkcl90IGRldkJkQWRkcjsKICAgIGludCBsZW47CiAgICBib29sIHNjYW5u
+aW5nOwogICAgYm9vbCBmb3VuZDsKICAgIGJvb2wgY29ubmVjdGVkOwogICAgaGNpX2V2ZW50X2hk
+ciAqaGVhZGVyOwogICAgZXZ0X2xlX21ldGFfZXZlbnQgKm1ldGE7CiAgICBsZV9hZHZlcnRpc2lu
+Z19pbmZvICppbmZvOwogICAgdWludDhfdCBkYXRhTGVuLCBkYXRhVHlwZTsKICAgIHVuc2lnbmVk
+IGNoYXIgYnVmW0hDSV9NQVhfRVZFTlRfU0laRV07CiAgICBpbnQgY291bnQ7CiAgICBpbnQgaSwg
+aiwgazsKCiAgICByZXN1bHQgPSAwOwoKICAgIGhjaUludGVyZmFjZSA9IGhjaV9nZXRfcm91dGUo
+TlVMTCk7CiAgICBoY2lmZCA9IC0xOwogICAgYXR0U29jayA9IC0xOwogICAgc2Nhbm5pbmcgPSBm
+YWxzZTsKICAgIGZvdW5kID0gZmFsc2U7CiAgICBjb25uZWN0ZWQgPSBmYWxzZTsKCiAgICBmb3Ig
+KGkgPSAxOyBpIDwgYXJnYyAmJiByZXN1bHQgPT0gMDsgaSsrKSB7CiAgICAgICAgaWYgKGFyZ3Zb
+aV1bMF0gPT0gJy0nKSB7CiAgICAgICAgICAgIHN3aXRjaCAoYXJndltpXVsxXSkgewogICAgICAg
+ICAgICBjYXNlICdpJzoKICAgICAgICAgICAgICAgIGhjaUludGVyZmFjZSA9IGF0b2koJmFyZ3Zb
+aV1bMl0pOwogICAgICAgICAgICAgICAgYnJlYWs7CiAgICAgICAgICAgIGRlZmF1bHQ6CiAgICAg
+ICAgICAgICAgICByZXN1bHQgPSAxOwogICAgICAgICAgICB9CiAgICAgICAgfSBlbHNlIHsKICAg
+ICAgICAgICAgcmVzdWx0ID0gMTsKICAgICAgICB9CiAgICB9CiAgICBpZiAocmVzdWx0KQogICAg
+ICAgIGZwcmludGYoc3RkZXJyLCB1c2FnZSwgYXJndlswXSk7CgoKICAgIGlmIChyZXN1bHQgPT0g
+MCkgewogICAgICAgIGhjaWZkID0gaGNpX29wZW5fZGV2KGhjaUludGVyZmFjZSk7CiAgICAgICAg
+aWYgKGhjaWZkIDwgMCkgewogICAgICAgICAgICBmcHJpbnRmKHN0ZGVyciwgImZhaWxlZCB0byBv
+cGVuIGhjaSVkXG4iLCBoY2lmZCk7CiAgICAgICAgICAgIHJlc3VsdCA9IDE7CiAgICAgICAgfQog
+ICAgfQogICAgaWYgKHJlc3VsdCA9PSAwKSB7CiAgICAgICAgaWYgKGhjaV9sZV9zZXRfc2Nhbl9w
+YXJhbWV0ZXJzKGhjaWZkLCAweDAxLCBodG9icygweDAwMTApLAogICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICBodG9icygweDAwMTApLCAweDAwLCAweDAwLAogICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAxMDAwKSA8IDApIHsKICAgICAgICAgICAgZnBy
+aW50ZihzdGRlcnIsICJmYWlsZWQgdG8gc2V0IHNjYW4gcGFyYW1ldGVyc1xuIik7CiAgICAgICAg
+ICAgIHJlc3VsdCA9IDE7CiAgICAgICAgfQogICAgfQogICAgaWYgKHJlc3VsdCA9PSAwKSB7CiAg
+ICAgICAgaWYgKGhjaV9sZV9zZXRfc2Nhbl9lbmFibGUoaGNpZmQsIDB4MDEsIDEsIDEwMDApIDwg
+MCkgewogICAgICAgICAgICBmcHJpbnRmKHN0ZGVyciwgImZhaWxlZCB0byBlbmFibGUgc2Nhblxu
+Iik7CiAgICAgICAgICAgIHJlc3VsdCA9IDE7CiAgICAgICAgfSBlbHNlCiAgICAgICAgICAgIHNj
+YW5uaW5nID0gdHJ1ZTsKICAgIH0KICAgIGlmIChyZXN1bHQgPT0gMCkgewogICAgICAgIGhjaV9m
+aWx0ZXJfY2xlYXIoJmZpbHRlcik7CiAgICAgICAgaGNpX2ZpbHRlcl9zZXRfcHR5cGUoSENJX0VW
+RU5UX1BLVCwgJmZpbHRlcik7CiAgICAgICAgaGNpX2ZpbHRlcl9zZXRfZXZlbnQoRVZUX0xFX01F
+VEFfRVZFTlQsICZmaWx0ZXIpOwogICAgICAgIGlmIChzZXRzb2Nrb3B0KGhjaWZkLCBTT0xfSENJ
+LCBIQ0lfRklMVEVSLAogICAgICAgICAgICAgICAgICAgICAgICZmaWx0ZXIsIHNpemVvZihmaWx0
+ZXIpKSA8IDApIHsKICAgICAgICAgICAgZnByaW50ZihzdGRlcnIsICJmYWlsZWQgdG8gc2V0IGZp
+bHRlclxuIik7CiAgICAgICAgICAgIHJlc3VsdCA9IDE7CiAgICAgICAgfQogICAgfQoKICAgIGlm
+IChyZXN1bHQgPT0gMCkgewogICAgICAgIGF0dFNvY2sgPSBzb2NrZXQoUEZfQkxVRVRPT1RILCBT
+T0NLX1NFUVBBQ0tFVCwgQlRQUk9UT19MMkNBUCk7CiAgICAgICAgaWYgKGF0dFNvY2sgPCAwKSB7
+CiAgICAgICAgICAgIGZwcmludGYoc3RkZXJyLCAiZmFpbGVkIHRvIGNyZWF0ZSBhdHQgc29ja2V0
+XG4iKTsKICAgICAgICAgICAgcmVzdWx0ID0gMTsKICAgICAgICB9CiAgICB9CiAgICBpZiAocmVz
+dWx0ID09IDApIHsKICAgICAgICBtZW1zZXQoJnNyYywgMCwgc2l6ZW9mKHNyYykpOwogICAgICAg
+IHNyYy5sMl9mYW1pbHkgPSBBRl9CTFVFVE9PVEg7CiAgICAgICAgc3JjLmwyX2NpZCA9IGh0b2Jz
+KC8qQVRUX0NJRCovNCk7CiAgICAgICAgc3JjLmwyX2JkYWRkcl90eXBlID0gQkRBRERSX0xFX1BV
+QkxJQzsKICAgICAgICBtZW1jcHkoJnNyYy5sMl9iZGFkZHIsIEJEQUREUl9BTlksIHNpemVvZihz
+cmMubDJfYmRhZGRyKSk7CiAgICAgICAgaWYgKGJpbmQoYXR0U29jaywgKHN0cnVjdCBzb2NrYWRk
+ciAqKSAmc3JjLCBzaXplb2Yoc3JjKSkgPCAwKSB7CiAgICAgICAgICAgIGZwcmludGYoc3RkZXJy
+LCAiZmFpbGVkIHRvIGJpbmQgYXR0IHNvY2tldFxuIik7CiAgICAgICAgICAgIHJlc3VsdCA9IDE7
+CiAgICAgICAgfQogICAgfQogICAgaWYgKHJlc3VsdCA9PSAwKSB7CiAgICAgICAgbWVtc2V0KCZi
+dHNlYywgMCwgc2l6ZW9mKGJ0c2VjKSk7CiAgICAgICAgYnRzZWMubGV2ZWwgPSBCVF9TRUNVUklU
+WV9MT1c7CiAgICAgICAgaWYgKHNldHNvY2tvcHQoYXR0U29jaywgU09MX0JMVUVUT09USCwgQlRf
+U0VDVVJJVFksICZidHNlYywKICAgICAgICAgICAgICAgICAgICAgICBzaXplb2YoYnRzZWMpKSAh
+PSAwKSB7CiAgICAgICAgICAgIGZwcmludGYoc3RkZXJyLCAiZmFpbGVkIHRvIHNldCBhdHQgc29j
+a2V0IG9wdGlvbnNcbiIpOwogICAgICAgICAgICByZXN1bHQgPSAtMTsKICAgICAgICB9CiAgICB9
+CgogICAgd2hpbGUgKHJlc3VsdCA9PSAwICYmICFmb3VuZCkgewogICAgICAgIGxlbiA9IHJlYWQo
+aGNpZmQsIGJ1Ziwgc2l6ZW9mKGJ1ZikpOwogICAgICAgIGlmIChsZW4gPj0gSENJX0VWRU5UX0hE
+Ul9TSVpFKSB7CiAgICAgICAgICAgIGhlYWRlciA9IChoY2lfZXZlbnRfaGRyICopIGJ1ZjsKICAg
+ICAgICAgICAgc3dpdGNoIChoZWFkZXItPmV2dCkgewogICAgICAgICAgICBjYXNlIEhDSV9FVkVO
+VF9QS1Q6CiAgICAgICAgICAgICAgICBpID0gMSArIEhDSV9FVkVOVF9IRFJfU0laRTsKICAgICAg
+ICAgICAgICAgIG1ldGEgPSAoZXZ0X2xlX21ldGFfZXZlbnQgKikgJmJ1ZltpXTsKICAgICAgICAg
+ICAgICAgIGkgKz0gMSArIEVWVF9MRV9NRVRBX0VWRU5UX1NJWkU7CiAgICAgICAgICAgICAgICBz
+d2l0Y2ggKG1ldGEtPnN1YmV2ZW50KSB7CiAgICAgICAgICAgICAgICBjYXNlIEVWVF9MRV9BRFZF
+UlRJU0lOR19SRVBPUlQ6CiAgICAgICAgICAgICAgICAgICAgY291bnQgPSBtZXRhLT5kYXRhWzBd
+OwogICAgICAgICAgICAgICAgICAgIHdoaWxlIChjb3VudC0tICYmICFmb3VuZCkgewogICAgICAg
+ICAgICAgICAgICAgICAgICBpbmZvID0gKGxlX2FkdmVydGlzaW5nX2luZm8gKikgJmJ1ZltpXTsK
+ICAgICAgICAgICAgICAgICAgICAgICAgaiAgPSAwOwogICAgICAgICAgICAgICAgICAgICAgICB3
+aGlsZSAoaiArIDEgPCBpbmZvLT5sZW5ndGggJiYgIWNvbm5lY3RlZCAmJgogICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgcmVzdWx0ID09IDApIHsKICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgIGRhdGFMZW4gPSBpbmZvLT5kYXRhW2pdOwogICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ZGF0YVR5cGUgPSBpbmZvLT5kYXRhW2ogKyAxXTsKICAgICAgICAgICAgICAgICAgICAgICAgICAg
+IGlmIChqICsgZGF0YUxlbiArIDEgPD0gaW5mby0+bGVuZ3RoKSB7CiAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgc3dpdGNoIChkYXRhVHlwZSkgewogICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgIGNhc2UgRUlSX05BTUVfU0hPUlQ6CiAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgY2FzZSBFSVJfTkFNRV9DT01QTEVURToKICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgayA9IGRhdGFMZW4gLSAxOwogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICBpZiAoayA+IHNpemVvZihOSVhJRV9OQU1FKSAtIDEpCiAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICBrID0gc2l6ZW9mKE5JWElFX05BTUUpIC0gMTsKICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgaWYgKGsgPiAwICYmIG1lbWNtcCgmaW5mby0+ZGF0
+YVtqICsgMl0sCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgTklYSUVfTkFNRSwgaykgPT0gMCkgewogICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgZnByaW50ZihzdGRlcnIsICJmb3VuZCBkZXZpY2VcbiIpOwogICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgZm91bmQgPSB0cnVlOwogICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgIGJyZWFrOwogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIH0KICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICAgICAgICAgICAgICAgIGogKz0gZGF0
+YUxlbiArIDE7CiAgICAgICAgICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICAgICAgICAg
+ICAgaSArPSBMRV9BRFZFUlRJU0lOR19JTkZPX1NJWkUgKyAyICsgaW5mby0+bGVuZ3RoOwogICAg
+ICAgICAgICAgICAgICAgIH0KCiAgICAgICAgICAgICAgICAgICAgYnJlYWs7CiAgICAgICAgICAg
+ICAgICBkZWZhdWx0OgogICAgICAgICAgICAgICAgICAgIGZwcmludGYoc3RkZXJyLCAidW5oYW5k
+bGVkIGxlIG1ldGEgc3ViZXZlbnQgMHglMDJ4XG4iLAogICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgKHVuc2lnbmVkIGludCkgbWV0YS0+c3ViZXZlbnQpOwogICAgICAgICAgICAgICAgICAgIGJy
+ZWFrOwogICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgYnJlYWs7CiAgICAgICAgICAg
+IGRlZmF1bHQ6CiAgICAgICAgICAgICAgICBmcHJpbnRmKHN0ZGVyciwgInVuaGFuZGxlZCBldmVu
+dCAweCUwMnhcbiIsCiAgICAgICAgICAgICAgICAgICAgICAgICh1bnNpZ25lZCBpbnQpIGhlYWRl
+ci0+ZXZ0KTsKICAgICAgICAgICAgICAgIGJyZWFrOwogICAgICAgICAgICB9CiAgICAgICAgfQog
+ICAgfQogICAgaWYgKGZvdW5kICYmIHJlc3VsdCA9PSAwKSB7CiAgICAgICAgaWYgKHNjYW5uaW5n
+KSB7CiAgICAgICAgICAgIGlmIChoY2lfbGVfc2V0X3NjYW5fZW5hYmxlKGhjaWZkLCAweDAwLCAx
+LCAxMDAwKSA8IDApCiAgICAgICAgICAgICAgICBmcHJpbnRmKHN0ZGVyciwgInN0b3Agc2NhbiBm
+YWlsZWRcbiIpOwogICAgICAgICAgICBzY2FubmluZyA9IGZhbHNlOwogICAgICAgIH0KICAgICAg
+ICAgICAgIAogICAgfQogICAgaWYgKGZvdW5kICYmIHJlc3VsdCA9PSAwKSB7CiAgICAgICAgZGV2
+QmRBZGRyVHlwZSA9IGluZm8tPmJkYWRkcl90eXBlOwogICAgICAgIG1lbWNweSgmZGV2QmRBZGRy
+LCAmaW5mby0+YmRhZGRyLAogICAgICAgICAgICAgICBzaXplb2YoZGV2QmRBZGRyKSk7CiAgICAg
+ICAgaWYgKGhjaV9sZV9jcmVhdGVfY29ubihoY2lmZCwgaHRvYnMoNCksIGh0b2JzKDQpLAogICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgMCwgaW5mby0+YmRhZGRyX3R5cGUsCiAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICBpbmZvLT5iZGFkZHIsCiAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICBMRV9QVUJMSUNfQUREUkVTUy8qQklTT04qLywKICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgIGh0b2JzKDE1KSwgaHRvYnMoMTUpLCBodG9icygwKSwKICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgIGh0b2JzKDEwMCksIGh0b2JzKDEpLCBodG9icygxKSwKICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICZoYW5kbGUsIDEwMDApID49IDApIHsKICAgICAgICAg
+ICAgZnByaW50ZihzdGRlcnIsICJoY2lfbGVfY3JlYXRlX2Nvbm5uIG9rYXlcbiIpOwogICAgICAg
+ICAgICBjb25uZWN0ZWQgPSB0cnVlOwogICAgICAgICAgICBtZW1zZXQoJmRzdCwgMCwgc2l6ZW9m
+KGRzdCkpOwogICAgICAgICAgICBkc3QubDJfZmFtaWx5ID0gQUZfQkxVRVRPT1RIOwogICAgICAg
+ICAgICBkc3QubDJfY2lkID0gaHRvYnMoLypBVFRfQ0lEKi80KTsKICAgICAgICAgICAgZHN0Lmwy
+X2JkYWRkcl90eXBlID0gZGV2QmRBZGRyVHlwZTsKICAgICAgICAgICAgbWVtY3B5KCZkc3QubDJf
+YmRhZGRyLCAmZGV2QmRBZGRyLCBzaXplb2YoZHN0LmwyX2JkYWRkcikpOwogICAgICAgICAgICBp
+ZiAoY29ubmVjdChhdHRTb2NrLCAoc3RydWN0IHNvY2thZGRyICopICZkc3QsIHNpemVvZihkc3Qp
+KSA8IDApIHsKICAgICAgICAgICAgICAgIGZwcmludGYoc3RkZXJyLCAiYXR0Y29ubmVjdCBmYWls
+ZWQgZXJybm8gJWQ6ICVzXG4iLAogICAgICAgICAgICAgICAgICAgICAgICBlcnJubywgc3RyZXJy
+b3IoZXJybm8pKTsKICAgICAgICAgICAgICAgICByZXN1bHQgPSAxOwogICAgICAgICAgICB9IGVs
+c2UgewogICAgICAgICAgICAgICAgZnByaW50ZihzdGRlcnIsICJDb25uZWN0ZWRcbiIpOwogICAg
+ICAgICAgICB9CiAgICAgICAgfSBlbHNlIHsKICAgICAgICAgICAgZnByaW50ZihzdGRlcnIsICJo
+Y2lfbGVfY3JlYXRlX2Nvbm4gZmFpbGVkXG4iKTsKICAgICAgICAgICAgcmVzdWx0ID0gMTsKICAg
+ICAgICB9CiAgICB9CgogICAgaWYgKGF0dFNvY2sgIT0gLTEpCiAgICAgICAgY2xvc2UoYXR0U29j
+ayk7CiAgICBpZiAoc2Nhbm5pbmcpCiAgICAgICAgaGNpX2xlX3NldF9zY2FuX2VuYWJsZShoY2lm
+ZCwgMHgwMCwgMSwgMTAwMCk7CiAgICBpZiAoY29ubmVjdGVkKQogICAgICAgIGhjaV9kaXNjb25u
+ZWN0KGhjaWZkLCBoYW5kbGUsCiAgICAgICAgICAgICAgICAgICAgICAgSENJX09FX1VTRVJfRU5E
+RURfQ09OTkVDVElPTiwgMTAwMCk7CgogICAgaWYgKGhjaWZkICE9IC0xKQogICAgICAgIGhjaV9j
+bG9zZV9kZXYoaGNpZmQpOwoKICAgIHJldHVybiByZXN1bHQ7Cn0KCg==
+--94eb2c083bc0ec35c5053239de57
+Content-Type: application/octet-stream; name=Makefile
+Content-Disposition: attachment; filename=Makefile
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_inwpkg5q1
+
+LlBIT05ZOiBhbGwgY2xlYW4KCmFsbDogYmx1ZXp0ZXN0CgpDX1NPVVJDRVMgPSBibHVlenRlc3Qu
+YwoKQ0NPUFRTID0gLWcgLWMgJChJTkNMVURFX1BBVEgpIC1XYWxsCgpDQ0xET1BUUyA9CgpMSUJT
+ID0gLWxibHVldG9vdGgKCkNfT0JKUyA9ICQoQ19TT1VSQ0VTOiUuYz0lLm8pCkNfREVQUyA9ICQo
+Q19TT1VSQ0VTOiUuYz0lLmQpCgpPQkpTID0gJChDX09CSlMpCgpERVBTID0gJChDX0RFUFMpCgok
+KENfT0JKUyk6ICUubzogJS5jCgkkKENDKSAkKENDT1BUUykgLW8gJEAgJDwKCmJsdWV6dGVzdDog
+JChPQkpTKQoJJChDQykgJChDQ0xET1BUUykgJChPQkpTKSAkKExJQlMpIC1vICRACgpjbGVhbjoK
+CS0kKFJNKSAtZiAkKE9CSlMpICQoREVQUykgYmx1ZXp0ZXN0CgotaW5jbHVkZSAkKERFUFMpCgo=
+--94eb2c083bc0ec35c5053239de57--
