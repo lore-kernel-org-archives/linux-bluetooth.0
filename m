@@ -1,9 +1,9 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 BlueZ 4/6] test: Update GATT examples with the new API
-Date: Mon,  9 May 2016 16:51:21 +0300
-Message-Id: <1462801883-6361-4-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCHv2 BlueZ 3/6] doc/gatt-api: Add secure flags
+Date: Mon,  9 May 2016 16:51:20 +0300
+Message-Id: <1462801883-6361-3-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1462801883-6361-1-git-send-email-luiz.dentz@gmail.com>
 References: <1462801883-6361-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,361 +11,273 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
+This add secure-{read,write} which shall be used by servers that want
+to restrict attribute access to secure connection only (BT_SECURITY_FIPS)
 ---
- test/example-gatt-client |   2 +-
- test/example-gatt-server |  90 +++++++++++++++++++++++++-------
- test/test-gatt-profile   | 130 ++++++++++++++++++++++++++++++++++++-----------
- 3 files changed, 172 insertions(+), 50 deletions(-)
+ doc/gatt-api.txt         |  4 +++
+ lib/bluetooth.h          |  1 +
+ src/gatt-database.c      | 90 ++++++++++++++++++++----------------------------
+ src/shared/att-types.h   |  5 +++
+ src/shared/gatt-server.c |  3 ++
+ 5 files changed, 51 insertions(+), 52 deletions(-)
 
-diff --git a/test/example-gatt-client b/test/example-gatt-client
-index b77a627..4d1df2f 100755
---- a/test/example-gatt-client
-+++ b/test/example-gatt-client
-@@ -113,7 +113,7 @@ def hr_msrmt_changed_cb(iface, changed_props, invalidated_props):
+diff --git a/doc/gatt-api.txt b/doc/gatt-api.txt
+index 9404986..cb4e196 100644
+--- a/doc/gatt-api.txt
++++ b/doc/gatt-api.txt
+@@ -150,6 +150,8 @@ Properties	string UUID [read-only]
+ 				"encrypt-write"
+ 				"encrypt-authenticated-read"
+ 				"encrypt-authenticated-write"
++				"secure-read" (Server only)
++				"secure-write" (Server only)
  
- def start_client():
-     # Read the Body Sensor Location value and print it asynchronously.
--    body_snsr_loc_chrc[0].ReadValue(reply_handler=body_sensor_val_cb,
-+    body_snsr_loc_chrc[0].ReadValue({}, reply_handler=body_sensor_val_cb,
-                                     error_handler=generic_error_cb,
-                                     dbus_interface=GATT_CHRC_IFACE)
+ Characteristic Descriptors hierarchy
+ ====================================
+@@ -217,6 +219,8 @@ Properties	string UUID [read-only]
+ 				"encrypt-write"
+ 				"encrypt-authenticated-read"
+ 				"encrypt-authenticated-write"
++				"secure-read" (Server Only)
++				"secure-write" (Server Only)
  
-diff --git a/test/example-gatt-server b/test/example-gatt-server
-index 93cf068..71aeb1b 100755
---- a/test/example-gatt-server
-+++ b/test/example-gatt-server
-@@ -166,13 +166,15 @@ class Characteristic(dbus.service.Object):
+ GATT Profile hierarcy
+ =====================
+diff --git a/lib/bluetooth.h b/lib/bluetooth.h
+index 852a6b2..eb27926 100644
+--- a/lib/bluetooth.h
++++ b/lib/bluetooth.h
+@@ -69,6 +69,7 @@ struct bt_security {
+ #define BT_SECURITY_LOW		1
+ #define BT_SECURITY_MEDIUM	2
+ #define BT_SECURITY_HIGH	3
++#define BT_SECURITY_FIPS	4
  
-         return self.get_properties[GATT_CHRC_IFACE]
+ #define BT_DEFER_SETUP	7
  
--    @dbus.service.method(GATT_CHRC_IFACE, out_signature='ay')
--    def ReadValue(self):
-+    @dbus.service.method(GATT_CHRC_IFACE,
-+                        in_signature='a{sv}',
-+                        out_signature='ay')
-+    def ReadValue(self, options):
-         print('Default ReadValue called, returning error')
-         raise NotSupportedException()
+diff --git a/src/gatt-database.c b/src/gatt-database.c
+index 09bec0b..e287b98 100644
+--- a/src/gatt-database.c
++++ b/src/gatt-database.c
+@@ -116,6 +116,7 @@ struct external_chrc {
+ 	GDBusProxy *proxy;
+ 	uint8_t props;
+ 	uint8_t ext_props;
++	uint32_t perm;
+ 	struct gatt_db_attribute *attrib;
+ 	struct gatt_db_attribute *ccc;
+ 	struct queue *pending_reads;
+@@ -1113,7 +1114,7 @@ static bool incr_attr_count(struct external_service *service, uint16_t incr)
+ }
  
--    @dbus.service.method(GATT_CHRC_IFACE, in_signature='ay')
--    def WriteValue(self, value):
-+    @dbus.service.method(GATT_CHRC_IFACE, in_signature='aya{sv}')
-+    def WriteValue(self, value, options):
-         print('Default WriteValue called, returning error')
-         raise NotSupportedException()
+ static bool parse_chrc_flags(DBusMessageIter *array, uint8_t *props,
+-							uint8_t *ext_props)
++					uint8_t *ext_props, uint32_t *perm)
+ {
+ 	const char *flag;
  
-@@ -222,13 +224,15 @@ class Descriptor(dbus.service.Object):
+@@ -1127,34 +1128,51 @@ static bool parse_chrc_flags(DBusMessageIter *array, uint8_t *props,
  
-         return self.get_properties[GATT_CHRC_IFACE]
+ 		if (!strcmp("broadcast", flag))
+ 			*props |= BT_GATT_CHRC_PROP_BROADCAST;
+-		else if (!strcmp("read", flag))
++		else if (!strcmp("read", flag)) {
+ 			*props |= BT_GATT_CHRC_PROP_READ;
+-		else if (!strcmp("write-without-response", flag))
++			*perm |= BT_ATT_PERM_READ;
++		} else if (!strcmp("write-without-response", flag)) {
+ 			*props |= BT_GATT_CHRC_PROP_WRITE_WITHOUT_RESP;
+-		else if (!strcmp("write", flag))
++			*perm |= BT_ATT_PERM_WRITE;
++		} else if (!strcmp("write", flag)) {
+ 			*props |= BT_GATT_CHRC_PROP_WRITE;
+-		else if (!strcmp("notify", flag))
++			*perm |= BT_ATT_PERM_WRITE;
++		} else if (!strcmp("notify", flag)) {
+ 			*props |= BT_GATT_CHRC_PROP_NOTIFY;
+-		else if (!strcmp("indicate", flag))
++		} else if (!strcmp("indicate", flag)) {
+ 			*props |= BT_GATT_CHRC_PROP_INDICATE;
+-		else if (!strcmp("authenticated-signed-writes", flag))
++		} else if (!strcmp("authenticated-signed-writes", flag)) {
+ 			*props |= BT_GATT_CHRC_PROP_AUTH;
+-		else if (!strcmp("reliable-write", flag))
++			*perm |= BT_ATT_PERM_WRITE;
++		} else if (!strcmp("reliable-write", flag)) {
+ 			*ext_props |= BT_GATT_CHRC_EXT_PROP_RELIABLE_WRITE;
+-		else if (!strcmp("writable-auxiliaries", flag))
++			*perm |= BT_ATT_PERM_WRITE;
++		} else if (!strcmp("writable-auxiliaries", flag)) {
+ 			*ext_props |= BT_GATT_CHRC_EXT_PROP_WRITABLE_AUX;
+-		else if (!strcmp("encrypt-read", flag)) {
++		} else if (!strcmp("encrypt-read", flag)) {
+ 			*props |= BT_GATT_CHRC_PROP_READ;
+ 			*ext_props |= BT_GATT_CHRC_EXT_PROP_ENC_READ;
++			*perm |= BT_ATT_PERM_READ | BT_ATT_PERM_READ_ENCRYPT;
+ 		} else if (!strcmp("encrypt-write", flag)) {
+ 			*props |= BT_GATT_CHRC_PROP_WRITE;
+ 			*ext_props |= BT_GATT_CHRC_EXT_PROP_ENC_WRITE;
++			*perm |= BT_ATT_PERM_WRITE | BT_ATT_PERM_WRITE_ENCRYPT;
+ 		} else if (!strcmp("encrypt-authenticated-read", flag)) {
+ 			*props |= BT_GATT_CHRC_PROP_READ;
+ 			*ext_props |= BT_GATT_CHRC_EXT_PROP_AUTH_READ;
++			*perm |= BT_ATT_PERM_READ | BT_ATT_PERM_READ_AUTHEN;
+ 		} else if (!strcmp("encrypt-authenticated-write", flag)) {
+ 			*props |= BT_GATT_CHRC_PROP_WRITE;
+ 			*ext_props |= BT_GATT_CHRC_EXT_PROP_AUTH_WRITE;
++			*perm |= BT_ATT_PERM_WRITE | BT_ATT_PERM_WRITE_AUTHEN;
++		} else if (!strcmp("secure-read", flag)) {
++			*props |= BT_GATT_CHRC_PROP_READ;
++			*ext_props |= BT_GATT_CHRC_EXT_PROP_AUTH_READ;
++			*perm |= BT_ATT_PERM_WRITE | BT_ATT_PERM_READ_SECURE;
++		} else if (!strcmp("secure-write", flag)) {
++			*props |= BT_GATT_CHRC_PROP_WRITE;
++			*ext_props |= BT_GATT_CHRC_EXT_PROP_AUTH_WRITE;
++			*perm |= BT_ATT_PERM_WRITE | BT_ATT_PERM_WRITE_SECURE;
+ 		} else {
+ 			error("Invalid characteristic flag: %s", flag);
+ 			return false;
+@@ -1191,6 +1209,10 @@ static bool parse_desc_flags(DBusMessageIter *array, uint32_t *perm)
+ 			*perm |= BT_ATT_PERM_READ | BT_ATT_PERM_READ_AUTHEN;
+ 		else if (!strcmp("encrypt-authenticated-write", flag))
+ 			*perm |= BT_ATT_PERM_WRITE | BT_ATT_PERM_WRITE_AUTHEN;
++		else if (!strcmp("secure-read", flag))
++			*perm |= BT_ATT_PERM_READ | BT_ATT_PERM_READ_AUTHEN;
++		else if (!strcmp("secure-write", flag))
++			*perm |= BT_ATT_PERM_WRITE | BT_ATT_PERM_WRITE_AUTHEN;
+ 		else {
+ 			error("Invalid descriptor flag: %s", flag);
+ 			return false;
+@@ -1204,6 +1226,7 @@ static bool parse_flags(GDBusProxy *proxy, uint8_t *props, uint8_t *ext_props,
+ 								uint32_t *perm)
+ {
+ 	DBusMessageIter iter, array;
++	const char *iface;
  
--    @dbus.service.method(GATT_DESC_IFACE, out_signature='ay')
--    def ReadValue(self):
-+    @dbus.service.method(GATT_DESC_IFACE,
-+                        in_signature='a{sv}',
-+                        out_signature='ay')
-+    def ReadValue(self, options):
-         print ('Default ReadValue called, returning error')
-         raise NotSupportedException()
+ 	if (!g_dbus_proxy_get_property(proxy, "Flags", &iter))
+ 		return false;
+@@ -1213,10 +1236,11 @@ static bool parse_flags(GDBusProxy *proxy, uint8_t *props, uint8_t *ext_props,
  
--    @dbus.service.method(GATT_DESC_IFACE, in_signature='ay')
--    def WriteValue(self, value):
-+    @dbus.service.method(GATT_DESC_IFACE, in_signature='aya{sv}')
-+    def WriteValue(self, value, options):
-         print('Default WriteValue called, returning error')
-         raise NotSupportedException()
+ 	dbus_message_iter_recurse(&iter, &array);
  
-@@ -317,7 +321,7 @@ class BodySensorLocationChrc(Characteristic):
-                 ['read'],
-                 service)
+-	if (perm)
++	iface = g_dbus_proxy_get_interface(proxy);
++	if (!strcmp(iface, GATT_DESC_IFACE))
+ 		return parse_desc_flags(&array, perm);
  
--    def ReadValue(self):
-+    def ReadValue(self, options):
-         # Return 'Chest' as the sensor location.
-         return [ 0x01 ]
+-	return parse_chrc_flags(&array, props, ext_props);
++	return parse_chrc_flags(&array, props, ext_props, perm);
+ }
  
-@@ -331,7 +335,7 @@ class HeartRateControlPointChrc(Characteristic):
-                 ['write'],
-                 service)
+ static struct external_chrc *chrc_create(struct gatt_app *app,
+@@ -1264,7 +1288,7 @@ static struct external_chrc *chrc_create(struct gatt_app *app,
+ 	 * are used to determine if any special descriptors should be
+ 	 * created.
+ 	 */
+-	if (!parse_flags(proxy, &chrc->props, &chrc->ext_props, NULL)) {
++	if (!parse_flags(proxy, &chrc->props, &chrc->ext_props, &chrc->perm)) {
+ 		error("Failed to parse characteristic properties");
+ 		goto fail;
+ 	}
+@@ -1752,37 +1776,6 @@ static struct pending_op *send_write(struct btd_device *device,
+ 	return NULL;
+ }
  
--    def WriteValue(self, value):
-+    def WriteValue(self, value, options):
-         print('Heart Rate Control Point WriteValue called')
+-static uint32_t permissions_from_props(uint8_t props, uint8_t ext_props)
+-{
+-	uint32_t perm = 0;
+-
+-	if (props & BT_GATT_CHRC_PROP_WRITE ||
+-			props & BT_GATT_CHRC_PROP_WRITE_WITHOUT_RESP ||
+-			ext_props & BT_GATT_CHRC_EXT_PROP_RELIABLE_WRITE ||
+-			ext_props & BT_GATT_CHRC_EXT_PROP_ENC_WRITE ||
+-			ext_props & BT_GATT_CHRC_EXT_PROP_AUTH_WRITE)
+-		perm |= BT_ATT_PERM_WRITE;
+-
+-	if (props & BT_GATT_CHRC_PROP_READ ||
+-			ext_props & BT_GATT_CHRC_EXT_PROP_ENC_READ ||
+-			ext_props & BT_GATT_CHRC_EXT_PROP_AUTH_READ)
+-		perm |= BT_ATT_PERM_READ;
+-
+-	if (ext_props & BT_GATT_CHRC_EXT_PROP_ENC_READ)
+-		perm |= BT_ATT_PERM_READ_ENCRYPT;
+-
+-	if (ext_props & BT_GATT_CHRC_EXT_PROP_ENC_WRITE)
+-		perm |= BT_ATT_PERM_WRITE_ENCRYPT;
+-
+-	if (ext_props & BT_GATT_CHRC_EXT_PROP_AUTH_READ)
+-		perm |= BT_ATT_PERM_READ_AUTHEN;
+-
+-	if (ext_props & BT_GATT_CHRC_EXT_PROP_AUTH_WRITE)
+-		perm |= BT_ATT_PERM_WRITE_AUTHEN;
+-
+-	return perm;
+-}
+-
+ static uint8_t ccc_write_cb(uint16_t value, void *user_data)
+ {
+ 	struct external_chrc *chrc = user_data;
+@@ -2112,7 +2105,6 @@ static bool database_add_chrc(struct external_service *service,
+ 						struct external_chrc *chrc)
+ {
+ 	bt_uuid_t uuid;
+-	uint32_t perm;
+ 	const struct queue_entry *entry;
  
-         if len(value) != 1:
-@@ -393,7 +397,7 @@ class BatteryLevelCharacteristic(Characteristic):
-         self.notify_battery_level()
-         return True
+ 	if (!parse_uuid(chrc->proxy, &uuid)) {
+@@ -2125,14 +2117,8 @@ static bool database_add_chrc(struct external_service *service,
+ 		return false;
+ 	}
  
--    def ReadValue(self):
-+    def ReadValue(self, options):
-         print('Battery Level read: ' + repr(self.battery_lvl))
-         return [dbus.Byte(self.battery_lvl)]
+-	/*
+-	 * TODO: Once shared/gatt-server properly supports permission checks,
+-	 * set the permissions based on a D-Bus property of the external
+-	 * characteristic.
+-	 */
+-	perm = permissions_from_props(chrc->props, chrc->ext_props);
+ 	chrc->attrib = gatt_db_service_add_characteristic(service->attrib,
+-						&uuid, perm,
++						&uuid, chrc->perm,
+ 						chrc->props, chrc_read_cb,
+ 						chrc_write_cb, chrc);
+ 	if (!chrc->attrib) {
+diff --git a/src/shared/att-types.h b/src/shared/att-types.h
+index c3062c0..4a9b67f 100644
+--- a/src/shared/att-types.h
++++ b/src/shared/att-types.h
+@@ -31,6 +31,7 @@
+ #define BT_ATT_SECURITY_LOW	1
+ #define BT_ATT_SECURITY_MEDIUM	2
+ #define BT_ATT_SECURITY_HIGH	3
++#define BT_ATT_SECURITY_FIPS	4
  
-@@ -425,6 +429,7 @@ class TestService(Service):
-         Service.__init__(self, bus, index, self.TEST_SVC_UUID, False)
-         self.add_characteristic(TestCharacteristic(bus, 0, self))
-         self.add_characteristic(TestEncryptCharacteristic(bus, 1, self))
-+        self.add_characteristic(TestSecureCharacteristic(bus, 2, self))
+ #define BT_ATT_DEFAULT_LE_MTU	23
+ #define BT_ATT_MAX_LE_MTU	517
+@@ -123,6 +124,10 @@ struct bt_att_pdu_error_rsp {
+ 					BT_ATT_PERM_WRITE_AUTHEN)
+ #define BT_ATT_PERM_AUTHOR		0x40
+ #define BT_ATT_PERM_NONE		0x80
++#define BT_ATT_PERM_READ_SECURE		0x0100
++#define BT_ATT_PERM_WRITE_SECURE	0x0200
++#define BT_ATT_PERM_SECURE		(BT_ATT_PERM_READ_SECURE | \
++					BT_ATT_PERM_WRITE_SECURE)
  
- class TestCharacteristic(Characteristic):
-     """
-@@ -445,11 +450,11 @@ class TestCharacteristic(Characteristic):
-         self.add_descriptor(
-                 CharacteristicUserDescriptionDescriptor(bus, 1, self))
+ /* GATT Characteristic Properties Bitfield values */
+ #define BT_GATT_CHRC_PROP_BROADCAST			0x01
+diff --git a/src/shared/gatt-server.c b/src/shared/gatt-server.c
+index 123d9c1..79e01c8 100644
+--- a/src/shared/gatt-server.c
++++ b/src/shared/gatt-server.c
+@@ -398,6 +398,9 @@ static uint8_t check_permissions(struct bt_gatt_server *server,
+ 		return 0;
  
--    def ReadValue(self):
-+    def ReadValue(self, options):
-         print('TestCharacteristic Read: ' + repr(self.value))
-         return self.value
- 
--    def WriteValue(self, value):
-+    def WriteValue(self, value, options):
-         print('TestCharacteristic Write: ' + repr(value))
-         self.value = value
- 
-@@ -468,7 +473,7 @@ class TestDescriptor(Descriptor):
-                 ['read', 'write'],
-                 characteristic)
- 
--    def ReadValue(self):
-+    def ReadValue(self, options):
-         return [
-                 dbus.Byte('T'), dbus.Byte('e'), dbus.Byte('s'), dbus.Byte('t')
-         ]
-@@ -491,10 +496,10 @@ class CharacteristicUserDescriptionDescriptor(Descriptor):
-                 ['read', 'write'],
-                 characteristic)
- 
--    def ReadValue(self):
-+    def ReadValue(self, options):
-         return self.value
- 
--    def WriteValue(self, value):
-+    def WriteValue(self, value, options):
-         if not self.writable:
-             raise NotPermittedException()
-         self.value = value
-@@ -517,11 +522,11 @@ class TestEncryptCharacteristic(Characteristic):
-         self.add_descriptor(
-                 CharacteristicUserDescriptionDescriptor(bus, 3, self))
- 
--    def ReadValue(self):
-+    def ReadValue(self, options):
-         print('TestCharacteristic Read: ' + repr(self.value))
-         return self.value
- 
--    def WriteValue(self, value):
-+    def WriteValue(self, value, options):
-         print('TestCharacteristic Write: ' + repr(value))
-         self.value = value
- 
-@@ -539,7 +544,54 @@ class TestEncryptDescriptor(Descriptor):
-                 ['encrypt-read', 'encrypt-write'],
-                 characteristic)
- 
--    def ReadValue(self):
-+    def ReadValue(self, options):
-+        return [
-+                dbus.Byte('T'), dbus.Byte('e'), dbus.Byte('s'), dbus.Byte('t')
-+        ]
+ 	security = bt_att_get_security(server->att);
++	if (perm & BT_ATT_PERM_SECURE && security < BT_ATT_SECURITY_FIPS)
++		return BT_ATT_ERROR_AUTHENTICATION;
 +
-+
-+class TestSecureCharacteristic(Characteristic):
-+    """
-+    Dummy test characteristic requiring secure connection.
-+
-+    """
-+    TEST_CHRC_UUID = '12345678-1234-5678-1234-56789abcdef5'
-+
-+    def __init__(self, bus, index, service):
-+        Characteristic.__init__(
-+                self, bus, index,
-+                self.TEST_CHRC_UUID,
-+                ['secure-read', 'secure-write'],
-+                service)
-+        self.value = []
-+        self.add_descriptor(TestEncryptDescriptor(bus, 2, self))
-+        self.add_descriptor(
-+                CharacteristicUserDescriptionDescriptor(bus, 3, self))
-+
-+    def ReadValue(self, options):
-+        print('TestCharacteristic Read: ' + repr(self.value))
-+        return self.value
-+
-+    def WriteValue(self, value, options):
-+        print('TestCharacteristic Write: ' + repr(value))
-+        self.value = value
-+
-+
-+class TestSecureDescriptor(Descriptor):
-+    """
-+    Dummy test descriptor requiring secure connection. Returns a static value.
-+
-+    """
-+    TEST_DESC_UUID = '12345678-1234-5678-1234-56789abcdef6'
-+
-+    def __init__(self, bus, index, characteristic):
-+        Descriptor.__init__(
-+                self, bus, index,
-+                self.TEST_DESC_UUID,
-+                ['secure-read', 'secure-write'],
-+                characteristic)
-+
-+    def ReadValue(self, options):
-         return [
-                 dbus.Byte('T'), dbus.Byte('e'), dbus.Byte('s'), dbus.Byte('t')
-         ]
-diff --git a/test/test-gatt-profile b/test/test-gatt-profile
-index ad320b1..995a659 100755
---- a/test/test-gatt-profile
-+++ b/test/test-gatt-profile
-@@ -15,46 +15,116 @@ except ImportError:
-   import gobject as GObject
- import bluezutils
+ 	if (perm & BT_ATT_PERM_AUTHEN && security < BT_ATT_SECURITY_HIGH)
+ 		return BT_ATT_ERROR_AUTHENTICATION;
  
--class GattProfile(dbus.service.Object):
--	@dbus.service.method("org.bluez.GattProfile1",
--					in_signature="", out_signature="")
--	def Release(self):
--		print("Release")
--		mainloop.quit()
-+BLUEZ_SERVICE_NAME = 'org.bluez'
-+GATT_MANAGER_IFACE = 'org.bluez.GattManager1'
-+DBUS_OM_IFACE = 'org.freedesktop.DBus.ObjectManager'
-+DBUS_PROP_IFACE = 'org.freedesktop.DBus.Properties'
- 
--if __name__ == '__main__':
--	dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
-+GATT_PROFILE_IFACE = 'org.bluez.GattProfile1'
-+
-+
-+class InvalidArgsException(dbus.exceptions.DBusException):
-+    _dbus_error_name = 'org.freedesktop.DBus.Error.InvalidArgs'
-+
-+
-+class Application(dbus.service.Object):
-+    def __init__(self, bus):
-+        self.path = '/'
-+        self.profiles = []
-+        dbus.service.Object.__init__(self, bus, self.path)
-+
-+    def get_path(self):
-+        return dbus.ObjectPath(self.path)
-+
-+    def add_profile(self, profile):
-+        self.profiles.append(profile)
-+
-+    @dbus.service.method(DBUS_OM_IFACE, out_signature='a{oa{sa{sv}}}')
-+    def GetManagedObjects(self):
-+        response = {}
-+        print('GetManagedObjects')
-+
-+        for profile in self.profiles:
-+            response[profile.get_path()] = profile.get_properties()
-+
-+        return response
-+
-+
-+class Profile(dbus.service.Object):
-+    PATH_BASE = '/org/bluez/example/profile'
- 
--	bus = dbus.SystemBus()
-+    def __init__(self, bus, uuids):
-+        self.path = self.PATH_BASE
-+        self.bus = bus
-+        self.uuids = uuids
-+        dbus.service.Object.__init__(self, bus, self.path)
-+
-+    def get_properties(self):
-+        return {
-+            GATT_PROFILE_IFACE: {
-+                'UUIDs': self.uuids,
-+            }
-+        }
-+
-+    def get_path(self):
-+        return dbus.ObjectPath(self.path)
-+
-+    @dbus.service.method(GATT_PROFILE_IFACE,
-+                        in_signature="",
-+                        out_signature="")
-+    def Release(self):
-+        print("Release")
-+        mainloop.quit()
-+
-+    @dbus.service.method(DBUS_PROP_IFACE,
-+                         in_signature='s',
-+                         out_signature='a{sv}')
-+    def GetAll(self, interface):
-+        if interface != GATT_PROFILE_IFACE:
-+            raise InvalidArgsException()
-+
-+        return self.get_properties[GATT_PROFILE_IFACE]
-+
-+
-+def register_app_cb():
-+    print('GATT application registered')
-+
-+
-+def register_app_error_cb(error):
-+    print('Failed to register application: ' + str(error))
-+    mainloop.quit()
-+
-+if __name__ == '__main__':
-+    dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
- 
--	path = bluezutils.find_adapter().object_path
-+    bus = dbus.SystemBus()
- 
--	manager = dbus.Interface(bus.get_object("org.bluez", path),
--				"org.bluez.GattManager1")
-+    path = bluezutils.find_adapter().object_path
- 
--	option_list = [
--			make_option("-u", "--uuid", action="store",
--					type="string", dest="uuid",
--					default=None),
--			make_option("-p", "--path", action="store",
--					type="string", dest="path",
--					default="/foo/bar/profile"),
--			]
-+    manager = dbus.Interface(bus.get_object("org.bluez", path),
-+                            GATT_MANAGER_IFACE)
- 
--	opts = dbus.Dictionary({ }, signature='sv')
-+    option_list = [make_option("-u", "--uuid", action="store",
-+                                type="string", dest="uuid",
-+                                default=None),
-+    ]
- 
--	parser = OptionParser(option_list=option_list)
-+    opts = dbus.Dictionary({}, signature='sv')
- 
--	(options, args) = parser.parse_args()
-+    parser = OptionParser(option_list=option_list)
- 
--	profile = GattProfile(bus, options.path)
-+    (options, args) = parser.parse_args()
- 
--	mainloop = GObject.MainLoop()
-+    mainloop = GObject.MainLoop()
- 
--	if not options.uuid:
--		options.uuid = str(uuid.uuid4())
-+    if not options.uuid:
-+        options.uuid = str(uuid.uuid4())
- 
--	uuids = { options.uuid }
--	manager.RegisterProfile(options.path, uuids, opts)
-+    app = Application(bus)
-+    profile = Profile(bus, [options.uuid])
-+    app.add_profile(profile)
-+    manager.RegisterApplication(app.get_path(), {},
-+                                reply_handler=register_app_cb,
-+                                error_handler=register_app_error_cb)
- 
--	mainloop.run()
-+    mainloop.run()
 -- 
 2.5.5
 
