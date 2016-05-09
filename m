@@ -1,9 +1,9 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 BlueZ 3/6] doc/gatt-api: Add secure flags
-Date: Mon,  9 May 2016 16:51:20 +0300
-Message-Id: <1462801883-6361-3-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCHv2 BlueZ 2/6] doc/gatt-api: Merge RegisterProfile with RegisterApplication
+Date: Mon,  9 May 2016 16:51:19 +0300
+Message-Id: <1462801883-6361-2-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1462801883-6361-1-git-send-email-luiz.dentz@gmail.com>
 References: <1462801883-6361-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,272 +11,592 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This add secure-{read,write} which shall be used by servers that want
-to restrict attribute access to secure connection only (BT_SECURITY_FIPS)
+Since RegisterApplication makes use of ObjectManager it is also possible
+to verify the existance of GattProfile objects unifying the API for both
+services (GATT server) and profiles (GATT client).
 ---
- doc/gatt-api.txt         |  4 +++
- lib/bluetooth.h          |  1 +
- src/gatt-database.c      | 90 ++++++++++++++++++++----------------------------
- src/shared/att-types.h   |  5 +++
- src/shared/gatt-server.c |  3 ++
- 5 files changed, 51 insertions(+), 52 deletions(-)
+ doc/gatt-api.txt    |  37 ++---
+ src/gatt-database.c | 413 +++++++++++++++++++++-------------------------------
+ 2 files changed, 171 insertions(+), 279 deletions(-)
 
 diff --git a/doc/gatt-api.txt b/doc/gatt-api.txt
-index 9404986..cb4e196 100644
+index 683b1b7..9404986 100644
 --- a/doc/gatt-api.txt
 +++ b/doc/gatt-api.txt
-@@ -150,6 +150,8 @@ Properties	string UUID [read-only]
- 				"encrypt-write"
+@@ -218,8 +218,8 @@ Properties	string UUID [read-only]
  				"encrypt-authenticated-read"
  				"encrypt-authenticated-write"
-+				"secure-read" (Server only)
-+				"secure-write" (Server only)
  
- Characteristic Descriptors hierarchy
- ====================================
-@@ -217,6 +219,8 @@ Properties	string UUID [read-only]
- 				"encrypt-write"
- 				"encrypt-authenticated-read"
- 				"encrypt-authenticated-write"
-+				"secure-read" (Server Only)
-+				"secure-write" (Server Only)
+-Profile hierarcy
+-================
++GATT Profile hierarcy
++=====================
  
- GATT Profile hierarcy
- =====================
-diff --git a/lib/bluetooth.h b/lib/bluetooth.h
-index 852a6b2..eb27926 100644
---- a/lib/bluetooth.h
-+++ b/lib/bluetooth.h
-@@ -69,6 +69,7 @@ struct bt_security {
- #define BT_SECURITY_LOW		1
- #define BT_SECURITY_MEDIUM	2
- #define BT_SECURITY_HIGH	3
-+#define BT_SECURITY_FIPS	4
+ Local profile (GATT client) instance. By registering this type of object
+ an application effectively indicates support for a specific GATT profile
+@@ -238,6 +238,10 @@ Methods		void Release()
+ 			profile, because when this method gets called it has
+ 			already been unregistered.
  
- #define BT_DEFER_SETUP	7
++Properties	array{string} UUIDs [read-only]
++
++			128-bit GATT service UUIDs.
++
  
+ GATT Manager hierarchy
+ ======================
+@@ -306,11 +310,12 @@ Object path	[variable prefix]/{hci0,hci1,...}
+ Methods		void RegisterApplication(object application, dict options)
+ 
+ 			Registers a local GATT services hierarchy as described
+-			above.
++			above (GATT Server) and/or GATT profiles (GATT Client).
+ 
+ 			The application object path together with the D-Bus
+ 			system bus connection ID define the identification of
+-			the application registering a GATT based service.
++			the application registering a GATT based
++			service or profile.
+ 
+ 			Possible errors: org.bluez.Error.InvalidArguments
+ 					 org.bluez.Error.AlreadyExists
+@@ -324,27 +329,3 @@ Methods		void RegisterApplication(object application, dict options)
+ 
+ 			Possible errors: org.bluez.Error.InvalidArguments
+ 					 org.bluez.Error.DoesNotExist
+-
+-		void RegisterProfile(object profile, array{string} UUIDs,
+-				     dict options)
+-
+-			Registers a GATT (client role) profile exported
+-			under interface GattProfile1. The array of UUIDs
+-			specifies the mandatory set of remote service
+-			UUIDs that should all be available for the
+-			remote device to match this profile. Matching
+-			devices will be added to the auto-connection
+-			list and connected whenever available.
+-
+-			Possible errors: org.bluez.Error.InvalidArguments
+-					 org.bluez.Error.AlreadyExists
+-
+-		void UnregisterProfile(object profile)
+-
+-			This unregisters the profile that has been
+-			previously registered. The object path parameter
+-			must match the same value that has been used
+-			on registration.
+-
+-			Possible errors: org.bluez.Error.InvalidArguments
+-					 org.bluez.Error.DoesNotExist
 diff --git a/src/gatt-database.c b/src/gatt-database.c
-index 09bec0b..e287b98 100644
+index 99d084d..09bec0b 100644
 --- a/src/gatt-database.c
 +++ b/src/gatt-database.c
-@@ -116,6 +116,7 @@ struct external_chrc {
- 	GDBusProxy *proxy;
- 	uint8_t props;
- 	uint8_t ext_props;
-+	uint32_t perm;
- 	struct gatt_db_attribute *attrib;
- 	struct gatt_db_attribute *ccc;
- 	struct queue *pending_reads;
-@@ -1113,7 +1114,7 @@ static bool incr_attr_count(struct external_service *service, uint16_t incr)
+@@ -54,6 +54,7 @@
+ #endif
+ 
+ #define GATT_MANAGER_IFACE	"org.bluez.GattManager1"
++#define GATT_PROFILE_IFACE	"org.bluez.GattProfile1"
+ #define GATT_SERVICE_IFACE	"org.bluez.GattService1"
+ #define GATT_CHRC_IFACE		"org.bluez.GattCharacteristic1"
+ #define GATT_DESC_IFACE		"org.bluez.GattDescriptor1"
+@@ -88,6 +89,7 @@ struct gatt_app {
+ 	DBusMessage *reg;
+ 	GDBusClient *client;
+ 	bool failed;
++	struct queue *profiles;
+ 	struct queue *services;
+ 	struct queue *proxies;
+ };
+@@ -103,10 +105,8 @@ struct external_service {
+ };
+ 
+ struct external_profile {
+-	struct btd_gatt_database *database;
+-	char *owner;
+-	char *path;	/* Path to GattProfile1 */
+-	unsigned int id;
++	struct gatt_app *app;
++	GDBusProxy *proxy;
+ 	struct queue *profiles; /* btd_profile list */
+ };
+ 
+@@ -362,30 +362,6 @@ static void service_free(void *data)
+ 	free(service);
  }
  
- static bool parse_chrc_flags(DBusMessageIter *array, uint8_t *props,
--							uint8_t *ext_props)
-+					uint8_t *ext_props, uint32_t *perm)
- {
- 	const char *flag;
- 
-@@ -1127,34 +1128,51 @@ static bool parse_chrc_flags(DBusMessageIter *array, uint8_t *props,
- 
- 		if (!strcmp("broadcast", flag))
- 			*props |= BT_GATT_CHRC_PROP_BROADCAST;
--		else if (!strcmp("read", flag))
-+		else if (!strcmp("read", flag)) {
- 			*props |= BT_GATT_CHRC_PROP_READ;
--		else if (!strcmp("write-without-response", flag))
-+			*perm |= BT_ATT_PERM_READ;
-+		} else if (!strcmp("write-without-response", flag)) {
- 			*props |= BT_GATT_CHRC_PROP_WRITE_WITHOUT_RESP;
--		else if (!strcmp("write", flag))
-+			*perm |= BT_ATT_PERM_WRITE;
-+		} else if (!strcmp("write", flag)) {
- 			*props |= BT_GATT_CHRC_PROP_WRITE;
--		else if (!strcmp("notify", flag))
-+			*perm |= BT_ATT_PERM_WRITE;
-+		} else if (!strcmp("notify", flag)) {
- 			*props |= BT_GATT_CHRC_PROP_NOTIFY;
--		else if (!strcmp("indicate", flag))
-+		} else if (!strcmp("indicate", flag)) {
- 			*props |= BT_GATT_CHRC_PROP_INDICATE;
--		else if (!strcmp("authenticated-signed-writes", flag))
-+		} else if (!strcmp("authenticated-signed-writes", flag)) {
- 			*props |= BT_GATT_CHRC_PROP_AUTH;
--		else if (!strcmp("reliable-write", flag))
-+			*perm |= BT_ATT_PERM_WRITE;
-+		} else if (!strcmp("reliable-write", flag)) {
- 			*ext_props |= BT_GATT_CHRC_EXT_PROP_RELIABLE_WRITE;
--		else if (!strcmp("writable-auxiliaries", flag))
-+			*perm |= BT_ATT_PERM_WRITE;
-+		} else if (!strcmp("writable-auxiliaries", flag)) {
- 			*ext_props |= BT_GATT_CHRC_EXT_PROP_WRITABLE_AUX;
--		else if (!strcmp("encrypt-read", flag)) {
-+		} else if (!strcmp("encrypt-read", flag)) {
- 			*props |= BT_GATT_CHRC_PROP_READ;
- 			*ext_props |= BT_GATT_CHRC_EXT_PROP_ENC_READ;
-+			*perm |= BT_ATT_PERM_READ | BT_ATT_PERM_READ_ENCRYPT;
- 		} else if (!strcmp("encrypt-write", flag)) {
- 			*props |= BT_GATT_CHRC_PROP_WRITE;
- 			*ext_props |= BT_GATT_CHRC_EXT_PROP_ENC_WRITE;
-+			*perm |= BT_ATT_PERM_WRITE | BT_ATT_PERM_WRITE_ENCRYPT;
- 		} else if (!strcmp("encrypt-authenticated-read", flag)) {
- 			*props |= BT_GATT_CHRC_PROP_READ;
- 			*ext_props |= BT_GATT_CHRC_EXT_PROP_AUTH_READ;
-+			*perm |= BT_ATT_PERM_READ | BT_ATT_PERM_READ_AUTHEN;
- 		} else if (!strcmp("encrypt-authenticated-write", flag)) {
- 			*props |= BT_GATT_CHRC_PROP_WRITE;
- 			*ext_props |= BT_GATT_CHRC_EXT_PROP_AUTH_WRITE;
-+			*perm |= BT_ATT_PERM_WRITE | BT_ATT_PERM_WRITE_AUTHEN;
-+		} else if (!strcmp("secure-read", flag)) {
-+			*props |= BT_GATT_CHRC_PROP_READ;
-+			*ext_props |= BT_GATT_CHRC_EXT_PROP_AUTH_READ;
-+			*perm |= BT_ATT_PERM_WRITE | BT_ATT_PERM_READ_SECURE;
-+		} else if (!strcmp("secure-write", flag)) {
-+			*props |= BT_GATT_CHRC_PROP_WRITE;
-+			*ext_props |= BT_GATT_CHRC_EXT_PROP_AUTH_WRITE;
-+			*perm |= BT_ATT_PERM_WRITE | BT_ATT_PERM_WRITE_SECURE;
- 		} else {
- 			error("Invalid characteristic flag: %s", flag);
- 			return false;
-@@ -1191,6 +1209,10 @@ static bool parse_desc_flags(DBusMessageIter *array, uint32_t *perm)
- 			*perm |= BT_ATT_PERM_READ | BT_ATT_PERM_READ_AUTHEN;
- 		else if (!strcmp("encrypt-authenticated-write", flag))
- 			*perm |= BT_ATT_PERM_WRITE | BT_ATT_PERM_WRITE_AUTHEN;
-+		else if (!strcmp("secure-read", flag))
-+			*perm |= BT_ATT_PERM_READ | BT_ATT_PERM_READ_AUTHEN;
-+		else if (!strcmp("secure-write", flag))
-+			*perm |= BT_ATT_PERM_WRITE | BT_ATT_PERM_WRITE_AUTHEN;
- 		else {
- 			error("Invalid descriptor flag: %s", flag);
- 			return false;
-@@ -1204,6 +1226,7 @@ static bool parse_flags(GDBusProxy *proxy, uint8_t *props, uint8_t *ext_props,
- 								uint32_t *perm)
- {
- 	DBusMessageIter iter, array;
-+	const char *iface;
- 
- 	if (!g_dbus_proxy_get_property(proxy, "Flags", &iter))
- 		return false;
-@@ -1213,10 +1236,11 @@ static bool parse_flags(GDBusProxy *proxy, uint8_t *props, uint8_t *ext_props,
- 
- 	dbus_message_iter_recurse(&iter, &array);
- 
--	if (perm)
-+	iface = g_dbus_proxy_get_interface(proxy);
-+	if (!strcmp(iface, GATT_DESC_IFACE))
- 		return parse_desc_flags(&array, perm);
- 
--	return parse_chrc_flags(&array, props, ext_props);
-+	return parse_chrc_flags(&array, props, ext_props, perm);
- }
- 
- static struct external_chrc *chrc_create(struct gatt_app *app,
-@@ -1264,7 +1288,7 @@ static struct external_chrc *chrc_create(struct gatt_app *app,
- 	 * are used to determine if any special descriptors should be
- 	 * created.
- 	 */
--	if (!parse_flags(proxy, &chrc->props, &chrc->ext_props, NULL)) {
-+	if (!parse_flags(proxy, &chrc->props, &chrc->ext_props, &chrc->perm)) {
- 		error("Failed to parse characteristic properties");
- 		goto fail;
- 	}
-@@ -1752,37 +1776,6 @@ static struct pending_op *send_write(struct btd_device *device,
- 	return NULL;
- }
- 
--static uint32_t permissions_from_props(uint8_t props, uint8_t ext_props)
+-static void app_free(void *data)
 -{
--	uint32_t perm = 0;
+-	struct gatt_app *app = data;
 -
--	if (props & BT_GATT_CHRC_PROP_WRITE ||
--			props & BT_GATT_CHRC_PROP_WRITE_WITHOUT_RESP ||
--			ext_props & BT_GATT_CHRC_EXT_PROP_RELIABLE_WRITE ||
--			ext_props & BT_GATT_CHRC_EXT_PROP_ENC_WRITE ||
--			ext_props & BT_GATT_CHRC_EXT_PROP_AUTH_WRITE)
--		perm |= BT_ATT_PERM_WRITE;
+-	queue_destroy(app->services, service_free);
+-	queue_destroy(app->proxies, NULL);
 -
--	if (props & BT_GATT_CHRC_PROP_READ ||
--			ext_props & BT_GATT_CHRC_EXT_PROP_ENC_READ ||
--			ext_props & BT_GATT_CHRC_EXT_PROP_AUTH_READ)
--		perm |= BT_ATT_PERM_READ;
+-	if (app->client) {
+-		g_dbus_client_set_disconnect_watch(app->client, NULL, NULL);
+-		g_dbus_client_set_proxy_handlers(app->client, NULL, NULL,
+-								NULL, NULL);
+-		g_dbus_client_set_ready_watch(app->client, NULL, NULL);
+-		g_dbus_client_unref(app->client);
+-	}
 -
--	if (ext_props & BT_GATT_CHRC_EXT_PROP_ENC_READ)
--		perm |= BT_ATT_PERM_READ_ENCRYPT;
+-	if (app->reg)
+-		dbus_message_unref(app->reg);
 -
--	if (ext_props & BT_GATT_CHRC_EXT_PROP_ENC_WRITE)
--		perm |= BT_ATT_PERM_WRITE_ENCRYPT;
+-	g_free(app->owner);
+-	g_free(app->path);
 -
--	if (ext_props & BT_GATT_CHRC_EXT_PROP_AUTH_READ)
--		perm |= BT_ATT_PERM_READ_AUTHEN;
--
--	if (ext_props & BT_GATT_CHRC_EXT_PROP_AUTH_WRITE)
--		perm |= BT_ATT_PERM_WRITE_AUTHEN;
--
--	return perm;
+-	free(app);
 -}
 -
- static uint8_t ccc_write_cb(uint16_t value, void *user_data)
+ static void profile_remove(void *data)
  {
- 	struct external_chrc *chrc = user_data;
-@@ -2112,7 +2105,6 @@ static bool database_add_chrc(struct external_service *service,
- 						struct external_chrc *chrc)
+ 	struct btd_profile *p = data;
+@@ -403,20 +379,10 @@ static void profile_remove(void *data)
+ 
+ static void profile_release(struct external_profile *profile)
  {
- 	bt_uuid_t uuid;
--	uint32_t perm;
+-	DBusMessage *msg;
+-
+-	if (!profile->id)
+-		return;
+-
+-	DBG("Releasing \"%s\"", profile->owner);
+-
+-	g_dbus_remove_watch(btd_get_dbus_connection(), profile->id);
++	DBG("Releasing \"%s\"", profile->app->owner);
+ 
+-	msg = dbus_message_new_method_call(profile->owner, profile->path,
+-						"org.bluez.GattProfile1",
+-						"Release");
+-	if (msg)
+-		g_dbus_send_message(btd_get_dbus_connection(), msg);
++	g_dbus_proxy_method_call(profile->proxy, "Release", NULL, NULL, NULL,
++									NULL);
+ }
+ 
+ static void profile_free(void *data)
+@@ -427,12 +393,36 @@ static void profile_free(void *data)
+ 
+ 	profile_release(profile);
+ 
+-	g_free(profile->owner);
+-	g_free(profile->path);
++	g_dbus_proxy_unref(profile->proxy);
+ 
+ 	free(profile);
+ }
+ 
++static void app_free(void *data)
++{
++	struct gatt_app *app = data;
++
++	queue_destroy(app->profiles, profile_free);
++	queue_destroy(app->services, service_free);
++	queue_destroy(app->proxies, NULL);
++
++	if (app->client) {
++		g_dbus_client_set_disconnect_watch(app->client, NULL, NULL);
++		g_dbus_client_set_proxy_handlers(app->client, NULL, NULL,
++								NULL, NULL);
++		g_dbus_client_set_ready_watch(app->client, NULL, NULL);
++		g_dbus_client_unref(app->client);
++	}
++
++	if (app->reg)
++		dbus_message_unref(app->reg);
++
++	g_free(app->owner);
++	g_free(app->path);
++
++	free(app);
++}
++
+ static void gatt_database_free(void *data)
+ {
+ 	struct btd_gatt_database *database = data;
+@@ -2235,9 +2225,6 @@ static bool database_add_app(struct gatt_app *app)
+ {
  	const struct queue_entry *entry;
  
- 	if (!parse_uuid(chrc->proxy, &uuid)) {
-@@ -2125,14 +2117,8 @@ static bool database_add_chrc(struct external_service *service,
- 		return false;
+-	if (queue_isempty(app->services))
+-		return false;
+-
+ 	entry = queue_get_entries(app->services);
+ 	while (entry) {
+ 		if (!database_add_service(entry->data)) {
+@@ -2251,6 +2238,131 @@ static bool database_add_app(struct gatt_app *app)
+ 	return true;
+ }
+ 
++static int profile_device_probe(struct btd_service *service)
++{
++	struct btd_profile *p = btd_service_get_profile(service);
++
++	DBG("%s probed", p->name);
++
++	return 0;
++}
++
++static void profile_device_remove(struct btd_service *service)
++{
++	struct btd_profile *p = btd_service_get_profile(service);
++
++	DBG("%s removed", p->name);
++}
++
++static int profile_add(struct external_profile *profile, const char *uuid)
++{
++	struct btd_profile *p;
++
++	p = new0(struct btd_profile, 1);
++
++	/* Assign directly to avoid having extra fields */
++	p->name = (const void *) g_strdup_printf("%s%s/%s", profile->app->owner,
++				g_dbus_proxy_get_path(profile->proxy), uuid);
++	if (!p->name) {
++		free(p);
++		return -ENOMEM;
++	}
++
++	p->remote_uuid = (const void *) g_strdup(uuid);
++	if (!p->remote_uuid) {
++		g_free((void *) p->name);
++		free(p);
++		return -ENOMEM;
++	}
++
++	p->device_probe = profile_device_probe;
++	p->device_remove = profile_device_remove;
++	p->auto_connect = true;
++	p->external = true;
++
++	queue_push_tail(profile->profiles, p);
++
++	DBG("Added \"%s\"", p->name);
++
++	return 0;
++}
++
++static void add_profile(void *data, void *user_data)
++{
++	struct btd_adapter *adapter = user_data;
++
++	btd_profile_register(data);
++	adapter_add_profile(adapter, data);
++}
++
++static struct external_profile *create_profile(struct gatt_app *app,
++						GDBusProxy *proxy,
++						const char *path)
++{
++	struct external_profile *profile;
++	DBusMessageIter iter, array;
++
++	if (!path || !g_str_has_prefix(path, "/"))
++		return NULL;
++
++	profile = new0(struct external_profile, 1);
++
++	profile->app = app;
++	profile->proxy = g_dbus_proxy_ref(proxy);
++	profile->profiles = queue_new();
++
++	if (!g_dbus_proxy_get_property(proxy, "UUIDs", &iter)) {
++		DBG("UUIDs property not found");
++		goto fail;
++	}
++
++	dbus_message_iter_recurse(&iter, &array);
++
++	while (dbus_message_iter_get_arg_type(&array) == DBUS_TYPE_STRING) {
++		const char *uuid;
++
++		dbus_message_iter_get_basic(&array, &uuid);
++
++		if (profile_add(profile, uuid) < 0)
++			goto fail;
++
++		dbus_message_iter_next(&array);
++	}
++
++	if (queue_isempty(profile->profiles))
++		goto fail;
++
++	queue_foreach(profile->profiles, add_profile, app->database->adapter);
++	queue_push_tail(app->profiles, profile);
++
++	return profile;
++
++fail:
++	profile_free(profile);
++	return NULL;
++}
++
++static void register_profile(void *data, void *user_data)
++{
++	struct gatt_app *app = user_data;
++	GDBusProxy *proxy = data;
++	const char *iface = g_dbus_proxy_get_interface(proxy);
++	const char *path = g_dbus_proxy_get_path(proxy);
++
++	if (app->failed)
++		return;
++
++	if (g_strcmp0(iface, GATT_PROFILE_IFACE) == 0) {
++		struct external_profile *profile;
++
++		profile = create_profile(app, proxy, path);
++		if (!profile) {
++			app->failed = true;
++			return;
++		}
++	}
++}
++
+ static void register_service(void *data, void *user_data)
+ {
+ 	struct gatt_app *app = user_data;
+@@ -2333,11 +2445,13 @@ static void client_ready_cb(GDBusClient *client, void *user_data)
+ 		goto reply;
  	}
  
--	/*
--	 * TODO: Once shared/gatt-server properly supports permission checks,
--	 * set the permissions based on a D-Bus property of the external
--	 * characteristic.
--	 */
--	perm = permissions_from_props(chrc->props, chrc->ext_props);
- 	chrc->attrib = gatt_db_service_add_characteristic(service->attrib,
--						&uuid, perm,
-+						&uuid, chrc->perm,
- 						chrc->props, chrc_read_cb,
- 						chrc_write_cb, chrc);
- 	if (!chrc->attrib) {
-diff --git a/src/shared/att-types.h b/src/shared/att-types.h
-index c3062c0..4a9b67f 100644
---- a/src/shared/att-types.h
-+++ b/src/shared/att-types.h
-@@ -31,6 +31,7 @@
- #define BT_ATT_SECURITY_LOW	1
- #define BT_ATT_SECURITY_MEDIUM	2
- #define BT_ATT_SECURITY_HIGH	3
-+#define BT_ATT_SECURITY_FIPS	4
++	queue_foreach(app->proxies, register_profile, app);
+ 	queue_foreach(app->proxies, register_service, app);
+ 	queue_foreach(app->proxies, register_characteristic, app);
+ 	queue_foreach(app->proxies, register_descriptor, app);
  
- #define BT_ATT_DEFAULT_LE_MTU	23
- #define BT_ATT_MAX_LE_MTU	517
-@@ -123,6 +124,10 @@ struct bt_att_pdu_error_rsp {
- 					BT_ATT_PERM_WRITE_AUTHEN)
- #define BT_ATT_PERM_AUTHOR		0x40
- #define BT_ATT_PERM_NONE		0x80
-+#define BT_ATT_PERM_READ_SECURE		0x0100
-+#define BT_ATT_PERM_WRITE_SECURE	0x0200
-+#define BT_ATT_PERM_SECURE		(BT_ATT_PERM_READ_SECURE | \
-+					BT_ATT_PERM_WRITE_SECURE)
+-	if (!app->services || app->failed) {
++	if ((queue_isempty(app->services) && queue_isempty(app->profiles)) ||
++							app->failed) {
+ 		error("No valid external GATT objects found");
+ 		fail = true;
+ 		reply = btd_error_failed(app->reg,
+@@ -2390,6 +2504,7 @@ static struct gatt_app *create_app(DBusConnection *conn, DBusMessage *msg,
+ 		goto fail;
  
- /* GATT Characteristic Properties Bitfield values */
- #define BT_GATT_CHRC_PROP_BROADCAST			0x01
-diff --git a/src/shared/gatt-server.c b/src/shared/gatt-server.c
-index 123d9c1..79e01c8 100644
---- a/src/shared/gatt-server.c
-+++ b/src/shared/gatt-server.c
-@@ -398,6 +398,9 @@ static uint8_t check_permissions(struct bt_gatt_server *server,
- 		return 0;
+ 	app->services = queue_new();
++	app->profiles = queue_new();
+ 	app->proxies = queue_new();
+ 	app->reg = dbus_message_ref(msg);
  
- 	security = bt_att_get_security(server->att);
-+	if (perm & BT_ATT_PERM_SECURE && security < BT_ATT_SECURITY_FIPS)
-+		return BT_ATT_ERROR_AUTHENTICATION;
-+
- 	if (perm & BT_ATT_PERM_AUTHEN && security < BT_ATT_SECURITY_HIGH)
- 		return BT_ATT_ERROR_AUTHENTICATION;
+@@ -2476,203 +2591,6 @@ static DBusMessage *manager_unregister_app(DBusConnection *conn,
+ 	return dbus_message_new_method_return(msg);
+ }
+ 
+-static void profile_exited(DBusConnection *conn, void *user_data)
+-{
+-	struct external_profile *profile = user_data;
+-
+-	DBG("\"%s\" exited", profile->owner);
+-
+-	profile->id = 0;
+-
+-	queue_remove(profile->database->profiles, profile);
+-
+-	profile_free(profile);
+-}
+-
+-static int profile_device_probe(struct btd_service *service)
+-{
+-	struct btd_profile *p = btd_service_get_profile(service);
+-
+-	DBG("%s probed", p->name);
+-
+-	return 0;
+-}
+-
+-static void profile_device_remove(struct btd_service *service)
+-{
+-	struct btd_profile *p = btd_service_get_profile(service);
+-
+-	DBG("%s removed", p->name);
+-}
+-
+-static int profile_add(struct external_profile *profile, const char *uuid)
+-{
+-	struct btd_profile *p;
+-
+-	p = new0(struct btd_profile, 1);
+-
+-	/* Assign directly to avoid having extra fields */
+-	p->name = (const void *) g_strdup_printf("%s%s/%s", profile->owner,
+-							profile->path, uuid);
+-	if (!p->name) {
+-		free(p);
+-		return -ENOMEM;
+-	}
+-
+-	p->remote_uuid = (const void *) g_strdup(uuid);
+-	if (!p->remote_uuid) {
+-		g_free((void *) p->name);
+-		free(p);
+-		return -ENOMEM;
+-	}
+-
+-	p->device_probe = profile_device_probe;
+-	p->device_remove = profile_device_remove;
+-	p->auto_connect = true;
+-	p->external = true;
+-
+-	queue_push_tail(profile->profiles, p);
+-
+-	DBG("Added \"%s\"", p->name);
+-
+-	return 0;
+-}
+-
+-static void add_profile(void *data, void *user_data)
+-{
+-	struct btd_adapter *adapter = user_data;
+-
+-	btd_profile_register(data);
+-	adapter_add_profile(adapter, data);
+-}
+-
+-static int profile_create(DBusConnection *conn,
+-				struct btd_gatt_database *database,
+-				const char *sender, const char *path,
+-				DBusMessageIter *iter)
+-{
+-	struct external_profile *profile;
+-	DBusMessageIter uuids;
+-
+-	if (!path || !g_str_has_prefix(path, "/"))
+-		return -EINVAL;
+-
+-	profile = new0(struct external_profile, 1);
+-
+-	profile->owner = g_strdup(sender);
+-	if (!profile->owner)
+-		goto fail;
+-
+-	profile->path = g_strdup(path);
+-	if (!profile->path)
+-		goto fail;
+-
+-	profile->profiles = queue_new();
+-	profile->database = database;
+-	profile->id = g_dbus_add_disconnect_watch(conn, sender, profile_exited,
+-								profile, NULL);
+-
+-	dbus_message_iter_recurse(iter, &uuids);
+-
+-	while (dbus_message_iter_get_arg_type(&uuids) == DBUS_TYPE_STRING) {
+-		const char *uuid;
+-
+-		dbus_message_iter_get_basic(&uuids, &uuid);
+-
+-		if (profile_add(profile, uuid) < 0)
+-			goto fail;
+-
+-		dbus_message_iter_next(&uuids);
+-	}
+-
+-	if (queue_isempty(profile->profiles))
+-		goto fail;
+-
+-	queue_foreach(profile->profiles, add_profile, database->adapter);
+-	queue_push_tail(database->profiles, profile);
+-
+-	return 0;
+-
+-fail:
+-	profile_free(profile);
+-	return -EINVAL;
+-}
+-
+-static bool match_profile(const void *a, const void *b)
+-{
+-	const struct external_profile *profile = a;
+-	const struct svc_match_data *data = b;
+-
+-	return g_strcmp0(profile->path, data->path) == 0 &&
+-				g_strcmp0(profile->owner, data->sender) == 0;
+-}
+-
+-static DBusMessage *manager_register_profile(DBusConnection *conn,
+-					DBusMessage *msg, void *user_data)
+-{
+-	struct btd_gatt_database *database = user_data;
+-	const char *sender = dbus_message_get_sender(msg);
+-	DBusMessageIter args;
+-	const char *path;
+-	struct svc_match_data match_data;
+-
+-	DBG("sender %s", sender);
+-
+-	if (!dbus_message_iter_init(msg, &args))
+-		return btd_error_invalid_args(msg);
+-
+-	if (dbus_message_iter_get_arg_type(&args) != DBUS_TYPE_OBJECT_PATH)
+-		return btd_error_invalid_args(msg);
+-
+-	dbus_message_iter_get_basic(&args, &path);
+-
+-	match_data.path = path;
+-	match_data.sender = sender;
+-
+-	if (queue_find(database->profiles, match_profile, &match_data))
+-		return btd_error_already_exists(msg);
+-
+-	dbus_message_iter_next(&args);
+-	if (dbus_message_iter_get_arg_type(&args) != DBUS_TYPE_ARRAY)
+-		return btd_error_invalid_args(msg);
+-
+-	if (profile_create(conn, database, sender, path, &args) < 0)
+-		return btd_error_failed(msg, "Failed to register profile");
+-
+-	return dbus_message_new_method_return(msg);
+-}
+-
+-static DBusMessage *manager_unregister_profile(DBusConnection *conn,
+-					DBusMessage *msg, void *user_data)
+-{
+-	struct btd_gatt_database *database = user_data;
+-	const char *sender = dbus_message_get_sender(msg);
+-	const char *path;
+-	DBusMessageIter args;
+-	struct external_profile *profile;
+-	struct svc_match_data match_data;
+-
+-	if (!dbus_message_iter_init(msg, &args))
+-		return btd_error_invalid_args(msg);
+-
+-	if (dbus_message_iter_get_arg_type(&args) != DBUS_TYPE_OBJECT_PATH)
+-		return btd_error_invalid_args(msg);
+-
+-	dbus_message_iter_get_basic(&args, &path);
+-
+-	match_data.path = path;
+-	match_data.sender = sender;
+-
+-	profile = queue_remove_if(database->profiles, match_profile,
+-								&match_data);
+-	if (!profile)
+-		return btd_error_does_not_exist(msg);
+-
+-	profile_free(profile);
+-
+-	return dbus_message_new_method_return(msg);
+-}
+-
+ static const GDBusMethodTable manager_methods[] = {
+ 	{ GDBUS_EXPERIMENTAL_ASYNC_METHOD("RegisterApplication",
+ 			GDBUS_ARGS({ "application", "o" },
+@@ -2681,13 +2599,6 @@ static const GDBusMethodTable manager_methods[] = {
+ 	{ GDBUS_EXPERIMENTAL_ASYNC_METHOD("UnregisterApplication",
+ 					GDBUS_ARGS({ "application", "o" }),
+ 					NULL, manager_unregister_app) },
+-	{ GDBUS_EXPERIMENTAL_ASYNC_METHOD("RegisterProfile",
+-			GDBUS_ARGS({ "profile", "o" }, { "UUIDs", "as" },
+-			{ "options", "a{sv}" }), NULL,
+-			manager_register_profile) },
+-	{ GDBUS_EXPERIMENTAL_ASYNC_METHOD("UnregisterProfile",
+-					GDBUS_ARGS({ "profile", "o" }),
+-					NULL, manager_unregister_profile) },
+ 	{ }
+ };
  
 -- 
 2.5.5
