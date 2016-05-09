@@ -1,30 +1,47 @@
-Return-Path: <lauro@polilinux.com.br>
-To: Marcel Holtmann <marcel@holtmann.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
 Subject: Re: [PATCH v2] Bluetooth: Add USB ID 13D3:3487 to ath3k
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Date: Mon, 09 May 2016 17:35:32 -0300
-From: Lauro Costa <lauro@polilinux.com.br>
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <5c39305f04339fc64f7e81af02efa495@polilinux.com.br>
+Date: Mon, 9 May 2016 09:55:33 -0700
 Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <0627362D-F471-44F1-BC0C-5BA54A661D8E@holtmann.org>
+Message-Id: <0627362D-F471-44F1-BC0C-5BA54A661D8E@holtmann.org>
 References: <5c39305f04339fc64f7e81af02efa495@polilinux.com.br>
- <0627362D-F471-44F1-BC0C-5BA54A661D8E@holtmann.org>
-Message-ID: <3a33c6785127246e637533ec75d81bf7@polilinux.com.br>
+To: Lauro Costa <lauro@polilinux.com.br>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Em 2016-05-09 13:55, Marcel Holtmann escreveu:
+Hi Lauro,
 
-Hi Marcel,
-
-> the patch does not apply to bluetooth-next tree.
+> Add hw id to ath3k usb device list and btusb blacklist.
 > 
-> Applying: Bluetooth: Add USB ID 13D3:3487 to ath3k
-> fatal: corrupt patch at line 19
-> Patch failed at 0001 Bluetooth: Add USB ID 13D3:3487 to ath3k
+> T:  Bus=01 Lev=01 Prnt=01 Port=08 Cnt=02 Dev#=  4 Spd=12  MxCh= 0
+> D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+> P:  Vendor=13d3 ProdID=3487 Rev=00.02
+> C:  #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
+> I:  If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> 
+> Requires these firmwares:
+> ar3k/AthrBT_0x11020100.dfu and ar3k/ramps_0x11020100_40.dfu
+> Firmwares are available in linux-firmware.
+> 
+> Device found in a laptop ASUS model N552VW. It's an Atheros AR9462 chip.
+> 
+> Signed-off-by: Lauro Costa <lauro@polilinux.com.br>
+> ---
+> drivers/bluetooth/ath3k.c | 2 ++
+> drivers/bluetooth/btusb.c | 1 +
+> 2 files changed, 3 insertions(+)
 
-It looks like the error is due to the way I copied the patch to send to 
-the list. I'm gonna send it again in the next message, this time using 
-git send-email. I'm sorry about that.
+the patch does not apply to bluetooth-next tree.
 
-Lauro Costa
+Applying: Bluetooth: Add USB ID 13D3:3487 to ath3k
+fatal: corrupt patch at line 19
+Patch failed at 0001 Bluetooth: Add USB ID 13D3:3487 to ath3k
+
+Regards
+
+Marcel
+
