@@ -1,69 +1,297 @@
-Return-Path: <lauro@polilinux.com.br>
-To: marcel@holtmann.org
-Subject: [PATCH v2] Bluetooth: Add USB ID 13D3:3487 to ath3k
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Date: Mon, 09 May 2016 11:04:32 -0300
-From: Lauro Costa <lauro@polilinux.com.br>
-Cc: linux-bluetooth@vger.kernel.org
-Message-ID: <5c39305f04339fc64f7e81af02efa495@polilinux.com.br>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCHv2 BlueZ 6/6] tools/gatt-service: Update to use new GATT API
+Date: Mon,  9 May 2016 16:51:23 +0300
+Message-Id: <1462801883-6361-6-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1462801883-6361-1-git-send-email-luiz.dentz@gmail.com>
+References: <1462801883-6361-1-git-send-email-luiz.dentz@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add hw id to ath3k usb device list and btusb blacklist.
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-T:  Bus=01 Lev=01 Prnt=01 Port=08 Cnt=02 Dev#=  4 Spd=12  MxCh= 0
-D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=13d3 ProdID=3487 Rev=00.02
-C:  #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
-I:  If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-
-Requires these firmwares:
-ar3k/AthrBT_0x11020100.dfu and ar3k/ramps_0x11020100_40.dfu
-Firmwares are available in linux-firmware.
-
-Device found in a laptop ASUS model N552VW. It's an Atheros AR9462 chip.
-
-Signed-off-by: Lauro Costa <lauro@polilinux.com.br>
+This update use of ReadValue and WriteValue to include the options
+introduced in the API.
 ---
-  drivers/bluetooth/ath3k.c | 2 ++
-  drivers/bluetooth/btusb.c | 1 +
-  2 files changed, 3 insertions(+)
+ tools/gatt-service.c | 159 ++++++++++++++++++++++++++++++++++++++++-----------
+ 1 file changed, 126 insertions(+), 33 deletions(-)
 
-diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
-index 641c2d1..2589468 100644
---- a/drivers/bluetooth/ath3k.c
-+++ b/drivers/bluetooth/ath3k.c
-@@ -122,6 +122,7 @@ static const struct usb_device_id ath3k_table[] = {
-  	{ USB_DEVICE(0x13d3, 0x3432) },
-  	{ USB_DEVICE(0x13d3, 0x3472) },
-  	{ USB_DEVICE(0x13d3, 0x3474) },
-+	{ USB_DEVICE(0x13d3, 0x3487) },
-
-  	/* Atheros AR5BBU12 with sflash firmware */
-  	{ USB_DEVICE(0x0489, 0xE02C) },
-@@ -188,6 +189,7 @@ static const struct usb_device_id ath3k_blist_tbl[] 
-= {
-  	{ USB_DEVICE(0x13d3, 0x3432), .driver_info = BTUSB_ATH3012 },
-  	{ USB_DEVICE(0x13d3, 0x3472), .driver_info = BTUSB_ATH3012 },
-  	{ USB_DEVICE(0x13d3, 0x3474), .driver_info = BTUSB_ATH3012 },
-+	{ USB_DEVICE(0x13d3, 0x3487), .driver_info = BTUSB_ATH3012 },
-
-  	/* Atheros AR5BBU22 with sflash firmware */
-  	{ USB_DEVICE(0x0489, 0xE036), .driver_info = BTUSB_ATH3012 },
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 6aae959..a3be65e 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -236,6 +236,7 @@ static const struct usb_device_id blacklist_table[] 
-= {
-  	{ USB_DEVICE(0x13d3, 0x3432), .driver_info = BTUSB_ATH3012 },
-  	{ USB_DEVICE(0x13d3, 0x3472), .driver_info = BTUSB_ATH3012 },
-  	{ USB_DEVICE(0x13d3, 0x3474), .driver_info = BTUSB_ATH3012 },
-+	{ USB_DEVICE(0x13d3, 0x3487), .driver_info = BTUSB_ATH3012 },
-
-  	/* Atheros AR5BBU12 with sflash firmware */
-  	{ USB_DEVICE(0x0489, 0xe02c), .driver_info = BTUSB_IGNORE },
+diff --git a/tools/gatt-service.c b/tools/gatt-service.c
+index 329d1af..0c78c4d 100644
+--- a/tools/gatt-service.c
++++ b/tools/gatt-service.c
+@@ -29,6 +29,7 @@
+ #include <stdio.h>
+ #include <stdbool.h>
+ #include <unistd.h>
++#include <string.h>
+ #include <sys/signalfd.h>
+ 
+ #include <glib.h>
+@@ -127,32 +128,48 @@ static gboolean desc_get_value(const GDBusPropertyTable *property,
+ 	return desc_read(desc, iter);
+ }
+ 
+-static void desc_write(struct descriptor *desc, DBusMessageIter *iter)
++static void desc_write(struct descriptor *desc, const uint8_t *value, int len)
+ {
+-	DBusMessageIter array;
+-	const uint8_t *value;
+-	int vlen;
+-
+-	dbus_message_iter_recurse(iter, &array);
+-	dbus_message_iter_get_fixed_array(&array, &value, &vlen);
+-
+ 	g_free(desc->value);
+-	desc->value = g_memdup(value, vlen);
+-	desc->vlen = vlen;
++	desc->value = g_memdup(value, len);
++	desc->vlen = len;
+ 
+ 	g_dbus_emit_property_changed(connection, desc->path,
+ 					GATT_DESCRIPTOR_IFACE, "Value");
+ }
+ 
++static int parse_value(DBusMessageIter *iter, const uint8_t **value, int *len)
++{
++	DBusMessageIter array;
++
++	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_ARRAY)
++		return -EINVAL;
++
++	dbus_message_iter_recurse(iter, &array);
++	dbus_message_iter_get_fixed_array(&array, value, len);
++
++	return 0;
++}
++
+ static void desc_set_value(const GDBusPropertyTable *property,
+ 				DBusMessageIter *iter,
+ 				GDBusPendingPropertySet id, void *user_data)
+ {
+ 	struct descriptor *desc = user_data;
++	const uint8_t *value;
++	int len;
+ 
+ 	printf("Descriptor(%s): Set(\"Value\", ...)\n", desc->uuid);
+ 
+-	desc_write(desc, iter);
++	if (parse_value(iter, &value, &len)) {
++		printf("Invalid value for Set('Value'...)\n");
++		g_dbus_pending_property_error(id,
++					ERROR_INTERFACE ".InvalidArguments",
++					"Invalid arguments in method call");
++		return;
++	}
++
++	desc_write(desc, value, len);
+ 
+ 	g_dbus_pending_property_success(id);
+ }
+@@ -249,15 +266,8 @@ static gboolean chr_get_props(const GDBusPropertyTable *property,
+ 	return TRUE;
+ }
+ 
+-static void chr_write(struct characteristic *chr, DBusMessageIter *iter)
++static void chr_write(struct characteristic *chr, const uint8_t *value, int len)
+ {
+-	DBusMessageIter array;
+-	uint8_t *value;
+-	int len;
+-
+-	dbus_message_iter_recurse(iter, &array);
+-	dbus_message_iter_get_fixed_array(&array, &value, &len);
+-
+ 	g_free(chr->value);
+ 	chr->value = g_memdup(value, len);
+ 	chr->vlen = len;
+@@ -271,10 +281,12 @@ static void chr_set_value(const GDBusPropertyTable *property,
+ 				GDBusPendingPropertySet id, void *user_data)
+ {
+ 	struct characteristic *chr = user_data;
++	const uint8_t *value;
++	int len;
+ 
+ 	printf("Characteristic(%s): Set('Value', ...)\n", chr->uuid);
+ 
+-	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_ARRAY) {
++	if (!parse_value(iter, &value, &len)) {
+ 		printf("Invalid value for Set('Value'...)\n");
+ 		g_dbus_pending_property_error(id,
+ 					ERROR_INTERFACE ".InvalidArguments",
+@@ -282,7 +294,7 @@ static void chr_set_value(const GDBusPropertyTable *property,
+ 		return;
+ 	}
+ 
+-	chr_write(chr, iter);
++	chr_write(chr, value, len);
+ 
+ 	g_dbus_pending_property_success(id);
+ }
+@@ -368,12 +380,53 @@ static void desc_iface_destroy(gpointer user_data)
+ 	g_free(desc);
+ }
+ 
++static int parse_options(DBusMessageIter *iter, const char **device)
++{
++	DBusMessageIter dict;
++
++	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_ARRAY)
++		return -EINVAL;
++
++	dbus_message_iter_recurse(iter, &dict);
++
++	while (dbus_message_iter_get_arg_type(&dict) == DBUS_TYPE_DICT_ENTRY) {
++		const char *key;
++		DBusMessageIter value, entry;
++		int var;
++
++		dbus_message_iter_recurse(&dict, &entry);
++		dbus_message_iter_get_basic(&entry, &key);
++
++		dbus_message_iter_next(&entry);
++		dbus_message_iter_recurse(&entry, &value);
++
++		var = dbus_message_iter_get_arg_type(&value);
++		if (strcasecmp(key, "device") == 0) {
++			if (var != DBUS_TYPE_OBJECT_PATH)
++				return -EINVAL;
++			dbus_message_iter_get_basic(&value, device);
++			printf("Device: %s\n", *device);
++		}
++	}
++
++	return 0;
++}
++
+ static DBusMessage *chr_read_value(DBusConnection *conn, DBusMessage *msg,
+ 							void *user_data)
+ {
+ 	struct characteristic *chr = user_data;
+ 	DBusMessage *reply;
+ 	DBusMessageIter iter;
++	const char *device;
++
++	if (!dbus_message_iter_init(msg, &iter))
++		return g_dbus_create_error(msg, DBUS_ERROR_INVALID_ARGS,
++							"Invalid arguments");
++
++	if (parse_options(&iter, &device))
++		return g_dbus_create_error(msg, DBUS_ERROR_INVALID_ARGS,
++							"Invalid arguments");
+ 
+ 	reply = dbus_message_new_method_return(msg);
+ 	if (!reply)
+@@ -392,10 +445,21 @@ static DBusMessage *chr_write_value(DBusConnection *conn, DBusMessage *msg,
+ {
+ 	struct characteristic *chr = user_data;
+ 	DBusMessageIter iter;
++	const uint8_t *value;
++	int len;
++	const char *device;
+ 
+ 	dbus_message_iter_init(msg, &iter);
+ 
+-	chr_write(chr, &iter);
++	if (parse_value(&iter, &value, &len))
++		return g_dbus_create_error(msg, DBUS_ERROR_INVALID_ARGS,
++							"Invalid arguments");
++
++	if (parse_options(&iter, &device))
++		return g_dbus_create_error(msg, DBUS_ERROR_INVALID_ARGS,
++							"Invalid arguments");
++
++	chr_write(chr, value, len);
+ 
+ 	return dbus_message_new_method_return(msg);
+ }
+@@ -415,10 +479,12 @@ static DBusMessage *chr_stop_notify(DBusConnection *conn, DBusMessage *msg,
+ }
+ 
+ static const GDBusMethodTable chr_methods[] = {
+-	{ GDBUS_ASYNC_METHOD("ReadValue", NULL, GDBUS_ARGS({ "value", "ay" }),
+-						chr_read_value) },
+-	{ GDBUS_ASYNC_METHOD("WriteValue", GDBUS_ARGS({ "value", "ay" }),
+-						NULL, chr_write_value) },
++	{ GDBUS_ASYNC_METHOD("ReadValue", GDBUS_ARGS({ "options", "a{sv}" }),
++					GDBUS_ARGS({ "value", "ay" }),
++					chr_read_value) },
++	{ GDBUS_ASYNC_METHOD("WriteValue", GDBUS_ARGS({ "value", "ay" },
++						{ "options", "a{sv}" }),
++					NULL, chr_write_value) },
+ 	{ GDBUS_ASYNC_METHOD("StartNotify", NULL, NULL, chr_start_notify) },
+ 	{ GDBUS_METHOD("StopNotify", NULL, NULL, chr_stop_notify) },
+ 	{ }
+@@ -430,6 +496,15 @@ static DBusMessage *desc_read_value(DBusConnection *conn, DBusMessage *msg,
+ 	struct descriptor *desc = user_data;
+ 	DBusMessage *reply;
+ 	DBusMessageIter iter;
++	const char *device;
++
++	if (!dbus_message_iter_init(msg, &iter))
++		return g_dbus_create_error(msg, DBUS_ERROR_INVALID_ARGS,
++							"Invalid arguments");
++
++	if (parse_options(&iter, &device))
++		return g_dbus_create_error(msg, DBUS_ERROR_INVALID_ARGS,
++							"Invalid arguments");
+ 
+ 	reply = dbus_message_new_method_return(msg);
+ 	if (!reply)
+@@ -438,6 +513,10 @@ static DBusMessage *desc_read_value(DBusConnection *conn, DBusMessage *msg,
+ 
+ 	dbus_message_iter_init_append(reply, &iter);
+ 
++	if (parse_options(&iter, &device))
++		return g_dbus_create_error(msg, DBUS_ERROR_INVALID_ARGS,
++							"Invalid arguments");
++
+ 	desc_read(desc, &iter);
+ 
+ 	return reply;
+@@ -448,20 +527,34 @@ static DBusMessage *desc_write_value(DBusConnection *conn, DBusMessage *msg,
+ {
+ 	struct descriptor *desc = user_data;
+ 	DBusMessageIter iter;
++	const char *device;
++	const uint8_t *value;
++	int len;
+ 
+-	dbus_message_iter_init(msg, &iter);
++	if (!dbus_message_iter_init(msg, &iter))
++		return g_dbus_create_error(msg, DBUS_ERROR_INVALID_ARGS,
++							"Invalid arguments");
++
++	if (parse_value(&iter, &value, &len))
++		return g_dbus_create_error(msg, DBUS_ERROR_INVALID_ARGS,
++							"Invalid arguments");
++
++	if (parse_options(&iter, &device))
++		return g_dbus_create_error(msg, DBUS_ERROR_INVALID_ARGS,
++							"Invalid arguments");
+ 
+-	desc_write(desc, &iter);
++	desc_write(desc, value, len);
+ 
+ 	return dbus_message_new_method_return(msg);
+ }
+ 
+ static const GDBusMethodTable desc_methods[] = {
+-	{ GDBUS_ASYNC_METHOD("ReadValue", NULL, GDBUS_ARGS({ "value", "ay" }),
+-						desc_read_value) },
+-	{ GDBUS_ASYNC_METHOD("WriteValue", GDBUS_ARGS({ "value", "ay" }),
+-						NULL,
+-						desc_write_value) },
++	{ GDBUS_ASYNC_METHOD("ReadValue", GDBUS_ARGS({ "options", "a{sv}" }),
++					GDBUS_ARGS({ "value", "ay" }),
++					desc_read_value) },
++	{ GDBUS_ASYNC_METHOD("WriteValue", GDBUS_ARGS({ "value", "ay" },
++						{ "options", "a{sv}" }),
++					NULL, desc_write_value) },
+ 	{ }
+ };
+ 
 -- 
-1.9.0
+2.5.5
+
