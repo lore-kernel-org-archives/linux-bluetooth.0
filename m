@@ -1,18 +1,82 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Travis Griggs <travisgriggs@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Subject: Best schema to "stream" data over BLE
-Message-Id: <EB98033C-EA6B-45A7-AC0D-DD2F2FAD69E6@gmail.com>
-Date: Tue, 10 May 2016 18:23:06 -0700
-To: linux-bluetooth@vger.kernel.org
-Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <linux-kernel-owner@vger.kernel.org>
+From: Amitkumar Karwar <akarwar@marvell.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"Ganapathi Bhat" <gbhat@marvell.com>
+Subject: RE: [PATCH v11 3/3] Bluetooth: hci_uart: Support firmware download
+ for Marvell
+Date: Tue, 10 May 2016 13:59:09 +0000
+Message-ID: <7dd472e261ac43da97c607a005418fcb@SC-EXCH04.marvell.com>
+References: <1462548714-7971-1-git-send-email-akarwar@marvell.com>
+ <1462548714-7971-3-git-send-email-akarwar@marvell.com>
+In-Reply-To: <1462548714-7971-3-git-send-email-akarwar@marvell.com>
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The GATT architecture of BLE lends itself to small fixed pieces of data (20 bytes max per characteristic). But in some cases, you end up wanting to “stream” some arbitrary length of data, that is greater than 20 bytes. For example, a firmware upgrade, even if you know its slow.
+Hi Marcel,
 
-I’m curious what scheme others have used if any, to “stream” data (even if small and slow) over BLE characteristics. I’m also curious how fast I can expect the bluez stuff to go when it’s having to channel through dbus.  I’ve used two different schemes to date. One was to use a control characteristic, where the receiving device notify the sending device how much data it had received, and the sending device then used that to trigger the next write (I did both with_response, and without) on a different characteristic. Another scheme I did recently, was to basically chunk the data into 19 byte segments, where the first byte indicates the number of packets to follow, when it hits 0, that clues the receiver that all of the recent updates can be concatenated and processed as a single packet.
+> From: Amitkumar Karwar [mailto:akarwar@marvell.com]
+> Sent: Friday, May 06, 2016 9:02 PM
+> To: linux-bluetooth@vger.kernel.org
+> Cc: linux-kernel@vger.kernel.org; Ganapathi Bhat; Amitkumar Karwar
+> Subject: [PATCH v11 3/3] Bluetooth: hci_uart: Support firmware download
+> for Marvell
+> 
+> From: Ganapathi Bhat <gbhat@marvell.com>
+> 
+> This patch implement firmware download feature for Marvell Bluetooth
+> devices. If firmware is already downloaded, it will skip downloading.
+> 
+> Signed-off-by: Ganapathi Bhat <gbhat@marvell.com>
+> Signed-off-by: Amitkumar Karwar <akarwar@marvell.com>
+> ---
+> v2: Fixed compilation warning reported by kbuild test robot
+> v3: Addressed review comments from Marcel Holtmann
+>     a) Removed vendor specific code from hci_ldisc.c
+>     b) Get rid of static forward declaration
+>     c) Removed unnecessary heavy nesting
+>     d) Git rid of module parameter and global variables
+>     e) Add logic to pick right firmware image
+> v4: Addresses review comments from Alan
+>     a) Use existing kernel helper APIs instead of writing own.
+>     b) Replace mdelay() with msleep()
+> v5: Addresses review comments from Loic Poulain
+>     a) Use bt_dev_err/warn/dbg helpers insted of BT_ERR/WARN/DBG
+>     b) Used static functions where required and removed forward
+> delcarations
+>     c) Edited comments for the function hci_uart_recv_data
+>     d) Made HCI_UART_DNLD_FW flag a part of driver private data
+> v6: Addresses review comments from Loic Poulain
+>     a) Used skb instead of array to store firmware data during download
+>     b) Used hci_uart_tx_wakeup and enqueued packets instead of tty write
+>     c) Used GFP_KERNEL instead of GFP_ATOMIC
+> v7: Edited Kconfig to add dependency for BT_HCIUART_H4. The change
+> resolves
+>     errors reported by kbuild test robot.
+> v8: Addressed review comments from Marcel Holtmann
+>     a) Removed unnecessary memory allocation failure messages
+>     b) Get rid of btmrvl.h header file and add definitions in hci_mrvl.c
+> file
+> v9: Addressed review comments from Marcel Holtmann
+>     a) Moved firmware download code from setup to prepare handler.
+>     b) Change messages from bt_dev_*->BT_*, as hdev isn't available
+> during firmware
+>      download.
+> v10: Addressed review comments from Marcel Holtmann
+>     a) Added new callback recv_for_prepare to receive data from device
+>      during prepare phase
+>     b) Avoided using private flags (HCI_UART_DNLD_FW) as new receive
+> callback is
+>      added for the same purpose
+>     c) Used kernel API to handle unaligned data
+>     d) Moved mrvl_set_baud functionality inside setup callback
+> v11: Write data through ldisc in mrvl_send_ack() instead of directly
+> calling
+>     write method(One Thousand Gnomes).
 
-I’m finding bluez pretty slow. Running between iOS and an STMicro chip, I can get around 500bytes/sec. But between iOS and bluez (embedded Linux, python3 with dbus), I’m getting much less, about 125 bytes/sec. The speed isn’t a show stopper. I’m really just curious what schemes (if any) others have used.
+Could you please take this patch if there are no further comments/suggestions for improvement?
 
-TIA
+Regards,
+Amitkumar
