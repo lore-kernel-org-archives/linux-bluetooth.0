@@ -1,82 +1,118 @@
-Return-Path: <linux-kernel-owner@vger.kernel.org>
-From: Amitkumar Karwar <akarwar@marvell.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"Ganapathi Bhat" <gbhat@marvell.com>
-Subject: RE: [PATCH v11 3/3] Bluetooth: hci_uart: Support firmware download
- for Marvell
-Date: Tue, 10 May 2016 13:59:09 +0000
-Message-ID: <7dd472e261ac43da97c607a005418fcb@SC-EXCH04.marvell.com>
-References: <1462548714-7971-1-git-send-email-akarwar@marvell.com>
- <1462548714-7971-3-git-send-email-akarwar@marvell.com>
-In-Reply-To: <1462548714-7971-3-git-send-email-akarwar@marvell.com>
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Sender: linux-kernel-owner@vger.kernel.org
+Return-Path: <zhaoyichen@google.com>
+From: Yichen Zhao <zhaoyichen@google.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Yichen Zhao <zhaoyichen@google.com>
+Subject: [PATCH] Bluetooth: Fix l2cap_sock_teardown_cb race condition with bt_accept_dequeue
+Date: Mon,  9 May 2016 18:15:35 -0700
+Message-Id: <1462842935-136364-1-git-send-email-zhaoyichen@google.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Fix a race condition between l2cap_sock_teardown_cb on an L2CAP socket
+and bt_accept_dequeue on its parent socket. When the race condition is
+encountered bt_accept_dequeue may call bt_accept_unlink on an already
+unlinked socket and result in a NULL pointer dereference.
 
-> From: Amitkumar Karwar [mailto:akarwar@marvell.com]
-> Sent: Friday, May 06, 2016 9:02 PM
-> To: linux-bluetooth@vger.kernel.org
-> Cc: linux-kernel@vger.kernel.org; Ganapathi Bhat; Amitkumar Karwar
-> Subject: [PATCH v11 3/3] Bluetooth: hci_uart: Support firmware download
-> for Marvell
-> 
-> From: Ganapathi Bhat <gbhat@marvell.com>
-> 
-> This patch implement firmware download feature for Marvell Bluetooth
-> devices. If firmware is already downloaded, it will skip downloading.
-> 
-> Signed-off-by: Ganapathi Bhat <gbhat@marvell.com>
-> Signed-off-by: Amitkumar Karwar <akarwar@marvell.com>
-> ---
-> v2: Fixed compilation warning reported by kbuild test robot
-> v3: Addressed review comments from Marcel Holtmann
->     a) Removed vendor specific code from hci_ldisc.c
->     b) Get rid of static forward declaration
->     c) Removed unnecessary heavy nesting
->     d) Git rid of module parameter and global variables
->     e) Add logic to pick right firmware image
-> v4: Addresses review comments from Alan
->     a) Use existing kernel helper APIs instead of writing own.
->     b) Replace mdelay() with msleep()
-> v5: Addresses review comments from Loic Poulain
->     a) Use bt_dev_err/warn/dbg helpers insted of BT_ERR/WARN/DBG
->     b) Used static functions where required and removed forward
-> delcarations
->     c) Edited comments for the function hci_uart_recv_data
->     d) Made HCI_UART_DNLD_FW flag a part of driver private data
-> v6: Addresses review comments from Loic Poulain
->     a) Used skb instead of array to store firmware data during download
->     b) Used hci_uart_tx_wakeup and enqueued packets instead of tty write
->     c) Used GFP_KERNEL instead of GFP_ATOMIC
-> v7: Edited Kconfig to add dependency for BT_HCIUART_H4. The change
-> resolves
->     errors reported by kbuild test robot.
-> v8: Addressed review comments from Marcel Holtmann
->     a) Removed unnecessary memory allocation failure messages
->     b) Get rid of btmrvl.h header file and add definitions in hci_mrvl.c
-> file
-> v9: Addressed review comments from Marcel Holtmann
->     a) Moved firmware download code from setup to prepare handler.
->     b) Change messages from bt_dev_*->BT_*, as hdev isn't available
-> during firmware
->      download.
-> v10: Addressed review comments from Marcel Holtmann
->     a) Added new callback recv_for_prepare to receive data from device
->      during prepare phase
->     b) Avoided using private flags (HCI_UART_DNLD_FW) as new receive
-> callback is
->      added for the same purpose
->     c) Used kernel API to handle unaligned data
->     d) Moved mrvl_set_baud functionality inside setup callback
-> v11: Write data through ldisc in mrvl_send_ack() instead of directly
-> calling
->     write method(One Thousand Gnomes).
+Even if bt_accept_unlink is not called by bt_accept_dequeue,
+bt_accept_unlink called by l2cap_sock_teardown_cb can race with
+list_for_each_entry_safe in bt_accept_dequeue, causing the latter to
+loop indefinitely on the unlinked socket, until release_sock crashes
+with a NULL pointer dereference when the sock pointer is freed.
 
-Could you please take this patch if there are no further comments/suggestions for improvement?
+The race condition is fixed by locking the parent socket in
+l2cap_sock_teardown_cb.
 
-Regards,
-Amitkumar
+[50510.241632] BUG: unable to handle kernel NULL pointer dereference at 00000000000001a8
+[50510.241694] IP: [<ffffffffc01243f7>] bt_accept_unlink+0x47/0xa0 [bluetooth]
+[50510.241759] PGD 0
+[50510.241776] Oops: 0002 [#1] SMP
+[50510.241802] Modules linked in: rtl8192cu rtl_usb rtlwifi rtl8192c_common 8021q garp stp mrp llc rfcomm bnep nls_iso8859_1 intel_rapl x86_pkg_temp_thermal intel_powerclamp coretemp arc4 ath9k ath9k_common ath9k_hw ath kvm eeepc_wmi asus_wmi mac80211 snd_hda_codec_hdmi snd_hda_codec_realtek sparse_keymap crct10dif_pclmul snd_hda_codec_generic crc32_pclmul snd_hda_intel snd_hda_controller cfg80211 snd_hda_codec i915 snd_hwdep snd_pcm ghash_clmulni_intel snd_timer snd soundcore serio_raw cryptd drm_kms_helper drm i2c_algo_bit shpchp ath3k mei_me lpc_ich btusb bluetooth 6lowpan_iphc mei lp parport wmi video mac_hid psmouse ahci libahci r8169 mii
+[50510.242279] CPU: 0 PID: 934 Comm: krfcommd Not tainted 3.16.0-49-generic #65~14.04.1-Ubuntu
+[50510.242327] Hardware name: ASUSTeK Computer INC. VM40B/VM40B, BIOS 1501 12/09/2014
+[50510.242370] task: ffff8800d9068a30 ti: ffff8800d7a54000 task.ti: ffff8800d7a54000
+[50510.242413] RIP: 0010:[<ffffffffc01243f7>]  [<ffffffffc01243f7>] bt_accept_unlink+0x47/0xa0 [bluetooth]
+[50510.242480] RSP: 0018:ffff8800d7a57d58  EFLAGS: 00010246
+[50510.242511] RAX: 0000000000000000 RBX: ffff880119bb8c00 RCX: ffff880119bb8eb0
+[50510.242552] RDX: ffff880119bb8eb0 RSI: 00000000fffffe01 RDI: ffff880119bb8c00
+[50510.242592] RBP: ffff8800d7a57d60 R08: 0000000000000283 R09: 0000000000000001
+[50510.242633] R10: 0000000000000000 R11: 0000000000000000 R12: ffff8800d8da9eb0
+[50510.242673] R13: ffff8800d74fdb80 R14: ffff880119bb8c00 R15: ffff8800d8da9c00
+[50510.242715] FS:  0000000000000000(0000) GS:ffff88011fa00000(0000) knlGS:0000000000000000
+[50510.242761] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[50510.242794] CR2: 00000000000001a8 CR3: 0000000001c13000 CR4: 00000000001407f0
+[50510.242835] Stack:
+[50510.242849]  ffff880119bb8eb0 ffff8800d7a57da0 ffffffffc0124506 ffff8800d8da9eb0
+[50510.242899]  ffff8800d8da9c00 ffff8800d9068a30 0000000000000000 ffff8800d74fdb80
+[50510.242949]  ffff8800d6f85208 ffff8800d7a57e08 ffffffffc0159985 000000000000001f
+[50510.242999] Call Trace:
+[50510.243027]  [<ffffffffc0124506>] bt_accept_dequeue+0xb6/0x180 [bluetooth]
+[50510.243085]  [<ffffffffc0159985>] l2cap_sock_accept+0x125/0x220 [bluetooth]
+[50510.243128]  [<ffffffff810a1b30>] ? wake_up_state+0x20/0x20
+[50510.243163]  [<ffffffff8164946e>] kernel_accept+0x4e/0xa0
+[50510.243200]  [<ffffffffc05b97cd>] rfcomm_run+0x1ad/0x890 [rfcomm]
+[50510.243238]  [<ffffffffc05b9620>] ? rfcomm_process_rx+0x8a0/0x8a0 [rfcomm]
+[50510.243281]  [<ffffffff81091572>] kthread+0xd2/0xf0
+[50510.243312]  [<ffffffff810914a0>] ? kthread_create_on_node+0x1c0/0x1c0
+[50510.243353]  [<ffffffff8176e9d8>] ret_from_fork+0x58/0x90
+[50510.243387]  [<ffffffff810914a0>] ? kthread_create_on_node+0x1c0/0x1c0
+[50510.243424] Code: 00 48 8b 93 b8 02 00 00 48 8d 83 b0 02 00 00 48 89 51 08 48 89 0a 48 89 83 b0 02 00 00 48 89 83 b8 02 00 00 48 8b 83 c0 02 00 00 <66> 83 a8 a8 01 00 00 01 48 c7 83 c0 02 00 00 00 00 00 00 f0 ff
+[50510.243685] RIP  [<ffffffffc01243f7>] bt_accept_unlink+0x47/0xa0 [bluetooth]
+[50510.243737]  RSP <ffff8800d7a57d58>
+[50510.243758] CR2: 00000000000001a8
+[50510.249457] ---[ end trace bb984f932c4e3ab3 ]---
+
+Signed-off-by: Yichen Zhao <zhaoyichen@google.com>
+---
+ net/bluetooth/l2cap_sock.c | 18 +++++++++++++++++-
+ 1 file changed, 17 insertions(+), 1 deletion(-)
+
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index e4cae72..ff1c821 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -1307,6 +1307,15 @@ static void l2cap_sock_teardown_cb(struct l2cap_chan *chan, int err)
+ 
+ 	BT_DBG("chan %p state %s", chan, state_to_string(chan->state));
+ 
++	parent = bt_sk(sk)->parent;
++
++	/* The parent sock must be locked if its state is mutated by
++	 * bt_accept_unlink. It must be locked before sk to maintain the same
++	 * locking order as bt_accept_dequeue.
++	 */
++	if (parent)
++		lock_sock_nested(parent, L2CAP_NESTING_PARENT);
++
+ 	/* This callback can be called both for server (BT_LISTEN)
+ 	 * sockets as well as "normal" ones. To avoid lockdep warnings
+ 	 * with child socket locking (through l2cap_sock_cleanup_listen)
+@@ -1316,7 +1325,11 @@ static void l2cap_sock_teardown_cb(struct l2cap_chan *chan, int err)
+ 	 */
+ 	lock_sock_nested(sk, atomic_read(&chan->nesting));
+ 
+-	parent = bt_sk(sk)->parent;
++	/* bt_accept_unlink could have been called before locking parent. */
++	if (parent && !bt_sk(sk)->parent) {
++		release_sock(parent);
++		parent = NULL;
++	}
+ 
+ 	sock_set_flag(sk, SOCK_ZAPPED);
+ 
+@@ -1348,6 +1361,9 @@ static void l2cap_sock_teardown_cb(struct l2cap_chan *chan, int err)
+ 	}
+ 
+ 	release_sock(sk);
++
++	if (parent)
++		release_sock(parent);
+ }
+ 
+ static void l2cap_sock_state_change_cb(struct l2cap_chan *chan, int state,
+-- 
+2.8.0.rc3.226.g39d4020
