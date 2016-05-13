@@ -1,74 +1,39 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Date: Sat, 14 May 2016 14:22:01 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: davem@davemloft.net
-Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: pull request: bluetooth-next 2016-05-14
-Message-ID: <20160514112201.GA3954@t440s>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="wac7ysb48OaltWcw"
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <zhaoyichen@google.com>
+From: Yichen Zhao <zhaoyichen@google.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Yichen Zhao <zhaoyichen@google.com>,
+	"Gustavo F. Padovan" <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Fix l2cap_sock_teardown_cb race condition with bt_accept_dequeue
+Date: Fri, 13 May 2016 14:00:30 -0700
+Message-Id: <1463173230-16159-1-git-send-email-zhaoyichen@google.com>
+In-Reply-To: <45EE47FA-D319-4091-941A-C4005E32B572@holtmann.org>
+References: <45EE47FA-D319-4091-941A-C4005E32B572@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Marcel,
 
---wac7ysb48OaltWcw
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+> so I am not big fan of the conditional locking in case of parent is set or not. Do you have a test case that reproduces the mentioned race. It would love to have that in tools/l2cap-tester or similar.
 
-Hi Dave,
+So far I could only reproduce the bug by repeatedly performing RFCOMM connections and resets. I'll try to implement something in rfcomm-tester or l2cap-tester.
 
-Here are two more Bluetooth patches for the 4.7 kernel which we wanted
-to get into net-next before the merge window opens. Please let me know
-if there are any issues pulling. Thanks.
+Since this is a race condition, I'm not confident that I can help you reproduce the bug reliably on a different test setup. I'd appreciate it very much if you can offer any tips on triggering a race condition faster in a test case.
 
-Johan
+> Maybe the code needs some restructuring to avoid the conditional locking.
 
----
-The following changes since commit ed7cbbce544856b20e5811de373cf92e92499771:
+I agree that my patch is not very elegant, and I'd love any way to improve it.
+I have some ideas, but I'm not familiar enough with kernel development to know whether other solutions are safe to implement, such as:
 
-  udp: Resolve NULL pointer dereference over flow-based vxlan device (2016-05-13 01:56:14 -0400)
+* Removing bt_accept_unlink from l2cap_teardown_cb, and relying on bt_accept_dequeue to unlink the socket when it's enumerated. Is it safe to leave a zapped sock in accept_q?
+* Perform "unlock sock; lock parent; lock sock" before calling bt_accept_unlink in teardown_cb. This is still conditional locking, but around a smaller block of code. Is it safe to unlock a zapped sock?
+* Use RCU for handling accept_q. Is this appropriate?
 
-are available in the git repository at:
+Please let me know what you think.
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git for-upstream
+Regards,
 
-for you to fetch changes up to 72f9f8b58bc743e6b6abdc68f60db98486c3ffcf:
-
-  Bluetooth: Add USB ID 13D3:3487 to ath3k (2016-05-13 16:54:59 +0200)
-
-----------------------------------------------------------------
-Jiri Slaby (1):
-      Bluetooth: fix power_on vs close race
-
-Lauro Costa (1):
-      Bluetooth: Add USB ID 13D3:3487 to ath3k
-
- drivers/bluetooth/ath3k.c | 2 ++
- drivers/bluetooth/btusb.c | 1 +
- net/bluetooth/hci_core.c  | 4 ++--
- 3 files changed, 5 insertions(+), 2 deletions(-)
-
-
---wac7ysb48OaltWcw
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
-
-iQIcBAEBAgAGBQJXNwpZAAoJECQj9vv5qNQSw0MQALtrBXVsNCTbRuHSzTNuEeNG
-50MC3idq9STg0MbuIgd16yjjSyJtb0GFBIrcGWJBjEX4nK+vtfoq/FFXV2gArunj
-5v7J+Lw5P+s7rLOrfdCh6gxfZBBFAexmdRhi1E6pzYIDty5ZOVLc8r+lvvYjRIDE
-EaBusokEinsD1rJH+jRN5Zx0I0mH2CbRGRqDcS/y61eFVPA4B9dRl3BtxiOvmeNl
-Kw4w9Wgz6Bhp7ll+GirPGKLHljcxlhhy6NrzQXARllaoALCFhpWdCKNzXiTL9Nyo
-271v6gCCs8+tMdiBeZpsT9tlQ7s2+e+JXhYvuHG5bAWnChirYx8KjezwjEC+QjMY
-nCIS17sRKpldwlgJT8KrwNkdU6PRQK7Om4cIPDEexP1hRMbz5D0pppv920IzAakv
-2qY2GrnJEHuMd+NnKBrLbMPOysRYzTkbyjMNLlBhTKuTxeNxuO3OmdEchE71iT8u
-pkRqGmgjX+RVJlpEJFf4FPMEZxH39DcfVuAKdGU5/gAoDbuGgjCi0b6SSiyCVfof
-2BXR6C4Y1YeuFAMPW5+5xRED8aaLJ8zw7EWSwPqZgAHKNSSTGeH1sxouklY1efj/
-tS2RGKhfmbqTyQtHqiJd/cUMiNw2w3gECIYcmTBxB23KqpvSa/DOpygB11VxtUne
-9u4w/3lxXVqgxRtz3VOi
-=NqlX
------END PGP SIGNATURE-----
-
---wac7ysb48OaltWcw--
+Yichen Zhao
