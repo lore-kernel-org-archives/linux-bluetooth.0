@@ -1,39 +1,43 @@
-Return-Path: <zhaoyichen@google.com>
-From: Yichen Zhao <zhaoyichen@google.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Yichen Zhao <zhaoyichen@google.com>,
-	"Gustavo F. Padovan" <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Fix l2cap_sock_teardown_cb race condition with bt_accept_dequeue
-Date: Fri, 13 May 2016 14:00:30 -0700
-Message-Id: <1463173230-16159-1-git-send-email-zhaoyichen@google.com>
-In-Reply-To: <45EE47FA-D319-4091-941A-C4005E32B572@holtmann.org>
-References: <45EE47FA-D319-4091-941A-C4005E32B572@holtmann.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
+Subject: Re: [PATCH v2] Bluetooth: Add USB ID 13D3:3487 to ath3k
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1462826171-12707-1-git-send-email-lauro@polilinux.com.br>
+Date: Fri, 13 May 2016 07:55:40 -0700
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <924DD1E4-CD48-4046-8736-A12D519D894B@holtmann.org>
+References: <3a33c6785127246e637533ec75d81bf7@polilinux.com.br> <1462826171-12707-1-git-send-email-lauro@polilinux.com.br>
+To: Lauro Costa <lauro@polilinux.com.br>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Lauro,
 
-> so I am not big fan of the conditional locking in case of parent is set or not. Do you have a test case that reproduces the mentioned race. It would love to have that in tools/l2cap-tester or similar.
+> Add hw id to ath3k usb device list and btusb blacklist
+> 
+> T:  Bus=01 Lev=01 Prnt=01 Port=08 Cnt=02 Dev#=  4 Spd=12  MxCh= 0
+> D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+> P:  Vendor=13d3 ProdID=3487 Rev=00.02
+> C:  #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
+> I:  If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> 
+> Requires these firmwares:
+> ar3k/AthrBT_0x11020100.dfu and ar3k/ramps_0x11020100_40.dfu
+> Firmwares are available in linux-firmware.
+> 
+> Device found in a laptop ASUS model N552VW. It's an Atheros AR9462 chip.
+> 
+> Signed-off-by: Lauro Costa <lauro@polilinux.com.br>
+> ---
+> drivers/bluetooth/ath3k.c | 2 ++
+> drivers/bluetooth/btusb.c | 1 +
+> 2 files changed, 3 insertions(+)
 
-So far I could only reproduce the bug by repeatedly performing RFCOMM connections and resets. I'll try to implement something in rfcomm-tester or l2cap-tester.
+patch has been applied to bluetooth-next tree.
 
-Since this is a race condition, I'm not confident that I can help you reproduce the bug reliably on a different test setup. I'd appreciate it very much if you can offer any tips on triggering a race condition faster in a test case.
+Regards
 
-> Maybe the code needs some restructuring to avoid the conditional locking.
+Marcel
 
-I agree that my patch is not very elegant, and I'd love any way to improve it.
-I have some ideas, but I'm not familiar enough with kernel development to know whether other solutions are safe to implement, such as:
-
-* Removing bt_accept_unlink from l2cap_teardown_cb, and relying on bt_accept_dequeue to unlink the socket when it's enumerated. Is it safe to leave a zapped sock in accept_q?
-* Perform "unlock sock; lock parent; lock sock" before calling bt_accept_unlink in teardown_cb. This is still conditional locking, but around a smaller block of code. Is it safe to unlock a zapped sock?
-* Use RCU for handling accept_q. Is this appropriate?
-
-Please let me know what you think.
-
-Regards,
-
-Yichen Zhao
