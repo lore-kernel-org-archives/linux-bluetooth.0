@@ -1,36 +1,27 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
-Subject: Re: Request for BLE server applications and documents - BLUEZ
-From: Travis Griggs <travisgriggs@gmail.com>
-In-Reply-To: <CABBYNZJK20KwkcxFzhds8c+E1YsDFcOFhn3veTWzvumhbJLQyQ@mail.gmail.com>
-Date: Tue, 17 May 2016 10:33:43 -0700
-Message-Id: <DB8A8A19-2F0C-474D-8E60-67AFE937D31A@gmail.com>
-References: <57397128.8080208@redpinesignals.com> <CABBYNZLb99QkEggXOiOye+VPp+UXK8i9bSZ0m=Vv2Mc_davLCw@mail.gmail.com> <573ACC64.60502@redpinesignals.com> <CABBYNZJK20KwkcxFzhds8c+E1YsDFcOFhn3veTWzvumhbJLQyQ@mail.gmail.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH] tools: add more entities to company ID parser
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1459968044-29298-1-git-send-email-mikeryan@lacklustre.net>
+Date: Tue, 17 May 2016 18:53:17 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <C776DE55-D926-4DAD-A1AA-2C0C06B373D4@holtmann.org>
+References: <1459968044-29298-1-git-send-email-mikeryan@lacklustre.net>
+To: Mike Ryan <mikeryan@lacklustre.net>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Mike,
 
-> On May 17, 2016, at 1:14 AM, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
-> 
-<snip>
-> Regarding the actual problem it is probably because experimental
-> interfaces are not enabled by default, you can do enable that by
-> passing -E to bluetoothd.
+> This patch adds lower and uppercase u with umlaut.
+> ---
+> tools/parse_companies.pl | 2 ++
+> 1 file changed, 2 insertions(+)
 
-If you’re using systemd, the file you’ll want to tweak is 
+patch has been applied.
 
-/lib/systemd/system/bluetooth.service
+Regards
 
-Modify your ExecStart line to include the -E option. Mine currently looks like:
+Marcel
 
-ExecStart=/usr/lib/bluetooth/bluetoothd -d -E --noplugin=*
-
-The -d is indispensable and took my a while to stumble upon. Any python error you have that is fired by dbus callbacks will not show up on the stdout/stderr of you program (e.g. an error downstream of a WriteValue() callback). Rather it will show up in the debug output of the bluetooth daemon. So I pretty much always have
-
-journalctl -flu bluetooth
-
-running when I’m changing things, so I can see those errors reported there.
-
-By default, you get a whole bunch of stuff in your dbus namespace from older stuff. The —noplugin=* flag gets rid of all of those, so you’ll only see your own stuff in the dbus tree. 
