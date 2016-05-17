@@ -1,821 +1,139 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+To: =?utf-8?B?SGFra8SxIEfDtsOnZW/En2x1?= <hakki@bir618.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: bluez dbus ble connection problem when a filter is set
+In-Reply-To: <CADrC6GwZPBJzq_zy2mZesihuYGDc47iJTsHPwkNj-6NXd3cMqg@mail.gmail.com>
+References: <CADrC6Gxef2A=EsVLxG-izD4xBKvrBW85wOzybuZCrr-OL52VSw@mail.gmail.com> <8737pug8ea.fsf@intel.com> <CADrC6Gzz2fVg5poDov4j4REh6C=2sLEKcUBBfA3M+td9vu7J2w@mail.gmail.com> <CADrC6GwZPBJzq_zy2mZesihuYGDc47iJTsHPwkNj-6NXd3cMqg@mail.gmail.com>
+Date: Tue, 17 May 2016 15:59:00 -0300
+Message-ID: <87eg90ecjv.fsf@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <CANCcNXdu8PZ7=iYeRO-4wir4hdmhuFCq_a7+VXdMgSXDNe_veA@mail.gmail.com>
-References: <1462801883-6361-1-git-send-email-luiz.dentz@gmail.com> <CANCcNXdu8PZ7=iYeRO-4wir4hdmhuFCq_a7+VXdMgSXDNe_veA@mail.gmail.com>
-From: Puthikorn Voravootivat <puthik@chromium.org>
-Date: Tue, 17 May 2016 14:16:52 -0700
-Message-ID: <CANCcNXcPnEea+KFY3mr72S9oG+O7yNW6vaD9upBX8Xh6K-1ghA@mail.gmail.com>
-Subject: Re: [PATCHv2 BlueZ 1/6] doc/gatt-api: Add options dictionary to ReadValue/WriteValue
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Vinicius Costa Gomes <vinicius.gomes@intel.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-*resend in plain text
+Hi Hakkı,
 
-Hi.
-I found a possible bug below. Comment in line.
-Thanks
+Hakkı Göçeoğlu <hakki@bir618.com> writes:
 
-On Mon, May 9, 2016 at 6:51 AM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
+> Hi Vinicius,
 >
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> This adds the possibility to pass an offset to these operations, and
-> also in the server case to give the device object.
-> ---
-> v2: Fix Vinicius comments, add necessary changes to other tools affected.
->
->  doc/gatt-api.txt    |  20 ++++-
->  src/gatt-client.c   | 180 ++++++++++++++++++++++++++++--------------
->  src/gatt-database.c | 219 ++++++++++++++++++++++++++++++++++++++--------------
->  3 files changed, 296 insertions(+), 123 deletions(-)
->
-> diff --git a/doc/gatt-api.txt b/doc/gatt-api.txt
-> index ad2ab16..683b1b7 100644
-> --- a/doc/gatt-api.txt
-> +++ b/doc/gatt-api.txt
-> @@ -61,23 +61,29 @@ Service             org.bluez
->  Interface      org.bluez.GattCharacteristic1 [Experimental]
->  Object path    [variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX/serviceXX/charYYYY
->
-> -Methods                array{byte} ReadValue()
-> +Methods                array{byte} ReadValue(dict options)
->
->                         Issues a request to read the value of the
->                         characteristic and returns the value if the
->                         operation was successful.
->
-> +                       Possible options: "offset": uint16 offset
-> +                                         "device": Object Device (Server only)
-> +
->                         Possible Errors: org.bluez.Error.Failed
->                                          org.bluez.Error.InProgress
->                                          org.bluez.Error.NotPermitted
->                                          org.bluez.Error.NotAuthorized
->                                          org.bluez.Error.NotSupported
->
-> -               void WriteValue(array{byte} value)
-> +               void WriteValue(array{byte} value, dict options)
->
->                         Issues a request to write the value of the
->                         characteristic.
->
-> +                       Possible options: "offset": Start offset
-> +                                         "device": Device path (Server only)
-> +
->                         Possible Errors: org.bluez.Error.Failed
->                                          org.bluez.Error.InProgress
->                                          org.bluez.Error.NotPermitted
-> @@ -154,23 +160,29 @@ Service           org.bluez
->  Interface      org.bluez.GattDescriptor1 [Experimental]
->  Object path    [variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX/serviceXX/charYYYY/descriptorZZZ
->
-> -Methods                array{byte} ReadValue()
-> +Methods                array{byte} ReadValue(dict flags)
->
->                         Issues a request to read the value of the
->                         characteristic and returns the value if the
->                         operation was successful.
->
-> +                       Possible options: "offset": Start offset
-> +                                         "device": Device path (Server only)
-> +
->                         Possible Errors: org.bluez.Error.Failed
->                                          org.bluez.Error.InProgress
->                                          org.bluez.Error.NotPermitted
->                                          org.bluez.Error.NotAuthorized
->                                          org.bluez.Error.NotSupported
->
-> -               void WriteValue(array{byte} value)
-> +               void WriteValue(array{byte} value, dict flags)
->
->                         Issues a request to write the value of the
->                         characteristic.
->
-> +                       Possible options: "offset": Start offset
-> +                                         "device": Device path (Server only)
-> +
->                         Possible Errors: org.bluez.Error.Failed
->                                          org.bluez.Error.InProgress
->                                          org.bluez.Error.NotPermitted
-> diff --git a/src/gatt-client.c b/src/gatt-client.c
-> index 16a1f6c..0cbacca 100644
-> --- a/src/gatt-client.c
-> +++ b/src/gatt-client.c
-> @@ -23,6 +23,7 @@
->
->  #include <stdbool.h>
->  #include <stdint.h>
-> +#include <errno.h>
->
->  #include <dbus/dbus.h>
->
-> @@ -191,33 +192,17 @@ static gboolean descriptor_value_exists(const GDBusPropertyTable *property,
->         return ret;
->  }
->
-> -static bool parse_value_arg(DBusMessage *msg, uint8_t **value,
-> -                                                       size_t *value_len)
-> +static int parse_value_arg(DBusMessageIter *iter, uint8_t **value, int *len)
->  {
-> -       DBusMessageIter iter, array;
-> -       uint8_t *val;
-> -       int len;
-> -
-> -       if (!dbus_message_iter_init(msg, &iter))
-> -               return false;
-> -
-> -       if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_ARRAY)
-> -               return false;
-> -
-> -       dbus_message_iter_recurse(&iter, &array);
-> -       dbus_message_iter_get_fixed_array(&array, &val, &len);
-> -       dbus_message_iter_next(&iter);
-> -
-> -       if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_INVALID)
-> -               return false;
-> +       DBusMessageIter array;
->
-> -       if (len < 0)
-> -               return false;
-> +       if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_ARRAY)
-> +               return -EINVAL;
->
-> -       *value = val;
-> -       *value_len = len;
-> +       dbus_message_iter_recurse(iter, &array);
-> +       dbus_message_iter_get_fixed_array(&array, value, len);
->
-> -       return true;
-> +       return 0;
->  }
->
->  typedef bool (*async_dbus_op_complete_t)(void *data);
-> @@ -390,12 +375,60 @@ fail:
->         return;
->  }
->
-> +static int parse_options(DBusMessageIter *iter, uint16_t *offset)
-> +{
-> +       DBusMessageIter dict;
-> +
-> +       if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_ARRAY)
-> +               return -EINVAL;
-> +
-> +       dbus_message_iter_recurse(iter, &dict);
-> +
-> +       while (dbus_message_iter_get_arg_type(&dict) == DBUS_TYPE_DICT_ENTRY) {
-> +               const char *key;
-> +               DBusMessageIter value, entry;
-> +               int var;
-> +
-> +               dbus_message_iter_recurse(&dict, &entry);
-> +               dbus_message_iter_get_basic(&entry, &key);
-> +
-> +               dbus_message_iter_next(&entry);
-> +               dbus_message_iter_recurse(&entry, &value);
-> +
-> +               var = dbus_message_iter_get_arg_type(&value);
-> +               if (strcasecmp(key, "offset") == 0) {
-> +                       if (var != DBUS_TYPE_UINT16)
-> +                               return -EINVAL;
-> +                       dbus_message_iter_get_basic(&value, offset);
-> +               }
+> I have tested the same problem with the newer kernel
+> (Linux raspberrypi 4.4.9-v7+ #884 SMP Fri May 6 17:28:59 BST 2016
+> armv7l GNU/Linux)
+> the outcome is still the same, is there anything I can do, further
+> testing etc. ?
 
-Add dbus_message_iter_next(&dict); here?
+Just something for futures emails, we are not big fans of top posting
+around here.
+
+The output of 'btmon' (it shows the HCI and MGMT traffic in the system)
+should prove helpful.
+
+I don't really follow the rpi scene, but I heard somewhere that there was an
+update for the firmware of the Bluetooth controller.
+
 >
-> +       }
-> +
-> +       return 0;
-> +}
-> +
-> +static unsigned int read_value(struct bt_gatt_client *gatt, uint16_t handle,
-> +                               bt_gatt_client_read_callback_t callback,
-> +                               struct async_dbus_op *op)
-> +{
-> +       if (op->offset)
-> +               return bt_gatt_client_read_long_value(gatt, handle, op->offset,
-> +                                                       callback,
-> +                                                       async_dbus_op_ref(op),
-> +                                                       async_dbus_op_unref);
-> +       else
-> +               return bt_gatt_client_read_value(gatt, handle, callback,
-> +                                                       async_dbus_op_ref(op),
-> +                                                       async_dbus_op_unref);
-> +}
-> +
->  static DBusMessage *descriptor_read_value(DBusConnection *conn,
->                                         DBusMessage *msg, void *user_data)
->  {
->         struct descriptor *desc = user_data;
->         struct bt_gatt_client *gatt = desc->chrc->service->client->gatt;
-> +       DBusMessageIter iter;
->         struct async_dbus_op *op;
-> +       uint16_t offset = 0;
+> Thanks a lot, take care
 >
->         if (!gatt)
->                 return btd_error_failed(msg, "Not connected");
-> @@ -403,14 +436,17 @@ static DBusMessage *descriptor_read_value(DBusConnection *conn,
->         if (desc->read_id)
->                 return btd_error_in_progress(msg);
+> Hakki
 >
-> +       dbus_message_iter_init(msg, &iter);
-> +
-> +       if (parse_options(&iter, &offset))
-> +               return btd_error_invalid_args(msg);
-> +
->         op = new0(struct async_dbus_op, 1);
->         op->msg = dbus_message_ref(msg);
->         op->data = desc;
-> +       op->offset = offset;
->
-> -       desc->read_id = bt_gatt_client_read_value(gatt, desc->handle,
-> -                                                       desc_read_cb,
-> -                                                       async_dbus_op_ref(op),
-> -                                                       async_dbus_op_unref);
-> +       desc->read_id = read_value(gatt, desc->handle, desc_read_cb, op);
->         if (desc->read_id)
->                 return NULL;
->
-> @@ -450,7 +486,6 @@ done:
->         g_dbus_send_message(btd_get_dbus_connection(), reply);
->  }
->
-> -
->  static void write_cb(bool success, uint8_t att_ecode, void *user_data)
->  {
->         write_result_cb(success, false, att_ecode, user_data);
-> @@ -459,7 +494,8 @@ static void write_cb(bool success, uint8_t att_ecode, void *user_data)
->  static unsigned int start_long_write(DBusMessage *msg, uint16_t handle,
->                                         struct bt_gatt_client *gatt,
->                                         bool reliable, const uint8_t *value,
-> -                                       size_t value_len, void *data,
-> +                                       size_t value_len, uint16_t offset,
-> +                                       void *data,
->                                         async_dbus_op_complete_t complete)
->  {
->         struct async_dbus_op *op;
-> @@ -469,9 +505,10 @@ static unsigned int start_long_write(DBusMessage *msg, uint16_t handle,
->         op->msg = dbus_message_ref(msg);
->         op->data = data;
->         op->complete = complete;
-> +       op->offset = offset;
->
-> -       id = bt_gatt_client_write_long_value(gatt, reliable, handle,
-> -                                                       0, value, value_len,
-> +       id = bt_gatt_client_write_long_value(gatt, reliable, handle, offset,
-> +                                                       value, value_len,
->                                                         write_result_cb, op,
->                                                         async_dbus_op_free);
->
-> @@ -522,8 +559,10 @@ static DBusMessage *descriptor_write_value(DBusConnection *conn,
->  {
->         struct descriptor *desc = user_data;
->         struct bt_gatt_client *gatt = desc->chrc->service->client->gatt;
-> +       DBusMessageIter iter;
->         uint8_t *value = NULL;
-> -       size_t value_len = 0;
-> +       int value_len = 0;
-> +       uint16_t offset = 0;
->
->         if (!gatt)
->                 return btd_error_failed(msg, "Not connected");
-> @@ -531,7 +570,12 @@ static DBusMessage *descriptor_write_value(DBusConnection *conn,
->         if (desc->write_id)
->                 return btd_error_in_progress(msg);
->
-> -       if (!parse_value_arg(msg, &value, &value_len))
-> +       dbus_message_iter_init(msg, &iter);
-> +
-> +       if (parse_value_arg(&iter, &value, &value_len))
-> +               return btd_error_invalid_args(msg);
-> +
-> +       if (parse_options(&iter, &offset))
->                 return btd_error_invalid_args(msg);
->
->         /*
-> @@ -546,15 +590,15 @@ static DBusMessage *descriptor_write_value(DBusConnection *conn,
->          * Based on the value length and the MTU, either use a write or a long
->          * write.
->          */
-> -       if (value_len <= (unsigned) bt_gatt_client_get_mtu(gatt) - 3)
-> +       if (value_len <= bt_gatt_client_get_mtu(gatt) - 3 && !offset)
->                 desc->write_id = start_write_request(msg, desc->handle,
->                                                         gatt, value,
->                                                         value_len, desc,
->                                                         desc_write_complete);
->         else
-> -               desc->write_id = start_long_write(msg, desc->handle,
-> -                                                       gatt, false, value,
-> -                                                       value_len, desc,
-> +               desc->write_id = start_long_write(msg, desc->handle, gatt,
-> +                                                       false, value,
-> +                                                       value_len, offset, desc,
->                                                         desc_write_complete);
->
->         if (!desc->write_id)
-> @@ -574,13 +618,15 @@ static const GDBusPropertyTable descriptor_properties[] = {
->  };
->
->  static const GDBusMethodTable descriptor_methods[] = {
-> -       { GDBUS_EXPERIMENTAL_ASYNC_METHOD("ReadValue", NULL,
-> -                                               GDBUS_ARGS({ "value", "ay" }),
-> -                                               descriptor_read_value) },
-> +       { GDBUS_EXPERIMENTAL_ASYNC_METHOD("ReadValue",
-> +                                       GDBUS_ARGS({ "options", "a{sv}" }),
-> +                                       GDBUS_ARGS({ "value", "ay" }),
-> +                                       descriptor_read_value) },
->         { GDBUS_EXPERIMENTAL_ASYNC_METHOD("WriteValue",
-> -                                               GDBUS_ARGS({ "value", "ay" }),
-> -                                               NULL,
-> -                                               descriptor_write_value) },
-> +                                       GDBUS_ARGS({ "value", "ay" },
-> +                                               { "options", "a{sv}" }),
-> +                                       NULL,
-> +                                       descriptor_write_value) },
->         { }
->  };
->
-> @@ -837,7 +883,9 @@ static DBusMessage *characteristic_read_value(DBusConnection *conn,
->  {
->         struct characteristic *chrc = user_data;
->         struct bt_gatt_client *gatt = chrc->service->client->gatt;
-> +       DBusMessageIter iter;
->         struct async_dbus_op *op;
-> +       uint16_t offset = 0;
->
->         if (!gatt)
->                 return btd_error_failed(msg, "Not connected");
-> @@ -845,14 +893,17 @@ static DBusMessage *characteristic_read_value(DBusConnection *conn,
->         if (chrc->read_id)
->                 return btd_error_in_progress(msg);
->
-> +       dbus_message_iter_init(msg, &iter);
-> +
-> +       if (parse_options(&iter, &offset))
-> +               return btd_error_invalid_args(msg);
-> +
->         op = new0(struct async_dbus_op, 1);
->         op->msg = dbus_message_ref(msg);
->         op->data = chrc;
-> +       op->offset = offset;
->
-> -       chrc->read_id = bt_gatt_client_read_value(gatt, chrc->value_handle,
-> -                                                       chrc_read_cb,
-> -                                                       async_dbus_op_ref(op),
-> -                                                       async_dbus_op_unref);
-> +       chrc->read_id = read_value(gatt, chrc->value_handle, chrc_read_cb, op);
->         if (chrc->read_id)
->                 return NULL;
->
-> @@ -879,9 +930,11 @@ static DBusMessage *characteristic_write_value(DBusConnection *conn,
->  {
->         struct characteristic *chrc = user_data;
->         struct bt_gatt_client *gatt = chrc->service->client->gatt;
-> +       DBusMessageIter iter;
->         uint8_t *value = NULL;
-> -       size_t value_len = 0;
-> +       int value_len = 0;
->         bool supported = false;
-> +       uint16_t offset = 0;
->
->         if (!gatt)
->                 return btd_error_failed(msg, "Not connected");
-> @@ -889,7 +942,12 @@ static DBusMessage *characteristic_write_value(DBusConnection *conn,
->         if (chrc->write_id)
->                 return btd_error_in_progress(msg);
->
-> -       if (!parse_value_arg(msg, &value, &value_len))
-> +       dbus_message_iter_init(msg, &iter);
-> +
-> +       if (parse_value_arg(&iter, &value, &value_len))
-> +               return btd_error_invalid_args(msg);
-> +
-> +       if (parse_options(&iter, &offset))
->                 return btd_error_invalid_args(msg);
->
->         /*
-> @@ -906,7 +964,7 @@ static DBusMessage *characteristic_write_value(DBusConnection *conn,
->         if ((chrc->ext_props & BT_GATT_CHRC_EXT_PROP_RELIABLE_WRITE)) {
->                 supported = true;
->                 chrc->write_id = start_long_write(msg, chrc->value_handle, gatt,
-> -                                               true, value, value_len,
-> +                                               true, value, value_len, offset,
->                                                 chrc, chrc_write_complete);
->                 if (chrc->write_id)
->                         return NULL;
-> @@ -920,7 +978,7 @@ static DBusMessage *characteristic_write_value(DBusConnection *conn,
->                 if (!mtu)
->                         return btd_error_failed(msg, "No ATT transport");
->
-> -               if (value_len <= (unsigned) mtu - 3)
-> +               if (value_len <= mtu - 3 && !offset)
->                         chrc->write_id = start_write_request(msg,
->                                                 chrc->value_handle,
->                                                 gatt, value, value_len,
-> @@ -928,7 +986,7 @@ static DBusMessage *characteristic_write_value(DBusConnection *conn,
->                 else
->                         chrc->write_id = start_long_write(msg,
->                                                 chrc->value_handle, gatt,
-> -                                               false, value, value_len,
-> +                                               false, value, value_len, offset,
->                                                 chrc, chrc_write_complete);
->
->                 if (chrc->write_id)
-> @@ -1242,17 +1300,19 @@ static const GDBusPropertyTable characteristic_properties[] = {
->  };
->
->  static const GDBusMethodTable characteristic_methods[] = {
-> -       { GDBUS_EXPERIMENTAL_ASYNC_METHOD("ReadValue", NULL,
-> -                                               GDBUS_ARGS({ "value", "ay" }),
-> -                                               characteristic_read_value) },
-> +       { GDBUS_EXPERIMENTAL_ASYNC_METHOD("ReadValue",
-> +                                       GDBUS_ARGS({ "options", "a{sv}" }),
-> +                                       GDBUS_ARGS({ "value", "ay" }),
-> +                                       characteristic_read_value) },
->         { GDBUS_EXPERIMENTAL_ASYNC_METHOD("WriteValue",
-> -                                               GDBUS_ARGS({ "value", "ay" }),
-> -                                               NULL,
-> -                                               characteristic_write_value) },
-> +                                       GDBUS_ARGS({ "value", "ay" },
-> +                                               { "options", "a{sv}" }),
-> +                                       NULL,
-> +                                       characteristic_write_value) },
->         { GDBUS_EXPERIMENTAL_ASYNC_METHOD("StartNotify", NULL, NULL,
-> -                                               characteristic_start_notify) },
-> +                                       characteristic_start_notify) },
->         { GDBUS_EXPERIMENTAL_METHOD("StopNotify", NULL, NULL,
-> -                                               characteristic_stop_notify) },
-> +                                       characteristic_stop_notify) },
->         { }
->  };
->
-> diff --git a/src/gatt-database.c b/src/gatt-database.c
-> index b8da955..99d084d 100644
-> --- a/src/gatt-database.c
-> +++ b/src/gatt-database.c
-> @@ -135,6 +135,7 @@ struct external_desc {
->  };
->
->  struct pending_op {
-> +       struct btd_device *device;
->         unsigned int id;
->         struct gatt_db_attribute *attrib;
->         struct queue *owner_queue;
-> @@ -1592,7 +1593,8 @@ static void pending_op_free(void *data)
->         free(op);
->  }
->
-> -static struct pending_op *pending_read_new(struct queue *owner_queue,
-> +static struct pending_op *pending_read_new(struct btd_device *device,
-> +                                       struct queue *owner_queue,
->                                         struct gatt_db_attribute *attrib,
->                                         unsigned int id)
->  {
-> @@ -1601,6 +1603,7 @@ static struct pending_op *pending_read_new(struct queue *owner_queue,
->         op = new0(struct pending_op, 1);
->
->         op->owner_queue = owner_queue;
-> +       op->device = device;
->         op->attrib = attrib;
->         op->id = id;
->         queue_push_tail(owner_queue, op);
-> @@ -1608,33 +1611,75 @@ static struct pending_op *pending_read_new(struct queue *owner_queue,
->         return op;
->  }
->
-> -static void send_read(struct gatt_db_attribute *attrib, GDBusProxy *proxy,
-> -                                               struct queue *owner_queue,
-> -                                               unsigned int id)
-> +static void append_options(DBusMessageIter *iter, void *user_data)
-> +{
-> +       struct pending_op *op = user_data;
-> +       const char *path = device_get_path(op->device);
-> +
-> +       dict_append_entry(iter, "device", DBUS_TYPE_OBJECT_PATH, &path);
-> +}
-> +
-> +static void read_setup_cb(DBusMessageIter *iter, void *user_data)
-> +{
-> +       struct pending_op *op = user_data;
-> +       DBusMessageIter dict;
-> +
-> +       dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
-> +                                       DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
-> +                                       DBUS_TYPE_STRING_AS_STRING
-> +                                       DBUS_TYPE_VARIANT_AS_STRING
-> +                                       DBUS_DICT_ENTRY_END_CHAR_AS_STRING,
-> +                                       &dict);
-> +
-> +       append_options(&dict, op);
-> +
-> +       dbus_message_iter_close_container(iter, &dict);
-> +}
-> +
-> +static struct pending_op *send_read(struct btd_device *device,
-> +                                       struct gatt_db_attribute *attrib,
-> +                                       GDBusProxy *proxy,
-> +                                       struct queue *owner_queue,
-> +                                       unsigned int id)
->  {
->         struct pending_op *op;
-> -       uint8_t ecode = BT_ATT_ERROR_UNLIKELY;
->
-> -       op = pending_read_new(owner_queue, attrib, id);
-> +       op = pending_read_new(device, owner_queue, attrib, id);
->
-> -       if (g_dbus_proxy_method_call(proxy, "ReadValue", NULL, read_reply_cb,
-> -                                               op, pending_op_free) == TRUE)
-> -               return;
-> +       if (g_dbus_proxy_method_call(proxy, "ReadValue", read_setup_cb,
-> +                               read_reply_cb, op, pending_op_free) == TRUE)
-> +               return op;
->
->         pending_op_free(op);
->
-> -       gatt_db_attribute_read_result(attrib, id, ecode, NULL, 0);
-> +       return NULL;
->  }
->
->  static void write_setup_cb(DBusMessageIter *iter, void *user_data)
->  {
->         struct pending_op *op = user_data;
-> -       DBusMessageIter array;
-> +       DBusMessageIter array, dict;
->
->         dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY, "y", &array);
->         dbus_message_iter_append_fixed_array(&array, DBUS_TYPE_BYTE,
->                                         &op->data.iov_base, op->data.iov_len);
->         dbus_message_iter_close_container(iter, &array);
-> +
-> +       dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
-> +                                       DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
-> +                                       DBUS_TYPE_STRING_AS_STRING
-> +                                       DBUS_TYPE_VARIANT_AS_STRING
-> +                                       DBUS_DICT_ENTRY_END_CHAR_AS_STRING,
-> +                                       &dict);
-> +
-> +       append_options(&dict, op);
-> +
-> +       dbus_message_iter_close_container(iter, &dict);
-> +
-> +       if (!op->owner_queue) {
-> +               gatt_db_attribute_write_result(op->attrib, op->id, 0);
-> +               pending_op_free(op);
-> +       }
->  }
->
->  static void write_reply_cb(DBusMessage *message, void *user_data)
-> @@ -1673,7 +1718,8 @@ done:
->         gatt_db_attribute_write_result(op->attrib, op->id, ecode);
->  }
->
-> -static struct pending_op *pending_write_new(struct queue *owner_queue,
-> +static struct pending_op *pending_write_new(struct btd_device *device,
-> +                                       struct queue *owner_queue,
->                                         struct gatt_db_attribute *attrib,
->                                         unsigned int id,
->                                         const uint8_t *value,
-> @@ -1686,6 +1732,7 @@ static struct pending_op *pending_write_new(struct queue *owner_queue,
->         op->data.iov_base = (uint8_t *) value;
->         op->data.iov_len = len;
->
-> +       op->device = device;
->         op->owner_queue = owner_queue;
->         op->attrib = attrib;
->         op->id = id;
-> @@ -1694,24 +1741,25 @@ static struct pending_op *pending_write_new(struct queue *owner_queue,
->         return op;
->  }
->
-> -static void send_write(struct gatt_db_attribute *attrib, GDBusProxy *proxy,
-> +static struct pending_op *send_write(struct btd_device *device,
-> +                                       struct gatt_db_attribute *attrib,
-> +                                       GDBusProxy *proxy,
->                                         struct queue *owner_queue,
->                                         unsigned int id,
->                                         const uint8_t *value, size_t len)
->  {
->         struct pending_op *op;
-> -       uint8_t ecode = BT_ATT_ERROR_UNLIKELY;
->
-> -       op = pending_write_new(owner_queue, attrib, id, value, len);
-> +       op = pending_write_new(device, owner_queue, attrib, id, value, len);
->
->         if (g_dbus_proxy_method_call(proxy, "WriteValue", write_setup_cb,
-> -                                               write_reply_cb, op,
-> -                                               pending_op_free) == TRUE)
-> -               return;
-> +                                       owner_queue ? write_reply_cb : NULL,
-> +                                       op, pending_op_free) == TRUE)
-> +               return op;
->
->         pending_op_free(op);
->
-> -       gatt_db_attribute_write_result(attrib, id, ecode);
-> +       return NULL;
->  }
->
->  static uint32_t permissions_from_props(uint8_t props, uint8_t ext_props)
-> @@ -1895,19 +1943,65 @@ static bool database_add_cep(struct external_service *service,
->         return true;
->  }
->
-> +static struct btd_device *att_get_device(struct bt_att *att)
-> +{
-> +       GIOChannel *io = NULL;
-> +       GError *gerr = NULL;
-> +       bdaddr_t src, dst;
-> +       uint8_t dst_type;
-> +       struct btd_adapter *adapter;
-> +
-> +       io = g_io_channel_unix_new(bt_att_get_fd(att));
-> +       if (!io)
-> +               return NULL;
-> +
-> +       bt_io_get(io, &gerr, BT_IO_OPT_SOURCE_BDADDR, &src,
-> +                                       BT_IO_OPT_DEST_BDADDR, &dst,
-> +                                       BT_IO_OPT_DEST_TYPE, &dst_type,
-> +                                       BT_IO_OPT_INVALID);
-> +       if (gerr) {
-> +               error("bt_io_get: %s", gerr->message);
-> +               g_error_free(gerr);
-> +               g_io_channel_unref(io);
-> +               return NULL;
-> +       }
-> +
-> +       g_io_channel_unref(io);
-> +
-> +       adapter = adapter_find(&src);
-> +       if (!adapter) {
-> +               error("Unable to find adapter object");
-> +               return NULL;
-> +       }
-> +
-> +       return btd_adapter_find_device(adapter, &dst, dst_type);
-> +}
-> +
->  static void desc_read_cb(struct gatt_db_attribute *attrib,
->                                         unsigned int id, uint16_t offset,
->                                         uint8_t opcode, struct bt_att *att,
->                                         void *user_data)
->  {
->         struct external_desc *desc = user_data;
-> +       struct btd_device *device;
->
->         if (desc->attrib != attrib) {
->                 error("Read callback called with incorrect attribute");
-> -               return;
-> +               goto fail;
->         }
->
-> -       send_read(attrib, desc->proxy, desc->pending_reads, id);
-> +       device = att_get_device(att);
-> +       if (!device) {
-> +               error("Unable to find device object");
-> +               goto fail;
-> +       }
-> +
-> +       if (send_read(device, attrib, desc->proxy, desc->pending_reads, id))
-> +               return;
-> +
-> +fail:
-> +       gatt_db_attribute_read_result(attrib, id, BT_ATT_ERROR_UNLIKELY,
-> +                                                               NULL, 0);
->  }
->
->  static void desc_write_cb(struct gatt_db_attribute *attrib,
-> @@ -1917,13 +2011,26 @@ static void desc_write_cb(struct gatt_db_attribute *attrib,
->                                         void *user_data)
->  {
->         struct external_desc *desc = user_data;
-> +       struct btd_device *device;
->
->         if (desc->attrib != attrib) {
->                 error("Read callback called with incorrect attribute");
-> -               return;
-> +               goto fail;
->         }
->
-> -       send_write(attrib, desc->proxy, desc->pending_writes, id, value, len);
-> +       device = att_get_device(att);
-> +       if (!device) {
-> +               error("Unable to find device object");
-> +               goto fail;
-> +       }
-> +
-> +       if (send_write(device, attrib, desc->proxy, desc->pending_writes, id,
-> +                                                       value, len))
-> +               return;
-> +
-> +fail:
-> +       gatt_db_attribute_read_result(attrib, id, BT_ATT_ERROR_UNLIKELY,
-> +                                                               NULL, 0);
->  }
->
->  static bool database_add_desc(struct external_service *service,
-> @@ -1956,43 +2063,25 @@ static void chrc_read_cb(struct gatt_db_attribute *attrib,
->                                         void *user_data)
->  {
->         struct external_chrc *chrc = user_data;
-> +       struct btd_device *device;
->
->         if (chrc->attrib != attrib) {
->                 error("Read callback called with incorrect attribute");
-> -               return;
-> +               goto fail;
->         }
->
-> -       send_read(attrib, chrc->proxy, chrc->pending_reads, id);
-> -}
-> -
-> -static void write_without_response_setup_cb(DBusMessageIter *iter,
-> -                                                       void *user_data)
-> -{
-> -       struct iovec *iov = user_data;
-> -       DBusMessageIter array;
-> -
-> -       dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY, "y", &array);
-> -       dbus_message_iter_append_fixed_array(&array, DBUS_TYPE_BYTE,
-> -                                               &iov->iov_base, iov->iov_len);
-> -       dbus_message_iter_close_container(iter, &array);
-> -}
-> -
-> -static void send_write_without_response(struct gatt_db_attribute *attrib,
-> -                                       GDBusProxy *proxy, unsigned int id,
-> -                                       const uint8_t *value, size_t len)
-> -{
-> -       struct iovec iov;
-> -       uint8_t ecode = 0;
-> -
-> -       iov.iov_base = (uint8_t *) value;
-> -       iov.iov_len = len;
-> +       device = att_get_device(att);
-> +       if (!device) {
-> +               error("Unable to find device object");
-> +               goto fail;
-> +       }
->
-> -       if (!g_dbus_proxy_method_call(proxy, "WriteValue",
-> -                                       write_without_response_setup_cb,
-> -                                       NULL, &iov, NULL))
-> -               ecode = BT_ATT_ERROR_UNLIKELY;
-> +       if (send_read(device, attrib, chrc->proxy, chrc->pending_reads, id))
-> +               return;
->
-> -       gatt_db_attribute_write_result(attrib, id, ecode);
-> +fail:
-> +       gatt_db_attribute_read_result(attrib, id, BT_ATT_ERROR_UNLIKELY,
-> +                                                               NULL, 0);
->  }
->
->  static void chrc_write_cb(struct gatt_db_attribute *attrib,
-> @@ -2002,19 +2091,31 @@ static void chrc_write_cb(struct gatt_db_attribute *attrib,
->                                         void *user_data)
->  {
->         struct external_chrc *chrc = user_data;
-> +       struct btd_device *device;
-> +       struct queue *queue;
->
->         if (chrc->attrib != attrib) {
->                 error("Write callback called with incorrect attribute");
-> -               return;
-> +               goto fail;
->         }
->
-> -       if (chrc->props & BT_GATT_CHRC_PROP_WRITE_WITHOUT_RESP) {
-> -               send_write_without_response(attrib, chrc->proxy, id, value,
-> -                                                                       len);
-> -               return;
-> +       device = att_get_device(att);
-> +       if (!device) {
-> +               error("Unable to find device object");
-> +               goto fail;
->         }
->
-> -       send_write(attrib, chrc->proxy, chrc->pending_writes, id, value, len);
-> +       if (!(chrc->props & BT_GATT_CHRC_PROP_WRITE_WITHOUT_RESP))
-> +               queue = chrc->pending_writes;
-> +       else
-> +               queue = NULL;
-> +
-> +       if (send_write(device, attrib, chrc->proxy, queue, id, value, len))
-> +               return;
-> +
-> +fail:
-> +       gatt_db_attribute_read_result(attrib, id, BT_ATT_ERROR_UNLIKELY,
-> +                                                               NULL, 0);
->  }
->
->  static bool database_add_chrc(struct external_service *service,
-> --
-> 2.5.5
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> On Sat, May 7, 2016 at 8:12 AM, Hakkı Göçeoğlu <hakki@bir618.com> wrote:
+>> Hi again, please discard my previous mail I had not seen the second question:
+>>
+>>> Which kernel version are you running?
+>>
+>> pi@raspberrypi:~ $ uname -a
+>>
+>> Linux raspberrypi 4.1.19-v7+ #858 SMP Tue Mar 15 15:56:00 GMT 2016
+>> armv7l GNU/Linux
+>>
+>>> I couldn't reproduce this, can you provide the btmon output when this
+>>> happens?
+>>
+>> I have attached two log outputs, one correct behaviour, and the other
+>> erratic, on both the flow is the same until the line:
+>>
+>> 14:22 src/adapter.c:connected_callback() hci0 device EB:52:CE:B5:A3:52
+>> connected eir_len 0
+>>
+>>  on the correct flow the next four lines:
+>> 14:22 attrib/gattrib.c:g_attrib_ref() 0x1b7eb8: g_attrib_ref=1
+>> 14:22 src/gatt-client.c:btd_gatt_client_connected() Device connected.
+>> 14:22 src/device.c:load_gatt_db() Restoring EB:52:CE:B5:A3:52 gatt
+>> database from file
+>> 14:22 No cache for EB:52:CE:B5:A3:52
+>>
+>> and on the erratic flow the next six lines:
+>> 15:17 src/adapter.c:device_found_callback() hci0 addr
+>> EB:52:CE:B5:A3:52, rssi -48 flags 0x0000 eir_len 21
+>> 15:17 src/device.c:device_set_legacy() legacy 0
+>> 15:17 src/device.c:device_set_rssi_with_delta() rssi -48 delta 16
+>> 15:17 src/device.c:att_connect_cb() connect error: Function not implemented (38)
+>> 15:17 src/device.c:btd_device_set_temporary() temporary 1
+>> 15:17 src/adapter.c:dev_disconnected() Device EB:52:CE:B5:A3:52
+>> disconnected, reason 0
+>>
+>> cheers
+>>
+>> Hakki
+>>
+>>
+>>
+>> On Sat, May 7, 2016 at 12:54 AM, Vinicius Costa Gomes
+>> <vinicius.gomes@intel.com> wrote:
+>>> Hi hakkig,
+>>>
+>>> Hakkı Göçeoğlu <hakki@bir618.com> writes:
+>>>
+>>>> Hi All,
+>>>>
+>>>> raspberry pi 3
+>>>> bluez v5.39
+>>>> testing platform client/bluetoothctl
+>>>
+>>> Which kernel version are you running?
+>>>
+>>>>
+>>>> I have a ble peripheral device advertising a custom uuid.
+>>>> Within bluetoothctl when I try to connect to it after a filter is set,
+>>>> one third of the time I get an error.
+>>>> There is no problem if no filter is set, turning scanning off before
+>>>> the connect command does not help.
+>>>>
+>>>> Here is an example flow within bluetoothctl
+>>>>
+>>>> [bluetooth]# set-scan-filter-uuids f655b638-fead-4268-b07c-e5d79d09b22b
+>>>> SetDiscoveryFilter success
+>>>> [bluetooth]# scan on
+>>>> Discovery started
+>>>> [CHG] Controller B8:27:EB:37:3F:CD Discovering: yes
+>>>> [NEW] Device CF:05:30:F2:6F:5E CF-05-30-F2-6F-5E
+>>>> [bluetooth]# connect CF:05:30:F2:6F:5E
+>>>> Attempting to connect to CF:05:30:F2:6F:5E
+>>>> [CHG] Device CF:05:30:F2:6F:5E Connected: yes
+>>>> Failed to connect: org.bluez.Error.Failed
+>>>> [CHG] Device CF:05:30:F2:6F:5E Connected: no
+>>>
+>>> I couldn't reproduce this, can you provide the btmon output when this
+>>> happens?
+>>>
+>>>>
+>>>>
+>>>> Any ideas? Thanks in advance, cheers
+>>>>
+>>>> hakkig
+>>>> --
+>>>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>>>> the body of a message to majordomo@vger.kernel.org
+>>>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>>>
+>>>
+>>> Cheers,
+>>> --
+>>> Vinicius
+
+
+Cheers,
+--
+Vinicius
