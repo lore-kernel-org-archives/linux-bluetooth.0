@@ -1,139 +1,36 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Vinicius Costa Gomes <vinicius.gomes@intel.com>
-To: =?utf-8?B?SGFra8SxIEfDtsOnZW/En2x1?= <hakki@bir618.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: bluez dbus ble connection problem when a filter is set
-In-Reply-To: <CADrC6GwZPBJzq_zy2mZesihuYGDc47iJTsHPwkNj-6NXd3cMqg@mail.gmail.com>
-References: <CADrC6Gxef2A=EsVLxG-izD4xBKvrBW85wOzybuZCrr-OL52VSw@mail.gmail.com> <8737pug8ea.fsf@intel.com> <CADrC6Gzz2fVg5poDov4j4REh6C=2sLEKcUBBfA3M+td9vu7J2w@mail.gmail.com> <CADrC6GwZPBJzq_zy2mZesihuYGDc47iJTsHPwkNj-6NXd3cMqg@mail.gmail.com>
-Date: Tue, 17 May 2016 15:59:00 -0300
-Message-ID: <87eg90ecjv.fsf@intel.com>
-MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
+Subject: Re: Request for BLE server applications and documents - BLUEZ
+From: Travis Griggs <travisgriggs@gmail.com>
+In-Reply-To: <CABBYNZJK20KwkcxFzhds8c+E1YsDFcOFhn3veTWzvumhbJLQyQ@mail.gmail.com>
+Date: Tue, 17 May 2016 10:33:43 -0700
+Message-Id: <DB8A8A19-2F0C-474D-8E60-67AFE937D31A@gmail.com>
+References: <57397128.8080208@redpinesignals.com> <CABBYNZLb99QkEggXOiOye+VPp+UXK8i9bSZ0m=Vv2Mc_davLCw@mail.gmail.com> <573ACC64.60502@redpinesignals.com> <CABBYNZJK20KwkcxFzhds8c+E1YsDFcOFhn3veTWzvumhbJLQyQ@mail.gmail.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Hakkı,
 
-Hakkı Göçeoğlu <hakki@bir618.com> writes:
+> On May 17, 2016, at 1:14 AM, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
+> 
+<snip>
+> Regarding the actual problem it is probably because experimental
+> interfaces are not enabled by default, you can do enable that by
+> passing -E to bluetoothd.
 
-> Hi Vinicius,
->
-> I have tested the same problem with the newer kernel
-> (Linux raspberrypi 4.4.9-v7+ #884 SMP Fri May 6 17:28:59 BST 2016
-> armv7l GNU/Linux)
-> the outcome is still the same, is there anything I can do, further
-> testing etc. ?
+If you’re using systemd, the file you’ll want to tweak is 
 
-Just something for futures emails, we are not big fans of top posting
-around here.
+/lib/systemd/system/bluetooth.service
 
-The output of 'btmon' (it shows the HCI and MGMT traffic in the system)
-should prove helpful.
+Modify your ExecStart line to include the -E option. Mine currently looks like:
 
-I don't really follow the rpi scene, but I heard somewhere that there was an
-update for the firmware of the Bluetooth controller.
+ExecStart=/usr/lib/bluetooth/bluetoothd -d -E --noplugin=*
 
->
-> Thanks a lot, take care
->
-> Hakki
->
-> On Sat, May 7, 2016 at 8:12 AM, Hakkı Göçeoğlu <hakki@bir618.com> wrote:
->> Hi again, please discard my previous mail I had not seen the second question:
->>
->>> Which kernel version are you running?
->>
->> pi@raspberrypi:~ $ uname -a
->>
->> Linux raspberrypi 4.1.19-v7+ #858 SMP Tue Mar 15 15:56:00 GMT 2016
->> armv7l GNU/Linux
->>
->>> I couldn't reproduce this, can you provide the btmon output when this
->>> happens?
->>
->> I have attached two log outputs, one correct behaviour, and the other
->> erratic, on both the flow is the same until the line:
->>
->> 14:22 src/adapter.c:connected_callback() hci0 device EB:52:CE:B5:A3:52
->> connected eir_len 0
->>
->>  on the correct flow the next four lines:
->> 14:22 attrib/gattrib.c:g_attrib_ref() 0x1b7eb8: g_attrib_ref=1
->> 14:22 src/gatt-client.c:btd_gatt_client_connected() Device connected.
->> 14:22 src/device.c:load_gatt_db() Restoring EB:52:CE:B5:A3:52 gatt
->> database from file
->> 14:22 No cache for EB:52:CE:B5:A3:52
->>
->> and on the erratic flow the next six lines:
->> 15:17 src/adapter.c:device_found_callback() hci0 addr
->> EB:52:CE:B5:A3:52, rssi -48 flags 0x0000 eir_len 21
->> 15:17 src/device.c:device_set_legacy() legacy 0
->> 15:17 src/device.c:device_set_rssi_with_delta() rssi -48 delta 16
->> 15:17 src/device.c:att_connect_cb() connect error: Function not implemented (38)
->> 15:17 src/device.c:btd_device_set_temporary() temporary 1
->> 15:17 src/adapter.c:dev_disconnected() Device EB:52:CE:B5:A3:52
->> disconnected, reason 0
->>
->> cheers
->>
->> Hakki
->>
->>
->>
->> On Sat, May 7, 2016 at 12:54 AM, Vinicius Costa Gomes
->> <vinicius.gomes@intel.com> wrote:
->>> Hi hakkig,
->>>
->>> Hakkı Göçeoğlu <hakki@bir618.com> writes:
->>>
->>>> Hi All,
->>>>
->>>> raspberry pi 3
->>>> bluez v5.39
->>>> testing platform client/bluetoothctl
->>>
->>> Which kernel version are you running?
->>>
->>>>
->>>> I have a ble peripheral device advertising a custom uuid.
->>>> Within bluetoothctl when I try to connect to it after a filter is set,
->>>> one third of the time I get an error.
->>>> There is no problem if no filter is set, turning scanning off before
->>>> the connect command does not help.
->>>>
->>>> Here is an example flow within bluetoothctl
->>>>
->>>> [bluetooth]# set-scan-filter-uuids f655b638-fead-4268-b07c-e5d79d09b22b
->>>> SetDiscoveryFilter success
->>>> [bluetooth]# scan on
->>>> Discovery started
->>>> [CHG] Controller B8:27:EB:37:3F:CD Discovering: yes
->>>> [NEW] Device CF:05:30:F2:6F:5E CF-05-30-F2-6F-5E
->>>> [bluetooth]# connect CF:05:30:F2:6F:5E
->>>> Attempting to connect to CF:05:30:F2:6F:5E
->>>> [CHG] Device CF:05:30:F2:6F:5E Connected: yes
->>>> Failed to connect: org.bluez.Error.Failed
->>>> [CHG] Device CF:05:30:F2:6F:5E Connected: no
->>>
->>> I couldn't reproduce this, can you provide the btmon output when this
->>> happens?
->>>
->>>>
->>>>
->>>> Any ideas? Thanks in advance, cheers
->>>>
->>>> hakkig
->>>> --
->>>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->>>> the body of a message to majordomo@vger.kernel.org
->>>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->>>
->>>
->>> Cheers,
->>> --
->>> Vinicius
+The -d is indispensable and took my a while to stumble upon. Any python error you have that is fired by dbus callbacks will not show up on the stdout/stderr of you program (e.g. an error downstream of a WriteValue() callback). Rather it will show up in the debug output of the bluetooth daemon. So I pretty much always have
 
+journalctl -flu bluetooth
 
-Cheers,
---
-Vinicius
+running when I’m changing things, so I can see those errors reported there.
+
+By default, you get a whole bunch of stuff in your dbus namespace from older stuff. The —noplugin=* flag gets rid of all of those, so you’ll only see your own stuff in the dbus tree. 
