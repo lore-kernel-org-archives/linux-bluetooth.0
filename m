@@ -1,27 +1,37 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
-Subject: Re: [PATCH] tools: add more entities to company ID parser
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1459968044-29298-1-git-send-email-mikeryan@lacklustre.net>
-Date: Tue, 17 May 2016 18:53:17 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <C776DE55-D926-4DAD-A1AA-2C0C06B373D4@holtmann.org>
-References: <1459968044-29298-1-git-send-email-mikeryan@lacklustre.net>
-To: Mike Ryan <mikeryan@lacklustre.net>
+MIME-Version: 1.0
+In-Reply-To: <87k2j2et63.fsf@intel.com>
+References: <1462801883-6361-1-git-send-email-luiz.dentz@gmail.com>
+	<87k2j2et63.fsf@intel.com>
+Date: Tue, 17 May 2016 17:21:40 +0300
+Message-ID: <CABBYNZ+C86mPyq-86s+TX5-kkcnr6zA+nv_Xog48yX4eq0n+MA@mail.gmail.com>
+Subject: Re: [PATCHv2 BlueZ 1/6] doc/gatt-api: Add options dictionary to ReadValue/WriteValue
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mike,
+Hi,
 
-> This patch adds lower and uppercase u with umlaut.
-> ---
-> tools/parse_companies.pl | 2 ++
-> 1 file changed, 2 insertions(+)
+On Tue, May 10, 2016 at 1:57 AM, Vinicius Costa Gomes
+<vinicius.gomes@intel.com> wrote:
+> Hi Luiz,
+>
+> Luiz Augusto von Dentz <luiz.dentz@gmail.com> writes:
+>
+>> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>>
+>> This adds the possibility to pass an offset to these operations, and
+>> also in the server case to give the device object.
+>> ---
+>> v2: Fix Vinicius comments, add necessary changes to other tools affected.
+>>
+>
+> The series is looking good.
 
-patch has been applied.
+If there are no comments to this set I will be pushing by the end of the day.
 
-Regards
-
-Marcel
-
+-- 
+Luiz Augusto von Dentz
