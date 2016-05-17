@@ -1,122 +1,74 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <luiz.dentz@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <CADrC6Gzz2fVg5poDov4j4REh6C=2sLEKcUBBfA3M+td9vu7J2w@mail.gmail.com>
-References: <CADrC6Gxef2A=EsVLxG-izD4xBKvrBW85wOzybuZCrr-OL52VSw@mail.gmail.com>
-	<8737pug8ea.fsf@intel.com>
-	<CADrC6Gzz2fVg5poDov4j4REh6C=2sLEKcUBBfA3M+td9vu7J2w@mail.gmail.com>
-Date: Tue, 17 May 2016 16:57:14 +0300
-Message-ID: <CADrC6GwZPBJzq_zy2mZesihuYGDc47iJTsHPwkNj-6NXd3cMqg@mail.gmail.com>
-Subject: Re: bluez dbus ble connection problem when a filter is set
-From: =?UTF-8?B?SGFra8SxIEfDtsOnZW/En2x1?= <hakki@bir618.com>
-To: Vinicius Costa Gomes <vinicius.gomes@intel.com>
-Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <573ACC64.60502@redpinesignals.com>
+References: <57397128.8080208@redpinesignals.com>
+	<CABBYNZLb99QkEggXOiOye+VPp+UXK8i9bSZ0m=Vv2Mc_davLCw@mail.gmail.com>
+	<573ACC64.60502@redpinesignals.com>
+Date: Tue, 17 May 2016 11:14:28 +0300
+Message-ID: <CABBYNZJK20KwkcxFzhds8c+E1YsDFcOFhn3veTWzvumhbJLQyQ@mail.gmail.com>
+Subject: Re: Request for BLE server applications and documents - BLUEZ
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Mallikarjuna V <mallikarjuna.v@redpinesignals.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Vinicius,
+Hi,
 
-I have tested the same problem with the newer kernel
-(Linux raspberrypi 4.4.9-v7+ #884 SMP Fri May 6 17:28:59 BST 2016
-armv7l GNU/Linux)
-the outcome is still the same, is there anything I can do, further
-testing etc. ?
+On Tue, May 17, 2016 at 10:46 AM, Mallikarjuna V
+<mallikarjuna.v@redpinesignals.com> wrote:
+>
+> Luiz,
+>
+>
+> We tried below python script, we got an error "GattManager1 interface not found"
+>
+> Can you please provide flow of sequence and dependences.
 
-Thanks a lot, take care
+Please don't top post in the list, comment inline:
+http://www.bluez.org/development/lists/. It is also not recommended to
+use html in the emails sent to the list.
 
-Hakki
+Regarding the actual problem it is probably because experimental
+interfaces are not enabled by default, you can do enable that by
+passing -E to bluetoothd.
 
-On Sat, May 7, 2016 at 8:12 AM, Hakkı Göçeoğlu <hakki@bir618.com> wrote:
-> Hi again, please discard my previous mail I had not seen the second question:
+
 >
->> Which kernel version are you running?
+> On 05/16/2016 01:15 PM, Luiz Augusto von Dentz wrote:
 >
-> pi@raspberrypi:~ $ uname -a
+> Hi,
 >
-> Linux raspberrypi 4.1.19-v7+ #858 SMP Tue Mar 15 15:56:00 GMT 2016
-> armv7l GNU/Linux
+> On Mon, May 16, 2016 at 10:05 AM, Mallikarjuna V
+> <mallikarjuna.v@redpinesignals.com> wrote:
 >
->> I couldn't reproduce this, can you provide the btmon output when this
->> happens?
+> Hi Marcel,
 >
-> I have attached two log outputs, one correct behaviour, and the other
-> erratic, on both the flow is the same until the line:
+> I need to develop the BLE based profile on GATT layer by using BULEZ
+> software. I am unable to find the any reference documents to add new BLE
+> services on GATT layer.
 >
-> 14:22 src/adapter.c:connected_callback() hci0 device EB:52:CE:B5:A3:52
-> connected eir_len 0
+> Can you please provide any documents or links to develop the GATT server
+> profiles on BLUEZ stack.
 >
->  on the correct flow the next four lines:
-> 14:22 attrib/gattrib.c:g_attrib_ref() 0x1b7eb8: g_attrib_ref=1
-> 14:22 src/gatt-client.c:btd_gatt_client_connected() Device connected.
-> 14:22 src/device.c:load_gatt_db() Restoring EB:52:CE:B5:A3:52 gatt
-> database from file
-> 14:22 No cache for EB:52:CE:B5:A3:52
+> You can find the GATT related API documentation here:
 >
-> and on the erratic flow the next six lines:
-> 15:17 src/adapter.c:device_found_callback() hci0 addr
-> EB:52:CE:B5:A3:52, rssi -48 flags 0x0000 eir_len 21
-> 15:17 src/device.c:device_set_legacy() legacy 0
-> 15:17 src/device.c:device_set_rssi_with_delta() rssi -48 delta 16
-> 15:17 src/device.c:att_connect_cb() connect error: Function not implemented (38)
-> 15:17 src/device.c:btd_device_set_temporary() temporary 1
-> 15:17 src/adapter.c:dev_disconnected() Device EB:52:CE:B5:A3:52
-> disconnected, reason 0
+> https://git.kernel.org/cgit/bluetooth/bluez.git/tree/doc/gatt-api.txt
 >
-> cheers
+> There is also a python sample available under test/example-gatt-server:
 >
-> Hakki
+> https://git.kernel.org/cgit/bluetooth/bluez.git/tree/test/example-gatt-server
 >
 >
 >
-> On Sat, May 7, 2016 at 12:54 AM, Vinicius Costa Gomes
-> <vinicius.gomes@intel.com> wrote:
->> Hi hakkig,
->>
->> Hakkı Göçeoğlu <hakki@bir618.com> writes:
->>
->>> Hi All,
->>>
->>> raspberry pi 3
->>> bluez v5.39
->>> testing platform client/bluetoothctl
->>
->> Which kernel version are you running?
->>
->>>
->>> I have a ble peripheral device advertising a custom uuid.
->>> Within bluetoothctl when I try to connect to it after a filter is set,
->>> one third of the time I get an error.
->>> There is no problem if no filter is set, turning scanning off before
->>> the connect command does not help.
->>>
->>> Here is an example flow within bluetoothctl
->>>
->>> [bluetooth]# set-scan-filter-uuids f655b638-fead-4268-b07c-e5d79d09b22b
->>> SetDiscoveryFilter success
->>> [bluetooth]# scan on
->>> Discovery started
->>> [CHG] Controller B8:27:EB:37:3F:CD Discovering: yes
->>> [NEW] Device CF:05:30:F2:6F:5E CF-05-30-F2-6F-5E
->>> [bluetooth]# connect CF:05:30:F2:6F:5E
->>> Attempting to connect to CF:05:30:F2:6F:5E
->>> [CHG] Device CF:05:30:F2:6F:5E Connected: yes
->>> Failed to connect: org.bluez.Error.Failed
->>> [CHG] Device CF:05:30:F2:6F:5E Connected: no
->>
->> I couldn't reproduce this, can you provide the btmon output when this
->> happens?
->>
->>>
->>>
->>> Any ideas? Thanks in advance, cheers
->>>
->>> hakkig
->>> --
->>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->>> the body of a message to majordomo@vger.kernel.org
->>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->>
->>
->> Cheers,
->> --
->> Vinicius
+>
+>
+>
+>
+>
+
+
+
+-- 
+Luiz Augusto von Dentz
