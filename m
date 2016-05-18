@@ -1,55 +1,96 @@
-Return-Path: <netdev-owner@vger.kernel.org>
-From: Michael Richardson <mcr@sandelman.ca>
-To: Alexander Aring <aar@pengutronix.de>
-cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCHv2 bluetooth-next 04/10] ndisc: add addr_len parameter to ndisc_opt_addr_space
-In-Reply-To: <cdf01ed0-2cc1-667d-40ef-34dcaddce099@pengutronix.de>
-References: <1461140382-4784-1-git-send-email-aar@pengutronix.de> <1461140382-4784-5-git-send-email-aar@pengutronix.de> <109698cb-18ae-abdb-34a5-1db5a2e8dc6b@stressinduktion.org> <800c5c08-c2c8-3b44-d457-cdcf6374f280@pengutronix.de> <240084aa-2751-6f24-c07b-662b19a74475@stressinduktion.org> <cdf01ed0-2cc1-667d-40ef-34dcaddce099@pengutronix.de>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: "Kasper Markus (ETAS-PSC/ECE1)" <Markus.Kasper@escrypt.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: RE: [PATCHv2 BlueZ 1/6] doc/gatt-api: Add options dictionary to
+ ReadValue/WriteValue
+Date: Wed, 18 May 2016 15:31:04 +0000
+Message-ID: <c7126690df724e2284f5b1c097f26548@FE-MBX1011.de.bosch.com>
+References: <1462801883-6361-1-git-send-email-luiz.dentz@gmail.com>
+	<87k2j2et63.fsf@intel.com>
+	<CABBYNZ+C86mPyq-86s+TX5-kkcnr6zA+nv_Xog48yX4eq0n+MA@mail.gmail.com>
+	<beca2329ea604e6d8de35dca7494099b@FE-MBX1011.de.bosch.com>
+	<CABBYNZKdeiBFP63fiZra0SwxXN_BDtcPHA_Ac-hpvyO+MGht_w@mail.gmail.com>
+ <CABBYNZJ=uFTH=qjYyce1JjcNzge8uMSuoTbHsNhJ48dsQ39FjQ@mail.gmail.com>
+In-Reply-To: <CABBYNZJ=uFTH=qjYyce1JjcNzge8uMSuoTbHsNhJ48dsQ39FjQ@mail.gmail.com>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
-	micalg=pgp-sha1; protocol="application/pgp-signature"
-Date: Wed, 18 May 2016 17:39:39 -0400
-Message-ID: <21520.1463607579@obiwan.sandelman.ca>
-Sender: netdev-owner@vger.kernel.org
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---=-=-=
-Content-Type: text/plain
+Hi Luiz,
 
+> -----Original Message-----
+> From: Luiz Augusto von Dentz [mailto:luiz.dentz@gmail.com]
+> Sent: Wednesday, May 18, 2016 3:56 PM
+> To: Kasper Markus (ETAS-PSC/ECE1) <Markus.Kasper@escrypt.com>
+> Cc: linux-bluetooth@vger.kernel.org
+> Subject: Re: [PATCHv2 BlueZ 1/6] doc/gatt-api: Add options dictionary to
+> ReadValue/WriteValue
+> 
+> Hi,
+> 
+> On Wed, May 18, 2016 at 4:55 PM, Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+> > Hi Markus,
+> >
+> > On Wed, May 18, 2016 at 10:59 AM, Kasper Markus (ETAS-PSC/ECE1)
+> > <Markus.Kasper@escrypt.com> wrote:
+> >> Hi,
+> >>
+> >>> -----Original Message-----
+> >>> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
+> >>> owner@vger.kernel.org] On Behalf Of Luiz Augusto von Dentz
+> >>> Sent: Tuesday, May 17, 2016 4:22 PM
+> >>> Subject: Re: [PATCHv2 BlueZ 1/6] doc/gatt-api: Add options
+> >>> dictionary to ReadValue/WriteValue
+> >>>
+> >>> Hi,
+> >>>
+> >>> On Tue, May 10, 2016 at 1:57 AM, Vinicius Costa Gomes
+> >>> <vinicius.gomes@intel.com> wrote:
+> >>> > Hi Luiz,
+> >>> >
+> >>> > Luiz Augusto von Dentz <luiz.dentz@gmail.com> writes:
+> >>> >
+> >>> >> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> >>> >>
+> >>> >> This adds the possibility to pass an offset to these operations,
+> >>> >> and also in the server case to give the device object.
+> >>> >> ---
+> >>> >> v2: Fix Vinicius comments, add necessary changes to other tools
+> affected.
+> >>> >>
+> >>> >
+> >>> > The series is looking good.
+> >>>
+> >>> If there are no comments to this set I will be pushing by the end of the day.
+> >>
+> >> Currently the write command inherently selects a write method based on the
+> characteristics properties (write-without-response, reliable-write...).
+> >> The option dictionary within the API allows for adding another option to
+> override the default selection of the write method for characteristics supporting
+> multiple write options.
+> >> I thus consider this patch a more generic enabler within the given API to path
+> the way for further improvements.
+> >
+> > Yes, I don't know where using a specific method would actually be
+> > recommended since it the server should be able to indicate the proper
+> > operation to use via properties but in case there is a real case where
+> > the server has the properties somewhat broken then perhaps we can
+> > include such feature.
+> >
+> > --
+> > Luiz Augusto von Dentz
+> 
+> Btw, these patches are now upstream.
+> 
 
-Alexander Aring <aar@pengutronix.de> wrote:
-    > What I did in the patch series to store short address in neighbour
-    > private data, which makes everything 802.15.4 6lowpan specific.
+I'm facing this problem for an iOS peripheral, where the properties of a characteristic are set to "write-without-response" only. The iOS stack adds a "reliable-write" descriptor to these characteristics, although write is not supported. 
+While I'm quite sure the Apple stack does not behave correctly when advertising the "reliable-write" extended property for a characteristic without "write" property, having control over bluez's writes would be the easiest way to handle this. 
+My current fix is a patched bluez: I modified the condition for a reliable write to check for both flags: "write" & "reliable-write" before using the reliable-write code.
 
-FYI: there are a whole family of network types which have multiple
-addresses (long/short).  This includes:
-1) BTLE - RFC 7668 IPv6 over BLUETOOTH(R) Low Energy
-2) G.9959 - RFC 7428 Transmission of IPv6 Packets over ITU-T G.9959 Networks
-3) BACnet and DECT will be defined.  Some of these have 1 byte short
-addresses...
-4) the various LPWAN people might be able to do IPv6... we'll see.
+Markus
 
-I think that we the 802.15.4 specific stuff is fine for now, and we can
-figure out it might need generalization later on.
-
---
-]               Never tell me the odds!                 | ipv6 mesh networks [
-]   Michael Richardson, Sandelman Software Works        | network architect  [
-]     mcr@sandelman.ca  http://www.sandelman.ca/        |   ruby on rails    [
-
-
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
-
-iQEVAwUBVzzhGICLcPvd0N1lAQKWWgf/TXlS2bKvbLSi/OxhvcC6m4CgMMe0cOpV
-zE0eh+9LwWu3oOVExakbg2BXuwgUkofz2G+uJtSozzpz4oPTV82Yr31o/CAxGxgB
-NR8zTtfKpbDPY3712MlnPm8Y9Te86DHDM0asDArzxrjtS7CCqfP7p51H6aahytZk
-/kIcR0C2/2E1SOJuej+mC5E1rCKvzCaMBRvom82oeyR2I34tXGcRdVxYGd8HOvTL
-855eKKSBaNCmpo0pRCY8bAfllfmkiJ8QgSTCWwZbHi4hJBo4dPiJFFcTTMLe/w0M
-KbiHGoVM3WNQtw8zOgFRMAlYW9QcxaD5IJyVHWlgtU1PCcTpa2BKAg==
-=gmgA
------END PGP SIGNATURE-----
---=-=-=--
+> --
+> Luiz Augusto von Dentz
