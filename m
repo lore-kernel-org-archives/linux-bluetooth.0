@@ -1,41 +1,154 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: "Kasper Markus (ETAS-PSC/ECE1)" <Markus.Kasper@escrypt.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: [PATCHv2 BlueZ 1/6] doc/gatt-api: Add options dictionary to
- ReadValue/WriteValue
-Date: Wed, 18 May 2016 07:59:37 +0000
-Message-ID: <beca2329ea604e6d8de35dca7494099b@FE-MBX1011.de.bosch.com>
-References: <1462801883-6361-1-git-send-email-luiz.dentz@gmail.com>
-	<87k2j2et63.fsf@intel.com>
- <CABBYNZ+C86mPyq-86s+TX5-kkcnr6zA+nv_Xog48yX4eq0n+MA@mail.gmail.com>
-In-Reply-To: <CABBYNZ+C86mPyq-86s+TX5-kkcnr6zA+nv_Xog48yX4eq0n+MA@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
+In-Reply-To: <87eg90ecjv.fsf@intel.com>
+References: <CADrC6Gxef2A=EsVLxG-izD4xBKvrBW85wOzybuZCrr-OL52VSw@mail.gmail.com>
+	<8737pug8ea.fsf@intel.com>
+	<CADrC6Gzz2fVg5poDov4j4REh6C=2sLEKcUBBfA3M+td9vu7J2w@mail.gmail.com>
+	<CADrC6GwZPBJzq_zy2mZesihuYGDc47iJTsHPwkNj-6NXd3cMqg@mail.gmail.com>
+	<87eg90ecjv.fsf@intel.com>
+Date: Wed, 18 May 2016 08:51:18 +0300
+Message-ID: <CADrC6GzPTO43wqR1BX-=Nmwekwsqt14hatfVnMDeFaC8ARVp=w@mail.gmail.com>
+Subject: Re: bluez dbus ble connection problem when a filter is set
+From: =?UTF-8?B?SGFra8SxIEfDtsOnZW/En2x1?= <hakki@bir618.com>
+To: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGksIA0KDQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IGxpbnV4LWJsdWV0
-b290aC1vd25lckB2Z2VyLmtlcm5lbC5vcmcgW21haWx0bzpsaW51eC1ibHVldG9vdGgtDQo+IG93
-bmVyQHZnZXIua2VybmVsLm9yZ10gT24gQmVoYWxmIE9mIEx1aXogQXVndXN0byB2b24gRGVudHoN
-Cj4gU2VudDogVHVlc2RheSwgTWF5IDE3LCAyMDE2IDQ6MjIgUE0NCj4gU3ViamVjdDogUmU6IFtQ
-QVRDSHYyIEJsdWVaIDEvNl0gZG9jL2dhdHQtYXBpOiBBZGQgb3B0aW9ucyBkaWN0aW9uYXJ5IHRv
-DQo+IFJlYWRWYWx1ZS9Xcml0ZVZhbHVlDQo+IA0KPiBIaSwNCj4gDQo+IE9uIFR1ZSwgTWF5IDEw
-LCAyMDE2IGF0IDE6NTcgQU0sIFZpbmljaXVzIENvc3RhIEdvbWVzDQo+IDx2aW5pY2l1cy5nb21l
-c0BpbnRlbC5jb20+IHdyb3RlOg0KPiA+IEhpIEx1aXosDQo+ID4NCj4gPiBMdWl6IEF1Z3VzdG8g
-dm9uIERlbnR6IDxsdWl6LmRlbnR6QGdtYWlsLmNvbT4gd3JpdGVzOg0KPiA+DQo+ID4+IEZyb206
-IEx1aXogQXVndXN0byB2b24gRGVudHogPGx1aXoudm9uLmRlbnR6QGludGVsLmNvbT4NCj4gPj4N
-Cj4gPj4gVGhpcyBhZGRzIHRoZSBwb3NzaWJpbGl0eSB0byBwYXNzIGFuIG9mZnNldCB0byB0aGVz
-ZSBvcGVyYXRpb25zLCBhbmQNCj4gPj4gYWxzbyBpbiB0aGUgc2VydmVyIGNhc2UgdG8gZ2l2ZSB0
-aGUgZGV2aWNlIG9iamVjdC4NCj4gPj4gLS0tDQo+ID4+IHYyOiBGaXggVmluaWNpdXMgY29tbWVu
-dHMsIGFkZCBuZWNlc3NhcnkgY2hhbmdlcyB0byBvdGhlciB0b29scyBhZmZlY3RlZC4NCj4gPj4N
-Cj4gPg0KPiA+IFRoZSBzZXJpZXMgaXMgbG9va2luZyBnb29kLg0KPiANCj4gSWYgdGhlcmUgYXJl
-IG5vIGNvbW1lbnRzIHRvIHRoaXMgc2V0IEkgd2lsbCBiZSBwdXNoaW5nIGJ5IHRoZSBlbmQgb2Yg
-dGhlIGRheS4NCg0KQ3VycmVudGx5IHRoZSB3cml0ZSBjb21tYW5kIGluaGVyZW50bHkgc2VsZWN0
-cyBhIHdyaXRlIG1ldGhvZCBiYXNlZCBvbiB0aGUgY2hhcmFjdGVyaXN0aWNzIHByb3BlcnRpZXMg
-KHdyaXRlLXdpdGhvdXQtcmVzcG9uc2UsIHJlbGlhYmxlLXdyaXRlLi4uKS4gDQpUaGUgb3B0aW9u
-IGRpY3Rpb25hcnkgd2l0aGluIHRoZSBBUEkgYWxsb3dzIGZvciBhZGRpbmcgYW5vdGhlciBvcHRp
-b24gdG8gb3ZlcnJpZGUgdGhlIGRlZmF1bHQgc2VsZWN0aW9uIG9mIHRoZSB3cml0ZSBtZXRob2Qg
-Zm9yIGNoYXJhY3RlcmlzdGljcyBzdXBwb3J0aW5nIG11bHRpcGxlIHdyaXRlIG9wdGlvbnMuIA0K
-SSB0aHVzIGNvbnNpZGVyIHRoaXMgcGF0Y2ggYSBtb3JlIGdlbmVyaWMgZW5hYmxlciB3aXRoaW4g
-dGhlIGdpdmVuIEFQSSB0byBwYXRoIHRoZSB3YXkgZm9yIGZ1cnRoZXIgaW1wcm92ZW1lbnRzLg0K
-DQpCZXN0IHJlZ2FyZHMsDQpNYXJrdXMNCg0K
+Hi again,
+
+Thanks for the prompt reply, I will further investigate on my own. By
+the way kernel, firmware all up to date.
+
+Cheers
+
+Hakki
+
+On Tue, May 17, 2016 at 9:59 PM, Vinicius Costa Gomes
+<vinicius.gomes@intel.com> wrote:
+> Hi Hakkı,
+>
+> Hakkı Göçeoğlu <hakki@bir618.com> writes:
+>
+>> Hi Vinicius,
+>>
+>> I have tested the same problem with the newer kernel
+>> (Linux raspberrypi 4.4.9-v7+ #884 SMP Fri May 6 17:28:59 BST 2016
+>> armv7l GNU/Linux)
+>> the outcome is still the same, is there anything I can do, further
+>> testing etc. ?
+>
+> Just something for futures emails, we are not big fans of top posting
+> around here.
+>
+> The output of 'btmon' (it shows the HCI and MGMT traffic in the system)
+> should prove helpful.
+>
+> I don't really follow the rpi scene, but I heard somewhere that there was an
+> update for the firmware of the Bluetooth controller.
+>
+>>
+>> Thanks a lot, take care
+>>
+>> Hakki
+>>
+>> On Sat, May 7, 2016 at 8:12 AM, Hakkı Göçeoğlu <hakki@bir618.com> wrote:
+>>> Hi again, please discard my previous mail I had not seen the second question:
+>>>
+>>>> Which kernel version are you running?
+>>>
+>>> pi@raspberrypi:~ $ uname -a
+>>>
+>>> Linux raspberrypi 4.1.19-v7+ #858 SMP Tue Mar 15 15:56:00 GMT 2016
+>>> armv7l GNU/Linux
+>>>
+>>>> I couldn't reproduce this, can you provide the btmon output when this
+>>>> happens?
+>>>
+>>> I have attached two log outputs, one correct behaviour, and the other
+>>> erratic, on both the flow is the same until the line:
+>>>
+>>> 14:22 src/adapter.c:connected_callback() hci0 device EB:52:CE:B5:A3:52
+>>> connected eir_len 0
+>>>
+>>>  on the correct flow the next four lines:
+>>> 14:22 attrib/gattrib.c:g_attrib_ref() 0x1b7eb8: g_attrib_ref=1
+>>> 14:22 src/gatt-client.c:btd_gatt_client_connected() Device connected.
+>>> 14:22 src/device.c:load_gatt_db() Restoring EB:52:CE:B5:A3:52 gatt
+>>> database from file
+>>> 14:22 No cache for EB:52:CE:B5:A3:52
+>>>
+>>> and on the erratic flow the next six lines:
+>>> 15:17 src/adapter.c:device_found_callback() hci0 addr
+>>> EB:52:CE:B5:A3:52, rssi -48 flags 0x0000 eir_len 21
+>>> 15:17 src/device.c:device_set_legacy() legacy 0
+>>> 15:17 src/device.c:device_set_rssi_with_delta() rssi -48 delta 16
+>>> 15:17 src/device.c:att_connect_cb() connect error: Function not implemented (38)
+>>> 15:17 src/device.c:btd_device_set_temporary() temporary 1
+>>> 15:17 src/adapter.c:dev_disconnected() Device EB:52:CE:B5:A3:52
+>>> disconnected, reason 0
+>>>
+>>> cheers
+>>>
+>>> Hakki
+>>>
+>>>
+>>>
+>>> On Sat, May 7, 2016 at 12:54 AM, Vinicius Costa Gomes
+>>> <vinicius.gomes@intel.com> wrote:
+>>>> Hi hakkig,
+>>>>
+>>>> Hakkı Göçeoğlu <hakki@bir618.com> writes:
+>>>>
+>>>>> Hi All,
+>>>>>
+>>>>> raspberry pi 3
+>>>>> bluez v5.39
+>>>>> testing platform client/bluetoothctl
+>>>>
+>>>> Which kernel version are you running?
+>>>>
+>>>>>
+>>>>> I have a ble peripheral device advertising a custom uuid.
+>>>>> Within bluetoothctl when I try to connect to it after a filter is set,
+>>>>> one third of the time I get an error.
+>>>>> There is no problem if no filter is set, turning scanning off before
+>>>>> the connect command does not help.
+>>>>>
+>>>>> Here is an example flow within bluetoothctl
+>>>>>
+>>>>> [bluetooth]# set-scan-filter-uuids f655b638-fead-4268-b07c-e5d79d09b22b
+>>>>> SetDiscoveryFilter success
+>>>>> [bluetooth]# scan on
+>>>>> Discovery started
+>>>>> [CHG] Controller B8:27:EB:37:3F:CD Discovering: yes
+>>>>> [NEW] Device CF:05:30:F2:6F:5E CF-05-30-F2-6F-5E
+>>>>> [bluetooth]# connect CF:05:30:F2:6F:5E
+>>>>> Attempting to connect to CF:05:30:F2:6F:5E
+>>>>> [CHG] Device CF:05:30:F2:6F:5E Connected: yes
+>>>>> Failed to connect: org.bluez.Error.Failed
+>>>>> [CHG] Device CF:05:30:F2:6F:5E Connected: no
+>>>>
+>>>> I couldn't reproduce this, can you provide the btmon output when this
+>>>> happens?
+>>>>
+>>>>>
+>>>>>
+>>>>> Any ideas? Thanks in advance, cheers
+>>>>>
+>>>>> hakkig
+>>>>> --
+>>>>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>>>>> the body of a message to majordomo@vger.kernel.org
+>>>>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>>>>
+>>>>
+>>>> Cheers,
+>>>> --
+>>>> Vinicius
+>
+>
+> Cheers,
+> --
+> Vinicius
