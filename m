@@ -1,154 +1,102 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <87eg90ecjv.fsf@intel.com>
-References: <CADrC6Gxef2A=EsVLxG-izD4xBKvrBW85wOzybuZCrr-OL52VSw@mail.gmail.com>
-	<8737pug8ea.fsf@intel.com>
-	<CADrC6Gzz2fVg5poDov4j4REh6C=2sLEKcUBBfA3M+td9vu7J2w@mail.gmail.com>
-	<CADrC6GwZPBJzq_zy2mZesihuYGDc47iJTsHPwkNj-6NXd3cMqg@mail.gmail.com>
-	<87eg90ecjv.fsf@intel.com>
-Date: Wed, 18 May 2016 08:51:18 +0300
-Message-ID: <CADrC6GzPTO43wqR1BX-=Nmwekwsqt14hatfVnMDeFaC8ARVp=w@mail.gmail.com>
-Subject: Re: bluez dbus ble connection problem when a filter is set
-From: =?UTF-8?B?SGFra8SxIEfDtsOnZW/En2x1?= <hakki@bir618.com>
-To: Vinicius Costa Gomes <vinicius.gomes@intel.com>
-Cc: linux-bluetooth@vger.kernel.org
+Date: Tue, 17 May 2016 21:58:06 -0400
+Message-ID: <CAO52t7=F9j4M=XdLVpVsbN81QoAUoWgYNDZAr_oLsdZUZXepwg@mail.gmail.com>
+Subject: Unable to use Microsoft Bluetooth Mobile Mouse 3600
+From: Rick Ueno <rick.ueno@gmail.com>
+To: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi again,
+I'm trying to connect a microsoft bluetooth mobile mouse 3600 (the
+bluetooth card is Intel AC 3160
+(http://www.intel.com/content/www/us/en/wireless-products/dual-band-wireless-ac-3160-bluetooth.html).
+Using bluetoothctl, I was able to pair and connect ("Pairing
+successful" and "Connection successful").
 
-Thanks for the prompt reply, I will further investigate on my own. By
-the way kernel, firmware all up to date.
+---
+> bluetoothctl
+[NEW] Controller 34:E6:AD:A1:44:6E ChromeLinux_0EB6 [default]
+[NEW] Device 00:1E:52:CB:01:34 rueno’s mouse
+[NEW] Device 0C:FC:85:00:44:D9 JETech 2155
+[JETech 2155]# agent on
+Agent registered
+[JETech 2155]# default-agent
+Default agent request successful
+[JETech 2155]# scan on
+Discovery started
+[CHG] Controller 34:E6:AD:A1:44:6E Discovering: yes
+[NEW] Device F4:F9:51:D4:8E:77 F4-F9-51-D4-8E-77
+[NEW] Device C2:DD:27:45:BD:4E BluetoothMouse3600
+[JETech 2155]# trust C2:DD:27:45:BD:4E
+[CHG] Device C2:DD:27:45:BD:4E Trusted: yes
+Changing C2:DD:27:45:BD:4E trust succeeded
+[CHG] Device C2:DD:27:45:BD:4E RSSI: -55
+[JETech 2155]# pair C2:DD:27:45:BD:4E
+Attempting to pair with C2:DD:27:45:BD:4E
+[CHG] Device C2:DD:27:45:BD:4E Connected: yes
+[CHG] Device C2:DD:27:45:BD:4E UUIDs: 00001800-0000-1000-8000-00805f9b34fb
+[CHG] Device C2:DD:27:45:BD:4E UUIDs: 00001801-0000-1000-8000-00805f9b34fb
+[CHG] Device C2:DD:27:45:BD:4E UUIDs: 0000180a-0000-1000-8000-00805f9b34fb
+[CHG] Device C2:DD:27:45:BD:4E UUIDs: 0000180f-0000-1000-8000-00805f9b34fb
+[CHG] Device C2:DD:27:45:BD:4E UUIDs: 00001812-0000-1000-8000-00805f9b34fb
+[CHG] Device C2:DD:27:45:BD:4E Paired: yes
+Pairing successful
+[CHG] Device C2:DD:27:45:BD:4E Modalias: usb:v045Ep0916d0100
+[JETech 2155]# connect C2:DD:27:45:BD:4E
+Attempting to connect to C2:DD:27:45:BD:4E
+Connection successful
+[BluetoothMouse3600]# info C2:DD:27:45:BD:4E
+Device C2:DD:27:45:BD:4E
+Name: BluetoothMouse3600
+Alias: BluetoothMouse3600
+Appearance: 0x03c2
+Icon: input-mouse
+Paired: yes
+Trusted: yes
+Blocked: no
+Connected: yes
+LegacyPairing: no
+UUID: Generic Access Profile    (00001800-0000-1000-8000-00805f9b34fb)
+UUID: Generic Attribute Profile (00001801-0000-1000-8000-00805f9b34fb)
+UUID: Device Information        (0000180a-0000-1000-8000-00805f9b34fb)
+UUID: Battery Service           (0000180f-0000-1000-8000-00805f9b34fb)
+UUID: Human Interface Device    (00001812-0000-1000-8000-00805f9b34fb)
+Modalias: usb:v045Ep0916d0100
+RSSI: -55
+---
 
-Cheers
+However, the mouse does not seem to be responsive (Moving the mouse
+doesn't move the cursor, or clicks are not registering). As you can
+see above, I have a BT keyboard (JETech 2155) and another mouse
+(rueno's mouse) that is working perfectly, so I believe the issue is
+with the microsoft mouse.
 
-Hakki
+When I look at the bluetoothd log, I see the following errors:
 
-On Tue, May 17, 2016 at 9:59 PM, Vinicius Costa Gomes
-<vinicius.gomes@intel.com> wrote:
-> Hi Hakkı,
->
-> Hakkı Göçeoğlu <hakki@bir618.com> writes:
->
->> Hi Vinicius,
->>
->> I have tested the same problem with the newer kernel
->> (Linux raspberrypi 4.4.9-v7+ #884 SMP Fri May 6 17:28:59 BST 2016
->> armv7l GNU/Linux)
->> the outcome is still the same, is there anything I can do, further
->> testing etc. ?
->
-> Just something for futures emails, we are not big fans of top posting
-> around here.
->
-> The output of 'btmon' (it shows the HCI and MGMT traffic in the system)
-> should prove helpful.
->
-> I don't really follow the rpi scene, but I heard somewhere that there was an
-> update for the firmware of the Bluetooth controller.
->
->>
->> Thanks a lot, take care
->>
->> Hakki
->>
->> On Sat, May 7, 2016 at 8:12 AM, Hakkı Göçeoğlu <hakki@bir618.com> wrote:
->>> Hi again, please discard my previous mail I had not seen the second question:
->>>
->>>> Which kernel version are you running?
->>>
->>> pi@raspberrypi:~ $ uname -a
->>>
->>> Linux raspberrypi 4.1.19-v7+ #858 SMP Tue Mar 15 15:56:00 GMT 2016
->>> armv7l GNU/Linux
->>>
->>>> I couldn't reproduce this, can you provide the btmon output when this
->>>> happens?
->>>
->>> I have attached two log outputs, one correct behaviour, and the other
->>> erratic, on both the flow is the same until the line:
->>>
->>> 14:22 src/adapter.c:connected_callback() hci0 device EB:52:CE:B5:A3:52
->>> connected eir_len 0
->>>
->>>  on the correct flow the next four lines:
->>> 14:22 attrib/gattrib.c:g_attrib_ref() 0x1b7eb8: g_attrib_ref=1
->>> 14:22 src/gatt-client.c:btd_gatt_client_connected() Device connected.
->>> 14:22 src/device.c:load_gatt_db() Restoring EB:52:CE:B5:A3:52 gatt
->>> database from file
->>> 14:22 No cache for EB:52:CE:B5:A3:52
->>>
->>> and on the erratic flow the next six lines:
->>> 15:17 src/adapter.c:device_found_callback() hci0 addr
->>> EB:52:CE:B5:A3:52, rssi -48 flags 0x0000 eir_len 21
->>> 15:17 src/device.c:device_set_legacy() legacy 0
->>> 15:17 src/device.c:device_set_rssi_with_delta() rssi -48 delta 16
->>> 15:17 src/device.c:att_connect_cb() connect error: Function not implemented (38)
->>> 15:17 src/device.c:btd_device_set_temporary() temporary 1
->>> 15:17 src/adapter.c:dev_disconnected() Device EB:52:CE:B5:A3:52
->>> disconnected, reason 0
->>>
->>> cheers
->>>
->>> Hakki
->>>
->>>
->>>
->>> On Sat, May 7, 2016 at 12:54 AM, Vinicius Costa Gomes
->>> <vinicius.gomes@intel.com> wrote:
->>>> Hi hakkig,
->>>>
->>>> Hakkı Göçeoğlu <hakki@bir618.com> writes:
->>>>
->>>>> Hi All,
->>>>>
->>>>> raspberry pi 3
->>>>> bluez v5.39
->>>>> testing platform client/bluetoothctl
->>>>
->>>> Which kernel version are you running?
->>>>
->>>>>
->>>>> I have a ble peripheral device advertising a custom uuid.
->>>>> Within bluetoothctl when I try to connect to it after a filter is set,
->>>>> one third of the time I get an error.
->>>>> There is no problem if no filter is set, turning scanning off before
->>>>> the connect command does not help.
->>>>>
->>>>> Here is an example flow within bluetoothctl
->>>>>
->>>>> [bluetooth]# set-scan-filter-uuids f655b638-fead-4268-b07c-e5d79d09b22b
->>>>> SetDiscoveryFilter success
->>>>> [bluetooth]# scan on
->>>>> Discovery started
->>>>> [CHG] Controller B8:27:EB:37:3F:CD Discovering: yes
->>>>> [NEW] Device CF:05:30:F2:6F:5E CF-05-30-F2-6F-5E
->>>>> [bluetooth]# connect CF:05:30:F2:6F:5E
->>>>> Attempting to connect to CF:05:30:F2:6F:5E
->>>>> [CHG] Device CF:05:30:F2:6F:5E Connected: yes
->>>>> Failed to connect: org.bluez.Error.Failed
->>>>> [CHG] Device CF:05:30:F2:6F:5E Connected: no
->>>>
->>>> I couldn't reproduce this, can you provide the btmon output when this
->>>> happens?
->>>>
->>>>>
->>>>>
->>>>> Any ideas? Thanks in advance, cheers
->>>>>
->>>>> hakkig
->>>>> --
->>>>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->>>>> the body of a message to majordomo@vger.kernel.org
->>>>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->>>>
->>>>
->>>> Cheers,
->>>> --
->>>> Vinicius
->
->
-> Cheers,
-> --
-> Vinicius
+---
+May 17 14:47:49 valkyrie bluetoothd[279]: Bluetooth daemon 5.39
+May 17 14:47:49 valkyrie systemd[1]: Started Bluetooth service.
+May 17 14:47:49 valkyrie bluetoothd[279]: Starting SDP server
+May 17 14:47:49 valkyrie bluetoothd[279]: Bluetooth management
+interface 1.10 initialized
+May 17 14:47:49 valkyrie bluetoothd[279]: Failed to obtain handles for
+"Service Changed" characteristic
+May 17 14:47:49 valkyrie bluetoothd[279]: Sap driver initialization failed.
+May 17 14:47:49 valkyrie bluetoothd[279]: sap-server: Operation not
+permitted (1)
+May 17 21:35:49 valkyrie bluetoothd[279]: No cache for C2:DD:27:45:BD:4E
+May 17 21:35:53 valkyrie bluetoothd[279]: input-hog profile probe
+failed for C2:DD:27:45:BD:4E
+May 17 21:35:53 valkyrie bluetoothd[279]: GATT service objects disabled
+---
+
+>From what I understand, the error about sap-server can be ignored, but
+I'm worried about the input-hog profile error (The device ID is of the
+mouse in question). Am I missing a step somewhere?
+
+I am wondering if the mouse is not yet supported by the kernel? If it
+is not, is there a plan to add support for this mouse?
+
+Thank you,
