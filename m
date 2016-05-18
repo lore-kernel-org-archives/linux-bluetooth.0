@@ -1,76 +1,55 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <netdev-owner@vger.kernel.org>
+From: Michael Richardson <mcr@sandelman.ca>
+To: Alexander Aring <aar@pengutronix.de>
+cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCHv2 bluetooth-next 04/10] ndisc: add addr_len parameter to ndisc_opt_addr_space
+In-Reply-To: <cdf01ed0-2cc1-667d-40ef-34dcaddce099@pengutronix.de>
+References: <1461140382-4784-1-git-send-email-aar@pengutronix.de> <1461140382-4784-5-git-send-email-aar@pengutronix.de> <109698cb-18ae-abdb-34a5-1db5a2e8dc6b@stressinduktion.org> <800c5c08-c2c8-3b44-d457-cdcf6374f280@pengutronix.de> <240084aa-2751-6f24-c07b-662b19a74475@stressinduktion.org> <cdf01ed0-2cc1-667d-40ef-34dcaddce099@pengutronix.de>
 MIME-Version: 1.0
-Date: Wed, 18 May 2016 15:55:33 -0700
-Message-ID: <CADEbe8No6u7Bw3scdyZqApxx9JUNxYrEOGxGJ_2gnFGNpvJ4Xg@mail.gmail.com>
-Subject: Create Connection Cancel after 2 seconds
-From: Aaron Okano <aaron@thetileapp.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: multipart/signed; boundary="=-=-=";
+	micalg=pgp-sha1; protocol="application/pgp-signature"
+Date: Wed, 18 May 2016 17:39:39 -0400
+Message-ID: <21520.1463607579@obiwan.sandelman.ca>
+Sender: netdev-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello all!
-
-I am using a Raspberry Pi 3 to scan for and connect to BLE devices
-using the BlueZ DBus API. However, I frequently receive the error:
-
-    GDBus.Error:org.bluez.Error.Failed: Software caused connection abort
-
-This appears to be because the connection request is cancelled after 2
-seconds. Below is the relevant btmon dump:
-
-< HCI Command: LE Create Connection (0x08|0x000d) plen 25      [hci0] 58.198376
-        Scan interval: 60.000 msec (0x0060)
-        Scan window: 60.000 msec (0x0060)
-        Filter policy: White list is not used (0x00)
-        Peer address type: Random (0x01)
-        Peer address: E3:2E:9A:D6:29:93 (Static)
-        Own address type: Public (0x00)
-        Min connection interval: 50.00 msec (0x0028)
-        Max connection interval: 70.00 msec (0x0038)
-        Connection latency: 0x0000
-        Supervision timeout: 420 msec (0x002a)
-        Min connection length: 0.000 msec (0x0000)
-        Max connection length: 0.000 msec (0x0000)
-> HCI Event: Command Status (0x0f) plen 4                      [hci0] 58.199341
-      LE Create Connection (0x08|0x000d) ncmd 1
-        Status: Success (0x00)
-< HCI Command: LE Create Connection Ca.. (0x08|0x000e) plen 0  [hci0] 60.198208
-> HCI Event: Command Complete (0x0e) plen 4                    [hci0] 60.239715
-      LE Create Connection Cancel (0x08|0x000e) ncmd 1
-        Status: Success (0x00)
-> HCI Event: LE Meta Event (0x3e) plen 19                      [hci0] 60.239957
-      LE Connection Complete (0x01)
-        Status: Unknown Connection Identifier (0x02)
-        Handle: 64
-        Role: Master (0x00)
-        Peer address type: Random (0x01)
-        Peer address: E3:2E:9A:D6:29:93 (Static)
-        Connection interval: 67.50 msec (0x0036)
-        Connection latency: 0.00 msec (0x0000)
-        Supervision timeout: 420 msec (0x002a)
-        Master clock accuracy: 0x00
-@ Connect Failed: E3:2E:9A:D6:29:93 (2) status 0x02
+--=-=-=
+Content-Type: text/plain
 
 
-It seems that this is expected behavior:
-http://marc.info/?l=linux-bluetooth&m=144830298701744&w=2
+Alexander Aring <aar@pengutronix.de> wrote:
+    > What I did in the patch series to store short address in neighbour
+    > private data, which makes everything 802.15.4 6lowpan specific.
 
-It is possible to decrease the probability of the error by making the
-advertising interval of the device smaller, but I would prefer a fix
-that can be implemented on the Raspberry Pi instead. Is it possible to
-adjust the 2 second parameter? If not, are there any workarounds that
-can mitigate the connection delays caused by the error? I am currently
-re-issuing the connection request when I receive the error, but it
-takes much more than 2 seconds for the error to be received, and also
-it often takes several connection attempts before one is successful.
+FYI: there are a whole family of network types which have multiple
+addresses (long/short).  This includes:
+1) BTLE - RFC 7668 IPv6 over BLUETOOTH(R) Low Energy
+2) G.9959 - RFC 7428 Transmission of IPv6 Packets over ITU-T G.9959 Networks
+3) BACnet and DECT will be defined.  Some of these have 1 byte short
+addresses...
+4) the various LPWAN people might be able to do IPv6... we'll see.
 
-Here also is further information about my setup:
-* BlueZ 5.39, with patches for hciattach that are required for the
-Raspberry Pi 3
-* Kernel 4.4.9-v7+
-* Ubuntu 16.04
+I think that we the 802.15.4 specific stuff is fine for now, and we can
+figure out it might need generalization later on.
+
+--
+]               Never tell me the odds!                 | ipv6 mesh networks [
+]   Michael Richardson, Sandelman Software Works        | network architect  [
+]     mcr@sandelman.ca  http://www.sandelman.ca/        |   ruby on rails    [
 
 
-Thanks,
-Aaron Okano
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEVAwUBVzzhGICLcPvd0N1lAQKWWgf/TXlS2bKvbLSi/OxhvcC6m4CgMMe0cOpV
+zE0eh+9LwWu3oOVExakbg2BXuwgUkofz2G+uJtSozzpz4oPTV82Yr31o/CAxGxgB
+NR8zTtfKpbDPY3712MlnPm8Y9Te86DHDM0asDArzxrjtS7CCqfP7p51H6aahytZk
+/kIcR0C2/2E1SOJuej+mC5E1rCKvzCaMBRvom82oeyR2I34tXGcRdVxYGd8HOvTL
+855eKKSBaNCmpo0pRCY8bAfllfmkiJ8QgSTCWwZbHi4hJBo4dPiJFFcTTMLe/w0M
+KbiHGoVM3WNQtw8zOgFRMAlYW9QcxaD5IJyVHWlgtU1PCcTpa2BKAg==
+=gmgA
+-----END PGP SIGNATURE-----
+--=-=-=--
