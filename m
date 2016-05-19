@@ -1,111 +1,137 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZL-+VJ0vkbM42Ea62FjuHATnorN6X15jZ1hOdkVC9zu+A@mail.gmail.com>
-References: <CADEbe8No6u7Bw3scdyZqApxx9JUNxYrEOGxGJ_2gnFGNpvJ4Xg@mail.gmail.com>
-	<CABBYNZL-+VJ0vkbM42Ea62FjuHATnorN6X15jZ1hOdkVC9zu+A@mail.gmail.com>
-Date: Thu, 19 May 2016 09:45:41 -0700
-Message-ID: <CADEbe8ObHyjL0ythdnkRDyYDLAxgZmC3bFSDqVKo_1ywpZ6zJQ@mail.gmail.com>
-Subject: Re: Create Connection Cancel after 2 seconds
-From: Aaron Okano <aaron@thetileapp.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <87bn42drzk.fsf@intel.com>
+References: <CAO52t7=F9j4M=XdLVpVsbN81QoAUoWgYNDZAr_oLsdZUZXepwg@mail.gmail.com>
+	<87bn42drzk.fsf@intel.com>
+Date: Thu, 19 May 2016 11:46:01 -0400
+Message-ID: <CAO52t7k16pgNFPP++iQvHpap_mb2NUyc-Dqzhmsgz63TaOFyuw@mail.gmail.com>
+Subject: Re: Unable to use Microsoft Bluetooth Mobile Mouse 3600
+From: Rick Ueno <rick.ueno@gmail.com>
+To: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Vinicius,
 
-On Thu, May 19, 2016 at 6:40 AM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi Aaron,
+Thanks for the hint. Indeed the uhid was not built into the kernel.
+After recompiling the kernel the mouse works fine.
+
+~Rick
+
+
+On 19 May 2016 at 10:47, Vinicius Costa Gomes <vinicius.gomes@intel.com> wrote:
+> Hi,
 >
-> On Thu, May 19, 2016 at 1:55 AM, Aaron Okano <aaron@thetileapp.com> wrote:
->> Hello all!
->>
->> I am using a Raspberry Pi 3 to scan for and connect to BLE devices
->> using the BlueZ DBus API. However, I frequently receive the error:
->>
->>     GDBus.Error:org.bluez.Error.Failed: Software caused connection abort
->>
->> This appears to be because the connection request is cancelled after 2
->> seconds. Below is the relevant btmon dump:
->>
->> < HCI Command: LE Create Connection (0x08|0x000d) plen 25      [hci0] 58.198376
->>         Scan interval: 60.000 msec (0x0060)
->>         Scan window: 60.000 msec (0x0060)
->>         Filter policy: White list is not used (0x00)
->>         Peer address type: Random (0x01)
->>         Peer address: E3:2E:9A:D6:29:93 (Static)
->>         Own address type: Public (0x00)
->>         Min connection interval: 50.00 msec (0x0028)
->>         Max connection interval: 70.00 msec (0x0038)
->>         Connection latency: 0x0000
->>         Supervision timeout: 420 msec (0x002a)
->>         Min connection length: 0.000 msec (0x0000)
->>         Max connection length: 0.000 msec (0x0000)
->>> HCI Event: Command Status (0x0f) plen 4                      [hci0] 58.199341
->>       LE Create Connection (0x08|0x000d) ncmd 1
->>         Status: Success (0x00)
->> < HCI Command: LE Create Connection Ca.. (0x08|0x000e) plen 0  [hci0] 60.198208
->>> HCI Event: Command Complete (0x0e) plen 4                    [hci0] 60.239715
->>       LE Create Connection Cancel (0x08|0x000e) ncmd 1
->>         Status: Success (0x00)
->>> HCI Event: LE Meta Event (0x3e) plen 19                      [hci0] 60.239957
->>       LE Connection Complete (0x01)
->>         Status: Unknown Connection Identifier (0x02)
->>         Handle: 64
->>         Role: Master (0x00)
->>         Peer address type: Random (0x01)
->>         Peer address: E3:2E:9A:D6:29:93 (Static)
->>         Connection interval: 67.50 msec (0x0036)
->>         Connection latency: 0.00 msec (0x0000)
->>         Supervision timeout: 420 msec (0x002a)
->>         Master clock accuracy: 0x00
->> @ Connect Failed: E3:2E:9A:D6:29:93 (2) status 0x02
->>
->>
->> It seems that this is expected behavior:
->> http://marc.info/?l=linux-bluetooth&m=144830298701744&w=2
->>
->> It is possible to decrease the probability of the error by making the
->> advertising interval of the device smaller, but I would prefer a fix
->> that can be implemented on the Raspberry Pi instead. Is it possible to
->> adjust the 2 second parameter? If not, are there any workarounds that
->> can mitigate the connection delays caused by the error? I am currently
->> re-issuing the connection request when I receive the error, but it
->> takes much more than 2 seconds for the error to be received, and also
->> it often takes several connection attempts before one is successful.
+> Rick Ueno <rick.ueno@gmail.com> writes:
 >
-> 2 seconds is quite a big window to connect and we do that because LE
-> Create Connection blocks the baseband since the controller will
-> probably be scanning in the meantime, but if that is given that much
-> problem we could probably attempt to increase it a little bit, maybe
-> 5-6 seconds like we used to have as page timeout.
-
-6 seconds should be enough for me. However, it seems a bit arbitrary,
-and could still
-be too small for some devices, considering the Bluetooth spec allows advertising
-intervals of up to 10.24 seconds. Is it not possible to have a timeout
-of, say, 60
-seconds? I am not familiar with the internals of the BlueZ stack, so
-if this is not
-possible, then that is fine with me.
-
->> Here also is further information about my setup:
->> * BlueZ 5.39, with patches for hciattach that are required for the
->> Raspberry Pi 3
->> * Kernel 4.4.9-v7+
->> * Ubuntu 16.04
+>> I'm trying to connect a microsoft bluetooth mobile mouse 3600 (the
+>> bluetooth card is Intel AC 3160
+>> (http://www.intel.com/content/www/us/en/wireless-products/dual-band-wireless-ac-3160-bluetooth.html).
+>> Using bluetoothctl, I was able to pair and connect ("Pairing
+>> successful" and "Connection successful").
 >>
+>> ---
+>>> bluetoothctl
+>> [NEW] Controller 34:E6:AD:A1:44:6E ChromeLinux_0EB6 [default]
+>> [NEW] Device 00:1E:52:CB:01:34 rueno’s mouse
+>> [NEW] Device 0C:FC:85:00:44:D9 JETech 2155
+>> [JETech 2155]# agent on
+>> Agent registered
+>> [JETech 2155]# default-agent
+>> Default agent request successful
+>> [JETech 2155]# scan on
+>> Discovery started
+>> [CHG] Controller 34:E6:AD:A1:44:6E Discovering: yes
+>> [NEW] Device F4:F9:51:D4:8E:77 F4-F9-51-D4-8E-77
+>> [NEW] Device C2:DD:27:45:BD:4E BluetoothMouse3600
+>> [JETech 2155]# trust C2:DD:27:45:BD:4E
+>> [CHG] Device C2:DD:27:45:BD:4E Trusted: yes
+>> Changing C2:DD:27:45:BD:4E trust succeeded
+>> [CHG] Device C2:DD:27:45:BD:4E RSSI: -55
+>> [JETech 2155]# pair C2:DD:27:45:BD:4E
+>> Attempting to pair with C2:DD:27:45:BD:4E
+>> [CHG] Device C2:DD:27:45:BD:4E Connected: yes
+>> [CHG] Device C2:DD:27:45:BD:4E UUIDs: 00001800-0000-1000-8000-00805f9b34fb
+>> [CHG] Device C2:DD:27:45:BD:4E UUIDs: 00001801-0000-1000-8000-00805f9b34fb
+>> [CHG] Device C2:DD:27:45:BD:4E UUIDs: 0000180a-0000-1000-8000-00805f9b34fb
+>> [CHG] Device C2:DD:27:45:BD:4E UUIDs: 0000180f-0000-1000-8000-00805f9b34fb
+>> [CHG] Device C2:DD:27:45:BD:4E UUIDs: 00001812-0000-1000-8000-00805f9b34fb
+>> [CHG] Device C2:DD:27:45:BD:4E Paired: yes
+>> Pairing successful
+>> [CHG] Device C2:DD:27:45:BD:4E Modalias: usb:v045Ep0916d0100
+>> [JETech 2155]# connect C2:DD:27:45:BD:4E
+>> Attempting to connect to C2:DD:27:45:BD:4E
+>> Connection successful
+>> [BluetoothMouse3600]# info C2:DD:27:45:BD:4E
+>> Device C2:DD:27:45:BD:4E
+>> Name: BluetoothMouse3600
+>> Alias: BluetoothMouse3600
+>> Appearance: 0x03c2
+>> Icon: input-mouse
+>> Paired: yes
+>> Trusted: yes
+>> Blocked: no
+>> Connected: yes
+>> LegacyPairing: no
+>> UUID: Generic Access Profile    (00001800-0000-1000-8000-00805f9b34fb)
+>> UUID: Generic Attribute Profile (00001801-0000-1000-8000-00805f9b34fb)
+>> UUID: Device Information        (0000180a-0000-1000-8000-00805f9b34fb)
+>> UUID: Battery Service           (0000180f-0000-1000-8000-00805f9b34fb)
+>> UUID: Human Interface Device    (00001812-0000-1000-8000-00805f9b34fb)
+>> Modalias: usb:v045Ep0916d0100
+>> RSSI: -55
+>> ---
 >>
->> Thanks,
->> Aaron Okano
+>> However, the mouse does not seem to be responsive (Moving the mouse
+>> doesn't move the cursor, or clicks are not registering). As you can
+>> see above, I have a BT keyboard (JETech 2155) and another mouse
+>> (rueno's mouse) that is working perfectly, so I believe the issue is
+>> with the microsoft mouse.
+>>
+>> When I look at the bluetoothd log, I see the following errors:
+>>
+>> ---
+>> May 17 14:47:49 valkyrie bluetoothd[279]: Bluetooth daemon 5.39
+>> May 17 14:47:49 valkyrie systemd[1]: Started Bluetooth service.
+>> May 17 14:47:49 valkyrie bluetoothd[279]: Starting SDP server
+>> May 17 14:47:49 valkyrie bluetoothd[279]: Bluetooth management
+>> interface 1.10 initialized
+>> May 17 14:47:49 valkyrie bluetoothd[279]: Failed to obtain handles for
+>> "Service Changed" characteristic
+>> May 17 14:47:49 valkyrie bluetoothd[279]: Sap driver initialization failed.
+>> May 17 14:47:49 valkyrie bluetoothd[279]: sap-server: Operation not
+>> permitted (1)
+>> May 17 21:35:49 valkyrie bluetoothd[279]: No cache for C2:DD:27:45:BD:4E
+>> May 17 21:35:53 valkyrie bluetoothd[279]: input-hog profile probe
+>> failed for C2:DD:27:45:BD:4E
+>> May 17 21:35:53 valkyrie bluetoothd[279]: GATT service objects disabled
+>> ---
+>>
+>> From what I understand, the error about sap-server can be ignored, but
+>> I'm worried about the input-hog profile error (The device ID is of the
+>> mouse in question). Am I missing a step somewhere?
+>>
+>
+> It could be that the 'uhid' kernel module is not loaded? You could try
+> loading it by hand, if after loading the module, it still doesn't work,
+> please provide the output of 'bluetoothd -n -d' (it will include debug
+> information).
+>
+>> I am wondering if the mouse is not yet supported by the kernel? If it
+>> is not, is there a plan to add support for this mouse?
+>
+> It should be working already, if it isn't there's a bug.
+>
+>>
+>> Thank you,
 >> --
 >> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
 >> the body of a message to majordomo@vger.kernel.org
 >> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 >
 >
->
+> Cheers,
 > --
-> Luiz Augusto von Dentz
+> Vinicius
