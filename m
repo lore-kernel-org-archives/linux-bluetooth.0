@@ -1,100 +1,128 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-Date: Fri, 20 May 2016 11:18:12 +1000
-Message-ID: <CAPcThSHowLeD-C=e4z8CJsUC5hHzLyGFaR3QirJNJGK3L+5Fjg@mail.gmail.com>
-Subject: How to setup the voice setting and sco-over-pcm parameters properly
- for bcm4356?
+In-Reply-To: <CAPcThSG+7dEmy=MpJnzYFTb+o__j=mZncjxKyQNqOfPYGdzTTg@mail.gmail.com>
+References: <CAPcThSG+7dEmy=MpJnzYFTb+o__j=mZncjxKyQNqOfPYGdzTTg@mail.gmail.com>
+Date: Fri, 20 May 2016 10:52:55 +1000
+Message-ID: <CAPcThSG5AhO3tczS-D3QBptafg=6dabrkizOx-cT+1S2Cxpv4g@mail.gmail.com>
+Subject: Re: How to enable hci0 for bcm4356 chip on htc m9?
 From: Qingtao Cao <qingtao.cao.au@gmail.com>
-To: linux-bluetooth@vger.kernel.org,
-	Qingtao Cao <qingtao.cao.au@gmail.com>
+To: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello Community,
+Hello,
 
-I had a trouble to set sco-over-pcm properly and couldn't hear sound
-properly through a connect bluetooth headset. With sco-over-hci, I
-could just hear some noise.
+I've figured out how to enable hci0 for bcm4356 chipset on Linux other
+than android. Turns out the bluedroid in CyanogenMod android for htc
+m9 phone no longer uses bluez and its dbus interfaces any longer, no
+wonder there is no hci0 found there.
 
-I've got a htc m9 phone with bcm4356 as wifi/bt/fm chipset. Currently
-I have enabled the hci0 for it with the the help of brcm_patchram_plus
-program which has an "--scopcm" option to setup the hardware pcm
-interface and the pcm frame format with the following sub-parameters:
+Turns out broadcom wifi/bt/fm chipset needs a special program to
+download the required "mini driver" or *.hcd file to it at system
+startup. Previously I tried to extract relevant code from broadcom's
+libbt-vendor.so implementation for bluedroid, it was on the correct
+direction but I hadn't unveiled all needed code. Turns out there is a
+open source program for this purpose already, brcm_patchram_plus,
+which could bring about the hci0 interface by the following command:
 
-#1 sco_routing
-    0 for PCM, 1 for Transport, 2 for Codec and 3 for I2S
+./brcm_patchram_plus -d --patchram
+/system/etc/firmware/BCM4354A2_001.003.015.0064.0175.hcd --no2bytes
+--baudrate 4000000 --use_baudrate_for_download --bd_addr
+90:E7:C4:F3:F7:09 --enable_hci --scopcm=0,4,0,0,0,1,0,3,0,0
+/dev/ttyHS0 &
 
-#2 pcm_interface_rate
-    0 for 128k, 1 for 256k, 2 for 512k, 3 for 1034k, 4 for 2048k
+Please note that bluetooth kernel driver needs to enable HCIUART and
+HCIUART_H4 options to  activate relevant tty driver for the HCI-UART
+interface. Of course, before running the above program, the bluetooth
+hardware functionality should be powered on by "rfkill unblock
+bluetooth" command, or directly writing 1 into relevant
+/sys/class/rfkill/rfkillN/state file.
 
-#3 frame_type
-    0 for short, 1 for long
+Moreover, if the --scopcm option needs to be changed, the process of
+brcm_patchram_plus can be killed and restarted, however, I found that
+I also need to block and then unblock the bluetooth via rfkill command
+otherwise it will fail to download the mini drivers in the hcd file.
 
-#4 sync_mode
-    0 for slave, 1 for master
-
-#5 clock_mode
-    0 for slave and 1 for master
-
-#6 lsb_first
-    0 for false and 1 for true
-
-#7 fill_bits
-    the value in decimal for unused bits
-
-#8 fill_method
-    0 for 0's, 1 for 1's, 2 for signed and 3 for programmable
-
-#9 fill_num
-    the number or bits to be filled
-
-#10 right_justify
-    0 for false and 1 for true
-
-
-Broadcom's libbt-vendor.so implementation for bluedroid set it up as
-"0,4,0,0,0,0,0,3,0,0", since the first sco_routing == 0，the pcm data
-is routed into the pcm interface instead of through HCI-UART
-interface. I have enabled SCORouting = PCM in audio.conf, however, I
-can't hear anything at all through my connected bluetooth headset
-using the HSP/HFP profiles.
-
-However, if I change the sco_routing byte to 1 and SCORouting = HCI,
-that is, to route pcm data from the HCI-UART interface instead of the
-hardware pcm interface, I could hear some noise from my connected
-bluetooth headset. I also tried with different sample rate but failed
-to have them played properly.
-
-BTW, if I use A2DP profile I can play mp3 file well through a bluetooth speaker.
-
-Currently the voice setting for my hci0 is the default value of 0x0060
-
-/ # hciconfig hci0 voice
-hci0:    Type: BR/EDR  Bus: UART
-    BD Address: 90:E7:C4:F3:F7:09  ACL MTU: 1021:8  SCO MTU: 64:1
-    Voice setting: 0x0060 (Default Condition)
-    Input Coding: Linear
-    Input Data Format: 2's complement
-    Input Sample Size: 16 bit
-    # of bits padding at MSB: 0
-    Air Coding Format: CVSD
-
-So how could I set below options:
-#1 above parameters of input coding, input data format, input sample
-size etc, and
-#2 the sample rate and format settings when recording the audio file
-(used by arecord for example), and
-#3 the --scopcm option of the brcm_patchram_plus program
-
-in accordance with each other to make both sco-over-hci and sco-over-pcm work?
-
-Last but not least, suppose the to be played .wav file is of a
-different sample rate or format settings than what has been set
-through the --scopcm option, should the music player or audio server
-convert it to the expected format before writing to sco socket?
-
-Many thanks for any comments or advices!
+Last but not least, please note that the --scopcm option is not
+working for me at the time being. I've already specified SCORouting =
+PCM in audio.conf, but SCO-over-PCM doesn't work for me and I can't
+hear anything from a connected bluetooth headset. Only change the SCO
+routing to HCI (also requires the first byte, sco_routing, in the
+--scopcm option, set to 1) would I hear some sound through the
+headset, however, unfortunately, they are simply noise.
 
 Cheers,
 Harry
+
+On Fri, May 13, 2016 at 2:57 PM, Qingtao Cao <qingtao.cao.au@gmail.com> wrote:
+> Dear community,
+>
+> I am trying to enable hci0 on the htc m9 phone. Of course, the
+> bluetooth functionality on that phone with the original CyanogenMod
+> Android works well. To my surprise, after I mounted a yocto
+> rootfs(with bluez built in), setup needed pseudo filesystems such as
+> proc  and chroot into it, the hciconfig finds no hci0 device at all.
+>
+> So how could I enable the hci0 interface for the bcm4356 chipset? Also
+> doesn't bluedroid manipulate it at all?
+>
+> BTW, the /dev/ttyHS0 is available on CyanogenMod Android, I also found
+> how bluedroid and broadcom's libbt repo (implements the
+> libbt-vendor.so library) setup its baud rate and writes into it the
+> content of a firmware patchfile, so I tried to abstract relevant logic
+> into the attached c file and run it on my own Linux (derived from 3.10
+> mainline kernel) with bluetooth and /dev/ttyHS0 drivers all enabled,
+> however, again, I failed to run hciattach to attach /dev/ttyHS0 to
+> further bring about hci0, despite that this simple c file can achieve
+> similar result.
+>
+> The results of bluetooth related commands on my tailored linux on htc
+> m9 are as followed.
+>
+> Many thanks for any advice or comment!
+>
+> Cheers,
+> Harry
+>
+>
+>
+> / # hciconfig hci0
+> Can't get device info: No such device
+> / #
+>
+> / # ls -l /dev/ttyHS0
+> crw-rw----    1 root     dialout   236,   0 May 13 04:50 /dev/ttyHS0
+> / # grep 236 /proc/devices
+> 236 ttyHS
+> / #
+>
+> / # rfkill list
+> 0: bt_power: bluetooth
+>     Soft blocked: no
+>     Hard blocked: no
+> 1: bcm4356: bluetooth
+>     Soft blocked: no
+>     Hard blocked: no
+> 2: phy0: wlan
+>     Soft blocked: no
+>     Hard blocked: no
+> 3: brcmfmac-wifi: wlan
+>     Soft blocked: no
+>     Hard blocked: no
+> / #
+>
+> / # ./bcm4356_init
+> userial vendor open: opening /dev/ttyHS0
+> device fd = 3 open
+> bt vendor lib: set UART baud 4000000
+> HCI_VSC_LAUNCH_RAM received!
+> bt vendor lib: set UART baud 115200
+> bt vendor lib: set UART baud 4000000
+> Setting local bd addr to 90:E7:C4:F3:F7:09
+> vendor lib fwcfg completed
+> / #
+>
+> / # hciattach -n /dev/ttyHS0 any 4000000 90:E7:C4:F3:F7:09
+> Device setup complete
+> (blocked, pressed ctrl + c to terminate)
