@@ -16,18 +16,18 @@ Cc: kernel@pengutronix.de,
 	James Morris <jmorris@namei.org>,
 	Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
 	Patrick McHardy <kaber@trash.net>
-Subject: [RFC 05/12] ndisc: get rid off dev parameter in ndisc_opt_addr_data
-Date: Mon, 23 May 2016 21:22:01 +0200
-Message-Id: <1464031328-17524-6-git-send-email-aar@pengutronix.de>
+Subject: [RFC 04/12] ndisc: get rid off dev parameter in ndisc_opt_addr_space
+Date: Mon, 23 May 2016 21:22:00 +0200
+Message-Id: <1464031328-17524-5-git-send-email-aar@pengutronix.de>
 In-Reply-To: <1464031328-17524-1-git-send-email-aar@pengutronix.de>
 References: <1464031328-17524-1-git-send-email-aar@pengutronix.de>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch removes the net_device parameter from ndisc_opt_addr_data
+This patch removes the net_device parameter from ndisc_opt_addr_space
 function. This can be useful for calling such functionality which
 doesn't depends on dev parameter. For current existing functionality
-which depends on dev parameter, we introduce ndisc_dev_opt_addr_data to have
-an easy replacement for the ndisc_opt_addr_data function.
+which depends on dev parameter, we introduce ndisc_dev_opt_addr_space to have
+an easy replacement for the ndisc_opt_addr_space function.
 
 Cc: David S. Miller <davem@davemloft.net>
 Cc: Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>
@@ -36,101 +36,93 @@ Cc: Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>
 Cc: Patrick McHardy <kaber@trash.net>
 Signed-off-by: Alexander Aring <aar@pengutronix.de>
 ---
- include/net/ndisc.h | 12 +++++++++---
- net/ipv6/ndisc.c    | 14 ++++++++------
- net/ipv6/route.c    |  4 ++--
- 3 files changed, 19 insertions(+), 11 deletions(-)
+ include/net/ndisc.h | 13 +++++++++----
+ net/ipv6/ndisc.c    | 12 ++++++------
+ 2 files changed, 15 insertions(+), 10 deletions(-)
 
 diff --git a/include/net/ndisc.h b/include/net/ndisc.h
-index dbc8d01..7fa74b0 100644
+index 2d8edaa..dbc8d01 100644
 --- a/include/net/ndisc.h
 +++ b/include/net/ndisc.h
-@@ -139,16 +139,22 @@ static inline int ndisc_dev_opt_addr_space(const struct net_device *dev)
+@@ -127,10 +127,15 @@ static inline int ndisc_addr_option_pad(unsigned short type)
+ 	}
+ }
+ 
+-static inline int ndisc_opt_addr_space(struct net_device *dev)
++static inline int ndisc_opt_addr_space(unsigned char addr_len, int pad)
+ {
+-	return NDISC_OPT_SPACE(dev->addr_len +
+-			       ndisc_addr_option_pad(dev->type));
++	return NDISC_OPT_SPACE(addr_len + pad);
++}
++
++static inline int ndisc_dev_opt_addr_space(const struct net_device *dev)
++{
++	return ndisc_opt_addr_space(dev->addr_len,
++				    ndisc_addr_option_pad(dev->type));
  }
  
  static inline u8 *ndisc_opt_addr_data(struct nd_opt_hdr *p,
--				      struct net_device *dev)
-+				      unsigned char addr_len, int prepad)
- {
+@@ -139,7 +144,7 @@ static inline u8 *ndisc_opt_addr_data(struct nd_opt_hdr *p,
  	u8 *lladdr = (u8 *)(p + 1);
  	int lladdrlen = p->nd_opt_len << 3;
--	int prepad = ndisc_addr_option_pad(dev->type);
--	if (lladdrlen != ndisc_opt_addr_space(dev->addr_len, prepad))
-+	if (lladdrlen != ndisc_opt_addr_space(addr_len, prepad))
+ 	int prepad = ndisc_addr_option_pad(dev->type);
+-	if (lladdrlen != ndisc_opt_addr_space(dev))
++	if (lladdrlen != ndisc_opt_addr_space(dev->addr_len, prepad))
  		return NULL;
  	return lladdr + prepad;
  }
- 
-+static inline u8 *ndisc_dev_opt_addr_data(struct nd_opt_hdr *p,
-+					  const struct net_device *dev)
-+{
-+	return ndisc_opt_addr_data(p, dev->addr_len,
-+				   ndisc_addr_option_pad(dev->type));
-+}
-+
- static inline u32 ndisc_hashfn(const void *pkey, const struct net_device *dev, __u32 *hash_rnd)
- {
- 	const u32 *p32 = pkey;
 diff --git a/net/ipv6/ndisc.c b/net/ipv6/ndisc.c
-index 2241f06..d6f28d5 100644
+index c245895..2241f06 100644
 --- a/net/ipv6/ndisc.c
 +++ b/net/ipv6/ndisc.c
-@@ -744,7 +744,8 @@ static void ndisc_recv_ns(struct sk_buff *skb)
- 	}
+@@ -152,9 +152,9 @@ EXPORT_SYMBOL_GPL(nd_tbl);
  
- 	if (ndopts.nd_opts_src_lladdr) {
--		lladdr = ndisc_opt_addr_data(ndopts.nd_opts_src_lladdr, dev);
-+		lladdr = ndisc_dev_opt_addr_data(ndopts.nd_opts_src_lladdr,
-+						 dev);
- 		if (!lladdr) {
- 			ND_PRINTK(2, warn,
- 				  "NS: invalid link-layer address length\n");
-@@ -916,7 +917,8 @@ static void ndisc_recv_na(struct sk_buff *skb)
- 		return;
- 	}
- 	if (ndopts.nd_opts_tgt_lladdr) {
--		lladdr = ndisc_opt_addr_data(ndopts.nd_opts_tgt_lladdr, dev);
-+		lladdr = ndisc_dev_opt_addr_data(ndopts.nd_opts_tgt_lladdr,
-+						 dev);
- 		if (!lladdr) {
- 			ND_PRINTK(2, warn,
- 				  "NA: invalid link-layer address length\n");
-@@ -1023,8 +1025,8 @@ static void ndisc_recv_rs(struct sk_buff *skb)
- 	}
+ static void ndisc_fill_addr_option(struct sk_buff *skb, int type, void *data)
+ {
+-	int pad   = ndisc_addr_option_pad(skb->dev->type);
++	int pad = ndisc_addr_option_pad(skb->dev->type);
+ 	int data_len = skb->dev->addr_len;
+-	int space = ndisc_opt_addr_space(skb->dev);
++	int space = ndisc_opt_addr_space(data_len, pad);
+ 	u8 *opt = skb_put(skb, space);
  
- 	if (ndopts.nd_opts_src_lladdr) {
--		lladdr = ndisc_opt_addr_data(ndopts.nd_opts_src_lladdr,
--					     skb->dev);
-+		lladdr = ndisc_dev_opt_addr_data(ndopts.nd_opts_src_lladdr,
-+						 skb->dev);
- 		if (!lladdr)
- 			goto out;
- 	}
-@@ -1321,8 +1323,8 @@ skip_linkparms:
- 	if (neigh) {
- 		u8 *lladdr = NULL;
- 		if (ndopts.nd_opts_src_lladdr) {
--			lladdr = ndisc_opt_addr_data(ndopts.nd_opts_src_lladdr,
--						     skb->dev);
-+			lladdr = ndisc_dev_opt_addr_data(ndopts.nd_opts_src_lladdr,
-+							 skb->dev);
- 			if (!lladdr) {
- 				ND_PRINTK(2, warn,
- 					  "RA: invalid link-layer address length\n");
-diff --git a/net/ipv6/route.c b/net/ipv6/route.c
-index 969913d..d662cd8 100644
---- a/net/ipv6/route.c
-+++ b/net/ipv6/route.c
-@@ -2207,8 +2207,8 @@ static void rt6_do_redirect(struct dst_entry *dst, struct sock *sk, struct sk_bu
+ 	opt[0] = type;
+@@ -509,7 +509,7 @@ void ndisc_send_na(struct net_device *dev, const struct in6_addr *daddr,
+ 	if (!dev->addr_len)
+ 		inc_opt = 0;
+ 	if (inc_opt)
+-		optlen += ndisc_opt_addr_space(dev);
++		optlen += ndisc_dev_opt_addr_space(dev);
  
- 	lladdr = NULL;
- 	if (ndopts.nd_opts_tgt_lladdr) {
--		lladdr = ndisc_opt_addr_data(ndopts.nd_opts_tgt_lladdr,
--					     skb->dev);
-+		lladdr = ndisc_dev_opt_addr_data(ndopts.nd_opts_tgt_lladdr,
-+						 skb->dev);
- 		if (!lladdr) {
- 			net_dbg_ratelimited("rt6_redirect: invalid link-layer address length\n");
- 			return;
+ 	skb = ndisc_alloc_skb(dev, sizeof(*msg) + optlen);
+ 	if (!skb)
+@@ -574,7 +574,7 @@ void ndisc_send_ns(struct net_device *dev, const struct in6_addr *solicit,
+ 	if (ipv6_addr_any(saddr))
+ 		inc_opt = false;
+ 	if (inc_opt)
+-		optlen += ndisc_opt_addr_space(dev);
++		optlen += ndisc_dev_opt_addr_space(dev);
+ 
+ 	skb = ndisc_alloc_skb(dev, sizeof(*msg) + optlen);
+ 	if (!skb)
+@@ -626,7 +626,7 @@ void ndisc_send_rs(struct net_device *dev, const struct in6_addr *saddr,
+ 	}
+ #endif
+ 	if (send_sllao)
+-		optlen += ndisc_opt_addr_space(dev);
++		optlen += ndisc_dev_opt_addr_space(dev);
+ 
+ 	skb = ndisc_alloc_skb(dev, sizeof(*msg) + optlen);
+ 	if (!skb)
+@@ -1563,7 +1563,7 @@ void ndisc_send_redirect(struct sk_buff *skb, const struct in6_addr *target)
+ 			memcpy(ha_buf, neigh->ha, dev->addr_len);
+ 			read_unlock_bh(&neigh->lock);
+ 			ha = ha_buf;
+-			optlen += ndisc_opt_addr_space(dev);
++			optlen += ndisc_dev_opt_addr_space(dev);
+ 		} else
+ 			read_unlock_bh(&neigh->lock);
+ 
 -- 
 2.8.2
