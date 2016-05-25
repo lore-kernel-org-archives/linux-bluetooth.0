@@ -1,44 +1,94 @@
-Return-Path: <hideaki.yoshifuji@miraclelinux.com>
-Subject: Re: [RFC 00/12] 6lowpan: introduce 6lowpan-nd
-To: Alexander Aring <aar@pengutronix.de>, linux-wpan@vger.kernel.org
-References: <1464031328-17524-1-git-send-email-aar@pengutronix.de>
-Cc: hideaki.yoshifuji@miraclelinux.com, kernel@pengutronix.de,
- marcel@holtmann.org, jukka.rissanen@linux.intel.com,
- hannes@stressinduktion.org, stefan@osg.samsung.com, mcr@sandelman.ca,
- werner@almesberger.net, linux-bluetooth@vger.kernel.org,
- netdev@vger.kernel.org, "David S . Miller" <davem@davemloft.net>,
- Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>, James Morris <jmorris@namei.org>,
- Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
- Patrick McHardy <kaber@trash.net>
-From: YOSHIFUJI Hideaki <hideaki.yoshifuji@miraclelinux.com>
-Message-ID: <57453479.9080603@miraclelinux.com>
-Date: Wed, 25 May 2016 14:13:29 +0900
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <1464031328-17524-1-git-send-email-aar@pengutronix.de>
-Content-Type: text/plain; charset=iso-2022-jp
+Date: Wed, 25 May 2016 11:13:17 +1000
+Message-ID: <CAPcThSH8ZFNHCfVRWPcJJf=dASSvgBN6ns-tCR3_XX4N88usfw@mail.gmail.com>
+Subject: SelectConfiguration not called by bluez for a bluetooth headset
+From: Qingtao Cao <qingtao.cao.au@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi.
+Hi Community,
 
-Alexander Aring wrote:
-> Hi,
-> 
-> this patch series introduces the ndisc ops callback structure to add different
-> handling for IPv6 neighbour discovery cache functionality. It implements at first
-> the two following use-cases:
-> 
->  - 6CO handling as userspace option (For all 6LoWPAN layers, BTLE/802.15.4) [0]
->  - short address handling for 802.15.4 6LoWPAN only [1]
-> 
-> Since my last patch series, I completely changed the whole ndisc_ops callback
-> structure to not replace the whole ndisc functionality at recv/send level of
-> NS/NA/RS/RA which I send in my previous patch-series "6lowpan: introduce basic
-> 6lowpan-nd". I changed it now to add different handling in a very low-level way
-> of ndisc functionality.
+I have two questions about how bluez would invoke the
+SelectConfiguration provided by the registered media endpoint. I am
+using bluez-4.101.
 
-Thank you for your work!  It looks much better now.
-Some comments will follow.
+1. With a bluetooth speaker that supports A2DP, from logs of my
+program manipulating bluez's dbus API I saw bluez had invoked the
+SelectConfiguration method with parameters describing the capability
+of the bluetooth speaker, so that my program could send back bluez a
+dbus message with my preferred settings, e.g., 48k Hz frequency and
+Mono.
 
--- 
-Hideaki Yoshifuji <hideaki.yoshifuji@miraclelinux.com>
-Technical Division, MIRACLE LINUX CORPORATION
+However, when I tested with a bluetooth headset that only supports
+HFP/HSP, bluez seems not calling SelectConfiguration, but
+SetConfiguration directly. Furthermore, the "Configuration" in the
+parameters of the SetConfiguration is an empty array:
+
+   object path "/org/bluez/3765/hci1/dev_1C_48_F9_AD_19_EE/fd5"
+   array [
+      dict entry(
+         string "Device"
+         variant             object path
+"/org/bluez/3765/hci1/dev_1C_48_F9_AD_19_EE"
+      )
+      dict entry(
+         string "UUID"
+         variant             string "0000111f-0000-1000-8000-00805f9b34fb"
+      )
+      dict entry(
+         string "Codec"
+         variant             byte 0
+      )
+      dict entry(
+         string "Configuration"
+         variant             array [
+            ]
+      )
+      dict entry(
+         string "NREC"
+         variant             boolean true
+      )
+      dict entry(
+         string "InbandRingtone"
+         variant             boolean true
+      )
+      dict entry(
+         string "Routing"
+         variant             string "HCI"
+      )
+   ]
+
+I am wondering if this is the reason that makes bluez not calling
+SelectConfiguration for such bluetooth headsetl in the first place,
+since it is not configurable at all.
+
+Please confirm whether this is how bluez works.
+
+Then how can I further know the frequency and the number of channel
+supported by my bluetooth headset? (from my testing with different wav
+files it seems only plays well format of S16_LE, 8kHz, mono)
+
+
+2. For my bluetooth speaker that is configurable on frequency and the
+number of channel, if I specify a particular configuration, then it
+won't support other wave files with different configurations. For
+example, if I specify the sample rate used by it to be 48k Hz, but I
+play a wav file of 8k Hz instead, then it will be played 6 times
+faster than expected, only a short screaming is heard.
+
+Moreover, during testing I found that if I specify more than one bit
+for frequency or channel_mode for example in the return message of
+SelectConfiguration, the connection will simply fail.
+
+So, does this mean my program, or the audio server, would have to
+convert the format of sound files to the frequency, channel_mode etc
+used by the remote bluetooth configured through SelectConfiguration
+before playing sound files?
+
+Many thanks for any comments!
+
+Cheers,
+Harry
