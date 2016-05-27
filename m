@@ -1,59 +1,106 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [RFC BlueZ] core/device: Make filtered discovery able to detect beacons
-Date: Fri, 27 May 2016 14:18:29 +0300
-Message-Id: <1464347909-19738-1-git-send-email-luiz.dentz@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <netdev-owner@vger.kernel.org>
+Subject: Re: [RFC 11/12] 6lowpan: add support for getting short address
+To: Stefan Schmidt <stefan@osg.samsung.com>, linux-wpan@vger.kernel.org
+References: <1464031328-17524-1-git-send-email-aar@pengutronix.de>
+ <1464031328-17524-12-git-send-email-aar@pengutronix.de>
+ <57481BEB.6050105@osg.samsung.com>
+Cc: kernel@pengutronix.de, marcel@holtmann.org,
+	jukka.rissanen@linux.intel.com, hannes@stressinduktion.org,
+	mcr@sandelman.ca, werner@almesberger.net,
+	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+From: Alexander Aring <aar@pengutronix.de>
+Message-ID: <b25a477f-0bb1-979e-1bfe-a8b35dc0d289@pengutronix.de>
+Date: Fri, 27 May 2016 13:03:59 +0200
+MIME-Version: 1.0
+In-Reply-To: <57481BEB.6050105@osg.samsung.com>
+Content-Type: text/plain; charset=windows-1252
+Sender: netdev-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This makes it possible to use SetDiscoveryFilter to disable checking
-discoverable flags making it possible to see beacons such as the ones
-create by tools/eddystone that doesn't show on regular discovery sessions
-since they are not discoverable/connectable.
----
-This is an alternative to core/device: Fix checking flags for
-non-connectable advertisements as it would not spam the UI trying to
-configure new devices with beacons and improve the filtered discovery
-to be more useful in regard of matching beacons.
+Hi,
 
+On 05/27/2016 12:05 PM, Stefan Schmidt wrote:
+> Hello.
+> 
+> On 23/05/16 21:22, Alexander Aring wrote:
+>> In case of sending RA messages we need some way to get the short address
+>> from an 802.15.4 6LoWPAN interface. This patch will add a temporary
+>> debugfs entry for experimental userspace api.
+>>
+>> Signed-off-by: Alexander Aring<aar@pengutronix.de>
+>> ---
+>>   net/6lowpan/debugfs.c | 35 +++++++++++++++++++++++++++++++++++
+>>   1 file changed, 35 insertions(+)
+>>
+>> diff --git a/net/6lowpan/debugfs.c b/net/6lowpan/debugfs.c
+>> index acbaa3d..638ae59 100644
+>> --- a/net/6lowpan/debugfs.c
+>> +++ b/net/6lowpan/debugfs.c
+>> @@ -245,6 +245,37 @@ static const struct file_operations lowpan_context_fops = {
+>>       .release    = single_release,
+>>   };
+>>   +static int lowpan_short_addr_get(void *data, u64 *val)
+>> +{
+>> +    struct wpan_dev *wdev = data;
+>> +
+>> +    rtnl_lock();
+>> +    *val = le16_to_cpu(wdev->short_addr);
+>> +    rtnl_unlock();
+>> +
+>> +    return 0;
+>> +}
+>> +
+>> +DEFINE_SIMPLE_ATTRIBUTE(lowpan_short_addr_fops, lowpan_short_addr_get,
+>> +            NULL, "0x%04llx\n");
+>> +
+>> +static int lowpan_dev_debugfs_802154_init(const struct net_device *dev,
+>> +                      struct lowpan_dev *ldev)
+>> +{
+>> +    struct dentry *dentry;
+>> +
+>> +    if (!lowpan_is_ll(dev, LOWPAN_LLTYPE_IEEE802154))
+>> +        return 0;
+>> +
+>> +    dentry = debugfs_create_file("short_addr", 0444, ldev->iface_debugfs,
+>> +                     lowpan_802154_dev(dev)->wdev->ieee802154_ptr,
+>> +                     &lowpan_short_addr_fops);
+>> +    if (!dentry)
+>> +        return -EINVAL;
+>> +
+>> +    return 0;
+>> +}
+>> +
+>>   int lowpan_dev_debugfs_init(struct net_device *dev)
+>>   {
+>>       struct lowpan_dev *ldev = lowpan_dev(dev);
+>> @@ -272,6 +303,10 @@ int lowpan_dev_debugfs_init(struct net_device *dev)
+>>               goto remove_root;
+>>       }
+>>   +    ret = lowpan_dev_debugfs_802154_init(dev, ldev);
+>> +    if (ret < 0)
+>> +        goto remove_root;
+>> +
+>>       return 0;
+>>     remove_root:
+> 
+> Reviewed-by: Stefan Schmidt<stefan@osg.samsung.com>
+> 
 
- doc/adapter-api.txt | 6 +++++-
- src/adapter.c       | 2 +-
- 2 files changed, 6 insertions(+), 2 deletions(-)
+grml, I changed this patch now to have an 802154/short_addr directory
+inside the root of 6lowpan debugfs entry.
 
-diff --git a/doc/adapter-api.txt b/doc/adapter-api.txt
-index 4dbf879..97462a3 100644
---- a/doc/adapter-api.txt
-+++ b/doc/adapter-api.txt
-@@ -80,7 +80,11 @@ Methods		void StartDiscovery()
- 
- 			When discovery filter is set, Device objects will be
- 			created as new devices with matching criteria are
--			discovered. PropertiesChanged signals will be emitted
-+			discovered regardless of they are connectable or
-+			discoverable which enables listening to
-+			non-connectable and non-discoverable devices.
-+
-+			PropertiesChanged signals will be emitted
- 			for already existing Device objects, with updated RSSI
- 			value. If one or more discovery filters have been set,
- 			the RSSI delta-threshold, that is imposed by
-diff --git a/src/adapter.c b/src/adapter.c
-index f4fbf82..5499bfc 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -5451,7 +5451,7 @@ static void update_found_devices(struct btd_adapter *adapter,
- 	memset(&eir_data, 0, sizeof(eir_data));
- 	eir_parse(&eir_data, data, data_len);
- 
--	if (bdaddr_type == BDADDR_BREDR)
-+	if (bdaddr_type == BDADDR_BREDR || adapter->filtered_discovery)
- 		discoverable = true;
- 	else
- 		discoverable = eir_data.flags & (EIR_LIM_DISC | EIR_GEN_DISC);
--- 
-2.5.5
+This is because Michael Richardson wrote that other L2 has also
+short_addr (any kind of second L2 address type), see [0].
 
+Each of them has their own "constraints" e.g. 802.15.4 2-byte length, or
+sometimes 1-byte. This constraint depends on L2, so I added 802154
+subdir.
+
+Nevertheless it's debugfs and we can still change it when introduce real
+UAPI, but it will remind me to introduce it as setting which has some
+kind of L2 dependency naming.
+
+- Alex
+
+[0] http://marc.info/?l=linux-netdev&m=146360758922131&w=4
