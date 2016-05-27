@@ -1,21 +1,38 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Date: Sat, 28 May 2016 12:51:12 +0200 (CEST)
-From: denk <denk@post.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <286937503.150813787.1464432672488.JavaMail.zimbra@dkadioglu.de>
-Subject: Name and Class in main.conf ignored
+From: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [RFC BlueZ] core/device: Make filtered discovery able to detect beacons
+In-Reply-To: <1464347909-19738-1-git-send-email-luiz.dentz@gmail.com>
+References: <1464347909-19738-1-git-send-email-luiz.dentz@gmail.com>
+Date: Fri, 27 May 2016 16:47:33 -0300
+Message-ID: <8760tze10q.fsf@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Luiz,
 
-I would like to configure the name and the class using the respective entries in /etc/bluetooth/main.conf. Unfortunately without success. Both values are ignored or overwritten, I don't know.
+Luiz Augusto von Dentz <luiz.dentz@gmail.com> writes:
 
-Any ideas why it doesn't work? Am I doing something wrong? Is there maybe an alternative way to achieve this?
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> This makes it possible to use SetDiscoveryFilter to disable checking
+> discoverable flags making it possible to see beacons such as the ones
+> create by tools/eddystone that doesn't show on regular discovery sessions
+> since they are not discoverable/connectable.
+> ---
+> This is an alternative to core/device: Fix checking flags for
+> non-connectable advertisements as it would not spam the UI trying to
+> configure new devices with beacons and improve the filtered discovery
+> to be more useful in regard of matching beacons.
+>
 
-Thanks in advance.
+I like this alternative better. I, too, dislike the idea of showing
+non-connectable devices by default.
 
-Best
-denk
+
+Cheers,
+--
+Vinicius
