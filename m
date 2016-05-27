@@ -1,260 +1,60 @@
-Return-Path: <stefan@osg.samsung.com>
-From: Stefan Schmidt <stefan@osg.samsung.com>
-Subject: Re: [RFC 07/12] addrconf: put prefix address add in an own function
-To: Alexander Aring <aar@pengutronix.de>, linux-wpan@vger.kernel.org
-References: <1464031328-17524-1-git-send-email-aar@pengutronix.de>
- <1464031328-17524-8-git-send-email-aar@pengutronix.de>
-Cc: kernel@pengutronix.de, marcel@holtmann.org,
- jukka.rissanen@linux.intel.com, hannes@stressinduktion.org,
- mcr@sandelman.ca, werner@almesberger.net, linux-bluetooth@vger.kernel.org,
- netdev@vger.kernel.org, "David S . Miller" <davem@davemloft.net>,
- Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>, James Morris <jmorris@namei.org>,
- Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
- Patrick McHardy <kaber@trash.net>
-Message-ID: <5748174A.4080309@osg.samsung.com>
-Date: Fri, 27 May 2016 11:45:46 +0200
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <1464031328-17524-8-git-send-email-aar@pengutronix.de>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+In-Reply-To: <CAEZxfGOkgYeJ7P03Jd3-VcSOHFdDBPo6k5zcUBBDYr0Z6A55wg@mail.gmail.com>
+References: <CABBYNZ+_bjxAgk6r3xahXjfG4CuUdzipKksX5dwOARBMDZ5ykw@mail.gmail.com>
+ <CAEZxfGOkgYeJ7P03Jd3-VcSOHFdDBPo6k5zcUBBDYr0Z6A55wg@mail.gmail.com>
+From: =?UTF-8?Q?Fran=C3=A7ois_Beaufort?= <beaufort.francois@gmail.com>
+Date: Fri, 27 May 2016 09:06:42 +0200
+Message-ID: <CAEZxfGPnrS=W1+c5LyX8LSpM1erMiq2pCqp-48sqr=-C7+WxgA@mail.gmail.com>
+Subject: Re: GATT service blacklist
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello.
+We now have a new Web Bluetooth sample which shows how to read all GAP
+characteristics from a nearby Bluetooth device.
+https://plus.google.com/+FrancoisBeaufort/posts/7pLosPyHd41
 
-On 23/05/16 21:22, Alexander Aring wrote:
-> This patch moves the functionality to add a RA PIO prefix generated
-> address in an own function. This move prepares to add a hook for
-> adding a second address for a second link-layer address. E.g. short
-> address for 802.15.4 6LoWPAN.
+Hopefully, we'll get BlueZ to work.
+
+On Wed, May 25, 2016 at 2:51 PM, François Beaufort
+<beaufort.francois@gmail.com> wrote:
+> For info, the Web Bluetooth team is tracking this issue at
+> https://bugs.chromium.org/p/chromium/issues/detail?id=611678
 >
-> Cc: David S. Miller<davem@davemloft.net>
-> Cc: Alexey Kuznetsov<kuznet@ms2.inr.ac.ru>
-> Cc: James Morris<jmorris@namei.org>
-> Cc: Hideaki YOSHIFUJI<yoshfuji@linux-ipv6.org>
-> Cc: Patrick McHardy<kaber@trash.net>
-> Signed-off-by: Alexander Aring<aar@pengutronix.de>
-> ---
->   net/ipv6/addrconf.c | 191 ++++++++++++++++++++++++++++------------------------
->   1 file changed, 102 insertions(+), 89 deletions(-)
+> We would really appreciate some consistency between Android, Mac OS
+> and Linux platforms to query GAP service characteristics.
 >
-> diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
-> index beaad49..393cdbf 100644
-> --- a/net/ipv6/addrconf.c
-> +++ b/net/ipv6/addrconf.c
-> @@ -2333,6 +2333,104 @@ static bool is_addr_mode_generate_stable(struct inet6_dev *idev)
->   	       idev->addr_gen_mode == IN6_ADDR_GEN_MODE_RANDOM;
->   }
->   
-> +static void addrconf_prefix_rcv_add_addr(struct net *net,
-> +					 struct net_device *dev,
-> +					 const struct prefix_info *pinfo,
-> +					 struct inet6_dev *in6_dev,
-> +					 const struct in6_addr *addr,
-> +					 int addr_type, u32 addr_flags,
-> +					 bool sllao, bool tokenized,
-> +					 __u32 valid_lft, u32 prefered_lft)
-> +{
-> +	struct inet6_ifaddr *ifp = ipv6_get_ifaddr(net, addr, dev, 1);
-> +	int create = 0, update_lft = 0;
-> +
-> +	if (!ifp && valid_lft) {
-> +		int max_addresses = in6_dev->cnf.max_addresses;
-> +
-> +#ifdef CONFIG_IPV6_OPTIMISTIC_DAD
-> +		if (in6_dev->cnf.optimistic_dad &&
-> +		    !net->ipv6.devconf_all->forwarding && sllao)
-> +			addr_flags |= IFA_F_OPTIMISTIC;
-> +#endif
-> +
-> +		/* Do not allow to create too much of autoconfigured
-> +		 * addresses; this would be too easy way to crash kernel.
-> +		 */
-> +		if (!max_addresses ||
-> +		    ipv6_count_addresses(in6_dev) < max_addresses)
-> +			ifp = ipv6_add_addr(in6_dev, addr, NULL,
-> +					    pinfo->prefix_len,
-> +					    addr_type&IPV6_ADDR_SCOPE_MASK,
-> +					    addr_flags, valid_lft,
-> +					    prefered_lft);
-> +
-> +		if (IS_ERR_OR_NULL(ifp)) {
-> +			in6_dev_put(in6_dev);
-> +			return;
-> +		}
-> +
-> +		update_lft = 0;
-> +		create = 1;
-> +		spin_lock_bh(&ifp->lock);
-> +		ifp->flags |= IFA_F_MANAGETEMPADDR;
-> +		ifp->cstamp = jiffies;
-> +		ifp->tokenized = tokenized;
-> +		spin_unlock_bh(&ifp->lock);
-> +		addrconf_dad_start(ifp);
-> +	}
-> +
-> +	if (ifp) {
-> +		u32 flags;
-> +		unsigned long now;
-> +		u32 stored_lft;
-> +
-> +		/* update lifetime (RFC2462 5.5.3 e) */
-> +		spin_lock_bh(&ifp->lock);
-> +		now = jiffies;
-> +		if (ifp->valid_lft > (now - ifp->tstamp) / HZ)
-> +			stored_lft = ifp->valid_lft - (now - ifp->tstamp) / HZ;
-> +		else
-> +			stored_lft = 0;
-> +		if (!update_lft && !create && stored_lft) {
-> +			const u32 minimum_lft = min_t(u32,
-> +				stored_lft, MIN_VALID_LIFETIME);
-> +			valid_lft = max(valid_lft, minimum_lft);
-> +
-> +			/* RFC4862 Section 5.5.3e:
-> +			 * "Note that the preferred lifetime of the
-> +			 *  corresponding address is always reset to
-> +			 *  the Preferred Lifetime in the received
-> +			 *  Prefix Information option, regardless of
-> +			 *  whether the valid lifetime is also reset or
-> +			 *  ignored."
-> +			 *
-> +			 * So we should always update prefered_lft here.
-> +			 */
-> +			update_lft = 1;
-> +		}
-> +
-> +		if (update_lft) {
-> +			ifp->valid_lft = valid_lft;
-> +			ifp->prefered_lft = prefered_lft;
-> +			ifp->tstamp = now;
-> +			flags = ifp->flags;
-> +			ifp->flags &= ~IFA_F_DEPRECATED;
-> +			spin_unlock_bh(&ifp->lock);
-> +
-> +			if (!(flags&IFA_F_TENTATIVE))
-> +				ipv6_ifa_notify(0, ifp);
-> +		} else
-> +			spin_unlock_bh(&ifp->lock);
-> +
-> +		manage_tempaddrs(in6_dev, ifp, valid_lft, prefered_lft,
-> +				 create, now);
-> +
-> +		in6_ifa_put(ifp);
-> +		addrconf_verify();
-> +	}
-> +}
-> +
->   void addrconf_prefix_rcv(struct net_device *dev, u8 *opt, int len, bool sllao)
->   {
->   	struct prefix_info *pinfo;
-> @@ -2432,9 +2530,7 @@ void addrconf_prefix_rcv(struct net_device *dev, u8 *opt, int len, bool sllao)
->   	/* Try to figure out our local address for this prefix */
->   
->   	if (pinfo->autoconf && in6_dev->cnf.autoconf) {
-> -		struct inet6_ifaddr *ifp;
->   		struct in6_addr addr;
-> -		int create = 0, update_lft = 0;
->   		bool tokenized = false;
->   
->   		if (pinfo->prefix_len == 64) {
-> @@ -2464,93 +2560,10 @@ void addrconf_prefix_rcv(struct net_device *dev, u8 *opt, int len, bool sllao)
->   		return;
->   
->   ok:
-> -
-> -		ifp = ipv6_get_ifaddr(net, &addr, dev, 1);
-> -
-> -		if (!ifp && valid_lft) {
-> -			int max_addresses = in6_dev->cnf.max_addresses;
-> -
-> -#ifdef CONFIG_IPV6_OPTIMISTIC_DAD
-> -			if (in6_dev->cnf.optimistic_dad &&
-> -			    !net->ipv6.devconf_all->forwarding && sllao)
-> -				addr_flags |= IFA_F_OPTIMISTIC;
-> -#endif
-> -
-> -			/* Do not allow to create too much of autoconfigured
-> -			 * addresses; this would be too easy way to crash kernel.
-> -			 */
-> -			if (!max_addresses ||
-> -			    ipv6_count_addresses(in6_dev) < max_addresses)
-> -				ifp = ipv6_add_addr(in6_dev, &addr, NULL,
-> -						    pinfo->prefix_len,
-> -						    addr_type&IPV6_ADDR_SCOPE_MASK,
-> -						    addr_flags, valid_lft,
-> -						    prefered_lft);
-> -
-> -			if (IS_ERR_OR_NULL(ifp)) {
-> -				in6_dev_put(in6_dev);
-> -				return;
-> -			}
-> -
-> -			update_lft = 0;
-> -			create = 1;
-> -			spin_lock_bh(&ifp->lock);
-> -			ifp->flags |= IFA_F_MANAGETEMPADDR;
-> -			ifp->cstamp = jiffies;
-> -			ifp->tokenized = tokenized;
-> -			spin_unlock_bh(&ifp->lock);
-> -			addrconf_dad_start(ifp);
-> -		}
-> -
-> -		if (ifp) {
-> -			u32 flags;
-> -			unsigned long now;
-> -			u32 stored_lft;
-> -
-> -			/* update lifetime (RFC2462 5.5.3 e) */
-> -			spin_lock_bh(&ifp->lock);
-> -			now = jiffies;
-> -			if (ifp->valid_lft > (now - ifp->tstamp) / HZ)
-> -				stored_lft = ifp->valid_lft - (now - ifp->tstamp) / HZ;
-> -			else
-> -				stored_lft = 0;
-> -			if (!update_lft && !create && stored_lft) {
-> -				const u32 minimum_lft = min_t(u32,
-> -					stored_lft, MIN_VALID_LIFETIME);
-> -				valid_lft = max(valid_lft, minimum_lft);
-> -
-> -				/* RFC4862 Section 5.5.3e:
-> -				 * "Note that the preferred lifetime of the
-> -				 *  corresponding address is always reset to
-> -				 *  the Preferred Lifetime in the received
-> -				 *  Prefix Information option, regardless of
-> -				 *  whether the valid lifetime is also reset or
-> -				 *  ignored."
-> -				 *
-> -				 * So we should always update prefered_lft here.
-> -				 */
-> -				update_lft = 1;
-> -			}
-> -
-> -			if (update_lft) {
-> -				ifp->valid_lft = valid_lft;
-> -				ifp->prefered_lft = prefered_lft;
-> -				ifp->tstamp = now;
-> -				flags = ifp->flags;
-> -				ifp->flags &= ~IFA_F_DEPRECATED;
-> -				spin_unlock_bh(&ifp->lock);
-> -
-> -				if (!(flags&IFA_F_TENTATIVE))
-> -					ipv6_ifa_notify(0, ifp);
-> -			} else
-> -				spin_unlock_bh(&ifp->lock);
-> -
-> -			manage_tempaddrs(in6_dev, ifp, valid_lft, prefered_lft,
-> -					 create, now);
-> -
-> -			in6_ifa_put(ifp);
-> -			addrconf_verify();
-> -		}
-> +		addrconf_prefix_rcv_add_addr(net, dev, pinfo, in6_dev, &addr,
-> +					     addr_type, addr_flags, sllao,
-> +					     tokenized, valid_lft,
-> +					     prefered_lft);
->   	}
->   	inet6_prefix_notify(RTM_NEWPREFIX, in6_dev, pinfo);
->   	in6_dev_put(in6_dev);
-
-Reviewed-by: Stefan Schmidt<stefan@osg.samsung.com>
-
-regards
-Stefan Schmidt
+> Thanks in advance for considering this,
+> Francois.
+>
+> On Fri, May 20, 2016 at 4:36 PM, Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+>> Hi,
+>>
+>> In Web Bluetooth there is a list of blacklisted attributes that may
+>> leak some important information:
+>>
+>> https://github.com/WebBluetoothCG/registries/blob/master/gatt_blacklist.txt
+>>
+>> Currently we don't support claiming attribute, which is what in the
+>> end prevent a service to be exposed, so I would like to know the
+>> opinion about having such a feature noting that this may lead to
+>> conflicts such as plugins and application accessing the same
+>> attributes which may or may not interfere.
+>>
+>> One of the service that web guys would like to access is GAP service
+>> which is something BlueZ don't actually let them do since there is a
+>> plugin accessing it, and given its name we can probably except changes
+>> on every new Bluetooth release making me wary about exposing its
+>> attributes over D-Bus.
+>>
+>>
+>> --
+>> Luiz Augusto von Dentz
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
