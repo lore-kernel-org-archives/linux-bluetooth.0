@@ -1,83 +1,107 @@
-Return-Path: <hannes@stressinduktion.org>
-Subject: Re: [RFC 04/12] ndisc: get rid off dev parameter in
- ndisc_opt_addr_space
-To: YOSHIFUJI Hideaki <hideaki.yoshifuji@miraclelinux.com>,
- Alexander Aring <aar@pengutronix.de>, linux-wpan@vger.kernel.org
+Return-Path: <stefan@osg.samsung.com>
+Subject: Re: [RFC 11/12] 6lowpan: add support for getting short address
+To: Alexander Aring <aar@pengutronix.de>, linux-wpan@vger.kernel.org
 References: <1464031328-17524-1-git-send-email-aar@pengutronix.de>
- <1464031328-17524-5-git-send-email-aar@pengutronix.de>
- <574534F8.20308@miraclelinux.com>
+ <1464031328-17524-12-git-send-email-aar@pengutronix.de>
+ <57481BEB.6050105@osg.samsung.com>
+ <b25a477f-0bb1-979e-1bfe-a8b35dc0d289@pengutronix.de>
 Cc: kernel@pengutronix.de, marcel@holtmann.org,
- jukka.rissanen@linux.intel.com, stefan@osg.samsung.com, mcr@sandelman.ca,
- werner@almesberger.net, linux-bluetooth@vger.kernel.org,
- netdev@vger.kernel.org, "David S . Miller" <davem@davemloft.net>,
- Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>, James Morris <jmorris@namei.org>,
- Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
- Patrick McHardy <kaber@trash.net>
-From: Hannes Frederic Sowa <hannes@stressinduktion.org>
-Message-ID: <0f311957-d645-422a-bf58-9aa3412b0bb4@stressinduktion.org>
-Date: Fri, 27 May 2016 18:56:08 +0200
+ jukka.rissanen@linux.intel.com, hannes@stressinduktion.org,
+ mcr@sandelman.ca, werner@almesberger.net, linux-bluetooth@vger.kernel.org,
+ netdev@vger.kernel.org
+From: Stefan Schmidt <stefan@osg.samsung.com>
+Message-ID: <5748498F.8040309@osg.samsung.com>
+Date: Fri, 27 May 2016 15:20:15 +0200
 MIME-Version: 1.0
-In-Reply-To: <574534F8.20308@miraclelinux.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <b25a477f-0bb1-979e-1bfe-a8b35dc0d289@pengutronix.de>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 25.05.2016 07:15, YOSHIFUJI Hideaki wrote:
-> 
-> 
-> Alexander Aring wrote:
->> This patch removes the net_device parameter from ndisc_opt_addr_space
->> function. This can be useful for calling such functionality which
->> doesn't depends on dev parameter. For current existing functionality
->> which depends on dev parameter, we introduce ndisc_dev_opt_addr_space to have
->> an easy replacement for the ndisc_opt_addr_space function.
+Hello.
+
+On 27/05/16 13:03, Alexander Aring wrote:
+> Hi,
+>
+> On 05/27/2016 12:05 PM, Stefan Schmidt wrote:
+>> Hello.
 >>
->> Cc: David S. Miller <davem@davemloft.net>
->> Cc: Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>
->> Cc: James Morris <jmorris@namei.org>
->> Cc: Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>
->> Cc: Patrick McHardy <kaber@trash.net>
->> Signed-off-by: Alexander Aring <aar@pengutronix.de>
->> ---
->>  include/net/ndisc.h | 13 +++++++++----
->>  net/ipv6/ndisc.c    | 12 ++++++------
->>  2 files changed, 15 insertions(+), 10 deletions(-)
+>> On 23/05/16 21:22, Alexander Aring wrote:
+>>> In case of sending RA messages we need some way to get the short address
+>>> from an 802.15.4 6LoWPAN interface. This patch will add a temporary
+>>> debugfs entry for experimental userspace api.
+>>>
+>>> Signed-off-by: Alexander Aring<aar@pengutronix.de>
+>>> ---
+>>>    net/6lowpan/debugfs.c | 35 +++++++++++++++++++++++++++++++++++
+>>>    1 file changed, 35 insertions(+)
+>>>
+>>> diff --git a/net/6lowpan/debugfs.c b/net/6lowpan/debugfs.c
+>>> index acbaa3d..638ae59 100644
+>>> --- a/net/6lowpan/debugfs.c
+>>> +++ b/net/6lowpan/debugfs.c
+>>> @@ -245,6 +245,37 @@ static const struct file_operations lowpan_context_fops = {
+>>>        .release    = single_release,
+>>>    };
+>>>    +static int lowpan_short_addr_get(void *data, u64 *val)
+>>> +{
+>>> +    struct wpan_dev *wdev = data;
+>>> +
+>>> +    rtnl_lock();
+>>> +    *val = le16_to_cpu(wdev->short_addr);
+>>> +    rtnl_unlock();
+>>> +
+>>> +    return 0;
+>>> +}
+>>> +
+>>> +DEFINE_SIMPLE_ATTRIBUTE(lowpan_short_addr_fops, lowpan_short_addr_get,
+>>> +            NULL, "0x%04llx\n");
+>>> +
+>>> +static int lowpan_dev_debugfs_802154_init(const struct net_device *dev,
+>>> +                      struct lowpan_dev *ldev)
+>>> +{
+>>> +    struct dentry *dentry;
+>>> +
+>>> +    if (!lowpan_is_ll(dev, LOWPAN_LLTYPE_IEEE802154))
+>>> +        return 0;
+>>> +
+>>> +    dentry = debugfs_create_file("short_addr", 0444, ldev->iface_debugfs,
+>>> +                     lowpan_802154_dev(dev)->wdev->ieee802154_ptr,
+>>> +                     &lowpan_short_addr_fops);
+>>> +    if (!dentry)
+>>> +        return -EINVAL;
+>>> +
+>>> +    return 0;
+>>> +}
+>>> +
+>>>    int lowpan_dev_debugfs_init(struct net_device *dev)
+>>>    {
+>>>        struct lowpan_dev *ldev = lowpan_dev(dev);
+>>> @@ -272,6 +303,10 @@ int lowpan_dev_debugfs_init(struct net_device *dev)
+>>>                goto remove_root;
+>>>        }
+>>>    +    ret = lowpan_dev_debugfs_802154_init(dev, ldev);
+>>> +    if (ret < 0)
+>>> +        goto remove_root;
+>>> +
+>>>        return 0;
+>>>      remove_root:
+>> Reviewed-by: Stefan Schmidt<stefan@osg.samsung.com>
 >>
->> diff --git a/include/net/ndisc.h b/include/net/ndisc.h
->> index 2d8edaa..dbc8d01 100644
->> --- a/include/net/ndisc.h
->> +++ b/include/net/ndisc.h
->> @@ -127,10 +127,15 @@ static inline int ndisc_addr_option_pad(unsigned short type)
->>  	}
->>  }
->>  
->> -static inline int ndisc_opt_addr_space(struct net_device *dev)
->> +static inline int ndisc_opt_addr_space(unsigned char addr_len, int pad)
->>  {
->> -	return NDISC_OPT_SPACE(dev->addr_len +
->> -			       ndisc_addr_option_pad(dev->type));
->> +	return NDISC_OPT_SPACE(addr_len + pad);
->> +}
->> +
->> +static inline int ndisc_dev_opt_addr_space(const struct net_device *dev)
->> +{
->> +	return ndisc_opt_addr_space(dev->addr_len,
->> +				    ndisc_addr_option_pad(dev->type));
->>  }
->>  
-> 
-> I prefer not to change existing functions such as ndisc_opt_addr_space(),
-> and name new function __ndisc_opt_addr_space() etc.
-> 
-> Plus, my original thought (when I implement these functions) was to
-> have per-net_device ndisc_opt_addr_spece(), ndisc_opt_adr_data() etc.
-> 
-> What do you think of that?
+> grml, I changed this patch now to have an 802154/short_addr directory
+> inside the root of 6lowpan debugfs entry.
+>
+> This is because Michael Richardson wrote that other L2 has also
+> short_addr (any kind of second L2 address type), see [0].
 
-As I understood it 6lowpan devices need to handle both, non-compressed
-and compressed options/addresses. Probably one can make them
-per-interface, but a change to the arguments has still to happen.
+The question is if we ever will have support for them in Linux. But I 
+agree that it might be better to have an architecture that would fit for 
+those cases as well.
 
-Alex?
+> Each of them has their own "constraints" e.g. 802.15.4 2-byte length, or
+> sometimes 1-byte. This constraint depends on L2, so I added 802154
+> subdir.
 
-Thanks,
-Hannes
+OK
+
+regards
+Stefan Schmidt
