@@ -1,47 +1,34 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-From: Marc Anders <andersm223@gmail.com>
-Date: Mon, 30 May 2016 19:42:06 -0500
-Message-ID: <CALmZcgaiS_nTdUtFae3rrB+Z9Lef+1V=GdhFjnC-rtPw=pRGvA@mail.gmail.com>
-Subject: BlueZ port to Android version 4.4.2
+From: Francois Beaufort <beaufort.francois@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Subject: [PATCH BlueZ] Recognize FIDO U2F service characteristics
+Date: Mon, 30 May 2016 17:45:46 +0200
+Message-Id: <1464623146-6127-1-git-send-email-beaufort.francois@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello,
+These FIDO U2F service characteristics are defined at
+https://fidoalliance.org/specs/u2f-specs-1.0-bt-nfc-id-amendment/fido-u2f-bt-protocol.html
 
-I am trying to port BlueZ to an Android 4.4.2 kernel.  I followed the
-instructions I found on the following site:
-https://git.kernel.org/cgit/bluetooth/bluez.git/tree/android/README
+---
+ monitor/uuid.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-I have the project compiling and was able to flash to the board.  When
-the bluetooth system boots up however the Bluez system times out
-during its init with the following error logs:
+diff --git a/monitor/uuid.c b/monitor/uuid.c
+index 1ceaa6f..6008626 100644
+--- a/monitor/uuid.c
++++ b/monitor/uuid.c
+@@ -562,6 +562,10 @@ static const struct {
+ 		"(Advanced) Factory reset"				},
+ 	{ "a3c8750c-8ed3-4bdf-8a39-a01bebede295",
+ 		"(Advanced) Remain Connectable"				},
++	{ "f1d0fff1-deaa-ecee-b42f-c9ba7ed623bb", "U2F Control Point"	},
++	{ "f1d0fff2-deaa-ecee-b42f-c9ba7ed623bb", "U2F Status"		},
++	{ "f1d0fff3-deaa-ecee-b42f-c9ba7ed623bb",
++		"U2F Control Point Length"				},
+ 	{ }
+ };
+ 
+-- 
+2.7.0
 
-05-26 09:05:36.381 D/BlueZ   ( 1828):
-external/bluetooth/bluez/android/hal-bluetooth.c:open_bluetooth()
-05-26 09:05:36.381 D/BlueZ   ( 1828):
-external/bluetooth/bluez/android/hal-bluetooth.c:get_bluetooth_interface()
-05-26 09:05:36.401 D/BlueZ   ( 1828):
-external/bluetooth/bluez/android/hal-bluetooth.c:init()
-05-26 09:05:36.551 I/bluetoothd( 1893): Bluetooth daemon 5.39
-05-26 09:05:36.551 I/bluetoothd( 1893): Starting SDP server
-05-26 09:05:36.551 I/bluetoothd( 1893): Bluetooth management interface
-1.3 initialized
-05-26 09:05:41.541 I/bluetoothd( 1893): Stopping SDP server
-05-26 09:05:41.541 I/bluetoothd( 1893): Exit
-05-26 09:05:46.431 E/BlueZ   ( 1828): bluetoothd connect timeout
-
-Looking further into what is causing the bluetoothd to time out I've
-found that calling poll() within the accept_connection() function
-within hal-bluetooth.c is what causes this.  Using the process
-described in the above readme I did port over the new epoll_create1()
-and ppoll() calls from
-https://github.com/bluez-android/aosp_platform_bionic.  I'm trying to
-determine what the poll() function is calling out to that is causing
-this to timeout.
-
-Any assistance is appreciated,
-
-Thank you.
