@@ -1,79 +1,105 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Date: Mon, 30 May 2016 09:36:20 +0000 (GMT)
-From: hyungju song <hyungju.song@samsung.com>
-Subject: Re: Re: Why network PAN immediately disconnect to mobile phone after
- connecting?
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Reply-to: hyungju.song@samsung.com
-MIME-version: 1.0
-Content-type: text/plain; charset=euc-kr
-MIME-version: 1.0
-Message-id: <996156423.270261464600980131.JavaMail.weblogic@epmlwas06d>
+MIME-Version: 1.0
+Date: Mon, 30 May 2016 16:22:32 +0900
+Message-ID: <CA+ZaN39hHDpaF54rF+dEN0n2tA0bhj1Kh80kkyynssZqp6aArg@mail.gmail.com>
+Subject: How to make object for RegisterAdvertisement()
+From: Seulki Shin <sskcorea@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-VGhhbmsgeW91IGZvciBhbnN3ZXIuDQoNCkkgdHJ5IHRvIGV4ZWN1dGUgL2JsdWV6L3Rlc3QvdGVz
-dF9uZXR3b3JrLg0KSXQgYWxzbyBjYXVzZWQgc2FtZSBwcm9ibGVtLg0KVGhlIHByb2JsZW0gaXMg
-dGhhdCBkZXZpY2UgaXMgaW1tZWRpYXRlbHkgIm9yZy5ibHVlei5EZXZpY2UxIGRpc2Nvbm5lY3Qi
-IGFmdGVyIHJldHVybmluZyBpbnRlcmZhY2UgKGJuZXAwKSBhbmQgc2lnbmFsICgib3JnLmJsdWV6
-Lm5ldHdvcmsxIC0+IGNvbm5lY3RlZCB0cnVlIikuIA0KDQo8LS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tIGJsdWV0b290aCBkYWVtb24gbG9nIC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tPg0KYmx1ZXRvb3RoZFs1MDQxXTogcHJvZmlsZXMvbmV0d29yay9jb25uZWN0aW9uLmM6
-Y29ubmVjdGlvbl9jb25uZWN0KCkgaWQgNDM3NA0KYmx1ZXRvb3RoZFs1MDQxXTogc3JjL2FkYXB0
-ZXIuYzpjb25uZWN0ZWRfY2FsbGJhY2soKSBoY2kwIGRldmljZSAxMjoyMzozNDo0NTo0QzpBQiBj
-b25uZWN0ZWQgZWlyX2xlbiA3DQpibHVldG9vdGhkWzUwNDFdOiBwcm9maWxlcy9uZXR3b3JrL2Nv
-bm5lY3Rpb24uYzpibmVwX2Nvbm5fY2IoKQ0KYmx1ZXRvb3RoZFs1MDQxXTogYm5lcDAgY29ubmVj
-dGVkDQoNCkNvbm5lY3RlZCB0byAxMjoyMzozNDo0NTo0QzpBQiBzZXJ2aWNlIG5hcCwgaW50ZXJm
-YWNlIGJuZXAwDQpQcmVzcyBDVFJMLUMgdG8gZGlzY29ubmVjdA0KDQpibHVldG9vdGhkWzUwNDFd
-OiBzcmMvYWRhcHRlci5jOmRldl9kaXNjb25uZWN0ZWQoKSBEZXZpY2UgMTI6MjM6MzQ6NDU6NEM6
-QUIgZGlzY29ubmVjdGVkLCByZWFzb24gMw0KYmx1ZXRvb3RoZFs1MDQxXTogc3JjL2FkYXB0ZXIu
-YzphZGFwdGVyX3JlbW92ZV9jb25uZWN0aW9uKCkNCmJsdWV0b290aGRbNTA0MV06IHBsdWdpbnMv
-cG9saWN5LmM6ZGlzY29ubmVjdF9jYigpIHJlYXNvbiAzDQpibHVldG9vdGhkWzUwNDFdOiBzcmMv
-YWRhcHRlci5jOmJvbmRpbmdfYXR0ZW1wdF9jb21wbGV0ZSgpIGhjaTAgYmRhZGRyIDEyOjIzOjM0
-OjQ1OjRDOkFCIHR5cGUgMCBzdGF0dXMgMHhlDQpibHVldG9vdGhkWzUwNDFdOiBzcmMvZGV2aWNl
-LmM6ZGV2aWNlX2JvbmRpbmdfY29tcGxldGUoKSBib25kaW5nIChuaWwpIHN0YXR1cyAweDBlDQpi
-bHVldG9vdGhkWzUwNDFdOiBzcmMvZGV2aWNlLmM6ZGV2aWNlX2JvbmRpbmdfZmFpbGVkKCkgc3Rh
-dHVzIDE0DQpibHVldG9vdGhkWzUwNDFdOiBzcmMvYWRhcHRlci5jOnJlc3VtZV9kaXNjb3Zlcnko
-KQ0KPC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLT4NCg0KDQpT
-bywgSSB0cnkgdG8gZXhlY3V0ZSAvYmx1ZXovdG9vbHMvYm5lcHRlc3QuIA0KKCAuL2JuZXB0ZXN0
-IC1iIGJuZXAwIC1uIGhjaTAgIC1jIDEyOjIzOjM0OjQ1OjRDOkFCICkNClRoZW4sIEkgd2lsbCBj
-b21tYW5kICJkaGNsaWVudCBibmVwMCIuIEkgY2FuIGNoZWNrIHRoZSBwaW5nIHRlc3Qgd2VsbC4N
-Cg0KV2h5IGRldmljZSBpcyBkaXNjb25uZWN0ZWQuLj8NCg0KVGhhbmsgeW91OikNCi1ISg0KDQot
-LS0tLS0tIE9yaWdpbmFsIE1lc3NhZ2UgLS0tLS0tLQ0KU2VuZGVyIDogTHVpeiBBdWd1c3RvIHZv
-biBEZW50ejxsdWl6LmRlbnR6QGdtYWlsLmNvbT4NCkRhdGUgOiAyMDE2LTA1LTI2IDIyOjEyIChH
-TVQrMDk6MDApDQpUaXRsZSA6IFJlOiBXaHkgbmV0d29yayBQQU4gaW1tZWRpYXRlbHkgZGlzY29u
-bmVjdCB0byBtb2JpbGUgcGhvbmUgYWZ0ZXIgY29ubmVjdGluZz8NCg0KSGkgSEosDQoNCk9uIFRo
-dSwgTWF5IDI2LCAyMDE2IGF0IDc6MTAgQU0sILzbx/zB1iB3cm90ZToNCj4gSGVsbG8sDQo+IEkg
-d2FuZGVyIHRoZSBOZXR3b3JrIFBBTiBhcGkuDQo+DQo+IEkgdGVzdGVkIHR3byBjYXNlcyB0byBj
-b25uZWN0IHRoZSBibHVldG9vdGggTmV0d29yaywNCj4gRGV2aWNlIEEgaXMgcGFpcmVkIFBob25l
-IEIuIFBob25lIGlzIHdvcmluZyB0aGUgTkFQIHNlcnZpY2UuDQo+DQo+IFRlc3QgY2FzZSAxID4g
-SSB1c2VkIHRoZSBjb25ubWFuY3RsLg0KPg0KPiBQYWlyZWQgdGhlIGRldmljZSBBIGFuZCBwaG9u
-ZSBieSB1c2luZyB0aGUgImJsdWV0b290aGN0bCIuDQo+IENoZWNraW5nIHRoZSBwYWlyZWRzdGF0
-dXMgaXMgc3VjY2Vzcy4NCj4NCj4gVGhlbiwgSSAgY2FsbCB0aGUgZGJ1cyBjb21tYW5kIHRvIHVz
-ZSBjb21tYW5kLWxpbmUgbmV0d29yayBtYW5hZ2VyIGFwaSB0aGF0IGlzICIgIGRidXMtc2VuZCAt
-LXN5c3RlbSAtLWRlc3Q9bmV0LmNvbm5tYW4gLS1wcmludC1yZXBseSAgL25ldC9jb25ubWFuL3Nl
-cnZpY2UvYmx1ZXRvb3RoXzAwMDAwMDAwMDAwMF80NDQ0NDQ0NDQ0NDQgbmV0LmNvbm5tYW4uU2Vy
-dmljZS5Db25uZWN0ICAiDQo+DQo+IEFmdGVyIHNlbmRpbmcgdGhlIGNvbW1hbmQsIERldmljZSBB
-IGlzIGNvbm5lY3RlZCB0byBQaG9uZSBBLg0KPiBCbHVldG9vdGggbmV0d29yayBjb25uZWN0aW9u
-IGlzIHdvcmtpbmcgd2VsbC4NCj4NCg0KTmV4dCB0aW1lIHVzZSBhIHBhc3RlYmluIGxpa2Ugc2Vy
-dmljZSBvciBhbiBhdHRhY2htZW50IGZvciBIQ0kgdHJhY2UuDQoNCj4gVGVzdCBjYXNlIDIgPiBJ
-IHVzZWQgdGhlIGJsdWV6IGFwaS4NCj4NCj4gUGFpcmVkIHRoZSBkZXZpY2UgQSBhbmQgcGhvbmUg
-YnkgdXNpbmcgdGhlICJibHVldG9vdGhjdGwiLg0KPiBDaGVja2luZyB0aGUgcGFpcmVkc3RhdHVz
-IGlzIHN1Y2Nlc3MuDQo+DQo+IFRoZW4sIEkgdXNlZCB0byBkYnVzIGNvbW1hbmQgdGhhdCBpcyAi
-IGRidXMtc2VuZCAtLXN5c3RlbSAtLWRlc3Q9b3JnLmJsdWV6IC0tcHJpbnQtcmVwbHkgIC9vcmcv
-Ymx1ZXovaGNpMC9kZXZfeHhfeHhfeHhfeHhfeHhfeHggb3JnLmJsdWV6Lk5ldHdvcmsxLkNvbm5l
-Y3Qgc3RyaW5nOiJuYXAiICIuDQo+IEFmdGVyIHNlbmRpbmcgdGhlIGNvbW1hbmQsIGkgY2FuIHJl
-Y2VpdmUgIHNpZ2FubCAgdGhhdCBuZXR3b3JrIGNvbm5lY3QgaXMgdHJ1ZSBhbmQgcmV0dXJuIHRo
-ZSBibHVldG9vdGggbmV0d29yayBpbnRlcmZhY2UgImJuZXAwIi4NCj4gQnV0LCBpbW1lZGlhdGVs
-eSBkZXZpY2UgaXMgZGlzY29ubmVjdGVkIGFmdGVyIGNvbm5lY3Rpb25nIG5ldHdvcmsuDQo+IFdo
-eSBuZXR3b3JrIGNvbm5lY3Rpb24gaXMgbm90IHdvcmtpbmcgd2hlbiBpIHVzZWQgdGhlIGJsdWV6
-IGFwaS4NCg0KSXQgaXMgYWN0dWFsbHkgcXVpdGUgc2ltcGxlLCBkYnVzLXNlbmQgZGlzY29ubmVj
-dHMgZnJvbSBELUJ1cyBvbmNlIGl0DQpleGl0IHdoaWNoIHdpbGwgbWFrZSBibHVldG9vdGhkIHRv
-IHJlbGVhc2UgdGhlIGNvbm5lY3Rpb24sIGlmIHlvdSB3YW50DQp0aGUgbmV0d29yayB0byBzdGF5
-IHVwIHlvdSBjYW4gdXNlIHRoZSBmb2xsb3dpbmc6DQoNCmh0dHBzOi8vZ2l0Lmtlcm5lbC5vcmcv
-Y2dpdC9ibHVldG9vdGgvYmx1ZXouZ2l0L3RyZWUvdGVzdC90ZXN0LW5ldHdvcmsNCg0KLS0gDQpM
-dWl6IEF1Z3VzdG8gdm9uIERlbnR6
+Hi,
 
+I'm trying to make a BLE avdertising device.
+But I have difficulty to use Bluez D-Bus C APIs.
 
+When I try to call RegisterAdvertisement(), I got this message.
+
+journalctl message:
+bluetoothd[352]: Failed to read "Type" property of advertisement
+
+dbus message:
+GDBus.Error:org.bluez.Error.Failed: Failed to parse advertisement.
+
+version:
+bluez: v5.39
+kernel: 4.1.15
+
+code chunk:
+static const gchar advertisement_introspection_xml[] =
+"<node name='/'>"
+"  <interface name='org.freedesktop.DBus.ObjectManager'>"
+"    <method name='GetManagedObjects'>"
+"      <arg type='a{oa{sa{sv}}}'
+name='object_paths_interfaces_and_properties' direction='out'/>"
+"    </method>"
+"  </interface>"
+"  <interface name='org.bluez.LEAdvertisement1'>"
+"    <property type='s' name='Type' access='read'>"
+"    </property>"
+"    <property type='as' name='ServiceUUIDs' access='read'>"
+"    </property>"
+"    <property type='a{sv}' name='ManufacturerData' access='read'>"
+"    </property>"
+"    <property type='as' name='SolicitUUIDs' access='read'>"
+"    </property>"
+"    <property type='a{sv}' name='ServiceData' access='read'>"
+"    </property>"
+"    <property type='b' name='IncludeTxPower' access='read'>"
+"    </property>"
+"  </interface>"
+"</node>";
+
+static void _serv_method_call(GDBusConnection *connection, const gchar *sender,
+                const gchar *object_path, const gchar *interface_name,
+                const gchar *method_name, GVariant *parameters,
+                GDBusMethodInvocation *invocation, gpointer user_data)
+{
+GVariantBuilder *b, *b1, *b11;
+b = g_variant_builder_new( G_VARIANT_TYPE("a{oa{sa{sv}}}"));
+b1 = g_variant_builder_new( G_VARIANT_TYPE("a{sa{sv}}"));
+b11 = g_variant_builder_new(G_VARIANT_TYPE("a{sv}"));
+
+  g_variant_builder_add(b11, "{sv}", "Type",
+                                g_variant_new_string("peripheral");
+g_variant_builder_add(b1, "{sa{sv}}",
+                                "org.bluez.LEAdvertisement1" , b11);
+g_variant_builder_add(b, "{oa{sa{sv}}}",
+                                object_path, b1);
+  g_dbus_method_invocation_return_value(invocation,
+                                g_variant_new("(a{oa{sa{sv}}})", b));
+}
+
+static const GDBusInterfaceVTable adv_interface_vtable = {
+        _adv_method_call,
+        NULL,
+        NULL,
+};
+
+node = g_dbus_node_info_new_for_xml(advertisement_introspection_xml, &e);
+
+object_id = g_dbus_connection_register_object(
+                        hci.conn,
+                        DBUS_ADVERTISEMENT,
+                        node->interfaces[0],
+                        &adv_interface_vtable,
+                        NULL, NULL, &e);
+
+g_dbus_connection_call_sync(
+                        hci.conn,
+                        DBUS_BLUEZ_BUS,
+                        DBUS_BLUEZ_OBJECT_PATH_HCI0,
+                        DBUS_IF_ADVERTISINGMANAGER1, "RegisterAdvertisement",
+                        g_variant_new("(o)", DBUS_ADVERTISEMENT),
+                        NULL, G_DBUS_CALL_FLAGS_NONE, G_MAXINT, NULL, &e);
+
+Is this right way to make an advertisement object and call
+"RegisterAdvertisement()" ?
+How can I register object especially having a dict type properties.
+
+I've already tested python script 'example-advertisement' and it works for me.
+Any comments would be highly appreciated.
+
+Thanks,
+Slki
