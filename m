@@ -1,79 +1,155 @@
-Return-Path: <Glenn.Ruben.Bakke@nordicsemi.no>
-From: Glenn Ruben Bakke <glenn.ruben.bakke@nordicsemi.no>
-To: <stable@vger.kernel.org>
-CC: <marcel@holtmann.org>, <jukka.rissanen@linux.intel.com>,
-	<linux-bluetooth@vger.kernel.org>
-Subject: [PATCH stable backport] Bluetooth: 6lowpan: Fix memory corruption of ipv6 destination address
-Date: Tue, 31 May 2016 12:23:15 +0200
-Message-ID: <1464690195-2575-1-git-send-email-glenn.ruben.bakke@nordicsemi.no>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <CAL2sZR6evPuMOd1PDvrffQt9tkcR5jEBCJuHjJecKxaj++4_Qg@mail.gmail.com>
+References: <CAL2sZR6evPuMOd1PDvrffQt9tkcR5jEBCJuHjJecKxaj++4_Qg@mail.gmail.com>
+Date: Tue, 31 May 2016 09:11:25 +0200
+Message-ID: <CAL2sZR7LssB-ptmvhHx2HfMwgODO6S=MW9RVGD5W1Hqr2OPGtA@mail.gmail.com>
+Subject: Fwd: Problem with l2pinging an iphone
+From: Arnold Maderthaner <arnold@maderthaner.me>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: multipart/mixed; boundary=001a113fc41abf4d4905341e1479
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Backport for v4.5 and v4.6 of
-commit 55441070ca1cbd47ce1ad2959bbf4b47aed9b83b upstream.
+--001a113fc41abf4d4905341e1479
+Content-Type: text/plain; charset=UTF-8
 
-The memcpy of ipv6 header destination address to the skb control block
-(sbk->cb) in header_create() results in currupted memory when bt_xmit()
-is issued. The skb->cb is "released" in the return of header_create()
-making room for lower layer to minipulate the skb->cb.
+Hi !
 
-The value retrieved in bt_xmit is not persistent across header creation
-and sending, and the lower layer will overwrite portions of skb->cb,
-making the copied destination address wrong.
+I want to use bluetooth for presence detection in my home utilizing my
+iphone bluetooth.
+I have 2 systems at the moment: 1x Intel NUC with onboard bluetooth
+and a Raspberry Pi 3.
 
-The memory corruption will lead to non-working multicast as the first 4
-bytes of the copied destination address is replaced by a value that
-resolves into a non-multicast prefix.
+My problem is that on my NUC I always get a "Permission Denied" error
+which I don't understand vs. on my RP3 with the same iphone it just
+works.
 
-This fix removes the dependency on the skb control block between header
-creation and send, by moving the destination address memcpy to the send
-function path (setup_create, which is called from bt_xmit).
+Attached I have 2 hcidumps. Could someone look at those and tell me
+what might be wrong ?
 
-Signed-off-by: Glenn Ruben Bakke <glenn.ruben.bakke@nordicsemi.no>
----
- net/bluetooth/6lowpan.c | 11 ++++-------
- 1 file changed, 4 insertions(+), 7 deletions(-)
+Thanks !
 
-diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
-index 8a4cc2f..e45cb91 100644
---- a/net/bluetooth/6lowpan.c
-+++ b/net/bluetooth/6lowpan.c
-@@ -431,15 +431,18 @@ static int setup_header(struct sk_buff *skb, struct net_device *netdev,
- 			bdaddr_t *peer_addr, u8 *peer_addr_type)
- {
- 	struct in6_addr ipv6_daddr;
-+	struct ipv6hdr *hdr;
- 	struct lowpan_dev *dev;
- 	struct lowpan_peer *peer;
- 	bdaddr_t addr, *any = BDADDR_ANY;
- 	u8 *daddr = any->b;
- 	int err, status = 0;
- 
-+	hdr = ipv6_hdr(skb);
-+
- 	dev = lowpan_dev(netdev);
- 
--	memcpy(&ipv6_daddr, &lowpan_cb(skb)->addr, sizeof(ipv6_daddr));
-+	memcpy(&ipv6_daddr, &hdr->daddr, sizeof(ipv6_daddr));
- 
- 	if (ipv6_addr_is_multicast(&ipv6_daddr)) {
- 		lowpan_cb(skb)->chan = NULL;
-@@ -489,15 +492,9 @@ static int header_create(struct sk_buff *skb, struct net_device *netdev,
- 			 unsigned short type, const void *_daddr,
- 			 const void *_saddr, unsigned int len)
- {
--	struct ipv6hdr *hdr;
--
- 	if (type != ETH_P_IPV6)
- 		return -EINVAL;
- 
--	hdr = ipv6_hdr(skb);
--
--	memcpy(&lowpan_cb(skb)->addr, &hdr->daddr, sizeof(struct in6_addr));
--
- 	return 0;
- }
- 
--- 
-2.5.0
+
+yours
+
+Arnold
+
+--001a113fc41abf4d4905341e1479
+Content-Type: text/plain; charset=US-ASCII; name="iphone_ok.txt"
+Content-Disposition: attachment; filename="iphone_ok.txt"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_iov3t81a0
+
+SENJIHNuaWZmZXIgLSBCbHVldG9vdGggcGFja2V0IGFuYWx5emVyIHZlciA1LjIzCmRldmljZTog
+aGNpMCBzbmFwX2xlbjogMTUwMCBmaWx0ZXI6IDB4ZmZmZmZmZmYKPCBIQ0kgQ29tbWFuZDogQ3Jl
+YXRlIENvbm5lY3Rpb24gKDB4MDF8MHgwMDA1KSBwbGVuIDEzCiAgICBiZGFkZHIgNDA6MzM6MUE6
+NzQ6ODk6NTggcHR5cGUgMHhjYzE4IHJzd2l0Y2ggMHgwMSBjbGtvZmZzZXQgMHgwMDAwCiAgICBQ
+YWNrZXQgdHlwZTogRE0xIERNMyBETTUgREgxIERIMyBESDUgCj4gSENJIEV2ZW50OiBDb21tYW5k
+IFN0YXR1cyAoMHgwZikgcGxlbiA0CiAgICBDcmVhdGUgQ29ubmVjdGlvbiAoMHgwMXwweDAwMDUp
+IHN0YXR1cyAweDAwIG5jbWQgMQo+IEhDSSBFdmVudDogQ29ubmVjdCBDb21wbGV0ZSAoMHgwMykg
+cGxlbiAxMQogICAgc3RhdHVzIDB4MDAgaGFuZGxlIDExIGJkYWRkciA0MDozMzoxQTo3NDo4OTo1
+OCB0eXBlIEFDTCBlbmNyeXB0IDB4MDAKPCBIQ0kgQ29tbWFuZDogUmVhZCBSZW1vdGUgU3VwcG9y
+dGVkIEZlYXR1cmVzICgweDAxfDB4MDAxYikgcGxlbiAyCiAgICBoYW5kbGUgMTEKPiBIQ0kgRXZl
+bnQ6IENvbW1hbmQgU3RhdHVzICgweDBmKSBwbGVuIDQKICAgIFJlYWQgUmVtb3RlIFN1cHBvcnRl
+ZCBGZWF0dXJlcyAoMHgwMXwweDAwMWIpIHN0YXR1cyAweDAwIG5jbWQgMQo+IEhDSSBFdmVudDog
+UmVhZCBSZW1vdGUgU3VwcG9ydGVkIEZlYXR1cmVzICgweDBiKSBwbGVuIDExCiAgICBzdGF0dXMg
+MHgwMCBoYW5kbGUgMTEKICAgIEZlYXR1cmVzOiAweGJmIDB4ZmUgMHhjZiAweGZlIDB4ZGIgMHhm
+ZiAweDdiIDB4ODcKPCBIQ0kgQ29tbWFuZDogUmVhZCBSZW1vdGUgRXh0ZW5kZWQgRmVhdHVyZXMg
+KDB4MDF8MHgwMDFjKSBwbGVuIDMKICAgIGhhbmRsZSAxMSBwYWdlIDEKPiBIQ0kgRXZlbnQ6IENv
+bW1hbmQgU3RhdHVzICgweDBmKSBwbGVuIDQKICAgIFJlYWQgUmVtb3RlIEV4dGVuZGVkIEZlYXR1
+cmVzICgweDAxfDB4MDAxYykgc3RhdHVzIDB4MDAgbmNtZCAxCj4gSENJIEV2ZW50OiBSZWFkIFJl
+bW90ZSBFeHRlbmRlZCBGZWF0dXJlcyAoMHgyMykgcGxlbiAxMwogICAgc3RhdHVzIDB4MDAgaGFu
+ZGxlIDExIHBhZ2UgMSBtYXggMgogICAgRmVhdHVyZXM6IDB4MDcgMHgwMCAweDAwIDB4MDAgMHgw
+MCAweDAwIDB4MDAgMHgwMAo8IEhDSSBDb21tYW5kOiBSZW1vdGUgTmFtZSBSZXF1ZXN0ICgweDAx
+fDB4MDAxOSkgcGxlbiAxMAogICAgYmRhZGRyIDQwOjMzOjFBOjc0Ojg5OjU4IG1vZGUgMiBjbGtv
+ZmZzZXQgMHgwMDAwCjwgQUNMIGRhdGE6IGhhbmRsZSAxMSBmbGFncyAweDAwIGRsZW4gMTAKICAg
+IEwyQ0FQKHMpOiBJbmZvIHJlcTogdHlwZSAyCj4gSENJIEV2ZW50OiBNYXggU2xvdHMgQ2hhbmdl
+ICgweDFiKSBwbGVuIDMKICAgIGhhbmRsZSAxMSBzbG90cyA1Cj4gSENJIEV2ZW50OiBDb21tYW5k
+IFN0YXR1cyAoMHgwZikgcGxlbiA0CiAgICBSZW1vdGUgTmFtZSBSZXF1ZXN0ICgweDAxfDB4MDAx
+OSkgc3RhdHVzIDB4MDAgbmNtZCAxCj4gSENJIEV2ZW50OiBSZW1vdGUgTmFtZSBSZXEgQ29tcGxl
+dGUgKDB4MDcpIHBsZW4gMjU1CiAgICBzdGF0dXMgMHgwMCBiZGFkZHIgNDA6MzM6MUE6NzQ6ODk6
+NTggbmFtZSAnaVBob25lJwo+IEFDTCBkYXRhOiBoYW5kbGUgMTEgZmxhZ3MgMHgwMiBkbGVuIDE2
+CiAgICBMMkNBUChzKTogSW5mbyByc3A6IHR5cGUgMiByZXN1bHQgMAogICAgICBFeHRlbmRlZCBm
+ZWF0dXJlIG1hc2sgMHgwMmE4CiAgICAgICAgRW5oYW5jZWQgUmV0cmFuc21pc3Npb24gbW9kZQog
+ICAgICAgIEZDUyBPcHRpb24KICAgICAgICBGaXhlZCBDaGFubmVscwogICAgICAgIFVuaWNhc3Qg
+Q29ubmVjdGxlc3MgRGF0YSBSZWNlcHRpb24KPCBBQ0wgZGF0YTogaGFuZGxlIDExIGZsYWdzIDB4
+MDAgZGxlbiAxMAogICAgTDJDQVAocyk6IEluZm8gcmVxOiB0eXBlIDMKPiBIQ0kgRXZlbnQ6IE51
+bWJlciBvZiBDb21wbGV0ZWQgUGFja2V0cyAoMHgxMykgcGxlbiA1CiAgICBoYW5kbGUgMTEgcGFj
+a2V0cyAyCj4gQUNMIGRhdGE6IGhhbmRsZSAxMSBmbGFncyAweDAyIGRsZW4gMjAKICAgIEwyQ0FQ
+KHMpOiBJbmZvIHJzcDogdHlwZSAzIHJlc3VsdCAwCiAgICAgIEZpeGVkIGNoYW5uZWwgbGlzdCAw
+eDQwMDA4MDAwMDAwMDAxMAo8IEFDTCBkYXRhOiBoYW5kbGUgMTEgZmxhZ3MgMHgwMCBkbGVuIDUy
+CiAgICBMMkNBUChzKTogRWNobyByZXE6IGRsZW4gNDQKICAgIDQxIDQyIDQzIDQ0IDQ1IDQ2IDQ3
+IDQ4IDQ5IDRBIDRCIDRDIDREIDRFIDRGIDUwIDUxIDUyIDUzIDU0IAogICAgNTUgNTYgNTcgNTgg
+NTkgNUEgNUIgNUMgNUQgNUUgNUYgNjAgNjEgNjIgNjMgNjQgNjUgNjYgNjcgNjggCiAgICA0MSA0
+MiA0MyA0NCAKCg==
+--001a113fc41abf4d4905341e1479
+Content-Type: text/plain; charset=US-ASCII; name="iphone-problem.txt"
+Content-Disposition: attachment; filename="iphone-problem.txt"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_iov3t81j1
+
+CnRAbnVjLWRlc2t0b3A6fiMgaGNpZHVtcCAteApIQ0kgc25pZmZlciAtIEJsdWV0b290aCBwYWNr
+ZXQgYW5hbHl6ZXIgdmVyIDUuMzkKZGV2aWNlOiBoY2kwIHNuYXBfbGVuOiAxNTAwIGZpbHRlcjog
+MHhmZmZmZmZmZmZmZmZmZmZmCjwgSENJIENvbW1hbmQ6IENyZWF0ZSBDb25uZWN0aW9uICgweDAx
+fDB4MDAwNSkgcGxlbiAxMwogICAgYmRhZGRyIDQwOjMzOjFBOjc0Ojg5OjU4IHB0eXBlIDB4Y2Mx
+OCByc3dpdGNoIDB4MDEgY2xrb2Zmc2V0IDB4MDAwMAogICAgUGFja2V0IHR5cGU6IERNMSBETTMg
+RE01IERIMSBESDMgREg1IAo+IEhDSSBFdmVudDogQ29tbWFuZCBTdGF0dXMgKDB4MGYpIHBsZW4g
+NAogICAgQ3JlYXRlIENvbm5lY3Rpb24gKDB4MDF8MHgwMDA1KSBzdGF0dXMgMHgwMCBuY21kIDEK
+PiBIQ0kgRXZlbnQ6IFJvbGUgQ2hhbmdlICgweDEyKSBwbGVuIDgKICAgIHN0YXR1cyAweDAwIGJk
+YWRkciA0MDozMzoxQTo3NDo4OTo1OCByb2xlIDB4MDEKICAgIFJvbGU6IFNsYXZlCj4gSENJIEV2
+ZW50OiBDb25uZWN0IENvbXBsZXRlICgweDAzKSBwbGVuIDExCiAgICBzdGF0dXMgMHgwMCBoYW5k
+bGUgMjU2IGJkYWRkciA0MDozMzoxQTo3NDo4OTo1OCB0eXBlIEFDTCBlbmNyeXB0IDB4MDAKPCBI
+Q0kgQ29tbWFuZDogUmVhZCBSZW1vdGUgU3VwcG9ydGVkIEZlYXR1cmVzICgweDAxfDB4MDAxYikg
+cGxlbiAyCiAgICBoYW5kbGUgMjU2Cj4gSENJIEV2ZW50OiBDb21tYW5kIFN0YXR1cyAoMHgwZikg
+cGxlbiA0CiAgICBSZWFkIFJlbW90ZSBTdXBwb3J0ZWQgRmVhdHVyZXMgKDB4MDF8MHgwMDFiKSBz
+dGF0dXMgMHgwMCBuY21kIDEKPiBIQ0kgRXZlbnQ6IE1heCBTbG90cyBDaGFuZ2UgKDB4MWIpIHBs
+ZW4gMwogICAgaGFuZGxlIDI1NiBzbG90cyA1Cj4gSENJIEV2ZW50OiBSZWFkIFJlbW90ZSBTdXBw
+b3J0ZWQgRmVhdHVyZXMgKDB4MGIpIHBsZW4gMTEKICAgIHN0YXR1cyAweDAwIGhhbmRsZSAyNTYK
+ICAgIEZlYXR1cmVzOiAweGJmIDB4ZmUgMHhjZiAweGZlIDB4ZGIgMHhmZiAweDdiIDB4ODcKPCBI
+Q0kgQ29tbWFuZDogUmVhZCBSZW1vdGUgRXh0ZW5kZWQgRmVhdHVyZXMgKDB4MDF8MHgwMDFjKSBw
+bGVuIDMKICAgIGhhbmRsZSAyNTYgcGFnZSAxCj4gSENJIEV2ZW50OiBDb21tYW5kIFN0YXR1cyAo
+MHgwZikgcGxlbiA0CiAgICBSZWFkIFJlbW90ZSBFeHRlbmRlZCBGZWF0dXJlcyAoMHgwMXwweDAw
+MWMpIHN0YXR1cyAweDAwIG5jbWQgMQo+IEhDSSBFdmVudDogUmVhZCBSZW1vdGUgRXh0ZW5kZWQg
+RmVhdHVyZXMgKDB4MjMpIHBsZW4gMTMKICAgIHN0YXR1cyAweDAwIGhhbmRsZSAyNTYgcGFnZSAx
+IG1heCAyCiAgICBGZWF0dXJlczogMHgwNyAweDAwIDB4MDAgMHgwMCAweDAwIDB4MDAgMHgwMCAw
+eDAwCjwgSENJIENvbW1hbmQ6IFJlbW90ZSBOYW1lIFJlcXVlc3QgKDB4MDF8MHgwMDE5KSBwbGVu
+IDEwCiAgICBiZGFkZHIgNDA6MzM6MUE6NzQ6ODk6NTggbW9kZSAyIGNsa29mZnNldCAweDAwMDAK
+PiBIQ0kgRXZlbnQ6IENvbW1hbmQgU3RhdHVzICgweDBmKSBwbGVuIDQKICAgIFJlbW90ZSBOYW1l
+IFJlcXVlc3QgKDB4MDF8MHgwMDE5KSBzdGF0dXMgMHgwMCBuY21kIDEKPiBIQ0kgRXZlbnQ6IFJl
+bW90ZSBOYW1lIFJlcSBDb21wbGV0ZSAoMHgwNykgcGxlbiAyNTUKICAgIHN0YXR1cyAweDAwIGJk
+YWRkciA0MDozMzoxQTo3NDo4OTo1OCBuYW1lICdpUGhvbmUnCjwgSENJIENvbW1hbmQ6IEF1dGhl
+bnRpY2F0aW9uIFJlcXVlc3RlZCAoMHgwMXwweDAwMTEpIHBsZW4gMgogICAgaGFuZGxlIDI1Ngo+
+IEhDSSBFdmVudDogQ29tbWFuZCBTdGF0dXMgKDB4MGYpIHBsZW4gNAogICAgQXV0aGVudGljYXRp
+b24gUmVxdWVzdGVkICgweDAxfDB4MDAxMSkgc3RhdHVzIDB4MDAgbmNtZCAxCj4gSENJIEV2ZW50
+OiBMaW5rIEtleSBSZXF1ZXN0ICgweDE3KSBwbGVuIDYKICAgIGJkYWRkciA0MDozMzoxQTo3NDo4
+OTo1OAo8IEhDSSBDb21tYW5kOiBMaW5rIEtleSBSZXF1ZXN0IE5lZ2F0aXZlIFJlcGx5ICgweDAx
+fDB4MDAwYykgcGxlbiA2CiAgICBiZGFkZHIgNDA6MzM6MUE6NzQ6ODk6NTgKPiBIQ0kgRXZlbnQ6
+IENvbW1hbmQgQ29tcGxldGUgKDB4MGUpIHBsZW4gMTAKICAgIExpbmsgS2V5IFJlcXVlc3QgTmVn
+YXRpdmUgUmVwbHkgKDB4MDF8MHgwMDBjKSBuY21kIDEKICAgIHN0YXR1cyAweDAwIGJkYWRkciA0
+MDozMzoxQTo3NDo4OTo1OAo+IEhDSSBFdmVudDogSU8gQ2FwYWJpbGl0eSBSZXF1ZXN0ICgweDMx
+KSBwbGVuIDYKICAgIGJkYWRkciA0MDozMzoxQTo3NDo4OTo1OAo8IEhDSSBDb21tYW5kOiBJTyBD
+YXBhYmlsaXR5IFJlcXVlc3QgUmVwbHkgKDB4MDF8MHgwMDJiKSBwbGVuIDkKICAgIGJkYWRkciA0
+MDozMzoxQTo3NDo4OTo1OCBjYXBhYmlsaXR5IDB4MDMgb29iIDB4MDAgYXV0aCAweDAwCiAgICBD
+YXBhYmlsaXR5OiBOb0lucHV0Tm9PdXRwdXQgKE9PQiBkYXRhIG5vdCBwcmVzZW50KQogICAgQXV0
+aGVudGljYXRpb246IE5vIEJvbmRpbmcgKE5vIE1JVE0gUHJvdGVjdGlvbikKPiBIQ0kgRXZlbnQ6
+IENvbW1hbmQgQ29tcGxldGUgKDB4MGUpIHBsZW4gMTAKICAgIElPIENhcGFiaWxpdHkgUmVxdWVz
+dCBSZXBseSAoMHgwMXwweDAwMmIpIG5jbWQgMQogICAgc3RhdHVzIDB4MDAgYmRhZGRyIDQwOjMz
+OjFBOjc0Ojg5OjU4Cj4gSENJIEV2ZW50OiBJTyBDYXBhYmlsaXR5IFJlc3BvbnNlICgweDMyKSBw
+bGVuIDkKICAgIGJkYWRkciA0MDozMzoxQTo3NDo4OTo1OCBjYXBhYmlsaXR5IDB4MDEgb29iIDB4
+MDAgYXV0aCAweDAwCiAgICBDYXBhYmlsaXR5OiBEaXNwbGF5WWVzTm8gKE9PQiBkYXRhIG5vdCBw
+cmVzZW50KQogICAgQXV0aGVudGljYXRpb246IE5vIEJvbmRpbmcgKE5vIE1JVE0gUHJvdGVjdGlv
+bikKPiBIQ0kgRXZlbnQ6IFVzZXIgQ29uZmlybWF0aW9uIFJlcXVlc3QgKDB4MzMpIHBsZW4gMTAK
+ICAgIGJkYWRkciA0MDozMzoxQTo3NDo4OTo1OCBwYXNza2V5IDI3NDU3OAo8IEhDSSBDb21tYW5k
+OiBVc2VyIENvbmZpcm1hdGlvbiBSZXF1ZXN0IFJlcGx5ICgweDAxfDB4MDAyYykgcGxlbiA2CiAg
+ICBiZGFkZHIgNDA6MzM6MUE6NzQ6ODk6NTgKPiBIQ0kgRXZlbnQ6IENvbW1hbmQgQ29tcGxldGUg
+KDB4MGUpIHBsZW4gMTAKICAgIFVzZXIgQ29uZmlybWF0aW9uIFJlcXVlc3QgUmVwbHkgKDB4MDF8
+MHgwMDJjKSBuY21kIDEKICAgIHN0YXR1cyAweDAwIGJkYWRkciA0MDozMzoxQTo3NDo4OTo1OAo+
+IEhDSSBFdmVudDogU2ltcGxlIFBhaXJpbmcgQ29tcGxldGUgKDB4MzYpIHBsZW4gNwogICAgc3Rh
+dHVzIDB4MDUgYmRhZGRyIDQwOjMzOjFBOjc0Ojg5OjU4CiAgICBFcnJvcjogQXV0aGVudGljYXRp
+b24gRmFpbHVyZQo+IEhDSSBFdmVudDogQXV0aCBDb21wbGV0ZSAoMHgwNikgcGxlbiAzCiAgICBz
+dGF0dXMgMHgwNSBoYW5kbGUgMjU2CiAgICBFcnJvcjogQXV0aGVudGljYXRpb24gRmFpbHVyZQo+
+IEhDSSBFdmVudDogRGlzY29ubiBDb21wbGV0ZSAoMHgwNSkgcGxlbiA0CiAgICBzdGF0dXMgMHgw
+MCBoYW5kbGUgMjU2IHJlYXNvbiAweDE0CiAgICBSZWFzb246IFJlbW90ZSBEZXZpY2UgVGVybWlu
+YXRlZCBDb25uZWN0aW9uIGR1ZSB0byBMb3cgUmVzb3VyY2VzCg==
+--001a113fc41abf4d4905341e1479--
