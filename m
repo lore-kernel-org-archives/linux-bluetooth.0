@@ -1,46 +1,47 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Date: Tue, 31 May 2016 07:11:57 +0200 (CEST)
-From: Dennis Kadioglu <denk@post.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <1116111592.162575276.1464671516930.JavaMail.zimbra@dkadioglu.de>
-In-Reply-To: <1881831.AdeVxpHkvy@ix>
-References: <286937503.150813787.1464432672488.JavaMail.zimbra@dkadioglu.de> <1881831.AdeVxpHkvy@ix>
-Subject: Re: Name and Class in main.conf ignored
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+From: Marc Anders <andersm223@gmail.com>
+Date: Mon, 30 May 2016 19:42:06 -0500
+Message-ID: <CALmZcgaiS_nTdUtFae3rrB+Z9Lef+1V=GdhFjnC-rtPw=pRGvA@mail.gmail.com>
+Subject: BlueZ port to Android version 4.4.2
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hello,
 
-thanks for your immediate answer. Using -P hostname now and it works!
-One question: Shouldn't the settings in the configuration file supersede otherwise configured settings? I want to change the class of my device but, on the other hand I don't want to change the hostname which is set by the hostname plugin, I can't do that now. Instead I have to disable the whole plugin by changing the bluetooth.service file and therefor I have to take care for the changed bluetooth.service file in case of updates. What are the reasons for the current implementation? Would it be possible to change the current implementation in a way, that settings in main.conf overwrite settings in other places?
+I am trying to port BlueZ to an Android 4.4.2 kernel.  I followed the
+instructions I found on the following site:
+https://git.kernel.org/cgit/bluetooth/bluez.git/tree/android/README
 
------ Ursprüngliche Mail -----
-Von: "Szymon Janc" <szymon.janc@codecoup.pl>
-An: "denk" <denk@post.com>
-CC: linux-bluetooth@vger.kernel.org
-Gesendet: Sonntag, 29. Mai 2016 11:30:24
-Betreff: Re: Name and Class in main.conf ignored
+I have the project compiling and was able to flash to the board.  When
+the bluetooth system boots up however the Bluez system times out
+during its init with the following error logs:
 
-Hi,
+05-26 09:05:36.381 D/BlueZ   ( 1828):
+external/bluetooth/bluez/android/hal-bluetooth.c:open_bluetooth()
+05-26 09:05:36.381 D/BlueZ   ( 1828):
+external/bluetooth/bluez/android/hal-bluetooth.c:get_bluetooth_interface()
+05-26 09:05:36.401 D/BlueZ   ( 1828):
+external/bluetooth/bluez/android/hal-bluetooth.c:init()
+05-26 09:05:36.551 I/bluetoothd( 1893): Bluetooth daemon 5.39
+05-26 09:05:36.551 I/bluetoothd( 1893): Starting SDP server
+05-26 09:05:36.551 I/bluetoothd( 1893): Bluetooth management interface
+1.3 initialized
+05-26 09:05:41.541 I/bluetoothd( 1893): Stopping SDP server
+05-26 09:05:41.541 I/bluetoothd( 1893): Exit
+05-26 09:05:46.431 E/BlueZ   ( 1828): bluetoothd connect timeout
 
-On Saturday 28 May 2016 12:51:12 denk wrote:
-> Hi,
-> 
-> I would like to configure the name and the class using the respective
-> entries in /etc/bluetooth/main.conf. Unfortunately without success. Both
-> values are ignored or overwritten, I don't know.
-> 
-> Any ideas why it doesn't work? Am I doing something wrong? Is there maybe an
-> alternative way to achieve this?
-> 
-> Thanks in advance.
-> 
+Looking further into what is causing the bluetoothd to time out I've
+found that calling poll() within the accept_connection() function
+within hal-bluetooth.c is what causes this.  Using the process
+described in the above readme I did port over the new epoll_create1()
+and ppoll() calls from
+https://github.com/bluez-android/aosp_platform_bionic.  I'm trying to
+determine what the poll() function is calling out to that is causing
+this to timeout.
 
-This is probably due to hostname plugin. Try disabling it  (-P option) in 
-command line.
+Any assistance is appreciated,
 
--- 
-pozdrawiam
-Szymon Janc
+Thank you.
