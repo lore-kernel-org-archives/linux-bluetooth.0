@@ -1,293 +1,1266 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Date: Wed, 1 Jun 2016 11:59:50 -0700
-From: Tedd Ho-Jeong An <tedd.an@intel.com>
-To: "linux-firmware@kernel.org" <linux-firmware@kernel.org>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Tedd Ho-Jeong An <tedd.an@intel.com>
-Subject: linux-firmware: Update firmware patch for Intel Bluetooth 7260
- (B3/B4)
-Message-ID: <20160601115950.0a954160@fedora-linux-22.shared>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <salvatore.benedetto@intel.com>
+From: Salvatore Benedetto <salvatore.benedetto@intel.com>
+To: herbert@gondor.apana.org.au,
+	gustavo@padovan.org,
+	linux-bluetooth@vger.kernel.org
+Cc: salvatore.benedetto@intel.com,
+	linux-crypto@vger.kernel.org,
+	marcel@holtmann.org,
+	johan.hedberg@gmail.com
+Subject: [PATCH v4] Bluetooth: convert smp and selftest to crypto kpp API
+Date: Wed,  1 Jun 2016 11:00:18 +0100
+Message-Id: <1464775218-96138-1-git-send-email-salvatore.benedetto@intel.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Tedd Ho-Jeong An <tedd.an@intel.com>
+ * Convert both smp and selftest to crypto kpp API
+ * Remove module ecc as not more required
+ * Add ecdh_helper functions for wrapping kpp async calls
 
-This patch updates the firmware patch for Intel bluetooth 7260
-also known as Intel WP2 B3 and WP1 B4.
-
-Patch Version: 86
-
-Release Version: 19.01
-
-Signed-off-by: Tedd Ho-Jeong An <tedd.an@intel.com>
+Signed-off-by: Salvatore Benedetto <salvatore.benedetto@intel.com>
 ---
- WHENCE                                  |   4 ++--
- intel/ibt-hw-37.7.10-fw-1.0.2.3.d.bseq  | Bin 25857 -> 25853 bytes
- intel/ibt-hw-37.7.10-fw-1.80.2.3.d.bseq | Bin 25631 -> 25627 bytes
- 3 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/WHENCE b/WHENCE
-index 9331897..b416c56 100644
---- a/WHENCE
-+++ b/WHENCE
-@@ -2722,9 +2722,9 @@ Driver: btusb - Bluetooth USB driver
- File: intel/ibt-hw-37.7.bseq
- Version: 1316.02.00
- File: intel/ibt-hw-37.7.10-fw-1.80.2.3.d.bseq
--BT_WilkinsPeak_B3_REL_85_0001
-+Version: BT_WilkinsPeak_B3_REL_86_0001
- File: intel/ibt-hw-37.7.10-fw-1.0.2.3.d.bseq
--BT_WilkinsPeak_B3_REL_85_0001
-+Version: BT_WilkinsPeak_B3_REL_86_0001
- File: intel/ibt-hw-37.7.10-fw-1.80.1.2d.d.bseq
- Version: BT_WilkinsPeak_B5_REL_37_0001
- File: intel/ibt-hw-37.7.10-fw-1.0.1.2d.d.bseq
-diff --git a/intel/ibt-hw-37.7.10-fw-1.0.2.3.d.bseq b/intel/ibt-hw-37.7.10-fw-1.0.2.3.d.bseq
-index b057cb0b926c2b1898f2f8ffeaa10f78cdc57053..46ef39b95c36f5b006545a695cce46f0f9a3cd98 100644
-GIT binary patch
-delta 4578
-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
+Patch based on https://patchwork.kernel.org/patch/9145037/
 
-delta 4513
-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
-DD^}Dq
+Changes from v3:
+ * Patch adjusted to minor API change. crypto_kpp_set_params no longer
+   takes len as input parameter
 
-diff --git a/intel/ibt-hw-37.7.10-fw-1.80.2.3.d.bseq b/intel/ibt-hw-37.7.10-fw-1.80.2.3.d.bseq
-index 6627aecc54c6d341bd7fe5848f40a5ad112f5cae..9a930916a116d6a6d55978aeda76210b49bd3c80 100644
-GIT binary patch
-delta 4466
-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
+Changes from v2:
+ * Remove header guard in internal header
+ * Shorter name for ecdh wrappers and fix 80chars issue
+ * Add CRYPTO_ECDH dependency in bluetooth Kconfig
 
-delta 4668
-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
-Rb22`;rJ1St;Fm3C=KmRn>Hh!#
+Changes from v1:
+ * Convert ecc_make_key to kpp API
 
+
+ net/bluetooth/Kconfig       |   1 +
+ net/bluetooth/Makefile      |   2 +-
+ net/bluetooth/ecc.c         | 816 --------------------------------------------
+ net/bluetooth/ecc.h         |  54 ---
+ net/bluetooth/ecdh_helper.c | 204 +++++++++++
+ net/bluetooth/ecdh_helper.h |  27 ++
+ net/bluetooth/selftest.c    |   6 +-
+ net/bluetooth/smp.c         |   8 +-
+ 8 files changed, 240 insertions(+), 878 deletions(-)
+ delete mode 100644 net/bluetooth/ecc.c
+ delete mode 100644 net/bluetooth/ecc.h
+ create mode 100644 net/bluetooth/ecdh_helper.c
+ create mode 100644 net/bluetooth/ecdh_helper.h
+
+diff --git a/net/bluetooth/Kconfig b/net/bluetooth/Kconfig
+index 06c31b9..68f951b 100644
+--- a/net/bluetooth/Kconfig
++++ b/net/bluetooth/Kconfig
+@@ -13,6 +13,7 @@ menuconfig BT
+ 	select CRYPTO_CMAC
+ 	select CRYPTO_ECB
+ 	select CRYPTO_SHA256
++	select CRYPTO_ECDH
+ 	help
+ 	  Bluetooth is low-cost, low-power, short-range wireless technology.
+ 	  It was designed as a replacement for cables and other short-range
+diff --git a/net/bluetooth/Makefile b/net/bluetooth/Makefile
+index b3ff12e..c54d790 100644
+--- a/net/bluetooth/Makefile
++++ b/net/bluetooth/Makefile
+@@ -13,7 +13,7 @@ bluetooth_6lowpan-y := 6lowpan.o
+ 
+ bluetooth-y := af_bluetooth.o hci_core.o hci_conn.o hci_event.o mgmt.o \
+ 	hci_sock.o hci_sysfs.o l2cap_core.o l2cap_sock.o smp.o lib.o \
+-	ecc.o hci_request.o mgmt_util.o
++	ecdh_helper.o hci_request.o mgmt_util.o
+ 
+ bluetooth-$(CONFIG_BT_BREDR) += sco.o
+ bluetooth-$(CONFIG_BT_HS) += a2mp.o amp.o
+diff --git a/net/bluetooth/ecc.c b/net/bluetooth/ecc.c
+deleted file mode 100644
+index e1709f8..0000000
+--- a/net/bluetooth/ecc.c
++++ /dev/null
+@@ -1,816 +0,0 @@
+-/*
+- * Copyright (c) 2013, Kenneth MacKay
+- * All rights reserved.
+- *
+- * Redistribution and use in source and binary forms, with or without
+- * modification, are permitted provided that the following conditions are
+- * met:
+- *  * Redistributions of source code must retain the above copyright
+- *   notice, this list of conditions and the following disclaimer.
+- *  * Redistributions in binary form must reproduce the above copyright
+- *    notice, this list of conditions and the following disclaimer in the
+- *    documentation and/or other materials provided with the distribution.
+- *
+- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+- * HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+- */
+-
+-#include <linux/random.h>
+-
+-#include "ecc.h"
+-
+-/* 256-bit curve */
+-#define ECC_BYTES 32
+-
+-#define MAX_TRIES 16
+-
+-/* Number of u64's needed */
+-#define NUM_ECC_DIGITS (ECC_BYTES / 8)
+-
+-struct ecc_point {
+-	u64 x[NUM_ECC_DIGITS];
+-	u64 y[NUM_ECC_DIGITS];
+-};
+-
+-typedef struct {
+-	u64 m_low;
+-	u64 m_high;
+-} uint128_t;
+-
+-#define CURVE_P_32 {	0xFFFFFFFFFFFFFFFFull, 0x00000000FFFFFFFFull, \
+-			0x0000000000000000ull, 0xFFFFFFFF00000001ull }
+-
+-#define CURVE_G_32 { \
+-		{	0xF4A13945D898C296ull, 0x77037D812DEB33A0ull,	\
+-			0xF8BCE6E563A440F2ull, 0x6B17D1F2E12C4247ull }, \
+-		{	0xCBB6406837BF51F5ull, 0x2BCE33576B315ECEull,	\
+-			0x8EE7EB4A7C0F9E16ull, 0x4FE342E2FE1A7F9Bull }	\
+-}
+-
+-#define CURVE_N_32 {	0xF3B9CAC2FC632551ull, 0xBCE6FAADA7179E84ull,	\
+-			0xFFFFFFFFFFFFFFFFull, 0xFFFFFFFF00000000ull }
+-
+-static u64 curve_p[NUM_ECC_DIGITS] = CURVE_P_32;
+-static struct ecc_point curve_g = CURVE_G_32;
+-static u64 curve_n[NUM_ECC_DIGITS] = CURVE_N_32;
+-
+-static void vli_clear(u64 *vli)
+-{
+-	int i;
+-
+-	for (i = 0; i < NUM_ECC_DIGITS; i++)
+-		vli[i] = 0;
+-}
+-
+-/* Returns true if vli == 0, false otherwise. */
+-static bool vli_is_zero(const u64 *vli)
+-{
+-	int i;
+-
+-	for (i = 0; i < NUM_ECC_DIGITS; i++) {
+-		if (vli[i])
+-			return false;
+-	}
+-
+-	return true;
+-}
+-
+-/* Returns nonzero if bit bit of vli is set. */
+-static u64 vli_test_bit(const u64 *vli, unsigned int bit)
+-{
+-	return (vli[bit / 64] & ((u64) 1 << (bit % 64)));
+-}
+-
+-/* Counts the number of 64-bit "digits" in vli. */
+-static unsigned int vli_num_digits(const u64 *vli)
+-{
+-	int i;
+-
+-	/* Search from the end until we find a non-zero digit.
+-	 * We do it in reverse because we expect that most digits will
+-	 * be nonzero.
+-	 */
+-	for (i = NUM_ECC_DIGITS - 1; i >= 0 && vli[i] == 0; i--);
+-
+-	return (i + 1);
+-}
+-
+-/* Counts the number of bits required for vli. */
+-static unsigned int vli_num_bits(const u64 *vli)
+-{
+-	unsigned int i, num_digits;
+-	u64 digit;
+-
+-	num_digits = vli_num_digits(vli);
+-	if (num_digits == 0)
+-		return 0;
+-
+-	digit = vli[num_digits - 1];
+-	for (i = 0; digit; i++)
+-		digit >>= 1;
+-
+-	return ((num_digits - 1) * 64 + i);
+-}
+-
+-/* Sets dest = src. */
+-static void vli_set(u64 *dest, const u64 *src)
+-{
+-	int i;
+-
+-	for (i = 0; i < NUM_ECC_DIGITS; i++)
+-		dest[i] = src[i];
+-}
+-
+-/* Returns sign of left - right. */
+-static int vli_cmp(const u64 *left, const u64 *right)
+-{
+-    int i;
+-
+-    for (i = NUM_ECC_DIGITS - 1; i >= 0; i--) {
+-	    if (left[i] > right[i])
+-		    return 1;
+-	    else if (left[i] < right[i])
+-		    return -1;
+-    }
+-
+-    return 0;
+-}
+-
+-/* Computes result = in << c, returning carry. Can modify in place
+- * (if result == in). 0 < shift < 64.
+- */
+-static u64 vli_lshift(u64 *result, const u64 *in,
+-			   unsigned int shift)
+-{
+-	u64 carry = 0;
+-	int i;
+-
+-	for (i = 0; i < NUM_ECC_DIGITS; i++) {
+-		u64 temp = in[i];
+-
+-		result[i] = (temp << shift) | carry;
+-		carry = temp >> (64 - shift);
+-	}
+-
+-	return carry;
+-}
+-
+-/* Computes vli = vli >> 1. */
+-static void vli_rshift1(u64 *vli)
+-{
+-	u64 *end = vli;
+-	u64 carry = 0;
+-
+-	vli += NUM_ECC_DIGITS;
+-
+-	while (vli-- > end) {
+-		u64 temp = *vli;
+-		*vli = (temp >> 1) | carry;
+-		carry = temp << 63;
+-	}
+-}
+-
+-/* Computes result = left + right, returning carry. Can modify in place. */
+-static u64 vli_add(u64 *result, const u64 *left,
+-			const u64 *right)
+-{
+-	u64 carry = 0;
+-	int i;
+-
+-	for (i = 0; i < NUM_ECC_DIGITS; i++) {
+-		u64 sum;
+-
+-		sum = left[i] + right[i] + carry;
+-		if (sum != left[i])
+-			carry = (sum < left[i]);
+-
+-		result[i] = sum;
+-	}
+-
+-	return carry;
+-}
+-
+-/* Computes result = left - right, returning borrow. Can modify in place. */
+-static u64 vli_sub(u64 *result, const u64 *left, const u64 *right)
+-{
+-	u64 borrow = 0;
+-	int i;
+-
+-	for (i = 0; i < NUM_ECC_DIGITS; i++) {
+-		u64 diff;
+-
+-		diff = left[i] - right[i] - borrow;
+-		if (diff != left[i])
+-			borrow = (diff > left[i]);
+-
+-		result[i] = diff;
+-	}
+-
+-	return borrow;
+-}
+-
+-static uint128_t mul_64_64(u64 left, u64 right)
+-{
+-	u64 a0 = left & 0xffffffffull;
+-	u64 a1 = left >> 32;
+-	u64 b0 = right & 0xffffffffull;
+-	u64 b1 = right >> 32;
+-	u64 m0 = a0 * b0;
+-	u64 m1 = a0 * b1;
+-	u64 m2 = a1 * b0;
+-	u64 m3 = a1 * b1;
+-	uint128_t result;
+-
+-	m2 += (m0 >> 32);
+-	m2 += m1;
+-
+-	/* Overflow */
+-	if (m2 < m1)
+-		m3 += 0x100000000ull;
+-
+-	result.m_low = (m0 & 0xffffffffull) | (m2 << 32);
+-	result.m_high = m3 + (m2 >> 32);
+-
+-	return result;
+-}
+-
+-static uint128_t add_128_128(uint128_t a, uint128_t b)
+-{
+-	uint128_t result;
+-
+-	result.m_low = a.m_low + b.m_low;
+-	result.m_high = a.m_high + b.m_high + (result.m_low < a.m_low);
+-
+-	return result;
+-}
+-
+-static void vli_mult(u64 *result, const u64 *left, const u64 *right)
+-{
+-	uint128_t r01 = { 0, 0 };
+-	u64 r2 = 0;
+-	unsigned int i, k;
+-
+-	/* Compute each digit of result in sequence, maintaining the
+-	 * carries.
+-	 */
+-	for (k = 0; k < NUM_ECC_DIGITS * 2 - 1; k++) {
+-		unsigned int min;
+-
+-		if (k < NUM_ECC_DIGITS)
+-			min = 0;
+-		else
+-			min = (k + 1) - NUM_ECC_DIGITS;
+-
+-		for (i = min; i <= k && i < NUM_ECC_DIGITS; i++) {
+-			uint128_t product;
+-
+-			product = mul_64_64(left[i], right[k - i]);
+-
+-			r01 = add_128_128(r01, product);
+-			r2 += (r01.m_high < product.m_high);
+-		}
+-
+-		result[k] = r01.m_low;
+-		r01.m_low = r01.m_high;
+-		r01.m_high = r2;
+-		r2 = 0;
+-	}
+-
+-	result[NUM_ECC_DIGITS * 2 - 1] = r01.m_low;
+-}
+-
+-static void vli_square(u64 *result, const u64 *left)
+-{
+-	uint128_t r01 = { 0, 0 };
+-	u64 r2 = 0;
+-	int i, k;
+-
+-	for (k = 0; k < NUM_ECC_DIGITS * 2 - 1; k++) {
+-		unsigned int min;
+-
+-		if (k < NUM_ECC_DIGITS)
+-			min = 0;
+-		else
+-			min = (k + 1) - NUM_ECC_DIGITS;
+-
+-		for (i = min; i <= k && i <= k - i; i++) {
+-			uint128_t product;
+-
+-			product = mul_64_64(left[i], left[k - i]);
+-
+-			if (i < k - i) {
+-				r2 += product.m_high >> 63;
+-				product.m_high = (product.m_high << 1) |
+-						 (product.m_low >> 63);
+-				product.m_low <<= 1;
+-			}
+-
+-			r01 = add_128_128(r01, product);
+-			r2 += (r01.m_high < product.m_high);
+-		}
+-
+-		result[k] = r01.m_low;
+-		r01.m_low = r01.m_high;
+-		r01.m_high = r2;
+-		r2 = 0;
+-	}
+-
+-	result[NUM_ECC_DIGITS * 2 - 1] = r01.m_low;
+-}
+-
+-/* Computes result = (left + right) % mod.
+- * Assumes that left < mod and right < mod, result != mod.
+- */
+-static void vli_mod_add(u64 *result, const u64 *left, const u64 *right,
+-			const u64 *mod)
+-{
+-	u64 carry;
+-
+-	carry = vli_add(result, left, right);
+-
+-	/* result > mod (result = mod + remainder), so subtract mod to
+-	 * get remainder.
+-	 */
+-	if (carry || vli_cmp(result, mod) >= 0)
+-		vli_sub(result, result, mod);
+-}
+-
+-/* Computes result = (left - right) % mod.
+- * Assumes that left < mod and right < mod, result != mod.
+- */
+-static void vli_mod_sub(u64 *result, const u64 *left, const u64 *right,
+-			const u64 *mod)
+-{
+-	u64 borrow = vli_sub(result, left, right);
+-
+-	/* In this case, p_result == -diff == (max int) - diff.
+-	 * Since -x % d == d - x, we can get the correct result from
+-	 * result + mod (with overflow).
+-	 */
+-	if (borrow)
+-		vli_add(result, result, mod);
+-}
+-
+-/* Computes result = product % curve_p
+-   from http://www.nsa.gov/ia/_files/nist-routines.pdf */
+-static void vli_mmod_fast(u64 *result, const u64 *product)
+-{
+-	u64 tmp[NUM_ECC_DIGITS];
+-	int carry;
+-
+-	/* t */
+-	vli_set(result, product);
+-
+-	/* s1 */
+-	tmp[0] = 0;
+-	tmp[1] = product[5] & 0xffffffff00000000ull;
+-	tmp[2] = product[6];
+-	tmp[3] = product[7];
+-	carry = vli_lshift(tmp, tmp, 1);
+-	carry += vli_add(result, result, tmp);
+-
+-	/* s2 */
+-	tmp[1] = product[6] << 32;
+-	tmp[2] = (product[6] >> 32) | (product[7] << 32);
+-	tmp[3] = product[7] >> 32;
+-	carry += vli_lshift(tmp, tmp, 1);
+-	carry += vli_add(result, result, tmp);
+-
+-	/* s3 */
+-	tmp[0] = product[4];
+-	tmp[1] = product[5] & 0xffffffff;
+-	tmp[2] = 0;
+-	tmp[3] = product[7];
+-	carry += vli_add(result, result, tmp);
+-
+-	/* s4 */
+-	tmp[0] = (product[4] >> 32) | (product[5] << 32);
+-	tmp[1] = (product[5] >> 32) | (product[6] & 0xffffffff00000000ull);
+-	tmp[2] = product[7];
+-	tmp[3] = (product[6] >> 32) | (product[4] << 32);
+-	carry += vli_add(result, result, tmp);
+-
+-	/* d1 */
+-	tmp[0] = (product[5] >> 32) | (product[6] << 32);
+-	tmp[1] = (product[6] >> 32);
+-	tmp[2] = 0;
+-	tmp[3] = (product[4] & 0xffffffff) | (product[5] << 32);
+-	carry -= vli_sub(result, result, tmp);
+-
+-	/* d2 */
+-	tmp[0] = product[6];
+-	tmp[1] = product[7];
+-	tmp[2] = 0;
+-	tmp[3] = (product[4] >> 32) | (product[5] & 0xffffffff00000000ull);
+-	carry -= vli_sub(result, result, tmp);
+-
+-	/* d3 */
+-	tmp[0] = (product[6] >> 32) | (product[7] << 32);
+-	tmp[1] = (product[7] >> 32) | (product[4] << 32);
+-	tmp[2] = (product[4] >> 32) | (product[5] << 32);
+-	tmp[3] = (product[6] << 32);
+-	carry -= vli_sub(result, result, tmp);
+-
+-	/* d4 */
+-	tmp[0] = product[7];
+-	tmp[1] = product[4] & 0xffffffff00000000ull;
+-	tmp[2] = product[5];
+-	tmp[3] = product[6] & 0xffffffff00000000ull;
+-	carry -= vli_sub(result, result, tmp);
+-
+-	if (carry < 0) {
+-		do {
+-			carry += vli_add(result, result, curve_p);
+-		} while (carry < 0);
+-	} else {
+-		while (carry || vli_cmp(curve_p, result) != 1)
+-			carry -= vli_sub(result, result, curve_p);
+-	}
+-}
+-
+-/* Computes result = (left * right) % curve_p. */
+-static void vli_mod_mult_fast(u64 *result, const u64 *left, const u64 *right)
+-{
+-	u64 product[2 * NUM_ECC_DIGITS];
+-
+-	vli_mult(product, left, right);
+-	vli_mmod_fast(result, product);
+-}
+-
+-/* Computes result = left^2 % curve_p. */
+-static void vli_mod_square_fast(u64 *result, const u64 *left)
+-{
+-	u64 product[2 * NUM_ECC_DIGITS];
+-
+-	vli_square(product, left);
+-	vli_mmod_fast(result, product);
+-}
+-
+-#define EVEN(vli) (!(vli[0] & 1))
+-/* Computes result = (1 / p_input) % mod. All VLIs are the same size.
+- * See "From Euclid's GCD to Montgomery Multiplication to the Great Divide"
+- * https://labs.oracle.com/techrep/2001/smli_tr-2001-95.pdf
+- */
+-static void vli_mod_inv(u64 *result, const u64 *input, const u64 *mod)
+-{
+-	u64 a[NUM_ECC_DIGITS], b[NUM_ECC_DIGITS];
+-	u64 u[NUM_ECC_DIGITS], v[NUM_ECC_DIGITS];
+-	u64 carry;
+-	int cmp_result;
+-
+-	if (vli_is_zero(input)) {
+-		vli_clear(result);
+-		return;
+-	}
+-
+-	vli_set(a, input);
+-	vli_set(b, mod);
+-	vli_clear(u);
+-	u[0] = 1;
+-	vli_clear(v);
+-
+-	while ((cmp_result = vli_cmp(a, b)) != 0) {
+-		carry = 0;
+-
+-		if (EVEN(a)) {
+-			vli_rshift1(a);
+-
+-			if (!EVEN(u))
+-				carry = vli_add(u, u, mod);
+-
+-			vli_rshift1(u);
+-			if (carry)
+-				u[NUM_ECC_DIGITS - 1] |= 0x8000000000000000ull;
+-		} else if (EVEN(b)) {
+-			vli_rshift1(b);
+-
+-			if (!EVEN(v))
+-				carry = vli_add(v, v, mod);
+-
+-			vli_rshift1(v);
+-			if (carry)
+-				v[NUM_ECC_DIGITS - 1] |= 0x8000000000000000ull;
+-		} else if (cmp_result > 0) {
+-			vli_sub(a, a, b);
+-			vli_rshift1(a);
+-
+-			if (vli_cmp(u, v) < 0)
+-				vli_add(u, u, mod);
+-
+-			vli_sub(u, u, v);
+-			if (!EVEN(u))
+-				carry = vli_add(u, u, mod);
+-
+-			vli_rshift1(u);
+-			if (carry)
+-				u[NUM_ECC_DIGITS - 1] |= 0x8000000000000000ull;
+-		} else {
+-			vli_sub(b, b, a);
+-			vli_rshift1(b);
+-
+-			if (vli_cmp(v, u) < 0)
+-				vli_add(v, v, mod);
+-
+-			vli_sub(v, v, u);
+-			if (!EVEN(v))
+-				carry = vli_add(v, v, mod);
+-
+-			vli_rshift1(v);
+-			if (carry)
+-				v[NUM_ECC_DIGITS - 1] |= 0x8000000000000000ull;
+-		}
+-	}
+-
+-	vli_set(result, u);
+-}
+-
+-/* ------ Point operations ------ */
+-
+-/* Returns true if p_point is the point at infinity, false otherwise. */
+-static bool ecc_point_is_zero(const struct ecc_point *point)
+-{
+-	return (vli_is_zero(point->x) && vli_is_zero(point->y));
+-}
+-
+-/* Point multiplication algorithm using Montgomery's ladder with co-Z
+- * coordinates. From http://eprint.iacr.org/2011/338.pdf
+- */
+-
+-/* Double in place */
+-static void ecc_point_double_jacobian(u64 *x1, u64 *y1, u64 *z1)
+-{
+-	/* t1 = x, t2 = y, t3 = z */
+-	u64 t4[NUM_ECC_DIGITS];
+-	u64 t5[NUM_ECC_DIGITS];
+-
+-	if (vli_is_zero(z1))
+-		return;
+-
+-	vli_mod_square_fast(t4, y1);   /* t4 = y1^2 */
+-	vli_mod_mult_fast(t5, x1, t4); /* t5 = x1*y1^2 = A */
+-	vli_mod_square_fast(t4, t4);   /* t4 = y1^4 */
+-	vli_mod_mult_fast(y1, y1, z1); /* t2 = y1*z1 = z3 */
+-	vli_mod_square_fast(z1, z1);   /* t3 = z1^2 */
+-
+-	vli_mod_add(x1, x1, z1, curve_p); /* t1 = x1 + z1^2 */
+-	vli_mod_add(z1, z1, z1, curve_p); /* t3 = 2*z1^2 */
+-	vli_mod_sub(z1, x1, z1, curve_p); /* t3 = x1 - z1^2 */
+-	vli_mod_mult_fast(x1, x1, z1);    /* t1 = x1^2 - z1^4 */
+-
+-	vli_mod_add(z1, x1, x1, curve_p); /* t3 = 2*(x1^2 - z1^4) */
+-	vli_mod_add(x1, x1, z1, curve_p); /* t1 = 3*(x1^2 - z1^4) */
+-	if (vli_test_bit(x1, 0)) {
+-		u64 carry = vli_add(x1, x1, curve_p);
+-		vli_rshift1(x1);
+-		x1[NUM_ECC_DIGITS - 1] |= carry << 63;
+-	} else {
+-		vli_rshift1(x1);
+-	}
+-	/* t1 = 3/2*(x1^2 - z1^4) = B */
+-
+-	vli_mod_square_fast(z1, x1);      /* t3 = B^2 */
+-	vli_mod_sub(z1, z1, t5, curve_p); /* t3 = B^2 - A */
+-	vli_mod_sub(z1, z1, t5, curve_p); /* t3 = B^2 - 2A = x3 */
+-	vli_mod_sub(t5, t5, z1, curve_p); /* t5 = A - x3 */
+-	vli_mod_mult_fast(x1, x1, t5);    /* t1 = B * (A - x3) */
+-	vli_mod_sub(t4, x1, t4, curve_p); /* t4 = B * (A - x3) - y1^4 = y3 */
+-
+-	vli_set(x1, z1);
+-	vli_set(z1, y1);
+-	vli_set(y1, t4);
+-}
+-
+-/* Modify (x1, y1) => (x1 * z^2, y1 * z^3) */
+-static void apply_z(u64 *x1, u64 *y1, u64 *z)
+-{
+-	u64 t1[NUM_ECC_DIGITS];
+-
+-	vli_mod_square_fast(t1, z);    /* z^2 */
+-	vli_mod_mult_fast(x1, x1, t1); /* x1 * z^2 */
+-	vli_mod_mult_fast(t1, t1, z);  /* z^3 */
+-	vli_mod_mult_fast(y1, y1, t1); /* y1 * z^3 */
+-}
+-
+-/* P = (x1, y1) => 2P, (x2, y2) => P' */
+-static void xycz_initial_double(u64 *x1, u64 *y1, u64 *x2, u64 *y2,
+-				u64 *p_initial_z)
+-{
+-	u64 z[NUM_ECC_DIGITS];
+-
+-	vli_set(x2, x1);
+-	vli_set(y2, y1);
+-
+-	vli_clear(z);
+-	z[0] = 1;
+-
+-	if (p_initial_z)
+-		vli_set(z, p_initial_z);
+-
+-	apply_z(x1, y1, z);
+-
+-	ecc_point_double_jacobian(x1, y1, z);
+-
+-	apply_z(x2, y2, z);
+-}
+-
+-/* Input P = (x1, y1, Z), Q = (x2, y2, Z)
+- * Output P' = (x1', y1', Z3), P + Q = (x3, y3, Z3)
+- * or P => P', Q => P + Q
+- */
+-static void xycz_add(u64 *x1, u64 *y1, u64 *x2, u64 *y2)
+-{
+-	/* t1 = X1, t2 = Y1, t3 = X2, t4 = Y2 */
+-	u64 t5[NUM_ECC_DIGITS];
+-
+-	vli_mod_sub(t5, x2, x1, curve_p); /* t5 = x2 - x1 */
+-	vli_mod_square_fast(t5, t5);      /* t5 = (x2 - x1)^2 = A */
+-	vli_mod_mult_fast(x1, x1, t5);    /* t1 = x1*A = B */
+-	vli_mod_mult_fast(x2, x2, t5);    /* t3 = x2*A = C */
+-	vli_mod_sub(y2, y2, y1, curve_p); /* t4 = y2 - y1 */
+-	vli_mod_square_fast(t5, y2);      /* t5 = (y2 - y1)^2 = D */
+-
+-	vli_mod_sub(t5, t5, x1, curve_p); /* t5 = D - B */
+-	vli_mod_sub(t5, t5, x2, curve_p); /* t5 = D - B - C = x3 */
+-	vli_mod_sub(x2, x2, x1, curve_p); /* t3 = C - B */
+-	vli_mod_mult_fast(y1, y1, x2);    /* t2 = y1*(C - B) */
+-	vli_mod_sub(x2, x1, t5, curve_p); /* t3 = B - x3 */
+-	vli_mod_mult_fast(y2, y2, x2);    /* t4 = (y2 - y1)*(B - x3) */
+-	vli_mod_sub(y2, y2, y1, curve_p); /* t4 = y3 */
+-
+-	vli_set(x2, t5);
+-}
+-
+-/* Input P = (x1, y1, Z), Q = (x2, y2, Z)
+- * Output P + Q = (x3, y3, Z3), P - Q = (x3', y3', Z3)
+- * or P => P - Q, Q => P + Q
+- */
+-static void xycz_add_c(u64 *x1, u64 *y1, u64 *x2, u64 *y2)
+-{
+-	/* t1 = X1, t2 = Y1, t3 = X2, t4 = Y2 */
+-	u64 t5[NUM_ECC_DIGITS];
+-	u64 t6[NUM_ECC_DIGITS];
+-	u64 t7[NUM_ECC_DIGITS];
+-
+-	vli_mod_sub(t5, x2, x1, curve_p); /* t5 = x2 - x1 */
+-	vli_mod_square_fast(t5, t5);      /* t5 = (x2 - x1)^2 = A */
+-	vli_mod_mult_fast(x1, x1, t5);    /* t1 = x1*A = B */
+-	vli_mod_mult_fast(x2, x2, t5);    /* t3 = x2*A = C */
+-	vli_mod_add(t5, y2, y1, curve_p); /* t4 = y2 + y1 */
+-	vli_mod_sub(y2, y2, y1, curve_p); /* t4 = y2 - y1 */
+-
+-	vli_mod_sub(t6, x2, x1, curve_p); /* t6 = C - B */
+-	vli_mod_mult_fast(y1, y1, t6);    /* t2 = y1 * (C - B) */
+-	vli_mod_add(t6, x1, x2, curve_p); /* t6 = B + C */
+-	vli_mod_square_fast(x2, y2);      /* t3 = (y2 - y1)^2 */
+-	vli_mod_sub(x2, x2, t6, curve_p); /* t3 = x3 */
+-
+-	vli_mod_sub(t7, x1, x2, curve_p); /* t7 = B - x3 */
+-	vli_mod_mult_fast(y2, y2, t7);    /* t4 = (y2 - y1)*(B - x3) */
+-	vli_mod_sub(y2, y2, y1, curve_p); /* t4 = y3 */
+-
+-	vli_mod_square_fast(t7, t5);      /* t7 = (y2 + y1)^2 = F */
+-	vli_mod_sub(t7, t7, t6, curve_p); /* t7 = x3' */
+-	vli_mod_sub(t6, t7, x1, curve_p); /* t6 = x3' - B */
+-	vli_mod_mult_fast(t6, t6, t5);    /* t6 = (y2 + y1)*(x3' - B) */
+-	vli_mod_sub(y1, t6, y1, curve_p); /* t2 = y3' */
+-
+-	vli_set(x1, t7);
+-}
+-
+-static void ecc_point_mult(struct ecc_point *result,
+-			   const struct ecc_point *point, u64 *scalar,
+-			   u64 *initial_z, int num_bits)
+-{
+-	/* R0 and R1 */
+-	u64 rx[2][NUM_ECC_DIGITS];
+-	u64 ry[2][NUM_ECC_DIGITS];
+-	u64 z[NUM_ECC_DIGITS];
+-	int i, nb;
+-
+-	vli_set(rx[1], point->x);
+-	vli_set(ry[1], point->y);
+-
+-	xycz_initial_double(rx[1], ry[1], rx[0], ry[0], initial_z);
+-
+-	for (i = num_bits - 2; i > 0; i--) {
+-		nb = !vli_test_bit(scalar, i);
+-		xycz_add_c(rx[1 - nb], ry[1 - nb], rx[nb], ry[nb]);
+-		xycz_add(rx[nb], ry[nb], rx[1 - nb], ry[1 - nb]);
+-	}
+-
+-	nb = !vli_test_bit(scalar, 0);
+-	xycz_add_c(rx[1 - nb], ry[1 - nb], rx[nb], ry[nb]);
+-
+-	/* Find final 1/Z value. */
+-	vli_mod_sub(z, rx[1], rx[0], curve_p); /* X1 - X0 */
+-	vli_mod_mult_fast(z, z, ry[1 - nb]); /* Yb * (X1 - X0) */
+-	vli_mod_mult_fast(z, z, point->x);   /* xP * Yb * (X1 - X0) */
+-	vli_mod_inv(z, z, curve_p);          /* 1 / (xP * Yb * (X1 - X0)) */
+-	vli_mod_mult_fast(z, z, point->y);   /* yP / (xP * Yb * (X1 - X0)) */
+-	vli_mod_mult_fast(z, z, rx[1 - nb]); /* Xb * yP / (xP * Yb * (X1 - X0)) */
+-	/* End 1/Z calculation */
+-
+-	xycz_add(rx[nb], ry[nb], rx[1 - nb], ry[1 - nb]);
+-
+-	apply_z(rx[0], ry[0], z);
+-
+-	vli_set(result->x, rx[0]);
+-	vli_set(result->y, ry[0]);
+-}
+-
+-static void ecc_bytes2native(const u8 bytes[ECC_BYTES],
+-			     u64 native[NUM_ECC_DIGITS])
+-{
+-	int i;
+-
+-	for (i = 0; i < NUM_ECC_DIGITS; i++) {
+-		const u8 *digit = bytes + 8 * (NUM_ECC_DIGITS - 1 - i);
+-
+-		native[NUM_ECC_DIGITS - 1 - i] =
+-				((u64) digit[0] << 0) |
+-				((u64) digit[1] << 8) |
+-				((u64) digit[2] << 16) |
+-				((u64) digit[3] << 24) |
+-				((u64) digit[4] << 32) |
+-				((u64) digit[5] << 40) |
+-				((u64) digit[6] << 48) |
+-				((u64) digit[7] << 56);
+-	}
+-}
+-
+-static void ecc_native2bytes(const u64 native[NUM_ECC_DIGITS],
+-			     u8 bytes[ECC_BYTES])
+-{
+-	int i;
+-
+-	for (i = 0; i < NUM_ECC_DIGITS; i++) {
+-		u8 *digit = bytes + 8 * (NUM_ECC_DIGITS - 1 - i);
+-
+-		digit[0] = native[NUM_ECC_DIGITS - 1 - i] >> 0;
+-		digit[1] = native[NUM_ECC_DIGITS - 1 - i] >> 8;
+-		digit[2] = native[NUM_ECC_DIGITS - 1 - i] >> 16;
+-		digit[3] = native[NUM_ECC_DIGITS - 1 - i] >> 24;
+-		digit[4] = native[NUM_ECC_DIGITS - 1 - i] >> 32;
+-		digit[5] = native[NUM_ECC_DIGITS - 1 - i] >> 40;
+-		digit[6] = native[NUM_ECC_DIGITS - 1 - i] >> 48;
+-		digit[7] = native[NUM_ECC_DIGITS - 1 - i] >> 56;
+-	}
+-}
+-
+-bool ecc_make_key(u8 public_key[64], u8 private_key[32])
+-{
+-	struct ecc_point pk;
+-	u64 priv[NUM_ECC_DIGITS];
+-	unsigned int tries = 0;
+-
+-	do {
+-		if (tries++ >= MAX_TRIES)
+-			return false;
+-
+-		get_random_bytes(priv, ECC_BYTES);
+-
+-		if (vli_is_zero(priv))
+-			continue;
+-
+-		/* Make sure the private key is in the range [1, n-1]. */
+-		if (vli_cmp(curve_n, priv) != 1)
+-			continue;
+-
+-		ecc_point_mult(&pk, &curve_g, priv, NULL, vli_num_bits(priv));
+-	} while (ecc_point_is_zero(&pk));
+-
+-	ecc_native2bytes(priv, private_key);
+-	ecc_native2bytes(pk.x, public_key);
+-	ecc_native2bytes(pk.y, &public_key[32]);
+-
+-	return true;
+-}
+-
+-bool ecdh_shared_secret(const u8 public_key[64], const u8 private_key[32],
+-		        u8 secret[32])
+-{
+-	u64 priv[NUM_ECC_DIGITS];
+-	u64 rand[NUM_ECC_DIGITS];
+-	struct ecc_point product, pk;
+-
+-	get_random_bytes(rand, ECC_BYTES);
+-
+-	ecc_bytes2native(public_key, pk.x);
+-	ecc_bytes2native(&public_key[32], pk.y);
+-	ecc_bytes2native(private_key, priv);
+-
+-	ecc_point_mult(&product, &pk, priv, rand, vli_num_bits(priv));
+-
+-	ecc_native2bytes(product.x, secret);
+-
+-	return !ecc_point_is_zero(&product);
+-}
+diff --git a/net/bluetooth/ecc.h b/net/bluetooth/ecc.h
+deleted file mode 100644
+index 8d6a2f4..0000000
+--- a/net/bluetooth/ecc.h
++++ /dev/null
+@@ -1,54 +0,0 @@
+-/*
+- * Copyright (c) 2013, Kenneth MacKay
+- * All rights reserved.
+- *
+- * Redistribution and use in source and binary forms, with or without
+- * modification, are permitted provided that the following conditions are
+- * met:
+- *  * Redistributions of source code must retain the above copyright
+- *   notice, this list of conditions and the following disclaimer.
+- *  * Redistributions in binary form must reproduce the above copyright
+- *    notice, this list of conditions and the following disclaimer in the
+- *    documentation and/or other materials provided with the distribution.
+- *
+- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+- * HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+- */
+-
+-/* Create a public/private key pair.
+- * Outputs:
+- *	public_key  - Will be filled in with the public key.
+- *	private_key - Will be filled in with the private key.
+- *
+- * Returns true if the key pair was generated successfully, false
+- * if an error occurred. The keys are with the LSB first.
+- */
+-bool ecc_make_key(u8 public_key[64], u8 private_key[32]);
+-
+-/* Compute a shared secret given your secret key and someone else's
+- * public key.
+- * Note: It is recommended that you hash the result of ecdh_shared_secret
+- * before using it for symmetric encryption or HMAC.
+- *
+- * Inputs:
+- *	public_key  - The public key of the remote party
+- *	private_key - Your private key.
+- *
+- * Outputs:
+- *	secret - Will be filled in with the shared secret value.
+- *
+- * Returns true if the shared secret was generated successfully, false
+- * if an error occurred. Both input and output parameters are with the
+- * LSB first.
+- */
+-bool ecdh_shared_secret(const u8 public_key[64], const u8 private_key[32],
+-		        u8 secret[32]);
+diff --git a/net/bluetooth/ecdh_helper.c b/net/bluetooth/ecdh_helper.c
+new file mode 100644
+index 0000000..a09df45
+--- /dev/null
++++ b/net/bluetooth/ecdh_helper.c
+@@ -0,0 +1,204 @@
++/*
++ * ECDH helper functions - KPP wrappings
++ *
++ * Copyright (C) 2016 Intel Corporation
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 as
++ * published by the Free Software Foundation;
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
++ * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT OF THIRD PARTY RIGHTS.
++ * IN NO EVENT SHALL THE COPYRIGHT HOLDER(S) AND AUTHOR(S) BE LIABLE FOR ANY
++ * CLAIM, OR ANY SPECIAL INDIRECT OR CONSEQUENTIAL DAMAGES, OR ANY DAMAGES
++ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
++ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
++ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
++ *
++ * ALL LIABILITY, INCLUDING LIABILITY FOR INFRINGEMENT OF ANY PATENTS,
++ * COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS, RELATING TO USE OF THIS
++ * SOFTWARE IS DISCLAIMED.
++ */
++#include "ecdh_helper.h"
++
++#include <linux/random.h>
++#include <linux/scatterlist.h>
++#include <crypto/kpp.h>
++#include <crypto/ecdh.h>
++
++struct ecdh_completion {
++	struct completion completion;
++	int err;
++};
++
++static void ecdh_complete(struct crypto_async_request *req, int err)
++{
++	struct ecdh_completion *res = req->data;
++
++	if (err == -EINPROGRESS)
++		return;
++
++	res->err = err;
++	complete(&res->completion);
++}
++
++static inline void swap_digits(u64 *in, u64 *out, unsigned int ndigits)
++{
++	int i;
++
++	for (i = 0; i < ndigits; i++)
++		out[i] = __swab64(in[ndigits - 1 - i]);
++}
++
++bool compute_ecdh_secret(const u8 public_key[64], const u8 private_key[32],
++			 u8 secret[32])
++{
++	struct crypto_kpp *tfm;
++	struct kpp_request *req;
++	struct ecdh_params p;
++	struct ecdh_completion result;
++	struct scatterlist src, dst;
++	u8 tmp[64];
++	int err = -ENOMEM;
++
++	tfm = crypto_alloc_kpp("ecdh", CRYPTO_ALG_INTERNAL, 0);
++	if (IS_ERR(tfm)) {
++		pr_err("alg: kpp: Failed to load tfm for kpp: %ld\n",
++		       PTR_ERR(tfm));
++		return false;
++	}
++
++	req = kpp_request_alloc(tfm, GFP_KERNEL);
++	if (!req)
++		goto free_kpp;
++
++	init_completion(&result.completion);
++
++	/* Set curve_id */
++	p.curve_id = ECC_CURVE_NIST_P256;
++	err = crypto_kpp_set_params(tfm, (void *)&p);
++	if (err)
++		goto free_req;
++
++	/* Security Manager Protocol holds digits in litte-endian order
++	 * while ECC API expect big-endian data
++	 */
++	swap_digits((u64 *)private_key, (u64 *)tmp, 4);
++
++	/* Set A private Key */
++	err = crypto_kpp_set_secret(tfm, (void *)tmp, 32);
++	if (err)
++		goto free_all;
++
++	swap_digits((u64 *)public_key, (u64 *)tmp, 4); /* x */
++	swap_digits((u64 *)&public_key[32], (u64 *)&tmp[32], 4); /* y */
++
++	sg_init_one(&src, tmp, 64);
++	sg_init_one(&dst, secret, 32);
++	kpp_request_set_input(req, &src, 64);
++	kpp_request_set_output(req, &dst, 32);
++	kpp_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
++				 ecdh_complete, &result);
++	err = crypto_kpp_compute_shared_secret(req);
++	if (err == -EINPROGRESS) {
++		wait_for_completion(&result.completion);
++		err = result.err;
++	}
++	if (err < 0) {
++		pr_err("alg: ecdh: compute shard secret test failed. err %d\n",
++		       err);
++		goto free_all;
++	}
++
++	swap_digits((u64 *)secret, (u64 *)tmp, 4);
++	memcpy(secret, tmp, 32);
++
++free_all:
++free_req:
++	kpp_request_free(req);
++free_kpp:
++	crypto_free_kpp(tfm);
++	return (err == 0);
++}
++
++bool generate_ecdh_keys(u8 public_key[64], u8 private_key[32])
++{
++	struct crypto_kpp *tfm;
++	struct kpp_request *req;
++	struct ecdh_params p;
++	struct ecdh_completion result;
++	struct scatterlist dst;
++	u8 tmp[64];
++	int err = -ENOMEM;
++	const unsigned short max_tries = 16;
++	unsigned short tries = 0;
++
++	tfm = crypto_alloc_kpp("ecdh", CRYPTO_ALG_INTERNAL, 0);
++	if (IS_ERR(tfm)) {
++		pr_err("alg: kpp: Failed to load tfm for kpp: %ld\n",
++		       PTR_ERR(tfm));
++		return false;
++	}
++
++	req = kpp_request_alloc(tfm, GFP_KERNEL);
++	if (!req)
++		goto free_kpp;
++
++	init_completion(&result.completion);
++
++	/* Set curve_id */
++	p.curve_id = ECC_CURVE_NIST_P256;
++	err = crypto_kpp_set_params(tfm, (void *)&p);
++	if (err)
++		goto free_req;
++
++	do {
++		if (tries++ >= max_tries)
++			goto free_all;
++
++		get_random_bytes(private_key, 32);
++
++		/* Set private Key */
++		err = crypto_kpp_set_secret(tfm, (void *)private_key, 32);
++		if (err)
++			goto free_all;
++
++		sg_init_one(&dst, tmp, 64);
++		kpp_request_set_output(req, &dst, 64);
++		kpp_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
++					 ecdh_complete, &result);
++
++		err = crypto_kpp_generate_public_key(req);
++
++		if (err == -EINPROGRESS) {
++			wait_for_completion(&result.completion);
++			err = result.err;
++		}
++
++		/* Private key is not valid. Regenerate */
++		if (err == -EINVAL)
++			continue;
++
++		if (err < 0)
++			goto free_all;
++		else
++			break;
++
++	} while (true);
++
++	/* Keys are handed back in little endian as expected by Security
++	 * Manager Protocol
++	 */
++	swap_digits((u64 *)tmp, (u64 *)public_key, 4); /* x */
++	swap_digits((u64 *)&tmp[32], (u64 *)&public_key[32], 4); /* y */
++	swap_digits((u64 *)private_key, (u64 *)tmp, 4);
++	memcpy(private_key, tmp, 32);
++
++free_all:
++free_req:
++	kpp_request_free(req);
++free_kpp:
++	crypto_free_kpp(tfm);
++	return (err == 0);
++}
+diff --git a/net/bluetooth/ecdh_helper.h b/net/bluetooth/ecdh_helper.h
+new file mode 100644
+index 0000000..726a500
+--- /dev/null
++++ b/net/bluetooth/ecdh_helper.h
+@@ -0,0 +1,27 @@
++/*
++ * ECDH helper functions - KPP wrappings
++ *
++ * Copyright (C) 2016 Intel Corporation
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 as
++ * published by the Free Software Foundation;
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
++ * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT OF THIRD PARTY RIGHTS.
++ * IN NO EVENT SHALL THE COPYRIGHT HOLDER(S) AND AUTHOR(S) BE LIABLE FOR ANY
++ * CLAIM, OR ANY SPECIAL INDIRECT OR CONSEQUENTIAL DAMAGES, OR ANY DAMAGES
++ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
++ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
++ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
++ *
++ * ALL LIABILITY, INCLUDING LIABILITY FOR INFRINGEMENT OF ANY PATENTS,
++ * COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS, RELATING TO USE OF THIS
++ * SOFTWARE IS DISCLAIMED.
++ */
++#include <linux/types.h>
++
++bool compute_ecdh_secret(const u8 pub_a[64], const u8 priv_b[32],
++			 u8 secret[32]);
++bool generate_ecdh_keys(u8 public_key[64], u8 private_key[32]);
+diff --git a/net/bluetooth/selftest.c b/net/bluetooth/selftest.c
+index dc688f1..efef281 100644
+--- a/net/bluetooth/selftest.c
++++ b/net/bluetooth/selftest.c
+@@ -26,7 +26,7 @@
+ #include <net/bluetooth/bluetooth.h>
+ #include <net/bluetooth/hci_core.h>
+ 
+-#include "ecc.h"
++#include "ecdh_helper.h"
+ #include "smp.h"
+ #include "selftest.h"
+ 
+@@ -144,8 +144,8 @@ static int __init test_ecdh_sample(const u8 priv_a[32], const u8 priv_b[32],
+ {
+ 	u8 dhkey_a[32], dhkey_b[32];
+ 
+-	ecdh_shared_secret(pub_b, priv_a, dhkey_a);
+-	ecdh_shared_secret(pub_a, priv_b, dhkey_b);
++	compute_ecdh_secret(pub_b, priv_a, dhkey_a);
++	compute_ecdh_secret(pub_a, priv_b, dhkey_b);
+ 
+ 	if (memcmp(dhkey_a, dhkey, 32))
+ 		return -EINVAL;
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index 50976a6..083e176 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -31,7 +31,7 @@
+ #include <net/bluetooth/l2cap.h>
+ #include <net/bluetooth/mgmt.h>
+ 
+-#include "ecc.h"
++#include "ecdh_helper.h"
+ #include "smp.h"
+ 
+ #define SMP_DEV(hdev) \
+@@ -564,7 +564,7 @@ int smp_generate_oob(struct hci_dev *hdev, u8 hash[16], u8 rand[16])
+ 	} else {
+ 		while (true) {
+ 			/* Generate local key pair for Secure Connections */
+-			if (!ecc_make_key(smp->local_pk, smp->local_sk))
++			if (!generate_ecdh_keys(smp->local_pk, smp->local_sk))
+ 				return -EIO;
+ 
+ 			/* This is unlikely, but we need to check that
+@@ -1862,7 +1862,7 @@ static u8 sc_send_public_key(struct smp_chan *smp)
+ 	} else {
+ 		while (true) {
+ 			/* Generate local key pair for Secure Connections */
+-			if (!ecc_make_key(smp->local_pk, smp->local_sk))
++			if (!generate_ecdh_keys(smp->local_pk, smp->local_sk))
+ 				return SMP_UNSPECIFIED;
+ 
+ 			/* This is unlikely, but we need to check that
+@@ -2630,7 +2630,7 @@ static int smp_cmd_public_key(struct l2cap_conn *conn, struct sk_buff *skb)
+ 	SMP_DBG("Remote Public Key X: %32phN", smp->remote_pk);
+ 	SMP_DBG("Remote Public Key Y: %32phN", smp->remote_pk + 32);
+ 
+-	if (!ecdh_shared_secret(smp->remote_pk, smp->local_sk, smp->dhkey))
++	if (!compute_ecdh_secret(smp->remote_pk, smp->local_sk, smp->dhkey))
+ 		return SMP_UNSPECIFIED;
+ 
+ 	SMP_DBG("DHKey %32phN", smp->dhkey);
 -- 
-2.4.11
-
+2.7.4
