@@ -1,46 +1,47 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <85edbbc7-91ca-368a-1a2c-db5463a22df5@gmail.com>
-References: <85edbbc7-91ca-368a-1a2c-db5463a22df5@gmail.com>
+In-Reply-To: <CAL2sZR7LssB-ptmvhHx2HfMwgODO6S=MW9RVGD5W1Hqr2OPGtA@mail.gmail.com>
+References: <CAL2sZR6evPuMOd1PDvrffQt9tkcR5jEBCJuHjJecKxaj++4_Qg@mail.gmail.com>
+ <CAL2sZR7LssB-ptmvhHx2HfMwgODO6S=MW9RVGD5W1Hqr2OPGtA@mail.gmail.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Fri, 3 Jun 2016 13:11:34 +0300
-Message-ID: <CABBYNZ+PT=jMXvfem_n9u=P96p1fFG0GWDwrPmg7N3+Ebt6Rxw@mail.gmail.com>
-Subject: Re: Proximity Profile (PXP) Reporter
-To: Marco Trapanese <marcotrapanese@gmail.com>
+Date: Fri, 3 Jun 2016 13:06:57 +0300
+Message-ID: <CABBYNZKxg0uBZFOQjCY52EO320Z8VJ35tc7aN-Y0XB_OmVdAEA@mail.gmail.com>
+Subject: Re: Problem with l2pinging an iphone
+To: Arnold Maderthaner <arnold@maderthaner.me>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marco,
+Hi Arnold,
 
-On Fri, Jun 3, 2016 at 10:03 AM, Marco Trapanese
-<marcotrapanese@gmail.com> wrote:
+On Tue, May 31, 2016 at 10:11 AM, Arnold Maderthaner
+<arnold@maderthaner.me> wrote:
+> Hi !
 >
+> I want to use bluetooth for presence detection in my home utilizing my
+> iphone bluetooth.
+> I have 2 systems at the moment: 1x Intel NUC with onboard bluetooth
+> and a Raspberry Pi 3.
 >
-> I have a linux-based machine, which runs bluez 5.39. I want to setup a
-> Proximity Reporter on that:
+> My problem is that on my NUC I always get a "Permission Denied" error
+> which I don't understand vs. on my RP3 with the same iphone it just
+> works.
 >
-> https://developer.bluetooth.org/TechnologyOverview/Pages/PXP.aspx
->
-> I edited the proximity.conf file:
->
-> https://github.com/r10r/bluez/blob/master/profiles/proximity/proximity.conf
->
-> [General]
-> Disable=
->
-> in order to enable all options. Now, I don't know how to "start" the
-> Reporter service. I would use a smartphone (Android or iOS) with any App as
-> Monitor to connect and "track" my machine.
->
-> Please, would you help me to understand how to use this profile?
+> Attached I have 2 hcidumps. Could someone look at those and tell me
+> what might be wrong ?
 
-PXP plugin is currently not working, the API has changed making it
-deprecated, the recommended way to use GATT profiles/service is to use
-the D-Bus API which you can find the documentation here:
+Looks like the NUC is triggering paring while RPI 3 doesn't, perhaps
+at some point you had the NUC paired but you remove the link-key
+locally (by removing the device) but iOS still has the link-key which
+makes it trigger authentication which fails with the following error:
 
-https://git.kernel.org/cgit/bluetooth/bluez.git/tree/doc/gatt-api.txt
+Reason: Remote Device Terminated Connection due to Low Resources
+
+It could be that the iOS device is running out of slots to store the
+new link-key, anyway try removing the NUC from the iPhone and see if
+that helps.
+
 
 -- 
 Luiz Augusto von Dentz
