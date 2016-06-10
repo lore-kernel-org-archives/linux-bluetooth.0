@@ -1,37 +1,27 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Date: Fri, 10 Jun 2016 15:21:39 +0200
-From: Miroslav Koskar <mk@mkoskar.com>
-To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Subject: [PATCH] core/service: Allow disconnected -> connected state change
-Message-ID: <20160610132139.GA2514@mkoskar.com>
+Subject: Re: How to initialise bcm4354A2 with 3.10 kernel?
+To: Qingtao Cao <qingtao.cao.au@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+References: <CAPcThSGPMaqJ9zr5fPWM38YH+2DE5M7a5oBNM4pUa3g1Xdba1w@mail.gmail.com>
+From: lpoulain <loic.poulain@intel.com>
+Message-ID: <575A749A.1090409@intel.com>
+Date: Fri, 10 Jun 2016 10:04:42 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CAPcThSGPMaqJ9zr5fPWM38YH+2DE5M7a5oBNM4pUa3g1Xdba1w@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-By ignoring case where service->state == BTD_SERVICE_STATE_DISCONNECTED
-in btd_service_connecting_complete(), state_callbacks don't get
-executed. Such case occurs when e.g., phone using a2dp-source profile
-connects to the bluez. Because no state_callbacks are executed
-(including one added by policy plugin) no reconnection is attempted
-after connection timeout, although if situation is reversed (bluez
-connects to the phone) reconnection works.
----
- src/service.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Hi Harry,
 
-diff --git a/src/service.c b/src/service.c
-index f7912f5..0da14ab 100644
---- a/src/service.c
-+++ b/src/service.c
-@@ -353,7 +353,8 @@ bool btd_service_remove_state_cb(unsigned int id)
- 
- void btd_service_connecting_complete(struct btd_service *service, int err)
- {
--	if (service->state != BTD_SERVICE_STATE_CONNECTING)
-+	if (service->state != BTD_SERVICE_STATE_DISCONNECTED &&
-+			service->state != BTD_SERVICE_STATE_CONNECTING)
- 		return;
- 
- 	if (err == 0)
+> Dear community,
+> r
+> I am trying to use the brcm_patchram_plus program to initialise
+> broadcom bcm4354A2 on my target with 3.10 Linux kernel. Currently the
+> hci0 can be found UP, however, it doesn't seem to function properly.
 
+Did you try to init the chip with hciattach (bcm43xx) ?
+If yes, do you reproduce the same issue ?
+
+Regards,
+Loic
