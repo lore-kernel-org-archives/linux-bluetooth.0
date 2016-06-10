@@ -1,54 +1,37 @@
-Return-Path: <SRS0=tFU8=SD=m4x.org=yvain.thonnart@bounces.m4x.org>
-From: Yvain THONNART <yvain.thonnart@m4x.org>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Yvain THONNART <yvain.thonnart@m4x.org>
-Subject: [PATCH] bluetooth: add support for device 0489:e092
-Date: Sat, 11 Jun 2016 15:43:30 +0200
-Message-Id: <1465652610-1293-1-git-send-email-yvain.thonnart@m4x.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Date: Fri, 10 Jun 2016 15:21:39 +0200
+From: Miroslav Koskar <mk@mkoskar.com>
+To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Subject: [PATCH] core/service: Allow disconnected -> connected state change
+Message-ID: <20160610132139.GA2514@mkoskar.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-With current btusb.ko kernel module, Bluetooth pretends to be active
-but there is no real activity.
-
-I'm using an Acer Aspire VN7-791.
-
-Output of lsusb:
-Bus 003 Device 007: ID 0489:e092 Foxconn / Hon Hai
-
-On my laptop, this device is actually used as a combo with wifi chipset
-Atheros Qualcomm Killer N1525 Wireless-AC [168c:003e],
-
-* Fix by adding a declaration in kernel sources drivers/bluetooth/btusb.c
-
-        { USB_DEVICE(0x0489, 0xe092), .driver_info = BTUSB_QCA_ROME },
-
-* Compiled extra module /lib/modules/4.4.0-22-generic/extra/btusb.ko
-
-* Successfully tested against my phone (obex file transfer)
-
-DistroRelease: Ubuntu 16.04
-Package: linux-image-4.4.0-22-generic 4.4.0-22.40
-ProcVersionSignature: Ubuntu 4.4.0-22.40-generic 4.4.8
-Uname: Linux 4.4.0-22-generic x86_64
-Signed-off-by: Yvain THONNART <yvain.thonnart@m4x.org>
+By ignoring case where service->state == BTD_SERVICE_STATE_DISCONNECTED
+in btd_service_connecting_complete(), state_callbacks don't get
+executed. Such case occurs when e.g., phone using a2dp-source profile
+connects to the bluez. Because no state_callbacks are executed
+(including one added by policy plugin) no reconnection is attempted
+after connection timeout, although if situation is reversed (bluez
+connects to the phone) reconnection works.
 ---
- drivers/bluetooth/btusb.c | 1 +
- 1 file changed, 1 insertion(+)
+ src/service.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index a191e31..74b52bb 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -244,6 +244,7 @@ static const struct usb_device_id blacklist_table[] = {
- 	{ USB_DEVICE(0x0cf3, 0xe007), .driver_info = BTUSB_QCA_ROME },
- 	{ USB_DEVICE(0x0cf3, 0xe300), .driver_info = BTUSB_QCA_ROME },
- 	{ USB_DEVICE(0x0cf3, 0xe360), .driver_info = BTUSB_QCA_ROME },
-+	{ USB_DEVICE(0x0489, 0xe092), .driver_info = BTUSB_QCA_ROME },
+diff --git a/src/service.c b/src/service.c
+index f7912f5..0da14ab 100644
+--- a/src/service.c
++++ b/src/service.c
+@@ -353,7 +353,8 @@ bool btd_service_remove_state_cb(unsigned int id)
  
- 	/* Broadcom BCM2035 */
- 	{ USB_DEVICE(0x0a5c, 0x2009), .driver_info = BTUSB_BCM92035 },
--- 
-2.7.4
+ void btd_service_connecting_complete(struct btd_service *service, int err)
+ {
+-	if (service->state != BTD_SERVICE_STATE_CONNECTING)
++	if (service->state != BTD_SERVICE_STATE_DISCONNECTED &&
++			service->state != BTD_SERVICE_STATE_CONNECTING)
+ 		return;
+ 
+ 	if (err == 0)
+
