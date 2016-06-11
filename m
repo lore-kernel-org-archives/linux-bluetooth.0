@@ -1,43 +1,54 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-To: linux-bluetooth@vger.kernel.org
-From: Marco Trapanese <marcotrapanese@gmail.com>
-Subject: AVRCP example
-Message-ID: <5a957e95-1768-31a9-1a0a-da6ff58f8574@gmail.com>
-Date: Sun, 12 Jun 2016 13:11:13 +0200
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-15; format=flowed
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <SRS0=tFU8=SD=m4x.org=yvain.thonnart@bounces.m4x.org>
+From: Yvain THONNART <yvain.thonnart@m4x.org>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Yvain THONNART <yvain.thonnart@m4x.org>
+Subject: [PATCH] bluetooth: add support for device 0489:e092
+Date: Sat, 11 Jun 2016 15:43:30 +0200
+Message-Id: <1465652610-1293-1-git-send-email-yvain.thonnart@m4x.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello,
-I'm running bluez 5.40 and pulseaudio 8.0 on a Debian Jessie system.
-I paired and trusted a phone and I can play audio using A2DP from phone 
-to the machine.
+With current btusb.ko kernel module, Bluetooth pretends to be active
+but there is no real activity.
 
-Now I want to control the audio from the machine, i.e. prev/next, show 
-song title, etc...
+I'm using an Acer Aspire VN7-791.
 
-I don't understand how to use the simple-player example.
-It says:
+Output of lsusb:
+Bus 003 Device 007: ID 0489:e092 Foxconn / Hon Hai
 
-> Available commands:
-> 	PropertiesChanged(interface, properties)
-> 	help(cmd)
->
-> Use python syntax to pass arguments to available methods.
-> E.g.: PropertiesChanged({'Metadata' : {'Title': 'My title', 'Album': 'my album' }})
+On my laptop, this device is actually used as a combo with wifi chipset
+Atheros Qualcomm Killer N1525 Wireless-AC [168c:003e],
 
-but if I try exactly what it suggests:
+* Fix by adding a declaration in kernel sources drivers/bluetooth/btusb.c
 
-> PropertiesChanged({'Metadata' : {'Title': 'My title', 'Album': 'my album' }})
+        { USB_DEVICE(0x0489, 0xe092), .driver_info = BTUSB_QCA_ROME },
 
-it returns this error:
+* Compiled extra module /lib/modules/4.4.0-22-generic/extra/btusb.ko
 
-> PropertiesChanged() takes at least 3 arguments (2 given)
+* Successfully tested against my phone (obex file transfer)
 
+DistroRelease: Ubuntu 16.04
+Package: linux-image-4.4.0-22-generic 4.4.0-22.40
+ProcVersionSignature: Ubuntu 4.4.0-22.40-generic 4.4.8
+Uname: Linux 4.4.0-22-generic x86_64
+Signed-off-by: Yvain THONNART <yvain.thonnart@m4x.org>
+---
+ drivers/bluetooth/btusb.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Please, would you help me to understand how to run this example, or at 
-least how to implement a single command? i.e. how to select the next song.
-
-Thanks!
-Marco
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index a191e31..74b52bb 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -244,6 +244,7 @@ static const struct usb_device_id blacklist_table[] = {
+ 	{ USB_DEVICE(0x0cf3, 0xe007), .driver_info = BTUSB_QCA_ROME },
+ 	{ USB_DEVICE(0x0cf3, 0xe300), .driver_info = BTUSB_QCA_ROME },
+ 	{ USB_DEVICE(0x0cf3, 0xe360), .driver_info = BTUSB_QCA_ROME },
++	{ USB_DEVICE(0x0489, 0xe092), .driver_info = BTUSB_QCA_ROME },
+ 
+ 	/* Broadcom BCM2035 */
+ 	{ USB_DEVICE(0x0a5c, 0x2009), .driver_info = BTUSB_BCM92035 },
+-- 
+2.7.4
