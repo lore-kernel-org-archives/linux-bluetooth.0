@@ -10,53 +10,36 @@ Cc: kernel@pengutronix.de,
 	werner@almesberger.net,
 	linux-bluetooth@vger.kernel.org,
 	netdev@vger.kernel.org,
-	Alexander Aring <aar@pengutronix.de>,
-	"David S . Miller" <davem@davemloft.net>,
-	Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
-	James Morris <jmorris@namei.org>,
-	Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
-	Patrick McHardy <kaber@trash.net>
-Subject: [PATCHv3 net-next 04/12] ndisc: add __ndisc_opt_addr_space function
-Date: Tue, 14 Jun 2016 13:52:31 +0200
-Message-Id: <20160614115239.17788-5-aar@pengutronix.de>
+	Alexander Aring <aar@pengutronix.de>
+Subject: [PATCHv3 net-next 03/12] 6lowpan: remove ipv6 module request
+Date: Tue, 14 Jun 2016 13:52:30 +0200
+Message-Id: <20160614115239.17788-4-aar@pengutronix.de>
 In-Reply-To: <20160614115239.17788-1-aar@pengutronix.de>
 References: <20160614115239.17788-1-aar@pengutronix.de>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds __ndisc_opt_addr_space as low-level function for
-ndisc_opt_addr_space which doesn't depend on net_device parameter.
+Since we use exported function from ipv6 kernel module we don't need to
+request the module anymore to have ipv6 functionality.
 
-Cc: David S. Miller <davem@davemloft.net>
-Cc: Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>
-Cc: James Morris <jmorris@namei.org>
-Cc: Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>
-Cc: Patrick McHardy <kaber@trash.net>
+Acked-by: Hannes Frederic Sowa <hannes@stressinduktion.org>
+Reviewed-by: Stefan Schmidt <stefan@osg.samsung.com>
 Signed-off-by: Alexander Aring <aar@pengutronix.de>
 ---
- include/net/ndisc.h | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+ net/6lowpan/core.c | 2 --
+ 1 file changed, 2 deletions(-)
 
-diff --git a/include/net/ndisc.h b/include/net/ndisc.h
-index 2d8edaa..4cee826 100644
---- a/include/net/ndisc.h
-+++ b/include/net/ndisc.h
-@@ -127,10 +127,15 @@ static inline int ndisc_addr_option_pad(unsigned short type)
+diff --git a/net/6lowpan/core.c b/net/6lowpan/core.c
+index 801404c..1c7a42b 100644
+--- a/net/6lowpan/core.c
++++ b/net/6lowpan/core.c
+@@ -158,8 +158,6 @@ static int __init lowpan_module_init(void)
+ 		return ret;
  	}
- }
  
-+static inline int __ndisc_opt_addr_space(unsigned char addr_len, int pad)
-+{
-+	return NDISC_OPT_SPACE(addr_len + pad);
-+}
-+
- static inline int ndisc_opt_addr_space(struct net_device *dev)
- {
--	return NDISC_OPT_SPACE(dev->addr_len +
--			       ndisc_addr_option_pad(dev->type));
-+	return __ndisc_opt_addr_space(dev->addr_len,
-+				      ndisc_addr_option_pad(dev->type));
- }
- 
- static inline u8 *ndisc_opt_addr_data(struct nd_opt_hdr *p,
+-	request_module_nowait("ipv6");
+-
+ 	request_module_nowait("nhc_dest");
+ 	request_module_nowait("nhc_fragment");
+ 	request_module_nowait("nhc_hop");
 -- 
 2.8.3
