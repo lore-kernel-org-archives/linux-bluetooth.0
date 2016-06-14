@@ -16,15 +16,15 @@ Cc: kernel@pengutronix.de,
 	James Morris <jmorris@namei.org>,
 	Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
 	Patrick McHardy <kaber@trash.net>
-Subject: [PATCHv3 net-next 06/12] ndisc: add __ndisc_fill_addr_option function
-Date: Tue, 14 Jun 2016 13:52:33 +0200
-Message-Id: <20160614115239.17788-7-aar@pengutronix.de>
+Subject: [PATCHv3 net-next 05/12] ndisc: add __ndisc_opt_addr_data function
+Date: Tue, 14 Jun 2016 13:52:32 +0200
+Message-Id: <20160614115239.17788-6-aar@pengutronix.de>
 In-Reply-To: <20160614115239.17788-1-aar@pengutronix.de>
 References: <20160614115239.17788-1-aar@pengutronix.de>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds __ndisc_fill_addr_option as low-level function for
-ndisc_fill_addr_option which doesn't depend on net_device parameter.
+This patch adds __ndisc_opt_addr_data as low-level function for
+ndisc_opt_addr_data which doesn't depend on net_device parameter.
 
 Cc: David S. Miller <davem@davemloft.net>
 Cc: Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>
@@ -33,41 +33,40 @@ Cc: Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>
 Cc: Patrick McHardy <kaber@trash.net>
 Signed-off-by: Alexander Aring <aar@pengutronix.de>
 ---
- net/ipv6/ndisc.c | 14 ++++++++++----
+ include/net/ndisc.h | 14 ++++++++++----
  1 file changed, 10 insertions(+), 4 deletions(-)
 
-diff --git a/net/ipv6/ndisc.c b/net/ipv6/ndisc.c
-index c245895..a7b9468 100644
---- a/net/ipv6/ndisc.c
-+++ b/net/ipv6/ndisc.c
-@@ -150,11 +150,10 @@ struct neigh_table nd_tbl = {
- };
- EXPORT_SYMBOL_GPL(nd_tbl);
- 
--static void ndisc_fill_addr_option(struct sk_buff *skb, int type, void *data)
-+static void __ndisc_fill_addr_option(struct sk_buff *skb, int type, void *data,
-+				     int data_len, int pad)
- {
--	int pad   = ndisc_addr_option_pad(skb->dev->type);
--	int data_len = skb->dev->addr_len;
--	int space = ndisc_opt_addr_space(skb->dev);
-+	int space = __ndisc_opt_addr_space(data_len, pad);
- 	u8 *opt = skb_put(skb, space);
- 
- 	opt[0] = type;
-@@ -172,6 +171,13 @@ static void ndisc_fill_addr_option(struct sk_buff *skb, int type, void *data)
- 		memset(opt, 0, space);
+diff --git a/include/net/ndisc.h b/include/net/ndisc.h
+index 4cee826..c8962ad 100644
+--- a/include/net/ndisc.h
++++ b/include/net/ndisc.h
+@@ -138,17 +138,23 @@ static inline int ndisc_opt_addr_space(struct net_device *dev)
+ 				      ndisc_addr_option_pad(dev->type));
  }
  
-+static inline void ndisc_fill_addr_option(struct sk_buff *skb, int type,
-+					  void *data)
+-static inline u8 *ndisc_opt_addr_data(struct nd_opt_hdr *p,
+-				      struct net_device *dev)
++static inline u8 *__ndisc_opt_addr_data(struct nd_opt_hdr *p,
++					unsigned char addr_len, int prepad)
+ {
+ 	u8 *lladdr = (u8 *)(p + 1);
+ 	int lladdrlen = p->nd_opt_len << 3;
+-	int prepad = ndisc_addr_option_pad(dev->type);
+-	if (lladdrlen != ndisc_opt_addr_space(dev))
++	if (lladdrlen != __ndisc_opt_addr_space(addr_len, prepad))
+ 		return NULL;
+ 	return lladdr + prepad;
+ }
+ 
++static inline u8 *ndisc_opt_addr_data(struct nd_opt_hdr *p,
++				      struct net_device *dev)
 +{
-+	__ndisc_fill_addr_option(skb, type, data, skb->dev->addr_len,
-+				 ndisc_addr_option_pad(skb->dev->type));
++	return __ndisc_opt_addr_data(p, dev->addr_len,
++				     ndisc_addr_option_pad(dev->type));
 +}
 +
- static struct nd_opt_hdr *ndisc_next_option(struct nd_opt_hdr *cur,
- 					    struct nd_opt_hdr *end)
+ static inline u32 ndisc_hashfn(const void *pkey, const struct net_device *dev, __u32 *hash_rnd)
  {
+ 	const u32 *p32 = pkey;
 -- 
 2.8.3
