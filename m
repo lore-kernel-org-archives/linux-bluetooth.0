@@ -11,163 +11,99 @@ Cc: kernel@pengutronix.de,
 	linux-bluetooth@vger.kernel.org,
 	netdev@vger.kernel.org,
 	Alexander Aring <aar@pengutronix.de>,
-	"David S . Miller" <davem@davemloft.net>,
-	Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
-	James Morris <jmorris@namei.org>,
-	Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
-	Patrick McHardy <kaber@trash.net>
-Subject: [PATCHv3 net-next 02/12] 6lowpan: add 802.15.4 short addr slaac
-Date: Tue, 14 Jun 2016 13:52:29 +0200
-Message-Id: <20160614115239.17788-3-aar@pengutronix.de>
+	"David S . Miller" <davem@davemloft.net>
+Subject: [PATCHv3 net-next 01/12] 6lowpan: add private neighbour data
+Date: Tue, 14 Jun 2016 13:52:28 +0200
+Message-Id: <20160614115239.17788-2-aar@pengutronix.de>
 In-Reply-To: <20160614115239.17788-1-aar@pengutronix.de>
 References: <20160614115239.17788-1-aar@pengutronix.de>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds the autoconfiguration if a valid 802.15.4 short address
-is available for 802.15.4 6LoWPAN interfaces.
+This patch will introduce a 6lowpan neighbour private data. Like the
+interface private data we handle private data for generic 6lowpan and
+for link-layer specific 6lowpan.
+
+The current first use case if to save the short address for a 802.15.4
+6lowpan neighbour.
 
 Cc: David S. Miller <davem@davemloft.net>
-Cc: Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>
-Cc: James Morris <jmorris@namei.org>
-Cc: Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>
-Cc: Patrick McHardy <kaber@trash.net>
-Acked-by: Hannes Frederic Sowa <hannes@stressinduktion.org>
 Reviewed-by: Stefan Schmidt <stefan@osg.samsung.com>
 Signed-off-by: Alexander Aring <aar@pengutronix.de>
 ---
- include/net/6lowpan.h  |  6 ++++++
- include/net/addrconf.h |  3 +++
- net/6lowpan/core.c     | 46 ++++++++++++++++++++++++++++++++++++++++++++++
- net/ipv6/addrconf.c    |  5 +++--
- 4 files changed, 58 insertions(+), 2 deletions(-)
+ include/linux/netdevice.h     |  3 +--
+ include/net/6lowpan.h         | 10 ++++++++++
+ net/ieee802154/6lowpan/core.c | 12 ++++++++++++
+ 3 files changed, 23 insertions(+), 2 deletions(-)
 
+diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+index d101e4d..36e43bd 100644
+--- a/include/linux/netdevice.h
++++ b/include/linux/netdevice.h
+@@ -1483,8 +1483,7 @@ enum netdev_priv_flags {
+  * 	@perm_addr:		Permanent hw address
+  * 	@addr_assign_type:	Hw address assignment type
+  * 	@addr_len:		Hardware address length
+- * 	@neigh_priv_len;	Used in neigh_alloc(),
+- * 				initialized only in atm/clip.c
++ *	@neigh_priv_len:	Used in neigh_alloc()
+  * 	@dev_id:		Used to differentiate devices that share
+  * 				the same link layer address
+  * 	@dev_port:		Used to differentiate devices that share
 diff --git a/include/net/6lowpan.h b/include/net/6lowpan.h
-index 2d9b9d3..5ab4c99 100644
+index da84cf9..2d9b9d3 100644
 --- a/include/net/6lowpan.h
 +++ b/include/net/6lowpan.h
-@@ -254,6 +254,12 @@ static inline bool lowpan_fetch_skb(struct sk_buff *skb, void *data,
- 	return false;
- }
+@@ -141,6 +141,16 @@ struct lowpan_dev {
+ 	u8 priv[0] __aligned(sizeof(void *));
+ };
  
-+static inline bool lowpan_802154_is_valid_src_short_addr(__le16 addr)
++struct lowpan_802154_neigh {
++	__le16 short_addr;
++};
++
++static inline
++struct lowpan_802154_neigh *lowpan_802154_neigh(void *neigh_priv)
 +{
-+	/* First bit of addr is multicast, reserved or 802.15.4 specific */
-+	return !(addr & cpu_to_le16(0x8000));
++	return neigh_priv;
 +}
 +
- static inline void lowpan_push_hc_data(u8 **hc_ptr, const void *data,
- 				       const size_t len)
+ static inline
+ struct lowpan_dev *lowpan_dev(const struct net_device *dev)
  {
-diff --git a/include/net/addrconf.h b/include/net/addrconf.h
-index 730d856..b1774eb 100644
---- a/include/net/addrconf.h
-+++ b/include/net/addrconf.h
-@@ -94,6 +94,9 @@ int ipv6_rcv_saddr_equal(const struct sock *sk, const struct sock *sk2,
- void addrconf_join_solict(struct net_device *dev, const struct in6_addr *addr);
- void addrconf_leave_solict(struct inet6_dev *idev, const struct in6_addr *addr);
- 
-+void addrconf_add_linklocal(struct inet6_dev *idev,
-+			    const struct in6_addr *addr, u32 flags);
-+
- static inline int addrconf_ifid_eui48(u8 *eui, struct net_device *dev)
- {
- 	if (dev->addr_len != ETH_ALEN)
-diff --git a/net/6lowpan/core.c b/net/6lowpan/core.c
-index 7a240b3..801404c 100644
---- a/net/6lowpan/core.c
-+++ b/net/6lowpan/core.c
-@@ -14,6 +14,7 @@
- #include <linux/module.h>
- 
- #include <net/6lowpan.h>
-+#include <net/addrconf.h>
- 
- #include "6lowpan_i.h"
- 
-@@ -72,16 +73,61 @@ void lowpan_unregister_netdev(struct net_device *dev)
+diff --git a/net/ieee802154/6lowpan/core.c b/net/ieee802154/6lowpan/core.c
+index 4e2b308..8c004a0 100644
+--- a/net/ieee802154/6lowpan/core.c
++++ b/net/ieee802154/6lowpan/core.c
+@@ -81,11 +81,21 @@ static int lowpan_stop(struct net_device *dev)
+ 	return 0;
  }
- EXPORT_SYMBOL(lowpan_unregister_netdev);
  
-+static int addrconf_ifid_802154_6lowpan(u8 *eui, struct net_device *dev)
++static int lowpan_neigh_construct(struct neighbour *n)
 +{
-+	struct wpan_dev *wpan_dev = lowpan_802154_dev(dev)->wdev->ieee802154_ptr;
++	struct lowpan_802154_neigh *neigh = lowpan_802154_neigh(neighbour_priv(n));
 +
-+	/* Set short_addr autoconfiguration if short_addr is present only */
-+	if (!lowpan_802154_is_valid_src_short_addr(wpan_dev->short_addr))
-+		return -1;
-+
-+	/* For either address format, all zero addresses MUST NOT be used */
-+	if (wpan_dev->pan_id == cpu_to_le16(0x0000) &&
-+	    wpan_dev->short_addr == cpu_to_le16(0x0000))
-+		return -1;
-+
-+	/* Alternatively, if no PAN ID is known, 16 zero bits may be used */
-+	if (wpan_dev->pan_id == cpu_to_le16(IEEE802154_PAN_ID_BROADCAST))
-+		memset(eui, 0, 2);
-+	else
-+		ieee802154_le16_to_be16(eui, &wpan_dev->pan_id);
-+
-+	/* The "Universal/Local" (U/L) bit shall be set to zero */
-+	eui[0] &= ~2;
-+	eui[2] = 0;
-+	eui[3] = 0xFF;
-+	eui[4] = 0xFE;
-+	eui[5] = 0;
-+	ieee802154_le16_to_be16(&eui[6], &wpan_dev->short_addr);
++	/* default no short_addr is available for a neighbour */
++	neigh->short_addr = cpu_to_le16(IEEE802154_ADDR_SHORT_UNSPEC);
 +	return 0;
 +}
 +
- static int lowpan_event(struct notifier_block *unused,
- 			unsigned long event, void *ptr)
- {
- 	struct net_device *dev = netdev_notifier_info_to_dev(ptr);
-+	struct inet6_dev *idev;
-+	struct in6_addr addr;
- 	int i;
+ static const struct net_device_ops lowpan_netdev_ops = {
+ 	.ndo_init		= lowpan_dev_init,
+ 	.ndo_start_xmit		= lowpan_xmit,
+ 	.ndo_open		= lowpan_open,
+ 	.ndo_stop		= lowpan_stop,
++	.ndo_neigh_construct    = lowpan_neigh_construct,
+ };
  
- 	if (dev->type != ARPHRD_6LOWPAN)
- 		return NOTIFY_DONE;
+ static void lowpan_setup(struct net_device *ldev)
+@@ -150,6 +160,8 @@ static int lowpan_newlink(struct net *src_net, struct net_device *ldev,
+ 				wdev->needed_headroom;
+ 	ldev->needed_tailroom = wdev->needed_tailroom;
  
-+	idev = __in6_dev_get(dev);
-+	if (!idev)
-+		return NOTIFY_DONE;
++	ldev->neigh_priv_len = sizeof(struct lowpan_802154_neigh);
 +
- 	switch (event) {
-+	case NETDEV_UP:
-+	case NETDEV_CHANGE:
-+		/* (802.15.4 6LoWPAN short address slaac handling */
-+		if (lowpan_is_ll(dev, LOWPAN_LLTYPE_IEEE802154) &&
-+		    addrconf_ifid_802154_6lowpan(addr.s6_addr + 8, dev) == 0) {
-+			__ipv6_addr_set_half(&addr.s6_addr32[0],
-+					     htonl(0xFE800000), 0);
-+			addrconf_add_linklocal(idev, &addr, 0);
-+		}
-+		break;
- 	case NETDEV_DOWN:
- 		for (i = 0; i < LOWPAN_IPHC_CTX_TABLE_SIZE; i++)
- 			clear_bit(LOWPAN_IPHC_CTX_FLAG_ACTIVE,
-diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
-index 47f837a..beaad49 100644
---- a/net/ipv6/addrconf.c
-+++ b/net/ipv6/addrconf.c
-@@ -2947,8 +2947,8 @@ static void init_loopback(struct net_device *dev)
- 	}
- }
- 
--static void addrconf_add_linklocal(struct inet6_dev *idev,
--				   const struct in6_addr *addr, u32 flags)
-+void addrconf_add_linklocal(struct inet6_dev *idev,
-+			    const struct in6_addr *addr, u32 flags)
- {
- 	struct inet6_ifaddr *ifp;
- 	u32 addr_flags = flags | IFA_F_PERMANENT;
-@@ -2967,6 +2967,7 @@ static void addrconf_add_linklocal(struct inet6_dev *idev,
- 		in6_ifa_put(ifp);
- 	}
- }
-+EXPORT_SYMBOL_GPL(addrconf_add_linklocal);
- 
- static bool ipv6_reserved_interfaceid(struct in6_addr address)
- {
+ 	ret = lowpan_register_netdevice(ldev, LOWPAN_LLTYPE_IEEE802154);
+ 	if (ret < 0) {
+ 		dev_put(wdev);
 -- 
 2.8.3
