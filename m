@@ -1,133 +1,35 @@
-Return-Path: <aar@pengutronix.de>
-From: Alexander Aring <aar@pengutronix.de>
-To: linux-wpan@vger.kernel.org
-Cc: kernel@pengutronix.de,
-	marcel@holtmann.org,
-	jukka.rissanen@linux.intel.com,
-	hannes@stressinduktion.org,
-	stefan@osg.samsung.com,
-	mcr@sandelman.ca,
-	werner@almesberger.net,
-	linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Alexander Aring <aar@pengutronix.de>
-Subject: [PATCHv3 net-next 00/12] 6lowpan: introduce 6lowpan-nd
-Date: Tue, 14 Jun 2016 13:52:27 +0200
-Message-Id: <20160614115239.17788-1-aar@pengutronix.de>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Subject: Re: How to initialise bcm4354A2 with 3.10 kernel?
+To: Qingtao Cao <qingtao.cao.au@gmail.com>
+References: <CAPcThSGPMaqJ9zr5fPWM38YH+2DE5M7a5oBNM4pUa3g1Xdba1w@mail.gmail.com>
+ <575A749A.1090409@intel.com>
+ <CAPcThSGtgY=KyAvgtMd2HPTin7uKqNXbTc-4-9ME4ZYGutK1Lg@mail.gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+From: lpoulain <loic.poulain@intel.com>
+Message-ID: <575FD5FB.4000404@intel.com>
+Date: Tue, 14 Jun 2016 12:01:31 +0200
+MIME-Version: 1.0
+In-Reply-To: <CAPcThSGtgY=KyAvgtMd2HPTin7uKqNXbTc-4-9ME4ZYGutK1Lg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Harry,
 
-this patch series introduces the ndisc ops callback structure to add different
-handling for IPv6 neighbour discovery cache functionality. It implements at first
-the two following use-cases:
+> However, I still found logs that an extra 0x00 byte was skipped over
+> (by my workaround patch) for some HCI_Event packet (otherwise lots of
+> HCI commands would time out because this extra 0x00 byte would fail
+> hci_reassembly()) and start discovery also failed by 0x0C error code
+> (command disallowed).
 
- - 6CO handling as userspace option (For all 6LoWPAN layers, BTLE/802.15.4) [0]
- - short address handling for 802.15.4 6LoWPAN only [1]
+You should ask to the vendor about this issue.
+Maybe:
+- The firmware is buggy or the wrong one.
+- This extra byte is a vendor specific one (for low power mgmt, sw flow 
+control...)
 
-Since my last patch series, I completely changed the whole ndisc_ops callback
-structure to not replace the whole ndisc functionality at recv/send level of
-NS/NA/RS/RA which I send in my previous patch-series "6lowpan: introduce basic
-6lowpan-nd". I changed it now to add different handling in a very low-level way
-of ndisc functionality.
+What is the behavior if you don't download the hcd ? (using the embedded fw)
+Just in case, you can also try to reduce the operational baudrate (115200).
 
-The ndisc_ops don't must be registered to dev->ndisc_ops anymore, if they are not
-set, then no additional ipv6 ndisc handling will be done.
-
-This patch series now introduce a complete handling of short address for
-802.15.4 6LoWPAN in case of send/recv of NA/NS/RS and RA. In case of RA
-(receive only) and PIO we also need a second prefix + short-address based
-address.
-
-This callback structure can be used later (I hope) for RFC 6775 [0]. This RFC
-defines some new option fields and messages for 6LoWPAN-ND. This patch series
-does not implement RFC 6775 (except we decide now to handle 6CO in userspace).
-
-Additional we can use the current ops for parse/fill ndisc options for kernel
-handled ndisc messages to add 6CIO, see [2].
-
-I tested RA/NS/NA/RS messages with short address which seems to work, what I
-didn't test is the redirect messages since I don't know how to generate them.
-The short address for redirect messages are also some special case here, because
-the short address by a L3 target address lookuped by neighbour cache need to be
-added.
-
-btw:
-According to [3] sending redirect messages should be also disabled by default
-on 6lowpan interfaces, but can be activated afterwards. This is maybe
-something for the ipv6_devconf structure. There is a "accept_redirects" but
-no "disable_redirects".
-
-- Alex
-
-[0] https://tools.ietf.org/html/rfc7400
-[1] https://tools.ietf.org/html/rfc6775
-[2] https://tools.ietf.org/html/rfc4944#section-8
-
-changes since RFC:
- - add lowlevel functions __ndisc_opt_addr_space,
-   __ndisc_opt_addr_data and __ndisc_fill_addr_option for corresponding
-   functions which doesn't requires net_device argument.
- - move ndisc_ops e.g. ndisc_ops_fill_addr_option function call into the
-   corresponding device argument function ndisc_fill_addr_option.
-   (Introduced a special static inline function for redirect handling).
- - fix error handling in addrconf_prefix_rcv_add_addr.
-   (Please see, introduce new API handling that second address registration
-    (in case of 802.15.4 6LoWPAN) will still be notified if failed, because
-    dev->addr was successful.
- - add ieee802154 sub-directory in short address entry for 6lowpan UAPI.
- - add lowpan_802154_is_valid_src_short_addr, because 802.15.4 6lowpan
-   defines the first bit as multicast (don't know how this can be working
-   at the end, because some hardware addresses will handle such addresses
-   in L2 as unicast. See:
-   https://www.iana.org/assignments/_6lowpan-parameters/_6lowpan-parameters.xhtml#_6lowpan-parameters-2
-
-changes since v2:
- - Introduce ndisc_ops to have our own implementation for dealing with NS/NA
-   which allows also to support RFC6775 (e.g. ARO).
- - add handling for handling 6CO as userspace option for RA messages in
-   case of 6LoWPAN interfaces.
- - change lowpan_is_ll to check on linklayer type only.
- - added some reviewed-by's.
- - move short addr slaac to net/6lowpan instead ipv6 handling.
- - add handling for context based address compression in case for
-   short address as link-layer address.
- - change strategy to use short address, a short address will always be used
-   when it's available.
- - Handle override flag in NA messages to update short address information or
-   not.
-
-Alexander Aring (12):
-  6lowpan: add private neighbour data
-  6lowpan: add 802.15.4 short addr slaac
-  6lowpan: remove ipv6 module request
-  ndisc: add __ndisc_opt_addr_space function
-  ndisc: add __ndisc_opt_addr_data function
-  ndisc: add __ndisc_fill_addr_option function
-  addrconf: put prefix address add in an own function
-  ipv6: introduce neighbour discovery ops
-  ipv6: export several functions
-  6lowpan: introduce 6lowpan-nd
-  6lowpan: add support for getting short address
-  6lowpan: add support for 802.15.4 short addr handling
-
- include/linux/netdevice.h     |   8 +-
- include/net/6lowpan.h         |  16 +++
- include/net/addrconf.h        |  10 ++
- include/net/ndisc.h           | 248 +++++++++++++++++++++++++++++++++++++++---
- net/6lowpan/6lowpan_i.h       |   4 +
- net/6lowpan/Makefile          |   2 +-
- net/6lowpan/core.c            |  50 ++++++++-
- net/6lowpan/debugfs.c         |  39 +++++++
- net/6lowpan/iphc.c            | 167 +++++++++++++++++++++++-----
- net/6lowpan/ndisc.c           | 234 +++++++++++++++++++++++++++++++++++++++
- net/ieee802154/6lowpan/core.c |  12 ++
- net/ieee802154/6lowpan/tx.c   | 113 +++++++++----------
- net/ipv6/addrconf.c           | 218 +++++++++++++++++++++----------------
- net/ipv6/ndisc.c              | 123 +++++++++++++--------
- net/ipv6/route.c              |   8 +-
- 15 files changed, 1004 insertions(+), 248 deletions(-)
- create mode 100644 net/6lowpan/ndisc.c
-
--- 
-2.8.3
+Regards,
+Loic
