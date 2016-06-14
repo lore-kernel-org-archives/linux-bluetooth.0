@@ -1,35 +1,99 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Subject: Re: How to initialise bcm4354A2 with 3.10 kernel?
-To: Qingtao Cao <qingtao.cao.au@gmail.com>
-References: <CAPcThSGPMaqJ9zr5fPWM38YH+2DE5M7a5oBNM4pUa3g1Xdba1w@mail.gmail.com>
- <575A749A.1090409@intel.com>
- <CAPcThSGtgY=KyAvgtMd2HPTin7uKqNXbTc-4-9ME4ZYGutK1Lg@mail.gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-From: lpoulain <loic.poulain@intel.com>
-Message-ID: <575FD5FB.4000404@intel.com>
-Date: Tue, 14 Jun 2016 12:01:31 +0200
+Return-Path: <linux-kernel-owner@vger.kernel.org>
+From: Amitkumar Karwar <akarwar@marvell.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"Ganapathi Bhat" <gbhat@marvell.com>, Cathy Luo <cluo@marvell.com>
+Subject: RE: [PATCH v11 3/3] Bluetooth: hci_uart: Support firmware download
+ for Marvell
+Date: Tue, 14 Jun 2016 06:35:37 +0000
+Message-ID: <9744498ed55b499abebf95624ffcc664@SC-EXCH04.marvell.com>
+References: <1462548714-7971-1-git-send-email-akarwar@marvell.com>
+ <1462548714-7971-3-git-send-email-akarwar@marvell.com>  
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-In-Reply-To: <CAPcThSGtgY=KyAvgtMd2HPTin7uKqNXbTc-4-9ME4ZYGutK1Lg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Sender: linux-bluetooth-owner@vger.kernel.org
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Harry,
+Hi Marcel,
 
-> However, I still found logs that an extra 0x00 byte was skipped over
-> (by my workaround patch) for some HCI_Event packet (otherwise lots of
-> HCI commands would time out because this extra 0x00 byte would fail
-> hci_reassembly()) and start discovery also failed by 0x0C error code
-> (command disallowed).
+> From: Amitkumar Karwar
+> Sent: Monday, May 23, 2016 11:37 AM
+> To: 'linux-bluetooth@vger.kernel.org'
+> Cc: 'linux-kernel@vger.kernel.org'; Ganapathi Bhat; Cathy Luo
+> Subject: RE: [PATCH v11 3/3] Bluetooth: hci_uart: Support firmware
+> download for Marvell
+> 
+> Hi Marcel,
+> 
+> > > From: Amitkumar Karwar [mailto:akarwar@marvell.com]
+> > > Sent: Friday, May 06, 2016 9:02 PM
+> > > To: linux-bluetooth@vger.kernel.org
+> > > Cc: linux-kernel@vger.kernel.org; Ganapathi Bhat; Amitkumar Karwar
+> > > Subject: [PATCH v11 3/3] Bluetooth: hci_uart: Support firmware
+> > > download for Marvell
+> > >
+> > > From: Ganapathi Bhat <gbhat@marvell.com>
+> > >
+> > > This patch implement firmware download feature for Marvell Bluetooth
+> > > devices. If firmware is already downloaded, it will skip
+> downloading.
+> > >
+> > > Signed-off-by: Ganapathi Bhat <gbhat@marvell.com>
+> > > Signed-off-by: Amitkumar Karwar <akarwar@marvell.com>
+> > > ---
+> > > v2: Fixed compilation warning reported by kbuild test robot
+> > > v3: Addressed review comments from Marcel Holtmann
+> > >     a) Removed vendor specific code from hci_ldisc.c
+> > >     b) Get rid of static forward declaration
+> > >     c) Removed unnecessary heavy nesting
+> > >     d) Git rid of module parameter and global variables
+> > >     e) Add logic to pick right firmware image
+> > > v4: Addresses review comments from Alan
+> > >     a) Use existing kernel helper APIs instead of writing own.
+> > >     b) Replace mdelay() with msleep()
+> > > v5: Addresses review comments from Loic Poulain
+> > >     a) Use bt_dev_err/warn/dbg helpers insted of BT_ERR/WARN/DBG
+> > >     b) Used static functions where required and removed forward
+> > > delcarations
+> > >     c) Edited comments for the function hci_uart_recv_data
+> > >     d) Made HCI_UART_DNLD_FW flag a part of driver private data
+> > > v6: Addresses review comments from Loic Poulain
+> > >     a) Used skb instead of array to store firmware data during
+> > download
+> > >     b) Used hci_uart_tx_wakeup and enqueued packets instead of tty
+> > write
+> > >     c) Used GFP_KERNEL instead of GFP_ATOMIC
+> > > v7: Edited Kconfig to add dependency for BT_HCIUART_H4. The change
+> > > resolves
+> > >     errors reported by kbuild test robot.
+> > > v8: Addressed review comments from Marcel Holtmann
+> > >     a) Removed unnecessary memory allocation failure messages
+> > >     b) Get rid of btmrvl.h header file and add definitions in
+> > > hci_mrvl.c file
+> > > v9: Addressed review comments from Marcel Holtmann
+> > >     a) Moved firmware download code from setup to prepare handler.
+> > >     b) Change messages from bt_dev_*->BT_*, as hdev isn't available
+> > > during firmware
+> > >      download.
+> > > v10: Addressed review comments from Marcel Holtmann
+> > >     a) Added new callback recv_for_prepare to receive data from
+> device
+> > >      during prepare phase
+> > >     b) Avoided using private flags (HCI_UART_DNLD_FW) as new receive
+> > > callback is
+> > >      added for the same purpose
+> > >     c) Used kernel API to handle unaligned data
+> > >     d) Moved mrvl_set_baud functionality inside setup callback
+> > > v11: Write data through ldisc in mrvl_send_ack() instead of directly
+> > > calling
+> > >     write method(One Thousand Gnomes).
+> >
+> 
+> Could you please take this patch?
+> 
 
-You should ask to the vendor about this issue.
-Maybe:
-- The firmware is buggy or the wrong one.
-- This extra byte is a vendor specific one (for low power mgmt, sw flow 
-control...)
-
-What is the behavior if you don't download the hcd ? (using the embedded fw)
-Just in case, you can also try to reduce the operational baudrate (115200).
+This has been pending for a while.
+Please let me know your comment.
 
 Regards,
-Loic
+Amitkumar
