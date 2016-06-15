@@ -1,43 +1,28 @@
-Return-Path: <linux-wpan-owner@vger.kernel.org>
-To: Linux Bluetooth <linux-bluetooth@vger.kernel.org>
-From: Alexander Aring <aar@pengutronix.de>
-Subject: current btle 6lowpan issues
-Cc: Jukka Rissanen <jukka.rissanen@linux.intel.com>,
-	linux-wpan@vger.kernel.org, kernel@pengutronix.de
-Message-ID: <ccd6b822-4af0-ea89-2dba-b914e6427191@pengutronix.de>
-Date: Wed, 15 Jun 2016 20:02:19 +0200
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Date: Wed, 15 Jun 2016 13:00:25 -0400
+From: Don Zickus <dzickus@redhat.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: Debugging bluetoothd, dbus and selinux help?
+Message-ID: <20160615170025.GB90326@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Sender: linux-wpan-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
 
-I like to collect some _big_ issues which I detected on current btle 6lowpan
-implementation, these are:
+I am trying to debug why bluetoothd decides to disconnect from the d-bus on
+the host, when the client does an object push to an obex agent on the host.
 
- 1. The l2 daddr comes not from ndisc cache. This should come from ndisc
-    cache, instead the implementation construct the l2 from L3 address
-    which only works for autoconfiguration addresses, all other
-    addresses seems not be working for btle 6lowpan.
+When I set selinux to permissive mode ('setenforce 0'), things work fine (ie
+the object push goes through).
 
- 2. The dev->dev_addr should be the 6 byte baddr and NOT the eui64
-    generated baddr with fffe pattern and u/l bit. The eui64 should not
-    be part of source/target address options of ndisc messages, it should
-    be the baddr in big endian format. (dev->addr_len need to be 6 then,
-    as well). baddr is the mac address of btle transceiver.
+I tried searching /var/log/audit/audit.log, journalctl and dbus-monitor for
+clues (on the host) and can't find anything obvious.
 
-The 1. is easy to fix, but then I detected if we do that, the neighbour
-cache messages NS/NA/RS, etc use the eui64 fffe pattern with u/l bit for
-these messages, because the issue 2. So we will get the wrong address
-from ndisc. The ndisc should store the 6 bytes baddr in big endian format.
-So these two issues need to be fixed in some patch and changes everything
-in btle 6lowpan.
+Does anyone have any tips on how to find what security policy might be
+interfering with my test?
 
-I started to work on this but the issue 2. is a big change in btle 6lowpan
-so I want to start the discussion about to fix that to doing it in the
-right way.
+Cheers,
+Don
 
-Jukka, do you agree that this behaviour is currently broken in btle 6lowpan?
-
-- Alex
