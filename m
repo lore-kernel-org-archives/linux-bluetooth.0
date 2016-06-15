@@ -1,61 +1,113 @@
-Return-Path: <hideaki.yoshifuji@miraclelinux.com>
-Subject: Re: [PATCHv3 net-next 00/12] 6lowpan: introduce 6lowpan-nd
-To: Alexander Aring <aar@pengutronix.de>, linux-wpan@vger.kernel.org,
- davem@davemloft.net
-References: <20160614115239.17788-1-aar@pengutronix.de>
-Cc: hideaki.yoshifuji@miraclelinux.com, kernel@pengutronix.de,
- marcel@holtmann.org, jukka.rissanen@linux.intel.com,
- hannes@stressinduktion.org, stefan@osg.samsung.com, mcr@sandelman.ca,
- werner@almesberger.net, linux-bluetooth@vger.kernel.org,
- netdev@vger.kernel.org
-From: YOSHIFUJI Hideaki <hideaki.yoshifuji@miraclelinux.com>
-Message-ID: <5761361F.5050406@miraclelinux.com>
-Date: Wed, 15 Jun 2016 20:03:59 +0900
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Szymon Janc <ext.szymon.janc@tieto.com>
+To: Mr Dini <diniboy74@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: Bluez Can't see my adapter
+Date: Wed, 15 Jun 2016 12:24:47 +0200
+Message-ID: <1735193.DjGFazkIj4@leonov>
+In-Reply-To: <CANVNt1Y=9Jz8tC-Awg0YeG4hzMzo-T9y3u8qbW1Jth-V-AUiuw@mail.gmail.com>
+References: <CANVNt1Yn_e6Cifr3RS-j+V3zfernk68wEp_t-BgTcs6o1FJ-Fw@mail.gmail.com> <1949209.JsJb5RHiCb@leonov> <CANVNt1Y=9Jz8tC-Awg0YeG4hzMzo-T9y3u8qbW1Jth-V-AUiuw@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20160614115239.17788-1-aar@pengutronix.de>
-Content-Type: text/plain; charset=iso-2022-jp
+Content-Type: text/plain; charset="iso-8859-1"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
 
-Alexander Aring wrote:
-> Alexander Aring (12):
->   6lowpan: add private neighbour data
->   6lowpan: add 802.15.4 short addr slaac
->   6lowpan: remove ipv6 module request
->   ndisc: add __ndisc_opt_addr_space function
->   ndisc: add __ndisc_opt_addr_data function
->   ndisc: add __ndisc_fill_addr_option function
->   addrconf: put prefix address add in an own function
->   ipv6: introduce neighbour discovery ops
->   ipv6: export several functions
->   6lowpan: introduce 6lowpan-nd
->   6lowpan: add support for getting short address
->   6lowpan: add support for 802.15.4 short addr handling
+On Wednesday 15 of June 2016 12:21:09 Mr Dini wrote:
+> And if I try bluez4 or older? What is the best for mine case?
 > 
->  include/linux/netdevice.h     |   8 +-
->  include/net/6lowpan.h         |  16 +++
->  include/net/addrconf.h        |  10 ++
->  include/net/ndisc.h           | 248 +++++++++++++++++++++++++++++++++++++++---
->  net/6lowpan/6lowpan_i.h       |   4 +
->  net/6lowpan/Makefile          |   2 +-
->  net/6lowpan/core.c            |  50 ++++++++-
->  net/6lowpan/debugfs.c         |  39 +++++++
->  net/6lowpan/iphc.c            | 167 +++++++++++++++++++++++-----
->  net/6lowpan/ndisc.c           | 234 +++++++++++++++++++++++++++++++++++++++
->  net/ieee802154/6lowpan/core.c |  12 ++
->  net/ieee802154/6lowpan/tx.c   | 113 +++++++++----------
->  net/ipv6/addrconf.c           | 218 +++++++++++++++++++++----------------
->  net/ipv6/ndisc.c              | 123 +++++++++++++--------
->  net/ipv6/route.c              |   8 +-
->  15 files changed, 1004 insertions(+), 248 deletions(-)
->  create mode 100644 net/6lowpan/ndisc.c
+> Thanks!
+
+BlueZ4 should work. Just note that it is quite old and unsupported by 
+upstream.
+
 > 
-
-Looks good to me.
-
-Acked-by: YOSHIFUJI Hideaki <yoshfuji@linux-ipv6.org>
+> 2016.06.15. 12:18, "Szymon Janc" <ext.szymon.janc@tieto.com> ezt írta:
+> > Hi,
+> > 
+> > On Wednesday 15 of June 2016 11:18:22 Mr Dini wrote:
+> > > Hi!
+> > > 
+> > > I have a 0a12:0001 bluetooth dongle and an arm5 based nas. It is an
+> > > embedded linux with the old 2.6.31.8 kernel.
+> > 
+> > BlueZ5 requires kernel 3.4 or newer. You could try with kernel backports
+> > but
+> > I'm not sure if they still support 2.6 kernels.
+> > 
+> > > Unfortunately the manufacturer disabled the bt at the kernel, So I had
+> > > to recompile a kernel with Bluetooth support. I flashed it using an
+> > > USB TTL cable via u-boot.
+> > > 
+> > > After it I compiled the latest bluez 5.40 with "./configure
+> > > --prefix=/ffp --disable-systemd" command and I wrote a patch to not
+> > > use ppol, because the kernel not supports that syscall...
+> > > 
+> > > After a make and an install I Can launch the bluetoothd and I Can use
+> > > the whole bluez package as expected. :)
+> > > 
+> > > Now I tried to load the btusb module, but the dmesg said, it already
+> > > loaded. So I put on my dongle and saw this dmesg part(the dongle is
+> > > reattached):
+> > > 
+> > > btusb_intr_complete: hci0 urb ce155da0 failed to resubmit (19)
+> > > btusb_bulk_complete: hci0 urb c01832c0 failed to resubmit (19)
+> > > btusb_bulk_complete: hci0 urb c0183540 failed to resubmit (19)
+> > > btusb_send_frame: hci0 urb c0183540 submission failed
+> > > usb 1-1.1: new full speed USB device using ehci_marvell and address 8
+> > > usb 1-1.1: device descriptor read/64, error -32
+> > > In hub_port_init, usb_device_id = 7, devnum = 8
+> > > In hub_port_init, and number is 2, retry 0, port 1 .....
+> > > usb 1-1.1: configuration #1 chosen from 1 choice
+> > > 
+> > > When I execute "hciconfig hci0 up" I Can see my dongle at the hciconfig:
+> > > 
+> > > hci0:   Type: BR/EDR  Bus: USB
+> > > 
+> > >         BD Address: secret  ACL MTU: 310:10  SCO MTU: 64:8
+> > >         UP RUNNING
+> > >         RX bytes:380 acl:0 sco:0 events:13 errors:0
+> > >         TX bytes:38 acl:0 sco:0 commands:11 errors:0
+> > > 
+> > > And I Can see my nearby bt devices if I make a scan using the hcitool.
+> > > 
+> > > But if I try to use the bluetoothctl to do this, it says:
+> > > 
+> > > # bluetoothctl
+> > > [bluetooth]# scan on
+> > > No default controller available
+> > > 
+> > > But why? I have run out of ideas at this part...
+> > > 
+> > > Some additional information:
+> > > 
+> > > The system uses uClibc compiler.
+> > > 
+> > > And the rfkill says my device isn't blocked:
+> > > 
+> > > # rfkill list
+> > > 2: hci0: Bluetooth
+> > > 
+> > >         Soft blocked: no
+> > >         Hard blocked: no
+> > > 
+> > > Thanks a lot!
+> > > 
+> > > Ps: Sorry for my bad English and for the unformatted message (I am
+> > > using mutt)...
+> > > --
+> > > To unsubscribe from this list: send the line "unsubscribe
+> > 
+> > linux-bluetooth"
+> > 
+> > > in the body of a message to majordomo@vger.kernel.org
+> > > More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> > 
+> > --
+> > BR
+> > Szymon Janc
 
 -- 
-Hideaki Yoshifuji <hideaki.yoshifuji@miraclelinux.com>
-Technical Division, MIRACLE LINUX CORPORATION
+BR
+Szymon Janc
