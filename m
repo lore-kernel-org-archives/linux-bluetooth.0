@@ -1,38 +1,69 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Subject: Re: "complex" Bluetooth handling
-To: "Ben-melech, Shiran" <shiran.ben-melech@intel.com>,
+From: "Ben-melech, Shiran" <shiran.ben-melech@intel.com>
+To: Marco Trapanese <marcotrapanese@gmail.com>,
 	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: RE: "complex" Bluetooth handling
+Date: Wed, 15 Jun 2016 06:54:06 +0000
+Message-ID: <A4D30064D9E2C94BAAF5CE9449A29AAC4B864E3F@hasmsx109.ger.corp.intel.com>
 References: <c290d35f-1637-1199-11a2-e2424262b175@gmail.com>
- <A4D30064D9E2C94BAAF5CE9449A29AAC4B864E3F@hasmsx109.ger.corp.intel.com>
-From: Marco Trapanese <marcotrapanese@gmail.com>
-Message-ID: <4eaaac10-30a0-2483-8235-99e9c5d993cc@gmail.com>
-Date: Wed, 15 Jun 2016 09:20:26 +0200
+In-Reply-To: <c290d35f-1637-1199-11a2-e2424262b175@gmail.com>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-In-Reply-To: <A4D30064D9E2C94BAAF5CE9449A29AAC4B864E3F@hasmsx109.ger.corp.intel.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Il 15/06/2016 08:54, Ben-melech, Shiran ha scritto:
-> For BLE there is a library called TinyB which is pure c++ https://github.com/intel-iot-devkit/tinyb
-> Although I'm not sure it support classic BL profiles but I guess you can start with that.
+Hi,
 
-Thanks, it's interesting but I think it's just a guide to make my own 
-library because it doesn't support GATT server yet:
+For BLE there is a library called TinyB which is pure c++ https://github.com/intel-iot-devkit/tinyb
+Although I'm not sure it support classic BL profiles but I guess you can start with that.
 
-> At this time it is not possible to create a BLE server
+Good Luck,
 
-(from https://github.com/intel-iot-devkit/tinyb/issues/16)
+Shiran Ben-Melech
+SW Engineer @ Flex Services | Intel Corporation
+iNet: 8-465-3851 | Cellular: 054-6662594
+Website: http://flexservices.intel.com
 
-I found an example in Qt5:
+-----Original Message-----
+From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-owner@vger.kernel.org] On Behalf Of Marco Trapanese
+Sent: Wednesday, June 15, 2016 08:11
+To: linux-bluetooth@vger.kernel.org
+Subject: "complex" Bluetooth handling
 
-https://doc-snapshots.qt.io/qt5-dev/qtbluetooth-heartrate-server-example.html
+Hello,
 
-I will try it as soon as possible.
-If it works only ANCS is still uncovered.
+I'm working on an unattended machine (i.e. with no direct user
+interaction) which should handle the following Bluetooth features:
 
-Best regards
+- A2DP
+- AVRCP
+- HFP
+- GATT server
+- ANCS consumer
+
+all at the same time. I mean, the user might listen to a song and answer to incoming calls, while he's receiving the ANCS notifications and exchanging data through a custom GATT profile.
+
+I have a USB / BT,BLE dongle and I'm using Raspbian Jessie with bluez 5.40.
+Right now I'm just trying to make the things work before write a C++ application which manages all the stuff.
+
+First question:
+
+1. I mainly find Python scripts, but I'm interested into Qt5/C++ libraries. Is there something out there? Before write a new one from scratch....
+
+2. Do you know any working example to subscribe to ANCS push notifications?
+
+3. Do you have any suggestion about how to handle all those profile together?
+
+Thanks!
 Marco
 
+--
+To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in the body of a message to majordomo@vger.kernel.org More majordomo info at  http://vger.kernel.org/majordomo-info.html
+---------------------------------------------------------------------
+Intel Electronics Ltd.
 
+This e-mail and any attachments may contain confidential material for
+the sole use of the intended recipient(s). Any review or distribution
+by others is strictly prohibited. If you are not the intended
+recipient, please contact the sender and delete all copies.
 
