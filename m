@@ -1,35 +1,34 @@
-Return-Path: <linux-wpan-owner@vger.kernel.org>
-Message-ID: <1466084491.13892.99.camel@linux.intel.com>
-Subject: Re: current btle 6lowpan issues
-From: Patrik Flykt <Patrik.Flykt@linux.intel.com>
-To: Jukka Rissanen <jukka.rissanen@linux.intel.com>,
-	Alexander Aring <aar@pengutronix.de>,
-	Linux Bluetooth <linux-bluetooth@vger.kernel.org>
-Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de
-Date: Thu, 16 Jun 2016 16:41:31 +0300
-In-Reply-To: <1466071258.31678.12.camel@linux.intel.com>
-References: <ccd6b822-4af0-ea89-2dba-b914e6427191@pengutronix.de>
-	 <1466071258.31678.12.camel@linux.intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Sender: linux-wpan-owner@vger.kernel.org
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Tobias Svehagen <tobias.svehagen@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Tobias Svehagen <tobias.svehagen@gmail.com>
+Subject: [PATCH BlueZ 1/2] tools/gatt-service: Fix iteration through options
+Date: Thu, 16 Jun 2016 15:29:12 +0200
+Message-Id: <20160616132913.13138-2-tobias.svehagen@gmail.com>
+In-Reply-To: <20160616132913.13138-1-tobias.svehagen@gmail.com>
+References: <20160616132913.13138-1-tobias.svehagen@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, 2016-06-16 at 13:00 +0300, Jukka Rissanen wrote:
-> Yes you are right that there are issues. Fortunately the bt0 is
-> currently a point-to-point link in which case ND is not really done
-> and everything kind of "works" ok.
-> 
-> I added Patrik to cc: as he has been working to fix the issues but
-> the patches are not yet ready. Perhaps we could combine the efforts
-> here.
+Fixes an infinite loop when trying to read a descriptor and the
+ReadValue call has at least one option.
+---
+ tools/gatt-service.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-I had some patches that make BTLE interfaces non-point-to-point. Let me
-check that they can be applied on the latest bluetooth-next and that
-they still compile after a few months of sitting on an old version.
-Then let's hope they also work as expected...
-
-Cheers,
-
-	Patrik
+diff --git a/tools/gatt-service.c b/tools/gatt-service.c
+index 0c78c4d..1cf8b3c 100644
+--- a/tools/gatt-service.c
++++ b/tools/gatt-service.c
+@@ -407,6 +407,8 @@ static int parse_options(DBusMessageIter *iter, const char **device)
+ 			dbus_message_iter_get_basic(&value, device);
+ 			printf("Device: %s\n", *device);
+ 		}
++
++		dbus_message_iter_next(&dict);
+ 	}
+ 
+ 	return 0;
+-- 
+2.8.3
 
