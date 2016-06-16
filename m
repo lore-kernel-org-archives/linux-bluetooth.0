@@ -1,40 +1,72 @@
-Return-Path: <hannes@stressinduktion.org>
-Subject: Re: [PATCHv4 net-next 04/12] ndisc: add __ndisc_opt_addr_space
- function
-To: Alexander Aring <aar@pengutronix.de>, linux-wpan@vger.kernel.org
-References: <20160615192027.4064-1-aar@pengutronix.de>
- <20160615192027.4064-5-aar@pengutronix.de>
-Cc: kernel@pengutronix.de, marcel@holtmann.org,
- jukka.rissanen@linux.intel.com, stefan@osg.samsung.com, mcr@sandelman.ca,
- werner@almesberger.net, linux-bluetooth@vger.kernel.org,
- netdev@vger.kernel.org, "David S . Miller" <davem@davemloft.net>,
- Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>, James Morris <jmorris@namei.org>,
- Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
- Patrick McHardy <kaber@trash.net>
-From: Hannes Frederic Sowa <hannes@stressinduktion.org>
-Message-ID: <797c4085-3bc2-1f62-ba9a-4582de01cec9@stressinduktion.org>
-Date: Thu, 16 Jun 2016 12:44:09 +0200
-MIME-Version: 1.0
-In-Reply-To: <20160615192027.4064-5-aar@pengutronix.de>
-Content-Type: text/plain; charset=utf-8
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Message-ID: <1466071258.31678.12.camel@linux.intel.com>
+Subject: Re: current btle 6lowpan issues
+From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+To: Alexander Aring <aar@pengutronix.de>,
+	Linux Bluetooth <linux-bluetooth@vger.kernel.org>
+Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de,
+	patrik.flykt@linux.intel.com
+Date: Thu, 16 Jun 2016 13:00:58 +0300
+In-Reply-To: <ccd6b822-4af0-ea89-2dba-b914e6427191@pengutronix.de>
+References: <ccd6b822-4af0-ea89-2dba-b914e6427191@pengutronix.de>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 15.06.2016 21:20, Alexander Aring wrote:
-> This patch adds __ndisc_opt_addr_space as low-level function for
-> ndisc_opt_addr_space which doesn't depend on net_device parameter.
+Hi Alex,
+
+On Wed, 2016-06-15 at 20:02 +0200, Alexander Aring wrote:
+> Hi,
 > 
-> Cc: David S. Miller <davem@davemloft.net>
-> Cc: Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>
-> Cc: James Morris <jmorris@namei.org>
-> Cc: Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>
-> Cc: Patrick McHardy <kaber@trash.net>
-> Acked-by: YOSHIFUJI Hideaki <yoshfuji@linux-ipv6.org>
-> Reviewed-by: Stefan Schmidt <stefan@osg.samsung.com>
-> Signed-off-by: Alexander Aring <aar@pengutronix.de>
+> I like to collect some _big_ issues which I detected on current btle
+> 6lowpan
+> implementation, these are:
+> 
+>  1. The l2 daddr comes not from ndisc cache. This should come from
+> ndisc
+>     cache, instead the implementation construct the l2 from L3
+> address
+>     which only works for autoconfiguration addresses, all other
+>     addresses seems not be working for btle 6lowpan.
+> 
+>  2. The dev->dev_addr should be the 6 byte baddr and NOT the eui64
+>     generated baddr with fffe pattern and u/l bit. The eui64 should
+> not
+>     be part of source/target address options of ndisc messages, it
+> should
+>     be the baddr in big endian format. (dev->addr_len need to be 6
+> then,
+>     as well). baddr is the mac address of btle transceiver.
+> 
+> The 1. is easy to fix, but then I detected if we do that, the
+> neighbour
+> cache messages NS/NA/RS, etc use the eui64 fffe pattern with u/l bit
+> for
+> these messages, because the issue 2. So we will get the wrong address
+> from ndisc. The ndisc should store the 6 bytes baddr in big endian
+> format.
+> So these two issues need to be fixed in some patch and changes
+> everything
+> in btle 6lowpan.
+> 
+> I started to work on this but the issue 2. is a big change in btle
+> 6lowpan
+> so I want to start the discussion about to fix that to doing it in
+> the
+> right way.
+> 
+> Jukka, do you agree that this behaviour is currently broken in btle
+> 6lowpan?
 
-Acked-by: Hannes Frederic Sowa <hannes@stressinduktion.org>
+Yes you are right that there are issues. Fortunately the bt0 is
+currently a point-to-point link in which case ND is not really done and
+everything kind of "works" ok.
 
-[note, patchworks picks up the acks automatically, you don't need to repost]
+I added Patrik to cc: as he has been working to fix the issues but the
+patches are not yet ready. Perhaps we could combine the efforts here.
 
-Thanks,
-Hannes
+
+Cheers,
+Jukka
+
