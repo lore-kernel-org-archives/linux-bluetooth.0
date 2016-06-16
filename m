@@ -1,152 +1,156 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <linux-wpan-owner@vger.kernel.org>
+Subject: Re: current btle 6lowpan issues
+To: Patrik Flykt <Patrik.Flykt@linux.intel.com>,
+	Jukka Rissanen <jukka.rissanen@linux.intel.com>,
+	Linux Bluetooth <linux-bluetooth@vger.kernel.org>
+References: <ccd6b822-4af0-ea89-2dba-b914e6427191@pengutronix.de>
+ <1466071258.31678.12.camel@linux.intel.com>
+ <1466084491.13892.99.camel@linux.intel.com>
+Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de
+From: Alexander Aring <aar@pengutronix.de>
+Message-ID: <594d0734-87d2-2cbf-716b-2c3b0ac97ac6@pengutronix.de>
+Date: Thu, 16 Jun 2016 23:38:24 +0200
 MIME-Version: 1.0
-In-Reply-To: <57626C6A.9050606@intel.com>
-References: <CAPcThSGPMaqJ9zr5fPWM38YH+2DE5M7a5oBNM4pUa3g1Xdba1w@mail.gmail.com>
- <575A749A.1090409@intel.com> <CAPcThSGtgY=KyAvgtMd2HPTin7uKqNXbTc-4-9ME4ZYGutK1Lg@mail.gmail.com>
- <575FD5FB.4000404@intel.com> <CAPcThSEhPyV5Z1oWOv1_UP6TYVMqj9JVL-yRKnYZde0Jun1uZw@mail.gmail.com>
- <57626C6A.9050606@intel.com>
-From: Qingtao Cao <qingtao.cao.au@gmail.com>
-Date: Fri, 17 Jun 2016 17:18:43 +1000
-Message-ID: <CAPcThSFE5t=WRTQk53LHyk_tV3Bp3O3jRYO9AqjpObAn7dN74w@mail.gmail.com>
-Subject: Re: How to initialise bcm4354A2 with 3.10 kernel?
-To: Loic Poulain <loic.poulain@intel.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1466084491.13892.99.camel@linux.intel.com>
+Content-Type: text/plain; charset=utf-8
+Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello Loic,
 
-I've got feedback from vendor, turns out the hcd file I have been
-testing is as a matter of fact, the latest one available from their
-github:
+Hi,
 
-https://github.com/sonyxperiadev/device-sony-karin_windy/blob/master/rootdir/system/etc/BCM4356.hcd
-
-So the hcd file should be fine. Given that I have managed to use
-brcm_patchram_plus program to achieve the same results as bluedroid to
-initialise the BCM4354A2 hardware and I have even used "hcitool cmd"
-to send extra dozens of HCI commands sent by bluedroid (as recorded in
-btsnoop_hci.log file) right after initialisation, the culprit might
-locate in kernel space. So I compared and contrasted bluetooth kernel
-stack in my 3.10 kernel tree and the one used by vendor
-(git://github.com/sonyxperiadev/kernel) , turns out there indeed has
-one file different - msm_serial_hs.c, the high speed uart driver!
-
-commit 67f8f9d4579db3cd7e852ec42801f2748b18d1d2
-Author: Humberto Borba <humberos@gmail.com>
-Date:   Thu Apr 21 00:03:06 2016 -0300
-
-    drivers: msm_serial_hs: Fix unbalanced IRQ for msm8974
-
-    This path fixes unbalanced IRQ for msm8974 platforms,
-    also it fixes bluesleep wakelocks and it saves the battery life.
-
-    Welcome back deep sleep state.
-
-    This issue happened after driver update (for msm8994 platform) on:
-    https://github.com/sonyxperiadev/kernel/commit/529ec81e42194fee05bfd18bffc2c95ba796887d
-
-    Signed-off-by: Humberto Borba <humberos@gmail.com>
-
-
-Well, after I patched above commit, my situation was greatly improved:
-
-1. The HCI inquiry command will receive relevant command status,
-inquiry result and inquiry complete events successfully. Previously
-the Inquiry result event won't be received until the HCI inquiry
-cancel command is sent.
-
-2. The brcm_patchram_plus program won't have to re-send HCI reset
-command any more. Previously the 4-second alarm will be triggered
-twice to send the HCI reset command 3 times in total.
-
-3. The HCI write simple pairing mode command will receive its command
-complete event immediately. Previously using hcitool to send such
-command will block and I would have to send another HCI command to
-receive relevant command complete status for it (along with that of
-the second command)
-
-All above facts made me wondering that HCI events could be stuck by
-uart driver and not relayed upwards to bluetooth kernel stack until a
-new event is received.
-
-
-Last but not least, even after applied this commit, there are still
-0x00 leading bytes issue (although they could be worked around by my
-patch to skip them over), and sometimes I still could run into
-hci_reassembly() error:
-
-Apr 12 13:20:58 armv8-generic-okl4 kernel: [21928.544467] Bluetooth:
-Packet too short! Ignored. Count: 1 :
-Apr 12 13:20:58 armv8-generic-okl4 kernel: [21928.544500] Bluetooth: 04
-Apr 12 13:20:58 armv8-generic-okl4 kernel: [21928.544612] Bluetooth:
-Frame Reassembly Failed: 84
-Apr 12 13:20:58 armv8-generic-okl4 kernel: [21928.544626] Bluetooth:
-Received 6 bytes of data:
-Apr 12 13:20:58 armv8-generic-okl4 kernel: [21928.544645] Bluetooth: 0e
-Apr 12 13:20:58 armv8-generic-okl4 kernel: [21928.544656] Bluetooth: 04
-Apr 12 13:20:58 armv8-generic-okl4 kernel: [21928.544665] Bluetooth: 01
-Apr 12 13:20:58 armv8-generic-okl4 kernel: [21928.544672] Bluetooth: 08
-Apr 12 13:20:58 armv8-generic-okl4 kernel: [21928.544676] Bluetooth: 20
-Apr 12 13:20:58 armv8-generic-okl4 kernel: [21928.544680] Bluetooth: 00
-
-As we can see, the h4_recv() callback has been incorrectly invoked
-twice by the low level tty driver for only one hci event packet: once
-for the first "04" byte and another for the rest of the "04 0e 04 01
-08 20 00" packet, which otherwise would have been passed on to hcitool
-in usrspace through the HCI socket.
-
-Anyway, I will continue chase this issue up to relevant developer
-Humberto Borba :-D
-
-Many thanks again for all your help and guidance throughout this whole week!
-
-Harry
-
-
-On Thu, Jun 16, 2016 at 7:07 PM, Loic Poulain <loic.poulain@intel.com> wrote:
-> Hi Harry,
->
->> I have to say you are shrewd in this respect, if I use baud rate of
->> 115.2K, then the leading "garbage" bytes would no longer be 0x00 as
->> with baud rate of 3M or 4M, e.g.:
+On 06/16/2016 03:41 PM, Patrik Flykt wrote:
+> On Thu, 2016-06-16 at 13:00 +0300, Jukka Rissanen wrote:
+>> Yes you are right that there are issues. Fortunately the bt0 is
+>> currently a point-to-point link in which case ND is not really done
+>> and everything kind of "works" ok.
 >>
->> Above logs are printed when hci_reassembly() returns -84 error code,
->> as we can see, the leading bytes becomes f8 or fc, sometimes even an
->> array of "18 90 90 15 f8". By contrast, if baudrate of 3M/4M is used,
->> the leading bytes seem always be 0x00. So it seems apparent that the
->> leading garbage bytes are related with the baudrate used.
->
->
-> Look like some unsync serial bytes.
-> This seems definitely related to your firmware.
->
->> Moreover, with baudrate of 4M, I tried avoid downloading BCM43xx.hcd
->> file at all, to my surprise, the hci0 can still be enabled well.
->> "hciconfig -a" reads that the HCI revision has changed from 0x2108
->> (with *.hcd downloaded) to 0x2000 (without *.hcd at all):
->>      HCI Version:  (0x7)  Revision: 0x2000
->>      HCI Version:  (0x7)  Revision: 0x2108
->>
->> with all the other features/link policy/packet types identical. Out of
->> curiosity, what difference could HCI revision make for hardware
->> capability?
->
->
-> HCI revision is implementation dependent, vendor can change revision with
-> new firmwares (including fixes, capabilities...).
->
->>
->> Further more, when a *.hcd file is downloaded if I use "hcitool cmd"
->> to send the HCI Inquiry command, I can receive the corresponding HCI
->> Inquiry Result event when I send out the HCI Inquiry Cancel commands.
->> However, when the *.hcd file is not used, I received no HCI Inquiry
->> Result event at all. So I guess the firmware patchfile *.hcd is still
->> desirable to configure hardware properly.
->
->
-> Indeed, embedded firmware can be buggy, you need the right hcd.
->
-> Regards,
-> Loic
+>> I added Patrik to cc: as he has been working to fix the issues but
+>> the patches are not yet ready. Perhaps we could combine the efforts
+>> here.
+> 
+> I had some patches that make BTLE interfaces non-point-to-point. Let me
+> check that they can be applied on the latest bluetooth-next and that
+> they still compile after a few months of sitting on an old version.
+> Then let's hope they also work as expected...
+> 
+
+With non-point-to-point you mean to remove the IFF_POINTOPOINT flag in
+net_device? Yes this should be removed.
+
+But I think this is one of the smallest issue in btle 6lowpan.
+
+What means "ND is not really done", does that means you will not see
+btle neighbours by doing "ip -6 neigh" for your bt interface?
+
+I don't believe that and I think no matter if you set IFF_POINTOPOINT or
+not, the IPv6 stack will mostly ignore such flag. I did a grep and it
+seems the SIT stuff sets this flag and IPv6 stack does something with
+that, but not in case of ARPHRD_6LOWPAN, it's for ARPHRD_SIT only. So I
+think this flag makes some "peer" address in "ip a" handling instead of
+showing broadcast address. But nobody will make special handling in IPv6
+or btle 6lowpan if this flag is set.
+
+What I mean is, you can set this flag on or off but it will don't change
+any behaviour.
+
+---
+
+Back to the two issues which I mentioned. I suppose "ip -6 neigh" shows
+currently some neighbours or not? I don't believe, that IPv6 can
+working without any neighbours in "ip -6 neigh", otherwise the IPv6
+stack would send NS messages again and again. (Because 2. issue the
+addresses in ndisc is not be the 6-byte address of bluetooth device, it's
+the fffe with u/l bit flip stuff, which is the /64 prefix of
+autoconfiguration L3 address which is wrong.)
+
+These NS messages have some multicast address as L3 daddr and so far I
+know, it should be working like the following example: 
+(correct me if I am wrong)
+
+         _____ Slave #1 (6LN)
+        /
+Master #0 (6LBR)
+        \----- Slave #2 (6LN)
+	 \
+	  \--- Slave #n (6LN)
+	   \
+	    \- ... (6LN)
+	     .
+	      .
+	       .
+
+So if one Slave multicast address as destination, the master need to
+send to all Slaves the same 6lowpan packet to handle somehow the
+multicast stuff for L2 point-to-point connection.
+
+I think it's described at [0], also there is somewhere some nicer
+graphic.
+
+So far I see it in the code, there is no such implementation to realize
+multicasting on btle 6lowpan, or?
+
+---
+
+My questions are:
+
+The neighbour cache stores the wrong addresses because the dev->addr isn't
+the real bluetooth device addr and we need to use the l2 addr getting from
+ndisc cache. Will this be fixed in the pending patch series?
+
+As an example I can show you [1], which should be something like:
+
+(I changed some variable names, just a byteswap)
+
+dev->dev_addr[0] = bdaddr->b[5];
+dev->dev_addr[1] = bdaddr->b[4];
+dev->dev_addr[2] = bdaddr->b[3];
+dev->dev_addr[3] = bdaddr->b[2];
+dev->dev_addr[4] = bdaddr->b[1];
+dev->dev_addr[5] = bdaddr->b[0];
+
+The fffe, and bitflip for has nothing to do with that, this is necessary
+for the /64 prefix in case of autoconfiguration [2], which should look
+something like:
+
+static int addrconf_ifid_eui64(u8 *eui, struct net_device *dev)
+{
+       switch (lowpan_dev(dev)->lltype) {
+       case LOWPAN_LLTYPE_BTLE:
+               if (dev->addr_len != 6)
+                       return -1;
+
+               memcpy(eui, dev->dev_addr, 3);
+               memcpy(eui + 5, dev->dev_addr + 3, 3);
+               eui[3] = 0xFF;
+               eui[4] = 0xFE;
+
+               /* Universal/local bit set, BT 6lowpan draft ch. 3.2.1 */
+               if (*(dev->dev_addr + 5) & 0x02)
+                       eui[0] |= 0x02;
+               else
+                       eui[0] &= ~0x02;
+               break;
+       default:
+               if (dev->addr_len != EUI64_ADDR_LEN)
+                       return -1;
+
+               memcpy(eui, dev->dev_addr, EUI64_ADDR_LEN);
+               eui[0] ^= 2;
+               break;
+       }
+
+       return 0;
+}
+
+Second question:
+
+Still I don't know what exactly "some patches that make BTLE interfaces
+non-point-to-point" really means here. Dropping the above mentioned flag
+will not fix this behaviour. What does this really mean?
+
+- Alex
+
+[0] https://tools.ietf.org/html/rfc7668#section-3.2.5
+[1] http://lxr.free-electrons.com/source/net/bluetooth/6lowpan.c#L674
+[2] http://lxr.free-electrons.com/source/net/ipv6/addrconf.c#L1963
