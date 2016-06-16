@@ -2,32 +2,35 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Tobias Svehagen <tobias.svehagen@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Tobias Svehagen <tobias.svehagen@gmail.com>
-Subject: [PATCH BlueZ] src/gatt-client: Fix iteration through options
-Date: Thu, 16 Jun 2016 15:29:11 +0200
-Message-Id: <20160616132913.13138-1-tobias.svehagen@gmail.com>
+Subject: [PATCH BlueZ 2/2] tools/gatt-service: Do not call parse_options on reply message
+Date: Thu, 16 Jun 2016 15:29:13 +0200
+Message-Id: <20160616132913.13138-3-tobias.svehagen@gmail.com>
+In-Reply-To: <20160616132913.13138-1-tobias.svehagen@gmail.com>
+References: <20160616132913.13138-1-tobias.svehagen@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Fix infinite loop when trying to read/write a characteristic or
-a descriptor and the ReadValue/WriteValue call has at least one
-option.
+A call to dbus_message_iter_get_arg_type will cause an assertion
+since it is called on the wrong type of iterator.
 ---
- src/gatt-client.c | 2 ++
- 1 file changed, 2 insertions(+)
+ tools/gatt-service.c | 4 ----
+ 1 file changed, 4 deletions(-)
 
-diff --git a/src/gatt-client.c b/src/gatt-client.c
-index 0cbacca..6fc0d19 100644
---- a/src/gatt-client.c
-+++ b/src/gatt-client.c
-@@ -401,6 +401,8 @@ static int parse_options(DBusMessageIter *iter, uint16_t *offset)
- 				return -EINVAL;
- 			dbus_message_iter_get_basic(&value, offset);
- 		}
-+
-+		dbus_message_iter_next(&dict);
- 	}
+diff --git a/tools/gatt-service.c b/tools/gatt-service.c
+index 1cf8b3c..6bd5576 100644
+--- a/tools/gatt-service.c
++++ b/tools/gatt-service.c
+@@ -515,10 +515,6 @@ static DBusMessage *desc_read_value(DBusConnection *conn, DBusMessage *msg,
  
- 	return 0;
+ 	dbus_message_iter_init_append(reply, &iter);
+ 
+-	if (parse_options(&iter, &device))
+-		return g_dbus_create_error(msg, DBUS_ERROR_INVALID_ARGS,
+-							"Invalid arguments");
+-
+ 	desc_read(desc, &iter);
+ 
+ 	return reply;
 -- 
 2.8.3
 
