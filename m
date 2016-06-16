@@ -1,75 +1,59 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Subject: Re: How to initialise bcm4354A2 with 3.10 kernel?
+To: Qingtao Cao <qingtao.cao.au@gmail.com>
+References: <CAPcThSGPMaqJ9zr5fPWM38YH+2DE5M7a5oBNM4pUa3g1Xdba1w@mail.gmail.com>
+ <575A749A.1090409@intel.com>
+ <CAPcThSGtgY=KyAvgtMd2HPTin7uKqNXbTc-4-9ME4ZYGutK1Lg@mail.gmail.com>
+ <575FD5FB.4000404@intel.com>
+ <CAPcThSEhPyV5Z1oWOv1_UP6TYVMqj9JVL-yRKnYZde0Jun1uZw@mail.gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+From: Loic Poulain <loic.poulain@intel.com>
+Message-ID: <57626C6A.9050606@intel.com>
+Date: Thu, 16 Jun 2016 11:07:54 +0200
 MIME-Version: 1.0
-In-Reply-To: <1465993598-30695-1-git-send-email-luiz.dentz@gmail.com>
-References: <1465993598-30695-1-git-send-email-luiz.dentz@gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 16 Jun 2016 12:34:36 +0300
-Message-ID: <CABBYNZKvRiAYjjoJoxzDpUc-ggZt8ikg5_txCtJumDgMwXNTDw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/2] audio/avrcp: Fix crash if no player is available
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <CAPcThSEhPyV5Z1oWOv1_UP6TYVMqj9JVL-yRKnYZde0Jun1uZw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Harry,
 
-On Wed, Jun 15, 2016 at 3:26 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> I have to say you are shrewd in this respect, if I use baud rate of
+> 115.2K, then the leading "garbage" bytes would no longer be 0x00 as
+> with baud rate of 3M or 4M, e.g.:
 >
-> It seems some Samsung Android devices may actually report no players
-> at all causing the following crash:
->
-> Program terminated with signal 11, Segmentation fault.
->   #0  set_ct_player (player=0x0, session=<value optimized out>)
->     at profiles/audio/avrcp.c:3139
->   #1  0xb76c0aab in player_remove (data=0xb849a100)
->     at profiles/audio/avrcp.c:3278
-> ---
->  profiles/audio/avrcp.c | 11 ++++++++++-
->  1 file changed, 10 insertions(+), 1 deletion(-)
->
-> diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
-> index 6c8ed81..c100149 100644
-> --- a/profiles/audio/avrcp.c
-> +++ b/profiles/audio/avrcp.c
-> @@ -3200,7 +3200,8 @@ static void set_ct_player(struct avrcp *session, struct avrcp_player *player)
->
->         session->controller->player = player;
->         service = btd_device_get_service(session->dev, AVRCP_TARGET_UUID);
-> -       control_set_player(service, media_player_get_path(player->user_data));
-> +       control_set_player(service, player ?
-> +                       media_player_get_path(player->user_data) : NULL);
->  }
->
->  static struct avrcp_player *create_ct_player(struct avrcp *session,
-> @@ -3330,6 +3331,10 @@ static void player_remove(gpointer data)
->         struct avrcp_player *player = data;
->         GSList *l;
->
-> +       /* Don't remove reserved player */
-> +       if (!player->id)
-> +               return;
-> +
->         for (l = player->sessions; l; l = l->next) {
->                 struct avrcp *session = l->data;
->                 struct avrcp_data *controller = session->controller;
-> @@ -3393,6 +3398,10 @@ static gboolean avrcp_get_media_player_list_rsp(struct avctp *conn,
->
->         g_slist_free_full(removed, player_remove);
->
-> +       /* There should always be an active player */
-> +       if (!session->controller->player)
-> +               create_ct_player(session, 0);
-> +
->         return FALSE;
->  }
->
-> --
-> 2.5.5
+> Above logs are printed when hci_reassembly() returns -84 error code,
+> as we can see, the leading bytes becomes f8 or fc, sometimes even an
+> array of "18 90 90 15 f8". By contrast, if baudrate of 3M/4M is used,
+> the leading bytes seem always be 0x00. So it seems apparent that the
+> leading garbage bytes are related with the baudrate used.
 
-Applied.
+Look like some unsync serial bytes.
+This seems definitely related to your firmware.
 
+> Moreover, with baudrate of 4M, I tried avoid downloading BCM43xx.hcd
+> file at all, to my surprise, the hci0 can still be enabled well.
+> "hciconfig -a" reads that the HCI revision has changed from 0x2108
+> (with *.hcd downloaded) to 0x2000 (without *.hcd at all):
+>      HCI Version:  (0x7)  Revision: 0x2000
+>      HCI Version:  (0x7)  Revision: 0x2108
+>
+> with all the other features/link policy/packet types identical. Out of
+> curiosity, what difference could HCI revision make for hardware
+> capability?
 
--- 
-Luiz Augusto von Dentz
+HCI revision is implementation dependent, vendor can change revision 
+with new firmwares (including fixes, capabilities...).
+
+>
+> Further more, when a *.hcd file is downloaded if I use "hcitool cmd"
+> to send the HCI Inquiry command, I can receive the corresponding HCI
+> Inquiry Result event when I send out the HCI Inquiry Cancel commands.
+> However, when the *.hcd file is not used, I received no HCI Inquiry
+> Result event at all. So I guess the firmware patchfile *.hcd is still
+> desirable to configure hardware properly.
+
+Indeed, embedded firmware can be buggy, you need the right hcd.
+
+Regards,
+Loic
