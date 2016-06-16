@@ -1,44 +1,35 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: bugzilla-daemon@bugzilla.kernel.org
-To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 98021] Broadcom 43341 sdio bluetooth module is not recognized.
-Date: Thu, 16 Jun 2016 15:21:11 +0000
-Message-ID: <bug-98021-62941-PmuRkm3p74@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-98021-62941@https.bugzilla.kernel.org/>
-References: <bug-98021-62941@https.bugzilla.kernel.org/>
+Return-Path: <linux-wpan-owner@vger.kernel.org>
+Message-ID: <1466084491.13892.99.camel@linux.intel.com>
+Subject: Re: current btle 6lowpan issues
+From: Patrik Flykt <Patrik.Flykt@linux.intel.com>
+To: Jukka Rissanen <jukka.rissanen@linux.intel.com>,
+	Alexander Aring <aar@pengutronix.de>,
+	Linux Bluetooth <linux-bluetooth@vger.kernel.org>
+Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de
+Date: Thu, 16 Jun 2016 16:41:31 +0300
+In-Reply-To: <1466071258.31678.12.camel@linux.intel.com>
+References: <ccd6b822-4af0-ea89-2dba-b914e6427191@pengutronix.de>
+	 <1466071258.31678.12.camel@linux.intel.com>
 Content-Type: text/plain; charset="UTF-8"
-MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Mime-Version: 1.0
+Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-https://bugzilla.kernel.org/show_bug.cgi?id=98021
+On Thu, 2016-06-16 at 13:00 +0300, Jukka Rissanen wrote:
+> Yes you are right that there are issues. Fortunately the bt0 is
+> currently a point-to-point link in which case ND is not really done
+> and everything kind of "works" ok.
+> 
+> I added Patrik to cc: as he has been working to fix the issues but
+> the patches are not yet ready. Perhaps we could combine the efforts
+> here.
 
---- Comment #4 from Francesco Bonanno <mibofra@frozenbox.org> ---
-Hello, after some time I have started to work again with the my asus t200ta. I
-have the bluetooth module working now!
+I had some patches that make BTLE interfaces non-point-to-point. Let me
+check that they can be applied on the latest bluetooth-next and that
+they still compile after a few months of sitting on an old version.
+Then let's hope they also work as expected...
 
-https://github.com/LGSInnovations/edison-yocto-image/raw/master/edison-image-edison-ext4/etc/firmware/bcm43341.hcd
-this is the firmware used to get it working (I've originally unpacked it from
-the intel edison image, anyway I have found this repository where it is pushed
-already, so you can take the firmware here for tests)
+Cheers,
 
-After I have discovered that the bcm43341 (at least on my t200ta and with linux
-4.7rc3) is seen as a bcm43341B0 on /dev/ttyS4
+	Patrik
 
-[ 1251.074780] Bluetooth: hci1: BCM: chip id 82
-[ 1251.074792] Bluetooth: hci1: BCM43341B0 (002.001.014) build 0000
-
-So I have put the firmware under /lib/firmware/brcm/BCM43341B0.hcd where
-btattach is looking for it and after I have launched it with:
-
-"btattach --bredr /dev/ttyS4 -P bcm" as root, and it is working without issues!
-
-I have put the command under /etc/rc.local as workaround, however I imagine
-that you will find a better solution to have it recognised automatically by the
-kernel. 
-
-I hope all this will be usefull!
-
--- 
-You are receiving this mail because:
-You are the assignee for the bug.
