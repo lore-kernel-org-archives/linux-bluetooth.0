@@ -1,72 +1,75 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Message-ID: <1466071258.31678.12.camel@linux.intel.com>
-Subject: Re: current btle 6lowpan issues
-From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
-To: Alexander Aring <aar@pengutronix.de>,
-	Linux Bluetooth <linux-bluetooth@vger.kernel.org>
-Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de,
-	patrik.flykt@linux.intel.com
-Date: Thu, 16 Jun 2016 13:00:58 +0300
-In-Reply-To: <ccd6b822-4af0-ea89-2dba-b914e6427191@pengutronix.de>
-References: <ccd6b822-4af0-ea89-2dba-b914e6427191@pengutronix.de>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+MIME-Version: 1.0
+In-Reply-To: <1465993598-30695-1-git-send-email-luiz.dentz@gmail.com>
+References: <1465993598-30695-1-git-send-email-luiz.dentz@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Thu, 16 Jun 2016 12:34:36 +0300
+Message-ID: <CABBYNZKvRiAYjjoJoxzDpUc-ggZt8ikg5_txCtJumDgMwXNTDw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/2] audio/avrcp: Fix crash if no player is available
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alex,
+Hi,
 
-On Wed, 2016-06-15 at 20:02 +0200, Alexander Aring wrote:
-> Hi,
-> 
-> I like to collect some _big_ issues which I detected on current btle
-> 6lowpan
-> implementation, these are:
-> 
->  1. The l2 daddr comes not from ndisc cache. This should come from
-> ndisc
->     cache, instead the implementation construct the l2 from L3
-> address
->     which only works for autoconfiguration addresses, all other
->     addresses seems not be working for btle 6lowpan.
-> 
->  2. The dev->dev_addr should be the 6 byte baddr and NOT the eui64
->     generated baddr with fffe pattern and u/l bit. The eui64 should
-> not
->     be part of source/target address options of ndisc messages, it
-> should
->     be the baddr in big endian format. (dev->addr_len need to be 6
-> then,
->     as well). baddr is the mac address of btle transceiver.
-> 
-> The 1. is easy to fix, but then I detected if we do that, the
-> neighbour
-> cache messages NS/NA/RS, etc use the eui64 fffe pattern with u/l bit
-> for
-> these messages, because the issue 2. So we will get the wrong address
-> from ndisc. The ndisc should store the 6 bytes baddr in big endian
-> format.
-> So these two issues need to be fixed in some patch and changes
-> everything
-> in btle 6lowpan.
-> 
-> I started to work on this but the issue 2. is a big change in btle
-> 6lowpan
-> so I want to start the discussion about to fix that to doing it in
-> the
-> right way.
-> 
-> Jukka, do you agree that this behaviour is currently broken in btle
-> 6lowpan?
+On Wed, Jun 15, 2016 at 3:26 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> It seems some Samsung Android devices may actually report no players
+> at all causing the following crash:
+>
+> Program terminated with signal 11, Segmentation fault.
+>   #0  set_ct_player (player=0x0, session=<value optimized out>)
+>     at profiles/audio/avrcp.c:3139
+>   #1  0xb76c0aab in player_remove (data=0xb849a100)
+>     at profiles/audio/avrcp.c:3278
+> ---
+>  profiles/audio/avrcp.c | 11 ++++++++++-
+>  1 file changed, 10 insertions(+), 1 deletion(-)
+>
+> diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
+> index 6c8ed81..c100149 100644
+> --- a/profiles/audio/avrcp.c
+> +++ b/profiles/audio/avrcp.c
+> @@ -3200,7 +3200,8 @@ static void set_ct_player(struct avrcp *session, struct avrcp_player *player)
+>
+>         session->controller->player = player;
+>         service = btd_device_get_service(session->dev, AVRCP_TARGET_UUID);
+> -       control_set_player(service, media_player_get_path(player->user_data));
+> +       control_set_player(service, player ?
+> +                       media_player_get_path(player->user_data) : NULL);
+>  }
+>
+>  static struct avrcp_player *create_ct_player(struct avrcp *session,
+> @@ -3330,6 +3331,10 @@ static void player_remove(gpointer data)
+>         struct avrcp_player *player = data;
+>         GSList *l;
+>
+> +       /* Don't remove reserved player */
+> +       if (!player->id)
+> +               return;
+> +
+>         for (l = player->sessions; l; l = l->next) {
+>                 struct avrcp *session = l->data;
+>                 struct avrcp_data *controller = session->controller;
+> @@ -3393,6 +3398,10 @@ static gboolean avrcp_get_media_player_list_rsp(struct avctp *conn,
+>
+>         g_slist_free_full(removed, player_remove);
+>
+> +       /* There should always be an active player */
+> +       if (!session->controller->player)
+> +               create_ct_player(session, 0);
+> +
+>         return FALSE;
+>  }
+>
+> --
+> 2.5.5
 
-Yes you are right that there are issues. Fortunately the bt0 is
-currently a point-to-point link in which case ND is not really done and
-everything kind of "works" ok.
-
-I added Patrik to cc: as he has been working to fix the issues but the
-patches are not yet ready. Perhaps we could combine the efforts here.
+Applied.
 
 
-Cheers,
-Jukka
-
+-- 
+Luiz Augusto von Dentz
