@@ -1,36 +1,102 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Szymon Janc <szymon.janc@codecoup.pl>
-To: Don Zickus <dzickus@redhat.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: Debugging bluetoothd, dbus and selinux help?
-Date: Fri, 17 Jun 2016 10:32:23 +0200
-Message-ID: <14376099.m2jF0XBNfH@ix>
-In-Reply-To: <20160615170025.GB90326@redhat.com>
-References: <20160615170025.GB90326@redhat.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/2] monitor: Add support for analyzing index info
+Date: Fri, 17 Jun 2016 10:26:35 +0200
+Message-ID: <3037568.vWaAmnrnek@ix>
+In-Reply-To: <1461703933-18073-1-git-send-email-szymon.janc@codecoup.pl>
+References: <1461703933-18073-1-git-send-email-szymon.janc@codecoup.pl>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+On Tuesday 26 April 2016 22:52:12 Szymon Janc wrote:
+> Will now show vendor name if it was provided in snoop file.
+> ---
+>  monitor/analyze.c | 30 +++++++++++++++++++++++++++++-
+>  1 file changed, 29 insertions(+), 1 deletion(-)
+> 
+> diff --git a/monitor/analyze.c b/monitor/analyze.c
+> index 0f2d19a..197c7f9 100644
+> --- a/monitor/analyze.c
+> +++ b/monitor/analyze.c
+> @@ -29,6 +29,8 @@
+>  #include <stdio.h>
+>  #include <string.h>
+> 
+> +#include "lib/bluetooth.h"
+> +
+>  #include "src/shared/util.h"
+>  #include "src/shared/queue.h"
+>  #include "src/shared/btsnoop.h"
+> @@ -45,6 +47,7 @@ struct hci_dev {
+>  	unsigned long num_evt;
+>  	unsigned long num_acl;
+>  	unsigned long num_sco;
+> +	uint16_t manufacturer;
+>  };
+> 
+>  static struct queue *dev_list;
+> @@ -67,9 +70,14 @@ static void dev_destroy(void *data)
+>  	}
+> 
+>  	printf("Found %s controller with index %u\n", str, dev->index);
+> -	printf("  BD_ADDR %2.2X:%2.2X:%2.2X:%2.2X:%2.2X:%2.2X\n",
+> +	printf("  BD_ADDR %2.2X:%2.2X:%2.2X:%2.2X:%2.2X:%2.2X",
+>  			dev->bdaddr[5], dev->bdaddr[4], dev->bdaddr[3],
+>  			dev->bdaddr[2], dev->bdaddr[1], dev->bdaddr[0]);
+> +	if (dev->manufacturer != 0xffff)
+> +		printf(" (%s)", bt_compidtostr(dev->manufacturer));
+> +	printf("\n");
+> +
+> +
+>  	printf("  %lu commands\n", dev->num_cmd);
+>  	printf("  %lu events\n", dev->num_evt);
+>  	printf("  %lu ACL packets\n", dev->num_acl);
+> @@ -90,6 +98,7 @@ static struct hci_dev *dev_alloc(uint16_t index)
+>  	}
+> 
+>  	dev->index = index;
+> +	dev->manufacturer = 0xffff;
+> 
+>  	return dev;
+>  }
+> @@ -251,6 +260,22 @@ static void sco_pkt(struct timeval *tv, uint16_t index,
+> dev->num_sco++;
+>  }
+> 
+> +static void info_index(struct timeval *tv, uint16_t index,
+> +					const void *data, uint16_t size)
+> +{
+> +	const struct btsnoop_opcode_index_info *hdr = data;
+> +	struct hci_dev *dev;
+> +
+> +	data += sizeof(*hdr);
+> +	size -= sizeof(*hdr);
+> +
+> +	dev = dev_lookup(index);
+> +	if (!dev)
+> +		return;
+> +
+> +	dev->manufacturer = hdr->manufacturer;
+> +}
+> +
+>  void analyze_trace(const char *path)
+>  {
+>  	struct btsnoop *btsnoop_file;
+> @@ -312,6 +337,9 @@ void analyze_trace(const char *path)
+>  		case BTSNOOP_OPCODE_OPEN_INDEX:
+>  		case BTSNOOP_OPCODE_CLOSE_INDEX:
+>  			break;
+> +		case BTSNOOP_OPCODE_INDEX_INFO:
+> +			info_index(&tv, index, buf, pktlen);
+> +			break;
+>  		default:
+>  			fprintf(stderr, "Wrong opcode %u\n", opcode);
+>  			goto done;
 
-On Wednesday 15 June 2016 13:00:25 Don Zickus wrote:
-> Hi,
-> 
-> I am trying to debug why bluetoothd decides to disconnect from the d-bus on
-> the host, when the client does an object push to an obex agent on the host.
-> 
-> When I set selinux to permissive mode ('setenforce 0'), things work fine (ie
-> the object push goes through).
-> 
-> I tried searching /var/log/audit/audit.log, journalctl and dbus-monitor for
-> clues (on the host) and can't find anything obvious.
-> 
-> Does anyone have any tips on how to find what security policy might be
-> interfering with my test?
-> 
-
-To me it looks like FD passing on D-Bus is being blocked by SELinux.
+Pushed.
 
 -- 
 pozdrawiam
