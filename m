@@ -1,39 +1,44 @@
-Return-Path: <linux-wpan-owner@vger.kernel.org>
-To: Linux Bluetooth <linux-bluetooth@vger.kernel.org>
-From: Alexander Aring <aar@pengutronix.de>
-Subject: linux-wpan radvd upstream
-Cc: linux-wpan@vger.kernel.org,
-	Jukka Rissanen <jukka.rissanen@linux.intel.com>,
-	reubenhwk@gmail.com
-Message-ID: <22574127-79b0-9877-769d-1489eb3162e5@pengutronix.de>
-Date: Sat, 18 Jun 2016 11:23:02 +0200
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Date: Fri, 17 Jun 2016 10:43:19 -0400
+From: Don Zickus <dzickus@redhat.com>
+To: Szymon Janc <szymon.janc@codecoup.pl>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: Debugging bluetoothd, dbus and selinux help?
+Message-ID: <20160617144319.GW90326@redhat.com>
+References: <20160615170025.GB90326@redhat.com>
+ <14376099.m2jF0XBNfH@ix>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Sender: linux-wpan-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <14376099.m2jF0XBNfH@ix>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi wpan and bluetooth people,
+On Fri, Jun 17, 2016 at 10:32:23AM +0200, Szymon Janc wrote:
+> Hi,
+> 
+> On Wednesday 15 June 2016 13:00:25 Don Zickus wrote:
+> > Hi,
+> > 
+> > I am trying to debug why bluetoothd decides to disconnect from the d-bus on
+> > the host, when the client does an object push to an obex agent on the host.
+> > 
+> > When I set selinux to permissive mode ('setenforce 0'), things work fine (ie
+> > the object push goes through).
+> > 
+> > I tried searching /var/log/audit/audit.log, journalctl and dbus-monitor for
+> > clues (on the host) and can't find anything obvious.
+> > 
+> > Does anyone have any tips on how to find what security policy might be
+> > interfering with my test?
+> > 
+> 
+> To me it looks like FD passing on D-Bus is being blocked by SELinux.
 
-Please review dev branch [0]. The important commit is the rework of the 6CO
-support which is used by Bluetooth and 802.15.4 6LoWPAN.
+Hi Szymon,
 
-Jukka, tell me if support for a common userspace application to sending
-RA frames is okay for you.
+Thanks for the tip!  Is there a way I can verify that.  I am scratching my
+head for the right log file or monitor probe.  Or better yet, the right file
+to modify to fix that permission problem..
 
-I like to send a push request the next days to radvd repository.
-
-btw:
-
-We have now the layer for ndisc stuff and could think about to handle
-6CO in userspace.
-
-NOT the sending transmit of RA + 6CO, this isn't kernel job, but processing
-RA frames with 6CO could be moved to kernel. The kernel take care for
-context table only (overwrites by administration should always possible).
-
-Anyway, I think we can still change it later if we want to move the
-handling into kernelspace.
-
-- Alex
-
-[0] https://github.com/linux-wpan/radvd/commits/6lowpan
+Cheers,
+Don
