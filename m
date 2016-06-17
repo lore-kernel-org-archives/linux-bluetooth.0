@@ -1,45 +1,37 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Szymon Janc <szymon.janc@codecoup.pl>
+To: Don Zickus <dzickus@redhat.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: Debugging bluetoothd, dbus and selinux help?
+Date: Fri, 17 Jun 2016 10:32:23 +0200
+Message-ID: <14376099.m2jF0XBNfH@ix>
+In-Reply-To: <20160615170025.GB90326@redhat.com>
+References: <20160615170025.GB90326@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20160616132913.13138-1-tobias.svehagen@gmail.com>
-References: <20160616132913.13138-1-tobias.svehagen@gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Fri, 17 Jun 2016 11:44:54 +0300
-Message-ID: <CABBYNZJ6X5u=jL5q=mDj4NKU=rSA1gxXBxJMYPk1xjeKq=y=_Q@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] src/gatt-client: Fix iteration through options
-To: Tobias Svehagen <tobias.svehagen@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Tobias,
+Hi,
 
-On Thu, Jun 16, 2016 at 4:29 PM, Tobias Svehagen
-<tobias.svehagen@gmail.com> wrote:
-> Fix infinite loop when trying to read/write a characteristic or
-> a descriptor and the ReadValue/WriteValue call has at least one
-> option.
-> ---
->  src/gatt-client.c | 2 ++
->  1 file changed, 2 insertions(+)
->
-> diff --git a/src/gatt-client.c b/src/gatt-client.c
-> index 0cbacca..6fc0d19 100644
-> --- a/src/gatt-client.c
-> +++ b/src/gatt-client.c
-> @@ -401,6 +401,8 @@ static int parse_options(DBusMessageIter *iter, uint16_t *offset)
->                                 return -EINVAL;
->                         dbus_message_iter_get_basic(&value, offset);
->                 }
-> +
-> +               dbus_message_iter_next(&dict);
->         }
->
->         return 0;
-> --
-> 2.8.3
+On Wednesday 15 June 2016 13:00:25 Don Zickus wrote:
+> Hi,
+> 
+> I am trying to debug why bluetoothd decides to disconnect from the d-bus on
+> the host, when the client does an object push to an obex agent on the host.
+> 
+> When I set selinux to permissive mode ('setenforce 0'), things work fine (ie
+> the object push goes through).
+> 
+> I tried searching /var/log/audit/audit.log, journalctl and dbus-monitor for
+> clues (on the host) and can't find anything obvious.
+> 
+> Does anyone have any tips on how to find what security policy might be
+> interfering with my test?
+> 
 
-Applied, thanks.
+To me it looks like FD passing on D-Bus is being blocked by SELinux.
 
 -- 
-Luiz Augusto von Dentz
+pozdrawiam
+Szymon Janc
