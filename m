@@ -1,44 +1,44 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Date: Fri, 17 Jun 2016 10:43:19 -0400
-From: Don Zickus <dzickus@redhat.com>
-To: Szymon Janc <szymon.janc@codecoup.pl>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: Debugging bluetoothd, dbus and selinux help?
-Message-ID: <20160617144319.GW90326@redhat.com>
-References: <20160615170025.GB90326@redhat.com>
- <14376099.m2jF0XBNfH@ix>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <14376099.m2jF0XBNfH@ix>
+In-Reply-To: <20160616132913.13138-2-tobias.svehagen@gmail.com>
+References: <20160616132913.13138-1-tobias.svehagen@gmail.com> <20160616132913.13138-2-tobias.svehagen@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Fri, 17 Jun 2016 11:45:31 +0300
+Message-ID: <CABBYNZJ05RGoEOWhE0ZKDUmn6DbjtNqe3HotR+rY2J=UmaYFVg@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/2] tools/gatt-service: Fix iteration through options
+To: Tobias Svehagen <tobias.svehagen@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, Jun 17, 2016 at 10:32:23AM +0200, Szymon Janc wrote:
-> Hi,
-> 
-> On Wednesday 15 June 2016 13:00:25 Don Zickus wrote:
-> > Hi,
-> > 
-> > I am trying to debug why bluetoothd decides to disconnect from the d-bus on
-> > the host, when the client does an object push to an obex agent on the host.
-> > 
-> > When I set selinux to permissive mode ('setenforce 0'), things work fine (ie
-> > the object push goes through).
-> > 
-> > I tried searching /var/log/audit/audit.log, journalctl and dbus-monitor for
-> > clues (on the host) and can't find anything obvious.
-> > 
-> > Does anyone have any tips on how to find what security policy might be
-> > interfering with my test?
-> > 
-> 
-> To me it looks like FD passing on D-Bus is being blocked by SELinux.
+Hi Tobias,
 
-Hi Szymon,
+On Thu, Jun 16, 2016 at 4:29 PM, Tobias Svehagen
+<tobias.svehagen@gmail.com> wrote:
+> Fixes an infinite loop when trying to read a descriptor and the
+> ReadValue call has at least one option.
+> ---
+>  tools/gatt-service.c | 2 ++
+>  1 file changed, 2 insertions(+)
+>
+> diff --git a/tools/gatt-service.c b/tools/gatt-service.c
+> index 0c78c4d..1cf8b3c 100644
+> --- a/tools/gatt-service.c
+> +++ b/tools/gatt-service.c
+> @@ -407,6 +407,8 @@ static int parse_options(DBusMessageIter *iter, const char **device)
+>                         dbus_message_iter_get_basic(&value, device);
+>                         printf("Device: %s\n", *device);
+>                 }
+> +
+> +               dbus_message_iter_next(&dict);
+>         }
+>
+>         return 0;
+> --
+> 2.8.3
 
-Thanks for the tip!  Is there a way I can verify that.  I am scratching my
-head for the right log file or monitor probe.  Or better yet, the right file
-to modify to fix that permission problem..
+Applied, thanks.
 
-Cheers,
-Don
+-- 
+Luiz Augusto von Dentz
