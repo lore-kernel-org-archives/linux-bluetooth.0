@@ -1,53 +1,90 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Patrik Flykt <patrik.flykt@linux.intel.com>
-To: linux-bluetooth@vger.kernel.org, aar@pengutronix.de,
-	jukka.rissanen@linux.intel.com
-Subject: [RFC 0/4] Fix BT 6lowpan point-to-point interface
-Date: Mon, 20 Jun 2016 10:49:49 +0300
-Message-Id: <1466408993-3808-1-git-send-email-patrik.flykt@linux.intel.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <linux-wpan-owner@vger.kernel.org>
+Message-ID: <1466406443.31678.121.camel@linux.intel.com>
+Subject: Re: current btle 6lowpan issues
+From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+To: Alexander Aring <aar@pengutronix.de>,
+	Patrik Flykt <Patrik.Flykt@linux.intel.com>,
+	Linux Bluetooth <linux-bluetooth@vger.kernel.org>
+Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de
+Date: Mon, 20 Jun 2016 10:07:23 +0300
+In-Reply-To: <594d0734-87d2-2cbf-716b-2c3b0ac97ac6@pengutronix.de>
+References: <ccd6b822-4af0-ea89-2dba-b914e6427191@pengutronix.de>
+	 <1466071258.31678.12.camel@linux.intel.com>
+	 <1466084491.13892.99.camel@linux.intel.com>
+	 <594d0734-87d2-2cbf-716b-2c3b0ac97ac6@pengutronix.de>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Alex,
 
-	Hi,
+On Thu, 2016-06-16 at 23:38 +0200, Alexander Aring wrote:
+> Hi,
+> 
+> On 06/16/2016 03:41 PM, Patrik Flykt wrote:
+> > 
+> > On Thu, 2016-06-16 at 13:00 +0300, Jukka Rissanen wrote:
+> > > 
+> > > Yes you are right that there are issues. Fortunately the bt0 is
+> > > currently a point-to-point link in which case ND is not really
+> > > done
+> > > and everything kind of "works" ok.
+> > > 
+> > > I added Patrik to cc: as he has been working to fix the issues
+> > > but
+> > > the patches are not yet ready. Perhaps we could combine the
+> > > efforts
+> > > here.
+> > I had some patches that make BTLE interfaces non-point-to-point.
+> > Let me
+> > check that they can be applied on the latest bluetooth-next and
+> > that
+> > they still compile after a few months of sitting on an old version.
+> > Then let's hope they also work as expected...
+> > 
+> With non-point-to-point you mean to remove the IFF_POINTOPOINT flag
+> in
+> net_device? Yes this should be removed.
 
-I made an effort some time ago to get the IPv6 ND messages working also
-for Bluetooth Low Energy 6lowpan interfaces. The initial discovery was
-that they get sent when the interface is not a point-to-point one. The
-point-to-point interface flag is removed in patch 4/4.
+Yes, agreed.
 
-In order to get the ND messages properly working, the MAC address for a
-BTLE interface needs fixing, it's only 48 bits compared to the 64 bits
-for 802.15.4. Patches 1/4 and 2/4 fix these common issues.
+> 
+> But I think this is one of the smallest issue in btle 6lowpan.
+> 
+> What means "ND is not really done", does that means you will not see
+> btle neighbours by doing "ip -6 neigh" for your bt interface?
 
-Patch 3/4, which is more hackish than the others, the patch uses an
-array of length EUI64_ADDR_LEN to lowpan_header_decompress() in order
-not to overwrite anything
+Yes.
 
-These changes worked when tested against Zephyr, but that was on a
-4.5.0-rc2 kernel. This time around I only forward-ported them to latest
-and tested that they compiled successfully.
+> 
+> I don't believe that and I think no matter if you set IFF_POINTOPOINT
+> or
+> not, the IPv6 stack will mostly ignore such flag. I did a grep and it
+> seems the SIT stuff sets this flag and IPv6 stack does something with
+> that, but not in case of ARPHRD_6LOWPAN, it's for ARPHRD_SIT only. So
+> I
+> think this flag makes some "peer" address in "ip a" handling instead
+> of
+> showing broadcast address. But nobody will make special handling in
+> IPv6
+> or btle 6lowpan if this flag is set.
+> 
+> What I mean is, you can set this flag on or off but it will don't
+> change
+> any behaviour.
 
-I hope these patches help with ND work moving forward in some way or
-another.
+Unfortunately there is a different behaviour. If the interface has
+IFF_POINTTOPOINT, then kernel will not send neighbor discovery messages
+to that link. I have not checked the kernel code where exactly that is
+enforced but I have looked the wireshark output and there are no ND's
+sent if bt0 is p-to-p link. If the flag is removed, the device starts
+to send ND's to that interface.
+
+Removing the IFF_POINTTOPPOINT is not enough as the MAC address will be
+wrongly set in that case as you have noticed.
 
 
 Cheers,
-
-	Patrik
-
-
-Patrik Flykt (4):
-  addrconf: Create EUI48 IPv6 addresses for BTLE 6LoWPAN
-  6lowpan: Set MAC address lenght according to LOWPAN_LLTYPE
-  bluetooth: Set 6 byte device addresses
-  bluetooth: Do not set IFF_POINTOPOINT
-
- net/6lowpan/core.c      | 11 ++++++++++-
- net/bluetooth/6lowpan.c | 25 +++++++++++--------------
- net/ipv6/addrconf.c     |  4 ++++
- 3 files changed, 25 insertions(+), 15 deletions(-)
-
--- 
-2.8.1
+Jukka
 
