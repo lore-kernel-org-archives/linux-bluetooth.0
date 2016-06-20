@@ -1,117 +1,95 @@
-Return-Path: <jcliang@chromium.org>
-From: Ricky Liang <jcliang@chromium.org>
-To: 
-Cc: wnhuang@chromium.org,
-	akarwar@marvell.com,
-	Ricky Liang <jcliang@chromium.org>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	linux-bluetooth@vger.kernel.org (open list:BLUETOOTH DRIVERS),
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH] Bluetooth: btmrvl: fix slab-out-of-bounds access in btmrvl_sdio
-Date: Mon, 20 Jun 2016 16:29:47 +0800
-Message-Id: <1466411387-3525-1-git-send-email-jcliang@chromium.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Patrik Flykt <patrik.flykt@linux.intel.com>
+To: linux-bluetooth@vger.kernel.org, aar@pengutronix.de,
+	jukka.rissanen@linux.intel.com
+Subject: [RFC 3/4] bluetooth: Set 6 byte device addresses
+Date: Mon, 20 Jun 2016 10:49:52 +0300
+Message-Id: <1466408993-3808-4-git-send-email-patrik.flykt@linux.intel.com>
+In-Reply-To: <1466408993-3808-1-git-send-email-patrik.flykt@linux.intel.com>
+References: <1466408993-3808-1-git-send-email-patrik.flykt@linux.intel.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Kasan reported slab-out-of-bounds access in btmrvl_sdio:
+Set BTLE MAC addresses that are 6 bytes long and not 8 bytes
+that are used in other places with 6lowpan.
 
-[   33.055400] ==================================================================
-[   33.062585] BUG: KASAN: slab-out-of-bounds in memcpy+0x24/0x50 at addr ffffffc0d89b4a00
-[   33.070529] Read of size 256 by task btmrvl_main_ser/3576
-[   33.075885] =============================================================================
-[   33.084002] BUG kmalloc-256 (Tainted: G    B         ): kasan: bad access detected
-[   33.091511] -----------------------------------------------------------------------------
-<snip...>
-[   33.413498] Call trace:
-[   33.415928] [<ffffffc00020a440>] dump_backtrace+0x0/0x190
-[   33.421288] [<ffffffc00020a5ec>] show_stack+0x1c/0x28
-[   33.426305] [<ffffffc000b3288c>] dump_stack+0xa0/0xf8
-[   33.431320] [<ffffffc000396130>] print_trailer+0x158/0x16c
-[   33.436765] [<ffffffc0003962cc>] object_err+0x48/0x5c
-[   33.441780] [<ffffffc00039be24>] kasan_report+0x344/0x510
-[   33.447141] [<ffffffc00039afd8>] __asan_loadN+0x20/0x150
-[   33.452413] [<ffffffc00039b60c>] memcpy+0x20/0x50
-[   33.457084] [<ffffffc000595fcc>] swiotlb_tbl_map_single+0x2ec/0x310
-[   33.463305] [<ffffffc000596b54>] map_single+0x24/0x30
-[   33.468320] [<ffffffc0005970c8>] swiotlb_map_sg_attrs+0xec/0x21c
-[   33.474286] [<ffffffc000219d4c>] __swiotlb_map_sg_attrs+0x48/0xec
-[   33.480339] [<ffffffc0008ea610>] msdc_prepare_data.isra.11+0xf0/0x11c
-[   33.486733] [<ffffffc0008ecbd0>] msdc_ops_request+0x74/0xf0
-[   33.492266] [<ffffffc0008c6b38>] __mmc_start_request+0x78/0x8c
-[   33.498057] [<ffffffc0008c6d6c>] mmc_start_request+0x220/0x240
-[   33.503848] [<ffffffc0008c6e04>] mmc_wait_for_req+0x78/0x250
-[   33.509468] [<ffffffc0008d70fc>] mmc_io_rw_extended+0x2ec/0x388
-[   33.515347] [<ffffffc0008d8fc0>] sdio_io_rw_ext_helper+0x160/0x268
-[   33.521483] [<ffffffc0008d93fc>] sdio_writesb+0x40/0x50
-[   33.526677] [<ffffffbffc338b38>] btmrvl_sdio_host_to_card+0x124/0x1bc [btmrvl_sdio]
-[   33.534283] [<ffffffbffc3290a0>] btmrvl_service_main_thread+0x384/0x428 [btmrvl]
-[   33.541626] [<ffffffc0002518e8>] kthread+0x140/0x158
-[   33.546550] Memory state around the buggy address:
-[   33.551305]  ffffffc0d89b4980: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
-[   33.558474]  ffffffc0d89b4a00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-[   33.565643] >ffffffc0d89b4a80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 fc
-[   33.572809]                                                                 ^
-[   33.579889]  ffffffc0d89b4b00: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
-[   33.587055]  ffffffc0d89b4b80: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
-[   33.594221] ==================================================================
-
-The cause of this is that btmrvl_sdio_host_to_card can access memory region
-out of its allocated space due to:
-
-  1. the requested block size is smaller than SDIO_BLOCK_SIZE, and/or
-  2. the allocated memory is not BTSDIO_DMA_ALIGN-aligned.
-
-This patch fixes the issue by allocating a buffer which is big enough for
-SDIO_BLOCK_SIZE transfer and/or BTSDIO_DMA_ALIGN address relocation.
-
-Signed-off-by: Ricky Liang <jcliang@chromium.org>
+Signed-off-by: Patrik Flykt <patrik.flykt@linux.intel.com>
+This patch needs to be cleaned up but worksforme.
 ---
- drivers/bluetooth/btmrvl_sdio.c | 11 +++++------
- 1 file changed, 5 insertions(+), 6 deletions(-)
+ net/bluetooth/6lowpan.c | 22 ++++++++++------------
+ 1 file changed, 10 insertions(+), 12 deletions(-)
 
-diff --git a/drivers/bluetooth/btmrvl_sdio.c b/drivers/bluetooth/btmrvl_sdio.c
-index f425ddf..0bfeb19 100644
---- a/drivers/bluetooth/btmrvl_sdio.c
-+++ b/drivers/bluetooth/btmrvl_sdio.c
-@@ -1071,7 +1071,6 @@ static int btmrvl_sdio_host_to_card(struct btmrvl_private *priv,
- {
- 	struct btmrvl_sdio_card *card = priv->btmrvl_dev.card;
- 	int ret = 0;
--	int buf_block_len;
- 	int blksz;
- 	int i = 0;
- 	u8 *buf = NULL;
-@@ -1083,9 +1082,12 @@ static int btmrvl_sdio_host_to_card(struct btmrvl_private *priv,
- 		return -EINVAL;
- 	}
+diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
+index d020299..2dddb2b 100644
+--- a/net/bluetooth/6lowpan.c
++++ b/net/bluetooth/6lowpan.c
+@@ -80,6 +80,8 @@ struct lowpan_btle_dev {
+ 	struct delayed_work notify_peers;
+ };
  
-+	blksz = DIV_ROUND_UP(nb, SDIO_BLOCK_SIZE) * SDIO_BLOCK_SIZE;
++static void set_addr(u8 *eui, u8 *addr, u8 addr_type);
 +
- 	buf = payload;
- 	if ((unsigned long) payload & (BTSDIO_DMA_ALIGN - 1)) {
--		tmpbufsz = ALIGN_SZ(nb, BTSDIO_DMA_ALIGN);
-+		tmpbufsz = ALIGN_SZ(blksz, BTSDIO_DMA_ALIGN) +
-+			   BTSDIO_DMA_ALIGN;
- 		tmpbuf = kzalloc(tmpbufsz, GFP_KERNEL);
- 		if (!tmpbuf)
- 			return -ENOMEM;
-@@ -1093,15 +1095,12 @@ static int btmrvl_sdio_host_to_card(struct btmrvl_private *priv,
- 		memcpy(buf, payload, nb);
- 	}
+ static inline struct lowpan_btle_dev *
+ lowpan_btle_dev(const struct net_device *netdev)
+ {
+@@ -272,9 +274,10 @@ static int give_skb_to_upper(struct sk_buff *skb, struct net_device *dev)
+ static int iphc_decompress(struct sk_buff *skb, struct net_device *netdev,
+ 			   struct l2cap_chan *chan)
+ {
+-	const u8 *saddr, *daddr;
++	const u8 *saddr;
+ 	struct lowpan_btle_dev *dev;
+ 	struct lowpan_peer *peer;
++	unsigned char eui64_daddr[EUI64_ADDR_LEN];
  
--	blksz = SDIO_BLOCK_SIZE;
--	buf_block_len = DIV_ROUND_UP(nb, blksz);
+ 	dev = lowpan_btle_dev(netdev);
+ 
+@@ -285,9 +288,9 @@ static int iphc_decompress(struct sk_buff *skb, struct net_device *netdev,
+ 		return -EINVAL;
+ 
+ 	saddr = peer->eui64_addr;
+-	daddr = dev->netdev->dev_addr;
++	set_addr(&eui64_daddr[0], chan->src.b, chan->src_type);
+ 
+-	return lowpan_header_decompress(skb, netdev, daddr, saddr);
++	return lowpan_header_decompress(skb, netdev, &eui64_daddr, saddr);
+ }
+ 
+ static int recv_pkt(struct sk_buff *skb, struct net_device *dev,
+@@ -681,13 +684,6 @@ static void set_addr(u8 *eui, u8 *addr, u8 addr_type)
+ 	BT_DBG("type %d addr %*phC", addr_type, 8, eui);
+ }
+ 
+-static void set_dev_addr(struct net_device *netdev, bdaddr_t *addr,
+-		         u8 addr_type)
+-{
+-	netdev->addr_assign_type = NET_ADDR_PERM;
+-	set_addr(netdev->dev_addr, addr->b, addr_type);
+-}
 -
- 	sdio_claim_host(card->func);
+ static void ifup(struct net_device *netdev)
+ {
+ 	int err;
+@@ -795,7 +791,7 @@ static struct l2cap_chan *add_peer_chan(struct l2cap_chan *chan,
+ static int setup_netdev(struct l2cap_chan *chan, struct lowpan_btle_dev **dev)
+ {
+ 	struct net_device *netdev;
+-	int err = 0;
++	int i, err = 0;
  
- 	do {
- 		/* Transfer data to card */
- 		ret = sdio_writesb(card->func, card->ioport, buf,
--				   buf_block_len * blksz);
-+				   blksz);
- 		if (ret < 0) {
- 			i++;
- 			BT_ERR("i=%d writesb failed: %d", i, ret);
+ 	netdev = alloc_netdev(LOWPAN_PRIV_SIZE(sizeof(struct lowpan_btle_dev)),
+ 			      IFACE_NAME_TEMPLATE, NET_NAME_UNKNOWN,
+@@ -803,7 +799,9 @@ static int setup_netdev(struct l2cap_chan *chan, struct lowpan_btle_dev **dev)
+ 	if (!netdev)
+ 		return -ENOMEM;
+ 
+-	set_dev_addr(netdev, &chan->src, chan->src_type);
++	netdev->addr_assign_type = NET_ADDR_PERM;
++	for (i = 0; i < sizeof(chan->src); i++)
++		netdev->dev_addr[i] = chan->src.b[sizeof(chan->src) - 1 - i];
+ 
+ 	netdev->netdev_ops = &netdev_ops;
+ 	SET_NETDEV_DEV(netdev, &chan->conn->hcon->hdev->dev);
 -- 
-2.1.2
+2.8.1
+
