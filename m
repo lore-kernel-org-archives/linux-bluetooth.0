@@ -1,58 +1,60 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <luto@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CAEZxfGOiiBs_eCGsgsm=CvoJSsGtEsFENr8uxEbzSnt400f6qg@mail.gmail.com>
-References: <CAEZxfGOiiBs_eCGsgsm=CvoJSsGtEsFENr8uxEbzSnt400f6qg@mail.gmail.com>
-From: =?UTF-8?Q?Fran=C3=A7ois_Beaufort?= <beaufort.francois@gmail.com>
-Date: Tue, 21 Jun 2016 22:34:19 +0200
-Message-ID: <CAEZxfGMMcjSQdoXd=W+mSO+xVV1Gwqrcc0+x=2PSZX3V+vEi2Q@mail.gmail.com>
-Subject: Re: Cached device in a weird place
-To: BlueZ development <linux-bluetooth@vger.kernel.org>
+From: Andy Lutomirski <luto@kernel.org>
+Date: Tue, 21 Jun 2016 10:43:40 -0700
+Message-ID: <CALCETrVJzzKkRsSbgsUmVd_+ArKEgoRSVdG1tVp7CXzFoPyVgA@mail.gmail.com>
+Subject: Doing crypto in small stack buffers (bluetooth vs vmalloc-stack
+ crash, etc)
+To: linux-bluetooth@vger.kernel.org, Johan Hedberg <johan.hedberg@gmail.com>,
+	Gustavo Padovan <gustavo@padovan.org>, Marcel Holtmann <marcel@holtmann.org>, linux-crypto@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>, Herbert Xu <herbert@gondor.apana.org.au>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	Linus Torvalds <torvalds@linux-foundation.org>
 Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-And sometimes, when I run "remove *" command and make sure "devices"
-returns nothing, I still can see this device in
-/var/lib/bluetooth/A4\:17\:31\:78\:A6\:04/.
-Any idea?
+net/bluetooth/smp.c (in smp_e) wants to do AES-ECB on a 16-byte stack
+buffer, which seems eminently reasonable to me.  It does it like this:
 
-On Tue, Jun 21, 2016 at 10:27 PM, François Beaufort
-<beaufort.francois@gmail.com> wrote:
-> As I was explaining to sjanc in #bluez, I've noticed some weird
-> behaviour regarding some cached device and I think I found one reason
-> today.
-> As you can see below, a device called tis9E is found in "devices"
-> command while I have removed all devices with "remove *" command
-> previously and not seen this device for a long time.
->
-> I wonder now where this comes from.
-> How such an old device would come back from the dead like that?
->
-> Thanks in advance,
-> Francois.
->
-> ---
->
-> localhost / # bluetoothctl
-> [NEW] Controller A4:17:31:78:A6:04 Chromebook_0A65 [default]
-> [NEW] Device C7:78:B4:5F:FA:DF tis9E
-> [bluetooth]# devices
-> Device C7:78:B4:5F:FA:DF tis9E
->
-> ---
->
-> localhost bluetooth # more
-> /var/lib/bluetooth/A4\:17\:31\:78\:A6\:04/C7\:78\:B4\:5F\:FA\:DF/info
-> [General]
-> Name=tis9E
-> AddressType=static
-> SupportedTechnologies=LE;
-> Trusted=false
-> Blocked=false
->
-> ---
->
-> localhost bluetooth # more
-> /var/lib/bluetooth/A4\:17\:31\:78\:A6\:04/cache/C7\:78\:B4\:5F\:FA\:DF/
-> more: stat of /var/lib/bluetooth/A4:17:31:78:A6:04/cache/C7:78:B4:5F:FA:DF/
-> failed: No such file or directory
+    sg_init_one(&sg, data, 16);
+
+    skcipher_request_set_tfm(req, tfm);
+    skcipher_request_set_callback(req, 0, NULL, NULL);
+    skcipher_request_set_crypt(req, &sg, &sg, 16, NULL);
+
+    err = crypto_skcipher_encrypt(req);
+    skcipher_request_zero(req);
+    if (err)
+        BT_ERR("Encrypt data error %d", err);
+
+I tried to figure out what exactly that does, and I got like in so
+many layers of indirection that I mostly gave up.  But it appears to
+map the stack address to a physical address, stick it in a
+scatterlist, follow several function pointers, go through a bunch of
+"scatterwalk" indirection, and call blkcipher_next_fast, which calls
+blkcipher_map_src, which calls scatterwalk_map, which calls
+kmap_atomic (!).  This is anything but fast.
+
+I think this code has several serious problems:
+
+ - It uses kmap_atomic to access a 16-byte stack buffer.  This is absurd.
+
+ - It blows up if the stack is in vmalloc space, because you can't
+virt_to_phys on the stack buffer in the first place.  (This is why I
+care.)  And I really, really don't want to write sg_init_stack to
+create a scatterlist that points to the stack, although such a thing
+could be done if absolutely necessary.
+
+ - It's very, very compllicated and it does something very, very
+simple (call aes_encrypt on a plain old u8 *).
+
+Oh yeah, it sets CRYPTO_ALG_ASYNC, too.  I can't even figure out what
+that does because the actual handling of that flag is so many layers
+deep.
+
+Is there a straightforward way that bluetooth and, potentially, other
+drivers can just do synchronous crypto in a small buffer specified by
+its virtual address?  The actual cryptography part of the crypto code
+already works this way, but I can't find an API for it.
+
+--Andy
