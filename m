@@ -1,35 +1,49 @@
-Return-Path: <herbert@gondor.apana.org.au>
-Date: Wed, 22 Jun 2016 08:42:14 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Andy Lutomirski <luto@kernel.org>
-Cc: linux-bluetooth@vger.kernel.org,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Marcel Holtmann <marcel@holtmann.org>, linux-crypto@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	Linus Torvalds <torvalds@linux-foundation.org>
-Subject: Re: Doing crypto in small stack buffers (bluetooth vs vmalloc-stack
- crash, etc)
-Message-ID: <20160622004214.GA27134@gondor.apana.org.au>
-References: <CALCETrVJzzKkRsSbgsUmVd_+ArKEgoRSVdG1tVp7CXzFoPyVgA@mail.gmail.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <CALCETrVJzzKkRsSbgsUmVd_+ArKEgoRSVdG1tVp7CXzFoPyVgA@mail.gmail.com>
+From: =?UTF-8?Q?Fran=C3=A7ois_Beaufort?= <beaufort.francois@gmail.com>
+Date: Tue, 21 Jun 2016 22:27:51 +0200
+Message-ID: <CAEZxfGOiiBs_eCGsgsm=CvoJSsGtEsFENr8uxEbzSnt400f6qg@mail.gmail.com>
+Subject: Cached device in a weird place
+To: BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, Jun 21, 2016 at 10:43:40AM -0700, Andy Lutomirski wrote:
->
-> Is there a straightforward way that bluetooth and, potentially, other
-> drivers can just do synchronous crypto in a small buffer specified by
-> its virtual address?  The actual cryptography part of the crypto code
-> already works this way, but I can't find an API for it.
+As I was explaining to sjanc in #bluez, I've noticed some weird
+behaviour regarding some cached device and I think I found one reason
+today.
+As you can see below, a device called tis9E is found in "devices"
+command while I have removed all devices with "remove *" command
+previously and not seen this device for a long time.
 
-Yes, single block users should use crypto_cipher_encrypt_one, an
-example would be drivers/md/dm-crypt.c.
+I wonder now where this comes from.
+How such an old device would come back from the dead like that?
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Thanks in advance,
+Francois.
+
+---
+
+localhost / # bluetoothctl
+[NEW] Controller A4:17:31:78:A6:04 Chromebook_0A65 [default]
+[NEW] Device C7:78:B4:5F:FA:DF tis9E
+[bluetooth]# devices
+Device C7:78:B4:5F:FA:DF tis9E
+
+---
+
+localhost bluetooth # more
+/var/lib/bluetooth/A4\:17\:31\:78\:A6\:04/C7\:78\:B4\:5F\:FA\:DF/info
+[General]
+Name=tis9E
+AddressType=static
+SupportedTechnologies=LE;
+Trusted=false
+Blocked=false
+
+---
+
+localhost bluetooth # more
+/var/lib/bluetooth/A4\:17\:31\:78\:A6\:04/cache/C7\:78\:B4\:5F\:FA\:DF/
+more: stat of /var/lib/bluetooth/A4:17:31:78:A6:04/cache/C7:78:B4:5F:FA:DF/
+failed: No such file or directory
