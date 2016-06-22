@@ -1,85 +1,37 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Date: Wed, 22 Jun 2016 05:42:24 -0400 (EDT)
-From: Jaroslav Skarvada <jskarvad@redhat.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <1586316808.864730.1466588544143.JavaMail.zimbra@redhat.com>
-In-Reply-To: <1606210521.630724.1466514115545.JavaMail.zimbra@redhat.com>
-References: <1606210521.630724.1466514115545.JavaMail.zimbra@redhat.com>
-Subject: Re: Unable to pair with Genius Navigator 900 Pro mouse
+Return-Path: <linux-wpan-owner@vger.kernel.org>
+Subject: Re: [RFC bluetooth-next] 6lowpan: add debugfs to get lltype
+To: linux-wpan@vger.kernel.org
+References: <20160621144656.32469-1-aar@pengutronix.de>
+Cc: linux-bluetooth@vger.kernel.org, kernel@pengutronix.de,
+	patrik.flykt@linux.intel.com, jukka.rissanen@linux.intel.com
+From: Alexander Aring <aar@pengutronix.de>
+Message-ID: <7d9424ba-6d55-1ca3-2bbe-787221ac4440@pengutronix.de>
+Date: Wed, 22 Jun 2016 10:12:38 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <20160621144656.32469-1-aar@pengutronix.de>
+Content-Type: text/plain; charset=windows-1252
+Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi,
 
-
------ Original Message -----
-> Hi,
+On 06/21/2016 04:46 PM, Alexander Aring wrote:
+> This patch adds debugfs entry for get the link layer type for userspace.
 > 
-> hopefully this is the right list (please don't blame me if not :)
+> Signed-off-by: Alexander Aring <aar@pengutronix.de>
+> ---
+> Patrik,
 > 
-> It seems it is no more possible to pair with Genius Navigator 900
-> Pro mouse. It seems it's older mouse probably with no SSP/
-> built-in PIN.
-> 
-> # bluetoothctl
-> [bluetooth]# pair ADDR
-> [CHG] Device ADDR Connected: yes
-> [CHG] Device ADDR Connected: no
-> [CHG] Device ADDR Connected: yes
-> Failed to pair: org.bluez.Error.AuthenticationRejected
-> [CHG] Device ADDR Connected: no
-> 
-> Hcitool "trick":
-> # hcitool cc ADDR;hcitool auth ADDR
-> HCI authentication request failed: Input/output error
-> 
-> The above error is shown before the PIN dialog appears. I also
-> tried Blueman GUI, but it tracebacks (report also sent).
-> 
-> Moreover:
-> # hciconfig hci0 sspmode 0
-> Can't set Simple Pairing mode on hci0: Input/output error (5)
-> 
-> So I cannot try without SSP. It seems there is nothing related
-> in dmesg.
-> 
-> IIRC the mouse worked in the past.
-> 
-> $ uname -r
-> 4.5.7-200.fc23.x86_64
-> 
-> OS: Fedora 23
-> userspace: bluez-5.39
-> 
-> machine: Lenovo ThinkPad X240
-> adapter probably: Intel Centrino 7260 2 x 2 AC+ BT 4.0
-> module: btintel: Intel Bluetooth firmware file:
-> intel/ibt-hw-37.7.10-fw-1.80.2.3.d.bseq
-> 
-> Could you advice some other tricks how to get it working?
-> I could also bisect the problem later
-> 
-> thanks & regards
-> 
-> Jaroslav
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> after changing the dev->addr_len = 6 in btle 6lowpan. I think you should
+> add this patch to the end of your patch series. Then a "recent" radvd will use
+> the correct hardware address length.
 > 
 
-I wasn't right, the mouse seems to support autopairing and I paired it
-without problem under RHEL-7 and it also works there without problem.
-I tried to shuffle user-space bluez and there is no change, so it has to be
-kernel. I also tried with CSR USB dongle. Regarding the sspmode error,
-it's probably not supported by the HW. To sum it up:
+please ignore this patch. After chatting with Marcel we need a better
+UAPI for bringing features into upstream radvd... and maybe RTNL has the
+feature to get the dev->addr_len. :-)
 
-kernel-3.10.0-229.el7.x86_64 - it works
-kernel-4.5.7-200.fc23.x86_64 - it doesn't work
+I will try to add the current stuff which we have in debugfs into some
+netlink UAPI.
 
-I am going to bisect with vanilla kernel
-
-thanks & regards
-
-Jaroslav
+- Alex
