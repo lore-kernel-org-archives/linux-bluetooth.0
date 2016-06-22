@@ -1,101 +1,30 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: bugzilla-daemon@bugzilla.kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [Bug 120691] UART HCI memory leak
+Date: Wed, 22 Jun 2016 10:00:48 +0000
+Message-ID: <bug-120691-62941-knfMUCR4hh@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-120691-62941@https.bugzilla.kernel.org/>
+References: <bug-120691-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZKjGWi9QKaaiXugEFBMxxvy58M4=4GAnCBjJcyCf9odfQ@mail.gmail.com>
-References: <CAEZxfGNEYZ4Y+uAcN=vjkv0EBq4o5UfWHQiCURq-uENthBrcuQ@mail.gmail.com>
- <CABBYNZKjGWi9QKaaiXugEFBMxxvy58M4=4GAnCBjJcyCf9odfQ@mail.gmail.com>
-From: =?UTF-8?Q?Fran=C3=A7ois_Beaufort?= <beaufort.francois@gmail.com>
-Date: Wed, 22 Jun 2016 12:49:34 +0200
-Message-ID: <CAEZxfGMG3QPSc0Ty4gH_Z2Ht3q7WFxFKhSErrkXzo2m5Jd03jw@mail.gmail.com>
-Subject: Re: cache folder is never cleared
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Thank you Luiz!
-I've filed a feature request at http://crbug.com/622250 to investigate
-further on the Chrome OS side.
+https://bugzilla.kernel.org/show_bug.cgi?id=120691
 
-On Wed, Jun 22, 2016 at 11:44 AM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi François,
->
-> On Tue, Jun 21, 2016 at 11:38 PM, François Beaufort
-> <beaufort.francois@gmail.com> wrote:
->> I'm not 100% sure but il looks like my
->> /var/lib/bluetooth/<adapter>/cache folder is never cleared.
->> Is that on purpose?
->
-> Yes this is by design, this is to speed up things like showing the
-> actual name of devices in the discovery, if that becomes a problem you
-> can mount it with tmpfs and cleanup on every reboot.
->
->> If not, could we make sure it doesn't grow too much by removing oldest ones?
->>
->> For info, here's my cache folder content:
->>
->> localhost A4:17:31:78:A6:04 # ls /var/lib/bluetooth/A4:17:31:78:A6:04/cache
->> 00:02:72:1F:35:29  28:CF:E9:7A:31:59  64:89:9A:DD:0A:8E
->> 9C:18:74:5D:4A:89  C0:7A:A5:01:53:07  D1:D2:D9:C1:BA:D5
->> E6:5B:1E:4F:7C:4C
->> 00:07:80:79:20:B7  30:A8:DB:47:84:64  64:9A:BE:83:10:50
->> 9C:35:EB:50:55:FC  C1:64:9D:66:91:62  D3:C3:BD:41:6B:90
->> E7:38:93:EC:05:9B
->> 00:07:80:79:20:F6  38:2C:4A:2A:FF:E1  6C:2F:2C:AF:99:ED
->> A4:17:31:78:B2:50  C1:DC:AB:13:00:1E  D3:D2:95:84:00:08
->> E8:2A:EA:84:E0:76
->> 00:07:80:79:21:19  3C:A1:0D:95:70:63  6C:40:08:BC:35:95
->> A4:77:33:C8:F6:07  C1:EA:05:39:19:9C  D4:8C:61:C2:00:83
->> E8:3A:12:EF:B6:7F
->> 00:0A:9B:33:83:40  40:6F:2A:6E:D1:3B  70:48:0F:68:A6:13
->> AC:7B:A1:B2:0D:DA  C2:F3:90:BC:72:F5  D5:9B:DF:CE:75:9A
->> EA:F5:5C:B7:9F:2E
->> 00:0A:9B:41:0E:39  44:5E:CD:80:00:79  74:1B:B2:DA:6F:76
->> AC:9E:17:07:58:48  C4:E9:73:72:05:85  D5:DF:32:D8:60:B3
->> F0:5A:09:F8:64:23
->> 00:21:3C:91:02:C1  48:D2:24:FD:F4:37  74:45:8A:49:B4:F5
->> AC:9E:17:E5:10:2B  C4:EC:FA:14:5B:A3  D6:A2:2D:7F:8E:C9
->> F1:6F:DE:EC:F1:D6
->> 00:22:D0:8B:3C:C9  48:D7:05:B6:13:6C  78:F8:82:4D:BC:84
->> AC:E5:F0:00:19:1E  C5:2F:8F:29:ED:0C  D8:42:48:1F:92:17
->> F4:0B:93:97:FB:B9
->> 00:22:D0:9E:31:FD  50:F5:20:FA:9F:71  7C:E9:D3:EA:DF:4B
->> AC:E5:F0:00:23:F9  C5:88:B9:87:62:15  DB:90:20:DA:92:7B
->> F4:B7:E2:E6:38:4A
->> 00:4D:32:02:C3:0D  54:60:09:E6:8F:D7  7C:EC:79:51:3A:2A
->> AC:E6:4B:04:EF:65  C6:A4:9E:8F:60:A2  DE:C9:44:E8:97:33
->> F4:B7:E2:E6:6B:19
->> 00:80:25:11:28:F4  54:79:75:BE:95:88  88:0F:10:95:88:F0
->> AC:E6:4B:05:88:2D  C8:85:73:DB:B7:92  DF:78:A8:84:34:13
->> F8:16:54:E4:86:B6
->> 08:D4:2B:E4:E3:33  5C:31:3E:80:1A:FF  88:0F:10:9D:EB:42
->> AC:E6:4B:05:FE:03  C9:1A:BB:EA:01:D0  E0:06:E6:BA:77:B2
->> FB:1F:30:C2:94:EA
->> 08:DF:1F:53:74:69  5C:70:A3:F2:32:BC  90:00:DB:02:2E:A4
->> AC:E6:4B:06:00:CE  CA:0F:41:59:E4:AF  E0:AC:CB:8C:66:75
->> FC:19:10:02:27:FA
->> 08:DF:1F:C4:A9:C0  5C:70:A3:F2:32:F6  90:03:B7:AE:65:8B
->> AC:E6:4B:06:1A:7A  CA:54:48:65:A6:45  E3:60:DB:26:74:69
->> FC:92:3B:76:B8:E7
->> 18:7A:93:34:E4:A7  5C:70:A3:F2:47:81  94:00:70:2B:B7:5C
->> AC:E6:4B:07:A7:3E  CC:07:AB:D9:70:AA  E4:0F:25:40:BB:93
->> FC:ED:57:43:91:CE
->> 1C:62:B8:9D:8A:63  5C:C5:D4:00:55:3B  94:00:70:D3:94:93
->> AC:E6:4D:05:8E:32  CD:36:32:47:CA:1C  E5:5A:DC:17:76:3B
->> FD:96:48:A8:F6:07
->> 1C:CB:99:C0:E4:8D  60:03:08:9A:B8:BD  94:65:9C:7C:81:97
->> B0:E0:3C:3D:8C:91  CD:85:5C:A1:D2:70  E5:9F:8D:EE:61:57
->> FF:41:69:34:16:E1
->> 1C:CB:99:F4:46:DD  61:85:60:56:62:60  98:4F:EE:05:B3:7B
->> B8:5A:73:53:A3:FC  D0:65:68:C3:6E:88  E5:FC:57:99:32:23
->> FF:BA:16:65:6C:78
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->> the body of a message to majordomo@vger.kernel.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
->
->
-> --
-> Luiz Augusto von Dentz
+Loic Poulain <loic.poulain@intel.com> changed:
+
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |loic.poulain@intel.com
+
+--- Comment #1 from Loic Poulain <loic.poulain@intel.com> ---
+Seems that this memory leak is due to the hci_ll (TI) proto.
+Don't think this comes from the generic hci-uart/ldisc part.
+To be sure, are you able to reproduce this issue with any other proto (hci_h4,
+hci_bcm, hci_intel..)?
+
+-- 
+You are receiving this mail because:
+You are the assignee for the bug.
