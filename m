@@ -1,49 +1,74 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Subject: Re: [PATCH bluetooth-next 1/2] 6lowpan: ndisc: fix double read unlock
-To: Alexander Aring <aar@pengutronix.de>, linux-wpan@vger.kernel.org
-References: <20160621082719.9903-1-aar@pengutronix.de>
-Cc: linux-bluetooth@vger.kernel.org, kernel@pengutronix.de,
-	dan.carpenter@oracle.com
-From: Stefan Schmidt <stefan@osg.samsung.com>
-Message-ID: <576A92EA.9020906@osg.samsung.com>
-Date: Wed, 22 Jun 2016 15:30:18 +0200
 MIME-Version: 1.0
-In-Reply-To: <20160621082719.9903-1-aar@pengutronix.de>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+From: =?UTF-8?Q?Fran=C3=A7ois_Beaufort?= <beaufort.francois@gmail.com>
+Date: Wed, 22 Jun 2016 13:10:09 +0200
+Message-ID: <CAEZxfGNdtXFznY_D-HLnkFBtQsHaqGbn65ZhmcKkgoh9em5L3g@mail.gmail.com>
+Subject: Caching device name in different connectable state
+To: BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello.
+I have a bluetooth beacon device that advertises a name depending on
+its configuration (connectable or not).
+Sadly, in Bluez, the first time it sees it while advertising its name,
+it caches it which is nice for future discovery.
+Except it doesn't because I don't want to see this name while it
+advertises in non-connectable state as it is "not" the same device
+anymore (sort of).
+I guess what I'm asking is if we can make Device name aware of the
+connectable state and only use it if it matches state when it was
+cached.
 
-On 21/06/16 10:27, Alexander Aring wrote:
-> This patch removes a double unlock case to accessing neighbour private
-> data.
->
-> Reported-by: Dan Carpenter <dan.carpenter@oracle.com>
-> Signed-off-by: Alexander Aring <aar@pengutronix.de>
-> ---
->   net/6lowpan/ndisc.c | 3 ++-
->   1 file changed, 2 insertions(+), 1 deletion(-)
->
-> diff --git a/net/6lowpan/ndisc.c b/net/6lowpan/ndisc.c
-> index ae1d419..030504e 100644
-> --- a/net/6lowpan/ndisc.c
-> +++ b/net/6lowpan/ndisc.c
-> @@ -135,8 +135,9 @@ static int lowpan_ndisc_opt_addr_space(const struct net_device *dev,
->   			read_unlock_bh(&neigh->lock);
->   			addr_space += __ndisc_opt_addr_space(IEEE802154_SHORT_ADDR_LEN, 0);
->   			*ha = ha_buf;
-> +		} else {
-> +			read_unlock_bh(&neigh->lock);
->   		}
-> -		read_unlock_bh(&neigh->lock);
->   		break;
->   	case NDISC_NEIGHBOUR_ADVERTISEMENT:
->   	case NDISC_NEIGHBOUR_SOLICITATION:
+See some btmon trace of what it looks like in both configurations:
 
-Dan, thanks for finding this one!
+> HCI Event: LE Meta Event (0x3e) plen 42                                                                     [hci0] 5.600723
+      LE Advertising Report (0x02)
+        Num reports: 1
+        Event type: Non connectable undirected - ADV_NONCONN_IND (0x03)
+        Address type: Random (0x01)
+        Address: D0:65:68:C3:6E:88 (Static)
+        Data length: 30
+        Flags: 0x06
+          LE General Discoverable Mode
+          BR/EDR Not Supported
+        16-bit Service UUIDs (complete): 1 entry
+          Google (0xfeaa)
+        Service Data (UUID 0xfeaa): 10de0263662e706879736963616c2d77656208
+        RSSI: -80 dBm (0xb0)
+@ Device Found: D0:65:68:C3:6E:88 (2) rssi -80 flags 0x0004
+        02 01 06 03 03 aa fe 16 16 aa fe 10 de 02 63 66  ..............cf
 
-Reviewed-by: Stefan Schmidt<stefan@osg.samsung.com> regards Stefan Schmidt
+        2e 70 68 79 73 69 63 61 6c 2d 77 65 62 08 .physical-web.
 
 
 
+> HCI Event: LE Meta Event (0x3e) plen 37                                                                   [hci0] 114.202975
+      LE Advertising Report (0x02)
+        Num reports: 1
+        Event type: Connectable undirected - ADV_IND (0x00)
+        Address type: Random (0x01)
+        Address: D0:65:68:C3:6E:88 (Static)
+        Data length: 25
+        Flags: 0x06
+          LE General Discoverable Mode
+          BR/EDR Not Supported
+        128-bit Service UUIDs (complete): 1 entry
+          a3c87500-8ed3-4bdf-8a39-a01bebede295
+        Appearance: Tag (0x0200)
+        RSSI: -63 dBm (0xc1)
+> HCI Event: LE Meta Event (0x3e) plen 38                                                                   [hci0] 114.205892
+      LE Advertising Report (0x02)
+        Num reports: 1
+        Event type: Scan response - SCAN_RSP (0x04)
+        Address type: Random (0x01)
+        Address: D0:65:68:C3:6E:88 (Static)
+        Data length: 26
+        Name (complete): Eddystone Config:beta
+        TX power: -18 dBm
+        RSSI: -61 dBm (0xc3)
+@ Device Found: D0:65:68:C3:6E:88 (2) rssi -61 flags 0x0000
+        02 01 06 11 07 95 e2 ed eb 1b a0 39 8a df 4b d3  ...........9..K.
+        8e 00 75 c8 a3 03 19 00 02 16 09 45 64 64 79 73  ..u........Eddys
+        74 6f 6e 65 20 43 6f 6e 66 69 67 3a 62 65 74 61  tone Config:beta
+        02 0a ee ...
