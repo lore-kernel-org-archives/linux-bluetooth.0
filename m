@@ -1,34 +1,30 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+MIME-Version: 1.0
+In-Reply-To: <CA+ZaN3-=bpNt0NVudLQQ9AR83gWVzvURnArQzcUEmYqGEL9tXQ@mail.gmail.com>
+References: <CA+ZaN3-=bpNt0NVudLQQ9AR83gWVzvURnArQzcUEmYqGEL9tXQ@mail.gmail.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] core/device: Don't even attempt to load name if address is private
-Date: Thu, 23 Jun 2016 14:40:28 +0300
-Message-Id: <1466682028-10937-1-git-send-email-luiz.dentz@gmail.com>
+Date: Thu, 23 Jun 2016 14:29:22 +0300
+Message-ID: <CABBYNZK+QFVZJTYmynmfO+Zo-_1Dib2S8KnjmAjo=C_8Jfeagg@mail.gmail.com>
+Subject: Re: Why is BLE still under -E option?
+To: Seulki Shin <sskcorea@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Slki,
 
-Device with private address does not have their name stored so it makes
-not sense to attempt to load their names.
----
- src/device.c | 3 +++
- 1 file changed, 3 insertions(+)
+On Thu, Jun 23, 2016 at 10:54 AM, Seulki Shin <sskcorea@gmail.com> wrote:
+> Hi Bluez,
+>
+> BLE is getting important these days.
+> However we have to rebuild Bluez to use BLE features.
+> Why don't we have BLE feaures open?
 
-diff --git a/src/device.c b/src/device.c
-index 83a794e..5506bc9 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -2655,6 +2655,9 @@ static char *load_cached_name(struct btd_device *device, const char *local,
- 	char *str = NULL;
- 	int len;
- 
-+	if (device_address_is_private(device))
-+		return NULL;
-+
- 	snprintf(filename, PATH_MAX, STORAGEDIR "/%s/cache/%s", local, peer);
- 
- 	key_file = g_key_file_new();
+I guess you are talking about GATT, we are working in making them
+stable but we need feedback from users if the API is proper, recently
+I made some changes adding flags for ReadValue and WriteValue to cover
+some GATT server requirements coming for Web folks.
+
 -- 
-2.5.5
-
+Luiz Augusto von Dentz
