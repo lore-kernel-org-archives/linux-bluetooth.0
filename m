@@ -1,34 +1,48 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Szymon Janc <szymon.janc@codecoup.pl>
-To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@codecoup.pl>
-Subject: [PATCH] doc/mgmt-api: Add Authentication Failure code to Disconnected event
-Date: Fri, 24 Jun 2016 11:59:16 +0200
-Message-Id: <1466762356-4171-1-git-send-email-szymon.janc@codecoup.pl>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <johan.hedberg@gmail.com>
+Date: Fri, 24 Jun 2016 10:19:08 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Andy Lutomirski <luto@kernel.org>
+Cc: x86@kernel.org, linux-kernel@vger.kernel.org,
+	linux-arch@vger.kernel.org, Borislav Petkov <bp@alien8.de>,
+	Nadav Amit <nadav.amit@gmail.com>,
+	Kees Cook <keescook@chromium.org>, Brian Gerst <brgerst@gmail.com>,
+	"kernel-hardening@lists.openwall.com" <kernel-hardening@lists.openwall.com>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	Josh Poimboeuf <jpoimboe@redhat.com>, Jann Horn <jann@thejh.net>,
+	Heiko Carstens <heiko.carstens@de.ibm.com>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-bluetooth@vger.kernel.org,
+	Herbert Xu <herbert@gondor.apana.org.au>, netdev@vger.kernel.org
+Subject: Re: [PATCH v4 01/16] bluetooth: Switch SMP to
+ crypto_cipher_encrypt_one()
+Message-ID: <20160624071908.GA7040@t440s>
+References: <cover.1466741835.git.luto@kernel.org>
+ <9a1ddd10d96898f8a2c94c3f3d37073c73ba50c9.1466741835.git.luto@kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <9a1ddd10d96898f8a2c94c3f3d37073c73ba50c9.1466741835.git.luto@kernel.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This error code will be set if authentication (enabling encryption)
-failed with 'PIN or Key Missing' error. This will allow userspace
-to take actions (eg ask user for consent for rebonding) when remote
-device lost bond.
----
- doc/mgmt-api.txt | 1 +
- 1 file changed, 1 insertion(+)
+On Thu, Jun 23, 2016, Andy Lutomirski wrote:
+> SMP does ECB crypto on stack buffers.  This is complicated and
+> fragile, and it will not work if the stack is virtually allocated.
+> 
+> Switch to the crypto_cipher interface, which is simpler and safer.
+> 
+> Cc: Marcel Holtmann <marcel@holtmann.org>
+> Cc: Gustavo Padovan <gustavo@padovan.org>
+> Cc: Johan Hedberg <johan.hedberg@gmail.com>
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: linux-bluetooth@vger.kernel.org
+> Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> Cc: netdev@vger.kernel.org
+> Signed-off-by: Andy Lutomirski <luto@kernel.org>
+> ---
+>  net/bluetooth/smp.c | 67 ++++++++++++++++++++++-------------------------------
+>  1 file changed, 28 insertions(+), 39 deletions(-)
 
-diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
-index 8393bbf..9384f70 100644
---- a/doc/mgmt-api.txt
-+++ b/doc/mgmt-api.txt
-@@ -3061,6 +3061,7 @@ Device Disconnected Event
- 		1	Connection timeout
- 		2	Connection terminated by local host
- 		3	Connection terminated by remote host
-+		4	Connection terminated due to authentication failure
- 
- 	Note that the local/remote distinction just determines which side
- 	terminated the low-level connection, regardless of the
--- 
-2.7.4
+Acked-and-tested-by: Johan Hedberg <johan.hedberg@intel.com>
 
-On behalf of SCHILLER Medical SAS.
+Johan
