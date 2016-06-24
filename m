@@ -1,48 +1,41 @@
-Return-Path: <johan.hedberg@gmail.com>
-Date: Fri, 24 Jun 2016 10:19:08 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Andy Lutomirski <luto@kernel.org>
-Cc: x86@kernel.org, linux-kernel@vger.kernel.org,
-	linux-arch@vger.kernel.org, Borislav Petkov <bp@alien8.de>,
-	Nadav Amit <nadav.amit@gmail.com>,
-	Kees Cook <keescook@chromium.org>, Brian Gerst <brgerst@gmail.com>,
-	"kernel-hardening@lists.openwall.com" <kernel-hardening@lists.openwall.com>,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	Josh Poimboeuf <jpoimboe@redhat.com>, Jann Horn <jann@thejh.net>,
-	Heiko Carstens <heiko.carstens@de.ibm.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-bluetooth@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>, netdev@vger.kernel.org
-Subject: Re: [PATCH v4 01/16] bluetooth: Switch SMP to
- crypto_cipher_encrypt_one()
-Message-ID: <20160624071908.GA7040@t440s>
-References: <cover.1466741835.git.luto@kernel.org>
- <9a1ddd10d96898f8a2c94c3f3d37073c73ba50c9.1466741835.git.luto@kernel.org>
+Return-Path: <linux-crypto-owner@vger.kernel.org>
+Date: Fri, 24 Jun 2016 14:45:06 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Salvatore Benedetto <salvatore.benedetto@intel.com>
+Cc: linux-crypto@vger.kernel.org, fengguang.wu@intel.com,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [cryptodev:master 79/79] (.text+0x330de0): multiple definition
+ of `ecdh_shared_secret'
+Message-ID: <20160624064506.GA17229@gondor.apana.org.au>
+References: <201606240302.rtIGIxRf%fengguang.wu@intel.com>
+ <20160624060649.GA21165@localhost>
+ <20160624061012.GA16850@gondor.apana.org.au>
+ <20160624062316.GA16985@gondor.apana.org.au>
+ <20160624063644.GA21443@localhost>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <9a1ddd10d96898f8a2c94c3f3d37073c73ba50c9.1466741835.git.luto@kernel.org>
+In-Reply-To: <20160624063644.GA21443@localhost>
+Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, Jun 23, 2016, Andy Lutomirski wrote:
-> SMP does ECB crypto on stack buffers.  This is complicated and
-> fragile, and it will not work if the stack is virtually allocated.
+On Fri, Jun 24, 2016 at 07:36:44AM +0100, Salvatore Benedetto wrote:
+>
 > 
-> Switch to the crypto_cipher interface, which is simpler and safer.
+> The patch was based on the current tree. I just pulled.
+> There is not point in moving to lib because bluetooth is
+> about to be converted to kpp. 
+> That patch I believe will go up the bluetooth tree, so
+> my suggestion is to simply accept that I fail to properly
+> name that symbol.
 > 
-> Cc: Marcel Holtmann <marcel@holtmann.org>
-> Cc: Gustavo Padovan <gustavo@padovan.org>
-> Cc: Johan Hedberg <johan.hedberg@gmail.com>
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: linux-bluetooth@vger.kernel.org
-> Cc: Herbert Xu <herbert@gondor.apana.org.au>
-> Cc: netdev@vger.kernel.org
-> Signed-off-by: Andy Lutomirski <luto@kernel.org>
-> ---
->  net/bluetooth/smp.c | 67 ++++++++++++++++++++++-------------------------------
->  1 file changed, 28 insertions(+), 39 deletions(-)
+> Renaming the symbol in net/bluetooth/ecc which I think will conflict
+> with the patch where I remove it completely which, again, I believe
+> will go up the BT tree.
 
-Acked-and-tested-by: Johan Hedberg <johan.hedberg@intel.com>
+OK I will have no option but to revert your patches then.
 
-Johan
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
