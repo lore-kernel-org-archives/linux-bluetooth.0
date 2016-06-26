@@ -1,122 +1,296 @@
-Return-Path: <jcliang@chromium.org>
-From: Ricky Liang <jcliang@chromium.org>
-To: 
-Cc: Ricky Liang <jcliang@chromium.org>,
-	Wei-Ning Huang <wnhuang@chromium.org>,
-	Daniel Kurtz <djkurtz@chromium.org>,
-	Amitkumar Karwar <akarwar@marvell.com>,
+Return-Path: <luto@kernel.org>
+From: Andy Lutomirski <luto@kernel.org>
+To: x86@kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	linux-arch@vger.kernel.org,
+	Borislav Petkov <bp@alien8.de>,
+	Nadav Amit <nadav.amit@gmail.com>,
+	Kees Cook <keescook@chromium.org>,
+	Brian Gerst <brgerst@gmail.com>,
+	"kernel-hardening@lists.openwall.com" <kernel-hardening@lists.openwall.com>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	Josh Poimboeuf <jpoimboe@redhat.com>,
+	Jann Horn <jann@thejh.net>,
+	Heiko Carstens <heiko.carstens@de.ibm.com>,
+	Andy Lutomirski <luto@kernel.org>,
 	Marcel Holtmann <marcel@holtmann.org>,
 	Gustavo Padovan <gustavo@padovan.org>,
 	Johan Hedberg <johan.hedberg@gmail.com>,
-	linux-bluetooth@vger.kernel.org (open list:BLUETOOTH DRIVERS),
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH] Bluetooth: btmrvl: fix slab-out-of-bounds access in btmrvl_sdio
-Date: Mon, 27 Jun 2016 12:19:18 +0800
-Message-Id: <1467001158-1964-1-git-send-email-jcliang@chromium.org>
-In-Reply-To: <1466411387-3525-1-git-send-email-jcliang@chromium.org>
-References: <1466411387-3525-1-git-send-email-jcliang@chromium.org>
+	"David S. Miller" <davem@davemloft.net>,
+	linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH v4 01/29] bluetooth: Switch SMP to crypto_cipher_encrypt_one()
+Date: Sun, 26 Jun 2016 14:55:23 -0700
+Message-Id: <264af59a3060c2bc2a725cfc66a8fa68219d1c4a.1466974736.git.luto@kernel.org>
+In-Reply-To: <cover.1466974736.git.luto@kernel.org>
+References: <cover.1466974736.git.luto@kernel.org>
+In-Reply-To: <cover.1466974736.git.luto@kernel.org>
+References: <cover.1466974736.git.luto@kernel.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Kasan reported slab-out-of-bounds access in btmrvl_sdio:
+SMP does ECB crypto on stack buffers.  This is complicated and
+fragile, and it will not work if the stack is virtually allocated.
 
-[   33.055400] ==================================================================
-[   33.062585] BUG: KASAN: slab-out-of-bounds in memcpy+0x24/0x50 at addr ffffffc0d89b4a00
-[   33.070529] Read of size 256 by task btmrvl_main_ser/3576
-[   33.075885] =============================================================================
-[   33.084002] BUG kmalloc-256 (Tainted: G    B         ): kasan: bad access detected
-[   33.091511] -----------------------------------------------------------------------------
-<snip...>
-[   33.413498] Call trace:
-[   33.415928] [<ffffffc00020a440>] dump_backtrace+0x0/0x190
-[   33.421288] [<ffffffc00020a5ec>] show_stack+0x1c/0x28
-[   33.426305] [<ffffffc000b3288c>] dump_stack+0xa0/0xf8
-[   33.431320] [<ffffffc000396130>] print_trailer+0x158/0x16c
-[   33.436765] [<ffffffc0003962cc>] object_err+0x48/0x5c
-[   33.441780] [<ffffffc00039be24>] kasan_report+0x344/0x510
-[   33.447141] [<ffffffc00039afd8>] __asan_loadN+0x20/0x150
-[   33.452413] [<ffffffc00039b60c>] memcpy+0x20/0x50
-[   33.457084] [<ffffffc000595fcc>] swiotlb_tbl_map_single+0x2ec/0x310
-[   33.463305] [<ffffffc000596b54>] map_single+0x24/0x30
-[   33.468320] [<ffffffc0005970c8>] swiotlb_map_sg_attrs+0xec/0x21c
-[   33.474286] [<ffffffc000219d4c>] __swiotlb_map_sg_attrs+0x48/0xec
-[   33.480339] [<ffffffc0008ea610>] msdc_prepare_data.isra.11+0xf0/0x11c
-[   33.486733] [<ffffffc0008ecbd0>] msdc_ops_request+0x74/0xf0
-[   33.492266] [<ffffffc0008c6b38>] __mmc_start_request+0x78/0x8c
-[   33.498057] [<ffffffc0008c6d6c>] mmc_start_request+0x220/0x240
-[   33.503848] [<ffffffc0008c6e04>] mmc_wait_for_req+0x78/0x250
-[   33.509468] [<ffffffc0008d70fc>] mmc_io_rw_extended+0x2ec/0x388
-[   33.515347] [<ffffffc0008d8fc0>] sdio_io_rw_ext_helper+0x160/0x268
-[   33.521483] [<ffffffc0008d93fc>] sdio_writesb+0x40/0x50
-[   33.526677] [<ffffffbffc338b38>] btmrvl_sdio_host_to_card+0x124/0x1bc [btmrvl_sdio]
-[   33.534283] [<ffffffbffc3290a0>] btmrvl_service_main_thread+0x384/0x428 [btmrvl]
-[   33.541626] [<ffffffc0002518e8>] kthread+0x140/0x158
-[   33.546550] Memory state around the buggy address:
-[   33.551305]  ffffffc0d89b4980: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
-[   33.558474]  ffffffc0d89b4a00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-[   33.565643] >ffffffc0d89b4a80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 fc
-[   33.572809]                                                                 ^
-[   33.579889]  ffffffc0d89b4b00: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
-[   33.587055]  ffffffc0d89b4b80: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
-[   33.594221] ==================================================================
+Switch to the crypto_cipher interface, which is simpler and safer.
 
-The cause of this is that btmrvl_sdio_host_to_card can access memory region
-out of its allocated space due to:
-
-  1. the requested block size is smaller than SDIO_BLOCK_SIZE, and/or
-  2. the allocated memory is not BTSDIO_DMA_ALIGN-aligned.
-
-Since sdio_writesb() is able to handle any size of data it's not necessary
-to re-allocate memroy region which size is multiple of SDIO_BLOCK_SIZE. We
-just need to make sure the relocation of memory for making the address
-BTSDIO_DMA_ALIGN-aligned does not cause out-of-bound access.
-
-CC: Wei-Ning Huang <wnhuang@chromium.org>
-CC: Daniel Kurtz <djkurtz@chromium.org>
-CC: Amitkumar Karwar <akarwar@marvell.com>
-
-Signed-off-by: Ricky Liang <jcliang@chromium.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>
+Cc: Gustavo Padovan <gustavo@padovan.org>
+Cc: Johan Hedberg <johan.hedberg@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: linux-bluetooth@vger.kernel.org
+Cc: netdev@vger.kernel.org
+Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
+Acked-and-tested-by: Johan Hedberg <johan.hedberg@intel.com>
+Signed-off-by: Andy Lutomirski <luto@kernel.org>
 ---
- drivers/bluetooth/btmrvl_sdio.c | 9 ++-------
- 1 file changed, 2 insertions(+), 7 deletions(-)
+ net/bluetooth/smp.c | 67 ++++++++++++++++++++++-------------------------------
+ 1 file changed, 28 insertions(+), 39 deletions(-)
 
-diff --git a/drivers/bluetooth/btmrvl_sdio.c b/drivers/bluetooth/btmrvl_sdio.c
-index f425ddf..ecc0191 100644
---- a/drivers/bluetooth/btmrvl_sdio.c
-+++ b/drivers/bluetooth/btmrvl_sdio.c
-@@ -1071,8 +1071,6 @@ static int btmrvl_sdio_host_to_card(struct btmrvl_private *priv,
- {
- 	struct btmrvl_sdio_card *card = priv->btmrvl_dev.card;
- 	int ret = 0;
--	int buf_block_len;
--	int blksz;
- 	int i = 0;
- 	u8 *buf = NULL;
- 	void *tmpbuf = NULL;
-@@ -1085,7 +1083,7 @@ static int btmrvl_sdio_host_to_card(struct btmrvl_private *priv,
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index 50976a6481f3..4c1a16a96ae5 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -22,9 +22,9 @@
  
- 	buf = payload;
- 	if ((unsigned long) payload & (BTSDIO_DMA_ALIGN - 1)) {
--		tmpbufsz = ALIGN_SZ(nb, BTSDIO_DMA_ALIGN);
-+		tmpbufsz = ALIGN_SZ(nb, BTSDIO_DMA_ALIGN) + BTSDIO_DMA_ALIGN;
- 		tmpbuf = kzalloc(tmpbufsz, GFP_KERNEL);
- 		if (!tmpbuf)
- 			return -ENOMEM;
-@@ -1093,15 +1091,12 @@ static int btmrvl_sdio_host_to_card(struct btmrvl_private *priv,
- 		memcpy(buf, payload, nb);
+ #include <linux/debugfs.h>
+ #include <linux/scatterlist.h>
++#include <linux/crypto.h>
+ #include <crypto/b128ops.h>
+ #include <crypto/hash.h>
+-#include <crypto/skcipher.h>
+ 
+ #include <net/bluetooth/bluetooth.h>
+ #include <net/bluetooth/hci_core.h>
+@@ -88,7 +88,7 @@ struct smp_dev {
+ 	u8			min_key_size;
+ 	u8			max_key_size;
+ 
+-	struct crypto_skcipher	*tfm_aes;
++	struct crypto_cipher	*tfm_aes;
+ 	struct crypto_shash	*tfm_cmac;
+ };
+ 
+@@ -127,7 +127,7 @@ struct smp_chan {
+ 	u8			dhkey[32];
+ 	u8			mackey[16];
+ 
+-	struct crypto_skcipher	*tfm_aes;
++	struct crypto_cipher	*tfm_aes;
+ 	struct crypto_shash	*tfm_cmac;
+ };
+ 
+@@ -361,10 +361,8 @@ static int smp_h6(struct crypto_shash *tfm_cmac, const u8 w[16],
+  * s1 and ah.
+  */
+ 
+-static int smp_e(struct crypto_skcipher *tfm, const u8 *k, u8 *r)
++static int smp_e(struct crypto_cipher *tfm, const u8 *k, u8 *r)
+ {
+-	SKCIPHER_REQUEST_ON_STACK(req, tfm);
+-	struct scatterlist sg;
+ 	uint8_t tmp[16], data[16];
+ 	int err;
+ 
+@@ -378,7 +376,7 @@ static int smp_e(struct crypto_skcipher *tfm, const u8 *k, u8 *r)
+ 	/* The most significant octet of key corresponds to k[0] */
+ 	swap_buf(k, tmp, 16);
+ 
+-	err = crypto_skcipher_setkey(tfm, tmp, 16);
++	err = crypto_cipher_setkey(tfm, tmp, 16);
+ 	if (err) {
+ 		BT_ERR("cipher setkey failed: %d", err);
+ 		return err;
+@@ -387,16 +385,7 @@ static int smp_e(struct crypto_skcipher *tfm, const u8 *k, u8 *r)
+ 	/* Most significant octet of plaintextData corresponds to data[0] */
+ 	swap_buf(r, data, 16);
+ 
+-	sg_init_one(&sg, data, 16);
+-
+-	skcipher_request_set_tfm(req, tfm);
+-	skcipher_request_set_callback(req, 0, NULL, NULL);
+-	skcipher_request_set_crypt(req, &sg, &sg, 16, NULL);
+-
+-	err = crypto_skcipher_encrypt(req);
+-	skcipher_request_zero(req);
+-	if (err)
+-		BT_ERR("Encrypt data error %d", err);
++	crypto_cipher_encrypt_one(tfm, data, data);
+ 
+ 	/* Most significant octet of encryptedData corresponds to data[0] */
+ 	swap_buf(data, r, 16);
+@@ -406,7 +395,7 @@ static int smp_e(struct crypto_skcipher *tfm, const u8 *k, u8 *r)
+ 	return err;
+ }
+ 
+-static int smp_c1(struct crypto_skcipher *tfm_aes, const u8 k[16],
++static int smp_c1(struct crypto_cipher *tfm_aes, const u8 k[16],
+ 		  const u8 r[16], const u8 preq[7], const u8 pres[7], u8 _iat,
+ 		  const bdaddr_t *ia, u8 _rat, const bdaddr_t *ra, u8 res[16])
+ {
+@@ -455,7 +444,7 @@ static int smp_c1(struct crypto_skcipher *tfm_aes, const u8 k[16],
+ 	return err;
+ }
+ 
+-static int smp_s1(struct crypto_skcipher *tfm_aes, const u8 k[16],
++static int smp_s1(struct crypto_cipher *tfm_aes, const u8 k[16],
+ 		  const u8 r1[16], const u8 r2[16], u8 _r[16])
+ {
+ 	int err;
+@@ -471,7 +460,7 @@ static int smp_s1(struct crypto_skcipher *tfm_aes, const u8 k[16],
+ 	return err;
+ }
+ 
+-static int smp_ah(struct crypto_skcipher *tfm, const u8 irk[16],
++static int smp_ah(struct crypto_cipher *tfm, const u8 irk[16],
+ 		  const u8 r[3], u8 res[3])
+ {
+ 	u8 _res[16];
+@@ -759,7 +748,7 @@ static void smp_chan_destroy(struct l2cap_conn *conn)
+ 	kzfree(smp->slave_csrk);
+ 	kzfree(smp->link_key);
+ 
+-	crypto_free_skcipher(smp->tfm_aes);
++	crypto_free_cipher(smp->tfm_aes);
+ 	crypto_free_shash(smp->tfm_cmac);
+ 
+ 	/* Ensure that we don't leave any debug key around if debug key
+@@ -1359,9 +1348,9 @@ static struct smp_chan *smp_chan_create(struct l2cap_conn *conn)
+ 	if (!smp)
+ 		return NULL;
+ 
+-	smp->tfm_aes = crypto_alloc_skcipher("ecb(aes)", 0, CRYPTO_ALG_ASYNC);
++	smp->tfm_aes = crypto_alloc_cipher("aes", 0, CRYPTO_ALG_ASYNC);
+ 	if (IS_ERR(smp->tfm_aes)) {
+-		BT_ERR("Unable to create ECB crypto context");
++		BT_ERR("Unable to create AES crypto context");
+ 		kzfree(smp);
+ 		return NULL;
+ 	}
+@@ -1369,7 +1358,7 @@ static struct smp_chan *smp_chan_create(struct l2cap_conn *conn)
+ 	smp->tfm_cmac = crypto_alloc_shash("cmac(aes)", 0, 0);
+ 	if (IS_ERR(smp->tfm_cmac)) {
+ 		BT_ERR("Unable to create CMAC crypto context");
+-		crypto_free_skcipher(smp->tfm_aes);
++		crypto_free_cipher(smp->tfm_aes);
+ 		kzfree(smp);
+ 		return NULL;
+ 	}
+@@ -3120,7 +3109,7 @@ static struct l2cap_chan *smp_add_cid(struct hci_dev *hdev, u16 cid)
+ {
+ 	struct l2cap_chan *chan;
+ 	struct smp_dev *smp;
+-	struct crypto_skcipher *tfm_aes;
++	struct crypto_cipher *tfm_aes;
+ 	struct crypto_shash *tfm_cmac;
+ 
+ 	if (cid == L2CAP_CID_SMP_BREDR) {
+@@ -3132,9 +3121,9 @@ static struct l2cap_chan *smp_add_cid(struct hci_dev *hdev, u16 cid)
+ 	if (!smp)
+ 		return ERR_PTR(-ENOMEM);
+ 
+-	tfm_aes = crypto_alloc_skcipher("ecb(aes)", 0, CRYPTO_ALG_ASYNC);
++	tfm_aes = crypto_alloc_cipher("aes", 0, CRYPTO_ALG_ASYNC);
+ 	if (IS_ERR(tfm_aes)) {
+-		BT_ERR("Unable to create ECB crypto context");
++		BT_ERR("Unable to create AES crypto context");
+ 		kzfree(smp);
+ 		return ERR_CAST(tfm_aes);
+ 	}
+@@ -3142,7 +3131,7 @@ static struct l2cap_chan *smp_add_cid(struct hci_dev *hdev, u16 cid)
+ 	tfm_cmac = crypto_alloc_shash("cmac(aes)", 0, 0);
+ 	if (IS_ERR(tfm_cmac)) {
+ 		BT_ERR("Unable to create CMAC crypto context");
+-		crypto_free_skcipher(tfm_aes);
++		crypto_free_cipher(tfm_aes);
+ 		kzfree(smp);
+ 		return ERR_CAST(tfm_cmac);
+ 	}
+@@ -3156,7 +3145,7 @@ create_chan:
+ 	chan = l2cap_chan_create();
+ 	if (!chan) {
+ 		if (smp) {
+-			crypto_free_skcipher(smp->tfm_aes);
++			crypto_free_cipher(smp->tfm_aes);
+ 			crypto_free_shash(smp->tfm_cmac);
+ 			kzfree(smp);
+ 		}
+@@ -3203,7 +3192,7 @@ static void smp_del_chan(struct l2cap_chan *chan)
+ 	smp = chan->data;
+ 	if (smp) {
+ 		chan->data = NULL;
+-		crypto_free_skcipher(smp->tfm_aes);
++		crypto_free_cipher(smp->tfm_aes);
+ 		crypto_free_shash(smp->tfm_cmac);
+ 		kzfree(smp);
+ 	}
+@@ -3440,7 +3429,7 @@ void smp_unregister(struct hci_dev *hdev)
+ 
+ #if IS_ENABLED(CONFIG_BT_SELFTEST_SMP)
+ 
+-static int __init test_ah(struct crypto_skcipher *tfm_aes)
++static int __init test_ah(struct crypto_cipher *tfm_aes)
+ {
+ 	const u8 irk[16] = {
+ 			0x9b, 0x7d, 0x39, 0x0a, 0xa6, 0x10, 0x10, 0x34,
+@@ -3460,7 +3449,7 @@ static int __init test_ah(struct crypto_skcipher *tfm_aes)
+ 	return 0;
+ }
+ 
+-static int __init test_c1(struct crypto_skcipher *tfm_aes)
++static int __init test_c1(struct crypto_cipher *tfm_aes)
+ {
+ 	const u8 k[16] = {
+ 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+@@ -3490,7 +3479,7 @@ static int __init test_c1(struct crypto_skcipher *tfm_aes)
+ 	return 0;
+ }
+ 
+-static int __init test_s1(struct crypto_skcipher *tfm_aes)
++static int __init test_s1(struct crypto_cipher *tfm_aes)
+ {
+ 	const u8 k[16] = {
+ 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+@@ -3686,7 +3675,7 @@ static const struct file_operations test_smp_fops = {
+ 	.llseek		= default_llseek,
+ };
+ 
+-static int __init run_selftests(struct crypto_skcipher *tfm_aes,
++static int __init run_selftests(struct crypto_cipher *tfm_aes,
+ 				struct crypto_shash *tfm_cmac)
+ {
+ 	ktime_t calltime, delta, rettime;
+@@ -3764,27 +3753,27 @@ done:
+ 
+ int __init bt_selftest_smp(void)
+ {
+-	struct crypto_skcipher *tfm_aes;
++	struct crypto_cipher *tfm_aes;
+ 	struct crypto_shash *tfm_cmac;
+ 	int err;
+ 
+-	tfm_aes = crypto_alloc_skcipher("ecb(aes)", 0, CRYPTO_ALG_ASYNC);
++	tfm_aes = crypto_alloc_cipher("aes", 0, CRYPTO_ALG_ASYNC);
+ 	if (IS_ERR(tfm_aes)) {
+-		BT_ERR("Unable to create ECB crypto context");
++		BT_ERR("Unable to create AES crypto context");
+ 		return PTR_ERR(tfm_aes);
  	}
  
--	blksz = SDIO_BLOCK_SIZE;
--	buf_block_len = DIV_ROUND_UP(nb, blksz);
--
- 	sdio_claim_host(card->func);
+ 	tfm_cmac = crypto_alloc_shash("cmac(aes)", 0, CRYPTO_ALG_ASYNC);
+ 	if (IS_ERR(tfm_cmac)) {
+ 		BT_ERR("Unable to create CMAC crypto context");
+-		crypto_free_skcipher(tfm_aes);
++		crypto_free_cipher(tfm_aes);
+ 		return PTR_ERR(tfm_cmac);
+ 	}
  
- 	do {
- 		/* Transfer data to card */
- 		ret = sdio_writesb(card->func, card->ioport, buf,
--				   buf_block_len * blksz);
-+				   nb);
- 		if (ret < 0) {
- 			i++;
- 			BT_ERR("i=%d writesb failed: %d", i, ret);
+ 	err = run_selftests(tfm_aes, tfm_cmac);
+ 
+ 	crypto_free_shash(tfm_cmac);
+-	crypto_free_skcipher(tfm_aes);
++	crypto_free_cipher(tfm_aes);
+ 
+ 	return err;
+ }
 -- 
-2.1.2
+2.7.4
