@@ -1,48 +1,76 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Alexander Aring <aar@pengutronix.de>
-To: linux-wpan@vger.kernel.org
-Cc: kernel@pengutronix.de, Alexander Aring <aar@pengutronix.de>,
-	linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 bluetooth-next 5/8] 6lowpan: ndisc: set invalid unicast short addr to unspec
-Date: Tue, 28 Jun 2016 00:00:34 +0200
-Message-Id: <20160627220037.10108-6-aar@pengutronix.de>
-In-Reply-To: <20160627220037.10108-1-aar@pengutronix.de>
-References: <20160627220037.10108-1-aar@pengutronix.de>
+From: Denis Kenzior <denkenz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Denis Kenzior <denkenz@gmail.com>
+Subject: [PATCH 2/2] hci_sock: Fix recvmsg return value
+Date: Mon, 27 Jun 2016 11:01:13 -0500
+Message-Id: <1467043273-3781-2-git-send-email-denkenz@gmail.com>
+In-Reply-To: <1467043273-3781-1-git-send-email-denkenz@gmail.com>
+References: <1467043273-3781-1-git-send-email-denkenz@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When receiving neighbour information with short address option field we
-should check the complete range of invalid short addresses and set it to
-one invalid address setting which is the unspecified address. This
-address is also used when by creating at first a new neighbour entry to
-indicate no short address is set.
+If recvmsg is called with a destination buffer that is too small to
+receive the contents of skb in its entirety, the return value from
+recvmsg was inconsistent with common SOCK_SEQPACKET or SOCK_DGRAM
+semantics.
 
-Cc: linux-bluetooth@vger.kernel.org
-Signed-off-by: Alexander Aring <aar@pengutronix.de>
+If destination buffer provided by userspace is too small (e.g. len <
+copied), then MSG_TRUNC flag is set and copied is returned.  Instead, it
+should return the length of the message, which is consistent with how
+other datagram based sockets act.  Quoting 'man recv':
+
+"All  three calls return the length of the message on successful comple‐
+tion.  If a message is too long to fit in the supplied  buffer,  excess
+bytes  may  be discarded depending on the type of socket the message is
+received from."
+
+and
+
+"MSG_TRUNC (since Linux 2.2)
+
+    For   raw   (AF_PACKET),   Internet   datagram   (since    Linux
+    2.4.27/2.6.8),  netlink  (since Linux 2.6.22), and UNIX datagram
+    (since Linux 3.4) sockets: return the real length of the packet
+    or datagram, even when it was longer than the passed buffer."
+
+Signed-off-by: Denis Kenzior <denkenz@gmail.com>
 ---
- net/6lowpan/ndisc.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+ net/bluetooth/hci_sock.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/net/6lowpan/ndisc.c b/net/6lowpan/ndisc.c
-index 79c5fa9..86450b7 100644
---- a/net/6lowpan/ndisc.c
-+++ b/net/6lowpan/ndisc.c
-@@ -97,10 +97,13 @@ static void lowpan_ndisc_802154_update(struct neighbour *n, u32 flags,
- 	}
+diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
+index 1298d72..12e9294 100644
+--- a/net/bluetooth/hci_sock.c
++++ b/net/bluetooth/hci_sock.c
+@@ -1048,6 +1048,7 @@ static int hci_sock_recvmsg(struct socket *sock, struct msghdr *msg,
+ 	struct sock *sk = sock->sk;
+ 	struct sk_buff *skb;
+ 	int copied, err;
++	unsigned int skblen;
  
- 	write_lock_bh(&n->lock);
--	if (lladdr_short)
-+	if (lladdr_short) {
- 		ieee802154_be16_to_le16(&neigh->short_addr, lladdr_short);
--	else
-+		if (!lowpan_802154_is_valid_src_short_addr(neigh->short_addr))
-+			neigh->short_addr = cpu_to_le16(IEEE802154_ADDR_SHORT_UNSPEC);
-+	} else {
- 		neigh->short_addr = cpu_to_le16(IEEE802154_ADDR_SHORT_UNSPEC);
-+	}
- 	write_unlock_bh(&n->lock);
+ 	BT_DBG("sock %p, sk %p", sock, sk);
+ 
+@@ -1064,6 +1065,7 @@ static int hci_sock_recvmsg(struct socket *sock, struct msghdr *msg,
+ 	if (!skb)
+ 		return err;
+ 
++	skblen = skb->len;
+ 	copied = skb->len;
+ 	if (len < copied) {
+ 		msg->msg_flags |= MSG_TRUNC;
+@@ -1089,6 +1091,9 @@ static int hci_sock_recvmsg(struct socket *sock, struct msghdr *msg,
+ 
+ 	skb_free_datagram(sk, skb);
+ 
++	if (msg->msg_flags & MSG_TRUNC)
++		copied = skblen;
++
+ 	return err ? : copied;
  }
  
 -- 
-2.9.0
+2.4.10
 
