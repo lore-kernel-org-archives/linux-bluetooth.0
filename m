@@ -1,45 +1,33 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <1466762356-4171-1-git-send-email-szymon.janc@codecoup.pl>
-References: <1466762356-4171-1-git-send-email-szymon.janc@codecoup.pl>
+In-Reply-To: <CD551047A838BB45A959E537E0B25AB56D70B330@AZ-US1EXMB04.global.avaya.com>
+References: <CD551047A838BB45A959E537E0B25AB56D70B330@AZ-US1EXMB04.global.avaya.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 27 Jun 2016 14:44:32 +0300
-Message-ID: <CABBYNZJUnGZsjvDAig7_V9=aT_-K3DSAC2QsgwK-GxXkohXVcg@mail.gmail.com>
-Subject: Re: [PATCH] doc/mgmt-api: Add Authentication Failure code to
- Disconnected event
-To: Szymon Janc <szymon.janc@codecoup.pl>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Mon, 27 Jun 2016 14:41:11 +0300
+Message-ID: <CABBYNZ+4kLiYq+r0xg2sd8MVdTXH0z19AO4tr4F5-h1t8=QPcw@mail.gmail.com>
+Subject: Re: Bluez 5.37 SIG QDID?
+To: "Tupe, Amol (Amol)" <tupea@avaya.com>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi Amol,
 
-On Fri, Jun 24, 2016 at 12:59 PM, Szymon Janc <szymon.janc@codecoup.pl> wrote:
-> This error code will be set if authentication (enabling encryption)
-> failed with 'PIN or Key Missing' error. This will allow userspace
-> to take actions (eg ask user for consent for rebonding) when remote
-> device lost bond.
-> ---
->  doc/mgmt-api.txt | 1 +
->  1 file changed, 1 insertion(+)
->
-> diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
-> index 8393bbf..9384f70 100644
-> --- a/doc/mgmt-api.txt
-> +++ b/doc/mgmt-api.txt
-> @@ -3061,6 +3061,7 @@ Device Disconnected Event
->                 1       Connection timeout
->                 2       Connection terminated by local host
->                 3       Connection terminated by remote host
-> +               4       Connection terminated due to authentication failure
->
->         Note that the local/remote distinction just determines which side
->         terminated the low-level connection, regardless of the
-> --
-> 2.7.4
+On Fri, Jun 24, 2016 at 6:55 PM, Tupe, Amol (Amol) <tupea@avaya.com> wrote:
+> Hello All,
+> Is Bluez 5.37  Protocol stack has updated listing (component tested) on Bluetooth SIG?
+> What is QDID for 5.37?
+> I want to see which Bluetooth Specification does this stack support....
 
-Looks good, lets get the kernel patch merged first then I will merge this one.
+We track profiles version in here:
+
+https://git.kernel.org/cgit/bluetooth/bluez.git/tree/doc/supported-features.txt
+
+There is no official QDID to each release, but you can see the public
+qualification listing here:
+
+http://www.bluez.org/qualification/
 
 -- 
 Luiz Augusto von Dentz
