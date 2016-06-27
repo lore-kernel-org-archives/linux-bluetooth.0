@@ -1,32 +1,53 @@
-Return-Path: <linux-wpan-owner@vger.kernel.org>
+Return-Path: <linux-kernel-owner@vger.kernel.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
-Subject: Re: [PATCH bluetooth-next 1/2] 6lowpan: ndisc: fix double read unlock
+Subject: Re: [PATCH v4 01/29] bluetooth: Switch SMP to crypto_cipher_encrypt_one()
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20160621082719.9903-1-aar@pengutronix.de>
-Date: Mon, 27 Jun 2016 08:03:54 +0200
-Cc: linux-wpan@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	kernel@pengutronix.de, dan.carpenter@oracle.com
-Message-Id: <2F025960-E3E9-4C4E-BC34-C34C575E756F@holtmann.org>
-References: <20160621082719.9903-1-aar@pengutronix.de>
-To: Alexander Aring <aar@pengutronix.de>
-Sender: linux-wpan-owner@vger.kernel.org
+In-Reply-To: <264af59a3060c2bc2a725cfc66a8fa68219d1c4a.1466974736.git.luto@kernel.org>
+Date: Mon, 27 Jun 2016 07:58:33 +0200
+Cc: x86@kernel.org, LKML <linux-kernel@vger.kernel.org>,
+	linux-arch@vger.kernel.org, Borislav Petkov <bp@alien8.de>,
+	Nadav Amit <nadav.amit@gmail.com>,
+	Kees Cook <keescook@chromium.org>,
+	Brian Gerst <brgerst@gmail.com>,
+	"kernel-hardening@lists.openwall.com"
+	<kernel-hardening@lists.openwall.com>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	Josh Poimboeuf <jpoimboe@redhat.com>,
+	Jann Horn <jann@thejh.net>,
+	Heiko Carstens <heiko.carstens@de.ibm.com>,
+	"Gustavo F. Padovan" <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Message-Id: <8C5360E3-94EE-4869-B9B9-AF9D41B5A3AC@holtmann.org>
+References: <cover.1466974736.git.luto@kernel.org> <cover.1466974736.git.luto@kernel.org> <264af59a3060c2bc2a725cfc66a8fa68219d1c4a.1466974736.git.luto@kernel.org>
+To: Andy Lutomirski <luto@kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alex,
+Hi Andy,
 
-> This patch removes a double unlock case to accessing neighbour private
-> data.
+> SMP does ECB crypto on stack buffers.  This is complicated and
+> fragile, and it will not work if the stack is virtually allocated.
 > 
-> Reported-by: Dan Carpenter <dan.carpenter@oracle.com>
-> Signed-off-by: Alexander Aring <aar@pengutronix.de>
+> Switch to the crypto_cipher interface, which is simpler and safer.
+> 
+> Cc: Marcel Holtmann <marcel@holtmann.org>
+> Cc: Gustavo Padovan <gustavo@padovan.org>
+> Cc: Johan Hedberg <johan.hedberg@gmail.com>
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: linux-bluetooth@vger.kernel.org
+> Cc: netdev@vger.kernel.org
+> Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
+> Acked-and-tested-by: Johan Hedberg <johan.hedberg@intel.com>
+> Signed-off-by: Andy Lutomirski <luto@kernel.org>
 > ---
-> net/6lowpan/ndisc.c | 3 ++-
-> 1 file changed, 2 insertions(+), 1 deletion(-)
+> net/bluetooth/smp.c | 67 ++++++++++++++++++++++-------------------------------
+> 1 file changed, 28 insertions(+), 39 deletions(-)
 
 patch has been applied to bluetooth-next tree.
 
 Regards
 
 Marcel
-
