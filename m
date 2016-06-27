@@ -1,39 +1,52 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Date: Mon, 27 Jun 2016 17:54:13 +0200
-From: Arthur LAMBERT <lambertarthur22@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: gatt server and reset of hci device
-Message-ID: <20160627155413.GA5294@arthur-bzh>
-References: <20160511125102.GC17904@arthur-bzh>
- <CABBYNZ+c4mFuBUsR3uzOnMKMKJV-3GXkJiDZESoWzBvnXRg6Yg@mail.gmail.com>
+Return-Path: <christophe.ricard@gmail.com>
+Subject: Re: Bluetooth pairing using NFC
+To: Szymon Janc <ext.szymon.janc@tieto.com>
+References: <CALD+uuz7Xoc6k0DXbuwOzc7zj0z2cN70A4j-VafcWqeTM1VYTQ@mail.gmail.com>
+ <577136F7.4090505@gmail.com> <10190122.Hd9JXv7fO7@leonov>
+Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org
+From: Christophe Ricard <christophe.ricard@gmail.com>
+Message-ID: <57714295.9060809@gmail.com>
+Date: Mon, 27 Jun 2016 17:13:25 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <CABBYNZ+c4mFuBUsR3uzOnMKMKJV-3GXkJiDZESoWzBvnXRg6Yg@mail.gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <10190122.Hd9JXv7fO7@leonov>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-> Is that something preventing you to use bluetoothd and just create a
-> plugin or use the GATT API for your server? Manually using hciconfig
-> is not recommended since it may interfere with other users, for manual
-> testing it is actually recommended to use btmgmt or bluetoothd +
-> bluetoothctl. Also note that having btgatt-server along side with
-> bluetoothd will not work because both listen on the same channel and
-> the kernel can only redirect the packets to one process.
+Hi Szymon,
 
-If I want to properly implement custom gatt service with dbus instead of low c api.
-Can we use the python script test/example-gatt-server as reference ?
-Is there any example in c using glibdbus ?
+Thanks a lot for your feedback.
 
-Is it normal that I am not able to run it with success ?
+I will try that :).
 
+Best Regards
+Christophe
 
-* Run bluetoothd with experimental mode enable :
-sudo ./bluetoothd -E
-
-* Run python script from test directory :
-[arthur ] python3  ./example-gatt-server
-Failed to register application: org.bluez.Error.Failed: No object received
-
-Thanks,
-Arthur.
+On 27/06/2016 16:56, Szymon Janc wrote:
+> Hi Christophe,
+>
+> On Monday 27 of June 2016 16:23:51 Christophe Ricard wrote:
+>> Hi,
+>>
+>> I have been trying to get bluetooth pairing working using NFC (bluez
+>> together with neard).
+>> I am using a NFC enabled bluetooth headset (Mototorola Elite Silver).
+>>
+>> I have been trying with bluez 5.23 up to 5.40 as well as with neard 0.9
+>> up to neard 0.15 but without success so far.
+>> Bluez shows a message push_oob() but no pairing is happening. When
+>> looking at the code, i have suspected an agent issue
+>> but this is out of my knowledge scope.
+>>
+>> Can anybody suggest what would be the best bluez/neard combination to
+>> get nfc/bluetooth pairing to work or to track down this to get
+>> it working ?
+>>
+>> I can provide traces if you need.
+> I didn't look at that code for quite some time but I think to get it work
+> you need to have adapter powered up and have bluetooth agent registered.
+>
+> So doing: 'power up', 'agent on' 'default-agent' from bluetoothctl should do.
+>
+> PS
+> Mailing list is linux-bluetooth@vger.kernel.org :)
+>
