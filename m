@@ -1,97 +1,45 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <OF4C4942A2.E6B3B8B6-ON86257FDF.00498A15-86257FDF.004991D8@continental-corporation.com>
-References: <CD551047A838BB45A959E537E0B25AB56D70B330@AZ-US1EXMB04.global.avaya.com>
- <CABBYNZ+4kLiYq+r0xg2sd8MVdTXH0z19AO4tr4F5-h1t8=QPcw@mail.gmail.com> <OF4C4942A2.E6B3B8B6-ON86257FDF.00498A15-86257FDF.004991D8@continental-corporation.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 27 Jun 2016 17:14:03 +0300
-Message-ID: <CABBYNZ+7ZYR1CP8U50BwVT-y4Kp-8728ZSPbQvagJLP5WHKj+Q@mail.gmail.com>
-Subject: Re: Bluez 5.37 SIG QDID?
-To: burch.seymour@continental-corporation.com
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
+Subject: Re: Problems with LE Advertising using GDBus API
+From: Alex Coplan <alex.coplan@starleaf.com>
+In-Reply-To: <567E72EE-8264-4BCF-ABFC-925BF62725ED@starleaf.com>
+Date: Mon, 27 Jun 2016 15:13:03 +0100
+Message-Id: <7643C610-2B63-4572-AC3D-6A001F9CF8C0@starleaf.com>
+References: <567E72EE-8264-4BCF-ABFC-925BF62725ED@starleaf.com>
+To: linux-bluetooth@vger.kernel.org
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Burch,
-
-On Mon, Jun 27, 2016 at 4:23 PM,
-<burch.seymour@continental-corporation.com> wrote:
-> According to the page link below, BlueZ supports SPP ver 1.1
->
-> SPP                                              1.1  Server, Client
->
-> This version is deprecated as of August 2013 with 1.2 replacing it.
->
-> The ICS file in the 5.39 source indicates 1.2.
->
->                 Profile Version
-> -------------------------------------------------------------------------------
-> Item            Selected        Description
-> -------------------------------------------------------------------------------
-> TSPC_SPP_0_1    False           SPP v1.1 (C.1)
-> TSPC_SPP_0_2    True (*)                SPP v1.2 (C.1)
-> -------------------------------------------------------------------------------
-> C.1: Mandatory to support only one Profile version.
-> -------------------------------------------------------------------------------
->
-> So, is the ICS correct, with the documentation lagging a bit?
-
-Looks like it:
-
-https://www.bluetooth.org/tpg/showPICS.cfm?3A000A5A005C5347545E5D14403B0C0D0E2405022413010E57503F202A5A72
-
-It is actually correct in the SDP record so I just fixed it so it
-should now show the correct version.
-
-> -Burch
->
->
->
-> From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-> To:     "Tupe, Amol (Amol)" <tupea@avaya.com>,
-> Cc:     BlueZ development <linux-bluetooth@vger.kernel.org>
-> Date:   06/27/2016 06:41 AM
-> Subject:        Re: Bluez 5.37 SIG QDID?
-> Sent by:        linux-bluetooth-owner@vger.kernel.org
->
->
->
-> Hi Amol,
->
-> On Fri, Jun 24, 2016 at 6:55 PM, Tupe, Amol (Amol) <tupea@avaya.com>
-> wrote:
->> Hello All,
->> Is Bluez 5.37  Protocol stack has updated listing (component tested) on
-> Bluetooth SIG?
->> What is QDID for 5.37?
->> I want to see which Bluetooth Specification does this stack support....
->
-> We track profiles version in here:
->
-> https://git.kernel.org/cgit/bluetooth/bluez.git/tree/doc/supported-features.txt
->
->
-> There is no official QDID to each release, but you can see the public
-> qualification listing here:
->
-> http://www.bluez.org/qualification/
->
-> --
-> Luiz Augusto von Dentz
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
-> in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> On 27 Jun 2016, at 13:25, Alex Coplan <alex.coplan@starleaf.com> wrote:
+> 
+> Hi All,
+> 
+> I’m having issues getting LE Advertising to work using the GDBus API. I’ve managed to get my chip to advertise using the direct HCI socket API with e.g. this code (https://github.com/carsonmcdonald/bluez-ibeacon).
+> 
+> However, for writing my own code I’d prefer to use the higher-level (G)DBus API. I thought that tools/gap-tester might be a good place to start, since this appears to be written using the more modern, higher-level GDBus API. However, if I run this program, e.g. with:
+> $ sudo ./gap-tester
+> it just hangs, after printing:
+> 
+> Adapter setup - init
+> Adapter setup - setup
+> 
+> To give a bit of background, this is on a clean Ubuntu 16.04 install (Kernel 4.4.0) with BlueZ 5.40 compiled from the source repository (but not installed). The unit tests (invoked with `make check`) pass fine. The chip I’m using is an ASUS USB-BT400. hciconfig gives:
+> 
+> hci0:	Type: BR/EDR  Bus: USB
+> 	BD Address: 5C:F3:70:77:DE:0D  ACL MTU: 1021:8  SCO MTU: 64:1
+> 	DOWN
+> 	RX bytes:2142 acl:0 sco:0 events:65 errors:0
+> 	TX bytes:988 acl:0 sco:0 commands:133 errors:14
+> 
+> On further investigation, I decided to run some of the tests in the tools directory. Running hci-tester gives the following summary:
+> 
+> Test Summary
 
 
+Further to this, I have since run the same tests on an Intel chip and I obtained exactly the same results (except that I received one fewer failures in hci-tester; this is, however, unimportant).
 
--- 
-Luiz Augusto von Dentz
+It would be great if somebody could confirm whether this is a bug, or perhaps suggest any further investigation I should do? Perhaps I’m missing something obvious.
+
+Many thanks,
+Alex
