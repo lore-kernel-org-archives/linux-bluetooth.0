@@ -1,33 +1,60 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <mingo.kernel.org@gmail.com>
+Sender: Ingo Molnar <mingo.kernel.org@gmail.com>
+Date: Mon, 27 Jun 2016 10:54:03 +0200
+From: Ingo Molnar <mingo@kernel.org>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Andy Lutomirski <luto@kernel.org>, x86@kernel.org,
+	LKML <linux-kernel@vger.kernel.org>, linux-arch@vger.kernel.org,
+	Borislav Petkov <bp@alien8.de>, Nadav Amit <nadav.amit@gmail.com>,
+	Kees Cook <keescook@chromium.org>, Brian Gerst <brgerst@gmail.com>,
+	"kernel-hardening@lists.openwall.com" <kernel-hardening@lists.openwall.com>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	Josh Poimboeuf <jpoimboe@redhat.com>, Jann Horn <jann@thejh.net>,
+	Heiko Carstens <heiko.carstens@de.ibm.com>,
+	"Gustavo F. Padovan" <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH v4 01/29] bluetooth: Switch SMP to
+ crypto_cipher_encrypt_one()
+Message-ID: <20160627085403.GA26865@gmail.com>
+References: <cover.1466974736.git.luto@kernel.org>
+ <cover.1466974736.git.luto@kernel.org>
+ <264af59a3060c2bc2a725cfc66a8fa68219d1c4a.1466974736.git.luto@kernel.org>
+ <8C5360E3-94EE-4869-B9B9-AF9D41B5A3AC@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CD551047A838BB45A959E537E0B25AB56D70B330@AZ-US1EXMB04.global.avaya.com>
-References: <CD551047A838BB45A959E537E0B25AB56D70B330@AZ-US1EXMB04.global.avaya.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 27 Jun 2016 14:41:11 +0300
-Message-ID: <CABBYNZ+4kLiYq+r0xg2sd8MVdTXH0z19AO4tr4F5-h1t8=QPcw@mail.gmail.com>
-Subject: Re: Bluez 5.37 SIG QDID?
-To: "Tupe, Amol (Amol)" <tupea@avaya.com>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <8C5360E3-94EE-4869-B9B9-AF9D41B5A3AC@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Amol,
 
-On Fri, Jun 24, 2016 at 6:55 PM, Tupe, Amol (Amol) <tupea@avaya.com> wrote:
-> Hello All,
-> Is Bluez 5.37  Protocol stack has updated listing (component tested) on Bluetooth SIG?
-> What is QDID for 5.37?
-> I want to see which Bluetooth Specification does this stack support....
+* Marcel Holtmann <marcel@holtmann.org> wrote:
 
-We track profiles version in here:
+> Hi Andy,
+> 
+> > SMP does ECB crypto on stack buffers.  This is complicated and
+> > fragile, and it will not work if the stack is virtually allocated.
+> > 
+> > Switch to the crypto_cipher interface, which is simpler and safer.
+> > 
+> > Cc: Marcel Holtmann <marcel@holtmann.org>
+> > Cc: Gustavo Padovan <gustavo@padovan.org>
+> > Cc: Johan Hedberg <johan.hedberg@gmail.com>
+> > Cc: "David S. Miller" <davem@davemloft.net>
+> > Cc: linux-bluetooth@vger.kernel.org
+> > Cc: netdev@vger.kernel.org
+> > Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
+> > Acked-and-tested-by: Johan Hedberg <johan.hedberg@intel.com>
+> > Signed-off-by: Andy Lutomirski <luto@kernel.org>
+> > ---
+> > net/bluetooth/smp.c | 67 ++++++++++++++++++++++-------------------------------
+> > 1 file changed, 28 insertions(+), 39 deletions(-)
+> 
+> patch has been applied to bluetooth-next tree.
 
-https://git.kernel.org/cgit/bluetooth/bluez.git/tree/doc/supported-features.txt
+Sadly carrying this separately will delay the virtual kernel stacks feature by a 
+kernel cycle, because it's a must-have prerequisite.
 
-There is no official QDID to each release, but you can see the public
-qualification listing here:
+Thanks,
 
-http://www.bluez.org/qualification/
-
--- 
-Luiz Augusto von Dentz
+	Ingo
