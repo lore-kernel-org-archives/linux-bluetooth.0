@@ -10,9 +10,9 @@ Cc: Ricky Liang <jcliang@chromium.org>,
 	Johan Hedberg <johan.hedberg@gmail.com>,
 	linux-bluetooth@vger.kernel.org (open list:BLUETOOTH DRIVERS),
 	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH v2] Bluetooth: btmrvl: fix slab-out-of-bounds access in btmrvl_sdio
-Date: Mon, 27 Jun 2016 12:22:44 +0800
-Message-Id: <1467001364-2055-1-git-send-email-jcliang@chromium.org>
+Subject: [PATCH] Bluetooth: btmrvl: fix slab-out-of-bounds access in btmrvl_sdio
+Date: Mon, 27 Jun 2016 12:19:18 +0800
+Message-Id: <1467001158-1964-1-git-send-email-jcliang@chromium.org>
 In-Reply-To: <1466411387-3525-1-git-send-email-jcliang@chromium.org>
 References: <1466411387-3525-1-git-send-email-jcliang@chromium.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
