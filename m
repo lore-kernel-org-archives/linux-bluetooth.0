@@ -1,41 +1,48 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: "Tupe, Amol (Amol)" <tupea@avaya.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-CC: BlueZ development <linux-bluetooth@vger.kernel.org>
-Subject: RE: Bluez 5.37 SIG QDID?
-Date: Mon, 27 Jun 2016 22:16:15 +0000
-Message-ID: <CD551047A838BB45A959E537E0B25AB56D70B7F2@AZ-US1EXMB04.global.avaya.com>
-References: <CD551047A838BB45A959E537E0B25AB56D70B330@AZ-US1EXMB04.global.avaya.com>
- <CABBYNZ+4kLiYq+r0xg2sd8MVdTXH0z19AO4tr4F5-h1t8=QPcw@mail.gmail.com>
-In-Reply-To: <CABBYNZ+4kLiYq+r0xg2sd8MVdTXH0z19AO4tr4F5-h1t8=QPcw@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
+From: Alexander Aring <aar@pengutronix.de>
+To: linux-wpan@vger.kernel.org
+Cc: kernel@pengutronix.de, Alexander Aring <aar@pengutronix.de>,
+	linux-bluetooth@vger.kernel.org
+Subject: [PATCHv2 bluetooth-next 5/8] 6lowpan: ndisc: set invalid unicast short addr to unspec
+Date: Tue, 28 Jun 2016 00:00:34 +0200
+Message-Id: <20160627220037.10108-6-aar@pengutronix.de>
+In-Reply-To: <20160627220037.10108-1-aar@pengutronix.de>
+References: <20160627220037.10108-1-aar@pengutronix.de>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgTHVpeiwNClRoaXMgbWVhbnMgd2UgY2FuJ3QgbGV2ZXJhZ2UgUURJRCAoY29tcG9uZW50IHRl
-c3RlZCkgZm9yIEJsdWV6IDUuMzcuDQpXZSB3aWxsIG5lZWQgdG8gZG8gcXVhbGlmeSBCbHVlWiA1
-LjM3IGZvciBvdXIgcHJvZHVjdCBhZ2Fpbj8NCg0KQW55IGlkZWEgd2hhdCBCbHVldG9vdGggc3Bl
-Y2lmaWNhdGlvbiB2ZXJzaW9uIEJsdWVaIDUuMzcgc3VwcG9ydHM/IChCbHVldG9vdGggNC4xPykN
-Cg0KVGhhbmtzIGFuZCByZWdhcmRzLA0KDQpBbW9sIFQNCg0KDQotLS0tLU9yaWdpbmFsIE1lc3Nh
-Z2UtLS0tLQ0KRnJvbTogTHVpeiBBdWd1c3RvIHZvbiBEZW50eiBbbWFpbHRvOmx1aXouZGVudHpA
-Z21haWwuY29tXSANClNlbnQ6IE1vbmRheSwgSnVuZSAyNywgMjAxNiA3OjQxIEFNDQpUbzogVHVw
-ZSwgQW1vbCAoQW1vbCkNCkNjOiBCbHVlWiBkZXZlbG9wbWVudA0KU3ViamVjdDogUmU6IEJsdWV6
-IDUuMzcgU0lHIFFESUQ/DQoNCkhpIEFtb2wsDQoNCk9uIEZyaSwgSnVuIDI0LCAyMDE2IGF0IDY6
-NTUgUE0sIFR1cGUsIEFtb2wgKEFtb2wpIDx0dXBlYUBhdmF5YS5jb20+IHdyb3RlOg0KPiBIZWxs
-byBBbGwsDQo+IElzIEJsdWV6IDUuMzcgIFByb3RvY29sIHN0YWNrIGhhcyB1cGRhdGVkIGxpc3Rp
-bmcgKGNvbXBvbmVudCB0ZXN0ZWQpIG9uIEJsdWV0b290aCBTSUc/DQo+IFdoYXQgaXMgUURJRCBm
-b3IgNS4zNz8NCj4gSSB3YW50IHRvIHNlZSB3aGljaCBCbHVldG9vdGggU3BlY2lmaWNhdGlvbiBk
-b2VzIHRoaXMgc3RhY2sgc3VwcG9ydC4uLi4NCg0KV2UgdHJhY2sgcHJvZmlsZXMgdmVyc2lvbiBp
-biBoZXJlOg0KDQpodHRwczovL3VybGRlZmVuc2UucHJvb2Zwb2ludC5jb20vdjIvdXJsP3U9aHR0
-cHMtM0FfX2dpdC5rZXJuZWwub3JnX2NnaXRfYmx1ZXRvb3RoX2JsdWV6LmdpdF90cmVlX2RvY19z
-dXBwb3J0ZWQtMkRmZWF0dXJlcy50eHQmZD1Dd0lCYVEmYz1CRnBXUXc4YnN1S3BsMVNnaVpINjRR
-JnI9dlJ0VFFFVk9DNFVNY0cyMWRnMkZOdyZtPTJQWUlIXzBZSW9odktiUUF4NGYxVEVTMURYOW90
-M0ZjMDBVOWNHZnJEblkmcz1YY0F2MkJwMTZkZ2lSQmV4QVEyTmNSS0RIUV84UHJRZDlVdWJ6QlVo
-U1FNJmU9IA0KDQpUaGVyZSBpcyBubyBvZmZpY2lhbCBRRElEIHRvIGVhY2ggcmVsZWFzZSwgYnV0
-IHlvdSBjYW4gc2VlIHRoZSBwdWJsaWMgcXVhbGlmaWNhdGlvbiBsaXN0aW5nIGhlcmU6DQoNCmh0
-dHBzOi8vdXJsZGVmZW5zZS5wcm9vZnBvaW50LmNvbS92Mi91cmw/dT1odHRwLTNBX193d3cuYmx1
-ZXoub3JnX3F1YWxpZmljYXRpb25fJmQ9Q3dJQmFRJmM9QkZwV1F3OGJzdUtwbDFTZ2laSDY0USZy
-PXZSdFRRRVZPQzRVTWNHMjFkZzJGTncmbT0yUFlJSF8wWUlvaHZLYlFBeDRmMVRFUzFEWDlvdDNG
-YzAwVTljR2ZyRG5ZJnM9UU1NNjZQTXVsc0tnTW1zckdqa2hZX08xQXc5eWRvUmNwc01tSUJoNTlp
-SSZlPSANCg0KLS0NCkx1aXogQXVndXN0byB2b24gRGVudHoNCg==
+When receiving neighbour information with short address option field we
+should check the complete range of invalid short addresses and set it to
+one invalid address setting which is the unspecified address. This
+address is also used when by creating at first a new neighbour entry to
+indicate no short address is set.
+
+Cc: linux-bluetooth@vger.kernel.org
+Signed-off-by: Alexander Aring <aar@pengutronix.de>
+---
+ net/6lowpan/ndisc.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/net/6lowpan/ndisc.c b/net/6lowpan/ndisc.c
+index 79c5fa9..86450b7 100644
+--- a/net/6lowpan/ndisc.c
++++ b/net/6lowpan/ndisc.c
+@@ -97,10 +97,13 @@ static void lowpan_ndisc_802154_update(struct neighbour *n, u32 flags,
+ 	}
+ 
+ 	write_lock_bh(&n->lock);
+-	if (lladdr_short)
++	if (lladdr_short) {
+ 		ieee802154_be16_to_le16(&neigh->short_addr, lladdr_short);
+-	else
++		if (!lowpan_802154_is_valid_src_short_addr(neigh->short_addr))
++			neigh->short_addr = cpu_to_le16(IEEE802154_ADDR_SHORT_UNSPEC);
++	} else {
+ 		neigh->short_addr = cpu_to_le16(IEEE802154_ADDR_SHORT_UNSPEC);
++	}
+ 	write_unlock_bh(&n->lock);
+ }
+ 
+-- 
+2.9.0
+
