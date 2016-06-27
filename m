@@ -1,59 +1,41 @@
-Return-Path: <linux-kernel-owner@vger.kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
-Subject: Re: [PATCH v4 01/29] bluetooth: Switch SMP to crypto_cipher_encrypt_one()
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20160627085403.GA26865@gmail.com>
-Date: Tue, 28 Jun 2016 00:30:24 +0200
-Cc: Andy Lutomirski <luto@kernel.org>, x86@kernel.org,
-	LKML <linux-kernel@vger.kernel.org>, linux-arch@vger.kernel.org,
-	Borislav Petkov <bp@alien8.de>,
-	Nadav Amit <nadav.amit@gmail.com>,
-	Kees Cook <keescook@chromium.org>,
-	Brian Gerst <brgerst@gmail.com>,
-	"kernel-hardening@lists.openwall.com"
-	<kernel-hardening@lists.openwall.com>,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	Josh Poimboeuf <jpoimboe@redhat.com>,
-	Jann Horn <jann@thejh.net>,
-	Heiko Carstens <heiko.carstens@de.ibm.com>,
-	"Gustavo F. Padovan" <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Message-Id: <2833CC26-7306-4803-A5DB-4CBECCF35C08@holtmann.org>
-References: <cover.1466974736.git.luto@kernel.org> <cover.1466974736.git.luto@kernel.org> <264af59a3060c2bc2a725cfc66a8fa68219d1c4a.1466974736.git.luto@kernel.org> <8C5360E3-94EE-4869-B9B9-AF9D41B5A3AC@holtmann.org> <20160627085403.GA26865@gmail.com>
-To: Ingo Molnar <mingo@kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: "Tupe, Amol (Amol)" <tupea@avaya.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+CC: BlueZ development <linux-bluetooth@vger.kernel.org>
+Subject: RE: Bluez 5.37 SIG QDID?
+Date: Mon, 27 Jun 2016 22:16:15 +0000
+Message-ID: <CD551047A838BB45A959E537E0B25AB56D70B7F2@AZ-US1EXMB04.global.avaya.com>
+References: <CD551047A838BB45A959E537E0B25AB56D70B330@AZ-US1EXMB04.global.avaya.com>
+ <CABBYNZ+4kLiYq+r0xg2sd8MVdTXH0z19AO4tr4F5-h1t8=QPcw@mail.gmail.com>
+In-Reply-To: <CABBYNZ+4kLiYq+r0xg2sd8MVdTXH0z19AO4tr4F5-h1t8=QPcw@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ingo,
-
->>> SMP does ECB crypto on stack buffers.  This is complicated and
->>> fragile, and it will not work if the stack is virtually allocated.
->>> 
->>> Switch to the crypto_cipher interface, which is simpler and safer.
->>> 
->>> Cc: Marcel Holtmann <marcel@holtmann.org>
->>> Cc: Gustavo Padovan <gustavo@padovan.org>
->>> Cc: Johan Hedberg <johan.hedberg@gmail.com>
->>> Cc: "David S. Miller" <davem@davemloft.net>
->>> Cc: linux-bluetooth@vger.kernel.org
->>> Cc: netdev@vger.kernel.org
->>> Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
->>> Acked-and-tested-by: Johan Hedberg <johan.hedberg@intel.com>
->>> Signed-off-by: Andy Lutomirski <luto@kernel.org>
->>> ---
->>> net/bluetooth/smp.c | 67 ++++++++++++++++++++++-------------------------------
->>> 1 file changed, 28 insertions(+), 39 deletions(-)
->> 
->> patch has been applied to bluetooth-next tree.
-> 
-> Sadly carrying this separately will delay the virtual kernel stacks feature by a 
-> kernel cycle, because it's a must-have prerequisite.
-
-I can take it back out, but then I have the fear the the ECDH change to use KPP for SMP might be the one that has to wait a kernel cycle. Either way is fine with me, but I want to avoid nasty merge conflicts in the Bluetooth SMP code.
-
-Regards
-
-Marcel
+SGkgTHVpeiwNClRoaXMgbWVhbnMgd2UgY2FuJ3QgbGV2ZXJhZ2UgUURJRCAoY29tcG9uZW50IHRl
+c3RlZCkgZm9yIEJsdWV6IDUuMzcuDQpXZSB3aWxsIG5lZWQgdG8gZG8gcXVhbGlmeSBCbHVlWiA1
+LjM3IGZvciBvdXIgcHJvZHVjdCBhZ2Fpbj8NCg0KQW55IGlkZWEgd2hhdCBCbHVldG9vdGggc3Bl
+Y2lmaWNhdGlvbiB2ZXJzaW9uIEJsdWVaIDUuMzcgc3VwcG9ydHM/IChCbHVldG9vdGggNC4xPykN
+Cg0KVGhhbmtzIGFuZCByZWdhcmRzLA0KDQpBbW9sIFQNCg0KDQotLS0tLU9yaWdpbmFsIE1lc3Nh
+Z2UtLS0tLQ0KRnJvbTogTHVpeiBBdWd1c3RvIHZvbiBEZW50eiBbbWFpbHRvOmx1aXouZGVudHpA
+Z21haWwuY29tXSANClNlbnQ6IE1vbmRheSwgSnVuZSAyNywgMjAxNiA3OjQxIEFNDQpUbzogVHVw
+ZSwgQW1vbCAoQW1vbCkNCkNjOiBCbHVlWiBkZXZlbG9wbWVudA0KU3ViamVjdDogUmU6IEJsdWV6
+IDUuMzcgU0lHIFFESUQ/DQoNCkhpIEFtb2wsDQoNCk9uIEZyaSwgSnVuIDI0LCAyMDE2IGF0IDY6
+NTUgUE0sIFR1cGUsIEFtb2wgKEFtb2wpIDx0dXBlYUBhdmF5YS5jb20+IHdyb3RlOg0KPiBIZWxs
+byBBbGwsDQo+IElzIEJsdWV6IDUuMzcgIFByb3RvY29sIHN0YWNrIGhhcyB1cGRhdGVkIGxpc3Rp
+bmcgKGNvbXBvbmVudCB0ZXN0ZWQpIG9uIEJsdWV0b290aCBTSUc/DQo+IFdoYXQgaXMgUURJRCBm
+b3IgNS4zNz8NCj4gSSB3YW50IHRvIHNlZSB3aGljaCBCbHVldG9vdGggU3BlY2lmaWNhdGlvbiBk
+b2VzIHRoaXMgc3RhY2sgc3VwcG9ydC4uLi4NCg0KV2UgdHJhY2sgcHJvZmlsZXMgdmVyc2lvbiBp
+biBoZXJlOg0KDQpodHRwczovL3VybGRlZmVuc2UucHJvb2Zwb2ludC5jb20vdjIvdXJsP3U9aHR0
+cHMtM0FfX2dpdC5rZXJuZWwub3JnX2NnaXRfYmx1ZXRvb3RoX2JsdWV6LmdpdF90cmVlX2RvY19z
+dXBwb3J0ZWQtMkRmZWF0dXJlcy50eHQmZD1Dd0lCYVEmYz1CRnBXUXc4YnN1S3BsMVNnaVpINjRR
+JnI9dlJ0VFFFVk9DNFVNY0cyMWRnMkZOdyZtPTJQWUlIXzBZSW9odktiUUF4NGYxVEVTMURYOW90
+M0ZjMDBVOWNHZnJEblkmcz1YY0F2MkJwMTZkZ2lSQmV4QVEyTmNSS0RIUV84UHJRZDlVdWJ6QlVo
+U1FNJmU9IA0KDQpUaGVyZSBpcyBubyBvZmZpY2lhbCBRRElEIHRvIGVhY2ggcmVsZWFzZSwgYnV0
+IHlvdSBjYW4gc2VlIHRoZSBwdWJsaWMgcXVhbGlmaWNhdGlvbiBsaXN0aW5nIGhlcmU6DQoNCmh0
+dHBzOi8vdXJsZGVmZW5zZS5wcm9vZnBvaW50LmNvbS92Mi91cmw/dT1odHRwLTNBX193d3cuYmx1
+ZXoub3JnX3F1YWxpZmljYXRpb25fJmQ9Q3dJQmFRJmM9QkZwV1F3OGJzdUtwbDFTZ2laSDY0USZy
+PXZSdFRRRVZPQzRVTWNHMjFkZzJGTncmbT0yUFlJSF8wWUlvaHZLYlFBeDRmMVRFUzFEWDlvdDNG
+YzAwVTljR2ZyRG5ZJnM9UU1NNjZQTXVsc0tnTW1zckdqa2hZX08xQXc5eWRvUmNwc01tSUJoNTlp
+SSZlPSANCg0KLS0NCkx1aXogQXVndXN0byB2b24gRGVudHoNCg==
