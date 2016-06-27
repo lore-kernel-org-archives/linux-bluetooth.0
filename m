@@ -1,171 +1,75 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-To: linux-bluetooth@vger.kernel.org
-From: Tobias Preclik <linux-bluetooth@tobias.preclik.de>
-Subject: EBUSY when connecting in parallel to btle devices
-Message-ID: <a567f9a0-cf7a-bafb-f735-656dc5371a60@tobias.preclik.de>
-Date: Mon, 27 Jun 2016 15:42:29 +0200
+In-Reply-To: <CABBYNZ+4kLiYq+r0xg2sd8MVdTXH0z19AO4tr4F5-h1t8=QPcw@mail.gmail.com>
+References: <CD551047A838BB45A959E537E0B25AB56D70B330@AZ-US1EXMB04.global.avaya.com> <CABBYNZ+4kLiYq+r0xg2sd8MVdTXH0z19AO4tr4F5-h1t8=QPcw@mail.gmail.com>
+To: BlueZ development <linux-bluetooth@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/mixed;
- boundary="------------48AC61FF41C284D5C29E56DD"
+Subject: Re: Bluez 5.37 SIG QDID?
+Message-ID: <OF4C4942A2.E6B3B8B6-ON86257FDF.00498A15-86257FDF.004991D8@continental-corporation.com>
+From: burch.seymour@continental-corporation.com
+Date: Mon, 27 Jun 2016 08:23:34 -0500
+Content-Type: text/plain; charset="US-ASCII"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is a multi-part message in MIME format.
---------------48AC61FF41C284D5C29E56DD
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+According to the page link below, BlueZ supports SPP ver 1.1
 
-Dear devs,
+SPP                                              1.1  Server, Client
 
-when performing two subsequent non-blocking connects to two different 
-BTLE devices (using the same HCI device) results in the first connection 
-attempt completing successfully (POLLOUT event when polling the socket) 
-and the second connection hanging up (POLLOUT, POLLHUP and POLLERR 
-events when polling the socket). The error is usually EBUSY (Device or 
-resource busy), sometimes also ELOOP (Too many levels of symbolic 
-links). This behavior is somewhat reasonable even though I would expect 
-the connection attempt to be queued. However, the HCI device still seems 
-to establish _both_ connections (judging from the status LEDs on the 
-BTLE devices I connect to). And even if I close the hung-up socket and 
-exit the process the connection remains established until the 
-corresponding BTLE device is powered down. This can be verified using 
-netstat built with HAVE_AFBLUETOOTH=1:
+This version is deprecated as of August 2013 with 1.2 replacing it. 
 
-Active Bluetooth connections (w/o servers)
-Proto  Destination       Source            State         PSM DCID   SCID 
-      IMTU    OMTU Security
-l2cap  00:BA:DC:AB:1E:00 00:de:ca:fb:ad:00 CONNECTED       0 0x0004 
-0x0004     672     672 LOW
+The ICS file in the 5.39 source indicates 1.2.
 
-I suspect this is erroneous behavior. I attached a small program 
-demonstrating the behavior. Currently, I am using kernel 4.4.0 (Ubuntu) 
-and bluez 5.40. The problem can be reproduced using various HCI devices. 
-The sample output of the behavior described above is:
+                Profile Version
+-------------------------------------------------------------------------------
+Item            Selected        Description
+-------------------------------------------------------------------------------
+TSPC_SPP_0_1    False           SPP v1.1 (C.1)
+TSPC_SPP_0_2    True (*)                SPP v1.2 (C.1)
+-------------------------------------------------------------------------------
+C.1: Mandatory to support only one Profile version.
+-------------------------------------------------------------------------------
 
-$ g++ -Wall -std=c++11 -o bttest bttest.cpp -lbluetooth
-$ ./bttest
-Connecting socket (00:DE:AD:BE:EF:00)...
-Connection in progress (00:DE:AD:BE:EF:00)...
-Connecting socket (00:DE:CA:FB:AD:00)...
-Connection in progress (00:DE:CA:FB:AD:00)...
-Events from socket connection (00:DE:CA:FB:AD:00): POLLOUT POLLHUP POLLERR
-Socket error occurred: Device or resource busy
-Events from socket connection (00:DE:CA:FB:AD:00): POLLOUT POLLHUP
-Closing socket (00:DE:CA:FB:AD:00) due to hang-up...
-Events from socket connection (00:DE:AD:BE:EF:00): POLLOUT
-Connected socket (00:DE:AD:BE:EF:00).
-# Powering down device 00:DE:AD:BE:EF:00...
-Events from socket connection (00:DE:AD:BE:EF:00): POLLHUP POLLERR
-Socket error occurred: Connection timed out
-Events from socket connection (00:DE:AD:BE:EF:00): POLLHUP
-Closing socket (00:DE:AD:BE:EF:00) due to hang-up...
+So, is the ICS correct, with the documentation lagging a bit?
 
-The EBUSY/ELOOP error is also reported if neither of the hard-coded BTLE 
-devices (00:DE:AD:BE:EF:00 and 00:DE:CA:FB:AD:00) exists.
+-Burch
 
-Can anyone confirm that this is a bug?
 
-Regards,
-Tobias
 
---------------48AC61FF41C284D5C29E56DD
-Content-Type: text/plain; charset=UTF-8; x-mac-type="0"; x-mac-creator="0";
- name="bttest.cpp"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment;
- filename="bttest.cpp"
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     "Tupe, Amol (Amol)" <tupea@avaya.com>, 
+Cc:     BlueZ development <linux-bluetooth@vger.kernel.org>
+Date:   06/27/2016 06:41 AM
+Subject:        Re: Bluez 5.37 SIG QDID?
+Sent by:        linux-bluetooth-owner@vger.kernel.org
 
-I2luY2x1ZGUgPHN5cy90eXBlcy5oPgojaW5jbHVkZSA8c3lzL3NvY2tldC5oPgojaW5jbHVk
-ZSA8dW5pc3RkLmg+CiNpbmNsdWRlIDxmY250bC5oPgojaW5jbHVkZSA8cG9sbC5oPgojaW5j
-bHVkZSA8ZXJybm8uaD4KI2luY2x1ZGUgPGlvc3RyZWFtPgoKI2luY2x1ZGUgPGJsdWV0b290
-aC9ibHVldG9vdGguaD4KI2luY2x1ZGUgPGJsdWV0b290aC9oY2kuaD4KI2luY2x1ZGUgPGJs
-dWV0b290aC9oY2lfbGliLmg+CiNpbmNsdWRlIDxibHVldG9vdGgvbDJjYXAuaD4KCiNkZWZp
-bmUgQVRUX0NJRCA0CgpzdHJ1Y3QgRGV2aWNlIHsKCURldmljZShjb25zdCBzdGQ6OnN0cmlu
-ZyAmYWRkcmVzcykgOiBhZGRyZXNzXyhhZGRyZXNzKSB7fQoJRGV2aWNlKCkge30KCX5EZXZp
-Y2UoKSB7CgkJY2xvc2UoKTsKCX0KCglib29sIGNsb3NlKCkgewoJCWlmIChzb2NrXyA8IDAp
-CgkJCXJldHVybiB0cnVlOwoKCQlpZiAoOjpjbG9zZShzb2NrXykgPCAwKSB7CgkJCXN0ZDo6
-Y291dCA8PCAiRmFpbGVkIHRvIGNsb3NlIHNvY2tldDogIiA8PCBzdHJlcnJvcihlcnJubykg
-PDwgc3RkOjplbmRsOwoJCQlyZXR1cm4gZmFsc2U7CgkJfQoKCQlzb2NrXyA9IC0xOwoJCXJl
-dHVybiB0cnVlOwoJfQoKCWJvb2wgb3BlblNvY2tldChjb25zdCBjaGFyICpoY2lNYWMpIHsK
-CQlzdHJ1Y3Qgc29ja2FkZHJfbDIgc3JjYWRkciwgZHN0YWRkcjsKCgkJaW50IGRldl9pZDsK
-CQlpZiAoaGNpTWFjID09IG51bGxwdHIpCgkJCWRldl9pZCA9IGhjaV9nZXRfcm91dGUobnVs
-bHB0cik7CgkJZWxzZQoJCQlkZXZfaWQgPSBoY2lfZGV2aWQoaGNpTWFjKTsKCgkJc3RydWN0
-IGhjaV9kZXZfaW5mbyBkZXZfaW5mbzsKCQlpZiAoaGNpX2RldmluZm8oZGV2X2lkLCAmZGV2
-X2luZm8pIDwgMCkgewoJCQlzdGQ6OmNvdXQgPDwgIkZhaWxlZCB0byBvYnRhaW4gZGV2aWNl
-IGluZm86ICIgPDwgc3RyZXJyb3IoZXJybm8pIDw8IHN0ZDo6ZW5kbDsKCQkJcmV0dXJuIGZh
-bHNlOwoJCX0KCgkJc29ja18gPSBzb2NrZXQoUEZfQkxVRVRPT1RILCBTT0NLX1NFUVBBQ0tF
-VCwgQlRQUk9UT19MMkNBUCk7CgkJaWYgKHNvY2tfIDwgMCkgewoJCQlzdGQ6OmNvdXQgPDwg
-IkZhaWxlZCB0byBjcmVhdGUgTDJDQVAgc29ja2V0OiAiIDw8IHN0cmVycm9yKGVycm5vKSA8
-PCBzdGQ6OmVuZGw7CgkJCXJldHVybiBmYWxzZTsKCQl9CgoJCW1lbXNldCgmc3JjYWRkciwg
-MCwgc2l6ZW9mKHNyY2FkZHIpKTsKCQlzcmNhZGRyLmwyX2ZhbWlseSA9IEFGX0JMVUVUT09U
-SDsKCQlzcmNhZGRyLmwyX2NpZCA9IGh0b2JzKEFUVF9DSUQpOwoJCXNyY2FkZHIubDJfYmRh
-ZGRyID0gZGV2X2luZm8uYmRhZGRyOwoKCQlpZiAoYmluZChzb2NrXywgKHN0cnVjdCBzb2Nr
-YWRkciAqKSZzcmNhZGRyLCBzaXplb2Yoc3JjYWRkcikpIDwgMCkgewoJCQlzdGQ6OmNvdXQg
-PDwgIkZhaWxlZCB0byBiaW5kOiAiIDw8IHN0cmVycm9yKGVycm5vKSA8PCBzdGQ6OmVuZGw7
-CgkJCWNsb3NlKCk7CgkJCXJldHVybiBmYWxzZTsKCQl9CgoJCS8vIFNldCB1cCBkZXN0aW5h
-dGlvbiBhZGRyZXNzLgoJCW1lbXNldCgmZHN0YWRkciwgMCwgc2l6ZW9mKGRzdGFkZHIpKTsK
-CQlkc3RhZGRyLmwyX2ZhbWlseSA9IEFGX0JMVUVUT09USDsKCQlkc3RhZGRyLmwyX2NpZCA9
-IGh0b2JzKEFUVF9DSUQpOwoJCWRzdGFkZHIubDJfYmRhZGRyX3R5cGUgPSBCREFERFJfTEVf
-UkFORE9NOwoJCXN0cjJiYShhZGRyZXNzXy5jX3N0cigpLCAmZHN0YWRkci5sMl9iZGFkZHIp
-OwoKCQkvLyBTZXQgc29ja2V0IHRvIG5vbi1ibG9ja2luZyBtb2RlLgoJCWludCBmbGFncyA9
-IGZjbnRsKHNvY2tfLCBGX0dFVEZMLCBOVUxMKTsKCQlpZiAoZmxhZ3MgPCAwKSB7CgkJCXN0
-ZDo6Y291dCA8PCAiRmFpbGVkIHRvIGdldCBzb2NrZXQgc3RhdHVzIGZsYWdzOiAiIDw8IHN0
-cmVycm9yKGVycm5vKSA8PCBzdGQ6OmVuZGw7CgkJCWNsb3NlKCk7CgkJCXJldHVybiBmYWxz
-ZTsKCQl9CgoJCWZsYWdzIHw9IE9fTk9OQkxPQ0s7CgoJCWlmIChmY250bChzb2NrXywgRl9T
-RVRGTCwgZmxhZ3MpIDwgMCkgewoJCQlzdGQ6OmNvdXQgPDwgIkZhaWxlZCB0byBzZXQgc29j
-a2V0IHN0YXR1cyBmbGFnczogIiA8PCBzdHJlcnJvcihlcnJubykgPDwgc3RkOjplbmRsOwoJ
-CQljbG9zZSgpOwoJCQlyZXR1cm4gZmFsc2U7CgkJfQoKCQlzdGQ6OmNvdXQgPDwgIkNvbm5l
-Y3Rpbmcgc29ja2V0ICgiIDw8IGFkZHJlc3NfIDw8ICIpLi4uIiA8PCBzdGQ6OmVuZGw7CgoJ
-CWludCBlcnIgPSA6OmNvbm5lY3Qoc29ja18sIChzdHJ1Y3Qgc29ja2FkZHIgKikmZHN0YWRk
-ciwgc2l6ZW9mKGRzdGFkZHIpKTsKCQlpZiAoZXJyIDwgMCAmJiBlcnJubyAhPSBFSU5QUk9H
-UkVTUykgewoJCQlzdGQ6OmNvdXQgPDwgIkZhaWxlZCB0byBjb25uZWN0OiAiIDw8IHN0cmVy
-cm9yKGVycm5vKSA8PCBzdGQ6OmVuZGw7CgkJCWNsb3NlKCk7CgkJCXJldHVybiBmYWxzZTsK
-CQl9CgoJCWlmIChlcnJubyA9PSBFSU5QUk9HUkVTUykKCQkJc3RkOjpjb3V0IDw8ICJDb25u
-ZWN0aW9uIGluIHByb2dyZXNzICgiIDw8IGFkZHJlc3NfIDw8ICIpLi4uIiA8PCBzdGQ6OmVu
-ZGw7CgkJZWxzZQoJCQlzdGQ6OmNvdXQgPDwgIkNvbm5lY3RlZCBzb2NrZXQgKCIgPDwgYWRk
-cmVzc18gPDwgIikuIiA8PCBzdGQ6OmVuZGw7CgoJCXJldHVybiB0cnVlOwoJfQoKCWludCBz
-b2NrX3stMX07CglzdGQ6OnN0cmluZyBhZGRyZXNzXzsKfTsKCmludCBtYWluKCkKewoJY29u
-c3Qgc3RkOjpzaXplX3QgbnVtRGV2aWNlcyA9IDI7CgoJRGV2aWNlIGRldmljZXNbbnVtRGV2
-aWNlc107CglkZXZpY2VzWzBdID0gRGV2aWNlKCIwMDpERTpBRDpCRTpFRjowMCIpOwoJZGV2
-aWNlc1sxXSA9IERldmljZSgiMDA6REU6Q0E6RkI6QUQ6MDAiKTsKCQoJcG9sbGZkIGZkc1tu
-dW1EZXZpY2VzXTsKCglmb3IgKHN0ZDo6c2l6ZV90IGkgPSAwOyBpIDwgbnVtRGV2aWNlczsg
-KytpKSB7CgkJYm9vbCByZXQgPSBkZXZpY2VzW2ldLm9wZW5Tb2NrZXQobnVsbHB0cik7CgkJ
-aWYgKCFyZXQpCgkJCXN0ZDo6Y291dCA8PCAiRmFpbGVkIHRvIG9wZW4gc29ja2V0ICgiIDw8
-IGRldmljZXNbaV0uYWRkcmVzc18gPDwgIikuIiA8PCBzdGQ6OmVuZGw7CgoJCWZkc1tpXS5m
-ZCA9IGRldmljZXNbaV0uc29ja187CgkJZmRzW2ldLmV2ZW50cyA9IFBPTExJTiB8IFBPTExQ
-UkkgfCBQT0xMT1VUIHwgUE9MTFJESFVQOwoJfQoKCS8vIFdhaXQgZm9yIGV2ZW50cy4uLgoJ
-Zm9yICg7OykgewoJCXN0ZDo6c2l6ZV90IG51bUFjdGl2ZSA9IDA7CgkJZm9yIChzdGQ6OnNp
-emVfdCBpID0gMDsgaSA8IG51bURldmljZXM7ICsraSkKCQkJaWYgKGZkc1tpXS5mZCAhPSAt
-MSkKCQkJCSsrbnVtQWN0aXZlOwoKCQlpZiAobnVtQWN0aXZlID09IDApCgkJCWJyZWFrOwoK
-CQlpbnQgcmV0ID0gcG9sbChmZHMsIG51bURldmljZXMsIC0xKTsKCQlpZiAocmV0IDwgMCkg
-ewoJCQlzdGQ6OmNvdXQgPDwgIkZhaWxlZCB0byBwb2xsIHNvY2tldHM6ICIgPDwgc3RyZXJy
-b3IoZXJybm8pIDw8IHN0ZDo6ZW5kbDsKCQkJc3RkOjpleGl0KEVYSVRfRkFJTFVSRSk7CgkJ
-fQoKCQlmb3IgKHN0ZDo6c2l6ZV90IGkgPSAwOyBpIDwgbnVtRGV2aWNlczsgKytpKSB7CgkJ
-CXNob3J0IHJldmVudHMgPSBmZHNbaV0ucmV2ZW50czsKCgkJCWlmIChyZXZlbnRzID09IDAp
-CgkJCQljb250aW51ZTsKCgkJCXN0ZDo6Y291dCA8PCAiRXZlbnRzIGZyb20gc29ja2V0IGNv
-bm5lY3Rpb24gKCIgPDwgZGV2aWNlc1tpXS5hZGRyZXNzXyA8PCAiKToiOwoJCQlpZiAocmV2
-ZW50cyAmIFBPTExJTikKCQkJCXN0ZDo6Y291dCA8PCAiIFBPTExJTiI7CgkJCWlmIChyZXZl
-bnRzICYgUE9MTFBSSSkKCQkJCXN0ZDo6Y291dCA8PCAiIFBPTExQUkkiOwoJCQlpZiAocmV2
-ZW50cyAmIFBPTExPVVQpCgkJCQlzdGQ6OmNvdXQgPDwgIiBQT0xMT1VUIjsKCQkJaWYgKHJl
-dmVudHMgJiBQT0xMUkRIVVApCgkJCQlzdGQ6OmNvdXQgPDwgIiBQT0xMUkRIVVAiOwoJCQlp
-ZiAocmV2ZW50cyAmIFBPTExIVVApCgkJCQlzdGQ6OmNvdXQgPDwgIiBQT0xMSFVQIjsKCQkJ
-aWYgKHJldmVudHMgJiBQT0xMRVJSKQoJCQkJc3RkOjpjb3V0IDw8ICIgUE9MTEVSUiI7CgkJ
-CWlmIChyZXZlbnRzICYgUE9MTE5WQUwpCgkJCQlzdGQ6OmNvdXQgPDwgIiBQT0xMTlZBTCI7
-CgkJCXN0ZDo6Y291dCA8PCBzdGQ6OmVuZGw7CgoJCQlpZiAocmV2ZW50cyAmIFBPTExOVkFM
-KSB7CgkJCQlzdGQ6OmNvdXQgPDwgIkludmFsaWQgZmlsZSBkZXNjcmlwdG9yIGRldGVjdGVk
-OiAiIDw8IGZkc1tpXS5mZCA8PCBzdGQ6OmVuZGw7CgkJCQlmZHNbaV0uZmQgPSAtMTsKCQkJ
-fQoJCQllbHNlIGlmIChyZXZlbnRzICYgUE9MTEVSUikgewoJCQkJaW50IG9wdGlvblZhbHVl
-ID0gMDsKCQkJCXNvY2tsZW5fdCBvcHRpb25MZW5ndGggPSBzaXplb2Yob3B0aW9uVmFsdWUp
-OwoKCQkJCWlmIChnZXRzb2Nrb3B0KGRldmljZXNbaV0uc29ja18sIFNPTF9TT0NLRVQsIFNP
-X0VSUk9SLCAmb3B0aW9uVmFsdWUsICZvcHRpb25MZW5ndGgpIDwgMCkKCQkJCQlzdGQ6OmNv
-dXQgPDwgIkZhaWxlZCB0byBkZXRlcm1pbmUgcmVhc29uIG9mIHNvY2tldCBlcnJvcjogIiA8
-PCBzdHJlcnJvcihlcnJubykgPDwgc3RkOjplbmRsOwoJCQkJZWxzZQoJCQkJCXN0ZDo6Y291
-dCA8PCAiU29ja2V0IGVycm9yIG9jY3VycmVkOiAiIDw8IHN0cmVycm9yKG9wdGlvblZhbHVl
-KSA8PCBzdGQ6OmVuZGw7CgkJCX0KCQkJZWxzZSBpZiAocmV2ZW50cyAmIFBPTExIVVApIHsK
-CQkJCXN0ZDo6Y291dCA8PCAiQ2xvc2luZyBzb2NrZXQgKCIgPDwgZGV2aWNlc1tpXS5hZGRy
-ZXNzXyA8PCAiKSBkdWUgdG8gaGFuZy11cC4uLiIgPDwgc3RkOjplbmRsOwoKCQkJCWRldmlj
-ZXNbaV0uY2xvc2UoKTsKCQkJCWZkc1tpXS5mZCA9IC0xOwoJCQl9CgkJCWVsc2UgaWYgKHJl
-dmVudHMgJiBQT0xMT1VUKSB7CgkJCQlzdGQ6OmNvdXQgPDwgIkNvbm5lY3RlZCBzb2NrZXQg
-KCIgPDwgZGV2aWNlc1tpXS5hZGRyZXNzXyA8PCAiKS4iIDw8IHN0ZDo6ZW5kbDsKCQkJCWZk
-c1tpXS5ldmVudHMgPSAwOwoJCQl9CgkJfQoJfQp9Cg==
---------------48AC61FF41C284D5C29E56DD--
+
+
+Hi Amol,
+
+On Fri, Jun 24, 2016 at 6:55 PM, Tupe, Amol (Amol) <tupea@avaya.com> 
+wrote:
+> Hello All,
+> Is Bluez 5.37  Protocol stack has updated listing (component tested) on 
+Bluetooth SIG?
+> What is QDID for 5.37?
+> I want to see which Bluetooth Specification does this stack support....
+
+We track profiles version in here:
+
+https://git.kernel.org/cgit/bluetooth/bluez.git/tree/doc/supported-features.txt
+
+
+There is no official QDID to each release, but you can see the public
+qualification listing here:
+
+http://www.bluez.org/qualification/
+
+-- 
+Luiz Augusto von Dentz
+--
+To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" 
+in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
