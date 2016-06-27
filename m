@@ -2,11 +2,9 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Denis Kenzior <denkenz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Denis Kenzior <denkenz@gmail.com>
-Subject: [PATCH 2/2] hci_sock: Fix recvmsg return value
-Date: Mon, 27 Jun 2016 11:01:13 -0500
-Message-Id: <1467043273-3781-2-git-send-email-denkenz@gmail.com>
-In-Reply-To: <1467043273-3781-1-git-send-email-denkenz@gmail.com>
-References: <1467043273-3781-1-git-send-email-denkenz@gmail.com>
+Subject: [PATCH 1/2] af_bluetooth: Fix recvmsg return value
+Date: Mon, 27 Jun 2016 11:01:12 -0500
+Message-Id: <1467043273-3781-1-git-send-email-denkenz@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -38,30 +36,30 @@ and
 
 Signed-off-by: Denis Kenzior <denkenz@gmail.com>
 ---
- net/bluetooth/hci_sock.c | 5 +++++
+ net/bluetooth/af_bluetooth.c | 5 +++++
  1 file changed, 5 insertions(+)
 
-diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
-index 1298d72..12e9294 100644
---- a/net/bluetooth/hci_sock.c
-+++ b/net/bluetooth/hci_sock.c
-@@ -1048,6 +1048,7 @@ static int hci_sock_recvmsg(struct socket *sock, struct msghdr *msg,
+diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
+index 955eda9..eab6f62 100644
+--- a/net/bluetooth/af_bluetooth.c
++++ b/net/bluetooth/af_bluetooth.c
+@@ -215,6 +215,7 @@ int bt_sock_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
  	struct sock *sk = sock->sk;
  	struct sk_buff *skb;
- 	int copied, err;
-+	unsigned int skblen;
+ 	size_t copied;
++	size_t skblen;
+ 	int err;
  
- 	BT_DBG("sock %p, sk %p", sock, sk);
- 
-@@ -1064,6 +1065,7 @@ static int hci_sock_recvmsg(struct socket *sock, struct msghdr *msg,
- 	if (!skb)
+ 	BT_DBG("sock %p sk %p len %zu", sock, sk, len);
+@@ -230,6 +231,7 @@ int bt_sock_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
  		return err;
+ 	}
  
 +	skblen = skb->len;
  	copied = skb->len;
  	if (len < copied) {
  		msg->msg_flags |= MSG_TRUNC;
-@@ -1089,6 +1091,9 @@ static int hci_sock_recvmsg(struct socket *sock, struct msghdr *msg,
+@@ -248,6 +250,9 @@ int bt_sock_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
  
  	skb_free_datagram(sk, skb);
  
@@ -70,7 +68,7 @@ index 1298d72..12e9294 100644
 +
  	return err ? : copied;
  }
- 
+ EXPORT_SYMBOL(bt_sock_recvmsg);
 -- 
 2.4.10
 
