@@ -1,27 +1,25 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Kropf Johannes <Johannes.Kropf@ait.ac.at>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Gatt Client - RegisterApplication options
-Date: Tue, 28 Jun 2016 09:24:21 +0000
-Message-ID: <E92610C73D6DE84EB154DC52F5ECCE541D73F131@S0MSMAIL111.arc.local>
-References: <E92610C73D6DE84EB154DC52F5ECCE541D73E0E8@S0MSMAIL111.arc.local>
-In-Reply-To: <E92610C73D6DE84EB154DC52F5ECCE541D73E0E8@S0MSMAIL111.arc.local>
-Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
+From: Seulki Shin <sskcorea@gmail.com>
+Date: Tue, 28 Jun 2016 17:38:01 +0900
+Message-ID: <CA+ZaN38pJ-2FM9t8c+sOT+ViXvYA79YgUe=ispYKVQwZiQW0ZQ@mail.gmail.com>
+Subject: Configure supervision timeout
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Bluez,
 
-I upgraded to the newest version of bluez (5.40) and noticed that the "RegisterService" method to register the services for a client application is not existing anymore.
+Recently, I have noticed supervision timeout is not enough to pair devices.
 
-However, I have troubles using the "RegisterApplication" method since I don't know how to put the profile hierarchy into the requested dict object. It is not clear for me, even after checking doc/gatt-api.txt and the source code.
-Whatever I try results in the error message "No object received", invoked by the method
-static void client_ready_cb(GDBusClient *client, void *user_data) in gatt-database.c
+How can I configure supervision timeout? Is there any configuration file?
 
+First, I have checked "main.conf" but I couldn't find any related properties.
+I also found /sys/kernel/debug/bluetooth/hci0 has a bunch of system settings.
+But I am not sure editing those files is a right approach.
 
-Can anybody help me? 
+Any help would be appreciated.
 
-Kind regards,
-
-Johannes
+Thanks,
+Seulki.
