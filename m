@@ -1,66 +1,17 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <1467114630-27822-1-git-send-email-luiz.dentz@gmail.com>
-References: <1467114630-27822-1-git-send-email-luiz.dentz@gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 29 Jun 2016 16:44:24 +0300
-Message-ID: <CABBYNZK6UbnvvA7e=HZtQr2OsP353KdrmML3dNFwwW3GEtT+Vw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] core/device: Make filtered discovery able to detect beacons
+In-Reply-To: <20160629133159.GA28159@arthur-bzh>
+References: <20160629133159.GA28159@arthur-bzh>
+From: Tobias Svehagen <tobias.svehagen@gmail.com>
+Date: Wed, 29 Jun 2016 15:39:51 +0200
+Message-ID: <CADwkJj+fmSoOsyeg4txjdPUS7ajb4tHL25ZDZS3e-w=kU6iN4Q@mail.gmail.com>
+Subject: Re: gatt server and reset of hci device
 To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
-
-On Tue, Jun 28, 2016 at 2:50 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> This makes it possible to use SetDiscoveryFilter to disable checking
-> discoverable flags making it possible to see beacons such as the ones
-> create by tools/eddystone that doesn't show on regular discovery sessions
-> since they are not discoverable/connectable.
-> ---
->  doc/adapter-api.txt | 6 +++++-
->  src/adapter.c       | 2 +-
->  2 files changed, 6 insertions(+), 2 deletions(-)
->
-> diff --git a/doc/adapter-api.txt b/doc/adapter-api.txt
-> index 4dbf879..97462a3 100644
-> --- a/doc/adapter-api.txt
-> +++ b/doc/adapter-api.txt
-> @@ -80,7 +80,11 @@ Methods              void StartDiscovery()
->
->                         When discovery filter is set, Device objects will be
->                         created as new devices with matching criteria are
-> -                       discovered. PropertiesChanged signals will be emitted
-> +                       discovered regardless of they are connectable or
-> +                       discoverable which enables listening to
-> +                       non-connectable and non-discoverable devices.
-> +
-> +                       PropertiesChanged signals will be emitted
->                         for already existing Device objects, with updated RSSI
->                         value. If one or more discovery filters have been set,
->                         the RSSI delta-threshold, that is imposed by
-> diff --git a/src/adapter.c b/src/adapter.c
-> index f4fbf82..5499bfc 100644
-> --- a/src/adapter.c
-> +++ b/src/adapter.c
-> @@ -5451,7 +5451,7 @@ static void update_found_devices(struct btd_adapter *adapter,
->         memset(&eir_data, 0, sizeof(eir_data));
->         eir_parse(&eir_data, data, data_len);
->
-> -       if (bdaddr_type == BDADDR_BREDR)
-> +       if (bdaddr_type == BDADDR_BREDR || adapter->filtered_discovery)
->                 discoverable = true;
->         else
->                 discoverable = eir_data.flags & (EIR_LIM_DISC | EIR_GEN_DISC);
-> --
-> 2.7.4
-
-Applied.
-
-
--- 
-Luiz Augusto von Dentz
+> [arthur * dev] uname -a
+> Linux arthur-bzh 3.13.0-88-generic #135-Ubuntu SMP Wed Jun 8 21:10:42 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+That kernel doesn't support the MGMT_OP_READ_ADV_FEATURES. You should
+try updating your kernel. Ubuntu 14.04.4 uses kernel 4.2.
