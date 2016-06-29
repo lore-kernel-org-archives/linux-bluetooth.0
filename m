@@ -1,17 +1,26 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Date: Wed, 29 Jun 2016 15:31:59 +0200
-From: Arthur LAMBERT <lambertarthur22@gmail.com>
-To: Tobias Svehagen <tobias.svehagen@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: gatt server and reset of hci device
-Message-ID: <20160629133159.GA28159@arthur-bzh>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20160629123310.GA11250@arthur-bzh>
+References: <20160629123310.GA11250@arthur-bzh>
+From: Tobias Svehagen <tobias.svehagen@gmail.com>
+Date: Wed, 29 Jun 2016 15:22:52 +0200
+Message-ID: <CADwkJj+eSMWVAR+4nP3w9BUzbc6Wuzu62gmtq6=-BdLEsJTowg@mail.gmail.com>
+Subject: Re: gatt server and reset of hci device
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-> Okay, the 'Unknown Command' lines don't look so good, what kernel are
-> you running?
+> [arthur ] sudo ./bluetoothd -nE -d src/gatt-database.
+> bluetoothd[11131]: Bluetooth daemon 5.39
+> bluetoothd[11131]: Starting SDP server
+> bluetoothd[11131]: Bluetooth management interface 1.4 initialized
+> bluetoothd[11131]: Failed to obtain handles for "Service Changed" characteristic
+> bluetoothd[11131]: Failed to read advertising features: Unknown Command (0x01)
+> bluetoothd[11131]: hci0 Load Connection Parameters failed: Unknown Command (0x01)
+>
+> This test is running on ubuntu 14.04. We stop bluetooth service before starting bluetoothd.
+> We also run the test on arm target but without trouble this time.
 
-[arthur * dev] uname -a
-Linux arthur-bzh 3.13.0-88-generic #135-Ubuntu SMP Wed Jun 8 21:10:42 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+Okay, the 'Unknown Command' lines don't look so good, what kernel are
+you running?
