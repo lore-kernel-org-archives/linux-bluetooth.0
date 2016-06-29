@@ -1,65 +1,30 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-From: =?UTF-8?Q?Fran=C3=A7ois_Beaufort?= <beaufort.francois@gmail.com>
-Date: Wed, 29 Jun 2016 09:24:45 +0200
-Message-ID: <CAEZxfGOq_QkN65B=F_u+rb=6+O-4c=0dF0ZaDZ5t9D6nNtY2rw@mail.gmail.com>
-Subject: Notify on succeeds while no apparent descriptor
-To: BlueZ development <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <20160627155413.GA5294@arthur-bzh>
+References: <20160511125102.GC17904@arthur-bzh> <CABBYNZ+c4mFuBUsR3uzOnMKMKJV-3GXkJiDZESoWzBvnXRg6Yg@mail.gmail.com>
+ <20160627155413.GA5294@arthur-bzh>
+From: Tobias Svehagen <tobias.svehagen@gmail.com>
+Date: Wed, 29 Jun 2016 09:20:20 +0200
+Message-ID: <CADwkJj+VR=gB6oESpCJ260JYL6_6-knFYM+gZVz6S+sU2DQR1Q@mail.gmail.com>
+Subject: Re: gatt server and reset of hci device
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I have a bogus BLE device which exposes "badly" a characteristic
-notification. Even though it doesn't find a characteristic descriptor,
-I'm still able to start notifications and even receive value changed
-events.
+Hi,
 
-For info, Android and macOS raise an exception when trying to start
-notifications. See
-https://github.com/WebBluetoothCG/ble-test-peripheral-android/issues/63
+What version of bluez are you using?
 
-See logs:
+> Is there any example in c using glibdbus ?
 
-< ACL Data TX: Handle 32 flags 0x00 dlen 9
-                                                   [hci0] 403.621325
-      ATT: Find Information Request (0x04) len 4
-        Handle range: 0x002b-0xffff
-> HCI Event: Number of Completed Packets (0x13) plen 5                                                                    [hci0] 403.689256
-        Num handles: 1
-        Handle: 32
-        Count: 1
-> ACL Data RX: Handle 32 flags 0x02 dlen 9                                                                                [hci0] 403.755926
-      ATT: Error Response (0x01) len 4
-        Find Information Request (0x04)
-        Handle: 0x002b
-        Error: Attribute Not Found (0x0a)
+Yes you can also look at tools/gatt-service.c for a C example of using
+the GATT dbus API.
 
----
+> * Run bluetoothd with experimental mode enable :
+> sudo ./bluetoothd -E
 
-[Nexus 5X]# list-attributes
-Primary Service
-        /org/bluez/hci0/dev_46_EE_57_93_31_08/service0001
-        Generic Attribute Profile
-Characteristic
-        /org/bluez/hci0/dev_46_EE_57_93_31_08/service0001/char0002
-        Service Changed
-Primary Service
-        /org/bluez/hci0/dev_46_EE_57_93_31_08/service0028
-        Battery Service
-Characteristic
-        /org/bluez/hci0/dev_46_EE_57_93_31_08/service0028/char0029
-        Battery Level
-[Nexus 5X]# select-attribute
-/org/bluez/hci0/dev_46_EE_57_93_31_08/service0028/char0029
-[Nexus 5X:/service0028/char0029]# notify on
-[CHG] Attribute
-/org/bluez/hci0/dev_46_EE_57_93_31_08/service0028/char0029 Notifying:
-yes
-Notify started
-[CHG] Attribute
-/org/bluez/hci0/dev_46_EE_57_93_31_08/service0028/char0029 Value: 0x32
-[Nexus 5X:/service0028/char0029]# notify off
-[CHG] Attribute
-/org/bluez/hci0/dev_46_EE_57_93_31_08/service0028/char0029 Notifying:
-no
-Notify stopped
+Can you run 'bluetoothd -nE -d src/gatt-database.c'. Do you see
+something like 'GATT Manager registered for adapter: /org/bluez/hci0'?
+
+/Tobias
