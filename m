@@ -1,51 +1,23 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Date: Wed, 29 Jun 2016 14:33:10 +0200
-From: Arthur LAMBERT <lambertarthur22@gmail.com>
-To: Tobias Svehagen <tobias.svehagen@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: gatt server and reset of hci device
-Message-ID: <20160629123310.GA11250@arthur-bzh>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <netdev-owner@vger.kernel.org>
+Date: 29 Jun 2016 08:10:24 -0400
+Message-ID: <20160629121024.2497.qmail@ns.sciencehorizons.net>
+From: "George Spelvin" <linux@sciencehorizons.net>
+To: herbert@gondor.apana.org.au, linux@sciencehorizons.net
+Subject: Re: Doing crypto in small stack buffers (bluetooth vs vmalloc-stack crash, etc)
+Cc: linux-bluetooth@vger.kernel.org, linux-crypto@vger.kernel.org,
+	luto@amacapital.net, netdev@vger.kernel.org
+In-Reply-To: <20160629022049.GA23390@gondor.apana.org.au>
+Sender: netdev-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-> What version of bluez are you using?
+>> Also not mentioned in the documentation is that some algorithms *do*
+>> have different implementations depending on key size.  SHA-2 is the
+>> classic example.
 
-5.37 & 5.39 & 5.40. Same result for all these versions.
+> What do you mean by that? SHA has no keying at all.
 
-> Yes you can also look at tools/gatt-service.c for a C example of using
-> the GATT dbus API.
+In this case, the analagous property is hash size.  Sorry, I thought
+that was so obvious I didn't need to say it.
 
-Ok thanks. I will check that.
-
-> Can you run 'bluetoothd -nE -d src/gatt-database.c'. Do you see
-> something like 'GATT Manager registered for adapter: /org/bluez/hci0'?
-
-[arthur ] sudo ./bluetoothd -nE -d src/gatt-database.
-[sudo] password for arthur: 
-bluetoothd[9754]: Bluetooth daemon 5.39
-bluetoothd[9754]: Unknown key PageTimeout in main.conf
-bluetoothd[9754]: Unknown key InitiallyPowered in main.conf
-bluetoothd[9754]: Unknown key RememberPowered in main.conf
-bluetoothd[9754]: Unknown key EnableGatt in main.conf
-bluetoothd[9754]: Starting SDP server
-bluetoothd[9754]: Bluetooth management interface 1.4 initialized
-bluetoothd[9754]: Failed to obtain handles for "Service Changed" characteristic
-bluetoothd[9754]: Failed to read advertising features: Unknown Command (0x01)
-bluetoothd[9754]: hci0 Load Connection Parameters failed: Unknown Command (0x01)
-
-I replace the main.conf from source in /etc and retry the test :
-
-[arthur ] sudo ./bluetoothd -nE -d src/gatt-database.
-bluetoothd[11131]: Bluetooth daemon 5.39
-bluetoothd[11131]: Starting SDP server
-bluetoothd[11131]: Bluetooth management interface 1.4 initialized
-bluetoothd[11131]: Failed to obtain handles for "Service Changed" characteristic
-bluetoothd[11131]: Failed to read advertising features: Unknown Command (0x01)
-bluetoothd[11131]: hci0 Load Connection Parameters failed: Unknown Command (0x01)
-
-This test is running on ubuntu 14.04. We stop bluetooth service before starting bluetoothd.
-We also run the test on arm target but without trouble this time.
-
-Arthur.
+Specifically, SHA2-256 (and -224) and SHA2-512 (and -384) are separate
+algorithms with similar structures but deparate implementations.
