@@ -1,53 +1,51 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <E92610C73D6DE84EB154DC52F5ECCE541D7401C9@S0MSMAIL111.arc.local>
-References: <E92610C73D6DE84EB154DC52F5ECCE541D73E0E8@S0MSMAIL111.arc.local>
- <E92610C73D6DE84EB154DC52F5ECCE541D73F131@S0MSMAIL111.arc.local>
- <CABBYNZKdT-ckFMzDEL9bz+pqsqttmnK5yg8gxCTTthOj+1JJGA@mail.gmail.com> <E92610C73D6DE84EB154DC52F5ECCE541D7401C9@S0MSMAIL111.arc.local>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 29 Jun 2016 15:33:36 +0300
-Message-ID: <CABBYNZKXaich4vK5L=41_PqhayVHLzrEq3GevoPtrP2UAj6iCg@mail.gmail.com>
-Subject: Re: Gatt Client - RegisterApplication options
-To: Kropf Johannes <Johannes.Kropf@ait.ac.at>
+Date: Wed, 29 Jun 2016 14:33:10 +0200
+From: Arthur LAMBERT <lambertarthur22@gmail.com>
+To: Tobias Svehagen <tobias.svehagen@gmail.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Subject: Re: gatt server and reset of hci device
+Message-ID: <20160629123310.GA11250@arthur-bzh>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johannes,
+> What version of bluez are you using?
 
-On Wed, Jun 29, 2016 at 2:50 PM, Kropf Johannes
-<Johannes.Kropf@ait.ac.at> wrote:
-> Dear Luiz,
->
->>Hi Johannes,
->
->>On Tue, Jun 28, 2016 at 12:24 PM, Kropf Johannes
->><Johannes.Kropf@ait.ac.at> wrote:
->>> Hi,
->>>
->>> I upgraded to the newest version of bluez (5.40) and noticed that the "RegisterService" method to register the services for a client application is not existing anymore.
->>>
->>> However, I have troubles using the "RegisterApplication" method since I don't know how to put the profile hierarchy into the requested dict object. It is not clear for me, even after checking doc/gatt-api.txt and the source code.
->>> Whatever I try results in the error message "No object received", invoked by the method
->>> static void client_ready_cb(GDBusClient *client, void *user_data) in gatt-database.c
->
->>I suspect that you don't have ObjectManager support, you can check
->>tests/example-gatt-server how it is done in python, for other binding
->>there should be a similar way to register the ObjectManager interface
->>so bluetoothd is able to list the objects.
->
-> The ObjectManager Interface is available under the root of org.bluez, it is used also for finding devices as far as I understand.
+5.37 & 5.39 & 5.40. Same result for all these versions.
 
-Yep, but in this case we are looking for the ObjectManager in the
-application side not in bluetoothd.
+> Yes you can also look at tools/gatt-service.c for a C example of using
+> the GATT dbus API.
 
-> The GetManagedObjects() method also works.
-> Which kind of object does bluetoothd try to find when calling the RegisterApplication method?
+Ok thanks. I will check that.
 
-It does call GetManagedObjects, we use that to enumerate the services
-the application has and then proceed to register them.
+> Can you run 'bluetoothd -nE -d src/gatt-database.c'. Do you see
+> something like 'GATT Manager registered for adapter: /org/bluez/hci0'?
 
+[arthur ] sudo ./bluetoothd -nE -d src/gatt-database.
+[sudo] password for arthur: 
+bluetoothd[9754]: Bluetooth daemon 5.39
+bluetoothd[9754]: Unknown key PageTimeout in main.conf
+bluetoothd[9754]: Unknown key InitiallyPowered in main.conf
+bluetoothd[9754]: Unknown key RememberPowered in main.conf
+bluetoothd[9754]: Unknown key EnableGatt in main.conf
+bluetoothd[9754]: Starting SDP server
+bluetoothd[9754]: Bluetooth management interface 1.4 initialized
+bluetoothd[9754]: Failed to obtain handles for "Service Changed" characteristic
+bluetoothd[9754]: Failed to read advertising features: Unknown Command (0x01)
+bluetoothd[9754]: hci0 Load Connection Parameters failed: Unknown Command (0x01)
 
--- 
-Luiz Augusto von Dentz
+I replace the main.conf from source in /etc and retry the test :
+
+[arthur ] sudo ./bluetoothd -nE -d src/gatt-database.
+bluetoothd[11131]: Bluetooth daemon 5.39
+bluetoothd[11131]: Starting SDP server
+bluetoothd[11131]: Bluetooth management interface 1.4 initialized
+bluetoothd[11131]: Failed to obtain handles for "Service Changed" characteristic
+bluetoothd[11131]: Failed to read advertising features: Unknown Command (0x01)
+bluetoothd[11131]: hci0 Load Connection Parameters failed: Unknown Command (0x01)
+
+This test is running on ubuntu 14.04. We stop bluetooth service before starting bluetoothd.
+We also run the test on arm target but without trouble this time.
+
+Arthur.
