@@ -1,246 +1,66 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CAEZxfGOAyn=VuBKGaC8tdU+21RLfSCkth507UcVVr+GT5U4DgQ@mail.gmail.com>
-References: <1467189316-28213-1-git-send-email-luiz.dentz@gmail.com> <CAEZxfGOAyn=VuBKGaC8tdU+21RLfSCkth507UcVVr+GT5U4DgQ@mail.gmail.com>
+In-Reply-To: <1467114630-27822-1-git-send-email-luiz.dentz@gmail.com>
+References: <1467114630-27822-1-git-send-email-luiz.dentz@gmail.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 29 Jun 2016 16:45:28 +0300
-Message-ID: <CABBYNZJfCFRcoJn7Rv35Ocn65Hn3+ttr3OYFptUKmZYQ=D=SqA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] client: Fix filtered scan
-To: =?UTF-8?Q?Fran=C3=A7ois_Beaufort?= <beaufort.francois@gmail.com>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Date: Wed, 29 Jun 2016 16:44:24 +0300
+Message-ID: <CABBYNZK6UbnvvA7e=HZtQr2OsP353KdrmML3dNFwwW3GEtT+Vw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] core/device: Make filtered discovery able to detect beacons
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
 
-On Wed, Jun 29, 2016 at 12:10 PM, François Beaufort
-<beaufort.francois@gmail.com> wrote:
-> Works great. Thanks!
+On Tue, Jun 28, 2016 at 2:50 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 >
-> On Wed, Jun 29, 2016 at 10:35 AM, Luiz Augusto von Dentz
-> <luiz.dentz@gmail.com> wrote:
->> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->>
->> Empty list of UUIDs should be allowed to be passed to
->> set-scan-filter-uuids as bluetoothd accepts it to enable filtering
->> every UUID.
->> ---
->>  client/main.c | 134 +++++++++++++++++++++++++++++++++++++---------------------
->>  1 file changed, 86 insertions(+), 48 deletions(-)
->>
->> diff --git a/client/main.c b/client/main.c
->> index c75b558..6a2892a 100644
->> --- a/client/main.c
->> +++ b/client/main.c
->> @@ -932,6 +932,36 @@ static void append_variant(DBusMessageIter *iter, int type, void *val)
->>         dbus_message_iter_close_container(iter, &value);
->>  }
->>
->> +static void append_array_variant(DBusMessageIter *iter, int type, void *val,
->> +                                                       int n_elements)
->> +{
->> +       DBusMessageIter variant, array;
->> +       char type_sig[2] = { type, '\0' };
->> +       char array_sig[3] = { DBUS_TYPE_ARRAY, type, '\0' };
->> +
->> +       dbus_message_iter_open_container(iter, DBUS_TYPE_VARIANT,
->> +                                               array_sig, &variant);
->> +
->> +       dbus_message_iter_open_container(&variant, DBUS_TYPE_ARRAY,
->> +                                               type_sig, &array);
->> +
->> +       if (dbus_type_is_fixed(type) == TRUE) {
->> +               dbus_message_iter_append_fixed_array(&array, type, val,
->> +                                                       n_elements);
->> +       } else if (type == DBUS_TYPE_STRING || type == DBUS_TYPE_OBJECT_PATH) {
->> +               const char ***str_array = val;
->> +               int i;
->> +
->> +               for (i = 0; i < n_elements; i++)
->> +                       dbus_message_iter_append_basic(&array, type,
->> +                                                       &((*str_array)[i]));
->> +       }
->> +
->> +       dbus_message_iter_close_container(&variant, &array);
->> +
->> +       dbus_message_iter_close_container(iter, &variant);
->> +}
->> +
->>  static void dict_append_entry(DBusMessageIter *dict, const char *key,
->>                                                         int type, void *val)
->>  {
->> @@ -954,13 +984,37 @@ static void dict_append_entry(DBusMessageIter *dict, const char *key,
->>         dbus_message_iter_close_container(dict, &entry);
->>  }
->>
->> +static void dict_append_basic_array(DBusMessageIter *dict, int key_type,
->> +                                       const void *key, int type, void *val,
->> +                                       int n_elements)
->> +{
->> +       DBusMessageIter entry;
->> +
->> +       dbus_message_iter_open_container(dict, DBUS_TYPE_DICT_ENTRY,
->> +                                               NULL, &entry);
->> +
->> +       dbus_message_iter_append_basic(&entry, key_type, key);
->> +
->> +       append_array_variant(&entry, type, val, n_elements);
->> +
->> +       dbus_message_iter_close_container(dict, &entry);
->> +}
->> +
->> +static void dict_append_array(DBusMessageIter *dict, const char *key, int type,
->> +                                               void *val, int n_elements)
->> +{
->> +       dict_append_basic_array(dict, DBUS_TYPE_STRING, &key, type, val,
->> +                                                               n_elements);
->> +}
->> +
->>  #define        DISTANCE_VAL_INVALID    0x7FFF
->>
->>  struct set_discovery_filter_args {
->>         char *transport;
->>         dbus_uint16_t rssi;
->>         dbus_int16_t pathloss;
->> -       GSList *uuids;
->> +       char **uuids;
->> +       size_t uuids_len;
->>  };
->>
->>  static void set_discovery_filter_setup(DBusMessageIter *iter, void *user_data)
->> @@ -974,37 +1028,9 @@ static void set_discovery_filter_setup(DBusMessageIter *iter, void *user_data)
->>                                 DBUS_TYPE_VARIANT_AS_STRING
->>                                 DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &dict);
->>
->> -       if (args->uuids != NULL) {
->> -               DBusMessageIter entry, value, arrayIter;
->> -               char *uuids = "UUIDs";
->> -               GSList *l;
->> -
->> -               dbus_message_iter_open_container(&dict, DBUS_TYPE_DICT_ENTRY,
->> -                                                       NULL, &entry);
->> -               /* dict key */
->> -               dbus_message_iter_append_basic(&entry, DBUS_TYPE_STRING,
->> -                                                       &uuids);
->> -
->> -               dbus_message_iter_open_container(&entry, DBUS_TYPE_VARIANT,
->> -                                                       "as", &value);
->> -
->> -               dbus_message_iter_open_container(&value, DBUS_TYPE_ARRAY, "s",
->> -                                                       &arrayIter);
->> -
->> -               for (l = args->uuids; l != NULL; l = g_slist_next(l))
->> -                       /* list->data contains string representation of uuid */
->> -                       dbus_message_iter_append_basic(&arrayIter,
->> -                                                       DBUS_TYPE_STRING,
->> -                                                       &l->data);
->> -
->> -               dbus_message_iter_close_container(&value, &arrayIter);
->>
->> -               /* close vararg*/
->> -               dbus_message_iter_close_container(&entry, &value);
->> -
->> -               /* close entry */
->> -               dbus_message_iter_close_container(&dict, &entry);
->> -       }
->> +       dict_append_array(&dict, "UUIDs", DBUS_TYPE_STRING, args->uuids,
->> +                                                       args->uuids_len);
->>
->>         if (args->pathloss != DISTANCE_VAL_INVALID)
->>                 dict_append_entry(&dict, "Pathloss", DBUS_TYPE_UINT16,
->> @@ -1037,7 +1063,8 @@ static void set_discovery_filter_reply(DBusMessage *message, void *user_data)
->>
->>  static gint filtered_scan_rssi = DISTANCE_VAL_INVALID;
->>  static gint filtered_scan_pathloss = DISTANCE_VAL_INVALID;
->> -static GSList *filtered_scan_uuids;
->> +static char **filtered_scan_uuids;
->> +static size_t filtered_scan_uuids_len;
->>  static char *filtered_scan_transport;
->>
->>  static void cmd_set_scan_filter_commit(void)
->> @@ -1049,6 +1076,7 @@ static void cmd_set_scan_filter_commit(void)
->>         args.rssi = filtered_scan_rssi;
->>         args.transport = filtered_scan_transport;
->>         args.uuids = filtered_scan_uuids;
->> +       args.uuids_len = filtered_scan_uuids_len;
->>
->>         if (check_default_ctrl() == FALSE)
->>                 return;
->> @@ -1063,25 +1091,17 @@ static void cmd_set_scan_filter_commit(void)
->>
->>  static void cmd_set_scan_filter_uuids(const char *arg)
->>  {
->> -       char *uuid_str, *saveptr, *uuids, *uuidstmp;
->> -
->> -       g_slist_free_full(filtered_scan_uuids, g_free);
->> +       g_strfreev(filtered_scan_uuids);
->>         filtered_scan_uuids = NULL;
->> +       filtered_scan_uuids_len = 0;
->>
->>         if (!arg || !strlen(arg))
->> -               return;
->> -
->> -       uuids = g_strdup(arg);
->> -       for (uuidstmp = uuids; ; uuidstmp = NULL) {
->> -               uuid_str = strtok_r(uuidstmp, " \t", &saveptr);
->> -               if (uuid_str == NULL)
->> -                       break;
->> -               filtered_scan_uuids = g_slist_append(filtered_scan_uuids,
->> -                                                       strdup(uuid_str));
->> -       }
->> +               goto commit;
->>
->> -       g_free(uuids);
->> +       filtered_scan_uuids = g_strsplit(arg, " ", -1);
->> +       filtered_scan_uuids_len = g_strv_length(filtered_scan_uuids);
->>
->> +commit:
->>         cmd_set_scan_filter_commit();
->>  }
->>
->> @@ -1121,17 +1141,35 @@ static void cmd_set_scan_filter_transport(const char *arg)
->>         cmd_set_scan_filter_commit();
->>  }
->>
->> +static void clear_discovery_filter_setup(DBusMessageIter *iter, void *user_data)
->> +{
->> +       DBusMessageIter dict;
->> +
->> +       dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
->> +                               DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
->> +                               DBUS_TYPE_STRING_AS_STRING
->> +                               DBUS_TYPE_VARIANT_AS_STRING
->> +                               DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &dict);
->> +
->> +       dbus_message_iter_close_container(iter, &dict);
->> +}
->> +
->>  static void cmd_set_scan_filter_clear(const char *arg)
->>  {
->>         /* set default values for all options */
->>         filtered_scan_rssi = DISTANCE_VAL_INVALID;
->>         filtered_scan_pathloss = DISTANCE_VAL_INVALID;
->> -       g_slist_free_full(filtered_scan_uuids, g_free);
->> +       g_strfreev(filtered_scan_uuids);
->>         filtered_scan_uuids = NULL;
->> +       filtered_scan_uuids_len = 0;
->>         g_free(filtered_scan_transport);
->>         filtered_scan_transport = NULL;
->>
->> -       cmd_set_scan_filter_commit();
->> +       if (g_dbus_proxy_method_call(default_ctrl, "SetDiscoveryFilter",
->> +               clear_discovery_filter_setup, set_discovery_filter_reply,
->> +               NULL, NULL) == FALSE) {
->> +               rl_printf("Failed to clear discovery filter\n");
->> +       }
->>  }
->>
->>  static struct GDBusProxy *find_device(const char *arg)
->> --
->> 2.7.4
+> This makes it possible to use SetDiscoveryFilter to disable checking
+> discoverable flags making it possible to see beacons such as the ones
+> create by tools/eddystone that doesn't show on regular discovery sessions
+> since they are not discoverable/connectable.
+> ---
+>  doc/adapter-api.txt | 6 +++++-
+>  src/adapter.c       | 2 +-
+>  2 files changed, 6 insertions(+), 2 deletions(-)
+>
+> diff --git a/doc/adapter-api.txt b/doc/adapter-api.txt
+> index 4dbf879..97462a3 100644
+> --- a/doc/adapter-api.txt
+> +++ b/doc/adapter-api.txt
+> @@ -80,7 +80,11 @@ Methods              void StartDiscovery()
+>
+>                         When discovery filter is set, Device objects will be
+>                         created as new devices with matching criteria are
+> -                       discovered. PropertiesChanged signals will be emitted
+> +                       discovered regardless of they are connectable or
+> +                       discoverable which enables listening to
+> +                       non-connectable and non-discoverable devices.
+> +
+> +                       PropertiesChanged signals will be emitted
+>                         for already existing Device objects, with updated RSSI
+>                         value. If one or more discovery filters have been set,
+>                         the RSSI delta-threshold, that is imposed by
+> diff --git a/src/adapter.c b/src/adapter.c
+> index f4fbf82..5499bfc 100644
+> --- a/src/adapter.c
+> +++ b/src/adapter.c
+> @@ -5451,7 +5451,7 @@ static void update_found_devices(struct btd_adapter *adapter,
+>         memset(&eir_data, 0, sizeof(eir_data));
+>         eir_parse(&eir_data, data, data_len);
+>
+> -       if (bdaddr_type == BDADDR_BREDR)
+> +       if (bdaddr_type == BDADDR_BREDR || adapter->filtered_discovery)
+>                 discoverable = true;
+>         else
+>                 discoverable = eir_data.flags & (EIR_LIM_DISC | EIR_GEN_DISC);
+> --
+> 2.7.4
 
-Applied after fixing a crash when passing some argument.
+Applied.
+
 
 -- 
 Luiz Augusto von Dentz
