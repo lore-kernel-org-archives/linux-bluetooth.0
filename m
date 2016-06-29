@@ -1,62 +1,47 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CA+ZaN3-y6UppvKOYPtJ7eGzD-zN5Cf8DW754FxU_Q9BaW+RKpA@mail.gmail.com>
-References: <CA+ZaN3-y6UppvKOYPtJ7eGzD-zN5Cf8DW754FxU_Q9BaW+RKpA@mail.gmail.com>
-From: Seulki Shin <sskcorea@gmail.com>
-Date: Wed, 29 Jun 2016 16:09:06 +0900
-Message-ID: <CA+ZaN3-KHcWw+-yz1Qg8Xd2ctysYZWx=4pZSbyfYp=KmVBzC6Q@mail.gmail.com>
-Subject: Re: bug report - bluetoothctl ble connection
-To: linux-bluetooth@vger.kernel.org
+From: =?UTF-8?Q?Fran=C3=A7ois_Beaufort?= <beaufort.francois@gmail.com>
+Date: Wed, 29 Jun 2016 08:59:28 +0200
+Message-ID: <CAEZxfGPM1-3+4CP5zeNT7yEkp+8BNeaq6oFBroPX2YLdKpy3DA@mail.gmail.com>
+Subject: LE ControllerMode fails with Google Chrome
+To: BlueZ development <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-* test envrionment:
-Fedora release 22 (Twenty Two)
-Kernel 4.1.15-00035-gd1a75bb on an armv7l (ttyAMA3)
-[root@localhost ~]# bluetoothctl -v
-5.39
+When setting "ControllerMode = le" in /etc/bluetooth/main.conf file,
+starting a dual scan from Google Chrome fails as you can see below.
 
-> Hi Bluez,
->
-> I found a pairing/connection bug in bluetoothctl.
->
-> * Steps to reproduce:
->
-> [bluetoothctl] scan on
-> [bluetoothctl] pair ble_device
-> [bluetoothctl] connect ble_device
-> [bluetoothctl] exit
->
-> Right after exiting from bluetoothctl, Disconnect happens like below.
->
-> < HCI Command: Disconnect (0x01|0x0006) plen 3                [hci0] 156.978499
->         Handle: 128
->         Reason: Remote User Terminated Connection (0x13)
->> HCI Event: Command Status (0x0f) plen 4                     [hci0] 156.995345
->       Disconnect (0x01|0x0006) ncmd 1
->         Status: Success (0x00)
->> HCI Event: Disconnect Complete (0x05) plen 4                [hci0] 157.005387
->         Status: Success (0x00)
->         Handle: 128
->         Reason: Connection Terminated By Local Host (0x16)
-> @ Device Disconnected: 00:22:D0:8D:22:6D (1) reason 2
->
-> * My observation1:
-> This is not the case of the hcitool. It works.
->
-> * My observation2:
-> Right after receiving GATT services, bluez does some more work.
-> But the Value doesn't look like normal.
->
-> ......
->
->> ACL Data RX: Handle 128 flags 0x02 dlen 22                  [hci0] 132.295271
->       ATT: Read Response (0x0b) len 17
->         Value: 506f6c6172204837203844323236443146
-> ......
->
-> * I attached full hci logs.
->
-> Thanks,
-> Seulki
+Run ./chrome --enable-web-bluetooth
+Go to https://googlechrome.github.io/samples/web-bluetooth/automatic-reconnect.html
+Click "Scan button"
+Bluetooth chooser should show nearby Bluetooth devices. Sadly it only
+returns the ones in cache.with "ControllerMode = dual"
+
+According to logs below, it looks like the scan stopped immediately.
+For info, it works great
+
+// Click Scan Web button
+bluetoothd[26766]: src/adapter.c:set_discovery_filter() sender :1.11
+bluetoothd[26766]: src/adapter.c:parse_discovery_filter_dict()
+filtered discovery params: transport: 7 rssi: 32767 pathloss: 32767
+bluetoothd[26766]: src/adapter.c:set_discovery_filter() successfully
+pre-set filter
+bluetoothd[26766]: src/adapter.c:start_discovery() sender :1.11
+bluetoothd[26766]: src/adapter.c:update_discovery_filter()
+bluetoothd[26766]: src/adapter.c:discovery_filter_to_mgmt_cp()
+bluetoothd[26766]: src/adapter.c:trigger_start_discovery()
+bluetoothd[26766]: src/adapter.c:cancel_passive_scanning()
+bluetoothd[26766]: src/adapter.c:start_discovery_timeout()
+bluetoothd[26766]: src/adapter.c:start_discovery_timeout()
+adapter->current_discovery_filter == 1
+bluetoothd[26766]: src/adapter.c:start_discovery_timeout() sending
+MGMT_OP_START_SERVICE_DISCOVERY 127, 7, 0
+bluetoothd[26766]: src/adapter.c:start_discovery_complete() status 0x0b
+bluetoothd[26766]: src/adapter.c:trigger_start_discovery()
+bluetoothd[26766]: src/adapter.c:cancel_passive_scanning()
+
+// Click "Cancel" button from Chrome Bluetooth chooser
+bluetoothd[26766]: src/adapter.c:stop_discovery() sender :1.11
+bluetoothd[26766]: src/adapter.c:discovery_destroy() owner :1.11
+bluetoothd[26766]: src/adapter.c:trigger_passive_scanning()
