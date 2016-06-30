@@ -1,97 +1,75 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <loic.poulain@intel.com>
+Subject: Re: [v11,3/3] Bluetooth: hci_uart: Support firmware download for
+ Marvell
+To: Amitkumar Karwar <akarwar@marvell.com>,
+ Jeffy Chen <jeffy.chen@rock-chips.com>,
+ "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+References: <1462548714-7971-3-git-send-email-akarwar@marvell.com>
+ <576CCCDE.1050004@rock-chips.com>
+ <ea454b25f2334ef9be0451a01cd15e15@SC-EXCH04.marvell.com>
+Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ Ganapathi Bhat <gbhat@marvell.com>, Cathy Luo <cluo@marvell.com>,
+ Marcel Holtmann <marcel@holtmann.org>
+From: Loic Poulain <loic.poulain@intel.com>
+Message-ID: <5774FA48.7080803@intel.com>
+Date: Thu, 30 Jun 2016 12:54:00 +0200
 MIME-Version: 1.0
-In-Reply-To: <CAEZxfGOq_QkN65B=F_u+rb=6+O-4c=0dF0ZaDZ5t9D6nNtY2rw@mail.gmail.com>
-References: <CAEZxfGOq_QkN65B=F_u+rb=6+O-4c=0dF0ZaDZ5t9D6nNtY2rw@mail.gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 30 Jun 2016 14:36:34 +0300
-Message-ID: <CABBYNZ+XEFe1wp1Rr5TQ+SRsc0ZTRmZErYpvVQ=Txf2=a+EjGA@mail.gmail.com>
-Subject: Re: Notify on succeeds while no apparent descriptor
-To: =?UTF-8?Q?Fran=C3=A7ois_Beaufort?= <beaufort.francois@gmail.com>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <ea454b25f2334ef9be0451a01cd15e15@SC-EXCH04.marvell.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi François,
+Hi Amitkumar,
 
-On Wed, Jun 29, 2016 at 10:24 AM, François Beaufort
-<beaufort.francois@gmail.com> wrote:
-> I have a bogus BLE device which exposes "badly" a characteristic
-> notification. Even though it doesn't find a characteristic descriptor,
-> I'm still able to start notifications and even receive value changed
-> events.
+
+> Hi Marcel,
+
+I suggest you to add Marcel as recipient of your patches.
+
 >
-> For info, Android and macOS raise an exception when trying to start
-> notifications. See
-> https://github.com/WebBluetoothCG/ble-test-peripheral-android/issues/63
->
-> See logs:
->
-> < ACL Data TX: Handle 32 flags 0x00 dlen 9
->                                                    [hci0] 403.621325
->       ATT: Find Information Request (0x04) len 4
->         Handle range: 0x002b-0xffff
->> HCI Event: Number of Completed Packets (0x13) plen 5                                                                    [hci0] 403.689256
->         Num handles: 1
->         Handle: 32
->         Count: 1
->> ACL Data RX: Handle 32 flags 0x02 dlen 9                                                                                [hci0] 403.755926
->       ATT: Error Response (0x01) len 4
->         Find Information Request (0x04)
->         Handle: 0x002b
->         Error: Attribute Not Found (0x0a)
->
-> ---
->
-> [Nexus 5X]# list-attributes
-> Primary Service
->         /org/bluez/hci0/dev_46_EE_57_93_31_08/service0001
->         Generic Attribute Profile
-> Characteristic
->         /org/bluez/hci0/dev_46_EE_57_93_31_08/service0001/char0002
->         Service Changed
-> Primary Service
->         /org/bluez/hci0/dev_46_EE_57_93_31_08/service0028
->         Battery Service
-> Characteristic
->         /org/bluez/hci0/dev_46_EE_57_93_31_08/service0028/char0029
->         Battery Level
-> [Nexus 5X]# select-attribute
-> /org/bluez/hci0/dev_46_EE_57_93_31_08/service0028/char0029
-> [Nexus 5X:/service0028/char0029]# notify on
-> [CHG] Attribute
-> /org/bluez/hci0/dev_46_EE_57_93_31_08/service0028/char0029 Notifying:
-> yes
-> Notify started
-> [CHG] Attribute
-> /org/bluez/hci0/dev_46_EE_57_93_31_08/service0028/char0029 Value: 0x32
-> [Nexus 5X:/service0028/char0029]# notify off
-> [CHG] Attribute
-> /org/bluez/hci0/dev_46_EE_57_93_31_08/service0028/char0029 Notifying:
-> no
-> Notify stopped
-> --
-
-Just to make it public what I have stated in the irc, currently we
-allow enabling notification even without CCC (out of the spect
-unsolicited notification):
-
-commit 46aad83687251bef0fa0ac60583e5898170b0f10
-Author: Arman Uguray <armansito@chromium.org>
-Date:   Tue Feb 3 19:58:22 2015 -0800
-    shared/gatt: Allow register_notify without CCC
-
-    Most OSes allow to register characteristics without a CCC even if they
-    do support notification/indication, this is not according to the
-    specification and may not even work in practice since there is no way
-    to enable notifications/indications without a CCC to write to but there
-    has been some applications that do that anyway.
-
-Perhaps Arman had it exactly for these broken application that don't
-register a CCC which Im guessing is because the GATT API don't do it
-by default (Android?) leaving it up to the app which can screw up we
-can observe here.
+>> From: Jeffy Chen [mailto:jeffy.chen@rock-chips.com]
+>> Sent: Friday, June 24, 2016 11:32 AM
+>> To: Amitkumar Karwar; linux-bluetooth@vger.kernel.org
+>> Cc: linux-kernel@vger.kernel.org; Ganapathi Bhat
+>> Subject: Re: [v11,3/3] Bluetooth: hci_uart: Support firmware download
+>> for Marvell
+>>
+>> On 2016-5-6 23:31, Amitkumar Karwar wrote:
+>>> From: Ganapathi Bhat <gbhat@marvell.com>
+>>>
+>>> This patch implement firmware download feature for Marvell Bluetooth
+>>> devices. If firmware is already downloaded, it will skip downloading.
 
 
--- 
-Luiz Augusto von Dentz
+>>> +static struct sk_buff *mrvl_process_fw_data(struct hci_uart *hu,
+>>> +					    struct sk_buff *skb,
+>>> +					    u8 *buf, int count)
+>>> +{
+>>> +	struct mrvl_data *mrvl = hu->priv;
+>>> +	struct fw_data *fw_data = mrvl->fwdata;
+>>> +	int i = 0, len;
+>>> +
+>>> +	if (!skb) {
+>>> +		while (buf[i] != fw_data->expected_ack && i < count)
+>>> +			i++;
+>>> +		if (i == count)
+>>> +			return ERR_PTR(-EILSEQ);
+>>> +
+>>> +		skb = bt_skb_alloc(MRVL_FW_HDR_LEN, GFP_KERNEL);
+
+Why you don't test skb here.
+
+>>> +	}
+>>> +
+>>> +	if (!skb)
+>>> +		return ERR_PTR(-ENOMEM);
+>>> +
+>>> +	len = count - i;
+>>> +	memcpy(skb_put(skb, len), &buf[i], len);
+
+You copy all the remaining data from buf into your skb, but what if buf 
+contains more than one packet ? out of skb.
+Don't assume that buf contains a full packet as well as only one packet.
+
+
+Regards,
+Loic
