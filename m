@@ -1,122 +1,53 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Date: Thu, 30 Jun 2016 08:30:32 -0400 (EDT)
-From: Jaroslav Skarvada <jskarvad@redhat.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <461676602.4071511.1467289832862.JavaMail.zimbra@redhat.com>
-In-Reply-To: <CABBYNZLjbZFT3Oev7XsW5WhFzju5Zhv6XbPu10VUQ_s39Uo9Cg@mail.gmail.com>
-References: <1606210521.630724.1466514115545.JavaMail.zimbra@redhat.com> <1586316808.864730.1466588544143.JavaMail.zimbra@redhat.com> <CABBYNZLjbZFT3Oev7XsW5WhFzju5Zhv6XbPu10VUQ_s39Uo9Cg@mail.gmail.com>
-Subject: Re: Unable to pair with Genius Navigator 900 Pro mouse
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Date: Thu, 30 Jun 2016 10:02:07 -0400
+From: Craig Andrews <candrews@integralblue.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: systemd service hardening
+In-Reply-To: <CABBYNZLtSHL=+94W9DtP6KHP0H8g-Yy1nP_JC7Kg2a7uovqvxg@mail.gmail.com>
+References: <7c5ca1d4dd4aac0e52ee10ec7d9b81ba@integralblue.com>
+ <CABBYNZLtSHL=+94W9DtP6KHP0H8g-Yy1nP_JC7Kg2a7uovqvxg@mail.gmail.com>
+Message-ID: <51eccf324d4335c514d0fdc3cddc02db@integralblue.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-
-
------ Original Message -----
-> Hi Jaroslav,
+On 30.06.2016 08:51, Luiz Augusto von Dentz wrote:
+> Hi Craig,
 > 
-> On Wed, Jun 22, 2016 at 12:42 PM, Jaroslav Skarvada <jskarvad@redhat.com>
-> wrote:
-> >
-> >
-> > ----- Original Message -----
-> >> Hi,
-> >>
-> >> hopefully this is the right list (please don't blame me if not :)
-> >>
-> >> It seems it is no more possible to pair with Genius Navigator 900
-> >> Pro mouse. It seems it's older mouse probably with no SSP/
-> >> built-in PIN.
-> >>
-> >> # bluetoothctl
-> >> [bluetooth]# pair ADDR
-> >> [CHG] Device ADDR Connected: yes
-> >> [CHG] Device ADDR Connected: no
-> >> [CHG] Device ADDR Connected: yes
-> >> Failed to pair: org.bluez.Error.AuthenticationRejected
-> >> [CHG] Device ADDR Connected: no
-> >>
-> >> Hcitool "trick":
-> >> # hcitool cc ADDR;hcitool auth ADDR
-> >> HCI authentication request failed: Input/output error
-> >>
-> >> The above error is shown before the PIN dialog appears. I also
-> >> tried Blueman GUI, but it tracebacks (report also sent).
-> >>
-> >> Moreover:
-> >> # hciconfig hci0 sspmode 0
-> >> Can't set Simple Pairing mode on hci0: Input/output error (5)
-> >>
-> >> So I cannot try without SSP. It seems there is nothing related
-> >> in dmesg.
-> >>
-> >> IIRC the mouse worked in the past.
-> >>
-> >> $ uname -r
-> >> 4.5.7-200.fc23.x86_64
-> >>
-> >> OS: Fedora 23
-> >> userspace: bluez-5.39
-> >>
-> >> machine: Lenovo ThinkPad X240
-> >> adapter probably: Intel Centrino 7260 2 x 2 AC+ BT 4.0
-> >> module: btintel: Intel Bluetooth firmware file:
-> >> intel/ibt-hw-37.7.10-fw-1.80.2.3.d.bseq
-> >>
-> >> Could you advice some other tricks how to get it working?
-> >> I could also bisect the problem later
-> >>
-> >> thanks & regards
-> >>
-> >> Jaroslav
-> >> --
-> >> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
-> >> in
-> >> the body of a message to majordomo@vger.kernel.org
-> >> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> >>
-> >
-> > I wasn't right, the mouse seems to support autopairing and I paired it
-> > without problem under RHEL-7 and it also works there without problem.
-> > I tried to shuffle user-space bluez and there is no change, so it has to be
-> > kernel. I also tried with CSR USB dongle. Regarding the sspmode error,
-> > it's probably not supported by the HW. To sum it up:
-> >
-> > kernel-3.10.0-229.el7.x86_64 - it works
-> > kernel-4.5.7-200.fc23.x86_64 - it doesn't work
+> On Thu, Jun 30, 2016 at 12:07 AM, Craig Andrews
+> <candrews@integralblue.com> wrote:
+>> I've been on a bit of a mission lately to improve the hardening of 
+>> systemd
+>> services wherever I can find them. Today, I ran across this one.
+>> 
+>> I believe the hardening of the bluetooth.service (
+>> https://git.kernel.org/cgit/bluetooth/bluez.git/tree/src/bluetooth.service.in
+>> ) can be easily improved by adding these 2 lines:
+>> PrivateTmp=true
+>> NoNewPrivileges=true
+>> 
+>> If there is agreement, can a committer please make this change?
 > 
-> Try collecting the HCI trace with btmon, btw make sure you have an
-> agent registered and set as default.
-> 
-> > I am going to bisect with vanilla kernel
-> >
-> > thanks & regards
-> >
-> > Jaroslav
-> > --
-> > To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
-> > in
-> > the body of a message to majordomo@vger.kernel.org
-> > More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> 
-> 
-> 
-> --
-> Luiz Augusto von Dentz
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> 
+> I don't see any problems in doing it, how long have them been 
+> introduced?
 
-Thanks for reply, I created:
+Going by https://github.com/systemd/systemd/blob/master/NEWS :
+PrivateTmp has been around since at least systemd 183
+NoNewPrivileges has been around since at least systemd 227
 
-https://bugzilla.kernel.org/show_bug.cgi?id=121221
+However, I don't think that matters very much. Quoting 
+https://www.freedesktop.org/software/systemd/man/systemd.unit.html :
+---
+Unit files may contain additional options on top of those listed here. 
+If systemd encounters an unknown option, it will write a warning log 
+message but continue loading the unit.
+---
 
-and attached all information there including the trace. Please let me know,
-whether more information is needed
+So if a user is using a version of systemd that doesn't yet have 
+NoNewPrivileges, for example, there's no negative consequence.
 
-thanks & regards
-
-Jaroslav
+Thanks,
+~Craig
