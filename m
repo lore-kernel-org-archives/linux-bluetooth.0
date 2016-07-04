@@ -1,72 +1,91 @@
-Return-Path: <netdev-owner@vger.kernel.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
-Subject: Re: [PATCH v4 01/29] bluetooth: Switch SMP to crypto_cipher_encrypt_one()
+Subject: Re: Configure supervision timeout
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CALCETrVx6PDUb+5S9eYuB+Dhu2VEkz-iz=hpRJdzxRfXypwK8A@mail.gmail.com>
-Date: Mon, 4 Jul 2016 19:56:00 +0200
-Cc: Ingo Molnar <mingo@kernel.org>, Andy Lutomirski <luto@kernel.org>,
-	X86 ML <x86@kernel.org>, LKML <linux-kernel@vger.kernel.org>,
-	linux-arch <linux-arch@vger.kernel.org>,
-	Borislav Petkov <bp@alien8.de>,
-	Nadav Amit <nadav.amit@gmail.com>,
-	Kees Cook <keescook@chromium.org>,
-	Brian Gerst <brgerst@gmail.com>,
-	"kernel-hardening@lists.openwall.com"
-	<kernel-hardening@lists.openwall.com>,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	Josh Poimboeuf <jpoimboe@redhat.com>,
-	Jann Horn <jann@thejh.net>,
-	Heiko Carstens <heiko.carstens@de.ibm.com>,
-	"Gustavo F. Padovan" <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-bluetooth@vger.kernel.org,
-	Network Development <netdev@vger.kernel.org>
-Message-Id: <73C272C5-ECDB-4508-B8D3-1F54D5E8E6AB@holtmann.org>
-References: <cover.1466974736.git.luto@kernel.org> <264af59a3060c2bc2a725cfc66a8fa68219d1c4a.1466974736.git.luto@kernel.org> <8C5360E3-94EE-4869-B9B9-AF9D41B5A3AC@holtmann.org> <20160627085403.GA26865@gmail.com> <2833CC26-7306-4803-A5DB-4CBECCF35C08@holtmann.org> <CALCETrVx6PDUb+5S9eYuB+Dhu2VEkz-iz=hpRJdzxRfXypwK8A@mail.gmail.com>
-To: Andy Lutomirski <luto@amacapital.net>
-Sender: netdev-owner@vger.kernel.org
+In-Reply-To: <CA+ZaN3-R3nC_NLyeio1RO0zqC80f1EQSBgnzCiaGsqLsOModDg@mail.gmail.com>
+Date: Mon, 4 Jul 2016 19:33:19 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <619B9A32-0666-4DC4-8B87-ACBBB30340C5@holtmann.org>
+References: <CA+ZaN38pJ-2FM9t8c+sOT+ViXvYA79YgUe=ispYKVQwZiQW0ZQ@mail.gmail.com> <370D4E27-437D-4AFC-A463-B4AB8599CEB5@holtmann.org> <CA+ZaN3-R3nC_NLyeio1RO0zqC80f1EQSBgnzCiaGsqLsOModDg@mail.gmail.com>
+To: Seulki Shin <sskcorea@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andy,
+Hi Seulki,
 
->>>>> SMP does ECB crypto on stack buffers.  This is complicated and
->>>>> fragile, and it will not work if the stack is virtually allocated.
->>>>> 
->>>>> Switch to the crypto_cipher interface, which is simpler and safer.
->>>>> 
->>>>> Cc: Marcel Holtmann <marcel@holtmann.org>
->>>>> Cc: Gustavo Padovan <gustavo@padovan.org>
->>>>> Cc: Johan Hedberg <johan.hedberg@gmail.com>
->>>>> Cc: "David S. Miller" <davem@davemloft.net>
->>>>> Cc: linux-bluetooth@vger.kernel.org
->>>>> Cc: netdev@vger.kernel.org
->>>>> Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
->>>>> Acked-and-tested-by: Johan Hedberg <johan.hedberg@intel.com>
->>>>> Signed-off-by: Andy Lutomirski <luto@kernel.org>
->>>>> ---
->>>>> net/bluetooth/smp.c | 67 ++++++++++++++++++++++-------------------------------
->>>>> 1 file changed, 28 insertions(+), 39 deletions(-)
->>>> 
->>>> patch has been applied to bluetooth-next tree.
->>> 
->>> Sadly carrying this separately will delay the virtual kernel stacks feature by a
->>> kernel cycle, because it's a must-have prerequisite.
->> 
->> I can take it back out, but then I have the fear the the ECDH change to use KPP for SMP might be the one that has to wait a kernel cycle. Either way is fine with me, but I want to avoid nasty merge conflicts in the Bluetooth SMP code.
+> Thanks a lot for sharing valuable information.
 > 
-> Nothing goes wrong if an identical patch is queued in both places,
-> right?  Or, if you prefer not to duplicate it, could one of you commit
-> it and the other one pull it?  Ingo, given that this is patch 1 in the
-> series and unlikely to change, if you want to make this whole thing
-> have a separate branch in -tip, this could live there for starters.
-> (But, if you do so, please make sure you base off a very new copy of
-> Linus' tree -- the series is heavily dependent on the thread_info
-> change he applied a few days ago.)
+> On Tue, Jun 28, 2016 at 11:36 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
+>> Hi Seulki,
+>> 
+>>> Recently, I have noticed supervision timeout is not enough to pair devices.
+>>> 
+>>> How can I configure supervision timeout? Is there any configuration file?
+>>> 
+>>> First, I have checked "main.conf" but I couldn't find any related properties.
+>>> I also found /sys/kernel/debug/bluetooth/hci0 has a bunch of system settings.
+>>> But I am not sure editing those files is a right approach.
+>> 
+>> the supervision timeout will trigger if the baseband will not even ack packets. A longer timeout is most likely not going to help you either to pair. Why do you think it would?
+>> 
+>> Can you provide btmon traces to see why a disconnect is happening?
+>> 
+>> Regards
+>> 
+>> Marcel
+>> 
+> 
+> 1. I thought Supervision timeout was setting up too short like below. (420msec)
+> 
+> < HCI Command: LE Create Connection (0x08|0x000d) plen 25    [hci0] 1360.262067
+>        Scan interval: 60.000 msec (0x0060)
+>        Scan window: 30.000 msec (0x0030)
+>        Filter policy: White list is not used (0x00)
+>        Peer address type: Public (0x00)
+>        Peer address: 00:22:D0:8D:22:6D (Polar Electro Oy)
+>        Own address type: Public (0x00)
+>        Min connection interval: 50.00 msec (0x0028)
+>        Max connection interval: 70.00 msec (0x0038)
+>        Connection latency: 0x0000
+>        Supervision timeout: 420 msec (0x002a)
+>        Min connection length: 0.000 msec (0x0000)
+>        Max connection length: 0.000 msec (0x0000)
+> 
+> 2. I found Attribute Not Found error message which had not been noticed before.
+> 
+> < ACL Data TX: Handle 128 flags 0x00 dlen 11                 [hci0] 1363.521878
+>      ATT: Read By Type Request (0x08) len 6
+>        Handle range: 0x000e-0x000f
+>        Attribute type: Characteristic (0x2803)
+>> HCI Event: Number of Completed Packets (0x13) plen 5       [hci0] 1363.591184
+>        Num handles: 1
+>        Handle: 128
+>        Count: 1
+>> ACL Data RX: Handle 128 flags 0x02 dlen 9                  [hci0] 1363.660998
+>      ATT: Error Response (0x01) len 4
+>        Read By Type Request (0x08)
+>        Handle: 0x000e
+>        Error: Attribute Not Found (0x0a)
+> < ACL Data TX: Handle 128 flags 0x00 dlen 9                  [hci0] 1363.661926
+>      ATT: Find Information Request (0x04) len 4
+>        Handle range: 0x000f-0x000f
+>> HCI Event: Number of Completed Packets (0x13) plen 5       [hci0] 1363.730944
+>        Num handles: 1
+>        Handle: 128
+>        Count: 1
+> 
+> 3. Because of Connection Timeout message, I suspected supervision timeout.
+> 
+>> HCI Event: Disconnect Complete (0x05) plen 4               [hci0] 1364.131002
+>        Status: Success (0x00)
+>        Handle: 128
+>        Reason: Connection Timeout (0x08)
+> @ Device Disconnected: 00:22:D0:8D:22:6D (1) reason 1
 
-so what are doing now? I take this back out or we keep it in and let git deal with it when merging the trees?
+this reason is odd. However I highly doubt that it is because of the link supervision timeout. If so, then something else is going really wrong. Check the messages from SMP on what is going on. Meaning, does it actually try to pair or is the remote stack crashing somehow.
 
 Regards
 
 Marcel
+
