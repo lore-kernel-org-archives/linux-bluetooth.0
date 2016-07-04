@@ -1,34 +1,47 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
-Subject: Re: [PATCH] Bluetooth: Replace constant hw_variant from Intel Bluetooth firmware filename
+Subject: Re: [PATCH 2/2] hci_sock: Fix recvmsg return value
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20160628085639.7caaf7f7@fedora-linux-22.shared>
-Date: Mon, 4 Jul 2016 20:10:13 +0200
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Message-Id: <B6FCA562-0B4A-423D-9B4C-FA85AB2C62E9@holtmann.org>
-References: <20160628085639.7caaf7f7@fedora-linux-22.shared>
-To: Tedd Ho-Jeong An <tedd.an@intel.com>
+In-Reply-To: <1467043273-3781-2-git-send-email-denkenz@gmail.com>
+Date: Mon, 4 Jul 2016 20:10:10 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <272E7A17-D8A8-4A62-BB39-CFD54D58B002@holtmann.org>
+References: <1467043273-3781-1-git-send-email-denkenz@gmail.com> <1467043273-3781-2-git-send-email-denkenz@gmail.com>
+To: Denis Kenzior <denkenz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Tedd,
+Hi Denis,
 
-> The format of Intel Bluetooth firmware filename for bootloader product
-> is ibt-<hw_variant>-<device_revision_id>.sfi
+> If recvmsg is called with a destination buffer that is too small to
+> receive the contents of skb in its entirety, the return value from
+> recvmsg was inconsistent with common SOCK_SEQPACKET or SOCK_DGRAM
+> semantics.
 > 
-> Currently the driver uses a constant value 11 (0x0b) for hw_variant
-> to support LnP/SfP product. But new product like WsP product has
-> a different value such as 12 (0x0c).
+> If destination buffer provided by userspace is too small (e.g. len <
+> copied), then MSG_TRUNC flag is set and copied is returned.  Instead, it
+> should return the length of the message, which is consistent with how
+> other datagram based sockets act.  Quoting 'man recv':
 > 
-> To support the multiple products, this patch replaces the constant
-> value of hw_variant to the actual hw_variant value read from
-> the device.
+> "All  three calls return the length of the message on successful comple‐
+> tion.  If a message is too long to fit in the supplied  buffer,  excess
+> bytes  may  be discarded depending on the type of socket the message is
+> received from."
 > 
-> Signed-off-by: Tedd Ho-Jeong An <tedd.an@intel.com>
+> and
+> 
+> "MSG_TRUNC (since Linux 2.2)
+> 
+>    For   raw   (AF_PACKET),   Internet   datagram   (since    Linux
+>    2.4.27/2.6.8),  netlink  (since Linux 2.6.22), and UNIX datagram
+>    (since Linux 3.4) sockets: return the real length of the packet
+>    or datagram, even when it was longer than the passed buffer."
+> 
+> Signed-off-by: Denis Kenzior <denkenz@gmail.com>
 > ---
-> drivers/bluetooth/btusb.c | 13 +++++++++----
-> 1 file changed, 9 insertions(+), 4 deletions(-)
+> net/bluetooth/hci_sock.c | 5 +++++
+> 1 file changed, 5 insertions(+)
 
 patch has been applied to bluetooth-next tree.
 
