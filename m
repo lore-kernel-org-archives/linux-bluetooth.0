@@ -1,47 +1,48 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
-Subject: Re: [PATCH 1/2] af_bluetooth: Fix recvmsg return value
+Subject: Re: [PATCH] bluetooth: add support for device 0489:e092
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1467043273-3781-1-git-send-email-denkenz@gmail.com>
-Date: Mon, 4 Jul 2016 20:10:05 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <C75115E8-98E8-4CFF-9DB1-7AED652E27CF@holtmann.org>
-References: <1467043273-3781-1-git-send-email-denkenz@gmail.com>
-To: Denis Kenzior <denkenz@gmail.com>
+In-Reply-To: <1465652610-1293-1-git-send-email-yvain.thonnart@m4x.org>
+Date: Mon, 4 Jul 2016 20:10:02 +0200
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Message-Id: <ABE47F5C-BF8C-40F9-AAEA-EA96E3A476CB@holtmann.org>
+References: <1465652610-1293-1-git-send-email-yvain.thonnart@m4x.org>
+To: Yvain THONNART <yvain.thonnart@m4x.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Denis,
+Hi Yvain,
 
-> If recvmsg is called with a destination buffer that is too small to
-> receive the contents of skb in its entirety, the return value from
-> recvmsg was inconsistent with common SOCK_SEQPACKET or SOCK_DGRAM
-> semantics.
+> With current btusb.ko kernel module, Bluetooth pretends to be active
+> but there is no real activity.
 > 
-> If destination buffer provided by userspace is too small (e.g. len <
-> copied), then MSG_TRUNC flag is set and copied is returned.  Instead, it
-> should return the length of the message, which is consistent with how
-> other datagram based sockets act.  Quoting 'man recv':
+> I'm using an Acer Aspire VN7-791.
 > 
-> "All  three calls return the length of the message on successful comple‐
-> tion.  If a message is too long to fit in the supplied  buffer,  excess
-> bytes  may  be discarded depending on the type of socket the message is
-> received from."
+> Output of lsusb:
+> Bus 003 Device 007: ID 0489:e092 Foxconn / Hon Hai
 > 
-> and
+> On my laptop, this device is actually used as a combo with wifi chipset
+> Atheros Qualcomm Killer N1525 Wireless-AC [168c:003e],
 > 
-> "MSG_TRUNC (since Linux 2.2)
+> * Fix by adding a declaration in kernel sources drivers/bluetooth/btusb.c
 > 
->    For   raw   (AF_PACKET),   Internet   datagram   (since    Linux
->    2.4.27/2.6.8),  netlink  (since Linux 2.6.22), and UNIX datagram
->    (since Linux 3.4) sockets: return the real length of the packet
->    or datagram, even when it was longer than the passed buffer."
+>        { USB_DEVICE(0x0489, 0xe092), .driver_info = BTUSB_QCA_ROME },
 > 
-> Signed-off-by: Denis Kenzior <denkenz@gmail.com>
+> * Compiled extra module /lib/modules/4.4.0-22-generic/extra/btusb.ko
+> 
+> * Successfully tested against my phone (obex file transfer)
+> 
+> DistroRelease: Ubuntu 16.04
+> Package: linux-image-4.4.0-22-generic 4.4.0-22.40
+> ProcVersionSignature: Ubuntu 4.4.0-22.40-generic 4.4.8
+> Uname: Linux 4.4.0-22-generic x86_64
+> Signed-off-by: Yvain THONNART <yvain.thonnart@m4x.org>
 > ---
-> net/bluetooth/af_bluetooth.c | 5 +++++
-> 1 file changed, 5 insertions(+)
+> drivers/bluetooth/btusb.c | 1 +
+> 1 file changed, 1 insertion(+)
 
 patch has been applied to bluetooth-next tree.
 
