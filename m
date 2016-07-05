@@ -1,66 +1,129 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Date: Tue, 5 Jul 2016 10:39:50 -0400
-From: Don Zickus <dzickus@redhat.com>
+From: Kropf Johannes <Johannes.Kropf@ait.ac.at>
 To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Luiz Augusto Von Dentz <luiz.von.dentz@intel.com>,
-	mkasik@redhat.com
-Subject: Re: [PATCH 0/3] obexd fixes
-Message-ID: <20160705143950.GF90326@redhat.com>
-References: <1467320489-127890-1-git-send-email-dzickus@redhat.com>
- <CABBYNZJMpqUv1S7B1c1HGgPe7J5yMjjayws+rcXqd=Z-tceRLw@mail.gmail.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: AW: Gatt Client - RegisterApplication options
+Date: Tue, 5 Jul 2016 14:34:43 +0000
+Message-ID: <E92610C73D6DE84EB154DC52F5ECCE541D740902@S0MSMAIL111.arc.local>
+References: <E92610C73D6DE84EB154DC52F5ECCE541D73E0E8@S0MSMAIL111.arc.local>
+ <E92610C73D6DE84EB154DC52F5ECCE541D73F131@S0MSMAIL111.arc.local>
+ <CABBYNZKdT-ckFMzDEL9bz+pqsqttmnK5yg8gxCTTthOj+1JJGA@mail.gmail.com>
+ <E92610C73D6DE84EB154DC52F5ECCE541D7401C9@S0MSMAIL111.arc.local>
+ <CABBYNZKXaich4vK5L=41_PqhayVHLzrEq3GevoPtrP2UAj6iCg@mail.gmail.com>
+ <E92610C73D6DE84EB154DC52F5ECCE541D740866@S0MSMAIL111.arc.local>,<CABBYNZLyN2puLuU6RYb+z=yuZdu9WTwj-n+mHFpq0oJp0tjVdA@mail.gmail.com>
+In-Reply-To: <CABBYNZLyN2puLuU6RYb+z=yuZdu9WTwj-n+mHFpq0oJp0tjVdA@mail.gmail.com>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <CABBYNZJMpqUv1S7B1c1HGgPe7J5yMjjayws+rcXqd=Z-tceRLw@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Jul 04, 2016 at 03:07:47PM +0300, Luiz Augusto von Dentz wrote:
-> Hi Don,
-> 
-> On Fri, Jul 1, 2016 at 12:01 AM, Don Zickus <dzickus@redhat.com> wrote:
-> > We started running some obexd tests to help mimic Fedora users passing info
-> > from their phone to their laptop.  These tests uncovered some issues.
-> >
-> > Let me know if I need to fix these patches or try something different.
-> >
-> > Cheers,
-> > Don
-> >
-> > Don Zickus (3):
-> >   obexd: Allow CreateFolder to create a directory
-> >   obexd: Return dummy_data instead of int in phonebook-dummy
-> >   obexd: Add a detailed failure message for exchanging business cards
-> >
-> >  obexd/client/opp.c              |  2 +-
-> >  obexd/plugins/ftp.c             |  2 ++
-> >  obexd/plugins/phonebook-dummy.c | 11 +++++++----
-> >  3 files changed, 10 insertions(+), 5 deletions(-)
-> >
-> > --
-> > 1.8.3.1
-> 
-> Applied after fixing the following problems:
-> 
-> #36: FILE: obexd/plugins/phonebook-dummy.c:578:
-> + dummy->id = g_idle_add_full(G_PRIORITY_DEFAULT_IDLE, create_cache, query,
-> 
-> obexd/plugins/phonebook-dummy.c:523:8: error: unused variable ‘ret’
-> [-Werror=unused-variable]
->   guint ret;
->         ^~~
-> obexd/plugins/phonebook-dummy.c:556:8: error: unused variable ‘ret’
-> [-Werror=unused-variable]
->   guint ret;
->         ^~~
+Hi,
 
-Awesome!  Thanks.  Sorry about the warning.
+thanks for your replies so far, but unfortunately I'm still confused.
 
-> 
-> Ive also fixed the author of the patches so we don't have to add in
-> the patch description.
+>Hi Johannes,
 
-Perfect.  Yeah, Marek should take full credit for those patches.
+>On Tue, Jul 5, 2016 at 12:55 PM, Kropf Johannes
+><Johannes.Kropf@ait.ac.at> wrote:
+>> Hi Luiz,
+>>
+>>>Hi Johannes,
+>>
+>>>On Wed, Jun 29, 2016 at 2:50 PM, Kropf Johannes
+>>><Johannes.Kropf@ait.ac.at> wrote:
+>>>> Dear Luiz,
+>>>>
+>>>>Hi Johannes,
+>>>>
+>>>>>On Tue, Jun 28, 2016 at 12:24 PM, Kropf Johannes
+>>>>><Johannes.Kropf@ait.ac.at> wrote:
+>>>>>> Hi,
+>>>>>>
+>>>>>> I upgraded to the newest version of bluez (5.40) and noticed that the "RegisterService" method to register the services for a client application is not existing anymore.
+>>>>>>
+>>>>>> However, I have troubles using the "RegisterApplication" method since I don't know how to put the profile hierarchy into the requested dict object. It is not clear for me, even after checking doc/gatt->api.txt and the source code.
+>>>>>> Whatever I try results in the error message "No object received", invoked by the method
+>>>>>> static void client_ready_cb(GDBusClient *client, void *user_data) in gatt-database.c
+>>>>
+>>>>>I suspect that you don't have ObjectManager support, you can check
+>>>>>tests/example-gatt-server how it is done in python, for other binding
+>>>>>there should be a similar way to register the ObjectManager interface
+>>>>>so bluetoothd is able to list the objects.
+>>>>
+>>>> The ObjectManager Interface is available under the root of org.bluez, it is used also for finding devices as far as I understand.
+>>
+>>>Yep, but in this case we are looking for the ObjectManager in the
+>>>application side not in bluetoothd.
+>> Ah ok, I understand. I registered the ObjectManger interface on a separate bus for my application and provided the object. It seems to work so far, but now I get the error message
+>>
+>> bluetoothd[4521]: src/gatt-database.c:manager_register_app() Registering application: :1.150:/homer/bluez/client
+>> bluetoothd[4521]: src/gatt-database.c:proxy_added_cb() Object received: /homer/bluez/client, iface: org.bluez.GattProfile1
+>> bluetoothd[4521]: Failed to create GATT service entry in local database
+>>
+>> My problem is now that I don't know the hierarchy the object manager is expected to provide. I used the following:
+>> {Path of objectmanager, { 'org.bluez.GattProfile1', {'name': name of profile' , 'UUIDs':, String array of UUIds of services }}},
+>>
+>> for example
+>> {'/homer/bluez/client': {'org.bluez.GattProfile1': {'name': 'WEIGHT_SCALE', 'UUIDs': ['0000181d-0000-1000-8000-00805f9b34fb', '0000180a-0000-1000-8000-00805f9b34fb', '0000181c-0000-1000-8000-00805f9b34fb', '0000181b-0000-1000-8000-00805f9b34fb', '0000180f-0000-1000-8000-00805f9b34fb', '00001805-0000-1000-8000-00805f9b34fb']}}}
 
-Cheers,
-Don
+>org.bluez.GattProfile1 is client side not server, are you sure you did
+>check the documentation:
+
+>https://git.kernel.org/cgit/bluetooth/bluez.git/tree/doc/gatt-api.txt
+
+>There is an example of who the hierarchy should looks like:
+
+>-> /com/example
+> |   - org.freedesktop.DBus.ObjectManager
+> |
+>  -> /com/example/service0
+> | |   - org.freedesktop.DBus.Properties
+>  | |   - org.bluez.GattService1
+>  | |
+>  | -> /com/example/service0/char0
+>  | |     - org.freedesktop.DBus.Properties
+>  | |     - org.bluez.GattCharacteristic1
+>  | |
+>  | -> /com/example/service0/char1
+>  |   |   - org.freedesktop.DBus.Properties
+>  |   |   - org.bluez.GattCharacteristic1
+>  |   |
+>  |   -> /com/example/service0/char1/desc0
+>  |       - org.freedesktop.DBus.Properties
+>  |       - org.bluez.GattDescriptor1
+>  |
+>  -> /com/example/service1
+>    |   - org.freedesktop.DBus.Properties
+>    |   - org.bluez.GattService1
+>    |
+>    -> /com/example/service1/char0
+>        - org.freedesktop.DBus.Properties
+>        - org.bluez.GattCharacteristic1
+
+Yes, I have seen it, but it didn't make sense to me, and it still doesn't. IMHO my application is a client, isn't it? 
+What I want to do is to register the services my application supports as a listener so I get the data of a remote BLE devices when it connects to bluez. I do not want to make a new service available to remote devices. 
+Why do I need to provide the full hierarchy? Isn't the client side GattProfile1 interface what I need?
+
+In other words:
+What I have understood so far is that I need to create a service as a server which provides the service UUIDs my client application is supporting, is that correct?
+
+Kind regards,
+
+Johannes
+
+
+>> What is the correct hierarchy for providing the supported profiles of a client application? I couldn't find it anywhere in the doc.>
+>>
+>>>> The GetManagedObjects() method also works.
+>>>> Which kind of object does bluetoothd try to find when calling the RegisterApplication method?
+>
+>>>It does call GetManagedObjects, we use that to enumerate the services
+>>>the application has and then proceed to register them.
+>> Ok, but see above.
+>>
+ Regards,
+Johannes
+
+
+
+
