@@ -1,92 +1,114 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/3] Bluetooth: Remove controller device attributes
-Date: Tue,  5 Jul 2016 14:30:13 +0200
-Message-Id: <1467721814-117020-2-git-send-email-marcel@holtmann.org>
+MIME-Version: 1.0
+In-Reply-To: <E92610C73D6DE84EB154DC52F5ECCE541D740866@S0MSMAIL111.arc.local>
+References: <E92610C73D6DE84EB154DC52F5ECCE541D73E0E8@S0MSMAIL111.arc.local>
+ <E92610C73D6DE84EB154DC52F5ECCE541D73F131@S0MSMAIL111.arc.local>
+ <CABBYNZKdT-ckFMzDEL9bz+pqsqttmnK5yg8gxCTTthOj+1JJGA@mail.gmail.com>
+ <E92610C73D6DE84EB154DC52F5ECCE541D7401C9@S0MSMAIL111.arc.local>
+ <CABBYNZKXaich4vK5L=41_PqhayVHLzrEq3GevoPtrP2UAj6iCg@mail.gmail.com> <E92610C73D6DE84EB154DC52F5ECCE541D740866@S0MSMAIL111.arc.local>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Tue, 5 Jul 2016 14:27:37 +0300
+Message-ID: <CABBYNZLyN2puLuU6RYb+z=yuZdu9WTwj-n+mHFpq0oJp0tjVdA@mail.gmail.com>
+Subject: Re: Gatt Client - RegisterApplication options
+To: Kropf Johannes <Johannes.Kropf@ait.ac.at>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The controller device attributes are not used and expose no valuable
-information.
+Hi Johannes,
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
----
- net/bluetooth/hci_sysfs.c | 54 -----------------------------------------------
- 1 file changed, 54 deletions(-)
+On Tue, Jul 5, 2016 at 12:55 PM, Kropf Johannes
+<Johannes.Kropf@ait.ac.at> wrote:
+> Hi Luiz,
+>
+>>Hi Johannes,
+>
+>>On Wed, Jun 29, 2016 at 2:50 PM, Kropf Johannes
+>><Johannes.Kropf@ait.ac.at> wrote:
+>>> Dear Luiz,
+>>>
+>>>Hi Johannes,
+>>>
+>>>>On Tue, Jun 28, 2016 at 12:24 PM, Kropf Johannes
+>>>><Johannes.Kropf@ait.ac.at> wrote:
+>>>>> Hi,
+>>>>>
+>>>>> I upgraded to the newest version of bluez (5.40) and noticed that the "RegisterService" method to register the services for a client application is not existing anymore.
+>>>>>
+>>>>> However, I have troubles using the "RegisterApplication" method since I don't know how to put the profile hierarchy into the requested dict object. It is not clear for me, even after checking doc/gatt->api.txt and the source code.
+>>>>> Whatever I try results in the error message "No object received", invoked by the method
+>>>>> static void client_ready_cb(GDBusClient *client, void *user_data) in gatt-database.c
+>>>
+>>>>I suspect that you don't have ObjectManager support, you can check
+>>>>tests/example-gatt-server how it is done in python, for other binding
+>>>>there should be a similar way to register the ObjectManager interface
+>>>>so bluetoothd is able to list the objects.
+>>>
+>>> The ObjectManager Interface is available under the root of org.bluez, it is used also for finding devices as far as I understand.
+>
+>>Yep, but in this case we are looking for the ObjectManager in the
+>>application side not in bluetoothd.
+> Ah ok, I understand. I registered the ObjectManger interface on a separate bus for my application and provided the object. It seems to work so far, but now I get the error message
+>
+> bluetoothd[4521]: src/gatt-database.c:manager_register_app() Registering application: :1.150:/homer/bluez/client
+> bluetoothd[4521]: src/gatt-database.c:proxy_added_cb() Object received: /homer/bluez/client, iface: org.bluez.GattProfile1
+> bluetoothd[4521]: Failed to create GATT service entry in local database
+>
+> My problem is now that I don't know the hierarchy the object manager is expected to provide. I used the following:
+> {Path of objectmanager, { 'org.bluez.GattProfile1', {'name': name of profile' , 'UUIDs':, String array of UUIds of services }}},
+>
+> for example
+> {'/homer/bluez/client': {'org.bluez.GattProfile1': {'name': 'WEIGHT_SCALE', 'UUIDs': ['0000181d-0000-1000-8000-00805f9b34fb', '0000180a-0000-1000-8000-00805f9b34fb', '0000181c-0000-1000-8000-00805f9b34fb', '0000181b-0000-1000-8000-00805f9b34fb', '0000180f-0000-1000-8000-00805f9b34fb', '00001805-0000-1000-8000-00805f9b34fb']}}}
 
-diff --git a/net/bluetooth/hci_sysfs.c b/net/bluetooth/hci_sysfs.c
-index 6bfdca8541d6..ca7a35ebaefb 100644
---- a/net/bluetooth/hci_sysfs.c
-+++ b/net/bluetooth/hci_sysfs.c
-@@ -79,59 +79,6 @@ void hci_conn_del_sysfs(struct hci_conn *conn)
- 	hci_dev_put(hdev);
- }
- 
--static inline char *host_typetostr(int type)
--{
--	switch (type) {
--	case HCI_BREDR:
--		return "BR/EDR";
--	case HCI_AMP:
--		return "AMP";
--	default:
--		return "UNKNOWN";
--	}
--}
--
--static ssize_t show_type(struct device *dev,
--			 struct device_attribute *attr, char *buf)
--{
--	struct hci_dev *hdev = to_hci_dev(dev);
--	return sprintf(buf, "%s\n", host_typetostr(hdev->dev_type));
--}
--
--static ssize_t show_name(struct device *dev,
--			 struct device_attribute *attr, char *buf)
--{
--	struct hci_dev *hdev = to_hci_dev(dev);
--	char name[HCI_MAX_NAME_LENGTH + 1];
--	int i;
--
--	for (i = 0; i < HCI_MAX_NAME_LENGTH; i++)
--		name[i] = hdev->dev_name[i];
--
--	name[HCI_MAX_NAME_LENGTH] = '\0';
--	return sprintf(buf, "%s\n", name);
--}
--
--static ssize_t show_address(struct device *dev,
--			    struct device_attribute *attr, char *buf)
--{
--	struct hci_dev *hdev = to_hci_dev(dev);
--	return sprintf(buf, "%pMR\n", &hdev->bdaddr);
--}
--
--static DEVICE_ATTR(type, S_IRUGO, show_type, NULL);
--static DEVICE_ATTR(name, S_IRUGO, show_name, NULL);
--static DEVICE_ATTR(address, S_IRUGO, show_address, NULL);
--
--static struct attribute *bt_host_attrs[] = {
--	&dev_attr_type.attr,
--	&dev_attr_name.attr,
--	&dev_attr_address.attr,
--	NULL
--};
--
--ATTRIBUTE_GROUPS(bt_host);
--
- static void bt_host_release(struct device *dev)
- {
- 	struct hci_dev *hdev = to_hci_dev(dev);
-@@ -141,7 +88,6 @@ static void bt_host_release(struct device *dev)
- 
- static struct device_type bt_host = {
- 	.name    = "host",
--	.groups  = bt_host_groups,
- 	.release = bt_host_release,
- };
- 
+org.bluez.GattProfile1 is client side not server, are you sure you did
+check the documentation:
+
+https://git.kernel.org/cgit/bluetooth/bluez.git/tree/doc/gatt-api.txt
+
+There is an example of who the hierarchy should looks like:
+
+-> /com/example
+  |   - org.freedesktop.DBus.ObjectManager
+  |
+  -> /com/example/service0
+  | |   - org.freedesktop.DBus.Properties
+  | |   - org.bluez.GattService1
+  | |
+  | -> /com/example/service0/char0
+  | |     - org.freedesktop.DBus.Properties
+  | |     - org.bluez.GattCharacteristic1
+  | |
+  | -> /com/example/service0/char1
+  |   |   - org.freedesktop.DBus.Properties
+  |   |   - org.bluez.GattCharacteristic1
+  |   |
+  |   -> /com/example/service0/char1/desc0
+  |       - org.freedesktop.DBus.Properties
+  |       - org.bluez.GattDescriptor1
+  |
+  -> /com/example/service1
+    |   - org.freedesktop.DBus.Properties
+    |   - org.bluez.GattService1
+    |
+    -> /com/example/service1/char0
+        - org.freedesktop.DBus.Properties
+        - org.bluez.GattCharacteristic1
+
+
+> What is the correct hierarchy for providing the supported profiles of a client application? I couldn't find it anywhere in the doc.
+>
+>>> The GetManagedObjects() method also works.
+>>> Which kind of object does bluetoothd try to find when calling the RegisterApplication method?
+>
+>>It does call GetManagedObjects, we use that to enumerate the services
+>>the application has and then proceed to register them.
+> Ok, but see above.
+>
+> Regards,
+> Johannes
+
+
+
 -- 
-2.7.4
-
+Luiz Augusto von Dentz
