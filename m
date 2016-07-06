@@ -1,71 +1,44 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Date: Wed, 6 Jul 2016 12:21:02 -0400
-From: Don Zickus <dzickus@redhat.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Luiz Augusto Von Dentz <luiz.von.dentz@intel.com>,
-	mkasik@redhat.com
-Subject: Re: [PATCH 0/3] obexd fixes
-Message-ID: <20160706162102.GZ90326@redhat.com>
-References: <1467320489-127890-1-git-send-email-dzickus@redhat.com>
- <CABBYNZJMpqUv1S7B1c1HGgPe7J5yMjjayws+rcXqd=Z-tceRLw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <CABBYNZJMpqUv1S7B1c1HGgPe7J5yMjjayws+rcXqd=Z-tceRLw@mail.gmail.com>
+In-Reply-To: <CAAF1PxS=UkQ-bXDg+DfTUVoU4uxkh7K-5pxv_s3KUoUOooQ0xQ@mail.gmail.com>
+References: <CAAF1PxS=UkQ-bXDg+DfTUVoU4uxkh7K-5pxv_s3KUoUOooQ0xQ@mail.gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Wed, 6 Jul 2016 17:17:40 +0300
+Message-ID: <CABBYNZJcs7pqhTht3Sq-THwYfE4kkrLqBRjv9+vewbNYhoBhXw@mail.gmail.com>
+Subject: Re: BlueZ supported features/profiles
+To: Mun Choy Wong <munchoy@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Jul 04, 2016 at 03:07:47PM +0300, Luiz Augusto von Dentz wrote:
-> Hi Don,
-> 
-> On Fri, Jul 1, 2016 at 12:01 AM, Don Zickus <dzickus@redhat.com> wrote:
-> > We started running some obexd tests to help mimic Fedora users passing info
-> > from their phone to their laptop.  These tests uncovered some issues.
-> >
-> > Let me know if I need to fix these patches or try something different.
-> >
-> > Cheers,
-> > Don
-> >
-> > Don Zickus (3):
-> >   obexd: Allow CreateFolder to create a directory
-> >   obexd: Return dummy_data instead of int in phonebook-dummy
-> >   obexd: Add a detailed failure message for exchanging business cards
-> >
-> >  obexd/client/opp.c              |  2 +-
-> >  obexd/plugins/ftp.c             |  2 ++
-> >  obexd/plugins/phonebook-dummy.c | 11 +++++++----
-> >  3 files changed, 10 insertions(+), 5 deletions(-)
-> >
-> > --
-> > 1.8.3.1
-> 
-> Applied after fixing the following problems:
-> 
-> #36: FILE: obexd/plugins/phonebook-dummy.c:578:
-> + dummy->id = g_idle_add_full(G_PRIORITY_DEFAULT_IDLE, create_cache, query,
-> 
-> obexd/plugins/phonebook-dummy.c:523:8: error: unused variable ‘ret’
-> [-Werror=unused-variable]
->   guint ret;
->         ^~~
-> obexd/plugins/phonebook-dummy.c:556:8: error: unused variable ‘ret’
-> [-Werror=unused-variable]
->   guint ret;
->         ^~~
-> 
-> Ive also fixed the author of the patches so we don't have to add in
-> the patch description.
+Hi,
 
-Hi Luiz,
+On Tue, Jul 5, 2016 at 6:08 PM, Mun Choy Wong <munchoy@gmail.com> wrote:
+> I am looking for the information on what profiles or features are
+> supported by BlueZ.
+> There are 2 places that I can find such information, one is in the
+> BlueZ official website and another one is in the release package from
+> a file called supported-features.txt, it looks to me that the text
+> file is better with more details but could anyone here please confirm
+> that I can rely on it?
 
-Side question,  Marek posted a patch back in April that didn't get any
-attention.  It seems you are the committer for that code??  Could you look
-and provide some feedback, if you have time?
+The repository file is probably the most accurate.
 
-http://article.gmane.org/gmane.linux.bluez.kernel/67420/match=
+> Also, if the features or profiles are not listed, i.e. TCS-BIN
+> protocols, then is this not supported?
 
-Thanks!
+ - TCS-BIN is only used by the cordless telephony profile, which
+failed to attract implementers. As such it is only of historical
+interest.
+https://en.wikipedia.org/wiki/Bluetooth#TCS
 
-Cheers,
-Don
+BlueZ has been used mostly in mobile, pc and headsets/IVI environments
+so that the profiles you should expect.
+
+You may also implement your own profiles with the following APIs:
+
+https://git.kernel.org/cgit/bluetooth/bluez.git/tree/doc/profile-api.txt
+
+-- 
+Luiz Augusto von Dentz
