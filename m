@@ -1,43 +1,24 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: wu.zheng@intel.com
-To: linux-bluetooth@vger.kernel.org
-Cc: wu.zheng@intel.com
-Subject: [PATCH] Fix bluez5 capabilities for Smack setup
-Date: Fri,  8 Jul 2016 16:03:07 +0800
-Message-Id: <1467964987-6402-1-git-send-email-wu.zheng@intel.com>
+Date: Thu, 7 Jul 2016 16:55:13 +0200
+From: Arthur LAMBERT <lambertarthur22@gmail.com>
+To: Tobias Svehagen <tobias.svehagen@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: gatt server and reset of hci device
+Message-ID: <20160707145513.GA27247@arthur-bzh>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Wu Zheng <wu.zheng@intel.com>
+Sorry for the delay of my answer.
 
-Recent bluez5 releases started limiting the capabilities of
-bluetoothd. When running on a Smack-enabled system, that change has the
-effect that bluetoothd can no longer create the input device under
-/sys because bluez5 running with label "System" has no write
-access to that.
+> You should update your kernel. Ubuntu 14.04.4 uses kernel 4.2.
 
-It works when running as normal root with unrestricted capabilities
-because then CAP_MAC_OVERRIDE (a Smack-specific capability) allows
-the process to ignore Smack rules.
+Ok I tried to update my kernel with linux-image-4.2.0-41-generic + headers with
+apt-get. After rebooting my device all my peripherals are not working (wifi/bt/usb).
+Due to that I will work directly on my ARM target. I will try to fix the problem
+on x86 later.
 
-We need to ensure that bluetoothd still has that capability.
----
- src/bluetooth.service.in | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Thanks for your help.
 
-diff --git a/src/bluetooth.service.in b/src/bluetooth.service.in
-index f799f65..1b0fead 100644
---- a/src/bluetooth.service.in
-+++ b/src/bluetooth.service.in
-@@ -10,7 +10,7 @@ ExecStart=@libexecdir@/bluetoothd
- NotifyAccess=main
- #WatchdogSec=10
- #Restart=on-failure
--CapabilityBoundingSet=CAP_NET_ADMIN CAP_NET_BIND_SERVICE
-+CapabilityBoundingSet=CAP_MAC_OVERRIDE CAP_NET_ADMIN CAP_NET_BIND_SERVICE
- LimitNPROC=1
- ProtectHome=true
- ProtectSystem=full
--- 
-2.1.4
-
+Arthur.
