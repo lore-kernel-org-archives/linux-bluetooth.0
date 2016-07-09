@@ -1,44 +1,44 @@
-Return-Path: <johan.hedberg@gmail.com>
-Date: Sat, 9 Jul 2016 21:51:41 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 3/3] Bluetooth: Rename HCI_BREDR into HCI_PRIMARY
-Message-ID: <20160709185141.GA2152@t440s.P-661HNU-F1>
-References: <1467721814-117020-3-git-send-email-marcel@holtmann.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Date: Fri, 8 Jul 2016 21:07:43 -0400
+From: Kyle McMartin <kyle@infradead.org>
+To: Tedd Ho-Jeong An <tedd.an@intel.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	linux-firmware@kernel.org
+Subject: Re: [PATCH] linux-firmware: Fix the filename for WsP to align with
+ device HW_VARIANT
+Message-ID: <20160709010743.GE8680@merlin.infradead.org>
+References: <20160706114456.34d2985b@fedora-linux-22.shared>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1467721814-117020-3-git-send-email-marcel@holtmann.org>
+In-Reply-To: <20160706114456.34d2985b@fedora-linux-22.shared>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
-
-On Tue, Jul 05, 2016, Marcel Holtmann wrote:
-> The HCI_BREDR naming is confusing since it actually stands for Primary
-> Bluetooth Controller. Which is a term that has been used in the latest
-> standard. However from a legacy point of view there only really have
-> been Basic Rate (BR) and Enhanced Data Rate (EDR). Recent versions of
-> Bluetooth introduced Low Energy (LE) and made this terminology a little
-> bit confused since Dual Mode Controllers include BR/EDR and LE. To
-> simplify this the name HCI_PRIMARY stands for the Primary Controller
-> which can be a single mode or dual mode controller.
+On Wed, Jul 06, 2016 at 11:44:56AM -0700, Tedd Ho-Jeong An wrote:
+> From: Tedd Ho-Jeong An <tedd.an@intel.com>
 > 
-> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+> There was a driver (btusb.c) change to include the device's
+> HW_VARIANT in the filename to support multiple devices and
+> this patch fixes the firmware filename for WsP to align with
+> that patch.
+> 
+> WsP(WindStorm Peak) is also known as Intel Bluetooth 8264.
+> 
+> Signed-off-by: Tedd Ho-Jeong An <tedd.an@intel.com>
+
+applied, thanks Tedd.
+
+cheers, --Kyle
+
 > ---
->  drivers/bluetooth/btmrvl_main.c |  2 +-
->  drivers/bluetooth/btsdio.c      |  2 +-
->  drivers/bluetooth/btusb.c       |  2 +-
->  drivers/bluetooth/hci_ldisc.c   |  2 +-
->  drivers/bluetooth/hci_vhci.c    |  6 +++---
->  include/net/bluetooth/hci.h     |  2 +-
->  net/bluetooth/hci_conn.c        |  2 +-
->  net/bluetooth/hci_core.c        | 28 +++++++++++++---------------
->  net/bluetooth/hci_event.c       |  2 +-
->  net/bluetooth/hci_sock.c        |  2 +-
->  net/bluetooth/l2cap_core.c      |  2 +-
->  net/bluetooth/mgmt.c            | 16 ++++++++--------
->  12 files changed, 33 insertions(+), 35 deletions(-)
-
-All three patches have been applied to bluetooth-next. Thanks.
-
-Johan
+>  WHENCE              |   4 ++--
+>  intel/ibt-11-16.ddc | Bin 9 -> 0 bytes
+>  intel/ibt-11-16.sfi | Bin 584264 -> 0 bytes
+>  intel/ibt-12-16.ddc | Bin 0 -> 9 bytes
+>  intel/ibt-12-16.sfi | Bin 0 -> 584264 bytes
+>  5 files changed, 2 insertions(+), 2 deletions(-)
+>  delete mode 100644 intel/ibt-11-16.ddc
+>  delete mode 100644 intel/ibt-11-16.sfi
+>  create mode 100644 intel/ibt-12-16.ddc
+>  create mode 100644 intel/ibt-12-16.sfi
+> 
