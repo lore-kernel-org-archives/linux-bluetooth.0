@@ -2,8 +2,8 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: bugzilla-daemon@bugzilla.kernel.org
 To: linux-bluetooth@vger.kernel.org
 Subject: [Bug 120691] UART HCI memory leak
-Date: Sun, 10 Jul 2016 03:12:01 +0000
-Message-ID: <bug-120691-62941-9poyXI0xWN@https.bugzilla.kernel.org/>
+Date: Sun, 10 Jul 2016 03:11:41 +0000
+Message-ID: <bug-120691-62941-caEZVusbKB@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-120691-62941@https.bugzilla.kernel.org/>
 References: <bug-120691-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -13,10 +13,14 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 https://bugzilla.kernel.org/show_bug.cgi?id=120691
 
---- Comment #4 from bastienphilbert@gmail.com ---
-Created attachment 222571
-  --> https://bugzilla.kernel.org/attachment.cgi?id=222571&action=edit
-Test Patch
+bastienphilbert@gmail.com changed:
+
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |bastienphilbert@gmail.com
+
+--- Comment #3 from bastienphilbert@gmail.com ---
+Try the below attached patch.
 
 -- 
 You are receiving this mail because:
