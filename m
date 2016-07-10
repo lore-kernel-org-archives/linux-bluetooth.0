@@ -1,61 +1,57 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <luiz.dentz@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <CAAF1PxQ3E5qHW0DZE_4DFsFEU8Q=f=8izR+Su7Bd60tfGp9Q3Q@mail.gmail.com>
-References: <CAAF1PxS=UkQ-bXDg+DfTUVoU4uxkh7K-5pxv_s3KUoUOooQ0xQ@mail.gmail.com>
- <CABBYNZJcs7pqhTht3Sq-THwYfE4kkrLqBRjv9+vewbNYhoBhXw@mail.gmail.com> <CAAF1PxQ3E5qHW0DZE_4DFsFEU8Q=f=8izR+Su7Bd60tfGp9Q3Q@mail.gmail.com>
-From: Mun Choy Wong <munchoy@gmail.com>
-Date: Mon, 11 Jul 2016 14:59:04 +0800
-Message-ID: <CAAF1PxQssfkGT7tAO_GjSnbR99skofTOu2=kMGmiV1skpzkL2g@mail.gmail.com>
-Subject: Re: BlueZ supported features/profiles
-To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+In-Reply-To: <30D5A9D0-8BBC-44FD-8E13-5C7C9A52619B@holtmann.org>
+References: <1467964987-6402-1-git-send-email-wu.zheng@intel.com> <30D5A9D0-8BBC-44FD-8E13-5C7C9A52619B@holtmann.org>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Mon, 11 Jul 2016 00:52:15 +0300
+Message-ID: <CABBYNZ+iS7neCkKQPebz0WRPOZnWpO+dxywxyz3RnOV2qZ7GQw@mail.gmail.com>
+Subject: Re: [PATCH] Fix bluez5 capabilities for Smack setup
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: "Zheng, Wu" <wu.zheng@intel.com>,
+	"open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Jul 11, 2016 at 10:33 AM, Mun Choy Wong <munchoy@gmail.com> wrote:
-> ---------- Forwarded message ----------
-> From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-> Date: Wed, Jul 6, 2016 at 10:17 PM
-> Subject: Re: BlueZ supported features/profiles
-> To: Mun Choy Wong <munchoy@gmail.com>
-> Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Hi,
+
+On Fri, Jul 8, 2016 at 12:07 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Wu,
 >
+>> Recent bluez5 releases started limiting the capabilities of
+>> bluetoothd. When running on a Smack-enabled system, that change has the
+>> effect that bluetoothd can no longer create the input device under
+>> /sys because bluez5 running with label "System" has no write
+>> access to that.
+>>
+>> It works when running as normal root with unrestricted capabilities
+>> because then CAP_MAC_OVERRIDE (a Smack-specific capability) allows
+>> the process to ignore Smack rules.
+>>
+>> We need to ensure that bluetoothd still has that capability.
+>> ---
+>> src/bluetooth.service.in | 2 +-
+>> 1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/src/bluetooth.service.in b/src/bluetooth.service.in
+>> index f799f65..1b0fead 100644
+>> --- a/src/bluetooth.service.in
+>> +++ b/src/bluetooth.service.in
+>> @@ -10,7 +10,7 @@ ExecStart=@libexecdir@/bluetoothd
+>> NotifyAccess=main
+>> #WatchdogSec=10
+>> #Restart=on-failure
+>> -CapabilityBoundingSet=CAP_NET_ADMIN CAP_NET_BIND_SERVICE
+>> +CapabilityBoundingSet=CAP_MAC_OVERRIDE CAP_NET_ADMIN CAP_NET_BIND_SERVICE
 >
-> Hi,
->
-> On Tue, Jul 5, 2016 at 6:08 PM, Mun Choy Wong <munchoy@gmail.com> wrote:
->> I am looking for the information on what profiles or features are
->> supported by BlueZ.
->> There are 2 places that I can find such information, one is in the
->> BlueZ official website and another one is in the release package from
->> a file called supported-features.txt, it looks to me that the text
->> file is better with more details but could anyone here please confirm
->> that I can rely on it?
->
-> The repository file is probably the most accurate.
->
->> Also, if the features or profiles are not listed, i.e. TCS-BIN
->> protocols, then is this not supported?
->
->  - TCS-BIN is only used by the cordless telephony profile, which
-> failed to attract implementers. As such it is only of historical
-> interest.
-> https://en.wikipedia.org/wiki/Bluetooth#TCS
->
-> BlueZ has been used mostly in mobile, pc and headsets/IVI environments
-> so that the profiles you should expect.
->
-> You may also implement your own profiles with the following APIs:
->
-> https://git.kernel.org/cgit/bluetooth/bluez.git/tree/doc/profile-api.txt
->
-> --
-> Luiz Augusto von Dentz
+> this looks like the big hammer approach. I think if this is needed, then the Smack policies are just wrong. Why not fix them instead of punching such a big hole into it.
+
++1, CAP_NET_ADMIN would have that capability since it is stated:
+
+ CAP_NET_ADMIN
+              Perform various network-related operations:
+              * interface configuration;
 
 
-What about the support of SDAP and DUN profiles in BlueZ?
-It is listed in the repository file but I wonder why I can't read much
-of its source code.
 
-Thanks,
-munchoy
+-- 
+Luiz Augusto von Dentz
