@@ -1,41 +1,92 @@
-Return-Path: <linux-wpan-owner@vger.kernel.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Alexander Aring <aar@pengutronix.de>
 To: linux-wpan@vger.kernel.org
 Cc: kernel@pengutronix.de, luiz.dentz@gmail.com, kaspar@schleiser.de,
 	jukka.rissanen@linux.intel.com, linux-bluetooth@vger.kernel.org,
 	Patrik.Flykt@linux.intel.com, Alexander Aring <aar@pengutronix.de>
-Subject: [RFC bluetooth-next 06/20] 6lowpan: hold netdev while unregister
-Date: Mon, 11 Jul 2016 21:50:30 +0200
-Message-Id: <20160711195044.25343-7-aar@pengutronix.de>
+Subject: [RFC bluetooth-next 10/20] bluetooth: add hci dev notifier
+Date: Mon, 11 Jul 2016 21:50:34 +0200
+Message-Id: <20160711195044.25343-11-aar@pengutronix.de>
 In-Reply-To: <20160711195044.25343-1-aar@pengutronix.de>
 References: <20160711195044.25343-1-aar@pengutronix.de>
-Sender: linux-wpan-owner@vger.kernel.org
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I saw that unregister_netdevice will also free the netdev by running
-dev_put. This may clash run debugfs exist, because it use netdevice
-private data room.
+I need to react at least somehow on a hci dev unregister event to clean
+all 6LoWPAN interfaces on it. This patch adds a notifier for non
+socket stuff.
+
+I also thought about to react somehow on "struct device" unregister but
+I didn't found any functionality for that.
 
 Signed-off-by: Alexander Aring <aar@pengutronix.de>
 ---
- net/6lowpan/core.c | 2 ++
- 1 file changed, 2 insertions(+)
+ include/net/bluetooth/hci_core.h |  4 ++++
+ net/bluetooth/hci_core.c         | 22 ++++++++++++++++++++++
+ net/bluetooth/hci_sock.c         |  2 ++
+ 3 files changed, 28 insertions(+)
 
-diff --git a/net/6lowpan/core.c b/net/6lowpan/core.c
-index 5945f7e..00ffab3 100644
---- a/net/6lowpan/core.c
-+++ b/net/6lowpan/core.c
-@@ -62,8 +62,10 @@ EXPORT_SYMBOL(lowpan_register_netdev);
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index dc71473..a37027a 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -902,6 +902,10 @@ void hci_conn_enter_active_mode(struct hci_conn *conn, __u8 force_active);
  
- void lowpan_unregister_netdevice(struct net_device *dev)
- {
-+	dev_hold(dev);
- 	unregister_netdevice(dev);
- 	lowpan_dev_debugfs_exit(dev);
-+	dev_put(dev);
+ void hci_le_conn_failed(struct hci_conn *conn, u8 status);
+ 
++int register_hci_dev_notifier(struct notifier_block *nb);
++void unregister_hci_dev_notifier(struct notifier_block *nb);
++int call_hci_dev_notifiers(unsigned long val, struct hci_dev *hdev);
++
+ /*
+  * hci_conn_get() and hci_conn_put() are used to control the life-time of an
+  * "hci_conn" object. They do not guarantee that the hci_conn object is running,
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 98f6c37..a75e9e7 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -57,6 +57,28 @@ DEFINE_MUTEX(hci_cb_list_lock);
+ /* HCI ID Numbering */
+ static DEFINE_IDA(hci_index_ida);
+ 
++/* HCI device notifier list */
++static RAW_NOTIFIER_HEAD(hci_dev_chain);
++
++/* ---- HCI notifiers functions ---- */
++
++int register_hci_dev_notifier(struct notifier_block *nb)
++{
++	return raw_notifier_chain_register(&hci_dev_chain, nb);
++}
++EXPORT_SYMBOL(register_hci_dev_notifier);
++
++void unregister_hci_dev_notifier(struct notifier_block *nb)
++{
++	raw_notifier_chain_unregister(&hci_dev_chain, nb);
++}
++EXPORT_SYMBOL(unregister_hci_dev_notifier);
++
++int call_hci_dev_notifiers(unsigned long val, struct hci_dev *hdev)
++{
++	return raw_notifier_call_chain(&hci_dev_chain, val, hdev);
++}
++
+ /* ---- HCI debugfs entries ---- */
+ 
+ static ssize_t dut_mode_read(struct file *file, char __user *user_buf,
+diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
+index 6ef8a01..290eb1e 100644
+--- a/net/bluetooth/hci_sock.c
++++ b/net/bluetooth/hci_sock.c
+@@ -529,6 +529,8 @@ void hci_sock_dev_event(struct hci_dev *hdev, int event)
+ 		}
+ 		read_unlock(&hci_sk_list.lock);
+ 	}
++
++	call_hci_dev_notifiers(event, hdev);
  }
- EXPORT_SYMBOL(lowpan_unregister_netdevice);
  
+ static struct hci_mgmt_chan *__hci_mgmt_chan_find(unsigned short channel)
 -- 
 2.9.0
 
