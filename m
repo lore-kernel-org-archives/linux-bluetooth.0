@@ -4,47 +4,41 @@ To: linux-wpan@vger.kernel.org
 Cc: kernel@pengutronix.de, luiz.dentz@gmail.com, kaspar@schleiser.de,
 	jukka.rissanen@linux.intel.com, linux-bluetooth@vger.kernel.org,
 	Patrik.Flykt@linux.intel.com, Alexander Aring <aar@pengutronix.de>
-Subject: [RFC bluetooth-next 19/20] 6lowpan: delete addr_len handling to generic
-Date: Mon, 11 Jul 2016 21:50:43 +0200
-Message-Id: <20160711195044.25343-20-aar@pengutronix.de>
+Subject: [RFC bluetooth-next 07/20] 6lowpan: introduce generic default naming
+Date: Mon, 11 Jul 2016 21:50:31 +0200
+Message-Id: <20160711195044.25343-8-aar@pengutronix.de>
 In-Reply-To: <20160711195044.25343-1-aar@pengutronix.de>
 References: <20160711195044.25343-1-aar@pengutronix.de>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The address length for BTLE 6LoWPAN is not 8 bytes, it's 6 bytes. We
-need to move this setting away from generic branch.
+This patch adds a default naming for all 6LoWPAN interfaces. All
+userspace software should have them as example e.g. for configurations.
+
+I see currently many examples which has different interface naming for
+software which works for 6LoWPAN BTLE and 6LoWPAN 802.15.4.
+
+We need to change also all examples outside to this naming stuff, so the
+interface naming inside such examples doesn't depends on L2.
 
 Signed-off-by: Alexander Aring <aar@pengutronix.de>
 ---
- net/6lowpan/core.c            | 1 -
- net/ieee802154/6lowpan/core.c | 1 +
- 2 files changed, 1 insertion(+), 1 deletion(-)
+ include/net/6lowpan.h | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/net/6lowpan/core.c b/net/6lowpan/core.c
-index 6b7de14..e03cecf 100644
---- a/net/6lowpan/core.c
-+++ b/net/6lowpan/core.c
-@@ -58,7 +58,6 @@ int lowpan_register_netdevice(struct net_device *dev,
+diff --git a/include/net/6lowpan.h b/include/net/6lowpan.h
+index 7f4b63c..2570237 100644
+--- a/include/net/6lowpan.h
++++ b/include/net/6lowpan.h
+@@ -78,6 +78,8 @@
+ #define LOWPAN_DISPATCH_IPHC		0x60 /* 011xxxxx = ... */
+ #define LOWPAN_DISPATCH_IPHC_MASK	0xe0
+ 
++#define LOWPAN_IFNAME_TEMPLATE "6lo%d"
++
+ static inline bool lowpan_is_ipv6(u8 dispatch)
  {
- 	int i, ret;
- 
--	dev->addr_len = EUI64_ADDR_LEN;
- 	dev->type = ARPHRD_6LOWPAN;
- 	dev->mtu = IPV6_MIN_MTU;
- 	dev->priv_flags |= IFF_NO_QUEUE;
-diff --git a/net/ieee802154/6lowpan/core.c b/net/ieee802154/6lowpan/core.c
-index a60abad..c97eb7a 100644
---- a/net/ieee802154/6lowpan/core.c
-+++ b/net/ieee802154/6lowpan/core.c
-@@ -134,6 +134,7 @@ static int lowpan_newlink(struct net *src_net, struct net_device *ldev,
- 	}
- 
- 	lowpan_802154_dev(ldev)->wdev = wdev;
-+	ldev->addr_len = IEEE802154_ADDR_LEN;
- 	/* Set the lowpan hardware address to the wpan hardware address. */
- 	memcpy(ldev->dev_addr, wdev->dev_addr, IEEE802154_ADDR_LEN);
- 	/* We need headroom for possible wpan_dev_hard_header call and tailroom
+ 	return dispatch == LOWPAN_DISPATCH_IPV6;
 -- 
 2.9.0
 
