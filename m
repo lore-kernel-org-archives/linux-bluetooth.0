@@ -1,60 +1,52 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <linux-wpan-owner@vger.kernel.org>
 From: Alexander Aring <aar@pengutronix.de>
 To: linux-wpan@vger.kernel.org
 Cc: kernel@pengutronix.de, luiz.dentz@gmail.com, kaspar@schleiser.de,
 	jukka.rissanen@linux.intel.com, linux-bluetooth@vger.kernel.org,
 	Patrik.Flykt@linux.intel.com, Alexander Aring <aar@pengutronix.de>
-Subject: [RFC bluetooth-next 08/20] 6lowpan: move rx defines to generic
-Date: Mon, 11 Jul 2016 21:50:32 +0200
-Message-Id: <20160711195044.25343-9-aar@pengutronix.de>
+Subject: [RFC bluetooth-next 04/20] ieee802154: 6lowpan: move skb cb BUILD_BUG_ON check
+Date: Mon, 11 Jul 2016 21:50:28 +0200
+Message-Id: <20160711195044.25343-5-aar@pengutronix.de>
 In-Reply-To: <20160711195044.25343-1-aar@pengutronix.de>
 References: <20160711195044.25343-1-aar@pengutronix.de>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch prepares to use 802.15.4 6LoWPAN receive handling also for
-BTLE 6LoWPAN.
+This patch moves the control block information BUILD_BUG_ON to the init
+of module. All compile timed BUILD_BUG_ON macros should be placed there.
 
 Signed-off-by: Alexander Aring <aar@pengutronix.de>
 ---
- include/net/6lowpan.h              | 6 ++++++
- net/ieee802154/6lowpan/6lowpan_i.h | 6 ------
- 2 files changed, 6 insertions(+), 6 deletions(-)
+ include/net/6lowpan.h         | 1 -
+ net/ieee802154/6lowpan/core.c | 3 +++
+ 2 files changed, 3 insertions(+), 1 deletion(-)
 
 diff --git a/include/net/6lowpan.h b/include/net/6lowpan.h
-index 2570237..90d9d08 100644
+index 5ab4c99..6d56be7 100644
 --- a/include/net/6lowpan.h
 +++ b/include/net/6lowpan.h
-@@ -80,6 +80,12 @@
- 
- #define LOWPAN_IFNAME_TEMPLATE "6lo%d"
- 
-+typedef unsigned __bitwise__ lowpan_rx_result;
-+#define RX_CONTINUE		((__force lowpan_rx_result) 0u)
-+#define RX_DROP_UNUSABLE	((__force lowpan_rx_result) 1u)
-+#define RX_DROP			((__force lowpan_rx_result) 2u)
-+#define RX_QUEUED		((__force lowpan_rx_result) 3u)
-+
- static inline bool lowpan_is_ipv6(u8 dispatch)
+@@ -178,7 +178,6 @@ struct lowpan_802154_cb {
+ static inline
+ struct lowpan_802154_cb *lowpan_802154_cb(const struct sk_buff *skb)
  {
- 	return dispatch == LOWPAN_DISPATCH_IPV6;
-diff --git a/net/ieee802154/6lowpan/6lowpan_i.h b/net/ieee802154/6lowpan/6lowpan_i.h
-index 5ac7789..39b739f 100644
---- a/net/ieee802154/6lowpan/6lowpan_i.h
-+++ b/net/ieee802154/6lowpan/6lowpan_i.h
-@@ -7,12 +7,6 @@
- #include <net/inet_frag.h>
- #include <net/6lowpan.h>
+-	BUILD_BUG_ON(sizeof(struct lowpan_802154_cb) > sizeof(skb->cb));
+ 	return (struct lowpan_802154_cb *)skb->cb;
+ }
  
--typedef unsigned __bitwise__ lowpan_rx_result;
--#define RX_CONTINUE		((__force lowpan_rx_result) 0u)
--#define RX_DROP_UNUSABLE	((__force lowpan_rx_result) 1u)
--#define RX_DROP			((__force lowpan_rx_result) 2u)
--#define RX_QUEUED		((__force lowpan_rx_result) 3u)
--
- #define LOWPAN_DISPATCH_FRAG1           0xc0
- #define LOWPAN_DISPATCH_FRAGN           0xe0
+diff --git a/net/ieee802154/6lowpan/core.c b/net/ieee802154/6lowpan/core.c
+index d7efbf0..6afb8cd 100644
+--- a/net/ieee802154/6lowpan/core.c
++++ b/net/ieee802154/6lowpan/core.c
+@@ -233,6 +233,9 @@ static int __init lowpan_init_module(void)
+ {
+ 	int err = 0;
  
++	BUILD_BUG_ON(sizeof(struct lowpan_802154_cb) >
++		     FIELD_SIZEOF(struct sk_buff, cb));
++
+ 	err = lowpan_net_frag_init();
+ 	if (err < 0)
+ 		goto out;
 -- 
 2.9.0
 
