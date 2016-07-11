@@ -4,34 +4,36 @@ To: linux-wpan@vger.kernel.org
 Cc: kernel@pengutronix.de, luiz.dentz@gmail.com, kaspar@schleiser.de,
 	jukka.rissanen@linux.intel.com, linux-bluetooth@vger.kernel.org,
 	Patrik.Flykt@linux.intel.com, Alexander Aring <aar@pengutronix.de>
-Subject: [RFC bluetooth-next 03/20] ieee802154: 6lowpan: remove headroom check
-Date: Mon, 11 Jul 2016 21:50:27 +0200
-Message-Id: <20160711195044.25343-4-aar@pengutronix.de>
+Subject: [RFC bluetooth-next 01/20] 6lowpan: ndisc: don't remove short address
+Date: Mon, 11 Jul 2016 21:50:25 +0200
+Message-Id: <20160711195044.25343-2-aar@pengutronix.de>
 In-Reply-To: <20160711195044.25343-1-aar@pengutronix.de>
 References: <20160711195044.25343-1-aar@pengutronix.de>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch removes unnessary headroom check. We will check that value
-while register net device that we have such headroom for placing address
-information at the headroom of skb.
+This patch removes handling to remove short address for a neigbour entry
+if RS/RA/NS/NA doesn't contain a short address. If these messages
+doesn't has any short address option, the existing short address from
+ndisc cache will be used.
 
 Signed-off-by: Alexander Aring <aar@pengutronix.de>
 ---
- net/ieee802154/6lowpan/tx.c | 1 -
- 1 file changed, 1 deletion(-)
+ net/6lowpan/ndisc.c | 2 --
+ 1 file changed, 2 deletions(-)
 
-diff --git a/net/ieee802154/6lowpan/tx.c b/net/ieee802154/6lowpan/tx.c
-index dbb476d..a7a1b12 100644
---- a/net/ieee802154/6lowpan/tx.c
-+++ b/net/ieee802154/6lowpan/tx.c
-@@ -26,7 +26,6 @@ struct lowpan_addr_info {
- static inline struct
- lowpan_addr_info *lowpan_skb_priv(const struct sk_buff *skb)
- {
--	WARN_ON_ONCE(skb_headroom(skb) < sizeof(struct lowpan_addr_info));
- 	return (struct lowpan_addr_info *)(skb->data -
- 			sizeof(struct lowpan_addr_info));
+diff --git a/net/6lowpan/ndisc.c b/net/6lowpan/ndisc.c
+index 86450b7..941df2f 100644
+--- a/net/6lowpan/ndisc.c
++++ b/net/6lowpan/ndisc.c
+@@ -101,8 +101,6 @@ static void lowpan_ndisc_802154_update(struct neighbour *n, u32 flags,
+ 		ieee802154_be16_to_le16(&neigh->short_addr, lladdr_short);
+ 		if (!lowpan_802154_is_valid_src_short_addr(neigh->short_addr))
+ 			neigh->short_addr = cpu_to_le16(IEEE802154_ADDR_SHORT_UNSPEC);
+-	} else {
+-		neigh->short_addr = cpu_to_le16(IEEE802154_ADDR_SHORT_UNSPEC);
+ 	}
+ 	write_unlock_bh(&n->lock);
  }
 -- 
 2.9.0
