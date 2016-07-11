@@ -4,61 +4,46 @@ To: linux-wpan@vger.kernel.org
 Cc: kernel@pengutronix.de, luiz.dentz@gmail.com, kaspar@schleiser.de,
 	jukka.rissanen@linux.intel.com, linux-bluetooth@vger.kernel.org,
 	Patrik.Flykt@linux.intel.com, Alexander Aring <aar@pengutronix.de>
-Subject: [RFC bluetooth-next 16/20] ipv6: addrconf: fix 48 bit 6lowpan autoconfiguration
-Date: Mon, 11 Jul 2016 21:50:40 +0200
-Message-Id: <20160711195044.25343-17-aar@pengutronix.de>
+Subject: [RFC bluetooth-next 18/20] 6lowpan: move multicast flags to generic
+Date: Mon, 11 Jul 2016 21:50:42 +0200
+Message-Id: <20160711195044.25343-19-aar@pengutronix.de>
 In-Reply-To: <20160711195044.25343-1-aar@pengutronix.de>
 References: <20160711195044.25343-1-aar@pengutronix.de>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds support for 48 bit 6LoWPAN address length
-autoconfiguration which is the case for BTLE 6LoWPAN.
+These flags should be all the same for 6LoWPAN so move it to 6LoWPAN generic.
 
 Signed-off-by: Alexander Aring <aar@pengutronix.de>
 ---
- net/ipv6/addrconf.c | 19 ++++++++++++++-----
- 1 file changed, 14 insertions(+), 5 deletions(-)
+ net/6lowpan/core.c            | 1 +
+ net/ieee802154/6lowpan/core.c | 1 -
+ 2 files changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
-index a1f6b7b..aab9b0d 100644
---- a/net/ipv6/addrconf.c
-+++ b/net/ipv6/addrconf.c
-@@ -2007,12 +2007,21 @@ static void addrconf_leave_anycast(struct inet6_ifaddr *ifp)
- 	__ipv6_dev_ac_dec(ifp->idev, &addr);
- }
+diff --git a/net/6lowpan/core.c b/net/6lowpan/core.c
+index a978000..6b7de14 100644
+--- a/net/6lowpan/core.c
++++ b/net/6lowpan/core.c
+@@ -62,6 +62,7 @@ int lowpan_register_netdevice(struct net_device *dev,
+ 	dev->type = ARPHRD_6LOWPAN;
+ 	dev->mtu = IPV6_MIN_MTU;
+ 	dev->priv_flags |= IFF_NO_QUEUE;
++	dev->flags = IFF_BROADCAST | IFF_MULTICAST;
  
--static int addrconf_ifid_eui64(u8 *eui, struct net_device *dev)
-+static int addrconf_ifid_6lowpan(u8 *eui, struct net_device *dev)
- {
--	if (dev->addr_len != EUI64_ADDR_LEN)
-+	switch (dev->addr_len) {
-+	case ETH_ALEN:
-+		return addrconf_ifid_eui48(eui, dev);
-+	case EUI64_ADDR_LEN:
-+		if (dev->addr_len != EUI64_ADDR_LEN)
-+			return -1;
-+		memcpy(eui, dev->dev_addr, EUI64_ADDR_LEN);
-+		eui[0] ^= 2;
-+		break;
-+	default:
- 		return -1;
--	memcpy(eui, dev->dev_addr, EUI64_ADDR_LEN);
--	eui[0] ^= 2;
-+	}
-+
- 	return 0;
- }
+ 	dev->header_ops = &header_ops;
  
-@@ -2103,7 +2112,7 @@ static int ipv6_generate_eui64(u8 *eui, struct net_device *dev)
- 	case ARPHRD_IPGRE:
- 		return addrconf_ifid_gre(eui, dev);
- 	case ARPHRD_6LOWPAN:
--		return addrconf_ifid_eui64(eui, dev);
-+		return addrconf_ifid_6lowpan(eui, dev);
- 	case ARPHRD_IEEE1394:
- 		return addrconf_ifid_ieee1394(eui, dev);
- 	case ARPHRD_TUNNEL6:
+diff --git a/net/ieee802154/6lowpan/core.c b/net/ieee802154/6lowpan/core.c
+index 228a711..a60abad 100644
+--- a/net/ieee802154/6lowpan/core.c
++++ b/net/ieee802154/6lowpan/core.c
+@@ -92,7 +92,6 @@ static void lowpan_setup(struct net_device *ldev)
+ 	memset(ldev->broadcast, 0xff, IEEE802154_ADDR_LEN);
+ 	/* We need an ipv6hdr as minimum len when calling xmit */
+ 	ldev->hard_header_len	= sizeof(struct ipv6hdr);
+-	ldev->flags		= IFF_BROADCAST | IFF_MULTICAST;
+ 
+ 	ldev->netdev_ops	= &lowpan_netdev_ops;
+ 	ldev->destructor	= free_netdev;
 -- 
 2.9.0
 
