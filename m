@@ -1,40 +1,64 @@
-Return-Path: <linux-kernel-owner@vger.kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
-Subject: Re: [PATCH] Bluetooth: Add support of 13d3:3490 AR3012 device
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1468276518-12220-1-git-send-email-hanipouspilot@gmail.com>
-Date: Tue, 12 Jul 2016 00:37:55 +0200
-Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	"open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Message-Id: <A3F8EA18-D101-44FE-A25C-9C27AD565F78@holtmann.org>
-References: <1468276518-12220-1-git-send-email-hanipouspilot@gmail.com>
-To: Dmitry Tunin <hanipouspilot@gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
+Return-Path: <hanipouspilot@gmail.com>
+From: Dmitry Tunin <hanipouspilot@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Dmitry Tunin <hanipouspilot@gmail.com>,
+	stable@vger.kernel.org
+Subject: [PATCH] Bluetooth: Add support of 13d3:3490 AR3012 device
+Date: Tue, 12 Jul 2016 01:35:18 +0300
+Message-Id: <1468276518-12220-1-git-send-email-hanipouspilot@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Dmitry,
+T: Bus=01 Lev=01 Prnt=01 Port=07 Cnt=05 Dev#= 5 Spd=12 MxCh= 0
+D: Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs= 1
+P: Vendor=13d3 ProdID=3490 Rev=00.01
+C: #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
+I: If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+I: If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
 
-> T: Bus=01 Lev=01 Prnt=01 Port=07 Cnt=05 Dev#= 5 Spd=12 MxCh= 0
-> D: Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs= 1
-> P: Vendor=13d3 ProdID=3490 Rev=00.01
-> C: #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
-> I: If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> I: If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> 
-> BugLink: https://bugs.launchpad.net/bugs/1600623 
-> 
-> Signed-off-by: Dmitry Tunin <hanipouspilot@gmail.com>
-> Cc: stable@vger.kernel.org
-> ---
-> drivers/bluetooth/ath3k.c | 2 ++
-> drivers/bluetooth/btusb.c | 1 +
-> 2 files changed, 3 insertions(+)
+BugLink: https://bugs.launchpad.net/bugs/1600623 
 
-patch has been applied to bluetooth-next tree.
+Signed-off-by: Dmitry Tunin <hanipouspilot@gmail.com>
+Cc: stable@vger.kernel.org
+---
+ drivers/bluetooth/ath3k.c | 2 ++
+ drivers/bluetooth/btusb.c | 1 +
+ 2 files changed, 3 insertions(+)
 
-Regards
-
-Marcel
+diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
+index 2589468..fadba88 100644
+--- a/drivers/bluetooth/ath3k.c
++++ b/drivers/bluetooth/ath3k.c
+@@ -123,6 +123,7 @@ static const struct usb_device_id ath3k_table[] = {
+ 	{ USB_DEVICE(0x13d3, 0x3472) },
+ 	{ USB_DEVICE(0x13d3, 0x3474) },
+ 	{ USB_DEVICE(0x13d3, 0x3487) },
++	{ USB_DEVICE(0x13d3, 0x3490) },
+ 
+ 	/* Atheros AR5BBU12 with sflash firmware */
+ 	{ USB_DEVICE(0x0489, 0xE02C) },
+@@ -190,6 +191,7 @@ static const struct usb_device_id ath3k_blist_tbl[] = {
+ 	{ USB_DEVICE(0x13d3, 0x3472), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x13d3, 0x3474), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x13d3, 0x3487), .driver_info = BTUSB_ATH3012 },
++	{ USB_DEVICE(0x13d3, 0x3490), .driver_info = BTUSB_ATH3012 },
+ 
+ 	/* Atheros AR5BBU22 with sflash firmware */
+ 	{ USB_DEVICE(0x0489, 0xE036), .driver_info = BTUSB_ATH3012 },
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index f2e8fd7..811f9b9 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -237,6 +237,7 @@ static const struct usb_device_id blacklist_table[] = {
+ 	{ USB_DEVICE(0x13d3, 0x3472), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x13d3, 0x3474), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x13d3, 0x3487), .driver_info = BTUSB_ATH3012 },
++	{ USB_DEVICE(0x13d3, 0x3490), .driver_info = BTUSB_ATH3012 },
+ 
+ 	/* Atheros AR5BBU12 with sflash firmware */
+ 	{ USB_DEVICE(0x0489, 0xe02c), .driver_info = BTUSB_IGNORE },
+-- 
+2.7.4
