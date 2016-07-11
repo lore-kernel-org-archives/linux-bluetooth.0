@@ -1,68 +1,97 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <linux-wpan-owner@vger.kernel.org>
 From: Alexander Aring <aar@pengutronix.de>
 To: linux-wpan@vger.kernel.org
 Cc: kernel@pengutronix.de, luiz.dentz@gmail.com, kaspar@schleiser.de,
 	jukka.rissanen@linux.intel.com, linux-bluetooth@vger.kernel.org,
 	Patrik.Flykt@linux.intel.com, Alexander Aring <aar@pengutronix.de>
-Subject: [RFC bluetooth-next 11/20] bluetooth: export functions and variables
-Date: Mon, 11 Jul 2016 21:50:35 +0200
-Message-Id: <20160711195044.25343-12-aar@pengutronix.de>
+Subject: [RFC bluetooth-next 09/20] bluetooth: introduce l2cap_hdev_chan_connect
+Date: Mon, 11 Jul 2016 21:50:33 +0200
+Message-Id: <20160711195044.25343-10-aar@pengutronix.de>
 In-Reply-To: <20160711195044.25343-1-aar@pengutronix.de>
 References: <20160711195044.25343-1-aar@pengutronix.de>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This function exports some functions which are needed by the 6LoWPAN BTLE
-module.
+A BTLE 6LoWPAN should be binded to one hci device and is not changeable
+afterwards. This patch adds l2cap_hdev_chan_connect function without calling
+hci_get_route which decides on bluetooth side which may be the best hci
+device which should be use. The hci dev will be available by parameter.
 
 Signed-off-by: Alexander Aring <aar@pengutronix.de>
 ---
- net/bluetooth/hci_core.c   | 4 ++++
- net/bluetooth/l2cap_core.c | 1 +
- 2 files changed, 5 insertions(+)
+ include/net/bluetooth/l2cap.h |  3 +++
+ net/bluetooth/l2cap_core.c    | 28 +++++++++++++++++++++-------
+ 2 files changed, 24 insertions(+), 7 deletions(-)
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index a75e9e7..4935b94 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -48,7 +48,9 @@ static void hci_tx_work(struct work_struct *work);
- 
- /* HCI device list */
- LIST_HEAD(hci_dev_list);
-+EXPORT_SYMBOL(hci_dev_list);
- DEFINE_RWLOCK(hci_dev_list_lock);
-+EXPORT_SYMBOL(hci_dev_list_lock);
- 
- /* HCI callback list */
- LIST_HEAD(hci_cb_list);
-@@ -955,6 +957,7 @@ struct hci_dev *hci_dev_get(int index)
- 	read_unlock(&hci_dev_list_lock);
- 	return hdev;
- }
-+EXPORT_SYMBOL(hci_dev_get);
- 
- /* ---- Inquiry support ---- */
- 
-@@ -2941,6 +2944,7 @@ void hci_copy_identity_address(struct hci_dev *hdev, bdaddr_t *bdaddr,
- 		*bdaddr_type = ADDR_LE_DEV_PUBLIC;
- 	}
- }
-+EXPORT_SYMBOL(hci_copy_identity_address);
- 
- /* Alloc HCI device */
- struct hci_dev *hci_alloc_dev(void)
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index 5ee3c68..8a4d26e 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -928,6 +928,9 @@ struct l2cap_chan *l2cap_chan_create(void);
+ void l2cap_chan_close(struct l2cap_chan *chan, int reason);
+ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
+ 		       bdaddr_t *dst, u8 dst_type);
++int l2cap_hdev_chan_connect(struct hci_dev *hdev,
++			    struct l2cap_chan *chan, __le16 psm, u16 cid,
++			    bdaddr_t *dst, u8 dst_type);
+ int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len);
+ void l2cap_chan_busy(struct l2cap_chan *chan, int busy);
+ int l2cap_chan_check_security(struct l2cap_chan *chan, bool initiator);
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 2ab8814..1bf534d 100644
+index 54ceb1f..2ab8814 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -484,6 +484,7 @@ void l2cap_chan_hold(struct l2cap_chan *c)
- 
- 	kref_get(&c->kref);
+@@ -7041,21 +7041,17 @@ static bool is_valid_psm(u16 psm, u8 dst_type) {
+ 	return ((psm & 0x0101) == 0x0001);
  }
-+EXPORT_SYMBOL(l2cap_chan_hold);
  
- void l2cap_chan_put(struct l2cap_chan *c)
+-int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
+-		       bdaddr_t *dst, u8 dst_type)
++int l2cap_hdev_chan_connect(struct hci_dev *hdev,
++			    struct l2cap_chan *chan, __le16 psm, u16 cid,
++			    bdaddr_t *dst, u8 dst_type)
  {
+ 	struct l2cap_conn *conn;
+ 	struct hci_conn *hcon;
+-	struct hci_dev *hdev;
+ 	int err;
+ 
+ 	BT_DBG("%pMR -> %pMR (type %u) psm 0x%2.2x", &chan->src, dst,
+ 	       dst_type, __le16_to_cpu(psm));
+ 
+-	hdev = hci_get_route(dst, &chan->src);
+-	if (!hdev)
+-		return -EHOSTUNREACH;
+-
+ 	hci_dev_lock(hdev);
+ 
+ 	if (!is_valid_psm(__le16_to_cpu(psm), dst_type) && !cid &&
+@@ -7199,7 +7195,25 @@ chan_unlock:
+ 	mutex_unlock(&conn->chan_lock);
+ done:
+ 	hci_dev_unlock(hdev);
++	return err;
++}
++EXPORT_SYMBOL_GPL(l2cap_hdev_chan_connect);
++
++int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
++		       bdaddr_t *dst, u8 dst_type)
++{
++	struct hci_dev *hdev;
++	int err = -EHOSTUNREACH;
++
++	hdev = hci_get_route(dst, &chan->src);
++	if (!hdev)
++		goto done;
++
++	err = l2cap_hdev_chan_connect(hdev, chan, psm, cid, dst, dst_type);
++
+ 	hci_dev_put(hdev);
++
++done:
+ 	return err;
+ }
+ EXPORT_SYMBOL_GPL(l2cap_chan_connect);
 -- 
 2.9.0
 
