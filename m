@@ -1,96 +1,92 @@
-Return-Path: <linux-wpan-owner@vger.kernel.org>
-Subject: Re: [RFC bluetooth-next 16/20] ipv6: addrconf: fix 48 bit 6lowpan
- autoconfiguration
-To: linux-wpan@vger.kernel.org
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Subject: Re: [RFC bluetooth-next 00/20] bluetooth: rework 6lowpan
+ implementation
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 References: <20160711195044.25343-1-aar@pengutronix.de>
- <20160711195044.25343-17-aar@pengutronix.de>
-Cc: kernel@pengutronix.de, luiz.dentz@gmail.com, kaspar@schleiser.de,
-	jukka.rissanen@linux.intel.com, linux-bluetooth@vger.kernel.org,
-	Patrik.Flykt@linux.intel.com
+ <CABBYNZJFStOf6qOcpP6DmdxFBx7swrnFPmQLizy0UyokwS64ng@mail.gmail.com>
+Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de,
+	kaspar@schleiser.de,
+	Jukka Rissanen <jukka.rissanen@linux.intel.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Patrik Flykt <Patrik.Flykt@linux.intel.com>
 From: Alexander Aring <aar@pengutronix.de>
-Message-ID: <8b4e7905-95a0-0fde-a035-87aff73b0fe4@pengutronix.de>
-Date: Tue, 12 Jul 2016 22:16:55 +0200
+Message-ID: <5b41b0e5-c017-20d9-c94f-11fb1ab2847d@pengutronix.de>
+Date: Tue, 12 Jul 2016 20:35:51 +0200
 MIME-Version: 1.0
-In-Reply-To: <20160711195044.25343-17-aar@pengutronix.de>
-Content-Type: text/plain; charset=windows-1252
-Sender: linux-wpan-owner@vger.kernel.org
+In-Reply-To: <CABBYNZJFStOf6qOcpP6DmdxFBx7swrnFPmQLizy0UyokwS64ng@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 
 Hi,
 
-own review notes to lookup for next run, otherwise I will forget them.
-
-On 07/11/2016 09:50 PM, Alexander Aring wrote:
-> This patch adds support for 48 bit 6LoWPAN address length
-> autoconfiguration which is the case for BTLE 6LoWPAN.
+On 07/12/2016 04:51 PM, Luiz Augusto von Dentz wrote:
+...
+>>
+>> HOW TO REPRODUCE:
+>>
+>> It's simple, do some high payloads which makes lot tx/rcv traffic on both sides:
+>>
+>> Node A:
+>>
+>>  ping6 $IP_NODEB%6lo0 -s 60000
+>>
+>> Node B:
+>>
+>>  ping6 ff02::1%6lo0
 > 
-> Signed-off-by: Alexander Aring <aar@pengutronix.de>
-> ---
->  net/ipv6/addrconf.c | 19 ++++++++++++++-----
->  1 file changed, 14 insertions(+), 5 deletions(-)
+> Im not sure I understand what you are trying to do with a packet of
+> 60Kb, the l2cap_chan can most likely only do 1280 bytes and even with
+
+60Kb is just some incredible high value to produce on both sides tx/rx
+data. The other side will normally send some "defragmentation failure"
+icmp messages.
+
+This value is just to produce the high traffic, not practice payload.
+
+> fragmentation this will consume the credits quicker than we can
+> receive more so it will eventually starting buffering until it gets
+> stuck. Note that it is probably still receiving credits but we
+
+This is exactly what I like to do. Produce a lot of data to kill L3
+layer, but this should not kill the L2 layer. Killing the L2 layer is
+what's happend here.
+
+If I do a lot of data on e.g. tcp traffic and the tcp connection will be
+closed -> that's fine for me but afterwards starting a new L3 connection
+should be still working. This is not the case here, I can kill L2 layer
+and nothing works anymore, because L2 running into deadlock.
+
+> probably have so much data buffered that all the credits are consumed
+> almost immediately after receiving, or you don't see -EAGAIN more than
+> once?
 > 
-> diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
-> index a1f6b7b..aab9b0d 100644
-> --- a/net/ipv6/addrconf.c
-> +++ b/net/ipv6/addrconf.c
-> @@ -2007,12 +2007,21 @@ static void addrconf_leave_anycast(struct inet6_ifaddr *ifp)
->  	__ipv6_dev_ac_dec(ifp->idev, &addr);
->  }
->  
-> -static int addrconf_ifid_eui64(u8 *eui, struct net_device *dev)
-> +static int addrconf_ifid_6lowpan(u8 *eui, struct net_device *dev)
->  {
-> -	if (dev->addr_len != EUI64_ADDR_LEN)
-> +	switch (dev->addr_len) {
-> +	case ETH_ALEN:
-> +		return addrconf_ifid_eui48(eui, dev);
-> +	case EUI64_ADDR_LEN:
-> +		if (dev->addr_len != EUI64_ADDR_LEN)
-> +			return -1;
 
-this if branch should be removed.
+My example shows that we transmit some data on both nodes, that is
+important to check the l2cap_chan_send return type.
 
-The idea is here now to not check on "link layer type". Now we check on
-address length type and do some usually stuff which all others
-link-layers does which such address length. This works now for btle and
-802.15.4 but maybe there will exists another 8 byte or 6 byte address
-length link-layer where we cannot use the same stuff here.
+When I do that above and running into the deadlock the IPv6 connection
+runs "NS" messages only, because it still can send on L3 layer but the
+L2 layer is killed -> I get -EAGAIN in l2cap_chan_send always on both
+nodes because tx_credits are on both nodes zero and will not be
+incremented again.
 
-If that will be the case we can still figure out the link-layer type and
-do different handling.
+So far I know these tx_credits will be incremented only if somebody
+sends something again, right? This will never be the case again and I am
+stucked in a deadlock which should not be there.
 
-btw: this should also be switched then in iphc code, where we evaluate
-the link-layer type to do uncompress. We can switch to evaluate addr_len
-there as well.
+to your question:
 
-OR we introduce some callbacks which must be set from link-layer 6lowpan
-implementation for compress or decompress L3 addresses (which based on
-L2 address bits). I need to think about here what will be the best fit.
+"or you don't see -EAGAIN more than once"
 
-This callback can be used here also then.
+I see -EAGAIN always at calling l2cap_chan_send on both nodes. I think I
+can wait forever, after an year I still see "-EAGAIN" when calling
+l2cap_chan_send.
 
-> +		memcpy(eui, dev->dev_addr, EUI64_ADDR_LEN);
-> +		eui[0] ^= 2;
-> +		break;
-> +	default:
->  		return -1;
-> -	memcpy(eui, dev->dev_addr, EUI64_ADDR_LEN);
-> -	eui[0] ^= 2;
-> +	}
-> +
->  	return 0;
->  }
->  
-> @@ -2103,7 +2112,7 @@ static int ipv6_generate_eui64(u8 *eui, struct net_device *dev)
->  	case ARPHRD_IPGRE:
->  		return addrconf_ifid_gre(eui, dev);
->  	case ARPHRD_6LOWPAN:
-> -		return addrconf_ifid_eui64(eui, dev);
-> +		return addrconf_ifid_6lowpan(eui, dev);
->  	case ARPHRD_IEEE1394:
->  		return addrconf_ifid_ieee1394(eui, dev);
->  	case ARPHRD_TUNNEL6:
-> 
+Nevertheless, I will try to hit the deadlock (-EAGAIN) on both nodes so
+nobody transmits anything anymore. Then waiting six hours and look if
+still -EAGAIN is there on both nodes. I will report again here, after
+that time it should working again, but I don't believe that.
 
 - Alex
