@@ -1,26 +1,63 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain; charset=utf-8
+Return-Path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
-Subject: 5.40 Gatt BLE broke and fixed
-From: Travis Griggs <travisgriggs@gmail.com>
-In-Reply-To: <bug-130751-62941@https.bugzilla.kernel.org/>
-Date: Wed, 13 Jul 2016 11:55:45 -0700
-Message-Id: <7139D6D9-5288-40FB-9276-889F569652B5@gmail.com>
-References: <bug-130751-62941@https.bugzilla.kernel.org/>
-To: linux-bluetooth@vger.kernel.org
-Sender: linux-bluetooth-owner@vger.kernel.org
+Subject: Re: [PATCH] drivers: misc: ti-st: Use int instead of fuzzy char for callback status
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1465203723-16928-1-git-send-email-geert@linux-m68k.org>
+Date: Wed, 13 Jul 2016 14:12:36 +0100
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Mauro Carvalho Chehab <mchehab@osg.samsung.com>,
+	Lauro Ramos Venancio <lauro.venancio@openbossa.org>,
+	Aloisio Almeida Jr <aloisio.almeida@openbossa.org>,
+	Samuel Ortiz <sameo@linux.intel.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Pavan Savoy <pavan_savoy@ti.com>,
+	Arnd Bergmann <arnd@arndb.de>,
+	"open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+	linux-media@vger.kernel.org,
+	linux-wireless <linux-wireless@vger.kernel.org>,
+	linux-kernel@vger.kernel.org
+Message-Id: <CE4AC59B-9138-4415-99AD-8C359ACFB5C7@holtmann.org>
+References: <1465203723-16928-1-git-send-email-geert@linux-m68k.org>
+To: Geert Uytterhoeven <geert@linux-m68k.org>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This post is mostly informational, in case some other poor soul is scratching their head with what happened in 5.40.
+Hi Geert,
 
-I upgraded from 5.39 to 5.40 yesterday, and my embedded Linux boarding acting as a BLE Peripheral/GATT Server quit working.
+> On mips and parisc:
+> 
+>    drivers/bluetooth/btwilink.c: In function 'ti_st_open':
+>    drivers/bluetooth/btwilink.c:174:21: warning: overflow in implicit constant conversion [-Woverflow]
+>       hst->reg_status = -EINPROGRESS;
+> 
+>    drivers/nfc/nfcwilink.c: In function 'nfcwilink_open':
+>    drivers/nfc/nfcwilink.c:396:31: warning: overflow in implicit constant conversion [-Woverflow]
+>      drv->st_register_cb_status = -EINPROGRESS;
+> 
+> There are actually two issues:
+>  1. Whether "char" is signed or unsigned depends on the architecture.
+>     As the completion callback data is used to pass a (negative) error
+>     code, it should always be signed.
+>  2. EINPROGRESS is 150 on mips, 245 on parisc.
+>     Hence -EINPROGRESS doesn't fit in a signed 8-bit number.
+> 
+> Change the callback status from "char" to "int" to fix these.
+> 
+> Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
+> ---
+> Compile-tested only.
+> ---
+> drivers/bluetooth/btwilink.c              | 4 ++--
+> drivers/media/radio/wl128x/fmdrv_common.c | 2 +-
+> drivers/misc/ti-st/st_core.c              | 2 +-
+> drivers/nfc/nfcwilink.c                   | 4 ++--
+> include/linux/ti_wilink_st.h              | 2 +-
+> 5 files changed, 7 insertions(+), 7 deletions(-)
 
-After some digging around, I discovered that the interfaces for ReadValue() and WriteValue() have changed. An extra ‘options’ option has been added to the method arguments, and the method signatures need to change accordingly. Let the example provided in test/example-gatt-server be your guide. Bluez does not appear to be at that stage yet where a change like this has a big README/ANNOUNCEMENT somewhere that points out the particulars on a change like this.
+patch has been applied to bluetooth-next tree.
 
-Thank you so much to whoever writes and maintains the example python apps in the test directory. They’re a godsend for figuring things like this out. 
+Regards
 
-The other feature that is indispensable for things like this, is the -d option for the bluetooth daemon. I modify my /lib/systemd/system/bluetooth.service to read:
-
-ExecStart=/usr/lib/bluetooth/bluetoothd -d -E --noplugin=*
-
-With that -d option, watching the output of journalctl -flu bluetooth is really good at illuminating what’s not working. Thanks to those who put effort into the useful debug output.
+Marcel
