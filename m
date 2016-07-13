@@ -1,105 +1,150 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Kropf Johannes <Johannes.Kropf@ait.ac.at>
-To: "Kasper Markus (ETAS-PSC/ECE1)" <Markus.Kasper@escrypt.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: AW: bluez 5.40 - RegisterApplication as Client
-Date: Wed, 13 Jul 2016 10:45:06 +0000
-Message-ID: <E92610C73D6DE84EB154DC52F5ECCE541D744B32@S0MSMAIL111.arc.local>
-References: <E92610C73D6DE84EB154DC52F5ECCE541D743728@S0MSMAIL111.arc.local>,<cd0204e760b642a1bfb1f25586ed87be@FE-MBX1011.de.bosch.com>
- <E92610C73D6DE84EB154DC52F5ECCE541D743784@S0MSMAIL111.arc.local>
- <dfc116e86d434a64808bf7e5aafd37b0@FE-MBX1011.de.bosch.com>
-In-Reply-To: <dfc116e86d434a64808bf7e5aafd37b0@FE-MBX1011.de.bosch.com>
-Content-Type: text/plain; charset="us-ascii"
+Return-Path: <mchehab@osg.samsung.com>
+Date: Wed, 13 Jul 2016 07:41:14 -0300
+From: Mauro Carvalho Chehab <mchehab@osg.samsung.com>
+To: Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Gustavo Padovan
+ <gustavo@padovan.org>, Johan Hedberg <johan.hedberg@gmail.com>, Lauro Ramos
+ Venancio <lauro.venancio@openbossa.org>, Aloisio Almeida Jr
+ <aloisio.almeida@openbossa.org>, Samuel Ortiz <sameo@linux.intel.com>, Greg
+ Kroah-Hartman <gregkh@linuxfoundation.org>, Pavan Savoy
+ <pavan_savoy@ti.com>, Arnd Bergmann <arnd@arndb.de>,
+ linux-bluetooth@vger.kernel.org, linux-media@vger.kernel.org,
+ linux-wireless@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] drivers: misc: ti-st: Use int instead of fuzzy char for
+ callback status
+Message-ID: <20160713074114.76c35d04@recife.lan>
+In-Reply-To: <1465203723-16928-1-git-send-email-geert@linux-m68k.org>
+References: <1465203723-16928-1-git-send-email-geert@linux-m68k.org>
 MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Em Mon,  6 Jun 2016 11:02:03 +0200
+Geert Uytterhoeven <geert@linux-m68k.org> escreveu:
 
--- snip
- -- snap
+> On mips and parisc:
 > 
-> > >/org/bluez/hcix
-> > >Use org.bluez.Adapter1 for scanning, scan filters and to power up.
-> > >--> Interact with the adapter  --> adapter-api.txt Use
-> > >org.bluez.GattManager1 to autoconnect (RegisterProfile API... do not
-> > >use RegisterApplication here) --> >gatt-api.txt
-> >
-> > I have successfully used the RegisterProfile API with previous
-> > versions of bluetoothd, but in version 5.40 the RegisterProfile method
-> > does not exist anymore at the GattManager object, instead
-> > doc/gatt-api.txt says
-> >
-> > "void RegisterApplication(object application, dict options)
-> >
-> > 			Registers a local GATT services hierarchy as described
-> > 			above (GATT Server) and/or GATT profiles (GATT
-> Client).
-> >
-> > 			The application object path together with the D-Bus
-> > 			system bus connection ID define the identification of
-> > 			the application registering a GATT based
-> > 			service or profile."
-> > In this sense I have seen my application as a client and registered
-> > the application with a list of GATT profiles. Is this correct?
+>     drivers/bluetooth/btwilink.c: In function 'ti_st_open':
+>     drivers/bluetooth/btwilink.c:174:21: warning: overflow in implicit constant conversion [-Woverflow]
+>        hst->reg_status = -EINPROGRESS;
 > 
-> Ah OK, I'm sorry, I'm still used to 5.38 and thus missed the 5.40 change with
-> respect to the RegisterApplication part.
-> You understood correctly to use this one to replace the old RegisterProfile API. I
-> checked gatt-database.c and it seems to be implemented as expected:
-> The proxies to all org.bluez.GattProfile1 interfaces are added to the database.
-> Each profile is set to autoconnect. Devices with matching profiles are also set
-> to autoconnect.
+>     drivers/nfc/nfcwilink.c: In function 'nfcwilink_open':
+>     drivers/nfc/nfcwilink.c:396:31: warning: overflow in implicit constant conversion [-Woverflow]
+>       drv->st_register_cb_status = -EINPROGRESS;
 > 
-> We seem to have another problem here. Could you try to explain in more detail
-> what goes wrong?
-> 1. What do you expect to happen?
-> 2. What happens?
-
-1. I expect that when I register an Application as a client with GattProfile1 objects and lists of services that bluetoothd accepts connections only form devices providing this profiles/services.
-That makes sense since otherwise data are sent but not handled by an application and therefor the data get lost.
-
-2. What happens is that as soon as I register my Application with an arbitrary GattProfile1 all connections from paired devices are accepted. E.g.  I registered a Weight Scale service but also a connection from a blood pressure device gets accepted even no service is registerted and no application is existing which is able to handle this data.
- 
-Does that make it more clear
-
-
-
-> From what I understood registering profiles will make bluez auto-connect to
-> devices with registered profiles. Your question below indicates you're expecting
-> something else (talking about accepting/blocking data?)
+> There are actually two issues:
+>   1. Whether "char" is signed or unsigned depends on the architecture.
+>      As the completion callback data is used to pass a (negative) error
+>      code, it should always be signed.
+>   2. EINPROGRESS is 150 on mips, 245 on parisc.
+>      Hence -EINPROGRESS doesn't fit in a signed 8-bit number.
 > 
-> > Regards,
-> > Johannes
+> Change the callback status from "char" to "int" to fix these.
 > 
-> >
-> > > -----Original Message-----
-> > > From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
-> > > owner@vger.kernel.org] On Behalf Of Kropf Johannes
-> > > Sent: Friday, July 08, 2016 1:45 PM
-> > > To: linux-bluetooth@vger.kernel.org
-> > > Subject: bluez 5.40 - RegisterApplication as Client
-> > >
-> > > Hi,
-> > >
-> > > I have registered an application as a Gatt client using the
-> > > GattManager1 interface with an ObjectManager providing the profiles
-> > > as implementations of the
-> > > GattProfile1 interface.
-> > >
-> > > As soon as I register one profile, any other profile gets accepted
-> > > as well, e.g. I registered a blood pressure profile with the
-> > > supported services, but bluetoothd is also accepting data from a
-> > > weight scale device without having its service registered on the application
-> side.
-> > >
-> > > Is this a bug?
-> > >
-> > > Kind regards,
-> > > Johannes
-> > >
-> > > --
-> > > To unsubscribe from this list: send the line "unsubscribe
-> > > linux-bluetooth" in the body of a message to
-> > > majordomo@vger.kernel.org More majordomo info at
-> > > http://vger.kernel.org/majordomo-info.html
+> Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
+
+Patch looks sane to me, but who will apply it?
+
+Anyway:
+
+Acked-by: Mauro Carvalho Chehab <mchehab@s-opensource.com>
+
+
+> ---
+> Compile-tested only.
+> ---
+>  drivers/bluetooth/btwilink.c              | 4 ++--
+>  drivers/media/radio/wl128x/fmdrv_common.c | 2 +-
+>  drivers/misc/ti-st/st_core.c              | 2 +-
+>  drivers/nfc/nfcwilink.c                   | 4 ++--
+>  include/linux/ti_wilink_st.h              | 2 +-
+>  5 files changed, 7 insertions(+), 7 deletions(-)
+> 
+> diff --git a/drivers/bluetooth/btwilink.c b/drivers/bluetooth/btwilink.c
+> index 24a652f9252be899..485281b3f1677678 100644
+> --- a/drivers/bluetooth/btwilink.c
+> +++ b/drivers/bluetooth/btwilink.c
+> @@ -51,7 +51,7 @@
+>   */
+>  struct ti_st {
+>  	struct hci_dev *hdev;
+> -	char reg_status;
+> +	int reg_status;
+>  	long (*st_write) (struct sk_buff *);
+>  	struct completion wait_reg_completion;
+>  };
+> @@ -83,7 +83,7 @@ static inline void ti_st_tx_complete(struct ti_st *hst, int pkt_type)
+>   * status.ti_st_open() function will wait for signal from this
+>   * API when st_register() function returns ST_PENDING.
+>   */
+> -static void st_reg_completion_cb(void *priv_data, char data)
+> +static void st_reg_completion_cb(void *priv_data, int data)
+>  {
+>  	struct ti_st *lhst = priv_data;
+>  
+> diff --git a/drivers/media/radio/wl128x/fmdrv_common.c b/drivers/media/radio/wl128x/fmdrv_common.c
+> index 3f9e6df7d837ac27..642b89c66bcb99eb 100644
+> --- a/drivers/media/radio/wl128x/fmdrv_common.c
+> +++ b/drivers/media/radio/wl128x/fmdrv_common.c
+> @@ -1472,7 +1472,7 @@ static long fm_st_receive(void *arg, struct sk_buff *skb)
+>   * Called by ST layer to indicate protocol registration completion
+>   * status.
+>   */
+> -static void fm_st_reg_comp_cb(void *arg, char data)
+> +static void fm_st_reg_comp_cb(void *arg, int data)
+>  {
+>  	struct fmdev *fmdev;
+>  
+> diff --git a/drivers/misc/ti-st/st_core.c b/drivers/misc/ti-st/st_core.c
+> index dcdbd58672ccc6d2..00051590e00f9647 100644
+> --- a/drivers/misc/ti-st/st_core.c
+> +++ b/drivers/misc/ti-st/st_core.c
+> @@ -141,7 +141,7 @@ static void st_send_frame(unsigned char chnl_id, struct st_data_s *st_gdata)
+>   * This function is being called with spin lock held, protocol drivers are
+>   * only expected to complete their waits and do nothing more than that.
+>   */
+> -static void st_reg_complete(struct st_data_s *st_gdata, char err)
+> +static void st_reg_complete(struct st_data_s *st_gdata, int err)
+>  {
+>  	unsigned char i = 0;
+>  	pr_info(" %s ", __func__);
+> diff --git a/drivers/nfc/nfcwilink.c b/drivers/nfc/nfcwilink.c
+> index f81e500e765061fd..3fbd18b8e473f696 100644
+> --- a/drivers/nfc/nfcwilink.c
+> +++ b/drivers/nfc/nfcwilink.c
+> @@ -94,7 +94,7 @@ struct nfcwilink {
+>  	struct nci_dev			*ndev;
+>  	unsigned long			flags;
+>  
+> -	char				st_register_cb_status;
+> +	int				st_register_cb_status;
+>  	long				(*st_write) (struct sk_buff *);
+>  
+>  	struct completion		completed;
+> @@ -320,7 +320,7 @@ exit:
+>  }
+>  
+>  /* Called by ST when registration is complete */
+> -static void nfcwilink_register_complete(void *priv_data, char data)
+> +static void nfcwilink_register_complete(void *priv_data, int data)
+>  {
+>  	struct nfcwilink *drv = priv_data;
+>  
+> diff --git a/include/linux/ti_wilink_st.h b/include/linux/ti_wilink_st.h
+> index 0a0d56834c8eb412..f2293028ab9d65e6 100644
+> --- a/include/linux/ti_wilink_st.h
+> +++ b/include/linux/ti_wilink_st.h
+> @@ -71,7 +71,7 @@ struct st_proto_s {
+>  	enum proto_type type;
+>  	long (*recv) (void *, struct sk_buff *);
+>  	unsigned char (*match_packet) (const unsigned char *data);
+> -	void (*reg_complete_cb) (void *, char data);
+> +	void (*reg_complete_cb) (void *, int data);
+>  	long (*write) (struct sk_buff *skb);
+>  	void *priv_data;
+>  
+
+
+-- 
+Thanks,
+Mauro
