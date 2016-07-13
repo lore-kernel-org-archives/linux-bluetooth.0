@@ -1,30 +1,26 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Date: Wed, 13 Jul 2016 16:06:02 -0700 (PDT)
-Message-Id: <20160713.160602.1965210574276689269.davem@davemloft.net>
-To: johan.hedberg@gmail.com
-Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: pull request: bluetooth-next 2016-07-13
-From: David Miller <davem@davemloft.net>
-In-Reply-To: <20160713082540.GA3719@t440s.lan>
-References: <20160713082540.GA3719@t440s.lan>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
+Subject: 5.40 Gatt BLE broke and fixed
+From: Travis Griggs <travisgriggs@gmail.com>
+In-Reply-To: <bug-130751-62941@https.bugzilla.kernel.org/>
+Date: Wed, 13 Jul 2016 11:55:45 -0700
+Message-Id: <7139D6D9-5288-40FB-9276-889F569652B5@gmail.com>
+References: <bug-130751-62941@https.bugzilla.kernel.org/>
+To: linux-bluetooth@vger.kernel.org
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@gmail.com>
-Date: Wed, 13 Jul 2016 11:25:40 +0300
+This post is mostly informational, in case some other poor soul is scratching their head with what happened in 5.40.
 
-> Here's our main bluetooth-next pull request for the 4.8 kernel:
-> 
->  - Fixes and cleanups in 802.15.4 and 6LoWPAN code
->  - Fix out of bounds issue in btmrvl driver
->  - Fixes to Bluetooth socket recvmsg return values
->  - Use crypto_cipher_encrypt_one() instead of crypto_skcipher
->  - Cleanup of Bluetooth connection sysfs interface
->  - New Authentication failure reson code for Disconnected mgmt event
->  - New USB IDs for Atheros, Qualcomm and Intel Bluetooth controllers
-> 
-> Please let me know if there are any issues pulling. Thanks.
+I upgraded from 5.39 to 5.40 yesterday, and my embedded Linux boarding acting as a BLE Peripheral/GATT Server quit working.
 
-Pulled, thanks Johan.
+After some digging around, I discovered that the interfaces for ReadValue() and WriteValue() have changed. An extra ‘options’ option has been added to the method arguments, and the method signatures need to change accordingly. Let the example provided in test/example-gatt-server be your guide. Bluez does not appear to be at that stage yet where a change like this has a big README/ANNOUNCEMENT somewhere that points out the particulars on a change like this.
+
+Thank you so much to whoever writes and maintains the example python apps in the test directory. They’re a godsend for figuring things like this out. 
+
+The other feature that is indispensable for things like this, is the -d option for the bluetooth daemon. I modify my /lib/systemd/system/bluetooth.service to read:
+
+ExecStart=/usr/lib/bluetooth/bluetoothd -d -E --noplugin=*
+
+With that -d option, watching the output of journalctl -flu bluetooth is really good at illuminating what’s not working. Thanks to those who put effort into the useful debug output.
