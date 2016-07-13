@@ -1,35 +1,89 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Increment management interface revision
-Date: Wed, 13 Jul 2016 10:57:18 +0300
-Message-Id: <1468396638-2029-1-git-send-email-johan.hedberg@gmail.com>
+From: "Kasper Markus (ETAS-PSC/ECE1)" <Markus.Kasper@escrypt.com>
+To: Kropf Johannes <Johannes.Kropf@ait.ac.at>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: RE: bluez 5.40 - RegisterApplication as Client
+Date: Wed, 13 Jul 2016 07:17:50 +0000
+Message-ID: <dfc116e86d434a64808bf7e5aafd37b0@FE-MBX1011.de.bosch.com>
+References: <E92610C73D6DE84EB154DC52F5ECCE541D743728@S0MSMAIL111.arc.local>,<cd0204e760b642a1bfb1f25586ed87be@FE-MBX1011.de.bosch.com>
+ <E92610C73D6DE84EB154DC52F5ECCE541D743784@S0MSMAIL111.arc.local>
+In-Reply-To: <E92610C73D6DE84EB154DC52F5ECCE541D743784@S0MSMAIL111.arc.local>
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi Johannes,
 
-Increment the mgmt revision due to the recently added new
-reason code for the Disconnected event.
+> -----Original Message-----
+> From: Kropf Johannes [mailto:Johannes.Kropf@ait.ac.at]
+> 
+> Hi Markus,
+> 
+-- snip
+-- snap
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- net/bluetooth/mgmt.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> >/org/bluez/hcix
+> >Use org.bluez.Adapter1 for scanning, scan filters and to power up. -->
+> >Interact with the adapter  --> adapter-api.txt Use
+> >org.bluez.GattManager1 to autoconnect (RegisterProfile API... do not
+> >use RegisterApplication here) --> >gatt-api.txt
+> 
+> I have successfully used the RegisterProfile API with previous versions of
+> bluetoothd, but in version 5.40 the RegisterProfile method  does not exist anymore
+> at the GattManager object, instead doc/gatt-api.txt says
+> 
+> "void RegisterApplication(object application, dict options)
+> 
+> 			Registers a local GATT services hierarchy as described
+> 			above (GATT Server) and/or GATT profiles (GATT Client).
+> 
+> 			The application object path together with the D-Bus
+> 			system bus connection ID define the identification of
+> 			the application registering a GATT based
+> 			service or profile."
+> In this sense I have seen my application as a client and registered the application
+> with a list of GATT profiles. Is this correct?
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 7983ec8d4c60..7639290b6de3 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -38,7 +38,7 @@
- #include "mgmt_util.h"
- 
- #define MGMT_VERSION	1
--#define MGMT_REVISION	12
-+#define MGMT_REVISION	13
- 
- static const u16 mgmt_commands[] = {
- 	MGMT_OP_READ_INDEX_LIST,
--- 
-2.7.4
+Ah OK, I'm sorry, I'm still used to 5.38 and thus missed the 5.40 change with respect to the RegisterApplication part. 
+You understood correctly to use this one to replace the old RegisterProfile API. I checked gatt-database.c and it seems to be implemented as expected: 
+The proxies to all org.bluez.GattProfile1 interfaces are added to the database. Each profile is set to autoconnect. Devices with matching profiles are also set to autoconnect.
 
+We seem to have another problem here. Could you try to explain in more detail what goes wrong? 
+1. What do you expect to happen?
+2. What happens?
+
+>From what I understood registering profiles will make bluez auto-connect to devices with registered profiles. Your question below indicates you're expecting something else (talking about accepting/blocking data?)
+
+> Regards,
+> Johannes
+
+> 
+> > -----Original Message-----
+> > From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
+> > owner@vger.kernel.org] On Behalf Of Kropf Johannes
+> > Sent: Friday, July 08, 2016 1:45 PM
+> > To: linux-bluetooth@vger.kernel.org
+> > Subject: bluez 5.40 - RegisterApplication as Client
+> >
+> > Hi,
+> >
+> > I have registered an application as a Gatt client using the
+> > GattManager1 interface with an ObjectManager providing the profiles as
+> > implementations of the
+> > GattProfile1 interface.
+> >
+> > As soon as I register one profile, any other profile gets accepted as
+> > well, e.g. I registered a blood pressure profile with the supported
+> > services, but bluetoothd is also accepting data from a weight scale
+> > device without having its service registered on the application side.
+> >
+> > Is this a bug?
+> >
+> > Kind regards,
+> > Johannes
+> >
+> > --
+> > To unsubscribe from this list: send the line "unsubscribe
+> > linux-bluetooth" in the body of a message to majordomo@vger.kernel.org
+> > More majordomo info at http://vger.kernel.org/majordomo-info.html
