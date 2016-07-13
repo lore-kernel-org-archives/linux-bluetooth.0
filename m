@@ -1,30 +1,35 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
-Subject: Re: [PATCH] Bluetooth: Increment management interface revision
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1468396638-2029-1-git-send-email-johan.hedberg@gmail.com>
-Date: Wed, 13 Jul 2016 09:03:51 +0100
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <230C89DE-7CE9-4F54-B5A9-2C21195EBA96@holtmann.org>
-References: <1468396638-2029-1-git-send-email-johan.hedberg@gmail.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Increment management interface revision
+Date: Wed, 13 Jul 2016 10:57:18 +0300
+Message-Id: <1468396638-2029-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-> Increment the mgmt revision due to the recently added new
-> reason code for the Disconnected event.
-> 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> ---
-> net/bluetooth/mgmt.c | 2 +-
-> 1 file changed, 1 insertion(+), 1 deletion(-)
+Increment the mgmt revision due to the recently added new
+reason code for the Disconnected event.
 
-patch has been applied to bluetooth-next tree.
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ net/bluetooth/mgmt.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Regards
-
-Marcel
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 7983ec8d4c60..7639290b6de3 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -38,7 +38,7 @@
+ #include "mgmt_util.h"
+ 
+ #define MGMT_VERSION	1
+-#define MGMT_REVISION	12
++#define MGMT_REVISION	13
+ 
+ static const u16 mgmt_commands[] = {
+ 	MGMT_OP_READ_INDEX_LIST,
+-- 
+2.7.4
 
