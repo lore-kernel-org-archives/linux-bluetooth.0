@@ -1,107 +1,35 @@
-Return-Path: <guodong.xu@linaro.org>
-MIME-Version: 1.0
-In-Reply-To: <D2545F6D-7100-4B59-A19D-7CF878902BAA@holtmann.org>
-References: <1466657923-5776-1-git-send-email-guodong.xu@linaro.org> <D2545F6D-7100-4B59-A19D-7CF878902BAA@holtmann.org>
-From: Guodong Xu <guodong.xu@linaro.org>
-Date: Thu, 14 Jul 2016 17:30:56 +0800
-Message-ID: <CAFGCpxwuOH83hdPc-c0DV5A_cKMp-0rjxg+3tMwOPTukHGd6vA@mail.gmail.com>
-Subject: Re: [PATCH 1/2] Bluetooth: Add LED triggers for HCI frames tx and rx
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: "Gustavo F. Padovan" <gustavo@padovan.org>, Johan Hedberg <johan.hedberg@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>, Xu Wei <xuwei5@hisilicon.com>,
-	Rob Herring <robh+dt@kernel.org>, Pawel Moll <pawel.moll@arm.com>,
-	Mark Rutland <mark.rutland@arm.com>, Ian Campbell <ijc+devicetree@hellion.org.uk>,
-	Kumar Gala <galak@codeaurora.org>, Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will.deacon@arm.com>, Haojian Zhuang <haojian.zhuang@linaro.org>,
-	Linus Walleij <linus.walleij@linaro.org>, Tony Lindgren <tony@atomide.com>,
-	"open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-	Network Development <netdev@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>,
-	devicetree@vger.kernel.org,
-	linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
-Content-Type: text/plain; charset=UTF-8
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Content-Type: text/plain; charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
+Subject: Re: [PATCH] Bluetooth: Fix l2cap_sock_setsockopt() with optname BT_RCVMTU
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1468486223-10140-1-git-send-email-amadeusz.slawinski@tieto.com>
+Date: Thu, 14 Jul 2016 10:07:39 +0100
+Cc: "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+	open list <linux-kernel@vger.kernel.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	"Gustavo F. Padovan" <gustavo@padovan.org>
+Message-Id: <D20D6768-AF6A-46F8-8F4F-786A908F4521@holtmann.org>
+References: <1468486223-10140-1-git-send-email-amadeusz.slawinski@tieto.com>
+To: =?utf-8?Q?Amadeusz_S=C5=82awi=C5=84ski?=
+	<amadeusz.slawinski@tieto.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 13 July 2016 at 16:07, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Guodong,
->
->> Two LED triggers are defined: tx_led and rx_led. Upon frames
->> available in HCI core layer, for tx or for rx, the combined LED
->> can blink.
->>
->> Verified on HiKey, 96boards. It uses hi6220 SoC and TI WL1835 combo
->> chip.
->>
->> Signed-off-by: Guodong Xu <guodong.xu@linaro.org>
->> ---
->> include/net/bluetooth/hci_core.h |  1 +
->> net/bluetooth/hci_core.c         |  3 +++
->> net/bluetooth/leds.c             | 15 +++++++++++++++
->> net/bluetooth/leds.h             |  2 ++
->> 4 files changed, 21 insertions(+)
->>
->> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
->> index dc71473..37b8dd9 100644
->> --- a/include/net/bluetooth/hci_core.h
->> +++ b/include/net/bluetooth/hci_core.h
->> @@ -398,6 +398,7 @@ struct hci_dev {
->>       bdaddr_t                rpa;
->>
->>       struct led_trigger      *power_led;
->> +     struct led_trigger      *tx_led, *rx_led;
->>
->>       int (*open)(struct hci_dev *hdev);
->>       int (*close)(struct hci_dev *hdev);
->> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
->> index 45a9fc6..c6e1210 100644
->> --- a/net/bluetooth/hci_core.c
->> +++ b/net/bluetooth/hci_core.c
->> @@ -3248,6 +3248,7 @@ int hci_recv_frame(struct hci_dev *hdev, struct sk_buff *skb)
->>       skb_queue_tail(&hdev->rx_q, skb);
->>       queue_work(hdev->workqueue, &hdev->rx_work);
->>
->> +     hci_leds_blink_oneshot(hdev->rx_led);
->>       return 0;
->> }
->> EXPORT_SYMBOL(hci_recv_frame);
->> @@ -3325,6 +3326,8 @@ static void hci_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
->>               BT_ERR("%s sending frame failed (%d)", hdev->name, err);
->>               kfree_skb(skb);
->>       }
->> +
->> +     hci_leds_blink_oneshot(hdev->tx_led);
->> }
->
-> so I am not convinced that this is the right way of doing TX/RX activity leds. This would have them purely based on HCI traffic and this would include control frames.
->
+Hi Amadeusz,
 
-Hi, Marcel
+> When we retrieve imtu value from userspace we should use 16 bit pointer
+> cast instead of 32 as it's defined that way in headers. Fixes setsockopt
+> calls on big-endian platforms.
+> 
+> Signed-off-by: Amadeusz Sławiński <amadeusz.slawinski@tieto.com>
+> ---
+> net/bluetooth/l2cap_sock.c | 2 +-
+> 1 file changed, 1 insertion(+), 1 deletion(-)
 
-+       if (hci_skb_pkt_type(skb) == HCI_ACLDATA_PKT ||
-+           hci_skb_pkt_type(skb) == HCI_SCODATA_PKT)
-+               hci_leds_blink_oneshot(hdev->rx_led);
-+
+patch has been applied to bluetooth-next tree.
 
-By adding pkt_type checks, we can limit LED blinks only at ACL/SCO
-DATA_PKT. Similar checks can be added for tx_led too.
+Regards
 
-Does this look good to you? If you agree, I can send v2 to include this change.
+Marcel
 
-> I think that we want activity leds for actual radio activity. Meaning that when we have an active connection and ACL packets are exchanged or when we are scanning.
->
-
-Radio is controlled in Bluetooth module side, not Host. So I'm afraid
-actual radio activity cannot be captured in its exact form in Host
-side. The purpose of this patch is not for radio, it is for
-incoming/outgoing data. For example, it can give user a blinking
-indicator on RX frames after a Bluetooth mouse is connected. Another
-example, it can blink at bluetooth streamed audio (TX).
-
-Would that make sense?
-
--Guodong
-
->
-> Regards
->
-> Marcel
->
