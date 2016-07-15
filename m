@@ -1,11 +1,12 @@
 Return-Path: <marvell@marvell.com>
 From: Amitkumar Karwar <akarwar@marvell.com>
 To: <linux-bluetooth@vger.kernel.org>
-CC: <linux-kernel@vger.kernel.org>, <marcel@holtmann.org>,
-        <Minghsiu.Tsai@mediatek.com>, Amitkumar Karwar <akarwar@marvell.com>
+CC: <marcel@holtmann.org>, <Minghsiu.Tsai@mediatek.com>,
+        Amitkumar Karwar
+	<akarwar@marvell.com>
 Subject: [PATCH] Bluetooth: btmrvl: reset is_suspending flag in failure path
-Date: Fri, 15 Jul 2016 16:20:52 +0530
-Message-ID: <1468579852-7118-1-git-send-email-akarwar@marvell.com>
+Date: Fri, 15 Jul 2016 16:18:03 +0530
+Message-ID: <1468579683-7061-1-git-send-email-akarwar@marvell.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 List-ID: <linux-bluetooth.vger.kernel.org>
