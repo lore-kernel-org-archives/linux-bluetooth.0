@@ -1,242 +1,129 @@
-Return-Path: <jaya.p.g@intel.com>
-From: "G, Jaya P" <jaya.p.g@intel.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>, "An,
- Tedd" <tedd.an@intel.com>
-Subject: RE: Please review and upstream to bluetooth-next
-Date: Fri, 15 Jul 2016 07:30:17 +0000
-Message-ID: <DAC39EC0A5DE12469D14E5A0B14E6CF5054737BC@BGSMSX108.gar.corp.intel.com>
-References: <DAC39EC0A5DE12469D14E5A0B14E6CF505470BE4@BGSMSX108.gar.corp.intel.com>
- <DAC39EC0A5DE12469D14E5A0B14E6CF505473770@BGSMSX108.gar.corp.intel.com>
- <0331C8DC-83C0-4737-A063-5BE7B01845CB@holtmann.org>
-In-Reply-To: <0331C8DC-83C0-4737-A063-5BE7B01845CB@holtmann.org>
-Content-Type: multipart/mixed;
-	boundary="_002_DAC39EC0A5DE12469D14E5A0B14E6CF5054737BCBGSMSX108garcor_"
-MIME-Version: 1.0
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Content-Type: text/plain; charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
+Subject: Re: Please review and upstream to bluetooth-next
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <DAC39EC0A5DE12469D14E5A0B14E6CF505473770@BGSMSX108.gar.corp.intel.com>
+Date: Fri, 15 Jul 2016 07:48:05 +0100
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	"An, Tedd" <tedd.an@intel.com>
+Message-Id: <0331C8DC-83C0-4737-A063-5BE7B01845CB@holtmann.org>
+References: <DAC39EC0A5DE12469D14E5A0B14E6CF505470BE4@BGSMSX108.gar.corp.intel.com> <DAC39EC0A5DE12469D14E5A0B14E6CF505473770@BGSMSX108.gar.corp.intel.com>
+To: "G, Jaya P" <jaya.p.g@intel.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---_002_DAC39EC0A5DE12469D14E5A0B14E6CF5054737BCBGSMSX108garcor_
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Hi Jaya,
 
-SGkgTWFyY2VsLA0KDQpJIGFtIHNlbmRpbmcgdGhlIGZpcnN0IHBhdGNoIHRvIEJsdWV0b290aC1u
-ZXh0Lg0KUmVnYXJkaW5nIHRoZSBjb2RpbmcgZ3VpZGVsaW5lcywgQXR0YWNoZWQgYSBuZXcgcGF0
-Y2hzZXQgd2l0aCB0aGUgY29kaW5nIGd1aWRlbGluZXMsIGV4Y2VwdCBmb3IgcmVtb3ZpbmcgdGhl
-IGtvYmplY3QgY2hhbmdlcy4NCg0KQW5kIHJlZ2FyZGluZyB0aGlzIHJlcXVpcmVtZW50LCB0aGlz
-IGNhbWUgZm9yIGdvb2dsZSBjaHJvbWUgIHRvIGNoZWNrIHRoZSANCkRpZmZlcmVudCBTS1UncyB2
-ZXJzaW9uIG9uIHRoZSBnbyByYXRoZXIgdGhhbiBpc3N1aW5nIHJlYWQgdmVyc2lvbiBjb21tYW5k
-IGZvciB0aGUgY29udHJvbGxlci4NCkFuZCBzbywgdGhlIGRlc2lnbiBwcm9wb3NlZCB0aGF0IHdl
-IGV4cG9zZSBhIGtvYmplY3QgZmlsZSBmb3IgdGhpcyBmcm9tIGJ0dXNiCS4gDQpBbmQgZm9yIHlv
-dXIgdW5kZXJzdGFuZGluZywgdGhlIEludGVsIEZXIGZpbGUgcHVzaGVkIGZvciB0aGUgY29udHJv
-bGxlciB3aWxsIGhhdmUgdGhlc2UgMyBjb21wb25lbnRzIA0KSFcgVmFyaWFudCA6IDB4MDAwMDAw
-DQpGVyBWYXJpYW50OiAweDAwMDAwMDAwMDANClBhdGNoIG51bWJlcjogMHgwMA0KV2hpY2ggaXMg
-bm90IHRoZSBzYW1lIGZvciBhbGwgdGhlIHZlbmRvcnMsIHRoaXMgaW5mb3JtYXRpb24gcmVxdWly
-ZWQgdG8gY2hlY2sgd2hpY2ggY29udHJvbGxlciBpcyANCkluc2VydGVkIGluIG91ciBsaW51eCBw
-Yywgc28gYW4gYWRkaXRpb25hbCBpbmZvcm1hdGlvbiBhbG9uZyBWSUQsIFBJRCBpbmZvcm1hdGlv
-biB3aGljaCBpcyBzYW1lIGRpZmZlcmVudCBJbnRlbCBDb250cm9sbGVycy4NClRoaXMgaXMgcmVx
-dWlyZWQgYmVjYXVzZSwgSW50ZWwgU0tVJ3MgaGF2ZSBzYW1lIFZJRCxQSUQgZm9yIGRpZmZlcmVu
-dCBjaGlwcyBpLmUgZm9yIFhYIEIwLCBYWCBCMSB3aWxsIGhhdmUgdGhlIHNhbWUgVklELCBQSUQu
-DQoNCkFuZCB0aGUgTGludXggUEMgb3IgdGhlIE9FTSB0aGF0IHdlIGFyZSBzdXBwb3J0aW5nIGNh
-biBoYXZlIG9ubHkgb25lIEJsdWV0b290aCBjb250cm9sbGVyLCBzbyB0aGUNCklzc3VlIHRoYXQg
-eW91IG1lbnRpb24gbmV2ZXIgaGFwcGVucy4NCg0KUmVnYXJkcywNCkpheWEgUHJhdmVlbiBHDQot
-LS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KRnJvbTogTWFyY2VsIEhvbHRtYW5uIFttYWlsdG86
-bWFyY2VsQGhvbHRtYW5uLm9yZ10gDQpTZW50OiBGcmlkYXksIEp1bHkgMTUsIDIwMTYgMTI6MTgg
-UE0NClRvOiBHLCBKYXlhIFAgPGpheWEucC5nQGludGVsLmNvbT4NCkNjOiBsaW51eC1ibHVldG9v
-dGhAdmdlci5rZXJuZWwub3JnOyBBbiwgVGVkZCA8dGVkZC5hbkBpbnRlbC5jb20+DQpTdWJqZWN0
-OiBSZTogUGxlYXNlIHJldmlldyBhbmQgdXBzdHJlYW0gdG8gYmx1ZXRvb3RoLW5leHQNCg0KSGkg
-SmF5YSwNCg0KcGxlYXNlIGRvIG5vdCBwb3N0IEhUTUwgZW1haWxzIHRvIHRoaXMgbWFpbGluZyBs
-aXN0LiBUaGUgbWFpbGluZyBsaXN0IHN5c3RlbSB3aWxsIG1vc3QgbGlrZWx5IHJlamVjdCB0aGVt
-IGFueXdheS4NCg0KPiBQYXRjaCBpcyBmb3IgY3JlYXRpbmcgYSBrb2JqZWN0IGZpbGUgZnJvbSBi
-dHVzYiB3aGljaCBjcmVhdGVzIGEgZmlsZSANCj4gdW5kZXIga29iamVjdCBXaGljaCBleHBvc2Vz
-IEhXIFZhcmlhbnQsIEZXIFZhcmlhbnQgYW5kIFBhdGNoIG51bWJlciANCj4gZm9yIEludGVsIHNw
-ZWNpZmljIFNLVeKAmXMgV2hpY2ggaXMgcmVxdWlyZWQgdG8gZGlmZmVyZW50aWF0ZSBkaWZmZXJl
-bnQgY2hpcHMgZnJvbSBpbnRlbCBtYW51ZmFjdHVyZXIuDQo+ICANCj4gUGxlYXNlIHJldmlldyBh
-bmQgdXBzdHJlYW0gdGhlIFBhdGNoIHRvIGJsdWV0b290aC1uZXh0Lg0KDQpQbGVhc2Ugc2VuZCBw
-YXRjaGVzIGFjY29yZGluZyB0byB0aGUgc3VibWl0dGluZyBwYXRjaGVzIGd1aWRlbGluZXMuIEkg
-Y2FuIG5vdCBhcHBseSBwYXRjaGVzIHJhbmRvbWx5IGluc2VydGVkIGludG8gZW1haWwgYm9kaWVz
-Lg0KDQo+IEZyb20gMDFlOTA0MTQ4ZjRkZTZkOGQ0OGQ2MWIwMWIwOGRhN2E3NzFmZTk5OCBNb24g
-U2VwIDE3IDAwOjAwOjAwIDIwMDENCj4gRnJvbTogSmF5YSBQcmF2ZWVuIEcgPGpheWEucC5nQGlu
-dGVsLmNvbT4NCj4gRGF0ZTogRnJpLCAxNSBKdWwgMjAxNiAxNzoyNTozMSArMDUzMA0KPiBTdWJq
-ZWN0OiBbUEFUQ0hdIGJ0dXNiOiBFeHBvcnQgdGhlIEludGVsIEhXL0ZXL1BhdGNoIHZhcmlhbnRz
-IHRvIA0KPiAvc3lzZnMNCj4gIA0KPiBJbnRlbCB3aWxsIGhhdmUgZGlmZmVyZW50IFNLVSBhbmQg
-dmVyc2lvbiB3aXRoIHRoZSBzYW1lIFZJRC9QSUQuIA0KPiBEaWZmZXJlbnQgU0tVIHVzZSBkaWZm
-ZXJlbnQgQlQgdmVyc2lvbiB0aGlzIG1lYW5zIGRpZmZlcmVudCBIVyBhbmQgRlcuIA0KPiBUbyBj
-aGVjayB0aGlzLCB3ZSBoYXZlIHJlYWQgdmVyc2lvbiBmb3IgdGhlIGludGVsIFNLVSB3aGljaCBp
-cyB1bmlxdWUsIA0KPiB0aGUgc2FtZSBkYXRhIGlzIHB1dCBpbiBhIGZpbGUgY3JlYXRlIHdpdGgg
-a29iamVjdCBpbiANCj4gL3N5cy9rZXJuZWwvaW50ZWxfaHdfdmVyc2lvbl9rb2JqZWN0Lw0KPiB3
-aXRoIHRoZSBuYW1lIC9pbnRlbF9od192ZXJzaW9uIHdoZXJlIGl0IHNob3dzIHRoZSBIVyB2YXJp
-YW50LCBGVyANCj4gdmFyaWFudCBhbmQgUGF0Y2ggbnVtYmVyIHdoaWNoIHdpbGwgZGlmZmVyZW50
-IGZvciBlYWNoIFNLVS4NCg0KSSBhbSBmYWlsaW5nIHRvIHVuZGVyc3RhbmQgd2hhdCB0aGVzZSBp
-bmZvcm1hdGlvbnMgYXJlIHVzZWQgZm9yLiBUaGUgYmx1ZW1vb24gdXRpbGl0eSBjYW4gcmVhZCBv
-dXQgdGhlc2UgaW5mb3JtYXRpb24gZWFzaWx5IGFscmVhZHkuDQoNCkl0IGlzIGFsc28gc29tZXRo
-aW5nIHRoYXQgbm8gb3RoZXIgZHJpdmVyIGlzIGRvaW5nLiBXaHkgd291bGQgSW50ZWwgbmVlZCBz
-dWNoIGEgdGhpbmcgaW4gdGhlIGZpcnN0IHBsYWNlLiBBbHNvIGV4cG9zaW5nIHJhbmRvbSBrb2Jq
-ZWN0cyBmcm9tIGEgZHJpdmVyIGlzIHRoZSB3cm9uZyBhcHByb2FjaCB0byB0aGlzLiBJIG1lYW4g
-bm8gQmx1ZXRvb3RoIGRyaXZlciBpcyBleHBvc2luZyB0aGluZ3MgaW4gc3lzZnMuDQoNCj4gIA0K
-PiBTaWduZWQtb2ZmLWJ5OiBKYXlhIFByYXZlZW4gRyA8amF5YS5wLmdAaW50ZWwuY29tPg0KPiAt
-LS0NCj4gZHJpdmVycy9ibHVldG9vdGgvYnR1c2IuYyB8IDU3IA0KPiArKysrKysrKysrKysrKysr
-KysrKysrKysrKysrKysrKysrKysrKysrKysrKystLQ0KPiAxIGZpbGUgY2hhbmdlZCwgNTUgaW5z
-ZXJ0aW9ucygrKSwgMiBkZWxldGlvbnMoLSkNCj4gIA0KPiBkaWZmIC0tZ2l0IGEvZHJpdmVycy9i
-bHVldG9vdGgvYnR1c2IuYyBiL2RyaXZlcnMvYmx1ZXRvb3RoL2J0dXNiLmMgDQo+IGluZGV4IDgx
-MWY5YjkuLjcyMGYxNGYgMTAwNjQ0DQo+IC0tLSBhL2RyaXZlcnMvYmx1ZXRvb3RoL2J0dXNiLmMN
-Cj4gKysrIGIvZHJpdmVycy9ibHVldG9vdGgvYnR1c2IuYw0KPiBAQCAtMjQsNiArMjQsMTAgQEAN
-Cj4gI2luY2x1ZGUgPGxpbnV4L21vZHVsZS5oPg0KPiAjaW5jbHVkZSA8bGludXgvdXNiLmg+DQo+
-ICNpbmNsdWRlIDxsaW51eC9maXJtd2FyZS5oPg0KPiArI2luY2x1ZGUgPGxpbnV4L2tvYmplY3Qu
-aD4NCj4gKyNpbmNsdWRlIDxsaW51eC9zeXNmcy5oPg0KPiArI2luY2x1ZGUgPGxpbnV4L2ZzLmg+
-DQo+ICsjaW5jbHVkZSA8bGludXgvc3RyaW5nLmg+DQo+ICNpbmNsdWRlIDxhc20vdW5hbGlnbmVk
-Lmg+DQo+ICAjaW5jbHVkZSA8bmV0L2JsdWV0b290aC9ibHVldG9vdGguaD4NCj4gQEAgLTQyLDYg
-KzQ2LDMwIEBAIHN0YXRpYyBib29sIHJlc2V0ID0gdHJ1ZTsgIHN0YXRpYyBzdHJ1Y3QgdXNiX2Ry
-aXZlciANCj4gYnR1c2JfZHJpdmVyOw0KPiArc3RhdGljIHN0cnVjdCBrb2JqZWN0ICppbnRlbF9o
-d192ZXJzaW9uX2tvYmplY3Q7IHN0cnVjdCBpbnRlbF92ZXJzaW9uIA0KPiArdmVyOw0KPiArDQo+
-ICsvKg0KPiArICogVGhpcyBmaWxlIHdoaWNoIGlzIHVuZGVyIC9zeXMva2VybmVsL2ludGVsX2h3
-X3ZlcnNpb25fa29iamVjdCANCj4gK2tvYmplY3Qgd2hpY2ggaGFzIHRoZSBmaWxlIG5hbWUgYXMg
-aW50ZWxfaHdfdmVyc2lvbg0KPiArICogY29udGFpbnMgdGhlIGludGVsIEZXIHZlcnNpb24gaW4g
-dGVybXMgb2YgSFcgdmFyaWFudCwgRlcgdmFyaWFudCANCj4gK2FuZCBQYXRjaCBudW1iZXIgd2hp
-Y2ggYXJlIGRpZmZlcmVudCBmb3INCj4gKyAqIGRpZmZlcmVudCBTS1Uncy4NCj4gKyAqLw0KPiAr
-c3RhdGljIHNzaXplX3QgaW50ZWxfaHdfc2hvd3JldihzdHJ1Y3Qga29iamVjdCAqaywgc3RydWN0
-IGF0dHJpYnV0ZSANCj4gKyphLCBjaGFyICpidWYpIHsNCj4gKyAgICAgICAgcmV0dXJuIHNwcmlu
-dGYoYnVmLCAiSFdfVmFyaWFudDogMHglMDJ4JTAyeCUwMnhcbkZXX3ZhcmlhbnQ6IDB4JTAyeCUw
-MnglMDJ4JTAyeCUwMnhcblBhdGNoIE51bTogMHglMDJ4XG4iLHZlci5od19wbGF0Zm9ybSwgdmVy
-Lmh3X3ZhcmlhbnQsIHZlci5od19yZXZpc2lvbiwNCj4gKyAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICB2ZXIuZndfdmFyaWFudCwgIHZlci5md19yZXZpc2lvbiwgdmVyLmZ3X2J1aWxkX251bSwN
-Cj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICB2ZXIuZndfYnVpbGRfd3csIHZlci5md19i
-dWlsZF95eSwgDQo+ICt2ZXIuZndfcGF0Y2hfbnVtKTsgfQ0KDQpXZSBoYXZlIGEgbGluZSBzaXpl
-IGxpbWl0IG9mIDc4IGNoYXJhY3RlcnMgdGhhdCBzaG91bGQgYmUgY29uc2lkZXJlZCB3aGVuZXZl
-ciBwb3NzaWJsZSB0byBicmVhayB0aGluZ3MgaW50byBtdWx0aXBsZSBsaW5lcy4gT25seSBhIGZl
-dyBleGNlcHRpb25zIGFyZSBicmVha2luZyB0aGlzIGNvZGluZyBzdHlsZSBydWxlcy4NCg0KPiAr
-DQo+ICsvKiBTeXNmcyBhdHRyaWJ1dGVzIG1hZGUgYXMgdXNlciByZWFkYWJsZSBhbmQgd3JpdGFi
-bGUqLyBzdGF0aWMgY29uc3QgDQo+ICtzdHJ1Y3Qgew0KPiArICAgICAgICAgICAgIHN0cnVjdCBh
-dHRyaWJ1dGUgYXR0cjsNCj4gKyAgICAgICAgICAgICBzc2l6ZV90ICgqc2hvdykoc3RydWN0IGtv
-YmplY3QgKmssIHN0cnVjdCBhdHRyaWJ1dGUgKmEsIA0KPiArY2hhciAqYnVmKTsgfSBpbnRlbF9o
-d192ZXJzaW9uX2F0dHIgPSB7DQo+ICsgICAgICAgICAgICAgLmF0dHIgPSB7IC5uYW1lID0gImlu
-dGVsX2h3X3ZlcnNpb24iLCAubW9kZSA9IFNfSVdVU1IgfCBTX0lSVVNSfSwNCj4gKyAgICAgICAg
-ICAgICAuc2hvdyA9IGludGVsX2h3X3Nob3dyZXYsIH07DQo+ICsNCj4gI2RlZmluZSBCVFVTQl9J
-R05PUkUgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAweDAxDQo+ICNkZWZpbmUgQlRVU0Jf
-RElHSUFOU1dFUiAgICAgIDB4MDINCj4gI2RlZmluZSBCVFVTQl9DU1IgICAgICAgICAgICAgICAg
-ICAgICAgIDB4MDQNCj4gQEAgLTE2NTUsNyArMTY4Myw3IEBAIHN0YXRpYyBpbnQgYnR1c2Jfc2V0
-dXBfaW50ZWwoc3RydWN0IGhjaV9kZXYgKmhkZXYpDQo+ICAgICAgICAgICAgICAgY29uc3Qgc3Ry
-dWN0IGZpcm13YXJlICpmdzsNCj4gICAgICAgICAgICAgICBjb25zdCB1OCAqZndfcHRyOw0KPiAg
-ICAgICAgICAgICAgIGludCBkaXNhYmxlX3BhdGNoLCBlcnI7DQo+IC0gICAgICAgICAgICAgIHN0
-cnVjdCBpbnRlbF92ZXJzaW9uIHZlcjsNCj4gKyAgICAgICAgaW50IGVycm9yID0gMDsNCj4gICAg
-ICAgICAgICAgICAgQlRfREJHKCIlcyIsIGhkZXYtPm5hbWUpOyBAQCAtMTY5MCw2ICsxNzE4LDE5
-IEBAIHN0YXRpYyANCj4gaW50IGJ0dXNiX3NldHVwX2ludGVsKHN0cnVjdCBoY2lfZGV2ICpoZGV2
-KQ0KPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHZlci5md192YXJpYW50LCAgdmVyLmZ3
-X3JldmlzaW9uLCB2ZXIuZndfYnVpbGRfbnVtLA0KPiAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgIHZlci5md19idWlsZF93dywgdmVyLmZ3X2J1aWxkX3l5LCANCj4gdmVyLmZ3X3BhdGNoX251
-bSk7DQo+ICsgICAgICAgIC8qIENyZWF0ZSBhIGtvYmplY3Qgd2l0aCB0aGUgbmFtZSAiaW50ZWxf
-aHdfdmVyc2lvbl9rb2JqZWN0IiwgbG9jYXRlZA0KPiArICAgICAgICAgKiB1bmRlciAvc3lzL2tl
-cm5lbC8uDQo+ICsgICAgICAgICAqLw0KPiArICAgICAgICBpbnRlbF9od192ZXJzaW9uX2tvYmpl
-Y3QgPSANCj4gKyBrb2JqZWN0X2NyZWF0ZV9hbmRfYWRkKCJpbnRlbF9od192ZXJzaW9uX2tvYmpl
-Y3QiLCBrZXJuZWxfa29iaik7DQoNClRoaXMgaXMgYnJva2VuIGJ5IGRlc2lnbi4gTGludXggc3Vw
-cG9ydHMgbXVsdGlwbGUgY29udHJvbGxlcnMuIFNvIHdoYXQgaGFwcGVucyBpZiB5b3UgYXR0YWNo
-IGEgc2Vjb25kIEludGVsIGNvbnRyb2xsZXIgdG8gdGhlIHNhbWUgc3lzdGVtLg0KDQo+ICsgICAg
-ICAgIGlmKCFpbnRlbF9od192ZXJzaW9uX2tvYmplY3QpDQo+ICsgICAgICAgICAgICAgICAgICBy
-ZXR1cm4gLUVOT01FTTsNCj4gKw0KPiArICAgICAgICAvKiBDcmVhdGUgYSBmaWxlIGFzc29jaWF0
-ZWQgd2l0aCB0aGUga29iamVjdCAqLw0KPiArICAgICAgICBlcnJvciA9IHN5c2ZzX2NyZWF0ZV9m
-aWxlKGludGVsX2h3X3ZlcnNpb25fa29iamVjdCwgJmludGVsX2h3X3ZlcnNpb25fYXR0ci5hdHRy
-KTsNCj4gKyAgICAgICAgaWYoZXJyb3IpIHsNCj4gKyAgICAgICAgICAgICAgQlRfREJHKCJmYWls
-ZWQgdG8gY3JlYXRlIHRoZSB2ZXJzaW9uIGZpbGUgaW4gL3N5cy9rZXJuZWwvaW50ZWxfaHdfdmVy
-c2lvbl9rb2JqZWN0IFxuIik7DQo+ICsgICAgICAgIH0NCj4gKw0KDQpUaGUgd2hvbGUgc2VjdGlv
-biBpcyB3cm9uZ2x5IGludGVuZGVkIGFuZCBpcyBub3QgZm9sbG93aW5nIHRoZSBuZXR3b3JrIHN1
-YnN5c3RlbSBjb2Rpbmcgc3R5bGUuDQoNClJlZ2FyZHMNCg0KTWFyY2VsDQoNCg==
+please do not post HTML emails to this mailing list. The mailing list system will most likely reject them anyway.
 
---_002_DAC39EC0A5DE12469D14E5A0B14E6CF5054737BCBGSMSX108garcor_
-Content-Type: application/octet-stream;
-	name="0001-btusb-Export-the-Intel-HW-FW-Patch-variants-to-sysfs.patch"
-Content-Description: 0001-btusb-Export-the-Intel-HW-FW-Patch-variants-to-sysfs.patch
-Content-Disposition: attachment;
-	filename="0001-btusb-Export-the-Intel-HW-FW-Patch-variants-to-sysfs.patch";
-	size=4993; creation-date="Fri, 15 Jul 2016 06:27:39 GMT";
-	modification-date="Fri, 15 Jul 2016 07:27:59 GMT"
-Content-Transfer-Encoding: base64
+> Patch is for creating a kobject file from btusb which creates a file under kobject
+> Which exposes HW Variant, FW Variant and Patch number for Intel specific SKU’s
+> Which is required to differentiate different chips from intel manufacturer.
+>  
+> Please review and upstream the Patch to bluetooth-next.
 
-RnJvbSAwMWU5MDQxNDhmNGRlNmQ4ZDQ4ZDYxYjAxYjA4ZGE3YTc3MWZlOTk4IE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBKYXlhIFByYXZlZW4gRyA8amF5YS5wLmdAaW50ZWwuY29tPgpE
-YXRlOiBGcmksIDE1IEp1bCAyMDE2IDE3OjI1OjMxICswNTMwClN1YmplY3Q6IFtQQVRDSF0gYnR1
-c2I6IEV4cG9ydCB0aGUgSW50ZWwgSFcvRlcvUGF0Y2ggdmFyaWFudHMgdG8gL3N5c2ZzCgpJbnRl
-bCB3aWxsIGhhdmUgZGlmZmVyZW50IFNLVSBhbmQgdmVyc2lvbiB3aXRoIHRoZSBzYW1lClZJRC9Q
-SUQuIERpZmZlcmVudCBTS1UgdXNlIGRpZmZlcmVudCBCVCB2ZXJzaW9uIHRoaXMgbWVhbnMKZGlm
-ZmVyZW50IEhXIGFuZCBGVy4gVG8gY2hlY2sgdGhpcywgd2UgaGF2ZSByZWFkIHZlcnNpb24KZm9y
-IHRoZSBpbnRlbCBTS1Ugd2hpY2ggaXMgdW5pcXVlLCB0aGUgc2FtZSBkYXRhIGlzIHB1dCBpbgph
-IGZpbGUgY3JlYXRlIHdpdGgga29iamVjdCBpbiAvc3lzL2tlcm5lbC9pbnRlbF9od192ZXJzaW9u
-X2tvYmplY3QvCndpdGggdGhlIG5hbWUgL2ludGVsX2h3X3ZlcnNpb24gd2hlcmUgaXQgc2hvd3Mg
-dGhlIEhXIHZhcmlhbnQsCkZXIHZhcmlhbnQgYW5kIFBhdGNoIG51bWJlciB3aGljaCB3aWxsIGRp
-ZmZlcmVudCBmb3IgZWFjaCBTS1UuCgpTaWduZWQtb2ZmLWJ5OiBKYXlhIFByYXZlZW4gRyA8amF5
-YS5wLmdAaW50ZWwuY29tPgotLS0KIGRyaXZlcnMvYmx1ZXRvb3RoL2J0dXNiLmMgfCA1NyArKysr
-KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKystLQogMSBmaWxlIGNoYW5n
-ZWQsIDU1IGluc2VydGlvbnMoKyksIDIgZGVsZXRpb25zKC0pCgpkaWZmIC0tZ2l0IGEvZHJpdmVy
-cy9ibHVldG9vdGgvYnR1c2IuYyBiL2RyaXZlcnMvYmx1ZXRvb3RoL2J0dXNiLmMKaW5kZXggODEx
-ZjliOS4uNzIwZjE0ZiAxMDA2NDQKLS0tIGEvZHJpdmVycy9ibHVldG9vdGgvYnR1c2IuYworKysg
-Yi9kcml2ZXJzL2JsdWV0b290aC9idHVzYi5jCkBAIC0yNCw2ICsyNCwxMCBAQAogI2luY2x1ZGUg
-PGxpbnV4L21vZHVsZS5oPgogI2luY2x1ZGUgPGxpbnV4L3VzYi5oPgogI2luY2x1ZGUgPGxpbnV4
-L2Zpcm13YXJlLmg+CisjaW5jbHVkZSA8bGludXgva29iamVjdC5oPgorI2luY2x1ZGUgPGxpbnV4
-L3N5c2ZzLmg+CisjaW5jbHVkZSA8bGludXgvZnMuaD4KKyNpbmNsdWRlIDxsaW51eC9zdHJpbmcu
-aD4KICNpbmNsdWRlIDxhc20vdW5hbGlnbmVkLmg+CiAKICNpbmNsdWRlIDxuZXQvYmx1ZXRvb3Ro
-L2JsdWV0b290aC5oPgpAQCAtNDIsNiArNDYsMzAgQEAgc3RhdGljIGJvb2wgcmVzZXQgPSB0cnVl
-OwogCiBzdGF0aWMgc3RydWN0IHVzYl9kcml2ZXIgYnR1c2JfZHJpdmVyOwogCitzdGF0aWMgc3Ry
-dWN0IGtvYmplY3QgKmludGVsX2h3X3ZlcnNpb25fa29iamVjdDsKK3N0cnVjdCBpbnRlbF92ZXJz
-aW9uIHZlcjsKKworLyoKKyAqIFRoaXMgZmlsZSB3aGljaCBpcyB1bmRlciAvc3lzL2tlcm5lbC9p
-bnRlbF9od192ZXJzaW9uX2tvYmplY3Qga29iamVjdCB3aGljaCBoYXMgdGhlIGZpbGUgbmFtZSBh
-cyBpbnRlbF9od192ZXJzaW9uCisgKiBjb250YWlucyB0aGUgaW50ZWwgRlcgdmVyc2lvbiBpbiB0
-ZXJtcyBvZiBIVyB2YXJpYW50LCBGVyB2YXJpYW50IGFuZCBQYXRjaCBudW1iZXIgd2hpY2ggYXJl
-IGRpZmZlcmVudCBmb3IKKyAqIGRpZmZlcmVudCBTS1Uncy4KKyAqLworc3RhdGljIHNzaXplX3Qg
-aW50ZWxfaHdfc2hvd3JldihzdHJ1Y3Qga29iamVjdCAqaywgc3RydWN0IGF0dHJpYnV0ZSAqYSwg
-Y2hhciAqYnVmKQoreworICAgICAgICByZXR1cm4gc3ByaW50ZihidWYsICJIV19WYXJpYW50OiAw
-eCUwMnglMDJ4JTAyeFxuRldfdmFyaWFudDogMHglMDJ4JTAyeCUwMnglMDJ4JTAyeFxuUGF0Y2gg
-TnVtOiAweCUwMnhcbiIsdmVyLmh3X3BsYXRmb3JtLCB2ZXIuaHdfdmFyaWFudCwgdmVyLmh3X3Jl
-dmlzaW9uLAorCQl2ZXIuZndfdmFyaWFudCwgIHZlci5md19yZXZpc2lvbiwgdmVyLmZ3X2J1aWxk
-X251bSwKKwkJdmVyLmZ3X2J1aWxkX3d3LCB2ZXIuZndfYnVpbGRfeXksIHZlci5md19wYXRjaF9u
-dW0pOworfQorCisvKiBTeXNmcyBhdHRyaWJ1dGVzIG1hZGUgYXMgdXNlciByZWFkYWJsZSBhbmQg
-d3JpdGFibGUqLworc3RhdGljIGNvbnN0IHN0cnVjdCB7CisJc3RydWN0IGF0dHJpYnV0ZSBhdHRy
-OworCXNzaXplX3QgKCpzaG93KShzdHJ1Y3Qga29iamVjdCAqaywgc3RydWN0IGF0dHJpYnV0ZSAq
-YSwgY2hhciAqYnVmKTsKK30gaW50ZWxfaHdfdmVyc2lvbl9hdHRyID0geworCS5hdHRyID0geyAu
-bmFtZSA9ICJpbnRlbF9od192ZXJzaW9uIiwgLm1vZGUgPSBTX0lXVVNSIHwgU19JUlVTUn0sCisJ
-LnNob3cgPSBpbnRlbF9od19zaG93cmV2LAorfTsKKwogI2RlZmluZSBCVFVTQl9JR05PUkUJCTB4
-MDEKICNkZWZpbmUgQlRVU0JfRElHSUFOU1dFUgkweDAyCiAjZGVmaW5lIEJUVVNCX0NTUgkJMHgw
-NApAQCAtMTY1NSw3ICsxNjgzLDcgQEAgc3RhdGljIGludCBidHVzYl9zZXR1cF9pbnRlbChzdHJ1
-Y3QgaGNpX2RldiAqaGRldikKIAljb25zdCBzdHJ1Y3QgZmlybXdhcmUgKmZ3OwogCWNvbnN0IHU4
-ICpmd19wdHI7CiAJaW50IGRpc2FibGVfcGF0Y2gsIGVycjsKLQlzdHJ1Y3QgaW50ZWxfdmVyc2lv
-biB2ZXI7CisgICAgICAgIGludCBlcnJvciA9IDA7CiAKIAlCVF9EQkcoIiVzIiwgaGRldi0+bmFt
-ZSk7CiAKQEAgLTE2OTAsNiArMTcxOCwxOSBAQCBzdGF0aWMgaW50IGJ0dXNiX3NldHVwX2ludGVs
-KHN0cnVjdCBoY2lfZGV2ICpoZGV2KQogCQl2ZXIuZndfdmFyaWFudCwgIHZlci5md19yZXZpc2lv
-biwgdmVyLmZ3X2J1aWxkX251bSwKIAkJdmVyLmZ3X2J1aWxkX3d3LCB2ZXIuZndfYnVpbGRfeXks
-IHZlci5md19wYXRjaF9udW0pOwogCisgICAgICAgIC8qIENyZWF0ZSBhIGtvYmplY3Qgd2l0aCB0
-aGUgbmFtZSAiaW50ZWxfaHdfdmVyc2lvbl9rb2JqZWN0IiwgbG9jYXRlZAorICAgICAgICAgKiB1
-bmRlciAvc3lzL2tlcm5lbC8uCisgICAgICAgICAqLworICAgICAgICBpbnRlbF9od192ZXJzaW9u
-X2tvYmplY3QgPSBrb2JqZWN0X2NyZWF0ZV9hbmRfYWRkKCJpbnRlbF9od192ZXJzaW9uX2tvYmpl
-Y3QiLCBrZXJuZWxfa29iaik7CisgICAgICAgIGlmKCFpbnRlbF9od192ZXJzaW9uX2tvYmplY3Qp
-CisgICAgICAgICAgICAgICAgICByZXR1cm4gLUVOT01FTTsKKworICAgICAgICAvKiBDcmVhdGUg
-YSBmaWxlIGFzc29jaWF0ZWQgd2l0aCB0aGUga29iamVjdCAqLworICAgICAgICBlcnJvciA9IHN5
-c2ZzX2NyZWF0ZV9maWxlKGludGVsX2h3X3ZlcnNpb25fa29iamVjdCwgJmludGVsX2h3X3ZlcnNp
-b25fYXR0ci5hdHRyKTsKKyAgICAgICAgaWYoZXJyb3IpIHsKKyAgICAgICAgICAgICAgQlRfREJH
-KCJmYWlsZWQgdG8gY3JlYXRlIHRoZSB2ZXJzaW9uIGZpbGUgaW4gL3N5cy9rZXJuZWwvaW50ZWxf
-aHdfdmVyc2lvbl9rb2JqZWN0IFxuIik7CisgICAgICAgIH0KKwogCS8qIGZ3X3BhdGNoX251bSBp
-bmRpY2F0ZXMgdGhlIHZlcnNpb24gb2YgcGF0Y2ggdGhlIGRldmljZSBjdXJyZW50bHkKIAkgKiBo
-YXZlLiBJZiB0aGVyZSBpcyBubyBwYXRjaCBkYXRhIGluIHRoZSBkZXZpY2UsIGl0IGlzIGFsd2F5
-cyAweDAwLgogCSAqIFNvLCBpZiBpdCBpcyBvdGhlciB0aGFuIDB4MDAsIG5vIG5lZWQgdG8gcGF0
-Y2ggdGhlIGRldmljZSBhZ2Fpbi4KQEAgLTE5NzQsNyArMjAxNSw2IEBAIHN0YXRpYyBpbnQgYnR1
-c2Jfc2V0dXBfaW50ZWxfbmV3KHN0cnVjdCBoY2lfZGV2ICpoZGV2KQogCQkJCQkgIDB4MDAsIDB4
-MDgsIDB4MDQsIDB4MDAgfTsKIAlzdHJ1Y3QgYnR1c2JfZGF0YSAqZGF0YSA9IGhjaV9nZXRfZHJ2
-ZGF0YShoZGV2KTsKIAlzdHJ1Y3Qgc2tfYnVmZiAqc2tiOwotCXN0cnVjdCBpbnRlbF92ZXJzaW9u
-IHZlcjsKIAlzdHJ1Y3QgaW50ZWxfYm9vdF9wYXJhbXMgKnBhcmFtczsKIAljb25zdCBzdHJ1Y3Qg
-ZmlybXdhcmUgKmZ3OwogCWNvbnN0IHU4ICpmd19wdHI7CkBAIC0xOTgzLDYgKzIwMjMsNyBAQCBz
-dGF0aWMgaW50IGJ0dXNiX3NldHVwX2ludGVsX25ldyhzdHJ1Y3QgaGNpX2RldiAqaGRldikKIAlr
-dGltZV90IGNhbGx0aW1lLCBkZWx0YSwgcmV0dGltZTsKIAl1bnNpZ25lZCBsb25nIGxvbmcgZHVy
-YXRpb247CiAJaW50IGVycjsKKyAgICAgICAgaW50IGVycm9yID0gMDsKIAogCUJUX0RCRygiJXMi
-LCBoZGV2LT5uYW1lKTsKIApAQCAtMTk5Niw2ICsyMDM3LDE4IEBAIHN0YXRpYyBpbnQgYnR1c2Jf
-c2V0dXBfaW50ZWxfbmV3KHN0cnVjdCBoY2lfZGV2ICpoZGV2KQogCWlmIChlcnIpCiAJCXJldHVy
-biBlcnI7CiAKKyAgICAgICAgLyogQ3JlYXRlIGEga29iamVjdCB3aXRoIHRoZSBuYW1lICJpbnRl
-bF9od192ZXJzaW9uX2tvYmplY3QiLCBsb2NhdGVkCisgICAgICAgICAqIHVuZGVyIC9zeXMva2Vy
-bmVsLy4KKyAgICAgICAgICovCisgICAgICAgIGludGVsX2h3X3ZlcnNpb25fa29iamVjdCA9IGtv
-YmplY3RfY3JlYXRlX2FuZF9hZGQoImludGVsX2h3X3ZlcnNpb25fa29iamVjdCIsIGtlcm5lbF9r
-b2JqKTsKKyAgICAgICAgaWYoIWludGVsX2h3X3ZlcnNpb25fa29iamVjdCkKKyAgICAgICAgICAg
-ICAgICAgIHJldHVybiAtRU5PTUVNOworCisgICAgICAgIC8qIENyZWF0ZSBhIGZpbGUgYXNzb2Np
-YXRlZCB3aXRoIHRoZSBrb2JqZWN0ICovCisgICAgICAgIGVycm9yID0gc3lzZnNfY3JlYXRlX2Zp
-bGUoaW50ZWxfaHdfdmVyc2lvbl9rb2JqZWN0LCAmaW50ZWxfaHdfdmVyc2lvbl9hdHRyLmF0dHIp
-OworICAgICAgICBpZihlcnJvcikgeworICAgICAgICAgICAgICBCVF9EQkcoImZhaWxlZCB0byBj
-cmVhdGUgdGhlIHZlcnNpb24gZmlsZSBpbiAvc3lzL2tlcm5lbC9pbnRlbF9od192ZXJzaW9uX2tv
-YmplY3QgXG4iKTsKKyAgICAgICAgfQogCS8qIFRoZSBoYXJkd2FyZSBwbGF0Zm9ybSBudW1iZXIg
-aGFzIGEgZml4ZWQgdmFsdWUgb2YgMHgzNyBhbmQKIAkgKiBmb3Igbm93IG9ubHkgYWNjZXB0IHRo
-aXMgc2luZ2xlIHZhbHVlLgogCSAqLwotLSAKMS45LjEKCg==
+Please send patches according to the submitting patches guidelines. I can not apply patches randomly inserted into email bodies.
 
---_002_DAC39EC0A5DE12469D14E5A0B14E6CF5054737BCBGSMSX108garcor_--
+> From 01e904148f4de6d8d48d61b01b08da7a771fe998 Mon Sep 17 00:00:00 2001
+> From: Jaya Praveen G <jaya.p.g@intel.com>
+> Date: Fri, 15 Jul 2016 17:25:31 +0530
+> Subject: [PATCH] btusb: Export the Intel HW/FW/Patch variants to /sysfs
+>  
+> Intel will have different SKU and version with the same
+> VID/PID. Different SKU use different BT version this means
+> different HW and FW. To check this, we have read version
+> for the intel SKU which is unique, the same data is put in
+> a file create with kobject in /sys/kernel/intel_hw_version_kobject/
+> with the name /intel_hw_version where it shows the HW variant,
+> FW variant and Patch number which will different for each SKU.
+
+I am failing to understand what these informations are used for. The bluemoon utility can read out these information easily already.
+
+It is also something that no other driver is doing. Why would Intel need such a thing in the first place. Also exposing random kobjects from a driver is the wrong approach to this. I mean no Bluetooth driver is exposing things in sysfs.
+
+>  
+> Signed-off-by: Jaya Praveen G <jaya.p.g@intel.com>
+> ---
+> drivers/bluetooth/btusb.c | 57 +++++++++++++++++++++++++++++++++++++++++++++--
+> 1 file changed, 55 insertions(+), 2 deletions(-)
+>  
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index 811f9b9..720f14f 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -24,6 +24,10 @@
+> #include <linux/module.h>
+> #include <linux/usb.h>
+> #include <linux/firmware.h>
+> +#include <linux/kobject.h>
+> +#include <linux/sysfs.h>
+> +#include <linux/fs.h>
+> +#include <linux/string.h>
+> #include <asm/unaligned.h>
+>  #include <net/bluetooth/bluetooth.h>
+> @@ -42,6 +46,30 @@ static bool reset = true;
+>  static struct usb_driver btusb_driver;
+> +static struct kobject *intel_hw_version_kobject;
+> +struct intel_version ver;
+> +
+> +/*
+> + * This file which is under /sys/kernel/intel_hw_version_kobject kobject which has the file name as intel_hw_version
+> + * contains the intel FW version in terms of HW variant, FW variant and Patch number which are different for
+> + * different SKU's.
+> + */
+> +static ssize_t intel_hw_showrev(struct kobject *k, struct attribute *a, char *buf)
+> +{
+> +        return sprintf(buf, "HW_Variant: 0x%02x%02x%02x\nFW_variant: 0x%02x%02x%02x%02x%02x\nPatch Num: 0x%02x\n",ver.hw_platform, ver.hw_variant, ver.hw_revision,
+> +                            ver.fw_variant,  ver.fw_revision, ver.fw_build_num,
+> +                            ver.fw_build_ww, ver.fw_build_yy, ver.fw_patch_num);
+> +}
+
+We have a line size limit of 78 characters that should be considered whenever possible to break things into multiple lines. Only a few exceptions are breaking this coding style rules.
+
+> +
+> +/* Sysfs attributes made as user readable and writable*/
+> +static const struct {
+> +             struct attribute attr;
+> +             ssize_t (*show)(struct kobject *k, struct attribute *a, char *buf);
+> +} intel_hw_version_attr = {
+> +             .attr = { .name = "intel_hw_version", .mode = S_IWUSR | S_IRUSR},
+> +             .show = intel_hw_showrev,
+> +};
+> +
+> #define BTUSB_IGNORE                              0x01
+> #define BTUSB_DIGIANSWER      0x02
+> #define BTUSB_CSR                       0x04
+> @@ -1655,7 +1683,7 @@ static int btusb_setup_intel(struct hci_dev *hdev)
+>               const struct firmware *fw;
+>               const u8 *fw_ptr;
+>               int disable_patch, err;
+> -              struct intel_version ver;
+> +        int error = 0;
+>                BT_DBG("%s", hdev->name);
+> @@ -1690,6 +1718,19 @@ static int btusb_setup_intel(struct hci_dev *hdev)
+>                              ver.fw_variant,  ver.fw_revision, ver.fw_build_num,
+>                              ver.fw_build_ww, ver.fw_build_yy, ver.fw_patch_num);
+> +        /* Create a kobject with the name "intel_hw_version_kobject", located
+> +         * under /sys/kernel/.
+> +         */
+> +        intel_hw_version_kobject = kobject_create_and_add("intel_hw_version_kobject", kernel_kobj);
+
+This is broken by design. Linux supports multiple controllers. So what happens if you attach a second Intel controller to the same system.
+
+> +        if(!intel_hw_version_kobject)
+> +                  return -ENOMEM;
+> +
+> +        /* Create a file associated with the kobject */
+> +        error = sysfs_create_file(intel_hw_version_kobject, &intel_hw_version_attr.attr);
+> +        if(error) {
+> +              BT_DBG("failed to create the version file in /sys/kernel/intel_hw_version_kobject \n");
+> +        }
+> +
+
+The whole section is wrongly intended and is not following the network subsystem coding style.
+
+Regards
+
+Marcel
+
