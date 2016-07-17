@@ -1,267 +1,97 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Subject: Re: [RFC bluetooth-next 20/20] 6lowpan: bluetooth: add new
- implementation
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-References: <20160711195044.25343-1-aar@pengutronix.de>
- <20160711195044.25343-21-aar@pengutronix.de>
- <dc82361d-4c3c-8b40-8463-97909c217485@pengutronix.de>
- <CABBYNZL0xFGcW_t-eW9hAL8VOLnp4NYL_iKqChJ8B0srBdEgvQ@mail.gmail.com>
-Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de,
-	kaspar@schleiser.de,
-	Jukka Rissanen <jukka.rissanen@linux.intel.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Patrik Flykt <Patrik.Flykt@linux.intel.com>
-From: Alexander Aring <aar@pengutronix.de>
-Message-ID: <11469f72-fa15-5545-387c-ecd051b74897@pengutronix.de>
-Date: Sun, 17 Jul 2016 17:52:55 +0200
+From: bugzilla-daemon@bugzilla.kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [Bug 135431] New: HCI User Channel is not exclusive
+Date: Sun, 17 Jul 2016 13:40:25 +0000
+Message-ID: <bug-135431-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZL0xFGcW_t-eW9hAL8VOLnp4NYL_iKqChJ8B0srBdEgvQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+https://bugzilla.kernel.org/show_bug.cgi?id=135431
 
-Hi,
+            Bug ID: 135431
+           Summary: HCI User Channel is not exclusive
+           Product: Drivers
+           Version: 2.5
+    Kernel Version: 4.4.0
+          Hardware: All
+                OS: Linux
+              Tree: Mainline
+            Status: NEW
+          Severity: normal
+          Priority: P1
+         Component: Bluetooth
+          Assignee: linux-bluetooth@vger.kernel.org
+          Reporter: emil.lenngren@gmail.com
+        Regression: No
 
-On 07/14/2016 01:40 PM, Luiz Augusto von Dentz wrote:
-> Hi Alex,
-> 
-> On Wed, Jul 13, 2016 at 12:19 AM, Alexander Aring <aar@pengutronix.de> wrote:
->>
->> Hi,
->>
->> On 07/11/2016 09:50 PM, Alexander Aring wrote:
->>> This patch adds a new btle 6lowpan implementation in version 0.2. This
->>> new implementation has a new userspace API for debugfs.
->>>
->>> It's now possible to decide on which hci interface do you want to run
->>> your 6LoWPAN interface, for that you can run:
->>>
->>> echo "hci0 1" > /sys/kernel/debug/bluetooth/6lowpan_enable
->>>
->>> to enable, or:
->>>
->>> echo "hci0 0" > /sys/kernel/debug/bluetooth/6lowpan_enable
-> 
-> No please no more designs for debugfs, we are past that and moving
-> towards having proper management commands, so what you did here is a
-> huge waste of time and you have instead just ask before hand.
-> 
+Hi. I'm using HCI_CHANNEL_USER and I've read that "The application gains
+exclusive access to this device and forces the kernel to stay away and not
+manage it."
 
-The first time when I used BTLE 6LoWPAN I complaint about that I can not
-say "use this special hci%d for lowpan interface xy", I did that not on
-the mailinglist it was on the irc channel and everybody agreed that it
-need to be fixed. The basic idea on my side was to run only one Virtual
-Machine with two BTLE usb dongles to communicate to each other, so I
-needed to switch to two virtual machines to workaround this issue.
+But this does not seem to be true. For example both a "hciconfig -a" as well as
+a "hcitool lescan" sends some packets over the HCI.
 
-If you have the current debugfs UAPI 1:1 already in some kind of stable
-bluetooth API then I would give you the BIG advice to fix that and let
-me look into that. (As far I know there exists idea's only, no
-implementations).
+However, "hciconfig -a" fails with "Can't read class of device on hci0:
+Connection timed out (110)" but still the messages are sent on the socket. And
+"hcitool lescan" disables scan right after it has enabled it for some reason.
 
-Another really BIG thing is (it comes to the direction "breaking UAPI"
-as well) that the interface depends on if Slaves are connected. So if
-the last Slave will be disconnected then the interface will be deregistered.
-Every IPv6 userspace application cannot deal with that. The interface
-lifetime must not depend on if slaves connected or not.
+When I have an active HCI_CHANNEL_USER socket and issue "hciconfig -a", I see
+this in btmon:
 
-At this case, I think every netdev people would agree.
+< HCI Command: Read Local Name (0x03|0x0014) plen 0           [hci0] 3.287660
+> HCI Event: Command Complete (0x0e) plen 252                 [hci0] 3.303241
+      Read Local Name (0x03|0x0014) ncmd 1
+        Status: Success (0x00)
+        Name: Bluetooth USB Host Controller
+< HCI Command: Read Class of Device (0x03|0x0023) plen 0      [hci0] 5.288940
+> HCI Event: Command Complete (0x0e) plen 7                   [hci0] 5.290457
+      Read Class of Device (0x03|0x0023) ncmd 1
+        Status: Success (0x00)
+        Class: 0x000000
+          Major class: Miscellaneous
+          Minor class: 0x00
 
->>> to disable it. A cat on this file will show the current hci <-> 6lowpan
->>> interface mapping.
->>>
->>> Additional the different is, that the interface will be created after
->>> enable it. The old behaviour is that the interface will be created when
->>> one first connection is established and deleted after all connections
->>> (peers) will be disconnected. This handling is different now.
->>>
->>> The reason (in my opinion) is that the existing of such interface should
->>> not based on if there is a connection or not. At runtime of many IPv6
->>> application an interface will be removed -> I think the most userspace
->>> application can and will never handle that an IPv6 interface will be
->>> deleted and recreating during runtime.
->>>
->>> The new handling is that the interface will not removed and you can
->>> re-establish the connection to your peers.
->>>
->>> Connection to peers:
->>>
->>> Connection to peers are not binded to hci interface, it's binded to your
->>> 6LoWPAN interface. This will prepare handling for multiple 6LoWPAN
->>> interfaces on one hci (maybe also with netns support, which isn't
->>> available yet) and you can choose which peers should be handled by
->>> different BTLE 6LoWPAN interfaces. Example:
->>>
->>> L2: hci0 is connected to node A, B, C, D
->>>
->>> L3: 6lo0 and 6lo1 are two interfaces based on hci0.
->>>     6lo0 is connected to nodes: A, B, C
->>>     6lo1 is connected to nodes: D, C, B
-> 
-> Is this is useful for what exactly? I much rather have a simple module
-> that just deal with 1 connection than have to deal with complex
-> topology in the beginning, so this is moving in the exact opposite
-> direction.
-> 
+For "sudo hcitool lescan":
 
-Well, I learned now to not talking about crazy use-cases which you could
-do with that. I need more to talk about why this is really needed. I
-will do that in future.
+< HCI Command: LE Set Scan Parameters (0x08|0x000b) plen 7    [hci0] 22.557600
+        Type: Active (0x01)
+        Interval: 10.000 msec (0x0010)
+        Window: 10.000 msec (0x0010)
+        Own address type: Public (0x00)
+        Filter policy: Accept all advertisement (0x00)
+> HCI Event: Command Complete (0x0e) plen 4                   [hci0] 22.558289
+      LE Set Scan Parameters (0x08|0x000b) ncmd 1
+        Status: Success (0x00)
+< HCI Command: LE Set Scan Enable (0x08|0x000c) plen 2        [hci0] 24.561344
+        Scanning: Enabled (0x01)
+        Filter duplicates: Enabled (0x01)
+> HCI Event: Command Complete (0x0e) plen 4                   [hci0] 24.562613
+      LE Set Scan Enable (0x08|0x000c) ncmd 1
+        Status: Success (0x00)
+< HCI Command: LE Set Scan Enable (0x08|0x000c) plen 2        [hci0] 24.562879
+        Scanning: Disabled (0x00)
+        Filter duplicates: Disabled (0x00)
+> HCI Event: Command Complete (0x0e) plen 4                   [hci0] 24.563499
+      LE Set Scan Enable (0x08|0x000c) ncmd 1
+        Status: Success (0x00)
+< HCI Command: LE Set Scan Enable (0x08|0x000c) plen 2        [hci0] 26.565344
+        Scanning: Disabled (0x00)
+        Filter duplicates: Enabled (0x01)
+> HCI Event: Command Complete (0x0e) plen 4                   [hci0] 26.566494
+      LE Set Scan Enable (0x08|0x000c) ncmd 1
+        Status: Success (0x00)
+< HCI Command: LE Set Scan Enable (0x08|0x000c) plen 2        [hci0] 26.568638
+        Scanning: Disabled (0x00)
+        Filter duplicates: Disabled (0x00)
+> HCI Event: Command Complete (0x0e) plen 4                   [hci0] 26.569530
+      LE Set Scan Enable (0x08|0x000c) ncmd 1
+        Status: Success (0x00)
 
-I observed, what I explained above. There exists two "connect" mechanism,
-these are L2 and L3.
+Trying to connect to a BLE device using gatttool however fails as expected.
 
-With L2 I mean $FIND_OUT_RIGHT_NOT_DEPRECATED_TOOL_IN_BT_UTILITY_DSCHUNGEL
-leadv/lecc stuff. This prepares somehow that you can say
-l2cap_chan_connect in the upper-layer to connect to slaves.
-
-With l2cap_chan_connect I mean L3 connection, which is the same like
-what you doing in L2 for L3. It's also not be a MUST, because you can
-run e.g. above example Node A, B, C, D on L2 and:
-
-BTLE 6LoWPAN: A <-> B
-
-L2CAP_SOCK:   C <-> D
-
-or some other mixed scenario. I think you want to still have such behaviour.
-This would be the same like: A, B, C, D and 6lo0 is connected to A, B.
-Forget the C, D, make with them whatever you want (_maybe_ namespace with
-C, D or l2cap_sock).
-
-At least if you want to have netns support with mutliple lowpan then
-there will nothing to complex, it's just the same interface handling
-like having one interface in init_net namespace. Just you can deal with
-different namespaces with that (UAPI need to support namespaces for that).
-
-It makes completely more sense to say to "lowpan interface 6lo%d connect
-to slave xy".
-
-The current way is that the user has no control of it and
-l2cap_chan_connect call this "hci_get_route" function behind and with
-bluetooth magic the user get one hci interface which best-fits and maybe
-not that what you want.
-
->>> as one possible example. Handle this peer interface will have a possible
->>> more fine-granularity connection for peers.
-> 
-> Not useful when we most likely we will not have that many peers, this
-> is no Wifi or ethernet, this is for very embedded devices lets not
-> over engineer here please.
-> 
-
-Okay, I will not talk about any crazy use-cases which I could have. But
-such setup is currently also possible but you can't control it because
-bluetooth "hci_get_route" magic. On L2 you can connect to a number of Nodes
-in some set. The funny thing is on L3 the "connect" command you cannot
-say which interface connects now to which slave. If you have two lowpan
-interfaces it will be decided by the magic "hci_get_route" function.
-
-At last the question is not here to make such use-case the question is
-here to make the "connect" command per interface. To doing that it will
-not increase the number of "connect" commands which you need to use
-anyway. What we remove is the bluetooth magic "hci_get_route", so now
-you can "please connect from 6lo0 interface to $SLAVE, and this
-interface is bounded to hci0", as exmaple.
-
->>> To connect to peers, there exists no "6lowpan_control" anymore. The
->>> control file is now peer interface, it's simple:
->>>
->>> echo "connect $PEER_ADDRESS 1" > /sys/kernel/debug/bluetooth/6lo0
->>>
->>> Also after connecting to peers it's still possible that another peer can
->>> to connect to the peer which has already a connected peer (complicated
->>> to describe). I saw that is somehow disabled in version before, see:
->>>
->>> http://lxr.free-electrons.com/source/net/bluetooth/6lowpan.c#L1247
->>>
->>> I am not a bluetooth expert, but I guess that is somehow if there exists
->>> limitation to devices which are not "peers" that means devices which can
->>> be run as master or slave only. So far I know such limitations for
->>> devices doesn't exists for BTLE 6LoWPAN, or?
->>>
-> 
-> I guess that is because dual role is not specified, you either are a
-> node or a router but not both at the same time.
-> 
-
-Okay, then I will close the "listen" l2cap channel after somebody did a
-connect. But I bet there was some graphic somewhere which had a
-
-SLAVE.... <---- MASTER <----> MASTER ----> SLAVE...
-
-So with that we forbid such MASTER <-> MASTER connections.
-
->> I think the following will explain somehow when it's a SLAVE and when
->> MASTER as my current view.
->>
->> SLAVES:
->>
->> They don't makes this echo "connect ..." foo in control files.
->> they only do "hciconfig hci0 leadv" that somebody other can connect to
->> that node (some MASTER node).
->>
->> MASTERS:
->>
->> can do the same what the SLAVES does but to be as MASTER they need to call
->> additional stuff:
->>
->> hcitool lecc $SLAVE_ADDR (one or more times)
-> 
-> Don't use hcitool, actually never mention any of hci related
-> interfaces on the patches there are deprecated, btmgmt shall be used
-> to enable things like advertising, I will be working on adding
-> advertising support for bluetoothctl but we actually need IPSP UUID
-> support in order to make this work properly so not even btmgmt will be
-> enough in the end.
-> 
-
-Yes, Marcel already told me some tools are deprecated and I should not
-use them. You don't want to know how long I took when I had some working
-setup with my broadcom dongles. :-)
-
-I am too lazy to switch, I will use now btmgmt. I hope it can do the
-same suff up/down (I think power on/off) and leadv and lecc.
-
-Thanks.
-
->> Additional for different lowpan interfaces (don't need the same addresses
->> which was used by previous one or more hcitool lecc calls):
->>
->> echo "connect SLAVE_ADDR 1" > /sys/kernel/debug/bluetooth/6lo0
->>
->> is this a correct view and can all BTLE transceivers run as SLAVE or
->> MASTER, or exists there some special transceivers outside which can be
->> run as SLAVE only?
->>
->>> Nevertheless I disabled that stuff, it's still possible to connect to
->>> some node which already run "connect ..." on his side.
->>>
->>> Otherwise I fixed the ndisc stuff and removed a lot of races/side
->>> effects. The old code had some static "lowpan_devices" list and most
->>> time there was some lookup mapping according to bdaddr to get the right
->>> 6lo netdevice struct. I removed that, also the skb->cb is used a lot in
->>> some callback which had some side-effects.
-> 
-> Send the fixes, and the fixes only.
-> 
-
-There exists fixes only, no new features. In my opinion, UAPI is broken
-because you can't control what you want. Again, because "hci_get_route" magic.
-I added no new features, I fixed the broken things. Maybe there are some
-little small cleanups if you say changing function namens is not a
-bugfix it's a cleanup.
-
-Removing the whole implementation and adding a new one is the only way
-which I would think it is possible, because we need to fix stuff in
-IPHC and as well in IPv6 as well.
-
-I know the zephyr people wants to be backwardscompatible I could say, I
-add a big BROKEN_IMPLEMENTATION Kconfig switch which let's you compile
-the old broken version which is still compatible with stacks outside.
-
-btw: stacks outside I see currently pull-request in RIOT-OS which do the
-same L2 address length is 8 instead 6, which means they are currently
-bug compatible with Linux.
-
-- Alex
+-- 
+You are receiving this mail because:
+You are the assignee for the bug.
