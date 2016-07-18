@@ -1,31 +1,29 @@
-Return-Path: <linux-kernel-owner@vger.kernel.org>
+Return-Path: <johan.hedberg@gmail.com>
+Date: Mon, 18 Jul 2016 09:35:05 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/3] Bluetooth: Move hci_recv_frame and hci_recv_diag
+ prototypes
+Message-ID: <20160718063505.GA23227@t440s.P-661HNU-F1>
+References: <1468778117-62931-1-git-send-email-marcel@holtmann.org>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
-Subject: Re: [PATCH] Bluetooth: btmrvl: reset is_suspending flag in failure path
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1468579852-7118-1-git-send-email-akarwar@marvell.com>
-Date: Mon, 18 Jul 2016 10:13:54 +0200
-Cc: "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-	linux-kernel@vger.kernel.org, Minghsiu.Tsai@mediatek.com
-Message-Id: <EF122B05-3E8E-4B94-B96D-50A0C437732E@holtmann.org>
-References: <1468579852-7118-1-git-send-email-akarwar@marvell.com>
-To: Amitkumar Karwar <akarwar@marvell.com>
-Sender: linux-kernel-owner@vger.kernel.org
+In-Reply-To: <1468778117-62931-1-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Amitkumar,
+Hi Marcel,
 
-> is_suspending flag remains on when host sleep fails to enable. Data
-> path is unnecessarily blocked after this. This patch ensures to
-> reset the flag in failure path.
+On Sun, Jul 17, 2016, Marcel Holtmann wrote:
+> The protoypes for hci_recv_frame and hci_recv_diag are in the wrong
+> location in the header file. Move them close to all the other hci_dev
+> related exported functions.
 > 
-> Signed-off-by: Amitkumar Karwar <akarwar@marvell.com>
+> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 > ---
-> drivers/bluetooth/btmrvl_sdio.c | 1 +
-> 1 file changed, 1 insertion(+)
+>  include/net/bluetooth/hci_core.h | 5 ++---
+>  1 file changed, 2 insertions(+), 3 deletions(-)
 
-patch has been applied to bluetooth-next tree.
+All three patches have been applied to bluetooth-next. Thanks.
 
-Regards
-
-Marcel
+Johan
