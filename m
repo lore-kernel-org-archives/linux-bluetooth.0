@@ -9,17 +9,19 @@ References: <20160711195044.25343-1-aar@pengutronix.de>
  <11469f72-fa15-5545-387c-ecd051b74897@pengutronix.de>
  <CABBYNZ+A54MQ3uWGjDVXNOwwX3v3VptZz2UQUNV4_KFKPaV==A@mail.gmail.com>
  <190983bc-9467-8ff8-436c-ca1fcdfe001b@pengutronix.de>
- <CABBYNZK-zzTzy5uUYd1GVgwiNX9MNpAmWpWUbRyAbOqN0fcNdg@mail.gmail.com>
+ <20160719054501.GA17979@t440s.P-661HNU-F1>
+ <CABBYNZ+epQ6LPP4PfwXAstim_h5yY78GgbVLEH-i96g6u8p_Dw@mail.gmail.com>
 Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de,
 	kaspar@schleiser.de,
 	Jukka Rissanen <jukka.rissanen@linux.intel.com>,
 	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Patrik Flykt <Patrik.Flykt@linux.intel.com>
+	Patrik Flykt <Patrik.Flykt@linux.intel.com>,
+	carlesgo@entel.upc.edu
 From: Alexander Aring <aar@pengutronix.de>
-Message-ID: <304c7949-08aa-5ada-a37e-e12b9ab83a2c@pengutronix.de>
-Date: Tue, 19 Jul 2016 23:24:34 +0200
+Message-ID: <ae47fe95-3599-d3f7-49bf-66c02b067fca@pengutronix.de>
+Date: Tue, 19 Jul 2016 23:05:58 +0200
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZK-zzTzy5uUYd1GVgwiNX9MNpAmWpWUbRyAbOqN0fcNdg@mail.gmail.com>
+In-Reply-To: <CABBYNZ+epQ6LPP4PfwXAstim_h5yY78GgbVLEH-i96g6u8p_Dw@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
@@ -27,141 +29,72 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
 
-On 07/19/2016 10:49 AM, Luiz Augusto von Dentz wrote:
-> Hi Alex,
+On 07/19/2016 10:23 AM, Luiz Augusto von Dentz wrote:
+> Hi Alex, Johan,
 > 
-> On Tue, Jul 19, 2016 at 12:52 AM, Alexander Aring <aar@pengutronix.de> wrote:
->>>> If you have the current debugfs UAPI 1:1 already in some kind of stable
->>>> bluetooth API then I would give you the BIG advice to fix that and let
->>>> me look into that. (As far I know there exists idea's only, no
->>>> implementations).
->>>
->>> There is the patches posted by Patrik implementing the management interface:
->>>
->>> http://www.spinics.net/lists/linux-bluetooth/msg66486.html
->>>
->> Okay, just to be sure here, in the above document:
+> On Tue, Jul 19, 2016 at 8:45 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+>> Hi Alex,
 >>
->> Controller ID = hdev(usually var name, struct hci_dev)->id
->>
->> Interface Index = dev(usualy var name, struct net_device)->idx
->>
->> Is this right? I think so, so my next stuff will base on that.
+...
 > 
-> Yep.
-> 
->>> Note that these commands are per interface index, so you would be able
->>> to have two dongle talking to each other, we could in fact even
->>> automate this to test with 2 virtual controllers.
->>>
->>
->> We have similar automating testing in 802.15.4 6LoWPAN with virtual
->> transceiver drivers.
->>
->> I always looked somehow for some virtual driver in bluetooth, does this
->> exist mainline?
-> 
-> Take a look at the emulator directory:
-> 
-> https://git.kernel.org/cgit/bluetooth/bluez.git/tree/emulator
+> Following the recommendation of rfc7668 which say the node should
+> always change its address when connecting, which means advertise a
+> different address, also the router should periodically change is RPA,
+> thus the network interface may have to assume different MAC addresses
+> which I don't is currently possible or we are back to having the
+> interfaces created on demand.
 > 
 
-cool.
+mhhh, I am not a bluetooth expert. What really means "periodically
+change is RPA" and how is this done in the Linux bluetooth?
 
->>> It is about priorities, we should concentrate in making it work for
->>> simpler cases, besides the RFC don't talk about subnets either.
->>>
->>
->> I don't talking about subnets.
->>
->> I am talking about "make the connect command per interface". Patrik
->> works shows the following:
->>
->> Add Network Command
->> ===================
->>
->>         Command Code:           0x0043
->>         Controller Index:       <controller id>
->>         Command Parameters:     Address (6 Octets)
->>                                 Address_Type (1 Octet)
->>         Return Parameters:      Address (6 Octets)
->>                                 Address_Type (1 Octet)
->>                                 Interface Index (4 Octets)
->>
->>         This command is used to connect to establish a network connection
->>         to a remote BTLE node. A pre-requisite is that LE is supported
->>         by the controller, otherwise this command will return a
->>         "not supported" response.
->>
->>         Possible values for the Address_Type parameter:
->>                 0       Reserved
->>                 1       LE Public
->>                 2       LE Random
->>
->>         This command generates a Command Complete event on success
->>         or failure.
->>
->>         Possible errors:        Busy
->>                                 Refused
->>                                 Invalid Parameters
->>                                 Not Supported
->>                                 Invalid Index
->>                                 Already Connected
->>
->> So far I understand, this is "make the connect command per device", the
->> device in this case is not a "struct net_device" it's "struct hci_dev".
->>
->> In the "possible" future case to having multiple interfaces you cannot
->> say on which interface this connect should be done. With "connect" I
->> mean the l2cap_chan_connect call.
-> 
-> And why would we want more than one one net_dev per hci_dev, the
-> rfc7668 only talks about star topology:
-> 
-> https://tools.ietf.org/html/rfc7668#section-2.2
-> 
-> Bluetooth currently don't have support for a mesh topology, and anyway
-> I don't think the userspace would need to be involved in the selection
-> of the netdev since this is beyond the Bluetooth interface. In PAN for
-> example we end up doing one netdev per connection and the which the
-> userspace managing using a bridge.
-> 
+When "changing the RPA" happens, does that mean the all connections will
+be lost (unregister interface). Then the previous connections will be
+recreated (register interface) with a complete different MAC address?
 
-I am sure that there will be some use-case with namespaces some day.
+I think it will be a complete different MAC address and this happens all
+15 minutes.
 
-In general:
+"The recommended time interval before randomizing new private address is 15
+ minutes, as determined by timer T_GAP(private_addr_int) in Table 17.1 of
+ the Bluetooth Generic Access Profile [BTCorev4.1]."
 
-In my opinion, having hci_dev as input parameter and as output the
-interface will do something hidden behind which you can't control.
-The Output return value "interface" will indicate on which interface
-the operation was operated on. For me it's something behind which you
-cannot control as user. E.g. When having multiple interfaces. On 1:1
-mapping, I agree this should work.
+If so, then I could understand the reason why recreation of interface.
 
-But why not simple drop the interface idx from the Output and move it to
-Input?
+The only question would for me, how does the bluetooth subsystem handle
+such MAC address update with running l2cap channel connections. I
+suppose it will close all connections, otherwise the current mainline
+solution doesn't work here, because if all channels are disconnected we
+get an interface deregister, so far I understood. Afterwards somehow all
+connection will be re-established under a new interface, or?
 
-         Command Code:           0x0043
-         Controller Index:       <controller id>
-         Command Parameters:     Address (6 Octets)
-                                 Address_Type (1 Octet)
-                                 Interface Index (4 Octets)
-         Return Parameters:      Address (6 Octets)
-                                 Address_Type (1 Octet)
+---
 
-If we get some way that the 6LoWPAN interface can be created before and
-not when doing the first "connect command" then the "Controller Index"
-would be unnecessary because you would give that information when
-creating an interface.
+Another idea would be stop the interface which allows to change mac
+address. Maybe we can have some event handling here, that the mac
+address will be changed. If so, such event occur change dev->dev_addr
+and open the interface again. stop (ifdown) and open (ifup) with changing
+the mac address should be handled by IPv6 applications.
 
->> btw:
->> Also I don't know what's now the parameters "Address/Address_Type"
->> source/destination? Is the Input of them equal to the output?
-> 
-> That is always the destination address, and we needs its type to know
-> if it is public or private to act accordingly.
-> 
+We need at least to run [0] on mac address changes, this reacts on IFUP
+and CHANGE netdev notifiers. This will generate the SLAAC address, but
+it confuse me somehow to change this address all 15 minutes because the
+MAC address changed. :-/
 
-okay.
+Deregister and register the interface is a no-go in my opinion and we
+should have another solution. Especially when such deregister/register
+mechanism happens periodically all 15 minutes.
+
+---
+
+I suppose the "RPA" will be the device address which also need to be
+filled in as source/target address option in NS/NA/RS/RA then. It's just
+difficult to deal with that when the address will be changed
+periodically in 15 minutes.
+
+btw: I talked with C. Gomez today, because I am at the IETF. He would
+like to help here to make everything clear and agreed that I cc him here.
 
 - Alex
+
+[0] http://lxr.free-electrons.com/source/net/ipv6/addrconf.c#L3333
