@@ -1,33 +1,37 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
 From: Michael Richardson <mcr@sandelman.ca>
-To: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 cc: Alexander Aring <aar@pengutronix.de>, linux-wpan@vger.kernel.org,
-	kernel@pengutronix.de, luiz.dentz@gmail.com, kaspar@schleiser.de,
-	linux-bluetooth@vger.kernel.org, Patrik.Flykt@linux.intel.com
-Subject: Re: [RFC bluetooth-next 18/20] 6lowpan: move multicast flags to generic
-In-Reply-To: <1468408545.3075.21.camel@linux.intel.com>
-References: <20160711195044.25343-1-aar@pengutronix.de> <20160711195044.25343-19-aar@pengutronix.de> <1295fe6f-280f-90c1-bb06-a507ecd6dc2b@pengutronix.de> <1468408545.3075.21.camel@linux.intel.com>
+	kernel@pengutronix.de, kaspar@schleiser.de,
+	Jukka Rissanen <jukka.rissanen@linux.intel.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Patrik Flykt <Patrik.Flykt@linux.intel.com>
+Subject: Re: [RFC bluetooth-next 20/20] 6lowpan: bluetooth: add new implementation
+In-Reply-To: <CABBYNZK-zzTzy5uUYd1GVgwiNX9MNpAmWpWUbRyAbOqN0fcNdg@mail.gmail.com>
+References: <20160711195044.25343-1-aar@pengutronix.de> <20160711195044.25343-21-aar@pengutronix.de> <dc82361d-4c3c-8b40-8463-97909c217485@pengutronix.de> <CABBYNZL0xFGcW_t-eW9hAL8VOLnp4NYL_iKqChJ8B0srBdEgvQ@mail.gmail.com> <11469f72-fa15-5545-387c-ecd051b74897@pengutronix.de> <CABBYNZ+A54MQ3uWGjDVXNOwwX3v3VptZz2UQUNV4_KFKPaV==A@mail.gmail.com> <190983bc-9467-8ff8-436c-ca1fcdfe001b@pengutronix.de> <CABBYNZK-zzTzy5uUYd1GVgwiNX9MNpAmWpWUbRyAbOqN0fcNdg@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-Date: Tue, 19 Jul 2016 10:51:21 -0400
-Message-ID: <21544.1468939881@obiwan.sandelman.ca>
+Date: Tue, 19 Jul 2016 10:48:24 -0400
+Message-ID: <20912.1468939704@obiwan.sandelman.ca>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Jukka Rissanen <jukka.rissanen@linux.intel.com> wrote:
-    > According to packet(7), the "Packet sockets are used to receive or send
-    > raw packets at the device driver (OSI Layer 2) level."
-    > But lowpan0 interface is meant to compress IPv6 header so it is working
-    > on L3 data (or more precisely between L2 and L3).
-    > So I am wondering how this is suppose to work and what kind of use case
-    > you have for this?
+Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
+    > And why would we want more than one one net_dev per hci_dev, the
+    > rfc7668 only talks about star topology:
 
-First, one might want to send 802.15.4 packets with custom Information
-Elements. So you ask why we would want to do this through the lowpan
-interface... well, because lowpan will perhaps grow support for the 6tisch
-(802.15.4e) mode of operation, and the custom IEs need to be scheduled out
-with the other packets.   In particular, you don't want to jump the 6lowpan
-queue of fragments.
+    > https://tools.ietf.org/html/rfc7668#section-2.2
+
+    > Bluetooth currently don't have support for a mesh topology, and anyway
+    > I don't think the userspace would need to be involved in the selection
+    > of the netdev since this is beyond the Bluetooth interface. In PAN for
+    > example we end up doing one netdev per connection and the which the
+    > userspace managing using a bridge.
+
+BTLE 4.2 moves quite far to supporting a mesh, but doesn't yet get there.
+I'm told that it will come.  BTLE 4.2 does support switching to which
+star one belongs quickly enough that one could actually route, but it's
+probably not practical yet.
 
 --
 ]               Never tell me the odds!                 | ipv6 mesh networks [
