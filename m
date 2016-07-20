@@ -1,50 +1,90 @@
-Return-Path: <willemb@google.com>
+Return-Path: <daniel@iogearbox.net>
+Message-ID: <578FC1E0.3070803@iogearbox.net>
+Date: Wed, 20 Jul 2016 20:24:32 +0200
+From: Daniel Borkmann <daniel@iogearbox.net>
 MIME-Version: 1.0
-In-Reply-To: <ca6905bba5f094171cef36a9279fd991b30a2abc.1469030410.git.daniel@iogearbox.net>
-References: <ca6905bba5f094171cef36a9279fd991b30a2abc.1469030410.git.daniel@iogearbox.net>
-From: Willem de Bruijn <willemb@google.com>
-Date: Wed, 20 Jul 2016 14:57:42 -0400
-Message-ID: <CA+FuTScJn4osUUZaCK0bnBwZPQjqy2zrRwqRNepwhPWL_Y11Bw@mail.gmail.com>
+To: Mat Martineau <mathew.j.martineau@linux.intel.com>
+CC: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org,
+ marcel@holtmann.org, Gustavo Padovan <gustavo.padovan@collabora.co.uk>,
+ Willem de Bruijn <willemb@google.com>,
+ Alexei Starovoitov <ast@kernel.org>
 Subject: Re: [PATCH net RFT] bluetooth, bpf: split sk_filter in l2cap_sock_recv_cb
-To: Daniel Borkmann <daniel@iogearbox.net>
-Cc: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org,
-	mathew.j.martineau@linux.intel.com, Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo.padovan@collabora.co.uk>, Alexei Starovoitov <ast@kernel.org>
-Content-Type: text/plain; charset=UTF-8
+References: <ca6905bba5f094171cef36a9279fd991b30a2abc.1469030410.git.daniel@iogearbox.net> <alpine.OSX.2.20.1607200933390.23580@pkrystad-desk1.amr.corp.intel.com>
+In-Reply-To: <alpine.OSX.2.20.1607200933390.23580@pkrystad-desk1.amr.corp.intel.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-> In that case sock_queue_rcv_skb() will return with -EPERM, propagated
-> from sk_filter() and if in L2CAP_MODE_ERTM mode, wrong assumption was
-> that we failed due to receive buffer being full. From that point onwards,
-> due to the to-be-dropped skb being held in rx_busy_skb, we cannot make
-> any forward progress as rx_busy_skb is never cleared from l2cap_sock_recvmsg(),
-> due to the filter drop verdict over and over coming from sk_filter().
-> Meanwhile, in l2cap_sock_recv_cb() all new incoming skbs are being
-> dropped due to rx_busy_skb being occupied.
+On 07/20/2016 06:47 PM, Mat Martineau wrote:
+> On Wed, 20 Jul 2016, Daniel Borkmann wrote:
 >
-> Instead, just use __sock_queue_rcv_skb() where an error really tells
-> that there's a receive buffer issue. Split the sk_filter() and only
-> enable it for non-L2CAP_MODE_ERTM modes since at this point in time the
-> skb has already been through the ERTM state machine and it has been
-> acked, so dropping is not allowed. Since skipping sk_filter() for ERTM
-> may have consequences wrt future abi, we need to generally disallow
-> filters to be attached for this mode. So set SOCK_FILTER_LOCKED during
-> socket initialization. Given that noone run into this issue before as
-> it otherwise would have been noticed and fixed, there should be little
-> risk of any breakage. The SOCK_FILTER_LOCKED can later on be lifted
-> should there be a use case to call sk_filter() at a safe place for such
-> kind of sockets.
+>> During an audit for sk_filter(), we found that rx_busy_skb handling
+>> in l2cap_sock_recv_cb() and l2cap_sock_recvmsg() looks not quite as
+>> intended.
+>>
+>> The assumption from commit e328140fdacb ("Bluetooth: Use event-driven
+>> approach for handling ERTM receive buffer") is that errors returned
+>> from sock_queue_rcv_skb() are due to receive buffer shortage. However,
+>> nothing should prevent doing a setsockopt() with SO_ATTACH_FILTER on
+>> the socket, that could drop some of the incoming skbs when handled in
+>> sock_queue_rcv_skb().
+>>
+>> In that case sock_queue_rcv_skb() will return with -EPERM, propagated
+>> from sk_filter() and if in L2CAP_MODE_ERTM mode, wrong assumption was
+>> that we failed due to receive buffer being full. From that point onwards,
+>> due to the to-be-dropped skb being held in rx_busy_skb, we cannot make
+>> any forward progress as rx_busy_skb is never cleared from l2cap_sock_recvmsg(),
+>> due to the filter drop verdict over and over coming from sk_filter().
+>> Meanwhile, in l2cap_sock_recv_cb() all new incoming skbs are being
+>> dropped due to rx_busy_skb being occupied.
+>>
+>> Instead, just use __sock_queue_rcv_skb() where an error really tells
+>> that there's a receive buffer issue. Split the sk_filter() and only
+>> enable it for non-L2CAP_MODE_ERTM modes since at this point in time the
+>> skb has already been through the ERTM state machine and it has been
+>> acked, so dropping is not allowed. Since skipping sk_filter() for ERTM
+>> may have consequences wrt future abi, we need to generally disallow
+>> filters to be attached for this mode. So set SOCK_FILTER_LOCKED during
+>> socket initialization. Given that noone run into this issue before as
+>> it otherwise would have been noticed and fixed, there should be little
+>> risk of any breakage. The SOCK_FILTER_LOCKED can later on be lifted
+>> should there be a use case to call sk_filter() at a safe place for such
+>> kind of sockets.
+>
+> I think the location for a call to sk_filter() for ERTM is early in l2cap_data_rcv(), if that change is needed later on.
+>
+>> Fixes: e328140fdacb ("Bluetooth: Use event-driven approach for handling ERTM receive buffer")
+>> Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
+>> Cc: Mat Martineau <mathew.j.martineau@linux.intel.com>
+>> Cc: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+>> Cc: Willem de Bruijn <willemb@google.com>
+>> Cc: Alexei Starovoitov <ast@kernel.org>
+>
+> Acked-by: Mat Martineau <mathew.j.martineau@linux.intel.com>
+>
+>> ---
+>> I don't have a BT setup at hand, so compile tested only at this time.
+>> Would be great if some of the BT folks could help out or take over if
+>> possible. Thanks!
+>>
+>> net/bluetooth/l2cap_sock.c | 16 ++++++++++++++--
+>> 1 file changed, 14 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+>> index 388ee8b..10ba801 100644
+>> --- a/net/bluetooth/l2cap_sock.c
+>> +++ b/net/bluetooth/l2cap_sock.c
+>> @@ -1019,7 +1019,7 @@ static int l2cap_sock_recvmsg(struct socket *sock, struct msghdr *msg,
+>>         goto done;
+>>
+>>     if (pi->rx_busy_skb) {
+>> -        if (!sock_queue_rcv_skb(sk, pi->rx_busy_skb))
+>> +        if (!__sock_queue_rcv_skb(sk, pi->rx_busy_skb))
+>
+> It would be more future-proof to check specifically for -ENOMEM and -ENOBUFS, but right now those are the only errors returned by __sock_queue_rcv_skb().
 
-Silently setting SOCK_FILTER_LOCKED is unexpected and inconsistent
-with all other socket types. I don't think that we need to protect
-processes in this way against their own actions.
+Since there's also core code relying that an error from __sock_queue_rcv_skb()
+really means we have some recvbuf issue, I think we can spare making this two
+tests in fast-path.
 
-All socket types support SO_ATTACH_FILTER and there is value in being
-able to expect consistent behavior across sockets for SOL_SOCKET
-options. Even if using the feature incorrectly can cause a protocol to
-become wedged.
-
-Even without this precaution, this patch fixes the real wedge: an
-infinite rx_busy_skb filter loop. It is a stretch, but I could imagine
-scenarios where a protocol wants to acknowledge data arrival, but drop
-contents instead of queue it to userspace.
+Thanks,
+Daniel
