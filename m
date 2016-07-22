@@ -1,28 +1,36 @@
-Return-Path: <johan.hedberg@gmail.com>
-Date: Sat, 23 Jul 2016 17:43:11 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/2] Bluetooth: Put led_trigger field behind
- CONFIG_BT_LEDS
-Message-ID: <20160723144311.GA15045@t440s.P-661HNU-F1>
-References: <1469103161-39260-1-git-send-email-marcel@holtmann.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1469103161-39260-1-git-send-email-marcel@holtmann.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ] core/advertising: Fix not adding local name and appearance flags
+Date: Fri, 22 Jul 2016 16:56:25 +0300
+Message-Id: <1469195785-8907-1-git-send-email-luiz.dentz@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Thu, Jul 21, 2016, Marcel Holtmann wrote:
-> The led_trigger field in hci_dev should be conditional based on if
-> CONFIG_BT_LEDS is set or not.
-> 
-> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-> ---
->  include/net/bluetooth/hci_core.h | 2 ++
->  1 file changed, 2 insertions(+)
+If the advertisement is cause the connectable flag to be set add local
+name and appearance so the scan response is generated properly as the
+remote may attempt connect/pair these information shall be made available
+as well.
+---
+ src/advertising.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-Both patches have been applied to bluetooth-next. Thanks.
+diff --git a/src/advertising.c b/src/advertising.c
+index d2019de..52b536d 100644
+--- a/src/advertising.c
++++ b/src/advertising.c
+@@ -473,7 +473,8 @@ static DBusMessage *refresh_advertisement(struct advertisement *ad)
+ 	DBG("Refreshing advertisement: %s", ad->path);
+ 
+ 	if (ad->type == AD_TYPE_PERIPHERAL)
+-		flags = MGMT_ADV_FLAG_CONNECTABLE | MGMT_ADV_FLAG_DISCOV;
++		flags = MGMT_ADV_FLAG_CONNECTABLE | MGMT_ADV_FLAG_DISCOV |
++			MGMT_ADV_FLAG_APPEARANCE | MGMT_ADV_FLAG_LOCAL_NAME;
+ 
+ 	if (ad->include_tx_power)
+ 		flags |= MGMT_ADV_FLAG_TX_POWER;
+-- 
+2.7.4
 
-Johan
