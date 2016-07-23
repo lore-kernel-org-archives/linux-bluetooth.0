@@ -1,31 +1,28 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <johan.hedberg@gmail.com>
+Date: Sat, 23 Jul 2016 17:43:11 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/2] Bluetooth: Put led_trigger field behind
+ CONFIG_BT_LEDS
+Message-ID: <20160723144311.GA15045@t440s.P-661HNU-F1>
+References: <1469103161-39260-1-git-send-email-marcel@holtmann.org>
 MIME-Version: 1.0
-From: Ajay Parashar <ajay.parasha@gmail.com>
-Date: Sun, 24 Jul 2016 00:09:19 +0530
-Message-ID: <CAMj0Yyu7Ot6xzCxTh0puAuVeV-jBuspSDMLxg_R0Y4V068zHhg@mail.gmail.com>
-Subject: BT PAN Connection - NAP with PANU ?
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1469103161-39260-1-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Marcel,
 
-I am using bluez 5.35 and performing one POC with NAP and PANU communication.
-I want to connect PANU with NAP, for this i executed below tasks
+On Thu, Jul 21, 2016, Marcel Holtmann wrote:
+> The led_trigger field in hci_dev should be conditional based on if
+> CONFIG_BT_LEDS is set or not.
+> 
+> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+> ---
+>  include/net/bluetooth/hci_core.h | 2 ++
+>  1 file changed, 2 insertions(+)
 
-1) Created a bridge successfully with Ubuntu 15.10.
-2) Executed /test/test-nap script and i can see that NAP has established.
+Both patches have been applied to bluetooth-next. Thanks.
 
-3) I am not getting how to start PANU (client) so that it can be
-connected with NAP (as defined in above step 2) and start
-communicating each other.
-
-I searched a lot but did not get any example, script  or command that
-can let me know how to execute PANU.
-
-It will be great help if you please let me know how can i start PANU
-and communicate it with NAP.
-
-Regards
-Ajay
+Johan
