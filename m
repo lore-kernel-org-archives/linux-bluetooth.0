@@ -1,29 +1,30 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
-Subject: Re: [PATCH bluetooth-next 1/2] mac802154: set phy net namespace for new ifaces
+Subject: Re: [PATCH bluetooth-next 2/2] 6lowpan: ndisc: no overreact if no short address is available
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20160724141225.17591-1-aar@pengutronix.de>
-Date: Sun, 24 Jul 2016 18:42:35 +0200
+In-Reply-To: <20160724141225.17591-2-aar@pengutronix.de>
+Date: Sun, 24 Jul 2016 18:42:33 +0200
 Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de,
 	linux-bluetooth@vger.kernel.org
-Message-Id: <8B7819D2-CF97-4596-984E-4E33793E2ACB@holtmann.org>
-References: <20160724141225.17591-1-aar@pengutronix.de>
+Message-Id: <B40D8264-956A-43FB-A6A3-670E428486D9@holtmann.org>
+References: <20160724141225.17591-1-aar@pengutronix.de> <20160724141225.17591-2-aar@pengutronix.de>
 To: Alexander Aring <aar@pengutronix.de>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Alex,
 
-> This patch sets the net namespace when creating SoftMAC interfaces. This
-> is important if the namespace at phy layer was switched before.
-> Currently we losing interfaces in some namespace and it's not possible
-> to recover that.
+> This patch removes handling to remove short address for a neigbour entry
+> if RS/RA/NS/NA doesn't contain a short address. If these messages
+> doesn't has any short address option, the existing short address from
+> ndisc cache will be used. The current behaviour will set that the
+> neigbour doesn't has a short address anymore.
 > 
 > Signed-off-by: Alexander Aring <aar@pengutronix.de>
 > ---
-> net/mac802154/iface.c | 1 +
-> 1 file changed, 1 insertion(+)
+> net/6lowpan/ndisc.c | 2 --
+> 1 file changed, 2 deletions(-)
 
 patch has been applied to bluetooth-next tree.
 
