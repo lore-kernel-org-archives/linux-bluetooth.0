@@ -1,84 +1,119 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <CABBYNZLNzLx0+BGgLzubwOHUaMcyde6bL1hhxrHtfskt9OGbzg@mail.gmail.com>
-References: <CAMj0Yyu7Ot6xzCxTh0puAuVeV-jBuspSDMLxg_R0Y4V068zHhg@mail.gmail.com>
- <CABBYNZJnSZtmEkBb8T4urYhHw2+pqAKu77d_g3_eJ1nw=02D7A@mail.gmail.com>
- <CAMj0Yys1efPQoZPPHbPKs54c9DFWRfFjhkt4Pe3K-fYaZZiarw@mail.gmail.com> <CABBYNZLNzLx0+BGgLzubwOHUaMcyde6bL1hhxrHtfskt9OGbzg@mail.gmail.com>
-From: Ajay Parashar <ajay.parasha@gmail.com>
-Date: Tue, 26 Jul 2016 11:11:12 +0530
-Message-ID: <CAMj0YytVTxHLY-Mkrjy9PEvNPVd-2GmX9vAK5PeLVo+kSCvAZw@mail.gmail.com>
-Subject: Re: BT PAN Connection - NAP with PANU ?
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <mathew.j.martineau@linux.intel.com>
+From: Mat Martineau <mathew.j.martineau@linux.intel.com>
+To: linux-bluetooth@vger.kernel.org,
+	daniel@iogearbox.net
+Cc: marcel@holtmann.org,
+	Mat Martineau <mathew.j.martineau@linux.intel.com>,
+	Gustavo Padovan <gustavo.padovan@collabora.co.uk>,
+	Willem de Bruijn <willemb@google.com>,
+	Alexei Starovoitov <ast@kernel.org>
+Subject: [PATCH v2] bluetooth, bpf: split sk_filter in l2cap_sock_recv_cb
+Date: Mon, 25 Jul 2016 17:05:23 -0700
+Message-Id: <20160726000523.11189-1-mathew.j.martineau@linux.intel.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Jul 25, 2016 at 5:06 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi Ajay,
->
-> On Mon, Jul 25, 2016 at 2:11 PM, Ajay Parashar <ajay.parasha@gmail.com> wrote:
->>> Hi,
->>>
->>> I am using bluez 5.35 and performing one POC with NAP and PANU communication.
->>> I want to connect PANU with NAP, for this i executed below tasks
->>>
->>> 1) Created a bridge successfully with Ubuntu 15.10.
->>> 2) Executed /test/test-nap script and i can see that NAP has established.
->>>
->>> 3) I am not getting how to start PANU (client) so that it can be
->>> connected with NAP (as defined in above step 2) and start
->>> communicating each other.
->>
->> How about doc/network-api.txt:
->>
->> https://git.kernel.org/cgit/bluetooth/bluez.git/tree/doc/network-api.txt
->>
->> e.g: org.bluez.Network1.Connect("panu")
->>
->> ----------------------------------------------------------------------------------------------
->> My fault i did Top posting, so giving my reply again in right format.
->> ----------------------------------------------------------------------------------------------------
->> Hi,
->>
->> Thanks for reply, I will try this connect API.
->> In my case it need to be connected with NAP as PANU itself, so the
->> parameter of connect api  should states its own role or the role of
->> server with whom it needs to be connected?
->>
->> These APIs are used in python examples, is there similar API available
->> for C programming application also?
->> Can i get similar C example ?
->
-> It is actually a D-Bus method call so any D-Bus binding would do it,
-> we just did in python because it is much more convenient.
->
-> --
-> Luiz Augusto von Dentz
+From: Daniel Borkmann <daniel@iogearbox.net>
 
-HI Luiz,
+During an audit for sk_filter(), we found that rx_busy_skb handling
+in l2cap_sock_recv_cb() and l2cap_sock_recvmsg() looks not quite as
+intended.
 
-I will try with C language D-Bus binding.
+The assumption from commit e328140fdacb ("Bluetooth: Use event-driven
+approach for handling ERTM receive buffer") is that errors returned
+from sock_queue_rcv_skb() are due to receive buffer shortage. However,
+nothing should prevent doing a setsockopt() with SO_ATTACH_FILTER on
+the socket, that could drop some of the incoming skbs when handled in
+sock_queue_rcv_skb().
 
-Prior to this I tried to execute bluez-5.34/test/test-network example
-and i m getting below error.
- 1) It sounds me that it is unable to found Bluetooth device, but my
-device is quite ready and working with other examples."
-2) other reason could me i did not pair this with /test-nap example,
-should first i pair this test-network example device with test-nap
-example device ?
+In that case sock_queue_rcv_skb() will return with -EPERM, propagated
+from sk_filter() and if in L2CAP_MODE_ERTM mode, wrong assumption was
+that we failed due to receive buffer being full. From that point onwards,
+due to the to-be-dropped skb being held in rx_busy_skb, we cannot make
+any forward progress as rx_busy_skb is never cleared from l2cap_sock_recvmsg(),
+due to the filter drop verdict over and over coming from sk_filter().
+Meanwhile, in l2cap_sock_recv_cb() all new incoming skbs are being
+dropped due to rx_busy_skb being occupied.
 
-Can you please let me know why i am getting this error or let me know
-some pointers from where i can debug this issue.
+Instead, just use __sock_queue_rcv_skb() where an error really tells
+that there's a receive buffer issue. Split the sk_filter() and only
+enable it for non-L2CAP_MODE_ERTM modes since at this point in time the
+skb has already been through the ERTM state machine and it has been
+acked, so dropping is not allowed. Instead, for ERTM, call sk_filter in
+l2cap_data_rcv() so the packet can be dropped before the state machine
+sees it.
 
-Traceback (most recent call last):
-  File "./test-network", line 41, in <module>
-    device = bluezutils.find_device(args[0], options.dev_id)
-  File "/mnt/hgfs/shared_With_VM_Ubuntu/test/bluezutils.py", line 30,
-in find_device
-    adapter_pattern)
-  File "/mnt/hgfs/shared_With_VM_Ubuntu/test/bluezutils.py", line 47,
-in find_device_in_objects
-    raise Exception("Bluetooth device not found")
-Exception: Bluetooth device not found
+Fixes: e328140fdacb ("Bluetooth: Use event-driven approach for handling ERTM receive buffer")
+Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
+Signed-off-by: Mat Martineau <mathew.j.martineau@linux.intel.com>
+Cc: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+Cc: Willem de Bruijn <willemb@google.com>
+Cc: Alexei Starovoitov <ast@kernel.org>
+---
+
+I modified the original patch to call sk_filter for ERTM before the packet is
+handled by the state machine and to not set the filter locked flag. I tested
+using l2test in ERTM mode, with and without a "randomly drop 1 in 64 packets"
+filter attached.
+
+Mat
+
+---
+ net/bluetooth/l2cap_core.c |  4 ++++
+ net/bluetooth/l2cap_sock.c | 13 +++++++++++--
+ 2 files changed, 15 insertions(+), 2 deletions(-)
+
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 54ceb1f..d5de0ce 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -32,6 +32,7 @@
+ 
+ #include <linux/debugfs.h>
+ #include <linux/crc16.h>
++#include <linux/filter.h>
+ 
+ #include <net/bluetooth/bluetooth.h>
+ #include <net/bluetooth/hci_core.h>
+@@ -6610,6 +6611,9 @@ static int l2cap_data_rcv(struct l2cap_chan *chan, struct sk_buff *skb)
+ 		goto drop;
+ 	}
+ 
++	if (chan->mode == L2CAP_MODE_ERTM && sk_filter(chan->data, skb))
++		goto drop;
++
+ 	if (!control->sframe) {
+ 		int err;
+ 
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index 1842141..94daa2e 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -1019,7 +1019,7 @@ static int l2cap_sock_recvmsg(struct socket *sock, struct msghdr *msg,
+ 		goto done;
+ 
+ 	if (pi->rx_busy_skb) {
+-		if (!sock_queue_rcv_skb(sk, pi->rx_busy_skb))
++		if (!__sock_queue_rcv_skb(sk, pi->rx_busy_skb))
+ 			pi->rx_busy_skb = NULL;
+ 		else
+ 			goto done;
+@@ -1270,7 +1270,16 @@ static int l2cap_sock_recv_cb(struct l2cap_chan *chan, struct sk_buff *skb)
+ 		goto done;
+ 	}
+ 
+-	err = sock_queue_rcv_skb(sk, skb);
++	if (chan->mode != L2CAP_MODE_ERTM) {
++		/* Even if no filter is attached, we could potentially
++		 * get errors from security modules, etc.
++		 */
++		err = sk_filter(sk, skb);
++		if (err)
++			goto done;
++	}
++
++	err = __sock_queue_rcv_skb(sk, skb);
+ 
+ 	/* For ERTM, handle one skb that doesn't fit into the recv
+ 	 * buffer.  This is important to do because the data frames
+-- 
+2.9.2
