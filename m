@@ -1,10 +1,12 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: fabien.proriolpatch@kazoe.org
 To: linux-bluetooth@vger.kernel.org
-Cc: fabien.proriol@jdsu.com
-Subject: [PATCH] Fix obex protocol for powerpc
-Date: Tue, 26 Jul 2016 15:14:11 +0200
-Message-Id: <1469538851-17006-1-git-send-email-fabien.proriolpatch@kazoe.org>
+Cc: Fabien Proriol <fabien.proriol@jdsu.com>
+Subject: [PATCH BlueZ] Fix obex protocol for powerpc
+Date: Tue, 26 Jul 2016 15:22:49 +0200
+Message-Id: <1469539369-17245-2-git-send-email-fabien.proriolpatch@kazoe.org>
+In-Reply-To: <1469539369-17245-1-git-send-email-fabien.proriolpatch@kazoe.org>
+References: <1469539369-17245-1-git-send-email-fabien.proriolpatch@kazoe.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
