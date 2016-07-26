@@ -1,61 +1,36 @@
-Return-Path: <willemb@google.com>
-MIME-Version: 1.0
-In-Reply-To: <20160726000523.11189-1-mathew.j.martineau@linux.intel.com>
-References: <20160726000523.11189-1-mathew.j.martineau@linux.intel.com>
-From: Willem de Bruijn <willemb@google.com>
-Date: Tue, 26 Jul 2016 10:51:49 -0400
-Message-ID: <CA+FuTSc18TsLQQx5v0Wdkmk6ffqS+=vUVRHxBx6pyYtpxyk2Fw@mail.gmail.com>
-Subject: Re: [PATCH v2] bluetooth, bpf: split sk_filter in l2cap_sock_recv_cb
-To: Mat Martineau <mathew.j.martineau@linux.intel.com>
-Cc: linux-bluetooth@vger.kernel.org, Daniel Borkmann <daniel@iogearbox.net>,
-	Marcel Holtmann <marcel@holtmann.org>, Gustavo Padovan <gustavo.padovan@collabora.co.uk>,
-	Alexei Starovoitov <ast@kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: fabien.proriolpatch@kazoe.org
+To: linux-bluetooth@vger.kernel.org
+Cc: fabien.proriol@jdsu.com
+Subject: [PATCH] Fix obex protocol for powerpc
+Date: Tue, 26 Jul 2016 15:14:11 +0200
+Message-Id: <1469538851-17006-1-git-send-email-fabien.proriolpatch@kazoe.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-> I modified the original patch to call sk_filter for ERTM before the packet is
-> handled by the state machine and to not set the filter locked flag. I tested
-> using l2test in ERTM mode, with and without a "randomly drop 1 in 64 packets"
-> filter attached.
+From: Fabien Proriol <fabien.proriol@jdsu.com>
 
-Thanks for testing. For consistency's sake, is it preferable to filter
-at this point for all modes?
+omtu and imtu is define as uint16_t in l2cap_get function (use with va_arg).
 
->
-> Mat
->
-> ---
->  net/bluetooth/l2cap_core.c |  4 ++++
->  net/bluetooth/l2cap_sock.c | 13 +++++++++++--
->  2 files changed, 15 insertions(+), 2 deletions(-)
->
-> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> index 54ceb1f..d5de0ce 100644
-> --- a/net/bluetooth/l2cap_core.c
-> +++ b/net/bluetooth/l2cap_core.c
-> @@ -32,6 +32,7 @@
->
->  #include <linux/debugfs.h>
->  #include <linux/crc16.h>
-> +#include <linux/filter.h>
->
->  #include <net/bluetooth/bluetooth.h>
->  #include <net/bluetooth/hci_core.h>
-> @@ -6610,6 +6611,9 @@ static int l2cap_data_rcv(struct l2cap_chan *chan, struct sk_buff *skb)
->                 goto drop;
->         }
->
-> +       if (chan->mode == L2CAP_MODE_ERTM && sk_filter(chan->data, skb))
-> +               goto drop;
-> +
+Signed-off-by: Fabien Proriol <fabien.proriol@jdsu.com>
+---
+ obexd/plugins/bluetooth.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-sk_filter can also accept, but trim, packets. If the protocol expects
-a header that it unconditionally pulls later, use sk_filter_trim to
-avoid trimming to below header length. I think I saw a path from
-
-  l2cap_data_rcv
-    l2cap_rx
-      l2cap_rx_state_recv
-        l2cap_reassemble_sdu
-          case L2CAP_SAR_START
-            skb_pull(skb, L2CAP_SDULEN_SIZE)
+diff --git a/obexd/plugins/bluetooth.c b/obexd/plugins/bluetooth.c
+index d8b872a..3ee5432 100644
+--- a/obexd/plugins/bluetooth.c
++++ b/obexd/plugins/bluetooth.c
+@@ -75,8 +75,8 @@ static void connect_event(GIOChannel *io, GError *err, void *user_data)
+ 	struct bluetooth_profile *profile = user_data;
+ 	struct obex_server *server = profile->server;
+ 	int type;
+-	int omtu = BT_TX_MTU;
+-	int imtu = BT_RX_MTU;
++	uint16_t omtu = BT_TX_MTU;
++	uint16_t imtu = BT_RX_MTU;
+ 	gboolean stream = TRUE;
+ 	socklen_t len = sizeof(int);
+ 
+-- 
+2.7.3
