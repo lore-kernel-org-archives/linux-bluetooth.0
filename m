@@ -1,54 +1,52 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain; charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
-Subject: Re: 5.40 --> 5.41 BLE regression for me
-From: Travis Griggs <travisgriggs@gmail.com>
-In-Reply-To: <726D281F-7FFA-490E-A02D-77E71E01DE15@gmail.com>
-Date: Wed, 27 Jul 2016 15:32:01 -0700
-Message-Id: <328F498E-7874-44C8-ADB3-681377082429@gmail.com>
-References: <726D281F-7FFA-490E-A02D-77E71E01DE15@gmail.com>
+From: Matthew Waddell <matt@littlecraft.io>
+Subject: HFP - No Audio
 To: linux-bluetooth@vger.kernel.org
+Message-ID: <5799150B.2040401@littlecraft.io>
+Date: Wed, 27 Jul 2016 13:09:47 -0700
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi,
 
-> On Jul 27, 2016, at 12:07 PM, Travis Griggs <travisgriggs@gmail.com> wrote:
-> 
-> This is surely my own fault. But my understanding of dbus is quaint enough that I don’t get what the problem is. I use a python3 variant/evolution of the example-advertisement and example-gatt-server to make my Linux SBC a BLE peripheral. Upgrading my bluez libraries from 5.40 to 5.41, I’m suddenly getting an error that I wasn’t seeing before:
-> 
-> ERROR:dbus.connection:Unable to set arguments (dbus.ObjectPath('/'), {}) according to signature None: <class 'ValueError'>: Unable to guess signature from an empty dict
-> Traceback (most recent call last):
->  File "/usr/lib/python3/dist-packages/dbus/connection.py", line 604, in msg_reply_handler
->    reply_handler(*message.get_args_list(**get_args_opts))
->  File "/usr/lib/python3/dist-packages/dbus/proxies.py", line 401, in _introspect_reply_handler
->    self._introspect_execute_queue()
->  File "/usr/lib/python3/dist-packages/dbus/proxies.py", line 387, in _introspect_execute_queue
->    proxy_method(*args, **keywords)
->  File "/usr/lib/python3/dist-packages/dbus/proxies.py", line 137, in __call__
->    **keywords)
->  File "/usr/lib/python3/dist-packages/dbus/connection.py", line 584, in call_async
->    message.append(signature=signature, *args)
-> ValueError: Unable to guess signature from an empty dict
-> ERROR:dbus.connection:Unable to set arguments (dbus.ObjectPath('/nelson_irrigation/twig_pilot'), {}) according to signature None: <class 'ValueError'>: Unable to guess signature from an empty dict
-> Traceback (most recent call last):
->  File "/usr/lib/python3/dist-packages/dbus/connection.py", line 604, in msg_reply_handler
->    reply_handler(*message.get_args_list(**get_args_opts))
->  File "/usr/lib/python3/dist-packages/dbus/proxies.py", line 401, in _introspect_reply_handler
->    self._introspect_execute_queue()
->  File "/usr/lib/python3/dist-packages/dbus/proxies.py", line 387, in _introspect_execute_queue
->    proxy_method(*args, **keywords)
->  File "/usr/lib/python3/dist-packages/dbus/proxies.py", line 137, in __call__
->    **keywords)
->  File "/usr/lib/python3/dist-packages/dbus/connection.py", line 584, in call_async
->    message.append(signature=signature, *args)
-> ValueError: Unable to guess signature from an empty dict
-> 
-> One of the errors (the second) goes away if I just try to bring up advertising (no application/services defined).
-> 
-> The only thing I can see that I am doing significantly different from the original examples, is that I derive my PATH_BASE as ‘/nelson_irrigation/twig_pilot’ rather than '/org/bluez/example/service’. I notice that the PATH_BASE value is showing up in there. Does this PATH_BASE matter more than it used to (it was basically arbitrary before)? If so, what do I need to change to make it work again?
+I am trying to configure HFP to allow in-call audio to be routed through 
+my PC's audio card.  I'm interested to know the current state of 
+support, and if anyone has had success in getting it to work.  I have 
+tried various combinations of the following components, but have so far 
+been unable to get the in-call audio working:
 
-Argh. Ignore this.
+Kernel: 4.4.11, 4.6.4, 4.7 (unstable)
+Bluez: 5.37, 5.7, 5.8, 5.9
+Pulesaudio: 7, 8, 9
+Ofono: 1.7, 1.8, 1.9
+USB Bluetooth Adapters:
+      0a12:0001 Cambridge Silicon Radio, Ltd Bluetooth Dongle (CSR8510 A10)
+      0a5c:21e8 Broadcom Corp. BCM20702A0 Bluetooth 4.0 (with firmware 
+001.002.014 build 1338)
 
-I build debian packages with the latest and install those. The default bluetooth.service has to be tweaked to include the ‘-E’ option.
+I've can verify that ofono is able to detect the HFP capabilities of a 
+connected device, and to establish a 'modem' to it. Pulseaudio is also 
+notified when a call becomes active, and appears to load the appropriate 
+loopbacks to route the audio from/to the call through the HFP modem. 
+Hacking in some extra debug tracing to pulseaudio, I've verified that 
+pulseaudio receives SCO packets from the file descriptor that it 
+receives from ofono.  Still, I am unable to hear any audio from the call.
 
-Did I see that 5.42 may see the -Experimental interface turned on by default? That would be cool… since 42 IS the answer.
+Something interesting that I've noticed, however, is that if I look at 
+the in-call traffic with hcidump, it looks to me like the payloads of 
+each of the SCO packets that are received from the remote device (the 
+phone) are either all 0x0000 or 0x0001.  I have not seen cases where it 
+is anything other than that.
+
+Does anyone have any suggestions for what might be going on, or how I 
+might be able to debug this further?
+
+This post from May sounds like similar circumstances, and possibly even 
+a success story:
+http://www.spinics.net/lists/linux-bluetooth/msg67283.html
+
+
+Thanks!
+_matt
