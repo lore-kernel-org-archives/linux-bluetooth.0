@@ -1,58 +1,45 @@
-Return-Path: <willemb@google.com>
-MIME-Version: 1.0
-In-Reply-To: <20160727184014.10859-1-mathew.j.martineau@linux.intel.com>
-References: <20160727184014.10859-1-mathew.j.martineau@linux.intel.com>
-From: Willem de Bruijn <willemb@google.com>
-Date: Wed, 27 Jul 2016 15:46:48 -0400
-Message-ID: <CA+FuTScTVdLYfkQKqc8q96FXbUBeFNgsGtucQ5tV0Ax3mwvquw@mail.gmail.com>
-Subject: Re: [PATCH v3] bluetooth, bpf: split sk_filter in l2cap_sock_recv_cb
-To: Mat Martineau <mathew.j.martineau@linux.intel.com>
-Cc: linux-bluetooth@vger.kernel.org, Daniel Borkmann <daniel@iogearbox.net>,
-	Marcel Holtmann <marcel@holtmann.org>, Gustavo Padovan <gustavo.padovan@collabora.co.uk>,
-	Alexei Starovoitov <ast@kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Travis Griggs <travisgriggs@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Subject: 5.40 --> 5.41 BLE regression for me
+Message-Id: <726D281F-7FFA-490E-A02D-77E71E01DE15@gmail.com>
+Date: Wed, 27 Jul 2016 12:07:38 -0700
+To: linux-bluetooth@vger.kernel.org
+Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, Jul 27, 2016 at 2:40 PM, Mat Martineau
-<mathew.j.martineau@linux.intel.com> wrote:
-> From: Daniel Borkmann <daniel@iogearbox.net>
->
-> During an audit for sk_filter(), we found that rx_busy_skb handling
-> in l2cap_sock_recv_cb() and l2cap_sock_recvmsg() looks not quite as
-> intended.
->
-> The assumption from commit e328140fdacb ("Bluetooth: Use event-driven
-> approach for handling ERTM receive buffer") is that errors returned
-> from sock_queue_rcv_skb() are due to receive buffer shortage. However,
-> nothing should prevent doing a setsockopt() with SO_ATTACH_FILTER on
-> the socket, that could drop some of the incoming skbs when handled in
-> sock_queue_rcv_skb().
->
-> In that case sock_queue_rcv_skb() will return with -EPERM, propagated
-> from sk_filter() and if in L2CAP_MODE_ERTM mode, wrong assumption was
-> that we failed due to receive buffer being full. From that point onwards,
-> due to the to-be-dropped skb being held in rx_busy_skb, we cannot make
-> any forward progress as rx_busy_skb is never cleared from l2cap_sock_recvmsg(),
-> due to the filter drop verdict over and over coming from sk_filter().
-> Meanwhile, in l2cap_sock_recv_cb() all new incoming skbs are being
-> dropped due to rx_busy_skb being occupied.
->
-> Instead, just use __sock_queue_rcv_skb() where an error really tells that
-> there's a receive buffer issue. Split the sk_filter() and enable it for
-> non-segmented modes at queuing time since at this point in time the skb has
-> already been through the ERTM state machine and it has been acked, so dropping
-> is not allowed. Instead, for ERTM and streaming mode, call sk_filter() in
-> l2cap_data_rcv() so the packet can be dropped before the state machine sees it.
->
-> Fixes: e328140fdacb ("Bluetooth: Use event-driven approach for handling ERTM receive buffer")
-> Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
-> Signed-off-by: Mat Martineau <mathew.j.martineau@linux.intel.com>
-> Cc: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-> Cc: Willem de Bruijn <willemb@google.com>
-> Cc: Alexei Starovoitov <ast@kernel.org>
+This is surely my own fault. But my understanding of dbus is quaint enough that I don’t get what the problem is. I use a python3 variant/evolution of the example-advertisement and example-gatt-server to make my Linux SBC a BLE peripheral. Upgrading my bluez libraries from 5.40 to 5.41, I’m suddenly getting an error that I wasn’t seeing before:
 
-Acked-by: Willem de Bruijn <willemb@google.com>
-> ---
->
-> For v3 I incorporated Willem's feedback regarding ERTM/streaming mode
-> consistency and checking for a trimmed SDU length header.
+ERROR:dbus.connection:Unable to set arguments (dbus.ObjectPath('/'), {}) according to signature None: <class 'ValueError'>: Unable to guess signature from an empty dict
+Traceback (most recent call last):
+  File "/usr/lib/python3/dist-packages/dbus/connection.py", line 604, in msg_reply_handler
+    reply_handler(*message.get_args_list(**get_args_opts))
+  File "/usr/lib/python3/dist-packages/dbus/proxies.py", line 401, in _introspect_reply_handler
+    self._introspect_execute_queue()
+  File "/usr/lib/python3/dist-packages/dbus/proxies.py", line 387, in _introspect_execute_queue
+    proxy_method(*args, **keywords)
+  File "/usr/lib/python3/dist-packages/dbus/proxies.py", line 137, in __call__
+    **keywords)
+  File "/usr/lib/python3/dist-packages/dbus/connection.py", line 584, in call_async
+    message.append(signature=signature, *args)
+ValueError: Unable to guess signature from an empty dict
+ERROR:dbus.connection:Unable to set arguments (dbus.ObjectPath('/nelson_irrigation/twig_pilot'), {}) according to signature None: <class 'ValueError'>: Unable to guess signature from an empty dict
+Traceback (most recent call last):
+  File "/usr/lib/python3/dist-packages/dbus/connection.py", line 604, in msg_reply_handler
+    reply_handler(*message.get_args_list(**get_args_opts))
+  File "/usr/lib/python3/dist-packages/dbus/proxies.py", line 401, in _introspect_reply_handler
+    self._introspect_execute_queue()
+  File "/usr/lib/python3/dist-packages/dbus/proxies.py", line 387, in _introspect_execute_queue
+    proxy_method(*args, **keywords)
+  File "/usr/lib/python3/dist-packages/dbus/proxies.py", line 137, in __call__
+    **keywords)
+  File "/usr/lib/python3/dist-packages/dbus/connection.py", line 584, in call_async
+    message.append(signature=signature, *args)
+ValueError: Unable to guess signature from an empty dict
+
+One of the errors (the second) goes away if I just try to bring up advertising (no application/services defined).
+
+The only thing I can see that I am doing significantly different from the original examples, is that I derive my PATH_BASE as ‘/nelson_irrigation/twig_pilot’ rather than '/org/bluez/example/service’. I notice that the PATH_BASE value is showing up in there. Does this PATH_BASE matter more than it used to (it was basically arbitrary before)? If so, what do I need to change to make it work again?
+
+TIA
