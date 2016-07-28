@@ -1,111 +1,130 @@
-Return-Path: <linux-wpan-owner@vger.kernel.org>
-Subject: Re: [PATCH linux-wpan/radvd 6lowpan] device-linux: detect 6LoWPAN
- lltype for hwaddr length
-To: linux-wpan@vger.kernel.org
-References: <20160621144250.31650-1-aar@pengutronix.de>
-From: Alexander Aring <aar@pengutronix.de>
-Cc: linux-bluetooth@vger.kernel.org, kernel@pengutronix.de,
-	patrik.flykt@linux.intel.com, jukka.rissanen@linux.intel.com
-Message-ID: <21cdff8b-9994-63ec-a9c8-6691b5820302@pengutronix.de>
-Date: Thu, 28 Jul 2016 14:20:53 +0200
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20160621144250.31650-1-aar@pengutronix.de>
-Content-Type: text/plain; charset=windows-1252
-Sender: linux-wpan-owner@vger.kernel.org
+In-Reply-To: <579943D4.5070900@littlecraft.io>
+References: <5799150B.2040401@littlecraft.io> <CAHY_EhU3F-DN5N9cUt=BSnd=LH1+05xqSpwCFE-iEr+hoQALYw@mail.gmail.com>
+ <579943D4.5070900@littlecraft.io>
+From: Jason Gauthier <jagauthier@gmail.com>
+Date: Wed, 27 Jul 2016 20:23:43 -0400
+Message-ID: <CAHY_EhUvhffcZUVU0QnKm+OOjid9sPcPaR_gOx6-2TVtMjwq_w@mail.gmail.com>
+Subject: Re: HFP - No Audio
+To: Matthew Waddell <matt@littlecraft.io>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Sure!
 
-On 06/21/2016 04:42 PM, Alexander Aring wrote:
-> This patch will change the behaviour for 6LoWPAN interface to detect the
-> linklayer type via debugfs. Each L2 interface has a different address
-> length and need to be detected.
-> 
-> Signed-off-by: Alexander Aring <aar@pengutronix.de>
-> ---
-> We have two choices (or even more):
-> 
->  - Add lltype like this patch to detect the hwaddr length
-> 
->  or
-> 
->  - Add a UAPI to get the hwaddr length doesn't depend on lltype
-> 
-> I did the first choice now, because it works like the net core api which
-> also has no UAPI for addr length. To get the address length you need to
-> map it to the netdev type. But this also means that a netdev type should
-> not have different hardware addresses.
-> 
-> In 6LoWPAN this is different, the ARPHRD_6LOWPAN can have different address
-> lengths. Jukka please tell me if this is fine or not, I usually don't want
-> to make things for ARPHRD_6LOWPAN link-layer specific, but we need to add
-> some solution for this.
-> 
-> My different UAPI solution is shown above, don't know which is actually
-> better. I think we need for some cases an UAPI to get the link-layer
-> type anyway.
-> 
-> btw: as fallback it use the olf behaviour 64 bit's so if we fix btle 6lowpan
-> to work with dev->addr_len = 6 and introduce the UAPI it will be fixed
-> automatically.
-> 
-> Later we need to move this stuff to sysfs. Debugfs is also not namespace
-> aware and because that it forbids me to make some special testing stuff.
-> 
->  device-linux.c | 52 +++++++++++++++++++++++++++++++++++++++++++++++++++-
->  pathnames.h    |  1 +
->  2 files changed, 52 insertions(+), 1 deletion(-)
-> 
-> diff --git a/device-linux.c b/device-linux.c
-> index 55f8522..3d18071 100644
-> --- a/device-linux.c
-> +++ b/device-linux.c
-> @@ -60,6 +60,42 @@ static uint16_t lowpan_get_short_addr(struct Interface *iface)
+Linux Kernel: 4.4.11-v7+
+Bluez 5.39
+PA: 8.0
+Ofono : 1.18
 
-...
+Bus 001 Device 006: ID 0a12:0001 Cambridge Silicon Radio, Ltd
+Bluetooth Dongle (HCI mode)
 
->   * this function gets the hardware type and address of an interface,
->   * determines the link layer token length and checks it against
->   * the defined prefixes
-> @@ -115,7 +151,21 @@ int update_device_info(int sock, struct Interface *iface)
->  		break;
->  #endif				/* ARPHDR_ARCNET */
->  	case ARPHRD_6LOWPAN:
-> -		iface->sllao.if_hwaddr_len = 64;
-> +		/* hwaddr length differs on each L2 type lets detect them */
-> +		switch (lowpan_get_lltype(iface)) {
-> +		case LOWPAN_LLTYPE_BTLE:
-> +			iface->sllao.if_hwaddr_len = 48;
-> +			break;
-> +		case LOWPAN_LLTYPE_IEEE802154:
-> +			iface->sllao.if_hwaddr_len = 64;
-> +			break;
-> +		default:
-> +			/* TODO change to -1 if 6LoWPAN has better UAPI for that */
-> +			flog(LOG_WARNING, "WARNING, couldn't get 6LoWPAN link-layer type on %s, falling back to 64 bit hwaddr", iface->props.name);
-> +			iface->sllao.if_hwaddr_len = 64;
-> +			break;
-> +		}
-> +
+hci1:   Type: BR/EDR  Bus: USB
+        BD Address: 00:1A:7D:DA:71:13  ACL MTU: 310:10  SCO MTU: 64:8
+        UP RUNNING PSCAN
+        RX bytes:997282 acl:2321 sco:7085 events:417 errors:0
+        TX bytes:369146 acl:198 sco:7083 commands:138 errors:1
+        Features: 0xff 0xff 0x8f 0xfe 0xdb 0xff 0x5b 0x87
+        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+        Link policy: RSWITCH HOLD SNIFF PARK
+        Link mode: SLAVE ACCEPT
+        Name: 'CarPi #2'
+        Class: 0x2c0000
+        Service Classes: Rendering, Capturing, Audio
+        Device Class: Miscellaneous,
+        HCI Version: 4.0 (0x6)  Revision: 0x22bb
+        LMP Version: 4.0 (0x6)  Subversion: 0x22bb
+        Manufacturer: Cambridge Silicon Radio (10)
 
 
-I think to solve this issue, the best way currently is to evaluate:
-
-/sys/class/net/$IFNAME/addr_len
-
-which directly told us the dev->addr_len attribute in kernel. The only
-thing that it could be that CONFIG_SYSFS isn't compiled. On 802.15.4 we
-need to have SYSFS because iwpan and phy enumaration [0].
-
-This solution should make radvd working with current mainline version
-which does dev->addr_len == 8 and also with the version when we change
-addr_len to 6.
-
-Or we introduce an UAPI subtype mechanism? Maybe something which is
-already set the NET_DEVTYPE stuff. Don't know I think we should go that
-way, we can later still change it to some subtype (linklayer type)
-evaluation if this information isn't enough for some linklayer types.
-
-- Alex
-
-[0] https://github.com/linux-wpan/wpan-tools/blob/master/src/iwpan.c#L221
+On Wed, Jul 27, 2016 at 7:29 PM, Matthew Waddell <matt@littlecraft.io> wrote:
+> Hi Jason,
+>
+> Thank you for the success report!
+>
+> Would you be able to share the version numbers of the Kernel, Bluez, Ofono,
+> and pulseaudio you are using on your pi3?  Also, do you know what chipset of
+> bluetooth adapter you are using?
+>
+> Thanks!
+> _matt
+>
+> On 07/27/2016 04:25 PM, Jason Gauthier wrote:
+>>
+>> Matthew,
+>>
+>>   That was my original email, but no success.  The BT adapter in the
+>> raspberry pi 3 I was using does not show any SCO packets during the
+>> call.  I've moved to an external BT device and I haven't had any
+>> issues with it.
+>>
+>> When the call is made, your screen should be *flooded* with SCO
+>> packets.  If not, then you are experiencing the same problem that I've
+>> never found a solution to.
+>>
+>> Good luck,
+>>
+>> Jason
+>>
+>> On Wed, Jul 27, 2016 at 4:09 PM, Matthew Waddell <matt@littlecraft.io>
+>> wrote:
+>>>
+>>> Hi,
+>>>
+>>> I am trying to configure HFP to allow in-call audio to be routed through
+>>> my
+>>> PC's audio card.  I'm interested to know the current state of support,
+>>> and
+>>> if anyone has had success in getting it to work.  I have tried various
+>>> combinations of the following components, but have so far been unable to
+>>> get
+>>> the in-call audio working:
+>>>
+>>> Kernel: 4.4.11, 4.6.4, 4.7 (unstable)
+>>> Bluez: 5.37, 5.7, 5.8, 5.9
+>>> Pulesaudio: 7, 8, 9
+>>> Ofono: 1.7, 1.8, 1.9
+>>> USB Bluetooth Adapters:
+>>>       0a12:0001 Cambridge Silicon Radio, Ltd Bluetooth Dongle (CSR8510
+>>> A10)
+>>>       0a5c:21e8 Broadcom Corp. BCM20702A0 Bluetooth 4.0 (with firmware
+>>> 001.002.014 build 1338)
+>>>
+>>> I've can verify that ofono is able to detect the HFP capabilities of a
+>>> connected device, and to establish a 'modem' to it. Pulseaudio is also
+>>> notified when a call becomes active, and appears to load the appropriate
+>>> loopbacks to route the audio from/to the call through the HFP modem.
+>>> Hacking
+>>> in some extra debug tracing to pulseaudio, I've verified that pulseaudio
+>>> receives SCO packets from the file descriptor that it receives from
+>>> ofono.
+>>> Still, I am unable to hear any audio from the call.
+>>>
+>>> Something interesting that I've noticed, however, is that if I look at
+>>> the
+>>> in-call traffic with hcidump, it looks to me like the payloads of each of
+>>> the SCO packets that are received from the remote device (the phone) are
+>>> either all 0x0000 or 0x0001.  I have not seen cases where it is anything
+>>> other than that.
+>>>
+>>> Does anyone have any suggestions for what might be going on, or how I
+>>> might
+>>> be able to debug this further?
+>>>
+>>> This post from May sounds like similar circumstances, and possibly even a
+>>> success story:
+>>> http://www.spinics.net/lists/linux-bluetooth/msg67283.html
+>>>
+>>>
+>>> Thanks!
+>>> _matt
+>>> --
+>>> To unsubscribe from this list: send the line "unsubscribe
+>>> linux-bluetooth"
+>>> in
+>>> the body of a message to majordomo@vger.kernel.org
+>>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
