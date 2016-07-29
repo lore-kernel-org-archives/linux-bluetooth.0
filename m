@@ -1,42 +1,101 @@
-Return-Path: <SRS0=aPAi=TT=m4x.org=nicolas.iooss_linux@bounces.m4x.org>
-From: Nicolas Iooss <nicolas.iooss_linux@m4x.org>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Nicolas Iooss <nicolas.iooss_linux@m4x.org>
-Subject: [PATCH 1/1] Bluetooth: add printf format attribute to hci_set_[fh]w_info()
-Date: Fri, 29 Jul 2016 13:28:25 +0200
-Message-Id: <20160729112825.22091-1-nicolas.iooss_linux@m4x.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+MIME-Version: 1.0
+In-Reply-To: <20160728162147.29986-1-mathew.j.martineau@linux.intel.com>
+References: <20160728162147.29986-1-mathew.j.martineau@linux.intel.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Fri, 29 Jul 2016 14:11:44 +0300
+Message-ID: <CABBYNZ+_rMYB_mRhC2+wxytv=O=K3BNcK05yZooGrAQA=4ZpEA@mail.gmail.com>
+Subject: Re: [PATCH] tools: Fix recevied/received typos
+To: Mat Martineau <mathew.j.martineau@linux.intel.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Commit 5177a83827cd ("Bluetooth: Add debugfs fields for hardware and
-firmware info") introduced hci_set_hw_info() and hci_set_fw_info().
-These functions use kvasprintf_const() but are not marked with a
-__printf attribute.  Adding such an attribute helps detecting issues
-related to printf-formatting at build time.
+Hi Mat,
 
-Signed-off-by: Nicolas Iooss <nicolas.iooss_linux@m4x.org>
----
- include/net/bluetooth/hci_core.h | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+On Thu, Jul 28, 2016 at 7:21 PM, Mat Martineau
+<mathew.j.martineau@linux.intel.com> wrote:
+> ---
+>
+> While fixing this, I noticed that ubcsp.{c,h} are the only source files
+> without proper Unix line endings. It's an easy fix but a lot of
+> churn. Let me know if I should submit a patch for that.
+>
+> Mat
+>
+> ---
+>  tools/l2test.c  | 2 +-
+>  tools/scotest.c | 2 +-
+>  tools/ubcsp.c   | 6 +++---
+>  3 files changed, 5 insertions(+), 5 deletions(-)
+>
+> diff --git a/tools/l2test.c b/tools/l2test.c
+> index d4e3ae6..1819423 100644
+> --- a/tools/l2test.c
+> +++ b/tools/l2test.c
+> @@ -830,7 +830,7 @@ static void dump_mode(int sk)
+>                         return;
+>                 }
+>
+> -               syslog(LOG_INFO, "Recevied %d bytes", len);
+> +               syslog(LOG_INFO, "Received %d bytes", len);
+>                 hexdump(buf, len);
+>         }
+>  }
+> diff --git a/tools/scotest.c b/tools/scotest.c
+> index 596e403..f894c24 100644
+> --- a/tools/scotest.c
+> +++ b/tools/scotest.c
+> @@ -265,7 +265,7 @@ static void dump_mode(int sk)
+>
+>         syslog(LOG_INFO,"Receiving ...");
+>         while ((len = read(sk, buf, data_size)) > 0)
+> -               syslog(LOG_INFO, "Recevied %d bytes", len);
+> +               syslog(LOG_INFO, "Received %d bytes", len);
+>  }
+>
+>  static void recv_mode(int sk)
+> diff --git a/tools/ubcsp.c b/tools/ubcsp.c
+> index b3f883a..cd17d48 100644
+> --- a/tools/ubcsp.c
+> +++ b/tools/ubcsp.c
+> @@ -351,14 +351,14 @@ bad_match_loop:
+>
+>  /*****************************************************************************/
+>  /**                                                                         **/
+> -/** ubcsp_recevied_packet                                                   **/
+> +/** ubcsp_received_packet                                                   **/
+>  /**                                                                         **/
+>  /** This function is called when we have a SLIP END octet and a full        **/
+>  /** packet header and possibly data in the receive packet                   **/
+>  /**                                                                         **/
+>  /*****************************************************************************/
+>
+> -static uint8 ubcsp_recevied_packet (void)
+> +static uint8 ubcsp_received_packet (void)
+>  {
+>         static uint8
+>                 receive_crc,
+> @@ -1107,7 +1107,7 @@ uint8 ubcsp_poll (uint8 *activity)
+>                                 {
+>                                         /* process the received packet */
+>
+> -                                       *activity |= ubcsp_recevied_packet ();
+> +                                       *activity |= ubcsp_received_packet ();
+>
+>                                         if (*activity & UBCSP_PACKET_ACK)
+>                                         {
+> --
+> 2.9.2
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index ee7fc47680a1..012e5031fe47 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -1026,8 +1026,8 @@ int hci_resume_dev(struct hci_dev *hdev);
- int hci_reset_dev(struct hci_dev *hdev);
- int hci_recv_frame(struct hci_dev *hdev, struct sk_buff *skb);
- int hci_recv_diag(struct hci_dev *hdev, struct sk_buff *skb);
--void hci_set_hw_info(struct hci_dev *hdev, const char *fmt, ...);
--void hci_set_fw_info(struct hci_dev *hdev, const char *fmt, ...);
-+__printf(2, 3) void hci_set_hw_info(struct hci_dev *hdev, const char *fmt, ...);
-+__printf(2, 3) void hci_set_fw_info(struct hci_dev *hdev, const char *fmt, ...);
- int hci_dev_open(__u16 dev);
- int hci_dev_close(__u16 dev);
- int hci_dev_do_close(struct hci_dev *hdev);
+Doesn't apply:
+
+Applying: tools: Fix recevied/received typos
+error: patch failed: tools/ubcsp.c:351
+error: tools/ubcsp.c: patch does not apply
+Patch failed at 0002 tools: Fix recevied/received typos
+
+
 -- 
-2.9.0
+Luiz Augusto von Dentz
