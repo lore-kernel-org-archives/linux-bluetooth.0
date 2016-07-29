@@ -1,101 +1,63 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20160728162147.29986-1-mathew.j.martineau@linux.intel.com>
-References: <20160728162147.29986-1-mathew.j.martineau@linux.intel.com>
+In-Reply-To: <1469714808-18136-2-git-send-email-fabien.proriolpatch@kazoe.org>
+References: <1469714808-18136-1-git-send-email-fabien.proriolpatch@kazoe.org> <1469714808-18136-2-git-send-email-fabien.proriolpatch@kazoe.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Fri, 29 Jul 2016 14:11:44 +0300
-Message-ID: <CABBYNZ+_rMYB_mRhC2+wxytv=O=K3BNcK05yZooGrAQA=4ZpEA@mail.gmail.com>
-Subject: Re: [PATCH] tools: Fix recevied/received typos
-To: Mat Martineau <mathew.j.martineau@linux.intel.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Fri, 29 Jul 2016 14:02:08 +0300
+Message-ID: <CABBYNZ+GxgQvSZam0mKLBnWXz4GuL3o3C9hfqs=EMUOvC2NxNg@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] Fix obex protocol for powerpc
+To: fabien.proriolpatch@kazoe.org
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Fabien Proriol <fabien.proriol@jdsu.com>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mat,
+Hi Fabien,
 
-On Thu, Jul 28, 2016 at 7:21 PM, Mat Martineau
-<mathew.j.martineau@linux.intel.com> wrote:
+On Thu, Jul 28, 2016 at 5:06 PM,  <fabien.proriolpatch@kazoe.org> wrote:
+> From: Fabien Proriol <fabien.proriol@jdsu.com>
+>
+> omtu and imtu is define as uint16_t in l2cap_get function (use with va_arg).
 > ---
+>  obexd/client/bluetooth.c  | 4 ++--
+>  obexd/plugins/bluetooth.c | 4 ++--
+>  2 files changed, 4 insertions(+), 4 deletions(-)
 >
-> While fixing this, I noticed that ubcsp.{c,h} are the only source files
-> without proper Unix line endings. It's an easy fix but a lot of
-> churn. Let me know if I should submit a patch for that.
->
-> Mat
->
-> ---
->  tools/l2test.c  | 2 +-
->  tools/scotest.c | 2 +-
->  tools/ubcsp.c   | 6 +++---
->  3 files changed, 5 insertions(+), 5 deletions(-)
->
-> diff --git a/tools/l2test.c b/tools/l2test.c
-> index d4e3ae6..1819423 100644
-> --- a/tools/l2test.c
-> +++ b/tools/l2test.c
-> @@ -830,7 +830,7 @@ static void dump_mode(int sk)
->                         return;
->                 }
->
-> -               syslog(LOG_INFO, "Recevied %d bytes", len);
-> +               syslog(LOG_INFO, "Received %d bytes", len);
->                 hexdump(buf, len);
->         }
->  }
-> diff --git a/tools/scotest.c b/tools/scotest.c
-> index 596e403..f894c24 100644
-> --- a/tools/scotest.c
-> +++ b/tools/scotest.c
-> @@ -265,7 +265,7 @@ static void dump_mode(int sk)
->
->         syslog(LOG_INFO,"Receiving ...");
->         while ((len = read(sk, buf, data_size)) > 0)
-> -               syslog(LOG_INFO, "Recevied %d bytes", len);
-> +               syslog(LOG_INFO, "Received %d bytes", len);
->  }
->
->  static void recv_mode(int sk)
-> diff --git a/tools/ubcsp.c b/tools/ubcsp.c
-> index b3f883a..cd17d48 100644
-> --- a/tools/ubcsp.c
-> +++ b/tools/ubcsp.c
-> @@ -351,14 +351,14 @@ bad_match_loop:
->
->  /*****************************************************************************/
->  /**                                                                         **/
-> -/** ubcsp_recevied_packet                                                   **/
-> +/** ubcsp_received_packet                                                   **/
->  /**                                                                         **/
->  /** This function is called when we have a SLIP END octet and a full        **/
->  /** packet header and possibly data in the receive packet                   **/
->  /**                                                                         **/
->  /*****************************************************************************/
->
-> -static uint8 ubcsp_recevied_packet (void)
-> +static uint8 ubcsp_received_packet (void)
+> diff --git a/obexd/client/bluetooth.c b/obexd/client/bluetooth.c
+> index be007de..e35124a 100644
+> --- a/obexd/client/bluetooth.c
+> +++ b/obexd/client/bluetooth.c
+> @@ -443,8 +443,8 @@ static int bluetooth_getpacketopt(GIOChannel *io, int *tx_mtu, int *rx_mtu)
 >  {
->         static uint8
->                 receive_crc,
-> @@ -1107,7 +1107,7 @@ uint8 ubcsp_poll (uint8 *activity)
->                                 {
->                                         /* process the received packet */
+>         int sk = g_io_channel_unix_get_fd(io);
+>         int type;
+> -       int omtu = -1;
+> -       int imtu = -1;
+> +       uint16_t omtu = BT_TX_MTU;
+> +       uint16_t imtu = BT_RX_MTU;
+>         socklen_t len = sizeof(int);
 >
-> -                                       *activity |= ubcsp_recevied_packet ();
-> +                                       *activity |= ubcsp_received_packet ();
+>         DBG("");
+> diff --git a/obexd/plugins/bluetooth.c b/obexd/plugins/bluetooth.c
+> index d8b872a..3ee5432 100644
+> --- a/obexd/plugins/bluetooth.c
+> +++ b/obexd/plugins/bluetooth.c
+> @@ -75,8 +75,8 @@ static void connect_event(GIOChannel *io, GError *err, void *user_data)
+>         struct bluetooth_profile *profile = user_data;
+>         struct obex_server *server = profile->server;
+>         int type;
+> -       int omtu = BT_TX_MTU;
+> -       int imtu = BT_RX_MTU;
+> +       uint16_t omtu = BT_TX_MTU;
+> +       uint16_t imtu = BT_RX_MTU;
+>         gboolean stream = TRUE;
+>         socklen_t len = sizeof(int);
 >
->                                         if (*activity & UBCSP_PACKET_ACK)
->                                         {
 > --
-> 2.9.2
+> 2.7.3
 
-Doesn't apply:
-
-Applying: tools: Fix recevied/received typos
-error: patch failed: tools/ubcsp.c:351
-error: tools/ubcsp.c: patch does not apply
-Patch failed at 0002 tools: Fix recevied/received typos
-
+Applied, thanks.
 
 -- 
 Luiz Augusto von Dentz
