@@ -1,194 +1,52 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: =?UTF-8?q?Micha=C5=82=20Narajowski?=
-	<michal.narajowski@codecoup.pl>
-To: linux-bluetooth@vger.kernel.org
-Cc: =?UTF-8?q?Micha=C5=82=20Narajowski?=
-	<michal.narajowski@codecoup.pl>
-Subject: [PATCH BlueZ] core/adapter: Add support for enabling privacy
-Date: Mon,  1 Aug 2016 13:53:53 +0200
-Message-Id: <1470052433-21116-1-git-send-email-michal.narajowski@codecoup.pl>
+MIME-Version: 1.0
+In-Reply-To: <1469195785-8907-1-git-send-email-luiz.dentz@gmail.com>
+References: <1469195785-8907-1-git-send-email-luiz.dentz@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Mon, 1 Aug 2016 14:49:56 +0300
+Message-ID: <CABBYNZKriUJXF=Msg3vw1O78cmzY6Aw97UeEOBPQbg_FWGaaew@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] core/advertising: Fix not adding local name and
+ appearance flags
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This adds support for loading local IRK key when adapter is configured.
-In case IRK is not present new key is generated and stored.
----
- src/adapter.c | 141 +++++++++++++++++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 136 insertions(+), 5 deletions(-)
+Hi,
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 3742398..fc8d10c 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -433,6 +433,12 @@ static void store_adapter_info(struct btd_adapter *adapter)
- 
- 	key_file = g_key_file_new();
- 
-+	ba2str(&adapter->bdaddr, address);
-+	snprintf(filename, PATH_MAX, STORAGEDIR "/%s/settings", address);
-+
-+	/* IRK must be preserved in the file, so load contents first */
-+	g_key_file_load_from_file(key_file, filename, 0, NULL);
-+
- 	if (adapter->pairable_timeout != main_opts.pairto)
- 		g_key_file_set_integer(key_file, "General", "PairableTimeout",
- 					adapter->pairable_timeout);
-@@ -455,11 +461,6 @@ static void store_adapter_info(struct btd_adapter *adapter)
- 		g_key_file_set_string(key_file, "General", "Alias",
- 							adapter->stored_alias);
- 
--	ba2str(&adapter->bdaddr, address);
--	snprintf(filename, PATH_MAX, STORAGEDIR "/%s/settings", address);
--
--	create_file(filename, S_IRUSR | S_IWUSR);
--
- 	str = g_key_file_to_data(key_file, &length, NULL);
- 	g_file_set_contents(filename, str, length, NULL);
- 	g_free(str);
-@@ -3141,6 +3142,130 @@ static struct conn_param *get_conn_param(GKeyFile *key_file, const char *peer,
- 	return param;
- }
- 
-+static int generate_random_buffer(uint8_t *buf, int buflen)
-+{
-+	int fd;
-+
-+	fd = open("/dev/urandom", O_RDONLY);
-+	if (fd < 0) {
-+		error("Error opening /dev/urandom: %s", strerror(errno));
-+		return -1;
-+	}
-+
-+	if (read(fd, buf, buflen) != buflen) {
-+		error("Reading from urandom failed");
-+		close(fd);
-+		return -1;
-+	}
-+
-+	close(fd);
-+	return 0;
-+}
-+
-+static int generate_and_write_irk(uint8_t *irk, GKeyFile *key_file, const char *filename)
-+{
-+	char str_irk_out[33];
-+	gsize length = 0;
-+	int i;
-+	char *str;
-+
-+	if (generate_random_buffer(irk, 16)) {
-+		error("Failed to generate IRK");
-+		return -1;
-+	}
-+
-+	for (i = 0; i < 16; i++)
-+		sprintf(str_irk_out + (i * 2), "%02x", irk[i]);
-+
-+	str_irk_out[32] = '\0';
-+	info("Generated IRK successfully");
-+
-+	g_key_file_set_string(key_file, "Keys", "IRK", str_irk_out);
-+	str = g_key_file_to_data(key_file, &length, NULL);
-+	g_file_set_contents(filename, str, length, NULL);
-+	g_free(str);
-+	DBG("Generated IRK written to file");
-+	return 0;
-+}
-+
-+static int load_irk(struct btd_adapter *adapter, uint8_t *irk)
-+{
-+	GKeyFile *key_file;
-+	char filename[PATH_MAX];
-+	char address[18];
-+	char *str_irk;
-+	int ret;
-+
-+	ba2str(&adapter->bdaddr, address);
-+	snprintf(filename, PATH_MAX, STORAGEDIR "/%s/settings", address);
-+
-+	key_file = g_key_file_new();
-+	g_key_file_load_from_file(key_file, filename, 0, NULL);
-+
-+	str_irk = g_key_file_get_string(key_file, "Keys", "IRK", NULL);
-+	if (!str_irk) {
-+		info("No IRK for %s, creating new IRK", address);
-+		ret = generate_and_write_irk(irk, key_file, filename);
-+		g_key_file_free(key_file);
-+		return ret;
-+	}
-+
-+	g_key_file_free(key_file);
-+
-+	if (strlen(str_irk) != 32 || str2buf(str_irk, irk, 16)) {
-+		/* TODO re-create new IRK here? */
-+		error("Invalid IRK format, not enabling privacy");
-+		g_free(str_irk);
-+		return -1;
-+	}
-+
-+	g_free(str_irk);
-+	DBG("Successfully read IRK from file");
-+	return 0;
-+}
-+
-+static void set_privacy_complete(uint8_t status, uint16_t length,
-+					const void *param, void *user_data)
-+{
-+	struct btd_adapter *adapter = user_data;
-+
-+	if (status != MGMT_STATUS_SUCCESS) {
-+		btd_error(adapter->dev_id, "Failed to set privacy: %s (0x%02x)",
-+						mgmt_errstr(status), status);
-+		return;
-+	}
-+
-+	DBG("Successfuly set privacy for index %u", adapter->dev_id);
-+}
-+
-+static int set_privacy(struct btd_adapter *adapter)
-+{
-+	struct mgmt_cp_set_privacy cp;
-+	int err;
-+
-+	memset(&cp, 0, sizeof(cp));
-+	/* TODO privacy mode should be configured from main.conf */
-+	cp.privacy = 0x01;
-+	err = load_irk(adapter, cp.irk);
-+
-+	/* TODO should we disable if IRK is invalid? */
-+	if (err)
-+		return err;
-+
-+	DBG("sending set privacy command for index %u", adapter->dev_id);
-+	DBG("setting privacy mode %u for index %u", cp.privacy, adapter->dev_id);
-+
-+	if (mgmt_send(adapter->mgmt, MGMT_OP_SET_PRIVACY,
-+				adapter->dev_id, sizeof(cp), &cp,
-+				set_privacy_complete, adapter, NULL) > 0)
-+		return 0;
-+
-+	btd_error(adapter->dev_id, "Failed to set privacy for index %u",
-+							adapter->dev_id);
-+
-+	return -1;
-+}
-+
- static void load_link_keys_complete(uint8_t status, uint16_t length,
- 					const void *param, void *user_data)
- {
-@@ -7893,6 +8018,12 @@ static void read_info_complete(uint8_t status, uint16_t length,
- 	if (missing_settings & MGMT_SETTING_SECURE_CONN)
- 		set_mode(adapter, MGMT_OP_SET_SECURE_CONN, 0x01);
- 
-+	/*
-+	 * Always reload privacy settings and set IRK.
-+	 */
-+	if (adapter->supported_settings & MGMT_SETTING_PRIVACY)
-+		set_privacy(adapter);
-+
- 	if (main_opts.fast_conn &&
- 			(missing_settings & MGMT_SETTING_FAST_CONNECTABLE))
- 		set_mode(adapter, MGMT_OP_SET_FAST_CONNECTABLE, 0x01);
+On Fri, Jul 22, 2016 at 4:56 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> If the advertisement is cause the connectable flag to be set add local
+> name and appearance so the scan response is generated properly as the
+> remote may attempt connect/pair these information shall be made available
+> as well.
+> ---
+>  src/advertising.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+>
+> diff --git a/src/advertising.c b/src/advertising.c
+> index d2019de..52b536d 100644
+> --- a/src/advertising.c
+> +++ b/src/advertising.c
+> @@ -473,7 +473,8 @@ static DBusMessage *refresh_advertisement(struct advertisement *ad)
+>         DBG("Refreshing advertisement: %s", ad->path);
+>
+>         if (ad->type == AD_TYPE_PERIPHERAL)
+> -               flags = MGMT_ADV_FLAG_CONNECTABLE | MGMT_ADV_FLAG_DISCOV;
+> +               flags = MGMT_ADV_FLAG_CONNECTABLE | MGMT_ADV_FLAG_DISCOV |
+> +                       MGMT_ADV_FLAG_APPEARANCE | MGMT_ADV_FLAG_LOCAL_NAME;
+>
+>         if (ad->include_tx_power)
+>                 flags |= MGMT_ADV_FLAG_TX_POWER;
+> --
+> 2.7.4
+
+This does not work since the kernel does not even check those flags,
+instead it seems to expect the scan data to come directly from
+userspace.
+
+
 -- 
-2.7.4
-
+Luiz Augusto von Dentz
