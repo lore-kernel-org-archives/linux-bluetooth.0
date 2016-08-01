@@ -1,52 +1,33 @@
-Return-Path: <linux-wpan-owner@vger.kernel.org>
-Subject: Re: [PATCH linux-wpan/radvd 6lowpan] device-linux: detect 6LoWPAN
- lltype for hwaddr length
-References: <20160621144250.31650-1-aar@pengutronix.de>
- <21cdff8b-9994-63ec-a9c8-6691b5820302@pengutronix.de>
-Cc: linux-bluetooth@vger.kernel.org, kernel@pengutronix.de,
-	patrik.flykt@linux.intel.com, jukka.rissanen@linux.intel.com
-From: Alexander Aring <aar@pengutronix.de>
-To: linux-wpan@vger.kernel.org
-Message-ID: <ccc16ce0-8f7e-5e4a-5cd6-fe1ba1e3a30d@pengutronix.de>
-Date: Mon, 1 Aug 2016 16:07:15 +0200
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <21cdff8b-9994-63ec-a9c8-6691b5820302@pengutronix.de>
-Content-Type: text/plain; charset=windows-1252
-Sender: linux-wpan-owner@vger.kernel.org
+In-Reply-To: <alpine.BSF.2.00.1608011427420.69212@toad.stack.nl>
+References: <alpine.BSF.2.00.1608011427420.69212@toad.stack.nl>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Mon, 1 Aug 2016 17:13:32 +0300
+Message-ID: <CABBYNZJMMSrgRO8EsZ78yOv0R5cwfpz65EQ+-zSV67mX2ee4Dw@mail.gmail.com>
+Subject: Re: Registering profile or making discoverable resets adapter class
+To: Serge van den Boom <serge@vdboom.org>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Serge,
 
-Hi,
-
-On 07/28/2016 02:20 PM, Alexander Aring wrote:
+On Mon, Aug 1, 2016 at 3:34 PM, Serge van den Boom <serge@vdboom.org> wrote:
 > Hi,
-> 
-> On 06/21/2016 04:42 PM, Alexander Aring wrote:
-...
-> 
-> I think to solve this issue, the best way currently is to evaluate:
-> 
-> /sys/class/net/$IFNAME/addr_len
-> 
-> which directly told us the dev->addr_len attribute in kernel. The only
-> thing that it could be that CONFIG_SYSFS isn't compiled. On 802.15.4 we
-> need to have SYSFS because iwpan and phy enumaration [0].
-> 
-> This solution should make radvd working with current mainline version
-> which does dev->addr_len == 8 and also with the version when we change
-> addr_len to 6.
+>
+> When a new profile is registered, or an adapter is make discoverable,
+> the device class of the adapter is reset to the value set in
+> /etc/bluetooth/main.conf.
+>
+> The test case below (to be run as root) demonstrates the issue. For this
+> demonstration, there should be no 'Class = ...' setting in
+> /etc/bluetooth/main.conf.
 
-this doesn't work because the kernel stuff will put the device address
-with U/L bitflip inside the address option. radvd will never do that
-because this should never be the case...
-
-Setting the U/L bit in radvd is a crazy behaviour inside the radvd code for
-support bug compatible version of btle 6lowpan.
-
-I currently try to catch all suggestions from the bluetooth 6lowpan
-rework RFC and making a next round. Then maybe we can finding more
-"issues" about using right dev->addr etc. :-)
-
-Also I want to sent some RFC to fix radvd in upstream for 6LoWPAN.
-
-- Alex
+This is a classical problem of using hci* tools along with bluetoothd,
+they both are trying to control the same thing and then you got a
+conflict, it shall be one or the other but not both. If you are
+curious to look at the bluetoothd source code you will see that the we
+derive the class of the device from the registered services so there
+is no point in doing anything with hcitool.
