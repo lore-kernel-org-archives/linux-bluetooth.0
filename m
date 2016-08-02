@@ -1,101 +1,71 @@
-Return-Path: <linux-wpan-owner@vger.kernel.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Alexander Aring <aar@pengutronix.de>
 To: linux-wpan@vger.kernel.org
 Cc: kernel@pengutronix.de, linux-bluetooth@vger.kernel.org,
 	Alexander Aring <aar@pengutronix.de>
-Subject: [PATCH linux-wpan/radvd for-upstream 2/2] device-linux: get address length via sysfs
-Date: Tue,  2 Aug 2016 16:37:52 +0200
-Message-Id: <20160802143752.12831-3-aar@pengutronix.de>
+Subject: [PATCH linux-wpan/radvd for-upstream 1/2] device-linux: replace ARPHRD_IEEE802154 to ARPHRD_6LOWPAN
+Date: Tue,  2 Aug 2016 16:37:51 +0200
+Message-Id: <20160802143752.12831-2-aar@pengutronix.de>
 In-Reply-To: <20160802143752.12831-1-aar@pengutronix.de>
 References: <20160802143752.12831-1-aar@pengutronix.de>
-Sender: linux-wpan-owner@vger.kernel.org
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch will change the behaviour for 6LoWPAN interface to detect the
-linklayer address length via sysfs. The usually way to get the address
-length is via a mapping from ARPHRD device type. This doesn't work for
-6LoWPAN interfaces, we need at least some other mechanism. This patch
-adds the mechanism to read out the sysfs UAPI to get the addr_len
-attribute of net_device. This will not work if there are two 6LoWPAN
-link-layer types with the same address length but need different
-handling in userspace. For that reason I think a linklayer type would be
-better, this requires a 6lowpan netlink API which doesn't exist right
-now. So we use this simple way now.
+This patch changes the ARPHRD_IEEE802154 to ARPHRD_6LOWPAN. The IEEE
+802.15.4 6lowpan module changed the ARPHRD_IEEE802154 type to
+ARPHRD_6LOWPAN. Nowadays it's use ARPHRD_6LOWPAN which is also used by
+BTLE 6LoWPAN. Both interfaces uses an EUI64 address and the handling to
+get the link-layer address should be the same.
+
+There is no backward compatibility for 802.15.4 6LoWPAN before we
+changed the ARPHRD. Anyway if somebody wants that it should be patched
+manually. When the ARPHRD was ARPHRD_IEEE802154 the 802.15.4 6lowpan was
+anyway in a somehow unusable state.
 
 Signed-off-by: Alexander Aring <aar@pengutronix.de>
 ---
- device-linux.c | 38 ++++++++++++++++++++++++++++++++++++--
- pathnames.h    |  1 +
- 2 files changed, 37 insertions(+), 2 deletions(-)
+ device-linux.c | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
 
 diff --git a/device-linux.c b/device-linux.c
-index 7301927..c483952 100644
+index de83f2e..7301927 100644
 --- a/device-linux.c
 +++ b/device-linux.c
-@@ -29,6 +29,34 @@
+@@ -22,6 +22,10 @@
+ #define IPV6_ADDR_LINKLOCAL   0x0020U
+ #endif
+ 
++#ifndef ARPHRD_6LOWPAN
++#define ARPHRD_6LOWPAN	825	/* IPv6 over LoWPAN */
++#endif
++
  static char const *hwstr(unsigned short sa_family);
  
  /*
-+ * get interface address length over sysfs
-+ */
-+static int get_device_addr_len(struct Interface *iface)
-+{
-+	char path[PATH_MAX];
-+	uint32_t addr_len;
-+	FILE *f;
-+	int ret;
-+
-+	ret = sprintf(path, SYS_CLASS_NET_ADDRLEN, iface->props.name);
-+	if (ret < 0)
-+		return -1;
-+
-+	f = fopen(path, "r");
-+	if (!f)
-+		return -1;
-+
-+	ret = fscanf(f, "%u", &addr_len);
-+	if (ferror(f)) {
-+		fclose(f);
-+		return -1;
-+	}
-+
-+	fclose(f);
-+	return addr_len;
-+}
-+
-+/*
-  * this function gets the hardware type and address of an interface,
-  * determines the link layer token length and checks it against
-  * the defined prefixes
-@@ -84,8 +112,14 @@ int update_device_info(int sock, struct Interface *iface)
+@@ -79,12 +83,10 @@ int update_device_info(int sock, struct Interface *iface)
+ 		iface->sllao.if_maxmtu = -1;
  		break;
  #endif				/* ARPHDR_ARCNET */
- 	case ARPHRD_6LOWPAN:
--		iface->sllao.if_hwaddr_len = 64;
--		iface->sllao.if_prefix_len = 64;
-+		iface->sllao.if_hwaddr_len = get_device_addr_len(iface);
-+		if (iface->sllao.if_hwaddr_len != -1) {
-+			iface->sllao.if_hwaddr_len *= 8;
-+			iface->sllao.if_prefix_len = 64;
-+		} else {
-+			iface->sllao.if_prefix_len = -1;
-+		}
-+
+-#ifdef ARPHRD_IEEE802154
+-	case ARPHRD_IEEE802154:
++	case ARPHRD_6LOWPAN:
+ 		iface->sllao.if_hwaddr_len = 64;
+ 		iface->sllao.if_prefix_len = 64;
  		break;
+-#endif
  	default:
  		iface->sllao.if_hwaddr_len = -1;
-diff --git a/pathnames.h b/pathnames.h
-index 580e2b2..152bb7a 100644
---- a/pathnames.h
-+++ b/pathnames.h
-@@ -40,6 +40,7 @@
- #define PROC_SYS_IP6_BASEREACHTIME "/proc/sys/net/ipv6/neigh/%s/base_reachable_time"
- #define PROC_SYS_IP6_RETRANSTIMER_MS "/proc/sys/net/ipv6/neigh/%s/retrans_time_ms"
- #define PROC_SYS_IP6_RETRANSTIMER "/proc/sys/net/ipv6/neigh/%s/retrans_time"
-+#define SYS_CLASS_NET_ADDRLEN "/sys/class/net/%s/addr_len"
- #else				/* BSD */
- #define SYSCTL_IP6_FORWARDING CTL_NET, PF_INET6, IPPROTO_IPV6, IPV6CTL_FORWARDING
+ 		iface->sllao.if_prefix_len = -1;
+@@ -382,6 +384,9 @@ static char const *hwstr(unsigned short sa_family)
+ 		rc = "ARPHRD_IEEE802154_PHY";
+ 		break;
  #endif
++	case ARPHRD_6LOWPAN:
++		rc = "ARPHRD_6LOWPAN";
++		break;
+ 	case ARPHRD_VOID:
+ 		rc = "ARPHRD_VOID";
+ 		break;
 -- 
 2.9.0
 
