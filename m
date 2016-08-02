@@ -1,58 +1,74 @@
-Return-Path: <baolex.ni@intel.com>
-From: Baole Ni <baolex.ni@intel.com>
-To: marcel@holtmann.org,
-	gustavo@padovan.org,
-	johan.hedberg@gmail.com,
-	davem@davemloft.net,
-	jiangshanlai@gmail.com,
-	m.chehab@samsung.com,
-	gregkh@linuxfoundation.org,
-	m.szyprowski@samsung.com,
-	kyungmin.park@samsung.com,
-	k.kozlowski@samsung.com
-Cc: linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	danny.schweizer@proofnet.de,
-	chuansheng.liu@intel.com,
-	baolex.ni@intel.com,
-	mhocko@suse.com,
-	koct9i@gmail.com,
-	aarcange@redhat.com,
-	aryabinin@virtuozzo.com
-Subject: [PATCH 1087/1285] Replace numeric parameter like 0444 with macro
-Date: Tue,  2 Aug 2016 20:15:20 +0800
-Message-Id: <20160802121520.22594-1-baolex.ni@intel.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 3/3] test/example-gatt-server: Add more comments
+Date: Tue,  2 Aug 2016 14:33:57 +0300
+Message-Id: <1470137637-6189-3-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1470137637-6189-1-git-send-email-luiz.dentz@gmail.com>
+References: <1470137637-6189-1-git-send-email-luiz.dentz@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I find that the developers often just specified the numeric value
-when calling a macro which is defined with a parameter for access permission.
-As we know, these numeric value for access permission have had the corresponding macro,
-and that using macro can improve the robustness and readability of the code,
-thus, I suggest replacing the numeric parameter with the macro.
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Signed-off-by: Chuansheng Liu <chuansheng.liu@intel.com>
-Signed-off-by: Baole Ni <baolex.ni@intel.com>
+This adds more comments what the example is doing.
 ---
- net/bluetooth/bnep/core.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ test/example-gatt-server | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
-diff --git a/net/bluetooth/bnep/core.c b/net/bluetooth/bnep/core.c
-index fbf251f..d8f9f58 100644
---- a/net/bluetooth/bnep/core.c
-+++ b/net/bluetooth/bnep/core.c
-@@ -759,10 +759,10 @@ static void __exit bnep_exit(void)
- module_init(bnep_init);
- module_exit(bnep_exit);
+diff --git a/test/example-gatt-server b/test/example-gatt-server
+index 84905f3..44ceb70 100755
+--- a/test/example-gatt-server
++++ b/test/example-gatt-server
+@@ -42,6 +42,9 @@ class FailedException(dbus.exceptions.DBusException):
  
--module_param(compress_src, bool, 0644);
-+module_param(compress_src, bool, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
- MODULE_PARM_DESC(compress_src, "Compress sources headers");
  
--module_param(compress_dst, bool, 0644);
-+module_param(compress_dst, bool, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
- MODULE_PARM_DESC(compress_dst, "Compress destination headers");
+ class Application(dbus.service.Object):
++    """
++    org.bluez.GattApplication1 interface implementation
++    """
+     def __init__(self, bus):
+         self.path = '/'
+         self.services = []
+@@ -74,6 +77,9 @@ class Application(dbus.service.Object):
  
- MODULE_AUTHOR("Marcel Holtmann <marcel@holtmann.org>");
+ 
+ class Service(dbus.service.Object):
++    """
++    org.bluez.GattService1 interface implementation
++    """
+     PATH_BASE = '/org/bluez/example/service'
+ 
+     def __init__(self, bus, index, uuid, primary):
+@@ -121,6 +127,9 @@ class Service(dbus.service.Object):
+ 
+ 
+ class Characteristic(dbus.service.Object):
++    """
++    org.bluez.GattCharacteristic1 interface implementation
++    """
+     def __init__(self, bus, index, uuid, flags, service):
+         self.path = service.path + '/char' + str(index)
+         self.bus = bus
+@@ -195,6 +204,9 @@ class Characteristic(dbus.service.Object):
+ 
+ 
+ class Descriptor(dbus.service.Object):
++    """
++    org.bluez.GattDescriptor1 interface implementation
++    """
+     def __init__(self, bus, index, uuid, flags, characteristic):
+         self.path = characteristic.path + '/desc' + str(index)
+         self.bus = bus
+@@ -636,6 +648,8 @@ def main():
+ 
+     mainloop = GObject.MainLoop()
+ 
++    print('Registering GATT application...')
++
+     service_manager.RegisterApplication(app.get_path(), {},
+                                     reply_handler=register_app_cb,
+                                     error_handler=register_app_error_cb)
 -- 
-2.9.2
+2.7.4
+
