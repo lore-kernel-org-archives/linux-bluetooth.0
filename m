@@ -13,15 +13,16 @@ To: marcel@holtmann.org,
 Cc: linux-bluetooth@vger.kernel.org,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
+	danny.schweizer@proofnet.de,
 	chuansheng.liu@intel.com,
 	baolex.ni@intel.com,
 	mhocko@suse.com,
 	koct9i@gmail.com,
 	aarcange@redhat.com,
 	aryabinin@virtuozzo.com
-Subject: [PATCH 1088/1285] Replace numeric parameter like 0444 with macro
-Date: Tue,  2 Aug 2016 20:15:27 +0800
-Message-Id: <20160802121527.22660-1-baolex.ni@intel.com>
+Subject: [PATCH 1087/1285] Replace numeric parameter like 0444 with macro
+Date: Tue,  2 Aug 2016 20:15:20 +0800
+Message-Id: <20160802121520.22594-1-baolex.ni@intel.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 I find that the developers often just specified the numeric value
@@ -33,19 +34,25 @@ thus, I suggest replacing the numeric parameter with the macro.
 Signed-off-by: Chuansheng Liu <chuansheng.liu@intel.com>
 Signed-off-by: Baole Ni <baolex.ni@intel.com>
 ---
- net/bluetooth/l2cap_core.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ net/bluetooth/bnep/core.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index eb4f5f2..1dfb4bc 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -7636,5 +7636,5 @@ void l2cap_exit(void)
- 	l2cap_cleanup_sockets();
- }
+diff --git a/net/bluetooth/bnep/core.c b/net/bluetooth/bnep/core.c
+index fbf251f..d8f9f58 100644
+--- a/net/bluetooth/bnep/core.c
++++ b/net/bluetooth/bnep/core.c
+@@ -759,10 +759,10 @@ static void __exit bnep_exit(void)
+ module_init(bnep_init);
+ module_exit(bnep_exit);
  
--module_param(disable_ertm, bool, 0644);
-+module_param(disable_ertm, bool, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
- MODULE_PARM_DESC(disable_ertm, "Disable enhanced retransmission mode");
+-module_param(compress_src, bool, 0644);
++module_param(compress_src, bool, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+ MODULE_PARM_DESC(compress_src, "Compress sources headers");
+ 
+-module_param(compress_dst, bool, 0644);
++module_param(compress_dst, bool, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+ MODULE_PARM_DESC(compress_dst, "Compress destination headers");
+ 
+ MODULE_AUTHOR("Marcel Holtmann <marcel@holtmann.org>");
 -- 
 2.9.2
