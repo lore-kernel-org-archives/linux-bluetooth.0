@@ -12,9 +12,9 @@ Cc: linux-bluetooth@vger.kernel.org,
 	baolex.ni@intel.com,
 	martin.petersen@oracle.com,
 	kent.overstreet@gmail.com
-Subject: [PATCH 0098/1285] Replace numeric parameter like 0444 with macro
-Date: Tue,  2 Aug 2016 18:40:29 +0800
-Message-Id: <20160802104029.20289-1-baolex.ni@intel.com>
+Subject: [PATCH 0097/1285] Replace numeric parameter like 0444 with macro
+Date: Tue,  2 Aug 2016 18:40:25 +0800
+Message-Id: <20160802104025.20223-1-baolex.ni@intel.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 I find that the developers often just specified the numeric value
@@ -26,23 +26,29 @@ thus, I suggest replacing the numeric parameter with the macro.
 Signed-off-by: Chuansheng Liu <chuansheng.liu@intel.com>
 Signed-off-by: Baole Ni <baolex.ni@intel.com>
 ---
- drivers/bluetooth/hci_bcsp.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/bluetooth/btusb.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/bluetooth/hci_bcsp.c b/drivers/bluetooth/hci_bcsp.c
-index d7d23ce..917751b 100644
---- a/drivers/bluetooth/hci_bcsp.c
-+++ b/drivers/bluetooth/hci_bcsp.c
-@@ -764,8 +764,8 @@ int __exit bcsp_deinit(void)
- 	return hci_uart_unregister_proto(&bcsp);
- }
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index a3be65e..ac96e89 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -3174,13 +3174,13 @@ static struct usb_driver btusb_driver = {
  
--module_param(txcrc, bool, 0644);
-+module_param(txcrc, bool, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
- MODULE_PARM_DESC(txcrc, "Transmit CRC with every BCSP packet");
+ module_usb_driver(btusb_driver);
  
--module_param(hciextn, bool, 0644);
-+module_param(hciextn, bool, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
- MODULE_PARM_DESC(hciextn, "Convert HCI Extensions into BCSP packets");
+-module_param(disable_scofix, bool, 0644);
++module_param(disable_scofix, bool, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+ MODULE_PARM_DESC(disable_scofix, "Disable fixup of wrong SCO buffer size");
+ 
+-module_param(force_scofix, bool, 0644);
++module_param(force_scofix, bool, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+ MODULE_PARM_DESC(force_scofix, "Force fixup of wrong SCO buffers size");
+ 
+-module_param(reset, bool, 0644);
++module_param(reset, bool, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+ MODULE_PARM_DESC(reset, "Send HCI reset command on initialization");
+ 
+ MODULE_AUTHOR("Marcel Holtmann <marcel@holtmann.org>");
 -- 
 2.9.2
