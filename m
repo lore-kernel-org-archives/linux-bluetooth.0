@@ -13,16 +13,15 @@ To: marcel@holtmann.org,
 Cc: linux-bluetooth@vger.kernel.org,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	geliangtang@163.com,
 	chuansheng.liu@intel.com,
 	baolex.ni@intel.com,
 	mhocko@suse.com,
 	koct9i@gmail.com,
 	aarcange@redhat.com,
 	aryabinin@virtuozzo.com
-Subject: [PATCH 1089/1285] Replace numeric parameter like 0444 with macro
-Date: Tue,  2 Aug 2016 20:15:34 +0800
-Message-Id: <20160802121534.22728-1-baolex.ni@intel.com>
+Subject: [PATCH 1088/1285] Replace numeric parameter like 0444 with macro
+Date: Tue,  2 Aug 2016 20:15:27 +0800
+Message-Id: <20160802121527.22660-1-baolex.ni@intel.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 I find that the developers often just specified the numeric value
@@ -34,33 +33,19 @@ thus, I suggest replacing the numeric parameter with the macro.
 Signed-off-by: Chuansheng Liu <chuansheng.liu@intel.com>
 Signed-off-by: Baole Ni <baolex.ni@intel.com>
 ---
- net/bluetooth/rfcomm/core.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ net/bluetooth/l2cap_core.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
-index f7eb02f..4132114 100644
---- a/net/bluetooth/rfcomm/core.c
-+++ b/net/bluetooth/rfcomm/core.c
-@@ -2240,16 +2240,16 @@ static void __exit rfcomm_exit(void)
- module_init(rfcomm_init);
- module_exit(rfcomm_exit);
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index eb4f5f2..1dfb4bc 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -7636,5 +7636,5 @@ void l2cap_exit(void)
+ 	l2cap_cleanup_sockets();
+ }
  
--module_param(disable_cfc, bool, 0644);
-+module_param(disable_cfc, bool, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
- MODULE_PARM_DESC(disable_cfc, "Disable credit based flow control");
- 
--module_param(channel_mtu, int, 0644);
-+module_param(channel_mtu, int, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
- MODULE_PARM_DESC(channel_mtu, "Default MTU for the RFCOMM channel");
- 
--module_param(l2cap_mtu, uint, 0644);
-+module_param(l2cap_mtu, uint, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
- MODULE_PARM_DESC(l2cap_mtu, "Default MTU for the L2CAP connection");
- 
--module_param(l2cap_ertm, bool, 0644);
-+module_param(l2cap_ertm, bool, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
- MODULE_PARM_DESC(l2cap_ertm, "Use L2CAP ERTM mode for connection");
- 
- MODULE_AUTHOR("Marcel Holtmann <marcel@holtmann.org>");
+-module_param(disable_ertm, bool, 0644);
++module_param(disable_ertm, bool, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+ MODULE_PARM_DESC(disable_ertm, "Disable enhanced retransmission mode");
 -- 
 2.9.2
