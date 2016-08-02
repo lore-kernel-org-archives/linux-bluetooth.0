@@ -1,48 +1,58 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Alexander Aring <aar@pengutronix.de>
-To: linux-wpan@vger.kernel.org
-Cc: kernel@pengutronix.de, linux-bluetooth@vger.kernel.org,
-	Alexander Aring <aar@pengutronix.de>
-Subject: [PATCH linux-wpan/radvd for-upstream 0/2] radvd: upstream patches
-Date: Tue,  2 Aug 2016 16:37:50 +0200
-Message-Id: <20160802143752.12831-1-aar@pengutronix.de>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
+Subject: Re: [PATCH 1088/1285] Replace numeric parameter like 0444 with macro
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20160802121527.22660-1-baolex.ni@intel.com>
+Date: Tue, 2 Aug 2016 15:56:28 +0200
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>, jiangshanlai@gmail.com,
+	m.chehab@samsung.com,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	kyungmin.park@samsung.com, k.kozlowski@samsung.com,
+	"open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+	Network Development <netdev@vger.kernel.org>,
+	open list <linux-kernel@vger.kernel.org>,
+	chuansheng.liu@intel.com, mhocko@suse.com, koct9i@gmail.com,
+	Andrea Arcangeli <aarcange@redhat.com>, aryabinin@virtuozzo.com
+Message-Id: <9FB95BB0-0382-41AF-9B1E-5D17D1523F3B@holtmann.org>
+References: <20160802121527.22660-1-baolex.ni@intel.com>
+To: Baole Ni <baolex.ni@intel.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Baole,
 
-this patch series has some overdue updates for radvd upstream version.
-It doesn't contain rework of 6CO handling, since we don't have a stable
-UAPI to provide stateful compression to userspace.
+> I find that the developers often just specified the numeric value
+> when calling a macro which is defined with a parameter for access permission.
+> As we know, these numeric value for access permission have had the corresponding macro,
+> and that using macro can improve the robustness and readability of the code,
+> thus, I suggest replacing the numeric parameter with the macro.
+> 
+> Signed-off-by: Chuansheng Liu <chuansheng.liu@intel.com>
+> Signed-off-by: Baole Ni <baolex.ni@intel.com>
+> ---
+> net/bluetooth/l2cap_core.c | 2 +-
+> 1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> index eb4f5f2..1dfb4bc 100644
+> --- a/net/bluetooth/l2cap_core.c
+> +++ b/net/bluetooth/l2cap_core.c
+> @@ -7636,5 +7636,5 @@ void l2cap_exit(void)
+> 	l2cap_cleanup_sockets();
+> }
+> 
+> -module_param(disable_ertm, bool, 0644);
+> +module_param(disable_ertm, bool, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+> MODULE_PARM_DESC(disable_ertm, "Disable enhanced retransmission mode");
 
-Anyway radvd has actually 6CO handling which is ?broken? don't know what
-it should do at the moment. 6CO without stateful compression setting
-makes no sense for me. If you like to use 6CO over debugfs use
-linux-wpan/radvd "6lowpan" branch.
+I am not taking any of these patches for the Bluetooth subsystem or its drivers. They are pretty much pointless to me and do not improve readability. I think they actually decrease readability. Every Unix/Linux developers knowns what 0644 (and all its magic cousins) mean.
 
----
+The only way I would accept any patches to change this is if they would introduce module_param_rw / module_param_ro or something alike. Since I am pretty sure the majority is 644 and 444 here anyway.
 
-I will update the "6lowpan" branch also with Patch 2/2 which adds support
-to get address length via sysfs. This patch will prepare correct handling
-for the new BTLE 6LoWPAN handling to use the correct address and
-address length (not 8 bytes, with U/L bit). It will not work with the
-current mainline version because the address option will set the address
-length with U/L bitflip in NS/NA/RS, but radvd will not do this because
-it's simple wrong to do it. :-)
+Regards
 
-Everbody which wants to have this bug compatible stuff should change
-radvd in their own source code.
-
-- Alex
-
-Alexander Aring (2):
-  device-linux: replace ARPHRD_IEEE802154 to ARPHRD_6LOWPAN
-  device-linux: get address length via sysfs
-
- device-linux.c | 49 ++++++++++++++++++++++++++++++++++++++++++++-----
- pathnames.h    |  1 +
- 2 files changed, 45 insertions(+), 5 deletions(-)
-
--- 
-2.9.0
-
+Marcel
