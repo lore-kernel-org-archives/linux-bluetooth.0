@@ -1,52 +1,43 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: andrey.zheregelya@dsr-company.com
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Andrey Zheregelya <andrey.zheregelya@dsr-company.com>
-Subject: [PATCH 1/2] device: LastSeen property for D-Bus interface
-Date: Tue,  2 Aug 2016 18:40:58 +0300
-Message-Id: <20160802154059.24472-1-andrey.zheregelya@dsr-company.com>
+Subject: [PATCH BlueZ 2/3] test/example-gatt-client: Add more comments
+Date: Tue,  2 Aug 2016 14:33:56 +0300
+Message-Id: <1470137637-6189-2-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1470137637-6189-1-git-send-email-luiz.dentz@gmail.com>
+References: <1470137637-6189-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrey Zheregelya <andrey.zheregelya@dsr-company.com>
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-It returns le_seen or bredr_seen to caller. Marked as experimental.
-Can be used to detect if device is still reachable.
+This adds more comments what the example is doing.
 ---
- src/device.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+ test/example-gatt-client | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/src/device.c b/src/device.c
-index 264d599..7fe4d32 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -937,6 +937,17 @@ static gboolean dev_property_get_tx_power(const GDBusPropertyTable *property,
- 	return TRUE;
- }
+diff --git a/test/example-gatt-client b/test/example-gatt-client
+index 4d1df2f..b4bbaa9 100755
+--- a/test/example-gatt-client
++++ b/test/example-gatt-client
+@@ -193,14 +193,17 @@ def main():
+     om = dbus.Interface(bus.get_object(BLUEZ_SERVICE_NAME, '/'), DBUS_OM_IFACE)
+     om.connect_to_signal('InterfacesRemoved', interfaces_removed_cb)
  
-+static gboolean dev_property_get_last_seen(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *data)
-+{
-+	struct btd_device *dev = data;
-+	dbus_int64_t val = (dev->bredr_seen > dev->le_seen) ? dev->bredr_seen : dev->le_seen;
-+
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_INT64, &val);
-+
-+	return TRUE;
-+}
-+
- static gboolean dev_property_exists_tx_power(const GDBusPropertyTable *property,
- 								void *data)
- {
-@@ -2529,6 +2540,8 @@ static const GDBusPropertyTable device_properties[] = {
- 	{ "TxPower", "n", dev_property_get_tx_power, NULL,
- 					dev_property_exists_tx_power },
- 	{ "ServicesResolved", "b", dev_property_get_svc_resolved, NULL, NULL },
-+	{ "LastSeen", "x", dev_property_get_last_seen, NULL, NULL,
-+					G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
++    print('Getting objects...')
+     objects = om.GetManagedObjects()
+     chrcs = []
  
- 	{ }
- };
++    # List characteristics found
+     for path, interfaces in objects.items():
+         if GATT_CHRC_IFACE not in interfaces.keys():
+             continue
+         chrcs.append(path)
+ 
++    # List sevices found
+     for path, interfaces in objects.items():
+         if GATT_SERVICE_IFACE not in interfaces.keys():
+             continue
 -- 
-2.9.2
+2.7.4
 
