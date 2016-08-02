@@ -1,38 +1,46 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/3] doc/gatt-api: Mention available examples
-Date: Tue,  2 Aug 2016 14:33:55 +0300
-Message-Id: <1470137637-6189-1-git-send-email-luiz.dentz@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <baolex.ni@intel.com>
+From: Baole Ni <baolex.ni@intel.com>
+To: marcel@holtmann.org,
+	gustavo@padovan.org,
+	johan.hedberg@gmail.com,
+	gregkh@linuxfoundation.org,
+	hpa@zytor.com,
+	x86@kernel.org
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	chuansheng.liu@intel.com,
+	baolex.ni@intel.com,
+	martin.petersen@oracle.com,
+	kent.overstreet@gmail.com
+Subject: [PATCH 0099/1285] Replace numeric parameter like 0444 with macro
+Date: Tue,  2 Aug 2016 18:40:34 +0800
+Message-Id: <20160802104034.20355-1-baolex.ni@intel.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+I find that the developers often just specified the numeric value
+when calling a macro which is defined with a parameter for access permission.
+As we know, these numeric value for access permission have had the corresponding macro,
+and that using macro can improve the robustness and readability of the code,
+thus, I suggest replacing the numeric parameter with the macro.
 
+Signed-off-by: Chuansheng Liu <chuansheng.liu@intel.com>
+Signed-off-by: Baole Ni <baolex.ni@intel.com>
 ---
- doc/gatt-api.txt | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ drivers/bluetooth/hci_vhci.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/doc/gatt-api.txt b/doc/gatt-api.txt
-index f2f3d89..fd4bdd5 100644
---- a/doc/gatt-api.txt
-+++ b/doc/gatt-api.txt
-@@ -307,6 +307,15 @@ unregister the service. Similarly, if the application disconnects from the bus,
- all of its registered services will be automatically unregistered.
- InterfacesAdded signals will be ignored.
+diff --git a/drivers/bluetooth/hci_vhci.c b/drivers/bluetooth/hci_vhci.c
+index aba3121..db4f808 100644
+--- a/drivers/bluetooth/hci_vhci.c
++++ b/drivers/bluetooth/hci_vhci.c
+@@ -393,7 +393,7 @@ static void __exit vhci_exit(void)
+ module_init(vhci_init);
+ module_exit(vhci_exit);
  
-+Examples:
-+	- Client
-+		test/example-gatt-client
-+		client/bluetoothctl
-+	- Server
-+		test/example-gatt-server
-+		tools/gatt-service
-+
-+
- Service		org.bluez
- Interface	org.bluez.GattManager1
- Object path	[variable prefix]/{hci0,hci1,...}
+-module_param(amp, bool, 0644);
++module_param(amp, bool, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+ MODULE_PARM_DESC(amp, "Create AMP controller device");
+ 
+ MODULE_AUTHOR("Marcel Holtmann <marcel@holtmann.org>");
 -- 
-2.7.4
-
+2.9.2
