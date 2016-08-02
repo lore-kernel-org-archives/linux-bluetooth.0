@@ -1,44 +1,44 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Message-ID: <1470153463.21877.24.camel@hadess.net>
 Subject: Re: [PATCH 2/2] doc/device-api.txt Information about D-Bus LastSeen
  property
-To: Bastien Nocera <hadess@hadess.net>, linux-bluetooth@vger.kernel.org
+From: Bastien Nocera <hadess@hadess.net>
+To: andrey.zheregelya@dsr-company.com, linux-bluetooth@vger.kernel.org
+Date: Tue, 02 Aug 2016 17:57:43 +0200
+In-Reply-To: <20160802154059.24472-2-andrey.zheregelya@dsr-company.com>
 References: <20160802154059.24472-1-andrey.zheregelya@dsr-company.com>
- <20160802154059.24472-2-andrey.zheregelya@dsr-company.com>
- <1470153463.21877.24.camel@hadess.net>
-From: Andrey Zheregelya <andrey.zheregelya@dsr-company.com>
-Message-ID: <04a3d2af-f55a-da57-776d-3cdc28cbeb16@dsr-company.com>
-Date: Tue, 2 Aug 2016 19:55:54 +0300
-MIME-Version: 1.0
-In-Reply-To: <1470153463.21877.24.camel@hadess.net>
-Content-Type: text/plain; charset=utf-8; format=flowed
+	 <20160802154059.24472-2-andrey.zheregelya@dsr-company.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+On Tue, 2016-08-02 at 18:40 +0300, andrey.zheregelya@dsr-company.com
+wrote:
+> From: Andrey Zheregelya <andrey.zheregelya@dsr-company.com>
+> 
+> ---
+>  doc/device-api.txt | 8 ++++++++
+>  1 file changed, 8 insertions(+)
+> 
+> diff --git a/doc/device-api.txt b/doc/device-api.txt
+> index 087efb9..6387a0c 100644
+> --- a/doc/device-api.txt
+> +++ b/doc/device-api.txt
+> @@ -216,3 +216,11 @@ Properties	string Address [readonly]
+>  
+>  			Indicate whether or not service discovery
+> has been
+>  			resolved.
+> +
+> +    bool LastSeen [readonly, experimantal]
+> +
+> +      Unix time of last found device update. 
+> +      Indicates if device is alive and reachable.
 
+It's doesn't, really, until you apply heuristics to it. How do you plan
+to use this?
 
-On 02.08.2016 18:57, Bastien Nocera wrote:
-
-> It's doesn't, really, until you apply heuristics to it. How do you plan
-> to use this?
-
-Initially, there is a requirement for application to detect if a list of 
-device are available for connection or not. Before connection and after.
-
-As far as I understood, d-bus interface doesn't provide any way to 
-detect if device is advertising or not.
-
-le_seen and bredr_seen provides the last time when device's 
-advertisement packet was detected (Of course if my understanding is correct)
-
-Application can read LastSeen time, read current time and compare with 
-application-defined timeout to make a decision if device is alive.
-
-Yes, this property doesn't answer to direct question "Alive or not". But 
-in this way user can apply any heuristic algorithm he wants.
-
-And this approach doesn't require any BLE connections to device.
-
--- 
-Best regards,
-Andrey Zheregelya
-
+> +      Adapter should be in discovery mode.
+> +      Information about device's reachability is based
+> +      on advertisement packets.
