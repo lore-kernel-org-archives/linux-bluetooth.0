@@ -1,88 +1,39 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Mat Martineau <mathew.j.martineau@linux.intel.com>
+From: Travis Griggs <travisgriggs@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Subject: Going Faster between iOS and BlueZ
+Message-Id: <6A53EA11-BBCC-41CA-9EA7-FB2B5375F00D@gmail.com>
+Date: Wed, 3 Aug 2016 15:26:59 -0700
 To: linux-bluetooth@vger.kernel.org
-Cc: Mat Martineau <mathew.j.martineau@linux.intel.com>
-Subject: [PATCH BlueZ RESEND] tools: Fix recevied/received typos
-Date: Wed,  3 Aug 2016 16:33:43 -0700
-Message-Id: <20160803233343.23515-1-mathew.j.martineau@linux.intel.com>
+Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
+After my report from a week or so ago, I decided to put my application to the side, and just write a simple application where I could try different things easily. My main goal, was to get to a point where I could *stream* arbitrary chunks of bytes through one or more characteristics using the APIs provided by iOS and the bluez gatt dbus api. This is briefly what I found.
 
-ubcsp.c is one of the files changed, and it has CRLF line endings. The
-normal git-format-patch, git-send-email, git-am flow does not handle
-CRLF well.
+An app that tries to write 1040 bytes through a write (with response) characteristic will take 7 seconds to do the 52 writes required. So roughly 7 writes a second.
 
-I'm sending using "git send-email --transfer-encoding=quoted-printable"
-in order to make git-am happy. You'll need to make sure your email
-client saves the raw message correctly, and git-am will print whitespace
-warnings even though the patch is applied.
+I played multiple games at this point. What if I have 2 characteristics? Could I get 7 writes a second through each in parallel? The answer is no.
 
-Mat
+Conversely, the same is true for ‘indicate’ characteristics. Pushing data the other way also manages about 7 changes a second. And doubling up, just doubles the time it takes.
 
----
- tools/l2test.c  | 2 +-
- tools/scotest.c | 2 +-
- tools/ubcsp.c   | 6 +++---
- 3 files changed, 5 insertions(+), 5 deletions(-)
+write-without-response is a different story. iOS will run this so fast, that they just start to disappear. I think I’ve read that that’s on the iOS side itself. My testing indicates there seems to be a buffer of about 30 writes, and then they just start going to /dev/null. If I issue them at a regular timed interval though (essentially throttling it), they all get through. In that case, delaying 18 milliseconds between each write, everything makes it through, and I’m now able able to send the 52 packets in 1 second (+/- 100 ms). That’s at least 7x faster. Similar as before, you can’t “double pump” this. Using two characteristics, if i do 2 without response writes every 18ms, I’ll start to lose packets.
 
-diff --git a/tools/l2test.c b/tools/l2test.c
-index d4e3ae6..1819423 100644
---- a/tools/l2test.c
-+++ b/tools/l2test.c
-@@ -830,7 +830,7 @@ static void dump_mode(int sk)
- 			return;
- 		}
- 
--		syslog(LOG_INFO, "Recevied %d bytes", len);
-+		syslog(LOG_INFO, "Received %d bytes", len);
- 		hexdump(buf, len);
- 	}
- }
-diff --git a/tools/scotest.c b/tools/scotest.c
-index 596e403..f894c24 100644
---- a/tools/scotest.c
-+++ b/tools/scotest.c
-@@ -265,7 +265,7 @@ static void dump_mode(int sk)
- 
- 	syslog(LOG_INFO,"Receiving ...");
- 	while ((len = read(sk, buf, data_size)) > 0)
--		syslog(LOG_INFO, "Recevied %d bytes", len);
-+		syslog(LOG_INFO, "Received %d bytes", len);
- }
- 
- static void recv_mode(int sk)
-diff --git a/tools/ubcsp.c b/tools/ubcsp.c
-index b3f883a..cd17d48 100644
---- a/tools/ubcsp.c
-+++ b/tools/ubcsp.c
-@@ -351,14 +351,14 @@ bad_match_loop:
- 
- /*****************************************************************************/
- /**                                                                         **/
--/** ubcsp_recevied_packet                                                   **/
-+/** ubcsp_received_packet                                                   **/
- /**                                                                         **/
- /** This function is called when we have a SLIP END octet and a full        **/
- /** packet header and possibly data in the receive packet                   **/
- /**                                                                         **/
- /*****************************************************************************/
- 
--static uint8 ubcsp_recevied_packet (void)
-+static uint8 ubcsp_received_packet (void)
- {
- 	static uint8
- 		receive_crc,
-@@ -1107,7 +1107,7 @@ uint8 ubcsp_poll (uint8 *activity)
- 				{
- 					/* process the received packet */
- 
--					*activity |= ubcsp_recevied_packet ();
-+					*activity |= ubcsp_received_packet ();
- 
- 					if (*activity & UBCSP_PACKET_ACK)
- 					{
--- 
-2.9.2
+The story plays out similar for a ‘notify’ characteristic. I can issue 50 or so changes a second and have them picked up fine by the iOS side. The difference between bluez and iOS is that it seems to self throttle. It runs faster, but there’s no need to throttle it, it never seems to lose stuff due to some sort of buffer overflow. Double pumping has no effect. The throughput will still be about 1 KB/second, whether spread across multiple or just one characteristic.
+
+The final observation was the surprise. It turns out that while you can only go so fast in one direction, you can go the same speed in both directions simultaneously. IOW you can be notifying 1KB/s changes at the same time you are writing without response  1 KB/s (on two separate characteristics). So the net data transfer at that point is more like 2KB/s.
+
+So I was able to get 2 speed gains to my schema and basically simplify things to go faster:
+
+1) Use clocked write-without-response from the central/iOS device; use notify as fast as it will go from the bluez/peripheral device
+2) Separate the request/reply streams so that while you’re receiving the response from one request, you’re already sending the next request.
+
+With these 2 changes, my app is now streaming rest-like queries to my device at least 15x faster than before. And I went from 3 characteristics down to just 1.
+
+
+To “frame” the data, I used a leading byte countdown scheme. Any time that leading byte gets down to 0, I know it’s time to process the accumulated buffer (on either side). My requst/response format includes an identifier so that the responses can be correlated with the requests that go out asynchronously.
+
+Hopefully, this might help some other soul who ends up searching archives if he’s doing handheld to bluez/peripheral stuff.
+
+
 
