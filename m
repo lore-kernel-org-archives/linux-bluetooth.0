@@ -1,49 +1,66 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CABi8O6YW-wmG8xF5V7vkGJ8_3Wp98-b57L+1jJK_DxWjz=couQ@mail.gmail.com>
-References: <CABi8O6YW-wmG8xF5V7vkGJ8_3Wp98-b57L+1jJK_DxWjz=couQ@mail.gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 3 Aug 2016 13:21:35 +0300
-Message-ID: <CABBYNZ++wDB=Hy6YNXo-UU2xiVEazSHGKd60+=1XNk8yTWKcfw@mail.gmail.com>
-Subject: Re: [PATCH SBC] Fix for build on windows mingw
-To: Ilya Averyanov <averyanovin@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+From: Ajay Parashar <ajay.parasha@gmail.com>
+Date: Wed, 3 Aug 2016 15:44:53 +0530
+Message-ID: <CAMj0Yyv0LEjLSspsMP7MosNGbah376ncaY0Jmw6RR=41gVB4EA@mail.gmail.com>
+Subject: Connect method of org.bluez.Network1 interface throws error "Connect
+ with signature "s" doesn't exist"
+To: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ilya,
+Hi,
 
-On Tue, Aug 2, 2016 at 6:14 PM, Ilya Averyanov <averyanovin@gmail.com> wrote:
+I am using bluez 5.35 and developing an application using Glib DBUS binding.
 
-Please add some description, perhaps with the error caused by the lack
-of this include.
+As per network-api.txt documentation, my code calls connect API with
+String type parameter but while execution it prompts below error.
+Can you please let me know why is it giving this error and how can i
+resolve this.
 
-> ---
->  sbc/sbc_math.h | 2 ++
->  1 file changed, 2 insertions(+)
->
-> diff --git a/sbc/sbc_math.h b/sbc/sbc_math.h
-> index 5476860..25b08ea 100644
-> --- a/sbc/sbc_math.h
-> +++ b/sbc/sbc_math.h
-> @@ -24,6 +24,8 @@
->   *
->   */
->
-> +#include <stdint.h>
-> +
->  #define fabs(x) ((x) < 0 ? -(x) : (x))
->  /* C does not provide an explicit arithmetic shift right but this will
->     always be correct and every compiler *should* generate optimal code */
-> --
-> 2.7.4
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+Unable to connect with network :
+GDBus.Error:org.freedesktop.DBus.Error.UnknownObject: Method "Connect"
+with signature "s" on interface "org.bluez.Network1" doesn't exist
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+/* For reference please find my code as below*/
 
+int connect_network(char *interface)
+{
+  int       ret       = 0;
+  GError   *error     = NULL;
+  GVariant *reply     = NULL;
 
--- 
-Luiz Augusto von Dentz
+  GVariant **t = NULL;
+  t    = g_new(GVariant *, 1);
+  t[0] = g_variant_new_string ("nap");
+
+  GVariant *tuple_variant = g_variant_new_tuple(t, 1);
+
+  /* connect with network */
+  reply = g_dbus_connection_call_sync(dbus_conn,
+    BLUEZ_BUS_NAME,
+    "/org/bluez/hci0",
+    "org.bluez.Network1",
+    "Connect",
+    tuple_variant,
+    G_VARIANT_TYPE_STRING,
+    G_DBUS_CALL_FLAGS_NONE,
+    -1,
+    NULL,
+    &error);
+
+if (error) {
+    printf("Unable to connect with network : %s\n", error->message);
+g_free(t);
+    return -3;
+  }
+
+   g_variant_get(reply, "(s)", &interface);
+   printf("interface from connect is = %s\n", interface);
+  g_free(t);
+
+  return ret;
+}
