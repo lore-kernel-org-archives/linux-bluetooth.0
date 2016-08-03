@@ -1,66 +1,53 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-From: Ajay Parashar <ajay.parasha@gmail.com>
-Date: Wed, 3 Aug 2016 15:44:53 +0530
-Message-ID: <CAMj0Yyv0LEjLSspsMP7MosNGbah376ncaY0Jmw6RR=41gVB4EA@mail.gmail.com>
-Subject: Connect method of org.bluez.Network1 interface throws error "Connect
- with signature "s" doesn't exist"
-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <04a3d2af-f55a-da57-776d-3cdc28cbeb16@dsr-company.com>
+References: <20160802154059.24472-1-andrey.zheregelya@dsr-company.com>
+ <20160802154059.24472-2-andrey.zheregelya@dsr-company.com>
+ <1470153463.21877.24.camel@hadess.net> <04a3d2af-f55a-da57-776d-3cdc28cbeb16@dsr-company.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Wed, 3 Aug 2016 12:48:37 +0300
+Message-ID: <CABBYNZKkAGN0sM=nEpYXsQCX60mg14HjGM32KpjOVigc6N5seA@mail.gmail.com>
+Subject: Re: [PATCH 2/2] doc/device-api.txt Information about D-Bus LastSeen property
+To: Andrey Zheregelya <andrey.zheregelya@dsr-company.com>
+Cc: Bastien Nocera <hadess@hadess.net>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Andrey,
 
-I am using bluez 5.35 and developing an application using Glib DBUS binding.
+On Tue, Aug 2, 2016 at 7:55 PM, Andrey Zheregelya
+<andrey.zheregelya@dsr-company.com> wrote:
+>
+>
+> On 02.08.2016 18:57, Bastien Nocera wrote:
+>
+>> It's doesn't, really, until you apply heuristics to it. How do you plan
+>> to use this?
+>
+>
+> Initially, there is a requirement for application to detect if a list of
+> device are available for connection or not. Before connection and after.
+>
+> As far as I understood, d-bus interface doesn't provide any way to detect if
+> device is advertising or not.
+>
+> le_seen and bredr_seen provides the last time when device's advertisement
+> packet was detected (Of course if my understanding is correct)
+>
+> Application can read LastSeen time, read current time and compare with
+> application-defined timeout to make a decision if device is alive.
+>
+> Yes, this property doesn't answer to direct question "Alive or not". But in
+> this way user can apply any heuristic algorithm he wants.
+>
+> And this approach doesn't require any BLE connections to device.
 
-As per network-api.txt documentation, my code calls connect API with
-String type parameter but while execution it prompts below error.
-Can you please let me know why is it giving this error and how can i
-resolve this.
+But can't you use the last time you received a RSSI from the device?
+Just timestamp it in the application side, in the other hand if
+duplicate filtering is active this won't update in every packet
+received since the controller can omit them.
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-Unable to connect with network :
-GDBus.Error:org.freedesktop.DBus.Error.UnknownObject: Method "Connect"
-with signature "s" on interface "org.bluez.Network1" doesn't exist
-////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-/* For reference please find my code as below*/
-
-int connect_network(char *interface)
-{
-  int       ret       = 0;
-  GError   *error     = NULL;
-  GVariant *reply     = NULL;
-
-  GVariant **t = NULL;
-  t    = g_new(GVariant *, 1);
-  t[0] = g_variant_new_string ("nap");
-
-  GVariant *tuple_variant = g_variant_new_tuple(t, 1);
-
-  /* connect with network */
-  reply = g_dbus_connection_call_sync(dbus_conn,
-    BLUEZ_BUS_NAME,
-    "/org/bluez/hci0",
-    "org.bluez.Network1",
-    "Connect",
-    tuple_variant,
-    G_VARIANT_TYPE_STRING,
-    G_DBUS_CALL_FLAGS_NONE,
-    -1,
-    NULL,
-    &error);
-
-if (error) {
-    printf("Unable to connect with network : %s\n", error->message);
-g_free(t);
-    return -3;
-  }
-
-   g_variant_get(reply, "(s)", &interface);
-   printf("interface from connect is = %s\n", interface);
-  g_free(t);
-
-  return ret;
-}
+-- 
+Luiz Augusto von Dentz
