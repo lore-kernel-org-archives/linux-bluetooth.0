@@ -1,91 +1,50 @@
-Return-Path: <linux-wpan-owner@vger.kernel.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20160802143752.12831-2-aar@pengutronix.de>
-References: <20160802143752.12831-1-aar@pengutronix.de> <20160802143752.12831-2-aar@pengutronix.de>
+In-Reply-To: <1470137637-6189-1-git-send-email-luiz.dentz@gmail.com>
+References: <1470137637-6189-1-git-send-email-luiz.dentz@gmail.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 4 Aug 2016 11:26:05 +0300
-Message-ID: <CABBYNZ++YLsfPv+oR=Mwae=y+Q-wVWFmFWZfDnhssS_0xFMktw@mail.gmail.com>
-Subject: Re: [PATCH linux-wpan/radvd for-upstream 1/2] device-linux: replace
- ARPHRD_IEEE802154 to ARPHRD_6LOWPAN
-To: Alexander Aring <aar@pengutronix.de>
-Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Thu, 4 Aug 2016 11:09:55 +0300
+Message-ID: <CABBYNZLwm7jG=5NwEp-GUJq4fnjvbJKBUfT0RYKT4fVHzQNqUg@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/3] doc/gatt-api: Mention available examples
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
-Sender: linux-wpan-owner@vger.kernel.org
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alex,
+Hi,
 
-On Tue, Aug 2, 2016 at 5:37 PM, Alexander Aring <aar@pengutronix.de> wrote:
-> This patch changes the ARPHRD_IEEE802154 to ARPHRD_6LOWPAN. The IEEE
-> 802.15.4 6lowpan module changed the ARPHRD_IEEE802154 type to
-> ARPHRD_6LOWPAN. Nowadays it's use ARPHRD_6LOWPAN which is also used by
-> BTLE 6LoWPAN. Both interfaces uses an EUI64 address and the handling to
-> get the link-layer address should be the same.
-
-Bluetooth MAC addresses are 48 bits long, it could be converted to 64
-bits to generate the so called IID but that is only to generate the
-link-local address:
-
-https://tools.ietf.org/html/rfc7668#section-3.2.2
-
-> There is no backward compatibility for 802.15.4 6LoWPAN before we
-> changed the ARPHRD. Anyway if somebody wants that it should be patched
-> manually. When the ARPHRD was ARPHRD_IEEE802154 the 802.15.4 6lowpan was
-> anyway in a somehow unusable state.
+On Tue, Aug 2, 2016 at 2:33 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 >
-> Signed-off-by: Alexander Aring <aar@pengutronix.de>
 > ---
->  device-linux.c | 11 ++++++++---
->  1 file changed, 8 insertions(+), 3 deletions(-)
+>  doc/gatt-api.txt | 9 +++++++++
+>  1 file changed, 9 insertions(+)
 >
-> diff --git a/device-linux.c b/device-linux.c
-> index de83f2e..7301927 100644
-> --- a/device-linux.c
-> +++ b/device-linux.c
-> @@ -22,6 +22,10 @@
->  #define IPV6_ADDR_LINKLOCAL   0x0020U
->  #endif
+> diff --git a/doc/gatt-api.txt b/doc/gatt-api.txt
+> index f2f3d89..fd4bdd5 100644
+> --- a/doc/gatt-api.txt
+> +++ b/doc/gatt-api.txt
+> @@ -307,6 +307,15 @@ unregister the service. Similarly, if the application disconnects from the bus,
+>  all of its registered services will be automatically unregistered.
+>  InterfacesAdded signals will be ignored.
 >
-> +#ifndef ARPHRD_6LOWPAN
-> +#define ARPHRD_6LOWPAN 825     /* IPv6 over LoWPAN */
-> +#endif
+> +Examples:
+> +       - Client
+> +               test/example-gatt-client
+> +               client/bluetoothctl
+> +       - Server
+> +               test/example-gatt-server
+> +               tools/gatt-service
 > +
->  static char const *hwstr(unsigned short sa_family);
->
->  /*
-> @@ -79,12 +83,10 @@ int update_device_info(int sock, struct Interface *iface)
->                 iface->sllao.if_maxmtu = -1;
->                 break;
->  #endif                         /* ARPHDR_ARCNET */
-> -#ifdef ARPHRD_IEEE802154
-> -       case ARPHRD_IEEE802154:
-> +       case ARPHRD_6LOWPAN:
->                 iface->sllao.if_hwaddr_len = 64;
->                 iface->sllao.if_prefix_len = 64;
->                 break;
-> -#endif
->         default:
->                 iface->sllao.if_hwaddr_len = -1;
->                 iface->sllao.if_prefix_len = -1;
-> @@ -382,6 +384,9 @@ static char const *hwstr(unsigned short sa_family)
->                 rc = "ARPHRD_IEEE802154_PHY";
->                 break;
->  #endif
-> +       case ARPHRD_6LOWPAN:
-> +               rc = "ARPHRD_6LOWPAN";
-> +               break;
->         case ARPHRD_VOID:
->                 rc = "ARPHRD_VOID";
->                 break;
+> +
+>  Service                org.bluez
+>  Interface      org.bluez.GattManager1
+>  Object path    [variable prefix]/{hci0,hci1,...}
 > --
-> 2.9.0
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> 2.7.4
 
+Applied.
 
 
 -- 
