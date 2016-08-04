@@ -1,250 +1,92 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: =?UTF-8?q?Micha=C5=82=20Narajowski?=
-	<michal.narajowski@codecoup.pl>
-To: linux-bluetooth@vger.kernel.org
-Cc: =?UTF-8?q?Micha=C5=82=20Narajowski?=
-	<michal.narajowski@codecoup.pl>
-Subject: [PATCH BlueZ v2] core/adapter: Add support for enabling privacy
-Date: Thu,  4 Aug 2016 11:00:08 +0200
-Message-Id: <1470301208-32369-1-git-send-email-michal.narajowski@codecoup.pl>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <linux-wpan-owner@vger.kernel.org>
+MIME-Version: 1.0
+In-Reply-To: <20160802143752.12831-2-aar@pengutronix.de>
+References: <20160802143752.12831-1-aar@pengutronix.de> <20160802143752.12831-2-aar@pengutronix.de>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Thu, 4 Aug 2016 11:26:05 +0300
+Message-ID: <CABBYNZ++YLsfPv+oR=Mwae=y+Q-wVWFmFWZfDnhssS_0xFMktw@mail.gmail.com>
+Subject: Re: [PATCH linux-wpan/radvd for-upstream 1/2] device-linux: replace
+ ARPHRD_IEEE802154 to ARPHRD_6LOWPAN
+To: Alexander Aring <aar@pengutronix.de>
+Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This adds support for loading local IRK key when adapter is configured.
-In case IRK is not present new key is generated and stored.
-In case of errors privacy is explicitly disabled. We ensure that we
-memset IRK to zero before disabling privacy.
-IRK is stored in %s/identity file. Privacy setting is configured
-globally in main.conf. In the future we may add per device
-configuration in %s/settings.
----
- doc/settings-storage.txt |  12 +++++
- src/adapter.c            | 117 +++++++++++++++++++++++++++++++++++++++++++++++
- src/hcid.h               |   2 +
- src/main.c               |  21 +++++++++
- src/main.conf            |   6 +++
- 5 files changed, 158 insertions(+)
+Hi Alex,
 
-diff --git a/doc/settings-storage.txt b/doc/settings-storage.txt
-index 2c34ec4..57c089e 100644
---- a/doc/settings-storage.txt
-+++ b/doc/settings-storage.txt
-@@ -89,6 +89,18 @@ Sample:
-   DiscoverableTimeout=0
- 
- 
-+Identity file format
-+====================
-+Identity file contains one [General] group that holds identity information 
-+such as keys and adresses:
-+
-+	IdentityResolvingKey	String	128-bit value of the IRK
-+
-+Sample:
-+  [General]
-+  IdentityResolvingKey=00112233445566778899aabbccddeeff
-+
-+
- Attributes file format
- ======================
- 
-diff --git a/src/adapter.c b/src/adapter.c
-index 3742398..3262516 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -3141,6 +3141,120 @@ static struct conn_param *get_conn_param(GKeyFile *key_file, const char *peer,
- 	return param;
- }
- 
-+static int generate_and_write_irk(uint8_t *irk, GKeyFile *key_file, const char *filename)
-+{
-+	char str_irk_out[33];
-+	gsize length = 0;
-+	char *str;
-+	int i;
-+
-+	struct bt_crypto *crypto = bt_crypto_new();
-+	if (!crypto) {
-+		error("Failed to open crypto");
-+		return -1;
-+	}
-+	
-+	if (!bt_crypto_random_bytes(crypto, irk, 16)) {
-+		error("Failed to generate IRK");
-+		bt_crypto_unref(crypto);
-+		return -1;
-+	}
-+
-+	bt_crypto_unref(crypto);
-+
-+	for (i = 0; i < 16; i++)
-+		sprintf(str_irk_out + (i * 2), "%02x", irk[i]);
-+
-+	str_irk_out[32] = '\0';
-+	info("Generated IRK successfully");
-+
-+	g_key_file_set_string(key_file, "General", "IdentityResolvingKey", str_irk_out);
-+	str = g_key_file_to_data(key_file, &length, NULL);
-+	g_file_set_contents(filename, str, length, NULL);
-+	g_free(str);
-+	DBG("Generated IRK written to file");
-+	return 0;
-+}
-+
-+static int load_irk(struct btd_adapter *adapter, uint8_t *irk)
-+{
-+	char filename[PATH_MAX];
-+	GKeyFile *key_file;
-+	char address[18];
-+	char *str_irk;
-+	int ret;
-+
-+	ba2str(&adapter->bdaddr, address);
-+	snprintf(filename, PATH_MAX, STORAGEDIR "/%s/identity", address);
-+
-+	key_file = g_key_file_new();
-+	g_key_file_load_from_file(key_file, filename, 0, NULL);
-+
-+	str_irk = g_key_file_get_string(key_file, "General", "IdentityResolvingKey", NULL);
-+	if (!str_irk) {
-+		info("No IRK for %s, creating new IRK", address);
-+		ret = generate_and_write_irk(irk, key_file, filename);
-+		g_key_file_free(key_file);
-+		return ret;
-+	}
-+
-+	g_key_file_free(key_file);
-+
-+	if (strlen(str_irk) != 32 || str2buf(str_irk, irk, 16)) {
-+		/* TODO re-create new IRK here? */
-+		error("Invalid IRK format, disabling privacy");
-+		g_free(str_irk);
-+		return -1;
-+	}
-+
-+	g_free(str_irk);
-+	DBG("Successfully read IRK from file");
-+	return 0;
-+}
-+
-+static void set_privacy_complete(uint8_t status, uint16_t length,
-+					const void *param, void *user_data)
-+{
-+	struct btd_adapter *adapter = user_data;
-+
-+	if (status != MGMT_STATUS_SUCCESS) {
-+		btd_error(adapter->dev_id, "Failed to set privacy: %s (0x%02x)",
-+						mgmt_errstr(status), status);
-+		return;
-+	}
-+
-+	DBG("Successfuly set privacy for index %u", adapter->dev_id);
-+}
-+
-+static int set_privacy(struct btd_adapter *adapter, uint8_t privacy)
-+{
-+	struct mgmt_cp_set_privacy cp;
-+
-+	memset(&cp, 0, sizeof(cp));
-+
-+	if (privacy) {
-+		uint8_t irk[16];
-+
-+		if (load_irk(adapter, irk) == 0) {
-+			cp.privacy = privacy;
-+			memcpy(cp.irk, irk, 16);
-+		}
-+	}
-+
-+	DBG("sending set privacy command for index %u", adapter->dev_id);
-+	DBG("setting privacy mode 0x%02x for index %u", cp.privacy, adapter->dev_id);
-+
-+	if (mgmt_send(adapter->mgmt, MGMT_OP_SET_PRIVACY,
-+				adapter->dev_id, sizeof(cp), &cp,
-+				set_privacy_complete, adapter, NULL) > 0)
-+		return 0;
-+
-+	btd_error(adapter->dev_id, "Failed to set privacy for index %u",
-+							adapter->dev_id);
-+
-+	return -1;
-+}
-+
- static void load_link_keys_complete(uint8_t status, uint16_t length,
- 					const void *param, void *user_data)
- {
-@@ -7893,6 +8007,9 @@ static void read_info_complete(uint8_t status, uint16_t length,
- 	if (missing_settings & MGMT_SETTING_SECURE_CONN)
- 		set_mode(adapter, MGMT_OP_SET_SECURE_CONN, 0x01);
- 
-+	if (adapter->supported_settings & MGMT_SETTING_PRIVACY)
-+		set_privacy(adapter, main_opts.privacy);
-+
- 	if (main_opts.fast_conn &&
- 			(missing_settings & MGMT_SETTING_FAST_CONNECTABLE))
- 		set_mode(adapter, MGMT_OP_SET_FAST_CONNECTABLE, 0x01);
-diff --git a/src/hcid.h b/src/hcid.h
-index 60e2b0a..0b785ee 100644
---- a/src/hcid.h
-+++ b/src/hcid.h
-@@ -35,6 +35,8 @@ struct main_opts {
- 	uint16_t	autoto;
- 	uint32_t	pairto;
- 	uint32_t	discovto;
-+	uint8_t		privacy;
-+
- 	gboolean	reverse_sdp;
- 	gboolean	name_resolv;
- 	gboolean	debug_keys;
-diff --git a/src/main.c b/src/main.c
-index ebc93f5..0de144e 100644
---- a/src/main.c
-+++ b/src/main.c
-@@ -255,6 +255,27 @@ static void parse_config(GKeyFile *config)
- 		main_opts.autoto = val;
- 	}
- 
-+	str = g_key_file_get_string(config, "General", "Privacy",
-+									&err);
-+	if (err) {
-+		DBG("%s", err->message);
-+		g_clear_error(&err);
-+		main_opts.privacy = 0x00;
-+	} else {
-+		DBG("privacy=%s", str);
-+
-+		if (!strcmp(str, "on"))
-+			main_opts.privacy = 0x01;
-+		else if (!strcmp(str, "off"))
-+			main_opts.privacy = 0x00;
-+		else {
-+			DBG("Invalid privacy option: %s", str);
-+			main_opts.privacy = 0x00;
-+		}
-+
-+		g_free(str);
-+	}
-+
- 	str = g_key_file_get_string(config, "General", "Name", &err);
- 	if (err) {
- 		DBG("%s", err->message);
-diff --git a/src/main.conf b/src/main.conf
-index 49528b9..0f60dc1 100644
---- a/src/main.conf
-+++ b/src/main.conf
-@@ -64,6 +64,12 @@
- # 'false'.
- #FastConnectable = false
- 
-+# Default privacy setting. 
-+# Enables use of private address.
-+# Possible values: "off", "on"
-+# Defaults to "off"
-+# Privacy = off
-+
- #[Policy]
- #
- # The ReconnectUUIDs defines the set of remote services that should try
+On Tue, Aug 2, 2016 at 5:37 PM, Alexander Aring <aar@pengutronix.de> wrote:
+> This patch changes the ARPHRD_IEEE802154 to ARPHRD_6LOWPAN. The IEEE
+> 802.15.4 6lowpan module changed the ARPHRD_IEEE802154 type to
+> ARPHRD_6LOWPAN. Nowadays it's use ARPHRD_6LOWPAN which is also used by
+> BTLE 6LoWPAN. Both interfaces uses an EUI64 address and the handling to
+> get the link-layer address should be the same.
+
+Bluetooth MAC addresses are 48 bits long, it could be converted to 64
+bits to generate the so called IID but that is only to generate the
+link-local address:
+
+https://tools.ietf.org/html/rfc7668#section-3.2.2
+
+> There is no backward compatibility for 802.15.4 6LoWPAN before we
+> changed the ARPHRD. Anyway if somebody wants that it should be patched
+> manually. When the ARPHRD was ARPHRD_IEEE802154 the 802.15.4 6lowpan was
+> anyway in a somehow unusable state.
+>
+> Signed-off-by: Alexander Aring <aar@pengutronix.de>
+> ---
+>  device-linux.c | 11 ++++++++---
+>  1 file changed, 8 insertions(+), 3 deletions(-)
+>
+> diff --git a/device-linux.c b/device-linux.c
+> index de83f2e..7301927 100644
+> --- a/device-linux.c
+> +++ b/device-linux.c
+> @@ -22,6 +22,10 @@
+>  #define IPV6_ADDR_LINKLOCAL   0x0020U
+>  #endif
+>
+> +#ifndef ARPHRD_6LOWPAN
+> +#define ARPHRD_6LOWPAN 825     /* IPv6 over LoWPAN */
+> +#endif
+> +
+>  static char const *hwstr(unsigned short sa_family);
+>
+>  /*
+> @@ -79,12 +83,10 @@ int update_device_info(int sock, struct Interface *iface)
+>                 iface->sllao.if_maxmtu = -1;
+>                 break;
+>  #endif                         /* ARPHDR_ARCNET */
+> -#ifdef ARPHRD_IEEE802154
+> -       case ARPHRD_IEEE802154:
+> +       case ARPHRD_6LOWPAN:
+>                 iface->sllao.if_hwaddr_len = 64;
+>                 iface->sllao.if_prefix_len = 64;
+>                 break;
+> -#endif
+>         default:
+>                 iface->sllao.if_hwaddr_len = -1;
+>                 iface->sllao.if_prefix_len = -1;
+> @@ -382,6 +384,9 @@ static char const *hwstr(unsigned short sa_family)
+>                 rc = "ARPHRD_IEEE802154_PHY";
+>                 break;
+>  #endif
+> +       case ARPHRD_6LOWPAN:
+> +               rc = "ARPHRD_6LOWPAN";
+> +               break;
+>         case ARPHRD_VOID:
+>                 rc = "ARPHRD_VOID";
+>                 break;
+> --
+> 2.9.0
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
 -- 
-2.7.4
-
+Luiz Augusto von Dentz
