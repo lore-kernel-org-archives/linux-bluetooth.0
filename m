@@ -1,62 +1,145 @@
-Return-Path: <linux-wpan-owner@vger.kernel.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Alexander Aring <aar@pengutronix.de>
 To: linux-wpan@vger.kernel.org
 Cc: kernel@pengutronix.de, linux-bluetooth@vger.kernel.org,
 	Alexander Aring <aar@pengutronix.de>
-Subject: [PATCHv2 linux-wpan/radvd for-upstream 0/2] radvd: upstream patches
-Date: Thu,  4 Aug 2016 15:09:30 +0200
-Message-Id: <20160804130932.4429-2-aar@pengutronix.de>
+Subject: [PATCHv2 linux-wpan/radvd for-upstream 2/2] device-linux: get address length via netlink
+Date: Thu,  4 Aug 2016 15:09:32 +0200
+Message-Id: <20160804130932.4429-4-aar@pengutronix.de>
 In-Reply-To: <20160804130932.4429-1-aar@pengutronix.de>
 References: <20160804130932.4429-1-aar@pengutronix.de>
-Sender: linux-wpan-owner@vger.kernel.org
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
-
-this patch series has some overdue updates for radvd upstream version.
-It doesn't contain rework of 6CO handling, since we don't have a stable
-UAPI to provide stateful compression to userspace.
-
-Anyway radvd has actually 6CO handling which is ?broken? don't know what
-it should do at the moment. 6CO without stateful compression setting
-makes no sense for me. If you like to use 6CO over debugfs use
-linux-wpan/radvd "6lowpan" branch.
-
+This patch adds a mechanism to get the device address length via
+netlink. This is necessary for device type 6LoWPAN which can have
+different device address lengths.
 ---
-
-I will update the "6lowpan" branch also with Patch 2/2 which adds support
-to get address length via sysfs. This patch will prepare correct handling
-for the new BTLE 6LoWPAN handling to use the correct address and
-address length (not 8 bytes, with U/L bit).
-
-If everything seems fine I will send a pull-request for radvd github
-repository. Please reply if this "hopefully final version" is okay for
-all 6LoWPAN people. Then I will try to get this upstream, at last the
-radvd maintainer need to apply this patch series if this looks okay
-for him.
-
-- Alex
-
-changes since v2:
-
-I need to correct me here, I think the buggy btle 6lowpan implementation
-addr_len == 8 and U/L will work. This is because the U/L bit is part of
-interface device address and radvd will use them. But anyway it's wrong
-and the next step will be to fix BTLE 6LoWPAN mainline.
-
-- change device address length UAPI to netlink
-- correct commit message in PATCH 1/2 - remove the part that all 6LoWPAN
-  types has the same device address length.
-
-Alexander Aring (2):
-  device-linux: replace ARPHRD_IEEE802154 to ARPHRD_6LOWPAN
-  device-linux: get address length via netlink
-
- device-linux.c | 27 ++++++++++++++++++++-----
+ device-linux.c | 16 +++++++++++++--
  netlink.c      | 64 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
  netlink.h      |  1 +
- 3 files changed, 87 insertions(+), 5 deletions(-)
+ 3 files changed, 79 insertions(+), 2 deletions(-)
 
+diff --git a/device-linux.c b/device-linux.c
+index 7301927..1ccb207 100644
+--- a/device-linux.c
++++ b/device-linux.c
+@@ -17,6 +17,7 @@
+ #include "radvd.h"
+ #include "defaults.h"
+ #include "pathnames.h"
++#include "netlink.h"
+ 
+ #ifndef IPV6_ADDR_LINKLOCAL
+ #define IPV6_ADDR_LINKLOCAL   0x0020U
+@@ -84,8 +85,19 @@ int update_device_info(int sock, struct Interface *iface)
+ 		break;
+ #endif				/* ARPHDR_ARCNET */
+ 	case ARPHRD_6LOWPAN:
+-		iface->sllao.if_hwaddr_len = 64;
+-		iface->sllao.if_prefix_len = 64;
++#ifdef HAVE_NETLINK
++		/* hwaddr length differs on some L2 type lets detect them */
++		iface->sllao.if_hwaddr_len = netlink_get_device_addr_len(iface);
++		if (iface->sllao.if_hwaddr_len != -1) {
++			iface->sllao.if_hwaddr_len *= 8;
++			iface->sllao.if_prefix_len = 64;
++		} else {
++			iface->sllao.if_prefix_len = -1;
++		}
++#else
++		iface->sllao.if_hwaddr_len = -1;
++		iface->sllao.if_prefix_len = -1;
++#endif
+ 		break;
+ 	default:
+ 		iface->sllao.if_hwaddr_len = -1;
+diff --git a/netlink.c b/netlink.c
+index 80d2254..d07a0b8 100644
+--- a/netlink.c
++++ b/netlink.c
+@@ -32,6 +32,70 @@
+ #define SOL_NETLINK	270
+ #endif
+ 
++struct iplink_req {
++	struct nlmsghdr		n;
++	struct ifinfomsg	i;
++	char			buf[1024];
++};
++
++int netlink_get_device_addr_len(struct Interface *iface)
++{
++	struct iplink_req req = {};
++	struct iovec iov = { &req, sizeof(req) };
++	struct sockaddr_nl sa = {};
++	struct msghdr msg = { (void *)&sa, sizeof(sa), &iov, 1, NULL, 0, 0 };
++	int sock, len, addr_len = -1;
++	unsigned short type;
++	char answer[32768];
++	struct rtattr *tb;
++
++	/* nl_pid (for linux kernel) and nl_groups (unicast) should be zero */
++	sa.nl_family = AF_NETLINK;
++	req.n.nlmsg_len = NLMSG_LENGTH(sizeof(struct ifinfomsg));
++	req.n.nlmsg_flags = NLM_F_REQUEST;
++	req.n.nlmsg_type = RTM_GETLINK;
++	req.i.ifi_index = iface->props.if_index;
++
++	sock = netlink_socket();
++	if (sock == -1)
++		return -1;
++
++	len = sendmsg(sock, &msg, 0);
++	if (len == -1) {
++		flog(LOG_ERR, "netlink: sendmsg for addr_len failed: %s", strerror(errno));
++		close(sock);
++		goto out;
++	}
++
++	iov.iov_base = answer;
++	iov.iov_len = sizeof(answer);
++	len = recvmsg(sock, &msg, 0);
++	if (len == -1) {
++		flog(LOG_ERR, "netlink: recvmsg for addr_len failed: %s", strerror(errno));
++		close(sock);
++		goto out;
++	}
++
++	if (len < NLMSG_LENGTH(sizeof(struct ifinfomsg)))
++		goto out;
++	len -= NLMSG_LENGTH(sizeof(struct ifinfomsg));
++
++	tb = (struct rtattr *)(answer + NLMSG_LENGTH(sizeof(struct ifinfomsg)));
++	while (RTA_OK(tb, len)) {
++		type = tb->rta_type & ~NLA_F_NESTED;
++		if (type == IFLA_ADDRESS) {
++			addr_len = RTA_PAYLOAD(tb);
++			break;
++		}
++		tb = RTA_NEXT(tb, len);
++	}
++
++out:
++	close(sock);
++
++	return addr_len;
++}
++
+ void process_netlink_msg(int sock, struct Interface * ifaces)
+ {
+ 	char buf[4096];
+diff --git a/netlink.h b/netlink.h
+index e2b706e..c693a10 100644
+--- a/netlink.h
++++ b/netlink.h
+@@ -17,5 +17,6 @@
+ 
+ #include "radvd.h"
+ 
++int netlink_get_device_addr_len(struct Interface *iface);
+ void process_netlink_msg(int sock, struct Interface * ifaces);
+ int netlink_socket(void);
 -- 
 2.9.2
 
