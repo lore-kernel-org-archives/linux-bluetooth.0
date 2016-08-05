@@ -1,66 +1,93 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Subject: Re: [RFC bluetooth-next 00/20] bluetooth: rework 6lowpan
+ implementation
+References: <20160711195044.25343-1-aar@pengutronix.de>
+ <2D2C7A7559A21B4EAB6B76FE23E27DFA0221FF4FB6@mbx04.nvlsi.no>
+To: "Bakke, Glenn Ruben" <Glenn.Ruben.Bakke@nordicsemi.no>
+From: Alexander Aring <aar@pengutronix.de>
+Cc: "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>,
+	"kernel@pengutronix.de" <kernel@pengutronix.de>,
+	"luiz.dentz@gmail.com" <luiz.dentz@gmail.com>,
+	"kaspar@schleiser.de" <kaspar@schleiser.de>,
+	"jukka.rissanen@linux.intel.com" <jukka.rissanen@linux.intel.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	"Patrik.Flykt@linux.intel.com" <Patrik.Flykt@linux.intel.com>
+Message-ID: <74a09ed9-80bd-d216-8036-3c5bd641bd81@pengutronix.de>
+Date: Fri, 5 Aug 2016 11:18:50 +0200
 MIME-Version: 1.0
-In-Reply-To: <1470317498-4092-1-git-send-email-szymon.janc@codecoup.pl>
-References: <1470317498-4092-1-git-send-email-szymon.janc@codecoup.pl>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Fri, 5 Aug 2016 14:44:36 +0300
-Message-ID: <CABBYNZ+SXrfwpr_t3Oi7E=o8mBh=znPniuoEKyAjsZrAmbq6+Q@mail.gmail.com>
-Subject: Re: [PATCH] core/gatt: Fix not marking GATT D-Bus properties as stable
-To: Szymon Janc <szymon.janc@codecoup.pl>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <2D2C7A7559A21B4EAB6B76FE23E27DFA0221FF4FB6@mbx04.nvlsi.no>
+Content-Type: text/plain; charset=windows-1252
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
 
-On Thu, Aug 4, 2016 at 4:31 PM, Szymon Janc <szymon.janc@codecoup.pl> wrote:
-> Those are no longer experimental. This fix not being able to use
-> GATT client over D-Bus without -E option.
-> ---
->  src/gatt-client.c | 18 ++++++------------
->  1 file changed, 6 insertions(+), 12 deletions(-)
->
-> diff --git a/src/gatt-client.c b/src/gatt-client.c
-> index f50db0b..029a9d1 100644
-> --- a/src/gatt-client.c
-> +++ b/src/gatt-client.c
-> @@ -613,12 +613,9 @@ static DBusMessage *descriptor_write_value(DBusConnection *conn,
->  }
->
->  static const GDBusPropertyTable descriptor_properties[] = {
-> -       { "UUID", "s", descriptor_get_uuid, NULL, NULL,
-> -                                       G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
-> -       { "Characteristic", "o", descriptor_get_characteristic, NULL, NULL,
-> -                                       G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
-> -       { "Value", "ay", descriptor_get_value, NULL, descriptor_value_exists,
-> -                                       G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
-> +       { "UUID", "s", descriptor_get_uuid },
-> +       { "Characteristic", "o", descriptor_get_characteristic, },
-> +       { "Value", "ay", descriptor_get_value, NULL, descriptor_value_exists },
->         { }
->  };
->
-> @@ -1402,12 +1399,9 @@ static gboolean service_get_primary(const GDBusPropertyTable *property,
->  }
->
->  static const GDBusPropertyTable service_properties[] = {
-> -       { "UUID", "s", service_get_uuid, NULL, NULL,
-> -                                       G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
-> -       { "Device", "o", service_get_device, NULL, NULL,
-> -                                       G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
-> -       { "Primary", "b", service_get_primary, NULL, NULL,
-> -                                       G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
-> +       { "UUID", "s", service_get_uuid },
-> +       { "Device", "o", service_get_device },
-> +       { "Primary", "b", service_get_primary },
->         { }
->  };
->
-> --
-> 2.7.4
+Hi,
 
-Applied, thanks.
+On 08/05/2016 09:15 AM, Bakke, Glenn Ruben wrote:
+> Hi Alex,
+> 
+>> -----Original Message-----
+>> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
+>>
+...
+>> --
+>> 2.9.0
+>>
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>> the body of a message to majordomo@vger.kernel.org More majordomo
+>> info at  http://vger.kernel.org/majordomo-info.html
+> 
+> I have tested the patch series with all 20 patches and verified that I can connect to devices and communicate between them over IPv6. Multicast and unicast where tested.
+> The neighbors where manually added with the command "ip -6 neigh". However I did not do a long run or thoroughly test, but did the basic verification.
+> I really liked the way the HCI device was manually selected for the interface, giving me flexibility to choose what connections I wanted on a given HCI device.
+> 
 
--- 
-Luiz Augusto von Dentz
+thank you for testing it.
+
+The "ip -6 neigh" command for adding neighbours should not be needed,
+why did you do that?
+
+Also the most important information for me would be:
+
+- Did it ever crashed your kernel?
+- Do you also have the tx credits deadlock?
+
+I have locally a RFCv2 where I put now these things which I got from
+this RFC as suggestion, which are:
+
+ - try to solve that dev->dev_addr is set when first connection is
+   there and remove dev_addr when last connection is gone.
+
+   I solved this by creating the interface with address 0...0 at first.
+   If there comes a connection in then the address will be set and the
+   interface comes up.
+
+   If the last connection will be close (for what reason ever) then the
+   interface comes down and the address is 0...0.
+
+   It's not possible to set the interface up when the address is 0...0.
+
+   This behaviour is somewhat better than recreating new interface (in
+   my opinion).
+
+ - 6lo%d interface will be created when power on the hci interface and
+   deleted when power off. (That's a suggestion from Marcel, so far I
+   understood it).
+
+   I implemented it now that "6lowpan_enable" need to be set to "1"
+   before setting hci will be powered on. All hci will create an
+   interface then.
+
+   This change has a ?nice? effekt that we don't need to close all
+   connection when doing a interface unregister.
+
+ - Changed the "6lowpan_control" per hci, not per interface. Which is
+   more what Partrik's UAPI draft.
+
+These three things did I change now, I just need to create new patches
+and send it to the mailinglist.
+
+But the tx credits deadlock still exists on my side.
+
+- Alex
