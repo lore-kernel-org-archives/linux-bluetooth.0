@@ -1,22 +1,66 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: bugzilla-daemon@bugzilla.kernel.org
-To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 120691] UART HCI memory leak
-Date: Sun, 07 Aug 2016 00:58:25 +0000
-Message-ID: <bug-120691-62941-2PfIS04UuK@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-120691-62941@https.bugzilla.kernel.org/>
-References: <bug-120691-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
 MIME-Version: 1.0
+In-Reply-To: <1470317498-4092-1-git-send-email-szymon.janc@codecoup.pl>
+References: <1470317498-4092-1-git-send-email-szymon.janc@codecoup.pl>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Fri, 5 Aug 2016 14:44:36 +0300
+Message-ID: <CABBYNZ+SXrfwpr_t3Oi7E=o8mBh=znPniuoEKyAjsZrAmbq6+Q@mail.gmail.com>
+Subject: Re: [PATCH] core/gatt: Fix not marking GATT D-Bus properties as stable
+To: Szymon Janc <szymon.janc@codecoup.pl>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-https://bugzilla.kernel.org/show_bug.cgi?id=120691
+Hi Szymon,
 
---- Comment #12 from bastienphilbert@gmail.com ---
-See if the below patch fixes or does something new in terms of kmemleak
-warning(s) you are getting from these bluetooth drivers.
+On Thu, Aug 4, 2016 at 4:31 PM, Szymon Janc <szymon.janc@codecoup.pl> wrote:
+> Those are no longer experimental. This fix not being able to use
+> GATT client over D-Bus without -E option.
+> ---
+>  src/gatt-client.c | 18 ++++++------------
+>  1 file changed, 6 insertions(+), 12 deletions(-)
+>
+> diff --git a/src/gatt-client.c b/src/gatt-client.c
+> index f50db0b..029a9d1 100644
+> --- a/src/gatt-client.c
+> +++ b/src/gatt-client.c
+> @@ -613,12 +613,9 @@ static DBusMessage *descriptor_write_value(DBusConnection *conn,
+>  }
+>
+>  static const GDBusPropertyTable descriptor_properties[] = {
+> -       { "UUID", "s", descriptor_get_uuid, NULL, NULL,
+> -                                       G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
+> -       { "Characteristic", "o", descriptor_get_characteristic, NULL, NULL,
+> -                                       G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
+> -       { "Value", "ay", descriptor_get_value, NULL, descriptor_value_exists,
+> -                                       G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
+> +       { "UUID", "s", descriptor_get_uuid },
+> +       { "Characteristic", "o", descriptor_get_characteristic, },
+> +       { "Value", "ay", descriptor_get_value, NULL, descriptor_value_exists },
+>         { }
+>  };
+>
+> @@ -1402,12 +1399,9 @@ static gboolean service_get_primary(const GDBusPropertyTable *property,
+>  }
+>
+>  static const GDBusPropertyTable service_properties[] = {
+> -       { "UUID", "s", service_get_uuid, NULL, NULL,
+> -                                       G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
+> -       { "Device", "o", service_get_device, NULL, NULL,
+> -                                       G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
+> -       { "Primary", "b", service_get_primary, NULL, NULL,
+> -                                       G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
+> +       { "UUID", "s", service_get_uuid },
+> +       { "Device", "o", service_get_device },
+> +       { "Primary", "b", service_get_primary },
+>         { }
+>  };
+>
+> --
+> 2.7.4
+
+Applied, thanks.
 
 -- 
-You are receiving this mail because:
-You are the assignee for the bug.
+Luiz Augusto von Dentz
