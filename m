@@ -1,48 +1,91 @@
-Return-Path: <linux-wpan-owner@vger.kernel.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Alexander Aring <aar@pengutronix.de>
 To: linux-wpan@vger.kernel.org
 Cc: kernel@pengutronix.de, linux-bluetooth@vger.kernel.org,
 	Alexander Aring <aar@pengutronix.de>
-Subject: [RFCv2 bluetooth-next 17/19] 6lowpan: move multicast flags to generic
-Date: Sun,  7 Aug 2016 16:30:54 +0200
-Message-Id: <20160807143056.3116-18-aar@pengutronix.de>
+Subject: [RFCv2 bluetooth-next 08/19] bluetooth: add hci dev notifier
+Date: Sun,  7 Aug 2016 16:30:45 +0200
+Message-Id: <20160807143056.3116-9-aar@pengutronix.de>
 In-Reply-To: <20160807143056.3116-1-aar@pengutronix.de>
 References: <20160807143056.3116-1-aar@pengutronix.de>
-Sender: linux-wpan-owner@vger.kernel.org
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-These flags should be all the same for 6LoWPAN so move it to 6LoWPAN generic.
+I need to react at least somehow on a hci dev unregister event to clean
+all 6LoWPAN interfaces on it. This patch adds a notifier for non
+socket stuff.
+
+I also thought about to react somehow on "struct device" unregister but
+I didn't found any functionality for that.
 
 Signed-off-by: Alexander Aring <aar@pengutronix.de>
 ---
- net/6lowpan/core.c            | 1 +
- net/ieee802154/6lowpan/core.c | 1 -
- 2 files changed, 1 insertion(+), 1 deletion(-)
+ include/net/bluetooth/hci_core.h |  4 ++++
+ net/bluetooth/hci_core.c         | 22 ++++++++++++++++++++++
+ net/bluetooth/hci_sock.c         |  2 ++
+ 3 files changed, 28 insertions(+)
 
-diff --git a/net/6lowpan/core.c b/net/6lowpan/core.c
-index a978000..6b7de14 100644
---- a/net/6lowpan/core.c
-+++ b/net/6lowpan/core.c
-@@ -62,6 +62,7 @@ int lowpan_register_netdevice(struct net_device *dev,
- 	dev->type = ARPHRD_6LOWPAN;
- 	dev->mtu = IPV6_MIN_MTU;
- 	dev->priv_flags |= IFF_NO_QUEUE;
-+	dev->flags = IFF_BROADCAST | IFF_MULTICAST;
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index b8d43bd..f808aa0 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -907,6 +907,10 @@ void hci_conn_enter_active_mode(struct hci_conn *conn, __u8 force_active);
  
- 	dev->header_ops = &header_ops;
+ void hci_le_conn_failed(struct hci_conn *conn, u8 status);
  
-diff --git a/net/ieee802154/6lowpan/core.c b/net/ieee802154/6lowpan/core.c
-index 228a711..a60abad 100644
---- a/net/ieee802154/6lowpan/core.c
-+++ b/net/ieee802154/6lowpan/core.c
-@@ -92,7 +92,6 @@ static void lowpan_setup(struct net_device *ldev)
- 	memset(ldev->broadcast, 0xff, IEEE802154_ADDR_LEN);
- 	/* We need an ipv6hdr as minimum len when calling xmit */
- 	ldev->hard_header_len	= sizeof(struct ipv6hdr);
--	ldev->flags		= IFF_BROADCAST | IFF_MULTICAST;
++int register_hci_dev_notifier(struct notifier_block *nb);
++void unregister_hci_dev_notifier(struct notifier_block *nb);
++int call_hci_dev_notifiers(unsigned long val, struct hci_dev *hdev);
++
+ /*
+  * hci_conn_get() and hci_conn_put() are used to control the life-time of an
+  * "hci_conn" object. They do not guarantee that the hci_conn object is running,
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index ddf8432..999c83b 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -57,6 +57,28 @@ DEFINE_MUTEX(hci_cb_list_lock);
+ /* HCI ID Numbering */
+ static DEFINE_IDA(hci_index_ida);
  
- 	ldev->netdev_ops	= &lowpan_netdev_ops;
- 	ldev->destructor	= free_netdev;
++/* HCI device notifier list */
++static RAW_NOTIFIER_HEAD(hci_dev_chain);
++
++/* ---- HCI notifiers functions ---- */
++
++int register_hci_dev_notifier(struct notifier_block *nb)
++{
++	return raw_notifier_chain_register(&hci_dev_chain, nb);
++}
++EXPORT_SYMBOL(register_hci_dev_notifier);
++
++void unregister_hci_dev_notifier(struct notifier_block *nb)
++{
++	raw_notifier_chain_unregister(&hci_dev_chain, nb);
++}
++EXPORT_SYMBOL(unregister_hci_dev_notifier);
++
++int call_hci_dev_notifiers(unsigned long val, struct hci_dev *hdev)
++{
++	return raw_notifier_call_chain(&hci_dev_chain, val, hdev);
++}
++
+ /* ---- HCI debugfs entries ---- */
+ 
+ static ssize_t dut_mode_read(struct file *file, char __user *user_buf,
+diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
+index 6ef8a01..290eb1e 100644
+--- a/net/bluetooth/hci_sock.c
++++ b/net/bluetooth/hci_sock.c
+@@ -529,6 +529,8 @@ void hci_sock_dev_event(struct hci_dev *hdev, int event)
+ 		}
+ 		read_unlock(&hci_sk_list.lock);
+ 	}
++
++	call_hci_dev_notifiers(event, hdev);
+ }
+ 
+ static struct hci_mgmt_chan *__hci_mgmt_chan_find(unsigned short channel)
 -- 
 2.9.2
 
