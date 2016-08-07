@@ -3,55 +3,49 @@ From: Alexander Aring <aar@pengutronix.de>
 To: linux-wpan@vger.kernel.org
 Cc: kernel@pengutronix.de, linux-bluetooth@vger.kernel.org,
 	Alexander Aring <aar@pengutronix.de>
-Subject: [RFCv2 bluetooth-next 10/19] bluetooth: export functions and variables
-Date: Sun,  7 Aug 2016 16:30:47 +0200
-Message-Id: <20160807143056.3116-11-aar@pengutronix.de>
+Subject: [RFCv2 bluetooth-next 02/19] ieee802154: 6lowpan: move skb cb BUILD_BUG_ON check
+Date: Sun,  7 Aug 2016 16:30:39 +0200
+Message-Id: <20160807143056.3116-3-aar@pengutronix.de>
 In-Reply-To: <20160807143056.3116-1-aar@pengutronix.de>
 References: <20160807143056.3116-1-aar@pengutronix.de>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This function exports some functions which are needed by the 6LoWPAN BTLE
-module.
+This patch moves the control block information BUILD_BUG_ON to the init
+of module. All compile timed BUILD_BUG_ON macros should be placed there.
 
 Signed-off-by: Alexander Aring <aar@pengutronix.de>
 ---
- net/bluetooth/hci_core.c   | 2 ++
- net/bluetooth/l2cap_core.c | 1 +
- 2 files changed, 3 insertions(+)
+ include/net/6lowpan.h         | 1 -
+ net/ieee802154/6lowpan/core.c | 3 +++
+ 2 files changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 999c83b..4624165 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -955,6 +955,7 @@ struct hci_dev *hci_dev_get(int index)
- 	read_unlock(&hci_dev_list_lock);
- 	return hdev;
- }
-+EXPORT_SYMBOL(hci_dev_get);
- 
- /* ---- Inquiry support ---- */
- 
-@@ -2941,6 +2942,7 @@ void hci_copy_identity_address(struct hci_dev *hdev, bdaddr_t *bdaddr,
- 		*bdaddr_type = ADDR_LE_DEV_PUBLIC;
- 	}
- }
-+EXPORT_SYMBOL(hci_copy_identity_address);
- 
- /* Alloc HCI device */
- struct hci_dev *hci_alloc_dev(void)
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index cce5d21..128d5a4 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -501,6 +501,7 @@ void l2cap_chan_hold(struct l2cap_chan *c)
- 
- 	kref_get(&c->kref);
- }
-+EXPORT_SYMBOL(l2cap_chan_hold);
- 
- void l2cap_chan_put(struct l2cap_chan *c)
+diff --git a/include/net/6lowpan.h b/include/net/6lowpan.h
+index 5ab4c99..6d56be7 100644
+--- a/include/net/6lowpan.h
++++ b/include/net/6lowpan.h
+@@ -178,7 +178,6 @@ struct lowpan_802154_cb {
+ static inline
+ struct lowpan_802154_cb *lowpan_802154_cb(const struct sk_buff *skb)
  {
+-	BUILD_BUG_ON(sizeof(struct lowpan_802154_cb) > sizeof(skb->cb));
+ 	return (struct lowpan_802154_cb *)skb->cb;
+ }
+ 
+diff --git a/net/ieee802154/6lowpan/core.c b/net/ieee802154/6lowpan/core.c
+index d7efbf0..6afb8cd 100644
+--- a/net/ieee802154/6lowpan/core.c
++++ b/net/ieee802154/6lowpan/core.c
+@@ -233,6 +233,9 @@ static int __init lowpan_init_module(void)
+ {
+ 	int err = 0;
+ 
++	BUILD_BUG_ON(sizeof(struct lowpan_802154_cb) >
++		     FIELD_SIZEOF(struct sk_buff, cb));
++
+ 	err = lowpan_net_frag_init();
+ 	if (err < 0)
+ 		goto out;
 -- 
 2.9.2
 
