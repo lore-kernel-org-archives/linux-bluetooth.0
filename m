@@ -1,37 +1,23 @@
-Return-Path: <linux-wpan-owner@vger.kernel.org>
-From: Alexander Aring <aar@pengutronix.de>
-To: linux-wpan@vger.kernel.org
-Cc: kernel@pengutronix.de, linux-bluetooth@vger.kernel.org,
-	Alexander Aring <aar@pengutronix.de>
-Subject: [RFCv2 bluetooth-next 01/19] ieee802154: 6lowpan: remove headroom check
-Date: Sun,  7 Aug 2016 16:30:38 +0200
-Message-Id: <20160807143056.3116-2-aar@pengutronix.de>
-In-Reply-To: <20160807143056.3116-1-aar@pengutronix.de>
-References: <20160807143056.3116-1-aar@pengutronix.de>
-Sender: linux-wpan-owner@vger.kernel.org
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: bugzilla-daemon@bugzilla.kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [Bug 120691] UART HCI memory leak
+Date: Sun, 07 Aug 2016 00:58:46 +0000
+Message-ID: <bug-120691-62941-Cp7aZM9mzG@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-120691-62941@https.bugzilla.kernel.org/>
+References: <bug-120691-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch removes unnessary headroom check. We will check that value
-while register net device that we have such headroom for placing address
-information at the headroom of skb.
+https://bugzilla.kernel.org/show_bug.cgi?id=120691
 
-Signed-off-by: Alexander Aring <aar@pengutronix.de>
----
- net/ieee802154/6lowpan/tx.c | 1 -
- 1 file changed, 1 deletion(-)
+--- Comment #13 from bastienphilbert@gmail.com ---
+Created attachment 227881
+  --> https://bugzilla.kernel.org/attachment.cgi?id=227881&action=edit
+Bluetooth Test Patch
 
-diff --git a/net/ieee802154/6lowpan/tx.c b/net/ieee802154/6lowpan/tx.c
-index dbb476d..a7a1b12 100644
---- a/net/ieee802154/6lowpan/tx.c
-+++ b/net/ieee802154/6lowpan/tx.c
-@@ -26,7 +26,6 @@ struct lowpan_addr_info {
- static inline struct
- lowpan_addr_info *lowpan_skb_priv(const struct sk_buff *skb)
- {
--	WARN_ON_ONCE(skb_headroom(skb) < sizeof(struct lowpan_addr_info));
- 	return (struct lowpan_addr_info *)(skb->data -
- 			sizeof(struct lowpan_addr_info));
- }
 -- 
-2.9.2
-
+You are receiving this mail because:
+You are the assignee for the bug.
