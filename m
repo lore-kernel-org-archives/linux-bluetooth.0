@@ -1,49 +1,96 @@
-Return-Path: <linux-wpan-owner@vger.kernel.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Alexander Aring <aar@pengutronix.de>
 To: linux-wpan@vger.kernel.org
 Cc: kernel@pengutronix.de, linux-bluetooth@vger.kernel.org,
 	Alexander Aring <aar@pengutronix.de>
-Subject: [RFCv2 bluetooth-next 18/19] 6lowpan: move addr_len setting away from generic
-Date: Sun,  7 Aug 2016 16:30:55 +0200
-Message-Id: <20160807143056.3116-19-aar@pengutronix.de>
+Subject: [RFCv2 bluetooth-next 07/19] bluetooth: introduce l2cap_hdev_chan_connect
+Date: Sun,  7 Aug 2016 16:30:44 +0200
+Message-Id: <20160807143056.3116-8-aar@pengutronix.de>
 In-Reply-To: <20160807143056.3116-1-aar@pengutronix.de>
 References: <20160807143056.3116-1-aar@pengutronix.de>
-Sender: linux-wpan-owner@vger.kernel.org
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The address length for BTLE 6LoWPAN is not 8 bytes, it's 6 bytes. We
-need to move this setting away from generic branch.
+A BTLE 6LoWPAN should be binded to one hci device and is not changeable
+afterwards. This patch adds l2cap_hdev_chan_connect function without calling
+hci_get_route which decides on bluetooth side which may be the best hci
+device which should be use. The hci dev will be available by parameter.
 
 Signed-off-by: Alexander Aring <aar@pengutronix.de>
 ---
- net/6lowpan/core.c            | 1 -
- net/ieee802154/6lowpan/core.c | 1 +
- 2 files changed, 1 insertion(+), 1 deletion(-)
+ include/net/bluetooth/l2cap.h |  3 +++
+ net/bluetooth/l2cap_core.c    | 28 +++++++++++++++++++++-------
+ 2 files changed, 24 insertions(+), 7 deletions(-)
 
-diff --git a/net/6lowpan/core.c b/net/6lowpan/core.c
-index 6b7de14..e03cecf 100644
---- a/net/6lowpan/core.c
-+++ b/net/6lowpan/core.c
-@@ -58,7 +58,6 @@ int lowpan_register_netdevice(struct net_device *dev,
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index 5ee3c68..8a4d26e 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -928,6 +928,9 @@ struct l2cap_chan *l2cap_chan_create(void);
+ void l2cap_chan_close(struct l2cap_chan *chan, int reason);
+ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
+ 		       bdaddr_t *dst, u8 dst_type);
++int l2cap_hdev_chan_connect(struct hci_dev *hdev,
++			    struct l2cap_chan *chan, __le16 psm, u16 cid,
++			    bdaddr_t *dst, u8 dst_type);
+ int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len);
+ void l2cap_chan_busy(struct l2cap_chan *chan, int busy);
+ int l2cap_chan_check_security(struct l2cap_chan *chan, bool initiator);
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 54ceb1f..2ab8814 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -7041,21 +7041,17 @@ static bool is_valid_psm(u16 psm, u8 dst_type) {
+ 	return ((psm & 0x0101) == 0x0001);
+ }
+ 
+-int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
+-		       bdaddr_t *dst, u8 dst_type)
++int l2cap_hdev_chan_connect(struct hci_dev *hdev,
++			    struct l2cap_chan *chan, __le16 psm, u16 cid,
++			    bdaddr_t *dst, u8 dst_type)
  {
- 	int i, ret;
+ 	struct l2cap_conn *conn;
+ 	struct hci_conn *hcon;
+-	struct hci_dev *hdev;
+ 	int err;
  
--	dev->addr_len = EUI64_ADDR_LEN;
- 	dev->type = ARPHRD_6LOWPAN;
- 	dev->mtu = IPV6_MIN_MTU;
- 	dev->priv_flags |= IFF_NO_QUEUE;
-diff --git a/net/ieee802154/6lowpan/core.c b/net/ieee802154/6lowpan/core.c
-index a60abad..c97eb7a 100644
---- a/net/ieee802154/6lowpan/core.c
-+++ b/net/ieee802154/6lowpan/core.c
-@@ -134,6 +134,7 @@ static int lowpan_newlink(struct net *src_net, struct net_device *ldev,
- 	}
+ 	BT_DBG("%pMR -> %pMR (type %u) psm 0x%2.2x", &chan->src, dst,
+ 	       dst_type, __le16_to_cpu(psm));
  
- 	lowpan_802154_dev(ldev)->wdev = wdev;
-+	ldev->addr_len = IEEE802154_ADDR_LEN;
- 	/* Set the lowpan hardware address to the wpan hardware address. */
- 	memcpy(ldev->dev_addr, wdev->dev_addr, IEEE802154_ADDR_LEN);
- 	/* We need headroom for possible wpan_dev_hard_header call and tailroom
+-	hdev = hci_get_route(dst, &chan->src);
+-	if (!hdev)
+-		return -EHOSTUNREACH;
+-
+ 	hci_dev_lock(hdev);
+ 
+ 	if (!is_valid_psm(__le16_to_cpu(psm), dst_type) && !cid &&
+@@ -7199,7 +7195,25 @@ chan_unlock:
+ 	mutex_unlock(&conn->chan_lock);
+ done:
+ 	hci_dev_unlock(hdev);
++	return err;
++}
++EXPORT_SYMBOL_GPL(l2cap_hdev_chan_connect);
++
++int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
++		       bdaddr_t *dst, u8 dst_type)
++{
++	struct hci_dev *hdev;
++	int err = -EHOSTUNREACH;
++
++	hdev = hci_get_route(dst, &chan->src);
++	if (!hdev)
++		goto done;
++
++	err = l2cap_hdev_chan_connect(hdev, chan, psm, cid, dst, dst_type);
++
+ 	hci_dev_put(hdev);
++
++done:
+ 	return err;
+ }
+ EXPORT_SYMBOL_GPL(l2cap_chan_connect);
 -- 
 2.9.2
 
