@@ -3,94 +3,91 @@ From: Alexander Aring <aar@pengutronix.de>
 To: linux-wpan@vger.kernel.org
 Cc: kernel@pengutronix.de, linux-bluetooth@vger.kernel.org,
 	Alexander Aring <aar@pengutronix.de>
-Subject: [RFCv2 bluetooth-next 07/19] bluetooth: introduce l2cap_hdev_chan_connect
-Date: Sun,  7 Aug 2016 16:30:44 +0200
-Message-Id: <20160807143056.3116-8-aar@pengutronix.de>
+Subject: [RFCv2 bluetooth-next 09/19] bluetooth: introduce l2cap chan priv data
+Date: Sun,  7 Aug 2016 16:30:46 +0200
+Message-Id: <20160807143056.3116-10-aar@pengutronix.de>
 In-Reply-To: <20160807143056.3116-1-aar@pengutronix.de>
 References: <20160807143056.3116-1-aar@pengutronix.de>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-A BTLE 6LoWPAN should be binded to one hci device and is not changeable
-afterwards. This patch adds l2cap_hdev_chan_connect function without calling
-hci_get_route which decides on bluetooth side which may be the best hci
-device which should be use. The hci dev will be available by parameter.
+This patch adds possibility to add a private data room to the l2cap_chan
+structure. This private dataroom will be freed when the l2cap_chan
+reference count reach zero. This avoids dealing with separate allocated
+data pointer for l2cap_chan "data" attribute.
 
 Signed-off-by: Alexander Aring <aar@pengutronix.de>
 ---
- include/net/bluetooth/l2cap.h |  3 +++
- net/bluetooth/l2cap_core.c    | 28 +++++++++++++++++++++-------
- 2 files changed, 24 insertions(+), 7 deletions(-)
+ include/net/bluetooth/l2cap.h |  4 ++++
+ net/bluetooth/l2cap_core.c    | 21 +++++++++++++++++++--
+ 2 files changed, 23 insertions(+), 2 deletions(-)
 
 diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index 5ee3c68..8a4d26e 100644
+index 8a4d26e..925c78a 100644
 --- a/include/net/bluetooth/l2cap.h
 +++ b/include/net/bluetooth/l2cap.h
-@@ -928,6 +928,9 @@ struct l2cap_chan *l2cap_chan_create(void);
+@@ -598,6 +598,9 @@ struct l2cap_chan {
+ 	void			*data;
+ 	const struct l2cap_ops	*ops;
+ 	struct mutex		lock;
++
++	/* must be last */
++	u8 priv[0] __aligned(sizeof(void *));
+ };
+ 
+ struct l2cap_ops {
+@@ -925,6 +928,7 @@ int l2cap_add_psm(struct l2cap_chan *chan, bdaddr_t *src, __le16 psm);
+ int l2cap_add_scid(struct l2cap_chan *chan,  __u16 scid);
+ 
+ struct l2cap_chan *l2cap_chan_create(void);
++struct l2cap_chan *l2cap_chan_create_priv(size_t priv_size);
  void l2cap_chan_close(struct l2cap_chan *chan, int reason);
  int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
  		       bdaddr_t *dst, u8 dst_type);
-+int l2cap_hdev_chan_connect(struct hci_dev *hdev,
-+			    struct l2cap_chan *chan, __le16 psm, u16 cid,
-+			    bdaddr_t *dst, u8 dst_type);
- int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len);
- void l2cap_chan_busy(struct l2cap_chan *chan, int busy);
- int l2cap_chan_check_security(struct l2cap_chan *chan, bool initiator);
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 54ceb1f..2ab8814 100644
+index 2ab8814..cce5d21 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -7041,21 +7041,17 @@ static bool is_valid_psm(u16 psm, u8 dst_type) {
- 	return ((psm & 0x0101) == 0x0001);
+@@ -433,11 +433,11 @@ static void l2cap_chan_timeout(struct work_struct *work)
+ 	l2cap_chan_put(chan);
  }
  
--int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
--		       bdaddr_t *dst, u8 dst_type)
-+int l2cap_hdev_chan_connect(struct hci_dev *hdev,
-+			    struct l2cap_chan *chan, __le16 psm, u16 cid,
-+			    bdaddr_t *dst, u8 dst_type)
+-struct l2cap_chan *l2cap_chan_create(void)
++static struct l2cap_chan *__l2cap_chan_create(size_t priv_size)
  {
- 	struct l2cap_conn *conn;
- 	struct hci_conn *hcon;
--	struct hci_dev *hdev;
- 	int err;
+ 	struct l2cap_chan *chan;
  
- 	BT_DBG("%pMR -> %pMR (type %u) psm 0x%2.2x", &chan->src, dst,
- 	       dst_type, __le16_to_cpu(psm));
+-	chan = kzalloc(sizeof(*chan), GFP_ATOMIC);
++	chan = kzalloc(sizeof(*chan) + priv_size, GFP_ATOMIC);
+ 	if (!chan)
+ 		return NULL;
  
--	hdev = hci_get_route(dst, &chan->src);
--	if (!hdev)
--		return -EHOSTUNREACH;
--
- 	hci_dev_lock(hdev);
+@@ -463,8 +463,25 @@ struct l2cap_chan *l2cap_chan_create(void)
  
- 	if (!is_valid_psm(__le16_to_cpu(psm), dst_type) && !cid &&
-@@ -7199,7 +7195,25 @@ chan_unlock:
- 	mutex_unlock(&conn->chan_lock);
- done:
- 	hci_dev_unlock(hdev);
-+	return err;
-+}
-+EXPORT_SYMBOL_GPL(l2cap_hdev_chan_connect);
-+
-+int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
-+		       bdaddr_t *dst, u8 dst_type)
-+{
-+	struct hci_dev *hdev;
-+	int err = -EHOSTUNREACH;
-+
-+	hdev = hci_get_route(dst, &chan->src);
-+	if (!hdev)
-+		goto done;
-+
-+	err = l2cap_hdev_chan_connect(hdev, chan, psm, cid, dst, dst_type);
-+
- 	hci_dev_put(hdev);
-+
-+done:
- 	return err;
+ 	return chan;
  }
- EXPORT_SYMBOL_GPL(l2cap_chan_connect);
++
++struct l2cap_chan *l2cap_chan_create(void)
++{
++	return __l2cap_chan_create(0);
++}
+ EXPORT_SYMBOL_GPL(l2cap_chan_create);
+ 
++struct l2cap_chan *l2cap_chan_create_priv(size_t priv_size)
++{
++	struct l2cap_chan *chan = __l2cap_chan_create(priv_size);
++
++	/* let's point data pointer to private space */
++	if (chan)
++		chan->data = chan->priv;
++
++	return chan;
++}
++EXPORT_SYMBOL_GPL(l2cap_chan_create_priv);
++
+ static void l2cap_chan_destroy(struct kref *kref)
+ {
+ 	struct l2cap_chan *chan = container_of(kref, struct l2cap_chan, kref);
 -- 
 2.9.2
 
