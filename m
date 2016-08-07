@@ -1,78 +1,37 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <linux-wpan-owner@vger.kernel.org>
 From: Alexander Aring <aar@pengutronix.de>
 To: linux-wpan@vger.kernel.org
 Cc: kernel@pengutronix.de, linux-bluetooth@vger.kernel.org,
 	Alexander Aring <aar@pengutronix.de>
-Subject: [RFCv2 bluetooth-next 03/19] 6lowpan: remove LOWPAN_IPHC_MAX_HEADER_LEN
-Date: Sun,  7 Aug 2016 16:30:40 +0200
-Message-Id: <20160807143056.3116-4-aar@pengutronix.de>
+Subject: [RFCv2 bluetooth-next 01/19] ieee802154: 6lowpan: remove headroom check
+Date: Sun,  7 Aug 2016 16:30:38 +0200
+Message-Id: <20160807143056.3116-2-aar@pengutronix.de>
 In-Reply-To: <20160807143056.3116-1-aar@pengutronix.de>
 References: <20160807143056.3116-1-aar@pengutronix.de>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-My observations with btle 6lowpan was that such parameter doesn't
-exists. IPHC will not increase the packet size of IPv6 afterwards, but
-decrease it.
-
-I thought about that LOWPAN_IPHC are the 2 bytes headers, but we will
-always save two bytes because the payload_length of ipv6 will be elided.
-
-Then I thought the CID byte will increase the payload at one byte, this
-is correct but when we add the CID byte, we need to compress at
-worst-case 8 bytes.
-
-After that I thought the nhc id will be at least increase currently the
-payload to one byte. This is correct, but when we set the NHC bit, then
-we save one byte because ipv6 next header byte will be elided. That's
-why everything should be fine until we have NHC's which have two bytes
-length until or NHC compression use more bytes than raw next header
-format.
+This patch removes unnessary headroom check. We will check that value
+while register net device that we have such headroom for placing address
+information at the headroom of skb.
 
 Signed-off-by: Alexander Aring <aar@pengutronix.de>
 ---
- include/net/6lowpan.h         | 7 -------
- net/ieee802154/6lowpan/core.c | 6 ++----
- 2 files changed, 2 insertions(+), 11 deletions(-)
+ net/ieee802154/6lowpan/tx.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/include/net/6lowpan.h b/include/net/6lowpan.h
-index 6d56be7..7f4b63c 100644
---- a/include/net/6lowpan.h
-+++ b/include/net/6lowpan.h
-@@ -68,15 +68,8 @@
-  * possible inline data.
-  */
- #define LOWPAN_NHC_MAX_HDR_LEN	(sizeof(struct udphdr))
--/* Max IPHC Header len without IPv6 hdr specific inline data.
-- * Useful for getting the "extra" bytes we need at worst case compression.
-- *
-- * LOWPAN_IPHC + CID + LOWPAN_NHC_MAX_ID_LEN
-- */
--#define LOWPAN_IPHC_MAX_HEADER_LEN	(2 + 1 + LOWPAN_NHC_MAX_ID_LEN)
- /* Maximum worst case IPHC header buffer size */
- #define LOWPAN_IPHC_MAX_HC_BUF_LEN	(sizeof(struct ipv6hdr) +	\
--					 LOWPAN_IPHC_MAX_HEADER_LEN +	\
- 					 LOWPAN_NHC_MAX_HDR_LEN)
- /* SCI/DCI is 4 bit width, so we have maximum 16 entries */
- #define LOWPAN_IPHC_CTX_TABLE_SIZE	(1 << 4)
-diff --git a/net/ieee802154/6lowpan/core.c b/net/ieee802154/6lowpan/core.c
-index 6afb8cd..f70edcc 100644
---- a/net/ieee802154/6lowpan/core.c
-+++ b/net/ieee802154/6lowpan/core.c
-@@ -152,11 +152,9 @@ static int lowpan_newlink(struct net *src_net, struct net_device *ldev,
- 	/* We need headroom for possible wpan_dev_hard_header call and tailroom
- 	 * for encryption/fcs handling. The lowpan interface will replace
- 	 * the IPv6 header with 6LoWPAN header. At worst case the 6LoWPAN
--	 * header has LOWPAN_IPHC_MAX_HEADER_LEN more bytes than the IPv6
--	 * header.
-+	 * header has one byte more for possible raw IPv6 dispatch.
- 	 */
--	ldev->needed_headroom = LOWPAN_IPHC_MAX_HEADER_LEN +
--				wdev->needed_headroom;
-+	ldev->needed_headroom = 1 + wdev->needed_headroom;
- 	ldev->needed_tailroom = wdev->needed_tailroom;
- 
- 	ldev->neigh_priv_len = sizeof(struct lowpan_802154_neigh);
+diff --git a/net/ieee802154/6lowpan/tx.c b/net/ieee802154/6lowpan/tx.c
+index dbb476d..a7a1b12 100644
+--- a/net/ieee802154/6lowpan/tx.c
++++ b/net/ieee802154/6lowpan/tx.c
+@@ -26,7 +26,6 @@ struct lowpan_addr_info {
+ static inline struct
+ lowpan_addr_info *lowpan_skb_priv(const struct sk_buff *skb)
+ {
+-	WARN_ON_ONCE(skb_headroom(skb) < sizeof(struct lowpan_addr_info));
+ 	return (struct lowpan_addr_info *)(skb->data -
+ 			sizeof(struct lowpan_addr_info));
+ }
 -- 
 2.9.2
 
