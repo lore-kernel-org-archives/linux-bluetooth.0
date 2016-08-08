@@ -1,45 +1,55 @@
-Return-Path: <hadess@hadess.net>
-Message-ID: <1470671433.2492.14.camel@hadess.net>
-Subject: Re: 3dsp sample app and Bluez v5
-From: Bastien Nocera <hadess@hadess.net>
-To: Marcel Holtmann <marcel@holtmann.org>, Gary Mort <gary@mort.net>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Mon, 08 Aug 2016 17:50:33 +0200
-In-Reply-To: <37075208-AE18-4114-8029-40930FE22DA7@holtmann.org>
-References: <556CC928.60503@mort.net>	
-	 <C1D5C485-4FA0-4221-9F1A-A1A0941FE5F8@holtmann.org>	
-	 <556CF450.2030107@mort.net>	
-	 <4CBFCC0A-794F-4F78-A499-DFD083F29378@holtmann.org>	
-	 <556D3082.5060403@mort.net>
-	 <37075208-AE18-4114-8029-40930FE22DA7@holtmann.org>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Return-Path: <linux-wpan-owner@vger.kernel.org>
+Subject: Re: [RFCv2 bluetooth-next 00/19] bluetooth: rework 6lowpan
+ implementation
+To: linux-wpan@vger.kernel.org
+References: <20160807143056.3116-1-aar@pengutronix.de>
+Cc: kernel@pengutronix.de, linux-bluetooth@vger.kernel.org
+From: Alexander Aring <aar@pengutronix.de>
+Message-ID: <628fdbf2-7600-b176-f896-08f26318048d@pengutronix.de>
+Date: Mon, 8 Aug 2016 14:10:15 +0200
+MIME-Version: 1.0
+In-Reply-To: <20160807143056.3116-1-aar@pengutronix.de>
+Content-Type: text/plain; charset=windows-1252
+Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, 2015-06-02 at 07:00 +0200, Marcel Holtmann wrote:
-> 
-<snip>
-> then you need a controller with connectionless slave broadcast
-> support in master mode. The only ones I know of are some Marvell
-> PCIe/USB or SDIO based cards and one Broadcom dongle with the
-> firmware update applied.
-> 
-> https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/commi
-> t/?id=d049f4e513e861167361b06c7ca85f9e872c8cde
-> 
-> I wrote an extra long commit message for reference on how this dongle
-> works and that its slave mode is actually broken. And I have run this
-> against a 3D enabled TV and I can pretend to be 3D glasses.
-> 
-> However for the display side, I have never gotten any good timing
-> values that would allow me to get the glasses do something useful.
-> And hooking it up to a proper frame sync was then just too much work.
-> Then again, the code is there and you can start toying with it.
+Hi,
 
-Doing thread grave digging.
+On 08/07/2016 04:30 PM, Alexander Aring wrote:
+> Hi,
+> 
+> This patch series is my second RFC for making btle 6lowpan into the right
+> direction.
+> 
+> I added hopefully all suggestions which I got from RFCv1. The interface address
+> will be assigned when the first l2cap chan connection gets in. This device
+> address will be get by "hci_copy_identity_address" bluetooth API function and
+> I hope this is the right function to get the "RPA device address".
+> 
+> Checkout commit message of Patch 19/19 to see how I used it.
+> 
+> Bad news are, I will start my master thesis shortly so I am not able to work
+> on this patch series anymore.
+> 
 
-Are there any more Bluetooth adapters that would support the necessary
-mode to use 3DS glasses? One that would be available as external USB
-dongle would be nice.
+and I got the following warnings from bots/persons, I just send it here
+again for the next person who like to work on that or I forget it again
+the next time when I can work on this:
 
-Cheers
+"ERROR: "baswap" [net/6lowpan/6lowpan.ko] undefined!"
+
+This is because baswap is some compiled function in bluetooth module and
+6lowpan doesn;t depend on that.
+
+Another issue:
+
+net/bluetooth/6lowpan.c:892:0-23: WARNING: lowpan_enabled_fops should be
+defined with DEFINE_DEBUGFS_ATTRIBUTE
+
+ Use DEFINE_DEBUGFS_ATTRIBUTE rather than DEFINE_SIMPLE_ATTRIBUTE
+  for debugfs files.
+
+which seems to be also affected in net/6lowpan/debugfs.c and
+net/bluetooth/hci_debugfs.c
+
+- Alex
