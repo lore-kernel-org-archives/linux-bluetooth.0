@@ -1,35 +1,38 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] core/service: Fix setting connecting state
-Date: Mon,  8 Aug 2016 13:41:00 +0300
-Message-Id: <1470652860-11461-1-git-send-email-luiz.dentz@gmail.com>
+Date: Mon, 8 Aug 2016 12:42:55 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Kropf Johannes <Johannes.Kropf@ait.ac.at>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: 5.41 - Authentication Failed with kernel 4.2.0
+Message-ID: <20160808094255.GA8136@t440s.lan>
+References: <E92610C73D6DE84EB154DC52F5ECCE541D74740E@S0MSMAIL111.arc.local>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <E92610C73D6DE84EB154DC52F5ECCE541D74740E@S0MSMAIL111.arc.local>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Johannes,
 
-If the profile don't implement .accept callback it means it cannot
-connect in this mode, which is normally used for GATT profiles, so the
-code shall not assume the profile will be connecting and instead just
-return an error.
----
- src/service.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On Mon, Aug 08, 2016, Kropf Johannes wrote:
+> we had a problem when attempting to pair low energy devices on Ubuntu with kernel version 4.2.0-42-generic:
+> After scanning there always occured an "authentication failed" error. 
+> The devices we tried to pair were a A&D UC-352-BLE weighing scale and a A&D UA-651BLE blood pressure monitor. 
+> Both devices can be paired on the same machine with the same setup but with kernel version 3.13.0.92. 
+> Unfortunately the log doesn't give me an idea what the problem is.
+>  
+> Here is the output using bluetoothctl:
+> [bluetooth]# pair 5C:31:3E:5E:54:5E 
+> Attempting to pair with 5C:31:3E:5E:54:5E
+> [CHG] Device 5C:31:3E:5E:54:5E Connected: yes
+> Failed to pair: org.bluez.Error.AuthenticationFailed
+> [CHG] Device 5C:31:3E:5E:54:5E Connected: no
 
-diff --git a/src/service.c b/src/service.c
-index 0da14ab..f387fc4 100644
---- a/src/service.c
-+++ b/src/service.c
-@@ -197,7 +197,7 @@ int service_accept(struct btd_service *service)
- 	}
- 
- 	if (!service->profile->accept)
--		goto done;
-+		return -ENOSYS;
- 
- 	err = service->profile->accept(service);
- 	if (!err)
--- 
-2.7.4
+Did you also have an agent registered? (e.g. "agent KeyboardDisplay" in
+bluetoothctl)
 
+What would give an even better view of what's going on is the HCI logs.
+You can get those with the btmon tool (found under monitor/ in the BlueZ
+source tree).
+
+Johan
