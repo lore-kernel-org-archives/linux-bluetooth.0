@@ -1,89 +1,175 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Kropf Johannes <Johannes.Kropf@ait.ac.at>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: 5.41 - Authentication Failed with kernel 4.2.0
-Date: Mon, 8 Aug 2016 09:31:41 +0000
-Message-ID: <E92610C73D6DE84EB154DC52F5ECCE541D74740E@S0MSMAIL111.arc.local>
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+From: =?UTF-8?q?Micha=C5=82=20Narajowski?=
+	<michal.narajowski@codecoup.pl>
+To: linux-bluetooth@vger.kernel.org
+Cc: =?UTF-8?q?Micha=C5=82=20Narajowski?=
+	<michal.narajowski@codecoup.pl>
+Subject: [PATCH BlueZ] client: Add better support for managing devices of multiple controllers
+Date: Mon,  8 Aug 2016 11:15:41 +0200
+Message-Id: <1470647741-12865-1-git-send-email-michal.narajowski@codecoup.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Previously devices list was cleared when selecting new default
+controller. Now devices list is preserverd allowing to list and suggest
+devices for default controller even after changing the default
+controller.
+---
+ client/main.c | 56 ++++++++++++++++++++++++++++++++++++--------------------
+ 1 file changed, 36 insertions(+), 20 deletions(-)
 
-we had a problem when attempting to pair low energy devices on Ubuntu with kernel version 4.2.0-42-generic:
-After scanning there always occured an "authentication failed" error. 
-The devices we tried to pair were a A&D UC-352-BLE weighing scale and a A&D UA-651BLE blood pressure monitor. 
-Both devices can be paired on the same machine with the same setup but with kernel version 3.13.0.92. 
-Unfortunately the log doesn't give me an idea what the problem is.
+diff --git a/client/main.c b/client/main.c
+index 056331f..e1d8eeb 100644
+--- a/client/main.c
++++ b/client/main.c
+@@ -63,6 +63,7 @@ static GDBusProxy *default_dev;
+ static GDBusProxy *default_attr;
+ static GList *ctrl_list;
+ static GList *dev_list;
++static GList *default_ctrl_dev_list;
  
-Here is the output using bluetoothctl:
-[bluetooth]# pair 5C:31:3E:5E:54:5E 
-Attempting to pair with 5C:31:3E:5E:54:5E
-[CHG] Device 5C:31:3E:5E:54:5E Connected: yes
-Failed to pair: org.bluez.Error.AuthenticationFailed
-[CHG] Device 5C:31:3E:5E:54:5E Connected: no
-
-Bluetoothd debug messages:
-bluetoothd[2386]: src/device.c:bonding_request_new() Requesting bonding for 5C:31:3E:5E:54:5E
-bluetoothd[2386]: src/adapter.c:suspend_discovery() 
-bluetoothd[2386]: src/adapter.c:adapter_bonding_attempt() hci0 bdaddr 5C:31:3E:5E:54:5E type 1 io_cap 0x03
-bluetoothd[2386]: src/adapter.c:connected_callback() hci0 device 5C:31:3E:5E:54:5E connected eir_len 0
-bluetoothd[2386]: src/gatt-database.c:connect_cb() New incoming LE ATT connection
-bluetoothd[2386]: attrib/gattrib.c:g_attrib_ref() 0x1232f40: g_attrib_ref=1 
-bluetoothd[2386]: src/gatt-client.c:btd_gatt_client_connected() Device connected.
-bluetoothd[2386]: src/device.c:load_gatt_db() Restoring 5C:31:3E:5E:54:5E gatt database from file
-bluetoothd[2386]: src/device.c:load_service() loading service: 0x0001, end: 0x000b, uuid: 00001800-0000-1000-8000-00805f9b34fb
-bluetoothd[2386]: src/device.c:load_service() loading service: 0x000c, end: 0x000f, uuid: 00001801-0000-1000-8000-00805f9b34fb
-bluetoothd[2386]: src/device.c:load_service() loading service: 0x0010, end: 0x0017, uuid: 0000181d-0000-1000-8000-00805f9b34fb
-bluetoothd[2386]: src/device.c:load_service() loading service: 0x0018, end: 0x0028, uuid: 0000180a-0000-1000-8000-00805f9b34fb
-bluetoothd[2386]: src/device.c:load_service() loading service: 0x0029, end: 0x002b, uuid: 0000180f-0000-1000-8000-00805f9b34fb
-bluetoothd[2386]: src/device.c:load_service() loading service: 0x002c, end: 0xffff, uuid: 233bf000-5a34-1b6d-975c-000d5690abe4
-bluetoothd[2386]: src/device.c:load_chrc() loading characteristic handle: 0x0002, value handle: 0x0003, properties 0x0002 uuid: 00002a00-0000-1000-8000-00805f9b34fb
-bluetoothd[2386]: src/device.c:load_chrc() loading characteristic handle: 0x0004, value handle: 0x0005, properties 0x0002 uuid: 00002a01-0000-1000-8000-00805f9b34fb
-bluetoothd[2386]: src/device.c:load_chrc() loading characteristic handle: 0x0006, value handle: 0x0007, properties 0x000a uuid: 00002a02-0000-1000-8000-00805f9b34fb
-bluetoothd[2386]: src/device.c:load_chrc() loading characteristic handle: 0x0008, value handle: 0x0009, properties 0x0008 uuid: 00002a03-0000-1000-8000-00805f9b34fb
-bluetoothd[2386]: src/device.c:load_chrc() loading characteristic handle: 0x000a, value handle: 0x000b, properties 0x0002 uuid: 00002a04-0000-1000-8000-00805f9b34fb
-bluetoothd[2386]: src/device.c:load_chrc() loading characteristic handle: 0x000d, value handle: 0x000e, properties 0x0020 uuid: 00002a05-0000-1000-8000-00805f9b34fb
-bluetoothd[2386]: src/device.c:load_desc() loading descriptor handle: 0x000f, value: 0x0000, uuid: 00002902-0000-1000-8000-00805f9b34fb
-bluetoothd[2386]: src/device.c:load_chrc() loading characteristic handle: 0x0011, value handle: 0x0012, properties 0x0020 uuid: 00002a9d-0000-1000-8000-00805f9b34fb
-bluetoothd[2386]: src/device.c:load_desc() loading descriptor handle: 0x0013, value: 0x0000, uuid: 00002902-0000-1000-8000-00805f9b34fb
-bluetoothd[2386]: src/device.c:load_chrc() loading characteristic handle: 0x0014, value handle: 0x0015, properties 0x0002 uuid: 00002a9e-0000-1000-8000-00805f9b34fb
-bluetoothd[2386]: src/device.c:load_chrc() loading characteristic handle: 0x0016, value handle: 0x0017, properties 0x000a uuid: 00002a08-0000-1000-8000-00805f9b34fb
-bluetoothd[2386]: src/device.c:load_chrc() loading characteristic handle: 0x0019, value handle: 0x001a, properties 0x0002 uuid: 00002a29-0000-1000-8000-00805f9b34fb
-bluetoothd[2386]: src/device.c:load_chrc() loading characteristic handle: 0x001b, value handle: 0x001c, properties 0x0002 uuid: 00002a24-0000-1000-8000-00805f9b34fb
-bluetoothd[2386]: src/device.c:load_chrc() loading characteristic handle: 0x001d, value handle: 0x001e, properties 0x0002 uuid: 00002a25-0000-1000-8000-00805f9b34fb
-bluetoothd[2386]: src/device.c:load_chrc() loading characteristic handle: 0x001f, value handle: 0x0020, properties 0x0002 uuid: 00002a27-0000-1000-8000-00805f9b34fb
-bluetoothd[2386]: src/device.c:load_chrc() loading characteristic handle: 0x0021, value handle: 0x0022, properties 0x0002 uuid: 00002a26-0000-1000-8000-00805f9b34fb
-bluetoothd[2386]: src/device.c:load_chrc() loading characteristic handle: 0x0023, value handle: 0x0024, properties 0x0002 uuid: 00002a28-0000-1000-8000-00805f9b34fb
-bluetoothd[2386]: src/device.c:load_chrc() loading characteristic handle: 0x0025, value handle: 0x0026, properties 0x0002 uuid: 00002a23-0000-1000-8000-00805f9b34fb
-bluetoothd[2386]: src/device.c:load_chrc() loading characteristic handle: 0x0027, value handle: 0x0028, properties 0x0002 uuid: 00002a2a-0000-1000-8000-00805f9b34fb
-bluetoothd[2386]: src/device.c:load_chrc() loading characteristic handle: 0x002a, value handle: 0x002b, properties 0x0002 uuid: 00002a19-0000-1000-8000-00805f9b34fb
-bluetoothd[2386]: src/device.c:load_chrc() loading characteristic handle: 0x002d, value handle: 0x002e, properties 0x000a uuid: 233bf001-5a34-1b6d-975c-000d5690abe4
-bluetoothd[2386]: src/device.c:gatt_debug() MTU exchange complete, with MTU: 23
-bluetoothd[2386]: src/adapter.c:pair_device_complete() Authentication Failed (0x05)
-bluetoothd[2386]: src/adapter.c:bonding_attempt_complete() hci0 bdaddr 5C:31:3E:5E:54:5E type 1 status 0x5
-bluetoothd[2386]: src/device.c:device_bonding_complete() bonding 0x12344d0 status 0x05
-bluetoothd[2386]: src/device.c:device_bonding_failed() status 5
-bluetoothd[2386]: src/adapter.c:resume_discovery() 
-bluetoothd[2386]: src/adapter.c:dev_disconnected() Device 5C:31:3E:5E:54:5E disconnected, reason 2
-bluetoothd[2386]: src/adapter.c:adapter_remove_connection() 
-bluetoothd[2386]: plugins/policy.c:disconnect_cb() reason 2
-bluetoothd[2386]: src/adapter.c:bonding_attempt_complete() hci0 bdaddr 5C:31:3E:5E:54:5E type 1 status 0xe
-bluetoothd[2386]: src/device.c:device_bonding_complete() bonding (nil) status 0x0e
-bluetoothd[2386]: src/device.c:device_bonding_failed() status 14
-
-Kind regards,
-Johannes
-
-
-
-
-
-
-
-
-
-
-
+ static guint input = 0;
+ 
+@@ -358,6 +359,24 @@ static gboolean service_is_child(GDBusProxy *service)
+ 	return FALSE;
+ }
+ 
++static void update_default_ctrl_dev_list(void)
++{
++	GList *list;
++
++	if (default_ctrl_dev_list) {
++		g_list_free(default_ctrl_dev_list);
++		default_ctrl_dev_list = NULL;
++	}
++
++	for (list = g_list_first(dev_list); list; list = g_list_next(list)) {
++		GDBusProxy *proxy = list->data;
++
++		if (device_is_child(proxy, default_ctrl) == TRUE) 
++			default_ctrl_dev_list = g_list_append(default_ctrl_dev_list, 
++					proxy);
++	}
++}
++
+ static void set_default_device(GDBusProxy *proxy, const char *attribute)
+ {
+ 	char *desc = NULL;
+@@ -418,9 +437,8 @@ static void proxy_added(GDBusProxy *proxy, void *user_data)
+ 	interface = g_dbus_proxy_get_interface(proxy);
+ 
+ 	if (!strcmp(interface, "org.bluez.Device1")) {
+-		if (device_is_child(proxy, default_ctrl) == TRUE)
+-			device_added(proxy);
+-
++		device_added(proxy);
++		update_default_ctrl_dev_list();
+ 	} else if (!strcmp(interface, "org.bluez.Adapter1")) {
+ 		ctrl_list = g_list_append(ctrl_list, proxy);
+ 
+@@ -466,14 +484,13 @@ static void proxy_removed(GDBusProxy *proxy, void *user_data)
+ 	interface = g_dbus_proxy_get_interface(proxy);
+ 
+ 	if (!strcmp(interface, "org.bluez.Device1")) {
+-		if (device_is_child(proxy, default_ctrl) == TRUE) {
+-			dev_list = g_list_remove(dev_list, proxy);
++		dev_list = g_list_remove(dev_list, proxy);
+ 
+-			print_device(proxy, COLORED_DEL);
++		print_device(proxy, COLORED_DEL);
++		update_default_ctrl_dev_list();
+ 
+-			if (default_dev == proxy)
+-				set_default_device(NULL, NULL);
+-		}
++		if (default_dev == proxy)
++			set_default_device(NULL, NULL);
+ 	} else if (!strcmp(interface, "org.bluez.Adapter1")) {
+ 		ctrl_list = g_list_remove(ctrl_list, proxy);
+ 
+@@ -482,9 +499,7 @@ static void proxy_removed(GDBusProxy *proxy, void *user_data)
+ 		if (default_ctrl == proxy) {
+ 			default_ctrl = NULL;
+ 			set_default_device(NULL, NULL);
+-
+-			g_list_free(dev_list);
+-			dev_list = NULL;
++			update_default_ctrl_dev_list();
+ 		}
+ 	} else if (!strcmp(interface, "org.bluez.AgentManager1")) {
+ 		if (agent_manager == proxy) {
+@@ -734,16 +749,14 @@ static void cmd_select(const char *arg)
+ 
+ 	default_ctrl = proxy;
+ 	print_adapter(proxy, NULL);
+-
+-	g_list_free(dev_list);
+-	dev_list = NULL;
++	update_default_ctrl_dev_list();
+ }
+ 
+ static void cmd_devices(const char *arg)
+ {
+ 	GList *list;
+ 
+-	for (list = g_list_first(dev_list); list; list = g_list_next(list)) {
++	for (list = g_list_first(default_ctrl_dev_list); list; list = g_list_next(list)) {
+ 		GDBusProxy *proxy = list->data;
+ 		print_device(proxy, NULL);
+ 	}
+@@ -753,7 +766,7 @@ static void cmd_paired_devices(const char *arg)
+ {
+ 	GList *list;
+ 
+-	for (list = g_list_first(dev_list); list; list = g_list_next(list)) {
++	for (list = g_list_first(default_ctrl_dev_list); list; list = g_list_next(list)) {
+ 		GDBusProxy *proxy = list->data;
+ 		DBusMessageIter iter;
+ 		dbus_bool_t paired;
+@@ -1439,22 +1452,24 @@ static void cmd_remove(const char *arg)
+ 	if (strcmp(arg, "*") == 0) {
+ 		GList *list;
+ 
+-		for (list = g_list_first(dev_list); list; list = g_list_next(list)) {
++		for (list = g_list_first(default_ctrl_dev_list); list; list = g_list_next(list)) {
+ 			GDBusProxy *proxy = list->data;
+ 
+ 			remove_device(proxy);
+ 		}
++		update_default_ctrl_dev_list();
+ 
+ 		return;
+ 	}
+ 
+-	proxy = find_proxy_by_address(dev_list, arg);
++	proxy = find_proxy_by_address(default_ctrl_dev_list, arg);
+ 	if (!proxy) {
+ 		rl_printf("Device %s not available\n", arg);
+ 		return;
+ 	}
+ 
+ 	remove_device(proxy);
++	update_default_ctrl_dev_list();
+ }
+ 
+ static void connect_reply(DBusMessage *message, void *user_data)
+@@ -1755,7 +1770,7 @@ static char *ctrl_generator(const char *text, int state)
+ 
+ static char *dev_generator(const char *text, int state)
+ {
+-	return generic_generator(text, state, dev_list, "Address");
++	return generic_generator(text, state, default_ctrl_dev_list, "Address");
+ }
+ 
+ static char *attribute_generator(const char *text, int state)
+@@ -2156,6 +2171,7 @@ int main(int argc, char *argv[])
+ 
+ 	g_list_free_full(ctrl_list, proxy_leak);
+ 	g_list_free_full(dev_list, proxy_leak);
++	g_list_free(default_ctrl_dev_list);
+ 
+ 	g_free(auto_register_agent);
+ 
+-- 
+2.7.4
 
