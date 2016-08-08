@@ -1,55 +1,203 @@
-Return-Path: <linux-wpan-owner@vger.kernel.org>
-Subject: Re: [RFCv2 bluetooth-next 00/19] bluetooth: rework 6lowpan
- implementation
-To: linux-wpan@vger.kernel.org
-References: <20160807143056.3116-1-aar@pengutronix.de>
-Cc: kernel@pengutronix.de, linux-bluetooth@vger.kernel.org
-From: Alexander Aring <aar@pengutronix.de>
-Message-ID: <628fdbf2-7600-b176-f896-08f26318048d@pengutronix.de>
-Date: Mon, 8 Aug 2016 14:10:15 +0200
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20160807143056.3116-1-aar@pengutronix.de>
-Content-Type: text/plain; charset=windows-1252
-Sender: linux-wpan-owner@vger.kernel.org
+In-Reply-To: <1470647741-12865-1-git-send-email-michal.narajowski@codecoup.pl>
+References: <1470647741-12865-1-git-send-email-michal.narajowski@codecoup.pl>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Mon, 8 Aug 2016 14:34:20 +0300
+Message-ID: <CABBYNZKJV5NH=uUYvb_tfHyprrDc3aM4qQ1vuLpQuokODXY+XQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] client: Add better support for managing devices of
+ multiple controllers
+To: =?UTF-8?Q?Micha=C5=82_Narajowski?= <michal.narajowski@codecoup.pl>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Michał,
 
-On 08/07/2016 04:30 PM, Alexander Aring wrote:
-> Hi,
-> 
-> This patch series is my second RFC for making btle 6lowpan into the right
-> direction.
-> 
-> I added hopefully all suggestions which I got from RFCv1. The interface address
-> will be assigned when the first l2cap chan connection gets in. This device
-> address will be get by "hci_copy_identity_address" bluetooth API function and
-> I hope this is the right function to get the "RPA device address".
-> 
-> Checkout commit message of Patch 19/19 to see how I used it.
-> 
-> Bad news are, I will start my master thesis shortly so I am not able to work
-> on this patch series anymore.
-> 
+On Mon, Aug 8, 2016 at 12:15 PM, Michał Narajowski
+<michal.narajowski@codecoup.pl> wrote:
+> Previously devices list was cleared when selecting new default
+> controller. Now devices list is preserverd allowing to list and suggest
+> devices for default controller even after changing the default
+> controller.
+> ---
+>  client/main.c | 56 ++++++++++++++++++++++++++++++++++++--------------------
+>  1 file changed, 36 insertions(+), 20 deletions(-)
+>
+> diff --git a/client/main.c b/client/main.c
+> index 056331f..e1d8eeb 100644
+> --- a/client/main.c
+> +++ b/client/main.c
+> @@ -63,6 +63,7 @@ static GDBusProxy *default_dev;
+>  static GDBusProxy *default_attr;
+>  static GList *ctrl_list;
+>  static GList *dev_list;
+> +static GList *default_ctrl_dev_list;
 
-and I got the following warnings from bots/persons, I just send it here
-again for the next person who like to work on that or I forget it again
-the next time when I can work on this:
+Hmm I don't think you will be able keep all the device list like that,
+instead what I would do is to create a struct per device so you keep a
+list of controllers like this:
 
-"ERROR: "baswap" [net/6lowpan/6lowpan.ko] undefined!"
+struct bt_adapter {
+  GDBusProxy *proxy;
+  GList *devices;
+};
 
-This is because baswap is some compiled function in bluetooth module and
-6lowpan doesn;t depend on that.
+That way when we switch we keep have the list of the devices to access
+directly from the struct.
 
-Another issue:
+>  static guint input = 0;
+>
+> @@ -358,6 +359,24 @@ static gboolean service_is_child(GDBusProxy *service)
+>         return FALSE;
+>  }
+>
+> +static void update_default_ctrl_dev_list(void)
+> +{
+> +       GList *list;
+> +
+> +       if (default_ctrl_dev_list) {
+> +               g_list_free(default_ctrl_dev_list);
+> +               default_ctrl_dev_list = NULL;
+> +       }
+> +
+> +       for (list = g_list_first(dev_list); list; list = g_list_next(list)) {
+> +               GDBusProxy *proxy = list->data;
+> +
+> +               if (device_is_child(proxy, default_ctrl) == TRUE)
+> +                       default_ctrl_dev_list = g_list_append(default_ctrl_dev_list,
+> +                                       proxy);
+> +       }
+> +}
+> +
+>  static void set_default_device(GDBusProxy *proxy, const char *attribute)
+>  {
+>         char *desc = NULL;
+> @@ -418,9 +437,8 @@ static void proxy_added(GDBusProxy *proxy, void *user_data)
+>         interface = g_dbus_proxy_get_interface(proxy);
+>
+>         if (!strcmp(interface, "org.bluez.Device1")) {
+> -               if (device_is_child(proxy, default_ctrl) == TRUE)
+> -                       device_added(proxy);
+> -
+> +               device_added(proxy);
+> +               update_default_ctrl_dev_list();
+>         } else if (!strcmp(interface, "org.bluez.Adapter1")) {
+>                 ctrl_list = g_list_append(ctrl_list, proxy);
+>
+> @@ -466,14 +484,13 @@ static void proxy_removed(GDBusProxy *proxy, void *user_data)
+>         interface = g_dbus_proxy_get_interface(proxy);
+>
+>         if (!strcmp(interface, "org.bluez.Device1")) {
+> -               if (device_is_child(proxy, default_ctrl) == TRUE) {
+> -                       dev_list = g_list_remove(dev_list, proxy);
+> +               dev_list = g_list_remove(dev_list, proxy);
+>
+> -                       print_device(proxy, COLORED_DEL);
+> +               print_device(proxy, COLORED_DEL);
+> +               update_default_ctrl_dev_list();
+>
+> -                       if (default_dev == proxy)
+> -                               set_default_device(NULL, NULL);
+> -               }
+> +               if (default_dev == proxy)
+> +                       set_default_device(NULL, NULL);
+>         } else if (!strcmp(interface, "org.bluez.Adapter1")) {
+>                 ctrl_list = g_list_remove(ctrl_list, proxy);
+>
+> @@ -482,9 +499,7 @@ static void proxy_removed(GDBusProxy *proxy, void *user_data)
+>                 if (default_ctrl == proxy) {
+>                         default_ctrl = NULL;
+>                         set_default_device(NULL, NULL);
+> -
+> -                       g_list_free(dev_list);
+> -                       dev_list = NULL;
+> +                       update_default_ctrl_dev_list();
+>                 }
+>         } else if (!strcmp(interface, "org.bluez.AgentManager1")) {
+>                 if (agent_manager == proxy) {
+> @@ -734,16 +749,14 @@ static void cmd_select(const char *arg)
+>
+>         default_ctrl = proxy;
+>         print_adapter(proxy, NULL);
+> -
+> -       g_list_free(dev_list);
+> -       dev_list = NULL;
+> +       update_default_ctrl_dev_list();
+>  }
+>
+>  static void cmd_devices(const char *arg)
+>  {
+>         GList *list;
+>
+> -       for (list = g_list_first(dev_list); list; list = g_list_next(list)) {
+> +       for (list = g_list_first(default_ctrl_dev_list); list; list = g_list_next(list)) {
+>                 GDBusProxy *proxy = list->data;
+>                 print_device(proxy, NULL);
+>         }
+> @@ -753,7 +766,7 @@ static void cmd_paired_devices(const char *arg)
+>  {
+>         GList *list;
+>
+> -       for (list = g_list_first(dev_list); list; list = g_list_next(list)) {
+> +       for (list = g_list_first(default_ctrl_dev_list); list; list = g_list_next(list)) {
+>                 GDBusProxy *proxy = list->data;
+>                 DBusMessageIter iter;
+>                 dbus_bool_t paired;
+> @@ -1439,22 +1452,24 @@ static void cmd_remove(const char *arg)
+>         if (strcmp(arg, "*") == 0) {
+>                 GList *list;
+>
+> -               for (list = g_list_first(dev_list); list; list = g_list_next(list)) {
+> +               for (list = g_list_first(default_ctrl_dev_list); list; list = g_list_next(list)) {
+>                         GDBusProxy *proxy = list->data;
+>
+>                         remove_device(proxy);
+>                 }
+> +               update_default_ctrl_dev_list();
+>
+>                 return;
+>         }
+>
+> -       proxy = find_proxy_by_address(dev_list, arg);
+> +       proxy = find_proxy_by_address(default_ctrl_dev_list, arg);
+>         if (!proxy) {
+>                 rl_printf("Device %s not available\n", arg);
+>                 return;
+>         }
+>
+>         remove_device(proxy);
+> +       update_default_ctrl_dev_list();
+>  }
+>
+>  static void connect_reply(DBusMessage *message, void *user_data)
+> @@ -1755,7 +1770,7 @@ static char *ctrl_generator(const char *text, int state)
+>
+>  static char *dev_generator(const char *text, int state)
+>  {
+> -       return generic_generator(text, state, dev_list, "Address");
+> +       return generic_generator(text, state, default_ctrl_dev_list, "Address");
+>  }
+>
+>  static char *attribute_generator(const char *text, int state)
+> @@ -2156,6 +2171,7 @@ int main(int argc, char *argv[])
+>
+>         g_list_free_full(ctrl_list, proxy_leak);
+>         g_list_free_full(dev_list, proxy_leak);
+> +       g_list_free(default_ctrl_dev_list);
+>
+>         g_free(auto_register_agent);
+>
+> --
+> 2.7.4
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-net/bluetooth/6lowpan.c:892:0-23: WARNING: lowpan_enabled_fops should be
-defined with DEFINE_DEBUGFS_ATTRIBUTE
 
- Use DEFINE_DEBUGFS_ATTRIBUTE rather than DEFINE_SIMPLE_ATTRIBUTE
-  for debugfs files.
 
-which seems to be also affected in net/6lowpan/debugfs.c and
-net/bluetooth/hci_debugfs.c
-
-- Alex
+-- 
+Luiz Augusto von Dentz
