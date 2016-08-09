@@ -1,75 +1,34 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Date: Tue, 9 Aug 2016 17:32:12 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Kropf Johannes <Johannes.Kropf@ait.ac.at>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: 5.41 - Authentication Failed with kernel 4.2.0
-Message-ID: <20160809143212.GA10222@t440s.P-661HNU-F1>
-References: <E92610C73D6DE84EB154DC52F5ECCE541D74740E@S0MSMAIL111.arc.local>
- <20160808094255.GA8136@t440s.lan>
- <E92610C73D6DE84EB154DC52F5ECCE541D7479B6@S0MSMAIL111.arc.local>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <E92610C73D6DE84EB154DC52F5ECCE541D7479B6@S0MSMAIL111.arc.local>
+Content-Type: text/plain; charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
+Subject: Re: Change LE advertising interval via D-Bus API
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <FB35544E-8D8B-48B1-825A-E0A5BC8D92C3@starleaf.com>
+Date: Tue, 9 Aug 2016 15:50:54 +0200
+Cc: "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>
+Message-Id: <581A4CCB-9778-4C48-9075-7CFCC1C95884@holtmann.org>
+References: <1DAD8581-6B6C-4973-A284-C8B1F210C4AD@starleaf.com> <14FF3F29-1C6E-41F9-B41D-850772B758B3@holtmann.org> <FB35544E-8D8B-48B1-825A-E0A5BC8D92C3@starleaf.com>
+To: Alex Coplan <alex.coplan@starleaf.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johannes,
+Hi Alex,
 
-Please don't drop the mailing list from the thread (added it back now).
+>>> There doesn’t currently appear to be an obvious way to change the advertising interval via the D-Bus API.
+>>> 
+>>> Are there plans to add this as an option to the RegisterAdvertisement method, or perhaps a property of the LEAdvertisement1 interface?
+>> 
+>> what do you want to change it to? There are certain limits that make sense. For example fine control over the advertising interval from an application makes no sense. It might however make sense to have some low, medium, high interval adjectives so that bluetoothd can pick the right options. Even the mgmt API into the kernel for setting advertising has no control over advertising internal at the moment.
+> 
+> Currently it’s using the default value of 0x0800 (= 1.28 seconds), as set in net/bluetooth/hci_core.c:2950. This is too infrequent for e.g. iBeacons on iOS to be able to perform the “ranging” function which does distance estimation etc. Perhaps 0x0200 (around 250ms) would be sensible as a more frequent option?
 
-On Tue, Aug 09, 2016, Kropf Johannes wrote:
-> > On Mon, Aug 08, 2016, Kropf Johannes wrote:
-> > > we had a problem when attempting to pair low energy devices on Ubuntu
-> > with kernel version 4.2.0-42-generic:
-> > > After scanning there always occured an "authentication failed" error.
-> > > The devices we tried to pair were a A&D UC-352-BLE weighing scale and a
-> > A&D UA-651BLE blood pressure monitor.
-> > > Both devices can be paired on the same machine with the same setup but
-> > with kernel version 3.13.0.92.
-> > > Unfortunately the log doesn't give me an idea what the problem is.
-> > >
-> > > Here is the output using bluetoothctl:
-> > > [bluetooth]# pair 5C:31:3E:5E:54:5E
-> > > Attempting to pair with 5C:31:3E:5E:54:5E [CHG] Device
-> > > 5C:31:3E:5E:54:5E Connected: yes Failed to pair:
-> > > org.bluez.Error.AuthenticationFailed
-> > > [CHG] Device 5C:31:3E:5E:54:5E Connected: no
-> > 
-> > Did you also have an agent registered? (e.g. "agent KeyboardDisplay" in
-> > bluetoothctl)
-> Yes, an agent was registered in bluetoothctl with "agent on"
+for me this sounds like we should be adding a "low latency" flag to the Add Advertising flags parameters that picks a short advertising interval. In general this is similar to what we have done with "fast connectable" option that we have. However in this case it is not just fast connectable since we also have non-connectable advertising.
 
-Ok, good. It shouldn't make a difference for pairings initiated from the
-local side, but just in case, did you also issue "default-agent"?
+I also have the feeling that for the general Set Advertising, the setting of Set Fast Connectable should be honored and results in using the other advertising interval. That would also mean that the Set Fast Connectable setting becomes available for LE controllers.
 
-> > What would give an even better view of what's going on is the HCI logs.
-> > You can get those with the btmon tool (found under monitor/ in the BlueZ
-> > source tree).
-> Here is the output of btmon. Does it mean anything to you?
-> ....
-> < ACL Data TX: Handle 70 flags 0x00 dlen 11                    [hci0] 28.489379
->       ATT: Read By Group Type Request (0x10) len 6
->         Handle range: 0x0018-0xffff
->         Attribute group type: Primary Service (0x2800)
-> > HCI Event: Number of Completed Packets (0x13) plen 5         [hci0] 28.559451
->         Num handles: 1
->         Handle: 70
->         Count: 1
-> > HCI Event: Number of Completed Packets (0x13) plen 5         [hci0] 28.560451
->         Num handles: 1
->         Handle: 70
->         Count: 1
-> > ACL Data RX: Handle 70 flags 0x02 dlen 6                     [hci0] 28.628456
->       SMP: Pairing Failed (0x05) len 1
->         Reason: Confirm value failed (0x04)
-> < HCI Command: Disconnect (0x01|0x0006) plen 3                 [hci0] 28.628506
->         Handle: 70
->         Reason: Authentication Failure (0x05)
+Does iOS beacon guide give some advise on what is the best advertising interval for the iBeacons?
 
-To me this looks like the remote either rejected the pairing, or
-something else went wrong there. It'd help to see the full HCI log,
-particularly from the beginning of the SMP session, i.e. including the
-Pairing Request and Response PDUs.
+Regards
 
-Johan
+Marcel
+
