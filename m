@@ -1,48 +1,48 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-From: Ajay Parashar <ajay.parasha@gmail.com>
-Date: Tue, 9 Aug 2016 16:54:45 +0530
-Message-ID: <CAMj0YytpeGZpKC3rgh2eDVE1V9L1eZK29oGJfX_6rCesZ0wRrw@mail.gmail.com>
-Subject: connection breaks after 2 seconds ?
-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <1470652860-11461-1-git-send-email-luiz.dentz@gmail.com>
+References: <1470652860-11461-1-git-send-email-luiz.dentz@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Tue, 9 Aug 2016 11:31:32 +0300
+Message-ID: <CABBYNZKKoTx7eL4_jAMpk097Wv+YuKx2kp0aC3iuY+m=M6=OyA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] core/service: Fix setting connecting state
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
 
-I have two USB Bluetooth controller and connected on same Ubuntu 15.10
-PC.(kernel  4.2.0-42)
-I want to set a connection between them using blueZ 5.35.
+On Mon, Aug 8, 2016 at 1:41 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> If the profile don't implement .accept callback it means it cannot
+> connect in this mode, which is normally used for GATT profiles, so the
+> code shall not assume the profile will be connecting and instead just
+> return an error.
+> ---
+>  src/service.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/src/service.c b/src/service.c
+> index 0da14ab..f387fc4 100644
+> --- a/src/service.c
+> +++ b/src/service.c
+> @@ -197,7 +197,7 @@ int service_accept(struct btd_service *service)
+>         }
+>
+>         if (!service->profile->accept)
+> -               goto done;
+> +               return -ENOSYS;
+>
+>         err = service->profile->accept(service);
+>         if (!err)
+> --
+> 2.7.4
 
-I verified by hciconfig command
-hciconfig
-------------------------------------------------------------------------------------------------------
-hci2: Type: BR/EDR  Bus: USB
-BD Address: 00:1A:7D:DA:71:05  ACL MTU: 310:10  SCO MTU: 64:8
-UP RUNNING PSCAN ISCAN
-RX bytes:6922 acl:12 sco:0 events:171 errors:0
-TX bytes:5775 acl:12 sco:0 commands:112 errors:0
-
-hci1: Type: BR/EDR  Bus: USB
-BD Address: 00:1A:7D:DA:71:07  ACL MTU: 310:10  SCO MTU: 64:8
-UP RUNNING PSCAN ISCAN
-RX bytes:2808 acl:13 sco:0 events:155 errors:0
-TX bytes:6689 acl:12 sco:0 commands:113 errors:0
------------------------------------------------------------------------------------------------------------
+Applied.
 
 
-I opened two shell session for each controller and execute bluetoothctl.
-when i executed below command then connection established only for 2
-second and then it disconnects?
-
-[bluetooth]# connect 00:1A:7D:DA:71:05
-Attempting to connect to 00:1A:7D:DA:71:05
-[CHG] Device 00:1A:7D:DA:71:05 Connected: yes
-Failed to connect: org.bluez.Error.Failed
-[CHG] Device 00:1A:7D:DA:71:05 Connected: no
-
-Please let me know why it disconnects after 2 seconds?
-
-Regards
-Ajay
+-- 
+Luiz Augusto von Dentz
