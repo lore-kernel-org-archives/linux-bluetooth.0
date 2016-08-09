@@ -1,76 +1,62 @@
-Return-Path: <marvell@marvell.com>
+Return-Path: <akarwar@marvell.com>
 From: Amitkumar Karwar <akarwar@marvell.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <linux-kernel@vger.kernel.org>, <linux-rockchip@lists.infradead.org>,
-        <marcel@holtmann.org>, Ganapathi Bhat <gbhat@marvell.com>,
-        Amitkumar Karwar
-	<akarwar@marvell.com>
-Subject: [PATCH v12 1/3] Bluetooth: hci_uart: add prepare callbacks to hci_uart_proto structure.
-Date: Tue, 9 Aug 2016 22:02:31 +0530
-Message-ID: <1470760353-2394-1-git-send-email-akarwar@marvell.com>
+To: Loic Poulain <loic.poulain@intel.com>,
+        Jeffy Chen
+	<jeffy.chen@rock-chips.com>,
+        "linux-bluetooth@vger.kernel.org"
+	<linux-bluetooth@vger.kernel.org>
+CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Ganapathi
+ Bhat" <gbhat@marvell.com>,
+        Marcel Holtmann <marcel@holtmann.org>
+Subject: RE: [v11,3/3] Bluetooth: hci_uart: Support firmware download for
+ Marvell
+Date: Tue, 9 Aug 2016 16:18:02 +0000
+Message-ID: <2680ec4f15c0459298c7ca91bdf73f31@SC-EXCH04.marvell.com>
+References: <1462548714-7971-3-git-send-email-akarwar@marvell.com>
+ <576CCCDE.1050004@rock-chips.com>
+ <ea454b25f2334ef9be0451a01cd15e15@SC-EXCH04.marvell.com>
+ <5774FA48.7080803@intel.com>
+In-Reply-To: <5774FA48.7080803@intel.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Ganapathi Bhat <gbhat@marvell.com>
-
-The new callback is used to prepare the device before HCI becomes
-ready. One can use this to download firmware if the download process
-doesn't use HCI commands. Also recv_for_prepare callback is
-introduced for receiving data from devices during prepare phase.
-
-Signed-off-by: Ganapathi Bhat <gbhat@marvell.com>
-Signed-off-by: Amitkumar Karwar <akarwar@marvell.com>
----
- drivers/bluetooth/hci_ldisc.c | 11 ++++++++++-
- drivers/bluetooth/hci_uart.h  |  3 +++
- 2 files changed, 13 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
-index dda9739..d7184dc 100644
---- a/drivers/bluetooth/hci_ldisc.c
-+++ b/drivers/bluetooth/hci_ldisc.c
-@@ -551,8 +551,11 @@ static void hci_uart_tty_receive(struct tty_struct *tty, const u8 *data,
- 	if (!hu || tty != hu->tty)
- 		return;
- 
--	if (!test_bit(HCI_UART_PROTO_READY, &hu->flags))
-+	if (!test_bit(HCI_UART_PROTO_READY, &hu->flags)) {
-+		if (hu->proto->recv_for_prepare)
-+			hu->proto->recv_for_prepare(hu, data, count);
- 		return;
-+	}
- 
- 	/* It does not need a lock here as it is already protected by a mutex in
- 	 * tty caller
-@@ -639,6 +642,12 @@ static int hci_uart_set_proto(struct hci_uart *hu, int id)
- 		return err;
- 
- 	hu->proto = p;
-+	if (p->prepare) {
-+		err = p->prepare(hu);
-+		if (err)
-+			return err;
-+	}
-+
- 	set_bit(HCI_UART_PROTO_READY, &hu->flags);
- 
- 	err = hci_uart_register_dev(hu);
-diff --git a/drivers/bluetooth/hci_uart.h b/drivers/bluetooth/hci_uart.h
-index 839bad1..17ba3b4 100644
---- a/drivers/bluetooth/hci_uart.h
-+++ b/drivers/bluetooth/hci_uart.h
-@@ -67,8 +67,11 @@ struct hci_uart_proto {
- 	int (*close)(struct hci_uart *hu);
- 	int (*flush)(struct hci_uart *hu);
- 	int (*setup)(struct hci_uart *hu);
-+	int (*prepare)(struct hci_uart *hu);
- 	int (*set_baudrate)(struct hci_uart *hu, unsigned int speed);
- 	int (*recv)(struct hci_uart *hu, const void *data, int len);
-+	int (*recv_for_prepare)(struct hci_uart *hu, const void *data,
-+				int len);
- 	int (*enqueue)(struct hci_uart *hu, struct sk_buff *skb);
- 	struct sk_buff *(*dequeue)(struct hci_uart *hu);
- };
--- 
-1.8.1.4
+SGkgTG9pYywNCg0KPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBMb2ljIFBv
+dWxhaW4gW21haWx0bzpsb2ljLnBvdWxhaW5AaW50ZWwuY29tXQ0KPiBTZW50OiBUaHVyc2RheSwg
+SnVuZSAzMCwgMjAxNiA0OjI0IFBNDQo+IFRvOiBBbWl0a3VtYXIgS2Fyd2FyOyBKZWZmeSBDaGVu
+OyBsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnDQo+IENjOiBsaW51eC1rZXJuZWxAdmdl
+ci5rZXJuZWwub3JnOyBHYW5hcGF0aGkgQmhhdDsgQ2F0aHkgTHVvOyBNYXJjZWwNCj4gSG9sdG1h
+bm4NCj4gU3ViamVjdDogUmU6IFt2MTEsMy8zXSBCbHVldG9vdGg6IGhjaV91YXJ0OiBTdXBwb3J0
+IGZpcm13YXJlIGRvd25sb2FkDQo+IGZvciBNYXJ2ZWxsDQo+IA0KPiBIaSBBbWl0a3VtYXIsDQo+
+IA0KPiANCj4gPiBIaSBNYXJjZWwsDQo+IA0KPiBJIHN1Z2dlc3QgeW91IHRvIGFkZCBNYXJjZWwg
+YXMgcmVjaXBpZW50IG9mIHlvdXIgcGF0Y2hlcy4NCj4gDQo+ID4NCj4gPj4gRnJvbTogSmVmZnkg
+Q2hlbiBbbWFpbHRvOmplZmZ5LmNoZW5Acm9jay1jaGlwcy5jb21dDQo+ID4+IFNlbnQ6IEZyaWRh
+eSwgSnVuZSAyNCwgMjAxNiAxMTozMiBBTQ0KPiA+PiBUbzogQW1pdGt1bWFyIEthcndhcjsgbGlu
+dXgtYmx1ZXRvb3RoQHZnZXIua2VybmVsLm9yZw0KPiA+PiBDYzogbGludXgta2VybmVsQHZnZXIu
+a2VybmVsLm9yZzsgR2FuYXBhdGhpIEJoYXQNCj4gPj4gU3ViamVjdDogUmU6IFt2MTEsMy8zXSBC
+bHVldG9vdGg6IGhjaV91YXJ0OiBTdXBwb3J0IGZpcm13YXJlIGRvd25sb2FkDQo+ID4+IGZvciBN
+YXJ2ZWxsDQo+ID4+DQo+ID4+IE9uIDIwMTYtNS02IDIzOjMxLCBBbWl0a3VtYXIgS2Fyd2FyIHdy
+b3RlOg0KPiA+Pj4gRnJvbTogR2FuYXBhdGhpIEJoYXQgPGdiaGF0QG1hcnZlbGwuY29tPg0KPiA+
+Pj4NCj4gPj4+IFRoaXMgcGF0Y2ggaW1wbGVtZW50IGZpcm13YXJlIGRvd25sb2FkIGZlYXR1cmUg
+Zm9yIE1hcnZlbGwgQmx1ZXRvb3RoDQo+ID4+PiBkZXZpY2VzLiBJZiBmaXJtd2FyZSBpcyBhbHJl
+YWR5IGRvd25sb2FkZWQsIGl0IHdpbGwgc2tpcA0KPiBkb3dubG9hZGluZy4NCj4gDQo+IA0KPiA+
+Pj4gK3N0YXRpYyBzdHJ1Y3Qgc2tfYnVmZiAqbXJ2bF9wcm9jZXNzX2Z3X2RhdGEoc3RydWN0IGhj
+aV91YXJ0ICpodSwNCj4gPj4+ICsJCQkJCSAgICBzdHJ1Y3Qgc2tfYnVmZiAqc2tiLA0KPiA+Pj4g
+KwkJCQkJICAgIHU4ICpidWYsIGludCBjb3VudCkNCj4gPj4+ICt7DQo+ID4+PiArCXN0cnVjdCBt
+cnZsX2RhdGEgKm1ydmwgPSBodS0+cHJpdjsNCj4gPj4+ICsJc3RydWN0IGZ3X2RhdGEgKmZ3X2Rh
+dGEgPSBtcnZsLT5md2RhdGE7DQo+ID4+PiArCWludCBpID0gMCwgbGVuOw0KPiA+Pj4gKw0KPiA+
+Pj4gKwlpZiAoIXNrYikgew0KPiA+Pj4gKwkJd2hpbGUgKGJ1ZltpXSAhPSBmd19kYXRhLT5leHBl
+Y3RlZF9hY2sgJiYgaSA8IGNvdW50KQ0KPiA+Pj4gKwkJCWkrKzsNCj4gPj4+ICsJCWlmIChpID09
+IGNvdW50KQ0KPiA+Pj4gKwkJCXJldHVybiBFUlJfUFRSKC1FSUxTRVEpOw0KPiA+Pj4gKw0KPiA+
+Pj4gKwkJc2tiID0gYnRfc2tiX2FsbG9jKE1SVkxfRldfSERSX0xFTiwgR0ZQX0tFUk5FTCk7DQo+
+IA0KPiBXaHkgeW91IGRvbid0IHRlc3Qgc2tiIGhlcmUuDQo+IA0KPiA+Pj4gKwl9DQo+ID4+PiAr
+DQo+ID4+PiArCWlmICghc2tiKQ0KPiA+Pj4gKwkJcmV0dXJuIEVSUl9QVFIoLUVOT01FTSk7DQo+
+ID4+PiArDQo+ID4+PiArCWxlbiA9IGNvdW50IC0gaTsNCj4gPj4+ICsJbWVtY3B5KHNrYl9wdXQo
+c2tiLCBsZW4pLCAmYnVmW2ldLCBsZW4pOw0KPiANCj4gWW91IGNvcHkgYWxsIHRoZSByZW1haW5p
+bmcgZGF0YSBmcm9tIGJ1ZiBpbnRvIHlvdXIgc2tiLCBidXQgd2hhdCBpZiBidWYNCj4gY29udGFp
+bnMgbW9yZSB0aGFuIG9uZSBwYWNrZXQgPyBvdXQgb2Ygc2tiLg0KPiBEb24ndCBhc3N1bWUgdGhh
+dCBidWYgY29udGFpbnMgYSBmdWxsIHBhY2tldCBhcyB3ZWxsIGFzIG9ubHkgb25lIHBhY2tldC4N
+Cj4gDQo+IA0KDQpUaGFua3MgZm9yIHlvdXIgY29tbWVudHMuIFdlIGhhdmUgYWRkZWQgbmVjZXNz
+YXJpbHkgY2hlY2tzIHRvIGFkZHJlc3MgdGhlc2UgY29tbWVudHMuIEkgd2lsbCBzdWJtaXQgdXBk
+YXRlZCB2ZXJzaW9uIHNob3J0bHkuDQoNClJlZ2FyZHMsDQpBbWl0a3VtYXIgS2Fyd2FyDQo=
