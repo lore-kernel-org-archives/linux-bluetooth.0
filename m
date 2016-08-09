@@ -1,62 +1,75 @@
-Return-Path: <akarwar@marvell.com>
-From: Amitkumar Karwar <akarwar@marvell.com>
-To: Loic Poulain <loic.poulain@intel.com>,
-        Jeffy Chen
-	<jeffy.chen@rock-chips.com>,
-        "linux-bluetooth@vger.kernel.org"
-	<linux-bluetooth@vger.kernel.org>
-CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Ganapathi
- Bhat" <gbhat@marvell.com>,
-        Marcel Holtmann <marcel@holtmann.org>
-Subject: RE: [v11,3/3] Bluetooth: hci_uart: Support firmware download for
- Marvell
-Date: Tue, 9 Aug 2016 16:18:02 +0000
-Message-ID: <2680ec4f15c0459298c7ca91bdf73f31@SC-EXCH04.marvell.com>
-References: <1462548714-7971-3-git-send-email-akarwar@marvell.com>
- <576CCCDE.1050004@rock-chips.com>
- <ea454b25f2334ef9be0451a01cd15e15@SC-EXCH04.marvell.com>
- <5774FA48.7080803@intel.com>
-In-Reply-To: <5774FA48.7080803@intel.com>
-Content-Type: text/plain; charset="utf-8"
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Date: Tue, 9 Aug 2016 17:32:12 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Kropf Johannes <Johannes.Kropf@ait.ac.at>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: 5.41 - Authentication Failed with kernel 4.2.0
+Message-ID: <20160809143212.GA10222@t440s.P-661HNU-F1>
+References: <E92610C73D6DE84EB154DC52F5ECCE541D74740E@S0MSMAIL111.arc.local>
+ <20160808094255.GA8136@t440s.lan>
+ <E92610C73D6DE84EB154DC52F5ECCE541D7479B6@S0MSMAIL111.arc.local>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <E92610C73D6DE84EB154DC52F5ECCE541D7479B6@S0MSMAIL111.arc.local>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgTG9pYywNCg0KPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBMb2ljIFBv
-dWxhaW4gW21haWx0bzpsb2ljLnBvdWxhaW5AaW50ZWwuY29tXQ0KPiBTZW50OiBUaHVyc2RheSwg
-SnVuZSAzMCwgMjAxNiA0OjI0IFBNDQo+IFRvOiBBbWl0a3VtYXIgS2Fyd2FyOyBKZWZmeSBDaGVu
-OyBsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnDQo+IENjOiBsaW51eC1rZXJuZWxAdmdl
-ci5rZXJuZWwub3JnOyBHYW5hcGF0aGkgQmhhdDsgQ2F0aHkgTHVvOyBNYXJjZWwNCj4gSG9sdG1h
-bm4NCj4gU3ViamVjdDogUmU6IFt2MTEsMy8zXSBCbHVldG9vdGg6IGhjaV91YXJ0OiBTdXBwb3J0
-IGZpcm13YXJlIGRvd25sb2FkDQo+IGZvciBNYXJ2ZWxsDQo+IA0KPiBIaSBBbWl0a3VtYXIsDQo+
-IA0KPiANCj4gPiBIaSBNYXJjZWwsDQo+IA0KPiBJIHN1Z2dlc3QgeW91IHRvIGFkZCBNYXJjZWwg
-YXMgcmVjaXBpZW50IG9mIHlvdXIgcGF0Y2hlcy4NCj4gDQo+ID4NCj4gPj4gRnJvbTogSmVmZnkg
-Q2hlbiBbbWFpbHRvOmplZmZ5LmNoZW5Acm9jay1jaGlwcy5jb21dDQo+ID4+IFNlbnQ6IEZyaWRh
-eSwgSnVuZSAyNCwgMjAxNiAxMTozMiBBTQ0KPiA+PiBUbzogQW1pdGt1bWFyIEthcndhcjsgbGlu
-dXgtYmx1ZXRvb3RoQHZnZXIua2VybmVsLm9yZw0KPiA+PiBDYzogbGludXgta2VybmVsQHZnZXIu
-a2VybmVsLm9yZzsgR2FuYXBhdGhpIEJoYXQNCj4gPj4gU3ViamVjdDogUmU6IFt2MTEsMy8zXSBC
-bHVldG9vdGg6IGhjaV91YXJ0OiBTdXBwb3J0IGZpcm13YXJlIGRvd25sb2FkDQo+ID4+IGZvciBN
-YXJ2ZWxsDQo+ID4+DQo+ID4+IE9uIDIwMTYtNS02IDIzOjMxLCBBbWl0a3VtYXIgS2Fyd2FyIHdy
-b3RlOg0KPiA+Pj4gRnJvbTogR2FuYXBhdGhpIEJoYXQgPGdiaGF0QG1hcnZlbGwuY29tPg0KPiA+
-Pj4NCj4gPj4+IFRoaXMgcGF0Y2ggaW1wbGVtZW50IGZpcm13YXJlIGRvd25sb2FkIGZlYXR1cmUg
-Zm9yIE1hcnZlbGwgQmx1ZXRvb3RoDQo+ID4+PiBkZXZpY2VzLiBJZiBmaXJtd2FyZSBpcyBhbHJl
-YWR5IGRvd25sb2FkZWQsIGl0IHdpbGwgc2tpcA0KPiBkb3dubG9hZGluZy4NCj4gDQo+IA0KPiA+
-Pj4gK3N0YXRpYyBzdHJ1Y3Qgc2tfYnVmZiAqbXJ2bF9wcm9jZXNzX2Z3X2RhdGEoc3RydWN0IGhj
-aV91YXJ0ICpodSwNCj4gPj4+ICsJCQkJCSAgICBzdHJ1Y3Qgc2tfYnVmZiAqc2tiLA0KPiA+Pj4g
-KwkJCQkJICAgIHU4ICpidWYsIGludCBjb3VudCkNCj4gPj4+ICt7DQo+ID4+PiArCXN0cnVjdCBt
-cnZsX2RhdGEgKm1ydmwgPSBodS0+cHJpdjsNCj4gPj4+ICsJc3RydWN0IGZ3X2RhdGEgKmZ3X2Rh
-dGEgPSBtcnZsLT5md2RhdGE7DQo+ID4+PiArCWludCBpID0gMCwgbGVuOw0KPiA+Pj4gKw0KPiA+
-Pj4gKwlpZiAoIXNrYikgew0KPiA+Pj4gKwkJd2hpbGUgKGJ1ZltpXSAhPSBmd19kYXRhLT5leHBl
-Y3RlZF9hY2sgJiYgaSA8IGNvdW50KQ0KPiA+Pj4gKwkJCWkrKzsNCj4gPj4+ICsJCWlmIChpID09
-IGNvdW50KQ0KPiA+Pj4gKwkJCXJldHVybiBFUlJfUFRSKC1FSUxTRVEpOw0KPiA+Pj4gKw0KPiA+
-Pj4gKwkJc2tiID0gYnRfc2tiX2FsbG9jKE1SVkxfRldfSERSX0xFTiwgR0ZQX0tFUk5FTCk7DQo+
-IA0KPiBXaHkgeW91IGRvbid0IHRlc3Qgc2tiIGhlcmUuDQo+IA0KPiA+Pj4gKwl9DQo+ID4+PiAr
-DQo+ID4+PiArCWlmICghc2tiKQ0KPiA+Pj4gKwkJcmV0dXJuIEVSUl9QVFIoLUVOT01FTSk7DQo+
-ID4+PiArDQo+ID4+PiArCWxlbiA9IGNvdW50IC0gaTsNCj4gPj4+ICsJbWVtY3B5KHNrYl9wdXQo
-c2tiLCBsZW4pLCAmYnVmW2ldLCBsZW4pOw0KPiANCj4gWW91IGNvcHkgYWxsIHRoZSByZW1haW5p
-bmcgZGF0YSBmcm9tIGJ1ZiBpbnRvIHlvdXIgc2tiLCBidXQgd2hhdCBpZiBidWYNCj4gY29udGFp
-bnMgbW9yZSB0aGFuIG9uZSBwYWNrZXQgPyBvdXQgb2Ygc2tiLg0KPiBEb24ndCBhc3N1bWUgdGhh
-dCBidWYgY29udGFpbnMgYSBmdWxsIHBhY2tldCBhcyB3ZWxsIGFzIG9ubHkgb25lIHBhY2tldC4N
-Cj4gDQo+IA0KDQpUaGFua3MgZm9yIHlvdXIgY29tbWVudHMuIFdlIGhhdmUgYWRkZWQgbmVjZXNz
-YXJpbHkgY2hlY2tzIHRvIGFkZHJlc3MgdGhlc2UgY29tbWVudHMuIEkgd2lsbCBzdWJtaXQgdXBk
-YXRlZCB2ZXJzaW9uIHNob3J0bHkuDQoNClJlZ2FyZHMsDQpBbWl0a3VtYXIgS2Fyd2FyDQo=
+Hi Johannes,
+
+Please don't drop the mailing list from the thread (added it back now).
+
+On Tue, Aug 09, 2016, Kropf Johannes wrote:
+> > On Mon, Aug 08, 2016, Kropf Johannes wrote:
+> > > we had a problem when attempting to pair low energy devices on Ubuntu
+> > with kernel version 4.2.0-42-generic:
+> > > After scanning there always occured an "authentication failed" error.
+> > > The devices we tried to pair were a A&D UC-352-BLE weighing scale and a
+> > A&D UA-651BLE blood pressure monitor.
+> > > Both devices can be paired on the same machine with the same setup but
+> > with kernel version 3.13.0.92.
+> > > Unfortunately the log doesn't give me an idea what the problem is.
+> > >
+> > > Here is the output using bluetoothctl:
+> > > [bluetooth]# pair 5C:31:3E:5E:54:5E
+> > > Attempting to pair with 5C:31:3E:5E:54:5E [CHG] Device
+> > > 5C:31:3E:5E:54:5E Connected: yes Failed to pair:
+> > > org.bluez.Error.AuthenticationFailed
+> > > [CHG] Device 5C:31:3E:5E:54:5E Connected: no
+> > 
+> > Did you also have an agent registered? (e.g. "agent KeyboardDisplay" in
+> > bluetoothctl)
+> Yes, an agent was registered in bluetoothctl with "agent on"
+
+Ok, good. It shouldn't make a difference for pairings initiated from the
+local side, but just in case, did you also issue "default-agent"?
+
+> > What would give an even better view of what's going on is the HCI logs.
+> > You can get those with the btmon tool (found under monitor/ in the BlueZ
+> > source tree).
+> Here is the output of btmon. Does it mean anything to you?
+> ....
+> < ACL Data TX: Handle 70 flags 0x00 dlen 11                    [hci0] 28.489379
+>       ATT: Read By Group Type Request (0x10) len 6
+>         Handle range: 0x0018-0xffff
+>         Attribute group type: Primary Service (0x2800)
+> > HCI Event: Number of Completed Packets (0x13) plen 5         [hci0] 28.559451
+>         Num handles: 1
+>         Handle: 70
+>         Count: 1
+> > HCI Event: Number of Completed Packets (0x13) plen 5         [hci0] 28.560451
+>         Num handles: 1
+>         Handle: 70
+>         Count: 1
+> > ACL Data RX: Handle 70 flags 0x02 dlen 6                     [hci0] 28.628456
+>       SMP: Pairing Failed (0x05) len 1
+>         Reason: Confirm value failed (0x04)
+> < HCI Command: Disconnect (0x01|0x0006) plen 3                 [hci0] 28.628506
+>         Handle: 70
+>         Reason: Authentication Failure (0x05)
+
+To me this looks like the remote either rejected the pairing, or
+something else went wrong there. It'd help to see the full HCI log,
+particularly from the beginning of the SMP session, i.e. including the
+Pairing Request and Response PDUs.
+
+Johan
