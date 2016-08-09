@@ -1,19 +1,48 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Alex Coplan <alex.coplan@starleaf.com>
-Content-Type: text/plain; charset=utf-8
-Subject: Change LE advertising interval via D-Bus API
-Message-Id: <1DAD8581-6B6C-4973-A284-C8B1F210C4AD@starleaf.com>
-Date: Tue, 9 Aug 2016 13:09:09 +0100
+MIME-Version: 1.0
+From: Ajay Parashar <ajay.parasha@gmail.com>
+Date: Tue, 9 Aug 2016 16:54:45 +0530
+Message-ID: <CAMj0YytpeGZpKC3rgh2eDVE1V9L1eZK29oGJfX_6rCesZ0wRrw@mail.gmail.com>
+Subject: connection breaks after 2 seconds ?
 To: linux-bluetooth@vger.kernel.org
-Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi All,
+Hi,
 
-There doesn’t currently appear to be an obvious way to change the advertising interval via the D-Bus API.
+I have two USB Bluetooth controller and connected on same Ubuntu 15.10
+PC.(kernel  4.2.0-42)
+I want to set a connection between them using blueZ 5.35.
 
-Are there plans to add this as an option to the RegisterAdvertisement method, or perhaps a property of the LEAdvertisement1 interface?
+I verified by hciconfig command
+hciconfig
+------------------------------------------------------------------------------------------------------
+hci2: Type: BR/EDR  Bus: USB
+BD Address: 00:1A:7D:DA:71:05  ACL MTU: 310:10  SCO MTU: 64:8
+UP RUNNING PSCAN ISCAN
+RX bytes:6922 acl:12 sco:0 events:171 errors:0
+TX bytes:5775 acl:12 sco:0 commands:112 errors:0
 
-Regards,
-Alex
+hci1: Type: BR/EDR  Bus: USB
+BD Address: 00:1A:7D:DA:71:07  ACL MTU: 310:10  SCO MTU: 64:8
+UP RUNNING PSCAN ISCAN
+RX bytes:2808 acl:13 sco:0 events:155 errors:0
+TX bytes:6689 acl:12 sco:0 commands:113 errors:0
+-----------------------------------------------------------------------------------------------------------
+
+
+I opened two shell session for each controller and execute bluetoothctl.
+when i executed below command then connection established only for 2
+second and then it disconnects?
+
+[bluetooth]# connect 00:1A:7D:DA:71:05
+Attempting to connect to 00:1A:7D:DA:71:05
+[CHG] Device 00:1A:7D:DA:71:05 Connected: yes
+Failed to connect: org.bluez.Error.Failed
+[CHG] Device 00:1A:7D:DA:71:05 Connected: no
+
+Please let me know why it disconnects after 2 seconds?
+
+Regards
+Ajay
