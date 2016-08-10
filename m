@@ -1,153 +1,74 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Date: Wed, 10 Aug 2016 14:30:12 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Kropf Johannes <Johannes.Kropf@ait.ac.at>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: 5.41 - Authentication Failed with kernel 4.2.0
+Message-ID: <20160810113012.GA25012@t440s.lan>
+References: <E92610C73D6DE84EB154DC52F5ECCE541D74740E@S0MSMAIL111.arc.local>
+ <20160808094255.GA8136@t440s.lan>
+ <E92610C73D6DE84EB154DC52F5ECCE541D7479B6@S0MSMAIL111.arc.local>
+ <20160809143212.GA10222@t440s.P-661HNU-F1>
+ <E92610C73D6DE84EB154DC52F5ECCE541D748ADC@S0MSMAIL111.arc.local>
 MIME-Version: 1.0
-In-Reply-To: <CAMj0YytBJw6Amp8y4=HgZMhVB2n+sbh866TNTSsB==-Dfn0AUQ@mail.gmail.com>
-References: <CAMj0Yyv0LEjLSspsMP7MosNGbah376ncaY0Jmw6RR=41gVB4EA@mail.gmail.com>
- <CAMj0YytBJw6Amp8y4=HgZMhVB2n+sbh866TNTSsB==-Dfn0AUQ@mail.gmail.com>
-From: Ajay Parashar <ajay.parasha@gmail.com>
-Date: Wed, 10 Aug 2016 16:52:19 +0530
-Message-ID: <CAMj0YyuCwA7BOy1rwHwX1VHGnvOkDYNBXJxUKfXfHN2HV5c8_g@mail.gmail.com>
-Subject: Re: Connect method of org.bluez.Network1 interface throws error
- "Connect with signature "s" doesn't exist"
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <E92610C73D6DE84EB154DC52F5ECCE541D748ADC@S0MSMAIL111.arc.local>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, Aug 10, 2016 at 12:11 PM, Ajay Parashar <ajay.parasha@gmail.com> wrote:
-> On Wed, Aug 3, 2016 at 3:44 PM, Ajay Parashar <ajay.parasha@gmail.com> wrote:
->> Hi,
->>
->> I am using bluez 5.35 and developing an application using Glib DBUS binding.
->>
->> As per network-api.txt documentation, my code calls connect API with
->> String type parameter but while execution it prompts below error.
->> Can you please let me know why is it giving this error and how can i
->> resolve this.
->>
->> //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
->> Unable to connect with network :
->> GDBus.Error:org.freedesktop.DBus.Error.UnknownObject: Method "Connect"
->> with signature "s" on interface "org.bluez.Network1" doesn't exist
->> ////////////////////////////////////////////////////////////////////////////////////////////////////////////
->>
->> /* For reference please find my code as below*/
->>
->> int connect_network(char *interface)
->> {
->>   int       ret       = 0;
->>   GError   *error     = NULL;
->>   GVariant *reply     = NULL;
->>
->>   GVariant **t = NULL;
->>   t    = g_new(GVariant *, 1);
->>   t[0] = g_variant_new_string ("nap");
->>
->>   GVariant *tuple_variant = g_variant_new_tuple(t, 1);
->>
->>   /* connect with network */
->>   reply = g_dbus_connection_call_sync(dbus_conn,
->>     BLUEZ_BUS_NAME,
->>     "/org/bluez/hci0",
->>     "org.bluez.Network1",
->>     "Connect",
->>     tuple_variant,
->>     G_VARIANT_TYPE_STRING,
->>     G_DBUS_CALL_FLAGS_NONE,
->>     -1,
->>     NULL,
->>     &error);
->>
->> if (error) {
->>     printf("Unable to connect with network : %s\n", error->message);
->> g_free(t);
->>     return -3;
->>   }
->>
->>    g_variant_get(reply, "(s)", &interface);
->>    printf("interface from connect is = %s\n", interface);
->>   g_free(t);
->>
->>   return ret;
->> }
->
->
-> I am facing the same issue when i executed test-network program
-> available with  /bluez-5.35/test directory.
-> I m blocked here, please let me know how to proceed with bluez?
->
-> Regards
-> Ajay
+Hi Johannes,
 
-Hi,
+On Wed, Aug 10, 2016, Kropf Johannes wrote:
+> Here is the whole log:
 
-I experiment this issue with two different machines, issue still persists.
-Please let me know how can i unblock from this issue, i will be
-thankful you guys.
-Let me explain the steps followed.
-On Machine 1
-Step 1)
-# hciconfig
-hci1: Type: BR/EDR  Bus: USB
-BD Address: 00:1A:7D:DA:71:05  ACL MTU: 310:10  SCO MTU: 64:8
-UP RUNNING PSCAN ISCAN INQUIRY
-\RX bytes:43793 acl:12 sco:0 events:353 errors:0
-TX bytes:2641 acl:11 sco:0 commands:130 errors:0
+Thanks. I'll filter it so only the relevant stuff (SMP) is present:
 
-Step 2)
-create a bridge using brctl commands and it is very much visible and
-verified the same by ifconfig command.
-# ifconfig
-br0       Link encap:Ethernet  HWaddr b6:a3:07:14:05:73
-          inet addr:10.0.10.1  Bcast:0.0.0.0  Mask:255.255.255.0
-          inet6 addr: fe80::b4a3:7ff:fe14:573/64 Scope:Link
-          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
-          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
-          TX packets:215 errors:0 dropped:0 overruns:0 carrier:0
-          collisions:0 txqueuelen:0
-          RX bytes:0 (0.0 B)  TX bytes:22135 (22.1 KB)
+> > ACL Data RX: Handle 70 flags 0x02 dlen 6                     [hci0] 28.145172
+>       SMP: Security Request (0x0b) len 1
+>         Authentication requirement: Bonding, No MITM, Legacy, No Keypresses (0x01)
+> < ACL Data TX: Handle 70 flags 0x00 dlen 11                    [hci0] 28.209526
+>       SMP: Pairing Request (0x01) len 6
+>         IO capability: NoInputNoOutput (0x03)
+>         OOB data: Authentication data not present (0x00)
+>         Authentication requirement: Bonding, No MITM, SC, No Keypresses (0x09)
+>         Max encryption key size: 16
+>         Initiator key distribution: EncKey Sign LinkKey (0x0d)
+>         Responder key distribution: EncKey IdKey Sign LinkKey (0x0f)
+> > ACL Data RX: Handle 70 flags 0x02 dlen 11                    [hci0] 28.348460
+>       SMP: Pairing Response (0x02) len 6
+>         IO capability: NoInputNoOutput (0x03)
+>         OOB data: Authentication data not present (0x00)
+>         Authentication requirement: Bonding, No MITM, Legacy, No Keypresses (0x01)
+>         Max encryption key size: 16
+>         Initiator key distribution: EncKey Sign (0x05)
+>         Responder key distribution: EncKey IdKey Sign (0x07)
+> < ACL Data TX: Handle 70 flags 0x00 dlen 21                    [hci0] 28.348510
+>       SMP: Pairing Confirm (0x03) len 16
+>         Confim value: 12bd199ba4739a017395109cfa4621b3
+> > ACL Data RX: Handle 70 flags 0x02 dlen 21                    [hci0] 28.488508
+>       SMP: Pairing Confirm (0x03) len 16
+>         Confim value: 41f5f7a6212356d0eefa268f7994844a
+> < ACL Data TX: Handle 70 flags 0x00 dlen 21                    [hci0] 28.488545
+>       SMP: Pairing Random (0x04) len 16
+>         Random value: 4e8d532caf34ab845ff243acf6a0a681
+> > ACL Data RX: Handle 70 flags 0x02 dlen 6                     [hci0] 28.628456
+>       SMP: Pairing Failed (0x05) len 1
+>         Reason: Confirm value failed (0x04)
+> < HCI Command: Disconnect (0x01|0x0006) plen 3                 [hci0] 28.628506
+>         Handle: 70
+>         Reason: Authentication Failure (0x05)
+> @ Authentication Failed: 5C:31:3E:5E:54:5E (1) status 0x05
 
-Step 3)
-paired this controller successfully with other BT controller that is
-associated with machine 2
+That "Confirm value failed" response still looks like something strange
+is happening on the remote side - maybe a bug there. Unfortunately I
+don't really have any other ideas except going for raw bisecting here if
+you have a kernel version this did work with.
 
-Step 4)
-verified pair status from both machines.
+The inputs to the function that generates the confirm value are the
+local and remote public keys and the random number that was sent over
+the air, so there's not much that can go wrong there - also nothing I
+can remember that would have changed on the Linux side regarding this
+for a long time. This of course assumes that the remote device is using
+this error code correctly and doesn't send it for some other condition.
 
-Step 5)
-execute the test-nap program
-
-./test-nap br0
-
-Server for nap registered for br0
-Press CTRL-C to disconnect
-
-step 6)
-On machine 2  verify that controller is working by hciconfig command
-# hciconfig
-hci0: Type: BR/EDR  Bus: USB
-BD Address: 00:1A:7D:DA:71:07  ACL MTU: 310:10  SCO MTU: 64:8
-UP RUNNING PSCAN ISCAN
-RX bytes:1488 acl:12 sco:0 events:83 errors:0
-TX bytes:3609 acl:13 sco:0 commands:56 errors:0
-
-step 7)
-On machine 2 execute test-network program
-./test-network 00:1A:7D:DA:71:05 nap
-
-Traceback (most recent call last):
-  File "./test-network", line 48, in <module>
-    iface = network.Connect(service)
-  File "/usr/lib/python2.7/dist-packages/dbus/proxies.py", line 70, in __call__
-    return self._proxy_method(*args, **keywords)
-  File "/usr/lib/python2.7/dist-packages/dbus/proxies.py", line 145, in __call__
-    **keywords)
-  File "/usr/lib/python2.7/dist-packages/dbus/connection.py", line
-651, in call_blocking
-    message, timeout)
-dbus.exceptions.DBusException:
-org.freedesktop.DBus.Error.UnknownMethod: Method "Connect" with
-signature "s" on interface "org.bluez.Network1" doesn't exist
-
-
-Regards
-Ajay
+Johan
