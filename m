@@ -1,77 +1,62 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CAMj0Yyv0LEjLSspsMP7MosNGbah376ncaY0Jmw6RR=41gVB4EA@mail.gmail.com>
-References: <CAMj0Yyv0LEjLSspsMP7MosNGbah376ncaY0Jmw6RR=41gVB4EA@mail.gmail.com>
+In-Reply-To: <CAMj0YytpeGZpKC3rgh2eDVE1V9L1eZK29oGJfX_6rCesZ0wRrw@mail.gmail.com>
+References: <CAMj0YytpeGZpKC3rgh2eDVE1V9L1eZK29oGJfX_6rCesZ0wRrw@mail.gmail.com>
 From: Ajay Parashar <ajay.parasha@gmail.com>
-Date: Wed, 10 Aug 2016 12:11:10 +0530
-Message-ID: <CAMj0YytBJw6Amp8y4=HgZMhVB2n+sbh866TNTSsB==-Dfn0AUQ@mail.gmail.com>
-Subject: Re: Connect method of org.bluez.Network1 interface throws error
- "Connect with signature "s" doesn't exist"
+Date: Wed, 10 Aug 2016 12:17:20 +0530
+Message-ID: <CAMj0Yyt8HirDhQXXNqC3ipGoO3oYxeOPnv5QkyQ7LuXkv9XsRQ@mail.gmail.com>
+Subject: Re: connection breaks after 2 seconds ?
 To: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, Aug 3, 2016 at 3:44 PM, Ajay Parashar <ajay.parasha@gmail.com> wrote:
+On Tue, Aug 9, 2016 at 4:54 PM, Ajay Parashar <ajay.parasha@gmail.com> wrote:
 > Hi,
 >
-> I am using bluez 5.35 and developing an application using Glib DBUS binding.
+> I have two USB Bluetooth controller and connected on same Ubuntu 15.10
+> PC.(kernel  4.2.0-42)
+> I want to set a connection between them using blueZ 5.35.
 >
-> As per network-api.txt documentation, my code calls connect API with
-> String type parameter but while execution it prompts below error.
-> Can you please let me know why is it giving this error and how can i
-> resolve this.
+> I verified by hciconfig command
+> hciconfig
+> ------------------------------------------------------------------------------------------------------
+> hci2: Type: BR/EDR  Bus: USB
+> BD Address: 00:1A:7D:DA:71:05  ACL MTU: 310:10  SCO MTU: 64:8
+> UP RUNNING PSCAN ISCAN
+> RX bytes:6922 acl:12 sco:0 events:171 errors:0
+> TX bytes:5775 acl:12 sco:0 commands:112 errors:0
 >
-> //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-> Unable to connect with network :
-> GDBus.Error:org.freedesktop.DBus.Error.UnknownObject: Method "Connect"
-> with signature "s" on interface "org.bluez.Network1" doesn't exist
-> ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+> hci1: Type: BR/EDR  Bus: USB
+> BD Address: 00:1A:7D:DA:71:07  ACL MTU: 310:10  SCO MTU: 64:8
+> UP RUNNING PSCAN ISCAN
+> RX bytes:2808 acl:13 sco:0 events:155 errors:0
+> TX bytes:6689 acl:12 sco:0 commands:113 errors:0
+> -----------------------------------------------------------------------------------------------------------
 >
-> /* For reference please find my code as below*/
 >
-> int connect_network(char *interface)
-> {
->   int       ret       = 0;
->   GError   *error     = NULL;
->   GVariant *reply     = NULL;
+> I opened two shell session for each controller and execute bluetoothctl.
+> when i executed below command then connection established only for 2
+> second and then it disconnects?
 >
->   GVariant **t = NULL;
->   t    = g_new(GVariant *, 1);
->   t[0] = g_variant_new_string ("nap");
+> [bluetooth]# connect 00:1A:7D:DA:71:05
+> Attempting to connect to 00:1A:7D:DA:71:05
+> [CHG] Device 00:1A:7D:DA:71:05 Connected: yes
+> Failed to connect: org.bluez.Error.Failed
+> [CHG] Device 00:1A:7D:DA:71:05 Connected: no
 >
->   GVariant *tuple_variant = g_variant_new_tuple(t, 1);
+> Please let me know why it disconnects after 2 seconds?
 >
->   /* connect with network */
->   reply = g_dbus_connection_call_sync(dbus_conn,
->     BLUEZ_BUS_NAME,
->     "/org/bluez/hci0",
->     "org.bluez.Network1",
->     "Connect",
->     tuple_variant,
->     G_VARIANT_TYPE_STRING,
->     G_DBUS_CALL_FLAGS_NONE,
->     -1,
->     NULL,
->     &error);
->
-> if (error) {
->     printf("Unable to connect with network : %s\n", error->message);
-> g_free(t);
->     return -3;
->   }
->
->    g_variant_get(reply, "(s)", &interface);
->    printf("interface from connect is = %s\n", interface);
->   g_free(t);
->
->   return ret;
-> }
+> Regards
+> Ajay
 
+This issue has solved when I executed commands with bluetoothctl
+prompt in below order.
 
-I am facing the same issue when i executed test-network program
-available with  /bluez-5.35/test directory.
-I m blocked here, please let me know how to proceed with bluez?
+1) agent  NoInputNoOutput
+2) default-agent
+3) pair
+4) connect
 
-Regards
+Thanks
 Ajay
