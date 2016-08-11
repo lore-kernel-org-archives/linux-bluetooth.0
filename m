@@ -1,9 +1,9 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 5/7] client: Add set-advertise-service command
-Date: Thu, 11 Aug 2016 15:14:50 +0300
-Message-Id: <1470917692-8878-6-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 4/7] client: Add set-advertise-uuids command
+Date: Thu, 11 Aug 2016 15:14:49 +0300
+Message-Id: <1470917692-8878-5-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1470917692-8878-1-git-send-email-luiz.dentz@gmail.com>
 References: <1470917692-8878-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,11 +11,11 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds set-advertise-service which can be used set UUID data to be
+This adds set-advertise-uuids which can be used set UUIDs to be
 advertised:
 
-set-advertise-service [uuid][data=[xx xx ...]
-[bluetooth]# set-advertise-service 180D 0xff 0xff
+set-advertise-uuids [uuid1 uuid2...]
+[bluetooth]# set-advertise-uuids 180D 180F
 [bluetooth]# advertise on
 
 @ Advertising Added: 1
@@ -23,188 +23,103 @@ set-advertise-service [uuid][data=[xx xx ...]
         Length: 9
         Flags: 0x02
           LE General Discoverable Mode
-        Service Data (UUID 0x180d): ffff
+        16-bit Service UUIDs (complete): 2 entries
+          Heart Rate (0x180d)
+          Battery Service (0x180f)
 ---
- client/advertising.c | 128 +++++++++++++++++++++++++++++++++++++++++++++++++++
- client/main.c        |   8 ++++
- 2 files changed, 136 insertions(+)
+ client/advertising.c | 43 +++++++++++++++++++++++++++++++++++++++++++
+ client/main.c        |  7 +++++++
+ 2 files changed, 50 insertions(+)
 
 diff --git a/client/advertising.c b/client/advertising.c
-index e74221f..3e4e10c 100644
+index 34e3f59..e74221f 100644
 --- a/client/advertising.c
 +++ b/client/advertising.c
-@@ -42,6 +42,9 @@ static gboolean registered = FALSE;
+@@ -40,6 +40,8 @@
+ 
+ static gboolean registered = FALSE;
  static char *ad_type = NULL;
- static char **ad_uuids = NULL;
- static size_t ad_uuids_len = 0;
-+static char *ad_service_uuid = NULL;
-+static uint8_t ad_service_data[25];
-+static uint8_t ad_service_data_len = 0;
++static char **ad_uuids = NULL;
++static size_t ad_uuids_len = 0;
  
  static void ad_release(DBusConnection *conn)
  {
-@@ -134,9 +137,85 @@ static gboolean get_uuids(const GDBusPropertyTable *property,
+@@ -110,8 +112,31 @@ static gboolean get_type(const GDBusPropertyTable *property,
  	return TRUE;
  }
  
-+static void append_array_variant(DBusMessageIter *iter, int type, void *val,
-+							int n_elements)
++static gboolean uuids_exists(const GDBusPropertyTable *property, void *data)
 +{
-+	DBusMessageIter variant, array;
-+	char type_sig[2] = { type, '\0' };
-+	char array_sig[3] = { DBUS_TYPE_ARRAY, type, '\0' };
-+
-+	dbus_message_iter_open_container(iter, DBUS_TYPE_VARIANT,
-+						array_sig, &variant);
-+
-+	dbus_message_iter_open_container(&variant, DBUS_TYPE_ARRAY,
-+						type_sig, &array);
-+
-+	if (dbus_type_is_fixed(type) == TRUE) {
-+		dbus_message_iter_append_fixed_array(&array, type, val,
-+							n_elements);
-+	} else if (type == DBUS_TYPE_STRING || type == DBUS_TYPE_OBJECT_PATH) {
-+		const char ***str_array = val;
-+		int i;
-+
-+		for (i = 0; i < n_elements; i++)
-+			dbus_message_iter_append_basic(&array, type,
-+							&((*str_array)[i]));
-+	}
-+
-+	dbus_message_iter_close_container(&variant, &array);
-+
-+	dbus_message_iter_close_container(iter, &variant);
++	return ad_uuids_len != 0;
 +}
 +
-+static void dict_append_basic_array(DBusMessageIter *dict, int key_type,
-+					const void *key, int type, void *val,
-+					int n_elements)
-+{
-+	DBusMessageIter entry;
-+
-+	dbus_message_iter_open_container(dict, DBUS_TYPE_DICT_ENTRY,
-+						NULL, &entry);
-+
-+	dbus_message_iter_append_basic(&entry, key_type, key);
-+
-+	append_array_variant(&entry, type, val, n_elements);
-+
-+	dbus_message_iter_close_container(dict, &entry);
-+}
-+
-+static void dict_append_array(DBusMessageIter *dict, const char *key, int type,
-+				void *val, int n_elements)
-+{
-+	dict_append_basic_array(dict, DBUS_TYPE_STRING, &key, type, val,
-+								n_elements);
-+}
-+
-+static gboolean service_data_exists(const GDBusPropertyTable *property,
-+								void *data)
-+{
-+	return ad_service_uuid != NULL;
-+}
-+
-+static gboolean get_service_data(const GDBusPropertyTable *property,
++static gboolean get_uuids(const GDBusPropertyTable *property,
 +				DBusMessageIter *iter, void *user_data)
 +{
-+	DBusMessageIter dict;
-+	const uint8_t *data = ad_service_data;
++	DBusMessageIter array;
++	size_t i;
 +
-+	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY, "{sv}", &dict);
++	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY, "as", &array);
 +
-+	dict_append_array(&dict, ad_service_uuid, DBUS_TYPE_BYTE, &data,
-+							ad_service_data_len);
++	for (i = 0; i < ad_uuids_len; i++)
++		dbus_message_iter_append_basic(&array, DBUS_TYPE_STRING,
++							&ad_uuids[i]);
 +
-+	dbus_message_iter_close_container(iter, &dict);
++	dbus_message_iter_close_container(iter, &array);
 +
 +	return TRUE;
 +}
 +
  static const GDBusPropertyTable ad_props[] = {
  	{ "Type", "s", get_type },
- 	{ "ServiceUUIDs", "as", get_uuids, NULL, uuids_exists },
-+	{ "ServiceData", "a{sv}", get_service_data, NULL, service_data_exists },
++	{ "ServiceUUIDs", "as", get_uuids, NULL, uuids_exists },
  	{ }
  };
  
-@@ -220,3 +299,52 @@ void ad_advertise_uuids(const char *arg)
- 
- 	ad_uuids_len = g_strv_length(ad_uuids);
+@@ -177,3 +202,21 @@ void ad_unregister(DBusConnection *conn, GDBusProxy *manager)
+ 		return;
+ 	}
  }
 +
-+static void ad_clear_service(void)
++void ad_advertise_uuids(const char *arg)
 +{
-+	g_free(ad_service_uuid);
-+	ad_service_uuid = NULL;
-+	memset(ad_service_data, 0, sizeof(ad_service_data));
-+	ad_service_data_len = 0;
-+}
++	g_strfreev(ad_uuids);
++	ad_uuids = NULL;
++	ad_uuids_len = 0;
 +
-+void ad_advertise_service(const char *arg)
-+{
-+	wordexp_t w;
-+	unsigned int i;
++	if (!arg || !strlen(arg))
++		return;
 +
-+	if (wordexp(arg, &w, WRDE_NOCMD)) {
-+		rl_printf("Invalid argument\n");
++	ad_uuids = g_strsplit(arg, " ", -1);
++	if (!ad_uuids) {
++		rl_printf("Failed to parse input\n");
 +		return;
 +	}
 +
-+	ad_clear_service();
-+
-+	if (w.we_wordc == 0)
-+		goto done;
-+
-+	ad_service_uuid = g_strdup(w.we_wordv[0]);
-+
-+	for (i = 1; i < w.we_wordc; i++) {
-+		long int val;
-+		char *endptr = NULL;
-+
-+		if (i >= G_N_ELEMENTS(ad_service_data)) {
-+			rl_printf("Too much data\n");
-+			goto done;
-+		}
-+
-+		val = strtol(w.we_wordv[i], &endptr, 0);
-+		if (!endptr || *endptr != '\0' || val > UINT8_MAX) {
-+			rl_printf("Invalid value at index %d\n", i);
-+			ad_clear_service();
-+			goto done;
-+		}
-+
-+		ad_service_data[ad_service_data_len] = val;
-+		ad_service_data_len++;
-+	}
-+
-+done:
-+	wordfree(&w);
++	ad_uuids_len = g_strv_length(ad_uuids);
 +}
 diff --git a/client/main.c b/client/main.c
-index d6b52c4..72c2cd9 100644
+index 471879f..d6b52c4 100644
 --- a/client/main.c
 +++ b/client/main.c
-@@ -1878,6 +1878,11 @@ static void cmd_set_advertise_uuids(const char *arg)
- 	ad_advertise_uuids(arg);
+@@ -1873,6 +1873,11 @@ static char *ad_generator(const char *text, int state)
+ 	return NULL;
  }
  
-+static void cmd_set_advertise_service(const char *arg)
++static void cmd_set_advertise_uuids(const char *arg)
 +{
-+	ad_advertise_service(arg);
++	ad_advertise_uuids(arg);
 +}
 +
  static const struct {
  	const char *cmd;
  	const char *arg;
-@@ -1911,6 +1916,9 @@ static const struct {
+@@ -1904,6 +1909,8 @@ static const struct {
+ 	{ "advertise",    "<on/off/type>", cmd_advertise,
+ 				"Enable/disable advertising with given type",
  							ad_generator},
- 	{ "set-advertise-uuids", "[uuid1 uuid2 ...]",
- 			cmd_set_advertise_uuids, "Set advertise uuids" },
-+	{ "set-advertise-service", "[uuid][data=[xx xx ...]",
-+			cmd_set_advertise_service,
-+			"Set advertise service data" },
++	{ "set-advertise-uuids", "[uuid1 uuid2 ...]",
++			cmd_set_advertise_uuids, "Set advertise uuids" },
  	{ "set-scan-filter-uuids", "[uuid1 uuid2 ...]",
  			cmd_set_scan_filter_uuids, "Set scan filter uuids" },
  	{ "set-scan-filter-rssi", "[rssi]", cmd_set_scan_filter_rssi,
