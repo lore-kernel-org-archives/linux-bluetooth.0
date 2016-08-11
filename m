@@ -1,38 +1,41 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+MIME-Version: 1.0
+In-Reply-To: <CAAu3APY6aF9BckMfuH+2Ua7M=oHZuf7ghJVKT0t0_j0mSLyEBA@mail.gmail.com>
+References: <4F35DE52-6E93-4668-95D5-8D5D1E5C9DFA@keyinitiative.com> <CAAu3APY6aF9BckMfuH+2Ua7M=oHZuf7ghJVKT0t0_j0mSLyEBA@mail.gmail.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 0/7] client: Add advertise support
-Date: Thu, 11 Aug 2016 15:14:45 +0300
-Message-Id: <1470917692-8878-1-git-send-email-luiz.dentz@gmail.com>
+Date: Thu, 11 Aug 2016 14:29:00 +0300
+Message-ID: <CABBYNZJN0tq8E3x3PZSw5Ee0M4Y8ZugjMZmQLNaEqY0GT3negw@mail.gmail.com>
+Subject: Re: Eddystone scanning - TLM packet
+To: Barry Byford <31baz66@gmail.com>
+Cc: Jason Anderssen <j@keyinitiative.com>,
+	Bluez mailing list <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi All,
 
-This changes adds command to manage advertisement data to bluetootctl.
+On Thu, Aug 11, 2016 at 11:01 AM, Barry Byford <31baz66@gmail.com> wrote:
+> Hello Jason,
+>
+>
+> On 11 August 2016 at 02:53, Jason Anderssen <j@keyinitiative.com> wrote:
+>> Hi,
+>>
+>> I have successfully written code to scan for iBeacons using bluez, I was wondering if there is a link to some example or doc that explains how to detect the eddy stone different frames, for example, the main one I am after is the  Eddystone-TLM data which can be interleaved.
+>> Any help or direction I can search would be fantastic.
+>
+> The different Eddystone frames are identified at the start of the
+> service data. TLM is 0x02 as detailed in the spec at:
+> https://github.com/google/eddystone/blob/master/protocol-specification.md
+>
+> You may also find this beacon cheat-sheet useful that was posted on Twitter:
+> https://twitter.com/josryke/status/763006284052463617
 
-Note: This also fix the format of ManufacturerData and ServiceData that
-has been documented as being dictionaries but the implemention and sample
-has it more like a struct using fixed types instead of variant container
-so this would probably break any application using these properties.
 
-Luiz Augusto von Dentz (7):
-  core/advertising: Fix not parsing data properly
-  test/example-advertisement: Fix data format of properties
-  client: Add advertise command
-  client: Add set-advertise-uuids command
-  client: Add set-advertise-service command
-  client: Add set-advertise-manufacturer command
-  client: Add set-advertise-tx-power command
-
- Makefile.tools             |   2 +
- client/advertising.c       | 452 +++++++++++++++++++++++++++++++++++++++++++++
- client/main.c              | 139 ++++++++++++++
- src/advertising.c          |  24 ++-
- test/example-advertisement |  12 +-
- 5 files changed, 613 insertions(+), 16 deletions(-)
- create mode 100644 client/advertising.c
+Btw, I will be sending patches to add support for creating advertising
+instance with bluetoothctl, so if all goes well it would be possible
+to do this with bluetoothctl.
 
 -- 
-2.7.4
-
+Luiz Augusto von Dentz
