@@ -1,37 +1,48 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Mike Ryan <mikeryan@lacklustre.net>
+To: linux-bluetooth@vger.kernel.org
+Cc: Mike Ryan <mikeryan@lacklustre.net>
+Subject: [PATCH] tools: add more entities and better error handling to parse_companies
+Date: Thu, 11 Aug 2016 13:19:45 -0700
+Message-Id: <1470946785-92700-1-git-send-email-mikeryan@lacklustre.net>
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZJKFGv9zfiCKzA1d-e-Yc-iPocUyXPkw+30tWXQpYBEYw@mail.gmail.com>
-References: <CA+ZaN3-y6UppvKOYPtJ7eGzD-zN5Cf8DW754FxU_Q9BaW+RKpA@mail.gmail.com>
- <CA+ZaN3-KHcWw+-yz1Qg8Xd2ctysYZWx=4pZSbyfYp=KmVBzC6Q@mail.gmail.com> <CABBYNZJKFGv9zfiCKzA1d-e-Yc-iPocUyXPkw+30tWXQpYBEYw@mail.gmail.com>
-From: Seulki Shin <sskcorea@gmail.com>
-Date: Fri, 1 Jul 2016 16:37:55 +0900
-Message-ID: <CA+ZaN39ovR=zp3_ZShJWBJGk1V8M_YT7FG0xrQaYdZOHBf=Vpg@mail.gmail.com>
-Subject: Re: bug report - bluetoothctl ble connection
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Add the remaining lowercase acute accented vowel HTML entities to
+parse_companies.pl. On unknown entity, print an error to STDERR so the
+maintainer can more clearly understand the failure.
+---
+ tools/parse_companies.pl | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-Thanks for reply.
-You are always very helpful and I appreciate that.
+diff --git a/tools/parse_companies.pl b/tools/parse_companies.pl
+index 99d3f31..d5b2815 100755
+--- a/tools/parse_companies.pl
++++ b/tools/parse_companies.pl
+@@ -8,7 +8,11 @@ use strict;
+ 
+ my %known_entities = (
+     'nbsp' => ' ',
++    'aacute' => 'á',
+     'eacute' => 'é',
++    'iacute' => 'í',
++    'oacute' => 'ó',
++    'uacute' => 'ú',
+     'auml' => 'ä',
+     'uuml' => 'ü',
+     'Uuml' => 'Ü',
+@@ -23,8 +27,7 @@ sub uri_decode {
+     }
+     foreach my $entity (map { lc $_ } $name =~ /&([^;]+);/g) {
+         if ($entity ne 'amp') {
+-            print "Unable to convert &$entity;, giving up\n";
+-            exit 1;
++            die "\nparse_companies.pl: Unable to convert &$entity; giving up\n";
+         }
+     }
+     $name =~ s/&amp;/&/ig;
+-- 
+2.1.4
 
->>> ......
->>>
->>>> ACL Data RX: Handle 128 flags 0x02 dlen 22                  [hci0] 132.295271
->>>       ATT: Read Response (0x0b) len 17
->>>         Value: 506f6c6172204837203844323236443146
->>> ......
->
-> Well this is a response to a read, if there is something wrong with
-> the value then either the attribute handle is not correct or it is the
-> remote fault.
->
-I don't think remote device has a problem because I had tested this
-device with prior version of bluez (5.29 and 5.39) and there was no
-problem.
-
-Thanks anyway,
-Seulki
