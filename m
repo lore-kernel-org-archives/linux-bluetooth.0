@@ -1,42 +1,74 @@
-Return-Path: <wsa@the-dreams.de>
-From: Wolfram Sang <wsa@the-dreams.de>
-To: linux-usb@vger.kernel.org
-Cc: Wolfram Sang <wsa-dev@sang-engineering.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
 	linux-bluetooth@vger.kernel.org
-Subject: [PATCH] bluetooth: bcm203x: don't print error when allocating urb fails
-Date: Thu, 11 Aug 2016 22:51:34 +0200
-Message-Id: <1470948695-23421-2-git-send-email-wsa@the-dreams.de>
-In-Reply-To: <1470948695-23421-1-git-send-email-wsa@the-dreams.de>
-References: <1470948695-23421-1-git-send-email-wsa@the-dreams.de>
+Subject: Re: [PATCH BlueZ 2/7] test/example-advertisement: Fix data format of properties
+In-Reply-To: <1470917692-8878-3-git-send-email-luiz.dentz@gmail.com>
+References: <1470917692-8878-1-git-send-email-luiz.dentz@gmail.com> <1470917692-8878-3-git-send-email-luiz.dentz@gmail.com>
+Date: Thu, 11 Aug 2016 10:41:07 -0300
+Message-ID: <87shubxw24.fsf@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Wolfram Sang <wsa-dev@sang-engineering.com>
+Hi,
 
-kmalloc will print enough information in case of failure.
+Luiz Augusto von Dentz <luiz.dentz@gmail.com> writes:
 
-Signed-off-by: Wolfram Sang <wsa-dev@sang-engineering.com>
----
- drivers/bluetooth/bcm203x.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> D-Bus dictionaries always except the values to be of variant type.
 
-diff --git a/drivers/bluetooth/bcm203x.c b/drivers/bluetooth/bcm203x.c
-index 5b0ef7bbe8ac87..5ce6d4176dc302 100644
---- a/drivers/bluetooth/bcm203x.c
-+++ b/drivers/bluetooth/bcm203x.c
-@@ -185,10 +185,8 @@ static int bcm203x_probe(struct usb_interface *intf, const struct usb_device_id
- 	data->state = BCM203X_LOAD_MINIDRV;
- 
- 	data->urb = usb_alloc_urb(0, GFP_KERNEL);
--	if (!data->urb) {
--		BT_ERR("Can't allocate URB");
-+	if (!data->urb)
- 		return -ENOMEM;
--	}
- 
- 	if (request_firmware(&firmware, "BCM2033-MD.hex", &udev->dev) < 0) {
- 		BT_ERR("Mini driver request failed");
--- 
-2.8.1
+nitpick: expect
+
+> ---
+>  test/example-advertisement | 12 ++++++------
+>  1 file changed, 6 insertions(+), 6 deletions(-)
+>
+> diff --git a/test/example-advertisement b/test/example-advertisement
+> index ce6e40f..7da0c7b 100755
+> --- a/test/example-advertisement
+> +++ b/test/example-advertisement
+> @@ -65,10 +65,10 @@ class Advertisement(dbus.service.Object):
+>                                                      signature='s')
+>          if self.manufacturer_data is not None:
+>              properties['ManufacturerData'] = dbus.Dictionary(
+> -                self.manufacturer_data, signature='qay')
+> +                self.manufacturer_data, signature='qv')
+>          if self.service_data is not None:
+>              properties['ServiceData'] = dbus.Dictionary(self.service_data,
+> -                                                        signature='say')
+> +                                                        signature='sv')
+>          if self.include_tx_power is not None:
+>              properties['IncludeTxPower'] = dbus.Boolean(self.include_tx_power)
+>          return {LE_ADVERTISEMENT_IFACE: properties}
+> @@ -88,13 +88,13 @@ class Advertisement(dbus.service.Object):
+>
+>      def add_manufacturer_data(self, manuf_code, data):
+>          if not self.manufacturer_data:
+> -            self.manufacturer_data = dict()
+> -        self.manufacturer_data[manuf_code] = data
+> +            self.manufacturer_data = dbus.Dictionary({}, signature='qv')
+> +        self.manufacturer_data[manuf_code] = dbus.Array(data, signature='y')
+>
+>      def add_service_data(self, uuid, data):
+>          if not self.service_data:
+> -            self.service_data = dict()
+> -        self.service_data[uuid] = data
+> +            self.service_data = dbus.Dictionary({}, signature='sv')
+> +        self.service_data[uuid] = dbus.Array(data, signature='y')
+>
+>      @dbus.service.method(DBUS_PROP_IFACE,
+>                           in_signature='s',
+> --
+> 2.7.4
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+Cheers,
+--
+Vinicius
