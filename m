@@ -1,46 +1,30 @@
-Return-Path: <johan.hedberg@gmail.com>
-Date: Fri, 12 Aug 2016 12:12:37 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Bart Van Assche <bart.vanassche@sandisk.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH, RFC] Bluetooth: btusb, hci_intel: Fix
- wait_on_bit_timeout() return value checks
-Message-ID: <20160812091237.GA31871@t440s.P-661HNU-F1>
-References: <fae0be30-bd77-e5ce-37c6-58591916d28c@sandisk.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+To: linux-bluetooth@vger.kernel.org
+From: Bernd Porr <mail@berndporr.me.uk>
+Subject: rfcomm stability problems
+Message-ID: <c2eb7579-71de-f8bb-cbe7-4537d25aaa47@berndporr.me.uk>
+Date: Fri, 12 Aug 2016 08:58:51 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <fae0be30-bd77-e5ce-37c6-58591916d28c@sandisk.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bart,
+I've upgraded recently to UBUNTU LTS xenial and since then the rfcomm 
+has been working very unreliable up to complete kernel crashes with 
+freezes. My testing results are here:
 
-On Thu, Aug 11, 2016, Bart Van Assche wrote:
-> wait_on_bit_timeout() returns one of the following three values:
-> * 0 to indicate success.
-> * -EINTR to indicate that a signal has been received;
-> * -EAGAIN to indicate timeout;
-> Make the wait_on_bit_timeout() callers check for these values.
-> This patch has not yet been tested.
-> 
-> Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-> Cc: Marcel Holtmann <marcel@holtmann.org>
-> Cc: Gustavo Padovan <gustavo@padovan.org>
-> Cc: Johan Hedberg <johan.hedberg@gmail.com>
-> ---
->  drivers/bluetooth/btusb.c     | 5 ++---
->  drivers/bluetooth/hci_intel.c | 6 +++---
->  2 files changed, 5 insertions(+), 6 deletions(-)
+https://bugs.launchpad.net/ubuntu/+source/linux/+bug/1611532
 
-Good catch. It seems the API was changed not to return 1 by this commit
-(which failed to update any users of of it):
+That happens with all kernels from 4.4 up to the development kernel. It 
+worked fine with the stock ubuntu kernels of precise.
 
-  commit 68985633bccb6066bf1803e316fbc6c1f5b796d6
-  Author: Peter Zijlstra <peterz@infradead.org>
-  Date:   Tue Dec 1 14:04:04 2015 +0100
+I'd be happy to do a bit of kernel debugging if somebody can point me to 
+possible reasons and/or major changes from the 3.x kernel.
 
-      sched/wait: Fix signal handling in bit wait helpers
-
-Do you have some doubts about your fix? You put "RFC" in the subject
-which usually means the author isn't completely sure about it.
-
-Johan
+Best,
+/Bernd
+-- 
+http://www.berndporr.me.uk
+http://www.linux-usb-daq.co.uk
+http://www.imdb.com/name/nm3293421/
++44 (0)7840 340069
