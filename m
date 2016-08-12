@@ -1,39 +1,46 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Fix bt_sock_recvmsg when MSG_TRUNC is not set
-Date: Fri, 12 Aug 2016 15:11:28 +0300
-Message-Id: <1471003888-27124-1-git-send-email-luiz.dentz@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <johan.hedberg@gmail.com>
+Date: Fri, 12 Aug 2016 12:12:37 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Bart Van Assche <bart.vanassche@sandisk.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH, RFC] Bluetooth: btusb, hci_intel: Fix
+ wait_on_bit_timeout() return value checks
+Message-ID: <20160812091237.GA31871@t440s.P-661HNU-F1>
+References: <fae0be30-bd77-e5ce-37c6-58591916d28c@sandisk.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <fae0be30-bd77-e5ce-37c6-58591916d28c@sandisk.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Bart,
 
-Commit b5f34f9420b50c9b5876b9a2b68e96be6d629054 attempt to introduce
-proper handling for MSG_TRUNC but recv and variants should still work
-as read if no flag is passed, but because the code may set MSG_TRUNC to
-msg->msg_flags that shall not be used as it may cause it to be behave as
-if MSG_TRUNC is always, so instead of using it this changes the code to
-use the flags parameter which shall contain the original flags.
+On Thu, Aug 11, 2016, Bart Van Assche wrote:
+> wait_on_bit_timeout() returns one of the following three values:
+> * 0 to indicate success.
+> * -EINTR to indicate that a signal has been received;
+> * -EAGAIN to indicate timeout;
+> Make the wait_on_bit_timeout() callers check for these values.
+> This patch has not yet been tested.
+> 
+> Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+> Cc: Marcel Holtmann <marcel@holtmann.org>
+> Cc: Gustavo Padovan <gustavo@padovan.org>
+> Cc: Johan Hedberg <johan.hedberg@gmail.com>
+> ---
+>  drivers/bluetooth/btusb.c     | 5 ++---
+>  drivers/bluetooth/hci_intel.c | 6 +++---
+>  2 files changed, 5 insertions(+), 6 deletions(-)
 
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
----
- net/bluetooth/af_bluetooth.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Good catch. It seems the API was changed not to return 1 by this commit
+(which failed to update any users of of it):
 
-diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
-index b8a5caf..1d96ff3 100644
---- a/net/bluetooth/af_bluetooth.c
-+++ b/net/bluetooth/af_bluetooth.c
-@@ -251,7 +251,7 @@ int bt_sock_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
- 
- 	skb_free_datagram(sk, skb);
- 
--	if (msg->msg_flags & MSG_TRUNC)
-+	if (flags & MSG_TRUNC)
- 		copied = skblen;
- 
- 	return err ? : copied;
--- 
-2.7.4
+  commit 68985633bccb6066bf1803e316fbc6c1f5b796d6
+  Author: Peter Zijlstra <peterz@infradead.org>
+  Date:   Tue Dec 1 14:04:04 2015 +0100
 
+      sched/wait: Fix signal handling in bit wait helpers
+
+Do you have some doubts about your fix? You put "RFC" in the subject
+which usually means the author isn't completely sure about it.
+
+Johan
