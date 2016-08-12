@@ -1,69 +1,51 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <1470835502-30698-1-git-send-email-luiz.dentz@gmail.com>
-References: <1470835502-30698-1-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <20160810221428.23951-1-vcgomes@gmail.com>
+References: <20160810221428.23951-1-vcgomes@gmail.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Fri, 12 Aug 2016 11:00:26 +0300
-Message-ID: <CABBYNZKHsanSRUD1MMHE4xp_5ykkpxNA3p5zfJOLWMcFdkzTSw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] core: Prefer BR/EDR over LE if it set in
- advertisement flag
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Fri, 12 Aug 2016 10:57:10 +0300
+Message-ID: <CABBYNZKT87Hng4C6yXUA4L02Oi+OT85QE-3TNFfoYbDA+6M5Rw@mail.gmail.com>
+Subject: Re: [PATCH] core: Fix wrong expectations for the return of recv()
+To: Vinicius Costa Gomes <vcgomes@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Vinicius,
 
-On Wed, Aug 10, 2016 at 4:25 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+On Thu, Aug 11, 2016 at 1:14 AM, Vinicius Costa Gomes <vcgomes@gmail.com> wrote:
+> Since commit b5f34f9420b50 "Bluetooth: Fix bt_sock_recvmsg return value"
+> in the kernel, Bluetooth sockets of type SOCK_SEQPACKET, when read()
+> will return the size of the packet received, which can be larger than
+> the the buffer passed by user space.
 >
-> This makes the code prefer BR/EDR if the last advertisement has it set
-> in the flags.
+> In this case the problem was causing a disconnection soon after
+> the reception of an SDP request.
+>
+> Reported by: Alban Browaeys <prahal@yahoo.com>
 > ---
->  src/adapter.c | 5 ++++-
->  src/device.c  | 6 +++++-
->  2 files changed, 9 insertions(+), 2 deletions(-)
+>  src/sdpd-server.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >
-> diff --git a/src/adapter.c b/src/adapter.c
-> index 3742398..ddabf2d 100644
-> --- a/src/adapter.c
-> +++ b/src/adapter.c
-> @@ -5488,8 +5488,11 @@ static void update_found_devices(struct btd_adapter *adapter,
->          * supports this we can make the non-zero check conditional.
->          */
->         if (bdaddr_type != BDADDR_BREDR && eir_data.flags &&
-> -                                       !(eir_data.flags & EIR_BREDR_UNSUP))
-> +                                       !(eir_data.flags & EIR_BREDR_UNSUP)) {
->                 device_set_bredr_support(dev);
-> +               /* Update last seen for BR/EDR in case its flag is set */
-> +               device_update_last_seen(dev, BDADDR_BREDR);
-> +       }
+> diff --git a/src/sdpd-server.c b/src/sdpd-server.c
+> index c863508..b8190da 100644
+> --- a/src/sdpd-server.c
+> +++ b/src/sdpd-server.c
+> @@ -164,7 +164,7 @@ static gboolean io_session_event(GIOChannel *chan, GIOCondition cond, gpointer d
+>         }
 >
->         if (eir_data.name != NULL && eir_data.name_complete)
->                 device_store_cached_name(dev, eir_data.name);
-> diff --git a/src/device.c b/src/device.c
-> index 264d599..6c6be92 100644
-> --- a/src/device.c
-> +++ b/src/device.c
-> @@ -1763,7 +1763,11 @@ static uint8_t select_conn_bearer(struct btd_device *dev)
->         if (dev->le && (!dev->bredr || bredr_last == NVAL_TIME))
->                 return dev->bdaddr_type;
->
-> -       if (bredr_last < le_last)
-> +       /*
-> +        * Prefer BR/EDR if time is the same since it might be from an
-> +        * advertisement with BR/EDR flag set.
-> +        */
-> +       if (bredr_last <= le_last)
->                 return BDADDR_BREDR;
->
->         return dev->bdaddr_type;
+>         len = recv(sk, &hdr, sizeof(sdp_pdu_hdr_t), MSG_PEEK);
+> -       if (len != sizeof(sdp_pdu_hdr_t)) {
+> +       if (len < sizeof(sdp_pdu_hdr_t)) {
+>                 sdp_svcdb_collect_all(sk);
+>                 return FALSE;
+>         }
 > --
-> 2.7.4
+> 2.9.2
 
-Applied.
-
+Applied, note that I did have to include a cast since it was causing
+and signess comparison error.
 
 -- 
 Luiz Augusto von Dentz
