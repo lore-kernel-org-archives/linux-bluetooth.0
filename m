@@ -18,57 +18,66 @@ Cc: Ville Tervo <ville.tervo@iki.fi>,
 	linux-omap@vger.kernel.org,
 	devicetree@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [RFC 4/7] Bluetooth: hci_uart: Add support for word alignment
-Date: Sat, 13 Aug 2016 05:14:35 +0200
-Message-Id: <1471058078-5579-5-git-send-email-sre@kernel.org>
+Subject: [RFC 3/7] dt: bindings: Add nokia-bluetooth
+Date: Sat, 13 Aug 2016 05:14:34 +0200
+Message-Id: <1471058078-5579-4-git-send-email-sre@kernel.org>
 In-Reply-To: <1471058078-5579-1-git-send-email-sre@kernel.org>
 References: <1471058078-5579-1-git-send-email-sre@kernel.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This will be used by Nokia's H4+ protocol, which
-adds padding to packets to reach word alignment.
 ---
- drivers/bluetooth/hci_h4.c   | 10 ++++++++++
- drivers/bluetooth/hci_uart.h |  1 +
- 2 files changed, 11 insertions(+)
+ .../devicetree/bindings/net/nokia-bluetooth.txt    | 43 ++++++++++++++++++++++
+ 1 file changed, 43 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/net/nokia-bluetooth.txt
 
-diff --git a/drivers/bluetooth/hci_h4.c b/drivers/bluetooth/hci_h4.c
-index 635597b6e168..a934e4eb692b 100644
---- a/drivers/bluetooth/hci_h4.c
-+++ b/drivers/bluetooth/hci_h4.c
-@@ -253,11 +253,21 @@ struct sk_buff *h4_recv_buf(struct hci_dev *hdev, struct sk_buff *skb,
- 			}
- 
- 			if (!dlen) {
-+				if ((&pkts[i])->wordaligned && !(skb->len % 2)) {
-+					buffer++;
-+					count--;
-+				}
+diff --git a/Documentation/devicetree/bindings/net/nokia-bluetooth.txt b/Documentation/devicetree/bindings/net/nokia-bluetooth.txt
+new file mode 100644
+index 000000000000..a0fceabb4cce
+--- /dev/null
++++ b/Documentation/devicetree/bindings/net/nokia-bluetooth.txt
+@@ -0,0 +1,43 @@
++Nokia bluetooth UART devices
++------
 +
- 				/* No more data, complete frame */
- 				(&pkts[i])->recv(hdev, skb);
- 				skb = NULL;
- 			}
- 		} else {
-+			if ((&pkts[i])->wordaligned && !(skb->len % 2)) {
-+				buffer++;
-+				count--;
-+			}
++Some vendors have custom versions of their chips, that can be found in Nokia
++devices. These chips are controlled differently, than the non-Nokia version,
++so a different binding is required. All chips listed here implement the Nokia
++H4+ protocol.
 +
- 			/* Complete frame */
- 			(&pkts[i])->recv(hdev, skb);
- 			skb = NULL;
-diff --git a/drivers/bluetooth/hci_uart.h b/drivers/bluetooth/hci_uart.h
-index 839bad1d8152..a7d67aec3632 100644
---- a/drivers/bluetooth/hci_uart.h
-+++ b/drivers/bluetooth/hci_uart.h
-@@ -121,6 +121,7 @@ struct h4_recv_pkt {
- 	u8  loff;	/* Data length offset in header */
- 	u8  lsize;	/* Data length field size */
- 	u16 maxlen;	/* Max overall packet length */
-+	bool wordaligned;	/* packets are word aligned */
- 	int (*recv)(struct hci_dev *hdev, struct sk_buff *skb);
- };
- 
++Required properties:
++
++  - compatible: should be one of the following:
++	* "nokia,brcm,bcm2048"
++	* "nokia,ti,wl1271-bluetooth"
++  - reset-gpios:		Should specify the gpio for bluetooth reset
++  - host-wakeup-gpios:		Should specify the gpio for host wakeup
++  - bluetooth-wakeup-gpios:	Should specify the gpio for bluetooth wakeup
++  - clock-names:		Should be "sysclk"
++  - clocks:			Should contain a clock phandle for system clock
++
++Example:
++
++/ {
++	/* controlled (enabled/disabled) directly by wl1271 */
++	vctcxo: vctcxo {
++		compatible = "fixed-clock";
++		#clock-cells = <0>;
++		clock-frequency = <38400000>;
++	};
++};
++
++&uart2 {
++	bluetooth {
++		compatible = "nokia,ti,wl1271-bluetooth";
++
++		reset-gpios = <&gpio1 26 GPIO_ACTIVE_HIGH>; /* 26 */
++		host-wakeup-gpios = <&gpio4 5 GPIO_ACTIVE_HIGH>; /* 101 */
++		bluetooth-wakeup-gpios = <&gpio2 5 GPIO_ACTIVE_HIGH>; /* 37 */
++
++		clocks = <&vctcxo>;
++		clock-names = "sysclk";
++	};
++
++};
 -- 
 2.8.1
