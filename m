@@ -17,66 +17,31 @@ Cc: Ville Tervo <ville.tervo@iki.fi>,
 	linux-serial@vger.kernel.org,
 	linux-omap@vger.kernel.org,
 	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	NeilBrown <neilb@suse.de>
-Subject: [RFC 2/7] tty: add support for "tty slave" devices
-Date: Sat, 13 Aug 2016 05:14:33 +0200
-Message-Id: <1471058078-5579-3-git-send-email-sre@kernel.org>
+	linux-kernel@vger.kernel.org
+Subject: [RFC 1/7] tty: serial: omap: add UPF_BOOT_AUTOCONF flag for DT init
+Date: Sat, 13 Aug 2016 05:14:32 +0200
+Message-Id: <1471058078-5579-2-git-send-email-sre@kernel.org>
 In-Reply-To: <1471058078-5579-1-git-send-email-sre@kernel.org>
 References: <1471058078-5579-1-git-send-email-sre@kernel.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: NeilBrown <neilb@suse.de>
-
-A "tty slave" is a device connected via UART.  It may need a driver to,
-for example, power the device on when the tty is opened, and power it
-off when the tty is released.
-
-Signed-off-by: NeilBrown <neilb@suse.de>
-Signed-off-by: Sebastian Reichel <sre@kernel.org>
 ---
- Documentation/devicetree/bindings/serial/8250.txt | 4 ++++
- drivers/tty/tty_io.c                              | 6 ++++++
- 2 files changed, 10 insertions(+)
+ drivers/tty/serial/omap-serial.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/Documentation/devicetree/bindings/serial/8250.txt b/Documentation/devicetree/bindings/serial/8250.txt
-index f5561ac7e17e..ecb74730f71b 100644
---- a/Documentation/devicetree/bindings/serial/8250.txt
-+++ b/Documentation/devicetree/bindings/serial/8250.txt
-@@ -46,6 +46,10 @@ Optional properties:
-   line respectively. It will use specified GPIO instead of the peripheral
-   function pin for the UART feature. If unsure, don't specify this property.
+diff --git a/drivers/tty/serial/omap-serial.c b/drivers/tty/serial/omap-serial.c
+index a2a529994ba5..7c2c77789c2c 100644
+--- a/drivers/tty/serial/omap-serial.c
++++ b/drivers/tty/serial/omap-serial.c
+@@ -1542,6 +1542,9 @@ static struct omap_uart_port_info *of_get_uart_port_info(struct device *dev)
  
-+Optional child node:
-+- a device connected to the uart can be specified as child node with
-+  compatible value.
+ 	of_property_read_u32(dev->of_node, "clock-frequency",
+ 					 &omap_up_info->uartclk);
 +
- Note:
- * fsl,ns16550:
-   ------------
-diff --git a/drivers/tty/tty_io.c b/drivers/tty/tty_io.c
-index 734a635e7363..39ff5dcdfd50 100644
---- a/drivers/tty/tty_io.c
-+++ b/drivers/tty/tty_io.c
-@@ -95,6 +95,7 @@
- #include <linux/seq_file.h>
- #include <linux/serial.h>
- #include <linux/ratelimit.h>
-+#include <linux/of_platform.h>
- 
- #include <linux/uaccess.h>
- 
-@@ -3317,6 +3318,11 @@ struct device *tty_register_device_attr(struct tty_driver *driver,
- 	retval = device_register(dev);
- 	if (retval)
- 		goto error;
-+	if (device && device->of_node)
-+		/* Children are platform devices and will be
-+		 * runtime_pm managed by this tty.
-+		 */
-+		of_platform_populate(device->of_node, NULL, NULL, dev);
- 
- 	return dev;
++	omap_up_info->flags = UPF_BOOT_AUTOCONF;
++
+ 	return omap_up_info;
+ }
  
 -- 
 2.8.1
