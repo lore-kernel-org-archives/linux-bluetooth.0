@@ -17,67 +17,66 @@ Cc: Ville Tervo <ville.tervo@iki.fi>,
 	linux-serial@vger.kernel.org,
 	linux-omap@vger.kernel.org,
 	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [RFC 3/7] dt: bindings: Add nokia-bluetooth
-Date: Sat, 13 Aug 2016 05:14:34 +0200
-Message-Id: <1471058078-5579-4-git-send-email-sre@kernel.org>
+	linux-kernel@vger.kernel.org,
+	NeilBrown <neilb@suse.de>
+Subject: [RFC 2/7] tty: add support for "tty slave" devices
+Date: Sat, 13 Aug 2016 05:14:33 +0200
+Message-Id: <1471058078-5579-3-git-send-email-sre@kernel.org>
 In-Reply-To: <1471058078-5579-1-git-send-email-sre@kernel.org>
 References: <1471058078-5579-1-git-send-email-sre@kernel.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- .../devicetree/bindings/net/nokia-bluetooth.txt    | 43 ++++++++++++++++++++++
- 1 file changed, 43 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/net/nokia-bluetooth.txt
+From: NeilBrown <neilb@suse.de>
 
-diff --git a/Documentation/devicetree/bindings/net/nokia-bluetooth.txt b/Documentation/devicetree/bindings/net/nokia-bluetooth.txt
-new file mode 100644
-index 000000000000..a0fceabb4cce
---- /dev/null
-+++ b/Documentation/devicetree/bindings/net/nokia-bluetooth.txt
-@@ -0,0 +1,43 @@
-+Nokia bluetooth UART devices
-+------
+A "tty slave" is a device connected via UART.  It may need a driver to,
+for example, power the device on when the tty is opened, and power it
+off when the tty is released.
+
+Signed-off-by: NeilBrown <neilb@suse.de>
+Signed-off-by: Sebastian Reichel <sre@kernel.org>
+---
+ Documentation/devicetree/bindings/serial/8250.txt | 4 ++++
+ drivers/tty/tty_io.c                              | 6 ++++++
+ 2 files changed, 10 insertions(+)
+
+diff --git a/Documentation/devicetree/bindings/serial/8250.txt b/Documentation/devicetree/bindings/serial/8250.txt
+index f5561ac7e17e..ecb74730f71b 100644
+--- a/Documentation/devicetree/bindings/serial/8250.txt
++++ b/Documentation/devicetree/bindings/serial/8250.txt
+@@ -46,6 +46,10 @@ Optional properties:
+   line respectively. It will use specified GPIO instead of the peripheral
+   function pin for the UART feature. If unsure, don't specify this property.
+ 
++Optional child node:
++- a device connected to the uart can be specified as child node with
++  compatible value.
 +
-+Some vendors have custom versions of their chips, that can be found in Nokia
-+devices. These chips are controlled differently, than the non-Nokia version,
-+so a different binding is required. All chips listed here implement the Nokia
-+H4+ protocol.
-+
-+Required properties:
-+
-+  - compatible: should be one of the following:
-+	* "nokia,brcm,bcm2048"
-+	* "nokia,ti,wl1271-bluetooth"
-+  - reset-gpios:		Should specify the gpio for bluetooth reset
-+  - host-wakeup-gpios:		Should specify the gpio for host wakeup
-+  - bluetooth-wakeup-gpios:	Should specify the gpio for bluetooth wakeup
-+  - clock-names:		Should be "sysclk"
-+  - clocks:			Should contain a clock phandle for system clock
-+
-+Example:
-+
-+/ {
-+	/* controlled (enabled/disabled) directly by wl1271 */
-+	vctcxo: vctcxo {
-+		compatible = "fixed-clock";
-+		#clock-cells = <0>;
-+		clock-frequency = <38400000>;
-+	};
-+};
-+
-+&uart2 {
-+	bluetooth {
-+		compatible = "nokia,ti,wl1271-bluetooth";
-+
-+		reset-gpios = <&gpio1 26 GPIO_ACTIVE_HIGH>; /* 26 */
-+		host-wakeup-gpios = <&gpio4 5 GPIO_ACTIVE_HIGH>; /* 101 */
-+		bluetooth-wakeup-gpios = <&gpio2 5 GPIO_ACTIVE_HIGH>; /* 37 */
-+
-+		clocks = <&vctcxo>;
-+		clock-names = "sysclk";
-+	};
-+
-+};
+ Note:
+ * fsl,ns16550:
+   ------------
+diff --git a/drivers/tty/tty_io.c b/drivers/tty/tty_io.c
+index 734a635e7363..39ff5dcdfd50 100644
+--- a/drivers/tty/tty_io.c
++++ b/drivers/tty/tty_io.c
+@@ -95,6 +95,7 @@
+ #include <linux/seq_file.h>
+ #include <linux/serial.h>
+ #include <linux/ratelimit.h>
++#include <linux/of_platform.h>
+ 
+ #include <linux/uaccess.h>
+ 
+@@ -3317,6 +3318,11 @@ struct device *tty_register_device_attr(struct tty_driver *driver,
+ 	retval = device_register(dev);
+ 	if (retval)
+ 		goto error;
++	if (device && device->of_node)
++		/* Children are platform devices and will be
++		 * runtime_pm managed by this tty.
++		 */
++		of_platform_populate(device->of_node, NULL, NULL, dev);
+ 
+ 	return dev;
+ 
 -- 
 2.8.1
