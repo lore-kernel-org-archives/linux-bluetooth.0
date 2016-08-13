@@ -1,85 +1,269 @@
-Return-Path: <sre@kernel.org>
-From: Sebastian Reichel <sre@kernel.org>
-To: Sebastian Reichel <sre@kernel.org>,
-	Tony Lindgren <tony@atomide.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Jiri Slaby <jslaby@suse.com>
-Cc: Ville Tervo <ville.tervo@iki.fi>,
-	=?UTF-8?q?Filip=20Matijevi=C4=87?= <filip.matijevic.pz@gmail.com>,
-	Aaro Koskinen <aaro.koskinen@iki.fi>,
-	Pavel Machek <pavel@ucw.cz>,
-	=?UTF-8?q?Pali=20Roh=C3=A1r?= <pali.rohar@gmail.com>,
-	ivo.g.dimitrov.75@gmail.com,
+Return-Path: <bjorn.andersson@linaro.org>
+From: Bjorn Andersson <bjorn.andersson@linaro.org>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>
+Cc: linux-kernel@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org,
 	linux-bluetooth@vger.kernel.org,
-	linux-serial@vger.kernel.org,
-	linux-omap@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [RFC 0/7] Nokia N9xx bluetooth driver
-Date: Sat, 13 Aug 2016 05:14:31 +0200
-Message-Id: <1471058078-5579-1-git-send-email-sre@kernel.org>
+	Bjorn Andersson <bjorn.andersson@sonymobile.com>
+Subject: [PATCH v3 2/2] Bluetooth: Introduce Qualcomm WCNSS SMD based HCI driver
+Date: Fri, 12 Aug 2016 17:01:28 -0700
+Message-Id: <1471046488-14860-2-git-send-email-bjorn.andersson@linaro.org>
+In-Reply-To: <1471046488-14860-1-git-send-email-bjorn.andersson@linaro.org>
+References: <1471046488-14860-1-git-send-email-bjorn.andersson@linaro.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+From: Bjorn Andersson <bjorn.andersson@sonymobile.com>
 
-This series (based von 4.8-rc1) adds support for bluetooth on the Nokia
-N9xx devices. It has been tested on the Nokia N950, where it works
-correctly. On Nokia N900 it currently fails during negotiation
-(probably related to slightly incorrect serial settings/timings).
-The N900's bcm2048 correctly answeres to alive check even before
-negotiation (on N950 it does not work before negotiation), but replies
-with an Hardware error event to the negotiation packet.
+The Qualcomm WCNSS chip provides two SMD channels to the BT core; one
+for command and one for event packets. This driver exposes the two
+channels as a hci device.
 
-Apart from N900 support there are still two "features" missing in the
-driver:
+Signed-off-by: Bjorn Andersson <bjorn.andersson@sonymobile.com>
+Signed-off-by: Bjorn Andersson <bjorn.andersson@linaro.org>
+---
 
-1. To save energy the bluetooth module can be put into sleep mode via a
-   GPIO. This gpio should be enabled before sending data via UART and
-   disabled once the transmission is done. I currently just keep the
-   GPIO always enabled.
-2. It would be nice to have a bluetooth device exposed by the kernel
-   automatically without having to setup the tty disector first for
-   proper configurationless out of the box support. I could not find
-   a nice way to do this from the kernel, though.
+Due to timing issues with the combo chip firmware boot process I had to move
+things around slighly. So this driver is now probed by the wcnss_ctrl driver,
+once the firmware have signaled that boot is completed.
 
-On N950 the driver works with omap-serial and omap8250-serial drivers.
+The wcnss_ctrl changes are merged in v4.8, as is the devicetree binding for
+this part (soc/qcom/qcom,wcnss.txt)
 
-You can also find this series in the following branch:
-https://git.kernel.org/cgit/linux/kernel/git/sre/linux-n900.git/log/?h=nokia-bluetooth
+Changes since v2:
+- This is now a child of wcnss_ctrl
+- Added missing kfree_skb() in btqcomsmd_send()
 
--- Sebastian
+ drivers/bluetooth/Kconfig     |  12 +++
+ drivers/bluetooth/Makefile    |   1 +
+ drivers/bluetooth/btqcomsmd.c | 183 ++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 196 insertions(+)
+ create mode 100644 drivers/bluetooth/btqcomsmd.c
 
-NeilBrown (1):
-  tty: add support for "tty slave" devices
-
-Sebastian Reichel (6):
-  tty: serial: omap: add UPF_BOOT_AUTOCONF flag for DT init
-  dt: bindings: Add nokia-bluetooth
-  Bluetooth: hci_uart: Add support for word alignment
-  Bluetooth: hci_nokia: Introduce new driver
-  ARM: dts: OMAP3-N900: Add bluetooth
-  ARM: dts: OMAP3-N950: Add bluetooth
-
- .../devicetree/bindings/net/nokia-bluetooth.txt    |  43 ++
- Documentation/devicetree/bindings/serial/8250.txt  |   4 +
- arch/arm/boot/dts/omap3-n900.dts                   |  22 +-
- arch/arm/boot/dts/omap3-n950-n9.dtsi               |  34 +
- drivers/bluetooth/Kconfig                          |  10 +
- drivers/bluetooth/Makefile                         |   1 +
- drivers/bluetooth/hci_h4.c                         |  10 +
- drivers/bluetooth/hci_ldisc.c                      |   6 +
- drivers/bluetooth/hci_nokia.c                      | 734 +++++++++++++++++++++
- drivers/bluetooth/hci_nokia.h                      | 140 ++++
- drivers/bluetooth/hci_uart.h                       |   9 +-
- drivers/tty/serial/omap-serial.c                   |   3 +
- drivers/tty/tty_io.c                               |   6 +
- 13 files changed, 1020 insertions(+), 2 deletions(-)
- create mode 100644 Documentation/devicetree/bindings/net/nokia-bluetooth.txt
- create mode 100644 drivers/bluetooth/hci_nokia.c
- create mode 100644 drivers/bluetooth/hci_nokia.h
-
+diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
+index cf50fd2e96df..aaf1719623b0 100644
+--- a/drivers/bluetooth/Kconfig
++++ b/drivers/bluetooth/Kconfig
+@@ -169,6 +169,18 @@ config BT_HCIUART_QCA
+ 
+ 	  Say Y here to compile support for QCA protocol.
+ 
++config BT_QCOMSMD
++	tristate "Qualcomm SMD based HCI support"
++	depends on QCOM_SMD
++	select BT_QCA
++	help
++	  Qualcomm SMD based HCI driver.
++	  This driver is used to bridge HCI data onto the shared memory
++	  channels to the WCNSS core.
++
++	  Say Y here to compile support for HCI over Qualcomm SMD into the
++	  kernel or say M to compile as a module.
++
+ config BT_HCIUART_AG6XX
+ 	bool "Intel AG6XX protocol support"
+ 	depends on BT_HCIUART
+diff --git a/drivers/bluetooth/Makefile b/drivers/bluetooth/Makefile
+index 9c18939fc5c9..c31fc01acc7a 100644
+--- a/drivers/bluetooth/Makefile
++++ b/drivers/bluetooth/Makefile
+@@ -23,6 +23,7 @@ obj-$(CONFIG_BT_WILINK)		+= btwilink.o
+ obj-$(CONFIG_BT_BCM)		+= btbcm.o
+ obj-$(CONFIG_BT_RTL)		+= btrtl.o
+ obj-$(CONFIG_BT_QCA)		+= btqca.o
++obj-$(CONFIG_BT_QCOMSMD)	+= btqcomsmd.o
+ 
+ btmrvl-y			:= btmrvl_main.o
+ btmrvl-$(CONFIG_DEBUG_FS)	+= btmrvl_debugfs.o
+diff --git a/drivers/bluetooth/btqcomsmd.c b/drivers/bluetooth/btqcomsmd.c
+new file mode 100644
+index 000000000000..a163e3fc5766
+--- /dev/null
++++ b/drivers/bluetooth/btqcomsmd.c
+@@ -0,0 +1,183 @@
++/*
++ * Copyright (c) 2016, Linaro Ltd.
++ * Copyright (c) 2015, Sony Mobile Communications Inc.
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 and
++ * only version 2 as published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ */
++
++#include <linux/module.h>
++#include <linux/slab.h>
++#include <linux/soc/qcom/smd.h>
++#include <linux/soc/qcom/wcnss_ctrl.h>
++#include <linux/platform_device.h>
++#include <net/bluetooth/bluetooth.h>
++#include <net/bluetooth/hci_core.h>
++#include <net/bluetooth/hci.h>
++#include "btqca.h"
++
++struct btqcomsmd {
++	struct hci_dev *hdev;
++
++	struct qcom_smd_channel *acl_channel;
++	struct qcom_smd_channel *cmd_channel;
++};
++
++static int btqcomsmd_recv(struct hci_dev *hdev, unsigned int type,
++			   const void *data, size_t count)
++{
++	struct sk_buff *skb;
++
++	/* Use GFP_ATOMIC as we're in IRQ context */
++	skb = bt_skb_alloc(count, GFP_ATOMIC);
++	if (!skb) {
++		hdev->stat.err_rx++;
++		return -ENOMEM;
++	}
++
++	bt_cb(skb)->pkt_type = type;
++	memcpy(skb_put(skb, count), data, count);
++
++	return hci_recv_frame(hdev, skb);
++}
++
++static int btqcomsmd_acl_callback(struct qcom_smd_channel *channel,
++				  const void *data,
++				  size_t count)
++{
++	struct btqcomsmd *btq = qcom_smd_get_drvdata(channel);
++
++	btq->hdev->stat.byte_rx += count;
++	return btqcomsmd_recv(btq->hdev, HCI_ACLDATA_PKT, data, count);
++}
++
++static int btqcomsmd_cmd_callback(struct qcom_smd_channel *channel,
++				  const void *data,
++				  size_t count)
++{
++	struct btqcomsmd *btq = qcom_smd_get_drvdata(channel);
++
++	return btqcomsmd_recv(btq->hdev, HCI_EVENT_PKT, data, count);
++}
++
++static int btqcomsmd_send(struct hci_dev *hdev, struct sk_buff *skb)
++{
++	struct btqcomsmd *btq = hci_get_drvdata(hdev);
++	int ret;
++
++	switch (bt_cb(skb)->pkt_type) {
++	case HCI_ACLDATA_PKT:
++		ret = qcom_smd_send(btq->acl_channel, skb->data, skb->len);
++		hdev->stat.acl_tx++;
++		hdev->stat.byte_tx += skb->len;
++		break;
++	case HCI_COMMAND_PKT:
++		ret = qcom_smd_send(btq->cmd_channel, skb->data, skb->len);
++		hdev->stat.cmd_tx++;
++		break;
++	default:
++		ret = -EILSEQ;
++		break;
++	}
++
++	kfree_skb(skb);
++
++	return ret;
++}
++
++static int btqcomsmd_open(struct hci_dev *hdev)
++{
++	return 0;
++}
++
++static int btqcomsmd_close(struct hci_dev *hdev)
++{
++	return 0;
++}
++
++static int btqcomsmd_probe(struct platform_device *pdev)
++{
++	struct btqcomsmd *btq;
++	struct hci_dev *hdev;
++	void *wcnss;
++	int ret;
++
++	btq = devm_kzalloc(&pdev->dev, sizeof(*btq), GFP_KERNEL);
++	if (!btq)
++		return -ENOMEM;
++
++	wcnss = dev_get_drvdata(pdev->dev.parent);
++
++	btq->acl_channel = qcom_wcnss_open_channel(wcnss, "APPS_RIVA_BT_ACL",
++						   btqcomsmd_acl_callback);
++	if (IS_ERR(btq->acl_channel))
++		return PTR_ERR(btq->acl_channel);
++
++	btq->cmd_channel = qcom_wcnss_open_channel(wcnss, "APPS_RIVA_BT_CMD",
++						   btqcomsmd_cmd_callback);
++	if (IS_ERR(btq->cmd_channel))
++		return PTR_ERR(btq->cmd_channel);
++
++	qcom_smd_set_drvdata(btq->acl_channel, btq);
++	qcom_smd_set_drvdata(btq->cmd_channel, btq);
++
++	hdev = hci_alloc_dev();
++	if (!hdev)
++		return -ENOMEM;
++
++	hci_set_drvdata(hdev, btq);
++	btq->hdev = hdev;
++	SET_HCIDEV_DEV(hdev, &pdev->dev);
++
++	hdev->bus = HCI_SMD;
++	hdev->open = btqcomsmd_open;
++	hdev->close = btqcomsmd_close;
++	hdev->send = btqcomsmd_send;
++	hdev->set_bdaddr = qca_set_bdaddr_rome;
++
++	ret = hci_register_dev(hdev);
++	if (ret < 0) {
++		hci_free_dev(hdev);
++		return ret;
++	}
++
++	platform_set_drvdata(pdev, btq);
++
++	return 0;
++}
++
++static int btqcomsmd_remove(struct platform_device *pdev)
++{
++	struct btqcomsmd *btq = platform_get_drvdata(pdev);
++
++	hci_unregister_dev(btq->hdev);
++	hci_free_dev(btq->hdev);
++
++	return 0;
++}
++
++static const struct of_device_id btqcomsmd_of_match[] = {
++	{ .compatible = "qcom,wcnss-bt", },
++	{ },
++};
++
++static struct platform_driver btqcomsmd_driver = {
++	.probe = btqcomsmd_probe,
++	.remove = btqcomsmd_remove,
++	.driver  = {
++		.name  = "btqcomsmd",
++		.of_match_table = btqcomsmd_of_match,
++	},
++};
++
++module_platform_driver(btqcomsmd_driver);
++
++MODULE_AUTHOR("Bjorn Andersson <bjorn.andersson@sonymobile.com>");
++MODULE_DESCRIPTION("Qualcomm SMD HCI driver");
++MODULE_LICENSE("GPL v2");
 -- 
-2.8.1
+2.5.0
