@@ -1,33 +1,32 @@
 Return-Path: <gregkh@linuxfoundation.org>
-Date: Sun, 14 Aug 2016 13:36:12 +0200
+Date: Sun, 14 Aug 2016 13:35:13 +0200
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: Sebastian Reichel <sre@kernel.org>
-Cc: Tony Lindgren <tony@atomide.com>, Rob Herring <robh+dt@kernel.org>,
+To: Pavel Machek <pavel@ucw.cz>
+Cc: Sebastian Reichel <sre@kernel.org>, Tony Lindgren <tony@atomide.com>,
+	Rob Herring <robh+dt@kernel.org>,
 	Mark Rutland <mark.rutland@arm.com>,
 	Marcel Holtmann <marcel@holtmann.org>, Jiri Slaby <jslaby@suse.com>,
 	Ville Tervo <ville.tervo@iki.fi>,
 	Filip =?utf-8?Q?Matijevi=C4=87?= <filip.matijevic.pz@gmail.com>,
-	Aaro Koskinen <aaro.koskinen@iki.fi>, Pavel Machek <pavel@ucw.cz>,
+	Aaro Koskinen <aaro.koskinen@iki.fi>,
 	Pali =?iso-8859-1?Q?Roh=E1r?= <pali.rohar@gmail.com>,
 	ivo.g.dimitrov.75@gmail.com, linux-bluetooth@vger.kernel.org,
 	linux-serial@vger.kernel.org, linux-omap@vger.kernel.org,
 	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
 	NeilBrown <neilb@suse.de>
 Subject: Re: [RFC 2/7] tty: add support for "tty slave" devices
-Message-ID: <20160814113612.GC21529@kroah.com>
+Message-ID: <20160814113513.GB21529@kroah.com>
 References: <1471058078-5579-1-git-send-email-sre@kernel.org>
  <1471058078-5579-3-git-send-email-sre@kernel.org>
  <20160813100345.GA14665@kroah.com>
- <20160813203124.GA647@earth>
+ <20160814084822.GA21321@amd>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20160813203124.GA647@earth>
+In-Reply-To: <20160814084822.GA21321@amd>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Sat, Aug 13, 2016 at 10:31:24PM +0200, Sebastian Reichel wrote:
-> Hi,
-> 
-> On Sat, Aug 13, 2016 at 12:03:45PM +0200, Greg Kroah-Hartman wrote:
+On Sun, Aug 14, 2016 at 10:48:22AM +0200, Pavel Machek wrote:
+> On Sat 2016-08-13 12:03:45, Greg Kroah-Hartman wrote:
 > > On Sat, Aug 13, 2016 at 05:14:33AM +0200, Sebastian Reichel wrote:
 > > > From: NeilBrown <neilb@suse.de>
 > > > 
@@ -37,38 +36,9 @@ On Sat, Aug 13, 2016 at 10:31:24PM +0200, Sebastian Reichel wrote:
 > > > 
 > > > Signed-off-by: NeilBrown <neilb@suse.de>
 > > > Signed-off-by: Sebastian Reichel <sre@kernel.org>
-> > > ---
-> > >  Documentation/devicetree/bindings/serial/8250.txt | 4 ++++
-> > >  drivers/tty/tty_io.c                              | 6 ++++++
-> > >  2 files changed, 10 insertions(+)
-> > > 
-> > > diff --git a/Documentation/devicetree/bindings/serial/8250.txt b/Documentation/devicetree/bindings/serial/8250.txt
-> > > index f5561ac7e17e..ecb74730f71b 100644
-> > > --- a/Documentation/devicetree/bindings/serial/8250.txt
-> > > +++ b/Documentation/devicetree/bindings/serial/8250.txt
-> > > @@ -46,6 +46,10 @@ Optional properties:
-> > >    line respectively. It will use specified GPIO instead of the peripheral
-> > >    function pin for the UART feature. If unsure, don't specify this property.
-> > >  
-> > > +Optional child node:
-> > > +- a device connected to the uart can be specified as child node with
-> > > +  compatible value.
-> > > +
-> > >  Note:
-> > >  * fsl,ns16550:
-> > >    ------------
-> > > diff --git a/drivers/tty/tty_io.c b/drivers/tty/tty_io.c
-> > > index 734a635e7363..39ff5dcdfd50 100644
-> > > --- a/drivers/tty/tty_io.c
-> > > +++ b/drivers/tty/tty_io.c
-> > > @@ -95,6 +95,7 @@
-> > >  #include <linux/seq_file.h>
-> > >  #include <linux/serial.h>
-> > >  #include <linux/ratelimit.h>
-> > > +#include <linux/of_platform.h>
-> > >  
-> > >  #include <linux/uaccess.h>
-> > >  
+> 
+> Acked-by: Pavel Machek <pavel@ucw.cz>
+> 
 > > > @@ -3317,6 +3318,11 @@ struct device *tty_register_device_attr(struct tty_driver *driver,
 > > >  	retval = device_register(dev);
 > > >  	if (retval)
@@ -78,23 +48,21 @@ On Sat, Aug 13, 2016 at 10:31:24PM +0200, Sebastian Reichel wrote:
 > > > +		 * runtime_pm managed by this tty.
 > > > +		 */
 > > > +		of_platform_populate(device->of_node, NULL, NULL, dev);
-> >
-> > Why are these platform devices?
-> > And why only OF?
+> > 
+> > Why are these platform devices?  And why only OF?
 > 
-> I just took this patch over from Neil to get bluetooth working
-> on N900/N950. Both of them are DT only (well N900 still has
-> boardcode, but that will be removed shortly), so it was enough
-> for me.
+> OF based systems are the only ones that have this problem, so that's
+> the only place where we can test this solution.
 > 
-> I guess you have something in mind, that's similar to e.g. i2c
-> and spi with a serial_client device and support to instanciate
-> it from DT, ACPI and boardcode?
+> Given that these devices are connected over the UART, it seems right
+> to categorize them as platform devices... You can't connect PCI, SATA
+> or USB device over UART port.
 
-I'm not going to accept a OF-only patch to the tty layer like this,
-especially one that abuses platform drivers.
+No, that's a total abuse of the platform bus, please don't.
 
-See my response to Pavel for what this "should" look like.
+I've said before that a "serial" bus should be created and you can hang
+devices off of it.  For some reason that message keeps getting
+ignored...
 
 thanks,
 
