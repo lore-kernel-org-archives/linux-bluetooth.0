@@ -1,5 +1,5 @@
 Return-Path: <pavel@ucw.cz>
-Date: Sun, 14 Aug 2016 10:53:20 +0200
+Date: Sun, 14 Aug 2016 10:51:54 +0200
 From: Pavel Machek <pavel@ucw.cz>
 To: Sebastian Reichel <sre@kernel.org>
 Cc: Tony Lindgren <tony@atomide.com>, Rob Herring <robh+dt@kernel.org>,
@@ -13,28 +13,25 @@ Cc: Tony Lindgren <tony@atomide.com>, Rob Herring <robh+dt@kernel.org>,
 	ivo.g.dimitrov.75@gmail.com, linux-bluetooth@vger.kernel.org,
 	linux-serial@vger.kernel.org, linux-omap@vger.kernel.org,
 	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [RFC 6/7] ARM: dts: OMAP3-N900: Add bluetooth
-Message-ID: <20160814085320.GD21321@amd>
+Subject: Re: [RFC 4/7] Bluetooth: hci_uart: Add support for word alignment
+Message-ID: <20160814085154.GC21321@amd>
 References: <1471058078-5579-1-git-send-email-sre@kernel.org>
- <1471058078-5579-7-git-send-email-sre@kernel.org>
+ <1471058078-5579-5-git-send-email-sre@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1471058078-5579-7-git-send-email-sre@kernel.org>
+In-Reply-To: <1471058078-5579-5-git-send-email-sre@kernel.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Sat 2016-08-13 05:14:37, Sebastian Reichel wrote:
-> Add bcm2048 node and its system clock to the N900 device tree file.
-> Apart from that a reference to the new clock has been added to
-> wl1251 (which uses it, too).
-> 
-> Signed-off-by: Sebastian Reichel <sre@kernel.org>
+On Sat 2016-08-13 05:14:35, Sebastian Reichel wrote:
+> This will be used by Nokia's H4+ protocol, which
+> adds padding to packets to reach word alignment.
 
-As the driver is not currently working at N900, I agree that this
-patch is useful, but it should probably not go upstream.
+Add a sign-off.
+
+Acked-by: Pavel Machek <pavel@ucw.cz>
 
 Thanks,
-								Pavel
-
+							Pavel
 -- 
 (english) http://www.livejournal.com/~pavelmachek
 (cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blog.html
