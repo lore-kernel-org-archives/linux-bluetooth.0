@@ -1,5 +1,5 @@
 Return-Path: <pavel@ucw.cz>
-Date: Sun, 14 Aug 2016 10:51:54 +0200
+Date: Sun, 14 Aug 2016 10:49:56 +0200
 From: Pavel Machek <pavel@ucw.cz>
 To: Sebastian Reichel <sre@kernel.org>
 Cc: Tony Lindgren <tony@atomide.com>, Rob Herring <robh+dt@kernel.org>,
@@ -13,25 +13,27 @@ Cc: Tony Lindgren <tony@atomide.com>, Rob Herring <robh+dt@kernel.org>,
 	ivo.g.dimitrov.75@gmail.com, linux-bluetooth@vger.kernel.org,
 	linux-serial@vger.kernel.org, linux-omap@vger.kernel.org,
 	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [RFC 4/7] Bluetooth: hci_uart: Add support for word alignment
-Message-ID: <20160814085154.GC21321@amd>
+Subject: Re: [RFC 1/7] tty: serial: omap: add UPF_BOOT_AUTOCONF flag for DT
+ init
+Message-ID: <20160814084956.GB21321@amd>
 References: <1471058078-5579-1-git-send-email-sre@kernel.org>
- <1471058078-5579-5-git-send-email-sre@kernel.org>
+ <1471058078-5579-2-git-send-email-sre@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1471058078-5579-5-git-send-email-sre@kernel.org>
+In-Reply-To: <1471058078-5579-2-git-send-email-sre@kernel.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Sat 2016-08-13 05:14:35, Sebastian Reichel wrote:
-> This will be used by Nokia's H4+ protocol, which
-> adds padding to packets to reach word alignment.
 
-Add a sign-off.
+It would be nice to have a line about why it is needed, unfortunately
+include/linux/serial_core.h is not exactly helpful.
+
+Plus you'll need to sign off the patch.
 
 Acked-by: Pavel Machek <pavel@ucw.cz>
 
 Thanks,
-							Pavel
+								Pavel
+								
 -- 
 (english) http://www.livejournal.com/~pavelmachek
 (cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blog.html
