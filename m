@@ -1,60 +1,32 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <johan.hedberg@gmail.com>
+Date: Mon, 15 Aug 2016 11:30:53 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Nicolas Iooss <nicolas.iooss_linux@m4x.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/1] Bluetooth: add printf format attribute to
+ hci_set_[fh]w_info()
+Message-ID: <20160815083053.GA32660@t440s.lan>
+References: <20160729112825.22091-1-nicolas.iooss_linux@m4x.org>
 MIME-Version: 1.0
-In-Reply-To: <1470990389-9434-1-git-send-email-luiz.dentz@gmail.com>
-References: <1470990389-9434-1-git-send-email-luiz.dentz@gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 15 Aug 2016 13:13:19 +0300
-Message-ID: <CABBYNZJLhJw2ez_zyi_afjL8VD=KU98j9hfXcA2UkjW-hh+PBg@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] core/device: Fix not connecting services properly
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20160729112825.22091-1-nicolas.iooss_linux@m4x.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Nicolas,
 
-On Fri, Aug 12, 2016 at 11:26 AM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> Device.Connect shall check if the service discovery is pending or no
-> service have been connected yet before switching to LE otherwise these
-> services may never be connected.
+On Fri, Jul 29, 2016, Nicolas Iooss wrote:
+> Commit 5177a83827cd ("Bluetooth: Add debugfs fields for hardware and
+> firmware info") introduced hci_set_hw_info() and hci_set_fw_info().
+> These functions use kvasprintf_const() but are not marked with a
+> __printf attribute.  Adding such an attribute helps detecting issues
+> related to printf-formatting at build time.
+> 
+> Signed-off-by: Nicolas Iooss <nicolas.iooss_linux@m4x.org>
 > ---
->  src/device.c | 15 ++++++++++++---
->  1 file changed, 12 insertions(+), 3 deletions(-)
->
-> diff --git a/src/device.c b/src/device.c
-> index 6c6be92..c103bb2 100644
-> --- a/src/device.c
-> +++ b/src/device.c
-> @@ -1779,9 +1779,18 @@ static DBusMessage *dev_connect(DBusConnection *conn, DBusMessage *msg,
->         struct btd_device *dev = user_data;
->         uint8_t bdaddr_type;
->
-> -       if (dev->bredr_state.connected)
-> -               bdaddr_type = dev->bdaddr_type;
-> -       else if (dev->le_state.connected && dev->bredr)
-> +       if (dev->bredr_state.connected) {
-> +               /*
-> +                * Check if services have been resolved and there is at list
-> +                * one connected before switching to connect LE.
-> +                */
-> +               if (dev->bredr_state.svc_resolved &&
-> +                       find_service_with_state(dev->services,
-> +                                               BTD_SERVICE_STATE_CONNECTED))
-> +                       bdaddr_type = dev->bdaddr_type;
-> +               else
-> +                       bdaddr_type = BDADDR_BREDR;
-> +       } else if (dev->le_state.connected && dev->bredr)
->                 bdaddr_type = BDADDR_BREDR;
->         else
->                 bdaddr_type = select_conn_bearer(dev);
-> --
-> 2.7.4
+>  include/net/bluetooth/hci_core.h | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 
-Applied.
+Applied to bluetooth-next. Thanks.
 
-
--- 
-Luiz Augusto von Dentz
+Johan
