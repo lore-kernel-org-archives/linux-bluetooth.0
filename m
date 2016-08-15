@@ -1,30 +1,43 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
-Subject: Re: [PATCH] Bluetooth: Fix hci_sock_recvmsg when MSG_TRUNC is not set
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1471266140-6901-1-git-send-email-luiz.dentz@gmail.com>
-Date: Mon, 15 Aug 2016 16:36:34 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <F53CF1C6-2F77-4F66-AAD3-225B99D485ED@holtmann.org>
-References: <1471266140-6901-1-git-send-email-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <CALe7QMA-kexji4xo_P1usXg5JVE=BrqfxUJALa9Fd1Azv-ejJQ@mail.gmail.com>
+References: <CALe7QMApaeG0orTAXL_s2VWeDnkG1af60Fp5Eu6U5SjhHitMvw@mail.gmail.com>
+ <CABBYNZJgssL4rL2-p10wOHuMtMR20aH1aY7RHUNx+EdcUM3qAA@mail.gmail.com> <CALe7QMA-kexji4xo_P1usXg5JVE=BrqfxUJALa9Fd1Azv-ejJQ@mail.gmail.com>
+From: Wilson Perez <wilsonpp@gmail.com>
+Date: Mon, 15 Aug 2016 09:23:26 -0400
+Message-ID: <CALe7QMAzxXfPi0tCR04dSKKBR=RUc2dLfT0qG8ckBqxk=VB2ew@mail.gmail.com>
+Subject: Fwd: BlueZ5: Unable to re-pair device after unpairing
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Thank you, Luiz.  I have tested successfully removing the device
+manually and paring afterwards.  Is there a way to allow either by
+configuration or patch subsequent pairing requests of already paired
+devices in a Bluetooth controller?  This condition would take place
+when, say, a phone is paired with a Bluetooth controller, later
+unpaired by the phone's internal capabilities, and finally attempting
+to pair once again with the Bluetooth controller.  Bluez 3.36 allowed
+this capability.
 
-> Similar to bt_sock_recvmsg MSG_TRUNC shall be checked using the original
-> flags not msg_flags.
-> 
-> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> ---
-> net/bluetooth/hci_sock.c | 2 +-
-> 1 file changed, 1 insertion(+), 1 deletion(-)
+Thank you so much.
 
-patch has been applied to bluetooth-stable tree.
+Wilson
 
-Regards
 
-Marcel
 
+On Mon, Aug 15, 2016 at 3:56 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+>
+> Hi Wilson,
+>
+> On Mon, Aug 15, 2016 at 5:22 AM, Wilson Perez <wilsonpp@gmail.com> wrote:
+> > I am using BlueZ 5.41 on ARM Linux 4,1,18 and would like to be able to
+> > pair a device that had previously been paired but then unpaired.  How
+> > can this be accomplished?
+>
+> You can do that by removing the device and then pairing again.
+>
+> --
+> Luiz Augusto von Dentz
