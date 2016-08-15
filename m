@@ -1,36 +1,52 @@
-Return-Path: <johan.hedberg@gmail.com>
-Date: Mon, 15 Aug 2016 11:09:18 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Bart Van Assche <bart.vanassche@sandisk.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH, RFC] Bluetooth: btusb, hci_intel: Fix
- wait_on_bit_timeout() return value checks
-Message-ID: <20160815080918.GA23198@t440s.lan>
-References: <fae0be30-bd77-e5ce-37c6-58591916d28c@sandisk.com>
+Return-Path: <nicolasiooss@gmail.com>
+Subject: Re: [PATCH 1/1] Bluetooth: add printf format attribute to
+ hci_set_[fh]w_info()
+To: Marcel Holtmann <marcel@holtmann.org>,
+ Gustavo Padovan <gustavo@padovan.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>
+References: <20160729112825.22091-1-nicolas.iooss_linux@m4x.org>
+Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+From: Nicolas Iooss <nicolas.iooss_linux@m4x.org>
+Message-ID: <2def3cf7-e2a4-0e08-ffc6-b5d9f633778b@m4x.org>
+Date: Mon, 15 Aug 2016 10:00:46 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <fae0be30-bd77-e5ce-37c6-58591916d28c@sandisk.com>
+In-Reply-To: <20160729112825.22091-1-nicolas.iooss_linux@m4x.org>
+Content-Type: text/plain; charset=windows-1252
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bart,
+Hello,
+After I sent the following patch a few weeks ago, I have not received
+any feedback. Could you please review it?
 
-On Thu, Aug 11, 2016, Bart Van Assche wrote:
-> wait_on_bit_timeout() returns one of the following three values:
-> * 0 to indicate success.
-> * -EINTR to indicate that a signal has been received;
-> * -EAGAIN to indicate timeout;
-> Make the wait_on_bit_timeout() callers check for these values.
-> This patch has not yet been tested.
+Thanks,
+Nicolas
+
+On 29/07/16 13:28, Nicolas Iooss wrote:
+> Commit 5177a83827cd ("Bluetooth: Add debugfs fields for hardware and
+> firmware info") introduced hci_set_hw_info() and hci_set_fw_info().
+> These functions use kvasprintf_const() but are not marked with a
+> __printf attribute.  Adding such an attribute helps detecting issues
+> related to printf-formatting at build time.
 > 
-> Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-> Cc: Marcel Holtmann <marcel@holtmann.org>
-> Cc: Gustavo Padovan <gustavo@padovan.org>
-> Cc: Johan Hedberg <johan.hedberg@gmail.com>
+> Signed-off-by: Nicolas Iooss <nicolas.iooss_linux@m4x.org>
 > ---
->  drivers/bluetooth/btusb.c     | 5 ++---
->  drivers/bluetooth/hci_intel.c | 6 +++---
->  2 files changed, 5 insertions(+), 6 deletions(-)
-
-The patch has now been applied to bluetooth-next. Thanks.
-
-Johan
+>  include/net/bluetooth/hci_core.h | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+> index ee7fc47680a1..012e5031fe47 100644
+> --- a/include/net/bluetooth/hci_core.h
+> +++ b/include/net/bluetooth/hci_core.h
+> @@ -1026,8 +1026,8 @@ int hci_resume_dev(struct hci_dev *hdev);
+>  int hci_reset_dev(struct hci_dev *hdev);
+>  int hci_recv_frame(struct hci_dev *hdev, struct sk_buff *skb);
+>  int hci_recv_diag(struct hci_dev *hdev, struct sk_buff *skb);
+> -void hci_set_hw_info(struct hci_dev *hdev, const char *fmt, ...);
+> -void hci_set_fw_info(struct hci_dev *hdev, const char *fmt, ...);
+> +__printf(2, 3) void hci_set_hw_info(struct hci_dev *hdev, const char *fmt, ...);
+> +__printf(2, 3) void hci_set_fw_info(struct hci_dev *hdev, const char *fmt, ...);
+>  int hci_dev_open(__u16 dev);
+>  int hci_dev_close(__u16 dev);
+>  int hci_dev_do_close(struct hci_dev *hdev);
+> 
