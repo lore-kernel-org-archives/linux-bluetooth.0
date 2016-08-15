@@ -1,32 +1,36 @@
 Return-Path: <johan.hedberg@gmail.com>
-Date: Mon, 15 Aug 2016 11:30:53 +0300
+Date: Mon, 15 Aug 2016 11:09:18 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Nicolas Iooss <nicolas.iooss_linux@m4x.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/1] Bluetooth: add printf format attribute to
- hci_set_[fh]w_info()
-Message-ID: <20160815083053.GA32660@t440s.lan>
-References: <20160729112825.22091-1-nicolas.iooss_linux@m4x.org>
+To: Bart Van Assche <bart.vanassche@sandisk.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH, RFC] Bluetooth: btusb, hci_intel: Fix
+ wait_on_bit_timeout() return value checks
+Message-ID: <20160815080918.GA23198@t440s.lan>
+References: <fae0be30-bd77-e5ce-37c6-58591916d28c@sandisk.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20160729112825.22091-1-nicolas.iooss_linux@m4x.org>
+In-Reply-To: <fae0be30-bd77-e5ce-37c6-58591916d28c@sandisk.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Nicolas,
+Hi Bart,
 
-On Fri, Jul 29, 2016, Nicolas Iooss wrote:
-> Commit 5177a83827cd ("Bluetooth: Add debugfs fields for hardware and
-> firmware info") introduced hci_set_hw_info() and hci_set_fw_info().
-> These functions use kvasprintf_const() but are not marked with a
-> __printf attribute.  Adding such an attribute helps detecting issues
-> related to printf-formatting at build time.
+On Thu, Aug 11, 2016, Bart Van Assche wrote:
+> wait_on_bit_timeout() returns one of the following three values:
+> * 0 to indicate success.
+> * -EINTR to indicate that a signal has been received;
+> * -EAGAIN to indicate timeout;
+> Make the wait_on_bit_timeout() callers check for these values.
+> This patch has not yet been tested.
 > 
-> Signed-off-by: Nicolas Iooss <nicolas.iooss_linux@m4x.org>
+> Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+> Cc: Marcel Holtmann <marcel@holtmann.org>
+> Cc: Gustavo Padovan <gustavo@padovan.org>
+> Cc: Johan Hedberg <johan.hedberg@gmail.com>
 > ---
->  include/net/bluetooth/hci_core.h | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+>  drivers/bluetooth/btusb.c     | 5 ++---
+>  drivers/bluetooth/hci_intel.c | 6 +++---
+>  2 files changed, 5 insertions(+), 6 deletions(-)
 
-Applied to bluetooth-next. Thanks.
+The patch has now been applied to bluetooth-next. Thanks.
 
 Johan
