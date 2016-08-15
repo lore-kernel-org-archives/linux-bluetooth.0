@@ -1,21 +1,30 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Jason Anderssen <j@keyinitiative.com>
 Content-Type: text/plain; charset=us-ascii
-Subject: LE RSSI value
-Message-Id: <5E15B113-2E5C-46FF-8112-EE7E10977BD6@keyinitiative.com>
-Date: Tue, 16 Aug 2016 11:30:41 +1000
-To: linux-bluetooth@vger.kernel.org
-Mime-Version: 1.0 (Mac OS X Mail 9.2 \(3112\))
+Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
+Subject: Re: [PATCH] Bluetooth: Fix hci_sock_recvmsg when MSG_TRUNC is not set
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1471266140-6901-1-git-send-email-luiz.dentz@gmail.com>
+Date: Mon, 15 Aug 2016 16:36:34 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <F53CF1C6-2F77-4F66-AAD3-225B99D485ED@holtmann.org>
+References: <1471266140-6901-1-git-send-email-luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi all,
+Hi Luiz,
 
-I have been writing a BLE scanner following hcittool.c as a basis, however, getting the RSSI value does not seem as straight forward.
-I have worked out that I need to run btmon in the background, and then use hcitool with lescan option to get the RSSI from the btmon output.
-While I wait for an expertise answer from this mail group, I will continue debugging the btmon to hopefully work out how to get this value for a advertising beacon, but hope that someone on this list may give me the ultimate solution.
+> Similar to bt_sock_recvmsg MSG_TRUNC shall be checked using the original
+> flags not msg_flags.
+> 
+> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> ---
+> net/bluetooth/hci_sock.c | 2 +-
+> 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Basically I would simply like to get the RSSI when I receive a advertisement, any direction or code samples would be much appreciated.
+patch has been applied to bluetooth-stable tree.
 
-Cheers and thanks in advance for you help.
-Jason Anderssen
+Regards
+
+Marcel
+
