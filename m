@@ -1,66 +1,60 @@
-Return-Path: <johan.hedberg@gmail.com>
-Date: Mon, 15 Aug 2016 13:25:40 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Kropf Johannes <Johannes.Kropf@ait.ac.at>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: 5.41 - Authentication Failed with kernel 4.2.0
-Message-ID: <20160815102540.GA8199@t440s.lan>
-References: <E92610C73D6DE84EB154DC52F5ECCE541D74740E@S0MSMAIL111.arc.local>
- <20160808094255.GA8136@t440s.lan>
- <E92610C73D6DE84EB154DC52F5ECCE541D7479B6@S0MSMAIL111.arc.local>
- <20160809143212.GA10222@t440s.P-661HNU-F1>
- <E92610C73D6DE84EB154DC52F5ECCE541D748ADC@S0MSMAIL111.arc.local>
- <20160810113012.GA25012@t440s.lan>
- <F7CF570F-5AC4-48AE-A532-DECEE8AD9F04@holtmann.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <F7CF570F-5AC4-48AE-A532-DECEE8AD9F04@holtmann.org>
+In-Reply-To: <1470990389-9434-1-git-send-email-luiz.dentz@gmail.com>
+References: <1470990389-9434-1-git-send-email-luiz.dentz@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Mon, 15 Aug 2016 13:13:19 +0300
+Message-ID: <CABBYNZJLhJw2ez_zyi_afjL8VD=KU98j9hfXcA2UkjW-hh+PBg@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] core/device: Fix not connecting services properly
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, Aug 10, 2016, Marcel Holtmann wrote:
-> >>> ACL Data RX: Handle 70 flags 0x02 dlen 11                    [hci0] 28.348460
-> >>      SMP: Pairing Response (0x02) len 6
-> >>        IO capability: NoInputNoOutput (0x03)
-> >>        OOB data: Authentication data not present (0x00)
-> >>        Authentication requirement: Bonding, No MITM, Legacy, No Keypresses (0x01)
-> >>        Max encryption key size: 16
-> >>        Initiator key distribution: EncKey Sign (0x05)
-> >>        Responder key distribution: EncKey IdKey Sign (0x07)
-> >> < ACL Data TX: Handle 70 flags 0x00 dlen 21                    [hci0] 28.348510
-> >>      SMP: Pairing Confirm (0x03) len 16
-> >>        Confim value: 12bd199ba4739a017395109cfa4621b3
-> >>> ACL Data RX: Handle 70 flags 0x02 dlen 21                    [hci0] 28.488508
-> >>      SMP: Pairing Confirm (0x03) len 16
-> >>        Confim value: 41f5f7a6212356d0eefa268f7994844a
-> >> < ACL Data TX: Handle 70 flags 0x00 dlen 21                    [hci0] 28.488545
-> >>      SMP: Pairing Random (0x04) len 16
-> >>        Random value: 4e8d532caf34ab845ff243acf6a0a681
-> >>> ACL Data RX: Handle 70 flags 0x02 dlen 6                     [hci0] 28.628456
-> >>      SMP: Pairing Failed (0x05) len 1
-> >>        Reason: Confirm value failed (0x04)
-> >> < HCI Command: Disconnect (0x01|0x0006) plen 3                 [hci0] 28.628506
-> >>        Handle: 70
-> >>        Reason: Authentication Failure (0x05)
-> >> @ Authentication Failed: 5C:31:3E:5E:54:5E (1) status 0x05
-> > 
-> > That "Confirm value failed" response still looks like something strange
-> > is happening on the remote side - maybe a bug there. Unfortunately I
-> > don't really have any other ideas except going for raw bisecting here if
-> > you have a kernel version this did work with.
-> > 
-> > The inputs to the function that generates the confirm value are the
-> > local and remote public keys and the random number that was sent over
-> > the air, so there's not much that can go wrong there - also nothing I
-> > can remember that would have changed on the Linux side regarding this
-> > for a long time. This of course assumes that the remote device is using
-> > this error code correctly and doesn't send it for some other condition.
-> 
-> I bet that the peripheral side wrongly clears some RFU bits. Which
-> leads to wrong values for confirm values.
+Hi,
 
-Johannes, could you try to experiment and see whether this is the issue?
-You can temporarily disable Secure Connections support with the command
-"btmgmt sc off"
+On Fri, Aug 12, 2016 at 11:26 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> Device.Connect shall check if the service discovery is pending or no
+> service have been connected yet before switching to LE otherwise these
+> services may never be connected.
+> ---
+>  src/device.c | 15 ++++++++++++---
+>  1 file changed, 12 insertions(+), 3 deletions(-)
+>
+> diff --git a/src/device.c b/src/device.c
+> index 6c6be92..c103bb2 100644
+> --- a/src/device.c
+> +++ b/src/device.c
+> @@ -1779,9 +1779,18 @@ static DBusMessage *dev_connect(DBusConnection *conn, DBusMessage *msg,
+>         struct btd_device *dev = user_data;
+>         uint8_t bdaddr_type;
+>
+> -       if (dev->bredr_state.connected)
+> -               bdaddr_type = dev->bdaddr_type;
+> -       else if (dev->le_state.connected && dev->bredr)
+> +       if (dev->bredr_state.connected) {
+> +               /*
+> +                * Check if services have been resolved and there is at list
+> +                * one connected before switching to connect LE.
+> +                */
+> +               if (dev->bredr_state.svc_resolved &&
+> +                       find_service_with_state(dev->services,
+> +                                               BTD_SERVICE_STATE_CONNECTED))
+> +                       bdaddr_type = dev->bdaddr_type;
+> +               else
+> +                       bdaddr_type = BDADDR_BREDR;
+> +       } else if (dev->le_state.connected && dev->bredr)
+>                 bdaddr_type = BDADDR_BREDR;
+>         else
+>                 bdaddr_type = select_conn_bearer(dev);
+> --
+> 2.7.4
 
-Johan
+Applied.
+
+
+-- 
+Luiz Augusto von Dentz
