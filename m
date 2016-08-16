@@ -1,87 +1,51 @@
-Return-Path: <linux-kernel-owner@vger.kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
-Subject: Re: [PATCH v2] Bluetooth: Add LED triggers for HCI frames tx and rx
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CAFGCpxz6j_7aOTX+uShdpyxmt71k61v=Abdw=7MfrRjvdygmTg@mail.gmail.com>
-Date: Tue, 16 Aug 2016 14:33:13 +0200
-Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	"open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-	Network Development <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
-Message-Id: <30869CE7-FE5E-4CAF-86FC-D140E2C0963D@holtmann.org>
-References: <1469939084-15603-1-git-send-email-guodong.xu@linaro.org> <1394C970-3726-4C42-A06D-0B3B3015D980@holtmann.org> <CAFGCpxz6j_7aOTX+uShdpyxmt71k61v=Abdw=7MfrRjvdygmTg@mail.gmail.com>
-To: Guodong Xu <guodong.xu@linaro.org>
-Sender: linux-kernel-owner@vger.kernel.org
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+MIME-Version: 1.0
+In-Reply-To: <1470917692-8878-1-git-send-email-luiz.dentz@gmail.com>
+References: <1470917692-8878-1-git-send-email-luiz.dentz@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Tue, 16 Aug 2016 14:59:14 +0300
+Message-ID: <CABBYNZ+1KgTRR6GdWd+k=-8Wtq36o0vKXY+HjjfWnGN-uHKmVQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 0/7] client: Add advertise support
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Guodong,
+Hi,
 
->>> Two LED triggers are added into hci_dev: tx_led and rx_led. Upon ACL/SCO
->>> packets available in tx or rx, the LEDs will blink.
->>> 
->>> For each hci registration, two triggers are added into LED subsystem:
->>> [hdev->name]-tx and [hdev-name]-rx.
->>> Refer to Documentation/leds/leds-class.txt for usage.
->>> 
->>> Verified on HiKey 96boards, which uses HiSilicon hi6220 SoC and TI
->>> WL1835 WiFi/BT combo chip.
->> 
->> so I have no idea what to do with adding adding hci0-rx and hci0-tx triggers. Combined with hci0-power trigger these are already 3 triggers. And if you have 2 Bluetooth controllers in your system, then you have 6 triggers.
->> 
-> 
-> True, 6 triggers. But, taking example for other subsytems, eg. cpu
-> cores. On my board, I have "heartbeat cpu0 cpu1 cpu2 cpu3 cpu4 cpu5
-> cpu6 cpu7". It doesn't have to mean you need all of them connected to
-> some LED(s). Actually, in most of the case, I only need heartbeat.
-> 
-> 
-> 
->> If we then maybe add another trigger, then this number just goes up and up.
->> 
->> As far as I can tell you can only assign a single trigger to a LED.
->> 
-> 
-> That's true. And people got a choice of which feature he wants to visualize.
+On Thu, Aug 11, 2016 at 3:14 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> This changes adds command to manage advertisement data to bluetootctl.
+>
+> Note: This also fix the format of ManufacturerData and ServiceData that
+> has been documented as being dictionaries but the implemention and sample
+> has it more like a struct using fixed types instead of variant container
+> so this would probably break any application using these properties.
+>
+> Luiz Augusto von Dentz (7):
+>   core/advertising: Fix not parsing data properly
+>   test/example-advertisement: Fix data format of properties
+>   client: Add advertise command
+>   client: Add set-advertise-uuids command
+>   client: Add set-advertise-service command
+>   client: Add set-advertise-manufacturer command
+>   client: Add set-advertise-tx-power command
+>
+>  Makefile.tools             |   2 +
+>  client/advertising.c       | 452 +++++++++++++++++++++++++++++++++++++++++++++
+>  client/main.c              | 139 ++++++++++++++
+>  src/advertising.c          |  24 ++-
+>  test/example-advertisement |  12 +-
+>  5 files changed, 613 insertions(+), 16 deletions(-)
+>  create mode 100644 client/advertising.c
+>
+> --
+> 2.7.4
 
-and as a result we keep adding senseless triggers to the kernel and bloating it up for no reason. Especially since it feels like 99% of the LED triggers are not used at all. This makes no sense to me.
+Applied.
 
->> So this means to even use these triggers, you need now 3 LEDs per Bluetooth controller. How is that useful for anybody in a real system? Maybe I am missing something here and somehow there is magic to combine triggers, but I have not found it yet. So please someone enlighten me on how this is suppose to be used with real devices.
->> 
->> Recently I have added a simple bluetooth-power trigger that combines all Bluetooth controllers into a single trigger. If any of them is enabled, then you can control your LED. Which makes a lot more sense to me since you most likely have a single Bluetooth LED on your system. And you want it to show the correct state no matter what Bluetooth controller is in use. However I can see the case that someone might want to assign one specific Bluetooth controller to a LED status.
->> 
->> So instead of adding many independent triggers to each controller, why not create one global bluetooth trigger and one individual bluetooth-hci0 trigger for each controller. And the combine power, tx, rx and whatever else we need to trigger the LED for?
->> 
-> 
-> When I starting this work, I referred to WiFi system. See
-> CONFIG_MAC80211_LEDS. WiFi system implements these types of triggers "
-> phy0rx phy0tx phy0assoc phy0radio" for each 'controller'.
 
-And I actually wonder who ever used these triggers. You need 4 LEDs to visualize the WiFi status. Which systems has 4 LEDs to spare to visualize this.
-
-> Besides, there are also RFKILL which stands for WiFi/BT power status.
-> RFKILL adds triggers for each module too. Eg. in the below example, I
-> have one WiFi (phy0), one BT (hci0). Trigger rfkill1 equals to
-> hci0-power.
-> 
-> Ref: here are all LED triggers I found in my 96boards/HiKey:
-> 
-> # cat trigger
-> none kbd-scrollock kbd-numlock kbd-capslock kbd-kanalock kbd-shiftlock
-> kbd-altgrlock kbd-ctrllock kbd-altlock kbd-shiftllock kbd-shiftrlock
-> kbd-ctrlllock kbd-ctrlrlock mmc0 mmc1 heartbeat cpu0 cpu1 cpu2 cpu3
-> cpu4 cpu5 cpu6 cpu7 mmc2 rfkill0 phy0rx phy0tx phy0assoc phy0radio
-> hci0-power hci0-tx [hci0-rx] rfkill1
-
-And how many LEDs do you have in the your system? I think you are making my point here.
-
-So I think what we need to do is to not add to this madness and instead create one "bluetooth" LED trigger that combines power and TX/RX for all controllers. And then allow for individual "bluetooth-hci0" LED triggers so that you can bind a single Bluetooth controller to a single LED.
-
-For me, if I can not combine hci0-power, hci0-tx and hci0-rx into a single LED, it becomes utterly useless on pretty much every system that is out there.
-
-Regards
-
-Marcel
+-- 
+Luiz Augusto von Dentz
