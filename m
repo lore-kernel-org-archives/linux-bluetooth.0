@@ -1,69 +1,57 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <CALe7QMAzxXfPi0tCR04dSKKBR=RUc2dLfT0qG8ckBqxk=VB2ew@mail.gmail.com>
-References: <CALe7QMApaeG0orTAXL_s2VWeDnkG1af60Fp5Eu6U5SjhHitMvw@mail.gmail.com>
- <CABBYNZJgssL4rL2-p10wOHuMtMR20aH1aY7RHUNx+EdcUM3qAA@mail.gmail.com>
- <CALe7QMA-kexji4xo_P1usXg5JVE=BrqfxUJALa9Fd1Azv-ejJQ@mail.gmail.com> <CALe7QMAzxXfPi0tCR04dSKKBR=RUc2dLfT0qG8ckBqxk=VB2ew@mail.gmail.com>
-From: Szymon Janc <szymon.janc@codecoup.pl>
-Date: Tue, 16 Aug 2016 09:46:30 +0200
-Message-ID: <CAAEJBhKRK0sYo+FZNW9jOMX2ewV2He5XmpKptkkHW=bwRhNNww@mail.gmail.com>
-Subject: Re: BlueZ5: Unable to re-pair device after unpairing
-To: Wilson Perez <wilsonpp@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
+Subject: Re: [RFC 0/7] Nokia N9xx bluetooth driver
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1471058078-5579-1-git-send-email-sre@kernel.org>
+Date: Tue, 16 Aug 2016 09:10:54 +0200
+Cc: Tony Lindgren <tony@atomide.com>, Rob Herring <robh+dt@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Jiri Slaby <jslaby@suse.com>, Ville Tervo <ville.tervo@iki.fi>,
+	=?utf-8?Q?Filip_Matijevi=C4=87?= <filip.matijevic.pz@gmail.com>,
+	Aaro Koskinen <aaro.koskinen@iki.fi>,
+	Pavel Machek <pavel@ucw.cz>,
+	=?utf-8?Q?Pali_Roh=C3=A1r?= <pali.rohar@gmail.com>,
+	ivo.g.dimitrov.75@gmail.com, linux-bluetooth@vger.kernel.org,
+	linux-serial@vger.kernel.org, linux-omap@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Message-Id: <A9EA833E-DDDE-46FB-917C-30CF00A70A6C@holtmann.org>
+References: <1471058078-5579-1-git-send-email-sre@kernel.org>
+To: Sebastian Reichel <sre@kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Wilson,
+Hi Sebastian,
 
-On 15 August 2016 at 15:23, Wilson Perez <wilsonpp@gmail.com> wrote:
-> Thank you, Luiz.  I have tested successfully removing the device
-> manually and paring afterwards.  Is there a way to allow either by
-> configuration or patch subsequent pairing requests of already paired
-> devices in a Bluetooth controller?  This condition would take place
-> when, say, a phone is paired with a Bluetooth controller, later
-> unpaired by the phone's internal capabilities, and finally attempting
-> to pair once again with the Bluetooth controller.  Bluez 3.36 allowed
-> this capability.
+> This series (based von 4.8-rc1) adds support for bluetooth on the Nokia
+> N9xx devices. It has been tested on the Nokia N950, where it works
+> correctly. On Nokia N900 it currently fails during negotiation
+> (probably related to slightly incorrect serial settings/timings).
+> The N900's bcm2048 correctly answeres to alive check even before
+> negotiation (on N950 it does not work before negotiation), but replies
+> with an Hardware error event to the negotiation packet.
+> 
+> Apart from N900 support there are still two "features" missing in the
+> driver:
+> 
+> 1. To save energy the bluetooth module can be put into sleep mode via a
+>   GPIO. This gpio should be enabled before sending data via UART and
+>   disabled once the transmission is done. I currently just keep the
+>   GPIO always enabled.
+> 2. It would be nice to have a bluetooth device exposed by the kernel
+>   automatically without having to setup the tty disector first for
+>   proper configurationless out of the box support. I could not find
+>   a nice way to do this from the kernel, though.
 
-There is " [RFC 0/5] Rebond support" series (from 2 weeks ago) that
-tries to address that.
-In general it extends Agent API with callback for getting user consent
-for device re-pairing.
+currently using the HCI line discipline is the only way to attach a Bluetooth device to a serial line / UART.
 
-If you are interested feel free to comment/test on that series.
+However I have been advocating for a serial bus or UART bus for a long time now. It is needed especially for Bluetooth devices which have no business in being exposed as TTYs in the first place.
 
-PS
-no top posting please :)
+This is true for the ACPI and DT world actually. Some UARTs should not be exposed as TTY and just be stuck on a bus that can be enumerated and matched by a driver that knows how to handle it.
 
->
-> Thank you so much.
->
-> Wilson
->
->
->
-> On Mon, Aug 15, 2016 at 3:56 AM, Luiz Augusto von Dentz
-> <luiz.dentz@gmail.com> wrote:
->>
->> Hi Wilson,
->>
->> On Mon, Aug 15, 2016 at 5:22 AM, Wilson Perez <wilsonpp@gmail.com> wrote:
->> > I am using BlueZ 5.41 on ARM Linux 4,1,18 and would like to be able to
->> > pair a device that had previously been paired but then unpaired.  How
->> > can this be accomplished?
->>
->> You can do that by removing the device and then pairing again.
->>
->> --
->> Luiz Augusto von Dentz
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+This goes along with the weird fetish to expose certain Bluetooth GPIOs as RFKILL switches. They are not that either since they just power the UART. They have nothing to do with a radio RFKILL switch. We fixed the Intel and Broadcom ones to be mapped into the driver. Having a proper bus would make this one also a lot easier.
 
+Regards
 
-
--- 
-pozdrawiam
-Szymon K. Janc
+Marcel
