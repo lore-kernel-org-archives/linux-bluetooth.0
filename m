@@ -1,10 +1,10 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <linux-kernel-owner@vger.kernel.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
 Subject: Re: [RFC 5/7] Bluetooth: hci_nokia: Introduce new driver
 From: Marcel Holtmann <marcel@holtmann.org>
 In-Reply-To: <20160816090952.ur35t5bbcr7hsxvj@earth>
-Date: Tue, 16 Aug 2016 12:23:50 +0200
+Date: Tue, 16 Aug 2016 12:23:43 +0200
 Cc: Tony Lindgren <tony@atomide.com>, Rob Herring <robh+dt@kernel.org>,
 	Mark Rutland <mark.rutland@arm.com>,
 	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -18,10 +18,10 @@ Cc: Tony Lindgren <tony@atomide.com>, Rob Herring <robh+dt@kernel.org>,
 	linux-serial@vger.kernel.org,
 	linux-omap <linux-omap@vger.kernel.org>,
 	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Message-Id: <E6B16AB6-341F-459B-AE6C-B9344CA5DA8A@holtmann.org>
+Message-Id: <2B099E26-62C8-4778-B701-F727BB3FC110@holtmann.org>
 References: <1471058078-5579-1-git-send-email-sre@kernel.org> <1471058078-5579-6-git-send-email-sre@kernel.org> <0528B894-39CB-4D18-971E-3209EEEA2583@holtmann.org> <20160816090952.ur35t5bbcr7hsxvj@earth>
 To: Sebastian Reichel <sre@kernel.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Sebastian,
@@ -230,4 +230,3 @@ An alternative is to add the align parameter to h4_recv_buf. Which might be the 
 Regards
 
 Marcel
-
