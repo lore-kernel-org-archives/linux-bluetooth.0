@@ -1,98 +1,118 @@
-Return-Path: <guodong.xu@linaro.org>
+Return-Path: <sre@kernel.org>
+Date: Tue, 16 Aug 2016 11:25:48 +0200
+From: Sebastian Reichel <sre@kernel.org>
+To: Pali =?iso-8859-1?Q?Roh=E1r?= <pali.rohar@gmail.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Tony Lindgren <tony@atomide.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Jiri Slaby <jslaby@suse.com>, Ville Tervo <ville.tervo@iki.fi>,
+	Filip =?utf-8?Q?Matijevi=C4=87?= <filip.matijevic.pz@gmail.com>,
+	Aaro Koskinen <aaro.koskinen@iki.fi>, Pavel Machek <pavel@ucw.cz>,
+	ivo.g.dimitrov.75@gmail.com, linux-bluetooth@vger.kernel.org,
+	linux-serial@vger.kernel.org, linux-omap@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [RFC 5/7] Bluetooth: hci_nokia: Introduce new driver
+Message-ID: <20160816092548.swayvx4zu3vlg7as@earth>
+References: <1471058078-5579-1-git-send-email-sre@kernel.org>
+ <1471058078-5579-6-git-send-email-sre@kernel.org>
+ <0528B894-39CB-4D18-971E-3209EEEA2583@holtmann.org>
+ <20160816075217.GK30047@pali>
 MIME-Version: 1.0
-In-Reply-To: <1394C970-3726-4C42-A06D-0B3B3015D980@holtmann.org>
-References: <1469939084-15603-1-git-send-email-guodong.xu@linaro.org> <1394C970-3726-4C42-A06D-0B3B3015D980@holtmann.org>
-From: Guodong Xu <guodong.xu@linaro.org>
-Date: Tue, 16 Aug 2016 17:30:21 +0800
-Message-ID: <CAFGCpxz6j_7aOTX+uShdpyxmt71k61v=Abdw=7MfrRjvdygmTg@mail.gmail.com>
-Subject: Re: [PATCH v2] Bluetooth: Add LED triggers for HCI frames tx and rx
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: "Gustavo F. Padovan" <gustavo@padovan.org>, Johan Hedberg <johan.hedberg@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	"open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-	Network Development <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="o7bzbzsdqbdxhmu2"
+In-Reply-To: <20160816075217.GK30047@pali>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi, Marcel
 
-On 16 August 2016 at 14:03, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Guodong,
->
->> Two LED triggers are added into hci_dev: tx_led and rx_led. Upon ACL/SCO
->> packets available in tx or rx, the LEDs will blink.
->>
->> For each hci registration, two triggers are added into LED subsystem:
->> [hdev->name]-tx and [hdev-name]-rx.
->> Refer to Documentation/leds/leds-class.txt for usage.
->>
->> Verified on HiKey 96boards, which uses HiSilicon hi6220 SoC and TI
->> WL1835 WiFi/BT combo chip.
->
-> so I have no idea what to do with adding adding hci0-rx and hci0-tx trigg=
-ers. Combined with hci0-power trigger these are already 3 triggers. And if =
-you have 2 Bluetooth controllers in your system, then you have 6 triggers.
->
+--o7bzbzsdqbdxhmu2
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-True, 6 triggers. But, taking example for other subsytems, eg. cpu
-cores. On my board, I have "heartbeat cpu0 cpu1 cpu2 cpu3 cpu4 cpu5
-cpu6 cpu7". It doesn't have to mean you need all of them connected to
-some LED(s). Actually, in most of the case, I only need heartbeat.
+Hi,
 
+On Tue, Aug 16, 2016 at 09:52:17AM +0200, Pali Roh=E1r wrote:
+> > > +		case HCI_NOKIA_RADIO_PKT:
+> >=20
+> > Are you sure you can ignore the RADIO_PKT commands. They are
+> > used to set up the FM radio parts of the chip. They are standard
+> > HCI commands (in the case of Broadcom at least). At minimum it
+> > should be added a comment here that you are ignoring them on
+> > purpose.
+> >=20
+> > > +		case HCI_NOKIA_NEG_PKT:
+> > > +		case HCI_NOKIA_ALIVE_PKT:
+> >=20
+> > And here I would also a comment on why are we ignore these
+> > commands and driving this all by ourselves.
+> >=20
+>=20
+> Good question... In Pavel's version of bluetooth driver, which is
+> working on Nokia N900, is sent whole firmware at one __hci_cmd_sync
+> step. It does not skip any packets, plus he added this comment:
+>=20
+> /* Note that this is timing-critical. If sending packets takes
+>  * too long, initialization will fail.
+>  */
+>=20
+> So really, can we skip those packets? And is not this reason why
+> this bluetooth driver does not work on Nokia N900?
 
+Let's have a look - here is Pavel's version:
+https://lwn.net/Articles/627201/
 
-> If we then maybe add another trigger, then this number just goes up and u=
-p.
->
-> As far as I can tell you can only assign a single trigger to a LED.
->
+In pseudocode:
 
-That's true. And people got a choice of which feature he wants to visualize=
-.
+while(true) {
+    cmd =3D get_cmd_from_firmware();
+    if (!cmd) break;
+    __hci_cmd_sync(cmd);
+}
 
-> So this means to even use these triggers, you need now 3 LEDs per Bluetoo=
-th controller. How is that useful for anybody in a real system? Maybe I am =
-missing something here and somehow there is magic to combine triggers, but =
-I have not found it yet. So please someone enlighten me on how this is supp=
-ose to be used with real devices.
->
-> Recently I have added a simple bluetooth-power trigger that combines all =
-Bluetooth controllers into a single trigger. If any of them is enabled, the=
-n you can control your LED. Which makes a lot more sense to me since you mo=
-st likely have a single Bluetooth LED on your system. And you want it to sh=
-ow the correct state no matter what Bluetooth controller is in use. However=
- I can see the case that someone might want to assign one specific Bluetoot=
-h controller to a LED status.
->
-> So instead of adding many independent triggers to each controller, why no=
-t create one global bluetooth trigger and one individual bluetooth-hci0 tri=
-gger for each controller. And the combine power, tx, rx and whatever else w=
-e need to trigger the LED for?
->
+This is not "whole firmware at one __hci_cmd_sync step", is it?
+And obviously that wouldn't work. Next let's have a look at
+"It does not skip any packets":
 
-When I starting this work, I referred to WiFi system. See
-CONFIG_MAC80211_LEDS. WiFi system implements these types of triggers "
-phy0rx phy0tx phy0assoc phy0radio" for each 'controller'.
+/* Skip first two packets */
+if (++num <=3D 2)
+    continue;
 
-Besides, there are also RFKILL which stands for WiFi/BT power status.
-RFKILL adds triggers for each module too. Eg. in the below example, I
-have one WiFi (phy0), one BT (hci0). Trigger rfkill1 equals to
-hci0-power.
+Which are HCI_NOKIA_NEG_PKT and HCI_NOKIA_ALIVE_PKT. Those are
+open-coded. By using the packets from the firmware we could drop the
+negotiation/alive functions from the driver and remove quite a few
+lines of code. I think it should only be done after finding the N900
+bug, though. I found it quite useful, that first communication does not
+happen through the firmware file.
 
-Ref: here are all LED triggers I found in my 96boards/HiKey:
+Surely the radio packet is not ignored, but that part is not used on
+N950 and N900 fails at first packet, so no way to test the radio
+packet handling. I probably should add a /* TODO: check how to
+handle radio packets */ for the radio packet entry. Or implement it
+the way Marcel suggested and hope that it just works once the other
+bug is found.
 
-# cat trigger
-none kbd-scrollock kbd-numlock kbd-capslock kbd-kanalock kbd-shiftlock
-kbd-altgrlock kbd-ctrllock kbd-altlock kbd-shiftllock kbd-shiftrlock
-kbd-ctrlllock kbd-ctrlrlock mmc0 mmc1 heartbeat cpu0 cpu1 cpu2 cpu3
-cpu4 cpu5 cpu6 cpu7 mmc2 rfkill0 phy0rx phy0tx phy0assoc phy0radio
-hci0-power hci0-tx [hci0-rx] rfkill1
+-- Sebastian
 
--Guodong
+--o7bzbzsdqbdxhmu2
+Content-Type: application/pgp-signature; name="signature.asc"
 
-> Regards
->
-> Marcel
->
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBCgAGBQJXstwXAAoJENju1/PIO/qaTZwP/1F4KCuwWEdThZPDApa6cW1A
+Dv54llsXV1A907qhn58CWAm2OTYny/Ygl9m3V4Ox0aJ3JlNc1nJcGY5Y6rKibf/9
+Hcq+VNXytc8NiZ0Q73NrtxbLqoJPBNs+qYy1GqO08q6+rxwv99dJLpN9DUPtgt/U
+pm9crgkn96QdLt/R+XV2qupHBsCZOzagLZiCJPRCJX2pb/P0nyzKR20I6FX5cMjo
+8IAXdhf+oJrV6RiGpcaVT7FPw/GG6DeoQ/7hBhsanAEgikl03DuHTjmgUx9wlwIp
+OFLTlEj01ZNf63wZa9Qr7fbzsPJrQdFfycT/RHTMX8ExNGOu4zokyIDg998rqU1M
+cdyAoOJ/ak1mygbF4Ae8d/RsAjhsL8JTmQgsgkkemDLlVZAuh54jZTJPFX97lZ2k
+pxl0K6iCobu6bxTDz3lnHwgxnkg3Z7cdhl0ZMZkVEZ7GhzmhdoeTA2oVDA3AVKot
+pxHfkcB/JNt7fd29arHFdz+m5x3Rb83yRjZVBuXz/+b0PDJQtLPRNkjElqA+uhYO
+z31QVyxpA+SPgP0qUrAFuVA9NNPMwPo756ysSkTDS8drabOKaJBUri7wmcn2kfdF
+TPVu3BZpX//5nOJDBSpn0notykZi0kh3SdnDUBljg1Og3GqIsOZ/poEA8lmbaGVU
+8Y8yB4g7wpH2RxMWUGBZ
+=C/Js
+-----END PGP SIGNATURE-----
+
+--o7bzbzsdqbdxhmu2--
