@@ -1,69 +1,158 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: bugzilla-daemon@bugzilla.kernel.org
-To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 104011] SMP Security check breaks formerly working bluetooth
- mouse connection
-Date: Wed, 17 Aug 2016 00:19:45 +0000
-Message-ID: <bug-104011-62941-PWfse2hM7L@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-104011-62941@https.bugzilla.kernel.org/>
-References: <bug-104011-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
+Return-Path: <sre@kernel.org>
+Date: Wed, 17 Aug 2016 01:28:55 +0200
+From: Sebastian Reichel <sre@kernel.org>
+To: Rob Herring <robh@kernel.org>
+Cc: Tony Lindgren <tony@atomide.com>, Mark Rutland <mark.rutland@arm.com>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Jiri Slaby <jslaby@suse.com>, Ville Tervo <ville.tervo@iki.fi>,
+	Filip =?utf-8?Q?Matijevi=C4=87?= <filip.matijevic.pz@gmail.com>,
+	Aaro Koskinen <aaro.koskinen@iki.fi>, Pavel Machek <pavel@ucw.cz>,
+	Pali =?iso-8859-1?Q?Roh=E1r?= <pali.rohar@gmail.com>,
+	ivo.g.dimitrov.75@gmail.com, linux-bluetooth@vger.kernel.org,
+	linux-serial@vger.kernel.org, linux-omap@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [RFC 3/7] dt: bindings: Add nokia-bluetooth
+Message-ID: <20160816232855.qgempm64zgp36ufd@earth>
+References: <1471058078-5579-1-git-send-email-sre@kernel.org>
+ <1471058078-5579-4-git-send-email-sre@kernel.org>
+ <20160816135155.GA20948@rob-hp-laptop>
 MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="gqolknfnakynch3i"
+In-Reply-To: <20160816135155.GA20948@rob-hp-laptop>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-https://bugzilla.kernel.org/show_bug.cgi?id=104011
 
-Peter Lindener <lindener.peter@gmail.com> changed:
+--gqolknfnakynch3i
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |lindener.peter@gmail.com
+Hi Rob,
 
---- Comment #13 from Peter Lindener <lindener.peter@gmail.com> ---
-I am running a fresh build of Mint 18, modified for real-time by:
-  sudo apt-get install linux-lowlatency linux-headers-lowlatency
+On Tue, Aug 16, 2016 at 08:51:55AM -0500, Rob Herring wrote:
+> On Sat, Aug 13, 2016 at 05:14:34AM +0200, Sebastian Reichel wrote:
+> > ---
+> >  .../devicetree/bindings/net/nokia-bluetooth.txt    | 43 ++++++++++++++=
+++++++++
+> >  1 file changed, 43 insertions(+)
+> >  create mode 100644 Documentation/devicetree/bindings/net/nokia-bluetoo=
+th.txt
+> >=20
+> > diff --git a/Documentation/devicetree/bindings/net/nokia-bluetooth.txt =
+b/Documentation/devicetree/bindings/net/nokia-bluetooth.txt
+> > new file mode 100644
+> > index 000000000000..a0fceabb4cce
+> > --- /dev/null
+> > +++ b/Documentation/devicetree/bindings/net/nokia-bluetooth.txt
+> > @@ -0,0 +1,43 @@
+> > +Nokia bluetooth UART devices
+> > +------
+> > +
+> > +Some vendors have custom versions of their chips, that can be found in=
+ Nokia
+> > +devices. These chips are controlled differently, than the non-Nokia ve=
+rsion,
+> > +so a different binding is required. All chips listed here implement th=
+e Nokia
+> > +H4+ protocol.
+> > +
+> > +Required properties:
+> > +
+> > +  - compatible: should be one of the following:
+> > +	* "nokia,brcm,bcm2048"
+> > +	* "nokia,ti,wl1271-bluetooth"
+>=20
+> Perhaps these should be 2 separate strings. Something like=20
+> '"nokia,n900-bt", "brcm,bcm2048"'. However, if they are in no way=20
+> compatible with the default version from the vendors, then just a single=
+=20
+> string is fine, but it doesn't need to be aligned to the vendor=20
+> compatible string. So just "nokia,n900-bcm2048" or similar is fine.
 
-Linux 4.4.0-34-lowlatency #53-Ubuntu SMP PREEMPT Wed Jul 27 19:23:26 UTC 2016
-x86_64 x86_64 x86_64 GNU/Linux 
+The default bcm2048 variant uses different initialization process
+and does not use word alignment as far as I know. I think having
+"brcm,bcm2048" in the compatible string is wrong.
 
-I am typing this on a Dell XPS 15, with a Broadcom BCM20703A bluetooth chip.
-that is now persistently paired / connected to a "Arc Touch Mouse SE".
+I guess "brcm,bcm2048-nokia" would also be an option, since the
+chip has been built buy broadcom, but it has a custom Nokia
+interface.
 
-two issues were encountered while getting this bluetooth mouse to work.
+> > +  - reset-gpios:		Should specify the gpio for bluetooth reset
+> > +  - host-wakeup-gpios:		Should specify the gpio for host wakeup
+>=20
+> Should be interrupt instead?
 
-   2. the "Bluetooth: SMP security requested but not available" error message
-that is encountered via ">> dmesg | tail" during BT mouse pairing (required
-only once) due to an apparently incorrect..
- [powered in legacy way (eg hciconfig up) where SMP is not correctly
-initialized. see comment #5 above] was worked around by "sudo bluetoothctl -a"
-power off/on toggling...  so it seems Szymon Janc's hunch is on the right
-track..  but it also seems likely that successful blue-tooth device pairing
-likely requires running bluetoothctl with some level of elevated privilege, if
-one wishes this bluetooth pairing to remain persistent across reboots.
-   having done this once paired, my Arc Touch Mouse SE seems to come up working
-after a reboot..
+Yes this is mostly an interrupt, but I need to read the current
+line state.
 
-   1. But before the above SMP security bug workaround might work..
-if one's bluetooth controller happens to be a Broadcom device..
-in my case the BCM20703A found in a more recent Dell XPS 15.
-you may find this error message in the logs:
->> dmesg | egrep 'blue|firm'
-[    4.220629] brcmfmac 0000:02:00.0: Direct firmware load for
-brcm/brcmfmac43602-pcie.txt failed with error -2
+> > +  - bluetooth-wakeup-gpios:	Should specify the gpio for bluetooth wake=
+up
+>=20
+> State direction and active state for gpios.
 
-if so, you will also likely want to place this file:
-https://bugs.launchpad.net/ubuntu/+source/bluez/+bug/1589889/+attachment/4683974/+files/BCM-0a5c-6410.hcd 
-into the  /lib/firmware/bcrm/ directory..
-for details see: 
-http://osdir.com/ml/ubuntu-bluetooth/2016-06/msg00043.html
+ok.
 
-   That said, my really cool Arc Touch Mouse bluetooth mouse seems quite
-happily persistently paired to new dell XPS 15..
-   thanks for the clue regarding the need to work around the power mode during
-blue-tooth device pairing..!   hope this helps resolve the last remaining
-blue-tooth driver issues for Linux..
+> > +  - clock-names:		Should be "sysclk"
+> > +  - clocks:			Should contain a clock phandle for system clock
+> > +
+> > +Example:
+> > +
+> > +/ {
+> > +	/* controlled (enabled/disabled) directly by wl1271 */
+> > +	vctcxo: vctcxo {
+> > +		compatible =3D "fixed-clock";
+> > +		#clock-cells =3D <0>;
+> > +		clock-frequency =3D <38400000>;
+> > +	};
+> > +};
+> > +
+> > +&uart2 {
+>=20
+> I want to see a common serial device binding doc before accepting any=20
+> device bindings. It's not going to say much initially other than devices=
+=20
+> are child nodes of uarts. Perhaps something on baudrate settings.
 
--- 
-You are receiving this mail because:
-You are the assignee for the bug.
+Neil added a short sentence about this in "[RFC 2/7] tty: add
+support for "tty slave" devices". I just took the unmodified patch
+=66rom Neil (*), so it's not in its own patch.
+
+> > +	bluetooth {
+> > +		compatible =3D "nokia,ti,wl1271-bluetooth";
+> > +
+> > +		reset-gpios =3D <&gpio1 26 GPIO_ACTIVE_HIGH>; /* 26 */
+> > +		host-wakeup-gpios =3D <&gpio4 5 GPIO_ACTIVE_HIGH>; /* 101 */
+> > +		bluetooth-wakeup-gpios =3D <&gpio2 5 GPIO_ACTIVE_HIGH>; /* 37 */
+> > +
+> > +		clocks =3D <&vctcxo>;
+> > +		clock-names =3D "sysclk";
+> > +	};
+> > +
+> > +};
+
+-- Sebastian
+
+--gqolknfnakynch3i
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBCgAGBQJXs6G0AAoJENju1/PIO/qaBjgP/3NyQR71NcKE8H7e5PalXd5P
+eC4y9TDx92CP3bQK5sHt1LBrt5v5R3oi7ddUB5tQNi6w431CZlaDUf22SlqhWap3
+sZUhHCMJS1ulTtaNMDY2egxtB9YDlYc5iudZaFIzidbiMno0go1E3YPlNVY/HSYC
+rmqcvQhEEx9CqntQEaVPb+cEQFaMPYYQ7AuQWg4kK8lYcZ0UesHDeu9Je1OO10wn
+OiHPho5zBcnc7Yut+1uDq0AUCGOAjIPsxQsdvZQy3K5VHZ+zE/lPGAT8wikq9tF1
+jc75ZnlIPrt+yd3kShCPXH0qfLBDvwJ9xWaimYeGOQWwRJl4BbQn5jzz1yIsZF7w
+Cyn0lwM4xN/OYGsHQz2aY0+f6cw6d9qgut3Ky7Z/0nbmw+TwDL/WuA9a0SB8aD4g
+RZnaYMczXwGCsWqE7rrQ9z5PLl+X2BVezOBravQf80m+Eh1KEFoyFX8X+GQyHVNh
+/cA3FZDSkdcnyoo8ASy9+M+gb0m/QeuMo60GbsTIe5f/CjfTAlcLMLzpKWTeZLhK
+6bGooSx7THMv7MRW3fbV6Wzj3AUYyZzqj64hes6mWmyNuUdqClKmBZFj1tr3kTc2
+76OXDXUluZXTQz5go1MmkyoQo0yNRDTMzvG2kObCWFzP9Zsv2RO9F5U4ug/wfQgi
+GayHKqcsj8A/Fbusa3ey
+=6SXu
+-----END PGP SIGNATURE-----
+
+--gqolknfnakynch3i--
