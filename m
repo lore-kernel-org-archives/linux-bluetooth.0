@@ -1,933 +1,584 @@
-Return-Path: <sre@kernel.org>
-Date: Tue, 16 Aug 2016 11:09:52 +0200
-From: Sebastian Reichel <sre@kernel.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Tony Lindgren <tony@atomide.com>, Rob Herring <robh+dt@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Jiri Slaby <jslaby@suse.com>, Ville Tervo <ville.tervo@iki.fi>,
-	Filip =?utf-8?Q?Matijevi=C4=87?= <filip.matijevic.pz@gmail.com>,
-	Aaro Koskinen <aaro.koskinen@iki.fi>, Pavel Machek <pavel@ucw.cz>,
-	Pali =?iso-8859-1?Q?Roh=E1r?= <pali.rohar@gmail.com>,
-	ivo.g.dimitrov.75@gmail.com, linux-bluetooth@vger.kernel.org,
-	linux-serial@vger.kernel.org, linux-omap@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [RFC 5/7] Bluetooth: hci_nokia: Introduce new driver
-Message-ID: <20160816090952.ur35t5bbcr7hsxvj@earth>
-References: <1471058078-5579-1-git-send-email-sre@kernel.org>
- <1471058078-5579-6-git-send-email-sre@kernel.org>
- <0528B894-39CB-4D18-971E-3209EEEA2583@holtmann.org>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="ih4qhin7qfdlbn7f"
-In-Reply-To: <0528B894-39CB-4D18-971E-3209EEEA2583@holtmann.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: =?UTF-8?q?Micha=C5=82=20Narajowski?=
+	<michal.narajowski@codecoup.pl>
+To: linux-bluetooth@vger.kernel.org
+Cc: =?UTF-8?q?Micha=C5=82=20Narajowski?=
+	<michal.narajowski@codecoup.pl>
+Subject: [PATCH BlueZ v2] client: Add better support for managing devices of multiple controllers
+Date: Tue, 16 Aug 2016 10:20:16 +0200
+Message-Id: <1471335616-17622-1-git-send-email-michal.narajowski@codecoup.pl>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Previously devices list was cleared when selecting new default
+controller. Now devices list is preserverd allowing to list and suggest
+devices for default controller even after changing the default
+controller.
+---
+ Makefile.tools |   2 +-
+ client/main.c  | 261 +++++++++++++++++++++++++++++++++++++++++----------------
+ 2 files changed, 189 insertions(+), 74 deletions(-)
 
---ih4qhin7qfdlbn7f
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+diff --git a/Makefile.tools b/Makefile.tools
+index 0d5f143..11fb60e 100644
+--- a/Makefile.tools
++++ b/Makefile.tools
+@@ -8,7 +8,7 @@ client_bluetoothctl_SOURCES = client/main.c \
+ 					client/gatt.h client/gatt.c \
+ 					monitor/uuid.h monitor/uuid.c
+ client_bluetoothctl_LDADD = gdbus/libgdbus-internal.la @GLIB_LIBS@ @DBUS_LIBS@ \
+-				-lreadline
++				-lreadline src/libshared-mainloop.la
+ endif
+ 
+ if MONITOR
+diff --git a/client/main.c b/client/main.c
+index 056331f..59baa1d 100644
+--- a/client/main.c
++++ b/client/main.c
+@@ -43,6 +43,7 @@
+ #include "agent.h"
+ #include "display.h"
+ #include "gatt.h"
++#include "src/shared/util.h"
+ 
+ /* String display constants */
+ #define COLORED_NEW	COLOR_GREEN "NEW" COLOR_OFF
+@@ -58,11 +59,15 @@ static DBusConnection *dbus_conn;
+ static GDBusProxy *agent_manager;
+ static char *auto_register_agent = NULL;
+ 
+-static GDBusProxy *default_ctrl;
++struct adapter {
++	GDBusProxy *proxy;
++	GList *devices;
++};
++
++static struct adapter *default_ctrl;
+ static GDBusProxy *default_dev;
+ static GDBusProxy *default_attr;
+ static GList *ctrl_list;
+-static GList *dev_list;
+ 
+ static guint input = 0;
+ 
+@@ -134,13 +139,10 @@ static void disconnect_handler(DBusConnection *connection, void *user_data)
+ 	rl_on_new_line();
+ 	rl_redisplay();
+ 
+-	g_list_free(ctrl_list);
++	g_list_free_full(ctrl_list, proxy_leak);
+ 	ctrl_list = NULL;
+ 
+ 	default_ctrl = NULL;
+-
+-	g_list_free(dev_list);
+-	dev_list = NULL;
+ }
+ 
+ static void print_adapter(GDBusProxy *proxy, const char *description)
+@@ -163,7 +165,7 @@ static void print_adapter(GDBusProxy *proxy, const char *description)
+ 				description ? : "",
+ 				description ? "] " : "",
+ 				address, name,
+-				default_ctrl == proxy ? "[default]" : "");
++				default_ctrl && default_ctrl->proxy == proxy ? "[default]" : "");
+ 
+ }
+ 
+@@ -346,10 +348,13 @@ static gboolean service_is_child(GDBusProxy *service)
+ 
+ 	dbus_message_iter_get_basic(&iter, &device);
+ 
+-	for (l = dev_list; l; l = g_list_next(l)) {
+-		GDBusProxy *proxy = l->data;
++	if (!default_ctrl)
++		return FALSE;
++
++	for (l = default_ctrl->devices; l; l = g_list_next(l)) {
++		struct adapter *adapter = l->data;
+ 
+-		path = g_dbus_proxy_get_path(proxy);
++		path = g_dbus_proxy_get_path(adapter->proxy);
+ 
+ 		if (!strcmp(path, device))
+ 			return TRUE;
+@@ -358,6 +363,19 @@ static gboolean service_is_child(GDBusProxy *service)
+ 	return FALSE;
+ }
+ 
++static struct adapter *find_parent(GDBusProxy *device)
++{
++	GList *list;
++
++	for (list = g_list_first(ctrl_list); list; list = g_list_next(list)) {
++		struct adapter *adapter = list->data;
++
++		if (device_is_child(device, adapter->proxy) == TRUE) 
++			return adapter;
++	}
++	return NULL;
++}
++
+ static void set_default_device(GDBusProxy *proxy, const char *attribute)
+ {
+ 	char *desc = NULL;
+@@ -394,8 +412,13 @@ static void device_added(GDBusProxy *proxy)
+ {
+ 	DBusMessageIter iter;
+ 
+-	dev_list = g_list_append(dev_list, proxy);
++	struct adapter *adapter = find_parent(proxy);
++	if (!adapter) {
++		/* TODO: Error */
++		return;
++	}
+ 
++	adapter->devices = g_list_append(adapter->devices, proxy);
+ 	print_device(proxy, COLORED_NEW);
+ 
+ 	if (default_dev)
+@@ -411,6 +434,19 @@ static void device_added(GDBusProxy *proxy)
+ 	}
+ }
+ 
++static void adapter_added(GDBusProxy *proxy)
++{
++	struct adapter *adapter = new0(struct adapter, 1);
++
++	adapter->proxy = proxy;
++	ctrl_list = g_list_append(ctrl_list, adapter);
++
++	if (!default_ctrl)
++		default_ctrl = adapter;
++
++	print_adapter(proxy, COLORED_NEW);
++}
++
+ static void proxy_added(GDBusProxy *proxy, void *user_data)
+ {
+ 	const char *interface;
+@@ -418,16 +454,9 @@ static void proxy_added(GDBusProxy *proxy, void *user_data)
+ 	interface = g_dbus_proxy_get_interface(proxy);
+ 
+ 	if (!strcmp(interface, "org.bluez.Device1")) {
+-		if (device_is_child(proxy, default_ctrl) == TRUE)
+-			device_added(proxy);
+-
++		device_added(proxy);
+ 	} else if (!strcmp(interface, "org.bluez.Adapter1")) {
+-		ctrl_list = g_list_append(ctrl_list, proxy);
+-
+-		if (!default_ctrl)
+-			default_ctrl = proxy;
+-
+-		print_adapter(proxy, COLORED_NEW);
++		adapter_added(proxy);
+ 	} else if (!strcmp(interface, "org.bluez.AgentManager1")) {
+ 		if (!agent_manager) {
+ 			agent_manager = proxy;
+@@ -459,33 +488,56 @@ static void set_default_attribute(GDBusProxy *proxy)
+ 	set_default_device(default_dev, path);
+ }
+ 
+-static void proxy_removed(GDBusProxy *proxy, void *user_data)
++static void device_removed(GDBusProxy *proxy)
+ {
+-	const char *interface;
++	struct adapter *adapter = find_parent(proxy);
++	if (!adapter) {
++		/* TODO: Error */
++		return;
++	}
+ 
+-	interface = g_dbus_proxy_get_interface(proxy);
++	adapter->devices = g_list_remove(adapter->devices, proxy);
+ 
+-	if (!strcmp(interface, "org.bluez.Device1")) {
+-		if (device_is_child(proxy, default_ctrl) == TRUE) {
+-			dev_list = g_list_remove(dev_list, proxy);
++	print_device(proxy, COLORED_DEL);
++
++	if (default_dev == proxy)
++		set_default_device(NULL, NULL);
++}
+ 
+-			print_device(proxy, COLORED_DEL);
++static void adapter_removed(GDBusProxy *proxy)
++{
++	GList *llink;
++
++	for (llink = g_list_first(ctrl_list); llink; llink = g_list_next(llink)) {
++		struct adapter *adapter = llink->data;
+ 
+-			if (default_dev == proxy)
++		if (adapter->proxy == proxy) {
++			print_adapter(proxy, COLORED_DEL);
++
++			if (default_ctrl && default_ctrl->proxy == proxy) {
++				default_ctrl = NULL;
+ 				set_default_device(NULL, NULL);
++			}
++
++			ctrl_list = g_list_remove_link(ctrl_list, llink);
++			g_list_free(adapter->devices);
++			free(adapter);
++			g_list_free(llink);
++			return;
+ 		}
+-	} else if (!strcmp(interface, "org.bluez.Adapter1")) {
+-		ctrl_list = g_list_remove(ctrl_list, proxy);
++	}
++}
+ 
+-		print_adapter(proxy, COLORED_DEL);
++static void proxy_removed(GDBusProxy *proxy, void *user_data)
++{
++	const char *interface;
+ 
+-		if (default_ctrl == proxy) {
+-			default_ctrl = NULL;
+-			set_default_device(NULL, NULL);
++	interface = g_dbus_proxy_get_interface(proxy);
+ 
+-			g_list_free(dev_list);
+-			dev_list = NULL;
+-		}
++	if (!strcmp(interface, "org.bluez.Device1")) {
++		device_removed(proxy);
++	} else if (!strcmp(interface, "org.bluez.Adapter1")) {
++		adapter_removed(proxy);
+ 	} else if (!strcmp(interface, "org.bluez.AgentManager1")) {
+ 		if (agent_manager == proxy) {
+ 			agent_manager = NULL;
+@@ -520,7 +572,7 @@ static void property_changed(GDBusProxy *proxy, const char *name,
+ 	interface = g_dbus_proxy_get_interface(proxy);
+ 
+ 	if (!strcmp(interface, "org.bluez.Device1")) {
+-		if (device_is_child(proxy, default_ctrl) == TRUE) {
++		if (default_ctrl && device_is_child(proxy, default_ctrl->proxy) == TRUE) {
+ 			DBusMessageIter addr_iter;
+ 			char *str;
+ 
+@@ -583,6 +635,27 @@ static void message_handler(DBusConnection *connection,
+ 					dbus_message_get_member(message));
+ }
+ 
++static struct adapter *find_ctrl_by_address(GList *source, const char *address)
++{
++	GList *list;
++
++	for (list = g_list_first(source); list; list = g_list_next(list)) {
++		struct adapter *adapter = list->data;
++		DBusMessageIter iter;
++		const char *str;
++
++		if (g_dbus_proxy_get_property(adapter->proxy, "Address", &iter) == FALSE)
++			continue;
++
++		dbus_message_iter_get_basic(&iter, &str);
++
++		if (!strcmp(str, address))
++			return adapter;
++	}
++
++	return NULL;
++}
++
+ static GDBusProxy *find_proxy_by_address(GList *source, const char *address)
+ {
+ 	GList *list;
+@@ -673,13 +746,14 @@ static void cmd_list(const char *arg)
+ 	GList *list;
+ 
+ 	for (list = g_list_first(ctrl_list); list; list = g_list_next(list)) {
+-		GDBusProxy *proxy = list->data;
+-		print_adapter(proxy, NULL);
++		struct adapter *adapter = list->data;
++		print_adapter(adapter->proxy, NULL);
+ 	}
+ }
+ 
+ static void cmd_show(const char *arg)
+ {
++	struct adapter *adapter;
+ 	GDBusProxy *proxy;
+ 	DBusMessageIter iter;
+ 	const char *address;
+@@ -688,13 +762,14 @@ static void cmd_show(const char *arg)
+ 		if (check_default_ctrl() == FALSE)
+ 			return;
+ 
+-		proxy = default_ctrl;
++		proxy = default_ctrl->proxy;
+ 	} else {
+-		proxy = find_proxy_by_address(ctrl_list, arg);
+-		if (!proxy) {
++		adapter = find_ctrl_by_address(ctrl_list, arg);
++		if (!adapter) {
+ 			rl_printf("Controller %s not available\n", arg);
+ 			return;
+ 		}
++		proxy = adapter->proxy;
+ 	}
+ 
+ 	if (g_dbus_proxy_get_property(proxy, "Address", &iter) == FALSE)
+@@ -716,34 +791,34 @@ static void cmd_show(const char *arg)
+ 
+ static void cmd_select(const char *arg)
+ {
+-	GDBusProxy *proxy;
++	struct adapter *adapter;
+ 
+ 	if (!arg || !strlen(arg)) {
+ 		rl_printf("Missing controller address argument\n");
+ 		return;
+ 	}
+ 
+-	proxy = find_proxy_by_address(ctrl_list, arg);
+-	if (!proxy) {
++	adapter = find_ctrl_by_address(ctrl_list, arg);
++	if (!adapter) {
+ 		rl_printf("Controller %s not available\n", arg);
+ 		return;
+ 	}
+ 
+-	if (default_ctrl == proxy)
++	if (default_ctrl && default_ctrl->proxy == adapter->proxy)
+ 		return;
+ 
+-	default_ctrl = proxy;
+-	print_adapter(proxy, NULL);
+-
+-	g_list_free(dev_list);
+-	dev_list = NULL;
++	default_ctrl = adapter;
++	print_adapter(adapter->proxy, NULL);
+ }
+ 
+ static void cmd_devices(const char *arg)
+ {
+ 	GList *list;
+ 
+-	for (list = g_list_first(dev_list); list; list = g_list_next(list)) {
++	if (check_default_ctrl() == FALSE)
++		return;
++
++	for (list = g_list_first(default_ctrl->devices); list; list = g_list_next(list)) {
+ 		GDBusProxy *proxy = list->data;
+ 		print_device(proxy, NULL);
+ 	}
+@@ -753,7 +828,10 @@ static void cmd_paired_devices(const char *arg)
+ {
+ 	GList *list;
+ 
+-	for (list = g_list_first(dev_list); list; list = g_list_next(list)) {
++	if (check_default_ctrl() == FALSE)
++		return;
++
++	for (list = g_list_first(default_ctrl->devices); list; list = g_list_next(list)) {
+ 		GDBusProxy *proxy = list->data;
+ 		DBusMessageIter iter;
+ 		dbus_bool_t paired;
+@@ -793,7 +871,7 @@ static void cmd_system_alias(const char *arg)
+ 
+ 	name = g_strdup(arg);
+ 
+-	if (g_dbus_proxy_set_property_basic(default_ctrl, "Alias",
++	if (g_dbus_proxy_set_property_basic(default_ctrl->proxy, "Alias",
+ 					DBUS_TYPE_STRING, &name,
+ 					generic_callback, name, g_free) == TRUE)
+ 		return;
+@@ -810,7 +888,7 @@ static void cmd_reset_alias(const char *arg)
+ 
+ 	name = g_strdup("");
+ 
+-	if (g_dbus_proxy_set_property_basic(default_ctrl, "Alias",
++	if (g_dbus_proxy_set_property_basic(default_ctrl->proxy, "Alias",
+ 					DBUS_TYPE_STRING, &name,
+ 					generic_callback, name, g_free) == TRUE)
+ 		return;
+@@ -831,7 +909,7 @@ static void cmd_power(const char *arg)
+ 
+ 	str = g_strdup_printf("power %s", powered == TRUE ? "on" : "off");
+ 
+-	if (g_dbus_proxy_set_property_basic(default_ctrl, "Powered",
++	if (g_dbus_proxy_set_property_basic(default_ctrl->proxy, "Powered",
+ 					DBUS_TYPE_BOOLEAN, &powered,
+ 					generic_callback, str, g_free) == TRUE)
+ 		return;
+@@ -852,7 +930,7 @@ static void cmd_pairable(const char *arg)
+ 
+ 	str = g_strdup_printf("pairable %s", pairable == TRUE ? "on" : "off");
+ 
+-	if (g_dbus_proxy_set_property_basic(default_ctrl, "Pairable",
++	if (g_dbus_proxy_set_property_basic(default_ctrl->proxy, "Pairable",
+ 					DBUS_TYPE_BOOLEAN, &pairable,
+ 					generic_callback, str, g_free) == TRUE)
+ 		return;
+@@ -874,7 +952,7 @@ static void cmd_discoverable(const char *arg)
+ 	str = g_strdup_printf("discoverable %s",
+ 				discoverable == TRUE ? "on" : "off");
+ 
+-	if (g_dbus_proxy_set_property_basic(default_ctrl, "Discoverable",
++	if (g_dbus_proxy_set_property_basic(default_ctrl->proxy, "Discoverable",
+ 					DBUS_TYPE_BOOLEAN, &discoverable,
+ 					generic_callback, str, g_free) == TRUE)
+ 		return;
+@@ -948,7 +1026,7 @@ static void cmd_scan(const char *arg)
+ 	else
+ 		method = "StopDiscovery";
+ 
+-	if (g_dbus_proxy_method_call(default_ctrl, method,
++	if (g_dbus_proxy_method_call(default_ctrl->proxy, method,
+ 				NULL, start_discovery_reply,
+ 				GUINT_TO_POINTER(enable), NULL) == FALSE) {
+ 		rl_printf("Failed to %s discovery\n",
+@@ -1117,7 +1195,7 @@ static void cmd_set_scan_filter_commit(void)
+ 	if (check_default_ctrl() == FALSE)
+ 		return;
+ 
+-	if (g_dbus_proxy_method_call(default_ctrl, "SetDiscoveryFilter",
++	if (g_dbus_proxy_method_call(default_ctrl->proxy, "SetDiscoveryFilter",
+ 		set_discovery_filter_setup, set_discovery_filter_reply,
+ 		&args, NULL) == FALSE) {
+ 		rl_printf("Failed to set discovery filter\n");
+@@ -1206,7 +1284,10 @@ static void cmd_set_scan_filter_clear(const char *arg)
+ 	g_free(filtered_scan_transport);
+ 	filtered_scan_transport = NULL;
+ 
+-	if (g_dbus_proxy_method_call(default_ctrl, "SetDiscoveryFilter",
++	if (check_default_ctrl() == FALSE)
++		return;
++
++	if (g_dbus_proxy_method_call(default_ctrl->proxy, "SetDiscoveryFilter",
+ 		clear_discovery_filter_setup, set_discovery_filter_reply,
+ 		NULL, NULL) == FALSE) {
+ 		rl_printf("Failed to clear discovery filter\n");
+@@ -1224,7 +1305,10 @@ static struct GDBusProxy *find_device(const char *arg)
+ 		return NULL;
+ 	}
+ 
+-	proxy = find_proxy_by_address(dev_list, arg);
++	if (check_default_ctrl() == FALSE)
++		return NULL;
++
++	proxy = find_proxy_by_address(default_ctrl->devices, arg);
+ 	if (!proxy) {
+ 		rl_printf("Device %s not available\n", arg);
+ 		return NULL;
+@@ -1414,8 +1498,11 @@ static void remove_device(GDBusProxy *proxy)
+ 	char *path;
+ 
+ 	path = g_strdup(g_dbus_proxy_get_path(proxy));
++	
++	if (!default_ctrl)
++		return;
+ 
+-	if (g_dbus_proxy_method_call(default_ctrl, "RemoveDevice",
++	if (g_dbus_proxy_method_call(default_ctrl->proxy, "RemoveDevice",
+ 						remove_device_setup,
+ 						remove_device_reply,
+ 						path, g_free) == FALSE) {
+@@ -1439,16 +1526,15 @@ static void cmd_remove(const char *arg)
+ 	if (strcmp(arg, "*") == 0) {
+ 		GList *list;
+ 
+-		for (list = g_list_first(dev_list); list; list = g_list_next(list)) {
++		for (list = g_list_first(default_ctrl->devices); list; list = g_list_next(list)) {
+ 			GDBusProxy *proxy = list->data;
+ 
+ 			remove_device(proxy);
+ 		}
+-
+ 		return;
+ 	}
+ 
+-	proxy = find_proxy_by_address(dev_list, arg);
++	proxy = find_proxy_by_address(default_ctrl->devices, arg);
+ 	if (!proxy) {
+ 		rl_printf("Device %s not available\n", arg);
+ 		return;
+@@ -1484,7 +1570,10 @@ static void cmd_connect(const char *arg)
+ 		return;
+ 	}
+ 
+-	proxy = find_proxy_by_address(dev_list, arg);
++	if (check_default_ctrl() == FALSE)
++		return;
++
++	proxy = find_proxy_by_address(default_ctrl->devices, arg);
+ 	if (!proxy) {
+ 		rl_printf("Device %s not available\n", arg);
+ 		return;
+@@ -1694,7 +1783,7 @@ static void cmd_register_profile(const char *arg)
+ 		return;
+ 	}
+ 
+-	gatt_register_profile(dbus_conn, default_ctrl, &w);
++	gatt_register_profile(dbus_conn, default_ctrl->proxy, &w);
+ 
+ 	wordfree(&w);
+ }
+@@ -1704,7 +1793,7 @@ static void cmd_unregister_profile(const char *arg)
+ 	if (check_default_ctrl() == FALSE)
+ 		return;
+ 
+-	gatt_unregister_profile(dbus_conn, default_ctrl);
++	gatt_unregister_profile(dbus_conn, default_ctrl->proxy);
+ }
+ 
+ static void cmd_version(const char *arg)
+@@ -1750,12 +1839,39 @@ static char *generic_generator(const char *text, int state,
+ 
+ static char *ctrl_generator(const char *text, int state)
+ {
+-	return generic_generator(text, state, ctrl_list, "Address");
++	static int index = 0;
++	static int len = 0;
++	GList *list;
++
++	if (!state) {
++		index = 0;
++		len = strlen(text);
++	}
++
++	for (list = g_list_nth(ctrl_list, index); list;
++						list = g_list_next(list)) {
++		struct adapter *adapter = list->data;
++		DBusMessageIter iter;
++		const char *str;
++
++		index++;
++
++		if (g_dbus_proxy_get_property(adapter->proxy, "Address", &iter) == FALSE)
++			continue;
++
++		dbus_message_iter_get_basic(&iter, &str);
++
++		if (!strncmp(str, text, len))
++			return strdup(str);
++        }
++
++	return NULL;
+ }
+ 
+ static char *dev_generator(const char *text, int state)
+ {
+-	return generic_generator(text, state, dev_list, "Address");
++	return generic_generator(text, state, 
++			default_ctrl ? default_ctrl->devices : NULL, "Address");
+ }
+ 
+ static char *attribute_generator(const char *text, int state)
+@@ -2155,7 +2271,6 @@ int main(int argc, char *argv[])
+ 	g_main_loop_unref(main_loop);
+ 
+ 	g_list_free_full(ctrl_list, proxy_leak);
+-	g_list_free_full(dev_list, proxy_leak);
+ 
+ 	g_free(auto_register_agent);
+ 
+-- 
+2.7.4
 
-Hi Marcel,
-
-On Tue, Aug 16, 2016 at 09:02:14AM +0200, Marcel Holtmann wrote:
-> [...]
-> > +#include <linux/module.h>
-> > +
-> > +#include <linux/clk.h>
-> > +#include <linux/kernel.h>
-> > +#include <linux/init.h>
-> > +#include <linux/types.h>
-> > +#include <linux/fcntl.h>
-> > +#include <linux/interrupt.h>
-> > +#include <linux/ptrace.h>
-> > +#include <linux/poll.h>
-> > +#include <linux/pm_runtime.h>
-> > +#include <linux/firmware.h>
-> > +#include <linux/slab.h>
-> > +#include <linux/tty.h>
-> > +#include <linux/errno.h>
-> > +#include <linux/string.h>
-> > +#include <linux/signal.h>
-> > +#include <linux/ioctl.h>
-> > +#include <linux/skbuff.h>
-> > +#include <linux/delay.h>
-> > +#include <linux/platform_device.h>
-> > +
-> > +#include <linux/gpio/consumer.h>
-> > +
-> > +#include <linux/unaligned/le_struct.h>
->=20
-> are you sure all these includes are needed?
-
-No. A few of them are from previous version of
-the driver. I will clean this up in the next
-version.
-
-> [...]
-> > +static int hci_uart_wait_for_cts(struct hci_uart *hu, bool state,
-> > +				 int timeout_ms)
-> > +{
-> > +	unsigned long timeout;
-> > +	int signal;
-> > +
-> > +	timeout =3D jiffies + msecs_to_jiffies(timeout_ms);
-> > +	for (;;) {
-> > +		signal =3D hu->tty->ops->tiocmget(hu->tty) & TIOCM_CTS;
-> > +		if (!!signal =3D=3D !!state) {
-> > +			dev_dbg(hu->tty->dev, "wait for cts... received!\n");
-> > +			return 0;
-> > +		}
-> > +		if (time_after(jiffies, timeout)) {
-> > +			dev_dbg(hu->tty->dev, "wait for cts... timeout!\n");
-> > +			return -ETIMEDOUT;
-> > +		}
-> > +		usleep_range(1000, 2000);
-> > +	}
-> > +}
->=20
-> This is a super odd function. No return value since we essentially
-> have an endless loop.
-
-I will rewrite it, so that the loop condition checks for timeout.
-
-> > +
-> > +static int btdev_match(struct device *child, void *data)
-> > +{
-> > +	if (!strcmp(child->driver->name, "nokia-bluetooth"))
-> > +		return 1;
-> > +	else
-> > +		return 0;
-> > +}
->=20
-> Anything wrong with just return !strcmp?
-
-No. I had initially debug prints in the cases.
-
-> > +static int nokia_send_alive_packet(struct hci_uart *hu)
-> > +{
-> > +	struct nokia_bt_dev *btdev =3D hu->priv;
-> > +	struct hci_nokia_alive_hdr *hdr;
-> > +	struct hci_nokia_alive_pkt *pkt;
-> > +	struct sk_buff *skb;
-> > +	int len;
-> > +
-> > +	dev_dbg(hu->tty->dev, "Sending alive packet...\n");
-> > +
-> > +	init_completion(&btdev->init_completion);
-> > +
-> > +	len =3D H4_TYPE_SIZE + sizeof(*hdr) + sizeof(*pkt);
-> > +	skb =3D bt_skb_alloc(len, GFP_KERNEL);
-> > +	if (!skb)
-> > +		return -ENOMEM;
-> > +
-> > +	hci_skb_pkt_type(skb) =3D HCI_NOKIA_ALIVE_PKT;
-> > +	memset(skb->data, 0x00, len);
-> > +
-> > +	hdr =3D (struct hci_nokia_alive_hdr *)skb_put(skb, sizeof(*hdr));
-> > +	hdr->dlen =3D sizeof(*pkt);
-> > +	pkt =3D (struct hci_nokia_alive_pkt *)skb_put(skb, sizeof(*pkt));
-> > +	pkt->mid =3D NOKIA_ALIVE_REQ;
-> > +
-> > +	hu->hdev->send(hu->hdev, skb);
->=20
-> I am not sure we want these to go through the Bluetooth core
-> packet sending. They are not standard HCI packet and should stay
-> within the driver. If you send them through the core they will
-> cause problems with the monitor interface.
-
-ok. I will directly call nokia_enqueue().
-
-> > +
-> > +	if (!wait_for_completion_interruptible_timeout(&btdev->init_completio=
-n,
-> > +		msecs_to_jiffies(1000))) {
-> > +		return -ETIMEDOUT;
-> > +	}
-> > +
-> > +	if (btdev->init_error < 0)
-> > +		return btdev->init_error;
-> > +
-> > +	return 0;
-> > +}
-> > +
-> > +static int nokia_send_negotiation(struct hci_uart *hu)
-> > +{
-> > +	struct nokia_bt_dev *btdev =3D hu->priv;
-> > +	struct hci_nokia_neg_cmd *neg_cmd;
-> > +	struct hci_nokia_neg_hdr *neg_hdr;
-> > +	struct sk_buff *skb;
-> > +	int len, err;
-> > +	u16 baud =3D DIV_ROUND_CLOSEST(BT_BAUDRATE_DIVIDER, MAX_BAUD_RATE);
-> > +	int sysclk =3D btdev->btdata->sysclk_speed / 1000;
-> > +
-> > +	dev_dbg(hu->tty->dev, "Sending negotiation...\n");
-> > +
-> > +	len =3D H4_TYPE_SIZE + sizeof(*neg_hdr) + sizeof(*neg_cmd);
-> > +	skb =3D bt_skb_alloc(len, GFP_KERNEL);
-> > +	if (!skb)
-> > +		return -ENOMEM;
-> > +
-> > +	hci_skb_pkt_type(skb) =3D HCI_NOKIA_NEG_PKT;
-> > +
-> > +	neg_hdr =3D (struct hci_nokia_neg_hdr *)skb_put(skb, sizeof(*neg_hdr)=
-);
-> > +	neg_hdr->dlen =3D sizeof(*neg_cmd);
-> > +
-> > +	neg_cmd =3D (struct hci_nokia_neg_cmd *)skb_put(skb, sizeof(*neg_cmd)=
-);
-> > +	neg_cmd->ack =3D NOKIA_NEG_REQ;
-> > +	neg_cmd->baud =3D cpu_to_le16(baud);
-> > +	neg_cmd->unused1 =3D 0x0000;
-> > +	neg_cmd->proto =3D NOKIA_PROTO_BYTE;
-> > +	neg_cmd->sys_clk =3D cpu_to_le16(sysclk);
-> > +	neg_cmd->unused2 =3D 0x0000;
-> > +
-> > +	btdev->init_error =3D 0;
-> > +	init_completion(&btdev->init_completion);
-> > +
-> > +	hu->hdev->send(hu->hdev, skb);
-> > +
-> > +	if (!wait_for_completion_interruptible_timeout(&btdev->init_completio=
-n,
-> > +		msecs_to_jiffies(10000))) {
-> > +		return -ETIMEDOUT;
-> > +	}
-> > +
-> > +	if (btdev->init_error < 0)
-> > +		return btdev->init_error;
-> > +
-> > +	/* Change to operational settings */
-> > +	hci_uart_set_flow_control(hu, true); // disable flow control
->=20
-> Please use a proper comment that explains also
-> disabling flow control.
-
-ok.
-
-> > +
-> > +	/* setup negotiated max. baudrate */
-> > +	hci_uart_set_baudrate(hu, MAX_BAUD_RATE);
-> > +
-> > +	err =3D hci_uart_wait_for_cts(hu, true, 100);
-> > +	if (err < 0)
-> > +		return err;
-> > +
-> > +	hci_uart_set_flow_control(hu, false); // re-enable flow control
-> > +
-> > +	dev_dbg(hu->tty->dev, "Negotiation successful...\n");
-> > +
-> > +	return 0;
-> > +}
-> > +
-> > +static int nokia_setup_fw(struct hci_uart *hu)
-> > +{
-> > +	struct nokia_bt_dev *btdev =3D hu->priv;
-> > +	const struct firmware *fw;
-> > +	const u8 *fw_ptr;
-> > +	size_t fw_size;
-> > +	int err;
-> > +
-> > +	BT_DBG("hu %p", hu);
-> > +
-> > +	err =3D request_firmware(&fw, nokia_get_fw_name(btdev), hu->tty->dev);
->=20
-> So does this nokia_get_fw_name really needs to be a separate
-> function? Or can this just be done right here in this function? I
-> prefer it to be done where it is actually used. Unless you use
-> that name in many places.
-
-I inlined it and dropped CSR support.
-
-> > +	if (err < 0) {
-> > +		BT_ERR("%s: Failed to load Nokia firmware file (%d)",
-> > +		       hu->hdev->name, err);
-> > +		return err;
-> > +	}
-> > +
-> > +	fw_ptr =3D fw->data;
-> > +	fw_size =3D fw->size;
-> > +
-> > +	while (fw_size >=3D 4) {
-> > +		u16 pkt_size =3D get_unaligned_le16(fw_ptr);
-> > +		u8 pkt_type =3D fw_ptr[2];
-> > +		const struct hci_command_hdr *cmd;
-> > +		u16 opcode;
-> > +		struct sk_buff *skb;
-> > +
-> > +		switch (pkt_type) {
-> > +		case HCI_COMMAND_PKT:
-> > +			cmd =3D (struct hci_command_hdr *)(fw_ptr + 3);
-> > +			opcode =3D le16_to_cpu(cmd->opcode);
-> > +
-> > +			skb =3D __hci_cmd_sync(hu->hdev, opcode, cmd->plen,
-> > +					     fw_ptr + 3 + HCI_COMMAND_HDR_SIZE,
-> > +					     HCI_INIT_TIMEOUT);
-> > +			if (IS_ERR(skb)) {
-> > +				err =3D PTR_ERR(skb);
-> > +				BT_ERR("%s: Firmware command %04x failed (%d)",
-> > +				       hu->hdev->name, opcode, err);
-> > +				goto done;
-> > +			}
-> > +			kfree_skb(skb);
-> > +			break;
-> > +		case HCI_NOKIA_RADIO_PKT:
->=20
-> Are you sure you can ignore the RADIO_PKT commands. They are used
-> to set up the FM radio parts of the chip. They are standard HCI
-> commands (in the case of Broadcom at least). At minimum it should
-> be added a comment here that you are ignoring them on purpose.
-
-I got the driver working on N950. I think it does not make use of
-the radio packets at all. On N900 they may be needed, though. I do
-not reach far enough in the firmware loading process to know for
-sure.
-
-If I remember correctly your template driver does bundle it together
-with HCI_COMMAND_PKT, but that does not work, since HCI_NOKIA_RADIO_PKT
-opcode size is u8 instead of u16. I ignored it for now, since I
-could not properly test it.
-
-> > +		case HCI_NOKIA_NEG_PKT:
-> > +		case HCI_NOKIA_ALIVE_PKT:
->=20
-> And here I would also a comment on why are we ignore these
-> commands and driving this all by ourselves.
-
-I think we could use the packets from the firmware instead
-of doing it manually (On N900 they are bit identical to the
-manually generated one - On N950 I have not yet checked), but
-until N900 works having it coded explicitly helps debugging.
-
-> > +			break;
-> > +		}
-> > +
-> > +		fw_ptr +=3D pkt_size + 2;
-> > +		fw_size -=3D pkt_size + 2;
-> > +	}
-> > +
-> > +done:
-> > +	release_firmware(fw);
-> > +	return err;
-> > +}
-> > +
-> > +static int nokia_setup(struct hci_uart *hu)
-> > +{
-> > +	int err;
-> > +
-> > +	pm_runtime_get_sync(hu->tty->dev);
-> > +
-> > +	dev_dbg(hu->tty->dev, "Nokia H4+ protocol setup...\n");
-> > +
-> > +	/* 0. reset connection */
-> > +	err =3D nokia_reset(hu);
-> > +	if (err < 0) {
-> > +		dev_err(hu->tty->dev, "Reset failed: %d\n", err);
-> > +		goto out;
-> > +	}
-> > +
-> > +	/* 1. negotiate speed etc */
-> > +	err =3D nokia_send_negotiation(hu);
-> > +	if (err < 0) {
-> > +		dev_err(hu->tty->dev, "Negotiation failed: %d\n", err);
-> > +		goto out;
-> > +	}
-> > +
-> > +	/* 2. verify correct setup using alive packet */
-> > +	err =3D nokia_send_alive_packet(hu);
-> > +	if (err < 0) {
-> > +		dev_err(hu->tty->dev, "Alive check failed: %d\n", err);
-> > +		goto out;
-> > +	}
-> > +
-> > +	/* 3. send firmware */
-> > +	err =3D nokia_setup_fw(hu);
-> > +	if (err < 0) {
-> > +		dev_err(hu->tty->dev, "Could not setup FW: %d\n", err);
-> > +		goto out;
-> > +	}
-> > +
-> > +	hci_uart_set_flow_control(hu, true);
-> > +	hci_uart_set_baudrate(hu, BC4_MAX_BAUD_RATE);
->=20
-> I think this variable needs a better name if
-> it is common for all vendors.
-
-It is common. I will rename it to MAX_BAUD_RATE and
-old MAX_BAUD_RATE to SETUP_BAUD_RATE.
-
-> > +	hci_uart_set_flow_control(hu, false);
-> > +
-> > +	dev_dbg(hu->tty->dev, "Nokia H4+ protocol setup done!\n");
-> > +
-> > +	/*
-> > +	 * TODO:
-> > +	 * disable wakeup_bt at this point and automatically enable it when
-> > +	 * data is about to be written until all data has been written (+ some
-> > +	 * delay).
-> > +	 *
-> > +	 * Since this is not yet support by the uart/tty kernel framework we
-> > +	 * will always keep enabled the wakeup_bt gpio for now, so that the
-> > +	 * bluetooth chip will never transit into idle modes.
-> > +	 */
-> > +
-> > +out:
-> > +	pm_runtime_put(hu->tty->dev);
-> > +
-> > +	return err;
-> > +}
-> > +
-> > +static int nokia_open(struct hci_uart *hu)
-> > +{
-> > +	struct device *serialdev =3D hu->tty->dev;
-> > +	struct nokia_bt_dev *btdev;
-> > +	struct device *uartbtdev;
-> > +	int err;
-> > +
-> > +	btdev =3D kzalloc(sizeof(*btdev), GFP_KERNEL);
-> > +	if (!btdev)
-> > +		return -ENOMEM;
-> > +
-> > +	btdev->hu =3D hu;
-> > +
-> > +	skb_queue_head_init(&btdev->txq);
-> > +
-> > +	uartbtdev =3D device_find_child(serialdev, NULL, btdev_match);
-> > +	if (!uartbtdev) {
-> > +		dev_err(serialdev, "bluetooth device node not found!\n");
-> > +		return -ENODEV;
-> > +	}
-> > +
-> > +	btdev->btdata =3D dev_get_drvdata(uartbtdev);
-> > +	if (!btdev->btdata)
-> > +		return -EINVAL;
-> > +
-> > +	hu->priv =3D btdev;
-> > +
-> > +	/* register handler for host wakeup gpio */
-> > +	btdev->wake_irq =3D gpiod_to_irq(btdev->btdata->wakeup_host);
-> > +	err =3D request_threaded_irq(btdev->wake_irq, NULL, wakeup_handler,
-> > +		IRQF_TRIGGER_RISING | IRQF_TRIGGER_FALLING | IRQF_ONESHOT,
-> > +		"wakeup", btdev);
-> > +	if (err) {
-> > +		gpiod_set_value(btdev->btdata->reset, 0);
-> > +		gpiod_set_value(btdev->btdata->wakeup_bt, 0);
-> > +		return err;
-> > +	}
-> > +
-> > +	dev_dbg(serialdev, "Nokia H4+ protocol initialized with %s!\n",
-> > +		dev_name(uartbtdev));
-> > +
-> > +	pm_runtime_enable(hu->tty->dev);
-> > +
-> > +	return 0;
-> > +}
-> > +
-> > +static int nokia_flush(struct hci_uart *hu)
-> > +{
-> > +	struct nokia_bt_dev *btdev =3D hu->priv;
-> > +
-> > +	BT_DBG("hu %p", hu);
-> > +
-> > +	skb_queue_purge(&btdev->txq);
-> > +
-> > +	return 0;
-> > +}
-> > +
-> > +static int nokia_close(struct hci_uart *hu)
-> > +{
-> > +	struct nokia_bt_dev *btdev =3D hu->priv;
-> > +
-> > +	hu->priv =3D NULL;
-> > +
-> > +	BT_DBG("hu %p", hu);
-> > +
-> > +	skb_queue_purge(&btdev->txq);
-> > +
-> > +	kfree_skb(btdev->rx_skb);
-> > +
-> > +	free_irq(btdev->wake_irq, btdev);
-> > +
-> > +	/* disable module */
-> > +	gpiod_set_value(btdev->btdata->reset, 0);
-> > +	gpiod_set_value(btdev->btdata->wakeup_bt, 0);
-> > +
-> > +	hu->priv =3D NULL;
-> > +	kfree(btdev);
-> > +
-> > +	pm_runtime_disable(hu->tty->dev);
-> > +
-> > +	return 0;
-> > +}
-> > +
-> > +/* Enqueue frame for transmittion (padding, crc, etc) */
-> > +static int nokia_enqueue(struct hci_uart *hu, struct sk_buff *skb)
-> > +{
-> > +	struct nokia_bt_dev *btdev =3D hu->priv;
-> > +	int err;
-> > +
-> > +	BT_DBG("hu %p skb %p", hu, skb);
-> > +
-> > +	/* Prepend skb with frame type */
-> > +	memcpy(skb_push(skb, 1), &bt_cb(skb)->pkt_type, 1);
-> > +
-> > +	/* Packets must be word aligned */
-> > +	if (skb->len % 2) {
-> > +		err =3D skb_pad(skb, 1);
-> > +		if (err)
-> > +			return err;
-> > +		*skb_put(skb, 1) =3D 0x00;
-> > +	}
-> > +
-> > +	skb_queue_tail(&btdev->txq, skb);
-> > +
-> > +	return 0;
-> > +}
-> > +
-> > +static int nokia_recv_negotiation_packet(struct hci_dev *hdev,
-> > +					 struct sk_buff *skb)
-> > +{
-> > +	struct hci_uart *hu =3D hci_get_drvdata(hdev);
-> > +	struct nokia_bt_dev *btdev =3D hu->priv;
-> > +	struct hci_nokia_neg_hdr *hdr;
-> > +	struct hci_nokia_neg_evt *evt;
-> > +	int ret =3D 0;
-> > +
-> > +	hdr =3D (struct hci_nokia_neg_hdr *)skb->data;
-> > +	if (hdr->dlen !=3D sizeof(*evt)) {
-> > +		btdev->init_error =3D -EIO;
-> > +		ret =3D -EIO;
-> > +		goto finish_neg;
-> > +	}
-> > +
-> > +	evt =3D (struct hci_nokia_neg_evt *)skb_pull(skb, sizeof(*hdr));
-> > +
-> > +	if (evt->ack !=3D NOKIA_NEG_ACK) {
-> > +		dev_err(hu->tty->dev, "Could not negotiate hci_nokia settings\n");
-> > +		btdev->init_error =3D -EINVAL;
-> > +	}
-> > +
-> > +	btdev->man_id =3D evt->man_id;
-> > +	btdev->ver_id =3D evt->ver_id;
-> > +
-> > +	dev_dbg(hu->tty->dev, "NOKIA negotiation:\n");
-> > +	dev_dbg(hu->tty->dev, "\tbaudrate =3D %u\n", evt->baud);
-> > +	dev_dbg(hu->tty->dev, "\tsystem clock =3D %u\n", evt->sys_clk);
-> > +	dev_dbg(hu->tty->dev, "\tmanufacturer id =3D %u\n", evt->man_id);
-> > +	dev_dbg(hu->tty->dev, "\tversion id =3D %u\n", evt->ver_id);
-> > +
-> > +finish_neg:
-> > +	complete(&btdev->init_completion);
-> > +	kfree_skb(skb);
-> > +	return ret;
-> > +}
-> > +
-> > +static int nokia_recv_alive_packet(struct hci_dev *hdev, struct sk_buf=
-f *skb)
-> > +{
-> > +	struct hci_uart *hu =3D hci_get_drvdata(hdev);
-> > +	struct nokia_bt_dev *btdev =3D hu->priv;
-> > +	struct hci_nokia_alive_hdr *hdr;
-> > +	struct hci_nokia_alive_pkt *pkt;
-> > +	int ret =3D 0;
-> > +
-> > +	hdr =3D (struct hci_nokia_alive_hdr *)skb->data;
-> > +	if (hdr->dlen !=3D sizeof(*pkt)) {
-> > +		dev_err(hu->tty->dev, "Corrupted alive message\n");
-> > +		btdev->init_error =3D -EIO;
-> > +		ret =3D -EIO;
-> > +		goto finish_alive;
-> > +	}
-> > +
-> > +	pkt =3D (struct hci_nokia_alive_pkt *)skb_pull(skb, sizeof(*hdr));
-> > +
-> > +	if (pkt->mid !=3D NOKIA_ALIVE_RESP) {
-> > +		dev_err(hu->tty->dev, "Invalid alive response: 0x%02x!\n",
-> > +			pkt->mid);
-> > +		btdev->init_error =3D -EINVAL;
-> > +		goto finish_alive;
-> > +	}
-> > +
-> > +	dev_dbg(hu->tty->dev, "Received alive packet!\n");
-> > +
-> > +finish_alive:
-> > +	complete(&btdev->init_completion);
-> > +	kfree_skb(skb);
-> > +	return ret;
-> > +}
-> > +
-> > +static int nokia_recv_radio(struct hci_dev *hdev, struct sk_buff *skb)
-> > +{
-> > +	/* Packets received on the dedicated radio channel are
-> > +	 * HCI events and so feed them back into the core.
-> > +	 */
-> > +	bt_cb(skb)->pkt_type =3D HCI_EVENT_PKT;
->=20
-> I think using hci_skb_pkt_type(skb) is correct here as well.
-
-ok.
-
-> > +	return hci_recv_frame(hdev, skb);
-> > +}
-> > +
-> > +/* Recv data */
-> > +static const struct h4_recv_pkt nokia_recv_pkts[] =3D {
-> > +	{ NOKIA_RECV_ACL,	.recv =3D hci_recv_frame },
-> > +	{ NOKIA_RECV_SCO,	.recv =3D hci_recv_frame },
-> > +	{ NOKIA_RECV_EVENT,	.recv =3D hci_recv_frame },
-> > +	{ NOKIA_RECV_ALIVE,	.recv =3D nokia_recv_alive_packet },
-> > +	{ NOKIA_RECV_NEG,	.recv =3D nokia_recv_negotiation_packet },
-> > +	{ NOKIA_RECV_RADIO,	.recv =3D nokia_recv_radio },
-> > +};
-> > +
-> > +static int nokia_recv(struct hci_uart *hu, const void *data, int count)
-> > +{
-> > +	struct nokia_bt_dev *btdev =3D hu->priv;
-> > +	int err;
-> > +
-> > +	if (!test_bit(HCI_UART_REGISTERED, &hu->flags))
-> > +		return -EUNATCH;
-> > +
-> > +	btdev->rx_skb =3D h4_recv_buf(hu->hdev, btdev->rx_skb, data, count,
-> > +				  nokia_recv_pkts, ARRAY_SIZE(nokia_recv_pkts));
-> > +	if (IS_ERR(btdev->rx_skb)) {
-> > +		err =3D PTR_ERR(btdev->rx_skb);
-> > +		BT_ERR("%s: Frame reassembly failed (%d)", hu->hdev->name, err);
-> > +		btdev->rx_skb =3D NULL;
-> > +		return err;
-> > +	}
-> > +
-> > +	return count;
-> > +}
-> > +
-> > +static struct sk_buff *nokia_dequeue(struct hci_uart *hu)
-> > +{
-> > +	struct nokia_bt_dev *btdev =3D hu->priv;
-> > +
-> > +	return skb_dequeue(&btdev->txq);
-> > +}
-> > +
-> > +static const struct hci_uart_proto nokia_proto =3D {
-> > +	.id		=3D HCI_UART_NOKIA,
-> > +	.name		=3D "Nokia",
-> > +	.open		=3D nokia_open,
-> > +	.close		=3D nokia_close,
-> > +	.recv		=3D nokia_recv,
-> > +	.enqueue	=3D nokia_enqueue,
-> > +	.dequeue	=3D nokia_dequeue,
-> > +	.flush		=3D nokia_flush,
-> > +	.setup		=3D nokia_setup,
-> > +};
-> > +
-> > +static int nokia_bluetooth_probe(struct platform_device *pdev)
-> > +{
-> > +	struct nokia_uart_dev *btdata;
-> > +	struct device *bcmdev =3D &pdev->dev;
-> > +	struct clk *sysclk;
-> > +	int err =3D 0;
-> > +
-> > +	if(!bcmdev->parent) {
-> > +		dev_err(bcmdev, "parent device missing!\n");
-> > +		return -ENODEV;
-> > +	}
-> > +
-> > +	btdata =3D devm_kmalloc(bcmdev, sizeof(*btdata), GFP_KERNEL);
-> > +	if(!btdata)
-> > +		return -ENOMEM;
-> > +
-> > +	btdata->dev =3D bcmdev;
-> > +	dev_set_drvdata(bcmdev, btdata);
-> > +
-> > +	btdata->port =3D dev_get_drvdata(bcmdev->parent);
-> > +	if(!btdata->port) {
-> > +		dev_err(bcmdev, "port data missing in parent device!\n");
-> > +		return -ENODEV;
-> > +	}
-> > +
-> > +	btdata->reset =3D devm_gpiod_get(bcmdev, "reset", GPIOD_OUT_LOW);
-> > +	if (IS_ERR(btdata->reset)) {
-> > +		err =3D PTR_ERR(btdata->reset);
-> > +		dev_err(bcmdev, "could not get reset gpio: %d\n", err);
-> > +		return err;
-> > +	}
-> > +
-> > +	btdata->wakeup_host =3D devm_gpiod_get(bcmdev, "host-wakeup", GPIOD_I=
-N);
-> > +	if (IS_ERR(btdata->wakeup_host)) {
-> > +		err =3D PTR_ERR(btdata->wakeup_host);
-> > +		dev_err(bcmdev, "could not get host wakeup gpio: %d\n", err);
-> > +		return err;
-> > +	}
-> > +
-> > +
-> > +	btdata->wakeup_bt =3D devm_gpiod_get(bcmdev, "bluetooth-wakeup",
-> > +					    GPIOD_OUT_LOW);
-> > +	if (IS_ERR(btdata->wakeup_bt)) {
-> > +		err =3D PTR_ERR(btdata->wakeup_bt);
-> > +		dev_err(bcmdev, "could not get BT wakeup gpio: %d\n", err);
-> > +		return err;
-> > +	}
-> > +
-> > +	sysclk =3D devm_clk_get(bcmdev, "sysclk");
-> > +	if (IS_ERR(sysclk)) {
-> > +		err =3D PTR_ERR(sysclk);
-> > +		dev_err(bcmdev, "could not get sysclk: %d\n", err);
-> > +		return err;
-> > +	}
-> > +
-> > +	clk_prepare_enable(sysclk);
-> > +	btdata->sysclk_speed =3D clk_get_rate(sysclk);
-> > +	clk_disable_unprepare(sysclk);
-> > +
-> > +	dev_dbg(bcmdev, "parent uart: %s\n", dev_name(bcmdev->parent));
-> > +	dev_dbg(bcmdev, "sysclk speed: %ld kHz\n", btdata->sysclk_speed / 100=
-0);
-> > +
-> > +	/* TODO: open tty and setup line disector from kernel-side */
-> > +
-> > +	return err;
-> > +}
-> > +
-> > +static const struct of_device_id nokia_bluetooth_of_match[] =3D {
-> > +	{ .compatible =3D "nokia,brcm,bcm2048", },
-> > +	{ .compatible =3D "nokia,ti,wl1271-bluetooth", },
->=20
-> Where is the CSR BC4 one here? I prefer if we only have support
-> for the ones that are actually supported and detected. We can
-> easily extend things later.
-
-I will drop CSR stuff. I don't have a device to test it.
-
-> > +	{},
-> > +};
-> > +MODULE_DEVICE_TABLE(of, nokia_bluetooth_of_match);
-> > +
-> > +static struct platform_driver platform_nokia_driver =3D {
-> > +	.driver =3D {
-> > +		.name =3D "nokia-bluetooth",
-> > +		.of_match_table =3D nokia_bluetooth_of_match,
-> > +	},
-> > +	.probe =3D nokia_bluetooth_probe,
-> > +};
-> > +
-> > +int __init nokia_init(void)
-> > +{
-> > +	platform_driver_register(&platform_nokia_driver);
-> > +	return hci_uart_register_proto(&nokia_proto);
-> > +}
-> > +
-> > +int __exit nokia_deinit(void)
-> > +{
-> > +	platform_driver_unregister(&platform_nokia_driver);
-> > +	return hci_uart_unregister_proto(&nokia_proto);
-> > +}
-> > diff --git a/drivers/bluetooth/hci_nokia.h b/drivers/bluetooth/hci_noki=
-a.h
-> > new file mode 100644
-> > index 000000000000..8c4d307840e5
-> > --- /dev/null
-> > +++ b/drivers/bluetooth/hci_nokia.h
-> > @@ -0,0 +1,140 @@
-> > +/*
-> > + *  Copyright (C) 2016 Sebastian Reichel <sre@kernel.org>
-> > + *
-> > + *  This program is free software; you can redistribute it and/or modi=
-fy
-> > + *  it under the terms of the GNU General Public License as published =
-by
-> > + *  the Free Software Foundation; either version 2 of the License, or
-> > + *  (at your option) any later version.
-> > + *
-> > + *  This program is distributed in the hope that it will be useful,
-> > + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-> > + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> > + *  GNU General Public License for more details.
-> > + */
-> > +
-> > +#ifndef __HCI_NOKIA_H
-> > +#define __HCI_NOKIA_H
->=20
-> Lets not do a separate header here. Just move this all into
-> hci_nokia.c. There is really zero benefit in the header.
-
-ok.
-
-> > +
-> > +#define NOKIA_ID_CSR		0x02
-> > +#define NOKIA_ID_BCM2048	0x04
-> > +#define NOKIA_ID_TI1271		0x31
-> > +
-> > +#define FIRMWARE_CSR		"nokia/bc4fw.bin"
->=20
-> If the CSR ones are not yet supported, then leave them out for
-> now. We can add this later.
->=20
-> > +#define FIRMWARE_BCM2048	"nokia/bcmfw.bin"
-> > +#define FIRMWARE_TI1271		"nokia/ti1273.bin"
-> > +
-> > +#define NOKIA_BCM_BDADDR	0xfc01
->=20
-> We have btbcm.[ch] for this.
-
-ah this is a leftover. Currently the driver does not set
-set_bdaddr() callback, since it differs between ti and bcm backend.
-It looks like btbcm_set_bdaddr() can be used for the broadcom based
-chips, though.
-
-> > +#define HCI_NOKIA_NEG_PKT	0x06
-> > +#define HCI_NOKIA_ALIVE_PKT	0x07
-> > +#define HCI_NOKIA_RADIO_PKT	0x08
-> > +
-> > +#define HCI_NOKIA_NEG_HDR_SIZE		1
-> > +#define HCI_NOKIA_MAX_NEG_SIZE		255
-> > +#define HCI_NOKIA_ALIVE_HDR_SIZE	1
-> > +#define HCI_NOKIA_MAX_ALIVE_SIZE	255
-> > +#define HCI_NOKIA_RADIO_HDR_SIZE	2
-> > +#define HCI_NOKIA_MAX_RADIO_SIZE	255
-> > +
-> > +#define NOKIA_PROTO_PKT		0x44
-> > +#define NOKIA_PROTO_BYTE	0x4c
-> > +
-> > +#define NOKIA_NEG_REQ		0x00
-> > +#define NOKIA_NEG_ACK		0x20
-> > +#define NOKIA_NEG_NAK		0x40
-> > +
-> > +#define H4_TYPE_SIZE		1
->=20
-> I am not sure this define adds any overall value to the code.
->=20
-> > +
-> > +#define NOKIA_RECV_ACL \
-> > +	H4_RECV_ACL, \
-> > +	.wordaligned =3D true
-> > +
-> > +#define NOKIA_RECV_SCO \
-> > +	H4_RECV_SCO, \
-> > +	.wordaligned =3D true
-> > +
-> > +#define NOKIA_RECV_EVENT \
-> > +	H4_RECV_EVENT, \
-> > +	.wordaligned =3D true
-> > +
-> > +#define NOKIA_RECV_ALIVE \
-> > +	.type =3D HCI_NOKIA_ALIVE_PKT, \
-> > +	.hlen =3D HCI_NOKIA_ALIVE_HDR_SIZE, \
-> > +	.loff =3D 0, \
-> > +	.lsize =3D 1, \
-> > +	.maxlen =3D HCI_NOKIA_MAX_ALIVE_SIZE, \
-> > +	.wordaligned =3D true
-> > +
-> > +#define NOKIA_RECV_NEG \
-> > +	.type =3D HCI_NOKIA_NEG_PKT, \
-> > +	.hlen =3D HCI_NOKIA_NEG_HDR_SIZE, \
-> > +	.loff =3D 0, \
-> > +	.lsize =3D 1, \
-> > +	.maxlen =3D HCI_NOKIA_MAX_NEG_SIZE, \
-> > +	.wordaligned =3D true
-> > +
-> > +#define NOKIA_RECV_RADIO \
-> > +	.type =3D HCI_NOKIA_RADIO_PKT, \
-> > +	.hlen =3D HCI_NOKIA_RADIO_HDR_SIZE, \
-> > +	.loff =3D 1, \
-> > +	.lsize =3D 1, \
-> > +	.maxlen =3D HCI_NOKIA_MAX_RADIO_SIZE, \
-> > +	.wordaligned =3D true
->=20
-> For this ones I would have use the HCI event ones.
-> My original patch had this:
->=20
-> +#define NOK_RECV_NEG \
-> +	.type =3D NOK_NEG_PKT, \
-> +	.hlen =3D NOK_NEG_HDR_SIZE, \
-> +	.loff =3D 0, \
-> +	.lsize =3D 1, \
-> +	.maxlen =3D HCI_MAX_EVENT_SIZE
-> +
-> +#define NOK_RECV_ALIVE \
-> +	.type =3D NOK_ALIVE_PKT, \
-> +	.hlen =3D NOK_ALIVE_HDR_SIZE, \
-> +	.loff =3D 0, \
-> +	.lsize =3D 1, \
-> +	.maxlen =3D HCI_MAX_EVENT_SIZE
-> +
-> +#define NOK_RECV_RADIO \
-> +	.type =3D NOK_RADIO_PKT, \
-> +	.hlen =3D HCI_EVENT_HDR_SIZE, \
-> +	.loff =3D 1, \
-> +	.lsize =3D 1, \
-> +	.maxlen =3D HCI_MAX_EVENT_SIZE
-> +
-> +static const struct h4_recv_pkt nok_recv_pkts[] =3D {
-> +	{ H4_RECV_ACL,    .recv =3D hci_recv_frame },
-> +	{ H4_RECV_SCO,    .recv =3D hci_recv_frame },
-> +	{ H4_RECV_EVENT,  .recv =3D hci_recv_frame },
-> +	{ NOK_RECV_NEG,   .recv =3D nok_recv_neg   },
-> +	{ NOK_RECV_ALIVE, .recv =3D nok_recv_alive },
-> +	{ NOK_RECV_RADIO, .recv =3D nok_recv_radio },
->=20
-> With just these simple defines at the top:
->=20
-> +#define NOK_NEG_PKT	0x06
-> +#define NOK_ALIVE_PKT	0x07
-> +#define NOK_RADIO_PKT	0x08
-> +
-> +#define NOK_NEG_HDR_SIZE	1
-> +#define NOK_ALIVE_HDR_SIZE	1
->=20
-> And I would prefer if we keep it like that.
-
-ok. I used explicit defines, since it looks like
-a copy/paste error otherwise.
-
-> > +
-> > +struct hci_nokia_neg_hdr {
-> > +	__u8	dlen;
-> > +} __packed;
-> > +
-> > +struct hci_nokia_neg_cmd {
-> > +	__u8	ack;
-> > +	__u16	baud;
-> > +	__u16	unused1;
-> > +	__u8	proto;
-> > +	__u16	sys_clk;
-> > +	__u16	unused2;
-> > +} __packed;
-> > +
-> > +static inline struct hci_nokia_neg_hdr *hci_nokia_neg_hdr(const struct=
- sk_buff *skb)
-> > +{
-> > +	return (struct hci_nokia_neg_hdr *) skb->data;
-> > +}
->=20
-> What good is this inline? A define would be way better, if really
-> needed.
-
-I will drop hci_nokia_neg_hdr() and hci_nokia_alive_hdr() inlines
-
-> [...]
-
--- Sebastian
-
---ih4qhin7qfdlbn7f
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
-
-iQIcBAEBCgAGBQJXstheAAoJENju1/PIO/qavL4P/2mXeF6HkHrp4sTBSlgcir6d
-lZixXfxdPHPxQl5eBYXQGwxsBijPsMn/9iK6UHUoFTCsrsrUn+TwQUago6YC379E
-054UvFUWSWB1Gx/IrD9BBinZsmpQQzhhLFtNlvl6b4QUvivVXtXiNbFQjjvOBvRG
-ZcHLmV61wsjlfcXt6urhlbTgMxr2I0NvuEL1ujvF7nfJ+mMTmTMwfi66FDERNnuA
-4/41iQFrmIhXI7yimWYAVX1yWBC8l+QfHX6X9Cz5DWIkqMHzoUZVwQ/3oBHvrlU7
-oEIoGfqoPcUpBYOwVqmFjAHuCo4FpizejTrOdYFbIDVFAhVR2cfHV8RXd+RNaIrj
-BO6x4NTPeVY7IMxE/qBfSZqK99+37OUwdVc0lYoLrJ3C7yIb2wZM2AJ74rJqTUzF
-jXJnE8vVaVCfuYdu8TFx4xFBafpyfEj7rG9WLllMKRvIePfRgHiqq8MP5BjL+MTX
-Sf04FX4P12o9mnCPqKP8BDX8kmbt062OiHpxE2zDiWrEq0AMSUnaOiSJ967b4FuA
-loi9RuyOev+CSPQy4Wi+jQRmpj2u/l+9OEnCIUOQCJ9MKUm4upbV9H4EMA2U/goC
-ipdcjf3YaqdFS0FFHx/sHY7ctzI5ykmcoN0vRdjTWBWU1QHk4C35+lMB8buaAVFL
-1Z9Eo/peKJyIE+7fUia4
-=HRQ0
------END PGP SIGNATURE-----
-
---ih4qhin7qfdlbn7f--
