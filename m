@@ -1,99 +1,57 @@
-Return-Path: <robherring2@gmail.com>
-Date: Tue, 16 Aug 2016 08:51:55 -0500
-From: Rob Herring <robh@kernel.org>
-To: Sebastian Reichel <sre@kernel.org>
-Cc: Tony Lindgren <tony@atomide.com>, Mark Rutland <mark.rutland@arm.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Jiri Slaby <jslaby@suse.com>, Ville Tervo <ville.tervo@iki.fi>,
-	Filip =?utf-8?Q?Matijevi=C4=87?= <filip.matijevic.pz@gmail.com>,
-	Aaro Koskinen <aaro.koskinen@iki.fi>, Pavel Machek <pavel@ucw.cz>,
-	Pali =?iso-8859-1?Q?Roh=E1r?= <pali.rohar@gmail.com>,
-	ivo.g.dimitrov.75@gmail.com, linux-bluetooth@vger.kernel.org,
-	linux-serial@vger.kernel.org, linux-omap@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [RFC 3/7] dt: bindings: Add nokia-bluetooth
-Message-ID: <20160816135155.GA20948@rob-hp-laptop>
-References: <1471058078-5579-1-git-send-email-sre@kernel.org>
- <1471058078-5579-4-git-send-email-sre@kernel.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1471058078-5579-4-git-send-email-sre@kernel.org>
+In-Reply-To: <CAMj0Yyu_uh9s8rhSa36T73PRRzGNubs1f_kLYFngmFS6hH-swA@mail.gmail.com>
+References: <CAMj0Yyu7Ot6xzCxTh0puAuVeV-jBuspSDMLxg_R0Y4V068zHhg@mail.gmail.com>
+ <CABBYNZJnSZtmEkBb8T4urYhHw2+pqAKu77d_g3_eJ1nw=02D7A@mail.gmail.com>
+ <CAMj0Yys1efPQoZPPHbPKs54c9DFWRfFjhkt4Pe3K-fYaZZiarw@mail.gmail.com>
+ <CABBYNZLNzLx0+BGgLzubwOHUaMcyde6bL1hhxrHtfskt9OGbzg@mail.gmail.com>
+ <CAMj0YytVTxHLY-Mkrjy9PEvNPVd-2GmX9vAK5PeLVo+kSCvAZw@mail.gmail.com>
+ <CANBo3n9=-VeFh2EAwm5EcSHgBuZUzFyJDwMZDR29wwKrmgKvVg@mail.gmail.com>
+ <CAMj0YytkTtekdgHnZSWbHW+zwdANvMNjgaKfym6a4n5mKWaM_Q@mail.gmail.com>
+ <CAMj0Yyu1CKr934V0jcFeeY9QEYSMoS6XO+3hjQNshGE4pFe2cg@mail.gmail.com>
+ <CANBo3n_NVJCha8qLAan_9yEmk_9HPuaXK96MDT8S4DTqp=_y-w@mail.gmail.com>
+ <CAMj0YyuTWMxc0xJZp=z-7smmtXNtiOMy-FS4d7ePH1s-C+hVCQ@mail.gmail.com> <CAMj0Yyu_uh9s8rhSa36T73PRRzGNubs1f_kLYFngmFS6hH-swA@mail.gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Tue, 16 Aug 2016 16:11:46 +0300
+Message-ID: <CABBYNZJZtU23ryoE6BUoDWD-BQMpahhVJn8rPDYn-1UX-=VOeQ@mail.gmail.com>
+Subject: Re: BT PAN Connection - NAP with PANU ?
+To: Ajay Parashar <ajay.parasha@gmail.com>
+Cc: bharat panda <bharat22bhusan@gmail.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Sat, Aug 13, 2016 at 05:14:34AM +0200, Sebastian Reichel wrote:
-> ---
->  .../devicetree/bindings/net/nokia-bluetooth.txt    | 43 ++++++++++++++++++++++
->  1 file changed, 43 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/net/nokia-bluetooth.txt
-> 
-> diff --git a/Documentation/devicetree/bindings/net/nokia-bluetooth.txt b/Documentation/devicetree/bindings/net/nokia-bluetooth.txt
-> new file mode 100644
-> index 000000000000..a0fceabb4cce
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/net/nokia-bluetooth.txt
-> @@ -0,0 +1,43 @@
-> +Nokia bluetooth UART devices
-> +------
-> +
-> +Some vendors have custom versions of their chips, that can be found in Nokia
-> +devices. These chips are controlled differently, than the non-Nokia version,
-> +so a different binding is required. All chips listed here implement the Nokia
-> +H4+ protocol.
-> +
-> +Required properties:
-> +
-> +  - compatible: should be one of the following:
-> +	* "nokia,brcm,bcm2048"
-> +	* "nokia,ti,wl1271-bluetooth"
+Hi Ajay,
 
-Perhaps these should be 2 separate strings. Something like 
-'"nokia,n900-bt", "brcm,bcm2048"'. However, if they are in no way 
-compatible with the default version from the vendors, then just a single 
-string is fine, but it doesn't need to be aligned to the vendor 
-compatible string. So just "nokia,n900-bcm2048" or similar is fine.
+>> Hi Bharat,
+>>
+>> I hope this issue has resolve at your end?
+>>
+>> i did the change as suggested by you but it did not resolve the issue.
+>> For your reference i am attaching bluetooth.conf with my change at
+>> line number 21,  can you please confirm is this the only change
+>> required ? or some more changes need to do ?
+>>
+>> I have 1 more question the interfaces name mentioned in
+>> bluetooth.conf does not match with my set up. Again i am attaching
+>> snapshot of my setup.
+>>
+>> Please let me know how this issue can be resolved at my end ?
+>>
+>> Regards
+>> Ajay
+>
+> Hi,
+>
+> Can you please provide update regarding this issue?
+> How can i solve this , i am very much locked here.
 
-> +  - reset-gpios:		Should specify the gpio for bluetooth reset
-> +  - host-wakeup-gpios:		Should specify the gpio for host wakeup
+Usage: ./test-network <address> [service]
 
-Should be interrupt instead?
+There should be a device object for the given address and it must
+implement org.bluez.Network1 interface, if that doesn't exist than it
+is probably due to missing SDP record.
 
-> +  - bluetooth-wakeup-gpios:	Should specify the gpio for bluetooth wakeup
-
-State direction and active state for gpios.
-
-> +  - clock-names:		Should be "sysclk"
-> +  - clocks:			Should contain a clock phandle for system clock
-> +
-> +Example:
-> +
-> +/ {
-> +	/* controlled (enabled/disabled) directly by wl1271 */
-> +	vctcxo: vctcxo {
-> +		compatible = "fixed-clock";
-> +		#clock-cells = <0>;
-> +		clock-frequency = <38400000>;
-> +	};
-> +};
-> +
-> +&uart2 {
-
-I want to see a common serial device binding doc before accepting any 
-device bindings. It's not going to say much initially other than devices 
-are child nodes of uarts. Perhaps something on baudrate settings.
-
-> +	bluetooth {
-> +		compatible = "nokia,ti,wl1271-bluetooth";
-> +
-> +		reset-gpios = <&gpio1 26 GPIO_ACTIVE_HIGH>; /* 26 */
-> +		host-wakeup-gpios = <&gpio4 5 GPIO_ACTIVE_HIGH>; /* 101 */
-> +		bluetooth-wakeup-gpios = <&gpio2 5 GPIO_ACTIVE_HIGH>; /* 37 */
-> +
-> +		clocks = <&vctcxo>;
-> +		clock-names = "sysclk";
-> +	};
-> +
-> +};
-> -- 
-> 2.8.1
-> 
+-- 
+Luiz Augusto von Dentz
