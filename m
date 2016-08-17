@@ -1,95 +1,586 @@
-Return-Path: <linux-kernel-owner@vger.kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
-Subject: Re: [PATCH v2] Bluetooth: Add LED triggers for HCI frames tx and rx
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CAFGCpxx7teWAGzw+-uy+nwoHgsS__8S-CdfGuNuycCUuWJRC+Q@mail.gmail.com>
-Date: Wed, 17 Aug 2016 09:40:46 +0200
-Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	"open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-	Network Development <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
-Message-Id: <7B1B501B-73E5-49E8-B147-25D9EEFC789D@holtmann.org>
-References: <1469939084-15603-1-git-send-email-guodong.xu@linaro.org> <1394C970-3726-4C42-A06D-0B3B3015D980@holtmann.org> <CAFGCpxz6j_7aOTX+uShdpyxmt71k61v=Abdw=7MfrRjvdygmTg@mail.gmail.com> <30869CE7-FE5E-4CAF-86FC-D140E2C0963D@holtmann.org> <CAFGCpxx7teWAGzw+-uy+nwoHgsS__8S-CdfGuNuycCUuWJRC+Q@mail.gmail.com>
-To: Guodong Xu <guodong.xu@linaro.org>
-Sender: linux-kernel-owner@vger.kernel.org
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: =?UTF-8?q?Micha=C5=82=20Narajowski?=
+	<michal.narajowski@codecoup.pl>
+To: linux-bluetooth@vger.kernel.org
+Cc: =?UTF-8?q?Micha=C5=82=20Narajowski?=
+	<michal.narajowski@codecoup.pl>
+Subject: [PATCH BlueZ v3] client: Add better support for managing devices of multiple controllers
+Date: Wed, 17 Aug 2016 09:36:17 +0200
+Message-Id: <1471419377-9522-1-git-send-email-michal.narajowski@codecoup.pl>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Guodong,
+Previously devices list was cleared when selecting new default
+controller. Now devices list is preserverd allowing to list and suggest
+devices for default controller even after changing the default
+controller.
+---
+ Makefile.tools |   2 +-
+ client/main.c  | 262 +++++++++++++++++++++++++++++++++++++++++----------------
+ 2 files changed, 189 insertions(+), 75 deletions(-)
 
->>>>> Two LED triggers are added into hci_dev: tx_led and rx_led. Upon ACL/SCO
->>>>> packets available in tx or rx, the LEDs will blink.
->>>>> 
->>>>> For each hci registration, two triggers are added into LED subsystem:
->>>>> [hdev->name]-tx and [hdev-name]-rx.
->>>>> Refer to Documentation/leds/leds-class.txt for usage.
->>>>> 
->>>>> Verified on HiKey 96boards, which uses HiSilicon hi6220 SoC and TI
->>>>> WL1835 WiFi/BT combo chip.
->>>> 
->>>> so I have no idea what to do with adding adding hci0-rx and hci0-tx triggers. Combined with hci0-power trigger these are already 3 triggers. And if you have 2 Bluetooth controllers in your system, then you have 6 triggers.
->>>> 
->>> 
->>> True, 6 triggers. But, taking example for other subsytems, eg. cpu
->>> cores. On my board, I have "heartbeat cpu0 cpu1 cpu2 cpu3 cpu4 cpu5
->>> cpu6 cpu7". It doesn't have to mean you need all of them connected to
->>> some LED(s). Actually, in most of the case, I only need heartbeat.
->>> 
->>> 
->>> 
->>>> If we then maybe add another trigger, then this number just goes up and up.
->>>> 
->>>> As far as I can tell you can only assign a single trigger to a LED.
->>>> 
->>> 
->>> That's true. And people got a choice of which feature he wants to visualize.
->> 
->> and as a result we keep adding senseless triggers to the kernel and bloating it up for no reason. Especially since it feels like 99% of the LED triggers are not used at all. This makes no sense to me.
->> 
->>>> So this means to even use these triggers, you need now 3 LEDs per Bluetooth controller. How is that useful for anybody in a real system? Maybe I am missing something here and somehow there is magic to combine triggers, but I have not found it yet. So please someone enlighten me on how this is suppose to be used with real devices.
->>>> 
->>>> Recently I have added a simple bluetooth-power trigger that combines all Bluetooth controllers into a single trigger. If any of them is enabled, then you can control your LED. Which makes a lot more sense to me since you most likely have a single Bluetooth LED on your system. And you want it to show the correct state no matter what Bluetooth controller is in use. However I can see the case that someone might want to assign one specific Bluetooth controller to a LED status.
->>>> 
->>>> So instead of adding many independent triggers to each controller, why not create one global bluetooth trigger and one individual bluetooth-hci0 trigger for each controller. And the combine power, tx, rx and whatever else we need to trigger the LED for?
->>>> 
->>> 
->>> When I starting this work, I referred to WiFi system. See
->>> CONFIG_MAC80211_LEDS. WiFi system implements these types of triggers "
->>> phy0rx phy0tx phy0assoc phy0radio" for each 'controller'.
->> 
->> And I actually wonder who ever used these triggers. You need 4 LEDs to visualize the WiFi status. Which systems has 4 LEDs to spare to visualize this.
->> 
->>> Besides, there are also RFKILL which stands for WiFi/BT power status.
->>> RFKILL adds triggers for each module too. Eg. in the below example, I
->>> have one WiFi (phy0), one BT (hci0). Trigger rfkill1 equals to
->>> hci0-power.
->>> 
->>> Ref: here are all LED triggers I found in my 96boards/HiKey:
->>> 
->>> # cat trigger
->>> none kbd-scrollock kbd-numlock kbd-capslock kbd-kanalock kbd-shiftlock
->>> kbd-altgrlock kbd-ctrllock kbd-altlock kbd-shiftllock kbd-shiftrlock
->>> kbd-ctrlllock kbd-ctrlrlock mmc0 mmc1 heartbeat cpu0 cpu1 cpu2 cpu3
->>> cpu4 cpu5 cpu6 cpu7 mmc2 rfkill0 phy0rx phy0tx phy0assoc phy0radio
->>> hci0-power hci0-tx [hci0-rx] rfkill1
->> 
->> And how many LEDs do you have in the your system? I think you are making my point here.
->> 
->> So I think what we need to do is to not add to this madness and instead create one "bluetooth" LED trigger that combines power and TX/RX for all controllers. And then allow for individual "bluetooth-hci0" LED triggers so that you can bind a single Bluetooth controller to a single LED.
->> 
->> For me, if I can not combine hci0-power, hci0-tx and hci0-rx into a single LED,
-> 
-> By combining them into a single LED, do you mean such a use case?
-> - when hci0 is powered on, this LED starts on.
-> - then, when there is tx/rx traffic, this LED should blink (reversely
-> of course).
-> - when hci0 is powered off, this LED turns off.
+diff --git a/Makefile.tools b/Makefile.tools
+index 7706dc7..944c8e9 100644
+--- a/Makefile.tools
++++ b/Makefile.tools
+@@ -10,7 +10,7 @@ client_bluetoothctl_SOURCES = client/main.c \
+ 					client/gatt.h client/gatt.c \
+ 					monitor/uuid.h monitor/uuid.c
+ client_bluetoothctl_LDADD = gdbus/libgdbus-internal.la @GLIB_LIBS@ @DBUS_LIBS@ \
+-				-lreadline
++				-lreadline src/libshared-mainloop.la
+ endif
+ 
+ if MONITOR
+diff --git a/client/main.c b/client/main.c
+index 1ceddb0..af98354 100644
+--- a/client/main.c
++++ b/client/main.c
+@@ -38,6 +38,7 @@
+ #include <readline/history.h>
+ #include <glib.h>
+ 
++#include "src/shared/util.h"
+ #include "gdbus/gdbus.h"
+ #include "monitor/uuid.h"
+ #include "agent.h"
+@@ -59,13 +60,16 @@ static DBusConnection *dbus_conn;
+ static GDBusProxy *agent_manager;
+ static char *auto_register_agent = NULL;
+ 
+-static GDBusProxy *ad_manager;
++struct adapter {
++	GDBusProxy *proxy;
++	GList *devices;
++};
+ 
+-static GDBusProxy *default_ctrl;
++static struct adapter *default_ctrl;
+ static GDBusProxy *default_dev;
+ static GDBusProxy *default_attr;
++static GDBusProxy *ad_manager;
+ static GList *ctrl_list;
+-static GList *dev_list;
+ 
+ static guint input = 0;
+ 
+@@ -145,13 +149,10 @@ static void disconnect_handler(DBusConnection *connection, void *user_data)
+ 	rl_on_new_line();
+ 	rl_redisplay();
+ 
+-	g_list_free(ctrl_list);
++	g_list_free_full(ctrl_list, proxy_leak);
+ 	ctrl_list = NULL;
+ 
+ 	default_ctrl = NULL;
+-
+-	g_list_free(dev_list);
+-	dev_list = NULL;
+ }
+ 
+ static void print_adapter(GDBusProxy *proxy, const char *description)
+@@ -174,7 +175,7 @@ static void print_adapter(GDBusProxy *proxy, const char *description)
+ 				description ? : "",
+ 				description ? "] " : "",
+ 				address, name,
+-				default_ctrl == proxy ? "[default]" : "");
++				default_ctrl && default_ctrl->proxy == proxy ? "[default]" : "");
+ 
+ }
+ 
+@@ -357,10 +358,13 @@ static gboolean service_is_child(GDBusProxy *service)
+ 
+ 	dbus_message_iter_get_basic(&iter, &device);
+ 
+-	for (l = dev_list; l; l = g_list_next(l)) {
+-		GDBusProxy *proxy = l->data;
++	if (!default_ctrl)
++		return FALSE;
++
++	for (l = default_ctrl->devices; l; l = g_list_next(l)) {
++		struct adapter *adapter = l->data;
+ 
+-		path = g_dbus_proxy_get_path(proxy);
++		path = g_dbus_proxy_get_path(adapter->proxy);
+ 
+ 		if (!strcmp(path, device))
+ 			return TRUE;
+@@ -369,6 +373,19 @@ static gboolean service_is_child(GDBusProxy *service)
+ 	return FALSE;
+ }
+ 
++static struct adapter *find_parent(GDBusProxy *device)
++{
++	GList *list;
++
++	for (list = g_list_first(ctrl_list); list; list = g_list_next(list)) {
++		struct adapter *adapter = list->data;
++
++		if (device_is_child(device, adapter->proxy) == TRUE) 
++			return adapter;
++	}
++	return NULL;
++}
++
+ static void set_default_device(GDBusProxy *proxy, const char *attribute)
+ {
+ 	char *desc = NULL;
+@@ -405,8 +422,13 @@ static void device_added(GDBusProxy *proxy)
+ {
+ 	DBusMessageIter iter;
+ 
+-	dev_list = g_list_append(dev_list, proxy);
++	struct adapter *adapter = find_parent(proxy);
++	if (!adapter) {
++		/* TODO: Error */
++		return;
++	}
+ 
++	adapter->devices = g_list_append(adapter->devices, proxy);
+ 	print_device(proxy, COLORED_NEW);
+ 
+ 	if (default_dev)
+@@ -422,6 +444,19 @@ static void device_added(GDBusProxy *proxy)
+ 	}
+ }
+ 
++static void adapter_added(GDBusProxy *proxy)
++{
++	struct adapter *adapter = new0(struct adapter, 1);
++
++	adapter->proxy = proxy;
++	ctrl_list = g_list_append(ctrl_list, adapter);
++
++	if (!default_ctrl)
++		default_ctrl = adapter;
++
++	print_adapter(proxy, COLORED_NEW);
++}
++
+ static void proxy_added(GDBusProxy *proxy, void *user_data)
+ {
+ 	const char *interface;
+@@ -429,16 +464,9 @@ static void proxy_added(GDBusProxy *proxy, void *user_data)
+ 	interface = g_dbus_proxy_get_interface(proxy);
+ 
+ 	if (!strcmp(interface, "org.bluez.Device1")) {
+-		if (device_is_child(proxy, default_ctrl) == TRUE)
+-			device_added(proxy);
+-
++		device_added(proxy);
+ 	} else if (!strcmp(interface, "org.bluez.Adapter1")) {
+-		ctrl_list = g_list_append(ctrl_list, proxy);
+-
+-		if (!default_ctrl)
+-			default_ctrl = proxy;
+-
+-		print_adapter(proxy, COLORED_NEW);
++		adapter_added(proxy);
+ 	} else if (!strcmp(interface, "org.bluez.AgentManager1")) {
+ 		if (!agent_manager) {
+ 			agent_manager = proxy;
+@@ -472,33 +500,56 @@ static void set_default_attribute(GDBusProxy *proxy)
+ 	set_default_device(default_dev, path);
+ }
+ 
+-static void proxy_removed(GDBusProxy *proxy, void *user_data)
++static void device_removed(GDBusProxy *proxy)
+ {
+-	const char *interface;
++	struct adapter *adapter = find_parent(proxy);
++	if (!adapter) {
++		/* TODO: Error */
++		return;
++	}
+ 
+-	interface = g_dbus_proxy_get_interface(proxy);
++	adapter->devices = g_list_remove(adapter->devices, proxy);
+ 
+-	if (!strcmp(interface, "org.bluez.Device1")) {
+-		if (device_is_child(proxy, default_ctrl) == TRUE) {
+-			dev_list = g_list_remove(dev_list, proxy);
++	print_device(proxy, COLORED_DEL);
++
++	if (default_dev == proxy)
++		set_default_device(NULL, NULL);
++}
++
++static void adapter_removed(GDBusProxy *proxy)
++{
++	GList *llink;
++
++	for (llink = g_list_first(ctrl_list); llink; llink = g_list_next(llink)) {
++		struct adapter *adapter = llink->data;
+ 
+-			print_device(proxy, COLORED_DEL);
++		if (adapter->proxy == proxy) {
++			print_adapter(proxy, COLORED_DEL);
+ 
+-			if (default_dev == proxy)
++			if (default_ctrl && default_ctrl->proxy == proxy) {
++				default_ctrl = NULL;
+ 				set_default_device(NULL, NULL);
++			}
++
++			ctrl_list = g_list_remove_link(ctrl_list, llink);
++			g_list_free(adapter->devices);
++			free(adapter);
++			g_list_free(llink);
++			return;
+ 		}
+-	} else if (!strcmp(interface, "org.bluez.Adapter1")) {
+-		ctrl_list = g_list_remove(ctrl_list, proxy);
++	}
++}
+ 
+-		print_adapter(proxy, COLORED_DEL);
++static void proxy_removed(GDBusProxy *proxy, void *user_data)
++{
++	const char *interface;
+ 
+-		if (default_ctrl == proxy) {
+-			default_ctrl = NULL;
+-			set_default_device(NULL, NULL);
++	interface = g_dbus_proxy_get_interface(proxy);
+ 
+-			g_list_free(dev_list);
+-			dev_list = NULL;
+-		}
++	if (!strcmp(interface, "org.bluez.Device1")) {
++		device_removed(proxy);
++	} else if (!strcmp(interface, "org.bluez.Adapter1")) {
++		adapter_removed(proxy);
+ 	} else if (!strcmp(interface, "org.bluez.AgentManager1")) {
+ 		if (agent_manager == proxy) {
+ 			agent_manager = NULL;
+@@ -538,7 +589,7 @@ static void property_changed(GDBusProxy *proxy, const char *name,
+ 	interface = g_dbus_proxy_get_interface(proxy);
+ 
+ 	if (!strcmp(interface, "org.bluez.Device1")) {
+-		if (device_is_child(proxy, default_ctrl) == TRUE) {
++		if (default_ctrl && device_is_child(proxy, default_ctrl->proxy) == TRUE) {
+ 			DBusMessageIter addr_iter;
+ 			char *str;
+ 
+@@ -601,6 +652,27 @@ static void message_handler(DBusConnection *connection,
+ 					dbus_message_get_member(message));
+ }
+ 
++static struct adapter *find_ctrl_by_address(GList *source, const char *address)
++{
++	GList *list;
++
++	for (list = g_list_first(source); list; list = g_list_next(list)) {
++		struct adapter *adapter = list->data;
++		DBusMessageIter iter;
++		const char *str;
++
++		if (g_dbus_proxy_get_property(adapter->proxy, "Address", &iter) == FALSE)
++			continue;
++
++		dbus_message_iter_get_basic(&iter, &str);
++
++		if (!strcmp(str, address))
++			return adapter;
++	}
++
++	return NULL;
++}
++
+ static GDBusProxy *find_proxy_by_address(GList *source, const char *address)
+ {
+ 	GList *list;
+@@ -691,13 +763,14 @@ static void cmd_list(const char *arg)
+ 	GList *list;
+ 
+ 	for (list = g_list_first(ctrl_list); list; list = g_list_next(list)) {
+-		GDBusProxy *proxy = list->data;
+-		print_adapter(proxy, NULL);
++		struct adapter *adapter = list->data;
++		print_adapter(adapter->proxy, NULL);
+ 	}
+ }
+ 
+ static void cmd_show(const char *arg)
+ {
++	struct adapter *adapter;
+ 	GDBusProxy *proxy;
+ 	DBusMessageIter iter;
+ 	const char *address;
+@@ -706,13 +779,14 @@ static void cmd_show(const char *arg)
+ 		if (check_default_ctrl() == FALSE)
+ 			return;
+ 
+-		proxy = default_ctrl;
++		proxy = default_ctrl->proxy;
+ 	} else {
+-		proxy = find_proxy_by_address(ctrl_list, arg);
+-		if (!proxy) {
++		adapter = find_ctrl_by_address(ctrl_list, arg);
++		if (!adapter) {
+ 			rl_printf("Controller %s not available\n", arg);
+ 			return;
+ 		}
++		proxy = adapter->proxy;
+ 	}
+ 
+ 	if (g_dbus_proxy_get_property(proxy, "Address", &iter) == FALSE)
+@@ -734,34 +808,34 @@ static void cmd_show(const char *arg)
+ 
+ static void cmd_select(const char *arg)
+ {
+-	GDBusProxy *proxy;
++	struct adapter *adapter;
+ 
+ 	if (!arg || !strlen(arg)) {
+ 		rl_printf("Missing controller address argument\n");
+ 		return;
+ 	}
+ 
+-	proxy = find_proxy_by_address(ctrl_list, arg);
+-	if (!proxy) {
++	adapter = find_ctrl_by_address(ctrl_list, arg);
++	if (!adapter) {
+ 		rl_printf("Controller %s not available\n", arg);
+ 		return;
+ 	}
+ 
+-	if (default_ctrl == proxy)
++	if (default_ctrl && default_ctrl->proxy == adapter->proxy)
+ 		return;
+ 
+-	default_ctrl = proxy;
+-	print_adapter(proxy, NULL);
+-
+-	g_list_free(dev_list);
+-	dev_list = NULL;
++	default_ctrl = adapter;
++	print_adapter(adapter->proxy, NULL);
+ }
+ 
+ static void cmd_devices(const char *arg)
+ {
+ 	GList *list;
+ 
+-	for (list = g_list_first(dev_list); list; list = g_list_next(list)) {
++	if (check_default_ctrl() == FALSE)
++		return;
++
++	for (list = g_list_first(default_ctrl->devices); list; list = g_list_next(list)) {
+ 		GDBusProxy *proxy = list->data;
+ 		print_device(proxy, NULL);
+ 	}
+@@ -771,7 +845,10 @@ static void cmd_paired_devices(const char *arg)
+ {
+ 	GList *list;
+ 
+-	for (list = g_list_first(dev_list); list; list = g_list_next(list)) {
++	if (check_default_ctrl() == FALSE)
++		return;
++
++	for (list = g_list_first(default_ctrl->devices); list; list = g_list_next(list)) {
+ 		GDBusProxy *proxy = list->data;
+ 		DBusMessageIter iter;
+ 		dbus_bool_t paired;
+@@ -811,7 +888,7 @@ static void cmd_system_alias(const char *arg)
+ 
+ 	name = g_strdup(arg);
+ 
+-	if (g_dbus_proxy_set_property_basic(default_ctrl, "Alias",
++	if (g_dbus_proxy_set_property_basic(default_ctrl->proxy, "Alias",
+ 					DBUS_TYPE_STRING, &name,
+ 					generic_callback, name, g_free) == TRUE)
+ 		return;
+@@ -828,7 +905,7 @@ static void cmd_reset_alias(const char *arg)
+ 
+ 	name = g_strdup("");
+ 
+-	if (g_dbus_proxy_set_property_basic(default_ctrl, "Alias",
++	if (g_dbus_proxy_set_property_basic(default_ctrl->proxy, "Alias",
+ 					DBUS_TYPE_STRING, &name,
+ 					generic_callback, name, g_free) == TRUE)
+ 		return;
+@@ -849,7 +926,7 @@ static void cmd_power(const char *arg)
+ 
+ 	str = g_strdup_printf("power %s", powered == TRUE ? "on" : "off");
+ 
+-	if (g_dbus_proxy_set_property_basic(default_ctrl, "Powered",
++	if (g_dbus_proxy_set_property_basic(default_ctrl->proxy, "Powered",
+ 					DBUS_TYPE_BOOLEAN, &powered,
+ 					generic_callback, str, g_free) == TRUE)
+ 		return;
+@@ -870,7 +947,7 @@ static void cmd_pairable(const char *arg)
+ 
+ 	str = g_strdup_printf("pairable %s", pairable == TRUE ? "on" : "off");
+ 
+-	if (g_dbus_proxy_set_property_basic(default_ctrl, "Pairable",
++	if (g_dbus_proxy_set_property_basic(default_ctrl->proxy, "Pairable",
+ 					DBUS_TYPE_BOOLEAN, &pairable,
+ 					generic_callback, str, g_free) == TRUE)
+ 		return;
+@@ -892,7 +969,7 @@ static void cmd_discoverable(const char *arg)
+ 	str = g_strdup_printf("discoverable %s",
+ 				discoverable == TRUE ? "on" : "off");
+ 
+-	if (g_dbus_proxy_set_property_basic(default_ctrl, "Discoverable",
++	if (g_dbus_proxy_set_property_basic(default_ctrl->proxy, "Discoverable",
+ 					DBUS_TYPE_BOOLEAN, &discoverable,
+ 					generic_callback, str, g_free) == TRUE)
+ 		return;
+@@ -966,7 +1043,7 @@ static void cmd_scan(const char *arg)
+ 	else
+ 		method = "StopDiscovery";
+ 
+-	if (g_dbus_proxy_method_call(default_ctrl, method,
++	if (g_dbus_proxy_method_call(default_ctrl->proxy, method,
+ 				NULL, start_discovery_reply,
+ 				GUINT_TO_POINTER(enable), NULL) == FALSE) {
+ 		rl_printf("Failed to %s discovery\n",
+@@ -1135,7 +1212,7 @@ static void cmd_set_scan_filter_commit(void)
+ 	if (check_default_ctrl() == FALSE)
+ 		return;
+ 
+-	if (g_dbus_proxy_method_call(default_ctrl, "SetDiscoveryFilter",
++	if (g_dbus_proxy_method_call(default_ctrl->proxy, "SetDiscoveryFilter",
+ 		set_discovery_filter_setup, set_discovery_filter_reply,
+ 		&args, NULL) == FALSE) {
+ 		rl_printf("Failed to set discovery filter\n");
+@@ -1224,7 +1301,10 @@ static void cmd_set_scan_filter_clear(const char *arg)
+ 	g_free(filtered_scan_transport);
+ 	filtered_scan_transport = NULL;
+ 
+-	if (g_dbus_proxy_method_call(default_ctrl, "SetDiscoveryFilter",
++	if (check_default_ctrl() == FALSE)
++		return;
++
++	if (g_dbus_proxy_method_call(default_ctrl->proxy, "SetDiscoveryFilter",
+ 		clear_discovery_filter_setup, set_discovery_filter_reply,
+ 		NULL, NULL) == FALSE) {
+ 		rl_printf("Failed to clear discovery filter\n");
+@@ -1242,7 +1322,10 @@ static struct GDBusProxy *find_device(const char *arg)
+ 		return NULL;
+ 	}
+ 
+-	proxy = find_proxy_by_address(dev_list, arg);
++	if (check_default_ctrl() == FALSE)
++		return NULL;
++
++	proxy = find_proxy_by_address(default_ctrl->devices, arg);
+ 	if (!proxy) {
+ 		rl_printf("Device %s not available\n", arg);
+ 		return NULL;
+@@ -1432,8 +1515,11 @@ static void remove_device(GDBusProxy *proxy)
+ 	char *path;
+ 
+ 	path = g_strdup(g_dbus_proxy_get_path(proxy));
++	
++	if (!default_ctrl)
++		return;
+ 
+-	if (g_dbus_proxy_method_call(default_ctrl, "RemoveDevice",
++	if (g_dbus_proxy_method_call(default_ctrl->proxy, "RemoveDevice",
+ 						remove_device_setup,
+ 						remove_device_reply,
+ 						path, g_free) == FALSE) {
+@@ -1457,16 +1543,15 @@ static void cmd_remove(const char *arg)
+ 	if (strcmp(arg, "*") == 0) {
+ 		GList *list;
+ 
+-		for (list = g_list_first(dev_list); list; list = g_list_next(list)) {
++		for (list = g_list_first(default_ctrl->devices); list; list = g_list_next(list)) {
+ 			GDBusProxy *proxy = list->data;
+ 
+ 			remove_device(proxy);
+ 		}
+-
+ 		return;
+ 	}
+ 
+-	proxy = find_proxy_by_address(dev_list, arg);
++	proxy = find_proxy_by_address(default_ctrl->devices, arg);
+ 	if (!proxy) {
+ 		rl_printf("Device %s not available\n", arg);
+ 		return;
+@@ -1502,7 +1587,10 @@ static void cmd_connect(const char *arg)
+ 		return;
+ 	}
+ 
+-	proxy = find_proxy_by_address(dev_list, arg);
++	if (check_default_ctrl() == FALSE)
++		return;
++
++	proxy = find_proxy_by_address(default_ctrl->devices, arg);
+ 	if (!proxy) {
+ 		rl_printf("Device %s not available\n", arg);
+ 		return;
+@@ -1712,7 +1800,7 @@ static void cmd_register_profile(const char *arg)
+ 		return;
+ 	}
+ 
+-	gatt_register_profile(dbus_conn, default_ctrl, &w);
++	gatt_register_profile(dbus_conn, default_ctrl->proxy, &w);
+ 
+ 	wordfree(&w);
+ }
+@@ -1722,7 +1810,7 @@ static void cmd_unregister_profile(const char *arg)
+ 	if (check_default_ctrl() == FALSE)
+ 		return;
+ 
+-	gatt_unregister_profile(dbus_conn, default_ctrl);
++	gatt_unregister_profile(dbus_conn, default_ctrl->proxy);
+ }
+ 
+ static void cmd_version(const char *arg)
+@@ -1768,12 +1856,39 @@ static char *generic_generator(const char *text, int state,
+ 
+ static char *ctrl_generator(const char *text, int state)
+ {
+-	return generic_generator(text, state, ctrl_list, "Address");
++	static int index = 0;
++	static int len = 0;
++	GList *list;
++
++	if (!state) {
++		index = 0;
++		len = strlen(text);
++	}
++
++	for (list = g_list_nth(ctrl_list, index); list;
++						list = g_list_next(list)) {
++		struct adapter *adapter = list->data;
++		DBusMessageIter iter;
++		const char *str;
++
++		index++;
++
++		if (g_dbus_proxy_get_property(adapter->proxy, "Address", &iter) == FALSE)
++			continue;
++
++		dbus_message_iter_get_basic(&iter, &str);
++
++		if (!strncmp(str, text, len))
++			return strdup(str);
++        }
++
++	return NULL;
+ }
+ 
+ static char *dev_generator(const char *text, int state)
+ {
+-	return generic_generator(text, state, dev_list, "Address");
++	return generic_generator(text, state, 
++			default_ctrl ? default_ctrl->devices : NULL, "Address");
+ }
+ 
+ static char *attribute_generator(const char *text, int state)
+@@ -2294,7 +2409,6 @@ int main(int argc, char *argv[])
+ 	g_main_loop_unref(main_loop);
+ 
+ 	g_list_free_full(ctrl_list, proxy_leak);
+-	g_list_free_full(dev_list, proxy_leak);
+ 
+ 	g_free(auto_register_agent);
+ 
+-- 
+2.7.4
 
-yes, that is what I am thinking of.
-
-Regards
-
-Marcel
