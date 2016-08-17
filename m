@@ -1,128 +1,69 @@
-Return-Path: <guodong.xu@linaro.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: bugzilla-daemon@bugzilla.kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [Bug 104011] SMP Security check breaks formerly working bluetooth
+ mouse connection
+Date: Wed, 17 Aug 2016 00:19:45 +0000
+Message-ID: <bug-104011-62941-PWfse2hM7L@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-104011-62941@https.bugzilla.kernel.org/>
+References: <bug-104011-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
 MIME-Version: 1.0
-In-Reply-To: <30869CE7-FE5E-4CAF-86FC-D140E2C0963D@holtmann.org>
-References: <1469939084-15603-1-git-send-email-guodong.xu@linaro.org>
- <1394C970-3726-4C42-A06D-0B3B3015D980@holtmann.org> <CAFGCpxz6j_7aOTX+uShdpyxmt71k61v=Abdw=7MfrRjvdygmTg@mail.gmail.com>
- <30869CE7-FE5E-4CAF-86FC-D140E2C0963D@holtmann.org>
-From: Guodong Xu <guodong.xu@linaro.org>
-Date: Wed, 17 Aug 2016 10:47:21 +0800
-Message-ID: <CAFGCpxx7teWAGzw+-uy+nwoHgsS__8S-CdfGuNuycCUuWJRC+Q@mail.gmail.com>
-Subject: Re: [PATCH v2] Bluetooth: Add LED triggers for HCI frames tx and rx
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: "Gustavo F. Padovan" <gustavo@padovan.org>, Johan Hedberg <johan.hedberg@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	"open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-	Network Development <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
-Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 16 August 2016 at 20:33, Marcel Holtmann <marcel@holtmann.org> wrote:
->
-> Hi Guodong,
->
-> >>> Two LED triggers are added into hci_dev: tx_led and rx_led. Upon ACL/=
-SCO
-> >>> packets available in tx or rx, the LEDs will blink.
-> >>>
-> >>> For each hci registration, two triggers are added into LED subsystem:
-> >>> [hdev->name]-tx and [hdev-name]-rx.
-> >>> Refer to Documentation/leds/leds-class.txt for usage.
-> >>>
-> >>> Verified on HiKey 96boards, which uses HiSilicon hi6220 SoC and TI
-> >>> WL1835 WiFi/BT combo chip.
-> >>
-> >> so I have no idea what to do with adding adding hci0-rx and hci0-tx tr=
-iggers. Combined with hci0-power trigger these are already 3 triggers. And =
-if you have 2 Bluetooth controllers in your system, then you have 6 trigger=
-s.
-> >>
-> >
-> > True, 6 triggers. But, taking example for other subsytems, eg. cpu
-> > cores. On my board, I have "heartbeat cpu0 cpu1 cpu2 cpu3 cpu4 cpu5
-> > cpu6 cpu7". It doesn't have to mean you need all of them connected to
-> > some LED(s). Actually, in most of the case, I only need heartbeat.
-> >
-> >
-> >
-> >> If we then maybe add another trigger, then this number just goes up an=
-d up.
-> >>
-> >> As far as I can tell you can only assign a single trigger to a LED.
-> >>
-> >
-> > That's true. And people got a choice of which feature he wants to visua=
-lize.
->
-> and as a result we keep adding senseless triggers to the kernel and bloat=
-ing it up for no reason. Especially since it feels like 99% of the LED trig=
-gers are not used at all. This makes no sense to me.
->
-> >> So this means to even use these triggers, you need now 3 LEDs per Blue=
-tooth controller. How is that useful for anybody in a real system? Maybe I =
-am missing something here and somehow there is magic to combine triggers, b=
-ut I have not found it yet. So please someone enlighten me on how this is s=
-uppose to be used with real devices.
-> >>
-> >> Recently I have added a simple bluetooth-power trigger that combines a=
-ll Bluetooth controllers into a single trigger. If any of them is enabled, =
-then you can control your LED. Which makes a lot more sense to me since you=
- most likely have a single Bluetooth LED on your system. And you want it to=
- show the correct state no matter what Bluetooth controller is in use. Howe=
-ver I can see the case that someone might want to assign one specific Bluet=
-ooth controller to a LED status.
-> >>
-> >> So instead of adding many independent triggers to each controller, why=
- not create one global bluetooth trigger and one individual bluetooth-hci0 =
-trigger for each controller. And the combine power, tx, rx and whatever els=
-e we need to trigger the LED for?
-> >>
-> >
-> > When I starting this work, I referred to WiFi system. See
-> > CONFIG_MAC80211_LEDS. WiFi system implements these types of triggers "
-> > phy0rx phy0tx phy0assoc phy0radio" for each 'controller'.
->
-> And I actually wonder who ever used these triggers. You need 4 LEDs to vi=
-sualize the WiFi status. Which systems has 4 LEDs to spare to visualize thi=
-s.
->
-> > Besides, there are also RFKILL which stands for WiFi/BT power status.
-> > RFKILL adds triggers for each module too. Eg. in the below example, I
-> > have one WiFi (phy0), one BT (hci0). Trigger rfkill1 equals to
-> > hci0-power.
-> >
-> > Ref: here are all LED triggers I found in my 96boards/HiKey:
-> >
-> > # cat trigger
-> > none kbd-scrollock kbd-numlock kbd-capslock kbd-kanalock kbd-shiftlock
-> > kbd-altgrlock kbd-ctrllock kbd-altlock kbd-shiftllock kbd-shiftrlock
-> > kbd-ctrlllock kbd-ctrlrlock mmc0 mmc1 heartbeat cpu0 cpu1 cpu2 cpu3
-> > cpu4 cpu5 cpu6 cpu7 mmc2 rfkill0 phy0rx phy0tx phy0assoc phy0radio
-> > hci0-power hci0-tx [hci0-rx] rfkill1
->
-> And how many LEDs do you have in the your system? I think you are making =
-my point here.
->
-> So I think what we need to do is to not add to this madness and instead c=
-reate one "bluetooth" LED trigger that combines power and TX/RX for all con=
-trollers. And then allow for individual "bluetooth-hci0" LED triggers so th=
-at you can bind a single Bluetooth controller to a single LED.
->
-> For me, if I can not combine hci0-power, hci0-tx and hci0-rx into a singl=
-e LED,
+https://bugzilla.kernel.org/show_bug.cgi?id=104011
 
-By combining them into a single LED, do you mean such a use case?
- - when hci0 is powered on, this LED starts on.
- - then, when there is tx/rx traffic, this LED should blink (reversely
-of course).
- - when hci0 is powered off, this LED turns off.
+Peter Lindener <lindener.peter@gmail.com> changed:
 
--Guodong
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |lindener.peter@gmail.com
 
-> it becomes utterly useless on pretty much every system that is out there.
->
-> Regards
->
-> Marcel
->
+--- Comment #13 from Peter Lindener <lindener.peter@gmail.com> ---
+I am running a fresh build of Mint 18, modified for real-time by:
+  sudo apt-get install linux-lowlatency linux-headers-lowlatency
+
+Linux 4.4.0-34-lowlatency #53-Ubuntu SMP PREEMPT Wed Jul 27 19:23:26 UTC 2016
+x86_64 x86_64 x86_64 GNU/Linux 
+
+I am typing this on a Dell XPS 15, with a Broadcom BCM20703A bluetooth chip.
+that is now persistently paired / connected to a "Arc Touch Mouse SE".
+
+two issues were encountered while getting this bluetooth mouse to work.
+
+   2. the "Bluetooth: SMP security requested but not available" error message
+that is encountered via ">> dmesg | tail" during BT mouse pairing (required
+only once) due to an apparently incorrect..
+ [powered in legacy way (eg hciconfig up) where SMP is not correctly
+initialized. see comment #5 above] was worked around by "sudo bluetoothctl -a"
+power off/on toggling...  so it seems Szymon Janc's hunch is on the right
+track..  but it also seems likely that successful blue-tooth device pairing
+likely requires running bluetoothctl with some level of elevated privilege, if
+one wishes this bluetooth pairing to remain persistent across reboots.
+   having done this once paired, my Arc Touch Mouse SE seems to come up working
+after a reboot..
+
+   1. But before the above SMP security bug workaround might work..
+if one's bluetooth controller happens to be a Broadcom device..
+in my case the BCM20703A found in a more recent Dell XPS 15.
+you may find this error message in the logs:
+>> dmesg | egrep 'blue|firm'
+[    4.220629] brcmfmac 0000:02:00.0: Direct firmware load for
+brcm/brcmfmac43602-pcie.txt failed with error -2
+
+if so, you will also likely want to place this file:
+https://bugs.launchpad.net/ubuntu/+source/bluez/+bug/1589889/+attachment/4683974/+files/BCM-0a5c-6410.hcd 
+into the  /lib/firmware/bcrm/ directory..
+for details see: 
+http://osdir.com/ml/ubuntu-bluetooth/2016-06/msg00043.html
+
+   That said, my really cool Arc Touch Mouse bluetooth mouse seems quite
+happily persistently paired to new dell XPS 15..
+   thanks for the clue regarding the need to work around the power mode during
+blue-tooth device pairing..!   hope this helps resolve the last remaining
+blue-tooth driver issues for Linux..
+
+-- 
+You are receiving this mail because:
+You are the assignee for the bug.
