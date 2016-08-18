@@ -12,64 +12,68 @@ Cc: Pavel Machek <pavel@ucw.cz>,
 	Linus Walleij <linus.walleij@linaro.org>,
 	linux-bluetooth@vger.kernel.org, linux-serial@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [RFC PATCH 2/3] tty: serial_core: make tty_struct optional
-Date: Wed, 17 Aug 2016 20:14:44 -0500
-Message-Id: <20160818011445.22726-3-robh@kernel.org>
+Subject: [RFC PATCH 3/3] tty: serial_core: add uart controller registration
+Date: Wed, 17 Aug 2016 20:14:45 -0500
+Message-Id: <20160818011445.22726-4-robh@kernel.org>
 In-Reply-To: <20160818011445.22726-1-robh@kernel.org>
 References: <20160818011445.22726-1-robh@kernel.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-In order to allow serial drivers to work without a tty, make calls from
-drivers and serial_core work when tty_struct is NULL.
+Register serial ports with the uart device core as a controller and add
+a receive handler call.
 
 Signed-off-by: Rob Herring <robh@kernel.org>
 ---
- drivers/tty/serial/serial_core.c | 3 ++-
- drivers/tty/tty_buffer.c         | 2 ++
- include/linux/serial_core.h      | 2 +-
- 3 files changed, 5 insertions(+), 2 deletions(-)
+ drivers/tty/serial/serial_core.c | 8 ++++++++
+ include/linux/serial_core.h      | 1 +
+ 2 files changed, 9 insertions(+)
 
 diff --git a/drivers/tty/serial/serial_core.c b/drivers/tty/serial/serial_core.c
-index 9fc1533..9dd444f 100644
+index 9dd444f..1552fee 100644
 --- a/drivers/tty/serial/serial_core.c
 +++ b/drivers/tty/serial/serial_core.c
-@@ -111,7 +111,8 @@ void uart_write_wakeup(struct uart_port *port)
- 	 * closed.  No cookie for you.
- 	 */
- 	BUG_ON(!state);
--	tty_wakeup(state->port.tty);
-+	if (state->port.tty)
-+		tty_wakeup(state->port.tty);
- }
+@@ -34,6 +34,7 @@
+ #include <linux/serial_core.h>
+ #include <linux/delay.h>
+ #include <linux/mutex.h>
++#include <linux/uart_device.h>
  
- static void uart_stop(struct tty_struct *tty)
-diff --git a/drivers/tty/tty_buffer.c b/drivers/tty/tty_buffer.c
-index aa80dc9..ffab8ea 100644
---- a/drivers/tty/tty_buffer.c
-+++ b/drivers/tty/tty_buffer.c
-@@ -528,6 +528,8 @@ static void flush_to_ldisc(struct work_struct *work)
+ #include <asm/irq.h>
+ #include <asm/uaccess.h>
+@@ -2800,6 +2801,10 @@ int uart_add_one_port(struct uart_driver *drv, struct uart_port *uport)
  
- void tty_flip_buffer_push(struct tty_port *port)
+ 	uart_configure_port(drv, state, uport);
+ 
++	uport->ctrlr = uart_controller_alloc(uport->dev, 0);
++	uport->ctrlr->port = uport;
++	uart_controller_add(uport->ctrlr);
++
+ 	num_groups = 2;
+ 	if (uport->attr_group)
+ 		num_groups++;
+@@ -3027,6 +3032,9 @@ void uart_insert_char(struct uart_port *port, unsigned int status,
  {
-+	if (!port->tty)
+ 	struct tty_port *tport = &port->state->port;
+ 
++	if (uart_controller_rx(port->ctrlr, ch) >= 0)
 +		return;
- 	tty_schedule_flip(port);
- }
- EXPORT_SYMBOL(tty_flip_buffer_push);
++
+ 	if ((status & port->ignore_status_mask & ~overrun) == 0)
+ 		if (tty_insert_flip_char(tport, ch, flag) == 0)
+ 			++port->icount.buf_overrun;
 diff --git a/include/linux/serial_core.h b/include/linux/serial_core.h
-index 2f44e20..a27ca1f 100644
+index a27ca1f..7cde6a9 100644
 --- a/include/linux/serial_core.h
 +++ b/include/linux/serial_core.h
-@@ -412,7 +412,7 @@ int uart_resume_port(struct uart_driver *reg, struct uart_port *port);
- static inline int uart_tx_stopped(struct uart_port *port)
- {
- 	struct tty_struct *tty = port->state->port.tty;
--	if (tty->stopped || port->hw_stopped)
-+	if ((tty && tty->stopped) || port->hw_stopped)
- 		return 1;
- 	return 0;
- }
+@@ -155,6 +155,7 @@ struct uart_port {
+ 
+ 	unsigned int		read_status_mask;	/* driver specific */
+ 	unsigned int		ignore_status_mask;	/* driver specific */
++	struct uart_controller	*ctrlr;
+ 	struct uart_state	*state;			/* pointer to parent state */
+ 	struct uart_icount	icount;			/* statistics */
+ 
 -- 
 2.9.2
 
