@@ -1,51 +1,67 @@
-Return-Path: <linux-kernel-owner@vger.kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
-Subject: Re: [RFC PATCH 0/3] UART slave device bus
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CACRpkdZYmXHE=6KoB7vn0PKrowEfEz6wh9_L6c4mtqQm_-du5A@mail.gmail.com>
-Date: Thu, 18 Aug 2016 19:31:05 +0200
-Cc: Rob Herring <robh@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Jiri Slaby <jslaby@suse.com>,
-        Sebastian Reichel <sre@kernel.org>,
-        Pavel Machek <pavel@ucw.cz>,
-        Peter Hurley <peter@hurleysoftware.com>,
-        NeilBrown <neil@brown.name>,
-        "Dr . H . Nikolaus Schaller" <hns@goldelico.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "linux-serial@vger.kernel.org" <linux-serial@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Message-Id: <E1CFF612-FB5B-4DBA-A45E-5B1E658D70F8@holtmann.org>
-References: <20160818011445.22726-1-robh@kernel.org> <CACRpkdZYmXHE=6KoB7vn0PKrowEfEz6wh9_L6c4mtqQm_-du5A@mail.gmail.com>
-To: Linus Walleij <linus.walleij@linaro.org>
-Sender: linux-kernel-owner@vger.kernel.org
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+MIME-Version: 1.0
+In-Reply-To: <1471531954.4976.13.camel@toniob.net>
+References: <1471515072.4976.10.camel@toniob.net> <CABBYNZKvqrbF7XzW4yShJyM2wXWckJX7X5PD6gU=mT7Pg6HUGw@mail.gmail.com>
+ <1471531954.4976.13.camel@toniob.net>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Thu, 18 Aug 2016 19:20:45 +0300
+Message-ID: <CABBYNZKDS1HU2_1hGdbDemNyX7xcRxOUM-ZV1fRVd8UkENEP4w@mail.gmail.com>
+Subject: Re: Can't connect a Xbox one controller
+To: Anthony Bourguignon <contact@toniob.net>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Linus,
+Hi Anthony,
 
->> Currently, devices attached via a UART are not well supported in the
->> kernel. The problem is the device support is done in tty line disciplines,
->> various platform drivers to handle some sideband, and in userspace with
->> utilities such as hciattach.
-> 
-> Freaking *awesome* Rob, this really really needs to happen.
-> I'm very happy that you're driving this.
-> 
->> This is functional with minimal testing using the loopback driver and
->> pl011 (w/o DMA) UART under QEMU (modified to add a DT node for the slave
->> device). It still needs lots of work and polish.
-> 
-> I have Bluetooth (HCI) over UART on the Nomadik and Ux500,
-> both with DMA support for the PL011 too. So I hope to be able
-> to utilize this.
-> 
-> (The HCI transport is then used for GPS, FM radio and whatnot
-> but that is another issue.)
+On Thu, Aug 18, 2016 at 5:52 PM, Anthony Bourguignon <contact@toniob.net> w=
+rote:
+> Le jeudi 18 ao=C3=BBt 2016 =C3=A0 16:56 +0300, Luiz Augusto von Dentz a =
+=C3=A9crit :
+>> Hi Anthony,
+>>
+>> On Thu, Aug 18, 2016 at 1:11 PM, Anthony Bourguignon <contact@toniob.
+>> net> wrote:
+>> >
+>> > Hi,
+>> >
+>> > I've recently bought a new xbox one controller as the 2016 version
+>> > has
+>> > bluetooth connectivity.
+>> >
+>> > The controller is pairing and connecting well on a windows 10
+>> > computer
+>> > and an android 4.4 tablet. But I can"t make it connect under linux
+>> > (Debian unstable, kernel 4.6 and 4.7-rc7, bluez 5.40 from
+>> > experimental). The pairing is ok but when I try to connect to
+>> > controller, it stays connected for less than one second, then
+>> > disconnects, then connects again and so one until the controller
+>> > goes
+>> > to sleep, because of the lack of a remote connection.
+>> >
+>> > Any idea ?
+>>
+>> It seems there is some problem configuring the L2CAP connection
+>> (probably for SDP):
+>>
+>> >
+>> > ACL data: handle 256 flags 0x02 dlen 15
+>>     L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 3 clen 1
+>>       Failure - unknown options
+>>       RFC
+>> < ACL data: handle 256 flags 0x00 dlen 12
+>>     L2CAP(s): Disconn req: dcid 0x0040 scid 0x0040
+>
+> So, is it a bug of bluez or of the controller firmware ? Why is it
+> possible to make a connection with an android tablet ?
+>
+> Is there something more I can do to help ?
 
-that is something we can already solve via regmap. We have started work on Intel LnP which also includes a FM radio chip where registers/interrupts are exposed via HCI commands/events. So fundamentally the Bluetooth HCI device would expose the GPS and FM radio nodes via regmap.
+Well perhaps we can compare to what other stacks are responding, but
+this seem quite weird given L2CAP_Config request is an essential part
+of setting up L2CAP connections so a response with unknown options
+sounds kind broken, but perhaps other stacks are ignoring it.
 
-Regards
-
-Marcel
+--=20
+Luiz Augusto von Dentz
