@@ -1,134 +1,43 @@
-Return-Path: <hns@goldelico.com>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
+Return-Path: <gnomes@lxorguk.ukuu.org.uk>
+Date: Thu, 18 Aug 2016 16:15:27 +0100
+From: One Thousand Gnomes <gnomes@lxorguk.ukuu.org.uk>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: "H. Nikolaus Schaller" <hns@goldelico.com>, Pavel Machek <pavel@ucw.cz>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Rob Herring
+ <robh@kernel.org>, Jiri Slaby <jslaby@suse.com>,
+        Sebastian Reichel
+ <sre@kernel.org>,
+        Peter Hurley <peter@hurleysoftware.com>, NeilBrown
+ <neil@brown.name>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Linus Walleij
+ <linus.walleij@linaro.org>,
+        linux-bluetooth@vger.kernel.org, linux-serial@vger.kernel.org,
+        linux-kernel@vger.kernel.org, herkne@gmx.de
 Subject: Re: [RFC PATCH 0/3] UART slave device bus
-From: "H. Nikolaus Schaller" <hns@goldelico.com>
-In-Reply-To: <20160818152528.569eb426@lxorguk.ukuu.org.uk>
-Date: Thu, 18 Aug 2016 17:14:21 +0200
-Cc: Rob Herring <robh@kernel.org>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Marcel Holtmann <marcel@holtmann.org>,
- Jiri Slaby <jslaby@suse.com>,
- Sebastian Reichel <sre@kernel.org>,
- Pavel Machek <pavel@ucw.cz>,
- Peter Hurley <peter@hurleysoftware.com>,
- NeilBrown <neil@brown.name>,
- Arnd Bergmann <arnd@arndb.de>,
- Linus Walleij <linus.walleij@linaro.org>,
- linux-bluetooth@vger.kernel.org,
- linux-serial@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Message-Id: <227BE734-C9C1-4059-B0B4-EB47819703A8@goldelico.com>
-References: <20160818011445.22726-1-robh@kernel.org> <20160818152528.569eb426@lxorguk.ukuu.org.uk>
-To: One Thousand Gnomes <gnomes@lxorguk.ukuu.org.uk>
+Message-ID: <20160818161527.4f24bd92@lxorguk.ukuu.org.uk>
+In-Reply-To: <951C95FD-35DD-4EC5-A62C-31378B85EF14@holtmann.org>
+References: <20160818011445.22726-1-robh@kernel.org>
+	<118926C8-F4D0-41F5-B6A8-690E0312F3FB@goldelico.com>
+	<28DDAF2B-2341-403B-80D8-DA0A63F51FF1@holtmann.org>
+	<20160818105521.GB7031@kroah.com>
+	<20160818111046.GE7427@amd>
+	<A8AFECE4-8501-4186-A834-5E08EEE8A0C4@goldelico.com>
+	<951C95FD-35DD-4EC5-A62C-31378B85EF14@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alan,
+> > Indeed. In such a case the translation should be done in the kernel.
+> > But it is not necessary for devices that already provide NEMA over UART.
+> > Still user-space should be able to tcsetattr how it wants to see the records
+> > (mainly CR/LF translations).  
+> 
+> I disagree here. NMEA is a standard and the kernel should just enforce framing of NMEA sentences. It makes no difference what the CR/LF is. Userspace gets full sentences.
 
-> Am 18.08.2016 um 16:25 schrieb One Thousand Gnomes =
-<gnomes@lxorguk.ukuu.org.uk>:
->=20
-> On Wed, 17 Aug 2016 20:14:42 -0500
-> Rob Herring <robh@kernel.org> wrote:
->=20
-> This was proposed ages ago and the point clearly made that
->=20
-> a) the idea doesn't work because uarts are not required to use the =
-uart
-> layer and even those that do sometimes only use half of it
->=20
-> b) that you should use the tty_port abstraction
->=20
-> So instead of just waiting some months and recycling the proposals =
-it's
-> unfortunate that no listening and reworking was done.
->=20
-> https://lkml.org/lkml/2016/1/18/177
->=20
-> So I'm giving this a large neon flashing NAK, because none of the
-> problems have been addressed.
->=20
->> Currently, devices attached via a UART are not well supported in the
->> kernel. The problem is the device support is done in tty line =
-disciplines,
->> various platform drivers to handle some sideband, and in userspace =
-with
->> utilities such as hciattach.
->=20
-> For most platforms it works very nicely and out of the box. The only
-> real issue I have actually seen is the bandwidth issue from early tty
-> based 3G modems. That's not hard to fix with some tty buffer changes.
-> Basically you need a tty port pointer that is atomic exchangable and
-> points either to the usual tty queue logic or to a 'fastpath' handler
-> which just gets thrown a block of bytes and told to use them or lose =
-them
-> - which is the interface the non n_tty ldiscs want anyway. That's =
-exactly
-> what you would need to fix to support in kernel stuff as well. The tty
-> queue mechanism for devices that can receive in blocks just becomes a
-> fastpath.
->=20
-> There are some disgusting Android turds floating around out of tree =
-where
-> people use things like userspace GPIO line control but you won't fix =
-most
-> of those anyway because they are generally being used for user
-> space modules including dumb GPS where the US government rules won't =
-allow
-> them to be open sourced anyway.
->=20
->> - Split out the controller for uart_ports into separate driver. Do we =
-see
->>  a need for controller drivers that are not standard serial drivers?
->=20
-> As I told you over six months ago uart_port is not the correct
-> abstraction. You need to be working at the tty_port layer. The =
-original
-> design of tty_port was indeed partly to push towards being able to =
-have a
-> serial interface that is in use but not open to user space. The rather
-> nice rework that the maintainers have done to put the buffers in the
-> tty_port takes it closer still.
->=20
-> Plenty of the classic serial port interfaces also don't use the UART
-> layer including every USB device (which is most of them these days), =
-SDIO
-> and others. USB has to be covered for this to be sensible.
+GPS drivers for anything that's dumb are binary only. They have to
+contain specific checks so that people can't buy them from amazon and
+attach them to missles.
 
-It looks as if you try to solve a different problem than some of us. =
-Maybe this is
-the reason why you get the impression that nobody is listening to your =
-proposal
-(but that seems to be common for this topic - I have the impression that
-nobody is listening to my proposals... so don't mind).
-
-I can only talk for my device where I just want to be able to write a =
-driver that
-gets access to a low level physical UART within a SoC (a little =
-abstracted
-by uart_port) to directly talk to a device connected to such an UART for =
-reasons
-I have explained plenty of times.
-
-Other devices may have orthogonal needs (or suspected needs) and hence
-a single solution may not fit everybody.
-=20
->=20
-> Your changes also don't work because serial uart drivers are not =
-obliged
-> to use any of the uart buffering helpers and particularly on the rx =
-side
-> many do not do so and the performance hit would be too high.
-
-The SoC I have, is using it.
-
->=20
-> It's been explained how to make it work with tty_port, every tty is a
-> dynamic file handle life time object bound to a tty_port. Every tty =
-has a
-> tty_port, every tty driver has a tty_port.
-
->=20
-> Alan
-
-BR, Nikolaus
+Alan
