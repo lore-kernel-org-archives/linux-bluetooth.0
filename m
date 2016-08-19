@@ -7,81 +7,56 @@ To: Marcel Holtmann <marcel@holtmann.org>,
 Cc: linux-kernel@vger.kernel.org,
 	jason.abele@gmail.com,
 	Boris Brezillon <boris.brezillon@free-electrons.com>
-Subject: [PATCH 1/4] Bluetooth: hci_ldisc: fix a race in the hdev closing path
-Date: Fri, 19 Aug 2016 09:38:44 +0200
-Message-Id: <1471592327-14133-2-git-send-email-boris.brezillon@free-electrons.com>
-In-Reply-To: <1471592327-14133-1-git-send-email-boris.brezillon@free-electrons.com>
-References: <1471592327-14133-1-git-send-email-boris.brezillon@free-electrons.com>
+Subject: [PATCH 0/4] Bluetooth: hci_uart: various fixes
+Date: Fri, 19 Aug 2016 09:38:43 +0200
+Message-Id: <1471592327-14133-1-git-send-email-boris.brezillon@free-electrons.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-hci_uart_tty_close() is cancelling any pending write work, but some
-hci_uart_proto implementations might re-schedule this work after its
-cancellation (by calling hci_uart_tx_wakeup()).
+Hi,
 
-Make sure the write work is not re-scheduled in our back while we're
-closing the device.
+We recently faced some problems when using an BT uart chip interfaced
+through the H5 proto (rtk_h5). Here are the logs of the 2 different
+issues we had when closing the line discipline (actually, restoring
+the previous one) [1][2]. I know the kernel is Tainted in those logs,
+but after some investigations I found a few potential issues that might
+explain what we're seeing.
 
-We also cancel any pending init work and prevent the active one (if
-any) from registering the hdev if the line discipline is being closed.
+Patches 1 and 2 are fixing 2 potential 'use after free' bugs: in some
+(unlikely) cases the timer and work we try to cancel in the closing
+path can be re-scheduled in our back, and since we're releasing the
+memory region assigned to those elements at the end of the closing
+procedure we can end-up with those invalid pointer exception when the
+work or timer handler is called.
 
-Signed-off-by: Boris Brezillon <boris.brezillon@free-electrons.com>
----
- drivers/bluetooth/hci_ldisc.c | 15 ++++++++++++++-
+Note that this problem is pretty hard to reproduce, so I'm not sure
+my patches are fixing all the racy paths.
+
+Patches 3 and 4 are fixing potential issues that I didn't directly
+face but may be worth fixing. Path 3 is fixing a potential double
+free issue (proto->close() called twice if the hdev registration
+failed). Patch 4 is making sure we don't loose some TX events.
+
+Let me know what you think.
+
+Thanks,
+
+Boris
+
+[1]http://code.bulix.org/8qtjly-105082
+[2]http://code.bulix.org/qzur9n-105083
+
+
+Boris Brezillon (4):
+  Bluetooth: hci_ldisc: fix a race in the hdev closing path
+  Bluetooth: hci_h5: fix a race in the closing path
+  Bluetooth: hci_ldisc: don't release resources in hci_uart_init_work()
+  Bluetooth: hci_ldisc: make sure we don't loose HCI_UART_TX_WAKEUP
+    events
+
+ drivers/bluetooth/hci_h5.c    |  7 ++++++-
+ drivers/bluetooth/hci_ldisc.c | 30 ++++++++++++++++++++++++++----
  drivers/bluetooth/hci_uart.h  |  1 +
- 2 files changed, 15 insertions(+), 1 deletion(-)
+ 3 files changed, 33 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
-index dda97398c59a..de7f7f1f995c 100644
---- a/drivers/bluetooth/hci_ldisc.c
-+++ b/drivers/bluetooth/hci_ldisc.c
-@@ -130,7 +130,9 @@ int hci_uart_tx_wakeup(struct hci_uart *hu)
- 
- 	BT_DBG("");
- 
--	schedule_work(&hu->write_work);
-+	/* Don't schedule the work if the device is being closed. */
-+	if (!test_bit(HCI_UART_CLOSING, &hu->flags))
-+		schedule_work(&hu->write_work);
- 
- 	return 0;
- }
-@@ -180,6 +182,11 @@ static void hci_uart_init_work(struct work_struct *work)
- 	if (!test_and_clear_bit(HCI_UART_INIT_PENDING, &hu->hdev_flags))
- 		return;
- 
-+	if (test_bit(HCI_UART_CLOSING, &hu->flags)) {
-+		BT_DBG("HCI device is being closed, don't register it.");
-+		return;
-+	}
-+
- 	err = hci_register_dev(hu->hdev);
- 	if (err < 0) {
- 		BT_ERR("Can't register HCI device");
-@@ -490,7 +497,13 @@ static void hci_uart_tty_close(struct tty_struct *tty)
- 	if (hdev)
- 		hci_uart_close(hdev);
- 
-+	/*
-+	 * Set the closing bit to make sure nobody re-schedules the write work
-+	 * in our back.
-+	 */
-+	set_bit(HCI_UART_CLOSING, &hu->flags);
- 	cancel_work_sync(&hu->write_work);
-+	cancel_work_sync(&hu->init_ready);
- 
- 	if (test_and_clear_bit(HCI_UART_PROTO_READY, &hu->flags)) {
- 		if (hdev) {
-diff --git a/drivers/bluetooth/hci_uart.h b/drivers/bluetooth/hci_uart.h
-index 839bad1d8152..c092ad6607e1 100644
---- a/drivers/bluetooth/hci_uart.h
-+++ b/drivers/bluetooth/hci_uart.h
-@@ -96,6 +96,7 @@ struct hci_uart {
- #define HCI_UART_PROTO_SET	0
- #define HCI_UART_REGISTERED	1
- #define HCI_UART_PROTO_READY	2
-+#define HCI_UART_CLOSING	3
- 
- /* TX states  */
- #define HCI_UART_SENDING	1
 -- 
 2.7.4
