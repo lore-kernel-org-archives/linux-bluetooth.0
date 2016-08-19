@@ -1,49 +1,91 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Leigh Fiddes <leigh.fiddes@atomos.com>
-Subject: Race condition between DIS and HoG profiles
+Subject: [Proposed Patch Bluez v5] btmon: Print connection latency correctly
 To: Linux Bluetooth <linux-bluetooth@vger.kernel.org>
-Message-ID: <96447190-1a92-5864-f4f6-cfe9898da242@atomos.com>
-Date: Fri, 19 Aug 2016 16:29:48 +1000
+Message-ID: <155e0135-7d14-259d-322b-a582afb979c9@atomos.com>
+Date: Fri, 19 Aug 2016 17:00:17 +1000
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
-
-In November 2012 an issue was identified in which the uhid device was
-being created before the DIS information had been retrieved. This cause
-the input device to not have the correct vendor and product identifiers.
-See the message http://www.spinics.net/lists/linux-bluetooth/msg31931.html
-
-The patch proposed was not included and I have not seen any discussion as to why.
-
-I am seeing this exact problem with Bluez 5.41 on Linux 4.1 with a
-Nordic nRF51 development board as the peripheral. Some snippets from the
-/var/log/messages show the result.
-
-
-Jan  1 00:02:54 bluetoothd[714]: src/device.c:device_probe_profiles() Probing profiles for device C0:58:9E:9D:A6:FF
-Jan  1 00:02:54 bluetoothd[714]: profiles/input/hog.c:hog_probe() path /org/bluez/hci0/dev_C0_58_9E_9D_A6_FF
-Jan  1 00:02:54 bluetoothd[714]: profiles/input/hog.c:hog_device_new() name=Nordic_Mouse vendor=0x0, product=0x0, version=0x0
-
-Jan  1 00:02:55 bluetoothd[714]: profiles/deviceinfo/deviceinfo.c:read_pnpid_cb() Vendor 1915 Product EEEE Version 0001
-
-Jan  1 00:02:57 kernel: [  179.706068] input: Nordic_Mouse as /devices/virtual/misc/uhid/0005:0000:0000.0001/input/input2
-Jan  1 00:02:57 kernel: [  179.706681] hid-generic 0005:0000:0000.0001:input: BLUETOOTH HID v0.00 Mouse [Nordic_Mouse] on 00:1A:7D:DA:71:13
-Jan  1 00:02:57 bluetoothd[714]: profiles/input/hog-lib.c:report_map_read_cb() HoG created uHID device
-
-interestingly, if I stop and restart bluetoothd without changing
-anything else the correct input is created, since the vendor, product
-and version are now valid
-
-Jan  1 00:04:14 kernel: [  256.476283] input: Nordic_Mouse as /devices/virtual/misc/uhid/0005:1915:EEEE.0002/input/input3
-Jan  1 00:04:14 bluetoothd[773]: profiles/input/hog-lib.c:report_map_read_cb() HoG created uHID device
-Jan  1 00:04:14 bluetoothd[773]: attrib/gattrib.c:g_attrib_unref() 0xad4e78: g_attrib_unref=2
-Jan  1 00:04:14 kernel: [  256.477313] hid-generic 0005:1915:EEEE.0002:input: BLUETOOTH HID v0.01 Mouse [Nordic_Mouse] on 00:1A:7D:DA:71:13
-
-Is this a problem for anyone else?
-
+I submit the following small patch for consideration.
 Leigh
+---
 
+In at least two places the Connection Latency field was being displayed by btmon in units of 1.25mS,
+which is incorrect. Print in decimal instead of hex as it is a number.
+
+--
+ monitor/packet.c | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/monitor/packet.c b/monitor/packet.c
+index 259c20b..9b9b037 100644
+--- a/monitor/packet.c
++++ b/monitor/packet.c
+@@ -6226,7 +6226,7 @@ static void le_create_conn_cmd(const void *data, uint8_t size)
+ 
+ 	print_slot_125("Min connection interval", cmd->min_interval);
+ 	print_slot_125("Max connection interval", cmd->max_interval);
+-	print_field("Connection latency: 0x%4.4x", le16_to_cpu(cmd->latency));
++	print_field("Connection latency: %u", le16_to_cpu(cmd->latency));
+ 	print_field("Supervision timeout: %d msec (0x%4.4x)",
+ 					le16_to_cpu(cmd->supv_timeout) * 10,
+ 					le16_to_cpu(cmd->supv_timeout));
+@@ -6265,7 +6265,7 @@ static void le_conn_update_cmd(const void *data, uint8_t size)
+ 	print_handle(cmd->handle);
+ 	print_slot_125("Min connection interval", cmd->min_interval);
+ 	print_slot_125("Max connection interval", cmd->max_interval);
+-	print_field("Connection latency: 0x%4.4x", le16_to_cpu(cmd->latency));
++	print_field("Connection latency: %u", le16_to_cpu(cmd->latency));
+ 	print_field("Supervision timeout: %d msec (0x%4.4x)",
+ 					le16_to_cpu(cmd->supv_timeout) * 10,
+ 					le16_to_cpu(cmd->supv_timeout));
+@@ -6409,7 +6409,7 @@ static void le_conn_param_req_reply_cmd(const void *data, uint8_t size)
+ 	print_handle(cmd->handle);
+ 	print_slot_125("Min connection interval", cmd->min_interval);
+ 	print_slot_125("Max connection interval", cmd->max_interval);
+-	print_field("Connection latency: 0x%4.4x", le16_to_cpu(cmd->latency));
++	print_field("Connection latency: %u", le16_to_cpu(cmd->latency));
+ 	print_field("Supervision timeout: %d msec (0x%4.4x)",
+ 					le16_to_cpu(cmd->supv_timeout) * 10,
+ 					le16_to_cpu(cmd->supv_timeout));
+@@ -8218,7 +8218,7 @@ static void le_conn_complete_evt(const void *data, uint8_t size)
+ 	print_peer_addr_type("Peer address type", evt->peer_addr_type);
+ 	print_addr("Peer address", evt->peer_addr, evt->peer_addr_type);
+ 	print_slot_125("Connection interval", evt->interval);
+-	print_slot_125("Connection latency", evt->latency);
++	print_field("Connection latency: %d", le16_to_cpu(evt->latency));
+ 	print_field("Supervision timeout: %d msec (0x%4.4x)",
+ 					le16_to_cpu(evt->supv_timeout) * 10,
+ 					le16_to_cpu(evt->supv_timeout));
+@@ -8263,7 +8263,7 @@ static void le_conn_update_complete_evt(const void *data, uint8_t size)
+ 	print_status(evt->status);
+ 	print_handle(evt->handle);
+ 	print_slot_125("Connection interval", evt->interval);
+-	print_slot_125("Connection latency", evt->latency);
++	print_field("Connection latency: %d", le16_to_cpu(evt->latency));
+ 	print_field("Supervision timeout: %d msec (0x%4.4x)",
+ 					le16_to_cpu(evt->supv_timeout) * 10,
+ 					le16_to_cpu(evt->supv_timeout));
+@@ -8294,7 +8294,7 @@ static void le_conn_param_request_evt(const void *data, uint8_t size)
+ 	print_handle(evt->handle);
+ 	print_slot_125("Min connection interval", evt->min_interval);
+ 	print_slot_125("Max connection interval", evt->max_interval);
+-	print_field("Connection latency: 0x%4.4x", le16_to_cpu(evt->latency));
++	print_field("Connection latency: %d", le16_to_cpu(evt->latency));
+ 	print_field("Supervision timeout: %d msec (0x%4.4x)",
+ 					le16_to_cpu(evt->supv_timeout) * 10,
+ 					le16_to_cpu(evt->supv_timeout));
+@@ -8339,7 +8339,7 @@ static void le_enhanced_conn_complete_evt(const void *data, uint8_t size)
+ 	print_addr("Local resolvable private address", evt->local_rpa, 0x01);
+ 	print_addr("Peer resolvable private address", evt->peer_rpa, 0x01);
+ 	print_slot_125("Connection interval", evt->interval);
+-	print_slot_125("Connection latency", evt->latency);
++	print_field("Connection latency: %d", le16_to_cpu(evt->latency));
+ 	print_field("Supervision timeout: %d msec (0x%4.4x)",
+ 					le16_to_cpu(evt->supv_timeout) * 10,
+ 					le16_to_cpu(evt->supv_timeout));
 
