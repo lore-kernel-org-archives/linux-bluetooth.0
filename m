@@ -7,35 +7,38 @@ To: Marcel Holtmann <marcel@holtmann.org>,
 Cc: linux-kernel@vger.kernel.org,
 	jason.abele@gmail.com,
 	Boris Brezillon <boris.brezillon@free-electrons.com>
-Subject: [PATCH 3/4] Bluetooth: hci_ldisc: don't release resources in hci_uart_init_work()
-Date: Fri, 19 Aug 2016 09:38:46 +0200
-Message-Id: <1471592327-14133-4-git-send-email-boris.brezillon@free-electrons.com>
+Subject: [PATCH 2/4] Bluetooth: hci_h5: fix a race in the closing path
+Date: Fri, 19 Aug 2016 09:38:45 +0200
+Message-Id: <1471592327-14133-3-git-send-email-boris.brezillon@free-electrons.com>
 In-Reply-To: <1471592327-14133-1-git-send-email-boris.brezillon@free-electrons.com>
 References: <1471592327-14133-1-git-send-email-boris.brezillon@free-electrons.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is done in hci_uart_tty_close() and can lead to double cleanup if
-proto->close() is not tracking the closed/open state.
+The H5 timer should not be rescheduled while we are closing the device,
+otherwise it's defeating the del_timer_sync() call done in h5_close().
 
 Signed-off-by: Boris Brezillon <boris.brezillon@free-electrons.com>
 ---
- drivers/bluetooth/hci_ldisc.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+ drivers/bluetooth/hci_h5.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
-index de7f7f1f995c..27f73294edcb 100644
---- a/drivers/bluetooth/hci_ldisc.c
-+++ b/drivers/bluetooth/hci_ldisc.c
-@@ -190,9 +190,7 @@ static void hci_uart_init_work(struct work_struct *work)
- 	err = hci_register_dev(hu->hdev);
- 	if (err < 0) {
- 		BT_ERR("Can't register HCI device");
--		hci_free_dev(hu->hdev);
--		hu->hdev = NULL;
--		hu->proto->close(hu);
-+		return;
+diff --git a/drivers/bluetooth/hci_h5.c b/drivers/bluetooth/hci_h5.c
+index 0879d64b1caf..d9720c59cffa 100644
+--- a/drivers/bluetooth/hci_h5.c
++++ b/drivers/bluetooth/hci_h5.c
+@@ -140,7 +140,12 @@ static void h5_timed_event(unsigned long arg)
  	}
  
- 	set_bit(HCI_UART_REGISTERED, &hu->flags);
+ 	if (h5->state != H5_ACTIVE) {
+-		mod_timer(&h5->timer, jiffies + H5_SYNC_TIMEOUT);
++		/*
++		 * Do not re-schedule the timer if the device is being closed.
++		 */
++		if (!test_bit(HCI_UART_CLOSING, &hu->flags))
++			mod_timer(&h5->timer, jiffies + H5_SYNC_TIMEOUT);
++
+ 		goto wakeup;
+ 	}
+ 
 -- 
 2.7.4
