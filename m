@@ -1,91 +1,136 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Leigh Fiddes <leigh.fiddes@atomos.com>
-Subject: [Proposed Patch Bluez v5] btmon: Print connection latency correctly
-To: Linux Bluetooth <linux-bluetooth@vger.kernel.org>
-Message-ID: <155e0135-7d14-259d-322b-a582afb979c9@atomos.com>
-Date: Fri, 19 Aug 2016 17:00:17 +1000
+Return-Path: <sre@kernel.org>
+Date: Fri, 19 Aug 2016 07:21:26 +0200
+From: Sebastian Reichel <sre@kernel.org>
+To: Rob Herring <robh@kernel.org>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Marcel Holtmann <marcel@holtmann.org>, Jiri Slaby <jslaby@suse.com>,
+	Pavel Machek <pavel@ucw.cz>,
+	Peter Hurley <peter@hurleysoftware.com>,
+	NeilBrown <neil@brown.name>,
+	"Dr . H . Nikolaus Schaller" <hns@goldelico.com>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	"open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+	"linux-serial@vger.kernel.org" <linux-serial@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [RFC PATCH 0/3] UART slave device bus
+Message-ID: <20160819052125.ze5zilppwoe3f2lx@earth>
+References: <20160818011445.22726-1-robh@kernel.org>
+ <20160818202900.hyvm4hfxedifuefn@earth>
+ <CAL_Jsq+OfT1AXaEKOgZ4oVfpVZhu=55dYoHTG7D_prpnTqpeOg@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="henxg5cothif7yv2"
+In-Reply-To: <CAL_Jsq+OfT1AXaEKOgZ4oVfpVZhu=55dYoHTG7D_prpnTqpeOg@mail.gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+
+--henxg5cothif7yv2
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
 Hi,
-I submit the following small patch for consideration.
-Leigh
----
 
-In at least two places the Connection Latency field was being displayed by btmon in units of 1.25mS,
-which is incorrect. Print in decimal instead of hex as it is a number.
+On Thu, Aug 18, 2016 at 06:08:24PM -0500, Rob Herring wrote:
+> On Thu, Aug 18, 2016 at 3:29 PM, Sebastian Reichel <sre@kernel.org> wrote:
+> > Thanks for going forward and implementing this. I also started,
+> > but was far from a functional state.
+> >
+> > On Wed, Aug 17, 2016 at 08:14:42PM -0500, Rob Herring wrote:
+> >> Currently, devices attached via a UART are not well supported in
+> >> the kernel. The problem is the device support is done in tty line
+> >> disciplines, various platform drivers to handle some sideband, and
+> >> in userspace with utilities such as hciattach.
+> >>
+> >> There have been several attempts to improve support, but they suffer f=
+rom
+> >> still being tied into the tty layer and/or abusing the platform bus. T=
+his
+> >> is a prototype to show creating a proper UART bus for UART devices. It=
+ is
+> >> tied into the serial core (really struct uart_port) below the tty layer
+> >> in order to use existing serial drivers.
+> >>
+> >> This is functional with minimal testing using the loopback driver and
+> >> pl011 (w/o DMA) UART under QEMU (modified to add a DT node for the sla=
+ve
+> >> device). It still needs lots of work and polish.
+> >>
+> >> TODOs:
+> >> - Figure out the port locking. mutex plus spinlock plus refcounting? I=
+'m
+> >>   hoping all that complexity is from the tty layer and not needed here.
+> >> - Split out the controller for uart_ports into separate driver. Do we =
+see
+> >>   a need for controller drivers that are not standard serial drivers?
+> >> - Implement/test the removal paths
+> >> - Fix the receive callbacks for more than character at a time (i.e. DM=
+A)
+> >> - Need better receive buffering than just a simple circular buffer or
+> >>   perhaps a different receive interface (e.g. direct to client buffer)?
+> >> - Test with other UART drivers
+> >> - Convert a real driver/line discipline over to UART bus.
+> >>
+> >> Before I spend more time on this, I'm looking mainly for feedback on t=
+he
+> >> general direction and structure (the interface with the existing serial
+> >> drivers in particular).
+> >
+> > I had a look at the uart_dev API:
+> >
+> > int uart_dev_config(struct uart_device *udev, int baud, int parity, int=
+ bits, int flow);
+> > int uart_dev_connect(struct uart_device *udev);
+> >
+> >   The flow control configuration should be done separately. e.g.:
+> >   uart_dev_flow_control(struct uart_device *udev, bool enable);
+>=20
+> No objection, but out of curiosity, why?
 
---
- monitor/packet.c | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
+Nokia's bluetooth uart protocol disables flow control during speed
+changes.
 
-diff --git a/monitor/packet.c b/monitor/packet.c
-index 259c20b..9b9b037 100644
---- a/monitor/packet.c
-+++ b/monitor/packet.c
-@@ -6226,7 +6226,7 @@ static void le_create_conn_cmd(const void *data, uint8_t size)
- 
- 	print_slot_125("Min connection interval", cmd->min_interval);
- 	print_slot_125("Max connection interval", cmd->max_interval);
--	print_field("Connection latency: 0x%4.4x", le16_to_cpu(cmd->latency));
-+	print_field("Connection latency: %u", le16_to_cpu(cmd->latency));
- 	print_field("Supervision timeout: %d msec (0x%4.4x)",
- 					le16_to_cpu(cmd->supv_timeout) * 10,
- 					le16_to_cpu(cmd->supv_timeout));
-@@ -6265,7 +6265,7 @@ static void le_conn_update_cmd(const void *data, uint8_t size)
- 	print_handle(cmd->handle);
- 	print_slot_125("Min connection interval", cmd->min_interval);
- 	print_slot_125("Max connection interval", cmd->max_interval);
--	print_field("Connection latency: 0x%4.4x", le16_to_cpu(cmd->latency));
-+	print_field("Connection latency: %u", le16_to_cpu(cmd->latency));
- 	print_field("Supervision timeout: %d msec (0x%4.4x)",
- 					le16_to_cpu(cmd->supv_timeout) * 10,
- 					le16_to_cpu(cmd->supv_timeout));
-@@ -6409,7 +6409,7 @@ static void le_conn_param_req_reply_cmd(const void *data, uint8_t size)
- 	print_handle(cmd->handle);
- 	print_slot_125("Min connection interval", cmd->min_interval);
- 	print_slot_125("Max connection interval", cmd->max_interval);
--	print_field("Connection latency: 0x%4.4x", le16_to_cpu(cmd->latency));
-+	print_field("Connection latency: %u", le16_to_cpu(cmd->latency));
- 	print_field("Supervision timeout: %d msec (0x%4.4x)",
- 					le16_to_cpu(cmd->supv_timeout) * 10,
- 					le16_to_cpu(cmd->supv_timeout));
-@@ -8218,7 +8218,7 @@ static void le_conn_complete_evt(const void *data, uint8_t size)
- 	print_peer_addr_type("Peer address type", evt->peer_addr_type);
- 	print_addr("Peer address", evt->peer_addr, evt->peer_addr_type);
- 	print_slot_125("Connection interval", evt->interval);
--	print_slot_125("Connection latency", evt->latency);
-+	print_field("Connection latency: %d", le16_to_cpu(evt->latency));
- 	print_field("Supervision timeout: %d msec (0x%4.4x)",
- 					le16_to_cpu(evt->supv_timeout) * 10,
- 					le16_to_cpu(evt->supv_timeout));
-@@ -8263,7 +8263,7 @@ static void le_conn_update_complete_evt(const void *data, uint8_t size)
- 	print_status(evt->status);
- 	print_handle(evt->handle);
- 	print_slot_125("Connection interval", evt->interval);
--	print_slot_125("Connection latency", evt->latency);
-+	print_field("Connection latency: %d", le16_to_cpu(evt->latency));
- 	print_field("Supervision timeout: %d msec (0x%4.4x)",
- 					le16_to_cpu(evt->supv_timeout) * 10,
- 					le16_to_cpu(evt->supv_timeout));
-@@ -8294,7 +8294,7 @@ static void le_conn_param_request_evt(const void *data, uint8_t size)
- 	print_handle(evt->handle);
- 	print_slot_125("Min connection interval", evt->min_interval);
- 	print_slot_125("Max connection interval", evt->max_interval);
--	print_field("Connection latency: 0x%4.4x", le16_to_cpu(evt->latency));
-+	print_field("Connection latency: %d", le16_to_cpu(evt->latency));
- 	print_field("Supervision timeout: %d msec (0x%4.4x)",
- 					le16_to_cpu(evt->supv_timeout) * 10,
- 					le16_to_cpu(evt->supv_timeout));
-@@ -8339,7 +8339,7 @@ static void le_enhanced_conn_complete_evt(const void *data, uint8_t size)
- 	print_addr("Local resolvable private address", evt->local_rpa, 0x01);
- 	print_addr("Peer resolvable private address", evt->peer_rpa, 0x01);
- 	print_slot_125("Connection interval", evt->interval);
--	print_slot_125("Connection latency", evt->latency);
-+	print_field("Connection latency: %d", le16_to_cpu(evt->latency));
- 	print_field("Supervision timeout: %d msec (0x%4.4x)",
- 					le16_to_cpu(evt->supv_timeout) * 10,
- 					le16_to_cpu(evt->supv_timeout));
+> > int uart_dev_tx(struct uart_device *udev, u8 *buf, size_t count);
+> > int uart_dev_rx(struct uart_device *udev, u8 *buf, size_t count);
+> >
+> >   UART communication does not have to be host-initiated, so this
+> >   API requires polling. Either some function similar to poll in
+> >   userspace is needed, or it should be implemented as callback.
+>=20
+> What's the userspace need?
 
+I meant "Either some function similar to userspace's poll() is
+needed, ...". Something like uart_dev_wait_for_rx()
+
+Alternatively the rx function could be a callback, that
+is called when there is new data.
+
+> I'm assuming the only immediate consumers are in-kernel.
+
+Yes, but the driver should be notified about incoming data.
+
+-- Sebastian
+
+--henxg5cothif7yv2
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBCgAGBQJXtpdTAAoJENju1/PIO/qaCjgQAIQDP+hEvxcbpGJGHcrLan0O
+3M2Piv7KCess3my+LQ7ipCzCXVKV3L96t70v/3AqWbK1VrfY68X6FhvWNZtlj3KP
+0yK1mhBZdqU3fzHBhRHFVHO0uiD/lBf4MNXRa1xi4m5haZvVryp2j7cA0DrRHyOM
+bb2TxewGmIyZ8zMRGEsbEF9JSEwMRb9Nga1+hW8mldshRPqgTALuRfdfAoOOOxsZ
+GxtqjAxMEEL+OEvaNN52315nA8AGF+dkifla/RZvksTy54tmMpxO/njwkC1kzmEH
+DxLvNzDarA6ohdYpHp0x+twb3Iu3n61eN8eg/V/mWWLOqwZUAEahmiPBTYOFeDuF
+n5Z4pfDGLeyvPcEVIncE8q1GsM4fqfX6vPWHR153CjgYxuzok00u//IU/DB6uAS+
+oS3+MaX8y4nqdIEVk0WSkPk/aP6zT+0jyFkSuGzYlRmFh3RnItCWQtjsKQNhdg6H
+3nwZXjprcky2gDj4NM774fRJhECqrwwNwOEUKvmPvnANmQ+/gVoh2n8KN9Jo+/i8
+yBzXz1LdFcd8m0pk6yCFtoIEt/uR800aPUxy1x23TXBMAZ3sou3X5HKQUsxG+Yqz
+3RHtd/ExCcmQ5+DxoXV35seczPd2WZLtaBWFTTNefvCa6+6wesb26OnfUROVwqC/
+wsWzV3MfZyCCPU58n06I
+=ItwL
+-----END PGP SIGNATURE-----
+
+--henxg5cothif7yv2--
