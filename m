@@ -1,44 +1,40 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <leigh.fiddes@atomos.com>
+Subject: Re: [Proposed Patch Bluez v5] btmon: Print connection latency
+ correctly
+To: Marcel Holtmann <marcel@holtmann.org>
+References: <155e0135-7d14-259d-322b-a582afb979c9@atomos.com>
+ <35A91F39-E5C2-47F2-81D5-398797B31C1C@holtmann.org>
+CC: Linux Bluetooth <linux-bluetooth@vger.kernel.org>
+From: Leigh Fiddes <leigh.fiddes@atomos.com>
+Message-ID: <ccb0c2f9-0643-4030-3111-93f4d36f5b4e@atomos.com>
+Date: Fri, 19 Aug 2016 22:01:01 +1000
 MIME-Version: 1.0
-From: Jay Aurabind <jay.aurabind@gmail.com>
-Date: Fri, 19 Aug 2016 19:36:10 +0530
-Message-ID: <CAOsEZohrTsrZuLxpfRQ37mVcXGDqO+rV6TzfzR1ELbSHe0jtng@mail.gmail.com>
-Subject: BLE Hexiwear connection fail
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <35A91F39-E5C2-47F2-81D5-398797B31C1C@holtmann.org>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Marcel,
 
-I have the IoT device Hexiwear[1], which connects through BLE. They
-have an android app which can take data from it. I want to use from my
-linux machine. Its BLE API is provided at their github[2] page.
-
-I tried connecting to it, but fails with an error no implemented:
-
-[root@fedaura-envy jayaura]# gatttool -b 00:20:40:0B:00:24 -I
-[00:20:40:0B:00:24][LE]> connect
-Attempting to connect to 00:20:40:0B:00:24
-Error: connect error: Function not implemented (38)
-[00:20:40:0B:00:24][LE]>
-
-
-I have the log[3] while this is happening. Does the above error mean
-that connect is not implemented in my device? That is highly unlikely
-as I can read data through the Android app.
-
-Please provide some recommendations to get some data out of this
-device through bluez
-
-
-
-
-[1]:http://www.hexiwear.com/
-[2]:https://github.com/MikroElektronika/HEXIWEAR/blob/master/documentation/HEXIWEAR%20Bluetooth%20Specifications.pdf
-[3]:https://paste.gnome.org/pcdgqjf9r
-
--- 
-
-Thanks and Regards,
-Aurabindo J
+> Hi Leigh,
+>
+>> I submit the following small patch for consideration.
+>> Leigh
+>> ---
+>>
+>> In at least two places the Connection Latency field was being displayed by btmon in units of 1.25mS,
+>> which is incorrect. Print in decimal instead of hex as it is a number.
+> then print the connection latency with a correct unit and the hex value in parentheses. This way is not acceptable. If we need a print_field_msec helper, then introduce that and use it throughout.
+>
+> Regards
+>
+> Marcel
+>
+Thank you for the quick response.
+I think there may be a misunderstanding here. In these LE messages, the 
+Connection Latency is not a time unit. It is a count of the number of
+Connection messages from the Host that the Peripheral can ignore if the 
+Peripheral has no new data to send at that time.
+Since it is just a count, printing the same value in both decimal and 
+hex is a stylistic decision.
+Regards,
+Leigh
