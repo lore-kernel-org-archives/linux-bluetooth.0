@@ -1,73 +1,63 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+To: Anthony Bourguignon <contact@toniob.net>,
+        linux-bluetooth@vger.kernel.org
+Subject: Re: Can't connect a Xbox one controller
+In-Reply-To: <1471642506.3626.5.camel@toniob.net>
+References: <1471515072.4976.10.camel@toniob.net> <8760qwy6vv.fsf@intel.com> <1471642506.3626.5.camel@toniob.net>
+Date: Fri, 19 Aug 2016 20:34:05 -0300
+Message-ID: <87zio8wcya.fsf@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZJZtU23ryoE6BUoDWD-BQMpahhVJn8rPDYn-1UX-=VOeQ@mail.gmail.com>
-References: <CAMj0Yyu7Ot6xzCxTh0puAuVeV-jBuspSDMLxg_R0Y4V068zHhg@mail.gmail.com>
- <CABBYNZJnSZtmEkBb8T4urYhHw2+pqAKu77d_g3_eJ1nw=02D7A@mail.gmail.com>
- <CAMj0Yys1efPQoZPPHbPKs54c9DFWRfFjhkt4Pe3K-fYaZZiarw@mail.gmail.com>
- <CABBYNZLNzLx0+BGgLzubwOHUaMcyde6bL1hhxrHtfskt9OGbzg@mail.gmail.com>
- <CAMj0YytVTxHLY-Mkrjy9PEvNPVd-2GmX9vAK5PeLVo+kSCvAZw@mail.gmail.com>
- <CANBo3n9=-VeFh2EAwm5EcSHgBuZUzFyJDwMZDR29wwKrmgKvVg@mail.gmail.com>
- <CAMj0YytkTtekdgHnZSWbHW+zwdANvMNjgaKfym6a4n5mKWaM_Q@mail.gmail.com>
- <CAMj0Yyu1CKr934V0jcFeeY9QEYSMoS6XO+3hjQNshGE4pFe2cg@mail.gmail.com>
- <CANBo3n_NVJCha8qLAan_9yEmk_9HPuaXK96MDT8S4DTqp=_y-w@mail.gmail.com>
- <CAMj0YyuTWMxc0xJZp=z-7smmtXNtiOMy-FS4d7ePH1s-C+hVCQ@mail.gmail.com>
- <CAMj0Yyu_uh9s8rhSa36T73PRRzGNubs1f_kLYFngmFS6hH-swA@mail.gmail.com> <CABBYNZJZtU23ryoE6BUoDWD-BQMpahhVJn8rPDYn-1UX-=VOeQ@mail.gmail.com>
-From: Ajay Parashar <ajay.parasha@gmail.com>
-Date: Sat, 20 Aug 2016 10:31:39 +0530
-Message-ID: <CAMj0YytVoPYjLaDO31KOURK4m1b-aS6E+jFbS_xjFzU8M8ARbw@mail.gmail.com>
-Subject: Re: BT PAN Connection - NAP with PANU ?
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: bharat panda <bharat22bhusan@gmail.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, Aug 16, 2016 at 6:41 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi Ajay,
->
->>> Hi Bharat,
->>>
->>> I hope this issue has resolve at your end?
->>>
->>> i did the change as suggested by you but it did not resolve the issue.
->>> For your reference i am attaching bluetooth.conf with my change at
->>> line number 21,  can you please confirm is this the only change
->>> required ? or some more changes need to do ?
->>>
->>> I have 1 more question the interfaces name mentioned in
->>> bluetooth.conf does not match with my set up. Again i am attaching
->>> snapshot of my setup.
->>>
->>> Please let me know how this issue can be resolved at my end ?
->>>
->>> Regards
->>> Ajay
+Hi,
+
+Anthony Bourguignon <contact@toniob.net> writes:
+
+> Le vendredi 19 août 2016 à 15:02 -0300, Vinicius Costa Gomes a écrit :
+>> Hi Anthony,
 >>
->> Hi,
+>> Anthony Bourguignon <contact@toniob.net> writes:
 >>
->> Can you please provide update regarding this issue?
->> How can i solve this , i am very much locked here.
+>> >
+>> > Hi,
+>> >
+>> > I've recently bought a new xbox one controller as the 2016 version
+>> > has
+>> > bluetooth connectivity.
+>> >
+>> > The controller is pairing and connecting well on a windows 10
+>> > computer
+>> > and an android 4.4 tablet. But I can"t make it connect under linux
+>> > (Debian unstable, kernel 4.6 and 4.7-rc7, bluez 5.40 from
+>> > experimental). The pairing is ok but when I try to connect to
+>> > controller, it stays connected for less than one second, then
+>> > disconnects, then connects again and so one until the controller
+>> > goes
+>> > to sleep, because of the lack of a remote connection.
+>>
+>> Can you produce the logs with L2CAP ERTM/Streaming mode disabled,
+>> doing something like this before connecting this should work:
+>>
+>> $ echo 1 > /sys/module/bluetooth/parameters/disable_ertm
 >
-> Usage: ./test-network <address> [service]
+> The connection worked with ertm disabled, the controller is fully
+> usable.
 >
-> There should be a device object for the given address and it must
-> implement org.bluez.Network1 interface, if that doesn't exist than it
-> is probably due to missing SDP record.
->
-> --
-> Luiz Augusto von Dentz
+> Is that normal that we have to disable it ?
 
-Hi Luiz,
+No. It could be a bug in the xbox controller. But I need to take a
+closer look at the specification to be really sure.
 
-Thanks a lot for pointing  the right direction.
-Issue was bad sequence of steps execution, i was doing pairing first
-and then executing NAP server.
+Thinking out loud: this seems too basic a mistake for an end product
+(but I wouldn't be too surprised if this is the case), perhaps something
+that we are assuming and is incorrect?
 
-Now first i am executing NAP server and then pairing, so that both
-devices have knowledge of NAP service.
-I confirmed that this issue has resolved @ my end.
+But glad that we found a workaround.
 
-Thanks & Regards
-Ajay Parashar
+
+Cheers,
+--
+Vinicius
