@@ -1,51 +1,60 @@
-Return-Path: <gnomes@lxorguk.ukuu.org.uk>
-Date: Fri, 19 Aug 2016 12:03:05 +0100
-From: One Thousand Gnomes <gnomes@lxorguk.ukuu.org.uk>
-To: Sebastian Reichel <sre@kernel.org>
-Cc: Rob Herring <robh@kernel.org>,
-        Greg Kroah-Hartman
- <gregkh@linuxfoundation.org>,
-        Marcel Holtmann <marcel@holtmann.org>, Jiri
- Slaby <jslaby@suse.com>,
-        Pavel Machek <pavel@ucw.cz>, Peter Hurley
- <peter@hurleysoftware.com>,
-        NeilBrown <neil@brown.name>,
-        "Dr . H . Nikolaus
- Schaller" <hns@goldelico.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Linus Walleij
- <linus.walleij@linaro.org>,
-        "open list:BLUETOOTH DRIVERS"
- <linux-bluetooth@vger.kernel.org>,
-        "linux-serial@vger.kernel.org"
- <linux-serial@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org"
- <linux-kernel@vger.kernel.org>
-Subject: Re: [RFC PATCH 0/3] UART slave device bus
-Message-ID: <20160819120305.4a3b1b54@lxorguk.ukuu.org.uk>
-In-Reply-To: <20160819052125.ze5zilppwoe3f2lx@earth>
-References: <20160818011445.22726-1-robh@kernel.org>
-	<20160818202900.hyvm4hfxedifuefn@earth>
-	<CAL_Jsq+OfT1AXaEKOgZ4oVfpVZhu=55dYoHTG7D_prpnTqpeOg@mail.gmail.com>
-	<20160819052125.ze5zilppwoe3f2lx@earth>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <96447190-1a92-5864-f4f6-cfe9898da242@atomos.com>
+References: <96447190-1a92-5864-f4f6-cfe9898da242@atomos.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Fri, 19 Aug 2016 13:36:25 +0300
+Message-ID: <CABBYNZL1oW9DdEXD3teMfudzwp540pWZnZ1zun0Az6D6qn2tcw@mail.gmail.com>
+Subject: Re: Race condition between DIS and HoG profiles
+To: Leigh Fiddes <leigh.fiddes@atomos.com>
+Cc: Linux Bluetooth <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-> I meant "Either some function similar to userspace's poll() is
-> needed, ...". Something like uart_dev_wait_for_rx()
+Hi Leigh,
 
-You can't really do that - it might never return and then how do you want
-to handle timeouts and cleanups
+On Fri, Aug 19, 2016 at 9:29 AM, Leigh Fiddes <leigh.fiddes@atomos.com> wrote:
+> Hi,
+>
+> In November 2012 an issue was identified in which the uhid device was
+> being created before the DIS information had been retrieved. This cause
+> the input device to not have the correct vendor and product identifiers.
+> See the message http://www.spinics.net/lists/linux-bluetooth/msg31931.html
+>
+> The patch proposed was not included and I have not seen any discussion as to why.
+>
+> I am seeing this exact problem with Bluez 5.41 on Linux 4.1 with a
+> Nordic nRF51 development board as the peripheral. Some snippets from the
+> /var/log/messages show the result.
+>
+>
+> Jan  1 00:02:54 bluetoothd[714]: src/device.c:device_probe_profiles() Probing profiles for device C0:58:9E:9D:A6:FF
+> Jan  1 00:02:54 bluetoothd[714]: profiles/input/hog.c:hog_probe() path /org/bluez/hci0/dev_C0_58_9E_9D_A6_FF
+> Jan  1 00:02:54 bluetoothd[714]: profiles/input/hog.c:hog_device_new() name=Nordic_Mouse vendor=0x0, product=0x0, version=0x0
+>
+> Jan  1 00:02:55 bluetoothd[714]: profiles/deviceinfo/deviceinfo.c:read_pnpid_cb() Vendor 1915 Product EEEE Version 0001
+>
+> Jan  1 00:02:57 kernel: [  179.706068] input: Nordic_Mouse as /devices/virtual/misc/uhid/0005:0000:0000.0001/input/input2
+> Jan  1 00:02:57 kernel: [  179.706681] hid-generic 0005:0000:0000.0001:input: BLUETOOTH HID v0.00 Mouse [Nordic_Mouse] on 00:1A:7D:DA:71:13
+> Jan  1 00:02:57 bluetoothd[714]: profiles/input/hog-lib.c:report_map_read_cb() HoG created uHID device
+>
+> interestingly, if I stop and restart bluetoothd without changing
+> anything else the correct input is created, since the vendor, product
+> and version are now valid
+>
+> Jan  1 00:04:14 kernel: [  256.476283] input: Nordic_Mouse as /devices/virtual/misc/uhid/0005:1915:EEEE.0002/input/input3
+> Jan  1 00:04:14 bluetoothd[773]: profiles/input/hog-lib.c:report_map_read_cb() HoG created uHID device
+> Jan  1 00:04:14 bluetoothd[773]: attrib/gattrib.c:g_attrib_unref() 0xad4e78: g_attrib_unref=2
+> Jan  1 00:04:14 kernel: [  256.477313] hid-generic 0005:1915:EEEE.0002:input: BLUETOOTH HID v0.01 Mouse [Nordic_Mouse] on 00:1A:7D:DA:71:13
+>
+> Is this a problem for anyone else?
 
-> Alternatively the rx function could be a callback, that
-> is called when there is new data.
+I guess this would be a problem only if the device requires a specific
+driver, or are you saying it doesn't work the first time either? We
+should be able to fix the this problem by checking the profile
+priority and have DIS before HoG in case the generic HID driver
+doesn't work.
 
-That's what the existing API gives you as an ldisc, it can't be immediate
-in many cases however but must be buffered.
-
-> > I'm assuming the only immediate consumers are in-kernel.  
-> 
-> Yes, but the driver should be notified about incoming data.
-
-Alan
+-- 
+Luiz Augusto von Dentz
