@@ -3,8 +3,8 @@ From: bugzilla-daemon@bugzilla.kernel.org
 To: linux-bluetooth@vger.kernel.org
 Subject: [Bug 98221] [REGRESSION] Conwise Technology Co., Ltd. CW6622
  Bluetooth Dongle doesn't work
-Date: Sun, 21 Aug 2016 18:44:08 +0000
-Message-ID: <bug-98221-62941-eIQRhYPllw@https.bugzilla.kernel.org/>
+Date: Sun, 21 Aug 2016 18:43:27 +0000
+Message-ID: <bug-98221-62941-0gmjFmRN7u@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-98221-62941@https.bugzilla.kernel.org/>
 References: <bug-98221-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -14,10 +14,16 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 https://bugzilla.kernel.org/show_bug.cgi?id=98221
 
---- Comment #7 from Szymon Janc <szymon.janc@gmail.com> ---
-Created attachment 229591
-  --> https://bugzilla.kernel.org/attachment.cgi?id=229591&action=edit
-fix
+Szymon Janc <szymon.janc@gmail.com> changed:
+
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |szymon.janc@gmail.com
+
+--- Comment #6 from Szymon Janc <szymon.janc@gmail.com> ---
+Looks like this chip has broken support for Read Stored Link Key command.
+
+Can you try attached patch?
 
 -- 
 You are receiving this mail because:
