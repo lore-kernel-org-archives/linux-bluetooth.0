@@ -1,66 +1,42 @@
-Return-Path: <gnomes@lxorguk.ukuu.org.uk>
-Date: Sun, 21 Aug 2016 18:09:10 +0100
-From: One Thousand Gnomes <gnomes@lxorguk.ukuu.org.uk>
-To: "H. Nikolaus Schaller" <hns@goldelico.com>
-Cc: Sebastian Reichel <sre@kernel.org>, Rob Herring <robh@kernel.org>,
-        Greg
- Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Marcel Holtmann
- <marcel@holtmann.org>, Jiri Slaby <jslaby@suse.com>,
-        Pavel Machek
- <pavel@ucw.cz>, Peter Hurley <peter@hurleysoftware.com>,
-        NeilBrown
- <neil@brown.name>, Arnd Bergmann <arnd@arndb.de>,
-        Linus Walleij
- <linus.walleij@linaro.org>,
-        "open list:BLUETOOTH DRIVERS"
- <linux-bluetooth@vger.kernel.org>,
-        "linux-serial@vger.kernel.org"
- <linux-serial@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org"
- <linux-kernel@vger.kernel.org>
-Subject: Re: [RFC PATCH 0/3] UART slave device bus
-Message-ID: <20160821180910.51cf919d@lxorguk.ukuu.org.uk>
-In-Reply-To: <CC150758-1D16-4BB7-A35B-1A7F4D061C7C@goldelico.com>
-References: <20160818011445.22726-1-robh@kernel.org>
-	<20160818202900.hyvm4hfxedifuefn@earth>
-	<CAL_Jsq+OfT1AXaEKOgZ4oVfpVZhu=55dYoHTG7D_prpnTqpeOg@mail.gmail.com>
-	<20160819052125.ze5zilppwoe3f2lx@earth>
-	<ACEF800E-8DB3-4345-ADE2-15C99F3659D5@goldelico.com>
-	<20160819120631.5fe2af0d@lxorguk.ukuu.org.uk>
-	<61F43885-BE05-482C-9AD6-B52A2DA166B8@goldelico.com>
-	<20160820142226.6121e76d@lxorguk.ukuu.org.uk>
-	<CC150758-1D16-4BB7-A35B-1A7F4D061C7C@goldelico.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
+        <frederic.dalleau@collabora.co.uk>
+To: linux-bluetooth@vger.kernel.org
+Cc: Frederic Dalleau <frederic.dalleau@collabora.co.uk>
+Subject: [PATCH] Bluetooth: Fix memory leak at end of hci requests
+Date: Sun, 21 Aug 2016 14:25:31 +0200
+Message-Id: <1471782331-3755-1-git-send-email-frederic.dalleau@collabora.co.uk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-> Let me ask a question about your centralized and pre-cooked buffering approach.
-> 
-> As far as I see, even then the kernel API must notify the driver at the right moment
-> that a new block has arrived. Right?
+From: Frederic Dalleau <frederic.dalleau@collabora.co.uk>
 
-The low level driver queues words (data byte, flag byte)
-The buffer processing workqueue picks those bytes from the queue and
-atomically empties the queue
-The workqueue involves the receive handler.
+hci_req_sync_complete takes a reference on the skb in hdev->req_skb.
+It is called (via hci_req_run_skb) from either __hci_cmd_sync_ev which will
+pass the skb to the caller, or __hci_req_sync which leaks.
 
-> But how does the kernel API know how long such a block is?
+Signed-off-by: Frédéric Dalleau <frederic.dalleau@collabora.co.uk>
+---
+ net/bluetooth/hci_request.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-It's as long as the data that has arrived in that time.
+diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
+index c045b3c..7a5f9ed 100644
+--- a/net/bluetooth/hci_request.c
++++ b/net/bluetooth/hci_request.c
+@@ -212,6 +212,10 @@ int __hci_req_sync(struct hci_dev *hdev, int (*func)(struct hci_request *req,
+ 	set_current_state(TASK_INTERRUPTIBLE);
+ 
+ 	err = hci_req_run_skb(&req, hci_req_sync_complete);
++
++	kfree_skb(hdev->req_skb);
++	hdev->req_skb = NULL;
++
+ 	if (err < 0) {
+ 		hdev->req_status = 0;
+ 
+-- 
+2.7.4
 
-> Usually there is a start byte/character, sometimes a length indicator, then payload data,
-> some checksum and finally a stop byte/character. For NMEA it is $, no length, * and \r\n.
-> For other serial protocols it might be AT, no length, and \r. Or something different.
-> HCI seems to use 2 byte op-code or 1 byte event code and 1 byte parameter length.
-
-It doesn't look for any kind of protocol block headers. The routine
-invoked by the work queue does any frame recovery.
-
-> So I would even conclude that you usually can't even use DMA based UART receive
-> processing for arbitrary and not well-defined protocols. Or have to assume that the
-
-We do, today for bluetooth and other protocols just fine - it's all about
-data flows not about framing in the protocol sense.
-
-Alan
