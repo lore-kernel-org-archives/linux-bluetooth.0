@@ -1,42 +1,39 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
-        <frederic.dalleau@collabora.co.uk>
-To: linux-bluetooth@vger.kernel.org
-Cc: Frederic Dalleau <frederic.dalleau@collabora.co.uk>
-Subject: [PATCH] Bluetooth: Fix memory leak at end of hci requests
-Date: Sun, 21 Aug 2016 14:25:31 +0200
-Message-Id: <1471782331-3755-1-git-send-email-frederic.dalleau@collabora.co.uk>
+Return-Path: <frederic.dalleau@collabora.co.uk>
+From: Frederic Dalleau <frederic.dalleau@collabora.co.uk>
+Subject: Re: Memory (skb) leak in kernel 4.8-rc2
+To: Marcel Holtmann <marcel@holtmann.org>,
+ Larry Finger <Larry.Finger@lwfinger.net>,
+ "Gustavo F. Padovan" <gustavo@padovan.org>,
+ Linux Bluetooth mailing list <linux-bluetooth@vger.kernel.org>,
+ LKML <linux-kernel@vger.kernel.org>
+References: <a62119eb-28d2-7b4d-acbb-6ca8d3a0c91d@lwfinger.net>
+ <A07D8003-F1EB-4408-A3F2-E043DF678296@holtmann.org>
+ <20160820071504.GA9663@t440s.P-661HNU-F1>
+Message-ID: <dd63c403-f35e-2543-e5ba-af40b263ea75@collabora.co.uk>
+Date: Sun, 21 Aug 2016 14:09:58 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <20160820071504.GA9663@t440s.P-661HNU-F1>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Frederic Dalleau <frederic.dalleau@collabora.co.uk>
+Hi Marcel, Johan,
 
-hci_req_sync_complete takes a reference on the skb in hdev->req_skb.
-It is called (via hci_req_run_skb) from either __hci_cmd_sync_ev which will
-pass the skb to the caller, or __hci_req_sync which leaks.
+>>> I am unable to unload module bluetooth to verify that the second
+>>> leak is not a false positive; however, the one in btusb is a real
+>>> memory leak.
 
-Signed-off-by: FrÃ©dÃ©ric Dalleau <frederic.dalleau@collabora.co.uk>
----
- net/bluetooth/hci_request.c | 4 ++++
- 1 file changed, 4 insertions(+)
+There was a bugzilla last week with that backtrace: 
+https://bugzilla.kernel.org/show_bug.cgi?id=120691
 
-diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
-index c045b3c..7a5f9ed 100644
---- a/net/bluetooth/hci_request.c
-+++ b/net/bluetooth/hci_request.c
-@@ -212,6 +212,10 @@ int __hci_req_sync(struct hci_dev *hdev, int (*func)(struct hci_request *req,
- 	set_current_state(TASK_INTERRUPTIBLE);
- 
- 	err = hci_req_run_skb(&req, hci_req_sync_complete);
-+
-+	kfree_skb(hdev->req_skb);
-+	hdev->req_skb = NULL;
-+
- 	if (err < 0) {
- 		hdev->req_status = 0;
- 
--- 
-2.7.4
+At the time, I was thinking that the leak could originate from one of 
+the req_complete_skb callback, but which one?
 
+And today that the issue has popped again, I found that 
+hci_req_sync_complete references the skb in hdev->req_skb. It is called 
+(via hci_req_run_skb) from either __hci_cmd_sync_ev which will pass the 
+skb to the caller, or __hci_req_sync which leaks.
+
+I have a patch on the grill.
+
+Best Regards,
+Frédéric
