@@ -1,57 +1,104 @@
-Return-Path: <arnd@arndb.de>
-From: Arnd Bergmann <arnd@arndb.de>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Rob Herring <robh@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Jiri Slaby <jslaby@suse.com>, Sebastian Reichel <sre@kernel.org>, Pavel Machek <pavel@ucw.cz>, Peter Hurley <peter@hurleysoftware.com>, NeilBrown <neil@brown.name>, "Dr . H . Nikolaus Schaller" <hns@goldelico.com>, Linus Walleij <linus.walleij@linaro.org>, "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>, "linux-serial@vger.kernel.org" <linux-serial@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Return-Path: <gnomes@lxorguk.ukuu.org.uk>
+Date: Mon, 22 Aug 2016 16:45:33 +0100
+From: One Thousand Gnomes <gnomes@lxorguk.ukuu.org.uk>
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: Rob Herring <robh@kernel.org>,
+        Greg Kroah-Hartman
+ <gregkh@linuxfoundation.org>,
+        Marcel Holtmann <marcel@holtmann.org>, Jiri
+ Slaby <jslaby@suse.com>,
+        Sebastian Reichel <sre@kernel.org>, Pavel Machek
+ <pavel@ucw.cz>,
+        Peter Hurley <peter@hurleysoftware.com>, NeilBrown
+ <neil@brown.name>,
+        "Dr . H . Nikolaus Schaller" <hns@goldelico.com>,
+        Linus
+ Walleij <linus.walleij@linaro.org>,
+        "open list:BLUETOOTH DRIVERS"
+ <linux-bluetooth@vger.kernel.org>,
+        "linux-serial@vger.kernel.org"
+ <linux-serial@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org"
+ <linux-kernel@vger.kernel.org>
 Subject: Re: [RFC PATCH 0/3] UART slave device bus
-Date: Mon, 22 Aug 2016 17:46:48 +0200
-Message-ID: <1921745.7GarJ3zo4T@wuerfel>
-In-Reply-To: <EBCC7C4D-92E0-4EC7-9C81-4E859E511C88@holtmann.org>
-References: <20160818011445.22726-1-robh@kernel.org> <2775954.hrE2UdODgU@wuerfel> <EBCC7C4D-92E0-4EC7-9C81-4E859E511C88@holtmann.org>
+Message-ID: <20160822164533.688a6aec@lxorguk.ukuu.org.uk>
+In-Reply-To: <2775954.hrE2UdODgU@wuerfel>
+References: <20160818011445.22726-1-robh@kernel.org>
+	<12886761.WF058qtZp8@wuerfel>
+	<CAL_JsqL1s9QTc+xVXafcHmyiH+6Yy0Ded+JbeYhTtYNxLtWREg@mail.gmail.com>
+	<2775954.hrE2UdODgU@wuerfel>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=US-ASCII
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Monday, August 22, 2016 11:28:02 AM CEST Marcel Holtmann wrote:
-> >>> My impression is that there is some overlap in what you want
-> >>> to do here, and what serio does today as a line discipline on top
-> >>> of a tty line discipline (and on top of other non-uart serial
-> >>> connections), so we should look into whether the two can be unified
-> >>> or not. Here is what I found so far:
-> >>> 
-> >>> For all I can tell, serio is only used for drivers/input/ but could
-> >>> easily be extended to other subsystems. It currently uses its own
-> >>> binary ID matching between drivers and devices through user space
-> >>> interfaces, though adding a DT binding for it would appear to be
-> >>> a good idea regardless.
-> >>> 
-> >>> It also has a bus_type already, and with some operations defined on
-> >>> it. In particular, it has an "interrupt" method that is used to
-> >>> notify the client driver when a byte is available (and pass
-> >>> that byte along with it). This seems to be a useful addition to
-> >>> what you have. Since it is based on sending single characters
-> >>> both ways, transferring large amounts of data would be slower,
-> >>> but the interface is somewhat simpler. In principle, both
-> >>> character based and buffer based interfaces could coexist here
-> >>> as they do in some other interfaces (e.g. smbus).
-> >> 
-> >> Given that about the only things it really provided are the bus_type
-> >> and associated boilerplate without much of a client interface, it
-> >> seemed to me that creating a new subsystem first made more sense. Then
-> >> we can convert serio to use the new subsystem.
-> > 
-> > One possible downside of merging later is that we end up having to
-> > support the existing user space ABI for serio that may not fit well
-> > within whatever we come up with independently.
+> Would it make sense then to define a DT binding that can cover these
+> four cases independent of the Linux usage:
 > 
-> if we need any kind of userspace ABI to setup of Bluetooth 
-> over UART devices, then we have failed. We want that the 
-> special UARTs are identified via ACPI or DT and become an
-> enumeratable bus. So we can attach a driver to it.
+> a) an existing tty line discipline matched to a tty port
+> b) a serio device using the N_MOUSE line discipline (which
+>    happens to cover non-mouse devices these days)
 
-I was not referring to new devices here, only to the existing user
-space ABI that is used for serio (input) devices. If we have
-any tools relying on e.g. the 'serio' name for the sysfs path, 
-using another name for the new bus_type may cause incompatibility
-when merging the two.
+These two are the same basic thing
 
-	Arnd
+	port x expects ldisc y {with properties ...}
+
+> c) a uart_port slave attached directly to the uart (like in your
+>    current code)
+
+c) needs to be a tty_port slave attached directly to a tty_port.
+Important detail, but as uart_port is just a subset of tty_port it's a
+trivial detail to the DT.
+
+> d) the same slave drivers using a new tty line discipline
+
+and this is also just a/b again.
+
+
+What use cases and connectivity do you need to describe. Looking at the
+ACPI platforms we have
+
+- the expected serial port configuration
+- the properties of the port (FIFO etc)
+- the power management for the port
+
+- the children of the port
+- the power management of the children (at a very simplistic abstracted
+  level)
+
+So we want to be able to describe something like
+
+  ttyS0 {
+	baud: 1152008N1
+	protocol: bluetooth hci
+	fixed: yes
+	powermanagement: { ... }
+  }
+
+and if I look at the usermode crapfest on a lot of Android systems it
+looks similar but with the notion of things like being able to describe
+
+-	Use GPIO mode sleeping and assume first char is X to save power
+
+-	Power up, wait n ms, write, read, wait n ms, power down (which
+	has to be driven at the ldisc/user level as only the ldisc
+	understands transactions, or via ioctls (right now Android user
+	space tends to do hardcoded writes to /sys.. gpio to drive power
+
+-	And a few variants thereof (power up on write, off on a timer
+  	etc)
+
+So I can imagine wanting to describe something like
+
+-	The bluetooth HCI hardware is managed by gpio 11 (or UART DTR,
+	or PMIC n etc)
+	The uart can switch into GPIO mode and is gpio 15
+
+or
+
+-	Raise gpio 4 when writing, drop it after 50mS with no read/write
+
+Then the ldisc needs to make port->ops. calls for enabling/disabling low
+power mode and expected char, and the uarts that can do it need to
+implement the gpio/uart switching and any timers.
+
+Alan
