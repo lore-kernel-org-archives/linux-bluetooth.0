@@ -1,35 +1,38 @@
-Return-Path: <luiz.dentz@gmail.com>
-MIME-Version: 1.0
-In-Reply-To: <8CD08159-2E3B-4663-9C49-56131BB77AFA@holtmann.org>
-References: <CAOsEZohrTsrZuLxpfRQ37mVcXGDqO+rV6TzfzR1ELbSHe0jtng@mail.gmail.com>
- <8CD08159-2E3B-4663-9C49-56131BB77AFA@holtmann.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 22 Aug 2016 13:57:59 +0300
-Message-ID: <CABBYNZ+cLHkDYH+L78oAr1P6Uua_TrbA02DE_tE0LoNq7wv=7A@mail.gmail.com>
-Subject: Re: BLE Hexiwear connection fail
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Jay Aurabind <jay.aurabind@gmail.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ] core/device: Fix marking auto-connect flag
+Date: Mon, 22 Aug 2016 13:08:38 +0300
+Message-Id: <1471860518-28875-1-git-send-email-luiz.dentz@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jay, Marcel,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Mon, Aug 22, 2016 at 11:51 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Jay,
->
->> I have the IoT device Hexiwear[1], which connects through BLE. They
->> have an android app which can take data from it. I want to use from my
->> linux machine. Its BLE API is provided at their github[2] page.
->
-> does it work on Android? If so, then enable Bluetooth HCI tracing/logging in Android and send around the /sdcard/btsnoop_hci.log file. You can read that wit btmon by yourself and compare.
->
-> I would also propose you start using btmon instead of hcidump.
+Device auto-connect shall be set only if the profile is able to accept
+incoming connections, this fixes the wrong behavior or connecting LE
+with dual mode devices immediatelly after probing service as profiles
+may have auto-connect flag for outgoing connection (usually BR/EDR only).
+---
+ src/device.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-The D-Bus GATT should be able to handle those, if we are able to
-connect, but there seems to be something wrong with the specification
-as it does seems to use UUID range reserved by the SIG instead of
-using proper 128 bits UUIDs.
-
+diff --git a/src/device.c b/src/device.c
+index c103bb2..14de7e8 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -4080,7 +4080,10 @@ static struct btd_service *probe_service(struct btd_device *device,
+ 		return NULL;
+ 	}
+ 
+-	if (profile->auto_connect)
++	/* Only set auto connect if profile has set the flag and can really
++	 * accept connections.
++	 */
++	if (profile->auto_connect && profile->accept)
+ 		device_set_auto_connect(device, TRUE);
+ 
+ 	return service;
 -- 
-Luiz Augusto von Dentz
+2.7.4
+
