@@ -1,56 +1,35 @@
-Return-Path: <arnd@arndb.de>
-From: Arnd Bergmann <arnd@arndb.de>
-To: Rob Herring <robh@kernel.org>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Marcel Holtmann <marcel@holtmann.org>, Jiri Slaby <jslaby@suse.com>, Sebastian Reichel <sre@kernel.org>, Pavel Machek <pavel@ucw.cz>, Peter Hurley <peter@hurleysoftware.com>, NeilBrown <neil@brown.name>, "Dr . H . Nikolaus Schaller" <hns@goldelico.com>, Linus Walleij <linus.walleij@linaro.org>, linux-bluetooth@vger.kernel.org, linux-serial@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH 0/3] UART slave device bus
-Date: Mon, 22 Aug 2016 14:37:02 +0200
-Message-ID: <12886761.WF058qtZp8@wuerfel>
-In-Reply-To: <20160818011445.22726-1-robh@kernel.org>
-References: <20160818011445.22726-1-robh@kernel.org>
+Return-Path: <luiz.dentz@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+In-Reply-To: <8CD08159-2E3B-4663-9C49-56131BB77AFA@holtmann.org>
+References: <CAOsEZohrTsrZuLxpfRQ37mVcXGDqO+rV6TzfzR1ELbSHe0jtng@mail.gmail.com>
+ <8CD08159-2E3B-4663-9C49-56131BB77AFA@holtmann.org>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Mon, 22 Aug 2016 13:57:59 +0300
+Message-ID: <CABBYNZ+cLHkDYH+L78oAr1P6Uua_TrbA02DE_tE0LoNq7wv=7A@mail.gmail.com>
+Subject: Re: BLE Hexiwear connection fail
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Jay Aurabind <jay.aurabind@gmail.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wednesday, August 17, 2016 8:14:42 PM CEST Rob Herring wrote:
-> 
-> Before I spend more time on this, I'm looking mainly for feedback on the
-> general direction and structure (the interface with the existing serial
-> drivers in particular).
+Hi Jay, Marcel,
 
-Aside from the things that have already been mentioned in the discussion,
-I wonder how this should relate to the drivers/input/serio framework.
+On Mon, Aug 22, 2016 at 11:51 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Jay,
+>
+>> I have the IoT device Hexiwear[1], which connects through BLE. They
+>> have an android app which can take data from it. I want to use from my
+>> linux machine. Its BLE API is provided at their github[2] page.
+>
+> does it work on Android? If so, then enable Bluetooth HCI tracing/logging in Android and send around the /sdcard/btsnoop_hci.log file. You can read that wit btmon by yourself and compare.
+>
+> I would also propose you start using btmon instead of hcidump.
 
-My impression is that there is some overlap in what you want
-to do here, and what serio does today as a line discipline on top
-of a tty line discipline (and on top of other non-uart serial
-connections), so we should look into whether the two can be unified
-or not. Here is what I found so far:
+The D-Bus GATT should be able to handle those, if we are able to
+connect, but there seems to be something wrong with the specification
+as it does seems to use UUID range reserved by the SIG instead of
+using proper 128 bits UUIDs.
 
-For all I can tell, serio is only used for drivers/input/ but could
-easily be extended to other subsystems. It currently uses its own
-binary ID matching between drivers and devices through user space
-interfaces, though adding a DT binding for it would appear to be
-a good idea regardless.
-
-It also has a bus_type already, and with some operations defined on
-it. In particular, it has an "interrupt" method that is used to
-notify the client driver when a byte is available (and pass
-that byte along with it). This seems to be a useful addition to
-what you have. Since it is based on sending single characters
-both ways, transferring large amounts of data would be slower,
-but the interface is somewhat simpler. In principle, both
-character based and buffer based interfaces could coexist here
-as they do in some other interfaces (e.g. smbus).
-
-While serio is typically layered on top of tty-ldisc (on top of
-tty_port, which is often on top of uart_port) or on top of
-i8042/ps2 drivers, I suppose we could add another back-end on top
-of uart_port directly to avoid the ldisc configuration in many
-cases when using devicetree based setup. This should also address
-the main concern that Alan raised about generality of the
-subsystem: we'd always leave the option of either manual configuration
-of the tty-ldisc (for any tty_port) or configuring on-chip devices
-(using uart_port) directly through DT. Of course the same thing
-can be done if we hook into tty_port rather than uart_port.
-
-	Arnd
+-- 
+Luiz Augusto von Dentz
