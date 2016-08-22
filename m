@@ -1,25 +1,44 @@
-Return-Path: <arnd@arndb.de>
-From: Arnd Bergmann <arnd@arndb.de>
-To: "H. Nikolaus Schaller" <hns@goldelico.com>
-Cc: Sebastian Reichel <sre@kernel.org>, One Thousand Gnomes <gnomes@lxorguk.ukuu.org.uk>, Oleksij Rempel <linux@rempel-privat.de>, Rob Herring <robh@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Marcel Holtmann <marcel@holtmann.org>, Jiri Slaby <jslaby@suse.com>, Pavel Machek <pavel@ucw.cz>, Peter Hurley <peter@hurleysoftware.com>, NeilBrown <neil@brown.name>, Linus Walleij <linus.walleij@linaro.org>, "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>, "linux-serial@vger.kernel.org" <linux-serial@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Return-Path: <gnomes@lxorguk.ukuu.org.uk>
+Date: Mon, 22 Aug 2016 22:35:56 +0100
+From: One Thousand Gnomes <gnomes@lxorguk.ukuu.org.uk>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Arnd Bergmann <arnd@arndb.de>, Rob Herring <robh@kernel.org>,
+        Greg
+ Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Jiri Slaby <jslaby@suse.com>, Sebastian Reichel <sre@kernel.org>,
+        Pavel Machek <pavel@ucw.cz>, Peter
+ Hurley <peter@hurleysoftware.com>,
+        NeilBrown <neil@brown.name>,
+        "Dr . H .
+ Nikolaus Schaller" <hns@goldelico.com>,
+        Linus Walleij
+ <linus.walleij@linaro.org>,
+        "open list:BLUETOOTH DRIVERS"
+ <linux-bluetooth@vger.kernel.org>,
+        "linux-serial@vger.kernel.org"
+ <linux-serial@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org"
+ <linux-kernel@vger.kernel.org>
 Subject: Re: [RFC PATCH 0/3] UART slave device bus
-Date: Mon, 22 Aug 2016 23:43:00 +0200
-Message-ID: <7864389.KcZiMyceNA@wuerfel>
-In-Reply-To: <EA228ADD-F03A-49C0-9A0B-E768D7A7A466@goldelico.com>
-References: <20160818011445.22726-1-robh@kernel.org> <20160822203947.ksxwnvzhc3tpnnx7@earth> <EA228ADD-F03A-49C0-9A0B-E768D7A7A466@goldelico.com>
+Message-ID: <20160822223556.0127ae6f@lxorguk.ukuu.org.uk>
+In-Reply-To: <FAD4CEF6-93F4-41D1-915E-823867F740F7@holtmann.org>
+References: <20160818011445.22726-1-robh@kernel.org>
+	<12886761.WF058qtZp8@wuerfel>
+	<CAL_JsqL1s9QTc+xVXafcHmyiH+6Yy0Ded+JbeYhTtYNxLtWREg@mail.gmail.com>
+	<2775954.hrE2UdODgU@wuerfel>
+	<20160822164533.688a6aec@lxorguk.ukuu.org.uk>
+	<FAD4CEF6-93F4-41D1-915E-823867F740F7@holtmann.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=US-ASCII
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Monday, August 22, 2016 11:23:26 PM CEST H. Nikolaus Schaller wrote:
-> I see what you mean, but kernel divides between directly connected UART and USB-connected UART.
-> 
-> drivers/usb/serial/ vs. drivers/tty/serial/
+> I now wonder if we can not just turn the ldisc into a bus. So we have a ldisc bus that exposes devices that have no business of having a userspace /dev/ttyX exposed. And our Bluetooth UART support just turns into a ldisc driver on the ldisc bus.
 
-That distinction purely exists for historic reasons. I'd argue that the
-former should actually go into drivers/tty/usb or similar. A long time
-ago, we commonly sorted device drivers by how they were attached to
-the system (as drivers/usb/serial/ and drivers/usb/storage still do),
-but almost everything is now sorted according to how it is used instead.
+The ldisc and tty have the wrong object lifetime for a bus, but you can
+put the tty_port objects onto the bus, and it is those you need to
+instantiate the stack.
 
-	Arnd
+The port exists for hardware lifetime, the tty and ldisc exist only while
+the port is "up".
+
+Alan
