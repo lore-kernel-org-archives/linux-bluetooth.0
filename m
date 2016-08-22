@@ -1,98 +1,121 @@
 Return-Path: <sre@kernel.org>
-Date: Tue, 23 Aug 2016 01:10:46 +0200
+Date: Tue, 23 Aug 2016 01:02:18 +0200
 From: Sebastian Reichel <sre@kernel.org>
-To: One Thousand Gnomes <gnomes@lxorguk.ukuu.org.uk>
-Cc: "H. Nikolaus Schaller" <hns@goldelico.com>,
-	Oleksij Rempel <linux@rempel-privat.de>,
-	Rob Herring <robh@kernel.org>,
+To: Pavel Machek <pavel@ucw.cz>
+Cc: One Thousand Gnomes <gnomes@lxorguk.ukuu.org.uk>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Rob Herring <robh@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
 	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Marcel Holtmann <marcel@holtmann.org>, Jiri Slaby <jslaby@suse.com>,
-	Pavel Machek <pavel@ucw.cz>,
+	Jiri Slaby <jslaby@suse.com>,
 	Peter Hurley <peter@hurleysoftware.com>,
-	NeilBrown <neil@brown.name>, Arnd Bergmann <arnd@arndb.de>,
+	NeilBrown <neil@brown.name>,
+	"Dr . H . Nikolaus Schaller" <hns@goldelico.com>,
 	Linus Walleij <linus.walleij@linaro.org>,
 	"open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
 	"linux-serial@vger.kernel.org" <linux-serial@vger.kernel.org>,
 	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 Subject: Re: [RFC PATCH 0/3] UART slave device bus
-Message-ID: <20160822231043.y6yqwychgsttd24r@earth>
-References: <20160819052125.ze5zilppwoe3f2lx@earth>
- <ACEF800E-8DB3-4345-ADE2-15C99F3659D5@goldelico.com>
- <efcd1fe0-52f8-ba84-1310-9f4c24ad35bc@rempel-privat.de>
- <53A846F1-33E5-48C3-B3A6-DB251661CDD5@goldelico.com>
- <20160820143405.04303834@lxorguk.ukuu.org.uk>
- <B4DF8974-1C6B-432E-AD1A-1E6067B9C158@goldelico.com>
- <20160822203947.ksxwnvzhc3tpnnx7@earth>
- <EA228ADD-F03A-49C0-9A0B-E768D7A7A466@goldelico.com>
- <20160822224247.vdh3plda6dxelvzw@earth>
- <20160822235256.2966dd49@lxorguk.ukuu.org.uk>
+Message-ID: <20160822230216.4fdvqmm4aruxmppi@earth>
+References: <12886761.WF058qtZp8@wuerfel>
+ <CAL_JsqL1s9QTc+xVXafcHmyiH+6Yy0Ded+JbeYhTtYNxLtWREg@mail.gmail.com>
+ <2775954.hrE2UdODgU@wuerfel>
+ <CAL_Jsq+tft4zsoOeE0WvMR3W9hAXEKzz35CgFtNJ6+P82uy-3A@mail.gmail.com>
+ <20160822180254.5c95af7c@lxorguk.ukuu.org.uk>
+ <CAL_JsqLe74GYN+j5muoCcnEX=BRu8cCvacRG0Xz7i+AEwxbDZg@mail.gmail.com>
+ <20160822183849.6dfdb9d2@lxorguk.ukuu.org.uk>
+ <2D07EA08-1055-4292-96B3-32913EC9BBE1@holtmann.org>
+ <20160822223223.398ee72d@lxorguk.ukuu.org.uk>
+ <20160822220017.GA10689@amd>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="tpj3junt67x2tagu"
-In-Reply-To: <20160822235256.2966dd49@lxorguk.ukuu.org.uk>
+	protocol="application/pgp-signature"; boundary="6gccjhclxmbojkch"
+In-Reply-To: <20160822220017.GA10689@amd>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 
---tpj3junt67x2tagu
+--6gccjhclxmbojkch
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
 Hi,
 
-On Mon, Aug 22, 2016 at 11:52:56PM +0100, One Thousand Gnomes wrote:
-> > There are usb-serial devices, which could benefit from support
-> > btw. I would find it really useful, if the Dangerous Prototype's
-> > Bus Pirate would expose native /dev/i2c and /dev/spi and it's
-> > based on FT232.
->=20
-> That should just need an ldisc.
+On Tue, Aug 23, 2016 at 12:00:17AM +0200, Pavel Machek wrote:
+> On Mon 2016-08-22 22:32:23, One Thousand Gnomes wrote:
+> > > why would we even have it create a /dev/ttyX for these devices
+> > > in the first place. Lets just not create an uevent for it and
+> > > lets not create a dev_t for it.
+> >=20
+> > Because if you don't it's a regression. It's not permissible to break
+> > existing userspace.
 
-Right, since it does not need any extra resources. Probably not the
-best example.
+I guess there are three classes
 
-> I2C and SPI should at this point be sane for hotplugging as needed
-> for an ldisc.
+1.) support for uart-slaves on new devices -> tty can be safely
+    disabled, as it was never exposed
+2.) support for uart-slaves on devices, which exported a useless
+    tty (-> port could not be used from userspace without kernel
+    modifications) [this is what N900 falls under]
+3.) support for uart-slaves on devices, which could use hciattach
+    or similar tools previously. I think these devices can't
+    switch to the new API without a regression anyways. If the
+    kernel already registered the bluetooth stuff hciattach will
+    fail due to the -EBUSY (or whatever is returned).
 
-I guess hotplugging support in the downstream kernel frameworks
-would be needed anyway with usb-serial being USB based.
+So from my point of view there is no real regression when we avoid
+exporting the tty at all.
 
-> And having an ldisc also has another nice effect. You can plug the bus
-> pirate into a remote machine, run an 8bit clean link over a pty/tty pair
-> half way around the world and get a local i2c/spi to the remote machine's
-> i2c/spi bus pirate ports and devices.
+> Yes, renumbering people's serials is bad, OTOH for new platforms it
+> would be nice not to expose ttyS15 which can only return -EBUSY.
 
-Right.
+No need to renumber, there is the serial mapping in DT. We can just
+export ttyS0, ttyS2 and ttyS3 (and skip ttyS1, which is used for
+hardwired serial device).
 
-> It also means that if Bus Pirate 5 changes USB uart nothing breaks.
+> And we may want to do incompatible change at some point. People should
+> not have to use hciattach on n900 from now
 
-And it means no auto-support. Which would be fine in case of Bus
-Pirate, since its mainly a developer device and some people may
-actually prefer the IMHO anoying serial interface.
+Don't worry, since platform_driver approach has been NAK'd by Greg,
+the N900 bluetooth driver can only proceed once this patchset has
+gone into the kernel. So N900 will never use hciattach.
 
-Let's forget that example.
+> on until end of time, just because we exposed USB port as ttyO1 in
+> past.
+
+USB port as ttyO1?
+
+> ...actually. I guess we should disable that ttyO1 in the device tree
+> for now, so nobody can start using it. As we currently have 2-3 people
+> in world who got that bluetooth to work with out-of-tree patches,
+> breakage should be quite acceptable :-).
+
+If you just disable ttyO1 in the N900's DT, you break runtime PM,
+since the kernel does not access disabled devices. We could add
+some kernel quirk, but who should use ttyO1 (which is btw named
+ttyS1 with 8251 based omap driver)? It's basically unusable from
+userspace.
 
 -- Sebastian
 
---tpj3junt67x2tagu
+--6gccjhclxmbojkch
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1
 
-iQIcBAEBCgAGBQJXu4ZzAAoJENju1/PIO/qaNusP+wfG5+bD/xQl88QcpW95DplN
-gsIAmE8ruvETwgXkA0V3JIrCTCQkGWEu36tqK43KGxERT5yNqLJhhSSvcKHXPLbZ
-itmONPK65/9cRFISaddu36X413OULgQWPwrN+JtJ1X1M4WS1neymrVb98A561x8q
-okVARY8d1Kw86BLY3UTmQsQ0MCUlLrLepvnVhYXxJROJDUXTVAZxdkxpyFAgedW9
-lir958/qGWoPGBbqcAtysiEzwti9iAhxf67Ukw4toWPCxqkrDpLRiwr/Yz19L5oz
-yfFgdLzeusmiBoUyB2FumvdDbxpoZq4fy2w5wgOTqA60hUvmnwxwx84TXH43aym1
-5dOgcz+9RDlGjqxFtzC1ZiXyddqbe65b8mgXEPAqz9b9cJ486RpX/quUV6q4laPR
-kSm9I3a1aFyQWi7lVkOfrxstcXXeBYLr73p/Vp1WxIJnc52iDzjYzTp96HdR+/na
-otDzCBjZmUhHUziprBbzJn0wAKKafRiYDt5bmmu1uCBTUOLHsNO+tE7C7eP/52OU
-gf7x71eEyqAYW39uqpz3W70m8w6UjBnPx8IZcW4tdzs9ANP89XS1Pp7JSwxKbtpu
-IyvM4GqThbz9yv/8DMoAidrDOIbTPt0yIHcNgxYCqlcr+Naa9CwAAXyD+A4d8vKS
-TuAqs3boeu43E8frKc7U
-=y9H1
+iQIcBAEBCgAGBQJXu4R1AAoJENju1/PIO/qal1UP/15ZKNC1rkvPARk0wMK2y9ma
+RYJkVcl6GlYi6SBCxb/q4mhUe5ct41eWlkihfy681VUjT9mZdXMqgh2WuxGBg62H
+qs5ZXURCGb2aejcB2QIgNWeWH/UgMF3HakE/dTiwxLg45LBdHdVjUvIBGiaL0bnP
+x5CuGRN1tXc3ugt3Xpjx6EHTOqfMVo5kBPOZCZddoznnzNvbiH9mUrSEGGipmju8
+M3vL/EUVToYp/Q0zYSJ693jlgnS5YXSOtOLMNWGBa2Bg77Q1kiBmxBQNIH7jXh2G
+v6h+CppZu1ejmiB9Qi6wGfRwKcYgGy5coOyObaPNqwse5Gm2cZm2W0hNhmc76pwX
+d+bTLHRiOkx7rRs3yJYym8AKH1cn6r0t2xjz2Rstha1maOLrqRupH1b7YVFRLVs9
+jQpACK/T+THLGU8Gm5XVEoJqrqHtwBB8zOiz4foMEnp35j7GyoHeYWfpOBZ/jrKY
+oWhLpKNiL4t2TqXRdWzfDc/wILWCMM/SGj8k4FgcmRX+660JIDHuN7TXIv8Q0EXj
+rvfPMZotWhr3p8El8r7kVP2LHgsrbgmBjm6FDXlYBytRN+fSVg6k+lY19VNCWun6
+cBcqu94prL3Mh9PG+wwLWL/msRjIlcWBxz8HgeHQeh6h89YsZMoiTiC3U2vS0KF7
+BwcJDgtm0v1Z3WuYIyel
+=k91G
 -----END PGP SIGNATURE-----
 
---tpj3junt67x2tagu--
+--6gccjhclxmbojkch--
