@@ -1,8 +1,8 @@
 Return-Path: <gnomes@lxorguk.ukuu.org.uk>
-Date: Mon, 22 Aug 2016 22:35:56 +0100
+Date: Mon, 22 Aug 2016 22:32:23 +0100
 From: One Thousand Gnomes <gnomes@lxorguk.ukuu.org.uk>
 To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Arnd Bergmann <arnd@arndb.de>, Rob Herring <robh@kernel.org>,
+Cc: Rob Herring <robh@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
         Greg
  Kroah-Hartman <gregkh@linuxfoundation.org>,
         Jiri Slaby <jslaby@suse.com>, Sebastian Reichel <sre@kernel.org>,
@@ -20,25 +20,29 @@ Cc: Arnd Bergmann <arnd@arndb.de>, Rob Herring <robh@kernel.org>,
         "linux-kernel@vger.kernel.org"
  <linux-kernel@vger.kernel.org>
 Subject: Re: [RFC PATCH 0/3] UART slave device bus
-Message-ID: <20160822223556.0127ae6f@lxorguk.ukuu.org.uk>
-In-Reply-To: <FAD4CEF6-93F4-41D1-915E-823867F740F7@holtmann.org>
+Message-ID: <20160822223223.398ee72d@lxorguk.ukuu.org.uk>
+In-Reply-To: <2D07EA08-1055-4292-96B3-32913EC9BBE1@holtmann.org>
 References: <20160818011445.22726-1-robh@kernel.org>
 	<12886761.WF058qtZp8@wuerfel>
 	<CAL_JsqL1s9QTc+xVXafcHmyiH+6Yy0Ded+JbeYhTtYNxLtWREg@mail.gmail.com>
 	<2775954.hrE2UdODgU@wuerfel>
-	<20160822164533.688a6aec@lxorguk.ukuu.org.uk>
-	<FAD4CEF6-93F4-41D1-915E-823867F740F7@holtmann.org>
+	<CAL_Jsq+tft4zsoOeE0WvMR3W9hAXEKzz35CgFtNJ6+P82uy-3A@mail.gmail.com>
+	<20160822180254.5c95af7c@lxorguk.ukuu.org.uk>
+	<CAL_JsqLe74GYN+j5muoCcnEX=BRu8cCvacRG0Xz7i+AEwxbDZg@mail.gmail.com>
+	<20160822183849.6dfdb9d2@lxorguk.ukuu.org.uk>
+	<2D07EA08-1055-4292-96B3-32913EC9BBE1@holtmann.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-> I now wonder if we can not just turn the ldisc into a bus. So we have a ldisc bus that exposes devices that have no business of having a userspace /dev/ttyX exposed. And our Bluetooth UART support just turns into a ldisc driver on the ldisc bus.
+> why would we even have it create a /dev/ttyX for these devices in the first place. Lets just not create an uevent for it and lets not create a dev_t for it.
 
-The ldisc and tty have the wrong object lifetime for a bus, but you can
-put the tty_port objects onto the bus, and it is those you need to
-instantiate the stack.
+Because if you don't it's a regression. It's not permissible to break
+existing userspace.
 
-The port exists for hardware lifetime, the tty and ldisc exist only while
-the port is "up".
+> Internally the setup stage does a hciconfig hci0 up and it is already abstracted out that way. So there has been a lot of work in the Bluetooth subsystem to allow for this. That part is really solved.
+
+So you'd create a kernel side tty struct and bind it to the tty_port on
+hci0 up and drop it on hci0 down ?
 
 Alan
