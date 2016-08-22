@@ -1,59 +1,25 @@
-Return-Path: <pavel@ucw.cz>
-Date: Tue, 23 Aug 2016 00:00:17 +0200
-From: Pavel Machek <pavel@ucw.cz>
-To: One Thousand Gnomes <gnomes@lxorguk.ukuu.org.uk>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Rob Herring <robh@kernel.org>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Jiri Slaby <jslaby@suse.com>, Sebastian Reichel <sre@kernel.org>,
-	Peter Hurley <peter@hurleysoftware.com>,
-	NeilBrown <neil@brown.name>,
-	"Dr . H . Nikolaus Schaller" <hns@goldelico.com>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	"open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-	"linux-serial@vger.kernel.org" <linux-serial@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Return-Path: <arnd@arndb.de>
+From: Arnd Bergmann <arnd@arndb.de>
+To: "H. Nikolaus Schaller" <hns@goldelico.com>
+Cc: Sebastian Reichel <sre@kernel.org>, One Thousand Gnomes <gnomes@lxorguk.ukuu.org.uk>, Oleksij Rempel <linux@rempel-privat.de>, Rob Herring <robh@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Marcel Holtmann <marcel@holtmann.org>, Jiri Slaby <jslaby@suse.com>, Pavel Machek <pavel@ucw.cz>, Peter Hurley <peter@hurleysoftware.com>, NeilBrown <neil@brown.name>, Linus Walleij <linus.walleij@linaro.org>, "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>, "linux-serial@vger.kernel.org" <linux-serial@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 Subject: Re: [RFC PATCH 0/3] UART slave device bus
-Message-ID: <20160822220017.GA10689@amd>
-References: <20160818011445.22726-1-robh@kernel.org>
- <12886761.WF058qtZp8@wuerfel>
- <CAL_JsqL1s9QTc+xVXafcHmyiH+6Yy0Ded+JbeYhTtYNxLtWREg@mail.gmail.com>
- <2775954.hrE2UdODgU@wuerfel>
- <CAL_Jsq+tft4zsoOeE0WvMR3W9hAXEKzz35CgFtNJ6+P82uy-3A@mail.gmail.com>
- <20160822180254.5c95af7c@lxorguk.ukuu.org.uk>
- <CAL_JsqLe74GYN+j5muoCcnEX=BRu8cCvacRG0Xz7i+AEwxbDZg@mail.gmail.com>
- <20160822183849.6dfdb9d2@lxorguk.ukuu.org.uk>
- <2D07EA08-1055-4292-96B3-32913EC9BBE1@holtmann.org>
- <20160822223223.398ee72d@lxorguk.ukuu.org.uk>
+Date: Mon, 22 Aug 2016 23:43:00 +0200
+Message-ID: <7864389.KcZiMyceNA@wuerfel>
+In-Reply-To: <EA228ADD-F03A-49C0-9A0B-E768D7A7A466@goldelico.com>
+References: <20160818011445.22726-1-robh@kernel.org> <20160822203947.ksxwnvzhc3tpnnx7@earth> <EA228ADD-F03A-49C0-9A0B-E768D7A7A466@goldelico.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20160822223223.398ee72d@lxorguk.ukuu.org.uk>
+Content-Type: text/plain; charset="us-ascii"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon 2016-08-22 22:32:23, One Thousand Gnomes wrote:
-> > why would we even have it create a /dev/ttyX for these devices in the first place. Lets just not create an uevent for it and lets not create a dev_t for it.
+On Monday, August 22, 2016 11:23:26 PM CEST H. Nikolaus Schaller wrote:
+> I see what you mean, but kernel divides between directly connected UART and USB-connected UART.
 > 
-> Because if you don't it's a regression. It's not permissible to break
-> existing userspace.
+> drivers/usb/serial/ vs. drivers/tty/serial/
 
-Well... it would be good to do the right thing, at least in the places
-where we can.
+That distinction purely exists for historic reasons. I'd argue that the
+former should actually go into drivers/tty/usb or similar. A long time
+ago, we commonly sorted device drivers by how they were attached to
+the system (as drivers/usb/serial/ and drivers/usb/storage still do),
+but almost everything is now sorted according to how it is used instead.
 
-Yes, renumbering people's serials is bad, OTOH for new platforms it
-would be nice not to expose ttyS15 which can only return -EBUSY.
-
-And we may want to do incompatible change at some point. People should
-not have to use hciattach on n900 from now on until end of time, just
-because we exposed USB port as ttyO1 in past.
-
-...actually. I guess we should disable that ttyO1 in the device tree
-for now, so nobody can start using it. As we currently have 2-3 people
-in world who got that bluetooth to work with out-of-tree patches,
-breakage should be quite acceptable :-).
-
-Best regards,
-									
-									Pavel
--- 
-(english) http://www.livejournal.com/~pavelmachek
-(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blog.html
+	Arnd
