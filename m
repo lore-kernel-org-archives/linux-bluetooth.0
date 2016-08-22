@@ -1,186 +1,150 @@
 Return-Path: <sre@kernel.org>
-Date: Tue, 23 Aug 2016 00:42:49 +0200
+Date: Tue, 23 Aug 2016 00:18:04 +0200
 From: Sebastian Reichel <sre@kernel.org>
-To: "H. Nikolaus Schaller" <hns@goldelico.com>
+To: Rob Herring <robh@kernel.org>
 Cc: One Thousand Gnomes <gnomes@lxorguk.ukuu.org.uk>,
-	Oleksij Rempel <linux@rempel-privat.de>,
-	Rob Herring <robh@kernel.org>,
+	Arnd Bergmann <arnd@arndb.de>,
 	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	Marcel Holtmann <marcel@holtmann.org>, Jiri Slaby <jslaby@suse.com>,
 	Pavel Machek <pavel@ucw.cz>,
 	Peter Hurley <peter@hurleysoftware.com>,
-	NeilBrown <neil@brown.name>, Arnd Bergmann <arnd@arndb.de>,
+	NeilBrown <neil@brown.name>,
+	"Dr . H . Nikolaus Schaller" <hns@goldelico.com>,
 	Linus Walleij <linus.walleij@linaro.org>,
 	"open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
 	"linux-serial@vger.kernel.org" <linux-serial@vger.kernel.org>,
 	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 Subject: Re: [RFC PATCH 0/3] UART slave device bus
-Message-ID: <20160822224247.vdh3plda6dxelvzw@earth>
-References: <20160818202900.hyvm4hfxedifuefn@earth>
- <CAL_Jsq+OfT1AXaEKOgZ4oVfpVZhu=55dYoHTG7D_prpnTqpeOg@mail.gmail.com>
- <20160819052125.ze5zilppwoe3f2lx@earth>
- <ACEF800E-8DB3-4345-ADE2-15C99F3659D5@goldelico.com>
- <efcd1fe0-52f8-ba84-1310-9f4c24ad35bc@rempel-privat.de>
- <53A846F1-33E5-48C3-B3A6-DB251661CDD5@goldelico.com>
- <20160820143405.04303834@lxorguk.ukuu.org.uk>
- <B4DF8974-1C6B-432E-AD1A-1E6067B9C158@goldelico.com>
- <20160822203947.ksxwnvzhc3tpnnx7@earth>
- <EA228ADD-F03A-49C0-9A0B-E768D7A7A466@goldelico.com>
+Message-ID: <20160822221801.mqwajt5qktqmcicp@earth>
+References: <20160818011445.22726-1-robh@kernel.org>
+ <12886761.WF058qtZp8@wuerfel>
+ <CAL_JsqL1s9QTc+xVXafcHmyiH+6Yy0Ded+JbeYhTtYNxLtWREg@mail.gmail.com>
+ <2775954.hrE2UdODgU@wuerfel>
+ <CAL_Jsq+tft4zsoOeE0WvMR3W9hAXEKzz35CgFtNJ6+P82uy-3A@mail.gmail.com>
+ <20160822180254.5c95af7c@lxorguk.ukuu.org.uk>
+ <CAL_JsqLe74GYN+j5muoCcnEX=BRu8cCvacRG0Xz7i+AEwxbDZg@mail.gmail.com>
+ <20160822200026.4i32vakhzipv7asl@earth>
+ <CAL_JsqJTbAri_7j5DWA2s1psyXMHu83MFXvEwB7tJGkwSwfU9g@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="ujbmmsf7oj6qiqrs"
-In-Reply-To: <EA228ADD-F03A-49C0-9A0B-E768D7A7A466@goldelico.com>
+	protocol="application/pgp-signature"; boundary="6jtqwxh4r6ldada3"
+In-Reply-To: <CAL_JsqJTbAri_7j5DWA2s1psyXMHu83MFXvEwB7tJGkwSwfU9g@mail.gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 
---ujbmmsf7oj6qiqrs
+--6jtqwxh4r6ldada3
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
 Hi,
 
-On Mon, Aug 22, 2016 at 11:23:26PM +0200, H. Nikolaus Schaller wrote:
-> > Am 22.08.2016 um 22:39 schrieb Sebastian Reichel <sre@kernel.org>:
-> >=20
+On Mon, Aug 22, 2016 at 05:00:40PM -0500, Rob Herring wrote:
+> On Mon, Aug 22, 2016 at 3:00 PM, Sebastian Reichel <sre@kernel.org> wrote:
 > > Hi,
-> >=20
-> > On Sun, Aug 21, 2016 at 09:50:57AM +0200, H. Nikolaus Schaller wrote:
-> >>> Am 20.08.2016 um 15:34 schrieb One Thousand Gnomes <gnomes@lxorguk.uk=
-uu.org.uk>:
-> >>>> What it is not about are UART/RS232 converters connected through USB=
- or virtual
-> >>>> serial ports created for WWAN modems (e.g. /dev/ttyACM, /dev/ttyHSO)=
-=2E Or BT devices
-> >>>> connected through USB (even if they also run HCI protocol).
-> >>>=20
-> >>> It actually has to be about both because you will find the exact same
-> >>> device wired via USB SSIC/HSIC to a USB UART or via a classic UART. N=
-ot is
-> >>> it just about embedded boards.
-> >>=20
-> >> Not necessarily.
-> >>=20
-> >> We often have two interface options for exactly the sam sensor chips. =
-They can be connected
-> >> either through SPI or I2C. Which means that there is a core driver for=
- the chip and two different
-> >> transport glue components (see e.g. iio/accel/bmc150).
-> >>=20
-> >> This does not require I2C to be able to handle SPI or vice versa or pr=
-ovide a common API.
-> >=20
-> > I don't understand this comparison. I2C and SPI are different
-> > protocols,
+> >
+> > On Mon, Aug 22, 2016 at 12:30:27PM -0500, Rob Herring wrote:
+> >> On Mon, Aug 22, 2016 at 12:02 PM, One Thousand Gnomes
+> >> <gnomes@lxorguk.ukuu.org.uk> wrote:
+> >> >> > I think there are two other valuable features provided by serio:
+> >> >> >
+> >> >> > - an existing set of drivers written to the API
+> >> >> > - the implementation of the tty_ldisc
+> >> >>
+> >> >> True, though I'd expect little of the data flow part of it to be re=
+used.
+> >> >
+> >> > Then your design is broken.
+> >>
+> >> I'm talking about serio, not my design which I already said the
+> >> receive side at least needs work.
+> >>
+> >> The serio API for rx and tx is a single character at a time. I thought
+> >> we agreed that's not sufficient for things like BT.
+> >>
+> >> >> - a child of the uart node
+> >> >> - a reg property containing the line number if the parent has multi=
+ple
+> >> >> uarts (I'd expect this to rarely be used).
+> >> >
+> >> > That surprises me as for current x86 platforms it would be the norm,
+> >> > except that we use ACPI.
+> >>
+> >> Exactly, we're talking DT bindings here. Each port will be a separate
+> >> node otherwise things like serial aliases and stdout-path won't work
+> >> correctly. Compatible strings for 8250 uarts are for a single port.
+> >> But if you had h/w such that it has common and per port registers then
+> >> it may be a single node. I'm not aware of any example offhand (maybe
+> >> PPC CPM). But it doesn't matter as reg can handle this case just fine
+> >> if we need to.
+> >
+> > I would expect, that your imaginary example h/w also has one node
+> > per port using a mfd style h/w description:
+> >
+> > multi-uart-device {
+> >     uart1 {
+> >         child { };
+> >     };
+> >     uart2 {
+> >         child { };
+> >     };
+> > };
 >=20
-> Yes, they are different on protocol level, but on both you transfer block=
-s of data from/to a slave device
-> which usually can be addressed. And for some chips they are just two slig=
-htly alternative serial interfaces.
->=20
-> > while native UART and USB-connected UART are both UART.
->=20
-> I see what you mean, but kernel divides between directly connected UART a=
-nd USB-connected UART.
->=20
-> drivers/usb/serial/ vs. drivers/tty/serial/
->=20
-> to implement two different groups of UARTs. Although on user space level =
-they are harmonized again.
-> This is why I compare with i2c and spi. But each such comparison is not p=
-erfect.
->=20
-> Anyways, to me it looks as if everybody wants to make the solution work f=
-or usb-uarts as well
-> (although I still would like to see a real world use-case).
->=20
-> >=20
-> >> And most Bluetooth devices I know have either UART or a direct
-> >> USB interface. So in the USB case there is no need to connect
-> >> it through some USB-UART bridge and treat it as an UART at all.
-> >=20
-> > I think having support for USB-UART dongles is useful for
-> > driver development and testing on non-embedded HW.
->=20
-> Hm. I assume you mean the Bluetooth situation where both, embedded UART
-> connected chips and USB dongles are available.
+> Yes, that is certainly possible too.
 
-No. I mean I have some serial device, which is connected to the
-embedded UART, but I also have a standalone version. For driver
-development I can just use my standalone serial device, connect
-it to an USB-UART and develop the driver on non embedded HW.
-Then I can use the same driver on my embedded platform and it
-works, since it uses the same API.
+That way aliases and stdout-path also works. I think I would just
+make one-node-per-uart-port mandatory and skip the reg part.
 
-For e.g. I2C this works perfectly fine. I already did this with
-the I2C interface exposed on my notebook's VGA port.
+Let's assume your imaginary example h/w would be and i2c master with
+two ports and some shared registers. Then it immidiatly becomes
+clear, that one wants to somehow expose two ports in the DT instead
+of using some port selection property (and reg would already be
+taken).
 
-> I am not a specialist for such things, but  I think you have three
-> options to connect bluetooth:
+> >> >> - baudrate and other line configuration (though I would expect the
+> >> >> slave driver to know all this and set it w/o DT. Also, we already h=
+ave
+> >> >> a way to set baudrate in the parent node at least.)
+> >
+> > I'm not sure if every slave driver knows this. Maybe some generic
+> > slave drivers will come up, once we have the infrastructure. So
+> > it could be useful to have the settings as optional properties.
+> > OTOH it can also be done once it is needed.
 >=20
-> a) SoC-UART <-> BT-Chip-UART-port
-> b) USB-UART (FT232, PL2303 etc.) <-> BT-Chip-UART-port
-> c) USB <-> BT-Chip-USB-port (not UART involved at all)
->
-> Case c) IMHO means you anyways need a special USB driver for the BT-Chip =
-connected
-> through USB and plugging it into a non-embedded USB port does not automat=
-ically
-> show it as a tty interface. So you can't use it for testing the UART driv=
-ers.
+> Yes, you could have devices that do autobaud detect and don't care
+> other than some max baudrate which could be limited by either the host
+> or device. Then you have others that are fixed or start at a fixed
+> baud and then switch.
 >=20
-> BTW: the Wi2Wi W2CBW003 chip comes in two firmware variants: one for UART=
- and
-> one for USB. So they are also not exchangeable.
+> As for generic slaves, no doubt they will come up and I will be
+> nak'ing the generic slave bindings. The "generic slave" is already
+> supported via tty devices in userspace IMO.
 
-Yes, let's ignore option c). I'm talking about UART only. If the
-chip has native USB support, then that's a different driver. Note,
-that for more complex drivers it may become possible to use the same
-high-level driver via regmap at some point. Not sure if this kind of
-HW exists, though.
-
-> Variant b) is IMHO of no practical relevance (but I may be wrong)
-> because it would mean to add some costly FT232 or PL2302 chip
-> where a different firmware variant works with direct USB
-> connection.
-
-Well for some chips there is not native USB support. But my scenario
-was about development. Let's say I have a serial-chip and I want to
-develop a driver for it. It would be nice if I can develop the
-driver with a USB-UART and then use it on my embedded system.
-
-There are usb-serial devices, which could benefit from support
-btw. I would find it really useful, if the Dangerous Prototype's
-Bus Pirate would expose native /dev/i2c and /dev/spi and it's
-based on FT232.
-
-> So to me it looks as if you need to develop different low-level
-> drivers anyways.
-
-No. You say, that option b) is irrelevant and assume, that every
-serial chip also has native USB support.
+Ok I didn't meant that generic. I meant something like "I have a
+remote controller with specific protocol, baudrate is board
+specific". Anyways it can be discussed once needed
 
 -- Sebastian
 
---ujbmmsf7oj6qiqrs
+--6jtqwxh4r6ldada3
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1
 
-iQIcBAEBCgAGBQJXu3/dAAoJENju1/PIO/qamhMP/0/9leORfw1QA9CDbLQYGyW0
-g1OOaANGvP8PH49x0kSl9NSXPwU7+KizSK0k3V0ZnAUQ8NHJyeakuDyck15ezyg8
-zqeXXcmC+iDO7LDGOg5WwdupHxZiYYPZeBi0C0RxbmNA4yyH/30WZJv01WZGYOTa
-V1GjC/F/VU1It1oVLEfrXfsklbUQUpsANx5MNl9PzKZRXYzFuBVmJ4Hd4I5apupO
-kpfaCMw+ZXiMgLDsoC5juty0MmN4guVtD8ie/t23ImQd8RE1lqFY9d4TQqjqpmCO
-2FOk1frVyEffVTjLO8l9EbbEWaVunmiUIDDjPcYND5l3xL17TpoT7KgHH1Vkm9R4
-dteOpY8uLbxugG0VMzd02q+iSHu9Q7i+t97+J5IqsQVOfr21rxdcDzTk4ioVUIZU
-i7cJBhvMX6fNzVd96G03A3igDAsyRbSOopmp5NGor4LEUwUpT3M+8QqlWjrzHeUk
-SGeYwOPzF/kBMPVfr2au3Dle6h6UJMe15CPTVXS5KaJGvT9L+CgneDlv4eI4uGVF
-EG3zsj+Qyff+rOZUrEVYM1pIUUJEFwMb9a/bNBXiHHDUKWUHAvC2iLvPmwKvLaqd
-B9dJ/7ZCltcRRQIWqCPr6R6lOU/DtB+8HnXZ3ThIEW/XoPu3ai0OG8NugjUwYxw1
-jf9NSZH+0rL5HNxSaTui
-=Zbkn
+iQIcBAEBCgAGBQJXu3oXAAoJENju1/PIO/qaw68QAJgiuRWtmlZJp3gN9RHVZzQK
+XiVAmN5tRWyi3rLUlV1Yc86HFJMR4b/eBAEWMdVKoYQK5lkaV3mv0ydjrjsfVhr1
+grho6fRvy0daxKJRMzqukJn9fZuEd0erBAP7o8UjJ594kw02gCbAda/4mma/QYPq
+a9zrtPg4SYqqw2YaqZu0oEL+ljv/5WTupZkJUrz6yVxx+s+YFdfimF2Nw9l8DtMz
+VL+eeBPVcKrKQTIGa0cJt656+LR62bbzTrad5RcUy8GDEZLdiewPqTmjMC7xt1+k
+JkN1jzPvvxaUTRXBhMXXNlv+6rW4XcTFr+7U3qcq+CfTzC15ZBKvvRpkTbtltOGd
+vJdXQJDisLG036gFFxeurFFrVBREY7ZKhA9dwkDWTqwJkm8GuO8ZW+Q0SYhF79Oe
+i5J2lluswtwEvB8xYe1VNML3x6TkKejp3fJXk1KfrShbCOSV28LMKOjpKFcqLgvC
+jL1vIJtzujr2iu4bIxJEMKK3uKTuKaijiYO8Ja2zjfT+6+EZjhop3kq3cn4gyUSa
+T7Yvbv9TcjVyXpQ/WtHoppUG8BvdUyzbO058TUH9yCmnP7SmfOOHKH3NqUH1YXcr
+JVq7oxFbHIyxKIwT69vxygyfhk1G7Dbz17EM/65eTVr7c4Fcll44XPRUrK9ArEsd
+g/N0RX4XVu79MdLGDLCB
+=ESXE
 -----END PGP SIGNATURE-----
 
---ujbmmsf7oj6qiqrs--
+--6jtqwxh4r6ldada3--
