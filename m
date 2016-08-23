@@ -1,73 +1,61 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: =?UTF-8?q?Micha=C5=82=20Narajowski?=
-        <michal.narajowski@codecoup.pl>
-To: linux-bluetooth@vger.kernel.org
-Cc: =?UTF-8?q?Micha=C5=82=20Narajowski?=
-        <michal.narajowski@codecoup.pl>
-Subject: [RFC PATCH] doc/mgmt-api: Add appearance command and event specification
-Date: Tue, 23 Aug 2016 13:55:34 +0200
-Message-Id: <1471953334-469-1-git-send-email-michal.narajowski@codecoup.pl>
+Content-Type: text/plain; charset=windows-1252
+Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
+Subject: Re: BLE Hexiwear connection fail
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <CAOsEZogZpPu7NBgVnp=eamwMp-jn8_9hTuK9PEua=2Pme9v5Eg@mail.gmail.com>
+Date: Tue, 23 Aug 2016 07:53:56 -0400
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Message-Id: <78FD0E95-1E02-4EDC-874D-AFD0AC0511E5@holtmann.org>
+References: <CAOsEZohrTsrZuLxpfRQ37mVcXGDqO+rV6TzfzR1ELbSHe0jtng@mail.gmail.com> <8CD08159-2E3B-4663-9C49-56131BB77AFA@holtmann.org> <CABBYNZ+cLHkDYH+L78oAr1P6Uua_TrbA02DE_tE0LoNq7wv=7A@mail.gmail.com> <CAOsEZogZpPu7NBgVnp=eamwMp-jn8_9hTuK9PEua=2Pme9v5Eg@mail.gmail.com>
+To: Jay Aurabind <jay.aurabind@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- doc/mgmt-api.txt | 39 +++++++++++++++++++++++++++++++++++++++
- 1 file changed, 39 insertions(+)
+Hi Jay,
 
-diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
-index 3f593f9..f7e760d 100644
---- a/doc/mgmt-api.txt
-+++ b/doc/mgmt-api.txt
-@@ -2811,6 +2811,31 @@ Start Limited Discovery Command
- 				Invalid Index
- 
- 
-+Set Appearance Command
-+======================
-+
-+	Command Code:		0x0042
-+	Controller Index:	<controller id>
-+	Command Parameters:	Appearance (2 Octets)
-+	Return Parameters:	Appearance (2 Octets)
-+
-+	This command is used to set the appearance value of a controller.
-+
-+	This command can be used when the controller is not 
-+	powered and all settings will be programmed once powered.
-+
-+	The value of appearance will be remembered when switching
-+	the controller off and back on again. So the appearance only
-+	have to be set once when a new controller is found and will
-+	stay until removed.
-+
-+	This command generates a Command Complete event on success
-+	or a Command Status event on failure.
-+
-+	Possible errors:	Invalid Parameters
-+				Invalid Index
-+
-+
- Command Complete Event
- ======================
- 
-@@ -3656,3 +3681,17 @@ Advertising Removed Event
- 
- 	The event will only be sent to management sockets other than the
- 	one through which the command was sent.
-+
-+
-+Appearance Changed Event
-+========================
-+
-+	Event Code:		0x0025
-+	Controller Index:	<controller id>
-+	Event Parameters:	Appearance (2 Octets)
-+
-+	This event indicates that the appearance of the controller has
-+	changed.
-+
-+	The event will only be sent to management sockets other than the
-+	one through which the command was sent.
--- 
-2.7.4
+>>>> I have the IoT device Hexiwear[1], which connects through BLE. They
+>>>> have an android app which can take data from it. I want to use from my
+>>>> linux machine. Its BLE API is provided at their github[2] page.
+>>> 
+>>> does it work on Android? If so, then enable Bluetooth HCI tracing/logging in Android and send around the /sdcard/btsnoop_hci.log file. You can read that wit btmon by yourself and compare.
+>>> 
+>>> I would also propose you start using btmon instead of hcidump.
+>> 
+> 
+> 
+> I took the btsnoop log from Android while the device is being paired.
+> To my surprise btmon crashes as I scroll down. The file is attached.
+> The crash is probably a different discussion,  but given below is the
+> backtrace. Can you please check if the same file crashes your btmon as
+> well?
+> 
+> #0  0x00007ffff7a4b6f5 in raise () from /lib64/libc.so.6
+> #1  0x00007ffff7a4d2fa in abort () from /lib64/libc.so.6
+> #2  0x00007ffff7a8c670 in __libc_message () from /lib64/libc.so.6
+> #3  0x00007ffff7b2bc57 in __fortify_fail () from /lib64/libc.so.6
+> #4  0x00007ffff7b29d80 in __chk_fail () from /lib64/libc.so.6
+> #5  0x00007ffff7b29339 in _IO_str_chk_overflow () from /lib64/libc.so.6
+> #6  0x00007ffff7a905a0 in __GI__IO_default_xsputn () from /lib64/libc.so.6
+> #7  0x00007ffff7a635ac in vfprintf () from /lib64/libc.so.6
+> #8  0x00007ffff7b293cc in __vsprintf_chk () from /lib64/libc.so.6
+> #9  0x00007ffff7b2931d in __sprintf_chk () from /lib64/libc.so.6
+> #10 0x000055555558a533 in print_uuid ()
+> #11 0x0000555555588352 in att_packet ()
+> #12 0x00005555555888f3 in l2cap_frame ()
+> #13 0x000055555557f517 in packet_hci_acldata ()
+> #14 0x000055555557fae7 in packet_monitor ()
+> #15 0x000055555556a1c6 in control_reader ()
+> #16 0x00005555555670bc in main ()
+
+it does not crash for me with the latest btmon from git. So maybe that is already fixed. If not, then lets us know and we have to figure out what is crashing here.
+
+So the trace is funny. It seems that Android tries to connect to the LE device over and over again. And on the 3rd attempt it gets through. However I see nothing different in Android. Minus the fact that Bluedroid is not even keeping track of Disconnect Events and sending packets anyway. That stack really has no clue what state it is in :(
+
+Can you just keep trying to connect and see if it eventually succeeds. If so, then please tell the manufacturer of that device to fix their BLE stack on the peripheral. Since there is little we can do to make this more reliable.
+
+Regards
+
+Marcel
 
