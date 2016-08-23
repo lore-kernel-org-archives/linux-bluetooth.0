@@ -1,54 +1,88 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain; charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
-Subject: Re: Bug
-From: Leonard Bocock <leonard.bocock@gmail.com>
-In-Reply-To: <CABBYNZKUr1m1zzcqjZrvwBVT47dTnVds5Jyiv6QN8OogbV0TkQ@mail.gmail.com>
-Date: Wed, 24 Aug 2016 18:15:08 +1000
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Message-Id: <42920C1A-F68F-4F5E-860E-FEE23D602055@gmail.com>
-References: <31D29646-769D-457D-B45E-3B1F8D887F80@gmail.com> <CABBYNZKUr1m1zzcqjZrvwBVT47dTnVds5Jyiv6QN8OogbV0TkQ@mail.gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <robh@kernel.org>
+MIME-Version: 1.0
+In-Reply-To: <2775954.hrE2UdODgU@wuerfel>
+References: <20160818011445.22726-1-robh@kernel.org> <12886761.WF058qtZp8@wuerfel>
+ <CAL_JsqL1s9QTc+xVXafcHmyiH+6Yy0Ded+JbeYhTtYNxLtWREg@mail.gmail.com> <2775954.hrE2UdODgU@wuerfel>
+From: Rob Herring <robh@kernel.org>
+Date: Tue, 23 Aug 2016 16:04:55 -0500
+Message-ID: <CAL_JsqJb0UXgZh_NZ0WtJz+nRPvZf8uViS8poDXWneC7zYsx=w@mail.gmail.com>
+Subject: Re: [RFC PATCH 0/3] UART slave device bus
+To: Arnd Bergmann <arnd@arndb.de>, Dmitry Torokhov <dmitry.torokhov@gmail.com>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Marcel Holtmann <marcel@holtmann.org>,
+	Jiri Slaby <jslaby@suse.com>, Sebastian Reichel <sre@kernel.org>, Pavel Machek <pavel@ucw.cz>,
+	Peter Hurley <peter@hurleysoftware.com>, NeilBrown <neil@brown.name>,
+	"Dr . H . Nikolaus Schaller" <hns@goldelico.com>, Linus Walleij <linus.walleij@linaro.org>,
+	"open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+	"linux-serial@vger.kernel.org" <linux-serial@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz
++Dmitry to get his opinion on using serio.
 
-I haven=E2=80=99t been able to track it through logs. It may be iOS 9.4 =
-related or hardware related.=20
+On Mon, Aug 22, 2016 at 10:24 AM, Arnd Bergmann <arnd@arndb.de> wrote:
+> On Monday, August 22, 2016 8:38:23 AM CEST Rob Herring wrote:
+>> On Mon, Aug 22, 2016 at 7:37 AM, Arnd Bergmann <arnd@arndb.de> wrote:
+>> > On Wednesday, August 17, 2016 8:14:42 PM CEST Rob Herring wrote:
+>> >>
+>> >> Before I spend more time on this, I'm looking mainly for feedback on the
+>> >> general direction and structure (the interface with the existing serial
+>> >> drivers in particular).
+>> >
+>> > Aside from the things that have already been mentioned in the discussion,
+>> > I wonder how this should relate to the drivers/input/serio framework.
+>>
+>> As I mentioned, I did investigate that route.
+>
+> Ok, sorry for missing that.
+>
+>> > My impression is that there is some overlap in what you want
+>> > to do here, and what serio does today as a line discipline on top
+>> > of a tty line discipline (and on top of other non-uart serial
+>> > connections), so we should look into whether the two can be unified
+>> > or not. Here is what I found so far:
+>> >
+>> > For all I can tell, serio is only used for drivers/input/ but could
+>> > easily be extended to other subsystems. It currently uses its own
+>> > binary ID matching between drivers and devices through user space
+>> > interfaces, though adding a DT binding for it would appear to be
+>> > a good idea regardless.
+>> >
+>> > It also has a bus_type already, and with some operations defined on
+>> > it. In particular, it has an "interrupt" method that is used to
+>> > notify the client driver when a byte is available (and pass
+>> > that byte along with it). This seems to be a useful addition to
+>> > what you have. Since it is based on sending single characters
+>> > both ways, transferring large amounts of data would be slower,
+>> > but the interface is somewhat simpler. In principle, both
+>> > character based and buffer based interfaces could coexist here
+>> > as they do in some other interfaces (e.g. smbus).
+>>
+>> Given that about the only things it really provided are the bus_type
+>> and associated boilerplate without much of a client interface, it
+>> seemed to me that creating a new subsystem first made more sense. Then
+>> we can convert serio to use the new subsystem.
+>
+> One possible downside of merging later is that we end up having to
+> support the existing user space ABI for serio that may not fit well
+> within whatever we come up with independently.
+>
+> I think there are two other valuable features provided by serio:
+>
+> - an existing set of drivers written to the API
+> - the implementation of the tty_ldisc
 
-I=E2=80=99ve decided to move the product under development to IP =
-wireless zero config.=20
+I've looked at serio a bit more and was able to add in DT matching to
+it. It's a bit hacky to make it work with the ldisc as it gets the DT
+node from serio->dev.parent->parent (the parent is the tty and
+grandparent is the uart dev) and still requires inputattach to open
+the tty and set the ldisc. Otherwise, the mode for inputattach doesn't
+matter. So I plan to continue down this path.
 
-Bluez is too unstable, too difficult to work with in it=E2=80=99s =
-current form (no code comments, no documentation).=20
+One thing I'm left wondering is serio essentially implements it's own
+async probing with connect()/disconnect(). Seems like it was because
+PS/2 port probing and resuming are slow. Is this still necessary or
+could be converted to use driver core async probing? That would make
+serio drivers look a bit more "normal".
 
-I=E2=80=99ve invested too much time in it already.=20
-
-Thanks, Leonard
-
-> On 23/08/2016, at 8:41 PM, Luiz Augusto von Dentz =
-<luiz.dentz@gmail.com> wrote:
->=20
-> Hi Leonard,
->=20
-> On Fri, Aug 19, 2016 at 11:44 PM, Leonard Bocock
-> <leonard.bocock@gmail.com> wrote:
->> The tools/gatt-service.c no longer works under 5.41. It worked under =
-5.3x.
->>=20
->> An iPhone will connect to it; however timeout while reading =
-characteristics.
->=20
-> Logs? Have you tried running upstream version?
->=20
-> --=20
-> Luiz Augusto von Dentz
-
-Leonard Bocock
-leonard.bocock@gmail.com
-Mobile: 	+64 (0)211 498 052
-
-
-
-
+Rob
