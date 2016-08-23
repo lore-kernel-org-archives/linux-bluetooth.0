@@ -1,38 +1,29 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+From: bugzilla-daemon@bugzilla.kernel.org
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/3] core/device: Fix marking auto-connect flag
-Date: Tue, 23 Aug 2016 13:17:46 +0300
-Message-Id: <1471947468-12696-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [Bug 120691] UART HCI memory leak
+Date: Tue, 23 Aug 2016 09:35:52 +0000
+Message-ID: <bug-120691-62941-xQaspQt0I3@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-120691-62941@https.bugzilla.kernel.org/>
+References: <bug-120691-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+https://bugzilla.kernel.org/show_bug.cgi?id=120691
 
-Device auto-connect shall be set only if the profile is able to accept
-incoming connections, this fixes the wrong behavior or connecting LE
-with dual mode devices immediatelly after probing service as profiles
-may have auto-connect flag for outgoing connection (usually BR/EDR only).
----
- src/device.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+nico.edev@gmail.com changed:
 
-diff --git a/src/device.c b/src/device.c
-index c103bb2..14de7e8 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -4080,7 +4080,10 @@ static struct btd_service *probe_service(struct btd_device *device,
- 		return NULL;
- 	}
- 
--	if (profile->auto_connect)
-+	/* Only set auto connect if profile has set the flag and can really
-+	 * accept connections.
-+	 */
-+	if (profile->auto_connect && profile->accept)
- 		device_set_auto_connect(device, TRUE);
- 
- 	return service;
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+             Status|NEW                         |RESOLVED
+         Resolution|---                         |PATCH_ALREADY_AVAILABLE
+
+--- Comment #17 from nico.edev@gmail.com ---
+Exactly; I tried this patch and the leak disappeared:
+http://marc.info/?l=linux-bluetooth&m=147193208628547
+
 -- 
-2.7.4
-
+You are receiving this mail because:
+You are the assignee for the bug.
