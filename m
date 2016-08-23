@@ -1,62 +1,63 @@
-Return-Path: <luiz.dentz@gmail.com>
+Return-Path: <szymon.janc@codecoup.pl>
 MIME-Version: 1.0
-In-Reply-To: <CAOsEZogZpPu7NBgVnp=eamwMp-jn8_9hTuK9PEua=2Pme9v5Eg@mail.gmail.com>
-References: <CAOsEZohrTsrZuLxpfRQ37mVcXGDqO+rV6TzfzR1ELbSHe0jtng@mail.gmail.com>
- <8CD08159-2E3B-4663-9C49-56131BB77AFA@holtmann.org> <CABBYNZ+cLHkDYH+L78oAr1P6Uua_TrbA02DE_tE0LoNq7wv=7A@mail.gmail.com>
- <CAOsEZogZpPu7NBgVnp=eamwMp-jn8_9hTuK9PEua=2Pme9v5Eg@mail.gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 23 Aug 2016 15:24:20 +0300
-Message-ID: <CABBYNZLeHE9Xp1mAPCXXJexnpBu2cNSqKYQkRmx1NdCd8ci55w@mail.gmail.com>
-Subject: Re: BLE Hexiwear connection fail
-To: Jay Aurabind <jay.aurabind@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <C0C54DF7-FFC1-45EC-B0FB-4823C02F016C@holtmann.org>
+References: <1471953334-469-1-git-send-email-michal.narajowski@codecoup.pl> <C0C54DF7-FFC1-45EC-B0FB-4823C02F016C@holtmann.org>
+From: Szymon Janc <szymon.janc@codecoup.pl>
+Date: Tue, 23 Aug 2016 14:20:52 +0200
+Message-ID: <CAAEJBhK_Ttnbypf+T6H52OvN3MYsV6=Ptv3CuC0W5-9Dm9irpg@mail.gmail.com>
+Subject: Re: [RFC PATCH] doc/mgmt-api: Add appearance command and event specification
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: =?UTF-8?Q?Micha=C5=82_Narajowski?= <michal.narajowski@codecoup.pl>,
+	linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jay,
+Hi Marcel,
 
-On Tue, Aug 23, 2016 at 9:18 AM, Jay Aurabind <jay.aurabind@gmail.com> wrote:
-> On 22 August 2016 at 16:27, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
->> Hi Jay, Marcel,
->>
->> On Mon, Aug 22, 2016 at 11:51 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
->>> Hi Jay,
->>>
->>>> I have the IoT device Hexiwear[1], which connects through BLE. They
->>>> have an android app which can take data from it. I want to use from my
->>>> linux machine. Its BLE API is provided at their github[2] page.
->>>
->>> does it work on Android? If so, then enable Bluetooth HCI tracing/logging in Android and send around the /sdcard/btsnoop_hci.log file. You can read that wit btmon by yourself and compare.
->>>
->>> I would also propose you start using btmon instead of hcidump.
->>
+On 23 August 2016 at 14:06, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Michal,
 >
->> The D-Bus GATT should be able to handle those, if we are able to
->> connect, but there seems to be something wrong with the specification
->> as it does seems to use UUID range reserved by the SIG instead of
->> using proper 128 bits UUIDs.
+>> ---
+>> doc/mgmt-api.txt | 39 +++++++++++++++++++++++++++++++++++++++
+>> 1 file changed, 39 insertions(+)
 >>
+>> diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
+>> index 3f593f9..f7e760d 100644
+>> --- a/doc/mgmt-api.txt
+>> +++ b/doc/mgmt-api.txt
+>> @@ -2811,6 +2811,31 @@ Start Limited Discovery Command
+>>                               Invalid Index
+>>
+>>
+>> +Set Appearance Command
+>> +======================
+>> +
+>> +     Command Code:           0x0042
+>> +     Controller Index:       <controller id>
+>> +     Command Parameters:     Appearance (2 Octets)
+>> +     Return Parameters:      Appearance (2 Octets)
+>> +
+>> +     This command is used to set the appearance value of a controller.
+>> +
+>> +     This command can be used when the controller is not
+>> +     powered and all settings will be programmed once powered.
+>> +
+>> +     The value of appearance will be remembered when switching
+>> +     the controller off and back on again. So the appearance only
+>> +     have to be set once when a new controller is found and will
+>> +     stay until removed.
+>> +
+>> +     This command generates a Command Complete event on success
+>> +     or a Command Status event on failure.
+>> +
+>> +     Possible errors:        Invalid Parameters
+>> +                             Invalid Index
 >
-> Since I do not know about much bluez stack, are you telling that some
-> changes needs to be done within the bluez stack so as to connect/pair
-> to such BLE devices which use  UUIDs reserved by SIG rather than
-> private ones? And could you please clarify about "something wrong with
-> the specification" ?
+> what is this good for?
 
-The 16 Bits UUIDs used for the custom service (0x2000-0x2040) are
-reserved to be used by the SIG:
-
-https://www.bluetooth.com/specifications/assigned-numbers/16-bit-UUIDs-for-SDOs
-
-Alternatively if you really want to use 16 Bits UUIDs:
-
-https://www.bluetooth.com/specifications/assigned-numbers/16-bit-UUIDs-for-Members
-
-Note: this has nothing to do with the connection problem, but it is
-perhaps even worst problem because you won't be able to pass Bluetooth
-qualification.
-
+This is needed to handle appearance flag in "Add Advertising" as well as
+being able to generate LE OOB data with it.
 
 -- 
-Luiz Augusto von Dentz
+pozdrawiam
+Szymon K. Janc
