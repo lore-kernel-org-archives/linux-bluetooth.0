@@ -1,39 +1,68 @@
-Return-Path: <linux-kernel-owner@vger.kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
-Subject: Re: [RFC PATCH 0/3] UART slave device bus
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20160824145714.02bbebb3@lxorguk.ukuu.org.uk>
-Date: Wed, 24 Aug 2016 10:29:58 -0400
-Cc: Sebastian Reichel <sre@kernel.org>, Pavel Machek <pavel@ucw.cz>,
-        Rob Herring <robh@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Jiri Slaby <jslaby@suse.com>,
-        Peter Hurley <peter@hurleysoftware.com>,
-        NeilBrown <neil@brown.name>,
-        "Dr . H . Nikolaus Schaller" <hns@goldelico.com>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-        "linux-serial@vger.kernel.org" <linux-serial@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Message-Id: <A8AA3046-E635-4697-BA01-86FFFBB5B2E0@holtmann.org>
-References: <CAL_Jsq+tft4zsoOeE0WvMR3W9hAXEKzz35CgFtNJ6+P82uy-3A@mail.gmail.com> <20160822180254.5c95af7c@lxorguk.ukuu.org.uk> <CAL_JsqLe74GYN+j5muoCcnEX=BRu8cCvacRG0Xz7i+AEwxbDZg@mail.gmail.com> <20160822183849.6dfdb9d2@lxorguk.ukuu.org.uk> <2D07EA08-1055-4292-96B3-32913EC9BBE1@holtmann.org> <20160822223223.398ee72d@lxorguk.ukuu.org.uk> <20160822220017.GA10689@amd> <20160822235414.4b2f8712@lxorguk.ukuu.org.uk> <20160822235758.gh33xupgyroye5wa@earth> <20160823011521.0ed94283@lxorguk.ukuu.org.uk> <20160823005749.io6x4oi7muttkhfx@earth> <20160824145714.02bbebb3@lxorguk.ukuu.org.uk>
-To: One Thousand Gnomes <gnomes@lxorguk.ukuu.org.uk>
-Sender: linux-kernel-owner@vger.kernel.org
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+To: Anthony Bourguignon <contact@toniob.net>,
+        linux-bluetooth@vger.kernel.org
+Subject: Re: Can't connect a Xbox one controller
+In-Reply-To: <1471697662.3650.1.camel@toniob.net>
+References: <1471515072.4976.10.camel@toniob.net> <8760qwy6vv.fsf@intel.com> <1471642506.3626.5.camel@toniob.net> <87zio8wcya.fsf@intel.com> <1471697662.3650.1.camel@toniob.net>
+Date: Wed, 24 Aug 2016 11:02:59 -0300
+Message-ID: <87inuqw9gs.fsf@intel.com>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="=-=-="
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alan,
+--=-=-=
+Content-Type: text/plain
 
->> So you mean if I do "hciconfig hci0 down", then the uart-bus should
->> "down" the tty and only on "hciconfig hci0 up" it should "up" the
->> tty? I would expect a uart-bus slave-device takes control of the
->> device ("up" it) on probe. It's hardwired anyway.
-> 
-> Today you can switch stacks at runtime, you can switch between the kernel
-> stack and debug tools at runtime. Breaking that is a regression.
+Hi,
 
-actually that is not true. We have HCI User Channel since a long time that gives you raw access to the devices. And also kernel interfaces to do all vendor / debug tasks.
+Anthony Bourguignon <contact@toniob.net> writes:
+>>
+>> No. It could be a bug in the xbox controller. But I need to take a
+>> closer look at the specification to be really sure.
+>
+> Can I be of any help ?
 
-Regards
+Attached is a patch that disables negotiating Flow Control and
+Retransmission parameters for the SDP channel only. This is a shot in
+the dark, as I could find nothing in the specification that advises
+against the current BlueZ behaviour.
 
-Marcel
+Could you give it a try? (but I don't have high hopes for it)
+
+This is looking more like a bug in the controller.
+
+>
+> Thanks a lot again
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+Cheers,
+--
+Vinicius
+
+
+--=-=-=
+Content-Type: text/x-patch
+Content-Disposition: attachment; filename=l2cap_ertm_xbox.patch
+Content-Description: disable ertm for SDP
+
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 54ceb1f..aa078b9 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -3216,6 +3216,9 @@ done:
+ 		if (disable_ertm)
+ 			break;
+ 
++		if (chan->psm == cpu_to_le16(L2CAP_PSM_SDP))
++			break;
++
+ 		if (!(chan->conn->feat_mask & L2CAP_FEAT_ERTM) &&
+ 		    !(chan->conn->feat_mask & L2CAP_FEAT_STREAMING))
+ 			break;
+
+--=-=-=--
