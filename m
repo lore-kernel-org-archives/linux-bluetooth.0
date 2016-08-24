@@ -1,70 +1,39 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <linux-kernel-owner@vger.kernel.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
-Subject: Re: [PATCH v3] bluetooth, bpf: split sk_filter in l2cap_sock_recv_cb
+Subject: Re: [RFC PATCH 0/3] UART slave device bus
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20160727184014.10859-1-mathew.j.martineau@linux.intel.com>
-Date: Wed, 24 Aug 2016 10:57:02 -0400
-Cc: linux-bluetooth@vger.kernel.org, daniel@iogearbox.net,
-        willemb@google.com,
-        Gustavo Padovan <gustavo.padovan@collabora.co.uk>,
-        Alexei Starovoitov <ast@kernel.org>
-Message-Id: <CF1D47B2-11CA-4EA8-A601-7A589D784A2F@holtmann.org>
-References: <20160727184014.10859-1-mathew.j.martineau@linux.intel.com>
-To: Mat Martineau <mathew.j.martineau@linux.intel.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <20160824145714.02bbebb3@lxorguk.ukuu.org.uk>
+Date: Wed, 24 Aug 2016 10:29:58 -0400
+Cc: Sebastian Reichel <sre@kernel.org>, Pavel Machek <pavel@ucw.cz>,
+        Rob Herring <robh@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Jiri Slaby <jslaby@suse.com>,
+        Peter Hurley <peter@hurleysoftware.com>,
+        NeilBrown <neil@brown.name>,
+        "Dr . H . Nikolaus Schaller" <hns@goldelico.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+        "linux-serial@vger.kernel.org" <linux-serial@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Message-Id: <A8AA3046-E635-4697-BA01-86FFFBB5B2E0@holtmann.org>
+References: <CAL_Jsq+tft4zsoOeE0WvMR3W9hAXEKzz35CgFtNJ6+P82uy-3A@mail.gmail.com> <20160822180254.5c95af7c@lxorguk.ukuu.org.uk> <CAL_JsqLe74GYN+j5muoCcnEX=BRu8cCvacRG0Xz7i+AEwxbDZg@mail.gmail.com> <20160822183849.6dfdb9d2@lxorguk.ukuu.org.uk> <2D07EA08-1055-4292-96B3-32913EC9BBE1@holtmann.org> <20160822223223.398ee72d@lxorguk.ukuu.org.uk> <20160822220017.GA10689@amd> <20160822235414.4b2f8712@lxorguk.ukuu.org.uk> <20160822235758.gh33xupgyroye5wa@earth> <20160823011521.0ed94283@lxorguk.ukuu.org.uk> <20160823005749.io6x4oi7muttkhfx@earth> <20160824145714.02bbebb3@lxorguk.ukuu.org.uk>
+To: One Thousand Gnomes <gnomes@lxorguk.ukuu.org.uk>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mat,
+Hi Alan,
 
-> During an audit for sk_filter(), we found that rx_busy_skb handling
-> in l2cap_sock_recv_cb() and l2cap_sock_recvmsg() looks not quite as
-> intended.
+>> So you mean if I do "hciconfig hci0 down", then the uart-bus should
+>> "down" the tty and only on "hciconfig hci0 up" it should "up" the
+>> tty? I would expect a uart-bus slave-device takes control of the
+>> device ("up" it) on probe. It's hardwired anyway.
 > 
-> The assumption from commit e328140fdacb ("Bluetooth: Use event-driven
-> approach for handling ERTM receive buffer") is that errors returned
-> from sock_queue_rcv_skb() are due to receive buffer shortage. However,
-> nothing should prevent doing a setsockopt() with SO_ATTACH_FILTER on
-> the socket, that could drop some of the incoming skbs when handled in
-> sock_queue_rcv_skb().
-> 
-> In that case sock_queue_rcv_skb() will return with -EPERM, propagated
-> from sk_filter() and if in L2CAP_MODE_ERTM mode, wrong assumption was
-> that we failed due to receive buffer being full. From that point onwards,
-> due to the to-be-dropped skb being held in rx_busy_skb, we cannot make
-> any forward progress as rx_busy_skb is never cleared from l2cap_sock_recvmsg(),
-> due to the filter drop verdict over and over coming from sk_filter().
-> Meanwhile, in l2cap_sock_recv_cb() all new incoming skbs are being
-> dropped due to rx_busy_skb being occupied.
-> 
-> Instead, just use __sock_queue_rcv_skb() where an error really tells that
-> there's a receive buffer issue. Split the sk_filter() and enable it for
-> non-segmented modes at queuing time since at this point in time the skb has
-> already been through the ERTM state machine and it has been acked, so dropping
-> is not allowed. Instead, for ERTM and streaming mode, call sk_filter() in
-> l2cap_data_rcv() so the packet can be dropped before the state machine sees it.
-> 
-> Fixes: e328140fdacb ("Bluetooth: Use event-driven approach for handling ERTM receive buffer")
-> Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
-> Signed-off-by: Mat Martineau <mathew.j.martineau@linux.intel.com>
-> Cc: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-> Cc: Willem de Bruijn <willemb@google.com>
-> Cc: Alexei Starovoitov <ast@kernel.org>
-> ---
-> 
-> For v3 I incorporated Willem's feedback regarding ERTM/streaming mode
-> consistency and checking for a trimmed SDU length header.
-> 
-> Mat
-> 
-> ---
-> net/bluetooth/l2cap_core.c |  8 ++++++++
-> net/bluetooth/l2cap_sock.c | 14 ++++++++++++--
-> 2 files changed, 20 insertions(+), 2 deletions(-)
+> Today you can switch stacks at runtime, you can switch between the kernel
+> stack and debug tools at runtime. Breaking that is a regression.
 
-patch has been applied to bluetooth-stable tree.
+actually that is not true. We have HCI User Channel since a long time that gives you raw access to the devices. And also kernel interfaces to do all vendor / debug tasks.
 
 Regards
 
 Marcel
-
