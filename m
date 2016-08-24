@@ -15,20 +15,25 @@ Cc: Loic Poulain <loic.poulain@intel.com>,
 	linux-bluetooth@vger.kernel.org,
 	linux-serial@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [RFC PATCH 1/6] serio: add OF driver binding
-Date: Wed, 24 Aug 2016 18:24:32 -0500
-Message-Id: <20160824232437.9446-3-robh@kernel.org>
+Subject: [RFC PATCH 1/6] serio: add DT driver binding
+Date: Wed, 24 Aug 2016 18:24:31 -0500
+Message-Id: <20160824232437.9446-2-robh@kernel.org>
 In-Reply-To: <20160824232437.9446-1-robh@kernel.org>
 References: <20160824232437.9446-1-robh@kernel.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+This adds DT driver binding support to the serio bus. The parent of the
+serio port device must have a device_node associated with it. Typically,
+this would be the UART device node. The slave device must be a child node
+of the UART device node.
+
 Signed-off-by: Rob Herring <robh@kernel.org>
 ---
- drivers/input/serio/serio.c | 20 +++++++++++++++++++-
- 1 file changed, 19 insertions(+), 1 deletion(-)
+ drivers/input/serio/serio.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/input/serio/serio.c b/drivers/input/serio/serio.c
-index 1ca7f55..6cfa22f 100644
+index 1ca7f55..9e8eb7a 100644
 --- a/drivers/input/serio/serio.c
 +++ b/drivers/input/serio/serio.c
 @@ -36,6 +36,7 @@
@@ -48,23 +53,7 @@ index 1ca7f55..6cfa22f 100644
  		if ((ids->type == SERIO_ANY || ids->type == serio->id.type) &&
  		    (ids->proto == SERIO_ANY || ids->proto == serio->id.proto) &&
  		    (ids->extra == SERIO_ANY || ids->extra == serio->id.extra) &&
-@@ -107,6 +108,7 @@ static int serio_bind_driver(struct serio *serio, struct serio_driver *drv)
- {
- 	int error;
- 
-+	printk("%s\n", __func__);
- 	if (serio_match_port(drv->id_table, serio)) {
- 
- 		serio->dev.driver = &drv->driver;
-@@ -133,6 +135,7 @@ static void serio_find_driver(struct serio *serio)
- {
- 	int error;
- 
-+	printk("%s\n", __func__);
- 	error = device_attach(&serio->dev);
- 	if (error < 0 && error != -EPROBE_DEFER)
- 		dev_warn(&serio->dev,
-@@ -542,8 +545,12 @@ static void serio_init_port(struct serio *serio)
+@@ -542,6 +543,8 @@ static void serio_init_port(struct serio *serio)
  static void serio_add_port(struct serio *serio)
  {
  	struct serio *parent = serio->parent;
@@ -72,12 +61,8 @@ index 1ca7f55..6cfa22f 100644
 +		serio->dev.parent ? serio->dev.parent->of_node : NULL;
  	int error;
  
-+	printk("%s\n", __func__);
-+
  	if (parent) {
- 		serio_pause_rx(parent);
- 		list_add_tail(&serio->child_node, &parent->children);
-@@ -555,6 +562,8 @@ static void serio_add_port(struct serio *serio)
+@@ -555,6 +558,8 @@ static void serio_add_port(struct serio *serio)
  	if (serio->start)
  		serio->start(serio);
  
@@ -86,29 +71,10 @@ index 1ca7f55..6cfa22f 100644
  	error = device_add(&serio->dev);
  	if (error)
  		dev_err(&serio->dev,
-@@ -570,6 +579,8 @@ static void serio_destroy_port(struct serio *serio)
- {
- 	struct serio *child;
- 
-+	printk("%s\n", __func__);
-+
- 	while ((child = serio_get_pending_child(serio)) != NULL) {
- 		serio_remove_pending_events(child);
- 		put_device(&child->dev);
-@@ -791,6 +802,7 @@ static int serio_driver_probe(struct device *dev)
- 	struct serio *serio = to_serio_port(dev);
- 	struct serio_driver *drv = to_serio_driver(dev->driver);
- 
-+	printk("%s\n", __func__);
- 	return serio_connect_driver(serio, drv);
- }
- 
-@@ -902,6 +914,12 @@ static int serio_bus_match(struct device *dev, struct device_driver *drv)
+@@ -902,6 +907,10 @@ static int serio_bus_match(struct device *dev, struct device_driver *drv)
  	struct serio *serio = to_serio_port(dev);
  	struct serio_driver *serio_drv = to_serio_driver(drv);
  
-+	printk("%s\n", __func__);
-+
 +	if (of_driver_match_device(dev, drv)) {
 +		printk("matched %s\n", dev->of_node->name);
 +		return 1;
