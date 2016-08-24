@@ -1,47 +1,32 @@
-Return-Path: <larry.finger@gmail.com>
-Sender: Larry Finger <larry.finger@gmail.com>
-Subject: Re: Memory (skb) leak in kernel 4.8-rc2
-To: Frederic Dalleau <frederic.dalleau@collabora.co.uk>,
- Marcel Holtmann <marcel@holtmann.org>,
- "Gustavo F. Padovan" <gustavo@padovan.org>,
- Linux Bluetooth mailing list <linux-bluetooth@vger.kernel.org>,
- LKML <linux-kernel@vger.kernel.org>
-References: <a62119eb-28d2-7b4d-acbb-6ca8d3a0c91d@lwfinger.net>
- <A07D8003-F1EB-4408-A3F2-E043DF678296@holtmann.org>
- <20160820071504.GA9663@t440s.P-661HNU-F1>
- <dd63c403-f35e-2543-e5ba-af40b263ea75@collabora.co.uk>
-From: Larry Finger <Larry.Finger@lwfinger.net>
-Message-ID: <2be4b143-4f0f-c688-87c3-8056ecc43dfb@lwfinger.net>
-Date: Wed, 24 Aug 2016 15:02:36 -0500
-MIME-Version: 1.0
-In-Reply-To: <dd63c403-f35e-2543-e5ba-af40b263ea75@collabora.co.uk>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
+Subject: Re: [PATCH] bluetooth: bcm203x: don't print error when allocating urb fails
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1470949231-23508-2-git-send-email-wsa-dev@sang-engineering.com>
+Date: Wed, 24 Aug 2016 10:57:04 -0400
+Cc: linux-usb@vger.kernel.org,
+        "Gustavo F. Padovan" <gustavo@padovan.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-bluetooth@vger.kernel.org
+Message-Id: <CFC7B2CC-D3B9-427E-9CA6-EF62782F020B@holtmann.org>
+References: <1470949231-23508-1-git-send-email-wsa-dev@sang-engineering.com> <1470949231-23508-2-git-send-email-wsa-dev@sang-engineering.com>
+To: Wolfram Sang <wsa-dev@sang-engineering.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 08/21/2016 07:09 AM, Frederic Dalleau wrote:
-> Hi Marcel, Johan,
->
->>>> I am unable to unload module bluetooth to verify that the second
->>>> leak is not a false positive; however, the one in btusb is a real
->>>> memory leak.
->
-> There was a bugzilla last week with that backtrace:
-> https://bugzilla.kernel.org/show_bug.cgi?id=120691
->
-> At the time, I was thinking that the leak could originate from one of the
-> req_complete_skb callback, but which one?
->
-> And today that the issue has popped again, I found that hci_req_sync_complete
-> references the skb in hdev->req_skb. It is called (via hci_req_run_skb) from
-> either __hci_cmd_sync_ev which will pass the skb to the caller, or
-> __hci_req_sync which leaks.
->
-> I have a patch on the grill.
+Hi Wolfram,
 
-Frédéric,
+> kmalloc will print enough information in case of failure.
+> 
+> Signed-off-by: Wolfram Sang <wsa-dev@sang-engineering.com>
+> ---
+> drivers/bluetooth/bcm203x.c | 4 +---
+> 1 file changed, 1 insertion(+), 3 deletions(-)
 
-Any progress on this patch?
+patch has been applied to bluetooth-next tree.
 
-Thanks,
+Regards
 
-Larry
+Marcel
+
