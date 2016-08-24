@@ -1,77 +1,49 @@
-Return-Path: <robherring2@gmail.com>
-From: Rob Herring <robh@kernel.org>
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Jiri Slaby <jslaby@suse.com>,
-	Sebastian Reichel <sre@kernel.org>,
-	Arnd Bergmann <arnd@arndb.de>,
-	"Dr . H . Nikolaus Schaller" <hns@goldelico.com>,
-	Alan Cox <gnomes@lxorguk.ukuu.org.uk>
-Cc: Loic Poulain <loic.poulain@intel.com>,
-	Pavel Machek <pavel@ucw.cz>,
-	Peter Hurley <peter@hurleysoftware.com>,
-	NeilBrown <neil@brown.name>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	linux-bluetooth@vger.kernel.org,
-	linux-serial@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [RFC PATCH 0/6] UART slave devices using serio
-Date: Wed, 24 Aug 2016 18:24:30 -0500
-Message-Id: <20160824232437.9446-1-robh@kernel.org>
+Return-Path: <linux-kernel-owner@vger.kernel.org>
+To: LKML <linux-kernel@vger.kernel.org>,
+        <linux-bluetooth@vger.kernel.org>
+From: =?UTF-8?Q?Mika_Penttil=c3=a4?= <mika.penttila@nextfour.com>
+Subject: [PATCH] bluetooth, regression: MSG_TRUNC fixes
+Message-ID: <9f92cebe-284c-47b1-1e7d-1ed6581b20f4@nextfour.com>
+Date: Wed, 24 Aug 2016 13:13:27 +0300
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is a new approach to supporting UART slave devices using the
-existing serio bus. After Arnd's proding, I took another look at serio
-and decided extending it does make sense. Using serio primarily requires
-adding DT based device matching and supporting buffer based write and
-receive.
+Recent 4.8-rc changes to bluetooth MSG_TRUNC handling introduced regression; pairing finishes
+but connecting profiles not. 
 
-Currently, I'm using the existing serio serport ldisc for testing. This
-requires using inputattach to open the tty and set the ldisc which in
-turn registers a serio port with the serio core:
+With the below fixes to MSG_TRUNC handling the connection is established normally.
 
-inputattach -bare /dev/ttyAMA1
-
-Once a tty_port based serio port driver is in place, this step will not
-be needed. Supporting cases like a USB UART will also work if the USB
-UART is described in DT. If not described in DT, I'm not sure if the
-existing serio manual binding is sufficient (Need to figure out how that
-works). Slave drivers also need other ways to specify additional data
-using module params perhaps. Getting DT overlays to work for
-non-discoverable devices behind discoverable buses (i.e. detached from
-a base DT) is another option, but that's not yet supported in general.
-
-I've done all the serio changes in place, but ultimately I think at
-least the core of serio should be moved out of drivers/input/. I don't
-think it belongs under drivers/tty/ or drivers/tty/serial/, so
-drivers/serio/?
-
-BT is working under QEMU to the point a slave driver can bind to a
-serio port device via DT, register as a BT device, start sending out
-initial packets and receive data (typed at a terminal). Now I need to
-find a real device.
-
-A git branch is available here[1]. Note it will get rebased.
-
-Rob
-
-[1] git://git.kernel.org/pub/scm/linux/kernel/git/robh/linux.git serial-bus-serio
+--Mika
 
 
-Rob Herring (6):
-  serio: add DT driver binding
-  serio: serport: hacks to get DT probe to work
-  serio: add buffer receive and write functions
-  serio: serport: add support for buffered write and receive
-  serio: add serial configuration functions
-  bluetooth: hack up ldisc to use serio
+Signed-off-by: Mika Penttilä <mika.penttila@nextfour.com>
+---
 
- drivers/bluetooth/hci_ldisc.c | 261 +++++++++++++++++-------------------------
- drivers/bluetooth/hci_uart.h  |   3 +
- drivers/input/serio/serio.c   |  34 +++++-
- drivers/input/serio/serport.c |  49 ++++----
- include/linux/serio.h         |  59 +++++++++-
- 5 files changed, 223 insertions(+), 183 deletions(-)
-
---
-2.9.3
+diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
+index ece45e0..0b5f729 100644
+--- a/net/bluetooth/af_bluetooth.c
++++ b/net/bluetooth/af_bluetooth.c
+@@ -250,7 +250,7 @@ int bt_sock_recvmsg(struct socket *sock, struct msghdr *msg, siz
+ 
+        skb_free_datagram(sk, skb);
+ 
+-       if (msg->msg_flags & MSG_TRUNC)
++       if (flags & MSG_TRUNC)
+                copied = skblen;
+ 
+        return err ? : copied;
+diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
+index 6ef8a01..96f04b7 100644
+--- a/net/bluetooth/hci_sock.c
++++ b/net/bluetooth/hci_sock.c
+@@ -1091,7 +1091,7 @@ static int hci_sock_recvmsg(struct socket *sock, struct msghdr
+ 
+        skb_free_datagram(sk, skb);
+ 
+-       if (msg->msg_flags & MSG_TRUNC)
++       if (flags & MSG_TRUNC)
+                copied = skblen;
+ 
+        return err ? : copied;
