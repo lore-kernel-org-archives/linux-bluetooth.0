@@ -1,56 +1,54 @@
-Return-Path: <linus.walleij@linaro.org>
-MIME-Version: 1.0
-In-Reply-To: <20160822164533.688a6aec@lxorguk.ukuu.org.uk>
-References: <20160818011445.22726-1-robh@kernel.org> <12886761.WF058qtZp8@wuerfel>
- <CAL_JsqL1s9QTc+xVXafcHmyiH+6Yy0Ded+JbeYhTtYNxLtWREg@mail.gmail.com>
- <2775954.hrE2UdODgU@wuerfel> <20160822164533.688a6aec@lxorguk.ukuu.org.uk>
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Wed, 24 Aug 2016 14:14:23 +0200
-Message-ID: <CACRpkda4BmgfuYo0Tj8Rvoq4qvfSz7HT03J0dNPJiL4z7PWx1g@mail.gmail.com>
-Subject: Re: [RFC PATCH 0/3] UART slave device bus
-To: One Thousand Gnomes <gnomes@lxorguk.ukuu.org.uk>
-Cc: Arnd Bergmann <arnd@arndb.de>, Rob Herring <robh@kernel.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Marcel Holtmann <marcel@holtmann.org>,
-	Jiri Slaby <jslaby@suse.com>, Sebastian Reichel <sre@kernel.org>, Pavel Machek <pavel@ucw.cz>,
-	Peter Hurley <peter@hurleysoftware.com>, NeilBrown <neil@brown.name>,
-	"Dr . H . Nikolaus Schaller" <hns@goldelico.com>,
-	"open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-	"linux-serial@vger.kernel.org" <linux-serial@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Content-Type: text/plain; charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
+Subject: Re: Bug
+From: Leonard Bocock <leonard.bocock@gmail.com>
+In-Reply-To: <CABBYNZKUr1m1zzcqjZrvwBVT47dTnVds5Jyiv6QN8OogbV0TkQ@mail.gmail.com>
+Date: Wed, 24 Aug 2016 18:15:08 +1000
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Message-Id: <42920C1A-F68F-4F5E-860E-FEE23D602055@gmail.com>
+References: <31D29646-769D-457D-B45E-3B1F8D887F80@gmail.com> <CABBYNZKUr1m1zzcqjZrvwBVT47dTnVds5Jyiv6QN8OogbV0TkQ@mail.gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Aug 22, 2016 at 5:45 PM, One Thousand Gnomes
-<gnomes@lxorguk.ukuu.org.uk> wrote:
+Hi Luiz
 
-> and if I look at the usermode crapfest on a lot of Android systems it
-> looks similar but with the notion of things like being able to describe
->
-> -       Use GPIO mode sleeping and assume first char is X to save power
+I haven=E2=80=99t been able to track it through logs. It may be iOS 9.4 =
+related or hardware related.=20
 
-It's really nasty hardware design, or a software hack to solve
-a hardware problem: what should have been done is
-of course create a UART with an asynchronous low-power mode
-that can recieve a character and wake up the system at any time,
-handing over the wakeup character(s) to the driver. That is
-obviously the usecase they were designing for.
+I=E2=80=99ve decided to move the product under development to IP =
+wireless zero config.=20
 
-But yeah, I guess we have to contain hacks like that.
+Bluez is too unstable, too difficult to work with in it=E2=80=99s =
+current form (no code comments, no documentation).=20
 
-> -       Power up, wait n ms, write, read, wait n ms, power down (which
->         has to be driven at the ldisc/user level as only the ldisc
->         understands transactions, or via ioctls (right now Android user
->         space tends to do hardcoded writes to /sys.. gpio to drive power
+I=E2=80=99ve invested too much time in it already.=20
 
-This kind of abominational abuse of the GPIO sysfs ABI is
-partly why I've obsoleted it. The right abstraction is the
-fixed regulator with a GPIO line obviously, then some
-sequencing along the lines of what you can find in
-drivers/mmc/core/pwrseq*
+Thanks, Leonard
 
-Unfortunately that sysfs ABI crept in during a window of time
-when GPIO was unmaintained and I am trying my best to
-contain and improve the situation.
+> On 23/08/2016, at 8:41 PM, Luiz Augusto von Dentz =
+<luiz.dentz@gmail.com> wrote:
+>=20
+> Hi Leonard,
+>=20
+> On Fri, Aug 19, 2016 at 11:44 PM, Leonard Bocock
+> <leonard.bocock@gmail.com> wrote:
+>> The tools/gatt-service.c no longer works under 5.41. It worked under =
+5.3x.
+>>=20
+>> An iPhone will connect to it; however timeout while reading =
+characteristics.
+>=20
+> Logs? Have you tried running upstream version?
+>=20
+> --=20
+> Luiz Augusto von Dentz
 
-Yours,
-Linus Walleij
+Leonard Bocock
+leonard.bocock@gmail.com
+Mobile: 	+64 (0)211 498 052
+
+
+
+
