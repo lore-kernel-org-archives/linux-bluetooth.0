@@ -1,115 +1,56 @@
-Return-Path: <gnomes@lxorguk.ukuu.org.uk>
-Date: Wed, 24 Aug 2016 14:57:14 +0100
-From: One Thousand Gnomes <gnomes@lxorguk.ukuu.org.uk>
-To: Sebastian Reichel <sre@kernel.org>
-Cc: Pavel Machek <pavel@ucw.cz>, Marcel Holtmann <marcel@holtmann.org>,
-        Rob
- Herring <robh@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
-        Greg
- Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Jiri Slaby <jslaby@suse.com>, Peter Hurley <peter@hurleysoftware.com>,
-        NeilBrown <neil@brown.name>,
-        "Dr .
- H . Nikolaus Schaller" <hns@goldelico.com>,
-        Linus Walleij
- <linus.walleij@linaro.org>,
-        "open list:BLUETOOTH DRIVERS"
- <linux-bluetooth@vger.kernel.org>,
-        "linux-serial@vger.kernel.org"
- <linux-serial@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org"
- <linux-kernel@vger.kernel.org>
-Subject: Re: [RFC PATCH 0/3] UART slave device bus
-Message-ID: <20160824145714.02bbebb3@lxorguk.ukuu.org.uk>
-In-Reply-To: <20160823005749.io6x4oi7muttkhfx@earth>
-References: <CAL_Jsq+tft4zsoOeE0WvMR3W9hAXEKzz35CgFtNJ6+P82uy-3A@mail.gmail.com>
-	<20160822180254.5c95af7c@lxorguk.ukuu.org.uk>
-	<CAL_JsqLe74GYN+j5muoCcnEX=BRu8cCvacRG0Xz7i+AEwxbDZg@mail.gmail.com>
-	<20160822183849.6dfdb9d2@lxorguk.ukuu.org.uk>
-	<2D07EA08-1055-4292-96B3-32913EC9BBE1@holtmann.org>
-	<20160822223223.398ee72d@lxorguk.ukuu.org.uk>
-	<20160822220017.GA10689@amd>
-	<20160822235414.4b2f8712@lxorguk.ukuu.org.uk>
-	<20160822235758.gh33xupgyroye5wa@earth>
-	<20160823011521.0ed94283@lxorguk.ukuu.org.uk>
-	<20160823005749.io6x4oi7muttkhfx@earth>
+Return-Path: <linus.walleij@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20160822164533.688a6aec@lxorguk.ukuu.org.uk>
+References: <20160818011445.22726-1-robh@kernel.org> <12886761.WF058qtZp8@wuerfel>
+ <CAL_JsqL1s9QTc+xVXafcHmyiH+6Yy0Ded+JbeYhTtYNxLtWREg@mail.gmail.com>
+ <2775954.hrE2UdODgU@wuerfel> <20160822164533.688a6aec@lxorguk.ukuu.org.uk>
+From: Linus Walleij <linus.walleij@linaro.org>
+Date: Wed, 24 Aug 2016 14:14:23 +0200
+Message-ID: <CACRpkda4BmgfuYo0Tj8Rvoq4qvfSz7HT03J0dNPJiL4z7PWx1g@mail.gmail.com>
+Subject: Re: [RFC PATCH 0/3] UART slave device bus
+To: One Thousand Gnomes <gnomes@lxorguk.ukuu.org.uk>
+Cc: Arnd Bergmann <arnd@arndb.de>, Rob Herring <robh@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Marcel Holtmann <marcel@holtmann.org>,
+	Jiri Slaby <jslaby@suse.com>, Sebastian Reichel <sre@kernel.org>, Pavel Machek <pavel@ucw.cz>,
+	Peter Hurley <peter@hurleysoftware.com>, NeilBrown <neil@brown.name>,
+	"Dr . H . Nikolaus Schaller" <hns@goldelico.com>,
+	"open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+	"linux-serial@vger.kernel.org" <linux-serial@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-> So you mean if I do "hciconfig hci0 down", then the uart-bus should
-> "down" the tty and only on "hciconfig hci0 up" it should "up" the
-> tty? I would expect a uart-bus slave-device takes control of the
-> device ("up" it) on probe. It's hardwired anyway.
+On Mon, Aug 22, 2016 at 5:45 PM, One Thousand Gnomes
+<gnomes@lxorguk.ukuu.org.uk> wrote:
 
-Today you can switch stacks at runtime, you can switch between the kernel
-stack and debug tools at runtime. Breaking that is a regression.
+> and if I look at the usermode crapfest on a lot of Android systems it
+> looks similar but with the notion of things like being able to describe
+>
+> -       Use GPIO mode sleeping and assume first char is X to save power
 
-> Also what should happen if old userspace use hciattach while
-> uart-bus slave-device doesn't have control over it? Do you
+It's really nasty hardware design, or a software hack to solve
+a hardware problem: what should have been done is
+of course create a UART with an asynchronous low-power mode
+that can recieve a character and wake up the system at any time,
+handing over the wakeup character(s) to the driver. That is
+obviously the usecase they were designing for.
 
-You would either use the old hciattach in which case you wouldn't be able
-to manage it via a new API while attached, or the new API in which case
-you wouldn't be able to manage it via the old interface while it was
-being used directly.
+But yeah, I guess we have to contain hacks like that.
 
-> Or do you suggest to register hci1 and one cannot use hci0? I guess
-> this breaks even more devices, as the device number changes.
+> -       Power up, wait n ms, write, read, wait n ms, power down (which
+>         has to be driven at the ldisc/user level as only the ldisc
+>         understands transactions, or via ioctls (right now Android user
+>         space tends to do hardcoded writes to /sys.. gpio to drive power
 
-Device numbers are dynamic anyway. Plug a USB adapter in and if it beats
-your onboard adapter to registration then the order changes.
+This kind of abominational abuse of the GPIO sysfs ABI is
+partly why I've obsoleted it. The right abstraction is the
+fixed regulator with a GPIO line obviously, then some
+sequencing along the lines of what you can find in
+drivers/mmc/core/pwrseq*
 
-> So yes, from your point of view there is a regression, just because
-> it's working automatically. So let's just not convert existing boards
-> with working hciattach based bluetooth devices. New devices can use
+Unfortunately that sysfs ABI crept in during a window of time
+when GPIO was unmaintained and I am trying my best to
+contain and improve the situation.
 
-=46rom a distribution point of view that would be a nightmare.
-
-> the uart-bus, as it's not a regression for them and Nokia N series
-> can also do it, since they have no working bluetooth at all at the
-> moment.
-
-The Nokia N series is a weird corner case.
-
-> > In many cases you'll also still need the tty interface to do
-> > things like firmware upgrades. =20
->=20
-> I would expect the uart-slave driver to know how to do firmware
-> updates. Actually most bluetooth chips are initialized by uploading
-> a firmware to them.
-
-Usually no - you don't want a ton of kernel code for flashing adapters
-when they have built in firmware (similar issue for 3G modems)
-
-> And there are definitely uart drivers not caring about having a tty
-> device. Nokia's vendor driver for their bluetooth protocol contains
-> a custom omap-serial driver combined with the actual bluetooth
-> driver. There is nothing related to the tty framework. I think the
-> same would work for the other hardwired bluetooth chips perfectly
-> fine.
-
-That means having two different omap serial drivers to maintain which is
-not ideal.
-
-To me there are four different things
-
-1. bluetooth devices "just work". That can be user space (eg it seems to
-just work on my Fedora boxes and bluetooth enumeration is being done via
-user space, or may be via kernel enumeration, or a mix. PPP is an
-existing example of this - serial port PPP is an ldisc but ports that are
-not UART like speak directly to the PPP layer as network adapters.
-
-2. Sideband controls and power management, where we need to give the
-tty_port a child device and power it up/down properly and have the
-tty_port hooks to do so based upon the ldisc protocol state machine when
-talking stuff like NMEA or HCI.
-
-3. The special case UART power saving features/hacks like GPIO snooping,
-again with the right hooks
-
-4. Whether it's useful to be able to create a tty device in kernel and
-attach that to stuff with no userspace involved.
-
-All are independent.
-
-Alan
+Yours,
+Linus Walleij
