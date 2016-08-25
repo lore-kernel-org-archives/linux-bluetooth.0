@@ -1,82 +1,111 @@
-Return-Path: <netdev-owner@vger.kernel.org>
-Date: Thu, 25 Aug 2016 22:17:46 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: davem@davemloft.net
-Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: pull request: bluetooth 2016-08-25
-Message-ID: <20160825191746.GA16954@t440s.P-661HNU-F1>
+Return-Path: <robh@kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-        protocol="application/pgp-signature"; boundary="2fHTh5uZTiUOsy+g"
-Sender: netdev-owner@vger.kernel.org
+In-Reply-To: <20160818160449.328b2eec@lxorguk.ukuu.org.uk>
+References: <20160818011445.22726-1-robh@kernel.org> <20160818102208.GA20476@kroah.com>
+ <CAL_Jsq+Va2OF1pYTivH8YN1GKsiaT1eTOaSv607K_V+H+0Buvw@mail.gmail.com> <20160818160449.328b2eec@lxorguk.ukuu.org.uk>
+From: Rob Herring <robh@kernel.org>
+Date: Thu, 25 Aug 2016 11:40:07 -0500
+Message-ID: <CAL_JsqJ_5+Em5SLSuqiJ3SnazhyEY2XaYh6N1AtR8_+MdcezMg@mail.gmail.com>
+Subject: Re: [RFC PATCH 0/3] UART slave device bus
+To: One Thousand Gnomes <gnomes@lxorguk.ukuu.org.uk>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Marcel Holtmann <marcel@holtmann.org>,
+	Jiri Slaby <jslaby@suse.com>, Sebastian Reichel <sre@kernel.org>, Pavel Machek <pavel@ucw.cz>,
+	Peter Hurley <peter@hurleysoftware.com>, NeilBrown <neil@brown.name>,
+	"Dr . H . Nikolaus Schaller" <hns@goldelico.com>, Arnd Bergmann <arnd@arndb.de>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	"open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+	"linux-serial@vger.kernel.org" <linux-serial@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+On Thu, Aug 18, 2016 at 10:04 AM, One Thousand Gnomes
+<gnomes@lxorguk.ukuu.org.uk> wrote:
+>> No, the code should be fast as it is so simple. I assume there is some
+>> reason the tty buffering is more complex than just a circular buffer.
+>
+> I would suggest you read n_tty.c carefully and then it'll make a fair bit
+> of sense. It has to interlock multiple reader/writes with discipline
+> changes and flushes of pending data. At the same time a received
+> character may cause output changes including bytes to be queued for
+> transmit and the entire lot must not excessively recurse.
+>
+> It's fun and it took years to make work safely but basically you need to
+> handle a simultaneous ldisc change, config change, read of data from the
+> buffers, receive, transmit and the receive causing the transmit status to
+> change and maybe other transmits, that might have to be sent with
+> priority. It's fun 8)
+>
+> The good news is that nobody but n_tty and maybe n_irda cares on the rx
+> side. Every other ldisc consumes the bytes immediately. IRDA hasn't worked
+> for years anyway.
+>
+>> My best guess is because the tty layer has to buffer things for
+>> userspace and userspace can be slow to read? Do line disciplines make
+>> assumptions about the tty buffering? Is 4KB enough buffering?
+>
+> RTFS but to save you a bit of effort
+>
+> 1. 4K is not enough, 64K is not always sufficient, this is why we have
+> all the functionality you appear to want to re-invent already in the tty
+> buffer logic of the tty_port
+> 2. Only n_tty actually uses the tty_port layer buffering
+> 3. The ring buffer used for dumb uarts is entirely about latency limits
+> on low end processors and only used by some uarts anyway.
+>
+>> Also, the current receive implementation has no concept of blocking or
+>> timeout. Should the uart_dev_rx() function return when there's no more
+>> data or wait (with timeout) until all requested data is received?
+>> (Probably do all of them is my guess).
+>
+> Your rx routine needs to be able to run in IRQ context, not block and
+> complete in very very short time scales because on some hardware you have
+> exactly 9 bit times to recover the data byte and clear the IRQ done.
+> Serial really stretches some of the low end embedded processors running
+> at 56K/115200, and RS485 at 4Mbits even with 8 bytes of buffering is
+> pretty tight. Thus you need very fast buffers for just about any use case.
+> Dumb uarts you'll need to keep the existing ring buffer or similar
+> (moving to a kfifo would slightly improve performance I think) and queue
+> after.
+>
+>> >> - Convert a real driver/line discipline over to UART bus.
+>> >
+>> > That's going to be the real test, I recommend trying that as soon as
+>> > possible as it will show where the real pain points are :)
+>
+> The locking. It's taken ten years to debug the current line discipline
+> change locking. If you want to be able to switch stuff kernel side
+> however it's somewhat easier.
+>
+> The change should be
+>
+> Add tty_port->rx(uint8_t *data,uint8_t *flags, unsigned int len)
+>
+> The semantics of tty_port->rx are
+>
+> - You may not assume a tty is bound to this port
+> - You may be called in IRQ context, but are guaranteed not to get
+>   parallel calls for the same port
+> - When you return the bytes you passed are history
+>
+> At that point you can set tty_port->rx to point to the
+> tty_flip_buffer_push() and everyone can use it. Slow ones will want to
+> queue to a ring buffer then do tty_port->rx (where we do the flush_buffer
+> now), fast ones will do the ->rx directly.
 
---2fHTh5uZTiUOsy+g
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Other than doing DMA, I did not find any examples of UARTs doing
+internal rx ring buffers. Most/all the non-DMA cases do
+tty_insert_flip_char directly in the ISR. The flow is insert a series
+of flags and characters as we process the receive status and then
+trigger a flush of the buffer at the end. That doesn't match up with
+what you are proposing for how tty_port->rx would work. That would
+change the receive ISR processing in all the drivers quite a bit.
+Either we'd have to call tty_port->rx a character at a time or
+implement some temporary buffer. I don't think we want to call things
+like BT receive code a byte at a time. This needs to be a layer
+higher. flush_to_ldisc either needs to be duplicated to handle
+tty_port->rx or generalized to call either tty_port->rx or ldisc
+receive_buf. I'm not sure what to do about ldisc ref counting in the
+latter case.
 
-Hi Dave,
-
-Here are a couple of important Bluetooth fixes for the 4.8 kernel:
-
- - Memory leak fix for HCI requests
- - Fix sk_filter handling with L2CAP
- - Fix sock_recvmsg behavior when MSG_TRUNC is not set
-
-Please let me know if there are any issues pulling. Thanks.
-
-Johan
-
----
-The following changes since commit d7226c7a4dd19929d6df4ae04698da2fcf6f875a:
-
-  net: diag: Fix refcnt leak in error path destroying socket (2016-08-23 23:11:36 -0700)
-
-are available in the git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git for-upstream
-
-for you to fetch changes up to 4f34228b67246ae3b3ab1dc33b980c77c0650ef4:
-
-  Bluetooth: Fix hci_sock_recvmsg when MSG_TRUNC is not set (2016-08-25 20:58:47 +0200)
-
-----------------------------------------------------------------
-Daniel Borkmann (1):
-      Bluetooth: split sk_filter in l2cap_sock_recv_cb
-
-Frederic Dalleau (1):
-      Bluetooth: Fix memory leak at end of hci requests
-
-Luiz Augusto von Dentz (2):
-      Bluetooth: Fix bt_sock_recvmsg when MSG_TRUNC is not set
-      Bluetooth: Fix hci_sock_recvmsg when MSG_TRUNC is not set
-
- net/bluetooth/af_bluetooth.c |  2 +-
- net/bluetooth/hci_request.c  |  2 ++
- net/bluetooth/hci_sock.c     |  2 +-
- net/bluetooth/l2cap_core.c   |  8 ++++++++
- net/bluetooth/l2cap_sock.c   | 14 ++++++++++++--
- 5 files changed, 24 insertions(+), 4 deletions(-)
-
---2fHTh5uZTiUOsy+g
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIcBAEBAgAGBQJXv0RaAAoJECQj9vv5qNQSTp0QAKj/bdzD7+cDQq1NizY6WzfS
-0oT0B5/vcz7qpB29zglpzM3Me6mwQw7ncKjsDPT8FIXkXa3Td8oHKRB8/d/rywLv
-n7MGZOxrb72KKtmW88Jn8XF7qm/BAixliLY3Zz2YOixxJRQOqMqWOPTcgky6OVZ6
-vIhRSRPk1P7sCS2XmEb9K8gIbTnw8n7/v3ZTYA2PF4LP2u6Lghj6ln+IcZmVQSdx
-YmDZlwVCgDXsvR2E3Tueqv3n4SMKGbj8a0lYcfmMVysXzVxvZRnhaXY6FQI2giYq
-Idsd6KvCRKppUZgqFfx7IDVwWrhIISZEDm8DqSJ3FreIS9WsUGmKg4cY1K5eiSB6
-dfb/u8q1An6o+5fyyAZGXNEwiywcwKk7UDMEnscDVKytWND9F3tocx/BTOTqIg1G
-kTBVrLi18oSEy3U3RMUqEoxPPG9pSrXibeD54ArvY+FqMMSFo0v3wUcHVPvie4aP
-f1Oam8Zs6AnilCxuCA//tt4JFGGyWhEXpDILf5hZKRxkZ4zVouy2jfKbgislEj+7
-cUrCMTPiLgLXMTuxIa6D+VDQMRfDtNmuri0doQZjck+i81Kl7jRA4j2bjGZCUAIq
-eOcwohJtEjSflHmGA3W2GhZeHiSUZNIk+n6ZiMAHvSqz3/qdR/c8ETRPCtk2TnmC
-w4idLn5UQZgvQ6ALE4Ma
-=mOl7
------END PGP SIGNATURE-----
-
---2fHTh5uZTiUOsy+g--
+Rob
