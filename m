@@ -1,45 +1,51 @@
-Return-Path: <larry.finger@gmail.com>
-Sender: Larry Finger <larry.finger@gmail.com>
-Subject: Re: Memory (skb) leak in kernel 4.8-rc2
-To: Frederic Dalleau <frederic.dalleau@collabora.co.uk>,
- Marcel Holtmann <marcel@holtmann.org>,
- "Gustavo F. Padovan" <gustavo@padovan.org>,
- Linux Bluetooth mailing list <linux-bluetooth@vger.kernel.org>,
- LKML <linux-kernel@vger.kernel.org>
-References: <a62119eb-28d2-7b4d-acbb-6ca8d3a0c91d@lwfinger.net>
- <A07D8003-F1EB-4408-A3F2-E043DF678296@holtmann.org>
- <20160820071504.GA9663@t440s.P-661HNU-F1>
- <dd63c403-f35e-2543-e5ba-af40b263ea75@collabora.co.uk>
- <2be4b143-4f0f-c688-87c3-8056ecc43dfb@lwfinger.net>
- <9484caf9-bc5a-9968-d786-fc7d40f0a720@collabora.co.uk>
-From: Larry Finger <Larry.Finger@lwfinger.net>
-Message-ID: <60c6f1ed-8ee1-133e-93cc-872f40fb73cd@lwfinger.net>
-Date: Thu, 25 Aug 2016 10:27:23 -0500
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <9484caf9-bc5a-9968-d786-fc7d40f0a720@collabora.co.uk>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+In-Reply-To: <1471947468-12696-1-git-send-email-luiz.dentz@gmail.com>
+References: <1471947468-12696-1-git-send-email-luiz.dentz@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Thu, 25 Aug 2016 15:59:21 +0300
+Message-ID: <CABBYNZLp2=1XbP0SEnFG5-GQMng+N49Nk=8iMeRjxmqE3YTEiw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/3] core/device: Fix marking auto-connect flag
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 08/25/2016 01:22 AM, Frederic Dalleau wrote:
-> Hi Larry,
->
-> On 24/08/2016 22:02, Larry Finger wrote:
->> On 08/21/2016 07:09 AM, Frederic Dalleau wrote:
->>>>>> I am unable to unload module bluetooth to verify that the second
->>>>>> leak is not a false positive; however, the one in btusb is a real
->>>>>> memory leak.
->
->>> I have a patch on the grill.
->
->> Any progress on this patch?
->
-> Yes, it is in bluetooth-stable.
-> http://marc.info/?l=linux-bluetooth&m=147205068529234&w=2
+Hi,
 
-Fred,
+On Tue, Aug 23, 2016 at 1:17 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> Device auto-connect shall be set only if the profile is able to accept
+> incoming connections, this fixes the wrong behavior or connecting LE
+> with dual mode devices immediatelly after probing service as profiles
+> may have auto-connect flag for outgoing connection (usually BR/EDR only).
+> ---
+>  src/device.c | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
+>
+> diff --git a/src/device.c b/src/device.c
+> index c103bb2..14de7e8 100644
+> --- a/src/device.c
+> +++ b/src/device.c
+> @@ -4080,7 +4080,10 @@ static struct btd_service *probe_service(struct btd_device *device,
+>                 return NULL;
+>         }
+>
+> -       if (profile->auto_connect)
+> +       /* Only set auto connect if profile has set the flag and can really
+> +        * accept connections.
+> +        */
+> +       if (profile->auto_connect && profile->accept)
+>                 device_set_auto_connect(device, TRUE);
+>
+>         return service;
+> --
+> 2.7.4
 
-Thanks for the link. That patch fixes the leaks that I was seeing from 
-bluetooth. It also seems to have fixed the leaks that were attributed to btusb. 
-At least, none have shown up in my preliminary testing.
+Applied.
 
-Larry
+
+-- 
+Luiz Augusto von Dentz
