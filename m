@@ -1,78 +1,82 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
-        <frederic.dalleau@collabora.co.uk>
-To: linux-bluetooth@vger.kernel.org
-Cc: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
-        <frederic.dalleau@collabora.co.uk>
-Subject: [RFC] Bluetooth: Do not allocate skb for hci requests
-Date: Thu, 25 Aug 2016 22:16:02 +0200
-Message-Id: <1472156162-2300-1-git-send-email-frederic.dalleau@collabora.co.uk>
+Return-Path: <netdev-owner@vger.kernel.org>
+Date: Thu, 25 Aug 2016 22:17:46 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: davem@davemloft.net
+Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Subject: pull request: bluetooth 2016-08-25
+Message-ID: <20160825191746.GA16954@t440s.P-661HNU-F1>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: multipart/signed; micalg=pgp-sha1;
+        protocol="application/pgp-signature"; boundary="2fHTh5uZTiUOsy+g"
+Sender: netdev-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If hci request do not use the skb they are provided with, it could be
-interesting to avoid the allocation. Using hci_req_run provides the
-expected result. As that implementation adds a few duplicate lines
-of code, and it still needs more tests, I send this as RFC.
-Let me know what you think.
-Fred
 
-Signed-off-by: Frédéric Dalleau <frederic.dalleau@collabora.co.uk>
+--2fHTh5uZTiUOsy+g
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+
+Hi Dave,
+
+Here are a couple of important Bluetooth fixes for the 4.8 kernel:
+
+ - Memory leak fix for HCI requests
+ - Fix sk_filter handling with L2CAP
+ - Fix sock_recvmsg behavior when MSG_TRUNC is not set
+
+Please let me know if there are any issues pulling. Thanks.
+
+Johan
+
 ---
- net/bluetooth/hci_request.c | 17 ++++++++++++++---
- 1 file changed, 14 insertions(+), 3 deletions(-)
+The following changes since commit d7226c7a4dd19929d6df4ae04698da2fcf6f875a:
 
-diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
-index b0e23df..a40a3fe 100644
---- a/net/bluetooth/hci_request.c
-+++ b/net/bluetooth/hci_request.c
-@@ -89,7 +89,7 @@ int hci_req_run_skb(struct hci_request *req, hci_req_complete_skb_t complete)
- 	return req_run(req, NULL, complete);
- }
- 
--static void hci_req_sync_complete(struct hci_dev *hdev, u8 result, u16 opcode,
-+static void hci_cmd_sync_complete(struct hci_dev *hdev, u8 result, u16 opcode,
- 				  struct sk_buff *skb)
- {
- 	BT_DBG("%s result 0x%2.2x", hdev->name, result);
-@@ -103,6 +103,17 @@ static void hci_req_sync_complete(struct hci_dev *hdev, u8 result, u16 opcode,
- 	}
- }
- 
-+static void hci_req_sync_complete(struct hci_dev *hdev, u8 result, u16 opcode)
-+{
-+	BT_DBG("%s result 0x%2.2x", hdev->name, result);
-+
-+	if (hdev->req_status == HCI_REQ_PEND) {
-+		hdev->req_result = result;
-+		hdev->req_status = HCI_REQ_DONE;
-+		wake_up_interruptible(&hdev->req_wait_q);
-+	}
-+}
-+
- void hci_req_sync_cancel(struct hci_dev *hdev, int err)
- {
- 	BT_DBG("%s err 0x%2.2x", hdev->name, err);
-@@ -133,7 +144,7 @@ struct sk_buff *__hci_cmd_sync_ev(struct hci_dev *hdev, u16 opcode, u32 plen,
- 	add_wait_queue(&hdev->req_wait_q, &wait);
- 	set_current_state(TASK_INTERRUPTIBLE);
- 
--	err = hci_req_run_skb(&req, hci_req_sync_complete);
-+	err = hci_req_run_skb(&req, hci_cmd_sync_complete);
- 	if (err < 0) {
- 		remove_wait_queue(&hdev->req_wait_q, &wait);
- 		set_current_state(TASK_RUNNING);
-@@ -211,7 +222,7 @@ int __hci_req_sync(struct hci_dev *hdev, int (*func)(struct hci_request *req,
- 	add_wait_queue(&hdev->req_wait_q, &wait);
- 	set_current_state(TASK_INTERRUPTIBLE);
- 
--	err = hci_req_run_skb(&req, hci_req_sync_complete);
-+	err = hci_req_run(&req, hci_req_sync_complete);
- 	if (err < 0) {
- 		hdev->req_status = 0;
- 
--- 
-2.7.4
+  net: diag: Fix refcnt leak in error path destroying socket (2016-08-23 23:11:36 -0700)
 
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git for-upstream
+
+for you to fetch changes up to 4f34228b67246ae3b3ab1dc33b980c77c0650ef4:
+
+  Bluetooth: Fix hci_sock_recvmsg when MSG_TRUNC is not set (2016-08-25 20:58:47 +0200)
+
+----------------------------------------------------------------
+Daniel Borkmann (1):
+      Bluetooth: split sk_filter in l2cap_sock_recv_cb
+
+Frederic Dalleau (1):
+      Bluetooth: Fix memory leak at end of hci requests
+
+Luiz Augusto von Dentz (2):
+      Bluetooth: Fix bt_sock_recvmsg when MSG_TRUNC is not set
+      Bluetooth: Fix hci_sock_recvmsg when MSG_TRUNC is not set
+
+ net/bluetooth/af_bluetooth.c |  2 +-
+ net/bluetooth/hci_request.c  |  2 ++
+ net/bluetooth/hci_sock.c     |  2 +-
+ net/bluetooth/l2cap_core.c   |  8 ++++++++
+ net/bluetooth/l2cap_sock.c   | 14 ++++++++++++--
+ 5 files changed, 24 insertions(+), 4 deletions(-)
+
+--2fHTh5uZTiUOsy+g
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIcBAEBAgAGBQJXv0RaAAoJECQj9vv5qNQSTp0QAKj/bdzD7+cDQq1NizY6WzfS
+0oT0B5/vcz7qpB29zglpzM3Me6mwQw7ncKjsDPT8FIXkXa3Td8oHKRB8/d/rywLv
+n7MGZOxrb72KKtmW88Jn8XF7qm/BAixliLY3Zz2YOixxJRQOqMqWOPTcgky6OVZ6
+vIhRSRPk1P7sCS2XmEb9K8gIbTnw8n7/v3ZTYA2PF4LP2u6Lghj6ln+IcZmVQSdx
+YmDZlwVCgDXsvR2E3Tueqv3n4SMKGbj8a0lYcfmMVysXzVxvZRnhaXY6FQI2giYq
+Idsd6KvCRKppUZgqFfx7IDVwWrhIISZEDm8DqSJ3FreIS9WsUGmKg4cY1K5eiSB6
+dfb/u8q1An6o+5fyyAZGXNEwiywcwKk7UDMEnscDVKytWND9F3tocx/BTOTqIg1G
+kTBVrLi18oSEy3U3RMUqEoxPPG9pSrXibeD54ArvY+FqMMSFo0v3wUcHVPvie4aP
+f1Oam8Zs6AnilCxuCA//tt4JFGGyWhEXpDILf5hZKRxkZ4zVouy2jfKbgislEj+7
+cUrCMTPiLgLXMTuxIa6D+VDQMRfDtNmuri0doQZjck+i81Kl7jRA4j2bjGZCUAIq
+eOcwohJtEjSflHmGA3W2GhZeHiSUZNIk+n6ZiMAHvSqz3/qdR/c8ETRPCtk2TnmC
+w4idLn5UQZgvQ6ALE4Ma
+=mOl7
+-----END PGP SIGNATURE-----
+
+--2fHTh5uZTiUOsy+g--
