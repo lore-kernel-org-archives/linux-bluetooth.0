@@ -1,5 +1,5 @@
 Return-Path: <pavel@ucw.cz>
-Date: Fri, 26 Aug 2016 22:12:02 +0200
+Date: Fri, 26 Aug 2016 22:05:09 +0200
 From: Pavel Machek <pavel@ucw.cz>
 To: Rob Herring <robh@kernel.org>
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -13,48 +13,28 @@ Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	Linus Walleij <linus.walleij@linaro.org>,
 	linux-bluetooth@vger.kernel.org, linux-serial@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH 4/6] serio: serport: add support for buffered write
- and receive
-Message-ID: <20160826201202.GA27227@amd>
+Subject: Re: [RFC PATCH 0/6] UART slave devices using serio
+Message-ID: <20160826200509.GA22583@amd>
 References: <20160824232437.9446-1-robh@kernel.org>
- <20160824232437.9446-6-robh@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20160824232437.9446-6-robh@kernel.org>
+In-Reply-To: <20160824232437.9446-1-robh@kernel.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi!
+On Wed 2016-08-24 18:24:30, Rob Herring wrote:
+> This is a new approach to supporting UART slave devices using the
+> existing serio bus. After Arnd's proding, I took another look at serio
+> and decided extending it does make sense. Using serio primarily requires
+> adding DT based device matching and supporting buffer based write and
+> receive.
 
-> @@ -133,26 +133,29 @@ static void serport_ldisc_receive(struct tty_struct *tty, const unsigned char *c
->  	if (!test_bit(SERPORT_ACTIVE, &serport->flags))
->  		goto out;
->  
-> -	for (i = 0; i < count; i++) {
-> -		if (fp) {
-> -			switch (fp[i]) {
-> -			case TTY_FRAME:
-> -				ch_flags = SERIO_FRAME;
-> -				break;
-> -
-> -			case TTY_PARITY:
-> -				ch_flags = SERIO_PARITY;
-> -				break;
-> -
-> -			default:
-> -				ch_flags = 0;
-> -				break;
-> +	if (serio_buffered_mode_enabled(serport->serio)) {
-> +		serio_receive_buf(serport->serio, cp, count);
+Strange, the series has _two_ 1/6 patches.
 
-Elsewhere:
-+       /* Use buffer receive if the driver provides a callback */
-+       if (drv->receive_buf)
-+               set_bit(SERIO_MODE_BUFFERED, &drv->flags);
+> Rob Herring (6):
+>   serio: add DT driver binding
 
-Could we use if (drv->receive_buf) above directly, and not require the
-bitfield?
-
-Thanks,
+There's one saying "add OF driver binding" on the mailinglist, too...
+Best regards,
 									Pavel
 -- 
 (english) http://www.livejournal.com/~pavelmachek
