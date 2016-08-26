@@ -1,26 +1,75 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Date: Fri, 26 Aug 2016 21:10:05 -0700 (PDT)
-Message-Id: <20160826.211005.1840302554943486711.davem@davemloft.net>
-To: johan.hedberg@gmail.com
-Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: pull request: bluetooth 2016-08-25
-From: David Miller <davem@davemloft.net>
-In-Reply-To: <20160825191746.GA16954@t440s.P-661HNU-F1>
-References: <20160825191746.GA16954@t440s.P-661HNU-F1>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <pavel@ucw.cz>
+Date: Sat, 27 Aug 2016 00:24:25 +0200
+From: Pavel Machek <pavel@ucw.cz>
+To: Rob Herring <robh@kernel.org>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Marcel Holtmann <marcel@holtmann.org>, Jiri Slaby <jslaby@suse.com>,
+	Sebastian Reichel <sre@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+	"Dr . H . Nikolaus Schaller" <hns@goldelico.com>,
+	Alan Cox <gnomes@lxorguk.ukuu.org.uk>,
+	Loic Poulain <loic.poulain@intel.com>,
+	Peter Hurley <peter@hurleysoftware.com>,
+	NeilBrown <neil@brown.name>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	"open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+	"linux-serial@vger.kernel.org" <linux-serial@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [RFC PATCH 4/6] serio: serport: add support for buffered write
+ and receive
+Message-ID: <20160826222425.GA1140@amd>
+References: <20160824232437.9446-1-robh@kernel.org>
+ <20160824232437.9446-6-robh@kernel.org>
+ <20160826201202.GA27227@amd>
+ <CAL_JsqLNeV9BDvRtRbDCKbrq-gO9jv8-kmGJNS9AKXUSmEvYOA@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CAL_JsqLNeV9BDvRtRbDCKbrq-gO9jv8-kmGJNS9AKXUSmEvYOA@mail.gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@gmail.com>
-Date: Thu, 25 Aug 2016 22:17:46 +0300
-
-> Here are a couple of important Bluetooth fixes for the 4.8 kernel:
+On Fri 2016-08-26 16:27:35, Rob Herring wrote:
+> On Fri, Aug 26, 2016 at 3:12 PM, Pavel Machek <pavel@ucw.cz> wrote:
+> > Hi!
+> >
+> >> @@ -133,26 +133,29 @@ static void serport_ldisc_receive(struct tty_struct *tty, const unsigned char *c
+> >>       if (!test_bit(SERPORT_ACTIVE, &serport->flags))
+> >>               goto out;
+> >>
+> >> -     for (i = 0; i < count; i++) {
+> >> -             if (fp) {
+> >> -                     switch (fp[i]) {
+> >> -                     case TTY_FRAME:
+> >> -                             ch_flags = SERIO_FRAME;
+> >> -                             break;
+> >> -
+> >> -                     case TTY_PARITY:
+> >> -                             ch_flags = SERIO_PARITY;
+> >> -                             break;
+> >> -
+> >> -                     default:
+> >> -                             ch_flags = 0;
+> >> -                             break;
+> >> +     if (serio_buffered_mode_enabled(serport->serio)) {
+> >> +             serio_receive_buf(serport->serio, cp, count);
+> >
+> > Elsewhere:
+> > +       /* Use buffer receive if the driver provides a callback */
+> > +       if (drv->receive_buf)
+> > +               set_bit(SERIO_MODE_BUFFERED, &drv->flags);
+> >
+> > Could we use if (drv->receive_buf) above directly, and not require the
+> > bitfield?
 > 
->  - Memory leak fix for HCI requests
->  - Fix sk_filter handling with L2CAP
->  - Fix sock_recvmsg behavior when MSG_TRUNC is not set
-> 
-> Please let me know if there are any issues pulling. Thanks.
+> I'm allowing for allowing drivers to provide both functions and be
+> able to switch between them. However, I didn't provide any mechanism
+> to do so yet.
 
-Pulled, thanks Johan.
+Dunno -- does switching make sense? IMO we'd want to migrate all the
+drivers to the "blocks" interface... no need to switch between the
+two.
+
+Best regards,
+									Pavel
+
+-- 
+(english) http://www.livejournal.com/~pavelmachek
+(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blog.html
