@@ -1,43 +1,75 @@
-Return-Path: <arnd@arndb.de>
-From: Arnd Bergmann <arnd@arndb.de>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Bjorn Andersson <bjorn.andersson@linaro.org>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] Bluetooth: add WCNSS dependency for HCI driver
-Date: Mon, 29 Aug 2016 14:36:18 +0200
-Message-Id: <20160829123630.3314682-1-arnd@arndb.de>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Per Thomas Jahr <perja@extern.uio.no>
+To: linux-bluetooth@vger.kernel.org
+Cc: Per Thomas Jahr <perja@extern.uio.no>
+Subject: [PATCH BlueZ v2] client: Include UUID when listing attributes
+Date: Mon, 29 Aug 2016 14:10:58 +0200
+Message-Id: <1472472658-3518-1-git-send-email-perja@extern.uio.no>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The newly added bluetooth driver is based on the soc-specific support,
-but lacks the obvious compile-time dependency on that:
+Show the full UUID for services, characteristics and descriptors.
 
-drivers/bluetooth/btqcomsmd.o: In function `btqcomsmd_probe':
-btqcomsmd.c:(.text.btqcomsmd_probe+0x40): undefined reference to `qcom_wcnss_open_channel'
-btqcomsmd.c:(.text.btqcomsmd_probe+0x5c): undefined reference to `qcom_wcnss_open_channel'
-Makefile:969: recipe for target 'vmlinux' failed
+Example output with this change:
 
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-Fixes: 90c107dc8b2c ("Bluetooth: Introduce Qualcomm WCNSS SMD based HCI driver")
+[NEW] Primary Service
+	/org/bluez/hci0/dev_D1_6E_07_45_B2_36/service0008
+	00001801-0000-1000-8000-00805f9b34fb
+	Generic Attribute Profile
 ---
- drivers/bluetooth/Kconfig | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ client/gatt.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
-index 2c481911f1ce..43e9f9328df8 100644
---- a/drivers/bluetooth/Kconfig
-+++ b/drivers/bluetooth/Kconfig
-@@ -333,7 +333,7 @@ config BT_WILINK
+diff --git a/client/gatt.c b/client/gatt.c
+index fee1cf9..2dc455f 100644
+--- a/client/gatt.c
++++ b/client/gatt.c
+@@ -75,13 +75,13 @@ static void print_service(GDBusProxy *proxy, const char *description)
+ 	if (!text)
+ 		text = uuid;
  
- config BT_QCOMSMD
- 	tristate "Qualcomm SMD based HCI support"
--	depends on QCOM_SMD
-+	depends on QCOM_SMD && QCOM_WCNSS_CTRL
- 	select BT_QCA
- 	help
- 	  Qualcomm SMD based HCI driver.
+-	rl_printf("%s%s%s%s Service\n\t%s\n\t%s\n",
++	rl_printf("%s%s%s%s Service\n\t%s\n\t%s\n\t%s\n",
+ 				description ? "[" : "",
+ 				description ? : "",
+ 				description ? "] " : "",
+ 				primary ? "Primary" : "Secondary",
+ 				g_dbus_proxy_get_path(proxy),
+-				text);
++				uuid, text);
+ }
+ 
+ void gatt_add_service(GDBusProxy *proxy)
+@@ -118,12 +118,12 @@ static void print_characteristic(GDBusProxy *proxy, const char *description)
+ 	if (!text)
+ 		text = uuid;
+ 
+-	rl_printf("%s%s%sCharacteristic\n\t%s\n\t%s\n",
++	rl_printf("%s%s%sCharacteristic\n\t%s\n\t%s\n\t%s\n",
+ 				description ? "[" : "",
+ 				description ? : "",
+ 				description ? "] " : "",
+ 				g_dbus_proxy_get_path(proxy),
+-				text);
++				uuid, text);
+ }
+ 
+ static gboolean characteristic_is_child(GDBusProxy *characteristic)
+@@ -186,12 +186,12 @@ static void print_descriptor(GDBusProxy *proxy, const char *description)
+ 	if (!text)
+ 		text = uuid;
+ 
+-	rl_printf("%s%s%sDescriptor\n\t%s\n\t%s\n",
++	rl_printf("%s%s%sDescriptor\n\t%s\n\t%s\n\t%s\n",
+ 				description ? "[" : "",
+ 				description ? : "",
+ 				description ? "] " : "",
+ 				g_dbus_proxy_get_path(proxy),
+-				text);
++				uuid, text);
+ }
+ 
+ static gboolean descriptor_is_child(GDBusProxy *characteristic)
 -- 
-2.9.0
+2.5.5
+
