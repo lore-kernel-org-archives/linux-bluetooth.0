@@ -1,62 +1,89 @@
-Return-Path: <pavel@ucw.cz>
-Date: Mon, 29 Aug 2016 11:57:13 +0200
-From: Pavel Machek <pavel@ucw.cz>
-To: Rob Herring <robh@kernel.org>, vojtech@ucw.cz
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Marcel Holtmann <marcel@holtmann.org>, Jiri Slaby <jslaby@suse.com>,
-	Sebastian Reichel <sre@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
-	"Dr . H . Nikolaus Schaller" <hns@goldelico.com>,
-	Alan Cox <gnomes@lxorguk.ukuu.org.uk>,
-	Loic Poulain <loic.poulain@intel.com>,
-	Peter Hurley <peter@hurleysoftware.com>,
-	NeilBrown <neil@brown.name>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	linux-bluetooth@vger.kernel.org, linux-serial@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH 1/6] serio: add DT driver binding
-Message-ID: <20160829095713.GA14178@amd>
-References: <20160824232437.9446-1-robh@kernel.org>
- <20160824232437.9446-2-robh@kernel.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Date: Mon, 29 Aug 2016 12:31:54 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Per Thomas Jahr <perja@extern.uio.no>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ] client: Include UUID when listing attributes
+Message-ID: <20160829093154.GA7410@t440s.lan>
+References: <1472462089-22900-1-git-send-email-perja@extern.uio.no>
+ <1472462089-22900-2-git-send-email-perja@extern.uio.no>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20160824232437.9446-2-robh@kernel.org>
+In-Reply-To: <1472462089-22900-2-git-send-email-perja@extern.uio.no>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed 2016-08-24 18:24:31, Rob Herring wrote:
-> This adds DT driver binding support to the serio bus. The parent of the
-> serio port device must have a device_node associated with it. Typically,
-> this would be the UART device node. The slave device must be a child node
-> of the UART device node.
-> 
-> Signed-off-by: Rob Herring <robh@kernel.org>
+Hi Per,
 
-Acked-by: Pavel Machek <pavel@ucw.cz>
+On Mon, Aug 29, 2016, Per Thomas Jahr wrote:
+> Show the full UUID for services, characteristics and descriptors.
+> ---
+>  client/gatt.c | 15 +++++++++------
+>  1 file changed, 9 insertions(+), 6 deletions(-)
 
-Added vojtech to cc list, as he's original author.
+The general idea is fine with me but you've managed to change the
+whitespace to something incompatible with the coding style - this needs
+to be fixed before the patch is merged. I'd also suggest that you
+provide some sample output of your changes in the commit message so that
+reviewers can easily see how the result looks like in practice.
 
-> diff --git a/drivers/input/serio/serio.c b/drivers/input/serio/serio.c
-> index 1ca7f55..9e8eb7a 100644
-> --- a/drivers/input/serio/serio.c
-> +++ b/drivers/input/serio/serio.c
-> @@ -36,6 +36,7 @@
->  #include <linux/slab.h>
->  #include <linux/workqueue.h>
->  #include <linux/mutex.h>
-> +#include <linux/of_device.h>
+> diff --git a/client/gatt.c b/client/gatt.c
+> index fee1cf9..201d668 100644
+> --- a/client/gatt.c
+> +++ b/client/gatt.c
+> @@ -75,12 +75,13 @@ static void print_service(GDBusProxy *proxy, const char *description)
+>  	if (!text)
+>  		text = uuid;
 >  
->  MODULE_AUTHOR("Vojtech Pavlik <vojtech@ucw.cz>");
->  MODULE_DESCRIPTION("Serio abstraction core");
-> @@ -902,6 +907,10 @@ static int serio_bus_match(struct device *dev, struct device_driver *drv)
->  	struct serio *serio = to_serio_port(dev);
->  	struct serio_driver *serio_drv = to_serio_driver(drv);
+> -	rl_printf("%s%s%s%s Service\n\t%s\n\t%s\n",
+> +        rl_printf("%s%s%s%s Service\n\t%s\n\t%s\n\t%s\n",
+
+Here the indentation of rl_printf has changed from a tab to spaces.
+
+>  				description ? "[" : "",
+>  				description ? : "",
+>  				description ? "] " : "",
+>  				primary ? "Primary" : "Secondary",
+> -				g_dbus_proxy_get_path(proxy),
+> +                                g_dbus_proxy_get_path(proxy),
+> +                                uuid,
+
+Here the indentation is also spaces when it should be tabs. Also, you
+can put 'text' on the same line as uuid to save some vertical space.
+
+> @@ -118,12 +119,13 @@ static void print_characteristic(GDBusProxy *proxy, const char *description)
+>  	if (!text)
+>  		text = uuid;
 >  
-> +	if (of_driver_match_device(dev, drv)) {
-> +		printk("matched %s\n", dev->of_node->name);
+> -	rl_printf("%s%s%sCharacteristic\n\t%s\n\t%s\n",
+> +        rl_printf("%s%s%sCharacteristic\n\t%s\n\t%s\n\t%s\n",
+>  				description ? "[" : "",
+>  				description ? : "",
+>  				description ? "] " : "",
+>  				g_dbus_proxy_get_path(proxy),
+> -				text);
+> +                                uuid,
+> +                                text);
 
-printk probalby should be removed when moving out of RFC phase.
+Same thing here.
 
-Thanks,
-									Pavel
--- 
-(english) http://www.livejournal.com/~pavelmachek
-(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blog.html
+> @@ -186,12 +188,13 @@ static void print_descriptor(GDBusProxy *proxy, const char *description)
+>  	if (!text)
+>  		text = uuid;
+>  
+> -	rl_printf("%s%s%sDescriptor\n\t%s\n\t%s\n",
+> +        rl_printf("%s%s%sDescriptor\n\t%s\n\t%s\n\t%s\n",
+>  				description ? "[" : "",
+>  				description ? : "",
+>  				description ? "] " : "",
+>  				g_dbus_proxy_get_path(proxy),
+> -				text);
+> +                                uuid,
+> +                                text);
+
+And here.
+
+Once these issues are fixed the patch should be good to go in (at least
+on my behalf).
+
+Johan
