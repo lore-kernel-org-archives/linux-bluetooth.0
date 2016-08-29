@@ -1,35 +1,38 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
+Subject: Re: [PATCH] Bluetooth: mgmt: Fix sending redundant event for Advertising Instance
 From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Use command status event for Set IO Capability errors
-Date: Mon, 29 Aug 2016 06:31:57 +0200
-Message-Id: <1472445117-6527-1-git-send-email-marcel@holtmann.org>
+In-Reply-To: <1472406814-25388-1-git-send-email-johan.hedberg@gmail.com>
+Date: Sun, 28 Aug 2016 21:26:24 -0700
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <CA430032-1FDD-45AB-977C-670D13A83A4B@holtmann.org>
+References: <1472406814-25388-1-git-send-email-johan.hedberg@gmail.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-In case of failure, the Set IO Capability command is suppose to return
-command status and not command complete.
+Hi Johan,
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
----
- net/bluetooth/mgmt.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+> When an Advertising Instance is removed, the Advertising Removed event
+> shouldn't be sent to the same socket that issued the Remove
+> Advertising command (it gets a command complete event instead). The
+> mgmt_advertising_removed() function already has a parameter for
+> skipping a specific socket, but there was no code to propagate the
+> right value to this parameter. This patch fixes the issue by making
+> sure the intermediate hci_req_clear_adv_instance() function gets the
+> socket pointer.
+> 
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> ---
+> net/bluetooth/hci_request.c | 11 ++++++-----
+> net/bluetooth/hci_request.h |  5 +++--
+> net/bluetooth/mgmt.c        |  6 +++---
+> 3 files changed, 12 insertions(+), 10 deletions(-)
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 7a7a8be3f2e4..c5345c814e49 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -2513,8 +2513,8 @@ static int set_io_capability(struct sock *sk, struct hci_dev *hdev, void *data,
- 	BT_DBG("");
- 
- 	if (cp->io_capability > SMP_IO_KEYBOARD_DISPLAY)
--		return mgmt_cmd_complete(sk, hdev->id, MGMT_OP_SET_IO_CAPABILITY,
--					 MGMT_STATUS_INVALID_PARAMS, NULL, 0);
-+		return mgmt_cmd_status(sk, hdev->id, MGMT_OP_SET_IO_CAPABILITY,
-+				       MGMT_STATUS_INVALID_PARAMS);
- 
- 	hci_dev_lock(hdev);
- 
--- 
-2.7.4
+patch has been applied to bluetooth-next tree.
+
+Regards
+
+Marcel
 
