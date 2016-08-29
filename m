@@ -1,21 +1,28 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Per Thomas Jahr <perja@extern.uio.no>
-To: linux-bluetooth@vger.kernel.org
-Cc: Per Thomas Jahr <perja@extern.uio.no>
-Subject: [PATCH BlueZ] Include UUID in output
-Date: Mon, 29 Aug 2016 11:14:48 +0200
-Message-Id: <1472462089-22900-1-git-send-email-perja@extern.uio.no>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <johan.hedberg@gmail.com>
+Date: Mon, 29 Aug 2016 10:05:06 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Use command status event for Set IO
+ Capability errors
+Message-ID: <20160829070506.GB7349@t440s.lan>
+References: <1472445117-6527-1-git-send-email-marcel@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1472445117-6527-1-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Added UUID in the output when listing attributes. This makes it more convenient to work with as it gives a mapping between UUID and attribute id.
+Hi Marcel,
 
-Per Thomas Jahr (1):
-  client: Include UUID when listing attributes
+On Mon, Aug 29, 2016, Marcel Holtmann wrote:
+> In case of failure, the Set IO Capability command is suppose to return
+> command status and not command complete.
+> 
+> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+> ---
+>  net/bluetooth/mgmt.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 
- client/gatt.c | 15 +++++++++------
- 1 file changed, 9 insertions(+), 6 deletions(-)
+Applied to bluetooth-next. Thanks.
 
--- 
-2.5.5
-
+Johan
