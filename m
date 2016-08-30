@@ -1,33 +1,85 @@
-Return-Path: <linux-kernel-owner@vger.kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
-Subject: Re: [PATCH 0/4] Bluetooth: hci_uart: various fixes
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1471592327-14133-1-git-send-email-boris.brezillon@free-electrons.com>
-Date: Tue, 30 Aug 2016 09:48:13 -0700
-Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-        linux-kernel@vger.kernel.org, jason.abele@gmail.com
-Message-Id: <0649B498-A8BC-42D1-8F70-07B3C8CAB8E2@holtmann.org>
-References: <1471592327-14133-1-git-send-email-boris.brezillon@free-electrons.com>
-To: Boris Brezillon <boris.brezillon@free-electrons.com>
-Sender: linux-kernel-owner@vger.kernel.org
+Return-Path: <netdev-owner@vger.kernel.org>
+Message-ID: <1472568698.25374.9.camel@decadent.org.uk>
+Subject: Re: [PATCH] rtl_bt: Add firmware and config file for RTL8822BE
+From: Ben Hutchings <ben@decadent.org.uk>
+To: Larry Finger <Larry.Finger@lwfinger.net>, linux-firmware@kernel.org
+Cc: linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
+        =?UTF-8?Q?=E9=99=86=E6=9C=B1=E4=BC=9F?= <alex_lu@realsil.com.cn>,
+        linux-bluetooth@vger.kernel.org
+Date: Tue, 30 Aug 2016 15:51:38 +0100
+In-Reply-To: <1472566081-1072-1-git-send-email-Larry.Finger@lwfinger.net>
+References: <1472566081-1072-1-git-send-email-Larry.Finger@lwfinger.net>
+Content-Type: multipart/signed; micalg="pgp-sha512";
+        protocol="application/pgp-signature"; boundary="=-BIi4uSpmmt1zprnli1nK"
+Mime-Version: 1.0
+Sender: netdev-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Boris,
 
-> We recently faced some problems when using an BT uart chip interfaced
-> through the H5 proto (rtk_h5). Here are the logs of the 2 different
-> issues we had when closing the line discipline (actually, restoring
-> the previous one) [1][2]. I know the kernel is Tainted in those logs,
-> but after some investigations I found a few potential issues that might
-> explain what we're seeing.
+--=-BIi4uSpmmt1zprnli1nK
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-while I can look through these patches, but I wonder when we are finally getting a full and proper RTK support that doesn't use these hackish hciattach code I have seen.
+On Tue, 2016-08-30 at 09:08 -0500, Larry Finger wrote:
+> This device is a new model from Realtek. Updates to driver btrtl will
+> soon be submitted to the kernel.
+>=20
+> These files were provided by the Realtek developer.
+>=20
+> Signed-off-by: =E9=99=86=E6=9C=B1=E4=BC=9F <alex_lu@realsil.com.cn>
+> Signed-off-by: Larry Finger <Larry.Finger@lwfinger.net>
+> Cc: linux-bluetooth@vger.kernel.org
+> ---
+> =C2=A0WHENCE=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0|=C2=A0=
+=C2=A0=C2=A03 +++
+> =C2=A0rtl_bt/rtl8822b_config.bin | Bin 0 -> 32 bytes
+> =C2=A0rtl_bt/rtl8822b_fw.bin=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0| Bin 0 -> 5175=
+6 bytes
+> =C2=A03 files changed, 3 insertions(+)
+> =C2=A0create mode 100644 rtl_bt/rtl8822b_config.bin
+> =C2=A0create mode 100644 rtl_bt/rtl8822b_fw.bin
+>=20
+> diff --git a/WHENCE b/WHENCE
+> index d0bef0d..a9d7c97 100644
+> --- a/WHENCE
+> +++ b/WHENCE
+> @@ -2755,11 +2755,14 @@ File: rtl_bt/rtl8723b_fw.bin
+> =C2=A0File: rtl_bt/rtl8761a_fw.bin
+> =C2=A0File: rtl_bt/rtl8812ae_fw.bin
+> =C2=A0File: rtl_bt/rtl8821a_fw.bin
+> +File: rtl_bt/rtl8822e_fw.bin
+> +File: rtl_bt/rtl8822e_config.bin
+[...]
 
-I mean the only thing userspace should be doing is attaching the line discipline and then everything else should run inside the kernel. Attaching the line discipline is the same as plugging in an USB dongle. Detaching it is the same as unplugging the dongle. That is how we should treat it. So for the lifetime of a system it should never detach. All the power control etc. should be done inside the kernel. Same as how we have done it for Broadcom and Intel devices.
+Should the filenames begin with "rtl822b" or "rtl822e"?
 
-Regards
+Ben.
 
-Marcel
+--=20
+Ben Hutchings
+All the simple programs have been written, and all the good names
+taken.
+
+--=-BIi4uSpmmt1zprnli1nK
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIcBAABCgAGBQJXxZ17AAoJEOe/yOyVhhEJ8H4P+wSbYmV/m1C6pLHGzahc9v5X
+a2y3C2eVRmzWUMM4aQcI1V/25kqG4UI6t9BLSMki7vhyYfy3Fsov4uX7aatBoDTH
+o95HlbolaPOK9+OcIzLA3F4cv6u7xdse8nxzTdn01PK6gOmtEgeYleur2FfvDrFH
+XNUxudOqbbQ0INlh9KPen5n36zSr0XO9VpN/bYBpEb2N7DqK3RVbkUOJIxgE8b/c
+fn2VQIREIPKU3zDjScSrMtgdOQmHsaNym6nDhrO9iy3llQ3PTrzd5ocX+iZkBAkC
+CHmYekMeA3xkrQvW9P61p5r03gsm3/I/Rt31Hoe1RPieUen3Essm4HfUTAJgocwG
+DPBBNBLu0bArI5lnQnOyb8HPWMh1fVmtwaKEzxIgkKGrQ52EYVcNu9MrIcMM6AED
+VFqgNyZR8yJiiFdzrxutKb7qu0BaDLk6VWgu1knKDj5E49npuwuX9IU9xrjWhUhf
+s8LGD29qQ6O/mEtYj9LbXbw5eeLbmn5hWrZANZHnXmyTufbSV7+ozWdFfcxJNSVZ
+P28fMe3aiZPw8KZ0aH0Ucomg2oUcVYg8exEaLb8b1wuWKBzF8CZuZ7gQMI/tuNVN
+4Hw9nvO5akj9T8JkXHxySSWP4zo9OwlG4W2jMp4GwqHRu1W9MN4J9r3y1UxiodwA
+beh99KiYVvOqKyRmlprV
+=dGP7
+-----END PGP SIGNATURE-----
+
+--=-BIi4uSpmmt1zprnli1nK--
