@@ -1,54 +1,55 @@
-Return-Path: <netdev-owner@vger.kernel.org>
-Subject: Re: [PATCH] rtl_bt: Add firmware and config file for RTL8822BE
-To: Ben Hutchings <ben@decadent.org.uk>, linux-firmware@kernel.org
-References: <1472566081-1072-1-git-send-email-Larry.Finger@lwfinger.net>
- <1472568698.25374.9.camel@decadent.org.uk>
-Cc: linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
-        =?UTF-8?B?6ZmG5pyx5Lyf?= <alex_lu@realsil.com.cn>,
-        linux-bluetooth@vger.kernel.org
-From: Larry Finger <Larry.Finger@lwfinger.net>
-Message-ID: <1d0a046a-9d16-2e1d-8a09-122e2b91979c@lwfinger.net>
-Date: Tue, 30 Aug 2016 20:10:43 -0500
+Return-Path: <boris.brezillon@free-electrons.com>
+Date: Tue, 30 Aug 2016 19:22:50 +0200
+From: Boris Brezillon <boris.brezillon@free-electrons.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>, Johan Hedberg
+ <johan.hedberg@gmail.com>, "open list:BLUETOOTH DRIVERS"
+ <linux-bluetooth@vger.kernel.org>, linux-kernel@vger.kernel.org,
+ jason.abele@gmail.com
+Subject: Re: [PATCH 0/4] Bluetooth: hci_uart: various fixes
+Message-ID: <20160830192250.40eea3cf@bbrezillon>
+In-Reply-To: <0649B498-A8BC-42D1-8F70-07B3C8CAB8E2@holtmann.org>
+References: <1471592327-14133-1-git-send-email-boris.brezillon@free-electrons.com>
+	<0649B498-A8BC-42D1-8F70-07B3C8CAB8E2@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1472568698.25374.9.camel@decadent.org.uk>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Sender: netdev-owner@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 08/30/2016 09:51 AM, Ben Hutchings wrote:
-> On Tue, 2016-08-30 at 09:08 -0500, Larry Finger wrote:
->> This device is a new model from Realtek. Updates to driver btrtl will
->> soon be submitted to the kernel.
->>
->> These files were provided by the Realtek developer.
->>
->> Signed-off-by: 陆朱伟 <alex_lu@realsil.com.cn>
->> Signed-off-by: Larry Finger <Larry.Finger@lwfinger.net>
->> Cc: linux-bluetooth@vger.kernel.org
->> ---
->>  WHENCE                     |   3 +++
->>  rtl_bt/rtl8822b_config.bin | Bin 0 -> 32 bytes
->>  rtl_bt/rtl8822b_fw.bin     | Bin 0 -> 51756 bytes
->>  3 files changed, 3 insertions(+)
->>  create mode 100644 rtl_bt/rtl8822b_config.bin
->>  create mode 100644 rtl_bt/rtl8822b_fw.bin
->>
->> diff --git a/WHENCE b/WHENCE
->> index d0bef0d..a9d7c97 100644
->> --- a/WHENCE
->> +++ b/WHENCE
->> @@ -2755,11 +2755,14 @@ File: rtl_bt/rtl8723b_fw.bin
->>  File: rtl_bt/rtl8761a_fw.bin
->>  File: rtl_bt/rtl8812ae_fw.bin
->>  File: rtl_bt/rtl8821a_fw.bin
->> +File: rtl_bt/rtl8822e_fw.bin
->> +File: rtl_bt/rtl8822e_config.bin
-> [...]
->
-> Should the filenames begin with "rtl822b" or "rtl822e"?
+Hi Marcel,
 
-They should start with rtl8822b. V2 will be sent shortly.
+On Tue, 30 Aug 2016 09:48:13 -0700
+Marcel Holtmann <marcel@holtmann.org> wrote:
 
-Thanks,
+> Hi Boris,
+> 
+> > We recently faced some problems when using an BT uart chip interfaced
+> > through the H5 proto (rtk_h5). Here are the logs of the 2 different
+> > issues we had when closing the line discipline (actually, restoring
+> > the previous one) [1][2]. I know the kernel is Tainted in those logs,
+> > but after some investigations I found a few potential issues that might
+> > explain what we're seeing.  
+> 
+> while I can look through these patches, but I wonder when we are finally getting a full and proper RTK support that doesn't use these hackish hciattach code I have seen.
+> 
+> I mean the only thing userspace should be doing is attaching the line discipline and then everything else should run inside the kernel. Attaching the line discipline is the same as plugging in an USB dongle. Detaching it is the same as unplugging the dongle. That is how we should treat it. So for the lifetime of a system it should never detach. All the power control etc. should be done inside the kernel. Same as how we have done it for Broadcom and Intel devices.
 
-Larry
+Well, I'm completely new to the bluetooth stack, and while the
+'hciattach/in-kernel driver' interaction does seem weird to me, I
+definitely can't tell whether it's good or bad.
+
+I just sent those patches because I was facing kernel panics.
+
+Still, I don't get your argument about allowing a user to attach the
+line discipline, but preventing him from detaching it. The races exist,
+so even if you decide that the line discipline cannot be detached, how
+do you plan to handle module unloading (maybe you don't want to allow
+that either)?
+
+One last comment. Even after applying those fixes I'm still facing
+panics [1], so there are probably other racy portions in the code.
+
+Anyway, tanks for your review.
+
+Boris
+
+[1]http://code.bulix.org/b5td9x-105502
