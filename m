@@ -1,71 +1,91 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 3/7] Bluetooth: Send control open and close only when cookie is present
-Date: Tue, 30 Aug 2016 05:00:36 +0200
-Message-Id: <1472526040-21804-3-git-send-email-marcel@holtmann.org>
+Subject: [PATCH 4/7] Bluetooth: Assign the channel early when binding HCI sockets
+Date: Tue, 30 Aug 2016 05:00:37 +0200
+Message-Id: <1472526040-21804-4-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Only when the cookie has been assigned, then send the open and close
-monitor messages. Also if the socket is bound to a device, then include
-the index into the message.
+Assignment of the hci_pi(sk)->channel should be done early when binding
+the HCI socket. This avoids confusion with the RAW channel that is used
+for legacy access.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/hci_sock.c | 18 ++++++++++++++++--
- 1 file changed, 16 insertions(+), 2 deletions(-)
+ net/bluetooth/hci_sock.c | 16 +++++++++++-----
+ 1 file changed, 11 insertions(+), 5 deletions(-)
 
 diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
-index fc3ccfe2a5c9..6137cda1c87c 100644
+index 6137cda1c87c..5c7d3fba9817 100644
 --- a/net/bluetooth/hci_sock.c
 +++ b/net/bluetooth/hci_sock.c
-@@ -483,6 +483,10 @@ static struct sk_buff *create_monitor_ctrl_open(struct sock *sk)
- 	u8 ver[3];
- 	u32 flags;
+@@ -1045,6 +1045,7 @@ static int hci_sock_bind(struct socket *sock, struct sockaddr *addr,
+ 			atomic_inc(&hdev->promisc);
+ 		}
  
-+	/* No message needed when cookie is not present */
-+	if (!hci_pi(sk)->cookie)
-+		return NULL;
++		hci_pi(sk)->channel = haddr.hci_channel;
+ 		hci_pi(sk)->hdev = hdev;
+ 		break;
+ 
+@@ -1107,9 +1108,10 @@ static int hci_sock_bind(struct socket *sock, struct sockaddr *addr,
+ 			}
+ 		}
+ 
+-		atomic_inc(&hdev->promisc);
+-
++		hci_pi(sk)->channel = haddr.hci_channel;
+ 		hci_pi(sk)->hdev = hdev;
 +
- 	skb = bt_skb_alloc(14 + TASK_COMM_LEN , GFP_ATOMIC);
- 	if (!skb)
- 		return NULL;
-@@ -501,7 +505,10 @@ static struct sk_buff *create_monitor_ctrl_open(struct sock *sk)
++		atomic_inc(&hdev->promisc);
+ 		break;
  
- 	hdr = (void *)skb_push(skb, HCI_MON_HDR_SIZE);
- 	hdr->opcode = cpu_to_le16(HCI_MON_CTRL_OPEN);
--	hdr->index = cpu_to_le16(HCI_DEV_NONE);
-+	if (hci_pi(sk)->hdev)
-+		hdr->index = cpu_to_le16(hci_pi(sk)->hdev->id);
-+	else
-+		hdr->index = cpu_to_le16(HCI_DEV_NONE);
- 	hdr->len = cpu_to_le16(skb->len - HCI_MON_HDR_SIZE);
+ 	case HCI_CHANNEL_MONITOR:
+@@ -1123,6 +1125,8 @@ static int hci_sock_bind(struct socket *sock, struct sockaddr *addr,
+ 			goto done;
+ 		}
  
- 	return skb;
-@@ -512,6 +519,10 @@ static struct sk_buff *create_monitor_ctrl_close(struct sock *sk)
- 	struct hci_mon_hdr *hdr;
- 	struct sk_buff *skb;
- 
-+	/* No message needed when cookie is not present */
-+	if (!hci_pi(sk)->cookie)
-+		return NULL;
++		hci_pi(sk)->channel = haddr.hci_channel;
 +
- 	skb = bt_skb_alloc(4, GFP_ATOMIC);
- 	if (!skb)
- 		return NULL;
-@@ -522,7 +533,10 @@ static struct sk_buff *create_monitor_ctrl_close(struct sock *sk)
+ 		/* The monitor interface is restricted to CAP_NET_RAW
+ 		 * capabilities and with that implicitly trusted.
+ 		 */
+@@ -1149,6 +1153,8 @@ static int hci_sock_bind(struct socket *sock, struct sockaddr *addr,
+ 			err = -EPERM;
+ 			goto done;
+ 		}
++
++		hci_pi(sk)->channel = haddr.hci_channel;
+ 		break;
  
- 	hdr = (void *)skb_push(skb, HCI_MON_HDR_SIZE);
- 	hdr->opcode = cpu_to_le16(HCI_MON_CTRL_CLOSE);
--	hdr->index = cpu_to_le16(HCI_DEV_NONE);
-+	if (hci_pi(sk)->hdev)
-+		hdr->index = cpu_to_le16(hci_pi(sk)->hdev->id);
-+	else
-+		hdr->index = cpu_to_le16(HCI_DEV_NONE);
- 	hdr->len = cpu_to_le16(skb->len - HCI_MON_HDR_SIZE);
+ 	default:
+@@ -1170,6 +1176,8 @@ static int hci_sock_bind(struct socket *sock, struct sockaddr *addr,
+ 		if (capable(CAP_NET_ADMIN))
+ 			hci_sock_set_flag(sk, HCI_SOCK_TRUSTED);
  
- 	return skb;
++		hci_pi(sk)->channel = haddr.hci_channel;
++
+ 		/* At the moment the index and unconfigured index events
+ 		 * are enabled unconditionally. Setting them on each
+ 		 * socket when binding keeps this functionality. They
+@@ -1180,7 +1188,7 @@ static int hci_sock_bind(struct socket *sock, struct sockaddr *addr,
+ 		 * received by untrusted users. Example for such events
+ 		 * are changes to settings, class of device, name etc.
+ 		 */
+-		if (haddr.hci_channel == HCI_CHANNEL_CONTROL) {
++		if (hci_pi(sk)->channel == HCI_CHANNEL_CONTROL) {
+ 			struct sk_buff *skb;
+ 
+ 			hci_sock_gen_cookie(sk);
+@@ -1203,8 +1211,6 @@ static int hci_sock_bind(struct socket *sock, struct sockaddr *addr,
+ 		break;
+ 	}
+ 
+-
+-	hci_pi(sk)->channel = haddr.hci_channel;
+ 	sk->sk_state = BT_BOUND;
+ 
+ done:
 -- 
 2.7.4
 
