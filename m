@@ -1,76 +1,62 @@
-Return-Path: <linux-kernel-owner@vger.kernel.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
-Subject: Re: [PATCH 1/4] Bluetooth: hci_ldisc: fix a race in the hdev closing path
+Subject: Re: [PATCH 4/4] Bluetooth: hci_ldisc: make sure we don't loose HCI_UART_TX_WAKEUP events
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1471592327-14133-2-git-send-email-boris.brezillon@free-electrons.com>
-Date: Tue, 30 Aug 2016 09:53:59 -0700
+In-Reply-To: <1471592327-14133-5-git-send-email-boris.brezillon@free-electrons.com>
+Date: Tue, 30 Aug 2016 09:53:53 -0700
 Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
         linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
         jason.abele@gmail.com
-Message-Id: <3FF88393-A83A-4C5D-B438-E76C923159A5@holtmann.org>
-References: <1471592327-14133-1-git-send-email-boris.brezillon@free-electrons.com> <1471592327-14133-2-git-send-email-boris.brezillon@free-electrons.com>
+Message-Id: <23C61632-54CF-43DD-8F99-B18176DF6C07@holtmann.org>
+References: <1471592327-14133-1-git-send-email-boris.brezillon@free-electrons.com> <1471592327-14133-5-git-send-email-boris.brezillon@free-electrons.com>
 To: Boris Brezillon <boris.brezillon@free-electrons.com>
-Sender: linux-kernel-owner@vger.kernel.org
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Boris,
 
-> hci_uart_tty_close() is cancelling any pending write work, but some
-> hci_uart_proto implementations might re-schedule this work after its
-> cancellation (by calling hci_uart_tx_wakeup()).
-> 
-> Make sure the write work is not re-scheduled in our back while we're
-> closing the device.
-> 
-> We also cancel any pending init work and prevent the active one (if
-> any) from registering the hdev if the line discipline is being closed.
+> The HCI_UART_TX_WAKEUP flag checking is racy and some HCI_UART_TX_WAKEUP
+> events can be lost.
 > 
 > Signed-off-by: Boris Brezillon <boris.brezillon@free-electrons.com>
 > ---
-> drivers/bluetooth/hci_ldisc.c | 15 ++++++++++++++-
-> drivers/bluetooth/hci_uart.h  |  1 +
-> 2 files changed, 15 insertions(+), 1 deletion(-)
+> drivers/bluetooth/hci_ldisc.c | 11 +++++++++++
+> 1 file changed, 11 insertions(+)
 > 
 > diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
-> index dda97398c59a..de7f7f1f995c 100644
+> index 27f73294edcb..ee7b25f1c6ce 100644
 > --- a/drivers/bluetooth/hci_ldisc.c
 > +++ b/drivers/bluetooth/hci_ldisc.c
-> @@ -130,7 +130,9 @@ int hci_uart_tx_wakeup(struct hci_uart *hu)
+> @@ -172,6 +172,17 @@ restart:
+> 		goto restart;
 > 
-> 	BT_DBG("");
-> 
-> -	schedule_work(&hu->write_work);
-> +	/* Don't schedule the work if the device is being closed. */
-> +	if (!test_bit(HCI_UART_CLOSING, &hu->flags))
-> +		schedule_work(&hu->write_work);
-> 
-> 	return 0;
-> }
-> @@ -180,6 +182,11 @@ static void hci_uart_init_work(struct work_struct *work)
-> 	if (!test_and_clear_bit(HCI_UART_INIT_PENDING, &hu->hdev_flags))
-> 		return;
-> 
-> +	if (test_bit(HCI_UART_CLOSING, &hu->flags)) {
-> +		BT_DBG("HCI device is being closed, don't register it.");
-> +		return;
-> +	}
+> 	clear_bit(HCI_UART_SENDING, &hu->tx_state);
 > +
-> 	err = hci_register_dev(hu->hdev);
-> 	if (err < 0) {
-> 		BT_ERR("Can't register HCI device");
-> @@ -490,7 +497,13 @@ static void hci_uart_tty_close(struct tty_struct *tty)
-> 	if (hdev)
-> 		hci_uart_close(hdev);
-> 
 > +	/*
-> +	 * Set the closing bit to make sure nobody re-schedules the write work
-> +	 * in our back.
+> +	 * One last check to make sure hci_uart_tx_wakeup() did not set
+> +	 * HCI_UART_TX_WAKEUP while we where clearing HCI_UART_SENDING.
+> +	 * The work might have been scheduled by someone else in the
+> +	 * meantime, in this case we return directly.
 > +	 */
+> +	if (test_bit(HCI_UART_TX_WAKEUP, &hu->tx_state) &&
+> +	    !test_and_set_bit(HCI_UART_SENDING, &hu->tx_state))
+> +		goto restart;
+> +
 
-please use the network subsystem comment style here.
+I know this is correct, but I would actually make it visually different.
+
+	if (test_bit(UART_TX_WAKEUP, ..) {
+		/* comment goes here
+		 */
+		if (!test_and_set_bit(UART_SENDING, ..)
+			goto restart;
+	}
+
+For me with a proper comment that is a lot easier to read and grok that it is correct.
 
 Regards
 
 Marcel
+
