@@ -1,80 +1,71 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 5/7] Bluetooth: Add extra channel checks for control open/close messages
-Date: Tue, 30 Aug 2016 05:00:38 +0200
-Message-Id: <1472526040-21804-5-git-send-email-marcel@holtmann.org>
+Subject: [PATCH 3/7] Bluetooth: Send control open and close only when cookie is present
+Date: Tue, 30 Aug 2016 05:00:36 +0200
+Message-Id: <1472526040-21804-3-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The control open and close monitoring events require special channel
-checks to ensure messages are only send when the right events happen.
+Only when the cookie has been assigned, then send the open and close
+monitor messages. Also if the socket is bound to a device, then include
+the index into the message.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/hci_sock.c | 24 +++++++++++++++++++-----
- 1 file changed, 19 insertions(+), 5 deletions(-)
+ net/bluetooth/hci_sock.c | 18 ++++++++++++++++--
+ 1 file changed, 16 insertions(+), 2 deletions(-)
 
 diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
-index 5c7d3fba9817..d5581ca7a07e 100644
+index fc3ccfe2a5c9..6137cda1c87c 100644
 --- a/net/bluetooth/hci_sock.c
 +++ b/net/bluetooth/hci_sock.c
-@@ -479,7 +479,7 @@ static struct sk_buff *create_monitor_ctrl_open(struct sock *sk)
- {
- 	struct hci_mon_hdr *hdr;
- 	struct sk_buff *skb;
--	u16 format = 0x0001;
-+	u16 format;
+@@ -483,6 +483,10 @@ static struct sk_buff *create_monitor_ctrl_open(struct sock *sk)
  	u8 ver[3];
  	u32 flags;
  
-@@ -487,11 +487,20 @@ static struct sk_buff *create_monitor_ctrl_open(struct sock *sk)
- 	if (!hci_pi(sk)->cookie)
- 		return NULL;
- 
-+	switch (hci_pi(sk)->channel) {
-+	case HCI_CHANNEL_CONTROL:
-+		format = 0x0001;
-+		mgmt_fill_version_info(ver);
-+		break;
-+	default:
-+		/* No message for unsupported format */
++	/* No message needed when cookie is not present */
++	if (!hci_pi(sk)->cookie)
 +		return NULL;
-+	}
 +
  	skb = bt_skb_alloc(14 + TASK_COMM_LEN , GFP_ATOMIC);
  	if (!skb)
  		return NULL;
+@@ -501,7 +505,10 @@ static struct sk_buff *create_monitor_ctrl_open(struct sock *sk)
  
--	mgmt_fill_version_info(ver);
- 	flags = hci_sock_test_flag(sk, HCI_SOCK_TRUSTED) ? 0x1 : 0x0;
+ 	hdr = (void *)skb_push(skb, HCI_MON_HDR_SIZE);
+ 	hdr->opcode = cpu_to_le16(HCI_MON_CTRL_OPEN);
+-	hdr->index = cpu_to_le16(HCI_DEV_NONE);
++	if (hci_pi(sk)->hdev)
++		hdr->index = cpu_to_le16(hci_pi(sk)->hdev->id);
++	else
++		hdr->index = cpu_to_le16(HCI_DEV_NONE);
+ 	hdr->len = cpu_to_le16(skb->len - HCI_MON_HDR_SIZE);
  
- 	put_unaligned_le32(hci_pi(sk)->cookie, skb_put(skb, 4));
-@@ -523,6 +532,14 @@ static struct sk_buff *create_monitor_ctrl_close(struct sock *sk)
- 	if (!hci_pi(sk)->cookie)
- 		return NULL;
+ 	return skb;
+@@ -512,6 +519,10 @@ static struct sk_buff *create_monitor_ctrl_close(struct sock *sk)
+ 	struct hci_mon_hdr *hdr;
+ 	struct sk_buff *skb;
  
-+	switch (hci_pi(sk)->channel) {
-+	case HCI_CHANNEL_CONTROL:
-+		break;
-+	default:
-+		/* No message for unsupported format */
++	/* No message needed when cookie is not present */
++	if (!hci_pi(sk)->cookie)
 +		return NULL;
-+	}
 +
  	skb = bt_skb_alloc(4, GFP_ATOMIC);
  	if (!skb)
  		return NULL;
-@@ -652,9 +669,6 @@ static void send_monitor_control_replay(struct sock *mon_sk)
- 	sk_for_each(sk, &hci_sk_list.head) {
- 		struct sk_buff *skb;
+@@ -522,7 +533,10 @@ static struct sk_buff *create_monitor_ctrl_close(struct sock *sk)
  
--		if (hci_pi(sk)->channel != HCI_CHANNEL_CONTROL)
--			continue;
--
- 		skb = create_monitor_ctrl_open(sk);
- 		if (!skb)
- 			continue;
+ 	hdr = (void *)skb_push(skb, HCI_MON_HDR_SIZE);
+ 	hdr->opcode = cpu_to_le16(HCI_MON_CTRL_CLOSE);
+-	hdr->index = cpu_to_le16(HCI_DEV_NONE);
++	if (hci_pi(sk)->hdev)
++		hdr->index = cpu_to_le16(hci_pi(sk)->hdev->id);
++	else
++		hdr->index = cpu_to_le16(HCI_DEV_NONE);
+ 	hdr->len = cpu_to_le16(skb->len - HCI_MON_HDR_SIZE);
+ 
+ 	return skb;
 -- 
 2.7.4
 
