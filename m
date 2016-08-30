@@ -1,61 +1,107 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <CAGNHjALN16FE0_7r4EYCELK5zA5nhs_QkNHC5_my1xtQT5wPmg@mail.gmail.com>
-References: <CAGNHjALN16FE0_7r4EYCELK5zA5nhs_QkNHC5_my1xtQT5wPmg@mail.gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 30 Aug 2016 11:18:19 +0300
-Message-ID: <CABBYNZKqWDDCdVm5BQmdnkg8rwNL6+fHVBqEXk6pN_JrHcAjYw@mail.gmail.com>
-Subject: Re: [RFC] Bluetooth: API: Registering Agent1 object has no effect
-To: Oliver Rode <oli67r@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Marcel Holtmann <marcel@holtmann.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 7/7] Bluetooth: Handle HCI raw socket transition from unbound to bound
+Date: Tue, 30 Aug 2016 05:00:40 +0200
+Message-Id: <1472526040-21804-7-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Oliver,
+In case an unbound HCI raw socket is later on bound, ensure that the
+monitor notification messages indicate a close and re-open. None of
+the userspace tools use the socket this, but it is actually possible
+to use an ioctl on an unbound socket and then later bind it.
 
-On Tue, Aug 30, 2016 at 12:58 AM, Oliver Rode <oli67r@gmail.com> wrote:
-> Hi everybody,
->
-> I have trouble with registering an Agent1 object over glib2.0 D-Bus API.
-> Do you have a current example that works with the new D-Bus API?
->
->
-> The desired effect is, when pairing with a CC2650 sensor tag, my agent1
-> object's callback get invoked and not the desktop's agent (he display a
-> pop-up and queries - i want to handle this by a coded subroutine).
->
-> With bluetoothctl it works to prevent the desktop from displaying the
-> popup. But this cute tool seems not to be ported to the new D-Bus API, so i
-> it works different (but very very cool tool !!).
->
-> I tried to archive this over glib2.0 and gdbus-codegen but it does not work.
->
-> An Agent1 object can be successfully been registered with BlueZ's
-> AgentManager1, but during pairing it is expected that the Agent1 call-back
-> method is invoked. That does not happen. Instead the desktop's agent popup
-> is displayed. Something wents wrong. I need to find out why AgentManager1's
-> registerAgent() and requestDefaultAgent() do fail, but do not report an
-> error.
->
-> I did not manage to find out with bluetoothctl what happens. For some
-> reason the callback of the Agent1 object are not invoked. Maybe a glib
-> issue ? What is the right debugging setup to find this out?
->
-> Maybe you can help me with some hints or a C example. Thank you.!
->
-> Regards,
-> Oliver
->
->
-> PS:
-> My project and the issue is public. Please be aware it is invoked over
-> Java/JNI:
-> https://github.com/olir/lbt4j/issues/1
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ net/bluetooth/hci_sock.c | 53 ++++++++++++++++++++++++++++++++----------------
+ 1 file changed, 36 insertions(+), 17 deletions(-)
 
-Does it stay connected over D-Bus? If the application disconnects from
-D-Bus the agent is automatically unregistered as there is no way to
-reach it anymore, this should be visible in the bluetoothd logs.
-
+diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
+index c2b2b1d7fe4d..f2c597facf0c 100644
+--- a/net/bluetooth/hci_sock.c
++++ b/net/bluetooth/hci_sock.c
+@@ -1049,6 +1049,7 @@ static int hci_sock_bind(struct socket *sock, struct sockaddr *addr,
+ 	struct sockaddr_hci haddr;
+ 	struct sock *sk = sock->sk;
+ 	struct hci_dev *hdev = NULL;
++	struct sk_buff *skb;
+ 	int len, err = 0;
+ 
+ 	BT_DBG("sock %p sk %p", sock, sk);
+@@ -1088,27 +1089,34 @@ static int hci_sock_bind(struct socket *sock, struct sockaddr *addr,
+ 		}
+ 
+ 		hci_pi(sk)->channel = haddr.hci_channel;
+-		hci_pi(sk)->hdev = hdev;
+-
+-		/* Only send the event to monitor when a new cookie has
+-		 * been generated. An existing cookie means that an unbound
+-		 * socket has seen an ioctl and that triggered the cookie
+-		 * generation and sending of the monitor event.
+-		 */
+-		if (hci_sock_gen_cookie(sk)) {
+-			struct sk_buff *skb;
+-
+-			if (capable(CAP_NET_ADMIN))
+-				hci_sock_set_flag(sk, HCI_SOCK_TRUSTED);
+ 
+-			/* Send event to monitor */
+-			skb = create_monitor_ctrl_open(sk);
++		if (!hci_sock_gen_cookie(sk)) {
++			/* In the case when a cookie has already been assigned,
++			 * then there has been already an ioctl issued against
++			 * an unbound socket and with that triggerd an open
++			 * notification. Send a close notification first to
++			 * allow the state transition to bounded.
++			 */
++			skb = create_monitor_ctrl_close(sk);
+ 			if (skb) {
+ 				hci_send_to_channel(HCI_CHANNEL_MONITOR, skb,
+ 						    HCI_SOCK_TRUSTED, NULL);
+ 				kfree_skb(skb);
+ 			}
+ 		}
++
++		if (capable(CAP_NET_ADMIN))
++			hci_sock_set_flag(sk, HCI_SOCK_TRUSTED);
++
++		hci_pi(sk)->hdev = hdev;
++
++		/* Send event to monitor */
++		skb = create_monitor_ctrl_open(sk);
++		if (skb) {
++			hci_send_to_channel(HCI_CHANNEL_MONITOR, skb,
++					    HCI_SOCK_TRUSTED, NULL);
++			kfree_skb(skb);
++		}
+ 		break;
+ 
+ 	case HCI_CHANNEL_USER:
+@@ -1251,9 +1259,20 @@ static int hci_sock_bind(struct socket *sock, struct sockaddr *addr,
+ 		 * are changes to settings, class of device, name etc.
+ 		 */
+ 		if (hci_pi(sk)->channel == HCI_CHANNEL_CONTROL) {
+-			struct sk_buff *skb;
+-
+-			hci_sock_gen_cookie(sk);
++			if (!hci_sock_gen_cookie(sk)) {
++				/* In the case when a cookie has already been
++				 * assigned, this socket will transtion from
++				 * a raw socket into a control socket. To
++				 * allow for a clean transtion, send the
++				 * close notification first.
++				 */
++				skb = create_monitor_ctrl_close(sk);
++				if (skb) {
++					hci_send_to_channel(HCI_CHANNEL_MONITOR, skb,
++							    HCI_SOCK_TRUSTED, NULL);
++					kfree_skb(skb);
++				}
++			}
+ 
+ 			/* Send event to monitor */
+ 			skb = create_monitor_ctrl_open(sk);
 -- 
-Luiz Augusto von Dentz
+2.7.4
+
