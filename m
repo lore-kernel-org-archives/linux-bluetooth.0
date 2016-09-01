@@ -1,35 +1,79 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Amith Raghunath <Amith.Raghunath@mindtree.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: Regarding IPSP over GATT Support in blueZ
-Date: Thu, 1 Sep 2016 15:49:11 +0000
-Message-ID: <MAXPR01MB0218E7395A5709B7785514FC90E20@MAXPR01MB0218.INDPRD01.PROD.OUTLOOK.COM>
-References: <MAXPR01MB0218AF3FE3A6214F17D9047090ED0@MAXPR01MB0218.INDPRD01.PROD.OUTLOOK.COM>
- <CABBYNZLLpO0TcozFuvorwCZOOAKr=96NJhZBoLxjeUgdM+G2UA@mail.gmail.com>
-In-Reply-To: <CABBYNZLLpO0TcozFuvorwCZOOAKr=96NJhZBoLxjeUgdM+G2UA@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
+From: Szymon Janc <szymon.janc@codecoup.pl>
+To: linux-bluetooth@vger.kernel.org
+Cc: Szymon Janc <szymon.janc@codecoup.pl>
+Subject: [PATCH v2] Bluetooth: btusb: Mark CW6622 devices to have broken link key commands
+Date: Thu,  1 Sep 2016 17:22:37 +0200
+Message-Id: <1472743357-11144-1-git-send-email-szymon.janc@codecoup.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgTHVpeiwNCg0KPiBJdCBpcyBjdXJyZW50bHkgcGVuZGluZyB0aGUgaW1wbGVtZW50YXRpb24g
-b2YgTUdNVCBpbnRlcmZhY2UsIGJ1dCB5b3UgY2FuIHVzZSBpdCB3aXRoIGRlYnVnZnM6DQoNClRo
-YW5rIHlvdSBmb3IgYW5zd2VyaW5nIHRoZSBxdWVyeS4NCkkgaGF2ZSB0cmllZCB0aGlzIHNldHVw
-IG9uIDIgVWJ1bnR1IDE2LjA0IG1hY2hpbmVzIHdpdGggY3NyIDQuMCBkb25nbGUuDQpUaHJvdWdo
-IHRoZSBkZWJ1Z2ZzIGFwcHJvYWNoIHBpbmc2IHRvIHRoZSByZW1vdGUgbWFjaGluZSBpcyB3b3Jr
-aW5nLg0KDQpJIGhhdmUgYW5vdGhlciBxdWVyeToNCkluIHRoZSA2bG93cGFuLmMgY29kZQ0KdGhl
-IGZ1bmN0aW9uICJyZWN2X3BrdCIgc2VuZHMgdGhlIHJlY2VpdmVkIHBhY2tldCB0byB0aGUgdXBw
-ZXIgKHByb3RvY29sKSBsZXZlbHMuDQpUaGUgZnVuY3Rpb24gImJ0X3htaXQiIHdpbGwgZWl0aGVy
-IHNlbmQgdGhlIHBrdCB0byBhbGwgaXRzIHBlZXJzIG9yIHNlbmQgaXQgdG8gb25lIG9mIHRoZSBw
-ZWVycy4NCg0KSW4gdGhlIGlldGYgUkZDNzY2OCBkb2N1bWVudCwgaXQgc3RhdGVzIHRoYXQgMiA2
-TEJOcyBjYW4gZXhjaGFuZ2UgcGFja2V0cyB0aHJvdWdoIGEgNkxCUi4NCldpdGggcmVnYXJkIHRv
-IHRoaXMgSSBoYXZlIHRoZSBmb2xsb3dpbmcgcXVlcmllczoNCjEuIFRoZSA2TEJSIGhhcyB0byBm
-b3J3YXJkIHRoZSBwYWNrZXRzIHNlbnQgYnkgb25lIG5vZGUgdG8gYW5vdGhlciBub2RlIGJhc2Vk
-IG9uIHRoZSBsaW5rLWxvY2FsIGFkZHJlc3MuIElzIHRoaXMgc2NlbmFyaW8gc3VwcG9ydGVkIGlu
-IHRoZSBwcmVzZW50IGNvZGUgYmFzZSA/DQoyLiBBcmUgYWxsIHRoZSB1c2UgY2FzZXMgbWVudGlv
-bmVkIGluIFJGQzc2NjggKGluY2x1ZGluZyBuZWlnaGJvciBkaXNjb3ZlcnkpIHN1cHBvcnRlZCBi
-eSB0aGUgcHJlc2VudCBjb2RlIGJhc2UgPw0KMy4gV2hhdCBpcyB0aGUgcHJlc2VudCBzdGF0dXMg
-b2YgYmx1ZXRvb3RoXzZsb3dwYW4gY29kZSB3aXRoIHJlZmVyZW5jZSB0byBpZXRmIFJGQzc2Njgg
-ZG9jdW1lbnQgPw0KDQpSZWdhcmRzLA0KQW1pdGgNCg0KX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX18NCg0KaHR0cDovL3d3dy5taW5kdHJlZS5jb20vZW1haWwvZGlzY2xhaW1lci5odG1s
-DQo=
+Conwise CW6622 seems to have a problem with the stored link key
+commands so just mark it as broken.
+
+< HCI Command: Read Local Supported Features (0x04|0x0003) plen 0
+> HCI Event: Command Complete (0x0e) plen 12
+    Read Local Supported Features (0x04|0x0003) ncmd 1
+    status 0x00
+    Features: 0xff 0x3e 0x85 0x38 0x18 0x18 0x00 0x00
+< HCI Command: Read Local Version Information (0x04|0x0001) plen 0
+> HCI Event: Command Complete (0x0e) plen 12
+    Read Local Version Information (0x04|0x0001) ncmd 1
+    status 0x00
+    HCI Version: 2.0 (0x3) HCI Revision: 0x1f4
+    LMP Version: 2.0 (0x3) LMP Subversion: 0x1f4
+    Manufacturer: CONWISE Technology Corporation Ltd (66)
+...
+< HCI Command: Read Local Supported Commands (0x04|0x0002) plen 0
+> HCI Event: Command Complete (0x0e) plen 68
+    Read Local Supported Commands (0x04|0x0002) ncmd 1
+    status 0x00
+    Commands: 7fffef03cedfffffffffff1ff20ff8ff3f
+...
+< HCI Command: Read Stored Link Key (0x03|0x000d) plen 7
+    bdaddr 00:00:00:00:00:00 all 1
+> HCI Event: Command Complete (0x0e) plen 8
+    Read Stored Link Key (0x03|0x000d) ncmd 1
+    status 0x11 max 0 num 0
+    Error: Unsupported Feature or Parameter Value
+
+Signed-off-by: Szymon Janc <szymon.janc@codecoup.pl>
+---
+ drivers/bluetooth/btusb.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 80ae854..4ef5ec8 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -62,6 +62,7 @@ static struct usb_driver btusb_driver;
+ #define BTUSB_REALTEK		0x20000
+ #define BTUSB_BCM2045		0x40000
+ #define BTUSB_IFNUM_2		0x80000
++#define BTUSB_CW6622		0x100000
+ 
+ static const struct usb_device_id btusb_table[] = {
+ 	/* Generic Bluetooth USB device */
+@@ -291,7 +292,8 @@ static const struct usb_device_id blacklist_table[] = {
+ 	{ USB_DEVICE(0x0400, 0x080a), .driver_info = BTUSB_BROKEN_ISOC },
+ 
+ 	/* CONWISE Technology based adapters with buggy SCO support */
+-	{ USB_DEVICE(0x0e5e, 0x6622), .driver_info = BTUSB_BROKEN_ISOC },
++	{ USB_DEVICE(0x0e5e, 0x6622),
++	  .driver_info = BTUSB_BROKEN_ISOC | BTUSB_CW6622},
+ 
+ 	/* Roper Class 1 Bluetooth Dongle (Silicon Wave based) */
+ 	{ USB_DEVICE(0x1310, 0x0001), .driver_info = BTUSB_SWAVE },
+@@ -2845,7 +2847,8 @@ static int btusb_probe(struct usb_interface *intf,
+ 	hdev->send   = btusb_send_frame;
+ 	hdev->notify = btusb_notify;
+ 
+-	if (id->driver_info & BTUSB_BCM2045)
++	if ((id->driver_info & BTUSB_BCM2045) ||
++	    (id->driver_info & BTUSB_CW6622))
+ 		set_bit(HCI_QUIRK_BROKEN_STORED_LINK_KEY, &hdev->quirks);
+ 
+ 	if (id->driver_info & BTUSB_BCM92035)
+-- 
+2.7.4
+
