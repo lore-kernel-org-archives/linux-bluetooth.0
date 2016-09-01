@@ -1,133 +1,127 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Szymon Janc <szymon.janc@codecoup.pl>
+From: =?UTF-8?q?Micha=C5=82=20Narajowski?=
+        <michal.narajowski@codecoup.pl>
 To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@codecoup.pl>
-Subject: [PATCH] Bluetooth: btusb: Mark CW6622 devices to have broken link key commands
-Date: Thu,  1 Sep 2016 16:52:39 +0200
-Message-Id: <1472741559-32358-1-git-send-email-szymon.janc@codecoup.pl>
+Cc: =?UTF-8?q?Micha=C5=82=20Narajowski?=
+        <michal.narajowski@codecoup.pl>
+Subject: [PATCH 2/2] Bluetooth: Append local name and CoD to Extended Controller Info
+Date: Thu,  1 Sep 2016 16:46:24 +0200
+Message-Id: <1472741184-29311-2-git-send-email-michal.narajowski@codecoup.pl>
+In-Reply-To: <1472741184-29311-1-git-send-email-michal.narajowski@codecoup.pl>
+References: <1472741184-29311-1-git-send-email-michal.narajowski@codecoup.pl>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Conwise CW6622 seems to have a problem with the stored link key
-commands so just mark it as broken.
+This adds device class, complete local name and short local name
+to EIR data in Extended Controller Info as specified in docs.
 
-< HCI Command: Read Local Supported Features (0x04|0x0003) plen 0
-> HCI Event: Command Complete (0x0e) plen 12
-    Read Local Supported Features (0x04|0x0003) ncmd 1
-    status 0x00
-    Features: 0xff 0x3e 0x85 0x38 0x18 0x18 0x00 0x00
-< HCI Command: Read Local Version Information (0x04|0x0001) plen 0
-> HCI Event: Command Complete (0x0e) plen 12
-    Read Local Version Information (0x04|0x0001) ncmd 1
-    status 0x00
-    HCI Version: 2.0 (0x3) HCI Revision: 0x1f4
-    LMP Version: 2.0 (0x3) LMP Subversion: 0x1f4
-    Manufacturer: CONWISE Technology Corporation Ltd (66)
-...
-< HCI Command: Read Local Supported Commands (0x04|0x0002) plen 0
-> HCI Event: Command Complete (0x0e) plen 68
-    Read Local Supported Commands (0x04|0x0002) ncmd 1
-    status 0x00
-    Commands: 7fffef03cedfffffffffff1ff20ff8ff3f
-...
-< HCI Command: Read Stored Link Key (0x03|0x000d) plen 7
-    bdaddr 00:00:00:00:00:00 all 1
-> HCI Event: Command Complete (0x0e) plen 8
-    Read Stored Link Key (0x03|0x000d) ncmd 1
-    status 0x11 max 0 num 0
-    Error: Unsupported Feature or Parameter Value
-
-Signed-off-by: Szymon Janc <szymon.janc@codecoup.pl>
+Signed-off-by: Michał Narajowski <michal.narajowski@codecoup.pl>
 ---
- drivers/bluetooth/btusb.c | 54 +++++++++++++++++++++++++----------------------
- 1 file changed, 29 insertions(+), 25 deletions(-)
+ net/bluetooth/mgmt.c | 63 ++++++++++++++++++++++++++++++++++------------------
+ 1 file changed, 42 insertions(+), 21 deletions(-)
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 80ae854..396f91d 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -42,26 +42,26 @@ static bool reset = true;
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 69001f4..74179b9 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -866,26 +866,58 @@ static int read_controller_info(struct sock *sk, struct hci_dev *hdev,
+ 				 sizeof(rp));
+ }
  
- static struct usb_driver btusb_driver;
++static inline u16 eir_append_data(u8 *eir, u16 eir_len, u8 type, u8 *data,
++				  u8 data_len)
++{
++	eir[eir_len++] = sizeof(type) + data_len;
++	eir[eir_len++] = type;
++	memcpy(&eir[eir_len], data, data_len);
++	eir_len += data_len;
++
++	return eir_len;
++}
++
+ static int read_ext_controller_info(struct sock *sk, struct hci_dev *hdev,
+ 				    void *data, u16 data_len)
+ {
+-	struct mgmt_rp_read_ext_info rp;
++	struct mgmt_rp_read_ext_info *rp;
++	char buff[512];
++	u16 eir_len = 0;
++	u8 name_len;
  
--#define BTUSB_IGNORE		0x01
--#define BTUSB_DIGIANSWER	0x02
--#define BTUSB_CSR		0x04
--#define BTUSB_SNIFFER		0x08
--#define BTUSB_BCM92035		0x10
--#define BTUSB_BROKEN_ISOC	0x20
--#define BTUSB_WRONG_SCO_MTU	0x40
--#define BTUSB_ATH3012		0x80
--#define BTUSB_INTEL		0x100
--#define BTUSB_INTEL_BOOT	0x200
--#define BTUSB_BCM_PATCHRAM	0x400
--#define BTUSB_MARVELL		0x800
--#define BTUSB_SWAVE		0x1000
--#define BTUSB_INTEL_NEW		0x2000
--#define BTUSB_AMP		0x4000
--#define BTUSB_QCA_ROME		0x8000
--#define BTUSB_BCM_APPLE		0x10000
--#define BTUSB_REALTEK		0x20000
--#define BTUSB_BCM2045		0x40000
--#define BTUSB_IFNUM_2		0x80000
-+#define BTUSB_IGNORE			0x01
-+#define BTUSB_DIGIANSWER		0x02
-+#define BTUSB_CSR			0x04
-+#define BTUSB_SNIFFER			0x08
-+#define BTUSB_BCM92035			0x10
-+#define BTUSB_BROKEN_ISOC		0x20
-+#define BTUSB_WRONG_SCO_MTU		0x40
-+#define BTUSB_ATH3012			0x80
-+#define BTUSB_INTEL			0x100
-+#define BTUSB_INTEL_BOOT		0x200
-+#define BTUSB_BCM_PATCHRAM		0x400
-+#define BTUSB_MARVELL			0x800
-+#define BTUSB_SWAVE			0x1000
-+#define BTUSB_INTEL_NEW			0x2000
-+#define BTUSB_AMP			0x4000
-+#define BTUSB_QCA_ROME			0x8000
-+#define BTUSB_BCM_APPLE			0x10000
-+#define BTUSB_REALTEK			0x20000
-+#define BTUSB_BROKEN_STORED_LINK_KEY	0x40000
-+#define BTUSB_IFNUM_2			0x80000
+ 	BT_DBG("sock %p %s", sk, hdev->name);
  
- static const struct usb_device_id btusb_table[] = {
- 	/* Generic Bluetooth USB device */
-@@ -173,8 +173,9 @@ static const struct usb_device_id blacklist_table[] = {
- 	/* Broadcom BCM2033 without firmware */
- 	{ USB_DEVICE(0x0a5c, 0x2033), .driver_info = BTUSB_IGNORE },
+ 	hci_dev_lock(hdev);
  
--	/* Broadcom BCM2045 devices */
--	{ USB_DEVICE(0x0a5c, 0x2045), .driver_info = BTUSB_BCM2045 },
-+	/* Broadcom BCM2045 devices, broken Read Stored Link Key command */
-+	{ USB_DEVICE(0x0a5c, 0x2045),
-+	  .driver_info = BTUSB_BROKEN_STORED_LINK_KEY },
+-	memset(&rp, 0, sizeof(rp));
++	if (hci_dev_test_flag(hdev, HCI_BREDR_ENABLED))
++		eir_len = eir_append_data(buff, eir_len,
++					  EIR_CLASS_OF_DEV,
++					  hdev->dev_class, 3);
  
- 	/* Atheros 3011 with sflash firmware */
- 	{ USB_DEVICE(0x0489, 0xe027), .driver_info = BTUSB_IGNORE },
-@@ -290,8 +291,11 @@ static const struct usb_device_id blacklist_table[] = {
- 	{ USB_DEVICE(0x0400, 0x0807), .driver_info = BTUSB_BROKEN_ISOC },
- 	{ USB_DEVICE(0x0400, 0x080a), .driver_info = BTUSB_BROKEN_ISOC },
+-	bacpy(&rp.bdaddr, &hdev->bdaddr);
++	name_len = strlen(hdev->dev_name);
++	eir_len = eir_append_data(buff, eir_len, EIR_NAME_COMPLETE,
++				  hdev->dev_name, name_len);
  
--	/* CONWISE Technology based adapters with buggy SCO support */
--	{ USB_DEVICE(0x0e5e, 0x6622), .driver_info = BTUSB_BROKEN_ISOC },
-+	/* CONWISE Technology based adapters with buggy SCO support and broken
-+	 * Read Stored Link Key command
-+	 */
-+	{ USB_DEVICE(0x0e5e, 0x6622),
-+	  .driver_info = BTUSB_BROKEN_ISOC | BTUSB_BROKEN_STORED_LINK_KEY},
+-	rp.version = hdev->hci_ver;
+-	rp.manufacturer = cpu_to_le16(hdev->manufacturer);
++	name_len = strlen(hdev->short_name);
++	eir_len = eir_append_data(buff, eir_len, EIR_NAME_SHORT,
++				  hdev->short_name, name_len);
  
- 	/* Roper Class 1 Bluetooth Dongle (Silicon Wave based) */
- 	{ USB_DEVICE(0x1310, 0x0001), .driver_info = BTUSB_SWAVE },
-@@ -2845,7 +2849,7 @@ static int btusb_probe(struct usb_interface *intf,
- 	hdev->send   = btusb_send_frame;
- 	hdev->notify = btusb_notify;
+-	rp.supported_settings = cpu_to_le32(get_supported_settings(hdev));
+-	rp.current_settings = cpu_to_le32(get_current_settings(hdev));
++	rp = kmalloc(sizeof(*rp) + eir_len, GFP_KERNEL);
++	if (!rp)
++		return -ENOMEM;
++
++	memset(rp, 0, sizeof(*rp) + eir_len);
++
++	rp->eir_len = cpu_to_le16(eir_len);
++	memcpy(rp->eir, buff, eir_len);
  
--	if (id->driver_info & BTUSB_BCM2045)
-+	if (id->driver_info & BTUSB_BROKEN_STORED_LINK_KEY)
- 		set_bit(HCI_QUIRK_BROKEN_STORED_LINK_KEY, &hdev->quirks);
+-	rp.eir_len = cpu_to_le16(0);
++	bacpy(&rp->bdaddr, &hdev->bdaddr);
++
++	rp->version = hdev->hci_ver;
++	rp->manufacturer = cpu_to_le16(hdev->manufacturer);
++
++	rp->supported_settings = cpu_to_le32(get_supported_settings(hdev));
++	rp->current_settings = cpu_to_le32(get_current_settings(hdev));
  
- 	if (id->driver_info & BTUSB_BCM92035)
+ 	hci_dev_unlock(hdev);
+ 
+@@ -898,8 +930,8 @@ static int read_ext_controller_info(struct sock *sk, struct hci_dev *hdev,
+ 	hci_sock_clear_flag(sk, HCI_MGMT_DEV_CLASS_EVENTS);
+ 	hci_sock_clear_flag(sk, HCI_MGMT_LOCAL_NAME_EVENTS);
+ 
+-	return mgmt_cmd_complete(sk, hdev->id, MGMT_OP_READ_EXT_INFO, 0, &rp,
+-				 sizeof(rp));
++	return mgmt_cmd_complete(sk, hdev->id, MGMT_OP_READ_EXT_INFO, 0, rp,
++				 sizeof(*rp) + eir_len);
+ }
+ 
+ static int ext_info_changed(struct hci_dev *hdev, struct sock *skip)
+@@ -5552,17 +5584,6 @@ unlock:
+ 	return err;
+ }
+ 
+-static inline u16 eir_append_data(u8 *eir, u16 eir_len, u8 type, u8 *data,
+-				  u8 data_len)
+-{
+-	eir[eir_len++] = sizeof(type) + data_len;
+-	eir[eir_len++] = type;
+-	memcpy(&eir[eir_len], data, data_len);
+-	eir_len += data_len;
+-
+-	return eir_len;
+-}
+-
+ static void read_local_oob_ext_data_complete(struct hci_dev *hdev, u8 status,
+ 					     u16 opcode, struct sk_buff *skb)
+ {
 -- 
 2.7.4
 
