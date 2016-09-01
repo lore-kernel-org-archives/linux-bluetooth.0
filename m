@@ -1,215 +1,85 @@
-Return-Path: <michal.narajowski@codecoup.pl>
-From: =?UTF-8?q?Micha=C5=82=20Narajowski?= <michal.narajowski@codecoup.pl>
-To: linux-bluetooth@vger.kernel.org
-Cc: Marcel Holtmann <marcel@holtmann.org>
-Subject: [PATCH 1/2] Bluetooth: Add framework for Extended Controller Information
-Date: Thu,  1 Sep 2016 16:46:23 +0200
-Message-Id: <1472741184-29311-1-git-send-email-michal.narajowski@codecoup.pl>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Content-Type: text/plain; charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
+Subject: Re: Two second pending connection timeout prevents connection to devices with long advertising interval
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <29147022-D6EA-4FEA-866C-4F296879FEBC@metanate.com>
+Date: Thu, 1 Sep 2016 07:04:24 -0700
+Cc: "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+        Johan Hedberg <johan.hedberg@intel.com>
+Message-Id: <91B9DFD1-C4E4-4E95-9053-7737F0ED61E7@holtmann.org>
+References: <B0B1991C-FD3E-4E08-9641-DE745A6EC690@metanate.com> <9942937A-4799-4AA2-9551-8FEBF110550B@holtmann.org> <D938EDFC-0164-4B3D-86C6-DAC2FE269367@metanate.com> <2A4D0751-61E7-430F-BEE5-9254A6D8E7CC@holtmann.org> <29147022-D6EA-4FEA-866C-4F296879FEBC@metanate.com>
+To: Northfield Stuart <stu@metanate.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Marcel Holtmann <marcel@holtmann.org>
+Hi Stu,
 
-This command is used to retrieve the current state and basic
-information of a controller. It is typically used right after
-getting the response to the Read Controller Index List command
-or an Index Added event (or its extended counterparts).
+>> The problem here is that we have to make this fly without harming any other user of the system. One peripheral should not block all the rest. And the problem here is really the re-connection time of for example a HID device where low-latency is what counts.
+> 
+> Understood.
+> 
+>> One solution would be to keep the long timeout with HCI_LE_Create_Connection if we have controllers that allow us to keep scanning. Meaning a combination of Passive Scanning State and Initiating State. This is something we need to find out with trial and error and see if it can be done.
+>> 
+>> As a background here. Currently we stop scanning when we see a device we need to connect to, then connect to it. And if there are other devices on the "to be connected" list, we enable scanning after successful or failure of the connection attempt.
+> 
+> Presumably this is per controller rather than global across controllers? One thing I forgot to mention is that some of our infrastructure code is capable of using multiple BLE controllers and (I guess due to the above) we usually keep one controller scanning while using the other(s) for connections. (NB I personally didn’t write any of this linux application code - I was merely tasked with investigating the 2s connection attempt termination issue.)
 
-When any of the values in the EIR_Data field changes, the event
-Extended Controller Information Changed will be used to inform
-clients about the updated information.
+in Linux every controller / radio is treated independently. For all I care you can attach 64k to a system. That is really the only limit :)
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
----
- include/net/bluetooth/hci.h  |  1 +
- include/net/bluetooth/mgmt.h | 18 +++++++++++++
- net/bluetooth/mgmt.c         | 62 ++++++++++++++++++++++++++++++++++++++++++--
- 3 files changed, 79 insertions(+), 2 deletions(-)
+I mean in theory we can always go with a super long timeout. However if the controller supports passive scanning and initiating state at the same time, we should use it. Limited controllers are limited. That's just it. If they are supporting it, then we should use it to make it low-latency if possible.
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index ddb9acc..99aa5e5 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -208,6 +208,7 @@ enum {
- 	HCI_MGMT_INDEX_EVENTS,
- 	HCI_MGMT_UNCONF_INDEX_EVENTS,
- 	HCI_MGMT_EXT_INDEX_EVENTS,
-+	HCI_MGMT_EXT_INFO_EVENTS,
- 	HCI_MGMT_OPTION_EVENTS,
- 	HCI_MGMT_SETTING_EVENTS,
- 	HCI_MGMT_DEV_CLASS_EVENTS,
-diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-index 7647964..611b243 100644
---- a/include/net/bluetooth/mgmt.h
-+++ b/include/net/bluetooth/mgmt.h
-@@ -586,6 +586,18 @@ struct mgmt_rp_get_adv_size_info {
- 
- #define MGMT_OP_START_LIMITED_DISCOVERY	0x0041
- 
-+#define MGMT_OP_READ_EXT_INFO		0x0042
-+#define MGMT_READ_EXT_INFO_SIZE		0
-+struct mgmt_rp_read_ext_info {
-+	bdaddr_t bdaddr;
-+	__u8     version;
-+	__le16   manufacturer;
-+	__le32   supported_settings;
-+	__le32   current_settings;
-+	__le16   eir_len;
-+	__u8     eir[0];
-+} __packed;
-+
- #define MGMT_EV_CMD_COMPLETE		0x0001
- struct mgmt_ev_cmd_complete {
- 	__le16	opcode;
-@@ -800,3 +812,9 @@ struct mgmt_ev_advertising_added {
- struct mgmt_ev_advertising_removed {
- 	__u8    instance;
- } __packed;
-+
-+#define MGMT_EV_EXT_INFO_CHANGED	0x0025
-+struct mgmt_ev_ext_info_changed {
-+	__le16	eir_len;
-+	__u8	eir[0];
-+} __packed;
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 47efdb4..69001f4 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -104,6 +104,7 @@ static const u16 mgmt_commands[] = {
- 	MGMT_OP_REMOVE_ADVERTISING,
- 	MGMT_OP_GET_ADV_SIZE_INFO,
- 	MGMT_OP_START_LIMITED_DISCOVERY,
-+	MGMT_OP_READ_EXT_INFO,
- };
- 
- static const u16 mgmt_events[] = {
-@@ -141,6 +142,7 @@ static const u16 mgmt_events[] = {
- 	MGMT_EV_LOCAL_OOB_DATA_UPDATED,
- 	MGMT_EV_ADVERTISING_ADDED,
- 	MGMT_EV_ADVERTISING_REMOVED,
-+	MGMT_EV_EXT_INFO_CHANGED,
- };
- 
- static const u16 mgmt_untrusted_commands[] = {
-@@ -149,6 +151,7 @@ static const u16 mgmt_untrusted_commands[] = {
- 	MGMT_OP_READ_UNCONF_INDEX_LIST,
- 	MGMT_OP_READ_CONFIG_INFO,
- 	MGMT_OP_READ_EXT_INDEX_LIST,
-+	MGMT_OP_READ_EXT_INFO,
- };
- 
- static const u16 mgmt_untrusted_events[] = {
-@@ -162,6 +165,7 @@ static const u16 mgmt_untrusted_events[] = {
- 	MGMT_EV_NEW_CONFIG_OPTIONS,
- 	MGMT_EV_EXT_INDEX_ADDED,
- 	MGMT_EV_EXT_INDEX_REMOVED,
-+	MGMT_EV_EXT_INFO_CHANGED,
- };
- 
- #define CACHE_TIMEOUT	msecs_to_jiffies(2 * 1000)
-@@ -862,6 +866,52 @@ static int read_controller_info(struct sock *sk, struct hci_dev *hdev,
- 				 sizeof(rp));
- }
- 
-+static int read_ext_controller_info(struct sock *sk, struct hci_dev *hdev,
-+				    void *data, u16 data_len)
-+{
-+	struct mgmt_rp_read_ext_info rp;
-+
-+	BT_DBG("sock %p %s", sk, hdev->name);
-+
-+	hci_dev_lock(hdev);
-+
-+	memset(&rp, 0, sizeof(rp));
-+
-+	bacpy(&rp.bdaddr, &hdev->bdaddr);
-+
-+	rp.version = hdev->hci_ver;
-+	rp.manufacturer = cpu_to_le16(hdev->manufacturer);
-+
-+	rp.supported_settings = cpu_to_le32(get_supported_settings(hdev));
-+	rp.current_settings = cpu_to_le32(get_current_settings(hdev));
-+
-+	rp.eir_len = cpu_to_le16(0);
-+
-+	hci_dev_unlock(hdev);
-+
-+	/* If this command is called at least once, then the events
-+	 * for class of device and local name changes are disabled
-+	 * and only the new extended controller information event
-+	 * is used.
-+	 */
-+	hci_sock_set_flag(sk, HCI_MGMT_EXT_INFO_EVENTS);
-+	hci_sock_clear_flag(sk, HCI_MGMT_DEV_CLASS_EVENTS);
-+	hci_sock_clear_flag(sk, HCI_MGMT_LOCAL_NAME_EVENTS);
-+
-+	return mgmt_cmd_complete(sk, hdev->id, MGMT_OP_READ_EXT_INFO, 0, &rp,
-+				 sizeof(rp));
-+}
-+
-+static int ext_info_changed(struct hci_dev *hdev, struct sock *skip)
-+{
-+	struct mgmt_ev_ext_info_changed ev;
-+
-+	ev.eir_len = cpu_to_le16(0);
-+
-+	return mgmt_limited_event(MGMT_EV_EXT_INFO_CHANGED, hdev, &ev,
-+				  sizeof(ev), HCI_MGMT_EXT_INFO_EVENTS, skip);
-+}
-+
- static int send_settings_rsp(struct sock *sk, u16 opcode, struct hci_dev *hdev)
- {
- 	__le32 settings = cpu_to_le32(get_current_settings(hdev));
-@@ -2995,6 +3045,7 @@ static int set_local_name(struct sock *sk, struct hci_dev *hdev, void *data,
- 
- 		err = mgmt_limited_event(MGMT_EV_LOCAL_NAME_CHANGED, hdev, data,
- 					 len, HCI_MGMT_LOCAL_NAME_EVENTS, sk);
-+		ext_info_changed(hdev, sk);
- 
- 		goto failed;
- 	}
-@@ -6356,6 +6407,8 @@ static const struct hci_mgmt_handler mgmt_handlers[] = {
- 	{ remove_advertising,	   MGMT_REMOVE_ADVERTISING_SIZE },
- 	{ get_adv_size_info,       MGMT_GET_ADV_SIZE_INFO_SIZE },
- 	{ start_limited_discovery, MGMT_START_DISCOVERY_SIZE },
-+	{ read_ext_controller_info,MGMT_READ_EXT_INFO_SIZE,
-+						HCI_MGMT_UNTRUSTED },
- };
- 
- void mgmt_index_added(struct hci_dev *hdev)
-@@ -6494,10 +6547,12 @@ void __mgmt_power_off(struct hci_dev *hdev)
- 
- 	mgmt_pending_foreach(0, hdev, cmd_complete_rsp, &status);
- 
--	if (memcmp(hdev->dev_class, zero_cod, sizeof(zero_cod)) != 0)
-+	if (memcmp(hdev->dev_class, zero_cod, sizeof(zero_cod)) != 0) {
- 		mgmt_limited_event(MGMT_EV_CLASS_OF_DEV_CHANGED, hdev,
- 				   zero_cod, sizeof(zero_cod),
- 				   HCI_MGMT_DEV_CLASS_EVENTS, NULL);
-+		ext_info_changed(hdev, NULL);
-+	}
- 
- 	new_settings(hdev, match.sk);
- 
-@@ -7093,9 +7148,11 @@ void mgmt_set_class_of_dev_complete(struct hci_dev *hdev, u8 *dev_class,
- 	mgmt_pending_foreach(MGMT_OP_ADD_UUID, hdev, sk_lookup, &match);
- 	mgmt_pending_foreach(MGMT_OP_REMOVE_UUID, hdev, sk_lookup, &match);
- 
--	if (!status)
-+	if (!status) {
- 		mgmt_limited_event(MGMT_EV_CLASS_OF_DEV_CHANGED, hdev, dev_class,
- 				   3, HCI_MGMT_DEV_CLASS_EVENTS, NULL);
-+		ext_info_changed(hdev, NULL);
-+	}
- 
- 	if (match.sk)
- 		sock_put(match.sk);
-@@ -7126,6 +7183,7 @@ void mgmt_set_local_name_complete(struct hci_dev *hdev, u8 *name, u8 status)
- 
- 	mgmt_limited_event(MGMT_EV_LOCAL_NAME_CHANGED, hdev, &ev, sizeof(ev),
- 			   HCI_MGMT_LOCAL_NAME_EVENTS, cmd ? cmd->sk : NULL);
-+	ext_info_changed(hdev, cmd ? cmd->sk : NULL);
- }
- 
- static inline bool has_uuid(u8 *uuid, u16 uuid_count, u8 (*uuids)[16])
--- 
-2.7.4
+>> Essentially you want to change this into this:
+>> 
+>> a) Found device we want to connect to
+>> b) If more devices are on the auto-connect list, keep scanning, other disable scanning
+>> c) Send connect request and wait for its completion
+>> d) For the first 2 seconds that connect attempt is exclusive
+>> e) After that cancel it if we see another auto-connect device and try that device
+>> f) Start over
+>> 
+>> Similar things then apply to when to re-enable scanning after connection termination, but I doubt that will actually have to change.
+>> 
+>> What this means in simple term, only disable background scanning when the auto-connect list empty. Otherwise keep it active and let the controller deal with the two instances of state machines by itself.
+>> 
+>> Now we need to check if that would work or not. We have quirks like HCI_QUIRK_SIMULTANEOUS_DISCOVERY and this might need another one. Not sure if we want to go with blacklist or whitelist here. I would do blacklist and actually check the supported states. Since this is LE only, the controller should not lie to us.
+>> 
+>> If you want to work on this, then try this simple approach:
+>> 
+>> a) Read the supported states and extract support for passive scanning + initiating
+>> a) Use a long timeout
+>> b) Only disable scanning when no other device is left on auto-connect list
+>> 
+>> If this basically works, then the only other thing we have to do is be smart about concurrent connection. Meaning that a long running one can be cancelled and replaced with something we see in the 2-x second window. As I said above, the 0-2 second window should be exclusive to the first attempt. We can tune these values, it is just the 20 second one is killing low-latency reconnect by HID device.
+>> 
+>> However there is one case to be made that we might only consider direct advertising to be able to interrupt it. Which would satisfy the HID requirement with low-latency. The advantage here is that they are high duty cycle and would show up right away. So you are not really losing out on your slow-connection attempt.
+>> 
+>> But this idea really stands and falls with the passive scanning + initiating state support in the controller.
+> 
+> OK - I’ll investigate the controllers we have (we are using at least two different chipsets I believe, possibly three) and then have a go at this simple test - probably won’t be before next week at the moment (trying to get a new release candidate out at the moment) and it might take me a day or two to re-familiarise myself and get to grips with the code :)
+
+I took a random Broadcom dongle of the shelf and it seems to actually do fine with imitating state + passive scanning.
+
+Btw. this is your main entry point to look at:
+
+        /* If controller is scanning, we stop it since some controllers are
+         * not able to scan and connect at the same time. Also set the
+         * HCI_LE_SCAN_INTERRUPTED flag so that the command complete
+         * handler for scan disabling knows to set the correct discovery
+         * state.
+         */
+        if (hci_dev_test_flag(hdev, HCI_LE_SCAN)) {
+                hci_req_add_le_scan_disable(&req);
+                hci_dev_set_flag(hdev, HCI_LE_SCAN_INTERRUPTED);
+        }
+
+        hci_req_add_le_create_conn(&req, conn);
+
+It is not as easy as just adding extra checks around it. There is a bit more logic that needs handling. Mainly since just disabling scanning is not going to do it. You actually need to update the white list. So now the fun part is that if you can update the white list while scanning or do you need to stop scanning, update the white list and then restart scanning.
+
+I wonder if we should start using hci-tester to some new tool (via HCI User Channel) to allow us do a quick check on what the controller supports.
+
+Regards
+
+Marcel
+
