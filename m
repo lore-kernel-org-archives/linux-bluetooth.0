@@ -1,61 +1,35 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 2/2] core/gatt-client: Fix not return empty array for ReadValue
-Date: Fri,  2 Sep 2016 15:49:09 +0300
-Message-Id: <1472820549-1976-2-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1472820549-1976-1-git-send-email-luiz.dentz@gmail.com>
-References: <1472820549-1976-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 1/2] core/device: Fix attempting to connect to random address over BR/EDR
+Date: Fri,  2 Sep 2016 15:49:08 +0300
+Message-Id: <1472820549-1976-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-The response to ReadValue shall be an array which can be empty.
+BR/EDR don't have the concept of random addresses so the only option is
+to over LE in that case.
 ---
- src/gatt-client.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ src/device.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/src/gatt-client.c b/src/gatt-client.c
-index 2af6979..57a1f66 100644
---- a/src/gatt-client.c
-+++ b/src/gatt-client.c
-@@ -297,7 +297,7 @@ static void write_descriptor_cb(struct gatt_db_attribute *attr, int err,
- }
+diff --git a/src/device.c b/src/device.c
+index fb766d1..b8556f1 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -1748,6 +1748,10 @@ static uint8_t select_conn_bearer(struct btd_device *dev)
+ 	else if (!dev->bredr_state.bonded && dev->le_state.bonded)
+ 		return dev->bdaddr_type;
  
- static void async_dbus_op_reply(struct async_dbus_op *op, int err,
--				const uint8_t *value, size_t length)
-+				const uint8_t *value, ssize_t length)
- {
- 	const struct queue_entry *entry;
- 	DBusMessage *reply;
-@@ -319,7 +319,7 @@ static void async_dbus_op_reply(struct async_dbus_op *op, int err,
- 			return;
- 		}
- 
--		if (value)
-+		if (length >= 0)
- 			message_append_byte_array(reply, value, length);
- 
- send_reply:
-@@ -489,7 +489,7 @@ static void write_result_cb(bool success, bool reliable_error,
- 	}
- 
- done:
--	async_dbus_op_reply(op, err, NULL, 0);
-+	async_dbus_op_reply(op, err, NULL, -1);
- }
- 
- static void write_cb(bool success, uint8_t att_ecode, void *user_data)
-@@ -1126,7 +1126,7 @@ static void create_notify_reply(struct async_dbus_op *op, bool success,
- 	else
- 		err = att_ecode ? att_ecode : -ENOENT;
- 
--	async_dbus_op_reply(op, err, NULL, 0);
-+	async_dbus_op_reply(op, err, NULL, -1);
- }
- 
- static void register_notify_cb(uint16_t att_ecode, void *user_data)
++	/* If the address is private it can only be connected over LE */
++	if (device_address_is_private(dev))
++		return dev->bdaddr_type;
++
+ 	if (dev->bredr_seen) {
+ 		bredr_last = current - dev->bredr_seen;
+ 		if (bredr_last > SEEN_TRESHHOLD)
 -- 
 2.7.4
 
