@@ -1,69 +1,48 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Subject: Re: [PATCH 1/1] obexd/pbap: clear cache if name header is present
+From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-References: <1467295600-31828-1-git-send-email-biman.paul@samsung.com>
-Cc: Biman Paul <biman.paul@samsung.com>
-From: Biman Paul <biman.innovative@gmail.com>
-Message-ID: <99a3d381-3735-2e26-7df4-a4de550f070b@gmail.com>
-Date: Sun, 4 Sep 2016 12:20:07 +0530
-MIME-Version: 1.0
-In-Reply-To: <1467295600-31828-1-git-send-email-biman.paul@samsung.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+Subject: [PATCH] Bluetooth: Fix wrong New Settings event when closing HCI User Channel
+Date: Sun,  4 Sep 2016 05:13:46 +0200
+Message-Id: <1472958826-43347-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+When closing HCI User Channel, the New Settings event was send out to
+inform about changed settings. However such event is wrong since the
+exclusive HCI User Channel access is active until the Index Added event
+has been sent.
 
+@ USER Close: test
+@ MGMT Event: New Settings (0x0006) plen 4
+        Current settings: 0x00000ad0
+          Bondable
+          Secure Simple Pairing
+          BR/EDR
+          Low Energy
+          Secure Connections
+= Close Index: 00:14:EF:22:04:12
+@ MGMT Event: Index Added (0x0004) plen 0
 
-On Thursday 30 June 2016 07:36 PM, Biman Paul wrote:
-> Remote device is not able to fetch call logs from different folder.
-> It always returns the call logs requested in first request.
->
-> Considering a situation to fetch from och and then from cch,
-> there are two ways to request x-bt/vcard-listing:
-> Case I:
-> 1. SetPhoneBook to /telecom/och (absolute path)
-> 2. PullvCardListing with name header '' (empty)
-> Remote devices using this method always calls SetPhoneBook with absolute path
-> to set the path and we clear the cache when new path is set.
-> Case II:
-> 1. SetPhoneBook to /telecom (relative path)
-> 2. PullvCardListing with name header 'och'
-> Remote devices using this method calls SetPhoneBook with '/telecom' only once
-> and cache is not cleared when second PullvCardListing is made with name header.
-> This results in cached incorrect list sent to remote device.
->
-> Clear cache if name header is present would prevent sending of
-> cache list as it is not present. Instead it would request to
-> create new cache based on new name header.
-> ---
->  obexd/plugins/pbap.c |    9 +++++++--
->  1 file changed, 7 insertions(+), 2 deletions(-)
->
-> diff --git a/obexd/plugins/pbap.c b/obexd/plugins/pbap.c
-> index bab691c..ad93208 100644
-> --- a/obexd/plugins/pbap.c
-> +++ b/obexd/plugins/pbap.c
-> @@ -543,13 +543,18 @@ static int pbap_get(struct obex_session *os, void *user_data)
->
->  	} else if (g_ascii_strcasecmp(type, VCARDLISTING_TYPE) == 0) {
->  		/* Always relative */
-> -		if (!name || strlen(name) == 0)
-> +		if (!name || strlen(name) == 0) {
->  			/* Current folder */
->  			path = g_strdup(pbap->folder);
-> -		else
-> +		} else {
->  			/* Current folder + relative path */
->  			path = g_build_filename(pbap->folder, name, NULL);
->
-> +			/* clear cache */
-> +			pbap->cache.valid = FALSE;
-> +			pbap->cache.index = 0;
-> +			cache_clear(&pbap->cache);
-> +		}
->  	} else if (g_ascii_strcasecmp(type, VCARDENTRY_TYPE) == 0) {
->  		/* File name only */
->  		path = g_strdup(name);
->
+Calling __mgmt_power_off from hci_dev_do_close requires an extra check
+for an active HCI User Channel.
 
-Ping
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ net/bluetooth/hci_core.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index ddf8432fe8fb..3ac89e9ace71 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1562,6 +1562,7 @@ int hci_dev_do_close(struct hci_dev *hdev)
+ 	auto_off = hci_dev_test_and_clear_flag(hdev, HCI_AUTO_OFF);
+ 
+ 	if (!auto_off && hdev->dev_type == HCI_PRIMARY &&
++	    !hci_dev_test_flag(hdev, HCI_USER_CHANNEL) &&
+ 	    hci_dev_test_flag(hdev, HCI_MGMT))
+ 		__mgmt_power_off(hdev);
+ 
+-- 
+2.7.4
+
