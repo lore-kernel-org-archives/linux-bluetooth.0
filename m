@@ -1,50 +1,58 @@
-Return-Path: <jerome.debretagne@gmail.com>
-Message-ID: <1473111620.4063.29.camel@gmail.com>
-Subject: Re: btattach: auto triggering at boot time by Linux distributions
-From: =?ISO-8859-1?Q?J=E9r=F4me?= de Bretagne <jerome.debretagne@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Mon, 05 Sep 2016 23:40:20 +0200
-In-Reply-To: <72B34103-D15B-463B-B63B-8DD3CE99D712@holtmann.org>
-References: 
-	<CA+kEDGFm2jko+bC+DuPK1qQx5OXJZTXUj=aWdk+rm9RC8DDCOA@mail.gmail.com>
-	 <72B34103-D15B-463B-B63B-8DD3CE99D712@holtmann.org>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+MIME-Version: 1.0
+In-Reply-To: <20160905180241.GA29844@t440s.P-661HNU-F1>
+References: <1472820549-1976-1-git-send-email-luiz.dentz@gmail.com> <20160905180241.GA29844@t440s.P-661HNU-F1>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Mon, 5 Sep 2016 21:35:58 +0300
+Message-ID: <CABBYNZLTYBTV4NCvEjT6ysYUWjYSqbUWPwev_EUQvHh_O7x1Og@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/2] core/device: Fix attempting to connect to
+ random address over BR/EDR
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Johan,
 
-> the real evolution would be that we get a serial bus (as discussed a
-> few weeks ago) which then the UART kernel drivers can enumerate its
-> devices on.
+On Mon, Sep 5, 2016 at 9:02 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi Luiz,
+>
+> On Fri, Sep 02, 2016, Luiz Augusto von Dentz wrote:
+>> BR/EDR don't have the concept of random addresses so the only option is
+>> to over LE in that case.
+>> ---
+>>  src/device.c | 4 ++++
+>>  1 file changed, 4 insertions(+)
+>>
+>> diff --git a/src/device.c b/src/device.c
+>> index fb766d1..b8556f1 100644
+>> --- a/src/device.c
+>> +++ b/src/device.c
+>> @@ -1748,6 +1748,10 @@ static uint8_t select_conn_bearer(struct btd_device *dev)
+>>       else if (!dev->bredr_state.bonded && dev->le_state.bonded)
+>>               return dev->bdaddr_type;
+>>
+>> +     /* If the address is private it can only be connected over LE */
+>> +     if (device_address_is_private(dev))
+>> +             return dev->bdaddr_type;
+>> +
+>
+> This doesn't look right to me. The comment also isn't correct since a
+> dual mode device may use a resolvable private address for LE, i.e.
+> device_address_is_private(dev) would return true. IIRC the
+> dev->bdaddr_type value tells the LE address type when LE is supported.
 
-I've read this discussion, thanks for the pointer, and I've seen the
-latest patch set proposal from Rob Herring reusing the existing serio
-bus. 
+This is evaluated after checking if device is bonded, but it doesn't
+actually matter because this device object can only use the random
+address until it is resolved, if we later on resolve the address I
+suppose the object is updated with its identity address and the
+address type is changed to public.
 
-If I understood correctly, you would like to stop exposing /dev/ttyX
-for Bluetooth UART drivers in the long run. Would it mean that the
-user-space btattach will then be deprecated and the firmware loading
-will be moved into the kernel itself? Or another approach instead?
+> If LE is not supported then dev->bdaddr_type is BDADDR_BREDR.
 
-> Until then, you need an userspace part that triggers btattach with
-> the right hardware id on the right /dev/ttySx device node as soon as
-> it becomes available. So that means udev rules.
+But private addresses can only be used in LE, so
+device_address_is_private will only return true for LE.
 
-Great, I will investigate the udev rules direction.
-
->  However the problem is and always has been to figure out what
-> hardware is behind what /dev/ttySx. If you are lucky it is part of
-> ACPI tables or DT. If you are unlucky you need a DT overlay or
-> hardcode it.
-
-I faced that precise limitation when I was trying to find out what was
-the chipset ACPI ID on the ThinkPad 8 tablet, to guess which btattach
-parameter to use. And I don't remember finding it in the ACPI tables :(
-
-I fear I will have to hardcode it to get started, and then investigate
-the usage of a DT overlay in a second step.
-
-Regards,
-Jérôme
+-- 
+Luiz Augusto von Dentz
