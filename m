@@ -1,69 +1,56 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Date: Tue, 6 Sep 2016 07:57:42 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH BlueZ 1/2] core/device: Fix attempting to connect to
- random address over BR/EDR
-Message-ID: <20160906045742.GA6742@t440s.P-661HNU-F1>
-References: <1472820549-1976-1-git-send-email-luiz.dentz@gmail.com>
- <20160905180241.GA29844@t440s.P-661HNU-F1>
- <CABBYNZLTYBTV4NCvEjT6ysYUWjYSqbUWPwev_EUQvHh_O7x1Og@mail.gmail.com>
-MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <CABBYNZLTYBTV4NCvEjT6ysYUWjYSqbUWPwev_EUQvHh_O7x1Og@mail.gmail.com>
+Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
+Subject: Re: btattach: auto triggering at boot time by Linux distributions
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1473111620.4063.29.camel@gmail.com>
+Date: Mon, 5 Sep 2016 15:31:12 -0700
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <7D06FCA8-A64C-4437-BEE2-5BA0D1C2F030@holtmann.org>
+References: <CA+kEDGFm2jko+bC+DuPK1qQx5OXJZTXUj=aWdk+rm9RC8DDCOA@mail.gmail.com> <72B34103-D15B-463B-B63B-8DD3CE99D712@holtmann.org> <1473111620.4063.29.camel@gmail.com>
+To: =?utf-8?Q?J=C3=A9r=C3=B4me_de_Bretagne?=
+        <jerome.debretagne@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Jerome,
 
-On Mon, Sep 05, 2016, Luiz Augusto von Dentz wrote:
-> On Mon, Sep 5, 2016 at 9:02 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> > Hi Luiz,
-> >
-> > On Fri, Sep 02, 2016, Luiz Augusto von Dentz wrote:
-> >> BR/EDR don't have the concept of random addresses so the only option is
-> >> to over LE in that case.
-> >> ---
-> >>  src/device.c | 4 ++++
-> >>  1 file changed, 4 insertions(+)
-> >>
-> >> diff --git a/src/device.c b/src/device.c
-> >> index fb766d1..b8556f1 100644
-> >> --- a/src/device.c
-> >> +++ b/src/device.c
-> >> @@ -1748,6 +1748,10 @@ static uint8_t select_conn_bearer(struct btd_device *dev)
-> >>       else if (!dev->bredr_state.bonded && dev->le_state.bonded)
-> >>               return dev->bdaddr_type;
-> >>
-> >> +     /* If the address is private it can only be connected over LE */
-> >> +     if (device_address_is_private(dev))
-> >> +             return dev->bdaddr_type;
-> >> +
-> >
-> > This doesn't look right to me. The comment also isn't correct since a
-> > dual mode device may use a resolvable private address for LE, i.e.
-> > device_address_is_private(dev) would return true. IIRC the
-> > dev->bdaddr_type value tells the LE address type when LE is supported.
+>> the real evolution would be that we get a serial bus (as discussed a
+>> few weeks ago) which then the UART kernel drivers can enumerate its
+>> devices on.
 > 
-> This is evaluated after checking if device is bonded, but it doesn't
-> actually matter because this device object can only use the random
-> address until it is resolved, if we later on resolve the address I
-> suppose the object is updated with its identity address and the
-> address type is changed to public.
-
-If that's the case then you're right that the patch shouldn't break
-anything. The comment is still confusing though.
-
-> > If LE is not supported then dev->bdaddr_type is BDADDR_BREDR.
+> I've read this discussion, thanks for the pointer, and I've seen the
+> latest patch set proposal from Rob Herring reusing the existing serio
+> bus. 
 > 
-> But private addresses can only be used in LE, so
-> device_address_is_private will only return true for LE.
+> If I understood correctly, you would like to stop exposing /dev/ttyX
+> for Bluetooth UART drivers in the long run. Would it mean that the
+> user-space btattach will then be deprecated and the firmware loading
+> will be moved into the kernel itself? Or another approach instead?
 
-Why specifically private addresses and not random addresses in general?
-The latter can be checked with dev->bdaddr_type == BDADDR_LE_RANDOM,
-which is more lightweight than calling device_address_is_private().
-Also, if your intention is to check for devices not supporting BR/EDR
-then why don't you just check for !dev->bredr?
+firmware loading is already in the kernel. At least for Broadcom and Intel based devices.
 
-Johan
+>> Until then, you need an userspace part that triggers btattach with
+>> the right hardware id on the right /dev/ttySx device node as soon as
+>> it becomes available. So that means udev rules.
+> 
+> Great, I will investigate the udev rules direction.
+> 
+>> However the problem is and always has been to figure out what
+>> hardware is behind what /dev/ttySx. If you are lucky it is part of
+>> ACPI tables or DT. If you are unlucky you need a DT overlay or
+>> hardcode it.
+> 
+> I faced that precise limitation when I was trying to find out what was
+> the chipset ACPI ID on the ThinkPad 8 tablet, to guess which btattach
+> parameter to use. And I don't remember finding it in the ACPI tables :(
+> 
+> I fear I will have to hardcode it to get started, and then investigate
+> the usage of a DT overlay in a second step.
+
+I do not have the ACPI tables available, but the kernel drivers will map the ACPI ID. So if you look into hci_bcm.c or hci_intel.c you should find the ones. Each chip should have a new ACPI ID on Intel platforms.
+
+Regards
+
+Marcel
+
