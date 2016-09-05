@@ -1,83 +1,49 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <99a3d381-3735-2e26-7df4-a4de550f070b@gmail.com>
-References: <1467295600-31828-1-git-send-email-biman.paul@samsung.com> <99a3d381-3735-2e26-7df4-a4de550f070b@gmail.com>
+In-Reply-To: <1472820549-1976-1-git-send-email-luiz.dentz@gmail.com>
+References: <1472820549-1976-1-git-send-email-luiz.dentz@gmail.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 5 Sep 2016 15:17:56 +0300
-Message-ID: <CABBYNZKVjGRZvvpwtefgH=XaQ2K-BFSdGc78AwzeJNn0gN67Qw@mail.gmail.com>
-Subject: Re: [PATCH 1/1] obexd/pbap: clear cache if name header is present
-To: Biman Paul <biman.innovative@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Biman Paul <biman.paul@samsung.com>
+Date: Mon, 5 Sep 2016 12:46:41 +0300
+Message-ID: <CABBYNZJ08sBdsGRzi7QTrzGDgf1XWymv9OSiuCXA58qc=vZEVA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/2] core/device: Fix attempting to connect to
+ random address over BR/EDR
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Paul,
+Hi,
 
-On Sun, Sep 4, 2016 at 9:50 AM, Biman Paul <biman.innovative@gmail.com> wrote:
+On Fri, Sep 2, 2016 at 3:49 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 >
+> BR/EDR don't have the concept of random addresses so the only option is
+> to over LE in that case.
+> ---
+>  src/device.c | 4 ++++
+>  1 file changed, 4 insertions(+)
 >
-> On Thursday 30 June 2016 07:36 PM, Biman Paul wrote:
->>
->> Remote device is not able to fetch call logs from different folder.
->> It always returns the call logs requested in first request.
->>
->> Considering a situation to fetch from och and then from cch,
->> there are two ways to request x-bt/vcard-listing:
->> Case I:
->> 1. SetPhoneBook to /telecom/och (absolute path)
->> 2. PullvCardListing with name header '' (empty)
->> Remote devices using this method always calls SetPhoneBook with absolute
->> path
->> to set the path and we clear the cache when new path is set.
->> Case II:
->> 1. SetPhoneBook to /telecom (relative path)
->> 2. PullvCardListing with name header 'och'
->> Remote devices using this method calls SetPhoneBook with '/telecom' only
->> once
->> and cache is not cleared when second PullvCardListing is made with name
->> header.
->> This results in cached incorrect list sent to remote device.
->>
->> Clear cache if name header is present would prevent sending of
->> cache list as it is not present. Instead it would request to
->> create new cache based on new name header.
->> ---
->>  obexd/plugins/pbap.c |    9 +++++++--
->>  1 file changed, 7 insertions(+), 2 deletions(-)
->>
->> diff --git a/obexd/plugins/pbap.c b/obexd/plugins/pbap.c
->> index bab691c..ad93208 100644
->> --- a/obexd/plugins/pbap.c
->> +++ b/obexd/plugins/pbap.c
->> @@ -543,13 +543,18 @@ static int pbap_get(struct obex_session *os, void
->> *user_data)
->>
->>         } else if (g_ascii_strcasecmp(type, VCARDLISTING_TYPE) == 0) {
->>                 /* Always relative */
->> -               if (!name || strlen(name) == 0)
->> +               if (!name || strlen(name) == 0) {
->>                         /* Current folder */
->>                         path = g_strdup(pbap->folder);
->> -               else
->> +               } else {
->>                         /* Current folder + relative path */
->>                         path = g_build_filename(pbap->folder, name, NULL);
->>
->> +                       /* clear cache */
->> +                       pbap->cache.valid = FALSE;
->> +                       pbap->cache.index = 0;
->> +                       cache_clear(&pbap->cache);
->> +               }
->>         } else if (g_ascii_strcasecmp(type, VCARDENTRY_TYPE) == 0) {
->>                 /* File name only */
->>                 path = g_strdup(name);
->>
+> diff --git a/src/device.c b/src/device.c
+> index fb766d1..b8556f1 100644
+> --- a/src/device.c
+> +++ b/src/device.c
+> @@ -1748,6 +1748,10 @@ static uint8_t select_conn_bearer(struct btd_device *dev)
+>         else if (!dev->bredr_state.bonded && dev->le_state.bonded)
+>                 return dev->bdaddr_type;
 >
-> Ping
+> +       /* If the address is private it can only be connected over LE */
+> +       if (device_address_is_private(dev))
+> +               return dev->bdaddr_type;
+> +
+>         if (dev->bredr_seen) {
+>                 bredr_last = current - dev->bredr_seen;
+>                 if (bredr_last > SEEN_TRESHHOLD)
+> --
+> 2.7.4
 
-Applied, thanks.
+Applied.
+
 
 -- 
 Luiz Augusto von Dentz
