@@ -1,18 +1,33 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Travis Griggs <travisgriggs@gmail.com>
 Content-Type: text/plain; charset=us-ascii
-Subject: Query BLE connected status?
-Message-Id: <04AC5786-517A-4834-AFD7-B0C6AC29B869@gmail.com>
-Date: Tue, 6 Sep 2016 11:20:21 -0700
-To: linux-bluetooth@vger.kernel.org
 Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
+Subject: Re: [PATCH] Bluetooth: btqca: remove null checks on edl->data as it is an array
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20160906121549.14144-1-colin.king@canonical.com>
+Date: Tue, 6 Sep 2016 20:01:46 +0200
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+        linux-kernel@vger.kernel.org
+Message-Id: <002919CC-E907-4A9D-AF4D-B26538000079@holtmann.org>
+References: <20160906121549.14144-1-colin.king@canonical.com>
+To: Colin King <colin.king@canonical.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Is there a method using the dbus API that one can use to determine if =
-there is an active BLE connection or not? I have an ARM Linux board =
-setup as a BLE peripheral, and I want another process to behave =
-differently based on whether it can determine there is an active =
-connection at the moment or not. I could set a timestamp based on when I =
-see WriteValue or other ble dbus activity and then timeout on that, but =
-I was hoping for something more direct.=
+Hi Colin,
+
+> edl->data is an array of __u8 so the null check is unneccessary,
+> so remove it.
+> 
+> Signed-off-by: Colin Ian King <colin.king@canonical.com>
+> ---
+> drivers/bluetooth/btqca.c | 8 ++++----
+> 1 file changed, 4 insertions(+), 4 deletions(-)
+
+patch has been applied to bluetooth-next tree.
+
+Regards
+
+Marcel
+
