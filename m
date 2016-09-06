@@ -1,33 +1,28 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
-Subject: Re: [PATCH] Bluetooth: btqca: remove null checks on edl->data as it is an array
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20160906121549.14144-1-colin.king@canonical.com>
-Date: Tue, 6 Sep 2016 20:01:46 +0200
-Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-        linux-kernel@vger.kernel.org
-Message-Id: <002919CC-E907-4A9D-AF4D-B26538000079@holtmann.org>
-References: <20160906121549.14144-1-colin.king@canonical.com>
-To: Colin King <colin.king@canonical.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+From: Marco Trapanese <marcotrapanese@gmail.com>
+Subject: BLE disconnects after BT pairing failed
+Message-ID: <92fef3ec-799a-ada8-2af5-fd0d55bdf099@gmail.com>
+Date: Tue, 6 Sep 2016 16:26:04 +0200
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-15; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Colin,
+Linux Raspbian Jessie Lite, Bluez 5.40. I have a GATT server and my own 
+agent for incoming "standard" bluetooth connections (i.e. A2DP).
 
-> edl->data is an array of __u8 so the null check is unneccessary,
-> so remove it.
-> 
-> Signed-off-by: Colin Ian King <colin.king@canonical.com>
-> ---
-> drivers/bluetooth/btqca.c | 8 ++++----
-> 1 file changed, 4 insertions(+), 4 deletions(-)
+I can successfully "connect" to the GATT server, but if the user doesn't 
+accept the pairing confirmation (from the BT) I receive this error:
 
-patch has been applied to bluetooth-next tree.
+    qt.bluetooth.bluez: Failed to create pairing
+    "org.freedesktop.DBus.Error.NoReply"
 
-Regards
+as expected, but after a couple of seconds also the BLE connection will 
+drop. I wonder if it's the correct behavior. I thought the BLE and BT 
+connections are indipendent each other.
 
-Marcel
+
+Best refards!
+Marco
 
