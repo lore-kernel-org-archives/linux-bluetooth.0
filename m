@@ -1,44 +1,69 @@
-Return-Path: <johan.hedberg@gmail.com>
-Date: Tue, 6 Sep 2016 12:21:48 +0300
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Date: Tue, 6 Sep 2016 07:57:42 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Fix wrong New Settings event when closing HCI
- User Channel
-Message-ID: <20160906092148.GA17371@t440s.lan>
-References: <1472958826-43347-1-git-send-email-marcel@holtmann.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH BlueZ 1/2] core/device: Fix attempting to connect to
+ random address over BR/EDR
+Message-ID: <20160906045742.GA6742@t440s.P-661HNU-F1>
+References: <1472820549-1976-1-git-send-email-luiz.dentz@gmail.com>
+ <20160905180241.GA29844@t440s.P-661HNU-F1>
+ <CABBYNZLTYBTV4NCvEjT6ysYUWjYSqbUWPwev_EUQvHh_O7x1Og@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1472958826-43347-1-git-send-email-marcel@holtmann.org>
+In-Reply-To: <CABBYNZLTYBTV4NCvEjT6ysYUWjYSqbUWPwev_EUQvHh_O7x1Og@mail.gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Luiz,
 
-On Sun, Sep 04, 2016, Marcel Holtmann wrote:
-> When closing HCI User Channel, the New Settings event was send out to
-> inform about changed settings. However such event is wrong since the
-> exclusive HCI User Channel access is active until the Index Added event
-> has been sent.
+On Mon, Sep 05, 2016, Luiz Augusto von Dentz wrote:
+> On Mon, Sep 5, 2016 at 9:02 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> > Hi Luiz,
+> >
+> > On Fri, Sep 02, 2016, Luiz Augusto von Dentz wrote:
+> >> BR/EDR don't have the concept of random addresses so the only option is
+> >> to over LE in that case.
+> >> ---
+> >>  src/device.c | 4 ++++
+> >>  1 file changed, 4 insertions(+)
+> >>
+> >> diff --git a/src/device.c b/src/device.c
+> >> index fb766d1..b8556f1 100644
+> >> --- a/src/device.c
+> >> +++ b/src/device.c
+> >> @@ -1748,6 +1748,10 @@ static uint8_t select_conn_bearer(struct btd_device *dev)
+> >>       else if (!dev->bredr_state.bonded && dev->le_state.bonded)
+> >>               return dev->bdaddr_type;
+> >>
+> >> +     /* If the address is private it can only be connected over LE */
+> >> +     if (device_address_is_private(dev))
+> >> +             return dev->bdaddr_type;
+> >> +
+> >
+> > This doesn't look right to me. The comment also isn't correct since a
+> > dual mode device may use a resolvable private address for LE, i.e.
+> > device_address_is_private(dev) would return true. IIRC the
+> > dev->bdaddr_type value tells the LE address type when LE is supported.
 > 
-> @ USER Close: test
-> @ MGMT Event: New Settings (0x0006) plen 4
->         Current settings: 0x00000ad0
->           Bondable
->           Secure Simple Pairing
->           BR/EDR
->           Low Energy
->           Secure Connections
-> = Close Index: 00:14:EF:22:04:12
-> @ MGMT Event: Index Added (0x0004) plen 0
-> 
-> Calling __mgmt_power_off from hci_dev_do_close requires an extra check
-> for an active HCI User Channel.
-> 
-> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-> ---
->  net/bluetooth/hci_core.c | 1 +
->  1 file changed, 1 insertion(+)
+> This is evaluated after checking if device is bonded, but it doesn't
+> actually matter because this device object can only use the random
+> address until it is resolved, if we later on resolve the address I
+> suppose the object is updated with its identity address and the
+> address type is changed to public.
 
-Applied to bluetooth-next. Thanks.
+If that's the case then you're right that the patch shouldn't break
+anything. The comment is still confusing though.
+
+> > If LE is not supported then dev->bdaddr_type is BDADDR_BREDR.
+> 
+> But private addresses can only be used in LE, so
+> device_address_is_private will only return true for LE.
+
+Why specifically private addresses and not random addresses in general?
+The latter can be checked with dev->bdaddr_type == BDADDR_LE_RANDOM,
+which is more lightweight than calling device_address_is_private().
+Also, if your intention is to check for devices not supporting BR/EDR
+then why don't you just check for !dev->bredr?
 
 Johan
