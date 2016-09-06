@@ -1,52 +1,37 @@
-Return-Path: <colin.king@canonical.com>
-From: Colin King <colin.king@canonical.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
-Subject: [PATCH] Bluetooth: btqca: remove null checks on edl->data as it is an array
-Date: Tue,  6 Sep 2016 13:15:49 +0100
-Message-Id: <20160906121549.14144-1-colin.king@canonical.com>
-MIME-Version: 1.0
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Amith Raghunath <Amith.Raghunath@mindtree.com>
+To: Alexander Aring <alex.aring@gmail.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        linux-wpan - ML <linux-wpan@vger.kernel.org>
+Subject: RE: Regarding IPSP over GATT Support in blueZ
+Date: Tue, 6 Sep 2016 11:50:14 +0000
+Message-ID: <MAXPR01MB02183664D9BD360723CD0B3190F90@MAXPR01MB0218.INDPRD01.PROD.OUTLOOK.COM>
+References: <MAXPR01MB0218AF3FE3A6214F17D9047090ED0@MAXPR01MB0218.INDPRD01.PROD.OUTLOOK.COM>
+ <CABBYNZLLpO0TcozFuvorwCZOOAKr=96NJhZBoLxjeUgdM+G2UA@mail.gmail.com>
+ <MAXPR01MB0218E7395A5709B7785514FC90E20@MAXPR01MB0218.INDPRD01.PROD.OUTLOOK.COM>
+ <CAB_54W4k7MBVSfp07nbhb8ugwCbX1w_DwmUQamqoY6DiVEiD=A@mail.gmail.com>
+ <CAB_54W6jaFDqzCwUOqRJsBV5AWU+Fa0OPiXHeUg5UOeT1qFomw@mail.gmail.com>
+In-Reply-To: <CAB_54W6jaFDqzCwUOqRJsBV5AWU+Fa0OPiXHeUg5UOeT1qFomw@mail.gmail.com>
 Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Colin Ian King <colin.king@canonical.com>
-
-edl->data is an array of __u8 so the null check is unneccessary,
-so remove it.
-
-Signed-off-by: Colin Ian King <colin.king@canonical.com>
----
- drivers/bluetooth/btqca.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
-index 4a62081..28afd5d 100644
---- a/drivers/bluetooth/btqca.c
-+++ b/drivers/bluetooth/btqca.c
-@@ -55,8 +55,8 @@ static int rome_patch_ver_req(struct hci_dev *hdev, u32 *rome_version)
- 	}
- 
- 	edl = (struct edl_event_hdr *)(skb->data);
--	if (!edl || !edl->data) {
--		BT_ERR("%s: TLV with no header or no data", hdev->name);
-+	if (!edl) {
-+		BT_ERR("%s: TLV with no header", hdev->name);
- 		err = -EILSEQ;
- 		goto out;
- 	}
-@@ -224,8 +224,8 @@ static int rome_tlv_send_segment(struct hci_dev *hdev, int idx, int seg_size,
- 	}
- 
- 	edl = (struct edl_event_hdr *)(skb->data);
--	if (!edl || !edl->data) {
--		BT_ERR("%s: TLV with no header or no data", hdev->name);
-+	if (!edl) {
-+		BT_ERR("%s: TLV with no header", hdev->name);
- 		err = -EILSEQ;
- 		goto out;
- 	}
--- 
-2.9.3
+SGkgQWxleCwNCg0KPiAyMDE2LTA5LTA0IDIwOjEzIEdNVCswMjowMCBBbGV4YW5kZXIgQXJpbmcg
+PGFsZXguYXJpbmdAeHh4eHh4eHh4PjoNCj4+DQo+PiAyMDE2LTA5LTAxIDE3OjQ5IEdNVCswMjow
+MCBBbWl0aCBSYWdodW5hdGggPEFtaXRoLlJhZ2h1bmF0aEB4eHh4eHh4eHg+Og0KPj4+DQo+Pj4N
+Cj4+PiAxLiBUaGUgNkxCUiBoYXMgdG8gZm9yd2FyZCB0aGUgcGFja2V0cyBzZW50IGJ5IG9uZSBu
+b2RlIHRvIGFub3RoZXIgbm9kZSBiYXNlZCBvbiB0aGUgbGluay1sb2NhbCBhZGRyZXNzLiBJcyB0
+aGlzIHNjZW5hcmlvIHN1cHBvcnRlZCBpbiB0aGUgcHJlc2VudCBjb2RlIGJhc2UgPw0KPj4NCj4+
+DQo+PiBzbyBmYXIgSSBrbm93LCBuby4NCj4+DQoNCkluIFJGQzc2NjggaXQgc3RhdGVzIHRoYXQg
+IiA2TE5zIGNvbm5lY3RlZCB0byB0aGUgc2FtZSA2TEJSIGhhdmUgdG8gY29tbXVuaWNhdGUgd2l0
+aCBlYWNoIG90aGVyIGJ5DQp1c2luZyB0aGUgc2hhcmVkIHByZWZpeCB1c2VkIG9uIHRoZSBzdWJu
+ZXQuIg0KSXQgaXMgbm90IHRoZSBsaW5rLWxvY2FsIGFkZHJlc3MgdGhhdCB3YXMgcmVmZXJyaW5n
+IHRvIGluIHRoZSBlYXJsaWVyIHF1ZXJ5LCBraW5kbHkgbGV0IG1lIGtub3cgd2hldGhlciB0aGlz
+IHNoYXJlZCBwcmVmaXggZmVhdHVyZSBhbmQgdGhlIDZMQlIgcm91dGluZyBtZWNoYW5pc20gYmFz
+ZWQgb24gdGhpcyBzaGFyZWQgcHJlZml4IGlzIHlldCB0byBiZSBpbXBsZW1lbnRlZC4gSSBjaGVj
+a2VkIHRoZSBuZXQvYmx1ZXRvb3RoLzZsb3dwYW4uYyBvZiBsaW51eCBrZXJuZWwgNC43LjEsIGNv
+dWxkIG5vdCBmaW5kIHRoaXMgZmVhdHVyZS4gVGhpcyB3b3VsZCBiZSByZXF1aXJlZCB0byBzdXBw
+b3J0IHRoZSAiSXNvbGF0ZWQgQmx1ZXRvb3RoIExFIE5ldHdvcmsiIHRvcG9sb2d5Lg0KDQoNCg0K
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18NCg0KaHR0cDovL3d3dy5taW5kdHJlZS5j
+b20vZW1haWwvZGlzY2xhaW1lci5odG1sDQo=
