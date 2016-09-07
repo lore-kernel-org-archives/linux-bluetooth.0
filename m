@@ -2,33 +2,46 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Szymon Janc <szymon.janc@codecoup.pl>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@codecoup.pl>
-Subject: [PATCH] Bluetooth: Increment management interface revision
-Date: Wed,  7 Sep 2016 23:04:46 +0200
-Message-Id: <1473282286-8990-1-git-send-email-szymon.janc@codecoup.pl>
+Subject: [PATCH 5/5] tools/btmgmt: Add support for scan rsp flags in add advertising
+Date: Wed,  7 Sep 2016 22:57:47 +0200
+Message-Id: <1473281867-8560-5-git-send-email-szymon.janc@codecoup.pl>
+In-Reply-To: <1473281867-8560-1-git-send-email-szymon.janc@codecoup.pl>
+References: <1473281867-8560-1-git-send-email-szymon.janc@codecoup.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Increment the mgmt revision due to the recently added
-Read Extended Controller Information and Set Appearance commands.
-
-Signed-off-by: Szymon Janc <szymon.janc@codecoup.pl>
+This allows to set local-name and appearance flags for add advertising
+command.
 ---
- net/bluetooth/mgmt.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ tools/btmgmt.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 9be23b5..4197fc9 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -38,7 +38,7 @@
- #include "mgmt_util.h"
- 
- #define MGMT_VERSION	1
--#define MGMT_REVISION	13
-+#define MGMT_REVISION	14
- 
- static const u16 mgmt_commands[] = {
- 	MGMT_OP_READ_INDEX_LIST,
+diff --git a/tools/btmgmt.c b/tools/btmgmt.c
+index 38e959f..43b73f2 100644
+--- a/tools/btmgmt.c
++++ b/tools/btmgmt.c
+@@ -4071,6 +4071,8 @@ static void add_adv_usage(void)
+ 		"\t -c, --connectable         \"connectable\" flag\n"
+ 		"\t -g, --general-discov      \"general-discoverable\" flag\n"
+ 		"\t -l, --limited-discov      \"limited-discoverable\" flag\n"
++		"\t -n, --scan-rsp-local-name \"local-name\" flag\n"
++		"\t -a, --scan-rsp-appearance \"appearance\" flag\n"
+ 		"\t -m, --managed-flags       \"managed-flags\" flag\n"
+ 		"\t -p, --tx-power            \"tx-power\" flag\n"
+ 		"e.g.:\n"
+@@ -4231,6 +4233,12 @@ static void cmd_add_adv(struct mgmt *mgmt, uint16_t index,
+ 		case 'p':
+ 			flags |= MGMT_ADV_FLAG_TX_POWER;
+ 			break;
++		case 'n':
++			flags |= MGMT_ADV_FLAG_LOCAL_NAME;
++			break;
++		case 'a':
++			flags |= MGMT_ADV_FLAG_APPEARANCE;
++			break;
+ 		case 'h':
+ 			success = true;
+ 		default:
 -- 
 2.7.4
 
