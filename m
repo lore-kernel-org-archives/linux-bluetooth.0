@@ -1,123 +1,177 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: "Montague, Jay" <jmontague@tycoint.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: bluez bluetooth problem
-Date: Wed, 7 Sep 2016 15:05:01 +0000
-Message-ID: <9F3DE92910DE1D4697DD7D6F2FB4FDDC25A15990@003FCH1MPN5-071.003f.mgd2.msft.net>
-Content-Type: text/plain; charset="iso-8859-1"
-MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
+Subject: Re: [PATCH v1 3/4] Bluetooth: BCSP fails to ACK re-transmitted frames from the peer
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1473257710-2073-4-git-send-email-Dean_Jenkins@mentor.com>
+Date: Wed, 7 Sep 2016 15:22:17 +0100
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-bluetooth@vger.kernel.org
+Message-Id: <09CFA74F-BCE6-4627-A318-E18B3BCEBE07@holtmann.org>
+References: <1473257710-2073-1-git-send-email-Dean_Jenkins@mentor.com> <1473257710-2073-4-git-send-email-Dean_Jenkins@mentor.com>
+To: Dean Jenkins <Dean_Jenkins@mentor.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Dear Bluez,
+Hi Dean,
 
-I am having a problem that I wondered whether you could help me with?
+> Send an ACK frame with the current txack value in response to
+> every received reliable frame unless a TX reliable frame is being
+> sent. This modification allows re-transmitted frames from the remote
+> peer to be acknowledged rather than ignored. It means that the remote
+> peer knows which frame number to start re-transmitting from.
+> 
+> Without this modification, the recovery time to a missing frame
+> from the remote peer was unnecessarily being extended because the
+> headers of the out of order reliable frames were being discarded rather
+> than being processed. The frame headers of received frames will
+> indicate whether the local peer's transmissions have been
+> acknowledged by the remote peer. Therefore, the local peer may
+> unnecessarily re-transmit despite the remote peer already indicating
+> that the frame had been acknowledged in out of order reliable frame.
+> 
+> Signed-off-by: Dean Jenkins <Dean_Jenkins@mentor.com>
+> Signed-off-by: Jiada Wang <jiada_wang@mentor.com>
+> Signed-off-by: Rajeev Kumar <rajeev_kumar@mentor.com>
+> ---
+> drivers/bluetooth/hci_bcsp.c | 82 ++++++++++++++++++++++++++------------------
+> 1 file changed, 48 insertions(+), 34 deletions(-)
+> 
+> diff --git a/drivers/bluetooth/hci_bcsp.c b/drivers/bluetooth/hci_bcsp.c
+> index d7d23ce..739ae59 100644
+> --- a/drivers/bluetooth/hci_bcsp.c
+> +++ b/drivers/bluetooth/hci_bcsp.c
+> @@ -485,13 +485,27 @@ static inline void bcsp_unslip_one_byte(struct bcsp_struct *bcsp, unsigned char
+> static void bcsp_complete_rx_pkt(struct hci_uart *hu)
+> {
+> 	struct bcsp_struct *bcsp = hu->priv;
+> -	int pass_up;
+> +	int pass_up = 0;
+> 
+> 	if (bcsp->rx_skb->data[0] & 0x80) {	/* reliable pkt */
+> 		BT_DBG("Received seqno %u from card", bcsp->rxseq_txack);
+> -		bcsp->rxseq_txack++;
+> -		bcsp->rxseq_txack %= 0x8;
+> -		bcsp->txack_req    = 1;
+> +
+> +		/* check the rx sequence number is as expected */
+> +		if ((bcsp->rx_skb->data[0] & 0x07) == bcsp->rxseq_txack) {
+> +			bcsp->rxseq_txack++;
+> +			bcsp->rxseq_txack %= 0x8;
+> +		} else {
+> +			/* handle re-transmitted packet or
+> +			   when packet was missed */
+> +			BT_ERR("Out-of-order packet arrived, got %u expected %u",
+> +				bcsp->rx_skb->data[0] & 0x07, bcsp->rxseq_txack);
+> +
+> +			/* do not process out-of-order packet payload */
+> +			pass_up = 2;
+> +		}
+> +
+> +		/* send current txack value to all received reliable packets */
+> +		bcsp->txack_req = 1;
+> 
+> 		/* If needed, transmit an ack pkt */
+> 		hci_uart_tx_wakeup(hu);
+> @@ -500,26 +514,32 @@ static void bcsp_complete_rx_pkt(struct hci_uart *hu)
+> 	bcsp->rxack = (bcsp->rx_skb->data[0] >> 3) & 0x07;
+> 	BT_DBG("Request for pkt %u from card", bcsp->rxack);
+> 
+> +	/* handle received ACK indications,
+> +	   including those from out-of-order packets */
+> 	bcsp_pkt_cull(bcsp);
+> -	if ((bcsp->rx_skb->data[1] & 0x0f) == 6 &&
+> -			bcsp->rx_skb->data[0] & 0x80) {
+> -		hci_skb_pkt_type(bcsp->rx_skb) = HCI_ACLDATA_PKT;
+> -		pass_up = 1;
+> -	} else if ((bcsp->rx_skb->data[1] & 0x0f) == 5 &&
+> -			bcsp->rx_skb->data[0] & 0x80) {
+> -		hci_skb_pkt_type(bcsp->rx_skb) = HCI_EVENT_PKT;
+> -		pass_up = 1;
+> -	} else if ((bcsp->rx_skb->data[1] & 0x0f) == 7) {
+> -		hci_skb_pkt_type(bcsp->rx_skb) = HCI_SCODATA_PKT;
+> -		pass_up = 1;
+> -	} else if ((bcsp->rx_skb->data[1] & 0x0f) == 1 &&
+> -			!(bcsp->rx_skb->data[0] & 0x80)) {
+> -		bcsp_handle_le_pkt(hu);
+> -		pass_up = 0;
+> -	} else
+> -		pass_up = 0;
+> -
+> -	if (!pass_up) {
+> +
+> +	if (pass_up != 2) {
+> +		if ((bcsp->rx_skb->data[1] & 0x0f) == 6 &&
+> +				(bcsp->rx_skb->data[0] & 0x80)) {
 
-I'm currently working on a project in which I'm trying to communicate to an=
- Intel Edison board from my Windows PC via Bluetooth. I have managed to suc=
-cessfully connect and communicate via Bluetooth using the serial port and b=
-luez version 5.22. But my problem is that I can only auto connect to the PC=
- once I have already manually paired to the device. So my aim is to have so=
-ftware running on the Edison which will be able to auto pair to a PC and co=
-nnect without knowing the PC device id in advance, for the PC to then send =
-commands and eventually files to the Edison.
+lets start using proper network subsystem coding style now.
 
-I have been able to manually send serial commands to the Edison by using a =
-Putty terminal and using rfcomm and the "cat /dev/rfcomm0" command. Using p=
-rocess below on the Edison:
+Regards
 
-rfkill unblock bluetooth
-sdptool add -channel=3D22 SP
-rfcomm watch /dev/rfcomm0 22 > /dev/null &
-bluetoothctl
-agent NoInputNoOutput
-default-agent
-discoverable on
+Marcel
 
-"pair with Edison from PC and accept pairing on the Edison"
+> +			bt_cb(bcsp->rx_skb)->pkt_type = HCI_ACLDATA_PKT;
+> +			pass_up = 1;
+> +		} else if ((bcsp->rx_skb->data[1] & 0x0f) == 5 &&
+> +				(bcsp->rx_skb->data[0] & 0x80)) {
+> +			bt_cb(bcsp->rx_skb)->pkt_type = HCI_EVENT_PKT;
+> +			pass_up = 1;
+> +		} else if ((bcsp->rx_skb->data[1] & 0x0f) == 7) {
+> +			bt_cb(bcsp->rx_skb)->pkt_type = HCI_SCODATA_PKT;
+> +			pass_up = 1;
+> +		} else if ((bcsp->rx_skb->data[1] & 0x0f) == 1 &&
+> +				!(bcsp->rx_skb->data[0] & 0x80)) {
+> +			bcsp_handle_le_pkt(hu);
+> +			pass_up = 0;
+> +		} else {
+> +			pass_up = 0;
+> +		}
+> +	}
+> +
+> +	if (pass_up == 0) {
+> 		struct hci_event_hdr hdr;
+> 		u8 desc = (bcsp->rx_skb->data[1] & 0x0f);
+> 
+> @@ -544,11 +564,15 @@ static void bcsp_complete_rx_pkt(struct hci_uart *hu)
+> 			}
+> 		} else
+> 			kfree_skb(bcsp->rx_skb);
+> -	} else {
+> +	} else if (pass_up == 1) {
+> 		/* Pull out BCSP hdr */
+> 		skb_pull(bcsp->rx_skb, 4);
+> 
+> 		hci_recv_frame(hu->hdev, bcsp->rx_skb);
+> +	} else {
+> +		/* ignore packet payload of already ACKed re-transmitted
+> +		   packets or when a packet was missed in the BCSP window */
 
-cat /dev/rfcomm0
+Also use network subsystem comment style.
 
-"send text to Edison via Putty terminal com port"
+> +		kfree_skb(bcsp->rx_skb);
+> 	}
+> 
+> 	bcsp->rx_state = BCSP_W4_PKT_DELIMITER;
+> @@ -594,16 +618,6 @@ static int bcsp_recv(struct hci_uart *hu, const void *data, int count)
+> 				bcsp->rx_count = 0;
+> 				continue;
+> 			}
+> -			if (bcsp->rx_skb->data[0] & 0x80	/* reliable pkt */
+> -						&& (bcsp->rx_skb->data[0] & 0x07) != bcsp->rxseq_txack) {
+> -				BT_ERR("Out-of-order packet arrived, got %u expected %u",
+> -					bcsp->rx_skb->data[0] & 0x07, bcsp->rxseq_txack);
+> -
+> -				kfree_skb(bcsp->rx_skb);
+> -				bcsp->rx_state = BCSP_W4_PKT_DELIMITER;
+> -				bcsp->rx_count = 0;
+> -				continue;
+> -			}
+> 			bcsp->rx_state = BCSP_W4_DATA;
+> 			bcsp->rx_count = (bcsp->rx_skb->data[1] >> 4) +
+> 					(bcsp->rx_skb->data[2] << 4);	/* May be 0 */
 
+Regards
 
-So I have been trying to automate this process by writing C code on the Ecl=
-ipse IDE and also by writing scripts running on the Edison but I have not b=
-een able to successfully send commands to the bluetoothctl function.
+Marcel
 
-I have tried to send commands using the Eclipse IDE but when I send the fol=
-lowing:
-
-system("echo -e 'agent NoInputNoOutput\n | bluetoothctl");
-
-On the Edison it reports "No agent is registered" and the following message=
-:
-
-(bluetoothctl:690): GLib-CRITICAL **: Source ID 22 was not found when attem=
-pting to remove it
-
-
-Also if I try to create a script file like the following:
-
-#!/bin/sh
-rfkill unblock bluetooth
-sdptool add -channel=3D22 SP
-sleep 1
-bluetoothctl << EOF
-agent NoInputNoOutput
-EOF
-sleep 1
-
-Again it just report "No agent is registered".
-
-
-I have been in communication with Intel support but I've got to a point whe=
-re I don't think I can get any further and they have recommended that I con=
-tact you.
-
-https://communities.intel.com/thread/104504
-
-
-Any help would be very much appreciated.
-
-Kind regards
-
-Jay Montague
-Software Engineer
-
-
-Scott Safety
-Unit 14, Repton Close,
-Basildon, Essex. SS13 1LN UK
-Office:     +44 (0)1268 527 700  Ext. 210
-Direct:     +44 (0)1268 885 360
-Fax:         +44 (0)1268 527 799
-
-JMontague@Tycoint.com
-www.ScottSafety.com
-
-Follow Scott Safety
-
-
-
-
-
-CONFIDENTIALITY NOTICE: This e-mail message, including any attachments, is =
-for the sole use of the intended recipient(s) and may contain confidential =
-and privileged information or information otherwise protected by law. Any u=
-nauthorized review, use, disclosure or distribution is prohibited. If you a=
-re not the intended recipient, please contact the sender by reply e-mail an=
-d destroy all copies of the original message. Any applicable rights to priv=
-ilege have not been waived.
-
-
-
-
-________________________________
-
-This e-mail contains privileged and confidential information intended for t=
-he use of the addressees named above. If you are not the intended recipient=
- of this e-mail, you are hereby notified that you must not disseminate, cop=
-y or take any action in respect of any information contained in it. If you =
-have received this e-mail in error, please notify the sender immediately by=
- e-mail and immediately destroy this e-mail and its attachments.
