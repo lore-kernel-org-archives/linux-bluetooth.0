@@ -3,9 +3,11 @@ From: Szymon Janc <szymon.janc@codecoup.pl>
 To: linux-bluetooth@vger.kernel.org
 Cc: =?UTF-8?q?Micha=C5=82=20Narajowski?=
         <michal.narajowski@codecoup.pl>
-Subject: [PATCH 1/5] doc/mgmt-api: Add appearance command specification
-Date: Wed,  7 Sep 2016 22:57:43 +0200
-Message-Id: <1473281867-8560-1-git-send-email-szymon.janc@codecoup.pl>
+Subject: [PATCH 2/5] lib/mgmt: Add appearance command definition
+Date: Wed,  7 Sep 2016 22:57:44 +0200
+Message-Id: <1473281867-8560-2-git-send-email-szymon.janc@codecoup.pl>
+In-Reply-To: <1473281867-8560-1-git-send-email-szymon.janc@codecoup.pl>
+References: <1473281867-8560-1-git-send-email-szymon.janc@codecoup.pl>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -14,45 +16,33 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 From: Michał Narajowski <michal.narajowski@codecoup.pl>
 
 ---
- doc/mgmt-api.txt | 25 +++++++++++++++++++++++++
- 1 file changed, 25 insertions(+)
+ lib/mgmt.h | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
-index 2b8a81d..ed0cb99 100644
---- a/doc/mgmt-api.txt
-+++ b/doc/mgmt-api.txt
-@@ -2885,6 +2885,31 @@ Read Extended Controller Information Command
- 				Invalid Index
+diff --git a/lib/mgmt.h b/lib/mgmt.h
+index 8de2616..798a05e 100644
+--- a/lib/mgmt.h
++++ b/lib/mgmt.h
+@@ -541,6 +541,11 @@ struct mgmt_rp_read_ext_info {
+ 	uint8_t  eir[0];
+ } __packed;
  
++#define MGMT_OP_SET_APPEARANCE		0x0043
++struct mgmt_cp_set_appearance {
++	uint16_t appearance;
++} __packed;
++
+ #define MGMT_EV_CMD_COMPLETE		0x0001
+ struct mgmt_ev_cmd_complete {
+ 	uint16_t opcode;
+@@ -827,6 +832,7 @@ static const char *mgmt_op[] = {
+ 	"Get Advertising Size Information",		/* 0x0040 */
+ 	"Start Limited Discovery",
+ 	"Read Extended Controller Information",
++	"Set Appearance",
+ };
  
-+Set Appearance Command
-+======================
-+
-+	Command Code:		0x0042
-+	Controller Index:	<controller id>
-+	Command Parameters:	Appearance (2 Octets)
-+	Return Parameters:	Appearance (2 Octets)
-+
-+	This command is used to set the appearance value of a controller.
-+
-+	This command can be used when the controller is not
-+	powered and all settings will be programmed once powered.
-+
-+	The value of appearance will be remembered when switching
-+	the controller off and back on again. So the appearance only
-+	have to be set once when a new controller is found and will
-+	stay until removed.
-+
-+	This command generates a Command Complete event on success
-+	or a Command Status event on failure.
-+
-+	Possible errors:	Invalid Parameters
-+				Invalid Index
-+
-+
- Command Complete Event
- ======================
- 
+ static const char *mgmt_ev[] = {
 -- 
 2.7.4
 
