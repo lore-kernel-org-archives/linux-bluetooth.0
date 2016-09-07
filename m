@@ -1,175 +1,131 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
-Subject: Re: [PATCH v1 3/4] Bluetooth: BCSP fails to ACK re-transmitted frames from the peer
+Subject: Re: [PATCH v1 2/4] Bluetooth: prevent a race condition on hci_uart_tty_ioctl() call
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1473257710-2073-4-git-send-email-Dean_Jenkins@mentor.com>
-Date: Wed, 7 Sep 2016 15:22:17 +0100
+In-Reply-To: <1473257710-2073-3-git-send-email-Dean_Jenkins@mentor.com>
+Date: Wed, 7 Sep 2016 15:20:45 +0100
 Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
         linux-bluetooth@vger.kernel.org
-Message-Id: <09CFA74F-BCE6-4627-A318-E18B3BCEBE07@holtmann.org>
-References: <1473257710-2073-1-git-send-email-Dean_Jenkins@mentor.com> <1473257710-2073-4-git-send-email-Dean_Jenkins@mentor.com>
+Message-Id: <DE3CB053-A790-4BC2-83F2-CF2A2BAFB454@holtmann.org>
+References: <1473257710-2073-1-git-send-email-Dean_Jenkins@mentor.com> <1473257710-2073-3-git-send-email-Dean_Jenkins@mentor.com>
 To: Dean Jenkins <Dean_Jenkins@mentor.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Dean,
 
-> Send an ACK frame with the current txack value in response to
-> every received reliable frame unless a TX reliable frame is being
-> sent. This modification allows re-transmitted frames from the remote
-> peer to be acknowledged rather than ignored. It means that the remote
-> peer knows which frame number to start re-transmitting from.
+> Add global mutex lock to prevent reentrancy in the hci_uart_tty_ioctl()
+> ioctl handling. This prevents concurrency of all function calls within
+> hci_uart_tty_ioctl handling including hci_uart_set_proto().
 > 
-> Without this modification, the recovery time to a missing frame
-> from the remote peer was unnecessarily being extended because the
-> headers of the out of order reliable frames were being discarded rather
-> than being processed. The frame headers of received frames will
-> indicate whether the local peer's transmissions have been
-> acknowledged by the remote peer. Therefore, the local peer may
-> unnecessarily re-transmit despite the remote peer already indicating
-> that the frame had been acknowledged in out of order reliable frame.
+> Also removed multiple return statements in hci_uart_tty_ioctl call and
+> added a single return statement since the mutex needs to be unlocked
+> before exiting the function.
+
+can we split this into two please. First change the error handling path and then introduce the mutex.
+
 > 
+> Signed-off-by: Vignesh Raman <Vignesh_Raman@mentor.com>
 > Signed-off-by: Dean Jenkins <Dean_Jenkins@mentor.com>
-> Signed-off-by: Jiada Wang <jiada_wang@mentor.com>
 > Signed-off-by: Rajeev Kumar <rajeev_kumar@mentor.com>
 > ---
-> drivers/bluetooth/hci_bcsp.c | 82 ++++++++++++++++++++++++++------------------
-> 1 file changed, 48 insertions(+), 34 deletions(-)
+> drivers/bluetooth/hci_ldisc.c | 43 ++++++++++++++++++++++++++-----------------
+> 1 file changed, 26 insertions(+), 17 deletions(-)
 > 
-> diff --git a/drivers/bluetooth/hci_bcsp.c b/drivers/bluetooth/hci_bcsp.c
-> index d7d23ce..739ae59 100644
-> --- a/drivers/bluetooth/hci_bcsp.c
-> +++ b/drivers/bluetooth/hci_bcsp.c
-> @@ -485,13 +485,27 @@ static inline void bcsp_unslip_one_byte(struct bcsp_struct *bcsp, unsigned char
-> static void bcsp_complete_rx_pkt(struct hci_uart *hu)
+> diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
+> index 1e338d5..cf1883d 100644
+> --- a/drivers/bluetooth/hci_ldisc.c
+> +++ b/drivers/bluetooth/hci_ldisc.c
+> @@ -51,6 +51,8 @@
+> 
+> #define VERSION "2.3"
+> 
+> +static DEFINE_MUTEX(ioctl_mutex);
+> +
+> static const struct hci_uart_proto *hup[HCI_UART_MAX_PROTO];
+> 
+> int hci_uart_register_proto(const struct hci_uart_proto *p)
+> @@ -685,7 +687,7 @@ static int hci_uart_tty_ioctl(struct tty_struct *tty, struct file *file,
+> 			      unsigned int cmd, unsigned long arg)
 > {
-> 	struct bcsp_struct *bcsp = hu->priv;
-> -	int pass_up;
-> +	int pass_up = 0;
-> 
-> 	if (bcsp->rx_skb->data[0] & 0x80) {	/* reliable pkt */
-> 		BT_DBG("Received seqno %u from card", bcsp->rxseq_txack);
-> -		bcsp->rxseq_txack++;
-> -		bcsp->rxseq_txack %= 0x8;
-> -		bcsp->txack_req    = 1;
-> +
-> +		/* check the rx sequence number is as expected */
-> +		if ((bcsp->rx_skb->data[0] & 0x07) == bcsp->rxseq_txack) {
-> +			bcsp->rxseq_txack++;
-> +			bcsp->rxseq_txack %= 0x8;
-> +		} else {
-> +			/* handle re-transmitted packet or
-> +			   when packet was missed */
-> +			BT_ERR("Out-of-order packet arrived, got %u expected %u",
-> +				bcsp->rx_skb->data[0] & 0x07, bcsp->rxseq_txack);
-> +
-> +			/* do not process out-of-order packet payload */
-> +			pass_up = 2;
-> +		}
-> +
-> +		/* send current txack value to all received reliable packets */
-> +		bcsp->txack_req = 1;
-> 
-> 		/* If needed, transmit an ack pkt */
-> 		hci_uart_tx_wakeup(hu);
-> @@ -500,26 +514,32 @@ static void bcsp_complete_rx_pkt(struct hci_uart *hu)
-> 	bcsp->rxack = (bcsp->rx_skb->data[0] >> 3) & 0x07;
-> 	BT_DBG("Request for pkt %u from card", bcsp->rxack);
-> 
-> +	/* handle received ACK indications,
-> +	   including those from out-of-order packets */
-> 	bcsp_pkt_cull(bcsp);
-> -	if ((bcsp->rx_skb->data[1] & 0x0f) == 6 &&
-> -			bcsp->rx_skb->data[0] & 0x80) {
-> -		hci_skb_pkt_type(bcsp->rx_skb) = HCI_ACLDATA_PKT;
-> -		pass_up = 1;
-> -	} else if ((bcsp->rx_skb->data[1] & 0x0f) == 5 &&
-> -			bcsp->rx_skb->data[0] & 0x80) {
-> -		hci_skb_pkt_type(bcsp->rx_skb) = HCI_EVENT_PKT;
-> -		pass_up = 1;
-> -	} else if ((bcsp->rx_skb->data[1] & 0x0f) == 7) {
-> -		hci_skb_pkt_type(bcsp->rx_skb) = HCI_SCODATA_PKT;
-> -		pass_up = 1;
-> -	} else if ((bcsp->rx_skb->data[1] & 0x0f) == 1 &&
-> -			!(bcsp->rx_skb->data[0] & 0x80)) {
-> -		bcsp_handle_le_pkt(hu);
-> -		pass_up = 0;
-> -	} else
-> -		pass_up = 0;
-> -
-> -	if (!pass_up) {
-> +
-> +	if (pass_up != 2) {
-> +		if ((bcsp->rx_skb->data[1] & 0x0f) == 6 &&
-> +				(bcsp->rx_skb->data[0] & 0x80)) {
+> 	struct hci_uart *hu = tty->disc_data;
+> -	int err = 0;
+> +	int result = 0;
 
-lets start using proper network subsystem coding style now.
+I am fine keeping this err. I think renaming it to result does not help.
 
-Regards
-
-Marcel
-
-> +			bt_cb(bcsp->rx_skb)->pkt_type = HCI_ACLDATA_PKT;
-> +			pass_up = 1;
-> +		} else if ((bcsp->rx_skb->data[1] & 0x0f) == 5 &&
-> +				(bcsp->rx_skb->data[0] & 0x80)) {
-> +			bt_cb(bcsp->rx_skb)->pkt_type = HCI_EVENT_PKT;
-> +			pass_up = 1;
-> +		} else if ((bcsp->rx_skb->data[1] & 0x0f) == 7) {
-> +			bt_cb(bcsp->rx_skb)->pkt_type = HCI_SCODATA_PKT;
-> +			pass_up = 1;
-> +		} else if ((bcsp->rx_skb->data[1] & 0x0f) == 1 &&
-> +				!(bcsp->rx_skb->data[0] & 0x80)) {
-> +			bcsp_handle_le_pkt(hu);
-> +			pass_up = 0;
-> +		} else {
-> +			pass_up = 0;
-> +		}
-> +	}
-> +
-> +	if (pass_up == 0) {
-> 		struct hci_event_hdr hdr;
-> 		u8 desc = (bcsp->rx_skb->data[1] & 0x0f);
 > 
-> @@ -544,11 +564,15 @@ static void bcsp_complete_rx_pkt(struct hci_uart *hu)
-> 			}
+> 	BT_DBG("");
+> 
+> @@ -693,45 +695,52 @@ static int hci_uart_tty_ioctl(struct tty_struct *tty, struct file *file,
+> 	if (!hu)
+> 		return -EBADF;
+> 
+> +	mutex_lock(&ioctl_mutex);
+> 	switch (cmd) {
+> 	case HCIUARTSETPROTO:
+> 		if (!test_bit(HCI_UART_PROTO_SET, &hu->flags)) {
+> -			err = hci_uart_set_proto(hu, arg);
+> -			if (!err)
+> +			result = hci_uart_set_proto(hu, arg);
+> +			if (!result)
+> 				set_bit(HCI_UART_PROTO_SET, &hu->flags);
+> -			else
+> -				return err;
 > 		} else
-> 			kfree_skb(bcsp->rx_skb);
-> -	} else {
-> +	} else if (pass_up == 1) {
-> 		/* Pull out BCSP hdr */
-> 		skb_pull(bcsp->rx_skb, 4);
+> -			return -EBUSY;
+> +			result = -EBUSY;
+> 		break;
 > 
-> 		hci_recv_frame(hu->hdev, bcsp->rx_skb);
-> +	} else {
-> +		/* ignore packet payload of already ACKed re-transmitted
-> +		   packets or when a packet was missed in the BCSP window */
-
-Also use network subsystem comment style.
-
-> +		kfree_skb(bcsp->rx_skb);
+> 	case HCIUARTGETPROTO:
+> 		if (test_bit(HCI_UART_PROTO_SET, &hu->flags))
+> -			return hu->proto->id;
+> -		return -EUNATCH;
+> +			result = hu->proto->id;
+> +		else
+> +			result = -EUNATCH;
+> +		break;
+> 
+> 	case HCIUARTGETDEVICE:
+> 		if (test_bit(HCI_UART_REGISTERED, &hu->flags))
+> -			return hu->hdev->id;
+> -		return -EUNATCH;
+> +			result = hu->hdev->id;
+> +		else
+> +			result = -EUNATCH;
+> +		break;
+> 
+> 	case HCIUARTSETFLAGS:
+> 		if (test_bit(HCI_UART_PROTO_SET, &hu->flags))
+> -			return -EBUSY;
+> -		err = hci_uart_set_flags(hu, arg);
+> -		if (err)
+> -			return err;
+> +			result = -EBUSY;
+> +		else {
+> +			result = hci_uart_set_flags(hu, arg);
+> +			if (result)
+> +				return result;
+> +		}
+> 		break;
+> 
+> 	case HCIUARTGETFLAGS:
+> -		return hu->hdev_flags;
+> +		result = hu->hdev_flags;
+> +		break;
+> 
+> 	default:
+> -		err = n_tty_ioctl_helper(tty, file, cmd, arg);
+> +		result = n_tty_ioctl_helper(tty, file, cmd, arg);
+> 		break;
 > 	}
+> +	mutex_unlock(&ioctl_mutex);
 > 
-> 	bcsp->rx_state = BCSP_W4_PKT_DELIMITER;
-> @@ -594,16 +618,6 @@ static int bcsp_recv(struct hci_uart *hu, const void *data, int count)
-> 				bcsp->rx_count = 0;
-> 				continue;
-> 			}
-> -			if (bcsp->rx_skb->data[0] & 0x80	/* reliable pkt */
-> -						&& (bcsp->rx_skb->data[0] & 0x07) != bcsp->rxseq_txack) {
-> -				BT_ERR("Out-of-order packet arrived, got %u expected %u",
-> -					bcsp->rx_skb->data[0] & 0x07, bcsp->rxseq_txack);
-> -
-> -				kfree_skb(bcsp->rx_skb);
-> -				bcsp->rx_state = BCSP_W4_PKT_DELIMITER;
-> -				bcsp->rx_count = 0;
-> -				continue;
-> -			}
-> 			bcsp->rx_state = BCSP_W4_DATA;
-> 			bcsp->rx_count = (bcsp->rx_skb->data[1] >> 4) +
-> 					(bcsp->rx_skb->data[2] << 4);	/* May be 0 */
+> -	return err;
+> +	return result;
+> }
 
 Regards
 
