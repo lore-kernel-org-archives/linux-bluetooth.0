@@ -1,104 +1,164 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
-Subject: Re: [PATCH v1 1/4] Bluetooth: Fix HCI UART HCI_UART_PROTO_SET locking
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1473257710-2073-2-git-send-email-Dean_Jenkins@mentor.com>
-Date: Wed, 7 Sep 2016 15:18:56 +0100
-Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org
-Message-Id: <298B2264-9177-4336-88F6-FFDF2A4909FA@holtmann.org>
-References: <1473257710-2073-1-git-send-email-Dean_Jenkins@mentor.com> <1473257710-2073-2-git-send-email-Dean_Jenkins@mentor.com>
-To: Dean Jenkins <Dean_Jenkins@mentor.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <Dean_Jenkins@mentor.com>
+From: Dean Jenkins <Dean_Jenkins@mentor.com>
+To: Dean Jenkins <Dean_Jenkins@mentor.com>, Marcel Holtmann
+	<marcel@holtmann.org>, Gustavo Padovan <gustavo@padovan.org>, Johan Hedberg
+	<johan.hedberg@gmail.com>
+CC: <linux-bluetooth@vger.kernel.org>
+Subject: [PATCH v1 4/4] Bluetooth: Prevent scheduling of work after hci_uart_tty_close()
+Date: Wed, 7 Sep 2016 15:15:10 +0100
+Message-ID: <1473257710-2073-5-git-send-email-Dean_Jenkins@mentor.com>
+In-Reply-To: <1473257710-2073-1-git-send-email-Dean_Jenkins@mentor.com>
+References: <1473257710-2073-1-git-send-email-Dean_Jenkins@mentor.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Dean,
+From: Deepak Das <Deepak_Das@mentor.com>
 
-> Here is a NULL pointer dereference that causes a Bluetooth crash:
-> 
-> (hci_uart_tty_receive+0x0/0x84 [hci_uart]) from (flush_to_ldisc+0x104/0x190)
-> (flush_to_ldisc+0x0/0x190) from (tty_flip_buffer_push+0x50/0x5c)
-> (tty_flip_buffer_push+0x0/0x5c) from (imx_rxint+0x228/0x23c)
-> (imx_rxint+0x0/0x23c) from (imx_int+0xa8/0x174)
-> (imx_int+0x0/0x174) from (handle_irq_event_percpu+0x90/0x280)
-> (handle_irq_event_percpu+0x0/0x280) from (handle_irq_event+0x44/0x64)
-> (handle_irq_event+0x0/0x64) from (handle_fasteoi_irq+0xc0/0x108)
-> (handle_fasteoi_irq+0x0/0x108) from (generic_handle_irq+0x28/0x38)
-> (generic_handle_irq+0x0/0x38) from (handle_IRQ+0x6c/0x94)
-> (handle_IRQ+0x0/0x94) from (gic_handle_irq+0x44/0x68)
-> (gic_handle_irq+0x0/0x68) from (__irq_svc+0x40/0x70)
-> (bcsp_open+0x0/0xcc [hci_uart]) from (hci_uart_tty_ioctl+0xa8/0x238 [hci_uart])
-> (hci_uart_tty_ioctl+0x0/0x238 [hci_uart]) from (tty_ioctl+0xa88/0xae8)
-> (tty_ioctl+0x0/0xae8) from (vfs_ioctl+0x30/0x44)
-> (vfs_ioctl+0x0/0x44) from (do_vfs_ioctl+0x53c/0x590)
-> (do_vfs_ioctl+0x0/0x590) from (sys_ioctl+0x40/0x68)
-> (sys_ioctl+0x0/0x68) from (ret_fast_syscall+0x0/0x30)
-> 
-> It can be seen that bcsp_open() is pre-empted by an interrupt relating
-> to reception of UART characters. bcsp_open() is called from
-> hci_uart_set_proto() which is called from hci_uart_tty_ioctl() due to
-> HCIUARTSETPROTO handling.
-> 
-> The crash occurs in hci_uart_tty_receive() and analysis shows:
-> 	if (!test_bit(HCI_UART_PROTO_SET, &hu->flags))
-> 		return;
-> 
-> 	spin_lock(&hu->rx_lock);
-> 	hu->proto->recv(hu, (void *) data, count);
-> 
-> The crash occurs in the dereference hu->proto->recv. Presumably no recv
-> function has been set and a NULL pointer dereference occurs.
-> 
-> Note that the flag HCI_UART_PROTO_SET being clear should prevent the failure
-> but in fact fails. This indicates that HCI_UART_PROTO_SET is in the set state.
-> 
-> The HCI_UART_PROTO_SET locking fails because HCI_UART_PROTO_SET is put into
-> the set state in hci_uart_tty_ioctl() BEFORE calling hci_uart_set_proto()
-> to set the recv function pointer. Therefore, there is a race condition.
-> 
-> The solution is to set the flag HCI_UART_PROTO_SET after successfully
-> calling hci_uart_set_proto() in the HCIUARTSETPROTO handling in
-> hci_uart_tty_ioctl(). This will prevent hci_uart_tty_receive() from
-> performing the recv function pointer dereference until hci_uart_set_proto()
-> has set the recv function pointer.
-> 
-> Signed-off-by: Vignesh Raman <Vignesh_Raman@mentor.com>
-> Signed-off-by: Dean Jenkins <Dean_Jenkins@mentor.com>
-> Signed-off-by: Mark Craske <Mark_Craske@mentor.com>
-> ---
-> drivers/bluetooth/hci_ldisc.c | 8 ++++----
-> 1 file changed, 4 insertions(+), 4 deletions(-)
-> 
-> diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
-> index dda9739..1e338d5 100644
-> --- a/drivers/bluetooth/hci_ldisc.c
-> +++ b/drivers/bluetooth/hci_ldisc.c
-> @@ -695,12 +695,12 @@ static int hci_uart_tty_ioctl(struct tty_struct *tty, struct file *file,
-> 
-> 	switch (cmd) {
-> 	case HCIUARTSETPROTO:
-> -		if (!test_and_set_bit(HCI_UART_PROTO_SET, &hu->flags)) {
-> +		if (!test_bit(HCI_UART_PROTO_SET, &hu->flags)) {
-> 			err = hci_uart_set_proto(hu, arg);
-> -			if (err) {
-> -				clear_bit(HCI_UART_PROTO_SET, &hu->flags);
-> +			if (!err)
-> +				set_bit(HCI_UART_PROTO_SET, &hu->flags);
-> +			else
-> 				return err;
-> -			}
+There is a work queue hu->write_work that can be scheduled to handle
+a transmission work item in BCSP scenarios that are described below.
 
-can we flip this around.
+In these scenarios, the payload of a BCSP frame can contain a HCI
+message as follows:
 
-		if (err)
-			return err;
+a) Normal sending of a HCI message within a BCSP frame from upper
+layers via hci_uart_send_frame().
 
-		/* Comment why this is correct thing to do */
-		set_bit(HCI_UART_PROTO_SET, &hu->flags);
+b) BCSP retransmission due to a failure to get a BCSP ACK indication.
+This resends an old HCI message triggered by the BCSP timer timeout event
+handled by bcsp_timed_event().
 
-Regards
+c) Sending of a BCSP ACK frame in response to a received reliable BCSP
+frame is handled in bcsp_complete_rx_pkt() which allows an empty payload
+(no HCI message) to be sent.
 
-Marcel
+A good reproduction scenario of the crash is for a bad UART driver to
+corrupt or cause a total loss of incoming BCSP frames. This leads to a link
+failure so the BCSP timer is periodically triggered in an attempt to
+retransmit unacknowledged frames. Then upper layers request the HCI UART
+to close immediately before the BCSP timer event is handled. This causes
+a race condition between closing the HCI UART and retransmitting a BCSP
+frame.
 
+The current solution is using cancel_work_sync(&hu->write_work); within
+hci_uart_tty_close() in an attempt to cleanse the work queue of the
+transmission work item.
+
+It should be noted that a transmission work item is scheduled into the work
+queue by hci_uart_tx_wakeup() which can be running in an atomic context
+such as a UART driver interrupt thread or in a process context. Therefore,
+it is possible for hci_uart_tx_wakeup() to interrupt or run concurrently
+with hci_uart_tty_close().
+
+In addition, hu->proto->close(hu) calls bcsp_close() which frees the
+various queues of messages and deletes the BCSP timer.
+
+The current solution has a flaw because hci_uart_tty_close() fails to
+inhibit the asynchronous b) and c) transmission events from adding a work
+item to the work queue AFTER cancel_work_sync(&hu->write_work); has been
+executed. A crash occurs after bcsp_close() has freed the message queues
+which are subsequently accessed when the work queue work item runs
+hci_uart_write_work(). Therefore, there is a race condition.
+
+This flaw was masked as typically retransmissions should be rare and
+Bluetooth has a low sub-system rate of being actively shutdown.
+
+This fix introduces a new HCI_UART proto flag bit called
+HCI_UART_UNREGISTERING to indicate the unregistering state of the HCI UART.
+This flag is used to prevent the addition of a transmission work item after
+hci_uart_tty_close() starts to run.
+
+Note that a spinlock is necessary because it is not possible to check
+the state of the atomic flag and to schedule the work queue in an atomic
+sequence of operations in hci_uart_tx_wakeup(). This means that the flag
+must be prevented from changing state after the flag is checked and before
+the work queue is scheduled in hci_uart_tx_wakeup().
+
+Signed-off-by: Deepak Das <Deepak_Das@mentor.com>
+Signed-off-by: Rajeev Kumar <rajeev_kumar@mentor.com>
+Signed-off-by: Dean_Jenkins@mentor.com
+Signed-off-by: Dean Jenkins <Dean_Jenkins@mentor.com>
+---
+ drivers/bluetooth/hci_ldisc.c | 16 +++++++++++++++-
+ drivers/bluetooth/hci_uart.h  |  3 +++
+ 2 files changed, 18 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
+index cf1883d..ddf4cda 100644
+--- a/drivers/bluetooth/hci_ldisc.c
++++ b/drivers/bluetooth/hci_ldisc.c
+@@ -125,15 +125,22 @@ static inline struct sk_buff *hci_uart_dequeue(struct hci_uart *hu)
+ 
+ int hci_uart_tx_wakeup(struct hci_uart *hu)
+ {
++	unsigned long flags;
++
++	spin_lock_irqsave(&hu->schedule_lock, flags);
++	if (test_bit(HCI_UART_UNREGISTERING, &hu->flags))
++		goto no_schedule;
+ 	if (test_and_set_bit(HCI_UART_SENDING, &hu->tx_state)) {
+ 		set_bit(HCI_UART_TX_WAKEUP, &hu->tx_state);
+-		return 0;
++		goto no_schedule;
+ 	}
+ 
+ 	BT_DBG("");
+ 
+ 	schedule_work(&hu->write_work);
+ 
++no_schedule:
++	spin_unlock_irqrestore(&hu->schedule_lock, flags);
+ 	return 0;
+ }
+ 
+@@ -464,6 +471,8 @@ static int hci_uart_tty_open(struct tty_struct *tty)
+ 	INIT_WORK(&hu->init_ready, hci_uart_init_work);
+ 	INIT_WORK(&hu->write_work, hci_uart_write_work);
+ 
++	spin_lock_init(&hu->schedule_lock);
++
+ 	/* Flush any pending characters in the driver */
+ 	tty_driver_flush_buffer(tty);
+ 
+@@ -479,6 +488,7 @@ static void hci_uart_tty_close(struct tty_struct *tty)
+ {
+ 	struct hci_uart *hu = tty->disc_data;
+ 	struct hci_dev *hdev;
++	unsigned long flags;
+ 
+ 	BT_DBG("tty %p", tty);
+ 
+@@ -488,6 +498,10 @@ static void hci_uart_tty_close(struct tty_struct *tty)
+ 	if (!hu)
+ 		return;
+ 
++	spin_lock_irqsave(&hu->schedule_lock, flags);
++	set_bit(HCI_UART_UNREGISTERING, &hu->flags);
++	spin_unlock_irqrestore(&hu->schedule_lock, flags);
++
+ 	hdev = hu->hdev;
+ 	if (hdev)
+ 		hci_uart_close(hdev);
+diff --git a/drivers/bluetooth/hci_uart.h b/drivers/bluetooth/hci_uart.h
+index 839bad1..27a7708 100644
+--- a/drivers/bluetooth/hci_uart.h
++++ b/drivers/bluetooth/hci_uart.h
+@@ -88,6 +88,8 @@ struct hci_uart {
+ 	struct sk_buff		*tx_skb;
+ 	unsigned long		tx_state;
+ 
++	/* prevent scheduling work during close */
++	spinlock_t		schedule_lock;
+ 	unsigned int init_speed;
+ 	unsigned int oper_speed;
+ };
+@@ -96,6 +98,7 @@ struct hci_uart {
+ #define HCI_UART_PROTO_SET	0
+ #define HCI_UART_REGISTERED	1
+ #define HCI_UART_PROTO_READY	2
++#define HCI_UART_UNREGISTERING	3
+ 
+ /* TX states  */
+ #define HCI_UART_SENDING	1
+-- 
+2.7.4
