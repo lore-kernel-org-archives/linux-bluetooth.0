@@ -1,52 +1,82 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <0176A088-7DFB-415E-9461-CB8BA391E087@gmail.com>
-References: <04AC5786-517A-4834-AFD7-B0C6AC29B869@gmail.com>
- <CADwkJjLm5RF54MHANHYUX3cmh52V4EgHB57hrMu4oXeOA6bR3Q@mail.gmail.com> <0176A088-7DFB-415E-9461-CB8BA391E087@gmail.com>
-From: Tobias Svehagen <tobias.svehagen@gmail.com>
-Date: Wed, 7 Sep 2016 09:37:42 +0200
-Message-ID: <CADwkJj+6n=7AAXmbEZ6me32_m-2fyErYOnKDcg4E8Kj7ibn1WA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
 Subject: Re: Query BLE connected status?
-To: Travis Griggs <travisgriggs@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+From: Travis Griggs <travisgriggs@gmail.com>
+In-Reply-To: <CADwkJjLm5RF54MHANHYUX3cmh52V4EgHB57hrMu4oXeOA6bR3Q@mail.gmail.com>
+Date: Tue, 6 Sep 2016 17:02:52 -0700
+Message-Id: <0176A088-7DFB-415E-9461-CB8BA391E087@gmail.com>
+References: <04AC5786-517A-4834-AFD7-B0C6AC29B869@gmail.com> <CADwkJjLm5RF54MHANHYUX3cmh52V4EgHB57hrMu4oXeOA6bR3Q@mail.gmail.com>
+To: linux-bluetooth@vger.kernel.org
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The property is not on the Adapter1 interface but it is found on the
-Device1 interface. Also note that you have to check for every object
-under /org/bluez/hci0 if that one is connected. I don't think there is
-a way to see if an adapter is connected or not. Here is an example of
-getting the Connected property of all the devices.
+
+> On Sep 6, 2016, at 1:53 PM, Tobias Svehagen =
+<tobias.svehagen@gmail.com> wrote:
+>=20
+> Travis,
+>=20
+> There is a Connected property on the org.bluez.Device1 interface (see
+> =
+http://git.kernel.org/cgit/bluetooth/bluez.git/tree/doc/device-api.txt).
+> This will tell you if that specific device is connected or not. Would
+> this solve your problem?
+
+I think it would. If I could figure out how to read it. My python/dbus =
+skills are very much monkey-see-monkey-do at this point. I was excited, =
+because I already have a snippet that sets the =E2=80=98Alias=E2=80=99 =
+of the same interface, so I thought I could just modify a little:
 
 #!/usr/bin/env python3
 
 import dbus
+import dbus.mainloop.glib
+import gi.repository.GLib as glib
 import os
 import sys
 
-def get_managed_objects():
-    bus = dbus.SystemBus()
-    manager = dbus.Interface(bus.get_object("org.bluez", "/"),
-
-"org.freedesktop.DBus.ObjectManager")
-    return manager.GetManagedObjects()
+Adapter =3D '/org/bluez/hci0'
 
 def main():
-    bus = dbus.SystemBus()
+   dbus.mainloop.glib.DBusGMainLoop(set_as_default=3DTrue)
+   bus =3D dbus.SystemBus()
 
-    objects = get_managed_objects()
-    for path, ifaces in iter(objects.items()):
-        dev = ifaces.get("org.bluez.Device1")
-        if dev is None:
-            continue
+   adapterProperties =3D dbus.Interface(bus.get_object('org.bluez', =
+Adapter), 'org.freedesktop.DBus.Properties')
+   value =3D adapterProperties.Get('org.bluez.Adapter1', 'Connected')
+   print('connected', value)
 
-        props = dbus.Interface(bus.get_object("org.bluez", path),
-                               "org.freedesktop.DBus.Properties")
+   mainloop =3D glib.MainLoop()
+   try:
+       mainloop.run()
+   except KeyboardInterrupt:
+       mainloop.quit()
 
-        print(path, "Connected:", props.Get("org.bluez.Device1", "Connected"))
 
-if __name__ == '__main__':
-    main()
+if __name__ =3D=3D '__main__':
+   main()
 
-/Tobias
+Unfortunately, that doesn=E2=80=99t work. I got the following error:
+
+root@nelson:/Pilot# ./connected=20
+Traceback (most recent call last):
+ File "./connected", line 28, in <module>
+   main()
+ File "./connected", line 17, in main
+   value =3D adapterProperties.Get('org.bluez.Adapter1', 'Connected')
+ File "/usr/lib/python3/dist-packages/dbus/proxies.py", line 70, in =
+__call__
+   return self._proxy_method(*args, **keywords)
+ File "/usr/lib/python3/dist-packages/dbus/proxies.py", line 145, in =
+__call__
+   **keywords)
+ File "/usr/lib/python3/dist-packages/dbus/connection.py", line 651, in =
+call_blocking
+   message, timeout)
+dbus.exceptions.DBusException: org.freedesktop.DBus.Error.InvalidArgs: =
+No such property =E2=80=98Connected'
+
+My original code had a .Set() call, but maybe I was naive in assuming =
+that a .Get() would be the converse? Do I even need to do the runloop =
+thing in this case?=
