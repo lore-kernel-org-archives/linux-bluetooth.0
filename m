@@ -1,49 +1,52 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <1473159891-11621-1-git-send-email-luiz.dentz@gmail.com>
-References: <1473159891-11621-1-git-send-email-luiz.dentz@gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 7 Sep 2016 16:14:43 +0300
-Message-ID: <CABBYNZJ9ujeP1X3FNv-NnjpTzQdVspZw0cDh=7J6LxqKwHjY3A@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] core/device: Make it more clear random addresses
- can only be used with LE
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <0176A088-7DFB-415E-9461-CB8BA391E087@gmail.com>
+References: <04AC5786-517A-4834-AFD7-B0C6AC29B869@gmail.com>
+ <CADwkJjLm5RF54MHANHYUX3cmh52V4EgHB57hrMu4oXeOA6bR3Q@mail.gmail.com> <0176A088-7DFB-415E-9461-CB8BA391E087@gmail.com>
+From: Tobias Svehagen <tobias.svehagen@gmail.com>
+Date: Wed, 7 Sep 2016 09:37:42 +0200
+Message-ID: <CADwkJj+6n=7AAXmbEZ6me32_m-2fyErYOnKDcg4E8Kj7ibn1WA@mail.gmail.com>
+Subject: Re: Query BLE connected status?
+To: Travis Griggs <travisgriggs@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+The property is not on the Adapter1 interface but it is found on the
+Device1 interface. Also note that you have to check for every object
+under /org/bluez/hci0 if that one is connected. I don't think there is
+a way to see if an adapter is connected or not. Here is an example of
+getting the Connected property of all the devices.
 
-On Tue, Sep 6, 2016 at 2:04 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> Any random address type can only be connected over LE as BR/EDR only
-> support public addresses.
-> ---
->  src/device.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/src/device.c b/src/device.c
-> index b8556f1..9586022 100644
-> --- a/src/device.c
-> +++ b/src/device.c
-> @@ -1748,8 +1748,8 @@ static uint8_t select_conn_bearer(struct btd_device *dev)
->         else if (!dev->bredr_state.bonded && dev->le_state.bonded)
->                 return dev->bdaddr_type;
->
-> -       /* If the address is private it can only be connected over LE */
-> -       if (device_address_is_private(dev))
-> +       /* If the address is random it can only be connected over LE */
-> +       if (dev->bdaddr_type == BDADDR_LE_RANDOM)
->                 return dev->bdaddr_type;
->
->         if (dev->bredr_seen) {
-> --
-> 2.7.4
+#!/usr/bin/env python3
 
-Applied.
+import dbus
+import os
+import sys
 
+def get_managed_objects():
+    bus = dbus.SystemBus()
+    manager = dbus.Interface(bus.get_object("org.bluez", "/"),
 
--- 
-Luiz Augusto von Dentz
+"org.freedesktop.DBus.ObjectManager")
+    return manager.GetManagedObjects()
+
+def main():
+    bus = dbus.SystemBus()
+
+    objects = get_managed_objects()
+    for path, ifaces in iter(objects.items()):
+        dev = ifaces.get("org.bluez.Device1")
+        if dev is None:
+            continue
+
+        props = dbus.Interface(bus.get_object("org.bluez", path),
+                               "org.freedesktop.DBus.Properties")
+
+        print(path, "Connected:", props.Get("org.bluez.Device1", "Connected"))
+
+if __name__ == '__main__':
+    main()
+
+/Tobias
