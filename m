@@ -4,161 +4,158 @@ To: Dean Jenkins <Dean_Jenkins@mentor.com>, Marcel Holtmann
 	<marcel@holtmann.org>, Gustavo Padovan <gustavo@padovan.org>, Johan Hedberg
 	<johan.hedberg@gmail.com>
 CC: <linux-bluetooth@vger.kernel.org>
-Subject: [PATCH v1 4/4] Bluetooth: Prevent scheduling of work after hci_uart_tty_close()
-Date: Wed, 7 Sep 2016 15:15:10 +0100
-Message-ID: <1473257710-2073-5-git-send-email-Dean_Jenkins@mentor.com>
+Subject: [PATCH v1 3/4] Bluetooth: BCSP fails to ACK re-transmitted frames from the peer
+Date: Wed, 7 Sep 2016 15:15:09 +0100
+Message-ID: <1473257710-2073-4-git-send-email-Dean_Jenkins@mentor.com>
 In-Reply-To: <1473257710-2073-1-git-send-email-Dean_Jenkins@mentor.com>
 References: <1473257710-2073-1-git-send-email-Dean_Jenkins@mentor.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Deepak Das <Deepak_Das@mentor.com>
+Send an ACK frame with the current txack value in response to
+every received reliable frame unless a TX reliable frame is being
+sent. This modification allows re-transmitted frames from the remote
+peer to be acknowledged rather than ignored. It means that the remote
+peer knows which frame number to start re-transmitting from.
 
-There is a work queue hu->write_work that can be scheduled to handle
-a transmission work item in BCSP scenarios that are described below.
+Without this modification, the recovery time to a missing frame
+from the remote peer was unnecessarily being extended because the
+headers of the out of order reliable frames were being discarded rather
+than being processed. The frame headers of received frames will
+indicate whether the local peer's transmissions have been
+acknowledged by the remote peer. Therefore, the local peer may
+unnecessarily re-transmit despite the remote peer already indicating
+that the frame had been acknowledged in out of order reliable frame.
 
-In these scenarios, the payload of a BCSP frame can contain a HCI
-message as follows:
-
-a) Normal sending of a HCI message within a BCSP frame from upper
-layers via hci_uart_send_frame().
-
-b) BCSP retransmission due to a failure to get a BCSP ACK indication.
-This resends an old HCI message triggered by the BCSP timer timeout event
-handled by bcsp_timed_event().
-
-c) Sending of a BCSP ACK frame in response to a received reliable BCSP
-frame is handled in bcsp_complete_rx_pkt() which allows an empty payload
-(no HCI message) to be sent.
-
-A good reproduction scenario of the crash is for a bad UART driver to
-corrupt or cause a total loss of incoming BCSP frames. This leads to a link
-failure so the BCSP timer is periodically triggered in an attempt to
-retransmit unacknowledged frames. Then upper layers request the HCI UART
-to close immediately before the BCSP timer event is handled. This causes
-a race condition between closing the HCI UART and retransmitting a BCSP
-frame.
-
-The current solution is using cancel_work_sync(&hu->write_work); within
-hci_uart_tty_close() in an attempt to cleanse the work queue of the
-transmission work item.
-
-It should be noted that a transmission work item is scheduled into the work
-queue by hci_uart_tx_wakeup() which can be running in an atomic context
-such as a UART driver interrupt thread or in a process context. Therefore,
-it is possible for hci_uart_tx_wakeup() to interrupt or run concurrently
-with hci_uart_tty_close().
-
-In addition, hu->proto->close(hu) calls bcsp_close() which frees the
-various queues of messages and deletes the BCSP timer.
-
-The current solution has a flaw because hci_uart_tty_close() fails to
-inhibit the asynchronous b) and c) transmission events from adding a work
-item to the work queue AFTER cancel_work_sync(&hu->write_work); has been
-executed. A crash occurs after bcsp_close() has freed the message queues
-which are subsequently accessed when the work queue work item runs
-hci_uart_write_work(). Therefore, there is a race condition.
-
-This flaw was masked as typically retransmissions should be rare and
-Bluetooth has a low sub-system rate of being actively shutdown.
-
-This fix introduces a new HCI_UART proto flag bit called
-HCI_UART_UNREGISTERING to indicate the unregistering state of the HCI UART.
-This flag is used to prevent the addition of a transmission work item after
-hci_uart_tty_close() starts to run.
-
-Note that a spinlock is necessary because it is not possible to check
-the state of the atomic flag and to schedule the work queue in an atomic
-sequence of operations in hci_uart_tx_wakeup(). This means that the flag
-must be prevented from changing state after the flag is checked and before
-the work queue is scheduled in hci_uart_tx_wakeup().
-
-Signed-off-by: Deepak Das <Deepak_Das@mentor.com>
-Signed-off-by: Rajeev Kumar <rajeev_kumar@mentor.com>
-Signed-off-by: Dean_Jenkins@mentor.com
 Signed-off-by: Dean Jenkins <Dean_Jenkins@mentor.com>
+Signed-off-by: Jiada Wang <jiada_wang@mentor.com>
+Signed-off-by: Rajeev Kumar <rajeev_kumar@mentor.com>
 ---
- drivers/bluetooth/hci_ldisc.c | 16 +++++++++++++++-
- drivers/bluetooth/hci_uart.h  |  3 +++
- 2 files changed, 18 insertions(+), 1 deletion(-)
+ drivers/bluetooth/hci_bcsp.c | 82 ++++++++++++++++++++++++++------------------
+ 1 file changed, 48 insertions(+), 34 deletions(-)
 
-diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
-index cf1883d..ddf4cda 100644
---- a/drivers/bluetooth/hci_ldisc.c
-+++ b/drivers/bluetooth/hci_ldisc.c
-@@ -125,15 +125,22 @@ static inline struct sk_buff *hci_uart_dequeue(struct hci_uart *hu)
- 
- int hci_uart_tx_wakeup(struct hci_uart *hu)
+diff --git a/drivers/bluetooth/hci_bcsp.c b/drivers/bluetooth/hci_bcsp.c
+index d7d23ce..739ae59 100644
+--- a/drivers/bluetooth/hci_bcsp.c
++++ b/drivers/bluetooth/hci_bcsp.c
+@@ -485,13 +485,27 @@ static inline void bcsp_unslip_one_byte(struct bcsp_struct *bcsp, unsigned char
+ static void bcsp_complete_rx_pkt(struct hci_uart *hu)
  {
-+	unsigned long flags;
+ 	struct bcsp_struct *bcsp = hu->priv;
+-	int pass_up;
++	int pass_up = 0;
+ 
+ 	if (bcsp->rx_skb->data[0] & 0x80) {	/* reliable pkt */
+ 		BT_DBG("Received seqno %u from card", bcsp->rxseq_txack);
+-		bcsp->rxseq_txack++;
+-		bcsp->rxseq_txack %= 0x8;
+-		bcsp->txack_req    = 1;
 +
-+	spin_lock_irqsave(&hu->schedule_lock, flags);
-+	if (test_bit(HCI_UART_UNREGISTERING, &hu->flags))
-+		goto no_schedule;
- 	if (test_and_set_bit(HCI_UART_SENDING, &hu->tx_state)) {
- 		set_bit(HCI_UART_TX_WAKEUP, &hu->tx_state);
--		return 0;
-+		goto no_schedule;
++		/* check the rx sequence number is as expected */
++		if ((bcsp->rx_skb->data[0] & 0x07) == bcsp->rxseq_txack) {
++			bcsp->rxseq_txack++;
++			bcsp->rxseq_txack %= 0x8;
++		} else {
++			/* handle re-transmitted packet or
++			   when packet was missed */
++			BT_ERR("Out-of-order packet arrived, got %u expected %u",
++				bcsp->rx_skb->data[0] & 0x07, bcsp->rxseq_txack);
++
++			/* do not process out-of-order packet payload */
++			pass_up = 2;
++		}
++
++		/* send current txack value to all received reliable packets */
++		bcsp->txack_req = 1;
+ 
+ 		/* If needed, transmit an ack pkt */
+ 		hci_uart_tx_wakeup(hu);
+@@ -500,26 +514,32 @@ static void bcsp_complete_rx_pkt(struct hci_uart *hu)
+ 	bcsp->rxack = (bcsp->rx_skb->data[0] >> 3) & 0x07;
+ 	BT_DBG("Request for pkt %u from card", bcsp->rxack);
+ 
++	/* handle received ACK indications,
++	   including those from out-of-order packets */
+ 	bcsp_pkt_cull(bcsp);
+-	if ((bcsp->rx_skb->data[1] & 0x0f) == 6 &&
+-			bcsp->rx_skb->data[0] & 0x80) {
+-		hci_skb_pkt_type(bcsp->rx_skb) = HCI_ACLDATA_PKT;
+-		pass_up = 1;
+-	} else if ((bcsp->rx_skb->data[1] & 0x0f) == 5 &&
+-			bcsp->rx_skb->data[0] & 0x80) {
+-		hci_skb_pkt_type(bcsp->rx_skb) = HCI_EVENT_PKT;
+-		pass_up = 1;
+-	} else if ((bcsp->rx_skb->data[1] & 0x0f) == 7) {
+-		hci_skb_pkt_type(bcsp->rx_skb) = HCI_SCODATA_PKT;
+-		pass_up = 1;
+-	} else if ((bcsp->rx_skb->data[1] & 0x0f) == 1 &&
+-			!(bcsp->rx_skb->data[0] & 0x80)) {
+-		bcsp_handle_le_pkt(hu);
+-		pass_up = 0;
+-	} else
+-		pass_up = 0;
+-
+-	if (!pass_up) {
++
++	if (pass_up != 2) {
++		if ((bcsp->rx_skb->data[1] & 0x0f) == 6 &&
++				(bcsp->rx_skb->data[0] & 0x80)) {
++			bt_cb(bcsp->rx_skb)->pkt_type = HCI_ACLDATA_PKT;
++			pass_up = 1;
++		} else if ((bcsp->rx_skb->data[1] & 0x0f) == 5 &&
++				(bcsp->rx_skb->data[0] & 0x80)) {
++			bt_cb(bcsp->rx_skb)->pkt_type = HCI_EVENT_PKT;
++			pass_up = 1;
++		} else if ((bcsp->rx_skb->data[1] & 0x0f) == 7) {
++			bt_cb(bcsp->rx_skb)->pkt_type = HCI_SCODATA_PKT;
++			pass_up = 1;
++		} else if ((bcsp->rx_skb->data[1] & 0x0f) == 1 &&
++				!(bcsp->rx_skb->data[0] & 0x80)) {
++			bcsp_handle_le_pkt(hu);
++			pass_up = 0;
++		} else {
++			pass_up = 0;
++		}
++	}
++
++	if (pass_up == 0) {
+ 		struct hci_event_hdr hdr;
+ 		u8 desc = (bcsp->rx_skb->data[1] & 0x0f);
+ 
+@@ -544,11 +564,15 @@ static void bcsp_complete_rx_pkt(struct hci_uart *hu)
+ 			}
+ 		} else
+ 			kfree_skb(bcsp->rx_skb);
+-	} else {
++	} else if (pass_up == 1) {
+ 		/* Pull out BCSP hdr */
+ 		skb_pull(bcsp->rx_skb, 4);
+ 
+ 		hci_recv_frame(hu->hdev, bcsp->rx_skb);
++	} else {
++		/* ignore packet payload of already ACKed re-transmitted
++		   packets or when a packet was missed in the BCSP window */
++		kfree_skb(bcsp->rx_skb);
  	}
  
- 	BT_DBG("");
- 
- 	schedule_work(&hu->write_work);
- 
-+no_schedule:
-+	spin_unlock_irqrestore(&hu->schedule_lock, flags);
- 	return 0;
- }
- 
-@@ -464,6 +471,8 @@ static int hci_uart_tty_open(struct tty_struct *tty)
- 	INIT_WORK(&hu->init_ready, hci_uart_init_work);
- 	INIT_WORK(&hu->write_work, hci_uart_write_work);
- 
-+	spin_lock_init(&hu->schedule_lock);
-+
- 	/* Flush any pending characters in the driver */
- 	tty_driver_flush_buffer(tty);
- 
-@@ -479,6 +488,7 @@ static void hci_uart_tty_close(struct tty_struct *tty)
- {
- 	struct hci_uart *hu = tty->disc_data;
- 	struct hci_dev *hdev;
-+	unsigned long flags;
- 
- 	BT_DBG("tty %p", tty);
- 
-@@ -488,6 +498,10 @@ static void hci_uart_tty_close(struct tty_struct *tty)
- 	if (!hu)
- 		return;
- 
-+	spin_lock_irqsave(&hu->schedule_lock, flags);
-+	set_bit(HCI_UART_UNREGISTERING, &hu->flags);
-+	spin_unlock_irqrestore(&hu->schedule_lock, flags);
-+
- 	hdev = hu->hdev;
- 	if (hdev)
- 		hci_uart_close(hdev);
-diff --git a/drivers/bluetooth/hci_uart.h b/drivers/bluetooth/hci_uart.h
-index 839bad1..27a7708 100644
---- a/drivers/bluetooth/hci_uart.h
-+++ b/drivers/bluetooth/hci_uart.h
-@@ -88,6 +88,8 @@ struct hci_uart {
- 	struct sk_buff		*tx_skb;
- 	unsigned long		tx_state;
- 
-+	/* prevent scheduling work during close */
-+	spinlock_t		schedule_lock;
- 	unsigned int init_speed;
- 	unsigned int oper_speed;
- };
-@@ -96,6 +98,7 @@ struct hci_uart {
- #define HCI_UART_PROTO_SET	0
- #define HCI_UART_REGISTERED	1
- #define HCI_UART_PROTO_READY	2
-+#define HCI_UART_UNREGISTERING	3
- 
- /* TX states  */
- #define HCI_UART_SENDING	1
+ 	bcsp->rx_state = BCSP_W4_PKT_DELIMITER;
+@@ -594,16 +618,6 @@ static int bcsp_recv(struct hci_uart *hu, const void *data, int count)
+ 				bcsp->rx_count = 0;
+ 				continue;
+ 			}
+-			if (bcsp->rx_skb->data[0] & 0x80	/* reliable pkt */
+-						&& (bcsp->rx_skb->data[0] & 0x07) != bcsp->rxseq_txack) {
+-				BT_ERR("Out-of-order packet arrived, got %u expected %u",
+-					bcsp->rx_skb->data[0] & 0x07, bcsp->rxseq_txack);
+-
+-				kfree_skb(bcsp->rx_skb);
+-				bcsp->rx_state = BCSP_W4_PKT_DELIMITER;
+-				bcsp->rx_count = 0;
+-				continue;
+-			}
+ 			bcsp->rx_state = BCSP_W4_DATA;
+ 			bcsp->rx_count = (bcsp->rx_skb->data[1] >> 4) +
+ 					(bcsp->rx_skb->data[2] << 4);	/* May be 0 */
 -- 
 2.7.4
