@@ -1,185 +1,720 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Subject: Re: [PATCH BlueZ 1/5] core/service: Fix setting wrong state after
- calling accept
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-bluetooth@vger.kernel.org
-References: <1473338340-7587-1-git-send-email-luiz.dentz@gmail.com>
-From: Felipe Ferreri Tonello <eu@felipetonello.com>
-Message-ID: <38a00e58-cde7-8774-3956-15255854001f@felipetonello.com>
-Date: Thu, 8 Sep 2016 15:45:26 +0100
+Return-Path: <marvell@marvell.com>
+From: Amitkumar Karwar <akarwar@marvell.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: <linux-kernel@vger.kernel.org>, <marcel@holtmann.org>,
+        <loic.poulain@intel.com>, Ganapathi Bhat <gbhat@marvell.com>,
+        Amitkumar
+ Karwar <akarwar@marvell.com>
+Subject: [PATCH v13 3/3] Bluetooth: hci_uart: Support firmware download for Marvell
+Date: Thu, 8 Sep 2016 20:11:15 +0530
+Message-ID: <1473345675-10995-3-git-send-email-akarwar@marvell.com>
+In-Reply-To: <1473345675-10995-1-git-send-email-akarwar@marvell.com>
+References: <1473345675-10995-1-git-send-email-akarwar@marvell.com>
 MIME-Version: 1.0
-In-Reply-To: <1473338340-7587-1-git-send-email-luiz.dentz@gmail.com>
-Content-Type: multipart/mixed;
- boundary="------------4139196B08E9B600FB16BA1F"
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is a multi-part message in MIME format.
---------------4139196B08E9B600FB16BA1F
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+From: Ganapathi Bhat <gbhat@marvell.com>
 
-Hi Luiz,
+This patch implement firmware download feature for
+Marvell Bluetooth devices. If firmware is already
+downloaded, it will skip downloading.
 
-On 08/09/16 13:38, Luiz Augusto von Dentz wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> The accept calback may transit the state to connected on the call itself
-> since most of the time it is just a matter of selecting the attributes
-> in case of GATT profiles.
-> ---
->  src/service.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/src/service.c b/src/service.c
-> index f387fc4..20a41d0 100644
-> --- a/src/service.c
-> +++ b/src/service.c
-> @@ -209,7 +209,8 @@ int service_accept(struct btd_service *service)
->  	return err;
->  
->  done:
-> -	change_state(service, BTD_SERVICE_STATE_CONNECTING, 0);
-> +	if (service->state == BTD_SERVICE_STATE_DISCONNECTED)
-> +		change_state(service, BTD_SERVICE_STATE_CONNECTING, 0);
+Signed-off-by: Ganapathi Bhat <gbhat@marvell.com>
+Signed-off-by: Amitkumar Karwar <akarwar@marvell.com>
+---
+v2: Fixed compilation warning reported by kbuild test robot
+v3: Addressed review comments from Marcel Holtmann
+    a) Removed vendor specific code from hci_ldisc.c
+    b) Get rid of static forward declaration
+    c) Removed unnecessary heavy nesting
+    d) Git rid of module parameter and global variables
+    e) Add logic to pick right firmware image
+v4: Addresses review comments from Alan
+    a) Use existing kernel helper APIs instead of writing own.
+    b) Replace mdelay() with msleep()
+v5: Addresses review comments from Loic Poulain
+    a) Use bt_dev_err/warn/dbg helpers insted of BT_ERR/WARN/DBG
+    b) Used static functions where required and removed forward delcarations
+    c) Edited comments for the function hci_uart_recv_data
+    d) Made HCI_UART_DNLD_FW flag a part of driver private data
+v6: Addresses review comments from Loic Poulain
+    a) Used skb instead of array to store firmware data during download
+    b) Used hci_uart_tx_wakeup and enqueued packets instead of tty write
+    c) Used GFP_KERNEL instead of GFP_ATOMIC
+v7: Edited Kconfig to add dependency for BT_HCIUART_H4. The change resolves
+    errors reported by kbuild test robot.
+v8: Addressed review comments from Marcel Holtmann
+    a) Removed unnecessary memory allocation failure messages
+    b) Get rid of btmrvl.h header file and add definitions in hci_mrvl.c file
+v9: Addressed review comments from Marcel Holtmann
+    a) Moved firmware download code from setup to prepare handler.
+    b) Change messages from bt_dev_*->BT_*, as hdev isn't available during firmware
+     download.
+v10: Addressed review comments from Marcel Holtmann
+    a) Added new callback recv_for_prepare to receive data from device
+     during prepare phase
+    b) Avoided using private flags (HCI_UART_DNLD_FW) as new receive callback is
+     added for the same purpose
+    c) Used kernel API to handle unaligned data
+    d) Moved mrvl_set_baud functionality inside setup callback
+v11: Write data through ldisc in mrvl_send_ack() instead of directly calling
+    write method(One Thousand Gnomes).
+v12: a) Check for buffer length before copying to skb (Loic Poulain)
+     b) Rearrange skb memory allocation check
+v13: Addressed review comments from Loic Poulain
+     a) Instead of hardcoding 115200, initialise init_speed as 115200
+     b) Allocate required length instead of max size.
+---
+ drivers/bluetooth/Kconfig     |  11 +
+ drivers/bluetooth/Makefile    |   1 +
+ drivers/bluetooth/hci_ldisc.c |   6 +
+ drivers/bluetooth/hci_mrvl.c  | 548 ++++++++++++++++++++++++++++++++++++++++++
+ drivers/bluetooth/hci_uart.h  |   8 +-
+ 5 files changed, 573 insertions(+), 1 deletion(-)
+ create mode 100644 drivers/bluetooth/hci_mrvl.c
 
-This looks really hacky - I know it was like this before already.
-
-Why can you change the state in two different places? What if the
-profile->accept doesn't change the state to connected? Will this change
-to connecting and then the connected state will never be set?
-
-I think btd_service_connecting_complete() should always be called with
-the same err as returned by profile->accept()
-
->  	return 0;
->  }
->  
-> 
-
+diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
+index 43e9f93..3cc9bff 100644
+--- a/drivers/bluetooth/Kconfig
++++ b/drivers/bluetooth/Kconfig
+@@ -180,6 +180,17 @@ config BT_HCIUART_AG6XX
+ 
+ 	  Say Y here to compile support for Intel AG6XX protocol.
+ 
++config BT_HCIUART_MRVL
++	bool "Marvell protocol support"
++	depends on BT_HCIUART
++	select BT_HCIUART_H4
++	help
++	  Marvell is serial protocol for communication between Bluetooth
++	  device and host. This protocol is required for most Marvell Bluetooth
++	  devices with UART interface.
++
++	  Say Y here to compile support for HCI MRVL protocol.
++
+ config BT_HCIBCM203X
+ 	tristate "HCI BCM203x USB driver"
+ 	depends on USB
+diff --git a/drivers/bluetooth/Makefile b/drivers/bluetooth/Makefile
+index 3e92cfe..b1fc29a 100644
+--- a/drivers/bluetooth/Makefile
++++ b/drivers/bluetooth/Makefile
+@@ -38,6 +38,7 @@ hci_uart-$(CONFIG_BT_HCIUART_INTEL)	+= hci_intel.o
+ hci_uart-$(CONFIG_BT_HCIUART_BCM)	+= hci_bcm.o
+ hci_uart-$(CONFIG_BT_HCIUART_QCA)	+= hci_qca.o
+ hci_uart-$(CONFIG_BT_HCIUART_AG6XX)	+= hci_ag6xx.o
++hci_uart-$(CONFIG_BT_HCIUART_MRVL)	+= hci_mrvl.o
+ hci_uart-objs				:= $(hci_uart-y)
+ 
+ ccflags-y += -D__CHECK_ENDIAN__
+diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
+index 2c88586..ded13d3 100644
+--- a/drivers/bluetooth/hci_ldisc.c
++++ b/drivers/bluetooth/hci_ldisc.c
+@@ -821,6 +821,9 @@ static int __init hci_uart_init(void)
+ #ifdef CONFIG_BT_HCIUART_AG6XX
+ 	ag6xx_init();
+ #endif
++#ifdef CONFIG_BT_HCIUART_MRVL
++	mrvl_init();
++#endif
+ 
+ 	return 0;
+ }
+@@ -856,6 +859,9 @@ static void __exit hci_uart_exit(void)
+ #ifdef CONFIG_BT_HCIUART_AG6XX
+ 	ag6xx_deinit();
+ #endif
++#ifdef CONFIG_BT_HCIUART_MRVL
++	mrvl_deinit();
++#endif
+ 
+ 	/* Release tty registration of line discipline */
+ 	err = tty_unregister_ldisc(N_HCI);
+diff --git a/drivers/bluetooth/hci_mrvl.c b/drivers/bluetooth/hci_mrvl.c
+new file mode 100644
+index 0000000..9805463
+--- /dev/null
++++ b/drivers/bluetooth/hci_mrvl.c
+@@ -0,0 +1,548 @@
++/* Bluetooth HCI UART driver for Marvell devices
++ *
++ * Copyright (C) 2016, Marvell International Ltd.
++ *
++ *  Acknowledgements:
++ *  This file is based on hci_h4.c, which was written
++ *  by Maxim Krasnyansky and Marcel Holtmann.
++ *
++ * This software file (the "File") is distributed by Marvell International
++ * Ltd. under the terms of the GNU General Public License Version 2, June 1991
++ * (the "License").  You may use, redistribute and/or modify this File in
++ * accordance with the terms and conditions of the License, a copy of which
++ * is available on the worldwide web at
++ * http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt.
++ *
++ * THE FILE IS DISTRIBUTED AS-IS, WITHOUT WARRANTY OF ANY KIND, AND THE
++ * IMPLIED WARRANTIES OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE
++ * ARE EXPRESSLY DISCLAIMED.  The License provides additional details about
++ * this warranty disclaimer.
++ */
++
++#include <linux/firmware.h>
++#include <linux/tty.h>
++#include <asm/unaligned.h>
++#include <net/bluetooth/bluetooth.h>
++#include <net/bluetooth/hci_core.h>
++#include "hci_uart.h"
++
++struct fw_data {
++	wait_queue_head_t init_wait_q;
++	u8 wait_fw;
++	int next_len;
++	u8 five_bytes[5];
++	u8 next_index;
++	u8 last_ack;
++	u8 expected_ack;
++	struct ktermios old_termios;
++	u8 chip_id;
++	u8 chip_rev;
++	struct sk_buff *skb;
++};
++
++#define MRVL_HELPER_NAME	"mrvl/helper_uart_3000000.bin"
++#define MRVL_8997_CHIP_ID	0x50
++#define MRVL_8997_FW_NAME	"mrvl/uart8997_bt.bin"
++#define MRVL_MAX_FW_BLOCK_SIZE	1024
++#define MRVL_MAX_RETRY_SEND	12
++#define MRVL_DNLD_DELAY		100
++#define MRVL_ACK		0x5A
++#define MRVL_NAK		0xBF
++#define MRVL_HDR_REQ_FW		0xA5
++#define MRVL_HDR_CHIP_VER	0xAA
++#define MRVL_HCI_OP_SET_BAUD	0xFC09
++#define MRVL_FW_HDR_LEN		5
++#define MRVL_WAIT_TIMEOUT	msecs_to_jiffies(12000)
++
++struct mrvl_data {
++	struct sk_buff *rx_skb;
++	struct sk_buff_head txq;
++	struct fw_data *fwdata;
++};
++
++static int get_cts(struct hci_uart *hu)
++{
++	struct tty_struct *tty = hu->tty;
++	u32 state =  tty->ops->tiocmget(tty);
++
++	if (state & TIOCM_CTS) {
++		bt_dev_dbg(hu->hdev, "CTS is low");
++		return 1;
++	}
++	bt_dev_dbg(hu->hdev, "CTS is high");
++
++	return 0;
++}
++
++/* Initialize protocol */
++static int mrvl_open(struct hci_uart *hu)
++{
++	struct mrvl_data *mrvl;
++
++	bt_dev_dbg(hu->hdev, "hu %p", hu);
++
++	mrvl = kzalloc(sizeof(*mrvl), GFP_KERNEL);
++	if (!mrvl)
++		return -ENOMEM;
++
++	skb_queue_head_init(&mrvl->txq);
++	hu->priv = mrvl;
++
++	return 0;
++}
++
++/* Flush protocol data */
++static int mrvl_flush(struct hci_uart *hu)
++{
++	struct mrvl_data *mrvl = hu->priv;
++
++	bt_dev_dbg(hu->hdev, "hu %p", hu);
++
++	skb_queue_purge(&mrvl->txq);
++
++	return 0;
++}
++
++/* Close protocol */
++static int mrvl_close(struct hci_uart *hu)
++{
++	struct mrvl_data *mrvl = hu->priv;
++
++	bt_dev_dbg(hu->hdev, "hu %p", hu);
++
++	skb_queue_purge(&mrvl->txq);
++	kfree_skb(mrvl->rx_skb);
++	hu->priv = NULL;
++	kfree(mrvl);
++
++	return 0;
++}
++
++/* Enqueue frame for transmittion (padding, crc, etc) */
++static int mrvl_enqueue(struct hci_uart *hu, struct sk_buff *skb)
++{
++	struct mrvl_data *mrvl = hu->priv;
++
++	bt_dev_dbg(hu->hdev, "hu %p skb %p", hu, skb);
++
++	/* Prepend skb with frame type */
++	memcpy(skb_push(skb, 1), &hci_skb_pkt_type(skb), 1);
++	skb_queue_tail(&mrvl->txq, skb);
++
++	return 0;
++}
++
++static const struct h4_recv_pkt mrvl_recv_pkts[] = {
++	{ H4_RECV_ACL,   .recv = hci_recv_frame },
++	{ H4_RECV_SCO,   .recv = hci_recv_frame },
++	{ H4_RECV_EVENT, .recv = hci_recv_frame },
++};
++
++/* Send ACK/NAK to the device */
++static void mrvl_send_ack(struct hci_uart *hu, unsigned char ack)
++{
++	struct mrvl_data *mrvl = hu->priv;
++	struct sk_buff *skb = NULL;
++
++	skb = bt_skb_alloc(sizeof(ack), GFP_KERNEL);
++	if (!skb)
++		return;
++
++	memcpy(skb->data, &ack, sizeof(ack));
++	skb_put(skb, sizeof(ack));
++	skb_queue_head(&mrvl->txq, skb);
++	hci_uart_tx_wakeup(hu);
++}
++
++/* Validate the feedback data from device */
++static void mrvl_pkt_complete(struct hci_uart *hu, struct sk_buff *skb)
++{
++	struct mrvl_data *mrvl = hu->priv;
++	struct fw_data *fw_data = mrvl->fwdata;
++	u16 lhs, rhs;
++
++	lhs = get_unaligned_le16(skb->data + 1);
++	rhs = get_unaligned_le16(skb->data + 3);
++	if ((lhs ^ rhs) == 0xffff) {
++		mrvl_send_ack(hu, MRVL_ACK);
++		fw_data->wait_fw = 1;
++		fw_data->next_len = lhs;
++		/* Firmware download is done, send the last ack */
++		if (!lhs)
++			fw_data->last_ack = 1;
++
++		if (fw_data->expected_ack == MRVL_HDR_CHIP_VER) {
++			fw_data->chip_id = skb->data[1];
++			fw_data->chip_rev = skb->data[2];
++		}
++		wake_up_interruptible(&fw_data->init_wait_q);
++	} else {
++		mrvl_send_ack(hu, MRVL_NAK);
++	}
++}
++
++/* This function receives data from the uart device during firmware download.
++ * Driver expects 5 bytes of data as per the protocal in the below format:
++ * <HEADER><BYTE_1><BYTE_2><BYTE_3><BYTE_4>
++ * BYTE_3 and BYTE_4 are compliment of BYTE_1 an BYTE_2. Data can come in chunks
++ * of any length. If length received is < 5, accumulate the data in an array,
++ * until we have a sequence of 5 bytes, starting with the expected HEADER. If
++ * the length received is > 5  bytes, then get the first 5 bytes, starting with
++ * the HEADER and process the same, ignoring the rest of the bytes as per the
++ * protocal.
++ */
++static struct sk_buff *mrvl_process_fw_data(struct hci_uart *hu,
++					    struct sk_buff *skb,
++					    u8 *buf, int count)
++{
++	struct mrvl_data *mrvl = hu->priv;
++	struct fw_data *fw_data = mrvl->fwdata;
++	int i = 0, len;
++
++	count = (count > MRVL_FW_HDR_LEN) ? MRVL_FW_HDR_LEN : count;
++
++	if (skb) {
++		count = ((skb->len + count) > MRVL_FW_HDR_LEN) ?
++			(MRVL_FW_HDR_LEN - skb->len) : count;
++	} else {
++		while ((i < count) && buf[i] != fw_data->expected_ack)
++			i++;
++		if (i == count)
++			return ERR_PTR(-EILSEQ);
++
++		skb = bt_skb_alloc(MRVL_FW_HDR_LEN, GFP_KERNEL);
++		if (!skb)
++			return ERR_PTR(-ENOMEM);
++	}
++
++	len = count - i;
++	memcpy(skb_put(skb, len), &buf[i], len);
++
++	if (skb->len == MRVL_FW_HDR_LEN) {
++		mrvl_pkt_complete(hu, skb);
++		kfree_skb(skb);
++		skb = NULL;
++	}
++
++	return skb;
++}
++
++/* Receive firmware feedback data */
++static int mrvl_recv_for_prepare(struct hci_uart *hu, const void *data,
++				 int count)
++{
++	struct mrvl_data *mrvl = hu->priv;
++
++	mrvl->fwdata->skb = mrvl_process_fw_data(hu, mrvl->fwdata->skb,
++						 (u8 *)data, count);
++	if (IS_ERR(mrvl->fwdata->skb)) {
++		int err = PTR_ERR(mrvl->fwdata->skb);
++
++		bt_dev_err(hu->hdev,
++			   "Receive firmware data failed (%d)", err);
++		mrvl->fwdata->skb = NULL;
++		return err;
++	}
++
++	return 0;
++}
++
++/* Receive data */
++static int mrvl_recv(struct hci_uart *hu, const void *data, int count)
++{
++	struct mrvl_data *mrvl = hu->priv;
++
++	if (!test_bit(HCI_UART_REGISTERED, &hu->flags))
++		return -EUNATCH;
++
++	mrvl->rx_skb = h4_recv_buf(hu->hdev, mrvl->rx_skb, data, count,
++				   mrvl_recv_pkts, ARRAY_SIZE(mrvl_recv_pkts));
++	if (IS_ERR(mrvl->rx_skb)) {
++		int err = PTR_ERR(mrvl->rx_skb);
++
++		bt_dev_err(hu->hdev, "Frame reassembly failed (%d)", err);
++		mrvl->rx_skb = NULL;
++		return err;
++	}
++
++	return count;
++}
++
++static struct sk_buff *mrvl_dequeue(struct hci_uart *hu)
++{
++	struct mrvl_data *mrvl = hu->priv;
++
++	return skb_dequeue(&mrvl->txq);
++}
++
++static int mrvl_init_fw_data(struct hci_uart *hu)
++{
++	struct fw_data *fwdata;
++	struct mrvl_data *mrvl = hu->priv;
++
++	fwdata = kzalloc(sizeof(*fwdata), GFP_KERNEL);
++	if (!fwdata)
++		return -ENOMEM;
++
++	mrvl->fwdata = fwdata;
++	init_waitqueue_head(&fwdata->init_wait_q);
++
++	return 0;
++}
++
++/* Wait for the header from device */
++static int mrvl_wait_for_hdr(struct hci_uart *hu, u8 header)
++{
++	struct mrvl_data *mrvl = hu->priv;
++	struct fw_data *fw_data = mrvl->fwdata;
++
++	fw_data->expected_ack = header;
++	fw_data->wait_fw = 0;
++
++	if (!wait_event_interruptible_timeout(fw_data->init_wait_q,
++					      fw_data->wait_fw,
++					      MRVL_WAIT_TIMEOUT)) {
++		BT_ERR("TIMEOUT, waiting for:0x%x", fw_data->expected_ack);
++		return -1;
++	}
++
++	return 0;
++}
++
++/* Send bytes to device */
++static int mrvl_send_data(struct hci_uart *hu, struct sk_buff *skb)
++{
++	struct mrvl_data *mrvl = hu->priv;
++
++	skb_queue_head(&mrvl->txq, skb);
++	hci_uart_tx_wakeup(hu);
++
++	if (mrvl_wait_for_hdr(hu, MRVL_HDR_REQ_FW) == -1)
++		return -1;
++
++	return 0;
++}
++
++/* Download firmware to the device */
++static int mrvl_dnld_fw(struct hci_uart *hu, const char *file_name)
++{
++	const struct firmware *fw = NULL;
++	struct sk_buff *skb = NULL;
++	int offset = 0;
++	int ret, tx_len;
++	struct mrvl_data *mrvl = hu->priv;
++	struct fw_data *fw_data = mrvl->fwdata;
++
++	ret = request_firmware(&fw, file_name, hu->tty->dev);
++	if (ret < 0) {
++		BT_ERR("request_firmware() failed");
++		return -1;
++	}
++
++	BT_INFO("Downloading FW (%d bytes)", (u16)fw->size);
++
++	fw_data->last_ack = 0;
++
++	while (1) {
++		if ((offset >= fw->size) || (fw_data->last_ack))
++			break;
++		tx_len = fw_data->next_len;
++		if ((fw->size - offset) < tx_len)
++			tx_len = fw->size - offset;
++
++		skb = bt_skb_alloc(tx_len, GFP_KERNEL);
++		if (!skb) {
++			ret = -1;
++			goto done;
++		}
++
++		memcpy(skb->data, &fw->data[offset], tx_len);
++		skb_put(skb, tx_len);
++		if (mrvl_send_data(hu, skb) != 0) {
++			BT_ERR("Fail to download firmware");
++			ret = -1;
++			goto done;
++		}
++		offset += tx_len;
++	}
++
++	BT_INFO("Downloaded %d byte firmware", offset);
++done:
++	release_firmware(fw);
++
++	return ret;
++}
++
++/* Set the baud rate */
++static int mrvl_set_dev_baud(struct hci_uart *hu)
++{
++	struct hci_dev *hdev = hu->hdev;
++	struct sk_buff *skb;
++	static const u8 baud_param[] = { 0xc0, 0xc6, 0x2d, 0x00 };
++	int err;
++
++	skb = __hci_cmd_sync(hdev, MRVL_HCI_OP_SET_BAUD, sizeof(baud_param),
++			     baud_param, HCI_INIT_TIMEOUT);
++	if (IS_ERR(skb)) {
++		err = PTR_ERR(skb);
++		bt_dev_err(hu->hdev, "Set device baudrate failed (%d)", err);
++		return err;
++	}
++	kfree_skb(skb);
++
++	return 0;
++}
++
++/* Reset device */
++static int mrvl_reset(struct hci_uart *hu)
++{
++	struct hci_dev *hdev = hu->hdev;
++	struct sk_buff *skb;
++	int err;
++
++	skb = __hci_cmd_sync(hdev, HCI_OP_RESET, 0, NULL, HCI_CMD_TIMEOUT);
++	if (IS_ERR(skb)) {
++		err = PTR_ERR(skb);
++		bt_dev_err(hu->hdev, "Reset device failed (%d)", err);
++		return err;
++	}
++	kfree_skb(skb);
++
++	return 0;
++}
++
++static int mrvl_get_fw_name(struct hci_uart *hu, char *fw_name)
++{
++	struct mrvl_data *mrvl = hu->priv;
++	struct fw_data *fw_data = mrvl->fwdata;
++
++	if (mrvl_wait_for_hdr(hu, MRVL_HDR_CHIP_VER) != 0) {
++		BT_ERR("Could not read chip id and revision");
++		return -1;
++	}
++
++	BT_DBG("chip_id=0x%x, chip_rev=0x%x",
++	       fw_data->chip_id, fw_data->chip_rev);
++
++	switch (fw_data->chip_id) {
++	case MRVL_8997_CHIP_ID:
++		memcpy(fw_name, MRVL_8997_FW_NAME, sizeof(MRVL_8997_FW_NAME));
++		return 0;
++	default:
++		BT_ERR("Invalid chip id");
++		return -1;
++	}
++}
++
++/* Download helper and firmare to device */
++static int hci_uart_dnld_fw(struct hci_uart *hu)
++{
++	struct tty_struct *tty = hu->tty;
++	struct ktermios new_termios;
++	struct ktermios old_termios;
++	char fw_name[128];
++	int ret;
++
++	old_termios = tty->termios;
++
++	if (get_cts(hu)) {
++		BT_INFO("fw is running");
++		return 0;
++	}
++
++	hci_uart_set_baudrate(hu, hu->proto->init_speed);
++	hci_uart_set_flow_control(hu, true);
++
++	ret = mrvl_wait_for_hdr(hu, MRVL_HDR_REQ_FW);
++	if (ret)
++		goto fail;
++
++	ret = mrvl_dnld_fw(hu, MRVL_HELPER_NAME);
++	if (ret)
++		goto fail;
++
++	msleep(MRVL_DNLD_DELAY);
++
++	hci_uart_set_baudrate(hu, 3000000);
++	hci_uart_set_flow_control(hu, false);
++
++	ret = mrvl_get_fw_name(hu, fw_name);
++	if (ret)
++		goto fail;
++
++	ret = mrvl_wait_for_hdr(hu, MRVL_HDR_REQ_FW);
++	if (ret)
++		goto fail;
++
++	ret = mrvl_dnld_fw(hu, fw_name);
++	if (ret)
++		goto fail;
++
++	msleep(MRVL_DNLD_DELAY);
++fail:
++	/* restore uart settings */
++	new_termios = tty->termios;
++	tty->termios.c_cflag = old_termios.c_cflag;
++	tty_set_termios(tty, &new_termios);
++
++	return ret;
++}
++
++static int mrvl_setup(struct hci_uart *hu)
++{
++	int err;
++
++	hci_uart_set_baudrate(hu, hu->proto->init_speed);
++	hci_uart_set_flow_control(hu, false);
++
++	err = mrvl_reset(hu);
++	if (!err) {
++		err = mrvl_set_dev_baud(hu);
++		if (err)
++			return -1;
++	}
++
++	hci_uart_set_baudrate(hu, 3000000);
++	hci_uart_set_flow_control(hu, false);
++	msleep(MRVL_DNLD_DELAY);
++
++	return 0;
++}
++
++static int mrvl_prepare(struct hci_uart *hu)
++{
++	struct mrvl_data *mrvl = hu->priv;
++	int err;
++
++	err = mrvl_init_fw_data(hu);
++	if (!err)
++		err = hci_uart_dnld_fw(hu);
++
++	kfree(mrvl->fwdata);
++	return err;
++}
++
++static const struct hci_uart_proto mrvlp = {
++	.id		= HCI_UART_MRVL,
++	.name		= "MRVL",
++	.init_speed	= 115200,
++	.open		= mrvl_open,
++	.close		= mrvl_close,
++	.recv		= mrvl_recv,
++	.enqueue	= mrvl_enqueue,
++	.dequeue	= mrvl_dequeue,
++	.flush		= mrvl_flush,
++	.setup		= mrvl_setup,
++	.prepare	= mrvl_prepare,
++	.recv_for_prepare	= mrvl_recv_for_prepare,
++};
++
++int __init mrvl_init(void)
++{
++	return hci_uart_register_proto(&mrvlp);
++}
++
++int __exit mrvl_deinit(void)
++{
++	return hci_uart_unregister_proto(&mrvlp);
++}
+diff --git a/drivers/bluetooth/hci_uart.h b/drivers/bluetooth/hci_uart.h
+index 17ba3b4..8c53b50 100644
+--- a/drivers/bluetooth/hci_uart.h
++++ b/drivers/bluetooth/hci_uart.h
+@@ -35,7 +35,7 @@
+ #define HCIUARTGETFLAGS		_IOR('U', 204, int)
+ 
+ /* UART protocols */
+-#define HCI_UART_MAX_PROTO	10
++#define HCI_UART_MAX_PROTO	11
+ 
+ #define HCI_UART_H4	0
+ #define HCI_UART_BCSP	1
+@@ -47,6 +47,7 @@
+ #define HCI_UART_BCM	7
+ #define HCI_UART_QCA	8
+ #define HCI_UART_AG6XX	9
++#define HCI_UART_MRVL	10
+ 
+ #define HCI_UART_RAW_DEVICE	0
+ #define HCI_UART_RESET_ON_INIT	1
+@@ -192,3 +193,8 @@ int qca_deinit(void);
+ int ag6xx_init(void);
+ int ag6xx_deinit(void);
+ #endif
++
++#ifdef CONFIG_BT_HCIUART_MRVL
++int mrvl_init(void);
++int mrvl_deinit(void);
++#endif
 -- 
-Felipe
-
---------------4139196B08E9B600FB16BA1F
-Content-Type: application/pgp-keys;
- name="0x92698E6A.asc"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
- filename="0x92698E6A.asc"
-
------BEGIN PGP PUBLIC KEY BLOCK-----
-
-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
-SkAyCfQaSw==
-=JwBB
------END PGP PUBLIC KEY BLOCK-----
-
---------------4139196B08E9B600FB16BA1F--
+1.8.1.4
