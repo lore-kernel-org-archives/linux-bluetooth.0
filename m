@@ -1,28 +1,35 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Marcin Kraglak <marcin.kraglak@tieto.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] core/device: Fix using not initialised uuid value.
-Date: Thu,  8 Sep 2016 11:29:20 +0200
-Message-Id: <1473326960-18003-1-git-send-email-marcin.kraglak@tieto.com>
+Subject: [PATCH BlueZ] core/service: Fix setting wrong state after calling accept
+Date: Thu,  8 Sep 2016 11:31:13 +0300
+Message-Id: <1473323473-29916-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- src/device.c | 1 +
- 1 file changed, 1 insertion(+)
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-diff --git a/src/device.c b/src/device.c
-index 9586022..788554a 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -2058,6 +2058,7 @@ static void store_incl(struct gatt_db_attribute *attr, void *user_data)
+The accept calback may transit the state to connected on the call itself
+since most of the time it is just a matter of selecting the attributes
+in case of GATT profiles.
+---
+ src/service.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/service.c b/src/service.c
+index f387fc4..20a41d0 100644
+--- a/src/service.c
++++ b/src/service.c
+@@ -209,7 +209,8 @@ int service_accept(struct btd_service *service)
+ 	return err;
  
- 	sprintf(handle, "%04hx", handle_num);
+ done:
+-	change_state(service, BTD_SERVICE_STATE_CONNECTING, 0);
++	if (service->state == BTD_SERVICE_STATE_DISCONNECTED)
++		change_state(service, BTD_SERVICE_STATE_CONNECTING, 0);
+ 	return 0;
+ }
  
-+	gatt_db_attribute_get_service_uuid(service, &uuid);
- 	bt_uuid_to_string(&uuid, uuid_str, sizeof(uuid_str));
- 	sprintf(value, GATT_INCLUDE_UUID_STR ":%04hx:%04hx:%s", start,
- 								end, uuid_str);
 -- 
-2.5.5
+2.7.4
 
