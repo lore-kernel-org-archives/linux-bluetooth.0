@@ -5,49 +5,72 @@ CC: <linux-kernel@vger.kernel.org>, <marcel@holtmann.org>,
         <loic.poulain@intel.com>, Ganapathi Bhat <gbhat@marvell.com>,
         Amitkumar
  Karwar <akarwar@marvell.com>
-Subject: [PATCH v13 2/3] Bluetooth: hci_uart: check if hdev is present before using it
-Date: Thu, 8 Sep 2016 20:11:14 +0530
-Message-ID: <1473345675-10995-2-git-send-email-akarwar@marvell.com>
-In-Reply-To: <1473345675-10995-1-git-send-email-akarwar@marvell.com>
-References: <1473345675-10995-1-git-send-email-akarwar@marvell.com>
+Subject: [PATCH v13 1/3] Bluetooth: hci_uart: add prepare callbacks to hci_uart_proto structure.
+Date: Thu, 8 Sep 2016 20:11:13 +0530
+Message-ID: <1473345675-10995-1-git-send-email-akarwar@marvell.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Ganapathi Bhat <gbhat@marvell.com>
 
-The hdev struct might not have initialized in protocol receive handler.
-This patch adds necessary checks.
+The new callback is used to prepare the device before HCI becomes
+ready. One can use this to download firmware if the download process
+doesn't use HCI commands. Also recv_for_prepare callback is
+introduced for receiving data from devices during prepare phase.
 
 Signed-off-by: Ganapathi Bhat <gbhat@marvell.com>
 Signed-off-by: Amitkumar Karwar <akarwar@marvell.com>
 ---
- drivers/bluetooth/hci_ldisc.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ drivers/bluetooth/hci_ldisc.c | 11 ++++++++++-
+ drivers/bluetooth/hci_uart.h  |  3 +++
+ 2 files changed, 13 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
-index d7184dc..2c88586 100644
+index dda9739..d7184dc 100644
 --- a/drivers/bluetooth/hci_ldisc.c
 +++ b/drivers/bluetooth/hci_ldisc.c
-@@ -154,7 +154,9 @@ restart:
+@@ -551,8 +551,11 @@ static void hci_uart_tty_receive(struct tty_struct *tty, const u8 *data,
+ 	if (!hu || tty != hu->tty)
+ 		return;
  
- 		set_bit(TTY_DO_WRITE_WAKEUP, &tty->flags);
- 		len = tty->ops->write(tty, skb->data, skb->len);
--		hdev->stat.byte_tx += len;
+-	if (!test_bit(HCI_UART_PROTO_READY, &hu->flags))
++	if (!test_bit(HCI_UART_PROTO_READY, &hu->flags)) {
++		if (hu->proto->recv_for_prepare)
++			hu->proto->recv_for_prepare(hu, data, count);
+ 		return;
++	}
+ 
+ 	/* It does not need a lock here as it is already protected by a mutex in
+ 	 * tty caller
+@@ -639,6 +642,12 @@ static int hci_uart_set_proto(struct hci_uart *hu, int id)
+ 		return err;
+ 
+ 	hu->proto = p;
++	if (p->prepare) {
++		err = p->prepare(hu);
++		if (err)
++			return err;
++	}
 +
-+		if (hdev)
-+			hdev->stat.byte_tx += len;
+ 	set_bit(HCI_UART_PROTO_READY, &hu->flags);
  
- 		skb_pull(skb, len);
- 		if (skb->len) {
-@@ -349,7 +351,7 @@ void hci_uart_set_baudrate(struct hci_uart *hu, unsigned int speed)
- 	/* tty_set_termios() return not checked as it is always 0 */
- 	tty_set_termios(tty, &ktermios);
- 
--	BT_DBG("%s: New tty speeds: %d/%d", hu->hdev->name,
-+	BT_DBG("%s: New tty speeds: %d/%d", hu->hdev ? hu->hdev->name : "",
- 	       tty->termios.c_ispeed, tty->termios.c_ospeed);
- }
- 
+ 	err = hci_uart_register_dev(hu);
+diff --git a/drivers/bluetooth/hci_uart.h b/drivers/bluetooth/hci_uart.h
+index 839bad1..17ba3b4 100644
+--- a/drivers/bluetooth/hci_uart.h
++++ b/drivers/bluetooth/hci_uart.h
+@@ -67,8 +67,11 @@ struct hci_uart_proto {
+ 	int (*close)(struct hci_uart *hu);
+ 	int (*flush)(struct hci_uart *hu);
+ 	int (*setup)(struct hci_uart *hu);
++	int (*prepare)(struct hci_uart *hu);
+ 	int (*set_baudrate)(struct hci_uart *hu, unsigned int speed);
+ 	int (*recv)(struct hci_uart *hu, const void *data, int len);
++	int (*recv_for_prepare)(struct hci_uart *hu, const void *data,
++				int len);
+ 	int (*enqueue)(struct hci_uart *hu, struct sk_buff *skb);
+ 	struct sk_buff *(*dequeue)(struct hci_uart *hu);
+ };
 -- 
 1.8.1.4
