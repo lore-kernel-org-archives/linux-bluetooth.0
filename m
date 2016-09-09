@@ -1,9 +1,9 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: "Montague, Jay" <jmontague@tycoint.com>
 To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: bluez bloutooth problem
-Date: Fri, 9 Sep 2016 10:27:15 +0000
-Message-ID: <9F3DE92910DE1D4697DD7D6F2FB4FDDC25A15D2C@003FCH1MPN5-071.003f.mgd2.msft.net>
+Subject: RE: bluez bluetooth problem
+Date: Fri, 9 Sep 2016 10:19:48 +0000
+Message-ID: <9F3DE92910DE1D4697DD7D6F2FB4FDDC25A15D17@003FCH1MPN5-071.003f.mgd2.msft.net>
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -85,11 +85,17 @@ I have been in communication with Intel support but I've got to a point whe=
 re I don't think I can get any further and they have recommended that I con=
 tact you.
 
+https://communities.intel.com/thread/104504
+
+
 Any help would be very much appreciated.
 
 Kind regards
 
 Jay
+
+
+
 
 ________________________________
 
