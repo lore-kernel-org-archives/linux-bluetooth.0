@@ -1,64 +1,50 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Szymon Janc <szymon.janc@codecoup.pl>
-To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@codecoup.pl>
-Subject: [PATCH] Bluetooth: Fix not registering BR/EDR SMP channel with force_bredr flag
-Date: Fri,  9 Sep 2016 20:24:40 +0200
-Message-Id: <1473445480-5177-1-git-send-email-szymon.janc@codecoup.pl>
+From: "Montague, Jay" <jmontague@tycoint.com>
+To: Barry Byford <31baz66@gmail.com>
+CC: Johan Hedberg <johan.hedberg@gmail.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: RE: bluez bluetooth problem
+Date: Fri, 9 Sep 2016 15:33:09 +0000
+Message-ID: <9F3DE92910DE1D4697DD7D6F2FB4FDDC25A15DBC@003FCH1MPN5-071.003f.mgd2.msft.net>
+References: <9F3DE92910DE1D4697DD7D6F2FB4FDDC25A15990@003FCH1MPN5-071.003f.mgd2.msft.net>
+ <20160909104247.GA11006@t440s.lan>
+ <9F3DE92910DE1D4697DD7D6F2FB4FDDC25A15D91@003FCH1MPN5-071.003f.mgd2.msft.net>
+ <CAAu3APbna02x-U5c23JFiTvNk+2q89SgHZ2rm+oSr2imCRh9HA@mail.gmail.com>
+In-Reply-To: <CAAu3APbna02x-U5c23JFiTvNk+2q89SgHZ2rm+oSr2imCRh9HA@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If force_bredr is set SMP BR/EDR channel should also be for non-SC
-capable controllers. Since hcidev flag is persistent wrt power toggle
-it can be already set when calling smp_register(). This resulted in
-SMP BR/EDR channel not being registered even if HCI_FORCE_BREDR_SMP
-flag was set.
-
-This also fix NULL pointer dereference when trying to disable
-force_bredr after power cycle.
-
-BUG: unable to handle kernel NULL pointer dereference at 0000000000000388
-IP: [<ffffffffc0493ad8>] smp_del_chan+0x18/0x80 [bluetooth]
-
-Call Trace:
-[<ffffffffc04950ca>] force_bredr_smp_write+0xba/0x100 [bluetooth]
-[<ffffffff8133be14>] full_proxy_write+0x54/0x90
-[<ffffffff81245967>] __vfs_write+0x37/0x160
-[<ffffffff813617f7>] ? selinux_file_permission+0xd7/0x110
-[<ffffffff81356fbd>] ? security_file_permission+0x3d/0xc0
-[<ffffffff810eb5b2>] ? percpu_down_read+0x12/0x50
-[<ffffffff812462a5>] vfs_write+0xb5/0x1a0
-[<ffffffff812476f5>] SyS_write+0x55/0xc0
-[<ffffffff817eb872>] entry_SYSCALL_64_fastpath+0x1a/0xa4
-Code: 48 8b 45 f0 eb c1 0f 1f 00 66 2e 0f 1f 84 00 00 00 00 00 0f 1f
-      44 00 00 f6 05 c6 3b 02 00 04 55 48 89 e5 41 54 53 49 89 fc 75
-      4b
-      <49> 8b 9c 24 88 03 00 00 48 85 db 74 31 49 c7 84 24 88 03 00 00
-RIP  [<ffffffffc0493ad8>] smp_del_chan+0x18/0x80 [bluetooth]
-RSP <ffff8802aee3bd90>
-CR2: 0000000000000388
-
-Signed-off-by: Szymon Janc <szymon.janc@codecoup.pl>
----
- net/bluetooth/smp.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
-
-diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index 4c1a16a..43faf2a 100644
---- a/net/bluetooth/smp.c
-+++ b/net/bluetooth/smp.c
-@@ -3387,7 +3387,10 @@ int smp_register(struct hci_dev *hdev)
- 	if (!lmp_sc_capable(hdev)) {
- 		debugfs_create_file("force_bredr_smp", 0644, hdev->debugfs,
- 				    hdev, &force_bredr_smp_fops);
--		return 0;
-+
-+		/* Flag can be already set here (due to power toggle) */
-+		if (!hci_dev_test_flag(hdev, HCI_FORCE_BREDR_SMP))
-+			return 0;
- 	}
- 
- 	if (WARN_ON(hdev->smp_bredr_data)) {
--- 
-2.7.4
-
+VGhhbmtzIEJhcnJ5DQoNCi0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQpGcm9tOiBCYXJyeSBC
+eWZvcmQgW21haWx0bzozMWJhejY2QGdtYWlsLmNvbV0NClNlbnQ6IDA5IFNlcHRlbWJlciAyMDE2
+IDE2OjI3DQpUbzogTW9udGFndWUsIEpheSA8am1vbnRhZ3VlQHR5Y29pbnQuY29tPg0KQ2M6IEpv
+aGFuIEhlZGJlcmcgPGpvaGFuLmhlZGJlcmdAZ21haWwuY29tPjsgbGludXgtYmx1ZXRvb3RoQHZn
+ZXIua2VybmVsLm9yZw0KU3ViamVjdDogUmU6IGJsdWV6IGJsdWV0b290aCBwcm9ibGVtDQoNCkhp
+IEpheSwNCg0KT24gOSBTZXB0ZW1iZXIgMjAxNiBhdCAxNjoxNCwgTW9udGFndWUsIEpheSA8am1v
+bnRhZ3VlQHR5Y29pbnQuY29tPiB3cm90ZToNCj4gPiB5b3UgbWlnaHQgd2FudCB0byBsb29rIGlu
+dG8gdXNpbmcgdGhlIHByb2ZpbGUgQVBJIGluc3RlYWQgKHNlZSBkb2MvcHJvZmlsZS1hcGkudHh0
+IGFuZCB0ZXN0L3Rlc3QtcHJvZmlsZSkuDQo+IEJ1dCBJIGd1ZXNzIGlsbCBsb29rIGludG8gdXNp
+bmcgdGhlIEFQSSBwcm9maWxlIGluc3RlYWQuIFlvdSBkaWRuJ3QgYXR0YWNoIGFueSBkb2N1bWVu
+dHMgc28gSSBndWVzcyB0aGVzZSBhcmUgYXZhaWxhYmxlIG9uIGdpdGh1YiBvciBzb21ldGhpbmcu
+DQpUbyBnaXZlIHRoZSBmdWxsIHBhdGhzLi4uDQoNClRoZSBkb2N1bWVudGF0aW9uIGNhbiBiZSBm
+b3VuZCBhdDoNCmh0dHBzOi8vdXJsZGVmZW5zZS5wcm9vZnBvaW50LmNvbS92Mi91cmw/dT1odHRw
+LTNBX19naXQua2VybmVsLm9yZ19jZ2l0X2JsdWV0b290aF9ibHVlei5naXRfdHJlZV9kb2NfcHJv
+ZmlsZS0yRGFwaS50eHQmZD1EUUlCYVEmYz0wWUd2VHMzdFQtVk15OF92NTF5TER3JnI9aHFsdVRW
+Q1M4ejZxRzMxVFdjZFVXUkVybXJsZ1Q4R29jTGFubGZGZU45VSZtPUZIdTJxTy05Qm41MkdZSTZt
+OC1CdnhhZEczd2hnSDFPalJiS2t1UVRaUzQmcz1qdUlFTExGR1dxNWhoYkVtV21Xa0ZlZ1dYOHpH
+cHdfXzVrOU5uRVotdmc0JmU9DQoNClRoZSBQeXRob24gZXhhbXBsZSBmb3IgdXNpbmcgdGhhdCBB
+UEkgaXMgYXQ6DQpodHRwczovL3VybGRlZmVuc2UucHJvb2Zwb2ludC5jb20vdjIvdXJsP3U9aHR0
+cC0zQV9fZ2l0Lmtlcm5lbC5vcmdfY2dpdF9ibHVldG9vdGhfYmx1ZXouZ2l0X3RyZWVfdGVzdF90
+ZXN0LTJEcHJvZmlsZSZkPURRSUJhUSZjPTBZR3ZUczN0VC1WTXk4X3Y1MXlMRHcmcj1ocWx1VFZD
+Uzh6NnFHMzFUV2NkVVdSRXJtcmxnVDhHb2NMYW5sZkZlTjlVJm09Rkh1MnFPLTlCbjUyR1lJNm04
+LUJ2eGFkRzN3aGdIMU9qUmJLa3VRVFpTNCZzPTllVnUwNHB0WERpVXd3TkpxR1pOV2Jrd0EzbzNt
+VUNtZmxuaTVybEJMUjgmZT0NCg0KX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18NCg0K
+VGhpcyBlLW1haWwgY29udGFpbnMgcHJpdmlsZWdlZCBhbmQgY29uZmlkZW50aWFsIGluZm9ybWF0
+aW9uIGludGVuZGVkIGZvciB0aGUgdXNlIG9mIHRoZSBhZGRyZXNzZWVzIG5hbWVkIGFib3ZlLiBJ
+ZiB5b3UgYXJlIG5vdCB0aGUgaW50ZW5kZWQgcmVjaXBpZW50IG9mIHRoaXMgZS1tYWlsLCB5b3Ug
+YXJlIGhlcmVieSBub3RpZmllZCB0aGF0IHlvdSBtdXN0IG5vdCBkaXNzZW1pbmF0ZSwgY29weSBv
+ciB0YWtlIGFueSBhY3Rpb24gaW4gcmVzcGVjdCBvZiBhbnkgaW5mb3JtYXRpb24gY29udGFpbmVk
+IGluIGl0LiBJZiB5b3UgaGF2ZSByZWNlaXZlZCB0aGlzIGUtbWFpbCBpbiBlcnJvciwgcGxlYXNl
+IG5vdGlmeSB0aGUgc2VuZGVyIGltbWVkaWF0ZWx5IGJ5IGUtbWFpbCBhbmQgaW1tZWRpYXRlbHkg
+ZGVzdHJveSB0aGlzIGUtbWFpbCBhbmQgaXRzIGF0dGFjaG1lbnRzLg0K
