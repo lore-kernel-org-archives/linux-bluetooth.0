@@ -1,50 +1,28 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: "Montague, Jay" <jmontague@tycoint.com>
-To: Barry Byford <31baz66@gmail.com>
-CC: Johan Hedberg <johan.hedberg@gmail.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: bluez bluetooth problem
-Date: Fri, 9 Sep 2016 15:33:09 +0000
-Message-ID: <9F3DE92910DE1D4697DD7D6F2FB4FDDC25A15DBC@003FCH1MPN5-071.003f.mgd2.msft.net>
-References: <9F3DE92910DE1D4697DD7D6F2FB4FDDC25A15990@003FCH1MPN5-071.003f.mgd2.msft.net>
- <20160909104247.GA11006@t440s.lan>
- <9F3DE92910DE1D4697DD7D6F2FB4FDDC25A15D91@003FCH1MPN5-071.003f.mgd2.msft.net>
- <CAAu3APbna02x-U5c23JFiTvNk+2q89SgHZ2rm+oSr2imCRh9HA@mail.gmail.com>
-In-Reply-To: <CAAu3APbna02x-U5c23JFiTvNk+2q89SgHZ2rm+oSr2imCRh9HA@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
+In-Reply-To: <9F3DE92910DE1D4697DD7D6F2FB4FDDC25A15D91@003FCH1MPN5-071.003f.mgd2.msft.net>
+References: <9F3DE92910DE1D4697DD7D6F2FB4FDDC25A15990@003FCH1MPN5-071.003f.mgd2.msft.net>
+ <20160909104247.GA11006@t440s.lan> <9F3DE92910DE1D4697DD7D6F2FB4FDDC25A15D91@003FCH1MPN5-071.003f.mgd2.msft.net>
+From: Barry Byford <31baz66@gmail.com>
+Date: Fri, 9 Sep 2016 16:27:19 +0100
+Message-ID: <CAAu3APbna02x-U5c23JFiTvNk+2q89SgHZ2rm+oSr2imCRh9HA@mail.gmail.com>
+Subject: Re: bluez bluetooth problem
+To: "Montague, Jay" <jmontague@tycoint.com>
+Cc: Johan Hedberg <johan.hedberg@gmail.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-VGhhbmtzIEJhcnJ5DQoNCi0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQpGcm9tOiBCYXJyeSBC
-eWZvcmQgW21haWx0bzozMWJhejY2QGdtYWlsLmNvbV0NClNlbnQ6IDA5IFNlcHRlbWJlciAyMDE2
-IDE2OjI3DQpUbzogTW9udGFndWUsIEpheSA8am1vbnRhZ3VlQHR5Y29pbnQuY29tPg0KQ2M6IEpv
-aGFuIEhlZGJlcmcgPGpvaGFuLmhlZGJlcmdAZ21haWwuY29tPjsgbGludXgtYmx1ZXRvb3RoQHZn
-ZXIua2VybmVsLm9yZw0KU3ViamVjdDogUmU6IGJsdWV6IGJsdWV0b290aCBwcm9ibGVtDQoNCkhp
-IEpheSwNCg0KT24gOSBTZXB0ZW1iZXIgMjAxNiBhdCAxNjoxNCwgTW9udGFndWUsIEpheSA8am1v
-bnRhZ3VlQHR5Y29pbnQuY29tPiB3cm90ZToNCj4gPiB5b3UgbWlnaHQgd2FudCB0byBsb29rIGlu
-dG8gdXNpbmcgdGhlIHByb2ZpbGUgQVBJIGluc3RlYWQgKHNlZSBkb2MvcHJvZmlsZS1hcGkudHh0
-IGFuZCB0ZXN0L3Rlc3QtcHJvZmlsZSkuDQo+IEJ1dCBJIGd1ZXNzIGlsbCBsb29rIGludG8gdXNp
-bmcgdGhlIEFQSSBwcm9maWxlIGluc3RlYWQuIFlvdSBkaWRuJ3QgYXR0YWNoIGFueSBkb2N1bWVu
-dHMgc28gSSBndWVzcyB0aGVzZSBhcmUgYXZhaWxhYmxlIG9uIGdpdGh1YiBvciBzb21ldGhpbmcu
-DQpUbyBnaXZlIHRoZSBmdWxsIHBhdGhzLi4uDQoNClRoZSBkb2N1bWVudGF0aW9uIGNhbiBiZSBm
-b3VuZCBhdDoNCmh0dHBzOi8vdXJsZGVmZW5zZS5wcm9vZnBvaW50LmNvbS92Mi91cmw/dT1odHRw
-LTNBX19naXQua2VybmVsLm9yZ19jZ2l0X2JsdWV0b290aF9ibHVlei5naXRfdHJlZV9kb2NfcHJv
-ZmlsZS0yRGFwaS50eHQmZD1EUUlCYVEmYz0wWUd2VHMzdFQtVk15OF92NTF5TER3JnI9aHFsdVRW
-Q1M4ejZxRzMxVFdjZFVXUkVybXJsZ1Q4R29jTGFubGZGZU45VSZtPUZIdTJxTy05Qm41MkdZSTZt
-OC1CdnhhZEczd2hnSDFPalJiS2t1UVRaUzQmcz1qdUlFTExGR1dxNWhoYkVtV21Xa0ZlZ1dYOHpH
-cHdfXzVrOU5uRVotdmc0JmU9DQoNClRoZSBQeXRob24gZXhhbXBsZSBmb3IgdXNpbmcgdGhhdCBB
-UEkgaXMgYXQ6DQpodHRwczovL3VybGRlZmVuc2UucHJvb2Zwb2ludC5jb20vdjIvdXJsP3U9aHR0
-cC0zQV9fZ2l0Lmtlcm5lbC5vcmdfY2dpdF9ibHVldG9vdGhfYmx1ZXouZ2l0X3RyZWVfdGVzdF90
-ZXN0LTJEcHJvZmlsZSZkPURRSUJhUSZjPTBZR3ZUczN0VC1WTXk4X3Y1MXlMRHcmcj1ocWx1VFZD
-Uzh6NnFHMzFUV2NkVVdSRXJtcmxnVDhHb2NMYW5sZkZlTjlVJm09Rkh1MnFPLTlCbjUyR1lJNm04
-LUJ2eGFkRzN3aGdIMU9qUmJLa3VRVFpTNCZzPTllVnUwNHB0WERpVXd3TkpxR1pOV2Jrd0EzbzNt
-VUNtZmxuaTVybEJMUjgmZT0NCg0KX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18NCg0K
-VGhpcyBlLW1haWwgY29udGFpbnMgcHJpdmlsZWdlZCBhbmQgY29uZmlkZW50aWFsIGluZm9ybWF0
-aW9uIGludGVuZGVkIGZvciB0aGUgdXNlIG9mIHRoZSBhZGRyZXNzZWVzIG5hbWVkIGFib3ZlLiBJ
-ZiB5b3UgYXJlIG5vdCB0aGUgaW50ZW5kZWQgcmVjaXBpZW50IG9mIHRoaXMgZS1tYWlsLCB5b3Ug
-YXJlIGhlcmVieSBub3RpZmllZCB0aGF0IHlvdSBtdXN0IG5vdCBkaXNzZW1pbmF0ZSwgY29weSBv
-ciB0YWtlIGFueSBhY3Rpb24gaW4gcmVzcGVjdCBvZiBhbnkgaW5mb3JtYXRpb24gY29udGFpbmVk
-IGluIGl0LiBJZiB5b3UgaGF2ZSByZWNlaXZlZCB0aGlzIGUtbWFpbCBpbiBlcnJvciwgcGxlYXNl
-IG5vdGlmeSB0aGUgc2VuZGVyIGltbWVkaWF0ZWx5IGJ5IGUtbWFpbCBhbmQgaW1tZWRpYXRlbHkg
-ZGVzdHJveSB0aGlzIGUtbWFpbCBhbmQgaXRzIGF0dGFjaG1lbnRzLg0K
+Hi Jay,
+
+On 9 September 2016 at 16:14, Montague, Jay <jmontague@tycoint.com> wrote:
+> > you might want to look into using the profile API instead (see doc/profile-api.txt and test/test-profile).
+> But I guess ill look into using the API profile instead. You didn't attach any documents so I guess these are available on github or something.
+To give the full paths...
+
+The documentation can be found at:
+http://git.kernel.org/cgit/bluetooth/bluez.git/tree/doc/profile-api.txt
+
+The Python example for using that API is at:
+http://git.kernel.org/cgit/bluetooth/bluez.git/tree/test/test-profile
