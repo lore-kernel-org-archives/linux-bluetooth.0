@@ -1,12 +1,14 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <a78fe881-49e0-790e-cbc5-513b0c005f39@felipetonello.com>
+In-Reply-To: <b4836467-b6e2-70fe-eda3-49e6de5882b7@felipetonello.com>
 References: <1473338340-7587-1-git-send-email-luiz.dentz@gmail.com>
- <1473338340-7587-2-git-send-email-luiz.dentz@gmail.com> <a78fe881-49e0-790e-cbc5-513b0c005f39@felipetonello.com>
+ <38a00e58-cde7-8774-3956-15255854001f@felipetonello.com> <CABBYNZ+ByJpF_6rbFwjbqeSM9yPcTMXBPCOiV2nEXnQ54jfOFg@mail.gmail.com>
+ <b4836467-b6e2-70fe-eda3-49e6de5882b7@felipetonello.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Fri, 9 Sep 2016 15:58:24 +0300
-Message-ID: <CABBYNZLUVCW2HhBY=vQiCz=mAFpNm=HOJbv15W2txRBa-FH33Q@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 2/5] core/device: Call profile disconnect if ATT disconnects
+Date: Fri, 9 Sep 2016 15:35:10 +0300
+Message-ID: <CABBYNZJ+OgwPaSbLKnU9oVZ1ZormVNm=-+8MA5MStKdCfEn31w@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/5] core/service: Fix setting wrong state after
+ calling accept
 To: Felipe Ferreri Tonello <eu@felipetonello.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
@@ -15,64 +17,65 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Felipe,
 
-On Thu, Sep 8, 2016 at 6:33 PM, Felipe Ferreri Tonello
+On Thu, Sep 8, 2016 at 6:37 PM, Felipe Ferreri Tonello
 <eu@felipetonello.com> wrote:
 > Hi Luiz,
 >
-> On 08/09/16 13:38, Luiz Augusto von Dentz wrote:
->> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> On 08/09/16 16:26, Luiz Augusto von Dentz wrote:
+>> Hi Felipe,
 >>
->> If the profile accepts connections it should also be notified when ATT
->> disconnects so it can cleanup properly.
->> ---
->>  src/device.c | 13 +++++++++++++
->>  1 file changed, 13 insertions(+)
+>> On Thu, Sep 8, 2016 at 5:45 PM, Felipe Ferreri Tonello
+>> <eu@felipetonello.com> wrote:
+>>> Hi Luiz,
+>>>
+>>> On 08/09/16 13:38, Luiz Augusto von Dentz wrote:
+>>>> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>>>>
+>>>> The accept calback may transit the state to connected on the call itself
+>>>> since most of the time it is just a matter of selecting the attributes
+>>>> in case of GATT profiles.
+>>>> ---
+>>>>  src/service.c | 3 ++-
+>>>>  1 file changed, 2 insertions(+), 1 deletion(-)
+>>>>
+>>>> diff --git a/src/service.c b/src/service.c
+>>>> index f387fc4..20a41d0 100644
+>>>> --- a/src/service.c
+>>>> +++ b/src/service.c
+>>>> @@ -209,7 +209,8 @@ int service_accept(struct btd_service *service)
+>>>>       return err;
+>>>>
+>>>>  done:
+>>>> -     change_state(service, BTD_SERVICE_STATE_CONNECTING, 0);
+>>>> +     if (service->state == BTD_SERVICE_STATE_DISCONNECTED)
+>>>> +             change_state(service, BTD_SERVICE_STATE_CONNECTING, 0);
+>>>
+>>> This looks really hacky - I know it was like this before already.
 >>
->> diff --git a/src/device.c b/src/device.c
->> index 9586022..eda873f 100644
->> --- a/src/device.c
->> +++ b/src/device.c
->> @@ -4563,6 +4563,18 @@ static void attio_disconnected(gpointer data, gpointer user_data)
->>               attio->dcfunc(attio->user_data);
->>  }
+>> This is to avoid resetting the connection if the accept callback has
+>> set it already.
 >>
->> +static void disconnect_gatt_service(gpointer data, gpointer user_data)
->> +{
->> +     struct btd_service *service = data;
->> +     struct btd_profile *profile = btd_service_get_profile(service);
->> +
->> +     /* Ignore if profile cannot accept connections */
->> +     if (!profile->accept)
->> +             return;
+>>> Why can you change the state in two different places? What if the
+>>> profile->accept doesn't change the state to connected? Will this change
+>>> to connecting and then the connected state will never be set?
+>>
+>> Going from connected to connecting is not valid, thus if the driver
+>> had changed the states there is nothing else to be done.
 >
-> What if the profile has connect and not accept?
-
-GATT drivers can only accept not connect so this specific to avoid
-disconnecting BR/EDR profiles if both bearers are connected, we might
-as well introduce a flag to indicate the driver is to be using with
-GATT only if we want to make it more clear.
-
->> +
->> +     btd_service_disconnect(service);
->> +}
->> +
->>  static void att_disconnected_cb(int err, void *user_data)
->>  {
->>       struct btd_device *device = user_data;
->> @@ -4575,6 +4587,7 @@ static void att_disconnected_cb(int err, void *user_data)
->>       DBG("%s (%d)", strerror(err), err);
+> Why do you have this done label if the driver is supposed to call
+> btd_service_connecting_complete() on success?
 >>
->>       g_slist_foreach(device->attios, attio_disconnected, NULL);
->> +     g_slist_foreach(device->services, disconnect_gatt_service, NULL);
+>>> I think btd_service_connecting_complete() should always be called with
+>>> the same err as returned by profile->accept()
 >>
->>       btd_gatt_client_disconnected(device->client_dbus);
->>
->>
+>> Not sure what difference does this make?
 >
-> --
-> Felipe
+> My suggestion is to handle the state based on the return value of the
+> driver's callback and not let the driver to change the state itself.
+> It's boilerplate code anyway.
 
-
+The driver may have to respond this asynchronously so we can't really
+depend on the return alone.
 
 -- 
 Luiz Augusto von Dentz
