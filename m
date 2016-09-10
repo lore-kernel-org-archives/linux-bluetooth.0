@@ -1,49 +1,44 @@
-Return-Path: <szymon.janc@codecoup.pl>
-From: Szymon Janc <szymon.janc@codecoup.pl>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org, =?utf-8?B?TWljaGHFgg==?= Narajowski <michal.narajowski@codecoup.pl>
-Subject: Re: [PATCH 1/5] doc/mgmt-api: Add appearance command specification
-Date: Sat, 10 Sep 2016 21:14:31 +0200
-Message-ID: <5226887.9EGP2XEMgz@ix>
-In-Reply-To: <825BB3CB-6594-432B-BEC2-6BF4FFEF05EA@holtmann.org>
-References: <1473281867-8560-1-git-send-email-szymon.janc@codecoup.pl> <825BB3CB-6594-432B-BEC2-6BF4FFEF05EA@holtmann.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Date: Sat, 10 Sep 2016 16:15:22 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Brennan Ashton <brn@deako.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: Option to disable filtering of duplicate LE ADV
+Message-ID: <20160910131522.GA27849@t440s.P-661HNU-F1>
+References: <1473451216.28342.4.camel@deako.com>
+ <CABBYNZLwu-PG+Vwrzx4-tPufvre7tjgZxJmgk=VaSCi3qttAjA@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CABBYNZLwu-PG+Vwrzx4-tPufvre7tjgZxJmgk=VaSCi3qttAjA@mail.gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Luiz,
 
-On Thursday, 8 September 2016 00:02:59 CEST Marcel Holtmann wrote:
-> Hi Szymon,
+On Sat, Sep 10, 2016, Luiz Augusto von Dentz wrote:
+> On Fri, Sep 9, 2016 at 11:00 PM, Brennan Ashton <brn@deako.com> wrote:
+> > Right now in all of the le_scan functions filter_dup is set to
+> > LE_SCAN_FILTER_DUP_ENABLE.  This is not always desired with beacons as
+> > the content may change.  I can force this by sending the HCI commands
+> > to enable scanning without this filter, but then the mgmt api (and
+> > DBUS) cannot be used for scanning.
+> >
+> > I was wondering if people had thoughts on making this configurable?
 > 
-> > ---
-> > doc/mgmt-api.txt | 25 +++++++++++++++++++++++++
-> > 1 file changed, 25 insertions(+)
-> > 
-> > diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
-> > index 2b8a81d..ed0cb99 100644
-> > --- a/doc/mgmt-api.txt
-> > +++ b/doc/mgmt-api.txt
-> > @@ -2885,6 +2885,31 @@ Read Extended Controller Information Command
-> > 
-> > 				Invalid Index
-> > 
-> > +Set Appearance Command
-> > +======================
-> > +
-> > +	Command Code:		0x0042
-> > +	Controller Index:	<controller id>
-> > +	Command Parameters:	Appearance (2 Octets)
-> > +	Return Parameters:	Appearance (2 Octets)
+> Check out the SetDiscoveryFilter:
 > 
-> hmmm. While I get that Set Local Name returns the input parameters, the Set
-> Device ID does not. For Set Device Class is that we match major and minor
-> class into class of device.
+> https://git.kernel.org/cgit/bluetooth/bluez.git/tree/doc/adapter-api.txt
 > 
-> So my thinking is that we should not return any result values. Thoughts?
+> When that is used it will not enable duplicated filter and in fact is
+> the only way to discover beacons which don't have discoverable flags
+> sets e.g. broadcaster.
 
-I'll remove Appearance from return parameters.
+Actually Brennan is right that none of these methods disable duplicate
+filtering. All of the places in the kernel that set the LE scan
+parameters explicitly enable duplicate filtering. I suppose we should
+seriously consider extending the mgmt API to allow performing LE scan
+without the duplicate filtering. Right now the only way to do that is
+through raw HCI access.
 
--- 
-pozdrawiam
-Szymon Janc
+Johan
