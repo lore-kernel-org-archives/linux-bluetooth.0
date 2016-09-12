@@ -1,48 +1,57 @@
-Return-Path: <linux-wireless-owner@vger.kernel.org>
-Content-Type: text/plain; charset=utf-8
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
-Subject: Re: [PATCH] rtlbt: Add RTL8822BE Bluetooth device
+Subject: Re: [PATCH] Bluetooth: Fix not registering BR/EDR SMP channel with force_bredr flag
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1473433325-25311-1-git-send-email-Larry.Finger@lwfinger.net>
-Date: Mon, 12 Sep 2016 09:27:38 +0200
-Cc: Kalle Valo <kvalo@codeaurora.org>, devel@driverdev.osuosl.org,
-        linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        =?utf-8?B?6ZmG5pyx5Lyf?= <alex_lu@realsil.com.cn>
-Message-Id: <0B750089-0CEE-4D43-A889-F65F0FF62115@holtmann.org>
-References: <1473433325-25311-1-git-send-email-Larry.Finger@lwfinger.net>
-To: Larry Finger <Larry.Finger@lwfinger.net>
-Sender: linux-wireless-owner@vger.kernel.org
+In-Reply-To: <1473445480-5177-1-git-send-email-szymon.janc@codecoup.pl>
+Date: Mon, 12 Sep 2016 09:17:01 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <8A3E60A3-C999-4AAF-BF12-2FE4E9EF1182@holtmann.org>
+References: <1473445480-5177-1-git-send-email-szymon.janc@codecoup.pl>
+To: Szymon Janc <szymon.janc@codecoup.pl>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Larry,
+Hi Szymon,
 
-> The RTL8822BE is a new Realtek wifi and BT device. Support for the BT
-> part is hereby added.
+> If force_bredr is set SMP BR/EDR channel should also be for non-SC
+> capable controllers. Since hcidev flag is persistent wrt power toggle
+> it can be already set when calling smp_register(). This resulted in
+> SMP BR/EDR channel not being registered even if HCI_FORCE_BREDR_SMP
+> flag was set.
 > 
-> As this device is similar to most of the other Realtek BT devices, the
-> changes are minimal. The main difference is that the 8822BE needs a
-> configuration file for enabling and disabling features. Thus code is
-> added to select and load this configuration file. Although not needed
-> at the moment, hooks are added for the other devices that might need
-> such configuration files.
+> This also fix NULL pointer dereference when trying to disable
+> force_bredr after power cycle.
 > 
-> One additional change is to the routine that tests that the project
-> ID contained in the firmware matches the hardware. As the project IDs
-> are not sequential, continuing to use the position in the array as the
-> expected value of the ID would require adding extra unused entries in
-> the table, and any subsequant rearrangment of the array would break the
-> code. To fix these problems, the array elements now contain both the
-> hardware ID and the expected value for the project ID.
+> BUG: unable to handle kernel NULL pointer dereference at 0000000000000388
+> IP: [<ffffffffc0493ad8>] smp_del_chan+0x18/0x80 [bluetooth]
 > 
-> Signed-off-by: 陆朱伟 <alex_lu@realsil.com.cn>
-> Signed-off-by: Larry Finger <Larry.Finger@lwfinger.net>
+> Call Trace:
+> [<ffffffffc04950ca>] force_bredr_smp_write+0xba/0x100 [bluetooth]
+> [<ffffffff8133be14>] full_proxy_write+0x54/0x90
+> [<ffffffff81245967>] __vfs_write+0x37/0x160
+> [<ffffffff813617f7>] ? selinux_file_permission+0xd7/0x110
+> [<ffffffff81356fbd>] ? security_file_permission+0x3d/0xc0
+> [<ffffffff810eb5b2>] ? percpu_down_read+0x12/0x50
+> [<ffffffff812462a5>] vfs_write+0xb5/0x1a0
+> [<ffffffff812476f5>] SyS_write+0x55/0xc0
+> [<ffffffff817eb872>] entry_SYSCALL_64_fastpath+0x1a/0xa4
+> Code: 48 8b 45 f0 eb c1 0f 1f 00 66 2e 0f 1f 84 00 00 00 00 00 0f 1f
+>      44 00 00 f6 05 c6 3b 02 00 04 55 48 89 e5 41 54 53 49 89 fc 75
+>      4b
+>      <49> 8b 9c 24 88 03 00 00 48 85 db 74 31 49 c7 84 24 88 03 00 00
+> RIP  [<ffffffffc0493ad8>] smp_del_chan+0x18/0x80 [bluetooth]
+> RSP <ffff8802aee3bd90>
+> CR2: 0000000000000388
+> 
+> Signed-off-by: Szymon Janc <szymon.janc@codecoup.pl>
 > ---
-> drivers/bluetooth/btrtl.c | 104 ++++++++++++++++++++++++++++++++++++++++------
-> drivers/bluetooth/btrtl.h |   5 +++
-> 2 files changed, 97 insertions(+), 12 deletions(-)
+> net/bluetooth/smp.c | 5 ++++-
+> 1 file changed, 4 insertions(+), 1 deletion(-)
 
 patch has been applied to bluetooth-next tree.
 
 Regards
 
 Marcel
+
