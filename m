@@ -1,63 +1,58 @@
-Return-Path: <luiz.dentz@gmail.com>
-MIME-Version: 1.0
-In-Reply-To: <608EEAD3-684A-4120-8694-B1777891447E@holtmann.org>
-References: <1473451216.28342.4.camel@deako.com> <CABBYNZLwu-PG+Vwrzx4-tPufvre7tjgZxJmgk=VaSCi3qttAjA@mail.gmail.com>
- <20160910131522.GA27849@t440s.P-661HNU-F1> <608EEAD3-684A-4120-8694-B1777891447E@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 12 Sep 2016 13:52:05 +0300
-Message-ID: <CABBYNZLkY1mQ8m62oWw1gFLrLVVOj_ENUuxCaLhwZnAbE4eB+g@mail.gmail.com>
-Subject: Re: Option to disable filtering of duplicate LE ADV
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Johan Hedberg <johan.hedberg@gmail.com>, Brennan Ashton <brn@deako.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
+Subject: Re: btattach: auto triggering at boot time by Linux distributions
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1473372206.3263.39.camel@gmail.com>
+Date: Mon, 12 Sep 2016 09:29:57 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <1C6C9A5E-3E82-4BC0-8FE1-CA72722B5EE1@holtmann.org>
+References: <CA+kEDGFm2jko+bC+DuPK1qQx5OXJZTXUj=aWdk+rm9RC8DDCOA@mail.gmail.com> <72B34103-D15B-463B-B63B-8DD3CE99D712@holtmann.org> <1473283543.3400.48.camel@gmail.com> <57368BCF-67A1-416C-A4DF-19289E7E06A8@holtmann.org> <1473372206.3263.39.camel@gmail.com>
+To: =?utf-8?Q?J=C3=A9r=C3=B4me_de_Bretagne?=
+        <jerome.debretagne@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel, Johan,
+Hi Jerome,
 
-On Mon, Sep 12, 2016 at 9:47 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Johan,
->
->>>> Right now in all of the le_scan functions filter_dup is set to
->>>> LE_SCAN_FILTER_DUP_ENABLE.  This is not always desired with beacons as
->>>> the content may change.  I can force this by sending the HCI commands
->>>> to enable scanning without this filter, but then the mgmt api (and
->>>> DBUS) cannot be used for scanning.
->>>>
->>>> I was wondering if people had thoughts on making this configurable?
->>>
->>> Check out the SetDiscoveryFilter:
->>>
->>> https://git.kernel.org/cgit/bluetooth/bluez.git/tree/doc/adapter-api.txt
->>>
->>> When that is used it will not enable duplicated filter and in fact is
->>> the only way to discover beacons which don't have discoverable flags
->>> sets e.g. broadcaster.
->>
->> Actually Brennan is right that none of these methods disable duplicate
->> filtering. All of the places in the kernel that set the LE scan
->> parameters explicitly enable duplicate filtering. I suppose we should
->> seriously consider extending the mgmt API to allow performing LE scan
->> without the duplicate filtering. Right now the only way to do that is
->> through raw HCI access.
->
-> however when a driver sets the strict duplicate filtering quirk, then scanning will be restarted and thus new advertising data can be found.
+>>>> Until then, you need an userspace part that triggers btattach with the
+>>>> right hardware id on the right /dev/ttySx device node as soon as it
+>>>> becomes available.
+>>> 
+>>> Maybe my mistake is that I've interpreted your sentence: "as soon as
+>>> *it* becomes available" to assume that "it" was referring to the
+>>> /dev/ttyS1 device node. I'll try to see if I can create another udev
+>>> rule that would trigger based on the actual BT chipset becoming
+>>> available, and not based on /dev/ttyS1 , but I'm still looking for how
+>>> to do it with dev.
+>> 
+>> maybe the RFKILL switch part gets discovered later than the TTY. I don't
+>> have a platform to verify, but just at few printk into the probe routine
+>> and see if its finds the according GPIOs for power control.
+> 
+> I've continued my investigation first by trying to create another udev rule
+> detecting the actual BCM4324(1) rev B5 Bluetooth chipset this time.
+> 
+> And I'm happy to share that it works finally!! as I have Bluetooth working
+> at boot.
+> 
+> This is not over though as I've just discovered this via "man udev" :-(
+> 
+>   Starting daemons or other long-running processes is not appropriate
+>   for udev; the forked processes, detached or not, will be
+>   unconditionally *killed* after the event handling has finished.
+> 
+> and indeed btattach gets killed later on. For that part, I will continue my
+> investigations off the list as I've found blogs / articles explaining
+> several solutions and how to do it using systemd for instance.
+> 
+> Once I'm done, would you be interested to see such a rule integrated into
+> the BlueZ project directly? Or do you consider this "last mile" integration
+> work to be more the responsibility of the various Linux distributions?
 
-Im not sure what the quirk actually means but it doesn't look like it
-will be able to attend the RSSI filtering since the controller may
-omit results thus why I though duplicate was not enabled when
-filtering is. From the code it looks like the quirk would force
-restarting the scanning:
+we could add a --daemon mode into btattach that can be just started at boot and then monitors udev to auto-attach devices.
 
-/* If duplicate filtering does not report RSSI changes, then restart
-* scanning to ensure updated result with updated RSSI values.
-*/
-if (test_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks)) {
-restart_le_scan(hdev);
+Regards
 
-Isn't that a causing a little too many restarts? I wonder if there is
-anyone using this quirk in practice? And is this really worth it
-instead of just disabling the duplicate filter?
+Marcel
 
--- 
-Luiz Augusto von Dentz
