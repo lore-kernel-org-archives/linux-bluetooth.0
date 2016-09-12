@@ -1,58 +1,48 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain; charset=us-ascii
+Return-Path: <linux-wireless-owner@vger.kernel.org>
+Content-Type: text/plain; charset=utf-8
 Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
-Subject: Re: btattach: auto triggering at boot time by Linux distributions
+Subject: Re: [PATCH] rtlbt: Add RTL8822BE Bluetooth device
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1473372206.3263.39.camel@gmail.com>
-Date: Mon, 12 Sep 2016 09:29:57 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <1C6C9A5E-3E82-4BC0-8FE1-CA72722B5EE1@holtmann.org>
-References: <CA+kEDGFm2jko+bC+DuPK1qQx5OXJZTXUj=aWdk+rm9RC8DDCOA@mail.gmail.com> <72B34103-D15B-463B-B63B-8DD3CE99D712@holtmann.org> <1473283543.3400.48.camel@gmail.com> <57368BCF-67A1-416C-A4DF-19289E7E06A8@holtmann.org> <1473372206.3263.39.camel@gmail.com>
-To: =?utf-8?Q?J=C3=A9r=C3=B4me_de_Bretagne?=
-        <jerome.debretagne@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1473433325-25311-1-git-send-email-Larry.Finger@lwfinger.net>
+Date: Mon, 12 Sep 2016 09:27:38 +0200
+Cc: Kalle Valo <kvalo@codeaurora.org>, devel@driverdev.osuosl.org,
+        linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        =?utf-8?B?6ZmG5pyx5Lyf?= <alex_lu@realsil.com.cn>
+Message-Id: <0B750089-0CEE-4D43-A889-F65F0FF62115@holtmann.org>
+References: <1473433325-25311-1-git-send-email-Larry.Finger@lwfinger.net>
+To: Larry Finger <Larry.Finger@lwfinger.net>
+Sender: linux-wireless-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jerome,
+Hi Larry,
 
->>>> Until then, you need an userspace part that triggers btattach with the
->>>> right hardware id on the right /dev/ttySx device node as soon as it
->>>> becomes available.
->>> 
->>> Maybe my mistake is that I've interpreted your sentence: "as soon as
->>> *it* becomes available" to assume that "it" was referring to the
->>> /dev/ttyS1 device node. I'll try to see if I can create another udev
->>> rule that would trigger based on the actual BT chipset becoming
->>> available, and not based on /dev/ttyS1 , but I'm still looking for how
->>> to do it with dev.
->> 
->> maybe the RFKILL switch part gets discovered later than the TTY. I don't
->> have a platform to verify, but just at few printk into the probe routine
->> and see if its finds the according GPIOs for power control.
+> The RTL8822BE is a new Realtek wifi and BT device. Support for the BT
+> part is hereby added.
 > 
-> I've continued my investigation first by trying to create another udev rule
-> detecting the actual BCM4324(1) rev B5 Bluetooth chipset this time.
+> As this device is similar to most of the other Realtek BT devices, the
+> changes are minimal. The main difference is that the 8822BE needs a
+> configuration file for enabling and disabling features. Thus code is
+> added to select and load this configuration file. Although not needed
+> at the moment, hooks are added for the other devices that might need
+> such configuration files.
 > 
-> And I'm happy to share that it works finally!! as I have Bluetooth working
-> at boot.
+> One additional change is to the routine that tests that the project
+> ID contained in the firmware matches the hardware. As the project IDs
+> are not sequential, continuing to use the position in the array as the
+> expected value of the ID would require adding extra unused entries in
+> the table, and any subsequant rearrangment of the array would break the
+> code. To fix these problems, the array elements now contain both the
+> hardware ID and the expected value for the project ID.
 > 
-> This is not over though as I've just discovered this via "man udev" :-(
-> 
->   Starting daemons or other long-running processes is not appropriate
->   for udev; the forked processes, detached or not, will be
->   unconditionally *killed* after the event handling has finished.
-> 
-> and indeed btattach gets killed later on. For that part, I will continue my
-> investigations off the list as I've found blogs / articles explaining
-> several solutions and how to do it using systemd for instance.
-> 
-> Once I'm done, would you be interested to see such a rule integrated into
-> the BlueZ project directly? Or do you consider this "last mile" integration
-> work to be more the responsibility of the various Linux distributions?
+> Signed-off-by: 陆朱伟 <alex_lu@realsil.com.cn>
+> Signed-off-by: Larry Finger <Larry.Finger@lwfinger.net>
+> ---
+> drivers/bluetooth/btrtl.c | 104 ++++++++++++++++++++++++++++++++++++++++------
+> drivers/bluetooth/btrtl.h |   5 +++
+> 2 files changed, 97 insertions(+), 12 deletions(-)
 
-we could add a --daemon mode into btattach that can be just started at boot and then monitors udev to auto-attach devices.
+patch has been applied to bluetooth-next tree.
 
 Regards
 
 Marcel
-
