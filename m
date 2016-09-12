@@ -1,72 +1,100 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain; charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
-Subject: StopNotify not firing? (was: Query BLE connected status?)
-From: Travis Griggs <travisgriggs@gmail.com>
-In-Reply-To: <A4055AB1-FBEC-48D9-81BB-54FAFDB73744@gmail.com>
-Date: Mon, 12 Sep 2016 10:49:37 -0700
-Message-Id: <BE6EC190-160F-4895-82D0-B31D7CB3DB18@gmail.com>
-References: <04AC5786-517A-4834-AFD7-B0C6AC29B869@gmail.com> <CADwkJjLm5RF54MHANHYUX3cmh52V4EgHB57hrMu4oXeOA6bR3Q@mail.gmail.com> <0176A088-7DFB-415E-9461-CB8BA391E087@gmail.com> <CADwkJj+6n=7AAXmbEZ6me32_m-2fyErYOnKDcg4E8Kj7ibn1WA@mail.gmail.com> <AFC130A9-CBDF-4DC3-BACD-69CF3ADBA1C6@gmail.com> <CAAu3APaLf-fEj61fA4UD1JDLipbgC72K2WWtUzLKypT2LJAErw@mail.gmail.com> <A4055AB1-FBEC-48D9-81BB-54FAFDB73744@gmail.com>
-To: Bluez mailing list <linux-bluetooth@vger.kernel.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <brn@deako.com>
+Message-ID: <1473698521.3306.4.camel@deako.com>
+Subject: Re: Option to disable filtering of duplicate LE ADV
+From: Brennan Ashton <brn@deako.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Marcel Holtmann
+	 <marcel@holtmann.org>
+Cc: Johan Hedberg <johan.hedberg@gmail.com>,
+	"linux-bluetooth@vger.kernel.org"
+	 <linux-bluetooth@vger.kernel.org>
+Date: Mon, 12 Sep 2016 09:42:01 -0700
+In-Reply-To: <CABBYNZLkY1mQ8m62oWw1gFLrLVVOj_ENUuxCaLhwZnAbE4eB+g@mail.gmail.com>
+References: <1473451216.28342.4.camel@deako.com>
+	 <CABBYNZLwu-PG+Vwrzx4-tPufvre7tjgZxJmgk=VaSCi3qttAjA@mail.gmail.com>
+	 <20160910131522.GA27849@t440s.P-661HNU-F1>
+	 <608EEAD3-684A-4120-8694-B1777891447E@holtmann.org>
+	 <CABBYNZLkY1mQ8m62oWw1gFLrLVVOj_ENUuxCaLhwZnAbE4eB+g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+On Mon, 2016-09-12 at 13:52 +0300, Luiz Augusto von Dentz wrote:
+> Hi Marcel, Johan,
+> 
+> On Mon, Sep 12, 2016 at 9:47 AM, Marcel Holtmann <marcel@holtmann.org
+> > wrote:
+> > 
+> > Hi Johan,
+> > 
+> > > 
+> > > > 
+> > > > > 
+> > > > > Right now in all of the le_scan functions filter_dup is set
+> > > > > to
+> > > > > LE_SCAN_FILTER_DUP_ENABLE.  This is not always desired with
+> > > > > beacons as
+> > > > > the content may change.  I can force this by sending the HCI
+> > > > > commands
+> > > > > to enable scanning without this filter, but then the mgmt api
+> > > > > (and
+> > > > > DBUS) cannot be used for scanning.
+> > > > > 
+> > > > > I was wondering if people had thoughts on making this
+> > > > > configurable?
+> > > > 
+> > > > Check out the SetDiscoveryFilter:
+> > > > 
+> > > > https://git.kernel.org/cgit/bluetooth/bluez.git/tree/doc/adapte
+> > > > r-api.txt
+> > > > 
+> > > > When that is used it will not enable duplicated filter and in
+> > > > fact is
+> > > > the only way to discover beacons which don't have discoverable
+> > > > flags
+> > > > sets e.g. broadcaster.
+> > > 
+> > > Actually Brennan is right that none of these methods disable
+> > > duplicate
+> > > filtering. All of the places in the kernel that set the LE scan
+> > > parameters explicitly enable duplicate filtering. I suppose we
+> > > should
+> > > seriously consider extending the mgmt API to allow performing LE
+> > > scan
+> > > without the duplicate filtering. Right now the only way to do
+> > > that is
+> > > through raw HCI access.
+> > 
+> > however when a driver sets the strict duplicate filtering quirk,
+> > then scanning will be restarted and thus new advertising data can
+> > be found.
+> 
+> Im not sure what the quirk actually means but it doesn't look like it
+> will be able to attend the RSSI filtering since the controller may
+> omit results thus why I though duplicate was not enabled when
+> filtering is. From the code it looks like the quirk would force
+> restarting the scanning:
+> 
+> /* If duplicate filtering does not report RSSI changes, then restart
+> * scanning to ensure updated result with updated RSSI values.
+> */
+> if (test_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks)) {
+> restart_le_scan(hdev);
+> 
+> Isn't that a causing a little too many restarts? I wonder if there is
+> anyone using this quirk in practice? And is this really worth it
+> instead of just disabling the duplicate filter?
+> 
 
-> On Sep 12, 2016, at 8:52 AM, Travis Griggs <travisgriggs@gmail.com> =
-wrote:
->=20
-> It seems to me though, that maybe I=E2=80=99m going about this wrong. =
-I don=E2=80=99t care about the device identity, or which devices are =
-connected or not. What I really care about is if any device is connected =
-to my app. And maybe I have this (kind of indirectly). My characteristic =
-will get a StartNotify/StopNotify event on connect/disconnect edges. I =
-can just use those to keep track of when I=E2=80=99m active or not.
+I am not sure I fully understand what this quirk, but I suspect we are
+going to want to have the option for turning on duplicate filtering.
+Beacons and mesh are going to become more and more common and the later
+would cause an HCI event every time a new packet was broadcast. In most
+cases these are not of interest to people unless they are explicity
+expecting them.
 
-So I implemented this, and now notice that while I get the StartNotify =
-events, I don=E2=80=99t seem to get the StopNotify events.
-
-In one case, I just shut down my iOS app (which had successfully =
-triggered the StartNotify), while the device eventually showed up as =
-disconnected, it never propagated a stop notify.
-
-In the next case, I used the LightBlueLE app which allows one to =
-explicitly start listen and stop listen. Explicit stop listen commands =
-on either didn=E2=80=99t show anything.
-
-Running btmon during a start listen/stop listen cycle produced the =
-following output:
-
-# btmon
-Bluetooth monitor ver 5.41
-=3D New Index: 5C:F3:70:68:C1:F9 (Primary,USB,hci0)               [hci0] =
-0.149811
-> ACL Data RX: Handle 64 flags 0x02 dlen 9                      [hci0] =
-2.681703
-      ATT: Write Request (0x12) len 4
-        Handle: 0x000d
-          Data: 0100
-< ACL Data TX: Handle 64 flags 0x00 dlen 5                      [hci0] =
-2.693201
-      ATT: Write Response (0x13) len 0
-> HCI Event: Number of Completed Packets (0x13) plen 5          [hci0] =
-3.036696
-        Num handles: 1
-        Handle: 64
-        Count: 1
-> ACL Data RX: Handle 64 flags 0x02 dlen 9                     [hci0] =
-11.862591
-      ATT: Write Request (0x12) len 4
-        Handle: 0x000d
-          Data: 0000
-< ACL Data TX: Handle 64 flags 0x00 dlen 5                     [hci0] =
-11.864894
-      ATT: Write Response (0x13) len 0
-> HCI Event: Number of Completed Packets (0x13) plen 5         [hci0] =
-12.161577
-        Num handles: 1
-        Handle: 64
-        Count: 1
+I would propose adding SetSuplicateFilter to the adaptor API. I am
+happy to write some code for this today if people think this makes
+sense.
 
 
-(also, having btmon running when connected caused btmon to buffer =
-overflow and die)=
+--Brennan
