@@ -1,90 +1,290 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <BE6EC190-160F-4895-82D0-B31D7CB3DB18@gmail.com>
-References: <04AC5786-517A-4834-AFD7-B0C6AC29B869@gmail.com>
- <CADwkJjLm5RF54MHANHYUX3cmh52V4EgHB57hrMu4oXeOA6bR3Q@mail.gmail.com>
- <0176A088-7DFB-415E-9461-CB8BA391E087@gmail.com> <CADwkJj+6n=7AAXmbEZ6me32_m-2fyErYOnKDcg4E8Kj7ibn1WA@mail.gmail.com>
- <AFC130A9-CBDF-4DC3-BACD-69CF3ADBA1C6@gmail.com> <CAAu3APaLf-fEj61fA4UD1JDLipbgC72K2WWtUzLKypT2LJAErw@mail.gmail.com>
- <A4055AB1-FBEC-48D9-81BB-54FAFDB73744@gmail.com> <BE6EC190-160F-4895-82D0-B31D7CB3DB18@gmail.com>
+In-Reply-To: <CADwkJjLnKpYw6m1eoU-aMQomDNWFhwgJsAMVUOf-FMFihS5MWQ@mail.gmail.com>
+References: <20160909122720.2404-1-tobias.svehagen@gmail.com>
+ <CABBYNZ+UZiFDmzZOLTyutiAVOa9Y7wYhVNNDpDYZ9tEnwR9niw@mail.gmail.com> <CADwkJjLnKpYw6m1eoU-aMQomDNWFhwgJsAMVUOf-FMFihS5MWQ@mail.gmail.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 13 Sep 2016 17:41:39 +0300
-Message-ID: <CABBYNZLux+k_cMH+7xdOewu2dfKA2p_m6q+U5ZoJjzSYAmc63w@mail.gmail.com>
-Subject: Re: StopNotify not firing? (was: Query BLE connected status?)
-To: Travis Griggs <travisgriggs@gmail.com>
-Cc: Bluez mailing list <linux-bluetooth@vger.kernel.org>
+Date: Tue, 13 Sep 2016 17:24:13 +0300
+Message-ID: <CABBYNZ++2J567kyM4=emAaehzDq_FFpwHmq-9bPRrMHq2VfPow@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] src/device: Use BT_ATT_DEFAULT_LE_MTU as default MTU
+To: Tobias Svehagen <tobias.svehagen@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Travis,
+Hi Tobias,
 
-On Mon, Sep 12, 2016 at 8:49 PM, Travis Griggs <travisgriggs@gmail.com> wro=
-te:
+On Sat, Sep 10, 2016 at 2:32 AM, Tobias Svehagen
+<tobias.svehagen@gmail.com> wrote:
+> Hi Luiz,
 >
->> On Sep 12, 2016, at 8:52 AM, Travis Griggs <travisgriggs@gmail.com> wrot=
-e:
->>
->> It seems to me though, that maybe I=E2=80=99m going about this wrong. I =
-don=E2=80=99t care about the device identity, or which devices are connecte=
-d or not. What I really care about is if any device is connected to my app.=
- And maybe I have this (kind of indirectly). My characteristic will get a S=
-tartNotify/StopNotify event on connect/disconnect edges. I can just use tho=
-se to keep track of when I=E2=80=99m active or not.
+> I have a scenario where I think there is an obvious problem with the
+> current implementation. Maybe I have missed something and that the
+> patch provided actually messes something else up which I didn't notice
+> :) Anyway, here is the problem scenario
 >
-> So I implemented this, and now notice that while I get the StartNotify ev=
-ents, I don=E2=80=99t seem to get the StopNotify events.
+> 1. Bluez with some additional gatt services registered is running on
+> adapter A with device maximum MTU (ie dev->att_mtu) of 517. This means
+> that also attrib->att->mtu is 517 since it is set in
+> device_attach_att()
+> 2. gatttool is started on adapter B, which does not support MTU
+> exchange, and connects to adapter A
+> 3. Bluez will send MTU exchange request, which will fail, and Bluez
+> MTU will remain at 517 but gatttool MTU will be at
+> BT_ATT_DEFAULT_LE_MTU
+> 4. gatttool asks for the primary services and Bluez answers with a
+> packet which is larger than the negotiated MTU. This makes all the
+> read routines behave strange and gatttool will fail to parse the
+> answer.
 >
-> In one case, I just shut down my iOS app (which had successfully triggere=
-d the StartNotify), while the device eventually showed up as disconnected, =
-it never propagated a stop notify.
+>> This is not complete right since latter on if the MTU is negotiated by
+>> bt_gatt_client, but I remember fixing something like this:
 >
-> In the next case, I used the LightBlueLE app which allows one to explicit=
-ly start listen and stop listen. Explicit stop listen commands on either di=
-dn=E2=80=99t show anything.
+> Yes it is negotiated in bt_gatt_client but the problem is that if
+> negotiation fails, the MTU will remain at device maximum and not at
+> the expected BT_ATT_DEFAULT_LE_MTU. Maybe I'm missing something?
 >
-> Running btmon during a start listen/stop listen cycle produced the follow=
-ing output:
+>> Btw, it would be good to have some logs what exactly is the scenario
+>> where this happens.
 >
-> # btmon
-> Bluetooth monitor ver 5.41
-> =3D New Index: 5C:F3:70:68:C1:F9 (Primary,USB,hci0)               [hci0] =
-0.149811
->> ACL Data RX: Handle 64 flags 0x02 dlen 9                      [hci0] 2.6=
-81703
->       ATT: Write Request (0x12) len 4
->         Handle: 0x000d
->           Data: 0100
-> < ACL Data TX: Handle 64 flags 0x00 dlen 5                      [hci0] 2.=
-693201
->       ATT: Write Response (0x13) len 0
->> HCI Event: Number of Completed Packets (0x13) plen 5          [hci0] 3.0=
-36696
+> Below is a log of a failure taken by btmon on the adapter running
+> Bluez. The interesting part are the following lines
+>
+> < ACL Data TX: Handle 64 flags 0x00 dlen 27
+>                              [hci0] 8.022432
+> < ACL Data TX: Handle 64 flags 0x01 dlen 27
+>                              [hci0] 8.022446
+> < ACL Data TX: Handle 64 flags 0x01 dlen 12
+>                              [hci0] 8.022449
+>       ATT: Read By Group Type Response (0x11) len 61
+>
+> What happens on the other side (ie gatttool) is this
+>
+> # ./gatttool -b 5c:f3:70:74:02:52 --primary
+> Discover all primary services failed: Internal application error: I/O
+>
+> This is because too much data, 61 bytes in this case, has been
+> received in one chunk since Bluez tries to send all services in one
+> go. Bluez does not honor the minimum MTU which it should in case of a
+> failed MTU exchange.
+>
+> --- btmon-log failure ---
+>
+>> HCI Event: LE Meta Event (0x3e) plen 19                                                           [hci0] 7.645659
+>       LE Connection Complete (0x01)
+>         Status: Success (0x00)
+>         Handle: 64
+>         Role: Slave (0x01)
+>         Peer address type: Public (0x00)
+>         Peer address: 5C:F3:70:2C:0F:BF (CC&C Technologies, Inc)
+>         Connection interval: 67.50 msec (0x0036)
+>         Connection latency: 0.00 msec (0x0000)
+>         Supervision timeout: 420 msec (0x002a)
+>         Master clock accuracy: 0x00
+> @ Device Connected: 5C:F3:70:2C:0F:BF (1) flags 0x0000
+> = bluetoothd: No cache for 5C:F3:70:2C:0F:BF
+>                                     7.649629
+> < ACL Data TX: Handle 64 flags 0x00 dlen 7
+>                              [hci0] 7.647408
+>       ATT: Exchange MTU Request (0x02) len 2
+>         Client RX MTU: 517
+>> ACL Data RX: Handle 64 flags 0x02 dlen 9                                                          [hci0] 7.884921
+>       ATT: Error Response (0x01) len 4
+>         Exchange MTU Request (0x02)
+>         Handle: 0x0000
+>         Error: Request Not Supported (0x06)
+> < ACL Data TX: Handle 64 flags 0x00 dlen 11
+>                              [hci0] 7.885640
+>       ATT: Read By Group Type Request (0x10) len 6
+>         Handle range: 0x0001-0xffff
+>         Attribute group type: Primary Service (0x2800)
+>> ACL Data RX: Handle 64 flags 0x02 dlen 11                                                         [hci0] 7.886024
+>       ATT: Read By Group Type Request (0x10) len 6
+>         Handle range: 0x0001-0xffff
+>         Attribute group type: Primary Service (0x2800)
+> < ACL Data TX: Handle 64 flags 0x00 dlen 18
+>                              [hci0] 7.886720
+>       ATT: Read By Group Type Response (0x11) len 13
+>         Attribute data length: 6
+>         Attribute group list: 2 entries
+>         Handle range: 0x0001-0x0005
+>         UUID: Generic Access Profile (0x1800)
+>         Handle range: 0x0006-0x0009
+>         UUID: Generic Attribute Profile (0x1801)
+>> HCI Event: Number of Completed Packets (0x13) plen 5                                              [hci0] 7.954078
+>         Num handles: 1
+>         Handle: 64
+>         Count: 2
+>> ACL Data RX: Handle 64 flags 0x02 dlen 9                                                          [hci0] 8.019656
+>       ATT: Error Response (0x01) len 4
+>         Read By Group Type Request (0x10)
+>         Handle: 0x0000
+>         Error: Request Not Supported (0x06)
+>> ACL Data RX: Handle 64 flags 0x02 dlen 11                                                         [hci0] 8.021654
+>       ATT: Read By Group Type Request (0x10) len 6
+>         Handle range: 0x000a-0xffff
+>         Attribute group type: Primary Service (0x2800)
+> < ACL Data TX: Handle 64 flags 0x00 dlen 27
+>                              [hci0] 8.022432
+> < ACL Data TX: Handle 64 flags 0x01 dlen 27
+>                              [hci0] 8.022446
+> < ACL Data TX: Handle 64 flags 0x01 dlen 12
+>                              [hci0] 8.022449
+>       ATT: Read By Group Type Response (0x11) len 61
+>         Attribute data length: 20
+>         Attribute group list: 3 entries
+>         Handle range: 0x000a-0x0010
+>         UUID: Vendor specific (00000001-000a-0003-1234-567890abcdef)
+>         Handle range: 0x0011-0x001e
+>         UUID: Vendor specific (00000001-0002-0003-1234-567890abcdef)
+>         Handle range: 0x001f-0x0024
+>         UUID: Vendor specific (10000000-0002-0003-1234-567890abcdef)
+>> HCI Event: Number of Completed Packets (0x13) plen 5                                              [hci0] 8.089016
+>         Num handles: 1
+>         Handle: 64
+>         Count: 2
+>> HCI Event: Number of Completed Packets (0x13) plen 5                                              [hci0] 8.155043
+>         Num handles: 1
+>         Handle: 64
+>         Count: 2
+>> HCI Event: Disconnect Complete (0x05) plen 4                                                     [hci0] 10.248239
+>         Status: Success (0x00)
+>         Handle: 64
+>         Reason: Remote User Terminated Connection (0x13)
+> @ Device Disconnected: 5C:F3:70:2C:0F:BF (1) reason 3
+>
+>
+> In the log below, which has the patch applied, the MTU is honored and
+> one packet per service is sent instead.
+>
+> --- btmon-log success ---
+>
+>> HCI Event: LE Meta Event (0x3e) plen 19                                                          [hci0] 13.013157
+>       LE Connection Complete (0x01)
+>         Status: Success (0x00)
+>         Handle: 64
+>         Role: Slave (0x01)
+>         Peer address type: Public (0x00)
+>         Peer address: 5C:F3:70:2C:0F:BF (CC&C Technologies, Inc)
+>         Connection interval: 67.50 msec (0x0036)
+>         Connection latency: 0.00 msec (0x0000)
+>         Supervision timeout: 420 msec (0x002a)
+>         Master clock accuracy: 0x00
+> @ Device Connected: 5C:F3:70:2C:0F:BF (1) flags 0x0000
+> = bluetoothd: No cache for 5C:F3:70:2C:0F:BF
+>                                    13.018786
+> < ACL Data TX: Handle 64 flags 0x00 dlen 7
+>                             [hci0] 13.014360
+>       ATT: Exchange MTU Request (0x02) len 2
+>         Client RX MTU: 517
+>> ACL Data RX: Handle 64 flags 0x02 dlen 9                                                         [hci0] 13.252181
+>       ATT: Error Response (0x01) len 4
+>         Exchange MTU Request (0x02)
+>         Handle: 0x0000
+>         Error: Request Not Supported (0x06)
+> < ACL Data TX: Handle 64 flags 0x00 dlen 11
+>                             [hci0] 13.252623
+>       ATT: Read By Group Type Request (0x10) len 6
+>         Handle range: 0x0001-0xffff
+>         Attribute group type: Primary Service (0x2800)
+>> ACL Data RX: Handle 64 flags 0x02 dlen 11                                                        [hci0] 13.253078
+>       ATT: Read By Group Type Request (0x10) len 6
+>         Handle range: 0x0001-0xffff
+>         Attribute group type: Primary Service (0x2800)
+> < ACL Data TX: Handle 64 flags 0x00 dlen 18
+>                             [hci0] 13.253371
+>       ATT: Read By Group Type Response (0x11) len 13
+>         Attribute data length: 6
+>         Attribute group list: 2 entries
+>         Handle range: 0x0001-0x0005
+>         UUID: Generic Access Profile (0x1800)
+>         Handle range: 0x0006-0x0009
+>         UUID: Generic Attribute Profile (0x1801)
+>> HCI Event: Number of Completed Packets (0x13) plen 5                                             [hci0] 13.321076
+>         Num handles: 1
+>         Handle: 64
+>         Count: 2
+>> ACL Data RX: Handle 64 flags 0x02 dlen 9                                                         [hci0] 13.386815
+>       ATT: Error Response (0x01) len 4
+>         Read By Group Type Request (0x10)
+>         Handle: 0x0000
+>         Error: Request Not Supported (0x06)
+>> ACL Data RX: Handle 64 flags 0x02 dlen 11                                                        [hci0] 13.392490
+>       ATT: Read By Group Type Request (0x10) len 6
+>         Handle range: 0x000a-0xffff
+>         Attribute group type: Primary Service (0x2800)
+> < ACL Data TX: Handle 64 flags 0x00 dlen 26
+>                             [hci0] 13.398941
+>       ATT: Read By Group Type Response (0x11) len 21
+>         Attribute data length: 20
+>         Attribute group list: 1 entry
+>         Handle range: 0x000a-0x0010
+>         UUID: Vendor specific (00000001-000a-0003-1234-567890abcdef)
+>> ACL Data RX: Handle 64 flags 0x02 dlen 11                                                        [hci0] 13.522237
+>       ATT: Read By Group Type Request (0x10) len 6
+>         Handle range: 0x0011-0xffff
+>         Attribute group type: Primary Service (0x2800)
+> < ACL Data TX: Handle 64 flags 0x00 dlen 26
+>                             [hci0] 13.522544
+>       ATT: Read By Group Type Response (0x11) len 21
+>         Attribute data length: 20
+>         Attribute group list: 1 entry
+>         Handle range: 0x0011-0x001e
+>         UUID: Vendor specific (00000001-0002-0003-1234-567890abcdef)
+>> HCI Event: Number of Completed Packets (0x13) plen 5                                             [hci0] 13.524591
+>         Num handles: 1
+>         Handle: 64
+>         Count: 2
+>> ACL Data RX: Handle 64 flags 0x02 dlen 11                                                        [hci0] 13.657102
+>       ATT: Read By Group Type Request (0x10) len 6
+>         Handle range: 0x001f-0xffff
+>         Attribute group type: Primary Service (0x2800)
+> < ACL Data TX: Handle 64 flags 0x00 dlen 26
+>                             [hci0] 13.657408
+>       ATT: Read By Group Type Response (0x11) len 21
+>         Attribute data length: 20
+>         Attribute group list: 1 entry
+>         Handle range: 0x001f-0x0024
+>         UUID: Vendor specific (10000000-0002-0003-1234-567890abcdef)
+>> ACL Data RX: Handle 64 flags 0x02 dlen 11                                                        [hci0] 13.792225
+>       ATT: Read By Group Type Request (0x10) len 6
+>         Handle range: 0x0025-0xffff
+>         Attribute group type: Primary Service (0x2800)
+> < ACL Data TX: Handle 64 flags 0x00 dlen 9
+>                             [hci0] 13.792849
+>       ATT: Error Response (0x01) len 4
+>         Read By Group Type Request (0x10)
+>         Handle: 0x0025
+>         Error: Attribute Not Found (0x0a)
+>> HCI Event: Number of Completed Packets (0x13) plen 5                                             [hci0] 13.793919
+>         Num handles: 1
+>         Handle: 64
+>         Count: 2
+>> HCI Event: Number of Completed Packets (0x13) plen 5                                             [hci0] 14.093431
 >         Num handles: 1
 >         Handle: 64
 >         Count: 1
->> ACL Data RX: Handle 64 flags 0x02 dlen 9                     [hci0] 11.8=
-62591
->       ATT: Write Request (0x12) len 4
->         Handle: 0x000d
->           Data: 0000
-> < ACL Data TX: Handle 64 flags 0x00 dlen 5                     [hci0] 11.=
-864894
->       ATT: Write Response (0x13) len 0
->> HCI Event: Number of Completed Packets (0x13) plen 5         [hci0] 12.1=
-61577
->         Num handles: 1
+>> HCI Event: Disconnect Complete (0x05) plen 4                                                     [hci0] 16.020489
+>         Status: Success (0x00)
 >         Handle: 64
->         Count: 1
+>         Reason: Remote User Terminated Connection (0x13)
 >
 >
-> (also, having btmon running when connected caused btmon to buffer overflo=
-w and die)--
+> Maybe this should be solved in some other way than what this patch
+> suggests but I think it is clear that something is a bit strange. I
+> guess you should be able to reproduce it easily as long as you can
+> make the MTU exchange fail. What do you think, does the patch create
+> any problems which I didn't see? Should it be solved in some other
+> way? Another possible fix is to call bt_att_set_mtu(client->att,
+> BT_ATT_DEFAULT_LE_MTU) when it is noticed that MTU exchange was not
+> supported at (src/shared/gatt-client.c:1174).
 
-We did have some fixes recently to btmon, please check with upstream
-version. Regarding StopNotify we are currently using refcount to track
-when to disable the notifications so I suspect this is not working
-properly. Also we are not stopping the notification when there is no
-peer connected, so there is a couple of things to fix.
+Actually this seems correct since gattrib don't actually do the MTU
+negotiation leaving it up to bt_gatt_client which once done it is
+shall set the final result with bt_att_set_mtu so we should really
+start with the default which was not the case so I went ahead and
+applied your patch.
 
---=20
+-- 
 Luiz Augusto von Dentz
