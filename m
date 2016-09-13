@@ -1,64 +1,54 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: biman.innovative@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Cc: Biman Paul <biman.paul@samsung.com>
-Subject: [PATCHv2 1/1] parser/sdp: parse MAS Instance ID and Message Type
-Date: Tue, 13 Sep 2016 19:40:53 +0530
-Message-Id: <1473775853-15129-1-git-send-email-biman.paul@samsung.com>
+MIME-Version: 1.0
+In-Reply-To: <1473689259-9523-1-git-send-email-luiz.dentz@gmail.com>
+References: <1473689259-9523-1-git-send-email-luiz.dentz@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Tue, 13 Sep 2016 17:09:19 +0300
+Message-ID: <CABBYNZJHQ+svovaHQ_C13Wjq1bLgdrX=8p16GP4PT0QHg+o05w@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/8] core/device: Load stored attributes before
+ initializing GATT client
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Biman Paul <biman.paul@samsung.com>
+Hi,
 
-Parsing Support added in SDP record:
-1. MAS Instance ID in MAP
-2. Message Types supported by MAS
+On Mon, Sep 12, 2016 at 5:07 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> During gatt_client_init service are requested to accept the connection
+> which may leads the driver to check existence of attributes.
+> ---
+>  src/device.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+>
+> diff --git a/src/device.c b/src/device.c
+> index fd928fc..73bcc8f 100644
+> --- a/src/device.c
+> +++ b/src/device.c
+> @@ -4823,12 +4823,12 @@ bool device_attach_att(struct btd_device *dev, GIOChannel *io)
+>         dst = device_get_address(dev);
+>         ba2str(dst, dstaddr);
+>
+> -       gatt_client_init(dev);
+> -       gatt_server_init(dev, btd_gatt_database_get_db(database));
+> -
+>         if (gatt_db_isempty(dev->db))
+>                 load_gatt_db(dev, srcaddr, dstaddr);
+>
+> +       gatt_client_init(dev);
+> +       gatt_server_init(dev, btd_gatt_database_get_db(database));
+> +
+>         /*
+>          * Remove the device from the connect_list and give the passive
+>          * scanning another chance to be restarted in case there are
+> --
+> 2.7.4
 
-Without this patch:
-   aid 0x0100 (SrvName)
-      str "MAP SMS/MMS"
-   aid 0x0315 (unknown)
-      uint 0x0
-   aid 0x0316 (unknown)
-      uint 0xe
+Applied.
 
-Using this patch:
-   aid 0x0100 (SrvName)
-      str "MAP SMS/MMS"
-   aid 0x0315 (MASInstanceID)
-      uint 0x0
-   aid 0x0316 (SupportedMessageTypes)
-      uint 0xe
----
- tools/parser/sdp.c | 2 ++
- tools/parser/sdp.h | 2 ++
- 2 files changed, 4 insertions(+)
 
-diff --git a/tools/parser/sdp.c b/tools/parser/sdp.c
-index dba9a36..cc69570 100644
---- a/tools/parser/sdp.c
-+++ b/tools/parser/sdp.c
-@@ -211,6 +211,8 @@ static sdp_attr_id_nam_lookup_table_t sdp_attr_id_nam_lookup_table[] = {
- 	{ SDP_ATTR_ID_SUPPORTED_FUNCTIONS,               "SuppFunctions"      }, /* Imaging */
- 	{ SDP_ATTR_ID_TOTAL_IMAGING_DATA_CAPACITY,       "SuppTotalCapacity"  }, /* Imaging */
- 	{ SDP_ATTR_ID_SUPPORTED_REPOSITORIES,            "SuppRepositories"   }, /* PBAP */
-+	{ SDP_ATTR_ID_MAS_INSTANCE_ID,                   "MASInstanceID"      }, /* MAS ID */
-+	{ SDP_ATTR_ID_MAP_SUPPORTED_TYPES,            "SupportedMessageTypes" }, /* Message Types */
- };
- 
- #define SDP_ATTR_ID_NAM_LOOKUP_TABLE_SIZE \
-diff --git a/tools/parser/sdp.h b/tools/parser/sdp.h
-index ed55a23..21d2e45 100644
---- a/tools/parser/sdp.h
-+++ b/tools/parser/sdp.h
-@@ -157,5 +157,7 @@
- #define SDP_ATTR_ID_SUPPORTED_FUNCTIONS                0x0312 /* Imaging */
- #define SDP_ATTR_ID_TOTAL_IMAGING_DATA_CAPACITY        0x0313 /* Imaging */
- #define SDP_ATTR_ID_SUPPORTED_REPOSITORIES             0x0314 /* PBAP */
-+#define SDP_ATTR_ID_MAS_INSTANCE_ID                    0x0315 /* MAS ID */
-+#define SDP_ATTR_ID_MAP_SUPPORTED_TYPES                0x0316 /* Message Types */
- 
- #endif /* __SDP_H */
 -- 
-2.5.0
-
+Luiz Augusto von Dentz
