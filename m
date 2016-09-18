@@ -2,15 +2,17 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Szymon Janc <szymon.janc@codecoup.pl>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@codecoup.pl>
-Subject: [PATCH v3] monitor: Add support for Set Appearance mgmt command
-Date: Sun, 18 Sep 2016 12:47:27 +0200
-Message-Id: <1474195647-10789-1-git-send-email-szymon.janc@codecoup.pl>
+Subject: [PATCH v2 5/5] monitor: Add support for Set Appearance mgmt command
+Date: Sun, 18 Sep 2016 12:34:41 +0200
+Message-Id: <1474194881-10403-5-git-send-email-szymon.janc@codecoup.pl>
+In-Reply-To: <1474194881-10403-1-git-send-email-szymon.janc@codecoup.pl>
+References: <1474194881-10403-1-git-send-email-szymon.janc@codecoup.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-@ MGMT Command: Set Appearance (0x0043) plen 2        {0x0002}
-        Appearance: Blood Pressure (0x0380)
-@ MGMT Event: Command Complete (0x0001) plen 3        {0x0002}
+@ MGMT Command: Set Appearance (0x0043) plen 2         {0x0002}
+        Appearance: (0x1234)
+@ MGMT Event: Command Complete (0x0001) plen 3         {0x0002}
       Set Appearance (0x0043) plen 0
         Status: Success (0x00)
 ---
@@ -18,7 +20,7 @@ List-ID: <linux-bluetooth.vger.kernel.org>
  1 file changed, 10 insertions(+)
 
 diff --git a/monitor/packet.c b/monitor/packet.c
-index f5d6f96..6272562 100644
+index f5d6f96..1b68d1b 100644
 --- a/monitor/packet.c
 +++ b/monitor/packet.c
 @@ -10755,6 +10755,13 @@ static void mgmt_read_ext_controller_info_rsp(const void *data, uint16_t size)
@@ -29,7 +31,7 @@ index f5d6f96..6272562 100644
 +{
 +	uint16_t appearance = get_le16(data);
 +
-+	print_appearance(appearance);
++	print_field("Appearance: (0x%2.2x)", appearance);
 +}
 +
  struct mgmt_data {
