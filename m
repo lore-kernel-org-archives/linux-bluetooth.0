@@ -1,509 +1,554 @@
-Return-Path: <loic.poulain@intel.com>
-From: Loic Poulain <loic.poulain@intel.com>
-To: marcel@holtmann.org,
-	akarwar@marvell.com
-Cc: linux-bluetooth@vger.kernel.org,
-	Loic Poulain <loic.poulain@intel.com>,
-	Loic Poulain <loic.poulain@gmail.com>
-Subject: [PATCH] Bluetooth: hci_uart: Add Marvell support
-Date: Sun, 18 Sep 2016 18:59:04 +0200
-Message-Id: <1474217944-10498-1-git-send-email-loic.poulain@intel.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Bobby Noelte <b0661n0e17e@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: "b0661n0e71e@gmail.com" <b0661.n0e17e@gmail.com>
+Subject: [Patch BlueZ 1/1] Make network server interface handling more robust
+Date: Sun, 18 Sep 2016 18:35:31 +0200
+Message-Id: <1474216531-11518-2-git-send-email-b0661n0e17e@gmail.com>
+In-Reply-To: <1474216531-11518-1-git-send-email-b0661n0e17e@gmail.com>
+References: <1474216531-11518-1-git-send-email-b0661n0e17e@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch introduces support for Marvell Bluetooth controller over
-UART (8897 for now). In order to send the final firmware at full speed,
-a helper firmware is firstly sent. Firmware download is driven by the
-controller which sends request firmware packets (including expected
-size).
+From: "b0661n0e71e@gmail.com" <b0661.n0e17e@gmail.com>
 
-This driver is a global rework of the one proposed by
-Amitkumar Karwar <akarwar@marvell.com>.
+Interface names may be renamed by udev (systemd-udev) after creation
+before the interface is up. Interfaces may also be renamed when
+the interface is down due to a bluetoothd restart.
 
-Signed-off-by: Loic Poulain <loic.poulain@gmail.com>
+Use the interface index, that does not change on renaming, where possible.
+Also do some retries when the creation of an interface fails.
 ---
- drivers/bluetooth/Kconfig     |  11 ++
- drivers/bluetooth/Makefile    |   1 +
- drivers/bluetooth/hci_ldisc.c |   6 +
- drivers/bluetooth/hci_mrvl.c  | 382 ++++++++++++++++++++++++++++++++++++++++++
- drivers/bluetooth/hci_uart.h  |   8 +-
- 5 files changed, 407 insertions(+), 1 deletion(-)
- create mode 100644 drivers/bluetooth/hci_mrvl.c
+ profiles/network/bnep.c | 311 ++++++++++++++++++++++++++++++++++++++++--------
+ 1 file changed, 260 insertions(+), 51 deletions(-)
 
-diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
-index cf50fd2..daafd0c 100644
---- a/drivers/bluetooth/Kconfig
-+++ b/drivers/bluetooth/Kconfig
-@@ -180,6 +180,17 @@ config BT_HCIUART_AG6XX
- 
- 	  Say Y here to compile support for Intel AG6XX protocol.
- 
-+config BT_HCIUART_MRVL
-+	bool "Marvell protocol support"
-+	depends on BT_HCIUART
-+	select BT_HCIUART_H4
-+	help
-+	  Marvell is serial protocol for communication between Bluetooth
-+	  device and host. This protocol is required for most Marvell Bluetooth
-+	  devices with UART interface.
-+
-+	  Say Y here to compile support for HCI MRVL protocol.
-+
- config BT_HCIBCM203X
- 	tristate "HCI BCM203x USB driver"
- 	depends on USB
-diff --git a/drivers/bluetooth/Makefile b/drivers/bluetooth/Makefile
-index 9c18939..364dbb6 100644
---- a/drivers/bluetooth/Makefile
-+++ b/drivers/bluetooth/Makefile
-@@ -37,6 +37,7 @@ hci_uart-$(CONFIG_BT_HCIUART_INTEL)	+= hci_intel.o
- hci_uart-$(CONFIG_BT_HCIUART_BCM)	+= hci_bcm.o
- hci_uart-$(CONFIG_BT_HCIUART_QCA)	+= hci_qca.o
- hci_uart-$(CONFIG_BT_HCIUART_AG6XX)	+= hci_ag6xx.o
-+hci_uart-$(CONFIG_BT_HCIUART_MRVL)	+= hci_mrvl.o
- hci_uart-objs				:= $(hci_uart-y)
- 
- ccflags-y += -D__CHECK_ENDIAN__
-diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
-index dda9739..9a3aab6 100644
---- a/drivers/bluetooth/hci_ldisc.c
-+++ b/drivers/bluetooth/hci_ldisc.c
-@@ -810,6 +810,9 @@ static int __init hci_uart_init(void)
- #ifdef CONFIG_BT_HCIUART_AG6XX
- 	ag6xx_init();
- #endif
-+#ifdef CONFIG_BT_HCIUART_MRVL
-+	mrvl_init();
-+#endif
- 
+diff --git a/profiles/network/bnep.c b/profiles/network/bnep.c
+index 9bf0b18..cba0f63 100644
+--- a/profiles/network/bnep.c
++++ b/profiles/network/bnep.c
+@@ -65,6 +65,7 @@ struct bnep {
+ 	uint16_t	dst;
+ 	bdaddr_t	dst_addr;
+ 	char	iface[16];
++	unsigned int	ifindex;
+ 	guint	attempts;
+ 	guint	setup_to;
+ 	guint	watch;
+@@ -98,25 +99,109 @@ int bnep_cleanup(void)
  	return 0;
  }
-@@ -845,6 +848,9 @@ static void __exit hci_uart_exit(void)
- #ifdef CONFIG_BT_HCIUART_AG6XX
- 	ag6xx_deinit();
- #endif
-+#ifdef CONFIG_BT_HCIUART_MRVL
-+	mrvl_deinit();
-+#endif
- 
- 	/* Release tty registration of line discipline */
- 	err = tty_unregister_ldisc(N_HCI);
-diff --git a/drivers/bluetooth/hci_mrvl.c b/drivers/bluetooth/hci_mrvl.c
-new file mode 100644
-index 0000000..46c39f3
---- /dev/null
-+++ b/drivers/bluetooth/hci_mrvl.c
-@@ -0,0 +1,382 @@
-+/*
+
++/**
++ * private: for local use only.
 + *
-+ *  Bluetooth HCI UART driver for marvell devices
++ * bnep_indextoname() - Return interface name corresponding to interface index.
++ * @ifindex interface index.
++ * @iface interface name, output only, will be filled with '<unknown>' in case of error.
 + *
-+ *  Copyright (C) 2016, Marvell International Ltd.
-+ *  Copyright (C) 2016, Intel Corporation
++ * The name is placed in the buffer pointed to by ifname.
++ * The buffer must allow for the storage of at least IF_NAMESIZE bytes.
 + *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-+ *
++ * On success 0 is returned. On error errno as a negative value is returned.
 + */
-+
-+#include <linux/kernel.h>
-+#include <linux/errno.h>
-+#include <linux/skbuff.h>
-+#include <linux/firmware.h>
-+#include <linux/module.h>
-+#include <linux/tty.h>
-+
-+#include <net/bluetooth/bluetooth.h>
-+#include <net/bluetooth/hci_core.h>
-+
-+#include "hci_uart.h"
-+
-+#define HCI_FW_REQ_PKT 0xA5
-+#define HCI_CHIP_VER_PKT 0xAA
-+
-+#define STATE_CHIP_VER_PENDING 0
-+#define STATE_FW_REQ_PENDING 1
-+
-+#define MRVL_ACK 0x5A
-+#define MRVL_NAK 0xBF
-+#define MRVL_RAW_DATA 0x1F
-+
-+struct mrvl_data {
-+	struct sk_buff *rx_skb;
-+	struct sk_buff_head txq;
-+	unsigned long flags;
-+	unsigned int tx_len;
-+	u8 id, rev;
-+};
-+
-+struct hci_mrvl_pkt {
-+	__le16 lhs;
-+	__le16 rhs;
-+} __packed;
-+#define HCI_MRVL_PKT_SIZE 4
-+
-+static int mrvl_open(struct hci_uart *hu)
++static int bnep_indextoname(unsigned int ifindex, char *iface)
 +{
-+	struct mrvl_data *mrvl;
-+
-+	BT_DBG("hu %p", hu);
-+
-+	mrvl = kzalloc(sizeof(*mrvl), GFP_KERNEL);
-+	if (!mrvl)
-+		return -ENOMEM;
-+
-+	skb_queue_head_init(&mrvl->txq);
-+
-+	set_bit(STATE_CHIP_VER_PENDING, &mrvl->flags);
-+
-+	hu->priv = mrvl;
-+	return 0;
-+}
-+
-+static int mrvl_close(struct hci_uart *hu)
-+{
-+	struct mrvl_data *mrvl = hu->priv;
-+
-+	BT_DBG("hu %p", hu);
-+
-+	skb_queue_purge(&mrvl->txq);
-+	kfree_skb(mrvl->rx_skb);
-+	kfree(mrvl);
-+
-+	hu->priv = NULL;
-+	return 0;
-+}
-+
-+static int mrvl_flush(struct hci_uart *hu)
-+{
-+	struct mrvl_data *mrvl = hu->priv;
-+
-+	BT_DBG("hu %p", hu);
-+
-+	skb_queue_purge(&mrvl->txq);
-+	return 0;
-+}
-+
-+static struct sk_buff *mrvl_dequeue(struct hci_uart *hu)
-+{
-+	struct mrvl_data *mrvl = hu->priv;
-+	struct sk_buff *skb;
-+
-+	skb = skb_dequeue(&mrvl->txq);
-+	if (!skb)
-+		return skb;
-+
-+	/* Prepend skb with frame type, except for raw data firmware */
-+	if (bt_cb(skb)->pkt_type != MRVL_RAW_DATA)
-+		memcpy(skb_push(skb, 1), &bt_cb(skb)->pkt_type, 1);
-+
-+	return skb;
-+}
-+
-+static int mrvl_enqueue(struct hci_uart *hu, struct sk_buff *skb)
-+{
-+	struct mrvl_data *mrvl = hu->priv;
-+
-+	skb_queue_tail(&mrvl->txq, skb);
-+	return 0;
-+}
-+
-+static void mrvl_send_ack(struct hci_uart *hu, unsigned char type)
-+{
-+	struct mrvl_data *mrvl = hu->priv;
-+	struct sk_buff *skb;
-+
-+	/* No H4 payload, only 1 byte header */
-+	skb = bt_skb_alloc(0, GFP_ATOMIC);
-+	if (!skb) {
-+		bt_dev_err(hu->hdev, "Unable to alloc ack/nak packet");
-+		return;
-+	}
-+	hci_skb_pkt_type(skb) = type;
-+
-+	skb_queue_tail(&mrvl->txq, skb);
-+	hci_uart_tx_wakeup(hu);
-+}
-+
-+static void mrvl_recv_fw_req(struct hci_dev *hdev, struct hci_mrvl_pkt *pkt)
-+{
-+	struct hci_uart *hu = hci_get_drvdata(hdev);
-+	struct mrvl_data *mrvl = hu->priv;
-+
-+	if (!test_bit(STATE_FW_REQ_PENDING, &mrvl->flags)) {
-+		bt_dev_err(hu->hdev, "Received unexpected firmware request");
-+		return;
-+	}
-+
-+	mrvl->tx_len = le16_to_cpu(pkt->lhs);
-+
-+	clear_bit(STATE_FW_REQ_PENDING, &mrvl->flags);
-+	smp_mb__after_atomic();
-+	wake_up_bit(&mrvl->flags, STATE_FW_REQ_PENDING);
-+}
-+
-+static void mrvl_recv_chip_ver(struct hci_dev *hdev, struct hci_mrvl_pkt *pkt)
-+{
-+	struct hci_uart *hu = hci_get_drvdata(hdev);
-+	struct mrvl_data *mrvl = hu->priv;
-+	u16 version = le16_to_cpu(pkt->lhs);
-+
-+	if (!test_bit(STATE_CHIP_VER_PENDING, &mrvl->flags)) {
-+		bt_dev_err(hu->hdev, "Received unexpected chip version");
-+		return;
-+	}
-+
-+	mrvl->id = version;
-+	mrvl->rev = version >> 8;
-+
-+	bt_dev_info(hdev, "Controller id = %x, rev = %x", mrvl->id, mrvl->rev);
-+
-+	clear_bit(STATE_CHIP_VER_PENDING, &mrvl->flags);
-+	smp_mb__after_atomic();
-+	wake_up_bit(&mrvl->flags, STATE_CHIP_VER_PENDING);
-+}
-+
-+static int mrvl_vendor_recv(struct hci_dev *hdev, struct sk_buff *skb)
-+{
-+	struct hci_uart *hu = hci_get_drvdata(hdev);
-+	struct hci_mrvl_pkt *pkt = (void *)skb->data;
-+
-+	if ((pkt->lhs ^ pkt->rhs) != 0xffff) {
-+		bt_dev_err(hu->hdev, "Corrupted mrvl header");
-+		mrvl_send_ack(hu, MRVL_NAK);
-+		kfree_skb(skb);
-+		return -EINVAL;
-+	}
-+	mrvl_send_ack(hu, MRVL_ACK);
-+
-+	switch (hci_skb_pkt_type(skb)) {
-+	case HCI_FW_REQ_PKT:
-+		mrvl_recv_fw_req(hdev, pkt);
-+		break;
-+	case HCI_CHIP_VER_PKT:
-+		mrvl_recv_chip_ver(hdev, pkt);
-+		break;
-+	default:
-+		bt_dev_err(hdev, "Unknown packet type");
-+	}
-+
-+	kfree_skb(skb);
-+
-+	return 0;
-+}
-+
-+#define HCI_RECV_CHIP_VER \
-+	.type = HCI_CHIP_VER_PKT, \
-+	.hlen = HCI_MRVL_PKT_SIZE, \
-+	.loff = 0, \
-+	.lsize = 0, \
-+	.maxlen = HCI_MRVL_PKT_SIZE
-+
-+#define HCI_RECV_FW_REQ \
-+	.type = HCI_FW_REQ_PKT, \
-+	.hlen = HCI_MRVL_PKT_SIZE, \
-+	.loff = 0, \
-+	.lsize = 0, \
-+	.maxlen = HCI_MRVL_PKT_SIZE
-+
-+static const struct h4_recv_pkt mrvl_recv_pkts[] = {
-+	{ H4_RECV_ACL,       .recv = hci_recv_frame   },
-+	{ H4_RECV_SCO,       .recv = hci_recv_frame   },
-+	{ H4_RECV_EVENT,     .recv = hci_recv_frame   },
-+	{ HCI_RECV_FW_REQ,   .recv = mrvl_vendor_recv },
-+	{ HCI_RECV_CHIP_VER, .recv = mrvl_vendor_recv },
-+};
-+
-+static int mrvl_recv(struct hci_uart *hu, const void *data, int count)
-+{
-+	struct mrvl_data *mrvl = hu->priv;
-+	char *fixed_data = NULL;
-+
-+	if (!test_bit(HCI_UART_REGISTERED, &hu->flags))
-+		return -EUNATCH;
-+
-+	mrvl->rx_skb = h4_recv_buf(hu->hdev, mrvl->rx_skb, data, count,
-+				    mrvl_recv_pkts,
-+				    ARRAY_SIZE(mrvl_recv_pkts));
-+	if (IS_ERR(mrvl->rx_skb)) {
-+		int err = PTR_ERR(mrvl->rx_skb);
-+		bt_dev_err(hu->hdev, "Frame reassembly failed (%d)", err);
-+		mrvl->rx_skb = NULL;
-+		kfree(fixed_data);
-+		return err;
-+	}
-+
-+	kfree(fixed_data);
-+	return count;
-+}
-+
-+static int mrvl_load_firmware(struct hci_dev *hdev, const char *name)
-+{
-+	struct hci_uart *hu = hci_get_drvdata(hdev);
-+	struct mrvl_data *mrvl = hu->priv;
-+	const struct firmware *fw = NULL;
-+	const u8 *fw_ptr, *fw_max;
 +	int err;
 +
-+	err = request_firmware(&fw, name, &hdev->dev);
-+	if (err < 0) {
-+		bt_dev_err(hdev, "Failed to load firmware file %s", name);
-+		return err;
++	err = 0;
++	if (if_indextoname(ifindex, iface) == 0) {
++		err = -errno;
++		strncpy(iface, "<unknown>", 10);
 +	}
-+
-+	fw_ptr = fw->data;
-+	fw_max = fw->data + fw->size;
-+
-+	bt_dev_info(hdev, "Loading %s", name);
-+
-+	set_bit(STATE_FW_REQ_PENDING, &mrvl->flags);
-+
-+	while (fw_ptr <= fw_max) {
-+		struct sk_buff *skb;
-+
-+		/* Controller drives the firmware loading by sending firmware
-+		 * request packets containing the expected fragment size.
-+		 */
-+		err = wait_on_bit_timeout(&mrvl->flags, STATE_FW_REQ_PENDING,
-+					  TASK_INTERRUPTIBLE,
-+					  msecs_to_jiffies(2000));
-+		if (err == 1) {
-+			bt_dev_err(hdev, "Firmware load interrupted");
-+			err = -EINTR;
-+			break;
-+		} else if (err) {
-+			bt_dev_err(hdev, "Firmware request timeout");
-+			err = -ETIMEDOUT;
-+			break;
-+		}
-+
-+		bt_dev_dbg(hdev, "Firmware request, expecting %d bytes",
-+			   mrvl->tx_len);
-+
-+		if (fw_ptr == fw_max) {
-+			/* Controller requests a null size once firmware is
-+			 * fully loaded. If controller expects more data, there
-+			 * is a mismatch.
-+			 */
-+			if (!mrvl->tx_len) {
-+				bt_dev_info(hdev, "Firmware loading complete");
-+			} else {
-+				bt_dev_err(hdev, "Firmware loading failure");
-+				err = -EINVAL;
-+			}
-+			break;
-+		}
-+
-+		if (fw_ptr + mrvl->tx_len > fw_max) {
-+			mrvl->tx_len = fw_max - fw_ptr;
-+			bt_dev_dbg(hdev, "Adjusting tx_len to %d",
-+				   mrvl->tx_len);
-+		}
-+
-+		skb = bt_skb_alloc(mrvl->tx_len, GFP_KERNEL);
-+		if (!skb) {
-+			bt_dev_err(hdev, "Failed to alloc mem for FW packet");
-+			err = -ENOMEM;
-+			break;
-+		}
-+		bt_cb(skb)->pkt_type = MRVL_RAW_DATA;
-+
-+		memcpy(skb_put(skb, mrvl->tx_len), fw_ptr, mrvl->tx_len);
-+		fw_ptr += mrvl->tx_len;
-+
-+		set_bit(STATE_FW_REQ_PENDING, &mrvl->flags);
-+
-+		skb_queue_tail(&mrvl->txq, skb);
-+		hci_uart_tx_wakeup(hu);
-+	}
-+
-+	release_firmware(fw);
 +	return err;
 +}
 +
-+static int mrvl_setup(struct hci_uart *hu)
++/**
++ * private: for local use only.
++ *
++ * bnep_nametoindext() - Return interface index corresponding to interface name.
++ * @iface interface name
++ * @ifindex interface index, output only, will be filled with 0 in case of error.
++ *
++ * The interface index is placed in the variable pointed to by ifindex.
++ *
++ * In case the interface is temporarily unavailable do a retry.
++ *
++ * On success 0 is returned. On error errno as a negative value is returned.
++ */
++static int bnep_nametoindex(const char *iface, unsigned int *ifindex)
 +{
++	int retry;
 +	int err;
 +
-+	hci_uart_set_flow_control(hu, true);
++	retry = 0;
++	while (retry < 2) {
++		DBG("get interface index for device %s retry %d", iface, retry);
++		*ifindex = if_nametoindex(iface);
++		if (*ifindex != 0) {
++			DBG("got interface index %d for added device %s retry %d",
++				*ifindex, iface, retry);
++			err = 0;
++		} else {
++			err = -errno;
++		}
++		if (err != -EAGAIN)
++			break;
++		/* EAGAIN - Resource temporarily unavailable */
++		retry++;
++		sleep(1);
++	}
++	return err;
++}
 +
-+	err = mrvl_load_firmware(hu->hdev, "mrvl/helper_uart_3000000.bin");
+ static int bnep_conndel(const bdaddr_t *dst)
+ {
++	int err;
+ 	struct bnep_conndel_req req;
++	char addr[20];
+
++	ba2str(dst, &addr[0]);
+ 	memset(&req, 0, sizeof(req));
+ 	baswap((bdaddr_t *)&req.dst, dst);
+ 	req.flags = 0;
+-	if (ioctl(ctl, BNEPCONNDEL, &req) < 0) {
+-		int err = -errno;
+-		error("bnep: Failed to kill connection: %s (%d)",
+-							strerror(-err), -err);
++	err = ioctl(ctl, BNEPCONNDEL, &req);
++	if (err < 0) {
++		err = -errno;
++		error("bnep: Failed to kill connection %s: %s (%d)",
++			addr, strerror(-err), -err);
+ 		return err;
+ 	}
++	DBG("deleted device %s, %d", addr, err);
++
+ 	return 0;
+ }
+
+-static int bnep_connadd(int sk, uint16_t role, char *dev)
++/**
++ * private: for local use only.
++ *
++ * bnep_connadd() - Add bluetooth ethernet connection.
++ * @sk bluez control socket.
++ * @role
++ * @dev device name, template for new interface name (e.g. "bnep%d") or name.
++ * @dst bluetooth address, only needed for retries.
++ * @ifindex interface index, ouput only - new interface index
++ *
++ * In case the interface can not be accessed by the device name (e.g. due to udev rename) do a retry.
++ *
++ * On success 0 is returned. On error errno as a negative value is returned.
++ */
++static int bnep_connadd(int sk, uint16_t role, char *dev, const bdaddr_t *dst, unsigned int *ifindex)
+ {
+ 	struct bnep_connadd_req req;
++	int err;
++	int retry;
+
+ 	memset(&req, 0, sizeof(req));
+ 	strncpy(req.device, dev, 16);
+@@ -125,15 +210,40 @@ static int bnep_connadd(int sk, uint16_t role, char *dev)
+ 	req.sock = sk;
+ 	req.role = role;
+ 	req.flags = (1 << BNEP_SETUP_RESPONSE);
+-	if (ioctl(ctl, BNEPCONNADD, &req) < 0) {
+-		int err = -errno;
+-		error("bnep: Failed to add device %s: %s(%d)",
+-						dev, strerror(-err), -err);
+-		return err;
++
++	retry = 0;
++
++	while (retry < 2) {
++		DBG("add device %s retry %d", req.device, retry);
++
++		err = ioctl(ctl, BNEPCONNADD, &req);
++		if (err < 0) {
++			err = -errno;
++			break;
++		}
++		DBG("added device %s retry %d", req.device, retry);
++		/*
++		* There is a potential race condition between udev renaming the interface
++		* after being created by BNEPCONNADD and bnep_nametoindex providing
++		* the interface index.
++		*/
++		err = bnep_nametoindex(&req.device[0], ifindex);
++		if (!err)
++			break;
++
++		/* Prepare retry */
++		retry++;
++		bnep_conndel(dst);
++		/* Give BT some time to really delete. */
++		sleep(1);
+ 	}
+
+-	strncpy(dev, req.device, 16);
+-	return 0;
 +	if (err) {
-+		bt_dev_err(hu->hdev, "Unable to download firmware helper");
-+		return -EINVAL;
++		error("bnep: Failed to add device %s with interface index %d: %s(%d)",
++			req.device, *ifindex, strerror(-err), -err);
 +	}
 +
-+	hci_uart_set_baudrate(hu, 3000000);
-+	hci_uart_set_flow_control(hu, false);
++	return err;
+ }
+
+ static uint32_t bnep_getsuppfeat(void)
+@@ -148,51 +258,108 @@ static uint32_t bnep_getsuppfeat(void)
+ 	return feat;
+ }
+
+-static int bnep_if_up(const char *devname)
++/**
++ * private: for local use only.
++ *
++ * bnep_if_up() - Bring interface up.
++ * @ifindex interface index
++ *
++ * In case the interface can not be accessed (e.g. due to udev rename) do a retry.
++ *
++ * On success 0 is returned. On error errno as a negative value is returned.
++ */
++static int bnep_if_up(unsigned int ifindex)
+ {
+ 	struct ifreq ifr;
+-	int sk, err = 0;
++	int sk, err;
++	int retry;
+
+ 	sk = socket(AF_INET, SOCK_DGRAM, 0);
+
+ 	memset(&ifr, 0, sizeof(ifr));
+-	strncpy(ifr.ifr_name, devname, IF_NAMESIZE - 1);
+-
+ 	ifr.ifr_flags |= IFF_UP;
+ 	ifr.ifr_flags |= IFF_MULTICAST;
+
+-	if (ioctl(sk, SIOCSIFFLAGS, (void *) &ifr) < 0) {
++	retry = 0;
++	while (retry < 2) {
++		err = bnep_indextoname(ifindex, ifr.ifr_name);
++		if (err)
++			break;
++		/*
++		* There is a potential race condition between udev renaming the interface
++		* after the name is retrieved by bnep_nametoindex and the usage of the
++		* interface name by ioctl.
++		*/
++		if (ioctl(sk, SIOCSIFFLAGS, (void *) &ifr) == 0)
++			break;
+ 		err = -errno;
+-		error("bnep: Could not bring up %s: %s(%d)",
+-						devname, strerror(-err), -err);
++		DBG("could not bring up interface %s with index %d: %s(%d) retry %d",
++			ifr.ifr_name, ifindex, strerror(-err), -err, retry);
 +
-+	err = mrvl_load_firmware(hu->hdev, "mrvl/uart8897_bt.bin");
-+	if (err)
-+		return err;
++		/* Prepare retry */
++		retry++;
++		sleep(1);
+ 	}
+
+ 	close(sk);
+
++	if (err) {
++		error("bnep: Could not bring up interface %s with index %d: %s(%d)",
++			ifr.ifr_name, ifindex, strerror(-err), -err);
++	}
 +
-+	return 0;
-+}
+ 	return err;
+ }
+
+-static int bnep_if_down(const char *devname)
++/**
++ * private: for local use only.
++ *
++ * bnep_if_down() - Bring interface down.
++ * @ifindex interface index
++ *
++ * In case the interface can not be accessed (e.g. due to udev rename) do a retry.
++ *
++ * On success 0 is returned. On error errno as a negative value is returned.
++ */
++static int bnep_if_down(unsigned int ifindex)
+ {
+ 	struct ifreq ifr;
+-	int sk, err = 0;
++	int sk, err;
++	int retry;
+
+ 	sk = socket(AF_INET, SOCK_DGRAM, 0);
+
+ 	memset(&ifr, 0, sizeof(ifr));
+-	strncpy(ifr.ifr_name, devname, IF_NAMESIZE - 1);
+-
+ 	ifr.ifr_flags &= ~IFF_UP;
+
+-	/* Bring down the interface */
+-	if (ioctl(sk, SIOCSIFFLAGS, (void *) &ifr) < 0) {
++	retry = 0;
++	while (retry < 2) {
++		err = bnep_indextoname(ifindex, ifr.ifr_name);
++		if (err)
++			break;
++		/*
++		* There is a potential race condition between udev renaming the interface
++		* after the name is retrieved by bnep_nametoindex and the usage of the
++		* interface name by ioctl.
++		*/
++		if (ioctl(sk, SIOCSIFFLAGS, (void *) &ifr) == 0)
++			break;
+ 		err = -errno;
+-		error("bnep: Could not bring down %s: %s(%d)",
+-						devname, strerror(-err), -err);
++		DBG("could not bring down interface %s with index %d: %s(%d) retry %d",
++			ifr.ifr_name, ifindex, strerror(-err), -err, retry);
 +
-+static const struct hci_uart_proto mrvl_proto = {
-+	.id		= HCI_UART_MRVL,
-+	.name		= "MARVELL",
-+	.init_speed	= 115200,
-+	.open		= mrvl_open,
-+	.close		= mrvl_close,
-+	.flush		= mrvl_flush,
-+	.setup		= mrvl_setup,
-+	.recv		= mrvl_recv,
-+	.enqueue	= mrvl_enqueue,
-+	.dequeue	= mrvl_dequeue,
-+};
++		/* Prepare retry */
++		retry++;
++		sleep(1);
+ 	}
+
+ 	close(sk);
+
++	if (err) {
++		error("bnep: Could not bring down interface %s with index %d: %s(%d)",
++			ifr.ifr_name, ifindex, strerror(-err), -err);
++	}
 +
-+int __init mrvl_init(void)
-+{
-+	return hci_uart_register_proto(&mrvl_proto);
-+}
+ 	return err;
+ }
+
+@@ -270,14 +437,19 @@ static gboolean bnep_setup_cb(GIOChannel *chan, GIOCondition cond,
+ 	setsockopt(sk, SOL_SOCKET, SO_RCVTIMEO, &timeo, sizeof(timeo));
+
+ 	sk = g_io_channel_unix_get_fd(session->io);
+-	if (bnep_connadd(sk, session->src, session->iface) < 0)
++	if (bnep_connadd(sk, session->src, session->iface, &session->dst_addr, &session->ifindex) < 0)
+ 		goto failed;
+
+-	if (bnep_if_up(session->iface) < 0) {
++	if (bnep_if_up(session->ifindex) < 0) {
+ 		bnep_conndel(&session->dst_addr);
+ 		goto failed;
+ 	}
+
++	/* Update interface name to current one only after interface is up.
++	 * Only at that time the name should be stable (no udev rename).
++	 */
++	bnep_indextoname(session->ifindex, session->iface);
 +
-+int __exit mrvl_deinit(void)
-+{
-+	return hci_uart_unregister_proto(&mrvl_proto);
-+}
-diff --git a/drivers/bluetooth/hci_uart.h b/drivers/bluetooth/hci_uart.h
-index 839bad1..8e7aa14 100644
---- a/drivers/bluetooth/hci_uart.h
-+++ b/drivers/bluetooth/hci_uart.h
-@@ -35,7 +35,7 @@
- #define HCIUARTGETFLAGS		_IOR('U', 204, int)
- 
- /* UART protocols */
--#define HCI_UART_MAX_PROTO	10
-+#define HCI_UART_MAX_PROTO	11
- 
- #define HCI_UART_H4	0
- #define HCI_UART_BCSP	1
-@@ -47,6 +47,7 @@
- #define HCI_UART_BCM	7
- #define HCI_UART_QCA	8
- #define HCI_UART_AG6XX	9
-+#define HCI_UART_MRVL	10
- 
- #define HCI_UART_RAW_DEVICE	0
- #define HCI_UART_RESET_ON_INIT	1
-@@ -189,3 +190,8 @@ int qca_deinit(void);
- int ag6xx_init(void);
- int ag6xx_deinit(void);
- #endif
+ 	session->watch = g_io_add_watch(session->io,
+ 					G_IO_ERR | G_IO_HUP | G_IO_NVAL,
+ 					(GIOFunc) bnep_watchdog_cb, session);
+@@ -305,7 +477,7 @@ static int bnep_setup_conn_req(struct bnep *session)
+ 	req = (void *) pkt;
+ 	req->type = BNEP_CONTROL;
+ 	req->ctrl = BNEP_SETUP_CONN_REQ;
+-	req->uuid_size = 2;     /* 16bit UUID */
++	req->uuid_size = 2;	/* 16bit UUID */
+ 	s = (void *) req->service;
+ 	s->src = htons(session->src);
+ 	s->dst = htons(session->dst);
+@@ -354,6 +526,7 @@ struct bnep *bnep_new(int sk, uint16_t local_role, uint16_t remote_role,
+ 	session->dst = remote_role;
+ 	strncpy(session->iface, iface, 16);
+ 	session->iface[15] = '\0';
++	session->ifindex = 0;
+
+ 	g_io_channel_set_close_on_unref(session->io, TRUE);
+ 	session->watch = g_io_add_watch(session->io,
+@@ -430,20 +603,26 @@ void bnep_disconnect(struct bnep *session)
+ 		session->io = NULL;
+ 	}
+
+-	bnep_if_down(session->iface);
++	bnep_if_down(session->ifindex);
+ 	bnep_conndel(&session->dst_addr);
+ }
+
+-static int bnep_add_to_bridge(const char *devname, const char *bridge)
++static int bnep_add_to_bridge(unsigned int ifindex, const char *bridge)
+ {
+-	int ifindex;
+ 	struct ifreq ifr;
+ 	int sk, err = 0;
++	char devname[IF_NAMESIZE];
+
+-	if (!devname || !bridge)
++	DBG("add interface index %d to bridge %s", ifindex, bridge);
++	if (!ifindex || !bridge)
+ 		return -EINVAL;
+
+-	ifindex = if_nametoindex(devname);
++	err = bnep_indextoname(ifindex, &devname[0]);
++	if (err) {
++		error("bnep: Can't add interface %s with index %d to the bridge %s: %s(%d)",
++					devname, ifindex, bridge, strerror(-err), -err);
++		return -EINVAL;
++	}
+
+ 	sk = socket(AF_INET, SOCK_STREAM, 0);
+ 	if (sk < 0)
+@@ -451,7 +630,8 @@ static int bnep_add_to_bridge(const char *devname, const char *bridge)
+
+ 	memset(&ifr, 0, sizeof(ifr));
+ 	strncpy(ifr.ifr_name, bridge, IFNAMSIZ - 1);
+-	ifr.ifr_ifindex = ifindex;
++	ifr.ifr_ifindex = (int)ifindex;
 +
-+#ifdef CONFIG_BT_HCIUART_MRVL
-+int mrvl_init(void);
-+int mrvl_deinit(void);
-+#endif
--- 
-1.9.1
+
+ 	if (ioctl(sk, SIOCBRADDIF, &ifr) < 0) {
+ 		err = -errno;
+@@ -466,16 +646,21 @@ static int bnep_add_to_bridge(const char *devname, const char *bridge)
+ 	return err;
+ }
+
+-static int bnep_del_from_bridge(const char *devname, const char *bridge)
++static int bnep_del_from_bridge(unsigned int ifindex, const char *bridge)
+ {
+-	int ifindex;
+ 	struct ifreq ifr;
+ 	int sk, err = 0;
++	char devname[IF_NAMESIZE];
+
+-	if (!devname || !bridge)
++	if (!ifindex || !bridge)
+ 		return -EINVAL;
+
+-	ifindex = if_nametoindex(devname);
++	err = bnep_indextoname(ifindex, &devname[0]);
++	if (err) {
++		error("bnep: Can't delete interface %s with index %d from the bridge %s: %s(%d)",
++					devname, ifindex, bridge, strerror(-err), -err);
++		return -EINVAL;
++	}
+
+ 	sk = socket(AF_INET, SOCK_STREAM, 0);
+ 	if (sk < 0)
+@@ -483,7 +668,7 @@ static int bnep_del_from_bridge(const char *devname, const char *bridge)
+
+ 	memset(&ifr, 0, sizeof(ifr));
+ 	strncpy(ifr.ifr_name, bridge, IFNAMSIZ - 1);
+-	ifr.ifr_ifindex = ifindex;
++	ifr.ifr_ifindex = (int)ifindex;
+
+ 	if (ioctl(sk, SIOCBRDELIF, &ifr) < 0) {
+ 		err = -errno;
+@@ -606,6 +791,7 @@ static int bnep_server_add_legacy(int sk, uint16_t dst, char *bridge,
+ 					char *iface, const bdaddr_t *addr,
+ 					uint8_t *setup_data, int len)
+ {
++	unsigned int ifindex;
+ 	int err, n;
+ 	uint16_t rsp;
+
+@@ -616,27 +802,32 @@ static int bnep_server_add_legacy(int sk, uint16_t dst, char *bridge,
+ 		goto reply;
+ 	}
+
+-	err = bnep_connadd(sk, dst, iface);
++	err = bnep_connadd(sk, dst, iface, addr, &ifindex);
+ 	if (err < 0) {
+ 		rsp = BNEP_CONN_NOT_ALLOWED;
+ 		goto reply;
+ 	}
+
+-	err = bnep_add_to_bridge(iface, bridge);
++	err = bnep_add_to_bridge(ifindex, bridge);
+ 	if (err < 0) {
+ 		bnep_conndel(addr);
+ 		rsp = BNEP_CONN_NOT_ALLOWED;
+ 		goto reply;
+ 	}
+
+-	err = bnep_if_up(iface);
++	err = bnep_if_up(ifindex);
+ 	if (err < 0) {
+-		bnep_del_from_bridge(iface, bridge);
++		bnep_del_from_bridge(ifindex, bridge);
+ 		bnep_conndel(addr);
+ 		rsp = BNEP_CONN_NOT_ALLOWED;
+ 		goto reply;
+ 	}
+
++	/* Update interface name to current one only after interface is up.
++	 * Only at that time the name should be stable (no udev rename).
++	 */
++	bnep_indextoname(ifindex, iface);
++
+ 	rsp = BNEP_SUCCESS;
+
+ reply:
+@@ -652,6 +843,7 @@ reply:
+ int bnep_server_add(int sk, char *bridge, char *iface, const bdaddr_t *addr,
+ 						uint8_t *setup_data, int len)
+ {
++	unsigned int ifindex;
+ 	int err;
+ 	uint32_t feat;
+ 	uint16_t rsp, dst;
+@@ -691,24 +883,29 @@ int bnep_server_add(int sk, char *bridge, char *iface, const bdaddr_t *addr,
+ 		return bnep_server_add_legacy(sk, dst, bridge, iface, addr,
+ 							setup_data, len);
+
+-	err = bnep_connadd(sk, dst, iface);
++	err = bnep_connadd(sk, dst, iface, addr, &ifindex);
+ 	if (err < 0) {
+ 		rsp = BNEP_CONN_NOT_ALLOWED;
+ 		goto failed;
+ 	}
+
+-	err = bnep_add_to_bridge(iface, bridge);
++	err = bnep_add_to_bridge(ifindex, bridge);
+ 	if (err < 0)
+ 		goto failed_conn;
+
+-	err = bnep_if_up(iface);
++	err = bnep_if_up(ifindex);
+ 	if (err < 0)
+ 		goto failed_bridge;
+
++	/* Update interface name to current one only after interface is up.
++	 * Only at that time the name should be stable (no udev rename).
++	 */
++	bnep_indextoname(ifindex, iface);
++
+ 	return 0;
+
+ failed_bridge:
+-	bnep_del_from_bridge(iface, bridge);
++	bnep_del_from_bridge(ifindex, bridge);
+
+ failed_conn:
+ 	bnep_conndel(addr);
+@@ -727,10 +924,22 @@ failed:
+
+ void bnep_server_delete(char *bridge, char *iface, const bdaddr_t *addr)
+ {
++	int err;
++	unsigned int ifindex;
++
+ 	if (!bridge || !iface || !addr)
+ 		return;
+
+-	bnep_del_from_bridge(iface, bridge);
+-	bnep_if_down(iface);
++	err = bnep_nametoindex(iface, &ifindex);
++	if (err) {
++		error("bnep: Failed to delete device %s - interface not available/ renamed: %s(%d)",
++						iface, strerror(-err), -err);
++		goto failed;
++	}
++
++	bnep_del_from_bridge(ifindex, bridge);
++	bnep_if_down(ifindex);
++failed:
+ 	bnep_conndel(addr);
+ }
++
+--
+2.7.4
+
