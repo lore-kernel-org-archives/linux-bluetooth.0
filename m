@@ -1,56 +1,48 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Szymon Janc <szymon.janc@codecoup.pl>
 To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@codecoup.pl>
-Subject: [PATCH v2 3/5] tools/btmgmt: Add support for scan rsp flags in add advertising
-Date: Sun, 18 Sep 2016 12:34:39 +0200
-Message-Id: <1474194881-10403-3-git-send-email-szymon.janc@codecoup.pl>
+Cc: =?UTF-8?q?Micha=C5=82=20Narajowski?=
+        <michal.narajowski@codecoup.pl>
+Subject: [PATCH v2 2/5] lib/mgmt: Add Set Appearance command definition
+Date: Sun, 18 Sep 2016 12:34:38 +0200
+Message-Id: <1474194881-10403-2-git-send-email-szymon.janc@codecoup.pl>
 In-Reply-To: <1474194881-10403-1-git-send-email-szymon.janc@codecoup.pl>
 References: <1474194881-10403-1-git-send-email-szymon.janc@codecoup.pl>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This allows to set local-name and appearance flags for add advertising
-command.
----
- tools/btmgmt.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+From: Michał Narajowski <michal.narajowski@codecoup.pl>
 
-diff --git a/tools/btmgmt.c b/tools/btmgmt.c
-index 38e959f..0def4e1 100644
---- a/tools/btmgmt.c
-+++ b/tools/btmgmt.c
-@@ -4071,6 +4071,8 @@ static void add_adv_usage(void)
- 		"\t -c, --connectable         \"connectable\" flag\n"
- 		"\t -g, --general-discov      \"general-discoverable\" flag\n"
- 		"\t -l, --limited-discov      \"limited-discoverable\" flag\n"
-+		"\t -n, --scan-rsp-local-name \"local-name\" flag\n"
-+		"\t -a, --scan-rsp-appearance \"appearance\" flag\n"
- 		"\t -m, --managed-flags       \"managed-flags\" flag\n"
- 		"\t -p, --tx-power            \"tx-power\" flag\n"
- 		"e.g.:\n"
-@@ -4152,7 +4154,7 @@ static void cmd_add_adv(struct mgmt *mgmt, uint16_t index,
- 	bool quit = true;
- 	uint32_t flags = 0;
+---
+ lib/mgmt.h | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/lib/mgmt.h b/lib/mgmt.h
+index 8de2616..798a05e 100644
+--- a/lib/mgmt.h
++++ b/lib/mgmt.h
+@@ -541,6 +541,11 @@ struct mgmt_rp_read_ext_info {
+ 	uint8_t  eir[0];
+ } __packed;
  
--	while ((opt = getopt_long(argc, argv, "+u:d:s:t:D:cglmph",
-+	while ((opt = getopt_long(argc, argv, "+u:d:s:t:D:cglmphna",
- 						add_adv_options, NULL)) != -1) {
- 		switch (opt) {
- 		case 'u':
-@@ -4231,6 +4233,12 @@ static void cmd_add_adv(struct mgmt *mgmt, uint16_t index,
- 		case 'p':
- 			flags |= MGMT_ADV_FLAG_TX_POWER;
- 			break;
-+		case 'n':
-+			flags |= MGMT_ADV_FLAG_LOCAL_NAME;
-+			break;
-+		case 'a':
-+			flags |= MGMT_ADV_FLAG_APPEARANCE;
-+			break;
- 		case 'h':
- 			success = true;
- 		default:
++#define MGMT_OP_SET_APPEARANCE		0x0043
++struct mgmt_cp_set_appearance {
++	uint16_t appearance;
++} __packed;
++
+ #define MGMT_EV_CMD_COMPLETE		0x0001
+ struct mgmt_ev_cmd_complete {
+ 	uint16_t opcode;
+@@ -827,6 +832,7 @@ static const char *mgmt_op[] = {
+ 	"Get Advertising Size Information",		/* 0x0040 */
+ 	"Start Limited Discovery",
+ 	"Read Extended Controller Information",
++	"Set Appearance",
+ };
+ 
+ static const char *mgmt_ev[] = {
 -- 
 2.7.4
 
