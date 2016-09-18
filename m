@@ -1,31 +1,36 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
-Subject: Re: [PATCH v3] monitor: Add support for Set Appearance mgmt command
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1474195647-10789-1-git-send-email-szymon.janc@codecoup.pl>
-Date: Sun, 18 Sep 2016 16:15:51 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <0C296804-7C71-4CF9-A7DB-6B420A76CFCA@holtmann.org>
-References: <1474195647-10789-1-git-send-email-szymon.janc@codecoup.pl>
-To: Szymon Janc <szymon.janc@codecoup.pl>
+From: Szymon Janc <szymon.janc@codecoup.pl>
+To: linux-bluetooth@vger.kernel.org
+Cc: Szymon Janc <szymon.janc@codecoup.pl>
+Subject: [PATCH v2 6/6] Bluetooth: Increment management interface revision
+Date: Sun, 18 Sep 2016 12:50:07 +0200
+Message-Id: <1474195807-12310-6-git-send-email-szymon.janc@codecoup.pl>
+In-Reply-To: <1474195807-12310-1-git-send-email-szymon.janc@codecoup.pl>
+References: <1474195807-12310-1-git-send-email-szymon.janc@codecoup.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Increment the mgmt revision due to the recently added
+Read Extended Controller Information and Set Appearance commands.
 
-> @ MGMT Command: Set Appearance (0x0043) plen 2        {0x0002}
->        Appearance: Blood Pressure (0x0380)
-> @ MGMT Event: Command Complete (0x0001) plen 3        {0x0002}
->      Set Appearance (0x0043) plen 0
->        Status: Success (0x00)
-> ---
-> monitor/packet.c | 10 ++++++++++
-> 1 file changed, 10 insertions(+)
+Signed-off-by: Szymon Janc <szymon.janc@codecoup.pl>
+---
+ net/bluetooth/mgmt.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-this patch and the other 4 from v2 have been applied.
-
-Regards
-
-Marcel
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 61e8153..b4075d1 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -38,7 +38,7 @@
+ #include "mgmt_util.h"
+ 
+ #define MGMT_VERSION	1
+-#define MGMT_REVISION	13
++#define MGMT_REVISION	14
+ 
+ static const u16 mgmt_commands[] = {
+ 	MGMT_OP_READ_INDEX_LIST,
+-- 
+2.7.4
 
