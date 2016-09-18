@@ -1,54 +1,192 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Bobby Noelte <b0661n0e17e@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Bobby Noelte <b0661n0e17e@gmail.com>
-Subject: [Patch BlueZ 0/1] Make network server interface handling more robust
-Date: Sun, 18 Sep 2016 18:35:30 +0200
-Message-Id: <1474216531-11518-1-git-send-email-b0661n0e17e@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
+Subject: Re: [PATCH v2 1/6] Bluetooth: Add support for local name in scan rsp
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1474195807-12310-1-git-send-email-szymon.janc@codecoup.pl>
+Date: Sun, 18 Sep 2016 16:28:11 +0200
+Cc: linux-bluetooth@vger.kernel.org,
+        =?utf-8?Q?Micha=C5=82_Narajowski?= <michal.narajowski@codecoup.pl>
+Message-Id: <FE85FEDF-CBFA-4365-926B-74DE3F69EA14@holtmann.org>
+References: <1474195807-12310-1-git-send-email-szymon.janc@codecoup.pl>
+To: Szymon Janc <szymon.janc@codecoup.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Szymon,
 
-I encountered a lot problems connecting to a NAP server running on
-Ubuntu 16.04 x86_64. Systemd-udev was renaming the bnepx interfaces
-before network server could bring up the interface. Network server
-went on to use the original interface name and failed on the creation
-of the interface. This did not happen always but quite often.
+> This patch enables appending local name to scan response data. If
+> currently advertised instance has name flag set it is expired
+> immediately.
+> 
+> Signed-off-by: Michał Narajowski <michal.narajowski@codecoup.pl>
+> Signed-off-by: Szymon Janc <szymon.janc@codecoup.pl>
+> ---
+> net/bluetooth/hci_request.c | 28 +++++++++++++++++++--------
+> net/bluetooth/mgmt.c        | 46 +++++++++++++++++++++++++++++++++++++++++++--
+> 2 files changed, 64 insertions(+), 10 deletions(-)
+> 
+> diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
+> index 9566ff8..0ce6cdd 100644
+> --- a/net/bluetooth/hci_request.c
+> +++ b/net/bluetooth/hci_request.c
+> @@ -971,14 +971,14 @@ void __hci_req_enable_advertising(struct hci_request *req)
+> 	hci_req_add(req, HCI_OP_LE_SET_ADV_ENABLE, sizeof(enable), &enable);
+> }
+> 
+> -static u8 create_default_scan_rsp_data(struct hci_dev *hdev, u8 *ptr)
+> +static u8 append_local_name(struct hci_dev *hdev, u8 *ptr, u8 ad_len)
+> {
+> -	u8 ad_len = 0;
+> 	size_t name_len;
+> +	int max_len;
+> 
+> +	max_len = HCI_MAX_AD_LENGTH - ad_len - 2;
+> 	name_len = strlen(hdev->dev_name);
+> -	if (name_len > 0) {
+> -		size_t max_len = HCI_MAX_AD_LENGTH - ad_len - 2;
+> +	if (name_len > 0 && max_len > 0) {
+> 
+> 		if (name_len > max_len) {
+> 			name_len = max_len;
+> @@ -997,22 +997,34 @@ static u8 create_default_scan_rsp_data(struct hci_dev *hdev, u8 *ptr)
+> 	return ad_len;
+> }
+> 
+> +static u8 create_default_scan_rsp_data(struct hci_dev *hdev, u8 *ptr)
+> +{
+> +	return append_local_name(hdev, ptr, 0);
+> +}
+> +
+> static u8 create_instance_scan_rsp_data(struct hci_dev *hdev, u8 instance,
+> 					u8 *ptr)
+> {
+> 	struct adv_info *adv_instance;
+> +	u32 instance_flags;
+> +	u8 scan_rsp_len = 0;
+> 
+> 	adv_instance = hci_find_adv_instance(hdev, instance);
+> 	if (!adv_instance)
+> 		return 0;
+> 
+> -	/* TODO: Set the appropriate entries based on advertising instance flags
+> -	 * here once flags other than 0 are supported.
+> -	 */
+> +	instance_flags = adv_instance->flags;
+> +
+> 	memcpy(ptr, adv_instance->scan_rsp_data,
+> 	       adv_instance->scan_rsp_len);
+> 
+> -	return adv_instance->scan_rsp_len;
+> +	scan_rsp_len += adv_instance->scan_rsp_len;
+> +	ptr += adv_instance->scan_rsp_len;
+> +
+> +	if (instance_flags & MGMT_ADV_FLAG_LOCAL_NAME)
+> +		scan_rsp_len = append_local_name(hdev, ptr, scan_rsp_len);
+> +
+> +	return scan_rsp_len;
+> }
+> 
+> void __hci_req_update_scan_rsp_data(struct hci_request *req, u8 instance)
+> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+> index 74179b9..fa1f1c7 100644
+> --- a/net/bluetooth/mgmt.c
+> +++ b/net/bluetooth/mgmt.c
+> @@ -3014,6 +3014,35 @@ static int user_passkey_neg_reply(struct sock *sk, struct hci_dev *hdev,
+> 				 HCI_OP_USER_PASSKEY_NEG_REPLY, 0);
+> }
+> 
+> +static void adv_expire(struct hci_dev *hdev, u32 flags)
+> +{
+> +	struct adv_info *adv_instance;
+> +	struct hci_request req;
+> +	int err;
+> +
+> +	adv_instance = hci_find_adv_instance(hdev, hdev->cur_adv_instance);
+> +	if (!adv_instance)
+> +		return;
+> +
+> +	/* stop if current instance doesn't need to be changed */
+> +	if (!(adv_instance->flags & flags))
+> +		return;
 
-The obvious solution was to prevent udev from renaming. But I could
-not make that work. Also, IMHO, it is the task of bluetoothd to cope
-with this situation because systemd-udev is now pretty common.
+are you sure this is correct? Isn't this !(current_flags ^ new_flags) what you are looking for.
 
-The choosen solution is to use the interface index where possible.
-It does not change on rename. The kernel does not provide the ifindex
-on BNEPCONNADD, but the interface name. So there is still a race
-condition when retrieving the ifindex. Also there are race conditions
-when using an interface name that was retrieved by interface index;
-which is necessary for if up/down. To cope with these potential
-races retry cycles are added.
+Also we should really have mgmt-tester test cases for this. We want to make sure that this works for active instances and also the default instance 0 (aka Set Advertising).
 
-The patched version of bluetoothd was tested using a SAMSUNG S2
-(Android 4.1.2) and a NVIDIA Shield (Android 5.1.1). No connection
-errors due to interface creation were realized so far. The
-retries are necessary though.
+> +
+> +	cancel_adv_timeout(hdev);
+> +
+> +	adv_instance = hci_get_next_instance(hdev, adv_instance->instance);
+> +	if (!adv_instance)
+> +		return;
+> +
+> +	hci_req_init(&req, hdev);
+> +	err = __hci_req_schedule_adv_instance(&req, adv_instance->instance,
+> +					      true);
+> +	if (err)
+> +		return;
+> +
+> +	hci_req_run(&req, NULL);
+> +}
+> +
+> static void set_name_complete(struct hci_dev *hdev, u8 status, u16 opcode)
+> {
+> 	struct mgmt_cp_set_local_name *cp;
+> @@ -3029,13 +3058,17 @@ static void set_name_complete(struct hci_dev *hdev, u8 status, u16 opcode)
+> 
+> 	cp = cmd->param;
+> 
+> -	if (status)
+> +	if (status) {
+> 		mgmt_cmd_status(cmd->sk, hdev->id, MGMT_OP_SET_LOCAL_NAME,
+> 			        mgmt_status(status));
+> -	else
+> +	} else {
+> 		mgmt_cmd_complete(cmd->sk, hdev->id, MGMT_OP_SET_LOCAL_NAME, 0,
+> 				  cp, sizeof(*cp));
+> 
+> +		if (hci_dev_test_flag(hdev, HCI_LE_ADV))
+> +			adv_expire(hdev, MGMT_ADV_FLAG_LOCAL_NAME);
+> +	}
+> +
+> 	mgmt_pending_remove(cmd);
+> 
+> unlock:
+> @@ -5887,6 +5920,7 @@ static u32 get_supported_adv_flags(struct hci_dev *hdev)
+> 	flags |= MGMT_ADV_FLAG_DISCOV;
+> 	flags |= MGMT_ADV_FLAG_LIMITED_DISCOV;
+> 	flags |= MGMT_ADV_FLAG_MANAGED_FLAGS;
+> +	flags |= MGMT_ADV_FLAG_LOCAL_NAME;
+> 
+> 	if (hdev->adv_tx_power != HCI_TX_POWER_INVALID)
+> 		flags |= MGMT_ADV_FLAG_TX_POWER;
+> @@ -5963,6 +5997,10 @@ static bool tlv_data_is_valid(struct hci_dev *hdev, u32 adv_flags, u8 *data,
+> 			tx_power_managed = true;
+> 			max_len -= 3;
+> 		}
+> +	} else {
+> +		/* at least 1 byte of name should fit in */
+> +		if (adv_flags & MGMT_ADV_FLAG_LOCAL_NAME)
+> +			max_len -= 3;
+> 	}
+> 
+> 	if (len > max_len)
+> @@ -6295,6 +6333,10 @@ static u8 tlv_data_max_len(u32 adv_flags, bool is_adv_data)
+> 
+> 		if (adv_flags & MGMT_ADV_FLAG_TX_POWER)
+> 			max_len -= 3;
+> +	} else {
+> +		/* at least 1 byte of name should fit in */
+> +		if (adv_flags & MGMT_ADV_FLAG_LOCAL_NAME)
+> +			max_len -= 3;
+> 	}
 
-The patch is 'minimal invasive'. Only the file bnep.c is changed.
-Only static local function interfaces of bnep.c are changed/ added.
-The patch also adds documentation to the static local functions
-that are substantially changed or added. make check is passed.
+So I do not get the math here. Either the short name will fit or the long name. Especially the Get Advertising Size Information command should return the accurate leftover size. I mean if the name utilizes all the space, then this should return 0.
 
-Comments, suggestions appreciated.
-Thanks,
+Also the short name is maximal 11 + 2 octets. Meaning it will always fit together with appearance no matter what. So if long name is too large, then we pick the short name and return the leftover space.
 
-Bobby
+Regards
 
-b0661n0e71e@gmail.com (1):
-  Make network server interface handling more robust
-
- profiles/network/bnep.c | 311 ++++++++++++++++++++++++++++++++++++++++--------
- 1 file changed, 260 insertions(+), 51 deletions(-)
-
---
-2.7.4
+Marcel
 
