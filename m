@@ -2,35 +2,35 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Szymon Janc <szymon.janc@codecoup.pl>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@codecoup.pl>
-Subject: [PATCH v2 6/6] Bluetooth: Increment management interface revision
-Date: Sun, 18 Sep 2016 12:50:07 +0200
-Message-Id: <1474195807-12310-6-git-send-email-szymon.janc@codecoup.pl>
+Subject: [PATCH v2 5/6] Bluetooth: Fix advertising instance validity check for flags
+Date: Sun, 18 Sep 2016 12:50:06 +0200
+Message-Id: <1474195807-12310-5-git-send-email-szymon.janc@codecoup.pl>
 In-Reply-To: <1474195807-12310-1-git-send-email-szymon.janc@codecoup.pl>
 References: <1474195807-12310-1-git-send-email-szymon.janc@codecoup.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Increment the mgmt revision due to the recently added
-Read Extended Controller Information and Set Appearance commands.
+Flags are not allowed in Scan Response.
 
 Signed-off-by: Szymon Janc <szymon.janc@codecoup.pl>
 ---
- net/bluetooth/mgmt.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ net/bluetooth/mgmt.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 61e8153..b4075d1 100644
+index cdc88f4..61e8153 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -38,7 +38,7 @@
- #include "mgmt_util.h"
+@@ -6067,7 +6067,8 @@ static bool tlv_data_is_valid(u32 adv_flags, u8 *data, u8 len, bool is_adv_data)
+ 	for (i = 0, cur_len = 0; i < len; i += (cur_len + 1)) {
+ 		cur_len = data[i];
  
- #define MGMT_VERSION	1
--#define MGMT_REVISION	13
-+#define MGMT_REVISION	14
+-		if (data[i + 1] == EIR_FLAGS && flags_managed(adv_flags))
++		if (data[i + 1] == EIR_FLAGS &&
++		    (!is_adv_data || flags_managed(adv_flags)))
+ 			return false;
  
- static const u16 mgmt_commands[] = {
- 	MGMT_OP_READ_INDEX_LIST,
+ 		if (data[i + 1] == EIR_TX_POWER && tx_power_managed(adv_flags))
 -- 
 2.7.4
 
