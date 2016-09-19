@@ -1,29 +1,38 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
-Subject: Re: [PATCH v2 1/5] Bluetooth: Refactor read_ext_controller_info handler
+Subject: Re: [PATCH v2] Bluetooth: hci_uart: Add Marvell support
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1474309556-7447-1-git-send-email-szymon.janc@codecoup.pl>
-Date: Mon, 19 Sep 2016 20:34:23 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <FC27F313-90B1-47A6-924D-BCC39A5F47C0@holtmann.org>
-References: <1474309556-7447-1-git-send-email-szymon.janc@codecoup.pl>
-To: Szymon Janc <szymon.janc@codecoup.pl>
+In-Reply-To: <1474295367-13208-1-git-send-email-loic.poulain@intel.com>
+Date: Mon, 19 Sep 2016 20:32:30 +0200
+Cc: akarwar@marvell.com, linux-bluetooth@vger.kernel.org
+Message-Id: <7BA5FF10-DA69-40E4-9180-D48509BD90A7@holtmann.org>
+References: <1474295367-13208-1-git-send-email-loic.poulain@intel.com>
+To: Loic Poulain <loic.poulain@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi Loic,
 
-> There is no need to allocate heap for reply only to copy stack data to
-> it. This also fix rp memory leak and missing hdev unlock if kmalloc
-> failed.
+> This patch introduces support for Marvell Bluetooth controller over
+> UART (8897 for now). In order to send the final firmware at full speed,
+> a helper firmware is firstly sent. Firmware download is driven by the
+> controller which sends request firmware packets (including expected
+> size).
 > 
-> Signed-off-by: Szymon Janc <szymon.janc@codecoup.pl>
+> This driver is a global rework of the one proposed by
+> Amitkumar Karwar <akarwar@marvell.com>.
+> 
+> Signed-off-by: Loic Poulain <loic.poulain@intel.com>
 > ---
-> net/bluetooth/mgmt.c | 36 ++++++++++++++++--------------------
-> 1 file changed, 16 insertions(+), 20 deletions(-)
+> v2: Remove comma from copyright fields
+>     Use enum instead of defines for mrvl states
+>     Use separate queue for raw data packets
+>     Use distinct recv functions for fw_req & chip_ver
+>     Remove fixed_data, not used anymore in upstream candidate ver
+>     Change protocol name to Marvell
 
-all 5 patches have been applied to bluetooth-next tree.
+patch has been applied to bluetooth-next tree.
 
 Regards
 
