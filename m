@@ -1,25 +1,25 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
-Subject: Re: [PATCH] Bluetooth: hci_uart: Add Nokia Protocol identifier
+Subject: Re: [PATCH] Bluetooth: hci_bcm: Change protocol name
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1474277555-18094-1-git-send-email-loic.poulain@intel.com>
-Date: Mon, 19 Sep 2016 20:27:12 +0200
+In-Reply-To: <1474279512-5729-1-git-send-email-loic.poulain@intel.com>
+Date: Mon, 19 Sep 2016 20:26:50 +0200
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <6BAC807A-C8FE-4C7E-9515-10F97CF9ED9E@holtmann.org>
-References: <1474277555-18094-1-git-send-email-loic.poulain@intel.com>
+Message-Id: <141FA02C-B4F0-4439-80F6-F8E069CF9C5A@holtmann.org>
+References: <1474279512-5729-1-git-send-email-loic.poulain@intel.com>
 To: Loic Poulain <loic.poulain@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Loic,
 
-> Will be used by hci_nokia extra protocol.
+> Use full name instead of abbreviation.
 > 
 > Signed-off-by: Loic Poulain <loic.poulain@intel.com>
 > ---
-> drivers/bluetooth/hci_uart.h | 3 ++-
-> 1 file changed, 2 insertions(+), 1 deletion(-)
+> drivers/bluetooth/hci_bcm.c | 2 +-
+> 1 file changed, 1 insertion(+), 1 deletion(-)
 
 patch has been applied to bluetooth-next tree.
 
