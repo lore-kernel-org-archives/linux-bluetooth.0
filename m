@@ -1,737 +1,205 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Bernhard Noelte <bernhard@noelte-family.de>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-bluetooth@vger.kernel.org
-Subject: Re: Re: [Patch BlueZ 1/1] Make network server interface handling more robust
-Date: Mon, 19 Sep 2016 22:28:31 +0200
-Message-ID: <9969450.4Wx3dLe6K4@comitvend>
-In-Reply-To: <CABBYNZK6zeHyyX6GFAFdkq3mJOOBOz8kxLr0Bakxq5qTsmJofA@mail.gmail.com>
-References: <1474216531-11518-1-git-send-email-b0661n0e17e@gmail.com> <1474216531-11518-2-git-send-email-b0661n0e17e@gmail.com> <CABBYNZK6zeHyyX6GFAFdkq3mJOOBOz8kxLr0Bakxq5qTsmJofA@mail.gmail.com>
+Return-Path: <netdev-owner@vger.kernel.org>
+Date: Mon, 19 Sep 2016 22:37:42 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: davem@davemloft.net
+Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Subject: pull request: bluetooth-next 2016-09-19
+Message-ID: <20160919193742.GA10296@t440s>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: multipart/signed; micalg=pgp-sha1;
+        protocol="application/pgp-signature"; boundary="fUYQa+Pmc3FrFX/N"
+Sender: netdev-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
 
-> I guess there should probably be a way to prevent systemd-udev to
-> change to rename the interface
-As I mentioned, I could not manage. Also makes Bluez depend on a configuration
-where it is not necessary.
+--fUYQa+Pmc3FrFX/N
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> or then we need kernel changes to make
-> sure the interface index is sent.
-It looks like the "correct" solution, but this one does not change
-the kernel API.
+Hi Dave,
 
-> sleep is no acceptable in the daemon code, it should never block in
-> any circumstances.
-Yes, obviously.
+Here's the main bluetooth-next pull request for the 4.9 kernel.
 
-Thank you for the review. I will prepare a new patch.
+ - Added new messages for monitor sockets for better mgmt tracing
+ - Added local name and appearance support in scan response
+ - Added new Qualcomm WCNSS SMD based HCI driver
+ - Minor fixes & cleanup to 802.15.4 code
+ - New USB ID to btusb driver
+ - Added Marvell support to HCI UART driver
+ - Add combined LED trigger for controller power
+ - Other minor fixes here and there
 
-Bobby
+Please let me know if there are any issues pulling. Thanks.
 
-Am Montag, 19. September 2016, 15:16:06 CEST schrieben Sie:
-> Hi Bobby,
-> 
-> On Sun, Sep 18, 2016 at 7:35 PM, Bobby Noelte <b0661n0e17e@gmail.com> wrote:
-> > From: "b0661n0e71e@gmail.com" <b0661.n0e17e@gmail.com>
-> > 
-> > Interface names may be renamed by udev (systemd-udev) after creation
-> > before the interface is up. Interfaces may also be renamed when
-> > the interface is down due to a bluetoothd restart.
-> 
-> I guess there should probably be a way to prevent systemd-udev to
-> change to rename the interface or then we need kernel changes to make
-> sure the interface index is sent.
-> 
-> > Use the interface index, that does not change on renaming, where possible.
-> > Also do some retries when the creation of an interface fails.
-> > ---
-> > 
-> >  profiles/network/bnep.c | 311
-> >  ++++++++++++++++++++++++++++++++++++++++-------- 1 file changed, 260
-> >  insertions(+), 51 deletions(-)
-> > 
-> > diff --git a/profiles/network/bnep.c b/profiles/network/bnep.c
-> > index 9bf0b18..cba0f63 100644
-> > --- a/profiles/network/bnep.c
-> > +++ b/profiles/network/bnep.c
-> > @@ -65,6 +65,7 @@ struct bnep {
-> > 
-> >         uint16_t        dst;
-> >         bdaddr_t        dst_addr;
-> >         char    iface[16];
-> > 
-> > +       unsigned int    ifindex;
-> > 
-> >         guint   attempts;
-> >         guint   setup_to;
-> >         guint   watch;
-> > 
-> > @@ -98,25 +99,109 @@ int bnep_cleanup(void)
-> > 
-> >         return 0;
-> >  
-> >  }
-> > 
-> > +/**
-> > + * private: for local use only.
-> > + *
-> > + * bnep_indextoname() - Return interface name corresponding to interface
-> > index. + * @ifindex interface index.
-> > + * @iface interface name, output only, will be filled with '<unknown>' in
-> > case of error. + *
-> > + * The name is placed in the buffer pointed to by ifname.
-> > + * The buffer must allow for the storage of at least IF_NAMESIZE bytes.
-> > + *
-> > + * On success 0 is returned. On error errno as a negative value is
-> > returned. + */
-> > +static int bnep_indextoname(unsigned int ifindex, char *iface)
-> > +{
-> > +       int err;
-> > +
-> > +       err = 0;
-> > +       if (if_indextoname(ifindex, iface) == 0) {
-> > +               err = -errno;
-> > +               strncpy(iface, "<unknown>", 10);
-> > +       }
-> > +       return err;
-> > +}
-> > +
-> > +/**
-> > + * private: for local use only.
-> > + *
-> > + * bnep_nametoindext() - Return interface index corresponding to
-> > interface name. + * @iface interface name
-> > + * @ifindex interface index, output only, will be filled with 0 in case
-> > of error. + *
-> > + * The interface index is placed in the variable pointed to by ifindex.
-> > + *
-> > + * In case the interface is temporarily unavailable do a retry.
-> > + *
-> > + * On success 0 is returned. On error errno as a negative value is
-> > returned. + */
-> > +static int bnep_nametoindex(const char *iface, unsigned int *ifindex)
-> > +{
-> > +       int retry;
-> > +       int err;
-> > +
-> > +       retry = 0;
-> > +       while (retry < 2) {
-> > +               DBG("get interface index for device %s retry %d", iface,
-> > retry); +               *ifindex = if_nametoindex(iface);
-> > +               if (*ifindex != 0) {
-> > +                       DBG("got interface index %d for added device %s
-> > retry %d", +                               *ifindex, iface, retry);
-> > +                       err = 0;
-> > +               } else {
-> > +                       err = -errno;
-> > +               }
-> > +               if (err != -EAGAIN)
-> > +                       break;
-> > +               /* EAGAIN - Resource temporarily unavailable */
-> > +               retry++;
-> > +               sleep(1);
-> 
-> sleep is no acceptable in the daemon code, it should never block in
-> any circumstances.
-> 
-> > +       }
-> > +       return err;
-> > +}
-> > +
-> > 
-> >  static int bnep_conndel(const bdaddr_t *dst)
-> >  {
-> > 
-> > +       int err;
-> > 
-> >         struct bnep_conndel_req req;
-> > 
-> > +       char addr[20];
-> > 
-> > +       ba2str(dst, &addr[0]);
-> > 
-> >         memset(&req, 0, sizeof(req));
-> >         baswap((bdaddr_t *)&req.dst, dst);
-> >         req.flags = 0;
-> > 
-> > -       if (ioctl(ctl, BNEPCONNDEL, &req) < 0) {
-> > -               int err = -errno;
-> > -               error("bnep: Failed to kill connection: %s (%d)",
-> > -                                                       strerror(-err),
-> > -err); +       err = ioctl(ctl, BNEPCONNDEL, &req);
-> > +       if (err < 0) {
-> > +               err = -errno;
-> > +               error("bnep: Failed to kill connection %s: %s (%d)",
-> > +                       addr, strerror(-err), -err);
-> > 
-> >                 return err;
-> >         
-> >         }
-> > 
-> > +       DBG("deleted device %s, %d", addr, err);
-> > +
-> > 
-> >         return 0;
-> >  
-> >  }
-> > 
-> > -static int bnep_connadd(int sk, uint16_t role, char *dev)
-> > +/**
-> > + * private: for local use only.
-> > + *
-> > + * bnep_connadd() - Add bluetooth ethernet connection.
-> > + * @sk bluez control socket.
-> > + * @role
-> > + * @dev device name, template for new interface name (e.g. "bnep%d") or
-> > name. + * @dst bluetooth address, only needed for retries.
-> > + * @ifindex interface index, ouput only - new interface index
-> > + *
-> > + * In case the interface can not be accessed by the device name (e.g. due
-> > to udev rename) do a retry. + *
-> > + * On success 0 is returned. On error errno as a negative value is
-> > returned. + */
-> > +static int bnep_connadd(int sk, uint16_t role, char *dev, const bdaddr_t
-> > *dst, unsigned int *ifindex)> 
-> >  {
-> >  
-> >         struct bnep_connadd_req req;
-> > 
-> > +       int err;
-> > +       int retry;
-> > 
-> >         memset(&req, 0, sizeof(req));
-> >         strncpy(req.device, dev, 16);
-> > 
-> > @@ -125,15 +210,40 @@ static int bnep_connadd(int sk, uint16_t role, char
-> > *dev)> 
-> >         req.sock = sk;
-> >         req.role = role;
-> >         req.flags = (1 << BNEP_SETUP_RESPONSE);
-> > 
-> > -       if (ioctl(ctl, BNEPCONNADD, &req) < 0) {
-> > -               int err = -errno;
-> > -               error("bnep: Failed to add device %s: %s(%d)",
-> > -                                               dev, strerror(-err),
-> > -err);
-> > -               return err;
-> > +
-> > +       retry = 0;
-> > +
-> > +       while (retry < 2) {
-> > +               DBG("add device %s retry %d", req.device, retry);
-> > +
-> > +               err = ioctl(ctl, BNEPCONNADD, &req);
-> > +               if (err < 0) {
-> > +                       err = -errno;
-> > +                       break;
-> > +               }
-> > +               DBG("added device %s retry %d", req.device, retry);
-> > +               /*
-> > +               * There is a potential race condition between udev
-> > renaming the interface +               * after being created by
-> > BNEPCONNADD and bnep_nametoindex providing +               * the
-> > interface index.
-> > +               */
-> > +               err = bnep_nametoindex(&req.device[0], ifindex);
-> > +               if (!err)
-> > +                       break;
-> > +
-> > +               /* Prepare retry */
-> > +               retry++;
-> > +               bnep_conndel(dst);
-> > +               /* Give BT some time to really delete. */
-> > +               sleep(1);
-> 
-> We aint gonna fix any race condition with sleep.
-> 
-> >         }
-> > 
-> > -       strncpy(dev, req.device, 16);
-> > -       return 0;
-> > +       if (err) {
-> > +               error("bnep: Failed to add device %s with interface index
-> > %d: %s(%d)", +                       req.device, *ifindex,
-> > strerror(-err), -err); +       }
-> > +
-> > +       return err;
-> > 
-> >  }
-> >  
-> >  static uint32_t bnep_getsuppfeat(void)
-> > 
-> > @@ -148,51 +258,108 @@ static uint32_t bnep_getsuppfeat(void)
-> > 
-> >         return feat;
-> >  
-> >  }
-> > 
-> > -static int bnep_if_up(const char *devname)
-> > +/**
-> > + * private: for local use only.
-> > + *
-> > + * bnep_if_up() - Bring interface up.
-> > + * @ifindex interface index
-> > + *
-> > + * In case the interface can not be accessed (e.g. due to udev rename) do
-> > a retry. + *
-> > + * On success 0 is returned. On error errno as a negative value is
-> > returned. + */
-> > +static int bnep_if_up(unsigned int ifindex)
-> > 
-> >  {
-> >  
-> >         struct ifreq ifr;
-> > 
-> > -       int sk, err = 0;
-> > +       int sk, err;
-> > +       int retry;
-> > 
-> >         sk = socket(AF_INET, SOCK_DGRAM, 0);
-> >         
-> >         memset(&ifr, 0, sizeof(ifr));
-> > 
-> > -       strncpy(ifr.ifr_name, devname, IF_NAMESIZE - 1);
-> > -
-> > 
-> >         ifr.ifr_flags |= IFF_UP;
-> >         ifr.ifr_flags |= IFF_MULTICAST;
-> > 
-> > -       if (ioctl(sk, SIOCSIFFLAGS, (void *) &ifr) < 0) {
-> > +       retry = 0;
-> > +       while (retry < 2) {
-> > +               err = bnep_indextoname(ifindex, ifr.ifr_name);
-> > +               if (err)
-> > +                       break;
-> > +               /*
-> > +               * There is a potential race condition between udev
-> > renaming the interface +               * after the name is retrieved by
-> > bnep_nametoindex and the usage of the +               * interface name by
-> > ioctl.
-> > +               */
-> > +               if (ioctl(sk, SIOCSIFFLAGS, (void *) &ifr) == 0)
-> > +                       break;
-> > 
-> >                 err = -errno;
-> > 
-> > -               error("bnep: Could not bring up %s: %s(%d)",
-> > -                                               devname, strerror(-err),
-> > -err); +               DBG("could not bring up interface %s with index
-> > %d: %s(%d) retry %d", +                       ifr.ifr_name, ifindex,
-> > strerror(-err), -err, retry); +
-> > +               /* Prepare retry */
-> > +               retry++;
-> > +               sleep(1);
-> 
-> Ditto.
-> 
-> >         }
-> >         
-> >         close(sk);
-> > 
-> > +       if (err) {
-> > +               error("bnep: Could not bring up interface %s with index
-> > %d: %s(%d)", +                       ifr.ifr_name, ifindex,
-> > strerror(-err), -err); +       }
-> > +
-> > 
-> >         return err;
-> >  
-> >  }
-> > 
-> > -static int bnep_if_down(const char *devname)
-> > +/**
-> > + * private: for local use only.
-> > + *
-> > + * bnep_if_down() - Bring interface down.
-> > + * @ifindex interface index
-> > + *
-> > + * In case the interface can not be accessed (e.g. due to udev rename) do
-> > a retry. + *
-> > + * On success 0 is returned. On error errno as a negative value is
-> > returned. + */
-> > +static int bnep_if_down(unsigned int ifindex)
-> > 
-> >  {
-> >  
-> >         struct ifreq ifr;
-> > 
-> > -       int sk, err = 0;
-> > +       int sk, err;
-> > +       int retry;
-> > 
-> >         sk = socket(AF_INET, SOCK_DGRAM, 0);
-> >         
-> >         memset(&ifr, 0, sizeof(ifr));
-> > 
-> > -       strncpy(ifr.ifr_name, devname, IF_NAMESIZE - 1);
-> > -
-> > 
-> >         ifr.ifr_flags &= ~IFF_UP;
-> > 
-> > -       /* Bring down the interface */
-> > -       if (ioctl(sk, SIOCSIFFLAGS, (void *) &ifr) < 0) {
-> > +       retry = 0;
-> > +       while (retry < 2) {
-> > +               err = bnep_indextoname(ifindex, ifr.ifr_name);
-> > +               if (err)
-> > +                       break;
-> > +               /*
-> > +               * There is a potential race condition between udev
-> > renaming the interface +               * after the name is retrieved by
-> > bnep_nametoindex and the usage of the +               * interface name by
-> > ioctl.
-> > +               */
-> > +               if (ioctl(sk, SIOCSIFFLAGS, (void *) &ifr) == 0)
-> > +                       break;
-> > 
-> >                 err = -errno;
-> > 
-> > -               error("bnep: Could not bring down %s: %s(%d)",
-> > -                                               devname, strerror(-err),
-> > -err); +               DBG("could not bring down interface %s with index
-> > %d: %s(%d) retry %d", +                       ifr.ifr_name, ifindex,
-> > strerror(-err), -err, retry); +
-> > +               /* Prepare retry */
-> > +               retry++;
-> > +               sleep(1);
-> 
-> Ditto.
-> 
-> >         }
-> >         
-> >         close(sk);
-> > 
-> > +       if (err) {
-> > +               error("bnep: Could not bring down interface %s with index
-> > %d: %s(%d)", +                       ifr.ifr_name, ifindex,
-> > strerror(-err), -err); +       }
-> > +
-> > 
-> >         return err;
-> >  
-> >  }
-> > 
-> > @@ -270,14 +437,19 @@ static gboolean bnep_setup_cb(GIOChannel *chan,
-> > GIOCondition cond,> 
-> >         setsockopt(sk, SOL_SOCKET, SO_RCVTIMEO, &timeo, sizeof(timeo));
-> >         
-> >         sk = g_io_channel_unix_get_fd(session->io);
-> > 
-> > -       if (bnep_connadd(sk, session->src, session->iface) < 0)
-> > +       if (bnep_connadd(sk, session->src, session->iface,
-> > &session->dst_addr, &session->ifindex) < 0)> 
-> >                 goto failed;
-> > 
-> > -       if (bnep_if_up(session->iface) < 0) {
-> > +       if (bnep_if_up(session->ifindex) < 0) {
-> > 
-> >                 bnep_conndel(&session->dst_addr);
-> >                 goto failed;
-> >         
-> >         }
-> > 
-> > +       /* Update interface name to current one only after interface is
-> > up.
-> > +        * Only at that time the name should be stable (no udev rename).
-> > +        */
-> > +       bnep_indextoname(session->ifindex, session->iface);
-> > +
-> > 
-> >         session->watch = g_io_add_watch(session->io,
-> >         
-> >                                         G_IO_ERR | G_IO_HUP | G_IO_NVAL,
-> >                                         (GIOFunc) bnep_watchdog_cb,
-> >                                         session);
-> > 
-> > @@ -305,7 +477,7 @@ static int bnep_setup_conn_req(struct bnep *session)
-> > 
-> >         req = (void *) pkt;
-> >         req->type = BNEP_CONTROL;
-> >         req->ctrl = BNEP_SETUP_CONN_REQ;
-> > 
-> > -       req->uuid_size = 2;     /* 16bit UUID */
-> > +       req->uuid_size = 2;     /* 16bit UUID */
-> > 
-> >         s = (void *) req->service;
-> >         s->src = htons(session->src);
-> >         s->dst = htons(session->dst);
-> > 
-> > @@ -354,6 +526,7 @@ struct bnep *bnep_new(int sk, uint16_t local_role,
-> > uint16_t remote_role,> 
-> >         session->dst = remote_role;
-> >         strncpy(session->iface, iface, 16);
-> >         session->iface[15] = '\0';
-> > 
-> > +       session->ifindex = 0;
-> > 
-> >         g_io_channel_set_close_on_unref(session->io, TRUE);
-> >         session->watch = g_io_add_watch(session->io,
-> > 
-> > @@ -430,20 +603,26 @@ void bnep_disconnect(struct bnep *session)
-> > 
-> >                 session->io = NULL;
-> >         
-> >         }
-> > 
-> > -       bnep_if_down(session->iface);
-> > +       bnep_if_down(session->ifindex);
-> > 
-> >         bnep_conndel(&session->dst_addr);
-> >  
-> >  }
-> > 
-> > -static int bnep_add_to_bridge(const char *devname, const char *bridge)
-> > +static int bnep_add_to_bridge(unsigned int ifindex, const char *bridge)
-> > 
-> >  {
-> > 
-> > -       int ifindex;
-> > 
-> >         struct ifreq ifr;
-> >         int sk, err = 0;
-> > 
-> > +       char devname[IF_NAMESIZE];
-> > 
-> > -       if (!devname || !bridge)
-> > +       DBG("add interface index %d to bridge %s", ifindex, bridge);
-> > +       if (!ifindex || !bridge)
-> > 
-> >                 return -EINVAL;
-> > 
-> > -       ifindex = if_nametoindex(devname);
-> > +       err = bnep_indextoname(ifindex, &devname[0]);
-> > +       if (err) {
-> > +               error("bnep: Can't add interface %s with index %d to the
-> > bridge %s: %s(%d)", +                                       devname,
-> > ifindex, bridge, strerror(-err), -err); +               return -EINVAL;
-> > +       }
-> > 
-> >         sk = socket(AF_INET, SOCK_STREAM, 0);
-> >         if (sk < 0)
-> > 
-> > @@ -451,7 +630,8 @@ static int bnep_add_to_bridge(const char *devname,
-> > const char *bridge)> 
-> >         memset(&ifr, 0, sizeof(ifr));
-> >         strncpy(ifr.ifr_name, bridge, IFNAMSIZ - 1);
-> > 
-> > -       ifr.ifr_ifindex = ifindex;
-> > +       ifr.ifr_ifindex = (int)ifindex;
-> > +
-> > 
-> >         if (ioctl(sk, SIOCBRADDIF, &ifr) < 0) {
-> >         
-> >                 err = -errno;
-> > 
-> > @@ -466,16 +646,21 @@ static int bnep_add_to_bridge(const char *devname,
-> > const char *bridge)> 
-> >         return err;
-> >  
-> >  }
-> > 
-> > -static int bnep_del_from_bridge(const char *devname, const char *bridge)
-> > +static int bnep_del_from_bridge(unsigned int ifindex, const char *bridge)
-> > 
-> >  {
-> > 
-> > -       int ifindex;
-> > 
-> >         struct ifreq ifr;
-> >         int sk, err = 0;
-> > 
-> > +       char devname[IF_NAMESIZE];
-> > 
-> > -       if (!devname || !bridge)
-> > +       if (!ifindex || !bridge)
-> > 
-> >                 return -EINVAL;
-> > 
-> > -       ifindex = if_nametoindex(devname);
-> > +       err = bnep_indextoname(ifindex, &devname[0]);
-> > +       if (err) {
-> > +               error("bnep: Can't delete interface %s with index %d from
-> > the bridge %s: %s(%d)", +                                       devname,
-> > ifindex, bridge, strerror(-err), -err); +               return -EINVAL;
-> > +       }
-> > 
-> >         sk = socket(AF_INET, SOCK_STREAM, 0);
-> >         if (sk < 0)
-> > 
-> > @@ -483,7 +668,7 @@ static int bnep_del_from_bridge(const char *devname,
-> > const char *bridge)> 
-> >         memset(&ifr, 0, sizeof(ifr));
-> >         strncpy(ifr.ifr_name, bridge, IFNAMSIZ - 1);
-> > 
-> > -       ifr.ifr_ifindex = ifindex;
-> > +       ifr.ifr_ifindex = (int)ifindex;
-> > 
-> >         if (ioctl(sk, SIOCBRDELIF, &ifr) < 0) {
-> >         
-> >                 err = -errno;
-> > 
-> > @@ -606,6 +791,7 @@ static int bnep_server_add_legacy(int sk, uint16_t
-> > dst, char *bridge,> 
-> >                                         char *iface, const bdaddr_t *addr,
-> >                                         uint8_t *setup_data, int len)
-> >  
-> >  {
-> > 
-> > +       unsigned int ifindex;
-> > 
-> >         int err, n;
-> >         uint16_t rsp;
-> > 
-> > @@ -616,27 +802,32 @@ static int bnep_server_add_legacy(int sk, uint16_t
-> > dst, char *bridge,> 
-> >                 goto reply;
-> >         
-> >         }
-> > 
-> > -       err = bnep_connadd(sk, dst, iface);
-> > +       err = bnep_connadd(sk, dst, iface, addr, &ifindex);
-> > 
-> >         if (err < 0) {
-> >         
-> >                 rsp = BNEP_CONN_NOT_ALLOWED;
-> >                 goto reply;
-> >         
-> >         }
-> > 
-> > -       err = bnep_add_to_bridge(iface, bridge);
-> > +       err = bnep_add_to_bridge(ifindex, bridge);
-> > 
-> >         if (err < 0) {
-> >         
-> >                 bnep_conndel(addr);
-> >                 rsp = BNEP_CONN_NOT_ALLOWED;
-> >                 goto reply;
-> >         
-> >         }
-> > 
-> > -       err = bnep_if_up(iface);
-> > +       err = bnep_if_up(ifindex);
-> > 
-> >         if (err < 0) {
-> > 
-> > -               bnep_del_from_bridge(iface, bridge);
-> > +               bnep_del_from_bridge(ifindex, bridge);
-> > 
-> >                 bnep_conndel(addr);
-> >                 rsp = BNEP_CONN_NOT_ALLOWED;
-> >                 goto reply;
-> >         
-> >         }
-> > 
-> > +       /* Update interface name to current one only after interface is
-> > up.
-> > +        * Only at that time the name should be stable (no udev rename).
-> > +        */
-> > +       bnep_indextoname(ifindex, iface);
-> > +
-> > 
-> >         rsp = BNEP_SUCCESS;
-> >  
-> >  reply:
-> > @@ -652,6 +843,7 @@ reply:
-> >  int bnep_server_add(int sk, char *bridge, char *iface, const bdaddr_t
-> >  *addr,>  
-> >                                                 uint8_t *setup_data, int
-> >                                                 len)
-> >  
-> >  {
-> > 
-> > +       unsigned int ifindex;
-> > 
-> >         int err;
-> >         uint32_t feat;
-> >         uint16_t rsp, dst;
-> > 
-> > @@ -691,24 +883,29 @@ int bnep_server_add(int sk, char *bridge, char
-> > *iface, const bdaddr_t *addr,> 
-> >                 return bnep_server_add_legacy(sk, dst, bridge, iface,
-> >                 addr,
-> >                 
-> >                                                         setup_data, len);
-> > 
-> > -       err = bnep_connadd(sk, dst, iface);
-> > +       err = bnep_connadd(sk, dst, iface, addr, &ifindex);
-> > 
-> >         if (err < 0) {
-> >         
-> >                 rsp = BNEP_CONN_NOT_ALLOWED;
-> >                 goto failed;
-> >         
-> >         }
-> > 
-> > -       err = bnep_add_to_bridge(iface, bridge);
-> > +       err = bnep_add_to_bridge(ifindex, bridge);
-> > 
-> >         if (err < 0)
-> >         
-> >                 goto failed_conn;
-> > 
-> > -       err = bnep_if_up(iface);
-> > +       err = bnep_if_up(ifindex);
-> > 
-> >         if (err < 0)
-> >         
-> >                 goto failed_bridge;
-> > 
-> > +       /* Update interface name to current one only after interface is
-> > up.
-> > +        * Only at that time the name should be stable (no udev rename).
-> > +        */
-> > +       bnep_indextoname(ifindex, iface);
-> > +
-> > 
-> >         return 0;
-> >  
-> >  failed_bridge:
-> > -       bnep_del_from_bridge(iface, bridge);
-> > +       bnep_del_from_bridge(ifindex, bridge);
-> > 
-> >  failed_conn:
-> >         bnep_conndel(addr);
-> > 
-> > @@ -727,10 +924,22 @@ failed:
-> >  void bnep_server_delete(char *bridge, char *iface, const bdaddr_t *addr)
-> >  {
-> > 
-> > +       int err;
-> > +       unsigned int ifindex;
-> > +
-> > 
-> >         if (!bridge || !iface || !addr)
-> >         
-> >                 return;
-> > 
-> > -       bnep_del_from_bridge(iface, bridge);
-> > -       bnep_if_down(iface);
-> > +       err = bnep_nametoindex(iface, &ifindex);
-> > +       if (err) {
-> > +               error("bnep: Failed to delete device %s - interface not
-> > available/ renamed: %s(%d)", +                                           
-> >    iface, strerror(-err), -err); +               goto failed;
-> > +       }
-> > +
-> > +       bnep_del_from_bridge(ifindex, bridge);
-> > +       bnep_if_down(ifindex);
-> > 
-> > +failed:
-> >         bnep_conndel(addr);
-> >  
-> >  }
-> > 
-> > +
-> > --
-> > 2.7.4
-> > 
-> > --
-> > To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
-> > in the body of a message to majordomo@vger.kernel.org
-> > More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Johan
 
+---
+The following changes since commit e867e87ae88c54f741d1cabd1de536b4497a0504:
 
+  Merge tag 'rxrpc-rewrite-20160917-2' of git://git.kernel.org/pub/scm/linu=
+x/kernel/git/dhowells/linux-fs (2016-09-19 01:52:21 -0400)
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.gi=
+t for-upstream
+
+for you to fetch changes up to af4168c5a925dc3b11b0246c2b91124327919f47:
+
+  Bluetooth: Set appearance only for LE capable controllers (2016-09-19 21:=
+48:22 +0300)
+
+----------------------------------------------------------------
+Alexander Aring (3):
+      mac802154: set phy net namespace for new ifaces
+      6lowpan: ndisc: no overreact if no short address is available
+      fakelb: fix schedule while atomic
+
+Aristeu Rozanski (2):
+      mac802154: don't warn on unsupported frames
+      mac802154: use rate limited warnings for malformed frames
+
+Arnd Bergmann (1):
+      Bluetooth: add WCNSS dependency for HCI driver
+
+Bart Van Assche (1):
+      Bluetooth: btusb, hci_intel: Fix wait_on_bit_timeout() return value c=
+hecks
+
+Bhaktipriya Shridhar (1):
+      Bluetooth: Remove deprecated create_singlethread_workqueue
+
+Bjorn Andersson (2):
+      Bluetooth: Add HCI device identifier for Qualcomm SMD
+      Bluetooth: Introduce Qualcomm WCNSS SMD based HCI driver
+
+Colin Ian King (1):
+      Bluetooth: btqca: remove null checks on edl->data as it is an array
+
+Fr=C3=A9d=C3=A9ric Dalleau (1):
+      Bluetooth: Fix reason code used for rejecting SCO connections
+
+Johan Hedberg (1):
+      Bluetooth: mgmt: Fix sending redundant event for Advertising Instance
+
+Kai-Heng Feng (1):
+      Bluetooth: btusb: Add support for 0cf3:e009
+
+Larry Finger (1):
+      Bluetooth: btrtl: Add RTL8822BE Bluetooth device
+
+Loic Poulain (3):
+      Bluetooth: hci_bcm: Change protocol name
+      Bluetooth: hci_uart: Add Nokia Protocol identifier
+      Bluetooth: hci_uart: Add Marvell support
+
+Marcel Holtmann (21):
+      Bluetooth: Put led_trigger field behind CONFIG_BT_LEDS
+      Bluetooth: Add combined LED trigger for controller power
+      Bluetooth: Check SOL_HCI for raw socket options
+      Bluetooth: Store control socket cookie and comm information
+      Bluetooth: Introduce helper to pack mgmt version information
+      Bluetooth: Add support for sending MGMT open and close to monitor
+      Bluetooth: Add support for sending MGMT commands and events to monitor
+      Bluetooth: Use individual flags for certain management events
+      Bluetooth: Fix wrong Get Clock Information return parameters
+      Bluetooth: Use command status event for Set IO Capability errors
+      Bluetooth: Introduce helper functions for socket cookie handling
+      Bluetooth: Use numbers for subsystem version string
+      Bluetooth: Send control open and close only when cookie is present
+      Bluetooth: Assign the channel early when binding HCI sockets
+      Bluetooth: Add extra channel checks for control open/close messages
+      Bluetooth: Send control open and close messages for HCI raw sockets
+      Bluetooth: Handle HCI raw socket transition from unbound to bound
+      Bluetooth: Add framework for Extended Controller Information
+      Bluetooth: Send control open and close messages for HCI user channels
+      Bluetooth: Fix wrong New Settings event when closing HCI User Channel
+      Bluetooth: Increase the subsystem minor version number
+
+Micha=C5=82 Narajowski (7):
+      Bluetooth: Append local name and CoD to Extended Controller Info
+      Bluetooth: Add support for local name in scan rsp
+      Bluetooth: Add support for appearance in scan rsp
+      Bluetooth: Factor appending EIR to separate helper
+      Bluetooth: Add supported data types to ext info changed event
+      Bluetooth: Fix missing ext info event when setting appearance
+      Bluetooth: Set appearance only for LE capable controllers
+
+Nicolas Iooss (1):
+      Bluetooth: add printf format attribute to hci_set_[fh]w_info()
+
+Szymon Janc (8):
+      Bluetooth: btusb: Mark CW6622 devices to have broken link key commands
+      Bluetooth: Fix not registering BR/EDR SMP channel with force_bredr fl=
+ag
+      Bluetooth: Remove unused parameter from tlv_data_is_valid function
+      Bluetooth: Unify advertising instance flags check
+      Bluetooth: Fix advertising instance validity check for flags
+      Bluetooth: Increment management interface revision
+      Bluetooth: Refactor read_ext_controller_info handler
+      Bluetooth: Add appearance to Read Ext Controller Info command
+
+Wei Yongjun (1):
+      Bluetooth: Use kzalloc instead of kmalloc/memset
+
+Wolfram Sang (1):
+      Bluetooth: bcm203x: don't print error when allocating urb fails
+
+ drivers/bluetooth/Kconfig         |  23 ++
+ drivers/bluetooth/Makefile        |   2 +
+ drivers/bluetooth/bcm203x.c       |   4 +-
+ drivers/bluetooth/btqca.c         |   8 +-
+ drivers/bluetooth/btqcomsmd.c     | 182 ++++++++++++++++
+ drivers/bluetooth/btrtl.c         | 107 ++++++++--
+ drivers/bluetooth/btusb.c         |  13 +-
+ drivers/bluetooth/hci_bcm.c       |   2 +-
+ drivers/bluetooth/hci_intel.c     |   6 +-
+ drivers/bluetooth/hci_ldisc.c     |   6 +
+ drivers/bluetooth/hci_mrvl.c      | 387 ++++++++++++++++++++++++++++++++++
+ drivers/bluetooth/hci_qca.c       |   2 +-
+ drivers/bluetooth/hci_uart.h      |   9 +-
+ drivers/net/ieee802154/fakelb.c   |  14 +-
+ include/net/bluetooth/bluetooth.h |   4 +-
+ include/net/bluetooth/hci.h       |   7 +-
+ include/net/bluetooth/hci_core.h  |  11 +-
+ include/net/bluetooth/hci_mon.h   |   4 +
+ include/net/bluetooth/mgmt.h      |  24 +++
+ net/6lowpan/ndisc.c               |   2 -
+ net/bluetooth/af_bluetooth.c      |  15 +-
+ net/bluetooth/hci_core.c          |   1 +
+ net/bluetooth/hci_request.c       |  49 +++--
+ net/bluetooth/hci_request.h       |   5 +-
+ net/bluetooth/hci_sock.c          | 396 ++++++++++++++++++++++++++++++++++-
+ net/bluetooth/leds.c              |  27 +++
+ net/bluetooth/leds.h              |  10 +
+ net/bluetooth/mgmt.c              | 349 +++++++++++++++++++++++-------
+ net/bluetooth/mgmt_util.c         |  66 +++++-
+ net/bluetooth/smp.c               |   5 +-
+ net/mac802154/iface.c             |   1 +
+ net/mac802154/rx.c                |   9 +-
+ 32 files changed, 1600 insertions(+), 150 deletions(-)
+ create mode 100644 drivers/bluetooth/btqcomsmd.c
+ create mode 100644 drivers/bluetooth/hci_mrvl.c
+
+--fUYQa+Pmc3FrFX/N
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIcBAEBAgAGBQJX4D6GAAoJECQj9vv5qNQSgRUP/1OYnpUEl38Ii8AeNa8kZM9H
+WLB66nL2Jdt3SA908Uz8r9Ua9tTF77XX5x52DFUoTSMxFT50vv43v9Db/UBZff4K
+K/zBfx0X8e5M7fu/Ubf7gqjgGxyo8htcO+TyezeBHuEyoFeeq5888X1h+cRj/StE
+8kahuZ45aejqWQ26/CfLUH9O8L1UFKe09WUhTwGoS1CRXVQ7bXD25HyT9+lI3DNX
+vu8LuRG3Af9/aLD+9wlkKtUo+gkdhebH/foRo+Lbw5xBWtFCFmvnOh2jmftrDhzI
+JZb7R/hxVR0p1MxhAerft/vWsRHPYD99lMTP3lSbZCln6S1BYfWoJY96DoigRFzc
+o3HhhG83CMyamS2Znbk7S6gT8W6/zKrs7knlqh6RLbLmJdHUfksZl1ECDVbEg17p
+ueYn9LOuJUQfAd1LTM7yFYol90UonnjZebp3a2XtTqkaW51RhuzSJOsQ3oIprHee
+c6szNvhYKchYkWpA0UlPNEhj01Duz0xyAi2WUV4fvuR7iOkU63YndmA1eKmePa0+
+tKNJLyJ3pBJH1aP+mns5YEn3FUfGJ+RrSax7+a9jZbNDX6Uta/T3aXp9/dKS7ru7
+vhMKvWoD6MptmHL3CIL2JV8PRtrb2NEO3ITLMz/vhw5N66TZ5VE5G4fuKrfb6jnZ
+FNVct7A+ZGLjfd9LvYxD
+=GLYx
+-----END PGP SIGNATURE-----
+
+--fUYQa+Pmc3FrFX/N--
