@@ -1,36 +1,45 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: =?UTF-8?q?Micha=C5=82=20Narajowski?=
-        <michal.narajowski@codecoup.pl>
-To: linux-bluetooth@vger.kernel.org
-Cc: =?UTF-8?q?Micha=C5=82=20Narajowski?=
-        <michal.narajowski@codecoup.pl>
-Subject: [PATCH BlueZ 1/5] doc/mgmt-api: Allow set appearance only for LE capable controllers
-Date: Tue, 20 Sep 2016 14:02:06 +0200
-Message-Id: <1474372930-9706-1-git-send-email-michal.narajowski@codecoup.pl>
+From: Loic Poulain <loic.poulain@intel.com>
+To: johan.hedberg@gmail.com, marcel@holtmann.org
+Cc: linux-bluetooth@vger.kernel.org,
+        Loic Poulain <loic.poulain@intel.com>
+Subject: [PATCH 2/2] tools: Add identifier for Marvell UART devices
+Date: Tue, 20 Sep 2016 09:10:19 +0200
+Message-Id: <1474355419-15042-2-git-send-email-loic.poulain@intel.com>
+In-Reply-To: <1474355419-15042-1-git-send-email-loic.poulain@intel.com>
+References: <1474355419-15042-1-git-send-email-loic.poulain@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- doc/mgmt-api.txt | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ tools/btattach.c  | 1 +
+ tools/hciattach.h | 1 +
+ 2 files changed, 2 insertions(+)
 
-diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
-index 334c884..a7bd6e4 100644
---- a/doc/mgmt-api.txt
-+++ b/doc/mgmt-api.txt
-@@ -2908,7 +2908,11 @@ Set Appearance Command
- 	This command generates a Command Complete event on success
- 	or a Command Status event on failure.
+diff --git a/tools/btattach.c b/tools/btattach.c
+index 44747c4..9d1868a 100644
+--- a/tools/btattach.c
++++ b/tools/btattach.c
+@@ -219,6 +219,7 @@ static const struct {
+ 	{ "qca",   HCI_UART_QCA   },
+ 	{ "ag6xx", HCI_UART_AG6XX },
+ 	{ "nokia", HCI_UART_NOKIA },
++	{ "mrvl",  HCI_UART_MRVL  },
+ 	{ }
+ };
  
--	Possible errors:	Invalid Parameters
-+	This command is only available for LE capable controllers.
-+	It will return Not Supported otherwise.
-+
-+	Possible errors:	Not Supported
-+				Invalid Parameters
- 				Invalid Index
+diff --git a/tools/hciattach.h b/tools/hciattach.h
+index 1709253..249aab4 100644
+--- a/tools/hciattach.h
++++ b/tools/hciattach.h
+@@ -44,6 +44,7 @@
+ #define HCI_UART_QCA	8
+ #define HCI_UART_AG6XX	9
+ #define HCI_UART_NOKIA	10
++#define HCI_UART_MRVL	11
  
- 
+ #define HCI_UART_RAW_DEVICE	0
+ #define HCI_UART_RESET_ON_INIT	1
 -- 
-2.7.4
+1.9.1
 
