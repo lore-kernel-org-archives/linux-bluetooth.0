@@ -2,8 +2,10 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Francois Beaufort <beaufort.francois@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Subject: [PATCH BlueZ] client: Show UUIDs when listing services, characteristics and descriptors.
-Date: Tue, 20 Sep 2016 16:00:49 +0200
-Message-Id: <20160920140049.3357-1-beaufort.francois@gmail.com>
+Date: Tue, 20 Sep 2016 15:13:37 +0200
+Message-Id: <20160920131337.19494-3-beaufort.francois@gmail.com>
+In-Reply-To: <20160920131337.19494-1-beaufort.francois@gmail.com>
+References: <20160920131337.19494-1-beaufort.francois@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
@@ -38,17 +40,18 @@ Connection successful
 [CHG] Device 7B:3F:2C:2B:D0:06 UUIDs: 0000180f-0000-1000-8000-00805f9b34fb
 [CHG] Device 7B:3F:2C:2B:D0:06 ServicesResolved: yes
 ---
- client/gatt.c | 66 +++++++++++++++++++++++++++++++++++++----------------------
- 1 file changed, 41 insertions(+), 25 deletions(-)
+ client/gatt.c | 75 +++++++++++++++++++++++++++++++++++++----------------------
+ 1 file changed, 47 insertions(+), 28 deletions(-)
 
 diff --git a/client/gatt.c b/client/gatt.c
-index fee1cf9..37f222d 100644
+index fee1cf9..e6159bc 100644
 --- a/client/gatt.c
 +++ b/client/gatt.c
-@@ -73,15 +73,21 @@ static void print_service(GDBusProxy *proxy, const char *description)
+@@ -72,16 +72,23 @@ static void print_service(GDBusProxy *proxy, const char *description)
+ 	dbus_message_iter_get_basic(&iter, &primary);
  
  	text = uuidstr_to_str(uuid);
- 	if (!text)
+-	if (!text)
 -		text = uuid;
 -
 -	rl_printf("%s%s%s%s Service\n\t%s\n\t%s\n",
@@ -58,6 +61,7 @@ index fee1cf9..37f222d 100644
 -				primary ? "Primary" : "Secondary",
 -				g_dbus_proxy_get_path(proxy),
 -				text);
++	if (!text) {
 +		rl_printf("%s%s%s%s Service\n\t%s\n\t%s\n",
 +					description ? "[" : "",
 +					description ? : "",
@@ -65,7 +69,7 @@ index fee1cf9..37f222d 100644
 +					primary ? "Primary" : "Secondary",
 +					g_dbus_proxy_get_path(proxy),
 +					uuid);
-+	else
++	} else {
 +		rl_printf("%s%s%s%s Service\n\t%s\n\t%s\n\t%s\n",
 +					description ? "[" : "",
 +					description ? : "",
@@ -73,13 +77,15 @@ index fee1cf9..37f222d 100644
 +					primary ? "Primary" : "Secondary",
 +					g_dbus_proxy_get_path(proxy),
 +					uuid, text);
++	}
  }
  
  void gatt_add_service(GDBusProxy *proxy)
-@@ -116,14 +122,19 @@ static void print_characteristic(GDBusProxy *proxy, const char *description)
+@@ -115,15 +122,21 @@ static void print_characteristic(GDBusProxy *proxy, const char *description)
+ 	dbus_message_iter_get_basic(&iter, &uuid);
  
  	text = uuidstr_to_str(uuid);
- 	if (!text)
+-	if (!text)
 -		text = uuid;
 -
 -	rl_printf("%s%s%sCharacteristic\n\t%s\n\t%s\n",
@@ -88,26 +94,29 @@ index fee1cf9..37f222d 100644
 -				description ? "] " : "",
 -				g_dbus_proxy_get_path(proxy),
 -				text);
++	if (!text) {
 +		rl_printf("%s%s%sCharacteristic\n\t%s\n\t%s\n",
 +					description ? "[" : "",
 +					description ? : "",
 +					description ? "] " : "",
 +					g_dbus_proxy_get_path(proxy),
 +					uuid);
-+	else
++	} else {
 +		rl_printf("%s%s%sCharacteristic\n\t%s\n\t%s\n\t%s\n",
 +					description ? "[" : "",
 +					description ? : "",
 +					description ? "] " : "",
 +					g_dbus_proxy_get_path(proxy),
 +					uuid, text);
++	}
  }
  
  static gboolean characteristic_is_child(GDBusProxy *characteristic)
-@@ -184,14 +195,19 @@ static void print_descriptor(GDBusProxy *proxy, const char *description)
+@@ -183,15 +196,21 @@ static void print_descriptor(GDBusProxy *proxy, const char *description)
+ 	dbus_message_iter_get_basic(&iter, &uuid);
  
  	text = uuidstr_to_str(uuid);
- 	if (!text)
+-	if (!text)
 -		text = uuid;
 -
 -	rl_printf("%s%s%sDescriptor\n\t%s\n\t%s\n",
@@ -116,19 +125,21 @@ index fee1cf9..37f222d 100644
 -				description ? "] " : "",
 -				g_dbus_proxy_get_path(proxy),
 -				text);
++	if (!text) {
 +		rl_printf("%s%s%sDescriptor\n\t%s\n\t%s\n",
 +					description ? "[" : "",
 +					description ? : "",
 +					description ? "] " : "",
 +					g_dbus_proxy_get_path(proxy),
 +					uuid);
-+	else
++	} else {
 +		rl_printf("%s%s%sDescriptor\n\t%s\n\t%s\n\t%s\n",
 +					description ? "[" : "",
 +					description ? : "",
 +					description ? "] " : "",
 +					g_dbus_proxy_get_path(proxy),
 +					uuid, text);
++	}
  }
  
  static gboolean descriptor_is_child(GDBusProxy *characteristic)
