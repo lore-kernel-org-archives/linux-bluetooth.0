@@ -3,11 +3,11 @@ From: Szymon Janc <szymon.janc@codecoup.pl>
 To: =?utf-8?B?TWljaGHFgg==?= Narajowski
         <michal.narajowski@codecoup.pl>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ 1/5] doc/mgmt-api: Allow set appearance only for LE capable controllers
-Date: Wed, 21 Sep 2016 20:20:30 +0200
-Message-ID: <1944213.CKoTx5OuZl@ix>
-In-Reply-To: <1474372930-9706-1-git-send-email-michal.narajowski@codecoup.pl>
-References: <1474372930-9706-1-git-send-email-michal.narajowski@codecoup.pl>
+Subject: Re: [PATCH BlueZ 1/2] doc/mgmt-api: Allow set appearance only for LE capable controllers
+Date: Wed, 21 Sep 2016 20:13:39 +0200
+Message-ID: <2058008.WmpYDgNHVY@ix>
+In-Reply-To: <1474288415-16308-2-git-send-email-michal.narajowski@codecoup.pl>
+References: <1474288415-16308-1-git-send-email-michal.narajowski@codecoup.pl> <1474288415-16308-2-git-send-email-michal.narajowski@codecoup.pl>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -15,7 +15,7 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Micha=C5=82,
 
-On Tuesday, 20 September 2016 14:02:06 CEST Micha=C5=82 Narajowski wrote:
+On Monday, 19 September 2016 14:33:34 CEST Micha=C5=82 Narajowski wrote:
 > ---
 >  doc/mgmt-api.txt | 6 +++++-
 >  1 file changed, 5 insertions(+), 1 deletion(-)
@@ -36,7 +36,7 @@ On Tuesday, 20 September 2016 14:02:06 CEST Micha=C5=82 Narajowski wrote:
 > +				Invalid Parameters
 >  				Invalid Index
 
-All patches applied, thanks.
+This patch is applied. Second patch needs to be rebased. Thanks.
 
 =2D-=20
 pozdrawiam
