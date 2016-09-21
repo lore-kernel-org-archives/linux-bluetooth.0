@@ -1,43 +1,45 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Szymon Janc <szymon.janc@codecoup.pl>
-To: =?utf-8?B?TWljaGHFgg==?= Narajowski
-        <michal.narajowski@codecoup.pl>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ 1/2] doc/mgmt-api: Allow set appearance only for LE capable controllers
-Date: Wed, 21 Sep 2016 20:13:39 +0200
-Message-ID: <2058008.WmpYDgNHVY@ix>
-In-Reply-To: <1474288415-16308-2-git-send-email-michal.narajowski@codecoup.pl>
-References: <1474288415-16308-1-git-send-email-michal.narajowski@codecoup.pl> <1474288415-16308-2-git-send-email-michal.narajowski@codecoup.pl>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <hanipouspilot@gmail.com>
+From: Dmitry Tunin <hanipouspilot@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	1535802@bugs.launchpad.net,
+	vanakt@gmail.com,
+	Dmitry Tunin <hanipouspilot@gmail.com>,
+	stable@vger.kernel.org
+Subject: [PATCH] Bluetooth: Add a new 04ca:3011 QCA_ROME device
+Date: Wed, 21 Sep 2016 19:13:08 +0300
+Message-Id: <1474474388-14742-1-git-send-email-hanipouspilot@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Micha=C5=82,
+BugLink: https://bugs.launchpad.net/bugs/1535802
 
-On Monday, 19 September 2016 14:33:34 CEST Micha=C5=82 Narajowski wrote:
-> ---
->  doc/mgmt-api.txt | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
->=20
-> diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
-> index 334c884..a7bd6e4 100644
-> --- a/doc/mgmt-api.txt
-> +++ b/doc/mgmt-api.txt
-> @@ -2908,7 +2908,11 @@ Set Appearance Command
->  	This command generates a Command Complete event on success
->  	or a Command Status event on failure.
->=20
-> -	Possible errors:	Invalid Parameters
-> +	This command is only available for LE capable controllers.
-> +	It will return Not Supported otherwise.
-> +
-> +	Possible errors:	Not Supported
-> +				Invalid Parameters
->  				Invalid Index
+T:  Bus=01 Lev=02 Prnt=02 Port=04 Cnt=01 Dev#=  3 Spd=12  MxCh= 0
+D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=04ca ProdID=3011 Rev=00.01
+C:  #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
+I:  If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
 
-This patch is applied. Second patch needs to be rebased. Thanks.
+Signed-off-by: Dmitry Tunin <hanipouspilot@gmail.com>
+Cc: stable@vger.kernel.org
+---
+ drivers/bluetooth/btusb.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-=2D-=20
-pozdrawiam
-Szymon Janc
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 9ebd73d..6bd63b8 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -253,6 +253,7 @@ static const struct usb_device_id blacklist_table[] = {
+ 	{ USB_DEVICE(0x0cf3, 0xe300), .driver_info = BTUSB_QCA_ROME },
+ 	{ USB_DEVICE(0x0cf3, 0xe360), .driver_info = BTUSB_QCA_ROME },
+ 	{ USB_DEVICE(0x0489, 0xe092), .driver_info = BTUSB_QCA_ROME },
++	{ USB_DEVICE(0x04ca, 0x3011), .driver_info = BTUSB_QCA_ROME },
+ 
+ 	/* Broadcom BCM2035 */
+ 	{ USB_DEVICE(0x0a5c, 0x2009), .driver_info = BTUSB_BCM92035 },
+-- 
+2.7.4
