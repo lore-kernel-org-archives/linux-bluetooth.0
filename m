@@ -2,16 +2,11 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Francois Beaufort <beaufort.francois@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Subject: [PATCH BlueZ 2/2] Don't allow notifications/indications without CCC
-Date: Wed, 21 Sep 2016 16:29:28 +0200
-Message-Id: <20160921142928.15190-1-beaufort.francois@gmail.com>
+Date: Wed, 21 Sep 2016 16:17:36 +0200
+Message-Id: <20160921141736.10770-1-beaufort.francois@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch will allow consistency between OSes for Web Bluetooth:
-- macOS fails if enabling notifications on a characteristic with no CCC.
-- Chrome checks on Android for CCC before enabling notifications.
-
-Background: crbug.com/624763
 ---
  src/shared/gatt-client.c | 33 ++++++++++++++++-----------------
  1 file changed, 16 insertions(+), 17 deletions(-)
