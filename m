@@ -1,42 +1,43 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Alexander Aring <aar@pengutronix.de>
-To: linux-bluetooth@vger.kernel.org
-Cc: revestflo@gmail.com, Alexander Aring <aar@pengutronix.de>,
-        Szymon Janc <szymon.janc@codecoup.pl>
-Subject: [BlueZ] tests: example-gatt-server: change GATT_CHRC_IFACE
-Date: Wed, 21 Sep 2016 21:32:25 +0200
-Message-Id: <20160921193225.23199-1-aar@pengutronix.de>
+From: Szymon Janc <szymon.janc@codecoup.pl>
+To: =?utf-8?B?TWljaGHFgg==?= Narajowski
+        <michal.narajowski@codecoup.pl>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ 1/5] doc/mgmt-api: Allow set appearance only for LE capable controllers
+Date: Wed, 21 Sep 2016 20:20:30 +0200
+Message-ID: <1944213.CKoTx5OuZl@ix>
+In-Reply-To: <1474372930-9706-1-git-send-email-michal.narajowski@codecoup.pl>
+References: <1474372930-9706-1-git-send-email-michal.narajowski@codecoup.pl>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch changes GATT_CHRC_IFACE to GATT_DESC_IFACE. The example
-do not test this case and this is the reason why nobody detected it yet.
+Hi Micha=C5=82,
 
-Cc: Szymon Janc <szymon.janc@codecoup.pl>
-Suggested-by: Florent Revest <revestflo@gmail.com>
-Signed-off-by: Alexander Aring <aar@pengutronix.de>
----
-Florent Revest reported this via irc and I put my "send-patches" hat on
-to send this fix to mainline.
+On Tuesday, 20 September 2016 14:02:06 CEST Micha=C5=82 Narajowski wrote:
+> ---
+>  doc/mgmt-api.txt | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
+> index 334c884..a7bd6e4 100644
+> --- a/doc/mgmt-api.txt
+> +++ b/doc/mgmt-api.txt
+> @@ -2908,7 +2908,11 @@ Set Appearance Command
+>  	This command generates a Command Complete event on success
+>  	or a Command Status event on failure.
+>=20
+> -	Possible errors:	Invalid Parameters
+> +	This command is only available for LE capable controllers.
+> +	It will return Not Supported otherwise.
+> +
+> +	Possible errors:	Not Supported
+> +				Invalid Parameters
+>  				Invalid Index
 
-Review carefully, not tested in any case.
+All patches applied, thanks.
 
- test/example-gatt-server | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/test/example-gatt-server b/test/example-gatt-server
-index 44ceb70..bac1687 100755
---- a/test/example-gatt-server
-+++ b/test/example-gatt-server
-@@ -234,7 +234,7 @@ class Descriptor(dbus.service.Object):
-         if interface != GATT_DESC_IFACE:
-             raise InvalidArgsException()
- 
--        return self.get_properties()[GATT_CHRC_IFACE]
-+        return self.get_properties()[GATT_DESC_IFACE]
- 
-     @dbus.service.method(GATT_DESC_IFACE,
-                         in_signature='a{sv}',
--- 
-2.9.3
-
+=2D-=20
+pozdrawiam
+Szymon Janc
