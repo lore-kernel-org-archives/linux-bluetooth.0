@@ -4,37 +4,87 @@ From: =?UTF-8?q?Micha=C5=82=20Narajowski?=
 To: linux-bluetooth@vger.kernel.org
 Cc: =?UTF-8?q?Micha=C5=82=20Narajowski?=
         <michal.narajowski@codecoup.pl>
-Subject: [PATCH 3/3] Bluetooth: Fix not updating scan rsp when adv off
-Date: Thu, 22 Sep 2016 16:01:39 +0200
-Message-Id: <1474552899-3837-3-git-send-email-michal.narajowski@codecoup.pl>
-In-Reply-To: <1474552899-3837-1-git-send-email-michal.narajowski@codecoup.pl>
-References: <1474552899-3837-1-git-send-email-michal.narajowski@codecoup.pl>
+Subject: [PATCH 1/3] Bluetooth: Fix local name in scan rsp
+Date: Thu, 22 Sep 2016 16:01:37 +0200
+Message-Id: <1474552899-3837-1-git-send-email-michal.narajowski@codecoup.pl>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Scan response data should not be updated unless there
-is an advertising instance.
+Use complete name if it fits. If not and there is short name
+check if it fits. If not then use shortened name as prefix
+of complete name.
 
 Signed-off-by: Michał Narajowski <michal.narajowski@codecoup.pl>
 ---
- net/bluetooth/mgmt.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ net/bluetooth/hci_request.c | 46 +++++++++++++++++++++++++++++++++------------
+ 1 file changed, 34 insertions(+), 12 deletions(-)
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 5709377..8125ab3 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -3181,7 +3181,7 @@ static int set_local_name(struct sock *sk, struct hci_dev *hdev, void *data,
- 	/* The name is stored in the scan response data and so
- 	 * no need to udpate the advertising data here.
- 	 */
--	if (lmp_le_capable(hdev))
-+	if (lmp_le_capable(hdev) && hci_dev_test_flag(hdev, HCI_ADVERTISING))
- 		__hci_req_update_scan_rsp_data(&req, hdev->cur_adv_instance);
+diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
+index c813568..880758c 100644
+--- a/net/bluetooth/hci_request.c
++++ b/net/bluetooth/hci_request.c
+@@ -973,25 +973,47 @@ void __hci_req_enable_advertising(struct hci_request *req)
  
- 	err = hci_req_run(&req, set_name_complete);
+ static u8 append_local_name(struct hci_dev *hdev, u8 *ptr, u8 ad_len)
+ {
+-	size_t name_len;
++	size_t complete_len;
++	size_t short_len;
+ 	int max_len;
+ 
+ 	max_len = HCI_MAX_AD_LENGTH - ad_len - 2;
+-	name_len = strlen(hdev->dev_name);
+-	if (name_len > 0 && max_len > 0) {
++	complete_len = strlen(hdev->dev_name);
++	short_len = strlen(hdev->short_name);
+ 
+-		if (name_len > max_len) {
+-			name_len = max_len;
+-			ptr[1] = EIR_NAME_SHORT;
+-		} else
+-			ptr[1] = EIR_NAME_COMPLETE;
++	/* no space left for name */
++	if (max_len < 1)
++		return ad_len;
+ 
+-		ptr[0] = name_len + 1;
++	/* no name set */
++	if (!complete_len)
++		return ad_len;
+ 
+-		memcpy(ptr + 2, hdev->dev_name, name_len);
++	/* complete name fits */
++	if (complete_len <= max_len) {
++		ptr[0] = complete_len + 1;
++		ptr[1] = EIR_NAME_COMPLETE;
++		memcpy(ptr + 2, hdev->dev_name, complete_len);
+ 
+-		ad_len += (name_len + 2);
+-		ptr += (name_len + 2);
++		return ad_len + complete_len + 2;
++	}
++
++	/* shortened name set and fits */
++	if (short_len && short_len <= max_len) {
++		ptr[0] = short_len + 1;
++		ptr[1] = EIR_NAME_SHORT;
++		memcpy(ptr + 2, hdev->short_name, short_len);
++
++		return ad_len + short_len + 2;
++	}
++
++	/* no shortened name set so shorten complete name */
++	if (!short_len) {
++		ptr[0] = max_len + 1;
++		ptr[1] = EIR_NAME_SHORT;
++		memcpy(ptr + 2, hdev->dev_name, max_len);
++
++		return ad_len + max_len + 2;
+ 	}
+ 
+ 	return ad_len;
 -- 
 2.7.4
 
