@@ -1,82 +1,54 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Arkadiusz Lichwa <arek.lichwa@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Arek Lichwa <arek.lichwa@gmail.com>
-Subject: [PATCH] Bluetooth: Fix NULL pointer dereference in mgmt context
-Date: Thu, 22 Sep 2016 14:08:05 +0200
-Message-Id: <20160922120805.30690-1-arek.lichwa@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <20160921193225.23199-1-aar@pengutronix.de>
+References: <20160921193225.23199-1-aar@pengutronix.de>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Thu, 22 Sep 2016 11:11:40 +0300
+Message-ID: <CABBYNZJqz0W-oeupFtaQs7bxmxdvMure5q=0twhk8sy3d9ujUw@mail.gmail.com>
+Subject: Re: [BlueZ] tests: example-gatt-server: change GATT_CHRC_IFACE
+To: Alexander Aring <aar@pengutronix.de>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        revestflo@gmail.com, Szymon Janc <szymon.janc@codecoup.pl>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Arek Lichwa <arek.lichwa@gmail.com>
+Hi Alex,
 
-Adds missing callback assignment to cmd_complete in pending management command
-context. Dump path involves security procedure performed on legacy (pre-SSP)
-devices with service security requirements set to HIGH (16digits PIN).
-It fails when shorter PIN is delivered by user.
+On Wed, Sep 21, 2016 at 10:32 PM, Alexander Aring <aar@pengutronix.de> wrote:
+> This patch changes GATT_CHRC_IFACE to GATT_DESC_IFACE. The example
+> do not test this case and this is the reason why nobody detected it yet.
+>
+> Cc: Szymon Janc <szymon.janc@codecoup.pl>
+> Suggested-by: Florent Revest <revestflo@gmail.com>
+> Signed-off-by: Alexander Aring <aar@pengutronix.de>
+> ---
+> Florent Revest reported this via irc and I put my "send-patches" hat on
+> to send this fix to mainline.
+>
+> Review carefully, not tested in any case.
+>
+>  test/example-gatt-server | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/test/example-gatt-server b/test/example-gatt-server
+> index 44ceb70..bac1687 100755
+> --- a/test/example-gatt-server
+> +++ b/test/example-gatt-server
+> @@ -234,7 +234,7 @@ class Descriptor(dbus.service.Object):
+>          if interface != GATT_DESC_IFACE:
+>              raise InvalidArgsException()
+>
+> -        return self.get_properties()[GATT_CHRC_IFACE]
+> +        return self.get_properties()[GATT_DESC_IFACE]
+>
+>      @dbus.service.method(GATT_DESC_IFACE,
+>                          in_signature='a{sv}',
+> --
+> 2.9.3
 
-[    1.517950] Bluetooth: PIN code is not 16 bytes long
-[    1.518491] BUG: unable to handle kernel NULL pointer dereference at           (null)
-[    1.518584] IP: [<          (null)>]           (null)
-[    1.518584] PGD 9e08067 PUD 9fdf067 PMD 0 
-[    1.518584] Oops: 0010 [#1] SMP
-[    1.518584] Modules linked in:
-[    1.518584] CPU: 0 PID: 1002 Comm: kworker/u3:2 Not tainted 4.8.0-rc6-354649-gaf4168c #16
-[    1.518584] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.9.3-20160701_074356-anatol 04/01/2014
-[    1.518584] Workqueue: hci0 hci_rx_work
-[    1.518584] task: ffff880009ce14c0 task.stack: ffff880009e10000
-[    1.518584] RIP: 0010:[<0000000000000000>]  [<          (null)>]           (null)
-[    1.518584] RSP: 0018:ffff880009e13bc8  EFLAGS: 00010293
-[    1.518584] RAX: 0000000000000000 RBX: ffff880009eed100 RCX: 0000000000000006
-[    1.518584] RDX: ffff880009ddc000 RSI: 0000000000000000 RDI: ffff880009eed100
-[    1.518584] RBP: ffff880009e13be0 R08: 0000000000000000 R09: 0000000000000001
-[    1.518584] R10: 0000000000000000 R11: 0000000000000000 R12: 0000000000000000
-[    1.518584] R13: ffff880009e13ccd R14: ffff880009ddc000 R15: ffff880009ddc010
-[    1.518584] FS:  0000000000000000(0000) GS:ffff88000bc00000(0000) knlGS:0000000000000000
-[    1.518584] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[    1.518584] CR2: 0000000000000000 CR3: 0000000009fdd000 CR4: 00000000000006f0
-[    1.518584] Stack:
-[    1.518584]  ffffffff81909808 ffff880009e13cce ffff880009e0d40b ffff880009e13c68
-[    1.518584]  ffffffff818f428d 00000000024000c0 ffff880009e13c08 ffffffff810ca903
-[    1.518584]  ffff880009e13c48 ffffffff811ade34 ffffffff8178c31f ffff880009ee6200
-[    1.518584] Call Trace:
-[    1.518584]  [<ffffffff81909808>] ? mgmt_pin_code_neg_reply_complete+0x38/0x60
-[    1.518584]  [<ffffffff818f428d>] hci_cmd_complete_evt+0x69d/0x3200
-[    1.518584]  [<ffffffff810ca903>] ? rcu_read_lock_sched_held+0x53/0x60
-[    1.518584]  [<ffffffff811ade34>] ? kmem_cache_alloc+0x1a4/0x200
-[    1.518584]  [<ffffffff8178c31f>] ? skb_clone+0x4f/0xa0
-[    1.518584]  [<ffffffff818f9d81>] hci_event_packet+0x8e1/0x28e0
-[    1.518584]  [<ffffffff81a421f1>] ? _raw_spin_unlock_irqrestore+0x31/0x50
-[    1.518584]  [<ffffffff810aea3e>] ? trace_hardirqs_on_caller+0xee/0x1b0
-[    1.518584]  [<ffffffff818e6bd1>] hci_rx_work+0x1e1/0x5b0
-[    1.518584]  [<ffffffff8107e4bd>] ? process_one_work+0x1ed/0x6b0
-[    1.518584]  [<ffffffff8107e538>] process_one_work+0x268/0x6b0
-[    1.518584]  [<ffffffff8107e4bd>] ? process_one_work+0x1ed/0x6b0
-[    1.518584]  [<ffffffff8107e9c3>] worker_thread+0x43/0x4e0
-[    1.518584]  [<ffffffff8107e980>] ? process_one_work+0x6b0/0x6b0
-[    1.518584]  [<ffffffff8107e980>] ? process_one_work+0x6b0/0x6b0
-[    1.518584]  [<ffffffff8108505f>] kthread+0xdf/0x100
-[    1.518584]  [<ffffffff81a4297f>] ret_from_fork+0x1f/0x40
-[    1.518584]  [<ffffffff81084f80>] ? kthread_create_on_node+0x210/0x210
+Applied, note that I reworded it a little bit and removed the
+Signed-off-by, etc, as we don't use that in userspace.
 
-Signed-off-by: Arek Lichwa <arek.lichwa@gmail.com>
----
- net/bluetooth/mgmt.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 7b2bac4..63f42f4 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -2541,6 +2541,8 @@ static int send_pin_code_neg_reply(struct sock *sk, struct hci_dev *hdev,
- 	if (!cmd)
- 		return -ENOMEM;
- 
-+	cmd->cmd_complete = addr_cmd_complete;
-+
- 	err = hci_send_cmd(hdev, HCI_OP_PIN_CODE_NEG_REPLY,
- 			   sizeof(cp->addr.bdaddr), &cp->addr.bdaddr);
- 	if (err < 0)
 -- 
-2.10.0
-
+Luiz Augusto von Dentz
