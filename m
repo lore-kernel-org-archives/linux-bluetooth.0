@@ -1,125 +1,82 @@
-Return-Path: <szymon.janc@codecoup.pl>
-From: Szymon Janc <szymon.janc@codecoup.pl>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: =?utf-8?B?TWljaGHFgg==?= Narajowski <michal.narajowski@codecoup.pl>, linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/3] Bluetooth: Fix local name in scan rsp
-Date: Thu, 22 Sep 2016 21:07:59 +0200
-Message-ID: <2407078.m1aT8J8x6x@ix>
-In-Reply-To: <9A1998C8-0404-4A27-B594-A55E2D80540D@holtmann.org>
-References: <1474552899-3837-1-git-send-email-michal.narajowski@codecoup.pl> <9A1998C8-0404-4A27-B594-A55E2D80540D@holtmann.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+Return-Path: <labbott@redhat.com>
+From: Laura Abbott <labbott@redhat.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>
+Cc: Laura Abbott <labbott@redhat.com>,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	John Stultz <john.stultz@linaro.org>
+Subject: [PATCH] Bluetooth: btwilink: Save the packet type before sending
+Date: Thu, 22 Sep 2016 11:20:42 -0700
+Message-Id: <1474568442-4810-1-git-send-email-labbott@redhat.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Running with KASAN produces some messages:
 
-On Thursday, 22 September 2016 17:47:15 CEST Marcel Holtmann wrote:
-> Hi Michal,
->=20
-> > Use complete name if it fits. If not and there is short name
-> > check if it fits. If not then use shortened name as prefix
-> > of complete name.
-> >=20
-> > Signed-off-by: Micha=C5=82 Narajowski <michal.narajowski@codecoup.pl>
-> > ---
-> > net/bluetooth/hci_request.c | 46
-> > +++++++++++++++++++++++++++++++++------------ 1 file changed, 34
-> > insertions(+), 12 deletions(-)
-> >=20
-> > diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
-> > index c813568..880758c 100644
-> > --- a/net/bluetooth/hci_request.c
-> > +++ b/net/bluetooth/hci_request.c
-> > @@ -973,25 +973,47 @@ void __hci_req_enable_advertising(struct hci_requ=
-est
-> > *req)
-> >=20
-> > static u8 append_local_name(struct hci_dev *hdev, u8 *ptr, u8 ad_len)
-> > {
-> > -	size_t name_len;
-> > +	size_t complete_len;
-> > +	size_t short_len;
-> >=20
-> > 	int max_len;
-> > =09
-> > 	max_len =3D HCI_MAX_AD_LENGTH - ad_len - 2;
-> >=20
-> > -	name_len =3D strlen(hdev->dev_name);
-> > -	if (name_len > 0 && max_len > 0) {
-> > +	complete_len =3D strlen(hdev->dev_name);
-> > +	short_len =3D strlen(hdev->short_name);
-> >=20
-> > -		if (name_len > max_len) {
-> > -			name_len =3D max_len;
-> > -			ptr[1] =3D EIR_NAME_SHORT;
-> > -		} else
-> > -			ptr[1] =3D EIR_NAME_COMPLETE;
-> > +	/* no space left for name */
-> > +	if (max_len < 1)
-> > +		return ad_len;
-> >=20
-> > -		ptr[0] =3D name_len + 1;
-> > +	/* no name set */
-> > +	if (!complete_len)
-> > +		return ad_len;
-> >=20
-> > -		memcpy(ptr + 2, hdev->dev_name, name_len);
-> > +	/* complete name fits */
-> > +	if (complete_len <=3D max_len) {
-> > +		ptr[0] =3D complete_len + 1;
-> > +		ptr[1] =3D EIR_NAME_COMPLETE;
-> > +		memcpy(ptr + 2, hdev->dev_name, complete_len);
-> >=20
-> > -		ad_len +=3D (name_len + 2);
-> > -		ptr +=3D (name_len + 2);
-> > +		return ad_len + complete_len + 2;
-> > +	}
->=20
-> so what we discussed is that at minimum 11 octets of name will be included
-> into the scan response. That is the same size of the Short_name (which
-> includes the nul-byte).
+BUG: KASAN: use-after-free in ti_st_send_frame+0x9c/0x16c at addr
+ffffffc064868fe8
+Read of size 1 by task kworker/u17:1/1266
 
-minimum? And do we need to put null byte there?
+<KASAN output trimmed>
 
->=20
-> If the full name is 11 octets or smaller, then that is included. If the f=
-ull
-> name is longer and a short name has been set, then the short name is used.
-> If the short name is not set, then the full name is truncated to 11 octet=
-s.
->=20
-> For the case where the full name is 11 octets or smaller, the complete tag
-> is used. For the case where the short name is used or the full name is
-> truncated, the partial tag is used.
+Hardware name: HiKey Development Board (DT)
+Workqueue: hci0 hci_cmd_work
+Call trace:
+[<ffffffc00008c00c>] dump_backtrace+0x0/0x178
+[<ffffffc00008c1a4>] show_stack+0x20/0x28
+[<ffffffc00067da38>] dump_stack+0xa8/0xe0
+[<ffffffc000288430>] print_trailer+0x110/0x174
+[<ffffffc00028aedc>] object_err+0x4c/0x5c
+[<ffffffc00028f714>] kasan_report_error+0x254/0x54c
+[<ffffffc00028fa70>] kasan_report+0x64/0x70
+[<ffffffc00028eb8c>] __asan_load1+0x4c/0x54
+[<ffffffc000b59b24>] ti_st_send_frame+0x9c/0x16c
+[<ffffffc000ee8dcc>] hci_send_frame+0xb4/0x118
+[<ffffffc000ee8efc>] hci_cmd_work+0xcc/0x154
+[<ffffffc0000f6c48>] process_one_work+0x26c/0x7a4
+[<ffffffc0000f721c>] worker_thread+0x9c/0x73c
+[<ffffffc000100250>] kthread+0x138/0x154
+[<ffffffc000085c50>] ret_from_fork+0x10/0x40
 
-So we never include full name if it is longer then 11 octets (with null)?
-BTW where this 11 octets value came from? I cannot find such requirement in=
-=20
-spec. Or this is just limited on mgmt interface level?
+The packet is being accessed for statistics after it has been freed.
+Save the packet type before sending for statistics afterwards.
 
-I don't undertand why not to include complete name if it fits, even if long=
-er=20
-than 11 octets.
+Signed-off-by: Laura Abbott <labbott@redhat.com>
+---
+Originally found and tested on 4.4 based branch.
+---
+ drivers/bluetooth/btwilink.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-> > +
-> > +	/* shortened name set and fits */
->=20
-> Just a note here, it is not called shortened name. It is the short name. =
-We
-> clearly separated the full name vs short name in the mgmt API.
-
-It is called 'shortened' in both CoreSpec and CSS.=20
-
-> Regards
->=20
-> Marcel
->=20
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
-> in the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-=2D-=20
-pozdrawiam
-Szymon Janc
+diff --git a/drivers/bluetooth/btwilink.c b/drivers/bluetooth/btwilink.c
+index 485281b..ef51c9c 100644
+--- a/drivers/bluetooth/btwilink.c
++++ b/drivers/bluetooth/btwilink.c
+@@ -245,6 +245,7 @@ static int ti_st_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
+ {
+ 	struct ti_st *hst;
+ 	long len;
++	int pkt_type;
+ 
+ 	hst = hci_get_drvdata(hdev);
+ 
+@@ -258,6 +259,7 @@ static int ti_st_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
+ 	 * Freeing skb memory is taken care in shared transport layer,
+ 	 * so don't free skb memory here.
+ 	 */
++	pkt_type = hci_skb_pkt_type(skb);
+ 	len = hst->st_write(skb);
+ 	if (len < 0) {
+ 		kfree_skb(skb);
+@@ -268,7 +270,7 @@ static int ti_st_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
+ 
+ 	/* ST accepted our skb. So, Go ahead and do rest */
+ 	hdev->stat.byte_tx += len;
+-	ti_st_tx_complete(hst, hci_skb_pkt_type(skb));
++	ti_st_tx_complete(hst, pkt_type);
+ 
+ 	return 0;
+ }
+-- 
+2.7.4
