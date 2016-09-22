@@ -1,40 +1,69 @@
-Return-Path: <linux-kernel-owner@vger.kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 10.0 \(3226\))
-Subject: Re: [PATCH] Bluetooth: Add a new 04ca:3011 QCA_ROME device
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1474474388-14742-1-git-send-email-hanipouspilot@gmail.com>
-Date: Thu, 22 Sep 2016 17:41:24 +0200
-Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>, 1535802@bugs.launchpad.net,
-        vanakt@gmail.com, stable@vger.kernel.org
-Message-Id: <3BBBC084-5038-4643-B217-A01126908475@holtmann.org>
-References: <1474474388-14742-1-git-send-email-hanipouspilot@gmail.com>
-To: Dmitry Tunin <hanipouspilot@gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: =?UTF-8?q?Micha=C5=82=20Narajowski?=
+        <michal.narajowski@codecoup.pl>
+To: linux-bluetooth@vger.kernel.org
+Cc: =?UTF-8?q?Micha=C5=82=20Narajowski?=
+        <michal.narajowski@codecoup.pl>
+Subject: [PATCH 2/3] Bluetooth: Fix local name validation
+Date: Thu, 22 Sep 2016 16:01:38 +0200
+Message-Id: <1474552899-3837-2-git-send-email-michal.narajowski@codecoup.pl>
+In-Reply-To: <1474552899-3837-1-git-send-email-michal.narajowski@codecoup.pl>
+References: <1474552899-3837-1-git-send-email-michal.narajowski@codecoup.pl>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Dmitry,
+Short name should be shorter than complete name
+and it should be a prefix of complete name.
 
-> BugLink: https://bugs.launchpad.net/bugs/1535802
-> 
-> T:  Bus=01 Lev=02 Prnt=02 Port=04 Cnt=01 Dev#=  3 Spd=12  MxCh= 0
-> D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-> P:  Vendor=04ca ProdID=3011 Rev=00.01
-> C:  #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
-> I:  If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> 
-> Signed-off-by: Dmitry Tunin <hanipouspilot@gmail.com>
-> Cc: stable@vger.kernel.org
-> ---
-> drivers/bluetooth/btusb.c | 1 +
-> 1 file changed, 1 insertion(+)
+Signed-off-by: Michał Narajowski <michal.narajowski@codecoup.pl>
+---
+ net/bluetooth/mgmt.c | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
 
-patch has been applied to bluetooth-next tree.
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 7b2bac4..5709377 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -3099,6 +3099,24 @@ unlock:
+ 	hci_dev_unlock(hdev);
+ }
+ 
++static bool name_is_valid(u8 *complete_name, u8 *short_name)
++{
++	size_t complete_len = strlen(complete_name);
++	size_t short_len = strlen(short_name);
++
++	if (complete_len <= short_len)
++		return false;
++
++	/* Core Specification Supplement, A, 1.2.1:
++	 * A shortened name shall only contain contiguous characters from
++	 * the beginning of the full name.
++	 */
++	if (strncmp(short_name, complete_name, short_len) != 0)
++		return false;
++
++	return true;
++}
++
+ static int set_local_name(struct sock *sk, struct hci_dev *hdev, void *data,
+ 			  u16 len)
+ {
+@@ -3122,6 +3140,12 @@ static int set_local_name(struct sock *sk, struct hci_dev *hdev, void *data,
+ 		goto failed;
+ 	}
+ 
++	if (!name_is_valid(cp->name, cp->short_name)) {
++		err = mgmt_cmd_status(sk, hdev->id, MGMT_OP_SET_LOCAL_NAME,
++				      MGMT_STATUS_INVALID_PARAMS);
++		goto failed;
++	}
++
+ 	memcpy(hdev->short_name, cp->short_name, sizeof(hdev->short_name));
+ 
+ 	if (!hdev_is_powered(hdev)) {
+-- 
+2.7.4
 
-Regards
-
-Marcel
