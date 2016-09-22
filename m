@@ -1,83 +1,74 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 10.0 \(3226\))
-Subject: Re: [PATCH 1/3] Bluetooth: Fix local name in scan rsp
+Subject: Re: [PATCH] Bluetooth: Fix NULL pointer dereference in mgmt context
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1474552899-3837-1-git-send-email-michal.narajowski@codecoup.pl>
-Date: Thu, 22 Sep 2016 17:47:15 +0200
+In-Reply-To: <20160922120805.30690-1-arek.lichwa@gmail.com>
+Date: Thu, 22 Sep 2016 17:38:58 +0200
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <9A1998C8-0404-4A27-B594-A55E2D80540D@holtmann.org>
-References: <1474552899-3837-1-git-send-email-michal.narajowski@codecoup.pl>
-To: =?utf-8?Q?Micha=C5=82_Narajowski?= <michal.narajowski@codecoup.pl>
+Message-Id: <F1633648-3856-4632-9D7F-F2FF1EA201DF@holtmann.org>
+References: <20160922120805.30690-1-arek.lichwa@gmail.com>
+To: Arkadiusz Lichwa <arek.lichwa@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Michal,
+Hi Arek,
 
-> Use complete name if it fits. If not and there is short name
-> check if it fits. If not then use shortened name as prefix
-> of complete name.
+> Adds missing callback assignment to cmd_complete in pending management command
+> context. Dump path involves security procedure performed on legacy (pre-SSP)
+> devices with service security requirements set to HIGH (16digits PIN).
+> It fails when shorter PIN is delivered by user.
 > 
-> Signed-off-by: Michał Narajowski <michal.narajowski@codecoup.pl>
+> [    1.517950] Bluetooth: PIN code is not 16 bytes long
+> [    1.518491] BUG: unable to handle kernel NULL pointer dereference at           (null)
+> [    1.518584] IP: [<          (null)>]           (null)
+> [    1.518584] PGD 9e08067 PUD 9fdf067 PMD 0 
+> [    1.518584] Oops: 0010 [#1] SMP
+> [    1.518584] Modules linked in:
+> [    1.518584] CPU: 0 PID: 1002 Comm: kworker/u3:2 Not tainted 4.8.0-rc6-354649-gaf4168c #16
+> [    1.518584] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.9.3-20160701_074356-anatol 04/01/2014
+> [    1.518584] Workqueue: hci0 hci_rx_work
+> [    1.518584] task: ffff880009ce14c0 task.stack: ffff880009e10000
+> [    1.518584] RIP: 0010:[<0000000000000000>]  [<          (null)>]           (null)
+> [    1.518584] RSP: 0018:ffff880009e13bc8  EFLAGS: 00010293
+> [    1.518584] RAX: 0000000000000000 RBX: ffff880009eed100 RCX: 0000000000000006
+> [    1.518584] RDX: ffff880009ddc000 RSI: 0000000000000000 RDI: ffff880009eed100
+> [    1.518584] RBP: ffff880009e13be0 R08: 0000000000000000 R09: 0000000000000001
+> [    1.518584] R10: 0000000000000000 R11: 0000000000000000 R12: 0000000000000000
+> [    1.518584] R13: ffff880009e13ccd R14: ffff880009ddc000 R15: ffff880009ddc010
+> [    1.518584] FS:  0000000000000000(0000) GS:ffff88000bc00000(0000) knlGS:0000000000000000
+> [    1.518584] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> [    1.518584] CR2: 0000000000000000 CR3: 0000000009fdd000 CR4: 00000000000006f0
+> [    1.518584] Stack:
+> [    1.518584]  ffffffff81909808 ffff880009e13cce ffff880009e0d40b ffff880009e13c68
+> [    1.518584]  ffffffff818f428d 00000000024000c0 ffff880009e13c08 ffffffff810ca903
+> [    1.518584]  ffff880009e13c48 ffffffff811ade34 ffffffff8178c31f ffff880009ee6200
+> [    1.518584] Call Trace:
+> [    1.518584]  [<ffffffff81909808>] ? mgmt_pin_code_neg_reply_complete+0x38/0x60
+> [    1.518584]  [<ffffffff818f428d>] hci_cmd_complete_evt+0x69d/0x3200
+> [    1.518584]  [<ffffffff810ca903>] ? rcu_read_lock_sched_held+0x53/0x60
+> [    1.518584]  [<ffffffff811ade34>] ? kmem_cache_alloc+0x1a4/0x200
+> [    1.518584]  [<ffffffff8178c31f>] ? skb_clone+0x4f/0xa0
+> [    1.518584]  [<ffffffff818f9d81>] hci_event_packet+0x8e1/0x28e0
+> [    1.518584]  [<ffffffff81a421f1>] ? _raw_spin_unlock_irqrestore+0x31/0x50
+> [    1.518584]  [<ffffffff810aea3e>] ? trace_hardirqs_on_caller+0xee/0x1b0
+> [    1.518584]  [<ffffffff818e6bd1>] hci_rx_work+0x1e1/0x5b0
+> [    1.518584]  [<ffffffff8107e4bd>] ? process_one_work+0x1ed/0x6b0
+> [    1.518584]  [<ffffffff8107e538>] process_one_work+0x268/0x6b0
+> [    1.518584]  [<ffffffff8107e4bd>] ? process_one_work+0x1ed/0x6b0
+> [    1.518584]  [<ffffffff8107e9c3>] worker_thread+0x43/0x4e0
+> [    1.518584]  [<ffffffff8107e980>] ? process_one_work+0x6b0/0x6b0
+> [    1.518584]  [<ffffffff8107e980>] ? process_one_work+0x6b0/0x6b0
+> [    1.518584]  [<ffffffff8108505f>] kthread+0xdf/0x100
+> [    1.518584]  [<ffffffff81a4297f>] ret_from_fork+0x1f/0x40
+> [    1.518584]  [<ffffffff81084f80>] ? kthread_create_on_node+0x210/0x210
+> 
+> Signed-off-by: Arek Lichwa <arek.lichwa@gmail.com>
 > ---
-> net/bluetooth/hci_request.c | 46 +++++++++++++++++++++++++++++++++------------
-> 1 file changed, 34 insertions(+), 12 deletions(-)
-> 
-> diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
-> index c813568..880758c 100644
-> --- a/net/bluetooth/hci_request.c
-> +++ b/net/bluetooth/hci_request.c
-> @@ -973,25 +973,47 @@ void __hci_req_enable_advertising(struct hci_request *req)
-> 
-> static u8 append_local_name(struct hci_dev *hdev, u8 *ptr, u8 ad_len)
-> {
-> -	size_t name_len;
-> +	size_t complete_len;
-> +	size_t short_len;
-> 	int max_len;
-> 
-> 	max_len = HCI_MAX_AD_LENGTH - ad_len - 2;
-> -	name_len = strlen(hdev->dev_name);
-> -	if (name_len > 0 && max_len > 0) {
-> +	complete_len = strlen(hdev->dev_name);
-> +	short_len = strlen(hdev->short_name);
-> 
-> -		if (name_len > max_len) {
-> -			name_len = max_len;
-> -			ptr[1] = EIR_NAME_SHORT;
-> -		} else
-> -			ptr[1] = EIR_NAME_COMPLETE;
-> +	/* no space left for name */
-> +	if (max_len < 1)
-> +		return ad_len;
-> 
-> -		ptr[0] = name_len + 1;
-> +	/* no name set */
-> +	if (!complete_len)
-> +		return ad_len;
-> 
-> -		memcpy(ptr + 2, hdev->dev_name, name_len);
-> +	/* complete name fits */
-> +	if (complete_len <= max_len) {
-> +		ptr[0] = complete_len + 1;
-> +		ptr[1] = EIR_NAME_COMPLETE;
-> +		memcpy(ptr + 2, hdev->dev_name, complete_len);
-> 
-> -		ad_len += (name_len + 2);
-> -		ptr += (name_len + 2);
-> +		return ad_len + complete_len + 2;
-> +	}
+> net/bluetooth/mgmt.c | 2 ++
+> 1 file changed, 2 insertions(+)
 
-so what we discussed is that at minimum 11 octets of name will be included into the scan response. That is the same size of the Short_name (which includes the nul-byte).
-
-If the full name is 11 octets or smaller, then that is included. If the full name is longer and a short name has been set, then the short name is used. If the short name is not set, then the full name is truncated to 11 octets.
-
-For the case where the full name is 11 octets or smaller, the complete tag is used. For the case where the short name is used or the full name is truncated, the partial tag is used.
-
-> +
-> +	/* shortened name set and fits */
-
-Just a note here, it is not called shortened name. It is the short name. We clearly separated the full name vs short name in the mgmt API.
+patch has been applied to bluetooth-next tree.
 
 Regards
 
