@@ -1,76 +1,40 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <linux-kernel-owner@vger.kernel.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 10.0 \(3226\))
-Subject: Re: [PATCH] Bluetooth: Fix NULL pointer dereference in mgmt context
+Subject: Re: [PATCH] Bluetooth: Add a new 04ca:3011 QCA_ROME device
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20160922120805.30690-1-arek.lichwa@gmail.com>
-Date: Thu, 22 Sep 2016 17:38:58 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <F1633648-3856-4632-9D7F-F2FF1EA201DF@holtmann.org>
-References: <20160922120805.30690-1-arek.lichwa@gmail.com>
-To: Arkadiusz Lichwa <arek.lichwa@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1474474388-14742-1-git-send-email-hanipouspilot@gmail.com>
+Date: Thu, 22 Sep 2016 17:41:24 +0200
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>, 1535802@bugs.launchpad.net,
+        vanakt@gmail.com, stable@vger.kernel.org
+Message-Id: <3BBBC084-5038-4643-B217-A01126908475@holtmann.org>
+References: <1474474388-14742-1-git-send-email-hanipouspilot@gmail.com>
+To: Dmitry Tunin <hanipouspilot@gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arek,
+Hi Dmitry,
 
-> Adds missing callback assignment to cmd_complete in pending management command
-> context. Dump path involves security procedure performed on legacy (pre-SSP)
-> devices with service security requirements set to HIGH (16digits PIN).
-> It fails when shorter PIN is delivered by user.
+> BugLink: https://bugs.launchpad.net/bugs/1535802
 > 
-> [    1.517950] Bluetooth: PIN code is not 16 bytes long
-> [    1.518491] BUG: unable to handle kernel NULL pointer dereference at           (null)
-> [    1.518584] IP: [<          (null)>]           (null)
-> [    1.518584] PGD 9e08067 PUD 9fdf067 PMD 0 
-> [    1.518584] Oops: 0010 [#1] SMP
-> [    1.518584] Modules linked in:
-> [    1.518584] CPU: 0 PID: 1002 Comm: kworker/u3:2 Not tainted 4.8.0-rc6-354649-gaf4168c #16
-> [    1.518584] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.9.3-20160701_074356-anatol 04/01/2014
-> [    1.518584] Workqueue: hci0 hci_rx_work
-> [    1.518584] task: ffff880009ce14c0 task.stack: ffff880009e10000
-> [    1.518584] RIP: 0010:[<0000000000000000>]  [<          (null)>]           (null)
-> [    1.518584] RSP: 0018:ffff880009e13bc8  EFLAGS: 00010293
-> [    1.518584] RAX: 0000000000000000 RBX: ffff880009eed100 RCX: 0000000000000006
-> [    1.518584] RDX: ffff880009ddc000 RSI: 0000000000000000 RDI: ffff880009eed100
-> [    1.518584] RBP: ffff880009e13be0 R08: 0000000000000000 R09: 0000000000000001
-> [    1.518584] R10: 0000000000000000 R11: 0000000000000000 R12: 0000000000000000
-> [    1.518584] R13: ffff880009e13ccd R14: ffff880009ddc000 R15: ffff880009ddc010
-> [    1.518584] FS:  0000000000000000(0000) GS:ffff88000bc00000(0000) knlGS:0000000000000000
-> [    1.518584] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> [    1.518584] CR2: 0000000000000000 CR3: 0000000009fdd000 CR4: 00000000000006f0
-> [    1.518584] Stack:
-> [    1.518584]  ffffffff81909808 ffff880009e13cce ffff880009e0d40b ffff880009e13c68
-> [    1.518584]  ffffffff818f428d 00000000024000c0 ffff880009e13c08 ffffffff810ca903
-> [    1.518584]  ffff880009e13c48 ffffffff811ade34 ffffffff8178c31f ffff880009ee6200
-> [    1.518584] Call Trace:
-> [    1.518584]  [<ffffffff81909808>] ? mgmt_pin_code_neg_reply_complete+0x38/0x60
-> [    1.518584]  [<ffffffff818f428d>] hci_cmd_complete_evt+0x69d/0x3200
-> [    1.518584]  [<ffffffff810ca903>] ? rcu_read_lock_sched_held+0x53/0x60
-> [    1.518584]  [<ffffffff811ade34>] ? kmem_cache_alloc+0x1a4/0x200
-> [    1.518584]  [<ffffffff8178c31f>] ? skb_clone+0x4f/0xa0
-> [    1.518584]  [<ffffffff818f9d81>] hci_event_packet+0x8e1/0x28e0
-> [    1.518584]  [<ffffffff81a421f1>] ? _raw_spin_unlock_irqrestore+0x31/0x50
-> [    1.518584]  [<ffffffff810aea3e>] ? trace_hardirqs_on_caller+0xee/0x1b0
-> [    1.518584]  [<ffffffff818e6bd1>] hci_rx_work+0x1e1/0x5b0
-> [    1.518584]  [<ffffffff8107e4bd>] ? process_one_work+0x1ed/0x6b0
-> [    1.518584]  [<ffffffff8107e538>] process_one_work+0x268/0x6b0
-> [    1.518584]  [<ffffffff8107e4bd>] ? process_one_work+0x1ed/0x6b0
-> [    1.518584]  [<ffffffff8107e9c3>] worker_thread+0x43/0x4e0
-> [    1.518584]  [<ffffffff8107e980>] ? process_one_work+0x6b0/0x6b0
-> [    1.518584]  [<ffffffff8107e980>] ? process_one_work+0x6b0/0x6b0
-> [    1.518584]  [<ffffffff8108505f>] kthread+0xdf/0x100
-> [    1.518584]  [<ffffffff81a4297f>] ret_from_fork+0x1f/0x40
-> [    1.518584]  [<ffffffff81084f80>] ? kthread_create_on_node+0x210/0x210
+> T:  Bus=01 Lev=02 Prnt=02 Port=04 Cnt=01 Dev#=  3 Spd=12  MxCh= 0
+> D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+> P:  Vendor=04ca ProdID=3011 Rev=00.01
+> C:  #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
+> I:  If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
 > 
-> Signed-off-by: Arek Lichwa <arek.lichwa@gmail.com>
+> Signed-off-by: Dmitry Tunin <hanipouspilot@gmail.com>
+> Cc: stable@vger.kernel.org
 > ---
-> net/bluetooth/mgmt.c | 2 ++
-> 1 file changed, 2 insertions(+)
+> drivers/bluetooth/btusb.c | 1 +
+> 1 file changed, 1 insertion(+)
 
 patch has been applied to bluetooth-next tree.
 
 Regards
 
 Marcel
-
