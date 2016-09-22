@@ -1,54 +1,66 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20160921193225.23199-1-aar@pengutronix.de>
-References: <20160921193225.23199-1-aar@pengutronix.de>
+In-Reply-To: <1474490152-627-1-git-send-email-szymon.janc@codecoup.pl>
+References: <1474490152-627-1-git-send-email-szymon.janc@codecoup.pl>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 22 Sep 2016 11:11:40 +0300
-Message-ID: <CABBYNZJqz0W-oeupFtaQs7bxmxdvMure5q=0twhk8sy3d9ujUw@mail.gmail.com>
-Subject: Re: [BlueZ] tests: example-gatt-server: change GATT_CHRC_IFACE
-To: Alexander Aring <aar@pengutronix.de>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        revestflo@gmail.com, Szymon Janc <szymon.janc@codecoup.pl>
+Date: Thu, 22 Sep 2016 11:06:18 +0300
+Message-ID: <CABBYNZL=Kj0_StweJBE736me1dYxPZfKH7okpSkNyFvboGz=nA@mail.gmail.com>
+Subject: Re: [PATCH 1/2] test/example-gatt-server: Fix few copy-paste errors
+To: Szymon Janc <szymon.janc@codecoup.pl>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alex,
+Hi Szymon,
 
-On Wed, Sep 21, 2016 at 10:32 PM, Alexander Aring <aar@pengutronix.de> wrote:
-> This patch changes GATT_CHRC_IFACE to GATT_DESC_IFACE. The example
-> do not test this case and this is the reason why nobody detected it yet.
->
-> Cc: Szymon Janc <szymon.janc@codecoup.pl>
-> Suggested-by: Florent Revest <revestflo@gmail.com>
-> Signed-off-by: Alexander Aring <aar@pengutronix.de>
+On Wed, Sep 21, 2016 at 11:35 PM, Szymon Janc <szymon.janc@codecoup.pl> wrote:
 > ---
-> Florent Revest reported this via irc and I put my "send-patches" hat on
-> to send this fix to mainline.
->
-> Review carefully, not tested in any case.
->
->  test/example-gatt-server | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  test/example-gatt-server | 10 +++++-----
+>  1 file changed, 5 insertions(+), 5 deletions(-)
 >
 > diff --git a/test/example-gatt-server b/test/example-gatt-server
-> index 44ceb70..bac1687 100755
+> index 44ceb70..ecf614f 100755
 > --- a/test/example-gatt-server
 > +++ b/test/example-gatt-server
-> @@ -234,7 +234,7 @@ class Descriptor(dbus.service.Object):
->          if interface != GATT_DESC_IFACE:
->              raise InvalidArgsException()
+> @@ -535,11 +535,11 @@ class TestEncryptCharacteristic(Characteristic):
+>                  CharacteristicUserDescriptionDescriptor(bus, 3, self))
 >
-> -        return self.get_properties()[GATT_CHRC_IFACE]
-> +        return self.get_properties()[GATT_DESC_IFACE]
+>      def ReadValue(self, options):
+> -        print('TestCharacteristic Read: ' + repr(self.value))
+> +        print('TestEncryptCharacteristic Read: ' + repr(self.value))
+>          return self.value
 >
->      @dbus.service.method(GATT_DESC_IFACE,
->                          in_signature='a{sv}',
+>      def WriteValue(self, value, options):
+> -        print('TestCharacteristic Write: ' + repr(value))
+> +        print('TestEncryptCharacteristic Write: ' + repr(value))
+>          self.value = value
+>
+>  class TestEncryptDescriptor(Descriptor):
+> @@ -576,16 +576,16 @@ class TestSecureCharacteristic(Characteristic):
+>                  ['secure-read', 'secure-write'],
+>                  service)
+>          self.value = []
+> -        self.add_descriptor(TestEncryptDescriptor(bus, 2, self))
+> +        self.add_descriptor(TestSecureDescriptor(bus, 2, self))
+>          self.add_descriptor(
+>                  CharacteristicUserDescriptionDescriptor(bus, 3, self))
+>
+>      def ReadValue(self, options):
+> -        print('TestCharacteristic Read: ' + repr(self.value))
+> +        print('TestSecureCharacteristic Read: ' + repr(self.value))
+>          return self.value
+>
+>      def WriteValue(self, value, options):
+> -        print('TestCharacteristic Write: ' + repr(value))
+> +        print('TestSecureCharacteristic Write: ' + repr(value))
+>          self.value = value
+>
+>
 > --
-> 2.9.3
+> 2.7.4
 
-Applied, note that I reworded it a little bit and removed the
-Signed-off-by, etc, as we don't use that in userspace.
+Applied, thanks.
 
 -- 
 Luiz Augusto von Dentz
