@@ -1,229 +1,119 @@
-Return-Path: <Dean_Jenkins@mentor.com>
-From: Dean Jenkins <Dean_Jenkins@mentor.com>
-To: Dean Jenkins <Dean_Jenkins@mentor.com>, Marcel Holtmann
-	<marcel@holtmann.org>, Gustavo Padovan <gustavo@padovan.org>, Johan Hedberg
-	<johan.hedberg@gmail.com>
-CC: <linux-bluetooth@vger.kernel.org>
-Subject: [PATCH V2 1/7] Bluetooth: Tidy-up coding style in hci_bcsp.c
-Date: Fri, 23 Sep 2016 18:56:26 +0100
-Message-ID: <1474653392-28770-2-git-send-email-Dean_Jenkins@mentor.com>
-In-Reply-To: <1474653392-28770-1-git-send-email-Dean_Jenkins@mentor.com>
-References: <1474653392-28770-1-git-send-email-Dean_Jenkins@mentor.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Content-Type: text/plain; charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 10.0 \(3226\))
+Subject: Re: [PATCH 1/3] Bluetooth: Fix local name in scan rsp
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <2407078.m1aT8J8x6x@ix>
+Date: Thu, 22 Sep 2016 21:56:32 +0200
+Cc: =?utf-8?Q?Micha=C5=82_Narajowski?= <michal.narajowski@codecoup.pl>,
+        linux-bluetooth@vger.kernel.org
+Message-Id: <391818D9-515B-4622-B07C-1BEB13437C8A@holtmann.org>
+References: <1474552899-3837-1-git-send-email-michal.narajowski@codecoup.pl>
+ <9A1998C8-0404-4A27-B594-A55E2D80540D@holtmann.org> <2407078.m1aT8J8x6x@ix>
+To: Szymon Janc <szymon.janc@codecoup.pl>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-drivers/bluetooth/hci_bcsp.c contains some style issues as
-highlighted by
+Hi Szymon,
 
-./scripts/checkpatch.pl --strict -f drivers/bluetooth/hci_bcsp.c
+>>> Use complete name if it fits. If not and there is short name
+>>> check if it fits. If not then use shortened name as prefix
+>>> of complete name.
+>>> 
+>>> Signed-off-by: Michał Narajowski <michal.narajowski@codecoup.pl>
+>>> ---
+>>> net/bluetooth/hci_request.c | 46
+>>> +++++++++++++++++++++++++++++++++------------ 1 file changed, 34
+>>> insertions(+), 12 deletions(-)
+>>> 
+>>> diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
+>>> index c813568..880758c 100644
+>>> --- a/net/bluetooth/hci_request.c
+>>> +++ b/net/bluetooth/hci_request.c
+>>> @@ -973,25 +973,47 @@ void __hci_req_enable_advertising(struct hci_request
+>>> *req)
+>>> 
+>>> static u8 append_local_name(struct hci_dev *hdev, u8 *ptr, u8 ad_len)
+>>> {
+>>> -	size_t name_len;
+>>> +	size_t complete_len;
+>>> +	size_t short_len;
+>>> 
+>>> 	int max_len;
+>>> 	
+>>> 	max_len = HCI_MAX_AD_LENGTH - ad_len - 2;
+>>> 
+>>> -	name_len = strlen(hdev->dev_name);
+>>> -	if (name_len > 0 && max_len > 0) {
+>>> +	complete_len = strlen(hdev->dev_name);
+>>> +	short_len = strlen(hdev->short_name);
+>>> 
+>>> -		if (name_len > max_len) {
+>>> -			name_len = max_len;
+>>> -			ptr[1] = EIR_NAME_SHORT;
+>>> -		} else
+>>> -			ptr[1] = EIR_NAME_COMPLETE;
+>>> +	/* no space left for name */
+>>> +	if (max_len < 1)
+>>> +		return ad_len;
+>>> 
+>>> -		ptr[0] = name_len + 1;
+>>> +	/* no name set */
+>>> +	if (!complete_len)
+>>> +		return ad_len;
+>>> 
+>>> -		memcpy(ptr + 2, hdev->dev_name, name_len);
+>>> +	/* complete name fits */
+>>> +	if (complete_len <= max_len) {
+>>> +		ptr[0] = complete_len + 1;
+>>> +		ptr[1] = EIR_NAME_COMPLETE;
+>>> +		memcpy(ptr + 2, hdev->dev_name, complete_len);
+>>> 
+>>> -		ad_len += (name_len + 2);
+>>> -		ptr += (name_len + 2);
+>>> +		return ad_len + complete_len + 2;
+>>> +	}
+>> 
+>> so what we discussed is that at minimum 11 octets of name will be included
+>> into the scan response. That is the same size of the Short_name (which
+>> includes the nul-byte).
+> 
+> minimum? And do we need to put null byte there?
 
-a) comments - maintainer prefers network style comments
-b) positioning of lines in multi-line statements
-c) spaces after casts
-d) missing blank lines after declarations
+I think the term maximum would have been better. 1-11 octets of name should be included. For the nul-byte, we need to double check the spec., but I think it is required to be included. If not, then we can leave it out.
 
-Therefore, tidy-up the above to make it easier to apply
-future code changes that have conforming style.
+>> If the full name is 11 octets or smaller, then that is included. If the full
+>> name is longer and a short name has been set, then the short name is used.
+>> If the short name is not set, then the full name is truncated to 11 octets.
+>> 
+>> For the case where the full name is 11 octets or smaller, the complete tag
+>> is used. For the case where the short name is used or the full name is
+>> truncated, the partial tag is used.
+> 
+> So we never include full name if it is longer then 11 octets (with null)?
+> BTW where this 11 octets value came from? I cannot find such requirement in 
+> spec. Or this is just limited on mgmt interface level?
 
-Signed-off-by: Dean Jenkins <Dean_Jenkins@mentor.com>
----
- drivers/bluetooth/hci_bcsp.c | 55 +++++++++++++++++++++++---------------------
- 1 file changed, 29 insertions(+), 26 deletions(-)
+Until we have longer advertising packets, I think the 11 octets sound like a good compromise. Userspace can always decide to drive scan response by itself. Or do you have a better idea for a policy?
 
-diff --git a/drivers/bluetooth/hci_bcsp.c b/drivers/bluetooth/hci_bcsp.c
-index d7d23ce..2628b36 100644
---- a/drivers/bluetooth/hci_bcsp.c
-+++ b/drivers/bluetooth/hci_bcsp.c
-@@ -90,7 +90,8 @@ struct bcsp_struct {
- /* ---- BCSP CRC calculation ---- */
- 
- /* Table for calculating CRC for polynomial 0x1021, LSB processed first,
--initial value 0xffff, bits shifted in reverse order. */
-+ * initial value 0xffff, bits shifted in reverse order.
-+ */
- 
- static const u16 crc_table[] = {
- 	0x0000, 0x1081, 0x2102, 0x3183,
-@@ -174,7 +175,7 @@ static int bcsp_enqueue(struct hci_uart *hu, struct sk_buff *skb)
- }
- 
- static struct sk_buff *bcsp_prepare_pkt(struct bcsp_struct *bcsp, u8 *data,
--		int len, int pkt_type)
-+					int len, int pkt_type)
- {
- 	struct sk_buff *nskb;
- 	u8 hdr[4], chan;
-@@ -213,6 +214,7 @@ static struct sk_buff *bcsp_prepare_pkt(struct bcsp_struct *bcsp, u8 *data,
- 		/* Vendor specific commands */
- 		if (hci_opcode_ogf(__le16_to_cpu(opcode)) == 0x3f) {
- 			u8 desc = *(data + HCI_COMMAND_HDR_SIZE);
-+
- 			if ((desc & 0xf0) == 0xc0) {
- 				data += HCI_COMMAND_HDR_SIZE + 1;
- 				len  -= HCI_COMMAND_HDR_SIZE + 1;
-@@ -271,8 +273,8 @@ static struct sk_buff *bcsp_prepare_pkt(struct bcsp_struct *bcsp, u8 *data,
- 	/* Put CRC */
- 	if (bcsp->use_crc) {
- 		bcsp_txmsg_crc = bitrev16(bcsp_txmsg_crc);
--		bcsp_slip_one_byte(nskb, (u8) ((bcsp_txmsg_crc >> 8) & 0x00ff));
--		bcsp_slip_one_byte(nskb, (u8) (bcsp_txmsg_crc & 0x00ff));
-+		bcsp_slip_one_byte(nskb, (u8)((bcsp_txmsg_crc >> 8) & 0x00ff));
-+		bcsp_slip_one_byte(nskb, (u8)(bcsp_txmsg_crc & 0x00ff));
- 	}
- 
- 	bcsp_slip_msgdelim(nskb);
-@@ -287,7 +289,8 @@ static struct sk_buff *bcsp_dequeue(struct hci_uart *hu)
- 	struct sk_buff *skb;
- 
- 	/* First of all, check for unreliable messages in the queue,
--	   since they have priority */
-+	 * since they have priority
-+	 */
- 
- 	skb = skb_dequeue(&bcsp->unrel);
- 	if (skb != NULL) {
-@@ -414,7 +417,7 @@ static void bcsp_handle_le_pkt(struct hci_uart *hu)
- 
- 	/* spot "conf" pkts and reply with a "conf rsp" pkt */
- 	if (bcsp->rx_skb->data[1] >> 4 == 4 && bcsp->rx_skb->data[2] == 0 &&
--			!memcmp(&bcsp->rx_skb->data[4], conf_pkt, 4)) {
-+	    !memcmp(&bcsp->rx_skb->data[4], conf_pkt, 4)) {
- 		struct sk_buff *nskb = alloc_skb(4, GFP_ATOMIC);
- 
- 		BT_DBG("Found a LE conf pkt");
-@@ -428,7 +431,7 @@ static void bcsp_handle_le_pkt(struct hci_uart *hu)
- 	}
- 	/* Spot "sync" pkts. If we find one...disaster! */
- 	else if (bcsp->rx_skb->data[1] >> 4 == 4 && bcsp->rx_skb->data[2] == 0 &&
--			!memcmp(&bcsp->rx_skb->data[4], sync_pkt, 4)) {
-+		 !memcmp(&bcsp->rx_skb->data[4], sync_pkt, 4)) {
- 		BT_ERR("Found a LE sync pkt, card has reset");
- 	}
- }
-@@ -446,7 +449,7 @@ static inline void bcsp_unslip_one_byte(struct bcsp_struct *bcsp, unsigned char
- 		default:
- 			memcpy(skb_put(bcsp->rx_skb, 1), &byte, 1);
- 			if ((bcsp->rx_skb->data[0] & 0x40) != 0 &&
--					bcsp->rx_state != BCSP_W4_CRC)
-+			    bcsp->rx_state != BCSP_W4_CRC)
- 				bcsp_crc_update(&bcsp->message_crc, byte);
- 			bcsp->rx_count--;
- 		}
-@@ -457,7 +460,7 @@ static inline void bcsp_unslip_one_byte(struct bcsp_struct *bcsp, unsigned char
- 		case 0xdc:
- 			memcpy(skb_put(bcsp->rx_skb, 1), &c0, 1);
- 			if ((bcsp->rx_skb->data[0] & 0x40) != 0 &&
--					bcsp->rx_state != BCSP_W4_CRC)
-+			    bcsp->rx_state != BCSP_W4_CRC)
- 				bcsp_crc_update(&bcsp->message_crc, 0xc0);
- 			bcsp->rx_esc_state = BCSP_ESCSTATE_NOESC;
- 			bcsp->rx_count--;
-@@ -466,7 +469,7 @@ static inline void bcsp_unslip_one_byte(struct bcsp_struct *bcsp, unsigned char
- 		case 0xdd:
- 			memcpy(skb_put(bcsp->rx_skb, 1), &db, 1);
- 			if ((bcsp->rx_skb->data[0] & 0x40) != 0 &&
--					bcsp->rx_state != BCSP_W4_CRC)
-+			    bcsp->rx_state != BCSP_W4_CRC)
- 				bcsp_crc_update(&bcsp->message_crc, 0xdb);
- 			bcsp->rx_esc_state = BCSP_ESCSTATE_NOESC;
- 			bcsp->rx_count--;
-@@ -502,18 +505,18 @@ static void bcsp_complete_rx_pkt(struct hci_uart *hu)
- 
- 	bcsp_pkt_cull(bcsp);
- 	if ((bcsp->rx_skb->data[1] & 0x0f) == 6 &&
--			bcsp->rx_skb->data[0] & 0x80) {
-+	    bcsp->rx_skb->data[0] & 0x80) {
- 		hci_skb_pkt_type(bcsp->rx_skb) = HCI_ACLDATA_PKT;
- 		pass_up = 1;
- 	} else if ((bcsp->rx_skb->data[1] & 0x0f) == 5 &&
--			bcsp->rx_skb->data[0] & 0x80) {
-+		   bcsp->rx_skb->data[0] & 0x80) {
- 		hci_skb_pkt_type(bcsp->rx_skb) = HCI_EVENT_PKT;
- 		pass_up = 1;
- 	} else if ((bcsp->rx_skb->data[1] & 0x0f) == 7) {
- 		hci_skb_pkt_type(bcsp->rx_skb) = HCI_SCODATA_PKT;
- 		pass_up = 1;
- 	} else if ((bcsp->rx_skb->data[1] & 0x0f) == 1 &&
--			!(bcsp->rx_skb->data[0] & 0x80)) {
-+		   !(bcsp->rx_skb->data[0] & 0x80)) {
- 		bcsp_handle_le_pkt(hu);
- 		pass_up = 0;
- 	} else
-@@ -537,9 +540,9 @@ static void bcsp_complete_rx_pkt(struct hci_uart *hu)
- 				hci_recv_frame(hu->hdev, bcsp->rx_skb);
- 			} else {
- 				BT_ERR("Packet for unknown channel (%u %s)",
--					bcsp->rx_skb->data[1] & 0x0f,
--					bcsp->rx_skb->data[0] & 0x80 ?
--					"reliable" : "unreliable");
-+				       bcsp->rx_skb->data[1] & 0x0f,
-+				       bcsp->rx_skb->data[0] & 0x80 ?
-+				       "reliable" : "unreliable");
- 				kfree_skb(bcsp->rx_skb);
- 			}
- 		} else
-@@ -567,7 +570,7 @@ static int bcsp_recv(struct hci_uart *hu, const void *data, int count)
- 	const unsigned char *ptr;
- 
- 	BT_DBG("hu %p count %d rx_state %d rx_count %ld",
--		hu, count, bcsp->rx_state, bcsp->rx_count);
-+	       hu, count, bcsp->rx_state, bcsp->rx_count);
- 
- 	ptr = data;
- 	while (count) {
-@@ -586,18 +589,18 @@ static int bcsp_recv(struct hci_uart *hu, const void *data, int count)
- 
- 		switch (bcsp->rx_state) {
- 		case BCSP_W4_BCSP_HDR:
--			if ((0xff & (u8) ~ (bcsp->rx_skb->data[0] + bcsp->rx_skb->data[1] +
--					bcsp->rx_skb->data[2])) != bcsp->rx_skb->data[3]) {
-+			if ((0xff & (u8)~(bcsp->rx_skb->data[0] + bcsp->rx_skb->data[1] +
-+			    bcsp->rx_skb->data[2])) != bcsp->rx_skb->data[3]) {
- 				BT_ERR("Error in BCSP hdr checksum");
- 				kfree_skb(bcsp->rx_skb);
- 				bcsp->rx_state = BCSP_W4_PKT_DELIMITER;
- 				bcsp->rx_count = 0;
- 				continue;
- 			}
--			if (bcsp->rx_skb->data[0] & 0x80	/* reliable pkt */
--						&& (bcsp->rx_skb->data[0] & 0x07) != bcsp->rxseq_txack) {
-+			if (bcsp->rx_skb->data[0] & 0x80 &&	/* reliable pkt */
-+			    (bcsp->rx_skb->data[0] & 0x07) != bcsp->rxseq_txack) {
- 				BT_ERR("Out-of-order packet arrived, got %u expected %u",
--					bcsp->rx_skb->data[0] & 0x07, bcsp->rxseq_txack);
-+				       bcsp->rx_skb->data[0] & 0x07, bcsp->rxseq_txack);
- 
- 				kfree_skb(bcsp->rx_skb);
- 				bcsp->rx_state = BCSP_W4_PKT_DELIMITER;
-@@ -620,8 +623,8 @@ static int bcsp_recv(struct hci_uart *hu, const void *data, int count)
- 		case BCSP_W4_CRC:
- 			if (bitrev16(bcsp->message_crc) != bscp_get_crc(bcsp)) {
- 				BT_ERR("Checksum failed: computed %04x received %04x",
--					bitrev16(bcsp->message_crc),
--					bscp_get_crc(bcsp));
-+				       bitrev16(bcsp->message_crc),
-+				       bscp_get_crc(bcsp));
- 
- 				kfree_skb(bcsp->rx_skb);
- 				bcsp->rx_state = BCSP_W4_PKT_DELIMITER;
-@@ -679,7 +682,7 @@ static int bcsp_recv(struct hci_uart *hu, const void *data, int count)
- 	/* Arrange to retransmit all messages in the relq. */
- static void bcsp_timed_event(unsigned long arg)
- {
--	struct hci_uart *hu = (struct hci_uart *) arg;
-+	struct hci_uart *hu = (struct hci_uart *)arg;
- 	struct bcsp_struct *bcsp = hu->priv;
- 	struct sk_buff *skb;
- 	unsigned long flags;
-@@ -715,7 +718,7 @@ static int bcsp_open(struct hci_uart *hu)
- 
- 	init_timer(&bcsp->tbcsp);
- 	bcsp->tbcsp.function = bcsp_timed_event;
--	bcsp->tbcsp.data     = (u_long) hu;
-+	bcsp->tbcsp.data     = (u_long)hu;
- 
- 	bcsp->rx_state = BCSP_W4_PKT_DELIMITER;
- 
--- 
-2.7.4
+The 11 octets is a mgmt limit for the short name. We decided on that when inventing mgmt interface.
+
+> I don't undertand why not to include complete name if it fits, even if longer 
+> than 11 octets.
+
+Feel free to define the policy then. It gets really complicated if userspace wants to include appearance, name and then its own data. If the name occupies the rest. Also when to decide when to use the short name vs long name. If we limit at the short name size, then the policy is simple.
+
+>>> +
+>>> +	/* shortened name set and fits */
+>> 
+>> Just a note here, it is not called shortened name. It is the short name. We
+>> clearly separated the full name vs short name in the mgmt API.
+> 
+> It is called 'shortened' in both CoreSpec and CSS. 
+
+And short name in mgmt.
+
+Regards
+
+Marcel
+
