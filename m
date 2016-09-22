@@ -1,119 +1,62 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain; charset=utf-8
+Return-Path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 10.0 \(3226\))
-Subject: Re: [PATCH 1/3] Bluetooth: Fix local name in scan rsp
+Subject: Re: [PATCH] Bluetooth: btwilink: Save the packet type before sending
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <2407078.m1aT8J8x6x@ix>
-Date: Thu, 22 Sep 2016 21:56:32 +0200
-Cc: =?utf-8?Q?Micha=C5=82_Narajowski?= <michal.narajowski@codecoup.pl>,
-        linux-bluetooth@vger.kernel.org
-Message-Id: <391818D9-515B-4622-B07C-1BEB13437C8A@holtmann.org>
-References: <1474552899-3837-1-git-send-email-michal.narajowski@codecoup.pl>
- <9A1998C8-0404-4A27-B594-A55E2D80540D@holtmann.org> <2407078.m1aT8J8x6x@ix>
-To: Szymon Janc <szymon.janc@codecoup.pl>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1474568442-4810-1-git-send-email-labbott@redhat.com>
+Date: Thu, 22 Sep 2016 21:48:43 +0200
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        John Stultz <john.stultz@linaro.org>
+Message-Id: <D4615527-A180-477F-A944-3AD8CE082DF9@holtmann.org>
+References: <1474568442-4810-1-git-send-email-labbott@redhat.com>
+To: Laura Abbott <labbott@redhat.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi Laura,
 
->>> Use complete name if it fits. If not and there is short name
->>> check if it fits. If not then use shortened name as prefix
->>> of complete name.
->>> 
->>> Signed-off-by: Michał Narajowski <michal.narajowski@codecoup.pl>
->>> ---
->>> net/bluetooth/hci_request.c | 46
->>> +++++++++++++++++++++++++++++++++------------ 1 file changed, 34
->>> insertions(+), 12 deletions(-)
->>> 
->>> diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
->>> index c813568..880758c 100644
->>> --- a/net/bluetooth/hci_request.c
->>> +++ b/net/bluetooth/hci_request.c
->>> @@ -973,25 +973,47 @@ void __hci_req_enable_advertising(struct hci_request
->>> *req)
->>> 
->>> static u8 append_local_name(struct hci_dev *hdev, u8 *ptr, u8 ad_len)
->>> {
->>> -	size_t name_len;
->>> +	size_t complete_len;
->>> +	size_t short_len;
->>> 
->>> 	int max_len;
->>> 	
->>> 	max_len = HCI_MAX_AD_LENGTH - ad_len - 2;
->>> 
->>> -	name_len = strlen(hdev->dev_name);
->>> -	if (name_len > 0 && max_len > 0) {
->>> +	complete_len = strlen(hdev->dev_name);
->>> +	short_len = strlen(hdev->short_name);
->>> 
->>> -		if (name_len > max_len) {
->>> -			name_len = max_len;
->>> -			ptr[1] = EIR_NAME_SHORT;
->>> -		} else
->>> -			ptr[1] = EIR_NAME_COMPLETE;
->>> +	/* no space left for name */
->>> +	if (max_len < 1)
->>> +		return ad_len;
->>> 
->>> -		ptr[0] = name_len + 1;
->>> +	/* no name set */
->>> +	if (!complete_len)
->>> +		return ad_len;
->>> 
->>> -		memcpy(ptr + 2, hdev->dev_name, name_len);
->>> +	/* complete name fits */
->>> +	if (complete_len <= max_len) {
->>> +		ptr[0] = complete_len + 1;
->>> +		ptr[1] = EIR_NAME_COMPLETE;
->>> +		memcpy(ptr + 2, hdev->dev_name, complete_len);
->>> 
->>> -		ad_len += (name_len + 2);
->>> -		ptr += (name_len + 2);
->>> +		return ad_len + complete_len + 2;
->>> +	}
->> 
->> so what we discussed is that at minimum 11 octets of name will be included
->> into the scan response. That is the same size of the Short_name (which
->> includes the nul-byte).
+> Running with KASAN produces some messages:
 > 
-> minimum? And do we need to put null byte there?
-
-I think the term maximum would have been better. 1-11 octets of name should be included. For the nul-byte, we need to double check the spec., but I think it is required to be included. If not, then we can leave it out.
-
->> If the full name is 11 octets or smaller, then that is included. If the full
->> name is longer and a short name has been set, then the short name is used.
->> If the short name is not set, then the full name is truncated to 11 octets.
->> 
->> For the case where the full name is 11 octets or smaller, the complete tag
->> is used. For the case where the short name is used or the full name is
->> truncated, the partial tag is used.
+> BUG: KASAN: use-after-free in ti_st_send_frame+0x9c/0x16c at addr
+> ffffffc064868fe8
+> Read of size 1 by task kworker/u17:1/1266
 > 
-> So we never include full name if it is longer then 11 octets (with null)?
-> BTW where this 11 octets value came from? I cannot find such requirement in 
-> spec. Or this is just limited on mgmt interface level?
-
-Until we have longer advertising packets, I think the 11 octets sound like a good compromise. Userspace can always decide to drive scan response by itself. Or do you have a better idea for a policy?
-
-The 11 octets is a mgmt limit for the short name. We decided on that when inventing mgmt interface.
-
-> I don't undertand why not to include complete name if it fits, even if longer 
-> than 11 octets.
-
-Feel free to define the policy then. It gets really complicated if userspace wants to include appearance, name and then its own data. If the name occupies the rest. Also when to decide when to use the short name vs long name. If we limit at the short name size, then the policy is simple.
-
->>> +
->>> +	/* shortened name set and fits */
->> 
->> Just a note here, it is not called shortened name. It is the short name. We
->> clearly separated the full name vs short name in the mgmt API.
+> <KASAN output trimmed>
 > 
-> It is called 'shortened' in both CoreSpec and CSS. 
+> Hardware name: HiKey Development Board (DT)
+> Workqueue: hci0 hci_cmd_work
+> Call trace:
+> [<ffffffc00008c00c>] dump_backtrace+0x0/0x178
+> [<ffffffc00008c1a4>] show_stack+0x20/0x28
+> [<ffffffc00067da38>] dump_stack+0xa8/0xe0
+> [<ffffffc000288430>] print_trailer+0x110/0x174
+> [<ffffffc00028aedc>] object_err+0x4c/0x5c
+> [<ffffffc00028f714>] kasan_report_error+0x254/0x54c
+> [<ffffffc00028fa70>] kasan_report+0x64/0x70
+> [<ffffffc00028eb8c>] __asan_load1+0x4c/0x54
+> [<ffffffc000b59b24>] ti_st_send_frame+0x9c/0x16c
+> [<ffffffc000ee8dcc>] hci_send_frame+0xb4/0x118
+> [<ffffffc000ee8efc>] hci_cmd_work+0xcc/0x154
+> [<ffffffc0000f6c48>] process_one_work+0x26c/0x7a4
+> [<ffffffc0000f721c>] worker_thread+0x9c/0x73c
+> [<ffffffc000100250>] kthread+0x138/0x154
+> [<ffffffc000085c50>] ret_from_fork+0x10/0x40
+> 
+> The packet is being accessed for statistics after it has been freed.
+> Save the packet type before sending for statistics afterwards.
+> 
+> Signed-off-by: Laura Abbott <labbott@redhat.com>
+> ---
+> Originally found and tested on 4.4 based branch.
+> ---
+> drivers/bluetooth/btwilink.c | 4 +++-
+> 1 file changed, 3 insertions(+), 1 deletion(-)
 
-And short name in mgmt.
+patch has been applied to bluetooth-next tree.
 
 Regards
 
 Marcel
-
