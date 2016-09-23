@@ -4,136 +4,98 @@ To: Dean Jenkins <Dean_Jenkins@mentor.com>, Marcel Holtmann
 	<marcel@holtmann.org>, Gustavo Padovan <gustavo@padovan.org>, Johan Hedberg
 	<johan.hedberg@gmail.com>
 CC: <linux-bluetooth@vger.kernel.org>
-Subject: [PATCH V2 6/7] Revert "Bluetooth: hci_ldisc: Fix null pointer derefence in case of early data"
-Date: Fri, 23 Sep 2016 18:56:31 +0100
-Message-ID: <1474653392-28770-7-git-send-email-Dean_Jenkins@mentor.com>
+Subject: [PATCH V2 5/7] Bluetooth: Fix HCI UART HCI_UART_PROTO_SET locking
+Date: Fri, 23 Sep 2016 18:56:30 +0100
+Message-ID: <1474653392-28770-6-git-send-email-Dean_Jenkins@mentor.com>
 In-Reply-To: <1474653392-28770-1-git-send-email-Dean_Jenkins@mentor.com>
 References: <1474653392-28770-1-git-send-email-Dean_Jenkins@mentor.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This reverts commit 84cb3df02aea4b00405521e67c4c67c2d525c364.
+From: Vignesh Raman <Vignesh_Raman@mentor.com>
 
-This commit solved the specific race condition mentioned in the commit:
+Here is a NULL pointer dereference that causes a Bluetooth crash:
 
-"HCI_UART_PROTO_SET flag is set before hci_uart_set_proto call. If we
-receive data from tty layer during this procedure, proto pointer may
-not be assigned yet, leading to null pointer dereference in rx
-method hci_uart_tty_receive.
+(hci_uart_tty_receive+0x0/0x84 [hci_uart]) from (flush_to_ldisc+0x104/0x190)
+(flush_to_ldisc+0x0/0x190) from (tty_flip_buffer_push+0x50/0x5c)
+(tty_flip_buffer_push+0x0/0x5c) from (imx_rxint+0x228/0x23c)
+(imx_rxint+0x0/0x23c) from (imx_int+0xa8/0x174)
+(imx_int+0x0/0x174) from (handle_irq_event_percpu+0x90/0x280)
+(handle_irq_event_percpu+0x0/0x280) from (handle_irq_event+0x44/0x64)
+(handle_irq_event+0x0/0x64) from (handle_fasteoi_irq+0xc0/0x108)
+(handle_fasteoi_irq+0x0/0x108) from (generic_handle_irq+0x28/0x38)
+(generic_handle_irq+0x0/0x38) from (handle_IRQ+0x6c/0x94)
+(handle_IRQ+0x0/0x94) from (gic_handle_irq+0x44/0x68)
+(gic_handle_irq+0x0/0x68) from (__irq_svc+0x40/0x70)
+(bcsp_open+0x0/0xcc [hci_uart]) from (hci_uart_tty_ioctl+0xa8/0x238 [hci_uart])
+(hci_uart_tty_ioctl+0x0/0x238 [hci_uart]) from (tty_ioctl+0xa88/0xae8)
+(tty_ioctl+0x0/0xae8) from (vfs_ioctl+0x30/0x44)
+(vfs_ioctl+0x0/0x44) from (do_vfs_ioctl+0x53c/0x590)
+(do_vfs_ioctl+0x0/0x590) from (sys_ioctl+0x40/0x68)
+(sys_ioctl+0x0/0x68) from (ret_fast_syscall+0x0/0x30)
 
-This patch fixes this issue by introducing HCI_UART_PROTO_READY flag
-in order to avoid any proto operation before proto opening and
-assignment."
+It can be seen that bcsp_open() is pre-empted by an interrupt relating
+to reception of UART characters. bcsp_open() is called from
+hci_uart_set_proto() which is called from hci_uart_tty_ioctl() due to
+HCIUARTSETPROTO handling.
 
-The design of the commit seems to be attempting to implement a
-lockless solution by relying on atomic variables.
+The crash occurs in hci_uart_tty_receive() and analysis shows:
+	if (!test_bit(HCI_UART_PROTO_SET, &hu->flags))
+		return;
 
-However, HCI_UART_PROTO_READY introduces a race condition here:
+	spin_lock(&hu->rx_lock);
+	hu->proto->recv(hu, (void *) data, count);
 
-static int hci_uart_set_proto(struct hci_uart *hu,
-...
-        hu->proto = p;
-+       set_bit(HCI_UART_PROTO_READY, &hu->flags);
+The crash occurs in the dereference hu->proto->recv. Presumably no recv
+function has been set and a NULL pointer dereference occurs.
 
-        err = hci_uart_register_dev(hu);
-        if (err) {
-+               clear_bit(HCI_UART_PROTO_READY, &hu->flags);
-                p->close(hu);
-                return err;
-        }
+Note that the flag HCI_UART_PROTO_SET being clear should prevent the failure
+but in fact fails. This indicates that HCI_UART_PROTO_SET is in the set state.
 
-The issue here is that hci_uart_register_dev() allocates the
-memory for hu->hdev and HCI_UART_PROTO_READY is set before
-hdev is allocated. This means there is a risk that an unallocated hdev
-is accessed because HCI_UART_PROTO_READY is set too early.
+The HCI_UART_PROTO_SET locking fails because HCI_UART_PROTO_SET is put into
+the set state in hci_uart_tty_ioctl() BEFORE calling hci_uart_set_proto()
+to set the recv function pointer. Therefore, there is a race condition.
 
-For example, hci_uart_tty_wakeup() used the HCI_UART_PROTO_READY flag
-which means a transmission work item could potentially be scheduled
-in hci_uart_tx_wakeup() when hdev has not been allocated.
+It would seem that HCI_UART_PROTO_SET was being used as a dual flag:
 
-Instead use a solution using locking supplied in commits:
-"Bluetooth: Use single return in hci_uart_tty_ioctl() call"
-"Bluetooth: Add mutex to hci_uart_tty_ioctl()"
-"Bluetooth: Fix HCI UART HCI_UART_PROTO_SET locking"
+a) HCI_UART_PROTO_SET being used to indicate the protocol Data Link
+layer had been successfully opened.
 
+b) HCI_UART_PROTO_SET being used as a lockless solution for
+hci_uart_tty_ioctl(). (mutex now added by a previous commit to prevent
+concurrency so HCI_UART_PROTO_SET no longer needs to fill that role.)
+
+The solution is to set the flag HCI_UART_PROTO_SET after successfully
+calling hci_uart_set_proto() in the HCIUARTSETPROTO handling in
+hci_uart_tty_ioctl(). This will prevent hci_uart_tty_receive() from
+performing the recv function pointer dereference until hci_uart_set_proto()
+has set the recv function pointer.
+
+Signed-off-by: Vignesh Raman <Vignesh_Raman@mentor.com>
 Signed-off-by: Dean Jenkins <Dean_Jenkins@mentor.com>
+Signed-off-by: Mark Craske <Mark_Craske@mentor.com>
 ---
- drivers/bluetooth/hci_ldisc.c | 11 ++++-------
- drivers/bluetooth/hci_uart.h  |  1 -
- 2 files changed, 4 insertions(+), 8 deletions(-)
+ drivers/bluetooth/hci_ldisc.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
-index 1fc9817..499fb09 100644
+index 01590f6..1fc9817 100644
 --- a/drivers/bluetooth/hci_ldisc.c
 +++ b/drivers/bluetooth/hci_ldisc.c
-@@ -229,7 +229,7 @@ static int hci_uart_flush(struct hci_dev *hdev)
- 	tty_ldisc_flush(tty);
- 	tty_driver_flush_buffer(tty);
- 
--	if (test_bit(HCI_UART_PROTO_READY, &hu->flags))
-+	if (test_bit(HCI_UART_PROTO_SET, &hu->flags))
- 		hu->proto->flush(hu);
- 
- 	return 0;
-@@ -494,7 +494,7 @@ static void hci_uart_tty_close(struct tty_struct *tty)
- 
- 	cancel_work_sync(&hu->write_work);
- 
--	if (test_and_clear_bit(HCI_UART_PROTO_READY, &hu->flags)) {
-+	if (test_and_clear_bit(HCI_UART_PROTO_SET, &hu->flags)) {
- 		if (hdev) {
- 			if (test_bit(HCI_UART_REGISTERED, &hu->flags))
- 				hci_unregister_dev(hdev);
-@@ -502,7 +502,6 @@ static void hci_uart_tty_close(struct tty_struct *tty)
- 		}
- 		hu->proto->close(hu);
- 	}
--	clear_bit(HCI_UART_PROTO_SET, &hu->flags);
- 
- 	kfree(hu);
- }
-@@ -529,7 +528,7 @@ static void hci_uart_tty_wakeup(struct tty_struct *tty)
- 	if (tty != hu->tty)
- 		return;
- 
--	if (test_bit(HCI_UART_PROTO_READY, &hu->flags))
-+	if (test_bit(HCI_UART_PROTO_SET, &hu->flags))
- 		hci_uart_tx_wakeup(hu);
- }
- 
-@@ -553,7 +552,7 @@ static void hci_uart_tty_receive(struct tty_struct *tty, const u8 *data,
- 	if (!hu || tty != hu->tty)
- 		return;
- 
--	if (!test_bit(HCI_UART_PROTO_READY, &hu->flags))
-+	if (!test_bit(HCI_UART_PROTO_SET, &hu->flags))
- 		return;
- 
- 	/* It does not need a lock here as it is already protected by a mutex in
-@@ -641,11 +640,9 @@ static int hci_uart_set_proto(struct hci_uart *hu, int id)
- 		return err;
- 
- 	hu->proto = p;
--	set_bit(HCI_UART_PROTO_READY, &hu->flags);
- 
- 	err = hci_uart_register_dev(hu);
- 	if (err) {
--		clear_bit(HCI_UART_PROTO_READY, &hu->flags);
- 		p->close(hu);
- 		return err;
- 	}
-diff --git a/drivers/bluetooth/hci_uart.h b/drivers/bluetooth/hci_uart.h
-index 0701395..f0707f4 100644
---- a/drivers/bluetooth/hci_uart.h
-+++ b/drivers/bluetooth/hci_uart.h
-@@ -97,7 +97,6 @@ struct hci_uart {
- /* HCI_UART proto flag bits */
- #define HCI_UART_PROTO_SET	0
- #define HCI_UART_REGISTERED	1
--#define HCI_UART_PROTO_READY	2
- 
- /* TX states  */
- #define HCI_UART_SENDING	1
+@@ -698,10 +698,10 @@ static int hci_uart_tty_ioctl(struct tty_struct *tty, struct file *file,
+ 	mutex_lock(&ioctl_mutex);
+ 	switch (cmd) {
+ 	case HCIUARTSETPROTO:
+-		if (!test_and_set_bit(HCI_UART_PROTO_SET, &hu->flags)) {
++		if (!test_bit(HCI_UART_PROTO_SET, &hu->flags)) {
+ 			err = hci_uart_set_proto(hu, arg);
+-			if (err)
+-				clear_bit(HCI_UART_PROTO_SET, &hu->flags);
++			if (!err)
++				set_bit(HCI_UART_PROTO_SET, &hu->flags);
+ 		} else
+ 			err = -EBUSY;
+ 		break;
 -- 
 2.7.4
