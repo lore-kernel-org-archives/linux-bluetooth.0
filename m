@@ -1,44 +1,43 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 10.0 \(3226\))
-Subject: Re: [PATCH V2 4/7] Bluetooth: Add mutex to hci_uart_tty_ioctl()
+Subject: Re: [PATCH V2 0/7] Bluetooth HCI LDISC and BCSP fixes
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1474653392-28770-5-git-send-email-Dean_Jenkins@mentor.com>
-Date: Sat, 24 Sep 2016 06:41:40 +0200
+In-Reply-To: <1474653392-28770-1-git-send-email-Dean_Jenkins@mentor.com>
+Date: Sat, 24 Sep 2016 06:41:38 +0200
 Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
         linux-bluetooth@vger.kernel.org
-Message-Id: <1E61CF84-3998-49C6-BDD7-C4E6A87B3BBC@holtmann.org>
+Message-Id: <309CAC2D-5247-4D30-BB70-CE905C875516@holtmann.org>
 References: <1474653392-28770-1-git-send-email-Dean_Jenkins@mentor.com>
- <1474653392-28770-5-git-send-email-Dean_Jenkins@mentor.com>
 To: Dean Jenkins <Dean_Jenkins@mentor.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Dean,
 
-> Add global mutex lock to prevent reentrancy in the hci_uart_tty_ioctl()
-> ioctl handling. This prevents concurrency of all function calls within
-> hci_uart_tty_ioctl() handling including hci_uart_set_proto().
+> This patchset contains the following commits:
 > 
-> Signed-off-by: Vignesh Raman <Vignesh_Raman@mentor.com>
-> Signed-off-by: Dean Jenkins <Dean_Jenkins@mentor.com>
-> ---
-> drivers/bluetooth/hci_ldisc.c | 4 ++++
-> 1 file changed, 4 insertions(+)
+> Dean Jenkins (4):
+>  Bluetooth: Tidy-up coding style in hci_bcsp.c
+>  Bluetooth: BCSP fails to ACK re-transmitted frames from the peer
+>  Bluetooth: Add mutex to hci_uart_tty_ioctl()
+>  Revert "Bluetooth: hci_ldisc: Fix null pointer derefence in case of
+>    early data"
 > 
-> diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
-> index 9497c46..01590f6 100644
-> --- a/drivers/bluetooth/hci_ldisc.c
-> +++ b/drivers/bluetooth/hci_ldisc.c
-> @@ -51,6 +51,8 @@
+> Deepak Das (1):
+>  Bluetooth: Prevent scheduling of work after hci_uart_tty_close()
 > 
-> #define VERSION "2.3"
+> Vignesh Raman (2):
+>  Bluetooth: Use single return in hci_uart_tty_ioctl() call
+>  Bluetooth: Fix HCI UART HCI_UART_PROTO_SET locking
 > 
-> +static DEFINE_MUTEX(ioctl_mutex);
-> +
+> drivers/bluetooth/hci_bcsp.c  | 128 ++++++++++++++++++++++++------------------
+> drivers/bluetooth/hci_ldisc.c |  63 +++++++++++++--------
+> drivers/bluetooth/hci_uart.h  |   4 +-
+> 3 files changed, 117 insertions(+), 78 deletions(-)
 
-explain to me why we need a global lock. I think that look can be per struct hci_uart.
+I applied patches 1-3 to bluetooth-next tree.
 
 Regards
 
