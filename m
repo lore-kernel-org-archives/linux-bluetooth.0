@@ -1,96 +1,106 @@
-Return-Path: <netdev-owner@vger.kernel.org>
-Date: Sun, 25 Sep 2016 15:42:38 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: davem@davemloft.net
-Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: pull request: bluetooth-next 2016-09-25
-Message-ID: <20160925124238.GA19411@t440s.P-661HNU-F1>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-        protocol="application/pgp-signature"; boundary="bg08WKrSYDhXBjb5"
-Sender: netdev-owner@vger.kernel.org
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 10.0 \(3226\))
+Subject: Re: [PATCH V2 5/7] Bluetooth: Fix HCI UART HCI_UART_PROTO_SET locking
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1474653392-28770-6-git-send-email-Dean_Jenkins@mentor.com>
+Date: Sat, 24 Sep 2016 06:41:42 +0200
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-bluetooth@vger.kernel.org
+Message-Id: <4B493FC9-949B-4110-8281-4FAE90B43C11@holtmann.org>
+References: <1474653392-28770-1-git-send-email-Dean_Jenkins@mentor.com>
+ <1474653392-28770-6-git-send-email-Dean_Jenkins@mentor.com>
+To: Dean Jenkins <Dean_Jenkins@mentor.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Dean,
 
---bg08WKrSYDhXBjb5
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> Here is a NULL pointer dereference that causes a Bluetooth crash:
+> 
+> (hci_uart_tty_receive+0x0/0x84 [hci_uart]) from (flush_to_ldisc+0x104/0x190)
+> (flush_to_ldisc+0x0/0x190) from (tty_flip_buffer_push+0x50/0x5c)
+> (tty_flip_buffer_push+0x0/0x5c) from (imx_rxint+0x228/0x23c)
+> (imx_rxint+0x0/0x23c) from (imx_int+0xa8/0x174)
+> (imx_int+0x0/0x174) from (handle_irq_event_percpu+0x90/0x280)
+> (handle_irq_event_percpu+0x0/0x280) from (handle_irq_event+0x44/0x64)
+> (handle_irq_event+0x0/0x64) from (handle_fasteoi_irq+0xc0/0x108)
+> (handle_fasteoi_irq+0x0/0x108) from (generic_handle_irq+0x28/0x38)
+> (generic_handle_irq+0x0/0x38) from (handle_IRQ+0x6c/0x94)
+> (handle_IRQ+0x0/0x94) from (gic_handle_irq+0x44/0x68)
+> (gic_handle_irq+0x0/0x68) from (__irq_svc+0x40/0x70)
+> (bcsp_open+0x0/0xcc [hci_uart]) from (hci_uart_tty_ioctl+0xa8/0x238 [hci_uart])
+> (hci_uart_tty_ioctl+0x0/0x238 [hci_uart]) from (tty_ioctl+0xa88/0xae8)
+> (tty_ioctl+0x0/0xae8) from (vfs_ioctl+0x30/0x44)
+> (vfs_ioctl+0x0/0x44) from (do_vfs_ioctl+0x53c/0x590)
+> (do_vfs_ioctl+0x0/0x590) from (sys_ioctl+0x40/0x68)
+> (sys_ioctl+0x0/0x68) from (ret_fast_syscall+0x0/0x30)
+> 
+> It can be seen that bcsp_open() is pre-empted by an interrupt relating
+> to reception of UART characters. bcsp_open() is called from
+> hci_uart_set_proto() which is called from hci_uart_tty_ioctl() due to
+> HCIUARTSETPROTO handling.
+> 
+> The crash occurs in hci_uart_tty_receive() and analysis shows:
+> 	if (!test_bit(HCI_UART_PROTO_SET, &hu->flags))
+> 		return;
+> 
+> 	spin_lock(&hu->rx_lock);
+> 	hu->proto->recv(hu, (void *) data, count);
+> 
+> The crash occurs in the dereference hu->proto->recv. Presumably no recv
+> function has been set and a NULL pointer dereference occurs.
+> 
+> Note that the flag HCI_UART_PROTO_SET being clear should prevent the failure
+> but in fact fails. This indicates that HCI_UART_PROTO_SET is in the set state.
+> 
+> The HCI_UART_PROTO_SET locking fails because HCI_UART_PROTO_SET is put into
+> the set state in hci_uart_tty_ioctl() BEFORE calling hci_uart_set_proto()
+> to set the recv function pointer. Therefore, there is a race condition.
+> 
+> It would seem that HCI_UART_PROTO_SET was being used as a dual flag:
+> 
+> a) HCI_UART_PROTO_SET being used to indicate the protocol Data Link
+> layer had been successfully opened.
+> 
+> b) HCI_UART_PROTO_SET being used as a lockless solution for
+> hci_uart_tty_ioctl(). (mutex now added by a previous commit to prevent
+> concurrency so HCI_UART_PROTO_SET no longer needs to fill that role.)
+> 
+> The solution is to set the flag HCI_UART_PROTO_SET after successfully
+> calling hci_uart_set_proto() in the HCIUARTSETPROTO handling in
+> hci_uart_tty_ioctl(). This will prevent hci_uart_tty_receive() from
+> performing the recv function pointer dereference until hci_uart_set_proto()
+> has set the recv function pointer.
+> 
+> Signed-off-by: Vignesh Raman <Vignesh_Raman@mentor.com>
+> Signed-off-by: Dean Jenkins <Dean_Jenkins@mentor.com>
+> Signed-off-by: Mark Craske <Mark_Craske@mentor.com>
+> ---
+> drivers/bluetooth/hci_ldisc.c | 6 +++---
+> 1 file changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
+> index 01590f6..1fc9817 100644
+> --- a/drivers/bluetooth/hci_ldisc.c
+> +++ b/drivers/bluetooth/hci_ldisc.c
+> @@ -698,10 +698,10 @@ static int hci_uart_tty_ioctl(struct tty_struct *tty, struct file *file,
+> 	mutex_lock(&ioctl_mutex);
+> 	switch (cmd) {
+> 	case HCIUARTSETPROTO:
+> -		if (!test_and_set_bit(HCI_UART_PROTO_SET, &hu->flags)) {
+> +		if (!test_bit(HCI_UART_PROTO_SET, &hu->flags)) {
+> 			err = hci_uart_set_proto(hu, arg);
+> -			if (err)
+> -				clear_bit(HCI_UART_PROTO_SET, &hu->flags);
+> +			if (!err)
+> +				set_bit(HCI_UART_PROTO_SET, &hu->flags);
+> 		} else
 
-Hi Dave,
+the extensive commit message is great, but can be get a small comment included here why we are doing it this way. I think that would help to accidentally revert it back to what it was in the future.
 
-Here are a few more Bluetooth & 802.15.4 patches for the 4.9 kernel that
-have popped up during the past week:
+Regards
 
- - New USB ID for QCA_ROME Bluetooth device
- - NULL pointer dereference fix for Bluetooth mgmt sockets
- - Fixes for BCSP driver
- - Fix for updating LE scan response
+Marcel
 
-Please let me know if there are any issues pulling. Thanks.
-
-Johan
-
----
-The following changes since commit cdd0766d7da19085e88df86d1e5e21d9fe3d374f:
-
-  Merge branch 'ftgmac100-ast2500-support' (2016-09-22 03:31:22 -0400)
-
-are available in the git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.gi=
-t for-upstream
-
-for you to fetch changes up to 056506944a58814e5767d55ef6389aa2ab06908c:
-
-  Bluetooth: Use single return in hci_uart_tty_ioctl() call (2016-09-24 06:=
-40:24 +0200)
-
-----------------------------------------------------------------
-Arek Lichwa (1):
-      Bluetooth: Fix NULL pointer dereference in mgmt context
-
-Dean Jenkins (2):
-      Bluetooth: Tidy-up coding style in hci_bcsp.c
-      Bluetooth: BCSP fails to ACK re-transmitted frames from the peer
-
-Dmitry Tunin (1):
-      Bluetooth: Add a new 04ca:3011 QCA_ROME device
-
-Laura Abbott (1):
-      Bluetooth: btwilink: Save the packet type before sending
-
-Micha=C5=82 Narajowski (1):
-      Bluetooth: Fix not updating scan rsp when adv off
-
-Vignesh Raman (1):
-      Bluetooth: Use single return in hci_uart_tty_ioctl() call
-
- drivers/bluetooth/btusb.c     |   1 +
- drivers/bluetooth/btwilink.c  |   4 +-
- drivers/bluetooth/hci_bcsp.c  | 128 ++++++++++++++++++++---------------
- drivers/bluetooth/hci_ldisc.c |  28 ++++----
- net/bluetooth/mgmt.c          |   4 +-
- 5 files changed, 96 insertions(+), 69 deletions(-)
-
---bg08WKrSYDhXBjb5
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIcBAEBAgAGBQJX58Y+AAoJECQj9vv5qNQSjrsP/R7/9SpGNaJdYMuYJ2BIila4
-0ull+Qxs+HZTYjoxcYmyoLneEcb/DFPZfI61IPfSbElgOuxml00+rHW7DHYd6WtM
-xBjMIebcqG8uSM/18rQsWA8bst08FWWDwtGyjrcSItvKc5tAjRVfeUAPWzsRxL63
-YWvo8BBYzXQ2kcVY/agDLrJF9Og8+R26GqWAN7Lderu4dKiszv4fiAoknz67wz4X
-zfsnI13zCywd02QU4y3lNksPTAzG+aNqYgAgLfh+55CoN+K6RGjNgR5gI1Zl7jcZ
-fIgQ1A6EMhr1zxpZ5lepb7469DrSp7883bBq2hNvPYlF+beYAkzO/drd0MYKJzft
-aBGUV6qnVDiomOC87mNq+/nf64fViyLmuy6ld/iot3YXbZzrsbQZEXjbRWtVm7je
-QajHKfgzXimsLNmncLT6SS5t+ovcUUijxgSYVN095IfYeh7s4S6ZrlqQUsAr0L4L
-JTXBN1lLQ+IzwCUNFvTcNpt+zt1Atg9BEQOVnI1neKMAnaZ2N45LwvUbuB0SYacQ
-8WdFoTNdFgsy3gOw8XMeZessE099sLk/XO1CcQoHhqbrTuqEoflT5gV4NL75bg19
-oUiUE9Nn3pOr3HOCav3hqJnbwkFg61bP14wKarawlOM8W9po7KY8fBYNzXu60DJO
-8zmZOIsoS6L9pfDYvnuT
-=JGCj
------END PGP SIGNATURE-----
-
---bg08WKrSYDhXBjb5--
