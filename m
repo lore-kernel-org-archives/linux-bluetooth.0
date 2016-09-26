@@ -1,28 +1,28 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 10.0 \(3226\))
-Subject: Re: [PATCH 1/2] tools: Add identifier for Nokia UART devices
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1474355419-15042-1-git-send-email-loic.poulain@intel.com>
-Date: Mon, 26 Sep 2016 09:16:23 +0200
-Cc: Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org
-Message-Id: <50D36C70-DEF6-4D3C-AC4E-F1DBF2D73334@holtmann.org>
-References: <1474355419-15042-1-git-send-email-loic.poulain@intel.com>
-To: Loic Poulain <loic.poulain@intel.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <netdev-owner@vger.kernel.org>
+Date: Sun, 25 Sep 2016 23:53:44 -0400 (EDT)
+Message-Id: <20160925.235344.1988547418818225600.davem@davemloft.net>
+To: johan.hedberg@gmail.com
+Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: pull request: bluetooth-next 2016-09-25
+From: David Miller <davem@davemloft.net>
+In-Reply-To: <20160925124238.GA19411@t440s.P-661HNU-F1>
+References: <20160925124238.GA19411@t440s.P-661HNU-F1>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Sender: netdev-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Loic,
+From: Johan Hedberg <johan.hedberg@gmail.com>
+Date: Sun, 25 Sep 2016 15:42:38 +0300
 
-> ---
-> tools/btattach.c  | 1 +
-> tools/hciattach.h | 1 +
-> 2 files changed, 2 insertions(+)
+> Here are a few more Bluetooth & 802.15.4 patches for the 4.9 kernel that
+> have popped up during the past week:
+> 
+>  - New USB ID for QCA_ROME Bluetooth device
+>  - NULL pointer dereference fix for Bluetooth mgmt sockets
+>  - Fixes for BCSP driver
+>  - Fix for updating LE scan response
+> 
+> Please let me know if there are any issues pulling. Thanks.
 
-patch has been applied.
-
-Regards
-
-Marcel
-
+Pulled, thanks Johan.
