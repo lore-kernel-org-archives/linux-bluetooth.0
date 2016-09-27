@@ -1,39 +1,49 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: "Reizer, Eyal" <eyalr@ti.com>
-To: "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "linux-omap@vger.kernel.org" <linux-omap@vger.kernel.org>
-CC: Rob Herring <robh@kernel.org>
-Subject: [RFC] wilink8-bluetooth: reading uart parametrs and enable pin info
- from device tree
-Date: Tue, 27 Sep 2016 10:35:57 +0000
-Message-ID: <8665E2433BC68541A24DFFCA87B70F5B361A3A3E@DFRE01.ent.ti.com>
-Content-Type: text/plain; charset="iso-8859-1"
-MIME-Version: 1.0
+From: Mat Martineau <mathew.j.martineau@linux.intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Mat Martineau <mathew.j.martineau@linux.intel.com>
+Subject: [PATCH BlueZ v2] tools: Fix recevied/received typos
+Date: Mon, 26 Sep 2016 17:03:12 -0700
+Message-Id: <20160927000312.1275-1-mathew.j.martineau@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-All,
+---
 
-The wl18xx family of chips include a Bluetooth subsystem which uses a UART 
-for HCI communication and a gpio as an enable pin.
+I removed the ubcsp.c change because the file's CRLF line endings were
+causing problems with git-am, and since the spelling problem there is
+not user-visible.
 
-See the following architecture diagram:
-http://www.ti.com/general/docs/datasheetdiagram.tsp?genericPartNumber=WL1837MOD&diagramId=SWRS170H
+ tools/l2test.c  | 2 +-
+ tools/scotest.c | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-In case we want to build an image that when it boots up, Bluetooth is enbled 
-out of the box we can pass this info to a user space app/script that would pick 
-the selected gpio, enable it and launch the bleutooth stack (using hciattach).
-
-The question is what would be the right practice for passing these parameters.
-As there is no kernel driver looking for this info and it is needed mainly 
-By user space, should we use something like the chosen node?
-If yes, would it be right to add a new chosen node entry, or just add additional
-Parameters to bootargs?
-Any other suggestion?
-
-Best Regards,
-Eyal Reizer
-
-
+diff --git a/tools/l2test.c b/tools/l2test.c
+index d4e3ae6..1819423 100644
+--- a/tools/l2test.c
++++ b/tools/l2test.c
+@@ -830,7 +830,7 @@ static void dump_mode(int sk)
+ 			return;
+ 		}
+ 
+-		syslog(LOG_INFO, "Recevied %d bytes", len);
++		syslog(LOG_INFO, "Received %d bytes", len);
+ 		hexdump(buf, len);
+ 	}
+ }
+diff --git a/tools/scotest.c b/tools/scotest.c
+index 596e403..f894c24 100644
+--- a/tools/scotest.c
++++ b/tools/scotest.c
+@@ -265,7 +265,7 @@ static void dump_mode(int sk)
+ 
+ 	syslog(LOG_INFO,"Receiving ...");
+ 	while ((len = read(sk, buf, data_size)) > 0)
+-		syslog(LOG_INFO, "Recevied %d bytes", len);
++		syslog(LOG_INFO, "Received %d bytes", len);
+ }
+ 
+ static void recv_mode(int sk)
+-- 
+2.10.0
 
