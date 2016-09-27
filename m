@@ -1,31 +1,49 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Date: Tue, 27 Sep 2016 17:54:56 +0300
-From: jukka.oravasaari@saunalahti.fi
-To: linux-bluetooth@vger.kernel.org
-Subject: LE =?UTF-8?Q?scatternet=3F?=
-Message-ID: <e29c33a0fc8b91a7bb2d5f7d56ad736a@be408.mail.saunalahti.fi>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 10.0 \(3226\))
+Subject: Re: [RFC] wilink8-bluetooth: reading uart parametrs and enable pin
+ info from device tree
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <8665E2433BC68541A24DFFCA87B70F5B361A3A3E@DFRE01.ent.ti.com>
+Date: Tue, 27 Sep 2016 13:16:18 +0200
+Cc: "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "linux-omap@vger.kernel.org" <linux-omap@vger.kernel.org>,
+        Rob Herring <robh@kernel.org>
+Message-Id: <08201AAB-F999-466D-A003-93FFFA5EE517@holtmann.org>
+References: <8665E2433BC68541A24DFFCA87B70F5B361A3A3E@DFRE01.ent.ti.com>
+To: "Reizer, Eyal" <eyalr@ti.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bluez-developers!
+Hi Eyal,
 
-I have a question regarding Bluez support of Low-Energy Topologies that 
-were introduced in Bluetooth Core Spec v4.1 (chapter 4.1.2 LE Topology). 
-LE Link Layer Topology is a category 3 feature and thus it requires 
-support in controller. Bluetooth Core Spec v4.0 added command LE Read 
-Supported States for host to be able to query states and state 
-combinations supported by the controller. There seems to be some 
-hard-coding in recent kernel code assuming controller not to support 
-certain states. Do you have plans to make this dynamic and thus to 
-enable LE scatternet functionality allowing also parallel GATT central 
-and peripheral functionality? By searching the archive I found  
-following thread but I would like to know the current status. Thanks.
+> The wl18xx family of chips include a Bluetooth subsystem which uses a UART 
+> for HCI communication and a gpio as an enable pin.
+> 
+> See the following architecture diagram:
+> http://www.ti.com/general/docs/datasheetdiagram.tsp?genericPartNumber=WL1837MOD&diagramId=SWRS170H
+> 
+> In case we want to build an image that when it boots up, Bluetooth is enbled 
+> out of the box we can pass this info to a user space app/script that would pick 
+> the selected gpio, enable it and launch the bleutooth stack (using hciattach).
+> 
+> The question is what would be the right practice for passing these parameters.
+> As there is no kernel driver looking for this info and it is needed mainly 
+> By user space, should we use something like the chosen node?
+> If yes, would it be right to add a new chosen node entry, or just add additional
+> Parameters to bootargs?
+> Any other suggestion?
 
-http://marc.info/?l=linux-bluetooth&m=141777346308734&w=2
+actually that is a job for DT to describe the GPIO and then let the driver handle it. See how we do it with ACPI provided information for Intel and Broadcom UART drivers.
 
-Best regards,
-Jukka
+The goal is that btattach just attaches the line discipline. And anything else is done via the driver on hdev->setup or when bringing up the controller. That is how we drive all the other UART chips now.
+
+As a side note, I would also prefer that the TI-ST part gets cleaned up. We have devres and other devices stacked on top of the Bluetooth HCI should be exposed as slaves. See the Intel driver for an example.
+
+At some point we might get the serial / UART bus that has been recently discussed. That would be even better and btattach would not be needed at all. The driver would attach itself. However we still need to drive the GPIO from the driver and not some external user space program. That is not going to fly.
+
+Regards
+
+Marcel
 
