@@ -1,35 +1,24 @@
-Return-Path: <marvell@marvell.com>
-From: Amitkumar Karwar <akarwar@marvell.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <marcel@holtmann.org>, <gustavo@padovan.org>, <huxm@marvell.com>,
-        Amitkumar Karwar <akarwar@marvell.com>
-Subject: [PATCH] Bluetooth: btusb: add entry for Marvell 8997 chipset
-Date: Wed, 28 Sep 2016 16:18:35 +0530
-Message-ID: <1475059715-6174-1-git-send-email-akarwar@marvell.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 10.0 \(3226\))
+Subject: Re: LE scatternet?
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <e29c33a0fc8b91a7bb2d5f7d56ad736a@be408.mail.saunalahti.fi>
+Date: Tue, 27 Sep 2016 17:23:25 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <2E71111C-A8AF-495D-A584-7457AFCBE5B9@holtmann.org>
+References: <e29c33a0fc8b91a7bb2d5f7d56ad736a@be408.mail.saunalahti.fi>
+To: jukka.oravasaari@saunalahti.fi
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-btusb_set_bdaddr_marvell() configures BD address for Marvell chipsets.
-This patch adds new chipset 8997 in the list so that BD address feature
-would be available for it.
+Hi Jukka,
 
-Signed-off-by: Amitkumar Karwar <akarwar@marvell.com>
----
- drivers/bluetooth/btusb.c | 1 +
- 1 file changed, 1 insertion(+)
+> I have a question regarding Bluez support of Low-Energy Topologies that were introduced in Bluetooth Core Spec v4.1 (chapter 4.1.2 LE Topology). LE Link Layer Topology is a category 3 feature and thus it requires support in controller. Bluetooth Core Spec v4.0 added command LE Read Supported States for host to be able to query states and state combinations supported by the controller. There seems to be some hard-coding in recent kernel code assuming controller not to support certain states. Do you have plans to make this dynamic and thus to enable LE scatternet functionality allowing also parallel GATT central and peripheral functionality? By searching the archive I found  following thread but I would like to know the current status. Thanks.
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 6bd63b8..8896233 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -314,6 +314,7 @@ static const struct usb_device_id blacklist_table[] = {
- 	/* Marvell Bluetooth devices */
- 	{ USB_DEVICE(0x1286, 0x2044), .driver_info = BTUSB_MARVELL },
- 	{ USB_DEVICE(0x1286, 0x2046), .driver_info = BTUSB_MARVELL },
-+	{ USB_DEVICE(0x1286, 0x204e), .driver_info = BTUSB_MARVELL },
- 
- 	/* Intel Bluetooth devices */
- 	{ USB_DEVICE(0x8087, 0x07da), .driver_info = BTUSB_CSR },
--- 
-1.8.1.4
+we have some historic dependencies, but I am all for removing them and more actively engaging multiple link-layer state machines if the controller supports them.
+
+Regards
+
+Marcel
+
