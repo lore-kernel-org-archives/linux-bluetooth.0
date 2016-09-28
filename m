@@ -1,61 +1,59 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CAAu3APZxiSXDUzuHO_O2ir1A7LuGyTXSD3xoRWDaC6JDSKMmjQ@mail.gmail.com>
-References: <CAAu3APZxiSXDUzuHO_O2ir1A7LuGyTXSD3xoRWDaC6JDSKMmjQ@mail.gmail.com>
+In-Reply-To: <20160927000312.1275-1-mathew.j.martineau@linux.intel.com>
+References: <20160927000312.1275-1-mathew.j.martineau@linux.intel.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 28 Sep 2016 13:55:57 +0300
-Message-ID: <CABBYNZ+zVj4cAvn_J3f5w0gDdj_z4S=B4=WAW_P0krdO2vUqzg@mail.gmail.com>
-Subject: Re: [PATCH v2 1/1] doc/gatt-api.txt: Correct spelling mistakes
-To: Barry Byford <31baz66@gmail.com>
-Cc: Bluez mailing list <linux-bluetooth@vger.kernel.org>
+Date: Wed, 28 Sep 2016 13:55:30 +0300
+Message-ID: <CABBYNZ+N4JJBy81TY_EfSt1XddxWCC3Y5ooZLBe=Awppt+MrXA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v2] tools: Fix recevied/received typos
+To: Mat Martineau <mathew.j.martineau@linux.intel.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Barry,
+Hi Mat,
 
-On Tue, Sep 27, 2016 at 12:39 AM, Barry Byford <31baz66@gmail.com> wrote:
-> Correct small spelling errors
->
+On Tue, Sep 27, 2016 at 3:03 AM, Mat Martineau
+<mathew.j.martineau@linux.intel.com> wrote:
 > ---
 >
->  doc/gatt-api.txt | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
+> I removed the ubcsp.c change because the file's CRLF line endings were
+> causing problems with git-am, and since the spelling problem there is
+> not user-visible.
 >
-> diff --git a/doc/gatt-api.txt b/doc/gatt-api.txt
-> index fd4bdd5..1864391 100644
-> --- a/doc/gatt-api.txt
-> +++ b/doc/gatt-api.txt
-> @@ -115,7 +115,7 @@ Properties string UUID [read-only]
+>  tools/l2test.c  | 2 +-
+>  tools/scotest.c | 2 +-
+>  2 files changed, 2 insertions(+), 2 deletions(-)
 >
->   object Service [read-only]
+> diff --git a/tools/l2test.c b/tools/l2test.c
+> index d4e3ae6..1819423 100644
+> --- a/tools/l2test.c
+> +++ b/tools/l2test.c
+> @@ -830,7 +830,7 @@ static void dump_mode(int sk)
+>                         return;
+>                 }
 >
-> - Object path of the GATT service the characteristc
-> + Object path of the GATT service the characteristic
->   belongs to.
+> -               syslog(LOG_INFO, "Recevied %d bytes", len);
+> +               syslog(LOG_INFO, "Received %d bytes", len);
+>                 hexdump(buf, len);
+>         }
+>  }
+> diff --git a/tools/scotest.c b/tools/scotest.c
+> index 596e403..f894c24 100644
+> --- a/tools/scotest.c
+> +++ b/tools/scotest.c
+> @@ -265,7 +265,7 @@ static void dump_mode(int sk)
 >
->   array{byte} Value [read-only, optional]
-> @@ -198,7 +198,7 @@ Properties string UUID [read-only]
+>         syslog(LOG_INFO,"Receiving ...");
+>         while ((len = read(sk, buf, data_size)) > 0)
+> -               syslog(LOG_INFO, "Recevied %d bytes", len);
+> +               syslog(LOG_INFO, "Received %d bytes", len);
+>  }
 >
->   object Characteristic [read-only]
->
-> - Object path of the GATT characteristc the descriptor
-> + Object path of the GATT characteristic the descriptor
->   belongs to.
->
->   array{byte} Value [read-only, optional]
-> @@ -222,7 +222,7 @@ Properties string UUID [read-only]
->   "secure-read" (Server Only)
->   "secure-write" (Server Only)
->
-> -GATT Profile hierarcy
-> +GATT Profile hierarchy
->  =====================
->
->  Local profile (GATT client) instance. By registering this type of object
->
+>  static void recv_mode(int sk)
 > --
-> 2.5.4
+> 2.10.0
 
 Applied, thanks.
 
