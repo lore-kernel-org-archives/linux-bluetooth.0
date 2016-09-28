@@ -1,32 +1,63 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 10.0 \(3226\))
-Subject: Re: [PATCH] Bluetooth: btusb: add entry for Marvell 8997 chipset
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1475059715-6174-1-git-send-email-akarwar@marvell.com>
-Date: Wed, 28 Sep 2016 13:03:35 +0200
-Cc: linux-bluetooth@vger.kernel.org,
-        "Gustavo F. Padovan" <gustavo@padovan.org>, huxm@marvell.com
-Message-Id: <A36D8BC6-2C6F-40FC-902F-7703FC74B919@holtmann.org>
-References: <1475059715-6174-1-git-send-email-akarwar@marvell.com>
-To: Amitkumar Karwar <akarwar@marvell.com>
+MIME-Version: 1.0
+In-Reply-To: <CAAu3APZxiSXDUzuHO_O2ir1A7LuGyTXSD3xoRWDaC6JDSKMmjQ@mail.gmail.com>
+References: <CAAu3APZxiSXDUzuHO_O2ir1A7LuGyTXSD3xoRWDaC6JDSKMmjQ@mail.gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Wed, 28 Sep 2016 13:55:57 +0300
+Message-ID: <CABBYNZ+zVj4cAvn_J3f5w0gDdj_z4S=B4=WAW_P0krdO2vUqzg@mail.gmail.com>
+Subject: Re: [PATCH v2 1/1] doc/gatt-api.txt: Correct spelling mistakes
+To: Barry Byford <31baz66@gmail.com>
+Cc: Bluez mailing list <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Amitkumar,
+Hi Barry,
 
-> btusb_set_bdaddr_marvell() configures BD address for Marvell chipsets.
-> This patch adds new chipset 8997 in the list so that BD address feature
-> would be available for it.
-> 
-> Signed-off-by: Amitkumar Karwar <akarwar@marvell.com>
+On Tue, Sep 27, 2016 at 12:39 AM, Barry Byford <31baz66@gmail.com> wrote:
+> Correct small spelling errors
+>
 > ---
-> drivers/bluetooth/btusb.c | 1 +
-> 1 file changed, 1 insertion(+)
+>
+>  doc/gatt-api.txt | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+>
+> diff --git a/doc/gatt-api.txt b/doc/gatt-api.txt
+> index fd4bdd5..1864391 100644
+> --- a/doc/gatt-api.txt
+> +++ b/doc/gatt-api.txt
+> @@ -115,7 +115,7 @@ Properties string UUID [read-only]
+>
+>   object Service [read-only]
+>
+> - Object path of the GATT service the characteristc
+> + Object path of the GATT service the characteristic
+>   belongs to.
+>
+>   array{byte} Value [read-only, optional]
+> @@ -198,7 +198,7 @@ Properties string UUID [read-only]
+>
+>   object Characteristic [read-only]
+>
+> - Object path of the GATT characteristc the descriptor
+> + Object path of the GATT characteristic the descriptor
+>   belongs to.
+>
+>   array{byte} Value [read-only, optional]
+> @@ -222,7 +222,7 @@ Properties string UUID [read-only]
+>   "secure-read" (Server Only)
+>   "secure-write" (Server Only)
+>
+> -GATT Profile hierarcy
+> +GATT Profile hierarchy
+>  =====================
+>
+>  Local profile (GATT client) instance. By registering this type of object
+>
+> --
+> 2.5.4
 
-patch has been applied to bluetooth-next tree.
+Applied, thanks.
 
-Regards
-
-Marcel
-
+-- 
+Luiz Augusto von Dentz
