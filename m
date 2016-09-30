@@ -1,52 +1,107 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <1469195785-8907-1-git-send-email-luiz.dentz@gmail.com>
-References: <1469195785-8907-1-git-send-email-luiz.dentz@gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 1 Aug 2016 14:49:56 +0300
-Message-ID: <CABBYNZKriUJXF=Msg3vw1O78cmzY6Aw97UeEOBPQbg_FWGaaew@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] core/advertising: Fix not adding local name and
- appearance flags
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: jiangbo.wu@intel.com
+To: martin.xu@intel.com, johan.hedberg@gmail.com
+Cc: linux-bluetooth@vger.kernel.org, Jiangbo Wu <jiangbo.wu@intel.com>
+Subject: [PATCH] src/device: Free bonding while failed to pair device
+Date: Fri, 30 Sep 2016 23:39:18 +0800
+Message-Id: <1475249958-9934-1-git-send-email-jiangbo.wu@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+From: Jiangbo Wu <jiangbo.wu@intel.com>
 
-On Fri, Jul 22, 2016 at 4:56 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> If the advertisement is cause the connectable flag to be set add local
-> name and appearance so the scan response is generated properly as the
-> remote may attempt connect/pair these information shall be made available
-> as well.
-> ---
->  src/advertising.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
->
-> diff --git a/src/advertising.c b/src/advertising.c
-> index d2019de..52b536d 100644
-> --- a/src/advertising.c
-> +++ b/src/advertising.c
-> @@ -473,7 +473,8 @@ static DBusMessage *refresh_advertisement(struct advertisement *ad)
->         DBG("Refreshing advertisement: %s", ad->path);
->
->         if (ad->type == AD_TYPE_PERIPHERAL)
-> -               flags = MGMT_ADV_FLAG_CONNECTABLE | MGMT_ADV_FLAG_DISCOV;
-> +               flags = MGMT_ADV_FLAG_CONNECTABLE | MGMT_ADV_FLAG_DISCOV |
-> +                       MGMT_ADV_FLAG_APPEARANCE | MGMT_ADV_FLAG_LOCAL_NAME;
->
->         if (ad->include_tx_power)
->                 flags |= MGMT_ADV_FLAG_TX_POWER;
-> --
-> 2.7.4
+---
+ src/device.c | 62 +++++++++++++++++++++++++++++++-----------------------------
+ 1 file changed, 32 insertions(+), 30 deletions(-)
 
-This does not work since the kernel does not even check those flags,
-instead it seems to expect the scan data to come directly from
-userspace.
-
-
+diff --git a/src/device.c b/src/device.c
+index 25d2e22..fb6104f 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -2314,6 +2314,35 @@ static void create_bond_req_exit(DBusConnection *conn, void *user_data)
+ 	}
+ }
+ 
++static void bonding_request_free(struct bonding_req *bonding)
++{
++	if (!bonding)
++		return;
++
++	if (bonding->listener_id)
++		g_dbus_remove_watch(dbus_conn, bonding->listener_id);
++
++	if (bonding->msg)
++		dbus_message_unref(bonding->msg);
++
++	if (bonding->cb_iter)
++		g_free(bonding->cb_iter);
++
++	if (bonding->agent) {
++		agent_cancel(bonding->agent);
++		agent_unref(bonding->agent);
++		bonding->agent = NULL;
++	}
++
++	if (bonding->retry_timer)
++		g_source_remove(bonding->retry_timer);
++
++	if (bonding->device)
++		bonding->device->bonding = NULL;
++
++	g_free(bonding);
++}
++
+ static DBusMessage *pair_device(DBusConnection *conn, DBusMessage *msg,
+ 								void *data)
+ {
+@@ -2384,8 +2413,10 @@ static DBusMessage *pair_device(DBusConnection *conn, DBusMessage *msg,
+ 							BDADDR_BREDR, io_cap);
+ 	}
+ 
+-	if (err < 0)
++	if (err < 0) {
++		bonding_request_free(device->bonding);
+ 		return btd_error_failed(msg, strerror(-err));
++	}
+ 
+ 	return NULL;
+ }
+@@ -2426,35 +2457,6 @@ static DBusMessage *new_authentication_return(DBusMessage *msg, uint8_t status)
+ 	}
+ }
+ 
+-static void bonding_request_free(struct bonding_req *bonding)
+-{
+-	if (!bonding)
+-		return;
+-
+-	if (bonding->listener_id)
+-		g_dbus_remove_watch(dbus_conn, bonding->listener_id);
+-
+-	if (bonding->msg)
+-		dbus_message_unref(bonding->msg);
+-
+-	if (bonding->cb_iter)
+-		g_free(bonding->cb_iter);
+-
+-	if (bonding->agent) {
+-		agent_cancel(bonding->agent);
+-		agent_unref(bonding->agent);
+-		bonding->agent = NULL;
+-	}
+-
+-	if (bonding->retry_timer)
+-		g_source_remove(bonding->retry_timer);
+-
+-	if (bonding->device)
+-		bonding->device->bonding = NULL;
+-
+-	g_free(bonding);
+-}
+-
+ static void device_cancel_bonding(struct btd_device *device, uint8_t status)
+ {
+ 	struct bonding_req *bonding = device->bonding;
 -- 
-Luiz Augusto von Dentz
+1.9.1
+
