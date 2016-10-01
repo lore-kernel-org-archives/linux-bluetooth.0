@@ -1,96 +1,129 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: "Wu, Jiangbo" <jiangbo.wu@intel.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-CC: "Xu, Martin" <martin.xu@intel.com>,
+MIME-Version: 1.0
+In-Reply-To: <1475249958-9934-1-git-send-email-jiangbo.wu@intel.com>
+References: <1475249958-9934-1-git-send-email-jiangbo.wu@intel.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Sat, 1 Oct 2016 19:55:47 +0300
+Message-ID: <CABBYNZJ0FS4i-n9b192yo8eN81+H6ex5YsEDRK1zYbB307A9Og@mail.gmail.com>
+Subject: Re: [PATCH] src/device: Free bonding while failed to pair device
+To: "Wu, Jiangbo" <jiangbo.wu@intel.com>
+Cc: "Xu, Martin" <martin.xu@intel.com>,
         Johan Hedberg <johan.hedberg@gmail.com>,
         "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: [PATCH] src/device: Free bonding while failed to pair device
-Date: Sun, 2 Oct 2016 12:30:01 +0000
-Message-ID: <ACB402E679F3454EAE433BF5E93F4EAA38987E2A@shsmsx102.ccr.corp.intel.com>
-References: <1475249958-9934-1-git-send-email-jiangbo.wu@intel.com>
- <CABBYNZJ0FS4i-n9b192yo8eN81+H6ex5YsEDRK1zYbB307A9Og@mail.gmail.com>
-In-Reply-To: <CABBYNZJ0FS4i-n9b192yo8eN81+H6ex5YsEDRK1zYbB307A9Og@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGksDQoNCkl0IGNvbWVzIGZyb20gYWN0dWFsbHkgdXNlIGluIG91ciBwcm9kdWN0LiBUaGUgc2Nl
-bmFyaW8gaXMgdGhhdDoNCiAgICAgICAgMS4gUGFpciBhIGRldmljZSBuYW1lZCAnQScuDQogICAg
-ICAgICAgICBCZWZvcmUgYWdlbnQgZ2l2ZSByZXNwb25zZSBmb3IgcGFpcmluZyBkZXZpY2UgJ0En
-Og0KICAgICAgICAyLiBDYWxsIHBhaXIgbWV0aG9kIGFnYWluIHRvIHBhaXIgYW5vdGhlciBkZXZp
-Y2UgbmFtZWQgJ0InIC4NCkRldmljZSAnQicgd2lsbCBuZXZlciBiZSBwYWlyZWQgdW50aWwgdHVy
-biBvZmYvb24gQmx1ZXRvb3RoLiBZb3UgY2FuIHRyeSBpdCB1c2UgYmx1ZXRvb3RoY3RsLg0KDQpU
-aGUgcm9vdCBjYXVzZSBpcyBwYWlyIG1ldGhvZCB3aWxsIGNoZWNrIGRldmljZS0+Ym9uZGluZywg
-cmV0dXJuICdJbiBwcm9ncmVzcycgd2hlbiBpdCBleGlzdHMuIE5vcm1hbGx5IGRldmljZSB3aWxs
-IGNyZWF0ZSBib25kaW5nLiBJZiBhbm90aGVyIGRldmljZSBpcyBpbiBwYWlyaW5nIHN0YXR1cywg
-SXQgd2lsbCBmYWlsIHRvIGNyZWF0ZSBib25kaW5nIGluICdhZGFwdGVyX2NyZWF0ZV9ib25kaW5n
-JywgYmVjYXVzZSBhbm90aGVyIHBhaXJpbmcgaXMgaW4gcHJvZ3Jlc3MuIEl0IHdpbGwgbmV2ZXIg
-YmUgcGFpcmVkIHRoYXQgZGV2aWNlIGJ5IGNoZWNraW5nIGRldmljZS0+Ym9uZGluZyBpZiBpdCBk
-b24ndCBmcmVlIGJvbmRpbmcuIA0KDQotLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KRnJvbTog
-THVpeiBBdWd1c3RvIHZvbiBEZW50eiBbbWFpbHRvOmx1aXouZGVudHpAZ21haWwuY29tXSANClNl
-bnQ6IFN1bmRheSwgT2N0b2JlciAyLCAyMDE2IDEyOjU2IEFNDQpUbzogV3UsIEppYW5nYm8gPGpp
-YW5nYm8ud3VAaW50ZWwuY29tPg0KQ2M6IFh1LCBNYXJ0aW4gPG1hcnRpbi54dUBpbnRlbC5jb20+
-OyBKb2hhbiBIZWRiZXJnIDxqb2hhbi5oZWRiZXJnQGdtYWlsLmNvbT47IGxpbnV4LWJsdWV0b290
-aEB2Z2VyLmtlcm5lbC5vcmcNClN1YmplY3Q6IFJlOiBbUEFUQ0hdIHNyYy9kZXZpY2U6IEZyZWUg
-Ym9uZGluZyB3aGlsZSBmYWlsZWQgdG8gcGFpciBkZXZpY2UNCg0KSGksDQoNCk9uIEZyaSwgU2Vw
-IDMwLCAyMDE2IGF0IDY6MzkgUE0sICA8amlhbmdiby53dUBpbnRlbC5jb20+IHdyb3RlOg0KPiBG
-cm9tOiBKaWFuZ2JvIFd1IDxqaWFuZ2JvLnd1QGludGVsLmNvbT4NCg0KSXQgd291bGQgYmUgZ29v
-ZCB0byBoYXZlIHNvbWV0aGluZyBpbiB0aGUgcGF0Y2ggZGVzY3JpcHRpb24sIHBlcmhhcHMgdGhl
-IGJhY2t0cmFjZSBpZiB0aGlzIGlzIGEgY3Jhc2ggZml4IG9yIHBlcmhhcHMgdGhpcyBjb21lcyBm
-cm9tIGEgc3RhdGljIGFuYWx5emVyPw0KDQo+IC0tLQ0KPiAgc3JjL2RldmljZS5jIHwgNjIgDQo+
-ICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrKystLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLQ0KPiAgMSBmaWxlIGNoYW5nZWQsIDMyIGluc2VydGlvbnMoKyksIDMwIGRlbGV0aW9ucygt
-KQ0KPg0KPiBkaWZmIC0tZ2l0IGEvc3JjL2RldmljZS5jIGIvc3JjL2RldmljZS5jIGluZGV4IDI1
-ZDJlMjIuLmZiNjEwNGYgMTAwNjQ0DQo+IC0tLSBhL3NyYy9kZXZpY2UuYw0KPiArKysgYi9zcmMv
-ZGV2aWNlLmMNCj4gQEAgLTIzMTQsNiArMjMxNCwzNSBAQCBzdGF0aWMgdm9pZCBjcmVhdGVfYm9u
-ZF9yZXFfZXhpdChEQnVzQ29ubmVjdGlvbiAqY29ubiwgdm9pZCAqdXNlcl9kYXRhKQ0KPiAgICAg
-ICAgIH0NCj4gIH0NCj4NCj4gK3N0YXRpYyB2b2lkIGJvbmRpbmdfcmVxdWVzdF9mcmVlKHN0cnVj
-dCBib25kaW5nX3JlcSAqYm9uZGluZykgew0KPiArICAgICAgIGlmICghYm9uZGluZykNCj4gKyAg
-ICAgICAgICAgICAgIHJldHVybjsNCj4gKw0KPiArICAgICAgIGlmIChib25kaW5nLT5saXN0ZW5l
-cl9pZCkNCj4gKyAgICAgICAgICAgICAgIGdfZGJ1c19yZW1vdmVfd2F0Y2goZGJ1c19jb25uLCBi
-b25kaW5nLT5saXN0ZW5lcl9pZCk7DQo+ICsNCj4gKyAgICAgICBpZiAoYm9uZGluZy0+bXNnKQ0K
-PiArICAgICAgICAgICAgICAgZGJ1c19tZXNzYWdlX3VucmVmKGJvbmRpbmctPm1zZyk7DQo+ICsN
-Cj4gKyAgICAgICBpZiAoYm9uZGluZy0+Y2JfaXRlcikNCj4gKyAgICAgICAgICAgICAgIGdfZnJl
-ZShib25kaW5nLT5jYl9pdGVyKTsNCj4gKw0KPiArICAgICAgIGlmIChib25kaW5nLT5hZ2VudCkg
-ew0KPiArICAgICAgICAgICAgICAgYWdlbnRfY2FuY2VsKGJvbmRpbmctPmFnZW50KTsNCj4gKyAg
-ICAgICAgICAgICAgIGFnZW50X3VucmVmKGJvbmRpbmctPmFnZW50KTsNCj4gKyAgICAgICAgICAg
-ICAgIGJvbmRpbmctPmFnZW50ID0gTlVMTDsNCj4gKyAgICAgICB9DQo+ICsNCj4gKyAgICAgICBp
-ZiAoYm9uZGluZy0+cmV0cnlfdGltZXIpDQo+ICsgICAgICAgICAgICAgICBnX3NvdXJjZV9yZW1v
-dmUoYm9uZGluZy0+cmV0cnlfdGltZXIpOw0KPiArDQo+ICsgICAgICAgaWYgKGJvbmRpbmctPmRl
-dmljZSkNCj4gKyAgICAgICAgICAgICAgIGJvbmRpbmctPmRldmljZS0+Ym9uZGluZyA9IE5VTEw7
-DQo+ICsNCj4gKyAgICAgICBnX2ZyZWUoYm9uZGluZyk7DQo+ICt9DQo+ICsNCj4gIHN0YXRpYyBE
-QnVzTWVzc2FnZSAqcGFpcl9kZXZpY2UoREJ1c0Nvbm5lY3Rpb24gKmNvbm4sIERCdXNNZXNzYWdl
-ICptc2csDQo+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICB2b2lkIA0KPiAqZGF0YSkgIHsgQEAgLTIzODQsOCArMjQxMywxMCBA
-QCBzdGF0aWMgREJ1c01lc3NhZ2UgDQo+ICpwYWlyX2RldmljZShEQnVzQ29ubmVjdGlvbiAqY29u
-biwgREJ1c01lc3NhZ2UgKm1zZywNCj4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICBCREFERFJfQlJFRFIsIGlvX2NhcCk7DQo+ICAgICAgICAg
-fQ0KPg0KPiAtICAgICAgIGlmIChlcnIgPCAwKQ0KPiArICAgICAgIGlmIChlcnIgPCAwKSB7DQo+
-ICsgICAgICAgICAgICAgICBib25kaW5nX3JlcXVlc3RfZnJlZShkZXZpY2UtPmJvbmRpbmcpOw0K
-PiAgICAgICAgICAgICAgICAgcmV0dXJuIGJ0ZF9lcnJvcl9mYWlsZWQobXNnLCBzdHJlcnJvcigt
-ZXJyKSk7DQo+ICsgICAgICAgfQ0KPg0KPiAgICAgICAgIHJldHVybiBOVUxMOw0KPiAgfQ0KPiBA
-QCAtMjQyNiwzNSArMjQ1Nyw2IEBAIHN0YXRpYyBEQnVzTWVzc2FnZSAqbmV3X2F1dGhlbnRpY2F0
-aW9uX3JldHVybihEQnVzTWVzc2FnZSAqbXNnLCB1aW50OF90IHN0YXR1cykNCj4gICAgICAgICB9
-DQo+ICB9DQo+DQo+IC1zdGF0aWMgdm9pZCBib25kaW5nX3JlcXVlc3RfZnJlZShzdHJ1Y3QgYm9u
-ZGluZ19yZXEgKmJvbmRpbmcpIC17DQo+IC0gICAgICAgaWYgKCFib25kaW5nKQ0KPiAtICAgICAg
-ICAgICAgICAgcmV0dXJuOw0KPiAtDQo+IC0gICAgICAgaWYgKGJvbmRpbmctPmxpc3RlbmVyX2lk
-KQ0KPiAtICAgICAgICAgICAgICAgZ19kYnVzX3JlbW92ZV93YXRjaChkYnVzX2Nvbm4sIGJvbmRp
-bmctPmxpc3RlbmVyX2lkKTsNCj4gLQ0KPiAtICAgICAgIGlmIChib25kaW5nLT5tc2cpDQo+IC0g
-ICAgICAgICAgICAgICBkYnVzX21lc3NhZ2VfdW5yZWYoYm9uZGluZy0+bXNnKTsNCj4gLQ0KPiAt
-ICAgICAgIGlmIChib25kaW5nLT5jYl9pdGVyKQ0KPiAtICAgICAgICAgICAgICAgZ19mcmVlKGJv
-bmRpbmctPmNiX2l0ZXIpOw0KPiAtDQo+IC0gICAgICAgaWYgKGJvbmRpbmctPmFnZW50KSB7DQo+
-IC0gICAgICAgICAgICAgICBhZ2VudF9jYW5jZWwoYm9uZGluZy0+YWdlbnQpOw0KPiAtICAgICAg
-ICAgICAgICAgYWdlbnRfdW5yZWYoYm9uZGluZy0+YWdlbnQpOw0KPiAtICAgICAgICAgICAgICAg
-Ym9uZGluZy0+YWdlbnQgPSBOVUxMOw0KPiAtICAgICAgIH0NCj4gLQ0KPiAtICAgICAgIGlmIChi
-b25kaW5nLT5yZXRyeV90aW1lcikNCj4gLSAgICAgICAgICAgICAgIGdfc291cmNlX3JlbW92ZShi
-b25kaW5nLT5yZXRyeV90aW1lcik7DQo+IC0NCj4gLSAgICAgICBpZiAoYm9uZGluZy0+ZGV2aWNl
-KQ0KPiAtICAgICAgICAgICAgICAgYm9uZGluZy0+ZGV2aWNlLT5ib25kaW5nID0gTlVMTDsNCj4g
-LQ0KPiAtICAgICAgIGdfZnJlZShib25kaW5nKTsNCj4gLX0NCj4gLQ0KPiAgc3RhdGljIHZvaWQg
-ZGV2aWNlX2NhbmNlbF9ib25kaW5nKHN0cnVjdCBidGRfZGV2aWNlICpkZXZpY2UsIHVpbnQ4X3Qg
-DQo+IHN0YXR1cykgIHsNCj4gICAgICAgICBzdHJ1Y3QgYm9uZGluZ19yZXEgKmJvbmRpbmcgPSBk
-ZXZpY2UtPmJvbmRpbmc7DQo+IC0tDQo+IDEuOS4xDQo+DQo+IC0tDQo+IFRvIHVuc3Vic2NyaWJl
-IGZyb20gdGhpcyBsaXN0OiBzZW5kIHRoZSBsaW5lICJ1bnN1YnNjcmliZSANCj4gbGludXgtYmx1
-ZXRvb3RoIiBpbiB0aGUgYm9keSBvZiBhIG1lc3NhZ2UgdG8gbWFqb3Jkb21vQHZnZXIua2VybmVs
-Lm9yZyANCj4gTW9yZSBtYWpvcmRvbW8gaW5mbyBhdCAgaHR0cDovL3ZnZXIua2VybmVsLm9yZy9t
-YWpvcmRvbW8taW5mby5odG1sDQoNCg0KDQotLQ0KTHVpeiBBdWd1c3RvIHZvbiBEZW50eg0K
+Hi,
+
+On Fri, Sep 30, 2016 at 6:39 PM,  <jiangbo.wu@intel.com> wrote:
+> From: Jiangbo Wu <jiangbo.wu@intel.com>
+
+It would be good to have something in the patch description, perhaps
+the backtrace if this is a crash fix or perhaps this comes from a
+static analyzer?
+
+> ---
+>  src/device.c | 62 +++++++++++++++++++++++++++++++-----------------------------
+>  1 file changed, 32 insertions(+), 30 deletions(-)
+>
+> diff --git a/src/device.c b/src/device.c
+> index 25d2e22..fb6104f 100644
+> --- a/src/device.c
+> +++ b/src/device.c
+> @@ -2314,6 +2314,35 @@ static void create_bond_req_exit(DBusConnection *conn, void *user_data)
+>         }
+>  }
+>
+> +static void bonding_request_free(struct bonding_req *bonding)
+> +{
+> +       if (!bonding)
+> +               return;
+> +
+> +       if (bonding->listener_id)
+> +               g_dbus_remove_watch(dbus_conn, bonding->listener_id);
+> +
+> +       if (bonding->msg)
+> +               dbus_message_unref(bonding->msg);
+> +
+> +       if (bonding->cb_iter)
+> +               g_free(bonding->cb_iter);
+> +
+> +       if (bonding->agent) {
+> +               agent_cancel(bonding->agent);
+> +               agent_unref(bonding->agent);
+> +               bonding->agent = NULL;
+> +       }
+> +
+> +       if (bonding->retry_timer)
+> +               g_source_remove(bonding->retry_timer);
+> +
+> +       if (bonding->device)
+> +               bonding->device->bonding = NULL;
+> +
+> +       g_free(bonding);
+> +}
+> +
+>  static DBusMessage *pair_device(DBusConnection *conn, DBusMessage *msg,
+>                                                                 void *data)
+>  {
+> @@ -2384,8 +2413,10 @@ static DBusMessage *pair_device(DBusConnection *conn, DBusMessage *msg,
+>                                                         BDADDR_BREDR, io_cap);
+>         }
+>
+> -       if (err < 0)
+> +       if (err < 0) {
+> +               bonding_request_free(device->bonding);
+>                 return btd_error_failed(msg, strerror(-err));
+> +       }
+>
+>         return NULL;
+>  }
+> @@ -2426,35 +2457,6 @@ static DBusMessage *new_authentication_return(DBusMessage *msg, uint8_t status)
+>         }
+>  }
+>
+> -static void bonding_request_free(struct bonding_req *bonding)
+> -{
+> -       if (!bonding)
+> -               return;
+> -
+> -       if (bonding->listener_id)
+> -               g_dbus_remove_watch(dbus_conn, bonding->listener_id);
+> -
+> -       if (bonding->msg)
+> -               dbus_message_unref(bonding->msg);
+> -
+> -       if (bonding->cb_iter)
+> -               g_free(bonding->cb_iter);
+> -
+> -       if (bonding->agent) {
+> -               agent_cancel(bonding->agent);
+> -               agent_unref(bonding->agent);
+> -               bonding->agent = NULL;
+> -       }
+> -
+> -       if (bonding->retry_timer)
+> -               g_source_remove(bonding->retry_timer);
+> -
+> -       if (bonding->device)
+> -               bonding->device->bonding = NULL;
+> -
+> -       g_free(bonding);
+> -}
+> -
+>  static void device_cancel_bonding(struct btd_device *device, uint8_t status)
+>  {
+>         struct bonding_req *bonding = device->bonding;
+> --
+> 1.9.1
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
+-- 
+Luiz Augusto von Dentz
