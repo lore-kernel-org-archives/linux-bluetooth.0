@@ -1,69 +1,163 @@
-Return-Path: <jerome.debretagne@gmail.com>
-Message-ID: <1475533357.2947.3.camel@gmail.com>
-Subject: Bluetooth not working anymore due to too agressive PM in hci_bcm ?
- (was: [PATCH v5 5/5] Bluetooth: hci_bcm: Add suspend/resume runtime PM
- functions)
-From: =?ISO-8859-1?Q?J=E9r=F4me?= de Bretagne <jerome.debretagne@gmail.com>
-To: Frederic Danis <frederic.danis@linux.intel.com>, Marcel Holtmann
-	 <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org
-Date: Tue, 04 Oct 2016 00:22:37 +0200
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Return-Path: <pavel@ucw.cz>
+Date: Mon, 3 Oct 2016 10:56:40 +0200
+From: Pavel Machek <pavel@ucw.cz>
+To: trivial@kernel.org, marcel@holtmann.org, gustavo@padovan.org,
+	johan.hedberg@gmail.com, davem@davemloft.net,
+	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] bluetooth.h: __ variants of u8 and friends are not
+ neccessary inside kernel
+Message-ID: <20161003085640.GA8130@amd>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="ReaqsoxgOBHFXBhH"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Frederic, Hi Marcel,
 
-I've been trying to figure this out for quite some time: since the Bluetooth
-BCM chipset of my ThinkPad 8 tablet was added into Linux kernel 4.6,
-Bluetooth has never been working fully as expected.
-
-To describe the issue: Bluetooth devices (keyboard, mouse) would work and
-keep connected *only* if a device scan was maintained running in the
-background. In my setup, the trick was achieved by having the Gnome
-Bluetooth setting page opened. Without this trick, devices would simply stop
-responding after a short amount of time; my BT keyboard would also seem
-disconnected during the session login (despite btattach being properly
-launched in the background) and would resume right away with a device scan.
-
-I don't know if this issue is widespread but I've found references to at
-least 2 similar cases at [1] & [2], both for products using hci_bcm. In the
-bug descriptions, it was stated that kernel 4.3 was working fine while 4.4
-wasn't anymore. And indeed, I was able to reproduce this on my side.
-
-By investigating the various changes introduced in 4.4, I've been able to
-pinpoint the commit [3] that introduces the regression on my tablet:
-   commit: e88ab30d3669f08e94e66e7f926713be93af97fc
-   Bluetooth: hci_bcm: Add suspend/resume runtime PM functions
-
-since building a kernel with its parent commit [4] works perfectly fine: 
-   commit: 7649faff1cfe4f76dabf78cd53d659d39f65b3c1
-   Bluetooth: Remove useless rx_lock spinlock
-
-The code change adding the runtime PM functions introduces an autosleep
-delay but it's unclear from the commit description how the BT chipset is
-supposed to get out of sleep afterwards.
-
-For 3 different devices at least (Asus T100 Chi, Asus T100TA and Lenovo
-ThinkPad Tablet 8), it seems to lead in practice to a regression since the
-BT chipset doesn't wake up anymore on normal operations (moving the mouse,
-typing a key on the keyboard, etc) breaking Bluetooth from a user PoV. And
-maybe a few more products using hci_bcm are impacted too.   
-
-If you have a patch suggestion for a potential fix, I would be glad to give
-it a try in the coming days and confirm if it solves the issue or not. 
-
-If a proper fix is going to need quite more time otherwise, could you
-consider reverting this specific commit in the meantime? Thanks.
-
-Regards,
-
-Jérôme
+--ReaqsoxgOBHFXBhH
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
 
-[1] https://bugzilla.kernel.org/show_bug.cgi?id=109321#c3 (Comments 3 & 4)
-for Asus T100TA
-[2] https://bugzilla.kernel.org/show_bug.cgi?id=114561#c1 for Asus T100 Chi
-[3] https://git.kernel.org/cgit/linux/kernel/git/bluetooth/bluetooth-next.gi
-t/commit/?id=e88ab30d3669f08e94e66e7f926713be93af97fc
-[4] https://git.kernel.org/cgit/linux/kernel/git/bluetooth/bluetooth-next.gi
-t/commit/?id=7649faff1cfe4f76dabf78cd53d659d39f65b3c1
+bluetooth.h is not part of user API, so __ variants are not neccessary
+here.
+
+Signed-off-by: Pavel Machek <pavel@ucw.cz>
+
+diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/blue=
+tooth.h
+index bfd1590..aea0371 100644
+--- a/include/net/bluetooth/bluetooth.h
++++ b/include/net/bluetooth/bluetooth.h
+@@ -60,8 +60,8 @@
+=20
+ #define BT_SECURITY	4
+ struct bt_security {
+-	__u8 level;
+-	__u8 key_size;
++	u8 level;
++	u8 key_size;
+ };
+ #define BT_SECURITY_SDP		0
+ #define BT_SECURITY_LOW		1
+@@ -78,7 +78,7 @@ struct bt_security {
+=20
+ #define BT_POWER	9
+ struct bt_power {
+-	__u8 force_active;
++	u8 force_active;
+ };
+ #define BT_POWER_FORCE_ACTIVE_OFF 0
+ #define BT_POWER_FORCE_ACTIVE_ON  1
+@@ -112,7 +112,7 @@ struct bt_power {
+=20
+ #define BT_VOICE		11
+ struct bt_voice {
+-	__u16 setting;
++	u16 setting;
+ };
+=20
+ #define BT_VOICE_TRANSPARENT			0x0003
+@@ -188,7 +188,7 @@ static inline const char *state_to_string(int state)
+=20
+ /* BD Address */
+ typedef struct {
+-	__u8 b[6];
++	u8 b[6];
+ } __packed bdaddr_t;
+=20
+ /* BD Address type */
+@@ -196,7 +196,7 @@ typedef struct {
+ #define BDADDR_LE_PUBLIC	0x01
+ #define BDADDR_LE_RANDOM	0x02
+=20
+-static inline bool bdaddr_type_is_valid(__u8 type)
++static inline bool bdaddr_type_is_valid(u8 type)
+ {
+ 	switch (type) {
+ 	case BDADDR_BREDR:
+@@ -208,7 +208,7 @@ static inline bool bdaddr_type_is_valid(__u8 type)
+ 	return false;
+ }
+=20
+-static inline bool bdaddr_type_is_le(__u8 type)
++static inline bool bdaddr_type_is_le(u8 type)
+ {
+ 	switch (type) {
+ 	case BDADDR_LE_PUBLIC:
+@@ -278,15 +278,16 @@ struct sock *bt_accept_dequeue(struct sock *parent, s=
+truct socket *newsock);
+=20
+ /* Skb helpers */
+ struct l2cap_ctrl {
+-	__u8	sframe:1,
++	u8	sframe:1,
+ 		poll:1,
+ 		final:1,
+ 		fcs:1,
+ 		sar:2,
+ 		super:2;
+-	__u16	reqseq;
+-	__u16	txseq;
+-	__u8	retries;
++
++	u16	reqseq;
++	u16	txseq;
++	u8	retries;
+ 	__le16  psm;
+ 	bdaddr_t bdaddr;
+ 	struct l2cap_chan *chan;
+@@ -302,7 +303,7 @@ typedef void (*hci_req_complete_skb_t)(struct hci_dev *=
+hdev, u8 status,
+ #define HCI_REQ_SKB	BIT(1)
+=20
+ struct hci_ctrl {
+-	__u16 opcode;
++	u16 opcode;
+ 	u8 req_flags;
+ 	u8 req_event;
+ 	union {
+@@ -312,10 +313,10 @@ struct hci_ctrl {
+ };
+=20
+ struct bt_skb_cb {
+-	__u8 pkt_type;
+-	__u8 force_active;
+-	__u16 expect;
+-	__u8 incoming:1;
++	u8 pkt_type;
++	u8 force_active;
++	u16 expect;
++	u8 incoming:1;
+ 	union {
+ 		struct l2cap_ctrl l2cap;
+ 		struct hci_ctrl hci;
+@@ -365,7 +366,7 @@ out:
+ 	return NULL;
+ }
+=20
+-int bt_to_errno(__u16 code);
++int bt_to_errno(u16 code);
+=20
+ void hci_sock_set_flag(struct sock *sk, int nr);
+ void hci_sock_clear_flag(struct sock *sk, int nr);
+
+--=20
+(english) http://www.livejournal.com/~pavelmachek
+(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blo=
+g.html
+
+--ReaqsoxgOBHFXBhH
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: Digital signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlfyHUgACgkQMOfwapXb+vKgwgCdH5BnfB+UmCpK6potpXq2I/vp
+r1gAnA1sor4deJXfMnIW0n1ZUfiqRM7N
+=8DqY
+-----END PGP SIGNATURE-----
+
+--ReaqsoxgOBHFXBhH--
