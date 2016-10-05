@@ -1,58 +1,35 @@
-Return-Path: <ethan.hsieh@canonical.com>
-MIME-Version: 1.0
-From: Ethan Hsieh <ethan.hsieh@canonical.com>
-Date: Thu, 6 Oct 2016 14:44:44 +0800
-Message-ID: <CAD571NjHoR-i48hTNcXLam0FPPEmGNQbhkMB8Y+61_Vf9O+Jbg@mail.gmail.com>
-Subject: [PATCH] Bluetooth: btusb: Fix atheros firmware download error
-To: linux-bluetooth@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>
-Cc: Ethan Hsieh <ethan.hsieh@canonical.com>
-Content-Type: text/plain; charset=UTF-8
+Return-Path: <joe@perches.com>
+Message-ID: <1475706531.1941.4.camel@perches.com>
+Subject: Re: [PATCH] bluetooth.h: __ variants of u8 and friends are not
+ neccessary inside kernel
+From: Joe Perches <joe@perches.com>
+To: Pavel Machek <pavel@ucw.cz>
+Cc: Marcel Holtmann <marcel@holtmann.org>, "Gustavo F. Padovan"
+ <gustavo@padovan.org>, Johan Hedberg <johan.hedberg@gmail.com>, "David S.
+ Miller" <davem@davemloft.net>, linux-bluetooth@vger.kernel.org,
+ netdev@vger.kernel.org,  linux-kernel@vger.kernel.org
+Date: Wed, 05 Oct 2016 15:28:51 -0700
+In-Reply-To: <20161005221317.GA21551@amd>
+References: <20161003085640.GA8130@amd>
+	 <368810F9-519C-44B5-85D4-1815273438BF@holtmann.org>
+	 <1475689996.6105.11.camel@perches.com> <20161005191103.GA25972@amd>
+	 <1475694934.1941.1.camel@perches.com> <20161005221317.GA21551@amd>
+Content-Type: text/plain; charset="ISO-8859-1"
+Mime-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Move usb_autopm_get_interface() ahead of setup_on_usb() to prevent device
-from sending usb control message in usb suspend mode.
+On Thu, 2016-10-06 at 00:13 +0200, Pavel Machek wrote:
+> On Wed 2016-10-05 12:15:34, Joe Perches wrote:
+> > On Wed, 2016-10-05 at 21:11 +0200, Pavel Machek wrote:
+> > > On Wed 2016-10-05 10:53:16, Joe Perches wrote:
+[]
+> > > > trivia:
+> > > > It's generally faster to use bool instead of u8 foo:1;
+> > > Ok, but I'm not changing that in this patch.
+> > > (And actually, bool will take a lot more memory, right?)
+> > No worries, and bool is the same size as u8.
+> Exactly what I'm talking about :-). One byte vs. one bit, right?
 
-The error message is as below:
-
-[   83.944103] btusb 1-2:1.1: usb_suspend_interface: status 0
-[   83.944107] btusb 1-2:1.0: usb_suspend_interface: status 0
-[   83.960132] usb 1-2: usb auto-suspend, wakeup 0
-[   83.976156] usb 1-2: usb_suspend_device: status 0
-[   83.976162] usb 1-2: usb_suspend_both: status 0
-[  298.689106] Bluetooth: hci0
-[  298.689399] Bluetooth: hci0: Failed to access otp area (-113)
-
-Signed-off-by: Ethan Hsieh <ethan.hsieh@canonical.com>
----
- drivers/bluetooth/btusb.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 8896233..2f633df 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -1043,6 +1043,10 @@ static int btusb_open(struct hci_dev *hdev)
-
-        BT_DBG("%s", hdev->name);
-
-+       err = usb_autopm_get_interface(data->intf);
-+       if (err < 0)
-+               return err;
-+
-        /* Patching USB firmware files prior to starting any URBs of HCI path
-         * It is more safe to use USB bulk channel for downloading USB patch
-         */
-@@ -1052,10 +1056,6 @@ static int btusb_open(struct hci_dev *hdev)
-                        return err;
-        }
-
--       err = usb_autopm_get_interface(data->intf);
--       if (err < 0)
--               return err;
--
-        data->intf->needs_remote_wakeup = 1;
-
-        if (test_and_set_bit(BTUSB_INTR_RUNNING, &data->flags))
-
--- 
-2.7.4
+Memory isn't bit addressable.
+So it's the same byte, it just doesn't use a read/modify/write
+operation to update a value.
