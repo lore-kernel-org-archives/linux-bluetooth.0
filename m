@@ -1,146 +1,192 @@
-Return-Path: <linux-kernel-owner@vger.kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 10.0 \(3226\))
-Subject: Re: [PATCH] bluetooth.h: __ variants of u8 and friends are not
- neccessary inside kernel
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20161003085640.GA8130@amd>
-Date: Wed, 5 Oct 2016 13:14:53 +0200
-Cc: trivial@kernel.org, "Gustavo F. Padovan" <gustavo@padovan.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Message-Id: <368810F9-519C-44B5-85D4-1815273438BF@holtmann.org>
-References: <20161003085640.GA8130@amd>
-To: Pavel Machek <pavel@ucw.cz>
-Sender: linux-kernel-owner@vger.kernel.org
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: =?UTF-8?q?Micha=C5=82=20Narajowski?=
+        <michal.narajowski@codecoup.pl>
+To: linux-bluetooth@vger.kernel.org
+Cc: =?UTF-8?q?Micha=C5=82=20Narajowski?=
+        <michal.narajowski@codecoup.pl>
+Subject: [PATCH 3/3] Bluetooth: Refactor append name and appearance
+Date: Wed,  5 Oct 2016 12:28:27 +0200
+Message-Id: <1475663307-3191-3-git-send-email-michal.narajowski@codecoup.pl>
+In-Reply-To: <1475663307-3191-1-git-send-email-michal.narajowski@codecoup.pl>
+References: <1475663307-3191-1-git-send-email-michal.narajowski@codecoup.pl>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Pavel,
+Use eir_append_data to remove code duplication.
 
-> bluetooth.h is not part of user API, so __ variants are not neccessary
-> here.
-> 
-> Signed-off-by: Pavel Machek <pavel@ucw.cz>
-> 
-> diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-> index bfd1590..aea0371 100644
-> --- a/include/net/bluetooth/bluetooth.h
-> +++ b/include/net/bluetooth/bluetooth.h
-> @@ -60,8 +60,8 @@
-> 
-> #define BT_SECURITY	4
-> struct bt_security {
-> -	__u8 level;
-> -	__u8 key_size;
-> +	u8 level;
-> +	u8 key_size;
-> };
-> #define BT_SECURITY_SDP		0
-> #define BT_SECURITY_LOW		1
-> @@ -78,7 +78,7 @@ struct bt_security {
-> 
-> #define BT_POWER	9
-> struct bt_power {
-> -	__u8 force_active;
-> +	u8 force_active;
-> };
-> #define BT_POWER_FORCE_ACTIVE_OFF 0
-> #define BT_POWER_FORCE_ACTIVE_ON  1
-> @@ -112,7 +112,7 @@ struct bt_power {
-> 
-> #define BT_VOICE		11
-> struct bt_voice {
-> -	__u16 setting;
-> +	u16 setting;
-> };
-> 
-> #define BT_VOICE_TRANSPARENT			0x0003
-> @@ -188,7 +188,7 @@ static inline const char *state_to_string(int state)
-> 
-> /* BD Address */
-> typedef struct {
-> -	__u8 b[6];
-> +	u8 b[6];
-> } __packed bdaddr_t;
-> 
+Signed-off-by: Michał Narajowski <michal.narajowski@codecoup.pl>
+---
+ net/bluetooth/hci_request.c | 44 +++++++++++++++-----------------------------
+ net/bluetooth/hci_request.h | 23 +++++++++++++++++++++++
+ net/bluetooth/mgmt.c        | 21 ---------------------
+ 3 files changed, 38 insertions(+), 50 deletions(-)
 
-can you leave these out please. They are meant to become UAPI eventually.
+diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
+index 3c44c54..e228842 100644
+--- a/net/bluetooth/hci_request.c
++++ b/net/bluetooth/hci_request.c
+@@ -21,8 +21,6 @@
+    SOFTWARE IS DISCLAIMED.
+ */
+ 
+-#include <asm/unaligned.h>
+-
+ #include <net/bluetooth/bluetooth.h>
+ #include <net/bluetooth/hci_core.h>
+ #include <net/bluetooth/mgmt.h>
+@@ -992,46 +990,39 @@ static u8 append_local_name(struct hci_dev *hdev, u8 *ptr, u8 ad_len)
+ 	/* complete name fits and is eq to max short name len or smaller */
+ 	if (complete_len <= max_len &&
+ 	    complete_len <= HCI_MAX_SHORT_NAME_LENGTH) {
+-		ptr[0] = complete_len + 1;
+-		ptr[1] = EIR_NAME_COMPLETE;
+-		memcpy(ptr + 2, hdev->dev_name, complete_len);
+-
+-		return ad_len + complete_len + 2;
++		return eir_append_data(ptr, ad_len, EIR_NAME_COMPLETE,
++				       hdev->dev_name, complete_len);
+ 	}
+ 
+ 	/* short name set and fits */
+ 	if (short_len && short_len <= max_len) {
+-		ptr[0] = short_len + 1;
+-		ptr[1] = EIR_NAME_SHORT;
+-		memcpy(ptr + 2, hdev->short_name, short_len);
+-
+-		return ad_len + short_len + 2;
++		return eir_append_data(ptr, ad_len, EIR_NAME_SHORT,
++				       hdev->short_name, short_len);
+ 	}
+ 
+ 	/* no short name set so shorten complete name */
+ 	if (!short_len) {
+-		ptr[0] = max_len + 1;
+-		ptr[1] = EIR_NAME_SHORT;
+-		memcpy(ptr + 2, hdev->dev_name, max_len);
+-
+-		return ad_len + max_len + 2;
++		return eir_append_data(ptr, ad_len, EIR_NAME_SHORT,
++				       hdev->dev_name, max_len);
+ 	}
+ 
+ 	return ad_len;
+ }
+ 
++static u8 append_appearance(struct hci_dev *hdev, u8 *ptr, u8 ad_len)
++{
++	return eir_append_le16(ptr, ad_len, EIR_APPEARANCE, hdev->appearance);
++}
++
+ static u8 create_default_scan_rsp_data(struct hci_dev *hdev, u8 *ptr)
+ {
+ 	u8 scan_rsp_len = 0;
+ 
+ 	if (hdev->appearance) {
+-		ptr[0] = 3;
+-		ptr[1] = EIR_APPEARANCE;
+-		put_unaligned_le16(hdev->appearance, ptr + 2);
+-		scan_rsp_len += 4;
++		scan_rsp_len = append_appearance(hdev, ptr, scan_rsp_len);
+ 	}
+ 
+-	return append_local_name(hdev, ptr + scan_rsp_len, scan_rsp_len);
++	return append_local_name(hdev, ptr, scan_rsp_len);
+ }
+ 
+ static u8 create_instance_scan_rsp_data(struct hci_dev *hdev, u8 instance,
+@@ -1048,18 +1039,13 @@ static u8 create_instance_scan_rsp_data(struct hci_dev *hdev, u8 instance,
+ 	instance_flags = adv_instance->flags;
+ 
+ 	if ((instance_flags & MGMT_ADV_FLAG_APPEARANCE) && hdev->appearance) {
+-		ptr[0] = 3;
+-		ptr[1] = EIR_APPEARANCE;
+-		put_unaligned_le16(hdev->appearance, ptr + 2);
+-		scan_rsp_len += 4;
+-		ptr += 4;
++		scan_rsp_len = append_appearance(hdev, ptr, scan_rsp_len);
+ 	}
+ 
+-	memcpy(ptr, adv_instance->scan_rsp_data,
++	memcpy(&ptr[scan_rsp_len], adv_instance->scan_rsp_data,
+ 	       adv_instance->scan_rsp_len);
+ 
+ 	scan_rsp_len += adv_instance->scan_rsp_len;
+-	ptr += adv_instance->scan_rsp_len;
+ 
+ 	if (instance_flags & MGMT_ADV_FLAG_LOCAL_NAME)
+ 		scan_rsp_len = append_local_name(hdev, ptr, scan_rsp_len);
+diff --git a/net/bluetooth/hci_request.h b/net/bluetooth/hci_request.h
+index ac1e110..6b06629 100644
+--- a/net/bluetooth/hci_request.h
++++ b/net/bluetooth/hci_request.h
+@@ -20,6 +20,8 @@
+    SOFTWARE IS DISCLAIMED.
+ */
+ 
++#include <asm/unaligned.h>
++
+ #define hci_req_sync_lock(hdev)   mutex_lock(&hdev->req_lock)
+ #define hci_req_sync_unlock(hdev) mutex_unlock(&hdev->req_lock)
+ 
+@@ -103,3 +105,24 @@ static inline void hci_update_background_scan(struct hci_dev *hdev)
+ 
+ void hci_request_setup(struct hci_dev *hdev);
+ void hci_request_cancel_all(struct hci_dev *hdev);
++
++static inline u16 eir_append_data(u8 *eir, u16 eir_len, u8 type,
++				  u8 *data, u8 data_len)
++{
++	eir[eir_len++] = sizeof(type) + data_len;
++	eir[eir_len++] = type;
++	memcpy(&eir[eir_len], data, data_len);
++	eir_len += data_len;
++
++	return eir_len;
++}
++
++static inline u16 eir_append_le16(u8 *eir, u16 eir_len, u8 type, u16 data)
++{
++	eir[eir_len++] = sizeof(type) + sizeof(data);
++	eir[eir_len++] = type;
++	put_unaligned_le16(data, &eir[eir_len]);
++	eir_len += sizeof(data);
++
++	return eir_len;
++}
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 19b8a5e..7360380 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -867,27 +867,6 @@ static int read_controller_info(struct sock *sk, struct hci_dev *hdev,
+ 				 sizeof(rp));
+ }
+ 
+-static inline u16 eir_append_data(u8 *eir, u16 eir_len, u8 type, u8 *data,
+-				  u8 data_len)
+-{
+-	eir[eir_len++] = sizeof(type) + data_len;
+-	eir[eir_len++] = type;
+-	memcpy(&eir[eir_len], data, data_len);
+-	eir_len += data_len;
+-
+-	return eir_len;
+-}
+-
+-static inline u16 eir_append_le16(u8 *eir, u16 eir_len, u8 type, u16 data)
+-{
+-	eir[eir_len++] = sizeof(type) + sizeof(data);
+-	eir[eir_len++] = type;
+-	put_unaligned_le16(data, &eir[eir_len]);
+-	eir_len += sizeof(data);
+-
+-	return eir_len;
+-}
+-
+ static u16 append_eir_data_to_buf(struct hci_dev *hdev, u8 *eir)
+ {
+ 	u16 eir_len = 0;
+-- 
+2.7.4
 
-> /* BD Address type */
-> @@ -196,7 +196,7 @@ typedef struct {
-> #define BDADDR_LE_PUBLIC	0x01
-> #define BDADDR_LE_RANDOM	0x02
-> 
-> -static inline bool bdaddr_type_is_valid(__u8 type)
-> +static inline bool bdaddr_type_is_valid(u8 type)
-> {
-> 	switch (type) {
-> 	case BDADDR_BREDR:
-> @@ -208,7 +208,7 @@ static inline bool bdaddr_type_is_valid(__u8 type)
-> 	return false;
-> }
-> 
-> -static inline bool bdaddr_type_is_le(__u8 type)
-> +static inline bool bdaddr_type_is_le(u8 type)
-> {
-> 	switch (type) {
-> 	case BDADDR_LE_PUBLIC:
-> @@ -278,15 +278,16 @@ struct sock *bt_accept_dequeue(struct sock *parent, struct socket *newsock);
-> 
-> /* Skb helpers */
-> struct l2cap_ctrl {
-> -	__u8	sframe:1,
-> +	u8	sframe:1,
-> 		poll:1,
-> 		final:1,
-> 		fcs:1,
-> 		sar:2,
-> 		super:2;
-> -	__u16	reqseq;
-> -	__u16	txseq;
-> -	__u8	retries;
-> +
-> +	u16	reqseq;
-> +	u16	txseq;
-> +	u8	retries;
-> 	__le16  psm;
-> 	bdaddr_t bdaddr;
-> 	struct l2cap_chan *chan;
-> @@ -302,7 +303,7 @@ typedef void (*hci_req_complete_skb_t)(struct hci_dev *hdev, u8 status,
-> #define HCI_REQ_SKB	BIT(1)
-> 
-> struct hci_ctrl {
-> -	__u16 opcode;
-> +	u16 opcode;
-> 	u8 req_flags;
-> 	u8 req_event;
-> 	union {
-> @@ -312,10 +313,10 @@ struct hci_ctrl {
-> };
-> 
-> struct bt_skb_cb {
-> -	__u8 pkt_type;
-> -	__u8 force_active;
-> -	__u16 expect;
-> -	__u8 incoming:1;
-> +	u8 pkt_type;
-> +	u8 force_active;
-> +	u16 expect;
-> +	u8 incoming:1;
-> 	union {
-> 		struct l2cap_ctrl l2cap;
-> 		struct hci_ctrl hci;
-> @@ -365,7 +366,7 @@ out:
-> 	return NULL;
-> }
-> 
-> -int bt_to_errno(__u16 code);
-> +int bt_to_errno(u16 code);
-
-The rest looks good to me.
-
-Regards
-
-Marcel
