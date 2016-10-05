@@ -4,191 +4,121 @@ From: =?UTF-8?q?Micha=C5=82=20Narajowski?=
 To: linux-bluetooth@vger.kernel.org
 Cc: =?UTF-8?q?Micha=C5=82=20Narajowski?=
         <michal.narajowski@codecoup.pl>
-Subject: [PATCH BlueZ 2/4] tools/mgmt-tester: Fix add local name to scan rsp
-Date: Wed,  5 Oct 2016 12:27:15 +0200
-Message-Id: <1475663237-3070-2-git-send-email-michal.narajowski@codecoup.pl>
-In-Reply-To: <1475663237-3070-1-git-send-email-michal.narajowski@codecoup.pl>
-References: <1475663237-3070-1-git-send-email-michal.narajowski@codecoup.pl>
+Subject: [PATCH BlueZ 1/4] tools/mgmt-tester: Fix setup commands and conditions handling
+Date: Wed,  5 Oct 2016 12:27:14 +0200
+Message-Id: <1475663237-3070-1-git-send-email-michal.narajowski@codecoup.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Use complete name if it fits. If not and there is short name
-check if it fits. If not then use shortened name as prefix
-of complete name.
+It used to be a quick hack so it would be possible to send
+multiple mgmt cmds on setup. Now sending setup command in
+setup_command_generic adds a setup condition (separate from
+ordinary conditions) so a setup is only successful when all
+the setup conditions are met.
 ---
- tools/mgmt-tester.c | 134 +++++++++++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 127 insertions(+), 7 deletions(-)
+ tools/mgmt-tester.c | 39 ++++++++++++++++++++++++++++++---------
+ 1 file changed, 30 insertions(+), 9 deletions(-)
 
 diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
-index 8929e09..bc770b7 100644
+index b052570..8929e09 100644
 --- a/tools/mgmt-tester.c
 +++ b/tools/mgmt-tester.c
-@@ -1789,6 +1789,11 @@ static const char write_eir_local_name_hci_1[241] = { 0x00,
- 		0x0a, 0x09, 'T', 'e', 's', 't', ' ', 'n', 'a', 'm', 'e',
- 		0x02, 0x0a, 0x00, };
- 
-+static const struct mgmt_cp_set_local_name set_local_name_cp = {
-+	.name = {'T', 'e', 's', 't', ' ', 'n', 'a', 'm', 'e'},
-+	.short_name = {'T', 'e', 's', 't'},
-+};
-+
- static const struct generic_data set_local_name_test_1 = {
- 	.send_opcode = MGMT_OP_SET_LOCAL_NAME,
- 	.send_param = set_local_name_param,
-@@ -5002,11 +5007,6 @@ static const struct generic_data read_ext_ctrl_info3 = {
- 	.expect_len = sizeof(ext_ctrl_info3),
+@@ -63,6 +63,7 @@ struct test_data {
+ 	struct hciemu *hciemu;
+ 	enum hciemu_type hciemu_type;
+ 	int unmet_conditions;
++	int unmet_setup_conditions;
  };
  
--static const struct mgmt_cp_set_local_name set_local_name_cp = {
--	.name = {'T', 'e', 's', 't', ' ', 'n', 'a', 'm', 'e'},
--	.short_name = {'T', 'e', 's', 't'},
--};
+ static void mgmt_debug(const char *str, void *user_data)
+@@ -287,6 +288,27 @@ static void test_add_condition(struct test_data *data)
+ 	tester_print("Test condition added, total %d", data->unmet_conditions);
+ }
+ 
++static void test_add_setup_condition(struct test_data *data)
++{
++	data->unmet_setup_conditions++;
++
++	tester_print("Test setup condition added, total %d",
++		     data->unmet_setup_conditions);
++}
++
++static void test_setup_condition_complete(struct test_data *data)
++{
++	data->unmet_setup_conditions--;
++
++	tester_print("Test setup condition complete, %d left",
++		     data->unmet_setup_conditions);
++
++	if (data->unmet_setup_conditions > 0)
++		return;
++
++	tester_setup_complete();
++}
++
+ static void test_condition_complete(struct test_data *data)
+ {
+ 	data->unmet_conditions--;
+@@ -6086,7 +6108,7 @@ static void command_setup_hci_callback(uint16_t opcode, const void *param,
+ 	}
+ 
+ 	hciemu_clear_master_post_command_hooks(data->hciemu);
+-	test_condition_complete(data);
++	test_setup_condition_complete(data);
+ }
+ 
+ static void command_hci_callback(uint16_t opcode, const void *param,
+@@ -6127,8 +6149,7 @@ static void setup_mgmt_cmd_callback(uint8_t status, uint16_t length,
+ 		tester_setup_failed();
+ 		return;
+ 	}
 -
- static const char ext_ctrl_info4[] = {
- 	0x00, 0x00, 0x00, 0x01, 0xaa, 0x00, /* btaddr */
- 	0x08, /* version */
-@@ -6366,6 +6366,111 @@ static const struct generic_data add_advertising_dta_name_scrsp = {
- 	.expect_hci_len = sizeof(set_scan_rsp_data_shortened_name),
- };
+-	tester_setup_complete();
++	test_setup_condition_complete(user_data);
+ }
  
-+static const uint8_t add_advertising_param_data_short_name_scan_rsp[] = {
-+	0x01,			/* adv instance */
-+	0x40, 0x00, 0x00, 0x00,	/* flags: Add local name to scan_rsp */
-+	0x00, 0x00,		/* duration: default */
-+	0x00, 0x00,		/* timeout: none */
-+	0x00,			/* adv data len */
-+	0x17,			/* scan rsp len */
-+	/* scan rsp data: */
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	0x00, 0x00, 0x00,
-+};
-+
-+static const uint8_t set_scan_rsp_data_short_name[] = {
-+	0x1d, /* Scan rsp len */
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	0x00, 0x00, 0x00, /* placeholder data */
-+	0x05, /* Local name length */
-+	0x08, /* Short name */
-+	0x54, 0x65, 0x73, 0x74, /* "Test" */
-+	0x00, 0x00, /* padding */
-+};
-+
-+static const struct generic_data add_advertising_dta_short_name_scrsp = {
-+	.setup_settings = settings_powered_le,
-+	.setup_expect_hci_command = BT_HCI_CMD_LE_SET_SCAN_RSP_DATA,
-+	.setup_expect_hci_param = set_scan_rsp_data_name,
-+	.setup_expect_hci_len = sizeof(set_scan_rsp_data_name),
-+	.setup_send_opcode = MGMT_OP_SET_LOCAL_NAME,
-+	.setup_send_param = &set_local_name_cp,
-+	.setup_send_len = sizeof(set_local_name_cp),
-+	.send_opcode = MGMT_OP_ADD_ADVERTISING,
-+	.send_param = add_advertising_param_data_short_name_scan_rsp,
-+	.send_len = sizeof(add_advertising_param_data_short_name_scan_rsp),
-+	.expect_status = MGMT_STATUS_SUCCESS,
-+	.expect_param = advertising_instance1_param,
-+	.expect_len = sizeof(advertising_instance1_param),
-+	.expect_hci_command = BT_HCI_CMD_LE_SET_SCAN_RSP_DATA,
-+	.expect_hci_param = set_scan_rsp_data_short_name,
-+	.expect_hci_len = sizeof(set_scan_rsp_data_short_name),
-+};
-+
-+static const uint8_t set_scan_rsp_data_too_long_name[] = {
-+	0x06, /* Scan rsp len */
-+	0x05, /* Local name length */
-+	0x08, /* Short name */
-+	0x54, 0x65, 0x73, 0x74, /* "Test" */
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x00, 0x00, /* padding */
-+};
-+
-+static const struct mgmt_cp_set_local_name set_long_local_name_cp = {
-+	.name = {'T', 'e', 's', 't', ' ', 'n', 'a', 'm', 'e', '1', '2'},
-+	.short_name = {'T', 'e', 's', 't'},
-+};
-+
-+static const struct generic_data add_advertising_too_long_name_scrsp = {
-+	.setup_settings = settings_powered_le,
-+	.setup_send_opcode = MGMT_OP_SET_LOCAL_NAME,
-+	.setup_send_param = &set_long_local_name_cp,
-+	.setup_send_len = sizeof(set_long_local_name_cp),
-+	.send_opcode = MGMT_OP_ADD_ADVERTISING,
-+	.send_param = add_advertising_param_name,
-+	.send_len = sizeof(add_advertising_param_name),
-+	.expect_status = MGMT_STATUS_SUCCESS,
-+	.expect_param = advertising_instance1_param,
-+	.expect_len = sizeof(advertising_instance1_param),
-+	.expect_hci_command = BT_HCI_CMD_LE_SET_SCAN_RSP_DATA,
-+	.expect_hci_param = set_scan_rsp_data_too_long_name,
-+	.expect_hci_len = sizeof(set_scan_rsp_data_too_long_name),
-+};
-+
-+static const uint8_t set_scan_rsp_data_name_fits[] = {
-+	0x0c, /* Scan rsp len */
-+	0x0b, /* Local name length */
-+	0x09, /* Complete name */
-+	0x54, 0x65, 0x73, 0x74, 0x20,
-+	0x6e, 0x61, 0x6d, 0x65, 0x31, /* "Test name1" */
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* padding */
-+};
-+
-+static const struct mgmt_cp_set_local_name set_local_name_fits_cp = {
-+	.name = {'T', 'e', 's', 't', ' ', 'n', 'a', 'm', 'e', '1'},
-+	.short_name = {'T', 'e', 's', 't'},
-+};
-+
-+static const struct generic_data add_advertising_name_fits_scrsp = {
-+	.setup_settings = settings_powered_le,
-+	.setup_send_opcode = MGMT_OP_SET_LOCAL_NAME,
-+	.setup_send_param = &set_local_name_fits_cp,
-+	.setup_send_len = sizeof(set_local_name_fits_cp),
-+	.send_opcode = MGMT_OP_ADD_ADVERTISING,
-+	.send_param = add_advertising_param_name,
-+	.send_len = sizeof(add_advertising_param_name),
-+	.expect_status = MGMT_STATUS_SUCCESS,
-+	.expect_param = advertising_instance1_param,
-+	.expect_len = sizeof(advertising_instance1_param),
-+	.expect_hci_command = BT_HCI_CMD_LE_SET_SCAN_RSP_DATA,
-+	.expect_hci_param = set_scan_rsp_data_name_fits,
-+	.expect_hci_len = sizeof(set_scan_rsp_data_name_fits),
-+};
-+
- static const uint8_t add_advertising_param_appearance1[] = {
- 	0x01,			/* adv instance */
- 	0x20, 0x00, 0x00, 0x00,	/* flags: Add local name to scan_rsp */
-@@ -7840,12 +7945,27 @@ int main(int argc, char *argv[])
- 					setup_command_generic,
- 					test_command_generic);
+ static void setup_command_generic(const void *test_data)
+@@ -6145,7 +6166,7 @@ static void setup_command_generic(const void *test_data)
+ 					 test->setup_expect_hci_command);
+ 		hciemu_add_master_post_command_hook(data->hciemu,
+ 					command_setup_hci_callback, data);
+-		test_add_condition(data);
++		test_add_setup_condition(data);
+ 	}
  
--	test_bredrle("Add Advertising - Success 5 (Appearance in ScRsp)",
-+	test_bredrle("Add Advertising - Success 5 (name too long in ScRsp)",
-+					&add_advertising_too_long_name_scrsp,
-+					setup_command_generic,
-+					test_command_generic);
-+
-+	test_bredrle("Add Advertising - Success 6 (name fits in ScRsp)",
-+					&add_advertising_name_fits_scrsp,
-+					setup_command_generic,
-+					test_command_generic);
-+
-+	test_bredrle("Add Advertising - Success 7 (Dta + short in ScRsp)",
-+					&add_advertising_dta_short_name_scrsp,
-+					setup_command_generic,
-+					test_command_generic);
-+
-+	test_bredrle("Add Advertising - Success 8 (Appearance in ScRsp)",
- 					&add_advertising_appearance_scrsp,
- 					setup_command_generic,
- 					test_command_generic);
+ 	if (test->setup_send_opcode) {
+@@ -6155,7 +6176,8 @@ static void setup_command_generic(const void *test_data)
+ 		mgmt_send(data->mgmt, test->setup_send_opcode, data->mgmt_index,
+ 					send_len, send_param,
+ 					setup_mgmt_cmd_callback,
+-					NULL, NULL);
++					data, NULL);
++		test_add_setup_condition(data);
+ 		return;
+ 	}
  
--	test_bredrle("Add Advertising - Success 6 (Appear + Dta in ScRsp)",
-+	test_bredrle("Add Advertising - Success 9 (Appear + Dta in ScRsp)",
- 					&add_advertising_appear_data_scrsp,
- 					setup_command_generic,
- 					test_command_generic);
+@@ -6173,10 +6195,9 @@ static void setup_command_generic(const void *test_data)
+ 		mgmt_send(data->mgmt, cmd->send_opcode, data->mgmt_index,
+ 				cmd->send_len, cmd->send_param,
+ 				setup_mgmt_cmd_callback,
+-				NULL, NULL);
++				data, NULL);
++		test_add_setup_condition(data);
+ 	}
+-
+-	tester_setup_complete();
+ }
+ 
+ static const uint8_t add_advertising_param_name[] = {
+@@ -7895,7 +7916,7 @@ int main(int argc, char *argv[])
+ 
+ 	test_bredrle("Read Ext Controller Info 1",
+ 				&read_ext_ctrl_info1,
+-				setup_command_generic, test_command_generic);
++				NULL, test_command_generic);
+ 
+ 	test_bredrle("Read Ext Controller Info 2",
+ 				&read_ext_ctrl_info2,
 -- 
 2.7.4
 
