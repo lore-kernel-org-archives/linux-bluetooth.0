@@ -1,38 +1,42 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-Reply-To: aaron.hamilton@atlaslabs.io
-From: Aaron Hamilton <aaron.hamilton@atlaslabs.io>
-Date: Thu, 6 Oct 2016 19:10:13 -0700
-Message-ID: <CAFjWW+aPVE4EMbsgem4MesotaXugE+=v5oYvLtT7n9KV5EQwpQ@mail.gmail.com>
-Subject: Auto-Add Serial Port Profile?
+From: Semih Hazar <shazar@gmail.com>
+Date: Thu, 6 Oct 2016 17:26:14 -0500
+Message-ID: <CAH3xFdZjm+YS+3N8=_v=jMhRPsBb5PzcqLe=vQDRDKKae6U1_Q@mail.gmail.com>
+Subject: BLE Connection Problem with iPhone 7
 To: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I'm looking for direction on the best way of automatically adding a
-serial port profile when bluetoothd starts up (from any peer/device,
-not a specified one). Currently I'm having to do the following:
+Hi All,
 
-1. launch bluetoothd via OpenWrt procd script with "bluetoothd -d -n -C"
-2. Execute "sdptool add --channel=2 SP". This is problematic in that
-it must be executed again if bluetoothd or the adapter is restarted,
-or it fails if run before bluetoothd is up.
-3. Start rfcomm listener/watch: "rfcomm watch /dev/rfcomm0 2
-launcher.sh -c /dev/rfcomm0" (this is a custom process for accepting
-files from any client that connects).
+I'm using the latest kernel (master) and latest Bluez release. Our
+Python app is using D-Bus API to create a BLE peripheral.
 
-I'm open to suggestion for a more reliable method if there is one.
-Otherwise, I'd like to eliminate the need for executing the "sdptool
-add ..." command since this is creating reliability issues. I
-initially tried creating a profile based off bluez5.42 SAP, but it
-locks up my machine when a peer tries to pair.
+When connecting from an iPhone 7, it doesn't work with our embedded
+WiFi/Bluetooth module, but works with a USB BT dongle. In [1] you can
+see the packet dump when using the embedded chip and in [2] when using
+the USB dongle.
 
-Ultimately, I need a robust method for allowing legacy devices to pair
-with the adapter and transfer files. The adapter is a server, so it
-accepts connections from any device that pairs successfully.
+Can you help me understand the difference between these two? Initially
+it looks like both the phone and our device is setting new MTU sizes.
+But in the non-working case only our device (i.e. Bluez) is asking for
+a new MTU size. Is that correct?
 
-Also, I don't have control over the other end, so all I can do is open
-up the RFCOMM port and accept files over it.
+Also in non-working scenario, iPhone doesn't seem to be querying
+services on our device.
 
-Thanks in advance for any assistance.
+What could be the reason for this? What else can I check?
+
+Another point is, embedded module works with other smartphones
+including other iPhones such as 6 and 6S.
+
+Both embedded module and the USB dongle use Broadcom chips. Module:
+BCM43438A0, USB: BCM20702A1
+
+[1] http://imgur.com/8uoXnVw
+[2] http://imgur.com/JnSlIKK
+
+Thanks in advance,
+Semih Hazar
