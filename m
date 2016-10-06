@@ -1,49 +1,81 @@
-Return-Path: <jerome.debretagne@gmail.com>
-Message-ID: <1475737388.5772.1.camel@gmail.com>
-Subject: Re: Bluetooth not working anymore due to too agressive PM in
- hci_bcm ? (was: [PATCH v5 5/5] Bluetooth: hci_bcm: Add suspend/resume
- runtime PM functions)
-From: =?ISO-8859-1?Q?J=E9r=F4me?= de Bretagne <jerome.debretagne@gmail.com>
-To: Loic Poulain <loic.poulain@intel.com>, Marcel Holtmann
- <marcel@holtmann.org>,  linux-bluetooth@vger.kernel.org
-Cc: Frederic Danis <frederic.danis@intel.com>
-Date: Thu, 06 Oct 2016 09:03:08 +0200
-In-Reply-To: <1475702165.5992.4.camel@gmail.com>
-References: <1475533357.2947.3.camel@gmail.com>
-	 <da9a4059-4164-e455-a451-83c97e57ad71@intel.com>
-	 <1475702165.5992.4.camel@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Return-Path: <pavel@ucw.cz>
+Date: Thu, 6 Oct 2016 09:02:38 +0200
+From: Pavel Machek <pavel@ucw.cz>
+To: Joe Perches <joe@perches.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	"Gustavo F. Padovan" <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] bluetooth.h: __ variants of u8 and friends are not
+ neccessary inside kernel
+Message-ID: <20161006070237.GB25972@amd>
+References: <20161003085640.GA8130@amd>
+ <368810F9-519C-44B5-85D4-1815273438BF@holtmann.org>
+ <1475689996.6105.11.camel@perches.com>
+ <20161005191103.GA25972@amd>
+ <1475694934.1941.1.camel@perches.com>
+ <20161005221317.GA21551@amd>
+ <1475706531.1941.4.camel@perches.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="wq9mPyueHGvFACwf"
+In-Reply-To: <1475706531.1941.4.camel@perches.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Loic,
 
-> > I remember Frederic had some gpio/irq polarity issues:>
-> > 5cebdfea32b89911d4540440c1c2854a1a3d591e
-> > Bluetooth: hci_bcm: Fix IRQ polarity for T100
-> > Maybe the ACPI table is not correct on some devices.
-> 
-> 
-> I had seen that patch indeed. I'm attaching the ACPI table I had shared on
-> the list a long time ago for the ThinkPad Tablet 8. Is there anything that
-> looks suspicious in there and that you could link to a similar gpio/irq
-> polarity issue maybe?
-> 
-> If you think there is a good chance that this could be the issue as well,
-> I
-> will try to build a similar patch for this ThinkPad product and share my
-> results.
+--wq9mPyueHGvFACwf
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Just to let you know, after finding the right DMI values to simply adapt the
-above patch for my ThinkPad tablet, I can confirm that a quick local kernel
-modification indeed fixes the issue.
+On Wed 2016-10-05 15:28:51, Joe Perches wrote:
+> On Thu, 2016-10-06 at 00:13 +0200, Pavel Machek wrote:
+> > On Wed 2016-10-05 12:15:34, Joe Perches wrote:
+> > > On Wed, 2016-10-05 at 21:11 +0200, Pavel Machek wrote:
+> > > > On Wed 2016-10-05 10:53:16, Joe Perches wrote:
+> []
+> > > > > trivia:
+> > > > > It's generally faster to use bool instead of u8 foo:1;
+> > > > Ok, but I'm not changing that in this patch.
+> > > > (And actually, bool will take a lot more memory, right?)
+> > > No worries, and bool is the same size as u8.
+> > Exactly what I'm talking about :-). One byte vs. one bit, right?
+>=20
+> Memory isn't bit addressable.
+> So it's the same byte, it just doesn't use a read/modify/write
+> operation to update a value.
 
-I will need a bit more time to propose a proper patch, adding this other
-impacted tablet instead of replacing the above Asus one, and supporting
-potentially even more products facing the same polarity issue.
+I believe you are wrong. bit addressability does not matter, cpu can
+definitely get the bit values.
 
-Is hard-coding such exceptions / polarity issues manually the only way to go
-or could there be a way to detect this programmatically instead?
+u8 foo:1;
+u8 bar:1;
+u8 baz:1;
 
-Regards,
-Jérôme
+should take 1 byte, where
+
+bool foo, bar, baz;
+
+will take more like 3.
+
+									Pavel
+--=20
+(english) http://www.livejournal.com/~pavelmachek
+(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blo=
+g.html
+
+--wq9mPyueHGvFACwf
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: Digital signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlf19w0ACgkQMOfwapXb+vIjTwCfQF2+aVCS+5vR9w4Q6m1MMwu0
+egsAoIkMUy2WHLNuvkQTYnR42lNJLUoy
+=jFQX
+-----END PGP SIGNATURE-----
+
+--wq9mPyueHGvFACwf--
