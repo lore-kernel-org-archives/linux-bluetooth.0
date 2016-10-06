@@ -1,42 +1,27 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: "Schaefer, Brandon" <brandon.schaefer@flukenetworks.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Headset profile no audio; works with a2dp
+Date: Thu, 6 Oct 2016 20:20:03 +0000
+Message-ID: <7D498A2F2F79AE4DBE2DF69CA72B3B55388EC338@US-EVT-EXM03-P.global.tektronix.net>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-From: Semih Hazar <shazar@gmail.com>
-Date: Thu, 6 Oct 2016 17:26:14 -0500
-Message-ID: <CAH3xFdZjm+YS+3N8=_v=jMhRPsBb5PzcqLe=vQDRDKKae6U1_Q@mail.gmail.com>
-Subject: BLE Connection Problem with iPhone 7
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi All,
+Bluez version: 5.40
+Pulseaudio: 6.0
 
-I'm using the latest kernel (master) and latest Bluez release. Our
-Python app is using D-Bus API to create a BLE peripheral.
+I have headset that I am able to pair, connect, and play audio via the a2dp_sink profile of pulseaudio. When I switch to headset_head_unit profile, I can no longer send audio to the headset. I first went to pulseaudio to see if they had any suggestions as I found a very similar case to mine (https://bugs.freedesktop.org/show_bug.cgi?id=97064). 
 
-When connecting from an iPhone 7, it doesn't work with our embedded
-WiFi/Bluetooth module, but works with a USB BT dongle. In [1] you can
-see the packet dump when using the embedded chip and in [2] when using
-the USB dongle.
+Tanu kindly pointed out that there seemed to be missing a dbus signal from bluetoothd, specifically "PropertiesChanged" signal on MediaTransport1 interface. I did some inspection, and transport_update_playing() in profiles/audio/transport.c shows Playing = 0 and not 1, which is the case when using a2dp_sink profile.
 
-Can you help me understand the difference between these two? Initially
-it looks like both the phone and our device is setting new MTU sizes.
-But in the non-working case only our device (i.e. Bluez) is asking for
-a new MTU size. Is that correct?
+Headset_head_unit:
+bluetoothd[756]: profiles/audio/transport.c:transport_update_playing() /org/bluez/hci0/dev_00_11_C2_08_15_F6/fd0 State=TRANSPORT_STATE_IDLE Playing=0
 
-Also in non-working scenario, iPhone doesn't seem to be querying
-services on our device.
+a2dp_sink:
+bluetoothd[756]: profiles/audio/transport.c:transport_update_playing() /org/bluez/hci0/dev_00_11_C2_08_15_F6/fd0 State=TRANSPORT_STATE_ACTIVE Playing=1
 
-What could be the reason for this? What else can I check?
+Any recommendation on what might be the issue? Happy to provide any logs that could be useful.
 
-Another point is, embedded module works with other smartphones
-including other iPhones such as 6 and 6S.
 
-Both embedded module and the USB dongle use Broadcom chips. Module:
-BCM43438A0, USB: BCM20702A1
-
-[1] http://imgur.com/8uoXnVw
-[2] http://imgur.com/JnSlIKK
-
-Thanks in advance,
-Semih Hazar
