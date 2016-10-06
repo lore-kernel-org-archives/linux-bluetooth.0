@@ -1,40 +1,30 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 10.0 \(3226\))
-Subject: Re: [PATCH] Bluetooth: btusb: Fix atheros firmware download error
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CAD571NjHoR-i48hTNcXLam0FPPEmGNQbhkMB8Y+61_Vf9O+Jbg@mail.gmail.com>
-Date: Thu, 6 Oct 2016 12:17:24 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <CEF0FBB8-ADCB-4E0E-AC5A-BC83EF55E036@holtmann.org>
-References: <CAD571NjHoR-i48hTNcXLam0FPPEmGNQbhkMB8Y+61_Vf9O+Jbg@mail.gmail.com>
-To: Ethan Hsieh <ethan.hsieh@canonical.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <David.Laight@ACULAB.COM>
+From: David Laight <David.Laight@ACULAB.COM>
+To: 'Joe Perches' <joe@perches.com>, Pavel Machek <pavel@ucw.cz>
+CC: Marcel Holtmann <marcel@holtmann.org>, "trivial@kernel.org"
+	<trivial@kernel.org>, "Gustavo F. Padovan" <gustavo@padovan.org>, "Johan
+ Hedberg" <johan.hedberg@gmail.com>, "David S. Miller" <davem@davemloft.net>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: RE: [PATCH] bluetooth.h: __ variants of u8 and friends are not
+ neccessary inside kernel
+Date: Thu, 6 Oct 2016 09:41:21 +0000
+Message-ID: <063D6719AE5E284EB5DD2968C1650D6DB01E3EAB@AcuExch.aculab.com>
+References: <20161003085640.GA8130@amd>
+         <368810F9-519C-44B5-85D4-1815273438BF@holtmann.org>
+         <1475689996.6105.11.camel@perches.com> <20161005191103.GA25972@amd>
+ <1475694934.1941.1.camel@perches.com>
+In-Reply-To: <1475694934.1941.1.camel@perches.com>
+Content-Type: text/plain; charset="Windows-1252"
+MIME-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ethan,
+From: Of Joe Perches
+...
+> No worries, and bool is the same size as u8.
 
-> Move usb_autopm_get_interface() ahead of setup_on_usb() to prevent device
-> from sending usb control message in usb suspend mode.
-> 
-> The error message is as below:
-> 
-> [   83.944103] btusb 1-2:1.1: usb_suspend_interface: status 0
-> [   83.944107] btusb 1-2:1.0: usb_suspend_interface: status 0
-> [   83.960132] usb 1-2: usb auto-suspend, wakeup 0
-> [   83.976156] usb 1-2: usb_suspend_device: status 0
-> [   83.976162] usb 1-2: usb_suspend_both: status 0
-> [  298.689106] Bluetooth: hci0
-> [  298.689399] Bluetooth: hci0: Failed to access otp area (-113)
-> 
-> Signed-off-by: Ethan Hsieh <ethan.hsieh@canonical.com>
-> ---
-> drivers/bluetooth/btusb.c | 8 ++++----
-> 1 file changed, 4 insertions(+), 4 deletions(-)
+That is not guaranteed at all.
+One of the ARM ABI defined bool to be the size of int.
 
-the patch does not apply. Please send one that actually applies against bluetooth-next tree.
-
-Regards
-
-Marcel
-
+	David
