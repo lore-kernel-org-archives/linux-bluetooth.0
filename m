@@ -1,21 +1,63 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Jamie Mccrae <Jamie.Mccrae@lairdtech.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Getting the address type of a  BLE device
-Date: Fri, 7 Oct 2016 14:49:07 +0000
-Message-ID: <5EFE62F1AC977B4F94A5BA55F4D506333BF4D43A@DEDC01MBX02.corp.lairdtech.com>
-Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
+In-Reply-To: <CAFjWW+aPVE4EMbsgem4MesotaXugE+=v5oYvLtT7n9KV5EQwpQ@mail.gmail.com>
+References: <CAFjWW+aPVE4EMbsgem4MesotaXugE+=v5oYvLtT7n9KV5EQwpQ@mail.gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Fri, 7 Oct 2016 11:15:56 +0300
+Message-ID: <CABBYNZK5N4+6TURA3Hs8TCH7C8OQ5mHj3VP1cvvZjWj87jMJig@mail.gmail.com>
+Subject: Re: Auto-Add Serial Port Profile?
+To: aaron.hamilton@atlaslabs.io
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Aaron,
 
-One thing I've noticed that is lacking in BlueZ seems to be the inability to get the address type of the devices found in a scan for Bluetooth Low Energy scans (not Bluetooth Classic). This is a headache in frameworks like Qt. According to a BlueZ 4 -> 5 porting guide when a device is detected the Bluetooth daemon holds the address type for 3 minutes and you should be able to connect or pair with it without needing to set the address type (random or private) but this does not work at all from Qt. Also (assuming it worked) there is the problem of what if a user performs a scan and decides to connect in 5 minutes' time? The type of address will have been deleted.
-I propose adding an additional field to the list of devices in a scan that will return nothing for BTC devices (or something to indicate it is not a BLE device, there is also the option to return something else if the device is both a BLE and BTC device combined) or the first byte of the BLE address if it is a BLE device. Right now in Qt it is purely guess work what type of address is received and it'd be nice to improve that to make the system workable. This means you can detect what type of device it is (great for logging), check if it also has  BTC service (and decide to connect with that) or check if it's using a random address that your device has a resolving key for - none of which is possible at the moment. It also helps out with a potential MITM issue whereby a device exists with a random address and someone clones the address but sets it as a static address: how do you know what device you are really pairing with? The correct device or the impersonation which could be decryp
- ting all data passing through it and passing it to the real device.
+On Fri, Oct 7, 2016 at 5:10 AM, Aaron Hamilton
+<aaron.hamilton@atlaslabs.io> wrote:
+> I'm looking for direction on the best way of automatically adding a
+> serial port profile when bluetoothd starts up (from any peer/device,
+> not a specified one). Currently I'm having to do the following:
+>
+> 1. launch bluetoothd via OpenWrt procd script with "bluetoothd -d -n -C"
+> 2. Execute "sdptool add --channel=2 SP". This is problematic in that
+> it must be executed again if bluetoothd or the adapter is restarted,
+> or it fails if run before bluetoothd is up.
+> 3. Start rfcomm listener/watch: "rfcomm watch /dev/rfcomm0 2
+> launcher.sh -c /dev/rfcomm0" (this is a custom process for accepting
+> files from any client that connects).
 
-I'm interested to hear everyone's thoughts and suggestions regarding this addition.
+This is all deprecated, sdptool and rfcomm tool, what you should be
+using the Profile API:
 
-Thanks,
-Jamie
+https://git.kernel.org/cgit/bluetooth/bluez.git/tree/doc/profile-api.txt
+
+And there is an example in python:
+
+https://git.kernel.org/cgit/bluetooth/bluez.git/tree/test/test-profile
+
+> I'm open to suggestion for a more reliable method if there is one.
+> Otherwise, I'd like to eliminate the need for executing the "sdptool
+> add ..." command since this is creating reliability issues. I
+> initially tried creating a profile based off bluez5.42 SAP, but it
+> locks up my machine when a peer tries to pair.
+
+Look at the profile API. As for pairing locking up I guess it is
+waiting for input on the agent, anyway you can require or not both
+authentication and authorization when registering the profile.
+
+> Ultimately, I need a robust method for allowing legacy devices to pair
+> with the adapter and transfer files. The adapter is a server, so it
+> accepts connections from any device that pairs successfully.
+
+Well for files there exists the OBEX based profiles, but you can of
+course do a custom profile using a RFCOMM channel.
+
+> Also, I don't have control over the other end, so all I can do is open
+> up the RFCOMM port and accept files over it.
+
+
+
+-- 
+Luiz Augusto von Dentz
