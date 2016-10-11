@@ -1,41 +1,19 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Steve Gladden <steve@michiganbroadband.com>
-To: Barry Byford <31baz66@gmail.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Tue, 11 Oct 2016 13:52:27 -0400
-Subject: RE: How can you set Transmit power level in Bluetooth LE mode for
- an LE beacon?
-Message-ID: <FEFD25773376F6448FE2884F5C1FA5270117A63D4D2D@X2.michiganbb.local>
-References: <FEFD25773376F6448FE2884F5C1FA527F5E8622404@X2.michiganbb.local>
- <FEFD25773376F6448FE2884F5C1FA5270117A63D4D2C@X2.michiganbb.local>,<CAAu3APZmaK_npAwEk9cd=KB8zqt2=DFnKJqV8Wd_QTUNi5vHrQ@mail.gmail.com>
-In-Reply-To: <CAAu3APZmaK_npAwEk9cd=KB8zqt2=DFnKJqV8Wd_QTUNi5vHrQ@mail.gmail.com>
-Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
+In-Reply-To: <FEFD25773376F6448FE2884F5C1FA5270117A63D4D2C@X2.michiganbb.local>
+References: <FEFD25773376F6448FE2884F5C1FA527F5E8622404@X2.michiganbb.local> <FEFD25773376F6448FE2884F5C1FA5270117A63D4D2C@X2.michiganbb.local>
+From: Barry Byford <31baz66@gmail.com>
+Date: Tue, 11 Oct 2016 18:38:56 +0100
+Message-ID: <CAAu3APZmaK_npAwEk9cd=KB8zqt2=DFnKJqV8Wd_QTUNi5vHrQ@mail.gmail.com>
+Subject: Re: How can you set Transmit power level in Bluetooth LE mode for an
+ LE beacon?
+To: Steve Gladden <steve@michiganbroadband.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Thanks!!   
-Yes it's nice to hear from somebody.  
-
-I've been scouring the web so far to no avail on what I think should be a simple and accessible setting.    
-It's obvious from the specs that most chips have a programmable (settable) transmitter power.  
-And with beacons it is very important and expected that one should be able to adjust the transmitter level.   
-All of the serial boards do it with simple AT commands.   
-
-I just don't get why there's no documentation on how to do it with a USB device!!   
-
-They sell class 1 bluetooth usb dongles for applications that require more range (100m) is quoted on most class 1 products.
-
-I'd expect there should be a straight forward easy to set power in LE mode to get more range or save power and limit range when wanted.  
-
-But I'm really not finding this information out there!   
-
-I don;t understand what I am doing wrong or why this is so difficult to find.  :)
-   
-
-
-
-
+Hello Steve,
 
 
 On 11 October 2016 at 17:50, Steve Gladden <steve@michiganbroadband.com> wrote:
