@@ -1,101 +1,86 @@
-Return-Path: <jiangbo.wu@intel.com>
-Date: Sat, 15 Oct 2016 00:43:13 +0800
-From: wujiangbo <jiangbo.wu@intel.com>
-To: Johan Hedberg <johan.hedberg@intel.com>
-Cc: marcel@holtmann.org, linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Add conn type to identify addr type with SMP
- over BR/EDR
-Message-ID: <20161014164313.GA16931@wujiangbo-ubuntu>
-References: <1476448183-8630-1-git-send-email-jiangbo.wu@intel.com>
- <46A11791-AE7E-4064-94EC-D824C875FB37@holtmann.org>
- <ACB402E679F3454EAE433BF5E93F4EAA389960DF@shsmsx102.ccr.corp.intel.com>
- <20161014141938.GA16585@x1c.P-661HNU-F1>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Date: Fri, 14 Oct 2016 17:58:29 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Jamie Mccrae <Jamie.Mccrae@lairdtech.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: Getting the address type of a  BLE device
+Message-ID: <20161014145829.GA17205@x1c.P-661HNU-F1>
+References: <5EFE62F1AC977B4F94A5BA55F4D506333BF4D43A@DEDC01MBX02.corp.lairdtech.com>
+ <20161008060409.GA4638@x1c.P-661HNU-F1>
+ <5EFE62F1AC977B4F94A5BA55F4D506333BF4D518@DEDC01MBX02.corp.lairdtech.com>
+ <20161009145208.GA9550@x1c.P-661HNU-F1>
+ <5EFE62F1AC977B4F94A5BA55F4D506333BF4DC07@DEDC01MBX02.corp.lairdtech.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20161014141938.GA16585@x1c.P-661HNU-F1>
+In-Reply-To: <5EFE62F1AC977B4F94A5BA55F4D506333BF4DC07@DEDC01MBX02.corp.lairdtech.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, Oct 14, 2016 at 05:19:38PM +0300, Johan Hedberg wrote:
-> Hi Jiangbo,
-> 
-> Please don't top-post on this list.
-> 
-> On Fri, Oct 14, 2016, Wu, Jiangbo wrote:
-> > If pair a device that unpair firstly that remove encryption key,
-> > encryption key event will be emitted. kernel will receive
-> > 'L2CAP_CID_SMP_BREDR' frame, and then it will use SMP to distribute
-> > key.  SMP would like to use LTK, IRK and CRSK to notify user. If it
-> > don't identify device by which conn type they are, only marks LE as
-> > the device type,
-> 
-> Why would that happen? Before SMP over BR/EDR happens pairing would have
-> happened over BR/EDR, so bluetoothd should know that BR/EDR is supported
-> as well (it would even be aware of an existing BR/EDR connection). Are
-> you perhaps trying to work around some bluetoothd bug with all this?
-> 
-I use upstream bluez source code without change.
+Hi Jamie,
 
-Yes, bluetoothd scan will find device type is BR/EDR or LE. As my case, device
-is BR/EDR. But if kernel report CRSK notify, bluetoothd will change the device
-type to LE. The code you can see:
-	new_csrk_callback -> btd_adapter_get_device -> btd_adapter_find_device
-		if (bdaddr_type == BDADDR_BREDR)
-			device_set_bredr_support(device);
-		else
-			device_set_le_support(device, bdaddr_type);
-As Marcel mentioned before, LTK, IRK and CRSK are only valid for LE link.
-So the rootcause is why remote start to pair a BR/EDR device, the kernel will
-receive CRSK event.
+On Fri, Oct 14, 2016, Jamie Mccrae wrote:
+>> The LE & BR/EDR D-Bus interface proposal from Szymon (that I
+>> mentioned in my earlier email) would likely be the cleanest way to do
+>> this.
+> 
+> Do you have a link to this proposal?
 
-This is the first pair, and it will pair success even if receive CRSK notify.
-And the second and the next all pair will be failed with remote device unpair
-and then pair again.
+http://thread.gmane.org/gmane.linux.bluez.kernel/67182
 
-> > while Bluetoothd will use this 'addr' and 'addr type' to reply the
-> > comfirm to kernel.
+>> What API does Qt use to connect? The first connection to LE devices
+>> is usually either through the Pair() or Connect() D-Bus method.
+>> Neither one requires knowledge of the address type. After the
+>> initial connection re-connections are typically done through passive
+>> background scanning by the kernel, and in this case the application
+>> also doesn't need knowledge of the address type.
 > 
-> What reply are you talking about? There's no user interaction involved
-> with SMP over BR/EDR - that would already have occurred when SSP over
-> BR/EDR happened.
-> 
-Sorry to confuse the case, the pairing failed coming with next pair procedure.
-Because at the last pair with CRSK notify, device type will be changed to LE,
-following is the failed scenario after last success with CRSK notify. Remote
-unpair and pair again.
+> Qt is using the DBus API but it seems they don't store the device
+> handles/IDs and instead when connecting to a device just require the
+> Bluetooth address (which is why this would be failing as it's not
+> using the kernels cached entries and is specifically setting if it's
+> connecting to a random address or public address before passing it to
+> BlueZ)
 
-This reply is SPP, user confirm passkey reply. When pairing proceduce, User
-confirm the pairing request through bluetoothd, that will send mgmt op
-'MGMT_OP_USER_CONFIRM_REPLY' with device address and device type in
-mgmt_cp_user_confirm_reply. Kernel use the device address and type to lookup
-hci conn. Unfortunately, it will lookup hci_conn from LE hashtable, that don't
-include hci conn. So spp reply couldn't send to remote, caused pair failed.
+The D-Bus API doesn't take addresses as input. The app selects a device
+based on its object path. It might of course be doing matching against
+the Address property, but when requesting to connect it's just based on
+what object path you direct your call to.
 
-> > At the same time kernel always uses them to lookup hci_conn in LE
-> > hashtable firstly, because addr type always marks as LE. Obviously it
-> > will failed with SMP over BR/EDR.
-> 
-> I don't follow this either since there shouldn't have been any "reply"
-> from user space for SMP over BR/EDR. All there should be are events from
-> the kernel for the generated LE keys.
-> 
-> > Actually, SPM is only for LE in SPEC,
-> 
-> That's not true. SMP is specified both for LE-U and ACL-U.
-> 
-> > but kernel already support and use SMP over BR/EDR. if BR/EDR
-> > exchanges key with SMP, it will never reply pairing response to
-> > remote, in other words it will be never paired, that is happened in
-> > our products.
-> 
-> Szymon recently implemented SMP over BR/EDR for Zephyr and used
-> Linux/BlueZ as a reference for testing. He didn't report any issues like
-> this. It might help if you could provide some logs (particularly
-> HCI/btmon but also from bluetoothd) to understand what's the actual
-> issue you're seeing.
-> 
-> Johan
+Is Qt persistently caching something rather than just at run-time? That
+sounds odd (i.e. unnecessary). If it's just run-time then the object
+path would be the most reliable identifier.
 
-Sorry to confuse this issue, the log is not in my hand right now,
-so it maybe later.
+>> That's only true for BR/EDR Security Mode 4, and even that has some
+>> exceptions like SDP.
+> 
+> I'm not sure I follow you? BLE does not require any bonding unless
+> mandated by the service/characteristics. It's possible to have many
+> BLE devices and have them all interacting without any of them ever
+> bonding with another device, yes this means there is no encryption or
+> security but in some instances it is not required.
 
-Jiangbo
+True. My comment above was about BR/EDR (which would have been cleared
+if you had also quoted the text I was responding to).
+
+>> I suppose you're referring to the Address property on the Device1
+>> interface? It'd be help understand what exactly your concern is if
+>> you could be more specific in this regard. I'll assume you're
+>> talking about the Address property. This property was originally
+>> created for BR/EDR devices and probably isn't that useful for LE
+>> where you need to know the random vs public information. The new
+>> LE-specific D-Bus interface talked about earlier would provide this
+>> missing info.
+> 
+> I think the confusion comes from how we envisage the address type.
+> When I think of the address type I think of it as part of the BLE
+> address itself and prepend it to the address so with
+> 00:11:22:33:44:55:66 the 00 is indicating that it is a public address
+> and with 01:11:22:33:44:55:66 the 01 is indicating that it is a random
+> address.
+
+It's a fair point that we could consider extending the Address property
+this way since it's just a string. I'm not sure we want to do that
+however since it'd break compatibility with applications that rely on
+the current format of this property.
+
+Johan
