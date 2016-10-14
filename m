@@ -1,44 +1,49 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Sebastian Hilbert <sebastian.hilbert@gmx.net>
-To: linux-bluetooth@vger.kernel.org
 Subject: Re: multiple headsets for voice conference
-Date: Fri, 14 Oct 2016 22:57:49 +0200
-Message-ID: <1714277.qsBd67Ld2h@basti-thinkpad-t410>
-In-Reply-To: <f01abc0e-33c2-b4e8-c513-0951ee58f1a4@mozilla.com>
-References: <5473190.yLOflKejXQ@basti-thinkpad-t410> <f01abc0e-33c2-b4e8-c513-0951ee58f1a4@mozilla.com>
+To: Sebastian Hilbert <sebastian.hilbert@gmx.net>,
+        linux-bluetooth@vger.kernel.org
+References: <5473190.yLOflKejXQ@basti-thinkpad-t410>
+From: David Teller <dteller@mozilla.com>
+Message-ID: <f01abc0e-33c2-b4e8-c513-0951ee58f1a4@mozilla.com>
+Date: Fri, 14 Oct 2016 22:23:51 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+In-Reply-To: <5473190.yLOflKejXQ@basti-thinkpad-t410>
+Content-Type: text/plain; charset=windows-1252
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi David,
+   Hi Sebastian,
 
-Am Freitag, 14. Oktober 2016, 22:23:51 CEST schrieben Sie:
->    Hi Sebastian,
+ Newbie here: I have (very briefly) attempted to do something similar
+and it was suggested to me that ofono, which is a higher-level API on
+top of BlueZ, was a better starting point.
+
+Hope this helps.
+
+Cheers,
+ David
+
+On 14/10/16 21:59, Sebastian Hilbert wrote:
+> Hi,
 > 
->  Newbie here: I have (very briefly) attempted to do something similar
-> and it was suggested to me that ofono, which is a higher-level API on
-> top of BlueZ, was a better starting point.
-
-There is a lot of confusing information out there on the web. It is hard to 
-judge what is current and what is outdated. 
-
-Seems like there were a number of changes over the years. It looks like HFP is 
-currently only supported by ofono while HSP is supported by both 
-
-Looks like Pulseaudio is a big part of this.
-
-https://www.freedesktop.org/wiki/Software/PulseAudio/Documentation/User/
-Bluetooth/
-
-People seem to recommend JACKaudio for low latency audio
-
-http://wiki.linuxaudio.org/wiki/raspberrypi
-
-In other words I would have to access the headsets without PulseAudio.
-There is something called alsa_in/out which potentially takes care of this.
-
-http://jackaudio.org/faq/routing_alsa.html 
-
-Best,
-Sebastian
+> I was wondering if the following can be built using bluez. I would like two or 
+> more people to communicate in something like a voice conference while wearing 
+> BT headsets. 
+> 
+> I imagine that one can connect multiple BT dongles to a PC and pair each 
+> headset with one dongle.
+> 
+> As far as I know ALSA can be used to setup the audio devices. Likely a 
+> soundserver such as JACK2 can be used to manage the audio routing.
+> 
+> Is this the right path ? Or is there another/better way to establish a voice 
+> connection between multiple headset units ?
+> 
+> Any pointers are appreciated.
+> 
+> Sebastian 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> 
