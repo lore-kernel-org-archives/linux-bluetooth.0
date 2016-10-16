@@ -1,277 +1,389 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Steve Gladden <steve@michiganbroadband.com>
-To: Jason Anderssen <j@keyinitiative.com>
-CC: Joseph Hwang <josephsih@google.com>,
+Content-Type: text/plain; charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 9.2 \(3112\))
+Subject: Re: How can you set Transmit power level in Bluetooth LE mode for an LE beacon?
+From: Jason Anderssen <j@keyinitiative.com>
+In-Reply-To: <FEFD25773376F6448FE2884F5C1FA5270117A63CE773@X2.michiganbb.local>
+Date: Mon, 17 Oct 2016 08:48:57 +1000
+Cc: Joseph Hwang <josephsih@google.com>,
         Hieu Le <hieu.le@veriksystems.com>,
         Barry Byford <31baz66@gmail.com>,
         "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Mon, 17 Oct 2016 00:15:40 -0400
-Subject: RE: How can you set Transmit power level in Bluetooth LE mode for
- an LE beacon?
-Message-ID: <FEFD25773376F6448FE2884F5C1FA5270117A63CE774@X2.michiganbb.local>
-References: <FEFD25773376F6448FE2884F5C1FA527F5E8622404@X2.michiganbb.local>
- <FEFD25773376F6448FE2884F5C1FA5270117A63D4D2C@X2.michiganbb.local>
- <CAAu3APZmaK_npAwEk9cd=KB8zqt2=DFnKJqV8Wd_QTUNi5vHrQ@mail.gmail.com>
- <FEFD25773376F6448FE2884F5C1FA5270117A63D4D2D@X2.michiganbb.local>
- <CADEmUHMF3gRai_kUHcKwA5RMi3WevMsE00NL2_NqWZWgu27OuA@mail.gmail.com>
- <FEFD25773376F6448FE2884F5C1FA5270117A63CE75B@X2.michiganbb.local>
- <CAHFy41_8FzDF-jATapn20Km8vbX6nt44DN9uPnazDMOJ_yD=Kw@mail.gmail.com>
- <FEFD25773376F6448FE2884F5C1FA5270117A63CE773@X2.michiganbb.local>
- <FC15A70F-9629-49C8-8BF4-88561B7DEEA3@keyinitiative.com>
-In-Reply-To: <FC15A70F-9629-49C8-8BF4-88561B7DEEA3@keyinitiative.com>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
+Message-Id: <FC15A70F-9629-49C8-8BF4-88561B7DEEA3@keyinitiative.com>
+References: <FEFD25773376F6448FE2884F5C1FA527F5E8622404@X2.michiganbb.local> <FEFD25773376F6448FE2884F5C1FA5270117A63D4D2C@X2.michiganbb.local> <CAAu3APZmaK_npAwEk9cd=KB8zqt2=DFnKJqV8Wd_QTUNi5vHrQ@mail.gmail.com> <FEFD25773376F6448FE2884F5C1FA5270117A63D4D2D@X2.michiganbb.local> <CADEmUHMF3gRai_kUHcKwA5RMi3WevMsE00NL2_NqWZWgu27OuA@mail.gmail.com> <FEFD25773376F6448FE2884F5C1FA5270117A63CE75B@X2.michiganbb.local> <CAHFy41_8FzDF-jATapn20Km8vbX6nt44DN9uPnazDMOJ_yD=Kw@mail.gmail.com> <FEFD25773376F6448FE2884F5C1FA5270117A63CE773@X2.michiganbb.local>
+To: Steve Gladden <steve@michiganbroadband.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgSmFzb24gYW5kIHRoYW5rcyENCg0KTm8sIGZ1bGx5IGFncmVlIHdpdGggd2hhdCB5b3Ugc2F5
-Lg0KDQpJJ20gd2lsbGluZyB0byBkbyB0aGUgZXh0cmEgcmVzZWFyY2guDQpqdXN0IGEgbGl0dGxl
-IGJ1bW1lZCB0aGF0IHRoZSBpbmZvcm1hdGlvbiBJIHNlZWsgc2VlbWluZ2x5IGp1c3QgaXMgbm90
-IHRoZXJlIGFueXdoZXJlLg0KDQpBbmQgSSBhbHNvIHdvdWxkIHRoaW5nIHRoYXQgbWFueSBvdGhl
-ciBhcHBsaWNhdGlvbnMgKGFuZCBwZW9wbGUpIHdvdWxkIHdhbnQgdG8gYmUgYWJsZSB0byBhZGp1
-c3QgdGhlIHBvd2VyIGZvciBvdGhlciB1c2VzIGFzIHdlbGwuDQpFc3BlY2lhbGx5IHRvIGdldCBm
-dWxsIHJhbmdlIGF2YWlsYWJsZSB3aXRoIGZ1bGwgVFggb3V0cHV0IHBvd2VyIHZlcnN1cyB0aGUg
-InVua25vd24gZGVmYXVsdCIuICBPciBmaXJtd2FyZSBzZXQgdW5rbm93biBkZWZhdWx0IGV0Yy4N
-Cg0KSSB0aG91Z2h0IHRoZXJlJ2QgYmUgbW9yZSBwZW9wbGUgb3V0IGhlcmUgdGhhdCB3YW50ZWQg
-YW5kIGtuZXcgaG93IHRvIHNldC9jaGFuZ2UgdHJhbnNtaXQgcG93ZXIgbGV2ZWwuDQoNClRoYW5r
-cyBmb3IgcmVwbHlpbmcgYW5kIGl0IHdhcyBlbmpveWFibGUgdG8gaGVhciBmcm9tIHlvdSENCg0K
-VGFrZSBjYXJlIQ0KDQoNClN0ZXZlIEdsYWRkZW4NCg0KTWljaGlnYW4gQnJvYWRiYW5kIFN5c3Rl
-bXMNCkNvbm5lY3RpbmcgWW91ciBCdXNpbmVzcyENCg0KDQoNCisxIDczNC41MjcuNzE1MCBEaXJl
-Y3QNCisxIDI0OC4zMjcuNDM4OSBGYXgNCnN0ZXZlQG1pY2hpZ2FuYnJvYWRiYW5kLmNvbQ0Kd3d3
-Lm1pY2hpZ2FuYnJvYWRiYW5kLmNvbQ0KDQotLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KRnJv
-bTogSmFzb24gQW5kZXJzc2VuIFttYWlsdG86akBrZXlpbml0aWF0aXZlLmNvbV0NClNlbnQ6IFN1
-bmRheSwgT2N0b2JlciAxNiwgMjAxNiA2OjQ5IFBNDQpUbzogU3RldmUgR2xhZGRlbg0KQ2M6IEpv
-c2VwaCBId2FuZzsgSGlldSBMZTsgQmFycnkgQnlmb3JkOyBsaW51eC1ibHVldG9vdGhAdmdlci5r
-ZXJuZWwub3JnDQpTdWJqZWN0OiBSZTogSG93IGNhbiB5b3Ugc2V0IFRyYW5zbWl0IHBvd2VyIGxl
-dmVsIGluIEJsdWV0b290aCBMRSBtb2RlIGZvciBhbiBMRSBiZWFjb24/DQoNCkhpIFN0ZXZlLA0K
-DQpJIGhhdmUgYmVlbiByZWFkaW5nIGFuZCB3YXRjaGluZyB5b3VyIGVtYWlscywgYW5kIGhhdmUg
-bm90IHJlcGxpZWQgYXMgSSBwcm9iYWJseSBkb27igJl0IGhhdmUgYW55IGFuc3dlcnMsIGJ1dCBt
-eSBndWVzcyBpcyBhcyBmb2xsb3dzIDoNCg0KTW9zdCBwZW9wbGUsIG15c2VsZiBpbmNsdWRlZCwg
-YXJlIHVzaW5nIExpbnV4IGFuZCBoYXJkd2FyZSBsaWtlIFJhc3BiZXJyeSBwaSB0byBwaWNrIHVw
-IGJlYWNvbnMsIG5vdCBhY3R1YWxseSBiZSBhIGJlYWNvbiwgSSBrbm93IHlvdSBjYW4gY3JlYXRl
-IGEgYmVhY29uIHdpdGggbGludXgsIGJ1dCBpdCBpcyBub3QgcmVhbGx5IHRoZSBtYWluIGZvY3Vz
-IGZvciBhIGxvdCBvZiBwZW9wbGUuDQpUaGUgaGFyZHdhcmUgSSB1c2UgZm9yIEJMRSBhZHZlcnRp
-c2luZyBjb21wbGV0ZWx5IGxldHMgbWUgYW5kIG90aGVycyB0byBwcm9ncmFtIHRoZSBwb3dlciBs
-ZXZlbCwgd2hpY2ggdGhlbiBpcyByZWNlaXZlZCBmcm9tIHRoZSBSYXNwYmVycnkgcGkgb3IgbGlr
-ZSBoYXJkd2FyZSwgc28gSSBkb27igJl0IGhhdmUgeW91ciBpc3N1ZSBvciBmcnVzdHJhdGlvbi4N
-Cg0KU28gbXkgc3VtbWFyeSBpczogeW91IG1heWJlIGEgbWlub3JpdHkgaW4geW91ciB3b3JrIDot
-KSAgTm90aGluZyB3cm9uZyB3aXRoIHRoYXQsIGJ1dCBpdCBkb2VzIG1lYW4gZXh0cmEgZGV2ZWxv
-cG1lbnQgYW5kIHJlc2VhcmNoIG9uIHlvdXIgYmVoYWxmIEkgd291bGQgc2F5Lg0KDQpBbnl3YXks
-IEkgaGVhciB5b3VyIGZydXN0cmF0aW9uLCBhbmQgSSBhZGQgbm8gdmFsdWUgdG8geW91ciBxdWVz
-dGlvbiwgaG9wZWZ1bGx5IHNvbWUgaW5zaWdodCBhcyBob3cgSSBzZWUgdGhpbmdzIGZpdCBpbiBs
-aWZlIGFuZCBtaWdodCBleHBsYWluIHlvdXIgY3VycmVudCBzaXR1YXRpb24uDQoNClJlbWVtYmVy
-IHRoaXMgaXMgc2ltcGx5IG15IG9waW5pb24sIGFuZCBpcyBwcm9iYWJseSB3cm9uZyB0b28gOikN
-Cg0KQ2hlZXJzDQpKYXNvbg0KDQo+IE9uIDE3IE9jdCAyMDE2LCBhdCA3OjU2IEFNLCBTdGV2ZSBH
-bGFkZGVuIDxzdGV2ZUBtaWNoaWdhbmJyb2FkYmFuZC5jb20+IHdyb3RlOg0KPg0KPiBPaywgdGhp
-cyBpcyBnZXR0aW5nIHJlYWxseSBmcnVzdHJhdGluZy4NCj4gV2h5IHdvdWxkIHNvbWV0aGluZyBz
-byBzaW1wbGUgbGlrZSB0aGlzIGJlIHNvIGRpZmZpY3VsdD8NCj4NCj4gQW0gSSByZWFsbHkgdGhl
-IG9ubHkgc2hlZXAgb3V0IGhlcmUgdGhhdCBoYXMgYW55IGludGVyZXN0IHdoYXRzb2V2ZXIgaW4g
-dGhlIHBhc3QgNSB5ZWFycyBvbiBob3cgdG8gYWN0dWFsbHkgc2V0IExFIHRyYW5zbWl0IHBvd2Vy
-IG9uIGEgVVNCIGRldmljZT8NCj4gRG8gSSBqdXN0IG5vdCBnZXQgaXQ/DQo+IFJlYWxseSBJIGRv
-buKAmXQgZ2V0IGl0Lg0KPg0KPiBBIHJlYWxseSBzaW1wbGUgdGFzayBhbmQgbm9ib2R5IG91dCBo
-ZXJlIGVpdGhlciBrbm93cyBvciBoYXMgYW55IGludGVyZXN0IGluIGRvaW5nIGl0Lg0KPg0KPiBN
-eSBxdWVzdGlvbiBpcyBub3QgZXZlbiB0ZWNobmljYWwgYXQgYWxsLiAgIElmIEkgYWN0dWFsbHkg
-YXNrZWQgc29tZXRoaW5nIHRlY2huaWNhbCBvdXQgaGVyZSB3b3VsZCB3b3VsZCBoYXBwZW4/DQo+
-DQo+IE5vIG9mZmVuc2UgdG8gYW55b25lIG91dCBoZXJlIGp1c3QgdG8gbXlzZWxmIHJlYWxseSBi
-dXQgd2hhdCBnaXZlcz8NCj4NCj4gSG93IGNvdWxkIHBlb3BsZSB3b3JraW5nIHdpdGggdGhpcyBz
-dHVmZiBOT1QgYmUgaW50ZXJlc3RlZCBpbiBzaW1wbHkNCj4gY29udHJvbGxpbmcgdGhlIFRYIHBv
-d2VyIG91dHB1dCB2ZXJzdXMganVzdCBsaXZpbmcgd2l0aCBzb21lIFVOS05PV04gREVGQVVMVCB0
-aGF0IGp1c3Qgc29ydGEgd29ya3MgaWYgeW914oCZcmUgaGFwcHkgd2l0aCBvbmx5IDIwIGZlZXQg
-b2YgcmFuZ2UgYWx0aG91Z2ggdGhlIGNoaXAgY2FuIHB1dCBvdXQgKzEwZGJtIGFuZCBnbyBmdXJ0
-aGVyIE9yIHNldCBpdCB3YXkgYmFjayB0byAtNDBkYm0gYW5kIGdldCBqc3R1IGEgZmV3IGZlZXQg
-YW5kIHllYXJzIG9mIGJhdHRlcnkgbGlmZS4NCj4NCj4gSG93IHRoZSBhY3R1YWwgRi0gYXJlIHBl
-b3BsZSBOT1QgaW50ZXJlc3RlZCBpbiB0aGlzIGFuZCB0YWxraW5nIGFib3V0IGl0IGFuZCB3b3Jr
-aW5nIHdpdGggaXQ/ICAg4pi6DQo+DQo+IEFsbCBJIGhhdmUgZm91bmQgb24gYmNjbWQgaXMgYSBQ
-REYgZG9jdW1lbnQgZnJvbSAyMDA1IHRoYXQgcHJlZGF0ZXMgQU5ZIGtpbmQgb2YgQlRMRSBzdHVm
-Zi4NCj4NCj4gQW5kIHRoYXTigJlzIGp1c3QgZm9yIHRoZSBDU1IgY2hpcHNldHMgdGhlIE9ORSB0
-aGF0IEkgY291bGQgZmluZCBkb2N1bWVudGF0aW9uIG9uLg0KPg0KPiBXaGF0IGFib3V0IGFsbCB0
-aGUgb3RoZXJzPw0KPg0KPiBXaGF0IGdpdmVzIGhlcmUgbWFuPw0KPg0KPiBBbSBJIGNvbXBsZXRl
-bHkgaW4gdGhlIHdyb25nIHBsYWNlIHRvIGJlIGFza2luZyBhYm91dCB0aGlzPw0KPg0KPiBJIGRv
-buKAmXQgbWVhbiBhbnkgZGlzcmVzcGVjdCwgcmVhbGx5IEkgZG9u4oCZdCENCj4NCj4gQnV0IHdo
-ZXJlIGluIHRoZSB3b3JsZCBkbyBJIGdvIHRvIGdldCB0aGlzIGJhc2ljIGluZm9ybWF0aW9uPw0K
-Pg0KPiBBbmQgd2h5IGRvZXMgbm9ib2R5IGNhcmUgb2YgaGF2ZSBhbnkgaGFuZHMtb24gZXhwZXJp
-ZW5jZSBoZXJlIGFuZC9vciBpbnRlcmVzdD8NCj4NCj4gVGhhbmtzISENCj4NCj4gU3RldmUNCj4N
-Cj4NCj4NCj4NCj4NCj4NCj4NCj4NCj4NCj4NCj4NCj4NCj4NCj4gVHJpZWQgdGhhdCBvZiBjb3Vy
-c2UgYWxyZWFkeSBkYXlzIGFnby4NCj4gQXMgd2VsbCBhcyBhbnl0aGluZyBlbHNlIGEgc2ltcGxl
-IGdvb2dsZSBzZWFyY2ggdHVybnMgdXAuDQo+DQo+IFRvIHNldCBNYXggdHggcG93ZXI6DQo+IHN1
-ZG8gYmNjbWQgcHNzZXQgLXMgMHgwMDAwIDB4MDAxNyAxMA0KPiBUbyBzZXQgZGVmYXVsdCB0eCBw
-b3dlcjoNCj4gc3VkbyBiY2NtZCBwc3NldCAtcyAweDAwMDAgMHgwMDJkIDEwDQo+DQo+IEl0IGVh
-dHMgYm90aCBvZiB0aG9zZSBjb21tYW5kcyBhbmQgZG9lcyBub3QgY29tcGxhaW4gbm8gZXJyb3Jz
-IGJ1dCBhbHNvIG5vIGNoYW5nZSBpbiBUWCBwb3dlciBvdXRwdXQuDQo+IEnigJltIHdhdGNoaW5n
-IHRoZSBiZWFjb25zIG9uIGEgcmVjZWl2ZXIgYW5kIGEgc3BlY3RydW0gYW5hbHlzZXIuDQo+DQo+
-IElmIEkgaXNzdWU6IH4jIGhjaWNvbmZpZyBoY2kwIGlucXRwbA0KPiBoY2kwOiAgIFR5cGU6IEJS
-L0VEUiAgQnVzOiBVU0INCj4gICAgICAgICBCRCBBZGRyZXNzOiAwMDoxNTo4MzpFQTowQTpCOSAg
-QUNMIE1UVTogMzEwOjEwICBTQ08gTVRVOiA2NDo4DQo+ICAgICAgICAgSW5xdWlyeSB0cmFuc21p
-dCBwb3dlciBsZXZlbDogNA0KPg0KPiBBbHdheXMgcmVhZHMgYmFjayB0aGF0IOKAnDTigJ0NCj4N
-Cj4gSXNzdWluZyBlaXRoZXI6DQo+DQo+ICMgYmNjbWQgd2FybXJlc2V0DQo+IC1vcg0KPiAjIGJj
-Y21kIGNvbGRyZXNldA0KPg0KPiByZXN1bHRzIGluIHRyYW5zbWl0dGVyIG9mZiBhbmQgaGF2ZSB0
-byBkbzoNCj4NCj4gaGNpdG9vbCAtaSBoY2kwIGNtZCAweDA4IDB4MDAwOCAxRSAwMiAwMSAxQSAx
-QSBGRiA0QyAwMCAwMiAxNSBFMiAwQSAzOQ0KPiBGNCA3MyBGNSA0QiBDNCBBMSAyRiAwMSA3MyA0
-NSAyNyA3MSA1MCAwQSAyOCAwQSAyOCAwMSBGRiAtYW5kIH4jDQo+IGhjaWNvbmZpZyBoY2kwIGxl
-YWR2Mw0KPg0KPiBUbyBnZXQgaXQgdHJhbnNtaXR0aW5nIGFnYWluIChhdCB0aGUgc2FtZSBub24g
-Y2hhbmdlZCBsZXZlbC4NCj4NCj4gQW5kDQo+DQo+IH4jIGhjaWNvbmZpZyBoY2kwIGlucXRwbA0K
-Pg0KPiBoY2kwOiAgIFR5cGU6IEJSL0VEUiAgQnVzOiBVU0INCj4gICAgICAgICBCRCBBZGRyZXNz
-OiAwMDoxNTo4MzpFQTowQTpCOSAgQUNMIE1UVTogMzEwOjEwICBTQ08gTVRVOiA2NDo4DQo+ICAg
-ICAgICAgSW5xdWlyeSB0cmFuc21pdCBwb3dlciBsZXZlbDogNA0KPg0KPiBBbHdheXMgc2hvd3Mg
-4oCcNOKAnQ0KPg0KPiBPbiB0b3Agb2YgZXZlcnl0aGluZyBJIGhhdmUgc3RhdGVkIGFuZCB0cmll
-ZCBoZXJlLi4NCj4gSSBkb27igJl0IHRoaW5rIHRoYXQgc2V0dGluZyAoaWYgaXQgZXZlbiB3b3Jr
-ZWQpIGhhcyBhbnkgcmVsYXRpb24gdG8gTEUgR0ZTSyBhZHZlcnRpc2luZyBtb2RlLg0KPg0KPiBQ
-cmV0dHkgc3VyZSBpdCBkb2VzIG5vdC4NCj4gVGhhdCAoaWYgaXQgd29ya2VkKSBzZXRzIHBvd2Vy
-IG9uIEJhc2ljIFJhdGUgYW5kIEVEUiBhcyBzZWVuIGluIHRoZSByZXN1bHQg4oCcaGNpMDogICBU
-eXBlOiBCUi9FRFIgIEJ1czogVVNC4oCdIHdoZW4gaXNzdWluZyB0aGUgaGNpY29uZmlnIGhjaTAg
-aW5xdHBsIGNvbW1hbmQuDQo+DQo+DQo+DQo+DQo+DQo+DQo+DQo+DQo+DQo+DQo+DQo+DQo+DQo+
-DQo+IFN0ZXZlIEdsYWRkZW4NCj4NCj4gTWljaGlnYW4gQnJvYWRiYW5kIFN5c3RlbXMNCj4gQ29u
-bmVjdGluZyBZb3VyIEJ1c2luZXNzIQ0KPg0KPg0KPg0KPiArMSA3MzQuNTI3LjcxNTAgRGlyZWN0
-DQo+ICsxIDI0OC4zMjcuNDM4OSBGYXgNCj4gc3RldmVAbWljaGlnYW5icm9hZGJhbmQuY29tDQo+
-IHd3dy5taWNoaWdhbmJyb2FkYmFuZC5jb20NCj4NCj4gRnJvbTogSm9zZXBoIEh3YW5nIFttYWls
-dG86am9zZXBoc2loQGdvb2dsZS5jb21dDQo+IFNlbnQ6IFdlZG5lc2RheSwgT2N0b2JlciAxMiwg
-MjAxNiAxMTo1NSBBTQ0KPiBUbzogU3RldmUgR2xhZGRlbg0KPiBDYzogSGlldSBMZTsgQmFycnkg
-Qnlmb3JkOyBsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnDQo+IFN1YmplY3Q6IFJlOiBI
-b3cgY2FuIHlvdSBzZXQgVHJhbnNtaXQgcG93ZXIgbGV2ZWwgaW4gQmx1ZXRvb3RoIExFIG1vZGUg
-Zm9yIGFuIExFIGJlYWNvbj8NCj4NCj4gSGkgU3RldmU6DQo+DQo+ICAgTWF5YmUgeW91IGNhbiB0
-cnkgQ1NSJ3MgY29tbWFuZCBsaW5lIHV0aWxpdHksIGJjY21kLiBUaGUgc3lzdGVtIGNvbnRyb2wg
-Y29tbWFuZCBNYXhfVHhfUG93ZXIgYW5kIERlZmF1bHRfVHhfUG93ZXIgYWxsb3cgeW91IHRvIHNl
-dCB0eCBwb3dlci4NCj4NCj4gR29vZCBsdWNrIQ0KPg0KPiBKb3NlcGgNCj4NCj4NCj4gT24gV2Vk
-LCBPY3QgMTIsIDIwMTYgYXQgMTE6MzMgUE0sIFN0ZXZlIEdsYWRkZW4gPHN0ZXZlQG1pY2hpZ2Fu
-YnJvYWRiYW5kLmNvbT4gd3JvdGU6DQo+IFRoYW5rcywNCj4gSSB3YXMgaG9waW5nIHRoZXJlIHdh
-cyBhbiBlYXNpZXIgd2F5IGFuZCBzb21laG93IGF0IHRoZSBjb21tYW5kIGxpbmUgYnV0IEknbGwg
-ZG8gd2hhdCBJIG5lZWQgdG8gZG8gYW5kIGZpZ3VyZSBpdCBvdXQgc29tZWhvdy4NCj4gSSB1c3Vh
-bGx5IGVuZCB1cCBvbiAxMCBvdGhlciByYWJiaXQgdHJhaWxzIHdoZW4gaXQgY29tZXMgdG8gaGF2
-aW5nIHRvDQo+IHJlY29tcGlsZSBhbnl0aGluZyBiZWNhdXNlIGl0IHVzdWFsbHkganVzdCBmYWls
-cyBmb3IgbWUgYW5kIEknbSBub3QgeWV0IHdlbGwgdmVyc2VkIGluIHRyb3VibGVzaG9vdGluZyB3
-aGVuIHRoaW5ncyB3b24ndCBjb21waWxlIHN1Y2Nlc3NmdWxseSBhc2lkZSBmcm9tIHdoYXQgSSBj
-YW4gZWFzaWx5IGdvb2dsZS4NCj4NCj4gSSBhbHNvIHRoaW5rIGl0J3MgYSBsaXR0bGUgbW9yZSBj
-b21wbGljYXRlZCB0aGFuIGp1c3Qgc2V0dGluZyB0aGUgcG93ZXIuDQo+IEkgaGF2ZSBnYXRoZXJl
-ZCBhdCBsZWFzdCB3aXQgaHRoZSBDU1IgY2hpcHNldCB0aGF0IHRoZXJlIGFyZSBhdCBsZWFzdCAz
-IHNlcGFyYXRlIHBvd2VyIHNldHRpbmdzIHRoYXQgY2FuIGJlIGFkanVzdGVkIGFuZCBub3QgYW55
-IG92ZXJhbGwgcG93ZXIgc2V0dGluZy4NCj4gU28gdGhlIHZhcmlvdXMgbW9kdWxhdGlvbiBtb2Rl
-cyAoaW5jbHVkaW5nIEdGU0sgLUxFIGFkdmVydGlzaW5nLSkgbmVlZCB0byBiZSBhZGRyZXNzZWQg
-YW5kIHNldCBpbmRpdmlkdWFsbHkuDQo+IFRoZXJlJ3Mgbm90IGEgbWFzdGVyIHRyYW5zbWl0IGxl
-dmVsIHRoYXQgc2V0cyB0aGVtIGFsbC4NCj4NCj4NCj4gU3RldmUgR2xhZGRlbg0KPg0KPiBNaWNo
-aWdhbiBCcm9hZGJhbmQgU3lzdGVtcw0KPiBDb25uZWN0aW5nIFlvdXIgQnVzaW5lc3MhDQo+DQo+
-DQo+DQo+ICsxIDczNC41MjcuNzE1MCBEaXJlY3QNCj4gKzEgMjQ4LjMyNy40Mzg5IEZheA0KPiBz
-dGV2ZUBtaWNoaWdhbmJyb2FkYmFuZC5jb20NCj4gd3d3Lm1pY2hpZ2FuYnJvYWRiYW5kLmNvbQ0K
-Pg0KPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBIaWV1IExlIFttYWlsdG86
-aGlldS5sZUB2ZXJpa3N5c3RlbXMuY29tXQ0KPiBTZW50OiBXZWRuZXNkYXksIE9jdG9iZXIgMTIs
-IDIwMTYgMTowMCBBTQ0KPiBUbzogU3RldmUgR2xhZGRlbg0KPiBDYzogQmFycnkgQnlmb3JkOyBs
-aW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnDQo+IFN1YmplY3Q6IFJlOiBIb3cgY2FuIHlv
-dSBzZXQgVHJhbnNtaXQgcG93ZXIgbGV2ZWwgaW4gQmx1ZXRvb3RoIExFIG1vZGUgZm9yIGFuIExF
-IGJlYWNvbj8NCj4NCj4gSGksDQo+DQo+IEluIG15IG9waW5pb24sIHRoZSBvbmx5IHdheSBJIGNh
-biBmaW5kIHRvIGluY3JlYXNlIHRoZSB0eF9wb3dlciBpcyB0bw0KPiByZWNvbXBpbGUgdGhlIGxp
-bnV4IGtlcm5lbC4gVGhlcmUgbWF5IGJlIGEgYmV0dGVyIHdheQ0KPg0KPiBJdCBzZWVtcyB0aGF0
-IGJsdWV0b290aCBzdGFjayB3aXRoaW4ga2VybmVsIHNlcGFyYXRlZCBpbnRvIHR3byBjbGFzc2Vz
-Og0KPiAxLiBJbnF1aXJ5IFR4X3Bvd2VyLg0KPiAyLiBBZHZlcnRpc2UgVHhfcG93ZXIuDQo+DQo+
-IEFuZCB0aGUgZGVmYXVsdCB2YWx1ZSBpcyAwLg0KPg0KPiBZb3UgY2FuIHRha2UgYSBsb29rIGF0
-Og0KPiAqaGNpX2FsbG9jX2Rldih2b2lkKSAgZnVuY3Rpb24gd2l0aGluIG5ldC9ibHVldG9vdGgv
-aGNpX2NvcmUuYyBmaWxlDQo+IGhkZXYtPmlucV90eF9wb3dlciA9IEhDSV9UWF9QT1dFUl9JTlZB
-TElEOyBhZHZfdHhfcG93ZXIgPQ0KPiBoZGV2LT5IQ0lfVFhfUE9XRVJfSU5WQUxJRDsNCj4NCj4g
-SG9wZSBpdCB3aWxsIGJlIGhlbHBmdWwgdG8geW91Lg0KPg0KPiBSZWdhcmRzLA0KPiBIaWV1Lg0K
-Pg0KPiBPbiBXZWQsIE9jdCAxMiwgMjAxNiBhdCAxMjo1MiBBTSwgU3RldmUgR2xhZGRlbiA8c3Rl
-dmVAbWljaGlnYW5icm9hZGJhbmQuY29tPiB3cm90ZToNCj4+IFRoYW5rcyEhDQo+PiBZZXMgaXQn
-cyBuaWNlIHRvIGhlYXIgZnJvbSBzb21lYm9keS4NCj4+DQo+PiBJJ3ZlIGJlZW4gc2NvdXJpbmcg
-dGhlIHdlYiBzbyBmYXIgdG8gbm8gYXZhaWwgb24gd2hhdCBJIHRoaW5rIHNob3VsZCBiZSBhIHNp
-bXBsZSBhbmQgYWNjZXNzaWJsZSBzZXR0aW5nLg0KPj4gSXQncyBvYnZpb3VzIGZyb20gdGhlIHNw
-ZWNzIHRoYXQgbW9zdCBjaGlwcyBoYXZlIGEgcHJvZ3JhbW1hYmxlIChzZXR0YWJsZSkgdHJhbnNt
-aXR0ZXIgcG93ZXIuDQo+PiBBbmQgd2l0aCBiZWFjb25zIGl0IGlzIHZlcnkgaW1wb3J0YW50IGFu
-ZCBleHBlY3RlZCB0aGF0IG9uZSBzaG91bGQgYmUgYWJsZSB0byBhZGp1c3QgdGhlIHRyYW5zbWl0
-dGVyIGxldmVsLg0KPj4gQWxsIG9mIHRoZSBzZXJpYWwgYm9hcmRzIGRvIGl0IHdpdGggc2ltcGxl
-IEFUIGNvbW1hbmRzLg0KPj4NCj4+IEkganVzdCBkb24ndCBnZXQgd2h5IHRoZXJlJ3Mgbm8gZG9j
-dW1lbnRhdGlvbiBvbiBob3cgdG8gZG8gaXQgd2l0aCBhIFVTQiBkZXZpY2UhIQ0KPj4NCj4+IFRo
-ZXkgc2VsbCBjbGFzcyAxIGJsdWV0b290aCB1c2IgZG9uZ2xlcyBmb3IgYXBwbGljYXRpb25zIHRo
-YXQgcmVxdWlyZSBtb3JlIHJhbmdlICgxMDBtKSBpcyBxdW90ZWQgb24gbW9zdCBjbGFzcyAxIHBy
-b2R1Y3RzLg0KPj4NCj4+IEknZCBleHBlY3QgdGhlcmUgc2hvdWxkIGJlIGEgc3RyYWlnaHQgZm9y
-d2FyZCBlYXN5IHRvIHNldCBwb3dlciBpbiBMRSBtb2RlIHRvIGdldCBtb3JlIHJhbmdlIG9yIHNh
-dmUgcG93ZXIgYW5kIGxpbWl0IHJhbmdlIHdoZW4gd2FudGVkLg0KPj4NCj4+IEJ1dCBJJ20gcmVh
-bGx5IG5vdCBmaW5kaW5nIHRoaXMgaW5mb3JtYXRpb24gb3V0IHRoZXJlIQ0KPj4NCj4+IEkgZG9u
-O3QgdW5kZXJzdGFuZCB3aGF0IEkgYW0gZG9pbmcgd3Jvbmcgb3Igd2h5IHRoaXMgaXMgc28gZGlm
-ZmljdWx0DQo+PiB0byBmaW5kLiAgOikNCj4+DQo+Pg0KPj4NCj4+DQo+Pg0KPj4NCj4+DQo+PiBP
-biAxMSBPY3RvYmVyIDIwMTYgYXQgMTc6NTAsIFN0ZXZlIEdsYWRkZW4gPHN0ZXZlQG1pY2hpZ2Fu
-YnJvYWRiYW5kLmNvbT4gd3JvdGU6DQo+Pj4gSXMgdGhpcyB0aGlzIGxpc3QganVzdCBzb21lIGtp
-bmQgb2YgYXV0b21hdGVkIHBhdGNoIGFubm91bmNlbWVudCBsb2cgYW5kIG5vdCBhbiBhY3R1YWwg
-bWFpbGluZyBsaXN0IHdoZXJlIHlvdSBjYW4gYXNrIGFueXRoaW5nIGFib3V0IGJsdWV0b290aC4N
-Cj4+PiBUaGlzIGlzIGFsbCBJIGhhdmUgc2VlbiBoZXJlIGZvciB0aGUgcGFzdCBmZXcgZGF5cz8N
-Cj4+PiBXaGVyZSBjYW4gSSBhc2sgYW4gYWN0dWFsIHF1ZXN0aW9uIGFib3V0IGJsdWV0b290aD8N
-Cj4+DQo+PiBUaGVyZSBhcmUgc29tZSByZWFsIGh1bWFucyBoZXJlIHRvbyEgIDotKQ0KPj4NCj4+
-IElmIHlvdSBsb29rIGJhY2sgb24gdGhlIGFyY2hpdmUgb2YgdGhpcyBsaXN0IHlvdSB3aWxsIHNl
-ZSBhIG1peHR1cmUNCj4+IG9mIHF1ZXN0aW9ucyBhbmQgcGF0Y2ggcmVxdWVzdHMuDQo+PiBtYXJj
-LmluZm8vP2w9bGludXgtYmx1ZXRvb3RoDQo+Pg0KPj4gSSd2ZSBrZXB0IHF1aWV0IGFzIEknbSBu
-b3Qgc3VyZSBJIGNhbiBhbnN3ZXIgcXVlc3Rpb25zLiBUbyBvZmZlciBzb21lDQo+PiBzaGFyZWQg
-ZXhwZXJpZW5jZSwgSSBjYW4gc2F5IHRoYXQgSSd2ZSBiZWVuIGV4cGVyaW1lbnRpbmcgd2l0aA0K
-Pj4gKEVkZHlzdG9uZSkgYmVhY29ucyBvbiBMaW51eCBzaW5nbGUgYm9hcmQgY29tcHV0ZXJzIGFj
-Y2Vzc2luZyBCbHVlWg0KPj4gdGhyb3VnaCB0aGUgREJ1cyBBUEkgdXNpbmcgUHl0aG9uLiBJIGFs
-c28gaGF2ZSBub3QgZm91bmQgYSB3YXkgdG8NCj4+IGNoYW5nZSB0aGUgcG93ZXIgbGV2ZWwgb2Yg
-YWR2ZXJ0aXNlbWVudHMgZWl0aGVyLiBGb3Igd2hhdCBJJ20gZG9pbmcsDQo+PiBqdXN0IG1ha2lu
-ZyBzdXJlIHRoZSBUWCBwb3dlciBpbiB0aGUgRWRkeXN0b25lIGFkdmVydCBtYXRjaGVzIHdoYXQN
-Cj4+IHRoZSBkb25nbGUgaXMgYWN0dWFsbHkgYnJvYWRjYXN0aW5nIGhhcyBiZWVuIGdvb2QgZW5v
-dWdoLg0KPj4NCj4+IFNvcnJ5IEkgY291bGRuJ3QgYmUgb2YgbW9yZSBoZWxwLg0KPj4NCj4+IFJl
-Z2FyZHMsDQo+PiBCYXJyeQ0KPj4NCj4+Pg0KPj4+DQo+Pj4NCj4+Pg0KPj4+IFN0ZXZlIEdsYWRk
-ZW4NCj4+Pg0KPj4+IE1pY2hpZ2FuIEJyb2FkYmFuZCBTeXN0ZW1zDQo+Pj4gQ29ubmVjdGluZyBZ
-b3VyIEJ1c2luZXNzIQ0KPj4+DQo+Pj4NCj4+Pg0KPj4+ICsxIDczNC41MjcuNzE1MCBEaXJlY3QN
-Cj4+PiArMSAyNDguMzI3LjQzODkgRmF4DQo+Pj4gc3RldmVAbWljaGlnYW5icm9hZGJhbmQuY29t
-DQo+Pj4gd3d3Lm1pY2hpZ2FuYnJvYWRiYW5kLmNvbQ0KPj4+DQo+Pj4gX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fXw0KPj4+IEZyb206IFN0ZXZlIEdsYWRkZW4NCj4+PiBT
-ZW50OiBTdW5kYXksIE9jdG9iZXIgMDksIDIwMTYgMTI6MTEgUE0NCj4+PiBUbzogbGludXgtYmx1
-ZXRvb3RoQHZnZXIua2VybmVsLm9yZw0KPj4+IFN1YmplY3Q6IEhvdyBjYW4geW91IHNldCBUcmFu
-c21pdCBwb3dlciBsZXZlbCBpbiBCbHVldG9vdGggTEUgbW9kZSBmb3IgYW4gTEUgYmVhY29uPw0K
-Pj4+DQo+Pj4gSGksDQo+Pj4gTXkgbmFtZSBpcyBTdGV2ZSBhbmQgSSBhbSBsb2NhdGVkIGluIEFu
-biBBcmJvciBNaWNoaWdhbiBVU0EuDQo+Pj4NCj4+PiBJIGFtIG5ldyAgYmx1ZXRvb3RoIExFIGFu
-ZCBsYXRlbHkgYW0gb2JzZXNzZWQgd2l0aCBCbHVldG9vdGggTEUgYmVhY29ucyBhbmQgdHJ5aW5n
-IHRoZW0gb3V0Lg0KPj4+DQo+Pj4gSSBoYXZlIHJlYWQgYXJ0aWNsZSBhZnRlciBhcnRpY2xlIGFu
-ZCBwYWdlIGFmdGVyIHBhZ2UgYWJvdXQgaG93DQo+Pj4gcGVvcGxlIGhhdmUgc2V0dXAgdXAgYmVh
-Y29ucyB3aXRoIFVTQiBCVCA0LjAgaW50ZXJmYWNlcyBhcyB3ZWxsIGFzIHNlcmlhbCBibHVldG9v
-dGggYm9hcmRzLg0KPj4+DQo+Pj4gSSBhbSBjdXJyZW50bHkgZXhwZXJpbWVudGluZyB3aXRoIGEg
-YmVhY29uIHJ1bm5pbmcgb24gYSBSYXNwYmVycnkgUGktQiBhbmQgdXNpbmcgYW4gZXh0ZXJuYWwg
-VVNCIEJsdWV0b290aCA0LjAgY2xhc3MgMSBkb25nbGUuDQo+Pj4NCj4+PiBNeSBmcnVzdHJhdGlv
-biBpcyB0aGF0IEkgaGF2ZSBub3QgYmVlbiBhYmxlIHRvIGZpbmQgYW55IHVzZWZ1bA0KPj4+IGlu
-Zm9ybWF0aW9uIGluIGhvdyB0byBjaGFuZ2UgdGhlIFRyYW5zbWl0dGVyIHBvd2VyIGxldmVsIHdo
-ZW4gaW4gTEUgbW9kZS4NCj4+Pg0KPj4+IFRoZSBkb25nbGUgYXBwZWFycyB0byBiZSB3b3JraW5n
-IGF0IGRlZmF1bHQgbGV2ZWwgYmVsb3cgemVybyBkYm0uDQo+Pj4NCj4+PiBUaGUgd2hvbGUgcG9p
-bnQgb2YgYnVpbGRpbmcgeW91ciBvd24gYmVhY29uIHRoaXMgd2F5IGlzIHRvIGJlIGFibGUNCj4+
-PiB0byBjdXN0b21pemUgaXQgYW5kIHNldHRpbmcgdGhlIHBvd2VyIGxldmVsIGlzIGFuIGltcG9y
-dGFudCBrZXkgaXRlbSB0aGF0IHNob3VsZCBiZSBlYXNpbHkgYWNjZXNzaWJsZSB5ZXQgSSBmaW5k
-IHRoYXQgTk9CT0RZIGV2ZXIgZXZlbiBtZW50aW9ucyBpdCBsZXQgYWxvbmUgZG8gdGhleSBleHBs
-YWluIG9yIHByb3ZpZGUgYSB3YXkgdG8gc2V0IHRoZSBwb3dlci4NCj4+Pg0KPj4+DQo+Pj4gRXZl
-cnkgdGV4dCB0aGF0IEkgaGF2ZSBmb3VuZCB0aGF0IGRldGFpbHMgYmVhY29uIHNldHVwcyBmcm9t
-IGNvbW1hbmQgbGluZSBuZXZlciBib3RoZXIgdG8gbWVudGlvbiBzZXR0aW5nIGJlYWNvbiBUWCBw
-b3dlci4NCj4+Pg0KPj4+IEFsbCB0aGUgcGFnZXMgSSBoYXZlIGZvdW5kIHNlZW0gdG8gY29weSBl
-YWNoIG90aGVyIGFuZCByZXBlYXQgdGhlDQo+Pj4gc2FtZSBpbmZvcm1hdGlvbiBvdmVyICYgb3Zl
-ciBCdXQgbmV2ZXIgZ2V0IGFyb3VuZCB0byBldmVuIG1lbnRpb25pbmcgb3IgZGlzY3Vzc2luZyBz
-ZXR0aW5nIHRoZSBwb3dlciBvdXRwdXQgbGV2ZWwgb2YgdGhlIGJsdXRvb3RoIGRvbmdsZS4NCj4+
-Pg0KPj4+IHN1ZG8gaGNpdG9vbCAtaSBoY2kwIGNtZCAweDA4IDB4MDAwOCAxRSAwMiAwMSAxQSAx
-QSBGRiA0QyAwMCAwMiAxNSBbDQo+Pj4gOTIgNzcgODMgMEEgQjIgRUIgNDkgMEYgQTEgREQgN0Yg
-RTMgOEMgNDkgMkUgREUgXSBbIDAwIDAwIF0gWyAwMCAwMA0KPj4+IF0NCj4+PiBDNSAwMA0KPj4+
-DQo+Pj4gVGhlIGJ5dGUganVzdCBsZWZ0IG9mIHRoZSBsYXN0IG9uZSBpcyB0aGUgInJlcG9ydGVk
-IiBUWCBsZXZlbCB0aGF0IHlvdSBhcmUgdHJhbnNtaXR0aW5nIGF0Lg0KPj4+IFdoaWNoIG1lYW5z
-IHlvdSdyZSBzdXBwb3NlZCB0byBrbm93IChvciBndWVzcz8pIHdoYXQgZGJtIGxldmVsIHlvdSBh
-cmUgYWN0dWFsbHkgdHJhbnNtaXR0aW5nIGF0IGFuZCBzZXQgaXQgaGVyZSB0byBkaXNwbGF5IHRv
-IHRoZSB3b3JsZCB3aGF0IHlvdXIgdHJhbnNtaXR0ZXIgbGV2ZWwgaXMgc2V0IHRvIHNvIHRoZXkg
-Y2FuIHJhbmdlIChndWVzcyBvciBlc3RpbWF0ZSBkaXN0YW5jZSBmcm9tIFRYKS4NCj4+PiBUaGlz
-IHZhbHVlIGRvZXMgbm90IGluZmx1ZW5jZSBvciByZWZsZWN0IGFjdHVhbCB0cmFuc21pdCBwb3dl
-ci4NCj4+Pg0KPj4+IFBsZWFzZSBoZWxwISENCj4+Pg0KPj4+IENvdWxkIHVzZSBhbnkgcG9pbnRl
-cnMuDQo+Pj4NCj4+PiBJJ20gYSBoYXJkd2FyZSBndXkgYXMgd2VsbCBzbyBub3QgdmVyeSBleHBl
-cmllbmNlZCBpbiBzb2Z0d2FyZS9wcm9ncmFtbWluZyBidXQgSSdtIHdpbGxpbmcgdG8gdHJ5IGFu
-eXRoaW5nIHRvIGdldCBjb250cm9sIG9mIHRoaXMuDQo+Pj4NCj4+PiBCZWVuIGF0IHRoaXMgZm9y
-IG92ZXIgYSB3ZWVrIGFuZCBoYXZlIHNvbWUgd29ya2luZyBiZWFjb25zIGJ1dCBubyBjb250cm9s
-IG9mIHRyYW5zbWl0IHBvd2VyIGxldmVsLg0KPj4+DQo+Pj4gQW0gdXNpbmcgVHJlbmRuZXQgVVNC
-IGRvbmdsZXMgd2hpY2ggYXBwZWFyIHRvIHVzZSBhIENhbWJyaWRnZSBDaGlwLiAgQnV0IEknbSBu
-b3QgZXhhY3RseSBzdXJlIHdoaWNoIGNoaXAuDQo+Pj4NCj4+Pg0KPj4+IDp+IyBsc3VzYg0KPj4+
-IEJ1cyAwMDEgRGV2aWNlIDAwNzogSUQgMGExMjowMDAxIENhbWJyaWRnZSBTaWxpY29uIFJhZGlv
-LCBMdGQNCj4+PiBCbHVldG9vdGggRG9uZ2xlIChIQ0kgbW9kZSkNCj4+Pg0KPj4+DQo+Pj4gcm9v
-dEByYXNwYmVycnlwaTp+IyBoY2ljb25maWcgaGNpMA0KPj4+IGhjaTA6ICAgVHlwZTogQlIvRURS
-ICBCdXM6IFVTQg0KPj4+ICAgICAgICAgIEJEIEFkZHJlc3M6IDAwOjE1OjgzOkVBOjBBOkI5ICBB
-Q0wgTVRVOiAzMTA6MTAgIFNDTyBNVFU6IDY0OjgNCj4+PiAgICAgICAgICBVUCBSVU5OSU5HDQo+
-Pj4gICAgICAgICAgUlggYnl0ZXM6NzgwIGFjbDowIHNjbzowIGV2ZW50czo1MCBlcnJvcnM6MA0K
-Pj4+ICAgICAgICAgIFRYIGJ5dGVzOjExMTAgYWNsOjAgc2NvOjAgY29tbWFuZHM6NTAgZXJyb3Jz
-OjANCj4+Pg0KPj4+DQo+Pj4NCj4+Pg0KPj4+DQo+Pj4NCj4+Pg0KPj4+DQo+Pj4NCj4+Pg0KPj4+
-DQo+Pj4NCj4+Pg0KPj4+DQo+Pj4gLS0NCj4+PiBUbyB1bnN1YnNjcmliZSBmcm9tIHRoaXMgbGlz
-dDogc2VuZCB0aGUgbGluZSAidW5zdWJzY3JpYmUNCj4+PiBsaW51eC1ibHVldG9vdGgiIGluIHRo
-ZSBib2R5IG9mIGEgbWVzc2FnZSB0bw0KPj4+IG1ham9yZG9tb0B2Z2VyLmtlcm5lbC5vcmcgTW9y
-ZSBtYWpvcmRvbW8gaW5mbyBhdA0KPj4+IGh0dHA6Ly92Z2VyLmtlcm5lbC5vcmcvbWFqb3Jkb21v
-LWluZm8uaHRtbA0KPj4gLS0NCj4+IFRvIHVuc3Vic2NyaWJlIGZyb20gdGhpcyBsaXN0OiBzZW5k
-IHRoZSBsaW5lICJ1bnN1YnNjcmliZQ0KPj4gbGludXgtYmx1ZXRvb3RoIiBpbiB0aGUgYm9keSBv
-ZiBhIG1lc3NhZ2UgdG8NCj4+IG1ham9yZG9tb0B2Z2VyLmtlcm5lbC5vcmcgTW9yZSBtYWpvcmRv
-bW8gaW5mbyBhdA0KPj4gaHR0cDovL3ZnZXIua2VybmVsLm9yZy9tYWpvcmRvbW8taW5mby5odG1s
-DQo+DQo+DQo+DQo+IC0tDQo+IC0tLS0gSGlldSBMZSAtLS0NCj4NCj4NCj4NCj4NCj4gLS0NCj4N
-Cj4gSm9zZXBoIFNoeWgtSW4gSHdhbmcNCj4gRW1haWw6IGpvc2VwaHNpaEBnb29nbGUuY29tDQo+
-DQo+IE4gICByIHkgICBiIFggx6d2IF4gKd66ey5uICsgeyBuWyAtICkgICB3KmpnIB4gIN2iai8g
-ICB6IN6WICAyIN6ZICAgJiAp36EgYQ0KPiAgIH8gHiBHICBoIA8gajordiB3INmlDQoNCg==
+Hi Steve,
+
+I have been reading and watching your emails, and have not replied as I probably don’t have any answers, but my guess is as follows :
+
+Most people, myself included, are using Linux and hardware like Raspberry pi to pick up beacons, not actually be a beacon, I know you can create a beacon with linux, but it is not really the main focus for a lot of people.
+The hardware I use for BLE advertising completely lets me and others to program the power level, which then is received from the Raspberry pi or like hardware, so I don’t have your issue or frustration.
+
+So my summary is: you maybe a minority in your work :-)  Nothing wrong with that, but it does mean extra development and research on your behalf I would say.
+
+Anyway, I hear your frustration, and I add no value to your question, hopefully some insight as how I see things fit in life and might explain your current situation.
+
+Remember this is simply my opinion, and is probably wrong too :)
+
+Cheers
+Jason
+
+> On 17 Oct 2016, at 7:56 AM, Steve Gladden <steve@michiganbroadband.com> wrote:
+> 
+> Ok, this is getting really frustrating.
+> Why would something so simple like this be so difficult?  
+> 
+> Am I really the only sheep out here that has any interest whatsoever in the past 5 years on how to actually set LE transmit power on a USB device?   
+> Do I just not get it?     
+> Really I don’t get it.   
+> 
+> A really simple task and nobody out here either knows or has any interest in doing it.  
+> 
+> My question is not even technical at all.   If I actually asked something technical out here would would happen?  
+> 
+> No offense to anyone out here just to myself really but what gives?   
+> 
+> How could people working with this stuff NOT be interested in simply controlling the TX power output versus just living with some UNKNOWN DEFAULT that just sorta works if you’re happy with only 20 feet of range although the chip can put out +10dbm and go further 
+> Or set it way back to -40dbm and get jstu a few feet and years of battery life. 
+> 
+> How the actual F- are people NOT interested in this and talking about it and working with it?   ☺   
+> 
+> All I have found on bccmd is a PDF document from 2005 that predates ANY kind of BTLE stuff.   
+> 
+> And that’s just for the CSR chipsets the ONE that I could find documentation on.   
+> 
+> What about all the others?   
+> 
+> What gives here man?   
+> 
+> Am I completely in the wrong place to be asking about this?   
+> 
+> I don’t mean any disrespect, really I don’t!  
+> 
+> But where in the world do I go to get this basic information?   
+> 
+> And why does nobody care of have any hands-on experience here and/or interest?   
+> 
+> Thanks!!  
+> 
+> Steve  
+> 
+> 
+> 
+> 
+> 
+> 
+> 
+> 
+> 
+> 
+> 
+> 
+> 
+> Tried that of course already days ago.  
+> As well as anything else a simple google search turns up.  
+> 
+> To set Max tx power:
+> sudo bccmd psset -s 0x0000 0x0017 10
+> To set default tx power:
+> sudo bccmd psset -s 0x0000 0x002d 10   
+> 
+> It eats both of those commands and does not complain no errors but also no change in TX power output. 
+> I’m watching the beacons on a receiver and a spectrum analyser.  
+> 
+> If I issue: ~# hciconfig hci0 inqtpl
+> hci0:   Type: BR/EDR  Bus: USB
+>         BD Address: 00:15:83:EA:0A:B9  ACL MTU: 310:10  SCO MTU: 64:8
+>         Inquiry transmit power level: 4
+> 
+> Always reads back that “4”   
+> 
+> Issuing either:  
+> 
+> # bccmd warmreset 
+> -or
+> # bccmd coldreset
+> 
+> results in transmitter off and have to do:  
+> 
+> hcitool -i hci0 cmd 0x08 0x0008 1E 02 01 1A 1A FF 4C 00 02 15 E2 0A 39 F4 73 F5 4B C4 A1 2F 01 73 45 27 71 50 0A 28 0A 28 01 FF
+> -and  
+> ~# hciconfig hci0 leadv3
+> 
+> To get it transmitting again (at the same non changed level.  
+> 
+> And 
+> 
+> ~# hciconfig hci0 inqtpl
+> 
+> hci0:   Type: BR/EDR  Bus: USB
+>         BD Address: 00:15:83:EA:0A:B9  ACL MTU: 310:10  SCO MTU: 64:8
+>         Inquiry transmit power level: 4
+> 
+> Always shows “4”   
+> 
+> On top of everything I have stated and tried here.. 
+> I don’t think that setting (if it even worked) has any relation to LE GFSK advertising mode.   
+> 
+> Pretty sure it does not.   
+> That (if it worked) sets power on Basic Rate and EDR as seen in the result “hci0:   Type: BR/EDR  Bus: USB” when issuing the hciconfig hci0 inqtpl command.
+> 
+> 
+> 
+>   
+> 
+> 
+> 
+> 
+> 
+> 
+> 
+> 
+> 
+> 
+> Steve Gladden
+>  
+> Michigan Broadband Systems
+> Connecting Your Business!
+> 
+> 
+> 
+> +1 734.527.7150 Direct
+> +1 248.327.4389 Fax
+> steve@michiganbroadband.com
+> www.michiganbroadband.com
+> 
+> From: Joseph Hwang [mailto:josephsih@google.com] 
+> Sent: Wednesday, October 12, 2016 11:55 AM
+> To: Steve Gladden
+> Cc: Hieu Le; Barry Byford; linux-bluetooth@vger.kernel.org
+> Subject: Re: How can you set Transmit power level in Bluetooth LE mode for an LE beacon?
+> 
+> Hi Steve:
+> 
+>   Maybe you can try CSR's command line utility, bccmd. The system control command Max_Tx_Power and Default_Tx_Power allow you to set tx power.
+> 
+> Good luck!
+> 
+> Joseph
+> 
+> 
+> On Wed, Oct 12, 2016 at 11:33 PM, Steve Gladden <steve@michiganbroadband.com> wrote:
+> Thanks,
+> I was hoping there was an easier way and somehow at the command line but I'll do what I need to do and figure it out somehow.
+> I usually end up on 10 other rabbit trails when it comes to having to recompile anything because it usually just fails for me and I'm
+> not yet well versed in troubleshooting when things won't compile successfully aside from what I can easily google.
+> 
+> I also think it's a little more complicated than just setting the power.
+> I have gathered at least wit hthe CSR chipset that there are at least 3 separate power settings that can be adjusted and not any overall power setting.
+> So the various modulation modes (including GFSK -LE advertising-) need to be addressed and set individually.
+> There's not a master transmit level that sets them all.
+> 
+> 
+> Steve Gladden
+>  
+> Michigan Broadband Systems
+> Connecting Your Business!
+> 
+> 
+> 
+> +1 734.527.7150 Direct
+> +1 248.327.4389 Fax
+> steve@michiganbroadband.com
+> www.michiganbroadband.com
+> 
+> -----Original Message-----
+> From: Hieu Le [mailto:hieu.le@veriksystems.com]
+> Sent: Wednesday, October 12, 2016 1:00 AM
+> To: Steve Gladden
+> Cc: Barry Byford; linux-bluetooth@vger.kernel.org
+> Subject: Re: How can you set Transmit power level in Bluetooth LE mode for an LE beacon?
+> 
+> Hi,
+> 
+> In my opinion, the only way I can find to increase the tx_power is to recompile the linux kernel. There may be a better way
+> 
+> It seems that bluetooth stack within kernel separated into two classes:
+> 1. Inquiry Tx_power.
+> 2. Advertise Tx_power.
+> 
+> And the default value is 0.
+> 
+> You can take a look at:
+> *hci_alloc_dev(void)  function within net/bluetooth/hci_core.c file
+> hdev->inq_tx_power = HCI_TX_POWER_INVALID; adv_tx_power =
+> hdev->HCI_TX_POWER_INVALID;
+> 
+> Hope it will be helpful to you.
+> 
+> Regards,
+> Hieu.
+> 
+> On Wed, Oct 12, 2016 at 12:52 AM, Steve Gladden <steve@michiganbroadband.com> wrote:
+>> Thanks!!
+>> Yes it's nice to hear from somebody.
+>> 
+>> I've been scouring the web so far to no avail on what I think should be a simple and accessible setting.
+>> It's obvious from the specs that most chips have a programmable (settable) transmitter power.
+>> And with beacons it is very important and expected that one should be able to adjust the transmitter level.
+>> All of the serial boards do it with simple AT commands.
+>> 
+>> I just don't get why there's no documentation on how to do it with a USB device!!
+>> 
+>> They sell class 1 bluetooth usb dongles for applications that require more range (100m) is quoted on most class 1 products.
+>> 
+>> I'd expect there should be a straight forward easy to set power in LE mode to get more range or save power and limit range when wanted.
+>> 
+>> But I'm really not finding this information out there!
+>> 
+>> I don;t understand what I am doing wrong or why this is so difficult
+>> to find.  :)
+>> 
+>> 
+>> 
+>> 
+>> 
+>> 
+>> 
+>> On 11 October 2016 at 17:50, Steve Gladden <steve@michiganbroadband.com> wrote:
+>>> Is this this list just some kind of automated patch announcement log and not an actual mailing list where you can ask anything about bluetooth.
+>>> This is all I have seen here for the past few days?
+>>> Where can I ask an actual question about bluetooth?
+>> 
+>> There are some real humans here too!  :-)
+>> 
+>> If you look back on the archive of this list you will see a mixture of
+>> questions and patch requests.
+>> marc.info/?l=linux-bluetooth
+>> 
+>> I've kept quiet as I'm not sure I can answer questions. To offer some
+>> shared experience, I can say that I've been experimenting with
+>> (Eddystone) beacons on Linux single board computers accessing BlueZ
+>> through the DBus API using Python. I also have not found a way to
+>> change the power level of advertisements either. For what I'm doing,
+>> just making sure the TX power in the Eddystone advert matches what the
+>> dongle is actually broadcasting has been good enough.
+>> 
+>> Sorry I couldn't be of more help.
+>> 
+>> Regards,
+>> Barry
+>> 
+>>> 
+>>> 
+>>> 
+>>> 
+>>> Steve Gladden
+>>> 
+>>> Michigan Broadband Systems
+>>> Connecting Your Business!
+>>> 
+>>> 
+>>> 
+>>> +1 734.527.7150 Direct
+>>> +1 248.327.4389 Fax
+>>> steve@michiganbroadband.com
+>>> www.michiganbroadband.com
+>>> 
+>>> ________________________________________
+>>> From: Steve Gladden
+>>> Sent: Sunday, October 09, 2016 12:11 PM
+>>> To: linux-bluetooth@vger.kernel.org
+>>> Subject: How can you set Transmit power level in Bluetooth LE mode for an LE beacon?
+>>> 
+>>> Hi,
+>>> My name is Steve and I am located in Ann Arbor Michigan USA.
+>>> 
+>>> I am new  bluetooth LE and lately am obsessed with Bluetooth LE beacons and trying them out.
+>>> 
+>>> I have read article after article and page after page about how
+>>> people have setup up beacons with USB BT 4.0 interfaces as well as serial bluetooth boards.
+>>> 
+>>> I am currently experimenting with a beacon running on a Raspberry Pi-B and using an external USB Bluetooth 4.0 class 1 dongle.
+>>> 
+>>> My frustration is that I have not been able to find any useful
+>>> information in how to change the Transmitter power level when in LE mode.
+>>> 
+>>> The dongle appears to be working at default level below zero dbm.
+>>> 
+>>> The whole point of building your own beacon this way is to be able to
+>>> customize it and setting the power level is an important key item that should be easily accessible yet I find that NOBODY ever even mentions it let alone do they explain or provide a way to set the power.
+>>> 
+>>> 
+>>> Every text that I have found that details beacon setups from command line never bother to mention setting beacon TX power.
+>>> 
+>>> All the pages I have found seem to copy each other and repeat the
+>>> same information over & over But never get around to even mentioning or discussing setting the power output level of the blutooth dongle.
+>>> 
+>>> sudo hcitool -i hci0 cmd 0x08 0x0008 1E 02 01 1A 1A FF 4C 00 02 15 [
+>>> 92 77 83 0A B2 EB 49 0F A1 DD 7F E3 8C 49 2E DE ] [ 00 00 ] [ 00 00 ]
+>>> C5 00
+>>> 
+>>> The byte just left of the last one is the "reported" TX level that you are transmitting at.
+>>> Which means you're supposed to know (or guess?) what dbm level you are actually transmitting at and set it here to display to the world what your transmitter level is set to so they can range (guess or estimate distance from TX).
+>>> This value does not influence or reflect actual transmit power.
+>>> 
+>>> Please help!!
+>>> 
+>>> Could use any pointers.
+>>> 
+>>> I'm a hardware guy as well so not very experienced in software/programming but I'm willing to try anything to get control of this.
+>>> 
+>>> Been at this for over a week and have some working beacons but no control of transmit power level.
+>>> 
+>>> Am using Trendnet USB dongles which appear to use a Cambridge Chip.  But I'm not exactly sure which chip.
+>>> 
+>>> 
+>>> :~# lsusb
+>>> Bus 001 Device 007: ID 0a12:0001 Cambridge Silicon Radio, Ltd
+>>> Bluetooth Dongle (HCI mode)
+>>> 
+>>> 
+>>> root@raspberrypi:~# hciconfig hci0
+>>> hci0:   Type: BR/EDR  Bus: USB
+>>>          BD Address: 00:15:83:EA:0A:B9  ACL MTU: 310:10  SCO MTU: 64:8
+>>>          UP RUNNING
+>>>          RX bytes:780 acl:0 sco:0 events:50 errors:0
+>>>          TX bytes:1110 acl:0 sco:0 commands:50 errors:0
+>>> 
+>>> 
+>>> 
+>>> 
+>>> 
+>>> 
+>>> 
+>>> 
+>>> 
+>>> 
+>>> 
+>>> 
+>>> 
+>>> 
+>>> --
+>>> To unsubscribe from this list: send the line "unsubscribe
+>>> linux-bluetooth" in the body of a message to
+>>> majordomo@vger.kernel.org More majordomo info at
+>>> http://vger.kernel.org/majordomo-info.html
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe
+>> linux-bluetooth" in the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> 
+> 
+> 
+> --
+> ---- Hieu Le ---
+> 
+> 
+> 
+> 
+> -- 
+> 
+> Joseph Shyh-In Hwang
+> Email: josephsih@google.com
+> 
+> N���r�y���b�X�ǧv�^�)޺{.n�+�{�n[�-�)���w*jg���ݢj/���z�ޖ��2�ޙ���&�)ߡ�a����G��h��j:+v�w�٥
+
