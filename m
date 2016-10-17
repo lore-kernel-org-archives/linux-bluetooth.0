@@ -4,43 +4,42 @@ From: =?UTF-8?q?=C5=81ukasz=20Rymanowski?=
 To: linux-bluetooth@vger.kernel.org
 Cc: =?UTF-8?q?=C5=81ukasz=20Rymanowski?=
         <lukasz.rymanowski@codecoup.pl>
-Subject: [PATCH BlueZ 2/2] shared/gatt-helpers: Fix find by type response handling
-Date: Mon, 17 Oct 2016 12:02:32 +0200
-Message-Id: <1476698552-8030-2-git-send-email-lukasz.rymanowski@codecoup.pl>
-In-Reply-To: <1476698552-8030-1-git-send-email-lukasz.rymanowski@codecoup.pl>
-References: <1476698552-8030-1-git-send-email-lukasz.rymanowski@codecoup.pl>
+Subject: [PATCH BlueZ 1/2] unit/test-gatt: Add /TP/GAD/CL/BV-02-C-1-alternative
+Date: Mon, 17 Oct 2016 12:02:31 +0200
+Message-Id: <1476698552-8030-1-git-send-email-lukasz.rymanowski@codecoup.pl>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Due to regression from
+According to GATT.TS.4.2.1,
+4.4.3 TP/GAD/CL/BV-02-C [Discover Primary Services by Service UUID – by Client]
 
-db24bf0 shared/gatt-helper: Consolidate error checking,
-
-procedure Discover Primary Services by Service UUID, can succeed
-only when last response is Error Response with ATTRIBUTE_NOT_FOUND
-error code.
-
-With this patch it also succeed when Find By Type response contains
-service which is already in a required search range.
-
-It is verified with unit test /TP/GAD/CL/BV-02-C-1-alternative
+Pass verdict is also when response has end_handle = 0xffff.
+This patch add such test.
 ---
- src/shared/gatt-helpers.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ unit/test-gatt.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/src/shared/gatt-helpers.c b/src/shared/gatt-helpers.c
-index a0a5b26..6b39bb1 100644
---- a/src/shared/gatt-helpers.c
-+++ b/src/shared/gatt-helpers.c
-@@ -797,7 +797,7 @@ static void find_by_type_val_cb(uint8_t opcode, const void *pdu,
- 		goto done;
- 	}
+diff --git a/unit/test-gatt.c b/unit/test-gatt.c
+index 8129719..c7a8fa5 100644
+--- a/unit/test-gatt.c
++++ b/unit/test-gatt.c
+@@ -2414,6 +2414,14 @@ int main(int argc, char *argv[])
+ 					0x18),
+ 			raw_pdu(0x01, 0x06, 0x08, 0x00, 0x0a));
  
--	success = false;
-+	success = true;
- 
- done:
- 	discovery_op_complete(op, success, att_ecode);
++	define_test_att("/TP/GAD/CL/BV-02-C-1-alternative",
++			test_search_primary, &uuid_16,
++			NULL,
++			MTU_EXCHANGE_CLIENT_PDUS,
++			raw_pdu(0x06, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28, 0x00,
++					0x18),
++			raw_pdu(0x07, 0x01, 0x00, 0xFF, 0xFF));
++
+ 	define_test_att("/TP/GAD/CL/BV-02-C-2", test_search_primary, &uuid_128,
+ 			NULL,
+ 			MTU_EXCHANGE_CLIENT_PDUS,
 -- 
 2.7.4
 
