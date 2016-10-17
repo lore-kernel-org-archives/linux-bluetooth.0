@@ -1,32 +1,55 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 10.0 \(3226\))
-Subject: Re: [PATCH] HCI_BCSP: Use setup_timer Kernel API instead of
- init_timer
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20161017183114.GA28622@prasanna-ubuntu.itc.intrinsyc.com>
-Date: Tue, 18 Oct 2016 06:41:12 +0200
-Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Message-Id: <D16CB6B5-B452-40A7-A467-2D280C9466E0@holtmann.org>
-References: <20161017183114.GA28622@prasanna-ubuntu.itc.intrinsyc.com>
-To: Prasanna Karthik <pkarthik@intrinsyc.com>
+Subject: Re: Connection handler and btmgmt/bluetoothctl
+To: <linux-bluetooth@vger.kernel.org>
+References: <578439E0.5080703@epita.fr>
+ <20160713055005.GA30167@t440s.P-661HNU-F1> <57D5D09E.7080801@epita.fr>
+From: =?UTF-8?Q?Cl=c3=a9ment_Jacquemin?= <clement.jacquemin@epita.fr>
+Message-ID: <5805609D.4080908@epita.fr>
+Date: Tue, 18 Oct 2016 01:37:01 +0200
+MIME-Version: 1.0
+In-Reply-To: <57D5D09E.7080801@epita.fr>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Prasanna,
+Hello,
 
-> Replace init_timer function with setup_timer reported by coccinelle
-> 
-> Signed-off-by: Prasanna Karthik <pkarthik@intrinsyc.com>
-> ---
-> drivers/bluetooth/hci_bcsp.c | 4 +---
-> 1 file changed, 1 insertion(+), 3 deletions(-)
+I am still looking for an answer about these two problems of timeout and 
+notifications.
 
-patch has been applied to bluetooth-next tree.
+Thank you!
 
-Regards
+Le 11/09/2016 23:46, Clément Jacquemin a écrit :
+> Thanks for your answer Johan!
+>
+> Le 13/07/2016 07:50, Johan Hedberg a écrit :
+>> On Tue, Jul 12, 2016, Clément Jacquemin wrote:
+>>> Another question about best practice. For the moment I use "btmgmt" to
+>>> configure my daemon. However, the "bluetoothctl" binary seems to be a
+>>> more
+>>> stable alternative except that i cannot find any way to do the "le on"
+>>> command as in "btmgmt".
+>>> Is there any way to activate the low energy option with bluetoothctl?
+>>
+>> bluetoothctl talks to bluetoothd and bluetoothd already automatically
+>> enables LE support whenever it's reported to be supported by the kernel.
+>>
+>> Johan
+>
+> I still have some questions.
+>
+> First, is there any equivalent of the 'bt_gatt_server_send_notification'
+> method from "src/shared/gatt-server.c" but with the GATT D-BUS API. I
+> did not find anything about that.
+>
+> Second, when one of my characteristic need more than 5 seconds to
+> process the data, the client is systematically disconnect 5 seconds
+> after requesting a read action on that characteristic. I suppose there
+> is a timeout configuration somewhere, but where ?
+>
+> Clément.
 
-Marcel
-
+-- 
+Clément Jacquemin
+Root GISTRE 2016
+clement.jacquemin@epita.fr
