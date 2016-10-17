@@ -1,36 +1,46 @@
-Return-Path: <pkarthik@intrinsyc.com>
-From: Prasanna Karthik <pkarthik@intrinsyc.com>
-To: Marcel Holtmann <marcel@holtmann.org>, Gustavo Padovan
-	<gustavo@padovan.org>, Johan Hedberg <johan.hedberg@gmail.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: [PATCH] HCI_BCSP: Use setup_timer Kernel API instead of init_timer
-Date: Mon, 17 Oct 2016 18:31:08 +0000
-Message-ID: <20161017183114.GA28622@prasanna-ubuntu.itc.intrinsyc.com>
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: =?UTF-8?q?=C5=81ukasz=20Rymanowski?=
+        <lukasz.rymanowski@codecoup.pl>
+To: linux-bluetooth@vger.kernel.org
+Cc: =?UTF-8?q?=C5=81ukasz=20Rymanowski?=
+        <lukasz.rymanowski@codecoup.pl>
+Subject: [PATCH BlueZ 2/2] shared/gatt-helpers: Fix find by type response handling
+Date: Mon, 17 Oct 2016 12:02:32 +0200
+Message-Id: <1476698552-8030-2-git-send-email-lukasz.rymanowski@codecoup.pl>
+In-Reply-To: <1476698552-8030-1-git-send-email-lukasz.rymanowski@codecoup.pl>
+References: <1476698552-8030-1-git-send-email-lukasz.rymanowski@codecoup.pl>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Replace init_timer function with setup_timer reported by coccinelle
+Due to regression from
 
-Signed-off-by: Prasanna Karthik <pkarthik@intrinsyc.com>
+db24bf0 shared/gatt-helper: Consolidate error checking,
+
+procedure Discover Primary Services by Service UUID, can succeed
+only when last response is Error Response with ATTRIBUTE_NOT_FOUND
+error code.
+
+With this patch it also succeed when Find By Type response contains
+service which is already in a required search range.
+
+It is verified with unit test /TP/GAD/CL/BV-02-C-1-alternative
 ---
- drivers/bluetooth/hci_bcsp.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+ src/shared/gatt-helpers.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/bluetooth/hci_bcsp.c b/drivers/bluetooth/hci_bcsp.c
-index a2c921f..910ec96 100644
---- a/drivers/bluetooth/hci_bcsp.c
-+++ b/drivers/bluetooth/hci_bcsp.c
-@@ -733,9 +733,7 @@ static int bcsp_open(struct hci_uart *hu)
- 	skb_queue_head_init(&bcsp->rel);
- 	skb_queue_head_init(&bcsp->unrel);
-=20
--	init_timer(&bcsp->tbcsp);
--	bcsp->tbcsp.function =3D bcsp_timed_event;
--	bcsp->tbcsp.data     =3D (u_long)hu;
-+	setup_timer(&bcsp->tbcsp, bcsp_timed_event, (u_long)hu);
-=20
- 	bcsp->rx_state =3D BCSP_W4_PKT_DELIMITER;
-=20
---=20
-1.9.1
+diff --git a/src/shared/gatt-helpers.c b/src/shared/gatt-helpers.c
+index a0a5b26..6b39bb1 100644
+--- a/src/shared/gatt-helpers.c
++++ b/src/shared/gatt-helpers.c
+@@ -797,7 +797,7 @@ static void find_by_type_val_cb(uint8_t opcode, const void *pdu,
+ 		goto done;
+ 	}
+ 
+-	success = false;
++	success = true;
+ 
+ done:
+ 	discovery_op_complete(op, success, att_ecode);
+-- 
+2.7.4
+
