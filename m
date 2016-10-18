@@ -4,121 +4,100 @@ From: =?UTF-8?q?Micha=C5=82=20Narajowski?=
 To: linux-bluetooth@vger.kernel.org
 Cc: =?UTF-8?q?Micha=C5=82=20Narajowski?=
         <michal.narajowski@codecoup.pl>
-Subject: [PATCH BlueZ v2 1/4] tools/mgmt-tester: Fix setup commands and conditions handling
-Date: Tue, 18 Oct 2016 15:12:05 +0200
-Message-Id: <1476796328-14808-1-git-send-email-michal.narajowski@codecoup.pl>
+Subject: [PATCH 2/2] Bluetooth: Fix append max 11 bytes of name to scan rsp data
+Date: Tue, 18 Oct 2016 15:10:24 +0200
+Message-Id: <1476796224-14476-2-git-send-email-michal.narajowski@codecoup.pl>
+In-Reply-To: <1476796224-14476-1-git-send-email-michal.narajowski@codecoup.pl>
+References: <1476796224-14476-1-git-send-email-michal.narajowski@codecoup.pl>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-It used to be a quick hack so it would be possible to send
-multiple mgmt cmds on setup. Now sending setup command in
-setup_command_generic adds a setup condition (separate from
-ordinary conditions) so a setup is only successful when all
-the setup conditions are met.
----
- tools/mgmt-tester.c | 39 ++++++++++++++++++++++++++++++---------
- 1 file changed, 30 insertions(+), 9 deletions(-)
+Append maximum of 10 + 1 bytes of name to scan response data.
+Complete name is appended only if exists and is <= 10 characters.
+Else append short name if exists. This makes sure name
+is consistent across multiple advertising instances.
 
-diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
-index b052570..8929e09 100644
---- a/tools/mgmt-tester.c
-+++ b/tools/mgmt-tester.c
-@@ -63,6 +63,7 @@ struct test_data {
- 	struct hciemu *hciemu;
- 	enum hciemu_type hciemu_type;
- 	int unmet_conditions;
-+	int unmet_setup_conditions;
- };
+Signed-off-by: Michał Narajowski <michal.narajowski@codecoup.pl>
+---
+ net/bluetooth/hci_request.c | 40 +++++++++++-----------------------------
+ net/bluetooth/mgmt.c        |  4 ++--
+ 2 files changed, 13 insertions(+), 31 deletions(-)
+
+diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
+index e228842..fc3d2a4 100644
+--- a/net/bluetooth/hci_request.c
++++ b/net/bluetooth/hci_request.c
+@@ -971,41 +971,23 @@ void __hci_req_enable_advertising(struct hci_request *req)
  
- static void mgmt_debug(const char *str, void *user_data)
-@@ -287,6 +288,27 @@ static void test_add_condition(struct test_data *data)
- 	tester_print("Test condition added, total %d", data->unmet_conditions);
- }
- 
-+static void test_add_setup_condition(struct test_data *data)
-+{
-+	data->unmet_setup_conditions++;
-+
-+	tester_print("Test setup condition added, total %d",
-+		     data->unmet_setup_conditions);
-+}
-+
-+static void test_setup_condition_complete(struct test_data *data)
-+{
-+	data->unmet_setup_conditions--;
-+
-+	tester_print("Test setup condition complete, %d left",
-+		     data->unmet_setup_conditions);
-+
-+	if (data->unmet_setup_conditions > 0)
-+		return;
-+
-+	tester_setup_complete();
-+}
-+
- static void test_condition_complete(struct test_data *data)
+ static u8 append_local_name(struct hci_dev *hdev, u8 *ptr, u8 ad_len)
  {
- 	data->unmet_conditions--;
-@@ -6086,7 +6108,7 @@ static void command_setup_hci_callback(uint16_t opcode, const void *param,
- 	}
+-	size_t complete_len;
+-	size_t short_len;
+-	int max_len;
++	size_t len;
  
- 	hciemu_clear_master_post_command_hooks(data->hciemu);
--	test_condition_complete(data);
-+	test_setup_condition_complete(data);
- }
- 
- static void command_hci_callback(uint16_t opcode, const void *param,
-@@ -6127,8 +6149,7 @@ static void setup_mgmt_cmd_callback(uint8_t status, uint16_t length,
- 		tester_setup_failed();
- 		return;
- 	}
+-	max_len = HCI_MAX_AD_LENGTH - ad_len - 2;
+-	complete_len = strlen(hdev->dev_name);
+-	short_len = strlen(hdev->short_name);
 -
--	tester_setup_complete();
-+	test_setup_condition_complete(user_data);
- }
- 
- static void setup_command_generic(const void *test_data)
-@@ -6145,7 +6166,7 @@ static void setup_command_generic(const void *test_data)
- 					 test->setup_expect_hci_command);
- 		hciemu_add_master_post_command_hook(data->hciemu,
- 					command_setup_hci_callback, data);
--		test_add_condition(data);
-+		test_add_setup_condition(data);
- 	}
- 
- 	if (test->setup_send_opcode) {
-@@ -6155,7 +6176,8 @@ static void setup_command_generic(const void *test_data)
- 		mgmt_send(data->mgmt, test->setup_send_opcode, data->mgmt_index,
- 					send_len, send_param,
- 					setup_mgmt_cmd_callback,
--					NULL, NULL);
-+					data, NULL);
-+		test_add_setup_condition(data);
- 		return;
- 	}
- 
-@@ -6173,10 +6195,9 @@ static void setup_command_generic(const void *test_data)
- 		mgmt_send(data->mgmt, cmd->send_opcode, data->mgmt_index,
- 				cmd->send_len, cmd->send_param,
- 				setup_mgmt_cmd_callback,
--				NULL, NULL);
-+				data, NULL);
-+		test_add_setup_condition(data);
- 	}
+-	/* no space left for name */
+-	if (max_len < 1)
+-		return ad_len;
 -
--	tester_setup_complete();
+-	/* no name set */
+-	if (!complete_len)
++	/* no space left for name (+ NULL + type + len) */
++	if ((HCI_MAX_AD_LENGTH - ad_len) < HCI_MAX_SHORT_NAME_LENGTH + 3)
+ 		return ad_len;
+ 
+-	/* complete name fits and is eq to max short name len or smaller */
+-	if (complete_len <= max_len &&
+-	    complete_len <= HCI_MAX_SHORT_NAME_LENGTH) {
++	/* use complete name if present and fits */
++	len = strlen(hdev->dev_name);
++	if (len && len <= HCI_MAX_SHORT_NAME_LENGTH)
+ 		return eir_append_data(ptr, ad_len, EIR_NAME_COMPLETE,
+-				       hdev->dev_name, complete_len);
+-	}
++				       hdev->dev_name, len + 1);
+ 
+-	/* short name set and fits */
+-	if (short_len && short_len <= max_len) {
++	/* use short name if present */
++	len = strlen(hdev->short_name);
++	if (len)
+ 		return eir_append_data(ptr, ad_len, EIR_NAME_SHORT,
+-				       hdev->short_name, short_len);
+-	}
+-
+-	/* no short name set so shorten complete name */
+-	if (!short_len) {
+-		return eir_append_data(ptr, ad_len, EIR_NAME_SHORT,
+-				       hdev->dev_name, max_len);
+-	}
+-
++				       hdev->short_name, len + 1);
+ 	return ad_len;
  }
  
- static const uint8_t add_advertising_param_name[] = {
-@@ -7895,7 +7916,7 @@ int main(int argc, char *argv[])
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index cc6e571..53be90e 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -6039,9 +6039,9 @@ static u8 tlv_data_max_len(u32 adv_flags, bool is_adv_data)
+ 		if (adv_flags & MGMT_ADV_FLAG_TX_POWER)
+ 			max_len -= 3;
+ 	} else {
+-		/* at least 1 byte of name should fit in */
++		/* max 11 bytes of name should fit in */
+ 		if (adv_flags & MGMT_ADV_FLAG_LOCAL_NAME)
+-			max_len -= 3;
++			max_len -= (1 + 1 + 11);
  
- 	test_bredrle("Read Ext Controller Info 1",
- 				&read_ext_ctrl_info1,
--				setup_command_generic, test_command_generic);
-+				NULL, test_command_generic);
- 
- 	test_bredrle("Read Ext Controller Info 2",
- 				&read_ext_ctrl_info2,
+ 		if (adv_flags & (MGMT_ADV_FLAG_APPEARANCE))
+ 			max_len -= 4;
 -- 
 2.7.4
 
