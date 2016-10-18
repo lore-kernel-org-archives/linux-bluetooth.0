@@ -3,10 +3,8 @@ From: puthik@chromium.org
 To: linux-bluetooth@vger.kernel.org
 Cc: Puthikorn Voravootivat <puthik@chromium.org>
 Subject: [PATCH v2 0/2] Expose AdvertisingDataFlags in Device API
-Date: Tue, 18 Oct 2016 12:10:58 -0700
-Message-Id: <1476817861-24158-2-git-send-email-puthik@chromium.org>
-In-Reply-To: <1476817861-24158-1-git-send-email-puthik@chromium.org>
-References: <1476817861-24158-1-git-send-email-puthik@chromium.org>
+Date: Tue, 18 Oct 2016 12:10:57 -0700
+Message-Id: <1476817861-24158-1-git-send-email-puthik@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
