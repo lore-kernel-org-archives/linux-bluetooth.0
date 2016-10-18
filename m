@@ -1,41 +1,30 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 10.0 \(3226\))
-Subject: Re: [PATCH 1/2] doc/device-api: Add AdvertisingDataFlags
+Subject: Re: [PATCH] HCI_BCSP: Use setup_timer Kernel API instead of
+ init_timer
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1476743233-26706-2-git-send-email-puthik@chromium.org>
-Date: Tue, 18 Oct 2016 06:44:55 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <47A80E45-6212-44B8-9DB0-E4B00F38A25F@holtmann.org>
-References: <1476743233-26706-1-git-send-email-puthik@chromium.org>
- <1476743233-26706-2-git-send-email-puthik@chromium.org>
-To: puthik@chromium.org
+In-Reply-To: <20161017183114.GA28622@prasanna-ubuntu.itc.intrinsyc.com>
+Date: Tue, 18 Oct 2016 06:41:12 +0200
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Message-Id: <D16CB6B5-B452-40A7-A467-2D280C9466E0@holtmann.org>
+References: <20161017183114.GA28622@prasanna-ubuntu.itc.intrinsyc.com>
+To: Prasanna Karthik <pkarthik@intrinsyc.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Puthikorn,
+Hi Prasanna,
 
-> This exposed AdvertisingDataFlags to BlueZ Device API
+> Replace init_timer function with setup_timer reported by coccinelle
 > 
-> Signed-off-by: Puthikorn Voravootivat <puthik@chromium.org>
+> Signed-off-by: Prasanna Karthik <pkarthik@intrinsyc.com>
 > ---
-> doc/device-api.txt | 4 ++++
-> 1 file changed, 4 insertions(+)
-> 
-> diff --git a/doc/device-api.txt b/doc/device-api.txt
-> index f5cac49..3ed4e06 100644
-> --- a/doc/device-api.txt
-> +++ b/doc/device-api.txt
-> @@ -230,3 +230,7 @@ Properties	string Address [readonly]
-> 
-> 			Indicate whether or not service discovery has been
-> 			resolved.
-> +
-> +		uint8 AdvertisingDataFlags [readonly]
-> +
-> +			The Advertising Data Flags of the remote device.
+> drivers/bluetooth/hci_bcsp.c | 4 +---
+> 1 file changed, 1 insertion(+), 3 deletions(-)
 
-I prefer if we just call this AdvertisingFlags and strictly speaking this needs to be array{uint8}. The AD type is defined as variable length. It is not just an uint8. We could debate to go with uint32 here if that helps, but just a uint8 will lock us in and is not really future proof.
+patch has been applied to bluetooth-next tree.
 
 Regards
 
