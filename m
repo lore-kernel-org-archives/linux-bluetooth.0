@@ -1,129 +1,123 @@
-Return-Path: <szymon.janc@gmail.com>
-MIME-Version: 1.0
-In-Reply-To: <0852A289-D8DB-4707-97EE-D2E8FBBA2421@holtmann.org>
-References: <1476802418-23134-1-git-send-email-michal.narajowski@codecoup.pl> <0852A289-D8DB-4707-97EE-D2E8FBBA2421@holtmann.org>
-From: Szymon Janc <szymon.janc@gmail.com>
-Date: Tue, 18 Oct 2016 21:27:41 +0200
-Message-ID: <CAA4A+aBrKSpHkeXAT+84-coTYONFrqx-D=5AKL1fDL+ZeS1ZpA@mail.gmail.com>
-Subject: Re: [PATCH v2] Bluetooth: Fix append max 11 bytes of name to scan rsp data
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: =?UTF-8?Q?Micha=C5=82_Narajowski?= <michal.narajowski@codecoup.pl>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: puthik@chromium.org
+To: linux-bluetooth@vger.kernel.org
+Cc: Puthikorn Voravootivat <puthik@chromium.org>
+Subject: [PATCH v2 2/2] core: Add implementation of AdvertisingFlags
+Date: Tue, 18 Oct 2016 12:11:00 -0700
+Message-Id: <1476817861-24158-4-git-send-email-puthik@chromium.org>
+In-Reply-To: <1476817861-24158-1-git-send-email-puthik@chromium.org>
+References: <1476817861-24158-1-git-send-email-puthik@chromium.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+From: Puthikorn Voravootivat <puthik@chromium.org>
 
-On Tue, Oct 18, 2016 at 7:58 PM, Marcel Holtmann <marcel@holtmann.org> wrot=
-e:
-> Hi Michal,
->
->> Append maximum of 10 + 1 bytes of name to scan response data.
->> Complete name is appended only if exists and is <=3D 10 characters.
->> Else append short name if exists or shorten complete name if not.
->> This makes sure name is consistent across multiple advertising
->> instances.
->>
->> Signed-off-by: Micha=C5=82 Narajowski <michal.narajowski@codecoup.pl>
->> ---
->> net/bluetooth/hci_request.c | 47 +++++++++++++++++++++------------------=
-------
->> net/bluetooth/mgmt.c        |  4 ++--
->> 2 files changed, 24 insertions(+), 27 deletions(-)
->>
->> diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
->> index e228842..cfdd2c8 100644
->> --- a/net/bluetooth/hci_request.c
->> +++ b/net/bluetooth/hci_request.c
->> @@ -971,39 +971,36 @@ void __hci_req_enable_advertising(struct hci_reque=
-st *req)
->>
->> static u8 append_local_name(struct hci_dev *hdev, u8 *ptr, u8 ad_len)
->> {
->> -     size_t complete_len;
->>       size_t short_len;
->> -     int max_len;
->> -
->> -     max_len =3D HCI_MAX_AD_LENGTH - ad_len - 2;
->> -     complete_len =3D strlen(hdev->dev_name);
->> -     short_len =3D strlen(hdev->short_name);
->> -
->> -     /* no space left for name */
->> -     if (max_len < 1)
->> -             return ad_len;
->> +     size_t complete_len;
->>
->> -     /* no name set */
->> -     if (!complete_len)
->> +     /* no space left for name (+ NULL + type + len) */
->> +     if ((HCI_MAX_AD_LENGTH - ad_len) < HCI_MAX_SHORT_NAME_LENGTH + 3)
->>               return ad_len;
->>
->> -     /* complete name fits and is eq to max short name len or smaller *=
-/
->> -     if (complete_len <=3D max_len &&
->> -         complete_len <=3D HCI_MAX_SHORT_NAME_LENGTH) {
->> +     /* use complete name if present and fits */
->> +     complete_len =3D strlen(hdev->dev_name);
->> +     if (complete_len && complete_len <=3D HCI_MAX_SHORT_NAME_LENGTH)
->>               return eir_append_data(ptr, ad_len, EIR_NAME_COMPLETE,
->> -                                    hdev->dev_name, complete_len);
->> -     }
->> +                                    hdev->dev_name, complete_len + 1);
->>
->> -     /* short name set and fits */
->> -     if (short_len && short_len <=3D max_len) {
->> +     /* use short name if present */
->> +     short_len =3D strlen(hdev->short_name);
->> +     if (short_len)
->>               return eir_append_data(ptr, ad_len, EIR_NAME_SHORT,
->> -                                    hdev->short_name, short_len);
->> -     }
->> +                                    hdev->short_name, short_len + 1);
->>
->> -     /* no short name set so shorten complete name */
->> -     if (!short_len) {
->> -             return eir_append_data(ptr, ad_len, EIR_NAME_SHORT,
->> -                                    hdev->dev_name, max_len);
->> +     /* use shortened full name if present, we already know that name
->> +      * is longer then HCI_MAX_SHORT_NAME_LENGTH
->> +      */
->> +     if (complete_len) {
->> +             u8 name[HCI_MAX_SHORT_NAME_LENGTH + 1];
->> +
->> +             memcpy(name, hdev->dev_name, HCI_MAX_SHORT_NAME_LENGTH);
->> +             name[HCI_MAX_SHORT_NAME_LENGTH] =3D '\0';
->> +
->> +             return eir_append_data(ptr, ad_len, EIR_NAME_SHORT, name,
->> +                                    sizeof(name));
->>       }
->>
->>       return ad_len;
->> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
->> index 7360380..cdcadca 100644
->> --- a/net/bluetooth/mgmt.c
->> +++ b/net/bluetooth/mgmt.c
->> @@ -6030,9 +6030,9 @@ static u8 tlv_data_max_len(u32 adv_flags, bool is_=
-adv_data)
->>               if (adv_flags & MGMT_ADV_FLAG_TX_POWER)
->>                       max_len -=3D 3;
->>       } else {
->> -             /* at least 1 byte of name should fit in */
->> +             /* max 11 bytes of name should fit in */
->>               if (adv_flags & MGMT_ADV_FLAG_LOCAL_NAME)
->> -                     max_len -=3D 3;
->> +                     max_len -=3D (1 + 1 + 11);
->
-> actually this one should also return correct values and not just max.
->
-> If either the full_name or short_name is shorter than 11 octets, then onl=
-y that value should be returned instead of always 11 octets.
+This adds 'AdvertisingFlags' property to Device interface.
 
-This would mean that if name is changed userspace will have to query
-this again (and track name changes from mgmt). If that is the case we
-should probably document this behavior.
+Bluetooth Core Supplementary Spec v6 Chapter 1.3 defines Bluetooth
+Flags as one of the data in advertise data. BlueZ also correctly
+parses this data but never exposes it to upper layer.
 
---=20
-pozdrawiam
-Szymon K. Janc
-szymon.janc@gmail.com
+Signed-off-by: Puthikorn Voravootivat <puthik@chromium.org>
+---
+ src/adapter.c |  2 ++
+ src/device.c  | 36 ++++++++++++++++++++++++++++++++++++
+ src/device.h  |  1 +
+ 3 files changed, 39 insertions(+)
+
+diff --git a/src/adapter.c b/src/adapter.c
+index b096d48..1abb5c0 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -5552,6 +5552,8 @@ static void update_found_devices(struct btd_adapter *adapter,
+ 	if (eir_data.sd_list)
+ 		device_set_service_data(dev, eir_data.sd_list);
+ 
++	device_set_flags(dev, eir_data.flags);
++
+ 	eir_data_free(&eir_data);
+ 
+ 	/*
+diff --git a/src/device.c b/src/device.c
+index fb6104f..993b8e7 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -247,6 +247,8 @@ struct btd_device {
+ 
+ 	GIOChannel	*att_io;
+ 	guint		store_id;
++
++	uint8_t         flags;
+ };
+ 
+ static const uint16_t uuid_list[] = {
+@@ -939,6 +941,23 @@ dev_property_get_svc_resolved(const GDBusPropertyTable *property,
+ 	return TRUE;
+ }
+ 
++static gboolean
++dev_property_get_flags(const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *data)
++{
++	struct btd_device *device = data;
++	uint8_t flags[] = { device->flags };
++	DBusMessageIter array;
++
++	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
++					DBUS_TYPE_BYTE_AS_STRING, &array);
++	dbus_message_iter_append_fixed_array(&array, DBUS_TYPE_BYTE,
++						&flags, sizeof(flags));
++	dbus_message_iter_close_container(iter, &array);
++
++	return TRUE;
++}
++
+ static gboolean dev_property_get_trusted(const GDBusPropertyTable *property,
+ 					DBusMessageIter *iter, void *data)
+ {
+@@ -2534,6 +2553,7 @@ static const GDBusPropertyTable device_properties[] = {
+ 	{ "TxPower", "n", dev_property_get_tx_power, NULL,
+ 					dev_property_exists_tx_power },
+ 	{ "ServicesResolved", "b", dev_property_get_svc_resolved, NULL, NULL },
++	{ "AdvertisingFlags", "ay", dev_property_get_flags },
+ 
+ 	{ }
+ };
+@@ -5221,6 +5241,22 @@ void device_set_tx_power(struct btd_device *device, int8_t tx_power)
+ 						DEVICE_INTERFACE, "TxPower");
+ }
+ 
++void device_set_flags(struct btd_device *device, uint8_t flags)
++{
++	if (!device)
++		return;
++
++	DBG("flags %d", flags);
++
++	if (device->flags == flags)
++		return;
++
++	device->flags = flags;
++
++	g_dbus_emit_property_changed(dbus_conn, device->path,
++					DEVICE_INTERFACE, "AdvertisingFlags");
++}
++
+ static gboolean start_discovery(gpointer user_data)
+ {
+ 	struct btd_device *device = user_data;
+diff --git a/src/device.h b/src/device.h
+index 387f598..93a159a 100644
+--- a/src/device.h
++++ b/src/device.h
+@@ -97,6 +97,7 @@ void device_set_rssi_with_delta(struct btd_device *device, int8_t rssi,
+ 							int8_t delta_threshold);
+ void device_set_rssi(struct btd_device *device, int8_t rssi);
+ void device_set_tx_power(struct btd_device *device, int8_t tx_power);
++void device_set_flags(struct btd_device *device, uint8_t flags);
+ bool btd_device_is_connected(struct btd_device *dev);
+ uint8_t btd_device_get_bdaddr_type(struct btd_device *dev);
+ bool device_is_retrying(struct btd_device *device);
+-- 
+2.8.0.rc3.226.g39d4020
+
