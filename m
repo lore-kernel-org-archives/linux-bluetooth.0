@@ -2,9 +2,9 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: puthik@chromium.org
 To: linux-bluetooth@vger.kernel.org
 Cc: Puthikorn Voravootivat <puthik@chromium.org>
-Subject: [PATCH v2 1/2] doc/device-api: Add AdvertisingFlags
-Date: Tue, 18 Oct 2016 12:10:59 -0700
-Message-Id: <1476817861-24158-3-git-send-email-puthik@chromium.org>
+Subject: [PATCH v2 0/2] Expose AdvertisingDataFlags in Device API
+Date: Tue, 18 Oct 2016 12:10:58 -0700
+Message-Id: <1476817861-24158-2-git-send-email-puthik@chromium.org>
 In-Reply-To: <1476817861-24158-1-git-send-email-puthik@chromium.org>
 References: <1476817861-24158-1-git-send-email-puthik@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,25 +12,26 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Puthikorn Voravootivat <puthik@chromium.org>
 
-This exposed Advertising Flags to BlueZ Device API
+The following patches expose AdvertisingFlags in Device API.
+This is need by Android app on ChromeOS as Android normally
+should get Advertising data flag from Bluetooth adapter.
 
-Signed-off-by: Puthikorn Voravootivat <puthik@chromium.org>
----
- doc/device-api.txt | 4 ++++
- 1 file changed, 4 insertions(+)
+v2:
+Address Marcel's review to make it more future proof by making it array{byte}.
+device->flags is still a uint8 because 1) We don't need it to be bigger now.
+and 2) We can easily changed it to bigger type when needed without affecting
+the DBus Device API.
 
-diff --git a/doc/device-api.txt b/doc/device-api.txt
-index f5cac49..1985698 100644
---- a/doc/device-api.txt
-+++ b/doc/device-api.txt
-@@ -230,3 +230,7 @@ Properties	string Address [readonly]
- 
- 			Indicate whether or not service discovery has been
- 			resolved.
-+
-+		array{byte} AdvertisingFlags [readonly]
-+
-+			The Advertising Data Flags of the remote device.
+Puthikorn Voravootivat (2):
+  doc/device-api: Add AdvertisingFlags
+  core: Add implementation of AdvertisingFlags
+
+ doc/device-api.txt |  4 ++++
+ src/adapter.c      |  2 ++
+ src/device.c       | 36 ++++++++++++++++++++++++++++++++++++
+ src/device.h       |  1 +
+ 4 files changed, 43 insertions(+)
+
 -- 
 2.8.0.rc3.226.g39d4020
 
