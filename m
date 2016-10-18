@@ -1,59 +1,57 @@
-Return-Path: <marvell@marvell.com>
-From: Amitkumar Karwar <akarwar@marvell.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <marcel@holtmann.org>, <linux-kernel@vger.kernel.org>,
-        Cathy Luo
-	<cluo@marvell.com>,
-        Nishant Sarmukadam <nishants@marvell.com>,
-        Ganapathi Bhat
-	<gbhat@marvell.com>,
-        Amitkumar Karwar <akarwar@marvell.com>
-Subject: [PATCH] btusb: fix zero BD address problem during stress test
-Date: Tue, 18 Oct 2016 18:27:29 +0530
-Message-ID: <1476795449-20592-1-git-send-email-akarwar@marvell.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <1476698552-8030-1-git-send-email-lukasz.rymanowski@codecoup.pl>
+References: <1476698552-8030-1-git-send-email-lukasz.rymanowski@codecoup.pl>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Tue, 18 Oct 2016 13:59:07 +0300
+Message-ID: <CABBYNZ+hwetcYD77kiAvCDvL-8DHFg-K8fK6fVD1gT1B7wHFzQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/2] unit/test-gatt: Add /TP/GAD/CL/BV-02-C-1-alternative
+To: =?UTF-8?Q?=C5=81ukasz_Rymanowski?= <lukasz.rymanowski@codecoup.pl>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Ganapathi Bhat <gbhat@marvell.com>
+Hi Lukasz,
 
-We came across a corner case issue during reboot stress test
-in which hciconfig shows BD address is all zero. Reason is we
-don't get response for HCI RESET command during initialization
+On Mon, Oct 17, 2016 at 1:02 PM, =C5=81ukasz Rymanowski
+<lukasz.rymanowski@codecoup.pl> wrote:
+> According to GATT.TS.4.2.1,
+> 4.4.3 TP/GAD/CL/BV-02-C [Discover Primary Services by Service UUID =E2=80=
+=93 by Client]
+>
+> Pass verdict is also when response has end_handle =3D 0xffff.
+> This patch add such test.
+> ---
+>  unit/test-gatt.c | 8 ++++++++
+>  1 file changed, 8 insertions(+)
+>
+> diff --git a/unit/test-gatt.c b/unit/test-gatt.c
+> index 8129719..c7a8fa5 100644
+> --- a/unit/test-gatt.c
+> +++ b/unit/test-gatt.c
+> @@ -2414,6 +2414,14 @@ int main(int argc, char *argv[])
+>                                         0x18),
+>                         raw_pdu(0x01, 0x06, 0x08, 0x00, 0x0a));
+>
+> +       define_test_att("/TP/GAD/CL/BV-02-C-1-alternative",
+> +                       test_search_primary, &uuid_16,
+> +                       NULL,
+> +                       MTU_EXCHANGE_CLIENT_PDUS,
+> +                       raw_pdu(0x06, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28,=
+ 0x00,
+> +                                       0x18),
+> +                       raw_pdu(0x07, 0x01, 0x00, 0xFF, 0xFF));
+> +
+>         define_test_att("/TP/GAD/CL/BV-02-C-2", test_search_primary, &uui=
+d_128,
+>                         NULL,
+>                         MTU_EXCHANGE_CLIENT_PDUS,
+> --
+> 2.7.4
 
-The issue is tracked to a race where USB subsystem calls
-btusb_intr_complete() to deliver a data(NOOP frame) received
-on interrupt endpoint. HCI_RUNNING flag is not yet set by
-bluetooth subsystem. So we ignore that frame and return.
+Applied, thanks. I just change the order so it doesn't break bisect.
 
-As we missed to resubmit the buffer to interrupt endpoint in
-this case, we don't get response for BT reset command downloaded
-after this.
 
-This patch handles the corner case to resolve zero BD address
-problem.
-
-Signed-off-by: Ganapathi Bhat <gbhat@marvell.com>
-Signed-off-by: Amitkumar Karwar <akarwar@marvell.com>
----
- drivers/bluetooth/btusb.c | 5 +----
- 1 file changed, 1 insertion(+), 4 deletions(-)
-
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 811f9b9..b5596ac 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -607,10 +607,7 @@ static void btusb_intr_complete(struct urb *urb)
- 	BT_DBG("%s urb %p status %d count %d", hdev->name, urb, urb->status,
- 	       urb->actual_length);
- 
--	if (!test_bit(HCI_RUNNING, &hdev->flags))
--		return;
--
--	if (urb->status == 0) {
-+	if (urb->status == 0 && test_bit(HCI_RUNNING, &hdev->flags)) {
- 		hdev->stat.byte_rx += urb->actual_length;
- 
- 		if (btusb_recv_intr(data, urb->transfer_buffer,
--- 
-1.9.1
+--=20
+Luiz Augusto von Dentz
