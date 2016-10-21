@@ -1,197 +1,84 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Szymon Janc <szymon.janc@codecoup.pl>
-To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@codecoup.pl>
-Subject: [RFC] core: Fix BR/EDR pairing for dual mode devices
-Date: Fri, 21 Oct 2016 22:34:14 +0200
-Message-Id: <1477082054-21423-1-git-send-email-szymon.janc@codecoup.pl>
+Date: Fri, 21 Oct 2016 17:40:53 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: davem@davemloft.net
+Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Subject: pull request: bluetooth 2016-10-21
+Message-ID: <20161021144053.GA14245@x1c.dominarus.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+        protocol="application/pgp-signature"; boundary="2fHTh5uZTiUOsy+g"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-For dual mode devices we need to pass address type used in pairing
-events to reply with correct one on agent reply. Otherwise reply for
-BR/EDR pairing of dual mode device would use address type (which is
-valid only for LE address) resulting in reply being ignored by kernel
-and eventually pairing timeout.
+
+--2fHTh5uZTiUOsy+g
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+Hi Dave,
+
+Here are some more Bluetooth fixes for the 4.9 kernel:
+
+ - Fix to btwilink driver probe function return value
+ - Power management fix to hci_bcm
+ - Fix to encoding name in scan response data
+
+Please let me know if there are any issues pulling. Thanks.
+
+Johan
+
 ---
- src/adapter.c |  7 ++++---
- src/device.c  | 31 +++++++++++++++++--------------
- src/device.h  | 10 +++++-----
- 3 files changed, 26 insertions(+), 22 deletions(-)
+The following changes since commit 6d3a4c404648e415e7d96e285d723936d4df7ed0:
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 1abb5c0..4deb980 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -6182,7 +6182,7 @@ static void user_confirm_request_callback(uint16_t index, uint16_t length,
- 		return;
- 	}
- 
--	err = device_confirm_passkey(device, btohl(ev->value),
-+	err = device_confirm_passkey(device, ev->addr.type, btohl(ev->value),
- 							ev->confirm_hint);
- 	if (err < 0) {
- 		btd_error(adapter->dev_id,
-@@ -6256,7 +6256,7 @@ static void user_passkey_request_callback(uint16_t index, uint16_t length,
- 		return;
- 	}
- 
--	err = device_request_passkey(device);
-+	err = device_request_passkey(device, ev->addr.type);
- 	if (err < 0) {
- 		btd_error(adapter->dev_id,
- 				"device_request_passkey: %s", strerror(-err));
-@@ -6295,7 +6295,8 @@ static void user_passkey_notify_callback(uint16_t index, uint16_t length,
- 
- 	DBG("passkey %06u entered %u", passkey, ev->entered);
- 
--	err = device_notify_passkey(device, passkey, ev->entered);
-+	err = device_notify_passkey(device, ev->addr.type, passkey,
-+								ev->entered);
- 	if (err < 0)
- 		btd_error(adapter->dev_id,
- 				"device_notify_passkey: %s", strerror(-err));
-diff --git a/src/device.c b/src/device.c
-index d06b5bf..cc16f8d 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -126,6 +126,7 @@ struct authentication_req {
- 	auth_type_t type;
- 	struct agent *agent;
- 	struct btd_device *device;
-+	uint8_t addr_type;
- 	uint32_t passkey;
- 	char *pincode;
- 	gboolean secure;
-@@ -5613,7 +5614,7 @@ static void confirm_cb(struct agent *agent, DBusError *err, void *data)
- 		return;
- 
- 	btd_adapter_confirm_reply(device->adapter, &device->bdaddr,
--							device->bdaddr_type,
-+							auth->addr_type,
- 							err ? FALSE : TRUE);
- 
- 	agent_unref(device->authr->agent);
-@@ -5634,7 +5635,7 @@ static void passkey_cb(struct agent *agent, DBusError *err,
- 		passkey = INVALID_PASSKEY;
- 
- 	btd_adapter_passkey_reply(device->adapter, &device->bdaddr,
--						device->bdaddr_type, passkey);
-+						auth->addr_type, passkey);
- 
- 	agent_unref(device->authr->agent);
- 	device->authr->agent = NULL;
-@@ -5652,7 +5653,9 @@ static void display_pincode_cb(struct agent *agent, DBusError *err, void *data)
- }
- 
- static struct authentication_req *new_auth(struct btd_device *device,
--					auth_type_t type, gboolean secure)
-+						uint8_t addr_type,
-+						auth_type_t type,
-+						gboolean secure)
- {
- 	struct authentication_req *auth;
- 	struct agent *agent;
-@@ -5680,6 +5683,7 @@ static struct authentication_req *new_auth(struct btd_device *device,
- 	auth->agent = agent;
- 	auth->device = device;
- 	auth->type = type;
-+	auth->addr_type = addr_type;
- 	auth->secure = secure;
- 	device->authr = auth;
- 
-@@ -5691,7 +5695,7 @@ int device_request_pincode(struct btd_device *device, gboolean secure)
- 	struct authentication_req *auth;
- 	int err;
- 
--	auth = new_auth(device, AUTH_TYPE_PINCODE, secure);
-+	auth = new_auth(device, BDADDR_BREDR, AUTH_TYPE_PINCODE, secure);
- 	if (!auth)
- 		return -EPERM;
- 
-@@ -5705,12 +5709,12 @@ int device_request_pincode(struct btd_device *device, gboolean secure)
- 	return err;
- }
- 
--int device_request_passkey(struct btd_device *device)
-+int device_request_passkey(struct btd_device *device, uint8_t type)
- {
- 	struct authentication_req *auth;
- 	int err;
- 
--	auth = new_auth(device, AUTH_TYPE_PASSKEY, FALSE);
-+	auth = new_auth(device, type, AUTH_TYPE_PASSKEY, FALSE);
- 	if (!auth)
- 		return -EPERM;
- 
-@@ -5724,14 +5728,13 @@ int device_request_passkey(struct btd_device *device)
- 	return err;
- }
- 
--int device_confirm_passkey(struct btd_device *device, uint32_t passkey,
--							uint8_t confirm_hint)
--
-+int device_confirm_passkey(struct btd_device *device, uint8_t type,
-+					int32_t passkey, uint8_t confirm_hint)
- {
- 	struct authentication_req *auth;
- 	int err;
- 
--	auth = new_auth(device, AUTH_TYPE_CONFIRM, FALSE);
-+	auth = new_auth(device, type, AUTH_TYPE_CONFIRM, FALSE);
- 	if (!auth)
- 		return -EPERM;
- 
-@@ -5752,8 +5755,8 @@ int device_confirm_passkey(struct btd_device *device, uint32_t passkey,
- 	return err;
- }
- 
--int device_notify_passkey(struct btd_device *device, uint32_t passkey,
--							uint8_t entered)
-+int device_notify_passkey(struct btd_device *device, uint8_t type,
-+					uint32_t passkey, uint8_t entered)
- {
- 	struct authentication_req *auth;
- 	int err;
-@@ -5763,7 +5766,7 @@ int device_notify_passkey(struct btd_device *device, uint32_t passkey,
- 		if (auth->type != AUTH_TYPE_NOTIFY_PASSKEY)
- 			return -EPERM;
- 	} else {
--		auth = new_auth(device, AUTH_TYPE_NOTIFY_PASSKEY, FALSE);
-+		auth = new_auth(device, type, AUTH_TYPE_NOTIFY_PASSKEY, FALSE);
- 		if (!auth)
- 			return -EPERM;
- 	}
-@@ -5783,7 +5786,7 @@ int device_notify_pincode(struct btd_device *device, gboolean secure,
- 	struct authentication_req *auth;
- 	int err;
- 
--	auth = new_auth(device, AUTH_TYPE_NOTIFY_PINCODE, secure);
-+	auth = new_auth(device, BDADDR_BREDR, AUTH_TYPE_NOTIFY_PINCODE, secure);
- 	if (!auth)
- 		return -EPERM;
- 
-diff --git a/src/device.h b/src/device.h
-index 93a159a..3cab366 100644
---- a/src/device.h
-+++ b/src/device.h
-@@ -111,11 +111,11 @@ int device_bonding_attempt_retry(struct btd_device *device);
- long device_bonding_last_duration(struct btd_device *device);
- void device_bonding_restart_timer(struct btd_device *device);
- int device_request_pincode(struct btd_device *device, gboolean secure);
--int device_request_passkey(struct btd_device *device);
--int device_confirm_passkey(struct btd_device *device, uint32_t passkey,
--							uint8_t confirm_hint);
--int device_notify_passkey(struct btd_device *device, uint32_t passkey,
--							uint8_t entered);
-+int device_request_passkey(struct btd_device *device, uint8_t type);
-+int device_confirm_passkey(struct btd_device *device, uint8_t type,
-+					int32_t passkey, uint8_t confirm_hint);
-+int device_notify_passkey(struct btd_device *device, uint8_t type,
-+					uint32_t passkey, uint8_t entered);
- int device_notify_pincode(struct btd_device *device, gboolean secure,
- 							const char *pincode);
- void device_cancel_authentication(struct btd_device *device, gboolean aborted);
--- 
-2.7.4
+  strparser: Propagate correct error code in strp_recv() (2016-10-12 01:51:=
+49 -0400)
 
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git for=
+-upstream
+
+for you to fetch changes up to 6add49fff9233a5c43011eb42b521257cbaa9bda:
+
+  Bluetooth: btwilink: Fix probe return value (2016-10-20 10:14:49 +0200)
+
+----------------------------------------------------------------
+Jacob Siverskog (1):
+      Bluetooth: btwilink: Fix probe return value
+
+J=C3=A9r=C3=B4me de Bretagne (1):
+      Bluetooth: hci_bcm: Fix autosuspend PM for Lenovo ThinkPad 8
+
+Micha=C5=82 Narajowski (1):
+      Bluetooth: Fix append max 11 bytes of name to scan rsp data
+
+ drivers/bluetooth/btwilink.c |  2 +-
+ drivers/bluetooth/hci_bcm.c  |  8 +++++
+ net/bluetooth/hci_request.c  | 49 +++++++++++++--------------
+ net/bluetooth/hci_request.h  |  2 ++
+ net/bluetooth/mgmt.c         | 26 +++++++++-----
+ 5 files changed, 51 insertions(+), 36 deletions(-)
+
+--2fHTh5uZTiUOsy+g
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIcBAEBAgAGBQJYCij1AAoJECQj9vv5qNQSAbcP/3GRNUaB+O535KBd8dbpH7TL
+ZT2qgPktzS0d6ND3hvGJKT6xsq+ZOJHcIu1jQq2oa/igSPf4q8YFzal186dwABFr
+ey61FC7DsaAMhHzuyYfcGQgfhTztu3lMOYsqCiRroZrUC0Ohg8Rc+y1F+CnDaSq5
+FC23Dwpo+4ApDdrAr2pffMt41YR8ZLsV9WVTDprl+sxBDBa2DwDqRVyka44d7Vbf
+UQ2hZU0VluFuCDhIQh+pJrf5cXvirzXOr/xycJkNZTweayrnB6g3Z799wdppp5NV
+ThO62r+dd6CKvCUXdNx9UKM1lVmsGvpyiOCzjIdPBeqwrCQYp3M8EyK8POAKGlRk
+op6UCI9xaD33D7Ch7d7fsJmjAJVpqkCv+M5/2GfEb4pt9LQu1eoPUguVWKDG/6mn
+f1olJoJ77bBEkKHSkFKFsLRKT4omcZ6sILYr6armStgHrbBrIT55AMXyWKc5xFpC
+s4ap86PM+otnUI6KuXTEDyXXwd5kBq1yCpZ3ruk5Jayu8OtKQxjY9vp1N5vx5VA0
+L/IVTEuz3Xj8xPJKj7Q9QLJpoSahr/zVGNnS3Ht3PwDk/3YxIOWgbiKIQvqmw3aU
+KV8m/s4aHOroa8vCdOySTGDlSU0qKdtqEHUlPgCAk2Q9u26UNLf1l77l6jEY0e/0
+2Cv0UWVSN6nf8N28FXUA
+=1VCX
+-----END PGP SIGNATURE-----
+
+--2fHTh5uZTiUOsy+g--
