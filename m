@@ -1,182 +1,197 @@
-Return-Path: <szymon.janc@codecoup.pl>
-MIME-Version: 1.0
-In-Reply-To: <1868573.jZNrvtjvi1@ix>
-References: <1476448183-8630-1-git-send-email-jiangbo.wu@intel.com>
- <1880358.RakREcZFtR@ix> <20161018102338.GB25770@wujiangbo-ubuntu> <1868573.jZNrvtjvi1@ix>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Szymon Janc <szymon.janc@codecoup.pl>
-Date: Sat, 22 Oct 2016 11:17:21 +0200
-Message-ID: <CAAEJBhKbpAMu5oYV3rLHPgeAiRdbPcaGGT8r4x-HwqkH_t3VVg@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: Add conn type to identify addr type with SMP
- over BR/EDR
-To: "Wu,Jiangbo" <jiangbo.wu@intel.com>
-Cc: Johan Hedberg <johan.hedberg@intel.com>, Marcel Holtmann <marcel@holtmann.org>, martin.xu@intel.com,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+To: linux-bluetooth@vger.kernel.org
+Cc: Szymon Janc <szymon.janc@codecoup.pl>
+Subject: [RFC] core: Fix BR/EDR pairing for dual mode devices
+Date: Fri, 21 Oct 2016 22:34:14 +0200
+Message-Id: <1477082054-21423-1-git-send-email-szymon.janc@codecoup.pl>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jiangbo,
+For dual mode devices we need to pass address type used in pairing
+events to reply with correct one on agent reply. Otherwise reply for
+BR/EDR pairing of dual mode device would use address type (which is
+valid only for LE address) resulting in reply being ignored by kernel
+and eventually pairing timeout.
+---
+ src/adapter.c |  7 ++++---
+ src/device.c  | 31 +++++++++++++++++--------------
+ src/device.h  | 10 +++++-----
+ 3 files changed, 26 insertions(+), 22 deletions(-)
 
-On 18 October 2016 at 22:32, Szymon Janc <szymon.janc@codecoup.pl> wrote:
-> Hi Jiangbo,
->
-> On Tuesday, 18 October 2016 18:23:38 CEST Wu,Jiangbo wrote:
->> Hi,
->>
->> On Mon, Oct 17, 2016 at 11:05:33PM +0200, Szymon Janc wrote:
->> > Hi,
->> >
->> > On Saturday, 15 October 2016 00:43:13 CEST wujiangbo wrote:
->> > > On Fri, Oct 14, 2016 at 05:19:38PM +0300, Johan Hedberg wrote:
->> > > > Hi Jiangbo,
->> > > >
->> > > > Please don't top-post on this list.
->> > > >
->> > > > On Fri, Oct 14, 2016, Wu, Jiangbo wrote:
->> > > > > If pair a device that unpair firstly that remove encryption key,
->> > > > > encryption key event will be emitted. kernel will receive
->> > > > > 'L2CAP_CID_SMP_BREDR' frame, and then it will use SMP to distribute
->> > > > > key.  SMP would like to use LTK, IRK and CRSK to notify user. If it
->> > > > > don't identify device by which conn type they are, only marks LE as
->> > > > > the device type,
->> > > >
->> > > > Why would that happen? Before SMP over BR/EDR happens pairing would
->> > > > have
->> > > > happened over BR/EDR, so bluetoothd should know that BR/EDR is
->> > > > supported
->> > > > as well (it would even be aware of an existing BR/EDR connection). Are
->> > > > you perhaps trying to work around some bluetoothd bug with all this?
->> > >
->> > > I use upstream bluez source code without change.
->> > >
->> > > Yes, bluetoothd scan will find device type is BR/EDR or LE. As my case,
->> > > device is BR/EDR. But if kernel report CRSK notify, bluetoothd will
->> > > change
->> > >
->> > > the device type to LE. The code you can see:
->> > >   new_csrk_callback -> btd_adapter_get_device ->
-> btd_adapter_find_device
->> > >
->> > >           if (bdaddr_type == BDADDR_BREDR)
->> > >
->> > >                   device_set_bredr_support(device);
->> > >
->> > >           else
->> > >
->> > >                   device_set_le_support(device, bdaddr_type);
->> > >
->> > > As Marcel mentioned before, LTK, IRK and CRSK are only valid for LE
->> > > link.
->> > > So the rootcause is why remote start to pair a BR/EDR device, the kernel
->> > > will receive CRSK event.
->> > >
->> > > This is the first pair, and it will pair success even if receive CRSK
->> > > notify. And the second and the next all pair will be failed with remote
->> > > device unpair and then pair again.
->> > >
->> > > > > while Bluetoothd will use this 'addr' and 'addr type' to reply the
->> > > > > comfirm to kernel.
->> > > >
->> > > > What reply are you talking about? There's no user interaction involved
->> > > > with SMP over BR/EDR - that would already have occurred when SSP over
->> > > > BR/EDR happened.
->> > >
->> > > Sorry to confuse the case, the pairing failed coming with next pair
->> > > procedure. Because at the last pair with CRSK notify, device type will
->> > > be
->> > > changed to LE, following is the failed scenario after last success with
->> > > CRSK notify. Remote unpair and pair again.
->> > >
->> > > This reply is SPP, user confirm passkey reply. When pairing proceduce,
->> > > User
->> > > confirm the pairing request through bluetoothd, that will send mgmt op
->> > > 'MGMT_OP_USER_CONFIRM_REPLY' with device address and device type in
->> > > mgmt_cp_user_confirm_reply. Kernel use the device address and type to
->> > > lookup hci conn. Unfortunately, it will lookup hci_conn from LE
->> > > hashtable, that don't include hci conn. So spp reply couldn't send to
->> > > remote, caused pair failed.
->> > >
->> > > > > At the same time kernel always uses them to lookup hci_conn in LE
->> > > > > hashtable firstly, because addr type always marks as LE. Obviously
->> > > > > it
->> > > > > will failed with SMP over BR/EDR.
->> > > >
->> > > > I don't follow this either since there shouldn't have been any "reply"
->> > > > from user space for SMP over BR/EDR. All there should be are events
->> > > > from
->> > > > the kernel for the generated LE keys.
->> > > >
->> > > > > Actually, SPM is only for LE in SPEC,
->> > > >
->> > > > That's not true. SMP is specified both for LE-U and ACL-U.
->> > > >
->> > > > > but kernel already support and use SMP over BR/EDR. if BR/EDR
->> > > > > exchanges key with SMP, it will never reply pairing response to
->> > > > > remote, in other words it will be never paired, that is happened in
->> > > > > our products.
->> > > >
->> > > > Szymon recently implemented SMP over BR/EDR for Zephyr and used
->> > > > Linux/BlueZ as a reference for testing. He didn't report any issues
->> > > > like
->> > > > this. It might help if you could provide some logs (particularly
->> > > > HCI/btmon but also from bluetoothd) to understand what's the actual
->> > > > issue you're seeing.
->> > > >
->> > > > Johan
->> > >
->> > > Sorry to confuse this issue, the log is not in my hand right now,
->> > > so it maybe later.
->> >
->> > So I was able to reproduce this issue. This is bluetoothd bug and not
->> > kernel one. This bug is no specific to cross-transport pairing. It can
->> > happen with any dual-mode device that is doing BR/EDR pairing while being
->> > known as dual mode by bluetoothd when agent replies with passkey or
->> > confirmation.
->> >
->> > To fix this we probably need to hold extra information in
->> > 'struct authentication_req' in device.c about type of pairing (LE or
->> > BR/EDR). This is not a one-liner-fix so I don't have a patch ready yet.
->>
->> Totally agree with you about dual-mode device pairing known as dual mode.
->> But i want to known is that reasonable about device is to do BR/EDR pairing
->> will generate CRSK notify? I'm very intersting about this fixing, this bug
->> is hight priority in our product. In my opinion hold extra informatin in
->> 'struct authentication_req' may not fix this bug. Because if CRSK event is
->> still report, then bluetoothd will change the device type to LE even if we
->> pair device that is scaned with BR/EDR. So i think the rootcase is find
->> does CRSK event make sense in BR/EDR pairing, and how to handle CRSK events
->> in BR/EDR pairing if it make sense. I'm confuse with those.
->
-> It doesn't change the device to LE but to dual mode device. This is
-> *cross-transport* pairing so keys for other transport are generated.
-> baddr_type specify only LE address type, not BR/EDR since there is no address
-> type for BR/EDR. This is mostly true but few places in bluetoothd seem to
-> asusme that for device supporting BR/EDR type is equal 0. Which is not true if
-> device is dual mode.
->
-> You should be able to reproduce this bug with dual-mode devices that don't
-> support cross-transport pairing: enable advertising, scan from linux, when
-> device is found stop advertising and make device discoverable over BR/EDR
-> (inquiry). When device is found over BR/EDR stop scanning and start pairing.
->
->>
->> I noticed that if quikly reply the passkey confirm, this bug always be
->> reproduced, but if wait for 2~3s to reply the passkey confirm, it works
->> well every time. In terms of code, wait for 2~3s will cause l2cap chan
->> timeout for info timer that created by HCI_EV_REMOTE_EXT_FEATURES event,
->> and timeout will change l2cap chan to BT_CONNECTED. So next SMP
->> resume/ready don't distribute key also CRSK events.
->>
->> It can't reproduce with btmgmt, because it reply passkey confirm always only
->> use BR/EDR in 'struct mgmt_cp_user_confirm_reply' not use device relation
->> type.
->>
->> bluetoothd.log and btmon.log are attached. It records two pair request
->> sequence, one is pair success that have CRSK event, another is next pair
->> reqeust don't success any, hope those maybe help you to annlyze this bug.
-
-I've sent a patch "[RFC] core: Fix BR/EDR pairing for dual mode devices".
-Please check if this solves issue you are seeing.
-
+diff --git a/src/adapter.c b/src/adapter.c
+index 1abb5c0..4deb980 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -6182,7 +6182,7 @@ static void user_confirm_request_callback(uint16_t index, uint16_t length,
+ 		return;
+ 	}
+ 
+-	err = device_confirm_passkey(device, btohl(ev->value),
++	err = device_confirm_passkey(device, ev->addr.type, btohl(ev->value),
+ 							ev->confirm_hint);
+ 	if (err < 0) {
+ 		btd_error(adapter->dev_id,
+@@ -6256,7 +6256,7 @@ static void user_passkey_request_callback(uint16_t index, uint16_t length,
+ 		return;
+ 	}
+ 
+-	err = device_request_passkey(device);
++	err = device_request_passkey(device, ev->addr.type);
+ 	if (err < 0) {
+ 		btd_error(adapter->dev_id,
+ 				"device_request_passkey: %s", strerror(-err));
+@@ -6295,7 +6295,8 @@ static void user_passkey_notify_callback(uint16_t index, uint16_t length,
+ 
+ 	DBG("passkey %06u entered %u", passkey, ev->entered);
+ 
+-	err = device_notify_passkey(device, passkey, ev->entered);
++	err = device_notify_passkey(device, ev->addr.type, passkey,
++								ev->entered);
+ 	if (err < 0)
+ 		btd_error(adapter->dev_id,
+ 				"device_notify_passkey: %s", strerror(-err));
+diff --git a/src/device.c b/src/device.c
+index d06b5bf..cc16f8d 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -126,6 +126,7 @@ struct authentication_req {
+ 	auth_type_t type;
+ 	struct agent *agent;
+ 	struct btd_device *device;
++	uint8_t addr_type;
+ 	uint32_t passkey;
+ 	char *pincode;
+ 	gboolean secure;
+@@ -5613,7 +5614,7 @@ static void confirm_cb(struct agent *agent, DBusError *err, void *data)
+ 		return;
+ 
+ 	btd_adapter_confirm_reply(device->adapter, &device->bdaddr,
+-							device->bdaddr_type,
++							auth->addr_type,
+ 							err ? FALSE : TRUE);
+ 
+ 	agent_unref(device->authr->agent);
+@@ -5634,7 +5635,7 @@ static void passkey_cb(struct agent *agent, DBusError *err,
+ 		passkey = INVALID_PASSKEY;
+ 
+ 	btd_adapter_passkey_reply(device->adapter, &device->bdaddr,
+-						device->bdaddr_type, passkey);
++						auth->addr_type, passkey);
+ 
+ 	agent_unref(device->authr->agent);
+ 	device->authr->agent = NULL;
+@@ -5652,7 +5653,9 @@ static void display_pincode_cb(struct agent *agent, DBusError *err, void *data)
+ }
+ 
+ static struct authentication_req *new_auth(struct btd_device *device,
+-					auth_type_t type, gboolean secure)
++						uint8_t addr_type,
++						auth_type_t type,
++						gboolean secure)
+ {
+ 	struct authentication_req *auth;
+ 	struct agent *agent;
+@@ -5680,6 +5683,7 @@ static struct authentication_req *new_auth(struct btd_device *device,
+ 	auth->agent = agent;
+ 	auth->device = device;
+ 	auth->type = type;
++	auth->addr_type = addr_type;
+ 	auth->secure = secure;
+ 	device->authr = auth;
+ 
+@@ -5691,7 +5695,7 @@ int device_request_pincode(struct btd_device *device, gboolean secure)
+ 	struct authentication_req *auth;
+ 	int err;
+ 
+-	auth = new_auth(device, AUTH_TYPE_PINCODE, secure);
++	auth = new_auth(device, BDADDR_BREDR, AUTH_TYPE_PINCODE, secure);
+ 	if (!auth)
+ 		return -EPERM;
+ 
+@@ -5705,12 +5709,12 @@ int device_request_pincode(struct btd_device *device, gboolean secure)
+ 	return err;
+ }
+ 
+-int device_request_passkey(struct btd_device *device)
++int device_request_passkey(struct btd_device *device, uint8_t type)
+ {
+ 	struct authentication_req *auth;
+ 	int err;
+ 
+-	auth = new_auth(device, AUTH_TYPE_PASSKEY, FALSE);
++	auth = new_auth(device, type, AUTH_TYPE_PASSKEY, FALSE);
+ 	if (!auth)
+ 		return -EPERM;
+ 
+@@ -5724,14 +5728,13 @@ int device_request_passkey(struct btd_device *device)
+ 	return err;
+ }
+ 
+-int device_confirm_passkey(struct btd_device *device, uint32_t passkey,
+-							uint8_t confirm_hint)
+-
++int device_confirm_passkey(struct btd_device *device, uint8_t type,
++					int32_t passkey, uint8_t confirm_hint)
+ {
+ 	struct authentication_req *auth;
+ 	int err;
+ 
+-	auth = new_auth(device, AUTH_TYPE_CONFIRM, FALSE);
++	auth = new_auth(device, type, AUTH_TYPE_CONFIRM, FALSE);
+ 	if (!auth)
+ 		return -EPERM;
+ 
+@@ -5752,8 +5755,8 @@ int device_confirm_passkey(struct btd_device *device, uint32_t passkey,
+ 	return err;
+ }
+ 
+-int device_notify_passkey(struct btd_device *device, uint32_t passkey,
+-							uint8_t entered)
++int device_notify_passkey(struct btd_device *device, uint8_t type,
++					uint32_t passkey, uint8_t entered)
+ {
+ 	struct authentication_req *auth;
+ 	int err;
+@@ -5763,7 +5766,7 @@ int device_notify_passkey(struct btd_device *device, uint32_t passkey,
+ 		if (auth->type != AUTH_TYPE_NOTIFY_PASSKEY)
+ 			return -EPERM;
+ 	} else {
+-		auth = new_auth(device, AUTH_TYPE_NOTIFY_PASSKEY, FALSE);
++		auth = new_auth(device, type, AUTH_TYPE_NOTIFY_PASSKEY, FALSE);
+ 		if (!auth)
+ 			return -EPERM;
+ 	}
+@@ -5783,7 +5786,7 @@ int device_notify_pincode(struct btd_device *device, gboolean secure,
+ 	struct authentication_req *auth;
+ 	int err;
+ 
+-	auth = new_auth(device, AUTH_TYPE_NOTIFY_PINCODE, secure);
++	auth = new_auth(device, BDADDR_BREDR, AUTH_TYPE_NOTIFY_PINCODE, secure);
+ 	if (!auth)
+ 		return -EPERM;
+ 
+diff --git a/src/device.h b/src/device.h
+index 93a159a..3cab366 100644
+--- a/src/device.h
++++ b/src/device.h
+@@ -111,11 +111,11 @@ int device_bonding_attempt_retry(struct btd_device *device);
+ long device_bonding_last_duration(struct btd_device *device);
+ void device_bonding_restart_timer(struct btd_device *device);
+ int device_request_pincode(struct btd_device *device, gboolean secure);
+-int device_request_passkey(struct btd_device *device);
+-int device_confirm_passkey(struct btd_device *device, uint32_t passkey,
+-							uint8_t confirm_hint);
+-int device_notify_passkey(struct btd_device *device, uint32_t passkey,
+-							uint8_t entered);
++int device_request_passkey(struct btd_device *device, uint8_t type);
++int device_confirm_passkey(struct btd_device *device, uint8_t type,
++					int32_t passkey, uint8_t confirm_hint);
++int device_notify_passkey(struct btd_device *device, uint8_t type,
++					uint32_t passkey, uint8_t entered);
+ int device_notify_pincode(struct btd_device *device, gboolean secure,
+ 							const char *pincode);
+ void device_cancel_authentication(struct btd_device *device, gboolean aborted);
 -- 
-pozdrawiam
-Szymon K. Janc
+2.7.4
+
