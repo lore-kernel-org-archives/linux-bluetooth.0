@@ -1,84 +1,72 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Date: Fri, 21 Oct 2016 17:40:53 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: davem@davemloft.net
-Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: pull request: bluetooth 2016-10-21
-Message-ID: <20161021144053.GA14245@x1c.dominarus.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-        protocol="application/pgp-signature"; boundary="2fHTh5uZTiUOsy+g"
+In-Reply-To: <1476994489-10860-1-git-send-email-szymon.janc@codecoup.pl>
+References: <1476994489-10860-1-git-send-email-szymon.janc@codecoup.pl>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Fri, 21 Oct 2016 11:12:26 +0300
+Message-ID: <CABBYNZJhbWaCF0096Y87reOKVX+p7z5FVaWFOq1hSxXs_ge7pg@mail.gmail.com>
+Subject: Re: [PATCH] shared/att: Fix handling 'Insufficent Authentication'
+ error respone
+To: Szymon Janc <szymon.janc@codecoup.pl>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Szymon,
 
---2fHTh5uZTiUOsy+g
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On Thu, Oct 20, 2016 at 11:14 PM, Szymon Janc <szymon.janc@codecoup.pl> wrote:
+> From Core Specification 4.2 Vol.3 Part C (page 375):
+>
+> When the link is not encrypted, the error code "Insufficient
+> Authentication" does not indicate that MITM protection is required.
+>
+> When unauthenticated pairing has occurred and the link is currently
+> encrypted, the error code "Insufficient Authentication" indicates that
+> MITM protection is required.
+>
+> If LE Secure Connections authenticated pairing is required but LE
+> legacy pairing has occurred and the link is currently encrypted, the
+> service request shall be rejected with the error code "Insufficient
+> Authentication".
+> ---
+>  src/shared/att.c | 17 ++++++++++++-----
+>  1 file changed, 12 insertions(+), 5 deletions(-)
+>
+> diff --git a/src/shared/att.c b/src/shared/att.c
+> index f1e0f59..3071b51 100644
+> --- a/src/shared/att.c
+> +++ b/src/shared/att.c
+> @@ -603,13 +603,20 @@ static bool change_security(struct bt_att *att, uint8_t ecode)
+>         security = bt_att_get_security(att);
+>
+>         if (ecode == BT_ATT_ERROR_INSUFFICIENT_ENCRYPTION &&
+> -                                       security < BT_ATT_SECURITY_MEDIUM)
+> +                                       security < BT_ATT_SECURITY_MEDIUM) {
+>                 security = BT_ATT_SECURITY_MEDIUM;
+> -       else if (ecode == BT_ATT_ERROR_AUTHENTICATION &&
+> -                                       security < BT_ATT_SECURITY_HIGH)
+> -               security = BT_ATT_SECURITY_HIGH;
+> -       else
+> +       } else if (ecode == BT_ATT_ERROR_AUTHENTICATION) {
+> +               if (security < BT_ATT_SECURITY_MEDIUM)
+> +                       security = BT_ATT_SECURITY_MEDIUM;
+> +               else if (security < BT_ATT_SECURITY_HIGH)
+> +                       security = BT_ATT_SECURITY_HIGH;
+> +               else if (security < BT_ATT_SECURITY_FIPS)
+> +                       security = BT_ATT_SECURITY_FIPS;
+> +               else
+> +                       return false;
+> +       } else {
+>                 return false;
+> +       }
+>
+>         return bt_att_set_security(att, security);
+>  }
+> --
+> 2.7.4
 
-Hi Dave,
+Applied, thanks.
 
-Here are some more Bluetooth fixes for the 4.9 kernel:
-
- - Fix to btwilink driver probe function return value
- - Power management fix to hci_bcm
- - Fix to encoding name in scan response data
-
-Please let me know if there are any issues pulling. Thanks.
-
-Johan
-
----
-The following changes since commit 6d3a4c404648e415e7d96e285d723936d4df7ed0:
-
-  strparser: Propagate correct error code in strp_recv() (2016-10-12 01:51:=
-49 -0400)
-
-are available in the git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git for=
--upstream
-
-for you to fetch changes up to 6add49fff9233a5c43011eb42b521257cbaa9bda:
-
-  Bluetooth: btwilink: Fix probe return value (2016-10-20 10:14:49 +0200)
-
-----------------------------------------------------------------
-Jacob Siverskog (1):
-      Bluetooth: btwilink: Fix probe return value
-
-J=C3=A9r=C3=B4me de Bretagne (1):
-      Bluetooth: hci_bcm: Fix autosuspend PM for Lenovo ThinkPad 8
-
-Micha=C5=82 Narajowski (1):
-      Bluetooth: Fix append max 11 bytes of name to scan rsp data
-
- drivers/bluetooth/btwilink.c |  2 +-
- drivers/bluetooth/hci_bcm.c  |  8 +++++
- net/bluetooth/hci_request.c  | 49 +++++++++++++--------------
- net/bluetooth/hci_request.h  |  2 ++
- net/bluetooth/mgmt.c         | 26 +++++++++-----
- 5 files changed, 51 insertions(+), 36 deletions(-)
-
---2fHTh5uZTiUOsy+g
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIcBAEBAgAGBQJYCij1AAoJECQj9vv5qNQSAbcP/3GRNUaB+O535KBd8dbpH7TL
-ZT2qgPktzS0d6ND3hvGJKT6xsq+ZOJHcIu1jQq2oa/igSPf4q8YFzal186dwABFr
-ey61FC7DsaAMhHzuyYfcGQgfhTztu3lMOYsqCiRroZrUC0Ohg8Rc+y1F+CnDaSq5
-FC23Dwpo+4ApDdrAr2pffMt41YR8ZLsV9WVTDprl+sxBDBa2DwDqRVyka44d7Vbf
-UQ2hZU0VluFuCDhIQh+pJrf5cXvirzXOr/xycJkNZTweayrnB6g3Z799wdppp5NV
-ThO62r+dd6CKvCUXdNx9UKM1lVmsGvpyiOCzjIdPBeqwrCQYp3M8EyK8POAKGlRk
-op6UCI9xaD33D7Ch7d7fsJmjAJVpqkCv+M5/2GfEb4pt9LQu1eoPUguVWKDG/6mn
-f1olJoJ77bBEkKHSkFKFsLRKT4omcZ6sILYr6armStgHrbBrIT55AMXyWKc5xFpC
-s4ap86PM+otnUI6KuXTEDyXXwd5kBq1yCpZ3ruk5Jayu8OtKQxjY9vp1N5vx5VA0
-L/IVTEuz3Xj8xPJKj7Q9QLJpoSahr/zVGNnS3Ht3PwDk/3YxIOWgbiKIQvqmw3aU
-KV8m/s4aHOroa8vCdOySTGDlSU0qKdtqEHUlPgCAk2Q9u26UNLf1l77l6jEY0e/0
-2Cv0UWVSN6nf8N28FXUA
-=1VCX
------END PGP SIGNATURE-----
-
---2fHTh5uZTiUOsy+g--
+-- 
+Luiz Augusto von Dentz
