@@ -1,86 +1,213 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <jiangbo.wu@intel.com>
+Date: Mon, 24 Oct 2016 15:30:34 +0800
+From: "Wu,Jiangbo" <jiangbo.wu@intel.com>
+To: Szymon Janc <szymon.janc@codecoup.pl>
+Cc: Johan Hedberg <johan.hedberg@intel.com>,
+	Marcel Holtmann <marcel@holtmann.org>, martin.xu@intel.com,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Add conn type to identify addr type with SMP
+ over BR/EDR
+Message-ID: <20161024073034.GA16791@wujiangbo-ubuntu>
+References: <1476448183-8630-1-git-send-email-jiangbo.wu@intel.com>
+ <1880358.RakREcZFtR@ix>
+ <20161018102338.GB25770@wujiangbo-ubuntu>
+ <1868573.jZNrvtjvi1@ix>
+ <CAAEJBhKbpAMu5oYV3rLHPgeAiRdbPcaGGT8r4x-HwqkH_t3VVg@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <580E24BF.6000206@gmail.com>
-References: <580891D0.5000705@gmail.com> <CABBYNZ+ccawCjfQVrS5Zvu4M5=N-_Mz_ozLr-Kz8YcF75DuJ5g@mail.gmail.com>
- <580E24BF.6000206@gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 24 Oct 2016 19:03:08 +0300
-Message-ID: <CABBYNZJNC5pRR-uu6x6kLYzTPCzwqG3B8AWUJB2PHc287mQK4Q@mail.gmail.com>
-Subject: Re: Write queue is not processed after last write was not proper
-To: Naresh <kbn456@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CAAEJBhKbpAMu5oYV3rLHPgeAiRdbPcaGGT8r4x-HwqkH_t3VVg@mail.gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Naresh,
+Hi Szymon,
 
-On Mon, Oct 24, 2016 at 6:11 PM, Naresh <kbn456@gmail.com> wrote:
-> On Thursday 20 October 2016 03:28 PM, Luiz Augusto von Dentz wrote:
-> Hi Luiz,
->>
->> Hi Naresh,
->>
->> On Thu, Oct 20, 2016 at 12:43 PM, Naresh <kbn456@gmail.com> wrote:
->>>
->>> Hi,
->>>
->>> I've been writing ble client application using latest bluez version
->>> (5.42)
->>> and based on gatttool. We have some different requirement, so we didn't
->>> used
->>> D-Bus based API's as its not implement with D-BUS API's, Like we wanted
->>> to
->>> disable filter duplicate to receive all the advertisement(Even all the
->>> parameters are same) for proximity check and than connect and pair.
->>>
->>> We have used HCI layer api for getting advertisement with filter
->>> duplicate
->>> disabled and based on the BD address we connect using the Btio layer API
->>> than used gattrib API to perform read/write/Notification confirmation
->>> operations.
->>
->> gattrib API is deprecated, you should use what is under src/shared
->> since that is what we unit test.
->
-> Yes, Now we have migrated and used API's under src/shared for read/Write.
->>>
->>> We are performing some write/write_without operation continuously based
->>> on
->>> request by the our app(it kind of stress test) but after some write, its
->>> gets stuck I mean write queue is not being processed, there is no ATT
->>> logs
->>> once write is failed (returning some negative id) but write are being
->>> queued.
->>>
->>> We have debugged this issue in bluez and found that once wakeup_writer
->>> sets
->>> the io_set_write_handler for queued operation than set writer_active to
->>> true, after that write is performed and destroyer callback will set
->>> writer_active back to false.
->>>
->>> But in failed case before wakeup_writer being set writer_active to true,
->>> the
->>> write and destroy operation are being processed i.e writer_active never
->>> set
->>> to false and io_set_write_handler are never set for upcoming operations.
->>>
->>> I don't know what causing this scenario.
->>
->> I guess the first thing to do is to attempt to reproduce with
->> bt_gatt_client API and have HCI traces so we can see where it fails,
->> perhaps it is even disconnecting in the meantime, but it shouldn't
->> queue them up.
->>
-> But we are still facing the same problem with write, Please find an
-> attachment of hci trace logs and write logs.
+On Sat, Oct 22, 2016 at 11:17:21AM +0200, Szymon Janc wrote:
+> Hi Jiangbo,
+> 
+> On 18 October 2016 at 22:32, Szymon Janc <szymon.janc@codecoup.pl> wrote:
+> > Hi Jiangbo,
+> >
+> > On Tuesday, 18 October 2016 18:23:38 CEST Wu,Jiangbo wrote:
+> >> Hi,
+> >>
+> >> On Mon, Oct 17, 2016 at 11:05:33PM +0200, Szymon Janc wrote:
+> >> > Hi,
+> >> >
+> >> > On Saturday, 15 October 2016 00:43:13 CEST wujiangbo wrote:
+> >> > > On Fri, Oct 14, 2016 at 05:19:38PM +0300, Johan Hedberg wrote:
+> >> > > > Hi Jiangbo,
+> >> > > >
+> >> > > > Please don't top-post on this list.
+> >> > > >
+> >> > > > On Fri, Oct 14, 2016, Wu, Jiangbo wrote:
+> >> > > > > If pair a device that unpair firstly that remove encryption key,
+> >> > > > > encryption key event will be emitted. kernel will receive
+> >> > > > > 'L2CAP_CID_SMP_BREDR' frame, and then it will use SMP to distribute
+> >> > > > > key.  SMP would like to use LTK, IRK and CRSK to notify user. If it
+> >> > > > > don't identify device by which conn type they are, only marks LE as
+> >> > > > > the device type,
+> >> > > >
+> >> > > > Why would that happen? Before SMP over BR/EDR happens pairing would
+> >> > > > have
+> >> > > > happened over BR/EDR, so bluetoothd should know that BR/EDR is
+> >> > > > supported
+> >> > > > as well (it would even be aware of an existing BR/EDR connection). Are
+> >> > > > you perhaps trying to work around some bluetoothd bug with all this?
+> >> > >
+> >> > > I use upstream bluez source code without change.
+> >> > >
+> >> > > Yes, bluetoothd scan will find device type is BR/EDR or LE. As my case,
+> >> > > device is BR/EDR. But if kernel report CRSK notify, bluetoothd will
+> >> > > change
+> >> > >
+> >> > > the device type to LE. The code you can see:
+> >> > >   new_csrk_callback -> btd_adapter_get_device ->
+> > btd_adapter_find_device
+> >> > >
+> >> > >           if (bdaddr_type == BDADDR_BREDR)
+> >> > >
+> >> > >                   device_set_bredr_support(device);
+> >> > >
+> >> > >           else
+> >> > >
+> >> > >                   device_set_le_support(device, bdaddr_type);
+> >> > >
+> >> > > As Marcel mentioned before, LTK, IRK and CRSK are only valid for LE
+> >> > > link.
+> >> > > So the rootcause is why remote start to pair a BR/EDR device, the kernel
+> >> > > will receive CRSK event.
+> >> > >
+> >> > > This is the first pair, and it will pair success even if receive CRSK
+> >> > > notify. And the second and the next all pair will be failed with remote
+> >> > > device unpair and then pair again.
+> >> > >
+> >> > > > > while Bluetoothd will use this 'addr' and 'addr type' to reply the
+> >> > > > > comfirm to kernel.
+> >> > > >
+> >> > > > What reply are you talking about? There's no user interaction involved
+> >> > > > with SMP over BR/EDR - that would already have occurred when SSP over
+> >> > > > BR/EDR happened.
+> >> > >
+> >> > > Sorry to confuse the case, the pairing failed coming with next pair
+> >> > > procedure. Because at the last pair with CRSK notify, device type will
+> >> > > be
+> >> > > changed to LE, following is the failed scenario after last success with
+> >> > > CRSK notify. Remote unpair and pair again.
+> >> > >
+> >> > > This reply is SPP, user confirm passkey reply. When pairing proceduce,
+> >> > > User
+> >> > > confirm the pairing request through bluetoothd, that will send mgmt op
+> >> > > 'MGMT_OP_USER_CONFIRM_REPLY' with device address and device type in
+> >> > > mgmt_cp_user_confirm_reply. Kernel use the device address and type to
+> >> > > lookup hci conn. Unfortunately, it will lookup hci_conn from LE
+> >> > > hashtable, that don't include hci conn. So spp reply couldn't send to
+> >> > > remote, caused pair failed.
+> >> > >
+> >> > > > > At the same time kernel always uses them to lookup hci_conn in LE
+> >> > > > > hashtable firstly, because addr type always marks as LE. Obviously
+> >> > > > > it
+> >> > > > > will failed with SMP over BR/EDR.
+> >> > > >
+> >> > > > I don't follow this either since there shouldn't have been any "reply"
+> >> > > > from user space for SMP over BR/EDR. All there should be are events
+> >> > > > from
+> >> > > > the kernel for the generated LE keys.
+> >> > > >
+> >> > > > > Actually, SPM is only for LE in SPEC,
+> >> > > >
+> >> > > > That's not true. SMP is specified both for LE-U and ACL-U.
+> >> > > >
+> >> > > > > but kernel already support and use SMP over BR/EDR. if BR/EDR
+> >> > > > > exchanges key with SMP, it will never reply pairing response to
+> >> > > > > remote, in other words it will be never paired, that is happened in
+> >> > > > > our products.
+> >> > > >
+> >> > > > Szymon recently implemented SMP over BR/EDR for Zephyr and used
+> >> > > > Linux/BlueZ as a reference for testing. He didn't report any issues
+> >> > > > like
+> >> > > > this. It might help if you could provide some logs (particularly
+> >> > > > HCI/btmon but also from bluetoothd) to understand what's the actual
+> >> > > > issue you're seeing.
+> >> > > >
+> >> > > > Johan
+> >> > >
+> >> > > Sorry to confuse this issue, the log is not in my hand right now,
+> >> > > so it maybe later.
+> >> >
+> >> > So I was able to reproduce this issue. This is bluetoothd bug and not
+> >> > kernel one. This bug is no specific to cross-transport pairing. It can
+> >> > happen with any dual-mode device that is doing BR/EDR pairing while being
+> >> > known as dual mode by bluetoothd when agent replies with passkey or
+> >> > confirmation.
+> >> >
+> >> > To fix this we probably need to hold extra information in
+> >> > 'struct authentication_req' in device.c about type of pairing (LE or
+> >> > BR/EDR). This is not a one-liner-fix so I don't have a patch ready yet.
+> >>
+> >> Totally agree with you about dual-mode device pairing known as dual mode.
+> >> But i want to known is that reasonable about device is to do BR/EDR pairing
+> >> will generate CRSK notify? I'm very intersting about this fixing, this bug
+> >> is hight priority in our product. In my opinion hold extra informatin in
+> >> 'struct authentication_req' may not fix this bug. Because if CRSK event is
+> >> still report, then bluetoothd will change the device type to LE even if we
+> >> pair device that is scaned with BR/EDR. So i think the rootcase is find
+> >> does CRSK event make sense in BR/EDR pairing, and how to handle CRSK events
+> >> in BR/EDR pairing if it make sense. I'm confuse with those.
+> >
+> > It doesn't change the device to LE but to dual mode device. This is
+> > *cross-transport* pairing so keys for other transport are generated.
+> > baddr_type specify only LE address type, not BR/EDR since there is no address
+> > type for BR/EDR. This is mostly true but few places in bluetoothd seem to
+> > asusme that for device supporting BR/EDR type is equal 0. Which is not true if
+> > device is dual mode.
+> >
+> > You should be able to reproduce this bug with dual-mode devices that don't
+> > support cross-transport pairing: enable advertising, scan from linux, when
+> > device is found stop advertising and make device discoverable over BR/EDR
+> > (inquiry). When device is found over BR/EDR stop scanning and start pairing.
+> >
+> >>
+> >> I noticed that if quikly reply the passkey confirm, this bug always be
+> >> reproduced, but if wait for 2~3s to reply the passkey confirm, it works
+> >> well every time. In terms of code, wait for 2~3s will cause l2cap chan
+> >> timeout for info timer that created by HCI_EV_REMOTE_EXT_FEATURES event,
+> >> and timeout will change l2cap chan to BT_CONNECTED. So next SMP
+> >> resume/ready don't distribute key also CRSK events.
+> >>
+> >> It can't reproduce with btmgmt, because it reply passkey confirm always only
+> >> use BR/EDR in 'struct mgmt_cp_user_confirm_reply' not use device relation
+> >> type.
+> >>
+> >> bluetoothd.log and btmon.log are attached. It records two pair request
+> >> sequence, one is pair success that have CRSK event, another is next pair
+> >> reqeust don't success any, hope those maybe help you to annlyze this bug.
+> 
+> I've sent a patch "[RFC] core: Fix BR/EDR pairing for dual mode devices".
+> Please check if this solves issue you are seeing.
+> 
 
-Yep, good luck scanning and transferring data at same time, about half
-of the logs are just reports you get from scanning. Btw APIs such as
-bt_gatt_client_write_without_response return unsigned int so it can
-never be a negative id, either you are printing as a signed or there
-is something else perhaps out of memory, bottom line is if it fails it
-should return 0.
+Thanks for your patch. Maybe it can resolve the issue, but it will cause other
+issues. For example, some operations also use device->bdaddr as parameter in
+MGMT operations, unpair is the same. If kernel hold the device as BR/EDR type
+in hdev->conn_hash, unpair operator won't find the hci conn, so it couldn't
+terminal the link. but the link is exist at the moment. MGMT also complete
+when don't terminal the link. So bluetoothd and the user don't feel the
+different. But is that we would like? The code implies we should terminate the
+connection if it is exist.
 
--- 
-Luiz Augusto von Dentz
+The patch use auth_req with BDADDR_BREDR to handle pairing request. It could
+resolve the pairing procedure. But kernel hold the device as BR/EDR, even if
+cross-tranport is generated on BR/EDR hci conn. Meanwhile bluetoothd will set
+device->bdaddr_type to BDADDR_LE_PUBLIC with new_csrk_callback that generated
+by cross-transport. I mean, the user-space hold the device with BDADDR_LE_PUBLIC
+(yes, device->bredr and device->le are true, but addr-type is BDADDR_LE_PUBLIC),
+the kernel hold the device with BDADDR_BREDR. Whenever user-space use couple
+{addr, addr-type} to send request to kernel. It maybe failed.
+
+As the end. In my case, i don't do the steps you mentioned(enable advertising,
+scan from linux, stop advertising). I only start BR/EDR discovering with discovery
+filter, pair device and unpair device to reproduce this bug. I don't start/stop
+LE advertising.
+
+> -- 
+> pozdrawiam
+> Szymon K. Janc
