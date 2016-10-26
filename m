@@ -1,26 +1,33 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: "Ben-melech, Shiran" <shiran.ben-melech@intel.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Identifying Bluetooth Low Energy using sd-bus org.bluez.Device1
+ interface
+Date: Wed, 26 Oct 2016 11:44:14 +0000
+Message-ID: <A4D30064D9E2C94BAAF5CE9449A29AAC4B8F6378@hasmsx109.ger.corp.intel.com>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-From: Jason Gauthier <jagauthier@gmail.com>
-Date: Fri, 28 Oct 2016 00:09:10 -0400
-Message-ID: <CAHY_EhVGVeoE+Ljw_rm+k6LnYC0=ySDsn3qYay3gJ_vM8u7WXw@mail.gmail.com>
-Subject: obexd MAP/MNS
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello,
+Hi,
 
-   In Python, I've been successful interfacing with PBAP, and recently
-MAP.  Ultimately, though, my goal is to receive new message
-notifications using MNS part of MAP.
+I have written a small C library to work with BLE devices over sd-bus bluez interface.
+Currently to identify if a device I have in list after a scan is a classic or a BLE, I connect and pair to it and check if new service objects were added to the device.
+This is relatively a lot of hassle and isn't stable, also forces me to connect and pair the device.
 
-I've read the Bluetooth document on MAP (section 6), and I've seen a
-few requests around, but I am not sure how to implement this.
+Is there another way, best without even connecting to a device, to identify if it's a BLE device?
 
-Does anyone have any python examples, or documentation, on how this is
-implemented?
+I saw that most BLE devices have the 1800, 1801 UUIDs for generic access / generic attribute profiles - but is this on all BLE devices and only on them?
 
-Thanks!
+Thank You and Regards,
 
-Jason
+Shiran
+---------------------------------------------------------------------
+Intel Electronics Ltd.
+
+This e-mail and any attachments may contain confidential material for
+the sole use of the intended recipient(s). Any review or distribution
+by others is strictly prohibited. If you are not the intended
+recipient, please contact the sender and delete all copies.
+
