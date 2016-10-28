@@ -1,44 +1,35 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] doc: Add definition of a new addresses file
-Date: Sun, 30 Oct 2016 17:45:28 +0200
-Message-Id: <1477842328-20312-1-git-send-email-johan.hedberg@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <CAHY_EhVGVeoE+Ljw_rm+k6LnYC0=ySDsn3qYay3gJ_vM8u7WXw@mail.gmail.com>
+References: <CAHY_EhVGVeoE+Ljw_rm+k6LnYC0=ySDsn3qYay3gJ_vM8u7WXw@mail.gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Fri, 28 Oct 2016 11:55:02 +0300
+Message-ID: <CABBYNZJauZSboT+PvdwQ7EGwLMnwDE3ghGjRioBppCfyemsD2w@mail.gmail.com>
+Subject: Re: obexd MAP/MNS
+To: Jason Gauthier <jagauthier@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi Jason,
 
-Currently bluetoothd doesn't support single-mode adapters without a
-public address. This patch defines a new 'addresses' file that will be
-used for managing generated static random addresses.
----
- doc/settings-storage.txt | 12 ++++++++++--
- 1 file changed, 10 insertions(+), 2 deletions(-)
+On Fri, Oct 28, 2016 at 7:09 AM, Jason Gauthier <jagauthier@gmail.com> wrote:
+> Hello,
+>
+>    In Python, I've been successful interfacing with PBAP, and recently
+> MAP.  Ultimately, though, my goal is to receive new message
+> notifications using MNS part of MAP.
+>
+> I've read the Bluetooth document on MAP (section 6), and I've seen a
+> few requests around, but I am not sure how to implement this.
+>
+> Does anyone have any python examples, or documentation, on how this is
+> implemented?
 
-diff --git a/doc/settings-storage.txt b/doc/settings-storage.txt
-index 6a708b45fee8..160bbb2460a1 100644
---- a/doc/settings-storage.txt
-+++ b/doc/settings-storage.txt
-@@ -24,8 +24,16 @@ All files are in ini-file format.
- Storage directory structure
- ===========================
- 
--There is one directory per adapter, named by its Bluetooth address, which
--contains:
-+The storage root directory contains an optional addresses file that's
-+used for managing adapters that come without a pre-allocated address.
-+The format of the addresses file is:
-+
-+	[Static]
-+	<manufacturer id> = <array of addresses>
-+
-+Each adapter with an assigned address has its own subdirectory under the
-+root, named based on the address, which contains:
-+
-  - a settings file for the local adapter
-  - an attributes file containing attributes of supported LE services
-  - a cache directory containing:
+Check obexctl under tools, when a notification arrive it will create
+an object implementing interface org.bluez.obex.Message1 which you can
+subscribe with InterfacesAdded signal from ObjectManager.
+
 -- 
-2.7.4
-
+Luiz Augusto von Dentz
