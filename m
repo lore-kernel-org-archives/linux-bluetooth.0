@@ -1,13 +1,13 @@
-Return-Path: <robh@kernel.org>
+Return-Path: <peter@hurleysoftware.com>
 MIME-Version: 1.0
 In-Reply-To: <CAKU3ayV7vLSaNJGzV2MoCyT2GopReS55DCH4MPtSmGiHEUKdXw@mail.gmail.com>
 References: <20160824232437.9446-1-robh@kernel.org> <20161025215521.5a5uxjpujmoatgor@earth>
  <CAL_JsqJQqkyz99SY=RcQ22ZzsQSuCjFkjEPLdEqLmJU-usBf-g@mail.gmail.com> <CAKU3ayV7vLSaNJGzV2MoCyT2GopReS55DCH4MPtSmGiHEUKdXw@mail.gmail.com>
-From: Rob Herring <robh@kernel.org>
-Date: Mon, 31 Oct 2016 22:40:19 -0500
-Message-ID: <CAL_JsqKhq9vVV9yvzd3OFUbNvHwj+3Ta9eHrWg97xLRfTxPCPw@mail.gmail.com>
+From: Peter Hurley <peter@hurleysoftware.com>
+Date: Mon, 31 Oct 2016 14:08:13 -0600
+Message-ID: <CAKU3ayVSrrWVbYukiTF+6rrAoQJGZ3guGYnmTrSYu84S8YwYmA@mail.gmail.com>
 Subject: Re: [RFC PATCH 0/6] UART slave devices using serio
-To: Peter Hurley <peter@hurleysoftware.com>
+To: Rob Herring <robh@kernel.org>
 Cc: Sebastian Reichel <sre@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	Marcel Holtmann <marcel@holtmann.org>, Jiri Slaby <jslaby@suse.com>, Arnd Bergmann <arnd@arndb.de>,
 	"Dr . H . Nikolaus Schaller" <hns@goldelico.com>, Alan Cox <gnomes@lxorguk.ukuu.org.uk>,
@@ -19,21 +19,19 @@ Cc: Sebastian Reichel <sre@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundati
 Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Oct 31, 2016 at 3:00 PM, Peter Hurley <peter@hurleysoftware.com> wrote:
-> On Tue, Oct 25, 2016 at 4:02 PM, Rob Herring <robh@kernel.org> wrote:
->>
->> > Maybe you can try to find some minutes at the Kernel Summit to talk
->> > about this?
->>
->> Still waiting for my invite...
->>
->> But I will be at Plumbers if folks want to discuss this.
->
->
-> Hey Rob,
->
-> I'm here so let's make time to discuss this.
+[ this time w/o the html ]
 
-Tomorrow should be good for me after the complex device dependencies discussion.
+On Tue, Oct 25, 2016 at 4:02 PM, Rob Herring <robh@kernel.org> wrote:
+> > Maybe you can try to find some minutes at the Kernel Summit to talk
+> > about this?
+>
+> Still waiting for my invite...
+>
+> But I will be at Plumbers if folks want to discuss this.
 
-Rob
+Hey Rob,
+
+I'm here so let's make time to discuss this.
+
+Regards,
+Peter Hurley
