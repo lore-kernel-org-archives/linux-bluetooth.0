@@ -1,62 +1,76 @@
-Return-Path: <peter@hurleysoftware.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CAL_JsqJQqkyz99SY=RcQ22ZzsQSuCjFkjEPLdEqLmJU-usBf-g@mail.gmail.com>
-References: <20160824232437.9446-1-robh@kernel.org> <20161025215521.5a5uxjpujmoatgor@earth>
- <CAL_JsqJQqkyz99SY=RcQ22ZzsQSuCjFkjEPLdEqLmJU-usBf-g@mail.gmail.com>
-From: Peter Hurley <peter@hurleysoftware.com>
-Date: Mon, 31 Oct 2016 14:00:53 -0600
-Message-ID: <CAKU3ayV7vLSaNJGzV2MoCyT2GopReS55DCH4MPtSmGiHEUKdXw@mail.gmail.com>
-Subject: Re: [RFC PATCH 0/6] UART slave devices using serio
-To: Rob Herring <robh@kernel.org>
-Cc: Sebastian Reichel <sre@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Marcel Holtmann <marcel@holtmann.org>, Jiri Slaby <jslaby@suse.com>, Arnd Bergmann <arnd@arndb.de>,
-	"Dr . H . Nikolaus Schaller" <hns@goldelico.com>, Alan Cox <gnomes@lxorguk.ukuu.org.uk>,
-	Loic Poulain <loic.poulain@intel.com>, Pavel Machek <pavel@ucw.cz>, NeilBrown <neil@brown.name>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	"open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-	"linux-serial@vger.kernel.org" <linux-serial@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Content-Type: multipart/alternative; boundary=001a113efb9258926b05402eaa07
+In-Reply-To: <CABBYNZJauZSboT+PvdwQ7EGwLMnwDE3ghGjRioBppCfyemsD2w@mail.gmail.com>
+References: <CAHY_EhVGVeoE+Ljw_rm+k6LnYC0=ySDsn3qYay3gJ_vM8u7WXw@mail.gmail.com>
+ <CABBYNZJauZSboT+PvdwQ7EGwLMnwDE3ghGjRioBppCfyemsD2w@mail.gmail.com>
+From: Jason Gauthier <jagauthier@gmail.com>
+Date: Mon, 31 Oct 2016 15:57:16 -0400
+Message-ID: <CAHY_EhUKMAFcjBQAVmSH7XCXFKxZcU_AFVs76BU2v5xPHZ=stQ@mail.gmail.com>
+Subject: Re: obexd MAP/MNS
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---001a113efb9258926b05402eaa07
-Content-Type: text/plain; charset=UTF-8
-
-On Tue, Oct 25, 2016 at 4:02 PM, Rob Herring <robh@kernel.org> wrote:
+On Fri, Oct 28, 2016 at 4:55 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi Jason,
 >
-> > Maybe you can try to find some minutes at the Kernel Summit to talk
-> > about this?
+> On Fri, Oct 28, 2016 at 7:09 AM, Jason Gauthier <jagauthier@gmail.com> wrote:
+>> Hello,
+>>
+>>    In Python, I've been successful interfacing with PBAP, and recently
+>> MAP.  Ultimately, though, my goal is to receive new message
+>> notifications using MNS part of MAP.
+>>
+>> I've read the Bluetooth document on MAP (section 6), and I've seen a
+>> few requests around, but I am not sure how to implement this.
+>>
+>> Does anyone have any python examples, or documentation, on how this is
+>> implemented?
 >
-> Still waiting for my invite...
+> Check obexctl under tools, when a notification arrive it will create
+> an object implementing interface org.bluez.obex.Message1 which you can
+> subscribe with InterfacesAdded signal from ObjectManager.
 >
-> But I will be at Plumbers if folks want to discuss this.
 
+Luiz,
 
-Hey Rob,
+ Thanks.  I've never used obexctl before. Thanks for pointing it out
+to me.  I've been experimenting with this a bit.  Maybe I'm on the
+wrong track.  It seems to me that  org.bluez.obex.Message1 is an
+interface for a specific message. These messages do not exist until
+after I do a .Get() function or one is received to the device.  Once
+they do exist the only signal that exists on the interface appears to
+be PropertiesChanged.
 
-I'm here so let's make time to discuss this.
+I do see new messages arrive within obexctl:
+[NEW] Message /org/bluez/obex/client/session10/message288230376151721061
 
-Regards,
-Peter Hurley
+Which would be the interface you are mentioning.  But I can't seem to
+capture this message within my existing code.
+I've attached to the session ( /org/bluez/obex/client/session10/), and
+I am using the one and only signal at this level:
+signal void org.freedesktop.DBus.Properties.PropertiesChanged(QString
+interface, QVariantMap changed_properties, QStringList
+invalidated_properties)
 
---001a113efb9258926b05402eaa07
-Content-Type: text/html; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+BUS_NAME='org.bluez.obex'
+SESSION_INTERFACE = 'org.bluez.obex.Session1'
+MESSAGE_ACCESS_INTERFACE = 'org.bluez.obex.MessageAccess1'
 
-<div dir=3D"ltr"><div class=3D"gmail_extra"><div class=3D"gmail_quote">On T=
-ue, Oct 25, 2016 at 4:02 PM, Rob Herring <span dir=3D"ltr">&lt;<a href=3D"m=
-ailto:robh@kernel.org" target=3D"_blank">robh@kernel.org</a>&gt;</span> wro=
-te:<blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left=
-:1px #ccc solid;padding-left:1ex"><span class=3D"">
-&gt; Maybe you can try to find some minutes at the Kernel Summit to talk<br=
->
-&gt; about this?<br>
-<br>
-</span>Still waiting for my invite...<br>
-<br>
-But I will be at Plumbers if folks want to discuss this.</blockquote><div><=
-br></div><div>Hey Rob,</div><div><br></div><div>I&#39;m here so let&#39;s m=
-ake time to discuss this.</div><div><br></div><div>Regards,</div><div>Peter=
- Hurley=C2=A0</div></div><br></div></div>
+       bus = dbus.SessionBus()
+       obj = bus.get_object(BUS_NAME, session_path)
+       self.session = dbus.Interface(obj, SESSION_INTERFACE)
+       self.map = dbus.Interface(obj, MESSAGE_ACCESS_INTERFACE)
 
---001a113efb9258926b05402eaa07--
+        bus.add_signal_receiver(self.properties_changed,
+            dbus_interface="org.freedesktop.DBus.Properties",
+            signal_name="PropertiesChanged",
+            path_keyword="path")
+
+But when the new message comes the signal is not activated.   This is
+the only way I can think of to achieve access to the new message.
+
+Jason
