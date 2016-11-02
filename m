@@ -1,216 +1,132 @@
-Return-Path: <linux-serial-owner@vger.kernel.org>
-From: Heikki Krogerus <heikki.krogerus@linux.intel.com>
-To: =?UTF-8?q?J=C3=A9r=C3=B4me=20de=20Bretagne?=
-        <jerome.debretagne@gmail.com>,
-        "Rafael J. Wysocki" <rafael@kernel.org>
-Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Kefeng Wang <wangkefeng.wang@huawei.com>,
-        Feng Kan <fkan@apm.com>, linux-serial@vger.kernel.org,
-        linux-acpi@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Subject: [PATCH] ACPI / platform: Add support for build-in properties
-Date: Thu,  3 Nov 2016 16:21:26 +0200
-Message-Id: <20161103142126.87413-1-heikki.krogerus@linux.intel.com>
-In-Reply-To: <20161102154139.GD11523@kuha.fi.intel.com>
-References: <20161102154139.GD11523@kuha.fi.intel.com>
+Return-Path: <luiz.dentz@gmail.com>
 MIME-Version: 1.0
+In-Reply-To: <4C4D637A-1741-449B-BDF0-35CE1088988B@holtmann.org>
+References: <1457091512-21270-1-git-send-email-patrik.flykt@linux.intel.com> <4C4D637A-1741-449B-BDF0-35CE1088988B@holtmann.org>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Wed, 2 Nov 2016 19:06:43 +0200
+Message-ID: <CABBYNZ+2WU3KHDCuBMPAHNXFet+tXStThCwTV+x8pUYm1F9icQ@mail.gmail.com>
+Subject: Re: [RFC v3] doc: Add Management Interface Network API definitions
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Patrik Flykt <Patrik.Flykt@linux.intel.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
-Sender: linux-serial-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-We have a couple of drivers, acpi_apd.c and acpi_lpss.c,
-that need to pass extra build-in properties to the devices
-they create. Previously the drivers added those properties
-to the struct device which is member of the struct
-acpi_device, but that does not work. Those properties need
-to be assigned to the struct device of the platform device
-instead in order for them to become available to the
-drivers.
+Hi Marcel,
 
-To fix this, this patch changes acpi_create_platform_device
-function to take struct property_entry pointer as parameter.
+On Fri, Mar 4, 2016 at 7:27 PM, Marcel Holtmann <marcel@holtmann.org> wrote=
+:
+> Hi Patrik,
+>
+>> ---
+>> v3: added interface index to 'Network' block, removed Nework_Role parame=
+ter
+>>    and dropped text about LE being enabled.
+>>
+>> doc/doc.txt      |   0
+>> doc/mgmt-api.txt | 142 +++++++++++++++++++++++++++++++++++++++++++++++++=
+++++++
+>> 2 files changed, 142 insertions(+)
+>> create mode 100644 doc/doc.txt
+>>
+>> diff --git a/doc/doc.txt b/doc/doc.txt
+>> new file mode 100644
+>> index 0000000..e69de29
+>> diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
+>> index 731a088..6317255 100644
+>> --- a/doc/mgmt-api.txt
+>> +++ b/doc/mgmt-api.txt
+>> @@ -2801,6 +2801,107 @@ Start Limited Discovery Command
+>>                               Invalid Index
+>>
+>>
+>> +Get Networks Command
+>> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>> +
+>> +     Command Code:           0x0042
+>> +     Controller Index:       <controller id>
+>> +     Command Parameters:
+>> +     Return Parameters:      Connection_Count (2 Octets)
+>> +                             Network1 {
+>> +                                     Address (6 Octets)
+>> +                                     Address_Type (1 Octet)
+>> +                                     Interface Index (4 Octets)
+>> +                             }
+>> +                             Network2 { }
+>> +                             ...
+>> +
+>> +     This command is used to retrieve a list of BTLE network
+>> +     connections. A pre-requisite is that LE is supported
+>> +     by the controller, otherwise this command will return a
+>> +     "not supported" response.
+>> +
+>> +     Possible values for the Address_Type parameter:
+>> +             0       Reserved
+>> +             1       LE Public
+>> +             2       LE Random
+>> +
+>> +     For devices using resolvable random addresses with a known
+>> +     identity resolving key, the Address and Address_Type will
+>> +     contain the identity information.
+>> +
+>> +     This command can only be used when the controller is powered.
+>> +
+>> +     This command generates a Command Complete event on success or
+>> +     a Command Status event on failure.
+>> +
+>> +     Possible errors:        Invalid Parameters
+>> +                             Not Supported
+>> +                             Invalid Index
+>> +
+>> +
+>> +Add Network Command
+>> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>> +
+>> +     Command Code:           0x0043
+>> +     Controller Index:       <controller id>
+>> +     Command Parameters:     Address (6 Octets)
+>> +                             Address_Type (1 Octet)
+>> +     Return Parameters:      Address (6 Octets)
+>> +                             Address_Type (1 Octet)
+>> +                             Interface Index (4 Octets)
+>
+> actually we have a bit of an issue here. So my understanding is that this=
+ command does not necessarily connects right away. If it is similar to Add =
+Device, then you add your remote device here and at some point in the futur=
+e if the device is found, it might get connected. If it gets connected it w=
+ill also establish IPSP or BNEP.
+>
+> So first of all, we are operating under the assumption that Add Network d=
+oes not really do any trigger of scanning or advertising. We let that one b=
+e handled by Add Device and Add Advertising. This is just for the network s=
+ide of things to decide if we establish the network layer.
+>
+> The second problem here is really if the above is what we want, that the =
+Interface Index will not be available at this point in time. Yes, for IPSP =
+we can just create it at this point and have it available in the system, bu=
+t for BNEP this is not going to work. That interface is only available once=
+ you actually connected. Unless we also want to change that and create the =
+BNEP interface ahead of time and mark it has LOWER_DOWN (meaning no link).
+>
+> In any case, we should keep a Type or Mode parameter here to select betwe=
+en IPSP and BNEP. Even while currently they are clearly limited to the addr=
+ess type, but in theory, there is nothing stopping us to run IPSP over BR/E=
+DR or a new future IPv6 / 6LoWPAN solution coming up that might be connecti=
+on-less.
+>
+> And no matter what we should have a note here that mentions Add Device an=
+d Add Advertising to be used to handle the connection parts of the establis=
+hment.
 
-Fixes: 20a875e2e86e ("serial: 8250_dw: Add quirk for APM X-Gene SoC")
-Signed-off-by: Heikki Krogerus <heikki.krogerus@linux.intel.com>
----
- drivers/acpi/acpi_apd.c             | 10 ++--------
- drivers/acpi/acpi_lpss.c            | 10 ++--------
- drivers/acpi/acpi_platform.c        |  5 ++++-
- drivers/acpi/dptf/int340x_thermal.c |  4 ++--
- drivers/acpi/scan.c                 |  2 +-
- drivers/platform/x86/intel-hid.c    |  2 +-
- drivers/platform/x86/intel-vbtn.c   |  2 +-
- include/linux/acpi.h                |  3 ++-
- 8 files changed, 15 insertions(+), 23 deletions(-)
-
-Hi,
-
-Found the problem, and this is my proposal for a fix.
-
-Jérôme, please test it when you have time.
+Another thing to consider here is that IPSP actually mention that
+security level 2 and 3 (and I guess fips as well although not
+mentioned) may be used depending on the use case, but the 6lowpan only
+does level 1 which might actually not be what we want by default, so
+Id consider adding a MGMT command to tell when to enable the L2CAP
+channel and what security level it shall use. Also maybe this could be
+applied to router if we want to force a certain security level then
+Add Network perhaps should the security level as input.
 
 
-Thanks,
-
-diff --git a/drivers/acpi/acpi_apd.c b/drivers/acpi/acpi_apd.c
-index 5ec7f3a..26696b6 100644
---- a/drivers/acpi/acpi_apd.c
-+++ b/drivers/acpi/acpi_apd.c
-@@ -127,7 +127,7 @@ static int acpi_apd_create_device(struct acpi_device *adev,
- 	int ret;
- 
- 	if (!dev_desc) {
--		pdev = acpi_create_platform_device(adev);
-+		pdev = acpi_create_platform_device(adev, NULL);
- 		return IS_ERR_OR_NULL(pdev) ? PTR_ERR(pdev) : 1;
- 	}
- 
-@@ -144,14 +144,8 @@ static int acpi_apd_create_device(struct acpi_device *adev,
- 			goto err_out;
- 	}
- 
--	if (dev_desc->properties) {
--		ret = device_add_properties(&adev->dev, dev_desc->properties);
--		if (ret)
--			goto err_out;
--	}
--
- 	adev->driver_data = pdata;
--	pdev = acpi_create_platform_device(adev);
-+	pdev = acpi_create_platform_device(adev, dev_desc->properties);
- 	if (!IS_ERR_OR_NULL(pdev))
- 		return 1;
- 
-diff --git a/drivers/acpi/acpi_lpss.c b/drivers/acpi/acpi_lpss.c
-index 5520102..373657f 100644
---- a/drivers/acpi/acpi_lpss.c
-+++ b/drivers/acpi/acpi_lpss.c
-@@ -395,7 +395,7 @@ static int acpi_lpss_create_device(struct acpi_device *adev,
- 
- 	dev_desc = (const struct lpss_device_desc *)id->driver_data;
- 	if (!dev_desc) {
--		pdev = acpi_create_platform_device(adev);
-+		pdev = acpi_create_platform_device(adev, NULL);
- 		return IS_ERR_OR_NULL(pdev) ? PTR_ERR(pdev) : 1;
- 	}
- 	pdata = kzalloc(sizeof(*pdata), GFP_KERNEL);
-@@ -451,14 +451,8 @@ static int acpi_lpss_create_device(struct acpi_device *adev,
- 		goto err_out;
- 	}
- 
--	if (dev_desc->properties) {
--		ret = device_add_properties(&adev->dev, dev_desc->properties);
--		if (ret)
--			goto err_out;
--	}
--
- 	adev->driver_data = pdata;
--	pdev = acpi_create_platform_device(adev);
-+	pdev = acpi_create_platform_device(adev, dev_desc->properties);
- 	if (!IS_ERR_OR_NULL(pdev)) {
- 		return 1;
- 	}
-diff --git a/drivers/acpi/acpi_platform.c b/drivers/acpi/acpi_platform.c
-index b200ae1..b4c1a6a 100644
---- a/drivers/acpi/acpi_platform.c
-+++ b/drivers/acpi/acpi_platform.c
-@@ -50,6 +50,7 @@ static void acpi_platform_fill_resource(struct acpi_device *adev,
- /**
-  * acpi_create_platform_device - Create platform device for ACPI device node
-  * @adev: ACPI device node to create a platform device for.
-+ * @properties: Optional collection of build-in properties.
-  *
-  * Check if the given @adev can be represented as a platform device and, if
-  * that's the case, create and register a platform device, populate its common
-@@ -57,7 +58,8 @@ static void acpi_platform_fill_resource(struct acpi_device *adev,
-  *
-  * Name of the platform device will be the same as @adev's.
-  */
--struct platform_device *acpi_create_platform_device(struct acpi_device *adev)
-+struct platform_device *acpi_create_platform_device(struct acpi_device *adev,
-+					struct property_entry *properties)
- {
- 	struct platform_device *pdev = NULL;
- 	struct platform_device_info pdevinfo;
-@@ -106,6 +108,7 @@ struct platform_device *acpi_create_platform_device(struct acpi_device *adev)
- 	pdevinfo.res = resources;
- 	pdevinfo.num_res = count;
- 	pdevinfo.fwnode = acpi_fwnode_handle(adev);
-+	pdevinfo.properties = properties;
- 
- 	if (acpi_dma_supported(adev))
- 		pdevinfo.dma_mask = DMA_BIT_MASK(32);
-diff --git a/drivers/acpi/dptf/int340x_thermal.c b/drivers/acpi/dptf/int340x_thermal.c
-index 33505c6..8636409 100644
---- a/drivers/acpi/dptf/int340x_thermal.c
-+++ b/drivers/acpi/dptf/int340x_thermal.c
-@@ -34,11 +34,11 @@ static int int340x_thermal_handler_attach(struct acpi_device *adev,
- 					const struct acpi_device_id *id)
- {
- 	if (IS_ENABLED(CONFIG_INT340X_THERMAL))
--		acpi_create_platform_device(adev);
-+		acpi_create_platform_device(adev, NULL);
- 	/* Intel SoC DTS thermal driver needs INT3401 to set IRQ descriptor */
- 	else if (IS_ENABLED(CONFIG_INTEL_SOC_DTS_THERMAL) &&
- 		 id->driver_data == INT3401_DEVICE)
--		acpi_create_platform_device(adev);
-+		acpi_create_platform_device(adev, NULL);
- 	return 1;
- }
- 
-diff --git a/drivers/acpi/scan.c b/drivers/acpi/scan.c
-index 035ac64..3d1856f 100644
---- a/drivers/acpi/scan.c
-+++ b/drivers/acpi/scan.c
-@@ -1734,7 +1734,7 @@ static void acpi_default_enumeration(struct acpi_device *device)
- 			       &is_spi_i2c_slave);
- 	acpi_dev_free_resource_list(&resource_list);
- 	if (!is_spi_i2c_slave) {
--		acpi_create_platform_device(device);
-+		acpi_create_platform_device(device, NULL);
- 		acpi_device_set_enumerated(device);
- 	} else {
- 		blocking_notifier_call_chain(&acpi_reconfig_chain,
-diff --git a/drivers/platform/x86/intel-hid.c b/drivers/platform/x86/intel-hid.c
-index ed58742..12dbb50 100644
---- a/drivers/platform/x86/intel-hid.c
-+++ b/drivers/platform/x86/intel-hid.c
-@@ -264,7 +264,7 @@ check_acpi_dev(acpi_handle handle, u32 lvl, void *context, void **rv)
- 		return AE_OK;
- 
- 	if (acpi_match_device_ids(dev, ids) == 0)
--		if (acpi_create_platform_device(dev))
-+		if (acpi_create_platform_device(dev, NULL))
- 			dev_info(&dev->dev,
- 				 "intel-hid: created platform device\n");
- 
-diff --git a/drivers/platform/x86/intel-vbtn.c b/drivers/platform/x86/intel-vbtn.c
-index 146d02f..7808076 100644
---- a/drivers/platform/x86/intel-vbtn.c
-+++ b/drivers/platform/x86/intel-vbtn.c
-@@ -164,7 +164,7 @@ check_acpi_dev(acpi_handle handle, u32 lvl, void *context, void **rv)
- 		return AE_OK;
- 
- 	if (acpi_match_device_ids(dev, ids) == 0)
--		if (acpi_create_platform_device(dev))
-+		if (acpi_create_platform_device(dev, NULL))
- 			dev_info(&dev->dev,
- 				 "intel-vbtn: created platform device\n");
- 
-diff --git a/include/linux/acpi.h b/include/linux/acpi.h
-index 689a8b9..61a3d90 100644
---- a/include/linux/acpi.h
-+++ b/include/linux/acpi.h
-@@ -555,7 +555,8 @@ int acpi_device_uevent_modalias(struct device *, struct kobj_uevent_env *);
- int acpi_device_modalias(struct device *, char *, int);
- void acpi_walk_dep_device_list(acpi_handle handle);
- 
--struct platform_device *acpi_create_platform_device(struct acpi_device *);
-+struct platform_device *acpi_create_platform_device(struct acpi_device *,
-+						    struct property_entry *);
- #define ACPI_PTR(_ptr)	(_ptr)
- 
- static inline void acpi_device_set_enumerated(struct acpi_device *adev)
--- 
-2.9.3
-
+--=20
+Luiz Augusto von Dentz
