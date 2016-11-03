@@ -1,29 +1,46 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Petri Gynther <pgynther@google.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Petri Gynther <pgynther@google.com>
-Subject: [PATCH] input/hog: Remove unused attioid from hog_device
-Date: Thu,  3 Nov 2016 13:03:53 -0700
-Message-Id: <1478203433-37526-1-git-send-email-pgynther@google.com>
+Date: Thu, 3 Nov 2016 12:12:51 -0400
+From: Yazen Ghannam <yazen.ghannam@amd.com>
+To: Heikki Krogerus <heikki.krogerus@linux.intel.com>
+CC: =?iso-8859-1?B?Suly9G1l?= de Bretagne
+        <jerome.debretagne@gmail.com>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Kefeng Wang <wangkefeng.wang@huawei.com>,
+        "Feng Kan" <fkan@apm.com>, <linux-serial@vger.kernel.org>,
+        <linux-acpi@vger.kernel.org>, <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH] ACPI / platform: Add support for build-in properties
+Message-ID: <20161103161250.GA25942@yaz-fedora.dyhomenet>
+References: <20161102154139.GD11523@kuha.fi.intel.com>
+ <20161103142126.87413-1-heikki.krogerus@linux.intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+In-Reply-To: <20161103142126.87413-1-heikki.krogerus@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- profiles/input/hog.c | 1 -
- 1 file changed, 1 deletion(-)
+On Thu, Nov 03, 2016 at 04:21:26PM +0200, Heikki Krogerus wrote:
+> We have a couple of drivers, acpi_apd.c and acpi_lpss.c,
+> that need to pass extra build-in properties to the devices
+> they create. Previously the drivers added those properties
+> to the struct device which is member of the struct
+> acpi_device, but that does not work. Those properties need
+> to be assigned to the struct device of the platform device
+> instead in order for them to become available to the
+> drivers.
+> 
+> To fix this, this patch changes acpi_create_platform_device
+> function to take struct property_entry pointer as parameter.
+> 
+> Fixes: 20a875e2e86e ("serial: 8250_dw: Add quirk for APM X-Gene SoC")
+> Signed-off-by: Heikki Krogerus <heikki.krogerus@linux.intel.com>
 
-diff --git a/profiles/input/hog.c b/profiles/input/hog.c
-index 9836a6c..7d318cd 100644
---- a/profiles/input/hog.c
-+++ b/profiles/input/hog.c
-@@ -60,7 +60,6 @@
- #define HOG_UUID		"00001812-0000-1000-8000-00805f9b34fb"
- 
- struct hog_device {
--	guint			attioid;
- 	struct btd_device	*device;
- 	struct bt_hog		*hog;
- };
--- 
-2.8.0.rc3.226.g39d4020
+I can confirm this patch fixes issues seen with AMD devices that were
+introduced with 20a875e2e86e.
 
+Please add:
+Tested-by: Yazen Ghannam <yazen.ghannam@amd.com>
+
+Thanks,
+Yazen
