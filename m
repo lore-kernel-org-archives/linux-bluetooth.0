@@ -1,59 +1,40 @@
-Return-Path: <linux-serial-owner@vger.kernel.org>
-Message-ID: <1478448574.1591.2.camel@gmail.com>
-Subject: Re: [PATCH] ACPI / platform: Add support for build-in properties
-From: =?ISO-8859-1?Q?J=E9r=F4me?= de Bretagne
-        <jerome.debretagne@gmail.com>
-To: Heikki Krogerus <heikki.krogerus@linux.intel.com>,
-        "Rafael J. Wysocki" <rafael@kernel.org>
-Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Kefeng Wang <wangkefeng.wang@huawei.com>,
-        Feng Kan <fkan@apm.com>, linux-serial@vger.kernel.org,
-        linux-acpi@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Date: Sun, 06 Nov 2016 17:09:34 +0100
-In-Reply-To: <20161103142126.87413-1-heikki.krogerus@linux.intel.com>
-References: <20161102154139.GD11523@kuha.fi.intel.com>
-         <20161103142126.87413-1-heikki.krogerus@linux.intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Sender: linux-serial-owner@vger.kernel.org
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+MIME-Version: 1.0
+In-Reply-To: <1478203433-37526-1-git-send-email-pgynther@google.com>
+References: <1478203433-37526-1-git-send-email-pgynther@google.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Fri, 4 Nov 2016 14:46:14 +0200
+Message-ID: <CABBYNZKUR5w4Yt0zF3_+t9DYpbS8hnLXm6hNa22a67Satxa2Wg@mail.gmail.com>
+Subject: Re: [PATCH] input/hog: Remove unused attioid from hog_device
+To: Petri Gynther <pgynther@google.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Le jeudi 03 novembre 2016 à 16:21 +0200, Heikki Krogerus a écrit :
-> We have a couple of drivers, acpi_apd.c and acpi_lpss.c,
-> that need to pass extra build-in properties to the devices
-> they create. Previously the drivers added those properties
-> to the struct device which is member of the struct
-> acpi_device, but that does not work. Those properties need
-> to be assigned to the struct device of the platform device
-> instead in order for them to become available to the
-> drivers.
-> 
-> To fix this, this patch changes acpi_create_platform_device
-> function to take struct property_entry pointer as parameter.
-> 
-> Fixes: 20a875e2e86e ("serial: 8250_dw: Add quirk for APM X-Gene SoC")
-> Signed-off-by: Heikki Krogerus <heikki.krogerus@linux.intel.com>
+Hi Petri,
+
+On Thu, Nov 3, 2016 at 10:03 PM, Petri Gynther <pgynther@google.com> wrote:
 > ---
-> 
-> Hi,
-> 
-> Found the problem, and this is my proposal for a fix.
-> 
-> Jérôme, please test it when you have time.
-> 
+>  profiles/input/hog.c | 1 -
+>  1 file changed, 1 deletion(-)
+>
+> diff --git a/profiles/input/hog.c b/profiles/input/hog.c
+> index 9836a6c..7d318cd 100644
+> --- a/profiles/input/hog.c
+> +++ b/profiles/input/hog.c
+> @@ -60,7 +60,6 @@
+>  #define HOG_UUID               "00001812-0000-1000-8000-00805f9b34fb"
+>
+>  struct hog_device {
+> -       guint                   attioid;
+>         struct btd_device       *device;
+>         struct bt_hog           *hog;
+>  };
+> --
+> 2.8.0.rc3.226.g39d4020
 
-Hi Heikki,
+Nice catch, applied thanks.
 
-I can confirm that this patch fixes the issue I've reported on the Lenovo
-ThinkPad 8 tablet. You were fast to find the root cause, impressive, really
-appreciated.
-
-Feel free to add:
-Tested-by: Jérôme de Bretagne <jerome.debretagne@gmail.com> 
-
-Let's hope it can still make it during the remaining 4.9 rc timing.
-
-Cheers,
-Jérôme
-
+-- 
+Luiz Augusto von Dentz
