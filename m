@@ -1,51 +1,57 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 00/10] build: Add options for every plugin
-Date: Fri, 11 Nov 2016 19:22:34 +0200
-Message-Id: <1478884964-7543-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 01/10] build: Add option to enable NFC pairing
+Date: Fri, 11 Nov 2016 19:22:35 +0200
+Message-Id: <1478884964-7543-2-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1478884964-7543-1-git-send-email-luiz.dentz@gmail.com>
+References: <1478884964-7543-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds a build option for non-essential plugins so they can be
-disable/enabled separately and leave options such as experimental only
-for tools.
+This adds --enable-nfc option dedicated to enabled neard plugin
+so it is no longer enabled with --enable-experimental since that
+enables other plugins that might not be relevant for the system.
+---
+ Makefile.plugins | 4 +++-
+ configure.ac     | 4 ++++
+ 2 files changed, 7 insertions(+), 1 deletion(-)
 
-Plugins that were enabled by default were given a disable option, for
-the option plugins behind experimental they are now supported with a
-enable option and they continue to be build with bootstrap-configure.
-
-This make one able to select exactly what plugins shall be build which,
-so it is now possible to build bluetoothd without any BR/EDR profile
-built-in which reduces the binary size of bluetoothd:
-
-all options:
-  text	   data	    bss	    dec	    hex	filename
-1271889	 292976	 294144	1859009	 1c5dc1	src/bluetoothd
-
-with --disable-a2dp --disable-avrcp --disable-network --disable-hid:
-text	   data	    bss	    dec	    hex	filename
-1003609	 227160	 226464	1457233	 163c51	src/bluetoothd
-
-Luiz Augusto von Dentz (10):
-  build: Add option to enable NFC pairing
-  build: Add option to enable SAP profile
-  build: Add option to disable A2DP profile
-  build: Add option to disable AVRCP profile
-  build: Add option to disable network profiles
-  build: Add option to disable HID profile
-  build: Add option to disable HoG profile
-  build: Add option to enable health profiles
-  build: Update experimental documentation
-  build: Update bootstrap-configure with new build options
-
- Makefile.plugins    | 17 +++++++++++++++--
- bootstrap-configure |  3 +++
- configure.ac        | 34 +++++++++++++++++++++++++++++++++-
- 3 files changed, 51 insertions(+), 3 deletions(-)
-
+diff --git a/Makefile.plugins b/Makefile.plugins
+index 4ad2103..495cb88 100644
+--- a/Makefile.plugins
++++ b/Makefile.plugins
+@@ -11,10 +11,12 @@ builtin_sources += plugins/autopair.c
+ builtin_modules += policy
+ builtin_sources += plugins/policy.c
+ 
+-if EXPERIMENTAL
++if NFC
+ builtin_modules += neard
+ builtin_sources += plugins/neard.c
++endif
+ 
++if EXPERIMENTAL
+ builtin_modules += sap
+ builtin_sources += profiles/sap/main.c profiles/sap/manager.h \
+ 			profiles/sap/manager.c profiles/sap/server.h \
+diff --git a/configure.ac b/configure.ac
+index 530d512..e1aa20a 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -140,6 +140,10 @@ AC_ARG_ENABLE(test, AC_HELP_STRING([--enable-test],
+ 		[enable test/example scripts]), [enable_test=${enableval}])
+ AM_CONDITIONAL(TEST, test "${enable_test}" = "yes")
+ 
++AC_ARG_ENABLE(test, AC_HELP_STRING([--enable-nfc],
++		[enable NFC paring]), [enable_nfc=${enableval}])
++AM_CONDITIONAL(NFC, test "${enable_nfc}" = "yes")
++
+ AC_ARG_ENABLE(tools, AC_HELP_STRING([--disable-tools],
+ 		[disable Bluetooth tools]), [enable_tools=${enableval}])
+ AM_CONDITIONAL(TOOLS, test "${enable_tools}" != "no")
 -- 
 2.7.4
 
