@@ -1,60 +1,79 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <1479391920-31828-1-git-send-email-luiz.dentz@gmail.com>
-References: <1479391920-31828-1-git-send-email-luiz.dentz@gmail.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Fri, 18 Nov 2016 15:13:47 +0200
-Message-ID: <CABBYNZLJEbWRbXTE3fWYKQPcA_cKxGgQ8-t6Aqr7CL3VsyrDhQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] core/advertising: Fix crash when passing invalid dictionary
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+To: linux-bluetooth@vger.kernel.org
+Subject: [BlueZ v2 06/10] build: Add option to disable HID profile
+Date: Thu, 17 Nov 2016 14:19:57 +0200
+Message-Id: <1479385201-10559-7-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1479385201-10559-1-git-send-email-luiz.dentz@gmail.com>
+References: <1479385201-10559-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Thu, Nov 17, 2016 at 4:12 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> We expect dict entries to have a{sv} format but the code don't check if
-> the entries really encode the variant which may lead to a crash in
-> dbus_message_iter_recurse.
-> ---
->  src/advertising.c | 8 ++++++++
->  1 file changed, 8 insertions(+)
->
-> diff --git a/src/advertising.c b/src/advertising.c
-> index ef84e45..e7840bf 100644
-> --- a/src/advertising.c
-> +++ b/src/advertising.c
-> @@ -298,6 +298,10 @@ static bool parse_advertising_manufacturer_data(GDBusProxy *proxy,
->                 dbus_message_iter_get_basic(&entry, &manuf_id);
->
->                 dbus_message_iter_next(&entry);
-> +
-> +               if (dbus_message_iter_get_arg_type(&entry) != DBUS_TYPE_VARIANT)
-> +                       goto fail;
-> +
->                 dbus_message_iter_recurse(&entry, &value);
->
->                 if (dbus_message_iter_get_arg_type(&value) != DBUS_TYPE_ARRAY)
-> @@ -356,6 +360,10 @@ static bool parse_advertising_service_data(GDBusProxy *proxy,
->                         goto fail;
->
->                 dbus_message_iter_next(&entry);
-> +
-> +               if (dbus_message_iter_get_arg_type(&entry) != DBUS_TYPE_VARIANT)
-> +                       goto fail;
-> +
->                 dbus_message_iter_recurse(&entry, &value);
->
->                 if (dbus_message_iter_get_arg_type(&value) != DBUS_TYPE_ARRAY)
-> --
-> 2.7.4
+This adds --disable-hid option to configure which make input plugin
+to not be build thus reducing the build time and binary size of
+bluetoothd in systems where HID profile is not supported.
+---
+ Makefile.plugins |  2 ++
+ README           | 10 ++++++++++
+ configure.ac     |  4 ++++
+ 3 files changed, 16 insertions(+)
 
-Applied.
-
-
+diff --git a/Makefile.plugins b/Makefile.plugins
+index 533922d..c6951b1 100644
+--- a/Makefile.plugins
++++ b/Makefile.plugins
+@@ -56,11 +56,13 @@ builtin_sources += profiles/network/manager.c \
+ 			profiles/network/connection.c
+ endif
+ 
++if HID
+ builtin_modules += input
+ builtin_sources += profiles/input/manager.c \
+ 			profiles/input/server.h profiles/input/server.c \
+ 			profiles/input/device.h profiles/input/device.c \
+ 			profiles/input/hidp_defs.h
++endif
+ 
+ builtin_modules += hog
+ builtin_sources += profiles/input/hog.c profiles/input/uhid_copy.h \
+diff --git a/README b/README
+index 5137e34..a73924d 100644
+--- a/README
++++ b/README
+@@ -135,6 +135,16 @@ For a working system, certain configuration options need to be enabled:
+ 		This option is provided for distributions that do not have any
+ 		network capabilities.
+ 
++	--disable-hid
++
++		Disable HID profile
++
++		By default bluetoothd supports HID profile using a built-in
++		plugin, this option disables it.
++
++		This option is provided for distributions that do not have any
++		input capabilities.
++
+ 	--enable-experimental
+ 
+ 		Enable experimental plugins
+diff --git a/configure.ac b/configure.ac
+index 63a5dfb..e63579e 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -160,6 +160,10 @@ AC_ARG_ENABLE(test, AC_HELP_STRING([--disable-network],
+ 		[disable network profiles]), [enable_network=${enableval}])
+ AM_CONDITIONAL(NETWORK, test "${enable_network}" != "no")
+ 
++AC_ARG_ENABLE(test, AC_HELP_STRING([--disable-hid],
++		[disable HID profile]), [enable_hid=${enableval}])
++AM_CONDITIONAL(HID, test "${enable_hid}" != "no")
++
+ AC_ARG_ENABLE(tools, AC_HELP_STRING([--disable-tools],
+ 		[disable Bluetooth tools]), [enable_tools=${enableval}])
+ AM_CONDITIONAL(TOOLS, test "${enable_tools}" != "no")
 -- 
-Luiz Augusto von Dentz
+2.7.4
+
