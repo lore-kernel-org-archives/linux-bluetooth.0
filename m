@@ -1,80 +1,36 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+From: bugzilla-daemon@bugzilla.kernel.org
 To: linux-bluetooth@vger.kernel.org
-Subject: [BlueZ v2 05/10] build: Add option to disable network profiles
-Date: Thu, 17 Nov 2016 14:19:56 +0200
-Message-Id: <1479385201-10559-6-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1479385201-10559-1-git-send-email-luiz.dentz@gmail.com>
-References: <1479385201-10559-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [Bug 187871] Bluetooth LE advertising interval: Using same value for
+ max and min
+Date: Thu, 17 Nov 2016 05:26:15 +0000
+Message-ID: <bug-187871-62941-GfJiHdoW16@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-187871-62941@https.bugzilla.kernel.org/>
+References: <bug-187871-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+https://bugzilla.kernel.org/show_bug.cgi?id=187871
 
-This adds --disable-network option to configure which make network plugin
-to not be build thus reducing the build time and binary size of
-bluetoothd in systems where those profiles are not supported.
----
- Makefile.plugins |  2 ++
- README           | 10 ++++++++++
- configure.ac     |  4 ++++
- 3 files changed, 16 insertions(+)
+Joseph Hwang <josephsih@chromium.org> changed:
 
-diff --git a/Makefile.plugins b/Makefile.plugins
-index c9bc50c..533922d 100644
---- a/Makefile.plugins
-+++ b/Makefile.plugins
-@@ -47,12 +47,14 @@ builtin_sources += profiles/audio/control.h profiles/audio/control.c \
- 			profiles/audio/player.h profiles/audio/player.c
- endif
- 
-+if NETWORK
- builtin_modules += network
- builtin_sources += profiles/network/manager.c \
- 			profiles/network/bnep.h profiles/network/bnep.c \
- 			profiles/network/server.h profiles/network/server.c \
- 			profiles/network/connection.h \
- 			profiles/network/connection.c
-+endif
- 
- builtin_modules += input
- builtin_sources += profiles/input/manager.c \
-diff --git a/README b/README
-index ec3ed30..5137e34 100644
---- a/README
-+++ b/README
-@@ -125,6 +125,16 @@ For a working system, certain configuration options need to be enabled:
- 		This option is provided for distributions that do not have any
- 		audio capabilities.
- 
-+	--disable-network
-+
-+		Disable PANU, NAP, GN profiles
-+
-+		By default bluetoothd supports PANU, NAP and GN profile using a
-+		built-in plugin, this option disables it.
-+
-+		This option is provided for distributions that do not have any
-+		network capabilities.
-+
- 	--enable-experimental
- 
- 		Enable experimental plugins
-diff --git a/configure.ac b/configure.ac
-index 99fbeb8..63a5dfb 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -156,6 +156,10 @@ AC_ARG_ENABLE(test, AC_HELP_STRING([--disable-avrcp],
- 		[disable AVRCP profile]), [enable_avrcp=${enableval}])
- AM_CONDITIONAL(AVRCP, test "${enable_avrcp}" != "no")
- 
-+AC_ARG_ENABLE(test, AC_HELP_STRING([--disable-network],
-+		[disable network profiles]), [enable_network=${enableval}])
-+AM_CONDITIONAL(NETWORK, test "${enable_network}" != "no")
-+
- AC_ARG_ENABLE(tools, AC_HELP_STRING([--disable-tools],
- 		[disable Bluetooth tools]), [enable_tools=${enableval}])
- AM_CONDITIONAL(TOOLS, test "${enable_tools}" != "no")
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |josephsih@chromium.org
+
+--- Comment #1 from Joseph Hwang <josephsih@chromium.org> ---
+On page 969 of the same Section 7.8.5 in the specification, it states that the
+default values of both Advertising_Interval_Min and Advertising_Interval_Max
+are 0x0800 (1.28 seconds).
+
+When setting distinct Advertising_Interval_Min and Advertising_Interval_Max
+values, a controller may pick up any value between the range. The chosen value
+might be different from the default 1.28 seconds that a user expects, and may
+keep changing each time after reboot depending on the controller's behavior.
+That could be a bit confusing though.
+
 -- 
-2.7.4
-
+You are receiving this mail because:
+You are the assignee for the bug.
