@@ -1,9 +1,9 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [BlueZ v2 01/10] build: Add option to enable NFC pairing
-Date: Thu, 17 Nov 2016 14:19:52 +0200
-Message-Id: <1479385201-10559-2-git-send-email-luiz.dentz@gmail.com>
+Subject: [BlueZ v2 09/10] build: Update experimental documentation
+Date: Thu, 17 Nov 2016 14:20:00 +0200
+Message-Id: <1479385201-10559-10-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1479385201-10559-1-git-send-email-luiz.dentz@gmail.com>
 References: <1479385201-10559-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,68 +11,49 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds --enable-nfc option dedicated to enabled neard plugin
-so it is no longer enabled with --enable-experimental since that
-enables other plugins that might not be relevant for the system.
+Reflect the build changes to only leave experimental tools being
+--enable-experimental.
 ---
- Makefile.plugins | 4 +++-
- README           | 9 +++++++++
- configure.ac     | 4 ++++
- 3 files changed, 16 insertions(+), 1 deletion(-)
+ README       | 8 ++++----
+ configure.ac | 2 +-
+ 2 files changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/Makefile.plugins b/Makefile.plugins
-index 4ad2103..495cb88 100644
---- a/Makefile.plugins
-+++ b/Makefile.plugins
-@@ -11,10 +11,12 @@ builtin_sources += plugins/autopair.c
- builtin_modules += policy
- builtin_sources += plugins/policy.c
- 
--if EXPERIMENTAL
-+if NFC
- builtin_modules += neard
- builtin_sources += plugins/neard.c
-+endif
- 
-+if EXPERIMENTAL
- builtin_modules += sap
- builtin_sources += profiles/sap/main.c profiles/sap/manager.h \
- 			profiles/sap/manager.c profiles/sap/server.h \
 diff --git a/README b/README
-index c991ab0..23405f3 100644
+index 823a204..7b6001b 100644
 --- a/README
 +++ b/README
-@@ -116,6 +116,15 @@ For a working system, certain configuration options need to be enabled:
- 		systems. The APIs or behavior of the experimental plugins
- 		is unstable and might still change.
+@@ -157,14 +157,14 @@ For a working system, certain configuration options need to be enabled:
  
-+	--enable-nfc
-+
-+		This option enable NFC pairing support.
-+
-+		By default the integration with neard is disabled, this gives
-+		the option to enable it in system where neard is supported.
-+
-+		The plugin is built into bluetoothd therefore it does not need
-+		to be package separately.
+ 	--enable-experimental
  
- Information
- ===========
+-		Enable experimental plugins
++		Enable experimental tools
+ 
+-		By default all plugins that are still in development
++		By default all tools that are still in development
+ 		are disabled. This option can be used to enable them.
+ 
+ 		It is not recommended to enable this option for production
+-		systems. The APIs or behavior of the experimental plugins
+-		is unstable and might still change.
++		systems. The behavior of the experimental tools is unstable
++		and might still change.
+ 
+ 	--enable-nfc
+ 
 diff --git a/configure.ac b/configure.ac
-index 530d512..e1aa20a 100644
+index 24d7589..768a20c 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -140,6 +140,10 @@ AC_ARG_ENABLE(test, AC_HELP_STRING([--enable-test],
- 		[enable test/example scripts]), [enable_test=${enableval}])
- AM_CONDITIONAL(TEST, test "${enable_test}" = "yes")
+@@ -275,7 +275,7 @@ AC_ARG_ENABLE(manpages, AC_HELP_STRING([--enable-manpages],
+ AM_CONDITIONAL(MANPAGES, test "${enable_manpages}" = "yes")
  
-+AC_ARG_ENABLE(test, AC_HELP_STRING([--enable-nfc],
-+		[enable NFC paring]), [enable_nfc=${enableval}])
-+AM_CONDITIONAL(NFC, test "${enable_nfc}" = "yes")
-+
- AC_ARG_ENABLE(tools, AC_HELP_STRING([--disable-tools],
- 		[disable Bluetooth tools]), [enable_tools=${enableval}])
- AM_CONDITIONAL(TOOLS, test "${enable_tools}" != "no")
+ AC_ARG_ENABLE(experimental, AC_HELP_STRING([--enable-experimental],
+-			[enable experimental plugins (SAP, NFC, ...)]),
++			[enable experimental tools]),
+ 					[enable_experimental=${enableval}])
+ AM_CONDITIONAL(EXPERIMENTAL, test "${enable_experimental}" = "yes")
+ 
 -- 
 2.7.4
 
