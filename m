@@ -1,47 +1,80 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] core/advertising: Fix crash when passing invalid dictionary
-Date: Thu, 17 Nov 2016 16:12:00 +0200
-Message-Id: <1479391920-31828-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [BlueZ v2 05/10] build: Add option to disable network profiles
+Date: Thu, 17 Nov 2016 14:19:56 +0200
+Message-Id: <1479385201-10559-6-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1479385201-10559-1-git-send-email-luiz.dentz@gmail.com>
+References: <1479385201-10559-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-We expect dict entries to have a{sv} format but the code don't check if
-the entries really encode the variant which may lead to a crash in
-dbus_message_iter_recurse.
+This adds --disable-network option to configure which make network plugin
+to not be build thus reducing the build time and binary size of
+bluetoothd in systems where those profiles are not supported.
 ---
- src/advertising.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ Makefile.plugins |  2 ++
+ README           | 10 ++++++++++
+ configure.ac     |  4 ++++
+ 3 files changed, 16 insertions(+)
 
-diff --git a/src/advertising.c b/src/advertising.c
-index ef84e45..e7840bf 100644
---- a/src/advertising.c
-+++ b/src/advertising.c
-@@ -298,6 +298,10 @@ static bool parse_advertising_manufacturer_data(GDBusProxy *proxy,
- 		dbus_message_iter_get_basic(&entry, &manuf_id);
+diff --git a/Makefile.plugins b/Makefile.plugins
+index c9bc50c..533922d 100644
+--- a/Makefile.plugins
++++ b/Makefile.plugins
+@@ -47,12 +47,14 @@ builtin_sources += profiles/audio/control.h profiles/audio/control.c \
+ 			profiles/audio/player.h profiles/audio/player.c
+ endif
  
- 		dbus_message_iter_next(&entry);
-+
-+		if (dbus_message_iter_get_arg_type(&entry) != DBUS_TYPE_VARIANT)
-+			goto fail;
-+
- 		dbus_message_iter_recurse(&entry, &value);
++if NETWORK
+ builtin_modules += network
+ builtin_sources += profiles/network/manager.c \
+ 			profiles/network/bnep.h profiles/network/bnep.c \
+ 			profiles/network/server.h profiles/network/server.c \
+ 			profiles/network/connection.h \
+ 			profiles/network/connection.c
++endif
  
- 		if (dbus_message_iter_get_arg_type(&value) != DBUS_TYPE_ARRAY)
-@@ -356,6 +360,10 @@ static bool parse_advertising_service_data(GDBusProxy *proxy,
- 			goto fail;
+ builtin_modules += input
+ builtin_sources += profiles/input/manager.c \
+diff --git a/README b/README
+index ec3ed30..5137e34 100644
+--- a/README
++++ b/README
+@@ -125,6 +125,16 @@ For a working system, certain configuration options need to be enabled:
+ 		This option is provided for distributions that do not have any
+ 		audio capabilities.
  
- 		dbus_message_iter_next(&entry);
++	--disable-network
 +
-+		if (dbus_message_iter_get_arg_type(&entry) != DBUS_TYPE_VARIANT)
-+			goto fail;
++		Disable PANU, NAP, GN profiles
 +
- 		dbus_message_iter_recurse(&entry, &value);
++		By default bluetoothd supports PANU, NAP and GN profile using a
++		built-in plugin, this option disables it.
++
++		This option is provided for distributions that do not have any
++		network capabilities.
++
+ 	--enable-experimental
  
- 		if (dbus_message_iter_get_arg_type(&value) != DBUS_TYPE_ARRAY)
+ 		Enable experimental plugins
+diff --git a/configure.ac b/configure.ac
+index 99fbeb8..63a5dfb 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -156,6 +156,10 @@ AC_ARG_ENABLE(test, AC_HELP_STRING([--disable-avrcp],
+ 		[disable AVRCP profile]), [enable_avrcp=${enableval}])
+ AM_CONDITIONAL(AVRCP, test "${enable_avrcp}" != "no")
+ 
++AC_ARG_ENABLE(test, AC_HELP_STRING([--disable-network],
++		[disable network profiles]), [enable_network=${enableval}])
++AM_CONDITIONAL(NETWORK, test "${enable_network}" != "no")
++
+ AC_ARG_ENABLE(tools, AC_HELP_STRING([--disable-tools],
+ 		[disable Bluetooth tools]), [enable_tools=${enableval}])
+ AM_CONDITIONAL(TOOLS, test "${enable_tools}" != "no")
 -- 
 2.7.4
 
