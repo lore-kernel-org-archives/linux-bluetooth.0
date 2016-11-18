@@ -1,69 +1,60 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZLZ=DPiGcEU51Nr3KdrB7TD5u1HFYi3XZUJursJc4d+fA@mail.gmail.com>
-References: <1479123009-7190-1-git-send-email-luiz.dentz@gmail.com>
- <20161114115118.GA5921@x1c> <CABuKQigFTmsni5cGhgMdneez_K78-cKTrg1LG6qHZjmK2tpj7g@mail.gmail.com>
- <CABBYNZK3B61f4gVuCGMM+7pSB3ik-jvAx+=6GWMwkS7mAecaKQ@mail.gmail.com>
- <CABuKQij9z-JOH7cGrasTQ8ONKB6dT0-vK3k4ONY3PXaSnjyREA@mail.gmail.com> <CABBYNZLZ=DPiGcEU51Nr3KdrB7TD5u1HFYi3XZUJursJc4d+fA@mail.gmail.com>
-From: Trump DD <wrxzzj@gmail.com>
-Date: Fri, 18 Nov 2016 22:34:47 +0800
-Message-ID: <CABuKQiidLfSt-jVN4BONXyVb7SBxs3AihLwTKQfdpOkE8xeD1A@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] core/adapter: Fix using wrong address type to
- listen ATT
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <1479391920-31828-1-git-send-email-luiz.dentz@gmail.com>
+References: <1479391920-31828-1-git-send-email-luiz.dentz@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Fri, 18 Nov 2016 15:13:47 +0200
+Message-ID: <CABBYNZLJEbWRbXTE3fWYKQPcA_cKxGgQ8-t6Aqr7CL3VsyrDhQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] core/advertising: Fix crash when passing invalid dictionary
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Thanks for you reply.
-now,I make the mouse work again, it's very strang issue.
-Yes, as you said, set privacy command must be available before hci0
-powered, so I have remove udev rules that run 'hciconfig hci0 up'
-I think that may be the root cause of this issue.
+Hi,
 
-
-On Wed, Nov 16, 2016 at 8:06 PM, Luiz Augusto von Dentz
+On Thu, Nov 17, 2016 at 4:12 PM, Luiz Augusto von Dentz
 <luiz.dentz@gmail.com> wrote:
-> Hi,
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 >
-> On Tue, Nov 15, 2016 at 2:45 AM, Trump DD <wrxzzj@gmail.com> wrote:
->> Hi
->>    compare the ok.log and failed.log generate by bluetoothd, I found
->> that the first time startup bluetoothd, a error message was presented
->> " Failed to set privacy: Rejected "
->>
->> bluetoothd[9988]: Failed to set privacy: Rejected (0x0b)
->> bluetoothd[9988]: src/adapter.c:new_settings_callback() Settings: 0x00000ac5
->> bluetoothd[9988]: src/adapter.c:settings_changed() Changed settings: 0x00000004
->> bluetoothd[9988]: src/adapter.c:load_link_keys_complete() link keys
->> loaded for hci0
->> bluetoothd[9988]: src/adapter.c:load_ltks_complete() LTKs loaded for hci0
->> bluetoothd[9988]: src/adapter.c:load_irks_complete() IRKs loaded for hci0
->> bluetoothd[9988]: src/adapter.c:load_conn_params_complete() Connection
->> Parameters loaded for hci0
->> bluetoothd[9988]: src/adapter.c:add_device_complete()
->> C0:11:5B:C6:55:DF (2) added to kernel connect list
->> bluetoothd[9988]: src/adapter.c:get_connections_complete() Connection count: 0
->>
->> In /etc/bluetooth/main.conf I have set
->> "
->>  Privacy=device
->> "
->>
->> Why the first time bluetoothd startup failed to set privacy, the
->> second time bluetoothd startup all works right ?
+> We expect dict entries to have a{sv} format but the code don't check if
+> the entries really encode the variant which may lead to a crash in
+> dbus_message_iter_recurse.
+> ---
+>  src/advertising.c | 8 ++++++++
+>  1 file changed, 8 insertions(+)
 >
-> Rejected is probably due to adapter being powered, perhaps hciconfig
-> or something is messing up the state during reboot, but this shouldn't
-> affect the address type thus Im not sure why it will cause the failure
-> loop. Also note that if privacy is used you may not be able to
-> reconnect using passive scanning, at least the 2 mouses I have here
-> seems to be using direct advertising to public address but with
-> privacy we are scanning using the random address the controller just
-> filter any advertisement to the public address.
+> diff --git a/src/advertising.c b/src/advertising.c
+> index ef84e45..e7840bf 100644
+> --- a/src/advertising.c
+> +++ b/src/advertising.c
+> @@ -298,6 +298,10 @@ static bool parse_advertising_manufacturer_data(GDBusProxy *proxy,
+>                 dbus_message_iter_get_basic(&entry, &manuf_id);
+>
+>                 dbus_message_iter_next(&entry);
+> +
+> +               if (dbus_message_iter_get_arg_type(&entry) != DBUS_TYPE_VARIANT)
+> +                       goto fail;
+> +
+>                 dbus_message_iter_recurse(&entry, &value);
+>
+>                 if (dbus_message_iter_get_arg_type(&value) != DBUS_TYPE_ARRAY)
+> @@ -356,6 +360,10 @@ static bool parse_advertising_service_data(GDBusProxy *proxy,
+>                         goto fail;
+>
+>                 dbus_message_iter_next(&entry);
+> +
+> +               if (dbus_message_iter_get_arg_type(&entry) != DBUS_TYPE_VARIANT)
+> +                       goto fail;
+> +
+>                 dbus_message_iter_recurse(&entry, &value);
+>
+>                 if (dbus_message_iter_get_arg_type(&value) != DBUS_TYPE_ARRAY)
+> --
+> 2.7.4
 
+Applied.
 
 
 -- 
-Thanks
+Luiz Augusto von Dentz
