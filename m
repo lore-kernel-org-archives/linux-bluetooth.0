@@ -3,45 +3,182 @@ From: mcchou@chromium.org
 To: linux-bluetooth@vger.kernel.org
 Cc: luiz.von.dentz@intel.com, josephsih@chromium.org,
         Miao-chen Chou <mcchou@chromium.org>
-Subject: [PATCH] monitor/rfcomm: Fix a potential memory access issue
-Date: Fri, 18 Nov 2016 17:32:52 -0800
-Message-Id: <1479519172-32499-1-git-send-email-mcchou@chromium.org>
+Subject: [PATCH] gobex: Fix a compilation error for the compatibility with LLVM
+Date: Fri, 18 Nov 2016 17:30:10 -0800
+Message-Id: <1479519010-32125-1-git-send-email-mcchou@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Miao-chen Chou <mcchou@chromium.org>
 
-Packed structs have a default alignment of 1. If address of a member
-is taken, the pointer value could be unaligned. Unaligned memory accesses
-can result in a crash in some architectures.
+Last argument to a function using va_args should not undergo argument promotion
+as the behavior is undefined. Detailed explanation here:
+https://www.securecoding.cert.org/confluence/display/cplusplus/EXP58-CPP.+
+Pass+an+object+of+the+correct+type+to+va_start
+
+Change-Id: I388908087ce804692a242fa8154e923dfe180dbd
 ---
- monitor/rfcomm.c | 2 +-
- monitor/rfcomm.h | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ gobex/gobex-packet.c   |  4 ++--
+ gobex/gobex-packet.h   |  4 ++--
+ gobex/gobex-transfer.c |  8 ++++----
+ gobex/gobex.c          |  4 ++--
+ gobex/gobex.h          | 12 ++++++------
+ 5 files changed, 16 insertions(+), 16 deletions(-)
 
-diff --git a/monitor/rfcomm.c b/monitor/rfcomm.c
-index b32ad40..7c688af 100644
---- a/monitor/rfcomm.c
-+++ b/monitor/rfcomm.c
-@@ -106,7 +106,7 @@ struct rfcomm_rpn {
- 	uint8_t xon;
- 	uint8_t xoff;
- 	uint16_t pm;
--} __attribute__ ((packed));
-+} __attribute__ ((packed, aligned(2)));
+diff --git a/gobex/gobex-packet.c b/gobex/gobex-packet.c
+index db56ed0..cd5c131 100644
+--- a/gobex/gobex-packet.c
++++ b/gobex/gobex-packet.c
+@@ -228,7 +228,7 @@ gboolean g_obex_packet_set_data(GObexPacket *pkt, const void *data, gsize len,
+ }
 
- struct rfcomm_rls {
- 	uint8_t dlci;
-diff --git a/monitor/rfcomm.h b/monitor/rfcomm.h
-index c157352..a8af484 100644
---- a/monitor/rfcomm.h
-+++ b/monitor/rfcomm.h
-@@ -77,4 +77,4 @@ struct rfcomm_pn {
- 	uint16_t mtu;
- 	uint8_t  max_retrans;
- 	uint8_t  credits;
--} __attribute__((packed));
-+} __attribute__((packed, aligned(2)));
+ GObexPacket *g_obex_packet_new_valist(guint8 opcode, gboolean final,
+-					guint8 first_hdr_id, va_list args)
++					guint first_hdr_id, va_list args)
+ {
+ 	GObexPacket *pkt;
+
+@@ -246,7 +246,7 @@ GObexPacket *g_obex_packet_new_valist(guint8 opcode, gboolean final,
+ }
+
+ GObexPacket *g_obex_packet_new(guint8 opcode, gboolean final,
+-						guint8 first_hdr_id, ...)
++						guint first_hdr_id, ...)
+ {
+ 	GObexPacket *pkt;
+ 	va_list args;
+diff --git a/gobex/gobex-packet.h b/gobex/gobex-packet.h
+index d1007ea..1d94ccf 100644
+--- a/gobex/gobex-packet.h
++++ b/gobex/gobex-packet.h
+@@ -98,9 +98,9 @@ gboolean g_obex_packet_set_data(GObexPacket *pkt, const void *data, gsize len,
+ 						GObexDataPolicy data_policy);
+ const void *g_obex_packet_get_data(GObexPacket *pkt, gsize *len);
+ GObexPacket *g_obex_packet_new(guint8 opcode, gboolean final,
+-						guint8 first_hdr_id, ...);
++						guint first_hdr_id, ...);
+ GObexPacket *g_obex_packet_new_valist(guint8 opcode, gboolean final,
+-					guint8 first_hdr_id, va_list args);
++					guint first_hdr_id, va_list args);
+ void g_obex_packet_free(GObexPacket *pkt);
+
+ GObexPacket *g_obex_packet_decode(const void *data, gsize len,
+diff --git a/gobex/gobex-transfer.c b/gobex/gobex-transfer.c
+index a5115bf..bc99306 100644
+--- a/gobex/gobex-transfer.c
++++ b/gobex/gobex-transfer.c
+@@ -296,7 +296,7 @@ guint g_obex_put_req_pkt(GObex *obex, GObexPacket *req,
+
+ guint g_obex_put_req(GObex *obex, GObexDataProducer data_func,
+ 			GObexFunc complete_func, gpointer user_data,
+-			GError **err, guint8 first_hdr_id, ...)
++			GError **err, guint first_hdr_id, ...)
+ {
+ 	GObexPacket *req;
+ 	va_list args;
+@@ -414,7 +414,7 @@ done:
+ guint g_obex_put_rsp(GObex *obex, GObexPacket *req,
+ 			GObexDataConsumer data_func, GObexFunc complete_func,
+ 			gpointer user_data, GError **err,
+-			guint8 first_hdr_id, ...)
++			guint first_hdr_id, ...)
+ {
+ 	struct transfer *transfer;
+ 	va_list args;
+@@ -471,7 +471,7 @@ guint g_obex_get_req_pkt(GObex *obex, GObexPacket *req,
+
+ guint g_obex_get_req(GObex *obex, GObexDataConsumer data_func,
+ 			GObexFunc complete_func, gpointer user_data,
+-			GError **err, guint8 first_hdr_id, ...)
++			GError **err, guint first_hdr_id, ...)
+ {
+ 	struct transfer *transfer;
+ 	GObexPacket *req;
+@@ -617,7 +617,7 @@ guint g_obex_get_rsp_pkt(GObex *obex, GObexPacket *rsp,
+
+ guint g_obex_get_rsp(GObex *obex, GObexDataProducer data_func,
+ 			GObexFunc complete_func, gpointer user_data,
+-			GError **err, guint8 first_hdr_id, ...)
++			GError **err, guint first_hdr_id, ...)
+ {
+ 	GObexPacket *rsp;
+ 	va_list args;
+diff --git a/gobex/gobex.c b/gobex/gobex.c
+index 42175fc..0e5817e 100644
+--- a/gobex/gobex.c
++++ b/gobex/gobex.c
+@@ -853,7 +853,7 @@ immediate_completion:
+ }
+
+ gboolean g_obex_send_rsp(GObex *obex, guint8 rspcode, GError **err,
+-						guint8 first_hdr_type, ...)
++						guint first_hdr_type, ...)
+ {
+ 	GObexPacket *rsp;
+ 	va_list args;
+@@ -1549,7 +1549,7 @@ void g_obex_unref(GObex *obex)
+ /* Higher level functions */
+
+ guint g_obex_connect(GObex *obex, GObexResponseFunc func, gpointer user_data,
+-					GError **err, guint8 first_hdr_id, ...)
++					GError **err, guint first_hdr_id, ...)
+ {
+ 	GObexPacket *req;
+ 	struct connect_data data;
+diff --git a/gobex/gobex.h b/gobex/gobex.h
+index 5bc9103..b223a2f 100644
+--- a/gobex/gobex.h
++++ b/gobex/gobex.h
+@@ -51,7 +51,7 @@ gboolean g_obex_cancel_req(GObex *obex, guint req_id,
+ 						gboolean remove_callback);
+
+ gboolean g_obex_send_rsp(GObex *obex, guint8 rspcode, GError **err,
+-						guint8 first_hdr_type, ...);
++						guint first_hdr_type, ...);
+
+ void g_obex_set_disconnect_function(GObex *obex, GObexFunc func,
+ 							gpointer user_data);
+@@ -73,7 +73,7 @@ void g_obex_unref(GObex *obex);
+ /* High level client functions */
+
+ guint g_obex_connect(GObex *obex, GObexResponseFunc func, gpointer user_data,
+-				GError **err, guint8 first_hdr_id, ...);
++				GError **err, guint first_hdr_id, ...);
+
+ guint g_obex_disconnect(GObex *obex, GObexResponseFunc func, gpointer user_data,
+ 								GError **err);
+@@ -102,7 +102,7 @@ guint g_obex_abort(GObex *obex, GObexResponseFunc func, gpointer user_data,
+
+ guint g_obex_put_req(GObex *obex, GObexDataProducer data_func,
+ 			GObexFunc complete_func, gpointer user_data,
+-			GError **err, guint8 first_hdr_id, ...);
++			GError **err, guint first_hdr_id, ...);
+
+ guint g_obex_put_req_pkt(GObex *obex, GObexPacket *req,
+ 			GObexDataProducer data_func, GObexFunc complete_func,
+@@ -110,7 +110,7 @@ guint g_obex_put_req_pkt(GObex *obex, GObexPacket *req,
+
+ guint g_obex_get_req(GObex *obex, GObexDataConsumer data_func,
+ 			GObexFunc complete_func, gpointer user_data,
+-			GError **err, guint8 first_hdr_id, ...);
++			GError **err, guint first_hdr_id, ...);
+
+ guint g_obex_get_req_pkt(GObex *obex, GObexPacket *req,
+ 			GObexDataConsumer data_func, GObexFunc complete_func,
+@@ -119,11 +119,11 @@ guint g_obex_get_req_pkt(GObex *obex, GObexPacket *req,
+ guint g_obex_put_rsp(GObex *obex, GObexPacket *req,
+ 			GObexDataConsumer data_func, GObexFunc complete_func,
+ 			gpointer user_data, GError **err,
+-			guint8 first_hdr_id, ...);
++			guint first_hdr_id, ...);
+
+ guint g_obex_get_rsp(GObex *obex, GObexDataProducer data_func,
+ 			GObexFunc complete_func, gpointer user_data,
+-			GError **err, guint8 first_hdr_id, ...);
++			GError **err, guint first_hdr_id, ...);
+
+ guint g_obex_get_rsp_pkt(GObex *obex, GObexPacket *rsp,
+ 			GObexDataProducer data_func, GObexFunc complete_func,
 --
 2.8.0.rc3.226.g39d4020
 
