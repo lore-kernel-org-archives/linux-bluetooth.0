@@ -3,8 +3,8 @@ From: bugzilla-daemon@bugzilla.kernel.org
 To: linux-bluetooth@vger.kernel.org
 Subject: [Bug 186201] Bluetooth kernel oops on suspend following resume -
  Lenoveo Yoga900, Dell Latitude E7270
-Date: Mon, 21 Nov 2016 14:55:43 +0000
-Message-ID: <bug-186201-62941-Le4KLX1zcu@https.bugzilla.kernel.org/>
+Date: Mon, 21 Nov 2016 14:50:06 +0000
+Message-ID: <bug-186201-62941-zu0rRktgZz@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-186201-62941@https.bugzilla.kernel.org/>
 References: <bug-186201-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -18,8 +18,10 @@ Len Brown <lenb@kernel.org> changed:
 
            What    |Removed                     |Added
 ----------------------------------------------------------------------------
-           Assignee|linux-bluetooth@vger.kernel |marcel@holtmann.org
-                   |.org                        |
+            Summary|kernel oops upon second     |Bluetooth kernel oops on
+                   |suspend to mem - Lenoveo    |suspend following resume -
+                   |Yoga900                     |Lenoveo Yoga900, Dell
+                   |                            |Latitude E7270
 
 -- 
 You are receiving this mail because:
