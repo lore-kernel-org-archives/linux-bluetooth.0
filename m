@@ -1,39 +1,36 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain; charset=us-ascii
+Return-Path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain; charset=utf-8
 Mime-Version: 1.0 (Mac OS X Mail 10.1 \(3251\))
-Subject: Re: hig_magicmouse HID_BATTERY_QUIRK_IGNORE
+Subject: Re: drivers/bluetooth/dtl1_cs.c:559: bad if statement ?
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CAJxTCxxMvwdrLZnsMsOG4vLDNbYmtdGgAXLofUMLvPvoepTk7Q@mail.gmail.com>
-Date: Tue, 22 Nov 2016 22:50:25 +0100
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <1E169F84-8B4E-4E63-B9BD-213FBBC1B36E@holtmann.org>
-References: <CAJxTCxxMvwdrLZnsMsOG4vLDNbYmtdGgAXLofUMLvPvoepTk7Q@mail.gmail.com>
-To: =?utf-8?B?SsOpcsOpbXkgTGFs?= <kapouer@melix.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <VI1PR08MB1022A48C7808FE88DB66059D9CBF0@VI1PR08MB1022.eurprd08.prod.outlook.com>
+Date: Tue, 22 Nov 2016 22:49:38 +0100
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Message-Id: <3184A4EA-4F3C-4CBC-AAA1-355CB62B5DE2@holtmann.org>
+References: <VI1PR08MB1022A48C7808FE88DB66059D9CBF0@VI1PR08MB1022.eurprd08.prod.outlook.com>
+To: David Binderman <dcb314@hotmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jeremy,
+Hi David,
 
-> i've using this patch for a while, or else
-> https://bugzilla.kernel.org/show_bug.cgi?id=103631
-> happens (mouse freeze when battery reports).
+> drivers/bluetooth/dtl1_cs.c:559:32: warning: logical ‘or’ of collectively exhaustive tests is always true [-Wlogical-op]
 > 
-> --- a/drivers/hid/hid-input.c
-> +++ b/drivers/hid/hid-input.c
-> @@ -321,6 +321,9 @@
->  { HID_BLUETOOTH_DEVICE(USB_VENDOR_ID_APPLE,
->    USB_DEVICE_ID_APPLE_ALU_WIRELESS_ANSI),
->    HID_BATTERY_QUIRK_PERCENT | HID_BATTERY_QUIRK_FEATURE },
-> +  { HID_BLUETOOTH_DEVICE(USB_VENDOR_ID_APPLE,
-> +    USB_DEVICE_ID_APPLE_MAGICMOUSE),
-> +    HID_BATTERY_QUIRK_IGNORE },
->  { HID_BLUETOOTH_DEVICE(USB_VENDOR_ID_ELECOM,
->    USB_DEVICE_ID_ELECOM_BM084),
->    HID_BATTERY_QUIRK_IGNORE },
+> Source code is
+> 
+>    if ((p_dev->resource[1]->end) || (p_dev->resource[1]->end < 8))
+>        return -ENODEV;
+> 
+> Maybe better code
+> 
+>    if ((p_dev->resource[1]->end < 0) || (p_dev->resource[1]->end >= 8))
+>        return -ENODEV;
 
-please send patches to linux-input@vger.kernel.org for HID drivers.
+mind sending a patch?
 
 Regards
 
 Marcel
-
