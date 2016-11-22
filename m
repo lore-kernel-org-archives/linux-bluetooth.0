@@ -1,39 +1,37 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 10.1 \(3251\))
-Subject: Re: [PATCH] Bluetooth: Fix using the correct source address type
+Subject: Re: hig_magicmouse HID_BATTERY_QUIRK_IGNORE
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1478962987-29898-1-git-send-email-johan.hedberg@gmail.com>
-Date: Tue, 22 Nov 2016 22:52:44 +0100
+In-Reply-To: <CAJxTCxxMvwdrLZnsMsOG4vLDNbYmtdGgAXLofUMLvPvoepTk7Q@mail.gmail.com>
+Date: Tue, 22 Nov 2016 22:50:25 +0100
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <9CFD2D4B-48CA-45FA-A59C-B9787D1BE1D3@holtmann.org>
-References: <1478962987-29898-1-git-send-email-johan.hedberg@gmail.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
+Message-Id: <1E169F84-8B4E-4E63-B9BD-213FBBC1B36E@holtmann.org>
+References: <CAJxTCxxMvwdrLZnsMsOG4vLDNbYmtdGgAXLofUMLvPvoepTk7Q@mail.gmail.com>
+To: =?utf-8?B?SsOpcsOpbXkgTGFs?= <kapouer@melix.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Jeremy,
 
-> The hci_get_route() API is used to look up local HCI devices, however
-> so far it has been incapable of dealing with anything else than the
-> public address of HCI devices. This completely breaks with LE-only HCI
-> devices that do not come with a public address, but use a static
-> random address instead.
+> i've using this patch for a while, or else
+> https://bugzilla.kernel.org/show_bug.cgi?id=103631
+> happens (mouse freeze when battery reports).
 > 
-> This patch exteds the hci_get_route() API with a src_type parameter
-> that's used for comparing with the right address of each HCI device.
-> 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> ---
-> include/net/bluetooth/hci_core.h |  2 +-
-> net/bluetooth/6lowpan.c          |  4 ++--
-> net/bluetooth/hci_conn.c         | 26 ++++++++++++++++++++++++--
-> net/bluetooth/l2cap_core.c       |  2 +-
-> net/bluetooth/rfcomm/tty.c       |  2 +-
-> net/bluetooth/sco.c              |  2 +-
-> 6 files changed, 30 insertions(+), 8 deletions(-)
+> --- a/drivers/hid/hid-input.c
+> +++ b/drivers/hid/hid-input.c
+> @@ -321,6 +321,9 @@
+>  { HID_BLUETOOTH_DEVICE(USB_VENDOR_ID_APPLE,
+>    USB_DEVICE_ID_APPLE_ALU_WIRELESS_ANSI),
+>    HID_BATTERY_QUIRK_PERCENT | HID_BATTERY_QUIRK_FEATURE },
+> +  { HID_BLUETOOTH_DEVICE(USB_VENDOR_ID_APPLE,
+> +    USB_DEVICE_ID_APPLE_MAGICMOUSE),
+> +    HID_BATTERY_QUIRK_IGNORE },
+>  { HID_BLUETOOTH_DEVICE(USB_VENDOR_ID_ELECOM,
+>    USB_DEVICE_ID_ELECOM_BM084),
+>    HID_BATTERY_QUIRK_IGNORE },
 
-patch has been applied to bluetooth-stable tree.
+please send patches to linux-input@vger.kernel.org for HID drivers.
 
 Regards
 
