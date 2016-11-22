@@ -1,76 +1,76 @@
-Return-Path: <netdev-owner@vger.kernel.org>
-Date: Wed, 23 Nov 2016 09:29:12 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: davem@davemloft.net
-Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: pull request: bluetooth 2016-11-23
-Message-ID: <20161123072912.GA3538@x1c>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-        protocol="application/pgp-signature"; boundary="RnlQjJ0d97Da+TV1"
-Sender: netdev-owner@vger.kernel.org
+Return-Path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 10.1 \(3251\))
+Subject: Re: [PATCH] btusb: fix zero BD address problem during stress test
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <a23725dc02bb48deb00e5f9c8043bc3c@SC-EXCH04.marvell.com>
+Date: Tue, 22 Nov 2016 22:55:10 +0100
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Cathy Luo <cluo@marvell.com>,
+        Nishant Sarmukadam <nishants@marvell.com>,
+        Ganapathi Bhat <gbhat@marvell.com>
+Message-Id: <077FBE27-DA84-4F11-BC69-F38184CE6B40@holtmann.org>
+References: <1476795449-20592-1-git-send-email-akarwar@marvell.com>
+ <a23725dc02bb48deb00e5f9c8043bc3c@SC-EXCH04.marvell.com>
+To: Amitkumar Karwar <akarwar@marvell.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Amitkumar,
 
---RnlQjJ0d97Da+TV1
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+>> From: Amitkumar Karwar [mailto:akarwar@marvell.com]
+>> Sent: Tuesday, October 18, 2016 6:27 PM
+>> To: linux-bluetooth@vger.kernel.org
+>> Cc: marcel@holtmann.org; linux-kernel@vger.kernel.org; Cathy Luo;
+>> Nishant Sarmukadam; Ganapathi Bhat; Amitkumar Karwar
+>> Subject: [PATCH] btusb: fix zero BD address problem during stress test
+>> 
+>> From: Ganapathi Bhat <gbhat@marvell.com>
+>> 
+>> We came across a corner case issue during reboot stress test in which
+>> hciconfig shows BD address is all zero. Reason is we don't get response
+>> for HCI RESET command during initialization
+>> 
+>> The issue is tracked to a race where USB subsystem calls
+>> btusb_intr_complete() to deliver a data(NOOP frame) received on
+>> interrupt endpoint. HCI_RUNNING flag is not yet set by bluetooth
+>> subsystem. So we ignore that frame and return.
+>> 
+>> As we missed to resubmit the buffer to interrupt endpoint in this case,
+>> we don't get response for BT reset command downloaded after this.
+>> 
+>> This patch handles the corner case to resolve zero BD address problem.
+>> 
+>> Signed-off-by: Ganapathi Bhat <gbhat@marvell.com>
+>> Signed-off-by: Amitkumar Karwar <akarwar@marvell.com>
+>> ---
+>> drivers/bluetooth/btusb.c | 5 +----
+>> 1 file changed, 1 insertion(+), 4 deletions(-)
+>> 
+>> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+>> index 811f9b9..b5596ac 100644
+>> --- a/drivers/bluetooth/btusb.c
+>> +++ b/drivers/bluetooth/btusb.c
+>> @@ -607,10 +607,7 @@ static void btusb_intr_complete(struct urb *urb)
+>> 	BT_DBG("%s urb %p status %d count %d", hdev->name, urb, urb-
+>>> status,
+>> 	       urb->actual_length);
+>> 
+>> -	if (!test_bit(HCI_RUNNING, &hdev->flags))
+>> -		return;
+>> -
+>> -	if (urb->status == 0) {
+>> +	if (urb->status == 0 && test_bit(HCI_RUNNING, &hdev->flags)) {
+>> 		hdev->stat.byte_rx += urb->actual_length;
+>> 
+>> 		if (btusb_recv_intr(data, urb->transfer_buffer,
+> 
+> Did you get a chance to check this?
+> Please let us know if you have any review comments.
 
-Hi Dave,
+can you explain how this is correct and show me the HCI traces for this.
 
-Sorry about the late pull request for 4.9, but we have one more
-important Bluetooth patch that should make it to the release. It fixes
-connection creation for Bluetooth LE controllers that do not have a
-public address (only a random one).
+Regards
 
-Please let me know if there are any issues pulling. Thanks.
-
-Johan
-
----
-The following changes since commit c9b8af1330198ae241cd545e1f040019010d44d9:
-
-  flow_dissect: call init_default_flow_dissectors() earlier (2016-11-22 14:44:01 -0500)
-
-are available in the git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git for-upstream
-
-for you to fetch changes up to 39385cb5f3274735b03ed1f8e7ff517b02a0beed:
-
-  Bluetooth: Fix using the correct source address type (2016-11-22 22:50:46 +0100)
-
-----------------------------------------------------------------
-Johan Hedberg (1):
-      Bluetooth: Fix using the correct source address type
-
- include/net/bluetooth/hci_core.h |  2 +-
- net/bluetooth/6lowpan.c          |  4 ++--
- net/bluetooth/hci_conn.c         | 26 ++++++++++++++++++++++++--
- net/bluetooth/l2cap_core.c       |  2 +-
- net/bluetooth/rfcomm/tty.c       |  2 +-
- net/bluetooth/sco.c              |  2 +-
- 6 files changed, 30 insertions(+), 8 deletions(-)
-
-
---RnlQjJ0d97Da+TV1
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIcBAEBAgAGBQJYNUVHAAoJECQj9vv5qNQS66gQALndXVs28c8VjZFbKUZTW+bF
-FRDmPb9qn9Ev7dJtjBILPyIoSfYnONQEp2SOS0j6kN2R4jiRBN9SZUqRe/NTvvPc
-AN5PA3/FwQ4I6VWFeR4hSP6yrDkl444GLv/NfhrcWBum7SAtYTGMxIEBTeIXH/WG
-WxUCrZ/N6pFy5TfU5Iun21oqgVoEZC9p2mI+Qr84yDIk25VkO2lfWl2ZTl8qAXb5
-Z8EKK6dpHs6A9BbqW3hJ088Fl3ON49bYEJ5u/2l04tDDpFs98RkmM96Hr15ZPdiL
-VJFP53CY/Dsl1wZ/my/R1GMgXOS8OCo4O4oKjP+EXMRO8oBXMmzboW5LNwvav+iv
-GlybEuPxLnnO6GQVS53HLchvgf0rITe4Yb5CITRZ4p6vV49gVn/Wv2lNyh15NU5X
-2TIPs9CKpfA33Mr4hcZoYTMqqrtlHpy9+x27rcgNi/uS799AZQGI/8EvjhbwQTSs
-ZuMbnDRE027i8iwKnCCQNOzZrN0XTmwjHQawB/XGE8Q/fPNu0WwCQXr6KYq6rrcZ
-z8PU5cjr3G1hOlbVROkkelX7TQ/7svIbETzWeC1vvBj+UcAsifLr6Bid0+xUhhyl
-z4XY2oElir++i+Nu46hZDL52VKKmJYZ7qxIUcAVBD7g1iaRgo1kfxySKCj3CzJeW
-2ExJLyVlTQfJ3fWoYBei
-=/h79
------END PGP SIGNATURE-----
-
---RnlQjJ0d97Da+TV1--
+Marcel
