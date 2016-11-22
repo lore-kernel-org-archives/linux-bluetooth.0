@@ -1,52 +1,80 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <linux-wpan-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <1466408993-3808-2-git-send-email-patrik.flykt@linux.intel.com>
-References: <1466408993-3808-1-git-send-email-patrik.flykt@linux.intel.com> <1466408993-3808-2-git-send-email-patrik.flykt@linux.intel.com>
+In-Reply-To: <628fdbf2-7600-b176-f896-08f26318048d@pengutronix.de>
+References: <20160807143056.3116-1-aar@pengutronix.de> <628fdbf2-7600-b176-f896-08f26318048d@pengutronix.de>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 22 Nov 2016 14:26:16 +0200
-Message-ID: <CABBYNZKFnwzgR7mp5qOqibvqZjF3tfTcDB-+LsNkPwcYVPvrKw@mail.gmail.com>
-Subject: Re: [RFC 1/4] addrconf: Create EUI48 IPv6 addresses for BTLE 6LoWPAN
-To: Patrik Flykt <patrik.flykt@linux.intel.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Alexander Aring <aar@pengutronix.de>,
-        Jukka Rissanen <jukka.rissanen@linux.intel.com>
+Date: Tue, 22 Nov 2016 14:14:31 +0200
+Message-ID: <CABBYNZ+3yU7zb5iHreh6HqZ1X3Zq8dEEJY4MYGxLMu6Y71NmKw@mail.gmail.com>
+Subject: Re: [RFCv2 bluetooth-next 00/19] bluetooth: rework 6lowpan implementation
+To: Alexander Aring <aar@pengutronix.de>
+Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Alex,
 
-On Mon, Jun 20, 2016 at 10:49 AM, Patrik Flykt
-<patrik.flykt@linux.intel.com> wrote:
-> Create EUI48 IPv6 addresses for 6LoWPAN over Bluetooth Low Energy.
-> Both IEEE802.15.4 and Bluetooth Low Energy use a netdevice type of
-> ARPHRD_6LOWPAN, therefore generate the IPv6 address based on the
-> MAC address length.
+On Mon, Aug 8, 2016 at 3:10 PM, Alexander Aring <aar@pengutronix.de> wrote:
+> Hi,
 >
-> Signed-off-by: Patrik Flykt <patrik.flykt@linux.intel.com>
-> ---
->  net/ipv6/addrconf.c | 4 ++++
->  1 file changed, 4 insertions(+)
+> On 08/07/2016 04:30 PM, Alexander Aring wrote:
+>> Hi,
+>>
+>> This patch series is my second RFC for making btle 6lowpan into the right
+>> direction.
+>>
+>> I added hopefully all suggestions which I got from RFCv1. The interface address
+>> will be assigned when the first l2cap chan connection gets in. This device
+>> address will be get by "hci_copy_identity_address" bluetooth API function and
+>> I hope this is the right function to get the "RPA device address".
+
+Well this does not work is identity address might not be the same as
+RPA, using hci_copy_identity_address might leak the identity address
+to other peer participating in the network.
+
+>> Checkout commit message of Patch 19/19 to see how I used it.
+>>
+>> Bad news are, I will start my master thesis shortly so I am not able to work
+>> on this patch series anymore.
+>>
+
+Did you keep track what patches have been merged upstream? Id like to
+first make the solution stable since even pings something makes the
+kernel crash, so how about those:
+
+  bluetooth: introduce l2cap_hdev_chan_connect
+  bluetooth: add hci dev notifier
+  bluetooth: introduce l2cap chan priv data
+  bluetooth: export functions and variables
+
+> and I got the following warnings from bots/persons, I just send it here
+> again for the next person who like to work on that or I forget it again
+> the next time when I can work on this:
 >
-> diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
-> index 6c8fc3f..6697fe6 100644
-> --- a/net/ipv6/addrconf.c
-> +++ b/net/ipv6/addrconf.c
-> @@ -2055,6 +2055,10 @@ static int ipv6_generate_eui64(u8 *eui, struct net_device *dev)
->         case ARPHRD_IPGRE:
->                 return addrconf_ifid_gre(eui, dev);
->         case ARPHRD_6LOWPAN:
-> +               /* 6LoWPAN over BTLE */
-> +               if (dev->addr_len == ETH_ALEN)
-> +                       return addrconf_ifid_eui48(eui, dev);
-> +
->                 return addrconf_ifid_eui64(eui, dev);
->         case ARPHRD_IEEE1394:
->                 return addrconf_ifid_ieee1394(eui, dev);
+> "ERROR: "baswap" [net/6lowpan/6lowpan.ko] undefined!"
+>
+> This is because baswap is some compiled function in bluetooth module and
+> 6lowpan doesn;t depend on that.
+>
+> Another issue:
+>
+> net/bluetooth/6lowpan.c:892:0-23: WARNING: lowpan_enabled_fops should be
+> defined with DEFINE_DEBUGFS_ATTRIBUTE
+>
+>  Use DEFINE_DEBUGFS_ATTRIBUTE rather than DEFINE_SIMPLE_ATTRIBUTE
+>   for debugfs files.
+>
+> which seems to be also affected in net/6lowpan/debugfs.c and
+> net/bluetooth/hci_debugfs.c
+>
+> - Alex
 > --
-> 2.8.1
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-This still seems to be broken.
+
 
 -- 
 Luiz Augusto von Dentz
