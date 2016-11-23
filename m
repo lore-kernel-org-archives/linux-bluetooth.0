@@ -1,118 +1,111 @@
-Return-Path: <akarwar@marvell.com>
-From: Amitkumar Karwar <akarwar@marvell.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+Return-Path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain; charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 10.1 \(3251\))
+Subject: Re: [PATCH] btusb: fix zero BD address problem during stress test
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <3926ae98e84248eaa53999e4d466b189@SC-EXCH04.marvell.com>
+Date: Wed, 23 Nov 2016 09:16:04 +0100
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Cathy Luo
-	<cluo@marvell.com>,
+        Cathy Luo <cluo@marvell.com>,
         Nishant Sarmukadam <nishants@marvell.com>,
-        Ganapathi Bhat
-	<gbhat@marvell.com>
-Subject: RE: [PATCH] btusb: fix zero BD address problem during stress test
-Date: Wed, 23 Nov 2016 09:44:15 +0000
-Message-ID: <1f1f6e030882485eb9f0a5b2b00ffe2a@SC-EXCH04.marvell.com>
+        Ganapathi Bhat <gbhat@marvell.com>
+Message-Id: <0175091F-6B2E-49CE-B099-FC6D35C9C1BF@holtmann.org>
 References: <1476795449-20592-1-git-send-email-akarwar@marvell.com>
  <a23725dc02bb48deb00e5f9c8043bc3c@SC-EXCH04.marvell.com>
  <077FBE27-DA84-4F11-BC69-F38184CE6B40@holtmann.org>
  <3926ae98e84248eaa53999e4d466b189@SC-EXCH04.marvell.com>
- <0175091F-6B2E-49CE-B099-FC6D35C9C1BF@holtmann.org>
-In-Reply-To: <0175091F-6B2E-49CE-B099-FC6D35C9C1BF@holtmann.org>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
+To: Amitkumar Karwar <akarwar@marvell.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgTWFyY2VsLA0KDQo+IEZyb206IE1hcmNlbCBIb2x0bWFubiBbbWFpbHRvOm1hcmNlbEBob2x0
-bWFubi5vcmddDQo+IFNlbnQ6IFdlZG5lc2RheSwgTm92ZW1iZXIgMjMsIDIwMTYgMTo0NiBQTQ0K
-PiBUbzogQW1pdGt1bWFyIEthcndhcg0KPiBDYzogbGludXgtYmx1ZXRvb3RoQHZnZXIua2VybmVs
-Lm9yZzsgbGludXgta2VybmVsQHZnZXIua2VybmVsLm9yZzsNCj4gQ2F0aHkgTHVvOyBOaXNoYW50
-IFNhcm11a2FkYW07IEdhbmFwYXRoaSBCaGF0DQo+IFN1YmplY3Q6IFJlOiBbUEFUQ0hdIGJ0dXNi
-OiBmaXggemVybyBCRCBhZGRyZXNzIHByb2JsZW0gZHVyaW5nIHN0cmVzcw0KPiB0ZXN0DQo+IA0K
-PiBIaSBBbWl0a3VtYXIsDQo+IA0KPiA+Pj4+IEZyb206IEFtaXRrdW1hciBLYXJ3YXIgW21haWx0
-bzpha2Fyd2FyQG1hcnZlbGwuY29tXQ0KPiA+Pj4+IFNlbnQ6IFR1ZXNkYXksIE9jdG9iZXIgMTgs
-IDIwMTYgNjoyNyBQTQ0KPiA+Pj4+IFRvOiBsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3Jn
-DQo+ID4+Pj4gQ2M6IG1hcmNlbEBob2x0bWFubi5vcmc7IGxpbnV4LWtlcm5lbEB2Z2VyLmtlcm5l
-bC5vcmc7IENhdGh5IEx1bzsNCj4gPj4+PiBOaXNoYW50IFNhcm11a2FkYW07IEdhbmFwYXRoaSBC
-aGF0OyBBbWl0a3VtYXIgS2Fyd2FyDQo+ID4+Pj4gU3ViamVjdDogW1BBVENIXSBidHVzYjogZml4
-IHplcm8gQkQgYWRkcmVzcyBwcm9ibGVtIGR1cmluZyBzdHJlc3MNCj4gPj4+PiB0ZXN0DQo+ID4+
-Pj4NCj4gPj4+PiBGcm9tOiBHYW5hcGF0aGkgQmhhdCA8Z2JoYXRAbWFydmVsbC5jb20+DQo+ID4+
-Pj4NCj4gPj4+PiBXZSBjYW1lIGFjcm9zcyBhIGNvcm5lciBjYXNlIGlzc3VlIGR1cmluZyByZWJv
-b3Qgc3RyZXNzIHRlc3QgaW4NCj4gPj4gd2hpY2gNCj4gPj4+PiBoY2ljb25maWcgc2hvd3MgQkQg
-YWRkcmVzcyBpcyBhbGwgemVyby4gUmVhc29uIGlzIHdlIGRvbid0IGdldA0KPiA+Pj4+IHJlc3Bv
-bnNlIGZvciBIQ0kgUkVTRVQgY29tbWFuZCBkdXJpbmcgaW5pdGlhbGl6YXRpb24NCj4gPj4+Pg0K
-PiA+Pj4+IFRoZSBpc3N1ZSBpcyB0cmFja2VkIHRvIGEgcmFjZSB3aGVyZSBVU0Igc3Vic3lzdGVt
-IGNhbGxzDQo+ID4+Pj4gYnR1c2JfaW50cl9jb21wbGV0ZSgpIHRvIGRlbGl2ZXIgYSBkYXRhKE5P
-T1AgZnJhbWUpIHJlY2VpdmVkIG9uDQo+ID4+Pj4gaW50ZXJydXB0IGVuZHBvaW50LiBIQ0lfUlVO
-TklORyBmbGFnIGlzIG5vdCB5ZXQgc2V0IGJ5IGJsdWV0b290aA0KPiA+Pj4+IHN1YnN5c3RlbS4g
-U28gd2UgaWdub3JlIHRoYXQgZnJhbWUgYW5kIHJldHVybi4NCj4gPj4+Pg0KPiA+Pj4+IEFzIHdl
-IG1pc3NlZCB0byByZXN1Ym1pdCB0aGUgYnVmZmVyIHRvIGludGVycnVwdCBlbmRwb2ludCBpbiB0
-aGlzDQo+ID4+Pj4gY2FzZSwgd2UgZG9uJ3QgZ2V0IHJlc3BvbnNlIGZvciBCVCByZXNldCBjb21t
-YW5kIGRvd25sb2FkZWQgYWZ0ZXINCj4gPj4gdGhpcy4NCj4gPj4+Pg0KPiA+Pj4+IFRoaXMgcGF0
-Y2ggaGFuZGxlcyB0aGUgY29ybmVyIGNhc2UgdG8gcmVzb2x2ZSB6ZXJvIEJEIGFkZHJlc3MNCj4g
-Pj4gcHJvYmxlbS4NCj4gPj4+Pg0KPiA+Pj4+IFNpZ25lZC1vZmYtYnk6IEdhbmFwYXRoaSBCaGF0
-IDxnYmhhdEBtYXJ2ZWxsLmNvbT4NCj4gPj4+PiBTaWduZWQtb2ZmLWJ5OiBBbWl0a3VtYXIgS2Fy
-d2FyIDxha2Fyd2FyQG1hcnZlbGwuY29tPg0KPiA+Pj4+IC0tLQ0KPiA+Pj4+IGRyaXZlcnMvYmx1
-ZXRvb3RoL2J0dXNiLmMgfCA1ICstLS0tDQo+ID4+Pj4gMSBmaWxlIGNoYW5nZWQsIDEgaW5zZXJ0
-aW9uKCspLCA0IGRlbGV0aW9ucygtKQ0KPiA+Pj4+DQo+ID4+Pj4gZGlmZiAtLWdpdCBhL2RyaXZl
-cnMvYmx1ZXRvb3RoL2J0dXNiLmMgYi9kcml2ZXJzL2JsdWV0b290aC9idHVzYi5jDQo+ID4+Pj4g
-aW5kZXggODExZjliOS4uYjU1OTZhYyAxMDA2NDQNCj4gPj4+PiAtLS0gYS9kcml2ZXJzL2JsdWV0
-b290aC9idHVzYi5jDQo+ID4+Pj4gKysrIGIvZHJpdmVycy9ibHVldG9vdGgvYnR1c2IuYw0KPiA+
-Pj4+IEBAIC02MDcsMTAgKzYwNyw3IEBAIHN0YXRpYyB2b2lkIGJ0dXNiX2ludHJfY29tcGxldGUo
-c3RydWN0IHVyYg0KPiA+PiAqdXJiKQ0KPiA+Pj4+IAlCVF9EQkcoIiVzIHVyYiAlcCBzdGF0dXMg
-JWQgY291bnQgJWQiLCBoZGV2LT5uYW1lLCB1cmIsIHVyYi0NCj4gPj4+Pj4gc3RhdHVzLA0KPiA+
-Pj4+IAkgICAgICAgdXJiLT5hY3R1YWxfbGVuZ3RoKTsNCj4gPj4+Pg0KPiA+Pj4+IC0JaWYgKCF0
-ZXN0X2JpdChIQ0lfUlVOTklORywgJmhkZXYtPmZsYWdzKSkNCj4gPj4+PiAtCQlyZXR1cm47DQo+
-ID4+Pj4gLQ0KPiA+Pj4+IC0JaWYgKHVyYi0+c3RhdHVzID09IDApIHsNCj4gPj4+PiArCWlmICh1
-cmItPnN0YXR1cyA9PSAwICYmIHRlc3RfYml0KEhDSV9SVU5OSU5HLCAmaGRldi0NCj4gPmZsYWdz
-KSkgew0KPiA+Pj4+IAkJaGRldi0+c3RhdC5ieXRlX3J4ICs9IHVyYi0+YWN0dWFsX2xlbmd0aDsN
-Cj4gPj4+Pg0KPiA+Pj4+IAkJaWYgKGJ0dXNiX3JlY3ZfaW50cihkYXRhLCB1cmItPnRyYW5zZmVy
-X2J1ZmZlciwNCj4gPj4+DQo+ID4+PiBEaWQgeW91IGdldCBhIGNoYW5jZSB0byBjaGVjayB0aGlz
-Pw0KPiA+Pj4gUGxlYXNlIGxldCB1cyBrbm93IGlmIHlvdSBoYXZlIGFueSByZXZpZXcgY29tbWVu
-dHMuDQo+ID4+DQo+ID4+IGNhbiB5b3UgZXhwbGFpbiBob3cgdGhpcyBpcyBjb3JyZWN0IGFuZCBz
-aG93IG1lIHRoZSBIQ0kgdHJhY2VzIGZvcg0KPiA+PiB0aGlzLg0KPiA+Pg0KPiA+DQo+ID4gSSBz
-dXBwb3NlIEhDSSB0cmFjZSBtZWFucyBoY2lkdW1wIGxvZ3MgaGVyZS4gQXMgZGV2aWNlIGhhc24n
-dCB5ZXQNCj4gaW5pdGlhbGl6ZWQsIGhjaWR1bXAgd29uJ3Qgc2hvdyBhbnl0aGluZy4NCj4gPiBX
-ZSBoYWQgYWRkZWQgZGVidWcgaW5mbyBpbiBidHVzYiBkcml2ZXIgdG8gdHJhY2UgdGhlIGRhdGEg
-cmVjZWl2ZWQgb24NCj4gYWxsIFVTQiBlbmRwb2ludHMgYW5kIGFsc28gY2hlY2tlZCB1c2Jtb24g
-bG9ncy4NCj4gDQo+IHVzZSBidG1vbiBhbmQgaXQgd2lsbCBzaG93IGl0Lg0KPiANCj4gPiBIZXJl
-IGlzIHRoZSBzZXF1ZW5jZSBvZiBldmVudHMgd2Ugb2JzZXJ2ZWQgaW4gYSBjb3JuZXIgY2FzZSB3
-aGlsZQ0KPiBydW5uaW5nIHN0cmVzcyB0ZXN0Lg0KPiA+IDEpIEluc2lkZSBidHVzYl9vcGVuKCkg
-Y2FsbCAtLS0tLS0gVGhyZWFkIDENCj4gPiAyKSBidHVzYl9zdWJtaXRfaW50cl91cmIoKSBzdWJt
-aXRzIHRoZSBVUkIgZm9yIHJlY2VpdmluZyBkYXRhIG9uDQo+ID4gaW50ZXJydXB0IGVuZHBvaW50
-IC0tLS0gVGhyZWFkIDENCj4gPiAzKSBidHVzYl9pbnRyX2NvbXBsZXRlKCkgZ2V0cyBjYWxsZWQg
-dG8gZGVsaXZlciBOT1AgZnJhbWUgZnJvbSBIQ0kNCj4gPiBjb250cm9sbGVyIC0tLS0gVGhyZWFk
-IDINCj4gPiA0KSBIQ0lfUlVOTklORyBpc24ndCBzZXQgeWV0LiBTbyB3ZSByZXR1cm4gZnJvbSBi
-dHVzYl9pbnRyX2NvbXBsZXRlKCkNCj4gPiB3aXRob3V0IHJlc3VibWl0dGluZyB0aGUgYnVmZmVy
-IC0tLSBUaHJlYWQgMg0KPiA+IDUpIEV4aXQgYnR1c2Jfb3BlbigpIC0tLS0gVGhyZWFkIDENCj4g
-PiA2KSAic2V0X2JpdChIQ0lfUlVOTklORywgJmhkZXYtPmZsYWdzKSIgZG9uZSBieSBibHVldG9v
-dGggY29yZSAtLS0tDQo+ID4gVGhyZWFkIDENCj4gPg0KPiA+IExhdGVyIEhDSV9SRVNFVCBjb21t
-YW5kIGdldHMgdGltZWRvdXQsIGFzIHdlIGhhdmVuJ3QgcmUtc3VibWl0dGVkDQo+IGJ1ZmZlciBm
-b3IgaW50ZXJydXB0IGVuZHBvaW50IGluIHN0ZXAgKDQpIGFib3ZlLg0KPiA+DQo+ID4gUGxlYXNl
-IGZpbmQgYXR0YWNoZWQgbG9ncy4gdXNibW9uIGxvZyBzaG93cyBmaXJzdCBmcmFtZSByZWNlaXZl
-ZCBvbg0KPiBpbnRlcnJ1cHQgZW5kcG9pbnQgaXMgTk9QKFNlYXJjaCBmb3IgTWFydmVsbCBpbiBs
-b2cpLg0KPiA+DQo+ID4gSGVyZSBpcyB3aGF0IGJsdWV0b290aCBzcGVjIHNheXMgYWJvdXQgTk9Q
-IGZyYW1lLg0KPiA+DQo+ID4gIlRvIGluZGljYXRlIHRvIHRoZSBIb3N0IHRoYXQgdGhlIENvbnRy
-b2xsZXIgaXMgcmVhZHkgdG8gcmVjZWl2ZSBIQ0kNCj4gPiBjb21tYW5kIHBhY2tldHMsIHRoZSBD
-b250cm9sbGVyIGdlbmVyYXRlcyBhIENvbW1hbmQgU3RhdHVzIGV2ZW50IHdpdGgNCj4gPiBTdGF0
-dXMgMHgwMCBhbmQgQ29tbWFuZF9PcGNvZGUgMHgwMDAwLCBhbmQgdGhlDQo+IE51bV9IQ0lfQ29t
-bWFuZF9QYWNrZXRzDQo+ID4gZXZlbnQgcGFyYW1ldGVyIGlzIHNldCB0byAxIG9yIG1vcmUuIENv
-bW1hbmRfT3Bjb2RlLCAweDAwMDAgaXMgYSBOT1ANCj4gKE5vIE9wZXJhdGlvbinigJ0NCj4gDQo+
-IFNvIEkgd29uZGVyIGlmIHdlIG5lZWQgdG8gcmVtb3ZlIHRoZSBIQ0lfUlVOTklORyBsb2dpYyBm
-cm9tIHRoZQ0KPiBkcml2ZXJzLiBJdCBpcyBvbmx5IGxlZnQgaW4gYSBmZXcgVVNCIGRyaXZlcnMg
-YW5kIEkgcmVtb3ZlZCB0aGUgcmVzdA0KPiBhbmQgbW92ZWQgaXQgaW50byB0aGUgY29yZS4gSSBh
-bSBub3QgaW4gZmF2b3VyIG9mIHBhcGVyaW5nIG92ZXIgdGhpcw0KPiBpc3N1ZS4gSSBuZWVkIHRv
-IHVuZGVyc3RhbmQgd2hhdCBpcyB3cm9uZy4gQW5kIGFjdHVhbGx5IEhDSV9SVU5OSU5HDQo+IG5l
-ZWRzIHRvIGJlIHRha2VuIGF3YXkgZnJvbSB0aGUgZHJpdmVycy4gU28gdGhlIHF1ZXN0aW9uIGlz
-IGlmIGJ0dXNiLmMNCj4gc3RpbGwgbmVlZHMgaXQgb3IgaWYgdGhhdCBpcyBqdXN0IGEgbGVmdG92
-ZXIuIE1lYW5pbmcgaXMgaXQgcHJvdGVjdGluZw0KPiBhbnl0aGluZz8NCj4gDQoNCkkgY2FuIHNl
-ZSBIQ0lfUlVOTklORyBjaGVjayBiZWluZyB1c2VkIGF0IGJlbG93IHBsYWNlcyBpbiBidHVzYi5j
-DQoNCjEpIGJ0dXNiX2ludHJfY29tcGxldGUNCjIpIGJ0dXNiX2J1bGtfY29tcGxldGUNCjMpIGJ0
-dXNiX2lzb2NfY29tcGxldGUNCjQpIGJ0dXNiX3R4X2NvbXBsZXRlDQo1KSBidHVzYl9pc29jX3R4
-X2NvbXBsZXRlDQo2KSBidHVzYl9iY21fc2V0X2RpYWcNCjcpIGJ0dXNiX3Jlc3VtZQ0KDQpJIHRo
-aW5rLCBpdCBjYW4gYmUgcmVtb3ZlZCBmcm9tICgxKSwgKDIpIGFuZCAoMyksIGFzIHdlIGFscmVh
-ZHkgaGF2ZSBiZWxvdyBjaGVjayBpbnNpZGUgaGNpX3JlY3ZfZnJhbWUoKSANCg0KICAgICAgICBp
-ZiAoIWhkZXYgfHwgKCF0ZXN0X2JpdChIQ0lfVVAsICZoZGV2LT5mbGFncykNCiAgICAgICAgICAg
-ICAgICAgICAgICAmJiAhdGVzdF9iaXQoSENJX0lOSVQsICZoZGV2LT5mbGFncykpKSB7DQogICAg
-ICAgICAgICAgICAga2ZyZWVfc2tiKHNrYik7DQogICAgICAgICAgICAgICAgcmV0dXJuIC1FTlhJ
-TzsNCiAgICAgICAgfQ0KDQpGb3IgKDQpIGFuZCAoNSksIGl0J3MganVzdCB1c2VkIHRvIGRlY2lk
-ZSBpZiB3ZSBzaG91bGQgdXBkYXRlICJoZGV2LT5zdGF0IiBvciBub3QuDQoNClJlZ2FyZHMsDQpB
-bWl0a3VtYXINCg==
+Hi Amitkumar,
+
+>>>> From: Amitkumar Karwar [mailto:akarwar@marvell.com]
+>>>> Sent: Tuesday, October 18, 2016 6:27 PM
+>>>> To: linux-bluetooth@vger.kernel.org
+>>>> Cc: marcel@holtmann.org; linux-kernel@vger.kernel.org; Cathy Luo;
+>>>> Nishant Sarmukadam; Ganapathi Bhat; Amitkumar Karwar
+>>>> Subject: [PATCH] btusb: fix zero BD address problem during stress
+>>>> test
+>>>> 
+>>>> From: Ganapathi Bhat <gbhat@marvell.com>
+>>>> 
+>>>> We came across a corner case issue during reboot stress test in
+>> which
+>>>> hciconfig shows BD address is all zero. Reason is we don't get
+>>>> response for HCI RESET command during initialization
+>>>> 
+>>>> The issue is tracked to a race where USB subsystem calls
+>>>> btusb_intr_complete() to deliver a data(NOOP frame) received on
+>>>> interrupt endpoint. HCI_RUNNING flag is not yet set by bluetooth
+>>>> subsystem. So we ignore that frame and return.
+>>>> 
+>>>> As we missed to resubmit the buffer to interrupt endpoint in this
+>>>> case, we don't get response for BT reset command downloaded after
+>> this.
+>>>> 
+>>>> This patch handles the corner case to resolve zero BD address
+>> problem.
+>>>> 
+>>>> Signed-off-by: Ganapathi Bhat <gbhat@marvell.com>
+>>>> Signed-off-by: Amitkumar Karwar <akarwar@marvell.com>
+>>>> ---
+>>>> drivers/bluetooth/btusb.c | 5 +----
+>>>> 1 file changed, 1 insertion(+), 4 deletions(-)
+>>>> 
+>>>> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+>>>> index 811f9b9..b5596ac 100644
+>>>> --- a/drivers/bluetooth/btusb.c
+>>>> +++ b/drivers/bluetooth/btusb.c
+>>>> @@ -607,10 +607,7 @@ static void btusb_intr_complete(struct urb
+>> *urb)
+>>>> 	BT_DBG("%s urb %p status %d count %d", hdev->name, urb, urb-
+>>>>> status,
+>>>> 	       urb->actual_length);
+>>>> 
+>>>> -	if (!test_bit(HCI_RUNNING, &hdev->flags))
+>>>> -		return;
+>>>> -
+>>>> -	if (urb->status == 0) {
+>>>> +	if (urb->status == 0 && test_bit(HCI_RUNNING, &hdev->flags)) {
+>>>> 		hdev->stat.byte_rx += urb->actual_length;
+>>>> 
+>>>> 		if (btusb_recv_intr(data, urb->transfer_buffer,
+>>> 
+>>> Did you get a chance to check this?
+>>> Please let us know if you have any review comments.
+>> 
+>> can you explain how this is correct and show me the HCI traces for
+>> this.
+>> 
+> 
+> I suppose HCI trace means hcidump logs here. As device hasn't yet initialized, hcidump won't show anything.
+> We had added debug info in btusb driver to trace the data received on all USB endpoints and also checked usbmon logs.
+
+use btmon and it will show it.
+
+> Here is the sequence of events we observed in a corner case while running stress test.
+> 1) Inside btusb_open() call ------ Thread 1
+> 2) btusb_submit_intr_urb() submits the URB for receiving data on interrupt endpoint ---- Thread 1
+> 3) btusb_intr_complete() gets called to deliver NOP frame from HCI controller ---- Thread 2
+> 4) HCI_RUNNING isn't set yet. So we return from btusb_intr_complete() without resubmitting the buffer --- Thread 2
+> 5) Exit btusb_open() ---- Thread 1
+> 6) "set_bit(HCI_RUNNING, &hdev->flags)" done by bluetooth core ---- Thread 1
+> 
+> Later HCI_RESET command gets timedout, as we haven't re-submitted buffer for interrupt endpoint in step (4) above.
+> 
+> Please find attached logs. usbmon log shows first frame received on interrupt endpoint is NOP(Search for Marvell in log).
+> 
+> Here is what bluetooth spec says about NOP frame.
+> 
+> "To indicate to the Host that the Controller is ready to receive HCI command packets,
+> the Controller generates a Command Status event with Status 0x00 and
+> Command_Opcode 0x0000, and the Num_HCI_Command_Packets event
+> parameter is set to 1 or more. Command_Opcode, 0x0000 is a NOP (No Operation)”
+
+So I wonder if we need to remove the HCI_RUNNING logic from the drivers. It is only left in a few USB drivers and I removed the rest and moved it into the core. I am not in favour of papering over this issue. I need to understand what is wrong. And actually HCI_RUNNING needs to be taken away from the drivers. So the question is if btusb.c still needs it or if that is just a leftover. Meaning is it protecting anything?
+
+Regards
+
+Marcel
