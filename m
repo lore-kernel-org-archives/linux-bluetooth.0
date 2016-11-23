@@ -1,25 +1,34 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Date: Wed, 23 Nov 2016 16:40:13 -0500
-From: Don Zickus <dzickus@redhat.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: d-bus or management api for beacon stuff
-Message-ID: <20161123214013.GZ35881@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <geliangtang@gmail.com>
+From: Geliang Tang <geliangtang@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>
+Cc: Geliang Tang <geliangtang@gmail.com>,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] Bluetooth: btmrvl: drop duplicate header slab.h
+Date: Wed, 23 Nov 2016 23:14:01 +0800
+Message-Id: <b8d01e387dcb3e909041baeea25b8bf81ad481a1.1479913974.git.geliangtang@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Drop duplicate header slab.h from btmrvl_drv.h.
 
-I was trying to write some code to continuously scan the bluetooth field
-for bluetooth devices sending advertising packets (ie beacon-mode).
+Signed-off-by: Geliang Tang <geliangtang@gmail.com>
+---
+ drivers/bluetooth/btmrvl_drv.h | 1 -
+ 1 file changed, 1 deletion(-)
 
-These devices would come and go so I wanted to avoid the cache.
-
-I noticed the D-Bus interface doesn't quite allow me to do this (as it
-caches the devices and I can't monitor the RSSI field).  But I think the
-bluetooth management interface does. Is that the correct approach?
-
-Cheers,
-Don
-
+diff --git a/drivers/bluetooth/btmrvl_drv.h b/drivers/bluetooth/btmrvl_drv.h
+index f742384..fc3caf4 100644
+--- a/drivers/bluetooth/btmrvl_drv.h
++++ b/drivers/bluetooth/btmrvl_drv.h
+@@ -32,7 +32,6 @@
+ #include <linux/of_platform.h>
+ #include <linux/platform_device.h>
+ #include <linux/pm_runtime.h>
+-#include <linux/slab.h>
+ #include <linux/of_irq.h>
+ 
+ #define BTM_HEADER_LEN			4
+-- 
+2.9.3
