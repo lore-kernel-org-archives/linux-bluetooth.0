@@ -1,52 +1,60 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Message-ID: <1480017363.31899.20.camel@interlinx.bc.ca>
-Subject: HSP unavailable on power up
-From: "Brian J. Murrell" <brian@interlinx.bc.ca>
-To: linux-bluetooth@vger.kernel.org
-Date: Thu, 24 Nov 2016 14:56:03 -0500
-Content-Type: multipart/signed; micalg="pgp-sha256";
-        protocol="application/pgp-signature"; boundary="=-wed8JhJC4zeReQeVw+au"
-Mime-Version: 1.0
+MIME-Version: 1.0
+In-Reply-To: <20161123214013.GZ35881@redhat.com>
+References: <20161123214013.GZ35881@redhat.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Thu, 24 Nov 2016 15:07:21 +0200
+Message-ID: <CABBYNZKYf3b8zTzGFNqd_3LGxYZkgo_g4LRs=jf=_qYS3fj1vA@mail.gmail.com>
+Subject: Re: d-bus or management api for beacon stuff
+To: Don Zickus <dzickus@redhat.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Don,
 
---=-wed8JhJC4zeReQeVw+au
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+On Wed, Nov 23, 2016 at 11:40 PM, Don Zickus <dzickus@redhat.com> wrote:
+> Hi,
+>
+> I was trying to write some code to continuously scan the bluetooth field
+> for bluetooth devices sending advertising packets (ie beacon-mode).
 
-Hi,
+That is tricky, if you have anyone else trying to use the adapter in
+this situation it will probably be blocked, we may add support for
+setting intervals but that will probably be a best effort in case
+there is no connection or other usage of the adapter by the system.
 
-I'm using Bluez 5.43 on Fedora 24.
+> These devices would come and go so I wanted to avoid the cache.
 
-Whenever I turn on my bluetooth headset, PA reports that the HSP
-profile is not available. =C2=A0I have to disconnect and then reconnect (as
-handsfree) my headset device in order to have the HSP profile be
-available.
+Beacon are not normally not connectable, connections and continuous
+advertisement don't go well together so we will probably have to
+reduce the intervals in order to maintain any traffic on the
+connections.
 
-Any idea what the problem is here? =C2=A0I am sure you will want more
-information so just tell me what you want me to provide and I'll be
-more than happy.
+> I noticed the D-Bus interface doesn't quite allow me to do this (as it
+> caches the devices and I can't monitor the RSSI field).  But I think the
+> bluetooth management interface does. Is that the correct approach?
 
-Cheers,
-b.
+Yep you could in theory use the MGMT interface and manually add you
+beacon management on top, but I guess you don't want applications to
+do that since it would require root permissions to connect to the
+management socket, so making bluetoothd, via kernel?, to adjust the
+intervals is probably a better idea in the long run. We would probably
+have to maintain the biggest advertising window possible, and the
+consider:
 
---=-wed8JhJC4zeReQeVw+au
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
-Content-Transfer-Encoding: 7bit
+1.  Is it connectable/there any advertising instance that is
+connectable? If yes, the it has to adjust the window to allow them
+(perhaps using the default connection parameters).
+2.  In case of a connection is made the controller may not be able to
+advertise anymore, and in case it can still advertise we need to make
+sure it doesn't interrupt the connection (this is not very clear if
+the controller is suppose to manage this somehow).
+3. Similar to the connection situation we may have application
+scanning, again there might be problems if the controller cannot scan
+while advertising we would probably have to stop advertising.
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
 
-iQEcBAABCAAGBQJYN0XTAAoJENrB0DQWy8ig68cIAIu9Lppje+88BUXVYsjn8NeC
-vI1LXFKL8HDyI+GDj0wDvPk3ZvTFZB05RKdqBqg8O2yCFOn8QWCd6C5kCluodh3A
-25rMHtVtuUnndontFvwVPDDtJakVgsFS3tKu1Aav7e9FnNns1NStFAYlwZZy8A96
-nymhFEgJyZDs6+vu7vhIRp92Pz/49a9w0I7JAPIrxqRjF3XG14l9r2UoVYkS0qde
-78M6bolgtRThnctwmMNwuhKkljGlUNLr6YdazRyvia5EHbKEliyEr+0EnbCK5hZG
-OpLoq2bnu6Pi9ErPbeHEq3p2B/9wdwlxfAYmRrlvi71Poo7XP+3O6Ej6oIUUXas=
-=EXdm
------END PGP SIGNATURE-----
-
---=-wed8JhJC4zeReQeVw+au--
-
+-- 
+Luiz Augusto von Dentz
