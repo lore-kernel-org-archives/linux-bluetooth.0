@@ -1,140 +1,72 @@
-Return-Path: <akarwar@marvell.com>
-From: Amitkumar Karwar <akarwar@marvell.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Cathy Luo
-	<cluo@marvell.com>,
-        Nishant Sarmukadam <nishants@marvell.com>,
-        Ganapathi Bhat
-	<gbhat@marvell.com>
-Subject: RE: [PATCH] btusb: fix zero BD address problem during stress test
-Date: Fri, 25 Nov 2016 11:21:19 +0000
-Message-ID: <e54bd46310454e50bca410e67b6a0fb2@SC-EXCH04.marvell.com>
-References: <1476795449-20592-1-git-send-email-akarwar@marvell.com>
- <a23725dc02bb48deb00e5f9c8043bc3c@SC-EXCH04.marvell.com>
- <077FBE27-DA84-4F11-BC69-F38184CE6B40@holtmann.org>
- <3926ae98e84248eaa53999e4d466b189@SC-EXCH04.marvell.com>
- <0175091F-6B2E-49CE-B099-FC6D35C9C1BF@holtmann.org>
-Content-Type: text/plain; charset="utf-8"
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: bugzilla-daemon@bugzilla.kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [Bug 188551] New: Function bpa10x_send_frame() does not return a
+ negative error code when the call to usb_submit_urb() fails.
+Date: Fri, 25 Nov 2016 10:32:49 +0000
+Message-ID: <bug-188551-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
 MIME-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgTWFyY2VsLA0KDQo+IEZyb206IEFtaXRrdW1hciBLYXJ3YXINCj4gU2VudDogV2VkbmVzZGF5
-LCBOb3ZlbWJlciAyMywgMjAxNiAzOjE0IFBNDQo+IFRvOiAnTWFyY2VsIEhvbHRtYW5uJw0KPiBD
-YzogbGludXgtYmx1ZXRvb3RoQHZnZXIua2VybmVsLm9yZzsgbGludXgta2VybmVsQHZnZXIua2Vy
-bmVsLm9yZzsNCj4gQ2F0aHkgTHVvOyBOaXNoYW50IFNhcm11a2FkYW07IEdhbmFwYXRoaSBCaGF0
-DQo+IFN1YmplY3Q6IFJFOiBbUEFUQ0hdIGJ0dXNiOiBmaXggemVybyBCRCBhZGRyZXNzIHByb2Js
-ZW0gZHVyaW5nIHN0cmVzcw0KPiB0ZXN0DQo+IA0KPiBIaSBNYXJjZWwsDQo+IA0KPiA+IEZyb206
-IE1hcmNlbCBIb2x0bWFubiBbbWFpbHRvOm1hcmNlbEBob2x0bWFubi5vcmddDQo+ID4gU2VudDog
-V2VkbmVzZGF5LCBOb3ZlbWJlciAyMywgMjAxNiAxOjQ2IFBNDQo+ID4gVG86IEFtaXRrdW1hciBL
-YXJ3YXINCj4gPiBDYzogbGludXgtYmx1ZXRvb3RoQHZnZXIua2VybmVsLm9yZzsgbGludXgta2Vy
-bmVsQHZnZXIua2VybmVsLm9yZzsNCj4gPiBDYXRoeSBMdW87IE5pc2hhbnQgU2FybXVrYWRhbTsg
-R2FuYXBhdGhpIEJoYXQNCj4gPiBTdWJqZWN0OiBSZTogW1BBVENIXSBidHVzYjogZml4IHplcm8g
-QkQgYWRkcmVzcyBwcm9ibGVtIGR1cmluZyBzdHJlc3MNCj4gPiB0ZXN0DQo+ID4NCj4gPiBIaSBB
-bWl0a3VtYXIsDQo+ID4NCj4gPiA+Pj4+IEZyb206IEFtaXRrdW1hciBLYXJ3YXIgW21haWx0bzph
-a2Fyd2FyQG1hcnZlbGwuY29tXQ0KPiA+ID4+Pj4gU2VudDogVHVlc2RheSwgT2N0b2JlciAxOCwg
-MjAxNiA2OjI3IFBNDQo+ID4gPj4+PiBUbzogbGludXgtYmx1ZXRvb3RoQHZnZXIua2VybmVsLm9y
-Zw0KPiA+ID4+Pj4gQ2M6IG1hcmNlbEBob2x0bWFubi5vcmc7IGxpbnV4LWtlcm5lbEB2Z2VyLmtl
-cm5lbC5vcmc7IENhdGh5DQo+IEx1bzsNCj4gPiA+Pj4+IE5pc2hhbnQgU2FybXVrYWRhbTsgR2Fu
-YXBhdGhpIEJoYXQ7IEFtaXRrdW1hciBLYXJ3YXINCj4gPiA+Pj4+IFN1YmplY3Q6IFtQQVRDSF0g
-YnR1c2I6IGZpeCB6ZXJvIEJEIGFkZHJlc3MgcHJvYmxlbSBkdXJpbmcNCj4gc3RyZXNzDQo+ID4g
-Pj4+PiB0ZXN0DQo+ID4gPj4+Pg0KPiA+ID4+Pj4gRnJvbTogR2FuYXBhdGhpIEJoYXQgPGdiaGF0
-QG1hcnZlbGwuY29tPg0KPiA+ID4+Pj4NCj4gPiA+Pj4+IFdlIGNhbWUgYWNyb3NzIGEgY29ybmVy
-IGNhc2UgaXNzdWUgZHVyaW5nIHJlYm9vdCBzdHJlc3MgdGVzdCBpbg0KPiA+ID4+IHdoaWNoDQo+
-ID4gPj4+PiBoY2ljb25maWcgc2hvd3MgQkQgYWRkcmVzcyBpcyBhbGwgemVyby4gUmVhc29uIGlz
-IHdlIGRvbid0IGdldA0KPiA+ID4+Pj4gcmVzcG9uc2UgZm9yIEhDSSBSRVNFVCBjb21tYW5kIGR1
-cmluZyBpbml0aWFsaXphdGlvbg0KPiA+ID4+Pj4NCj4gPiA+Pj4+IFRoZSBpc3N1ZSBpcyB0cmFj
-a2VkIHRvIGEgcmFjZSB3aGVyZSBVU0Igc3Vic3lzdGVtIGNhbGxzDQo+ID4gPj4+PiBidHVzYl9p
-bnRyX2NvbXBsZXRlKCkgdG8gZGVsaXZlciBhIGRhdGEoTk9PUCBmcmFtZSkgcmVjZWl2ZWQgb24N
-Cj4gPiA+Pj4+IGludGVycnVwdCBlbmRwb2ludC4gSENJX1JVTk5JTkcgZmxhZyBpcyBub3QgeWV0
-IHNldCBieSBibHVldG9vdGgNCj4gPiA+Pj4+IHN1YnN5c3RlbS4gU28gd2UgaWdub3JlIHRoYXQg
-ZnJhbWUgYW5kIHJldHVybi4NCj4gPiA+Pj4+DQo+ID4gPj4+PiBBcyB3ZSBtaXNzZWQgdG8gcmVz
-dWJtaXQgdGhlIGJ1ZmZlciB0byBpbnRlcnJ1cHQgZW5kcG9pbnQgaW4NCj4gdGhpcw0KPiA+ID4+
-Pj4gY2FzZSwgd2UgZG9uJ3QgZ2V0IHJlc3BvbnNlIGZvciBCVCByZXNldCBjb21tYW5kIGRvd25s
-b2FkZWQNCj4gYWZ0ZXINCj4gPiA+PiB0aGlzLg0KPiA+ID4+Pj4NCj4gPiA+Pj4+IFRoaXMgcGF0
-Y2ggaGFuZGxlcyB0aGUgY29ybmVyIGNhc2UgdG8gcmVzb2x2ZSB6ZXJvIEJEIGFkZHJlc3MNCj4g
-PiA+PiBwcm9ibGVtLg0KPiA+ID4+Pj4NCj4gPiA+Pj4+IFNpZ25lZC1vZmYtYnk6IEdhbmFwYXRo
-aSBCaGF0IDxnYmhhdEBtYXJ2ZWxsLmNvbT4NCj4gPiA+Pj4+IFNpZ25lZC1vZmYtYnk6IEFtaXRr
-dW1hciBLYXJ3YXIgPGFrYXJ3YXJAbWFydmVsbC5jb20+DQo+ID4gPj4+PiAtLS0NCj4gPiA+Pj4+
-IGRyaXZlcnMvYmx1ZXRvb3RoL2J0dXNiLmMgfCA1ICstLS0tDQo+ID4gPj4+PiAxIGZpbGUgY2hh
-bmdlZCwgMSBpbnNlcnRpb24oKyksIDQgZGVsZXRpb25zKC0pDQo+ID4gPj4+Pg0KPiA+ID4+Pj4g
-ZGlmZiAtLWdpdCBhL2RyaXZlcnMvYmx1ZXRvb3RoL2J0dXNiLmMNCj4gPiA+Pj4+IGIvZHJpdmVy
-cy9ibHVldG9vdGgvYnR1c2IuYyBpbmRleCA4MTFmOWI5Li5iNTU5NmFjIDEwMDY0NA0KPiA+ID4+
-Pj4gLS0tIGEvZHJpdmVycy9ibHVldG9vdGgvYnR1c2IuYw0KPiA+ID4+Pj4gKysrIGIvZHJpdmVy
-cy9ibHVldG9vdGgvYnR1c2IuYw0KPiA+ID4+Pj4gQEAgLTYwNywxMCArNjA3LDcgQEAgc3RhdGlj
-IHZvaWQgYnR1c2JfaW50cl9jb21wbGV0ZShzdHJ1Y3QgdXJiDQo+ID4gPj4gKnVyYikNCj4gPiA+
-Pj4+IAlCVF9EQkcoIiVzIHVyYiAlcCBzdGF0dXMgJWQgY291bnQgJWQiLCBoZGV2LT5uYW1lLCB1
-cmIsDQo+IHVyYi0NCj4gPiA+Pj4+PiBzdGF0dXMsDQo+ID4gPj4+PiAJICAgICAgIHVyYi0+YWN0
-dWFsX2xlbmd0aCk7DQo+ID4gPj4+Pg0KPiA+ID4+Pj4gLQlpZiAoIXRlc3RfYml0KEhDSV9SVU5O
-SU5HLCAmaGRldi0+ZmxhZ3MpKQ0KPiA+ID4+Pj4gLQkJcmV0dXJuOw0KPiA+ID4+Pj4gLQ0KPiA+
-ID4+Pj4gLQlpZiAodXJiLT5zdGF0dXMgPT0gMCkgew0KPiA+ID4+Pj4gKwlpZiAodXJiLT5zdGF0
-dXMgPT0gMCAmJiB0ZXN0X2JpdChIQ0lfUlVOTklORywgJmhkZXYtDQo+ID4gPmZsYWdzKSkgew0K
-PiA+ID4+Pj4gCQloZGV2LT5zdGF0LmJ5dGVfcnggKz0gdXJiLT5hY3R1YWxfbGVuZ3RoOw0KPiA+
-ID4+Pj4NCj4gPiA+Pj4+IAkJaWYgKGJ0dXNiX3JlY3ZfaW50cihkYXRhLCB1cmItPnRyYW5zZmVy
-X2J1ZmZlciwNCj4gPiA+Pj4NCj4gPiA+Pj4gRGlkIHlvdSBnZXQgYSBjaGFuY2UgdG8gY2hlY2sg
-dGhpcz8NCj4gPiA+Pj4gUGxlYXNlIGxldCB1cyBrbm93IGlmIHlvdSBoYXZlIGFueSByZXZpZXcg
-Y29tbWVudHMuDQo+ID4gPj4NCj4gPiA+PiBjYW4geW91IGV4cGxhaW4gaG93IHRoaXMgaXMgY29y
-cmVjdCBhbmQgc2hvdyBtZSB0aGUgSENJIHRyYWNlcyBmb3INCj4gPiA+PiB0aGlzLg0KPiA+ID4+
-DQo+ID4gPg0KPiA+ID4gSSBzdXBwb3NlIEhDSSB0cmFjZSBtZWFucyBoY2lkdW1wIGxvZ3MgaGVy
-ZS4gQXMgZGV2aWNlIGhhc24ndCB5ZXQNCj4gPiBpbml0aWFsaXplZCwgaGNpZHVtcCB3b24ndCBz
-aG93IGFueXRoaW5nLg0KPiA+ID4gV2UgaGFkIGFkZGVkIGRlYnVnIGluZm8gaW4gYnR1c2IgZHJp
-dmVyIHRvIHRyYWNlIHRoZSBkYXRhIHJlY2VpdmVkDQo+ID4gPiBvbg0KPiA+IGFsbCBVU0IgZW5k
-cG9pbnRzIGFuZCBhbHNvIGNoZWNrZWQgdXNibW9uIGxvZ3MuDQo+ID4NCj4gPiB1c2UgYnRtb24g
-YW5kIGl0IHdpbGwgc2hvdyBpdC4NCj4gPg0KPiA+ID4gSGVyZSBpcyB0aGUgc2VxdWVuY2Ugb2Yg
-ZXZlbnRzIHdlIG9ic2VydmVkIGluIGEgY29ybmVyIGNhc2Ugd2hpbGUNCj4gPiBydW5uaW5nIHN0
-cmVzcyB0ZXN0Lg0KPiA+ID4gMSkgSW5zaWRlIGJ0dXNiX29wZW4oKSBjYWxsIC0tLS0tLSBUaHJl
-YWQgMQ0KPiA+ID4gMikgYnR1c2Jfc3VibWl0X2ludHJfdXJiKCkgc3VibWl0cyB0aGUgVVJCIGZv
-ciByZWNlaXZpbmcgZGF0YSBvbg0KPiA+ID4gaW50ZXJydXB0IGVuZHBvaW50IC0tLS0gVGhyZWFk
-IDENCj4gPiA+IDMpIGJ0dXNiX2ludHJfY29tcGxldGUoKSBnZXRzIGNhbGxlZCB0byBkZWxpdmVy
-IE5PUCBmcmFtZSBmcm9tIEhDSQ0KPiA+ID4gY29udHJvbGxlciAtLS0tIFRocmVhZCAyDQo+ID4g
-PiA0KSBIQ0lfUlVOTklORyBpc24ndCBzZXQgeWV0LiBTbyB3ZSByZXR1cm4gZnJvbQ0KPiA+ID4g
-YnR1c2JfaW50cl9jb21wbGV0ZSgpIHdpdGhvdXQgcmVzdWJtaXR0aW5nIHRoZSBidWZmZXIgLS0t
-IFRocmVhZCAyDQo+ID4gPiA1KSBFeGl0IGJ0dXNiX29wZW4oKSAtLS0tIFRocmVhZCAxDQo+ID4g
-PiA2KSAic2V0X2JpdChIQ0lfUlVOTklORywgJmhkZXYtPmZsYWdzKSIgZG9uZSBieSBibHVldG9v
-dGggY29yZSAtLS0tDQo+ID4gPiBUaHJlYWQgMQ0KPiA+ID4NCj4gPiA+IExhdGVyIEhDSV9SRVNF
-VCBjb21tYW5kIGdldHMgdGltZWRvdXQsIGFzIHdlIGhhdmVuJ3QgcmUtc3VibWl0dGVkDQo+ID4g
-YnVmZmVyIGZvciBpbnRlcnJ1cHQgZW5kcG9pbnQgaW4gc3RlcCAoNCkgYWJvdmUuDQo+ID4gPg0K
-PiA+ID4gUGxlYXNlIGZpbmQgYXR0YWNoZWQgbG9ncy4gdXNibW9uIGxvZyBzaG93cyBmaXJzdCBm
-cmFtZSByZWNlaXZlZCBvbg0KPiA+IGludGVycnVwdCBlbmRwb2ludCBpcyBOT1AoU2VhcmNoIGZv
-ciBNYXJ2ZWxsIGluIGxvZykuDQo+ID4gPg0KPiA+ID4gSGVyZSBpcyB3aGF0IGJsdWV0b290aCBz
-cGVjIHNheXMgYWJvdXQgTk9QIGZyYW1lLg0KPiA+ID4NCj4gPiA+ICJUbyBpbmRpY2F0ZSB0byB0
-aGUgSG9zdCB0aGF0IHRoZSBDb250cm9sbGVyIGlzIHJlYWR5IHRvIHJlY2VpdmUNCj4gSENJDQo+
-ID4gPiBjb21tYW5kIHBhY2tldHMsIHRoZSBDb250cm9sbGVyIGdlbmVyYXRlcyBhIENvbW1hbmQg
-U3RhdHVzIGV2ZW50DQo+ID4gPiB3aXRoIFN0YXR1cyAweDAwIGFuZCBDb21tYW5kX09wY29kZSAw
-eDAwMDAsIGFuZCB0aGUNCj4gPiBOdW1fSENJX0NvbW1hbmRfUGFja2V0cw0KPiA+ID4gZXZlbnQg
-cGFyYW1ldGVyIGlzIHNldCB0byAxIG9yIG1vcmUuIENvbW1hbmRfT3Bjb2RlLCAweDAwMDAgaXMg
-YQ0KPiBOT1ANCj4gPiAoTm8gT3BlcmF0aW9uKeKAnQ0KPiA+DQo+ID4gU28gSSB3b25kZXIgaWYg
-d2UgbmVlZCB0byByZW1vdmUgdGhlIEhDSV9SVU5OSU5HIGxvZ2ljIGZyb20gdGhlDQo+ID4gZHJp
-dmVycy4gSXQgaXMgb25seSBsZWZ0IGluIGEgZmV3IFVTQiBkcml2ZXJzIGFuZCBJIHJlbW92ZWQg
-dGhlIHJlc3QNCj4gPiBhbmQgbW92ZWQgaXQgaW50byB0aGUgY29yZS4gSSBhbSBub3QgaW4gZmF2
-b3VyIG9mIHBhcGVyaW5nIG92ZXIgdGhpcw0KPiA+IGlzc3VlLiBJIG5lZWQgdG8gdW5kZXJzdGFu
-ZCB3aGF0IGlzIHdyb25nLiBBbmQgYWN0dWFsbHkgSENJX1JVTk5JTkcNCj4gPiBuZWVkcyB0byBi
-ZSB0YWtlbiBhd2F5IGZyb20gdGhlIGRyaXZlcnMuIFNvIHRoZSBxdWVzdGlvbiBpcyBpZg0KPiBi
-dHVzYi5jDQo+ID4gc3RpbGwgbmVlZHMgaXQgb3IgaWYgdGhhdCBpcyBqdXN0IGEgbGVmdG92ZXIu
-IE1lYW5pbmcgaXMgaXQNCj4gcHJvdGVjdGluZw0KPiA+IGFueXRoaW5nPw0KPiA+DQo+IA0KPiBJ
-IGNhbiBzZWUgSENJX1JVTk5JTkcgY2hlY2sgYmVpbmcgdXNlZCBhdCBiZWxvdyBwbGFjZXMgaW4g
-YnR1c2IuYw0KPiANCj4gMSkgYnR1c2JfaW50cl9jb21wbGV0ZQ0KPiAyKSBidHVzYl9idWxrX2Nv
-bXBsZXRlDQo+IDMpIGJ0dXNiX2lzb2NfY29tcGxldGUNCj4gNCkgYnR1c2JfdHhfY29tcGxldGUN
-Cj4gNSkgYnR1c2JfaXNvY190eF9jb21wbGV0ZQ0KPiA2KSBidHVzYl9iY21fc2V0X2RpYWcNCj4g
-NykgYnR1c2JfcmVzdW1lDQo+IA0KPiBJIHRoaW5rLCBpdCBjYW4gYmUgcmVtb3ZlZCBmcm9tICgx
-KSwgKDIpIGFuZCAoMyksIGFzIHdlIGFscmVhZHkgaGF2ZQ0KPiBiZWxvdyBjaGVjayBpbnNpZGUg
-aGNpX3JlY3ZfZnJhbWUoKQ0KPiANCj4gICAgICAgICBpZiAoIWhkZXYgfHwgKCF0ZXN0X2JpdChI
-Q0lfVVAsICZoZGV2LT5mbGFncykNCj4gICAgICAgICAgICAgICAgICAgICAgICYmICF0ZXN0X2Jp
-dChIQ0lfSU5JVCwgJmhkZXYtPmZsYWdzKSkpIHsNCj4gICAgICAgICAgICAgICAgIGtmcmVlX3Nr
-Yihza2IpOw0KPiAgICAgICAgICAgICAgICAgcmV0dXJuIC1FTlhJTzsNCj4gICAgICAgICB9DQo+
-IA0KPiBGb3IgKDQpIGFuZCAoNSksIGl0J3MganVzdCB1c2VkIHRvIGRlY2lkZSBpZiB3ZSBzaG91
-bGQgdXBkYXRlICJoZGV2LQ0KPiA+c3RhdCIgb3Igbm90Lg0KPiANCg0KUGxlYXNlIGd1aWRlIG9u
-IGhvdyBzaG91bGQgd2UgZml4IHRoaXMgaXNzdWUuIFdlIG9ic2VydmUgdGltZW91dCBmb3IgSENJ
-X1JFU0VUIGNvbW1hbmQgc29tZXRpbWVzIHdoZW4gc3lzdGVtIGlzIGJvb3RlZC4gVGhpcyBoYXBw
-ZW5zIGR1ZSB0byBtaXNzaW5nIHVyYl9zdWJtaXR0KCkgd2hlbiBmaXJzdCBmcmFtZShOT1ApIHJl
-Y2VpdmVkIG9uIElOVCBlbmRwb2ludCBpcyBpZ25vcmVkLiBCZWxvdyBjaGFuZ2Ugd291bGQgYWxz
-byBoZWxwLg0KDQotLS0gYS9uZXQvYmx1ZXRvb3RoL2hjaV9jb3JlLmMNCisrKyBiL25ldC9ibHVl
-dG9vdGgvaGNpX2NvcmUuYw0KQEAgLTEzMTgsMTIgKzEzMTgsMTMgQEAgc3RhdGljIGludCBoY2lf
-ZGV2X2RvX29wZW4oc3RydWN0IGhjaV9kZXYgKmhkZXYpDQogICAgICAgICAgICAgICAgZ290byBk
-b25lOw0KICAgICAgICB9DQoNCisgICAgICAgc2V0X2JpdChIQ0lfUlVOTklORywgJmhkZXYtPmZs
-YWdzKTsNCiAgICAgICAgaWYgKGhkZXYtPm9wZW4oaGRldikpIHsNCisgICAgICAgICAgICAgICBj
-bGVhcl9iaXQoSENJX1JVTk5JTkcsICZoZGV2LT5mbGFncyk7DQogICAgICAgICAgICAgICAgcmV0
-ID0gLUVJTzsNCiAgICAgICAgICAgICAgICBnb3RvIGRvbmU7DQogICAgICAgIH0NCg0KLSAgICAg
-ICBzZXRfYml0KEhDSV9SVU5OSU5HLCAmaGRldi0+ZmxhZ3MpOw0KICAgICAgICBoY2lfc29ja19k
-ZXZfZXZlbnQoaGRldiwgSENJX0RFVl9PUEVOKTsNCg0KUmVnYXJkcywNCkFtaXRrdW1hcg0K
+https://bugzilla.kernel.org/show_bug.cgi?id=188551
+
+            Bug ID: 188551
+           Summary: Function bpa10x_send_frame() does not return a
+                    negative error code when the call to usb_submit_urb()
+                    fails.
+           Product: Drivers
+           Version: 2.5
+    Kernel Version: linux-4.9-rc6
+          Hardware: All
+                OS: Linux
+              Tree: Mainline
+            Status: NEW
+          Severity: normal
+          Priority: P1
+         Component: Bluetooth
+          Assignee: linux-bluetooth@vger.kernel.org
+          Reporter: bianpan2010@ruc.edu.cn
+        Regression: No
+
+In function bpa10x_send_frame() defined in file drivers/bluetooth/bpa10x.c,
+variable err takes the error code. When the call to usb_submit_urb() (at line
+349) fails, a negative integer should be returned. However, it returns 0, which
+indicates that there is no error. Maybe it is better to "return err;" instead
+of "return 0;" at line 358. Codes related to this bug are summarised as
+follows.
+
+283 static int bpa10x_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
+284 {
+285     struct bpa10x_data *data = hci_get_drvdata(hdev);
+286     struct usb_ctrlrequest *dr;
+287     struct urb *urb;
+288     unsigned int pipe;
+289     int err;
+290 
+291     BT_DBG("%s", hdev->name);
+292 
+293     skb->dev = (void *) hdev;
+294 
+295     urb = usb_alloc_urb(0, GFP_ATOMIC);
+296     if (!urb)
+297         return -ENOMEM;
+        ...
+349     err = usb_submit_urb(urb, GFP_ATOMIC);
+350     if (err < 0) {
+351         BT_ERR("%s urb %p submission failed", hdev->name, urb);
+352         kfree(urb->setup_packet);
+353         usb_unanchor_urb(urb);
+354     }
+355 
+356     usb_free_urb(urb);
+357 
+358     return 0;      // return err?
+359 }
+
+Thanks very much!
+
+-- 
+You are receiving this mail because:
+You are the assignee for the bug.
