@@ -1,297 +1,330 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Message-ID: <1480568519.2010.3.camel@gmail.com>
-Subject: Re: Continuing the Xbox One Bluetooth controller debugging
-From: Cameron Gutman <aicommander@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Anthony Bourguignon <contact@toniob.net>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Vinicius Costa Gomes <vinicius.gomes@intel.com>
-Date: Wed, 30 Nov 2016 21:01:59 -0800
-In-Reply-To: <CABBYNZ+cfdym=m+Xn2kT_E74Vq81XTKB5mzv_JOWa7vvcHXVrg@mail.gmail.com>
-References: <1480481503.2256.4.camel@gmail.com>
-         <1480498971.2363.1.camel@toniob.net>
-         <CABBYNZ+cfdym=m+Xn2kT_E74Vq81XTKB5mzv_JOWa7vvcHXVrg@mail.gmail.com>
-Content-Type: multipart/mixed; boundary="=-ahw7Xcul/LCDW56B2UIO"
-Mime-Version: 1.0
+MIME-Version: 1.0
+In-Reply-To: <CAGXr9JEs_SUNBJhRqDoy90HqAkKs4NyamB4_q=qSNcLzyk8WsA@mail.gmail.com>
+References: <CAGXr9JFjURuq0brgMGYYU+r_5XedXm4WgS_B-vKLZiWS4WKbrA@mail.gmail.com>
+ <CABBYNZ+yMwgGN4+pv7dyog0P8LyME5zVz=RuD=sqXs6csYQBAQ@mail.gmail.com>
+ <CAGXr9JHSmQs-wZenHAVCPqpe+jL8b5awywBQ-XtZtqYSVtmcpQ@mail.gmail.com>
+ <CABBYNZ+cGzQcspVM0B3wbimsE5sjZS6t9Kk-TZ_qc324aO1Q2Q@mail.gmail.com>
+ <CAGXr9JET_-mB1qtOryXpUMhQPTe_ecw84f4kFH+Wv9_WYp3iog@mail.gmail.com>
+ <CAGXr9JGBGVy5P0BiGCer=RO4i9D_8qMabaSP0DufaTk3gx6Ryw@mail.gmail.com>
+ <CABBYNZ+v7B6gkUZ-a=3maBUmFu-boOduiSDxvcyaJ=Y-HcktCQ@mail.gmail.com>
+ <CABBYNZ+jYduJM-5j0tK7-TN0axQA_qdOfdrM+hZvm4_6raKK1g@mail.gmail.com> <CAGXr9JEs_SUNBJhRqDoy90HqAkKs4NyamB4_q=qSNcLzyk8WsA@mail.gmail.com>
+From: Petri Gynther <pgynther@google.com>
+Date: Wed, 30 Nov 2016 14:55:03 -0800
+Message-ID: <CAGXr9JFiYAo4kgp6WxJ2qyJuhMo-_8hQM4pFQ7xcDwDK0U2CYg@mail.gmail.com>
+Subject: Re: BlueZ 5.43: HoG peripheral services re-discovered again and again
+ on every reconnect
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Luiz,
 
---=-ahw7Xcul/LCDW56B2UIO
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
+On Wed, Nov 30, 2016 at 2:15 PM, Petri Gynther <pgynther@google.com> wrote:
+> Hi Luiz,
+>
+> On Wed, Nov 30, 2016 at 1:37 AM, Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+>> Hi Petri,
+>>
+>> On Wed, Nov 30, 2016 at 10:36 AM, Luiz Augusto von Dentz
+>> <luiz.dentz@gmail.com> wrote:
+>>> Hi Petri,
+>>>>
+>>>> This primary services re-discovery on every reconnect is actually now
+>>>> causing a problem for us.
+>>>>
+>>>> Basically, this is what happens:
+>>>> 1. HoG remote control reconnects to BlueZ host for firmware update check.
+>>>> 2. BlueZ starts re-discovering the services of the remote, but doesn't
+>>>> yet complete it.
+>>>> 3. The remote disconnects after being connected for 2 seconds (no
+>>>> firmware update was available, so quickly disconnect to save battery).
+>>>> 4. BlueZ declares the HoG remote "bad" since it couldn't complete step
+>>>> (2). And then, BlueZ ends up removing the HoG remote services from its
+>>>> GATT database completely.
+>>>> 5. On the next reconnect attempt, the remote does not work. Re-pairing
+>>>> is required.
+>>>>
+>>>> Obviously, this is bad for user experience. Therefore, I'm asking:
+>>>> 1. Is there a way to avoid services re-discovery on every reconnect?
+>>>> 2. If the remote control is successfully bonded previously, and BlueZ
+>>>> experiences a problem during reconnect (services re-discovery), can we
+>>>> avoid destroying the bonding and GATT info on BlueZ side? A failed
+>>>> reconnect should not be a reason to remove a bonded device.
+>>>
+>>> The second point should definitely be fixed, but I wonder how the
+>>> firmware update check does actually detects if the host is not doing
+>>> something important before it decides it has to save power. Also if I
+>>> recall this correctly dfu was exactly why some devices needed the
+>>> database check, they boot in dfu mode which has a different database
+>>> but they completely lost the state of service changed subscriptions so
+>>> basically nothing works since all handles are invalid and even if
+>>> service changed would work it would cause a rediscover anyway.
+>>
+>> Checking the code I did not find anything that could have break the
+>> remote services, or perhaps it is the passive scanning/reconnection
+>> logic that gets broken if we failed to discover the services?
+>>
+>> --
+>> Luiz Augusto von Dentz
+>
+> Here is a sample BlueZ log that shows HoG remote reconnect, quick
+> disconnect, primary services re-discovery failure, and subsequent
+> removal of all GATT services of the remote:
+>
+> 11/12,060338.676  bluez: bluetoothd[3980]:
+> src/gatt-database.c:connect_cb() New incoming LE ATT connection
+> 11/12,060338.677  bluez: bluetoothd[3980]:
+> src/device.c:device_attach_att() Elevating security level since LTK is
+> available
+> 11/12,060338.700  bluez: bluetoothd[3980]:
+> attrib/gattrib.c:g_attrib_ref() 0x50b138: g_attrib_ref=1
+> 11/12,060338.700  bluez: bluetoothd[3980]: src/device.c:attio_connected()
+> 11/12,060338.701  bluez: bluetoothd[3980]:
+> profiles/input/hog.c:attio_connected_cb() HoG connected
+> 11/12,060338.701  bluez: bluetoothd[3980]: src/device.c:attio_connected()
+> 11/12,060338.702  bluez: bluetoothd[3980]: src/device.c:attio_connected()
+> 11/12,060338.702  bluez: bluetoothd[3980]:
+> profiles/battery/battery.c:attio_connected_cb() BATT connected
+> 11/12,060338.703  bluez: bluetoothd[3980]: src/device.c:attio_connected()
+> 11/12,060338.703  bluez: bluetoothd[3980]:
+> profiles/oad/oad.c:oad_attio_connected_cb() OAD connected
+> 11/12,060338.704  bluez: bluetoothd[3980]:
+> profiles/oad/oad.c:oad_is_time_for_upgrade_check() OAD not time for
+> upgrade check yet (15164 seconds left)
+> 11/12,060338.704  bluez: bluetoothd[3980]:
+> src/gatt-client.c:btd_gatt_client_connected() Device connected.
+> 11/12,060343.426  bluez: bluetoothd[3980]: src/device.c:gatt_debug()
+> MTU exchange complete, with MTU: 23
+> 11/12,060343.476  bluez: bluetoothd[3980]:
+> profiles/battery/battery.c:level_read_char_cb() BATT level=78
+>
+> ==== HoG remote disconnects below; primary services re-discovery was
+> still in progress ====
+> 11/12,060343.691  bluez: bluetoothd[3980]:
+> src/adapter.c:dev_disconnected() Device LEFQAU disconnected, reason 3
+> 11/12,060343.692  bluez: bluetoothd[3980]:
+> src/adapter.c:dev_disconnected() device 0x522c18 paired 1 bonded 1
+> bonding 0
+> 11/12,060343.694  bluez: bluetoothd[3980]:
+> src/adapter.c:adapter_remove_connection()
+> 11/12,060343.694  bluez: bluetoothd[3980]:
+> plugins/policy.c:disconnect_cb() reason 3
+> 11/12,060343.695  bluez: bluetoothd[3980]:
+> src/adapter.c:bonding_attempt_complete() hci0 bdaddr LEFQAU type 1
+> status 0xe
+> 11/12,060343.695  bluez: bluetoothd[3980]:
+> src/device.c:device_bonding_complete() bonding (nil) status 0x0e
+> 11/12,060343.696  bluez: bluetoothd[3980]:
+> src/device.c:device_bonding_failed() status 14
+> 11/12,060343.696  bluez: bluetoothd[3980]: src/adapter.c:resume_discovery()
+>
+> ==== primary services discovery failure noted below; all GATT services
+> of the remote are then removed and become unavailable ====
+> 11/12,060343.698  bluez: bluetoothd[3980]: src/device.c:gatt_debug()
+> Primary service discovery failed. ATT ECODE: 0x00
+> 11/12,060343.698  bluez: bluetoothd[3980]:
+> src/device.c:gatt_service_removed() start: 0x0001, end: 0x000b
+> 11/12,060343.702  bluez: bluetoothd[3980]:
+> src/service.c:change_state() 0x53dd48: device LEFQAU profile
+> gap-profile state changed: connecting -> disconnected (-130)
+> 11/12,060343.707  bluez: bluetoothd[3980]:
+> src/device.c:device_profile_connected() gap-profile Software caused
+> connection abort (130)
+> 11/12,060343.707  bluez: bluetoothd[3980]:
+> src/service.c:change_state() 0x53dd48: device LEFQAU profile
+> gap-profile state changed: disconnected -> unavailable (0)
+> 11/12,060343.711  bluez: bluetoothd[3980]:
+> profiles/gap/gas.c:gap_driver_remove() GAP profile remove (LEFQAU)
+> 11/12,060343.712  bluez: bluetoothd[3980]:
+> src/service.c:btd_service_unref() 0x53dd48: ref=0
+> 11/12,060343.723  bluez: bluetoothd[3980]:
+> src/gatt-client.c:btd_gatt_client_service_removed() GATT Services
+> Removed - start: 0x0001, end: 0x000b
+> 11/12,060343.837  bluez: bluetoothd[3980]:
+> src/device.c:gatt_service_removed() start: 0x000c, end: 0x000f
+> 11/12,060343.838  bluez: bluetoothd[3980]:
+> src/gatt-client.c:btd_gatt_client_service_removed() GATT Services
+> Removed - start: 0x000c, end: 0x000f
+> 11/12,060343.838  bluez: bluetoothd[3980]:
+> src/gatt-client.c:unregister_service() Removing GATT service:
+> /org/bluez/hci0/dev_LEFQAU/service000c
+> 11/12,060343.839  bluez: bluetoothd[3980]:
+> src/gatt-client.c:unregister_characteristic() Removing GATT
+> characteristic: /org/bluez/hci0/dev_LEFQAU/service000c/char000d
+> 11/12,060343.840  bluez: bluetoothd[3980]:
+> src/gatt-client.c:unregister_descriptor() Removing GATT descriptor:
+> /org/bluez/hci0/dev_LEFQAU/service000c/char000d/desc000f
+> 11/12,060343.893  bluez: bluetoothd[3980]:
+> src/device.c:gatt_service_removed() start: 0x0010, end: 0x0022
+> 11/12,060343.894  bluez: bluetoothd[3980]:
+> src/service.c:change_state() 0x53dce8: device LEFQAU profile
+> deviceinfo state changed: connecting -> disconnected (-130)
+> 11/12,060343.895  bluez: bluetoothd[3980]:
+> src/device.c:device_profile_connected() deviceinfo Software caused
+> connection abort (130)
+> 11/12,060343.898  bluez: bluetoothd[3980]:
+> src/service.c:change_state() 0x53dce8: device LEFQAU profile
+> deviceinfo state changed: disconnected -> unavailable (0)
+> 11/12,060343.898  bluez: bluetoothd[3980]:
+> src/service.c:btd_service_unref() 0x53dce8: ref=0
+> 11/12,060343.902  bluez: bluetoothd[3980]:
+> src/gatt-client.c:btd_gatt_client_service_removed() GATT Services
+> Removed - start: 0x0010, end: 0x0022
+> 11/12,060343.905  bluez: bluetoothd[3980]:
+> src/gatt-client.c:unregister_service() Removing GATT service:
+> /org/bluez/hci0/dev_LEFQAU/service0010
+> 11/12,060343.906  bluez: bluetoothd[3980]:
+> src/gatt-client.c:unregister_characteristic() Removing GATT
+> characteristic: /org/bluez/hci0/dev_LEFQAU/service0010/char0011
+> 11/12,060343.910  bluez: bluetoothd[3980]:
+> src/gatt-client.c:unregister_characteristic() Removing GATT
+> characteristic: /org/bluez/hci0/dev_LEFQAU/service0010/char0013
+> 11/12,060343.914  bluez: bluetoothd[3980]:
+> src/gatt-client.c:unregister_characteristic() Removing GATT
+> characteristic: /org/bluez/hci0/dev_LEFQAU/service0010/char0015
+> 11/12,060343.920  bluez: bluetoothd[3980]:
+> src/gatt-client.c:unregister_characteristic() Removing GATT
+> characteristic: /org/bluez/hci0/dev_LEFQAU/service0010/char0017
+> 11/12,060343.922  bluez: bluetoothd[3980]:
+> src/gatt-client.c:unregister_characteristic() Removing GATT
+> characteristic: /org/bluez/hci0/dev_LEFQAU/service0010/char0019
+> 11/12,060343.926  bluez: bluetoothd[3980]:
+> src/gatt-client.c:unregister_characteristic() Removing GATT
+> characteristic: /org/bluez/hci0/dev_LEFQAU/service0010/char001b
+> 11/12,060343.940  bluez: bluetoothd[3980]:
+> src/gatt-client.c:unregister_characteristic() Removing GATT
+> characteristic: /org/bluez/hci0/dev_LEFQAU/service0010/char001d
+> 11/12,060343.941  bluez: bluetoothd[3980]:
+> src/gatt-client.c:unregister_characteris
+>
+> 11/12,061849.049  bluez: bluetoothd[3980]:
+> src/gatt-client.c:btd_gatt_client_disconnected() Device disconnected.
+> Cleaning up.
+> 11/12,061849.056  bluez: bluetoothd[3980]:
+> attrib/gattrib.c:g_attrib_unref() 0x51c360: g_attrib_unref=0tic()
+> Removing GATT characteristic:
+> /org/bluez/hci0/dev_LEFQAU/service0010/char001f
+> 11/12,060343.942  bluez: bluetoothd[3980]:
+> src/gatt-client.c:unregister_characteristic() Removing GATT
+> characteristic: /org/bluez/hci0/dev_LEFQAU/service0010/char0021
+> 11/12,060344.021  bluez: bluetoothd[3980]:
+> src/device.c:gatt_service_removed() start: 0x0023, end: 0x0028
+> 11/12,060344.022  bluez: bluetoothd[3980]:
+> src/service.c:change_state() 0x53dd80: device LEFQAU profile Battery
+> state changed: connecting -> disconnected (-130)
+> 11/12,060344.023  bluez: bluetoothd[3980]:
+> src/device.c:device_profile_connected() Battery Software caused
+> connection abort (130)
+> 11/12,060344.025  bluez: bluetoothd[3980]:
+> src/service.c:change_state() 0x53dd80: device LEFQAU profile Battery
+> state changed: disconnected -> unavailable (0)
+> 11/12,060344.033  bluez: bluetoothd[3980]:
+> profiles/battery/battery.c:batt_remove() BATT path
+> /org/bluez/hci0/dev_LEFQAU
+> 11/12,060344.036  bluez: bluetoothd[3980]:
+> src/service.c:btd_service_unref() 0x53dd80: ref=0
+> 11/12,060344.037  bluez: bluetoothd[3980]:
+> src/gatt-client.c:btd_gatt_client_service_removed() GATT Services
+> Removed - start: 0x0023, end: 0x0028
+> 11/12,060344.046  bluez: bluetoothd[3980]: Error storing included
+> service - can't find it
+> 11/12,060344.128  bluez: bluetoothd[3980]:
+> src/device.c:gatt_service_removed() start: 0x0029, end: 0x002e
+> 11/12,060344.129  bluez: bluetoothd[3980]:
+> src/service.c:change_state() 0x53dd08: device LEFQAU profile Scan
+> Parameters Client Driver state changed: connecting -> disconnected
+> (-130)
+> 11/12,060344.129  bluez: bluetoothd[3980]:
+> src/device.c:device_profile_connected() Scan Parameters Client Driver
+> Software caused connection abort (130)
+> 11/12,060344.133  bluez: bluetoothd[3980]:
+> src/service.c:change_state() 0x53dd08: device LEFQAU profile Scan
+> Parameters Client Driver state changed: disconnected -> unavailable
+> (0)
+> 11/12,060344.141  bluez: bluetoothd[3980]:
+> profiles/scanparam/scan.c:scan_param_remove() GAP profile remove
+> (LEFQAU)
+> 11/12,060344.145  bluez: bluetoothd[3980]:
+> src/service.c:btd_service_unref() 0x53dd08: ref=0
+> 11/12,060344.226  bluez: bluetoothd[3980]:
+> src/service.c:btd_service_unref() 0x53dc38: ref=0
+> 11/12,060344.239  bluez: bluetoothd[3980]:
+> src/gatt-client.c:btd_gatt_client_service_removed() GATT Services
+> Removed - start: 0x002f, end: 0x0037
+> 11/12,060344.247  bluez: bluetoothd[3980]: Error storing included
+> service - can't find it
+> 11/12,060344.291  bluez: bluetoothd[3980]:
+> src/device.c:gatt_service_removed() start: 0x0038, end: 0x005c
+> 11/12,060344.292  bluez: bluetoothd[3980]:
+> src/service.c:change_state() 0x53d3a0: device LEFQAU profile input-hog
+> state changed: connecting -> disconnected (-130)
+> 11/12,060344.293  bluez: bluetoothd[3980]:
+> src/device.c:device_profile_connected() input-hog Software caused
+> connection abort (130)
+> 11/12,060344.293  bluez: bluetoothd[3980]:
+> src/service.c:change_state() 0x53d3a0: device LEFQAU profile input-hog
+> state changed: disconnected -> unavailable (0)
+> 11/12,060344.296  bluez: bluetoothd[3980]:
+> profiles/input/hog.c:hog_remove() path /org/bluez/hci0/dev_LEFQAU
+> 11/12,060344.313  bluez: bluetoothd[3980]:
+> src/service.c:btd_service_unref() 0x53d3a0: ref=0
+> 11/12,060344.313  bluez: bluetoothd[3980]:
+> src/gatt-client.c:btd_gatt_client_service_removed() GATT Services
+> Removed - start: 0x0038, end: 0x005c
+> 11/12,060344.382  bluez: bluetoothd[3980]:
+> src/device.c:gatt_service_removed() start: 0x005d, end: 0x0070
+> 11/12,060344.383  bluez: bluetoothd[3980]:
+> src/gatt-client.c:btd_gatt_client_service_removed() GATT Services
+> Removed - start: 0x005d, end: 0x0070
+> 11/12,060344.575  bluez: bluetoothd[3980]:
+> src/device.c:device_svc_resolved() /org/bluez/hci0/dev_LEFQAU err 0
+> 11/12,060344.584  bluez: bluetoothd[3980]: src/device.c:att_disconnected_cb()
+> 11/12,060344.591  bluez: bluetoothd[3980]:
+> src/device.c:att_disconnected_cb() Connection reset by peer (131)
+>
+> So, if we can somehow avoid removing the GATT services of the remote
+> in this scenario, it would be a big usability win. Next reconnect
+> attempt would just work, since the services would be left in
+> disconnected state.
+>
+> -- Petri
 
-On Wed, 2016-11-30 at 16:54 +0200, Luiz Augusto von Dentz wrote:
-> Hi,
-> 
-> On Wed, Nov 30, 2016 at 11:42 AM, Anthony Bourguignon
-> <contact@toniob.net> wrote:
-> > Le mardi 29 novembre 2016 à 20:51 -0800, Cameron Gutman a écrit :
-> > > Hi,
-> > > 
-> > > I'm interesting in continuing the debugging of the Xbox One S
-> > > controller's issues with the BlueZ stack (original report [0]).
-> > > I confirmed the issue still affects v4.9-rc7. I've also tried
-> > > Vinicius's patch from [1] applied on v4.9-rc7 without success.
-> > > 
-> > > The controller is updated with the latest firmware and connects
-> > > reliably to (at least) macOS Sierra, Windows 10 14393, Android
-> > > 6.0.1, 7.0, and 7.1.1 (including devices using 3.10 and 3.18
-> > > based kernels).
-> > > 
-> > > I'm happy to collect logs, test other patches, etc.
-> > 
-> > Steam has made a patch referencing the xbox one S controller :
-> > https://github.com/ValveSoftware/steamlink-sdk/commit/d6afa93787217
-> > 033a0f0f5db5f557b252c36260e#diff-
-> > 45ba5a41f43606276c9bf9018eed43c2
-> > 
-> > You should check this.
-> 
-> That is a big hammer, instead I was thinking in just ignoring the
-> Unknown option since basic mode is default, so please check with the
-> following patch.
-> 
+Just found a bug in src/shared/gatt-client.c: discover_primary_cb()
 
-No dice. I think ignoring it won't work because it's the controller
-itself initiating the disconnect. Attached an hcidump log with the
-patch applied and another with disable_ertm set to 1.
+        if (!success) {
+                util_debug(client->debug_callback, client->debug_data,
+                                        "Primary service discovery failed."
+                                        " ATT ECODE: 0x%02x", att_ecode);
+                /* Reset error in case of not found */
+                if (BT_ATT_ERROR_ATTRIBUTE_NOT_FOUND) {
+                        success = true;
+                        att_ecode = 0;
+                }
+                goto secondary;
+        }
 
---=-ahw7Xcul/LCDW56B2UIO
-Content-Disposition: attachment; filename="hcidump-patch2.txt"
-Content-Type: text/plain; name="hcidump-patch2.txt"; charset="UTF-8"
-Content-Transfer-Encoding: base64
+The second if-statement:
+if (BT_ATT_ERROR_ATTRIBUTE_NOT_FOUND)
 
-SENJIHNuaWZmZXIgLSBCbHVldG9vdGggcGFja2V0IGFuYWx5emVyIHZlciA1LjQzCmRldmljZTog
-aGNpMCBzbmFwX2xlbjogMTUwMCBmaWx0ZXI6IDB4ZmZmZmZmZmZmZmZmZmZmZgo+IEhDSSBFdmVu
-dDogVmVuZG9yICgweGZmKSBwbGVuIDIKPiBIQ0kgRXZlbnQ6IFZlbmRvciAoMHhmZikgcGxlbiAy
-Cj4gSENJIEV2ZW50OiBDb25uZWN0IFJlcXVlc3QgKDB4MDQpIHBsZW4gMTAKICAgIGJkYWRkciBD
-ODozRjoyNjowRDpBNDo1NyBjbGFzcyAweDAwMDUwOCB0eXBlIEFDTAo8IEhDSSBDb21tYW5kOiBB
-Y2NlcHQgQ29ubmVjdGlvbiBSZXF1ZXN0ICgweDAxfDB4MDAwOSkgcGxlbiA3CiAgICBiZGFkZHIg
-Qzg6M0Y6MjY6MEQ6QTQ6NTcgcm9sZSAweDAwCiAgICBSb2xlOiBNYXN0ZXIKPiBIQ0kgRXZlbnQ6
-IENvbW1hbmQgU3RhdHVzICgweDBmKSBwbGVuIDQKICAgIEFjY2VwdCBDb25uZWN0aW9uIFJlcXVl
-c3QgKDB4MDF8MHgwMDA5KSBzdGF0dXMgMHgwMCBuY21kIDEKPiBIQ0kgRXZlbnQ6IFJvbGUgQ2hh
-bmdlICgweDEyKSBwbGVuIDgKICAgIHN0YXR1cyAweDAwIGJkYWRkciBDODozRjoyNjowRDpBNDo1
-NyByb2xlIDB4MDAKICAgIFJvbGU6IE1hc3Rlcgo+IEhDSSBFdmVudDogVmVuZG9yICgweGZmKSBw
-bGVuIDQKPiBIQ0kgRXZlbnQ6IENvbm5lY3QgQ29tcGxldGUgKDB4MDMpIHBsZW4gMTEKICAgIHN0
-YXR1cyAweDAwIGhhbmRsZSAyNTYgYmRhZGRyIEM4OjNGOjI2OjBEOkE0OjU3IHR5cGUgQUNMIGVu
-Y3J5cHQgMHgwMAo8IEhDSSBDb21tYW5kOiBSZWFkIFJlbW90ZSBTdXBwb3J0ZWQgRmVhdHVyZXMg
-KDB4MDF8MHgwMDFiKSBwbGVuIDIKICAgIGhhbmRsZSAyNTYKPiBIQ0kgRXZlbnQ6IENvbW1hbmQg
-U3RhdHVzICgweDBmKSBwbGVuIDQKICAgIFJlYWQgUmVtb3RlIFN1cHBvcnRlZCBGZWF0dXJlcyAo
-MHgwMXwweDAwMWIpIHN0YXR1cyAweDAwIG5jbWQgMQo+IEhDSSBFdmVudDogTWF4IFNsb3RzIENo
-YW5nZSAoMHgxYikgcGxlbiAzCiAgICBoYW5kbGUgMjU2IHNsb3RzIDUKPiBIQ0kgRXZlbnQ6IFJl
-YWQgUmVtb3RlIFN1cHBvcnRlZCBGZWF0dXJlcyAoMHgwYikgcGxlbiAxMQogICAgc3RhdHVzIDB4
-MDAgaGFuZGxlIDI1NgogICAgRmVhdHVyZXM6IDB4YmYgMHgzZSAweDhkIDB4ZmUgMHhkYiAweGZk
-IDB4N2IgMHg4Nwo8IEhDSSBDb21tYW5kOiBSZWFkIFJlbW90ZSBFeHRlbmRlZCBGZWF0dXJlcyAo
-MHgwMXwweDAwMWMpIHBsZW4gMwogICAgaGFuZGxlIDI1NiBwYWdlIDEKPiBIQ0kgRXZlbnQ6IENv
-bW1hbmQgU3RhdHVzICgweDBmKSBwbGVuIDQKICAgIFJlYWQgUmVtb3RlIEV4dGVuZGVkIEZlYXR1
-cmVzICgweDAxfDB4MDAxYykgc3RhdHVzIDB4MDAgbmNtZCAxCj4gSENJIEV2ZW50OiBMaW5rIEtl
-eSBSZXF1ZXN0ICgweDE3KSBwbGVuIDYKICAgIGJkYWRkciBDODozRjoyNjowRDpBNDo1Nwo8IEhD
-SSBDb21tYW5kOiBMaW5rIEtleSBSZXF1ZXN0IFJlcGx5ICgweDAxfDB4MDAwYikgcGxlbiAyMgog
-ICAgYmRhZGRyIEM4OjNGOjI2OjBEOkE0OjU3IGtleSA0NzIzRTgyOUFFMDI3NDgwMDM5MEIxQUU0
-QUE0NTA0RAo+IEhDSSBFdmVudDogQ29tbWFuZCBDb21wbGV0ZSAoMHgwZSkgcGxlbiAxMAogICAg
-TGluayBLZXkgUmVxdWVzdCBSZXBseSAoMHgwMXwweDAwMGIpIG5jbWQgMQogICAgc3RhdHVzIDB4
-MDAgYmRhZGRyIEM4OjNGOjI2OjBEOkE0OjU3Cj4gSENJIEV2ZW50OiBSZWFkIFJlbW90ZSBFeHRl
-bmRlZCBGZWF0dXJlcyAoMHgyMykgcGxlbiAxMwogICAgc3RhdHVzIDB4MDAgaGFuZGxlIDI1NiBw
-YWdlIDEgbWF4IDMKICAgIEZlYXR1cmVzOiAweDAxIDB4MDAgMHgwMCAweDAwIDB4MDAgMHgwMCAw
-eDAwIDB4MDAKPCBIQ0kgQ29tbWFuZDogUmVtb3RlIE5hbWUgUmVxdWVzdCAoMHgwMXwweDAwMTkp
-IHBsZW4gMTAKICAgIGJkYWRkciBDODozRjoyNjowRDpBNDo1NyBtb2RlIDIgY2xrb2Zmc2V0IDB4
-MDAwMAo8IEFDTCBkYXRhOiBoYW5kbGUgMjU2IGZsYWdzIDB4MDAgZGxlbiAxMAogICAgTDJDQVAo
-cyk6IEluZm8gcmVxOiB0eXBlIDIKPiBIQ0kgRXZlbnQ6IENvbW1hbmQgU3RhdHVzICgweDBmKSBw
-bGVuIDQKICAgIFJlbW90ZSBOYW1lIFJlcXVlc3QgKDB4MDF8MHgwMDE5KSBzdGF0dXMgMHgwMCBu
-Y21kIDEKPiBIQ0kgRXZlbnQ6IEVuY3J5cHQgQ2hhbmdlICgweDA4KSBwbGVuIDQKICAgIHN0YXR1
-cyAweDAwIGhhbmRsZSAyNTYgZW5jcnlwdCAweDAxCjwgSENJIENvbW1hbmQ6IFJlYWQgRW5jcnlw
-dGlvbiBLZXkgU2l6ZSAoMHgwNXwweDAwMDgpIHBsZW4gMgo+IEhDSSBFdmVudDogQ29tbWFuZCBD
-b21wbGV0ZSAoMHgwZSkgcGxlbiA3CiAgICBSZWFkIEVuY3J5cHRpb24gS2V5IFNpemUgKDB4MDV8
-MHgwMDA4KSBuY21kIDEKPiBBQ0wgZGF0YTogaGFuZGxlIDI1NiBmbGFncyAweDAyIGRsZW4gMTIK
-ICAgIEwyQ0FQKHMpOiBDb25uZWN0IHJlcTogcHNtIDE3IHNjaWQgMHgwMDQwCjwgQUNMIGRhdGE6
-IGhhbmRsZSAyNTYgZmxhZ3MgMHgwMCBkbGVuIDE2CiAgICBMMkNBUChzKTogQ29ubmVjdCByc3A6
-IGRjaWQgMHgwMDQwIHNjaWQgMHgwMDQwIHJlc3VsdCAxIHN0YXR1cyAwCiAgICAgIENvbm5lY3Rp
-b24gcGVuZGluZyAtIE5vIGZ1dGhlciBpbmZvcm1hdGlvbiBhdmFpbGFibGUKPCBBQ0wgZGF0YTog
-aGFuZGxlIDI1NiBmbGFncyAweDAwIGRsZW4gMTAKICAgIEwyQ0FQKHMpOiBJbmZvIHJlcTogdHlw
-ZSAyCj4gQUNMIGRhdGE6IGhhbmRsZSAyNTYgZmxhZ3MgMHgwMiBkbGVuIDE2CiAgICBMMkNBUChz
-KTogSW5mbyByc3A6IHR5cGUgMiByZXN1bHQgMAogICAgICBFeHRlbmRlZCBmZWF0dXJlIG1hc2sg
-MHgwMDEwCiAgICAgICAgU3RyZWFtaW5nIG1vZGUKPiBIQ0kgRXZlbnQ6IFJlbW90ZSBOYW1lIFJl
-cSBDb21wbGV0ZSAoMHgwNykgcGxlbiAyNTUKICAgIHN0YXR1cyAweDAwIGJkYWRkciBDODozRjoy
-NjowRDpBNDo1NyBuYW1lICdYYm94IFdpcmVsZXNzIENvbnRyb2xsZXInCj4gSENJIEV2ZW50OiBO
-dW1iZXIgb2YgQ29tcGxldGVkIFBhY2tldHMgKDB4MTMpIHBsZW4gNQogICAgaGFuZGxlIDI1NiBw
-YWNrZXRzIDEKPiBBQ0wgZGF0YTogaGFuZGxlIDI1NiBmbGFncyAweDAyIGRsZW4gMTYKICAgIEwy
-Q0FQKHMpOiBJbmZvIHJzcDogdHlwZSAyIHJlc3VsdCAwCiAgICAgIEV4dGVuZGVkIGZlYXR1cmUg
-bWFzayAweDAwMTAKICAgICAgICBTdHJlYW1pbmcgbW9kZQo8IEFDTCBkYXRhOiBoYW5kbGUgMjU2
-IGZsYWdzIDB4MDAgZGxlbiAxNgogICAgTDJDQVAocyk6IENvbm5lY3QgcnNwOiBkY2lkIDB4MDA0
-MCBzY2lkIDB4MDA0MCByZXN1bHQgMCBzdGF0dXMgMAogICAgICBDb25uZWN0aW9uIHN1Y2Nlc3Nm
-dWwKPCBBQ0wgZGF0YTogaGFuZGxlIDI1NiBmbGFncyAweDAwIGRsZW4gMjMKICAgIEwyQ0FQKHMp
-OiBDb25maWcgcmVxOiBkY2lkIDB4MDA0MCBmbGFncyAweDAwIGNsZW4gMTEKICAgICAgUkZDIDB4
-MDAgKEJhc2ljKSAKPiBIQ0kgRXZlbnQ6IE51bWJlciBvZiBDb21wbGV0ZWQgUGFja2V0cyAoMHgx
-MykgcGxlbiA1CiAgICBoYW5kbGUgMjU2IHBhY2tldHMgMQo+IEhDSSBFdmVudDogTnVtYmVyIG9m
-IENvbXBsZXRlZCBQYWNrZXRzICgweDEzKSBwbGVuIDUKICAgIGhhbmRsZSAyNTYgcGFja2V0cyAx
-Cj4gSENJIEV2ZW50OiBOdW1iZXIgb2YgQ29tcGxldGVkIFBhY2tldHMgKDB4MTMpIHBsZW4gNQog
-ICAgaGFuZGxlIDI1NiBwYWNrZXRzIDEKPiBBQ0wgZGF0YTogaGFuZGxlIDI1NiBmbGFncyAweDAy
-IGRsZW4gMTYKICAgIEwyQ0FQKHMpOiBDb25maWcgcmVxOiBkY2lkIDB4MDA0MCBmbGFncyAweDAw
-IGNsZW4gNAogICAgICBNVFUgMTQ4MCAKPCBBQ0wgZGF0YTogaGFuZGxlIDI1NiBmbGFncyAweDAw
-IGRsZW4gMTgKICAgIEwyQ0FQKHMpOiBDb25maWcgcnNwOiBzY2lkIDB4MDA0MCBmbGFncyAweDAw
-IHJlc3VsdCAwIGNsZW4gNAogICAgICBNVFUgMTQ4MCAKPiBIQ0kgRXZlbnQ6IE51bWJlciBvZiBD
-b21wbGV0ZWQgUGFja2V0cyAoMHgxMykgcGxlbiA1CiAgICBoYW5kbGUgMjU2IHBhY2tldHMgMQo+
-IEFDTCBkYXRhOiBoYW5kbGUgMjU2IGZsYWdzIDB4MDIgZGxlbiAxNQogICAgTDJDQVAocyk6IENv
-bmZpZyByc3A6IHNjaWQgMHgwMDQwIGZsYWdzIDB4MDAgcmVzdWx0IDMgY2xlbiAxCiAgICAgIEZh
-aWx1cmUgLSB1bmtub3duIG9wdGlvbnMKICAgICAgUkZDIAo8IEFDTCBkYXRhOiBoYW5kbGUgMjU2
-IGZsYWdzIDB4MDAgZGxlbiAxMgogICAgTDJDQVAocyk6IERpc2Nvbm4gcmVxOiBkY2lkIDB4MDA0
-MCBzY2lkIDB4MDA0MAo+IEhDSSBFdmVudDogTnVtYmVyIG9mIENvbXBsZXRlZCBQYWNrZXRzICgw
-eDEzKSBwbGVuIDUKICAgIGhhbmRsZSAyNTYgcGFja2V0cyAxCj4gSENJIEV2ZW50OiBOdW1iZXIg
-b2YgQ29tcGxldGVkIFBhY2tldHMgKDB4MTMpIHBsZW4gNQogICAgaGFuZGxlIDI1NiBwYWNrZXRz
-IDEKPiBBQ0wgZGF0YTogaGFuZGxlIDI1NiBmbGFncyAweDAyIGRsZW4gMTIKICAgIEwyQ0FQKHMp
-OiBEaXNjb25uIHJzcDogZGNpZCAweDAwNDAgc2NpZCAweDAwNDAKPCBIQ0kgQ29tbWFuZDogRGlz
-Y29ubmVjdCAoMHgwMXwweDAwMDYpIHBsZW4gMwogICAgaGFuZGxlIDI1NiByZWFzb24gMHgxMwog
-ICAgUmVhc29uOiBSZW1vdGUgVXNlciBUZXJtaW5hdGVkIENvbm5lY3Rpb24KPiBIQ0kgRXZlbnQ6
-IENvbW1hbmQgU3RhdHVzICgweDBmKSBwbGVuIDQKICAgIERpc2Nvbm5lY3QgKDB4MDF8MHgwMDA2
-KSBzdGF0dXMgMHgwMCBuY21kIDEKPiBIQ0kgRXZlbnQ6IERpc2Nvbm4gQ29tcGxldGUgKDB4MDUp
-IHBsZW4gNAogICAgc3RhdHVzIDB4MDAgaGFuZGxlIDI1NiByZWFzb24gMHgxNgogICAgUmVhc29u
-OiBDb25uZWN0aW9uIFRlcm1pbmF0ZWQgYnkgTG9jYWwgSG9zdAoK
+should be:
+if (att_ecode == BT_ATT_ERROR_ATTRIBUTE_NOT_FOUND)
 
+Furthermore, looking at my own failure log:
+bluez: bluetoothd[3980]: src/device.c:gatt_debug() Primary service
+discovery failed. ATT ECODE: 0x00
 
---=-ahw7Xcul/LCDW56B2UIO
-Content-Disposition: attachment; filename="hcidump-disable_ertm.txt"
-Content-Type: text/plain; name="hcidump-disable_ertm.txt"; charset="UTF-8"
-Content-Transfer-Encoding: base64
+Perhaps the if-statement should be:
+if (att_ecode == 0 || att_ecode == BT_ATT_ERROR_ATTRIBUTE_NOT_FOUND) {
+    success = true;
+    att_ecode = 0;
+    goto secondary;
+} else {
+    goto done;
+}
 
-SENJIHNuaWZmZXIgLSBCbHVldG9vdGggcGFja2V0IGFuYWx5emVyIHZlciA1LjQzCmRldmljZTog
-aGNpMCBzbmFwX2xlbjogMTUwMCBmaWx0ZXI6IDB4ZmZmZmZmZmZmZmZmZmZmZgo+IEhDSSBFdmVu
-dDogRGlzY29ubiBDb21wbGV0ZSAoMHgwNSkgcGxlbiA0CiAgICBzdGF0dXMgMHgwMCBoYW5kbGUg
-MjU2IHJlYXNvbiAweDA4CiAgICBSZWFzb246IENvbm5lY3Rpb24gVGltZW91dAo8IEhDSSBDb21t
-YW5kOiBXcml0ZSBTY2FuIEVuYWJsZSAoMHgwM3wweDAwMWEpIHBsZW4gMQogICAgZW5hYmxlIDIK
-PiBIQ0kgRXZlbnQ6IENvbW1hbmQgQ29tcGxldGUgKDB4MGUpIHBsZW4gNAogICAgV3JpdGUgU2Nh
-biBFbmFibGUgKDB4MDN8MHgwMDFhKSBuY21kIDIKICAgIHN0YXR1cyAweDAwCj4gSENJIEV2ZW50
-OiBWZW5kb3IgKDB4ZmYpIHBsZW4gMgo+IEhDSSBFdmVudDogVmVuZG9yICgweGZmKSBwbGVuIDIK
-PiBIQ0kgRXZlbnQ6IENvbm5lY3QgUmVxdWVzdCAoMHgwNCkgcGxlbiAxMAogICAgYmRhZGRyIEM4
-OjNGOjI2OjBEOkE0OjU3IGNsYXNzIDB4MDAwNTA4IHR5cGUgQUNMCjwgSENJIENvbW1hbmQ6IEFj
-Y2VwdCBDb25uZWN0aW9uIFJlcXVlc3QgKDB4MDF8MHgwMDA5KSBwbGVuIDcKICAgIGJkYWRkciBD
-ODozRjoyNjowRDpBNDo1NyByb2xlIDB4MDAKICAgIFJvbGU6IE1hc3Rlcgo+IEhDSSBFdmVudDog
-Q29tbWFuZCBTdGF0dXMgKDB4MGYpIHBsZW4gNAogICAgQWNjZXB0IENvbm5lY3Rpb24gUmVxdWVz
-dCAoMHgwMXwweDAwMDkpIHN0YXR1cyAweDAwIG5jbWQgMQo+IEhDSSBFdmVudDogUm9sZSBDaGFu
-Z2UgKDB4MTIpIHBsZW4gOAogICAgc3RhdHVzIDB4MDAgYmRhZGRyIEM4OjNGOjI2OjBEOkE0OjU3
-IHJvbGUgMHgwMAogICAgUm9sZTogTWFzdGVyCj4gSENJIEV2ZW50OiBWZW5kb3IgKDB4ZmYpIHBs
-ZW4gNAo+IEhDSSBFdmVudDogQ29ubmVjdCBDb21wbGV0ZSAoMHgwMykgcGxlbiAxMQogICAgc3Rh
-dHVzIDB4MDAgaGFuZGxlIDI1NiBiZGFkZHIgQzg6M0Y6MjY6MEQ6QTQ6NTcgdHlwZSBBQ0wgZW5j
-cnlwdCAweDAwCjwgSENJIENvbW1hbmQ6IFJlYWQgUmVtb3RlIFN1cHBvcnRlZCBGZWF0dXJlcyAo
-MHgwMXwweDAwMWIpIHBsZW4gMgogICAgaGFuZGxlIDI1Ngo+IEhDSSBFdmVudDogQ29tbWFuZCBT
-dGF0dXMgKDB4MGYpIHBsZW4gNAogICAgUmVhZCBSZW1vdGUgU3VwcG9ydGVkIEZlYXR1cmVzICgw
-eDAxfDB4MDAxYikgc3RhdHVzIDB4MDAgbmNtZCAxCjwgSENJIENvbW1hbmQ6IFdyaXRlIFNjYW4g
-RW5hYmxlICgweDAzfDB4MDAxYSkgcGxlbiAxCiAgICBlbmFibGUgMAo+IEhDSSBFdmVudDogQ29t
-bWFuZCBDb21wbGV0ZSAoMHgwZSkgcGxlbiA0CiAgICBXcml0ZSBTY2FuIEVuYWJsZSAoMHgwM3ww
-eDAwMWEpIG5jbWQgMgogICAgc3RhdHVzIDB4MDAKPiBIQ0kgRXZlbnQ6IE1heCBTbG90cyBDaGFu
-Z2UgKDB4MWIpIHBsZW4gMwogICAgaGFuZGxlIDI1NiBzbG90cyA1Cj4gSENJIEV2ZW50OiBSZWFk
-IFJlbW90ZSBTdXBwb3J0ZWQgRmVhdHVyZXMgKDB4MGIpIHBsZW4gMTEKICAgIHN0YXR1cyAweDAw
-IGhhbmRsZSAyNTYKICAgIEZlYXR1cmVzOiAweGJmIDB4M2UgMHg4ZCAweGZlIDB4ZGIgMHhmZCAw
-eDdiIDB4ODcKPCBIQ0kgQ29tbWFuZDogUmVhZCBSZW1vdGUgRXh0ZW5kZWQgRmVhdHVyZXMgKDB4
-MDF8MHgwMDFjKSBwbGVuIDMKICAgIGhhbmRsZSAyNTYgcGFnZSAxCj4gSENJIEV2ZW50OiBDb21t
-YW5kIFN0YXR1cyAoMHgwZikgcGxlbiA0CiAgICBSZWFkIFJlbW90ZSBFeHRlbmRlZCBGZWF0dXJl
-cyAoMHgwMXwweDAwMWMpIHN0YXR1cyAweDAwIG5jbWQgMQo+IEhDSSBFdmVudDogTGluayBLZXkg
-UmVxdWVzdCAoMHgxNykgcGxlbiA2CiAgICBiZGFkZHIgQzg6M0Y6MjY6MEQ6QTQ6NTcKPCBIQ0kg
-Q29tbWFuZDogTGluayBLZXkgUmVxdWVzdCBSZXBseSAoMHgwMXwweDAwMGIpIHBsZW4gMjIKICAg
-IGJkYWRkciBDODozRjoyNjowRDpBNDo1NyBrZXkgOEVGRTQ5OEFEMDk1MTFEREQxNDlDMTQ2QjNF
-NDNDMEMKPiBIQ0kgRXZlbnQ6IENvbW1hbmQgQ29tcGxldGUgKDB4MGUpIHBsZW4gMTAKICAgIExp
-bmsgS2V5IFJlcXVlc3QgUmVwbHkgKDB4MDF8MHgwMDBiKSBuY21kIDEKICAgIHN0YXR1cyAweDAw
-IGJkYWRkciBDODozRjoyNjowRDpBNDo1Nwo+IEhDSSBFdmVudDogUmVhZCBSZW1vdGUgRXh0ZW5k
-ZWQgRmVhdHVyZXMgKDB4MjMpIHBsZW4gMTMKICAgIHN0YXR1cyAweDAwIGhhbmRsZSAyNTYgcGFn
-ZSAxIG1heCAzCiAgICBGZWF0dXJlczogMHgwMSAweDAwIDB4MDAgMHgwMCAweDAwIDB4MDAgMHgw
-MCAweDAwCjwgSENJIENvbW1hbmQ6IFJlbW90ZSBOYW1lIFJlcXVlc3QgKDB4MDF8MHgwMDE5KSBw
-bGVuIDEwCiAgICBiZGFkZHIgQzg6M0Y6MjY6MEQ6QTQ6NTcgbW9kZSAyIGNsa29mZnNldCAweDAw
-MDAKPCBBQ0wgZGF0YTogaGFuZGxlIDI1NiBmbGFncyAweDAwIGRsZW4gMTAKICAgIEwyQ0FQKHMp
-OiBJbmZvIHJlcTogdHlwZSAyCj4gSENJIEV2ZW50OiBDb21tYW5kIFN0YXR1cyAoMHgwZikgcGxl
-biA0CiAgICBSZW1vdGUgTmFtZSBSZXF1ZXN0ICgweDAxfDB4MDAxOSkgc3RhdHVzIDB4MDAgbmNt
-ZCAxCj4gSENJIEV2ZW50OiBFbmNyeXB0IENoYW5nZSAoMHgwOCkgcGxlbiA0CiAgICBzdGF0dXMg
-MHgwMCBoYW5kbGUgMjU2IGVuY3J5cHQgMHgwMQo8IEhDSSBDb21tYW5kOiBSZWFkIEVuY3J5cHRp
-b24gS2V5IFNpemUgKDB4MDV8MHgwMDA4KSBwbGVuIDIKPiBIQ0kgRXZlbnQ6IENvbW1hbmQgQ29t
-cGxldGUgKDB4MGUpIHBsZW4gNwogICAgUmVhZCBFbmNyeXB0aW9uIEtleSBTaXplICgweDA1fDB4
-MDAwOCkgbmNtZCAxCj4gQUNMIGRhdGE6IGhhbmRsZSAyNTYgZmxhZ3MgMHgwMiBkbGVuIDEyCiAg
-ICBMMkNBUChzKTogQ29ubmVjdCByZXE6IHBzbSAxNyBzY2lkIDB4MDA0MAo8IEFDTCBkYXRhOiBo
-YW5kbGUgMjU2IGZsYWdzIDB4MDAgZGxlbiAxNgogICAgTDJDQVAocyk6IENvbm5lY3QgcnNwOiBk
-Y2lkIDB4MDA0MCBzY2lkIDB4MDA0MCByZXN1bHQgMSBzdGF0dXMgMAogICAgICBDb25uZWN0aW9u
-IHBlbmRpbmcgLSBObyBmdXRoZXIgaW5mb3JtYXRpb24gYXZhaWxhYmxlCjwgQUNMIGRhdGE6IGhh
-bmRsZSAyNTYgZmxhZ3MgMHgwMCBkbGVuIDEwCiAgICBMMkNBUChzKTogSW5mbyByZXE6IHR5cGUg
-Mgo+IEFDTCBkYXRhOiBoYW5kbGUgMjU2IGZsYWdzIDB4MDIgZGxlbiAxNgogICAgTDJDQVAocyk6
-IEluZm8gcnNwOiB0eXBlIDIgcmVzdWx0IDAKICAgICAgRXh0ZW5kZWQgZmVhdHVyZSBtYXNrIDB4
-MDAxMAogICAgICAgIFN0cmVhbWluZyBtb2RlCj4gSENJIEV2ZW50OiBSZW1vdGUgTmFtZSBSZXEg
-Q29tcGxldGUgKDB4MDcpIHBsZW4gMjU1CiAgICBzdGF0dXMgMHgwMCBiZGFkZHIgQzg6M0Y6MjY6
-MEQ6QTQ6NTcgbmFtZSAnWGJveCBXaXJlbGVzcyBDb250cm9sbGVyJwo+IEhDSSBFdmVudDogTnVt
-YmVyIG9mIENvbXBsZXRlZCBQYWNrZXRzICgweDEzKSBwbGVuIDUKICAgIGhhbmRsZSAyNTYgcGFj
-a2V0cyAxCj4gSENJIEV2ZW50OiBOdW1iZXIgb2YgQ29tcGxldGVkIFBhY2tldHMgKDB4MTMpIHBs
-ZW4gNQogICAgaGFuZGxlIDI1NiBwYWNrZXRzIDEKPiBBQ0wgZGF0YTogaGFuZGxlIDI1NiBmbGFn
-cyAweDAyIGRsZW4gMTYKICAgIEwyQ0FQKHMpOiBJbmZvIHJzcDogdHlwZSAyIHJlc3VsdCAwCiAg
-ICAgIEV4dGVuZGVkIGZlYXR1cmUgbWFzayAweDAwMTAKICAgICAgICBTdHJlYW1pbmcgbW9kZQo8
-IEFDTCBkYXRhOiBoYW5kbGUgMjU2IGZsYWdzIDB4MDAgZGxlbiAxNgogICAgTDJDQVAocyk6IENv
-bm5lY3QgcnNwOiBkY2lkIDB4MDA0MCBzY2lkIDB4MDA0MCByZXN1bHQgMCBzdGF0dXMgMAogICAg
-ICBDb25uZWN0aW9uIHN1Y2Nlc3NmdWwKPCBBQ0wgZGF0YTogaGFuZGxlIDI1NiBmbGFncyAweDAw
-IGRsZW4gMTIKICAgIEwyQ0FQKHMpOiBDb25maWcgcmVxOiBkY2lkIDB4MDA0MCBmbGFncyAweDAw
-IGNsZW4gMAo+IEhDSSBFdmVudDogTnVtYmVyIG9mIENvbXBsZXRlZCBQYWNrZXRzICgweDEzKSBw
-bGVuIDUKICAgIGhhbmRsZSAyNTYgcGFja2V0cyAxCj4gSENJIEV2ZW50OiBOdW1iZXIgb2YgQ29t
-cGxldGVkIFBhY2tldHMgKDB4MTMpIHBsZW4gNQogICAgaGFuZGxlIDI1NiBwYWNrZXRzIDEKPiBB
-Q0wgZGF0YTogaGFuZGxlIDI1NiBmbGFncyAweDAyIGRsZW4gMTYKICAgIEwyQ0FQKHMpOiBDb25m
-aWcgcmVxOiBkY2lkIDB4MDA0MCBmbGFncyAweDAwIGNsZW4gNAogICAgICBNVFUgMTQ4MCAKPCBB
-Q0wgZGF0YTogaGFuZGxlIDI1NiBmbGFncyAweDAwIGRsZW4gMTgKICAgIEwyQ0FQKHMpOiBDb25m
-aWcgcnNwOiBzY2lkIDB4MDA0MCBmbGFncyAweDAwIHJlc3VsdCAwIGNsZW4gNAogICAgICBNVFUg
-MTQ4MCAKPiBIQ0kgRXZlbnQ6IE51bWJlciBvZiBDb21wbGV0ZWQgUGFja2V0cyAoMHgxMykgcGxl
-biA1CiAgICBoYW5kbGUgMjU2IHBhY2tldHMgMQo+IEFDTCBkYXRhOiBoYW5kbGUgMjU2IGZsYWdz
-IDB4MDIgZGxlbiAxNAogICAgTDJDQVAocyk6IENvbmZpZyByc3A6IHNjaWQgMHgwMDQwIGZsYWdz
-IDB4MDAgcmVzdWx0IDAgY2xlbiAwCiAgICAgIFN1Y2Nlc3MKPiBIQ0kgRXZlbnQ6IE51bWJlciBv
-ZiBDb21wbGV0ZWQgUGFja2V0cyAoMHgxMykgcGxlbiA1CiAgICBoYW5kbGUgMjU2IHBhY2tldHMg
-MQo+IEFDTCBkYXRhOiBoYW5kbGUgMjU2IGZsYWdzIDB4MDIgZGxlbiAxMgogICAgTDJDQVAocyk6
-IENvbm5lY3QgcmVxOiBwc20gMTkgc2NpZCAweDAwNDEKPCBBQ0wgZGF0YTogaGFuZGxlIDI1NiBm
-bGFncyAweDAwIGRsZW4gMTYKICAgIEwyQ0FQKHMpOiBDb25uZWN0IHJzcDogZGNpZCAweDAwNDEg
-c2NpZCAweDAwNDEgcmVzdWx0IDEgc3RhdHVzIDIKICAgICAgQ29ubmVjdGlvbiBwZW5kaW5nIC0g
-QXV0aG9yaXphdGlvbiBwZW5kaW5nCjwgQUNMIGRhdGE6IGhhbmRsZSAyNTYgZmxhZ3MgMHgwMCBk
-bGVuIDE2CiAgICBMMkNBUChzKTogQ29ubmVjdCByc3A6IGRjaWQgMHgwMDQxIHNjaWQgMHgwMDQx
-IHJlc3VsdCAwIHN0YXR1cyAwCiAgICAgIENvbm5lY3Rpb24gc3VjY2Vzc2Z1bAo8IEFDTCBkYXRh
-OiBoYW5kbGUgMjU2IGZsYWdzIDB4MDAgZGxlbiAxMgogICAgTDJDQVAocyk6IENvbmZpZyByZXE6
-IGRjaWQgMHgwMDQxIGZsYWdzIDB4MDAgY2xlbiAwCj4gSENJIEV2ZW50OiBOdW1iZXIgb2YgQ29t
-cGxldGVkIFBhY2tldHMgKDB4MTMpIHBsZW4gNQogICAgaGFuZGxlIDI1NiBwYWNrZXRzIDEKPiBI
-Q0kgRXZlbnQ6IE51bWJlciBvZiBDb21wbGV0ZWQgUGFja2V0cyAoMHgxMykgcGxlbiA1CiAgICBo
-YW5kbGUgMjU2IHBhY2tldHMgMQo+IEFDTCBkYXRhOiBoYW5kbGUgMjU2IGZsYWdzIDB4MDIgZGxl
-biAxNgogICAgTDJDQVAocyk6IENvbmZpZyByZXE6IGRjaWQgMHgwMDQxIGZsYWdzIDB4MDAgY2xl
-biA0CiAgICAgIE1UVSAxNDgwIAo8IEFDTCBkYXRhOiBoYW5kbGUgMjU2IGZsYWdzIDB4MDAgZGxl
-biAxOAogICAgTDJDQVAocyk6IENvbmZpZyByc3A6IHNjaWQgMHgwMDQxIGZsYWdzIDB4MDAgcmVz
-dWx0IDAgY2xlbiA0CiAgICAgIE1UVSAxNDgwIAo+IEhDSSBFdmVudDogTnVtYmVyIG9mIENvbXBs
-ZXRlZCBQYWNrZXRzICgweDEzKSBwbGVuIDUKICAgIGhhbmRsZSAyNTYgcGFja2V0cyAxCj4gQUNM
-IGRhdGE6IGhhbmRsZSAyNTYgZmxhZ3MgMHgwMiBkbGVuIDE0CiAgICBMMkNBUChzKTogQ29uZmln
-IHJzcDogc2NpZCAweDAwNDEgZmxhZ3MgMHgwMCByZXN1bHQgMCBjbGVuIDAKICAgICAgU3VjY2Vz
-cwo+IEhDSSBFdmVudDogTnVtYmVyIG9mIENvbXBsZXRlZCBQYWNrZXRzICgweDEzKSBwbGVuIDUK
-ICAgIGhhbmRsZSAyNTYgcGFja2V0cyAxCj4gSENJIEV2ZW50OiBNYXggU2xvdHMgQ2hhbmdlICgw
-eDFiKSBwbGVuIDMKICAgIGhhbmRsZSAyNTYgc2xvdHMgMQo8IEFDTCBkYXRhOiBoYW5kbGUgMjU2
-IGZsYWdzIDB4MDAgZGxlbiA2CiAgICBMMkNBUChkKTogY2lkIDB4MDA0MCBsZW4gMiBbcHNtIDE3
-XQogICAgICBISURQOiBHZXQgcmVwb3J0OiBJbnB1dCByZXBvcnQKPiBIQ0kgRXZlbnQ6IE1vZGUg
-Q2hhbmdlICgweDE0KSBwbGVuIDYKICAgIHN0YXR1cyAweDAwIGhhbmRsZSAyNTYgbW9kZSAweDAy
-IGludGVydmFsIDEyCiAgICBNb2RlOiBTbmlmZgo+IEFDTCBkYXRhOiBoYW5kbGUgMjU2IGZsYWdz
-IDB4MDIgZGxlbiAyMgogICAgTDJDQVAoZCk6IGNpZCAweDAwNDEgbGVuIDE4IFtwc20gMTldCiAg
-ICAgIEhJRFA6IERhdGE6IElucHV0IHJlcG9ydAo+IEFDTCBkYXRhOiBoYW5kbGUgMjU2IGZsYWdz
-IDB4MDIgZGxlbiAyMgogICAgTDJDQVAoZCk6IGNpZCAweDAwNDEgbGVuIDE4IFtwc20gMTldCiAg
-ICAgIEhJRFA6IERhdGE6IElucHV0IHJlcG9ydAo+IEhDSSBFdmVudDogTnVtYmVyIG9mIENvbXBs
-ZXRlZCBQYWNrZXRzICgweDEzKSBwbGVuIDUKICAgIGhhbmRsZSAyNTYgcGFja2V0cyAxCj4gQUNM
-IGRhdGE6IGhhbmRsZSAyNTYgZmxhZ3MgMHgwMiBkbGVuIDUKICAgIEwyQ0FQKGQpOiBjaWQgMHgw
-MDQwIGxlbiAxIFtwc20gMTddCiAgICAgIEhJRFA6IEhhbmRzaGFrZTogSW52YWxpZCByZXBvcnQg
-SUQKPCBBQ0wgZGF0YTogaGFuZGxlIDI1NiBmbGFncyAweDAwIGRsZW4gNgogICAgTDJDQVAoZCk6
-IGNpZCAweDAwNDAgbGVuIDIgW3BzbSAxN10KICAgICAgSElEUDogR2V0IHJlcG9ydDogSW5wdXQg
-cmVwb3J0CjwgSENJIENvbW1hbmQ6IEV4aXQgU25pZmYgTW9kZSAoMHgwMnwweDAwMDQpIHBsZW4g
-MgogICAgaGFuZGxlIDI1Ngo+IEhDSSBFdmVudDogQ29tbWFuZCBTdGF0dXMgKDB4MGYpIHBsZW4g
-NAogICAgRXhpdCBTbmlmZiBNb2RlICgweDAyfDB4MDAwNCkgc3RhdHVzIDB4MDAgbmNtZCAxCj4g
-SENJIEV2ZW50OiBOdW1iZXIgb2YgQ29tcGxldGVkIFBhY2tldHMgKDB4MTMpIHBsZW4gNQogICAg
-aGFuZGxlIDI1NiBwYWNrZXRzIDEKPiBIQ0kgRXZlbnQ6IE1vZGUgQ2hhbmdlICgweDE0KSBwbGVu
-IDYKICAgIHN0YXR1cyAweDAwIGhhbmRsZSAyNTYgbW9kZSAweDAwIGludGVydmFsIDAKICAgIE1v
-ZGU6IEFjdGl2ZQo+IEhDSSBFdmVudDogTWF4IFNsb3RzIENoYW5nZSAoMHgxYikgcGxlbiAzCiAg
-ICBoYW5kbGUgMjU2IHNsb3RzIDUKPiBIQ0kgRXZlbnQ6IE1heCBTbG90cyBDaGFuZ2UgKDB4MWIp
-IHBsZW4gMwogICAgaGFuZGxlIDI1NiBzbG90cyAxCj4gQUNMIGRhdGE6IGhhbmRsZSAyNTYgZmxh
-Z3MgMHgwMiBkbGVuIDUKICAgIEwyQ0FQKGQpOiBjaWQgMHgwMDQwIGxlbiAxIFtwc20gMTddCiAg
-ICAgIEhJRFA6IEhhbmRzaGFrZTogSW52YWxpZCByZXBvcnQgSUQKPCBBQ0wgZGF0YTogaGFuZGxl
-IDI1NiBmbGFncyAweDAwIGRsZW4gNgogICAgTDJDQVAoZCk6IGNpZCAweDAwNDAgbGVuIDIgW3Bz
-bSAxN10KICAgICAgSElEUDogR2V0IHJlcG9ydDogSW5wdXQgcmVwb3J0Cj4gSENJIEV2ZW50OiBN
-b2RlIENoYW5nZSAoMHgxNCkgcGxlbiA2CiAgICBzdGF0dXMgMHgwMCBoYW5kbGUgMjU2IG1vZGUg
-MHgwMiBpbnRlcnZhbCAxMgogICAgTW9kZTogU25pZmYKPiBIQ0kgRXZlbnQ6IE51bWJlciBvZiBD
-b21wbGV0ZWQgUGFja2V0cyAoMHgxMykgcGxlbiA1CiAgICBoYW5kbGUgMjU2IHBhY2tldHMgMQo+
-IEFDTCBkYXRhOiBoYW5kbGUgMjU2IGZsYWdzIDB4MDIgZGxlbiA1CiAgICBMMkNBUChkKTogY2lk
-IDB4MDA0MCBsZW4gMSBbcHNtIDE3XQogICAgICBISURQOiBIYW5kc2hha2U6IEludmFsaWQgcmVw
-b3J0IElECj4gQUNMIGRhdGE6IGhhbmRsZSAyNTYgZmxhZ3MgMHgwMiBkbGVuIDcKICAgIEwyQ0FQ
-KGQpOiBjaWQgMHgwMDQxIGxlbiAzIFtwc20gMTldCiAgICAgIEhJRFA6IERhdGE6IElucHV0IHJl
-cG9ydAo=
-
-
---=-ahw7Xcul/LCDW56B2UIO--
-
+Similar adjustment for att_ecode == 0 might be needed for
+discover_secondary_cb().
