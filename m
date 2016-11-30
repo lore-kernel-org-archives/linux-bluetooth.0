@@ -1,63 +1,68 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Date: Wed, 30 Nov 2016 15:15:41 -0500
-From: Don Zickus <dzickus@redhat.com>
-To: Brennan Ashton <brn@deako.com>
-Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Barry Byford <31baz66@gmail.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: d-bus or management api for beacon stuff
-Message-ID: <20161130201541.GR35881@redhat.com>
-References: <20161123214013.GZ35881@redhat.com>
- <CABBYNZKYf3b8zTzGFNqd_3LGxYZkgo_g4LRs=jf=_qYS3fj1vA@mail.gmail.com>
- <20161128205526.GP35881@redhat.com>
- <CAAu3APY8oK4O57fbwzULRHiMnVT+75KQEbOaAEQRp-W6rJaWHw@mail.gmail.com>
- <CABBYNZ+7n3HR50ENp-Zjjb0uUM=YPPpP5ndRA38w9+gqXROFRw@mail.gmail.com>
- <1480449363.19570.6.camel@deako.com>
- <20161129210137.GX35881@redhat.com>
- <1480454922.19570.9.camel@deako.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <1480454922.19570.9.camel@deako.com>
+From: mohammed rilwan <rilwan03@gmail.com>
+Date: Wed, 30 Nov 2016 23:09:12 +0530
+Message-ID: <CAMaUp9YThwzj4SxyYUd-cHej1JvHR8_pm+z6Wf6jeEP06wakyg@mail.gmail.com>
+Subject: [ bluez + ofono+ pulseaudio] [Error when STARTING sco] WARN Event TRB
+ for slot 3 ep 5 with no TDs qued?
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, Nov 29, 2016 at 01:28:42PM -0800, Brennan Ashton wrote:
-> > 
-> > Sorry for being ignorant (as I can't quite find the filter duplicate
-> > code
-> > other than the setting of the bit), but would throttling work
-> > here?  Cap the
-> > duplicates at say every 100ms or 10x/second.  That probably won't
-> > help with
-> > power consumption (unless start/stop of the radio is quick?).
-> > 
-> > Just trying to help move this along..  willing to code/test.
-> > 
-> > Cheers,
-> > Don
-> > 
-> The thread I mentioned is here:
-> https://marc.info/?t=147345134200002&r=1&w=2
-> 
-> The constant of interest is this LE_SCAN_FILTER_DUP_ENABLE.  I had to
-> recompile with this disabled because I never wanted the filter for my
-> application.  I had proposed making this an option in the adaptor
-> interface, but there did not seem to be any interest.
+Hi,
 
-Hi Brennan,
+I am on ubuntu 16.04.
+playing audio over sco link from android device to ubuntu. PC as
+headset. Everything works as expected.I can hear the audio through PC
+speakers.  Unfortunately i get below error sometimes and not able to
+hear the audio. Not sure why and when i get this error. couldnot
+confirm the reproduction path. Anyone ahs seen this issue and solved
+this ? Any help much appreciated.
 
-Looking through the code, I am guessing you hacked up
+I am using inbuilt bluetooth device. A realtek one.
 
-net/bluetooth/hci_request.c::active_scan to set enable_cp.filter_dup = 0?
+Device Info-
+root@coex:# hciconfig -a
+hci0: Type: BR or EDR  Bus: USB
+BD Address: DC:85:DE:FF:D9:D4  ACL MTU: 820:8  SCO MTU: 255:16
+UP RUNNING PSCAN ISCAN
+RX bytes:12668 acl:61 sco:152 events:147 errors:0
+TX bytes:7558 acl:48 sco:154 commands:85 errors:0
+Features: 0xff 0xff 0xff 0xfe 0xdb 0xff 0x7b 0x87
+Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+Link policy: RSWITCH HOLD SNIFF PARK
+Link mode: SLAVE ACCEPT
+Name: 'coex_brix'
+Class: 0x2c010c
+Service Classes: Rendering, Capturing, Audio
+Device Class: Computer, Laptop
+HCI Version: 4.0 (0x6)  Revision: 0xe2f
+LMP Version: 4.0 (0x6)  Subversion: 0xa041
+Manufacturer: Realtek Semiconductor Corporation (93)
 
-How did that turn out?  Was there a lot of volume?
 
-I am running 'hcitool lescan --duplicates' with a couple of cc2650 tags I
-have (one custom fw) and see about 20-25 adv/second.  That doesn't seem so
-bad.
+error logs-
+...
+good logs until  ofono creates AG, and successful connection
+started audio play in android device , some sco connection whitenoise
+started, just before the real audio i get this error
+...
+Nov 28 18:51:56 coex kernel: [10831.352267] xhci_hcd 0000:00:14.0:
+WARN Event TRB for slot 3 ep 5 with no TDs queued?
+Nov 28 18:51:56 coex kernel: [10831.353261] xhci_hcd 0000:00:14.0:
+WARN Event TRB for slot 3 ep 5 with no TDs queued?
+Nov 28 18:51:56 coex kernel: [10831.354269] xhci_hcd 0000:00:14.0:
+WARN Event TRB for slot 3 ep 5 with no TDs queued?
+Nov 28 18:51:56 coex kernel: [10831.355270] xhci_hcd 0000:00:14.0:
+ERROR Transfer event TRB DMA ptr not part of current TD ep_index 5
+comp_code 1
+Nov 28 18:51:56 coex kernel: [10831.355273] xhci_hcd 0000:00:14.0:
+Looking for event-dma 000000002acfd0e0 trb-start 000000002acfd060
+trb-end 000000002acfd060 seg-start 000000002acfd000 seg-end
+000000002acfdff0
+Nov 28 18:51:56 coex kernel: [10831.356269] xhci_hcd 0000:00:14.0:
+ERROR Transfer event TRB DMA
 
-What type of numbers did you see?
-
-Cheers,
-Don
-
+Thanks
+Rilwan
