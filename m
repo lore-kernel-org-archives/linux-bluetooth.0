@@ -1,31 +1,33 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+From: Petri Gynther <pgynther@google.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/3] shared/gatt-client: Fix not checking ATT error properly
-Date: Thu,  1 Dec 2016 22:40:28 +0200
-Message-Id: <20161201204030.27626-1-luiz.dentz@gmail.com>
+Cc: luiz.dentz@gmail.com, Petri Gynther <pgynther@google.com>
+Subject: [PATCH 2/2] shared/gatt-client: Fix discover_secondary_cb()
+Date: Thu,  1 Dec 2016 12:16:02 -0800
+Message-Id: <1480623362-49499-2-git-send-email-pgynther@google.com>
+In-Reply-To: <1480623362-49499-1-git-send-email-pgynther@google.com>
+References: <1480623362-49499-1-git-send-email-pgynther@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-
+If included services discovery cannot be started, the services discovery
+operation has failed.
 ---
- src/shared/gatt-client.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ src/shared/gatt-client.c | 1 +
+ 1 file changed, 1 insertion(+)
 
 diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
-index 4386692..c4102dd 100644
+index 84145e7..dc98aaa 100644
 --- a/src/shared/gatt-client.c
 +++ b/src/shared/gatt-client.c
-@@ -1052,7 +1052,7 @@ static void discover_primary_cb(bool success, uint8_t att_ecode,
- 					"Primary service discovery failed."
- 					" ATT ECODE: 0x%02x", att_ecode);
- 		/* Reset error in case of not found */
--		if (BT_ATT_ERROR_ATTRIBUTE_NOT_FOUND) {
-+		if (att_ecode == BT_ATT_ERROR_ATTRIBUTE_NOT_FOUND) {
- 			success = true;
- 			att_ecode = 0;
- 		}
+@@ -1027,6 +1027,7 @@ next:
+ 	util_debug(client->debug_callback, client->debug_data,
+ 				"Failed to start included services discovery");
+ 	discovery_op_unref(op);
++	success = false;
+ 
+ done:
+ 	discovery_op_complete(op, success, att_ecode);
 -- 
-2.9.3
+2.8.0.rc3.226.g39d4020
 
