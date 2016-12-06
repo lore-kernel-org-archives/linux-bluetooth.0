@@ -3,120 +3,97 @@ From: Don Zickus <dzickus@redhat.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: luiz.dentz@gmail.com, brn@deako.com,
         Don Zickus <dzickus@redhat.com>
-Subject: [RFC 3/3] core/adapter: Hook le_duplicates into d-bus interface
-Date: Tue,  6 Dec 2016 16:40:00 -0500
-Message-Id: <1481060400-7088-4-git-send-email-dzickus@redhat.com>
+Subject: [RFC 1/3] bluetooth: Add managment ability to disable duplicate device fitlering
+Date: Tue,  6 Dec 2016 16:39:58 -0500
+Message-Id: <1481060400-7088-2-git-send-email-dzickus@redhat.com>
 In-Reply-To: <1481060400-7088-1-git-send-email-dzickus@redhat.com>
 References: <1481060400-7088-1-git-send-email-dzickus@redhat.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The previous patch provided the management hooks to disable duplicate
-device filtering on the adapter.  This patch allows the d-bus
-interface to use it with another field in SetDiscoveryFilter()
+There are use cases where userspace wants to disable duplicate device
+filtering for LE scans on the adapater.  One example is real time update
+of RSSI data.
 
-The new field is:
+This patch adds hooks into the management interface to allow that.
 
-bool LE_Duplicates
-
-The adapter-api.txt doc has been updated to reflect this.
+Currently only used on 'active_scan'.
 
 Signed-off-by: Don Zickus <dzickus@redhat.com>
 ---
- client/main.c       |  5 +++++
- doc/adapter-api.txt |  1 +
- src/adapter.c       | 22 ++++++++++++++++++++--
- 3 files changed, 26 insertions(+), 2 deletions(-)
+ include/net/bluetooth/hci_core.h | 1 +
+ include/net/bluetooth/mgmt.h     | 1 +
+ net/bluetooth/hci_request.c      | 2 +-
+ net/bluetooth/mgmt.c             | 5 +++++
+ 4 files changed, 8 insertions(+), 1 deletion(-)
 
-diff --git a/client/main.c b/client/main.c
-index e1198a8..d74d068 100644
---- a/client/main.c
-+++ b/client/main.c
-@@ -1153,6 +1153,7 @@ struct set_discovery_filter_args {
- 	dbus_int16_t pathloss;
- 	char **uuids;
- 	size_t uuids_len;
-+	bool le_duplicates;
- };
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 554671c..fd34707 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -79,6 +79,7 @@ struct discovery_state {
+ 	bool			report_invalid_rssi;
+ 	bool			result_filtering;
+ 	bool			limited;
++	bool			filter_dups;
+ 	s8			rssi;
+ 	u16			uuid_count;
+ 	u8			(*uuids)[16];
+diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+index 72a456b..6ffd2d8 100644
+--- a/include/net/bluetooth/mgmt.h
++++ b/include/net/bluetooth/mgmt.h
+@@ -503,6 +503,7 @@ struct mgmt_cp_start_service_discovery {
+ 	__s8 rssi;
+ 	__le16 uuid_count;
+ 	__u8 uuids[0][16];
++	__u8 le_duplicates;
+ } __packed;
+ #define MGMT_START_SERVICE_DISCOVERY_SIZE 4
  
- static void set_discovery_filter_setup(DBusMessageIter *iter, void *user_data)
-@@ -1180,6 +1181,10 @@ static void set_discovery_filter_setup(DBusMessageIter *iter, void *user_data)
- 		dict_append_entry(&dict, "Transport", DBUS_TYPE_STRING,
- 						&args->transport);
+diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
+index 1015d9c..8b5ee64 100644
+--- a/net/bluetooth/hci_request.c
++++ b/net/bluetooth/hci_request.c
+@@ -2038,7 +2038,7 @@ static int active_scan(struct hci_request *req, unsigned long opt)
  
-+	if (args->le_duplicates)
-+		dict_append_entry(&dict, "LE_Duplicates", DBUS_TYPE_BOOLEAN,
-+						&args->le_duplicates);
+ 	memset(&enable_cp, 0, sizeof(enable_cp));
+ 	enable_cp.enable = LE_SCAN_ENABLE;
+-	enable_cp.filter_dup = LE_SCAN_FILTER_DUP_ENABLE;
++	enable_cp.filter_dup = hdev->discovery.filter_dups;
+ 
+ 	hci_req_add(req, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(enable_cp),
+ 		    &enable_cp);
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 1fba2a0..b07aa7f 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -3578,6 +3578,7 @@ static int start_service_discovery(struct sock *sk, struct hci_dev *hdev,
+ 	struct mgmt_pending_cmd *cmd;
+ 	const u16 max_uuid_count = ((U16_MAX - sizeof(*cp)) / 16);
+ 	u16 uuid_count, expected_len;
++	bool filter_dups = LE_SCAN_FILTER_DUP_ENABLE;
+ 	u8 status;
+ 	int err;
+ 
+@@ -3631,6 +3632,9 @@ static int start_service_discovery(struct sock *sk, struct hci_dev *hdev,
+ 		goto failed;
+ 	}
+ 
++	if (cp->le_duplicates)
++		filter_dups = LE_SCAN_FILTER_DUP_DISABLE;
 +
- 	dbus_message_iter_close_container(iter, &dict);
- }
+ 	cmd = mgmt_pending_add(sk, MGMT_OP_START_SERVICE_DISCOVERY,
+ 			       hdev, data, len);
+ 	if (!cmd) {
+@@ -3649,6 +3653,7 @@ static int start_service_discovery(struct sock *sk, struct hci_dev *hdev,
+ 	hdev->discovery.type = cp->type;
+ 	hdev->discovery.rssi = cp->rssi;
+ 	hdev->discovery.uuid_count = uuid_count;
++	hdev->discovery.filter_dups = filter_dups;
  
-diff --git a/doc/adapter-api.txt b/doc/adapter-api.txt
-index 08de6cd..dc09752 100644
---- a/doc/adapter-api.txt
-+++ b/doc/adapter-api.txt
-@@ -58,6 +58,7 @@ Methods		void StartDiscovery()
- 			int16	      RSSI	: RSSI threshold value
- 			uint16        Pathloss	: Pathloss threshold value
- 			string        Transport	: type of scan to run
-+			bool          LE_Duplicates : Disable LE Duplicate filtering
- 
- 			When a remote device is found that advertises any UUID
- 			from UUIDs, it will be reported if:
-diff --git a/src/adapter.c b/src/adapter.c
-index ddf0d11..1e961a1 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -2220,6 +2220,16 @@ static bool parse_transport(DBusMessageIter *value, uint8_t *transport)
- 	return true;
- }
- 
-+static bool parse_le_duplicates(DBusMessageIter *value, bool *le_duplicates)
-+{
-+	if (dbus_message_iter_get_arg_type(value) != DBUS_TYPE_BOOLEAN)
-+		return false;
-+
-+	dbus_message_iter_get_basic(value, le_duplicates);
-+
-+	return true;
-+}
-+
- static bool parse_discovery_filter_entry(char *key, DBusMessageIter *value,
- 						struct discovery_filter *filter)
- {
-@@ -2235,6 +2245,9 @@ static bool parse_discovery_filter_entry(char *key, DBusMessageIter *value,
- 	if (!strcmp("Transport", key))
- 		return parse_transport(value, &filter->type);
- 
-+	if (!strcmp("LE_Duplicates", key))
-+		return parse_le_duplicates(value, &filter->le_duplicates);
-+
- 	DBG("Unknown key parameter: %s!\n", key);
- 	return false;
- }
-@@ -2260,6 +2273,7 @@ static bool parse_discovery_filter_dict(struct btd_adapter *adapter,
- 	(*filter)->pathloss = DISTANCE_VAL_INVALID;
- 	(*filter)->rssi = DISTANCE_VAL_INVALID;
- 	(*filter)->type = get_scan_type(adapter);
-+	(*filter)->le_duplicates = false;
- 
- 	dbus_message_iter_init(msg, &iter);
- 	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_ARRAY ||
-@@ -2304,8 +2318,12 @@ static bool parse_discovery_filter_dict(struct btd_adapter *adapter,
- 	    (*filter)->rssi != DISTANCE_VAL_INVALID)
- 		goto invalid_args;
- 
--	DBG("filtered discovery params: transport: %d rssi: %d pathloss: %d",
--	    (*filter)->type, (*filter)->rssi, (*filter)->pathloss);
-+	/* only allow LE duplicates for type LE */
-+	if ((*filter)->le_duplicates && (*filter)->type != SCAN_TYPE_LE)
-+		goto invalid_args;
-+
-+	DBG("filtered discovery params: transport: %d rssi: %d pathloss: %d le_duplicates: %d",
-+	    (*filter)->type, (*filter)->rssi, (*filter)->pathloss, (*filter)->le_duplicates);
- 
- 	return true;
- 
+ 	if (uuid_count > 0) {
+ 		hdev->discovery.uuids = kmemdup(cp->uuids, uuid_count * 16,
 -- 
-1.8.3.1
+1.8.4
 
