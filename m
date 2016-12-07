@@ -1,215 +1,29 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: SMP: Add support for H7 crypto function and CT2 auth flag
-Date: Wed,  7 Dec 2016 21:55:10 +0200
-Message-Id: <20161207195510.15831-1-johan.hedberg@gmail.com>
+Subject: Re: [PATCH] shared/mainloop: Fix timeout data memleak
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Loic Poulain <loic.poulain@gmail.com>
+References: <1481118263-4518-1-git-send-email-loic.poulain@gmail.com>
+ <CABBYNZJFoURMqFrVd2o4gac=nqWaQMBwOf+pdeHcJR-ZB8bBTw@mail.gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+From: loic.poulain@gmail.com
+Message-ID: <08701e98-98dd-23d5-109f-ec6c5883ee9c@intel.com>
+Date: Wed, 7 Dec 2016 16:39:28 +0100
+MIME-Version: 1.0
+In-Reply-To: <CABBYNZJFoURMqFrVd2o4gac=nqWaQMBwOf+pdeHcJR-ZB8bBTw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi Luiz,
 
-Bluetooth 5.0 introduces a new H7 key generation function that's used
-when both sides of the pairing set the CT2 authentication flag to 1.
+> Seems valid but can you add the backtrace, I wonder how we didn't spot
+> this before so perhaps the backtrace would explain it.
+>
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- net/bluetooth/smp.c | 83 ++++++++++++++++++++++++++++++++++++++++++-----------
- net/bluetooth/smp.h |  1 +
- 2 files changed, 67 insertions(+), 17 deletions(-)
+Actually, I included this useful shared code in a different project/poc, 
+don't have backtrace in a bluez context.
+This could explain why you've never met this issue (timeout/timerfd 
+seems only used in emulator).
 
-diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index 43faf2aea2ab..069436767d0e 100644
---- a/net/bluetooth/smp.c
-+++ b/net/bluetooth/smp.c
-@@ -57,7 +57,7 @@
- #define SMP_TIMEOUT	msecs_to_jiffies(30000)
- 
- #define AUTH_REQ_MASK(dev)	(hci_dev_test_flag(dev, HCI_SC_ENABLED) ? \
--				 0x1f : 0x07)
-+				 0x3f : 0x07)
- #define KEY_DIST_MASK		0x07
- 
- /* Maximum message length that can be passed to aes_cmac */
-@@ -76,6 +76,7 @@ enum {
- 	SMP_FLAG_DHKEY_PENDING,
- 	SMP_FLAG_REMOTE_OOB,
- 	SMP_FLAG_LOCAL_OOB,
-+	SMP_FLAG_CT2,
- };
- 
- struct smp_dev {
-@@ -357,6 +358,22 @@ static int smp_h6(struct crypto_shash *tfm_cmac, const u8 w[16],
- 	return err;
- }
- 
-+static int smp_h7(struct crypto_shash *tfm_cmac, const u8 w[16],
-+		  const u8 salt[16], u8 res[16])
-+{
-+	int err;
-+
-+	SMP_DBG("w %16phN salt %16phN", w, salt);
-+
-+	err = aes_cmac(tfm_cmac, salt, w, 16, res);
-+	if (err)
-+		return err;
-+
-+	SMP_DBG("res %16phN", res);
-+
-+	return err;
-+}
-+
- /* The following functions map to the legacy SMP crypto functions e, c1,
-  * s1 and ah.
-  */
-@@ -1130,20 +1147,30 @@ static void sc_add_ltk(struct smp_chan *smp)
- 
- static void sc_generate_link_key(struct smp_chan *smp)
- {
--	/* These constants are as specified in the core specification.
--	 * In ASCII they spell out to 'tmp1' and 'lebr'.
--	 */
--	const u8 tmp1[4] = { 0x31, 0x70, 0x6d, 0x74 };
-+	/* From core spec. Spells out in ASCII as 'lebr'. */
- 	const u8 lebr[4] = { 0x72, 0x62, 0x65, 0x6c };
- 
- 	smp->link_key = kzalloc(16, GFP_KERNEL);
- 	if (!smp->link_key)
- 		return;
- 
--	if (smp_h6(smp->tfm_cmac, smp->tk, tmp1, smp->link_key)) {
--		kzfree(smp->link_key);
--		smp->link_key = NULL;
--		return;
-+	if (test_bit(SMP_FLAG_CT2, &smp->flags)) {
-+		const u8 salt[16] = { 0x31, 0x70, 0x6d, 0x74 };
-+
-+		if (smp_h7(smp->tfm_cmac, smp->tk, salt, smp->link_key)) {
-+			kzfree(smp->link_key);
-+			smp->link_key = NULL;
-+			return;
-+		}
-+	} else {
-+		/* From core spec. Spells out in ASCII as 'tmp1'. */
-+		const u8 tmp1[4] = { 0x31, 0x70, 0x6d, 0x74 };
-+
-+		if (smp_h6(smp->tfm_cmac, smp->tk, tmp1, smp->link_key)) {
-+			kzfree(smp->link_key);
-+			smp->link_key = NULL;
-+			return;
-+		}
- 	}
- 
- 	if (smp_h6(smp->tfm_cmac, smp->link_key, lebr, smp->link_key)) {
-@@ -1169,10 +1196,7 @@ static void smp_allow_key_dist(struct smp_chan *smp)
- 
- static void sc_generate_ltk(struct smp_chan *smp)
- {
--	/* These constants are as specified in the core specification.
--	 * In ASCII they spell out to 'tmp2' and 'brle'.
--	 */
--	const u8 tmp2[4] = { 0x32, 0x70, 0x6d, 0x74 };
-+	/* From core spec. Spells out in ASCII as 'brle'. */
- 	const u8 brle[4] = { 0x65, 0x6c, 0x72, 0x62 };
- 	struct hci_conn *hcon = smp->conn->hcon;
- 	struct hci_dev *hdev = hcon->hdev;
-@@ -1187,8 +1211,18 @@ static void sc_generate_ltk(struct smp_chan *smp)
- 	if (key->type == HCI_LK_DEBUG_COMBINATION)
- 		set_bit(SMP_FLAG_DEBUG_KEY, &smp->flags);
- 
--	if (smp_h6(smp->tfm_cmac, key->val, tmp2, smp->tk))
--		return;
-+	if (test_bit(SMP_FLAG_CT2, &smp->flags)) {
-+		const u8 salt[16] = { 0x32, 0x70, 0x6d, 0x74 };
-+
-+		if (smp_h7(smp->tfm_cmac, key->val, salt, smp->tk))
-+			return;
-+	} else {
-+		/* From core spec. Spells out in ASCII as 'tmp2'. */
-+		const u8 tmp2[4] = { 0x32, 0x70, 0x6d, 0x74 };
-+
-+		if (smp_h6(smp->tfm_cmac, key->val, tmp2, smp->tk))
-+			return;
-+	}
- 
- 	if (smp_h6(smp->tfm_cmac, smp->tk, brle, smp->tk))
- 		return;
-@@ -1669,6 +1703,7 @@ static void build_bredr_pairing_cmd(struct smp_chan *smp,
- 	if (!rsp) {
- 		memset(req, 0, sizeof(*req));
- 
-+		req->auth_req        = SMP_AUTH_CT2;
- 		req->init_key_dist   = local_dist;
- 		req->resp_key_dist   = remote_dist;
- 		req->max_key_size    = conn->hcon->enc_key_size;
-@@ -1680,6 +1715,7 @@ static void build_bredr_pairing_cmd(struct smp_chan *smp,
- 
- 	memset(rsp, 0, sizeof(*rsp));
- 
-+	rsp->auth_req        = SMP_AUTH_CT2;
- 	rsp->max_key_size    = conn->hcon->enc_key_size;
- 	rsp->init_key_dist   = req->init_key_dist & remote_dist;
- 	rsp->resp_key_dist   = req->resp_key_dist & local_dist;
-@@ -1744,6 +1780,9 @@ static u8 smp_cmd_pairing_req(struct l2cap_conn *conn, struct sk_buff *skb)
- 
- 		build_bredr_pairing_cmd(smp, req, &rsp);
- 
-+		if (req->auth_req & SMP_AUTH_CT2)
-+			set_bit(SMP_FLAG_CT2, &smp->flags);
-+
- 		key_size = min(req->max_key_size, rsp.max_key_size);
- 		if (check_enc_key_size(conn, key_size))
- 			return SMP_ENC_KEY_SIZE;
-@@ -1761,9 +1800,13 @@ static u8 smp_cmd_pairing_req(struct l2cap_conn *conn, struct sk_buff *skb)
- 
- 	build_pairing_cmd(conn, req, &rsp, auth);
- 
--	if (rsp.auth_req & SMP_AUTH_SC)
-+	if (rsp.auth_req & SMP_AUTH_SC) {
- 		set_bit(SMP_FLAG_SC, &smp->flags);
- 
-+		if (rsp.auth_req & SMP_AUTH_CT2)
-+			set_bit(SMP_FLAG_CT2, &smp->flags);
-+	}
-+
- 	if (conn->hcon->io_capability == HCI_IO_NO_INPUT_OUTPUT)
- 		sec_level = BT_SECURITY_MEDIUM;
- 	else
-@@ -1917,6 +1960,9 @@ static u8 smp_cmd_pairing_rsp(struct l2cap_conn *conn, struct sk_buff *skb)
- 	 */
- 	smp->remote_key_dist &= rsp->resp_key_dist;
- 
-+	if ((req->auth_req & SMP_AUTH_CT2) && (auth & SMP_AUTH_CT2))
-+		set_bit(SMP_FLAG_CT2, &smp->flags);
-+
- 	/* For BR/EDR this means we're done and can start phase 3 */
- 	if (conn->hcon->type == ACL_LINK) {
- 		/* Clear bits which are generated but not distributed */
-@@ -2312,8 +2358,11 @@ int smp_conn_security(struct hci_conn *hcon, __u8 sec_level)
- 
- 	authreq = seclevel_to_authreq(sec_level);
- 
--	if (hci_dev_test_flag(hcon->hdev, HCI_SC_ENABLED))
-+	if (hci_dev_test_flag(hcon->hdev, HCI_SC_ENABLED)) {
- 		authreq |= SMP_AUTH_SC;
-+		if (hci_dev_test_flag(hcon->hdev, HCI_SSP_ENABLED))
-+			authreq |= SMP_AUTH_CT2;
-+	}
- 
- 	/* Require MITM if IO Capability allows or the security level
- 	 * requires it.
-diff --git a/net/bluetooth/smp.h b/net/bluetooth/smp.h
-index ffcc70b6b199..0ff6247eaa6c 100644
---- a/net/bluetooth/smp.h
-+++ b/net/bluetooth/smp.h
-@@ -57,6 +57,7 @@ struct smp_cmd_pairing {
- #define SMP_AUTH_MITM		0x04
- #define SMP_AUTH_SC		0x08
- #define SMP_AUTH_KEYPRESS	0x10
-+#define SMP_AUTH_CT2		0x20
- 
- #define SMP_CMD_PAIRING_CONFIRM	0x03
- struct smp_cmd_pairing_confirm {
--- 
-2.9.3
-
+Regards,
+Loic
