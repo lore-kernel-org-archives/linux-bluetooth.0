@@ -1,130 +1,74 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: mcchou@chromium.org
-To: linux-bluetooth@vger.kernel.org
-Cc: luiz.von.dentz@intel.com, josephsih@chromium.org,
-        johan.hedberg@gmail.com, Miao-chen Chou <mcchou@chromium.org>
-Subject: [PATCH v2] monitor/rfcomm: Fix a potential memory access issue for compatibility with LLVM
-Date: Wed,  7 Dec 2016 17:35:37 -0800
-Message-Id: <1481160937-148025-1-git-send-email-mcchou@chromium.org>
+MIME-Version: 1.0
+In-Reply-To: <20161207210708.GA28060@x1c.P-661HNU-F1>
+References: <CABBYNZ+_=ihEO+sVwUV-w5eNOs2FB=7OpjMPTdik_jLHCR29Jw@mail.gmail.com>
+ <1480730912-41560-1-git-send-email-mcchou@chromium.org> <CABBYNZJpANcHQuJ=Mcpst+KWXARpvPvYX7CFygB1_KevEoEGnQ@mail.gmail.com>
+ <CAHgsZ+iww2CLrw==650Aq4FfQNiZJigVboc7ZTqsmV_1=3yKgw@mail.gmail.com> <20161207210708.GA28060@x1c.P-661HNU-F1>
+From: Miao-chen Chou <mcchou@google.com>
+Date: Wed, 7 Dec 2016 15:20:45 -0800
+Message-ID: <CAHgsZ+j5darazR39cgi34sK=STEfP0sUnTHMUoVGa6kvqnCW7A@mail.gmail.com>
+Subject: Re: [PATCH 2/2] monitor/rfcomm: Fix a potential memory access issue
+To: Miao-chen Chou <mcchou@google.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        Luiz Augusto Von Dentz <luiz.von.dentz@intel.com>,
+        josephsih@chromium.org
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Miao-chen Chou <mcchou@chromium.org>
+Hi Johan and Luiz,
 
-This patch replaces the use of struct rfcomm_rpn with local variables in
-mmc_rpn() to prevent the access to an unaligned struct member. Since struct
-rfcomm_rpn is only used in mmc_rpn(), its definition is removed. This patch
-also introduces a temp variable in mcc_pn() to prevent unaligned access.
----
- monitor/rfcomm.c | 48 +++++++++++++++++++++---------------------------
- 1 file changed, 21 insertions(+), 27 deletions(-)
+I agree with Johan's comment on the rfcomm_rpn struct. struct
+rfcomm_rpn is only used on mcc_rpn(), and it causes the potential
+alignment issue. Removing it and replacing the use with normal stack
+variables seems to be a good way to go. Since the related patch
+"gobex: Fix a compilation error for the compatibility with LLVM" has
+been adopted. I will upload the next patch in a new thread. Thanks.
 
-diff --git a/monitor/rfcomm.c b/monitor/rfcomm.c
-index b32ad40..6b9d355 100644
---- a/monitor/rfcomm.c
-+++ b/monitor/rfcomm.c
-@@ -98,16 +98,6 @@ struct rfcomm_lmsc {
- 	uint8_t break_sig;
- } __attribute__((packed));
+-Miao
 
--struct rfcomm_rpn {
--	uint8_t dlci;
--	uint8_t bit_rate;
--	uint8_t parity;
--	uint8_t io;
--	uint8_t xon;
--	uint8_t xoff;
--	uint16_t pm;
--} __attribute__ ((packed));
--
- struct rfcomm_rls {
- 	uint8_t dlci;
- 	uint8_t error;
-@@ -198,47 +188,48 @@ done:
- static inline bool mcc_rpn(struct rfcomm_frame *rfcomm_frame, uint8_t indent)
- {
- 	struct l2cap_frame *frame = &rfcomm_frame->l2cap_frame;
--	struct rfcomm_rpn rpn;
-+	uint8_t dlci, bit_rate, parity, io, xon, xoff;
-+	uint16_t pm;
-
--	if (!l2cap_frame_get_u8(frame, &rpn.dlci))
-+	if (!l2cap_frame_get_u8(frame, &dlci))
- 		return false;
-
--	print_field("%*cdlci %d", indent, ' ', RFCOMM_GET_DLCI(rpn.dlci));
-+	print_field("%*cdlci %d", indent, ' ', RFCOMM_GET_DLCI(dlci));
-
- 	if (frame->size < 7)
- 		goto done;
-
- 	/* port value octets (optional) */
-
--	if (!l2cap_frame_get_u8(frame, &rpn.bit_rate))
-+	if (!l2cap_frame_get_u8(frame, &bit_rate))
- 		return false;
-
--	if (!l2cap_frame_get_u8(frame, &rpn.parity))
-+	if (!l2cap_frame_get_u8(frame, &parity))
- 		return false;
-
--	if (!l2cap_frame_get_u8(frame, &rpn.io))
-+	if (!l2cap_frame_get_u8(frame, &io))
- 		return false;
-
- 	print_field("%*cbr %d db %d sb %d p %d pt %d xi %d xo %d", indent, ' ',
--		rpn.bit_rate, GET_RPN_DB(rpn.parity), GET_RPN_SB(rpn.parity),
--		GET_RPN_PARITY(rpn.parity), GET_RPN_PTYPE(rpn.parity),
--		GET_RPN_XIN(rpn.io), GET_RPN_XOUT(rpn.io));
-+		bit_rate, GET_RPN_DB(parity), GET_RPN_SB(parity),
-+		GET_RPN_PARITY(parity), GET_RPN_PTYPE(parity),
-+		GET_RPN_XIN(io), GET_RPN_XOUT(io));
-
--	if (!l2cap_frame_get_u8(frame, &rpn.xon))
-+	if (!l2cap_frame_get_u8(frame, &xon))
- 		return false;
-
--	if (!l2cap_frame_get_u8(frame, &rpn.xoff))
-+	if (!l2cap_frame_get_u8(frame, &xoff))
- 		return false;
-
- 	print_field("%*crtri %d rtro %d rtci %d rtco %d xon %d xoff %d",
--		indent, ' ', GET_RPN_RTRI(rpn.io), GET_RPN_RTRO(rpn.io),
--		GET_RPN_RTCI(rpn.io), GET_RPN_RTCO(rpn.io), rpn.xon,
--		rpn.xoff);
-+		indent, ' ', GET_RPN_RTRI(io), GET_RPN_RTRO(io),
-+		GET_RPN_RTCI(io), GET_RPN_RTCO(io), xon, xoff);
-
--	if (!l2cap_frame_get_le16(frame, &rpn.pm))
-+	/* prevent unaligned memory access */
-+	if (!l2cap_frame_get_le16(frame, &pm))
- 		return false;
-
--	print_field("%*cpm 0x%04x", indent, ' ', rpn.pm);
-+	print_field("%*cpm 0x%04x", indent, ' ', pm);
-
- done:
- 	return true;
-@@ -265,6 +256,7 @@ static inline bool mcc_pn(struct rfcomm_frame *rfcomm_frame, uint8_t indent)
- {
- 	struct l2cap_frame *frame = &rfcomm_frame->l2cap_frame;
- 	struct rfcomm_pn pn;
-+	uint16_t mtu;
-
- 	/* rfcomm_pn struct is defined in rfcomm.h */
-
-@@ -284,8 +276,10 @@ static inline bool mcc_pn(struct rfcomm_frame *rfcomm_frame, uint8_t indent)
- 	if (!l2cap_frame_get_u8(frame, &pn.ack_timer))
- 		return false;
-
--	if (!l2cap_frame_get_le16(frame, &pn.mtu))
-+	/* prevent unaligned memory access */
-+	if (!l2cap_frame_get_le16(frame, &mtu))
- 		return false;
-+	pn.mtu = mtu;
-
- 	if (!l2cap_frame_get_u8(frame, &pn.max_retrans))
- 		return false;
---
-2.8.0.rc3.226.g39d4020
-
+On Wed, Dec 7, 2016 at 1:07 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi Miao,
+>
+> On Wed, Dec 07, 2016, Miao-chen Chou wrote:
+>> The intention is to prevent accessing the addresses of pn.mtu and
+>> rpn.pm, where the LLVM compiler complains about the potential
+>> unaligned pointer value, and the use of temp variables ensures the
+>> alignment. The error message are
+>> monitor/rfcomm.c:241:36: error: taking address of packed member 'pm'
+>> of class or structure 'rfcomm_rpn' may result in an unaligned pointer
+>> value [-Werror,-Waddress-of-packed-member]
+>>
+>> [18/1998]
+>>         if (!l2cap_frame_get_le16(frame, &rpn.pm))
+>>                                           ^~~~~~
+>> monitor/rfcomm.c:293:36: error: taking address of packed member 'mtu'
+>> of class or structure 'rfcomm_pn' may result in an unaligned pointer
+>> value [-Werror,-Waddress-of-packed-member]
+>>         if (!l2cap_frame_get_le16(frame, &pn.mtu))
+>
+> It seems to me like there's no point in mcc_rpn() using the packed
+> rfcomm_rpn struct, since what it really wants is normal properly aligned
+> stack variables. So a more appropriate fix is probably to remote the
+> rfcomm_rpn struct usage and instead just declare the necessary "normal"
+> variables to fetch the necessary values from the frame. Another, perhaps
+> better alternative, is to use a struct rfcomm_rpn pointer to frame->data
+> and use l2cap_frame_pull() to advance the data pointer, i.e. something
+> like:
+>
+>         struct rfcomm_rpn *rpn;
+>
+>         if (frame->size < sizeof(*rpn))
+>                 return false;
+>
+>         rpn = frame->data;
+>         l2cap_frame_pull(frame, frame, sizeof(*rpn))
+>
+>         ...print content of rpn, utilizing get_le16() etc...
+>
+> The downside of the above is that if you get an incomplete frame we
+> don't decode even the parts that we did receive. I'm not sure what's the
+> preferred policy with btmon decoding.
+>
+> Johan
