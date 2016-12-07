@@ -1,117 +1,121 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <CABBYNZJpANcHQuJ=Mcpst+KWXARpvPvYX7CFygB1_KevEoEGnQ@mail.gmail.com>
-References: <CABBYNZ+_=ihEO+sVwUV-w5eNOs2FB=7OpjMPTdik_jLHCR29Jw@mail.gmail.com>
- <1480730912-41560-1-git-send-email-mcchou@chromium.org> <CABBYNZJpANcHQuJ=Mcpst+KWXARpvPvYX7CFygB1_KevEoEGnQ@mail.gmail.com>
-From: Miao-chen Chou <mcchou@google.com>
-Date: Wed, 7 Dec 2016 12:27:41 -0800
-Message-ID: <CAHgsZ+iww2CLrw==650Aq4FfQNiZJigVboc7ZTqsmV_1=3yKgw@mail.gmail.com>
-Subject: Re: [PATCH 2/2] monitor/rfcomm: Fix a potential memory access issue
+Date: Wed, 7 Dec 2016 15:16:42 -0500
+From: Don Zickus <dzickus@redhat.com>
 To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Luiz Augusto Von Dentz <luiz.von.dentz@intel.com>,
-        josephsih@chromium.org
-Content-Type: text/plain; charset=UTF-8
+        Brennan Ashton <brn@deako.com>
+Subject: Re: [RFC 0/3] core/adapter: Add disabling duplicate device filtering
+ from d-bus
+Message-ID: <20161207201642.GF35881@redhat.com>
+References: <1481060400-7088-1-git-send-email-dzickus@redhat.com>
+ <CABBYNZLdm5TsxZeCzS0S_7Xf0sfqYPNy8YrOMTpOsL3pNUO0jA@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CABBYNZLdm5TsxZeCzS0S_7Xf0sfqYPNy8YrOMTpOsL3pNUO0jA@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz
+On Wed, Dec 07, 2016 at 12:21:58PM +0200, Luiz Augusto von Dentz wrote:
+> Hi Don,
+> 
+> On Tue, Dec 6, 2016 at 11:39 PM, Don Zickus <dzickus@redhat.com> wrote:
+> > Recent discussions on the bluez mailing list revealed it was not easy
+> > to disable duplicate device filtering from the d-bus interface.
+> >
+> > As a result, if I wanted to monitor LE devices entering and leaving the
+> > adapters range (using RSSI data), it was difficult.
+> >
+> > This patchset is a dirty hack to make this work. The first patch enables
+> > it on the kernel side, while the other two patches enable it from the bluez
+> > side.
+> >
+> > I understand there are concerns about flooding the d-bus interface when
+> > enabling this.  I tried to write a throttling mechanism using the mainloop
+> > as my timer, but soon realized you can only have 1 device RSSI event
+> > per loop, so that wasn't going to work.  Open to suggestions if still a
+> > concern.
+> >
+> > Posted as an RFC just to generate discussion.  I expect I missed a lot of
+> > little details here, but wanted to post my proof of concept to see if this
+> > is something to work with.
+> >
+> > This patchset includes both the kernel and bluez patches.  I understand this is
+> > not recommended for normal practice.  But I thought for an RFC, it is nice to
+> > keep things together for now.
+> 
+> I would avoid adding a new MGMT command and instead disabled
+> duplicated filtering if RSSI filtering is set since anyway RSSI
+> filtering needs to disable duplicates in order to do any RSSI
+> filtering reliable. So this would mean that if the user wants to see
+> to get duplicate filtering it needs to set a RSSI which should rate
+> limit as we would use a threshold.
 
-The intention is to prevent accessing the addresses of pn.mtu and
-rpn.pm, where the LLVM compiler complains about the potential
-unaligned pointer value, and the use of temp variables ensures the
-alignment. The error message are
-monitor/rfcomm.c:241:36: error: taking address of packed member 'pm'
-of class or structure 'rfcomm_rpn' may result in an unaligned pointer
-value [-Werror,-Waddress-of-packed-member]
+Hi Luiz,
 
-[18/1998]
-        if (!l2cap_frame_get_le16(frame, &rpn.pm))
-                                          ^~~~~~
-monitor/rfcomm.c:293:36: error: taking address of packed member 'mtu'
-of class or structure 'rfcomm_pn' may result in an unaligned pointer
-value [-Werror,-Waddress-of-packed-member]
-        if (!l2cap_frame_get_le16(frame, &pn.mtu))
+Ok, fair enough.  I then simplified it down to a small kernel patch that
+seems to work if I set an RSSI threshold with SetDiscoveryFilter.
 
-Thanks,
-Miao
+I only do this on an active_scan.  Not sure if I should do it for the
+passive scans too?
 
-On Wed, Dec 7, 2016 at 6:12 AM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi,
->
-> On Sat, Dec 3, 2016 at 4:08 AM,  <mcchou@chromium.org> wrote:
->> From: Miao-chen Chou <mcchou@chromium.org>
->>
->> This patch introduces a temp variable to prevent the access to an unaligned
->> struct member. Since the struct rfcomm_rpn is used from PDU, enforcing alignment
->> is not a solution due to padding.
->> ---
->>  monitor/rfcomm.c | 12 ++++++++++--
->>  1 file changed, 10 insertions(+), 2 deletions(-)
->>
->> diff --git a/monitor/rfcomm.c b/monitor/rfcomm.c
->> index b32ad40..7f1f23e 100644
->> --- a/monitor/rfcomm.c
->> +++ b/monitor/rfcomm.c
->> @@ -199,6 +199,7 @@ static inline bool mcc_rpn(struct rfcomm_frame *rfcomm_frame, uint8_t indent)
->>  {
->>         struct l2cap_frame *frame = &rfcomm_frame->l2cap_frame;
->>         struct rfcomm_rpn rpn;
->> +       uint16_t pm;
->>
->>         if (!l2cap_frame_get_u8(frame, &rpn.dlci))
->>                 return false;
->> @@ -235,8 +236,11 @@ static inline bool mcc_rpn(struct rfcomm_frame *rfcomm_frame, uint8_t indent)
->>                 GET_RPN_RTCI(rpn.io), GET_RPN_RTCO(rpn.io), rpn.xon,
->>                 rpn.xoff);
->>
->> -       if (!l2cap_frame_get_le16(frame, &rpn.pm))
->> +       /* prevent unaligned memory access */
->> +       pm = rpn.pm;
->> +       if (!l2cap_frame_get_le16(frame, &pm))
->>                 return false;
->> +       rpn.pm = pm;
->
-> Not sure what was the intention here but if you were to introduce a
-> new variable for pm then we don't need rpn struct anymore.
->
->>
->>         print_field("%*cpm 0x%04x", indent, ' ', rpn.pm);
->>
->> @@ -265,6 +269,7 @@ static inline bool mcc_pn(struct rfcomm_frame *rfcomm_frame, uint8_t indent)
->>  {
->>         struct l2cap_frame *frame = &rfcomm_frame->l2cap_frame;
->>         struct rfcomm_pn pn;
->> +       uint16_t mtu;
->>
->>         /* rfcomm_pn struct is defined in rfcomm.h */
->>
->> @@ -284,8 +289,11 @@ static inline bool mcc_pn(struct rfcomm_frame *rfcomm_frame, uint8_t indent)
->>         if (!l2cap_frame_get_u8(frame, &pn.ack_timer))
->>                 return false;
->>
->> -       if (!l2cap_frame_get_le16(frame, &pn.mtu))
->> +       /* prevent unaligned memory access */
->> +       mtu = pn.mtu;
->> +       if (!l2cap_frame_get_le16(frame, &mtu))
->>                 return false;
->> +       pn.mtu = mtu;
->
-> Similar problem here, but Im not exactly sure why this is a problem
-> since l2cap_frame_get_le16 does already takes care of unligned access.
->
->>         if (!l2cap_frame_get_u8(frame, &pn.max_retrans))
->>                 return false;
->> --
->> 2.8.0.rc3.226.g39d4020
->>
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->> the body of a message to majordomo@vger.kernel.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
->
->
-> --
-> Luiz Augusto von Dentz
+If this looks ok, I will resubmit properly.
+
+Cheers,
+Don
+
+
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 554671c..fd34707 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -79,6 +79,7 @@ struct discovery_state {
+ 	bool			report_invalid_rssi;
+ 	bool			result_filtering;
+ 	bool			limited;
++	bool			filter_dups;
+ 	s8			rssi;
+ 	u16			uuid_count;
+ 	u8			(*uuids)[16];
+diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
+index 1015d9c..8b5ee64 100644
+--- a/net/bluetooth/hci_request.c
++++ b/net/bluetooth/hci_request.c
+@@ -2038,7 +2038,7 @@ static int active_scan(struct hci_request *req, unsigned long opt)
+ 
+ 	memset(&enable_cp, 0, sizeof(enable_cp));
+ 	enable_cp.enable = LE_SCAN_ENABLE;
+-	enable_cp.filter_dup = LE_SCAN_FILTER_DUP_ENABLE;
++	enable_cp.filter_dup = hdev->discovery.filter_dups;
+ 
+ 	hci_req_add(req, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(enable_cp),
+ 		    &enable_cp);
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 1fba2a0..0ac6e6f 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -3578,6 +3578,7 @@ static int start_service_discovery(struct sock *sk, struct hci_dev *hdev,
+ 	struct mgmt_pending_cmd *cmd;
+ 	const u16 max_uuid_count = ((U16_MAX - sizeof(*cp)) / 16);
+ 	u16 uuid_count, expected_len;
++	bool filter_dups = LE_SCAN_FILTER_DUP_ENABLE;
+ 	u8 status;
+ 	int err;
+ 
+@@ -3631,6 +3632,9 @@ static int start_service_discovery(struct sock *sk, struct hci_dev *hdev,
+ 		goto failed;
+ 	}
+ 
++	if (cp->rssi)
++		filter_dups = LE_SCAN_FILTER_DUP_DISABLE;
++
+ 	cmd = mgmt_pending_add(sk, MGMT_OP_START_SERVICE_DISCOVERY,
+ 			       hdev, data, len);
+ 	if (!cmd) {
+@@ -3649,6 +3653,7 @@ static int start_service_discovery(struct sock *sk, struct hci_dev *hdev,
+ 	hdev->discovery.type = cp->type;
+ 	hdev->discovery.rssi = cp->rssi;
+ 	hdev->discovery.uuid_count = uuid_count;
++	hdev->discovery.filter_dups = filter_dups;
+ 
+ 	if (uuid_count > 0) {
+ 		hdev->discovery.uuids = kmemdup(cp->uuids, uuid_count * 16,
