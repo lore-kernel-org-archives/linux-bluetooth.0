@@ -1,30 +1,32 @@
-Return-Path: <linux-kernel-owner@vger.kernel.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 10.1 \(3251\))
-Subject: Re: [PATCH] Bluetooth: btmrvl: drop duplicate header slab.h
+Subject: Re: [PATCH v2] Bluetooth: SMP: Add support for H7 crypto function and
+ CT2 auth flag
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <b8d01e387dcb3e909041baeea25b8bf81ad481a1.1479913974.git.geliangtang@gmail.com>
-Date: Thu, 8 Dec 2016 08:05:04 +0100
-Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Message-Id: <71BFDB17-213C-42FA-9DFC-CF9447F4E172@holtmann.org>
-References: <b8d01e387dcb3e909041baeea25b8bf81ad481a1.1479913974.git.geliangtang@gmail.com>
-To: Geliang Tang <geliangtang@gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
+In-Reply-To: <20161208063254.2151-1-johan.hedberg@gmail.com>
+Date: Thu, 8 Dec 2016 08:04:59 +0100
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <460F420F-2C73-4084-A232-4047F6CBED18@holtmann.org>
+References: <20161208063254.2151-1-johan.hedberg@gmail.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Geliang,
+Hi Johan,
 
-> Drop duplicate header slab.h from btmrvl_drv.h.
+> Bluetooth 5.0 introduces a new H7 key generation function that's used
+> when both sides of the pairing set the CT2 authentication flag to 1.
 > 
-> Signed-off-by: Geliang Tang <geliangtang@gmail.com>
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 > ---
-> drivers/bluetooth/btmrvl_drv.h | 1 -
-> 1 file changed, 1 deletion(-)
+> net/bluetooth/smp.c | 85 ++++++++++++++++++++++++++++++++++++++++++-----------
+> net/bluetooth/smp.h |  1 +
+> 2 files changed, 69 insertions(+), 17 deletions(-)
 
 patch has been applied to bluetooth-next tree.
 
 Regards
 
 Marcel
+
