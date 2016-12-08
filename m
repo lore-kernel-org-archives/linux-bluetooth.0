@@ -1,229 +1,130 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 10.1 \(3251\))
-Subject: Re: [PATCH] Bluetooth: SMP: Add support for H7 crypto function and
- CT2 auth flag
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20161207195510.15831-1-johan.hedberg@gmail.com>
-Date: Thu, 8 Dec 2016 07:09:53 +0100
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <FEF655D3-5D97-482E-8A95-39F5A60D0AA7@holtmann.org>
-References: <20161207195510.15831-1-johan.hedberg@gmail.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
+From: mcchou@chromium.org
+To: linux-bluetooth@vger.kernel.org
+Cc: luiz.von.dentz@intel.com, josephsih@chromium.org,
+        johan.hedberg@gmail.com, Miao-chen Chou <mcchou@chromium.org>
+Subject: [PATCH v2] monitor/rfcomm: Fix a potential memory access issue for compatibility with LLVM
+Date: Wed,  7 Dec 2016 17:35:37 -0800
+Message-Id: <1481160937-148025-1-git-send-email-mcchou@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+From: Miao-chen Chou <mcchou@chromium.org>
 
-> Bluetooth 5.0 introduces a new H7 key generation function that's used
-> when both sides of the pairing set the CT2 authentication flag to 1.
-> 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> ---
-> net/bluetooth/smp.c | 83 ++++++++++++++++++++++++++++++++++++++++++-----------
-> net/bluetooth/smp.h |  1 +
-> 2 files changed, 67 insertions(+), 17 deletions(-)
-> 
-> diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-> index 43faf2aea2ab..069436767d0e 100644
-> --- a/net/bluetooth/smp.c
-> +++ b/net/bluetooth/smp.c
-> @@ -57,7 +57,7 @@
-> #define SMP_TIMEOUT	msecs_to_jiffies(30000)
-> 
-> #define AUTH_REQ_MASK(dev)	(hci_dev_test_flag(dev, HCI_SC_ENABLED) ? \
-> -				 0x1f : 0x07)
-> +				 0x3f : 0x07)
-> #define KEY_DIST_MASK		0x07
-> 
-> /* Maximum message length that can be passed to aes_cmac */
-> @@ -76,6 +76,7 @@ enum {
-> 	SMP_FLAG_DHKEY_PENDING,
-> 	SMP_FLAG_REMOTE_OOB,
-> 	SMP_FLAG_LOCAL_OOB,
-> +	SMP_FLAG_CT2,
-> };
-> 
-> struct smp_dev {
-> @@ -357,6 +358,22 @@ static int smp_h6(struct crypto_shash *tfm_cmac, const u8 w[16],
-> 	return err;
-> }
-> 
-> +static int smp_h7(struct crypto_shash *tfm_cmac, const u8 w[16],
-> +		  const u8 salt[16], u8 res[16])
-> +{
-> +	int err;
-> +
-> +	SMP_DBG("w %16phN salt %16phN", w, salt);
-> +
-> +	err = aes_cmac(tfm_cmac, salt, w, 16, res);
-> +	if (err)
-> +		return err;
-> +
-> +	SMP_DBG("res %16phN", res);
-> +
-> +	return err;
-> +}
-> +
-> /* The following functions map to the legacy SMP crypto functions e, c1,
->  * s1 and ah.
->  */
-> @@ -1130,20 +1147,30 @@ static void sc_add_ltk(struct smp_chan *smp)
-> 
-> static void sc_generate_link_key(struct smp_chan *smp)
-> {
-> -	/* These constants are as specified in the core specification.
-> -	 * In ASCII they spell out to 'tmp1' and 'lebr'.
-> -	 */
-> -	const u8 tmp1[4] = { 0x31, 0x70, 0x6d, 0x74 };
-> +	/* From core spec. Spells out in ASCII as 'lebr'. */
-> 	const u8 lebr[4] = { 0x72, 0x62, 0x65, 0x6c };
-> 
-> 	smp->link_key = kzalloc(16, GFP_KERNEL);
-> 	if (!smp->link_key)
-> 		return;
-> 
-> -	if (smp_h6(smp->tfm_cmac, smp->tk, tmp1, smp->link_key)) {
-> -		kzfree(smp->link_key);
-> -		smp->link_key = NULL;
-> -		return;
-> +	if (test_bit(SMP_FLAG_CT2, &smp->flags)) {
-> +		const u8 salt[16] = { 0x31, 0x70, 0x6d, 0x74 };
+This patch replaces the use of struct rfcomm_rpn with local variables in
+mmc_rpn() to prevent the access to an unaligned struct member. Since struct
+rfcomm_rpn is only used in mmc_rpn(), its definition is removed. This patch
+also introduces a temp variable in mcc_pn() to prevent unaligned access.
+---
+ monitor/rfcomm.c | 48 +++++++++++++++++++++---------------------------
+ 1 file changed, 21 insertions(+), 27 deletions(-)
 
-I think this one needs a comment. Especially since we only use 4 octets out of the 16 in the array.
+diff --git a/monitor/rfcomm.c b/monitor/rfcomm.c
+index b32ad40..6b9d355 100644
+--- a/monitor/rfcomm.c
++++ b/monitor/rfcomm.c
+@@ -98,16 +98,6 @@ struct rfcomm_lmsc {
+ 	uint8_t break_sig;
+ } __attribute__((packed));
 
-> +
-> +		if (smp_h7(smp->tfm_cmac, smp->tk, salt, smp->link_key)) {
-> +			kzfree(smp->link_key);
-> +			smp->link_key = NULL;
-> +			return;
-> +		}
-> +	} else {
-> +		/* From core spec. Spells out in ASCII as 'tmp1'. */
-> +		const u8 tmp1[4] = { 0x31, 0x70, 0x6d, 0x74 };
-> +
-> +		if (smp_h6(smp->tfm_cmac, smp->tk, tmp1, smp->link_key)) {
-> +			kzfree(smp->link_key);
-> +			smp->link_key = NULL;
-> +			return;
-> +		}
-> 	}
-> 
-> 	if (smp_h6(smp->tfm_cmac, smp->link_key, lebr, smp->link_key)) {
-> @@ -1169,10 +1196,7 @@ static void smp_allow_key_dist(struct smp_chan *smp)
-> 
-> static void sc_generate_ltk(struct smp_chan *smp)
-> {
-> -	/* These constants are as specified in the core specification.
-> -	 * In ASCII they spell out to 'tmp2' and 'brle'.
-> -	 */
-> -	const u8 tmp2[4] = { 0x32, 0x70, 0x6d, 0x74 };
-> +	/* From core spec. Spells out in ASCII as 'brle'. */
-> 	const u8 brle[4] = { 0x65, 0x6c, 0x72, 0x62 };
-> 	struct hci_conn *hcon = smp->conn->hcon;
-> 	struct hci_dev *hdev = hcon->hdev;
-> @@ -1187,8 +1211,18 @@ static void sc_generate_ltk(struct smp_chan *smp)
-> 	if (key->type == HCI_LK_DEBUG_COMBINATION)
-> 		set_bit(SMP_FLAG_DEBUG_KEY, &smp->flags);
-> 
-> -	if (smp_h6(smp->tfm_cmac, key->val, tmp2, smp->tk))
-> -		return;
-> +	if (test_bit(SMP_FLAG_CT2, &smp->flags)) {
-> +		const u8 salt[16] = { 0x32, 0x70, 0x6d, 0x74 };
+-struct rfcomm_rpn {
+-	uint8_t dlci;
+-	uint8_t bit_rate;
+-	uint8_t parity;
+-	uint8_t io;
+-	uint8_t xon;
+-	uint8_t xoff;
+-	uint16_t pm;
+-} __attribute__ ((packed));
+-
+ struct rfcomm_rls {
+ 	uint8_t dlci;
+ 	uint8_t error;
+@@ -198,47 +188,48 @@ done:
+ static inline bool mcc_rpn(struct rfcomm_frame *rfcomm_frame, uint8_t indent)
+ {
+ 	struct l2cap_frame *frame = &rfcomm_frame->l2cap_frame;
+-	struct rfcomm_rpn rpn;
++	uint8_t dlci, bit_rate, parity, io, xon, xoff;
++	uint16_t pm;
 
-Same as above, we document where the magic comes from everywhere else. And if it is zero padded, we should mention that.
+-	if (!l2cap_frame_get_u8(frame, &rpn.dlci))
++	if (!l2cap_frame_get_u8(frame, &dlci))
+ 		return false;
 
-> +
-> +		if (smp_h7(smp->tfm_cmac, key->val, salt, smp->tk))
-> +			return;
-> +	} else {
-> +		/* From core spec. Spells out in ASCII as 'tmp2'. */
-> +		const u8 tmp2[4] = { 0x32, 0x70, 0x6d, 0x74 };
-> +
-> +		if (smp_h6(smp->tfm_cmac, key->val, tmp2, smp->tk))
-> +			return;
-> +	}
-> 
-> 	if (smp_h6(smp->tfm_cmac, smp->tk, brle, smp->tk))
-> 		return;
-> @@ -1669,6 +1703,7 @@ static void build_bredr_pairing_cmd(struct smp_chan *smp,
-> 	if (!rsp) {
-> 		memset(req, 0, sizeof(*req));
-> 
-> +		req->auth_req        = SMP_AUTH_CT2;
-> 		req->init_key_dist   = local_dist;
-> 		req->resp_key_dist   = remote_dist;
-> 		req->max_key_size    = conn->hcon->enc_key_size;
-> @@ -1680,6 +1715,7 @@ static void build_bredr_pairing_cmd(struct smp_chan *smp,
-> 
-> 	memset(rsp, 0, sizeof(*rsp));
-> 
-> +	rsp->auth_req        = SMP_AUTH_CT2;
-> 	rsp->max_key_size    = conn->hcon->enc_key_size;
-> 	rsp->init_key_dist   = req->init_key_dist & remote_dist;
-> 	rsp->resp_key_dist   = req->resp_key_dist & local_dist;
-> @@ -1744,6 +1780,9 @@ static u8 smp_cmd_pairing_req(struct l2cap_conn *conn, struct sk_buff *skb)
-> 
-> 		build_bredr_pairing_cmd(smp, req, &rsp);
-> 
-> +		if (req->auth_req & SMP_AUTH_CT2)
-> +			set_bit(SMP_FLAG_CT2, &smp->flags);
-> +
-> 		key_size = min(req->max_key_size, rsp.max_key_size);
-> 		if (check_enc_key_size(conn, key_size))
-> 			return SMP_ENC_KEY_SIZE;
-> @@ -1761,9 +1800,13 @@ static u8 smp_cmd_pairing_req(struct l2cap_conn *conn, struct sk_buff *skb)
-> 
-> 	build_pairing_cmd(conn, req, &rsp, auth);
-> 
-> -	if (rsp.auth_req & SMP_AUTH_SC)
-> +	if (rsp.auth_req & SMP_AUTH_SC) {
-> 		set_bit(SMP_FLAG_SC, &smp->flags);
-> 
-> +		if (rsp.auth_req & SMP_AUTH_CT2)
-> +			set_bit(SMP_FLAG_CT2, &smp->flags);
-> +	}
-> +
-> 	if (conn->hcon->io_capability == HCI_IO_NO_INPUT_OUTPUT)
-> 		sec_level = BT_SECURITY_MEDIUM;
-> 	else
-> @@ -1917,6 +1960,9 @@ static u8 smp_cmd_pairing_rsp(struct l2cap_conn *conn, struct sk_buff *skb)
-> 	 */
-> 	smp->remote_key_dist &= rsp->resp_key_dist;
-> 
-> +	if ((req->auth_req & SMP_AUTH_CT2) && (auth & SMP_AUTH_CT2))
-> +		set_bit(SMP_FLAG_CT2, &smp->flags);
-> +
-> 	/* For BR/EDR this means we're done and can start phase 3 */
-> 	if (conn->hcon->type == ACL_LINK) {
-> 		/* Clear bits which are generated but not distributed */
-> @@ -2312,8 +2358,11 @@ int smp_conn_security(struct hci_conn *hcon, __u8 sec_level)
-> 
-> 	authreq = seclevel_to_authreq(sec_level);
-> 
-> -	if (hci_dev_test_flag(hcon->hdev, HCI_SC_ENABLED))
-> +	if (hci_dev_test_flag(hcon->hdev, HCI_SC_ENABLED)) {
-> 		authreq |= SMP_AUTH_SC;
-> +		if (hci_dev_test_flag(hcon->hdev, HCI_SSP_ENABLED))
-> +			authreq |= SMP_AUTH_CT2;
-> +	}
-> 
-> 	/* Require MITM if IO Capability allows or the security level
-> 	 * requires it.
-> diff --git a/net/bluetooth/smp.h b/net/bluetooth/smp.h
-> index ffcc70b6b199..0ff6247eaa6c 100644
-> --- a/net/bluetooth/smp.h
-> +++ b/net/bluetooth/smp.h
-> @@ -57,6 +57,7 @@ struct smp_cmd_pairing {
-> #define SMP_AUTH_MITM		0x04
-> #define SMP_AUTH_SC		0x08
-> #define SMP_AUTH_KEYPRESS	0x10
-> +#define SMP_AUTH_CT2		0x20
-> 
-> #define SMP_CMD_PAIRING_CONFIRM	0x03
-> struct smp_cmd_pairing_confirm {
+-	print_field("%*cdlci %d", indent, ' ', RFCOMM_GET_DLCI(rpn.dlci));
++	print_field("%*cdlci %d", indent, ' ', RFCOMM_GET_DLCI(dlci));
 
-Regards
+ 	if (frame->size < 7)
+ 		goto done;
 
-Marcel
+ 	/* port value octets (optional) */
+
+-	if (!l2cap_frame_get_u8(frame, &rpn.bit_rate))
++	if (!l2cap_frame_get_u8(frame, &bit_rate))
+ 		return false;
+
+-	if (!l2cap_frame_get_u8(frame, &rpn.parity))
++	if (!l2cap_frame_get_u8(frame, &parity))
+ 		return false;
+
+-	if (!l2cap_frame_get_u8(frame, &rpn.io))
++	if (!l2cap_frame_get_u8(frame, &io))
+ 		return false;
+
+ 	print_field("%*cbr %d db %d sb %d p %d pt %d xi %d xo %d", indent, ' ',
+-		rpn.bit_rate, GET_RPN_DB(rpn.parity), GET_RPN_SB(rpn.parity),
+-		GET_RPN_PARITY(rpn.parity), GET_RPN_PTYPE(rpn.parity),
+-		GET_RPN_XIN(rpn.io), GET_RPN_XOUT(rpn.io));
++		bit_rate, GET_RPN_DB(parity), GET_RPN_SB(parity),
++		GET_RPN_PARITY(parity), GET_RPN_PTYPE(parity),
++		GET_RPN_XIN(io), GET_RPN_XOUT(io));
+
+-	if (!l2cap_frame_get_u8(frame, &rpn.xon))
++	if (!l2cap_frame_get_u8(frame, &xon))
+ 		return false;
+
+-	if (!l2cap_frame_get_u8(frame, &rpn.xoff))
++	if (!l2cap_frame_get_u8(frame, &xoff))
+ 		return false;
+
+ 	print_field("%*crtri %d rtro %d rtci %d rtco %d xon %d xoff %d",
+-		indent, ' ', GET_RPN_RTRI(rpn.io), GET_RPN_RTRO(rpn.io),
+-		GET_RPN_RTCI(rpn.io), GET_RPN_RTCO(rpn.io), rpn.xon,
+-		rpn.xoff);
++		indent, ' ', GET_RPN_RTRI(io), GET_RPN_RTRO(io),
++		GET_RPN_RTCI(io), GET_RPN_RTCO(io), xon, xoff);
+
+-	if (!l2cap_frame_get_le16(frame, &rpn.pm))
++	/* prevent unaligned memory access */
++	if (!l2cap_frame_get_le16(frame, &pm))
+ 		return false;
+
+-	print_field("%*cpm 0x%04x", indent, ' ', rpn.pm);
++	print_field("%*cpm 0x%04x", indent, ' ', pm);
+
+ done:
+ 	return true;
+@@ -265,6 +256,7 @@ static inline bool mcc_pn(struct rfcomm_frame *rfcomm_frame, uint8_t indent)
+ {
+ 	struct l2cap_frame *frame = &rfcomm_frame->l2cap_frame;
+ 	struct rfcomm_pn pn;
++	uint16_t mtu;
+
+ 	/* rfcomm_pn struct is defined in rfcomm.h */
+
+@@ -284,8 +276,10 @@ static inline bool mcc_pn(struct rfcomm_frame *rfcomm_frame, uint8_t indent)
+ 	if (!l2cap_frame_get_u8(frame, &pn.ack_timer))
+ 		return false;
+
+-	if (!l2cap_frame_get_le16(frame, &pn.mtu))
++	/* prevent unaligned memory access */
++	if (!l2cap_frame_get_le16(frame, &mtu))
+ 		return false;
++	pn.mtu = mtu;
+
+ 	if (!l2cap_frame_get_u8(frame, &pn.max_retrans))
+ 		return false;
+--
+2.8.0.rc3.226.g39d4020
 
