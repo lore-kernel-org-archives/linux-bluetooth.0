@@ -3,23 +3,26 @@ Subject: Re: [PATCH BlueZ v2] profiles/midi: Added MIDI over BLE profile
  implementation
 To: linux-bluetooth@vger.kernel.org
 References: <20161209112243.8439-1-eu@felipetonello.com>
-Cc: agoode@chromium.org
 From: Felipe Ferreri Tonello <eu@felipetonello.com>
-Message-ID: <9a3cd8ee-89da-fd89-fca8-9cbe677fbeb2@felipetonello.com>
-Date: Fri, 9 Dec 2016 11:26:49 +0000
+Message-ID: <8f3b7b5e-bfe7-1074-6062-b4c16da26217@felipetonello.com>
+Date: Fri, 9 Dec 2016 11:24:18 +0000
 MIME-Version: 1.0
 In-Reply-To: <20161209112243.8439-1-eu@felipetonello.com>
 Content-Type: multipart/mixed;
- boundary="------------BB6356466F9F983358D556B9"
+ boundary="------------4DAE1BF5B85715132E825C06"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 This is a multi-part message in MIME format.
---------------BB6356466F9F983358D556B9
+--------------4DAE1BF5B85715132E825C06
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
 
-CC'ing agoode.
+Sorry for the typo, this is actually V3, and not V2!
+
+The changeset for the patch below confirms that.
+
+Thanks.
 
 On 09/12/16 11:22, Felipe F. Tonello wrote:
 > This plugin implements the Central role of MIDI over Bluetooth
@@ -1693,7 +1696,7 @@ On 09/12/16 11:22, Felipe F. Tonello wrote:
 -- 
 Felipe
 
---------------BB6356466F9F983358D556B9
+--------------4DAE1BF5B85715132E825C06
 Content-Type: application/pgp-keys;
  name="0x92698E6A.asc"
 Content-Transfer-Encoding: 7bit
@@ -1815,4 +1818,4 @@ SkAyCfQaSw==
 =JwBB
 -----END PGP PUBLIC KEY BLOCK-----
 
---------------BB6356466F9F983358D556B9--
+--------------4DAE1BF5B85715132E825C06--
