@@ -1,101 +1,94 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <gregkh@linuxfoundation.org>
+Date: Thu, 15 Dec 2016 03:50:59 -0800
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: linux-kernel@vger.kernel.org,
+	Emmanuel Grumbach <emmanuel.grumbach@intel.com>,
+	Stanislaw Gruszka <sgruszka@redhat.com>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	Arend van Spriel <arend.vanspriel@broadcom.com>,
+	Luca Coelho <luciano.coelho@intel.com>, devel@driverdev.osuosl.org,
+	Jakub Kicinski <kubakici@wp.pl>,
+	Stefan Schmidt <stefan@osg.samsung.com>,
+	linux-mediatek@lists.infradead.org, wil6210@qca.qualcomm.com,
+	linux-arm-kernel@lists.infradead.org,
+	Chris Snook <chris.snook@gmail.com>,
+	Wolfgang Grandegger <wg@grandegger.com>,
+	Jay Cliburn <jcliburn@gmail.com>, linux-wpan@vger.kernel.org,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Johannes Berg <johannes.berg@intel.com>,
+	Intel Linux Wireless <linuxwifi@intel.com>,
+	Alexander Aring <aar@pengutronix.de>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Hante Meuleman <hante.meuleman@broadcom.com>,
+	linux-can@vger.kernel.org, Marc Kleine-Budde <mkl@pengutronix.de>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	Kalle Valo <kvalo@codeaurora.org>,
+	Franky Lin <franky.lin@broadcom.com>,
+	brcm80211-dev-list.pdl@broadcom.com,
+	"Luis R. Rodriguez" <mcgrof@do-not-panic.com>,
+	linux-wireless@vger.kernel.org,
+	Maya Erez <qca_merez@qca.qualcomm.com>,
+	linux-bluetooth@vger.kernel.org,
+	Chaoming Li <chaoming_li@realsil.com.cn>, netdev@vger.kernel.org,
+	nios2-dev@lists.rocketboards.org,
+	Vince Bridgers <vbridger@opensource.altera.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Larry Finger <Larry.Finger@lwfinger.net>
+Subject: Re: [PATCH 8/8] Makefile: drop -D__CHECK_ENDIAN__ from cflags
+Message-ID: <20161215115059.GA22750@kroah.com>
+References: <1481778865-27667-1-git-send-email-mst@redhat.com>
+ <1481778865-27667-9-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAHgsZ+iWHFDNOqA4JBRpboKoOaCg5qxxJURa7apPyvuGqVJ38w@mail.gmail.com>
-References: <CABBYNZKzAbRHLBMU_WGH_aht_-ycU1OOuqJ_4M1RDovFd8z8tw@mail.gmail.com>
- <1481317184-173403-1-git-send-email-mcchou@chromium.org> <CAHgsZ+iWHFDNOqA4JBRpboKoOaCg5qxxJURa7apPyvuGqVJ38w@mail.gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 15 Dec 2016 14:05:10 +0200
-Message-ID: <CABBYNZ+NScyi8K9CJvwmM_6GngGCHLB=--PQa9s_4w1qOc=4JQ@mail.gmail.com>
-Subject: Re: [PATCH v3] monitor/rfcomm: Fix a potential memory access issue
- for compatibility with LLVM
-To: Miao-chen Chou <mcchou@chromium.org>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "Von Dentz, Luiz" <luiz.von.dentz@intel.com>,
-        josephsih@chromium.org
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1481778865-27667-9-git-send-email-mst@redhat.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+On Thu, Dec 15, 2016 at 07:15:30AM +0200, Michael S. Tsirkin wrote:
+> That's the default now, no need for makefiles to set it.
+> 
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> ---
+>  drivers/bluetooth/Makefile                                | 2 --
+>  drivers/net/can/Makefile                                  | 1 -
+>  drivers/net/ethernet/altera/Makefile                      | 1 -
+>  drivers/net/ethernet/atheros/alx/Makefile                 | 1 -
+>  drivers/net/ethernet/freescale/Makefile                   | 2 --
+>  drivers/net/wireless/ath/Makefile                         | 2 --
+>  drivers/net/wireless/ath/wil6210/Makefile                 | 2 --
+>  drivers/net/wireless/broadcom/brcm80211/brcmfmac/Makefile | 2 --
+>  drivers/net/wireless/broadcom/brcm80211/brcmsmac/Makefile | 1 -
+>  drivers/net/wireless/intel/iwlegacy/Makefile              | 2 --
+>  drivers/net/wireless/intel/iwlwifi/Makefile               | 2 +-
+>  drivers/net/wireless/intel/iwlwifi/dvm/Makefile           | 2 +-
+>  drivers/net/wireless/intel/iwlwifi/mvm/Makefile           | 2 +-
+>  drivers/net/wireless/intersil/orinoco/Makefile            | 3 ---
+>  drivers/net/wireless/mediatek/mt7601u/Makefile            | 2 --
+>  drivers/net/wireless/realtek/rtlwifi/Makefile             | 2 --
+>  drivers/net/wireless/realtek/rtlwifi/btcoexist/Makefile   | 2 --
+>  drivers/net/wireless/realtek/rtlwifi/rtl8188ee/Makefile   | 2 --
+>  drivers/net/wireless/realtek/rtlwifi/rtl8192c/Makefile    | 2 --
+>  drivers/net/wireless/realtek/rtlwifi/rtl8192ce/Makefile   | 2 --
+>  drivers/net/wireless/realtek/rtlwifi/rtl8192cu/Makefile   | 2 --
+>  drivers/net/wireless/realtek/rtlwifi/rtl8192de/Makefile   | 2 --
+>  drivers/net/wireless/realtek/rtlwifi/rtl8192ee/Makefile   | 2 --
+>  drivers/net/wireless/realtek/rtlwifi/rtl8192se/Makefile   | 2 --
+>  drivers/net/wireless/realtek/rtlwifi/rtl8723ae/Makefile   | 2 --
+>  drivers/net/wireless/realtek/rtlwifi/rtl8723be/Makefile   | 2 --
+>  drivers/net/wireless/realtek/rtlwifi/rtl8723com/Makefile  | 2 --
+>  drivers/net/wireless/realtek/rtlwifi/rtl8821ae/Makefile   | 2 --
+>  drivers/net/wireless/ti/wl1251/Makefile                   | 2 --
+>  drivers/net/wireless/ti/wlcore/Makefile                   | 2 --
+>  drivers/staging/rtl8188eu/Makefile                        | 2 +-
+>  drivers/staging/rtl8192e/Makefile                         | 2 --
+>  drivers/staging/rtl8192e/rtl8192e/Makefile                | 2 --
+>  net/bluetooth/Makefile                                    | 2 --
+>  net/ieee802154/Makefile                                   | 2 --
+>  net/mac80211/Makefile                                     | 2 +-
+>  net/mac802154/Makefile                                    | 2 --
+>  net/wireless/Makefile                                     | 2 --
+>  38 files changed, 5 insertions(+), 68 deletions(-)
 
-On Tue, Dec 13, 2016 at 11:34 PM, Miao-chen Chou <mcchou@chromium.org> wrote:
-> Hello Luiz,
->
-> Is there any comment on this patch?
+For drivers/staging:
 
-Ive sent a similar patch removing the remaining packed attribute from
-the RFCOMM, not sure if you have seen it? There is actually no reason
-to keep them packed since it is not used to stored the raw packets, so
-if you can please test the patch and let me know if that fixes the
-LLVM problem.
-
-> Thanks,
-> Miao
->
-> On Sat, Dec 10, 2016 at 4:59 AM,  <mcchou@chromium.org> wrote:
->> From: Miao-chen Chou <mcchou@chromium.org>
->>
->> This patch removes "packed" attribute from the definition of struct rfcomm_rpn
->> to prevent the access to an unaligned struct member in mmc_rpn(). This patch
->> also introduces a temp variable in mcc_pn() to prevent unaligned access without
->> touching the definition of struct rfcomm_pn, since struct rfcomm_pn is used as
->> a PDU.
->> ---
->>  monitor/rfcomm.c | 10 ++++++----
->>  1 file changed, 6 insertions(+), 4 deletions(-)
->>
->> diff --git a/monitor/rfcomm.c b/monitor/rfcomm.c
->> index b32ad40..08f3e36 100644
->> --- a/monitor/rfcomm.c
->> +++ b/monitor/rfcomm.c
->> @@ -106,7 +106,7 @@ struct rfcomm_rpn {
->>         uint8_t xon;
->>         uint8_t xoff;
->>         uint16_t pm;
->> -} __attribute__ ((packed));
->> +};
->>
->>  struct rfcomm_rls {
->>         uint8_t dlci;
->> @@ -232,8 +232,7 @@ static inline bool mcc_rpn(struct rfcomm_frame *rfcomm_frame, uint8_t indent)
->>
->>         print_field("%*crtri %d rtro %d rtci %d rtco %d xon %d xoff %d",
->>                 indent, ' ', GET_RPN_RTRI(rpn.io), GET_RPN_RTRO(rpn.io),
->> -               GET_RPN_RTCI(rpn.io), GET_RPN_RTCO(rpn.io), rpn.xon,
->> -               rpn.xoff);
->> +               GET_RPN_RTCI(rpn.io), GET_RPN_RTCO(rpn.io), rpn.xon, rpn.xoff);
->>
->>         if (!l2cap_frame_get_le16(frame, &rpn.pm))
->>                 return false;
->> @@ -265,6 +264,7 @@ static inline bool mcc_pn(struct rfcomm_frame *rfcomm_frame, uint8_t indent)
->>  {
->>         struct l2cap_frame *frame = &rfcomm_frame->l2cap_frame;
->>         struct rfcomm_pn pn;
->> +       uint16_t mtu;
->>
->>         /* rfcomm_pn struct is defined in rfcomm.h */
->>
->> @@ -284,8 +284,10 @@ static inline bool mcc_pn(struct rfcomm_frame *rfcomm_frame, uint8_t indent)
->>         if (!l2cap_frame_get_u8(frame, &pn.ack_timer))
->>                 return false;
->>
->> -       if (!l2cap_frame_get_le16(frame, &pn.mtu))
->> +       /* prevent unaligned memory access */
->> +       if (!l2cap_frame_get_le16(frame, &mtu))
->>                 return false;
->> +       pn.mtu = mtu;
->>
->>         if (!l2cap_frame_get_u8(frame, &pn.max_retrans))
->>                 return false;
->> --
->> 2.8.0.rc3.226.g39d4020
->>
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-
--- 
-Luiz Augusto von Dentz
+Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
