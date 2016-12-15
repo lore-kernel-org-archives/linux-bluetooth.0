@@ -1,58 +1,61 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: "Wong, Joshua Weng Onn" <joshua.weng.onn.wong@intel.com>
-To: "alex.aring@gmail.com" <alex.aring@gmail.com>,
-        "jukka.rissanen@linux.intel.com" <jukka.rissanen@linux.intel.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Bluetooth 6lowpan ping6 slab corruption
-Date: Fri, 16 Dec 2016 06:46:07 +0000
-Message-ID: <E3B98393E6037849B63EA428240A65135BC9D5@PGSMSX103.gar.corp.intel.com>
-Content-Type: text/plain; charset="us-ascii"
+Return-Path: <arend.vanspriel@broadcom.com>
+Subject: Re: [PATCH 8/8] Makefile: drop -D__CHECK_ENDIAN__ from cflags
+To: "Michael S. Tsirkin" <mst@redhat.com>, linux-kernel@vger.kernel.org
+References: <1481778865-27667-1-git-send-email-mst@redhat.com>
+ <1481778865-27667-9-git-send-email-mst@redhat.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+ Gustavo Padovan <gustavo@padovan.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>,
+ Wolfgang Grandegger <wg@grandegger.com>,
+ Marc Kleine-Budde <mkl@pengutronix.de>,
+ Vince Bridgers <vbridger@opensource.altera.com>,
+ Jay Cliburn <jcliburn@gmail.com>, Chris Snook <chris.snook@gmail.com>,
+ "Luis R. Rodriguez" <mcgrof@do-not-panic.com>,
+ Kalle Valo <kvalo@codeaurora.org>, Maya Erez <qca_merez@qca.qualcomm.com>,
+ Franky Lin <franky.lin@broadcom.com>,
+ Hante Meuleman <hante.meuleman@broadcom.com>,
+ Stanislaw Gruszka <sgruszka@redhat.com>,
+ Johannes Berg <johannes.berg@intel.com>,
+ Emmanuel Grumbach <emmanuel.grumbach@intel.com>,
+ Luca Coelho <luciano.coelho@intel.com>,
+ Intel Linux Wireless <linuxwifi@intel.com>, Jakub Kicinski <kubakici@wp.pl>,
+ Larry Finger <Larry.Finger@lwfinger.net>,
+ Chaoming Li <chaoming_li@realsil.com.cn>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ "David S. Miller" <davem@davemloft.net>, Alexander Aring
+ <aar@pengutronix.de>, Stefan Schmidt <stefan@osg.samsung.com>,
+ Matthias Brugger <matthias.bgg@gmail.com>, linux-bluetooth@vger.kernel.org,
+ linux-can@vger.kernel.org, netdev@vger.kernel.org,
+ nios2-dev@lists.rocketboards.org, linux-wireless@vger.kernel.org,
+ wil6210@qca.qualcomm.com, brcm80211-dev-list.pdl@broadcom.com,
+ devel@driverdev.osuosl.org, linux-wpan@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
+From: Arend Van Spriel <arend.vanspriel@broadcom.com>
+Message-ID: <5186291e-90ed-3070-72ad-d6f78fd1a410@broadcom.com>
+Date: Thu, 15 Dec 2016 21:15:23 +0100
 MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1481778865-27667-9-git-send-email-mst@redhat.com>
+Content-Type: text/plain; charset=windows-1252
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+On 15-12-2016 6:15, Michael S. Tsirkin wrote:
+> That's the default now, no need for makefiles to set it.
+> 
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> ---
+>  drivers/bluetooth/Makefile                                | 2 --
+>  drivers/net/can/Makefile                                  | 1 -
+>  drivers/net/ethernet/altera/Makefile                      | 1 -
+>  drivers/net/ethernet/atheros/alx/Makefile                 | 1 -
+>  drivers/net/ethernet/freescale/Makefile                   | 2 --
+>  drivers/net/wireless/ath/Makefile                         | 2 --
+>  drivers/net/wireless/ath/wil6210/Makefile                 | 2 --
+>  drivers/net/wireless/broadcom/brcm80211/brcmfmac/Makefile | 2 --
+>  drivers/net/wireless/broadcom/brcm80211/brcmsmac/Makefile | 1 -
 
-I have enabled 6lowpan and bluetooth 6lowpan in the kernel configuration on two systems. Both these systems are running linux and one act as a master and another act as a slave.
-I am facing a bug while in a bluetooth 6lowpan connection. This happens during a ping6. The kernel version that I am using is 4.1.27 with BlueZ 5.40 on a x86_64 architecture. The kernel reports regarding slab corruption.
+For brcm80211 drivers:
 
-The steps that I have performed are as follows:
-Slave device:
-$ modprobe 6lowpan
-$ modprobe Bluetooth_6lowpan
-$ echo 1 > /sys/kernel/debug/bluetooth/6lowpan_enable
-$ hciconfig hci0 leadv 
+Acked-by: Arend van Spriel <arend.vanspriel@broadcom.com>
 
-Master device:
-$ modprobe 6lowpan
-$ modprobe bluetooth_6lowpan
-$ echo 1 > /sys/kernel/debug/bluetooth/6lowpan_enable
-$ hcitool lescan << to obtain slave BT ADDR
-$ echo "connect <remote_BT_MAC> 1" > /sys/kernel/debug/bluetooth/6lowpan_control
-$ ifconfig (look for bt0 interface) << to obtain IPv6 address of slave device
-$ ping6 -I bt0 <IPV6_ADDR>     <<<<------ The console message starts to appear here during ping6
-
-The output of the console message:
-
-[  794.985623] Slab corruption (Tainted: G     U         ): skbuff_head_cache start=ffff8801f568f700, len=232
-[  795.008755] 050: 00 00 00 00 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b  ....kkkkkkkkkkkk
-[  795.029380] Prev obj: start=ffff8801f568f600, len=232
-[  795.044743] 000: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-[  795.061310] 010: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-[  795.076752] Next obj: start=ffff8801f568f800, len=232
-[  795.088448] 000: 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b  kkkkkkkkkkkkkkkk
-[  795.102365] 010: 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b  kkkkkkkkkkkkkkkk
-
-The 6lowpan connection between the two devices is connected.
-I observed that the console message appears once when the master initiates the connection to the slave and nothing happens after that.
-Once I start doing the ping6 from master to slave, the same message appears again. This same set of message continues to be printed every 5 seconds or so.
-This also persists when ping6 is done from the slave to the master. 
-
-Do you know what could possibly cause this issue?
-
-Please let me know if you require further information.
-
-Thank you.
-
-Best regards,
-Joshua
+Regards,
+Arend
