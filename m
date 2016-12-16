@@ -1,76 +1,94 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 2/2] core/gatt-database: Send offset if set to WriteValue
-Date: Fri, 16 Dec 2016 15:18:53 +0200
-Message-Id: <20161216131853.2815-2-luiz.dentz@gmail.com>
-In-Reply-To: <20161216131853.2815-1-luiz.dentz@gmail.com>
-References: <20161216131853.2815-1-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 1/2] core/gatt-database: Send offset if set to ReadValue
+Date: Fri, 16 Dec 2016 15:18:52 +0200
+Message-Id: <20161216131853.2815-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-If there remote is using Prepare + Execute Write commands as part of
-a Write Long procedure the offset needs to be set in order for the
-application to detect from where it shall write the data.
+If there remote is using Read Blob command as part of a Read Long
+procedure the offset needs to be set in order for the application to
+detect from where it shall start.
+
+Note that with this it is also possible to detect what the chunk sizes
+needs to be as the first offset indicates the maximum payload.
 ---
- src/gatt-database.c | 15 ++++++++++-----
- 1 file changed, 10 insertions(+), 5 deletions(-)
+ src/gatt-database.c | 18 +++++++++++++-----
+ 1 file changed, 13 insertions(+), 5 deletions(-)
 
 diff --git a/src/gatt-database.c b/src/gatt-database.c
-index 88627ac..5979e37 100644
+index 7b3ec16..88627ac 100644
 --- a/src/gatt-database.c
 +++ b/src/gatt-database.c
-@@ -1738,7 +1738,8 @@ static struct pending_op *pending_write_new(struct btd_device *device,
+@@ -138,6 +138,7 @@ struct external_desc {
+ struct pending_op {
+ 	struct btd_device *device;
+ 	unsigned int id;
++	uint16_t offset;
+ 	struct gatt_db_attribute *attrib;
+ 	struct queue *owner_queue;
+ 	struct iovec data;
+@@ -1605,7 +1606,7 @@ static void pending_op_free(void *data)
+ static struct pending_op *pending_read_new(struct btd_device *device,
+ 					struct queue *owner_queue,
  					struct gatt_db_attribute *attrib,
- 					unsigned int id,
- 					const uint8_t *value,
--					size_t len)
-+					size_t len,
-+					uint16_t offset)
+-					unsigned int id)
++					unsigned int id, uint16_t offset)
  {
  	struct pending_op *op;
  
-@@ -1751,6 +1752,7 @@ static struct pending_op *pending_write_new(struct btd_device *device,
- 	op->owner_queue = owner_queue;
+@@ -1615,6 +1616,7 @@ static struct pending_op *pending_read_new(struct btd_device *device,
+ 	op->device = device;
  	op->attrib = attrib;
  	op->id = id;
 +	op->offset = offset;
  	queue_push_tail(owner_queue, op);
  
  	return op;
-@@ -1761,11 +1763,13 @@ static struct pending_op *send_write(struct btd_device *device,
+@@ -1626,6 +1628,9 @@ static void append_options(DBusMessageIter *iter, void *user_data)
+ 	const char *path = device_get_path(op->device);
+ 
+ 	dict_append_entry(iter, "device", DBUS_TYPE_OBJECT_PATH, &path);
++	if (op->offset)
++		dict_append_entry(iter, "offset", DBUS_TYPE_UINT16,
++							&op->offset);
+ }
+ 
+ static void read_setup_cb(DBusMessageIter *iter, void *user_data)
+@@ -1649,11 +1654,12 @@ static struct pending_op *send_read(struct btd_device *device,
+ 					struct gatt_db_attribute *attrib,
  					GDBusProxy *proxy,
  					struct queue *owner_queue,
- 					unsigned int id,
--					const uint8_t *value, size_t len)
-+					const uint8_t *value, size_t len,
+-					unsigned int id)
++					unsigned int id,
 +					uint16_t offset)
  {
  	struct pending_op *op;
  
--	op = pending_write_new(device, owner_queue, attrib, id, value, len);
-+	op = pending_write_new(device, owner_queue, attrib, id, value, len,
-+								offset);
+-	op = pending_read_new(device, owner_queue, attrib, id);
++	op = pending_read_new(device, owner_queue, attrib, id, offset);
  
- 	if (g_dbus_proxy_method_call(proxy, "WriteValue", write_setup_cb,
- 					owner_queue ? write_reply_cb : NULL,
-@@ -2010,7 +2014,7 @@ static void desc_write_cb(struct gatt_db_attribute *attrib,
+ 	if (g_dbus_proxy_method_call(proxy, "ReadValue", read_setup_cb,
+ 				read_reply_cb, op, pending_op_free) == TRUE)
+@@ -1974,7 +1980,8 @@ static void desc_read_cb(struct gatt_db_attribute *attrib,
+ 		goto fail;
  	}
  
- 	if (send_write(device, attrib, desc->proxy, desc->pending_writes, id,
--							value, len))
-+							value, len, offset))
+-	if (send_read(device, attrib, desc->proxy, desc->pending_reads, id))
++	if (send_read(device, attrib, desc->proxy, desc->pending_reads, id,
++								offset))
  		return;
  
  fail:
-@@ -2096,7 +2100,8 @@ static void chrc_write_cb(struct gatt_db_attribute *attrib,
- 	else
- 		queue = NULL;
+@@ -2054,7 +2061,8 @@ static void chrc_read_cb(struct gatt_db_attribute *attrib,
+ 		goto fail;
+ 	}
  
--	if (send_write(device, attrib, chrc->proxy, queue, id, value, len))
-+	if (send_write(device, attrib, chrc->proxy, queue, id, value, len,
+-	if (send_read(device, attrib, chrc->proxy, chrc->pending_reads, id))
++	if (send_read(device, attrib, chrc->proxy, chrc->pending_reads, id,
 +								offset))
  		return;
  
