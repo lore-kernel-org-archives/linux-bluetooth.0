@@ -1,40 +1,50 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC 0/3] Bluetooth: Don't force MGMT device connected
-Date: Fri, 16 Dec 2016 14:19:26 +0200
-Message-Id: <20161216121929.26476-1-luiz.dentz@gmail.com>
+Subject: [RFC 1/3] Bluetooth: L2CAP: Use l2cap_request_info whenever requesting info
+Date: Fri, 16 Dec 2016 14:19:27 +0200
+Message-Id: <20161216121929.26476-2-luiz.dentz@gmail.com>
+In-Reply-To: <20161216121929.26476-1-luiz.dentz@gmail.com>
+References: <20161216121929.26476-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This set attempt to fix a race where Read Name command is pending but
-L2CAP connection request comes in which forced MGMT Device Connected event
-to allow userspace to handle the incoming connection causing the device
-to have no name.
+This reduces duplicated code and also ensures L2CAP_INFO_REQ is no sent
+twice as l2cap_request_info checks if L2CAP_INFO_FEAT_MASK_REQ_SENT has
+been set.
 
-In order to fix this the code will no longer send the event and instead
-will put the socket into BT_CONNECT2 and respond with pending result, then
-once Read Name completes it will continue the connection handling and
-emit Device Connected event with a proper name.
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+---
+ net/bluetooth/l2cap_core.c | 14 ++------------
+ 1 file changed, 2 insertions(+), 12 deletions(-)
 
-Preliminary test did not show any regression but there could devices that
-don't behave well if there are multiple responses with pending result so
-this has to go more extensive testing thus why Im sending first as RFC.
-
-Luiz Augusto von Dentz (3):
-  Bluetooth: L2CAP: Use l2cap_request_info whenever requesting info
-  Bluetooth: Don't force MGMT device connected on L2CAP connection
-    request
-  Bluetooth: L2CAP: Rework code around Connect Response
-
- include/net/bluetooth/hci_core.h |  13 ++
- include/net/bluetooth/l2cap.h    |   1 +
- net/bluetooth/hci_event.c        |  16 ++-
- net/bluetooth/l2cap_core.c       | 287 +++++++++++++++++++--------------------
- 4 files changed, 168 insertions(+), 149 deletions(-)
-
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 577f1c0..7718e4a 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -3872,18 +3872,8 @@ static struct l2cap_chan *l2cap_connect(struct l2cap_conn *conn,
+ 	rsp.status = cpu_to_le16(status);
+ 	l2cap_send_cmd(conn, cmd->ident, rsp_code, sizeof(rsp), &rsp);
+ 
+-	if (result == L2CAP_CR_PEND && status == L2CAP_CS_NO_INFO) {
+-		struct l2cap_info_req info;
+-		info.type = cpu_to_le16(L2CAP_IT_FEAT_MASK);
+-
+-		conn->info_state |= L2CAP_INFO_FEAT_MASK_REQ_SENT;
+-		conn->info_ident = l2cap_get_ident(conn);
+-
+-		schedule_delayed_work(&conn->info_timer, L2CAP_INFO_TIMEOUT);
+-
+-		l2cap_send_cmd(conn, conn->info_ident, L2CAP_INFO_REQ,
+-			       sizeof(info), &info);
+-	}
++	if (result == L2CAP_CR_PEND && status == L2CAP_CS_NO_INFO)
++		l2cap_request_info(conn);
+ 
+ 	if (chan && !test_bit(CONF_REQ_SENT, &chan->conf_state) &&
+ 	    result == L2CAP_CR_SUCCESS) {
 -- 
 2.9.3
 
