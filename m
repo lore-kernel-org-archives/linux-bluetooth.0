@@ -1,60 +1,115 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <E3B98393E6037849B63EA428240A65135BC9D5@PGSMSX103.gar.corp.intel.com>
-References: <E3B98393E6037849B63EA428240A65135BC9D5@PGSMSX103.gar.corp.intel.com>
+In-Reply-To: <20161209131731.4888-1-luiz.dentz@gmail.com>
+References: <20161209131731.4888-1-luiz.dentz@gmail.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Fri, 16 Dec 2016 14:34:03 +0200
-Message-ID: <CABBYNZKbuSLNMFVGzscK_faPEdHT-tH1=g48sdcyM6fhYHm5CA@mail.gmail.com>
-Subject: Re: Bluetooth 6lowpan ping6 slab corruption
-To: "Wong, Joshua Weng Onn" <joshua.weng.onn.wong@intel.com>
-Cc: "alex.aring@gmail.com" <alex.aring@gmail.com>,
-        "jukka.rissanen@linux.intel.com" <jukka.rissanen@linux.intel.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Fri, 16 Dec 2016 14:21:32 +0200
+Message-ID: <CABBYNZ+JCESJ39ZPM14u7+7qugR=kH0X5nhZJY9s3=XaN0gbvg@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] monitor/rfcomm: Remove packed attribute from structs
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Joshua,
+Hi,
 
-On Fri, Dec 16, 2016 at 8:46 AM, Wong, Joshua Weng Onn
-<joshua.weng.onn.wong@intel.com> wrote:
-> $ ifconfig (look for bt0 interface) << to obtain IPv6 address of slave device
-
-This is not right, the address of bt0 is in fact the local address not
-the remote address, not sure if that could cause the problems bellow
-though.
-
-> $ ping6 -I bt0 <IPV6_ADDR>     <<<<------ The console message starts to appear here during ping6
+On Fri, Dec 9, 2016 at 3:17 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 >
-> The output of the console message:
+> These structs do not represent the raw PDU format thus they don't need
+> to be the exact same size.
+> ---
+>  monitor/rfcomm.c | 10 +++++-----
+>  monitor/rfcomm.h | 10 +++++-----
+>  2 files changed, 10 insertions(+), 10 deletions(-)
 >
-> [  794.985623] Slab corruption (Tainted: G     U         ): skbuff_head_cache start=ffff8801f568f700, len=232
-> [  795.008755] 050: 00 00 00 00 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b  ....kkkkkkkkkkkk
-> [  795.029380] Prev obj: start=ffff8801f568f600, len=232
-> [  795.044743] 000: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-> [  795.061310] 010: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-> [  795.076752] Next obj: start=ffff8801f568f800, len=232
-> [  795.088448] 000: 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b  kkkkkkkkkkkkkkkk
-> [  795.102365] 010: 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b  kkkkkkkkkkkkkkkk
+> diff --git a/monitor/rfcomm.c b/monitor/rfcomm.c
+> index b32ad40..fd7bbdc 100644
+> --- a/monitor/rfcomm.c
+> +++ b/monitor/rfcomm.c
+> @@ -90,13 +90,13 @@ struct rfcomm_lhdr {
+>         uint16_t length;
+>         uint8_t fcs;
+>         uint8_t credits; /* only for UIH frame */
+> -} __attribute__((packed));
+> +};
 >
-> The 6lowpan connection between the two devices is connected.
-> I observed that the console message appears once when the master initiates the connection to the slave and nothing happens after that.
-> Once I start doing the ping6 from master to slave, the same message appears again. This same set of message continues to be printed every 5 seconds or so.
-> This also persists when ping6 is done from the slave to the master.
+>  struct rfcomm_lmsc {
+>         uint8_t dlci;
+>         uint8_t v24_sig;
+>         uint8_t break_sig;
+> -} __attribute__((packed));
+> +};
 >
-> Do you know what could possibly cause this issue?
+>  struct rfcomm_rpn {
+>         uint8_t dlci;
+> @@ -111,16 +111,16 @@ struct rfcomm_rpn {
+>  struct rfcomm_rls {
+>         uint8_t dlci;
+>         uint8_t error;
+> -} __attribute__((packed));
+> +};
 >
-> Please let me know if you require further information.
+>  struct rfcomm_nsc {
+>         uint8_t cmd_type;
+> -} __attribute__((packed));
+> +};
 >
-> Thank you.
+>  struct rfcomm_lmcc {
+>         uint8_t type;
+>         uint16_t length;
+> -} __attribute__((packed));
+> +};
 >
-> Best regards,
-> Joshua
+>  struct rfcomm_frame {
+>         struct rfcomm_lhdr hdr;
+> diff --git a/monitor/rfcomm.h b/monitor/rfcomm.h
+> index c157352..f95e9c7 100644
+> --- a/monitor/rfcomm.h
+> +++ b/monitor/rfcomm.h
+> @@ -38,14 +38,14 @@ struct rfcomm_hdr {
+>         uint8_t address;
+>         uint8_t control;
+>         uint8_t length;
+> -} __attribute__((packed));
+> +};
+>
+>  struct rfcomm_cmd {
+>         uint8_t address;
+>         uint8_t control;
+>         uint8_t length;
+>         uint8_t fcs;
+> -} __attribute__((packed));
+> +};
+>
+>  #define RFCOMM_TEST    0x08
+>  #define RFCOMM_FCON    0x28
+> @@ -62,12 +62,12 @@ struct rfcomm_cmd {
+>  struct rfcomm_mcc {
+>         uint8_t type;
+>         uint8_t length;
+> -} __attribute__((packed));
+> +};
+>
+>  struct rfcomm_msc {
+>         uint8_t dlci;
+>         uint8_t v24_sig;
+> -} __attribute__((packed));
+> +};
+>
+>  struct rfcomm_pn {
+>         uint8_t  dlci;
+> @@ -77,4 +77,4 @@ struct rfcomm_pn {
+>         uint16_t mtu;
+>         uint8_t  max_retrans;
+>         uint8_t  credits;
+> -} __attribute__((packed));
+> +};
 > --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> 2.9.3
 
+Applied.
 
 
 -- 
