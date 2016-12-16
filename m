@@ -1,20 +1,22 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-From: "Wong, Joshua Weng Onn" <joshua.weng.onn.wong@intel.com>
-To: Alexander Aring <aar@pengutronix.de>
-CC: "alex.aring@gmail.com" <alex.aring@gmail.com>,
+Subject: Re: Bluetooth 6lowpan ping6 slab corruption
+References: <E3B98393E6037849B63EA428240A65135BC9D5@PGSMSX103.gar.corp.intel.com>
+Cc: "Wong, Joshua Weng Onn" <joshua.weng.onn.wong@intel.com>,
+        "alex.aring@gmail.com" <alex.aring@gmail.com>,
         "jukka.rissanen@linux.intel.com" <jukka.rissanen@linux.intel.com>,
         "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
         "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>
-Subject: RE: Bluetooth 6lowpan ping6 slab corruption
-Date: Fri, 16 Dec 2016 08:18:18 +0000
-Message-ID: <E3B98393E6037849B63EA428240A65135BCA89@PGSMSX103.gar.corp.intel.com>
-References: <E3B98393E6037849B63EA428240A65135BC9D5@PGSMSX103.gar.corp.intel.com>
- <c70d7129-be2d-4764-6f09-1153192c49be@pengutronix.de>
-In-Reply-To: <c70d7129-be2d-4764-6f09-1153192c49be@pengutronix.de>
-Content-Type: text/plain; charset="us-ascii"
+From: Alexander Aring <aar@pengutronix.de>
+Message-ID: <c70d7129-be2d-4764-6f09-1153192c49be@pengutronix.de>
+Date: Fri, 16 Dec 2016 08:44:50 +0100
 MIME-Version: 1.0
+In-Reply-To: <E3B98393E6037849B63EA428240A65135BC9D5@PGSMSX103.gar.corp.intel.com>
+Content-Type: text/plain; charset=windows-1252
+To: unlisted-recipients:; (no To-header on input)
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
+
+
 
 On 12/16/2016 07:46 AM, Wong, Joshua Weng Onn wrote:
 > Hi,
@@ -27,28 +29,27 @@ On 12/16/2016 07:46 AM, Wong, Joshua Weng Onn wrote:
 > $ modprobe 6lowpan
 > $ modprobe Bluetooth_6lowpan
 > $ echo 1 > /sys/kernel/debug/bluetooth/6lowpan_enable
-> $ hciconfig hci0 leadv
+> $ hciconfig hci0 leadv 
 > 
 > Master device:
 > $ modprobe 6lowpan
 > $ modprobe bluetooth_6lowpan
 > $ echo 1 > /sys/kernel/debug/bluetooth/6lowpan_enable
-> $ hcitool lescan << to obtain slave BT ADDR $ echo "connect 
-> <remote_BT_MAC> 1" > /sys/kernel/debug/bluetooth/6lowpan_control
+> $ hcitool lescan << to obtain slave BT ADDR
+> $ echo "connect <remote_BT_MAC> 1" > /sys/kernel/debug/bluetooth/6lowpan_control
 > $ ifconfig (look for bt0 interface) << to obtain IPv6 address of slave device
 > $ ping6 -I bt0 <IPV6_ADDR>     <<<<------ The console message starts to appear here during ping6
 > 
 > The output of the console message:
 > 
 > [  794.985623] Slab corruption (Tainted: G     U         ): skbuff_head_cache start=ffff8801f568f700, len=232
-> [  795.008755] 050: 00 00 00 00 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b  
-> ....kkkkkkkkkkkk [  795.029380] Prev obj: start=ffff8801f568f600, 
-> len=232 [  795.044743] 000: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+> [  795.008755] 050: 00 00 00 00 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b  ....kkkkkkkkkkkk
+> [  795.029380] Prev obj: start=ffff8801f568f600, len=232
+> [  795.044743] 000: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
 > [  795.061310] 010: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-> [  795.076752] Next obj: start=ffff8801f568f800, len=232 [  
-> 795.088448] 000: 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b  
-> kkkkkkkkkkkkkkkk [  795.102365] 010: 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b 
-> 6b 6b 6b 6b 6b  kkkkkkkkkkkkkkkk
+> [  795.076752] Next obj: start=ffff8801f568f800, len=232
+> [  795.088448] 000: 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b  kkkkkkkkkkkkkkkk
+> [  795.102365] 010: 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b  kkkkkkkkkkkkkkkk
 > 
 > The 6lowpan connection between the two devices is connected.
 > I observed that the console message appears once when the master initiates the connection to the slave and nothing happens after that.
@@ -62,7 +63,10 @@ On 12/16/2016 07:46 AM, Wong, Joshua Weng Onn wrote:
 
 In short:
 
-BTLE 6LoWPAN is broken. Patch-Series which needs some love to fix some issues (mostly races/L2 address handling with L3 stuff, use ndisc stuff, still exists open question which L2 address should be used) exists at [0].
+BTLE 6LoWPAN is broken. Patch-Series which needs some love to fix some
+issues (mostly races/L2 address handling with L3 stuff, use ndisc stuff,
+still exists open question which L2 address should be used) exists at
+[0].
 
 Maybe YOU want to bring it mainline -> I have no time currently to do that.
 Of maybe you can test it and tell me your expierence. :-)
@@ -73,14 +77,3 @@ but races still exists. Also update the kernel version to a recent one.
 - Alex
 
 [0] http://www.spinics.net/lists/linux-wpan/msg04124.html
-
-Thank you for informing me about this. Sorry as I was not aware of the newer patches that you submitted to mainline.
-At the moment I am not able to upgrade the kernel to a recent version as the other teams in my department are using kernel version 4.1.27 and I have to follow it strictly.
-
-I just got an idea. Perhaps what I can do is backport the patches and apply them to this version of the kernel. I am not sure if it will work entirely. I'll discuss this with my lead first if he wants me to do this and let you know if I am pursuing this.
-
-Best regards,
-Joshua
- 
---
-To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in the body of a message to majordomo@vger.kernel.org More majordomo info at  http://vger.kernel.org/majordomo-info.html
