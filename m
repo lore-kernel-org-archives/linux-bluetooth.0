@@ -1,80 +1,80 @@
-Return-Path: <rajatja@google.com>
-From: Rajat Jain <rajatja@google.com>
-To: Rob Herring <robh+dt@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Amitkumar Karwar <akarwar@marvell.com>,
-	Wei-Ning Huang <wnhuang@chromium.org>,
-	Xinming Hu <huxm@marvell.com>,
-	netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org,
-	Brian Norris <briannorris@google.com>,
-	linux-kernel@vger.kernel.org
-Cc: Rajat Jain <rajatja@google.com>,
-	rajatxjain@gmail.com
-Subject: [PATCH v2 1/3] Bluetooth: btusb: Use an error label for error paths
-Date: Fri, 16 Dec 2016 11:30:02 -0800
-Message-Id: <1481916604-114279-1-git-send-email-rajatja@google.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 2/2] core/gatt-database: Send offset if set to WriteValue
+Date: Fri, 16 Dec 2016 15:18:53 +0200
+Message-Id: <20161216131853.2815-2-luiz.dentz@gmail.com>
+In-Reply-To: <20161216131853.2815-1-luiz.dentz@gmail.com>
+References: <20161216131853.2815-1-luiz.dentz@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Use a label to remove the repetetive cleanup, for error cases.
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Signed-off-by: Rajat Jain <rajatja@google.com>
+If there remote is using Prepare + Execute Write commands as part of
+a Write Long procedure the offset needs to be set in order for the
+application to detect from where it shall write the data.
 ---
-v2: same as v1
+ src/gatt-database.c | 15 ++++++++++-----
+ 1 file changed, 10 insertions(+), 5 deletions(-)
 
- drivers/bluetooth/btusb.c | 19 +++++++++----------
- 1 file changed, 9 insertions(+), 10 deletions(-)
-
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 2f633df..ce22cef 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -2991,18 +2991,15 @@ static int btusb_probe(struct usb_interface *intf,
- 		err = usb_set_interface(data->udev, 0, 0);
- 		if (err < 0) {
- 			BT_ERR("failed to set interface 0, alt 0 %d", err);
--			hci_free_dev(hdev);
--			return err;
-+			goto out_free_dev;
- 		}
+diff --git a/src/gatt-database.c b/src/gatt-database.c
+index 88627ac..5979e37 100644
+--- a/src/gatt-database.c
++++ b/src/gatt-database.c
+@@ -1738,7 +1738,8 @@ static struct pending_op *pending_write_new(struct btd_device *device,
+ 					struct gatt_db_attribute *attrib,
+ 					unsigned int id,
+ 					const uint8_t *value,
+-					size_t len)
++					size_t len,
++					uint16_t offset)
+ {
+ 	struct pending_op *op;
+ 
+@@ -1751,6 +1752,7 @@ static struct pending_op *pending_write_new(struct btd_device *device,
+ 	op->owner_queue = owner_queue;
+ 	op->attrib = attrib;
+ 	op->id = id;
++	op->offset = offset;
+ 	queue_push_tail(owner_queue, op);
+ 
+ 	return op;
+@@ -1761,11 +1763,13 @@ static struct pending_op *send_write(struct btd_device *device,
+ 					GDBusProxy *proxy,
+ 					struct queue *owner_queue,
+ 					unsigned int id,
+-					const uint8_t *value, size_t len)
++					const uint8_t *value, size_t len,
++					uint16_t offset)
+ {
+ 	struct pending_op *op;
+ 
+-	op = pending_write_new(device, owner_queue, attrib, id, value, len);
++	op = pending_write_new(device, owner_queue, attrib, id, value, len,
++								offset);
+ 
+ 	if (g_dbus_proxy_method_call(proxy, "WriteValue", write_setup_cb,
+ 					owner_queue ? write_reply_cb : NULL,
+@@ -2010,7 +2014,7 @@ static void desc_write_cb(struct gatt_db_attribute *attrib,
  	}
  
- 	if (data->isoc) {
- 		err = usb_driver_claim_interface(&btusb_driver,
- 						 data->isoc, data);
--		if (err < 0) {
--			hci_free_dev(hdev);
--			return err;
--		}
-+		if (err < 0)
-+			goto out_free_dev;
- 	}
+ 	if (send_write(device, attrib, desc->proxy, desc->pending_writes, id,
+-							value, len))
++							value, len, offset))
+ 		return;
  
- #ifdef CONFIG_BT_HCIBTUSB_BCM
-@@ -3016,14 +3013,16 @@ static int btusb_probe(struct usb_interface *intf,
- #endif
+ fail:
+@@ -2096,7 +2100,8 @@ static void chrc_write_cb(struct gatt_db_attribute *attrib,
+ 	else
+ 		queue = NULL;
  
- 	err = hci_register_dev(hdev);
--	if (err < 0) {
--		hci_free_dev(hdev);
--		return err;
--	}
-+	if (err < 0)
-+		goto out_free_dev;
+-	if (send_write(device, attrib, chrc->proxy, queue, id, value, len))
++	if (send_write(device, attrib, chrc->proxy, queue, id, value, len,
++								offset))
+ 		return;
  
- 	usb_set_intfdata(intf, data);
- 
- 	return 0;
-+
-+out_free_dev:
-+	hci_free_dev(hdev);
-+	return err;
- }
- 
- static void btusb_disconnect(struct usb_interface *intf)
+ fail:
 -- 
-2.8.0.rc3.226.g39d4020
+2.9.3
+
