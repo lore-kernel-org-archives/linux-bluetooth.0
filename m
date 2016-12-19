@@ -1,63 +1,67 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <linux-wpan-owner@vger.kernel.org>
 From: "Wong, Joshua Weng Onn" <joshua.weng.onn.wong@intel.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Alexander Aring <aar@pengutronix.de>
 CC: "alex.aring@gmail.com" <alex.aring@gmail.com>,
         "jukka.rissanen@linux.intel.com" <jukka.rissanen@linux.intel.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>
 Subject: RE: Bluetooth 6lowpan ping6 slab corruption
-Date: Mon, 19 Dec 2016 00:30:58 +0000
-Message-ID: <E3B98393E6037849B63EA428240A65135C42BC@PGSMSX103.gar.corp.intel.com>
+Date: Mon, 19 Dec 2016 00:27:14 +0000
+Message-ID: <E3B98393E6037849B63EA428240A65135C42A6@PGSMSX103.gar.corp.intel.com>
 References: <E3B98393E6037849B63EA428240A65135BC9D5@PGSMSX103.gar.corp.intel.com>
- <CABBYNZKbuSLNMFVGzscK_faPEdHT-tH1=g48sdcyM6fhYHm5CA@mail.gmail.com>
-In-Reply-To: <CABBYNZKbuSLNMFVGzscK_faPEdHT-tH1=g48sdcyM6fhYHm5CA@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
+ <c70d7129-be2d-4764-6f09-1153192c49be@pengutronix.de>
+ <E3B98393E6037849B63EA428240A65135BCA89@PGSMSX103.gar.corp.intel.com>
+ <efdc1a54-7fdc-80b8-f46d-d663addae509@pengutronix.de>
+In-Reply-To: <efdc1a54-7fdc-80b8-f46d-d663addae509@pengutronix.de>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgTHVpeiwNCiANCj4gSGkgSm9zaHVhLA0KPiANCj4gT24gRnJpLCBEZWMgMTYsIDIwMTYgYXQg
-ODo0NiBBTSwgV29uZywgSm9zaHVhIFdlbmcgT25uDQo+IDxqb3NodWEud2VuZy5vbm4ud29uZ0Bp
-bnRlbC5jb20+IHdyb3RlOg0KPiA+ICQgaWZjb25maWcgKGxvb2sgZm9yIGJ0MCBpbnRlcmZhY2Up
-IDw8IHRvIG9idGFpbiBJUHY2IGFkZHJlc3Mgb2Ygc2xhdmUNCj4gPiBkZXZpY2UNCj4gDQo+IFRo
-aXMgaXMgbm90IHJpZ2h0LCB0aGUgYWRkcmVzcyBvZiBidDAgaXMgaW4gZmFjdCB0aGUgbG9jYWwg
-YWRkcmVzcyBub3QgdGhlIHJlbW90ZQ0KPiBhZGRyZXNzLCBub3Qgc3VyZSBpZiB0aGF0IGNvdWxk
-IGNhdXNlIHRoZSBwcm9ibGVtcyBiZWxsb3cgdGhvdWdoLg0KPiANCg0KTXkgbW9zdCBzaW5jZXJl
-IGFwb2xvZ2llcyBhcyBJIGZvcmdvdCB0byBtZW50aW9uIHRoYXQgSSBhY3R1YWxseSBwZXJmb3Jt
-ZWQgaWZjb25maWcgaW4gdGhlIHNsYXZlIGRldmljZSB0byBvYnRhaW4gaXRzIElQdjYgYWRkcmVz
-cy4NCkFmdGVyIHRoYXQsIEkgZGlkIGEgcGluZzYgb2YgdGhlIElQdjYgYWRkcmVzcyBvZiBzbGF2
-ZSBkZXZpY2UuIFRoaXMgY2F1c2VkIHRoZSBvdXRwdXQgdG8gYXBwZWFyIGluIHRoZSBjb25zb2xl
-IG1lc3NhZ2UuDQoNCj4gPiAkIHBpbmc2IC1JIGJ0MCA8SVBWNl9BRERSPiAgICAgPDw8PC0tLS0t
-LSBUaGUgY29uc29sZSBtZXNzYWdlIHN0YXJ0cyB0byBhcHBlYXINCj4gaGVyZSBkdXJpbmcgcGlu
-ZzYNCj4gPg0KPiA+IFRoZSBvdXRwdXQgb2YgdGhlIGNvbnNvbGUgbWVzc2FnZToNCj4gPg0KPiA+
-IFsgIDc5NC45ODU2MjNdIFNsYWIgY29ycnVwdGlvbiAoVGFpbnRlZDogRyAgICAgVSAgICAgICAg
-ICk6IHNrYnVmZl9oZWFkX2NhY2hlDQo+IHN0YXJ0PWZmZmY4ODAxZjU2OGY3MDAsIGxlbj0yMzIN
-Cj4gPiBbICA3OTUuMDA4NzU1XSAwNTA6IDAwIDAwIDAwIDAwIDZiIDZiIDZiIDZiIDZiIDZiIDZi
-IDZiIDZiIDZiIDZiIDZiDQo+ID4gLi4uLmtra2tra2tra2trayBbICA3OTUuMDI5MzgwXSBQcmV2
-IG9iajogc3RhcnQ9ZmZmZjg4MDFmNTY4ZjYwMCwNCj4gPiBsZW49MjMyIFsgIDc5NS4wNDQ3NDNd
-IDAwMDogMDAgMDAgMDAgMDAgMDAgMDAgMDAgMDAgMDAgMDAgMDAgMDAgMDAgMDAgMDAgMDANCj4g
-Li4uLi4uLi4uLi4uLi4uLg0KPiA+IFsgIDc5NS4wNjEzMTBdIDAxMDogMDAgMDAgMDAgMDAgMDAg
-MDAgMDAgMDAgMDAgMDAgMDAgMDAgMDAgMDAgMDAgMDANCj4gLi4uLi4uLi4uLi4uLi4uLg0KPiA+
-IFsgIDc5NS4wNzY3NTJdIE5leHQgb2JqOiBzdGFydD1mZmZmODgwMWY1NjhmODAwLCBsZW49MjMy
-IFsNCj4gPiA3OTUuMDg4NDQ4XSAwMDA6IDZiIDZiIDZiIDZiIDZiIDZiIDZiIDZiIDZiIDZiIDZi
-IDZiIDZiIDZiIDZiIDZiDQo+ID4ga2tra2tra2tra2tra2trayBbICA3OTUuMTAyMzY1XSAwMTA6
-IDZiIDZiIDZiIDZiIDZiIDZiIDZiIDZiIDZiIDZiIDZiDQo+ID4gNmIgNmIgNmIgNmIgNmIgIGtr
-a2tra2tra2tra2tra2sNCj4gPg0KPiA+IFRoZSA2bG93cGFuIGNvbm5lY3Rpb24gYmV0d2VlbiB0
-aGUgdHdvIGRldmljZXMgaXMgY29ubmVjdGVkLg0KPiA+IEkgb2JzZXJ2ZWQgdGhhdCB0aGUgY29u
-c29sZSBtZXNzYWdlIGFwcGVhcnMgb25jZSB3aGVuIHRoZSBtYXN0ZXIgaW5pdGlhdGVzDQo+IHRo
-ZSBjb25uZWN0aW9uIHRvIHRoZSBzbGF2ZSBhbmQgbm90aGluZyBoYXBwZW5zIGFmdGVyIHRoYXQu
-DQo+ID4gT25jZSBJIHN0YXJ0IGRvaW5nIHRoZSBwaW5nNiBmcm9tIG1hc3RlciB0byBzbGF2ZSwg
-dGhlIHNhbWUgbWVzc2FnZSBhcHBlYXJzDQo+IGFnYWluLiBUaGlzIHNhbWUgc2V0IG9mIG1lc3Nh
-Z2UgY29udGludWVzIHRvIGJlIHByaW50ZWQgZXZlcnkgNSBzZWNvbmRzIG9yIHNvLg0KPiA+IFRo
-aXMgYWxzbyBwZXJzaXN0cyB3aGVuIHBpbmc2IGlzIGRvbmUgZnJvbSB0aGUgc2xhdmUgdG8gdGhl
-IG1hc3Rlci4NCj4gPg0KPiA+IERvIHlvdSBrbm93IHdoYXQgY291bGQgcG9zc2libHkgY2F1c2Ug
-dGhpcyBpc3N1ZT8NCj4gPg0KPiA+IFBsZWFzZSBsZXQgbWUga25vdyBpZiB5b3UgcmVxdWlyZSBm
-dXJ0aGVyIGluZm9ybWF0aW9uLg0KPiA+DQo+ID4gVGhhbmsgeW91Lg0KPiA+DQo+ID4gQmVzdCBy
-ZWdhcmRzLA0KPiA+IEpvc2h1YQ0KPiA+IC0tDQo+ID4gVG8gdW5zdWJzY3JpYmUgZnJvbSB0aGlz
-IGxpc3Q6IHNlbmQgdGhlIGxpbmUgInVuc3Vic2NyaWJlDQo+ID4gbGludXgtYmx1ZXRvb3RoIiBp
-biB0aGUgYm9keSBvZiBhIG1lc3NhZ2UgdG8gbWFqb3Jkb21vQHZnZXIua2VybmVsLm9yZw0KPiA+
-IE1vcmUgbWFqb3Jkb21vIGluZm8gYXQgIGh0dHA6Ly92Z2VyLmtlcm5lbC5vcmcvbWFqb3Jkb21v
-LWluZm8uaHRtbA0KPiANCj4gDQo+IA0KPiAtLQ0KPiBMdWl6IEF1Z3VzdG8gdm9uIERlbnR6DQo+
-IC0tDQo+IFRvIHVuc3Vic2NyaWJlIGZyb20gdGhpcyBsaXN0OiBzZW5kIHRoZSBsaW5lICJ1bnN1
-YnNjcmliZSBsaW51eC1ibHVldG9vdGgiIGluIHRoZQ0KPiBib2R5IG9mIGEgbWVzc2FnZSB0byBt
-YWpvcmRvbW9Admdlci5rZXJuZWwub3JnIE1vcmUgbWFqb3Jkb21vIGluZm8gYXQNCj4gaHR0cDov
-L3ZnZXIua2VybmVsLm9yZy9tYWpvcmRvbW8taW5mby5odG1sDQoNCkpvc2h1YQ0K
+Hi Alex,
+
+> Hi,
+> 
+> On 12/16/2016 09:18 AM, Wong, Joshua Weng Onn wrote:
+> ...
+> >
+> > Thank you for informing me about this. Sorry as I was not aware of the newer
+> patches that you submitted to mainline.
+> > At the moment I am not able to upgrade the kernel to a recent version as the
+> other teams in my department are using kernel version 4.1.27 and I have to
+> follow it strictly.
+> >
+> > I just got an idea. Perhaps what I can do is backport the patches and apply
+> them to this version of the kernel. I am not sure if it will work entirely. I'll discuss
+> this with my lead first if he wants me to do this and let you know if I am pursuing
+> this.
+> >
+> 
+> You can backport it, yes... but please _please_ don't do it... bring it mainline and
+> then backport it.
+> 
+> Tell that your lead as suggestion from me.
+> 
+> It makes no sense that you backporting it only for you. This thing need to be
+> fixed upstream...
+> 
+> In my opinion, all people who backporting it will do work for nothing...
+> The next guy/girl which wants to try that out runs again into such issues.
+> 
+> These patches was sending to bluetooth-next, now I am busy with other things
+> and can work on it at end of April maybe... and I think only in my free-time. This
+> patch-series just needs a little cleanup and send as PATCH...
+> 
+> - Alex
+
+I've finally just learned how to add inline '>' characters to the previous email. Had to make some changes in my email settings.
+
+Thank you very much for your reply.
+Ok noted on that. My most sincere apologies as I am quite new to this and I am still trying to understand how open source works. Didn't realize that it will cause repetitive work for others.
+
+I will discuss this with my technical lead and update you along the way.
+
+Thank you.
+
+Best regards,
+Joshua
