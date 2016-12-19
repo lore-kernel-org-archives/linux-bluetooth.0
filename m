@@ -1,40 +1,35 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Date: Mon, 19 Dec 2016 17:41:30 +0000
-From: Dario Teixeira <dario.teixeira@nleyten.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: Data exchange between two bluetooth devices
-Message-ID: <af00d3e489c2ea42ad03636143e3cb36@nleyten.com>
+Subject: [PATCH BlueZ] tools/test-runner: Fix not creating /usr/share/dbus-1/system.conf
+Date: Mon, 19 Dec 2016 13:16:21 +0200
+Message-Id: <20161219111621.16199-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-I'm new to Bluetooth programming, and I have some basic questions
-about the best approach to implement a fairly simple scenario.
-I have a small embedded device running Linux, and which supports
-Bluetooth 4.0.  I'm also developing a mobile app that needs to
-exchange some data with the embedded device.  The data consists
-of only a few JSON-encoded objects and is small in volume. The
-communication must happen bidirectionally, though.
+Apparently this is the new location where D-Bus will look for its
+configuration so just creare a symlink to /etc/dbus-1/system.conf.
+---
+ tools/test-runner.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-Those are pretty much the requirements.  Now the questions:
-
-a) On the embedded side, do I need to program a small daemon using
-    the DBUS-based Bluez API, or can I set up a special device and
-    read/write to it as if it were a character device?
-
-b) The old interface [1] has been deprecated, right?  (It's my
-    understanding that only the new DBUS-based API should be used.)
-
-c) Is Bluetooth Classic or Bluetooth Low Energy better for this
-    scenario? (I've read that BLE can dispense with pairing.)
-
-Thanks in advance for your time!
-Best regards,
-Dario Teixeira
-
-[1] https://people.csail.mit.edu/albert/bluez-intro/
+diff --git a/tools/test-runner.c b/tools/test-runner.c
+index 9b54426..fb8f7e2 100644
+--- a/tools/test-runner.c
++++ b/tools/test-runner.c
+@@ -419,6 +419,10 @@ static void create_dbus_system_conf(void)
+ 
+ 	fclose(fp);
+ 
++	if (symlink("/etc/dbus-1/system.conf",
++				"/usr/share/dbus-1/system.conf") < 0)
++		perror("Failed to create system.conf symlink");
++
+ 	mkdir("/run/dbus", 0755);
+ }
+ 
+-- 
+2.9.3
 
