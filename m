@@ -1,68 +1,60 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-From: =?UTF-8?B?5byg5aKe5rOi?= <zengbo.zhang@gmail.com>
-Date: Mon, 19 Dec 2016 17:47:24 +0800
-Message-ID: <CAOMnebqO6uRDXr-g16xTg8gY7Kh_-81fiYNNMHywc-ykOrc1Cg@mail.gmail.com>
-Subject: Strange issue for a blood pressure device
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <luca@coelho.fi>
+Message-ID: <1482138490.26174.7.camel@coelho.fi>
+From: Luca Coelho <luca@coelho.fi>
+To: "Michael S. Tsirkin" <mst@redhat.com>, linux-kernel@vger.kernel.org
+Cc: Marcel Holtmann <marcel@holtmann.org>, Gustavo Padovan
+ <gustavo@padovan.org>,  Johan Hedberg <johan.hedberg@gmail.com>, Wolfgang
+ Grandegger <wg@grandegger.com>, Marc Kleine-Budde <mkl@pengutronix.de>,
+ Vince Bridgers <vbridger@opensource.altera.com>, Jay Cliburn
+ <jcliburn@gmail.com>, Chris Snook <chris.snook@gmail.com>, "Luis R.
+ Rodriguez" <mcgrof@do-not-panic.com>, Kalle Valo <kvalo@codeaurora.org>,
+ Maya Erez <qca_merez@qca.qualcomm.com>, Arend van Spriel
+ <arend.vanspriel@broadcom.com>,  Franky Lin <franky.lin@broadcom.com>,
+ Hante Meuleman <hante.meuleman@broadcom.com>, Stanislaw Gruszka
+ <sgruszka@redhat.com>, Johannes Berg <johannes.berg@intel.com>, Emmanuel
+ Grumbach <emmanuel.grumbach@intel.com>, Intel Linux Wireless
+ <linuxwifi@intel.com>, Jakub Kicinski <kubakici@wp.pl>, Larry Finger
+ <Larry.Finger@lwfinger.net>, Chaoming Li <chaoming_li@realsil.com.cn>, Greg
+ Kroah-Hartman <gregkh@linuxfoundation.org>,  "David S. Miller"
+ <davem@davemloft.net>, Alexander Aring <aar@pengutronix.de>, Stefan Schmidt
+ <stefan@osg.samsung.com>,  Matthias Brugger <matthias.bgg@gmail.com>,
+ linux-bluetooth@vger.kernel.org, linux-can@vger.kernel.org,
+ netdev@vger.kernel.org, nios2-dev@lists.rocketboards.org,
+ linux-wireless@vger.kernel.org, wil6210@qca.qualcomm.com,
+ brcm80211-dev-list.pdl@broadcom.com, devel@driverdev.osuosl.org,
+ linux-wpan@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org
+Date: Mon, 19 Dec 2016 11:08:10 +0200
+In-Reply-To: <1481778865-27667-9-git-send-email-mst@redhat.com>
+References: <1481778865-27667-1-git-send-email-mst@redhat.com>
+	 <1481778865-27667-9-git-send-email-mst@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Subject: Re: [PATCH 8/8] Makefile: drop -D__CHECK_ENDIAN__ from cflags
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello,
+On Thu, 2016-12-15 at 07:15 +0200, Michael S. Tsirkin wrote:
+> That's the default now, no need for makefiles to set it.
+> 
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> ---
+>  drivers/bluetooth/Makefile                                | 2 --
+>  drivers/net/can/Makefile                                  | 1 -
+>  drivers/net/ethernet/altera/Makefile                      | 1 -
+>  drivers/net/ethernet/atheros/alx/Makefile                 | 1 -
+>  drivers/net/ethernet/freescale/Makefile                   | 2 --
+>  drivers/net/wireless/ath/Makefile                         | 2 --
+>  drivers/net/wireless/ath/wil6210/Makefile                 | 2 --
+>  drivers/net/wireless/broadcom/brcm80211/brcmfmac/Makefile | 2 --
+>  drivers/net/wireless/broadcom/brcm80211/brcmsmac/Makefile | 1 -
+>  drivers/net/wireless/intel/iwlegacy/Makefile              | 2 --
+>  drivers/net/wireless/intel/iwlwifi/Makefile               | 2 +-
+>  drivers/net/wireless/intel/iwlwifi/dvm/Makefile           | 2 +-
+>  drivers/net/wireless/intel/iwlwifi/mvm/Makefile           | 2 +-
 
-        I tested a blood pressure bluetooth device so I can use it for
-later use. But I found a strange issue: I can connect to the device
-successful ONLY BEFORE SCANNING after RE-PLUGGING THE Bluetooth dongle
-OR RESTARTING THE BLUETOOTH DAEMON.   I attached  an interactive log
-at the end of this mail of the using of bluetoothctl.
+For the drivers/net/wireless/intel/iwlwifi/ part:
 
-my enviroment: latest manjaro linux stable; kernel: 4.4.33; bluez 5.43 .
+Acked-by: Luca Coelho <luciano.coelho@intel.com>
 
-The device factory provided a protocol and two test methods on
-Android/IOS. For android host, it connect to the device over an
-serial; For ios host, it connect to the device over LE, both works
-flne. I wanted to connect to it on linux using LE mode.
-
-Maybe this information is helpful:  the uuids of the device changed
-over time. when just scanning, it reports 2 [ 0xff00, 0x1101 ], when I
-tried to connect it , it reports [0x1101, 0x1200 ] , and I can't
-connect to it without re-pluging the dongle. If I connect it
-succefully, it reports about 6 service uuids.
-
-So why this issue? I can do more test  but I don't know how to do
-without any suggestion, thanks.
-
-
-[bluetooth]# connect 88:1B:99:0D:A1:34
-Attempting to connect to 88:1B:99:0D:A1:34
-[CHG] Device 88:1B:99:0D:A1:34 Connected: yes
-Connection successful
-[CHG] Device 88:1B:99:0D:A1:34 ServicesResolved: yes
-[BP06D21609010379]# disconnect 88:1B:99:0D:A1:34
-Attempting to disconnect from 88:1B:99:0D:A1:34
-[CHG] Device 88:1B:99:0D:A1:34 ServicesResolved: no
-Successful disconnected
-[CHG] Device 88:1B:99:0D:A1:34 Connected: no
-[bluetooth]# scan on
-Discovery started
-[CHG] Controller 00:1A:7D:DA:71:05 Discovering: yes
-[CHG] Device 88:1B:99:0D:A1:34 RSSI: -78
-[CHG] Device 88:1B:99:0D:A1:34 TxPower: 2
-[CHG] Device 88:1B:99:0D:A1:34 ManufacturerData Key: 0x4d42
-[CHG] Device 88:1B:99:0D:A1:34 ManufacturerData Value: 0x37
-[CHG] Device 88:1B:99:0D:A1:34 ManufacturerData Value: 0x37
-[CHG] Device 88:1B:99:0D:A1:34 RSSI: -70
-[CHG] Device 88:1B:99:0D:A1:34 RSSI: -78
-[bluetooth]# scan off
-[CHG] Device 88:1B:99:0D:A1:34 TxPower is nil
-[CHG] Device 88:1B:99:0D:A1:34 RSSI is nil
-Discovery stopped
-[CHG] Controller 00:1A:7D:DA:71:05 Discovering: no
-[bluetooth]# connect 1B:99:0D:A1:34
-Attempting to connect to 88:1B:99:0D:A1:34
-[CHG] Device 88:1B:99:0D:A1:34 Connected: yes
-[CHG] Device 88:1B:99:0D:A1:34 ServicesResolved: yes
-Failed to connect: org.bluez.Error.NotAvailable
-[CHG] Device 88:1B:99:0D:A1:34 ServicesResolved: no
-[CHG] Device 88:1B:99:0D:A1:34 Connected: no
+--
+Luca.
