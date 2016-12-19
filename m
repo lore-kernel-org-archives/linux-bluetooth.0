@@ -1,60 +1,63 @@
-Return-Path: <luca@coelho.fi>
-Message-ID: <1482138490.26174.7.camel@coelho.fi>
-From: Luca Coelho <luca@coelho.fi>
-To: "Michael S. Tsirkin" <mst@redhat.com>, linux-kernel@vger.kernel.org
-Cc: Marcel Holtmann <marcel@holtmann.org>, Gustavo Padovan
- <gustavo@padovan.org>,  Johan Hedberg <johan.hedberg@gmail.com>, Wolfgang
- Grandegger <wg@grandegger.com>, Marc Kleine-Budde <mkl@pengutronix.de>,
- Vince Bridgers <vbridger@opensource.altera.com>, Jay Cliburn
- <jcliburn@gmail.com>, Chris Snook <chris.snook@gmail.com>, "Luis R.
- Rodriguez" <mcgrof@do-not-panic.com>, Kalle Valo <kvalo@codeaurora.org>,
- Maya Erez <qca_merez@qca.qualcomm.com>, Arend van Spriel
- <arend.vanspriel@broadcom.com>,  Franky Lin <franky.lin@broadcom.com>,
- Hante Meuleman <hante.meuleman@broadcom.com>, Stanislaw Gruszka
- <sgruszka@redhat.com>, Johannes Berg <johannes.berg@intel.com>, Emmanuel
- Grumbach <emmanuel.grumbach@intel.com>, Intel Linux Wireless
- <linuxwifi@intel.com>, Jakub Kicinski <kubakici@wp.pl>, Larry Finger
- <Larry.Finger@lwfinger.net>, Chaoming Li <chaoming_li@realsil.com.cn>, Greg
- Kroah-Hartman <gregkh@linuxfoundation.org>,  "David S. Miller"
- <davem@davemloft.net>, Alexander Aring <aar@pengutronix.de>, Stefan Schmidt
- <stefan@osg.samsung.com>,  Matthias Brugger <matthias.bgg@gmail.com>,
- linux-bluetooth@vger.kernel.org, linux-can@vger.kernel.org,
- netdev@vger.kernel.org, nios2-dev@lists.rocketboards.org,
- linux-wireless@vger.kernel.org, wil6210@qca.qualcomm.com,
- brcm80211-dev-list.pdl@broadcom.com, devel@driverdev.osuosl.org,
- linux-wpan@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org
-Date: Mon, 19 Dec 2016 11:08:10 +0200
-In-Reply-To: <1481778865-27667-9-git-send-email-mst@redhat.com>
-References: <1481778865-27667-1-git-send-email-mst@redhat.com>
-	 <1481778865-27667-9-git-send-email-mst@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Subject: Re: [PATCH 8/8] Makefile: drop -D__CHECK_ENDIAN__ from cflags
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: "Wong, Joshua Weng Onn" <joshua.weng.onn.wong@intel.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+CC: "alex.aring@gmail.com" <alex.aring@gmail.com>,
+        "jukka.rissanen@linux.intel.com" <jukka.rissanen@linux.intel.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: RE: Bluetooth 6lowpan ping6 slab corruption
+Date: Mon, 19 Dec 2016 00:30:58 +0000
+Message-ID: <E3B98393E6037849B63EA428240A65135C42BC@PGSMSX103.gar.corp.intel.com>
+References: <E3B98393E6037849B63EA428240A65135BC9D5@PGSMSX103.gar.corp.intel.com>
+ <CABBYNZKbuSLNMFVGzscK_faPEdHT-tH1=g48sdcyM6fhYHm5CA@mail.gmail.com>
+In-Reply-To: <CABBYNZKbuSLNMFVGzscK_faPEdHT-tH1=g48sdcyM6fhYHm5CA@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, 2016-12-15 at 07:15 +0200, Michael S. Tsirkin wrote:
-> That's the default now, no need for makefiles to set it.
-> 
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> ---
->  drivers/bluetooth/Makefile                                | 2 --
->  drivers/net/can/Makefile                                  | 1 -
->  drivers/net/ethernet/altera/Makefile                      | 1 -
->  drivers/net/ethernet/atheros/alx/Makefile                 | 1 -
->  drivers/net/ethernet/freescale/Makefile                   | 2 --
->  drivers/net/wireless/ath/Makefile                         | 2 --
->  drivers/net/wireless/ath/wil6210/Makefile                 | 2 --
->  drivers/net/wireless/broadcom/brcm80211/brcmfmac/Makefile | 2 --
->  drivers/net/wireless/broadcom/brcm80211/brcmsmac/Makefile | 1 -
->  drivers/net/wireless/intel/iwlegacy/Makefile              | 2 --
->  drivers/net/wireless/intel/iwlwifi/Makefile               | 2 +-
->  drivers/net/wireless/intel/iwlwifi/dvm/Makefile           | 2 +-
->  drivers/net/wireless/intel/iwlwifi/mvm/Makefile           | 2 +-
-
-For the drivers/net/wireless/intel/iwlwifi/ part:
-
-Acked-by: Luca Coelho <luciano.coelho@intel.com>
-
---
-Luca.
+SGkgTHVpeiwNCiANCj4gSGkgSm9zaHVhLA0KPiANCj4gT24gRnJpLCBEZWMgMTYsIDIwMTYgYXQg
+ODo0NiBBTSwgV29uZywgSm9zaHVhIFdlbmcgT25uDQo+IDxqb3NodWEud2VuZy5vbm4ud29uZ0Bp
+bnRlbC5jb20+IHdyb3RlOg0KPiA+ICQgaWZjb25maWcgKGxvb2sgZm9yIGJ0MCBpbnRlcmZhY2Up
+IDw8IHRvIG9idGFpbiBJUHY2IGFkZHJlc3Mgb2Ygc2xhdmUNCj4gPiBkZXZpY2UNCj4gDQo+IFRo
+aXMgaXMgbm90IHJpZ2h0LCB0aGUgYWRkcmVzcyBvZiBidDAgaXMgaW4gZmFjdCB0aGUgbG9jYWwg
+YWRkcmVzcyBub3QgdGhlIHJlbW90ZQ0KPiBhZGRyZXNzLCBub3Qgc3VyZSBpZiB0aGF0IGNvdWxk
+IGNhdXNlIHRoZSBwcm9ibGVtcyBiZWxsb3cgdGhvdWdoLg0KPiANCg0KTXkgbW9zdCBzaW5jZXJl
+IGFwb2xvZ2llcyBhcyBJIGZvcmdvdCB0byBtZW50aW9uIHRoYXQgSSBhY3R1YWxseSBwZXJmb3Jt
+ZWQgaWZjb25maWcgaW4gdGhlIHNsYXZlIGRldmljZSB0byBvYnRhaW4gaXRzIElQdjYgYWRkcmVz
+cy4NCkFmdGVyIHRoYXQsIEkgZGlkIGEgcGluZzYgb2YgdGhlIElQdjYgYWRkcmVzcyBvZiBzbGF2
+ZSBkZXZpY2UuIFRoaXMgY2F1c2VkIHRoZSBvdXRwdXQgdG8gYXBwZWFyIGluIHRoZSBjb25zb2xl
+IG1lc3NhZ2UuDQoNCj4gPiAkIHBpbmc2IC1JIGJ0MCA8SVBWNl9BRERSPiAgICAgPDw8PC0tLS0t
+LSBUaGUgY29uc29sZSBtZXNzYWdlIHN0YXJ0cyB0byBhcHBlYXINCj4gaGVyZSBkdXJpbmcgcGlu
+ZzYNCj4gPg0KPiA+IFRoZSBvdXRwdXQgb2YgdGhlIGNvbnNvbGUgbWVzc2FnZToNCj4gPg0KPiA+
+IFsgIDc5NC45ODU2MjNdIFNsYWIgY29ycnVwdGlvbiAoVGFpbnRlZDogRyAgICAgVSAgICAgICAg
+ICk6IHNrYnVmZl9oZWFkX2NhY2hlDQo+IHN0YXJ0PWZmZmY4ODAxZjU2OGY3MDAsIGxlbj0yMzIN
+Cj4gPiBbICA3OTUuMDA4NzU1XSAwNTA6IDAwIDAwIDAwIDAwIDZiIDZiIDZiIDZiIDZiIDZiIDZi
+IDZiIDZiIDZiIDZiIDZiDQo+ID4gLi4uLmtra2tra2tra2trayBbICA3OTUuMDI5MzgwXSBQcmV2
+IG9iajogc3RhcnQ9ZmZmZjg4MDFmNTY4ZjYwMCwNCj4gPiBsZW49MjMyIFsgIDc5NS4wNDQ3NDNd
+IDAwMDogMDAgMDAgMDAgMDAgMDAgMDAgMDAgMDAgMDAgMDAgMDAgMDAgMDAgMDAgMDAgMDANCj4g
+Li4uLi4uLi4uLi4uLi4uLg0KPiA+IFsgIDc5NS4wNjEzMTBdIDAxMDogMDAgMDAgMDAgMDAgMDAg
+MDAgMDAgMDAgMDAgMDAgMDAgMDAgMDAgMDAgMDAgMDANCj4gLi4uLi4uLi4uLi4uLi4uLg0KPiA+
+IFsgIDc5NS4wNzY3NTJdIE5leHQgb2JqOiBzdGFydD1mZmZmODgwMWY1NjhmODAwLCBsZW49MjMy
+IFsNCj4gPiA3OTUuMDg4NDQ4XSAwMDA6IDZiIDZiIDZiIDZiIDZiIDZiIDZiIDZiIDZiIDZiIDZi
+IDZiIDZiIDZiIDZiIDZiDQo+ID4ga2tra2tra2tra2tra2trayBbICA3OTUuMTAyMzY1XSAwMTA6
+IDZiIDZiIDZiIDZiIDZiIDZiIDZiIDZiIDZiIDZiIDZiDQo+ID4gNmIgNmIgNmIgNmIgNmIgIGtr
+a2tra2tra2tra2tra2sNCj4gPg0KPiA+IFRoZSA2bG93cGFuIGNvbm5lY3Rpb24gYmV0d2VlbiB0
+aGUgdHdvIGRldmljZXMgaXMgY29ubmVjdGVkLg0KPiA+IEkgb2JzZXJ2ZWQgdGhhdCB0aGUgY29u
+c29sZSBtZXNzYWdlIGFwcGVhcnMgb25jZSB3aGVuIHRoZSBtYXN0ZXIgaW5pdGlhdGVzDQo+IHRo
+ZSBjb25uZWN0aW9uIHRvIHRoZSBzbGF2ZSBhbmQgbm90aGluZyBoYXBwZW5zIGFmdGVyIHRoYXQu
+DQo+ID4gT25jZSBJIHN0YXJ0IGRvaW5nIHRoZSBwaW5nNiBmcm9tIG1hc3RlciB0byBzbGF2ZSwg
+dGhlIHNhbWUgbWVzc2FnZSBhcHBlYXJzDQo+IGFnYWluLiBUaGlzIHNhbWUgc2V0IG9mIG1lc3Nh
+Z2UgY29udGludWVzIHRvIGJlIHByaW50ZWQgZXZlcnkgNSBzZWNvbmRzIG9yIHNvLg0KPiA+IFRo
+aXMgYWxzbyBwZXJzaXN0cyB3aGVuIHBpbmc2IGlzIGRvbmUgZnJvbSB0aGUgc2xhdmUgdG8gdGhl
+IG1hc3Rlci4NCj4gPg0KPiA+IERvIHlvdSBrbm93IHdoYXQgY291bGQgcG9zc2libHkgY2F1c2Ug
+dGhpcyBpc3N1ZT8NCj4gPg0KPiA+IFBsZWFzZSBsZXQgbWUga25vdyBpZiB5b3UgcmVxdWlyZSBm
+dXJ0aGVyIGluZm9ybWF0aW9uLg0KPiA+DQo+ID4gVGhhbmsgeW91Lg0KPiA+DQo+ID4gQmVzdCBy
+ZWdhcmRzLA0KPiA+IEpvc2h1YQ0KPiA+IC0tDQo+ID4gVG8gdW5zdWJzY3JpYmUgZnJvbSB0aGlz
+IGxpc3Q6IHNlbmQgdGhlIGxpbmUgInVuc3Vic2NyaWJlDQo+ID4gbGludXgtYmx1ZXRvb3RoIiBp
+biB0aGUgYm9keSBvZiBhIG1lc3NhZ2UgdG8gbWFqb3Jkb21vQHZnZXIua2VybmVsLm9yZw0KPiA+
+IE1vcmUgbWFqb3Jkb21vIGluZm8gYXQgIGh0dHA6Ly92Z2VyLmtlcm5lbC5vcmcvbWFqb3Jkb21v
+LWluZm8uaHRtbA0KPiANCj4gDQo+IA0KPiAtLQ0KPiBMdWl6IEF1Z3VzdG8gdm9uIERlbnR6DQo+
+IC0tDQo+IFRvIHVuc3Vic2NyaWJlIGZyb20gdGhpcyBsaXN0OiBzZW5kIHRoZSBsaW5lICJ1bnN1
+YnNjcmliZSBsaW51eC1ibHVldG9vdGgiIGluIHRoZQ0KPiBib2R5IG9mIGEgbWVzc2FnZSB0byBt
+YWpvcmRvbW9Admdlci5rZXJuZWwub3JnIE1vcmUgbWFqb3Jkb21vIGluZm8gYXQNCj4gaHR0cDov
+L3ZnZXIua2VybmVsLm9yZy9tYWpvcmRvbW8taW5mby5odG1sDQoNCkpvc2h1YQ0K
