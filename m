@@ -1,76 +1,216 @@
-Return-Path: <briannorris@chromium.org>
-Date: Mon, 19 Dec 2016 19:41:23 -0800
-From: Brian Norris <briannorris@chromium.org>
-To: Rajat Jain <rajatja@google.com>
-Cc: Rob Herring <robh+dt@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+Return-Path: <rajatja@google.com>
+From: Rajat Jain <rajatja@google.com>
+To: Rob Herring <robh+dt@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
 	Marcel Holtmann <marcel@holtmann.org>,
 	Gustavo Padovan <gustavo@padovan.org>,
 	Johan Hedberg <johan.hedberg@gmail.com>,
 	Amitkumar Karwar <akarwar@marvell.com>,
 	Wei-Ning Huang <wnhuang@chromium.org>,
-	Xinming Hu <huxm@marvell.com>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Rajat Jain <rajatxjain@gmail.com>
-Subject: Re: [PATCH v2 2/3] Bluetooth: btusb: Add out-of-band wakeup support
-Message-ID: <20161220034122.GA40060@google.com>
-References: <1481916604-114279-1-git-send-email-rajatja@google.com>
- <1481916604-114279-2-git-send-email-rajatja@google.com>
- <20161219231021.GA142074@google.com>
- <CACK8Z6FteRYmrNq5Oq9LpHOUOYg49XrL0WsxD8G45pTw_cwaSg@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <CACK8Z6FteRYmrNq5Oq9LpHOUOYg49XrL0WsxD8G45pTw_cwaSg@mail.gmail.com>
+	Xinming Hu <huxm@marvell.com>,
+	netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org,
+	Brian Norris <briannorris@google.com>,
+	linux-kernel@vger.kernel.org
+Cc: Rajat Jain <rajatja@google.com>,
+	rajatxjain@gmail.com
+Subject: [PATCH v3 3/3] Bluetooth: btusb: Configure Marvell to use one of the pins for oob wakeup
+Date: Mon, 19 Dec 2016 18:56:32 -0800
+Message-Id: <1482202592-76314-3-git-send-email-rajatja@google.com>
+In-Reply-To: <1482202592-76314-1-git-send-email-rajatja@google.com>
+References: <1482202592-76314-1-git-send-email-rajatja@google.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Dec 19, 2016 at 05:46:19PM -0800, Rajat Jain wrote:
-> On Mon, Dec 19, 2016 at 3:10 PM, Brian Norris <briannorris@chromium.org> wrote:
-> > On Fri, Dec 16, 2016 at 11:30:03AM -0800, Rajat Jain wrote:
-> >> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> >> index ce22cef..beca4e9 100644
-> >> --- a/drivers/bluetooth/btusb.c
-> >> +++ b/drivers/bluetooth/btusb.c
+The Marvell devices may have many gpio pins, and hence for wakeup
+on these out-of-band pins, the chip needs to be told which pin is
+to be used for wakeup, using an hci command.
 
-> >> +static const struct of_device_id btusb_match_table[] = {
-> >> +     { .compatible = "usb1286,204e" },
-> >> +     { }
-> >> +};
-> >> +MODULE_DEVICE_TABLE(of, btusb_match_table);
-> >
-> > You define a match table here, but you also define essentially same
-> > table for Marvell-specific additions in patch 3. It looks like maybe
-> > it's legal to have more than one OF table in a module? But it seems like
-> > it would get confusing, besides being somewhat strange to maintain. It
-> > might also produce duplicate 'modinfo' output.
-> >
-> > If you really want to independently opt into device-tree-specified
-> > interrupts vs. Marvell-specific interrrupt configuration, then you
-> > should probably just merge the latter into the former table, and
-> > implement a Marvell/GPIO flag to stick in the .data field of this table.
-> 
-> The data we want to stick (The pin number on the chip) is board
-> specific rather than being chip specific, and hence .data may not be
-> useful here.
+Thus, we read the pin number etc from the device tree node and send
+a command to the chip.
 
-I just meant that if you conceptually wanted Marvell devices to "opt in"
-to this, then you could turn the .data field into some kind of flag or
-struct for describing capabilities (e.g., MARVELL_GPIO_WAKE or similar),
-effectively merging the two tables instead of having two
-mostly-overlapping tables.
+Signed-off-by: Rajat Jain <rajatja@google.com>
+Reviewed-by: Brian Norris <briannorris@chromium.org>
+Acked-by: Rob Herring <robh@kernel.org>
+---
+v3: * remove the Marvell specific id table and check
+    * Add reference to marvell-bt-8xxx.txt in btusb.txt
+    * Add "Reviewed-by" and "Acked-by"    
+v2: Fix the binding document to specify to use "wakeup" interrupt-name
 
-But you could do the same by putting such flag(s) in the
-{btusb,blacklist}_table[], or add such flag(s) later whenever there's a
-Marvell device that doesn't support this feature.
+ Documentation/devicetree/bindings/net/btusb.txt    |  3 ++
+ .../{marvell-bt-sd8xxx.txt => marvell-bt-8xxx.txt} | 46 +++++++++++++++----
+ drivers/bluetooth/btusb.c                          | 51 ++++++++++++++++++++++
+ 3 files changed, 92 insertions(+), 8 deletions(-)
+ rename Documentation/devicetree/bindings/net/{marvell-bt-sd8xxx.txt => marvell-bt-8xxx.txt} (50%)
 
-> > Or it might be fine to drop one or both "match" checks. Particularly for
-> > the Marvell-specific stuff, it's probably fair just to check if it has
-> > an ->of_node and if 'id->driver_info & BTUSB_MARVELL'. Any other Marvell
-> > device-specific quirks could probably be keyed off of the
-> > (weirdly-named?) blacklist_table[], which already matches PID/VID.
-> 
-> Yup, I think I can remove the compatible string checks.
-> 
-> I'll be sending a V3.
-
-Great!
-
-Brian
+diff --git a/Documentation/devicetree/bindings/net/btusb.txt b/Documentation/devicetree/bindings/net/btusb.txt
+index 2c0355c..01fa2d4 100644
+--- a/Documentation/devicetree/bindings/net/btusb.txt
++++ b/Documentation/devicetree/bindings/net/btusb.txt
+@@ -10,6 +10,9 @@ Required properties:
+ 
+ 		  "usb1286,204e" (Marvell 8997)
+ 
++Also, vendors that use btusb may have device additional properties, e.g:
++Documentation/devicetree/bindings/net/marvell-bt-8xxx.txt
++
+ Optional properties:
+ 
+   - interrupt-parent: phandle of the parent interrupt controller
+diff --git a/Documentation/devicetree/bindings/net/marvell-bt-sd8xxx.txt b/Documentation/devicetree/bindings/net/marvell-bt-8xxx.txt
+similarity index 50%
+rename from Documentation/devicetree/bindings/net/marvell-bt-sd8xxx.txt
+rename to Documentation/devicetree/bindings/net/marvell-bt-8xxx.txt
+index 6a9a63c..9be1059 100644
+--- a/Documentation/devicetree/bindings/net/marvell-bt-sd8xxx.txt
++++ b/Documentation/devicetree/bindings/net/marvell-bt-8xxx.txt
+@@ -1,16 +1,21 @@
+-Marvell 8897/8997 (sd8897/sd8997) bluetooth SDIO devices
++Marvell 8897/8997 (sd8897/sd8997) bluetooth devices (SDIO or USB based)
+ ------
++The 8997 devices supports multiple interfaces. When used on SDIO interfaces,
++the btmrvl driver is used and when used on USB interface, the btusb driver is
++used.
+ 
+ Required properties:
+ 
+   - compatible : should be one of the following:
+-	* "marvell,sd8897-bt"
+-	* "marvell,sd8997-bt"
++	* "marvell,sd8897-bt" (for SDIO)
++	* "marvell,sd8997-bt" (for SDIO)
++	* "usb1286,204e"      (for USB)
+ 
+ Optional properties:
+ 
+   - marvell,cal-data: Calibration data downloaded to the device during
+ 		      initialization. This is an array of 28 values(u8).
++		      This is only applicable to SDIO devices.
+ 
+   - marvell,wakeup-pin: It represents wakeup pin number of the bluetooth chip.
+ 		        firmware will use the pin to wakeup host system (u16).
+@@ -18,10 +23,15 @@ Optional properties:
+ 		      platform. The value will be configured to firmware. This
+ 		      is needed to work chip's sleep feature as expected (u16).
+   - interrupt-parent: phandle of the parent interrupt controller
+-  - interrupts : interrupt pin number to the cpu. Driver will request an irq based
+-		 on this interrupt number. During system suspend, the irq will be
+-		 enabled so that the bluetooth chip can wakeup host platform under
+-		 certain condition. During system resume, the irq will be disabled
++  - interrupt-names: Used only for USB based devices (See below)
++  - interrupts : specifies the interrupt pin number to the cpu. For SDIO, the
++		 driver will use the first interrupt specified in the interrupt
++		 array. For USB based devices, the driver will use the interrupt
++		 named "wakeup" from the interrupt-names and interrupt arrays.
++		 The driver will request an irq based on this interrupt number.
++		 During system suspend, the irq will be enabled so that the
++		 bluetooth chip can wakeup host platform under certain
++		 conditions. During system resume, the irq will be disabled
+ 		 to make sure unnecessary interrupt is not received.
+ 
+ Example:
+@@ -29,7 +39,9 @@ Example:
+ IRQ pin 119 is used as system wakeup source interrupt.
+ wakeup pin 13 and gap 100ms are configured so that firmware can wakeup host
+ using this device side pin and wakeup latency.
+-calibration data is also available in below example.
++
++Example for SDIO device follows (calibration data is also available in
++below example).
+ 
+ &mmc3 {
+ 	status = "okay";
+@@ -54,3 +66,21 @@ calibration data is also available in below example.
+ 		marvell,wakeup-gap-ms = /bits/ 16 <0x64>;
+ 	};
+ };
++
++Example for USB device:
++
++&usb_host1_ohci {
++    status = "okay";
++    #address-cells = <1>;
++    #size-cells = <0>;
++
++    mvl_bt1: bt@1 {
++	compatible = "usb1286,204e";
++	reg = <1>;
++	interrupt-parent = <&gpio0>;
++	interrupt-names = "wakeup";
++	interrupts = <119 IRQ_TYPE_LEVEL_LOW>;
++	marvell,wakeup-pin = /bits/ 16 <0x0d>;
++	marvell,wakeup-gap-ms = /bits/ 16 <0x64>;
++    };
++};
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index beca4e9..a5c2cf9 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -2343,6 +2343,50 @@ static int btusb_shutdown_intel(struct hci_dev *hdev)
+ 	return 0;
+ }
+ 
++#ifdef CONFIG_PM
++/* Configure an out-of-band gpio as wake-up pin, if specified in device tree */
++static int marvell_config_oob_wake(struct hci_dev *hdev)
++{
++	struct sk_buff *skb;
++	struct btusb_data *data = hci_get_drvdata(hdev);
++	struct device *dev = &data->udev->dev;
++	u16 pin, gap, opcode;
++	int ret;
++	u8 cmd[5];
++
++	/* Move on if no wakeup pin specified */
++	if (of_property_read_u16(dev->of_node, "marvell,wakeup-pin", &pin) ||
++	    of_property_read_u16(dev->of_node, "marvell,wakeup-gap-ms", &gap))
++		return 0;
++
++	/* Vendor specific command to configure a GPIO as wake-up pin */
++	opcode = hci_opcode_pack(0x3F, 0x59);
++	cmd[0] = opcode & 0xFF;
++	cmd[1] = opcode >> 8;
++	cmd[2] = 2; /* length of parameters that follow */
++	cmd[3] = pin;
++	cmd[4] = gap; /* time in ms, for which wakeup pin should be asserted */
++
++	skb = bt_skb_alloc(sizeof(cmd), GFP_KERNEL);
++	if (!skb) {
++		bt_dev_err(hdev, "%s: No memory\n", __func__);
++		return -ENOMEM;
++	}
++
++	memcpy(skb_put(skb, sizeof(cmd)), cmd, sizeof(cmd));
++	hci_skb_pkt_type(skb) = HCI_COMMAND_PKT;
++
++	ret = btusb_send_frame(hdev, skb);
++	if (ret) {
++		bt_dev_err(hdev, "%s: configuration failed\n", __func__);
++		kfree_skb(skb);
++		return ret;
++	}
++
++	return 0;
++}
++#endif
++
+ static int btusb_set_bdaddr_marvell(struct hci_dev *hdev,
+ 				    const bdaddr_t *bdaddr)
+ {
+@@ -2917,6 +2961,13 @@ static int btusb_probe(struct usb_interface *intf,
+ 	err = btusb_config_oob_wake(hdev);
+ 	if (err)
+ 		goto out_free_dev;
++
++	/* Marvell devices may need a specific chip configuration */
++	if (id->driver_info & BTUSB_MARVELL && data->oob_wake_irq) {
++		err = marvell_config_oob_wake(hdev);
++		if (err)
++			goto out_free_dev;
++	}
+ #endif
+ 	if (id->driver_info & BTUSB_CW6622)
+ 		set_bit(HCI_QUIRK_BROKEN_STORED_LINK_KEY, &hdev->quirks);
+-- 
+2.8.0.rc3.226.g39d4020
