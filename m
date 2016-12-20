@@ -1,72 +1,63 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20161220141039.5981-1-luiz.dentz@gmail.com>
-References: <20161220141039.5981-1-luiz.dentz@gmail.com>
-From: Szymon Janc <szymon.janc@codecoup.pl>
-Date: Tue, 20 Dec 2016 16:29:34 +0100
-Message-ID: <CAAEJBhKDx3p60aW9HrDUZJmOkURxGg_JJhqwv0ggNBCX0+KeDA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] doc/test-runner: Add Bluetooth config options
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <9523f746188f8ab683da6a9c2e995b5b@nleyten.com>
+References: <af00d3e489c2ea42ad03636143e3cb36@nleyten.com> <CAAu3APawTJPdFbiSWCDR0AdYp=_QFYJe=uGW0CabmsbsFWdU=w@mail.gmail.com>
+ <9523f746188f8ab683da6a9c2e995b5b@nleyten.com>
+From: Barry Byford <31baz66@gmail.com>
+Date: Tue, 20 Dec 2016 15:11:55 +0000
+Message-ID: <CAAu3APb76nyhngBkb=3HXbv4M-RkrhResLx+-hGJcHNmZLkNNg@mail.gmail.com>
+Subject: Re: Data exchange between two bluetooth devices
+To: Dario Teixeira <dario.teixeira@nleyten.com>
+Cc: Bluez mailing list <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hello Dario,
 
-On 20 December 2016 at 15:10, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
+On 20 December 2016 at 12:38, Dario Teixeira <dario.teixeira@nleyten.com> wrote:
+> Hi,
 >
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> Thanks a lot for your prompt reply -- it was very helpful!
+Good to hear. Thanks!
+
 >
-> List the build options for Bluetooth necessary to run testers.
-> ---
->  doc/test-runner.txt | 17 +++++++++++++++++
->  1 file changed, 17 insertions(+)
+>> Using BlueZ as a peripheral is still behind the --experimental flag so
+>> you will need to read up on that.
 >
-> diff --git a/doc/test-runner.txt b/doc/test-runner.txt
-> index 72e17ce..5ed5af9 100644
-> --- a/doc/test-runner.txt
-> +++ b/doc/test-runner.txt
-> @@ -32,6 +32,23 @@ minimal options for a successful boot.
->         CONFIG_DEVTMPFS=y
->         CONFIG_DEBUG_FS=y
 >
-> +For Bluetooth functionality:
-> +
-> +       CONFIG_BT=y
-> +       CONFIG_BT_BREDR=y
-> +       CONFIG_BT_RFCOMM=y
-> +       CONFIG_BT_LE=y
-
-I'd add other options (BNEP, HIDP etc) too.
-AFAIR those are needed by other testers eg android-tester and bnep-tester.
-
-> +
-> +       CONFIG_BT_HCIVHCI=y
-> +
-> +       CONFIG_CRYPTO_CMAC=y
-> +       CONFIG_CRYPTO_USER_API=y
-> +       CONFIG_CRYPTO_USER_API_HASH=y
-> +       CONFIG_CRYPTO_USER_API_SKCIPHER=y
-> +
-> +       CONFIG_UNIX=y
-> +
-> +
->  These options should be installed as .config in the kernel source directory
->  followed by this command.
+> I'm unsure whether I'll need to compile the latest version of Bluez
+> or if the version packaged for my distro has all the functionality
+> I need. This brings two related questions:
 >
-> --
-> 2.9.3
+> a) How do I query the bluetooth daemon to find out if the required
+>    functionality is available, and what should I look for?
+>    (I reckon I'll need to build a GATT server at least)
+
+I am not sure I have a scientific answer for you on this. Maybe one of
+the developers can offer better guidance on this if you share the
+version in your distro.
+My gut feeling on this is that if you read the release notes at
+http://www.bluez.org/ then you will see that the GATT D-Bus API gets
+mentioned as being updated in recent releases. Unless you have a very
+recent version in your distro, I'd upgrade.
+
+
 >
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> b) If the functionality is compiled into the binary, but requires
+>    the --experimental flag for activation, what's the standard way
+>    to enable it?  I can always modify the bluetooth.service file
+>    so that bluetoothd starts with the option, but I reckon there
+>    should be a standard config option, no? (I couldn't find any
+>    mention of "experimental" in the /etc/bluetooth files)
 
+It is in bluetooth.service that I would normally enable this.
+The binary will need to have been built with experimental enabled.
+I would think it unlikely that your distro has done that so again
+would suggest you need to build from source.
 
-
-
--- 
-pozdrawiam
-Szymon K. Janc
+>
+> Thanks again for your time!
+> Best regards,
+> Dario Teixeira
+>
