@@ -1,111 +1,76 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <briannorris@chromium.org>
+Date: Mon, 19 Dec 2016 19:41:23 -0800
+From: Brian Norris <briannorris@chromium.org>
+To: Rajat Jain <rajatja@google.com>
+Cc: Rob Herring <robh+dt@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Amitkumar Karwar <akarwar@marvell.com>,
+	Wei-Ning Huang <wnhuang@chromium.org>,
+	Xinming Hu <huxm@marvell.com>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Rajat Jain <rajatxjain@gmail.com>
+Subject: Re: [PATCH v2 2/3] Bluetooth: btusb: Add out-of-band wakeup support
+Message-ID: <20161220034122.GA40060@google.com>
+References: <1481916604-114279-1-git-send-email-rajatja@google.com>
+ <1481916604-114279-2-git-send-email-rajatja@google.com>
+ <20161219231021.GA142074@google.com>
+ <CACK8Z6FteRYmrNq5Oq9LpHOUOYg49XrL0WsxD8G45pTw_cwaSg@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20161216131853.2815-1-luiz.dentz@gmail.com>
-References: <20161216131853.2815-1-luiz.dentz@gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 20 Dec 2016 11:58:05 +0200
-Message-ID: <CABBYNZ+fSqhGEzQvtGkmohW1nEKp61a0733kNbMbCunQ9U4QCw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/2] core/gatt-database: Send offset if set to ReadValue
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CACK8Z6FteRYmrNq5Oq9LpHOUOYg49XrL0WsxD8G45pTw_cwaSg@mail.gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+On Mon, Dec 19, 2016 at 05:46:19PM -0800, Rajat Jain wrote:
+> On Mon, Dec 19, 2016 at 3:10 PM, Brian Norris <briannorris@chromium.org> wrote:
+> > On Fri, Dec 16, 2016 at 11:30:03AM -0800, Rajat Jain wrote:
+> >> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> >> index ce22cef..beca4e9 100644
+> >> --- a/drivers/bluetooth/btusb.c
+> >> +++ b/drivers/bluetooth/btusb.c
 
-On Fri, Dec 16, 2016 at 3:18 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> If there remote is using Read Blob command as part of a Read Long
-> procedure the offset needs to be set in order for the application to
-> detect from where it shall start.
->
-> Note that with this it is also possible to detect what the chunk sizes
-> needs to be as the first offset indicates the maximum payload.
-> ---
->  src/gatt-database.c | 18 +++++++++++++-----
->  1 file changed, 13 insertions(+), 5 deletions(-)
->
-> diff --git a/src/gatt-database.c b/src/gatt-database.c
-> index 7b3ec16..88627ac 100644
-> --- a/src/gatt-database.c
-> +++ b/src/gatt-database.c
-> @@ -138,6 +138,7 @@ struct external_desc {
->  struct pending_op {
->         struct btd_device *device;
->         unsigned int id;
-> +       uint16_t offset;
->         struct gatt_db_attribute *attrib;
->         struct queue *owner_queue;
->         struct iovec data;
-> @@ -1605,7 +1606,7 @@ static void pending_op_free(void *data)
->  static struct pending_op *pending_read_new(struct btd_device *device,
->                                         struct queue *owner_queue,
->                                         struct gatt_db_attribute *attrib,
-> -                                       unsigned int id)
-> +                                       unsigned int id, uint16_t offset)
->  {
->         struct pending_op *op;
->
-> @@ -1615,6 +1616,7 @@ static struct pending_op *pending_read_new(struct btd_device *device,
->         op->device = device;
->         op->attrib = attrib;
->         op->id = id;
-> +       op->offset = offset;
->         queue_push_tail(owner_queue, op);
->
->         return op;
-> @@ -1626,6 +1628,9 @@ static void append_options(DBusMessageIter *iter, void *user_data)
->         const char *path = device_get_path(op->device);
->
->         dict_append_entry(iter, "device", DBUS_TYPE_OBJECT_PATH, &path);
-> +       if (op->offset)
-> +               dict_append_entry(iter, "offset", DBUS_TYPE_UINT16,
-> +                                                       &op->offset);
->  }
->
->  static void read_setup_cb(DBusMessageIter *iter, void *user_data)
-> @@ -1649,11 +1654,12 @@ static struct pending_op *send_read(struct btd_device *device,
->                                         struct gatt_db_attribute *attrib,
->                                         GDBusProxy *proxy,
->                                         struct queue *owner_queue,
-> -                                       unsigned int id)
-> +                                       unsigned int id,
-> +                                       uint16_t offset)
->  {
->         struct pending_op *op;
->
-> -       op = pending_read_new(device, owner_queue, attrib, id);
-> +       op = pending_read_new(device, owner_queue, attrib, id, offset);
->
->         if (g_dbus_proxy_method_call(proxy, "ReadValue", read_setup_cb,
->                                 read_reply_cb, op, pending_op_free) == TRUE)
-> @@ -1974,7 +1980,8 @@ static void desc_read_cb(struct gatt_db_attribute *attrib,
->                 goto fail;
->         }
->
-> -       if (send_read(device, attrib, desc->proxy, desc->pending_reads, id))
-> +       if (send_read(device, attrib, desc->proxy, desc->pending_reads, id,
-> +                                                               offset))
->                 return;
->
->  fail:
-> @@ -2054,7 +2061,8 @@ static void chrc_read_cb(struct gatt_db_attribute *attrib,
->                 goto fail;
->         }
->
-> -       if (send_read(device, attrib, chrc->proxy, chrc->pending_reads, id))
-> +       if (send_read(device, attrib, chrc->proxy, chrc->pending_reads, id,
-> +                                                               offset))
->                 return;
->
->  fail:
-> --
-> 2.9.3
+> >> +static const struct of_device_id btusb_match_table[] = {
+> >> +     { .compatible = "usb1286,204e" },
+> >> +     { }
+> >> +};
+> >> +MODULE_DEVICE_TABLE(of, btusb_match_table);
+> >
+> > You define a match table here, but you also define essentially same
+> > table for Marvell-specific additions in patch 3. It looks like maybe
+> > it's legal to have more than one OF table in a module? But it seems like
+> > it would get confusing, besides being somewhat strange to maintain. It
+> > might also produce duplicate 'modinfo' output.
+> >
+> > If you really want to independently opt into device-tree-specified
+> > interrupts vs. Marvell-specific interrrupt configuration, then you
+> > should probably just merge the latter into the former table, and
+> > implement a Marvell/GPIO flag to stick in the .data field of this table.
+> 
+> The data we want to stick (The pin number on the chip) is board
+> specific rather than being chip specific, and hence .data may not be
+> useful here.
 
-Applied.
+I just meant that if you conceptually wanted Marvell devices to "opt in"
+to this, then you could turn the .data field into some kind of flag or
+struct for describing capabilities (e.g., MARVELL_GPIO_WAKE or similar),
+effectively merging the two tables instead of having two
+mostly-overlapping tables.
 
+But you could do the same by putting such flag(s) in the
+{btusb,blacklist}_table[], or add such flag(s) later whenever there's a
+Marvell device that doesn't support this feature.
 
--- 
-Luiz Augusto von Dentz
+> > Or it might be fine to drop one or both "match" checks. Particularly for
+> > the Marvell-specific stuff, it's probably fair just to check if it has
+> > an ->of_node and if 'id->driver_info & BTUSB_MARVELL'. Any other Marvell
+> > device-specific quirks could probably be keyed off of the
+> > (weirdly-named?) blacklist_table[], which already matches PID/VID.
+> 
+> Yup, I think I can remove the compatible string checks.
+> 
+> I'll be sending a V3.
+
+Great!
+
+Brian
