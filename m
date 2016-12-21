@@ -1,74 +1,86 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: mcchou@chromium.org
-To: linux-bluetooth@vger.kernel.org
-Cc: luiz.von.dentz@intel.com, josephsih@chromium.org,
-        Miao-chen Chou <mcchou@chromium.org>
-Subject: [PATCH v5] monitor/rfcomm: Fix a potential memory access issue for compatibility with LLVM
-Date: Wed, 21 Dec 2016 16:12:33 -0800
-Message-Id: <1482365553-71040-1-git-send-email-mcchou@chromium.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <linux-wpan-owner@vger.kernel.org>
+From: "Wong, Joshua Weng Onn" <joshua.weng.onn.wong@intel.com>
+To: 'Alexander Aring' <aar@pengutronix.de>
+CC: "'alex.aring@gmail.com'" <alex.aring@gmail.com>,
+        "'jukka.rissanen@linux.intel.com'" <jukka.rissanen@linux.intel.com>,
+        "'linux-bluetooth@vger.kernel.org'" <linux-bluetooth@vger.kernel.org>,
+        "'linux-wpan@vger.kernel.org'" <linux-wpan@vger.kernel.org>
+Subject: RE: Bluetooth 6lowpan ping6 slab corruption
+Date: Wed, 21 Dec 2016 23:38:52 +0000
+Message-ID: <E3B98393E6037849B63EA428240A65135C6C50@PGSMSX103.gar.corp.intel.com>
+References: <E3B98393E6037849B63EA428240A65135BC9D5@PGSMSX103.gar.corp.intel.com>
+ <c70d7129-be2d-4764-6f09-1153192c49be@pengutronix.de>
+ <E3B98393E6037849B63EA428240A65135BCA89@PGSMSX103.gar.corp.intel.com>
+ <efdc1a54-7fdc-80b8-f46d-d663addae509@pengutronix.de>
+ <E3B98393E6037849B63EA428240A65135C42A6@PGSMSX103.gar.corp.intel.com>
+In-Reply-To: <E3B98393E6037849B63EA428240A65135C42A6@PGSMSX103.gar.corp.intel.com>
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Miao-chen Chou <mcchou@chromium.org>
+Hi Alex,
 
-This patch removes "packed" attribute from the definition of struct rfcomm_rpn
-to prevent the access to an unaligned struct member in mmc_rpn(). This patch
-also introduces a temp variable in mcc_pn() to prevent unaligned access without
-touching the definition of struct rfcomm_pn, since struct rfcomm_pn is used as
-a PDU.
 
-error messages from LLVM build:
+> Hi Alex,
+> 
+> > Hi,
+> >
+> > On 12/16/2016 09:18 AM, Wong, Joshua Weng Onn wrote:
+> > ...
+> > >
+> > > Thank you for informing me about this. Sorry as I was not aware of
+> > > the newer
+> > patches that you submitted to mainline.
+> > > At the moment I am not able to upgrade the kernel to a recent
+> > > version as the
+> > other teams in my department are using kernel version 4.1.27 and I
+> > have to follow it strictly.
+> > >
+> > > I just got an idea. Perhaps what I can do is backport the patches
+> > > and apply
+> > them to this version of the kernel. I am not sure if it will work
+> > entirely. I'll discuss this with my lead first if he wants me to do
+> > this and let you know if I am pursuing this.
+> > >
+> >
+> > You can backport it, yes... but please _please_ don't do it... bring
+> > it mainline and then backport it.
+> >
+> > Tell that your lead as suggestion from me.
+> >
+> > It makes no sense that you backporting it only for you. This thing
+> > need to be fixed upstream...
+> >
+> > In my opinion, all people who backporting it will do work for nothing...
+> > The next guy/girl which wants to try that out runs again into such issues.
+> >
+> > These patches was sending to bluetooth-next, now I am busy with other
+> > things and can work on it at end of April maybe... and I think only in
+> > my free-time. This patch-series just needs a little cleanup and send as PATCH...
+> >
+> > - Alex
+> 
+> I've finally just learned how to add inline '>' characters to the previous email.
+> Had to make some changes in my email settings.
+> 
+> Thank you very much for your reply.
+> Ok noted on that. My most sincere apologies as I am quite new to this and I am
+> still trying to understand how open source works. Didn't realize that it will cause
+> repetitive work for others.
+> 
+> I will discuss this with my technical lead and update you along the way.
+> 
+> Thank you.
+> 
+> Best regards,
+> Joshua
 
-monitor/rfcomm.c:238:36: error: taking address of packed member 'pm' of class
-or structure 'rfcomm_rpn' may result in an unaligned pointer value
-[-Werror,-Waddress-of-packed-member]
-        if (!l2cap_frame_get_le16(frame, &rpn.pm))
-monitor/rfcomm.c:287:36: error: taking address of packed member 'mtu' of class
-or structure 'rfcomm_pn' may result in an unaligned pointer value
-[-Werror,-Waddress-of-packed-member]
-        if (!l2cap_frame_get_le16(frame, &pn.mtu))
+I have discussed this with my technical lead and that he mentioned that we will not be able to pursue to bring it to Linux mainline and also not able to backport the drivers due to resource limitation. We have pending tasks/projects that are upcoming.
 
-Currently there is no corresponding flag in GCC to generate the same error
-messages. See https://gcc.gnu.org/bugzilla/show_bug.cgi?id=51628.
----
-v5 adds more details about the error messages.
+Just curious, can we know the estimated timeline that it will take for an inexperienced person in Linux kernel development to complete this task?
 
- monitor/rfcomm.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+Thank you.
 
-diff --git a/monitor/rfcomm.c b/monitor/rfcomm.c
-index fd7bbdc..afeb5e1 100644
---- a/monitor/rfcomm.c
-+++ b/monitor/rfcomm.c
-@@ -106,7 +106,7 @@ struct rfcomm_rpn {
- 	uint8_t xon;
- 	uint8_t xoff;
- 	uint16_t pm;
--} __attribute__ ((packed));
-+};
-
- struct rfcomm_rls {
- 	uint8_t dlci;
-@@ -265,6 +265,7 @@ static inline bool mcc_pn(struct rfcomm_frame *rfcomm_frame, uint8_t indent)
- {
- 	struct l2cap_frame *frame = &rfcomm_frame->l2cap_frame;
- 	struct rfcomm_pn pn;
-+	uint16_t mtu;
-
- 	/* rfcomm_pn struct is defined in rfcomm.h */
-
-@@ -284,8 +285,10 @@ static inline bool mcc_pn(struct rfcomm_frame *rfcomm_frame, uint8_t indent)
- 	if (!l2cap_frame_get_u8(frame, &pn.ack_timer))
- 		return false;
-
--	if (!l2cap_frame_get_le16(frame, &pn.mtu))
-+	/* prevent unaligned memory access */
-+	if (!l2cap_frame_get_le16(frame, &mtu))
- 		return false;
-+	pn.mtu = mtu;
-
- 	if (!l2cap_frame_get_u8(frame, &pn.max_retrans))
- 		return false;
---
-2.8.0.rc3.226.g39d4020
-
+Best regards,
+Joshua
