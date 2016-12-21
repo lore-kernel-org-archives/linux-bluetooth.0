@@ -1,154 +1,217 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <CABBYNZ+Zi_euJQ5SbZjeYHcP_ScyAAn4rAv_GFMR3sfHHeCNCw@mail.gmail.com>
-References: <1482263413-85198-1-git-send-email-mcchou@chromium.org>
- <CABBYNZKZzvum3s8YcVzUYQME77UOAD_4FdnQSYHiRGSJ20noVA@mail.gmail.com>
- <CAHgsZ+gwVHZpU1kY++_U1SQnTF3EATAUwk4PN8dZKhj0bCrmTQ@mail.gmail.com> <CABBYNZ+Zi_euJQ5SbZjeYHcP_ScyAAn4rAv_GFMR3sfHHeCNCw@mail.gmail.com>
-From: Miao-chen Chou <mcchou@google.com>
-Date: Wed, 21 Dec 2016 15:09:16 -0800
-Message-ID: <CAHgsZ+jKT__=W=vWM_Nk82POQN=Xmjq6De90Sc1wjJZq81UjcQ@mail.gmail.com>
-Subject: Re: [PATCH v4] monitor/rfcomm: Fix a potential memory access issue
- for compatibility with LLVM
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Luiz Augusto Von Dentz <luiz.von.dentz@intel.com>,
-        josephsih@chromium.org
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <rajatja@google.com>
+From: Rajat Jain <rajatja@google.com>
+To: Rob Herring <robh+dt@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Amitkumar Karwar <akarwar@marvell.com>,
+	Wei-Ning Huang <wnhuang@chromium.org>,
+	Xinming Hu <huxm@marvell.com>,
+	netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org,
+	Brian Norris <briannorris@google.com>,
+	linux-kernel@vger.kernel.org
+Cc: Rajat Jain <rajatja@google.com>,
+	rajatxjain@gmail.com
+Subject: [PATCH v4 3/3] Bluetooth: btusb: Configure Marvell to use one of the pins for oob wakeup
+Date: Wed, 21 Dec 2016 12:33:52 -0800
+Message-Id: <1482352432-38302-3-git-send-email-rajatja@google.com>
+In-Reply-To: <1482352432-38302-1-git-send-email-rajatja@google.com>
+References: <1482352432-38302-1-git-send-email-rajatja@google.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello Luiz,
+The Marvell devices may have many gpio pins, and hence for wakeup
+on these out-of-band pins, the chip needs to be told which pin is
+to be used for wakeup, using an hci command.
 
-Indeed, there is currently no such option in GCC.
-http://git.kernel.org/cgit/bluetooth/bluez.git/commit/?id=452024ba83452eee5accdbe5506ab3683cd4790c
-has addressed the removal of packed attribute, but it missed out
-struct rfcomm_rpn, and we still need to take care of the access to mtu
-of struct rfcomm_pn. I will add more more description to the following
-patch (v5).
+Thus, we read the pin number etc from the device tree node and send
+a command to the chip.
 
-Thanks,
-Miao
+Signed-off-by: Rajat Jain <rajatja@google.com>
+Reviewed-by: Brian Norris <briannorris@chromium.org>
+Acked-by: Rob Herring <robh@kernel.org>
+---
+v4: same as v3
+v3: * remove the Marvell specific id table and check
+    * Add reference to marvell-bt-8xxx.txt in btusb.txt
+    * Add "Reviewed-by" and "Acked-by"    
+v2: Fix the binding document to specify to use "wakeup" interrupt-name
 
-On Wed, Dec 21, 2016 at 12:08 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi,
->
-> On Wed, Dec 21, 2016 at 9:26 PM, Miao-chen Chou <mcchou@google.com> wrote:
->> Hi Luiz,
->>
->> The unaligned error is raised when trying to access the address of mtu
->> of a packed struct where mtu's size is 2 bytes; which means accessing
->> the address of a packed member whose size is greater than 1 byte can
->> raised this error. So it is not true that there is no error as far as
->> the member is not accessed via void *(see the following function
->> signature).
->>
->> static inline bool l2cap_frame_get_le16(struct l2cap_frame *frame,
->> uint16_t *value)
->>
->> Here are the errors generated. The flags are "Werror" and
->> "Waddress-of-packed-member". I will also add these two errors into the
->> commit message.
->>
->> monitor/rfcomm.c:238:36: error: taking address of packed member 'pm'
->> of class or structure 'rfcomm_rpn' may result in an unaligned pointer
->> value [-Werror,-Waddress-of-packed-member]
->>         if (!l2cap_frame_get_le16(frame, &rpn.pm))
->> monitor/rfcomm.c:287:36: error: taking address of packed member 'mtu'
->> of class or structure 'rfcomm_pn' may result in an unaligned pointer
->> value [-Werror,-Waddress-of-packed-member]
->>         if (!l2cap_frame_get_le16(frame, &pn.mtu))
->
-> Ive only found the following bug in GCC:
->
-> https://gcc.gnu.org/bugzilla/show_bug.cgi?id=51628
->
-> But there doesn't seem to have any option such as
-> -Waddress-of-packed-member but it seems valid as explained in the bug.
-> So we got to remove any use of packed struct that don't represent the
-> PDU, iirc we did choose to parse individual members so we could tell
-> exactly where it PDU failed to parse but that is not done in other
-> layers which do use packed structs but they don't take addresses of
-> members so they are safe. Imo we should not resort to packed in the
-> monitor, specially since gcc don't seem to have a flag to catch
-> addresses of packed member, for non-monitor it might be fine because
-> they don't need to be decoding everything.
->
->> Thanks,
->> Miao
->>
->> On Wed, Dec 21, 2016 at 6:03 AM, Luiz Augusto von Dentz
->> <luiz.dentz@gmail.com> wrote:
->>> Hi,
->>>
->>> On Tue, Dec 20, 2016 at 9:50 PM,  <mcchou@chromium.org> wrote:
->>>> From: Miao-chen Chou <mcchou@chromium.org>
->>>>
->>>> This patch removes "packed" attribute from the definition of struct rfcomm_rpn
->>>> to prevent the access to an unaligned struct member in mmc_rpn(). This patch
->>>> also introduces a temp variable in mcc_pn() to prevent unaligned access without
->>>> touching the definition of struct rfcomm_pn, since struct rfcomm_pn is used as
->>>> a PDU.
->>>> ---
->>>> v4 removes the unrelated change on the code format.
->>>>
->>>>  monitor/rfcomm.c | 7 +++++--
->>>>  1 file changed, 5 insertions(+), 2 deletions(-)
->>>>
->>>> diff --git a/monitor/rfcomm.c b/monitor/rfcomm.c
->>>> index b32ad40..4bd549c 100644
->>>> --- a/monitor/rfcomm.c
->>>> +++ b/monitor/rfcomm.c
->>>> @@ -106,7 +106,7 @@ struct rfcomm_rpn {
->>>>         uint8_t xon;
->>>>         uint8_t xoff;
->>>>         uint16_t pm;
->>>> -} __attribute__ ((packed));
->>>> +};
->>>>
->>>>  struct rfcomm_rls {
->>>>         uint8_t dlci;
->>>> @@ -265,6 +265,7 @@ static inline bool mcc_pn(struct rfcomm_frame *rfcomm_frame, uint8_t indent)
->>>>  {
->>>>         struct l2cap_frame *frame = &rfcomm_frame->l2cap_frame;
->>>>         struct rfcomm_pn pn;
->>>> +       uint16_t mtu;
->>>>
->>>>         /* rfcomm_pn struct is defined in rfcomm.h */
->>>>
->>>> @@ -284,8 +285,10 @@ static inline bool mcc_pn(struct rfcomm_frame *rfcomm_frame, uint8_t indent)
->>>>         if (!l2cap_frame_get_u8(frame, &pn.ack_timer))
->>>>                 return false;
->>>>
->>>> -       if (!l2cap_frame_get_le16(frame, &pn.mtu))
->>>> +       /* prevent unaligned memory access */
->>>> +       if (!l2cap_frame_get_le16(frame, &mtu))
->>>>                 return false;
->>>> +       pn.mtu = mtu;
->>>
->>> Interesting, isn't this causing unaligned access anyway since it is
->>> assigning to pn.mtu which is packed? Or this is fine as far as it is
->>> not accessed via void *? Btw, please add the compiler output and flags
->>> it is being used, it is quite possible we can replicate the same
->>> errors on gcc or perhaps it is missing some flags used in gcc to make
->>> this aligned?
->>>
->>>>         if (!l2cap_frame_get_u8(frame, &pn.max_retrans))
->>>>                 return false;
->>>> --
->>>> 2.8.0.rc3.226.g39d4020
->>>>
->>>> --
->>>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->>>> the body of a message to majordomo@vger.kernel.org
->>>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->>>
->>>
->>>
->>> --
->>> Luiz Augusto von Dentz
->
->
->
-> --
-> Luiz Augusto von Dentz
+ Documentation/devicetree/bindings/net/btusb.txt    |  3 ++
+ .../{marvell-bt-sd8xxx.txt => marvell-bt-8xxx.txt} | 46 +++++++++++++++----
+ drivers/bluetooth/btusb.c                          | 51 ++++++++++++++++++++++
+ 3 files changed, 92 insertions(+), 8 deletions(-)
+ rename Documentation/devicetree/bindings/net/{marvell-bt-sd8xxx.txt => marvell-bt-8xxx.txt} (50%)
+
+diff --git a/Documentation/devicetree/bindings/net/btusb.txt b/Documentation/devicetree/bindings/net/btusb.txt
+index 2c0355c..01fa2d4 100644
+--- a/Documentation/devicetree/bindings/net/btusb.txt
++++ b/Documentation/devicetree/bindings/net/btusb.txt
+@@ -10,6 +10,9 @@ Required properties:
+ 
+ 		  "usb1286,204e" (Marvell 8997)
+ 
++Also, vendors that use btusb may have device additional properties, e.g:
++Documentation/devicetree/bindings/net/marvell-bt-8xxx.txt
++
+ Optional properties:
+ 
+   - interrupt-parent: phandle of the parent interrupt controller
+diff --git a/Documentation/devicetree/bindings/net/marvell-bt-sd8xxx.txt b/Documentation/devicetree/bindings/net/marvell-bt-8xxx.txt
+similarity index 50%
+rename from Documentation/devicetree/bindings/net/marvell-bt-sd8xxx.txt
+rename to Documentation/devicetree/bindings/net/marvell-bt-8xxx.txt
+index 6a9a63c..9be1059 100644
+--- a/Documentation/devicetree/bindings/net/marvell-bt-sd8xxx.txt
++++ b/Documentation/devicetree/bindings/net/marvell-bt-8xxx.txt
+@@ -1,16 +1,21 @@
+-Marvell 8897/8997 (sd8897/sd8997) bluetooth SDIO devices
++Marvell 8897/8997 (sd8897/sd8997) bluetooth devices (SDIO or USB based)
+ ------
++The 8997 devices supports multiple interfaces. When used on SDIO interfaces,
++the btmrvl driver is used and when used on USB interface, the btusb driver is
++used.
+ 
+ Required properties:
+ 
+   - compatible : should be one of the following:
+-	* "marvell,sd8897-bt"
+-	* "marvell,sd8997-bt"
++	* "marvell,sd8897-bt" (for SDIO)
++	* "marvell,sd8997-bt" (for SDIO)
++	* "usb1286,204e"      (for USB)
+ 
+ Optional properties:
+ 
+   - marvell,cal-data: Calibration data downloaded to the device during
+ 		      initialization. This is an array of 28 values(u8).
++		      This is only applicable to SDIO devices.
+ 
+   - marvell,wakeup-pin: It represents wakeup pin number of the bluetooth chip.
+ 		        firmware will use the pin to wakeup host system (u16).
+@@ -18,10 +23,15 @@ Optional properties:
+ 		      platform. The value will be configured to firmware. This
+ 		      is needed to work chip's sleep feature as expected (u16).
+   - interrupt-parent: phandle of the parent interrupt controller
+-  - interrupts : interrupt pin number to the cpu. Driver will request an irq based
+-		 on this interrupt number. During system suspend, the irq will be
+-		 enabled so that the bluetooth chip can wakeup host platform under
+-		 certain condition. During system resume, the irq will be disabled
++  - interrupt-names: Used only for USB based devices (See below)
++  - interrupts : specifies the interrupt pin number to the cpu. For SDIO, the
++		 driver will use the first interrupt specified in the interrupt
++		 array. For USB based devices, the driver will use the interrupt
++		 named "wakeup" from the interrupt-names and interrupt arrays.
++		 The driver will request an irq based on this interrupt number.
++		 During system suspend, the irq will be enabled so that the
++		 bluetooth chip can wakeup host platform under certain
++		 conditions. During system resume, the irq will be disabled
+ 		 to make sure unnecessary interrupt is not received.
+ 
+ Example:
+@@ -29,7 +39,9 @@ Example:
+ IRQ pin 119 is used as system wakeup source interrupt.
+ wakeup pin 13 and gap 100ms are configured so that firmware can wakeup host
+ using this device side pin and wakeup latency.
+-calibration data is also available in below example.
++
++Example for SDIO device follows (calibration data is also available in
++below example).
+ 
+ &mmc3 {
+ 	status = "okay";
+@@ -54,3 +66,21 @@ calibration data is also available in below example.
+ 		marvell,wakeup-gap-ms = /bits/ 16 <0x64>;
+ 	};
+ };
++
++Example for USB device:
++
++&usb_host1_ohci {
++    status = "okay";
++    #address-cells = <1>;
++    #size-cells = <0>;
++
++    mvl_bt1: bt@1 {
++	compatible = "usb1286,204e";
++	reg = <1>;
++	interrupt-parent = <&gpio0>;
++	interrupt-names = "wakeup";
++	interrupts = <119 IRQ_TYPE_LEVEL_LOW>;
++	marvell,wakeup-pin = /bits/ 16 <0x0d>;
++	marvell,wakeup-gap-ms = /bits/ 16 <0x64>;
++    };
++};
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 2b45f1c..91dcd8a 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -2343,6 +2343,50 @@ static int btusb_shutdown_intel(struct hci_dev *hdev)
+ 	return 0;
+ }
+ 
++#ifdef CONFIG_PM
++/* Configure an out-of-band gpio as wake-up pin, if specified in device tree */
++static int marvell_config_oob_wake(struct hci_dev *hdev)
++{
++	struct sk_buff *skb;
++	struct btusb_data *data = hci_get_drvdata(hdev);
++	struct device *dev = &data->udev->dev;
++	u16 pin, gap, opcode;
++	int ret;
++	u8 cmd[5];
++
++	/* Move on if no wakeup pin specified */
++	if (of_property_read_u16(dev->of_node, "marvell,wakeup-pin", &pin) ||
++	    of_property_read_u16(dev->of_node, "marvell,wakeup-gap-ms", &gap))
++		return 0;
++
++	/* Vendor specific command to configure a GPIO as wake-up pin */
++	opcode = hci_opcode_pack(0x3F, 0x59);
++	cmd[0] = opcode & 0xFF;
++	cmd[1] = opcode >> 8;
++	cmd[2] = 2; /* length of parameters that follow */
++	cmd[3] = pin;
++	cmd[4] = gap; /* time in ms, for which wakeup pin should be asserted */
++
++	skb = bt_skb_alloc(sizeof(cmd), GFP_KERNEL);
++	if (!skb) {
++		bt_dev_err(hdev, "%s: No memory\n", __func__);
++		return -ENOMEM;
++	}
++
++	memcpy(skb_put(skb, sizeof(cmd)), cmd, sizeof(cmd));
++	hci_skb_pkt_type(skb) = HCI_COMMAND_PKT;
++
++	ret = btusb_send_frame(hdev, skb);
++	if (ret) {
++		bt_dev_err(hdev, "%s: configuration failed\n", __func__);
++		kfree_skb(skb);
++		return ret;
++	}
++
++	return 0;
++}
++#endif
++
+ static int btusb_set_bdaddr_marvell(struct hci_dev *hdev,
+ 				    const bdaddr_t *bdaddr)
+ {
+@@ -2917,6 +2961,13 @@ static int btusb_probe(struct usb_interface *intf,
+ 	err = btusb_config_oob_wake(hdev);
+ 	if (err)
+ 		goto out_free_dev;
++
++	/* Marvell devices may need a specific chip configuration */
++	if (id->driver_info & BTUSB_MARVELL && data->oob_wake_irq) {
++		err = marvell_config_oob_wake(hdev);
++		if (err)
++			goto out_free_dev;
++	}
+ #endif
+ 	if (id->driver_info & BTUSB_CW6622)
+ 		set_bit(HCI_QUIRK_BROKEN_STORED_LINK_KEY, &hdev->quirks);
+-- 
+2.8.0.rc3.226.g39d4020
