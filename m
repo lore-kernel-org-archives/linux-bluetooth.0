@@ -1,85 +1,104 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <1482263413-85198-1-git-send-email-mcchou@chromium.org>
-References: <1482263413-85198-1-git-send-email-mcchou@chromium.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 21 Dec 2016 16:03:37 +0200
-Message-ID: <CABBYNZKZzvum3s8YcVzUYQME77UOAD_4FdnQSYHiRGSJ20noVA@mail.gmail.com>
-Subject: Re: [PATCH v4] monitor/rfcomm: Fix a potential memory access issue
- for compatibility with LLVM
-To: Miao-chen Chou <mcchou@chromium.org>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Luiz Augusto Von Dentz <luiz.von.dentz@intel.com>,
-        josephsih@chromium.org
-Content-Type: text/plain; charset=UTF-8
+From: Petri Gynther <pgynther@google.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: luiz.dentz@gmail.com, Petri Gynther <pgynther@google.com>
+Subject: [PATCH 2/2] monitor: Add -V option to suppress HCI vendor events
+Date: Tue, 20 Dec 2016 18:40:01 -0800
+Message-Id: <1482288001-146507-2-git-send-email-pgynther@google.com>
+In-Reply-To: <1482288001-146507-1-git-send-email-pgynther@google.com>
+References: <1482288001-146507-1-git-send-email-pgynther@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+When idle, Marvell 88W8897 Bluetooth adapter sends the following
+HCI vendor events to BlueZ stack on continuous basis:
 
-On Tue, Dec 20, 2016 at 9:50 PM,  <mcchou@chromium.org> wrote:
-> From: Miao-chen Chou <mcchou@chromium.org>
->
-> This patch removes "packed" attribute from the definition of struct rfcomm_rpn
-> to prevent the access to an unaligned struct member in mmc_rpn(). This patch
-> also introduces a temp variable in mcc_pn() to prevent unaligned access without
-> touching the definition of struct rfcomm_pn, since struct rfcomm_pn is used as
-> a PDU.
-> ---
-> v4 removes the unrelated change on the code format.
->
->  monitor/rfcomm.c | 7 +++++--
->  1 file changed, 5 insertions(+), 2 deletions(-)
->
-> diff --git a/monitor/rfcomm.c b/monitor/rfcomm.c
-> index b32ad40..4bd549c 100644
-> --- a/monitor/rfcomm.c
-> +++ b/monitor/rfcomm.c
-> @@ -106,7 +106,7 @@ struct rfcomm_rpn {
->         uint8_t xon;
->         uint8_t xoff;
->         uint16_t pm;
-> -} __attribute__ ((packed));
-> +};
->
->  struct rfcomm_rls {
->         uint8_t dlci;
-> @@ -265,6 +265,7 @@ static inline bool mcc_pn(struct rfcomm_frame *rfcomm_frame, uint8_t indent)
->  {
->         struct l2cap_frame *frame = &rfcomm_frame->l2cap_frame;
->         struct rfcomm_pn pn;
-> +       uint16_t mtu;
->
->         /* rfcomm_pn struct is defined in rfcomm.h */
->
-> @@ -284,8 +285,10 @@ static inline bool mcc_pn(struct rfcomm_frame *rfcomm_frame, uint8_t indent)
->         if (!l2cap_frame_get_u8(frame, &pn.ack_timer))
->                 return false;
->
-> -       if (!l2cap_frame_get_le16(frame, &pn.mtu))
-> +       /* prevent unaligned memory access */
-> +       if (!l2cap_frame_get_le16(frame, &mtu))
->                 return false;
-> +       pn.mtu = mtu;
+$ btmon
+Bluetooth monitor ver 5.43
+= New Index: XX:XX:XX:XX:XX:XX (Primary,SDIO,hci0)   [hci0] 0.029199
+= Open Index: XX:XX:XX:XX:XX:XX                      [hci0] 0.029211
+= Index Info: XX:XX:XX:XX:XX:XX (Marvell Technology Group Ltd.)
+                                                     [hci0] 0.029222
+> HCI Event: Vendor (0xff) plen 5                    [hci0] 0.300944
+        05 80 00 09 00
+> HCI Event: Vendor (0xff) plen 5                    [hci0] 2.860113
+        05 80 00 09 00
+> HCI Event: Vendor (0xff) plen 5                    [hci0] 5.420643
+        05 80 00 09 00
+  ...
 
-Interesting, isn't this causing unaligned access anyway since it is
-assigning to pn.mtu which is packed? Or this is fine as far as it is
-not accessed via void *? Btw, please add the compiler output and flags
-it is being used, it is quite possible we can replicate the same
-errors on gcc or perhaps it is missing some flags used in gcc to make
-this aligned?
+Add -V option to suppress these HCI vendor events from btmon log.
+---
+ monitor/main.c   | 7 ++++++-
+ monitor/packet.c | 3 +++
+ monitor/packet.h | 1 +
+ 3 files changed, 10 insertions(+), 1 deletion(-)
 
->         if (!l2cap_frame_get_u8(frame, &pn.max_retrans))
->                 return false;
-> --
-> 2.8.0.rc3.226.g39d4020
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-
+diff --git a/monitor/main.c b/monitor/main.c
+index 68ebdef..be10019 100644
+--- a/monitor/main.c
++++ b/monitor/main.c
+@@ -71,6 +71,7 @@ static void usage(void)
+ 		"\t-S, --sco              Dump SCO traffic\n"
+ 		"\t-E, --ellisys [ip]     Send Ellisys HCI Injection\n"
+ 		"\t-A, --no_leadv         Suppress LE_ADV messages\n"
++		"\t-V, --no_vendor        Suppress Vendor messages\n"
+ 		"\t-h, --help             Show help options\n");
+ }
+ 
+@@ -88,6 +89,7 @@ static const struct option main_options[] = {
+ 	{ "sco",     no_argument,	NULL, 'S' },
+ 	{ "ellisys", required_argument, NULL, 'E' },
+ 	{ "no_leadv", no_argument,      NULL, 'A' },
++	{ "no_vendor", no_argument,     NULL, 'V' },
+ 	{ "todo",    no_argument,       NULL, '#' },
+ 	{ "version", no_argument,       NULL, 'v' },
+ 	{ "help",    no_argument,       NULL, 'h' },
+@@ -115,7 +117,7 @@ int main(int argc, char *argv[])
+ 	for (;;) {
+ 		int opt;
+ 
+-		opt = getopt_long(argc, argv, "d:r:w:a:s:p:i:tTSAE:vh",
++		opt = getopt_long(argc, argv, "d:r:w:a:s:p:i:tTSAVE:vh",
+ 						main_options, NULL);
+ 		if (opt < 0)
+ 			break;
+@@ -172,6 +174,9 @@ int main(int argc, char *argv[])
+ 		case 'A':
+ 			filter_mask |= PACKET_FILTER_SUPPRESS_LE_ADV;
+ 			break;
++		case 'V':
++			filter_mask |= PACKET_FILTER_SUPPRESS_VENDOR;
++			break;
+ 		case 'E':
+ 			ellisys_server = optarg;
+ 			ellisys_port = 24352;
+diff --git a/monitor/packet.c b/monitor/packet.c
+index bf353d6..0b3353f 100644
+--- a/monitor/packet.c
++++ b/monitor/packet.c
+@@ -9046,6 +9046,9 @@ void packet_hci_event(struct timeval *tv, struct ucred *cred, uint16_t index,
+ 		}
+ 	}
+ 
++	if (filter_mask & PACKET_FILTER_SUPPRESS_VENDOR && hdr->evt == 0xff)
++		return;
++
+ 	sprintf(extra_str, "(0x%2.2x) plen %d", hdr->evt, hdr->plen);
+ 
+ 	print_packet(tv, cred, '>', index, NULL, event_color, "HCI Event",
+diff --git a/monitor/packet.h b/monitor/packet.h
+index a02ea50..0330857 100644
+--- a/monitor/packet.h
++++ b/monitor/packet.h
+@@ -33,6 +33,7 @@
+ #define PACKET_FILTER_SHOW_TIME_OFFSET	(1 << 3)
+ #define PACKET_FILTER_SHOW_ACL_DATA	(1 << 4)
+ #define PACKET_FILTER_SHOW_SCO_DATA	(1 << 5)
++#define PACKET_FILTER_SUPPRESS_VENDOR	(1 << 30)
+ #define PACKET_FILTER_SUPPRESS_LE_ADV	(1 << 31)
+ 
+ void packet_set_filter(unsigned long filter);
 -- 
-Luiz Augusto von Dentz
+2.8.0.rc3.226.g39d4020
+
