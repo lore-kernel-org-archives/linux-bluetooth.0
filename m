@@ -1,83 +1,24 @@
-Return-Path: <rajatja@google.com>
-From: Rajat Jain <rajatja@google.com>
-To: Rob Herring <robh+dt@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Amitkumar Karwar <akarwar@marvell.com>,
-	Wei-Ning Huang <wnhuang@chromium.org>,
-	Xinming Hu <huxm@marvell.com>,
-	netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org,
-	Brian Norris <briannorris@google.com>,
-	linux-kernel@vger.kernel.org
-Cc: Rajat Jain <rajatja@google.com>,
-	rajatxjain@gmail.com
-Subject: [PATCH v4 1/3] Bluetooth: btusb: Use an error label for error paths
-Date: Wed, 21 Dec 2016 12:33:50 -0800
-Message-Id: <1482352432-38302-1-git-send-email-rajatja@google.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: bugzilla-daemon@bugzilla.kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [Bug 190831] Intel Bluetooth 8260 breaks with latest firmware
+Date: Wed, 21 Dec 2016 20:24:09 +0000
+Message-ID: <bug-190831-62941-I7EYNYSgLO@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-190831-62941@https.bugzilla.kernel.org/>
+References: <bug-190831-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Use a label to remove the repetetive cleanup, for error cases.
+https://bugzilla.kernel.org/show_bug.cgi?id=190831
 
-Signed-off-by: Rajat Jain <rajatja@google.com>
-Reviewed-by: Brian Norris <briannorris@chromium.org>
----
-v4: same as v3
-v3: Added Brian's "Reviewed-by"
-v2: same as v1
+Jan Steffens <jan.steffens@gmail.com> changed:
 
- drivers/bluetooth/btusb.c | 19 +++++++++----------
- 1 file changed, 9 insertions(+), 10 deletions(-)
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+         Regression|No                          |Yes
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 2f633df..ce22cef 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -2991,18 +2991,15 @@ static int btusb_probe(struct usb_interface *intf,
- 		err = usb_set_interface(data->udev, 0, 0);
- 		if (err < 0) {
- 			BT_ERR("failed to set interface 0, alt 0 %d", err);
--			hci_free_dev(hdev);
--			return err;
-+			goto out_free_dev;
- 		}
- 	}
- 
- 	if (data->isoc) {
- 		err = usb_driver_claim_interface(&btusb_driver,
- 						 data->isoc, data);
--		if (err < 0) {
--			hci_free_dev(hdev);
--			return err;
--		}
-+		if (err < 0)
-+			goto out_free_dev;
- 	}
- 
- #ifdef CONFIG_BT_HCIBTUSB_BCM
-@@ -3016,14 +3013,16 @@ static int btusb_probe(struct usb_interface *intf,
- #endif
- 
- 	err = hci_register_dev(hdev);
--	if (err < 0) {
--		hci_free_dev(hdev);
--		return err;
--	}
-+	if (err < 0)
-+		goto out_free_dev;
- 
- 	usb_set_intfdata(intf, data);
- 
- 	return 0;
-+
-+out_free_dev:
-+	hci_free_dev(hdev);
-+	return err;
- }
- 
- static void btusb_disconnect(struct usb_interface *intf)
 -- 
-2.8.0.rc3.226.g39d4020
+You are receiving this mail because:
+You are the assignee for the bug.
