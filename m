@@ -1,89 +1,74 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Juha Kuikka <juha.kuikka@synapse.com>
+From: mcchou@chromium.org
 To: linux-bluetooth@vger.kernel.org
-Cc: Juha Kuikka <juha.kuikka@synapse.com>
-Subject: [PATCH] Remove deprecated UHID_FEATURE API
-Date: Wed, 21 Dec 2016 17:17:19 -0800
-Message-Id: <1482369439-57601-1-git-send-email-juha.kuikka@synapse.com>
+Cc: luiz.von.dentz@intel.com, josephsih@chromium.org,
+        Miao-chen Chou <mcchou@chromium.org>
+Subject: [PATCH v5] monitor/rfcomm: Fix a potential memory access issue for compatibility with LLVM
+Date: Wed, 21 Dec 2016 16:12:33 -0800
+Message-Id: <1482365553-71040-1-git-send-email-mcchou@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I believe I have identified an issue with the HID-over-GATT (HoG) where,
-through hidraw, the HIDIOCGFEATURE does not work correctly.
+From: Miao-chen Chou <mcchou@chromium.org>
 
-The symptom is that the ioctl call returns immediately with bogus data,
-before the Read Request to the peripheral has been completed.
+This patch removes "packed" attribute from the definition of struct rfcomm_rpn
+to prevent the access to an unaligned struct member in mmc_rpn(). This patch
+also introduces a temp variable in mcc_pn() to prevent unaligned access without
+touching the definition of struct rfcomm_pn, since struct rfcomm_pn is used as
+a PDU.
 
-I believe the issue is caused by the hog-lib.c registering a handler for
-both UHID_FEATURE and UHID_GET_REPORT events, which in the uhid header
-file turn out to be the same enum.
+error messages from LLVM build:
 
-This causes the get_report() to get called first, it issues the Read
-Request and waits for it's completion. After this the get_feature() is
-immediately called with the same uhid message, which sends the
-UHID_FEATURE_ANSWER in to the kernel with stale data, which then gets
-returned to the hidraw caller.
+monitor/rfcomm.c:238:36: error: taking address of packed member 'pm' of class
+or structure 'rfcomm_rpn' may result in an unaligned pointer value
+[-Werror,-Waddress-of-packed-member]
+        if (!l2cap_frame_get_le16(frame, &rpn.pm))
+monitor/rfcomm.c:287:36: error: taking address of packed member 'mtu' of class
+or structure 'rfcomm_pn' may result in an unaligned pointer value
+[-Werror,-Waddress-of-packed-member]
+        if (!l2cap_frame_get_le16(frame, &pn.mtu))
 
-I have fixed this by removing the get_feature() as it is unnecessary
-anyway. See attached patch.
-
-I have tested with against both old and new uhid API (kernels 3.8 and
-4.4).
+Currently there is no corresponding flag in GCC to generate the same error
+messages. See https://gcc.gnu.org/bugzilla/show_bug.cgi?id=51628.
 ---
- profiles/input/hog-lib.c | 33 ---------------------------------
- 1 file changed, 33 deletions(-)
+v5 adds more details about the error messages.
 
-diff --git a/profiles/input/hog-lib.c b/profiles/input/hog-lib.c
-index e376c2b..75c6078 100644
---- a/profiles/input/hog-lib.c
-+++ b/profiles/input/hog-lib.c
-@@ -704,38 +704,6 @@ static void forward_report(struct uhid_event *ev, void *user_data)
- 						data, size, NULL, NULL);
- }
- 
--static void get_feature(struct uhid_event *ev, void *user_data)
--{
--	struct bt_hog *hog = user_data;
--	struct report *report;
--	struct uhid_event rsp;
--	int err;
--
--	memset(&rsp, 0, sizeof(rsp));
--	rsp.type = UHID_FEATURE_ANSWER;
--	rsp.u.feature_answer.id = ev->u.feature.id;
--
--	report = find_report_by_rtype(hog, ev->u.feature.rtype,
--							ev->u.feature.rnum);
--	if (!report) {
--		rsp.u.feature_answer.err = ENOTSUP;
--		goto done;
--	}
--
--	if (!report->value) {
--		rsp.u.feature_answer.err = EIO;
--		goto done;
--	}
--
--	rsp.u.feature_answer.size = report->len;
--	memcpy(rsp.u.feature_answer.data, report->value, report->len);
--
--done:
--	err = bt_uhid_send(hog->uhid, &rsp);
--	if (err < 0)
--		error("bt_uhid_send: %s", strerror(-err));
--}
--
- static void set_report_cb(guint8 status, const guint8 *pdu,
- 					guint16 plen, gpointer user_data)
+ monitor/rfcomm.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/monitor/rfcomm.c b/monitor/rfcomm.c
+index fd7bbdc..afeb5e1 100644
+--- a/monitor/rfcomm.c
++++ b/monitor/rfcomm.c
+@@ -106,7 +106,7 @@ struct rfcomm_rpn {
+ 	uint8_t xon;
+ 	uint8_t xoff;
+ 	uint16_t pm;
+-} __attribute__ ((packed));
++};
+
+ struct rfcomm_rls {
+ 	uint8_t dlci;
+@@ -265,6 +265,7 @@ static inline bool mcc_pn(struct rfcomm_frame *rfcomm_frame, uint8_t indent)
  {
-@@ -1034,7 +1002,6 @@ static void report_map_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
- 	}
- 
- 	bt_uhid_register(hog->uhid, UHID_OUTPUT, forward_report, hog);
--	bt_uhid_register(hog->uhid, UHID_FEATURE, get_feature, hog);
- 	bt_uhid_register(hog->uhid, UHID_GET_REPORT, get_report, hog);
- 	bt_uhid_register(hog->uhid, UHID_SET_REPORT, set_report, hog);
- 
--- 
-1.9.1
+ 	struct l2cap_frame *frame = &rfcomm_frame->l2cap_frame;
+ 	struct rfcomm_pn pn;
++	uint16_t mtu;
+
+ 	/* rfcomm_pn struct is defined in rfcomm.h */
+
+@@ -284,8 +285,10 @@ static inline bool mcc_pn(struct rfcomm_frame *rfcomm_frame, uint8_t indent)
+ 	if (!l2cap_frame_get_u8(frame, &pn.ack_timer))
+ 		return false;
+
+-	if (!l2cap_frame_get_le16(frame, &pn.mtu))
++	/* prevent unaligned memory access */
++	if (!l2cap_frame_get_le16(frame, &mtu))
+ 		return false;
++	pn.mtu = mtu;
+
+ 	if (!l2cap_frame_get_u8(frame, &pn.max_retrans))
+ 		return false;
+--
+2.8.0.rc3.226.g39d4020
 
