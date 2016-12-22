@@ -2,36 +2,88 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Juha Kuikka <juha.kuikka@synapse.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Juha Kuikka <juha.kuikka@synapse.com>
-Subject: [PATCH 0/3] Dualshock4 controller enhancements
-Date: Wed, 21 Dec 2016 21:20:51 -0800
-Message-Id: <1482384054-59718-1-git-send-email-juha.kuikka@synapse.com>
+Subject: [PATCH] Remove deprecated UHID_FEATURE API
+Date: Wed, 21 Dec 2016 17:17:19 -0800
+Message-Id: <1482369439-57601-1-git-send-email-juha.kuikka@synapse.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch set contains enhancements for the Dualshock4 controller.
+I believe I have identified an issue with the HID-over-GATT (HoG) where,
+through hidraw, the HIDIOCGFEATURE does not work correctly.
 
-There are now two Dualshock4 PIDs out there, add second one to
-special case handler.
+The symptom is that the ioctl call returns immediately with bogus data,
+before the Read Request to the peripheral has been completed.
 
-Modify sixaxis plugin to add support for pairing DS4 controllers over USB.
-The HID report also allows for the link key to be set but since there is
-currently no API to set it from the plugins, this has not been implemented.
+I believe the issue is caused by the hog-lib.c registering a handler for
+both UHID_FEATURE and UHID_GET_REPORT events, which in the uhid header
+file turn out to be the same enum.
 
-Because of this the DS4 will connect to the bluez host automatically but
-the bonding still has to happen over the bluetooth connection as normal.
+This causes the get_report() to get called first, it issues the Read
+Request and waits for it's completion. After this the get_feature() is
+immediately called with the same uhid message, which sends the
+UHID_FEATURE_ANSWER in to the kernel with stale data, which then gets
+returned to the hidraw caller.
 
-Also set connected controllers "paired" by default. This allows for hands-free
-connection to bluez host.
+I have fixed this by removing the get_feature() as it is unnecessary
+anyway. See attached patch.
 
-Juha Kuikka (3):
-  Add new DS4 controller PID into special case handler
-  sixaxis: Add support for pairing DS4 over USB
-  sixaxis: Set created devices trusted by default
+I have tested with against both old and new uhid API (kernels 3.8 and
+4.4).
+---
+ profiles/input/hog-lib.c | 33 ---------------------------------
+ 1 file changed, 33 deletions(-)
 
- plugins/sixaxis.c       | 87 +++++++++++++++++++++++++++++++++++++------------
- profiles/input/server.c |  2 +-
- 2 files changed, 68 insertions(+), 21 deletions(-)
-
+diff --git a/profiles/input/hog-lib.c b/profiles/input/hog-lib.c
+index e376c2b..75c6078 100644
+--- a/profiles/input/hog-lib.c
++++ b/profiles/input/hog-lib.c
+@@ -704,38 +704,6 @@ static void forward_report(struct uhid_event *ev, void *user_data)
+ 						data, size, NULL, NULL);
+ }
+ 
+-static void get_feature(struct uhid_event *ev, void *user_data)
+-{
+-	struct bt_hog *hog = user_data;
+-	struct report *report;
+-	struct uhid_event rsp;
+-	int err;
+-
+-	memset(&rsp, 0, sizeof(rsp));
+-	rsp.type = UHID_FEATURE_ANSWER;
+-	rsp.u.feature_answer.id = ev->u.feature.id;
+-
+-	report = find_report_by_rtype(hog, ev->u.feature.rtype,
+-							ev->u.feature.rnum);
+-	if (!report) {
+-		rsp.u.feature_answer.err = ENOTSUP;
+-		goto done;
+-	}
+-
+-	if (!report->value) {
+-		rsp.u.feature_answer.err = EIO;
+-		goto done;
+-	}
+-
+-	rsp.u.feature_answer.size = report->len;
+-	memcpy(rsp.u.feature_answer.data, report->value, report->len);
+-
+-done:
+-	err = bt_uhid_send(hog->uhid, &rsp);
+-	if (err < 0)
+-		error("bt_uhid_send: %s", strerror(-err));
+-}
+-
+ static void set_report_cb(guint8 status, const guint8 *pdu,
+ 					guint16 plen, gpointer user_data)
+ {
+@@ -1034,7 +1002,6 @@ static void report_map_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
+ 	}
+ 
+ 	bt_uhid_register(hog->uhid, UHID_OUTPUT, forward_report, hog);
+-	bt_uhid_register(hog->uhid, UHID_FEATURE, get_feature, hog);
+ 	bt_uhid_register(hog->uhid, UHID_GET_REPORT, get_report, hog);
+ 	bt_uhid_register(hog->uhid, UHID_SET_REPORT, set_report, hog);
+ 
 -- 
 1.9.1
 
