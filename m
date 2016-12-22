@@ -1,101 +1,122 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
 From: Juha Kuikka <juha.kuikka@gmail.com>
-Date: Wed, 21 Dec 2016 22:06:38 -0800
-Message-ID: <CAKvrXUr+Q6AKcsQS+z8VwH--wtotawuiNz8j4RJy+D3Q7fGZ7Q@mail.gmail.com>
-Subject: HoG uHID device not destroyed on disconnect
-To: linux-bluetooth@vger.kernel.org
+Date: Wed, 21 Dec 2016 21:46:03 -0800
+Message-ID: <CAKvrXUojNa-vAn1DQ5WGnj-4wshk7WB+LtTmZTZ8ae8b7JtEyg@mail.gmail.com>
+Subject: Possible race condition between DIS and HoG
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
 
-It seems that when an HID-over-GATT (HoG) device connects an uHID
-devive is created for it. I would expect it to get destroyed upon
-disconnect but it seems to linger around.
+I believe I have identified an issue with BLE HoG service.
 
-This can be demonstrated using bluetoothctl. Here I am using a
-Microsoft Arc Touch Mouse.
+It is possible for the HoG service to get probed before the Device
+Information Service has finished reading the VID&PID of the
+peripheral.
 
-Paired and connected:
+This causes the uHID device to get created with zero VID&PID. For most
+devices this is not an issue but if there is a need to have a quirk
+driver or use of hidraw this will make identifying the device
+impossible.
 
-[bluetooth]# pair C9:33:31:6B:03:A9
-Attempting to pair with C9:33:31:6B:03:A9
-[CHG] Device C9:33:31:6B:03:A9 Connected: yes
-[CHG] Device C9:33:31:6B:03:A9 UUIDs: 00001800-0000-1000-8000-00805f9b34fb
-[CHG] Device C9:33:31:6B:03:A9 UUIDs: 00001801-0000-1000-8000-00805f9b34fb
-[CHG] Device C9:33:31:6B:03:A9 UUIDs: 0000180a-0000-1000-8000-00805f9b34fb
-[CHG] Device C9:33:31:6B:03:A9 UUIDs: 0000180f-0000-1000-8000-00805f9b34fb
-[CHG] Device C9:33:31:6B:03:A9 UUIDs: 00001812-0000-1000-8000-00805f9b34fb
-[CHG] Device C9:33:31:6B:03:A9 ServicesResolved: yes
-[CHG] Device C9:33:31:6B:03:A9 Paired: yes
-[NEW] Primary Service
-        /org/bluez/hci0/dev_C9_33_31_6B_03_A9/service0008
-        00001801-0000-1000-8000-00805f9b34fb
-        Generic Attribute Profile
-[NEW] Characteristic
-        /org/bluez/hci0/dev_C9_33_31_6B_03_A9/service0008/char0009
-        00002a05-0000-1000-8000-00805f9b34fb
-        Service Changed
-[NEW] Descriptor
-        /org/bluez/hci0/dev_C9_33_31_6B_03_A9/service0008/char0009/desc000b
-        00002902-0000-1000-8000-00805f9b34fb
-        Client Characteristic Configuration
-[NEW] Primary Service
-        /org/bluez/hci0/dev_C9_33_31_6B_03_A9/service000c
-        0000180a-0000-1000-8000-00805f9b34fb
-        Device Information
-[NEW] Characteristic
-        /org/bluez/hci0/dev_C9_33_31_6B_03_A9/service000c/char000d
-        00002a29-0000-1000-8000-00805f9b34fb
-        Manufacturer Name String
-[NEW] Characteristic
-        /org/bluez/hci0/dev_C9_33_31_6B_03_A9/service000c/char000f
-        00002a50-0000-1000-8000-00805f9b34fb
-        PnP ID
-[NEW] Primary Service
-        /org/bluez/hci0/dev_C9_33_31_6B_03_A9/service0011
-        0000180f-0000-1000-8000-00805f9b34fb
-        Battery Service
-[NEW] Characteristic
-        /org/bluez/hci0/dev_C9_33_31_6B_03_A9/service0011/char0012
-        00002a19-0000-1000-8000-00805f9b34fb
-        Battery Level
-[NEW] Descriptor
-        /org/bluez/hci0/dev_C9_33_31_6B_03_A9/service0011/char0012/desc0014
-        00002902-0000-1000-8000-00805f9b34fb
-        Client Characteristic Configuration
-Pairing successful
-[CHG] Device C9:33:31:6B:03:A9 Modalias: usb:v045Ep0804d0001
-[Arc Touch BT Mouse]# connect C9:33:31:6B:03:A9
-Attempting to connect to C9:33:31:6B:03:A9
-Connection successful
+This only seems to affect the first connection, on subsequent
+connections the cached VID&PID are used.
 
-And here it is disconnected:
+Here is the output from a slightly instrumented bluetoothd 5.43.
+bluetoothd[2479]: profiles/gap/gas.c:gap_probe() GAP profile probe
+(AA:BB:CC:44:16:AF)
+bluetoothd[2479]: src/service.c:change_state() 0x22aef10: device
+AA:BB:CC:44:16:AF profile gap-profile state changed: unavailable ->
+disconnected (0)
+bluetoothd[2479]: profiles/gap/gas.c:gap_accept() GAP profile accept
+(AA:BB:CC:44:16:AF)
+bluetoothd[2479]: profiles/gap/gas.c:handle_characteristic()
+Unsupported characteristic: 00002a04-0000-1000-8000-00805f9b34fb
+bluetoothd[2479]: src/service.c:change_state() 0x22aef10: device
+AA:BB:CC:44:16:AF profile gap-profile state changed: disconnected ->
+connected (0)
+bluetoothd[2479]: src/device.c:device_probe_profiles() Probing
+profiles for device AA:BB:CC:44:16:AF
+bluetoothd[2479]: src/device.c:device_probe_profiles() Probing
+profiles for device AA:BB:CC:44:16:AF
+bluetoothd[2479]: src/service.c:change_state() 0x22b4180: device
+AA:BB:CC:44:16:AF profile deviceinfo state changed: unavailable ->
+disconnected (0)
+bluetoothd[2479]: profiles/deviceinfo/deviceinfo.c:deviceinfo_accept()
+deviceinfo profile accept (AA:BB:CC:44:16:AF)
+bluetoothd[2479]:
+profiles/deviceinfo/deviceinfo.c:handle_characteristic() Unsupported
+characteristic: 00002a29-0000-1000-8000-00805f9b34fb
+bluetoothd[2479]: src/service.c:change_state() 0x22b4180: device
+AA:BB:CC:44:16:AF profile deviceinfo state changed: disconnected ->
+connected (0)
+bluetoothd[2479]: src/device.c:device_probe_profiles() Probing
+profiles for device AA:BB:CC:44:16:AF
+bluetoothd[2479]: profiles/input/hog.c:hog_probe() path
+/org/bluez/hci0/dev_AA_BB_CC_44_16_AF
 
-[CHG] Device C9:33:31:6B:03:A9 ServicesResolved: no
-[CHG] Device C9:33:31:6B:03:A9 Connected: no
+Here VID and PID are zeroes when the HoG device is created.
 
-After disconnection, the HID device is still present:
+bluetoothd[2479]: profiles/input/hog.c:hog_device_new() name=MyDevice
+vendor=0x0, product=0x0, version=0x0
+bluetoothd[2479]: src/service.c:change_state() 0x22c8220: device
+AA:BB:CC:44:16:AF profile input-hog state changed: unavailable ->
+disconnected (0)
+bluetoothd[2479]: src/device.c:device_set_auto_connect()
+AA:BB:CC:44:16:AF auto connect: 1
+bluetoothd[2479]: src/device.c:device_set_auto_connect() Already connected
+bluetoothd[2479]: attrib/gattrib.c:g_attrib_ref() 0x22aecf0: g_attrib_ref=2
+bluetoothd[2479]: profiles/input/hog-lib.c:bt_hog_attach() HoG
+discovering characteristics
+bluetoothd[2479]: attrib/gattrib.c:g_attrib_ref() 0x22aecf0: g_attrib_ref=3
+bluetoothd[2479]: src/service.c:change_state() 0x22c8220: device
+AA:BB:CC:44:16:AF profile input-hog state changed: disconnected ->
+connected (0)
+bluetoothd[2479]: src/service.c:btd_service_ref() 0x22c8220: ref=2
+bluetoothd[2479]: plugins/policy.c:service_cb() Added input-hog reconnect 0
+bluetoothd[2479]: src/gatt-client.c:btd_gatt_client_ready() GATT client ready
+bluetoothd[2479]: src/gatt-client.c:create_services() Exporting
+objects for GATT services: AA:BB:CC:44:16:AF
+bluetoothd[2479]: src/gatt-client.c:service_create() Exported GATT
+service: /org/bluez/hci0/dev_AA_BB_CC_44_16_AF/service0008
+bluetoothd[2479]: src/gatt-client.c:service_create() Exported GATT
+service: /org/bluez/hci0/dev_AA_BB_CC_44_16_AF/service0009
+bluetoothd[2479]: src/gatt-client.c:characteristic_create() Exported
+GATT characteristic:
+/org/bluez/hci0/dev_AA_BB_CC_44_16_AF/service0009/char000a
+bluetoothd[2479]: src/gatt-client.c:characteristic_create() Exported
+GATT characteristic:
+/org/bluez/hci0/dev_AA_BB_CC_44_16_AF/service0009/char000c
+bluetoothd[2479]: src/device.c:device_svc_resolved()
+/org/bluez/hci0/dev_AA_BB_CC_44_16_AF err 0
+bluetoothd[2479]: src/adapter.c:add_device_complete()
+AA:BB:CC:44:16:AF (2) added to kernel connect list
+bluetoothd[2479]: profiles/gap/gas.c:read_device_name_cb() GAP Device
+Name: MyDevice
+bluetoothd[2479]: profiles/gap/gas.c:read_appearance_cb() GAP Appearance: 0x03c2
+bluetoothd[2479]: src/adapter.c:new_conn_param() hci0
+AA:BB:CC:44:16:AF (2) min 0x0006 max 0x0008 latency 0x000a timeout
+0x012c
+bluetoothd[2479]: src/adapter.c:store_conn_param()
+bluetoothd[2479]: src/adapter.c:new_irk_callback() hci0 new IRK for
+AA:BB:CC:44:16:AF RPA 00:00:00:00:00:00
 
-$ ls -l /sys/class/hidraw/ /dev/hidraw*
-crw------- 1 root root 244, 0 Dec 21 21:45 /dev/hidraw0
+And they are set here.
 
-/sys/class/hidraw/:
-total 0
-lrwxrwxrwx 1 root root 0 Dec 21 21:52 hidraw0 ->
-../../devices/virtual/misc/uhid/0005:0000:0000.0019/hidraw/hidraw0
+bluetoothd[2479]: src/device.c:btd_device_set_pnpid() source=2
+vendor=1234 product=5678 version=1
+bluetoothd[2479]: src/adapter.c:new_long_term_key_callback() hci0 new
+LTK for AA:BB:CC:44:16:AF type 0 enc_size 16
+bluetoothd[2479]: src/device.c:device_set_bonded()
+bluetoothd[2479]: src/device.c:device_bonding_complete() bonding (nil)
+status 0x00
+bluetoothd[2479]: src/adapter.c:resume_discovery()
 
-The zero VID&PID of the HID device differ from the modalias due to
-another bug I just posted about.
+What would be a good approach to defer the HoG probe until the DIS is
+ready? Or should I look into a mechanism to indicate
 
-If I Remove() the the device, the HID device gets destroyed but it
-lingers until then.
-
-This behavior seems to be caused by the fact that the HoG service is
-kept alive between connections and the lifetime of the included
-bt_uhid is not limited between connections.
-
-Cheers,
+Thanks,
  - Juha
