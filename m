@@ -1,129 +1,301 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZLHK_H=augA1hd3R4aXEZLL435D8=CsuMUCUf_WC6bEUA@mail.gmail.com>
-References: <CAKvrXUr+Q6AKcsQS+z8VwH--wtotawuiNz8j4RJy+D3Q7fGZ7Q@mail.gmail.com>
- <CABBYNZLHK_H=augA1hd3R4aXEZLL435D8=CsuMUCUf_WC6bEUA@mail.gmail.com>
+In-Reply-To: <20161222112418.31121c6b3d9b0a339649a282@ao2.it>
+References: <1482384054-59718-1-git-send-email-juha.kuikka@synapse.com>
+ <1482384054-59718-3-git-send-email-juha.kuikka@synapse.com> <20161222112418.31121c6b3d9b0a339649a282@ao2.it>
 From: Juha Kuikka <juha.kuikka@gmail.com>
-Date: Thu, 22 Dec 2016 09:34:53 -0800
-Message-ID: <CAKvrXUpJ9BUXiLeNc0y_yVDaWZrxC1KuMeBea-vsdn-kGu+NJw@mail.gmail.com>
-Subject: Re: HoG uHID device not destroyed on disconnect
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Thu, 22 Dec 2016 09:29:18 -0800
+Message-ID: <CAKvrXUrH4rAEAxPVwPrguV6ocne1pMo3Aakqk8voorDV0Gfz1w@mail.gmail.com>
+Subject: Re: [PATCH 2/3] sixaxis: Add support for pairing DS4 over USB
+To: Antonio Ospite <ao2@ao2.it>
+Cc: Juha Kuikka <juha.kuikka@synapse.com>,
+        linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
-
-On Thu, Dec 22, 2016 at 1:03 AM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
+On Thu, Dec 22, 2016 at 2:24 AM, Antonio Ospite <ao2@ao2.it> wrote:
+> On Wed, 21 Dec 2016 21:20:53 -0800
+> Juha Kuikka <juha.kuikka@synapse.com> wrote:
+>
+>> This patch adds support for "pairing" a Dualshock4 controller over USB
+>> into the sixaxis plugin.
+>>
+>> Pairing is in quotes because we cannot do real bonding due to lack of
+>> API of setting link keys from the plugin so instead we just tell the
+>> controller that we are the master and to connect to us.
+>>
+>
 > Hi Juha,
+
+Hi Antonio,
+
 >
-> On Thu, Dec 22, 2016 at 8:06 AM, Juha Kuikka <juha.kuikka@gmail.com> wrote:
->> Hi,
->>
->> It seems that when an HID-over-GATT (HoG) device connects an uHID
->> devive is created for it. I would expect it to get destroyed upon
->> disconnect but it seems to linger around.
->>
->> This can be demonstrated using bluetoothctl. Here I am using a
->> Microsoft Arc Touch Mouse.
->>
->> Paired and connected:
->>
->> [bluetooth]# pair C9:33:31:6B:03:A9
->> Attempting to pair with C9:33:31:6B:03:A9
->> [CHG] Device C9:33:31:6B:03:A9 Connected: yes
->> [CHG] Device C9:33:31:6B:03:A9 UUIDs: 00001800-0000-1000-8000-00805f9b34fb
->> [CHG] Device C9:33:31:6B:03:A9 UUIDs: 00001801-0000-1000-8000-00805f9b34fb
->> [CHG] Device C9:33:31:6B:03:A9 UUIDs: 0000180a-0000-1000-8000-00805f9b34fb
->> [CHG] Device C9:33:31:6B:03:A9 UUIDs: 0000180f-0000-1000-8000-00805f9b34fb
->> [CHG] Device C9:33:31:6B:03:A9 UUIDs: 00001812-0000-1000-8000-00805f9b34fb
->> [CHG] Device C9:33:31:6B:03:A9 ServicesResolved: yes
->> [CHG] Device C9:33:31:6B:03:A9 Paired: yes
->> [NEW] Primary Service
->>         /org/bluez/hci0/dev_C9_33_31_6B_03_A9/service0008
->>         00001801-0000-1000-8000-00805f9b34fb
->>         Generic Attribute Profile
->> [NEW] Characteristic
->>         /org/bluez/hci0/dev_C9_33_31_6B_03_A9/service0008/char0009
->>         00002a05-0000-1000-8000-00805f9b34fb
->>         Service Changed
->> [NEW] Descriptor
->>         /org/bluez/hci0/dev_C9_33_31_6B_03_A9/service0008/char0009/desc000b
->>         00002902-0000-1000-8000-00805f9b34fb
->>         Client Characteristic Configuration
->> [NEW] Primary Service
->>         /org/bluez/hci0/dev_C9_33_31_6B_03_A9/service000c
->>         0000180a-0000-1000-8000-00805f9b34fb
->>         Device Information
->> [NEW] Characteristic
->>         /org/bluez/hci0/dev_C9_33_31_6B_03_A9/service000c/char000d
->>         00002a29-0000-1000-8000-00805f9b34fb
->>         Manufacturer Name String
->> [NEW] Characteristic
->>         /org/bluez/hci0/dev_C9_33_31_6B_03_A9/service000c/char000f
->>         00002a50-0000-1000-8000-00805f9b34fb
->>         PnP ID
->> [NEW] Primary Service
->>         /org/bluez/hci0/dev_C9_33_31_6B_03_A9/service0011
->>         0000180f-0000-1000-8000-00805f9b34fb
->>         Battery Service
->> [NEW] Characteristic
->>         /org/bluez/hci0/dev_C9_33_31_6B_03_A9/service0011/char0012
->>         00002a19-0000-1000-8000-00805f9b34fb
->>         Battery Level
->> [NEW] Descriptor
->>         /org/bluez/hci0/dev_C9_33_31_6B_03_A9/service0011/char0012/desc0014
->>         00002902-0000-1000-8000-00805f9b34fb
->>         Client Characteristic Configuration
->> Pairing successful
->> [CHG] Device C9:33:31:6B:03:A9 Modalias: usb:v045Ep0804d0001
->> [Arc Touch BT Mouse]# connect C9:33:31:6B:03:A9
->> Attempting to connect to C9:33:31:6B:03:A9
->> Connection successful
->>
->> And here it is disconnected:
->>
->> [CHG] Device C9:33:31:6B:03:A9 ServicesResolved: no
->> [CHG] Device C9:33:31:6B:03:A9 Connected: no
->>
->> After disconnection, the HID device is still present:
->>
->> $ ls -l /sys/class/hidraw/ /dev/hidraw*
->> crw------- 1 root root 244, 0 Dec 21 21:45 /dev/hidraw0
->>
->> /sys/class/hidraw/:
->> total 0
->> lrwxrwxrwx 1 root root 0 Dec 21 21:52 hidraw0 ->
->> ../../devices/virtual/misc/uhid/0005:0000:0000.0019/hidraw/hidraw0
->>
->> The zero VID&PID of the HID device differ from the modalias due to
->> another bug I just posted about.
->>
->> If I Remove() the the device, the HID device gets destroyed but it
->> lingers until then.
->>
->> This behavior seems to be caused by the fact that the HoG service is
->> kept alive between connections and the lifetime of the included
->> bt_uhid is not limited between connections.
+> I do not have a DS4, so it is not immediately clear to me what the
+> difference is between having or not having this USB "pairing" with DS4
+> controllers.
 >
-> This is actually on purpose so we don't keep creating more and more
-> device nodes every time the device reconnects, but we should
-> definitely fix the problem with DIS and HoG.
+> Could you please elaborate a little more? Thanks.
+> I thought people were using DS4s via BT just fine without it.
 
-I am not sure I understand the reasoning here, can you elaborate please?
+Certainly!
 
-If upon disconnect we close() the uhid device or use the UHID_DESTROY
-that will remove the device nodes (/dev/hidraw*, /dev/input/event/*)
-and conversely upon connection UHID_CREATE would indirectly create
-them. This way there should be no accumulation of the device nodes.
+This is a convenience feature. Users often use the same controllers
+with both their PS4 and a Linux gaming system. This feature would make
+switching a controller back-and-forth between the systems more
+convenient as there would be no need for keyboard and mouse to go
+through the BT discovery and pairing process every time they change
+systems, instead the user could just plug it in.
 
-This behavior would mimic the BT classic HID and any other devices
-where the device node is only present when the device is present and
-usable.
+This is exactly how the PS4 pairs/bonds the controllers
+(http://manuals.playstation.net/document/en/ps4/basic/usecontroller.html)
+so it would mimic that functionality as well.
 
-I could prepare a patch to demonstrate this if you'd like.
+>
+> And what about setup_leds() for the DS4?  Will it still be called when
+> the DS4 shows up via BT?
+
+Yes. The DS4 kernel driver exposes the LEDs. I will review this path as well.
+
+> Also consider CCing these developers when you send a possible next
+> iteration, they worked on the DS4 kernel driver and could be interested:
+>
+> Frank Praznik <frank.praznik@gmail.com>
+> Roderick Colenbrander <roderick.colenbrander@sony.com>
+>
+> Maybe mention BlueZ in the title of the cover letter when you do that,
+> to make clearer to them that the changes are not about the kernel
+> driver.
+
+Thank you for the suggestion, I will.
+
+> Some comments inlined below.
+>
+>> Actual bonding happens on first connection per usual.
+>>
+>> This patch is based on information from sixpair tool.
+>
+> Is there an official link to that?
+
+There are several links but I am not certain which one is the
+original. I will dig around for this.
+>
+>> ---
+>>  plugins/sixaxis.c | 86 ++++++++++++++++++++++++++++++++++++++++++-------------
+>>  1 file changed, 66 insertions(+), 20 deletions(-)
+>>
+>> diff --git a/plugins/sixaxis.c b/plugins/sixaxis.c
+>> index fcc93bc..1fb2091 100644
+>> --- a/plugins/sixaxis.c
+>> +++ b/plugins/sixaxis.c
+>> @@ -69,6 +69,20 @@ static const struct {
+>>               .pid = 0x042f,
+>>               .version = 0x0000,
+>>       },
+>> +     {
+>> +             .name = "Wireless Controller",
+>> +             .source = 0x0002,
+>> +             .vid = 0x054c,
+>> +             .pid = 0x05c4,
+>> +             .version = 0x0001,
+>
+> If these devices have a different pairing mechanism maybe we can set
+> some function pointers here, and use a "callback" approach to handle it.
+>
+> This would avoid having a lot of if...else in the functions below.
+>
+> Something like:
+>                 get_device_bdaddr = ds4_get_device_bdaddr,
+>                 get_master_bdaddr = ds4_get_master_bdaddr,
+>                 set_device_bdaddr = ds4_set_device_bdaddr,
+>> +     },
+>> +     {
+>> +             .name = "Wireless Controller",
+>> +             .source = 0x0002,
+>> +             .vid = 0x054c,
+>> +             .pid = 0x09cc,
+>> +             .version = 0x0001,
+>> +     },
+>>  };
+>>
+>>  struct leds_data {
+>> @@ -86,57 +100,89 @@ static struct udev *ctx = NULL;
+>>  static struct udev_monitor *monitor = NULL;
+>>  static guint watch_id = 0;
+>>
+>> -static int get_device_bdaddr(int fd, bdaddr_t *bdaddr)
+>
+> This function will just become sixaxis_get_device_bdaddr, and a new
+> function called ds4_get_device_bdaddr will implement the DS4 paring
+> which uses a different feature report, with a different size and
+> structure.
+>
+> This looks cleaner to me.
+
+I agree. I will refactor this.
+
+>
+>> +static bool is_dualshock4(int index)
+>> +{
+>> +     return devices[index].pid == 0x05c4 || devices[index].pid == 0x09cc;
+>> +}
+>
+> this will not be needed,
+
+Right.
+>
+>> +
+>> +static int get_device_bdaddr(int fd, int index, bdaddr_t *bdaddr)
+>
+> and neither changing the function parameters.
+>
+>>  {
+>>       uint8_t buf[18];
+>> -     int ret;
+>> +     int ret, report_length;
+>>
+>>       memset(buf, 0, sizeof(buf));
+>>
+>> -     buf[0] = 0xf2;
+>> +     if (is_dualshock4(index)) {
+>> +             report_length = 7;
+>> +             buf[0] = 0x81;
+>> +     } else {
+>> +             report_length = 18;
+>> +             buf[0] = 0xf2;
+>> +     }
+>>
+>> -     ret = ioctl(fd, HIDIOCGFEATURE(sizeof(buf)), buf);
+>> +     ret = ioctl(fd, HIDIOCGFEATURE(report_length), buf);
+>>       if (ret < 0) {
+>>               error("sixaxis: failed to read device address (%s)",
+>>                                                       strerror(errno));
+>>               return ret;
+>>       }
+>>
+>> -     baswap(bdaddr, (bdaddr_t *) (buf + 4));
+>> +     if (is_dualshock4(index))
+>> +             memcpy(bdaddr->b, buf + 1, 6); // little-endian on DS4
+>> +     else
+>> +             baswap(bdaddr, (bdaddr_t *) (buf + 4));
+>>
+>>       return 0;
+>>  }
+>>
+>> -static int get_master_bdaddr(int fd, bdaddr_t *bdaddr)
+>> +static int get_master_bdaddr(int fd, int index, bdaddr_t *bdaddr)
+>
+> ditto.
+>
+>>  {
+>> -     uint8_t buf[8];
+>> -     int ret;
+>> +     uint8_t buf[16];
+>> +     int ret, report_length;
+>>
+>>       memset(buf, 0, sizeof(buf));
+>>
+>> -     buf[0] = 0xf5;
+>> +     if (is_dualshock4(index)) {
+>> +             report_length = 16;
+>> +             buf[0] = 0x12;
+>> +     } else {
+>> +             report_length = 8;
+>> +             buf[0] = 0xf5;
+>> +     }
+>>
+>> -     ret = ioctl(fd, HIDIOCGFEATURE(sizeof(buf)), buf);
+>> +     ret = ioctl(fd, HIDIOCGFEATURE(report_length), buf);
+>>       if (ret < 0) {
+>>               error("sixaxis: failed to read master address (%s)",
+>>                                                       strerror(errno));
+>>               return ret;
+>>       }
+>>
+>> -     baswap(bdaddr, (bdaddr_t *) (buf + 2));
+>> +     if (is_dualshock4(index))
+>> +             memcpy(bdaddr->b, buf + 10, 6); // little-endian on DS4
+>> +     else
+>> +             baswap(bdaddr, (bdaddr_t *) (buf + 2));
+>>
+>>       return 0;
+>>  }
+>>
+>> -static int set_master_bdaddr(int fd, const bdaddr_t *bdaddr)
+>> +static int set_master_bdaddr(int fd, int index, const bdaddr_t *bdaddr)
+>
+> ditto.
+>
+>>  {
+>> -     uint8_t buf[8];
+>> -     int ret;
+>> +     uint8_t buf[23];
+>> +     int ret, report_length;
+>>
+>> -     buf[0] = 0xf5;
+>> -     buf[1] = 0x01;
+>> +     if (is_dualshock4(index)) {
+>> +             report_length = 23;
+>>
+>> -     baswap((bdaddr_t *) (buf + 2), bdaddr);
+>> +             buf[0] = 0x13;
+>> +             memcpy(buf + 1, bdaddr->b, 6);
+>> +             memset(buf + 7, 0, 16); /* TODO: we could put the key here but there is no way to force a re-loading of link keys to the kernel */
+
+Here is an interesting possibility, we could pass the link key here so
+the controller would be fully bonded after the USB connection but
+currently there is no API to pass that key back to the core.
+
+Do you think this would this be something worth looking into?
+
+>> +     } else {
+>> +             report_length = 8;
+>> +
+>> +             buf[0] = 0xf5;
+>> +             buf[1] = 0x01;
+>> +             baswap((bdaddr_t *) (buf + 2), bdaddr);
+>> +     }
+>>
+>>       ret = ioctl(fd, HIDIOCSFEATURE(sizeof(buf)), buf);
+>>       if (ret < 0)
+>> @@ -262,10 +308,10 @@ static bool setup_device(int fd, int index, struct btd_adapter *adapter)
+>>       const bdaddr_t *adapter_bdaddr;
+>>       struct btd_device *device;
+>>
+>> -     if (get_device_bdaddr(fd, &device_bdaddr) < 0)
+>> +     if (get_device_bdaddr(fd, index, &device_bdaddr) < 0)
+>>               return false;
+>>
+>> -     if (get_master_bdaddr(fd, &master_bdaddr) < 0)
+>> +     if (get_master_bdaddr(fd, index, &master_bdaddr) < 0)
+>>               return false;
+>>
+>
+> Here the function pointers will be used, like:
+>         if (devices[index].get_device_bdaddr(fd, &device_bdaddr) < 0)
+>         ...
+>         if (devices[index].get_master_bdaddr(fd, &master_bdaddr) < 0)
+>
+>>       /* This can happen if controller was plugged while already connected
+>> @@ -279,7 +325,7 @@ static bool setup_device(int fd, int index, struct btd_adapter *adapter)
+>>       adapter_bdaddr = btd_adapter_get_address(adapter);
+>>
+>>       if (bacmp(adapter_bdaddr, &master_bdaddr)) {
+>> -             if (set_master_bdaddr(fd, adapter_bdaddr) < 0)
+>> +             if (set_master_bdaddr(fd, index, adapter_bdaddr) < 0)
+>
+> and here too.
+>
+>>                       return false;
+>>       }
+>>
+>
+> If this approach sounds OK, send a preparatory patch which adds the
+> needed fields to the global struct and renames the sixaxis functions
+> maybe moving them before the definition of the devices[] array, and then
+> do the DS4 changes to add the new devices and callbacks.
+
+Will do! Thank you for the review and suggestions.
 
 Cheers,
  - Juha
