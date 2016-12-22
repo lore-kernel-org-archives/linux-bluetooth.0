@@ -1,87 +1,69 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <1482365553-71040-1-git-send-email-mcchou@chromium.org>
-References: <1482365553-71040-1-git-send-email-mcchou@chromium.org>
+In-Reply-To: <20161221140547.11293-1-luiz.dentz@gmail.com>
+References: <20161221140547.11293-1-luiz.dentz@gmail.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 22 Dec 2016 12:45:44 +0200
-Message-ID: <CABBYNZL6UPyaAz+mabh27vVWRbtSAsN0jRkwd_ANFQdy_4wMdw@mail.gmail.com>
-Subject: Re: [PATCH v5] monitor/rfcomm: Fix a potential memory access issue
- for compatibility with LLVM
-To: Miao-chen Chou <mcchou@chromium.org>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Luiz Augusto Von Dentz <luiz.von.dentz@intel.com>,
-        josephsih@chromium.org
+Date: Thu, 22 Dec 2016 12:44:55 +0200
+Message-ID: <CABBYNZL3HNsNrMT1H_WZq_khX+zqJSoWsbthq6uKLWEAcvRo2w@mail.gmail.com>
+Subject: Re: [PATCH v2 BlueZ] doc/test-runner: Add Bluetooth config options
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
 
-On Thu, Dec 22, 2016 at 2:12 AM,  <mcchou@chromium.org> wrote:
-> From: Miao-chen Chou <mcchou@chromium.org>
+On Wed, Dec 21, 2016 at 4:05 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 >
-> This patch removes "packed" attribute from the definition of struct rfcomm_rpn
-> to prevent the access to an unaligned struct member in mmc_rpn(). This patch
-> also introduces a temp variable in mcc_pn() to prevent unaligned access without
-> touching the definition of struct rfcomm_pn, since struct rfcomm_pn is used as
-> a PDU.
->
-> error messages from LLVM build:
->
-> monitor/rfcomm.c:238:36: error: taking address of packed member 'pm' of class
-> or structure 'rfcomm_rpn' may result in an unaligned pointer value
-> [-Werror,-Waddress-of-packed-member]
->         if (!l2cap_frame_get_le16(frame, &rpn.pm))
-> monitor/rfcomm.c:287:36: error: taking address of packed member 'mtu' of class
-> or structure 'rfcomm_pn' may result in an unaligned pointer value
-> [-Werror,-Waddress-of-packed-member]
->         if (!l2cap_frame_get_le16(frame, &pn.mtu))
->
-> Currently there is no corresponding flag in GCC to generate the same error
-> messages. See https://gcc.gnu.org/bugzilla/show_bug.cgi?id=51628.
+> List the build options for Bluetooth necessary to run testers.
 > ---
-> v5 adds more details about the error messages.
+> v2: Add missing options for android-tester, note it still fails on A2DP
+> with error: Unexpected Daemon shutdown with status 11, all other test
+> seem to work fine though.
 >
->  monitor/rfcomm.c | 7 +++++--
->  1 file changed, 5 insertions(+), 2 deletions(-)
+>  do/ctest-runner.txt | 21 +++++++++++++++++++++
+>  1 file changed, 21 insertions(+)
 >
-> diff --git a/monitor/rfcomm.c b/monitor/rfcomm.c
-> index fd7bbdc..afeb5e1 100644
-> --- a/monitor/rfcomm.c
-> +++ b/monitor/rfcomm.c
-> @@ -106,7 +106,7 @@ struct rfcomm_rpn {
->         uint8_t xon;
->         uint8_t xoff;
->         uint16_t pm;
-> -} __attribute__ ((packed));
-> +};
+> diff --git a/doc/test-runner.txt b/doc/test-runner.txt
+> index 72e17ce..fe0a0d4 100644
+> --- a/doc/test-runner.txt
+> +++ b/doc/test-runner.txt
+> @@ -32,6 +32,27 @@ minimal options for a successful boot.
+>         CONFIG_DEVTMPFS=y
+>         CONFIG_DEBUG_FS=y
 >
->  struct rfcomm_rls {
->         uint8_t dlci;
-> @@ -265,6 +265,7 @@ static inline bool mcc_pn(struct rfcomm_frame *rfcomm_frame, uint8_t indent)
->  {
->         struct l2cap_frame *frame = &rfcomm_frame->l2cap_frame;
->         struct rfcomm_pn pn;
-> +       uint16_t mtu;
+> +For Bluetooth functionality:
+> +
+> +       CONFIG_BT=y
+> +       CONFIG_BT_BREDR=y
+> +       CONFIG_BT_RFCOMM=y
+> +       CONFIG_BT_BNEP=y
+> +       CONFIG_BT_HIDP=y
+> +       CONFIG_BT_LE=y
+> +
+> +       CONFIG_BT_HCIVHCI=y
+> +
+> +       CONFIG_CRYPTO_CMAC=y
+> +       CONFIG_CRYPTO_USER_API=y
+> +       CONFIG_CRYPTO_USER_API_HASH=y
+> +       CONFIG_CRYPTO_USER_API_SKCIPHER=y
+> +
+> +       CONFIG_UNIX=y
+> +
+> +       CONFIG_UHID=y
+> +
+> +
+>  These options should be installed as .config in the kernel source directory
+>  followed by this command.
 >
->         /* rfcomm_pn struct is defined in rfcomm.h */
->
-> @@ -284,8 +285,10 @@ static inline bool mcc_pn(struct rfcomm_frame *rfcomm_frame, uint8_t indent)
->         if (!l2cap_frame_get_u8(frame, &pn.ack_timer))
->                 return false;
->
-> -       if (!l2cap_frame_get_le16(frame, &pn.mtu))
-> +       /* prevent unaligned memory access */
-> +       if (!l2cap_frame_get_le16(frame, &mtu))
->                 return false;
-> +       pn.mtu = mtu;
->
->         if (!l2cap_frame_get_u8(frame, &pn.max_retrans))
->                 return false;
 > --
-> 2.8.0.rc3.226.g39d4020
+> 2.9.3
 
-Applied, thanks.
+
+Applied.
+
 
 -- 
 Luiz Augusto von Dentz
