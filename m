@@ -1,21 +1,144 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: bugzilla-daemon@bugzilla.kernel.org
-To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 190831] Intel Bluetooth 8260 breaks with latest firmware
-Date: Thu, 22 Dec 2016 20:35:47 +0000
-Message-ID: <bug-190831-62941-kuyefXUUOd@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-190831-62941@https.bugzilla.kernel.org/>
-References: <bug-190831-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
 MIME-Version: 1.0
+In-Reply-To: <CAKvrXUpJ9BUXiLeNc0y_yVDaWZrxC1KuMeBea-vsdn-kGu+NJw@mail.gmail.com>
+References: <CAKvrXUr+Q6AKcsQS+z8VwH--wtotawuiNz8j4RJy+D3Q7fGZ7Q@mail.gmail.com>
+ <CABBYNZLHK_H=augA1hd3R4aXEZLL435D8=CsuMUCUf_WC6bEUA@mail.gmail.com> <CAKvrXUpJ9BUXiLeNc0y_yVDaWZrxC1KuMeBea-vsdn-kGu+NJw@mail.gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Thu, 22 Dec 2016 20:21:38 +0200
+Message-ID: <CABBYNZLUem+RYf-BaXm7HL7M_9jpLToFKSsTtLJOnJJixXLLpA@mail.gmail.com>
+Subject: Re: HoG uHID device not destroyed on disconnect
+To: Juha Kuikka <juha.kuikka@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-https://bugzilla.kernel.org/show_bug.cgi?id=190831
+Hi Juha,
 
---- Comment #6 from Jan Steffens <jan.steffens@gmail.com> ---
-Thank you. Is that patch already available in any public branch?
+On Thu, Dec 22, 2016 at 7:34 PM, Juha Kuikka <juha.kuikka@gmail.com> wrote:
+> Hi Luiz,
+>
+> On Thu, Dec 22, 2016 at 1:03 AM, Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+>> Hi Juha,
+>>
+>> On Thu, Dec 22, 2016 at 8:06 AM, Juha Kuikka <juha.kuikka@gmail.com> wrote:
+>>> Hi,
+>>>
+>>> It seems that when an HID-over-GATT (HoG) device connects an uHID
+>>> devive is created for it. I would expect it to get destroyed upon
+>>> disconnect but it seems to linger around.
+>>>
+>>> This can be demonstrated using bluetoothctl. Here I am using a
+>>> Microsoft Arc Touch Mouse.
+>>>
+>>> Paired and connected:
+>>>
+>>> [bluetooth]# pair C9:33:31:6B:03:A9
+>>> Attempting to pair with C9:33:31:6B:03:A9
+>>> [CHG] Device C9:33:31:6B:03:A9 Connected: yes
+>>> [CHG] Device C9:33:31:6B:03:A9 UUIDs: 00001800-0000-1000-8000-00805f9b34fb
+>>> [CHG] Device C9:33:31:6B:03:A9 UUIDs: 00001801-0000-1000-8000-00805f9b34fb
+>>> [CHG] Device C9:33:31:6B:03:A9 UUIDs: 0000180a-0000-1000-8000-00805f9b34fb
+>>> [CHG] Device C9:33:31:6B:03:A9 UUIDs: 0000180f-0000-1000-8000-00805f9b34fb
+>>> [CHG] Device C9:33:31:6B:03:A9 UUIDs: 00001812-0000-1000-8000-00805f9b34fb
+>>> [CHG] Device C9:33:31:6B:03:A9 ServicesResolved: yes
+>>> [CHG] Device C9:33:31:6B:03:A9 Paired: yes
+>>> [NEW] Primary Service
+>>>         /org/bluez/hci0/dev_C9_33_31_6B_03_A9/service0008
+>>>         00001801-0000-1000-8000-00805f9b34fb
+>>>         Generic Attribute Profile
+>>> [NEW] Characteristic
+>>>         /org/bluez/hci0/dev_C9_33_31_6B_03_A9/service0008/char0009
+>>>         00002a05-0000-1000-8000-00805f9b34fb
+>>>         Service Changed
+>>> [NEW] Descriptor
+>>>         /org/bluez/hci0/dev_C9_33_31_6B_03_A9/service0008/char0009/desc000b
+>>>         00002902-0000-1000-8000-00805f9b34fb
+>>>         Client Characteristic Configuration
+>>> [NEW] Primary Service
+>>>         /org/bluez/hci0/dev_C9_33_31_6B_03_A9/service000c
+>>>         0000180a-0000-1000-8000-00805f9b34fb
+>>>         Device Information
+>>> [NEW] Characteristic
+>>>         /org/bluez/hci0/dev_C9_33_31_6B_03_A9/service000c/char000d
+>>>         00002a29-0000-1000-8000-00805f9b34fb
+>>>         Manufacturer Name String
+>>> [NEW] Characteristic
+>>>         /org/bluez/hci0/dev_C9_33_31_6B_03_A9/service000c/char000f
+>>>         00002a50-0000-1000-8000-00805f9b34fb
+>>>         PnP ID
+>>> [NEW] Primary Service
+>>>         /org/bluez/hci0/dev_C9_33_31_6B_03_A9/service0011
+>>>         0000180f-0000-1000-8000-00805f9b34fb
+>>>         Battery Service
+>>> [NEW] Characteristic
+>>>         /org/bluez/hci0/dev_C9_33_31_6B_03_A9/service0011/char0012
+>>>         00002a19-0000-1000-8000-00805f9b34fb
+>>>         Battery Level
+>>> [NEW] Descriptor
+>>>         /org/bluez/hci0/dev_C9_33_31_6B_03_A9/service0011/char0012/desc0014
+>>>         00002902-0000-1000-8000-00805f9b34fb
+>>>         Client Characteristic Configuration
+>>> Pairing successful
+>>> [CHG] Device C9:33:31:6B:03:A9 Modalias: usb:v045Ep0804d0001
+>>> [Arc Touch BT Mouse]# connect C9:33:31:6B:03:A9
+>>> Attempting to connect to C9:33:31:6B:03:A9
+>>> Connection successful
+>>>
+>>> And here it is disconnected:
+>>>
+>>> [CHG] Device C9:33:31:6B:03:A9 ServicesResolved: no
+>>> [CHG] Device C9:33:31:6B:03:A9 Connected: no
+>>>
+>>> After disconnection, the HID device is still present:
+>>>
+>>> $ ls -l /sys/class/hidraw/ /dev/hidraw*
+>>> crw------- 1 root root 244, 0 Dec 21 21:45 /dev/hidraw0
+>>>
+>>> /sys/class/hidraw/:
+>>> total 0
+>>> lrwxrwxrwx 1 root root 0 Dec 21 21:52 hidraw0 ->
+>>> ../../devices/virtual/misc/uhid/0005:0000:0000.0019/hidraw/hidraw0
+>>>
+>>> The zero VID&PID of the HID device differ from the modalias due to
+>>> another bug I just posted about.
+>>>
+>>> If I Remove() the the device, the HID device gets destroyed but it
+>>> lingers until then.
+>>>
+>>> This behavior seems to be caused by the fact that the HoG service is
+>>> kept alive between connections and the lifetime of the included
+>>> bt_uhid is not limited between connections.
+>>
+>> This is actually on purpose so we don't keep creating more and more
+>> device nodes every time the device reconnects, but we should
+>> definitely fix the problem with DIS and HoG.
+>
+> I am not sure I understand the reasoning here, can you elaborate please?
+>
+> If upon disconnect we close() the uhid device or use the UHID_DESTROY
+> that will remove the device nodes (/dev/hidraw*, /dev/input/event/*)
+> and conversely upon connection UHID_CREATE would indirectly create
+> them. This way there should be no accumulation of the device nodes.
+
+If I recall correct it is exactly to cut time of recreating the device
+that this was done, and if you take a look at the log you would
+probably notice it was removing the device but someone at Google,
+don't recall who now, had problem with that and they actually would
+use UHID over HIDP even for classic because they don't want devices
+being created/removed.
+
+> This behavior would mimic the BT classic HID and any other devices
+> where the device node is only present when the device is present and
+> usable.
+>
+> I could prepare a patch to demonstrate this if you'd like.
+>
+> Cheers,
+>  - Juha
+
+
 
 -- 
-You are receiving this mail because:
-You are the assignee for the bug.
+Luiz Augusto von Dentz
