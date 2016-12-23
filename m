@@ -1,34 +1,24 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: "Felipe F. Tonello" <eu@felipetonello.com>
+From: bugzilla-daemon@bugzilla.kernel.org
 To: linux-bluetooth@vger.kernel.org
-Cc: agoode@chromium.org
-Subject: [PATCH BlueZ v4 0/2] MIDI over BLE implementation
-Date: Mon, 26 Dec 2016 20:26:32 +0000
-Message-Id: <20161226202634.28195-1-eu@felipetonello.com>
+Subject: [Bug 190831] Intel Bluetooth 8260 breaks with latest firmware
+Date: Fri, 23 Dec 2016 09:16:25 +0000
+Message-ID: <bug-190831-62941-A226hrQive@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-190831-62941@https.bugzilla.kernel.org/>
+References: <bug-190831-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patchset implements the MIDI over BLE spec, more information on patch #1.
+https://bugzilla.kernel.org/show_bug.cgi?id=190831
 
-Patch #2 is some unit-tests to make sure the MIDI parser works properly.
+--- Comment #7 from G Jaya Praveen <jaya.p.g@intel.com> ---
+Hi,
 
-Felipe F. Tonello (2):
-  profiles/midi: Added MIDI over BLE profile implementation
-  unit/test-midi: Added libmidi use-case tests
-
- Makefile.am             |  14 +-
- Makefile.plugins        |   8 +
- configure.ac            |  11 +
- profiles/midi/libmidi.c | 412 +++++++++++++++++++++++++++++++
- profiles/midi/libmidi.h | 150 ++++++++++++
- profiles/midi/midi.c    | 490 +++++++++++++++++++++++++++++++++++++
- unit/test-midi.c        | 628 ++++++++++++++++++++++++++++++++++++++++++++++++
- 7 files changed, 1712 insertions(+), 1 deletion(-)
- create mode 100644 profiles/midi/libmidi.c
- create mode 100644 profiles/midi/libmidi.h
- create mode 100644 profiles/midi/midi.c
- create mode 100644 unit/test-midi.c
+Currently requested the maintainers to merge it, but still not present in
+Linux-firmware public branch.
 
 -- 
-2.10.2
-
+You are receiving this mail because:
+You are the assignee for the bug.
