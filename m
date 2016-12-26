@@ -1,606 +1,681 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+From: "Felipe F. Tonello" <eu@felipetonello.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/3] input/hog-lib: Add support to gatt-db
-Date: Tue, 27 Dec 2016 14:40:37 +0200
-Message-Id: <20161227124039.10405-1-luiz.dentz@gmail.com>
+Cc: agoode@chromium.org
+Subject: [PATCH BlueZ v4 2/2] unit/test-midi: Added libmidi use-case tests
+Date: Mon, 26 Dec 2016 20:26:34 +0000
+Message-Id: <20161226202634.28195-3-eu@felipetonello.com>
+In-Reply-To: <20161226202634.28195-1-eu@felipetonello.com>
+References: <20161226202634.28195-1-eu@felipetonello.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+I tried to test all basic and most common use-case scenarios here and
+some more weird as well. It tests cases where the parser needs to handle
+problematic MIDI messages as well as ALSA Sequencer events.
 
-This add support of passing a gatt-db to avoid having to discover the
-services again, this should also make it easier to port to bt_gatt_client
-once Android code support it.
+It is really simple to add new tests, so others are welcome to do so.
 ---
- android/hidhost.c        |   4 +
- profiles/input/hog-lib.c | 247 +++++++++++++++++++++++++++++++++++++++++------
- profiles/input/hog-lib.h |   4 +-
- profiles/input/hog.c     |  61 ++++++------
- unit/test-hog.c          |   6 ++
- 5 files changed, 255 insertions(+), 67 deletions(-)
+ Makefile.am      |  10 +
+ unit/test-midi.c | 628 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 638 insertions(+)
+ create mode 100644 unit/test-midi.c
 
-diff --git a/android/hidhost.c b/android/hidhost.c
-index 591ca95..fe0ea2f 100644
---- a/android/hidhost.c
-+++ b/android/hidhost.c
-@@ -38,9 +38,13 @@
- #include "lib/bluetooth.h"
- #include "lib/sdp.h"
- #include "lib/sdp_lib.h"
-+#include "lib/uuid.h"
- #include "src/shared/mgmt.h"
- #include "src/shared/util.h"
- #include "src/shared/uhid.h"
-+#include "src/shared/queue.h"
-+#include "src/shared/att.h"
-+#include "src/shared/gatt-db.h"
- #include "src/sdp-client.h"
- #include "src/uuid-helper.h"
- #include "src/log.h"
-diff --git a/profiles/input/hog-lib.c b/profiles/input/hog-lib.c
-index e376c2b..ed38916 100644
---- a/profiles/input/hog-lib.c
-+++ b/profiles/input/hog-lib.c
-@@ -45,6 +45,8 @@
- #include "src/shared/util.h"
- #include "src/shared/uhid.h"
- #include "src/shared/queue.h"
-+#include "src/shared/att.h"
-+#include "src/shared/gatt-db.h"
- #include "src/log.h"
+diff --git a/Makefile.am b/Makefile.am
+index 7a758fbde713..f038cb2b5206 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -423,6 +423,16 @@ unit_test_gattrib_LDADD = lib/libbluetooth-internal.la \
+ 			src/libshared-glib.la \
+ 			@GLIB_LIBS@ @DBUS_LIBS@ -ldl -lrt
  
- #include "attrib/att.h"
-@@ -59,6 +61,7 @@
- #include "profiles/input/hog-lib.h"
- 
- #define HOG_UUID		"00001812-0000-1000-8000-00805f9b34fb"
-+#define HOG_UUID16		0x1812
- 
- #define HOG_INFO_UUID		0x2A4A
- #define HOG_REPORT_MAP_UUID	0x2A4B
-@@ -83,6 +86,7 @@ struct bt_hog {
- 	uint16_t		vendor;
- 	uint16_t		product;
- 	uint16_t		version;
-+	struct gatt_db_attribute *attr;
- 	struct gatt_primary	*primary;
- 	GAttrib			*attrib;
- 	GSList			*reports;
-@@ -110,9 +114,11 @@ struct report {
- 	struct bt_hog		*hog;
- 	uint8_t			id;
- 	uint8_t			type;
-+	uint16_t		handle;
-+	uint16_t		value_handle;
-+	uint8_t			properties;
- 	uint16_t		ccc_handle;
- 	guint			notifyid;
--	struct gatt_char	*decl;
- 	uint16_t		len;
- 	uint8_t			*value;
- };
-@@ -181,6 +187,10 @@ static void read_char(struct bt_hog *hog, GAttrib *attrib, uint16_t handle,
- 	struct gatt_request *req;
- 	unsigned int id;
- 
-+	/* Ignore if not connected */
-+	if (!attrib)
-+		return;
++if MIDI
++unit_tests += unit/test-midi
++unit_test_midi_CFLAGS = $(AM_CFLAGS) @ALSA_CFLAGS@ -DMIDI_TEST
++unit_test_midi_SOURCES = unit/test-midi.c \
++			profiles/midi/libmidi.h \
++			profiles/midi/libmidi.c
++unit_test_midi_LDADD = src/libshared-glib.la \
++			@GLIB_LIBS@ @ALSA_LIBS@
++endif
 +
- 	req = create_request(hog, user_data);
- 	if (!req)
- 		return;
-@@ -334,7 +344,7 @@ static void report_ccc_written_cb(guint8 status, const guint8 *pdu,
- 
- 	report->notifyid = g_attrib_register(hog->attrib,
- 					ATT_OP_HANDLE_NOTIFY,
--					report->decl->value_handle,
-+					report->value_handle,
- 					report_value_cb, report, NULL);
- 
- 	DBG("Report characteristic descriptor written: notifications enabled");
-@@ -403,7 +413,7 @@ static void report_reference_cb(guint8 status, const guint8 *pdu,
- 	report->id = pdu[1];
- 	report->type = pdu[2];
- 
--	DBG("Report 0x%04x: id 0x%02x type %s", report->decl->value_handle,
-+	DBG("Report 0x%04x: id 0x%02x type %s", report->value_handle,
- 				report->id, type_to_string(report->type));
- 
- 	/* Enable notifications only for Input Reports */
-@@ -516,7 +526,7 @@ static int report_chrc_cmp(const void *data, const void *user_data)
- 	const struct report *report = data;
- 	const struct gatt_char *decl = user_data;
- 
--	return report->decl->handle - decl->handle;
-+	return report->handle - decl->handle;
- }
- 
- static struct report *report_new(struct bt_hog *hog, struct gatt_char *chr)
-@@ -531,7 +541,9 @@ static struct report *report_new(struct bt_hog *hog, struct gatt_char *chr)
- 
- 	report = g_new0(struct report, 1);
- 	report->hog = hog;
--	report->decl = g_memdup(chr, sizeof(*chr));
-+	report->handle = chr->handle;
-+	report->value_handle = chr->value_handle;
-+	report->properties = chr->properties;
- 	hog->reports = g_slist_append(hog->reports, report);
- 
- 	read_char(hog, hog->attrib, chr->value_handle, report_read_cb, report);
-@@ -691,16 +703,16 @@ static void forward_report(struct uhid_event *ev, void *user_data)
- 	}
- 
- 	DBG("Sending report type %d ID %d to handle 0x%X", report->type,
--				report->id, report->decl->value_handle);
-+				report->id, report->value_handle);
- 
- 	if (hog->attrib == NULL)
- 		return;
- 
--	if (report->decl->properties & GATT_CHR_PROP_WRITE)
--		write_char(hog, hog->attrib, report->decl->value_handle,
-+	if (report->properties & GATT_CHR_PROP_WRITE)
-+		write_char(hog, hog->attrib, report->value_handle,
- 				data, size, output_written_cb, hog);
--	else if (report->decl->properties & GATT_CHR_PROP_WRITE_WITHOUT_RESP)
--		gatt_write_cmd(hog->attrib, report->decl->value_handle,
-+	else if (report->properties & GATT_CHR_PROP_WRITE_WITHOUT_RESP)
-+		gatt_write_cmd(hog->attrib, report->value_handle,
- 						data, size, NULL, NULL);
- }
- 
-@@ -789,13 +801,13 @@ static void set_report(struct uhid_event *ev, void *user_data)
- 	}
- 
- 	DBG("Sending report type %d ID %d to handle 0x%X", report->type,
--				report->id, report->decl->value_handle);
-+				report->id, report->value_handle);
- 
- 	if (hog->attrib == NULL)
- 		return;
- 
- 	hog->setrep_att = gatt_write_char(hog->attrib,
--						report->decl->value_handle,
-+						report->value_handle,
- 						data, size, set_report_cb,
- 						hog);
- 	if (!hog->setrep_att) {
-@@ -878,7 +890,7 @@ static void get_report(struct uhid_event *ev, void *user_data)
- 	}
- 
- 	hog->getrep_att = gatt_read_char(hog->attrib,
--						report->decl->value_handle,
-+						report->value_handle,
- 						get_report_cb, hog);
- 	if (!hog->getrep_att) {
- 		err = ENOMEM;
-@@ -1180,7 +1192,6 @@ static void report_free(void *data)
- 	struct report *report = data;
- 
- 	g_free(report->value);
--	g_free(report->decl);
- 	g_free(report);
- }
- 
-@@ -1211,14 +1222,132 @@ static void hog_free(void *data)
- 
- struct bt_hog *bt_hog_new_default(const char *name, uint16_t vendor,
- 					uint16_t product, uint16_t version,
--					void *primary)
-+					struct gatt_db *db)
- {
--	return bt_hog_new(-1, name, vendor, product, version, primary);
-+	return bt_hog_new(-1, name, vendor, product, version, db);
- }
- 
--struct bt_hog *bt_hog_new(int fd, const char *name, uint16_t vendor,
-+static void foreach_hog_report(struct gatt_db_attribute *attr, void *user_data)
-+{
-+	struct report *report = user_data;
-+	struct bt_hog *hog = report->hog;
-+	const bt_uuid_t *uuid;
-+	bt_uuid_t ref_uuid, ccc_uuid;
-+	uint16_t handle;
+ if MAINTAINER_MODE
+ noinst_PROGRAMS += $(unit_tests)
+ endif
+diff --git a/unit/test-midi.c b/unit/test-midi.c
+new file mode 100644
+index 000000000000..fc5da2c49796
+--- /dev/null
++++ b/unit/test-midi.c
+@@ -0,0 +1,628 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2015,2016 Felipe F. Tonello <eu@felipetonello.com>
++ *  Copyright (C) 2016 ROLI Ltd.
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ *
++ */
 +
-+	handle = gatt_db_attribute_get_handle(attr);
-+	uuid = gatt_db_attribute_get_type(attr);
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
 +
-+	bt_uuid16_create(&ref_uuid, GATT_REPORT_REFERENCE);
-+	if (!bt_uuid_cmp(&ref_uuid, uuid)) {
-+		read_char(hog, hog->attrib, handle, report_reference_cb,
-+								report);
-+		return;
++#include <glib.h>
++
++#define NUM_WRITE_TESTS 100
++
++#include "src/shared/tester.h"
++#include "profiles/midi/libmidi.h"
++
++struct ble_midi_packet {
++	const uint8_t *data;
++	size_t size;
++};
++
++#define BLE_MIDI_PACKET_INIT(_packet) \
++	{ \
++		.data = (_packet), \
++		.size = sizeof(_packet), \
 +	}
 +
-+	bt_uuid16_create(&ccc_uuid, GATT_CLIENT_CHARAC_CFG_UUID);
-+	if (!bt_uuid_cmp(&ccc_uuid, uuid))
-+		report->ccc_handle = handle;
-+}
++struct midi_read_test {
++	const struct ble_midi_packet *ble_packet;
++	size_t ble_packet_size;
++	const snd_seq_event_t *event;
++	size_t event_size;
++};
 +
-+static int report_attr_cmp(const void *data, const void *user_data)
-+{
-+	const struct report *report = data;
-+	const struct gatt_db_attribute *attr = user_data;
-+
-+	return report->handle - gatt_db_attribute_get_handle(attr);
-+}
-+
-+static struct report *report_add(struct bt_hog *hog,
-+					struct gatt_db_attribute *attr)
-+{
-+	struct report *report;
-+	GSList *l;
-+
-+	/* Skip if report already exists */
-+	l = g_slist_find_custom(hog->reports, attr, report_attr_cmp);
-+	if (l)
-+		return l->data;
-+
-+	report = g_new0(struct report, 1);
-+	report->hog = hog;
-+
-+	gatt_db_attribute_get_char_data(attr, &report->handle,
-+					&report->value_handle,
-+					&report->properties,
-+					NULL, NULL);
-+
-+	hog->reports = g_slist_append(hog->reports, report);
-+
-+	read_char(hog, hog->attrib, report->value_handle, report_read_cb,
-+								report);
-+
-+	return report;
-+}
-+
-+static void foreach_hog_external(struct gatt_db_attribute *attr,
-+							void *user_data)
-+{
-+	struct bt_hog *hog = user_data;
-+	const bt_uuid_t *uuid;
-+	bt_uuid_t ext_uuid;
-+	uint16_t handle;
-+
-+	handle = gatt_db_attribute_get_handle(attr);
-+	uuid = gatt_db_attribute_get_type(attr);
-+
-+	bt_uuid16_create(&ext_uuid, GATT_EXTERNAL_REPORT_REFERENCE);
-+	if (!bt_uuid_cmp(&ext_uuid, uuid))
-+		read_char(hog, hog->attrib, handle,
-+					external_report_reference_cb, hog);
-+}
-+
-+static void foreach_hog_chrc(struct gatt_db_attribute *attr, void *user_data)
-+{
-+	struct bt_hog *hog = user_data;
-+	bt_uuid_t uuid, report_uuid, report_map_uuid, info_uuid;
-+	bt_uuid_t proto_mode_uuid, ctrlpt_uuid;
-+	uint16_t handle, value_handle;
-+
-+	gatt_db_attribute_get_char_data(attr, &handle, &value_handle, NULL,
-+					NULL, &uuid);
-+
-+	bt_uuid16_create(&report_uuid, HOG_REPORT_UUID);
-+	if (!bt_uuid_cmp(&report_uuid, &uuid)) {
-+		struct report *report = report_add(hog, attr);
-+		gatt_db_service_foreach_desc(attr, foreach_hog_report, report);
-+		return;
++#define BLE_READ_TEST_INIT(_ble_packet, _event) \
++	{ \
++		.ble_packet = (_ble_packet), \
++		.ble_packet_size = G_N_ELEMENTS(_ble_packet), \
++		.event = (_event), \
++		.event_size = G_N_ELEMENTS(_event), \
 +	}
 +
-+	bt_uuid16_create(&report_map_uuid, HOG_REPORT_MAP_UUID);
-+	if (!bt_uuid_cmp(&report_map_uuid, &uuid)) {
-+		read_char(hog, hog->attrib, value_handle, report_map_read_cb,
-+									hog);
-+		gatt_db_service_foreach_desc(attr, foreach_hog_external, hog);
-+		return;
++struct midi_write_test {
++	const snd_seq_event_t *event;
++	const snd_seq_event_t *event_expect;
++	size_t event_size;
++};
++
++#define BLE_WRITE_TEST_INIT(_event, _event_expect)	  \
++	{ \
++		.event = (_event), \
++		.event_expect = (_event_expect), \
++		.event_size = G_N_ELEMENTS(_event), \
 +	}
 +
-+	bt_uuid16_create(&info_uuid, HOG_INFO_UUID);
-+	if (!bt_uuid_cmp(&info_uuid, &uuid)) {
-+		read_char(hog, hog->attrib, value_handle, info_read_cb, hog);
-+		return;
++#define BLE_WRITE_TEST_INIT_BASIC(_event) BLE_WRITE_TEST_INIT(_event, NULL)
++
++#define NOTE_EVENT(_event, _channel, _note, _velocity) \
++	{ \
++		.type = SND_SEQ_EVENT_##_event, \
++		.data = { \
++			.note = { \
++				.channel = (_channel), \
++				.note = (_note), \
++				.velocity = (_velocity), \
++			}, \
++		}, \
 +	}
 +
-+	bt_uuid16_create(&proto_mode_uuid, HOG_PROTO_MODE_UUID);
-+	if (!bt_uuid_cmp(&proto_mode_uuid, &uuid)) {
-+		hog->proto_mode_handle = value_handle;
-+		read_char(hog, hog->attrib, value_handle, proto_mode_read_cb,
-+									hog);
++#define CONTROL_EVENT(_event, _channel, _value, _param) \
++	{ \
++		.type = SND_SEQ_EVENT_##_event, \
++		.data = { \
++			.control = { \
++				.channel = (_channel), \
++				.value = (_value), \
++				.param = (_param), \
++			}, \
++		}, \
 +	}
 +
-+	bt_uuid16_create(&ctrlpt_uuid, HOG_CONTROL_POINT_UUID);
-+	if (!bt_uuid_cmp(&ctrlpt_uuid, &uuid))
-+		hog->ctrlpt_handle = value_handle;
-+}
++#define SYSEX_EVENT_RAW(_message, _size, _offset)	  \
++	{ \
++		.type = SND_SEQ_EVENT_SYSEX, \
++		.data = { \
++			.ext = { \
++				.ptr = (void *)(_message) + (_offset), \
++				.len = (_size), \
++			}, \
++		}, \
++	}
 +
-+static struct bt_hog *hog_new(int fd, const char *name, uint16_t vendor,
- 					uint16_t product, uint16_t version,
--					void *primary)
-+					struct gatt_db_attribute *attr)
- {
- 	struct bt_hog *hog;
- 
-@@ -1245,9 +1374,58 @@ struct bt_hog *bt_hog_new(int fd, const char *name, uint16_t vendor,
- 	hog->vendor = vendor;
- 	hog->product = product;
- 	hog->version = version;
-+	hog->attr = attr;
- 
--	if (primary)
--		hog->primary = g_memdup(primary, sizeof(*hog->primary));
-+	return hog;
-+}
++#define SYSEX_EVENT(_message) SYSEX_EVENT_RAW(_message, sizeof(_message), 0)
 +
-+static void hog_attach_instace(struct bt_hog *hog,
-+				struct gatt_db_attribute *attr)
++/* Multiple messages in one packet */
++static const uint8_t packet1_1[] = {
++	0xa6, 0x88, 0xe8, 0x00, 0x40, 0x88, 0xb8, 0x4a,
++	0x3f, 0x88, 0x98, 0x3e, 0x0e
++};
++
++/* Several one message per packet */
++static const uint8_t packet1_2[] = {
++	0xa6, 0xaa, 0xd8, 0x71
++};
++
++static const uint8_t packet1_3[] = {
++	0xa6, 0xb7, 0xb8, 0x4a, 0x43
++};
++
++/* This message contains a running status message */
++static const uint8_t packet1_4[] = {
++	0xa6, 0xc4, 0xe8, 0x7e, 0x3f, 0x7d, 0x3f, 0xc4,
++	0x7c, 0x3f
++};
++
++/* This message contain a running status message misplaced */
++static const uint8_t packet1_5[] = {
++	0xa6, 0xd9, 0x3e, 0x00, 0x88, 0x3e, 0x00
++};
++
++static const struct ble_midi_packet packet1[] = {
++	BLE_MIDI_PACKET_INIT(packet1_1),
++	BLE_MIDI_PACKET_INIT(packet1_2),
++	BLE_MIDI_PACKET_INIT(packet1_3),
++	BLE_MIDI_PACKET_INIT(packet1_4),
++	BLE_MIDI_PACKET_INIT(packet1_5),
++};
++
++static const snd_seq_event_t event1[] = {
++	CONTROL_EVENT(PITCHBEND, 8, 0, 0),    /* Pitch Bend */
++	CONTROL_EVENT(CONTROLLER, 8, 63, 74), /* Control Change */
++	NOTE_EVENT(NOTEON, 8, 62, 14),        /* Note On */
++	CONTROL_EVENT(CHANPRESS, 8, 113, 0),  /* Channel Aftertouch */
++	CONTROL_EVENT(CONTROLLER, 8, 67, 74), /* Control Change*/
++	CONTROL_EVENT(PITCHBEND, 8, -2, 0),   /* Pitch Bend */
++	CONTROL_EVENT(PITCHBEND, 8, -3, 0),   /* Pitch Bend */
++	CONTROL_EVENT(PITCHBEND, 8, -4, 0),   /* Pitch Bend */
++	NOTE_EVENT(NOTEOFF, 8, 62, 0),        /* Note Off */
++};
++
++static const struct midi_read_test midi1 = BLE_READ_TEST_INIT(packet1, event1);
++
++/* Basic SysEx in one packet */
++static const uint8_t packet2_1[] = {
++	0xa6, 0xda, 0xf0, 0x01, 0x02, 0x03, 0xda, 0xf7
++};
++
++/* SysEx across two packets */
++static const uint8_t packet2_2[] = {
++	0xa6, 0xda, 0xf0, 0x01, 0x02, 0x03, 0x04, 0x05
++};
++
++static const uint8_t packet2_3[] = {
++	0xa6, 0x06, 0x07, 0x08, 0x09, 0x0a, 0xdb, 0xf7
++};
++
++/* SysEx across multiple packets */
++static const uint8_t packet2_4[] = {
++	0xa6, 0xda, 0xf0, 0x01, 0x02, 0x03, 0x04, 0x05
++};
++
++static const uint8_t packet2_5[] = {
++	0xa6, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c
++};
++static const uint8_t packet2_6[] = {
++	0xa6, 0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13
++};
++
++static const uint8_t packet2_7[] = {
++	0xa6, 0x14, 0x15, 0x16, 0x17, 0x18, 0xdb, 0xf7
++};
++
++/* Two SysEx interleaved in two packets */
++static const uint8_t packet2_8[] = {
++	0xa6, 0xda, 0xf0, 0x01, 0x02, 0x03, 0xda, 0xf7,
++	0xda, 0xf0
++};
++
++static const uint8_t packet2_9[] = {
++	0xa6, 0x06, 0x07, 0x08, 0x09, 0x0a, 0xdb, 0xf7
++};
++
++
++static const struct ble_midi_packet packet2[] = {
++	BLE_MIDI_PACKET_INIT(packet2_1),
++	BLE_MIDI_PACKET_INIT(packet2_2),
++	BLE_MIDI_PACKET_INIT(packet2_3),
++	BLE_MIDI_PACKET_INIT(packet2_4),
++	BLE_MIDI_PACKET_INIT(packet2_5),
++	BLE_MIDI_PACKET_INIT(packet2_6),
++	BLE_MIDI_PACKET_INIT(packet2_7),
++	BLE_MIDI_PACKET_INIT(packet2_8),
++	BLE_MIDI_PACKET_INIT(packet2_9),
++};
++
++static const uint8_t sysex2_1[] = {
++	0xf0, 0x01, 0x02, 0x03, 0xf7
++};
++
++static const uint8_t sysex2_2[] = {
++	0xf0, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
++	0x08, 0x09, 0x0a, 0xf7
++};
++
++static const uint8_t sysex2_3[] = {
++	0xf0, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
++	0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
++	0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17,
++	0x18, 0xf7
++};
++
++static const uint8_t sysex2_4[] = {
++	0xf0, 0x01, 0x02, 0x03, 0xf7
++};
++
++static const uint8_t sysex2_5[] = {
++	0xf0, 0x06, 0x07, 0x08, 0x09, 0x0a, 0xf7
++};
++
++static const snd_seq_event_t event2[] = {
++	SYSEX_EVENT(sysex2_1),
++	SYSEX_EVENT(sysex2_2),
++	SYSEX_EVENT(sysex2_3),
++	SYSEX_EVENT(sysex2_4),
++	SYSEX_EVENT(sysex2_5),
++};
++
++static const struct midi_read_test midi2 = BLE_READ_TEST_INIT(packet2, event2);
++
++static void compare_events(const snd_seq_event_t *ev1,
++                           const snd_seq_event_t *ev2)
 +{
-+	struct bt_hog *instance;
++	g_assert_cmpint(ev1->type, ==, ev2->type);
 +
-+	if (!hog->attr) {
-+		hog->attr = attr;
-+		gatt_db_service_foreach_char(hog->attr, foreach_hog_chrc, hog);
-+		return;
++	switch (ev1->type) {
++	case SND_SEQ_EVENT_NOTEON:
++	case SND_SEQ_EVENT_NOTEOFF:
++	case SND_SEQ_EVENT_KEYPRESS:
++		g_assert_cmpint(ev1->data.note.channel,
++		                ==,
++		                ev2->data.note.channel);
++		g_assert_cmpint(ev1->data.note.note,
++		                ==,
++		                ev2->data.note.note);
++		g_assert_cmpint(ev1->data.note.velocity,
++		                ==,
++		                ev2->data.note.velocity);
++		break;
++	case SND_SEQ_EVENT_CONTROLLER:
++		g_assert_cmpint(ev1->data.control.param,
++		                ==,
++		                ev2->data.control.param);
++	case SND_SEQ_EVENT_PITCHBEND:
++	case SND_SEQ_EVENT_CHANPRESS:
++	case SND_SEQ_EVENT_PGMCHANGE:
++		g_assert_cmpint(ev1->data.control.channel,
++		                ==,
++		                ev2->data.control.channel);
++		g_assert_cmpint(ev1->data.control.value,
++		                ==,
++		                ev2->data.control.value);
++		break;
++	case SND_SEQ_EVENT_SYSEX:
++		g_assert_cmpmem(ev1->data.ext.ptr, ev1->data.ext.len,
++		                ev2->data.ext.ptr, ev2->data.ext.len);
++		break;
++	default:
++		g_assert_not_reached();
 +	}
-+
-+	instance = hog_new(hog->uhid_fd, hog->name, hog->vendor,
-+					hog->product, hog->version, attr);
-+	if (!instance)
-+		return;
-+
-+	hog->instances = g_slist_append(hog->instances, instance);
 +}
 +
-+static void foreach_hog_service(struct gatt_db_attribute *attr, void *user_data)
++static void test_midi_reader(gconstpointer data)
 +{
-+	struct bt_hog *hog = user_data;
++	const struct midi_read_test *midi_test = data;
++	struct midi_read_parser midi;
++	int err;
++	size_t i; /* ble_packet counter */
++	size_t j; /* ble_packet length counter */
++	size_t k = 0; /* event counter */
 +
-+	hog_attach_instace(hog, attr);
-+}
++	err = midi_read_init(&midi);
++	g_assert_cmpint(err, ==, 0);
 +
-+struct bt_hog *bt_hog_new(int fd, const char *name, uint16_t vendor,
-+					uint16_t product, uint16_t version,
-+					struct gatt_db *db)
-+{
-+	struct bt_hog *hog;
++	for (i = 0; i < midi_test->ble_packet_size; i++) {
++		const size_t length = midi_test->ble_packet[i].size;
++		j = 0;
++		midi_read_reset(&midi);
++		while (j < length) {
++			snd_seq_event_t ev;
++			const snd_seq_event_t *ev_expect = &midi_test->event[k];
++			size_t count;
 +
-+	hog = hog_new(fd, name, vendor, product, version, NULL);
-+	if (!hog)
-+		return NULL;
++			g_assert_cmpint(k, <, midi_test->event_size);
 +
-+	if (db) {
-+		bt_uuid_t uuid;
++			snd_seq_ev_clear(&ev);
 +
-+		/* Handle the HID services */
-+		bt_uuid16_create(&uuid, HOG_UUID16);
-+		gatt_db_foreach_service(db, &uuid, foreach_hog_service, hog);
-+		if (!hog->attr) {
-+			hog_free(hog);
-+			return NULL;
++			count = midi_read_raw(&midi,
++			                      midi_test->ble_packet[i].data + j,
++			                      length - j,
++			                      &ev);
++
++			g_assert_cmpuint(count, >, 0);
++
++			if (ev.type == SND_SEQ_EVENT_NONE)
++				goto _continue_loop;
++			else
++				k++;
++
++			compare_events(ev_expect, &ev);
++
++		_continue_loop:
++			j += count;
 +		}
 +	}
- 
- 	return bt_hog_ref(hog);
- }
-@@ -1357,10 +1535,11 @@ static void hog_attach_hog(struct bt_hog *hog, struct gatt_primary *primary)
- 	}
- 
- 	instance = bt_hog_new(hog->uhid_fd, hog->name, hog->vendor,
--					hog->product, hog->version, primary);
-+					hog->product, hog->version, NULL);
- 	if (!instance)
- 		return;
- 
-+	instance->primary = g_memdup(primary, sizeof(*primary));
- 	find_included(instance, hog->attrib, primary->range.start,
- 			primary->range.end, find_included_cb, instance);
- 
-@@ -1415,7 +1594,6 @@ static void primary_cb(uint8_t status, GSList *services, void *user_data)
- 
- bool bt_hog_attach(struct bt_hog *hog, void *gatt)
- {
--	struct gatt_primary *primary = hog->primary;
- 	GSList *l;
- 
- 	if (hog->attrib)
-@@ -1423,7 +1601,7 @@ bool bt_hog_attach(struct bt_hog *hog, void *gatt)
- 
- 	hog->attrib = g_attrib_ref(gatt);
- 
--	if (!primary) {
-+	if (!hog->attr && !hog->primary) {
- 		discover_primary(hog, hog->attrib, NULL, primary_cb, hog);
- 		return true;
- 	}
-@@ -1444,9 +1622,14 @@ bool bt_hog_attach(struct bt_hog *hog, void *gatt)
- 
- 	if (!hog->uhid_created) {
- 		DBG("HoG discovering characteristics");
--		discover_char(hog, hog->attrib, primary->range.start,
--						primary->range.end, NULL,
--						char_discovered_cb, hog);
-+		if (hog->attr)
-+			gatt_db_service_foreach_char(hog->attr,
-+							foreach_hog_chrc, hog);
-+		else
-+			discover_char(hog, hog->attrib,
-+					hog->primary->range.start,
-+					hog->primary->range.end, NULL,
-+					char_discovered_cb, hog);
- 		return true;
- 	}
- 
-@@ -1455,7 +1638,7 @@ bool bt_hog_attach(struct bt_hog *hog, void *gatt)
- 
- 		r->notifyid = g_attrib_register(hog->attrib,
- 					ATT_OP_HANDLE_NOTIFY,
--					r->decl->value_handle,
-+					r->value_handle,
- 					report_value_cb, r, NULL);
- 	}
- 
-@@ -1528,14 +1711,14 @@ int bt_hog_send_report(struct bt_hog *hog, void *data, size_t size, int type)
- 	if (!report)
- 		return -ENOTSUP;
- 
--	DBG("hog: Write report, handle 0x%X", report->decl->value_handle);
-+	DBG("hog: Write report, handle 0x%X", report->value_handle);
- 
--	if (report->decl->properties & GATT_CHR_PROP_WRITE)
--		write_char(hog, hog->attrib, report->decl->value_handle,
-+	if (report->properties & GATT_CHR_PROP_WRITE)
-+		write_char(hog, hog->attrib, report->value_handle,
- 				data, size, output_written_cb, hog);
- 
--	if (report->decl->properties & GATT_CHR_PROP_WRITE_WITHOUT_RESP)
--		gatt_write_cmd(hog->attrib, report->decl->value_handle,
-+	if (report->properties & GATT_CHR_PROP_WRITE_WITHOUT_RESP)
-+		gatt_write_cmd(hog->attrib, report->value_handle,
- 						data, size, NULL, NULL);
- 
- 	for (l = hog->instances; l; l = l->next) {
-diff --git a/profiles/input/hog-lib.h b/profiles/input/hog-lib.h
-index 2a9b899..415dc63 100644
---- a/profiles/input/hog-lib.h
-+++ b/profiles/input/hog-lib.h
-@@ -25,11 +25,11 @@ struct bt_hog;
- 
- struct bt_hog *bt_hog_new_default(const char *name, uint16_t vendor,
- 					uint16_t product, uint16_t version,
--					void *primary);
-+					struct gatt_db *db);
- 
- struct bt_hog *bt_hog_new(int fd, const char *name, uint16_t vendor,
- 					uint16_t product, uint16_t version,
--					void *primary);
-+					struct gatt_db *db);
- 
- struct bt_hog *bt_hog_ref(struct bt_hog *hog);
- void bt_hog_unref(struct bt_hog *hog);
-diff --git a/profiles/input/hog.c b/profiles/input/hog.c
-index 7d318cd..23c9c15 100644
---- a/profiles/input/hog.c
-+++ b/profiles/input/hog.c
-@@ -67,32 +67,34 @@ struct hog_device {
- static gboolean suspend_supported = FALSE;
- static struct queue *devices = NULL;
- 
--static struct hog_device *hog_device_new(struct btd_device *device,
--						struct gatt_primary *prim)
-+static void hog_device_accept(struct hog_device *dev, struct gatt_db *db)
- {
--	struct hog_device *dev;
- 	char name[248];
- 	uint16_t vendor, product, version;
- 
--	if (device_name_known(device))
--		device_get_name(device, name, sizeof(name));
-+	if (dev->hog)
-+		return;
 +
-+	if (device_name_known(dev->device))
-+		device_get_name(dev->device, name, sizeof(name));
- 	else
- 		strcpy(name, "bluez-hog-device");
- 
--	vendor = btd_device_get_vendor(device);
--	product = btd_device_get_product(device);
--	version = btd_device_get_version(device);
-+	vendor = btd_device_get_vendor(dev->device);
-+	product = btd_device_get_product(dev->device);
-+	version = btd_device_get_version(dev->device);
- 
- 	DBG("name=%s vendor=0x%X, product=0x%X, version=0x%X", name, vendor,
- 							product, version);
- 
--	dev = new0(struct hog_device, 1);
--	dev->hog = bt_hog_new_default(name, vendor, product, version, prim);
--	if (!dev->hog) {
--		free(dev);
--		return NULL;
--	}
-+	dev->hog = bt_hog_new_default(name, vendor, product, version, db);
++	midi_read_free(&midi);
++
++	tester_test_passed();
 +}
- 
-+static struct hog_device *hog_device_new(struct btd_device *device)
++
++static const snd_seq_event_t event3[] = {
++	CONTROL_EVENT(PITCHBEND, 8, 0, 0),    /* Pitch Bend */
++	CONTROL_EVENT(CONTROLLER, 8, 63, 74), /* Control Change */
++	NOTE_EVENT(NOTEON, 8, 62, 14),        /* Note On */
++	CONTROL_EVENT(CHANPRESS, 8, 113, 0),  /* Channel Aftertouch */
++	CONTROL_EVENT(CONTROLLER, 8, 67, 74), /* Control Change*/
++	CONTROL_EVENT(PITCHBEND, 8, -2, 0),   /* Pitch Bend */
++	CONTROL_EVENT(PITCHBEND, 8, -3, 0),   /* Pitch Bend */
++	CONTROL_EVENT(PITCHBEND, 8, -4, 0),   /* Pitch Bend */
++	NOTE_EVENT(NOTEOFF, 8, 62, 0),        /* Note Off */
++};
++
++static const struct midi_write_test midi3 = BLE_WRITE_TEST_INIT_BASIC(event3);
++
++static const uint8_t sysex4_1[] = {
++	0xf0, 0x01, 0x02, 0x03, 0xf7
++};
++
++static const uint8_t sysex4_2[] = {
++	0xf0, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
++	0x08, 0x09, 0x0a, 0xf7
++};
++
++static const uint8_t sysex4_3[] = {
++	0xf0, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
++	0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
++	0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17,
++	0x18, 0xf7
++};
++
++static const uint8_t sysex4_4[] = {
++	0xf0, 0x01, 0x02, 0x03, 0xf7
++};
++
++static const uint8_t sysex4_5[] = {
++	0xf0, 0x06, 0x07, 0x08, 0x09, 0x0a, 0xf7
++};
++
++static const snd_seq_event_t event4[] = {
++	SYSEX_EVENT(sysex4_1),
++	SYSEX_EVENT(sysex4_2),
++	SYSEX_EVENT(sysex4_3),
++	SYSEX_EVENT(sysex4_4),
++	SYSEX_EVENT(sysex4_5),
++};
++
++static const struct midi_write_test midi4 = BLE_WRITE_TEST_INIT_BASIC(event4);
++
++/* Sysex split in multiple events (256 bytes each),
++   it's common for ALSA to split big sysexes into 256 bytes events */
++static const uint8_t sysex5_1[] = {
++	0xf0, 0x1b, 0x46, 0x52, 0x68, 0x45, 0x19, 0x3d,
++	0x70, 0x3c, 0x2b, 0x41, 0x09, 0x09, 0x28, 0x2d,
++	0x66, 0x00, 0x4f, 0x06, 0x22, 0x30, 0x77, 0x0d,
++	0x5d, 0x0e, 0x30, 0x21, 0x64, 0x5f, 0x72, 0x3c,
++	0x31, 0x3a, 0x03, 0x37, 0x3f, 0x00, 0x66, 0x52,
++	0x61, 0x6d, 0x03, 0x1e, 0x24, 0x2d, 0x33, 0x20,
++	0x69, 0x17, 0x77, 0x36, 0x58, 0x53, 0x11, 0x25,
++	0x2f, 0x51, 0x70, 0x4f, 0x00, 0x73, 0x6c, 0x3e,
++	0x66, 0x62, 0x53, 0x20, 0x0e, 0x41, 0x0b, 0x0e,
++	0x22, 0x27, 0x37, 0x14, 0x75, 0x31, 0x6f, 0x4b,
++	0x3e, 0x4b, 0x55, 0x71, 0x33, 0x2d, 0x0d, 0x3e,
++	0x58, 0x74, 0x4c, 0x44, 0x42, 0x2d, 0x47, 0x15,
++	0x3c, 0x75, 0x5f, 0x10, 0x26, 0x54, 0x5a, 0x1e,
++	0x07, 0x5a, 0x4a, 0x55, 0x55, 0x31, 0x40, 0x5d,
++	0x7f, 0x25, 0x32, 0x0c, 0x74, 0x1a, 0x05, 0x22,
++	0x66, 0x33, 0x5d, 0x38, 0x70, 0x15, 0x77, 0x35,
++	0x52, 0x09, 0x3e, 0x63, 0x76, 0x37, 0x3c, 0x25,
++	0x4c, 0x5c, 0x1e, 0x7d, 0x47, 0x0f, 0x2d, 0x67,
++	0x6e, 0x68, 0x3c, 0x4e, 0x08, 0x6c, 0x16, 0x58,
++	0x3d, 0x47, 0x19, 0x6d, 0x56, 0x12, 0x57, 0x56,
++	0x5e, 0x2d, 0x0d, 0x0d, 0x43, 0x25, 0x75, 0x70,
++	0x6a, 0x59, 0x3a, 0x7a, 0x41, 0x54, 0x03, 0x17,
++	0x2d, 0x7a, 0x67, 0x06, 0x78, 0x53, 0x0f, 0x43,
++	0x53, 0x4c, 0x02, 0x42, 0x68, 0x59, 0x0f, 0x51,
++	0x74, 0x40, 0x1d, 0x64, 0x6f, 0x46, 0x3f, 0x77,
++	0x71, 0x56, 0x2a, 0x24, 0x17, 0x25, 0x7f, 0x1f,
++	0x60, 0x19, 0x1d, 0x75, 0x4e, 0x43, 0x3d, 0x0d,
++	0x0d, 0x2e, 0x53, 0x44, 0x6c, 0x73, 0x7c, 0x6a,
++	0x12, 0x02, 0x11, 0x38, 0x6c, 0x2b, 0x2c, 0x5d,
++	0x4a, 0x48, 0x70, 0x7d, 0x44, 0x20, 0x41, 0x1e,
++	0x15, 0x4c, 0x43, 0x33, 0x1b, 0x7e, 0x43, 0x2f,
++	0x60, 0x6a, 0x61, 0x71, 0x21, 0x12, 0x32, 0x77,
++	0x3c, 0x21, 0x7a, 0x5f, 0x58, 0x6c, 0x1f, 0x3a,
++	0x68, 0x1c, 0x5d, 0x57, 0x1b, 0x0d, 0x77, 0x01,
++	0x10, 0x31, 0x4a, 0x73, 0x03, 0x48, 0x18, 0x0a,
++	0x32, 0x69, 0x38, 0x3f, 0x4d, 0x1a, 0x6e, 0x2f,
++	0x30, 0x56, 0x4c, 0x66, 0x76, 0x16, 0x3c, 0x7a,
++	0x31, 0x42, 0x40, 0x5d, 0x05, 0x33, 0x46, 0x53,
++	0x5f, 0x2c, 0x4d, 0x0d, 0x39, 0x53, 0x20, 0x6e,
++	0x61, 0x58, 0x12, 0x38, 0x25, 0x56, 0x22, 0x5b,
++	0x27, 0x44, 0x27, 0x44, 0x59, 0x16, 0x77, 0x26,
++	0x53, 0x35, 0x6e, 0x05, 0x70, 0x0f, 0x31, 0x30,
++	0x23, 0x2c, 0x65, 0x16, 0x2d, 0x05, 0x3e, 0x22,
++	0x6d, 0x22, 0x44, 0x3d, 0x18, 0x05, 0x10, 0x25,
++	0x6b, 0x66, 0x69, 0x14, 0x63, 0x63, 0x1b, 0x04,
++	0x41, 0x34, 0x6c, 0x09, 0x37, 0x6a, 0x63, 0x2e,
++	0x70, 0x72, 0x44, 0x41, 0x33, 0x01, 0x05, 0x05,
++	0x0b, 0x2a, 0x1a, 0x71, 0x55, 0x7e, 0x6e, 0x59,
++	0x47, 0x7d, 0x2f, 0x44, 0x03, 0x52, 0x6e, 0x6b,
++	0x4e, 0x11, 0x60, 0x1e, 0x0a, 0x71, 0x3d, 0x54,
++	0x02, 0x1c, 0x73, 0x0b, 0x76, 0x32, 0x48, 0x66,
++	0x36, 0x47, 0x6f, 0x5b, 0x6b, 0x3b, 0x14, 0x47,
++	0x0c, 0x16, 0x6c, 0x27, 0x2a, 0x73, 0x17, 0x1d,
++	0x16, 0x60, 0x63, 0x7b, 0x1d, 0x4f, 0x61, 0x5b,
++	0x13, 0x20, 0x46, 0x0c, 0x71, 0x7d, 0x27, 0x43,
++	0x49, 0x48, 0x7f, 0x3e, 0x4b, 0x7b, 0x27, 0x7b,
++	0x73, 0x53, 0x57, 0x68, 0x05, 0x2a, 0x2f, 0x36,
++	0x3b, 0x31, 0x11, 0x4e, 0x4c, 0x13, 0x2e, 0x06,
++	0x06, 0x7c, 0x40, 0x37, 0x27, 0x0f, 0x01, 0x67,
++	0x06, 0x09, 0x4b, 0x17, 0x0f, 0x4e, 0x51, 0x44,
++	0x66, 0x6c, 0x70, 0x2a, 0x55, 0x62, 0x6d, 0x3b,
++	0x16, 0x1b, 0x79, 0x08, 0x08, 0x77, 0x4a, 0x17,
++	0x15, 0x47, 0x58, 0x5c, 0x5d, 0x3d, 0x12, 0x36,
++	0x48, 0x5e, 0x51, 0x19, 0x6e, 0x5f, 0x64, 0x3c,
++	0x62, 0x0b, 0x00, 0x15, 0x15, 0x2e, 0x4d, 0x5c,
++	0x1b, 0x0a, 0x51, 0x1b, 0x13, 0x68, 0x14, 0x28,
++	0x26, 0x69, 0x27, 0x52, 0x13, 0x1e, 0x19, 0x31,
++	0x42, 0x0e, 0x3a, 0x29, 0x07, 0x41, 0x27, 0x40,
++	0x4e, 0x68, 0x68, 0x78, 0x64, 0x36, 0x52, 0x7a,
++	0x07, 0x6e, 0x46, 0x63, 0x4a, 0x6c, 0x5b, 0x4c,
++	0x74, 0x14, 0x14, 0x76, 0x15, 0x2d, 0x79, 0x10,
++	0x65, 0x48, 0x60, 0x6a, 0x1c, 0x65, 0x74, 0x73,
++	0x56, 0x3c, 0x4b, 0x34, 0x20, 0x24, 0x36, 0x0d,
++	0x3c, 0x59, 0x0f, 0x46, 0x47, 0x4a, 0x53, 0x62,
++	0x63, 0x44, 0x22, 0x39, 0x15, 0x68, 0x60, 0x7b,
++	0x73, 0x0f, 0x34, 0x79, 0x6a, 0x76, 0x4e, 0x0f,
++	0x02, 0x5d, 0x09, 0x73, 0x76, 0x18, 0x48, 0x4f,
++	0x72, 0x19, 0x71, 0x3c, 0x6e, 0x0b, 0x3b, 0x45,
++	0x1c, 0x3e, 0x1b, 0x46, 0x74, 0x03, 0x5d, 0x0a,
++	0x01, 0x62, 0x04, 0x2f, 0x6f, 0x03, 0x4c, 0x36,
++	0x5f, 0x6a, 0x0c, 0x79, 0x34, 0x4f, 0x42, 0x6c,
++	0x66, 0x21, 0x26, 0x21, 0x4a, 0x0e, 0x3e, 0x73,
++	0x45, 0x43, 0x5e, 0x2a, 0x63, 0x32, 0x0b, 0x66,
++	0x09, 0x46, 0x15, 0x46, 0x1c, 0x46, 0x10, 0x5b,
++	0x09, 0x75, 0x67, 0x7f, 0x51, 0x6d, 0x12, 0x65,
++	0x0d, 0x52, 0x06, 0x28, 0x61, 0x0f, 0x4e, 0x51,
++	0x61, 0x75, 0x1f, 0x26, 0x31, 0x66, 0x34, 0x67,
++	0x5d, 0x59, 0x2e, 0x18, 0x40, 0x63, 0x16, 0x12,
++	0x49, 0x60, 0x1c, 0x62, 0x30, 0x21, 0x5c, 0x69,
++	0x2c, 0x29, 0x1c, 0x3b, 0x3d, 0x13, 0x49, 0x4d,
++	0x1f, 0x5f, 0x1d, 0x0a, 0x54, 0x1e, 0x52, 0x27,
++	0x79, 0x79, 0x31, 0x03, 0x67, 0x02, 0x6a, 0x63,
++	0x36, 0x5d, 0x38, 0x48, 0x1b, 0x4e, 0x5b, 0x63,
++	0x7b, 0x7b, 0x4e, 0x71, 0x45, 0x37, 0x34, 0x44,
++	0x03, 0x51, 0x31, 0x23, 0x0b, 0x18, 0x6d, 0x7f,
++	0x76, 0x21, 0x17, 0x27, 0x45, 0x09, 0x0c, 0x2e,
++	0x69, 0x74, 0x59, 0x2b, 0x75, 0x0c, 0x34, 0x0a,
++	0x3a, 0x27, 0x25, 0x7b, 0x45, 0x0d, 0x59, 0x2f,
++	0x2b, 0x57, 0x7e, 0x1f, 0x05, 0x62, 0x28, 0x79,
++	0x7e, 0x1d, 0x58, 0x30, 0x35, 0x06, 0x67, 0x5b,
++	0x7a, 0x00, 0x34, 0x32, 0x33, 0x2f, 0x68, 0x4b,
++	0x76, 0x38, 0x7e, 0x58, 0x50, 0x56, 0x6d, 0x1f,
++	0x14, 0x6f, 0x77, 0x39, 0x71, 0x35, 0x08, 0x44,
++	0x3b, 0x09, 0x16, 0x19, 0x13, 0x1c, 0x67, 0x7d,
++	0x7f, 0x56, 0x7e, 0x31, 0x6b, 0x67, 0x44, 0x76,
++	0x53, 0x55, 0x6d, 0x3d, 0x13, 0x3b, 0x37, 0x1c,
++	0x0b, 0x21, 0x58, 0x03, 0x31, 0x2d, 0x3d, 0x6c,
++	0x01, 0x6d, 0x08, 0x1d, 0x03, 0x4d, 0x6e, 0x63,
++	0x4c, 0x21, 0x2c, 0x57, 0x48, 0x07, 0x52, 0x2a,
++	0x6d, 0x64, 0x0d, 0x56, 0x7e, 0x08, 0x3c, 0x1b,
++	0x28, 0x04, 0x0f, 0x58, 0x0d, 0x6a, 0x73, 0x70,
++	0x28, 0x0c, 0x6e, 0x1e, 0x09, 0x39, 0x46, 0x3e,
++	0x62, 0x08, 0x72, 0x52, 0x42, 0x02, 0x78, 0x62,
++	0x31, 0x73, 0x0d, 0x4d, 0x5c, 0x07, 0x64, 0x17,
++	0x55, 0x29, 0x60, 0x07, 0x67, 0x59, 0x63, 0x78,
++	0x73, 0x17, 0x42, 0x27, 0x0e, 0x77, 0x15, 0x60,
++	0x07, 0x46, 0x53, 0x6a, 0x05, 0x38, 0x12, 0x14,
++	0x1f, 0x1b, 0x11, 0x6a, 0x1d, 0x02, 0x3c, 0x05,
++	0x75, 0x6d, 0x51, 0x16, 0x10, 0x6f, 0x02, 0x46,
++	0x39, 0x2e, 0x37, 0x47, 0x7a, 0x5b, 0x39, 0x15,
++	0x14, 0x4b, 0x77, 0x0b, 0x19, 0x24, 0x4d, 0x36,
++	0x33, 0x4c, 0x6a, 0x53, 0x79, 0x69, 0x57, 0x17,
++	0x10, 0x75, 0x1f, 0x72, 0x08, 0x71, 0x58, 0x14,
++	0x46, 0x4a, 0x6f, 0x3c, 0x30, 0x34, 0x5b, 0x36,
++	0x42, 0x13, 0x11, 0x45, 0x78, 0x5a, 0x57, 0x68,
++	0x33, 0x4b, 0x21, 0x00, 0x06, 0x6b, 0x3d, 0x17,
++	0x0e, 0x6a, 0x2b, 0x2a, 0x32, 0x3a, 0x2a, 0x46,
++	0x79, 0x1f, 0x56, 0x40, 0x43, 0x36, 0x18, 0xf7,
++};
++
++static const snd_seq_event_t event5[] = {
++	/* SysEx over 4 events */
++	SYSEX_EVENT_RAW(sysex5_1, 256, 0),
++	SYSEX_EVENT_RAW(sysex5_1, 256, 256),
++	SYSEX_EVENT_RAW(sysex5_1, 256, 512),
++	SYSEX_EVENT_RAW(sysex5_1, 256, 768),
++};
++
++static const snd_seq_event_t event5_expect[] = {
++	SYSEX_EVENT(sysex5_1),
++};
++
++static const struct midi_write_test midi5 = BLE_WRITE_TEST_INIT(event5, event5_expect);
++
++static void test_midi_writer(gconstpointer data)
 +{
-+	struct hog_device *dev;
++	const struct midi_write_test *midi_test = data;
++	struct midi_write_parser midi_out;
++	struct midi_read_parser midi_in;
++	size_t i; /* event counter */
++	size_t j; /* test counter */
++	struct midi_data {
++		size_t events_tested;
++		const struct midi_write_test *midi_test;
++		struct midi_read_parser *midi_in;
++	} midi_data;
 +
-+	dev = new0(struct hog_device, 1);
- 	dev->device = btd_device_ref(device);
- 
- 	if (!devices)
-@@ -148,30 +150,16 @@ static int hog_probe(struct btd_service *service)
- {
- 	struct btd_device *device = btd_service_get_device(service);
- 	const char *path = device_get_path(device);
--	GSList *primaries, *l;
-+	struct hog_device *dev;
- 
- 	DBG("path %s", path);
- 
--	primaries = btd_device_get_primaries(device);
--	if (primaries == NULL)
-+	dev = hog_device_new(device);
-+	if (!dev)
- 		return -EINVAL;
- 
--	for (l = primaries; l; l = g_slist_next(l)) {
--		struct gatt_primary *prim = l->data;
--		struct hog_device *dev;
--
--		if (strcmp(prim->uuid, HOG_UUID) != 0)
--			continue;
--
--		dev = hog_device_new(device, prim);
--		if (!dev)
--			break;
--
--		btd_service_set_user_data(service, dev);
--		return 0;
--	}
--
--	return -EINVAL;
-+	btd_service_set_user_data(service, dev);
-+	return 0;
- }
- 
- static void hog_remove(struct btd_service *service)
-@@ -189,8 +177,15 @@ static int hog_accept(struct btd_service *service)
- {
- 	struct hog_device *dev = btd_service_get_user_data(service);
- 	struct btd_device *device = btd_service_get_device(service);
-+	struct gatt_db *db = btd_device_get_gatt_db(device);
- 	GAttrib *attrib = btd_device_get_attrib(device);
- 
-+	if (!dev->hog) {
-+		hog_device_accept(dev, db);
-+		if (!dev->hog)
-+			return -EINVAL;
++	void compare_events_cb(const uint8_t *data, size_t size, void *user_data) {
++		struct midi_data *midi_data = user_data;
++		const struct midi_write_test *midi_test = midi_data->midi_test;
++		struct midi_read_parser *midi_in = midi_data->midi_in;
++		size_t i = 0;
++
++		midi_read_reset(midi_in);
++
++		while (i < size) {
++			snd_seq_event_t ev;
++			size_t count;
++
++			snd_seq_ev_clear(&ev);
++
++			count = midi_read_raw(midi_in, data + i,
++			                      size - i, &ev);
++
++			g_assert_cmpuint(count, >, 0);
++
++			if (ev.type != SND_SEQ_EVENT_NONE){
++				g_assert_cmpint(midi_data->events_tested,
++				                <,
++				                midi_test->event_size);
++				if (midi_test->event_expect)
++					compare_events(&midi_test->event_expect[midi_data->events_tested],
++					               &ev);
++				else
++					compare_events(&midi_test->event[midi_data->events_tested],
++					               &ev);
++				midi_data->events_tested++;
++			}
++
++			i += count;
++		}
++	};
++
++	midi_read_init(&midi_in);
++
++	for (j = 0; j < NUM_WRITE_TESTS; j++) {
++
++		/* Range of test for different MTU sizes. The spec specifies
++		   sizes of packet as MTU - 3 */
++		midi_write_init(&midi_out, g_random_int_range(5, 512));
++
++		midi_data.events_tested = 0;
++		midi_data.midi_test = midi_test;
++		midi_data.midi_in = &midi_in;
++
++		for (i = 0; i < midi_test->event_size; i++)
++			midi_read_ev(&midi_out, &midi_test->event[i],
++			             compare_events_cb, &midi_data);
++
++		if (midi_write_has_data(&midi_out))
++			compare_events_cb(midi_write_data(&midi_out),
++			                  midi_write_data_size(&midi_out),
++			                  &midi_data);
++
++		midi_write_free(&midi_out);
 +	}
++	midi_read_free(&midi_in);
 +
- 	/* TODO: Replace GAttrib with bt_gatt_client */
- 	bt_hog_attach(dev->hog, attrib);
- 
-diff --git a/unit/test-hog.c b/unit/test-hog.c
-index 9f026e5..d117968 100644
---- a/unit/test-hog.c
-+++ b/unit/test-hog.c
-@@ -32,8 +32,14 @@
- 
- #include <glib.h>
- 
-+#include "lib/bluetooth.h"
-+#include "lib/uuid.h"
++	tester_test_passed();
++}
 +
- #include "src/shared/util.h"
- #include "src/shared/tester.h"
-+#include "src/shared/queue.h"
-+#include "src/shared/att.h"
-+#include "src/shared/gatt-db.h"
- 
- #include "attrib/gattrib.h"
- 
++int main(int argc, char *argv[])
++{
++	tester_init(&argc, &argv);
++
++	tester_add("Raw BLE packets read",
++	           &midi1, NULL, test_midi_reader, NULL);
++	tester_add("Raw BLE packets SysEx read",
++	           &midi2, NULL, test_midi_reader, NULL);
++	tester_add("ALSA Seq events to Raw BLE packets",
++	           &midi3, NULL, test_midi_writer, NULL);
++	tester_add("ALSA SysEx events to Raw BLE packets",
++	           &midi4, NULL, test_midi_writer, NULL);
++	tester_add("Split ALSA SysEx events to Raw BLE packets",
++	           &midi5, NULL, test_midi_writer, NULL);
++
++	return tester_run();
++}
 -- 
-2.9.3
+2.10.2
 
