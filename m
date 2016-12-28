@@ -1,40 +1,57 @@
-Return-Path: <colin.king@canonical.com>
-From: Colin King <colin.king@canonical.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
-Subject: [PATCH] Bluetooth: fix spelling mistake: "advetising" -> "advertising"
-Date: Wed, 28 Dec 2016 21:17:54 +0000
-Message-Id: <20161228211754.6714-1-colin.king@canonical.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Message-ID: <1482942317.2308.5.camel@hadess.net>
+Subject: Re: [PATCH 3/3] sixaxis: Set created devices trusted by default
+From: Bastien Nocera <hadess@hadess.net>
+To: Szymon Janc <szymon.janc@codecoup.pl>,
+        Juha Kuikka <juha.kuikka@synapse.com>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Wed, 28 Dec 2016 17:25:17 +0100
+In-Reply-To: <148295789.8zPOI8aDb3@ix>
+References: <1482384054-59718-1-git-send-email-juha.kuikka@synapse.com>
+         <1482384054-59718-4-git-send-email-juha.kuikka@synapse.com>
+         <148295789.8zPOI8aDb3@ix>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Colin Ian King <colin.king@canonical.com>
+On Wed, 2016-12-28 at 17:07 +0100, Szymon Janc wrote:
+> Hi Juha,
+> 
+> On Wednesday, 21 December 2016 21:20:54 CET Juha Kuikka wrote:
+> > If user has enabled the sixaxis plugin and plugs a controller in,
+> > it can be assumed they also want the controllers to be able to
+> > connect
+> > automatically.
+> > ---
+> >  plugins/sixaxis.c | 1 +
+> >  1 file changed, 1 insertion(+)
+> > 
+> > diff --git a/plugins/sixaxis.c b/plugins/sixaxis.c
+> > index 1fb2091..ba96b54 100644
+> > --- a/plugins/sixaxis.c
+> > +++ b/plugins/sixaxis.c
+> > @@ -349,6 +349,7 @@ static bool setup_device(int fd, int index,
+> > struct
+> > btd_adapter *adapter) btd_device_set_pnpid(device,
+> > devices[index].source,
+> > devices[index].vid, devices[index].pid, devices[index].version);
+> >  	btd_device_set_temporary(device, false);
+> > +	btd_device_set_trusted(device, true);
+> > 
+> >  	return true;
+> >  }
+> 
+> This was already NACKed in the past for security reasons (mostly due
+> to 
+> possibility of fake device being trusted).
 
-trivial fix to spelling mistake in BT_ERR_RATELIMITED error message
+Juha, you could take a look at a way of getting this cleaned up and
+merged:
+https://www.spinics.net/lists/linux-bluetooth/msg62970.html
+https://www.spinics.net/lists/linux-bluetooth/msg62967.html
 
-Signed-off-by: Colin Ian King <colin.king@canonical.com>
----
- net/bluetooth/hci_event.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+I couldn't get a straight answer about the patch, as the developers
+themselves seemed to disagree on how to solve the problem.
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index e17aacb..0b4dba0 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -4749,7 +4749,7 @@ static void process_adv_report(struct hci_dev *hdev, u8 type, bdaddr_t *bdaddr,
- 	case LE_ADV_SCAN_RSP:
- 		break;
- 	default:
--		BT_ERR_RATELIMITED("Unknown advetising packet type: 0x%02x",
-+		BT_ERR_RATELIMITED("Unknown advertising packet type: 0x%02x",
- 				   type);
- 		return;
- 	}
--- 
-2.10.2
+Cheers
