@@ -1,32 +1,38 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Juha Kuikka <juha.kuikka@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: juha.kuikka@synapse.com, juha.kuikka@gmail.com,
-        frank.praznik@gmail.com, roderick.colenbrander@sony.com
-Subject: [PATCH v2 0/4] BlueZ: Add support for pairing the DS4 controller over USB
-Date: Wed, 28 Dec 2016 16:32:39 -0800
-Message-Id: <1482971563-15745-1-git-send-email-juha.kuikka@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <colin.king@canonical.com>
+From: Colin King <colin.king@canonical.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] Bluetooth: btmrvl: fix spelling mistake: "caibration" -> "calibration"
+Date: Wed, 28 Dec 2016 21:30:30 +0000
+Message-Id: <20161228213030.6981-1-colin.king@canonical.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch set first refactors the sixaxis plugin to more easily support
-multiple controllers with different protocols.
+From: Colin Ian King <colin.king@canonical.com>
 
-Secondly support for pairing the Dualshock 4 controller over USB is added.
+trivial fix to spelling mistake in BT_ERR error message
 
-Last, the PID of the new DS4 controller is added into the input device special
-case handler which allows this controller to be used.
+Signed-off-by: Colin Ian King <colin.king@canonical.com>
+---
+ drivers/bluetooth/btmrvl_main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Juha Kuikka (4):
-  sixaxis: Re-organize functions for refactoring
-  sixaxis: Refactor to add device-specific functions
-  sixaxis: Add support for pairing DS4 over USB
-  Add new DS4 controller PID into special case handler
-
- plugins/sixaxis.c       | 293 ++++++++++++++++++++++++++++++++----------------
- profiles/input/server.c |   6 +-
- 2 files changed, 202 insertions(+), 97 deletions(-)
-
+diff --git a/drivers/bluetooth/btmrvl_main.c b/drivers/bluetooth/btmrvl_main.c
+index e6a85f0..c38cb5b 100644
+--- a/drivers/bluetooth/btmrvl_main.c
++++ b/drivers/bluetooth/btmrvl_main.c
+@@ -502,7 +502,7 @@ static int btmrvl_download_cal_data(struct btmrvl_private *priv,
+ 	ret = btmrvl_send_sync_cmd(priv, BT_CMD_LOAD_CONFIG_DATA, data,
+ 				   BT_CAL_HDR_LEN + len);
+ 	if (ret)
+-		BT_ERR("Failed to download caibration data");
++		BT_ERR("Failed to download calibration data");
+ 
+ 	return 0;
+ }
 -- 
-2.7.4
-
+2.10.2
