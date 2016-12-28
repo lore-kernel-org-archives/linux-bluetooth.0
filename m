@@ -1,46 +1,52 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Szymon Janc <szymon.janc@codecoup.pl>
-To: Juha Kuikka <juha.kuikka@synapse.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/3] Add new DS4 controller PID into special case handler
-Date: Wed, 28 Dec 2016 17:06:21 +0100
-Message-ID: <2506634.F5JXQNkpjV@ix>
-In-Reply-To: <1482384054-59718-2-git-send-email-juha.kuikka@synapse.com>
-References: <1482384054-59718-1-git-send-email-juha.kuikka@synapse.com> <1482384054-59718-2-git-send-email-juha.kuikka@synapse.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+In-Reply-To: <1482402965-9462-1-git-send-email-maxime.chevallier@smile.fr>
+References: <1482402965-9462-1-git-send-email-maxime.chevallier@smile.fr>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Wed, 28 Dec 2016 11:14:22 +0200
+Message-ID: <CABBYNZKr=3ssvbypvP71kH5UzDfyLKzcgrW=P7sZXTSsgNPPHQ@mail.gmail.com>
+Subject: Re: [PATCH 1/2] tools/btgatt-client: Fix set-security interactive command
+To: Maxime Chevallier <maxime.chevallier@smile.fr>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Juha,
+Hi Maxime,
 
-On Wednesday, 21 December 2016 21:20:52 CET Juha Kuikka wrote:
-> There is a special path for various game controllers where they connect
-> to the hid service before bluetoothd knows what they are.
-> 
-> This patch adds another PID for the Dualshock4 controller.
+On Thu, Dec 22, 2016 at 12:36 PM, Maxime Chevallier
+<maxime.chevallier@smile.fr> wrote:
+> Fix the interactive "set-security" command in btgatt-client, that would
+> always fail due to bad initialization of argv buffer :
+>
+> [GATT client]# set-security 2
+> Usage: set_security <level>
+> level: 1-3
+> e.g.:
+>         set-sec-level 2
 > ---
->  profiles/input/server.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/profiles/input/server.c b/profiles/input/server.c
-> index eb3fcf8..61f084a 100644
-> --- a/profiles/input/server.c
-> +++ b/profiles/input/server.c
-> @@ -136,7 +136,7 @@ static bool dev_is_sixaxis(const bdaddr_t *src, const
-> bdaddr_t *dst) return true;
-> 
->  	/* DualShock 4 */
-> -	if (vid == 0x054c && pid == 0x05c4)
-> +	if (vid == 0x054c && (pid == 0x05c4 || pid == 0x09cc))
->  		return true;
+>  tools/btgatt-client.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+>
+> diff --git a/tools/btgatt-client.c b/tools/btgatt-client.c
+> index 40a03b1..afe00aa 100644
+> --- a/tools/btgatt-client.c
+> +++ b/tools/btgatt-client.c
+> @@ -1198,8 +1198,7 @@ static void set_security_usage(void)
+>
+>  static void cmd_set_security(struct client *cli, char *cmd_str)
+>  {
+> -       char *argvbuf[1];
+> -       char **argv = argvbuf;
+> +       char *argv[2];
+>         int argc = 0;
+>         char *endptr = NULL;
+>         int level;
+> --
+> 2.1.4
 
-Is this ID for new DS4 sold with PS4 pro? if so please add a comment.
-
-> 
->  	/* Navigation Controller */
+Applied, thanks.
 
 
 -- 
-pozdrawiam
-Szymon Janc
+Luiz Augusto von Dentz
