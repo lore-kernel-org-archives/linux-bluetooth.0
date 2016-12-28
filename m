@@ -2,11 +2,11 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Szymon Janc <szymon.janc@codecoup.pl>
 To: Juha Kuikka <juha.kuikka@synapse.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 3/3] sixaxis: Set created devices trusted by default
-Date: Wed, 28 Dec 2016 17:07:12 +0100
-Message-ID: <148295789.8zPOI8aDb3@ix>
-In-Reply-To: <1482384054-59718-4-git-send-email-juha.kuikka@synapse.com>
-References: <1482384054-59718-1-git-send-email-juha.kuikka@synapse.com> <1482384054-59718-4-git-send-email-juha.kuikka@synapse.com>
+Subject: Re: [PATCH 1/3] Add new DS4 controller PID into special case handler
+Date: Wed, 28 Dec 2016 17:06:21 +0100
+Message-ID: <2506634.F5JXQNkpjV@ix>
+In-Reply-To: <1482384054-59718-2-git-send-email-juha.kuikka@synapse.com>
+References: <1482384054-59718-1-git-send-email-juha.kuikka@synapse.com> <1482384054-59718-2-git-send-email-juha.kuikka@synapse.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -14,29 +14,31 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Juha,
 
-On Wednesday, 21 December 2016 21:20:54 CET Juha Kuikka wrote:
-> If user has enabled the sixaxis plugin and plugs a controller in,
-> it can be assumed they also want the controllers to be able to connect
-> automatically.
+On Wednesday, 21 December 2016 21:20:52 CET Juha Kuikka wrote:
+> There is a special path for various game controllers where they connect
+> to the hid service before bluetoothd knows what they are.
+> 
+> This patch adds another PID for the Dualshock4 controller.
 > ---
->  plugins/sixaxis.c | 1 +
->  1 file changed, 1 insertion(+)
+>  profiles/input/server.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/plugins/sixaxis.c b/plugins/sixaxis.c
-> index 1fb2091..ba96b54 100644
-> --- a/plugins/sixaxis.c
-> +++ b/plugins/sixaxis.c
-> @@ -349,6 +349,7 @@ static bool setup_device(int fd, int index, struct
-> btd_adapter *adapter) btd_device_set_pnpid(device, devices[index].source,
-> devices[index].vid, devices[index].pid, devices[index].version);
->  	btd_device_set_temporary(device, false);
-> +	btd_device_set_trusted(device, true);
+> diff --git a/profiles/input/server.c b/profiles/input/server.c
+> index eb3fcf8..61f084a 100644
+> --- a/profiles/input/server.c
+> +++ b/profiles/input/server.c
+> @@ -136,7 +136,7 @@ static bool dev_is_sixaxis(const bdaddr_t *src, const
+> bdaddr_t *dst) return true;
 > 
->  	return true;
->  }
+>  	/* DualShock 4 */
+> -	if (vid == 0x054c && pid == 0x05c4)
+> +	if (vid == 0x054c && (pid == 0x05c4 || pid == 0x09cc))
+>  		return true;
 
-This was already NACKed in the past for security reasons (mostly due to 
-possibility of fake device being trusted).
+Is this ID for new DS4 sold with PS4 pro? if so please add a comment.
+
+> 
+>  	/* Navigation Controller */
 
 
 -- 
