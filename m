@@ -1,85 +1,71 @@
-Return-Path: <ezequiel@vanguardiasur.com.ar>
-From: Ezequiel Garcia <ezequiel@vanguardiasur.com.ar>
-To: linux-bluetooth@vger.kernel.org
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Ezequiel Garcia <ezequiel@vanguardiasur.com.ar>
-Subject: [PATCH] Bluetooth: Fix NULL pointer dereference in bt_sock_recvmsg
-Date: Thu, 29 Dec 2016 09:51:19 -0300
-Message-Id: <20161229125119.8985-1-ezequiel@vanguardiasur.com.ar>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Message-ID: <1483012139.2308.9.camel@hadess.net>
+Subject: Re: [PATCH v2 4/4] Add new DS4 controller PID into special case
+ handler
+From: Bastien Nocera <hadess@hadess.net>
+To: Juha Kuikka <juha.kuikka@gmail.com>,
+        linux-bluetooth@vger.kernel.org
+Cc: juha.kuikka@synapse.com, frank.praznik@gmail.com,
+        roderick.colenbrander@sony.com
+Date: Thu, 29 Dec 2016 12:48:59 +0100
+In-Reply-To: <1482971563-15745-5-git-send-email-juha.kuikka@gmail.com>
+References: <1482971563-15745-1-git-send-email-juha.kuikka@gmail.com>
+         <1482971563-15745-5-git-send-email-juha.kuikka@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-As per the comment in include/linux/net.h, the recvfrom handlers
-should expect msg_name to be NULL. However, bt_sock_recvmsg()
-is currently not checking it, which could lead to a NULL pointer
-dereference.
+On Wed, 2016-12-28 at 16:32 -0800, Juha Kuikka wrote:
+> There is a special path for various game controllers where they
+> connect
+> to the hid service before bluetoothd knows what they are.
+> 
+> This patch adds another PID for the Dualshock4 controller. This new
+> PID
+> matches with the model number CUH-ZCT2U.
+> ---
+>  profiles/input/server.c | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
+> 
+> diff --git a/profiles/input/server.c b/profiles/input/server.c
+> index eb3fcf8..3576f2b 100644
+> --- a/profiles/input/server.c
+> +++ b/profiles/input/server.c
+> @@ -135,8 +135,10 @@ static bool dev_is_sixaxis(const bdaddr_t *src,
+> const bdaddr_t *dst)
+>  	if (vid == 0x054c && pid == 0x0268)
+>  		return true;
+>  
+> -	/* DualShock 4 */
+> -	if (vid == 0x054c && pid == 0x05c4)
+> +	/* DualShock 4 CUH-ZCT1U (PID 0x05c4)
+> +	 * DualShock 4 CUH-ZCT2U (PID 0x09cc) (slim/pro)
+> +	 */
+> +	if (vid == 0x054c && (pid == 0x05c4 || pid == 0x09cc))
+>  		return true;
+>  
+>  	/* Navigation Controller */
 
-The following NULL pointer dereference was produced while testing
-L2CAP datagram reception. Note that the kernel is tainted due to
-the r8723bs module being inserted. However, it seems the fix still
-applies.
+Might be nice to have the struct you currently have in the sixaxis
+plugin in a shared header, so we don't need to open code this function.
+For example:
 
-$ l2test -r -G
-l2test[326]: Receiving ...
-Unable to handle kernel NULL pointer dereference at virtual address 00000000
-pgd = ee008000
-[00000000] *pgd=7f896835
-Internal error: Oops: 817 [#1] PREEMPT SMP ARM
-Modules linked in: r8723bs(O)
-CPU: 0 PID: 326 Comm: l2test Tainted: G           O 4.8.0 #1
-Hardware name: Allwinner sun7i (A20) Family
-task: ef1c6880 task.stack: eea70000
-PC is at __memzero+0x58/0x80
-LR is at l2cap_skb_msg_name+0x1c/0x4c
-pc : [<c02c47d8>]    lr : [<c0506278>]    psr: 00070013
-sp : eea71e60  ip : 00000000  fp : 00034e1c
-r10: 00000000  r9 : 00000000  r8 : eea71ed4
-r7 : 000002a0  r6 : eea71ed8  r5 : 00000000  r4 : ee4a5d80
-r3 : 00000000  r2 : 00000000  r1 : 0000000e  r0 : 00000000
-Flags: nzcv  IRQs on  FIQs on  Mode SVC_32  ISA ARM Segment none
-Control: 10c5387d  Table: 7600806a  DAC: 00000051
-Process l2test (pid: 326, stack limit = 0xeea70210)
-Stack: (0xeea71e60 to 0xeea72000)
-1e60: ee4a5d80 eeac2800 000002a0 c04d7114 173eefa0 00000000 c06ca68e 00000000
-1e80: 00000001 eeac2800 eef23500 00000000 000002a0 eea71ed4 eea70000 c0504d50
-1ea0: 00000000 00000000 eef23500 00000000 00000000 c044e8a0 eea71edc eea9f904
-1ec0: bef89aa0 fffffff7 00000000 00035008 000002a0 00000000 00000000 00000000
-1ee0: 00000000 00000000 eea71ed4 00000000 00000000 00000000 00004000 00000000
-1f00: 0000011b c01078c4 eea70000 c044e5e4 00000000 00000000 642f0001 6c2f7665
-1f20: 0000676f 00000000 00000000 00000000 00000000 00000000 00000000 00000000
-1f40: 00000000 00000000 00000000 00000000 00000000 ffffffff 00000001 bef89ad8
-1f60: 000000a8 c01078c4 eea70000 00000000 00034e1c c01e6c74 00000000 00000000
-1f80: 00034e1c 000341f8 00000000 00000123 c01078c4 c044e90c 00000000 00000000
-1fa0: 000002a0 c0107700 00034e1c 000341f8 00000003 00035008 000002a0 00000000
-1fc0: 00034e1c 000341f8 00000000 00000123 00000000 00000000 00011ffc 00034e1c
-1fe0: 00000000 bef89aa4 0001211c b6eebb60 60070010 00000003 00000000 00000000
-[<c02c47d8>] (__memzero) from [<c0506278>] (l2cap_skb_msg_name+0x1c/0x4c)
-[<c0506278>] (l2cap_skb_msg_name) from [<c04d7114>] (bt_sock_recvmsg+0x128/0x160)
-[<c04d7114>] (bt_sock_recvmsg) from [<c0504d50>] (l2cap_sock_recvmsg+0x98/0x134)
-[<c0504d50>] (l2cap_sock_recvmsg) from [<c044e8a0>] (SyS_recvfrom+0x94/0xec)
-[<c044e8a0>] (SyS_recvfrom) from [<c044e90c>] (SyS_recv+0x14/0x1c)
-[<c044e90c>] (SyS_recv) from [<c0107700>] (ret_fast_syscall+0x0/0x3c)
-Code: e3110010 18a0500c e49de004 e3110008 (18a0000c)
----[ end trace 224e35e79fe06b42 ]---
+typedef enum {
+  CABLE_PAIRING_SIXAXIS,
+  CABLE_PAIRING_DS4
+} CablePairingType;
 
-Signed-off-by: Ezequiel Garcia <ezequiel@vanguardiasur.com.ar>
----
- net/bluetooth/af_bluetooth.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+static struct {
+  int vid;
+  int pid;
+  CablePairingType type;
+} cable_pairing_devices[] = {
+  ...
+};
 
-diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
-index 1aff2da9bc74..cfb2faba46de 100644
---- a/net/bluetooth/af_bluetooth.c
-+++ b/net/bluetooth/af_bluetooth.c
-@@ -245,7 +245,7 @@ int bt_sock_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
- 	if (err == 0) {
- 		sock_recv_ts_and_drops(msg, sk, skb);
- 
--		if (bt_sk(sk)->skb_msg_name)
-+		if (msg->msg_name && bt_sk(sk)->skb_msg_name)
- 			bt_sk(sk)->skb_msg_name(skb, msg->msg_name,
- 						&msg->msg_namelen);
- 	}
--- 
-2.11.0
+The sixaxis plugin would know which functions to use from the type, the
+input/server.c code would loop over the array to see whether it's a
+cable pairing.
+
+Looks fine otherwise.
