@@ -1,137 +1,44 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Message-ID: <1478019507.1676.23.camel@gmail.com>
-Subject: Re: [PATCHv2 3/3] serial: 8250_dw: Add quirk for APM X-Gene SoC
- (was: BT / serial regression introduced during the recent 4.9-rc1 merge?)
-From: =?ISO-8859-1?Q?J=E9r=F4me?= de Bretagne
-        <jerome.debretagne@gmail.com>
-To: Heikki Krogerus <heikki.krogerus@linux.intel.com>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "Rafael J. Wysocki" <rjw@rjwysocki.net>
-Cc: Kefeng Wang <wangkefeng.wang@huawei.com>, Feng Kan <fkan@apm.com>,
-        linux-serial@vger.kernel.org, linux-acpi@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org
-Date: Tue, 01 Nov 2016 17:58:27 +0100
-In-Reply-To: <1476815643.1658.3.camel@gmail.com>
-References: <1476815643.1658.3.camel@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+To: linux-bluetooth@vger.kernel.org
+From: Nathan Shearer <mail@nathanshearer.ca>
+Subject: Unable to Pair Bose QC35 with Bluez 5.43 or Bluez 5.39
+Message-ID: <45893082-1bae-cfce-5210-38cadd8cb993@nathanshearer.ca>
+Date: Fri, 30 Dec 2016 16:04:38 -0700
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Heikki, Andy, Greg, Rafael,
+Hello,
 
-I've detected a regression on my Lenovo ThinkPad 8 tablet introduced during
-4.9-rc1, preventing the built-in Bluetooth Broadcom chipset from properly
-initializing, with many timeout messages in dmesg like these:
-   "serial8250_interrupt: WXYZ callbacks suppressed"
-   "serial8250: too much work for irq39"
-cf. my earlier report on linux-bluetooth at the very end for reference.
+I have been using my Bose QC35 headphones with my Gentoo computers for a
+long time now. Recently I updated my computer and am now unable to pair
+my headphones.
 
+Before, when they worked, I had to follow the process at
+http://unix.stackexchange.com/questions/292189/pairing-bose-qc-35-over-bluetooth-on-fedora
+which was to change the ControllerMode from dual to bredr, pair, then
+change it back to dual.
 
-After a long git bisect, I've found the commit that's triggering the issue:
+However now when I follow that process, I am unable to pair at all in
+any ControllerMode (dual, bredr, or le). When I try to pair with
+bluetoothctl as root I get this error message:
 
-commit 20a875e2e86e73d13ec256781a7d55a7885868ec
-Author: Heikki Krogerus <heikki.krogerus@xxxxxxxxxxxxxxx>
-Date:   Tue Aug 23 11:33:28 2016 +0300
+[bluetooth]# pair 08:DF:1F:E3:46:93
+Attempting to pair with 08:DF:1F:E3:46:93
+[CHG] Device 08:DF:1F:E3:46:93 Connected: yes
+[CHG] Device 08:DF:1F:E3:46:93 Paired: yes
+Pairing successful
+[CHG] Device 08:DF:1F:E3:46:93 Connected: no
+[bluetooth]# connect 08:DF:1F:E3:46:93
+Attempting to connect to 08:DF:1F:E3:46:93
+Failed to connect: org.bluez.Error.Failed
 
-    serial: 8250_dw: Add quirk for APM X-Gene SoC
-    
-    The APM X-Gene SoC UART is the only board that still needs
-    the hard-coded values, so handle it separately in
-    dw8250_quirks(). The other ACPI platforms are able to
-    provide the values with device properties.
-    
-    Signed-off-by: Heikki Krogerus <heikki.krogerus@xxxxxxxxxxxxxxx>
-    Reviewed-by: Andy Shevchenko <andriy.shevchenko@xxxxxxxxxxxxxxx>
-    Acked-by: Greg Kroah-Hartman <gregkh@xxxxxxxxxxxxxxxxxxx>
-    Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@xxxxxxxxx>
+And in /var/log/messages I get:
 
-diff --git a/drivers/tty/serial/8250/8250_dw.c
-b/drivers/tty/serial/8250/8250_dw.c
-index e199696..5c0c123 100644
---- a/drivers/tty/serial/8250/8250_dw.c
-+++ b/drivers/tty/serial/8250/8250_dw.c
-@@ -298,12 +298,17 @@ static void dw8250_quirks(struct uart_port *p, struct
-dw8250_data *data)
-                        p->serial_out = dw8250_serial_out32be;
-                }
-        } else if (has_acpi_companion(p->dev)) {
--               p->iotype = UPIO_MEM32;
--               p->regshift = 2;
--               p->serial_in = dw8250_serial_in32;
-+               const struct acpi_device_id *id;
-+
-+               id = acpi_match_device(p->dev->driver->acpi_match_table,
-+                                      p->dev);
-+               if (id && !strcmp(id->id, "APMC0D08")) {
-+                       p->iotype = UPIO_MEM32;
-+                       p->regshift = 2;
-+                       p->serial_in = dw8250_serial_in32;
-+                       data->uart_16550_compatible = true;
-+               }
-                p->set_termios = dw8250_set_termios;
--               /* So far none of there implement the Busy Functionality */
--               data->uart_16550_compatible = true;
-        }
- 
-        /* Platforms with iDMA */
+Dec 30 15:53:50 varws03 bluetoothd[27559]: a2dp-sink profile connect
+failed for 08:DF:1F:E3:46:93: Protocol not available
 
-
-This is fully reproducible on my end: removing this specific patch gets rid
-of the issue; with the patch applied, Bluetooth simply doesn't work anymore.
-
-As opposed to the commit description, it seems that the Lenovo ThinkPad 8
-still needs the original hard-coded values currently (even if it could be
-possible to provide them in another way in the future, if I interpret the
-commit message the right way).
-
-Could this patch be reverted for the moment to remove the regression, until
-a proper fix is found?
-
-Thanks,
-Jérôme
-
-
-> I've compiled the latest bluetooth-next branch and I'm facing what looks
-> like a regression to me (still on a Lenovo ThinkPad 8 tablet): btattach
-> doesn't properly initialize the Broadcom BCM2E55 chipset anymore. 
-> 
-> I'm getting various timeout messages in dmesg:
-> 
-> [   13.188057] Bluetooth: hci0 command 0xfc45 tx timeout
-> [   16.093068] serial8250_interrupt: 4158 callbacks suppressed
-> [   16.093072] serial8250: too much work for irq39
-> [   16.094287] serial8250: too much work for irq39
-> ...
-> [   16.103868] serial8250: too much work for irq39
-> [   21.100041] serial8250_interrupt: 4167 callbacks suppressed
-> [   21.100044] serial8250: too much work for irq39
-> ...
-> [   21.222065] Bluetooth: hci0: BCM: failed to write clock (-110)
-> [   23.238528] Bluetooth: hci0 command 0x0c03 tx timeout
-> [   26.104253] serial8250_interrupt: 4165 callbacks suppressed
-> [   26.104257] serial8250: too much work for irq39
-> 
-> which I never had before and Bluetooth never actually starts.
-> 
-> Bluetooth doesn't init with a kernel built with the latest commit from
-> yesterday 526c86021e5102b8a4b5555b4196f7a19f44e2c4. 
-> 
-> I've gone back in time and it doesn't work either with a kernel built at 	
-> e6445f52d9c8b0e6557a45fa7d0e8e088d430a8c "Merge tag 'usb-4.9-rc1' of
-> git://git.kernel.org/pub/scm/linux/kernel/git/gregkh/usb".
-> 
-> It still worked at commit a2f195a73eba807006fb0cb882ecb552c06eea00
-> "bluetooth: bcm203x: don't print error when allocating urb fails" though,
-> which was the last previous commit modifying files in drivers/bluetooth in
-> the bluetooth-next branch.
-> 
-> I've attached the output of btmon when it used to work and one not working
-> (prefixed with .e6445f5) if that may be useful.
-> 
-> I'll continue my investigation in my spare time, trying to bissect to find
-> a while. I'll focus on patches touching the serial 8250 driver to start
-> with, as there are only a few of them, but feel free to point me into a
-> different direction if you have another idea or suggestion.
+How do I pair my headphones to my computer? Which protocol is not
+available and how do I add it?
 
