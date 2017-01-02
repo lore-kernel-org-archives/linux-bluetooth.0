@@ -1,81 +1,41 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] monitor: Add UUIDs of BBC micro:bit services
-Date: Mon,  2 Jan 2017 15:30:13 +0200
-Message-Id: <20170102133013.14169-1-luiz.dentz@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <javier@osg.samsung.com>
+From: Javier Martinez Canillas <javier@osg.samsung.com>
+To: linux-kernel@vger.kernel.org
+Cc: Javier Martinez Canillas <javier@osg.samsung.com>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: btqcomsmd: Allow driver to build if COMPILE_TEST is enabled
+Date: Mon,  2 Jan 2017 10:23:23 -0300
+Message-Id: <1483363403-25934-1-git-send-email-javier@osg.samsung.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+The driver only has runtime but no build time dependency with QCOM_SMD &&
+QCOM_WCNSS_CTRL. So it can be built for testing purposes if COMPILE_TEST
+option is enabled.
 
-This add the UUID of GATT attributes used in BBC micro:bit services as
-specified bellow:
+This is useful to have more build coverage and make sure that the driver
+is not affected by changes that could cause build regressions.
 
-https://lancaster-university.github.io/microbit-docs/resources/bluetooth/bluetooth_profile.html
+Signed-off-by: Javier Martinez Canillas <javier@osg.samsung.com>
 ---
- monitor/uuid.c | 48 ++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 48 insertions(+)
 
-diff --git a/monitor/uuid.c b/monitor/uuid.c
-index 6660bc7..d2e0af8 100644
---- a/monitor/uuid.c
-+++ b/monitor/uuid.c
-@@ -562,6 +562,54 @@ static const struct {
- 		"(Advanced) Factory reset"				},
- 	{ "a3c8750c-8ed3-4bdf-8a39-a01bebede295",
- 		"(Advanced) Remain Connectable"				},
-+	/* BBC micro:bit Bluetooth Profiles */
-+	{ "e95d0753-251d-470a-a062-fa1922dfa9a8",
-+		"MicroBit Accelerometer Service"			},
-+	{ "e95dca4b-251d-470a-a062-fa1922dfa9a8",
-+		"MicroBit Accelerometer Data"				},
-+	{ "e95dfb24-251d-470a-a062-fa1922dfa9a8",
-+		"MicroBit Accelerometer Period"				},
-+	{ "e95df2d8-251d-470a-a062-fa1922dfa9a8",
-+		"MicroBit Magnetometer Service"				},
-+	{ "e95dfb11-251d-470a-a062-fa1922dfa9a8",
-+		"MicroBit Magnetometer Data"				},
-+	{ "e95d386c-251d-470a-a062-fa1922dfa9a8",
-+		"MicroBit Magnetometer Period"				},
-+	{ "e95d9715-251d-470a-a062-fa1922dfa9a8",
-+		"MicroBit Magnetometer Bearing"				},
-+	{ "e95d9882-251d-470a-a062-fa1922dfa9a8",
-+		"MicroBit Button Service"				},
-+	{ "e95dda90-251d-470a-a062-fa1922dfa9a8",
-+		"MicroBit Button A State"				},
-+	{ "e95dda91-251d-470a-a062-fa1922dfa9a8",
-+		"MicroBit Button B State"				},
-+	{ "e95d127b-251d-470a-a062-fa1922dfa9a8",
-+		"MicroBit IO PIN Service"				},
-+	{ "e95d8d00-251d-470a-a062-fa1922dfa9a8", "MicroBit PIN Data"	},
-+	{ "e95d5899-251d-470a-a062-fa1922dfa9a8",
-+		"MicroBit PIN AD Configuration"				},
-+	{ "e95dd822-251d-470a-a062-fa1922dfa9a8", "MicroBit PWM Control" },
-+	{ "e95dd91d-251d-470a-a062-fa1922dfa9a8", "MicroBit LED Service" },
-+	{ "e95d7b77-251d-470a-a062-fa1922dfa9a8", "MicroBit LED Matrix state" },
-+	{ "e95d93ee-251d-470a-a062-fa1922dfa9a8", "MicroBit LED Text"	},
-+	{ "e95d0d2d-251d-470a-a062-fa1922dfa9a8", "MicroBit Scrolling Delay" },
-+	{ "e95d93af-251d-470a-a062-fa1922dfa9a8", "MicroBit Event Service" },
-+	{ "e95db84c-251d-470a-a062-fa1922dfa9a8", "MicroBit Requirements" },
-+	{ "e95d9775-251d-470a-a062-fa1922dfa9a8", "MicroBit Event Data" },
-+	{ "e95d23c4-251d-470a-a062-fa1922dfa9a8",
-+		"MicroBit Client Requirements"				},
-+	{ "e95d5404-251d-470a-a062-fa1922dfa9a8", "MicroBit Client Events" },
-+	{ "e95d93b0-251d-470a-a062-fa1922dfa9a8",
-+		"MicroBit DFU Control Service"				},
-+	{ "e95d93b1-251d-470a-a062-fa1922dfa9a8", "MicroBit DFU Control" },
-+	{ "e95d6100-251d-470a-a062-fa1922dfa9a8",
-+		"MicroBit Temperature Service"				},
-+	{ "e95d1b25-251d-470a-a062-fa1922dfa9a8",
-+		"MicroBit Temperature Period"				},
-+	/* Nordic UART Port Emulation */
-+	{ "6e400001-b5a3-f393-e0a9-e50e24dcca9e", "Nordic UART Service" },
-+	{ "6e400002-b5a3-f393-e0a9-e50e24dcca9e", "Nordic UART TX"	},
-+	{ "6e400002-b5a3-f393-e0a9-e50e24dcca9e", "Nordic UART RX"	},
- 	{ }
- };
+ drivers/bluetooth/Kconfig | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
+index 3cc9bff9d99d..c2c14a12713b 100644
+--- a/drivers/bluetooth/Kconfig
++++ b/drivers/bluetooth/Kconfig
+@@ -344,7 +344,7 @@ config BT_WILINK
  
+ config BT_QCOMSMD
+ 	tristate "Qualcomm SMD based HCI support"
+-	depends on QCOM_SMD && QCOM_WCNSS_CTRL
++	depends on (QCOM_SMD && QCOM_WCNSS_CTRL) || COMPILE_TEST
+ 	select BT_QCA
+ 	help
+ 	  Qualcomm SMD based HCI driver.
 -- 
-2.9.3
-
+2.7.4
