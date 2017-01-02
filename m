@@ -1,60 +1,65 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <45893082-1bae-cfce-5210-38cadd8cb993@nathanshearer.ca>
-References: <45893082-1bae-cfce-5210-38cadd8cb993@nathanshearer.ca>
+In-Reply-To: <860df5d3-22cc-83b0-9d37-bfd035b81b49@felipetonello.com>
+References: <20161226202634.28195-1-eu@felipetonello.com> <CABBYNZJoCOuiL1v8pc4gr4pN-Z-oC8FULG6Tn8PVnWw7tDhSOg@mail.gmail.com>
+ <860df5d3-22cc-83b0-9d37-bfd035b81b49@felipetonello.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 2 Jan 2017 14:03:26 +0200
-Message-ID: <CABBYNZ+WteYE2boD8C4JJ6avPz3JxJTM_zzFAx72snY4HczMbw@mail.gmail.com>
-Subject: Re: Unable to Pair Bose QC35 with Bluez 5.43 or Bluez 5.39
-To: Nathan Shearer <mail@nathanshearer.ca>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Mon, 2 Jan 2017 13:35:42 +0200
+Message-ID: <CABBYNZ+JBoC1E=7x6eGmJApvW-BKpi_mCOHNtkCem0dt3wXB_w@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v4 0/2] MIDI over BLE implementation
+To: Felipe Ferreri Tonello <eu@felipetonello.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        agoode@chromium.org
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Nathan,
+Hi Felipe,
 
-On Sat, Dec 31, 2016 at 1:04 AM, Nathan Shearer <mail@nathanshearer.ca> wrote:
-> Hello,
+On Sun, Jan 1, 2017 at 5:21 PM, Felipe Ferreri Tonello
+<eu@felipetonello.com> wrote:
+> Hi Luiz,
 >
-> I have been using my Bose QC35 headphones with my Gentoo computers for a
-> long time now. Recently I updated my computer and am now unable to pair
-> my headphones.
+> On 27/12/16 13:03, Luiz Augusto von Dentz wrote:
+>> Hi Felipe,
+>>
+>> On Mon, Dec 26, 2016 at 10:26 PM, Felipe F. Tonello
+>> <eu@felipetonello.com> wrote:
+>>> This patchset implements the MIDI over BLE spec, more information on patch #1.
+>>>
+>>> Patch #2 is some unit-tests to make sure the MIDI parser works properly.
+>>>
+>>> Felipe F. Tonello (2):
+>>>   profiles/midi: Added MIDI over BLE profile implementation
+>>>   unit/test-midi: Added libmidi use-case tests
+>>>
+>>>  Makefile.am             |  14 +-
+>>>  Makefile.plugins        |   8 +
+>>>  configure.ac            |  11 +
+>>>  profiles/midi/libmidi.c | 412 +++++++++++++++++++++++++++++++
+>>>  profiles/midi/libmidi.h | 150 ++++++++++++
+>>>  profiles/midi/midi.c    | 490 +++++++++++++++++++++++++++++++++++++
+>>>  unit/test-midi.c        | 628 ++++++++++++++++++++++++++++++++++++++++++++++++
+>>>  7 files changed, 1712 insertions(+), 1 deletion(-)
+>>>  create mode 100644 profiles/midi/libmidi.c
+>>>  create mode 100644 profiles/midi/libmidi.h
+>>>  create mode 100644 profiles/midi/midi.c
+>>>  create mode 100644 unit/test-midi.c
+>>>
+>>> --
+>>> 2.10.2
+>>
+>> Looks like there is something not quite rigth:
+>>
+>> https://paste.fedoraproject.org/513667/48284373/
+>>
 >
-> Before, when they worked, I had to follow the process at
-> http://unix.stackexchange.com/questions/292189/pairing-bose-qc-35-over-bluetooth-on-fedora
-> which was to change the ControllerMode from dual to bredr, pair, then
-> change it back to dual.
->
-> However now when I follow that process, I am unable to pair at all in
-> any ControllerMode (dual, bredr, or le). When I try to pair with
-> bluetoothctl as root I get this error message:
->
-> [bluetooth]# pair 08:DF:1F:E3:46:93
-> Attempting to pair with 08:DF:1F:E3:46:93
-> [CHG] Device 08:DF:1F:E3:46:93 Connected: yes
-> [CHG] Device 08:DF:1F:E3:46:93 Paired: yes
-> Pairing successful
-> [CHG] Device 08:DF:1F:E3:46:93 Connected: no
-> [bluetooth]# connect 08:DF:1F:E3:46:93
-> Attempting to connect to 08:DF:1F:E3:46:93
-> Failed to connect: org.bluez.Error.Failed
->
-> And in /var/log/messages I get:
->
-> Dec 30 15:53:50 varws03 bluetoothd[27559]: a2dp-sink profile connect
-> failed for 08:DF:1F:E3:46:93: Protocol not available
+> Weird... What command did you run to get this?
 
-This normally indicate that there isnt any stream endpoint registered,
-so perhaps PulseAudio has crashed or is not running for some reason?
+Ive just run make check with --enable-midi.
 
-> How do I pair my headphones to my computer? Which protocol is not
-> available and how do I add it?
->
 > --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> Felipe
 
 
 
