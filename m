@@ -1,58 +1,91 @@
-Return-Path: <linux-wpan-owner@vger.kernel.org>
-Subject: Re: Bluetooth 6lowpan ping6 slab corruption
-References: <E3B98393E6037849B63EA428240A65135BC9D5@PGSMSX103.gar.corp.intel.com>
- <c70d7129-be2d-4764-6f09-1153192c49be@pengutronix.de>
- <E3B98393E6037849B63EA428240A65135BCA89@PGSMSX103.gar.corp.intel.com>
- <efdc1a54-7fdc-80b8-f46d-d663addae509@pengutronix.de>
- <E3B98393E6037849B63EA428240A65135C42A6@PGSMSX103.gar.corp.intel.com>
- <E3B98393E6037849B63EA428240A65135C6C50@PGSMSX103.gar.corp.intel.com>
-Cc: "'alex.aring@gmail.com'" <alex.aring@gmail.com>,
-        "'jukka.rissanen@linux.intel.com'" <jukka.rissanen@linux.intel.com>,
-        "'linux-bluetooth@vger.kernel.org'" <linux-bluetooth@vger.kernel.org>,
-        "'linux-wpan@vger.kernel.org'" <linux-wpan@vger.kernel.org>
-From: Alexander Aring <aar@pengutronix.de>
-To: "Wong, Joshua Weng Onn" <joshua.weng.onn.wong@intel.com>
-Message-ID: <3205921b-4971-6617-223b-9b003ac28cac@pengutronix.de>
-Date: Thu, 5 Jan 2017 10:37:17 +0100
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <E3B98393E6037849B63EA428240A65135C6C50@PGSMSX103.gar.corp.intel.com>
-Content-Type: text/plain; charset=windows-1252
-Sender: linux-wpan-owner@vger.kernel.org
+In-Reply-To: <1483012139.2308.9.camel@hadess.net>
+References: <1482971563-15745-1-git-send-email-juha.kuikka@gmail.com>
+ <1482971563-15745-5-git-send-email-juha.kuikka@gmail.com> <1483012139.2308.9.camel@hadess.net>
+From: Juha Kuikka <juha.kuikka@gmail.com>
+Date: Wed, 4 Jan 2017 11:18:35 -0800
+Message-ID: <CAKvrXUpQ8b76Sc+MLLPkmmQ=ZLSP1YQSYKzep8VgJZr-sx1T0w@mail.gmail.com>
+Subject: Re: [PATCH v2 4/4] Add new DS4 controller PID into special case handler
+To: Bastien Nocera <hadess@hadess.net>
+Cc: linux-bluetooth@vger.kernel.org,
+        Juha Kuikka <juha.kuikka@synapse.com>,
+        Frank Praznik <frank.praznik@gmail.com>,
+        roderick.colenbrander@sony.com
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Bastien,
 
-Hi,
+On Thu, Dec 29, 2016 at 3:48 AM, Bastien Nocera <hadess@hadess.net> wrote:
+> On Wed, 2016-12-28 at 16:32 -0800, Juha Kuikka wrote:
+>> There is a special path for various game controllers where they
+>> connect
+>> to the hid service before bluetoothd knows what they are.
+>>
+>> This patch adds another PID for the Dualshock4 controller. This new
+>> PID
+>> matches with the model number CUH-ZCT2U.
+>> ---
+>>  profiles/input/server.c | 6 ++++--
+>>  1 file changed, 4 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/profiles/input/server.c b/profiles/input/server.c
+>> index eb3fcf8..3576f2b 100644
+>> --- a/profiles/input/server.c
+>> +++ b/profiles/input/server.c
+>> @@ -135,8 +135,10 @@ static bool dev_is_sixaxis(const bdaddr_t *src,
+>> const bdaddr_t *dst)
+>>       if (vid == 0x054c && pid == 0x0268)
+>>               return true;
+>>
+>> -     /* DualShock 4 */
+>> -     if (vid == 0x054c && pid == 0x05c4)
+>> +     /* DualShock 4 CUH-ZCT1U (PID 0x05c4)
+>> +      * DualShock 4 CUH-ZCT2U (PID 0x09cc) (slim/pro)
+>> +      */
+>> +     if (vid == 0x054c && (pid == 0x05c4 || pid == 0x09cc))
+>>               return true;
+>>
+>>       /* Navigation Controller */
+>
+> Might be nice to have the struct you currently have in the sixaxis
+> plugin in a shared header, so we don't need to open code this function.
+> For example:
+>
+> typedef enum {
+>   CABLE_PAIRING_SIXAXIS,
+>   CABLE_PAIRING_DS4
+> } CablePairingType;
+>
+> static struct {
+>   int vid;
+>   int pid;
+>   CablePairingType type;
+> } cable_pairing_devices[] = {
+>   ...
+> };
+>
 
-sorry for the delay...
+I agree, having the pertinent VID/PID in one place only would be a
+good idea. One small issue I see here is that it would unnecessarily
+expose internal information from sixaxis plugin.
 
-On 12/22/2016 12:38 AM, Wong, Joshua Weng Onn wrote:
-...
-> 
-> I have discussed this with my technical lead and that he mentioned that we will not be able to pursue to bring it to Linux mainline and also not able to backport the drivers due to resource limitation. We have pending tasks/projects that are upcoming.
-> 
-ok.
+> The sixaxis plugin would know which functions to use from the type, the
+> input/server.c code would loop over the array to see whether it's a
+> cable pairing.
 
-> Just curious, can we know the estimated timeline that it will take for an inexperienced person in Linux kernel development to complete this task?
-> 
+Having a type field instead of the function pointers would make for a
+less clear implementation in sixaxis.c. My previous patch had an
+analogous mechanism for detecting controller type and changing
+behavior accordingly and I got some comments about a function pointer
+approach being preferred.
 
-it would take so long until everything is fine and every reviewer has no
-comments on it what it could be made better...
+I saw some patches floating around concerning a generalized cable
+pairing mechanism. Perhaps this change should be part of that?
 
-But one issue at my patch series is that bluetooth L2CAP code has not
-asynchronous Transmit function, which is not that what it's expected by
-netdev xmit callback...
+>
+> Looks fine otherwise.
 
-So I queued it into a workqueue -> some people would say it's a bug,
-some people would say "it's works for now".
-
-I think it's also very difficult to add such behaviour because
-l2cap_chan mutex need to be replaced by some different fast locking
-mechanism - if linux-bluetooth really want such behaviour...
-
-Anyway, queueing into a workqueue is "okay" for me, because the way to
-do it right would be complicated. :-/
-
-Also there exists still the question about which L2 address should be
-really be used and when we need to set it.
-
-- Alex
+ - Juha
