@@ -1,63 +1,36 @@
-Return-Path: <hanipouspilot@gmail.com>
-From: Dmitry Tunin <hanipouspilot@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	1653843@bugs.launchpad.net,
-	Dmitry Tunin <hanipouspilot@gmail.com>,
-	stable@vger.kernel.org
-Subject: [PATCH] Bluetooth: Add another AR3012 04ca:3018 device
-Date: Thu,  5 Jan 2017 13:19:53 +0300
-Message-Id: <1483611593-5703-1-git-send-email-hanipouspilot@gmail.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: bugzilla-daemon@bugzilla.kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [Bug 190831] Intel Bluetooth 8260 breaks with latest firmware
+Date: Thu, 05 Jan 2017 10:09:03 +0000
+Message-ID: <bug-190831-62941-MMvNTShZ3P@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-190831-62941@https.bugzilla.kernel.org/>
+References: <bug-190831-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-T:  Bus=01 Lev=01 Prnt=01 Port=07 Cnt=04 Dev#=  5 Spd=12  MxCh= 0
-D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=04ca ProdID=3018 Rev=00.01
-C:  #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
-I:  If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+https://bugzilla.kernel.org/show_bug.cgi?id=190831
 
-Signed-off-by: Dmitry Tunin <hanipouspilot@gmail.com>
-Cc: stable@vger.kernel.org
----
- drivers/bluetooth/ath3k.c | 2 ++
- drivers/bluetooth/btusb.c | 1 +
- 2 files changed, 3 insertions(+)
+Stefan Schmid <schmidicom@gmail.com> changed:
 
-diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
-index fadba88..b793853 100644
---- a/drivers/bluetooth/ath3k.c
-+++ b/drivers/bluetooth/ath3k.c
-@@ -94,6 +94,7 @@ static const struct usb_device_id ath3k_table[] = {
- 	{ USB_DEVICE(0x04CA, 0x300f) },
- 	{ USB_DEVICE(0x04CA, 0x3010) },
- 	{ USB_DEVICE(0x04CA, 0x3014) },
-+	{ USB_DEVICE(0x04CA, 0x3018) },
- 	{ USB_DEVICE(0x0930, 0x0219) },
- 	{ USB_DEVICE(0x0930, 0x021c) },
- 	{ USB_DEVICE(0x0930, 0x0220) },
-@@ -162,6 +163,7 @@ static const struct usb_device_id ath3k_blist_tbl[] = {
- 	{ USB_DEVICE(0x04ca, 0x300f), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x04ca, 0x3010), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x04ca, 0x3014), .driver_info = BTUSB_ATH3012 },
-+	{ USB_DEVICE(0x04ca, 0x3018), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x0930, 0x0219), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x0930, 0x021c), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x0930, 0x0220), .driver_info = BTUSB_ATH3012 },
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 2f633df..dd220fa 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -209,6 +209,7 @@ static const struct usb_device_id blacklist_table[] = {
- 	{ USB_DEVICE(0x04ca, 0x300f), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x04ca, 0x3010), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x04ca, 0x3014), .driver_info = BTUSB_ATH3012 },
-+	{ USB_DEVICE(0x04ca, 0x3018), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x0930, 0x0219), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x0930, 0x021c), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x0930, 0x0220), .driver_info = BTUSB_ATH3012 },
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |schmidicom@gmail.com
+
+--- Comment #8 from Stefan Schmid <schmidicom@gmail.com> ---
+(In reply to G Jaya Praveen from comment #5)
+> Hi,
+> 
+> A Patch with the latest DDc is submitted. Still awaiting for merge.(8th
+> December sent to merge).
+> Issue will be resolved for you once it got merged to Linux-firmware.
+
+We have already January and a functioning firmware is still not available.
+Would it be possible to get an alternative link for the download of the new
+firmware?
+
 -- 
-2.7.4
+You are receiving this mail because:
+You are the assignee for the bug.
