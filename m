@@ -1,36 +1,58 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: bugzilla-daemon@bugzilla.kernel.org
-To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 190831] Intel Bluetooth 8260 breaks with latest firmware
-Date: Thu, 05 Jan 2017 10:09:03 +0000
-Message-ID: <bug-190831-62941-MMvNTShZ3P@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-190831-62941@https.bugzilla.kernel.org/>
-References: <bug-190831-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
+Return-Path: <linux-wpan-owner@vger.kernel.org>
+Subject: Re: Bluetooth 6lowpan ping6 slab corruption
+References: <E3B98393E6037849B63EA428240A65135BC9D5@PGSMSX103.gar.corp.intel.com>
+ <c70d7129-be2d-4764-6f09-1153192c49be@pengutronix.de>
+ <E3B98393E6037849B63EA428240A65135BCA89@PGSMSX103.gar.corp.intel.com>
+ <efdc1a54-7fdc-80b8-f46d-d663addae509@pengutronix.de>
+ <E3B98393E6037849B63EA428240A65135C42A6@PGSMSX103.gar.corp.intel.com>
+ <E3B98393E6037849B63EA428240A65135C6C50@PGSMSX103.gar.corp.intel.com>
+Cc: "'alex.aring@gmail.com'" <alex.aring@gmail.com>,
+        "'jukka.rissanen@linux.intel.com'" <jukka.rissanen@linux.intel.com>,
+        "'linux-bluetooth@vger.kernel.org'" <linux-bluetooth@vger.kernel.org>,
+        "'linux-wpan@vger.kernel.org'" <linux-wpan@vger.kernel.org>
+From: Alexander Aring <aar@pengutronix.de>
+To: "Wong, Joshua Weng Onn" <joshua.weng.onn.wong@intel.com>
+Message-ID: <3205921b-4971-6617-223b-9b003ac28cac@pengutronix.de>
+Date: Thu, 5 Jan 2017 10:37:17 +0100
 MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <E3B98393E6037849B63EA428240A65135C6C50@PGSMSX103.gar.corp.intel.com>
+Content-Type: text/plain; charset=windows-1252
+Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-https://bugzilla.kernel.org/show_bug.cgi?id=190831
 
-Stefan Schmid <schmidicom@gmail.com> changed:
+Hi,
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |schmidicom@gmail.com
+sorry for the delay...
 
---- Comment #8 from Stefan Schmid <schmidicom@gmail.com> ---
-(In reply to G Jaya Praveen from comment #5)
-> Hi,
+On 12/22/2016 12:38 AM, Wong, Joshua Weng Onn wrote:
+...
 > 
-> A Patch with the latest DDc is submitted. Still awaiting for merge.(8th
-> December sent to merge).
-> Issue will be resolved for you once it got merged to Linux-firmware.
+> I have discussed this with my technical lead and that he mentioned that we will not be able to pursue to bring it to Linux mainline and also not able to backport the drivers due to resource limitation. We have pending tasks/projects that are upcoming.
+> 
+ok.
 
-We have already January and a functioning firmware is still not available.
-Would it be possible to get an alternative link for the download of the new
-firmware?
+> Just curious, can we know the estimated timeline that it will take for an inexperienced person in Linux kernel development to complete this task?
+> 
 
--- 
-You are receiving this mail because:
-You are the assignee for the bug.
+it would take so long until everything is fine and every reviewer has no
+comments on it what it could be made better...
+
+But one issue at my patch series is that bluetooth L2CAP code has not
+asynchronous Transmit function, which is not that what it's expected by
+netdev xmit callback...
+
+So I queued it into a workqueue -> some people would say it's a bug,
+some people would say "it's works for now".
+
+I think it's also very difficult to add such behaviour because
+l2cap_chan mutex need to be replaced by some different fast locking
+mechanism - if linux-bluetooth really want such behaviour...
+
+Anyway, queueing into a workqueue is "okay" for me, because the way to
+do it right would be complicated. :-/
+
+Also there exists still the question about which L2 address should be
+really be used and when we need to set it.
+
+- Alex
