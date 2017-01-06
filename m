@@ -1,29 +1,78 @@
-Return-Path: <arnd@arndb.de>
-From: Arnd Bergmann <arnd@arndb.de>
-To: Rob Herring <robh@kernel.org>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Marcel Holtmann <marcel@holtmann.org>, Jiri Slaby <jslaby@suse.com>, Sebastian Reichel <sre@kernel.org>, "Dr . H . Nikolaus Schaller" <hns@goldelico.com>, Peter Hurley <peter@hurleysoftware.com>, Andy Shevchenko <andriy.shevchenko@linux.intel.com>, Alan Cox <gnomes@lxorguk.ukuu.org.uk>, Loic Poulain <loic.poulain@intel.com>, Pavel Machek <pavel@ucw.cz>, NeilBrown <neil@brown.name>, Linus Walleij <linus.walleij@linaro.org>, linux-bluetooth@vger.kernel.org, linux-serial@vger.kernel.org, linux-kernel@vger.kernel.org, Mark Rutland <mark.rutland@arm.com>, devicetree@vger.kernel.org
-Subject: Re: [PATCH 6/9] dt/bindings: Add a serial/UART attached device binding
-Date: Fri, 06 Jan 2017 20:21:34 +0100
-Message-ID: <3363597.IVJfReRkL0@wuerfel>
-In-Reply-To: <20170106162635.19677-7-robh@kernel.org>
-References: <20170106162635.19677-1-robh@kernel.org> <20170106162635.19677-7-robh@kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Return-Path: <robherring2@gmail.com>
+From: Rob Herring <robh@kernel.org>
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Jiri Slaby <jslaby@suse.com>,
+	Sebastian Reichel <sre@kernel.org>,
+	Arnd Bergmann <arnd@arndb.de>,
+	"Dr . H . Nikolaus Schaller" <hns@goldelico.com>,
+	Peter Hurley <peter@hurleysoftware.com>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Alan Cox <gnomes@lxorguk.ukuu.org.uk>
+Cc: Loic Poulain <loic.poulain@intel.com>,
+	Pavel Machek <pavel@ucw.cz>,
+	NeilBrown <neil@brown.name>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	linux-bluetooth@vger.kernel.org,
+	linux-serial@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 9/9] tty_port: register tty ports with serdev bus
+Date: Fri,  6 Jan 2017 10:26:35 -0600
+Message-Id: <20170106162635.19677-10-robh@kernel.org>
+In-Reply-To: <20170106162635.19677-1-robh@kernel.org>
+References: <20170106162635.19677-1-robh@kernel.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Friday, January 6, 2017 10:26:32 AM CET Rob Herring wrote:
-> +Optional Properties:
-> +
-> +- reg          : A single cell representing the port/line number of the
-> +                 host UART. Only used if the host UART is a single node
-> +                 with multiple ports.
-> +
+Register a serdev controller with the serdev bus when a tty_port is
+registered. This creates the serdev controller and create's serdev
+devices for any DT child nodes of the tty_port's parent (i.e. the UART
+device).
 
-If there is a 'reg' property in the child, I guess we should also
-document a #address-cells/#size-cells value for the parent.
+Signed-off-by: Rob Herring <robh@kernel.org>
+---
+ drivers/tty/tty_port.c | 14 +++++++++++++-
+ 1 file changed, 13 insertions(+), 1 deletion(-)
 
-Can you give an example of a multi-port serial device we support?
-I was expecting that we already need a device node per port anyway,
-to make the console work.
-
-	Arnd
+diff --git a/drivers/tty/tty_port.c b/drivers/tty/tty_port.c
+index 232a8cbf47bc..032786e5509e 100644
+--- a/drivers/tty/tty_port.c
++++ b/drivers/tty/tty_port.c
+@@ -16,6 +16,7 @@
+ #include <linux/bitops.h>
+ #include <linux/delay.h>
+ #include <linux/module.h>
++#include <linux/serdev.h>
+ 
+ static int tty_port_default_receive_buf(struct tty_port *port,
+ 					const unsigned char *p,
+@@ -125,9 +126,17 @@ struct device *tty_port_register_device_attr(struct tty_port *port,
+ 		struct device *device, void *drvdata,
+ 		const struct attribute_group **attr_grp)
+ {
++	struct device *ttydev;
++
+ 	tty_port_link_device(port, driver, index);
+-	return tty_register_device_attr(driver, index, device, drvdata,
++	ttydev = tty_register_device_attr(driver, index, device, drvdata,
+ 			attr_grp);
++	if (!ttydev)
++		return NULL;
++
++	serdev_tty_port_register(port, device, driver, index);
++	return ttydev;
++
+ }
+ EXPORT_SYMBOL_GPL(tty_port_register_device_attr);
+ 
+@@ -177,6 +186,9 @@ static void tty_port_destructor(struct kref *kref)
+ 	/* check if last port ref was dropped before tty release */
+ 	if (WARN_ON(port->itty))
+ 		return;
++
++	serdev_tty_port_unregister(port);
++
+ 	if (port->xmit_buf)
+ 		free_page((unsigned long)port->xmit_buf);
+ 	tty_port_destroy(port);
+-- 
+2.10.1
