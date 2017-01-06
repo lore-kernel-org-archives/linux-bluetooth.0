@@ -16,97 +16,71 @@ Cc: Loic Poulain <loic.poulain@intel.com>,
 	linux-bluetooth@vger.kernel.org,
 	linux-serial@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 1/9] tty: move the non-file related parts of tty_release to new tty_release_struct
-Date: Fri,  6 Jan 2017 10:26:27 -0600
-Message-Id: <20170106162635.19677-2-robh@kernel.org>
-In-Reply-To: <20170106162635.19677-1-robh@kernel.org>
-References: <20170106162635.19677-1-robh@kernel.org>
+Subject: [PATCH 0/9] Serial slave device bus
+Date: Fri,  6 Jan 2017 10:26:26 -0600
+Message-Id: <20170106162635.19677-1-robh@kernel.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-For in-kernel tty users, we need to be able to create and destroy
-'struct tty' that are not associated with a file. The creation side is
-fine, but tty_release() needs to be split into the file handle portion
-and the struct tty portion. Introduce a new function, tty_release_struct,
-to handle just the destroying of a struct tty.
+Here goes another attempt at a serial device bus (aka uart slaves, tty
+slaves, etc.).
 
-Signed-off-by: Rob Herring <robh@kernel.org>
----
- drivers/tty/tty_io.c | 42 ++++++++++++++++++++++++------------------
- include/linux/tty.h  |  1 +
- 2 files changed, 25 insertions(+), 18 deletions(-)
+After some discussions with Dmitry at LPC, I decided to move away from
+extending serio and moved back to making a new bus type instead. He didn't
+think using serio was a good fit, and serio has a number of peculiarities
+in regards to sysfs and it's driver model. I don't think we want to inherit
+those for serial slave devices.
 
-diff --git a/drivers/tty/tty_io.c b/drivers/tty/tty_io.c
-index 734a635e7363..5ebc090ec47f 100644
---- a/drivers/tty/tty_io.c
-+++ b/drivers/tty/tty_io.c
-@@ -1744,6 +1744,29 @@ static int tty_release_checks(struct tty_struct *tty, int idx)
- 	return 0;
- }
- 
-+void tty_release_struct(struct tty_struct *tty, int idx)
-+{
-+	/*
-+	 * Ask the line discipline code to release its structures
-+	 */
-+	tty_ldisc_release(tty);
-+
-+	/* Wait for pending work before tty destruction commmences */
-+	tty_flush_works(tty);
-+
-+	tty_debug_hangup(tty, "freeing structure\n");
-+	/*
-+	 * The release_tty function takes care of the details of clearing
-+	 * the slots and preserving the termios structure. The tty_unlock_pair
-+	 * should be safe as we keep a kref while the tty is locked (so the
-+	 * unlock never unlocks a freed tty).
-+	 */
-+	mutex_lock(&tty_mutex);
-+	release_tty(tty, idx);
-+	mutex_unlock(&tty_mutex);
-+}
-+EXPORT_SYMBOL_GPL(tty_release_struct);
-+
- /**
-  *	tty_release		-	vfs callback for close
-  *	@inode: inode of tty
-@@ -1898,25 +1921,8 @@ int tty_release(struct inode *inode, struct file *filp)
- 		return 0;
- 
- 	tty_debug_hangup(tty, "final close\n");
--	/*
--	 * Ask the line discipline code to release its structures
--	 */
--	tty_ldisc_release(tty);
--
--	/* Wait for pending work before tty destruction commmences */
--	tty_flush_works(tty);
--
--	tty_debug_hangup(tty, "freeing structure\n");
--	/*
--	 * The release_tty function takes care of the details of clearing
--	 * the slots and preserving the termios structure. The tty_unlock_pair
--	 * should be safe as we keep a kref while the tty is locked (so the
--	 * unlock never unlocks a freed tty).
--	 */
--	mutex_lock(&tty_mutex);
--	release_tty(tty, idx);
--	mutex_unlock(&tty_mutex);
- 
-+	tty_release_struct(tty, idx);
- 	return 0;
- }
- 
-diff --git a/include/linux/tty.h b/include/linux/tty.h
-index 40144f382516..86c7853282b7 100644
---- a/include/linux/tty.h
-+++ b/include/linux/tty.h
-@@ -528,6 +528,7 @@ extern int tty_alloc_file(struct file *file);
- extern void tty_add_file(struct tty_struct *tty, struct file *file);
- extern void tty_free_file(struct file *file);
- extern struct tty_struct *tty_init_dev(struct tty_driver *driver, int idx);
-+extern void tty_release_struct(struct tty_struct *tty, int idx);
- extern int tty_release(struct inode *inode, struct file *filp);
- extern void tty_init_termios(struct tty_struct *tty);
- extern int tty_standard_install(struct tty_driver *driver,
--- 
+This version sits on top of tty_port rather than uart_port as Alan
+requested. Once I created a struct tty rather than moving everything
+needed to tty_port, it became a lot easier and less invasive to the tty
+core code.
+
+I have hacked up versions of the BT ldisc and TI ST drivers moved over to
+use the serdev bus. I have BT working on the HiKey board which has TI BT.
+With the serdev bus support, it eliminates the need for the TI userspace
+UIM daemon.
+
+This series and the mentioned drivers can be found here[1].
+
+Rob
+
+[1] git://git.kernel.org/pub/scm/linux/kernel/git/robh/linux.git serial-bus-v2
+
+Alan Cox (1):
+  tty_port: allow a port to be opened with a tty that has no file handle
+
+Rob Herring (8):
+  tty: move the non-file related parts of tty_release to new
+    tty_release_struct
+  tty_port: make tty_port_register_device wrap
+    tty_port_register_device_attr
+  tty: constify tty_ldisc_receive_buf buffer pointer
+  tty_port: Add port client functions
+  dt/bindings: Add a serial/UART attached device binding
+  serdev: Introduce new bus for serial attached devices
+  serdev: add a tty port controller driver
+  tty_port: register tty ports with serdev bus
+
+ .../devicetree/bindings/serial/slave-device.txt    |  34 ++
+ MAINTAINERS                                        |   8 +
+ drivers/char/Kconfig                               |   1 +
+ drivers/tty/Makefile                               |   1 +
+ drivers/tty/serdev/Kconfig                         |  16 +
+ drivers/tty/serdev/Makefile                        |   5 +
+ drivers/tty/serdev/core.c                          | 388 +++++++++++++++++++++
+ drivers/tty/serdev/serdev-ttyport.c                | 244 +++++++++++++
+ drivers/tty/tty_buffer.c                           |  19 +-
+ drivers/tty/tty_io.c                               |  44 ++-
+ drivers/tty/tty_port.c                             |  60 +++-
+ include/linux/serdev.h                             | 227 ++++++++++++
+ include/linux/tty.h                                |  12 +-
+ 13 files changed, 1017 insertions(+), 42 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/serial/slave-device.txt
+ create mode 100644 drivers/tty/serdev/Kconfig
+ create mode 100644 drivers/tty/serdev/Makefile
+ create mode 100644 drivers/tty/serdev/core.c
+ create mode 100644 drivers/tty/serdev/serdev-ttyport.c
+ create mode 100644 include/linux/serdev.h
+
+--
 2.10.1
