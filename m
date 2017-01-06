@@ -15,84 +15,98 @@ Cc: Loic Poulain <loic.poulain@intel.com>,
 	Linus Walleij <linus.walleij@linaro.org>,
 	linux-bluetooth@vger.kernel.org,
 	linux-serial@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Alan Cox <alan@linux.intel.com>
-Subject: [PATCH 2/9] tty_port: allow a port to be opened with a tty that has no file handle
-Date: Fri,  6 Jan 2017 10:26:28 -0600
-Message-Id: <20170106162635.19677-3-robh@kernel.org>
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 1/9] tty: move the non-file related parts of tty_release to new tty_release_struct
+Date: Fri,  6 Jan 2017 10:26:27 -0600
+Message-Id: <20170106162635.19677-2-robh@kernel.org>
 In-Reply-To: <20170106162635.19677-1-robh@kernel.org>
 References: <20170106162635.19677-1-robh@kernel.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Alan Cox <alan@linux.intel.com>
+For in-kernel tty users, we need to be able to create and destroy
+'struct tty' that are not associated with a file. The creation side is
+fine, but tty_release() needs to be split into the file handle portion
+and the struct tty portion. Introduce a new function, tty_release_struct,
+to handle just the destroying of a struct tty.
 
-Let us create tty objects entirely in kernel space. Untested proposal to
-show why all the ideas around rewriting half the uart stack are not needed.
-
-With this a kernel created non file backed tty object could be used to handle
-data, and set terminal modes. Not all ldiscs can cope with this as N_TTY in
-particular has to work back to the fs/tty layer.
-
-The tty_port code is however otherwise clean of file handles as far as I can
-tell as is the low level tty port write path used by the ldisc, the
-configuration low level interfaces and most of the ldiscs.
-
-Currently you don't have any exposure to see tty hangups because those are
-built around the file layer. However a) it's a fixed port so you probably
-don't care about that b) if you do we can add a callback and c) you almost
-certainly don't want the userspace tear down/rebuild behaviour anyway.
-
-This should however be sufficient if we wanted for example to enumerate all
-the bluetooth bound fixed ports via ACPI and make them directly available.
-It doesn't deal with the case of a user opening a port that's also kernel
-opened and that would need some locking out (so it returned EBUSY if bound
-to a kernel device of some kind). That needs resolving along with how you
-"up" or "down" your new bluetooth device, or enumerate it while providing
-the existing tty API to avoid regressions (and to debug).
-
-Alan
+Signed-off-by: Rob Herring <robh@kernel.org>
 ---
-
-Alan, I need a proper patch with your S-O-B for this one.
-
- drivers/tty/tty_io.c   | 2 +-
- drivers/tty/tty_port.c | 4 ++--
- 2 files changed, 3 insertions(+), 3 deletions(-)
+ drivers/tty/tty_io.c | 42 ++++++++++++++++++++++++------------------
+ include/linux/tty.h  |  1 +
+ 2 files changed, 25 insertions(+), 18 deletions(-)
 
 diff --git a/drivers/tty/tty_io.c b/drivers/tty/tty_io.c
-index 5ebc090ec47f..928a70ed9175 100644
+index 734a635e7363..5ebc090ec47f 100644
 --- a/drivers/tty/tty_io.c
 +++ b/drivers/tty/tty_io.c
-@@ -855,7 +855,7 @@ static void tty_vhangup_session(struct tty_struct *tty)
-
- int tty_hung_up_p(struct file *filp)
- {
--	return (filp->f_op == &hung_up_tty_fops);
-+	return (filp && filp->f_op == &hung_up_tty_fops);
+@@ -1744,6 +1744,29 @@ static int tty_release_checks(struct tty_struct *tty, int idx)
+ 	return 0;
  }
-
- EXPORT_SYMBOL(tty_hung_up_p);
-diff --git a/drivers/tty/tty_port.c b/drivers/tty/tty_port.c
-index c3f9d93ba227..606d9e5bf28f 100644
---- a/drivers/tty/tty_port.c
-+++ b/drivers/tty/tty_port.c
-@@ -335,7 +335,7 @@ EXPORT_SYMBOL(tty_port_lower_dtr_rts);
-  *	tty_port_block_til_ready	-	Waiting logic for tty open
-  *	@port: the tty port being opened
-  *	@tty: the tty device being bound
-- *	@filp: the file pointer of the opener
-+ *	@filp: the file pointer of the opener or NULL
-  *
-  *	Implement the core POSIX/SuS tty behaviour when opening a tty device.
-  *	Handles:
-@@ -369,7 +369,7 @@ int tty_port_block_til_ready(struct tty_port *port,
- 		tty_port_set_active(port, 1);
+ 
++void tty_release_struct(struct tty_struct *tty, int idx)
++{
++	/*
++	 * Ask the line discipline code to release its structures
++	 */
++	tty_ldisc_release(tty);
++
++	/* Wait for pending work before tty destruction commmences */
++	tty_flush_works(tty);
++
++	tty_debug_hangup(tty, "freeing structure\n");
++	/*
++	 * The release_tty function takes care of the details of clearing
++	 * the slots and preserving the termios structure. The tty_unlock_pair
++	 * should be safe as we keep a kref while the tty is locked (so the
++	 * unlock never unlocks a freed tty).
++	 */
++	mutex_lock(&tty_mutex);
++	release_tty(tty, idx);
++	mutex_unlock(&tty_mutex);
++}
++EXPORT_SYMBOL_GPL(tty_release_struct);
++
+ /**
+  *	tty_release		-	vfs callback for close
+  *	@inode: inode of tty
+@@ -1898,25 +1921,8 @@ int tty_release(struct inode *inode, struct file *filp)
  		return 0;
- 	}
--	if (filp->f_flags & O_NONBLOCK) {
-+	if (filp == NULL || (filp->f_flags & O_NONBLOCK)) {
- 		/* Indicate we are open */
- 		if (C_BAUD(tty))
- 			tty_port_raise_dtr_rts(port);
---
+ 
+ 	tty_debug_hangup(tty, "final close\n");
+-	/*
+-	 * Ask the line discipline code to release its structures
+-	 */
+-	tty_ldisc_release(tty);
+-
+-	/* Wait for pending work before tty destruction commmences */
+-	tty_flush_works(tty);
+-
+-	tty_debug_hangup(tty, "freeing structure\n");
+-	/*
+-	 * The release_tty function takes care of the details of clearing
+-	 * the slots and preserving the termios structure. The tty_unlock_pair
+-	 * should be safe as we keep a kref while the tty is locked (so the
+-	 * unlock never unlocks a freed tty).
+-	 */
+-	mutex_lock(&tty_mutex);
+-	release_tty(tty, idx);
+-	mutex_unlock(&tty_mutex);
+ 
++	tty_release_struct(tty, idx);
+ 	return 0;
+ }
+ 
+diff --git a/include/linux/tty.h b/include/linux/tty.h
+index 40144f382516..86c7853282b7 100644
+--- a/include/linux/tty.h
++++ b/include/linux/tty.h
+@@ -528,6 +528,7 @@ extern int tty_alloc_file(struct file *file);
+ extern void tty_add_file(struct tty_struct *tty, struct file *file);
+ extern void tty_free_file(struct file *file);
+ extern struct tty_struct *tty_init_dev(struct tty_driver *driver, int idx);
++extern void tty_release_struct(struct tty_struct *tty, int idx);
+ extern int tty_release(struct inode *inode, struct file *filp);
+ extern void tty_init_termios(struct tty_struct *tty);
+ extern int tty_standard_install(struct tty_driver *driver,
+-- 
 2.10.1
