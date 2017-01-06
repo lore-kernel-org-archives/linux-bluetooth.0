@@ -1,86 +1,49 @@
-Return-Path: <robherring2@gmail.com>
-From: Rob Herring <robh@kernel.org>
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Jiri Slaby <jslaby@suse.com>,
-	Sebastian Reichel <sre@kernel.org>,
-	Arnd Bergmann <arnd@arndb.de>,
-	"Dr . H . Nikolaus Schaller" <hns@goldelico.com>,
-	Peter Hurley <peter@hurleysoftware.com>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	Alan Cox <gnomes@lxorguk.ukuu.org.uk>
-Cc: Loic Poulain <loic.poulain@intel.com>,
-	Pavel Machek <pavel@ucw.cz>,
-	NeilBrown <neil@brown.name>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	linux-bluetooth@vger.kernel.org,
-	linux-serial@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 0/9] Serial slave device bus
-Date: Fri,  6 Jan 2017 10:26:26 -0600
-Message-Id: <20170106162635.19677-1-robh@kernel.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: bugzilla-daemon@bugzilla.kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [Bug 190831] Intel Bluetooth 8260 breaks with latest firmware
+Date: Fri, 06 Jan 2017 12:25:12 +0000
+Message-ID: <bug-190831-62941-x7kWDGaLEK@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-190831-62941@https.bugzilla.kernel.org/>
+References: <bug-190831-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Here goes another attempt at a serial device bus (aka uart slaves, tty
-slaves, etc.).
+https://bugzilla.kernel.org/show_bug.cgi?id=190831
 
-After some discussions with Dmitry at LPC, I decided to move away from
-extending serio and moved back to making a new bus type instead. He didn't
-think using serio was a good fit, and serio has a number of peculiarities
-in regards to sysfs and it's driver model. I don't think we want to inherit
-those for serial slave devices.
+--- Comment #22 from Marcin Kurek <morgoth6@gmail.com> ---
+Hmm, the #250451 and #250461 looks like current version of .sfi file and older
+.ddc file.
 
-This version sits on top of tty_port rather than uart_port as Alan
-requested. Once I created a struct tty rather than moving everything
-needed to tty_port, it became a lot easier and less invasive to the tty
-core code.
+Anyway just tired with #250481:
 
-I have hacked up versions of the BT ldisc and TI ST drivers moved over to
-use the serdev bus. I have BT working on the HiKey board which has TI BT.
-With the serdev bus support, it eliminates the need for the TI userspace
-UIM daemon.
+873629534cf972411618c6c13aef80f2  ibt-11-5.ddc
+413da432ba53076ed31a1dda17a1f43d  ibt-11-5.sfi
 
-This series and the mentioned drivers can be found here[1].
+The .sfi file has same md5 sum as file currently in linux-firmware repository
+and only .ddc is different. And it loads fine:
 
-Rob
+Bluetooth: hci0: Bootloader revision 0.0 build 2 week 52 2014
+Bluetooth: hci0: Device revision is 5
+Bluetooth: hci0: Secure boot is enabled
+Bluetooth: hci0: OTP lock is enabled
+Bluetooth: hci0: API lock is enabled
+Bluetooth: hci0: Debug lock is disabled
+Bluetooth: hci0: Minimum firmware build 1 week 10 2014
+Bluetooth: hci0: Found device firmware: intel/ibt-11-5.sfi
+Bluetooth: hci0: Waiting for firmware download to complete
+Bluetooth: hci0: Firmware loaded in 1312477 usecs
+Bluetooth: hci0: Waiting for device to boot
+Bluetooth: hci0: Device booted in 10720 usecs
+Bluetooth: hci0: Found Intel DDC parameters: intel/ibt-11-5.ddc
+Bluetooth: hci0: Applying Intel DDC parameters completed
 
-[1] git://git.kernel.org/pub/scm/linux/kernel/git/robh/linux.git serial-bus-v2
+I can not see any event mask errors which is nice and for now I had no problem
+with sudden mouse stops/disconect, but it still feels a bit jumpy and
+definitely not so smooth as it should be.
 
-Alan Cox (1):
-  tty_port: allow a port to be opened with a tty that has no file handle
-
-Rob Herring (8):
-  tty: move the non-file related parts of tty_release to new
-    tty_release_struct
-  tty_port: make tty_port_register_device wrap
-    tty_port_register_device_attr
-  tty: constify tty_ldisc_receive_buf buffer pointer
-  tty_port: Add port client functions
-  dt/bindings: Add a serial/UART attached device binding
-  serdev: Introduce new bus for serial attached devices
-  serdev: add a tty port controller driver
-  tty_port: register tty ports with serdev bus
-
- .../devicetree/bindings/serial/slave-device.txt    |  34 ++
- MAINTAINERS                                        |   8 +
- drivers/char/Kconfig                               |   1 +
- drivers/tty/Makefile                               |   1 +
- drivers/tty/serdev/Kconfig                         |  16 +
- drivers/tty/serdev/Makefile                        |   5 +
- drivers/tty/serdev/core.c                          | 388 +++++++++++++++++++++
- drivers/tty/serdev/serdev-ttyport.c                | 244 +++++++++++++
- drivers/tty/tty_buffer.c                           |  19 +-
- drivers/tty/tty_io.c                               |  44 ++-
- drivers/tty/tty_port.c                             |  60 +++-
- include/linux/serdev.h                             | 227 ++++++++++++
- include/linux/tty.h                                |  12 +-
- 13 files changed, 1017 insertions(+), 42 deletions(-)
- create mode 100644 Documentation/devicetree/bindings/serial/slave-device.txt
- create mode 100644 drivers/tty/serdev/Kconfig
- create mode 100644 drivers/tty/serdev/Makefile
- create mode 100644 drivers/tty/serdev/core.c
- create mode 100644 drivers/tty/serdev/serdev-ttyport.c
- create mode 100644 include/linux/serdev.h
-
---
-2.10.1
+-- 
+You are receiving this mail because:
+You are the assignee for the bug.
