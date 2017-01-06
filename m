@@ -1,105 +1,47 @@
-Return-Path: <andriy.shevchenko@linux.intel.com>
-Message-ID: <1483786850.9552.249.camel@linux.intel.com>
-Subject: Re: [PATCH 0/9] Serial slave device bus
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Rob Herring <robh@kernel.org>, Greg Kroah-Hartman
- <gregkh@linuxfoundation.org>, Marcel Holtmann <marcel@holtmann.org>, Jiri
- Slaby <jslaby@suse.com>, Sebastian Reichel <sre@kernel.org>, Arnd Bergmann
- <arnd@arndb.de>, "Dr . H . Nikolaus Schaller" <hns@goldelico.com>, Peter
- Hurley <peter@hurleysoftware.com>, Alan Cox <gnomes@lxorguk.ukuu.org.uk>
-Cc: Loic Poulain <loic.poulain@intel.com>, Pavel Machek <pavel@ucw.cz>,
-	NeilBrown <neil@brown.name>, Linus Walleij <linus.walleij@linaro.org>,
-	linux-bluetooth@vger.kernel.org, linux-serial@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Date: Sat, 07 Jan 2017 13:00:50 +0200
-In-Reply-To: <20170106162635.19677-1-robh@kernel.org>
-References: <20170106162635.19677-1-robh@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Return-Path: <robh@kernel.org>
+MIME-Version: 1.0
+In-Reply-To: <3363597.IVJfReRkL0@wuerfel>
+References: <20170106162635.19677-1-robh@kernel.org> <20170106162635.19677-7-robh@kernel.org>
+ <3363597.IVJfReRkL0@wuerfel>
+From: Rob Herring <robh@kernel.org>
+Date: Fri, 6 Jan 2017 14:41:42 -0600
+Message-ID: <CAL_JsqLxRmSkuDUgTY04C1JUKVz+A8djHTfB5ZoSM3FfUowbMw@mail.gmail.com>
+Subject: Re: [PATCH 6/9] dt/bindings: Add a serial/UART attached device binding
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Marcel Holtmann <marcel@holtmann.org>,
+	Jiri Slaby <jslaby@suse.com>, Sebastian Reichel <sre@kernel.org>,
+	"Dr . H . Nikolaus Schaller" <hns@goldelico.com>, Peter Hurley <peter@hurleysoftware.com>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>, Alan Cox <gnomes@lxorguk.ukuu.org.uk>,
+	Loic Poulain <loic.poulain@intel.com>, Pavel Machek <pavel@ucw.cz>, NeilBrown <neil@brown.name>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	"open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+	"linux-serial@vger.kernel.org" <linux-serial@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, 2017-01-06 at 10:26 -0600, Rob Herring wrote:
-> Here goes another attempt at a serial device bus (aka uart slaves, tty
-> slaves, etc.).
-> 
-> After some discussions with Dmitry at LPC, I decided to move away from
-> extending serio and moved back to making a new bus type instead. He
-> didn't
-> think using serio was a good fit, and serio has a number of
-> peculiarities
-> in regards to sysfs and it's driver model. I don't think we want to
-> inherit
-> those for serial slave devices.
-> 
-> This version sits on top of tty_port rather than uart_port as Alan
-> requested. Once I created a struct tty rather than moving everything
-> needed to tty_port, it became a lot easier and less invasive to the
-> tty
-> core code.
-> 
-> I have hacked up versions of the BT ldisc and TI ST drivers moved over
-> to
-> use the serdev bus. I have BT working on the HiKey board which has TI
-> BT.
-> With the serdev bus support, it eliminates the need for the TI
-> userspace
-> UIM daemon.
-> 
-> This series and the mentioned drivers can be found here[1].
+On Fri, Jan 6, 2017 at 1:21 PM, Arnd Bergmann <arnd@arndb.de> wrote:
+> On Friday, January 6, 2017 10:26:32 AM CET Rob Herring wrote:
+>> +Optional Properties:
+>> +
+>> +- reg          : A single cell representing the port/line number of the
+>> +                 host UART. Only used if the host UART is a single node
+>> +                 with multiple ports.
+>> +
+>
+> If there is a 'reg' property in the child, I guess we should also
+> document a #address-cells/#size-cells value for the parent.
+>
+> Can you give an example of a multi-port serial device we support?
 
-For patches 1-4:
-Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+A 16550 DUART chip. Not sure if we have any bindings for one though.
+Maybe the chip would be the parent node containing 2 child ns16550
+nodes.
 
-Regarding to naming. Why can't we just name bus "serial"? If you are
-worrying about folder name under drivers/tty, I can propose at lease
-couple of options serialdev, serialbus.
+> I was expecting that we already need a device node per port anyway,
+> to make the console work.
 
-> 
-> Rob
-> 
-> [1] git://git.kernel.org/pub/scm/linux/kernel/git/robh/linux.git
-> serial-bus-v2
-> 
-> Alan Cox (1):
->   tty_port: allow a port to be opened with a tty that has no file
-> handle
-> 
-> Rob Herring (8):
->   tty: move the non-file related parts of tty_release to new
->     tty_release_struct
->   tty_port: make tty_port_register_device wrap
->     tty_port_register_device_attr
->   tty: constify tty_ldisc_receive_buf buffer pointer
->   tty_port: Add port client functions
->   dt/bindings: Add a serial/UART attached device binding
->   serdev: Introduce new bus for serial attached devices
->   serdev: add a tty port controller driver
->   tty_port: register tty ports with serdev bus
-> 
->  .../devicetree/bindings/serial/slave-device.txt    |  34 ++
->  MAINTAINERS                                        |   8 +
->  drivers/char/Kconfig                               |   1 +
->  drivers/tty/Makefile                               |   1 +
->  drivers/tty/serdev/Kconfig                         |  16 +
->  drivers/tty/serdev/Makefile                        |   5 +
->  drivers/tty/serdev/core.c                          | 388
-> +++++++++++++++++++++
->  drivers/tty/serdev/serdev-ttyport.c                | 244
-> +++++++++++++
->  drivers/tty/tty_buffer.c                           |  19 +-
->  drivers/tty/tty_io.c                               |  44 ++-
->  drivers/tty/tty_port.c                             |  60 +++-
->  include/linux/serdev.h                             | 227 ++++++++++++
->  include/linux/tty.h                                |  12 +-
->  13 files changed, 1017 insertions(+), 42 deletions(-)
->  create mode 100644 Documentation/devicetree/bindings/serial/slave-
-> device.txt
->  create mode 100644 drivers/tty/serdev/Kconfig
->  create mode 100644 drivers/tty/serdev/Makefile
->  create mode 100644 drivers/tty/serdev/core.c
->  create mode 100644 drivers/tty/serdev/serdev-ttyport.c
->  create mode 100644 include/linux/serdev.h
+Yes, good point. I think I'll just drop it for now.
 
--- 
-Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Intel Finland Oy
+Rob
