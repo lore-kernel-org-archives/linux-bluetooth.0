@@ -15,68 +15,188 @@ Cc: Loic Poulain <loic.poulain@intel.com>,
 	Linus Walleij <linus.walleij@linaro.org>,
 	linux-bluetooth@vger.kernel.org,
 	linux-serial@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Mark Rutland <mark.rutland@arm.com>,
-	devicetree@vger.kernel.org
-Subject: [PATCH 6/9] dt/bindings: Add a serial/UART attached device binding
-Date: Fri,  6 Jan 2017 10:26:32 -0600
-Message-Id: <20170106162635.19677-7-robh@kernel.org>
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 5/9] tty_port: Add port client functions
+Date: Fri,  6 Jan 2017 10:26:31 -0600
+Message-Id: <20170106162635.19677-6-robh@kernel.org>
 In-Reply-To: <20170106162635.19677-1-robh@kernel.org>
 References: <20170106162635.19677-1-robh@kernel.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add a common binding for describing serial/UART attached devices. Common
-examples are Bluetooth, WiFi, NFC and GPS devices.
+Introduce a client (upward direction) operations struct for tty_port
+clients. Initially supported operations are for receiving data and write
+wake-up. This will allow for having clients other than an ldisc.
 
-Serial attached devices are represented as child nodes of a UART node.
-This may need to be extended for more complex devices with multiple
-interfaces, but for the simple cases a child node is sufficient.
+Convert the calls to the ldisc to use the client ops as the default
+operations.
 
 Signed-off-by: Rob Herring <robh@kernel.org>
 ---
- .../devicetree/bindings/serial/slave-device.txt    | 34 ++++++++++++++++++++++
- 1 file changed, 34 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/serial/slave-device.txt
 
-diff --git a/Documentation/devicetree/bindings/serial/slave-device.txt b/Documentation/devicetree/bindings/serial/slave-device.txt
-new file mode 100644
-index 000000000000..9b7c2d651345
---- /dev/null
-+++ b/Documentation/devicetree/bindings/serial/slave-device.txt
-@@ -0,0 +1,34 @@
-+Serial Slave Device DT binding
+The major change here is the access of the tty ptr and the reference taken
+on the ldisc are moved into the client_ops rx function for the the ldisc.
+I *think* this should be okay, but no doubt I don't understand all the
+intricacies of the locking here. It does make the implementation a bit
+cleaner in that the tty buffer handling is free from struct tty and the
+ldisc.
+
+
+ drivers/tty/tty_buffer.c | 17 +++--------------
+ drivers/tty/tty_port.c   | 39 ++++++++++++++++++++++++++++++++++++++-
+ include/linux/tty.h      |  9 ++++++++-
+ 3 files changed, 49 insertions(+), 16 deletions(-)
+
+diff --git a/drivers/tty/tty_buffer.c b/drivers/tty/tty_buffer.c
+index f4dc3e296dd5..4e7a4e9dcf4d 100644
+--- a/drivers/tty/tty_buffer.c
++++ b/drivers/tty/tty_buffer.c
+@@ -437,7 +437,7 @@ int tty_ldisc_receive_buf(struct tty_ldisc *ld, const unsigned char *p,
+ EXPORT_SYMBOL_GPL(tty_ldisc_receive_buf);
+
+ static int
+-receive_buf(struct tty_ldisc *ld, struct tty_buffer *head, int count)
++receive_buf(struct tty_port *port, struct tty_buffer *head, int count)
+ {
+ 	unsigned char *p = char_buf_ptr(head, head->read);
+ 	char	      *f = NULL;
+@@ -445,7 +445,7 @@ receive_buf(struct tty_ldisc *ld, struct tty_buffer *head, int count)
+ 	if (~head->flags & TTYB_NORMAL)
+ 		f = flag_buf_ptr(head, head->read);
+
+-	return tty_ldisc_receive_buf(ld, p, f, count);
++	return port->client_ops->receive_buf(port, p, f, count);
+ }
+
+ /**
+@@ -465,16 +465,6 @@ static void flush_to_ldisc(struct work_struct *work)
+ {
+ 	struct tty_port *port = container_of(work, struct tty_port, buf.work);
+ 	struct tty_bufhead *buf = &port->buf;
+-	struct tty_struct *tty;
+-	struct tty_ldisc *disc;
+-
+-	tty = READ_ONCE(port->itty);
+-	if (tty == NULL)
+-		return;
+-
+-	disc = tty_ldisc_ref(tty);
+-	if (disc == NULL)
+-		return;
+
+ 	mutex_lock(&buf->lock);
+
+@@ -504,7 +494,7 @@ static void flush_to_ldisc(struct work_struct *work)
+ 			continue;
+ 		}
+
+-		count = receive_buf(disc, head, count);
++		count = receive_buf(port, head, count);
+ 		if (!count)
+ 			break;
+ 		head->read += count;
+@@ -512,7 +502,6 @@ static void flush_to_ldisc(struct work_struct *work)
+
+ 	mutex_unlock(&buf->lock);
+
+-	tty_ldisc_deref(disc);
+ }
+
+ /**
+diff --git a/drivers/tty/tty_port.c b/drivers/tty/tty_port.c
+index 1d8804843103..232a8cbf47bc 100644
+--- a/drivers/tty/tty_port.c
++++ b/drivers/tty/tty_port.c
+@@ -17,6 +17,41 @@
+ #include <linux/delay.h>
+ #include <linux/module.h>
+
++static int tty_port_default_receive_buf(struct tty_port *port,
++					const unsigned char *p,
++					const unsigned char *f, size_t count)
++{
++	int ret;
++	struct tty_struct *tty;
++	struct tty_ldisc *disc;
 +
-+This documents the binding structure and common properties for serial
-+attached devices. Common examples include Bluetooth, WiFi, NFC and GPS
-+devices.
++	tty = READ_ONCE(port->itty);
++	if (!tty)
++		return 0;
 +
-+qSerial attached devices shall be a child node of the host UART device the
-+slave device is attached to. It is expected that the attached device is
-+the only child node of the UART device. The slave device node name shall
-+reflect the generic type of device for the node.
++	disc = tty_ldisc_ref(tty);
++	if (!disc)
++		return 0;
 +
-+Required Properties:
++	ret = tty_ldisc_receive_buf(disc, p, (char *)f, count);
 +
-+- compatible 	: A string reflecting the vendor and specific device the node
-+		  represents.
++	tty_ldisc_deref(disc);
 +
-+Optional Properties:
++	return ret;
++}
 +
-+- reg		: A single cell representing the port/line number of the
-+		  host UART. Only used if the host UART is a single node
-+		  with multiple ports.
++static void tty_port_default_wakeup(struct tty_port *port)
++{
++	/* tty_port_tty_wakeup already took a reference to the tty */
++	tty_wakeup(port->tty);
++}
 +
-+Example:
-+
-+serial@1234 {
-+	compatible = "ns16550a";
-+	interrupts = <1>;
-+
-+	bluetooth {
-+		compatible = "brcm,bcm43341-bt";
-+		interrupt-parent = <&gpio>;
-+		interrupts = <10>;
-+	};
++static const struct tty_port_client_operations default_client_ops = {
++	.receive_buf = tty_port_default_receive_buf,
++	.write_wakeup = tty_port_default_wakeup,
 +};
++
++
+ void tty_port_init(struct tty_port *port)
+ {
+ 	memset(port, 0, sizeof(*port));
+@@ -28,6 +63,7 @@ void tty_port_init(struct tty_port *port)
+ 	spin_lock_init(&port->lock);
+ 	port->close_delay = (50 * HZ) / 100;
+ 	port->closing_wait = (3000 * HZ) / 100;
++	port->client_ops = &default_client_ops;
+ 	kref_init(&port->kref);
+ }
+ EXPORT_SYMBOL(tty_port_init);
+@@ -275,7 +311,8 @@ void tty_port_tty_wakeup(struct tty_port *port)
+ 	struct tty_struct *tty = tty_port_tty_get(port);
+
+ 	if (tty) {
+-		tty_wakeup(tty);
++		if (test_bit(TTY_DO_WRITE_WAKEUP, &tty->flags))
++			port->client_ops->write_wakeup(port);
+ 		tty_kref_put(tty);
+ 	}
+ }
+diff --git a/include/linux/tty.h b/include/linux/tty.h
+index 21c0fabfed60..1017e904c0a3 100644
+--- a/include/linux/tty.h
++++ b/include/linux/tty.h
+@@ -217,12 +217,18 @@ struct tty_port_operations {
+ 	/* Called on the final put of a port */
+ 	void (*destruct)(struct tty_port *port);
+ };
+-
++
++struct tty_port_client_operations {
++	int (*receive_buf)(struct tty_port *port, const unsigned char *, const unsigned char *, size_t);
++	void (*write_wakeup)(struct tty_port *port);
++};
++
+ struct tty_port {
+ 	struct tty_bufhead	buf;		/* Locked internally */
+ 	struct tty_struct	*tty;		/* Back pointer */
+ 	struct tty_struct	*itty;		/* internal back ptr */
+ 	const struct tty_port_operations *ops;	/* Port operations */
++	const struct tty_port_client_operations *client_ops; /* Port client operations */
+ 	spinlock_t		lock;		/* Lock protecting tty field */
+ 	int			blocked_open;	/* Waiting to open */
+ 	int			count;		/* Usage count */
+@@ -241,6 +247,7 @@ struct tty_port {
+ 						   based drain is needed else
+ 						   set to size of fifo */
+ 	struct kref		kref;		/* Ref counter */
++	void 			*client_data;
+ };
+
+ /* tty_port::iflags bits -- use atomic bit ops */
 --
 2.10.1
