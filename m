@@ -1,6 +1,7 @@
 Return-Path: <andriy.shevchenko@linux.intel.com>
-Message-ID: <1483798314.26691.3.camel@linux.intel.com>
-Subject: Re: [PATCH 8/9] serdev: add a tty port controller driver
+Message-ID: <1483797771.26691.1.camel@linux.intel.com>
+Subject: Re: [PATCH 7/9] serdev: Introduce new bus for serial attached
+ devices
 From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 To: Rob Herring <robh@kernel.org>, Greg Kroah-Hartman
  <gregkh@linuxfoundation.org>, Marcel Holtmann <marcel@holtmann.org>, Jiri
@@ -11,172 +12,287 @@ Cc: Loic Poulain <loic.poulain@intel.com>, Pavel Machek <pavel@ucw.cz>,
 	NeilBrown <neil@brown.name>, Linus Walleij <linus.walleij@linaro.org>,
 	linux-bluetooth@vger.kernel.org, linux-serial@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Date: Sat, 07 Jan 2017 16:11:54 +0200
-In-Reply-To: <20170106162635.19677-9-robh@kernel.org>
+Date: Sat, 07 Jan 2017 16:02:51 +0200
+In-Reply-To: <20170106162635.19677-8-robh@kernel.org>
 References: <20170106162635.19677-1-robh@kernel.org>
-	 <20170106162635.19677-9-robh@kernel.org>
+	 <20170106162635.19677-8-robh@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 On Fri, 2017-01-06 at 10:26 -0600, Rob Herring wrote:
-> Add a serdev controller driver for tty ports.
+> The serdev bus is designed for devices such as Bluetooth, WiFi, GPS
+> and NFC connected to UARTs on host processors. Tradionally these have
+> been handled with tty line disciplines, rfkill, and userspace glue
+> such
+> as hciattach. This approach has many drawbacks since it doesn't fit
+> into the Linux driver model. Handling of sideband signals, power
+> control
+> and firmware loading are the main issues.
 > 
-> The controller is registered with serdev when tty ports are registered
-> with the TTY core. As the TTY core is built-in only, this has the side
-> effect of making serdev built-in as well.
-> 
+> This creates a serdev bus with controllers (i.e. host serial ports)
+> and
+> attached devices. Typically, these are point to point connections, but
+> some devices have muxing protocols or a h/w mux is conceivable. Any
+> muxing is not yet supported with the serdev bus.
+
+
+> --- /dev/null
+> +++ b/drivers/tty/serdev/core.c
+> @@ -0,0 +1,388 @@
 > 
 
-> +if SERIAL_DEV_BUS
 > +
-> +config SERIAL_DEV_CTRL_TTYPORT
-> +	bool "Serial device TTY port controller"
-> +	depends on TTY
+> +#include <linux/kernel.h>
+> +#include <linux/errno.h>
+> +#include <linux/idr.h>
+> +#include <linux/slab.h>
+> +#include <linux/module.h>
+> +#include <linux/of.h>
+> +#include <linux/of_device.h>
+> +#include <linux/serdev.h>
 
-> +	depends on SERIAL_DEV_BUS=y
+Alphabetical order?
 
-Do you need one?
-
-
-> +static int ttyport_receive_buf(struct tty_port *port, const unsigned
-> char *cp,
-> +				const unsigned char *fp, size_t
-> count)
+> +
+> +static bool is_registered;
+> +static DEFINE_IDA(ctrl_ida);
+> +
+> +static void serdev_device_release(struct device *dev)
 > +{
-> +	struct serdev_controller *ctrl = port->client_data;
-> +	struct serport *serport =
-> serdev_controller_get_drvdata(ctrl);
-> +
-> +	mutex_lock(&serport->lock);
-> +
-> +	if (!test_bit(SERPORT_ACTIVE, &serport->flags))
-> +		goto out;
-> +
-> +	serdev_controller_receive_buf(ctrl, cp, count);
-> +
-> +out:
-
-out_unlock: ?
-
-> +	mutex_unlock(&serport->lock);
-> +	return count;
+> +	struct serdev_device *serdev = to_serdev_device(dev);
+> +	kfree(serdev);
 > +}
 > +
-> +static void ttyport_write_wakeup(struct tty_port *port)
+> +static const struct device_type serdev_device_type = {
+> +	.release	= serdev_device_release,
+> +};
+> +
+> +static void serdev_ctrl_release(struct device *dev)
 > +{
-> +	struct serdev_controller *ctrl = port->client_data;
-> +	struct serport *serport =
-> serdev_controller_get_drvdata(ctrl);
-> +
-> +	clear_bit(TTY_DO_WRITE_WAKEUP, &port->tty->flags);
-
-This doesn't prevent to be called this function in parallel. Is it okay?
-
-> +
-> +	if (test_bit(SERPORT_ACTIVE, &serport->flags))
-> +		serdev_controller_write_wakeup(ctrl);
+> +	struct serdev_controller *ctrl = to_serdev_controller(dev);
+> +	ida_simple_remove(&ctrl_ida, ctrl->nr);
+> +	kfree(ctrl);
 > +}
-
 > +
-> +static int ttyport_write_buf(struct serdev_controller *ctrl, const
-> unsigned char *data, size_t len)
+> +static const struct device_type serdev_ctrl_type = {
+> +	.release	= serdev_ctrl_release,
+> +};
+> +
+> +static int serdev_device_match(struct device *dev, struct
+> device_driver *drv)
 > +{
-> +	struct serport *serport =
-> serdev_controller_get_drvdata(ctrl);
-> +	struct tty_struct *tty = serport->tty;
+> +	return of_driver_match_device(dev, drv);
+> +}
 > +
-> +	set_bit(TTY_DO_WRITE_WAKEUP, &tty->flags);
-> +	return serport->tty->ops->write(serport->tty, data, len);
+> 
 
-Just tty->ops->...(); ?
+> +int serdev_device_open(struct serdev_device *serdev)
+> +{
+> +	struct serdev_controller *ctrl = serdev->ctrl;
+> +
+> +	if (!ctrl || !ctrl->ops->open)
+> +		return 0;
+> +
+
+> +	return serdev->ctrl->ops->open(ctrl);
+
+Perhaps just ctrl->...();
 
 > +}
-
-
-
-> +int serdev_tty_port_register(struct tty_port *port, struct device
-> *parent,
-> +			    struct tty_driver *drv, int idx)
+> +EXPORT_SYMBOL_GPL(serdev_device_open);
+> +
+> +void serdev_device_close(struct serdev_device *serdev)
 > +{
-> +	struct serdev_controller *ctrl;
-> +	struct serport *serport;
-> +	int ret;
+> +	struct serdev_controller *ctrl = serdev->ctrl;
 > +
-> +	if (!port || !drv || !parent || !parent->of_node)
+> +	if (ctrl && ctrl->ops->close)
 
-And if it's ACPI? Perhaps last is redundant.
+Perhaps same pattern
 
-> +		return -ENODEV;
-> +
-> +	ctrl = serdev_controller_alloc(parent, sizeof(struct
-> serport));
-> +	if (!ctrl)
-> +		return -ENOMEM;
-> +	serport = serdev_controller_get_drvdata(ctrl);
-> +
-> +	mutex_init(&serport->lock);
-> +	serport->port = port;
-> +	serport->tty_idx = idx;
-> +	serport->tty_drv = drv;
-> +
-> +	ctrl->ops = &ctrl_ops;
-> +
-> +	ret = serdev_controller_add(ctrl);
-> +	if (ret)
-> +		goto err;
-> +
-> +	printk(KERN_INFO "serdev: Serial port %s\n", drv->name);
+ if (!ctrl || !ctrl->ops->close)
+  return;
 
-Hmm... It's not a debug message, why not use pr_info()?
+> +		serdev->ctrl->ops->close(ctrl);
+
+Just ctrl->... ?
+
+> +}
+> +EXPORT_SYMBOL_GPL(serdev_device_close);
+> +
+> +int serdev_device_write_buf(struct serdev_device *serdev,
+> +			    const unsigned char *buf, size_t count)
+> +{
+> +	struct serdev_controller *ctrl = serdev->ctrl;
+> +
+> +	if (!ctrl || !ctrl->ops->write_buf)
+> +		return 0;
+> +
+> +	return serdev->ctrl->ops->write_buf(ctrl, buf, count);
+
+Just ctrl->... ?
+
+> +}
+> +EXPORT_SYMBOL_GPL(serdev_device_write_buf);
+> +
+> +void serdev_device_write_flush(struct serdev_device *serdev)
+> +{
+> +	struct serdev_controller *ctrl = serdev->ctrl;
+> +
+> +	if (ctrl && ctrl->ops->write_flush)
+> +		serdev->ctrl->ops->write_flush(ctrl);
+
+Both comments.
+
+> +}
+> +EXPORT_SYMBOL_GPL(serdev_device_write_flush);
+> +
+> +int serdev_device_write_room(struct serdev_device *serdev)
+> +{
+> +	struct serdev_controller *ctrl = serdev->ctrl;
+> +
+> +	if (ctrl && ctrl->ops->write_room)
+> +		return serdev->ctrl->ops->write_room(ctrl);
+> +
+
+Ditto.
 
 > +	return 0;
-> +
-> +err:
-
-err_controller_put: ?
-
-> +	serdev_controller_put(ctrl);
-> +	return ret;
 > +}
+> +EXPORT_SYMBOL_GPL(serdev_device_write_room);
 > +
-> +void serdev_tty_port_unregister(struct tty_port *port)
+> +unsigned int serdev_device_set_baudrate(struct serdev_device *serdev,
+> unsigned int speed)
 > +{
-> +	struct serdev_controller *ctrl = port->client_data;
-> +	struct serport *serport =
-> serdev_controller_get_drvdata(ctrl);
+> +	struct serdev_controller *ctrl = serdev->ctrl;
+> +
+> +	if (!ctrl || !ctrl->ops->set_baudrate)
+> +		return 0;
+> +
+> +	return serdev->ctrl->ops->set_baudrate(ctrl, speed);
+
+ctrl->...
+
+> +
+> +}
+> +EXPORT_SYMBOL_GPL(serdev_device_set_baudrate);
+> +
+> +void serdev_device_set_flow_control(struct serdev_device *serdev,
+> bool enable)
+> +{
+> +	struct serdev_controller *ctrl = serdev->ctrl;
+> +
+> +	if (ctrl && ctrl->ops->set_flow_control)
+> +		serdev->ctrl->ops->set_flow_control(ctrl, enable);
+
+Both comments.
+
+> +}
+> +EXPORT_SYMBOL_GPL(serdev_device_set_flow_control);
+> +
+
+
+
+> +static int of_serdev_register_devices(struct serdev_controller *ctrl)
+> +{
+> +	struct device_node *node;
+> +	struct serdev_device *serdev = NULL;
+> +	int err;
+> +	bool found = false;
+> +
+> +	for_each_available_child_of_node(ctrl->dev.of_node, node) {
+> +		if (!of_get_property(node, "compatible", NULL))
+> +			continue;
+> +
+> +		dev_dbg(&ctrl->dev, "adding child %s\n", node-
+> >full_name);
+> +
+> +		serdev = serdev_device_alloc(ctrl);
+> +		if (!serdev)
+> +			continue;
+> +
+> +		serdev->dev.of_node = node;
+> +
+> +		err = serdev_device_add(serdev);
+> +		if (err) {
+> +			dev_err(&serdev->dev,
+> +				"failure adding device. status %d\n",
+> err);
+> +			serdev_device_put(serdev);
+> +		}
+> 
+
+> +		found = true;
+
+Perhaps
+
+} else if (!found)
+ found = true;
+
+Otherwise if we end up with all devices not being added, called will not
+know about it.
+
+
+> +	}
+> +	if (!found)
+> +		return -ENODEV;
+> +
+> +	return 0;
+> +}
+> 
+
+
++/**
+> + * serdev_controller_remove(): remove an serdev controller
+> + * @ctrl:	controller to remove
+> + *
+> + * Remove a serdev controller.  Caller is responsible for calling
+> + * serdev_controller_put() to discard the allocated controller.
+> + */
+> +void serdev_controller_remove(struct serdev_controller *ctrl)
+> +{
+> +	int dummy;
 > +
 > 
 
-> +	if (!serport)
+> +	if (!ctrl)
 > +		return;
 
-Same question, whose responsibility to do this?
+By the way, should we take care or caller? What is the best practice
+here?
 
 
-+
-> +#ifdef CONFIG_SERIAL_DEV_CTRL_TTYPORT
-> +int serdev_tty_port_register(struct tty_port *port, struct device
-> *parent,
-> +			    struct tty_driver *drv, int idx);
-> +void serdev_tty_port_unregister(struct tty_port *port);
-> +#else
-> +static inline int serdev_tty_port_register(struct tty_port *port,
-> +					   struct device *parent,
-> +					   struct tty_driver *drv,
-> int idx)
+> +#include <linux/types.h>
+> +#include <linux/device.h>
+
+
+> 
+
+> +static inline void serdev_controller_write_wakeup(struct
+> serdev_controller *ctrl)
 > +{
-> +	return -ENODEV;
+> +	if (ctrl->serdev && ctrl->serdev->ops->write_wakeup)
+> +		ctrl->serdev->ops->write_wakeup(ctrl->serdev);
+
+Same comment about pattern.
+
 > +}
-> +static inline void serdev_tty_port_unregister(struct tty_port *port)
-> {}
+> +
+> +static inline int serdev_controller_receive_buf(struct
+> serdev_controller *ctrl,
+> +					      const unsigned char
+> *data,
+> +					      size_t count)
+> +{
+> +	if (ctrl->serdev && ctrl->serdev->ops->receive_buf)
+> +		return ctrl->serdev->ops->receive_buf(ctrl->serdev,
+> data, count);
 
-> +#endif
-
-Perhaps comment to see from which if this one.
+Ditto.
 
 > +
->  #endif
+> +	return 0;
+> +}
 
 -- 
 Andy Shevchenko <andriy.shevchenko@linux.intel.com>
