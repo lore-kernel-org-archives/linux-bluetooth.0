@@ -1,83 +1,79 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain; charset=us-ascii
+Return-Path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain; charset=utf-8
 Mime-Version: 1.0 (Mac OS X Mail 10.2 \(3259\))
-Subject: Re: Adding EAGAIN on 0x3e (Connection faile to be established) in
- net/bluetooth/lib.c/bt_to_errno()?
+Subject: Re: [PATCH 0/9] Serial slave device bus
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CAM4OqtDier-LrdJymk5npiGvZcvj7rsaGsrJwv+tz1o+kCoFcw@mail.gmail.com>
-Date: Tue, 10 Jan 2017 19:49:40 +0100
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <1BE3F300-B719-44E3-971F-5015C5F65A78@holtmann.org>
-References: <CAM4OqtDier-LrdJymk5npiGvZcvj7rsaGsrJwv+tz1o+kCoFcw@mail.gmail.com>
-To: Edward Rosten <ed@edwardrosten.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <CAL_JsqJHyQa9zeAzHVatRwWnH04nP35ykDLXD8C_1NSJucrkKA@mail.gmail.com>
+Date: Tue, 10 Jan 2017 19:32:30 +0100
+Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Jiri Slaby <jslaby@suse.com>,
+        Sebastian Reichel <sre@kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        "Dr . H . Nikolaus Schaller" <hns@goldelico.com>,
+        Peter Hurley <peter@hurleysoftware.com>,
+        Alan Cox <gnomes@lxorguk.ukuu.org.uk>,
+        Loic Poulain <loic.poulain@intel.com>,
+        Pavel Machek <pavel@ucw.cz>, NeilBrown <neil@brown.name>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+        "linux-serial@vger.kernel.org" <linux-serial@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Message-Id: <A7D8B43A-1AB6-4F76-8561-884CBCD73259@holtmann.org>
+References: <20170106162635.19677-1-robh@kernel.org>
+ <1483786850.9552.249.camel@linux.intel.com>
+ <CAL_JsqJHyQa9zeAzHVatRwWnH04nP35ykDLXD8C_1NSJucrkKA@mail.gmail.com>
+To: Rob Herring <robh@kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Edward,
+Hi Rob,
 
-> I've been doing some bluetooth LE work on an RPi 3. I've been getting
-> occasional ENOSYS replies from connect()---actually from retreiving
-> the error code via getsockopt since it's an async call. I'm apparently
-> not the only person, though it seems to be very rare (link below).
-> Drilling down, the relevant part of the HCI log (parsed by btmon) is
-> this:
+>>> Here goes another attempt at a serial device bus (aka uart slaves, tty
+>>> slaves, etc.).
+>>> 
+>>> After some discussions with Dmitry at LPC, I decided to move away from
+>>> extending serio and moved back to making a new bus type instead. He
+>>> didn't
+>>> think using serio was a good fit, and serio has a number of
+>>> peculiarities
+>>> in regards to sysfs and it's driver model. I don't think we want to
+>>> inherit
+>>> those for serial slave devices.
+>>> 
+>>> This version sits on top of tty_port rather than uart_port as Alan
+>>> requested. Once I created a struct tty rather than moving everything
+>>> needed to tty_port, it became a lot easier and less invasive to the
+>>> tty
+>>> core code.
+>>> 
+>>> I have hacked up versions of the BT ldisc and TI ST drivers moved over
+>>> to
+>>> use the serdev bus. I have BT working on the HiKey board which has TI
+>>> BT.
+>>> With the serdev bus support, it eliminates the need for the TI
+>>> userspace
+>>> UIM daemon.
+>>> 
+>>> This series and the mentioned drivers can be found here[1].
+>> 
+>> For patches 1-4:
+>> Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 > 
+> Thanks.
 > 
->> HCI Event: LE Meta Event (0x3e) plen 12                                                                                                                                                   [hci0] 461.313621
->      LE Read Remote Used Features (0x04)
->        Status: Connection Failed to be Established (0x3e)
->        Handle: 64
->        Features: 0x1f 0x00 0x00 0x00 0x00 0x00 0x00 0x00
->          LE Encryption
->          Connection Parameter Request Procedure
->          Extended Reject Indication
->          Slave-initiated Features Exchange
->          LE Ping
+>> Regarding to naming. Why can't we just name bus "serial"? If you are
+>> worrying about folder name under drivers/tty, I can propose at lease
+>> couple of options serialdev, serialbus.
 > 
-> You can see the error code is 0x3e (coincidently the same as the LE
-> Meta Event code!). According to the Core v4.0 spec (Volume 2, Part B,
-> Section 1.3, Table 1.1) the code 0x3e which according to the spec is:
+> Naming is hard, right?
 > 
-> 2.59 CONNECTION FAILED TO BE ESTABLISHED (0X3E)
-> The Connection Failed to be Established error code indicates that the LL initi-
-> ated a connection but the connection has failed to be established.
-> 
-> In other words, it appears to be an error along the lines of
-> "something wrong happened". On my machine it's very intermittent and
-> I've found some other people reporting the same
-> (https://www.raspberrypi.org/forums/viewtopic.php?f=63&t=145144&p=962612).
-> I modified my code to retry 3 times (with a 500ms pause) on one of
-> these errors and so far it's never failed on the second attempt.
+> I have don't have too much opinion on what the name should be. I just
+> came up with something unique and inspired by serio. It is a bit
+> easier to grep for serdev rather than just serial.
 
-I bet that if you take a sniffer and look at the raw air packets, then this means that CONNECT_REQ has been sent. The initiator then moves into connection state, but reality is that only after receiving the first data packet, the connection is fully established. Between the CONNECT_REQ and the first packet, things can actually go wrong.
-
-Can you send the whole trace for it? I wonder if we get a disconnect event as well, or just an indication that the request for the remote used features did not complete. And at a later LL connection event, the connection would successfully establish.
-
-If that is the case, then I have to say that it is a bit sad if this leaks through via HCI. I would have expected that the controllers hides this from the host. In case you have an Intel or Broadcom dongle, can you enable LL traces via /sys/kernel/debug/bluetooth/hci0/vendor_diag (just echo 1 > into it). That way we also see the LL traces going over the air and can analyse this.
-
-However my bet is that on this specific error, we should just send the LE Read Remote Used Features command at least one more time before we give up on the connection. If that would work, I do not want to send an EAGIN to the userspace socket. We want to at least hide that part in the kernel if can handle it.
-
-> In net/bluetooth/lib.c, there's a function, bt_to_errno(), which maps
-> HCI codes to errno numbers, there's no entry for 0x3e.
-> 
-> I was going to submit a 2 line patch to return a sensible error code,
-> but I've come here to ask what the best choice would be:
-> 
-> I currently think EAGAIN (Try Again---since trying again is usually
-> the appropriate choice), but this is the same number as EWOULDBLOCK. I
-> think it ought to be possible to distinguish all cases
-> EAGAIN/EWOULDBLOCK on a blocking socket is this kind of error. Getting
-> it on a non blocking socket would only ever mean "operation in
-> progress". Getting EAGAIN/EWOULDBLOCK from getsockopt(fd, SOL_SOCKET,
-> SO_ERROR, ...) would also only mean "try again".
-> 
-> Does any one have any input on this? There's not a huge choice when it
-> comes to error codes, and so I think this is the best one, but I'm not
-> really sure.
-
-I need to see the full trace and if possible with LL tracing enabled, then we can see what to do. As said above, if we can just handle it inside the kernel, then lets not bother the socket with it.
+while I do not really care for the function names and how they are named, but I think the sysfs bus name should be just “serial” or something generic like it. It is suppose to be like “usb”, “net”, “bluetooth” etc. Duplicating the word “bus” in it would seem kinda pointless. And that part is ABI and we should be sure that we want it that way. Function names and source directory names can be easily renamed later on.
 
 Regards
 
 Marcel
-
