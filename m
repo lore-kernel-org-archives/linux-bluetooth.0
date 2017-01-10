@@ -1,67 +1,68 @@
-Return-Path: <robh@kernel.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <1483786850.9552.249.camel@linux.intel.com>
-References: <20170106162635.19677-1-robh@kernel.org> <1483786850.9552.249.camel@linux.intel.com>
-From: Rob Herring <robh@kernel.org>
-Date: Tue, 10 Jan 2017 11:24:06 -0600
-Message-ID: <CAL_JsqJHyQa9zeAzHVatRwWnH04nP35ykDLXD8C_1NSJucrkKA@mail.gmail.com>
-Subject: Re: [PATCH 0/9] Serial slave device bus
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Marcel Holtmann <marcel@holtmann.org>,
-	Jiri Slaby <jslaby@suse.com>, Sebastian Reichel <sre@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
-	"Dr . H . Nikolaus Schaller" <hns@goldelico.com>, Peter Hurley <peter@hurleysoftware.com>,
-	Alan Cox <gnomes@lxorguk.ukuu.org.uk>, Loic Poulain <loic.poulain@intel.com>,
-	Pavel Machek <pavel@ucw.cz>, NeilBrown <neil@brown.name>, Linus Walleij <linus.walleij@linaro.org>,
-	"open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-	"linux-serial@vger.kernel.org" <linux-serial@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+From: Edward Rosten <ed@edwardrosten.com>
+Date: Tue, 10 Jan 2017 17:09:46 +0000
+Message-ID: <CAM4OqtDier-LrdJymk5npiGvZcvj7rsaGsrJwv+tz1o+kCoFcw@mail.gmail.com>
+Subject: Adding EAGAIN on 0x3e (Connection faile to be established) in net/bluetooth/lib.c/bt_to_errno()?
+To: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Sat, Jan 7, 2017 at 5:00 AM, Andy Shevchenko
-<andriy.shevchenko@linux.intel.com> wrote:
-> On Fri, 2017-01-06 at 10:26 -0600, Rob Herring wrote:
->> Here goes another attempt at a serial device bus (aka uart slaves, tty
->> slaves, etc.).
->>
->> After some discussions with Dmitry at LPC, I decided to move away from
->> extending serio and moved back to making a new bus type instead. He
->> didn't
->> think using serio was a good fit, and serio has a number of
->> peculiarities
->> in regards to sysfs and it's driver model. I don't think we want to
->> inherit
->> those for serial slave devices.
->>
->> This version sits on top of tty_port rather than uart_port as Alan
->> requested. Once I created a struct tty rather than moving everything
->> needed to tty_port, it became a lot easier and less invasive to the
->> tty
->> core code.
->>
->> I have hacked up versions of the BT ldisc and TI ST drivers moved over
->> to
->> use the serdev bus. I have BT working on the HiKey board which has TI
->> BT.
->> With the serdev bus support, it eliminates the need for the TI
->> userspace
->> UIM daemon.
->>
->> This series and the mentioned drivers can be found here[1].
->
-> For patches 1-4:
-> Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Hi All,
 
-Thanks.
+I've been doing some bluetooth LE work on an RPi 3. I've been getting
+occasional ENOSYS replies from connect()---actually from retreiving
+the error code via getsockopt since it's an async call. I'm apparently
+not the only person, though it seems to be very rare (link below).
+Drilling down, the relevant part of the HCI log (parsed by btmon) is
+this:
 
-> Regarding to naming. Why can't we just name bus "serial"? If you are
-> worrying about folder name under drivers/tty, I can propose at lease
-> couple of options serialdev, serialbus.
 
-Naming is hard, right?
+> HCI Event: LE Meta Event (0x3e) plen 12                                                                                                                                                   [hci0] 461.313621
+      LE Read Remote Used Features (0x04)
+        Status: Connection Failed to be Established (0x3e)
+        Handle: 64
+        Features: 0x1f 0x00 0x00 0x00 0x00 0x00 0x00 0x00
+          LE Encryption
+          Connection Parameter Request Procedure
+          Extended Reject Indication
+          Slave-initiated Features Exchange
+          LE Ping
 
-I have don't have too much opinion on what the name should be. I just
-came up with something unique and inspired by serio. It is a bit
-easier to grep for serdev rather than just serial.
+You can see the error code is 0x3e (coincidently the same as the LE
+Meta Event code!). According to the Core v4.0 spec (Volume 2, Part B,
+Section 1.3, Table 1.1) the code 0x3e which according to the spec is:
 
-Rob
+2.59 CONNECTION FAILED TO BE ESTABLISHED (0X3E)
+The Connection Failed to be Established error code indicates that the LL initi-
+ated a connection but the connection has failed to be established.
+
+In other words, it appears to be an error along the lines of
+"something wrong happened". On my machine it's very intermittent and
+I've found some other people reporting the same
+(https://www.raspberrypi.org/forums/viewtopic.php?f=63&t=145144&p=962612).
+I modified my code to retry 3 times (with a 500ms pause) on one of
+these errors and so far it's never failed on the second attempt.
+
+In net/bluetooth/lib.c, there's a function, bt_to_errno(), which maps
+HCI codes to errno numbers, there's no entry for 0x3e.
+
+I was going to submit a 2 line patch to return a sensible error code,
+but I've come here to ask what the best choice would be:
+
+I currently think EAGAIN (Try Again---since trying again is usually
+the appropriate choice), but this is the same number as EWOULDBLOCK. I
+think it ought to be possible to distinguish all cases
+EAGAIN/EWOULDBLOCK on a blocking socket is this kind of error. Getting
+it on a non blocking socket would only ever mean "operation in
+progress". Getting EAGAIN/EWOULDBLOCK from getsockopt(fd, SOL_SOCKET,
+SO_ERROR, ...) would also only mean "try again".
+
+Does any one have any input on this? There's not a huge choice when it
+comes to error codes, and so I think this is the best one, but I'm not
+really sure.
+
+Regards,
+
+-Ed
