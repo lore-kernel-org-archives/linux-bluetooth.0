@@ -1,5 +1,5 @@
 Return-Path: <pavel@ucw.cz>
-Date: Tue, 10 Jan 2017 23:04:45 +0100
+Date: Tue, 10 Jan 2017 22:46:17 +0100
 From: Pavel Machek <pavel@ucw.cz>
 To: Rob Herring <robh@kernel.org>
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -13,46 +13,56 @@ Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	Linus Walleij <linus.walleij@linaro.org>,
 	linux-bluetooth@vger.kernel.org, linux-serial@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 8/9] serdev: add a tty port controller driver
-Message-ID: <20170110220445.GC2053@amd>
+Subject: Re: [PATCH 7/9] serdev: Introduce new bus for serial attached devices
+Message-ID: <20170110214617.GB2053@amd>
 References: <20170106162635.19677-1-robh@kernel.org>
- <20170106162635.19677-9-robh@kernel.org>
+ <20170106162635.19677-8-robh@kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="DIOMP1UsTsWJauNi"
-In-Reply-To: <20170106162635.19677-9-robh@kernel.org>
+	protocol="application/pgp-signature"; boundary="LpQ9ahxlCli8rRTG"
+In-Reply-To: <20170106162635.19677-8-robh@kernel.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 
---DIOMP1UsTsWJauNi
+--LpQ9ahxlCli8rRTG
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
 Hi!
 
+> +static void serdev_ctrl_release(struct device *dev)
+> +{
+> +	struct serdev_controller *ctrl =3D to_serdev_controller(dev);
+> +	ida_simple_remove(&ctrl_ida, ctrl->nr);
+> +	kfree(ctrl);
+> +}
+
+Would it make sense to do something like to_serdev_controller(dev) =3D
+NULL; there?
+
 > +MODULE_AUTHOR("Rob Herring <robh@kernel.org");
 
-Missing ">".
+Missing >.
 
 Thanks,
-							Pavel
-						=09
+									Pavel
+
 --=20
 (english) http://www.livejournal.com/~pavelmachek
 (cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blo=
 g.html
 
---DIOMP1UsTsWJauNi
+--LpQ9ahxlCli8rRTG
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: Digital signature
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1
 
-iEYEARECAAYFAlh1Wn0ACgkQMOfwapXb+vJ2FQCbBCAMMNDhgoJwfz6J+vmqml2R
-rtcAoIb2PCnGrZUvp4z3438ZJs1wwbul
-=bDfy
+iEYEARECAAYFAlh1VikACgkQMOfwapXb+vJpTwCdHxpRpKGXxge+AkN+kPGpKHt+
++VcAniREIgsO7OqHsrPBzNwIpY9awhS4
+=6b3Z
 -----END PGP SIGNATURE-----
 
---DIOMP1UsTsWJauNi--
+--LpQ9ahxlCli8rRTG--
