@@ -1,68 +1,88 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-From: Edward Rosten <ed@edwardrosten.com>
-Date: Tue, 10 Jan 2017 17:09:46 +0000
-Message-ID: <CAM4OqtDier-LrdJymk5npiGvZcvj7rsaGsrJwv+tz1o+kCoFcw@mail.gmail.com>
-Subject: Adding EAGAIN on 0x3e (Connection faile to be established) in net/bluetooth/lib.c/bt_to_errno()?
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <linux-serial-owner@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
+Subject: Re: [PATCH 0/9] Serial slave device bus
+From: "H. Nikolaus Schaller" <hns@goldelico.com>
+In-Reply-To: <1484050829.2133.9.camel@linux.intel.com>
+Date: Tue, 10 Jan 2017 13:40:21 +0100
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+        Rob Herring <robh@kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Jiri Slaby <jslaby@suse.com>,
+        Sebastian Reichel <sre@kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Peter Hurley <peter@hurleysoftware.com>,
+        Alan Cox <gnomes@lxorguk.ukuu.org.uk>,
+        Loic Poulain <loic.poulain@intel.com>,
+        Pavel Machek <pavel@ucw.cz>, NeilBrown <neil@brown.name>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+        linux-serial@vger.kernel.org, linux-kernel@vger.kernel.org
+Message-Id: <ABB60E46-46B5-4F8B-9458-83F61785A2BF@goldelico.com>
+References: <20170106162635.19677-1-robh@kernel.org> <8E1651EC-E9E5-4BB5-84CB-8CFEE08009BA@goldelico.com> <D24F4B26-1F83-4154-A183-791C5C20DD1F@holtmann.org> <6C3E6EA6-5B22-47E8-B2B2-C37D4D080505@goldelico.com> <1484050829.2133.9.camel@linux.intel.com>
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Sender: linux-serial-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi All,
+Hi Andy,
 
-I've been doing some bluetooth LE work on an RPi 3. I've been getting
-occasional ENOSYS replies from connect()---actually from retreiving
-the error code via getsockopt since it's an async call. I'm apparently
-not the only person, though it seems to be very rare (link below).
-Drilling down, the relevant part of the HCI log (parsed by btmon) is
-this:
+> Am 10.01.2017 um 13:20 schrieb Andy Shevchenko =
+<andriy.shevchenko@linux.intel.com>:
+>=20
+> On Tue, 2017-01-10 at 13:10 +0100, H. Nikolaus Schaller wrote:
+>=20
+>>> So the question is really if a driver only needs to do power
+>>> management on open() and close() or if it also has to translate or
+>>> transform the packets. There are devices who speak NMEA and all is
+>>> good.
+>>=20
+>> The device I want to upstream the driver speaks NMEA but should be
+>> powered down unless accessed...
+>=20
+> By the way, have you seen the series [1] I'm working on towards =
+bringing
+> runtime PM for all (current) serial drivers?
+>=20
+> [1] https://www.spinics.net/lists/linux-serial/msg24025.html
+
+sorry no.
+
+Interesting: "The series has been tested on our hardware with serial =
+console and RxD
+used as GPIO to wake it."
+
+We had implemented a driver ca. 5 years ago (Neil Brown did it) for our =
+GPS chip by
+doing exactly this (setting the RxD to GPIO and interrupt mode to know =
+when it sends
+data but the UART is off).
+
+This would have been completely based on existing APIs (pinmux states, =
+gpio)
+and would not even have needed any general serial device bus driver API =
+because
+it did not tamper with the UART+tty layers but the RxD line.
+
+So from a viewpoint of encapsulation it would have done what it should =
+inside the
+driver.
+
+But there was no consensus to accept that to mainline.
+
+What we need for this chip is quite special regarding PM. It is not =
+about knowing
+when to suspend/resume or power down/up the UART or host.
+
+It is about that the chip might be in the wrong state, i.e. powered on =
+when it
+should be off and vice versa. This can only be detected by monitoring =
+RxD
+activity and taking action if it is in the unexpected state. And that =
+must
+be possible independently of some user space having /dev/ttyO1 opened.
+
+BR,
+Nikolaus
 
 
-> HCI Event: LE Meta Event (0x3e) plen 12                                                                                                                                                   [hci0] 461.313621
-      LE Read Remote Used Features (0x04)
-        Status: Connection Failed to be Established (0x3e)
-        Handle: 64
-        Features: 0x1f 0x00 0x00 0x00 0x00 0x00 0x00 0x00
-          LE Encryption
-          Connection Parameter Request Procedure
-          Extended Reject Indication
-          Slave-initiated Features Exchange
-          LE Ping
 
-You can see the error code is 0x3e (coincidently the same as the LE
-Meta Event code!). According to the Core v4.0 spec (Volume 2, Part B,
-Section 1.3, Table 1.1) the code 0x3e which according to the spec is:
-
-2.59 CONNECTION FAILED TO BE ESTABLISHED (0X3E)
-The Connection Failed to be Established error code indicates that the LL initi-
-ated a connection but the connection has failed to be established.
-
-In other words, it appears to be an error along the lines of
-"something wrong happened". On my machine it's very intermittent and
-I've found some other people reporting the same
-(https://www.raspberrypi.org/forums/viewtopic.php?f=63&t=145144&p=962612).
-I modified my code to retry 3 times (with a 500ms pause) on one of
-these errors and so far it's never failed on the second attempt.
-
-In net/bluetooth/lib.c, there's a function, bt_to_errno(), which maps
-HCI codes to errno numbers, there's no entry for 0x3e.
-
-I was going to submit a 2 line patch to return a sensible error code,
-but I've come here to ask what the best choice would be:
-
-I currently think EAGAIN (Try Again---since trying again is usually
-the appropriate choice), but this is the same number as EWOULDBLOCK. I
-think it ought to be possible to distinguish all cases
-EAGAIN/EWOULDBLOCK on a blocking socket is this kind of error. Getting
-it on a non blocking socket would only ever mean "operation in
-progress". Getting EAGAIN/EWOULDBLOCK from getsockopt(fd, SOL_SOCKET,
-SO_ERROR, ...) would also only mean "try again".
-
-Does any one have any input on this? There's not a huge choice when it
-comes to error codes, and so I think this is the best one, but I'm not
-really sure.
-
-Regards,
-
--Ed
