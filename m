@@ -1,113 +1,178 @@
-Return-Path: <ezequiel@vanguardiasur.com.ar>
-MIME-Version: 1.0
-In-Reply-To: <20161229125119.8985-1-ezequiel@vanguardiasur.com.ar>
-References: <20161229125119.8985-1-ezequiel@vanguardiasur.com.ar>
-From: Ezequiel Garcia <ezequiel@vanguardiasur.com.ar>
-Date: Wed, 11 Jan 2017 17:27:54 -0300
-Message-ID: <CAAEAJfB-U5ZwuAoBf_Qr0cYCY0Lb96T7JZsoxr_hy6+18mFWNw@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: Fix NULL pointer dereference in bt_sock_recvmsg
-To: linux-bluetooth@vger.kernel.org
-Cc: Marcel Holtmann <marcel@holtmann.org>, Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>, Ezequiel Garcia <ezequiel@vanguardiasur.com.ar>
-Content-Type: text/plain; charset=UTF-8
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Content-Type: text/plain; charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 10.2 \(3259\))
+Subject: Re: Adding EAGAIN on 0x3e (Connection faile to be established) in
+ net/bluetooth/lib.c/bt_to_errno()?
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <CAO1O6scU_WUU5KVVnUuC8YD5CWa+Spn24_7f_s8O3b2rLDBnAw@mail.gmail.com>
+Date: Wed, 11 Jan 2017 02:50:06 +0100
+Cc: Bluez mailing list <linux-bluetooth@vger.kernel.org>
+Message-Id: <9AE508C4-7C2E-4126-AF76-DC551C6142D4@holtmann.org>
+References: <CAM4OqtDier-LrdJymk5npiGvZcvj7rsaGsrJwv+tz1o+kCoFcw@mail.gmail.com>
+ <1BE3F300-B719-44E3-971F-5015C5F65A78@holtmann.org>
+ <CAM4OqtDb6cm18Eqs=+rJrt7a-h0N=j+s-jPEUc1c4rHwGDbYqQ@mail.gmail.com>
+ <49A36183-9C83-43B4-B462-3838E28E21C9@holtmann.org>
+ <CAO1O6scU_WUU5KVVnUuC8YD5CWa+Spn24_7f_s8O3b2rLDBnAw@mail.gmail.com>
+To: Emil Lenngren <emil.lenngren@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 29 December 2016 at 09:51, Ezequiel Garcia
-<ezequiel@vanguardiasur.com.ar> wrote:
-> As per the comment in include/linux/net.h, the recvfrom handlers
-> should expect msg_name to be NULL. However, bt_sock_recvmsg()
-> is currently not checking it, which could lead to a NULL pointer
-> dereference.
->
-> The following NULL pointer dereference was produced while testing
-> L2CAP datagram reception. Note that the kernel is tainted due to
-> the r8723bs module being inserted. However, it seems the fix still
-> applies.
->
-> $ l2test -r -G
-> l2test[326]: Receiving ...
-> Unable to handle kernel NULL pointer dereference at virtual address 00000=
-000
-> pgd =3D ee008000
-> [00000000] *pgd=3D7f896835
-> Internal error: Oops: 817 [#1] PREEMPT SMP ARM
-> Modules linked in: r8723bs(O)
-> CPU: 0 PID: 326 Comm: l2test Tainted: G           O 4.8.0 #1
-> Hardware name: Allwinner sun7i (A20) Family
-> task: ef1c6880 task.stack: eea70000
-> PC is at __memzero+0x58/0x80
-> LR is at l2cap_skb_msg_name+0x1c/0x4c
-> pc : [<c02c47d8>]    lr : [<c0506278>]    psr: 00070013
-> sp : eea71e60  ip : 00000000  fp : 00034e1c
-> r10: 00000000  r9 : 00000000  r8 : eea71ed4
-> r7 : 000002a0  r6 : eea71ed8  r5 : 00000000  r4 : ee4a5d80
-> r3 : 00000000  r2 : 00000000  r1 : 0000000e  r0 : 00000000
-> Flags: nzcv  IRQs on  FIQs on  Mode SVC_32  ISA ARM Segment none
-> Control: 10c5387d  Table: 7600806a  DAC: 00000051
-> Process l2test (pid: 326, stack limit =3D 0xeea70210)
-> Stack: (0xeea71e60 to 0xeea72000)
-> 1e60: ee4a5d80 eeac2800 000002a0 c04d7114 173eefa0 00000000 c06ca68e 0000=
-0000
-> 1e80: 00000001 eeac2800 eef23500 00000000 000002a0 eea71ed4 eea70000 c050=
-4d50
-> 1ea0: 00000000 00000000 eef23500 00000000 00000000 c044e8a0 eea71edc eea9=
-f904
-> 1ec0: bef89aa0 fffffff7 00000000 00035008 000002a0 00000000 00000000 0000=
-0000
-> 1ee0: 00000000 00000000 eea71ed4 00000000 00000000 00000000 00004000 0000=
-0000
-> 1f00: 0000011b c01078c4 eea70000 c044e5e4 00000000 00000000 642f0001 6c2f=
-7665
-> 1f20: 0000676f 00000000 00000000 00000000 00000000 00000000 00000000 0000=
-0000
-> 1f40: 00000000 00000000 00000000 00000000 00000000 ffffffff 00000001 bef8=
-9ad8
-> 1f60: 000000a8 c01078c4 eea70000 00000000 00034e1c c01e6c74 00000000 0000=
-0000
-> 1f80: 00034e1c 000341f8 00000000 00000123 c01078c4 c044e90c 00000000 0000=
-0000
-> 1fa0: 000002a0 c0107700 00034e1c 000341f8 00000003 00035008 000002a0 0000=
-0000
-> 1fc0: 00034e1c 000341f8 00000000 00000123 00000000 00000000 00011ffc 0003=
-4e1c
-> 1fe0: 00000000 bef89aa4 0001211c b6eebb60 60070010 00000003 00000000 0000=
-0000
-> [<c02c47d8>] (__memzero) from [<c0506278>] (l2cap_skb_msg_name+0x1c/0x4c)
-> [<c0506278>] (l2cap_skb_msg_name) from [<c04d7114>] (bt_sock_recvmsg+0x12=
-8/0x160)
-> [<c04d7114>] (bt_sock_recvmsg) from [<c0504d50>] (l2cap_sock_recvmsg+0x98=
-/0x134)
-> [<c0504d50>] (l2cap_sock_recvmsg) from [<c044e8a0>] (SyS_recvfrom+0x94/0x=
-ec)
-> [<c044e8a0>] (SyS_recvfrom) from [<c044e90c>] (SyS_recv+0x14/0x1c)
-> [<c044e90c>] (SyS_recv) from [<c0107700>] (ret_fast_syscall+0x0/0x3c)
-> Code: e3110010 18a0500c e49de004 e3110008 (18a0000c)
-> ---[ end trace 224e35e79fe06b42 ]---
->
-> Signed-off-by: Ezequiel Garcia <ezequiel@vanguardiasur.com.ar>
-> ---
->  net/bluetooth/af_bluetooth.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
-> index 1aff2da9bc74..cfb2faba46de 100644
-> --- a/net/bluetooth/af_bluetooth.c
-> +++ b/net/bluetooth/af_bluetooth.c
-> @@ -245,7 +245,7 @@ int bt_sock_recvmsg(struct socket *sock, struct msghd=
-r *msg, size_t len,
->         if (err =3D=3D 0) {
->                 sock_recv_ts_and_drops(msg, sk, skb);
->
-> -               if (bt_sk(sk)->skb_msg_name)
-> +               if (msg->msg_name && bt_sk(sk)->skb_msg_name)
->                         bt_sk(sk)->skb_msg_name(skb, msg->msg_name,
->                                                 &msg->msg_namelen);
->         }
-> --
-> 2.11.0
->
+Hi Emil,
 
-Any feedback here?
---=20
-Ezequiel Garc=C3=ADa, VanguardiaSur
-www.vanguardiasur.com.ar
+>>>> I bet that if you take a sniffer and look at the raw air packets, then this means that CONNECT_REQ has been sent. The initiator then moves into connection state, but reality is that only after receiving the first data packet, the connection is fully established. Between the CONNECT_REQ and the first packet, things can actually go wrong.
+> 
+> At the same moment the controller sends the CONNECT_REQ over the air,
+> it sends the LE Connection Complete Event to the host. This means that
+> the connection is considered created even though the slave has not yet
+> acknowledged.
+> After this the master link layer starts to send out packets at every
+> connection interval. If it doesn't get any response after 6 connection
+> intervals, it gives up and the link gets reported as disconnected.
+> 
+>>> 
+>>> I don't have a hardware sniffer: all I've got are tools to parse the HCI dump.
+>>> 
+>>>> Can you send the whole trace for it? I wonder if we get a disconnect event as well, or just an indication that the request for the remote used features did not complete. And at a later LL connection event, the connection would successfully establish.
+>>> 
+>>> Here's the complete HCI log, from Create Connection onwards:
+>>> 
+>>> < HCI Command: LE Create Connection (0x08|0x000d) plen 25
+>>> 
+>>>                                             [hci0] 460.552896
+>>>       Scan interval: 60.000 msec (0x0060)
+>>>       Scan window: 60.000 msec (0x0060)
+>>>       Filter policy: White list is not used (0x00)
+>>>       Peer address type: Public (0x00)
+>>>       Peer address: 00:07:80:CF:3E:94 (Bluegiga Technologies OY)
+>>>       Own address type: Public (0x00)
+>>>       Min connection interval: 50.00 msec (0x0028)
+>>>       Max connection interval: 70.00 msec (0x0038)
+>>>       Connection latency: 0x0000
+>>>       Supervision timeout: 420 msec (0x002a)
+>>>       Min connection length: 0.000 msec (0x0000)
+>>>       Max connection length: 0.000 msec (0x0000)
+>>>> HCI Event: Command Status (0x0f) plen 4                                                          [hci0] 460.553725
+>>>     LE Create Connection (0x08|0x000d) ncmd 1
+>>>       Status: Success (0x00)
+>>>> HCI Event: LE Meta Event (0x3e) plen 19                                                          [hci0] 460.882366
+>>>     LE Connection Complete (0x01)
+>>>       Status: Success (0x00)
+>>>       Handle: 64
+>>>       Role: Master (0x00)
+>>>       Peer address type: Public (0x00)
+>>>       Peer address: 00:07:80:CF:3E:94 (Bluegiga Technologies OY)
+>>>       Connection interval: 67.50 msec (0x0036)
+>>>       Connection latency: 0.00 msec (0x0000)
+>>>       Supervision timeout: 420 msec (0x002a)
+>>>       Master clock accuracy: 0x00
+>>> < HCI Command: LE Read Remote Used Features (0x08|0x0016) plen 2
+>>> 
+>>>                                             [hci0] 460.882691
+>>>       Handle: 64
+>>> @ Device Connected: 00:07:80:CF:3E:94 (1) flags 0x0000
+>>>       02 01 06 11 06 64 97 81 d1 ed ba 6b ac 11 4c 9d  .....d.....k..L.
+>>>       34 3e 20 09 73                                   4> .s
+>>>> HCI Event: Command Status (0x0f) plen 4                                                          [hci0] 460.883763
+>>>     LE Read Remote Used Features (0x08|0x0016) ncmd 1
+>>>       Status: Success (0x00)
+>>>> HCI Event: LE Meta Event (0x3e) plen 12                                                          [hci0] 461.313621
+>>>     LE Read Remote Used Features (0x04)
+>>>       Status: Connection Failed to be Established (0x3e)
+>>>       Handle: 64
+>>>       Features: 0x1f 0x00 0x00 0x00 0x00 0x00 0x00 0x00
+>>>         LE Encryption
+>>>         Connection Parameter Request Procedure
+>>>         Extended Reject Indication
+>>>         Slave-initiated Features Exchange
+>>>         LE Ping
+>>>> HCI Event: Disconnect Complete (0x05) plen 4                                                     [hci0] 461.314141
+>>>       Status: Success (0x00)
+>>>       Handle: 64
+>>>       Reason: Connection Failed to be Established (0x3e)
+>>> @ Device Disconnected: 00:07:80:CF:3E:94 (1) reason 0
+>> 
+>> never mind then. So we actually get disconnected here. Which means the connection never fully established. That can actually happen even after a successful LE Connection Complete. Mainly through interference etc.
+> 
+> Yes, always when the controller sends a disconnected event due to
+> Connection Failed To Be Established, the other pending commands (e.g.
+> read remote features / read remote version) are also completed with
+> the same status code (prior to the disconnected event).
+> 
+>> 
+>> I am fine treating the error 0x3e special, but we need to figure out what is the best socket error code to map it to. I am reluctant to use EAGAIN since that is kinda dedicated meaning for non-blocking operation. Keep in mind that EAGAIN and EWOULDBLOCK are the same number.
+>> 
+>> This needs some research on how normal network sockets would handle this. If they do it at all. However things like ECANCELED or ECONNABORTED might be a good choice.
+>> 
+>>>> If that is the case, then I have to say that it is a bit sad if this leaks through via HCI. I would have expected that the controllers hides this from the host. In case you have an Intel or Broadcom dongle, can you enable LL traces via /sys/kernel/debug/bluetooth/hci0/vendor_diag (just echo 1 > into it). That way we also see the LL traces going over the air and can analyse this.
+>>> 
+>>> I'm afraid not: it's the BCM43438 chip build into the RPi 3 and
+>>> doesn't provide that option.
+>> 
+>> It does support it, but if you use Rasparian or similar, then they use the old hciattach hacked up code for getting the chip recognised. The newly btattach tool and kernel drivers for Broadcom chips will enable that. It is pretty useful.
+>> 
+>> Do you want to work on using hci_bcm.c on the RPi3? Would be useful to have it natively integrated. I tried Fedora 25, but the SD card controller the card sits on wasn’t upstream yet.
+>> 
+>>>> However my bet is that on this specific error, we should just send the LE Read Remote Used Features command at least one more time before we give up on the connection. If that would work, I do not want to send an EAGIN to the userspace socket. We want to at least hide that part in the kernel if can handle it.
+> 
+> There is never a reason to retry a Read Remote Features command and
+> similar since if the controller fails for any reason, it sends a
+> disconnect event immediately after.
+> 
+>>> 
+>>> What should be the error message on failure? It seems to be a very
+>>> sporadic error. Also, I'm 99% sure it's not the remote hardware, since
+>>> I've tested it a lot on Linux with a Broadcom dongle and never
+>>> received an error.
+>> 
+>> As I said, I am pretty sure that is some interference or scheduling issue locally and the controller missing the LL connection event that confirm the connection is really alive and active. We know that occasionally that can happen. A newer firmware from Broadcom might also make this more robust. Nevertheless, reporting this better to userspace is a good fix. Just need to figure out the best error code.
+> 
+> There are basically 4 reasons the connection fails to establish:
+> 1. Radio interference. If the CONNECT_REQ is not received correctly by
+> the advertiser, the advertiser never enters the connection state.
+> Since there is no retransmission of the CONNECT_REQ in case of
+> failure, this is a more common cause of the problem than when a data
+> packet is transmitted (there are 6 attempts to exchange data packets).
+> Also, if a scanner sends a SCAN_REQ at the same time someone sends the
+> CONNECT_REQ, the packets interfere and the advertiser just gets
+> garbage and fails to create the connection.
+> 2. The clock in either the master or the slave is outside the allowed
+> range, causing missed packets.
+> 3. The advertiser uses the white list feature and the initiator is
+> currently not in the white list, causing the advertiser to drop the
+> CONNECT_REQ.
+> 4. The advertiser already has a connection to the initiator and
+> therefore drops the CONNECT_REQ. The standard says "If an advertiser
+> receives a connection request from an initiator it is already
+> connected to, it shall ignore that request.". (Not all controllers
+> obey this rule since it was introduced later than the 4.0 spec was
+> released and some other companies have missed this requirement.) If
+> the initiator host makes sure it doesn't create a new connection to a
+> device it is already connected to, this shouldn't happen however.
+> 
+> The Bluetooth spec treats a connection to be created even though the
+> slave has not yet acknowledged, in contrast to for example TCP.
+> Therefore the Connection Failed To Be Established error should be
+> treated similar to supervision timeout. The Bluetooth spec says "The
+> only difference between a connection that is created and a connection
+> that is established is the Link Layer connection supervision timeout
+> value that is used". But due to cause 3 above, I would still treat
+> them different.
+> In comparison, in Android Lollipop and up, the user does not get
+> informed about that the connection has been successfully created until
+> both the Read Remote Features and Read Remote Version commands have
+> completed.
+> 
+> As an application writer, you normally would like to distinguish
+> Connection Failed To Be Established to for example Connection Limit
+> Exceeded since you would normally like to try again a few times when
+> you get the first error, unless you are aware of that the advertising
+> device might use the white list.
+
+the ENOSYS error returning to the socket is currently bad. We should choose a better error code at least.
+
+However you are right, I think in case of the 0x3e error returned from the controller, the kernel should try to establish the connection again. And only after x failed attempts report an error back to the socket.
+
+Regards
+
+Marcel
+
