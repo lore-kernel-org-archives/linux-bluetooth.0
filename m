@@ -1,136 +1,63 @@
-Return-Path: <linux-serial-owner@vger.kernel.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <1483798314.26691.3.camel@linux.intel.com>
-References: <20170106162635.19677-1-robh@kernel.org> <20170106162635.19677-9-robh@kernel.org>
- <1483798314.26691.3.camel@linux.intel.com>
-From: Rob Herring <robh@kernel.org>
-Date: Thu, 12 Jan 2017 10:01:45 -0600
-Message-ID: <CAL_JsqJtJaadieC2PSe6YV9pvvv8TXTM-hSDR5MZR+n-aRWo1g@mail.gmail.com>
-Subject: Re: [PATCH 8/9] serdev: add a tty port controller driver
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Jiri Slaby <jslaby@suse.com>,
-        Sebastian Reichel <sre@kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        "Dr . H . Nikolaus Schaller" <hns@goldelico.com>,
-        Peter Hurley <peter@hurleysoftware.com>,
-        Alan Cox <gnomes@lxorguk.ukuu.org.uk>,
-        Loic Poulain <loic.poulain@intel.com>,
-        Pavel Machek <pavel@ucw.cz>, NeilBrown <neil@brown.name>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-        "linux-serial@vger.kernel.org" <linux-serial@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+In-Reply-To: <9CFEE4B0-5A6B-4153-BB3B-2CDF13955E2C@gmail.com>
+References: <CAM4OqtDier-LrdJymk5npiGvZcvj7rsaGsrJwv+tz1o+kCoFcw@mail.gmail.com>
+ <1BE3F300-B719-44E3-971F-5015C5F65A78@holtmann.org> <CAM4OqtDb6cm18Eqs=+rJrt7a-h0N=j+s-jPEUc1c4rHwGDbYqQ@mail.gmail.com>
+ <49A36183-9C83-43B4-B462-3838E28E21C9@holtmann.org> <CAO1O6scU_WUU5KVVnUuC8YD5CWa+Spn24_7f_s8O3b2rLDBnAw@mail.gmail.com>
+ <9AE508C4-7C2E-4126-AF76-DC551C6142D4@holtmann.org> <9CFEE4B0-5A6B-4153-BB3B-2CDF13955E2C@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Thu, 12 Jan 2017 14:44:08 +0200
+Message-ID: <CABBYNZL7mrxJfx_R0bi1ZyDwtFNMA09gXMGtX8VbmSKmunK9Hw@mail.gmail.com>
+Subject: Re: 5.43 Experimental Status?
+To: Travis Griggs <travisgriggs@gmail.com>
+Cc: Bluez mailing list <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
-Sender: linux-serial-owner@vger.kernel.org
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Sat, Jan 7, 2017 at 8:11 AM, Andy Shevchenko
-<andriy.shevchenko@linux.intel.com> wrote:
-> On Fri, 2017-01-06 at 10:26 -0600, Rob Herring wrote:
->> Add a serdev controller driver for tty ports.
->>
->> The controller is registered with serdev when tty ports are registered
->> with the TTY core. As the TTY core is built-in only, this has the side
->> effect of making serdev built-in as well.
->>
->>
+Hi Travis,
+
+On Thu, Jan 12, 2017 at 12:38 AM, Travis Griggs <travisgriggs@gmail.com> wr=
+ote:
+> I=E2=80=99m trying to bring my linux SBC acting as a peripheral up to deb=
+ian stretch. I had been running on jessie, with my own build of bluez 5.41.=
+ I had been modifying the bluetooth.service to execute:
 >
->> +if SERIAL_DEV_BUS
->> +
->> +config SERIAL_DEV_CTRL_TTYPORT
->> +     bool "Serial device TTY port controller"
->> +     depends on TTY
+>     /usr/lib/bluetooth/bluetoothd -d -E --noplugin=3D*
 >
->> +     depends on SERIAL_DEV_BUS=y
+> The latest stretch/testing bluez seems to be 5.43 though:
 >
-> Do you need one?
-
-Yes, otherwise the bus can be built as a module and this driver can
-still be enabled breaking the build. I could drop supporting building
-the bus as a module because as long as this is the only controller
-driver, it all has to be built-in. Is there any desire/plan to make
-the TTY layer buildable as a module?
-
-
->> +     mutex_unlock(&serport->lock);
->> +     return count;
->> +}
->> +
->> +static void ttyport_write_wakeup(struct tty_port *port)
->> +{
->> +     struct serdev_controller *ctrl = port->client_data;
->> +     struct serport *serport =
->> serdev_controller_get_drvdata(ctrl);
->> +
->> +     clear_bit(TTY_DO_WRITE_WAKEUP, &port->tty->flags);
+>     dpkg -l | grep bluez
+>     ii  bluez                         5.43-1                   armhf     =
+   Bluetooth tools and daemons
 >
-> This doesn't prevent to be called this function in parallel. Is it okay?
-
-I believe it should be fine. This is essentially what all the wakeup
-callbacks do for the ldisc based drivers.
-
-
->> +int serdev_tty_port_register(struct tty_port *port, struct device
->> *parent,
->> +                         struct tty_driver *drv, int idx)
->> +{
->> +     struct serdev_controller *ctrl;
->> +     struct serport *serport;
->> +     int ret;
->> +
->> +     if (!port || !drv || !parent || !parent->of_node)
+> I thought the -E flag was supposed to no longer be necessary after 5.42. =
+So I removed it. I updated my own python code to match the small changes I =
+found in example-advertisement. But I=E2=80=99m getting the following error=
+:
 >
-> And if it's ACPI? Perhaps last is redundant.
+>     ERROR:dbus.connection:Unable to set arguments (dbus.ObjectPath('/nels=
+on_irrigation/twig_pilot'), {}) according to signature None: <class 'ValueE=
+rror'>: Unable to guess signature from an empty dict
 
-Yes, fixed. We should only have the matching details in the core.
+Well RegisterAdvertisement is still using
+GDBUS_EXPERIMENTAL_ASYNC_METHOD, what has been marked as stable is the
+GATT APIs so for advertisement you still need -E.
 
+> Which after googling, was the same error I found a while back when I had =
+forgotten to turn -E on with 5.40.
 >
->> +             return -ENODEV;
->> +
->> +     ctrl = serdev_controller_alloc(parent, sizeof(struct
->> serport));
->> +     if (!ctrl)
->> +             return -ENOMEM;
->> +     serport = serdev_controller_get_drvdata(ctrl);
->> +
->> +     mutex_init(&serport->lock);
->> +     serport->port = port;
->> +     serport->tty_idx = idx;
->> +     serport->tty_drv = drv;
->> +
->> +     ctrl->ops = &ctrl_ops;
->> +
->> +     ret = serdev_controller_add(ctrl);
->> +     if (ret)
->> +             goto err;
->> +
->> +     printk(KERN_INFO "serdev: Serial port %s\n", drv->name);
+> So I added the -E back in and it started working as hoped.
 >
-> Hmm... It's not a debug message, why not use pr_info()?
+> Can someone explain why the -E is still needed with 5.43, for dbus code l=
+ike that found in the test/examples? Did it not really get promoted after a=
+ll? Or did I misunderstand the semantics of what was changing?--
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth=
+" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-Converted to dev_info().
 
 
->> +     serdev_controller_put(ctrl);
->> +     return ret;
->> +}
->> +
->> +void serdev_tty_port_unregister(struct tty_port *port)
->> +{
->> +     struct serdev_controller *ctrl = port->client_data;
->> +     struct serport *serport =
->> serdev_controller_get_drvdata(ctrl);
->> +
->>
->
->> +     if (!serport)
->> +             return;
->
-> Same question, whose responsibility to do this?
-
-I don't get the question. ctrl and serport can be NULL here so the
-caller can call this unconditionally.
-
-Rob
+--=20
+Luiz Augusto von Dentz
