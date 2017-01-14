@@ -1,30 +1,28 @@
-Return-Path: <nicolasiooss@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
- Johan Hedberg <johan.hedberg@gmail.com>,
- Gustavo Padovan <gustavo@padovan.org>, linux-bluetooth@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
-From: Nicolas Iooss <nicolas.iooss_linux@m4x.org>
-Subject: Bluetooth: always-true condition in dtl1_confcheck
-Message-ID: <7ce36049-55f9-c540-6f63-f513f3d7201a@m4x.org>
-Date: Sun, 15 Jan 2017 12:04:41 +0100
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: bugzilla-daemon@bugzilla.kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [Bug 84521] Ralink RT3290 doesn't have a bluetooth driver
+Date: Sat, 14 Jan 2017 19:30:11 +0000
+Message-ID: <bug-84521-62941-f2BkLP1LyH@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-84521-62941@https.bugzilla.kernel.org/>
+References: <bug-84521-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello,
+https://bugzilla.kernel.org/show_bug.cgi?id=84521
 
-Since commit 00990e7ce0b0 ("pcmcia: use autoconfiguration feature for
-ioports and iomem") function dtl1_confcheck() starts with the following
-statements (in drivers/bluetooth/dtl1_cs.c):
+--- Comment #4 from Mike Wortin <mikewortin@gmail.com> ---
+(In reply to Ashesh Kumar Singh from comment #3)
+> Any updates? Is this ever gonna work?
 
-    static int dtl1_confcheck(struct pcmcia_device *p_dev, void *priv_data)
-    {
-        if ((p_dev->resource[1]->end) || (p_dev->resource[1]->end < 8))
-            return -ENODEV;
+No, it does not working in any vanilla kernel.
+A workaround is installing rtbth as described here
+https://bbs.archlinux.org/viewtopic.php?id=176121
+After installing this driver I can pair and send files fro my android phone,
+but cannot connect to my bluetooth headphones.
 
-The condition in the if statement is always true and the compiler
-reports an issue when building with -Wlogical-op. What was the condition
-supposed to be?
-
-Thanks,
-Nicolas
+-- 
+You are receiving this mail because:
+You are the assignee for the bug.
