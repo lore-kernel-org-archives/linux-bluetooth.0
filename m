@@ -1,46 +1,75 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-To: linux-bluetooth@vger.kernel.org
-From: Istvan Posta <iposta@avmap.ro>
-Subject: AVRCP enabled music player application: Enable Browsing
-Message-ID: <587CC1BB.9000607@avmap.ro>
-Date: Mon, 16 Jan 2017 14:51:07 +0200
+Date: Mon, 16 Jan 2017 09:58:31 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: davem@davemloft.net
+Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Subject: pull request: bluetooth 2017-01-16
+Message-ID: <20170116075831.GA7190@x1c>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: multipart/signed; micalg=pgp-sha1;
+        protocol="application/pgp-signature"; boundary="YiEDa0DAkWCtVeE4"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello,
 
-I apologize if I will sound too dumb, but I am desperate because I can't 
-the solution for my problem.
+--YiEDa0DAkWCtVeE4
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-I am developing a music player application which will respond to 
-Play/Pause/Stop/Next/Previous media button keys if the device running 
-the application is connected to a media player device, like a media 
-player in the car.
+Hi Dave,
 
-Libraries I am using:
-     bluez version: 5.19
-     Dbus binding: GIO 2.42.1
+Here are a couple of important 802.15.4 driver fixes for the 4.10
+kernel.
 
-For this I have implemented all the interfaces following the MPRIS D-Bus 
-Interface Specification, and called the org.bluez.Media1.RegisterPlayer 
-method.
-The application is getting Play/Pause/Stop/Next/Previous key press 
-events and is responding to them accordingly.
+Please let me know if there are any issues pulling. Thanks.
 
-The next step is to implement the Browsing feature in the application. 
-This is where I got stuck. I have implemented the 
-org.mpris.MediaPlayer2.Playlists an the org.mpris.MediaPlayer2.TrackList 
-interfaces, but if I press the Browse button on the media player device, 
-isn't showing the dummy playlists and tracklists of the application.
+Johan
 
-I would really appreciate If somebody could help me and give me a good 
-step-by-step description of what to implement, register or call in order 
-to make it work.
+---
+The following changes since commit 8a430ed50bb1b19ca14a46661f3b1b35f2fb5c39:
 
-If I wasn't detailed enough and I have to give more information, please 
-tell me.
+  net: ipv4: fix table id in getroute response (2017-01-12 15:18:20 -0500)
 
-Kind regards,
-Istvan Posta.
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git for-upstream
+
+for you to fetch changes up to 8e38b7d4d71479b23b77f01cf0e5071610b8f357:
+
+  ieee802154: atusb: fix driver to work with older firmware versions (2017-01-12 22:12:43 +0100)
+
+----------------------------------------------------------------
+Andrey Smirnov (1):
+      at86rf230: Allow slow GPIO pins for "rstn"
+
+Stefan Schmidt (4):
+      ieee802154: atusb: do not use the stack for buffers to make them DMA able
+      ieee802154: atusb: make sure we set a randaom extended address if fetching fails
+      ieee802154: atusb: do not use the stack for address fetching to make it DMA able
+      ieee802154: atusb: fix driver to work with older firmware versions
+
+ drivers/net/ieee802154/at86rf230.c |  4 +--
+ drivers/net/ieee802154/atusb.c     | 59 +++++++++++++++++++++++---------
+ 2 files changed, 45 insertions(+), 18 deletions(-)
+
+--YiEDa0DAkWCtVeE4
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIcBAEBAgAGBQJYfH0nAAoJECQj9vv5qNQS9mgP/3eKGzRp7JB77D5A64JvfVhB
+tLfK/7mO2u67Oaje0kG06UwXFmCYOXH/i3MtX/SeLn44lpC7d9GNYFdYozkt4cz0
+pNVRhTJZzqJTMKcrPrl2XbL0bczP+C+CJ+3FOjJYCUvTDXehm4hHF+K30h0Jk9ES
+ZF+ArOJSRumn7uCNLm9qh2nVqq6HsCcyIJdWzm6T7ARk0SGYwoJfb/OmqqMFEo2j
+rRbwI53l7cXgOe1BpS1zQWlwbOUR2ro6gBixyKx1YVEoUz5BdWOZPBw/85T9Jq5+
+r2eybdUg4bW6OjP64IBO8JniQ5249pTbB9WC5Y0JZRQ617oyDRWYucrilTVzlKdX
+Qyx6Daevd/aQPIjEmfNTNQNjl4+nJmQrhD6ZDFSprkfAA/yRhIHISwq7FPO7g/8y
+4Xxd5z/GUmQUsGojFGohxwFcGSXj8pEYTekBoejRvw9Q+0VfMPq+BLLb64tOXwdq
+PdoScLgU6cM/F2Bugqh5zrft301NnM1RRwvpq3V5RdtwfdHCvod8eYGfWr3TtaFk
+/8a40JdNEIsF+up3gIYyP7jlKCzG009J2UTzickfArvx20QWfEZ6npEAkmrVdAHx
+wBp4IVL+WN/hRi0zAIKcJSllSeEOCKcZ09ICJnkuvcRIGFWVNoAmBlKidjagUw6x
+6faTvYaapEY35WglZCEg
+=64Oe
+-----END PGP SIGNATURE-----
+
+--YiEDa0DAkWCtVeE4--
