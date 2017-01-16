@@ -1,67 +1,80 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Date: Tue, 17 Jan 2017 12:35:06 +0530 (IST)
-From: Mallikarjun Phulari <p.mallikarjun@globaledgesoft.com>
-To: Maxime Chevallier <maxime.chevallier@smile.fr>
-Cc: linux-bluetooth@vger.kernel.org, luiz dentz <luiz.dentz@gmail.com>
-Message-ID: <947643683.19966188.1484636706688.JavaMail.zimbra@globaledgesoft.com>
-In-Reply-To: <1482402965-9462-1-git-send-email-maxime.chevallier@smile.fr>
-References: <1482402965-9462-1-git-send-email-maxime.chevallier@smile.fr>
-Subject: Re: [PATCH 1/2] tools/btgatt-client: Fix set-security interactive
- command
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <robherring2@gmail.com>
+From: Rob Herring <robh@kernel.org>
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Jiri Slaby <jslaby@suse.com>,
+	Sebastian Reichel <sre@kernel.org>,
+	Arnd Bergmann <arnd@arndb.de>,
+	"Dr . H . Nikolaus Schaller" <hns@goldelico.com>,
+	Peter Hurley <peter@hurleysoftware.com>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Alan Cox <gnomes@lxorguk.ukuu.org.uk>
+Cc: Loic Poulain <loic.poulain@intel.com>,
+	Pavel Machek <pavel@ucw.cz>,
+	NeilBrown <neil@brown.name>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	linux-bluetooth@vger.kernel.org,
+	linux-serial@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v2 9/9] tty_port: register tty ports with serdev bus
+Date: Mon, 16 Jan 2017 16:54:36 -0600
+Message-Id: <20170116225436.17505-10-robh@kernel.org>
+In-Reply-To: <20170116225436.17505-1-robh@kernel.org>
+References: <20170116225436.17505-1-robh@kernel.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi i am running heart-rate service using gatt-server.
-And i am using gatttool as client.
-gatt-server with default security level "low" is working fine.
-But when try different security levels "medium" and "high" with -s option, it is not connecting with the gatttool.
+Register a serdev controller with the serdev bus when a tty_port is
+registered. This creates the serdev controller and create's serdev
+devices for any DT child nodes of the tty_port's parent (i.e. the UART
+device).
 
-What might be the problem??
-
-Thanks & Regards
-Mallikarjun Phulari
-
------ Original Message -----
-From: "Maxime Chevallier" <maxime.chevallier@smile.fr>
-To: linux-bluetooth@vger.kernel.org
-Cc: "luiz dentz" <luiz.dentz@gmail.com>, "Maxime Chevallier" <maxime.chevallier@smile.fr>
-Sent: Thursday, December 22, 2016 4:06:04 PM
-Subject: [PATCH 1/2] tools/btgatt-client: Fix set-security interactive command
-
-Fix the interactive "set-security" command in btgatt-client, that would
-always fail due to bad initialization of argv buffer :
-
-[GATT client]# set-security 2
-Usage: set_security <level>
-level: 1-3
-e.g.:
-        set-sec-level 2
+Signed-off-by: Rob Herring <robh@kernel.org>
+Reviewed-By: Sebastian Reichel <sre@kernel.org>
 ---
- tools/btgatt-client.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+v2:
+- Skip creating the tty device file node when serdev_tty_port_register
+  finds slave devices.
 
-diff --git a/tools/btgatt-client.c b/tools/btgatt-client.c
-index 40a03b1..afe00aa 100644
---- a/tools/btgatt-client.c
-+++ b/tools/btgatt-client.c
-@@ -1198,8 +1198,7 @@ static void set_security_usage(void)
- 
- static void cmd_set_security(struct client *cli, char *cmd_str)
+ drivers/tty/tty_port.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/drivers/tty/tty_port.c b/drivers/tty/tty_port.c
+index 232a8cbf47bc..d7e0dced967b 100644
+--- a/drivers/tty/tty_port.c
++++ b/drivers/tty/tty_port.c
+@@ -16,6 +16,7 @@
+ #include <linux/bitops.h>
+ #include <linux/delay.h>
+ #include <linux/module.h>
++#include <linux/serdev.h>
+
+ static int tty_port_default_receive_buf(struct tty_port *port,
+ 					const unsigned char *p,
+@@ -125,7 +126,15 @@ struct device *tty_port_register_device_attr(struct tty_port *port,
+ 		struct device *device, void *drvdata,
+ 		const struct attribute_group **attr_grp)
  {
--	char *argvbuf[1];
--	char **argv = argvbuf;
-+	char *argv[2];
- 	int argc = 0;
- 	char *endptr = NULL;
- 	int level;
--- 
-2.1.4
-
++	struct device *dev;
++
+ 	tty_port_link_device(port, driver, index);
++
++	dev = serdev_tty_port_register(port, device, driver, index);
++	if (PTR_ERR(dev) != -ENODEV)
++		/* Skip creating cdev if we registered a serdev device */
++		return dev;
++
+ 	return tty_register_device_attr(driver, index, device, drvdata,
+ 			attr_grp);
+ }
+@@ -177,6 +186,9 @@ static void tty_port_destructor(struct kref *kref)
+ 	/* check if last port ref was dropped before tty release */
+ 	if (WARN_ON(port->itty))
+ 		return;
++
++	serdev_tty_port_unregister(port);
++
+ 	if (port->xmit_buf)
+ 		free_page((unsigned long)port->xmit_buf);
+ 	tty_port_destroy(port);
 --
-To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-the body of a message to majordomo@vger.kernel.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
-Disclaimer:- The information contained in this electronic message and any attachments to this message are intended for the exclusive use of the addressee(s) and may contain proprietary, confidential or privileged information. If you are not the intended recipient, you should not disseminate, distribute or copy this e-mail. Please notify the sender immediately and destroy all copies of this message and any attachments. The views expressed in this E-mail message (including the enclosure/(s) or attachment/(s) if any) are those of the individual sender, except where the sender expressly, and with authority, states them to be the views of GlobalEdge. Before opening any mail and attachments please check them for viruses .GlobalEdge does not accept any liability for virus infected mails.
-
+2.10.1
