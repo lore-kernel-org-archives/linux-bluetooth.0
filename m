@@ -1,39 +1,46 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+To: linux-bluetooth@vger.kernel.org
+From: Istvan Posta <iposta@avmap.ro>
+Subject: AVRCP enabled music player application: Enable Browsing
+Message-ID: <587CC1BB.9000607@avmap.ro>
+Date: Mon, 16 Jan 2017 14:51:07 +0200
 MIME-Version: 1.0
-In-Reply-To: <CAK-EfX=FkO9JSiQhE4WXeTTr3sw9WHDPVNr6pJmOXP1PgE0L5Q@mail.gmail.com>
-References: <CAK-EfX=FkO9JSiQhE4WXeTTr3sw9WHDPVNr6pJmOXP1PgE0L5Q@mail.gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 16 Jan 2017 15:46:26 +0200
-Message-ID: <CABBYNZK+jBHP959i-P+mQ2fX3p0fdFBYAxP8967BwEHnj=m-vQ@mail.gmail.com>
-Subject: Re: GATT service blacklist
-To: Vincent Scheib <scheib@google.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Vincent,
+Hello,
 
-On Sat, Jan 14, 2017 at 6:38 AM, Vincent Scheib <scheib@google.com> wrote:
-> I just ran into this issue again (being blocked from accessing a standard
-> GATT service) when using bluez. I had an application accessing GATT
-> objects, and also the generic_access service. It's very odd that GATT
-> operations to any service would be blocked unless there was a security
-> reason to prevent them. Reading and writing the device name should just
-> work. It doesn't make sense to write different code with a different API
-> when the GATT API is already designed to provide access to this service.
->
-> Is there a reason bluez can't allow access?
+I apologize if I will sound too dumb, but I am desperate because I can't 
+the solution for my problem.
 
-Well the general idea was to block access if there is a plugin already
-handling a certain service. Now you seem to be claiming this shouldn't
-be the case and any service can be accessed simultaneously by a plugin
-running in daemon process and an application, but I don't think this
-is always true and in some cases they may conflict, or just generate
-duplicated traffic.
+I am developing a music player application which will respond to 
+Play/Pause/Stop/Next/Previous media button keys if the device running 
+the application is connected to a media player device, like a media 
+player in the car.
 
-Perhaps for GAP service itself it is fine to allow applications to
-access it, the problem is if we allow the application to set the name
-like you want does it notifies that do the daemon as well? If it
-doesn't then the daemon might only be able to detect the name has
-changed once it connect again and attempt to read the name.
+Libraries I am using:
+     bluez version: 5.19
+     Dbus binding: GIO 2.42.1
+
+For this I have implemented all the interfaces following the MPRIS D-Bus 
+Interface Specification, and called the org.bluez.Media1.RegisterPlayer 
+method.
+The application is getting Play/Pause/Stop/Next/Previous key press 
+events and is responding to them accordingly.
+
+The next step is to implement the Browsing feature in the application. 
+This is where I got stuck. I have implemented the 
+org.mpris.MediaPlayer2.Playlists an the org.mpris.MediaPlayer2.TrackList 
+interfaces, but if I press the Browse button on the media player device, 
+isn't showing the dummy playlists and tracklists of the application.
+
+I would really appreciate If somebody could help me and give me a good 
+step-by-step description of what to implement, register or call in order 
+to make it work.
+
+If I wasn't detailed enough and I have to give more information, please 
+tell me.
+
+Kind regards,
+Istvan Posta.
