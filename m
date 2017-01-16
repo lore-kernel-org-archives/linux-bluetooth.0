@@ -1,75 +1,34 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Date: Mon, 16 Jan 2017 09:58:31 +0200
+Date: Mon, 16 Jan 2017 09:32:01 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: davem@davemloft.net
-Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: pull request: bluetooth 2017-01-16
-Message-ID: <20170116075831.GA7190@x1c>
+To: Tomasz Gorochowik <tgorochowik@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ] lib/sdp: Remove deprecated VIDEO_CONF profile id
+Message-ID: <20170116073201.GA5201@x1c>
+References: <20161210225926.10179-1-tgorochowik@gmail.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-        protocol="application/pgp-signature"; boundary="YiEDa0DAkWCtVeE4"
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20161210225926.10179-1-tgorochowik@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi, Tomasz,
 
---YiEDa0DAkWCtVeE4
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+On Sat, Dec 10, 2016, Tomasz Gorochowik wrote:
+> Commit 75e0c32af6bf ("lib/sdp: Replace VIDEO_CONF_SVCLASS_ID with
+> AV_REMOTE_CONTROLLER_SVCLASS_ID") removed the deprecated
+> VIDEO_CONF_SVCLASS_ID definition, but left the corresponding profile
+> definition..
+> 
+> According to the specification linked below A/V_RemoteControlController
+> UUID can only be used as a service class so its profile definition
+> should be removed.
+> 
+> https://www.bluetooth.org/en-us/specification/assigned-numbers/service-discovery
+> ---
+>  lib/sdp.h | 1 -
+>  1 file changed, 1 deletion(-)
 
-Hi Dave,
-
-Here are a couple of important 802.15.4 driver fixes for the 4.10
-kernel.
-
-Please let me know if there are any issues pulling. Thanks.
+Applied. Thanks.
 
 Johan
-
----
-The following changes since commit 8a430ed50bb1b19ca14a46661f3b1b35f2fb5c39:
-
-  net: ipv4: fix table id in getroute response (2017-01-12 15:18:20 -0500)
-
-are available in the git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git for-upstream
-
-for you to fetch changes up to 8e38b7d4d71479b23b77f01cf0e5071610b8f357:
-
-  ieee802154: atusb: fix driver to work with older firmware versions (2017-01-12 22:12:43 +0100)
-
-----------------------------------------------------------------
-Andrey Smirnov (1):
-      at86rf230: Allow slow GPIO pins for "rstn"
-
-Stefan Schmidt (4):
-      ieee802154: atusb: do not use the stack for buffers to make them DMA able
-      ieee802154: atusb: make sure we set a randaom extended address if fetching fails
-      ieee802154: atusb: do not use the stack for address fetching to make it DMA able
-      ieee802154: atusb: fix driver to work with older firmware versions
-
- drivers/net/ieee802154/at86rf230.c |  4 +--
- drivers/net/ieee802154/atusb.c     | 59 +++++++++++++++++++++++---------
- 2 files changed, 45 insertions(+), 18 deletions(-)
-
---YiEDa0DAkWCtVeE4
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIcBAEBAgAGBQJYfH0nAAoJECQj9vv5qNQS9mgP/3eKGzRp7JB77D5A64JvfVhB
-tLfK/7mO2u67Oaje0kG06UwXFmCYOXH/i3MtX/SeLn44lpC7d9GNYFdYozkt4cz0
-pNVRhTJZzqJTMKcrPrl2XbL0bczP+C+CJ+3FOjJYCUvTDXehm4hHF+K30h0Jk9ES
-ZF+ArOJSRumn7uCNLm9qh2nVqq6HsCcyIJdWzm6T7ARk0SGYwoJfb/OmqqMFEo2j
-rRbwI53l7cXgOe1BpS1zQWlwbOUR2ro6gBixyKx1YVEoUz5BdWOZPBw/85T9Jq5+
-r2eybdUg4bW6OjP64IBO8JniQ5249pTbB9WC5Y0JZRQ617oyDRWYucrilTVzlKdX
-Qyx6Daevd/aQPIjEmfNTNQNjl4+nJmQrhD6ZDFSprkfAA/yRhIHISwq7FPO7g/8y
-4Xxd5z/GUmQUsGojFGohxwFcGSXj8pEYTekBoejRvw9Q+0VfMPq+BLLb64tOXwdq
-PdoScLgU6cM/F2Bugqh5zrft301NnM1RRwvpq3V5RdtwfdHCvod8eYGfWr3TtaFk
-/8a40JdNEIsF+up3gIYyP7jlKCzG009J2UTzickfArvx20QWfEZ6npEAkmrVdAHx
-wBp4IVL+WN/hRi0zAIKcJSllSeEOCKcZ09ICJnkuvcRIGFWVNoAmBlKidjagUw6x
-6faTvYaapEY35WglZCEg
-=64Oe
------END PGP SIGNATURE-----
-
---YiEDa0DAkWCtVeE4--
