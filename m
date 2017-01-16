@@ -1,23 +1,63 @@
-Return-Path: <netdev-owner@vger.kernel.org>
-Date: Mon, 16 Jan 2017 11:37:50 -0500 (EST)
-Message-Id: <20170116.113750.107115602776612426.davem@davemloft.net>
-To: johan.hedberg@gmail.com
-Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: pull request: bluetooth 2017-01-16
-From: David Miller <davem@davemloft.net>
-In-Reply-To: <20170116075831.GA7190@x1c>
-References: <20170116075831.GA7190@x1c>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Sender: netdev-owner@vger.kernel.org
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Subject: Re: AVRCP enabled music player application: Enable Browsing
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+References: <587CC1BB.9000607@avmap.ro>
+ <CABBYNZLFrHSR5t4oDD5FSAEvSxAXnL4vpXDVr488Z6narbu4YQ@mail.gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+From: Istvan Posta <iposta@avmap.ro>
+Message-ID: <587CDDB0.3010208@avmap.ro>
+Date: Mon, 16 Jan 2017 16:50:24 +0200
+MIME-Version: 1.0
+In-Reply-To: <CABBYNZLFrHSR5t4oDD5FSAEvSxAXnL4vpXDVr488Z6narbu4YQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@gmail.com>
-Date: Mon, 16 Jan 2017 09:58:31 +0200
 
-> Here are a couple of important 802.15.4 driver fixes for the 4.10
-> kernel.
-> 
-> Please let me know if there are any issues pulling. Thanks.
+Hello Luiz,
 
-Pulled, thank you.
+Thank you for the fast answer.
+
+> Hi Istvan,
+>
+> On Mon, Jan 16, 2017 at 2:51 PM, Istvan Posta <iposta@avmap.ro> wrote:
+>> Hello,
+>>
+>> I apologize if I will sound too dumb, but I am desperate because I can't the
+>> solution for my problem.
+>>
+>> I am developing a music player application which will respond to
+>> Play/Pause/Stop/Next/Previous media button keys if the device running the
+>> application is connected to a media player device, like a media player in
+>> the car.
+>>
+>> Libraries I am using:
+>>      bluez version: 5.19
+>>      Dbus binding: GIO 2.42.1
+>>
+>> For this I have implemented all the interfaces following the MPRIS D-Bus
+>> Interface Specification, and called the org.bluez.Media1.RegisterPlayer
+>> method.
+>> The application is getting Play/Pause/Stop/Next/Previous key press events
+>> and is responding to them accordingly.
+>>
+>> The next step is to implement the Browsing feature in the application. This
+>> is where I got stuck. I have implemented the
+>> org.mpris.MediaPlayer2.Playlists an the org.mpris.MediaPlayer2.TrackList
+>> interfaces, but if I press the Browse button on the media player device,
+>> isn't showing the dummy playlists and tracklists of the application.
+>>
+>> I would really appreciate If somebody could help me and give me a good
+>> step-by-step description of what to implement, register or call in order to
+>> make it work.
+>>
+>> If I wasn't detailed enough and I have to give more information, please tell
+>> me.
+> Actually browsing isn't implemented for TG only for CT, so while you
+> might be doing everything correctly the implementation will never
+> pickup the Playlists and TrackList objects, although the idea would be
+> to do exactly that with playlists emulation the VFS and the TrackList
+> the NowPlaying but it has not being done yet.
+>
+This could be off-topic, but could other implementations of bluetooth 
+stack support the Browsing feature, like bluedroid?
