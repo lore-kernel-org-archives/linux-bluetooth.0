@@ -1,55 +1,22 @@
-Return-Path: <frederic.danis.oss@gmail.com>
-Subject: Re: [PATCH v2 7/9] serdev: Introduce new bus for serial attached
- devices
-To: Rob Herring <robh@kernel.org>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Marcel Holtmann <marcel@holtmann.org>, Jiri Slaby <jslaby@suse.com>,
- Sebastian Reichel <sre@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
- "Dr . H . Nikolaus Schaller" <hns@goldelico.com>,
- Peter Hurley <peter@hurleysoftware.com>,
- Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
- Alan Cox <gnomes@lxorguk.ukuu.org.uk>
-References: <20170116225436.17505-1-robh@kernel.org>
- <20170116225436.17505-8-robh@kernel.org>
-Cc: Loic Poulain <loic.poulain@intel.com>, Pavel Machek <pavel@ucw.cz>,
- NeilBrown <neil@brown.name>, Linus Walleij <linus.walleij@linaro.org>,
- linux-bluetooth@vger.kernel.org, linux-serial@vger.kernel.org,
- linux-kernel@vger.kernel.org
-From: =?UTF-8?Q?Fr=c3=a9d=c3=a9ric_Danis?= <frederic.danis.oss@gmail.com>
-Message-ID: <09cdab76-ee1a-45da-699f-a66bf7148579@gmail.com>
-Date: Wed, 18 Jan 2017 12:53:55 +0100
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: bugzilla-daemon@bugzilla.kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [Bug 190831] Intel Bluetooth 8260 breaks with latest firmware
+Date: Tue, 17 Jan 2017 17:09:46 +0000
+Message-ID: <bug-190831-62941-GDH5Bqg3xu@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-190831-62941@https.bugzilla.kernel.org/>
+References: <bug-190831-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
 MIME-Version: 1.0
-In-Reply-To: <20170116225436.17505-8-robh@kernel.org>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello,
+https://bugzilla.kernel.org/show_bug.cgi?id=190831
 
-Le 16/01/2017 à 23:54, Rob Herring a écrit :
-> ---
-> v2:
-> - Add modalias sysfs attr and uevent hook
-...
-> +static int serdev_uevent(struct device *dev, struct kobj_uevent_env *env)
-> +{
-> +	/* TODO: ACPI and platform modalias */
-> +	return of_device_uevent_modalias(dev, env);
-> +}
-...
-> +static ssize_t modalias_show(struct device *dev,
-> +			     struct device_attribute *attr, char *buf)
-> +{
-> +	ssize_t len = of_device_get_modalias(dev, buf, PAGE_SIZE - 2);
-> +	buf[len] = '\n';
-> +	buf[len+1] = 0;
-> +	return len+1;
-> +}
+--- Comment #28 from G Jaya Praveen <jaya.p.g@intel.com> ---
+Check with the latest FW again, this is still not upstreamed.
+Please check and update the status.
 
-This prevents from building serdev as a module with following errors:
-   ERROR: "of_device_uevent_modalias" [drivers/tty/serdev/serdev.ko] 
-undefined!
-   ERROR: "of_device_get_modalias" [drivers/tty/serdev/serdev.ko] undefined!
-
-Currently, those symbols are not exported in drivers/of/device.c
-
-Frédéric Danis
+-- 
+You are receiving this mail because:
+You are the assignee for the bug.
