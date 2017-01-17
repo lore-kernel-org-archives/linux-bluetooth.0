@@ -1,55 +1,41 @@
-Return-Path: <pavel@ucw.cz>
-Date: Tue, 17 Jan 2017 12:07:22 +0100
-From: Pavel Machek <pavel@ucw.cz>
-To: Rob Herring <robh@kernel.org>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Marcel Holtmann <marcel@holtmann.org>, Jiri Slaby <jslaby@suse.com>,
-	Sebastian Reichel <sre@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
-	"Dr . H . Nikolaus Schaller" <hns@goldelico.com>,
-	Peter Hurley <peter@hurleysoftware.com>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	Alan Cox <gnomes@lxorguk.ukuu.org.uk>,
-	Loic Poulain <loic.poulain@intel.com>, NeilBrown <neil@brown.name>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	linux-bluetooth@vger.kernel.org, linux-serial@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 0/9] Serial slave device bus
-Message-ID: <20170117110722.GB26116@xo-6d-61-c0.localdomain>
-References: <20170116225436.17505-1-robh@kernel.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170116225436.17505-1-robh@kernel.org>
+Content-Type: text/plain; charset=UTF-8;
+ format=flowed
+Date: Tue, 17 Jan 2017 09:51:42 +0100
+From: Maxime CHEVALLIER <maxime.chevallier@smile.fr>
+To: Mallikarjun Phulari <p.mallikarjun@globaledgesoft.com>
+Cc: <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH 1/2] tools/btgatt-client: Fix set-security interactive
+ command
+In-Reply-To: <947643683.19966188.1484636706688.JavaMail.zimbra@globaledgesoft.com>
+References: <1482402965-9462-1-git-send-email-maxime.chevallier@smile.fr>
+ <947643683.19966188.1484636706688.JavaMail.zimbra@globaledgesoft.com>
+Message-ID: <590a5c2e5fc345566b6966a71a94cc76@smile.fr>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi!
+Hi,
 
-> Here's a new version of the serdev bus support with all the review
-> feedback so far incorporated. I've left it named serdev for now pending
-> any further votes one way or the other, but I did rename the sysfs visible
-> portions to "serial".
+> Hi i am running heart-rate service using gatt-server.
+> And i am using gatttool as client.
+> gatt-server with default security level "low" is working fine.
+> But when try different security levels "medium" and "high" with -s
+> option, it is not connecting with the gatttool.
 > 
-> There's still some discussion about what to do with devices that pass thru
-> data to userspace unmodified like GPS and could still use tty device for
-> the data path. IMO, we should treat this as a separate problem following
-> this series. Drivers we want to convert to serdev and already in the
-> kernel don't need this functionality.
-> 
-> I need a SoB from Alan on his patch 2 and would like review from Alan and/or
-> Peter on the locking in patch 5.
-> 
-> I have hacked up versions of the BT ldisc and TI ST drivers moved over to
-> use the serdev bus. I have BT working on the HiKey board which has TI BT.
-> With the serdev bus support, it eliminates the need for the TI userspace
-> UIM daemon. I've made some progress cleaning up the TI-ST into proper
-> patches and also got it working at 3Mbps.
-> 
-> Changelog is in individual patches. Previous version is here[1]. This
-> series and the mentioned drivers can be found here[2].
+> What might be the problem??
 
-Series looks good to me. Thanks for doing the work.
+The patch you linked applies to the btgatt-client tool, you seem to be 
+using gatttool.
+When using gatttool, the option '-l' must be used to specify the 
+security level.
 
-Best regards,
-									Pavel
--- 
-(english) http://www.livejournal.com/~pavelmachek
-(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blog.html
+Note that gatttool will soon be marked as deprecated, you might want to 
+use btgatt-client instead.
+
+> Thanks & Regards
+> Mallikarjun Phulari
+
+Regards,
+
+Maxime
