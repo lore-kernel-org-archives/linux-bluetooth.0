@@ -8,23 +8,17 @@ Cc: linux-kernel@vger.kernel.org,
 	Gustavo Padovan <gustavo@padovan.org>,
 	Johan Hedberg <johan.hedberg@gmail.com>,
 	linux-bluetooth@vger.kernel.org
-Subject: [RFC 2/2] bluetooth: hci_uart: add LL protocol serdev driver support
-Date: Wed, 18 Jan 2017 12:05:00 -0600
-Message-Id: <20170118180500.7791-3-robh@kernel.org>
+Subject: [RFC 1/2] bluetooth: hci_uart: add serdev driver support library
+Date: Wed, 18 Jan 2017 12:04:59 -0600
+Message-Id: <20170118180500.7791-2-robh@kernel.org>
 In-Reply-To: <20170118180500.7791-1-robh@kernel.org>
 References: <20170118180500.7791-1-robh@kernel.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Turns out that the LL protocol and the TI-ST are the same thing AFAICT.
-The TI-ST adds firmware loading, GPIO control, and shared access for
-NFC, FM radio, etc. For now, we're only implementing what is needed for
-BT. This mirrors other drivers like BCM and Intel, but uses the new
-serdev bus.
-
-The firmware loading is greatly simplified by using existing
-infrastructure to send commands. It may be a bit slower than the
-original code using synchronous functions, but the real bottleneck is
-likely doing firmware load at 115.2kbps.
+This adds library functions for serdev based BT drivers. This is largely
+copied from hci_ldisc.c and modified to use serdev calls. There's a little
+bit of duplication, but I avoided intermixing this as the ldisc code should
+eventually go away.
 
 Signed-off-by: Rob Herring <robh@kernel.org>
 Cc: Marcel Holtmann <marcel@holtmann.org>
@@ -32,225 +26,221 @@ Cc: Gustavo Padovan <gustavo@padovan.org>
 Cc: Johan Hedberg <johan.hedberg@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
 ---
- drivers/bluetooth/hci_ll.c | 248 ++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 247 insertions(+), 1 deletion(-)
+ drivers/bluetooth/Makefile     |   2 +-
+ drivers/bluetooth/hci_serdev.c | 370 +++++++++++++++++++++++++++++++++++++++++
+ drivers/bluetooth/hci_uart.h   |   4 +
+ 3 files changed, 375 insertions(+), 1 deletion(-)
+ create mode 100644 drivers/bluetooth/hci_serdev.c
 
-diff --git a/drivers/bluetooth/hci_ll.c b/drivers/bluetooth/hci_ll.c
-index 02692fe30279..716c610fa54a 100644
---- a/drivers/bluetooth/hci_ll.c
-+++ b/drivers/bluetooth/hci_ll.c
-@@ -34,20 +34,23 @@
- #include <linux/sched.h>
- #include <linux/types.h>
- #include <linux/fcntl.h>
-+#include <linux/firmware.h>
- #include <linux/interrupt.h>
- #include <linux/ptrace.h>
- #include <linux/poll.h>
+diff --git a/drivers/bluetooth/Makefile b/drivers/bluetooth/Makefile
+index 80627187c8b6..a69b18ac704a 100644
+--- a/drivers/bluetooth/Makefile
++++ b/drivers/bluetooth/Makefile
+@@ -28,7 +28,7 @@ obj-$(CONFIG_BT_QCA)		+= btqca.o
+ btmrvl-y			:= btmrvl_main.o
+ btmrvl-$(CONFIG_DEBUG_FS)	+= btmrvl_debugfs.o
  
- #include <linux/slab.h>
--#include <linux/tty.h>
- #include <linux/errno.h>
- #include <linux/string.h>
- #include <linux/signal.h>
- #include <linux/ioctl.h>
-+#include <linux/serdev.h>
- #include <linux/skbuff.h>
-+#include <linux/ti_wilink_st.h>
- 
- #include <net/bluetooth/bluetooth.h>
- #include <net/bluetooth/hci_core.h>
-+#include <linux/gpio/consumer.h>
- 
- #include "hci_uart.h"
- 
-@@ -76,6 +79,12 @@ struct hcill_cmd {
- 	u8 cmd;
- } __packed;
- 
-+struct ll_device {
-+	struct hci_uart hu;
-+	struct serdev_device *serdev;
-+	struct gpio_desc *nshutdown;
-+};
-+
- struct ll_struct {
- 	unsigned long rx_state;
- 	unsigned long rx_count;
-@@ -164,6 +173,11 @@ static int ll_close(struct hci_uart *hu)
- 
- 	kfree_skb(ll->rx_skb);
- 
-+	if (hu->serdev) {
-+		struct ll_device *lldev = serdev_device_get_drvdata(hu->serdev);
-+		gpiod_set_value_cansleep(lldev->nshutdown, 1);
-+	}
-+
- 	hu->priv = NULL;
- 
- 	kfree(ll);
-@@ -171,6 +185,184 @@ static int ll_close(struct hci_uart *hu)
- 	return 0;
- }
- 
-+static int read_local_version(struct hci_dev *hdev)
-+{
-+	int err = 0;
-+	unsigned short version = 0;
-+	struct sk_buff *skb;
-+	struct hci_rp_read_local_version *ver;
-+
-+	skb = __hci_cmd_sync(hdev, HCI_OP_READ_LOCAL_VERSION, 0, NULL, HCI_INIT_TIMEOUT);
-+	if (IS_ERR(skb)) {
-+		bt_dev_err(hdev, "Reading TI version information failed (%ld)",
-+			   PTR_ERR(skb));
-+		err = PTR_ERR(skb);
-+		goto out;
-+	}
-+	if (skb->len != sizeof(*ver)) {
-+		err = -EILSEQ;
-+		goto out;
-+	}
-+
-+	ver = (struct hci_rp_read_local_version *)skb->data;
-+	if (le16_to_cpu(ver->manufacturer) != 13) {
-+		err = -ENODEV;
-+		goto out;
-+	}
-+
-+	version = le16_to_cpu(ver->lmp_subver);
-+
-+out:
-+	if (err) bt_dev_err(hdev, "Failed to read TI version info: %d", err);
-+	kfree_skb(skb);
-+	return err ? err : version;
-+}
-+
-+/**
-+ * download_firmware -
-+ *	internal function which parses through the .bts firmware
-+ *	script file intreprets SEND, DELAY actions only as of now
+-hci_uart-y				:= hci_ldisc.o
++hci_uart-y				:= hci_ldisc.o hci_serdev.o
+ hci_uart-$(CONFIG_BT_HCIUART_H4)	+= hci_h4.o
+ hci_uart-$(CONFIG_BT_HCIUART_BCSP)	+= hci_bcsp.o
+ hci_uart-$(CONFIG_BT_HCIUART_LL)	+= hci_ll.o
+diff --git a/drivers/bluetooth/hci_serdev.c b/drivers/bluetooth/hci_serdev.c
+new file mode 100644
+index 000000000000..b2f7293a3162
+--- /dev/null
++++ b/drivers/bluetooth/hci_serdev.c
+@@ -0,0 +1,370 @@
++/*
++ *
++ *  Bluetooth HCI serdev driver lib
++ *
++ *  Copyright (C) 2017  Linaro, Ltd., Rob Herring <robh@kernel.org>
++ *
++ *  Based on hci_ldisc.c:
++ *
++ *  Copyright (C) 2000-2001  Qualcomm Incorporated
++ *  Copyright (C) 2002-2003  Maxim Krasnyansky <maxk@qualcomm.com>
++ *  Copyright (C) 2004-2005  Marcel Holtmann <marcel@holtmann.org>
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++ *
 + */
-+static int download_firmware(struct ll_device *lldev)
++
++#include <linux/kernel.h>
++#include <linux/types.h>
++#include <linux/serdev.h>
++#include <linux/skbuff.h>
++
++#include <net/bluetooth/bluetooth.h>
++#include <net/bluetooth/hci_core.h>
++
++#include "hci_uart.h"
++
++struct serdev_device_ops hci_serdev_client_ops;
++
++static inline void hci_uart_tx_complete(struct hci_uart *hu, int pkt_type)
 +{
-+	unsigned short chip, min_ver, maj_ver;
-+	int version, err, len;
-+	unsigned char *ptr, *action_ptr;
-+	unsigned char bts_scr_name[40];	/* 40 char long bts scr name? */
-+	const struct firmware *fw;
-+	struct sk_buff *skb;
-+	struct hci_command *cmd;
++	struct hci_dev *hdev = hu->hdev;
 +
-+	version = read_local_version(lldev->hu.hdev);
-+	if (version < 0)
-+		return version;
++	/* Update HCI stat counters */
++	switch (pkt_type) {
++	case HCI_COMMAND_PKT:
++		hdev->stat.cmd_tx++;
++		break;
 +
-+	chip = (version & 0x7C00) >> 10;
-+	min_ver = (version & 0x007F);
-+	maj_ver = (version & 0x0380) >> 7;
-+	if (version & 0x8000)
-+		maj_ver |= 0x0008;
++	case HCI_ACLDATA_PKT:
++		hdev->stat.acl_tx++;
++		break;
 +
-+	snprintf(bts_scr_name, sizeof(bts_scr_name),
-+		 "ti-connectivity/TIInit_%d.%d.%d.bts",
-+		 chip, maj_ver, min_ver);
-+
-+	err = request_firmware(&fw, bts_scr_name, &lldev->serdev->dev);
-+	if (err || !fw->data || !fw->size) {
-+		pr_err(" request_firmware failed(errno %d) for %s", err,
-+			   bts_scr_name);
-+		return -EINVAL;
++	case HCI_SCODATA_PKT:
++		hdev->stat.sco_tx++;
++		break;
 +	}
-+	ptr = (void *)fw->data;
-+	len = fw->size;
-+	/* bts_header to remove out magic number and
-+	 * version
-+	 */
-+	ptr += sizeof(struct bts_header);
-+	len -= sizeof(struct bts_header);
-+
-+	while (len > 0 && ptr) {
-+		pr_debug(" action size %d, type %d ",
-+			   ((struct bts_action *)ptr)->size,
-+			   ((struct bts_action *)ptr)->type);
-+
-+		action_ptr = &(((struct bts_action *)ptr)->data[0]);
-+
-+		switch (((struct bts_action *)ptr)->type) {
-+		case ACTION_SEND_COMMAND:	/* action send */
-+			pr_debug("S");
-+			cmd = (struct hci_command *)action_ptr;
-+			if (cmd->opcode == 0xff36) {
-+				/* ignore remote change
-+				 * baud rate HCI VS command */
-+				pr_warn("change remote baud"
-+				    " rate command in firmware");
-+				break;
-+			}
-+			if (cmd->prefix != 1)
-+				printk("command type %d\n", cmd->prefix);
-+
-+			skb = __hci_cmd_sync(lldev->hu.hdev, cmd->opcode, cmd->plen, &cmd->speed, HCI_INIT_TIMEOUT);
-+			if (IS_ERR(skb)) {
-+				printk("send command failed\n");
-+				goto out_rel_fw;
-+			}
-+			kfree_skb(skb);
-+			break;
-+		case ACTION_WAIT_EVENT:  /* wait */
-+			/* no need to wait as command was synchronous */
-+			pr_debug("W");
-+			break;
-+		case ACTION_DELAY:	/* sleep */
-+			pr_info("sleep command in scr");
-+			mdelay(((struct bts_action_delay *)action_ptr)->msec);
-+			break;
-+		}
-+		len -= (sizeof(struct bts_action) +
-+			((struct bts_action *)ptr)->size);
-+		ptr += sizeof(struct bts_action) +
-+			((struct bts_action *)ptr)->size;
-+	}
-+
-+out_rel_fw:
-+	/* fw download complete */
-+	release_firmware(fw);
-+	return err;
 +}
 +
-+static int ll_setup(struct hci_uart *hu)
++static inline struct sk_buff *hci_uart_dequeue(struct hci_uart *hu)
 +{
-+	int err, retry = 3;
-+	struct ll_device *lldev;
-+	u32 speed;
++	struct sk_buff *skb = hu->tx_skb;
 +
-+	if (!hu->serdev)
-+		return 0;
++	if (!skb)
++		skb = hu->proto->dequeue(hu);
++	else
++		hu->tx_skb = NULL;
 +
-+	lldev = serdev_device_get_drvdata(hu->serdev);
++	return skb;
++}
 +
-+	serdev_device_set_flow_control(hu->serdev, true);
++static void hci_uart_write_work(struct work_struct *work)
++{
++	struct hci_uart *hu = container_of(work, struct hci_uart, write_work);
++	struct serdev_device *serdev = hu->serdev;
++	struct hci_dev *hdev = hu->hdev;
++	struct sk_buff *skb;
 +
-+	do {
-+		/* Configure BT nShutdown to HIGH state */
-+		gpiod_set_value_cansleep(lldev->nshutdown, 1);
-+		msleep(5);	/* FIXME: a proper toggle */
-+		gpiod_set_value_cansleep(lldev->nshutdown, 0);
-+		msleep(100);
++	/* REVISIT: should we cope with bad skbs or ->write() returning
++	 * and error value ?
++	 */
 +
-+		err = download_firmware(lldev);
-+		if (err != 0) {
-+			/* ldisc installed but fw download failed,
-+			 * flush uart & power cycle BT_EN */
-+			pr_err("download firmware failed");
-+			continue;
-+		} else {	/* on success don't retry */
++restart:
++	clear_bit(HCI_UART_TX_WAKEUP, &hu->tx_state);
++
++	while ((skb = hci_uart_dequeue(hu))) {
++		int len;
++
++		len = serdev_device_write_buf(serdev, skb->data, skb->len);
++		hdev->stat.byte_tx += len;
++
++		skb_pull(skb, len);
++		if (skb->len) {
++			hu->tx_skb = skb;
 +			break;
 +		}
-+	} while (retry--);
 +
-+	if (err)
-+		return err;
++		hci_uart_tx_complete(hu, hci_skb_pkt_type(skb));
++		kfree_skb(skb);
++	}
++
++	if (test_bit(HCI_UART_TX_WAKEUP, &hu->tx_state))
++		goto restart;
++
++	clear_bit(HCI_UART_SENDING, &hu->tx_state);
++}
++
++/* ------- Interface to HCI layer ------ */
++/* Initialize device */
++static int hci_uart_open(struct hci_dev *hdev)
++{
++	struct hci_uart *hu  = hci_get_drvdata(hdev);
++
++	BT_DBG("%s %p", hdev->name, hdev);
++
++	serdev_device_set_client_ops(hu->serdev, &hci_serdev_client_ops);
++
++	return serdev_device_open(hu->serdev);
++}
++
++/* Reset device */
++static int hci_uart_flush(struct hci_dev *hdev)
++{
++	struct hci_uart *hu  = hci_get_drvdata(hdev);
++
++	BT_DBG("hdev %p serdev %p", hdev, hu->serdev);
++
++	if (hu->tx_skb) {
++		kfree_skb(hu->tx_skb); hu->tx_skb = NULL;
++	}
++
++	/* Flush any pending characters in the driver and discipline. */
++	serdev_device_write_flush(hu->serdev);
++
++	if (test_bit(HCI_UART_PROTO_READY, &hu->flags))
++		hu->proto->flush(hu);
++
++	return 0;
++}
++
++/* Close device */
++static int hci_uart_close(struct hci_dev *hdev)
++{
++	struct hci_uart *hu  = hci_get_drvdata(hdev);
++
++	BT_DBG("hdev %p", hdev);
++
++	hci_uart_flush(hdev);
++	hdev->flush = NULL;
++
++	serdev_device_close(hu->serdev);
++
++	return 0;
++}
++
++/* Send frames from HCI layer */
++static int hci_uart_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
++{
++	struct hci_uart *hu = hci_get_drvdata(hdev);
++
++	BT_DBG("%s: type %d len %d", hdev->name, hci_skb_pkt_type(skb),
++	       skb->len);
++
++	hu->proto->enqueue(hu, skb);
++
++	hci_uart_tx_wakeup(hu);
++
++	return 0;
++}
++
++static int hci_uart_setup(struct hci_dev *hdev)
++{
++	struct hci_uart *hu = hci_get_drvdata(hdev);
++	struct hci_rp_read_local_version *ver;
++	struct sk_buff *skb;
++	unsigned int speed;
++	int err;
++
++	/* Init speed if any */
++	if (hu->init_speed)
++		speed = hu->init_speed;
++	else if (hu->proto->init_speed)
++		speed = hu->proto->init_speed;
++	else
++		speed = 0;
++
++	if (speed)
++		serdev_device_set_baudrate(hu->serdev, speed);
 +
 +	/* Operational speed if any */
 +	if (hu->oper_speed)
@@ -260,84 +250,205 @@ index 02692fe30279..716c610fa54a 100644
 +	else
 +		speed = 0;
 +
-+	if (speed) {
-+		struct sk_buff *skb = __hci_cmd_sync(hu->hdev, 0xff36, sizeof(speed), &speed, HCI_INIT_TIMEOUT);
-+		if (!IS_ERR(skb)) {
-+			kfree_skb(skb);
++	if (hu->proto->set_baudrate && speed) {
++		err = hu->proto->set_baudrate(hu, speed);
++		if (!err)
 +			serdev_device_set_baudrate(hu->serdev, speed);
-+		}
 +	}
 +
++	if (hu->proto->setup)
++		return hu->proto->setup(hu);
++
++	if (!test_bit(HCI_UART_VND_DETECT, &hu->hdev_flags))
++		return 0;
++
++	skb = __hci_cmd_sync(hdev, HCI_OP_READ_LOCAL_VERSION, 0, NULL,
++			     HCI_INIT_TIMEOUT);
++	if (IS_ERR(skb)) {
++		BT_ERR("%s: Reading local version information failed (%ld)",
++		       hdev->name, PTR_ERR(skb));
++		return 0;
++	}
++
++	if (skb->len != sizeof(*ver)) {
++		BT_ERR("%s: Event length mismatch for version information",
++		       hdev->name);
++		goto done;
++	}
++
++done:
++	kfree_skb(skb);
 +	return 0;
 +}
 +
- /*
-  * internal function, which does common work of the device wake up process:
-  * 1. places all pending packets (waiting in tx_wait_q list) in txq list.
-@@ -508,6 +700,7 @@ static struct sk_buff *ll_dequeue(struct hci_uart *hu)
- static const struct hci_uart_proto llp = {
- 	.id		= HCI_UART_LL,
- 	.name		= "LL",
-+	.setup		= ll_setup,
- 	.open		= ll_open,
- 	.close		= ll_close,
- 	.recv		= ll_recv,
-@@ -525,3 +718,56 @@ int __exit ll_deinit(void)
- {
- 	return hci_uart_unregister_proto(&llp);
- }
-+
-+static int hci_ti_probe(struct serdev_device *serdev)
++/* hci_uart_write_wakeup()
++ *
++ *    Callback for transmit wakeup. Called when low level
++ *    device driver can accept more send data.
++ *
++ * Arguments:        tty    pointer to associated tty instance data
++ * Return Value:    None
++ */
++static void hci_uart_write_wakeup(struct serdev_device *serdev)
 +{
-+	struct hci_uart *hu;
-+	struct ll_device *lldev;
-+	u32 max_speed = 3000000;
++	struct hci_uart *hu = serdev_device_get_drvdata(serdev);
 +
-+	lldev = devm_kzalloc(&serdev->dev, sizeof(struct ll_device), GFP_KERNEL);
-+	if (!lldev)
-+		return -ENOMEM;
-+	hu = &lldev->hu;
++	BT_DBG("");
 +
-+	serdev_device_set_drvdata(serdev, lldev);
-+	lldev->serdev = hu->serdev = serdev;
++	if (!hu)
++		return;
 +
-+	lldev->nshutdown = devm_gpiod_get(&serdev->dev, "shutdown", GPIOD_OUT_HIGH);
-+	if (IS_ERR(lldev->nshutdown))
-+		return PTR_ERR(lldev->nshutdown);
++	if (serdev != hu->serdev)
++		return;
 +
-+	of_property_read_u32(serdev->dev.of_node, "max-speed", &max_speed);
-+	hci_uart_set_speeds(hu, 115200, max_speed);
-+
-+	return hci_uart_register_device(hu, &llp);
++	if (test_bit(HCI_UART_PROTO_READY, &hu->flags))
++		hci_uart_tx_wakeup(hu);
 +}
 +
-+static void hci_ti_remove(struct serdev_device *serdev)
++/* hci_uart_receive_buf()
++ *
++ *     Called by tty low level driver when receive data is
++ *     available.
++ *
++ * Arguments:  tty          pointer to tty isntance data
++ *             data         pointer to received data
++ *             flags        pointer to flags for data
++ *             count        count of received data in bytes
++ *
++ * Return Value:    None
++ */
++static int hci_uart_receive_buf(struct serdev_device *serdev, const u8 *data,
++				   size_t count)
 +{
-+	struct ll_device *lldev = serdev_device_get_drvdata(serdev);
-+	struct hci_uart *hu = &lldev->hu;
-+	struct hci_dev *hdev = hu->hdev;
++	struct hci_uart *hu = serdev_device_get_drvdata(serdev);
 +
-+	cancel_work_sync(&hu->write_work);
++	if (!hu || serdev != hu->serdev)
++		return 0;
 +
-+	hci_unregister_dev(hdev);
++	if (!test_bit(HCI_UART_PROTO_READY, &hu->flags))
++		return 0;
++
++	/* It does not need a lock here as it is already protected by a mutex in
++	 * tty caller
++	 */
++	hu->proto->recv(hu, data, count);
++
++	if (hu->hdev)
++		hu->hdev->stat.byte_rx += count;
++
++	return count;
++}
++
++struct serdev_device_ops hci_serdev_client_ops = {
++	.receive_buf = hci_uart_receive_buf,
++	.write_wakeup = hci_uart_write_wakeup,
++};
++
++int hci_uart_register_device(struct hci_uart *hu, const struct hci_uart_proto *p)
++{
++	int err;
++	struct hci_dev *hdev;
++
++	BT_DBG("");
++
++	err = p->open(hu);
++	if (err)
++		return err;
++
++	hu->proto = p;
++	set_bit(HCI_UART_PROTO_READY, &hu->flags);
++
++	/* Initialize and register HCI device */
++	hdev = hci_alloc_dev();
++	if (!hdev) {
++		BT_ERR("Can't allocate HCI device");
++		err = -ENOMEM;
++		goto err_alloc;
++	}
++
++	hu->hdev = hdev;
++
++	hdev->bus = HCI_UART;
++	hci_set_drvdata(hdev, hu);
++
++	INIT_WORK(&hu->write_work, hci_uart_write_work);
++
++	/* Only when vendor specific setup callback is provided, consider
++	 * the manufacturer information valid. This avoids filling in the
++	 * value for Ericsson when nothing is specified.
++	 */
++	if (hu->proto->setup)
++		hdev->manufacturer = hu->proto->manufacturer;
++
++	hdev->open  = hci_uart_open;
++	hdev->close = hci_uart_close;
++	hdev->flush = hci_uart_flush;
++	hdev->send  = hci_uart_send_frame;
++	hdev->setup = hci_uart_setup;
++	SET_HCIDEV_DEV(hdev, &hu->serdev->dev);
++
++	if (test_bit(HCI_UART_RAW_DEVICE, &hu->hdev_flags))
++		set_bit(HCI_QUIRK_RAW_DEVICE, &hdev->quirks);
++
++	if (test_bit(HCI_UART_EXT_CONFIG, &hu->hdev_flags))
++		set_bit(HCI_QUIRK_EXTERNAL_CONFIG, &hdev->quirks);
++
++	if (!test_bit(HCI_UART_RESET_ON_INIT, &hu->hdev_flags))
++		set_bit(HCI_QUIRK_RESET_ON_CLOSE, &hdev->quirks);
++
++	if (test_bit(HCI_UART_CREATE_AMP, &hu->hdev_flags))
++		hdev->dev_type = HCI_AMP;
++	else
++		hdev->dev_type = HCI_PRIMARY;
++
++	if (test_bit(HCI_UART_INIT_PENDING, &hu->hdev_flags))
++		return 0;
++
++	if (hci_register_dev(hdev) < 0) {
++		BT_ERR("Can't register HCI device");
++		err = -ENODEV;
++		goto err_register;
++	}
++
++	set_bit(HCI_UART_REGISTERED, &hu->flags);
++
++	return 0;
++
++err_register:
 +	hci_free_dev(hdev);
-+	hu->proto->close(hu);
++err_alloc:
++	clear_bit(HCI_UART_PROTO_READY, &hu->flags);
++	p->close(hu);
++	return err;
 +}
+diff --git a/drivers/bluetooth/hci_uart.h b/drivers/bluetooth/hci_uart.h
+index cb7f4b4aeca0..4796a29d575f 100644
+--- a/drivers/bluetooth/hci_uart.h
++++ b/drivers/bluetooth/hci_uart.h
+@@ -58,6 +58,7 @@
+ #define HCI_UART_VND_DETECT	5
+ 
+ struct hci_uart;
++struct serdev_device;
+ 
+ struct hci_uart_proto {
+ 	unsigned int id;
+@@ -77,6 +78,7 @@ struct hci_uart_proto {
+ 
+ struct hci_uart {
+ 	struct tty_struct	*tty;
++	struct serdev_device	*serdev;
+ 	struct hci_dev		*hdev;
+ 	unsigned long		flags;
+ 	unsigned long		hdev_flags;
+@@ -105,6 +107,8 @@ struct hci_uart {
+ 
+ int hci_uart_register_proto(const struct hci_uart_proto *p);
+ int hci_uart_unregister_proto(const struct hci_uart_proto *p);
++int hci_uart_register_device(struct hci_uart *hu, const struct hci_uart_proto *p);
 +
-+static const struct of_device_id hci_ti_of_match[] = {
-+	{ .compatible = "ti,wl1835-st" },
-+	{},
-+};
-+MODULE_DEVICE_TABLE(of, hci_ti_of_match);
-+
-+static struct serdev_device_driver hci_ti_drv = {
-+	.driver		= {
-+		.name	= "hci-ti",
-+		.of_match_table = of_match_ptr(hci_ti_of_match),
-+	},
-+	.probe	= hci_ti_probe,
-+	.remove	= hci_ti_remove,
-+};
-+module_serdev_device_driver(hci_ti_drv);
+ int hci_uart_tx_wakeup(struct hci_uart *hu);
+ int hci_uart_init_ready(struct hci_uart *hu);
+ void hci_uart_set_baudrate(struct hci_uart *hu, unsigned int speed);
 -- 
 2.10.1
