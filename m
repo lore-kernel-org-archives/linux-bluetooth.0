@@ -1,67 +1,153 @@
-Return-Path: <robherring2@gmail.com>
+Return-Path: <robh@kernel.org>
+MIME-Version: 1.0
+In-Reply-To: <1484743377.2133.204.camel@linux.intel.com>
+References: <20170116225436.17505-1-robh@kernel.org> <20170116225436.17505-9-robh@kernel.org>
+ <1484743377.2133.204.camel@linux.intel.com>
 From: Rob Herring <robh@kernel.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Subject: [PATCH] bluetooth: hci_uart: remove unused hci_uart_init_tty
-Date: Wed, 18 Jan 2017 11:29:01 -0600
-Message-Id: <20170118172901.20546-1-robh@kernel.org>
+Date: Wed, 18 Jan 2017 09:03:20 -0600
+Message-ID: <CAL_JsqKhmMa3Vs7fnfqzVYJbz-0=AwT6DckxSuf5ykDvCmNqBQ@mail.gmail.com>
+Subject: Re: [PATCH v2 8/9] serdev: add a tty port controller driver
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Marcel Holtmann <marcel@holtmann.org>,
+	Jiri Slaby <jslaby@suse.com>, Sebastian Reichel <sre@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+	"Dr . H . Nikolaus Schaller" <hns@goldelico.com>, Peter Hurley <peter@hurleysoftware.com>,
+	Alan Cox <gnomes@lxorguk.ukuu.org.uk>, Loic Poulain <loic.poulain@intel.com>,
+	Pavel Machek <pavel@ucw.cz>, NeilBrown <neil@brown.name>, Linus Walleij <linus.walleij@linaro.org>,
+	"open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+	"linux-serial@vger.kernel.org" <linux-serial@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-There are no users of hci_uart_init_tty, so remove it.
+On Wed, Jan 18, 2017 at 6:42 AM, Andy Shevchenko
+<andriy.shevchenko@linux.intel.com> wrote:
+> On Mon, 2017-01-16 at 16:54 -0600, Rob Herring wrote:
+>> Add a serdev controller driver for tty ports.
+>>
+>> The controller is registered with serdev when tty ports are registered
+>> with the TTY core. As the TTY core is built-in only, this has the side
+>> effect of making serdev built-in as well.
+>>
+>
+>>
+>> +if SERIAL_DEV_BUS
+>> +
+>> +config SERIAL_DEV_CTRL_TTYPORT
+>> +     bool "Serial device TTY port controller"
+>> +     depends on TTY
+>
+>
+>> +     depends on SERIAL_DEV_BUS != m
+>
+> Since you have this line the
+>  if SERIAL_DEV_BUS
+> is redundant for it.
 
-Signed-off-by: Rob Herring <robh@kernel.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>
-Cc: Gustavo Padovan <gustavo@padovan.org>
-Cc: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
----
- drivers/bluetooth/hci_ldisc.c | 19 -------------------
- drivers/bluetooth/hci_uart.h  |  1 -
- 2 files changed, 20 deletions(-)
+It is not. It is the standard pattern of
 
-diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
-index 9497c469efd2..de20a438a78a 100644
---- a/drivers/bluetooth/hci_ldisc.c
-+++ b/drivers/bluetooth/hci_ldisc.c
-@@ -318,25 +318,6 @@ void hci_uart_set_speeds(struct hci_uart *hu, unsigned int init_speed,
- 	hu->oper_speed = oper_speed;
- }
- 
--void hci_uart_init_tty(struct hci_uart *hu)
--{
--	struct tty_struct *tty = hu->tty;
--	struct ktermios ktermios;
--
--	/* Bring the UART into a known 8 bits no parity hw fc state */
--	ktermios = tty->termios;
--	ktermios.c_iflag &= ~(IGNBRK | BRKINT | PARMRK | ISTRIP |
--			      INLCR | IGNCR | ICRNL | IXON);
--	ktermios.c_oflag &= ~OPOST;
--	ktermios.c_lflag &= ~(ECHO | ECHONL | ICANON | ISIG | IEXTEN);
--	ktermios.c_cflag &= ~(CSIZE | PARENB);
--	ktermios.c_cflag |= CS8;
--	ktermios.c_cflag |= CRTSCTS;
--
--	/* tty_set_termios() return not checked as it is always 0 */
--	tty_set_termios(tty, &ktermios);
--}
--
- void hci_uart_set_baudrate(struct hci_uart *hu, unsigned int speed)
- {
- 	struct tty_struct *tty = hu->tty;
-diff --git a/drivers/bluetooth/hci_uart.h b/drivers/bluetooth/hci_uart.h
-index 070139513e65..cb7f4b4aeca0 100644
---- a/drivers/bluetooth/hci_uart.h
-+++ b/drivers/bluetooth/hci_uart.h
-@@ -107,7 +107,6 @@ int hci_uart_register_proto(const struct hci_uart_proto *p);
- int hci_uart_unregister_proto(const struct hci_uart_proto *p);
- int hci_uart_tx_wakeup(struct hci_uart *hu);
- int hci_uart_init_ready(struct hci_uart *hu);
--void hci_uart_init_tty(struct hci_uart *hu);
- void hci_uart_set_baudrate(struct hci_uart *hu, unsigned int speed);
- void hci_uart_set_flow_control(struct hci_uart *hu, bool enable);
- void hci_uart_set_speeds(struct hci_uart *hu, unsigned int init_speed,
--- 
-2.10.1
+menuconfig BLAH
+
+if BLAH
+...
+endif
+<EOF>
+
+If I remove the "if", then SERIAL_DEV_CTRL_TTYPORT can be enabled when
+SERIAL_DEV_BUS=n which breaks the build
+
+
+> So, leave either one or another (as an example you can look at
+> DMADEVICES).
+>
+>> +
+>> +#define SERPORT_BUSY 1
+>> +#define SERPORT_ACTIVE       2
+>> +#define SERPORT_DEAD 3
+>> +
+>> +struct serport {
+>> +     struct tty_port *port;
+>> +     struct tty_struct *tty;
+>
+>> +     struct tty_driver *tty_drv;
+>> +     int tty_idx;
+>
+> Do you need tty_ prefix for them?
+
+It's just to be clear it's the tty driver and index rather than this
+driver's driver or index.
+
+
+>> +static int ttyport_open(struct serdev_controller *ctrl)
+>> +{
+>> +     struct serport *serport =
+>> serdev_controller_get_drvdata(ctrl);
+>> +     struct tty_struct *tty;
+>> +     struct ktermios ktermios;
+>> +
+>> +     tty = tty_init_dev(serport->tty_drv, serport->tty_idx);
+>> +     serport->tty = tty;
+>> +
+>> +     serport->port->client_ops = &client_ops;
+>> +     serport->port->client_data = ctrl;
+>> +
+>>
+>
+>> +     tty->receive_room = 65536;
+>
+> Magic?
+
+Probably. It's just what every ldisc uses. I suppose we could need
+clients to set this, but we can add that as needed.
+
+>> +     if (tty->ops->open)
+>> +             tty->ops->open(serport->tty, NULL);
+>> +     else
+>> +             tty_port_open(serport->port, tty, NULL);
+>> +
+>> +     /* Bring the UART into a known 8 bits no parity hw fc state
+>> */
+>> +     ktermios = tty->termios;
+>> +     ktermios.c_iflag &= ~(IGNBRK | BRKINT | PARMRK | ISTRIP |
+>> +                           INLCR | IGNCR | ICRNL | IXON);
+>> +     ktermios.c_oflag &= ~OPOST;
+>> +     ktermios.c_lflag &= ~(ECHO | ECHONL | ICANON | ISIG |
+>> IEXTEN);
+>> +     ktermios.c_cflag &= ~(CSIZE | PARENB);
+>> +     ktermios.c_cflag |= CS8;
+>> +     ktermios.c_cflag |= CRTSCTS;
+>> +     tty_set_termios(tty, &ktermios);
+>> +
+>> +     set_bit(TTY_DO_WRITE_WAKEUP, &tty->flags);
+>> +
+>>
+>
+>> +     mutex_lock(&serport->lock);
+>> +     set_bit(SERPORT_ACTIVE, &serport->flags);
+>> +     mutex_unlock(&serport->lock);
+>
+> So, some clarification would be good to have to understand why you need
+> mutex _and_ atomic operation together.
+>
+> What does mutex protect?
+
+Paranoia. Actually, looking at this closer, we can get rid of the
+mutex altogether.
+
+
+>> +void serdev_tty_port_unregister(struct tty_port *port)
+>> +{
+>> +     struct serdev_controller *ctrl = port->client_data;
+>> +     struct serport *serport =
+>> serdev_controller_get_drvdata(ctrl);
+>> +
+>
+>> +     if (!serport)
+>> +             return;
+>
+> What this check prevents from?
+
+Didn't you ask this last time? See patch #9. tty_port_destructor()
+calls this unconditionally as it doesn't know whether there's a serdev
+or not. ctrl may be NULL, and then serport may be NULL.
+
+Rob
