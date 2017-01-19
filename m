@@ -1,62 +1,122 @@
-Return-Path: <msuchanek@suse.de>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Date: Fri, 20 Jan 2017 02:36:12 +0100
-From: msuchanek <msuchanek@suse.de>
-To: Rob Herring <robh@kernel.org>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Marcel Holtmann
- <marcel@holtmann.org>, Jiri Slaby <jslaby@suse.com>, Sebastian Reichel
- <sre@kernel.org>, Arnd Bergmann <arnd@arndb.de>, "Dr . H . Nikolaus
- Schaller" <hns@goldelico.com>, Peter Hurley <peter@hurleysoftware.com>, Andy
- Shevchenko <andriy.shevchenko@linux.intel.com>, Alan Cox
- <gnomes@lxorguk.ukuu.org.uk>, Loic Poulain <loic.poulain@intel.com>, Pavel
- Machek <pavel@ucw.cz>, NeilBrown <neil@brown.name>, Linus Walleij
- <linus.walleij@linaro.org>, linux-bluetooth@vger.kernel.org,
- linux-serial@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-serial-owner@vger.kernel.org
-Subject: Re: [PATCH v2 0/9] Serial slave device bus
-In-Reply-To: <20170116225436.17505-1-robh@kernel.org>
-References: <20170116225436.17505-1-robh@kernel.org>
-Message-ID: <7d6a8a629f8b618cdb09c9112d1e5986@suse.de>
+In-Reply-To: <CABBYNZJfx1d5bfF6qceS028Y6OrC_0SrJF+MPuMh78OO9EMT4Q@mail.gmail.com>
+References: <1470835502-30698-1-git-send-email-luiz.dentz@gmail.com>
+ <CABBYNZKHsanSRUD1MMHE4xp_5ykkpxNA3p5zfJOLWMcFdkzTSw@mail.gmail.com>
+ <CA+ZaN3_M58rv0veLpL=C2A7JJz_YvcOCv31WFxqJraS7DOgF2g@mail.gmail.com> <CABBYNZJfx1d5bfF6qceS028Y6OrC_0SrJF+MPuMh78OO9EMT4Q@mail.gmail.com>
+From: Seulki Shin <sskcorea@gmail.com>
+Date: Fri, 20 Jan 2017 06:34:11 +0900
+Message-ID: <CA+ZaN3_ihRmQH7sihb2w9dEeFXcbf67Zw2XnVjB-iK8k_i=zhg@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] core: Prefer BR/EDR over LE if it set in
+ advertisement flag
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 2017-01-16 23:54, Rob Herring wrote:
-> Here's a new version of the serdev bus support with all the review
-> feedback so far incorporated. I've left it named serdev for now pending
-> any further votes one way or the other, but I did rename the sysfs 
-> visible
-> portions to "serial".
-> 
-> There's still some discussion about what to do with devices that pass 
-> thru
-> data to userspace unmodified like GPS and could still use tty device 
-> for
-> the data path. IMO, we should treat this as a separate problem 
-> following
-> this series. Drivers we want to convert to serdev and already in the
-> kernel don't need this functionality.
+Luiz,
 
-The whole point of the serial bus is to simplify and clean up support 
-for
-serial devices.
-If tty users cannot use the kernel support for automagic kill
-switches/resets/whatever with kernel GPIO or whatever framework and must
-continue supporting userspace GPIO and hacks for writing IO space from
-userland for their devices there is just no point.
+Thanks for your valuable information.
 
-I mean it's fine to add support for your single pet device but if you 
-are
-to support non-trivial number of devices they don't get all perfect 
-kernel
-driver overnight. And if you need userspace GPIO for half of your 
-devices
-you can just continue using it for all to *simplify* your userspace 
-code.
+On Thu, Jan 19, 2017 at 10:30 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi,
+>
+> On Thu, Jan 19, 2017 at 3:24 PM, Seulki Shin <sskcorea@gmail.com> wrote:
+>> Hi Luiz,
+>>
+>> I found that this patch stops me to test connect GDBus API, especially
+>> connecting to BLE device.
+>>
+>> After calling scan dbus api, bredr_last and le_last are updated at the
+>> same time  when update_found_devices() got called.
+>> Then connecting to ble device is failed because bredr_last and le_last
+>> has no differences and this leads changing bdaddr type to bredr which
+>> is wrong in this case.
+>>
+>> Please consider my analysis.
+>
+> Actually this is valid only if the device is advertising as a dual
+> mode device, so perhaps you want to check why does it advertise as
+> BR/EDR capable device. In the other if it is indeed a dual mode device
+> a second connect attempt will then trigger the LE connection, this in
+> on purpose since we don't yet have bearer specific Connect methods so
+> we have to prefer BR/EDR over LE as the first bearer to connect.
 
-It has already happened for SPI devices and the implementation of the
-userspace access to SPI is dragging for years.
+Yes, the device was advertising as a dual mode.
+But the problem is that I got "Host is down" error message from first trial
+so I don't think I can try to connect again.
 
-Thanks
+>
+>> Thanks in advance,
+>> SLKI
+>>
+>> On Fri, Aug 12, 2016 at 5:00 PM, Luiz Augusto von Dentz
+>> <luiz.dentz@gmail.com> wrote:
+>>> Hi,
+>>>
+>>> On Wed, Aug 10, 2016 at 4:25 PM, Luiz Augusto von Dentz
+>>> <luiz.dentz@gmail.com> wrote:
+>>>> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>>>>
+>>>> This makes the code prefer BR/EDR if the last advertisement has it set
+>>>> in the flags.
+>>>> ---
+>>>>  src/adapter.c | 5 ++++-
+>>>>  src/device.c  | 6 +++++-
+>>>>  2 files changed, 9 insertions(+), 2 deletions(-)
+>>>>
+>>>> diff --git a/src/adapter.c b/src/adapter.c
+>>>> index 3742398..ddabf2d 100644
+>>>> --- a/src/adapter.c
+>>>> +++ b/src/adapter.c
+>>>> @@ -5488,8 +5488,11 @@ static void update_found_devices(struct btd_adapter *adapter,
+>>>>          * supports this we can make the non-zero check conditional.
+>>>>          */
+>>>>         if (bdaddr_type != BDADDR_BREDR && eir_data.flags &&
+>>>> -                                       !(eir_data.flags & EIR_BREDR_UNSUP))
+>>>> +                                       !(eir_data.flags & EIR_BREDR_UNSUP)) {
+>>>>                 device_set_bredr_support(dev);
+>>>> +               /* Update last seen for BR/EDR in case its flag is set */
+>>>> +               device_update_last_seen(dev, BDADDR_BREDR);
+>>>> +       }
+>>>>
+>>>>         if (eir_data.name != NULL && eir_data.name_complete)
+>>>>                 device_store_cached_name(dev, eir_data.name);
+>>>> diff --git a/src/device.c b/src/device.c
+>>>> index 264d599..6c6be92 100644
+>>>> --- a/src/device.c
+>>>> +++ b/src/device.c
+>>>> @@ -1763,7 +1763,11 @@ static uint8_t select_conn_bearer(struct btd_device *dev)
+>>>>         if (dev->le && (!dev->bredr || bredr_last == NVAL_TIME))
+>>>>                 return dev->bdaddr_type;
+>>>>
+>>>> -       if (bredr_last < le_last)
+>>>> +       /*
+>>>> +        * Prefer BR/EDR if time is the same since it might be from an
+>>>> +        * advertisement with BR/EDR flag set.
+>>>> +        */
+>>>> +       if (bredr_last <= le_last)
+>>>>                 return BDADDR_BREDR;
+>>>>
+>>>>         return dev->bdaddr_type;
+>>>> --
+>>>> 2.7.4
+>>>
+>>> Applied.
+>>>
+>>>
+>>> --
+>>> Luiz Augusto von Dentz
+>>> --
+>>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>>> the body of a message to majordomo@vger.kernel.org
+>>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
+>
+>
+> --
+> Luiz Augusto von Dentz
 
-Michal
+SLKI
