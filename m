@@ -2,8 +2,8 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: bugzilla-daemon@bugzilla.kernel.org
 To: linux-bluetooth@vger.kernel.org
 Subject: [Bug 190831] Intel Bluetooth 8260 breaks with latest firmware
-Date: Thu, 19 Jan 2017 11:16:03 +0000
-Message-ID: <bug-190831-62941-b1Zgnp2Hr9@https.bugzilla.kernel.org/>
+Date: Thu, 19 Jan 2017 10:31:24 +0000
+Message-ID: <bug-190831-62941-lkPLaCLALw@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-190831-62941@https.bugzilla.kernel.org/>
 References: <bug-190831-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -13,12 +13,11 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 https://bugzilla.kernel.org/show_bug.cgi?id=190831
 
---- Comment #34 from G Jaya Praveen <jaya.p.g@intel.com> ---
-Created attachment 252431
-  --> https://bugzilla.kernel.org/attachment.cgi?id=252431&action=edit
-DDC file
+--- Comment #33 from Stefan Schmid <schmidicom@gmail.com> ---
+The DDC file from the last upload may not work. It is not a data file like the
+others.
 
-Check with this DDC.
+ibt-11-5.ddc: ASCII text, with no line terminators
 
 -- 
 You are receiving this mail because:
