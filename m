@@ -1,43 +1,37 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <gregkh@linuxfoundation.org>
+Date: Thu, 19 Jan 2017 17:24:03 +0100
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: Rob Herring <robh@kernel.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Jiri Slaby <jslaby@suse.com>,
+	Sebastian Reichel <sre@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+	"Dr . H . Nikolaus Schaller" <hns@goldelico.com>,
+	Peter Hurley <peter@hurleysoftware.com>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Alan Cox <gnomes@lxorguk.ukuu.org.uk>,
+	Loic Poulain <loic.poulain@intel.com>, Pavel Machek <pavel@ucw.cz>,
+	NeilBrown <neil@brown.name>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	linux-bluetooth@vger.kernel.org, linux-serial@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 4/9] tty: constify tty_ldisc_receive_buf buffer pointer
+Message-ID: <20170119162403.GA22571@kroah.com>
+References: <20170116225436.17505-1-robh@kernel.org>
+ <20170116225436.17505-5-robh@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZK+jBHP959i-P+mQ2fX3p0fdFBYAxP8967BwEHnj=m-vQ@mail.gmail.com>
-References: <CAK-EfX=FkO9JSiQhE4WXeTTr3sw9WHDPVNr6pJmOXP1PgE0L5Q@mail.gmail.com>
- <CABBYNZK+jBHP959i-P+mQ2fX3p0fdFBYAxP8967BwEHnj=m-vQ@mail.gmail.com>
-From: Vincent Scheib <scheib@google.com>
-Date: Thu, 19 Jan 2017 11:52:56 -0800
-Message-ID: <CAK-EfXn-ZB9erfz=MTB7dT2S86TNykPtgKOY-CuUr=KJTy87aA@mail.gmail.com>
-Subject: Re: GATT service blacklist
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170116225436.17505-5-robh@kernel.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Jan 16, 2017 at 5:46 AM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> On Sat, Jan 14, 2017 at 6:38 AM, Vincent Scheib <scheib@google.com> wrote:
->> I just ran into this issue again (being blocked from accessing a standard
->> GATT service) when using bluez. I had an application accessing GATT
->> objects, and also the generic_access service. ...
->
-> Well the general idea was to block access if there is a plugin already
-> handling a certain service. Now you seem to be claiming this shouldn't
-> be the case and any service can be accessed simultaneously by a plugin
-> running in daemon process and an application, but I don't think this
-> is always true and in some cases they may conflict, or just generate
-> duplicated traffic.
+On Mon, Jan 16, 2017 at 04:54:31PM -0600, Rob Herring wrote:
+> This is needed to work with the client operations which uses const ptrs.
+> 
+> Really, the flags pointer could be const, too, but this would be a tree
+> wide fix.
+> 
+> Signed-off-by: Rob Herring <robh@kernel.org>
+> Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+> Reviewed-By: Sebastian Reichel <sre@kernel.org>
 
-Correct. Bluetooth devices are all required to have a generic_access
-service, and I believe applications should be able to use the GATT
-protocol to interact with that service. I think that the current
-approach bluez has taken of trying to abstract this is a mistake.
-There doesn't seem to be value added by doing so, but there is harm in
-creating additional ways to interact, harming portability and
-requiring more attention and custom code by application developers.
+I've applied the first 4 patches in this series to my tree now, thanks.
 
-> Perhaps for GAP service itself it is fine to allow applications to
-> access it, the problem is if we allow the application to set the name
-> like you want does it notifies that do the daemon as well?
-
-Yes. The same way multiple applications should be able to receive
-notifications for one device.
+greg k-h
