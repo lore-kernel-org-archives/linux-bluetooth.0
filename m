@@ -1,64 +1,92 @@
-Return-Path: <gregkh@linuxfoundation.org>
-Date: Thu, 19 Jan 2017 14:37:18 +0100
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: Rob Herring <robh@kernel.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Jiri Slaby <jslaby@suse.com>,
-	Sebastian Reichel <sre@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
-	"Dr . H . Nikolaus Schaller" <hns@goldelico.com>,
-	Peter Hurley <peter@hurleysoftware.com>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	Alan Cox <gnomes@lxorguk.ukuu.org.uk>,
-	Loic Poulain <loic.poulain@intel.com>, Pavel Machek <pavel@ucw.cz>,
-	NeilBrown <neil@brown.name>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	linux-bluetooth@vger.kernel.org, linux-serial@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Alan Cox <alan@linux.intel.com>
-Subject: Re: [PATCH v2 2/9] tty_port: allow a port to be opened with a tty
- that has no file handle
-Message-ID: <20170119133718.GA6072@kroah.com>
-References: <20170116225436.17505-1-robh@kernel.org>
- <20170116225436.17505-3-robh@kernel.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170116225436.17505-3-robh@kernel.org>
+In-Reply-To: <CABBYNZKHsanSRUD1MMHE4xp_5ykkpxNA3p5zfJOLWMcFdkzTSw@mail.gmail.com>
+References: <1470835502-30698-1-git-send-email-luiz.dentz@gmail.com> <CABBYNZKHsanSRUD1MMHE4xp_5ykkpxNA3p5zfJOLWMcFdkzTSw@mail.gmail.com>
+From: Seulki Shin <sskcorea@gmail.com>
+Date: Thu, 19 Jan 2017 22:24:25 +0900
+Message-ID: <CA+ZaN3_M58rv0veLpL=C2A7JJz_YvcOCv31WFxqJraS7DOgF2g@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] core: Prefer BR/EDR over LE if it set in
+ advertisement flag
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Jan 16, 2017 at 04:54:29PM -0600, Rob Herring wrote:
-> From: Alan Cox <alan@linux.intel.com>
-> 
-> Let us create tty objects entirely in kernel space. Untested proposal to
-> show why all the ideas around rewriting half the uart stack are not needed.
-> 
-> With this a kernel created non file backed tty object could be used to handle
-> data, and set terminal modes. Not all ldiscs can cope with this as N_TTY in
-> particular has to work back to the fs/tty layer.
-> 
-> The tty_port code is however otherwise clean of file handles as far as I can
-> tell as is the low level tty port write path used by the ldisc, the
-> configuration low level interfaces and most of the ldiscs.
-> 
-> Currently you don't have any exposure to see tty hangups because those are
-> built around the file layer. However a) it's a fixed port so you probably
-> don't care about that b) if you do we can add a callback and c) you almost
-> certainly don't want the userspace tear down/rebuild behaviour anyway.
-> 
-> This should however be sufficient if we wanted for example to enumerate all
-> the bluetooth bound fixed ports via ACPI and make them directly available.
-> It doesn't deal with the case of a user opening a port that's also kernel
-> opened and that would need some locking out (so it returned EBUSY if bound
-> to a kernel device of some kind). That needs resolving along with how you
-> "up" or "down" your new bluetooth device, or enumerate it while providing
-> the existing tty API to avoid regressions (and to debug).
-> 
-> Alan
-> Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-> Reviewed-By: Sebastian Reichel <sre@kernel.org>
-> ---
-> Alan, Need your SoB here.
+Hi Luiz,
 
-Rob, as this patch is flowing through you, I need your signed-off-by as
-well if I am to take it.
+I found that this patch stops me to test connect GDBus API, especially
+connecting to BLE device.
 
-thanks,
+After calling scan dbus api, bredr_last and le_last are updated at the
+same time  when update_found_devices() got called.
+Then connecting to ble device is failed because bredr_last and le_last
+has no differences and this leads changing bdaddr type to bredr which
+is wrong in this case.
 
-greg k-h
+Please consider my analysis.
+
+Thanks in advance,
+SLKI
+
+On Fri, Aug 12, 2016 at 5:00 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi,
+>
+> On Wed, Aug 10, 2016 at 4:25 PM, Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+>> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>>
+>> This makes the code prefer BR/EDR if the last advertisement has it set
+>> in the flags.
+>> ---
+>>  src/adapter.c | 5 ++++-
+>>  src/device.c  | 6 +++++-
+>>  2 files changed, 9 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/src/adapter.c b/src/adapter.c
+>> index 3742398..ddabf2d 100644
+>> --- a/src/adapter.c
+>> +++ b/src/adapter.c
+>> @@ -5488,8 +5488,11 @@ static void update_found_devices(struct btd_adapter *adapter,
+>>          * supports this we can make the non-zero check conditional.
+>>          */
+>>         if (bdaddr_type != BDADDR_BREDR && eir_data.flags &&
+>> -                                       !(eir_data.flags & EIR_BREDR_UNSUP))
+>> +                                       !(eir_data.flags & EIR_BREDR_UNSUP)) {
+>>                 device_set_bredr_support(dev);
+>> +               /* Update last seen for BR/EDR in case its flag is set */
+>> +               device_update_last_seen(dev, BDADDR_BREDR);
+>> +       }
+>>
+>>         if (eir_data.name != NULL && eir_data.name_complete)
+>>                 device_store_cached_name(dev, eir_data.name);
+>> diff --git a/src/device.c b/src/device.c
+>> index 264d599..6c6be92 100644
+>> --- a/src/device.c
+>> +++ b/src/device.c
+>> @@ -1763,7 +1763,11 @@ static uint8_t select_conn_bearer(struct btd_device *dev)
+>>         if (dev->le && (!dev->bredr || bredr_last == NVAL_TIME))
+>>                 return dev->bdaddr_type;
+>>
+>> -       if (bredr_last < le_last)
+>> +       /*
+>> +        * Prefer BR/EDR if time is the same since it might be from an
+>> +        * advertisement with BR/EDR flag set.
+>> +        */
+>> +       if (bredr_last <= le_last)
+>>                 return BDADDR_BREDR;
+>>
+>>         return dev->bdaddr_type;
+>> --
+>> 2.7.4
+>
+> Applied.
+>
+>
+> --
+> Luiz Augusto von Dentz
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
