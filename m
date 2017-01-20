@@ -1,50 +1,82 @@
-Return-Path: <linux-kernel-owner@vger.kernel.org>
-From: Geliang Tang <geliangtang@gmail.com>
-To: Alexander Aring <aar@pengutronix.de>,
-        Jukka Rissanen <jukka.rissanen@linux.intel.com>,
-        "David S. Miller" <davem@davemloft.net>
-Cc: Geliang Tang <geliangtang@gmail.com>,
-        linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] 6lowpan: use rb_entry()
-Date: Fri, 20 Jan 2017 22:36:53 +0800
-Message-Id: <c6a809ea5820242a4ae126b03cdcd910a36e5cae.1484817152.git.geliangtang@gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
+Subject: Re: [PATCH v2 0/9] Serial slave device bus
+From: "H. Nikolaus Schaller" <hns@goldelico.com>
+In-Reply-To: <41321720-85FD-4CC0-8710-BB044DA37F6F@holtmann.org>
+Date: Fri, 20 Jan 2017 15:23:46 +0100
+Cc: Rob Herring <robh@kernel.org>,
+        "linux-iio@vger.kernel.org" <linux-iio@vger.kernel.org>,
+        Jonathan Cameron <jic23@kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Jiri Slaby <jslaby@suse.com>,
+        Sebastian Reichel <sre@kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Peter Hurley <peter@hurleysoftware.com>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Alan Cox <gnomes@lxorguk.ukuu.org.uk>,
+        Loic Poulain <loic.poulain@intel.com>,
+        Pavel Machek <pavel@ucw.cz>, NeilBrown <neil@brown.name>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "linux-serial@vger.kernel.org" <linux-serial@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Message-Id: <C18BE7FF-2C6A-4EC3-8FB9-1E69796D1491@goldelico.com>
+References: <20170116225436.17505-1-robh@kernel.org> <CACRpkdaf6uy6C6J5mcVF4dDPG7gwJ2vkR4ECLYSsT5-DRNNfcA@mail.gmail.com> <41321720-85FD-4CC0-8710-BB044DA37F6F@holtmann.org>
+To: Marcel Holtmann <marcel@holtmann.org>,
+        Linus Walleij <linus.walleij@linaro.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-To make the code clearer, use rb_entry() instead of container_of() to
-deal with rbtree.
 
-Signed-off-by: Geliang Tang <geliangtang@gmail.com>
----
- net/6lowpan/nhc.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+> Am 20.01.2017 um 15:14 schrieb Marcel Holtmann <marcel@holtmann.org>:
+>=20
+> Hi Linus,
+>=20
+>>> There's still some discussion about what to do with devices that =
+pass thru
+>>> data to userspace unmodified like GPS and could still use tty device =
+for
+>>> the data path. IMO, we should treat this as a separate problem =
+following
+>>> this series. Drivers we want to convert to serdev and already in the
+>>> kernel don't need this functionality.
+>>=20
+>> In my simple opinion GPSes shound live in drivers/iio/gps simply by
+>> usecase association: streaming out a series of accelerometer readings
+>> periodically through IIOs chardevs and other data about the physical
+>> world is not any different from the GPS usecase that give you a =
+stream
+>> of coordinates on where on this planet you are.
+>>=20
+>> The fact that vendors like to defer GPS processing to userspace =
+because
+>> it is considered "secret sauce" is not the concern of the kernel =
+community,
+>> though problems like that in general is the great tragedy of our =
+time.
+>>=20
+>> It would be fun to see a pure, reverse-engineered GPS driver in IIO.
+>=20
+> except for the pure NMEA devices. Which are pretty much defined as =
+terminal devices using RS422 and 4800 baud. For anything non-NMEA, I =
+would agree that using IIO might be a good option. So instead of a GPS =
+subsystem, might just have a GPS class / type in the IIO subsystem.
 
-diff --git a/net/6lowpan/nhc.c b/net/6lowpan/nhc.c
-index 7008d53..4fa2fdd 100644
---- a/net/6lowpan/nhc.c
-+++ b/net/6lowpan/nhc.c
-@@ -27,8 +27,8 @@ static int lowpan_nhc_insert(struct lowpan_nhc *nhc)
- 
- 	/* Figure out where to put new node */
- 	while (*new) {
--		struct lowpan_nhc *this = container_of(*new, struct lowpan_nhc,
--						       node);
-+		struct lowpan_nhc *this = rb_entry(*new, struct lowpan_nhc,
-+						   node);
- 		int result, len_dif, len;
- 
- 		len_dif = nhc->idlen - this->idlen;
-@@ -69,8 +69,8 @@ static struct lowpan_nhc *lowpan_nhc_by_nhcid(const struct sk_buff *skb)
- 	const u8 *nhcid_skb_ptr = skb->data;
- 
- 	while (node) {
--		struct lowpan_nhc *nhc = container_of(node, struct lowpan_nhc,
--						      node);
-+		struct lowpan_nhc *nhc = rb_entry(node, struct lowpan_nhc,
-+						  node);
- 		u8 nhcid_skb_ptr_masked[LOWPAN_NHC_MAX_ID_LEN];
- 		int result, i;
- 
--- 
-2.9.3
+Well, we could implement a default NMEA parser in the iio subsystem to
+translate satellite time, geolocation, orientation, speed, and satellite
+signal strengths to iio channels.
+
+On the other hand we have to wait until all user-space GPS applications
+use it and appear in wider use in distribution. Let's say in 3-4 years?
+
+Therefore, I'd like to see NMEA records passed to user space and not
+shielded completely.
+
+And some GPS devices send extensions to the core set of NEMA records,
+which might give other useful information. Having this needs some
+extensibility to the iio translation or side-channels.
+
+BR,
+Nikolaus
+
+
