@@ -1,45 +1,103 @@
-Return-Path: <jeffy.chen@rock-chips.com>
-From: Jeffy Chen <jeffy.chen@rock-chips.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Amitkumar Karwar <akarwar@marvell.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Brian Norris <briannorris@chromium.org>,
-	Jeffy Chen <jeffy.chen@rock-chips.com>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 1/3] btmrvl: avoid double-disable_irq() race
-Date: Fri, 20 Jan 2017 19:14:18 +0800
-Message-Id: <1484910860-7690-1-git-send-email-jeffy.chen@rock-chips.com>
+Return-Path: <sre@kernel.org>
+Date: Fri, 20 Jan 2017 10:50:50 +0100
+From: Sebastian Reichel <sre@kernel.org>
+To: msuchanek <msuchanek@suse.de>
+Cc: Rob Herring <robh@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Marcel Holtmann <marcel@holtmann.org>, Jiri Slaby <jslaby@suse.com>,
+	Arnd Bergmann <arnd@arndb.de>,
+	"Dr . H . Nikolaus Schaller" <hns@goldelico.com>,
+	Peter Hurley <peter@hurleysoftware.com>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Alan Cox <gnomes@lxorguk.ukuu.org.uk>,
+	Loic Poulain <loic.poulain@intel.com>, Pavel Machek <pavel@ucw.cz>,
+	NeilBrown <neil@brown.name>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	linux-bluetooth@vger.kernel.org, linux-serial@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-serial-owner@vger.kernel.org
+Subject: Re: [PATCH v2 0/9] Serial slave device bus
+Message-ID: <20170120095049.772jojzx6c6fyfaa@earth>
+References: <20170116225436.17505-1-robh@kernel.org>
+ <7d6a8a629f8b618cdb09c9112d1e5986@suse.de>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="vaiwmimbg3c6epf4"
+In-Reply-To: <7d6a8a629f8b618cdb09c9112d1e5986@suse.de>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-It's much the same as what we did for mwifiex in:
-b9da4d2 mwifiex: avoid double-disable_irq() race
 
-Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
----
+--vaiwmimbg3c6epf4
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
- drivers/bluetooth/btmrvl_sdio.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+Hi,
 
-diff --git a/drivers/bluetooth/btmrvl_sdio.c b/drivers/bluetooth/btmrvl_sdio.c
-index d02f2c1..c738bae 100644
---- a/drivers/bluetooth/btmrvl_sdio.c
-+++ b/drivers/bluetooth/btmrvl_sdio.c
-@@ -1682,8 +1682,12 @@ static int btmrvl_sdio_resume(struct device *dev)
- 	/* Disable platform specific wakeup interrupt */
- 	if (card->plt_wake_cfg && card->plt_wake_cfg->irq_bt >= 0) {
- 		disable_irq_wake(card->plt_wake_cfg->irq_bt);
--		if (!card->plt_wake_cfg->wake_by_bt)
--			disable_irq(card->plt_wake_cfg->irq_bt);
-+		disable_irq(card->plt_wake_cfg->irq_bt);
-+		if (card->plt_wake_cfg->wake_by_bt)
-+			/* Undo our disable, since interrupt handler already
-+			 * did this.
-+			 */
-+			enable_irq(card->plt_wake_cfg->irq_bt);
- 	}
- 
- 	return 0;
--- 
-2.1.4
+On Fri, Jan 20, 2017 at 02:36:12AM +0100, msuchanek wrote:
+> On 2017-01-16 23:54, Rob Herring wrote:
+> > Here's a new version of the serdev bus support with all the review
+> > feedback so far incorporated. I've left it named serdev for now pending
+> > any further votes one way or the other, but I did rename the sysfs
+> > visible
+> > portions to "serial".
+> >=20
+> > There's still some discussion about what to do with devices that pass
+> > thru
+> > data to userspace unmodified like GPS and could still use tty device for
+> > the data path. IMO, we should treat this as a separate problem following
+> > this series. Drivers we want to convert to serdev and already in the
+> > kernel don't need this functionality.
+>=20
+> The whole point of the serial bus is to simplify and clean up support for
+> serial devices.
+> If tty users cannot use the kernel support for automagic kill
+> switches/resets/whatever with kernel GPIO or whatever framework and must
+> continue supporting userspace GPIO and hacks for writing IO space from
+> userland for their devices there is just no point.
+
+> I mean it's fine to add support for your single pet device but if you are
+> to support non-trivial number of devices they don't get all perfect kernel
+> driver overnight. And if you need userspace GPIO for half of your devices
+> you can just continue using it for all to *simplify* your userspace code.
+
+This is definitely not about a single pet device. It helps for most
+of the serial attached bluetooth chips. For example my work on the
+Nokia N-series bluetooth driver is waiting for this series and
+supporting the nokia bluetooth chips with userspace GPIOs is more
+or less impossible with the data being handled in the kernel, since
+GPIOs have to be toggled based on that data.
+
+Also there is the kurobox, which uses a serial attached board reset
+controller. It may not need extra GPIOs/regulators/whatever, but it
+must have a full-in-kernel driver, so that 'reboot' works as expected ;)
+
+> It has already happened for SPI devices and the implementation of the
+> userspace access to SPI is dragging for years.
+
+Talking about dragging for years: This series has been initially
+discussed in 2014. Implementing this step-by-step looks sensible
+to me.
+
+-- Sebastian
+
+--vaiwmimbg3c6epf4
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCgAdFiEE72YNB0Y/i3JqeVQT2O7X88g7+poFAliB3XcACgkQ2O7X88g7
++pqV5RAAmTJE7riS/rcyZVyK6CUv4Lwh+p8A+Yyl2kuGqe4ReowR+uaAFDXYOtmj
+Cis5veWp6rxtHTlqj+H533DYW3/Wv43JIWqI7fq5CF6fxn53cmW9FR9O7hoLqTkv
+fTpO9N4qHRJpAUn9izU7lqVNqZG8pvULkn3gRUVUY0g0SLe5wCFi4YBAFt9u96Cc
+IFoQJA0syseC69nptEGv7IPj8I5yM436rfp3ImJB2oQy5zoRHorxy7i8UXRJpcAB
+iVV14mJ+20kCfsYpfitkhVdYyJ6vgjmAeMk7cGNX43agWWOh1UKG5kf38/BeBy9s
+ylsJhax5jEpDYZR0syrSjoFFIeb3hbaGZDZawOhdHpFxygYPt3iCnMn/oKugJIqR
+5XLJkke+ftEFvwPM7lToefuY5ADr0cvhpQ8mMLOIcx/W2wy92O9jBVhs9xxSIRdi
+brDS0NpiyPR3V3ypIOmb13NkOFCOHVnyLonmQDqDIHgcSJtWQtCQKiwD3qyuVb77
+PwgOeKJG4ffkSPwB59kB+/Z1u6h7Zt3FadlsH2b6h1FWU6raDBqIeI+yKFDSxHi/
+ph/p+UCLPagXMp5R++6BfCFC9iy3JnR1VdxNOD9+4phGs4xd7S1RIjvEg1+lKLvA
+RuXQkdNzfLBNLUdtaMIhvzX/VWeNQg/ng5QPJZbpPYhX3Qf/KkY=
+=ZKvi
+-----END PGP SIGNATURE-----
+
+--vaiwmimbg3c6epf4--
