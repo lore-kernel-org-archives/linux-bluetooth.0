@@ -8,34 +8,35 @@ Cc: Amitkumar Karwar <akarwar@marvell.com>,
 	Johan Hedberg <johan.hedberg@gmail.com>,
 	Gustavo Padovan <gustavo@padovan.org>,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 3/3] btmrvl: use dt's irqflags for wakeup pin
-Date: Fri, 20 Jan 2017 19:14:20 +0800
-Message-Id: <1484910860-7690-3-git-send-email-jeffy.chen@rock-chips.com>
+Subject: [PATCH 2/3] btmrvl: set irq_bt to -1 when failed to parse it
+Date: Fri, 20 Jan 2017 19:14:19 +0800
+Message-Id: <1484910860-7690-2-git-send-email-jeffy.chen@rock-chips.com>
 In-Reply-To: <1484910860-7690-1-git-send-email-jeffy.chen@rock-chips.com>
 References: <1484910860-7690-1-git-send-email-jeffy.chen@rock-chips.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Use irqflags parsed from dt.
+The irq_of_parse_and_map will return 0 as a invalid irq.
+
+Set irq_bt to -1 in this case, so that the btmrvl resume/suspend code
+would not get confused.
 
 Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
 ---
 
- drivers/bluetooth/btmrvl_sdio.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ drivers/bluetooth/btmrvl_sdio.c | 1 +
+ 1 file changed, 1 insertion(+)
 
 diff --git a/drivers/bluetooth/btmrvl_sdio.c b/drivers/bluetooth/btmrvl_sdio.c
-index 796f719..23711fe 100644
+index c738bae..796f719 100644
 --- a/drivers/bluetooth/btmrvl_sdio.c
 +++ b/drivers/bluetooth/btmrvl_sdio.c
-@@ -101,8 +101,7 @@ static int btmrvl_sdio_probe_of(struct device *dev,
+@@ -97,6 +97,7 @@ static int btmrvl_sdio_probe_of(struct device *dev,
+ 		cfg->irq_bt = irq_of_parse_and_map(card->plt_of_node, 0);
+ 		if (!cfg->irq_bt) {
+ 			dev_err(dev, "fail to parse irq_bt from device tree");
++			cfg->irq_bt = -1;
  		} else {
  			ret = devm_request_irq(dev, cfg->irq_bt,
  					       btmrvl_wake_irq_bt,
--					       IRQF_TRIGGER_LOW,
--					       "bt_wake", cfg);
-+					       0, "bt_wake", cfg);
- 			if (ret) {
- 				dev_err(dev,
- 					"Failed to request irq_bt %d (%d)\n",
 -- 
 2.1.4
