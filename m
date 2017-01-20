@@ -1,35 +1,41 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: bugzilla-daemon@bugzilla.kernel.org
+Return-Path: <jeffy.chen@rock-chips.com>
+From: Jeffy Chen <jeffy.chen@rock-chips.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 190831] Intel Bluetooth 8260 breaks with latest firmware
-Date: Fri, 20 Jan 2017 13:21:45 +0000
-Message-ID: <bug-190831-62941-cyezWGhW3l@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-190831-62941@https.bugzilla.kernel.org/>
-References: <bug-190831-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Cc: Amitkumar Karwar <akarwar@marvell.com>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Brian Norris <briannorris@chromium.org>,
+	Jeffy Chen <jeffy.chen@rock-chips.com>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 3/3] btmrvl: use dt's irqflags for wakeup pin
+Date: Fri, 20 Jan 2017 19:14:20 +0800
+Message-Id: <1484910860-7690-3-git-send-email-jeffy.chen@rock-chips.com>
+In-Reply-To: <1484910860-7690-1-git-send-email-jeffy.chen@rock-chips.com>
+References: <1484910860-7690-1-git-send-email-jeffy.chen@rock-chips.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-https://bugzilla.kernel.org/show_bug.cgi?id=190831
+Use irqflags parsed from dt.
 
---- Comment #35 from Stefan Schmid <schmidicom@gmail.com> ---
-(In reply to G Jaya Praveen from comment #30)
-> Created attachment 252421 [details]
-> Patch SFI and DDC
+Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
+---
 
-(In reply to G Jaya Praveen from comment #34)
-> Created attachment 252431 [details]
-> DDC file
-> 
-> Check with this DDC.
+ drivers/bluetooth/btmrvl_sdio.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-Bluetooth and WLAN are stable even if both active data are transmitted, but the
-mouse is sometimes a bit laggy.
-
-Is it normal that every data transmission via Bluetooth only reaches about 721
-kbit/s (Bluetooth 1.2)?
-
+diff --git a/drivers/bluetooth/btmrvl_sdio.c b/drivers/bluetooth/btmrvl_sdio.c
+index 796f719..23711fe 100644
+--- a/drivers/bluetooth/btmrvl_sdio.c
++++ b/drivers/bluetooth/btmrvl_sdio.c
+@@ -101,8 +101,7 @@ static int btmrvl_sdio_probe_of(struct device *dev,
+ 		} else {
+ 			ret = devm_request_irq(dev, cfg->irq_bt,
+ 					       btmrvl_wake_irq_bt,
+-					       IRQF_TRIGGER_LOW,
+-					       "bt_wake", cfg);
++					       0, "bt_wake", cfg);
+ 			if (ret) {
+ 				dev_err(dev,
+ 					"Failed to request irq_bt %d (%d)\n",
 -- 
-You are receiving this mail because:
-You are the assignee for the bug.
+2.1.4
