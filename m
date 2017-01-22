@@ -1,56 +1,25 @@
-Return-Path: <jeffy.chen@rock-chips.com>
-From: Jeffy Chen <jeffy.chen@rock-chips.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Amitkumar Karwar <akarwar@marvell.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Brian Norris <briannorris@chromium.org>,
-	Jeffy Chen <jeffy.chen@rock-chips.com>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 1/3] btmrvl: avoid double-disable_irq() race
-Date: Mon, 23 Jan 2017 12:18:51 +0800
-Message-Id: <1485145133-8612-1-git-send-email-jeffy.chen@rock-chips.com>
+Return-Path: <linux-wpan-owner@vger.kernel.org>
+Date: Sun, 22 Jan 2017 16:47:55 -0500 (EST)
+Message-Id: <20170122.164755.28768525589358817.davem@davemloft.net>
+To: geliangtang@gmail.com
+Cc: aar@pengutronix.de, jukka.rissanen@linux.intel.com,
+        linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] 6lowpan: use rb_entry()
+From: David Miller <davem@davemloft.net>
+In-Reply-To: <c6a809ea5820242a4ae126b03cdcd910a36e5cae.1484817152.git.geliangtang@gmail.com>
+References: <c6a809ea5820242a4ae126b03cdcd910a36e5cae.1484817152.git.geliangtang@gmail.com>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-It's much the same as what we did for mwifiex in:
-b9da4d2 mwifiex: avoid double-disable_irq() race
+From: Geliang Tang <geliangtang@gmail.com>
+Date: Fri, 20 Jan 2017 22:36:53 +0800
 
-"We have a race where the wakeup IRQ might be in flight while we're
-calling mwifiex_disable_wake() from resume(). This can leave us
-disabling the IRQ twice.
+> To make the code clearer, use rb_entry() instead of container_of() to
+> deal with rbtree.
+> 
+> Signed-off-by: Geliang Tang <geliangtang@gmail.com>
 
-Let's disable the IRQ and enable it in case if we have double-disabled
-it."
-
-Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
-Reviewed-by: Brian Norris <briannorris@chromium.org>
----
-
-Changes in v2:
-Update commit message.
-
- drivers/bluetooth/btmrvl_sdio.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/bluetooth/btmrvl_sdio.c b/drivers/bluetooth/btmrvl_sdio.c
-index d02f2c1..c738bae 100644
---- a/drivers/bluetooth/btmrvl_sdio.c
-+++ b/drivers/bluetooth/btmrvl_sdio.c
-@@ -1682,8 +1682,12 @@ static int btmrvl_sdio_resume(struct device *dev)
- 	/* Disable platform specific wakeup interrupt */
- 	if (card->plt_wake_cfg && card->plt_wake_cfg->irq_bt >= 0) {
- 		disable_irq_wake(card->plt_wake_cfg->irq_bt);
--		if (!card->plt_wake_cfg->wake_by_bt)
--			disable_irq(card->plt_wake_cfg->irq_bt);
-+		disable_irq(card->plt_wake_cfg->irq_bt);
-+		if (card->plt_wake_cfg->wake_by_bt)
-+			/* Undo our disable, since interrupt handler already
-+			 * did this.
-+			 */
-+			enable_irq(card->plt_wake_cfg->irq_bt);
- 	}
- 
- 	return 0;
--- 
-2.1.4
+Applied.
