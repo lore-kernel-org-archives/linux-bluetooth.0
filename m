@@ -1,120 +1,206 @@
-Return-Path: <ezequiel@vanguardiasur.com.ar>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CAAEAJfB-U5ZwuAoBf_Qr0cYCY0Lb96T7JZsoxr_hy6+18mFWNw@mail.gmail.com>
-References: <20161229125119.8985-1-ezequiel@vanguardiasur.com.ar> <CAAEAJfB-U5ZwuAoBf_Qr0cYCY0Lb96T7JZsoxr_hy6+18mFWNw@mail.gmail.com>
-From: Ezequiel Garcia <ezequiel@vanguardiasur.com.ar>
-Date: Mon, 23 Jan 2017 12:36:22 -0300
-Message-ID: <CAAEAJfCXnY8HVBBqUc+wJ2qyuVgSj0249+vkqT5zTww9Nv5sBQ@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: Fix NULL pointer dereference in bt_sock_recvmsg
-To: linux-bluetooth@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>, Ezequiel Garcia <ezequiel@vanguardiasur.com.ar>
+In-Reply-To: <20170104133401.3636-1-luiz.dentz@gmail.com>
+References: <20170104133401.3636-1-luiz.dentz@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Mon, 23 Jan 2017 12:59:10 +0200
+Message-ID: <CABBYNZKFJ82BgafuFc4NStt9J9m02yWk+oofqRFD_NatRrEhaQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/3] build: Hide deprecated tools under --enable-deprecated
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-+Andrew
+Hi,
 
-On 11 January 2017 at 17:27, Ezequiel Garcia
-<ezequiel@vanguardiasur.com.ar> wrote:
-> On 29 December 2016 at 09:51, Ezequiel Garcia
-> <ezequiel@vanguardiasur.com.ar> wrote:
->> As per the comment in include/linux/net.h, the recvfrom handlers
->> should expect msg_name to be NULL. However, bt_sock_recvmsg()
->> is currently not checking it, which could lead to a NULL pointer
->> dereference.
->>
->> The following NULL pointer dereference was produced while testing
->> L2CAP datagram reception. Note that the kernel is tainted due to
->> the r8723bs module being inserted. However, it seems the fix still
->> applies.
->>
->> $ l2test -r -G
->> l2test[326]: Receiving ...
->> Unable to handle kernel NULL pointer dereference at virtual address 0000=
-0000
->> pgd =3D ee008000
->> [00000000] *pgd=3D7f896835
->> Internal error: Oops: 817 [#1] PREEMPT SMP ARM
->> Modules linked in: r8723bs(O)
->> CPU: 0 PID: 326 Comm: l2test Tainted: G           O 4.8.0 #1
->> Hardware name: Allwinner sun7i (A20) Family
->> task: ef1c6880 task.stack: eea70000
->> PC is at __memzero+0x58/0x80
->> LR is at l2cap_skb_msg_name+0x1c/0x4c
->> pc : [<c02c47d8>]    lr : [<c0506278>]    psr: 00070013
->> sp : eea71e60  ip : 00000000  fp : 00034e1c
->> r10: 00000000  r9 : 00000000  r8 : eea71ed4
->> r7 : 000002a0  r6 : eea71ed8  r5 : 00000000  r4 : ee4a5d80
->> r3 : 00000000  r2 : 00000000  r1 : 0000000e  r0 : 00000000
->> Flags: nzcv  IRQs on  FIQs on  Mode SVC_32  ISA ARM Segment none
->> Control: 10c5387d  Table: 7600806a  DAC: 00000051
->> Process l2test (pid: 326, stack limit =3D 0xeea70210)
->> Stack: (0xeea71e60 to 0xeea72000)
->> 1e60: ee4a5d80 eeac2800 000002a0 c04d7114 173eefa0 00000000 c06ca68e 000=
-00000
->> 1e80: 00000001 eeac2800 eef23500 00000000 000002a0 eea71ed4 eea70000 c05=
-04d50
->> 1ea0: 00000000 00000000 eef23500 00000000 00000000 c044e8a0 eea71edc eea=
-9f904
->> 1ec0: bef89aa0 fffffff7 00000000 00035008 000002a0 00000000 00000000 000=
-00000
->> 1ee0: 00000000 00000000 eea71ed4 00000000 00000000 00000000 00004000 000=
-00000
->> 1f00: 0000011b c01078c4 eea70000 c044e5e4 00000000 00000000 642f0001 6c2=
-f7665
->> 1f20: 0000676f 00000000 00000000 00000000 00000000 00000000 00000000 000=
-00000
->> 1f40: 00000000 00000000 00000000 00000000 00000000 ffffffff 00000001 bef=
-89ad8
->> 1f60: 000000a8 c01078c4 eea70000 00000000 00034e1c c01e6c74 00000000 000=
-00000
->> 1f80: 00034e1c 000341f8 00000000 00000123 c01078c4 c044e90c 00000000 000=
-00000
->> 1fa0: 000002a0 c0107700 00034e1c 000341f8 00000003 00035008 000002a0 000=
-00000
->> 1fc0: 00034e1c 000341f8 00000000 00000123 00000000 00000000 00011ffc 000=
-34e1c
->> 1fe0: 00000000 bef89aa4 0001211c b6eebb60 60070010 00000003 00000000 000=
-00000
->> [<c02c47d8>] (__memzero) from [<c0506278>] (l2cap_skb_msg_name+0x1c/0x4c=
-)
->> [<c0506278>] (l2cap_skb_msg_name) from [<c04d7114>] (bt_sock_recvmsg+0x1=
-28/0x160)
->> [<c04d7114>] (bt_sock_recvmsg) from [<c0504d50>] (l2cap_sock_recvmsg+0x9=
-8/0x134)
->> [<c0504d50>] (l2cap_sock_recvmsg) from [<c044e8a0>] (SyS_recvfrom+0x94/0=
-xec)
->> [<c044e8a0>] (SyS_recvfrom) from [<c044e90c>] (SyS_recv+0x14/0x1c)
->> [<c044e90c>] (SyS_recv) from [<c0107700>] (ret_fast_syscall+0x0/0x3c)
->> Code: e3110010 18a0500c e49de004 e3110008 (18a0000c)
->> ---[ end trace 224e35e79fe06b42 ]---
->>
->> Signed-off-by: Ezequiel Garcia <ezequiel@vanguardiasur.com.ar>
->> ---
->>  net/bluetooth/af_bluetooth.c | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
->> index 1aff2da9bc74..cfb2faba46de 100644
->> --- a/net/bluetooth/af_bluetooth.c
->> +++ b/net/bluetooth/af_bluetooth.c
->> @@ -245,7 +245,7 @@ int bt_sock_recvmsg(struct socket *sock, struct msgh=
-dr *msg, size_t len,
->>         if (err =3D=3D 0) {
->>                 sock_recv_ts_and_drops(msg, sk, skb);
->>
->> -               if (bt_sk(sk)->skb_msg_name)
->> +               if (msg->msg_name && bt_sk(sk)->skb_msg_name)
->>                         bt_sk(sk)->skb_msg_name(skb, msg->msg_name,
->>                                                 &msg->msg_namelen);
->>         }
->> --
->> 2.11.0
->>
+On Wed, Jan 4, 2017 at 3:33 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 >
-> Any feedback here?
+> This marks the following tools as deprecated as they are not longer
+> maintained or have been replaced by other tools:
+>
+>   hciattach hciconfig hcitool hcidump rfcomm sdptool ciptool gatttool
+> ---
+>  Makefile.tools | 86 ++++++++++++++++++++++++++++++++--------------------------
+>  README         | 11 ++++++++
+>  configure.ac   |  2 +-
+>  3 files changed, 59 insertions(+), 40 deletions(-)
+>
+> diff --git a/Makefile.tools b/Makefile.tools
+> index 7706dc7..9841d31 100644
+> --- a/Makefile.tools
+> +++ b/Makefile.tools
+> @@ -154,11 +154,35 @@ tools_userchan_tester_LDADD = lib/libbluetooth-internal.la \
+>  endif
+>
+>  if TOOLS
+> -bin_PROGRAMS += tools/hciattach tools/hciconfig tools/hcitool tools/hcidump \
+> -                       tools/rfcomm tools/rctest tools/l2test tools/l2ping \
+> -                       tools/sdptool tools/ciptool tools/bccmd \
+> +bin_PROGRAMS += tools/rctest tools/l2test tools/l2ping tools/bccmd \
+>                         tools/bluemoon tools/hex2hcd tools/mpris-proxy
+>
+> +tools_rctest_LDADD = lib/libbluetooth-internal.la
+> +
+> +tools_l2test_LDADD = lib/libbluetooth-internal.la
+> +
+> +tools_l2ping_LDADD = lib/libbluetooth-internal.la
+> +
+> +tools_bccmd_SOURCES = tools/bccmd.c tools/csr.h tools/csr.c \
+> +                       tools/csr_hci.c tools/csr_usb.c \
+> +                       tools/csr_h4.c tools/csr_3wire.c \
+> +                       tools/csr_bcsp.c tools/ubcsp.h tools/ubcsp.c
+> +tools_bccmd_LDADD = lib/libbluetooth-internal.la
+> +
+> +tools_bluemoon_SOURCES = tools/bluemoon.c monitor/bt.h
+> +tools_bluemoon_LDADD = src/libshared-mainloop.la
+> +
+> +tools_hex2hcd_SOURCES = tools/hex2hcd.c
+> +
+> +tools_mpris_proxy_SOURCES = tools/mpris-proxy.c
+> +tools_mpris_proxy_LDADD = gdbus/libgdbus-internal.la @GLIB_LIBS@ @DBUS_LIBS@
+> +
+> +dist_man_MANS += tools/rctest.1 tools/l2ping.1 tools/bccmd.1
+> +
+> +if DEPRECATED
+> +bin_PROGRAMS += tools/hciattach tools/hciconfig tools/hcitool tools/hcidump \
+> +                       tools/rfcomm tools/sdptool tools/ciptool
+> +
+>  tools_hciattach_SOURCES = tools/hciattach.c tools/hciattach.h \
+>                                                 tools/hciattach_st.c \
+>                                                 tools/hciattach_ti.c \
+> @@ -200,44 +224,25 @@ tools_hcidump_SOURCES = tools/hcidump.c \
+>                                 tools/parser/ericsson.c \
+>                                 tools/parser/csr.c \
+>                                 tools/parser/bpa.c
+> -tools_hcidump_LDADD = lib/libbluetooth-internal.la
+> -
+> -tools_rfcomm_LDADD = lib/libbluetooth-internal.la
+> -
+> -tools_rctest_LDADD = lib/libbluetooth-internal.la
+> -
+> -tools_l2test_LDADD = lib/libbluetooth-internal.la
+> -
+> -tools_l2ping_LDADD = lib/libbluetooth-internal.la
+>
+>  tools_sdptool_SOURCES = tools/sdptool.c src/sdp-xml.h src/sdp-xml.c
+>  tools_sdptool_LDADD = lib/libbluetooth-internal.la @GLIB_LIBS@
+>
+>  tools_ciptool_LDADD = lib/libbluetooth-internal.la
+> +tools_hcidump_LDADD = lib/libbluetooth-internal.la
+>
+> -tools_bccmd_SOURCES = tools/bccmd.c tools/csr.h tools/csr.c \
+> -                       tools/csr_hci.c tools/csr_usb.c \
+> -                       tools/csr_h4.c tools/csr_3wire.c \
+> -                       tools/csr_bcsp.c tools/ubcsp.h tools/ubcsp.c
+> -tools_bccmd_LDADD = lib/libbluetooth-internal.la
+> -
+> -tools_bluemoon_SOURCES = tools/bluemoon.c monitor/bt.h
+> -tools_bluemoon_LDADD = src/libshared-mainloop.la
+> -
+> -tools_hex2hcd_SOURCES = tools/hex2hcd.c
+> -
+> -tools_mpris_proxy_SOURCES = tools/mpris-proxy.c
+> -tools_mpris_proxy_LDADD = gdbus/libgdbus-internal.la @GLIB_LIBS@ @DBUS_LIBS@
+> +tools_rfcomm_LDADD = lib/libbluetooth-internal.la
+>
+>  dist_man_MANS += tools/hciattach.1 tools/hciconfig.1 \
+>                         tools/hcitool.1 tools/hcidump.1 \
+> -                       tools/rfcomm.1 tools/rctest.1 tools/l2ping.1 \
+> -                       tools/sdptool.1 tools/ciptool.1 tools/bccmd.1
+> +                       tools/rfcomm.1 tools/sdptool.1 tools/ciptool.1
+>  else
+>  EXTRA_DIST += tools/hciattach.1 tools/hciconfig.1 \
+>                         tools/hcitool.1 tools/hcidump.1 \
+> -                       tools/rfcomm.1 tools/rctest.1 tools/l2ping.1 \
+> -                       tools/sdptool.1 tools/ciptool.1 tools/bccmd.1
+> +                       tools/rfcomm.1 tools/sdptool.1 tools/ciptool.1
+> +endif
+> +else
+> +EXTRA_DIST += tools/rctest.1 tools/l2ping.1 tools/bccmd.1
+>  endif
+>
+>  if HID2HCI
+> @@ -343,18 +348,9 @@ EXTRA_DIST += tools/btattach.1
+>  endif
+>
+>  if READLINE
+> -noinst_PROGRAMS += attrib/gatttool tools/btmgmt \
+> -                       tools/obex-client-tool tools/obex-server-tool \
+> +noinst_PROGRAMS += tools/btmgmt tools/obex-client-tool tools/obex-server-tool \
+>                         tools/bluetooth-player tools/obexctl
+>
+> -attrib_gatttool_SOURCES = attrib/gatttool.c attrib/att.c attrib/gatt.c \
+> -                               attrib/gattrib.c btio/btio.c \
+> -                               attrib/gatttool.h attrib/interactive.c \
+> -                               attrib/utils.c src/log.c client/display.c \
+> -                               client/display.h
+> -attrib_gatttool_LDADD = lib/libbluetooth-internal.la \
+> -                       src/libshared-glib.la @GLIB_LIBS@ -lreadline
+> -
+>  tools_obex_client_tool_SOURCES = $(gobex_sources) $(btio_sources) \
+>                                                 tools/obex-client-tool.c
+>  tools_obex_client_tool_LDADD = lib/libbluetooth-internal.la \
+> @@ -377,6 +373,18 @@ tools_obexctl_LDADD = gdbus/libgdbus-internal.la \
+>  tools_btmgmt_SOURCES = tools/btmgmt.c src/uuid-helper.c client/display.c
+>  tools_btmgmt_LDADD = lib/libbluetooth-internal.la src/libshared-mainloop.la \
+>                                 -lreadline
+> +if DEPRECATED
+> +noinst_PROGRAMS += attrib/gatttool
+> +
+> +attrib_gatttool_SOURCES = attrib/gatttool.c attrib/att.c attrib/gatt.c \
+> +                               attrib/gattrib.c btio/btio.c \
+> +                               attrib/gatttool.h attrib/interactive.c \
+> +                               attrib/utils.c src/log.c client/display.c \
+> +                               client/display.h
+> +attrib_gatttool_LDADD = lib/libbluetooth-internal.la \
+> +                       src/libshared-glib.la @GLIB_LIBS@ -lreadline
+> +
+> +endif
+>  endif
+>
+>  if EXPERIMENTAL
+> diff --git a/README b/README
+> index 7b6001b..c42a113 100644
+> --- a/README
+> +++ b/README
+> @@ -166,6 +166,17 @@ For a working system, certain configuration options need to be enabled:
+>                 systems. The behavior of the experimental tools is unstable
+>                 and might still change.
+>
+> +       --enable-deprecated
+> +
+> +               Enable deprecated tools
+> +
+> +               By defauld all tools that are no longer maintained are
+> +               disabled. This option can be used to enable them.
+> +
+> +               It is not recommended to enable this option for production
+> +               systems. The behavior of the deprecated tools may be unstable
+> +               or simply don't work anymore.
+> +
+>         --enable-nfc
+>
+>                 This option enable NFC pairing support.
+> diff --git a/configure.ac b/configure.ac
+> index 2b0363c..fb8deab 100644
+> --- a/configure.ac
+> +++ b/configure.ac
+> @@ -291,7 +291,7 @@ AC_ARG_ENABLE(experimental, AC_HELP_STRING([--enable-experimental],
+>  AM_CONDITIONAL(EXPERIMENTAL, test "${enable_experimental}" = "yes")
+>
+>  AC_ARG_ENABLE(deprecated, AC_HELP_STRING([--enable-deprecated],
+> -                       [enable deprecated plugins (BLE services, ...)]),
+> +                       [enable deprecated tools]),
+>                                         [enable_deprecated=${enableval}])
+>  AM_CONDITIONAL(DEPRECATED, test "${enable_deprecated}" = "yes")
+>
+> --
+> 2.9.3
+>
 
-Ping.
---=20
-Ezequiel Garc=C3=ADa, VanguardiaSur
-www.vanguardiasur.com.ar
+Applied.
+
+-- 
+Luiz Augusto von Dentz
