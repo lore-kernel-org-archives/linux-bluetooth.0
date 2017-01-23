@@ -1,29 +1,120 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <ezequiel@vanguardiasur.com.ar>
 MIME-Version: 1.0
-From: "yon ar c'hall" <yon.ar.chall@gmail.com>
-Date: Mon, 23 Jan 2017 17:44:51 +0100
-Message-ID: <CAOJvutMnJJJi=O1=e1kttqk4cLk_UvpwQyS4uetziqjsN_FX2g@mail.gmail.com>
-Subject: Blood Pressure GATT LE profile
-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <CAAEAJfB-U5ZwuAoBf_Qr0cYCY0Lb96T7JZsoxr_hy6+18mFWNw@mail.gmail.com>
+References: <20161229125119.8985-1-ezequiel@vanguardiasur.com.ar> <CAAEAJfB-U5ZwuAoBf_Qr0cYCY0Lb96T7JZsoxr_hy6+18mFWNw@mail.gmail.com>
+From: Ezequiel Garcia <ezequiel@vanguardiasur.com.ar>
+Date: Mon, 23 Jan 2017 12:36:22 -0300
+Message-ID: <CAAEAJfCXnY8HVBBqUc+wJ2qyuVgSj0249+vkqT5zTww9Nv5sBQ@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: Fix NULL pointer dereference in bt_sock_recvmsg
+To: linux-bluetooth@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>, Ezequiel Garcia <ezequiel@vanguardiasur.com.ar>
 Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello,
++Andrew
 
-The Blood Pressure LE profile is not listed on the
-www.bluez.org/profiles web page; can you please confirm whether this
-information is up to date or not regarding Bluez 5.43 ?
+On 11 January 2017 at 17:27, Ezequiel Garcia
+<ezequiel@vanguardiasur.com.ar> wrote:
+> On 29 December 2016 at 09:51, Ezequiel Garcia
+> <ezequiel@vanguardiasur.com.ar> wrote:
+>> As per the comment in include/linux/net.h, the recvfrom handlers
+>> should expect msg_name to be NULL. However, bt_sock_recvmsg()
+>> is currently not checking it, which could lead to a NULL pointer
+>> dereference.
+>>
+>> The following NULL pointer dereference was produced while testing
+>> L2CAP datagram reception. Note that the kernel is tainted due to
+>> the r8723bs module being inserted. However, it seems the fix still
+>> applies.
+>>
+>> $ l2test -r -G
+>> l2test[326]: Receiving ...
+>> Unable to handle kernel NULL pointer dereference at virtual address 0000=
+0000
+>> pgd =3D ee008000
+>> [00000000] *pgd=3D7f896835
+>> Internal error: Oops: 817 [#1] PREEMPT SMP ARM
+>> Modules linked in: r8723bs(O)
+>> CPU: 0 PID: 326 Comm: l2test Tainted: G           O 4.8.0 #1
+>> Hardware name: Allwinner sun7i (A20) Family
+>> task: ef1c6880 task.stack: eea70000
+>> PC is at __memzero+0x58/0x80
+>> LR is at l2cap_skb_msg_name+0x1c/0x4c
+>> pc : [<c02c47d8>]    lr : [<c0506278>]    psr: 00070013
+>> sp : eea71e60  ip : 00000000  fp : 00034e1c
+>> r10: 00000000  r9 : 00000000  r8 : eea71ed4
+>> r7 : 000002a0  r6 : eea71ed8  r5 : 00000000  r4 : ee4a5d80
+>> r3 : 00000000  r2 : 00000000  r1 : 0000000e  r0 : 00000000
+>> Flags: nzcv  IRQs on  FIQs on  Mode SVC_32  ISA ARM Segment none
+>> Control: 10c5387d  Table: 7600806a  DAC: 00000051
+>> Process l2test (pid: 326, stack limit =3D 0xeea70210)
+>> Stack: (0xeea71e60 to 0xeea72000)
+>> 1e60: ee4a5d80 eeac2800 000002a0 c04d7114 173eefa0 00000000 c06ca68e 000=
+00000
+>> 1e80: 00000001 eeac2800 eef23500 00000000 000002a0 eea71ed4 eea70000 c05=
+04d50
+>> 1ea0: 00000000 00000000 eef23500 00000000 00000000 c044e8a0 eea71edc eea=
+9f904
+>> 1ec0: bef89aa0 fffffff7 00000000 00035008 000002a0 00000000 00000000 000=
+00000
+>> 1ee0: 00000000 00000000 eea71ed4 00000000 00000000 00000000 00004000 000=
+00000
+>> 1f00: 0000011b c01078c4 eea70000 c044e5e4 00000000 00000000 642f0001 6c2=
+f7665
+>> 1f20: 0000676f 00000000 00000000 00000000 00000000 00000000 00000000 000=
+00000
+>> 1f40: 00000000 00000000 00000000 00000000 00000000 ffffffff 00000001 bef=
+89ad8
+>> 1f60: 000000a8 c01078c4 eea70000 00000000 00034e1c c01e6c74 00000000 000=
+00000
+>> 1f80: 00034e1c 000341f8 00000000 00000123 c01078c4 c044e90c 00000000 000=
+00000
+>> 1fa0: 000002a0 c0107700 00034e1c 000341f8 00000003 00035008 000002a0 000=
+00000
+>> 1fc0: 00034e1c 000341f8 00000000 00000123 00000000 00000000 00011ffc 000=
+34e1c
+>> 1fe0: 00000000 bef89aa4 0001211c b6eebb60 60070010 00000003 00000000 000=
+00000
+>> [<c02c47d8>] (__memzero) from [<c0506278>] (l2cap_skb_msg_name+0x1c/0x4c=
+)
+>> [<c0506278>] (l2cap_skb_msg_name) from [<c04d7114>] (bt_sock_recvmsg+0x1=
+28/0x160)
+>> [<c04d7114>] (bt_sock_recvmsg) from [<c0504d50>] (l2cap_sock_recvmsg+0x9=
+8/0x134)
+>> [<c0504d50>] (l2cap_sock_recvmsg) from [<c044e8a0>] (SyS_recvfrom+0x94/0=
+xec)
+>> [<c044e8a0>] (SyS_recvfrom) from [<c044e90c>] (SyS_recv+0x14/0x1c)
+>> [<c044e90c>] (SyS_recv) from [<c0107700>] (ret_fast_syscall+0x0/0x3c)
+>> Code: e3110010 18a0500c e49de004 e3110008 (18a0000c)
+>> ---[ end trace 224e35e79fe06b42 ]---
+>>
+>> Signed-off-by: Ezequiel Garcia <ezequiel@vanguardiasur.com.ar>
+>> ---
+>>  net/bluetooth/af_bluetooth.c | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
+>> index 1aff2da9bc74..cfb2faba46de 100644
+>> --- a/net/bluetooth/af_bluetooth.c
+>> +++ b/net/bluetooth/af_bluetooth.c
+>> @@ -245,7 +245,7 @@ int bt_sock_recvmsg(struct socket *sock, struct msgh=
+dr *msg, size_t len,
+>>         if (err =3D=3D 0) {
+>>                 sock_recv_ts_and_drops(msg, sk, skb);
+>>
+>> -               if (bt_sk(sk)->skb_msg_name)
+>> +               if (msg->msg_name && bt_sk(sk)->skb_msg_name)
+>>                         bt_sk(sk)->skb_msg_name(skb, msg->msg_name,
+>>                                                 &msg->msg_namelen);
+>>         }
+>> --
+>> 2.11.0
+>>
+>
+> Any feedback here?
 
-Note : we downloaded the last Bluez source archive, and tried to
-understand how the GATT LE profiles were implemented, e.g. for the
-Health Thermometer profile, but we are missing some points of the
-bluez's user-space architecture (are the "doc/*-api.txt" and the
-"plugin/gatt-example.c" files still valid ? Is it just a matter of
-D-BUS configuration/declaration as we can see in
-"test/test-thermometer.py" ?). If it turns out that we have to
-implement the Blood Pressure profile, could we get a pointer to some
-programming information, please ?
-
-Thanks.
--Yon
+Ping.
+--=20
+Ezequiel Garc=C3=ADa, VanguardiaSur
+www.vanguardiasur.com.ar
