@@ -1,206 +1,116 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20170104133401.3636-1-luiz.dentz@gmail.com>
-References: <20170104133401.3636-1-luiz.dentz@gmail.com>
+In-Reply-To: <CAO1O6se-S7ARAW_gJDB9iEPu3mce0pKrNNmBCy_XSvwHLngAvQ@mail.gmail.com>
+References: <CAK-EfX=FkO9JSiQhE4WXeTTr3sw9WHDPVNr6pJmOXP1PgE0L5Q@mail.gmail.com>
+ <CABBYNZK+jBHP959i-P+mQ2fX3p0fdFBYAxP8967BwEHnj=m-vQ@mail.gmail.com>
+ <CAK-EfXn-ZB9erfz=MTB7dT2S86TNykPtgKOY-CuUr=KJTy87aA@mail.gmail.com>
+ <CABBYNZKwZ7iUZoh9PeNsNstNUW30DKBm1VD_fSNoRXzFaPSesg@mail.gmail.com> <CAO1O6se-S7ARAW_gJDB9iEPu3mce0pKrNNmBCy_XSvwHLngAvQ@mail.gmail.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 23 Jan 2017 12:59:10 +0200
-Message-ID: <CABBYNZKFJ82BgafuFc4NStt9J9m02yWk+oofqRFD_NatRrEhaQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/3] build: Hide deprecated tools under --enable-deprecated
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Mon, 23 Jan 2017 11:41:54 +0200
+Message-ID: <CABBYNZK+PDJewy=FhY6ff_L+=7CPw1VNV_ytzFKZS_6nW1CxGA@mail.gmail.com>
+Subject: Re: GATT service blacklist
+To: Emil Lenngren <emil.lenngren@gmail.com>
+Cc: Vincent Scheib <scheib@google.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Emil,
 
-On Wed, Jan 4, 2017 at 3:33 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+On Thu, Jan 19, 2017 at 11:11 PM, Emil Lenngren <emil.lenngren@gmail.com> wrote:
+> Hi,
 >
-> This marks the following tools as deprecated as they are not longer
-> maintained or have been replaced by other tools:
+> 2017-01-19 21:17 GMT+01:00 Luiz Augusto von Dentz <luiz.dentz@gmail.com>:
+>> Hi Vincent,
+>>
+>> On Thu, Jan 19, 2017 at 9:52 PM, Vincent Scheib <scheib@google.com> wrote:
+>>> On Mon, Jan 16, 2017 at 5:46 AM, Luiz Augusto von Dentz
+>>> <luiz.dentz@gmail.com> wrote:
+>>>> On Sat, Jan 14, 2017 at 6:38 AM, Vincent Scheib <scheib@google.com> wrote:
+>>>>> I just ran into this issue again (being blocked from accessing a standard
+>>>>> GATT service) when using bluez. I had an application accessing GATT
+>>>>> objects, and also the generic_access service. ...
+>>>>
+>>>> Well the general idea was to block access if there is a plugin already
+>>>> handling a certain service. Now you seem to be claiming this shouldn't
+>>>> be the case and any service can be accessed simultaneously by a plugin
+>>>> running in daemon process and an application, but I don't think this
+>>>> is always true and in some cases they may conflict, or just generate
+>>>> duplicated traffic.
+>>>
+>>> Correct. Bluetooth devices are all required to have a generic_access
+>>> service, and I believe applications should be able to use the GATT
+>>> protocol to interact with that service. I think that the current
+>>> approach bluez has taken of trying to abstract this is a mistake.
+>>> There doesn't seem to be value added by doing so, but there is harm in
+>>> creating additional ways to interact, harming portability and
+>>> requiring more attention and custom code by application developers.
+>>
+>> Well you seem to forget that there are various ways to get the name,
+>> not only GATT. In fact the GAP Service over GATT is just the tip of
+>> the iceberg, since GAP define the connection procedures which has very
+>> little to do with this service, and when it comes to GAP procedures we
+>> do need to know the Name of the devices to display to the user and
+>> that may come from advertisements, inquiry results or from Read Name
+>> command so we can cache the name so we can display it even when not
+>> connected. So if you arguing that the stack should not deal with this
+>> service I would have to disagree.
+>>
 >
->   hciattach hciconfig hcitool hcidump rfcomm sdptool ciptool gatttool
-> ---
->  Makefile.tools | 86 ++++++++++++++++++++++++++++++++--------------------------
->  README         | 11 ++++++++
->  configure.ac   |  2 +-
->  3 files changed, 59 insertions(+), 40 deletions(-)
->
-> diff --git a/Makefile.tools b/Makefile.tools
-> index 7706dc7..9841d31 100644
-> --- a/Makefile.tools
-> +++ b/Makefile.tools
-> @@ -154,11 +154,35 @@ tools_userchan_tester_LDADD = lib/libbluetooth-internal.la \
->  endif
->
->  if TOOLS
-> -bin_PROGRAMS += tools/hciattach tools/hciconfig tools/hcitool tools/hcidump \
-> -                       tools/rfcomm tools/rctest tools/l2test tools/l2ping \
-> -                       tools/sdptool tools/ciptool tools/bccmd \
-> +bin_PROGRAMS += tools/rctest tools/l2test tools/l2ping tools/bccmd \
->                         tools/bluemoon tools/hex2hcd tools/mpris-proxy
->
-> +tools_rctest_LDADD = lib/libbluetooth-internal.la
-> +
-> +tools_l2test_LDADD = lib/libbluetooth-internal.la
-> +
-> +tools_l2ping_LDADD = lib/libbluetooth-internal.la
-> +
-> +tools_bccmd_SOURCES = tools/bccmd.c tools/csr.h tools/csr.c \
-> +                       tools/csr_hci.c tools/csr_usb.c \
-> +                       tools/csr_h4.c tools/csr_3wire.c \
-> +                       tools/csr_bcsp.c tools/ubcsp.h tools/ubcsp.c
-> +tools_bccmd_LDADD = lib/libbluetooth-internal.la
-> +
-> +tools_bluemoon_SOURCES = tools/bluemoon.c monitor/bt.h
-> +tools_bluemoon_LDADD = src/libshared-mainloop.la
-> +
-> +tools_hex2hcd_SOURCES = tools/hex2hcd.c
-> +
-> +tools_mpris_proxy_SOURCES = tools/mpris-proxy.c
-> +tools_mpris_proxy_LDADD = gdbus/libgdbus-internal.la @GLIB_LIBS@ @DBUS_LIBS@
-> +
-> +dist_man_MANS += tools/rctest.1 tools/l2ping.1 tools/bccmd.1
-> +
-> +if DEPRECATED
-> +bin_PROGRAMS += tools/hciattach tools/hciconfig tools/hcitool tools/hcidump \
-> +                       tools/rfcomm tools/sdptool tools/ciptool
-> +
->  tools_hciattach_SOURCES = tools/hciattach.c tools/hciattach.h \
->                                                 tools/hciattach_st.c \
->                                                 tools/hciattach_ti.c \
-> @@ -200,44 +224,25 @@ tools_hcidump_SOURCES = tools/hcidump.c \
->                                 tools/parser/ericsson.c \
->                                 tools/parser/csr.c \
->                                 tools/parser/bpa.c
-> -tools_hcidump_LDADD = lib/libbluetooth-internal.la
-> -
-> -tools_rfcomm_LDADD = lib/libbluetooth-internal.la
-> -
-> -tools_rctest_LDADD = lib/libbluetooth-internal.la
-> -
-> -tools_l2test_LDADD = lib/libbluetooth-internal.la
-> -
-> -tools_l2ping_LDADD = lib/libbluetooth-internal.la
->
->  tools_sdptool_SOURCES = tools/sdptool.c src/sdp-xml.h src/sdp-xml.c
->  tools_sdptool_LDADD = lib/libbluetooth-internal.la @GLIB_LIBS@
->
->  tools_ciptool_LDADD = lib/libbluetooth-internal.la
-> +tools_hcidump_LDADD = lib/libbluetooth-internal.la
->
-> -tools_bccmd_SOURCES = tools/bccmd.c tools/csr.h tools/csr.c \
-> -                       tools/csr_hci.c tools/csr_usb.c \
-> -                       tools/csr_h4.c tools/csr_3wire.c \
-> -                       tools/csr_bcsp.c tools/ubcsp.h tools/ubcsp.c
-> -tools_bccmd_LDADD = lib/libbluetooth-internal.la
-> -
-> -tools_bluemoon_SOURCES = tools/bluemoon.c monitor/bt.h
-> -tools_bluemoon_LDADD = src/libshared-mainloop.la
-> -
-> -tools_hex2hcd_SOURCES = tools/hex2hcd.c
-> -
-> -tools_mpris_proxy_SOURCES = tools/mpris-proxy.c
-> -tools_mpris_proxy_LDADD = gdbus/libgdbus-internal.la @GLIB_LIBS@ @DBUS_LIBS@
-> +tools_rfcomm_LDADD = lib/libbluetooth-internal.la
->
->  dist_man_MANS += tools/hciattach.1 tools/hciconfig.1 \
->                         tools/hcitool.1 tools/hcidump.1 \
-> -                       tools/rfcomm.1 tools/rctest.1 tools/l2ping.1 \
-> -                       tools/sdptool.1 tools/ciptool.1 tools/bccmd.1
-> +                       tools/rfcomm.1 tools/sdptool.1 tools/ciptool.1
->  else
->  EXTRA_DIST += tools/hciattach.1 tools/hciconfig.1 \
->                         tools/hcitool.1 tools/hcidump.1 \
-> -                       tools/rfcomm.1 tools/rctest.1 tools/l2ping.1 \
-> -                       tools/sdptool.1 tools/ciptool.1 tools/bccmd.1
-> +                       tools/rfcomm.1 tools/sdptool.1 tools/ciptool.1
-> +endif
-> +else
-> +EXTRA_DIST += tools/rctest.1 tools/l2ping.1 tools/bccmd.1
->  endif
->
->  if HID2HCI
-> @@ -343,18 +348,9 @@ EXTRA_DIST += tools/btattach.1
->  endif
->
->  if READLINE
-> -noinst_PROGRAMS += attrib/gatttool tools/btmgmt \
-> -                       tools/obex-client-tool tools/obex-server-tool \
-> +noinst_PROGRAMS += tools/btmgmt tools/obex-client-tool tools/obex-server-tool \
->                         tools/bluetooth-player tools/obexctl
->
-> -attrib_gatttool_SOURCES = attrib/gatttool.c attrib/att.c attrib/gatt.c \
-> -                               attrib/gattrib.c btio/btio.c \
-> -                               attrib/gatttool.h attrib/interactive.c \
-> -                               attrib/utils.c src/log.c client/display.c \
-> -                               client/display.h
-> -attrib_gatttool_LDADD = lib/libbluetooth-internal.la \
-> -                       src/libshared-glib.la @GLIB_LIBS@ -lreadline
-> -
->  tools_obex_client_tool_SOURCES = $(gobex_sources) $(btio_sources) \
->                                                 tools/obex-client-tool.c
->  tools_obex_client_tool_LDADD = lib/libbluetooth-internal.la \
-> @@ -377,6 +373,18 @@ tools_obexctl_LDADD = gdbus/libgdbus-internal.la \
->  tools_btmgmt_SOURCES = tools/btmgmt.c src/uuid-helper.c client/display.c
->  tools_btmgmt_LDADD = lib/libbluetooth-internal.la src/libshared-mainloop.la \
->                                 -lreadline
-> +if DEPRECATED
-> +noinst_PROGRAMS += attrib/gatttool
-> +
-> +attrib_gatttool_SOURCES = attrib/gatttool.c attrib/att.c attrib/gatt.c \
-> +                               attrib/gattrib.c btio/btio.c \
-> +                               attrib/gatttool.h attrib/interactive.c \
-> +                               attrib/utils.c src/log.c client/display.c \
-> +                               client/display.h
-> +attrib_gatttool_LDADD = lib/libbluetooth-internal.la \
-> +                       src/libshared-glib.la @GLIB_LIBS@ -lreadline
-> +
-> +endif
->  endif
->
->  if EXPERIMENTAL
-> diff --git a/README b/README
-> index 7b6001b..c42a113 100644
-> --- a/README
-> +++ b/README
-> @@ -166,6 +166,17 @@ For a working system, certain configuration options need to be enabled:
->                 systems. The behavior of the experimental tools is unstable
->                 and might still change.
->
-> +       --enable-deprecated
-> +
-> +               Enable deprecated tools
-> +
-> +               By defauld all tools that are no longer maintained are
-> +               disabled. This option can be used to enable them.
-> +
-> +               It is not recommended to enable this option for production
-> +               systems. The behavior of the deprecated tools may be unstable
-> +               or simply don't work anymore.
-> +
->         --enable-nfc
->
->                 This option enable NFC pairing support.
-> diff --git a/configure.ac b/configure.ac
-> index 2b0363c..fb8deab 100644
-> --- a/configure.ac
-> +++ b/configure.ac
-> @@ -291,7 +291,7 @@ AC_ARG_ENABLE(experimental, AC_HELP_STRING([--enable-experimental],
->  AM_CONDITIONAL(EXPERIMENTAL, test "${enable_experimental}" = "yes")
->
->  AC_ARG_ENABLE(deprecated, AC_HELP_STRING([--enable-deprecated],
-> -                       [enable deprecated plugins (BLE services, ...)]),
-> +                       [enable deprecated tools]),
->                                         [enable_deprecated=${enableval}])
->  AM_CONDITIONAL(DEPRECATED, test "${enable_deprecated}" = "yes")
->
-> --
-> 2.9.3
->
+> In my opinion, it's nice that the system tries to maintain a cache
+> using various methods to be able to show the name to the user even
+> when the device is disconnected. However that should not imply that it
+> shouldn't be possible to read the name characteristic directly from an
+> application. There are many reasons why one thinks the name is old and
+> needs to be refreshed; for example if you use a smartphone as GATT
+> server where you easily can change both GATT server and name, or if
+> you do a firmware update and reboot the device the name may change as
+> well. If there is no way to force the system to reload the name then
+> it should definitely be possible to read it directly. This is how
+> Android's implementation works and I guess no one has complained about
+> it.
 
-Applied.
+Reading is alright, writing is the one Im more concerned since we
+might not be able to detect the change until it gets reconnected. Also
+there is no mention on how this affects the name in the advertisement,
+if that gets truncated, etc. Flashing a new firmware is actually no
+problem, we do read the name every time it gets connected. Im not sure
+I follow regarding the GATT server and name, do you want applications
+to register a GAP service as a server? How would we handle different
+applications trying to register themselves as GAP service since I
+don't think we can have multiple instances of that service, if Android
+allow to do that its probably not even complaint.
+
+> Also when you want to build a Bluetooth library on top on another
+> Bluetooth library it's never fun when each platform has its own
+> restrictions that probably was intended to simplify for the users but
+> in practice often misses special cases leading to incompatibility
+> problems.
+
+Well the same can be said if the Bluetooth stack allow doing things
+forbidden by the spec.
+
+>
+>>>> Perhaps for GAP service itself it is fine to allow applications to
+>>>> access it, the problem is if we allow the application to set the name
+>>>> like you want does it notifies that do the daemon as well?
+>>>
+>>> Yes. The same way multiple applications should be able to receive
+>>> notifications for one device.
+>>
+>> Except that org.bluetooth.characteristic.gap.device_name excludes
+>> notification support:
+>>
+>> https://www.bluetooth.com/specifications/gatt/viewer?attributeXmlFile=org.bluetooth.service.generic_access.xml
+>
+> I would guess the spec writers didn't really think about what should
+> happen when the name gets updated. iOS actually "takes up/waste" one
+> round trip in each start of connection to read the name characteristic
+> in order to always try to have the latest.
+
+BlueZ does the same and we do emit a signal if we the detect the name
+has changed.
 
 -- 
 Luiz Augusto von Dentz
