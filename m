@@ -1,76 +1,80 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <DEBB0CAA2616974FAE35E4B560B9A43722784152@ORSMSX103.amr.corp.intel.com>
-References: <1485282579-9172-1-git-send-email-brian.gix@intel.com>
- <1485282579-9172-3-git-send-email-brian.gix@intel.com> <6ea10c35-12e7-fbcc-8db8-cee61754e066@felipetonello.com>
- <DEBB0CAA2616974FAE35E4B560B9A437227840FB@ORSMSX103.amr.corp.intel.com>
- <CAAEJBhJpkpr7YAd_rRtiOnVkhf66tvcpZjAse7PA76MpFGZGeA@mail.gmail.com> <DEBB0CAA2616974FAE35E4B560B9A43722784152@ORSMSX103.amr.corp.intel.com>
+In-Reply-To: <7467d398-33a5-fdaa-7e57-46e4f37fad87@felipetonello.com>
+References: <CAOJvutMnJJJi=O1=e1kttqk4cLk_UvpwQyS4uetziqjsN_FX2g@mail.gmail.com>
+ <5551c99c-e21c-2381-8b17-96a79ed233de@felipetonello.com> <CAOJvutNaiTm8FY2-zuCm5BC2uOJ13_cvOqEizeeFt1DpJYtv2A@mail.gmail.com>
+ <7467d398-33a5-fdaa-7e57-46e4f37fad87@felipetonello.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 24 Jan 2017 21:25:12 +0200
-Message-ID: <CABBYNZKCVegN+x7y-jtwO5W+N064gLvEJZfZnoqHqVxVf7RKLg@mail.gmail.com>
-Subject: Re: [PATCH v2 2/2] Require GLIB v2.46
-To: "Gix, Brian" <brian.gix@intel.com>
-Cc: Szymon Janc <szymon.janc@codecoup.pl>,
-        Felipe Ferreri Tonello <eu@felipetonello.com>,
+Date: Tue, 24 Jan 2017 21:19:58 +0200
+Message-ID: <CABBYNZJqL6OeEeMBi3eYJY8RRgJOiR3Qayf9=iYswh9M8YdxGw@mail.gmail.com>
+Subject: Re: Blood Pressure GATT LE profile
+To: Felipe Ferreri Tonello <eu@felipetonello.com>
+Cc: "yon ar c'hall" <yon.ar.chall@gmail.com>,
         "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Brian, Szymon,
+Hi,
 
-On Tue, Jan 24, 2017 at 9:18 PM, Gix, Brian <brian.gix@intel.com> wrote:
-> Hi Szymon,
+On Tue, Jan 24, 2017 at 9:02 PM, Felipe Ferreri Tonello
+<eu@felipetonello.com> wrote:
+> Hi Yon,
 >
->> -----Original Message-----
->> From: Szymon Janc [mailto:szymon.janc@codecoup.pl]
+> On 24/01/17 15:53, yon ar c'hall wrote:
+>> Hi Felipe,
 >>
->> Hi Brian,
+>> On Tue, Jan 24, 2017 at 3:45 PM, Felipe Ferreri Tonello
+>> <eu@felipetonello.com> wrote:
 >>
->> On 24 January 2017 at 20:04, Gix, Brian <brian.gix@intel.com> wrote:
->> > Done.
->> >
->> > -----Original Message-----
->> > From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
->> owner@vger.kernel.org] On Behalf Of Felipe Ferreri Tonello
->> > Sent: Tuesday, January 24, 2017 10:56 AM
->> > To: Gix, Brian <brian.gix@intel.com>; linux-bluetooth@vger.kernel.org
->> > Subject: Re: [PATCH v2 2/2] Require GLIB v2.46
->> >
->> > Hi Brian,
->> >
->> > Please, add the reason why this change is necessary in the commit
->> message.
->> >
->> > On 24/01/17 18:29, Brian Gix wrote:
->> >> ---
->> >>  configure.ac | 4 ++--
->> >>  1 file changed, 2 insertions(+), 2 deletions(-)
->> >>
->> >> diff --git a/configure.ac b/configure.ac index 91b4955..6d8bf9c 100644
->> >> --- a/configure.ac
->> >> +++ b/configure.ac
->> >> @@ -61,8 +61,8 @@ AC_CHECK_LIB(dl, dlopen, dummy=yes,
->> >>
->> >>  AC_CHECK_HEADERS(linux/types.h linux/if_alg.h)
->> >>
->> >> -PKG_CHECK_MODULES(GLIB, glib-2.0 >= 2.28, dummy=yes,
->> >> -                             AC_MSG_ERROR(GLib >= 2.28 is required))
->> >> +PKG_CHECK_MODULES(GLIB, glib-2.0 >= 2.46, dummy=yes,
->> >> +                             AC_MSG_ERROR(GLib >= 2.46 is required))
->> >>  AC_SUBST(GLIB_CFLAGS)
->> >>  AC_SUBST(GLIB_LIBS)
+>>> plugin/gatt-example.c is not in the repository, as it is relevant
+>>> anymore. gatt-example implemented a gatt-server using older deprecated API.
 >>
->> I'd rather change test instead of bumping glib dependency just for this...
->> But I'll let others to comment on this too.
+>> Oops, I made a typo : the sub-folder is "plugins" (with "s"), not
+>> "plugin", and it's still in the bluez archive (5.43).
 >
+> That is true, but it is still not usable anymore. From git log:
 >
-> I am fine either way.  The latest (LTS) Ubuntu and Fedora both include >= GLIB v2.46 by default, so I have no strong preference any way, however it is only the unit test that uses it, and no Core BlueZ code.
+> commit cc80afff47938a2c93aff0f7904fd937e6333908
+> Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> Date:   Tue Nov 8 11:00:28 2016 +0200
+>
+>     build: Remove gatt-example plugin
+>
+>     This examples can be done over D-Bus already so it makes no sense to
+> have
+>     it as a plugin and in fact it currently it doesn't even work since
+> it was
+>     never ported to the new code under src/shared.
+>
+>>
+>>> Anyway, there are two ways to implement a GATT client profile (Central
+>>> role). As a generic bluetoothd plugin that will export an API to
+>>> applications via D-Bus, more likely.
+>>
+>> We didn't find any source of a bluetoothd plugin implementing a GATT
+>> LE profile (such as those listed on http://www.bluez.org/profiles/ :
+>> HTP, HoG,...). Sorry, we're still missing something... Would there be
+>> any piece of doc that could help for creating a bluetoothd plugin, as
+>> it looks to be the correct way to proceed ?
+>
+> Not really. Just source code.
+>
+> You can check profile implementations under profiles/ and then just
+> check the code there.
+>
+>>
+>>> Or in your own application using the GATT D-Bus API that bluetoothd exports.
+>>> test/example-gatt-client implements the Heart Rate profile quite simply
+>>> using the D-Bus API.
+>>
+>> We do understand the Python code of test/example-gatt-client :-) It
+>> clearly helps to get the whole picture.
+>> Thanks for the pointer.
+>>
 
-In the past we tried to not bump the glib requirements since there are
-some, probably many, embedded platforms using BlueZ that are stuck
-with ancient glib. That said we might actually start removing glib
-dependencies all together in favor of ell.
+In case you are looking for C examples, take a look at bluetoothctl
+code under client/, it is pretty complete generic GATT client.
 
 
 -- 
