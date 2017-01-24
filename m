@@ -1,57 +1,35 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <DEBB0CAA2616974FAE35E4B560B9A437227840FB@ORSMSX103.amr.corp.intel.com>
-References: <1485282579-9172-1-git-send-email-brian.gix@intel.com>
- <1485282579-9172-3-git-send-email-brian.gix@intel.com> <6ea10c35-12e7-fbcc-8db8-cee61754e066@felipetonello.com>
- <DEBB0CAA2616974FAE35E4B560B9A437227840FB@ORSMSX103.amr.corp.intel.com>
-From: Szymon Janc <szymon.janc@codecoup.pl>
-Date: Tue, 24 Jan 2017 20:08:19 +0100
-Message-ID: <CAAEJBhJpkpr7YAd_rRtiOnVkhf66tvcpZjAse7PA76MpFGZGeA@mail.gmail.com>
-Subject: Re: [PATCH v2 2/2] Require GLIB v2.46
-To: "Gix, Brian" <brian.gix@intel.com>
-Cc: Felipe Ferreri Tonello <eu@felipetonello.com>,
+From: "Gix, Brian" <brian.gix@intel.com>
+To: Felipe Ferreri Tonello <eu@felipetonello.com>,
         "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Subject: RE: [PATCH v2 2/2] Require GLIB v2.46
+Date: Tue, 24 Jan 2017 19:04:54 +0000
+Message-ID: <DEBB0CAA2616974FAE35E4B560B9A437227840FB@ORSMSX103.amr.corp.intel.com>
+References: <1485282579-9172-1-git-send-email-brian.gix@intel.com>
+ <1485282579-9172-3-git-send-email-brian.gix@intel.com>
+ <6ea10c35-12e7-fbcc-8db8-cee61754e066@felipetonello.com>
+In-Reply-To: <6ea10c35-12e7-fbcc-8db8-cee61754e066@felipetonello.com>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Brian,
-
-On 24 January 2017 at 20:04, Gix, Brian <brian.gix@intel.com> wrote:
-> Done.
->
-> -----Original Message-----
-> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-owner@vger.kernel.org] On Behalf Of Felipe Ferreri Tonello
-> Sent: Tuesday, January 24, 2017 10:56 AM
-> To: Gix, Brian <brian.gix@intel.com>; linux-bluetooth@vger.kernel.org
-> Subject: Re: [PATCH v2 2/2] Require GLIB v2.46
->
-> Hi Brian,
->
-> Please, add the reason why this change is necessary in the commit message.
->
-> On 24/01/17 18:29, Brian Gix wrote:
->> ---
->>  configure.ac | 4 ++--
->>  1 file changed, 2 insertions(+), 2 deletions(-)
->>
->> diff --git a/configure.ac b/configure.ac index 91b4955..6d8bf9c 100644
->> --- a/configure.ac
->> +++ b/configure.ac
->> @@ -61,8 +61,8 @@ AC_CHECK_LIB(dl, dlopen, dummy=yes,
->>
->>  AC_CHECK_HEADERS(linux/types.h linux/if_alg.h)
->>
->> -PKG_CHECK_MODULES(GLIB, glib-2.0 >= 2.28, dummy=yes,
->> -                             AC_MSG_ERROR(GLib >= 2.28 is required))
->> +PKG_CHECK_MODULES(GLIB, glib-2.0 >= 2.46, dummy=yes,
->> +                             AC_MSG_ERROR(GLib >= 2.46 is required))
->>  AC_SUBST(GLIB_CFLAGS)
->>  AC_SUBST(GLIB_LIBS)
-
-I'd rather change test instead of bumping glib dependency just for this...
-But I'll let others to comment on this too.
-
--- 
-pozdrawiam
-Szymon K. Janc
+RG9uZS4NCg0KLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCkZyb206IGxpbnV4LWJsdWV0b290
+aC1vd25lckB2Z2VyLmtlcm5lbC5vcmcgW21haWx0bzpsaW51eC1ibHVldG9vdGgtb3duZXJAdmdl
+ci5rZXJuZWwub3JnXSBPbiBCZWhhbGYgT2YgRmVsaXBlIEZlcnJlcmkgVG9uZWxsbw0KU2VudDog
+VHVlc2RheSwgSmFudWFyeSAyNCwgMjAxNyAxMDo1NiBBTQ0KVG86IEdpeCwgQnJpYW4gPGJyaWFu
+LmdpeEBpbnRlbC5jb20+OyBsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnDQpTdWJqZWN0
+OiBSZTogW1BBVENIIHYyIDIvMl0gUmVxdWlyZSBHTElCIHYyLjQ2DQoNCkhpIEJyaWFuLA0KDQpQ
+bGVhc2UsIGFkZCB0aGUgcmVhc29uIHdoeSB0aGlzIGNoYW5nZSBpcyBuZWNlc3NhcnkgaW4gdGhl
+IGNvbW1pdCBtZXNzYWdlLg0KDQpPbiAyNC8wMS8xNyAxODoyOSwgQnJpYW4gR2l4IHdyb3RlOg0K
+PiAtLS0NCj4gIGNvbmZpZ3VyZS5hYyB8IDQgKystLQ0KPiAgMSBmaWxlIGNoYW5nZWQsIDIgaW5z
+ZXJ0aW9ucygrKSwgMiBkZWxldGlvbnMoLSkNCj4gDQo+IGRpZmYgLS1naXQgYS9jb25maWd1cmUu
+YWMgYi9jb25maWd1cmUuYWMgaW5kZXggOTFiNDk1NS4uNmQ4YmY5YyAxMDA2NDQNCj4gLS0tIGEv
+Y29uZmlndXJlLmFjDQo+ICsrKyBiL2NvbmZpZ3VyZS5hYw0KPiBAQCAtNjEsOCArNjEsOCBAQCBB
+Q19DSEVDS19MSUIoZGwsIGRsb3BlbiwgZHVtbXk9eWVzLA0KPiAgDQo+ICBBQ19DSEVDS19IRUFE
+RVJTKGxpbnV4L3R5cGVzLmggbGludXgvaWZfYWxnLmgpDQo+ICANCj4gLVBLR19DSEVDS19NT0RV
+TEVTKEdMSUIsIGdsaWItMi4wID49IDIuMjgsIGR1bW15PXllcywNCj4gLQkJCQlBQ19NU0dfRVJS
+T1IoR0xpYiA+PSAyLjI4IGlzIHJlcXVpcmVkKSkNCj4gK1BLR19DSEVDS19NT0RVTEVTKEdMSUIs
+IGdsaWItMi4wID49IDIuNDYsIGR1bW15PXllcywNCj4gKwkJCQlBQ19NU0dfRVJST1IoR0xpYiA+
+PSAyLjQ2IGlzIHJlcXVpcmVkKSkNCj4gIEFDX1NVQlNUKEdMSUJfQ0ZMQUdTKQ0KPiAgQUNfU1VC
+U1QoR0xJQl9MSUJTKQ0KPiAgDQo+IA0KDQotLQ0KRmVsaXBlDQo=
