@@ -1,35 +1,36 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: "Gix, Brian" <brian.gix@intel.com>
-To: Felipe Ferreri Tonello <eu@felipetonello.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: [PATCH v2 2/2] Require GLIB v2.46
-Date: Tue, 24 Jan 2017 19:04:54 +0000
-Message-ID: <DEBB0CAA2616974FAE35E4B560B9A437227840FB@ORSMSX103.amr.corp.intel.com>
-References: <1485282579-9172-1-git-send-email-brian.gix@intel.com>
- <1485282579-9172-3-git-send-email-brian.gix@intel.com>
- <6ea10c35-12e7-fbcc-8db8-cee61754e066@felipetonello.com>
-In-Reply-To: <6ea10c35-12e7-fbcc-8db8-cee61754e066@felipetonello.com>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
+From: Brian Gix <brian.gix@intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Brian Gix <brian.gix@intel.com>
+Subject: [PATCH v3 2/2] Require GLIB v2.46
+Date: Tue, 24 Jan 2017 11:03:42 -0800
+Message-Id: <1485284622-10210-3-git-send-email-brian.gix@intel.com>
+In-Reply-To: <1485284622-10210-1-git-send-email-brian.gix@intel.com>
+References: <1485284622-10210-1-git-send-email-brian.gix@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-RG9uZS4NCg0KLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCkZyb206IGxpbnV4LWJsdWV0b290
-aC1vd25lckB2Z2VyLmtlcm5lbC5vcmcgW21haWx0bzpsaW51eC1ibHVldG9vdGgtb3duZXJAdmdl
-ci5rZXJuZWwub3JnXSBPbiBCZWhhbGYgT2YgRmVsaXBlIEZlcnJlcmkgVG9uZWxsbw0KU2VudDog
-VHVlc2RheSwgSmFudWFyeSAyNCwgMjAxNyAxMDo1NiBBTQ0KVG86IEdpeCwgQnJpYW4gPGJyaWFu
-LmdpeEBpbnRlbC5jb20+OyBsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnDQpTdWJqZWN0
-OiBSZTogW1BBVENIIHYyIDIvMl0gUmVxdWlyZSBHTElCIHYyLjQ2DQoNCkhpIEJyaWFuLA0KDQpQ
-bGVhc2UsIGFkZCB0aGUgcmVhc29uIHdoeSB0aGlzIGNoYW5nZSBpcyBuZWNlc3NhcnkgaW4gdGhl
-IGNvbW1pdCBtZXNzYWdlLg0KDQpPbiAyNC8wMS8xNyAxODoyOSwgQnJpYW4gR2l4IHdyb3RlOg0K
-PiAtLS0NCj4gIGNvbmZpZ3VyZS5hYyB8IDQgKystLQ0KPiAgMSBmaWxlIGNoYW5nZWQsIDIgaW5z
-ZXJ0aW9ucygrKSwgMiBkZWxldGlvbnMoLSkNCj4gDQo+IGRpZmYgLS1naXQgYS9jb25maWd1cmUu
-YWMgYi9jb25maWd1cmUuYWMgaW5kZXggOTFiNDk1NS4uNmQ4YmY5YyAxMDA2NDQNCj4gLS0tIGEv
-Y29uZmlndXJlLmFjDQo+ICsrKyBiL2NvbmZpZ3VyZS5hYw0KPiBAQCAtNjEsOCArNjEsOCBAQCBB
-Q19DSEVDS19MSUIoZGwsIGRsb3BlbiwgZHVtbXk9eWVzLA0KPiAgDQo+ICBBQ19DSEVDS19IRUFE
-RVJTKGxpbnV4L3R5cGVzLmggbGludXgvaWZfYWxnLmgpDQo+ICANCj4gLVBLR19DSEVDS19NT0RV
-TEVTKEdMSUIsIGdsaWItMi4wID49IDIuMjgsIGR1bW15PXllcywNCj4gLQkJCQlBQ19NU0dfRVJS
-T1IoR0xpYiA+PSAyLjI4IGlzIHJlcXVpcmVkKSkNCj4gK1BLR19DSEVDS19NT0RVTEVTKEdMSUIs
-IGdsaWItMi4wID49IDIuNDYsIGR1bW15PXllcywNCj4gKwkJCQlBQ19NU0dfRVJST1IoR0xpYiA+
-PSAyLjQ2IGlzIHJlcXVpcmVkKSkNCj4gIEFDX1NVQlNUKEdMSUJfQ0ZMQUdTKQ0KPiAgQUNfU1VC
-U1QoR0xJQl9MSUJTKQ0KPiAgDQo+IA0KDQotLQ0KRmVsaXBlDQo=
+g_assert_cmpmem() called from unit test unit/test-midi.c
+This function was not introduced until GLIB v2.46
+---
+ configure.ac | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 91b4955..6d8bf9c 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -61,8 +61,8 @@ AC_CHECK_LIB(dl, dlopen, dummy=yes,
+ 
+ AC_CHECK_HEADERS(linux/types.h linux/if_alg.h)
+ 
+-PKG_CHECK_MODULES(GLIB, glib-2.0 >= 2.28, dummy=yes,
+-				AC_MSG_ERROR(GLib >= 2.28 is required))
++PKG_CHECK_MODULES(GLIB, glib-2.0 >= 2.46, dummy=yes,
++				AC_MSG_ERROR(GLib >= 2.46 is required))
+ AC_SUBST(GLIB_CFLAGS)
+ AC_SUBST(GLIB_LIBS)
+ 
+-- 
+1.9.1
+
