@@ -1,11 +1,31 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Brian Gix <brian.gix@intel.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v5 0/2] -- Try again for GLIB v2.28 compatibility
-Date: Tue, 24 Jan 2017 11:52:42 -0800
-Message-Id: <1485287564-16879-1-git-send-email-brian.gix@intel.com>
+Cc: Brian Gix <brian.gix@intel.com>
+Subject: [PATCH v4 1/2] Add test-midi to ignore list
+Date: Tue, 24 Jan 2017 11:33:46 -0800
+Message-Id: <1485286427-16413-2-git-send-email-brian.gix@intel.com>
+In-Reply-To: <1485286427-16413-1-git-send-email-brian.gix@intel.com>
+References: <1485286427-16413-1-git-send-email-brian.gix@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+---
+ .gitignore | 1 +
+ 1 file changed, 1 insertion(+)
 
-v4 still wasn't v2.28 compatible.  This one should be.
+diff --git a/.gitignore b/.gitignore
+index 6257505..c0745b4 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -138,6 +138,7 @@ unit/test-avdtp
+ unit/test-avctp
+ unit/test-avrcp
+ unit/test-gatt
++unit/test-midi
+ unit/test-gattrib
+ unit/test-*.log
+ unit/test-*.trs
+-- 
+1.9.1
+
