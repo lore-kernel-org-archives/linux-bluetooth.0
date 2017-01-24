@@ -1,83 +1,53 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Subject: Re: Blood Pressure GATT LE profile
-To: yon ar c'hall <yon.ar.chall@gmail.com>
-References: <CAOJvutMnJJJi=O1=e1kttqk4cLk_UvpwQyS4uetziqjsN_FX2g@mail.gmail.com>
- <5551c99c-e21c-2381-8b17-96a79ed233de@felipetonello.com>
- <CAOJvutNaiTm8FY2-zuCm5BC2uOJ13_cvOqEizeeFt1DpJYtv2A@mail.gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v2 2/2] Require GLIB v2.46
+To: Brian Gix <brian.gix@intel.com>, linux-bluetooth@vger.kernel.org
+References: <1485282579-9172-1-git-send-email-brian.gix@intel.com>
+ <1485282579-9172-3-git-send-email-brian.gix@intel.com>
 From: Felipe Ferreri Tonello <eu@felipetonello.com>
-Message-ID: <7467d398-33a5-fdaa-7e57-46e4f37fad87@felipetonello.com>
-Date: Tue, 24 Jan 2017 19:02:15 +0000
+Message-ID: <6ea10c35-12e7-fbcc-8db8-cee61754e066@felipetonello.com>
+Date: Tue, 24 Jan 2017 18:56:10 +0000
 MIME-Version: 1.0
-In-Reply-To: <CAOJvutNaiTm8FY2-zuCm5BC2uOJ13_cvOqEizeeFt1DpJYtv2A@mail.gmail.com>
+In-Reply-To: <1485282579-9172-3-git-send-email-brian.gix@intel.com>
 Content-Type: multipart/mixed;
- boundary="------------2BFE7988E026D92933E73296"
+ boundary="------------96ADAC4BDC01F13A1E7534C7"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 This is a multi-part message in MIME format.
---------------2BFE7988E026D92933E73296
+--------------96ADAC4BDC01F13A1E7534C7
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
 
-Hi Yon,
+Hi Brian,
 
-On 24/01/17 15:53, yon ar c'hall wrote:
-> Hi Felipe,
+Please, add the reason why this change is necessary in the commit message.
+
+On 24/01/17 18:29, Brian Gix wrote:
+> ---
+>  configure.ac | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 > 
-> On Tue, Jan 24, 2017 at 3:45 PM, Felipe Ferreri Tonello
-> <eu@felipetonello.com> wrote:
-> 
->> plugin/gatt-example.c is not in the repository, as it is relevant
->> anymore. gatt-example implemented a gatt-server using older deprecated API.
-> 
-> Oops, I made a typo : the sub-folder is "plugins" (with "s"), not
-> "plugin", and it's still in the bluez archive (5.43).
-
-That is true, but it is still not usable anymore. From git log:
-
-commit cc80afff47938a2c93aff0f7904fd937e6333908
-Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Date:   Tue Nov 8 11:00:28 2016 +0200
-
-    build: Remove gatt-example plugin
-
-    This examples can be done over D-Bus already so it makes no sense to
-have
-    it as a plugin and in fact it currently it doesn't even work since
-it was
-    never ported to the new code under src/shared.
-
-> 
->> Anyway, there are two ways to implement a GATT client profile (Central
->> role). As a generic bluetoothd plugin that will export an API to
->> applications via D-Bus, more likely.
-> 
-> We didn't find any source of a bluetoothd plugin implementing a GATT
-> LE profile (such as those listed on http://www.bluez.org/profiles/ :
-> HTP, HoG,...). Sorry, we're still missing something... Would there be
-> any piece of doc that could help for creating a bluetoothd plugin, as
-> it looks to be the correct way to proceed ?
-
-Not really. Just source code.
-
-You can check profile implementations under profiles/ and then just
-check the code there.
-
-> 
->> Or in your own application using the GATT D-Bus API that bluetoothd exports.
->> test/example-gatt-client implements the Heart Rate profile quite simply
->> using the D-Bus API.
-> 
-> We do understand the Python code of test/example-gatt-client :-) It
-> clearly helps to get the whole picture.
-> Thanks for the pointer.
+> diff --git a/configure.ac b/configure.ac
+> index 91b4955..6d8bf9c 100644
+> --- a/configure.ac
+> +++ b/configure.ac
+> @@ -61,8 +61,8 @@ AC_CHECK_LIB(dl, dlopen, dummy=yes,
+>  
+>  AC_CHECK_HEADERS(linux/types.h linux/if_alg.h)
+>  
+> -PKG_CHECK_MODULES(GLIB, glib-2.0 >= 2.28, dummy=yes,
+> -				AC_MSG_ERROR(GLib >= 2.28 is required))
+> +PKG_CHECK_MODULES(GLIB, glib-2.0 >= 2.46, dummy=yes,
+> +				AC_MSG_ERROR(GLib >= 2.46 is required))
+>  AC_SUBST(GLIB_CFLAGS)
+>  AC_SUBST(GLIB_LIBS)
+>  
 > 
 
 -- 
 Felipe
 
---------------2BFE7988E026D92933E73296
+--------------96ADAC4BDC01F13A1E7534C7
 Content-Type: application/pgp-keys;
  name="0x92698E6A.asc"
 Content-Transfer-Encoding: 7bit
@@ -199,4 +169,4 @@ SkAyCfQaSw==
 =JwBB
 -----END PGP PUBLIC KEY BLOCK-----
 
---------------2BFE7988E026D92933E73296--
+--------------96ADAC4BDC01F13A1E7534C7--
