@@ -1,13 +1,45 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Brian Gix <brian.gix@intel.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 0/2] Fix email submission address
-Date: Tue, 24 Jan 2017 10:29:37 -0800
-Message-Id: <1485282579-9172-1-git-send-email-brian.gix@intel.com>
+From: "Gix, Brian" <brian.gix@intel.com>
+To: Szymon Janc <szymon.janc@codecoup.pl>,
+        Brian Gix <brian.git@intel.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: RE: [PATCH 2/2] Require GLIB v2.46
+Date: Tue, 24 Jan 2017 18:05:49 +0000
+Message-ID: <DEBB0CAA2616974FAE35E4B560B9A43722783FD1@ORSMSX103.amr.corp.intel.com>
+References: <1485277866-7071-1-git-send-email-brian.git@intel.com>
+ <1485277866-7071-2-git-send-email-brian.git@intel.com>
+ <CAAEJBhLugxgdisfbL25MceV16e=MJ9qtYSkJuE0gPxykqbfGPA@mail.gmail.com>
+In-Reply-To: <CAAEJBhLugxgdisfbL25MceV16e=MJ9qtYSkJuE0gPxykqbfGPA@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-
-The requirement for GLIB v2.46 was introduced in the test-midi unit test with the invocation of g_assert_cmpmem()
-
-
+SGkgU3p5bW9uLA0KDQpUaGUgdGVzdC1taWRpIHVuaXQgdGVzdCBjYWxscyBjYWxscyBnX2Fzc2Vy
+dF9jbXBtZW0sIHdoaWNoIHdhcyBub3QgYWRkZWQgdG8gR0xJQiB1bnRpbCB2Mi40Ng0KDQpUaGlz
+IGJ1aWxkIGVycm9yIHdpbGwgc2hvdyB1cCBvbiBhIHZhbmlsbGEgVWJ1bnR1IDE0LjA0IExUUywg
+d2hpY2ggY3VycmVudGx5IGRlZmF1bHRzIHRvIHYyLjQwLCBJIHRoaW5rLg0KDQotLS0tLU9yaWdp
+bmFsIE1lc3NhZ2UtLS0tLQ0KRnJvbTogbGludXgtYmx1ZXRvb3RoLW93bmVyQHZnZXIua2VybmVs
+Lm9yZyBbbWFpbHRvOmxpbnV4LWJsdWV0b290aC1vd25lckB2Z2VyLmtlcm5lbC5vcmddIE9uIEJl
+aGFsZiBPZiBTenltb24gSmFuYw0KU2VudDogVHVlc2RheSwgSmFudWFyeSAyNCwgMjAxNyAxMDow
+MyBBTQ0KVG86IEJyaWFuIEdpeCA8YnJpYW4uZ2l0QGludGVsLmNvbT4NCkNjOiBsaW51eC1ibHVl
+dG9vdGhAdmdlci5rZXJuZWwub3JnOyBHaXgsIEJyaWFuIDxicmlhbi5naXhAaW50ZWwuY29tPg0K
+U3ViamVjdDogUmU6IFtQQVRDSCAyLzJdIFJlcXVpcmUgR0xJQiB2Mi40Ng0KDQpIaSBCcmlhbiwN
+Cg0KT24gMjQgSmFudWFyeSAyMDE3IGF0IDE4OjExLCBCcmlhbiBHaXggPGJyaWFuLmdpdEBpbnRl
+bC5jb20+IHdyb3RlOg0KPiBGcm9tOiBCcmlhbiBHaXggPGJyaWFuLmdpeEBpbnRlbC5jb20+DQo+
+DQo+IC0tLQ0KPiAgY29uZmlndXJlLmFjIHwgNCArKy0tDQo+ICAxIGZpbGUgY2hhbmdlZCwgMiBp
+bnNlcnRpb25zKCspLCAyIGRlbGV0aW9ucygtKQ0KPg0KPiBkaWZmIC0tZ2l0IGEvY29uZmlndXJl
+LmFjIGIvY29uZmlndXJlLmFjIGluZGV4IDkxYjQ5NTUuLjZkOGJmOWMgMTAwNjQ0DQo+IC0tLSBh
+L2NvbmZpZ3VyZS5hYw0KPiArKysgYi9jb25maWd1cmUuYWMNCj4gQEAgLTYxLDggKzYxLDggQEAg
+QUNfQ0hFQ0tfTElCKGRsLCBkbG9wZW4sIGR1bW15PXllcywNCj4NCj4gIEFDX0NIRUNLX0hFQURF
+UlMobGludXgvdHlwZXMuaCBsaW51eC9pZl9hbGcuaCkNCj4NCj4gLVBLR19DSEVDS19NT0RVTEVT
+KEdMSUIsIGdsaWItMi4wID49IDIuMjgsIGR1bW15PXllcywNCj4gLSAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICBBQ19NU0dfRVJST1IoR0xpYiA+PSAyLjI4IGlzIHJlcXVpcmVkKSkNCj4g
+K1BLR19DSEVDS19NT0RVTEVTKEdMSUIsIGdsaWItMi4wID49IDIuNDYsIGR1bW15PXllcywNCj4g
+KyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBBQ19NU0dfRVJST1IoR0xpYiA+PSAyLjQ2
+IGlzIA0KPiArcmVxdWlyZWQpKQ0KPiAgQUNfU1VCU1QoR0xJQl9DRkxBR1MpDQo+ICBBQ19TVUJT
+VChHTElCX0xJQlMpDQoNCldoeSBpcyB0aGlzIG5lZWRlZD8NCg0KLS0NCnBvemRyYXdpYW0NClN6
+eW1vbiBLLiBKYW5jDQotLQ0KVG8gdW5zdWJzY3JpYmUgZnJvbSB0aGlzIGxpc3Q6IHNlbmQgdGhl
+IGxpbmUgInVuc3Vic2NyaWJlIGxpbnV4LWJsdWV0b290aCIgaW4gdGhlIGJvZHkgb2YgYSBtZXNz
+YWdlIHRvIG1ham9yZG9tb0B2Z2VyLmtlcm5lbC5vcmcgTW9yZSBtYWpvcmRvbW8gaW5mbyBhdCAg
+aHR0cDovL3ZnZXIua2VybmVsLm9yZy9tYWpvcmRvbW8taW5mby5odG1sDQo=
