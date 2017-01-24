@@ -1,81 +1,50 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <7467d398-33a5-fdaa-7e57-46e4f37fad87@felipetonello.com>
-References: <CAOJvutMnJJJi=O1=e1kttqk4cLk_UvpwQyS4uetziqjsN_FX2g@mail.gmail.com>
- <5551c99c-e21c-2381-8b17-96a79ed233de@felipetonello.com> <CAOJvutNaiTm8FY2-zuCm5BC2uOJ13_cvOqEizeeFt1DpJYtv2A@mail.gmail.com>
- <7467d398-33a5-fdaa-7e57-46e4f37fad87@felipetonello.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 24 Jan 2017 21:19:58 +0200
-Message-ID: <CABBYNZJqL6OeEeMBi3eYJY8RRgJOiR3Qayf9=iYswh9M8YdxGw@mail.gmail.com>
-Subject: Re: Blood Pressure GATT LE profile
-To: Felipe Ferreri Tonello <eu@felipetonello.com>
-Cc: "yon ar c'hall" <yon.ar.chall@gmail.com>,
+From: "Gix, Brian" <brian.gix@intel.com>
+To: Szymon Janc <szymon.janc@codecoup.pl>
+CC: Felipe Ferreri Tonello <eu@felipetonello.com>,
         "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Subject: RE: [PATCH v2 2/2] Require GLIB v2.46
+Date: Tue, 24 Jan 2017 19:18:28 +0000
+Message-ID: <DEBB0CAA2616974FAE35E4B560B9A43722784152@ORSMSX103.amr.corp.intel.com>
+References: <1485282579-9172-1-git-send-email-brian.gix@intel.com>
+ <1485282579-9172-3-git-send-email-brian.gix@intel.com>
+ <6ea10c35-12e7-fbcc-8db8-cee61754e066@felipetonello.com>
+ <DEBB0CAA2616974FAE35E4B560B9A437227840FB@ORSMSX103.amr.corp.intel.com>
+ <CAAEJBhJpkpr7YAd_rRtiOnVkhf66tvcpZjAse7PA76MpFGZGeA@mail.gmail.com>
+In-Reply-To: <CAAEJBhJpkpr7YAd_rRtiOnVkhf66tvcpZjAse7PA76MpFGZGeA@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
-
-On Tue, Jan 24, 2017 at 9:02 PM, Felipe Ferreri Tonello
-<eu@felipetonello.com> wrote:
-> Hi Yon,
->
-> On 24/01/17 15:53, yon ar c'hall wrote:
->> Hi Felipe,
->>
->> On Tue, Jan 24, 2017 at 3:45 PM, Felipe Ferreri Tonello
->> <eu@felipetonello.com> wrote:
->>
->>> plugin/gatt-example.c is not in the repository, as it is relevant
->>> anymore. gatt-example implemented a gatt-server using older deprecated API.
->>
->> Oops, I made a typo : the sub-folder is "plugins" (with "s"), not
->> "plugin", and it's still in the bluez archive (5.43).
->
-> That is true, but it is still not usable anymore. From git log:
->
-> commit cc80afff47938a2c93aff0f7904fd937e6333908
-> Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> Date:   Tue Nov 8 11:00:28 2016 +0200
->
->     build: Remove gatt-example plugin
->
->     This examples can be done over D-Bus already so it makes no sense to
-> have
->     it as a plugin and in fact it currently it doesn't even work since
-> it was
->     never ported to the new code under src/shared.
->
->>
->>> Anyway, there are two ways to implement a GATT client profile (Central
->>> role). As a generic bluetoothd plugin that will export an API to
->>> applications via D-Bus, more likely.
->>
->> We didn't find any source of a bluetoothd plugin implementing a GATT
->> LE profile (such as those listed on http://www.bluez.org/profiles/ :
->> HTP, HoG,...). Sorry, we're still missing something... Would there be
->> any piece of doc that could help for creating a bluetoothd plugin, as
->> it looks to be the correct way to proceed ?
->
-> Not really. Just source code.
->
-> You can check profile implementations under profiles/ and then just
-> check the code there.
->
->>
->>> Or in your own application using the GATT D-Bus API that bluetoothd exports.
->>> test/example-gatt-client implements the Heart Rate profile quite simply
->>> using the D-Bus API.
->>
->> We do understand the Python code of test/example-gatt-client :-) It
->> clearly helps to get the whole picture.
->> Thanks for the pointer.
->>
-
-In case you are looking for C examples, take a look at bluetoothctl
-code under client/, it is pretty complete generic GATT client.
-
-
--- 
-Luiz Augusto von Dentz
+SGkgU3p5bW9uLA0KDQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IFN6eW1v
+biBKYW5jIFttYWlsdG86c3p5bW9uLmphbmNAY29kZWNvdXAucGxdDQo+IA0KPiBIaSBCcmlhbiwN
+Cj4gDQo+IE9uIDI0IEphbnVhcnkgMjAxNyBhdCAyMDowNCwgR2l4LCBCcmlhbiA8YnJpYW4uZ2l4
+QGludGVsLmNvbT4gd3JvdGU6DQo+ID4gRG9uZS4NCj4gPg0KPiA+IC0tLS0tT3JpZ2luYWwgTWVz
+c2FnZS0tLS0tDQo+ID4gRnJvbTogbGludXgtYmx1ZXRvb3RoLW93bmVyQHZnZXIua2VybmVsLm9y
+ZyBbbWFpbHRvOmxpbnV4LWJsdWV0b290aC0NCj4gb3duZXJAdmdlci5rZXJuZWwub3JnXSBPbiBC
+ZWhhbGYgT2YgRmVsaXBlIEZlcnJlcmkgVG9uZWxsbw0KPiA+IFNlbnQ6IFR1ZXNkYXksIEphbnVh
+cnkgMjQsIDIwMTcgMTA6NTYgQU0NCj4gPiBUbzogR2l4LCBCcmlhbiA8YnJpYW4uZ2l4QGludGVs
+LmNvbT47IGxpbnV4LWJsdWV0b290aEB2Z2VyLmtlcm5lbC5vcmcNCj4gPiBTdWJqZWN0OiBSZTog
+W1BBVENIIHYyIDIvMl0gUmVxdWlyZSBHTElCIHYyLjQ2DQo+ID4NCj4gPiBIaSBCcmlhbiwNCj4g
+Pg0KPiA+IFBsZWFzZSwgYWRkIHRoZSByZWFzb24gd2h5IHRoaXMgY2hhbmdlIGlzIG5lY2Vzc2Fy
+eSBpbiB0aGUgY29tbWl0DQo+IG1lc3NhZ2UuDQo+ID4NCj4gPiBPbiAyNC8wMS8xNyAxODoyOSwg
+QnJpYW4gR2l4IHdyb3RlOg0KPiA+PiAtLS0NCj4gPj4gIGNvbmZpZ3VyZS5hYyB8IDQgKystLQ0K
+PiA+PiAgMSBmaWxlIGNoYW5nZWQsIDIgaW5zZXJ0aW9ucygrKSwgMiBkZWxldGlvbnMoLSkNCj4g
+Pj4NCj4gPj4gZGlmZiAtLWdpdCBhL2NvbmZpZ3VyZS5hYyBiL2NvbmZpZ3VyZS5hYyBpbmRleCA5
+MWI0OTU1Li42ZDhiZjljIDEwMDY0NA0KPiA+PiAtLS0gYS9jb25maWd1cmUuYWMNCj4gPj4gKysr
+IGIvY29uZmlndXJlLmFjDQo+ID4+IEBAIC02MSw4ICs2MSw4IEBAIEFDX0NIRUNLX0xJQihkbCwg
+ZGxvcGVuLCBkdW1teT15ZXMsDQo+ID4+DQo+ID4+ICBBQ19DSEVDS19IRUFERVJTKGxpbnV4L3R5
+cGVzLmggbGludXgvaWZfYWxnLmgpDQo+ID4+DQo+ID4+IC1QS0dfQ0hFQ0tfTU9EVUxFUyhHTElC
+LCBnbGliLTIuMCA+PSAyLjI4LCBkdW1teT15ZXMsDQo+ID4+IC0gICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgIEFDX01TR19FUlJPUihHTGliID49IDIuMjggaXMgcmVxdWlyZWQpKQ0KPiA+PiAr
+UEtHX0NIRUNLX01PRFVMRVMoR0xJQiwgZ2xpYi0yLjAgPj0gMi40NiwgZHVtbXk9eWVzLA0KPiA+
+PiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICBBQ19NU0dfRVJST1IoR0xpYiA+PSAyLjQ2
+IGlzIHJlcXVpcmVkKSkNCj4gPj4gIEFDX1NVQlNUKEdMSUJfQ0ZMQUdTKQ0KPiA+PiAgQUNfU1VC
+U1QoR0xJQl9MSUJTKQ0KPiANCj4gSSdkIHJhdGhlciBjaGFuZ2UgdGVzdCBpbnN0ZWFkIG9mIGJ1
+bXBpbmcgZ2xpYiBkZXBlbmRlbmN5IGp1c3QgZm9yIHRoaXMuLi4NCj4gQnV0IEknbGwgbGV0IG90
+aGVycyB0byBjb21tZW50IG9uIHRoaXMgdG9vLg0KDQoNCkkgYW0gZmluZSBlaXRoZXIgd2F5LiAg
+VGhlIGxhdGVzdCAoTFRTKSBVYnVudHUgYW5kIEZlZG9yYSBib3RoIGluY2x1ZGUgPj0gR0xJQiB2
+Mi40NiBieSBkZWZhdWx0LCBzbyBJIGhhdmUgbm8gc3Ryb25nIHByZWZlcmVuY2UgYW55IHdheSwg
+aG93ZXZlciBpdCBpcyBvbmx5IHRoZSB1bml0IHRlc3QgdGhhdCB1c2VzIGl0LCBhbmQgbm8gQ29y
+ZSBCbHVlWiBjb2RlLg0KDQoNCg==
