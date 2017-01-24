@@ -1,197 +1,270 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Subject: Re: [PATCH v5 2/2] Make unit test compatible with GLIB v2.28
-To: "Gix, Brian" <brian.gix@intel.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-References: <1485287564-16879-1-git-send-email-brian.gix@intel.com>
- <1485287564-16879-3-git-send-email-brian.gix@intel.com>
- <DEBB0CAA2616974FAE35E4B560B9A4372278422C@ORSMSX103.amr.corp.intel.com>
-Cc: "Von Dentz, Luiz" <luiz.von.dentz@intel.com>,
-        Szymon Janc <szymon.janc@codecoup.pl>
-From: Felipe Ferreri Tonello <eu@felipetonello.com>
-Message-ID: <6feed7de-27f4-f484-e851-1e5a459e154b@felipetonello.com>
-Date: Wed, 25 Jan 2017 12:23:53 +0000
+Return-Path: <briannorris@chromium.org>
+Date: Tue, 24 Jan 2017 13:20:21 -0800
+From: Brian Norris <briannorris@chromium.org>
+To: Rajat Jain <rajatja@google.com>
+Cc: Rob Herring <robh+dt@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Amitkumar Karwar <akarwar@marvell.com>,
+	Wei-Ning Huang <wnhuang@chromium.org>,
+	Xinming Hu <huxm@marvell.com>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org, rajatxjain@gmail.com
+Subject: Re: [PATCH v5 2/3] Bluetooth: btusb: Add out-of-band wakeup support
+Message-ID: <20170124212020.GA68405@google.com>
+References: <20170112180107.63244-1-rajatja@google.com>
+ <20170112180107.63244-2-rajatja@google.com>
 MIME-Version: 1.0
-In-Reply-To: <DEBB0CAA2616974FAE35E4B560B9A4372278422C@ORSMSX103.amr.corp.intel.com>
-Content-Type: multipart/mixed;
- boundary="------------4ABCCF9CD32F7D2C90F330A6"
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170112180107.63244-2-rajatja@google.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is a multi-part message in MIME format.
---------------4ABCCF9CD32F7D2C90F330A6
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+Hi Rajat,
 
-Hi Brian,
-
-On 24/01/17 20:10, Gix, Brian wrote:
+On Thu, Jan 12, 2017 at 10:01:06AM -0800, Rajat Jain wrote:
+> Some onboard BT chips (e.g. Marvell 8997) contain a wakeup pin that
+> can be connected to a gpio on the CPU side, and can be used to wakeup
+> the host out-of-band. This can be useful in situations where the
+> in-band wakeup is not possible or not preferable (e.g. the in-band
+> wakeup may require the USB host controller to remain active, and
+> hence consuming more system power during system sleep).
 > 
-> H Luiz, Felipe, Szymon,
+> The oob gpio interrupt to be used for wakeup on the CPU side, is
+> read from the device tree node, (using standard interrupt descriptors).
+> A devcie tree binding document is also added for the driver. The
+> compatible string is in compliance with
+> Documentation/devicetree/bindings/usb/usb-device.txt
 > 
->> From: Gix, Brian
->>
->> ---
->>  unit/test-midi.c | 8 ++++++--
->>  1 file changed, 6 insertions(+), 2 deletions(-)
->>
->> diff --git a/unit/test-midi.c b/unit/test-midi.c index d318b07..3995c86 100644
->> --- a/unit/test-midi.c
->> +++ b/unit/test-midi.c
->> @@ -282,8 +282,12 @@ static void compare_events(const snd_seq_event_t
->> *ev1,
->>  		                ev2->data.control.value);
->>  		break;
->>  	case SND_SEQ_EVENT_SYSEX:
->> -		g_assert_cmpmem(ev1->data.ext.ptr, ev1->data.ext.len,
->> -		                ev2->data.ext.ptr, ev2->data.ext.len);
->> +		g_assert_cmpint(ev1->data.ext.len,
->> +		                ==,
->> +		                ev2->data.ext.len);
->> +		g_assert(memcmp(ev1->data.ext.ptr,
->> +		                ev2->data.ext.ptr,
->> +		                ev2->data.ext.len) == 0);
->>  		break;
->>  	default:
->>  		g_assert_not_reached();
+> Signed-off-by: Rajat Jain <rajatja@google.com>
+> Reviewed-by: Brian Norris <briannorris@chromium.org>
+> Acked-by: Rob Herring <robh@kernel.org>
+> ---
+> v5: Move the call to pm_wakeup_event() to the begining of irq handler.
+> v4: Move the set_bit(BTUSB_OOB_WAKE_DISABLED,..) call to the beginning of
+>     btusb_config_oob_wake()
+> v3: Add Brian's "Reviewed-by"
+> v2: * Use interrupt-names ("wakeup") instead of assuming first interrupt.
+>     * Leave it on device tree to specify IRQ flags (level /edge triggered)
+>     * Mark the device as non wakeable on exit.
 > 
+>  Documentation/devicetree/bindings/net/btusb.txt | 40 ++++++++++++
+>  drivers/bluetooth/btusb.c                       | 85 +++++++++++++++++++++++++
+>  2 files changed, 125 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/net/btusb.txt
 > 
-> Here is a straightforward rework of the g_assert_cmpmem assert.
+> diff --git a/Documentation/devicetree/bindings/net/btusb.txt b/Documentation/devicetree/bindings/net/btusb.txt
+> new file mode 100644
+> index 000000000000..2c0355c85972
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/net/btusb.txt
+> @@ -0,0 +1,40 @@
+> +Generic Bluetooth controller over USB (btusb driver)
+> +---------------------------------------------------
+> +
+> +Required properties:
+> +
+> +  - compatible : should comply with the format "usbVID,PID" specified in
+> +		 Documentation/devicetree/bindings/usb/usb-device.txt
+> +		 At the time of writing, the only OF supported devices
+> +		 (more may be added later) are:
+> +
+> +		  "usb1286,204e" (Marvell 8997)
+> +
+> +Optional properties:
+> +
+> +  - interrupt-parent: phandle of the parent interrupt controller
+> +  - interrupt-names: (see below)
+> +  - interrupts : The interrupt specified by the name "wakeup" is the interrupt
+> +		 that shall be used for out-of-band wake-on-bt. Driver will
+> +		 request this interrupt for wakeup. During system suspend, the
+> +		 irq will be enabled so that the bluetooth chip can wakeup host
+> +		 platform out of band. During system resume, the irq will be
+> +		 disabled to make sure unnecessary interrupt is not received.
+> +
+> +Example:
+> +
+> +Following example uses irq pin number 3 of gpio0 for out of band wake-on-bt:
+> +
+> +&usb_host1_ehci {
+> +    status = "okay";
+> +    #address-cells = <1>;
+> +    #size-cells = <0>;
+> +
+> +    mvl_bt1: bt@1 {
+> +	compatible = "usb1286,204e";
+> +	reg = <1>;
+> +	interrupt-parent = <&gpio0>;
+> +	interrupt-name = "wakeup";
+> +	interrupts = <3 IRQ_TYPE_LEVEL_LOW>;
+> +    };
+> +};
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index ce22cefceed1..0a777bb407b1 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -24,6 +24,8 @@
+>  #include <linux/module.h>
+>  #include <linux/usb.h>
+>  #include <linux/firmware.h>
+> +#include <linux/of_device.h>
+> +#include <linux/of_irq.h>
+>  #include <asm/unaligned.h>
+>  
+>  #include <net/bluetooth/bluetooth.h>
+> @@ -369,6 +371,7 @@ static const struct usb_device_id blacklist_table[] = {
+>  #define BTUSB_BOOTING		9
+>  #define BTUSB_RESET_RESUME	10
+>  #define BTUSB_DIAG_RUNNING	11
+> +#define BTUSB_OOB_WAKE_DISABLED	12
+>  
+>  struct btusb_data {
+>  	struct hci_dev       *hdev;
+> @@ -416,6 +419,8 @@ struct btusb_data {
+>  	int (*recv_bulk)(struct btusb_data *data, void *buffer, int count);
+>  
+>  	int (*setup_on_usb)(struct hci_dev *hdev);
+> +
+> +	int oob_wake_irq;   /* irq for out-of-band wake-on-bt */
+>  };
+>  
+>  static inline void btusb_free_frags(struct btusb_data *data)
+> @@ -2728,6 +2733,66 @@ static int btusb_bcm_set_diag(struct hci_dev *hdev, bool enable)
+>  }
+>  #endif
+>  
+> +#ifdef CONFIG_PM
+> +static irqreturn_t btusb_oob_wake_handler(int irq, void *priv)
+> +{
+> +	struct btusb_data *data = priv;
+> +
+> +	pm_wakeup_event(&data->udev->dev, 0);
+> +
+> +	/* Disable only if not already disabled (keep it balanced) */
+> +	if (!test_and_set_bit(BTUSB_OOB_WAKE_DISABLED, &data->flags)) {
+> +		disable_irq_nosync(irq);
+> +		disable_irq_wake(irq);
+> +	}
+> +	return IRQ_HANDLED;
+> +}
+> +
+> +static const struct of_device_id btusb_match_table[] = {
+> +	{ .compatible = "usb1286,204e" },
+> +	{ }
+> +};
+> +MODULE_DEVICE_TABLE(of, btusb_match_table);
+> +
+> +/* Use an oob wakeup pin? */
+> +static int btusb_config_oob_wake(struct hci_dev *hdev)
+> +{
+> +	struct btusb_data *data = hci_get_drvdata(hdev);
+> +	struct device *dev = &data->udev->dev;
+> +	int irq, ret;
+> +
+> +	set_bit(BTUSB_OOB_WAKE_DISABLED, &data->flags);
+> +
+> +	if (!of_match_device(btusb_match_table, dev))
+> +		return 0;
+> +
+> +	/* Move on if no IRQ specified */
+> +	irq = of_irq_get_byname(dev->of_node, "wakeup");
+> +	if (irq <= 0) {
+> +		bt_dev_dbg(hdev, "%s: no OOB Wakeup IRQ in DT", __func__);
+> +		return 0;
+> +	}
+> +
+> +	ret = devm_request_irq(&hdev->dev, irq, btusb_oob_wake_handler,
+> +			       0, "OOB Wake-on-BT", data);
+> +	if (ret) {
+> +		bt_dev_err(hdev, "%s: IRQ request failed", __func__);
+> +		return ret;
+> +	}
+> +
+> +	ret = device_init_wakeup(dev, true);
+> +	if (ret) {
+> +		bt_dev_err(hdev, "%s: failed to init_wakeup\n", __func__);
+
+bt_dev_err() includes the newlines for you, but you'd added an extra one
+here (but not above).
+
+> +		return ret;
+> +	}
+> +
+> +	data->oob_wake_irq = irq;
+> +	disable_irq(irq);
+> +	bt_dev_info(hdev, "OOB Wake-on-BT configured at IRQ %u\n", irq);
+
+And here.
+
+> +	return 0;
+> +}
+> +#endif
+> +
+>  static int btusb_probe(struct usb_interface *intf,
+>  		       const struct usb_device_id *id)
+>  {
+> @@ -2849,6 +2914,11 @@ static int btusb_probe(struct usb_interface *intf,
+>  	hdev->send   = btusb_send_frame;
+>  	hdev->notify = btusb_notify;
+>  
+> +#ifdef CONFIG_PM
+> +	err = btusb_config_oob_wake(hdev);
+> +	if (err)
+> +		goto out_free_dev;
+> +#endif
+>  	if (id->driver_info & BTUSB_CW6622)
+>  		set_bit(HCI_QUIRK_BROKEN_STORED_LINK_KEY, &hdev->quirks);
+>  
+> @@ -3061,6 +3131,9 @@ static void btusb_disconnect(struct usb_interface *intf)
+>  			usb_driver_release_interface(&btusb_driver, data->isoc);
+>  	}
+>  
+> +	if (data->oob_wake_irq)
+> +		device_init_wakeup(&data->udev->dev, false);
+> +
+>  	hci_free_dev(hdev);
+>  }
+>  
+> @@ -3089,6 +3162,12 @@ static int btusb_suspend(struct usb_interface *intf, pm_message_t message)
+>  	btusb_stop_traffic(data);
+>  	usb_kill_anchored_urbs(&data->tx_anchor);
+>  
+> +	if (data->oob_wake_irq && device_may_wakeup(&data->udev->dev)) {
+> +		clear_bit(BTUSB_OOB_WAKE_DISABLED, &data->flags);
+> +		enable_irq_wake(data->oob_wake_irq);
+> +		enable_irq(data->oob_wake_irq);
+> +	}
+> +
+>  	/* Optionally request a device reset on resume, but only when
+>  	 * wakeups are disabled. If wakeups are enabled we assume the
+>  	 * device will stay powered up throughout suspend.
+> @@ -3126,6 +3205,12 @@ static int btusb_resume(struct usb_interface *intf)
+>  	if (--data->suspend_count)
+>  		return 0;
+>  
+> +	/* Disable only if not already disabled (keep it balanced) */
+> +	if (!test_and_set_bit(BTUSB_OOB_WAKE_DISABLED, &data->flags)) {
+
+As I mentioned elsewhere, the negative form (i.e., DISABLED instead of
+ENABLED) seems a little backward to me. It has the small effect of
+meaning that the default behavior is actually to pretend that OOB wake
+was enabled, and so if somehow btusb_config_oob_wake() wasn't called
+(e.g., if CONFIG_PM is not enabled, or if the code gets refactored) this
+then btusb_resume() will behave badly.
+
+Now, this doesn't create an immediate problem (btusb_resume() should
+never be called if !CONFIG_PM), but it does suggest that maybe it would
+be better for the default (0) value to mean "disabled".
+
+Brian
+
+> +		disable_irq(data->oob_wake_irq);
+> +		disable_irq_wake(data->oob_wake_irq);
+> +	}
+> +
+>  	if (!test_bit(HCI_RUNNING, &hdev->flags))
+>  		goto done;
+>  
+> -- 
+> 2.11.0.390.gc69c2f50cf-goog
 > 
-> It was used only once, and both replacement asserts existed pre-v2.28
-> 
-
-Fine by me, but make sure you add a relevant comment in the git message,
-please.
-
-Just the title is not enough. You could write something like:
-
-g_assert_cmpmem was added in version X of glib and since we don't want
-to bump the required version of glib for BlueZ because of a unit-test,
-we use g_assert_cmpint and g_assert to replace previous code.
-
--- 
-Felipe
-
---------------4ABCCF9CD32F7D2C90F330A6
-Content-Type: application/pgp-keys;
- name="0x92698E6A.asc"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
- filename="0x92698E6A.asc"
-
------BEGIN PGP PUBLIC KEY BLOCK-----
-
-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
-SkAyCfQaSw==
-=JwBB
------END PGP PUBLIC KEY BLOCK-----
-
---------------4ABCCF9CD32F7D2C90F330A6--
