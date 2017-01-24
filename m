@@ -1,50 +1,57 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: "Gix, Brian" <brian.gix@intel.com>
-To: Szymon Janc <szymon.janc@codecoup.pl>
-CC: Felipe Ferreri Tonello <eu@felipetonello.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: [PATCH v2 2/2] Require GLIB v2.46
-Date: Tue, 24 Jan 2017 19:18:28 +0000
-Message-ID: <DEBB0CAA2616974FAE35E4B560B9A43722784152@ORSMSX103.amr.corp.intel.com>
-References: <1485282579-9172-1-git-send-email-brian.gix@intel.com>
- <1485282579-9172-3-git-send-email-brian.gix@intel.com>
- <6ea10c35-12e7-fbcc-8db8-cee61754e066@felipetonello.com>
- <DEBB0CAA2616974FAE35E4B560B9A437227840FB@ORSMSX103.amr.corp.intel.com>
- <CAAEJBhJpkpr7YAd_rRtiOnVkhf66tvcpZjAse7PA76MpFGZGeA@mail.gmail.com>
-In-Reply-To: <CAAEJBhJpkpr7YAd_rRtiOnVkhf66tvcpZjAse7PA76MpFGZGeA@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
+In-Reply-To: <DEBB0CAA2616974FAE35E4B560B9A437227840FB@ORSMSX103.amr.corp.intel.com>
+References: <1485282579-9172-1-git-send-email-brian.gix@intel.com>
+ <1485282579-9172-3-git-send-email-brian.gix@intel.com> <6ea10c35-12e7-fbcc-8db8-cee61754e066@felipetonello.com>
+ <DEBB0CAA2616974FAE35E4B560B9A437227840FB@ORSMSX103.amr.corp.intel.com>
+From: Szymon Janc <szymon.janc@codecoup.pl>
+Date: Tue, 24 Jan 2017 20:08:19 +0100
+Message-ID: <CAAEJBhJpkpr7YAd_rRtiOnVkhf66tvcpZjAse7PA76MpFGZGeA@mail.gmail.com>
+Subject: Re: [PATCH v2 2/2] Require GLIB v2.46
+To: "Gix, Brian" <brian.gix@intel.com>
+Cc: Felipe Ferreri Tonello <eu@felipetonello.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgU3p5bW9uLA0KDQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IFN6eW1v
-biBKYW5jIFttYWlsdG86c3p5bW9uLmphbmNAY29kZWNvdXAucGxdDQo+IA0KPiBIaSBCcmlhbiwN
-Cj4gDQo+IE9uIDI0IEphbnVhcnkgMjAxNyBhdCAyMDowNCwgR2l4LCBCcmlhbiA8YnJpYW4uZ2l4
-QGludGVsLmNvbT4gd3JvdGU6DQo+ID4gRG9uZS4NCj4gPg0KPiA+IC0tLS0tT3JpZ2luYWwgTWVz
-c2FnZS0tLS0tDQo+ID4gRnJvbTogbGludXgtYmx1ZXRvb3RoLW93bmVyQHZnZXIua2VybmVsLm9y
-ZyBbbWFpbHRvOmxpbnV4LWJsdWV0b290aC0NCj4gb3duZXJAdmdlci5rZXJuZWwub3JnXSBPbiBC
-ZWhhbGYgT2YgRmVsaXBlIEZlcnJlcmkgVG9uZWxsbw0KPiA+IFNlbnQ6IFR1ZXNkYXksIEphbnVh
-cnkgMjQsIDIwMTcgMTA6NTYgQU0NCj4gPiBUbzogR2l4LCBCcmlhbiA8YnJpYW4uZ2l4QGludGVs
-LmNvbT47IGxpbnV4LWJsdWV0b290aEB2Z2VyLmtlcm5lbC5vcmcNCj4gPiBTdWJqZWN0OiBSZTog
-W1BBVENIIHYyIDIvMl0gUmVxdWlyZSBHTElCIHYyLjQ2DQo+ID4NCj4gPiBIaSBCcmlhbiwNCj4g
-Pg0KPiA+IFBsZWFzZSwgYWRkIHRoZSByZWFzb24gd2h5IHRoaXMgY2hhbmdlIGlzIG5lY2Vzc2Fy
-eSBpbiB0aGUgY29tbWl0DQo+IG1lc3NhZ2UuDQo+ID4NCj4gPiBPbiAyNC8wMS8xNyAxODoyOSwg
-QnJpYW4gR2l4IHdyb3RlOg0KPiA+PiAtLS0NCj4gPj4gIGNvbmZpZ3VyZS5hYyB8IDQgKystLQ0K
-PiA+PiAgMSBmaWxlIGNoYW5nZWQsIDIgaW5zZXJ0aW9ucygrKSwgMiBkZWxldGlvbnMoLSkNCj4g
-Pj4NCj4gPj4gZGlmZiAtLWdpdCBhL2NvbmZpZ3VyZS5hYyBiL2NvbmZpZ3VyZS5hYyBpbmRleCA5
-MWI0OTU1Li42ZDhiZjljIDEwMDY0NA0KPiA+PiAtLS0gYS9jb25maWd1cmUuYWMNCj4gPj4gKysr
-IGIvY29uZmlndXJlLmFjDQo+ID4+IEBAIC02MSw4ICs2MSw4IEBAIEFDX0NIRUNLX0xJQihkbCwg
-ZGxvcGVuLCBkdW1teT15ZXMsDQo+ID4+DQo+ID4+ICBBQ19DSEVDS19IRUFERVJTKGxpbnV4L3R5
-cGVzLmggbGludXgvaWZfYWxnLmgpDQo+ID4+DQo+ID4+IC1QS0dfQ0hFQ0tfTU9EVUxFUyhHTElC
-LCBnbGliLTIuMCA+PSAyLjI4LCBkdW1teT15ZXMsDQo+ID4+IC0gICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgIEFDX01TR19FUlJPUihHTGliID49IDIuMjggaXMgcmVxdWlyZWQpKQ0KPiA+PiAr
-UEtHX0NIRUNLX01PRFVMRVMoR0xJQiwgZ2xpYi0yLjAgPj0gMi40NiwgZHVtbXk9eWVzLA0KPiA+
-PiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICBBQ19NU0dfRVJST1IoR0xpYiA+PSAyLjQ2
-IGlzIHJlcXVpcmVkKSkNCj4gPj4gIEFDX1NVQlNUKEdMSUJfQ0ZMQUdTKQ0KPiA+PiAgQUNfU1VC
-U1QoR0xJQl9MSUJTKQ0KPiANCj4gSSdkIHJhdGhlciBjaGFuZ2UgdGVzdCBpbnN0ZWFkIG9mIGJ1
-bXBpbmcgZ2xpYiBkZXBlbmRlbmN5IGp1c3QgZm9yIHRoaXMuLi4NCj4gQnV0IEknbGwgbGV0IG90
-aGVycyB0byBjb21tZW50IG9uIHRoaXMgdG9vLg0KDQoNCkkgYW0gZmluZSBlaXRoZXIgd2F5LiAg
-VGhlIGxhdGVzdCAoTFRTKSBVYnVudHUgYW5kIEZlZG9yYSBib3RoIGluY2x1ZGUgPj0gR0xJQiB2
-Mi40NiBieSBkZWZhdWx0LCBzbyBJIGhhdmUgbm8gc3Ryb25nIHByZWZlcmVuY2UgYW55IHdheSwg
-aG93ZXZlciBpdCBpcyBvbmx5IHRoZSB1bml0IHRlc3QgdGhhdCB1c2VzIGl0LCBhbmQgbm8gQ29y
-ZSBCbHVlWiBjb2RlLg0KDQoNCg==
+Hi Brian,
+
+On 24 January 2017 at 20:04, Gix, Brian <brian.gix@intel.com> wrote:
+> Done.
+>
+> -----Original Message-----
+> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-owner@vger.kernel.org] On Behalf Of Felipe Ferreri Tonello
+> Sent: Tuesday, January 24, 2017 10:56 AM
+> To: Gix, Brian <brian.gix@intel.com>; linux-bluetooth@vger.kernel.org
+> Subject: Re: [PATCH v2 2/2] Require GLIB v2.46
+>
+> Hi Brian,
+>
+> Please, add the reason why this change is necessary in the commit message.
+>
+> On 24/01/17 18:29, Brian Gix wrote:
+>> ---
+>>  configure.ac | 4 ++--
+>>  1 file changed, 2 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/configure.ac b/configure.ac index 91b4955..6d8bf9c 100644
+>> --- a/configure.ac
+>> +++ b/configure.ac
+>> @@ -61,8 +61,8 @@ AC_CHECK_LIB(dl, dlopen, dummy=yes,
+>>
+>>  AC_CHECK_HEADERS(linux/types.h linux/if_alg.h)
+>>
+>> -PKG_CHECK_MODULES(GLIB, glib-2.0 >= 2.28, dummy=yes,
+>> -                             AC_MSG_ERROR(GLib >= 2.28 is required))
+>> +PKG_CHECK_MODULES(GLIB, glib-2.0 >= 2.46, dummy=yes,
+>> +                             AC_MSG_ERROR(GLib >= 2.46 is required))
+>>  AC_SUBST(GLIB_CFLAGS)
+>>  AC_SUBST(GLIB_LIBS)
+
+I'd rather change test instead of bumping glib dependency just for this...
+But I'll let others to comment on this too.
+
+-- 
+pozdrawiam
+Szymon K. Janc
