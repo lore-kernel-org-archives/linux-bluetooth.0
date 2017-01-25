@@ -1,96 +1,118 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <e8ea545c-6ac1-0512-49b7-5d2cf86d6399@felipetonello.com>
-References: <1485287564-16879-1-git-send-email-brian.gix@intel.com>
- <1485287564-16879-3-git-send-email-brian.gix@intel.com> <DEBB0CAA2616974FAE35E4B560B9A4372278422C@ORSMSX103.amr.corp.intel.com>
- <6feed7de-27f4-f484-e851-1e5a459e154b@felipetonello.com> <DEBB0CAA2616974FAE35E4B560B9A43722784AA9@ORSMSX103.amr.corp.intel.com>
- <e8ea545c-6ac1-0512-49b7-5d2cf86d6399@felipetonello.com>
-From: "Von Dentz, Luiz" <luiz.von.dentz@intel.com>
-Date: Wed, 25 Jan 2017 19:53:20 +0200
-Message-ID: <CACumGO+ga3p13ZWW3iTsEqvzA6wb_oUYn5=F9gP7in1S4e1PNw@mail.gmail.com>
-Subject: Re: [PATCH v5 2/2] Make unit test compatible with GLIB v2.28
-To: Felipe Ferreri Tonello <eu@felipetonello.com>
-Cc: "Gix, Brian" <brian.gix@intel.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Szymon Janc <szymon.janc@codecoup.pl>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Date: Wed, 25 Jan 2017 17:20:14 +0000
+From: Dario Teixeira <dario.teixeira@nleyten.com>
+To: Petri Gynther <pgynther@google.com>
+Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Subject: Re: LEAdvertisement interface on older kernels
+In-Reply-To: <CAGXr9JE85t=__QUuxLO3fH_=9A=4kyN4KC2wXCALjFy8DOqerQ@mail.gmail.com>
+References: <e40dc0a21f7080547028dfb7dad6eb65@nleyten.com>
+ <b2bd7735f166b59b11369eb37d0b4d75@nleyten.com>
+ <CAGXr9JE85t=__QUuxLO3fH_=9A=4kyN4KC2wXCALjFy8DOqerQ@mail.gmail.com>
+Message-ID: <e8cc30e59a3e30aa399fa41cf2c76b92@nleyten.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
 
-On Wed, Jan 25, 2017 at 7:03 PM, Felipe Ferreri Tonello
-<eu@felipetonello.com> wrote:
-> Hi Brian,
->
-> On 25/01/17 16:43, Gix, Brian wrote:
->> Hi Felipe,
->>
->> On 25/1/17 Felipe Ferreri Tonello wrote:
->>>
->>> Hi Brian,
->>>
->>> On 24/01/17 20:10, Gix, Brian wrote:
->>>>
->>>> H Luiz, Felipe, Szymon,
->>>>
->>>>> From: Gix, Brian
->>>>>
->>>>> ---
->>>>>  unit/test-midi.c | 8 ++++++--
->>>>>  1 file changed, 6 insertions(+), 2 deletions(-)
->>>>>
->>>>> diff --git a/unit/test-midi.c b/unit/test-midi.c index
->>>>> d318b07..3995c86 100644
->>>>> --- a/unit/test-midi.c
->>>>> +++ b/unit/test-midi.c
->>>>> @@ -282,8 +282,12 @@ static void compare_events(const
->>> snd_seq_event_t
->>>>> *ev1,
->>>>>                            ev2->data.control.value);
->>>>>            break;
->>>>>    case SND_SEQ_EVENT_SYSEX:
->>>>> -          g_assert_cmpmem(ev1->data.ext.ptr, ev1->data.ext.len,
->>>>> -                          ev2->data.ext.ptr, ev2->data.ext.len);
->>>>> +          g_assert_cmpint(ev1->data.ext.len,
->>>>> +                          ==,
->>>>> +                          ev2->data.ext.len);
->>>>> +          g_assert(memcmp(ev1->data.ext.ptr,
->>>>> +                          ev2->data.ext.ptr,
->>>>> +                          ev2->data.ext.len) == 0);
->>>>>            break;
->>>>>    default:
->>>>>            g_assert_not_reached();
->>>>
->>>>
->>>> Here is a straightforward rework of the g_assert_cmpmem assert.
->>>>
->>>> It was used only once, and both replacement asserts existed pre-v2.28
->>>>
->>>
->>> Fine by me, but make sure you add a relevant comment in the git message,
->>> please.
->>>
->>> Just the title is not enough. You could write something like:
->>>
->>> g_assert_cmpmem was added in version X of glib and since we don't want to
->>> bump the required version of glib for BlueZ because of a unit-test, we use
->>> g_assert_cmpint and g_assert to replace previous code.
->>
->>
->> I can put this in the comment if people like, but it is a very straightforward change.
->>
->> You don't think the existing comment makes it clear that the change is being done to avoid up-reving GLIB?
->
-> IMO, no.
->
-> It doesn't make clear why you decided to change the code instead of
-> change the glib requirement.
->
->>
->> It is a *very* isolated change that affects only asserts, for the reason given in the headline. I think more verbiage would be excessive.
->
-> Well, I have given my opinion, but this is too small for me to push it.
-> It is up to Luiz to decide if he is ok with it.
+> If you have access to Artik 5 kernel 3.10.93 source, you could:
+> 1. recompile that kernel with all Bluetooth components disabled
+> 2. use Linux backports to pick up the latest Bluetooth kernel core and
+> drivers as a loadable module
+>     http://drvbp1.linux-foundation.org/~mcgrof/rel-html/backports/
 
-The more information the better, but in this case I can added it myself.
+Thanks for the suggestion! I have compiled Backports 4.4.2-1 against
+the Artik 5 kernel 3.10.93, and tried to run my application using
+Bluez 5.43.  It does advance further than before, but the Bluetooth
+daemon dies when I try to register a BLE advertisement (see the log
+below).  Moreover, on the phone side I am able to see the newly
+registered service, though I am of course unable to connect to it.
+
+Note that running lsmod confirms that the backported BT modules
+are loaded instead of their 3.10.93 counterparts.
+
+Anyway, do you reckon this issue is fixable, or should I instead
+shift my efforts to BT Classic?
+
+Thanks in advance for your attention!
+Best regards,
+Dario Teixeira
+
+
+Jan 22 14:30:32 localhost bluetoothd[2249]: 
+src/gatt-database.c:manager_register_app() Registering application: 
+:1.14:/com/company/app
+Jan 22 14:30:32 localhost bluetoothd[2249]: 
+src/gatt-database.c:proxy_added_cb() Object received: 
+/com/company/app/svc0, iface: org.bluez.GattService1
+Jan 22 14:30:32 localhost bluetoothd[2249]: 
+src/gatt-database.c:proxy_added_cb() Object received: 
+/com/company/app/svc0/chr0, iface: org.bluez.GattCharacteristic1
+Jan 22 14:30:32 localhost bluetoothd[2249]: 
+src/gatt-database.c:proxy_added_cb() Object received: 
+/com/company/app/svc0/chr1, iface: org.bluez.GattCharacteristic1
+Jan 22 14:30:32 localhost bluetoothd[2249]: 
+src/gatt-database.c:gatt_db_service_added() GATT Service added to local 
+database
+Jan 22 14:30:32 localhost bluetoothd[2249]: 
+src/gatt-database.c:client_ready_cb() GATT application registered: 
+:1.14:/com/company/app
+Jan 22 14:30:32 localhost bluetoothd[2249]: 
+src/advertising.c:register_advertisement() RegisterAdvertisement
+Jan 22 14:30:32 localhost bluetoothd[2249]: 
+src/advertising.c:advertisement_create() Adding proxy for 
+/com/company/app/adv0
+Jan 22 14:30:32 localhost bluetoothd[2249]: 
+src/advertising.c:register_advertisement() Registered advertisement at 
+path /com/company/app/adv0
+Jan 22 14:30:32 localhost bluetoothd[2249]: 
+src/advertising.c:parse_advertising_service_uuids() Adding ServiceUUID: 
+b228c495-11be-4f20-9b7b-a93e2f4cf380
+Jan 22 14:30:32 localhost bluetoothd[2249]: 
+src/advertising.c:refresh_advertisement() Refreshing advertisement: 
+/com/company/app/adv0
+Jan 22 14:30:32 localhost bluetoothd[2249]: 
+src/advertising.c:parse_advertising_service_uuids() Adding ServiceUUID: 
+b228c495-11be-4f20-9b7b-a93e2f4cf380
+Jan 22 14:30:32 localhost bluetoothd[2249]: 
+src/advertising.c:refresh_advertisement() Refreshing advertisement: 
+/com/company/app/adv0
+Jan 22 14:30:32 localhost bluetoothd[2249]: 
+src/advertising.c:parse_advertising_service_uuids() Adding ServiceUUID: 
+b228c495-11be-4f20-9b7b-a93e2f4cf380
+Jan 22 14:30:32 localhost bluetoothd[2249]: 
+src/advertising.c:refresh_advertisement() Refreshing advertisement: 
+/com/company/app/adv0
+Jan 22 14:30:32 localhost bluetoothd[2249]: 
+src/advertising.c:parse_advertising_service_uuids() Adding ServiceUUID: 
+b228c495-11be-4f20-9b7b-a93e2f4cf380
+Jan 22 14:30:32 localhost bluetoothd[2249]: 
+src/advertising.c:refresh_advertisement() Refreshing advertisement: 
+/com/company/app/adv0
+Jan 22 14:30:32 localhost bluetoothd[2249]: 
+src/advertising.c:add_advertising_callback() Advertisement registered: 
+/com/company/app/adv0
+Jan 22 14:30:32 localhost bluetoothd[2249]: 
+src/advertising.c:add_advertising_callback() Advertisement registered: 
+/com/company/app/adv0
+Jan 22 14:30:32 localhost bluetoothd[2249]: process 2249: arguments to 
+dbus_message_new_method_return() were incorrect, assertion "method_call 
+!= NULL" failed in file dbus-message.c line 1378.
+Jan 22 14:30:32 localhost bluetoothd[2249]: This is normally a bug in 
+some application using the D-Bus library.
+Jan 22 14:30:32 localhost bluetoothd[2249]: D-Bus not built with 
+-rdynamic so unable to print a backtrace
+Jan 22 14:30:32 localhost systemd[1]: bluetooth.service: main process 
+exited, code=dumped, status=6/ABRT
+Jan 22 14:30:32 localhost systemd[1]: Unit bluetooth.service entered 
+failed state.
+Jan 22 14:30:32 localhost systemd[1]: bluetooth.service failed.
+Jan 22 14:30:33 localhost systemd-coredump[2373]: Process 2249 
+(bluetoothd) of user 0 dumped core.
+                                                   Stack trace of thread 
+2249:
+                                                   #0  0x00000000b6c176f0 
+raise (libc.so.6)
+
