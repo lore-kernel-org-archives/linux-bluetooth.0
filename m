@@ -1,85 +1,25 @@
-Return-Path: <rajatja@google.com>
-From: Rajat Jain <rajatja@google.com>
-To: Rob Herring <robh+dt@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Amitkumar Karwar <akarwar@marvell.com>,
-	Wei-Ning Huang <wnhuang@chromium.org>,
-	Xinming Hu <huxm@marvell.com>,
-	netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org,
-	Brian Norris <briannorris@google.com>,
-	linux-kernel@vger.kernel.org
-Cc: Rajat Jain <rajatja@google.com>,
-	rajatxjain@gmail.com
-Subject: [PATCH v6 1/3] Bluetooth: btusb: Use an error label for error paths
-Date: Wed, 25 Jan 2017 10:34:58 -0800
-Message-Id: <20170125183500.8292-1-rajatja@google.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+MIME-Version: 1.0
+In-Reply-To: <1485287564-16879-1-git-send-email-brian.gix@intel.com>
+References: <1485287564-16879-1-git-send-email-brian.gix@intel.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Wed, 25 Jan 2017 20:05:00 +0200
+Message-ID: <CABBYNZLzqncRWmD0FKUA=hfk3LrRnORKWd86qqmznd7rdhLpbw@mail.gmail.com>
+Subject: Re: [PATCH v5 0/2] -- Try again for GLIB v2.28 compatibility
+To: Brian Gix <brian.gix@intel.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Use a label to remove the repetetive cleanup, for error cases.
+Hi Brian,
 
-Signed-off-by: Rajat Jain <rajatja@google.com>
-Reviewed-by: Brian Norris <briannorris@chromium.org>
----
-v6: same as v5
-v5: same as v4
-v4: same as v3
-v3: Added Brian's "Reviewed-by"
-v2: same as v1
+On Tue, Jan 24, 2017 at 9:52 PM, Brian Gix <brian.gix@intel.com> wrote:
+>
+> v4 still wasn't v2.28 compatible.  This one should be.
+> --
 
- drivers/bluetooth/btusb.c | 19 +++++++++----------
- 1 file changed, 9 insertions(+), 10 deletions(-)
+Applied, thanks.
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 2f633df9f4e6..ce22cefceed1 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -2991,18 +2991,15 @@ static int btusb_probe(struct usb_interface *intf,
- 		err = usb_set_interface(data->udev, 0, 0);
- 		if (err < 0) {
- 			BT_ERR("failed to set interface 0, alt 0 %d", err);
--			hci_free_dev(hdev);
--			return err;
-+			goto out_free_dev;
- 		}
- 	}
- 
- 	if (data->isoc) {
- 		err = usb_driver_claim_interface(&btusb_driver,
- 						 data->isoc, data);
--		if (err < 0) {
--			hci_free_dev(hdev);
--			return err;
--		}
-+		if (err < 0)
-+			goto out_free_dev;
- 	}
- 
- #ifdef CONFIG_BT_HCIBTUSB_BCM
-@@ -3016,14 +3013,16 @@ static int btusb_probe(struct usb_interface *intf,
- #endif
- 
- 	err = hci_register_dev(hdev);
--	if (err < 0) {
--		hci_free_dev(hdev);
--		return err;
--	}
-+	if (err < 0)
-+		goto out_free_dev;
- 
- 	usb_set_intfdata(intf, data);
- 
- 	return 0;
-+
-+out_free_dev:
-+	hci_free_dev(hdev);
-+	return err;
- }
- 
- static void btusb_disconnect(struct usb_interface *intf)
 -- 
-2.11.0.483.g087da7b7c-goog
+Luiz Augusto von Dentz
