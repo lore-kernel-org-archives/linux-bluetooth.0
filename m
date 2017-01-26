@@ -1,77 +1,45 @@
-Return-Path: <pavel@ucw.cz>
-Date: Fri, 27 Jan 2017 21:02:22 +0100
-From: Pavel Machek <pavel@ucw.cz>
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Cc: Linus Walleij <linus.walleij@linaro.org>, Rob Herring <robh@kernel.org>,
-	"linux-iio@vger.kernel.org" <linux-iio@vger.kernel.org>,
-	Jonathan Cameron <jic23@kernel.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Marcel Holtmann <marcel@holtmann.org>, Jiri Slaby <jslaby@suse.com>,
-	Sebastian Reichel <sre@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
-	"Dr . H . Nikolaus Schaller" <hns@goldelico.com>,
-	Peter Hurley <peter@hurleysoftware.com>,
-	Alan Cox <gnomes@lxorguk.ukuu.org.uk>,
-	Loic Poulain <loic.poulain@intel.com>, NeilBrown <neil@brown.name>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	"linux-serial@vger.kernel.org" <linux-serial@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: GPS drivers (was Re: [PATCH v2 0/9] Serial slave device bus)
-Message-ID: <20170127200222.GF20571@amd>
-References: <20170116225436.17505-1-robh@kernel.org>
- <CACRpkdaf6uy6C6J5mcVF4dDPG7gwJ2vkR4ECLYSsT5-DRNNfcA@mail.gmail.com>
- <20170120142242.GC5241@amd>
- <CACRpkdYi=OQ2fyvOvmo+8b4nAOsSjW_-EdHXyGnYf2PNZB5C9Q@mail.gmail.com>
- <1484928971.2133.273.camel@linux.intel.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="ULyIDA2m8JTe+TiX"
-In-Reply-To: <1484928971.2133.273.camel@linux.intel.com>
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Date: Thu, 26 Jan 2017 17:25:34 +0000
+From: Dario Teixeira <dario.teixeira@nleyten.com>
+To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Subject: Exchanging data over Bluetooth Classic
+Message-ID: <f0f88082abcb4aa700ca2e7898fc75b9@nleyten.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi,
 
---ULyIDA2m8JTe+TiX
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Here's the situation: I want to use a smart phone to communicate with
+a small embedded device (ED).  Unfortunately the ED is running a very
+old kernel (3.10.93) which does not support Bluetooth Low Energy.
+Therefore, if I am to use Bluetooth it will have to be BT Classic.
 
-On Fri 2017-01-20 18:16:11, Andy Shevchenko wrote:
-> On Fri, 2017-01-20 at 16:26 +0100, Linus Walleij wrote:
->=20
-> > > Now, NMEA knows about some of the complexity (not AGPS), but gets
-> > > the
-> > > details wrong. In particular, it would be good to have error
-> > > estimates
-> > > and velocities from the same moment you get position estimates.
-> >=20
-> > NMEA if it is this:
-> > https://en.wikipedia.org/wiki/NMEA_0183
-> >=20
-> > Seems to be a high-level format such as XML or CSV or any other
-> > $FAVOURITE_ASCII_TRANSPORT format.
->=20
-> Not exactly. It depends on device settings.
-> Old GPS I used to play with have AT command to switch between ASCII and
-> binary format. Some of the devices might use non-standard binary
-> protocols (however, representable as NMEA), etc.
+The communication is pretty straightforward: just a couple of RPC
+calls using JSON.  Both the requests and the replies are reasonably
+short.  The entire exchange can be summarised as follows:
 
-Apparently NMEA has some serious limitations. gpsd authors have some
-good docs about that.
-									Pavel
---=20
-(english) http://www.livejournal.com/~pavelmachek
-(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blo=
-g.html
+  Phone: Here's request #1 (JSON text).
+  ED: Okay, here's reply #1 (JSON text).
+  Phone: Here's request #2 (JSON text).
+  ED: Okay, here's reply #2 (JSON text).
 
---ULyIDA2m8JTe+TiX
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: Digital signature
+Now, I have a couple of related questions:
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
+a) I presume there's no other option than using RFCOMM, right?
 
-iEYEARECAAYFAliLp04ACgkQMOfwapXb+vJJ6QCfeLvNm8AIS/6hE+MKowxarVxh
-V1sAoK0XVkZDRCEkyG1SG/EcJ9o1gKAp
-=4GUX
------END PGP SIGNATURE-----
+b) I know that the first Google hit for "Bluetooth programming"
+    is hopelessly out of date [1], because Bluez now uses DBus.
+    However, where's the Bluez documentation for RFCOMM via DBus?
+    I could only find this page for Bluez documentation [2],
+    but RFCOMM is not mentioned.
 
---ULyIDA2m8JTe+TiX--
+Thanks in advance for your time!
+Best regards,
+Dario Teixeira
+
+[1] https://people.csail.mit.edu/albert/bluez-intro/
+[2] http://git.kernel.org/cgit/bluetooth/bluez.git/tree/doc
+
