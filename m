@@ -2,8 +2,8 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: bugzilla-daemon@bugzilla.kernel.org
 To: linux-bluetooth@vger.kernel.org
 Subject: [Bug 64671] hci0 command 0x1009 tx timeout, bluez can't find adapter
-Date: Mon, 30 Jan 2017 07:14:57 +0000
-Message-ID: <bug-64671-62941-Kcmom0nxli@https.bugzilla.kernel.org/>
+Date: Sun, 29 Jan 2017 21:50:51 +0000
+Message-ID: <bug-64671-62941-NCGU8mI1Xg@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-64671-62941@https.bugzilla.kernel.org/>
 References: <bug-64671-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -13,24 +13,28 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 https://bugzilla.kernel.org/show_bug.cgi?id=64671
 
-MOHAMMAD RASIM <mohammad.rasim96@gmail.com> changed:
+Leif Liddy <leif.liddy@gmail.com> changed:
 
            What    |Removed                     |Added
 ----------------------------------------------------------------------------
-                 CC|                            |mohammad.rasim96@gmail.com
+                 CC|                            |leif.liddy@gmail.com
 
---- Comment #6 from MOHAMMAD RASIM <mohammad.rasim96@gmail.com> ---
-I have the same issue and the same dmesg error.
+--- Comment #5 from Leif Liddy <leif.liddy@gmail.com> ---
+Have you tried resetting the usb port? Fixed an issue on my laptop where the
+bluetooth controller wouldn't work after suspend+resume. Was receiving the same
+sort of timeout errors. Worth a shot in any case.
 
-My adapter is:
-Broadcom Corporation BCM4313 802.11bgn Wireless Network Adapter [14e4:4727]
-(rev 01)
-I had the problem on archlinux but now I'm running linux mint and have the same
-problem.
+#!/usr/bin/python
 
-Current kernel:
-Linux mohammad-mint 4.4.0-21-generic #37-Ubuntu SMP Mon Apr 18 18:33:37 UTC
-2016 x86_64 x86_64 x86_64 GNU/Linux
+from usb.core import find as finddev
+dev = finddev(idVendor=0x13d3, idProduct=0x3362)
+dev.reset()
+
+
+**I wouldn't normally post a python script, but in this case, it's much simpler
+then the corresponding shell script would be
+
+**requires pyusb to run. "pip install pyusb" or "dnf install pyusb"
 
 -- 
 You are receiving this mail because:
