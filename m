@@ -1,44 +1,34 @@
-Return-Path: <Dean_Jenkins@mentor.com>
-From: Dean Jenkins <Dean_Jenkins@mentor.com>
-To: Dean Jenkins <Dean_Jenkins@mentor.com>, Marcel Holtmann
-	<marcel@holtmann.org>
-CC: Gustavo Padovan <gustavo@padovan.org>, Johan Hedberg
-	<johan.hedberg@gmail.com>, <linux-bluetooth@vger.kernel.org>
-Subject: [[RFC] PATCH V1 1/3] Bluetooth: Add missing return in hci_uart_init_work()
-Date: Sun, 29 Jan 2017 21:59:33 +0100
-Message-ID: <1485723575-12340-2-git-send-email-Dean_Jenkins@mentor.com>
-In-Reply-To: <1485723575-12340-1-git-send-email-Dean_Jenkins@mentor.com>
-References: <1485723575-12340-1-git-send-email-Dean_Jenkins@mentor.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Baruch Siach <baruch@tkos.co.il>
+To: linux-bluetooth@vger.kernel.org
+Cc: Phil Elwell <phil@raspberrypi.org>,
+        Baruch Siach <baruch@tkos.co.il>
+Subject: [PATCH] hciattach: bcm43xx: delay reset after firmware download
+Date: Sun, 29 Jan 2017 15:45:08 +0200
+Message-Id: <c23b80351e1a4046f1c0087d2243ed4dc16c0d37.1485697508.git.baruch@tkos.co.il>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If hci_register_dev() returns an error in hci_uart_init_work()
-then the HCI_UART_REGISTERED bit gets erroneously set due to
-a missing return statement. Therefore, add the missing return
-statement.
+The BCM43438 chip on the Raspberry Pi 3 board needs a delay after firmware
+download for the setup to complete successfully.
 
-The consequence of the missing return is that the HCI UART is not
-registered but HCI_UART_REGISTERED is set which allows the code
-to think that hu->hdev is safe to access but hu->hdev has been
-freed so could lead to a crash.
-
-Signed-off-by: Dean Jenkins <Dean_Jenkins@mentor.com>
+Based on Yocto patch from Phil Elwell.
 ---
- drivers/bluetooth/hci_ldisc.c | 1 +
+ tools/hciattach_bcm43xx.c | 1 +
  1 file changed, 1 insertion(+)
 
-diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
-index 9497c46..3a65414 100644
---- a/drivers/bluetooth/hci_ldisc.c
-+++ b/drivers/bluetooth/hci_ldisc.c
-@@ -186,6 +186,7 @@ static void hci_uart_init_work(struct work_struct *work)
- 		hci_free_dev(hu->hdev);
- 		hu->hdev = NULL;
- 		hu->proto->close(hu);
-+		return;
- 	}
+diff --git a/tools/hciattach_bcm43xx.c b/tools/hciattach_bcm43xx.c
+index 81f38cbbcf92..1140379d5cc4 100644
+--- a/tools/hciattach_bcm43xx.c
++++ b/tools/hciattach_bcm43xx.c
+@@ -380,6 +380,7 @@ int bcm43xx_init(int fd, int def_speed, int speed, struct termios *ti,
+ 			return -1;
+ 		}
  
- 	set_bit(HCI_UART_REGISTERED, &hu->flags);
++		sleep(1);
+ 		if (bcm43xx_reset(fd))
+ 			return -1;
+ 	}
 -- 
-2.7.4
+2.11.0
+
