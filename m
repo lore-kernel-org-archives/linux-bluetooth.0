@@ -1,41 +1,45 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: bugzilla-daemon@bugzilla.kernel.org
-To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 64671] hci0 command 0x1009 tx timeout, bluez can't find adapter
-Date: Sun, 29 Jan 2017 21:50:51 +0000
-Message-ID: <bug-64671-62941-NCGU8mI1Xg@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-64671-62941@https.bugzilla.kernel.org/>
-References: <bug-64671-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
+Return-Path: <Dean_Jenkins@mentor.com>
+From: Dean Jenkins <Dean_Jenkins@mentor.com>
+To: Dean Jenkins <Dean_Jenkins@mentor.com>, Marcel Holtmann
+	<marcel@holtmann.org>
+CC: Gustavo Padovan <gustavo@padovan.org>, Johan Hedberg
+	<johan.hedberg@gmail.com>, <linux-bluetooth@vger.kernel.org>
+Subject: [[RFC] PATCH V1 3/3] Bluetooth: Add missing clear HCI_UART_PROTO_READY
+Date: Sun, 29 Jan 2017 21:59:35 +0100
+Message-ID: <1485723575-12340-4-git-send-email-Dean_Jenkins@mentor.com>
+In-Reply-To: <1485723575-12340-1-git-send-email-Dean_Jenkins@mentor.com>
+References: <1485723575-12340-1-git-send-email-Dean_Jenkins@mentor.com>
 MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-https://bugzilla.kernel.org/show_bug.cgi?id=64671
+Ensure that HCI_UART_PROTO_READY is cleared before close(hu) is
+called which closes the Data Link protocol layer.
 
-Leif Liddy <leif.liddy@gmail.com> changed:
+Therefore, add the missing bit clear of HCI_UART_PROTO_READY to
+hci_uart_init_work() so that the flag is cleared when
+hci_register_dev fails.
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |leif.liddy@gmail.com
+Without the fix, the functions of the Data Link protocol layer could
+potentially be accessed after that layer has been closed. This
+could lead to a crash as memory would have been freed in that layer.
 
---- Comment #5 from Leif Liddy <leif.liddy@gmail.com> ---
-Have you tried resetting the usb port? Fixed an issue on my laptop where the
-bluetooth controller wouldn't work after suspend+resume. Was receiving the same
-sort of timeout errors. Worth a shot in any case.
+Signed-off-by: Dean Jenkins <Dean_Jenkins@mentor.com>
+---
+ drivers/bluetooth/hci_ldisc.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-#!/usr/bin/python
-
-from usb.core import find as finddev
-dev = finddev(idVendor=0x13d3, idProduct=0x3362)
-dev.reset()
-
-
-**I wouldn't normally post a python script, but in this case, it's much simpler
-then the corresponding shell script would be
-
-**requires pyusb to run. "pip install pyusb" or "dnf install pyusb"
-
+diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
+index a351cc7..1887ad4 100644
+--- a/drivers/bluetooth/hci_ldisc.c
++++ b/drivers/bluetooth/hci_ldisc.c
+@@ -187,6 +187,7 @@ static void hci_uart_init_work(struct work_struct *work)
+ 		hdev = hu->hdev;
+ 		hu->hdev = NULL;
+ 		hci_free_dev(hdev);
++		clear_bit(HCI_UART_PROTO_READY, &hu->flags);
+ 		hu->proto->close(hu);
+ 		return;
+ 	}
 -- 
-You are receiving this mail because:
-You are the assignee for the bug.
+2.7.4
