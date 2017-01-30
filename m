@@ -1,25 +1,37 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-From: mohammed rilwan <rilwan03@gmail.com>
-Date: Mon, 30 Jan 2017 13:00:59 +0530
-Message-ID: <CAMaUp9Za+DSAWwCvJf9-Zw+HQFe_0Vnt2Cn2rdu-30j9FDa-jg@mail.gmail.com>
-Subject: how to detect Bluetooth HID host-peripheral(mouse/keyboard) lag and latency?
+From: bugzilla-daemon@bugzilla.kernel.org
 To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Subject: [Bug 64671] hci0 command 0x1009 tx timeout, bluez can't find adapter
+Date: Mon, 30 Jan 2017 07:14:57 +0000
+Message-ID: <bug-64671-62941-Kcmom0nxli@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-64671-62941@https.bugzilla.kernel.org/>
+References: <bug-64671-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+https://bugzilla.kernel.org/show_bug.cgi?id=64671
 
-I am searching for ways to qualify HID host. Host is an android device.
-Bluetooth mouse/keyboard will be connected to android device. What is the
-efficient way to find out mouse/keyboard lag and latency.  Anyone had already
-gone through this ? Any help is much appreciated.
+MOHAMMAD RASIM <mohammad.rasim96@gmail.com> changed:
 
-Host-Android.
-Hid peripheral- can be simulated mouse in android phone/real mouse(or
-keyboard).
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |mohammad.rasim96@gmail.com
 
+--- Comment #6 from MOHAMMAD RASIM <mohammad.rasim96@gmail.com> ---
+I have the same issue and the same dmesg error.
 
-Thanks
-Rilwan
+My adapter is:
+Broadcom Corporation BCM4313 802.11bgn Wireless Network Adapter [14e4:4727]
+(rev 01)
+I had the problem on archlinux but now I'm running linux mint and have the same
+problem.
+
+Current kernel:
+Linux mohammad-mint 4.4.0-21-generic #37-Ubuntu SMP Mon Apr 18 18:33:37 UTC
+2016 x86_64 x86_64 x86_64 GNU/Linux
+
+-- 
+You are receiving this mail because:
+You are the assignee for the bug.
