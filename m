@@ -1,84 +1,84 @@
-Return-Path: <robh@kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <20170131054415.eiboj4ivumanxgso@earth>
-References: <20170125202343.30923-1-robh@kernel.org> <20170131030241.kehmuuxsbnbk5nnt@earth>
- <20170131054415.eiboj4ivumanxgso@earth>
-From: Rob Herring <robh@kernel.org>
-Date: Tue, 31 Jan 2017 09:45:40 -0600
-Message-ID: <CAL_JsqLw7XceDh81=doxDf++=AoUXubcCNd9HXurrMpaV6Sn+w@mail.gmail.com>
-Subject: Re: [PATCH v3 0/5] Serial slave device bus
-To: Sebastian Reichel <sre@kernel.org>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Marcel Holtmann <marcel@holtmann.org>,
-	Jiri Slaby <jslaby@suse.com>, Arnd Bergmann <arnd@arndb.de>,
-	"Dr . H . Nikolaus Schaller" <hns@goldelico.com>, Peter Hurley <peter@hurleysoftware.com>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>, Alan Cox <gnomes@lxorguk.ukuu.org.uk>,
-	Loic Poulain <loic.poulain@intel.com>, Pavel Machek <pavel@ucw.cz>, NeilBrown <neil@brown.name>,
+Return-Path: <sre@kernel.org>
+Date: Tue, 31 Jan 2017 15:31:43 +0100
+From: Sebastian Reichel <sre@kernel.org>
+To: Rob Herring <robh@kernel.org>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Marcel Holtmann <marcel@holtmann.org>, Jiri Slaby <jslaby@suse.com>,
+	Arnd Bergmann <arnd@arndb.de>,
+	"Dr . H . Nikolaus Schaller" <hns@goldelico.com>,
+	Peter Hurley <peter@hurleysoftware.com>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Alan Cox <gnomes@lxorguk.ukuu.org.uk>,
+	Loic Poulain <loic.poulain@intel.com>, Pavel Machek <pavel@ucw.cz>,
+	NeilBrown <neil@brown.name>,
 	Linus Walleij <linus.walleij@linaro.org>,
-	"open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-	"linux-serial@vger.kernel.org" <linux-serial@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+	linux-bluetooth@vger.kernel.org, linux-serial@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 3/5] serdev: Introduce new bus for serial attached
+ devices
+Message-ID: <20170131143143.tvf4w7itfwqmweq4@earth>
+References: <20170125202343.30923-1-robh@kernel.org>
+ <20170125202343.30923-4-robh@kernel.org>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="3cnesufgnubno33i"
+In-Reply-To: <20170125202343.30923-4-robh@kernel.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Jan 30, 2017 at 11:44 PM, Sebastian Reichel <sre@kernel.org> wrote:
-> Hi,
+
+--3cnesufgnubno33i
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+
+Hi Rob,
+
+On Wed, Jan 25, 2017 at 02:23:41PM -0600, Rob Herring wrote:
+> diff --git a/include/linux/serdev.h b/include/linux/serdev.h
+> new file mode 100644
+> index 000000000000..4f8f76d02ca8
+> --- /dev/null
+> +++ b/include/linux/serdev.h
 >
-> On Tue, Jan 31, 2017 at 04:02:41AM +0100, Sebastian Reichel wrote:
->> On Wed, Jan 25, 2017 at 02:23:38PM -0600, Rob Herring wrote:
->> > Here's V3 of the serdev bus support with all the review feedback so far
->> > incorporated. Greg applied the first 4 patches already. I also found a
->> > problem in the tty_port_wakeup changes and have fixed that.
->> >
->> > I've added serdev support to the BT hci_ll.c driver as it turns out it works
->> > on newer TI chips too, but just needed firmware loading. That avoids the
->> > impossible mess of cleaning up the TI-ST driver, and it's in a much closer
->> > state to being ready for upstream. I've sent that out separately.
->> >
->> > Changelog is in individual patches. Previous versions are here[1][2]. This
->> > series and the mentioned drivers can be found here[3].
->> >
->> > Rob
->> >
->> > [1] http://www.mail-archive.com/linux-kernel@vger.kernel.org/msg1304151.html
->> > [2] http://www.mail-archive.com/linux-kernel@vger.kernel.org/msg1311650.html
->> > [3] git://git.kernel.org/pub/scm/linux/kernel/git/robh/linux.git serial-bus-v4
->>
->> I rebased my nokia bluetooth driver on top of [3]. It's not yet
->> working, but everything added by this patchset (and
->> "bluetooth: hci_uart: add serdev driver support library") seems
->> to work as expected, so for the whole series:
->>
->> Tested-By: Sebastian Reichel <sre@kernel.org>
-
-Thanks.
-
-> FWIW, I got bluetooth on top of your patchset working on N950. N900
-> is not yet tested and probably does not yet work (it's more picky
-> about flow control and usage of the wakeup gpios). You can find a
-> branch with the additional patches @ [4]. I had to add serdev
-> functions to wait for TX buffer depletion and checking CTS. Apart
-> from that flow control only worked correctly when also taking care
-> of RTS (like hci_uart_set_flow_control does).
-
-I'd originally copied hci_uart_set_flow_control, but then realized
-that it didn't really do what I wanted. What I have now is turn on or
-off h/w control (i.e. off is no RTS/CTS signals connected). What
-hci_uart_set_flow_control does is enable h/w flow control
-(enable=false) or force assert RTS (enable=true). I guess it didn't
-help that I used the same _set_flow_control naming with different
-behavior. I did expect we'd also need something for RTS control, but
-figured we'd add it as needed and wanted to come up with something a
-bit clearer as to the function (i.e. serdev_device_pause_rx or
-serdev_device_assert_rts).
-
-> I noticed, that you did not yet write any DT bindings for your
-> bluetooth slaves. Did you already decide for a location?
-
-Marvell BT is already in bindings/net/.
-
-Rob
-
+> [...]
 >
-> [4] git://git.kernel.org/pub/scm/linux/kernel/git/sre/linux-n900.git serial-bus-v4-nokia-bt
+> +#ifdef CONFIG_SERIAL_DEV_BUS
 >
-> -- Sebastian
+> [method definitions]
+>
+> #else
+>
+> [method stubs]
+>
+> #endif
+>
+> [...]
+
+This should also test for SERIAL_DEV_BUS=m, so use
+
+#if IS_ENABLED(CONFIG_SERIAL_DEV_BUS)
+
+(This was found by the kbuild test robot)
+
+-- Sebastian
+
+--3cnesufgnubno33i
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCgAdFiEE72YNB0Y/i3JqeVQT2O7X88g7+poFAliQn8wACgkQ2O7X88g7
++pqQlg/8DSlRWrR4d3zPD34mACClm1NdayhnMs5tYAW/q+yvH3YA1joOE5g+9CbK
+X5QIczoFN/UNlFtA4Lg+8Dikgd49k8bB5zTvkXWCwznJ9UtbKtXlTSg1G4unGsKU
+qMRQ2a1JVOioHKT3JbHU/bVM7waFXI/5aX4SBrqRwngGorKH/J0LB2HPotLB40SN
+BKSZ47Rk06UZME2N7QDU8MsnGnMZL1SY26Ozf3JRpI7SRlArc0TRSBAlBHElWY+P
+URHWF9MAwZAWJ3GCalr9WKdNQe6qgQ9eA6oY4JF4SfGCAUMQs/K/MNJ2PpGLxlVa
+7XmRij2RQDwIbPEWnKV/1qiw5XSvz1M5ohGMCQAMq/KPpZkqA8cE6vI3AnKuTXWy
+tLwAVJh+mRnD4qiJMewCTAG7VF1v0ZjV4w92e7bYVtgxzAPPKBvjK3GDMPoFM2tJ
+HRBlXE7B6y3LCoXNig9dIY20virJpeKhvr0U1OOI6cuhuLF0IyLO6OVtTC9kKooW
+G+0q0dGlvCkLAFOjsdVKwuUgt3o+Uif33v7rKGWYDoJ6fjhFr0X51XwY9WnmOoNF
+kf5BHCDKOmtEAzSXGzhxmjfXJ7EwGznfvzYOccZ4ANDA6CyXwD9AQPu+IdETz5pv
+E0+taPA/18QUv8WoA5L6SkvCsK1tT41R7e8PR9ilIPG8tmcON2A=
+=vD/b
+-----END PGP SIGNATURE-----
+
+--3cnesufgnubno33i--
