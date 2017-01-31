@@ -1,84 +1,42 @@
-Return-Path: <sre@kernel.org>
-Date: Tue, 31 Jan 2017 15:31:43 +0100
-From: Sebastian Reichel <sre@kernel.org>
-To: Rob Herring <robh@kernel.org>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Marcel Holtmann <marcel@holtmann.org>, Jiri Slaby <jslaby@suse.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	"Dr . H . Nikolaus Schaller" <hns@goldelico.com>,
-	Peter Hurley <peter@hurleysoftware.com>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	Alan Cox <gnomes@lxorguk.ukuu.org.uk>,
-	Loic Poulain <loic.poulain@intel.com>, Pavel Machek <pavel@ucw.cz>,
-	NeilBrown <neil@brown.name>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	linux-bluetooth@vger.kernel.org, linux-serial@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 3/5] serdev: Introduce new bus for serial attached
- devices
-Message-ID: <20170131143143.tvf4w7itfwqmweq4@earth>
-References: <20170125202343.30923-1-robh@kernel.org>
- <20170125202343.30923-4-robh@kernel.org>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="3cnesufgnubno33i"
-In-Reply-To: <20170125202343.30923-4-robh@kernel.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Message-ID: <1485867673.2993.5.camel@iki.fi>
+Subject: SCO socket MTU problem in PulseAudio
+From: Tanu Kaskinen <tanuk@iki.fi>
+To: linux-bluetooth@vger.kernel.org
+Cc: Renjith Thomas <renjith@lightlevitate.com>,
+        Georg Chini <georg@chini.tk>
+Date: Tue, 31 Jan 2017 15:01:13 +0200
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi all,
 
---3cnesufgnubno33i
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+PulseAudio recently started to use
 
-Hi Rob,
+    getsockopt(sock, SOL_SCO, SCO_OPTIONS, &sco_opt, &len);
+    read_mtu = sco_opt.mtu;
+    write_mtu = sco_opt.mtu;
 
-On Wed, Jan 25, 2017 at 02:23:41PM -0600, Rob Herring wrote:
-> diff --git a/include/linux/serdev.h b/include/linux/serdev.h
-> new file mode 100644
-> index 000000000000..4f8f76d02ca8
-> --- /dev/null
-> +++ b/include/linux/serdev.h
->
-> [...]
->
-> +#ifdef CONFIG_SERIAL_DEV_BUS
->
-> [method definitions]
->
-> #else
->
-> [method stubs]
->
-> #endif
->
-> [...]
+to query the MTU of the SCO socket. Previously we used a fixed value of
+48, but that didn't work for some bluetooth chipsets (see the commit
+message[1]). Now, however, it was reported[2] that the new code doesn't
+work on some hardware where the old fixed MTU used to work.
 
-This should also test for SERIAL_DEV_BUS=m, so use
+What is PulseAudio expected to do? We will have to add an option for
+configuring the MTU for now, but that's not a real solution, because
+users can't be expected to figure out that they need to fiddle with the
+MTU if HSP audio doesn't work. Is this a kernel bug? When this new code
+ in PulseAudio gets more widely used and starts breaking people's
+bluetooth audio, should I tell the users to send bug reports to this
+mailing list? Or should PulseAudio keep using a fixed MTU, unless
+configured otherwise?
 
-#if IS_ENABLED(CONFIG_SERIAL_DEV_BUS)
+[1] https://cgit.freedesktop.org/pulseaudio/pulseaudio/commit/?id=fb6b8dfdec2df39c055f98266aa1eb75e8ebfb1c
+[2] https://lists.freedesktop.org/archives/pulseaudio-discuss/2017-January/027408.html
 
-(This was found by the kbuild test robot)
+-- 
+Tanu
 
--- Sebastian
-
---3cnesufgnubno33i
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCgAdFiEE72YNB0Y/i3JqeVQT2O7X88g7+poFAliQn8wACgkQ2O7X88g7
-+pqQlg/8DSlRWrR4d3zPD34mACClm1NdayhnMs5tYAW/q+yvH3YA1joOE5g+9CbK
-X5QIczoFN/UNlFtA4Lg+8Dikgd49k8bB5zTvkXWCwznJ9UtbKtXlTSg1G4unGsKU
-qMRQ2a1JVOioHKT3JbHU/bVM7waFXI/5aX4SBrqRwngGorKH/J0LB2HPotLB40SN
-BKSZ47Rk06UZME2N7QDU8MsnGnMZL1SY26Ozf3JRpI7SRlArc0TRSBAlBHElWY+P
-URHWF9MAwZAWJ3GCalr9WKdNQe6qgQ9eA6oY4JF4SfGCAUMQs/K/MNJ2PpGLxlVa
-7XmRij2RQDwIbPEWnKV/1qiw5XSvz1M5ohGMCQAMq/KPpZkqA8cE6vI3AnKuTXWy
-tLwAVJh+mRnD4qiJMewCTAG7VF1v0ZjV4w92e7bYVtgxzAPPKBvjK3GDMPoFM2tJ
-HRBlXE7B6y3LCoXNig9dIY20virJpeKhvr0U1OOI6cuhuLF0IyLO6OVtTC9kKooW
-G+0q0dGlvCkLAFOjsdVKwuUgt3o+Uif33v7rKGWYDoJ6fjhFr0X51XwY9WnmOoNF
-kf5BHCDKOmtEAzSXGzhxmjfXJ7EwGznfvzYOccZ4ANDA6CyXwD9AQPu+IdETz5pv
-E0+taPA/18QUv8WoA5L6SkvCsK1tT41R7e8PR9ilIPG8tmcON2A=
-=vD/b
------END PGP SIGNATURE-----
-
---3cnesufgnubno33i--
+https://www.patreon.com/tanuk
