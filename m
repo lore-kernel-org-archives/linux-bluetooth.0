@@ -1,57 +1,54 @@
-Return-Path: <carlo@endlessm.com>
-MIME-Version: 1.0
-In-Reply-To: <D130D4FB-7AF0-46BF-9BC7-D9050C596E1A@holtmann.org>
-References: <20170201171431.9633-1-carlo@caione.org> <D130D4FB-7AF0-46BF-9BC7-D9050C596E1A@holtmann.org>
-From: Carlo Caione <carlo@endlessm.com>
-Date: Wed, 1 Feb 2017 23:19:19 +0100
-Message-ID: <CAL9uMOEvFH-mi23U_9SYDcQ7oXJQMB5cy4TL0VKp6OL7Si1ePg@mail.gmail.com>
-Subject: Re: [PATCH] tools/btattach: Add detach option
+Return-Path: <baruch@tkos.co.il>
+Date: Wed, 1 Feb 2017 22:10:19 +0200
+From: Baruch Siach <baruch@tkos.co.il>
 To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Carlo Caione <carlo@caione.org>, Bluez mailing list <linux-bluetooth@vger.kernel.org>,
-	Linux Upstreaming Team <linux@endlessm.com>
-Content-Type: text/plain; charset=UTF-8
+Cc: linux-bluetooth@vger.kernel.org, Phil Elwell <phil@raspberrypi.org>,
+	Rob Herring <robh@kernel.org>
+Subject: Re: [PATCH] hciattach: bcm43xx: delay reset after firmware download
+Message-ID: <20170201201019.wn7ofkefo62v77cq@tarshish>
+References: <c23b80351e1a4046f1c0087d2243ed4dc16c0d37.1485697508.git.baruch@tkos.co.il>
+ <A0AA909E-8FF1-48A8-90C3-6C7BB2FCB1D1@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <A0AA909E-8FF1-48A8-90C3-6C7BB2FCB1D1@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, Feb 1, 2017 at 8:41 PM, Marcel Holtmann <marcel@holtmann.org> wrote=
-:
-> Hi Carl,
->
->> Signed-off-by: Carlo Caione <carlo@endlessm.com>
->
-> user space does not use signed off by statements.
->
->> ---
->> tools/btattach.c | 10 +++++++++-
->> 1 file changed, 9 insertions(+), 1 deletion(-)
->>
->> diff --git a/tools/btattach.c b/tools/btattach.c
->> index 5adbc8d..f1f115d 100644
->> --- a/tools/btattach.c
->> +++ b/tools/btattach.c
->> @@ -194,6 +194,7 @@ static void usage(void)
->>               "\t-P, --protocol <proto> Specify protocol type\n"
->>               "\t-S, --speed <baudrate> Specify which baudrate to use\n"
->>               "\t-N, --noflowctl        Disable flow control\n"
->> +             "\t-D, --detach           Open device and then fork\n"
->>               "\t-h, --help             Show help options\n=E2=80=9D);
->
-> And is this really a good idea. I think that I had removed all the fork c=
-alls from the standard tools. Mainly since we fail to maintain the signals =
-and more important child signals correctly. So we quickly end up with zombi=
-es or orphaned processes. My thinking instead was to leave this to systemd =
-to handle.
+Hi Marcel,
 
-Interesting. Any pointer how to achieve that?
-The problem is that I have btattach called by a systemd unit file to
-download the firmware to the bluetooth transceiver. I also have
-another systemd unit that must be called strictly after btattach has
-done uploading the firmware. Since btattach is hanging on the port
-AFAIU there is no way I can tell exactly when it is done uploading the
-firmware. That's why I was adding this detach option, to mark the unit
-as 'Type=3Dforking' and enforcing the ordering with
-'Before=3Dnext.service`.
-Anything I am missing?
+On Wed, Feb 01, 2017 at 08:50:10PM +0100, Marcel Holtmann wrote:
+> > The BCM43438 chip on the Raspberry Pi 3 board needs a delay after firmware
+> > download for the setup to complete successfully.
+> > 
+> > Based on Yocto patch from Phil Elwell.
+> > ---
+> > tools/hciattach_bcm43xx.c | 1 +
+> > 1 file changed, 1 insertion(+)
+> > 
+> > diff --git a/tools/hciattach_bcm43xx.c b/tools/hciattach_bcm43xx.c
+> > index 81f38cbbcf92..1140379d5cc4 100644
+> > --- a/tools/hciattach_bcm43xx.c
+> > +++ b/tools/hciattach_bcm43xx.c
+> > @@ -380,6 +380,7 @@ int bcm43xx_init(int fd, int def_speed, int speed, struct termios *ti,
+> > 			return -1;
+> > 		}
+> > 
+> > +		sleep(1);
+> > 		if (bcm43xx_reset(fd))
+> > 			return -1;
+> > 	}
+> 
+> any reason not to use the hci_bcm driver support in recent kernels? That 
+> would be a lot better than hacking the old hciattach code.
 
+Mainly the lack of device tree probe support in hci_bcm. I now see that Rob's 
+serial device work[1] would address that for hci_bcm. In the mean time, 
+hciattach is my only option, AFAIK.
 
---=20
-Carlo Caione  |  +39.340.80.30.096  |  Endless
+[1] https://git.kernel.org/cgit/linux/kernel/git/robh/linux.git/log/?h=serial-bus-v4
+
+baruch
+
+-- 
+     http://baruch.siach.name/blog/                  ~. .~   Tk Open Systems
+=}------------------------------------------------ooO--U--Ooo------------{=
+   - baruch@tkos.co.il - tel: +972.52.368.4656, http://www.tkos.co.il -
