@@ -1,54 +1,46 @@
-Return-Path: <baruch@tkos.co.il>
-Date: Wed, 1 Feb 2017 22:10:19 +0200
-From: Baruch Siach <baruch@tkos.co.il>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org, Phil Elwell <phil@raspberrypi.org>,
-	Rob Herring <robh@kernel.org>
-Subject: Re: [PATCH] hciattach: bcm43xx: delay reset after firmware download
-Message-ID: <20170201201019.wn7ofkefo62v77cq@tarshish>
-References: <c23b80351e1a4046f1c0087d2243ed4dc16c0d37.1485697508.git.baruch@tkos.co.il>
- <A0AA909E-8FF1-48A8-90C3-6C7BB2FCB1D1@holtmann.org>
-MIME-Version: 1.0
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <A0AA909E-8FF1-48A8-90C3-6C7BB2FCB1D1@holtmann.org>
+Mime-Version: 1.0 (Mac OS X Mail 10.2 \(3259\))
+Subject: Re: Exchanging data over Bluetooth Classic
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <f0f88082abcb4aa700ca2e7898fc75b9@nleyten.com>
+Date: Wed, 1 Feb 2017 20:51:30 +0100
+Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Message-Id: <59C74349-5707-4268-AB5A-8F3C5B6E03B3@holtmann.org>
+References: <f0f88082abcb4aa700ca2e7898fc75b9@nleyten.com>
+To: Dario Teixeira <dario.teixeira@nleyten.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Dario,
 
-On Wed, Feb 01, 2017 at 08:50:10PM +0100, Marcel Holtmann wrote:
-> > The BCM43438 chip on the Raspberry Pi 3 board needs a delay after firmware
-> > download for the setup to complete successfully.
-> > 
-> > Based on Yocto patch from Phil Elwell.
-> > ---
-> > tools/hciattach_bcm43xx.c | 1 +
-> > 1 file changed, 1 insertion(+)
-> > 
-> > diff --git a/tools/hciattach_bcm43xx.c b/tools/hciattach_bcm43xx.c
-> > index 81f38cbbcf92..1140379d5cc4 100644
-> > --- a/tools/hciattach_bcm43xx.c
-> > +++ b/tools/hciattach_bcm43xx.c
-> > @@ -380,6 +380,7 @@ int bcm43xx_init(int fd, int def_speed, int speed, struct termios *ti,
-> > 			return -1;
-> > 		}
-> > 
-> > +		sleep(1);
-> > 		if (bcm43xx_reset(fd))
-> > 			return -1;
-> > 	}
+> Here's the situation: I want to use a smart phone to communicate with
+> a small embedded device (ED).  Unfortunately the ED is running a very
+> old kernel (3.10.93) which does not support Bluetooth Low Energy.
+> Therefore, if I am to use Bluetooth it will have to be BT Classic.
 > 
-> any reason not to use the hci_bcm driver support in recent kernels? That 
-> would be a lot better than hacking the old hciattach code.
+> The communication is pretty straightforward: just a couple of RPC
+> calls using JSON.  Both the requests and the replies are reasonably
+> short.  The entire exchange can be summarised as follows:
+> 
+> Phone: Here's request #1 (JSON text).
+> ED: Okay, here's reply #1 (JSON text).
+> Phone: Here's request #2 (JSON text).
+> ED: Okay, here's reply #2 (JSON text).
+> 
+> Now, I have a couple of related questions:
+> 
+> a) I presume there's no other option than using RFCOMM, right?
+> 
+> b) I know that the first Google hit for "Bluetooth programming"
+>   is hopelessly out of date [1], because Bluez now uses DBus.
+>   However, where's the Bluez documentation for RFCOMM via DBus?
+>   I could only find this page for Bluez documentation [2],
+>   but RFCOMM is not mentioned.
 
-Mainly the lack of device tree probe support in hci_bcm. I now see that Rob's 
-serial device work[1] would address that for hci_bcm. In the mean time, 
-hciattach is my only option, AFAIK.
+you can use L2CAP or RFCOMM sockets to transfer data. Or you can use OBEX as provided by obexd if it is more file related transfer you are after.
 
-[1] https://git.kernel.org/cgit/linux/kernel/git/robh/linux.git/log/?h=serial-bus-v4
+Regards
 
-baruch
+Marcel
 
--- 
-     http://baruch.siach.name/blog/                  ~. .~   Tk Open Systems
-=}------------------------------------------------ooO--U--Ooo------------{=
-   - baruch@tkos.co.il - tel: +972.52.368.4656, http://www.tkos.co.il -
