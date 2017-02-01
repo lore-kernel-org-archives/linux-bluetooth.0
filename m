@@ -1,42 +1,52 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 Content-Type: text/plain; charset=utf-8
 Mime-Version: 1.0 (Mac OS X Mail 10.2 \(3259\))
-Subject: Re: [PATCH] tools/btattach: Add detach option
+Subject: Re: Update the connection's parameters
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20170201171431.9633-1-carlo@caione.org>
-Date: Wed, 1 Feb 2017 20:41:14 +0100
-Cc: Bluez mailing list <linux-bluetooth@vger.kernel.org>,
-        linux@endlessm.com, Carlo Caione <carlo@endlessm.com>
-Message-Id: <D130D4FB-7AF0-46BF-9BC7-D9050C596E1A@holtmann.org>
-References: <20170201171431.9633-1-carlo@caione.org>
-To: Carlo Caione <carlo@caione.org>
+In-Reply-To: <0770df3d-7d10-09be-5667-a652104f66bb@felipetonello.com>
+Date: Wed, 1 Feb 2017 20:38:45 +0100
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <09B30424-316E-4423-9547-660CE6F902E7@holtmann.org>
+References: <0770df3d-7d10-09be-5667-a652104f66bb@felipetonello.com>
+To: Felipe Ferreri Tonello <eu@felipetonello.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Carl,
+Hi Filipe,
 
-> Signed-off-by: Carlo Caione <carlo@endlessm.com>
-
-user space does not use signed off by statements.
-
-> ---
-> tools/btattach.c | 10 +++++++++-
-> 1 file changed, 9 insertions(+), 1 deletion(-)
+> I've been working on the MIDI profile plugin for bluetoothd. This
+> profile requires the lowest latency and connection interval possible. In
+> order to do that we need to update the connection parameters. There are
+> two ways of doing it, first is upon connection
+> (HCI_LE_Create_Connection) and second is updating current connection
+> link (HCI_LE_Connection_Update).
 > 
-> diff --git a/tools/btattach.c b/tools/btattach.c
-> index 5adbc8d..f1f115d 100644
-> --- a/tools/btattach.c
-> +++ b/tools/btattach.c
-> @@ -194,6 +194,7 @@ static void usage(void)
-> 		"\t-P, --protocol <proto> Specify protocol type\n"
-> 		"\t-S, --speed <baudrate> Specify which baudrate to use\n"
-> 		"\t-N, --noflowctl        Disable flow control\n"
-> +		"\t-D, --detach           Open device and then fork\n"
-> 		"\t-h, --help             Show help options\n”);
+> The first time an LE slave (MIDI controller) device is connected to
+> BlueZ, the plugin should be able to set this parameters for current
+> connection and save these settings for persistence purposes.
+> 
+> As of today, bluetoothd does support the persistence mechanist, which is
+> triggered by a mgmt's New Connection Parameter (0x001c) command, which
+> in turn is triggered by L2CAP Connection Parameter Update Request or a
+> HCI LE Remote Connection Parameter Request (BT 4.1).
+> 
+> As mentioned before, this is not enough. Specially because in practice
+> LE slave devices don't send a any of those two requests mentioned above.
+> 
+> My idea is to set the connection parameter using
+> HCI_LE_Connection_Update if one of the host controllers, master or
+> slave, only supports 4.0. Then update the device info file with current
+> ConnectionParameters for persistence.
+> 
+> In case both controllers support 4.1 and above, we should use the
+> Connection Parameters Request Procedure (BT 4.1 Vol 6 Part B §5.1.17) in
+> order to negotiate what is the best parameters for the connection.
+> 
+> I hope this makes sense. If not, I appreciate your comments. :)
 
-And is this really a good idea. I think that I had removed all the fork calls from the standard tools. Mainly since we fail to maintain the signals and more important child signals correctly. So we quickly end up with zombies or orphaned processes. My thinking instead was to leave this to systemd to handle.
+we need to introduce a L2CAP socket option that allows for setting some of the connection parameters. So that the kernel can consolidate these and request them.
 
-In addition, we are close to getting serdev bus which means btattach will be something of the past really soon.
+I am not 100% we want to expose the actual values. Maybe it is better to have a latency parameter with high, default and low as values.
 
 Regards
 
