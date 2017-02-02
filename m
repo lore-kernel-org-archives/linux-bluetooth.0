@@ -1,72 +1,70 @@
-Return-Path: <robherring2@gmail.com>
-From: Rob Herring <robh@kernel.org>
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Jiri Slaby <jslaby@suse.com>,
-	Sebastian Reichel <sre@kernel.org>,
-	Arnd Bergmann <arnd@arndb.de>,
-	"Dr . H . Nikolaus Schaller" <hns@goldelico.com>,
-	Peter Hurley <peter@hurleysoftware.com>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	Alan Cox <gnomes@lxorguk.ukuu.org.uk>
-Cc: Loic Poulain <loic.poulain@intel.com>,
-	Pavel Machek <pavel@ucw.cz>,
-	NeilBrown <neil@brown.name>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	linux-bluetooth@vger.kernel.org,
-	linux-serial@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v4 0/5] Serial slave device bus
-Date: Thu,  2 Feb 2017 13:48:04 -0600
-Message-Id: <20170202194809.18274-1-robh@kernel.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Content-Type: text/plain; charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 10.2 \(3259\))
+Subject: Re: Update the connection's parameters
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <45ee6cfc-7871-c600-0881-2ae7fa9a6955@felipetonello.com>
+Date: Thu, 2 Feb 2017 11:30:21 +0100
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <6B5EC9A7-4E31-4548-9F53-AFEC0163796D@holtmann.org>
+References: <0770df3d-7d10-09be-5667-a652104f66bb@felipetonello.com>
+ <09B30424-316E-4423-9547-660CE6F902E7@holtmann.org>
+ <45ee6cfc-7871-c600-0881-2ae7fa9a6955@felipetonello.com>
+To: Felipe Ferreri Tonello <eu@felipetonello.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Here's V4 of the serdev bus support. Just 2 small fixes from V3 and 
-Sebastian's Tested-by(Thanks!). I fixed a module build breakage in 
-serdev.h and dropped setting of receive_room. It was only needed for the 
-ldisc->receive_buf() function.
+Hi Felipe,
 
-There's a few additions Sebastion needed for more serial port control of 
-RTS/CTS. I think these can be added on top of this series as drivers 
-need them.
+>>> I've been working on the MIDI profile plugin for bluetoothd. This
+>>> profile requires the lowest latency and connection interval possible. In
+>>> order to do that we need to update the connection parameters. There are
+>>> two ways of doing it, first is upon connection
+>>> (HCI_LE_Create_Connection) and second is updating current connection
+>>> link (HCI_LE_Connection_Update).
+>>> 
+>>> The first time an LE slave (MIDI controller) device is connected to
+>>> BlueZ, the plugin should be able to set this parameters for current
+>>> connection and save these settings for persistence purposes.
+>>> 
+>>> As of today, bluetoothd does support the persistence mechanist, which is
+>>> triggered by a mgmt's New Connection Parameter (0x001c) command, which
+>>> in turn is triggered by L2CAP Connection Parameter Update Request or a
+>>> HCI LE Remote Connection Parameter Request (BT 4.1).
+>>> 
+>>> As mentioned before, this is not enough. Specially because in practice
+>>> LE slave devices don't send a any of those two requests mentioned above.
+>>> 
+>>> My idea is to set the connection parameter using
+>>> HCI_LE_Connection_Update if one of the host controllers, master or
+>>> slave, only supports 4.0. Then update the device info file with current
+>>> ConnectionParameters for persistence.
+>>> 
+>>> In case both controllers support 4.1 and above, we should use the
+>>> Connection Parameters Request Procedure (BT 4.1 Vol 6 Part B §5.1.17) in
+>>> order to negotiate what is the best parameters for the connection.
+>>> 
+>>> I hope this makes sense. If not, I appreciate your comments. :)
+>> 
+>> we need to introduce a L2CAP socket option that allows for setting some of the connection parameters. So that the kernel can consolidate these and request them.
+> 
+> Yes, this sounds great. What would you recommend to implement then?
+> Using SOL_L2CAP or SOL_SOCKET with a new optname?
 
-Changelog is in individual patches. Previous versions are here[1][2][3]. 
-This series and the mentioned drivers can be found here[4].
+we want to use SOL_BLUETOOTH. Unless there is a common SOL_SOCKET that would map here, but I hight doubt that is the case.
 
-Rob
+>> I am not 100% we want to expose the actual values. Maybe it is better to have a latency parameter with high, default and low as values.
+>> 
+> 
+> Yes.
+> 
+> What would this option trigger the controller to do? Because as I have
+> seen it really depends on HCI role and BT version, but I am not an
+> expert in BT, so I appreciate any comments.
 
-[1] http://www.mail-archive.com/linux-kernel@vger.kernel.org/msg1304151.html
-[2] http://www.mail-archive.com/linux-kernel@vger.kernel.org/msg1311650.html
-[3] https://www.mail-archive.com/linux-kernel@vger.kernel.org/msg1318626.html
-[4] git://git.kernel.org/pub/scm/linux/kernel/git/robh/linux.git serial-bus-v5
+It should not matter from the API point of view if you do this as slave or master. However inside the kernel, it needs to map to the right connection update procedure.
 
+Regards
 
-Rob Herring (5):
-  tty_port: Add port client functions
-  dt/bindings: Add a serial/UART attached device binding
-  serdev: Introduce new bus for serial attached devices
-  serdev: add a tty port controller driver
-  tty_port: register tty ports with serdev bus
+Marcel
 
- .../devicetree/bindings/serial/slave-device.txt    |  36 ++
- MAINTAINERS                                        |   8 +
- drivers/char/Kconfig                               |   1 +
- drivers/tty/Makefile                               |   1 +
- drivers/tty/serdev/Kconfig                         |  16 +
- drivers/tty/serdev/Makefile                        |   5 +
- drivers/tty/serdev/core.c                          | 421 +++++++++++++++++++++
- drivers/tty/serdev/serdev-ttyport.c                | 224 +++++++++++
- drivers/tty/tty_buffer.c                           |  17 +-
- drivers/tty/tty_port.c                             |  58 ++-
- include/linux/serdev.h                             | 262 +++++++++++++
- include/linux/tty.h                                |   9 +-
- 12 files changed, 1037 insertions(+), 21 deletions(-)
- create mode 100644 Documentation/devicetree/bindings/serial/slave-device.txt
- create mode 100644 drivers/tty/serdev/Kconfig
- create mode 100644 drivers/tty/serdev/Makefile
- create mode 100644 drivers/tty/serdev/core.c
- create mode 100644 drivers/tty/serdev/serdev-ttyport.c
- create mode 100644 include/linux/serdev.h
-
--- 
-2.10.1
