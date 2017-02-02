@@ -16,197 +16,57 @@ Cc: Loic Poulain <loic.poulain@intel.com>,
 	linux-bluetooth@vger.kernel.org,
 	linux-serial@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v4 1/5] tty_port: Add port client functions
-Date: Thu,  2 Feb 2017 13:48:05 -0600
-Message-Id: <20170202194809.18274-2-robh@kernel.org>
-In-Reply-To: <20170202194809.18274-1-robh@kernel.org>
-References: <20170202194809.18274-1-robh@kernel.org>
+Subject: [PATCH v4 0/5] Serial slave device bus
+Date: Thu,  2 Feb 2017 13:48:04 -0600
+Message-Id: <20170202194809.18274-1-robh@kernel.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Introduce a client (upward direction) operations struct for tty_port
-clients. Initially supported operations are for receiving data and write
-wake-up. This will allow for having clients other than an ldisc.
+Here's V4 of the serdev bus support. Just 2 small fixes from V3 and 
+Sebastian's Tested-by(Thanks!). I fixed a module build breakage in 
+serdev.h and dropped setting of receive_room. It was only needed for the 
+ldisc->receive_buf() function.
 
-Convert the calls to the ldisc to use the client ops as the default
-operations.
+There's a few additions Sebastion needed for more serial port control of 
+RTS/CTS. I think these can be added on top of this series as drivers 
+need them.
 
-Signed-off-by: Rob Herring <robh@kernel.org>
-Reviewed-By: Sebastian Reichel <sre@kernel.org>
-Tested-By: Sebastian Reichel <sre@kernel.org>
----
-v4:
-- no change
-v3:
-- Restructured wakeup handling. We need to maintain the behavior of getting
-  the tty ptr only once, otherwise the serial port can get in a bad state
-  and stops responding.
+Changelog is in individual patches. Previous versions are here[1][2][3]. 
+This series and the mentioned drivers can be found here[4].
 
-v2:
-- no change
+Rob
 
- drivers/tty/tty_buffer.c | 17 +++--------------
- drivers/tty/tty_port.c   | 46 ++++++++++++++++++++++++++++++++++++++++------
- include/linux/tty.h      |  9 ++++++++-
- 3 files changed, 51 insertions(+), 21 deletions(-)
+[1] http://www.mail-archive.com/linux-kernel@vger.kernel.org/msg1304151.html
+[2] http://www.mail-archive.com/linux-kernel@vger.kernel.org/msg1311650.html
+[3] https://www.mail-archive.com/linux-kernel@vger.kernel.org/msg1318626.html
+[4] git://git.kernel.org/pub/scm/linux/kernel/git/robh/linux.git serial-bus-v5
 
-diff --git a/drivers/tty/tty_buffer.c b/drivers/tty/tty_buffer.c
-index f4dc3e296dd5..4e7a4e9dcf4d 100644
---- a/drivers/tty/tty_buffer.c
-+++ b/drivers/tty/tty_buffer.c
-@@ -437,7 +437,7 @@ int tty_ldisc_receive_buf(struct tty_ldisc *ld, const unsigned char *p,
- EXPORT_SYMBOL_GPL(tty_ldisc_receive_buf);
- 
- static int
--receive_buf(struct tty_ldisc *ld, struct tty_buffer *head, int count)
-+receive_buf(struct tty_port *port, struct tty_buffer *head, int count)
- {
- 	unsigned char *p = char_buf_ptr(head, head->read);
- 	char	      *f = NULL;
-@@ -445,7 +445,7 @@ receive_buf(struct tty_ldisc *ld, struct tty_buffer *head, int count)
- 	if (~head->flags & TTYB_NORMAL)
- 		f = flag_buf_ptr(head, head->read);
- 
--	return tty_ldisc_receive_buf(ld, p, f, count);
-+	return port->client_ops->receive_buf(port, p, f, count);
- }
- 
- /**
-@@ -465,16 +465,6 @@ static void flush_to_ldisc(struct work_struct *work)
- {
- 	struct tty_port *port = container_of(work, struct tty_port, buf.work);
- 	struct tty_bufhead *buf = &port->buf;
--	struct tty_struct *tty;
--	struct tty_ldisc *disc;
--
--	tty = READ_ONCE(port->itty);
--	if (tty == NULL)
--		return;
--
--	disc = tty_ldisc_ref(tty);
--	if (disc == NULL)
--		return;
- 
- 	mutex_lock(&buf->lock);
- 
-@@ -504,7 +494,7 @@ static void flush_to_ldisc(struct work_struct *work)
- 			continue;
- 		}
- 
--		count = receive_buf(disc, head, count);
-+		count = receive_buf(port, head, count);
- 		if (!count)
- 			break;
- 		head->read += count;
-@@ -512,7 +502,6 @@ static void flush_to_ldisc(struct work_struct *work)
- 
- 	mutex_unlock(&buf->lock);
- 
--	tty_ldisc_deref(disc);
- }
- 
- /**
-diff --git a/drivers/tty/tty_port.c b/drivers/tty/tty_port.c
-index 1d8804843103..8d9886b06037 100644
---- a/drivers/tty/tty_port.c
-+++ b/drivers/tty/tty_port.c
-@@ -17,6 +17,44 @@
- #include <linux/delay.h>
- #include <linux/module.h>
- 
-+static int tty_port_default_receive_buf(struct tty_port *port,
-+					const unsigned char *p,
-+					const unsigned char *f, size_t count)
-+{
-+	int ret;
-+	struct tty_struct *tty;
-+	struct tty_ldisc *disc;
-+
-+	tty = READ_ONCE(port->itty);
-+	if (!tty)
-+		return 0;
-+
-+	disc = tty_ldisc_ref(tty);
-+	if (!disc)
-+		return 0;
-+
-+	ret = tty_ldisc_receive_buf(disc, p, (char *)f, count);
-+
-+	tty_ldisc_deref(disc);
-+
-+	return ret;
-+}
-+
-+static void tty_port_default_wakeup(struct tty_port *port)
-+{
-+	struct tty_struct *tty = tty_port_tty_get(port);
-+
-+	if (tty) {
-+		tty_wakeup(tty);
-+		tty_kref_put(tty);
-+	}
-+}
-+
-+static const struct tty_port_client_operations default_client_ops = {
-+	.receive_buf = tty_port_default_receive_buf,
-+	.write_wakeup = tty_port_default_wakeup,
-+};
-+
- void tty_port_init(struct tty_port *port)
- {
- 	memset(port, 0, sizeof(*port));
-@@ -28,6 +66,7 @@ void tty_port_init(struct tty_port *port)
- 	spin_lock_init(&port->lock);
- 	port->close_delay = (50 * HZ) / 100;
- 	port->closing_wait = (3000 * HZ) / 100;
-+	port->client_ops = &default_client_ops;
- 	kref_init(&port->kref);
- }
- EXPORT_SYMBOL(tty_port_init);
-@@ -272,12 +311,7 @@ EXPORT_SYMBOL_GPL(tty_port_tty_hangup);
-  */
- void tty_port_tty_wakeup(struct tty_port *port)
- {
--	struct tty_struct *tty = tty_port_tty_get(port);
--
--	if (tty) {
--		tty_wakeup(tty);
--		tty_kref_put(tty);
--	}
-+	port->client_ops->write_wakeup(port);
- }
- EXPORT_SYMBOL_GPL(tty_port_tty_wakeup);
- 
-diff --git a/include/linux/tty.h b/include/linux/tty.h
-index 21c0fabfed60..1017e904c0a3 100644
---- a/include/linux/tty.h
-+++ b/include/linux/tty.h
-@@ -217,12 +217,18 @@ struct tty_port_operations {
- 	/* Called on the final put of a port */
- 	void (*destruct)(struct tty_port *port);
- };
--	
-+
-+struct tty_port_client_operations {
-+	int (*receive_buf)(struct tty_port *port, const unsigned char *, const unsigned char *, size_t);
-+	void (*write_wakeup)(struct tty_port *port);
-+};
-+
- struct tty_port {
- 	struct tty_bufhead	buf;		/* Locked internally */
- 	struct tty_struct	*tty;		/* Back pointer */
- 	struct tty_struct	*itty;		/* internal back ptr */
- 	const struct tty_port_operations *ops;	/* Port operations */
-+	const struct tty_port_client_operations *client_ops; /* Port client operations */
- 	spinlock_t		lock;		/* Lock protecting tty field */
- 	int			blocked_open;	/* Waiting to open */
- 	int			count;		/* Usage count */
-@@ -241,6 +247,7 @@ struct tty_port {
- 						   based drain is needed else
- 						   set to size of fifo */
- 	struct kref		kref;		/* Ref counter */
-+	void 			*client_data;
- };
- 
- /* tty_port::iflags bits -- use atomic bit ops */
+
+Rob Herring (5):
+  tty_port: Add port client functions
+  dt/bindings: Add a serial/UART attached device binding
+  serdev: Introduce new bus for serial attached devices
+  serdev: add a tty port controller driver
+  tty_port: register tty ports with serdev bus
+
+ .../devicetree/bindings/serial/slave-device.txt    |  36 ++
+ MAINTAINERS                                        |   8 +
+ drivers/char/Kconfig                               |   1 +
+ drivers/tty/Makefile                               |   1 +
+ drivers/tty/serdev/Kconfig                         |  16 +
+ drivers/tty/serdev/Makefile                        |   5 +
+ drivers/tty/serdev/core.c                          | 421 +++++++++++++++++++++
+ drivers/tty/serdev/serdev-ttyport.c                | 224 +++++++++++
+ drivers/tty/tty_buffer.c                           |  17 +-
+ drivers/tty/tty_port.c                             |  58 ++-
+ include/linux/serdev.h                             | 262 +++++++++++++
+ include/linux/tty.h                                |   9 +-
+ 12 files changed, 1037 insertions(+), 21 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/serial/slave-device.txt
+ create mode 100644 drivers/tty/serdev/Kconfig
+ create mode 100644 drivers/tty/serdev/Makefile
+ create mode 100644 drivers/tty/serdev/core.c
+ create mode 100644 drivers/tty/serdev/serdev-ttyport.c
+ create mode 100644 include/linux/serdev.h
+
 -- 
 2.10.1
