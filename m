@@ -1,68 +1,61 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 Content-Type: text/plain; charset=utf-8
 Mime-Version: 1.0 (Mac OS X Mail 10.2 \(3259\))
-Subject: Re: Update the connection's parameters
+Subject: Re: [PATCH] tools/btattach: Add detach option
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <45ee6cfc-7871-c600-0881-2ae7fa9a6955@felipetonello.com>
-Date: Thu, 2 Feb 2017 11:30:21 +0100
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <6B5EC9A7-4E31-4548-9F53-AFEC0163796D@holtmann.org>
-References: <0770df3d-7d10-09be-5667-a652104f66bb@felipetonello.com>
- <09B30424-316E-4423-9547-660CE6F902E7@holtmann.org>
- <45ee6cfc-7871-c600-0881-2ae7fa9a6955@felipetonello.com>
-To: Felipe Ferreri Tonello <eu@felipetonello.com>
+In-Reply-To: <CAL9uMOEQyo3RmyOEs_7eM0FsRSktB+=5Jw6HCOV4Gvw6Wn66bg@mail.gmail.com>
+Date: Thu, 2 Feb 2017 11:28:29 +0100
+Cc: Bluez mailing list <linux-bluetooth@vger.kernel.org>,
+        Carlo Caione <carlo@caione.org>,
+        Linux Upstreaming Team <linux@endlessm.com>
+Message-Id: <1626001B-33D7-4B19-8798-8C18D6DADF6B@holtmann.org>
+References: <20170201171431.9633-1-carlo@caione.org>
+ <D130D4FB-7AF0-46BF-9BC7-D9050C596E1A@holtmann.org>
+ <CAL9uMOEvFH-mi23U_9SYDcQ7oXJQMB5cy4TL0VKp6OL7Si1ePg@mail.gmail.com>
+ <02A0165B-9058-4663-9809-E7DA030E0878@holtmann.org>
+ <CAL9uMOEQyo3RmyOEs_7eM0FsRSktB+=5Jw6HCOV4Gvw6Wn66bg@mail.gmail.com>
+To: Carlo Caione <carlo@endlessm.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Felipe,
+Hi Carlo,
 
->>> I've been working on the MIDI profile plugin for bluetoothd. This
->>> profile requires the lowest latency and connection interval possible. In
->>> order to do that we need to update the connection parameters. There are
->>> two ways of doing it, first is upon connection
->>> (HCI_LE_Create_Connection) and second is updating current connection
->>> link (HCI_LE_Connection_Update).
->>> 
->>> The first time an LE slave (MIDI controller) device is connected to
->>> BlueZ, the plugin should be able to set this parameters for current
->>> connection and save these settings for persistence purposes.
->>> 
->>> As of today, bluetoothd does support the persistence mechanist, which is
->>> triggered by a mgmt's New Connection Parameter (0x001c) command, which
->>> in turn is triggered by L2CAP Connection Parameter Update Request or a
->>> HCI LE Remote Connection Parameter Request (BT 4.1).
->>> 
->>> As mentioned before, this is not enough. Specially because in practice
->>> LE slave devices don't send a any of those two requests mentioned above.
->>> 
->>> My idea is to set the connection parameter using
->>> HCI_LE_Connection_Update if one of the host controllers, master or
->>> slave, only supports 4.0. Then update the device info file with current
->>> ConnectionParameters for persistence.
->>> 
->>> In case both controllers support 4.1 and above, we should use the
->>> Connection Parameters Request Procedure (BT 4.1 Vol 6 Part B §5.1.17) in
->>> order to negotiate what is the best parameters for the connection.
->>> 
->>> I hope this makes sense. If not, I appreciate your comments. :)
->> 
->> we need to introduce a L2CAP socket option that allows for setting some of the connection parameters. So that the kernel can consolidate these and request them.
+> >>> ---
+> >>> tools/btattach.c | 10 +++++++++-
+> >>> 1 file changed, 9 insertions(+), 1 deletion(-)
+> >>>
+> >>> diff --git a/tools/btattach.c b/tools/btattach.c
+> >>> index 5adbc8d..f1f115d 100644
+> >>> --- a/tools/btattach.c
+> >>> +++ b/tools/btattach.c
+> >>> @@ -194,6 +194,7 @@ static void usage(void)
+> >>>              "\t-P, --protocol <proto> Specify protocol type\n"
+> >>>              "\t-S, --speed <baudrate> Specify which baudrate to use\n"
+> >>>              "\t-N, --noflowctl        Disable flow control\n"
+> >>> +             "\t-D, --detach           Open device and then fork\n"
+> >>>              "\t-h, --help             Show help options\n”);
+> >>
+> >> And is this really a good idea. I think that I had removed all the fork calls from the standard tools. Mainly since we fail to maintain the signals and more important child signals correctly. So we quickly end up with zombies or orphaned processes. My thinking instead was to leave this to systemd to handle.
+> >
+> > Interesting. Any pointer how to achieve that?
+> > The problem is that I have btattach called by a systemd unit file to
+> > download the firmware to the bluetooth transceiver. I also have
+> > another systemd unit that must be called strictly after btattach has
+> > done uploading the firmware. Since btattach is hanging on the port
+> > AFAIU there is no way I can tell exactly when it is done uploading the
+> > firmware. That's why I was adding this detach option, to mark the unit
+> > as 'Type=forking' and enforcing the ordering with
+> > 'Before=next.service`.
+> > Anything I am missing?
 > 
-> Yes, this sounds great. What would you recommend to implement then?
-> Using SOL_L2CAP or SOL_SOCKET with a new optname?
-
-we want to use SOL_BLUETOOTH. Unless there is a common SOL_SOCKET that would map here, but I hight doubt that is the case.
-
->> I am not 100% we want to expose the actual values. Maybe it is better to have a latency parameter with high, default and low as values.
->> 
+> why do you need to know when the firmware uploading has completed? What hardware is this?
 > 
-> Yes.
-> 
-> What would this option trigger the controller to do? Because as I have
-> seen it really depends on HCI role and BT version, but I am not an
-> expert in BT, so I appreciate any comments.
+> The hardware is a custom ARM board based on an Amlogic SOC.
+> More specifically I need btattach systemd unit to run before systemd-rfkill. This is because the rfkill driver is actually driving the GPIO enable of the transceiver, so if systemd-rfkill runs before btattach has completed telling to disable the radio (because we rebooted with the BT off) this just interrupts the firmware downloading leaving the transceiver in a non-working state.
 
-It should not matter from the API point of view if you do this as slave or master. However inside the kernel, it needs to map to the right connection update procedure.
+this whole design mess with RFKILL switches for GPIO reset lines is a problem. We start fixing this for Intel and Broadcom based Bluetooth chips. So I would prefer if we can get this fixed inside the kernel. Also serdev bus is coming that will make btattach obsolete for hardwired Bluetooth UART chips.
+
+And frankly, I would prefer to add RFKILL handling to btattach then trying to introduce a fork() which only existence to is to do some syncing with systemd-rfkill.
 
 Regards
 
