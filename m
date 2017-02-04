@@ -2,8 +2,8 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Nicolas Werner <nicolas.werner@gmx.net>
 To: linux-bluetooth@vger.kernel.org
 Subject: [RFC][PATCH BlueZ] sixaxis: Differing device name between usb and bluetooth connection
-Date: Sat, 04 Feb 2017 19:16:28 +0100
-Message-ID: <2299304.XBxEXHNB4J@gentooasus>
+Date: Sat, 04 Feb 2017 19:15:50 +0100
+Message-ID: <3969021.WDePWYxnyn@gentooasus>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
