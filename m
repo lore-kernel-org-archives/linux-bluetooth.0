@@ -1,134 +1,47 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-From: bheemsen <bheemsenk@gmail.com>
-Date: Mon, 6 Feb 2017 19:33:10 +0530
-Message-ID: <CAE+w0_T88Dfqv8C5y3tSMpgRX1ZTVqKzDyLZhQ9Pt7mWMZrP+A@mail.gmail.com>
-Subject: Unable browse over BNEP
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <tanuk@iki.fi>
+Message-ID: <1486380902.4774.4.camel@iki.fi>
+Subject: Re: SCO socket MTU problem in PulseAudio
+From: Tanu Kaskinen <tanuk@iki.fi>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org, Renjith Thomas
+ <renjith@lightlevitate.com>,  Georg Chini <georg@chini.tk>
+Date: Mon, 06 Feb 2017 13:35:02 +0200
+In-Reply-To: <A00CAB7E-3131-4430-8AEA-4132E28CE8FE@holtmann.org>
+References: <1485867673.2993.5.camel@iki.fi>
+	 <A00CAB7E-3131-4430-8AEA-4132E28CE8FE@holtmann.org>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi All,
+On Wed, 2017-02-01 at 20:47 +0100, Marcel Holtmann wrote:
+> Hi Tanu,
+> 
+> > PulseAudio recently started to use
+> > 
+> >    getsockopt(sock, SOL_SCO, SCO_OPTIONS, &sco_opt, &len);
+> >    read_mtu = sco_opt.mtu;
+> >    write_mtu = sco_opt.mtu;
+> > 
+> > to query the MTU of the SCO socket. Previously we used a fixed value of
+> > 48, but that didn't work for some bluetooth chipsets (see the commit
+> > message[1]). Now, however, it was reported[2] that the new code doesn't
+> > work on some hardware where the old fixed MTU used to work.
+> 
+> can you share details here and btmon traces for the data buffer sizes
+> and the USB descriptor details. We would need to figure out where
+> this goes wrong and maybe introduce some driver quirks to ensure that
+> it returns usable values.
 
-We are trying to setup NAP server over WLAN bridge. The remote PANU is
-able to connect to the NAP server, while it is unable to browse/ping
-to network.
+Georg already provided a btmon dump. Did that contain everything you
+need? The way you put your words, it's not clear to me if the USB
+descriptor details are included in the btmon output or is the USB
+descriptor a separate thing?
 
-For setting up NAP, we are using BlueZ 5.41 underlying kernel 4.9.0.
-We do follow below steps to setup bridge and connect BNEP over same,
+I'd like to provide clear instructions for users to get the necessary
+information, in case it turns out that Georg is not the only one with
+this problem. What options should be given to btmon?
 
-Bringup WLAN:
+-- 
+Tanu
 
-wlan0     Link encap:Ethernet  HWaddr xx:xx:xx:xx:xx:xx
-
-          inet addr:192.168.43.100  Bcast:192.168.43.255  Mask:255.255.255.0
-
-          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
-
-          RX packets:6 errors:0 dropped:0 overruns:0 frame:0
-
-          TX packets:11 errors:0 dropped:0 overruns:0 carrier:0
-
-          collisions:0 txqueuelen:1000
-
-          RX bytes:890 (890.0 B)  TX bytes:1862 (1.8 KiB)
-
-Setup bridge:
-
-# brctl addbr br0
-
-# ip addr add 192.168.100.1 dev br0
-
-# ip link set br0 up
-
-# ifconfig
-
-br0       Link encap:Ethernet  HWaddr xx:xx:xx:xx:xx:xx
-
-          inet addr:192.168.43.7 Bcast:0.0.0.0  Mask:255.255.255.255
-
-          inet6 addr: fe80::94a7:c5ff:fe36:c3d6/64 Scope:Link
-
-          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
-
-          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
-
-          TX packets:7 errors:0 dropped:0 overruns:0 carrier:0
-
-          collisions:0 txqueuelen:0
-
-          RX bytes:0 (0.0 B)  TX bytes:640 (640.0 B)
-
-Iptable setup:
-
-# iptables -A FORWARD -i wlan0 -o br0 -m state --state
-ESTABLISHED,RELATED -j ACCEPT
-
-echo " Enabling SNAT (MASQUERADE) functionality on $EXTIF"
-
-# iptables -t nat -A POSTROUTING -o wlan0 -j MASQUERADE
-
-echo " Enabling forwarding.."
-
-# echo "1" > /proc/sys/net/ipv4/ip_forward
-
-To power on BT,
-
- -> hciconfig hci0 up
-
--> hciconfig hci0 piscan
-
--> Run bluetoothd with "-ndE"
-
--> tools/test-nap br0 &
-
--> bluetoothctl
-
-# agent on
-
-# default agent
-
-# pair <dev_addr>
-
-# trust <dev_addr>
-
-Now initiate NAP connection from remote device (Android device). The
-device gets connected to NAP server with below bnep configuration
-(without configuring inet). Though it says connected, on Android
-device we are unable to ping/browse to internet.
-
-bluetoothd[737]: src/agent.c:agent_ref() 0x9856c90: ref=3
-
-bluetoothd[737]: src/agent.c:agent_unref() 0x9856c90: ref=2
-
-bluetoothd[737]: src/agent.c:agent_unref() 0x9856c90: ref=1
-
-bluetoothd[737]: profiles/network/bnep.c:bnep_getsuppfeat() supported
-features: 0x1
-
-bluetoothd[737]: bnep: bridge br0: interface bnep0 added
-
-#ifconfig
-
-bnep0     Link encap:Ethernet  HWaddr xx:xx:xx:xx:xx:xx
-
-          inet6 addr: fe80::7aff:57ff:fe00:a400/64 Scope:Link
-
-          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
-
-          RX packets:10 errors:0 dropped:0 overruns:0 frame:0
-
-          TX packets:5 errors:0 dropped:0 overruns:0 carrier:0
-
-          collisions:0 txqueuelen:1000
-
-          RX bytes:1845 (1.8 KiB)  TX bytes:80 (80.0 B)
-
-Even though no ip address assigned dynamically for bnep after
-connection, configured static IP, but still not able to browse/ping.
-
-Please provide your input to resolve the issue.
-
-Thanks & Regards
-Bheemsen
+https://www.patreon.com/tanuk
