@@ -1,50 +1,49 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: "Felipe F. Tonello" <eu@felipetonello.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 2/2] profiles/midi: Moved MIDI UUIDs to library header
-Date: Tue,  7 Feb 2017 23:40:43 +0000
-Message-Id: <20170207234043.14003-3-eu@felipetonello.com>
+Subject: [PATCH BlueZ 1/2] profiles/midi: Add safer buffer setter function
+Date: Tue,  7 Feb 2017 23:40:42 +0000
+Message-Id: <20170207234043.14003-2-eu@felipetonello.com>
 In-Reply-To: <20170207234043.14003-1-eu@felipetonello.com>
 References: <20170207234043.14003-1-eu@felipetonello.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This allows other users of libmidi to consistently use MIDI UUIDs.
+This function helper makes buffer operations more consistent and adds
+boundary check when its available.
 
 Signed-off-by: Felipe F. Tonello <eu@felipetonello.com>
 ---
- profiles/midi/libmidi.h | 3 +++
- profiles/midi/midi.c    | 3 ---
- 2 files changed, 3 insertions(+), 3 deletions(-)
+ profiles/midi/libmidi.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
 
-diff --git a/profiles/midi/libmidi.h b/profiles/midi/libmidi.h
-index 7078fb4a690b..9d94065b60c0 100644
---- a/profiles/midi/libmidi.h
-+++ b/profiles/midi/libmidi.h
-@@ -29,6 +29,9 @@
- #include <stdbool.h>
- #include <alsa/asoundlib.h>
+diff --git a/profiles/midi/libmidi.c b/profiles/midi/libmidi.c
+index ac090b59eb60..4b4df799fc2e 100644
+--- a/profiles/midi/libmidi.c
++++ b/profiles/midi/libmidi.c
+@@ -52,6 +52,13 @@ inline static uint8_t buffer_reverse_get(struct midi_buffer *buffer, size_t i)
+ 	return buffer->data[buffer->len - (i + 1)];
+ }
  
-+#define MIDI_UUID "03B80E5A-EDE8-4B33-A751-6CE34EC4C700"
-+#define MIDI_IO_UUID "7772E5DB-3868-4112-A1A9-F2669D106BF3"
++inline static void buffer_reverse_set(struct midi_buffer *buffer, size_t i,
++                                      const uint8_t byte)
++{
++	MIDI_ASSERT(buffer->len > i);
++	buffer->data[buffer->len - (i + 1)] = byte;
++}
 +
- #define MIDI_MAX_TIMESTAMP 8191
- #define MIDI_MSG_MAX_SIZE 12
- #define MIDI_SYSEX_MAX_SIZE (4 * 1024)
-diff --git a/profiles/midi/midi.c b/profiles/midi/midi.c
-index d12b4cf29818..fdc1c007da1c 100644
---- a/profiles/midi/midi.c
-+++ b/profiles/midi/midi.c
-@@ -53,9 +53,6 @@
+ inline static size_t parser_get_available_size(struct midi_write_parser *parser)
+ {
+ 	return parser->stream_size - parser->midi_stream.len;
+@@ -314,7 +321,7 @@ static size_t handle_end_of_sysex(struct midi_read_parser *parser,
+ 	time_low = buffer_reverse_get(&parser->sysex_stream, 0) & 0x7F;
  
- #include "libmidi.h"
+ 	/* Remove timestamp byte */
+-	parser->sysex_stream.data[parser->sysex_stream.len - 1] = 0xF7;
++	buffer_reverse_set(&parser->sysex_stream, 0, 0xF7);
  
--#define MIDI_UUID "03B80E5A-EDE8-4B33-A751-6CE34EC4C700"
--#define MIDI_IO_UUID "7772E5DB-3868-4112-A1A9-F2669D106BF3"
--
- struct midi {
- 	struct btd_device *dev;
- 	struct gatt_db *db;
+ 	/* Update event */
+ 	update_ev_timestamp(parser, ev, time_low);
 -- 
 2.11.0
 
