@@ -1,115 +1,29 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-To: linux-bluetooth@vger.kernel.org
-From: Alan Roxdale <alanroxdale@gmail.com>
-Subject: Reducing input latency/lag on connected game controllers (On
- Raspberry Pi)
-Message-ID: <1bd86cc7-8d20-ba15-0cbe-9bda5d3e2327@gmail.com>
-Date: Wed, 8 Feb 2017 19:41:40 +0000
+From: Simon Falsig <sfalsig@veritystudios.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Reading manufacturer-specific advertisement data from BLE device
+Date: Wed, 8 Feb 2017 16:23:15 +0000
+Message-ID: <d01aae99bbca4803aa34ab90ba3f080b@veritystudios.com>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello. I'm trying to come up with a permanent solution to reducing input 
-lag/latency from connected bluetooth game controllers. The specific 
-setup I'm looking at is a RetroPie 3 (inbuilt bluetooth) with a PS3 
-controller, but from preliminary investigations I believe that lag 
-should be reducible in a wider class of set-ups and devices.
-To cut a long story short, as outlined in this forum thread -- 
-https://retropie.org.uk/forum/topic/7712/fixing-dualshock-3-bluetooth-lag 
--- the input lag can apparently be substantially reduced by (manually) 
-switching the controller's connection into slave mode. However this has 
-to be done manually each time the controller is connected. Also, I'm am 
-not sure why this is working. My knowledge of bluetooth is currently 
-fairly low.
+Hi,
 
-So I'm both looking for a more permanent automated solution and also a 
-greater understanding of what is actually happening here.
+I'm currently trying to read manufacturer-specific data from an advertisement from a custom BLE device, using the BlueZ D-Bus API, but can't seem to get it working.
 
-My current process for measuring and reducing input-lag manually is as 
-follows:
+I can see my device when doing a scan in bluetoothctl, but haven't figured out how to get to the actual advertisement data. I've tried modifying bluetoothctl to get the "ManufacturerData" property, but this is not found (g_dbus_proxy_get_property returns false). Also, no ManufacturerData property (or similar) shows up for the device in d-feet.
 
+I have a small utility that just uses the hci API directly, and using that, I can get the complete contents of the advertisement, including the manufacturer-specific data. Full data is (in hex):
 
-1) Determine controller IP
+02 01 06 03 02 e0 c0 11 ff 00 02 01 03 00 00 00 00 00 00 00 00 5d 58 0e 94
 
-$ hcitool con
+Is there something wrong in the way I'm sending out the data, or do I need to register for data in some way to get it working for the D-Bus API also?
 
-Produces output like (I have only the controller itself connected)
+I'm using BlueZ 5.37 on KUbuntu 16.04 (running in VirtualBox), using an Aircable Host XR4 Bluetooth adapter connected over USB. BLE device is a custom solution, based on a TI CC2650 chip, using the TI BLE-Stack 2.2.0.
 
-Connections:
- > ACL AA:BB:CC:DD:EE:FF handle 11 state 1 lm MASTER
+Any hints or comments are appreciated!
 
-2) Determine latency with l2ping  (Turning off wifi also reduces this 
-latency substantially on the Raspberry Pi at least)
-
-$ sudo l2ping AA:BB:CC:DD:EE:FF
-
-4 bytes from AA:BB:CC:DD:EE:FF id 0 time 13.70ms
-4 bytes from AA:BB:CC:DD:EE:FF id 1 time 36.19ms
-4 bytes from AA:BB:CC:DD:EE:FF id 2 time 34.83ms
-4 bytes from AA:BB:CC:DD:EE:FF id 3 time 36.08ms
-
-I presume that to use l2ping to determine latency times, one divides by 
-two. So the controller has a quasi consistent latency of (I assume) ~ 
-18ms. I believe this delay is being set by the (PS3) controller.
-
-
-3) Reducing latency by switching to slave mode using hcitool sr
-
-For reasons I do not fully understand, on the Pi, switching the 
-controller's connection to slave mode reduces input lag further. These 
-are the steps I take.
-
-$ sudo hcitool sr AA:BB:CC:DD:EE:FF slave
-
-$ hcitool con
-Connections:
-     > ACL AA:BB:CC:DD:EE:FF handle 11 state 1 lm SLAVE
-
-$ sudo l2ping AA:BB:CC:DD:EE:FF
-Ping: AA:BB:CC:DD:EE:FF from 00:11:22:33:44:55 (data size 44) ...
-4 bytes from AA:BB:CC:DD:EE:FF id 0 time 13.81ms
-4 bytes from AA:BB:CC:DD:EE:FF id 1 time 11.28ms
-4 bytes from AA:BB:CC:DD:EE:FF id 2 time 12.32ms
-4 bytes from AA:BB:CC:DD:EE:FF id 3 time 12.29ms
-4 bytes from AA:BB:CC:DD:EE:FF id 4 time 12.27ms
-4 bytes from AA:BB:CC:DD:EE:FF id 5 time 12.14ms
-4 bytes from AA:BB:CC:DD:EE:FF id 6 time 12.36ms
-4 bytes from AA:BB:CC:DD:EE:FF id 7 time 12.26ms
-4 bytes from AA:BB:CC:DD:EE:FF id 8 time 12.27ms
-
-I presume this means that the controller latency is now a fairly 
-consistent. ~6-7ms. Apparently this is the lowest latency possible (from 
-something called "SNIFF MODE"?).
-I can report that subjectively input lag is substantially reduced by 
-this step, and I believe these lowered pings do translate into actual 
-reduction in objective input lag. But I have no direct way of measuring 
-this.
-
-So my question is twofold:
-
-A) How can I set up the bluetooth/hci0/??? connection settings so that 
-the connected controllers are permanently in slave mode? (Something in 
-/etc/bluetooth ?)
-B) What exactly is going on here and how are input latency/lag settings 
-actually determined in the bluetooth standard? Again, is there a way of 
-reducing input lag for all such devices? (possibly to below 6ms?)
-
-======
-
-My reason for asking question B) is that, as can be seen in the linked 
-forum thread, this quick hack of switching to slave mode isn't working 
-for all controller types. Newer controller modes enter AUTH and ENCRYPT 
-modes and/or won't allow role switching.
-
-What I suspect is going on here is that the controllers, which are 
-pressed to initiate the bluetooth connection, connect as the master in 
-the connection, but each on their own terms. Strangely their connection 
-parameter seem to include very long (SNIFF mode?) delays and things like 
-encryption, authentication which I would presume would increase lag. Is 
-there any way of setting up the bluetooth (hci0) device on the Pi so 
-that it overrides the controllers' default settings and produces a 
-connection with the lowest possible latency on all devices?
-
-Thanks for any asistance.
-
+Thanks in advance,
+Simon Falsig
