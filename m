@@ -4,8 +4,8 @@ Cc: tedd.an@intel.com, anand.kalyanakrishnan@intel.com
 From: "jaya.p.g" <jaya.p.g@linux.intel.com>
 Subject: [PATCH] Bluetooth: Add Support for Intel Bluetooth Devices JfP and
  ThP [8087:0025,8087:0aaa]
-Message-ID: <589B24EF.4000401@linux.intel.com>
-Date: Wed, 8 Feb 2017 19:32:23 +0530
+Message-ID: <589B12AC.1040703@linux.intel.com>
+Date: Wed, 8 Feb 2017 18:14:28 +0530
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
