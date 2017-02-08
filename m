@@ -1,34 +1,67 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain; charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 10.2 \(3259\))
-Subject: Re: Bose Quiet Comfort 35 Remaining Battery Reporting
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CABBYNZKQGsQD_Zzy0AVpyS+Ufy29ovm-2GooSFvy1e=BGAFKJQ@mail.gmail.com>
-Date: Wed, 8 Feb 2017 14:19:39 +0100
-Cc: Hugues <morisset.hugues@gmail.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Message-Id: <2D4036B9-473E-45B2-A9DE-DEC13EAD2F94@holtmann.org>
-References: <58989E88.4000005@gmail.com> <5899CA52.8020607@gmail.com>
- <CABBYNZ+Msa3ObRKT-fe70YitPB+OA15hoPcwT2_XSSN8jgAN3g@mail.gmail.com>
- <589B0EB7.10903@gmail.com>
- <CABBYNZKQGsQD_Zzy0AVpyS+Ufy29ovm-2GooSFvy1e=BGAFKJQ@mail.gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <20170207234043.14003-2-eu@felipetonello.com>
+References: <20170207234043.14003-1-eu@felipetonello.com> <20170207234043.14003-2-eu@felipetonello.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Wed, 8 Feb 2017 14:45:09 +0200
+Message-ID: <CABBYNZJ0Cs8UZ9g0hB_mJpTF7jrAwK3JPNuWA1wgwH_fciEFaw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/2] profiles/midi: Add safer buffer setter function
+To: "Felipe F. Tonello" <eu@felipetonello.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Felipe,
 
->> Thanks for the reply, I know the bose android application do report the
->> battery power of the headset, but I don't know if it is done in a
->> propitiatory manner. How could I check that ?
-> 
-> It is probably the 00000000-deca-fade-deca-deafdecacaff service, Ive
-> also seem some bose devices that are dual-mode so they have a GATT
-> service over LE that might expose these details.
+On Wed, Feb 8, 2017 at 1:40 AM, Felipe F. Tonello <eu@felipetonello.com> wrote:
+> This function helper makes buffer operations more consistent and adds
+> boundary check when its available.
+>
+> Signed-off-by: Felipe F. Tonello <eu@felipetonello.com>
 
-or it uses the Apple HFP extensions they defined to get battery status. Also 00000000-deca-fade-deca-deafdecacaff should be the wireless version of Apple’ iAP (iPod Accessory Protocol).
+We don't use Signed-off-by on userspace, please remove it.
 
-Regards
+> ---
+>  profiles/midi/libmidi.c | 9 ++++++++-
+>  1 file changed, 8 insertions(+), 1 deletion(-)
+>
+> diff --git a/profiles/midi/libmidi.c b/profiles/midi/libmidi.c
+> index ac090b59eb60..4b4df799fc2e 100644
+> --- a/profiles/midi/libmidi.c
+> +++ b/profiles/midi/libmidi.c
+> @@ -52,6 +52,13 @@ inline static uint8_t buffer_reverse_get(struct midi_buffer *buffer, size_t i)
+>         return buffer->data[buffer->len - (i + 1)];
+>  }
+>
+> +inline static void buffer_reverse_set(struct midi_buffer *buffer, size_t i,
+> +                                      const uint8_t byte)
+> +{
+> +       MIDI_ASSERT(buffer->len > i);
+> +       buffer->data[buffer->len - (i + 1)] = byte;
+> +}
+> +
+>  inline static size_t parser_get_available_size(struct midi_write_parser *parser)
+>  {
+>         return parser->stream_size - parser->midi_stream.len;
+> @@ -314,7 +321,7 @@ static size_t handle_end_of_sysex(struct midi_read_parser *parser,
+>         time_low = buffer_reverse_get(&parser->sysex_stream, 0) & 0x7F;
+>
+>         /* Remove timestamp byte */
+> -       parser->sysex_stream.data[parser->sysex_stream.len - 1] = 0xF7;
+> +       buffer_reverse_set(&parser->sysex_stream, 0, 0xF7);
+>
+>         /* Update event */
+>         update_ev_timestamp(parser, ev, time_low);
+> --
+> 2.11.0
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-Marcel
 
+
+-- 
+Luiz Augusto von Dentz
