@@ -1,29 +1,34 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Simon Falsig <sfalsig@veritystudios.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Reading manufacturer-specific advertisement data from BLE device
-Date: Wed, 8 Feb 2017 16:23:15 +0000
-Message-ID: <d01aae99bbca4803aa34ab90ba3f080b@veritystudios.com>
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 10.2 \(3259\))
+Subject: Re: Bose Quiet Comfort 35 Remaining Battery Reporting
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <CABBYNZKQGsQD_Zzy0AVpyS+Ufy29ovm-2GooSFvy1e=BGAFKJQ@mail.gmail.com>
+Date: Wed, 8 Feb 2017 14:19:39 +0100
+Cc: Hugues <morisset.hugues@gmail.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Message-Id: <2D4036B9-473E-45B2-A9DE-DEC13EAD2F94@holtmann.org>
+References: <58989E88.4000005@gmail.com> <5899CA52.8020607@gmail.com>
+ <CABBYNZ+Msa3ObRKT-fe70YitPB+OA15hoPcwT2_XSSN8jgAN3g@mail.gmail.com>
+ <589B0EB7.10903@gmail.com>
+ <CABBYNZKQGsQD_Zzy0AVpyS+Ufy29ovm-2GooSFvy1e=BGAFKJQ@mail.gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Luiz,
 
-I'm currently trying to read manufacturer-specific data from an advertisement from a custom BLE device, using the BlueZ D-Bus API, but can't seem to get it working.
+>> Thanks for the reply, I know the bose android application do report the
+>> battery power of the headset, but I don't know if it is done in a
+>> propitiatory manner. How could I check that ?
+> 
+> It is probably the 00000000-deca-fade-deca-deafdecacaff service, Ive
+> also seem some bose devices that are dual-mode so they have a GATT
+> service over LE that might expose these details.
 
-I can see my device when doing a scan in bluetoothctl, but haven't figured out how to get to the actual advertisement data. I've tried modifying bluetoothctl to get the "ManufacturerData" property, but this is not found (g_dbus_proxy_get_property returns false). Also, no ManufacturerData property (or similar) shows up for the device in d-feet.
+or it uses the Apple HFP extensions they defined to get battery status. Also 00000000-deca-fade-deca-deafdecacaff should be the wireless version of Apple’ iAP (iPod Accessory Protocol).
 
-I have a small utility that just uses the hci API directly, and using that, I can get the complete contents of the advertisement, including the manufacturer-specific data. Full data is (in hex):
+Regards
 
-02 01 06 03 02 e0 c0 11 ff 00 02 01 03 00 00 00 00 00 00 00 00 5d 58 0e 94
+Marcel
 
-Is there something wrong in the way I'm sending out the data, or do I need to register for data in some way to get it working for the D-Bus API also?
-
-I'm using BlueZ 5.37 on KUbuntu 16.04 (running in VirtualBox), using an Aircable Host XR4 Bluetooth adapter connected over USB. BLE device is a custom solution, based on a TI CC2650 chip, using the TI BLE-Stack 2.2.0.
-
-Any hints or comments are appreciated!
-
-Thanks in advance,
-Simon Falsig
