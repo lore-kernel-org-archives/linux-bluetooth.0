@@ -1,101 +1,115 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: mcchou@chromium.org
 To: linux-bluetooth@vger.kernel.org
-Cc: luiz.von.dentz@intel.com, josephsih@chromium.org,
-        ortuno@chromium.org, Eric Caruso <ejcaruso@chromium.org>
-Subject: [PATCH] device: Add device type property
-Date: Wed,  8 Feb 2017 17:05:08 -0800
-Message-Id: <20170209010508.150518-1-mcchou@chromium.org>
+From: Alan Roxdale <alanroxdale@gmail.com>
+Subject: Reducing input latency/lag on connected game controllers (On
+ Raspberry Pi)
+Message-ID: <1bd86cc7-8d20-ba15-0cbe-9bda5d3e2327@gmail.com>
+Date: Wed, 8 Feb 2017 19:41:40 +0000
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Eric Caruso <ejcaruso@chromium.org>
+Hello. I'm trying to come up with a permanent solution to reducing input 
+lag/latency from connected bluetooth game controllers. The specific 
+setup I'm looking at is a RetroPie 3 (inbuilt bluetooth) with a PS3 
+controller, but from preliminary investigations I believe that lag 
+should be reducible in a wider class of set-ups and devices.
+To cut a long story short, as outlined in this forum thread -- 
+https://retropie.org.uk/forum/topic/7712/fixing-dualshock-3-bluetooth-lag 
+-- the input lag can apparently be substantially reduced by (manually) 
+switching the controller's connection into slave mode. However this has 
+to be done manually each time the controller is connected. Also, I'm am 
+not sure why this is working. My knowledge of bluetooth is currently 
+fairly low.
 
-This allows us to gather information about whether a device
-supports BR/EDR, BLE, or both. It appears as DBus Property
-"Type" on the org.bluez.Device1 interface.
+So I'm both looking for a more permanent automated solution and also a 
+greater understanding of what is actually happening here.
 
-This is tested with the following steps:
-Scan for devices and request the type property of a specific remote device,
-using:
-  # dbus-send --print-reply --system --dest=org.bluez <obj path> \
-    org.freedesktop.DBus.Properties.Get \
-      string:org.bluez.Device1 string:Type
-or request the type of all remote devices, using:
-  # dbus-send --print-reply --system --dest=org.bluez / \
-    org.freedesktop.DBus.ObjectManager.GetManagedObjects | \
-      grep -B1 -A2 Type
-and check for "BR/EDR", "LE", and "DUAL"
----
- doc/device-api.txt |  5 +++++
- src/device.c       | 31 +++++++++++++++++++++++++++++++
- 2 files changed, 36 insertions(+)
+My current process for measuring and reducing input-lag manually is as 
+follows:
 
-diff --git a/doc/device-api.txt b/doc/device-api.txt
-index 13b28818e..2f3100cd5 100644
---- a/doc/device-api.txt
-+++ b/doc/device-api.txt
-@@ -141,6 +141,11 @@ Properties	string Address [readonly]
 
- 			The Bluetooth class of device of the remote device.
+1) Determine controller IP
 
-+		string Type [readonly, optional]
-+
-+			The carriers supported by this remote device. If it
-+			exists, it can be one of "BR/EDR", "LE", or "DUAL".
-+
- 		uint16 Appearance [readonly, optional]
+$ hcitool con
 
- 			External appearance of device, as found on GAP service.
-diff --git a/src/device.c b/src/device.c
-index 8693eb826..14c62e127 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -788,6 +788,35 @@ static gboolean dev_property_get_class(const GDBusPropertyTable *property,
- 	return TRUE;
- }
+Produces output like (I have only the controller itself connected)
 
-+static gboolean dev_property_exists_type(const GDBusPropertyTable *property,
-+								void *data)
-+{
-+	struct btd_device *device = data;
-+
-+	return device->bredr || device->le;
-+}
-+
-+static gboolean dev_property_get_type(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *data)
-+{
-+	struct btd_device *device = data;
-+	const char *type;
-+
-+	if (!device->bredr && !device->le)
-+		return FALSE;
-+
-+	if (!device->bredr)
-+		type = "LE";
-+	else if (!device->le)
-+		type = "BR/EDR";
-+	else
-+		type = "DUAL";
-+
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &type);
-+
-+	return TRUE;
-+}
-+
- static gboolean get_appearance(const GDBusPropertyTable *property, void *data,
- 							uint16_t *appearance)
- {
-@@ -2541,6 +2570,8 @@ static const GDBusPropertyTable device_properties[] = {
- 	{ "Alias", "s", dev_property_get_alias, dev_property_set_alias },
- 	{ "Class", "u", dev_property_get_class, NULL,
- 					dev_property_exists_class },
-+	{ "Type", "s", dev_property_get_type, NULL,
-+					dev_property_exists_type },
- 	{ "Appearance", "q", dev_property_get_appearance, NULL,
- 					dev_property_exists_appearance },
- 	{ "Icon", "s", dev_property_get_icon, NULL,
---
-2.11.0.483.g087da7b7c-goog
+Connections:
+ > ACL AA:BB:CC:DD:EE:FF handle 11 state 1 lm MASTER
+
+2) Determine latency with l2ping  (Turning off wifi also reduces this 
+latency substantially on the Raspberry Pi at least)
+
+$ sudo l2ping AA:BB:CC:DD:EE:FF
+
+4 bytes from AA:BB:CC:DD:EE:FF id 0 time 13.70ms
+4 bytes from AA:BB:CC:DD:EE:FF id 1 time 36.19ms
+4 bytes from AA:BB:CC:DD:EE:FF id 2 time 34.83ms
+4 bytes from AA:BB:CC:DD:EE:FF id 3 time 36.08ms
+
+I presume that to use l2ping to determine latency times, one divides by 
+two. So the controller has a quasi consistent latency of (I assume) ~ 
+18ms. I believe this delay is being set by the (PS3) controller.
+
+
+3) Reducing latency by switching to slave mode using hcitool sr
+
+For reasons I do not fully understand, on the Pi, switching the 
+controller's connection to slave mode reduces input lag further. These 
+are the steps I take.
+
+$ sudo hcitool sr AA:BB:CC:DD:EE:FF slave
+
+$ hcitool con
+Connections:
+     > ACL AA:BB:CC:DD:EE:FF handle 11 state 1 lm SLAVE
+
+$ sudo l2ping AA:BB:CC:DD:EE:FF
+Ping: AA:BB:CC:DD:EE:FF from 00:11:22:33:44:55 (data size 44) ...
+4 bytes from AA:BB:CC:DD:EE:FF id 0 time 13.81ms
+4 bytes from AA:BB:CC:DD:EE:FF id 1 time 11.28ms
+4 bytes from AA:BB:CC:DD:EE:FF id 2 time 12.32ms
+4 bytes from AA:BB:CC:DD:EE:FF id 3 time 12.29ms
+4 bytes from AA:BB:CC:DD:EE:FF id 4 time 12.27ms
+4 bytes from AA:BB:CC:DD:EE:FF id 5 time 12.14ms
+4 bytes from AA:BB:CC:DD:EE:FF id 6 time 12.36ms
+4 bytes from AA:BB:CC:DD:EE:FF id 7 time 12.26ms
+4 bytes from AA:BB:CC:DD:EE:FF id 8 time 12.27ms
+
+I presume this means that the controller latency is now a fairly 
+consistent. ~6-7ms. Apparently this is the lowest latency possible (from 
+something called "SNIFF MODE"?).
+I can report that subjectively input lag is substantially reduced by 
+this step, and I believe these lowered pings do translate into actual 
+reduction in objective input lag. But I have no direct way of measuring 
+this.
+
+So my question is twofold:
+
+A) How can I set up the bluetooth/hci0/??? connection settings so that 
+the connected controllers are permanently in slave mode? (Something in 
+/etc/bluetooth ?)
+B) What exactly is going on here and how are input latency/lag settings 
+actually determined in the bluetooth standard? Again, is there a way of 
+reducing input lag for all such devices? (possibly to below 6ms?)
+
+======
+
+My reason for asking question B) is that, as can be seen in the linked 
+forum thread, this quick hack of switching to slave mode isn't working 
+for all controller types. Newer controller modes enter AUTH and ENCRYPT 
+modes and/or won't allow role switching.
+
+What I suspect is going on here is that the controllers, which are 
+pressed to initiate the bluetooth connection, connect as the master in 
+the connection, but each on their own terms. Strangely their connection 
+parameter seem to include very long (SNIFF mode?) delays and things like 
+encryption, authentication which I would presume would increase lag. Is 
+there any way of setting up the bluetooth (hci0) device on the Pi so 
+that it overrides the controllers' default settings and produces a 
+connection with the lowest possible latency on all devices?
+
+Thanks for any asistance.
 
