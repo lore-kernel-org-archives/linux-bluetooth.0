@@ -1,48 +1,26 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+From: "Felipe F. Tonello" <eu@felipetonello.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: patrik.flykt@linux.intel.com, aar@pengutronix.de
-Subject: [PATCH 2/5] 6lowpan: Set MAC address lenght according to LOWPAN_LLTYPE
-Date: Thu,  9 Feb 2017 16:55:48 +0200
-Message-Id: <20170209145551.12747-3-luiz.dentz@gmail.com>
-In-Reply-To: <20170209145551.12747-1-luiz.dentz@gmail.com>
-References: <20170209145551.12747-1-luiz.dentz@gmail.com>
+Subject: [PATCH v2 BlueZ 0/2] Minor MIDI profile improvements
+Date: Thu,  9 Feb 2017 14:55:47 +0000
+Message-Id: <20170209145549.17542-1-eu@felipetonello.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Patrik Flykt <patrik.flykt@linux.intel.com>
+Minor improvements that doesn't have any affect in functionality.
 
-Set MAC address length according to the 6LoWPAN link layer in use.
-Bluetooth Low Energy uses 48 bit addressing while IEEE802.15.4 uses
-64 bits.
+Changes from v1:
+ * Removed SOB from patches.
 
-Signed-off-by: Patrik Flykt <patrik.flykt@linux.intel.com>
----
- net/6lowpan/core.c | 11 ++++++++++-
- 1 file changed, 10 insertions(+), 1 deletion(-)
+Felipe F. Tonello (2):
+  profiles/midi: Add safer buffer setter function
+  profiles/midi: Moved MIDI UUIDs to library header
 
-diff --git a/net/6lowpan/core.c b/net/6lowpan/core.c
-index 5945f7e..5f9909a 100644
---- a/net/6lowpan/core.c
-+++ b/net/6lowpan/core.c
-@@ -23,7 +23,16 @@ int lowpan_register_netdevice(struct net_device *dev,
- {
- 	int i, ret;
- 
--	dev->addr_len = EUI64_ADDR_LEN;
-+	switch (lltype) {
-+	case LOWPAN_LLTYPE_IEEE802154:
-+		dev->addr_len = EUI64_ADDR_LEN;
-+		break;
-+
-+	case LOWPAN_LLTYPE_BTLE:
-+		dev->addr_len = ETH_ALEN;
-+		break;
-+	}
-+
- 	dev->type = ARPHRD_6LOWPAN;
- 	dev->mtu = IPV6_MIN_MTU;
- 	dev->priv_flags |= IFF_NO_QUEUE;
+ profiles/midi/libmidi.c | 9 ++++++++-
+ profiles/midi/libmidi.h | 3 +++
+ profiles/midi/midi.c    | 3 ---
+ 3 files changed, 11 insertions(+), 4 deletions(-)
+
 -- 
-2.9.3
+2.11.1
 
