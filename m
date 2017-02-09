@@ -1,156 +1,55 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: patrik.flykt@linux.intel.com, aar@pengutronix.de
-Subject: [PATCH 5/5] 6lowpan: Use netdev addr_len to determine lladdr len
-Date: Thu,  9 Feb 2017 16:55:51 +0200
-Message-Id: <20170209145551.12747-6-luiz.dentz@gmail.com>
-In-Reply-To: <20170209145551.12747-1-luiz.dentz@gmail.com>
-References: <20170209145551.12747-1-luiz.dentz@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <508E30B7-76A0-4589-8D2D-5C736695E4C4@gmail.com>
+References: <508E30B7-76A0-4589-8D2D-5C736695E4C4@gmail.com>
+From: Barry Byford <31baz66@gmail.com>
+Date: Thu, 9 Feb 2017 11:13:54 +0000
+Message-ID: <CAAu3APY6k07tYS_uAvPN77r1crhGiPKRQ0S9MTmF7LgLcvtrBw@mail.gmail.com>
+Subject: Re: Scanning for advertising packets more often
+To: Bridger Maxwell <bridger.maxwell@gmail.com>
+Cc: Bluez mailing list <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hello Bridger,
 
-This allow technologies such as Bluetooth to use its native lladdr which
-is eui48 instead of eui64 which was expected by functions like
-lowpan_header_decompress and lowpan_header_compress.
+On 9 February 2017 at 02:09, Bridger Maxwell <bridger.maxwell@gmail.com> wr=
+ote:
+> Hi,
+>
+> I=E2=80=99m trying to make a Bluetooth LE peripheral that will work witho=
+ut pairing. Instead, multiple receivers can listen for events by listening =
+for changes in the advertising packet. I=E2=80=99ve got the peripheral conf=
+igured to broadcast every 100ms, but the receiver running Bluez only gets u=
+pdates about once per second.
+>
+> Is there a way to configure Bluez to get advertising packets scanned more=
+ often? I=E2=80=99d also like to turn off any duplicate filtering.
+>
+> Additionally, the peripheral broadcasts two types of advertising packets.=
+ One type is from the builtin firmware and I don=E2=80=99t care about. The =
+other type is my custom advertising packet. Both of these have the same MAC=
+ address. I believe Bluez is filtering duplicates from the same address wit=
+hin each 1 second window. I am getting a random sampling of either the firm=
+ware advertising packet or my custom advertising packet once per second.
+>
+> I=E2=80=99m using Pybluez[ble] to use Bluez. This is the scratch script I=
+ have running so far: https://gist.github.com/bridger/83fc2e9c60fd07d925b0b=
+ec80c47acab I tried using LE_SET_SCAN_PARAMETERS to change the scan interva=
+l and window but this didn=E2=80=99t seem to have an effect.
+>
+> If this is a bad idea, let me know. I liked the simplicity of not pairing=
+ but maybe I=E2=80=99m headed in the wrong direction.
 
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
----
- net/6lowpan/iphc.c      | 17 +++++++++++++++--
- net/bluetooth/6lowpan.c | 43 ++++++++++---------------------------------
- 2 files changed, 25 insertions(+), 35 deletions(-)
+You may find this link to a previous thread relevant to your requirements:
+http://marc.info/?l=3Dlinux-bluetooth&m=3D148106041713054&w=3D2
 
-diff --git a/net/6lowpan/iphc.c b/net/6lowpan/iphc.c
-index fb5f6fa..ee88feb 100644
---- a/net/6lowpan/iphc.c
-+++ b/net/6lowpan/iphc.c
-@@ -827,8 +827,21 @@ static u8 lowpan_compress_ctx_addr(u8 **hc_ptr, const struct net_device *dev,
- 		}
- 		break;
- 	default:
--		/* check for SAM/DAM = 11 */
--		memcpy(&tmp.s6_addr[8], lladdr, EUI64_ADDR_LEN);
-+		switch (dev->addr_len) {
-+		case ETH_ALEN:
-+			memcpy(&tmp.s6_addr[8], lladdr, 3);
-+			tmp.s6_addr[11] = 0xFF;
-+			tmp.s6_addr[12] = 0xFE;
-+			memcpy(&tmp.s6_addr[13], lladdr + 3, 3);
-+			break;
-+		case EUI64_ADDR_LEN:
-+			memcpy(&tmp.s6_addr[8], lladdr, EUI64_ADDR_LEN);
-+			break;
-+		default:
-+			dam = LOWPAN_IPHC_DAM_11;
-+			goto out;
-+		}
-+
- 		/* second bit-flip (Universe/Local) is done according RFC2464 */
- 		tmp.s6_addr[8] ^= 0x02;
- 		/* context information are always used */
-diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
-index 1456b01..d2a1aa5 100644
---- a/net/bluetooth/6lowpan.c
-+++ b/net/bluetooth/6lowpan.c
-@@ -64,7 +64,7 @@ struct lowpan_peer {
- 	struct l2cap_chan *chan;
- 
- 	/* peer addresses in various formats */
--	unsigned char eui64_addr[EUI64_ADDR_LEN];
-+	unsigned char lladdr[ETH_ALEN];
- 	struct in6_addr peer_addr;
- };
- 
-@@ -80,8 +80,6 @@ struct lowpan_btle_dev {
- 	struct delayed_work notify_peers;
- };
- 
--static void set_addr(u8 *eui, u8 *addr, u8 addr_type);
--
- static inline struct lowpan_btle_dev *
- lowpan_btle_dev(const struct net_device *netdev)
- {
-@@ -277,7 +275,6 @@ static int iphc_decompress(struct sk_buff *skb, struct net_device *netdev,
- 	const u8 *saddr;
- 	struct lowpan_btle_dev *dev;
- 	struct lowpan_peer *peer;
--	unsigned char eui64_daddr[EUI64_ADDR_LEN];
- 
- 	dev = lowpan_btle_dev(netdev);
- 
-@@ -287,10 +284,9 @@ static int iphc_decompress(struct sk_buff *skb, struct net_device *netdev,
- 	if (!peer)
- 		return -EINVAL;
- 
--	saddr = peer->eui64_addr;
--	set_addr(&eui64_daddr[0], chan->src.b, chan->src_type);
-+	saddr = peer->lladdr;
- 
--	return lowpan_header_decompress(skb, netdev, &eui64_daddr, saddr);
-+	return lowpan_header_decompress(skb, netdev, netdev->dev_addr, saddr);
- }
- 
- static int recv_pkt(struct sk_buff *skb, struct net_device *dev,
-@@ -477,7 +473,7 @@ static int setup_header(struct sk_buff *skb, struct net_device *netdev,
- 			}
- 		}
- 
--		daddr = peer->eui64_addr;
-+		daddr = peer->lladdr;
- 		*peer_addr = addr;
- 		*peer_addr_type = addr_type;
- 		lowpan_cb(skb)->chan = peer->chan;
-@@ -663,27 +659,6 @@ static struct device_type bt_type = {
- 	.name	= "bluetooth",
- };
- 
--static void set_addr(u8 *eui, u8 *addr, u8 addr_type)
--{
--	/* addr is the BT address in little-endian format */
--	eui[0] = addr[5];
--	eui[1] = addr[4];
--	eui[2] = addr[3];
--	eui[3] = 0xFF;
--	eui[4] = 0xFE;
--	eui[5] = addr[2];
--	eui[6] = addr[1];
--	eui[7] = addr[0];
--
--	/* Universal/local bit set, BT 6lowpan draft ch. 3.2.1 */
--	if (addr_type == BDADDR_LE_PUBLIC)
--		eui[0] &= ~0x02;
--	else
--		eui[0] |= 0x02;
--
--	BT_DBG("type %d addr %*phC", addr_type, 8, eui);
--}
--
- static void ifup(struct net_device *netdev)
- {
- 	int err;
-@@ -762,14 +737,16 @@ static struct l2cap_chan *add_peer_chan(struct l2cap_chan *chan,
- 	peer->chan = chan;
- 	memset(&peer->peer_addr, 0, sizeof(struct in6_addr));
- 
-+	baswap((void *)peer->lladdr, &chan->dst);
-+
- 	/* RFC 2464 ch. 5 */
- 	peer->peer_addr.s6_addr[0] = 0xFE;
- 	peer->peer_addr.s6_addr[1] = 0x80;
--	set_addr((u8 *)&peer->peer_addr.s6_addr + 8, chan->dst.b,
--		 chan->dst_type);
- 
--	memcpy(&peer->eui64_addr, (u8 *)&peer->peer_addr.s6_addr + 8,
--	       EUI64_ADDR_LEN);
-+	memcpy(&peer->peer_addr.s6_addr[8], peer->lladdr, 3);
-+	peer->peer_addr.s6_addr[11] = 0xFF;
-+	peer->peer_addr.s6_addr[12] = 0xFE;
-+	memcpy(&peer->peer_addr.s6_addr[13], peer->lladdr + 3, 3);
- 
- 	/* IPv6 address needs to have the U/L bit set properly so toggle
- 	 * it back here.
--- 
-2.9.3
 
+
+>
+> - Bridger Maxwell--
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth=
+" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
