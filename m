@@ -1,397 +1,58 @@
-Return-Path: <eu@felipetonello.com>
-Subject: Re: [RFC][PATCH BlueZ] Bluetooth: L2CAP: Add BT_LE_CONN_PARAM socket
- option
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-References: <20170203213604.2697-1-eu@felipetonello.com>
- <f1d0214e-813c-b00f-198b-4a24c4a8adb1@felipetonello.com>
- <CABBYNZ+3zaBWQa_V9ASdHq7OA5is4HJ=H9Y=ZBRgCom1xMa-Mw@mail.gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
- Marcel Holtmann <marcel@holtmann.org>,
- "Von Dentz, Luiz" <luiz.von.dentz@intel.com>
-From: Felipe Ferreri Tonello <eu@felipetonello.com>
-Message-ID: <8fa5934b-bdcd-4a7e-52da-62aa9cd138b8@felipetonello.com>
-Date: Thu, 9 Feb 2017 17:14:07 +0000
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZ+3zaBWQa_V9ASdHq7OA5is4HJ=H9Y=ZBRgCom1xMa-Mw@mail.gmail.com>
-Content-Type: multipart/mixed;
- boundary="------------92DE48F821A57AD1F5A6B9FE"
+From: Dave Beal <dbeal@cardinalpeak.com>
+Date: Thu, 9 Feb 2017 09:12:48 -0700
+Message-ID: <CAHHBb0djp1X5=WTMLFUsTsSJQeOoREFFg88C0j1m12c5_XdRVw@mail.gmail.com>
+Subject: GATT client not working with BlueZ 5.19
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is a multi-part message in MIME format.
---------------92DE48F821A57AD1F5A6B9FE
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
+Hello -
 
-Hi Luiz,
+I'm trying to get a GATT client working on a Linux system that's
+running BlueZ 5.19.  Unfortunately, neither Python or glib are
+available on this system, so my only choice is using libdbus.  And did
+I mention that I've never used D-Bus before?  I have a GATT server on
+another system that provides and advertises a custom service by its
+16-byte UUID.  I'm trying to get my BlueZ-based system to access this
+service.  I've verified that I can discover the server by the UUID
+that it advertises, and I can get BlueZ to manually connect to it.  My
+client app has successfully called Bluez's RegisterProfile method,
+passing the UUID advertised by the server, but BlueZ never calls my
+NewConnection method.  In the options of the RegisterProfile call, I'm
+setting "Role" to "client", "AutoConnect" to TRUE, and both
+"RequireAuthorization" and "RequireAuthentication" to FALSE.  I am
+running bluetoothd with the -E (experimental) option.
 
-On 08/02/17 09:34, Luiz Augusto von Dentz wrote:
-> Hi Felipe,
-> 
-> On Wed, Feb 8, 2017 at 1:04 AM, Felipe Ferreri Tonello
-> <eu@felipetonello.com> wrote:
->> CC'ed Marcel and Luiz for comments.
->>
->> I have implemented and tested the functionality in the shared/att.[ch]
->> lib too, but I am waiting for your comments on the approach first.
->>
->> On 03/02/17 21:36, Felipe F. Tonello wrote:
->>> There is a need for certain LE profiles (MIDI for example)to change the
->>> current connection's parameters. In order to do that, this patch
->>> introduces a new BT_LE_CONN_PARAM socket option for SOL_BLUETOOTH
->>> protocol which allow user-space l2cap sockets to update the current
->>> connection.
->>>
->>> This option will also send a MGMT_EV_NEW_CONN_PARAM event with the
->>> store_hint set so the user-space application can store the connection
->>> parameters for persistence reasons.
->>>
->>> Signed-off-by: Felipe F. Tonello <eu@felipetonello.com>
->>> ---
->>>  include/net/bluetooth/bluetooth.h |  8 ++++
->>>  net/bluetooth/l2cap_sock.c        | 98 +++++++++++++++++++++++++++++++++++++++
->>>  2 files changed, 106 insertions(+)
->>>
->>> diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
->>> index 01487192f628..ce5b3abd3b27 100644
->>> --- a/include/net/bluetooth/bluetooth.h
->>> +++ b/include/net/bluetooth/bluetooth.h
->>> @@ -122,6 +122,14 @@ struct bt_voice {
->>>  #define BT_SNDMTU            12
->>>  #define BT_RCVMTU            13
->>>
->>> +#define BT_LE_CONN_PARAM     14
->>> +struct bt_le_conn_param {
->>> +     __u16 min_interval;
->>> +     __u16 max_interval;
->>> +     __u16 latency;
->>> +     __u16 supervision_timeout;
->>> +};
->>> +
->>>  __printf(1, 2)
->>>  void bt_info(const char *fmt, ...);
->>>  __printf(1, 2)
->>> diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
->>> index a8ba752732c9..9c492730b081 100644
->>> --- a/net/bluetooth/l2cap_sock.c
->>> +++ b/net/bluetooth/l2cap_sock.c
->>> @@ -498,6 +498,7 @@ static int l2cap_sock_getsockopt(struct socket *sock, int level, int optname,
->>>       struct l2cap_chan *chan = l2cap_pi(sk)->chan;
->>>       struct bt_security sec;
->>>       struct bt_power pwr;
->>> +     struct bt_le_conn_param conn_param;
->>>       int len, err = 0;
->>>
->>>       BT_DBG("sk %p", sk);
->>> @@ -514,6 +515,47 @@ static int l2cap_sock_getsockopt(struct socket *sock, int level, int optname,
->>>       lock_sock(sk);
->>>
->>>       switch (optname) {
->>> +     case BT_LE_CONN_PARAM: {
->>> +             struct hci_conn_params *params;
->>> +             struct hci_conn *hcon;
->>> +
->>> +             if (!chan->conn) {
->>> +                     err = -ENOTCONN;
->>> +                     break;
->>> +             }
->>> +
->>> +             hcon = chan->conn->hcon;
->>> +             hci_dev_lock(hcon->hdev);
->>> +
->>> +             params = hci_conn_params_lookup(hcon->hdev,
->>> +                     &hcon->dst, hcon->dst_type);
->>> +
->>> +             memset(&conn_param, 0, sizeof(conn_param));
->>> +             if (params) {
->>> +                     conn_param.min_interval = params->conn_min_interval;
->>> +                     conn_param.max_interval = params->conn_max_interval;
->>> +                     conn_param.latency = params->conn_latency;
->>> +                     conn_param.supervision_timeout =
->>> +                             params->supervision_timeout;
->>> +             } else {
->>> +                     conn_param.min_interval =
->>> +                             chan->conn->hcon->hdev->le_conn_min_interval;
->>> +                     conn_param.max_interval =
->>> +                             chan->conn->hcon->hdev->le_conn_max_interval;
->>> +                     conn_param.latency =
->>> +                             chan->conn->hcon->hdev->le_conn_latency;
->>> +                     conn_param.supervision_timeout =
->>> +                             chan->conn->hcon->hdev->le_supv_timeout;
->>> +             }
->>> +
->>> +             hci_dev_unlock(hcon->hdev);
->>> +
->>> +             len = min_t(unsigned int, len, sizeof(conn_param));
->>> +             if (copy_to_user(optval, (char *) &conn_param, len))
->>> +                     err = -EFAULT;
->>> +
->>> +             break;
->>> +     }
->>>       case BT_SECURITY:
->>>               if (chan->chan_type != L2CAP_CHAN_CONN_ORIENTED &&
->>>                   chan->chan_type != L2CAP_CHAN_FIXED &&
->>> @@ -746,6 +788,7 @@ static int l2cap_sock_setsockopt(struct socket *sock, int level, int optname,
->>>       struct l2cap_chan *chan = l2cap_pi(sk)->chan;
->>>       struct bt_security sec;
->>>       struct bt_power pwr;
->>> +     struct bt_le_conn_param conn_param;
->>>       struct l2cap_conn *conn;
->>>       int len, err = 0;
->>>       u32 opt;
->>> @@ -761,6 +804,61 @@ static int l2cap_sock_setsockopt(struct socket *sock, int level, int optname,
->>>       lock_sock(sk);
->>>
->>>       switch (optname) {
->>> +     case BT_LE_CONN_PARAM: {
->>> +             struct hci_conn_params *hci_param;
->>> +             struct hci_conn *hcon;
->>> +
->>> +             len = min_t(unsigned int, sizeof(conn_param), optlen);
->>> +             if (copy_from_user((char *) &conn_param, optval, len)) {
->>> +                     err = -EFAULT;
->>> +                     break;
->>> +             }
->>> +
->>> +             if (!chan->conn) {
->>> +                     err = -ENOTCONN;
->>> +                     break;
->>> +             }
->>> +
->>> +             if (hci_check_conn_params(conn_param.min_interval,
->>> +                     conn_param.max_interval, conn_param.latency,
->>> +                     conn_param.supervision_timeout) < 0) {
->>> +                     err = -EINVAL;
->>> +                     BT_ERR("Ignoring invalid connection parameters");
->>> +                     break;
->>> +             }
->>> +
->>> +             hcon = chan->conn->hcon;
->>> +
->>> +             hci_dev_lock(hcon->hdev);
->>> +
->>> +             hci_conn_params_clear_disabled(hcon->hdev);
->>> +
->>> +             hci_param = hci_conn_params_add(hcon->hdev,
->>> +                     &hcon->dst, hcon->dst_type);
->>> +             if (!hci_param) {
->>> +                     err = -ENOMEM;
->>> +                     BT_ERR("Failed to add connection parameters");
->>> +                     hci_dev_unlock(hcon->hdev);
->>> +                     break;
->>> +             }
->>> +
->>> +             hci_param->conn_min_interval = conn_param.min_interval;
->>> +             hci_param->conn_max_interval = conn_param.max_interval;
->>> +             hci_param->conn_latency = conn_param.latency;
->>> +             hci_param->supervision_timeout = conn_param.supervision_timeout;
->>> +
->>> +             hci_dev_unlock(hcon->hdev);
->>> +
->>> +             hci_le_conn_update(hcon, conn_param.min_interval,
->>> +                     conn_param.max_interval, conn_param.latency,
->>> +                     conn_param.supervision_timeout);
-> 
-> Does hci_le_conn_update have any logic to mix different intervals,
-> from the looks of this it seems the last request would always win
-> instead what we probably want is to have the most aggressive
-> intervals, latency and timeout (or actually perhaps the most relaxed
-> timeout). Btw, in Zephyr we are doing something like this:
+If I run bluetoothd in the foreground with both the -E and debug
+option, this is what I see when I start my client app:
 
-No, this simply sends a HCI command to the controller and saves the
-parameters in cache.
-
-> 
-> /*
-> * If remote does not support LL Connection Parameters Request
-> * Procedure
-> */
-> if ((conn->role == BT_HCI_ROLE_SLAVE) &&
->    !BT_FEAT_LE_CONN_PARAM_REQ_PROC(conn->le.features)) {
-> return bt_l2cap_update_conn_param(conn, param);
-> 
-> We should have something similar here.
-
-In this case, if it is HCI_ROLE_MASTER it will not be able to update?
-
-What is BT_FEAT_LE_CONN_PARAM_REQ_PROC() doing?
-
-Ideally we should use the this procedure if master and slave supports
-4.1 or greater. So they both are in sync (with the same conn_param) right?
-
-What is the proper way of doing on a 4.0 then? AFAIK this command is
-supposed to be supported only by the Master. (More below)
-
-> 
->>> +             mgmt_new_conn_param(hcon->hdev,
->>> +                     &hcon->dst, hcon->dst_type,
->>> +                     true, conn_param.min_interval, conn_param.max_interval,
->>> +                     conn_param.latency, conn_param.supervision_timeout);
-> 
-> iirc the parameter can be rejected, also is this a blocking API? Im
-> afraid if we do end up having to update the parameters using L2CAP
-> procedure the MGMT command may only be sent once that finishes, in
-> that case it has to be asynchronous at least from the kernel point of
-> view.
-
-The BT 5.0 says this about the LE Connection Update Complete Event:
-
-Note: The parameter values returned in this event may be different from
-the parameter values provided by the Host through the LE Connection
-Update command (Section 7.8.18)
-
-But on 4.0 it says:
-On a slave, if no connection parameters are updated, then this event
-shall not be issued.
-On a master, this event shall be issued if the Connection_Update command
-was sent.
-
-===
-
-So yes, I agree that the appropriate thing to do is send the MGMT
-command from the event handler, right?
-
-Also, based on the 4.0 spec, how can we trigger the LE Connection Update
-Complete Event as a Slave?
+bluetoothd[2126]: src/profile.c:register_profile() sender :1.20
+bluetoothd[2126]: src/profile.c:create_ext() Created "myRemoteControlProfile"
+bluetoothd[2126]: src/profile.c:ext_device_probe()
+myRemoteControlProfile probed with UUID
+119649b6-b656-22ae-e611-ba85a04effc5
+bluetoothd[2126]: src/service.c:change_state() 0x950d0: device
+24:71:89:09:AD:09 profile myRemoteControlProfile state changed:
+unavailable -> disconnected (0)
 
 
-> 
->>> +             break;
->>> +     }
->>> +
->>>       case BT_SECURITY:
->>>               if (chan->chan_type != L2CAP_CHAN_CONN_ORIENTED &&
->>>                   chan->chan_type != L2CAP_CHAN_FIXED &&
->>>
->>
->> --
->> Felipe
-> 
-> 
-> 
+That's all that happens.  "myRemoteControlProfile" is the name of the
+profile I registered with Bluez,
+"119649b6-b656-22ae-e611-ba85a04effc5" is the UUID that I passed in
+the RegisterProfile call and 24:71:89:09:AD:09 is the GATT server I'm
+trying to interact with, so BlueZ seems to know that this remote
+device provides the service I'm looking for.  When I watch on the
+server device, I never see BlueZ connecting to it.  Isn't BlueZ
+supposed to automatically connect to a device when it sees that the
+device offers the service that I passed in RegisterProfile?  Why don't
+I get a NewConnection method call?  What does it mean that my
+registered profile never gets past the "disconnected" state?  I know
+that the GATT API was still considered experimental in BlueZ 5.19;
+should I even expect this to work?  Thanks!
 
--- 
-Felipe
-
---------------92DE48F821A57AD1F5A6B9FE
-Content-Type: application/pgp-keys;
- name="0x92698E6A.asc"
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: attachment;
- filename="0x92698E6A.asc"
-
------BEGIN PGP PUBLIC KEY BLOCK-----
-
-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
-SkAyCfQaSw=3D=3D
-=3DJwBB
------END PGP PUBLIC KEY BLOCK-----
-
---------------92DE48F821A57AD1F5A6B9FE--
+- Dave Beal
+  dbeal@cardinalpeak.com
+  Cardinal Peak, LLC
