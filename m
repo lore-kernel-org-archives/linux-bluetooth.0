@@ -2,62 +2,38 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: patrik.flykt@linux.intel.com, aar@pengutronix.de
-Subject: [PATCH 4/5] ipv6: addrconf: fix 48 bit 6lowpan autoconfiguration
-Date: Thu,  9 Feb 2017 16:55:50 +0200
-Message-Id: <20170209145551.12747-5-luiz.dentz@gmail.com>
-In-Reply-To: <20170209145551.12747-1-luiz.dentz@gmail.com>
-References: <20170209145551.12747-1-luiz.dentz@gmail.com>
+Subject: [PATCH 0/5] Bluetooth: 6LoWPAN: Fix lladdr length
+Date: Thu,  9 Feb 2017 16:55:46 +0200
+Message-Id: <20170209145551.12747-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Alexander Aring <aar@pengutronix.de>
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This patch adds support for 48 bit 6LoWPAN address length
-autoconfiguration which is the case for BTLE 6LoWPAN.
+These patches fixes lladdr length to be 6 bytes long and not 8 which cause
+neighbor advertisement to be sent with wrong lladdr including FF:FE filler
+bytes for eui64.
 
-Signed-off-by: Alexander Aring <aar@pengutronix.de>
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
----
- net/ipv6/addrconf.c | 17 ++++++++++++-----
- 1 file changed, 12 insertions(+), 5 deletions(-)
+Note: This does not fix some of the existing crashes which I hope to address
+in a different set.
 
-diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
-index ac9bd56..dede33f 100644
---- a/net/ipv6/addrconf.c
-+++ b/net/ipv6/addrconf.c
-@@ -2050,12 +2050,19 @@ static void addrconf_leave_anycast(struct inet6_ifaddr *ifp)
- 	__ipv6_dev_ac_dec(ifp->idev, &addr);
- }
- 
--static int addrconf_ifid_eui64(u8 *eui, struct net_device *dev)
-+static int addrconf_ifid_6lowpan(u8 *eui, struct net_device *dev)
- {
--	if (dev->addr_len != EUI64_ADDR_LEN)
-+	switch (dev->addr_len) {
-+	case ETH_ALEN:
-+		return addrconf_ifid_eui48(eui, dev);
-+	case EUI64_ADDR_LEN:
-+		memcpy(eui, dev->dev_addr, EUI64_ADDR_LEN);
-+		eui[0] ^= 2;
-+		break;
-+	default:
- 		return -1;
--	memcpy(eui, dev->dev_addr, EUI64_ADDR_LEN);
--	eui[0] ^= 2;
-+	}
-+
- 	return 0;
- }
- 
-@@ -2146,7 +2153,7 @@ static int ipv6_generate_eui64(u8 *eui, struct net_device *dev)
- 	case ARPHRD_IPGRE:
- 		return addrconf_ifid_gre(eui, dev);
- 	case ARPHRD_6LOWPAN:
--		return addrconf_ifid_eui64(eui, dev);
-+		return addrconf_ifid_6lowpan(eui, dev);
- 	case ARPHRD_IEEE1394:
- 		return addrconf_ifid_ieee1394(eui, dev);
- 	case ARPHRD_TUNNEL6:
+Alexander Aring (2):
+  6lowpan: iphc: override l2 packet information
+  ipv6: addrconf: fix 48 bit 6lowpan autoconfiguration
+
+Luiz Augusto von Dentz (1):
+  6lowpan: Use netdev addr_len to determine lladdr len
+
+Patrik Flykt (2):
+  bluetooth: Set 6 byte device addresses
+  6lowpan: Set MAC address lenght according to LOWPAN_LLTYPE
+
+ net/6lowpan/core.c      | 11 ++++++++++-
+ net/6lowpan/iphc.c      | 25 ++++++++++++++++++++++--
+ net/bluetooth/6lowpan.c | 52 +++++++++++++------------------------------------
+ net/ipv6/addrconf.c     | 17 +++++++++++-----
+ 4 files changed, 58 insertions(+), 47 deletions(-)
+
 -- 
 2.9.3
 
