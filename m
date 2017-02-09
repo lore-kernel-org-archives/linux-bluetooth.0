@@ -1,48 +1,87 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: "Felipe F. Tonello" <eu@felipetonello.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 BlueZ 2/2] profiles/midi: Moved MIDI UUIDs to library header
-Date: Thu,  9 Feb 2017 14:55:49 +0000
-Message-Id: <20170209145549.17542-3-eu@felipetonello.com>
-In-Reply-To: <20170209145549.17542-1-eu@felipetonello.com>
-References: <20170209145549.17542-1-eu@felipetonello.com>
+Cc: patrik.flykt@linux.intel.com, aar@pengutronix.de
+Subject: [PATCH 1/5] bluetooth: Set 6 byte device addresses
+Date: Thu,  9 Feb 2017 16:55:47 +0200
+Message-Id: <20170209145551.12747-2-luiz.dentz@gmail.com>
+In-Reply-To: <20170209145551.12747-1-luiz.dentz@gmail.com>
+References: <20170209145551.12747-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This allows other users of libmidi to consistently use MIDI UUIDs.
----
- profiles/midi/libmidi.h | 3 +++
- profiles/midi/midi.c    | 3 ---
- 2 files changed, 3 insertions(+), 3 deletions(-)
+From: Patrik Flykt <patrik.flykt@linux.intel.com>
 
-diff --git a/profiles/midi/libmidi.h b/profiles/midi/libmidi.h
-index 7078fb4a690b..9d94065b60c0 100644
---- a/profiles/midi/libmidi.h
-+++ b/profiles/midi/libmidi.h
-@@ -29,6 +29,9 @@
- #include <stdbool.h>
- #include <alsa/asoundlib.h>
+Set BTLE MAC addresses that are 6 bytes long and not 8 bytes
+that are used in other places with 6lowpan.
+
+Signed-off-by: Patrik Flykt <patrik.flykt@linux.intel.com>
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+---
+ net/bluetooth/6lowpan.c | 19 ++++++++-----------
+ 1 file changed, 8 insertions(+), 11 deletions(-)
+
+diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
+index 1904a93..1456b01 100644
+--- a/net/bluetooth/6lowpan.c
++++ b/net/bluetooth/6lowpan.c
+@@ -80,6 +80,8 @@ struct lowpan_btle_dev {
+ 	struct delayed_work notify_peers;
+ };
  
-+#define MIDI_UUID "03B80E5A-EDE8-4B33-A751-6CE34EC4C700"
-+#define MIDI_IO_UUID "7772E5DB-3868-4112-A1A9-F2669D106BF3"
++static void set_addr(u8 *eui, u8 *addr, u8 addr_type);
 +
- #define MIDI_MAX_TIMESTAMP 8191
- #define MIDI_MSG_MAX_SIZE 12
- #define MIDI_SYSEX_MAX_SIZE (4 * 1024)
-diff --git a/profiles/midi/midi.c b/profiles/midi/midi.c
-index d12b4cf29818..fdc1c007da1c 100644
---- a/profiles/midi/midi.c
-+++ b/profiles/midi/midi.c
-@@ -53,9 +53,6 @@
+ static inline struct lowpan_btle_dev *
+ lowpan_btle_dev(const struct net_device *netdev)
+ {
+@@ -272,9 +274,10 @@ static int give_skb_to_upper(struct sk_buff *skb, struct net_device *dev)
+ static int iphc_decompress(struct sk_buff *skb, struct net_device *netdev,
+ 			   struct l2cap_chan *chan)
+ {
+-	const u8 *saddr, *daddr;
++	const u8 *saddr;
+ 	struct lowpan_btle_dev *dev;
+ 	struct lowpan_peer *peer;
++	unsigned char eui64_daddr[EUI64_ADDR_LEN];
  
- #include "libmidi.h"
+ 	dev = lowpan_btle_dev(netdev);
  
--#define MIDI_UUID "03B80E5A-EDE8-4B33-A751-6CE34EC4C700"
--#define MIDI_IO_UUID "7772E5DB-3868-4112-A1A9-F2669D106BF3"
+@@ -285,9 +288,9 @@ static int iphc_decompress(struct sk_buff *skb, struct net_device *netdev,
+ 		return -EINVAL;
+ 
+ 	saddr = peer->eui64_addr;
+-	daddr = dev->netdev->dev_addr;
++	set_addr(&eui64_daddr[0], chan->src.b, chan->src_type);
+ 
+-	return lowpan_header_decompress(skb, netdev, daddr, saddr);
++	return lowpan_header_decompress(skb, netdev, &eui64_daddr, saddr);
+ }
+ 
+ static int recv_pkt(struct sk_buff *skb, struct net_device *dev,
+@@ -681,13 +684,6 @@ static void set_addr(u8 *eui, u8 *addr, u8 addr_type)
+ 	BT_DBG("type %d addr %*phC", addr_type, 8, eui);
+ }
+ 
+-static void set_dev_addr(struct net_device *netdev, bdaddr_t *addr,
+-		         u8 addr_type)
+-{
+-	netdev->addr_assign_type = NET_ADDR_PERM;
+-	set_addr(netdev->dev_addr, addr->b, addr_type);
+-}
 -
- struct midi {
- 	struct btd_device *dev;
- 	struct gatt_db *db;
+ static void ifup(struct net_device *netdev)
+ {
+ 	int err;
+@@ -803,7 +799,8 @@ static int setup_netdev(struct l2cap_chan *chan, struct lowpan_btle_dev **dev)
+ 	if (!netdev)
+ 		return -ENOMEM;
+ 
+-	set_dev_addr(netdev, &chan->src, chan->src_type);
++	netdev->addr_assign_type = NET_ADDR_PERM;
++	baswap((void *)netdev->dev_addr, &chan->src);
+ 
+ 	netdev->netdev_ops = &netdev_ops;
+ 	SET_NETDEV_DEV(netdev, &chan->conn->hcon->hdev->dev);
 -- 
-2.11.1
+2.9.3
 
