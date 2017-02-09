@@ -1,40 +1,101 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Bridger Maxwell <bridger.maxwell@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 10.2 \(3259\))
-Subject: Scanning for advertising packets more often
-Message-Id: <508E30B7-76A0-4589-8D2D-5C736695E4C4@gmail.com>
-Date: Wed, 8 Feb 2017 21:09:44 -0500
+From: mcchou@chromium.org
 To: linux-bluetooth@vger.kernel.org
+Cc: luiz.von.dentz@intel.com, josephsih@chromium.org,
+        ortuno@chromium.org, Eric Caruso <ejcaruso@chromium.org>
+Subject: [PATCH] device: Add device type property
+Date: Wed,  8 Feb 2017 17:05:08 -0800
+Message-Id: <20170209010508.150518-1-mcchou@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+From: Eric Caruso <ejcaruso@chromium.org>
 
-I=E2=80=99m trying to make a Bluetooth LE peripheral that will work =
-without pairing. Instead, multiple receivers can listen for events by =
-listening for changes in the advertising packet. I=E2=80=99ve got the =
-peripheral configured to broadcast every 100ms, but the receiver running =
-Bluez only gets updates about once per second.
+This allows us to gather information about whether a device
+supports BR/EDR, BLE, or both. It appears as DBus Property
+"Type" on the org.bluez.Device1 interface.
 
-Is there a way to configure Bluez to get advertising packets scanned =
-more often? I=E2=80=99d also like to turn off any duplicate filtering.
+This is tested with the following steps:
+Scan for devices and request the type property of a specific remote device,
+using:
+  # dbus-send --print-reply --system --dest=org.bluez <obj path> \
+    org.freedesktop.DBus.Properties.Get \
+      string:org.bluez.Device1 string:Type
+or request the type of all remote devices, using:
+  # dbus-send --print-reply --system --dest=org.bluez / \
+    org.freedesktop.DBus.ObjectManager.GetManagedObjects | \
+      grep -B1 -A2 Type
+and check for "BR/EDR", "LE", and "DUAL"
+---
+ doc/device-api.txt |  5 +++++
+ src/device.c       | 31 +++++++++++++++++++++++++++++++
+ 2 files changed, 36 insertions(+)
 
-Additionally, the peripheral broadcasts two types of advertising =
-packets. One type is from the builtin firmware and I don=E2=80=99t care =
-about. The other type is my custom advertising packet. Both of these =
-have the same MAC address. I believe Bluez is filtering duplicates from =
-the same address within each 1 second window. I am getting a random =
-sampling of either the firmware advertising packet or my custom =
-advertising packet once per second.
+diff --git a/doc/device-api.txt b/doc/device-api.txt
+index 13b28818e..2f3100cd5 100644
+--- a/doc/device-api.txt
++++ b/doc/device-api.txt
+@@ -141,6 +141,11 @@ Properties	string Address [readonly]
 
-I=E2=80=99m using Pybluez[ble] to use Bluez. This is the scratch script =
-I have running so far: =
-https://gist.github.com/bridger/83fc2e9c60fd07d925b0bec80c47acab I tried =
-using LE_SET_SCAN_PARAMETERS to change the scan interval and window but =
-this didn=E2=80=99t seem to have an effect.
+ 			The Bluetooth class of device of the remote device.
 
-If this is a bad idea, let me know. I liked the simplicity of not =
-pairing but maybe I=E2=80=99m headed in the wrong direction.
++		string Type [readonly, optional]
++
++			The carriers supported by this remote device. If it
++			exists, it can be one of "BR/EDR", "LE", or "DUAL".
++
+ 		uint16 Appearance [readonly, optional]
 
-- Bridger Maxwell=
+ 			External appearance of device, as found on GAP service.
+diff --git a/src/device.c b/src/device.c
+index 8693eb826..14c62e127 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -788,6 +788,35 @@ static gboolean dev_property_get_class(const GDBusPropertyTable *property,
+ 	return TRUE;
+ }
+
++static gboolean dev_property_exists_type(const GDBusPropertyTable *property,
++								void *data)
++{
++	struct btd_device *device = data;
++
++	return device->bredr || device->le;
++}
++
++static gboolean dev_property_get_type(const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *data)
++{
++	struct btd_device *device = data;
++	const char *type;
++
++	if (!device->bredr && !device->le)
++		return FALSE;
++
++	if (!device->bredr)
++		type = "LE";
++	else if (!device->le)
++		type = "BR/EDR";
++	else
++		type = "DUAL";
++
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &type);
++
++	return TRUE;
++}
++
+ static gboolean get_appearance(const GDBusPropertyTable *property, void *data,
+ 							uint16_t *appearance)
+ {
+@@ -2541,6 +2570,8 @@ static const GDBusPropertyTable device_properties[] = {
+ 	{ "Alias", "s", dev_property_get_alias, dev_property_set_alias },
+ 	{ "Class", "u", dev_property_get_class, NULL,
+ 					dev_property_exists_class },
++	{ "Type", "s", dev_property_get_type, NULL,
++					dev_property_exists_type },
+ 	{ "Appearance", "q", dev_property_get_appearance, NULL,
+ 					dev_property_exists_appearance },
+ 	{ "Icon", "s", dev_property_get_icon, NULL,
+--
+2.11.0.483.g087da7b7c-goog
+
