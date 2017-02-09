@@ -1,1563 +1,405 @@
-Return-Path: <larry.finger@gmail.com>
-Sender: Larry Finger <larry.finger@gmail.com>
-From: Larry Finger <Larry.Finger@lwfinger.net>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Alex Lu <alex_lu@realsil.com.cn>,
-	linux-kernel@vger.kernel.org,
-	Larry Finger <Larry.Finger@lwfinger.net>
-Subject: [PATCH] rtlbt: Add Realtek Bluetooth profiling support
-Date: Thu,  9 Feb 2017 12:23:41 -0600
-Message-Id: <20170209182341.4977-1-Larry.Finger@lwfinger.net>
+Return-Path: <eu@felipetonello.com>
+Subject: Re: [RFC][PATCH BlueZ] Bluetooth: L2CAP: Add BT_LE_CONN_PARAM socket
+ option
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+References: <20170203213604.2697-1-eu@felipetonello.com>
+ <f1d0214e-813c-b00f-198b-4a24c4a8adb1@felipetonello.com>
+ <CABBYNZ+3zaBWQa_V9ASdHq7OA5is4HJ=H9Y=ZBRgCom1xMa-Mw@mail.gmail.com>
+ <8fa5934b-bdcd-4a7e-52da-62aa9cd138b8@felipetonello.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+ Marcel Holtmann <marcel@holtmann.org>,
+ "Von Dentz, Luiz" <luiz.von.dentz@intel.com>
+From: Felipe Ferreri Tonello <eu@felipetonello.com>
+Message-ID: <f8cc4423-5b22-a4d4-f350-898f9574f29d@felipetonello.com>
+Date: Thu, 9 Feb 2017 17:48:51 +0000
+MIME-Version: 1.0
+In-Reply-To: <8fa5934b-bdcd-4a7e-52da-62aa9cd138b8@felipetonello.com>
+Content-Type: multipart/mixed;
+ boundary="------------93427BBE98DC15D0693BBB74"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Alex Lu <alex_lu@realsil.com.cn>
+This is a multi-part message in MIME format.
+--------------93427BBE98DC15D0693BBB74
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-Add the Realtek Bluetooth profile profiling support to create
-profile information, which helps the firmware optimize transfer
-priority and balance the transmissions for multiple profiles.
+Hi Luiz,
 
-Signed-off-by: Alex Lu <alex_lu@realsil.com.cn>
-Signed-off-by: Larry Finger <Larry.Finger@lwfinger.net>
----
- drivers/bluetooth/Kconfig    |   16 +
- drivers/bluetooth/Makefile   |    1 +
- drivers/bluetooth/btusb.c    |   12 +
- drivers/bluetooth/rtl_btpf.c | 1249 ++++++++++++++++++++++++++++++++++++++++++
- drivers/bluetooth/rtl_btpf.h |  184 +++++++
- 5 files changed, 1462 insertions(+)
- create mode 100644 drivers/bluetooth/rtl_btpf.c
- create mode 100644 drivers/bluetooth/rtl_btpf.h
+On 09/02/17 17:14, Felipe Ferreri Tonello wrote:
+> Hi Luiz,
+> 
+> On 08/02/17 09:34, Luiz Augusto von Dentz wrote:
+>> Hi Felipe,
+>>
+>> On Wed, Feb 8, 2017 at 1:04 AM, Felipe Ferreri Tonello
+>> <eu@felipetonello.com> wrote:
+>>> CC'ed Marcel and Luiz for comments.
+>>>
+>>> I have implemented and tested the functionality in the shared/att.[ch]
+>>> lib too, but I am waiting for your comments on the approach first.
+>>>
+>>> On 03/02/17 21:36, Felipe F. Tonello wrote:
+>>>> There is a need for certain LE profiles (MIDI for example)to change the
+>>>> current connection's parameters. In order to do that, this patch
+>>>> introduces a new BT_LE_CONN_PARAM socket option for SOL_BLUETOOTH
+>>>> protocol which allow user-space l2cap sockets to update the current
+>>>> connection.
+>>>>
+>>>> This option will also send a MGMT_EV_NEW_CONN_PARAM event with the
+>>>> store_hint set so the user-space application can store the connection
+>>>> parameters for persistence reasons.
+>>>>
+>>>> Signed-off-by: Felipe F. Tonello <eu@felipetonello.com>
+>>>> ---
+>>>>  include/net/bluetooth/bluetooth.h |  8 ++++
+>>>>  net/bluetooth/l2cap_sock.c        | 98 +++++++++++++++++++++++++++++++++++++++
+>>>>  2 files changed, 106 insertions(+)
+>>>>
+>>>> diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+>>>> index 01487192f628..ce5b3abd3b27 100644
+>>>> --- a/include/net/bluetooth/bluetooth.h
+>>>> +++ b/include/net/bluetooth/bluetooth.h
+>>>> @@ -122,6 +122,14 @@ struct bt_voice {
+>>>>  #define BT_SNDMTU            12
+>>>>  #define BT_RCVMTU            13
+>>>>
+>>>> +#define BT_LE_CONN_PARAM     14
+>>>> +struct bt_le_conn_param {
+>>>> +     __u16 min_interval;
+>>>> +     __u16 max_interval;
+>>>> +     __u16 latency;
+>>>> +     __u16 supervision_timeout;
+>>>> +};
+>>>> +
+>>>>  __printf(1, 2)
+>>>>  void bt_info(const char *fmt, ...);
+>>>>  __printf(1, 2)
+>>>> diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+>>>> index a8ba752732c9..9c492730b081 100644
+>>>> --- a/net/bluetooth/l2cap_sock.c
+>>>> +++ b/net/bluetooth/l2cap_sock.c
+>>>> @@ -498,6 +498,7 @@ static int l2cap_sock_getsockopt(struct socket *sock, int level, int optname,
+>>>>       struct l2cap_chan *chan = l2cap_pi(sk)->chan;
+>>>>       struct bt_security sec;
+>>>>       struct bt_power pwr;
+>>>> +     struct bt_le_conn_param conn_param;
+>>>>       int len, err = 0;
+>>>>
+>>>>       BT_DBG("sk %p", sk);
+>>>> @@ -514,6 +515,47 @@ static int l2cap_sock_getsockopt(struct socket *sock, int level, int optname,
+>>>>       lock_sock(sk);
+>>>>
+>>>>       switch (optname) {
+>>>> +     case BT_LE_CONN_PARAM: {
+>>>> +             struct hci_conn_params *params;
+>>>> +             struct hci_conn *hcon;
+>>>> +
+>>>> +             if (!chan->conn) {
+>>>> +                     err = -ENOTCONN;
+>>>> +                     break;
+>>>> +             }
+>>>> +
+>>>> +             hcon = chan->conn->hcon;
+>>>> +             hci_dev_lock(hcon->hdev);
+>>>> +
+>>>> +             params = hci_conn_params_lookup(hcon->hdev,
+>>>> +                     &hcon->dst, hcon->dst_type);
+>>>> +
+>>>> +             memset(&conn_param, 0, sizeof(conn_param));
+>>>> +             if (params) {
+>>>> +                     conn_param.min_interval = params->conn_min_interval;
+>>>> +                     conn_param.max_interval = params->conn_max_interval;
+>>>> +                     conn_param.latency = params->conn_latency;
+>>>> +                     conn_param.supervision_timeout =
+>>>> +                             params->supervision_timeout;
+>>>> +             } else {
+>>>> +                     conn_param.min_interval =
+>>>> +                             chan->conn->hcon->hdev->le_conn_min_interval;
+>>>> +                     conn_param.max_interval =
+>>>> +                             chan->conn->hcon->hdev->le_conn_max_interval;
+>>>> +                     conn_param.latency =
+>>>> +                             chan->conn->hcon->hdev->le_conn_latency;
+>>>> +                     conn_param.supervision_timeout =
+>>>> +                             chan->conn->hcon->hdev->le_supv_timeout;
+>>>> +             }
+>>>> +
+>>>> +             hci_dev_unlock(hcon->hdev);
+>>>> +
+>>>> +             len = min_t(unsigned int, len, sizeof(conn_param));
+>>>> +             if (copy_to_user(optval, (char *) &conn_param, len))
+>>>> +                     err = -EFAULT;
+>>>> +
+>>>> +             break;
+>>>> +     }
+>>>>       case BT_SECURITY:
+>>>>               if (chan->chan_type != L2CAP_CHAN_CONN_ORIENTED &&
+>>>>                   chan->chan_type != L2CAP_CHAN_FIXED &&
+>>>> @@ -746,6 +788,7 @@ static int l2cap_sock_setsockopt(struct socket *sock, int level, int optname,
+>>>>       struct l2cap_chan *chan = l2cap_pi(sk)->chan;
+>>>>       struct bt_security sec;
+>>>>       struct bt_power pwr;
+>>>> +     struct bt_le_conn_param conn_param;
+>>>>       struct l2cap_conn *conn;
+>>>>       int len, err = 0;
+>>>>       u32 opt;
+>>>> @@ -761,6 +804,61 @@ static int l2cap_sock_setsockopt(struct socket *sock, int level, int optname,
+>>>>       lock_sock(sk);
+>>>>
+>>>>       switch (optname) {
+>>>> +     case BT_LE_CONN_PARAM: {
+>>>> +             struct hci_conn_params *hci_param;
+>>>> +             struct hci_conn *hcon;
+>>>> +
+>>>> +             len = min_t(unsigned int, sizeof(conn_param), optlen);
+>>>> +             if (copy_from_user((char *) &conn_param, optval, len)) {
+>>>> +                     err = -EFAULT;
+>>>> +                     break;
+>>>> +             }
+>>>> +
+>>>> +             if (!chan->conn) {
+>>>> +                     err = -ENOTCONN;
+>>>> +                     break;
+>>>> +             }
+>>>> +
+>>>> +             if (hci_check_conn_params(conn_param.min_interval,
+>>>> +                     conn_param.max_interval, conn_param.latency,
+>>>> +                     conn_param.supervision_timeout) < 0) {
+>>>> +                     err = -EINVAL;
+>>>> +                     BT_ERR("Ignoring invalid connection parameters");
+>>>> +                     break;
+>>>> +             }
+>>>> +
+>>>> +             hcon = chan->conn->hcon;
+>>>> +
+>>>> +             hci_dev_lock(hcon->hdev);
+>>>> +
+>>>> +             hci_conn_params_clear_disabled(hcon->hdev);
+>>>> +
+>>>> +             hci_param = hci_conn_params_add(hcon->hdev,
+>>>> +                     &hcon->dst, hcon->dst_type);
+>>>> +             if (!hci_param) {
+>>>> +                     err = -ENOMEM;
+>>>> +                     BT_ERR("Failed to add connection parameters");
+>>>> +                     hci_dev_unlock(hcon->hdev);
+>>>> +                     break;
+>>>> +             }
+>>>> +
+>>>> +             hci_param->conn_min_interval = conn_param.min_interval;
+>>>> +             hci_param->conn_max_interval = conn_param.max_interval;
+>>>> +             hci_param->conn_latency = conn_param.latency;
+>>>> +             hci_param->supervision_timeout = conn_param.supervision_timeout;
+>>>> +
+>>>> +             hci_dev_unlock(hcon->hdev);
+>>>> +
+>>>> +             hci_le_conn_update(hcon, conn_param.min_interval,
+>>>> +                     conn_param.max_interval, conn_param.latency,
+>>>> +                     conn_param.supervision_timeout);
+>>
+>> Does hci_le_conn_update have any logic to mix different intervals,
+>> from the looks of this it seems the last request would always win
+>> instead what we probably want is to have the most aggressive
+>> intervals, latency and timeout (or actually perhaps the most relaxed
+>> timeout). Btw, in Zephyr we are doing something like this:
+> 
+> No, this simply sends a HCI command to the controller and saves the
+> parameters in cache.
+> 
+>>
+>> /*
+>> * If remote does not support LL Connection Parameters Request
+>> * Procedure
+>> */
+>> if ((conn->role == BT_HCI_ROLE_SLAVE) &&
+>>    !BT_FEAT_LE_CONN_PARAM_REQ_PROC(conn->le.features)) {
+>> return bt_l2cap_update_conn_param(conn, param);
+>>
+>> We should have something similar here.
+> 
+> In this case, if it is HCI_ROLE_MASTER it will not be able to update?
+> 
+> What is BT_FEAT_LE_CONN_PARAM_REQ_PROC() doing?
+> 
+> Ideally we should use the this procedure if master and slave supports
+> 4.1 or greater. So they both are in sync (with the same conn_param) right?
+> 
+> What is the proper way of doing on a 4.0 then? AFAIK this command is
+> supposed to be supported only by the Master. (More below)
+> 
+>>
+>>>> +             mgmt_new_conn_param(hcon->hdev,
+>>>> +                     &hcon->dst, hcon->dst_type,
+>>>> +                     true, conn_param.min_interval, conn_param.max_interval,
+>>>> +                     conn_param.latency, conn_param.supervision_timeout);
+>>
+>> iirc the parameter can be rejected, also is this a blocking API? Im
+>> afraid if we do end up having to update the parameters using L2CAP
+>> procedure the MGMT command may only be sent once that finishes, in
+>> that case it has to be asynchronous at least from the kernel point of
+>> view.
+> 
+> The BT 5.0 says this about the LE Connection Update Complete Event:
+> 
+> Note: The parameter values returned in this event may be different from
+> the parameter values provided by the Host through the LE Connection
+> Update command (Section 7.8.18)
+> 
+> But on 4.0 it says:
+> On a slave, if no connection parameters are updated, then this event
+> shall not be issued.
+> On a master, this event shall be issued if the Connection_Update command
+> was sent.
+> 
+> ===
+> 
+> So yes, I agree that the appropriate thing to do is send the MGMT
+> command from the event handler, right?
 
-diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
-index 3cc9bff..354f852 100644
---- a/drivers/bluetooth/Kconfig
-+++ b/drivers/bluetooth/Kconfig
-@@ -14,6 +14,9 @@ config BT_RTL
- 	tristate
- 	select FW_LOADER
- 
-+config BT_RTL_BTPF
-+	tristate
-+
- config BT_QCA
- 	tristate
- 	select FW_LOADER
-@@ -52,6 +55,19 @@ config BT_HCIBTUSB_RTL
- 
- 	  Say Y here to compile support for Realtek protocol.
- 
-+config BT_HCIBTUSB_RTL_BTPF
-+	bool "Realtek profiling support"
-+	depends on BT_HCIBTUSB && BT_RTL
-+	select BT_RTL_BTPF
-+	default y
-+	help
-+	  This parameter adds Realtek Bluetooth profile profiling support
-+	  that enables the gathering of profile information, which helps
-+	  the firmware optimize transfer priority and balance the transmissions
-+	  for multiple profiles.
-+
-+	  Say Y here to compile support for Realtek profiling.
-+
- config BT_HCIBTSDIO
- 	tristate "HCI SDIO driver"
- 	depends on MMC
-diff --git a/drivers/bluetooth/Makefile b/drivers/bluetooth/Makefile
-index 8062718..a3dd8a4 100644
---- a/drivers/bluetooth/Makefile
-+++ b/drivers/bluetooth/Makefile
-@@ -23,6 +23,7 @@ obj-$(CONFIG_BT_WILINK)		+= btwilink.o
- obj-$(CONFIG_BT_QCOMSMD)	+= btqcomsmd.o
- obj-$(CONFIG_BT_BCM)		+= btbcm.o
- obj-$(CONFIG_BT_RTL)		+= btrtl.o
-+obj-$(CONFIG_BT_RTL_BTPF)	+= rtl_btpf.o
- obj-$(CONFIG_BT_QCA)		+= btqca.o
- 
- btmrvl-y			:= btmrvl_main.o
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 2f633df..bc1c923 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -33,6 +33,10 @@
- #include "btbcm.h"
- #include "btrtl.h"
- 
-+#ifdef CONFIG_BT_HCIBTUSB_RTL_BTPF
-+#include "rtl_btpf.h"
-+#endif
-+
- #define VERSION "0.8"
- 
- static bool disable_scofix;
-@@ -3023,6 +3027,10 @@ static int btusb_probe(struct usb_interface *intf,
- 
- 	usb_set_intfdata(intf, data);
- 
-+#ifdef CONFIG_BT_HCIBTUSB_RTL_BTPF
-+	rtl_btpf_init();
-+#endif
-+
- 	return 0;
- }
- 
-@@ -3045,6 +3053,10 @@ static void btusb_disconnect(struct usb_interface *intf)
- 	if (data->diag)
- 		usb_set_intfdata(data->diag, NULL);
- 
-+#ifdef CONFIG_BT_HCIBTUSB_RTL_BTPF
-+	rtl_btpf_deinit();
-+#endif
-+
- 	hci_unregister_dev(hdev);
- 
- 	if (intf == data->intf) {
-diff --git a/drivers/bluetooth/rtl_btpf.c b/drivers/bluetooth/rtl_btpf.c
-new file mode 100644
-index 0000000..a2d19b6
---- /dev/null
-+++ b/drivers/bluetooth/rtl_btpf.c
-@@ -0,0 +1,1249 @@
-+/*
-+ *
-+ *  Realtek Bluetooth Profile profiling driver
-+ *
-+ *  Copyright (C) 2015 Realtek Semiconductor Corporation
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ */
-+
-+#include <linux/kernel.h>
-+#include <linux/module.h>
-+#include <linux/init.h>
-+#include <linux/slab.h>
-+#include <linux/types.h>
-+#include <linux/sched.h>
-+#include <linux/errno.h>
-+#include <linux/skbuff.h>
-+#include <linux/usb.h>
-+#include <linux/dcache.h>
-+#include <linux/version.h>
-+#include <linux/skbuff.h>
-+#include <net/bluetooth/bluetooth.h>
-+#include <net/bluetooth/hci_core.h>
-+#include <net/bluetooth/l2cap.h>
-+#include <net/bluetooth/hci_mon.h>
-+#include "rtl_btpf.h"
-+
-+#define VERSION "0.1"
-+
-+#define BTPF_CMD_MAXLEN		64
-+
-+
-+static struct rtl_btpf *rtl_btpf;
-+
-+static int psm_to_profile(u16 psm)
-+{
-+	switch (psm) {
-+	case PSM_AVCTP:
-+	case PSM_SDP:
-+		return -1; /* ignore */
-+
-+	case PSM_HID:
-+	case PSM_HID_INT:
-+		return PROFILE_HID;
-+
-+	case PSM_AVDTP:
-+		return PROFILE_A2DP;
-+
-+	case PSM_PAN:
-+	case PSM_OPP:
-+	case PSM_FTP:
-+	case PSM_BIP:
-+	case PSM_RFCOMM:
-+		return PROFILE_PAN;
-+
-+	default:
-+		return PROFILE_PAN;
-+	}
-+}
-+
-+static struct rtl_hci_conn *rtl_hci_conn_lookup(struct rtl_btpf *btpf,
-+						u16 handle)
-+{
-+	struct list_head *head = &btpf->conn_list;
-+	struct list_head *p, *n;
-+	struct rtl_hci_conn *conn;
-+
-+	list_for_each_safe(p, n, head) {
-+		conn = list_entry(p, struct rtl_hci_conn, list);
-+		if ((handle & 0xfff) == conn->handle)
-+			return conn;
-+	}
-+
-+	return NULL;
-+}
-+
-+static void rtl_hci_conn_list_purge(struct rtl_btpf *btpf)
-+{
-+	struct list_head *head = &btpf->conn_list;
-+	struct list_head *p, *n;
-+	struct rtl_hci_conn *conn;
-+
-+	list_for_each_safe(p, n, head) {
-+		conn = list_entry(p, struct rtl_hci_conn, list);
-+		if (conn) {
-+			list_del(&conn->list);
-+			kfree(conn);
-+		}
-+	}
-+}
-+
-+static struct rtl_profile *profile_alloc(u16 handle, u16 psm, u8 idx,
-+					 u16 dcid, u16 scid)
-+{
-+	struct rtl_profile *pf;
-+
-+	pf = kzalloc(sizeof(struct rtl_profile), GFP_KERNEL);
-+	if (!pf)
-+		return NULL;
-+
-+	pf->handle = handle;
-+	pf->psm = psm;
-+	pf->scid = scid;
-+	pf->dcid = dcid;
-+	pf->idx = idx;
-+	INIT_LIST_HEAD(&pf->list);
-+
-+	return pf;
-+}
-+
-+static void rtl_profile_list_purge(struct rtl_btpf *btpf)
-+{
-+	struct list_head *head = &btpf->pf_list;
-+	struct list_head *p, *n;
-+	struct rtl_profile *pf;
-+
-+	list_for_each_safe(p, n, head) {
-+		pf = list_entry(p, struct rtl_profile, list);
-+		list_del(&pf->list);
-+		kfree(pf);
-+	}
-+}
-+
-+static struct rtl_profile *rtl_profile_lookup(struct rtl_btpf *btpf,
-+					      struct rtl_profile_id *id)
-+{
-+	struct list_head *head = &btpf->pf_list;
-+	struct list_head *p, *n;
-+	struct rtl_profile *tmp;
-+	u16 handle = id->handle;
-+
-+	if (!id->match_flags) {
-+		rtlbt_warn("%s: no match flags", __func__);
-+		return NULL;
-+	}
-+
-+	list_for_each_safe(p, n, head) {
-+		tmp = list_entry(p, struct rtl_profile, list);
-+
-+		if ((id->match_flags & RTL_PROFILE_MATCH_HANDLE) &&
-+		    (handle & 0xfff) != tmp->handle)
-+			continue;
-+
-+		if ((id->match_flags & RTL_PROFILE_MATCH_SCID) &&
-+		    id->scid != tmp->scid)
-+			continue;
-+
-+		if ((id->match_flags & RTL_PROFILE_MATCH_DCID) &&
-+		    id->dcid != tmp->dcid)
-+			continue;
-+
-+		return tmp;
-+	}
-+
-+	return NULL;
-+}
-+
-+static int hci_cmd_send_to_fw(struct rtl_btpf *btpf, u16 opcode, u8 dlen,
-+			      u8 *data)
-+{
-+	int n = 1 + 3 + dlen;
-+	u8 buff[BTPF_CMD_MAXLEN];
-+	struct kvec iv = { buff, n };
-+	struct msghdr msg;
-+	int ret;
-+
-+	if (!test_bit(BTPF_HCI_SOCK, &btpf->flags) ||
-+	    !test_bit(BTPF_CID_RTL, &btpf->flags))
-+		return -1;
-+
-+	rtlbt_info("%s: opcode 0x%04x", __func__, opcode);
-+	if (n > BTPF_CMD_MAXLEN) {
-+		rtlbt_err("vendor cmd too large");
-+		return -1;
-+	}
-+
-+	buff[0] = HCI_COMMAND_PKT;
-+	buff[1] = opcode & 0xff;
-+	buff[2] = (opcode >> 8) & 0xff;
-+	buff[3] = dlen;
-+	memcpy(buff + 4, data, dlen);
-+
-+	memset(&msg, 0, sizeof(msg));
-+
-+	ret = kernel_sendmsg(btpf->hci_sock, &msg, &iv, 1, n);
-+	if (ret < 0) {
-+		rtlbt_err("sendmsg failed: %d", ret);
-+		return -EAGAIN;
-+	}
-+
-+	return 0;
-+}
-+
-+static void btpf_update_to_controller(struct rtl_btpf *btpf)
-+{
-+	struct list_head *head, *pos, *q;
-+	struct rtl_hci_conn *conn;
-+	u8 handle_num;
-+	u32 buff_sz;
-+	u8 *buff;
-+	u8 *p;
-+
-+	if (!test_bit(BTPF_CID_RTL, &btpf->flags))
-+		return;
-+
-+	head = &btpf->conn_list;
-+	handle_num = 0;
-+	list_for_each_safe(pos, q, head) {
-+		conn = list_entry(pos, struct rtl_hci_conn, list);
-+		if (conn && conn->pf_bits)
-+			handle_num++;
-+	}
-+
-+	buff_sz = 1 + handle_num * 3 + 1;
-+
-+	rtlbt_info("%s: buff_sz %u, handle_num %u", __func__, buff_sz,
-+		   handle_num);
-+
-+	buff = kzalloc(buff_sz, GFP_ATOMIC);
-+	if (!buff)
-+		return;
-+
-+	p = buff;
-+	*p++ = handle_num;
-+	head = &btpf->conn_list;
-+	list_for_each(pos, head) {
-+		conn = list_entry(pos, struct rtl_hci_conn, list);
-+		if (conn && conn->pf_bits) {
-+			put_unaligned_le16(conn->handle, p);
-+			p += 2;
-+			rtlbt_info("%s: handle 0x%04x, pf_bits 0x%02x",
-+				   __func__, conn->handle, conn->pf_bits);
-+			*p++ = conn->pf_bits;
-+			handle_num--;
-+		}
-+		if (!handle_num)
-+			break;
-+	}
-+	*p++ = btpf->pf_state;
-+
-+	rtlbt_info("%s: pf_state 0x%02x", __func__, btpf->pf_state);
-+
-+	hci_cmd_send_to_fw(btpf, HCI_VENDOR_SET_PF_REPORT_CMD, buff_sz, buff);
-+
-+	kfree(buff);
-+}
-+
-+static void update_profile_state(struct rtl_btpf *btpf, u8 idx, u8 busy)
-+{
-+	u8 update = 0;
-+
-+	if (!(btpf->pf_bits & BIT(idx))) {
-+		rtlbt_err("%s: profile(%x) not exist", __func__, idx);
-+		return;
-+	}
-+
-+	if (busy) {
-+		if (!(btpf->pf_state & BIT(idx))) {
-+			update = 1;
-+			btpf->pf_state |= BIT(idx);
-+		}
-+	} else {
-+		if (btpf->pf_state & BIT(idx)) {
-+			update = 1;
-+			btpf->pf_state &= ~BIT(idx);
-+		}
-+	}
-+
-+	if (update) {
-+		rtlbt_info("%s: pf_bits 0x%02x", __func__, btpf->pf_bits);
-+		rtlbt_info("%s: pf_state 0x%02x", __func__, btpf->pf_state);
-+		btpf_update_to_controller(btpf);
-+	}
-+}
-+
-+static void a2dp_do_poll(unsigned long data)
-+{
-+	struct rtl_btpf *btpf = (struct rtl_btpf *)data;
-+
-+	rtlbt_dbg("%s: icount.a2dp %d", __func__, btpf->icount.a2dp);
-+
-+	if (!btpf->icount.a2dp) {
-+		if (btpf->pf_state & BIT(PROFILE_A2DP)) {
-+			rtlbt_info("%s: a2dp state, busy to idle", __func__);
-+			update_profile_state(btpf, PROFILE_A2DP, 0);
-+		}
-+	}
-+
-+	btpf->icount.a2dp = 0;
-+	mod_timer(&btpf->a2dp_timer, jiffies + msecs_to_jiffies(1000));
-+}
-+
-+static void pan_do_poll(unsigned long data)
-+{
-+	struct rtl_btpf *btpf = (struct rtl_btpf *)data;
-+
-+	rtlbt_dbg("%s: icount.pan %d", __func__, btpf->icount.pan);
-+
-+	if (btpf->icount.pan < PAN_PACKET_COUNT) {
-+		if (btpf->pf_state & BIT(PROFILE_PAN)) {
-+			rtlbt_info("%s: pan state, busy to idle", __func__);
-+			update_profile_state(btpf, PROFILE_PAN, 0);
-+		}
-+	} else {
-+		if (!(btpf->pf_state & BIT(PROFILE_PAN))) {
-+			rtlbt_info("%s: pan state, idle to busy", __func__);
-+			update_profile_state(btpf, PROFILE_PAN, 1);
-+		}
-+	}
-+
-+	btpf->icount.pan = 0;
-+	mod_timer(&btpf->pan_timer, jiffies + msecs_to_jiffies(1000));
-+}
-+
-+static void setup_monitor_timer(struct rtl_btpf *btpf, u8 idx)
-+{
-+	switch (idx) {
-+	case PROFILE_A2DP:
-+		btpf->icount.a2dp = 0;
-+		setup_timer(&btpf->a2dp_timer, a2dp_do_poll,
-+			    (unsigned long)btpf);
-+		btpf->a2dp_timer.expires = jiffies + msecs_to_jiffies(1000);
-+		add_timer(&btpf->a2dp_timer);
-+		break;
-+	case PROFILE_PAN:
-+		btpf->icount.pan = 0;
-+		setup_timer(&btpf->pan_timer, pan_do_poll, (unsigned long)btpf);
-+		btpf->pan_timer.expires = jiffies + msecs_to_jiffies(1000);
-+		add_timer(&(btpf->pan_timer));
-+		break;
-+	default:
-+		break;
-+	}
-+}
-+
-+static void del_monitor_timer(struct rtl_btpf *btpf, u8 idx)
-+{
-+	switch (idx) {
-+	case PROFILE_A2DP:
-+		btpf->icount.a2dp = 0;
-+		del_timer_sync(&btpf->a2dp_timer);
-+		break;
-+	case PROFILE_PAN:
-+		btpf->icount.pan = 0;
-+		del_timer_sync(&btpf->pan_timer);
-+		break;
-+	default:
-+		break;
-+	}
-+}
-+
-+static int profile_conn_get(struct rtl_btpf *btpf, struct rtl_hci_conn *conn,
-+			    u8 idx)
-+{
-+	int update = 0;
-+	u8 i;
-+
-+	rtlbt_dbg("%s: idx %u", __func__, idx);
-+
-+	if (!conn || idx >= PROFILE_MAX)
-+		return -EINVAL;
-+
-+	if (!btpf->pf_refs[idx]) {
-+		update = 1;
-+		btpf->pf_bits |= BIT(idx);
-+
-+		/* SCO is always busy */
-+		if (idx == PROFILE_SCO)
-+			btpf->pf_state |= BIT(idx);
-+
-+		setup_monitor_timer(btpf, idx);
-+	}
-+	btpf->pf_refs[idx]++;
-+
-+	if (!conn->pf_refs[idx]) {
-+		update = 1;
-+		conn->pf_bits |= BIT(idx);
-+	}
-+	conn->pf_refs[idx]++;
-+
-+	rtlbt_info("%s: btpf->pf_bits 0x%02x", __func__, btpf->pf_bits);
-+	for (i = 0; i < MAX_PROFILE_NUM; i++)
-+		rtlbt_info("%s: btpf->pf_refs[%u] %d", __func__, i,
-+			   btpf->pf_refs[i]);
-+
-+	if (update)
-+		btpf_update_to_controller(btpf);
-+
-+	return 0;
-+}
-+
-+static int profile_conn_put(struct rtl_btpf *btpf, struct rtl_hci_conn *conn,
-+			    u8 idx)
-+{
-+	int need_update = 0;
-+	u8 i;
-+
-+	rtlbt_dbg("%s: idx %u", __func__, idx);
-+
-+	if (!conn || idx >= PROFILE_MAX)
-+		return -EINVAL;
-+
-+	btpf->pf_refs[idx]--;
-+	if (!btpf->pf_refs[idx]) {
-+		need_update = 1;
-+		btpf->pf_bits &= ~BIT(idx);
-+		btpf->pf_state &= ~BIT(idx);
-+		del_monitor_timer(btpf, idx);
-+	}
-+
-+	conn->pf_refs[idx]--;
-+	if (!conn->pf_refs[idx]) {
-+		need_update = 1;
-+		conn->pf_bits &= ~BIT(idx);
-+
-+		/* Clear hid interval if needed */
-+		if (idx == PROFILE_HID &&
-+		    (conn->pf_bits & BIT(PROFILE_HID2))) {
-+			conn->pf_bits &= ~BIT(PROFILE_HID2);
-+			btpf->pf_refs[PROFILE_HID2]--;
-+		}
-+	}
-+
-+	rtlbt_info("%s: btpf->pf_refs[%u] %d", __func__, idx,
-+		   btpf->pf_refs[idx]);
-+	rtlbt_info("%s: pf_bits 0x%02x", __func__, btpf->pf_bits);
-+	for (i = 0; i < MAX_PROFILE_NUM; i++)
-+		rtlbt_info("%s: btpf->pf_refs[%u] %d", __func__, i,
-+			   btpf->pf_refs[i]);
-+
-+	if (need_update)
-+		btpf_update_to_controller(btpf);
-+
-+	return 0;
-+}
-+
-+static void hid_state_update(struct rtl_btpf *btpf, u16 handle,
-+			     u16 interval)
-+{
-+	u8 update = 0;
-+	struct rtl_hci_conn *conn;
-+
-+	conn = rtl_hci_conn_lookup(btpf, handle);
-+	if (!conn)
-+		return;
-+
-+	rtlbt_info("%s: handle 0x%04x, interval 0x%x", __func__, handle,
-+		   interval);
-+	if (!(conn->pf_bits & BIT(PROFILE_HID))) {
-+		rtlbt_dbg("hid not connected in the handle");
-+		return;
-+	}
-+
-+	if (interval < 60) {
-+		if (!(conn->pf_bits & BIT(PROFILE_HID2))) {
-+			update = 1;
-+			conn->pf_bits |= BIT(PROFILE_HID2);
-+
-+			btpf->pf_refs[PROFILE_HID2]++;
-+			if (btpf->pf_refs[PROFILE_HID2] == 1)
-+				btpf->pf_state |= BIT(PROFILE_HID);
-+		}
-+	} else {
-+		if (conn->pf_bits & BIT(PROFILE_HID2)) {
-+			update = 1;
-+			conn->pf_bits &= ~BIT(PROFILE_HID2);
-+
-+			btpf->pf_refs[PROFILE_HID2]--;
-+			if (!btpf->pf_refs[PROFILE_HID2])
-+				btpf->pf_state &= ~BIT(PROFILE_HID);
-+		}
-+	}
-+
-+	if (update)
-+		btpf_update_to_controller(btpf);
-+}
-+
-+static int handle_l2cap_conn_req(struct rtl_btpf *btpf, u16 handle, u16 psm,
-+				 u16 cid, u8 dir)
-+{
-+	struct rtl_profile *pf;
-+	int idx = psm_to_profile(psm);
-+	struct rtl_profile_id id;
-+
-+	if (idx < 0) {
-+		rtlbt_info("no need to parse psm %04x", psm);
-+		return 0;
-+	}
-+
-+	memset(&id, 0, sizeof(id));
-+	id.match_flags = RTL_PROFILE_MATCH_HANDLE;
-+	id.handle = handle;
-+
-+	if (dir == RTL_TO_REMOTE) {
-+		id.match_flags |= RTL_PROFILE_MATCH_SCID;
-+		id.scid = cid;
-+	} else {
-+		id.match_flags |= RTL_PROFILE_MATCH_DCID;
-+		id.dcid = cid;
-+	}
-+
-+	pf = rtl_profile_lookup(btpf, &id);
-+
-+	if (pf) {
-+		rtlbt_warn("%s: profile already exists", __func__);
-+		return -1;
-+	}
-+
-+	if (dir == RTL_TO_REMOTE)
-+		pf = profile_alloc(handle, psm, (u8)idx, 0, cid);
-+	else
-+		pf = profile_alloc(handle, psm, (u8)idx, cid, 0);
-+
-+	if (!pf) {
-+		rtlbt_err("%s: allocate profile failed", __func__);
-+		return -1;
-+	}
-+
-+	list_add_tail(&pf->list, &btpf->pf_list);
-+
-+	return 0;
-+}
-+
-+/* dcid is the cid on the device sending this resp packet.
-+ * scid is the cid on the device receiving the resp packet.
-+ */
-+static u8 handle_l2cap_conn_rsp(struct rtl_btpf *btpf,
-+		u16 handle, u16 dcid,
-+		u16 scid, u8 dir, u8 result)
-+{
-+	struct rtl_profile *pf;
-+	struct rtl_hci_conn *conn;
-+	struct rtl_profile_id id = {
-+		.match_flags = RTL_PROFILE_MATCH_HANDLE,
-+		.handle = handle,
-+	};
-+
-+	if (dir == RTL_FROM_REMOTE) {
-+		id.match_flags |= RTL_PROFILE_MATCH_SCID;
-+		id.scid = scid;
-+		pf = rtl_profile_lookup(btpf, &id);
-+	} else {
-+		id.match_flags |= RTL_PROFILE_MATCH_DCID;
-+		id.dcid = scid;
-+		pf = rtl_profile_lookup(btpf, &id);
-+	}
-+
-+	if (!pf) {
-+		rtlbt_err("%s: profile not found", __func__);
-+		return -1;
-+	}
-+
-+	if (!result) {
-+		rtlbt_info("l2cap connection success");
-+		if (dir == RTL_FROM_REMOTE)
-+			pf->dcid = dcid;
-+		else
-+			pf->scid = dcid;
-+
-+		conn = rtl_hci_conn_lookup(btpf, handle);
-+		if (conn)
-+			profile_conn_get(btpf, conn, pf->idx);
-+	}
-+
-+	return 0;
-+}
-+
-+static int handle_l2cap_disconn_req(struct rtl_btpf *btpf,
-+		u16 handle, u16 dcid,
-+		u16 scid, u8 dir)
-+{
-+	struct rtl_profile *pf;
-+	struct rtl_hci_conn *conn;
-+	int err = 0;
-+	struct rtl_profile_id id = {
-+		.match_flags = RTL_PROFILE_MATCH_HANDLE |
-+			       RTL_PROFILE_MATCH_SCID |
-+			       RTL_PROFILE_MATCH_DCID,
-+		.handle = handle,
-+		.scid   = scid,
-+		.dcid   = dcid,
-+	};
-+
-+	if (dir == RTL_FROM_REMOTE) {
-+		id.scid = dcid;
-+		id.dcid = scid;
-+		pf = rtl_profile_lookup(btpf, &id);
-+	} else {
-+		pf = rtl_profile_lookup(btpf, &id);
-+	}
-+
-+	if (!pf) {
-+		rtlbt_err("%s: no profile", __func__);
-+		err = -1;
-+		goto done;
-+	}
-+
-+	conn = rtl_hci_conn_lookup(btpf, handle);
-+	if (!conn) {
-+		rtlbt_err("%s: no connection", __func__);
-+		err = -1;
-+		goto done;
-+	}
-+
-+	profile_conn_put(btpf, conn, pf->idx);
-+	list_del(&pf->list);
-+	kfree(pf);
-+
-+done:
-+	rtlbt_info("%s: handle %04x, dcid %04x, scid %04x, dir %x",
-+		   __func__, handle, dcid, scid, dir);
-+
-+	return 0;
-+}
-+
-+static const char sample_freqs[4][8] = {
-+	"16", "32", "44.1", "48"
-+};
-+
-+static const u8 sbc_blocks[4] = { 4, 8, 12, 16 };
-+
-+static const char chan_modes[4][16] = {
-+	"MONO", "DUAL_CHANNEL", "STEREO", "JOINT_STEREO"
-+};
-+
-+static const char alloc_methods[2][12] = {
-+	"LOUDNESS", "SNR"
-+};
-+
-+static const u8 subbands[2] = { 4, 8 };
-+
-+static void pr_sbc_hdr(struct sbc_frame_hdr *hdr)
-+{
-+	rtlbt_info("syncword: %02x", hdr->syncword);
-+	rtlbt_info("freq %skHz", sample_freqs[hdr->sampling_frequency]);
-+	rtlbt_info("blocks %u", sbc_blocks[hdr->blocks]);
-+	rtlbt_info("channel mode %s", chan_modes[hdr->channel_mode]);
-+	rtlbt_info("allocation method %s",
-+		   alloc_methods[hdr->allocation_method]);
-+	rtlbt_info("subbands %u", subbands[hdr->subbands]);
-+}
-+
-+static void packet_increment(struct rtl_btpf *btpf, u16 handle,
-+		u16 ch_id, u16 length, u8 *payload, u8 dir)
-+{
-+	struct rtl_profile *pf;
-+	struct rtl_hci_conn *conn;
-+	struct rtl_profile_id id;
-+
-+	conn = rtl_hci_conn_lookup(btpf, handle);
-+	if (!conn)
-+		goto done;
-+
-+	if (conn->type != ACL_CONN)
-+		return;
-+
-+	memset(&id, 0, sizeof(id));
-+	id.match_flags = RTL_PROFILE_MATCH_HANDLE;
-+	id.handle = handle;
-+	if (dir == RTL_FROM_REMOTE) {
-+		id.match_flags |= RTL_PROFILE_MATCH_SCID;
-+		id.scid = ch_id;
-+	} else {
-+		id.match_flags |= RTL_PROFILE_MATCH_DCID;
-+		id.dcid = ch_id;
-+	}
-+	pf = rtl_profile_lookup(btpf, &id);
-+	if (!pf)
-+		goto done;
-+
-+	if (pf->idx == PROFILE_A2DP && length > 100) {
-+		/* avdtp media data */
-+		if (!(btpf->pf_state & BIT(PROFILE_A2DP))) {
-+			struct sbc_frame_hdr *sbc_hdr;
-+			struct rtp_header *rtp_hdr;
-+			u8 bitpool;
-+
-+			update_profile_state(btpf, PROFILE_A2DP, 1);
-+			rtp_hdr = (struct rtp_header *)payload;
-+
-+			rtlbt_info("rtp: v %u, cc %u, pt %u", rtp_hdr->v,
-+				   rtp_hdr->cc, rtp_hdr->pt);
-+
-+			payload += sizeof(*rtp_hdr) + rtp_hdr->cc * 4 + 1;
-+
-+			sbc_hdr = (struct sbc_frame_hdr *)payload;
-+
-+			rtlbt_info("bitpool %u", sbc_hdr->bitpool);
-+
-+			pr_sbc_hdr(sbc_hdr);
-+
-+			bitpool = sbc_hdr->bitpool;
-+			hci_cmd_send_to_fw(btpf, HCI_VENDOR_SET_BITPOOL_CMD, 1,
-+					   &bitpool);
-+		}
-+		btpf->icount.a2dp++;
-+
-+	}
-+
-+	if (pf->idx == PROFILE_PAN)
-+		btpf->icount.pan++;
-+
-+done:
-+	return;
-+}
-+
-+static void hci_cmd_complete_evt(struct rtl_btpf *btpf, u8 total_len, u8 *p)
-+{
-+	u16 opcode;
-+	struct hci_ev_cmd_complete *cmdcp;
-+
-+	cmdcp = (struct hci_ev_cmd_complete *)p;
-+	opcode = le16_to_cpu(cmdcp->opcode);
-+
-+	switch (opcode) {
-+	case HCI_OP_READ_LOCAL_VERSION: {
-+		struct hci_rp_read_local_version *v =
-+			(struct hci_rp_read_local_version *)(p +
-+					sizeof(*cmdcp));
-+		if (v->status)
-+			break;
-+
-+		btpf->hci_rev = le16_to_cpu(v->hci_rev);
-+		btpf->lmp_subver = le16_to_cpu(v->lmp_subver);
-+		rtlbt_info("HCI Rev 0x%04x, LMP Subver 0x%04x", btpf->hci_rev,
-+			   btpf->lmp_subver);
-+
-+		if (le16_to_cpu(v->manufacturer) == 0x005d) {
-+			rtlbt_info("Realtek Semiconductor Corporation");
-+			set_bit(BTPF_CID_RTL, &btpf->flags);
-+		} else {
-+			clear_bit(BTPF_CID_RTL, &btpf->flags);
-+		}
-+
-+		break;
-+	}
-+	default:
-+		break;
-+	}
-+}
-+
-+static void hci_conn_complete_evt(struct rtl_btpf *btpf, u8 *p)
-+{
-+	struct hci_ev_conn_complete *ev = (void *)p;
-+	u16 handle;
-+	struct rtl_hci_conn *conn;
-+
-+	handle = __le16_to_cpu(ev->handle);
-+
-+	conn = rtl_hci_conn_lookup(btpf, handle);
-+	if (!conn) {
-+		conn = kzalloc(sizeof(struct rtl_hci_conn), GFP_KERNEL);
-+		if (conn) {
-+			conn->handle = handle;
-+			list_add_tail(&conn->list, &btpf->conn_list);
-+			conn->pf_bits = 0;
-+			memset(conn->pf_refs, 0, MAX_PROFILE_NUM);
-+			/* sco or esco */
-+			if (ev->link_type == 0 || ev->link_type == 2) {
-+				conn->type = SYNC_CONN;
-+				profile_conn_get(btpf, conn, PROFILE_SCO);
-+			} else {
-+				conn->type = ACL_CONN;
-+			}
-+		} else {
-+			rtlbt_err("%s: hci conn allocate fail.", __func__);
-+			return;
-+		}
-+	} else {
-+		/* If the connection has already existed, reset connection
-+		 * information
-+		 */
-+		rtlbt_warn("%s: hci conn handle(0x%x) already existed",
-+			   __func__, handle);
-+		conn->pf_bits = 0;
-+		memset(conn->pf_refs, 0, MAX_PROFILE_NUM);
-+		/* sco or esco */
-+		if (ev->link_type == 0 || ev->link_type == 2) {
-+			conn->type = SYNC_CONN;
-+			profile_conn_get(btpf, conn, PROFILE_SCO);
-+		} else {
-+			conn->type = ACL_CONN;
-+		}
-+	}
-+}
-+
-+static int hci_disconn_complete_evt(struct rtl_btpf *btpf, u8 *p)
-+{
-+	struct hci_ev_disconn_complete *ev = (void *)p;
-+	u16 handle;
-+	struct rtl_hci_conn *conn;
-+	struct list_head *pos, *temp;
-+	struct rtl_profile *pf;
-+
-+	handle = le16_to_cpu(ev->handle);
-+
-+	rtlbt_info("%s: status %u, handle %04x, reason 0x%x", __func__,
-+		   ev->status, handle, ev->reason);
-+
-+	if (ev->status)
-+		return -1;
-+
-+	conn = rtl_hci_conn_lookup(btpf, handle);
-+	if (!conn) {
-+		rtlbt_err("hci conn handle(0x%x) not found", handle);
-+		return -1;
-+	}
-+
-+	switch (conn->type) {
-+	case ACL_CONN:
-+		list_for_each_safe(pos, temp, &btpf->pf_list) {
-+			pf = list_entry(pos, struct rtl_profile, list);
-+			if (pf->handle == handle && pf->scid && pf->dcid) {
-+				rtlbt_info(
-+				  "%s: hndl %04x psm %04x dcid %04x scid %04x",
-+				  __func__, pf->handle, pf->psm, pf->dcid,
-+				  pf->scid);
-+				/* If both scid and dcid are bigger than zero,
-+				 * L2cap connection exists.
-+				 */
-+				profile_conn_put(btpf, conn, pf->idx);
-+				list_del(&pf->list);
-+				kfree(pf);
-+			}
-+		}
-+		break;
-+
-+	case SYNC_CONN:
-+		profile_conn_put(btpf, conn, PROFILE_SCO);
-+		break;
-+
-+	case LE_CONN:
-+		profile_conn_put(btpf, conn, PROFILE_HID);
-+		break;
-+
-+	default:
-+		break;
-+	}
-+
-+	list_del(&conn->list);
-+	kfree(conn);
-+
-+	return 0;
-+}
-+
-+static void hci_mode_change_evt(struct rtl_btpf *btpf, u8 *p)
-+{
-+	struct hci_ev_mode_change *ev = (void *)p;
-+
-+	hid_state_update(btpf, le16_to_cpu(ev->handle),
-+			 le16_to_cpu(ev->interval));
-+}
-+
-+static void rtl_le_conn_compl_evt(struct rtl_btpf *btpf, u8 *p)
-+{
-+	struct hci_ev_le_conn_complete *ev = (void *)p;
-+	u16 handle, interval;
-+	struct rtl_hci_conn *conn;
-+
-+	handle = le16_to_cpu(ev->handle);
-+	interval = le16_to_cpu(ev->interval);
-+
-+	conn = rtl_hci_conn_lookup(btpf, handle);
-+	if (!conn) {
-+		conn = kzalloc(sizeof(struct rtl_hci_conn), GFP_ATOMIC);
-+		if (conn) {
-+			conn->handle = handle;
-+			list_add_tail(&conn->list, &btpf->conn_list);
-+			conn->pf_bits = 0;
-+			memset(conn->pf_refs, 0, MAX_PROFILE_NUM);
-+			conn->type = LE_CONN;
-+			/* We consider le is the same as hid */
-+			profile_conn_get(btpf, conn, PROFILE_HID);
-+			hid_state_update(btpf, handle, interval);
-+		} else {
-+			rtlbt_err("%s: hci conn allocate fail.", __func__);
-+		}
-+	} else {
-+		rtlbt_warn("%s: hci conn handle(%x) already existed.", __func__,
-+			   handle);
-+		conn->pf_bits = 0;
-+		memset(conn->pf_refs, 0, MAX_PROFILE_NUM);
-+		conn->type = LE_CONN;
-+		profile_conn_get(btpf, conn, PROFILE_HID);
-+		hid_state_update(btpf, handle, interval);
-+	}
-+}
-+
-+static void hci_le_conn_complete_evt(struct rtl_btpf *btpf, u8 *p)
-+{
-+	struct hci_ev_le_conn_update_complete *ev = (void *)p;
-+	u16 handle, interval;
-+
-+	handle = le16_to_cpu(ev->handle);
-+	interval = le16_to_cpu(ev->interval);
-+	hid_state_update(btpf, handle, interval);
-+}
-+
-+static void hci_le_meta_evt(struct rtl_btpf *btpf, u8 *p)
-+{
-+	struct hci_ev_le_meta *le_ev = (void *)p;
-+
-+	p += sizeof(struct hci_ev_le_meta);
-+
-+	switch (le_ev->subevent) {
-+	case HCI_EV_LE_CONN_COMPLETE:
-+		rtl_le_conn_compl_evt(btpf, p);
-+		break;
-+
-+	case HCI_EV_LE_CONN_UPDATE_COMPLETE:
-+		hci_le_conn_complete_evt(btpf, p);
-+		break;
-+
-+	default:
-+		break;
-+	}
-+}
-+
-+static void hci_process_evt(struct rtl_btpf *btpf, u8 *p, u16 len)
-+{
-+	struct hci_event_hdr *hdr = (struct hci_event_hdr *)p;
-+
-+	(void)&len;
-+
-+	p += sizeof(struct hci_event_hdr);
-+
-+	switch (hdr->evt) {
-+	case HCI_EV_CMD_COMPLETE:
-+		hci_cmd_complete_evt(btpf, hdr->plen, p);
-+		break;
-+	case HCI_EV_CONN_COMPLETE:
-+	case HCI_EV_SYNC_CONN_COMPLETE:
-+		hci_conn_complete_evt(btpf, p);
-+		break;
-+	case HCI_EV_DISCONN_COMPLETE:
-+		hci_disconn_complete_evt(btpf, p);
-+		break;
-+	case HCI_EV_MODE_CHANGE:
-+		hci_mode_change_evt(btpf, p);
-+		break;
-+	case HCI_EV_LE_META:
-+		hci_le_meta_evt(btpf, p);
-+		break;
-+	default:
-+		break;
-+	}
-+}
-+
-+static const char l2_dir_str[][4] = {
-+	"RX", "TX",
-+};
-+
-+static void l2_process_frame(struct rtl_btpf *btpf, u8 *data, u16 len,
-+			     u8 out)
-+{
-+	u16 handle;
-+	u16 flags;
-+	u16 chann_id;
-+	u16 psm, scid, dcid, result;
-+	struct hci_acl_hdr *acl_hdr = (void *)data;
-+	struct l2cap_cmd_hdr *cmd;
-+	struct l2cap_hdr *hdr;
-+	struct l2cap_conn_req *conn_req;
-+	struct l2cap_conn_rsp *conn_rsp;
-+	struct l2cap_disconn_req *disc_req;
-+
-+	handle = __le16_to_cpu(acl_hdr->handle);
-+	flags  = hci_flags(handle);
-+	handle = hci_handle(handle);
-+
-+	if (flags == ACL_CONT)
-+		return;
-+
-+	data += sizeof(*acl_hdr);
-+
-+	hdr = (void *)data;
-+	chann_id = le16_to_cpu(hdr->cid);
-+
-+	if (chann_id != 0x0001) {
-+		if (btpf->pf_bits & BIT(PROFILE_A2DP) ||
-+		    btpf->pf_bits & BIT(PROFILE_PAN))
-+			packet_increment(btpf, handle, chann_id,
-+					 le16_to_cpu(hdr->len), data + 4, out);
-+		return;
-+	}
-+
-+	data += sizeof(*hdr);
-+
-+	cmd = (void *)data;
-+	data += sizeof(*cmd);
-+
-+	switch (cmd->code) {
-+	case L2CAP_CONN_REQ:
-+		conn_req = (void *)data;
-+		psm = le16_to_cpu(conn_req->psm);
-+		scid = le16_to_cpu(conn_req->scid);
-+		rtlbt_info(
-+		    "%s l2cap conn req: hndl %04x psm %04x scid %04x",
-+		    l2_dir_str[out], handle, psm, scid);
-+		handle_l2cap_conn_req(btpf, handle, psm, scid, out);
-+		break;
-+
-+	case L2CAP_CONN_RSP:
-+		conn_rsp = (void *)data;
-+		dcid = le16_to_cpu(conn_rsp->dcid);
-+		scid = le16_to_cpu(conn_rsp->scid);
-+		result = le16_to_cpu(conn_rsp->result);
-+		rtlbt_info(
-+		    "%s l2cap conn rsp: hndl %04x dcid %04x scid %04x res %x",
-+		    l2_dir_str[out], handle, dcid, scid, result);
-+		handle_l2cap_conn_rsp(btpf, handle, dcid, scid, out, result);
-+		break;
-+
-+	case L2CAP_DISCONN_REQ:
-+		disc_req = (void *)data;
-+		dcid = le16_to_cpu(disc_req->dcid);
-+		scid = le16_to_cpu(disc_req->scid);
-+		rtlbt_info(
-+		    "%s l2cap disc req: hndl %04x dcid %04x scid %04x",
-+		    l2_dir_str[out], handle, dcid, scid);
-+		handle_l2cap_disconn_req(btpf, handle, dcid, scid, out);
-+		break;
-+	case L2CAP_DISCONN_RSP:
-+		break;
-+	default:
-+		rtlbt_dbg("undesired l2 command code 0x%02x", cmd->code);
-+		break;
-+	}
-+}
-+
-+static void btpf_process_frame(struct rtl_btpf *btpf, struct sk_buff *skb)
-+{
-+	u8 pkt_type = skb->data[0];
-+
-+	skb_pull(skb, 1);
-+
-+	if (!test_bit(BTPF_CID_RTL, &btpf->flags)) {
-+		if (pkt_type == HCI_EVENT_PKT) {
-+			struct hci_event_hdr *hdr = (void *)skb->data;
-+
-+			if (hdr->evt == HCI_EV_CMD_COMPLETE) {
-+				skb_pull(skb, sizeof(*hdr));
-+				hci_cmd_complete_evt(btpf, hdr->plen,
-+						     skb->data);
-+			}
-+		}
-+		return;
-+	}
-+
-+	switch (pkt_type) {
-+	case HCI_EVENT_PKT:
-+		hci_process_evt(btpf, skb->data, skb->len);
-+		break;
-+	case HCI_ACLDATA_PKT:
-+		if (bt_cb(skb)->incoming)
-+			l2_process_frame(btpf, skb->data, skb->len, 0);
-+		else
-+			l2_process_frame(btpf, skb->data, skb->len, 1);
-+		break;
-+	default:
-+		break;
-+	}
-+}
-+
-+static void btpf_process_work(struct work_struct *work)
-+{
-+	struct rtl_btpf *btpf;
-+	struct sock *sk;
-+	struct sk_buff *skb;
-+
-+	btpf = container_of(work, struct rtl_btpf, hci_work);
-+	sk = btpf->hci_sock->sk;
-+
-+	/* Get data directly from socket receive queue without copying it. */
-+	while ((skb = skb_dequeue(&sk->sk_receive_queue))) {
-+		skb_orphan(skb);
-+		btpf_process_frame(btpf, skb);
-+		kfree_skb(skb);
-+	}
-+}
-+
-+static void btpf_raw_data_ready(struct sock *sk)
-+{
-+	struct rtl_btpf *btpf;
-+
-+	/* rtlbt_dbg("qlen %d", skb_queue_len(&sk->sk_receive_queue)); */
-+
-+	btpf = sk->sk_user_data;
-+	queue_work(btpf->workq, &btpf->hci_work);
-+}
-+
-+static void btpf_raw_error_report(struct sock *sk)
-+{
-+}
-+
-+static int btpf_open_socket(struct rtl_btpf *btpf)
-+{
-+	int ret;
-+	struct sockaddr_hci addr;
-+	struct sock *sk;
-+	struct hci_filter flt;
-+
-+	ret = sock_create_kern(&init_net, PF_BLUETOOTH, SOCK_RAW, BTPROTO_HCI,
-+			       &btpf->hci_sock);
-+	if (ret < 0) {
-+		rtlbt_err("Create hci sock error %d", ret);
-+		goto err_1;
-+	}
-+
-+	memset(&addr, 0, sizeof(addr));
-+	addr.hci_family = AF_BLUETOOTH;
-+	/* Assume Realtek BT controller index is 0. */
-+	addr.hci_dev = 0;
-+	addr.hci_channel = HCI_CHANNEL_RAW;
-+	ret = kernel_bind(btpf->hci_sock, (struct sockaddr *)&addr,
-+			  sizeof(addr));
-+	if (ret < 0) {
-+		rtlbt_err("Bind hci sock error");
-+		goto err_2;
-+	}
-+
-+	memset(&flt, 0, sizeof(flt));
-+	/* flt.type_mask = 0; */
-+	flt.type_mask = (1 << HCI_EVENT_PKT | 1 << HCI_ACLDATA_PKT);
-+	flt.event_mask[0] = 0xffffffff;
-+	flt.event_mask[1] = 0xffffffff;
-+
-+	ret = kernel_setsockopt(btpf->hci_sock, SOL_HCI, HCI_FILTER,
-+				(char *)&flt, sizeof(flt));
-+	if (ret < 0) {
-+		rtlbt_err("Set hci sock filter error %d", ret);
-+		goto err_2;
-+	}
-+
-+	sk = btpf->hci_sock->sk;
-+	sk->sk_user_data	= btpf;
-+	sk->sk_data_ready	= btpf_raw_data_ready;
-+	sk->sk_error_report	= btpf_raw_error_report;
-+
-+	set_bit(BTPF_HCI_SOCK, &btpf->flags);
-+
-+	return 0;
-+err_2:
-+	sock_release(btpf->hci_sock);
-+err_1:
-+	return ret;
-+}
-+
-+static void btpf_close_socket(struct rtl_btpf *btpf)
-+{
-+	struct socket *socket = btpf->hci_sock;
-+
-+	if (socket) {
-+		btpf->hci_sock = NULL;
-+		kernel_sock_shutdown(socket, SHUT_RDWR);
-+		socket->sk->sk_user_data = NULL;
-+		sock_release(socket);
-+	}
-+
-+	clear_bit(BTPF_HCI_SOCK, &btpf->flags);
-+}
-+
-+int rtl_btpf_init(void)
-+{
-+	int i;
-+	struct rtl_btpf *btpf;
-+	int ret = 0;
-+
-+	btpf = kzalloc(sizeof(struct rtl_btpf), GFP_KERNEL);
-+	if (!btpf)
-+		return -ENOMEM;
-+
-+	INIT_LIST_HEAD(&btpf->conn_list);
-+	INIT_LIST_HEAD(&btpf->pf_list);
-+
-+	btpf->pf_bits = 0;
-+	btpf->pf_state = 0;
-+	for (i = 0; i < MAX_PROFILE_NUM; i++)
-+		btpf->pf_refs[i] = 0;
-+
-+	INIT_WORK(&btpf->hci_work, btpf_process_work);
-+
-+	btpf->workq = create_workqueue("rtl_btpf_workq");
-+	if (!btpf->workq) {
-+		ret = -ENOMEM;
-+		goto err_1;
-+	}
-+
-+	/* init sock */
-+	ret = btpf_open_socket(btpf);
-+	if (ret < 0) {
-+		rtlbt_err("Failed to open sock to monitor tx/rx");
-+		goto err_2;
-+	}
-+
-+	rtl_btpf = btpf;
-+
-+	rtlbt_info("rtl btpf initialized");
-+
-+	return 0;
-+err_2:
-+	flush_workqueue(btpf->workq);
-+	destroy_workqueue(btpf->workq);
-+err_1:
-+	kfree(btpf);
-+	return ret;
-+}
-+EXPORT_SYMBOL_GPL(rtl_btpf_init);
-+
-+void rtl_btpf_deinit(void)
-+{
-+	struct rtl_btpf *btpf = rtl_btpf;
-+
-+	rtlbt_info("rtl btpf de-initialize");
-+
-+	rtl_btpf = NULL;
-+
-+	if (!btpf)
-+		return;
-+
-+	flush_workqueue(btpf->workq);
-+	destroy_workqueue(btpf->workq);
-+
-+	del_timer_sync(&btpf->a2dp_timer);
-+	del_timer_sync(&btpf->pan_timer);
-+
-+	rtl_hci_conn_list_purge(btpf);
-+	rtl_profile_list_purge(btpf);
-+
-+	btpf_close_socket(btpf);
-+
-+	kfree(btpf);
-+}
-+EXPORT_SYMBOL_GPL(rtl_btpf_deinit);
-+
-+MODULE_AUTHOR("Alex Lu <alex_lu@realsil.com.cn>");
-+MODULE_DESCRIPTION("Bluetooth profiling for Realtek devices ver " VERSION);
-+MODULE_VERSION(VERSION);
-+MODULE_LICENSE("GPL");
-diff --git a/drivers/bluetooth/rtl_btpf.h b/drivers/bluetooth/rtl_btpf.h
-new file mode 100644
-index 0000000..2d507b0
---- /dev/null
-+++ b/drivers/bluetooth/rtl_btpf.h
-@@ -0,0 +1,184 @@
-+/*
-+ *
-+ *  Realtek Bluetooth Profile profiling driver
-+ *
-+ *  Copyright (C) 2015 Realtek Semiconductor Corporation
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ */
-+
-+#include <net/bluetooth/hci_core.h>
-+#include <linux/list.h>
-+
-+#define rtlbt_dbg(fmt, ...) \
-+		pr_debug("rtl_btpf: " fmt "\n", ##__VA_ARGS__)
-+#define rtlbt_info(fmt, ...) \
-+		pr_info("rtl_btpf: " fmt "\n", ##__VA_ARGS__)
-+#define rtlbt_warn(fmt, ...) \
-+		pr_warn("rtl_btpf: " fmt "\n", ##__VA_ARGS__)
-+#define rtlbt_err(fmt, ...) \
-+		pr_err("rtl_btpf: " fmt "\n", ##__VA_ARGS__)
-+
-+#define HCI_VENDOR_SET_PF_REPORT_CMD	0xfc19
-+#define HCI_VENDOR_SET_BITPOOL_CMD	0xfc51
-+
-+#define PAN_PACKET_COUNT                5
-+
-+#define ACL_CONN	0x0
-+#define SYNC_CONN	0x1
-+#define LE_CONN		0x2
-+
-+#define PSM_SDP     0x0001
-+#define PSM_RFCOMM  0x0003
-+#define PSM_PAN     0x000F
-+#define PSM_HID     0x0011
-+#define PSM_HID_INT 0x0013
-+#define PSM_AVCTP   0x0017
-+#define PSM_AVDTP   0x0019
-+#define PSM_FTP     0x1001
-+#define PSM_BIP     0x1003
-+#define PSM_OPP     0x1015
-+
-+#define MAX_PROFILE_NUM		7
-+enum __profile_type {
-+	PROFILE_SCO = 0,
-+	PROFILE_HID = 1,
-+	PROFILE_A2DP = 2,
-+	PROFILE_PAN = 3,
-+	PROFILE_HID2 = 4, /* hid interval */
-+	PROFILE_HOGP = 5,
-+	PROFILE_VOICE = 6,
-+	PROFILE_MAX = 7
-+};
-+
-+struct pf_pkt_icount {
-+	u32 a2dp;
-+	u32 pan;
-+	u32 hogp;
-+	u32 voice;
-+};
-+
-+#define RTL_FROM_REMOTE		0
-+#define RTL_TO_REMOTE		1
-+
-+#define RTL_PROFILE_MATCH_HANDLE	(1 << 0)
-+#define RTL_PROFILE_MATCH_SCID		(1 << 1)
-+#define RTL_PROFILE_MATCH_DCID		(1 << 2)
-+struct rtl_profile_id {
-+	u16	match_flags;
-+	u16	handle;
-+	u16	dcid;
-+	u16	scid;
-+};
-+
-+struct rtl_profile {
-+	struct list_head list;
-+	u16 handle;
-+	u16 psm;
-+	u16 dcid;
-+	u16 scid;
-+	u8  idx;
-+};
-+
-+struct rtl_hci_conn {
-+	struct list_head list;
-+	u16 handle;
-+	u8 type;
-+	u8 pf_bits;
-+	int pf_refs[MAX_PROFILE_NUM];
-+};
-+
-+struct rtl_btpf {
-+	u16   hci_rev;
-+	u16   lmp_subver;
-+
-+	struct hci_dev		*hdev;
-+	struct list_head	pf_list;
-+	struct list_head	conn_list;
-+
-+	u8	pf_bits;
-+	u8	pf_state;
-+	int	pf_refs[MAX_PROFILE_NUM];
-+
-+	struct pf_pkt_icount	icount;
-+
-+	/* Monitor timers */
-+	struct timer_list	a2dp_timer;
-+	struct timer_list	pan_timer;
-+
-+	struct workqueue_struct *workq;
-+	struct work_struct hci_work;
-+
-+	struct socket *hci_sock;
-+#define BTPF_HCI_SOCK		1
-+#define BTPF_CID_RTL		2
-+	unsigned long flags;
-+};
-+
-+#ifdef __LITTLE_ENDIAN
-+struct sbc_frame_hdr {
-+	u8 syncword:8;		/* Sync word */
-+	u8 subbands:1;		/* Subbands */
-+	u8 allocation_method:1;	/* Allocation method */
-+	u8 channel_mode:2;		/* Channel mode */
-+	u8 blocks:2;		/* Blocks */
-+	u8 sampling_frequency:2;	/* Sampling frequency */
-+	u8 bitpool:8;		/* Bitpool */
-+	u8 crc_check:8;		/* CRC check */
-+} __packed;
-+
-+struct rtp_header {
-+	unsigned cc:4;
-+	unsigned x:1;
-+	unsigned p:1;
-+	unsigned v:2;
-+
-+	unsigned pt:7;
-+	unsigned m:1;
-+
-+	u16 sequence_number;
-+	u32 timestamp;
-+	u32 ssrc;
-+	u32 csrc[0];
-+} __packed;
-+
-+#else /* !__LITTLE_ENDIAN */
-+struct sbc_frame_hdr {
-+	u8 syncword:8;		/* Sync word */
-+	u8 sampling_frequency:2;	/* Sampling frequency */
-+	u8 blocks:2;		/* Blocks */
-+	u8 channel_mode:2;		/* Channel mode */
-+	u8 allocation_method:1;	/* Allocation method */
-+	u8 subbands:1;		/* Subbands */
-+	u8 bitpool:8;		/* Bitpool */
-+	u8 crc_check:8;		/* CRC check */
-+} __packed;
-+
-+struct rtp_header {
-+	unsigned v:2;
-+	unsigned p:1;
-+	unsigned x:1;
-+	unsigned cc:4;
-+
-+	unsigned m:1;
-+	unsigned pt:7;
-+
-+	u16 sequence_number;
-+	u32 timestamp;
-+	u32 ssrc;
-+	u32 csrc[0];
-+} __packed;
-+#endif /* __LITTLE_ENDIAN */
-+
-+void rtl_btpf_deinit(void);
-+int rtl_btpf_init(void);
+I've been looking into this right now, and I believe we should send the
+MGMT command in the sockopt instead (how this patch is doing already).
+
+The reason is that bluetoothd (or the MGMT command itself) stores the
+data used on the HCI Connection Update command and not the actual value
+of the connection.
+
+> 
+> Also, based on the 4.0 spec, how can we trigger the LE Connection Update
+> Complete Event as a Slave?
+> 
+> 
+>>
+>>>> +             break;
+>>>> +     }
+>>>> +
+>>>>       case BT_SECURITY:
+>>>>               if (chan->chan_type != L2CAP_CHAN_CONN_ORIENTED &&
+>>>>                   chan->chan_type != L2CAP_CHAN_FIXED &&
+>>>>
+>>
+> 
+
 -- 
-2.10.2
+Felipe
+
+--------------93427BBE98DC15D0693BBB74
+Content-Type: application/pgp-keys;
+ name="0x92698E6A.asc"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+ filename="0x92698E6A.asc"
+
+-----BEGIN PGP PUBLIC KEY BLOCK-----
+
+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
+SkAyCfQaSw==
+=JwBB
+-----END PGP PUBLIC KEY BLOCK-----
+
+--------------93427BBE98DC15D0693BBB74--
