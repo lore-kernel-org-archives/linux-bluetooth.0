@@ -1,22 +1,28 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: bugzilla-daemon@bugzilla.kernel.org
-To: linux-bluetooth@kernel.org
-Subject: [Bug 190831] Intel Bluetooth 8260 breaks with latest firmware
-Date: Thu, 09 Feb 2017 20:57:15 +0000
-Message-ID: <bug-190831-62941-TWhXD6d7oR@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-190831-62941@https.bugzilla.kernel.org/>
-References: <bug-190831-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
 MIME-Version: 1.0
+From: Dave Beal <dbeal@cardinalpeak.com>
+Date: Thu, 9 Feb 2017 12:10:00 -0700
+Message-ID: <CAHHBb0cUctkkkisSdhosNms9QWmbRVwJm2BTwuEb64+V1eepag@mail.gmail.com>
+Subject: Don't understand BlueZ 5 GATT interface
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-https://bugzilla.kernel.org/show_bug.cgi?id=190831
+Hello -
 
---- Comment #44 from Marc Collin (collinm@laboiteaprog.com) ---
-when my mouse stop to work, i see
-reset full-speed USB device number 3 using ehci-pci
+I'm trying to write a GATT client using BlueZ 5.19. Neither Python nor
+glib are available in my environment, so I'm reduced to using libdbus.
+I understand that I call Bluez's RegisterProfile method to specify the
+UUID of the profile/service that I want to connect to, and that when a
+matching remote device is found, Bluez will call my NewConnection
+method. (This currently isn't working for me, but that's a different
+question, posed in an earlier email.) The NewConnection call passes a
+file descriptor that I use to talk to the remote device. Then what?
+What do I send over the connection in order to, for instance, read and
+write an attribute? Link layer messages? ATT protocol commands?
+Thanks!
 
--- 
-You are receiving this mail because:
-You are the assignee for the bug.
+- Dave Beal
+  dbeal@cardinalpeak.com
+  Cardinal Peak, LLC
