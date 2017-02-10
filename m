@@ -1,60 +1,55 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 10.2 \(3259\))
-Subject: Re: [RFC][PATCH BlueZ] Bluetooth: L2CAP: Add BT_LE_CONN_PARAM socket
- option
+Subject: Re: [PATCH] Bluetooth: btusb: add support for 0bb4:0306
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20170203213604.2697-1-eu@felipetonello.com>
-Date: Fri, 10 Feb 2017 12:30:34 +0100
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <6400F4C7-3488-4B59-9434-D6CC48D963E3@holtmann.org>
-References: <20170203213604.2697-1-eu@felipetonello.com>
-To: "Felipe F. Tonello" <eu@felipetonello.com>
+In-Reply-To: <20170210003142.3871-1-haagch@frickel.club>
+Date: Fri, 10 Feb 2017 12:23:43 +0100
+Cc: linux-bluetooth@vger.kernel.org,
+        "Gustavo F. Padovan" <gustavo@padovan.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>
+Message-Id: <04A5C1B8-16D8-4146-8A3E-7DCBA0FDB7CB@holtmann.org>
+References: <20170210003142.3871-1-haagch@frickel.club>
+To: Christoph Haag <haagch@frickel.club>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Felipe,
+Hi Christoph,
 
-> There is a need for certain LE profiles (MIDI for example)to change the
-> current connection's parameters. In order to do that, this patch
-> introduces a new BT_LE_CONN_PARAM socket option for SOL_BLUETOOTH
-> protocol which allow user-space l2cap sockets to update the current
-> connection.
+> It's a custom USB ID for the broadcom bt adapter in the HTC Vive.
 > 
-> This option will also send a MGMT_EV_NEW_CONN_PARAM event with the
-> store_hint set so the user-space application can store the connection
-> parameters for persistence reasons.
+> T:  Bus=01 Lev=02 Prnt=02 Port=01 Cnt=02 Dev#=  7 Spd=12  MxCh= 0
+> D:  Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+> P:  Vendor=0bb4 ProdID=0306 Rev=01.12
+> S:  Manufacturer=Broadcom Corp
+> S:  Product=BCM2045A0
+> S:  SerialNumber=AC3743E110CE
+> C:  #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=0mA
+> I:  If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+> I:  If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+> I:  If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
+> I:  If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
 > 
-> Signed-off-by: Felipe F. Tonello <eu@felipetonello.com>
+> Signed-off-by: Christoph Haag <haagch@frickel.club>
 > ---
-> include/net/bluetooth/bluetooth.h |  8 ++++
-> net/bluetooth/l2cap_sock.c        | 98 +++++++++++++++++++++++++++++++++++++++
-> 2 files changed, 106 insertions(+)
+> drivers/bluetooth/btusb.c | 3 +++
+> 1 file changed, 3 insertions(+)
 > 
-> diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-> index 01487192f628..ce5b3abd3b27 100644
-> --- a/include/net/bluetooth/bluetooth.h
-> +++ b/include/net/bluetooth/bluetooth.h
-> @@ -122,6 +122,14 @@ struct bt_voice {
-> #define BT_SNDMTU		12
-> #define BT_RCVMTU		13
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index 2f633df9f4e6..afb48aebe9c5 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -124,6 +124,9 @@ static const struct usb_device_id btusb_table[] = {
+> 	/* Broadcom BCM20702A0 */
+> 	{ USB_DEVICE(0x413c, 0x8197) },
 > 
-> +#define BT_LE_CONN_PARAM	14
-> +struct bt_le_conn_param {
-> +	__u16 min_interval;
-> +	__u16 max_interval;
-> +	__u16 latency;
-> +	__u16 supervision_timeout;
-> +};
+> +	/* Broadcom BCM2045A0 found in the HTC Vive */
+> +	{ USB_DEVICE(0x0bb4, 0x0306) },
 > +
 
-I am not 100% convinced that we want this level of detail exposed to user space. I was more thinking of having two or three sets of connection parameters and then a simple enum via socket option to choose from.
+actually you want to use USB_VENDOR_AND_INTERFACE_INFO like we do for all the other Broadcom based devices. So that all HTC devices that have the Broadcom ff:01:01 interface description are covered.
 
-We have the default value that we use for everything right now. And then we can have a high latency and low latency setting to change that. The supervision timeout is a different story since that would also apply to BR/EDR and we could allow for individual setting of that.
-
-The reason we store the exact connection parameters via mgmt is so that next time around, the slave does not have to request new ones. We already use the correct ones from the get go. One thing we are missing is to actually pick them up from advertising report. Since they can also be reported that way.
-
-Also with a socket option we have to be careful that multiple sockets might want to program different values. We do support connection oriented channels with LE. Otherwise this would have to artificially restricted to GATT CID for now. And even there is still the case between connect() and accept(). Also that accept() is use with the background connection. I mean on an outgoing connection, I want to be able to influence the settings before calling connect() so they are used directly in the LE_Create_Connection command. Especially if I already know what I am creating the connection for.
+And if you can add /sys/kernel/debug/usb/devices to have to the full descriptors, that would be great. If this works with the BTUSB_BCM_PATCHRAM quirk, then there is also some extra debug info in dmesg that you might want to include.
 
 Regards
 
