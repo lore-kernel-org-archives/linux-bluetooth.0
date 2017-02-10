@@ -1,72 +1,34 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 10.2 \(3259\))
-Subject: Re: SCO socket MTU problem in PulseAudio
+Subject: Re: Reading manufacturer-specific advertisement data from BLE device
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1486380902.4774.4.camel@iki.fi>
-Date: Fri, 10 Feb 2017 12:48:28 +0100
-Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        Renjith Thomas <renjith@lightlevitate.com>,
-        Georg Chini <georg@chini.tk>
-Message-Id: <6B0AC741-28BC-4F1A-90E2-5634246F591D@holtmann.org>
-References: <1485867673.2993.5.camel@iki.fi>
- <A00CAB7E-3131-4430-8AEA-4132E28CE8FE@holtmann.org>
- <1486380902.4774.4.camel@iki.fi>
-To: Tanu Kaskinen <tanuk@iki.fi>
+In-Reply-To: <d01aae99bbca4803aa34ab90ba3f080b@veritystudios.com>
+Date: Fri, 10 Feb 2017 12:39:40 +0100
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Message-Id: <82640EE1-8244-4609-B51E-F2ECFAE35992@holtmann.org>
+References: <d01aae99bbca4803aa34ab90ba3f080b@veritystudios.com>
+To: Simon Falsig <sfalsig@veritystudios.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Tanu,
+Hi Simon,
 
->>> PulseAudio recently started to use
->>> 
->>>   getsockopt(sock, SOL_SCO, SCO_OPTIONS, &sco_opt, &len);
->>>   read_mtu = sco_opt.mtu;
->>>   write_mtu = sco_opt.mtu;
->>> 
->>> to query the MTU of the SCO socket. Previously we used a fixed value of
->>> 48, but that didn't work for some bluetooth chipsets (see the commit
->>> message[1]). Now, however, it was reported[2] that the new code doesn't
->>> work on some hardware where the old fixed MTU used to work.
->> 
->> can you share details here and btmon traces for the data buffer sizes
->> and the USB descriptor details. We would need to figure out where
->> this goes wrong and maybe introduce some driver quirks to ensure that
->> it returns usable values.
+> I'm currently trying to read manufacturer-specific data from an advertisement from a custom BLE device, using the BlueZ D-Bus API, but can't seem to get it working.
 > 
-> Georg already provided a btmon dump. Did that contain everything you
-> need? The way you put your words, it's not clear to me if the USB
-> descriptor details are included in the btmon output or is the USB
-> descriptor a separate thing?
+> I can see my device when doing a scan in bluetoothctl, but haven't figured out how to get to the actual advertisement data. I've tried modifying bluetoothctl to get the "ManufacturerData" property, but this is not found (g_dbus_proxy_get_property returns false). Also, no ManufacturerData property (or similar) shows up for the device in d-feet.
 > 
-> I'd like to provide clear instructions for users to get the necessary
-> information, in case it turns out that Georg is not the only one with
-> this problem. What options should be given to btmon?
+> I have a small utility that just uses the hci API directly, and using that, I can get the complete contents of the advertisement, including the manufacturer-specific data. Full data is (in hex):
+> 
+> 02 01 06 03 02 e0 c0 11 ff 00 02 01 03 00 00 00 00 00 00 00 00 5d 58 0e 94
+> 
+> Is there something wrong in the way I'm sending out the data, or do I need to register for data in some way to get it working for the D-Bus API also?
+> 
+> I'm using BlueZ 5.37 on KUbuntu 16.04 (running in VirtualBox), using an Aircable Host XR4 Bluetooth adapter connected over USB. BLE device is a custom solution, based on a TI CC2650 chip, using the TI BLE-Stack 2.2.0.
+> 
+> Any hints or comments are appreciated!
 
-< HCI Command: Read Local Version Info.. (0x04|0x0001) plen 0
-> HCI Event: Command Complete (0x0e) plen 12
-      Read Local Version Information (0x04|0x0001) ncmd 1
-        Status: Success (0x00)
-        HCI version: Bluetooth 2.0 (0x03) - Revision 5276 (0x149c)
-        LMP version: Bluetooth 2.0 (0x03) - Subversion 5276 (0x149c)
-        Manufacturer: Cambridge Silicon Radio (10)
-< HCI Command: Read BD ADDR (0x04|0x0009) plen 0
-> HCI Event: Command Complete (0x0e) plen 10
-      Read BD ADDR (0x04|0x0009) ncmd 1
-        Status: Success (0x00)
-        Address: 00:15:83:73:FD:06 (IVT corporation)
-< HCI Command: Read Buffer Size (0x04|0x0005) plen 0
-> HCI Event: Command Complete (0x0e) plen 11
-      Read Buffer Size (0x04|0x0005) ncmd 1
-        Status: Success (0x00)
-        ACL MTU: 384  ACL max packet: 8
-        SCO MTU: 64   SCO max packet: 8
-
-This seems to be CSR based hardware. Can we verify that this is the case with the /sys/kernel/debug/usb/devices info for this device. If this is a fake device, then all bets are off anyway.
-
-And yes, it reports 64 octets for the MTU. Which is most likely what you are getting back from the SCO socket. If this is all bogus and doesn’t work for CSR devices, we need to quirk it in the btusb driver to report a different value.
-
-As a side note, a newer btmon version will decode all the Unknown packet entries.
+not sure when the support for ManufacturerData went into BlueZ. However try the latest version and run btmon to verify it is actually transmitted in the advertising report itself.
 
 Regards
 
