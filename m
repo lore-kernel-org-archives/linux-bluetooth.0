@@ -1,57 +1,81 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <linux-kernel-owner@vger.kernel.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 10.2 \(3259\))
-Subject: Re: [PATCH] Bluetooth: btusb: add support for 0bb4:0306
+Subject: Re: [PATCH] rtlbt: Add Realtek Bluetooth profiling support
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20170210003142.3871-1-haagch@frickel.club>
-Date: Fri, 10 Feb 2017 12:23:43 +0100
-Cc: linux-bluetooth@vger.kernel.org,
-        "Gustavo F. Padovan" <gustavo@padovan.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>
-Message-Id: <04A5C1B8-16D8-4146-8A3E-7DCBA0FDB7CB@holtmann.org>
-References: <20170210003142.3871-1-haagch@frickel.club>
-To: Christoph Haag <haagch@frickel.club>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <20170209182341.4977-1-Larry.Finger@lwfinger.net>
+Date: Fri, 10 Feb 2017 12:09:12 +0100
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        Alex Lu <alex_lu@realsil.com.cn>, linux-kernel@vger.kernel.org
+Message-Id: <485E2AC8-A0F6-4D02-9CB0-D73A231E6FB5@holtmann.org>
+References: <20170209182341.4977-1-Larry.Finger@lwfinger.net>
+To: Larry Finger <Larry.Finger@lwfinger.net>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Christoph,
+Hi Larry,
 
-> It's a custom USB ID for the broadcom bt adapter in the HTC Vive.
+> Add the Realtek Bluetooth profile profiling support to create
+> profile information, which helps the firmware optimize transfer
+> priority and balance the transmissions for multiple profiles.
 > 
-> T:  Bus=01 Lev=02 Prnt=02 Port=01 Cnt=02 Dev#=  7 Spd=12  MxCh= 0
-> D:  Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-> P:  Vendor=0bb4 ProdID=0306 Rev=01.12
-> S:  Manufacturer=Broadcom Corp
-> S:  Product=BCM2045A0
-> S:  SerialNumber=AC3743E110CE
-> C:  #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=0mA
-> I:  If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
-> I:  If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
-> I:  If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
-> I:  If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
-> 
-> Signed-off-by: Christoph Haag <haagch@frickel.club>
+> Signed-off-by: Alex Lu <alex_lu@realsil.com.cn>
+> Signed-off-by: Larry Finger <Larry.Finger@lwfinger.net>
 > ---
-> drivers/bluetooth/btusb.c | 3 +++
-> 1 file changed, 3 insertions(+)
+> drivers/bluetooth/Kconfig    |   16 +
+> drivers/bluetooth/Makefile   |    1 +
+> drivers/bluetooth/btusb.c    |   12 +
+> drivers/bluetooth/rtl_btpf.c | 1249 ++++++++++++++++++++++++++++++++++++++++++
+> drivers/bluetooth/rtl_btpf.h |  184 +++++++
+> 5 files changed, 1462 insertions(+)
+> create mode 100644 drivers/bluetooth/rtl_btpf.c
+> create mode 100644 drivers/bluetooth/rtl_btpf.h
 > 
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index 2f633df9f4e6..afb48aebe9c5 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -124,6 +124,9 @@ static const struct usb_device_id btusb_table[] = {
-> 	/* Broadcom BCM20702A0 */
-> 	{ USB_DEVICE(0x413c, 0x8197) },
-> 
-> +	/* Broadcom BCM2045A0 found in the HTC Vive */
-> +	{ USB_DEVICE(0x0bb4, 0x0306) },
+
+<snip>
+
+> +static int btpf_open_socket(struct rtl_btpf *btpf)
+> +{
+> +	int ret;
+> +	struct sockaddr_hci addr;
+> +	struct sock *sk;
+> +	struct hci_filter flt;
 > +
+> +	ret = sock_create_kern(&init_net, PF_BLUETOOTH, SOCK_RAW, BTPROTO_HCI,
+> +			       &btpf->hci_sock);
+> +	if (ret < 0) {
+> +		rtlbt_err("Create hci sock error %d", ret);
+> +		goto err_1;
+> +	}
+> +
+> +	memset(&addr, 0, sizeof(addr));
+> +	addr.hci_family = AF_BLUETOOTH;
+> +	/* Assume Realtek BT controller index is 0. */
+> +	addr.hci_dev = 0;
+> +	addr.hci_channel = HCI_CHANNEL_RAW;
+> +	ret = kernel_bind(btpf->hci_sock, (struct sockaddr *)&addr,
+> +			  sizeof(addr));
+> +	if (ret < 0) {
+> +		rtlbt_err("Bind hci sock error");
+> +		goto err_2;
+> +	}
 
-actually you want to use USB_VENDOR_AND_INTERFACE_INFO like we do for all the other Broadcom based devices. So that all HTC devices that have the Broadcom ff:01:01 interface description are covered.
+let me start with a clear answer here. This is insane and will never be merged upstream.
 
-And if you can add /sys/kernel/debug/usb/devices to have to the full descriptors, that would be great. If this works with the BTUSB_BCM_PATCHRAM quirk, then there is also some extra debug info in dmesg that you might want to include.
+I have no idea on how describe this any other way, but this is really bad idea, totally bloated and causing side affects left and right. The HCI raw socket is not for doing profiling. Especially not inside the kernel. And just thinking that someone took the old hcidump code and hacked it to run as a kernel module is something I never expected to happen.
+
+<snip>
+
+> +
+> +#define HCI_VENDOR_SET_PF_REPORT_CMD	0xfc19
+> +#define HCI_VENDOR_SET_BITPOOL_CMD	0xfc51
+
+I think that everything should start with what these two vendor commands are actually doing. So a simple descriptions of these two vendor commands is what is needed first.
+
+And then someone needs to tell me what all this code does that SO_PRIORITY is not already doing and has been doing for a long time.
 
 Regards
 
 Marcel
-
