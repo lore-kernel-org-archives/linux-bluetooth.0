@@ -1,55 +1,126 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <briannorris@chromium.org>
+Date: Fri, 10 Feb 2017 17:43:17 -0800
+From: Brian Norris <briannorris@chromium.org>
+To: Jeffy Chen <jeffy.chen@rock-chips.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Douglas Anderson <dianders@chromium.org>,
+	Johan Hedberg <johan.hedberg@intel.com>,
+	Peter Hurley <peter@hurleysoftware.com>,
+	Johan Hedberg <johan.hedberg@gmail.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Gustavo Padovan <gustavo@padovan.org>
+Subject: Re: [PATCH 2/3] Bluetooth: cmtp: fix possible might sleep error in
+ cmtp_session
+Message-ID: <20170211014247.GC101282@google.com>
+References: <1485230871-22828-1-git-send-email-jeffy.chen@rock-chips.com>
+ <1485230871-22828-2-git-send-email-jeffy.chen@rock-chips.com>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 10.2 \(3259\))
-Subject: Re: [PATCH] rtlbt: Add Realtek Bluetooth profiling support
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <0551C926975A174EA8972327741C7889ED340CE5@RS-MBS01.realsil.com.cn>
-Date: Sat, 11 Feb 2017 09:44:43 +0100
-Cc: Larry Finger <Larry.Finger@lwfinger.net>,
-        "Gustavo F. Padovan" <gustavo@padovan.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Message-Id: <74212B17-7307-41ED-B2DA-C40CBBA508CF@holtmann.org>
-References: <20170209182341.4977-1-Larry.Finger@lwfinger.net>
- <485E2AC8-A0F6-4D02-9CB0-D73A231E6FB5@holtmann.org>
- <0551C926975A174EA8972327741C7889ED340CE5@RS-MBS01.realsil.com.cn>
-To: =?utf-8?B?6ZmG5pyx5Lyf?= <alex_lu@realsil.com.cn>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1485230871-22828-2-git-send-email-jeffy.chen@rock-chips.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alex,
+Hi,
 
-> First, let me explain the BT profiling.
-> BT profiling parses some packets like connection complete event, l2cap conn req/rsp, ... to get profiles information for firmware.
-> Firmware uses the information to balance packet transmission priority to get good user experience.
-> The typical scenarios:
-> 1. a2dp transmission and opp transmission at the same time.
+On Tue, Jan 24, 2017 at 12:07:50PM +0800, Jeffy Chen wrote:
+> It looks like cmtp_session has same pattern as the issue reported in
+> old rfcomm:
+> 
+> 	while (1) {
+> 		set_current_state(TASK_INTERRUPTIBLE);
+> 		if (condition)
+> 			break;
+> 		// may call might_sleep here
+> 		schedule();
+> 	}
+> 	__set_current_state(TASK_RUNNING);
+> 
+> Which fixed at:
+> 	dfb2fae Bluetooth: Fix nested sleeps
+> 
+> So let's fix it at the same way, also follow the suggestion of:
+> https://lwn.net/Articles/628628/
+> 
+> Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
+> ---
+> 
+>  net/bluetooth/cmtp/core.c | 21 ++++++++++++++-------
+>  1 file changed, 14 insertions(+), 7 deletions(-)
+> 
+> diff --git a/net/bluetooth/cmtp/core.c b/net/bluetooth/cmtp/core.c
+> index 9e59b66..6b03f2b 100644
+> --- a/net/bluetooth/cmtp/core.c
+> +++ b/net/bluetooth/cmtp/core.c
+> @@ -280,16 +280,16 @@ static int cmtp_session(void *arg)
+>  	struct cmtp_session *session = arg;
+>  	struct sock *sk = session->sock->sk;
+>  	struct sk_buff *skb;
+> -	wait_queue_t wait;
+> +	DEFINE_WAIT_FUNC(wait, woken_wake_function);
+>  
+>  	BT_DBG("session %p", session);
+>  
+>  	set_user_nice(current, -15);
+>  
+> -	init_waitqueue_entry(&wait, current);
+>  	add_wait_queue(sk_sleep(sk), &wait);
+>  	while (1) {
+> -		set_current_state(TASK_INTERRUPTIBLE);
+> +		/* Ensure session->terminate is updated */
+> +		smp_mb__before_atomic();
+>  
+>  		if (atomic_read(&session->terminate))
+>  			break;
+> @@ -306,9 +306,8 @@ static int cmtp_session(void *arg)
+>  
+>  		cmtp_process_transmit(session);
+>  
+> -		schedule();
+> +		wait_woken(&wait, TASK_INTERRUPTIBLE, MAX_SCHEDULE_TIMEOUT);
+>  	}
+> -	__set_current_state(TASK_RUNNING);
+>  	remove_wait_queue(sk_sleep(sk), &wait);
+>  
+>  	down_write(&cmtp_session_sem);
+> @@ -393,7 +392,11 @@ int cmtp_add_connection(struct cmtp_connadd_req *req, struct socket *sock)
+>  		err = cmtp_attach_device(session);
+>  		if (err < 0) {
+>  			atomic_inc(&session->terminate);
+> -			wake_up_process(session->task);
+> +
+> +			/* Ensure session->terminate is updated */
+> +			smp_mb__after_atomic();
+> +
 
-that should work just fine with SO_PRIORITY. There is no need for the firmware to play tricks. Just trust that we prioritise the packets correctly. Which we already do.
+Same comment about the barrier.
 
-> 2. a2dp transmission and WiFi data transmission with one shared antenna at the same time.
-> a2dp transmission needs higher priority.
+> +			wake_up_interruptible(sk_sleep(session->sock->sk));
+>  			up_write(&cmtp_session_sem);
+>  			return err;
+>  		}
+> @@ -431,7 +434,11 @@ int cmtp_del_connection(struct cmtp_conndel_req *req)
+>  
+>  		/* Stop session thread */
+>  		atomic_inc(&session->terminate);
+> -		wake_up_process(session->task);
+> +
+> +		/* Ensure session->terminate is updated */
+> +		smp_mb__after_atomic();
 
-I wonder why not use the SO_PRIORITY setting we have anyway. It is actually more precise than what you have based on ACL handles. Since it will even prioritise between different L2CAP connections on the same ACL handle.
+And again.
 
-> Currently I found there is no filter for the specific packets except checking packets from hci raw/monitor socket or hack in btusb.c
-> If I miss something, please let me know, thanks.
+But otherwise I think this looks OK, again with the caveat that I don't
+know Bluetooth/CMTP that well:
 
-There is nothing for it since it was never needed. As I said, doing this for Bluetooth vs Bluetooth connections inside the firmware, that is totally pointless. Just trust the host stack that it sends you the packets in the right order. Which is what we do.
+Reviewed-by: Brian Norris <briannorris@chromium.org>
 
-For WiFi sharing the same antenna, I am fine adding extra callbacks to the driver. However this has to be internal and handed to the driver as extra information. As I said above, we already have SO_PRIORITY and so we know which ACL handle gets priority over another. We actually also know this for L2CAP connections and RFCOMM channels since it works all the way through the stack.
-
-> For the vendor commands HCI_VENDOR_SET_PF_REPORT_CMD and HCI_VENDOR_SET_BITPOOL_CMD, the former is used to send BT profiles information to firmware.
-> The other is used to send bitpool value(from a2dp) to firmware.
-
-I want the full description here. Especially the SET_PF_REPORT_CMD. What are the parameters and how is it suppose to work. How often does it need to be used. How to clear that information, do they survive HCI_Reset etc. The best way is if you send me the Realtek HCI vendor documentation (privately if you want to).
-
-As I said, I see the point for WiFi vs Bluetooth if you share the same antenna. And we can certainly make this work. I am however not trying to optimise Bluetooth vs Bluetooth since that actually does work correctly.
-
-For the SBC bitpool setting of A2DP, I am not even sure on how that is relevant, but I would clearly do that as a second patch (if ever).
-
-Regards
-
-Marcel
-
+> +
+> +		wake_up_interruptible(sk_sleep(session->sock->sk));
+>  	} else
+>  		err = -ENOENT;
+>  
+> -- 
+> 2.1.4
+> 
+> 
