@@ -1,149 +1,84 @@
-Return-Path: <briannorris@chromium.org>
-Date: Fri, 10 Feb 2017 17:26:51 -0800
-From: Brian Norris <briannorris@chromium.org>
-To: Jeffy Chen <jeffy.chen@rock-chips.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Douglas Anderson <dianders@chromium.org>,
-	Johan Hedberg <johan.hedberg@intel.com>,
-	Peter Hurley <peter@hurleysoftware.com>,
-	Johan Hedberg <johan.hedberg@gmail.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>
-Subject: Re: [PATCH 3/3] Bluetooth: hidp: fix possible might sleep error in
- hidp_session_thread
-Message-ID: <20170211012651.GA101282@google.com>
-References: <1485230871-22828-1-git-send-email-jeffy.chen@rock-chips.com>
- <1485230871-22828-3-git-send-email-jeffy.chen@rock-chips.com>
+Return-Path: <alex_lu@realsil.com.cn>
+From: =?gb2312?B?wr3W7M6w?= <alex_lu@realsil.com.cn>
+To: Marcel Holtmann <marcel@holtmann.org>,
+        Larry Finger
+	<Larry.Finger@lwfinger.net>
+CC: "Gustavo F. Padovan" <gustavo@padovan.org>,
+        Johan Hedberg
+	<johan.hedberg@gmail.com>,
+        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: =?gb2312?B?tPC4tDogW1BBVENIXSBydGxidDogQWRkIFJlYWx0ZWsgQmx1ZXRvb3RoIHBy?= =?gb2312?Q?ofiling_support?=
+Date: Sat, 11 Feb 2017 00:54:04 +0000
+Message-ID: <0551C926975A174EA8972327741C7889ED340CE5@RS-MBS01.realsil.com.cn>
+References: <20170209182341.4977-1-Larry.Finger@lwfinger.net>,<485E2AC8-A0F6-4D02-9CB0-D73A231E6FB5@holtmann.org>
+In-Reply-To: <485E2AC8-A0F6-4D02-9CB0-D73A231E6FB5@holtmann.org>
+Content-Type: text/plain; charset="gb2312"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1485230871-22828-3-git-send-email-jeffy.chen@rock-chips.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jeffy,
-
-I'm really not an expert on bluetooth or HIDP, but I can't bring myself
-to say that this is correct. I still think you have a problem.
-
-On Tue, Jan 24, 2017 at 12:07:51PM +0800, Jeffy Chen wrote:
-> It looks like hidp_session_thread has same pattern as the issue reported in
-> old rfcomm:
-> 
-> 	while (1) {
-> 		set_current_state(TASK_INTERRUPTIBLE);
-> 		if (condition)
-> 			break;
-> 		// may call might_sleep here
-> 		schedule();
-> 	}
-> 	__set_current_state(TASK_RUNNING);
-> 
-> Which fixed at:
-> 	dfb2fae Bluetooth: Fix nested sleeps
-> 
-> So let's fix it at the same way, also follow the suggestion of:
-> https://lwn.net/Articles/628628/
-> 
-> Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
-> ---
-> 
->  net/bluetooth/hidp/core.c | 23 +++++++++++++++--------
->  1 file changed, 15 insertions(+), 8 deletions(-)
-> 
-> diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
-> index 0bec458..43d6e6a 100644
-> --- a/net/bluetooth/hidp/core.c
-> +++ b/net/bluetooth/hidp/core.c
-> @@ -36,6 +36,7 @@
->  #define VERSION "1.2"
->  
->  static DECLARE_RWSEM(hidp_session_sem);
-> +static DECLARE_WAIT_QUEUE_HEAD(hidp_session_wq);
->  static LIST_HEAD(hidp_session_list);
->  
->  static unsigned char hidp_keycode[256] = {
-> @@ -1068,12 +1069,15 @@ static int hidp_session_start_sync(struct hidp_session *session)
->   * Wake up session thread and notify it to stop. This is asynchronous and
->   * returns immediately. Call this whenever a runtime error occurs and you want
->   * the session to stop.
-> - * Note: wake_up_process() performs any necessary memory-barriers for us.
->   */
->  static void hidp_session_terminate(struct hidp_session *session)
->  {
->  	atomic_inc(&session->terminate);
-> -	wake_up_process(session->task);
-> +
-> +	/* Ensure session->terminate is updated */
-> +	smp_mb__after_atomic();
-> +
-> +	wake_up_interruptible(&hidp_session_wq);
-
-So, you're adding a whole new wait queue here.
-
->  }
->  
->  /*
-> @@ -1180,7 +1184,9 @@ static void hidp_session_run(struct hidp_session *session)
->  	struct sock *ctrl_sk = session->ctrl_sock->sk;
->  	struct sock *intr_sk = session->intr_sock->sk;
->  	struct sk_buff *skb;
-> +	DEFINE_WAIT_FUNC(wait, woken_wake_function);
->  
-> +	add_wait_queue(&hidp_session_wq, &wait);
->  	for (;;) {
->  		/*
->  		 * This thread can be woken up two ways:
-> @@ -1188,12 +1194,10 @@ static void hidp_session_run(struct hidp_session *session)
->  		 *    session->terminate flag and wakes this thread up.
->  		 *  - Via modifying the socket state of ctrl/intr_sock. This
->  		 *    thread is woken up by ->sk_state_changed().
-> -		 *
-> -		 * Note: set_current_state() performs any necessary
-> -		 * memory-barriers for us.
->  		 */
-> -		set_current_state(TASK_INTERRUPTIBLE);
->  
-> +		/* Ensure session->terminate is updated */
-> +		smp_mb__before_atomic();
->  		if (atomic_read(&session->terminate))
->  			break;
->  
-> @@ -1227,11 +1231,14 @@ static void hidp_session_run(struct hidp_session *session)
->  		hidp_process_transmit(session, &session->ctrl_transmit,
->  				      session->ctrl_sock);
->  
-> -		schedule();
-> +		wait_woken(&wait, TASK_INTERRUPTIBLE, MAX_SCHEDULE_TIMEOUT);
-
-And you're waiting on it here.
-
-But you're already on two other wait queues (hidp_session_thread()). So
-the nice WQ_FLAG_WOKEN handling will only happen if you get woken via
-the new hidp_session_wq queue. But what about the other two? Seems like
-again you might have a race condition that would lead you to
-(temporarily, at least?) missing a wake-up attempt.
-
-I'm not really sure what the best way to resolve this would be. My best
-guess would be to either consolidate the use of these wait queues, or
-lese roll a version of wait_woken() to handle 2 or more wait heads...
-
-Am I wrong? I easily could be.
-
-Brian
-
->  	}
-> +	remove_wait_queue(&hidp_session_wq, &wait);
->  
->  	atomic_inc(&session->terminate);
-> -	set_current_state(TASK_RUNNING);
-> +
-> +	/* Ensure session->terminate is updated */
-> +	smp_mb__after_atomic();
->  }
->  
->  /*
-> -- 
-> 2.1.4
-> 
-> 
+SGkgTWFyY2VsLApUaGFua3MgZm9yIHlvdXIgcmVzcG9uc2UuCgpGaXJzdCwgbGV0IG1lIGV4cGxh
+aW4gdGhlIEJUIHByb2ZpbGluZy4KQlQgcHJvZmlsaW5nIHBhcnNlcyBzb21lIHBhY2tldHMgbGlr
+ZSBjb25uZWN0aW9uIGNvbXBsZXRlIGV2ZW50LCBsMmNhcCBjb25uIHJlcS9yc3AsIC4uLiB0byBn
+ZXQgcHJvZmlsZXMgaW5mb3JtYXRpb24gZm9yIGZpcm13YXJlLgpGaXJtd2FyZSB1c2VzIHRoZSBp
+bmZvcm1hdGlvbiB0byBiYWxhbmNlIHBhY2tldCB0cmFuc21pc3Npb24gcHJpb3JpdHkgdG8gZ2V0
+IGdvb2QgdXNlciBleHBlcmllbmNlLgpUaGUgdHlwaWNhbCBzY2VuYXJpb3M6CjEuIGEyZHAgdHJh
+bnNtaXNzaW9uIGFuZCBvcHAgdHJhbnNtaXNzaW9uIGF0IHRoZSBzYW1lIHRpbWUuCjIuIGEyZHAg
+dHJhbnNtaXNzaW9uIGFuZCBXaUZpIGRhdGEgdHJhbnNtaXNzaW9uIHdpdGggb25lIHNoYXJlZCBh
+bnRlbm5hIGF0IHRoZSBzYW1lIHRpbWUuCmEyZHAgdHJhbnNtaXNzaW9uIG5lZWRzIGhpZ2hlciBw
+cmlvcml0eS4KCkN1cnJlbnRseSBJIGZvdW5kIHRoZXJlIGlzIG5vIGZpbHRlciBmb3IgdGhlIHNw
+ZWNpZmljIHBhY2tldHMgZXhjZXB0IGNoZWNraW5nIHBhY2tldHMgZnJvbSBoY2kgcmF3L21vbml0
+b3Igc29ja2V0IG9yIGhhY2sgaW4gYnR1c2IuYwpJZiBJIG1pc3Mgc29tZXRoaW5nLCBwbGVhc2Ug
+bGV0IG1lIGtub3csIHRoYW5rcy4KCkZvciB0aGUgdmVuZG9yIGNvbW1hbmRzIEhDSV9WRU5ET1Jf
+U0VUX1BGX1JFUE9SVF9DTUQgYW5kIEhDSV9WRU5ET1JfU0VUX0JJVFBPT0xfQ01ELCB0aGUgZm9y
+bWVyIGlzIHVzZWQgdG8gc2VuZCBCVCBwcm9maWxlcyBpbmZvcm1hdGlvbiB0byBmaXJtd2FyZS4K
+VGhlIG90aGVyIGlzIHVzZWQgdG8gc2VuZCBiaXRwb29sIHZhbHVlKGZyb20gYTJkcCkgdG8gZmly
+bXdhcmUuCgpUaGFua3MsCkJScywKQWxleCBMdS4KX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fXwq3orz+yMs6IE1hcmNlbCBIb2x0bWFubiBbbWFyY2VsQGhvbHRtYW5uLm9y
+Z10Kt6LLzcqxvOQ6IDIwMTfE6jLUwjEwyNUgMTk6MDkKytW8/sjLOiBMYXJyeSBGaW5nZXIKs63L
+zTogR3VzdGF2byBGLiBQYWRvdmFuOyBKb2hhbiBIZWRiZXJnOyBsaW51eC1ibHVldG9vdGg7IMK9
+1uzOsDsgbGludXgta2VybmVsQHZnZXIua2VybmVsLm9yZwrW98ziOiBSZTogW1BBVENIXSBydGxi
+dDogQWRkIFJlYWx0ZWsgQmx1ZXRvb3RoIHByb2ZpbGluZyBzdXBwb3J0CgpIaSBMYXJyeSwKCj4g
+QWRkIHRoZSBSZWFsdGVrIEJsdWV0b290aCBwcm9maWxlIHByb2ZpbGluZyBzdXBwb3J0IHRvIGNy
+ZWF0ZQo+IHByb2ZpbGUgaW5mb3JtYXRpb24sIHdoaWNoIGhlbHBzIHRoZSBmaXJtd2FyZSBvcHRp
+bWl6ZSB0cmFuc2Zlcgo+IHByaW9yaXR5IGFuZCBiYWxhbmNlIHRoZSB0cmFuc21pc3Npb25zIGZv
+ciBtdWx0aXBsZSBwcm9maWxlcy4KPgo+IFNpZ25lZC1vZmYtYnk6IEFsZXggTHUgPGFsZXhfbHVA
+cmVhbHNpbC5jb20uY24+Cj4gU2lnbmVkLW9mZi1ieTogTGFycnkgRmluZ2VyIDxMYXJyeS5GaW5n
+ZXJAbHdmaW5nZXIubmV0Pgo+IC0tLQo+IGRyaXZlcnMvYmx1ZXRvb3RoL0tjb25maWcgICAgfCAg
+IDE2ICsKPiBkcml2ZXJzL2JsdWV0b290aC9NYWtlZmlsZSAgIHwgICAgMSArCj4gZHJpdmVycy9i
+bHVldG9vdGgvYnR1c2IuYyAgICB8ICAgMTIgKwo+IGRyaXZlcnMvYmx1ZXRvb3RoL3J0bF9idHBm
+LmMgfCAxMjQ5ICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKwo+IGRy
+aXZlcnMvYmx1ZXRvb3RoL3J0bF9idHBmLmggfCAgMTg0ICsrKysrKysKPiA1IGZpbGVzIGNoYW5n
+ZWQsIDE0NjIgaW5zZXJ0aW9ucygrKQo+IGNyZWF0ZSBtb2RlIDEwMDY0NCBkcml2ZXJzL2JsdWV0
+b290aC9ydGxfYnRwZi5jCj4gY3JlYXRlIG1vZGUgMTAwNjQ0IGRyaXZlcnMvYmx1ZXRvb3RoL3J0
+bF9idHBmLmgKPgoKPHNuaXA+Cgo+ICtzdGF0aWMgaW50IGJ0cGZfb3Blbl9zb2NrZXQoc3RydWN0
+IHJ0bF9idHBmICpidHBmKQo+ICt7Cj4gKyAgICAgaW50IHJldDsKPiArICAgICBzdHJ1Y3Qgc29j
+a2FkZHJfaGNpIGFkZHI7Cj4gKyAgICAgc3RydWN0IHNvY2sgKnNrOwo+ICsgICAgIHN0cnVjdCBo
+Y2lfZmlsdGVyIGZsdDsKPiArCj4gKyAgICAgcmV0ID0gc29ja19jcmVhdGVfa2VybigmaW5pdF9u
+ZXQsIFBGX0JMVUVUT09USCwgU09DS19SQVcsIEJUUFJPVE9fSENJLAo+ICsgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgJmJ0cGYtPmhjaV9zb2NrKTsKPiArICAgICBpZiAocmV0IDwgMCkgewo+
+ICsgICAgICAgICAgICAgcnRsYnRfZXJyKCJDcmVhdGUgaGNpIHNvY2sgZXJyb3IgJWQiLCByZXQp
+Owo+ICsgICAgICAgICAgICAgZ290byBlcnJfMTsKPiArICAgICB9Cj4gKwo+ICsgICAgIG1lbXNl
+dCgmYWRkciwgMCwgc2l6ZW9mKGFkZHIpKTsKPiArICAgICBhZGRyLmhjaV9mYW1pbHkgPSBBRl9C
+TFVFVE9PVEg7Cj4gKyAgICAgLyogQXNzdW1lIFJlYWx0ZWsgQlQgY29udHJvbGxlciBpbmRleCBp
+cyAwLiAqLwo+ICsgICAgIGFkZHIuaGNpX2RldiA9IDA7Cj4gKyAgICAgYWRkci5oY2lfY2hhbm5l
+bCA9IEhDSV9DSEFOTkVMX1JBVzsKPiArICAgICByZXQgPSBrZXJuZWxfYmluZChidHBmLT5oY2lf
+c29jaywgKHN0cnVjdCBzb2NrYWRkciAqKSZhZGRyLAo+ICsgICAgICAgICAgICAgICAgICAgICAg
+IHNpemVvZihhZGRyKSk7Cj4gKyAgICAgaWYgKHJldCA8IDApIHsKPiArICAgICAgICAgICAgIHJ0
+bGJ0X2VycigiQmluZCBoY2kgc29jayBlcnJvciIpOwo+ICsgICAgICAgICAgICAgZ290byBlcnJf
+MjsKPiArICAgICB9CgpsZXQgbWUgc3RhcnQgd2l0aCBhIGNsZWFyIGFuc3dlciBoZXJlLiBUaGlz
+IGlzIGluc2FuZSBhbmQgd2lsbCBuZXZlciBiZSBtZXJnZWQgdXBzdHJlYW0uCgpJIGhhdmUgbm8g
+aWRlYSBvbiBob3cgZGVzY3JpYmUgdGhpcyBhbnkgb3RoZXIgd2F5LCBidXQgdGhpcyBpcyByZWFs
+bHkgYmFkIGlkZWEsIHRvdGFsbHkgYmxvYXRlZCBhbmQgY2F1c2luZyBzaWRlIGFmZmVjdHMgbGVm
+dCBhbmQgcmlnaHQuIFRoZSBIQ0kgcmF3IHNvY2tldCBpcyBub3QgZm9yIGRvaW5nIHByb2ZpbGlu
+Zy4gRXNwZWNpYWxseSBub3QgaW5zaWRlIHRoZSBrZXJuZWwuIEFuZCBqdXN0IHRoaW5raW5nIHRo
+YXQgc29tZW9uZSB0b29rIHRoZSBvbGQgaGNpZHVtcCBjb2RlIGFuZCBoYWNrZWQgaXQgdG8gcnVu
+IGFzIGEga2VybmVsIG1vZHVsZSBpcyBzb21ldGhpbmcgSSBuZXZlciBleHBlY3RlZCB0byBoYXBw
+ZW4uCgo8c25pcD4KCj4gKwo+ICsjZGVmaW5lIEhDSV9WRU5ET1JfU0VUX1BGX1JFUE9SVF9DTUQg
+MHhmYzE5Cj4gKyNkZWZpbmUgSENJX1ZFTkRPUl9TRVRfQklUUE9PTF9DTUQgICAweGZjNTEKCkkg
+dGhpbmsgdGhhdCBldmVyeXRoaW5nIHNob3VsZCBzdGFydCB3aXRoIHdoYXQgdGhlc2UgdHdvIHZl
+bmRvciBjb21tYW5kcyBhcmUgYWN0dWFsbHkgZG9pbmcuIFNvIGEgc2ltcGxlIGRlc2NyaXB0aW9u
+cyBvZiB0aGVzZSB0d28gdmVuZG9yIGNvbW1hbmRzIGlzIHdoYXQgaXMgbmVlZGVkIGZpcnN0LgoK
+QW5kIHRoZW4gc29tZW9uZSBuZWVkcyB0byB0ZWxsIG1lIHdoYXQgYWxsIHRoaXMgY29kZSBkb2Vz
+IHRoYXQgU09fUFJJT1JJVFkgaXMgbm90IGFscmVhZHkgZG9pbmcgYW5kIGhhcyBiZWVuIGRvaW5n
+IGZvciBhIGxvbmcgdGltZS4KClJlZ2FyZHMKCk1hcmNlbAoK
