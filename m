@@ -1,59 +1,62 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 10.2 \(3259\))
-Subject: Re: hci_core: Buggy handling of HCI_SETUP flag in mgmt API
+Subject: Re: [PATCH] Bluetooth: hci_bcm: Do not change uart speed
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20170213070152.xub4xijmvnztpf43@earth>
-Date: Mon, 13 Feb 2017 10:34:26 +0100
-Cc: Linux-Bluetooth <linux-bluetooth@vger.kernel.org>
-Message-Id: <0ED8F56A-0542-4462-AE99-AFEB56AFB205@holtmann.org>
-References: <20170213070152.xub4xijmvnztpf43@earth>
-To: Sebastian Reichel <sre@kernel.org>
+In-Reply-To: <b549dc2e-d386-0654-f2db-18515a2929d9@axis.com>
+Date: Mon, 13 Feb 2017 10:30:02 +0100
+Cc: =?utf-8?Q?Fr=C3=A9d=C3=A9ric_Danis?= <frederic.danis.oss@gmail.com>,
+        linux-bluetooth@vger.kernel.org
+Message-Id: <D9B3A7D8-06CC-4E39-B82E-1E21F36EF1BF@holtmann.org>
+References: <20170207125342.21962-1-jonashg@axis.com>
+ <59DECB69-AB06-4F66-8CE1-AA90A797285B@holtmann.org>
+ <f6d456ea-427a-87ae-a35e-73c08edb6ad3@gmail.com>
+ <b549dc2e-d386-0654-f2db-18515a2929d9@axis.com>
+To: Jonas Holmberg <jonas.holmberg@axis.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Sebastian,
+Hi Jonas,
 
-> While working on the nokia BT driver, I found a strange bug in
-> bluetooth core support. If the driver's setup routine fails,
-> a hci0 interface is created with status DOWN, which looks ok.
-> The management interface is not happy, though:
+>>>> Do not change from init_speed to oper_speed per default since it may
+>>>> cause failures and timeouts if the uart cannot handle the new speed.
+>>>> orig_speed should probably be set using device tree instead.
+>>>> ---
+>>>> drivers/bluetooth/hci_bcm.c | 2 +-
+>>>> 1 file changed, 1 insertion(+), 1 deletion(-)
+>>>> 
+>>>> diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
+>>>> index 8f6c23c..7787f82 100644
+>>>> --- a/drivers/bluetooth/hci_bcm.c
+>>>> +++ b/drivers/bluetooth/hci_bcm.c
+>>>> @@ -809,7 +809,7 @@ static const struct hci_uart_proto bcm_proto = {
+>>>>    .name        = "Broadcom",
+>>>>    .manufacturer    = 15,
+>>>>    .init_speed    = 115200,
+>>>> -    .oper_speed    = 4000000,
+>>>> +    .oper_speed    = 0,
+>>>>    .open        = bcm_open,
+>>>>    .close        = bcm_close,
+>>>>    .flush        = bcm_flush,
+>>> I am generally fine with this, but the DT support for Broadcom UART
+>>> devices is not yet upstream. And we need to make sure this also works
+>>> for ACPI based devices. If we can get the max UART speed from ACPI,
+>>> then I am fine doing it this way.
+>> 
+>> Afair, the max UART speed is nor provided from ACPI, only the initial
+>> speed is provided, at least for the Asus T100TA.
 > 
-> n950# btmgmt info ; btmgmt config
-> Index list with 0 items
-> Unconfigured index list with 0 items
+> Does that mean that I will need to patch the kernel for uarts that does
+> not support 4000000 baud until the DT patches have been merged, or is
+> there anything else that I can do?
 > 
-> It becomes even more interesting, if I do "hciconfig hci0 up"
-> (the setup routine only failed due to FW not yet being available
-> during early boot). At that point btmgmt still fails:
-> 
-> n950# btmgmt info; btmgmt config
-> Index list with 0 items
-> Unconfigured index list with 0 items
-> 
-> But the device is up and running from hciconfig's perspective
-> and hcitool can be used to scan for devices.
-> 
-> I added a few debug prints to the management interface and the
-> problem is, that HCI_SETUP flag is never cleared, when initial
-> setup fails. This should be easily reproducible by adding this
-> to any BT driver's setup routine:
-> 
-> static bool fail = true;
-> if (fail) {
->    fail = false;
->    return -ENOENT;
-> }
-> 
-> I'm not sure about the correct solution to fix this. Initially I
-> thought the flag just needs to be cleared in the path used by
-> "hciconfig up". But this would mean, that such a device cannot be
-> enabled using the management API (since HCI_SETUP would be set
-> until its cleared by hciconfig).
+> It would be nice if this was a bit more obvious for the user somehow. I
+> had to use git bisect to figure out why I got random errors and timeouts
+> after upgrading to kernel version >= 4.2.
 
-so the legacy (aka old and don’t use it anymore) ioctl that hciconfig triggers for bringing an interface up should in theory do the same as Set Power from mgmt. At least from a BR/EDR perspective since for LE it is a lot more complicated. However this also includes Secure Connections and OOB pairing where you need mgmt to function properly.
+that is a good question and I do not know a clear answer to that. We have to set it to some value. Running these with the default speed of 115200 works, but is also not really acceptable if anybody wants to do A2DP streaming. So what value to pick?
 
-That all said, there might be some race condition here in case hdev->setup returns a negative error. Actually if hdev->setup fails the controller should be marked as non-functional. That would mean mark it as RAW only device. I think that is how we have treated this. Which means you can bring it up with hciconfig’s ioctl or use it as HCI User Channel, but the Bluetooth core stack will never touch it again.
+Maybe we can do some ACPI overlay or DT overlay over ACPI to allow setting this externally. But I would have to refer to the ACPI and DT experts on this.
 
 Regards
 
