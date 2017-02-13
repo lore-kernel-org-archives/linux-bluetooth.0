@@ -1,136 +1,167 @@
-Return-Path: <sre@kernel.org>
-Date: Mon, 13 Feb 2017 23:00:21 +0100
-From: Sebastian Reichel <sre@kernel.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Linux-Bluetooth <linux-bluetooth@vger.kernel.org>
-Subject: Re: hci_core: Buggy handling of HCI_SETUP flag in mgmt API
-Message-ID: <20170213220021.kgec5y2voxc2ighi@earth>
-References: <20170213070152.xub4xijmvnztpf43@earth>
- <0ED8F56A-0542-4462-AE99-AFEB56AFB205@holtmann.org>
+Return-Path: <dmitry.torokhov@gmail.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="smpuijrdk3iku4jw"
-In-Reply-To: <0ED8F56A-0542-4462-AE99-AFEB56AFB205@holtmann.org>
+In-Reply-To: <1486959154-25810-3-git-send-email-jeffy.chen@rock-chips.com>
+References: <1486959154-25810-1-git-send-email-jeffy.chen@rock-chips.com> <1486959154-25810-3-git-send-email-jeffy.chen@rock-chips.com>
+From: Dmitry Torokhov <dmitry.torokhov@gmail.com>
+Date: Mon, 13 Feb 2017 13:27:26 -0800
+Message-ID: <CAKdAkRTxN3TrNYwFB1AXz4XgOoJdKpgkgHSdqf299CoHfMZ2vQ@mail.gmail.com>
+Subject: Re: [PATCH v3 3/3] Bluetooth: hidp: fix possible might sleep error in hidp_session_thread
+To: Jeffy Chen <jeffy.chen@rock-chips.com>
+Cc: linux-bluetooth@vger.kernel.org, Brian Norris <briannorris@chromium.org>,
+	Douglas Anderson <dianders@chromium.org>, Johan Hedberg <johan.hedberg@intel.com>,
+	Peter Hurley <peter@hurleysoftware.com>, Johan Hedberg <johan.hedberg@gmail.com>,
+	netdev <netdev@vger.kernel.org>, lkml <linux-kernel@vger.kernel.org>,
+	"David S. Miller" <davem@davemloft.net>, Marcel Holtmann <marcel@holtmann.org>,
+	Gustavo Padovan <gustavo@padovan.org>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Jeffy,
 
---smpuijrdk3iku4jw
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On Sun, Feb 12, 2017 at 8:12 PM, Jeffy Chen <jeffy.chen@rock-chips.com> wrote:
+> It looks like hidp_session_thread has same pattern as the issue reported in
+> old rfcomm:
+>
+>         while (1) {
+>                 set_current_state(TASK_INTERRUPTIBLE);
+>                 if (condition)
+>                         break;
+>                 // may call might_sleep here
+>                 schedule();
+>         }
+>         __set_current_state(TASK_RUNNING);
+>
+> Which fixed at:
+>         dfb2fae Bluetooth: Fix nested sleeps
+>
+> So let's fix it at the same way, also follow the suggestion of:
+> https://lwn.net/Articles/628628/
+>
+> Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
+> 1/ Fix could not wake up by wake attempts on original wait queues.
+> 2/ Remove unnecessary memory barrier before wake_up_* functions.
+>
+> ---
+>
+> Changes in v3: None
+> Changes in v2: None
+>
+>  net/bluetooth/hidp/core.c | 33 ++++++++++++++++++++++-----------
+>  1 file changed, 22 insertions(+), 11 deletions(-)
+>
+> diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
+> index 0bec458..076bc50 100644
+> --- a/net/bluetooth/hidp/core.c
+> +++ b/net/bluetooth/hidp/core.c
+> @@ -36,6 +36,7 @@
+>  #define VERSION "1.2"
+>
+>  static DECLARE_RWSEM(hidp_session_sem);
+> +static DECLARE_WAIT_QUEUE_HEAD(hidp_session_wq);
+>  static LIST_HEAD(hidp_session_list);
+>
+>  static unsigned char hidp_keycode[256] = {
+> @@ -1068,12 +1069,12 @@ static int hidp_session_start_sync(struct hidp_session *session)
+>   * Wake up session thread and notify it to stop. This is asynchronous and
+>   * returns immediately. Call this whenever a runtime error occurs and you want
+>   * the session to stop.
+> - * Note: wake_up_process() performs any necessary memory-barriers for us.
+> + * Note: wake_up_interruptible() performs any necessary memory-barriers for us.
+>   */
+>  static void hidp_session_terminate(struct hidp_session *session)
+>  {
+>         atomic_inc(&session->terminate);
+> -       wake_up_process(session->task);
+> +       wake_up_interruptible(&hidp_session_wq);
+>  }
+>
+>  /*
+> @@ -1180,7 +1181,9 @@ static void hidp_session_run(struct hidp_session *session)
+>         struct sock *ctrl_sk = session->ctrl_sock->sk;
+>         struct sock *intr_sk = session->intr_sock->sk;
+>         struct sk_buff *skb;
+> +       DEFINE_WAIT_FUNC(wait, woken_wake_function);
+>
+> +       add_wait_queue(&hidp_session_wq, &wait);
+>         for (;;) {
+>                 /*
+>                  * This thread can be woken up two ways:
+> @@ -1188,12 +1191,10 @@ static void hidp_session_run(struct hidp_session *session)
+>                  *    session->terminate flag and wakes this thread up.
+>                  *  - Via modifying the socket state of ctrl/intr_sock. This
+>                  *    thread is woken up by ->sk_state_changed().
+> -                *
+> -                * Note: set_current_state() performs any necessary
+> -                * memory-barriers for us.
+>                  */
+> -               set_current_state(TASK_INTERRUPTIBLE);
+>
+> +               /* Ensure session->terminate is updated */
+> +               smp_mb__before_atomic();
+>                 if (atomic_read(&session->terminate))
+>                         break;
+>
+> @@ -1227,11 +1228,22 @@ static void hidp_session_run(struct hidp_session *session)
+>                 hidp_process_transmit(session, &session->ctrl_transmit,
+>                                       session->ctrl_sock);
+>
+> -               schedule();
+> +               wait_woken(&wait, TASK_INTERRUPTIBLE, MAX_SCHEDULE_TIMEOUT);
+>         }
+> +       remove_wait_queue(&hidp_session_wq, &wait);
+>
+>         atomic_inc(&session->terminate);
+> -       set_current_state(TASK_RUNNING);
+> +
+> +       /* Ensure session->terminate is updated */
+> +       smp_mb__after_atomic();
+> +}
+> +
+> +int hidp_session_wake_function(wait_queue_t *wait, unsigned int mode,
+> +                              int sync, void *key)
 
-Hi,
+static?
 
-On Mon, Feb 13, 2017 at 10:34:26AM +0100, Marcel Holtmann wrote:
-> > While working on the nokia BT driver, I found a strange bug in
-> > bluetooth core support. If the driver's setup routine fails,
-> > a hci0 interface is created with status DOWN, which looks ok.
-> > The management interface is not happy, though:
-> >=20
-> > n950# btmgmt info ; btmgmt config
-> > Index list with 0 items
-> > Unconfigured index list with 0 items
-> >=20
-> > It becomes even more interesting, if I do "hciconfig hci0 up"
-> > (the setup routine only failed due to FW not yet being available
-> > during early boot). At that point btmgmt still fails:
-> >=20
-> > n950# btmgmt info; btmgmt config
-> > Index list with 0 items
-> > Unconfigured index list with 0 items
-> >=20
-> > But the device is up and running from hciconfig's perspective
-> > and hcitool can be used to scan for devices.
-> >=20
-> > I added a few debug prints to the management interface and the
-> > problem is, that HCI_SETUP flag is never cleared, when initial
-> > setup fails. This should be easily reproducible by adding this
-> > to any BT driver's setup routine:
-> >=20
-> > static bool fail =3D true;
-> > if (fail) {
-> >    fail =3D false;
-> >    return -ENOENT;
-> > }
-> >=20
-> > I'm not sure about the correct solution to fix this. Initially I
-> > thought the flag just needs to be cleared in the path used by
-> > "hciconfig up". But this would mean, that such a device cannot be
-> > enabled using the management API (since HCI_SETUP would be set
-> > until its cleared by hciconfig).
->=20
-> so the legacy (aka old and don=E2=80=99t use it anymore) ioctl that
-> hciconfig triggers for bringing an interface up should in theory
-> do the same as Set Power from mgmt. At least from a BR/EDR
-> perspective since for LE it is a lot more complicated. However
-> this also includes Secure Connections and OOB pairing where you
-> need mgmt to function properly.
+> +{
+> +       wake_up_interruptible(&hidp_session_wq);
+> +
+> +       return default_wake_function(wait, mode, sync, key);
 
-ioctl calls hci_dev_do_open() directly and the mgmt interface uses
-hci_power_on(), which does a few extra things. As far as I can tell
-the ioctl should also do the extra things from hci_power_on().
-Basically the extra things are: clear HCI_SETUP flag & call
-mgmt_index_added. Otherwise using the legacy API results in
-inconsistent mgmt state.
+I do not think you need to call default_wake_function() here: the
+process is waiting on hidp_session_wq, so the wakeup above is what
+will wake up the session. By the time you get to call
+default_wake_function() task will already be in wrong state. I think
+we should simply return "false" instead of calling
+default_wake_function().
 
-> That all said, there might be some race condition here in case
-> hdev->setup returns a negative error. Actually if hdev->setup
-> fails the controller should be marked as non-functional. That
-> would mean mark it as RAW only device. I think that is how we have
-> treated this. Which means you can bring it up with hciconfig=E2=80=99s
-> ioctl or use it as HCI User Channel, but the Bluetooth core stack
-> will never touch it again.
+>  }
+>
+>  /*
+> @@ -1244,7 +1256,8 @@ static void hidp_session_run(struct hidp_session *session)
+>  static int hidp_session_thread(void *arg)
+>  {
+>         struct hidp_session *session = arg;
+> -       wait_queue_t ctrl_wait, intr_wait;
+> +       DEFINE_WAIT_FUNC(ctrl_wait, hidp_session_wake_function);
+> +       DEFINE_WAIT_FUNC(intr_wait, hidp_session_wake_function);
+>
+>         BT_DBG("session %p", session);
+>
+> @@ -1254,8 +1267,6 @@ static int hidp_session_thread(void *arg)
+>         set_user_nice(current, -15);
+>         hidp_set_timer(session);
+>
+> -       init_waitqueue_entry(&ctrl_wait, current);
+> -       init_waitqueue_entry(&intr_wait, current);
+>         add_wait_queue(sk_sleep(session->ctrl_sock->sk), &ctrl_wait);
+>         add_wait_queue(sk_sleep(session->intr_sock->sk), &intr_wait);
+>         /* This memory barrier is paired with wq_has_sleeper(). See
+> --
+> 2.1.4
+>
+>
 
-For me it happens reliably if setup fails initially. Also as far as
-I can tell this can potentially happen with all BT drivers loading a
-FW in their setup routine.
+Thanks.
 
-I added a few more debug prints for further information. During
-initial start hci_power_on() is called and fails when calling
-hci_dev_do_open(). As a result mgmt_set_powered_failed() is called.
-The HCI_SETUP flag is only removed after succesfully calling the
-setup routine.
-
-Now in the mgmt API the index lists (read_index_list,
-read_unconf_index_list and read_ext_index_list) all
-use the following loop, which ignores devices with
-the HCI_SETUP flag set:
-
-list_for_each_entry(d, &hci_dev_list, list) {
-    if (hci_dev_test_flag(d, HCI_SETUP) ||
-        hci_dev_test_flag(d, HCI_CONFIG) ||
-        hci_dev_test_flag(d, HCI_USER_CHANNEL))
-        continue;
-
-    ...
-}
-
-I wonder if it would be ok to just list a device with HCI_SETUP
-flag _and_ power status=3Dfailed as unpowered device in the management
-interface? For using the device it would have to be powered on
-first, which will result in running setup routine again. If it
-fails again mgmt_set_powered_failed() will be called.
-
--- Sebastian
-
---smpuijrdk3iku4jw
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCgAdFiEE72YNB0Y/i3JqeVQT2O7X88g7+poFAliiLHIACgkQ2O7X88g7
-+pr2Qw//ZhUsARPznsUZDoUMgcOzo4PLuBumz3EOszTwG7KiOSuyt2Fx9QHRZEtn
-/7wxqhYTEArsOcXOw8nscBJ566g93s1rlbSNZPTcgGHYLSq3k0c9ujcBtabEBwkA
-u+laxb1km1Flc0JzfrUFCk3K6dZP5fspRtUDhpWb2D1B77UE7er7XKmUB9ge8lSJ
-vV5QVBORrYB/zYA1AFHvsBrDAWz1qo6lkn91low+R+/bq8wmQFyiF/uaAqxOQETA
-MmsBaZn4wmfSAhpkHJ110R9qvrY+G2pgtGDmW0Fd1XoqO/IYh0mo+1CnTM/hPLJT
-m/L4+m/YaVIDhKDfKBHD+eryz97vCs36cUHLjGRte8HXfCMnE0JSmTSyfNOWjYk2
-AKNO25p1WNbsDuPO2qdfukaz6AbPi0n/AVC6bcP79l58wLCoqlKKUWq4ZwVzye+Y
-r2fmV9NSYCRfIZuU10p6ZJ4I8fnfEkeKc0vqUJuAd+2p8ksTcnpu+61ROwCu/pbU
-Fja+1TO3bN4zikTqcmFBf8/h4Hd3CeGUVSVs3Q1P1B7dLD8XU0cKbj5RDrVjzS2b
-7FTQWlTg6/6s6stdaAkoEBKjUgEwsQYPxIkESnIRzOHDJcSRjRt+Kj7WQtEz8Xlx
-YBpfOs2OY1wI8Tu1KNy9cJ/Uii7KF7P0GQvzaqWt7w74OY2+l4A=
-=aGhg
------END PGP SIGNATURE-----
-
---smpuijrdk3iku4jw--
+-- 
+Dmitry
