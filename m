@@ -1,62 +1,79 @@
-Return-Path: <jonas.holmberg@axis.com>
-Subject: Re: [PATCH] Bluetooth: hci_bcm: Do not change uart speed
-To: =?UTF-8?Q?Fr=c3=a9d=c3=a9ric_Danis?= <frederic.danis.oss@gmail.com>,
- Marcel Holtmann <marcel@holtmann.org>
-References: <20170207125342.21962-1-jonashg@axis.com>
- <59DECB69-AB06-4F66-8CE1-AA90A797285B@holtmann.org>
- <f6d456ea-427a-87ae-a35e-73c08edb6ad3@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-From: Jonas Holmberg <jonas.holmberg@axis.com>
-Message-ID: <b549dc2e-d386-0654-f2db-18515a2929d9@axis.com>
-Date: Mon, 13 Feb 2017 09:05:35 +0100
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Date: Mon, 13 Feb 2017 08:01:52 +0100
+From: Sebastian Reichel <sre@kernel.org>
+To: Linux-Bluetooth <linux-bluetooth@vger.kernel.org>
+Subject: hci_core: Buggy handling of HCI_SETUP flag in mgmt API
+Message-ID: <20170213070152.xub4xijmvnztpf43@earth>
 MIME-Version: 1.0
-In-Reply-To: <f6d456ea-427a-87ae-a35e-73c08edb6ad3@gmail.com>
-Content-Type: text/plain; charset=windows-1252
+Content-Type: multipart/signed; micalg=pgp-sha512;
+        protocol="application/pgp-signature"; boundary="n5akxdyfm7fqfu5d"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
+
+
+--n5akxdyfm7fqfu5d
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
 Hi,
 
-On 02/10/2017 01:01 PM, Frédéric Danis wrote:
-> Hello,
-> 
-> Le 10/02/2017 à 12:41, Marcel Holtmann a écrit :
->> Hi Jonas,
->>
->>> Do not change from init_speed to oper_speed per default since it may
->>> cause failures and timeouts if the uart cannot handle the new speed.
->>> orig_speed should probably be set using device tree instead.
->>> ---
->>> drivers/bluetooth/hci_bcm.c | 2 +-
->>> 1 file changed, 1 insertion(+), 1 deletion(-)
->>>
->>> diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
->>> index 8f6c23c..7787f82 100644
->>> --- a/drivers/bluetooth/hci_bcm.c
->>> +++ b/drivers/bluetooth/hci_bcm.c
->>> @@ -809,7 +809,7 @@ static const struct hci_uart_proto bcm_proto = {
->>>     .name        = "Broadcom",
->>>     .manufacturer    = 15,
->>>     .init_speed    = 115200,
->>> -    .oper_speed    = 4000000,
->>> +    .oper_speed    = 0,
->>>     .open        = bcm_open,
->>>     .close        = bcm_close,
->>>     .flush        = bcm_flush,
->> I am generally fine with this, but the DT support for Broadcom UART
->> devices is not yet upstream. And we need to make sure this also works
->> for ACPI based devices. If we can get the max UART speed from ACPI,
->> then I am fine doing it this way.
-> 
-> Afair, the max UART speed is nor provided from ACPI, only the initial
-> speed is provided, at least for the Asus T100TA.
+While working on the nokia BT driver, I found a strange bug in
+bluetooth core support. If the driver's setup routine fails,
+a hci0 interface is created with status DOWN, which looks ok.
+The management interface is not happy, though:
 
-Does that mean that I will need to patch the kernel for uarts that does
-not support 4000000 baud until the DT patches have been merged, or is
-there anything else that I can do?
+n950# btmgmt info ; btmgmt config
+Index list with 0 items
+Unconfigured index list with 0 items
 
-It would be nice if this was a bit more obvious for the user somehow. I
-had to use git bisect to figure out why I got random errors and timeouts
-after upgrading to kernel version >= 4.2.
+It becomes even more interesting, if I do "hciconfig hci0 up"
+(the setup routine only failed due to FW not yet being available
+during early boot). At that point btmgmt still fails:
 
-Regards
-Jonas
+n950# btmgmt info; btmgmt config
+Index list with 0 items
+Unconfigured index list with 0 items
+
+But the device is up and running from hciconfig's perspective
+and hcitool can be used to scan for devices.
+
+I added a few debug prints to the management interface and the
+problem is, that HCI_SETUP flag is never cleared, when initial
+setup fails. This should be easily reproducible by adding this
+to any BT driver's setup routine:
+
+static bool fail = true;
+if (fail) {
+    fail = false;
+    return -ENOENT;
+}
+
+I'm not sure about the correct solution to fix this. Initially I
+thought the flag just needs to be cleared in the path used by
+"hciconfig up". But this would mean, that such a device cannot be
+enabled using the management API (since HCI_SETUP would be set
+until its cleared by hciconfig).
+
+-- Sebastian
+
+--n5akxdyfm7fqfu5d
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCgAdFiEE72YNB0Y/i3JqeVQT2O7X88g7+poFAlihWd4ACgkQ2O7X88g7
++polAw//ddenpwYJwKUTEdZcjpEuyoLMuz9UoMNNlX7Hx22FUr1K4v7xrF0DfS1z
+IjrX1m7hMVGIb6MCg/YiC1yseEsH7avTeqjJPjVtNf7a4+y7ohDI6C9dkNFmahEh
+sCMdG2t7MtDlBADAdMNHudGJWZJjkOKtd6c2gbtt91DUsGJEJ74aUdHpoZR8u4um
+FesfI8aoFsjqR9/iNxSozAH67dJ1p5EO2ctjzSxGGu04+OgAOywUp12rF940PoUD
+RhMHC832fzSJYkJ7NOZzSStLo4jpeDhD9E7x5eqest2AUEciox4CgJ1K0NpP2wYe
+8SR3xX7pHIVB4Zit3lkwLm70nENa/uVo2P/Q/dL8aoQWA9gBnPyD6E3GnHOFkDkX
+aNhLSPjsYJbPWM9Abi+x1FwVRxJeVCB+SaSYChrKE9n0NVwCT90tcTq9rrgAlRTY
+H0+iBkD/nxCfpr39J44rFWwAZose6NG4RmHz1X7x8T/5o+B5T4/n466gw/2fMApN
+vWlUhARk8g39zBjMx7Vwf6cLl2qGQAGDWob/ne8wUt4zIcl9G9MB4SOUHz8vtyqO
+n3d5FMqvpjrOE414DcdKKaFHN6dE2qlf5qld1vtu8pU/aeNcsBUis090LRXjy9YT
+VxEn3QexTYQj9bFMere+zcRqeeIVixlx9duQi/zpMMzr0wB5beI=
+=kVgn
+-----END PGP SIGNATURE-----
+
+--n5akxdyfm7fqfu5d--
