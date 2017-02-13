@@ -1,64 +1,86 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 10.2 \(3259\))
-Subject: Re: [PATCH] Bluetooth: hci_bcm: Do not change uart speed
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <b549dc2e-d386-0654-f2db-18515a2929d9@axis.com>
-Date: Mon, 13 Feb 2017 10:30:02 +0100
-Cc: =?utf-8?Q?Fr=C3=A9d=C3=A9ric_Danis?= <frederic.danis.oss@gmail.com>,
-        linux-bluetooth@vger.kernel.org
-Message-Id: <D9B3A7D8-06CC-4E39-B82E-1E21F36EF1BF@holtmann.org>
-References: <20170207125342.21962-1-jonashg@axis.com>
- <59DECB69-AB06-4F66-8CE1-AA90A797285B@holtmann.org>
- <f6d456ea-427a-87ae-a35e-73c08edb6ad3@gmail.com>
- <b549dc2e-d386-0654-f2db-18515a2929d9@axis.com>
-To: Jonas Holmberg <jonas.holmberg@axis.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <alex_lu@realsil.com.cn>
+From: =?gb2312?B?wr3W7M6w?= <alex_lu@realsil.com.cn>
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: Larry Finger <Larry.Finger@lwfinger.net>,
+        "Gustavo F. Padovan"
+	<gustavo@padovan.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: =?gb2312?B?tPC4tDogW1BBVENIXSBydGxidDogQWRkIFJlYWx0ZWsgQmx1ZXRvb3RoIHBy?= =?gb2312?Q?ofiling_support?=
+Date: Mon, 13 Feb 2017 08:35:02 +0000
+Message-ID: <0551C926975A174EA8972327741C7889ED340FB6@RS-MBS01.realsil.com.cn>
+References: <20170209182341.4977-1-Larry.Finger@lwfinger.net>
+ <485E2AC8-A0F6-4D02-9CB0-D73A231E6FB5@holtmann.org>
+ <0551C926975A174EA8972327741C7889ED340CE5@RS-MBS01.realsil.com.cn>
+ <74212B17-7307-41ED-B2DA-C40CBBA508CF@holtmann.org>
+In-Reply-To: <74212B17-7307-41ED-B2DA-C40CBBA508CF@holtmann.org>
+Content-Type: text/plain; charset="gb2312"
+MIME-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jonas,
-
->>>> Do not change from init_speed to oper_speed per default since it may
->>>> cause failures and timeouts if the uart cannot handle the new speed.
->>>> orig_speed should probably be set using device tree instead.
->>>> ---
->>>> drivers/bluetooth/hci_bcm.c | 2 +-
->>>> 1 file changed, 1 insertion(+), 1 deletion(-)
->>>> 
->>>> diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
->>>> index 8f6c23c..7787f82 100644
->>>> --- a/drivers/bluetooth/hci_bcm.c
->>>> +++ b/drivers/bluetooth/hci_bcm.c
->>>> @@ -809,7 +809,7 @@ static const struct hci_uart_proto bcm_proto = {
->>>>    .name        = "Broadcom",
->>>>    .manufacturer    = 15,
->>>>    .init_speed    = 115200,
->>>> -    .oper_speed    = 4000000,
->>>> +    .oper_speed    = 0,
->>>>    .open        = bcm_open,
->>>>    .close        = bcm_close,
->>>>    .flush        = bcm_flush,
->>> I am generally fine with this, but the DT support for Broadcom UART
->>> devices is not yet upstream. And we need to make sure this also works
->>> for ACPI based devices. If we can get the max UART speed from ACPI,
->>> then I am fine doing it this way.
->> 
->> Afair, the max UART speed is nor provided from ACPI, only the initial
->> speed is provided, at least for the Asus T100TA.
-> 
-> Does that mean that I will need to patch the kernel for uarts that does
-> not support 4000000 baud until the DT patches have been merged, or is
-> there anything else that I can do?
-> 
-> It would be nice if this was a bit more obvious for the user somehow. I
-> had to use git bisect to figure out why I got random errors and timeouts
-> after upgrading to kernel version >= 4.2.
-
-that is a good question and I do not know a clear answer to that. We have to set it to some value. Running these with the default speed of 115200 works, but is also not really acceptable if anybody wants to do A2DP streaming. So what value to pick?
-
-Maybe we can do some ACPI overlay or DT overlay over ACPI to allow setting this externally. But I would have to refer to the ACPI and DT experts on this.
-
-Regards
-
-Marcel
-
+SGkgTWFyY2VsLA0KVGhhbmtzIGZvciB5b3VyIGV4cGxhbmF0aW9uLg0KSSdtIHNvcnJ5LCBJIG11
+c3QgY29ycmVjdCBvbmUgbXkgbWlzdGFrZS4NClRoZSBmaXJzdCB0eXBpY2FsIHNjZW5hcmlvIHNo
+b3VsZCBiZSBwcm9maWxlIGRhdGEgdHJhbnNtaXNzaW9uIChhMmRwIG9yIG9wcC4uLikgYW5kIGlu
+cXVpcnkvcGFnZSBhdCB0aGUgc2FtZSB0aW1lLiBVc2VyIG1pZ2h0IHdhbnQgdG8gY29ubmVjdCB0
+byBvdGhlciBCVCBkZXZpY2Ugd2hlbiBoZS9zaGUgaXMgbGlzdGVuaW5nIG11c2ljIHdpdGggQlQg
+aGVhZHNldC4NCklucXVpcnkvcGFnZSB3aWxsIG9jY3VweSBzb21lIGNvbnRpbnVvdXMgdGltZSBz
+bG90cyBmb3IgdHJhbnNmZXJyaW5nIElEIHBhY2tldHMsIHdoaWNoIGFyZSBub3QgZnJvbSBob3N0
+IHN0YWNrLg0KSWYgdGhlcmUgYXJlIHNvbWUgYTJkcCBtZWRpYSBwYWNrZXRzIHRvIHRyYW5zZmVy
+IGFuZCBpbnF1aXJ5L3BhZ2UgcHJpb3JpdHkgaXMgaGlnaGVyIHRoYW4gdHJhbnNmZXIgQUNMIHBh
+Y2tldHMsIHRoZSBBQ0wgcGFja2V0cyB0cmFuc21pc3Npb24gd291bGQgYmUgZGVsYXllZC4gQXQg
+dGhpcyB0aW1lLCBhdWRpbyBleHBlcmllbmNlIHdvdWxkIG5vdCBiZSBnb29kLg0KQnV0IGlmIHRo
+ZSBwYWNrZXRzIGFyZSBmcm9tIG9wcCB0cmFuc21pc3Npb24sIHRoZSBpbXBhY3Qgd291bGQgYmUg
+bGVzcy4NCg0KVGhhbmtzLA0KQlJzLA0KQWxleCBMdS4NCg0KLS0tLS3Tyrz+1K28/i0tLS0tDQq3
+orz+yMs6IE1hcmNlbCBIb2x0bWFubiBbbWFpbHRvOm1hcmNlbEBob2x0bWFubi5vcmddIA0Kt6LL
+zcqxvOQ6IDIwMTfE6jLUwjExyNUgMTY6NDUNCsrVvP7Iyzogwr3W7M6wDQqzrcvNOiBMYXJyeSBG
+aW5nZXI7IEd1c3Rhdm8gRi4gUGFkb3ZhbjsgSm9oYW4gSGVkYmVyZzsgbGludXgtYmx1ZXRvb3Ro
+OyBsaW51eC1rZXJuZWxAdmdlci5rZXJuZWwub3JnDQrW98ziOiBSZTogW1BBVENIXSBydGxidDog
+QWRkIFJlYWx0ZWsgQmx1ZXRvb3RoIHByb2ZpbGluZyBzdXBwb3J0DQoNCkhpIEFsZXgsDQoNCj4g
+Rmlyc3QsIGxldCBtZSBleHBsYWluIHRoZSBCVCBwcm9maWxpbmcuDQo+IEJUIHByb2ZpbGluZyBw
+YXJzZXMgc29tZSBwYWNrZXRzIGxpa2UgY29ubmVjdGlvbiBjb21wbGV0ZSBldmVudCwgbDJjYXAg
+Y29ubiByZXEvcnNwLCAuLi4gdG8gZ2V0IHByb2ZpbGVzIGluZm9ybWF0aW9uIGZvciBmaXJtd2Fy
+ZS4NCj4gRmlybXdhcmUgdXNlcyB0aGUgaW5mb3JtYXRpb24gdG8gYmFsYW5jZSBwYWNrZXQgdHJh
+bnNtaXNzaW9uIHByaW9yaXR5IHRvIGdldCBnb29kIHVzZXIgZXhwZXJpZW5jZS4NCj4gVGhlIHR5
+cGljYWwgc2NlbmFyaW9zOg0KPiAxLiBhMmRwIHRyYW5zbWlzc2lvbiBhbmQgb3BwIHRyYW5zbWlz
+c2lvbiBhdCB0aGUgc2FtZSB0aW1lLg0KDQp0aGF0IHNob3VsZCB3b3JrIGp1c3QgZmluZSB3aXRo
+IFNPX1BSSU9SSVRZLiBUaGVyZSBpcyBubyBuZWVkIGZvciB0aGUgZmlybXdhcmUgdG8gcGxheSB0
+cmlja3MuIEp1c3QgdHJ1c3QgdGhhdCB3ZSBwcmlvcml0aXNlIHRoZSBwYWNrZXRzIGNvcnJlY3Rs
+eS4gV2hpY2ggd2UgYWxyZWFkeSBkby4NCg0KPiAyLiBhMmRwIHRyYW5zbWlzc2lvbiBhbmQgV2lG
+aSBkYXRhIHRyYW5zbWlzc2lvbiB3aXRoIG9uZSBzaGFyZWQgYW50ZW5uYSBhdCB0aGUgc2FtZSB0
+aW1lLg0KPiBhMmRwIHRyYW5zbWlzc2lvbiBuZWVkcyBoaWdoZXIgcHJpb3JpdHkuDQoNCkkgd29u
+ZGVyIHdoeSBub3QgdXNlIHRoZSBTT19QUklPUklUWSBzZXR0aW5nIHdlIGhhdmUgYW55d2F5LiBJ
+dCBpcyBhY3R1YWxseSBtb3JlIHByZWNpc2UgdGhhbiB3aGF0IHlvdSBoYXZlIGJhc2VkIG9uIEFD
+TCBoYW5kbGVzLiBTaW5jZSBpdCB3aWxsIGV2ZW4gcHJpb3JpdGlzZSBiZXR3ZWVuIGRpZmZlcmVu
+dCBMMkNBUCBjb25uZWN0aW9ucyBvbiB0aGUgc2FtZSBBQ0wgaGFuZGxlLg0KDQo+IEN1cnJlbnRs
+eSBJIGZvdW5kIHRoZXJlIGlzIG5vIGZpbHRlciBmb3IgdGhlIHNwZWNpZmljIHBhY2tldHMgZXhj
+ZXB0IA0KPiBjaGVja2luZyBwYWNrZXRzIGZyb20gaGNpIHJhdy9tb25pdG9yIHNvY2tldCBvciBo
+YWNrIGluIGJ0dXNiLmMgSWYgSSBtaXNzIHNvbWV0aGluZywgcGxlYXNlIGxldCBtZSBrbm93LCB0
+aGFua3MuDQoNClRoZXJlIGlzIG5vdGhpbmcgZm9yIGl0IHNpbmNlIGl0IHdhcyBuZXZlciBuZWVk
+ZWQuIEFzIEkgc2FpZCwgZG9pbmcgdGhpcyBmb3IgQmx1ZXRvb3RoIHZzIEJsdWV0b290aCBjb25u
+ZWN0aW9ucyBpbnNpZGUgdGhlIGZpcm13YXJlLCB0aGF0IGlzIHRvdGFsbHkgcG9pbnRsZXNzLiBK
+dXN0IHRydXN0IHRoZSBob3N0IHN0YWNrIHRoYXQgaXQgc2VuZHMgeW91IHRoZSBwYWNrZXRzIGlu
+IHRoZSByaWdodCBvcmRlci4gV2hpY2ggaXMgd2hhdCB3ZSBkby4NCg0KRm9yIFdpRmkgc2hhcmlu
+ZyB0aGUgc2FtZSBhbnRlbm5hLCBJIGFtIGZpbmUgYWRkaW5nIGV4dHJhIGNhbGxiYWNrcyB0byB0
+aGUgZHJpdmVyLiBIb3dldmVyIHRoaXMgaGFzIHRvIGJlIGludGVybmFsIGFuZCBoYW5kZWQgdG8g
+dGhlIGRyaXZlciBhcyBleHRyYSBpbmZvcm1hdGlvbi4gQXMgSSBzYWlkIGFib3ZlLCB3ZSBhbHJl
+YWR5IGhhdmUgU09fUFJJT1JJVFkgYW5kIHNvIHdlIGtub3cgd2hpY2ggQUNMIGhhbmRsZSBnZXRz
+IHByaW9yaXR5IG92ZXIgYW5vdGhlci4gV2UgYWN0dWFsbHkgYWxzbyBrbm93IHRoaXMgZm9yIEwy
+Q0FQIGNvbm5lY3Rpb25zIGFuZCBSRkNPTU0gY2hhbm5lbHMgc2luY2UgaXQgd29ya3MgYWxsIHRo
+ZSB3YXkgdGhyb3VnaCB0aGUgc3RhY2suDQoNCj4gRm9yIHRoZSB2ZW5kb3IgY29tbWFuZHMgSENJ
+X1ZFTkRPUl9TRVRfUEZfUkVQT1JUX0NNRCBhbmQgSENJX1ZFTkRPUl9TRVRfQklUUE9PTF9DTUQs
+IHRoZSBmb3JtZXIgaXMgdXNlZCB0byBzZW5kIEJUIHByb2ZpbGVzIGluZm9ybWF0aW9uIHRvIGZp
+cm13YXJlLg0KPiBUaGUgb3RoZXIgaXMgdXNlZCB0byBzZW5kIGJpdHBvb2wgdmFsdWUoZnJvbSBh
+MmRwKSB0byBmaXJtd2FyZS4NCg0KSSB3YW50IHRoZSBmdWxsIGRlc2NyaXB0aW9uIGhlcmUuIEVz
+cGVjaWFsbHkgdGhlIFNFVF9QRl9SRVBPUlRfQ01ELiBXaGF0IGFyZSB0aGUgcGFyYW1ldGVycyBh
+bmQgaG93IGlzIGl0IHN1cHBvc2UgdG8gd29yay4gSG93IG9mdGVuIGRvZXMgaXQgbmVlZCB0byBi
+ZSB1c2VkLiBIb3cgdG8gY2xlYXIgdGhhdCBpbmZvcm1hdGlvbiwgZG8gdGhleSBzdXJ2aXZlIEhD
+SV9SZXNldCBldGMuIFRoZSBiZXN0IHdheSBpcyBpZiB5b3Ugc2VuZCBtZSB0aGUgUmVhbHRlayBI
+Q0kgdmVuZG9yIGRvY3VtZW50YXRpb24gKHByaXZhdGVseSBpZiB5b3Ugd2FudCB0bykuDQoNCkFz
+IEkgc2FpZCwgSSBzZWUgdGhlIHBvaW50IGZvciBXaUZpIHZzIEJsdWV0b290aCBpZiB5b3Ugc2hh
+cmUgdGhlIHNhbWUgYW50ZW5uYS4gQW5kIHdlIGNhbiBjZXJ0YWlubHkgbWFrZSB0aGlzIHdvcmsu
+IEkgYW0gaG93ZXZlciBub3QgdHJ5aW5nIHRvIG9wdGltaXNlIEJsdWV0b290aCB2cyBCbHVldG9v
+dGggc2luY2UgdGhhdCBhY3R1YWxseSBkb2VzIHdvcmsgY29ycmVjdGx5Lg0KDQpGb3IgdGhlIFNC
+QyBiaXRwb29sIHNldHRpbmcgb2YgQTJEUCwgSSBhbSBub3QgZXZlbiBzdXJlIG9uIGhvdyB0aGF0
+IGlzIHJlbGV2YW50LCBidXQgSSB3b3VsZCBjbGVhcmx5IGRvIHRoYXQgYXMgYSBzZWNvbmQgcGF0
+Y2ggKGlmIGV2ZXIpLg0KDQpSZWdhcmRzDQoNCk1hcmNlbA0KDQo=
