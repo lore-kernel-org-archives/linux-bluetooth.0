@@ -1,79 +1,61 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Subject: Re: Bluez5.43 stack for bcm4334x chipset
-To: Sinthu Raja M <sinthu.raja@mistralsolutions.com>
-References: <CAEd-yTTD0TAE86Ts=Doa0QFcMk2_FARQmxVr5zia8eaJ=NZNDA@mail.gmail.com>
- <CAAu3APanyqS-4JdV6yV-nnAKT4bqJjREjUNB3M1Ziq4OHta3XA@mail.gmail.com>
-Cc: Barry Byford <31baz66@gmail.com>,
-        Bluez mailing list <linux-bluetooth@vger.kernel.org>
-From: Loic Poulain <loic.poulain@intel.com>
-Message-ID: <ff770d8a-2f12-aa54-7273-07f8b244e9a3@intel.com>
-Date: Mon, 13 Feb 2017 11:28:23 +0100
-MIME-Version: 1.0
-In-Reply-To: <CAAu3APanyqS-4JdV6yV-nnAKT4bqJjREjUNB3M1Ziq4OHta3XA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 10.2 \(3259\))
+Subject: Re: hci_core: Buggy handling of HCI_SETUP flag in mgmt API
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20170213070152.xub4xijmvnztpf43@earth>
+Date: Mon, 13 Feb 2017 10:34:26 +0100
+Cc: Linux-Bluetooth <linux-bluetooth@vger.kernel.org>
+Message-Id: <0ED8F56A-0542-4462-AE99-AFEB56AFB205@holtmann.org>
+References: <20170213070152.xub4xijmvnztpf43@earth>
+To: Sebastian Reichel <sre@kernel.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Raja,
+Hi Sebastian,
 
+> While working on the nokia BT driver, I found a strange bug in
+> bluetooth core support. If the driver's setup routine fails,
+> a hci0 interface is created with status DOWN, which looks ok.
+> The management interface is not happy, though:
+> 
+> n950# btmgmt info ; btmgmt config
+> Index list with 0 items
+> Unconfigured index list with 0 items
+> 
+> It becomes even more interesting, if I do "hciconfig hci0 up"
+> (the setup routine only failed due to FW not yet being available
+> during early boot). At that point btmgmt still fails:
+> 
+> n950# btmgmt info; btmgmt config
+> Index list with 0 items
+> Unconfigured index list with 0 items
+> 
+> But the device is up and running from hciconfig's perspective
+> and hcitool can be used to scan for devices.
+> 
+> I added a few debug prints to the management interface and the
+> problem is, that HCI_SETUP flag is never cleared, when initial
+> setup fails. This should be easily reproducible by adding this
+> to any BT driver's setup routine:
+> 
+> static bool fail = true;
+> if (fail) {
+>    fail = false;
+>    return -ENOENT;
+> }
+> 
+> I'm not sure about the correct solution to fix this. Initially I
+> thought the flag just needs to be cleared in the path used by
+> "hciconfig up". But this would mean, that such a device cannot be
+> enabled using the management API (since HCI_SETUP would be set
+> until its cleared by hciconfig).
 
-On 12/02/2017 20:56, Barry Byford wrote:
-> Hello Raja,
->
-> On 12 February 2017 at 16:14, Sinthu Raja M
-> <sinthu.raja@mistralsolutions.com> wrote:
->> Hi,
->> I am working on Bluez5.43 stack, cross compiled for ARM v7 and
->> successfully compiled. also ported into the target device. I am using
->> Broadcom bluetooth chip (BCM4334x)The problem is when i do a hciconfig
->> i am getting the following result
->>
->> # hciconfig
->> hci0: Type: Primary  Bus: UART
->> BD Address: 72:8E:6C:AB:DD:A4  ACL MTU: 1021:8  SCO MTU: 64:1
->> DOWN
->> RX bytes:647 acl:0 sco:0 events:32 errors:0
->> TX bytes:407 acl:0 sco:0 commands:32 errors:0
->>
->> 1)  I am not able to scan any devices.  what could be the possible
->> causes ? In my other bluetooth device it is detected as Bluetooth USB
->> Host Controller
+so the legacy (aka old and don’t use it anymore) ioctl that hciconfig triggers for bringing an interface up should in theory do the same as Set Power from mgmt. At least from a BR/EDR perspective since for LE it is a lot more complicated. However this also includes Secure Connections and OOB pairing where you need mgmt to function properly.
 
-Typically meet this issue when running non-patched/embedded bcm firmware.
-HCI link is OK but controller functionalities limited. I suppose the 
-radio is off.
+That all said, there might be some race condition here in case hdev->setup returns a negative error. Actually if hdev->setup fails the controller should be marked as non-functional. That would mean mark it as RAW only device. I think that is how we have treated this. Which means you can bring it up with hciconfig’s ioctl or use it as HCI User Channel, but the Bluetooth core stack will never touch it again.
 
->>
->> 2) But I am expecting the following result
->> # hciconfig
->> hci0:   Type: BR/EDR  Bus: UART
->>          BD Address: C4:00:49:00:06:D9  ACL MTU: 1021:8  SCO MTU: 64:1
->>          UP RUNNING PSCAN ISCAN
->>          RX bytes:3640 acl:0 sco:0 events:317 errors:0
->>          TX bytes:43776 acl:0 sco:0 commands:311 errors:
->>
->> What modifications I need to be done in hciattach_bcm4334x.c code
->> inorder to get the above output or I need to modify in some other
->> files of Bluez?
-> I'm not sure if it is relevant to your situation but on the Raspbery Pi 3
-> I need to apply the following patches to BlueZ 5.43 for the BCM43xx
-> https://gist.github.com/pelwell/c8230c48ea24698527cd
->
-> The issue I see without the patch is that the controller has an
-> address of all A's in bluetoothctl.
->
->
+Regards
 
-Yes, seems to be the point here, check you have the correct 
-firmware/patch-file and maybe
-update the firmware dir accordingly.
+Marcel
 
-
-What is your kernel version ?
-Broadcom support is integrated in the kernel since Linux 4.1 and It is 
-recommended
-to use it (via btattach) instead of using hciattach (the old way).
-
-
-Regards,
-Loic
