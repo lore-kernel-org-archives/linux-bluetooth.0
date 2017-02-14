@@ -1,96 +1,21 @@
-Return-Path: <jeffy.chen@rock-chips.com>
-From: Jeffy Chen <jeffy.chen@rock-chips.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+MIME-Version: 1.0
+From: Dave Beal <dbeal@cardinalpeak.com>
+Date: Mon, 13 Feb 2017 17:28:35 -0700
+Message-ID: <CAHHBb0eePBK8bE3fkXJLdo5p1bhE42iOHxhwCiV1zgYvWg7k6g@mail.gmail.com>
+Subject: How to receive Notifications?
 To: linux-bluetooth@vger.kernel.org
-Cc: Brian Norris <briannorris@chromium.org>,
-	Douglas Anderson <dianders@chromium.org>,
-	Johan Hedberg <johan.hedberg@intel.com>,
-	Peter Hurley <peter@hurleysoftware.com>,
-	Jeffy Chen <jeffy.chen@rock-chips.com>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>
-Subject: [PATCH v4 1/3] Bluetooth: bnep: fix possible might sleep error in bnep_session
-Date: Tue, 14 Feb 2017 08:55:23 +0800
-Message-Id: <1487033725-7208-1-git-send-email-jeffy.chen@rock-chips.com>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-It looks like bnep_session has same pattern as the issue reported in
-old rfcomm:
+Hello -
 
-	while (1) {
-		set_current_state(TASK_INTERRUPTIBLE);
-		if (condition)
-			break;
-		// may call might_sleep here
-		schedule();
-	}
-	__set_current_state(TASK_RUNNING);
+I'm using the GATT API of BlueZ 5.43 via libdbus.  I've successfully
+registered for notifications with the remote GATT server by calling
+the StartNotify method on the characteristic.  I know that the
+registration worked, because I see the remote server processing in.
+How does my GATT client code get informed when a notification arrives?
+ Thanks!
 
-Which fixed at:
-	dfb2fae Bluetooth: Fix nested sleeps
-
-So let's fix it at the same way, also follow the suggestion of:
-https://lwn.net/Articles/628628/
-
-Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
-Reviewed-by: Brian Norris <briannorris@chromium.org>
----
-
-Changes in v3:
-Add brian's Reviewed-by.
-
-Changes in v2:
-Remove unnecessary memory barrier before wake_up_* functions.
-
- net/bluetooth/bnep/core.c | 11 +++++------
- 1 file changed, 5 insertions(+), 6 deletions(-)
-
-diff --git a/net/bluetooth/bnep/core.c b/net/bluetooth/bnep/core.c
-index fbf251f..4d6b94d 100644
---- a/net/bluetooth/bnep/core.c
-+++ b/net/bluetooth/bnep/core.c
-@@ -484,16 +484,16 @@ static int bnep_session(void *arg)
- 	struct net_device *dev = s->dev;
- 	struct sock *sk = s->sock->sk;
- 	struct sk_buff *skb;
--	wait_queue_t wait;
-+	DEFINE_WAIT_FUNC(wait, woken_wake_function);
- 
- 	BT_DBG("");
- 
- 	set_user_nice(current, -15);
- 
--	init_waitqueue_entry(&wait, current);
- 	add_wait_queue(sk_sleep(sk), &wait);
- 	while (1) {
--		set_current_state(TASK_INTERRUPTIBLE);
-+		/* Ensure session->terminate is updated */
-+		smp_mb__before_atomic();
- 
- 		if (atomic_read(&s->terminate))
- 			break;
-@@ -515,9 +515,8 @@ static int bnep_session(void *arg)
- 				break;
- 		netif_wake_queue(dev);
- 
--		schedule();
-+		wait_woken(&wait, TASK_INTERRUPTIBLE, MAX_SCHEDULE_TIMEOUT);
- 	}
--	__set_current_state(TASK_RUNNING);
- 	remove_wait_queue(sk_sleep(sk), &wait);
- 
- 	/* Cleanup session */
-@@ -666,7 +665,7 @@ int bnep_del_connection(struct bnep_conndel_req *req)
- 	s = __bnep_get_session(req->dst);
- 	if (s) {
- 		atomic_inc(&s->terminate);
--		wake_up_process(s->task);
-+		wake_up_interruptible(sk_sleep(s->sock->sk));
- 	} else
- 		err = -ENOENT;
- 
--- 
-2.1.4
+- Dave
