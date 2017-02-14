@@ -1,30 +1,38 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <CAHHBb0eePBK8bE3fkXJLdo5p1bhE42iOHxhwCiV1zgYvWg7k6g@mail.gmail.com>
-References: <CAHHBb0eePBK8bE3fkXJLdo5p1bhE42iOHxhwCiV1zgYvWg7k6g@mail.gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 14 Feb 2017 20:17:35 +0200
-Message-ID: <CABBYNZKToJJ-g4W8YfPGWPBV-kn1NhqWPL2op7PabNoRj0tcJg@mail.gmail.com>
-Subject: Re: How to receive Notifications?
-To: Dave Beal <dbeal@cardinalpeak.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Seulki Shin <sskcorea@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: SeulKi Shin <sskcorea@gmail.com>
+Subject: [PATCH] client: fix calling ad_unregister
+Date: Tue, 14 Feb 2017 18:27:50 +0900
+Message-Id: <20170214092750.5528-1-sskcorea@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Dave,
+From: SeulKi Shin <sskcorea@gmail.com>
 
-On Tue, Feb 14, 2017 at 2:28 AM, Dave Beal <dbeal@cardinalpeak.com> wrote:
-> Hello -
->
-> I'm using the GATT API of BlueZ 5.43 via libdbus.  I've successfully
-> registered for notifications with the remote GATT server by calling
-> the StartNotify method on the characteristic.  I know that the
-> registration worked, because I see the remote server processing in.
-> How does my GATT client code get informed when a notification arrives?
+ad_register shall only be called in case the advertise command has been
+called so registered flag should be checked before calling
+UnregisterAdvertisement.
 
-That should arrive as PropertiesChanged("Value", data) signals.
+Signed-off-by: SeulKi Shin <sskcorea@gmail.com>
+---
+ client/advertising.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-
+diff --git a/client/advertising.c b/client/advertising.c
+index 62201d5..81fa851 100644
+--- a/client/advertising.c
++++ b/client/advertising.c
+@@ -317,6 +317,9 @@ void ad_unregister(DBusConnection *conn, GDBusProxy *manager)
+ 	if (!manager)
+ 		ad_release(conn);
+ 
++	if (!registered)
++		return;
++
+ 	if (g_dbus_proxy_method_call(manager, "UnregisterAdvertisement",
+ 					unregister_setup, unregister_reply,
+ 					conn, NULL) == FALSE) {
 -- 
-Luiz Augusto von Dentz
+2.7.4
+
