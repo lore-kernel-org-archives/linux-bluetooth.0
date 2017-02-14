@@ -1,35 +1,53 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: "Felipe F. Tonello" <eu@felipetonello.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [RFC][PATCH v2 BlueZ 0/2] Connection Update improvements
-Date: Tue, 14 Feb 2017 20:28:27 +0000
-Message-Id: <20170214202829.550-1-eu@felipetonello.com>
+MIME-Version: 1.0
+In-Reply-To: <20170214092750.5528-1-sskcorea@gmail.com>
+References: <20170214092750.5528-1-sskcorea@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Tue, 14 Feb 2017 20:19:39 +0200
+Message-ID: <CABBYNZJLXHn9jXrtuvona1AXZFDG8XYPuVpUty48f5Shj-ukWw@mail.gmail.com>
+Subject: Re: [PATCH] client: fix calling ad_unregister
+To: Seulki Shin <sskcorea@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-These changes should improve application who want to update the connection
-parameters for both master and slave devices.
+Hi,
 
-Note: Connection Parameters Request Link Layer Control Procedure (>=4.1) is
-not supported in BlueZ yet. I will work on this on later patches.
+On Tue, Feb 14, 2017 at 11:27 AM, Seulki Shin <sskcorea@gmail.com> wrote:
+> From: SeulKi Shin <sskcorea@gmail.com>
+>
+> ad_register shall only be called in case the advertise command has been
+> called so registered flag should be checked before calling
+> UnregisterAdvertisement.
+>
+> Signed-off-by: SeulKi Shin <sskcorea@gmail.com>
 
-Changes from v1:
- * Use simpler user-space API
- * Added patch #1
+We don't use Signed-off-by line in userspace.
 
-Felipe F. Tonello (2):
-  Bluetooth: L2CAP: Refactor L2CAP_CONN_PARAM_UPDATE_REQ into a function
-  Bluetooth: L2CAP: Add BT_LE_CONN_CONFIG socket option
+> ---
+>  client/advertising.c | 3 +++
+>  1 file changed, 3 insertions(+)
+>
+> diff --git a/client/advertising.c b/client/advertising.c
+> index 62201d5..81fa851 100644
+> --- a/client/advertising.c
+> +++ b/client/advertising.c
+> @@ -317,6 +317,9 @@ void ad_unregister(DBusConnection *conn, GDBusProxy *manager)
+>         if (!manager)
+>                 ad_release(conn);
+>
+> +       if (!registered)
+> +               return;
+> +
+>         if (g_dbus_proxy_method_call(manager, "UnregisterAdvertisement",
+>                                         unregister_setup, unregister_reply,
+>                                         conn, NULL) == FALSE) {
+> --
+> 2.7.4
 
- include/net/bluetooth/bluetooth.h |   9 ++++
- include/net/bluetooth/hci_core.h  |   1 +
- include/net/bluetooth/l2cap.h     |   3 ++
- net/bluetooth/hci_core.c          |   1 +
- net/bluetooth/l2cap_core.c        |  36 ++++++++-----
- net/bluetooth/l2cap_sock.c        | 108 ++++++++++++++++++++++++++++++++++++++
- net/bluetooth/mgmt.c              |   1 +
- 7 files changed, 146 insertions(+), 13 deletions(-)
+Applied, thanks.
+
 
 -- 
-2.11.1
-
+Luiz Augusto von Dentz
