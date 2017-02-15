@@ -1,230 +1,240 @@
-Return-Path: <Dean_Jenkins@mentor.com>
-From: Dean Jenkins <Dean_Jenkins@mentor.com>
-Subject: L2CAP l2cap_sock_teardown_cb() race condition with RFCOMM
- rfcomm_accept_connection()
-To: Yichen Zhao <zhaoyichen@google.com>, Marcel Holtmann <marcel@holtmann.org>
-References: <45EE47FA-D319-4091-941A-C4005E32B572@holtmann.org>
- <1463173230-16159-1-git-send-email-zhaoyichen@google.com>
-CC: "Gustavo F. Padovan" <gustavo@padovan.org>, Johan Hedberg
-	<johan.hedberg@gmail.com>, <linux-bluetooth@vger.kernel.org>
-Message-ID: <2704ecde-aaea-9743-d5b7-ad57afec73a7@mentor.com>
-Date: Wed, 15 Feb 2017 11:14:37 +0100
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <1463173230-16159-1-git-send-email-zhaoyichen@google.com>
-Content-Type: text/plain; charset="windows-1252"; format=flowed
+In-Reply-To: <7f9a9a39-fbe4-c577-3b8b-e8350634ddcb@pengutronix.de>
+References: <20170209145551.12747-1-luiz.dentz@gmail.com> <20170209145551.12747-6-luiz.dentz@gmail.com>
+ <7f9a9a39-fbe4-c577-3b8b-e8350634ddcb@pengutronix.de>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Wed, 15 Feb 2017 10:24:02 +0200
+Message-ID: <CABBYNZLdpFyVZri8MDFYpkVFk+krRNfaW6wQp5MWX--gdCqMew@mail.gmail.com>
+Subject: Re: [PATCH 5/5] 6lowpan: Use netdev addr_len to determine lladdr len
+To: Alexander Aring <aar@pengutronix.de>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        Patrik Flykt <patrik.flykt@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Alex,
 
-My E-mail below is based on Yichen Zhao's 2016 E-mail from the mailing 
-list thread
-http://www.spinics.net/lists/linux-bluetooth/msg67218.html
-
-On 13/05/16 23:00, Yichen Zhao wrote:
->> so I am not big fan of the conditional locking in case of parent is set or not. Do you have a test case that reproduces the mentioned race. It would love to have that in tools/l2cap-tester or similar.
-> So far I could only reproduce the bug by repeatedly performing RFCOMM connections and resets. I'll try to implement something in rfcomm-tester or l2cap-tester.
+On Wed, Feb 15, 2017 at 9:44 AM, Alexander Aring <aar@pengutronix.de> wrote:
 >
-> Since this is a race condition, I'm not confident that I can help you reproduce the bug reliably on a different test setup. I'd appreciate it very much if you can offer any tips on triggering a race condition faster in a test case.
-
-We see a similar crash in a highly modified 3.14 kernel on ARM but I 
-think this failure is still possible in bluetooth-next based on kernel 
-4.10-rc2.
-
-I think the failure scenario is as follows:
-
-RFCOMM is processing the rfcomm_accept_connection() whilst L2CAP is 
-tearing down the L2CAP channel in l2cap_sock_teardown_cb().
-
-This means there are 2 threads racing with each other; there is the 
-RFCOMM krfcommd kernel thread and the userland system call thread 
-demanding L2CAP is torn down via l2cap_chan_del() (I think).
-
-The real-world failure is seen in userland abruptly terminating 
-Bluetooth connections such as switching to a pairing mode. Note that our 
-system does not use Bluez userland.
-
->> Maybe the code needs some restructuring to avoid the conditional locking.
-> I agree that my patch is not very elegant, and I'd love any way to improve it.
-> I have some ideas, but I'm not familiar enough with kernel development to know whether other solutions are safe to implement, such as:
+> Hi,
 >
-> * Removing bt_accept_unlink from l2cap_teardown_cb, and relying on bt_accept_dequeue to unlink the socket when it's enumerated. Is it safe to leave a zapped sock in accept_q?
-> * Perform "unlock sock; lock parent; lock sock" before calling bt_accept_unlink in teardown_cb. This is still conditional locking, but around a smaller block of code. Is it safe to unlock a zapped sock?
-> * Use RCU for handling accept_q. Is this appropriate?
+> On 02/09/2017 03:55 PM, Luiz Augusto von Dentz wrote:
+>> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>>
+>> This allow technologies such as Bluetooth to use its native lladdr which
+>> is eui48 instead of eui64 which was expected by functions like
+>> lowpan_header_decompress and lowpan_header_compress.
+>>
+>> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>> ---
+>>  net/6lowpan/iphc.c      | 17 +++++++++++++++--
+>>  net/bluetooth/6lowpan.c | 43 ++++++++++---------------------------------
+>>  2 files changed, 25 insertions(+), 35 deletions(-)
+>>
+>> diff --git a/net/6lowpan/iphc.c b/net/6lowpan/iphc.c
+>> index fb5f6fa..ee88feb 100644
+>> --- a/net/6lowpan/iphc.c
+>> +++ b/net/6lowpan/iphc.c
+>> @@ -827,8 +827,21 @@ static u8 lowpan_compress_ctx_addr(u8 **hc_ptr, const struct net_device *dev,
+>>               }
+>>               break;
+>>       default:
+>> -             /* check for SAM/DAM = 11 */
+>> -             memcpy(&tmp.s6_addr[8], lladdr, EUI64_ADDR_LEN);
+>> +             switch (dev->addr_len) {
+>> +             case ETH_ALEN:
+>> +                     memcpy(&tmp.s6_addr[8], lladdr, 3);
+>> +                     tmp.s6_addr[11] = 0xFF;
+>> +                     tmp.s6_addr[12] = 0xFE;
+>> +                     memcpy(&tmp.s6_addr[13], lladdr + 3, 3);
+>> +                     break;
+>> +             case EUI64_ADDR_LEN:
+>> +                     memcpy(&tmp.s6_addr[8], lladdr, EUI64_ADDR_LEN);
+>> +                     break;
+>> +             default:
+>> +                     dam = LOWPAN_IPHC_DAM_11;
+>> +                     goto out;
+>> +             }
+>> +
+>>               /* second bit-flip (Universe/Local) is done according RFC2464 */
+>>               tmp.s6_addr[8] ^= 0x02;
 >
-> Please let me know what you think.
-
-Our analysis suggests that there is a locking weakness here in 
-net/bluetooth/af_bluetooth.c:
-
- From bluetooth-next based on kernel 4.10-rc2
-
-> struct sock *bt_accept_dequeue(struct sock *parent, struct socket 
-> *newsock)
-> {
->     struct bt_sock *s, *n;
->     struct sock *sk;
+> move this handling in per link-layer layer decision, see below.
 >
->     BT_DBG("parent %p", parent);
+>>               /* context information are always used */
 >
->     list_for_each_entry_safe(s, n, &bt_sk(parent)->accept_q, accept_q) {
->         sk = (struct sock *)s;
-
-There is a risk that the sk socket gets modified here by another thread 
-or via pre-emption because there is no protection of sk with respect to 
-list operations on the parent. Any locking of the parent is done outside 
-of bt_accept_dequeue().
-
-In other words, sk can be removed from the list by another thread which 
-could mean that sk has been freed. Therefore, performing a lock on sk 
-that has been freed is invalid and dangerous.
-
-We suspect that bt_accept_unlink(sk) gets called by the other thread 
-which will remove sk from the list and set bt_sk(sk)->parent = NULL; 
-also potentially sk is freed as well.
-
->         lock_sock(sk);
-
-Taking the sk lock here can be too late as sk may already have been 
-removed from the list.
-
+> PLEASE... and this is one of my rant!
 >
->         /* FIXME: Is this check still needed */
->         if (sk->sk_state == BT_CLOSED) {
->             bt_accept_unlink(sk);
-
-NULL pointer dereference occurs in "2nd call" to bt_accept_unlink(sk) 
-because bt_sk(sk)->parent is NULL and crashes the bt_accept_unlink(sk) line:
-bt_sk(sk)->parent->sk_ack_backlog--;
-
->             release_sock(sk);
->             continue;
->         }
+> PLEASE LOOK WHAT I HAVE DONE IN THIS FILE IN MY RFC PATCH SERIES YOU
+> NEED TO FIX MORE THAN JUST CONTEXT BASED COMPRESSION.
 >
->         if (sk->sk_state == BT_CONNECTED || !newsock ||
->             test_bit(BT_SK_DEFER_SETUP, &bt_sk(parent)->flags)) {
->             bt_accept_unlink(sk);
->             if (newsock)
->                 sock_graft(sk, newsock);
+> e.g. stateless un/compression
+
+I haven't changed that and probably it needs a separate patch in that
+case since Im only, and I really mean only, fixing the address length
+and because your patches end up changing a lot more things it is
+pretty hard to extract the exact parts that fixes this.
+
+> Now I for this, I want to see a link-layer evaluation not address length based.
+> Please do so also for the other patch which fixing some behaviour in ipv6.
+> The reason is here that uncompress/compress addresses are defined by RFC
+> 6LoWPAN adapation.
 >
->             release_sock(sk);
->             return sk;
->         }
+> There is already a link-layer case, so please add BTLE LLTYPE there! Not
+> move your handling in default, add some WARN_ONCE there...
+
+Here I have to pretty blunt, it is a mistake to put link layer logic
+inside the 6lowpan module, first it creates a dependencies of these
+technologies and second it slow down the development because we end up
+with multiple trees having to synchronize which each other.
+
+Also I have not seen a single mention of link local IP that is not
+using 6 or 8 bytes link layer format, and in fact if there exist one
+then we should probably have the caller handle the link local ip
+format, but then again I haven't seen any indication that these needs
+changing in fact for 15.4 16 bit address you can generate a valid 8
+bytes address before calling 6lowpan API, which is probably what we
+should do to avoid depending on 15.4 code inside 6lowpan.
+
+> btw:
 >
->         release_sock(sk);
->     }
+> here exists also a cleanup to not always implement the same stuff. We
+> need for stateful/stateless compression one function, because and
+> remember my words if you want to make this cleanup:
 >
->     return NULL;
-> }
-
-We think the other thread is running l2cap_sock_teardown_cb() as pointed 
-out by Yichen Zhao (thanks for the hint).
-
-We made the assumption that l2cap_sock_teardown_cb is acting on the same 
-sk socket as sk in bt_accept_dequeue().
-
-In net/bluetooth/l2cap_sock.c from bluetooth-next based on kernel 4.10-rc2
-
-> static void l2cap_sock_teardown_cb(struct l2cap_chan *chan, int err)
-> {
->     struct sock *sk = chan->data;
->     struct sock *parent;
+> Stateless compression is stateful compression with prefix fe80::/64 as
+> context.
 >
->     BT_DBG("chan %p state %s", chan, state_to_string(chan->state));
+> ---
 >
->     /* This callback can be called both for server (BT_LISTEN)
->      * sockets as well as "normal" ones. To avoid lockdep warnings
->      * with child socket locking (through l2cap_sock_cleanup_listen)
->      * we need separation into separate nesting levels. The simplest
->      * way to accomplish this is to inherit the nesting level used
->      * for the channel.
->      */
->     lock_sock_nested(sk, atomic_read(&chan->nesting));
-
-Taking a lock on sk does not prevent the failure because 
-bt_accept_dequeue() can run until it waits for the lock.
-This is likely to synchronise and serialise the 2 threads which results 
-in bt_accept_unlink(sk) being called twice for the same sk.
-
+> Sorry for my rant, but I am somehow pissed off because intel people
+> doesn't look what I did there in my RFC.
 >
->     parent = bt_sk(sk)->parent;
-
-Here parent is taken from the sk socket.
-If parent is not NULL, the sk is still in the parent list of 
-bt_accept_dequeue().
-
+> ... I think now I know why linux kernel people do sometimes a rant. :-)
 >
->     sock_set_flag(sk, SOCK_ZAPPED);
+> Thanks.
 >
->     switch (chan->state) {
->     case BT_OPEN:
->     case BT_BOUND:
->     case BT_CLOSED:
->         break;
->     case BT_LISTEN:
->         l2cap_sock_cleanup_listen(sk);
->         sk->sk_state = BT_CLOSED;
->         chan->state = BT_CLOSED;
+>> diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
+>> index 1456b01..d2a1aa5 100644
+>> --- a/net/bluetooth/6lowpan.c
+>> +++ b/net/bluetooth/6lowpan.c
+>> @@ -64,7 +64,7 @@ struct lowpan_peer {
+>>       struct l2cap_chan *chan;
+>>
+>>       /* peer addresses in various formats */
+>> -     unsigned char eui64_addr[EUI64_ADDR_LEN];
+>> +     unsigned char lladdr[ETH_ALEN];
+>>       struct in6_addr peer_addr;
+>>  };
+>>
+>> @@ -80,8 +80,6 @@ struct lowpan_btle_dev {
+>>       struct delayed_work notify_peers;
+>>  };
+>>
+>> -static void set_addr(u8 *eui, u8 *addr, u8 addr_type);
+>> -
+>>  static inline struct lowpan_btle_dev *
+>>  lowpan_btle_dev(const struct net_device *netdev)
+>>  {
+>> @@ -277,7 +275,6 @@ static int iphc_decompress(struct sk_buff *skb, struct net_device *netdev,
+>>       const u8 *saddr;
+>>       struct lowpan_btle_dev *dev;
+>>       struct lowpan_peer *peer;
+>> -     unsigned char eui64_daddr[EUI64_ADDR_LEN];
+>>
+>>       dev = lowpan_btle_dev(netdev);
+>>
+>> @@ -287,10 +284,9 @@ static int iphc_decompress(struct sk_buff *skb, struct net_device *netdev,
+>>       if (!peer)
+>>               return -EINVAL;
+>>
+>> -     saddr = peer->eui64_addr;
+>> -     set_addr(&eui64_daddr[0], chan->src.b, chan->src_type);
+>> +     saddr = peer->lladdr;
+>>
+>> -     return lowpan_header_decompress(skb, netdev, &eui64_daddr, saddr);
+>> +     return lowpan_header_decompress(skb, netdev, netdev->dev_addr, saddr);
 >
->         break;
->     default:
->         sk->sk_state = BT_CLOSED;
->         chan->state = BT_CLOSED;
+> This looks not right, you are sure that netdev->dev_addr is the
+> _destination_ address? It looks very confusing, because dev_addr is
+> normally the source address of the netdevice interface.
 >
->         sk->sk_err = err;
+>>  }
+>>
+>>  static int recv_pkt(struct sk_buff *skb, struct net_device *dev,
+>> @@ -477,7 +473,7 @@ static int setup_header(struct sk_buff *skb, struct net_device *netdev,
+>>                       }
+>>               }
+>>
+>> -             daddr = peer->eui64_addr;
+>> +             daddr = peer->lladdr;
+>>               *peer_addr = addr;
+>>               *peer_addr_type = addr_type;
+>>               lowpan_cb(skb)->chan = peer->chan;
+>> @@ -663,27 +659,6 @@ static struct device_type bt_type = {
+>>       .name   = "bluetooth",
+>>  };
+>>
+>> -static void set_addr(u8 *eui, u8 *addr, u8 addr_type)
+>> -{
+>> -     /* addr is the BT address in little-endian format */
+>> -     eui[0] = addr[5];
+>> -     eui[1] = addr[4];
+>> -     eui[2] = addr[3];
+>> -     eui[3] = 0xFF;
+>> -     eui[4] = 0xFE;
+>> -     eui[5] = addr[2];
+>> -     eui[6] = addr[1];
+>> -     eui[7] = addr[0];
+>> -
+>> -     /* Universal/local bit set, BT 6lowpan draft ch. 3.2.1 */
+>> -     if (addr_type == BDADDR_LE_PUBLIC)
+>> -             eui[0] &= ~0x02;
+>> -     else
+>> -             eui[0] |= 0x02;
+>> -
+>> -     BT_DBG("type %d addr %*phC", addr_type, 8, eui);
+>> -}
+>> -
 >
->         if (parent) {
->             bt_accept_unlink(sk);
-
-This call to bt_accept_unlink() removes sk from the list, sets 
-bt_sk(sk)->parent to NULL and potentially frees sk.
-
-We think this can trigger this crash in RFCOMM:
-
-rfcomm_run() calls
-rfcomm_accept_connection() calls
-kernel_accept() calls
-l2cap_sock_accept() calls
-bt_accept_dequeue() which runs concurrently with l2cap_sock_teardown_cb()
-bt_accept_unlink() is called from l2cap_sock_teardown_cb()
-bt_accept_unlink() is called from bt_accept_dequeue() causing a NULL 
-pointer dereference crash
-
->  parent->sk_data_ready(parent);
->         } else {
->             sk->sk_state_change(sk);
->         }
+> YAY, this function is totally wrong! :-)
 >
->         break;
->     }
+>>  static void ifup(struct net_device *netdev)
+>>  {
+>>       int err;
+>> @@ -762,14 +737,16 @@ static struct l2cap_chan *add_peer_chan(struct l2cap_chan *chan,
+>>       peer->chan = chan;
+>>       memset(&peer->peer_addr, 0, sizeof(struct in6_addr));
+>>
+>> +     baswap((void *)peer->lladdr, &chan->dst);
+>> +
+>>       /* RFC 2464 ch. 5 */
+>>       peer->peer_addr.s6_addr[0] = 0xFE;
+>>       peer->peer_addr.s6_addr[1] = 0x80;
+>> -     set_addr((u8 *)&peer->peer_addr.s6_addr + 8, chan->dst.b,
+>> -              chan->dst_type);
+>>
+>> -     memcpy(&peer->eui64_addr, (u8 *)&peer->peer_addr.s6_addr + 8,
+>> -            EUI64_ADDR_LEN);
+>> +     memcpy(&peer->peer_addr.s6_addr[8], peer->lladdr, 3);
+>> +     peer->peer_addr.s6_addr[11] = 0xFF;
+>> +     peer->peer_addr.s6_addr[12] = 0xFE;
+>> +     memcpy(&peer->peer_addr.s6_addr[13], peer->lladdr + 3, 3);
+>>
 >
->     release_sock(sk);
-> }
+> What the hell is that? I suppose this is to handling something correct
+> to a behaviour which is another big thing which is totally broken in the
+> BTLE 6LoWPAN code.
+>
+>>       /* IPv6 address needs to have the U/L bit set properly so toggle
+>>        * it back here.
+>>
+>
+> - Alex
 
-I am not familiar with rfcomm-tester or l2cap-tester so I don't know 
-whether these tools are capable of reproducing this failure case.
 
-Yichen Zhao's patch shown in 
-http://www.spinics.net/lists/linux-bluetooth/msg67189.html would seem to 
-be a solution to this crash. We have not yet tested the patch but the 
-principle looks right to me.
-
-I agree that conditional locking looks strange but if parent is not NULL 
-then bt_accept_unlink() must not be called without the parent lock being 
-held.
-
-Do you have any thoughts on the issue ?
-
-Thanks,
-
-Regards,
-Dean
 
 -- 
-
-Dean Jenkins
-Embedded Software Engineer
-Linux Transportation Solutions
-Mentor Embedded Software Division
-Mentor Graphics (UK) Ltd.
-
-www.mentor.com/embedded
+Luiz Augusto von Dentz
