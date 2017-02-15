@@ -1,40 +1,52 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: "Felipe F. Tonello" <eu@felipetonello.com>
+Date: Wed, 15 Feb 2017 17:05:14 +0300
+From: Andrew Kanner <kanner@mail.ru>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 0/4] Improvements on connection parameters update
-Date: Wed, 15 Feb 2017 18:18:20 +0000
-Message-Id: <20170215181824.9041-1-eu@felipetonello.com>
+Subject: Elektex bluetooth keyboard incorrect device class
+Message-ID: <20170215140513.GA19149@localhost>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is one of the parts of a series of patches related to connection
-parameters update.
+I'm trying to get Elektex (G-Tech) Bluetooth Smart Fabric keyboard
+work on Linux (latest kernel).
 
-This initial implementation adds supports to GAP Peripheral Preferred
-Connection Parameters (PPCP) characteristic
+This keyboard have been supported by Android devices via some
+unofficial apk (I only found footprints of using some Bluez functions
+and native Android keyboard + device key mapping in sources). But when
+I tried to connect it to Linux, I saw that it's device class is
+0x500204 (like a cell phone) in btmon output and it's naturally not
+determined as a HID device.
 
-There is a problem described in #4 that due to a limitation of the BlueZ API
-it is not possible to update the current connection with specific parameters.
-I am working on a socket option API to allow something similar. Hopefully I
-will be able to write something that covers this use-case as well.
+Could someone direct me how to get this keyboard work like HID device?
+Where should I start from?
 
-Next step is to support connection parameters via the advertising data (AD).
-On that case, hopefully it is possible to set this parameters before the
-connection is actually established.
+Here is some minimal info about the device:
 
-Felipe F. Tonello (4):
-  profiles/gap: Some code cleanup
-  src/adapter: Added connection parameter load/store functions
-  src/device: Added function to set connection parameters
-  profiles/gap: Added support for PPCP characteristic
+# hcitool scan
+Scanning ...
+        00:16:C1:00:6A:C8       keyboard
+# sudo hcitool info 00:16:C1:00:6A:C8
+Requesting information ...
+        BD Address:  00:16:C1:00:6A:C8
+        OUI Company: Eleksen Ltd (00-16-C1)
+        Device Name: keyboard
+        LMP Version: 1.1 (0x1) LMP Subversion: 0x5e1
+        Manufacturer: Cambridge Silicon Radio (10)
+        Features: 0xff 0xff 0x00 0x00 0x00 0x00 0x00 0x00
+                <3-slot packets> <5-slot packets> <encryption> <slot offset>
+                <timing accuracy> <role switch> <hold mode> <sniff mode>
+                <park state> <RSSI> <channel quality> <SCO link> <HV2 packets>
+                <HV3 packets> <u-law log> <A-law log>
+# sudo hcitool cc --role=m 00:16:C1:00:6A:C8
+Connections:
+        < ACL 00:16:C1:00:6A:C8 handle 21 state 1 lm MASTER
+# sudo hcitool con
 
- profiles/gap/gas.c | 104 ++++++++++++++++++++++++++++++++++++++++++-----------
- src/adapter.c      |  24 +++++++++++--
- src/adapter.h      |   9 +++++
- src/device.c       |  16 +++++++++
- src/device.h       |   4 +++
- 5 files changed, 134 insertions(+), 23 deletions(-)
+(latest command return active connections, but after several seconds
+the device is disconnected by host)
 
--- 
-2.11.1
-
+--
+With best regards,
+Andrew Kanner
