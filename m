@@ -1,110 +1,109 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <CAEd-yTRFfdE=rMAOPDXW2dpGY8gtfhtPAhKCKDHhNCg=W9uimQ@mail.gmail.com>
-References: <CAEd-yTTD0TAE86Ts=Doa0QFcMk2_FARQmxVr5zia8eaJ=NZNDA@mail.gmail.com>
- <CAAu3APanyqS-4JdV6yV-nnAKT4bqJjREjUNB3M1Ziq4OHta3XA@mail.gmail.com>
- <ff770d8a-2f12-aa54-7273-07f8b244e9a3@intel.com> <CAEd-yTRFfdE=rMAOPDXW2dpGY8gtfhtPAhKCKDHhNCg=W9uimQ@mail.gmail.com>
-From: Sinthu Raja M <sinthu.raja@mistralsolutions.com>
-Date: Thu, 16 Feb 2017 13:27:16 +0530
-Message-ID: <CAEd-yTRH_6f09tjAs+2GZeaoOyoNJrzpGHNmhOXmmLTA7gZo6Q@mail.gmail.com>
-Subject: Re: Bluez5.43 stack for bcm4334x chipset
-To: Loic Poulain <loic.poulain@intel.com>
-Cc: Barry Byford <31baz66@gmail.com>,
-        Bluez mailing list <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: "Felipe F. Tonello" <eu@felipetonello.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 4/4] profiles/gap: Added support for PPCP characteristic
+Date: Wed, 15 Feb 2017 18:18:24 +0000
+Message-Id: <20170215181824.9041-5-eu@felipetonello.com>
+In-Reply-To: <20170215181824.9041-1-eu@felipetonello.com>
+References: <20170215181824.9041-1-eu@felipetonello.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi All,
-Thanks for the reply. I fixed the Issue it is because of the wrong
-firmware. Now it is working fine.
+The Peripheral Preferred Connection Parameters (PPCP) characteristic
+contains the preferred connection parameters of a peripheral device.
 
-With Regards
+These parameters are stored in the info file and loaded to Kernel using
+MGMT's respective command.
 
-Sinthu Raja
+IMPORTANT: The connection will only be updated upon next reconnection to
+the peripheral device. This is a limitation of the current BlueZ API
+that doesn't allow change specific parameters of current connection.
+---
+ profiles/gap/gas.c | 64 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 64 insertions(+)
 
+diff --git a/profiles/gap/gas.c b/profiles/gap/gas.c
+index 0d34503ad446..6de69f008767 100644
+--- a/profiles/gap/gas.c
++++ b/profiles/gap/gas.c
+@@ -162,6 +162,68 @@ static void handle_appearance(struct gas *gas, uint16_t value_handle)
+ 		DBG("Failed to send request to read appearance");
+ }
+ 
++static void read_ppcp_cb(bool success, uint8_t att_ecode,
++			const uint8_t *value, uint16_t length,
++			void *user_data)
++{
++	struct gas *gas = user_data;
++	uint16_t min_interval, max_interval, latency, timeout, max_latency;
++
++	if (!success) {
++		DBG("Reading PPCP failed with ATT error: %u", att_ecode);
++		return;
++	}
++
++	if (length != 8) {
++		DBG("Malformed PPCP value");
++		return;
++	}
++
++	min_interval = get_le16(&value[0]);
++	max_interval = get_le16(&value[2]);
++	latency = get_le16(&value[4]);
++	timeout = get_le16(&value[6]);
++
++	DBG("GAP Peripheral Preferred Connection Parameters:");
++	DBG("\tMinimum connection interval: %u", min_interval);
++	DBG("\tMaximum connection interval: %u", max_interval);
++	DBG("\tSlave latency: %u", latency);
++	DBG("\tConnection Supervision timeout multiplier: %u", timeout);
++
++	/* avoid persisting connection parameters that are not valid */
++	if (min_interval > max_interval ||
++	    min_interval < 6 || max_interval > 3200) {
++		warn("GAS PPCP: Invalid Connection Parameters values");
++		return;
++	}
++
++	if (timeout < 10 || timeout > 3200) {
++		warn("GAS PPCP: Invalid Connection Parameters values");
++		return;
++	}
++
++	if (max_interval >= timeout * 8) {
++		warn("GAS PPCP: Invalid Connection Parameters values");
++		return;
++	}
++
++	max_latency = (timeout * 4 / max_interval) - 1;
++	if (latency > 499 || latency > max_latency) {
++		warn("GAS PPCP: Invalid Connection Parameters values");
++		return;
++	}
++
++	btd_device_set_conn_param(gas->device, min_interval, max_interval,
++					latency, timeout);
++}
++
++static void handle_ppcp(struct gas *gas, uint16_t value_handle)
++{
++	if (!bt_gatt_client_read_value(gas->client, value_handle,
++						read_ppcp_cb, gas, NULL))
++		DBG("Failed to send request to read PPCP");
++}
++
+ static inline bool uuid_cmp(uint16_t u16, const bt_uuid_t *uuid)
+ {
+ 	bt_uuid_t lhs;
+@@ -188,6 +250,8 @@ static void handle_characteristic(struct gatt_db_attribute *attr,
+ 		handle_device_name(gas, value_handle);
+ 	else if (uuid_cmp(GATT_CHARAC_APPEARANCE, &uuid))
+ 		handle_appearance(gas, value_handle);
++	else if (uuid_cmp(GATT_CHARAC_PERIPHERAL_PREF_CONN, &uuid))
++		handle_ppcp(gas, value_handle);
+ 	else {
+ 		char uuid_str[MAX_LEN_UUID_STR];
+ 
+-- 
+2.11.1
 
-On Thu, Feb 16, 2017 at 1:26 PM, Sinthu Raja M
-<sinthu.raja@mistralsolutions.com> wrote:
-> Hi All,
-> Thanks for the reply. I fixed the Issue it is because of the wrong firmware.
-> Now it is working fine.
->
->
->
-> With Regards
->
-> Sinthu Raja
->
-> On Mon, Feb 13, 2017 at 3:58 PM, Loic Poulain <loic.poulain@intel.com>
-> wrote:
->>
->> Hi Raja,
->>
->>
->> On 12/02/2017 20:56, Barry Byford wrote:
->>>
->>> Hello Raja,
->>>
->>> On 12 February 2017 at 16:14, Sinthu Raja M
->>> <sinthu.raja@mistralsolutions.com> wrote:
->>>>
->>>> Hi,
->>>> I am working on Bluez5.43 stack, cross compiled for ARM v7 and
->>>> successfully compiled. also ported into the target device. I am using
->>>> Broadcom bluetooth chip (BCM4334x)The problem is when i do a hciconfig
->>>> i am getting the following result
->>>>
->>>> # hciconfig
->>>> hci0: Type: Primary  Bus: UART
->>>> BD Address: 72:8E:6C:AB:DD:A4  ACL MTU: 1021:8  SCO MTU: 64:1
->>>> DOWN
->>>> RX bytes:647 acl:0 sco:0 events:32 errors:0
->>>> TX bytes:407 acl:0 sco:0 commands:32 errors:0
->>>>
->>>> 1)  I am not able to scan any devices.  what could be the possible
->>>> causes ? In my other bluetooth device it is detected as Bluetooth USB
->>>> Host Controller
->>
->>
->> Typically meet this issue when running non-patched/embedded bcm firmware.
->> HCI link is OK but controller functionalities limited. I suppose the radio
->> is off.
->>
->>>>
->>>> 2) But I am expecting the following result
->>>> # hciconfig
->>>> hci0:   Type: BR/EDR  Bus: UART
->>>>          BD Address: C4:00:49:00:06:D9  ACL MTU: 1021:8  SCO MTU: 64:1
->>>>          UP RUNNING PSCAN ISCAN
->>>>          RX bytes:3640 acl:0 sco:0 events:317 errors:0
->>>>          TX bytes:43776 acl:0 sco:0 commands:311 errors:
->>>>
->>>> What modifications I need to be done in hciattach_bcm4334x.c code
->>>> inorder to get the above output or I need to modify in some other
->>>> files of Bluez?
->>>
->>> I'm not sure if it is relevant to your situation but on the Raspbery Pi 3
->>> I need to apply the following patches to BlueZ 5.43 for the BCM43xx
->>> https://gist.github.com/pelwell/c8230c48ea24698527cd
->>>
->>> The issue I see without the patch is that the controller has an
->>> address of all A's in bluetoothctl.
->>>
->>>
->>
->> Yes, seems to be the point here, check you have the correct
->> firmware/patch-file and maybe
->> update the firmware dir accordingly.
->>
->>
->> What is your kernel version ?
->> Broadcom support is integrated in the kernel since Linux 4.1 and It is
->> recommended
->> to use it (via btattach) instead of using hciattach (the old way).
->>
->>
->> Regards,
->> Loic
->
->
