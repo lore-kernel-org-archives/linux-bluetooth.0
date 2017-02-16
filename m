@@ -1,64 +1,49 @@
-Return-Path: <linux-wpan-owner@vger.kernel.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: patrik.flykt@linux.intel.com, aar@pengutronix.de,
         linux-wpan@vger.kernel.org
-Subject: [PATCH v2 4/5] ipv6: addrconf: fix 48 bit 6lowpan autoconfiguration
-Date: Thu, 16 Feb 2017 19:19:45 +0200
-Message-Id: <20170216171946.5105-5-luiz.dentz@gmail.com>
+Subject: [PATCH v2 2/5] 6lowpan: Set MAC address lenght according to LOWPAN_LLTYPE
+Date: Thu, 16 Feb 2017 19:19:43 +0200
+Message-Id: <20170216171946.5105-3-luiz.dentz@gmail.com>
 In-Reply-To: <20170216171946.5105-1-luiz.dentz@gmail.com>
 References: <20170216171946.5105-1-luiz.dentz@gmail.com>
-Sender: linux-wpan-owner@vger.kernel.org
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Alexander Aring <aar@pengutronix.de>
+From: Patrik Flykt <patrik.flykt@linux.intel.com>
 
-This patch adds support for 48 bit 6LoWPAN address length
-autoconfiguration which is the case for BTLE 6LoWPAN.
+Set MAC address length according to the 6LoWPAN link layer in use.
+Bluetooth Low Energy uses 48 bit addressing while IEEE802.15.4 uses
+64 bits.
 
-Signed-off-by: Alexander Aring <aar@pengutronix.de>
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Signed-off-by: Patrik Flykt <patrik.flykt@linux.intel.com>
 ---
- net/ipv6/addrconf.c | 17 ++++++++++++-----
- 1 file changed, 12 insertions(+), 5 deletions(-)
+ net/6lowpan/core.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
 
-diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
-index ac9bd56..dede33f 100644
---- a/net/ipv6/addrconf.c
-+++ b/net/ipv6/addrconf.c
-@@ -2050,12 +2050,19 @@ static void addrconf_leave_anycast(struct inet6_ifaddr *ifp)
- 	__ipv6_dev_ac_dec(ifp->idev, &addr);
- }
- 
--static int addrconf_ifid_eui64(u8 *eui, struct net_device *dev)
-+static int addrconf_ifid_6lowpan(u8 *eui, struct net_device *dev)
+diff --git a/net/6lowpan/core.c b/net/6lowpan/core.c
+index 5945f7e..5f9909a 100644
+--- a/net/6lowpan/core.c
++++ b/net/6lowpan/core.c
+@@ -23,7 +23,16 @@ int lowpan_register_netdevice(struct net_device *dev,
  {
--	if (dev->addr_len != EUI64_ADDR_LEN)
-+	switch (dev->addr_len) {
-+	case ETH_ALEN:
-+		return addrconf_ifid_eui48(eui, dev);
-+	case EUI64_ADDR_LEN:
-+		memcpy(eui, dev->dev_addr, EUI64_ADDR_LEN);
-+		eui[0] ^= 2;
+ 	int i, ret;
+ 
+-	dev->addr_len = EUI64_ADDR_LEN;
++	switch (lltype) {
++	case LOWPAN_LLTYPE_IEEE802154:
++		dev->addr_len = EUI64_ADDR_LEN;
 +		break;
-+	default:
- 		return -1;
--	memcpy(eui, dev->dev_addr, EUI64_ADDR_LEN);
--	eui[0] ^= 2;
++
++	case LOWPAN_LLTYPE_BTLE:
++		dev->addr_len = ETH_ALEN;
++		break;
 +	}
 +
- 	return 0;
- }
- 
-@@ -2146,7 +2153,7 @@ static int ipv6_generate_eui64(u8 *eui, struct net_device *dev)
- 	case ARPHRD_IPGRE:
- 		return addrconf_ifid_gre(eui, dev);
- 	case ARPHRD_6LOWPAN:
--		return addrconf_ifid_eui64(eui, dev);
-+		return addrconf_ifid_6lowpan(eui, dev);
- 	case ARPHRD_IEEE1394:
- 		return addrconf_ifid_ieee1394(eui, dev);
- 	case ARPHRD_TUNNEL6:
+ 	dev->type = ARPHRD_6LOWPAN;
+ 	dev->mtu = IPV6_MIN_MTU;
+ 	dev->priv_flags |= IFF_NO_QUEUE;
 -- 
 2.9.3
 
