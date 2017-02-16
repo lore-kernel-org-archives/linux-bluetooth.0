@@ -1,83 +1,58 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <linux-kernel-owner@vger.kernel.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 10.2 \(3259\))
-Subject: Re: [PATCH] Bluetooth: Fix NULL pointer dereference in
- bt_sock_recvmsg
+Subject: Re: [PATCH v7 3/3] Bluetooth: btusb: Configure Marvell to use one of
+ the pins for oob wakeup
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20161229125119.8985-1-ezequiel@vanguardiasur.com.ar>
-Date: Thu, 16 Feb 2017 17:24:28 +0100
-Cc: linux-bluetooth@vger.kernel.org,
+In-Reply-To: <20170201222410.145612-3-rajatja@google.com>
+Date: Thu, 16 Feb 2017 17:22:42 +0100
+Cc: Rob Herring <robh+dt@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
         "Gustavo F. Padovan" <gustavo@padovan.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>
-Message-Id: <72395EA2-28BF-42E5-8E8F-AD6248E1BFD9@holtmann.org>
-References: <20161229125119.8985-1-ezequiel@vanguardiasur.com.ar>
-To: Ezequiel Garcia <ezequiel@vanguardiasur.com.ar>
-Sender: linux-bluetooth-owner@vger.kernel.org
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Amitkumar Karwar <akarwar@marvell.com>,
+        Wei-Ning Huang <wnhuang@chromium.org>,
+        Xinming Hu <huxm@marvell.com>, netdev@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        Brian Norris <briannorris@google.com>,
+        linux-kernel@vger.kernel.org, rajatxjain@gmail.com
+Message-Id: <B13DDD1D-479B-4B13-BB6B-ED103A59158A@holtmann.org>
+References: <20170201222410.145612-1-rajatja@google.com>
+ <20170201222410.145612-3-rajatja@google.com>
+To: Rajat Jain <rajatja@google.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ezequiel,
+Hi,
 
-> As per the comment in include/linux/net.h, the recvfrom handlers
-> should expect msg_name to be NULL. However, bt_sock_recvmsg()
-> is currently not checking it, which could lead to a NULL pointer
-> dereference.
+> The Marvell devices may have many gpio pins, and hence for wakeup
+> on these out-of-band pins, the chip needs to be told which pin is
+> to be used for wakeup, using an hci command.
 > 
-> The following NULL pointer dereference was produced while testing
-> L2CAP datagram reception. Note that the kernel is tainted due to
-> the r8723bs module being inserted. However, it seems the fix still
-> applies.
+> Thus, we read the pin number etc from the device tree node and send
+> a command to the chip.
 > 
-> $ l2test -r -G
-> l2test[326]: Receiving ...
-> Unable to handle kernel NULL pointer dereference at virtual address 00000000
-> pgd = ee008000
-> [00000000] *pgd=7f896835
-> Internal error: Oops: 817 [#1] PREEMPT SMP ARM
-> Modules linked in: r8723bs(O)
-> CPU: 0 PID: 326 Comm: l2test Tainted: G           O 4.8.0 #1
-> Hardware name: Allwinner sun7i (A20) Family
-> task: ef1c6880 task.stack: eea70000
-> PC is at __memzero+0x58/0x80
-> LR is at l2cap_skb_msg_name+0x1c/0x4c
-> pc : [<c02c47d8>]    lr : [<c0506278>]    psr: 00070013
-> sp : eea71e60  ip : 00000000  fp : 00034e1c
-> r10: 00000000  r9 : 00000000  r8 : eea71ed4
-> r7 : 000002a0  r6 : eea71ed8  r5 : 00000000  r4 : ee4a5d80
-> r3 : 00000000  r2 : 00000000  r1 : 0000000e  r0 : 00000000
-> Flags: nzcv  IRQs on  FIQs on  Mode SVC_32  ISA ARM Segment none
-> Control: 10c5387d  Table: 7600806a  DAC: 00000051
-> Process l2test (pid: 326, stack limit = 0xeea70210)
-> Stack: (0xeea71e60 to 0xeea72000)
-> 1e60: ee4a5d80 eeac2800 000002a0 c04d7114 173eefa0 00000000 c06ca68e 00000000
-> 1e80: 00000001 eeac2800 eef23500 00000000 000002a0 eea71ed4 eea70000 c0504d50
-> 1ea0: 00000000 00000000 eef23500 00000000 00000000 c044e8a0 eea71edc eea9f904
-> 1ec0: bef89aa0 fffffff7 00000000 00035008 000002a0 00000000 00000000 00000000
-> 1ee0: 00000000 00000000 eea71ed4 00000000 00000000 00000000 00004000 00000000
-> 1f00: 0000011b c01078c4 eea70000 c044e5e4 00000000 00000000 642f0001 6c2f7665
-> 1f20: 0000676f 00000000 00000000 00000000 00000000 00000000 00000000 00000000
-> 1f40: 00000000 00000000 00000000 00000000 00000000 ffffffff 00000001 bef89ad8
-> 1f60: 000000a8 c01078c4 eea70000 00000000 00034e1c c01e6c74 00000000 00000000
-> 1f80: 00034e1c 000341f8 00000000 00000123 c01078c4 c044e90c 00000000 00000000
-> 1fa0: 000002a0 c0107700 00034e1c 000341f8 00000003 00035008 000002a0 00000000
-> 1fc0: 00034e1c 000341f8 00000000 00000123 00000000 00000000 00011ffc 00034e1c
-> 1fe0: 00000000 bef89aa4 0001211c b6eebb60 60070010 00000003 00000000 00000000
-> [<c02c47d8>] (__memzero) from [<c0506278>] (l2cap_skb_msg_name+0x1c/0x4c)
-> [<c0506278>] (l2cap_skb_msg_name) from [<c04d7114>] (bt_sock_recvmsg+0x128/0x160)
-> [<c04d7114>] (bt_sock_recvmsg) from [<c0504d50>] (l2cap_sock_recvmsg+0x98/0x134)
-> [<c0504d50>] (l2cap_sock_recvmsg) from [<c044e8a0>] (SyS_recvfrom+0x94/0xec)
-> [<c044e8a0>] (SyS_recvfrom) from [<c044e90c>] (SyS_recv+0x14/0x1c)
-> [<c044e90c>] (SyS_recv) from [<c0107700>] (ret_fast_syscall+0x0/0x3c)
-> Code: e3110010 18a0500c e49de004 e3110008 (18a0000c)
-> ---[ end trace 224e35e79fe06b42 ]---
-> 
-> Signed-off-by: Ezequiel Garcia <ezequiel@vanguardiasur.com.ar>
+> Signed-off-by: Rajat Jain <rajatja@google.com>
+> Reviewed-by: Brian Norris <briannorris@chromium.org>
+> Acked-by: Rob Herring <robh@kernel.org>
 > ---
-> net/bluetooth/af_bluetooth.c | 2 +-
-> 1 file changed, 1 insertion(+), 1 deletion(-)
+> v7: Same as v6
+> v6: same as v5
+> v5: same as v5
+> v4: same as v3
+> v3: * remove the Marvell specific id table and check
+>    * Add reference to marvell-bt-8xxx.txt in btusb.txt
+>    * Add "Reviewed-by" and "Acked-by"    
+> v2: Fix the binding document to specify to use "wakeup" interrupt-name
+> 
+> Documentation/devicetree/bindings/net/btusb.txt    |  3 ++
+> .../{marvell-bt-sd8xxx.txt => marvell-bt-8xxx.txt} | 46 +++++++++++++++----
+> drivers/bluetooth/btusb.c                          | 51 ++++++++++++++++++++++
+> 3 files changed, 92 insertions(+), 8 deletions(-)
+> rename Documentation/devicetree/bindings/net/{marvell-bt-sd8xxx.txt => marvell-bt-8xxx.txt} (50%)
 
-patch has been applied to bluetooth-next tree.
+all 3 patches have been applied to bluetooth-next tree.
 
 Regards
 
 Marcel
-
