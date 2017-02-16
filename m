@@ -1,35 +1,48 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 10.2 \(3259\))
-Subject: Re: [PATCH] Bluetooth: Add another AR3012 04ca:3018 device
+Subject: Re: [PATCH] Bluetooth: hci_bcm: Add support for BCM2E95 and BCM2E96
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1483611593-5703-1-git-send-email-hanipouspilot@gmail.com>
-Date: Thu, 16 Feb 2017 17:36:03 +0100
+In-Reply-To: <20170105171054.5256-1-drake@endlessm.com>
+Date: Thu, 16 Feb 2017 17:34:56 +0100
 Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        1653843@bugs.launchpad.net, stable@vger.kernel.org
-Message-Id: <0C3E2775-E116-43A6-8DD9-01702890E1CF@holtmann.org>
-References: <1483611593-5703-1-git-send-email-hanipouspilot@gmail.com>
-To: Dmitry Tunin <hanipouspilot@gmail.com>
+        linux-bluetooth@vger.kernel.org, linux@endlessm.com,
+        frederic.danis@linux.intel.com
+Message-Id: <7AEB9B95-E999-4D8D-A52A-D36EA4476AF8@holtmann.org>
+References: <20170105171054.5256-1-drake@endlessm.com>
+To: Daniel Drake <drake@endlessm.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Dmitry,
+Hi Daniel,
 
-> T:  Bus=01 Lev=01 Prnt=01 Port=07 Cnt=04 Dev#=  5 Spd=12  MxCh= 0
-> D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-> P:  Vendor=04ca ProdID=3018 Rev=00.01
-> C:  #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
-> I:  If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> The BCM2E96 ID is used by the ECS EF20 laptop, and BCM2E95 is present
+> in the Weibu F3C. Both are now logged as:
 > 
-> Signed-off-by: Dmitry Tunin <hanipouspilot@gmail.com>
-> Cc: stable@vger.kernel.org
+>     hci0: BCM: chip id 82
+>     hci0: BCM43341B0 (002.001.014) build 0000
+>     hci0: BCM (002.001.014) build 0158
+> 
+> The ECS vendor kernel predates the host-wakeup support in hci_bcm but
+> it explicitly has a comment saying that the GPIO assignment needs to be
+> reordered for BCM2E96:
+> 1. (not used in vendor driver)
+> 2. Device wakeup
+> 3. Shutdown
+> 
+> For both devices in question, the DSDT has these GPIOs listed in order
+> of GpioInt, GpioIo, GpioIo. And if we use the first one listed (GpioInt)
+> as the host wakeup, that interrupt handler fires while doing bluetooth
+> I/O.
+> 
+> I am assuming the convention of GPIO ordering has been changed for these
+> new device IDs, so lets use the new ordering on such devices.
+> 
+> Signed-off-by: Daniel Drake <drake@endlessm.com>
 > ---
-> drivers/bluetooth/ath3k.c | 2 ++
-> drivers/bluetooth/btusb.c | 1 +
-> 2 files changed, 3 insertions(+)
+> drivers/bluetooth/hci_bcm.c | 68 +++++++++++++++++++++++++++++----------------
+> 1 file changed, 44 insertions(+), 24 deletions(-)
 
 patch has been applied to bluetooth-next tree.
 
