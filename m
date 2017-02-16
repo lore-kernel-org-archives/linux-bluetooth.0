@@ -1,27 +1,34 @@
 Return-Path: <linux-kernel-owner@vger.kernel.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 10.2 \(3259\))
-Subject: Re: [PATCH] Bluetooth: btmrvl: fix spelling mistake: "caibration" ->
- "calibration"
+Subject: Re: [PATCH] Bluetooth: btqcomsmd: Allow driver to build if
+ COMPILE_TEST is enabled
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20161228213030.6981-1-colin.king@canonical.com>
-Date: Thu, 16 Feb 2017 17:39:17 +0100
-Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+In-Reply-To: <1483363403-25934-1-git-send-email-javier@osg.samsung.com>
+Date: Thu, 16 Feb 2017 17:38:30 +0100
+Cc: linux-kernel@vger.kernel.org,
         Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Message-Id: <D4550BFC-EB9E-4B7C-B63D-A0A55E182119@holtmann.org>
-References: <20161228213030.6981-1-colin.king@canonical.com>
-To: Colin King <colin.king@canonical.com>
+        "Gustavo F. Padovan" <gustavo@padovan.org>,
+        linux-bluetooth@vger.kernel.org
+Message-Id: <8E87450E-BE99-49AA-8946-EB84400C9665@holtmann.org>
+References: <1483363403-25934-1-git-send-email-javier@osg.samsung.com>
+To: Javier Martinez Canillas <javier@osg.samsung.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Colin,
+Hi Javier,
 
-> trivial fix to spelling mistake in BT_ERR error message
+> The driver only has runtime but no build time dependency with QCOM_SMD &&
+> QCOM_WCNSS_CTRL. So it can be built for testing purposes if COMPILE_TEST
+> option is enabled.
 > 
-> Signed-off-by: Colin Ian King <colin.king@canonical.com>
+> This is useful to have more build coverage and make sure that the driver
+> is not affected by changes that could cause build regressions.
+> 
+> Signed-off-by: Javier Martinez Canillas <javier@osg.samsung.com>
 > ---
-> drivers/bluetooth/btmrvl_main.c | 2 +-
+> 
+> drivers/bluetooth/Kconfig | 2 +-
 > 1 file changed, 1 insertion(+), 1 deletion(-)
 
 patch has been applied to bluetooth-next tree.
