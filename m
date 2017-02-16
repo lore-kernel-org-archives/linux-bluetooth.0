@@ -1,44 +1,33 @@
-Return-Path: <linux-wpan-owner@vger.kernel.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: patrik.flykt@linux.intel.com, aar@pengutronix.de,
-        linux-wpan@vger.kernel.org
-Subject: [PATCH v2 0/5] Bluetooth: 6LoWPAN: Fix lladdr length
-Date: Thu, 16 Feb 2017 19:19:41 +0200
-Message-Id: <20170216171946.5105-1-luiz.dentz@gmail.com>
-Sender: linux-wpan-owner@vger.kernel.org
+Return-Path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 10.2 \(3259\))
+Subject: Re: [PATCH] Bluetooth: fix spelling mistake: "advetising" ->
+ "advertising"
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20161228211754.6714-1-colin.king@canonical.com>
+Date: Thu, 16 Feb 2017 17:40:02 +0100
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Message-Id: <541423ED-D259-4CDD-9E4C-A87F63B7E381@holtmann.org>
+References: <20161228211754.6714-1-colin.king@canonical.com>
+To: Colin King <colin.king@canonical.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Colin,
 
-These patches fixes lladdr length to be 6 bytes long and not 8 which cause
-neighbor advertisement to be sent with wrong lladdr including FF:FE filler
-bytes for eui64.
+> trivial fix to spelling mistake in BT_ERR_RATELIMITED error message
+> 
+> Signed-off-by: Colin Ian King <colin.king@canonical.com>
+> ---
+> net/bluetooth/hci_event.c | 2 +-
+> 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Note: This does not fix some of the existing crashes which I hope to address
-in a different set.
+patch has been applied to bluetooth-next tree.
 
-v2: Make all code paths that generate a link-local from lladdr use the same
-code.
+Regards
 
-Alexander Aring (2):
-  6lowpan: iphc: override l2 packet information
-  ipv6: addrconf: fix 48 bit 6lowpan autoconfiguration
-
-Luiz Augusto von Dentz (1):
-  6lowpan: Use netdev addr_len to determine lladdr len
-
-Patrik Flykt (2):
-  bluetooth: Set 6 byte device addresses
-  6lowpan: Set MAC address lenght according to LOWPAN_LLTYPE
-
- include/net/6lowpan.h   | 19 +++++++++++++++++
- net/6lowpan/core.c      | 11 +++++++++-
- net/6lowpan/iphc.c      | 57 ++++++++++++++++++++++++++++++++++++++-----------
- net/bluetooth/6lowpan.c | 52 +++++++++++---------------------------------
- net/ipv6/addrconf.c     | 17 ++++++++++-----
- 5 files changed, 99 insertions(+), 57 deletions(-)
-
--- 
-2.9.3
-
+Marcel
