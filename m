@@ -1,117 +1,60 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: "Felipe F. Tonello" <eu@felipetonello.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 BlueZ 1/7] profiles/gap: Some code cleanup
-Date: Thu, 16 Feb 2017 18:03:09 +0000
-Message-Id: <20170216180315.30531-2-eu@felipetonello.com>
+Subject: [PATCH v2 BlueZ 3/7] src/device: Added function to set connection parameters
+Date: Thu, 16 Feb 2017 18:03:11 +0000
+Message-Id: <20170216180315.30531-4-eu@felipetonello.com>
 In-Reply-To: <20170216180315.30531-1-eu@felipetonello.com>
 References: <20170216180315.30531-1-eu@felipetonello.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Just removing unecessary function and code duplication.
----
- profiles/gap/gas.c | 40 +++++++++++++++++++---------------------
- 1 file changed, 19 insertions(+), 21 deletions(-)
+This function allows plugins to set the connection parameters of the
+respective btd_device object.
 
-diff --git a/profiles/gap/gas.c b/profiles/gap/gas.c
-index 43b7c3d0ef07..0d34503ad446 100644
---- a/profiles/gap/gas.c
-+++ b/profiles/gap/gas.c
-@@ -57,10 +57,18 @@ struct gas {
- 	struct gatt_db_attribute *attr;
- };
- 
--static void gas_free(struct gas *gas)
-+static void gas_reset(struct gas *gas)
+It is useful for GAP Peripheral Preferred Connection Parameters
+characteristic for example.
+---
+ src/device.c | 16 ++++++++++++++++
+ src/device.h |  4 ++++
+ 2 files changed, 20 insertions(+)
+
+diff --git a/src/device.c b/src/device.c
+index 8693eb826b54..d4aa7f90561e 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -6122,3 +6122,19 @@ void btd_device_cleanup(void)
  {
-+	gas->attr = NULL;
- 	gatt_db_unref(gas->db);
-+	gas->db = NULL;
- 	bt_gatt_client_unref(gas->client);
-+	gas->client = NULL;
-+}
+ 	btd_service_remove_state_cb(service_state_cb_id);
+ }
 +
-+static void gas_free(struct gas *gas)
++void btd_device_set_conn_param(struct btd_device *device, uint16_t min_interval,
++					uint16_t max_interval, uint16_t latency,
++					uint16_t timeout)
 +{
-+	gas_reset(gas);
- 	btd_device_unref(gas->device);
- 	g_free(gas);
- }
-@@ -154,7 +162,7 @@ static void handle_appearance(struct gas *gas, uint16_t value_handle)
- 		DBG("Failed to send request to read appearance");
- }
- 
--static bool uuid_cmp(uint16_t u16, const bt_uuid_t *uuid)
-+static inline bool uuid_cmp(uint16_t u16, const bt_uuid_t *uuid)
- {
- 	bt_uuid_t lhs;
- 
-@@ -190,11 +198,6 @@ static void handle_characteristic(struct gatt_db_attribute *attr,
- 	}
- }
- 
--static void handle_gap_service(struct gas *gas)
--{
--	gatt_db_service_foreach_char(gas->attr, handle_characteristic, gas);
--}
--
- static int gap_probe(struct btd_service *service)
- {
- 	struct btd_device *device = btd_service_get_device(service);
-@@ -248,16 +251,7 @@ static void foreach_gap_service(struct gatt_db_attribute *attr, void *user_data)
- 	}
- 
- 	gas->attr = attr;
--	handle_gap_service(gas);
--}
--
--static void gas_reset(struct gas *gas)
--{
--	gas->attr = NULL;
--	gatt_db_unref(gas->db);
--	gas->db = NULL;
--	bt_gatt_client_unref(gas->client);
--	gas->client = NULL;
-+	gatt_db_service_foreach_char(gas->attr, handle_characteristic, gas);
- }
- 
- static int gap_accept(struct btd_service *service)
-@@ -268,13 +262,15 @@ static int gap_accept(struct btd_service *service)
- 	struct gas *gas = btd_service_get_user_data(service);
- 	char addr[18];
- 	bt_uuid_t gap_uuid;
-+	int err = 0;
- 
- 	ba2str(device_get_address(device), addr);
- 	DBG("GAP profile accept (%s)", addr);
- 
- 	if (!gas) {
- 		error("GAP service not handled by profile");
--		return -1;
-+		err = -1;
-+		goto _finish;
- 	}
- 
- 	gas->db = gatt_db_ref(db);
-@@ -287,12 +283,14 @@ static int gap_accept(struct btd_service *service)
- 	if (!gas->attr) {
- 		error("GAP attribute not found");
- 		gas_reset(gas);
--		return -1;
-+		err = -1;
- 	}
- 
--	btd_service_connecting_complete(service, 0);
-+_finish:
- 
--	return 0;
-+	btd_service_connecting_complete(service, err);
++	btd_assert(device != NULL);
 +
-+	return err;
- }
++	adapter_store_conn_param(device->adapter, &device->bdaddr,
++					device->bdaddr_type, min_interval,
++					max_interval, latency,
++					timeout);
++	adapter_load_conn_param(device->adapter, &device->bdaddr,
++					device->bdaddr_type, min_interval,
++					max_interval, latency,
++					timeout);
++}
+diff --git a/src/device.h b/src/device.h
+index 3cab366eeaea..88076d2d196d 100644
+--- a/src/device.h
++++ b/src/device.h
+@@ -163,3 +163,7 @@ int btd_device_connect_services(struct btd_device *dev, GSList *services);
  
- static int gap_disconnect(struct btd_service *service)
+ void btd_device_init(void);
+ void btd_device_cleanup(void);
++
++void btd_device_set_conn_param(struct btd_device *device, uint16_t min_interval,
++					uint16_t max_interval, uint16_t latency,
++					uint16_t timeout);
 -- 
 2.11.1
 
