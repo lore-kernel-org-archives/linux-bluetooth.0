@@ -1,60 +1,48 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: "Felipe F. Tonello" <eu@felipetonello.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 BlueZ 3/7] src/device: Added function to set connection parameters
-Date: Thu, 16 Feb 2017 18:03:11 +0000
-Message-Id: <20170216180315.30531-4-eu@felipetonello.com>
-In-Reply-To: <20170216180315.30531-1-eu@felipetonello.com>
-References: <20170216180315.30531-1-eu@felipetonello.com>
+Subject: [PATCH v2 BlueZ 0/7] Improvements on connection parameters update
+Date: Thu, 16 Feb 2017 18:03:08 +0000
+Message-Id: <20170216180315.30531-1-eu@felipetonello.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This function allows plugins to set the connection parameters of the
-respective btd_device object.
+This is one of the parts of a series of patches related to connection
+parameters update.
 
-It is useful for GAP Peripheral Preferred Connection Parameters
-characteristic for example.
----
- src/device.c | 16 ++++++++++++++++
- src/device.h |  4 ++++
- 2 files changed, 20 insertions(+)
+This initial implementation adds supports to GAP Peripheral Preferred
+Connection Parameters (PPCP) characteristic and the Slave Connection Interval
+Range Advertising Data (AD).
 
-diff --git a/src/device.c b/src/device.c
-index 8693eb826b54..d4aa7f90561e 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -6122,3 +6122,19 @@ void btd_device_cleanup(void)
- {
- 	btd_service_remove_state_cb(service_state_cb_id);
- }
-+
-+void btd_device_set_conn_param(struct btd_device *device, uint16_t min_interval,
-+					uint16_t max_interval, uint16_t latency,
-+					uint16_t timeout)
-+{
-+	btd_assert(device != NULL);
-+
-+	adapter_store_conn_param(device->adapter, &device->bdaddr,
-+					device->bdaddr_type, min_interval,
-+					max_interval, latency,
-+					timeout);
-+	adapter_load_conn_param(device->adapter, &device->bdaddr,
-+					device->bdaddr_type, min_interval,
-+					max_interval, latency,
-+					timeout);
-+}
-diff --git a/src/device.h b/src/device.h
-index 3cab366eeaea..88076d2d196d 100644
---- a/src/device.h
-+++ b/src/device.h
-@@ -163,3 +163,7 @@ int btd_device_connect_services(struct btd_device *dev, GSList *services);
- 
- void btd_device_init(void);
- void btd_device_cleanup(void);
-+
-+void btd_device_set_conn_param(struct btd_device *device, uint16_t min_interval,
-+					uint16_t max_interval, uint16_t latency,
-+					uint16_t timeout);
+There is a problem described in #4 that due to a limitation of the BlueZ API
+it is not possible to update the current connection with specific parameters.
+I am working on a socket option API to allow something similar. Hopefully I
+will be able to write something that covers this use-case as well. This
+problem also applies to patch #6.
+
+Changes from v1:
+ * Added Slave Connection Interval Range AD support;
+ * Unit tests for connection interval.
+
+Felipe F. Tonello (7):
+  profiles/gap: Some code cleanup
+  src/adapter: Added connection parameter load/store functions
+  src/device: Added function to set connection parameters
+  profiles/gap: Added support for PPCP characteristic
+  src/eir: Added support for Slave Connection Interval Range AD
+  src/adapter: Store Slave Connection Interval Range
+  unit/test-eir: Added tests for connection interval
+
+ profiles/gap/gas.c | 111 +++++++++++++++++++++++++++++++++++++++++++----------
+ src/adapter.c      |  46 +++++++++++++++++++++-
+ src/adapter.h      |   9 +++++
+ src/device.c       |  16 ++++++++
+ src/device.h       |   4 ++
+ src/eir.c          |   7 ++++
+ src/eir.h          |   3 ++
+ unit/test-eir.c    |  26 +++++++++++--
+ 8 files changed, 196 insertions(+), 26 deletions(-)
+
 -- 
 2.11.1
 
