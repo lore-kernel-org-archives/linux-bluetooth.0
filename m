@@ -1,64 +1,67 @@
-Return-Path: <linux-wpan-owner@vger.kernel.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: patrik.flykt@linux.intel.com, aar@pengutronix.de,
         linux-wpan@vger.kernel.org
-Subject: [PATCH v3 4/5] ipv6: addrconf: fix 48 bit 6lowpan autoconfiguration
-Date: Fri, 17 Feb 2017 17:50:02 +0200
-Message-Id: <20170217155003.4594-5-luiz.dentz@gmail.com>
+Subject: [PATCH v3 3/5] 6lowpan: iphc: override l2 packet information
+Date: Fri, 17 Feb 2017 17:50:01 +0200
+Message-Id: <20170217155003.4594-4-luiz.dentz@gmail.com>
 In-Reply-To: <20170217155003.4594-1-luiz.dentz@gmail.com>
 References: <20170217155003.4594-1-luiz.dentz@gmail.com>
-Sender: linux-wpan-owner@vger.kernel.org
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Alexander Aring <aar@pengutronix.de>
 
-This patch adds support for 48 bit 6LoWPAN address length
-autoconfiguration which is the case for BTLE 6LoWPAN.
+The skb->pkt_type need to be set by L2, but on 6LoWPAN there exists L2
+e.g. BTLE which doesn't has multicast addressing. If it's a multicast or
+not is detected by IPHC headers multicast bit. The IPv6 layer will
+evaluate this pkt_type, so we force set this type while uncompressing.
+Should be okay for 802.15.4 as well.
 
 Signed-off-by: Alexander Aring <aar@pengutronix.de>
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
- net/ipv6/addrconf.c | 17 ++++++++++++-----
- 1 file changed, 12 insertions(+), 5 deletions(-)
+ net/6lowpan/iphc.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
-index ac9bd56..dede33f 100644
---- a/net/ipv6/addrconf.c
-+++ b/net/ipv6/addrconf.c
-@@ -2050,12 +2050,19 @@ static void addrconf_leave_anycast(struct inet6_ifaddr *ifp)
- 	__ipv6_dev_ac_dec(ifp->idev, &addr);
- }
+diff --git a/net/6lowpan/iphc.c b/net/6lowpan/iphc.c
+index 79f1fa2..fb5f6fa 100644
+--- a/net/6lowpan/iphc.c
++++ b/net/6lowpan/iphc.c
+@@ -666,6 +666,8 @@ int lowpan_header_decompress(struct sk_buff *skb, const struct net_device *dev,
  
--static int addrconf_ifid_eui64(u8 *eui, struct net_device *dev)
-+static int addrconf_ifid_6lowpan(u8 *eui, struct net_device *dev)
- {
--	if (dev->addr_len != EUI64_ADDR_LEN)
-+	switch (dev->addr_len) {
-+	case ETH_ALEN:
-+		return addrconf_ifid_eui48(eui, dev);
-+	case EUI64_ADDR_LEN:
-+		memcpy(eui, dev->dev_addr, EUI64_ADDR_LEN);
-+		eui[0] ^= 2;
-+		break;
-+	default:
- 		return -1;
--	memcpy(eui, dev->dev_addr, EUI64_ADDR_LEN);
--	eui[0] ^= 2;
-+	}
+ 	switch (iphc1 & (LOWPAN_IPHC_M | LOWPAN_IPHC_DAC)) {
+ 	case LOWPAN_IPHC_M | LOWPAN_IPHC_DAC:
++		skb->pkt_type = PACKET_BROADCAST;
 +
- 	return 0;
- }
- 
-@@ -2146,7 +2153,7 @@ static int ipv6_generate_eui64(u8 *eui, struct net_device *dev)
- 	case ARPHRD_IPGRE:
- 		return addrconf_ifid_gre(eui, dev);
- 	case ARPHRD_6LOWPAN:
--		return addrconf_ifid_eui64(eui, dev);
-+		return addrconf_ifid_6lowpan(eui, dev);
- 	case ARPHRD_IEEE1394:
- 		return addrconf_ifid_ieee1394(eui, dev);
- 	case ARPHRD_TUNNEL6:
+ 		spin_lock_bh(&lowpan_dev(dev)->ctx.lock);
+ 		ci = lowpan_iphc_ctx_get_by_id(dev, LOWPAN_IPHC_CID_DCI(cid));
+ 		if (!ci) {
+@@ -681,11 +683,15 @@ int lowpan_header_decompress(struct sk_buff *skb, const struct net_device *dev,
+ 		spin_unlock_bh(&lowpan_dev(dev)->ctx.lock);
+ 		break;
+ 	case LOWPAN_IPHC_M:
++		skb->pkt_type = PACKET_BROADCAST;
++
+ 		/* multicast */
+ 		err = lowpan_uncompress_multicast_daddr(skb, &hdr.daddr,
+ 							iphc1 & LOWPAN_IPHC_DAM_MASK);
+ 		break;
+ 	case LOWPAN_IPHC_DAC:
++		skb->pkt_type = PACKET_HOST;
++
+ 		spin_lock_bh(&lowpan_dev(dev)->ctx.lock);
+ 		ci = lowpan_iphc_ctx_get_by_id(dev, LOWPAN_IPHC_CID_DCI(cid));
+ 		if (!ci) {
+@@ -701,6 +707,8 @@ int lowpan_header_decompress(struct sk_buff *skb, const struct net_device *dev,
+ 		spin_unlock_bh(&lowpan_dev(dev)->ctx.lock);
+ 		break;
+ 	default:
++		skb->pkt_type = PACKET_HOST;
++
+ 		err = lowpan_iphc_uncompress_addr(skb, dev, &hdr.daddr,
+ 						  iphc1 & LOWPAN_IPHC_DAM_MASK,
+ 						  daddr);
 -- 
 2.9.3
 
