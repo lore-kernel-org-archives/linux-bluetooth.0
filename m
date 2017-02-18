@@ -1,32 +1,56 @@
-Return-Path: <linux-kernel-owner@vger.kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 10.2 \(3259\))
-Subject: Re: [PATCH] Bluetooth: hci_qca: fix spelling mistake: "Spurrious" ->
- "Spurious"
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20170217195810.19365-1-colin.king@canonical.com>
-Date: Sat, 18 Feb 2017 22:27:16 +0100
-Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Linux-Bluetooth <linux-bluetooth@vger.kernel.org>,
-        linux-kernel@vger.kernel.org
-Message-Id: <CE69CDC0-6B19-43A3-9C5C-F262703A310C@holtmann.org>
-References: <20170217195810.19365-1-colin.king@canonical.com>
-To: Colin King <colin.king@canonical.com>
-Sender: linux-kernel-owner@vger.kernel.org
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: bugzilla-daemon@bugzilla.kernel.org
+To: linux-bluetooth@kernel.org
+Subject: [Bug 190831] Intel Bluetooth 8260 breaks with latest firmware
+Date: Sat, 18 Feb 2017 20:43:16 +0000
+Message-ID: <bug-190831-62941-n5eVRsKuRu@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-190831-62941@https.bugzilla.kernel.org/>
+References: <bug-190831-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Colin,
+https://bugzilla.kernel.org/show_bug.cgi?id=190831
 
-> trivial fix to spelling mistake in error message
-> 
-> Signed-off-by: Colin Ian King <colin.king@canonical.com>
-> ---
-> drivers/bluetooth/hci_qca.c | 4 ++--
-> 1 file changed, 2 insertions(+), 2 deletions(-)
+Tony Houghton (h@realh.co.uk) changed:
 
-patch has been applied to bluetooth-next tree.
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |h@realh.co.uk
 
-Regards
+--- Comment #47 from Tony Houghton (h@realh.co.uk) ---
+I've got a similar problem with Debian kernel 4.9.6-3, except my mouse, a
+Microsoft 3600, just seems to stop, without going into a low framerate first.
+However, it did seem to go into a low framerate when I tried to see if my BT
+speaker would work. The speaker would connect, but either not become available
+in sound settings, or attempting to play to it caused the player (mpv) to just
+pause at 00:00 indefinitely.
 
-Marcel
+When trying to open GNOME's bluetooth settings when the mouse has stopped
+working, there's a delay of several seconds before it appears, and I see this
+in journalctl:
+
+Feb 18 19:29:31 lenny bluetoothd[1140]: Failed to set mode: Failed (0x03)
+Feb 18 19:29:31 lenny kernel: Bluetooth: hci0 command 0x0c1a tx timeout
+Feb 18 19:29:33 lenny bluetoothd[1140]: Failed to set mode: Failed (0x03)
+Feb 18 19:29:33 lenny gnome-control-c[1824]: Failed to set Discoverable to 1:
+GDBus.Error:org.bluez.Error.Failed: Failed
+Feb 18 19:29:33 lenny kernel: Bluetooth: hci0 command 0x0c1a tx timeout
+Feb 18 19:29:35 lenny kernel: Bluetooth: hci0 command 0x200c tx timeout
+Feb 18 19:29:37 lenny bluetoothd[1140]: Failed to set mode: Failed (0x03)
+Feb 18 19:29:37 lenny kernel: Bluetooth: hci0 command 0x0c1a tx timeout
+Feb 18 19:29:39 lenny bluetoothd[1140]: Failed to set mode: Failed (0x03)
+Feb 18 19:29:39 lenny kernel: Bluetooth: hci0 command 0x0c1a tx timeout
+Feb 18 19:29:47 lenny kernel: Bluetooth: hci0 command 0x200c tx timeout
+Feb 18 19:29:59 lenny kernel: Bluetooth: hci0 command 0x200c tx timeout
+Feb 18 19:30:11 lenny kernel: Bluetooth: hci0 command 0x200c tx timeout
+F
+
+When the settings dialog eventually opens, it says the mouse is still
+Connected. Turning bluetooth off and on again makes the mouse reconnect, but
+only for a few seconds.
+
+-- 
+You are receiving this mail because:
+You are the assignee for the bug.
