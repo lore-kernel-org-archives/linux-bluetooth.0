@@ -1,76 +1,60 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
 From: Stefan Schmidt <stefan@osg.samsung.com>
-Subject: Re: [PATCH v3 3/5] 6lowpan: iphc: override l2 packet information
+Subject: Re: [PATCH v3 2/5] 6lowpan: Set MAC address lenght according to
+ LOWPAN_LLTYPE
 To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
         linux-bluetooth@vger.kernel.org
 References: <20170217155003.4594-1-luiz.dentz@gmail.com>
- <20170217155003.4594-4-luiz.dentz@gmail.com>
+ <20170217155003.4594-3-luiz.dentz@gmail.com>
 Cc: patrik.flykt@linux.intel.com, aar@pengutronix.de,
         linux-wpan@vger.kernel.org
-Message-ID: <64530b9e-2be8-0446-cbc2-caf0914a49f7@osg.samsung.com>
-Date: Mon, 20 Feb 2017 23:03:34 +0100
+Message-ID: <64b054e1-7936-c384-3b58-3550a13d8030@osg.samsung.com>
+Date: Mon, 20 Feb 2017 22:58:12 +0100
 MIME-Version: 1.0
-In-Reply-To: <20170217155003.4594-4-luiz.dentz@gmail.com>
+In-Reply-To: <20170217155003.4594-3-luiz.dentz@gmail.com>
 Content-Type: text/plain; charset=windows-1252; format=flowed
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hello.
 
-On 02/17/2017 04:50 PM, Luiz Augusto von Dentz wrote:
-> From: Alexander Aring <aar@pengutronix.de>
->
-> The skb->pkt_type need to be set by L2, but on 6LoWPAN there exists L2
-> e.g. BTLE which doesn't has multicast addressing. If it's a multicast or
-> not is detected by IPHC headers multicast bit. The IPv6 layer will
-> evaluate this pkt_type, so we force set this type while uncompressing.
-> Should be okay for 802.15.4 as well.
->
-> Signed-off-by: Alexander Aring <aar@pengutronix.de>
-> ---
->  net/6lowpan/iphc.c | 8 ++++++++
->  1 file changed, 8 insertions(+)
->
-> diff --git a/net/6lowpan/iphc.c b/net/6lowpan/iphc.c
-> index 79f1fa2..fb5f6fa 100644
-> --- a/net/6lowpan/iphc.c
-> +++ b/net/6lowpan/iphc.c
-> @@ -666,6 +666,8 @@ int lowpan_header_decompress(struct sk_buff *skb, const struct net_device *dev,
->
->  	switch (iphc1 & (LOWPAN_IPHC_M | LOWPAN_IPHC_DAC)) {
->  	case LOWPAN_IPHC_M | LOWPAN_IPHC_DAC:
-> +		skb->pkt_type = PACKET_BROADCAST;
-> +
->  		spin_lock_bh(&lowpan_dev(dev)->ctx.lock);
->  		ci = lowpan_iphc_ctx_get_by_id(dev, LOWPAN_IPHC_CID_DCI(cid));
->  		if (!ci) {
-> @@ -681,11 +683,15 @@ int lowpan_header_decompress(struct sk_buff *skb, const struct net_device *dev,
->  		spin_unlock_bh(&lowpan_dev(dev)->ctx.lock);
->  		break;
->  	case LOWPAN_IPHC_M:
-> +		skb->pkt_type = PACKET_BROADCAST;
-> +
->  		/* multicast */
->  		err = lowpan_uncompress_multicast_daddr(skb, &hdr.daddr,
->  							iphc1 & LOWPAN_IPHC_DAM_MASK);
->  		break;
->  	case LOWPAN_IPHC_DAC:
-> +		skb->pkt_type = PACKET_HOST;
-> +
->  		spin_lock_bh(&lowpan_dev(dev)->ctx.lock);
->  		ci = lowpan_iphc_ctx_get_by_id(dev, LOWPAN_IPHC_CID_DCI(cid));
->  		if (!ci) {
-> @@ -701,6 +707,8 @@ int lowpan_header_decompress(struct sk_buff *skb, const struct net_device *dev,
->  		spin_unlock_bh(&lowpan_dev(dev)->ctx.lock);
->  		break;
->  	default:
-> +		skb->pkt_type = PACKET_HOST;
-> +
->  		err = lowpan_iphc_uncompress_addr(skb, dev, &hdr.daddr,
->  						  iphc1 & LOWPAN_IPHC_DAM_MASK,
->  						  daddr);
->
+lenght typo in subject line.
 
+On 02/17/2017 04:50 PM, Luiz Augusto von Dentz wrote:
+> From: Patrik Flykt <patrik.flykt@linux.intel.com>
+>
+> Set MAC address length according to the 6LoWPAN link layer in use.
+> Bluetooth Low Energy uses 48 bit addressing while IEEE802.15.4 uses
+> 64 bits.
+>
+> Signed-off-by: Patrik Flykt <patrik.flykt@linux.intel.com>
+> ---
+>  net/6lowpan/core.c | 11 ++++++++++-
+>  1 file changed, 10 insertions(+), 1 deletion(-)
+>
+> diff --git a/net/6lowpan/core.c b/net/6lowpan/core.c
+> index 5945f7e..5f9909a 100644
+> --- a/net/6lowpan/core.c
+> +++ b/net/6lowpan/core.c
+> @@ -23,7 +23,16 @@ int lowpan_register_netdevice(struct net_device *dev,
+>  {
+>  	int i, ret;
+>
+> -	dev->addr_len = EUI64_ADDR_LEN;
+> +	switch (lltype) {
+> +	case LOWPAN_LLTYPE_IEEE802154:
+> +		dev->addr_len = EUI64_ADDR_LEN;
+> +		break;
+> +
+> +	case LOWPAN_LLTYPE_BTLE:
+> +		dev->addr_len = ETH_ALEN;
+> +		break;
+> +	}
+> +
+>  	dev->type = ARPHRD_6LOWPAN;
+>  	dev->mtu = IPV6_MIN_MTU;
+>  	dev->priv_flags |= IFF_NO_QUEUE;
+>
 
 Reviewed-by: Stefan Schmidt <stefan@osg.samsung.com>
 
