@@ -1,59 +1,95 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
 From: Stefan Schmidt <stefan@osg.samsung.com>
-Subject: Re: [PATCH v3 2/5] 6lowpan: Set MAC address lenght according to
- LOWPAN_LLTYPE
+Subject: Re: [PATCH v3 1/5] bluetooth: Set 6 byte device addresses
 To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
         linux-bluetooth@vger.kernel.org
 References: <20170217155003.4594-1-luiz.dentz@gmail.com>
- <20170217155003.4594-3-luiz.dentz@gmail.com>
+ <20170217155003.4594-2-luiz.dentz@gmail.com>
 Cc: patrik.flykt@linux.intel.com, aar@pengutronix.de,
         linux-wpan@vger.kernel.org
-Message-ID: <64b054e1-7936-c384-3b58-3550a13d8030@osg.samsung.com>
-Date: Mon, 20 Feb 2017 22:58:12 +0100
+Message-ID: <9a3c996a-940a-49d0-1080-9917a5679401@osg.samsung.com>
+Date: Mon, 20 Feb 2017 22:56:28 +0100
 MIME-Version: 1.0
-In-Reply-To: <20170217155003.4594-3-luiz.dentz@gmail.com>
+In-Reply-To: <20170217155003.4594-2-luiz.dentz@gmail.com>
 Content-Type: text/plain; charset=windows-1252; format=flowed
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hello.
 
-lenght typo in subject line.
-
-On 02/17/2017 04:50 PM, Luiz Augusto von Dentz wrote:
+On 02/17/2017 04:49 PM, Luiz Augusto von Dentz wrote:
 > From: Patrik Flykt <patrik.flykt@linux.intel.com>
 >
-> Set MAC address length according to the 6LoWPAN link layer in use.
-> Bluetooth Low Energy uses 48 bit addressing while IEEE802.15.4 uses
-> 64 bits.
+> Set BTLE MAC addresses that are 6 bytes long and not 8 bytes
+> that are used in other places with 6lowpan.
 >
 > Signed-off-by: Patrik Flykt <patrik.flykt@linux.intel.com>
+> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 > ---
->  net/6lowpan/core.c | 11 ++++++++++-
->  1 file changed, 10 insertions(+), 1 deletion(-)
+>  net/bluetooth/6lowpan.c | 19 ++++++++-----------
+>  1 file changed, 8 insertions(+), 11 deletions(-)
 >
-> diff --git a/net/6lowpan/core.c b/net/6lowpan/core.c
-> index 5945f7e..5f9909a 100644
-> --- a/net/6lowpan/core.c
-> +++ b/net/6lowpan/core.c
-> @@ -23,7 +23,16 @@ int lowpan_register_netdevice(struct net_device *dev,
+> diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
+> index 1904a93..1456b01 100644
+> --- a/net/bluetooth/6lowpan.c
+> +++ b/net/bluetooth/6lowpan.c
+> @@ -80,6 +80,8 @@ struct lowpan_btle_dev {
+>  	struct delayed_work notify_peers;
+>  };
+>
+> +static void set_addr(u8 *eui, u8 *addr, u8 addr_type);
+> +
+>  static inline struct lowpan_btle_dev *
+>  lowpan_btle_dev(const struct net_device *netdev)
 >  {
->  	int i, ret;
+> @@ -272,9 +274,10 @@ static int give_skb_to_upper(struct sk_buff *skb, struct net_device *dev)
+>  static int iphc_decompress(struct sk_buff *skb, struct net_device *netdev,
+>  			   struct l2cap_chan *chan)
+>  {
+> -	const u8 *saddr, *daddr;
+> +	const u8 *saddr;
+>  	struct lowpan_btle_dev *dev;
+>  	struct lowpan_peer *peer;
+> +	unsigned char eui64_daddr[EUI64_ADDR_LEN];
 >
-> -	dev->addr_len = EUI64_ADDR_LEN;
-> +	switch (lltype) {
-> +	case LOWPAN_LLTYPE_IEEE802154:
-> +		dev->addr_len = EUI64_ADDR_LEN;
-> +		break;
-> +
-> +	case LOWPAN_LLTYPE_BTLE:
-> +		dev->addr_len = ETH_ALEN;
-> +		break;
-> +	}
-> +
->  	dev->type = ARPHRD_6LOWPAN;
->  	dev->mtu = IPV6_MIN_MTU;
->  	dev->priv_flags |= IFF_NO_QUEUE;
+>  	dev = lowpan_btle_dev(netdev);
+>
+> @@ -285,9 +288,9 @@ static int iphc_decompress(struct sk_buff *skb, struct net_device *netdev,
+>  		return -EINVAL;
+>
+>  	saddr = peer->eui64_addr;
+> -	daddr = dev->netdev->dev_addr;
+> +	set_addr(&eui64_daddr[0], chan->src.b, chan->src_type);
+>
+> -	return lowpan_header_decompress(skb, netdev, daddr, saddr);
+> +	return lowpan_header_decompress(skb, netdev, &eui64_daddr, saddr);
+>  }
+>
+>  static int recv_pkt(struct sk_buff *skb, struct net_device *dev,
+> @@ -681,13 +684,6 @@ static void set_addr(u8 *eui, u8 *addr, u8 addr_type)
+>  	BT_DBG("type %d addr %*phC", addr_type, 8, eui);
+>  }
+>
+> -static void set_dev_addr(struct net_device *netdev, bdaddr_t *addr,
+> -		         u8 addr_type)
+> -{
+> -	netdev->addr_assign_type = NET_ADDR_PERM;
+> -	set_addr(netdev->dev_addr, addr->b, addr_type);
+> -}
+> -
+>  static void ifup(struct net_device *netdev)
+>  {
+>  	int err;
+> @@ -803,7 +799,8 @@ static int setup_netdev(struct l2cap_chan *chan, struct lowpan_btle_dev **dev)
+>  	if (!netdev)
+>  		return -ENOMEM;
+>
+> -	set_dev_addr(netdev, &chan->src, chan->src_type);
+> +	netdev->addr_assign_type = NET_ADDR_PERM;
+> +	baswap((void *)netdev->dev_addr, &chan->src);
+>
+>  	netdev->netdev_ops = &netdev_ops;
+>  	SET_NETDEV_DEV(netdev, &chan->conn->hcon->hdev->dev);
 >
 
 Reviewed-by: Stefan Schmidt <stefan@osg.samsung.com>
