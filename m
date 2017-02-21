@@ -1,128 +1,255 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <20170216180315.30531-3-eu@felipetonello.com>
-References: <20170216180315.30531-1-eu@felipetonello.com> <20170216180315.30531-3-eu@felipetonello.com>
+Return-Path: <linux-wpan-owner@vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 23 Feb 2017 11:26:31 +0200
-Message-ID: <CABBYNZLs7YjJp+apMKF9-Qpg6GnvUWEfSUNEa+AkrffCqyg-Eg@mail.gmail.com>
-Subject: Re: [PATCH v2 BlueZ 2/7] src/adapter: Added connection parameter
- load/store functions
-To: "Felipe F. Tonello" <eu@felipetonello.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+To: linux-bluetooth@vger.kernel.org
+Cc: patrik.flykt@linux.intel.com, aar@pengutronix.de,
+        linux-wpan@vger.kernel.org, netdev@vger.kernel.org
+Subject: [PATCH v4 5/5] 6lowpan: Use netdev addr_len to determine lladdr len
+Date: Tue, 21 Feb 2017 12:38:11 +0200
+Message-Id: <20170221103811.1506-7-luiz.dentz@gmail.com>
+In-Reply-To: <20170221103811.1506-1-luiz.dentz@gmail.com>
+References: <20170221103811.1506-1-luiz.dentz@gmail.com>
+Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Felipe,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Thu, Feb 16, 2017 at 8:03 PM, Felipe F. Tonello <eu@felipetonello.com> wrote:
-> It is interesting to let other parts of bluetoothd to access these
-> functions since there are few different use-cases where this updating
-> and loading connection parameters can happen.
-> ---
->  src/adapter.c | 24 ++++++++++++++++++++++--
->  src/adapter.h |  9 +++++++++
->  2 files changed, 31 insertions(+), 2 deletions(-)
->
-> diff --git a/src/adapter.c b/src/adapter.c
-> index 3dac7d6490d6..b63883e3cae5 100644
-> --- a/src/adapter.c
-> +++ b/src/adapter.c
-> @@ -3609,6 +3609,26 @@ static void load_conn_params(struct btd_adapter *adapter, GSList *params)
->                 btd_error(adapter->dev_id, "Load connection parameters failed");
->  }
->
-> +void adapter_load_conn_param(struct btd_adapter *adapter, const bdaddr_t *peer,
-> +                               uint8_t bdaddr_type, uint16_t min_interval,
-> +                               uint16_t max_interval, uint16_t latency,
-> +                               uint16_t timeout)
-> +{
-> +       GSList *params = NULL;
-> +       struct conn_param param;
-> +
-> +       bacpy(&param.bdaddr, peer);
-> +       param.bdaddr_type = bdaddr_type;
-> +       param.max_interval = max_interval;
-> +       param.min_interval = min_interval;
-> +       param.latency = latency;
-> +       param.timeout = timeout;
-> +
-> +       params = g_slist_append(params, &param);
-> +       load_conn_params(adapter, params);
+This allow technologies such as Bluetooth to use its native lladdr which
+is eui48 instead of eui64 which was expected by functions like
+lowpan_header_decompress and lowpan_header_compress.
 
-Actually calling load_conn_params with just 1 setting does not work,
-the kernel does call hci_conn_params_clear_disabled before parsing the
-list of the connections which means it may endup cleaning up all the
-settings previously loaded. So we have to decide if the kernel should
-continue doing this thus the userspace has to reload everything or we
-change the handling in the kernel to update the existing settings
-which perhaps it is just a matter of removing
-hci_conn_params_clear_disabled call from load_conn_param since the
-following code code seems to be handling the updates:
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Reviewed-by: Stefan Schmidt <stefan@osg.samsung.com>
+---
+ include/net/6lowpan.h   | 19 +++++++++++++++++++
+ net/6lowpan/iphc.c      | 49 ++++++++++++++++++++++++++++++++++++++-----------
+ net/bluetooth/6lowpan.c | 42 ++++++------------------------------------
+ 3 files changed, 63 insertions(+), 47 deletions(-)
 
-hci_param = hci_conn_params_add(hdev, &param->addr.bdaddr,
-addr_type);
-if (!hci_param) {
-BT_ERR("Failed to add connection parameters");
-continue;
-}
-
-hci_param->conn_min_interval = min;
-hci_param->conn_max_interval = max;
-hci_param->conn_latency = latency;
-hci_param->supervision_timeout = timeout;
-
-
-> +       g_slist_free(params);
-> +}
-> +
->  static uint8_t get_le_addr_type(GKeyFile *keyfile)
->  {
->         uint8_t addr_type;
-> @@ -7251,7 +7271,7 @@ static void new_irk_callback(uint16_t index, uint16_t length,
->         btd_device_set_temporary(device, false);
->  }
->
-> -static void store_conn_param(struct btd_adapter *adapter, const bdaddr_t *peer,
-> +void adapter_store_conn_param(struct btd_adapter *adapter, const bdaddr_t *peer,
->                                 uint8_t bdaddr_type, uint16_t min_interval,
->                                 uint16_t max_interval, uint16_t latency,
->                                 uint16_t timeout)
-> @@ -7325,7 +7345,7 @@ static void new_conn_param(uint16_t index, uint16_t length,
->         if (!ev->store_hint)
->                 return;
->
-> -       store_conn_param(adapter, &ev->addr.bdaddr, ev->addr.type,
-> +       adapter_store_conn_param(adapter, &ev->addr.bdaddr, ev->addr.type,
->                                         ev->min_interval, ev->max_interval,
->                                         ev->latency, ev->timeout);
->  }
-> diff --git a/src/adapter.h b/src/adapter.h
-> index f9178d59e74a..ca2f6678cfca 100644
-> --- a/src/adapter.h
-> +++ b/src/adapter.h
-> @@ -227,3 +227,12 @@ void btd_adapter_for_each_device(struct btd_adapter *adapter,
->
->  bool btd_le_connect_before_pairing(void);
->
-> +void adapter_load_conn_param(struct btd_adapter *adapter, const bdaddr_t *peer,
-> +                               uint8_t bdaddr_type, uint16_t min_interval,
-> +                               uint16_t max_interval, uint16_t latency,
-> +                               uint16_t timeout);
-> +
-> +void adapter_store_conn_param(struct btd_adapter *adapter, const bdaddr_t *peer,
-> +                       uint8_t bdaddr_type, uint16_t min_interval,
-> +                       uint16_t max_interval, uint16_t latency,
-> +                       uint16_t timeout);
-> --
-> 2.11.1
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-
+diff --git a/include/net/6lowpan.h b/include/net/6lowpan.h
+index 5ab4c99..c5792cb 100644
+--- a/include/net/6lowpan.h
++++ b/include/net/6lowpan.h
+@@ -198,6 +198,25 @@ static inline void lowpan_iphc_uncompress_eui64_lladdr(struct in6_addr *ipaddr,
+ 	ipaddr->s6_addr[8] ^= 0x02;
+ }
+ 
++static inline void lowpan_iphc_uncompress_eui48_lladdr(struct in6_addr *ipaddr,
++						       const void *lladdr)
++{
++	/* fe:80::XXXX:XXff:feXX:XXXX
++	 *        \_________________/
++	 *              hwaddr
++	 */
++	ipaddr->s6_addr[0] = 0xFE;
++	ipaddr->s6_addr[1] = 0x80;
++	memcpy(&ipaddr->s6_addr[8], lladdr, 3);
++	ipaddr->s6_addr[11] = 0xFF;
++	ipaddr->s6_addr[12] = 0xFE;
++	memcpy(&ipaddr->s6_addr[13], lladdr + 3, 3);
++	/* second bit-flip (Universe/Local)
++	 * is done according RFC2464
++	 */
++	ipaddr->s6_addr[8] ^= 0x02;
++}
++
+ #ifdef DEBUG
+ /* print data in line */
+ static inline void raw_dump_inline(const char *caller, char *msg,
+diff --git a/net/6lowpan/iphc.c b/net/6lowpan/iphc.c
+index fb5f6fa..6b1042e 100644
+--- a/net/6lowpan/iphc.c
++++ b/net/6lowpan/iphc.c
+@@ -278,6 +278,23 @@ lowpan_iphc_ctx_get_by_mcast_addr(const struct net_device *dev,
+ 	return ret;
+ }
+ 
++static void lowpan_iphc_uncompress_lladdr(const struct net_device *dev,
++					  struct in6_addr *ipaddr,
++					  const void *lladdr)
++{
++	switch (dev->addr_len) {
++	case ETH_ALEN:
++		lowpan_iphc_uncompress_eui48_lladdr(ipaddr, lladdr);
++		break;
++	case EUI64_ADDR_LEN:
++		lowpan_iphc_uncompress_eui64_lladdr(ipaddr, lladdr);
++		break;
++	default:
++		WARN_ON_ONCE(1);
++		break;
++	}
++}
++
+ /* Uncompress address function for source and
+  * destination address(non-multicast).
+  *
+@@ -320,7 +337,7 @@ static int lowpan_iphc_uncompress_addr(struct sk_buff *skb,
+ 			lowpan_iphc_uncompress_802154_lladdr(ipaddr, lladdr);
+ 			break;
+ 		default:
+-			lowpan_iphc_uncompress_eui64_lladdr(ipaddr, lladdr);
++			lowpan_iphc_uncompress_lladdr(dev, ipaddr, lladdr);
+ 			break;
+ 		}
+ 		break;
+@@ -381,7 +398,7 @@ static int lowpan_iphc_uncompress_ctx_addr(struct sk_buff *skb,
+ 			lowpan_iphc_uncompress_802154_lladdr(ipaddr, lladdr);
+ 			break;
+ 		default:
+-			lowpan_iphc_uncompress_eui64_lladdr(ipaddr, lladdr);
++			lowpan_iphc_uncompress_lladdr(dev, ipaddr, lladdr);
+ 			break;
+ 		}
+ 		ipv6_addr_prefix_copy(ipaddr, &ctx->pfx, ctx->plen);
+@@ -810,6 +827,21 @@ lowpan_iphc_compress_ctx_802154_lladdr(const struct in6_addr *ipaddr,
+ 	return lladdr_compress;
+ }
+ 
++static bool lowpan_iphc_addr_equal(const struct net_device *dev,
++				   const struct lowpan_iphc_ctx *ctx,
++				   const struct in6_addr *ipaddr,
++				   const void *lladdr)
++{
++	struct in6_addr tmp = {};
++
++	lowpan_iphc_uncompress_lladdr(dev, &tmp, lladdr);
++
++	if (ctx)
++		ipv6_addr_prefix_copy(&tmp, &ctx->pfx, ctx->plen);
++
++	return ipv6_addr_equal(&tmp, ipaddr);
++}
++
+ static u8 lowpan_compress_ctx_addr(u8 **hc_ptr, const struct net_device *dev,
+ 				   const struct in6_addr *ipaddr,
+ 				   const struct lowpan_iphc_ctx *ctx,
+@@ -827,13 +859,7 @@ static u8 lowpan_compress_ctx_addr(u8 **hc_ptr, const struct net_device *dev,
+ 		}
+ 		break;
+ 	default:
+-		/* check for SAM/DAM = 11 */
+-		memcpy(&tmp.s6_addr[8], lladdr, EUI64_ADDR_LEN);
+-		/* second bit-flip (Universe/Local) is done according RFC2464 */
+-		tmp.s6_addr[8] ^= 0x02;
+-		/* context information are always used */
+-		ipv6_addr_prefix_copy(&tmp, &ctx->pfx, ctx->plen);
+-		if (ipv6_addr_equal(&tmp, ipaddr)) {
++		if (lowpan_iphc_addr_equal(dev, ctx, ipaddr, lladdr)) {
+ 			dam = LOWPAN_IPHC_DAM_11;
+ 			goto out;
+ 		}
+@@ -929,11 +955,12 @@ static u8 lowpan_compress_addr_64(u8 **hc_ptr, const struct net_device *dev,
+ 		}
+ 		break;
+ 	default:
+-		if (is_addr_mac_addr_based(ipaddr, lladdr)) {
+-			dam = LOWPAN_IPHC_DAM_11; /* 0-bits */
++		if (lowpan_iphc_addr_equal(dev, NULL, ipaddr, lladdr)) {
++			dam = LOWPAN_IPHC_DAM_11;
+ 			pr_debug("address compression 0 bits\n");
+ 			goto out;
+ 		}
++
+ 		break;
+ 	}
+ 
+diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
+index 1456b01..0b68cfc 100644
+--- a/net/bluetooth/6lowpan.c
++++ b/net/bluetooth/6lowpan.c
+@@ -64,7 +64,7 @@ struct lowpan_peer {
+ 	struct l2cap_chan *chan;
+ 
+ 	/* peer addresses in various formats */
+-	unsigned char eui64_addr[EUI64_ADDR_LEN];
++	unsigned char lladdr[ETH_ALEN];
+ 	struct in6_addr peer_addr;
+ };
+ 
+@@ -80,8 +80,6 @@ struct lowpan_btle_dev {
+ 	struct delayed_work notify_peers;
+ };
+ 
+-static void set_addr(u8 *eui, u8 *addr, u8 addr_type);
+-
+ static inline struct lowpan_btle_dev *
+ lowpan_btle_dev(const struct net_device *netdev)
+ {
+@@ -277,7 +275,6 @@ static int iphc_decompress(struct sk_buff *skb, struct net_device *netdev,
+ 	const u8 *saddr;
+ 	struct lowpan_btle_dev *dev;
+ 	struct lowpan_peer *peer;
+-	unsigned char eui64_daddr[EUI64_ADDR_LEN];
+ 
+ 	dev = lowpan_btle_dev(netdev);
+ 
+@@ -287,10 +284,9 @@ static int iphc_decompress(struct sk_buff *skb, struct net_device *netdev,
+ 	if (!peer)
+ 		return -EINVAL;
+ 
+-	saddr = peer->eui64_addr;
+-	set_addr(&eui64_daddr[0], chan->src.b, chan->src_type);
++	saddr = peer->lladdr;
+ 
+-	return lowpan_header_decompress(skb, netdev, &eui64_daddr, saddr);
++	return lowpan_header_decompress(skb, netdev, netdev->dev_addr, saddr);
+ }
+ 
+ static int recv_pkt(struct sk_buff *skb, struct net_device *dev,
+@@ -477,7 +473,7 @@ static int setup_header(struct sk_buff *skb, struct net_device *netdev,
+ 			}
+ 		}
+ 
+-		daddr = peer->eui64_addr;
++		daddr = peer->lladdr;
+ 		*peer_addr = addr;
+ 		*peer_addr_type = addr_type;
+ 		lowpan_cb(skb)->chan = peer->chan;
+@@ -663,27 +659,6 @@ static struct device_type bt_type = {
+ 	.name	= "bluetooth",
+ };
+ 
+-static void set_addr(u8 *eui, u8 *addr, u8 addr_type)
+-{
+-	/* addr is the BT address in little-endian format */
+-	eui[0] = addr[5];
+-	eui[1] = addr[4];
+-	eui[2] = addr[3];
+-	eui[3] = 0xFF;
+-	eui[4] = 0xFE;
+-	eui[5] = addr[2];
+-	eui[6] = addr[1];
+-	eui[7] = addr[0];
+-
+-	/* Universal/local bit set, BT 6lowpan draft ch. 3.2.1 */
+-	if (addr_type == BDADDR_LE_PUBLIC)
+-		eui[0] &= ~0x02;
+-	else
+-		eui[0] |= 0x02;
+-
+-	BT_DBG("type %d addr %*phC", addr_type, 8, eui);
+-}
+-
+ static void ifup(struct net_device *netdev)
+ {
+ 	int err;
+@@ -762,14 +737,9 @@ static struct l2cap_chan *add_peer_chan(struct l2cap_chan *chan,
+ 	peer->chan = chan;
+ 	memset(&peer->peer_addr, 0, sizeof(struct in6_addr));
+ 
+-	/* RFC 2464 ch. 5 */
+-	peer->peer_addr.s6_addr[0] = 0xFE;
+-	peer->peer_addr.s6_addr[1] = 0x80;
+-	set_addr((u8 *)&peer->peer_addr.s6_addr + 8, chan->dst.b,
+-		 chan->dst_type);
++	baswap((void *)peer->lladdr, &chan->dst);
+ 
+-	memcpy(&peer->eui64_addr, (u8 *)&peer->peer_addr.s6_addr + 8,
+-	       EUI64_ADDR_LEN);
++	lowpan_iphc_uncompress_eui48_lladdr(&peer->peer_addr, peer->lladdr);
+ 
+ 	/* IPv6 address needs to have the U/L bit set properly so toggle
+ 	 * it back here.
 -- 
-Luiz Augusto von Dentz
+2.9.3
+
