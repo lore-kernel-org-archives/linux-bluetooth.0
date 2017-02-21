@@ -1,56 +1,96 @@
-Return-Path: <eu@felipetonello.com>
-Subject: Re: [RFC][PATCH v2 BlueZ 0/2] Connection Update improvements
-To: linux-bluetooth@vger.kernel.org
-References: <20170214202829.550-1-eu@felipetonello.com>
-Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- Marcel Holtmann <marcel@holtmann.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Subject: Re: [PATCH v2 BlueZ 0/7] Improvements on connection parameters update
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+References: <20170216180315.30531-1-eu@felipetonello.com>
+ <CABBYNZL7W15pdvZLezBO146RXw8ADNXcatiuU2XhEA9A0tzSMA@mail.gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 From: Felipe Ferreri Tonello <eu@felipetonello.com>
-Message-ID: <06953c95-5655-bedf-8fcf-df405df10d2f@felipetonello.com>
-Date: Tue, 21 Feb 2017 09:40:56 +0000
+Message-ID: <cdefb429-7549-5454-b53f-b4cd3628fbae@felipetonello.com>
+Date: Tue, 21 Feb 2017 09:40:12 +0000
 MIME-Version: 1.0
-In-Reply-To: <20170214202829.550-1-eu@felipetonello.com>
+In-Reply-To: <CABBYNZL7W15pdvZLezBO146RXw8ADNXcatiuU2XhEA9A0tzSMA@mail.gmail.com>
 Content-Type: multipart/mixed;
- boundary="------------2ABF5CA17E2A717BF09177BB"
+ boundary="------------620053F593AF8DEDBFDF0A19"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 This is a multi-part message in MIME format.
---------------2ABF5CA17E2A717BF09177BB
+--------------620053F593AF8DEDBFDF0A19
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
 
-Hi,
+Hi Luiz,
 
-Any comments?
+On 20/02/17 15:21, Luiz Augusto von Dentz wrote:
+> Hi Felipe,
+> 
+> On Thu, Feb 16, 2017 at 8:03 PM, Felipe F. Tonello <eu@felipetonello.com> wrote:
+>> This is one of the parts of a series of patches related to connection
+>> parameters update.
+>>
+>> This initial implementation adds supports to GAP Peripheral Preferred
+>> Connection Parameters (PPCP) characteristic and the Slave Connection Interval
+>> Range Advertising Data (AD).
+> 
+> 
+> Are there any devices implementing these? Id like to do a some testing
+> but haven't find anything implementing this, or well I can generate
+> the PPCP but the SCRAD is probably a waste of AD since that is pretty
+> limited in size.
 
-On 14/02/17 20:28, Felipe F. Tonello wrote:
-> These changes should improve application who want to update the connection
-> parameters for both master and slave devices.
+PPCP not that I know of. But the AD there are devices, including in the
+unit-eir there is one.
+
+The PPCP and AD is important specially for MIDI devices who require
+low-latency.
+
+I did test it here, it will be nice if you could as well.
+
 > 
-> Note: Connection Parameters Request Link Layer Control Procedure (>=4.1) is
-> not supported in BlueZ yet. I will work on this on later patches.
+>> There is a problem described in #4 that due to a limitation of the BlueZ API
+>> it is not possible to update the current connection with specific parameters.
+>> I am working on a socket option API to allow something similar. Hopefully I
+>> will be able to write something that covers this use-case as well. This
+>> problem also applies to patch #6.
+>>
+>> Changes from v1:
+>>  * Added Slave Connection Interval Range AD support;
+>>  * Unit tests for connection interval.
+>>
+>> Felipe F. Tonello (7):
+>>   profiles/gap: Some code cleanup
+>>   src/adapter: Added connection parameter load/store functions
+>>   src/device: Added function to set connection parameters
+>>   profiles/gap: Added support for PPCP characteristic
+>>   src/eir: Added support for Slave Connection Interval Range AD
+>>   src/adapter: Store Slave Connection Interval Range
+>>   unit/test-eir: Added tests for connection interval
+>>
+>>  profiles/gap/gas.c | 111 +++++++++++++++++++++++++++++++++++++++++++----------
+>>  src/adapter.c      |  46 +++++++++++++++++++++-
+>>  src/adapter.h      |   9 +++++
+>>  src/device.c       |  16 ++++++++
+>>  src/device.h       |   4 ++
+>>  src/eir.c          |   7 ++++
+>>  src/eir.h          |   3 ++
+>>  unit/test-eir.c    |  26 +++++++++++--
+>>  8 files changed, 196 insertions(+), 26 deletions(-)
+>>
+>> --
+>> 2.11.1
+>>
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 > 
-> Changes from v1:
->  * Use simpler user-space API
->  * Added patch #1
 > 
-> Felipe F. Tonello (2):
->   Bluetooth: L2CAP: Refactor L2CAP_CONN_PARAM_UPDATE_REQ into a function
->   Bluetooth: L2CAP: Add BT_LE_CONN_CONFIG socket option
-> 
->  include/net/bluetooth/bluetooth.h |   9 ++++
->  include/net/bluetooth/hci_core.h  |   1 +
->  include/net/bluetooth/l2cap.h     |   3 ++
->  net/bluetooth/hci_core.c          |   1 +
->  net/bluetooth/l2cap_core.c        |  36 ++++++++-----
->  net/bluetooth/l2cap_sock.c        | 108 ++++++++++++++++++++++++++++++++++++++
->  net/bluetooth/mgmt.c              |   1 +
->  7 files changed, 146 insertions(+), 13 deletions(-)
 > 
 
 -- 
 Felipe
 
---------------2ABF5CA17E2A717BF09177BB
+--------------620053F593AF8DEDBFDF0A19
 Content-Type: application/pgp-keys;
  name="0x92698E6A.asc"
 Content-Transfer-Encoding: 7bit
@@ -172,4 +212,4 @@ SkAyCfQaSw==
 =JwBB
 -----END PGP PUBLIC KEY BLOCK-----
 
---------------2ABF5CA17E2A717BF09177BB--
+--------------620053F593AF8DEDBFDF0A19--
