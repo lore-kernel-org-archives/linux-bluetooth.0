@@ -1,88 +1,95 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Subject: Re: [PATCH v2 BlueZ 0/7] Improvements on connection parameters update
+Subject: Re: [PATCH v2 BlueZ 3/7] src/device: Added function to set connection
+ parameters
 To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 References: <20170216180315.30531-1-eu@felipetonello.com>
- <CABBYNZL7W15pdvZLezBO146RXw8ADNXcatiuU2XhEA9A0tzSMA@mail.gmail.com>
+ <20170216180315.30531-4-eu@felipetonello.com>
+ <df2d0d02-2d38-2712-4d9e-e40d7d47370b@felipetonello.com>
+ <CABBYNZLL4gjTnFhBTEniErMcOynPBXEBW5s2aK_xs_8hUB-jsQ@mail.gmail.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 From: Felipe Ferreri Tonello <eu@felipetonello.com>
-Message-ID: <cdefb429-7549-5454-b53f-b4cd3628fbae@felipetonello.com>
-Date: Tue, 21 Feb 2017 09:40:12 +0000
+Message-ID: <c081e2c4-a79c-791a-67b6-2fb8ceb05b22@felipetonello.com>
+Date: Tue, 21 Feb 2017 09:37:56 +0000
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZL7W15pdvZLezBO146RXw8ADNXcatiuU2XhEA9A0tzSMA@mail.gmail.com>
+In-Reply-To: <CABBYNZLL4gjTnFhBTEniErMcOynPBXEBW5s2aK_xs_8hUB-jsQ@mail.gmail.com>
 Content-Type: multipart/mixed;
- boundary="------------620053F593AF8DEDBFDF0A19"
+ boundary="------------D29406F8F21FBD38FA26F84B"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 This is a multi-part message in MIME format.
---------------620053F593AF8DEDBFDF0A19
+--------------D29406F8F21FBD38FA26F84B
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
 
 Hi Luiz,
 
-On 20/02/17 15:21, Luiz Augusto von Dentz wrote:
+On 20/02/17 16:55, Luiz Augusto von Dentz wrote:
 > Hi Felipe,
 > 
-> On Thu, Feb 16, 2017 at 8:03 PM, Felipe F. Tonello <eu@felipetonello.com> wrote:
->> This is one of the parts of a series of patches related to connection
->> parameters update.
+> On Fri, Feb 17, 2017 at 2:17 PM, Felipe Ferreri Tonello
+> <eu@felipetonello.com> wrote:
+>> Hi,
 >>
->> This initial implementation adds supports to GAP Peripheral Preferred
->> Connection Parameters (PPCP) characteristic and the Slave Connection Interval
->> Range Advertising Data (AD).
+>> On 16/02/17 18:03, Felipe F. Tonello wrote:
+>>> This function allows plugins to set the connection parameters of the
+>>> respective btd_device object.
+>>>
+>>> It is useful for GAP Peripheral Preferred Connection Parameters
+>>> characteristic for example.
+>>> ---
+>>>  src/device.c | 16 ++++++++++++++++
+>>>  src/device.h |  4 ++++
+>>>  2 files changed, 20 insertions(+)
+>>>
+>>> diff --git a/src/device.c b/src/device.c
+>>> index 8693eb826b54..d4aa7f90561e 100644
+>>> --- a/src/device.c
+>>> +++ b/src/device.c
+>>> @@ -6122,3 +6122,19 @@ void btd_device_cleanup(void)
+>>>  {
+>>>       btd_service_remove_state_cb(service_state_cb_id);
+>>>  }
+>>> +
+>>> +void btd_device_set_conn_param(struct btd_device *device, uint16_t min_interval,
+>>> +                                     uint16_t max_interval, uint16_t latency,
+>>> +                                     uint16_t timeout)
+>>> +{
+>>> +     btd_assert(device != NULL);
+>>
+>> This assert shouldn't be here. I'll fix next revision.
 > 
-> 
-> Are there any devices implementing these? Id like to do a some testing
-> but haven't find anything implementing this, or well I can generate
-> the PPCP but the SCRAD is probably a waste of AD since that is pretty
-> limited in size.
+> Is this new revision coming anytime soon?
 
-PPCP not that I know of. But the AD there are devices, including in the
-unit-eir there is one.
-
-The PPCP and AD is important specially for MIDI devices who require
-low-latency.
-
-I did test it here, it will be nice if you could as well.
+I was waiting on any comments before.
 
 > 
->> There is a problem described in #4 that due to a limitation of the BlueZ API
->> it is not possible to update the current connection with specific parameters.
->> I am working on a socket option API to allow something similar. Hopefully I
->> will be able to write something that covers this use-case as well. This
->> problem also applies to patch #6.
->>
->> Changes from v1:
->>  * Added Slave Connection Interval Range AD support;
->>  * Unit tests for connection interval.
->>
->> Felipe F. Tonello (7):
->>   profiles/gap: Some code cleanup
->>   src/adapter: Added connection parameter load/store functions
->>   src/device: Added function to set connection parameters
->>   profiles/gap: Added support for PPCP characteristic
->>   src/eir: Added support for Slave Connection Interval Range AD
->>   src/adapter: Store Slave Connection Interval Range
->>   unit/test-eir: Added tests for connection interval
->>
->>  profiles/gap/gas.c | 111 +++++++++++++++++++++++++++++++++++++++++++----------
->>  src/adapter.c      |  46 +++++++++++++++++++++-
->>  src/adapter.h      |   9 +++++
->>  src/device.c       |  16 ++++++++
->>  src/device.h       |   4 ++
->>  src/eir.c          |   7 ++++
->>  src/eir.h          |   3 ++
->>  unit/test-eir.c    |  26 +++++++++++--
->>  8 files changed, 196 insertions(+), 26 deletions(-)
+>>> +
+>>> +     adapter_store_conn_param(device->adapter, &device->bdaddr,
+>>> +                                     device->bdaddr_type, min_interval,
+>>> +                                     max_interval, latency,
+>>> +                                     timeout);
+>>> +     adapter_load_conn_param(device->adapter, &device->bdaddr,
+>>> +                                     device->bdaddr_type, min_interval,
+>>> +                                     max_interval, latency,
+>>> +                                     timeout);
+>>> +}
+>>> diff --git a/src/device.h b/src/device.h
+>>> index 3cab366eeaea..88076d2d196d 100644
+>>> --- a/src/device.h
+>>> +++ b/src/device.h
+>>> @@ -163,3 +163,7 @@ int btd_device_connect_services(struct btd_device *dev, GSList *services);
+>>>
+>>>  void btd_device_init(void);
+>>>  void btd_device_cleanup(void);
+>>> +
+>>> +void btd_device_set_conn_param(struct btd_device *device, uint16_t min_interval,
+>>> +                                     uint16_t max_interval, uint16_t latency,
+>>> +                                     uint16_t timeout);
+>>>
 >>
 >> --
->> 2.11.1
->>
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->> the body of a message to majordomo@vger.kernel.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>> Felipe
 > 
 > 
 > 
@@ -90,7 +97,7 @@ I did test it here, it will be nice if you could as well.
 -- 
 Felipe
 
---------------620053F593AF8DEDBFDF0A19
+--------------D29406F8F21FBD38FA26F84B
 Content-Type: application/pgp-keys;
  name="0x92698E6A.asc"
 Content-Transfer-Encoding: 7bit
@@ -212,4 +219,4 @@ SkAyCfQaSw==
 =JwBB
 -----END PGP PUBLIC KEY BLOCK-----
 
---------------620053F593AF8DEDBFDF0A19--
+--------------D29406F8F21FBD38FA26F84B--
