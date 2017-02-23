@@ -1,50 +1,34 @@
-Return-Path: <jeffy.chen@rock-chips.com>
-From: Jeffy Chen <jeffy.chen@rock-chips.com>
-To: Amitkumar Karwar <akarwar@marvell.com>
-Cc: Brian Norris <briannorris@chromium.org>,
-	Rajat Jain <rajatja@google.com>,
-	Jeffy Chen <jeffy.chen@rock-chips.com>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	linux-kernel@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/3] btusb: wake system up when receives a wake irq
-Date: Fri, 24 Feb 2017 14:24:29 +0800
-Message-Id: <1487917471-5501-1-git-send-email-jeffy.chen@rock-chips.com>
+Return-Path: <netdev-owner@vger.kernel.org>
+Date: Thu, 23 Feb 2017 14:05:01 -0500 (EST)
+Message-Id: <20170223.140501.1497931464135952468.davem@davemloft.net>
+To: luiz.dentz@gmail.com
+Cc: linux-bluetooth@vger.kernel.org, patrik.flykt@linux.intel.com,
+        aar@pengutronix.de, linux-wpan@vger.kernel.org,
+        netdev@vger.kernel.org
+Subject: Re: [PATCH v4 4/5] ipv6: addrconf: fix 48 bit 6lowpan
+ autoconfiguration
+From: David Miller <davem@davemloft.net>
+In-Reply-To: <20170221103811.1506-6-luiz.dentz@gmail.com>
+References: <20170221103811.1506-1-luiz.dentz@gmail.com>
+        <20170221103811.1506-6-luiz.dentz@gmail.com>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Sender: netdev-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Currrently we are disabling this wake irq after receiving it. If this
-happens before we finish suspend and the pm event check is disabled,
-the system will continue suspending, and this irq would not work again.
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Tue, 21 Feb 2017 12:38:10 +0200
 
-We may need to abort system suspend to avoid that.
+> From: Alexander Aring <aar@pengutronix.de>
+> 
+> This patch adds support for 48 bit 6LoWPAN address length
+> autoconfiguration which is the case for BTLE 6LoWPAN.
+> 
+> Signed-off-by: Alexander Aring <aar@pengutronix.de>
+> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> Reviewed-by: Stefan Schmidt <stefan@osg.samsung.com>
 
-Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
----
+This is fine and I have no problem with it going via the bluetooth
+tree, thanks.
 
- drivers/bluetooth/btusb.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 1c8094e..81a2f02 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -26,6 +26,7 @@
- #include <linux/firmware.h>
- #include <linux/of_device.h>
- #include <linux/of_irq.h>
-+#include <linux/suspend.h>
- #include <asm/unaligned.h>
- 
- #include <net/bluetooth/bluetooth.h>
-@@ -2792,6 +2793,7 @@ static irqreturn_t btusb_oob_wake_handler(int irq, void *priv)
- 	struct btusb_data *data = priv;
- 
- 	pm_wakeup_event(&data->udev->dev, 0);
-+	pm_system_wakeup();
- 
- 	/* Disable only if not already disabled (keep it balanced) */
- 	if (test_and_clear_bit(BTUSB_OOB_WAKE_ENABLED, &data->flags)) {
--- 
-2.1.4
+Acked-by: David S. Miller <davem@davemloft.net>
