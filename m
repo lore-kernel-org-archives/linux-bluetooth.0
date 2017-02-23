@@ -1,34 +1,25 @@
-Return-Path: <netdev-owner@vger.kernel.org>
-Date: Thu, 23 Feb 2017 14:05:01 -0500 (EST)
-Message-Id: <20170223.140501.1497931464135952468.davem@davemloft.net>
-To: luiz.dentz@gmail.com
-Cc: linux-bluetooth@vger.kernel.org, patrik.flykt@linux.intel.com,
-        aar@pengutronix.de, linux-wpan@vger.kernel.org,
-        netdev@vger.kernel.org
-Subject: Re: [PATCH v4 4/5] ipv6: addrconf: fix 48 bit 6lowpan
- autoconfiguration
-From: David Miller <davem@davemloft.net>
-In-Reply-To: <20170221103811.1506-6-luiz.dentz@gmail.com>
-References: <20170221103811.1506-1-luiz.dentz@gmail.com>
-        <20170221103811.1506-6-luiz.dentz@gmail.com>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Sender: netdev-owner@vger.kernel.org
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: bugzilla-daemon@bugzilla.kernel.org
+To: linux-bluetooth@kernel.org
+Subject: [Bug 190831] Intel Bluetooth 8260 breaks with latest firmware
+Date: Thu, 23 Feb 2017 16:39:58 +0000
+Message-ID: <bug-190831-62941-0UYU2tGnfU@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-190831-62941@https.bugzilla.kernel.org/>
+References: <bug-190831-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 21 Feb 2017 12:38:10 +0200
+https://bugzilla.kernel.org/show_bug.cgi?id=190831
 
-> From: Alexander Aring <aar@pengutronix.de>
-> 
-> This patch adds support for 48 bit 6LoWPAN address length
-> autoconfiguration which is the case for BTLE 6LoWPAN.
-> 
-> Signed-off-by: Alexander Aring <aar@pengutronix.de>
-> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> Reviewed-by: Stefan Schmidt <stefan@osg.samsung.com>
+--- Comment #49 from Tony Houghton (h@realh.co.uk) ---
+FWIW... I still had the Debian package firmware-iwlwifi version 20160824-1
+available in my cache so I installed that. With this version the situation is
+much improved, but still not perfect. Every so often (something like a couple
+of minutes) the mouse stops working for a few seconds, then the bluetooth icon
+in the status bar briefly flashes off, then the mouse connection is restored.
 
-This is fine and I have no problem with it going via the bluetooth
-tree, thanks.
-
-Acked-by: David S. Miller <davem@davemloft.net>
+-- 
+You are receiving this mail because:
+You are the assignee for the bug.
