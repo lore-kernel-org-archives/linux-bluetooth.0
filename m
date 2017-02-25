@@ -1,41 +1,46 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <1487981606-14150-1-git-send-email-juha.kuikka@synapse.com>
-References: <1487981606-14150-1-git-send-email-juha.kuikka@synapse.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Sat, 25 Feb 2017 17:11:11 +0200
-Message-ID: <CABBYNZJR3Tpi8CjSyZmThJYG5fQUxhe-ZndPbqujgr3H4BEpnw@mail.gmail.com>
-Subject: Re: [PATCH 0/3] Fix zero VID&PID on HoG initial connection
-To: Juha Kuikka <juha.kuikka@synapse.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Juha Kuikka <juha.kuikka@gmail.com>
+From: Dor Shemer <dorshemer@gmail.com>
+Date: Sat, 25 Feb 2017 16:10:39 +0200
+Message-ID: <CAKwwfuT5t6ARrmhPnpTTDpyhTUZ1j+enRh1jsMMhyb5jjiaBYA@mail.gmail.com>
+Subject: Unable to pair Bose QC35
+To: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Juha,
+Hello,
 
-On Sat, Feb 25, 2017 at 2:13 AM, Juha Kuikka <juha.kuikka@synapse.com> wrote:
-> When a BLE HID-over-GATT (HoG) device is initially connected, the created uHID
-> device has zero VID and PID, this is due to couple issues in how HoG handles
-> Device Information Service (DIS).
->
-> This patch set provices a fix for this.
->
-> Juha Kuikka (3):
->   dis: Fix attribute handle when initializing from db
->   hog: Move dis_notify around
->   hog: When no VID&PID also register a DIS notifier
->
->  profiles/deviceinfo/dis.c | 21 ++++++++++++++++++++-
->  profiles/input/hog-lib.c  | 21 +++++++++++----------
->  2 files changed, 31 insertions(+), 11 deletions(-)
->
-> --
-> 2.7.4
+I have a new set of Bose QC35 that won't my pair with ubuntu 16.10
+(dell xps 9550). I tried everything I could find on this mailing list
+(http://marc.info/?l=linux-bluetooth&m=148314289530765&w=2) and
+askubuntu.com (http://askubuntu.com/questions/833322/pair-bose-quietcomfort-35-with-ubuntu-16-04-over-bluetooth)
+but nothing seems to help.
 
-Applied, thanks.
+I'm trying to pair using either dual mode or bredr, as suggested in
+the askubunu answer.
+
+Using ControllerMode = dual I get:
+
+    [bluetooth]# devices
+    Device 04:52:C7:62:27:75 LE-Pigment Pete
+    [bluetooth]# pair 04:52:C7:62:27:75
+    Attempting to pair with 04:52:C7:62:27:75
+    [CHG] Device 04:52:C7:62:27:75 Connected: yes
+    Failed to pair: org.bluez.Error.AuthenticationFailed
+    [CHG] Device 04:52:C7:62:27:75 Connected: no
 
 
--- 
-Luiz Augusto von Dentz
+OnControllerMode = bredr I can't even find the device, but if
+remembered from the dual mode scan, I get:
+
+    [bluetooth]# devices
+    Device 04:52:C7:62:27:75 LE-Pigment Pete
+    [bluetooth]# pair 04:52:C7:62:27:75
+    Attempting to pair with 04:52:C7:62:27:75
+    Failed to pair: org.bluez.Error.AuthenticationRejected
+
+
+I'm not sure what causes this or where to keep looking, as none of the
+questions I found online have this exact problem. Could you help guide
+me?
