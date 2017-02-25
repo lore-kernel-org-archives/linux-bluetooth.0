@@ -1,46 +1,53 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-From: Dor Shemer <dorshemer@gmail.com>
-Date: Sat, 25 Feb 2017 16:10:39 +0200
-Message-ID: <CAKwwfuT5t6ARrmhPnpTTDpyhTUZ1j+enRh1jsMMhyb5jjiaBYA@mail.gmail.com>
-Subject: Unable to pair Bose QC35
+From: Leif Liddy <leif.linux@gmail.com>
+Date: Sat, 25 Feb 2017 04:48:45 +0100
+Message-ID: <CAAbRKOupReCoUbrJA2_38aWGjZf+w4EZO6Lct8zHaGykkTLCqw@mail.gmail.com>
+Subject: [Bug 193571] Request for assistance
 To: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello,
+https://bugzilla.kernel.org/show_bug.cgi?id=193571
 
-I have a new set of Bose QC35 that won't my pair with ubuntu 16.10
-(dell xps 9550). I tried everything I could find on this mailing list
-(http://marc.info/?l=linux-bluetooth&m=148314289530765&w=2) and
-askubuntu.com (http://askubuntu.com/questions/833322/pair-bose-quietcomfort-35-with-ubuntu-16-04-over-bluetooth)
-but nothing seems to help.
+I'd like to someone from the bluetooth community to just take a quick
+at this bug report and help me identify the likely source of the issue.
+btusb driver? usb subsystem?
 
-I'm trying to pair using either dual mode or bredr, as suggested in
-the askubunu answer.
+The symptoms are --after I suspend my laptop (10 min or more) and then
+resume, the bluetooth adaptor no longer functions. I have to reset the
+bluetooth usb device to get it working again.
 
-Using ControllerMode = dual I get:
+echo 0 > /sys/bus/usb/devices/1-4/authorized
+echo 1 > /sys/bus/usb/devices/1-4/authorized
 
-    [bluetooth]# devices
-    Device 04:52:C7:62:27:75 LE-Pigment Pete
-    [bluetooth]# pair 04:52:C7:62:27:75
-    Attempting to pair with 04:52:C7:62:27:75
-    [CHG] Device 04:52:C7:62:27:75 Connected: yes
-    Failed to pair: org.bluez.Error.AuthenticationFailed
-    [CHG] Device 04:52:C7:62:27:75 Connected: no
+What's the likely cause of this? Is the bluetooth adaptor losing power
+or it's firmware during a suspend cycle?
 
+Looking at the btusb driver, I found this
 
-OnControllerMode = bredr I can't even find the device, but if
-remembered from the dual mode scan, I get:
-
-    [bluetooth]# devices
-    Device 04:52:C7:62:27:75 LE-Pigment Pete
-    [bluetooth]# pair 04:52:C7:62:27:75
-    Attempting to pair with 04:52:C7:62:27:75
-    Failed to pair: org.bluez.Error.AuthenticationRejected
+---------------------------------------------------------------------
+#ifdef CONFIG_BT_HCIBTUSB_RTL
+if (id->driver_info & BTUSB_REALTEK) {
+hdev->setup = btrtl_setup_realtek;
 
 
-I'm not sure what causes this or where to keep looking, as none of the
-questions I found online have this exact problem. Could you help guide
-me?
+/* Realtek devices lose their updated firmware over suspend,
+* but the USB hub doesn't notice any status change.
+* Explicitly request a device reset on resume.
+*/
+set_bit(BTUSB_RESET_RESUME, &data->flags);
+}
+#endif
+------------------------------------------------------------------------
+
+I'm interested in trying this method for my bluetooth adaptor.
+I'm not a kernel developer...but if someone could show me what changes need to
+made to btusb driver so it would be work with my bluetooth adaptor (0cf3:e300)
+I could compile the driver and test it out.
+
+
+Thanks!
+
+-Leif
