@@ -1,53 +1,35 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-From: Leif Liddy <leif.linux@gmail.com>
-Date: Sat, 25 Feb 2017 04:48:45 +0100
-Message-ID: <CAAbRKOupReCoUbrJA2_38aWGjZf+w4EZO6Lct8zHaGykkTLCqw@mail.gmail.com>
-Subject: [Bug 193571] Request for assistance
+From: Juha Kuikka <juha.kuikka@synapse.com>
 To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Cc: juha.kuikka@gmail.com, Juha Kuikka <juha.kuikka@synapse.com>
+Subject: [PATCH 3/3] hog: When no VID&PID also register a DIS notifier
+Date: Fri, 24 Feb 2017 16:13:26 -0800
+Message-Id: <1487981606-14150-4-git-send-email-juha.kuikka@synapse.com>
+In-Reply-To: <1487981606-14150-1-git-send-email-juha.kuikka@synapse.com>
+References: <1487981606-14150-1-git-send-email-juha.kuikka@synapse.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-https://bugzilla.kernel.org/show_bug.cgi?id=193571
+DIS was reading VID & PID but they were not communicated to the HOG due to lack
+of registered notifier.
 
-I'd like to someone from the bluetooth community to just take a quick
-at this bug report and help me identify the likely source of the issue.
-btusb driver? usb subsystem?
+Add a notified also in this case.
+---
+ profiles/input/hog-lib.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-The symptoms are --after I suspend my laptop (10 min or more) and then
-resume, the bluetooth adaptor no longer functions. I have to reset the
-bluetooth usb device to get it working again.
+diff --git a/profiles/input/hog-lib.c b/profiles/input/hog-lib.c
+index 71de3a1..dab385f 100644
+--- a/profiles/input/hog-lib.c
++++ b/profiles/input/hog-lib.c
+@@ -1406,6 +1406,7 @@ struct bt_hog *bt_hog_new(int fd, const char *name, uint16_t vendor,
+ 		/* Try creating a DIS instance in case pid/vid are not set */
+ 		if (!vendor && !product) {
+ 			hog->dis = bt_dis_new(db);
++			bt_dis_set_notification(hog->dis, dis_notify, hog);
+ 		}
+ 	}
+ 
+-- 
+2.7.4
 
-echo 0 > /sys/bus/usb/devices/1-4/authorized
-echo 1 > /sys/bus/usb/devices/1-4/authorized
-
-What's the likely cause of this? Is the bluetooth adaptor losing power
-or it's firmware during a suspend cycle?
-
-Looking at the btusb driver, I found this
-
----------------------------------------------------------------------
-#ifdef CONFIG_BT_HCIBTUSB_RTL
-if (id->driver_info & BTUSB_REALTEK) {
-hdev->setup = btrtl_setup_realtek;
-
-
-/* Realtek devices lose their updated firmware over suspend,
-* but the USB hub doesn't notice any status change.
-* Explicitly request a device reset on resume.
-*/
-set_bit(BTUSB_RESET_RESUME, &data->flags);
-}
-#endif
-------------------------------------------------------------------------
-
-I'm interested in trying this method for my bluetooth adaptor.
-I'm not a kernel developer...but if someone could show me what changes need to
-made to btusb driver so it would be work with my bluetooth adaptor (0cf3:e300)
-I could compile the driver and test it out.
-
-
-Thanks!
-
--Leif
