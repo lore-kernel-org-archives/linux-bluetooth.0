@@ -1,28 +1,41 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-From: Tallo Tallo <octavio.santana@gmail.com>
-Date: Sat, 25 Feb 2017 18:14:42 +0100
-Message-ID: <CAN_hsJS3j8XpTJS-8mvXmSg5bCci6+iYzs9=xTZ0U5noXhmsFg@mail.gmail.com>
-Subject: i need to send a known number of beacons.
-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <1487981606-14150-1-git-send-email-juha.kuikka@synapse.com>
+References: <1487981606-14150-1-git-send-email-juha.kuikka@synapse.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Sat, 25 Feb 2017 17:11:11 +0200
+Message-ID: <CABBYNZJR3Tpi8CjSyZmThJYG5fQUxhe-ZndPbqujgr3H4BEpnw@mail.gmail.com>
+Subject: Re: [PATCH 0/3] Fix zero VID&PID on HoG initial connection
+To: Juha Kuikka <juha.kuikka@synapse.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        Juha Kuikka <juha.kuikka@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
-I am analysing the performance of my RPi3 Bluetooth IC (ble beacons point
-of view), to draw some more accurate curves, I would like to be able to
-send a known number of frames to my RPI from another computer, then I would
-be able to check the number of frames received Vs. the number of sent
-frames, and so on,...
+Hi Juha,
 
-So far I have seen ibeacons code where lower layers takes care of automatic
-resending, and this was good until know, but I am seeing some discrepancies
-I cannot explain.
+On Sat, Feb 25, 2017 at 2:13 AM, Juha Kuikka <juha.kuikka@synapse.com> wrote:
+> When a BLE HID-over-GATT (HoG) device is initially connected, the created uHID
+> device has zero VID and PID, this is due to couple issues in how HoG handles
+> Device Information Service (DIS).
+>
+> This patch set provices a fix for this.
+>
+> Juha Kuikka (3):
+>   dis: Fix attribute handle when initializing from db
+>   hog: Move dis_notify around
+>   hog: When no VID&PID also register a DIS notifier
+>
+>  profiles/deviceinfo/dis.c | 21 ++++++++++++++++++++-
+>  profiles/input/hog-lib.c  | 21 +++++++++++----------
+>  2 files changed, 31 insertions(+), 11 deletions(-)
+>
+> --
+> 2.7.4
 
-So the question is how can i send a known number of frames? could you give
-me some guidance or point me in the right direction? I have coded my
-applications, not afraid of write some more code.
+Applied, thanks.
 
-With Kind Regards
-O.
+
+-- 
+Luiz Augusto von Dentz
