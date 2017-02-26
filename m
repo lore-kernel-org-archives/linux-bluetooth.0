@@ -3,8 +3,8 @@ MIME-Version: 1.0
 In-Reply-To: <CAKwwfuT5t6ARrmhPnpTTDpyhTUZ1j+enRh1jsMMhyb5jjiaBYA@mail.gmail.com>
 References: <CAKwwfuT5t6ARrmhPnpTTDpyhTUZ1j+enRh1jsMMhyb5jjiaBYA@mail.gmail.com>
 From: Szymon Janc <szymon.janc@codecoup.pl>
-Date: Sun, 26 Feb 2017 21:03:46 +0100
-Message-ID: <CAAEJBh+B1UtzPPACWGTKnoB0YUM=TeXRwifUxb+xcEhA33GRtA@mail.gmail.com>
+Date: Sun, 26 Feb 2017 20:57:33 +0100
+Message-ID: <CAAEJBhJ_abML8TL7LQAA5S18Q9vAmV8OOX9USMeFqiU2Z9ULjA@mail.gmail.com>
 Subject: Re: Unable to pair Bose QC35
 To: Dor Shemer <dorshemer@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
