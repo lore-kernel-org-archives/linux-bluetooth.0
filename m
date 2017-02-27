@@ -1,74 +1,79 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Subject: Re: [PATCH v5 5/6] 6lowpan: Use netdev addr_len to determine lladdr
+ len
+References: <20170224121440.32269-1-luiz.dentz@gmail.com>
+ <20170224121440.32269-6-luiz.dentz@gmail.com>
+ <39321f06-c013-1e8f-efd1-2e230659535b@pengutronix.de>
+Cc: linux-bluetooth@vger.kernel.org, patrik.flykt@linux.intel.com,
+        jukka.rissanen@linux.intel.com, stefan@osg.samsung.com,
+        linux-wpan@vger.kernel.org, netdev@vger.kernel.org
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+From: Alexander Aring <aar@pengutronix.de>
+Message-ID: <4781629d-7a02-b511-7591-50a127c29f50@pengutronix.de>
+Date: Mon, 27 Feb 2017 08:24:33 +0100
 MIME-Version: 1.0
-In-Reply-To: <CAKwwfuQ0zvHYCWZMbBnOKGjUWtX++a6As=SjRY-ycQym3kBL8g@mail.gmail.com>
-References: <CAKwwfuT5t6ARrmhPnpTTDpyhTUZ1j+enRh1jsMMhyb5jjiaBYA@mail.gmail.com>
- <CAAEJBhJ_abML8TL7LQAA5S18Q9vAmV8OOX9USMeFqiU2Z9ULjA@mail.gmail.com> <CAKwwfuQ0zvHYCWZMbBnOKGjUWtX++a6As=SjRY-ycQym3kBL8g@mail.gmail.com>
-From: Szymon Janc <szymon.janc@codecoup.pl>
-Date: Mon, 27 Feb 2017 12:27:37 +0100
-Message-ID: <CAAEJBh+vb2z7UJd0-47V2fgizNS+k-HhFjFy7W_dBtVmHFRkmw@mail.gmail.com>
-Subject: Re: Unable to pair Bose QC35
-To: Dor Shemer <dorshemer@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <39321f06-c013-1e8f-efd1-2e230659535b@pengutronix.de>
+Content-Type: text/plain; charset=windows-1252
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+H
 
-On 26 February 2017 at 22:54, Dor Shemer <dorshemer@gmail.com> wrote:
-> Thanks for replying,
->
-> On Sun, Feb 26, 2017 at 9:57 PM, Szymon Janc <szymon.janc@codecoup.pl> wrote:
->> Hi,
+On 02/27/2017 08:13 AM, Alexander Aring wrote:
+> Hi,
+> 
+> On 02/24/2017 01:14 PM, Luiz Augusto von Dentz wrote:
+>> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 >>
->> On 25 February 2017 at 15:10, Dor Shemer <dorshemer@gmail.com> wrote:
->>> Hello,
->>>
->>> I have a new set of Bose QC35 that won't my pair with ubuntu 16.10
->>> (dell xps 9550). I tried everything I could find on this mailing list
->>> (http://marc.info/?l=linux-bluetooth&m=148314289530765&w=2) and
->>> askubuntu.com (http://askubuntu.com/questions/833322/pair-bose-quietcomfort-35-with-ubuntu-16-04-over-bluetooth)
->>> but nothing seems to help.
->>>
->>> I'm trying to pair using either dual mode or bredr, as suggested in
->>> the askubunu answer.
->>>
->>> Using ControllerMode = dual I get:
->>>
->>>     [bluetooth]# devices
->>>     Device 04:52:C7:62:27:75 LE-Pigment Pete
->>>     [bluetooth]# pair 04:52:C7:62:27:75
->>>     Attempting to pair with 04:52:C7:62:27:75
->>>     [CHG] Device 04:52:C7:62:27:75 Connected: yes
->>>     Failed to pair: org.bluez.Error.AuthenticationFailed
->>>     [CHG] Device 04:52:C7:62:27:75 Connected: no
->>>
->>>
->>> OnControllerMode = bredr I can't even find the device, but if
->>> remembered from the dual mode scan, I get:
->>>
->>>     [bluetooth]# devices
->>>     Device 04:52:C7:62:27:75 LE-Pigment Pete
->>>     [bluetooth]# pair 04:52:C7:62:27:75
->>>     Attempting to pair with 04:52:C7:62:27:75
->>>     Failed to pair: org.bluez.Error.AuthenticationRejected
->>>
->>>
->>> I'm not sure what causes this or where to keep looking, as none of the
->>> questions I found online have this exact problem. Could you help guide
->>> me?
+>> This allow technologies such as Bluetooth to use its native lladdr which
+>> is eui48 instead of eui64 which was expected by functions like
+>> lowpan_header_decompress and lowpan_header_compress.
 >>
->> Please update, this should be fixed in 5.42.
->
-> I tried that, and upgraded to 5.43 from source, however the issue
-> remains the same,
-> Should I upgrade another package? Are there logs or debug mode I should check?
+>> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>> Reviewed-by: Stefan Schmidt <stefan@osg.samsung.com>
+>> ---
+>>  include/net/6lowpan.h   | 19 +++++++++++++++++++
+>>  net/6lowpan/iphc.c      | 49 ++++++++++++++++++++++++++++++++++++++-----------
+>>  net/bluetooth/6lowpan.c | 42 ++++++------------------------------------
+>>  3 files changed, 63 insertions(+), 47 deletions(-)
+>>
+>> diff --git a/include/net/6lowpan.h b/include/net/6lowpan.h
+>> index 5ab4c99..c5792cb 100644
+>> --- a/include/net/6lowpan.h
+>> +++ b/include/net/6lowpan.h
+>> @@ -198,6 +198,25 @@ static inline void lowpan_iphc_uncompress_eui64_lladdr(struct in6_addr *ipaddr,
+>>  	ipaddr->s6_addr[8] ^= 0x02;
+>>  }
+>>  
+>> +static inline void lowpan_iphc_uncompress_eui48_lladdr(struct in6_addr *ipaddr,
+>> +						       const void *lladdr)
+>> +{
+>> +	/* fe:80::XXXX:XXff:feXX:XXXX
+>> +	 *        \_________________/
+>> +	 *              hwaddr
+>> +	 */
+>> +	ipaddr->s6_addr[0] = 0xFE;
+>> +	ipaddr->s6_addr[1] = 0x80;
+>> +	memcpy(&ipaddr->s6_addr[8], lladdr, 3);
+>> +	ipaddr->s6_addr[11] = 0xFF;
+>> +	ipaddr->s6_addr[12] = 0xFE;
+>> +	memcpy(&ipaddr->s6_addr[13], lladdr + 3, 3);
+>> +	/* second bit-flip (Universe/Local)
+>> +	 * is done according RFC2464
+>> +	 */
+>> +	ipaddr->s6_addr[8] ^= 0x02;
+>> +}
+>> +
+> 
+> same thing here. I think you don't need u/l bitflip here, you argumented
+> already that IID is without it in another patch, or?
+> 
 
-It seems to work just fine here.
+ahhh, got it. You just moved the function into the header and patch 6/6
+will remove the u/l handling. Sorry!
 
-Are you sure your headset is in pairing mode?
-You could collect btmon traces from pairing (including device discovery).
+But then still patch 4/6 is wrong because it use u/l bitflip there.
+(It's my patch yes :D, but I realized at first dev->addr_len should be 6
+and not 8).
 
--- 
-pozdrawiam
-Szymon K. Janc
+- Alex
