@@ -1,24 +1,82 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Travis Griggs <travisgriggs@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 10.2 \(3259\))
-Subject: Split list?
-Message-Id: <C3FDEAEB-7AF8-4CE2-A680-606F21ECBFBF@gmail.com>
-Date: Wed, 1 Mar 2017 08:29:16 -0800
-To: Bluez mailing list <linux-bluetooth@vger.kernel.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <colin.king@canonical.com>
+From: Colin King <colin.king@canonical.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: kernel-janitors@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] Bluetooth: fix assignments on error variable err
+Date: Wed,  1 Mar 2017 15:10:53 +0000
+Message-Id: <20170301151053.25779-1-colin.king@canonical.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Is there any appetite for splitting this mailing list? I see three =
-disparate types of messages come through here:
+From: Colin Ian King <colin.king@canonical.com>
 
-1) Bluez patches and related comments
-2) Bluetooth Classic questions (device XYZ doesn=E2=80=99t pair with my =
-computers, etc)
-3) BLE application developer questions
+Variable err is being initialized to zero and then later being
+set to the error return from the call to hci_req_run_skb; hence
+we can remove the redundant initialization to zero.
 
-I realize the traffic isn=E2=80=99t that high in any of the areas, but =
-it just doesn=E2=80=99t seem there=E2=80=99s much overlap, and I think =
-some questions get lost in the noise of the other conversations. Just =
-curious what others thought. I=E2=80=99m not the list maintainer, just a =
-lurker and infrequent question asker.=
+Also on two occassions err is not being set from the error return
+from the call to hci_req_run_skb, so add these missing assignments.
+
+Signed-off-by: Colin Ian King <colin.king@canonical.com>
+---
+ net/bluetooth/amp.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/net/bluetooth/amp.c b/net/bluetooth/amp.c
+index 02a4ccc..ebcab5b 100644
+--- a/net/bluetooth/amp.c
++++ b/net/bluetooth/amp.c
+@@ -263,7 +263,7 @@ void amp_read_loc_assoc_frag(struct hci_dev *hdev, u8 phy_handle)
+ 	struct hci_cp_read_local_amp_assoc cp;
+ 	struct amp_assoc *loc_assoc = &hdev->loc_assoc;
+ 	struct hci_request req;
+-	int err = 0;
++	int err;
+ 
+ 	BT_DBG("%s handle %d", hdev->name, phy_handle);
+ 
+@@ -282,7 +282,7 @@ void amp_read_loc_assoc(struct hci_dev *hdev, struct amp_mgr *mgr)
+ {
+ 	struct hci_cp_read_local_amp_assoc cp;
+ 	struct hci_request req;
+-	int err = 0;
++	int err;
+ 
+ 	memset(&hdev->loc_assoc, 0, sizeof(struct amp_assoc));
+ 	memset(&cp, 0, sizeof(cp));
+@@ -292,7 +292,7 @@ void amp_read_loc_assoc(struct hci_dev *hdev, struct amp_mgr *mgr)
+ 	set_bit(READ_LOC_AMP_ASSOC, &mgr->state);
+ 	hci_req_init(&req, hdev);
+ 	hci_req_add(&req, HCI_OP_READ_LOCAL_AMP_ASSOC, sizeof(cp), &cp);
+-	hci_req_run_skb(&req, read_local_amp_assoc_complete);
++	err = hci_req_run_skb(&req, read_local_amp_assoc_complete);
+ 	if (err < 0)
+ 		a2mp_send_getampassoc_rsp(hdev, A2MP_STATUS_INVALID_CTRL_ID);
+ }
+@@ -303,7 +303,7 @@ void amp_read_loc_assoc_final_data(struct hci_dev *hdev,
+ 	struct hci_cp_read_local_amp_assoc cp;
+ 	struct amp_mgr *mgr = hcon->amp_mgr;
+ 	struct hci_request req;
+-	int err = 0;
++	int err;
+ 
+ 	cp.phy_handle = hcon->handle;
+ 	cp.len_so_far = cpu_to_le16(0);
+@@ -314,7 +314,7 @@ void amp_read_loc_assoc_final_data(struct hci_dev *hdev,
+ 	/* Read Local AMP Assoc final link information data */
+ 	hci_req_init(&req, hdev);
+ 	hci_req_add(&req, HCI_OP_READ_LOCAL_AMP_ASSOC, sizeof(cp), &cp);
+-	hci_req_run_skb(&req, read_local_amp_assoc_complete);
++	err = hci_req_run_skb(&req, read_local_amp_assoc_complete);
+ 	if (err < 0)
+ 		a2mp_send_getampassoc_rsp(hdev, A2MP_STATUS_INVALID_CTRL_ID);
+ }
+-- 
+2.10.2
