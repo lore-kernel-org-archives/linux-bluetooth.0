@@ -1,186 +1,141 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Subject: Re: [PATCH BlueZ v4 0/2] MIDI over BLE implementation
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-References: <20161226202634.28195-1-eu@felipetonello.com>
- <CABBYNZJoCOuiL1v8pc4gr4pN-Z-oC8FULG6Tn8PVnWw7tDhSOg@mail.gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        agoode@chromium.org
-From: Felipe Ferreri Tonello <eu@felipetonello.com>
-Message-ID: <860df5d3-22cc-83b0-9d37-bfd035b81b49@felipetonello.com>
-Date: Sun, 1 Jan 2017 15:21:26 +0000
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZJoCOuiL1v8pc4gr4pN-Z-oC8FULG6Tn8PVnWw7tDhSOg@mail.gmail.com>
-Content-Type: multipart/mixed;
- boundary="------------DFEB8426E6505A62C5FC42F2"
+In-Reply-To: <CAKHsmFqKO9ZnOkhTyWytvQE7qOKe3vVV=DqCWoRMfifJLS-LnQ@mail.gmail.com>
+References: <1488235227-27632-1-git-send-email-juha.kuikka@synapse.com>
+ <1488235227-27632-2-git-send-email-juha.kuikka@synapse.com>
+ <CAGXr9JG_dKSjD31DW5=0TH5Y9YD_oFdpQ6t-MTek_2hCd7GzNg@mail.gmail.com> <CAKHsmFqKO9ZnOkhTyWytvQE7qOKe3vVV=DqCWoRMfifJLS-LnQ@mail.gmail.com>
+From: Petri Gynther <pgynther@google.com>
+Date: Tue, 28 Feb 2017 16:23:58 -0800
+Message-ID: <CAGXr9JFe7G0-ca-Vh86hu3Gfj=_-oXMBek-SMwzU-Rjm_MNMuA@mail.gmail.com>
+Subject: Re: [PATCH] hog: Destroy uHID device when disconnected
+To: Juha Kuikka <juha.kuikka@synapse.com>
+Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        Juha Kuikka <juha.kuikka@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is a multi-part message in MIME format.
---------------DFEB8426E6505A62C5FC42F2
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Hi Juha,
 
-Hi Luiz,
-
-On 27/12/16 13:03, Luiz Augusto von Dentz wrote:
-> Hi Felipe,
-> 
-> On Mon, Dec 26, 2016 at 10:26 PM, Felipe F. Tonello
-> <eu@felipetonello.com> wrote:
->> This patchset implements the MIDI over BLE spec, more information on patch #1.
+On Tue, Feb 28, 2017 at 4:01 PM, Juha Kuikka <juha.kuikka@synapse.com> wrote:
+> Hi Petry,
+>
+> On Mon, Feb 27, 2017 at 6:17 PM, Petri Gynther <pgynther@google.com> wrote:
+>> Hi Juha,
 >>
->> Patch #2 is some unit-tests to make sure the MIDI parser works properly.
+>> On Mon, Feb 27, 2017 at 2:40 PM, Juha Kuikka <juha.kuikka@synapse.com> wrote:
+>>>
+>>> Unlink bluetooth classic HID, HoG persists the uHID device after across
+>>> connections. This is fine for stateless devices but some device utilize hidraw
+>>> to configure them upon connection and with the persisting uHID device,
+>>> reconnections are hidden from them.
+>>>
+>>> Similarly, applications such as game emulators may be using the presence of the
+>>> HID or the accompanying input event devices to indicate that it is available,
+>>> thus changing behavior.
+>>>
+>>> This patch destroys the uHID device upon disconnection, it gets re-created upon
+>>> reconnection, just like on initial connection.
 >>
->> Felipe F. Tonello (2):
->>   profiles/midi: Added MIDI over BLE profile implementation
->>   unit/test-midi: Added libmidi use-case tests
->>
->>  Makefile.am             |  14 +-
->>  Makefile.plugins        |   8 +
->>  configure.ac            |  11 +
->>  profiles/midi/libmidi.c | 412 +++++++++++++++++++++++++++++++
->>  profiles/midi/libmidi.h | 150 ++++++++++++
->>  profiles/midi/midi.c    | 490 +++++++++++++++++++++++++++++++++++++
->>  unit/test-midi.c        | 628 ++++++++++++++++++++++++++++++++++++++++++++++++
->>  7 files changed, 1712 insertions(+), 1 deletion(-)
->>  create mode 100644 profiles/midi/libmidi.c
->>  create mode 100644 profiles/midi/libmidi.h
->>  create mode 100644 profiles/midi/midi.c
->>  create mode 100644 unit/test-midi.c
->>
->> --
->> 2.10.2
-> 
-> Looks like there is something not quite rigth:
-> 
-> https://paste.fedoraproject.org/513667/48284373/
-> 
+>> For HID and HoG remote controls, the reconnect latency is important
+>> for user experience. Thus, it is desirable that the uHID device is
+>> persistent across reconnects until next reboot.
+>
+> I see. That makes sense, this way the whole pipeline is guaranteed to
+> be already open when the connection forms, leading to less dropped
+> button presses I suppose.
+>
 
-Weird... What command did you run to get this?
+Correct.
 
--- 
-Felipe
+>> How about adding a new config item to profiles/input/input.conf to
+>> control this (default = persistent uHID devices)?
+>
+> Works for me. Something like this maybe? Excuse the quick patch, I
+> will send a revision to the set.
+>
+> diff --git a/profiles/input/hog-lib.c b/profiles/input/hog-lib.c
+> index f41055b..2b954b3 100644
+> --- a/profiles/input/hog-lib.c
+> +++ b/profiles/input/hog-lib.c
+> @@ -129,6 +129,13 @@ struct gatt_request {
+>         void *user_data;
+>  };
+>
+> +static bool persist_uhid = true;
+> +
+> +void bt_hog_set_persist_uhid(bool state)
+> +{
+> +       persist_uhid = state;
+> +}
+> +
+>  static struct gatt_request *create_request(struct bt_hog *hog,
+>                                                         void *user_data)
+>  {
+> diff --git a/profiles/input/hog-lib.h b/profiles/input/hog-lib.h
+> index 415dc63..7e81547 100644
+> --- a/profiles/input/hog-lib.h
+> +++ b/profiles/input/hog-lib.h
+> @@ -39,3 +39,4 @@ void bt_hog_detach(struct bt_hog *hog);
+>
+>  int bt_hog_set_control_point(struct bt_hog *hog, bool suspend);
+>  int bt_hog_send_report(struct bt_hog *hog, void *data, size_t size, int type);
+> +void bt_hog_set_persist_uhid(bool state);
+> diff --git a/profiles/input/manager.c b/profiles/input/manager.c
+> index 1d31b06..129b7b5 100644
+> --- a/profiles/input/manager.c
+> +++ b/profiles/input/manager.c
+> @@ -43,6 +43,8 @@
+>  #include "device.h"
+>  #include "server.h"
+>
+> +#include "profiles/input/hog-lib.h"
+> +
+>  static int hid_server_probe(struct btd_profile *p, struct btd_adapter *adapter)
+>  {
+>         return server_start(btd_adapter_get_address(adapter));
+> @@ -96,7 +98,7 @@ static int input_init(void)
+>         config = load_config_file(CONFIGDIR "/input.conf");
+>         if (config) {
+>                 int idle_timeout;
+> -               gboolean uhid_enabled;
+> +               gboolean uhid_enabled, persist_uhid;
+>
+>                 idle_timeout = g_key_file_get_integer(config, "General",
+>                                                         "IdleTimeout", &err);
+> @@ -114,6 +116,15 @@ static int input_init(void)
+>                         input_enable_userspace_hid(uhid_enabled);
+>                 } else
+>                         g_clear_error(&err);
+> +
+> +               persist_uhid = g_key_file_get_boolean(config, "General",
+> +                                                       "PersistUHID", &err);
+> +               if (!err) {
+> +                       DBG("input.conf: PersistUHID=%s", persist_uhid ?
+> +                                                       "true" : "false");
+> +                       bt_hog_set_persist_uhid(persist_uhid);
+> +               } else
+> +                       g_clear_error(&err);
+>         }
+>
+>         btd_profile_register(&input_profile);
+>
+> Thanks,
+>  - Juha
 
---------------DFEB8426E6505A62C5FC42F2
-Content-Type: application/pgp-keys;
- name="0x92698E6A.asc"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
- filename="0x92698E6A.asc"
+I would prefer to use UHIDDestroy (which will be false by default).
+Please add this to your patch:
 
------BEGIN PGP PUBLIC KEY BLOCK-----
-
-mQINBFYedIcBEACVKGKoEjb3zlvAz5SUvBej7Sx13BPd8hVulQD+mqjfuRFPmZA5
-LBXPX1zTRWwGEbbZegP3tLfKP+XekzO6BQhDihMmKuRusdgDsdMtldwhjHuUwKn7
-kxB2k79jSG802lAjIv2l5hijOfKIGTATKwiMijuXho54DGltIgNyN/Onwk9HnM6d
-jsV5uubaI468JRH6j8HXXievo24BDvsimIE75ImiM53ruiwPwEry1hi1CnE5OpqG
-oe/lt27+nLXijfNZOpBZ3Q+RPVBdqPTkMlBJAa4sg+qwZoSMvQJFAGROiJ7+ICCW
-O4GPMrAn8CRcCI9ENKBj2dQ4bBEP1a+f16GNMUUU37wocqtyNHo0Pa/DnFh91kcu
-/2dvUX4XPeEimEoSKroRLOXC9RGSFYB/r9UXqFgbmyQ4TZLx0mAWIjoUQtbIJNRz
-Pt46UeznCVLJTg7CzIvtv8vwmMFvaepr8ONoZn+tpX8VW4dgzsMZDrVspE0Vg3oo
-K9JRi1nN3GcJJK4zG2ShvEkPffRHuBuyX5wR8MPRYTShKnJR5qd1cCSK73fCv4DP
-bjywmGjucqcLiyYbByjmHaqzRaKJclmT/jhs6qZHs+pVLkmHkHdf/WLP6Xgcvmo8
-c+SATrJwRsyW9riyMB7uNg3T84umbQrl00nAhcq73rem/602H+Qrh8rEfQARAQAB
-tC1GZWxpcGUgRmVycmVyaSBUb25lbGxvIDxldUBmZWxpcGV0b25lbGxvLmNvbT6J
-AjwEEwEIACYCGyMHCwkIBwMCAQYVCAIJCgsEFgIDAQIeAQIXgAIZAQUCVlXsdwAK
-CRDMRLTQkmmOapJFD/9XZZdX5XdXrQ2Qr7znQCOMPfOFiTqK8A1vVJPfLcPdkDyW
-iDfV2w4jyxKjgkcO8hgjZWAGdXhKxEXt8bQIZ+Po3eOqKo/O69+WyYS33uAKfNbr
-t4BcJOM2Vh2MwTymzh5EKjsKi/vmqFqvcpa81Jc4exDaHhb2mqMW8DZc96nMPwij
-+Z4vVooOVt5DVGeG4o2rztoti+KaXys6nycm8ErMmqWmL0viEnXHDRTOUHpnhEQY
-Vlg+hfxYrk00DphAePrpRp/HaxNncxR+ID0SHmYlLCaEy7s5ksOORjlKSk+7Nqat
-X69ymfXeEI84ror11IR7kuAA+rkhHMacWXANPkXtuEBi9Nl3V5Rvud4f/RL3Sh2x
-lwPfxca9rIR/7JYwoCzQ8iORok3VqKOtpufLKMsIl9sdj7ZxI6f6tZDm5uAaCZAt
-f15EcGiVWZgGdKlXzIWFkUsdRhtGYEQBF1Li/qLrnoS5T32eSCt8cgJlkDyKqNbX
-fxvV0KON8tJ9jBnMmoADetF/9V3A6EIBtTdxsz+UKjk6PV0bx398AbdvNB22r6Kw
-n1E2ZqzfNIaAOv5lEHh7VP7+s3vdXcKfnfobW0qd56NpAGTPhAN00wl7T5oMN3xS
-MNTPIC4316E8KChA5CQ3h6RRlZYvAJx7QWfJKX5zb8EVcJb0ul67V8hn1h/s54kC
-PwQTAQgAKQUCVh50hwIbIwUJCWYBgAcLCQgHAwIBBhUIAgkKCwQWAgMBAh4BAheA
-AAoJEMxEtNCSaY5qHxAP/0LmkXtaZvFelixfYibDHwpz+62mWydYN8I13ikV7uK0
-DxpN6W3SeoAY6mF6mwHKyhsNhlOYPR8Rb+CpJxjIez6sPHAA02m4HqfTiNRuAeLM
-hSpiMIVesGgR9Lt/2gnCcF/R/pNJd5RC7wWzeeiS9/b2XtFImRSFvctyHwGXLBYM
-nlRx/o34kWscTCqixBF7lm3umAErDUd0fvL4oV2sC3W8Ncjfk/WQWfschV50lNtO
-h1Imvt+5ud3AJEcwXew0pbHKHvtrVc7toIO3jhZypD9YXP3aR9ZEkHS/bnd5HRHV
-t3iEwXH+bNu/evEB5dQcSf6M6Bwt7Ty2fqFx2PUmnZ22W4HGelPmE5aCqkBQqAkR
-kBmPEPlUIz6GLoj8jUL1ey+T+oCyD5wZoVb841bJDKIPxAa+P+MjFtQUpSXgyi8x
-G0Ic10pK9u3xsu5xzqLoAwt+pK+oxeWrZhJXg9/MFmqQQTX2dH8lIrgIOsHis5uK
-ySohiPwYQ0HUbbSFB9wM6e5dq621RvOkMA/myFtdjJX+Ynr7FmIpIZQiWZvOv0nM
-0CeF7MotMIVa1ioh9K6/Z5WLjTBQh32DrGL07H0h+SMOvcL1IJuw9aG5qDKH4VW9
-VSbHAogVSntamVrCg8jcT8uxEtwZNZH3aBqoYv4pa4MJsIs6vI0/9Y/mVyYVhQPN
-tDFGZWxpcGUgRmVycmVyaSBUb25lbGxvIDxmZWxpcGUudG9uZWxsb0BnbWFpbC5j
-b20+iQI5BBMBCAAjAhsjBwsJCAcDAgEGFQgCCQoLBBYCAwECHgECF4AFAlZV7HoA
-CgkQzES00JJpjmqexA//UHC0P+5NMN0HS0EC3vqdf+9AFfX/Gx+q6BjlaYh8gkGI
-5SNGGb25dooGBRhXzFvp5UmxQjngvZO0Jl071kbqOs7IylZWvUB0tIB/9kcvIgJM
-U13CvdD2XwHDgKoCCS07ymFd9j31FhfYK6eRpr72oGHtjhGOSIj1u8T/4mJDstoc
-zK39gZjTQjzT/2sDbr2sd41KLJ9Ly3H67EgoxYIAQQwwT1Z7x88a8BORIXS8iZPw
-z3D8A1r2BT55qukwEP7GktNArKlhrieFRHCxk8PAtZRj8TrOEyG9nnuZWZQWcb6M
-suIY6s4cyL5KRTUgGfnpc+VMcNKnm0WmKg5jZXRFwg0DECZi0wJqsS8GPrq4La+K
-laxPcXj3ShJePj0YuTcJ/fPYoqqelcbmlqg6m+S9s8PRKPzlESt2jYPbgqMzE0Lu
-DLRGT7SBYgHgDVFwIuFyHQaqEhnU/nLWmyMSuTOE5L4s/CR1xY4qQUtOTnDFbwqL
-125kbOCiRSMBBMOB4Q+UW3+dJ7uqo6LSqIKa/LWvzRmn5po4iSHAD18ivOh1wTe6
-0d/ngjzpTm80uFrwfgkQTexxESYjlBbceBC8kpb1zPFrip41hIi3iPP9UQnnpOO2
-hDrQu5z0N8HMIFg3kciR22wUMzQnyVN4iKfkrhERjjuYWOXJmC5I76DBqlEKLCWJ
-Aj8EEwEIACkFAlYyWW0CGyMFCQlmAYAHCwkIBwMCAQYVCAIJCgsEFgIDAQIeAQIX
-gAAKCRDMRLTQkmmOakxGD/4xoYnRMuy8m6IwT1Y6mWzXZMkcClxwisUkwgF37jMR
-Xk7aitPqlD7AOn/jzKZBmKqOokyH3Y65u/AV6O7jXWWM3Ru0fDYYt0RZR0CkE0c2
-Rio64ol6GWnF4dIiyTTSyxBNadVJXRYBpp5G78ie495ZOp35WUoz2RhExeIQGkBb
-++UIyCh3eK70PPJ+1/dDV9sSRncIBZLSv+4hc4gS6YoprtSgiS8sdf8uBVtjT3r0
-nmrKfTpktADqOOACd/K3LIdf6rlvAYsuWdQ/q32MF7Clrlpt9e5oqi+ASJcLNWUz
-cT8nFyvjJzM5kQEBblT6uzyWE5N6+K/t23Uw13vSx3Z2uhhfRQjcSOcZgHdvc8w1
-3UXhE+XRCMmtA7jonJuFLYOXbjeeNEbJj5ManrOQMSnVy+kRlf3pLoc7VjJGd2k9
-w1U+62b1IVypQCoDNhIy3YTjw7D151z/i5tK5yBvntswji10InowqPRuvt3C3fpW
-kv2MnB6qI+u6M5bP/1CvkLSC9vX+gavUFYZ/wCESVrl1FYQPfOoEgvEId9Ajzx0B
-qyR/5jXY3ZzWhnXNtYpHXy5/mJdvZ+v5ra5JLWKVA3pa+QbTd3v6ELo9NKavylcD
-FX9X2l2s7kp/FRVUZg3mr/3Pf0R1EFZAwM2Fgb5iKPLPjGi4b4sVtMxeXfbXRMBf
-5rQwRmVsaXBlIEZlcnJlcmkgVG9uZWxsbyA8ZmVsaXBlLnRvbmVsbG9Acm9saS5j
-b20+iQI5BBMBCAAjAhsjBwsJCAcDAgEGFQgCCQoLBBYCAwECHgECF4AFAlZV7HoA
-CgkQzES00JJpjmrkTA//YiyBcGn+hjsKsVxFHseUw0ygN7TDLGeG7z0sP7AybVXR
-h4AwVcqyNkJjJ1UPXxPm5ra6/TbJf3XEalhIJtqh0MI0p+NQTFVOcGG58e6oMWj1
-yBHAPmCyMJCi3GrB1/weP3qMiCdKWOWjxt+NoWss3pqqpSKHGW2rgmM3VP60iheR
-uZDDDI9DtoDz1ePT2AQZnopez2k75syZix1zkAI/VM/T3Y5lcnbaO4C+akDusfN0
-galjwveYPIv6bBY6gd3B/7leSe2l4M3VIahj/1e4R2aLB78/pyy5BaI47zprkzPF
-zOAtZTurrwnE/1s3qWMP3OFeKiD1NLCm8kkvVakk/FjG8avFTAB3idNjpRT3wyPp
-nGv3G5Bp2jII35l7L5e2/zGcIigDNAUtdL3IgszfqtTVwGgISZDoxHIyBucqpYqV
-+ZesP1CpvyXaG4ME1QNTYZcVj1VTtz97IwntHw51r0d4IXjTbbrwJYR/g15XqNRB
-HwQyumPr3kMXLKTHCroK0z1OoT+pwNAO/XEWqQ5NQwyjalkFa1PzSPgcbTH46gs+
-lilkrSgDuj/Amt0pkBSadgviJhsq2nQU49E8OOrrgDab0Z+6ur2lTENPWD4U9PS1
-PisVd3ZAm8WmLx1ZktMgv2IPS9Tm+HlIdTPcw8OY12iPP1tRcE7pu23HLP3Un++0
-KEZlbGlwZSBGZXJyZXJpIFRvbmVsbG8gPGZlbGlwZUByb2xpLmNvbT6JAjkEEwEI
-ACMCGyMHCwkIBwMCAQYVCAIJCgsEFgIDAQIeAQIXgAUCVlXsegAKCRDMRLTQkmmO
-aoymD/94mkk+RCXUQI6i3Z5qfenWHaJF86SH1tekpJl3eFHEUji0JWICOWS9225E
-3oBbLDAA3szFWFxXNA2JdOv0ljwqWHT/aRXJlQ19LHMItguUyxfoELf818aym8bL
-MtazXRrYTy71SfvJwIleMYrNeodZnC4GwSOaKz5Rh/Qbnfzz/wG4dCNtGTcQ+EKP
-vcA06bNbYaqGA+qtrZ3st3lEmz/OPqRox7LqZTs/fvdAo49F8BlTZ6p09s2u7wVF
-UfYbi4+PQonGpn47QTx41OjFzzeA3NnCDak6JuSYa92QznShP0b03G5g4LdonwbU
-P/ivpzkSdWYVNwp/a7GfuhBAyk2VP/StF6WzzGC0j4TyBx+H5RzU32brNNsye1bL
-8AMvHl9C3BEdgLnIlsTRMRCjs7f4EoFyEzmW40FUXPaJzxF6bCY/+GzDIhtMisjK
-fUFyakHnjITZSjo7Wqhp3W6a64esqPFbuFoX7sp5mWYzqDuKy0yD7S9vjA8wLdCt
-usBRw6TvVhaxmnOOa8zkyhOLqJ6le+zw8mW+Cot4LFFkeXyySNyRbrqOx3JqezRc
-olouAh2AJEir2sW3kdP53xRwUE5CJogC2QPuGSl5T1pcARmQJmudco2dk7C+hriF
-hkCHjp5ue9evv6u/Z7m+AcPJguVlq21ynYRrTeFJXCd2rgkAWbkCDQRWHnSHARAA
-yrLAhPO4JiqRk2sem+8bweimfnKmIm+ttTqjDni1DdBKtCZFUxPwEKzuOpU4aals
-9Ohk4rQMnm6Q2XaJxIs0lijQJjVFbExtm9G2R2gkPJ5fnk4+k2mvps5F/iJjQk0k
-zWMITEA6cJzt9B8YC4dfsIq3lhCInOvSMBIVtDapruDGU4OskFBiKfzIq8diq/Ep
-qNfwCxZX2IcPhFv2+SJjph60oUC4WJ4zgINfJWdUGlIZrQp8sr/aEa77BVtLnTsu
-MHwqOF7P7yk4qpb3EFuyNCsJVAirYTqZeMWEv/pYiwtAgYOewdwptP8+5lbcXAor
-Y8Cs0GdW0r7LUzQjfhXl67EQWJuvGDBKMQ35LyUJtOm5m+qAnalz9Eyb0xRc9Arl
-rzH2GfCIr4ga+2RPw7fq7fZcbBcJDs770Mz0kVrLv3IAcc6fmnvuo30TFeIPB62/
-c4xIe8njJ8RxbfwYAtd2KoAzwRQEqJQECyNnqENFHj2cimEueXf7NAw+z1nl1HIl
-7MrHUeA0FQTw4WdGCahTuFRaJCjmODmKCFAooDWEek6jwNv18hCDJytSDc7uLAvH
-D2b9Sd40P1V2ochSf/DS/osfEIEeBf5mkG/MHBBbNxvSGP1h2yUM5C7g4nc6B+nz
-5bIULhw0ojZx+U1i63gJkMsVMjKDAa+mGsWu0vAI3v0AEQEAAYkCHwQYAQgACQIb
-DAUCVlXsegAKCRDMRLTQkmmOao4vD/9GYLw5VmydK5BJ0sX12QmR7oMK4skMkcg/
-gofkJ6njI4ETDG/pQfgBSQ/P0gUMXmhHgmpaRgs0tkS2NwsvURianXiQNpJwUA2g
-qKngqWlEvGOVkgOw7JKpdLWBvEW4vfP0Z0Q9brdeQG//9T9xyoyTC/jPM9A33NtI
-KlexBfBT7lXBy/y4tqf96KTOXk3STmI6nmSwmpPPtjxXXGQiMExGxAru+VX0HFxi
-JBS2fw/ucluVk2kffAO0y7DTL0UH3IWq4wEtHJQlEcujmUkP8PJSVIkhJpNlppR2
-97DVxLcMAbnyxCW+ms1lCuZ5KB98KtowipqY9jhAPeP06W2WikENdmpLfNHhyIaM
-NKF7J+4zqPda7jZN1aKqs5OguJ4V82xXRJ0O6qSAd3Kvwi3MaKtNAv09JFG7UIcK
-ALJ+OQBzc00z54ii19ZPHjER6cYmcVutBUGOssqtyCOZymVbc7VYecdjxVrLwdDp
-LHHpcIjFn5ADjIAwGlt5ttkPvFTmqLeSWG9+vtoBShzQdeKJ4AN4r6/for/XsmF4
-Jf7qGK8RamVX8lpWaNjUGtVSUOMTaSR1pmQJERDO2/WEZCm5hUFkYDbu+h+9m1W+
-KL2ZkyGRC8FoZ46ly1J8koEeEoa57Au/uyK3KyvzlXuCI5zgGE+TohIjOr6d3TN4
-SkAyCfQaSw==
-=JwBB
------END PGP PUBLIC KEY BLOCK-----
-
---------------DFEB8426E6505A62C5FC42F2--
+diff --git a/profiles/input/input.conf b/profiles/input/input.conf
+index 3e1d65aae..4a93e4220 100644
+--- a/profiles/input/input.conf
++++ b/profiles/input/input.conf
+@@ -11,3 +11,7 @@
+ # Enable HID protocol handling in userspace input profile
+ # Defaults to false (HIDP handled in HIDP kernel module)
+ #UserspaceHID=true
++
++# Destroy uHID device on HID/HoG disconnect
++# Defaults to false (uHID device is persistent across reconnects)
++#UHIDDestroy=true
