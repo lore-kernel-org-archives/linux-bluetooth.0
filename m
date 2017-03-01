@@ -1,93 +1,114 @@
-Return-Path: <linux-wpan-owner@vger.kernel.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <973f0299-54ee-3625-6c96-98fa0daeba1b@pengutronix.de>
-References: <20170224121440.32269-1-luiz.dentz@gmail.com> <20170224121440.32269-5-luiz.dentz@gmail.com>
- <973f0299-54ee-3625-6c96-98fa0daeba1b@pengutronix.de>
+In-Reply-To: <1488330416-10463-4-git-send-email-juha.kuikka@synapse.com>
+References: <1488330416-10463-1-git-send-email-juha.kuikka@synapse.com> <1488330416-10463-4-git-send-email-juha.kuikka@synapse.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 1 Mar 2017 13:09:40 +0200
-Message-ID: <CABBYNZLtDxRmgA7=MErctZyTdxtcBD-QKjd4MxMbK81K7s8UAg@mail.gmail.com>
-Subject: Re: [PATCH v5 4/6] ipv6: addrconf: fix 48 bit 6lowpan autoconfiguration
-To: Alexander Aring <aar@pengutronix.de>
+Date: Wed, 1 Mar 2017 12:58:59 +0200
+Message-ID: <CABBYNZ+XivaqFmfGvXfkS4vY7WBRHkU9FhpkgYPkaP-4GYArgQ@mail.gmail.com>
+Subject: Re: [PATCH v2 3/3] hog: Optionally destroy uHID device when disconnected
+To: Juha Kuikka <juha.kuikka@synapse.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Patrik Flykt <patrik.flykt@linux.intel.com>,
-        Jukka Rissanen <jukka.rissanen@linux.intel.com>,
-        Stefan Schmidt <stefan@osg.samsung.com>,
-        linux-wpan@vger.kernel.org,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
+        Juha Kuikka <juha.kuikka@gmail.com>,
+        Petri Gynther <pgynther@google.com>
 Content-Type: text/plain; charset=UTF-8
-Sender: linux-wpan-owner@vger.kernel.org
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alex,
+Hi Juha,
 
-On Sun, Feb 26, 2017 at 8:38 AM, Alexander Aring <aar@pengutronix.de> wrote:
+On Wed, Mar 1, 2017 at 3:06 AM, Juha Kuikka <juha.kuikka@synapse.com> wrote:
+> Unlink bluetooth classic HID, HoG persists the uHID device after across
+> connections. This is fine for stateless devices that require fast reconnections
+> but some device utilize hidraw to configure them upon connection and with the
+> persisting uHID device, reconnections are hidden from them.
 >
-> Hi,
+> Similarly, applications such as game emulators may be using the presence of the
+> HID or the accompanying input event devices to indicate that it is available,
+> thus changing behavior.
 >
-> okay now I am finally confused.
->
-> On 02/24/2017 01:14 PM, Luiz Augusto von Dentz wrote:
->> From: Alexander Aring <aar@pengutronix.de>
->>
->> This patch adds support for 48 bit 6LoWPAN address length
->> autoconfiguration which is the case for BTLE 6LoWPAN.
->>
->> Signed-off-by: Alexander Aring <aar@pengutronix.de>
->> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->> Reviewed-by: Stefan Schmidt <stefan@osg.samsung.com>
->> ---
->>  net/ipv6/addrconf.c | 17 ++++++++++++-----
->>  1 file changed, 12 insertions(+), 5 deletions(-)
->>
->> diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
->> index 3a2025f..7756640 100644
->> --- a/net/ipv6/addrconf.c
->> +++ b/net/ipv6/addrconf.c
->> @@ -2052,12 +2052,19 @@ static void addrconf_leave_anycast(struct inet6_ifaddr *ifp)
->>       __ipv6_dev_ac_dec(ifp->idev, &addr);
->>  }
->>
->> -static int addrconf_ifid_eui64(u8 *eui, struct net_device *dev)
->> +static int addrconf_ifid_6lowpan(u8 *eui, struct net_device *dev)
->>  {
->> -     if (dev->addr_len != EUI64_ADDR_LEN)
->> +     switch (dev->addr_len) {
->> +     case ETH_ALEN:
->> +             return addrconf_ifid_eui48(eui, dev);
->
-> You need to make the same thing here like what we discusss in antoher
-> mail.
->
->    In the figure, letter 'b' represents a bit from the
->    Bluetooth device address, copied as is without any changes on any
->    bit.  This means that no bit in the IID indicates whether the
->    underlying Bluetooth device address is public or random.
->
->    |0              1|1              3|3              4|4              6|
->    |0              5|6              1|2              7|8              3|
->    +----------------+----------------+----------------+----------------+
->    |bbbbbbbbbbbbbbbb|bbbbbbbb11111111|11111110bbbbbbbb|bbbbbbbbbbbbbbbb|
->    +----------------+----------------+----------------+----------------+
->
-> The function addrconf_ifid_eui48 will do a u/l bitflip. You need to change
-> that otherwise transparent 6lowpan adaptiation will not match on your
-> local address.
->
-> Making u/l bit here, but not in IPHC code -> will not work together.
->
+> This patch introduces a configuration option that, when set, destroys the uHID
+> device upon disconnection, it gets re-created upon reconnection, just like on
+> initial connection.
 > ---
+>  profiles/input/hog-lib.c | 29 +++++++++++++++++++++++++++++
+>  profiles/input/hog-lib.h |  1 +
+>  2 files changed, 30 insertions(+)
 >
-> btw: That's why I think we should provide some function _once_ to
-> generate the IID for iphc code and ipv6. Then such mistakes will not
-> happen.
+> diff --git a/profiles/input/hog-lib.c b/profiles/input/hog-lib.c
+> index dab385f..b2a371e 100644
+> --- a/profiles/input/hog-lib.c
+> +++ b/profiles/input/hog-lib.c
+> @@ -129,6 +129,13 @@ struct gatt_request {
+>         void *user_data;
+>  };
 >
-> So we don't want to have some module dependency of 6lowpan in ipv6.
-> My first idea is to make a callback in 6lowpan private data of
-> netdevice. :-/
+> +static bool uhid_destroy = false;
+> +
+> +void bt_hog_set_uhid_destroy(bool state)
+> +{
+> +       uhid_destroy = state;
+> +}
+> +
+>  static struct gatt_request *create_request(struct bt_hog *hog,
+>                                                         void *user_data)
+>  {
+> @@ -1565,6 +1572,25 @@ static void primary_cb(uint8_t status, GSList *services, void *user_data)
+>         }
+>  }
+>
+> +static void destroy_uhid(struct bt_hog *hog)
+> +{
+> +       struct uhid_event ev = {
+> +               .type = UHID_DESTROY
+> +       };
+> +       int err;
+> +
+> +       if (hog->uhid_created) {
+> +               err = bt_uhid_send(hog->uhid, &ev);
+> +               if (err < 0) {
+> +                       error("bt_uhid_send: %s", strerror(-err));
+> +                       return;
+> +               }
+> +               hog->uhid_created = false;
+> +
+> +               DBG("HoG destroyed uHID device");
+> +       }
+> +}
+> +
+>  bool bt_hog_attach(struct bt_hog *hog, void *gatt)
+>  {
+>         GSList *l;
+> @@ -1651,6 +1677,9 @@ void bt_hog_detach(struct bt_hog *hog)
+>         queue_foreach(hog->gatt_op, (void *) cancel_gatt_req, NULL);
+>         g_attrib_unref(hog->attrib);
+>         hog->attrib = NULL;
+> +
+> +       if (uhid_destroy)
+> +               destroy_uhid(hog);
 
-Well if we will be introducing new fields why not introduce an iid
-field directly into net_device? That way we don't need to keep
-generating it in several places.
+It probably make sense to check if hog->uhid_created.
+
+>  }
+>
+>  int bt_hog_set_control_point(struct bt_hog *hog, bool suspend)
+> diff --git a/profiles/input/hog-lib.h b/profiles/input/hog-lib.h
+> index 415dc63..de8c42f 100644
+> --- a/profiles/input/hog-lib.h
+> +++ b/profiles/input/hog-lib.h
+> @@ -39,3 +39,4 @@ void bt_hog_detach(struct bt_hog *hog);
+>
+>  int bt_hog_set_control_point(struct bt_hog *hog, bool suspend);
+>  int bt_hog_send_report(struct bt_hog *hog, void *data, size_t size, int type);
+> +void bt_hog_set_uhid_destroy(bool state);
+
+Ive made this per instance.
+
+> --
+> 2.7.4
+
+I would consider doing this in the bt_uhid instance
+
+
 
 -- 
 Luiz Augusto von Dentz
