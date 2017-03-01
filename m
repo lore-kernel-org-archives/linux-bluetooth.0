@@ -3,58 +3,94 @@ From: Juha Kuikka <juha.kuikka@synapse.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: juha.kuikka@gmail.com, pgynther@google.com, luiz.dentz@gmail.com,
         Juha Kuikka <juha.kuikka@synapse.com>
-Subject: [PATCH v2 1/3] input: Add UHIDDestroy configuration option
-Date: Tue, 28 Feb 2017 17:06:54 -0800
-Message-Id: <1488330416-10463-2-git-send-email-juha.kuikka@synapse.com>
+Subject: [PATCH v2 3/3] hog: Optionally destroy uHID device when disconnected
+Date: Tue, 28 Feb 2017 17:06:56 -0800
+Message-Id: <1488330416-10463-4-git-send-email-juha.kuikka@synapse.com>
 In-Reply-To: <1488330416-10463-1-git-send-email-juha.kuikka@synapse.com>
 References: <1488330416-10463-1-git-send-email-juha.kuikka@synapse.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add a configuration option UHIDDestroy to control whether HoG uHID devices
-persist or are destroyed on disconnect.
----
- profiles/input/manager.c | 13 ++++++++++++-
- 1 file changed, 12 insertions(+), 1 deletion(-)
+Unlink bluetooth classic HID, HoG persists the uHID device after across
+connections. This is fine for stateless devices that require fast reconnections
+but some device utilize hidraw to configure them upon connection and with the
+persisting uHID device, reconnections are hidden from them.
 
-diff --git a/profiles/input/manager.c b/profiles/input/manager.c
-index 1d31b06..b36e77e 100644
---- a/profiles/input/manager.c
-+++ b/profiles/input/manager.c
-@@ -43,6 +43,8 @@
- #include "device.h"
- #include "server.h"
+Similarly, applications such as game emulators may be using the presence of the
+HID or the accompanying input event devices to indicate that it is available,
+thus changing behavior.
+
+This patch introduces a configuration option that, when set, destroys the uHID
+device upon disconnection, it gets re-created upon reconnection, just like on
+initial connection.
+---
+ profiles/input/hog-lib.c | 29 +++++++++++++++++++++++++++++
+ profiles/input/hog-lib.h |  1 +
+ 2 files changed, 30 insertions(+)
+
+diff --git a/profiles/input/hog-lib.c b/profiles/input/hog-lib.c
+index dab385f..b2a371e 100644
+--- a/profiles/input/hog-lib.c
++++ b/profiles/input/hog-lib.c
+@@ -129,6 +129,13 @@ struct gatt_request {
+ 	void *user_data;
+ };
  
-+#include "profiles/input/hog-lib.h"
++static bool uhid_destroy = false;
 +
- static int hid_server_probe(struct btd_profile *p, struct btd_adapter *adapter)
++void bt_hog_set_uhid_destroy(bool state)
++{
++	uhid_destroy = state;
++}
++
+ static struct gatt_request *create_request(struct bt_hog *hog,
+ 							void *user_data)
  {
- 	return server_start(btd_adapter_get_address(adapter));
-@@ -96,7 +98,7 @@ static int input_init(void)
- 	config = load_config_file(CONFIGDIR "/input.conf");
- 	if (config) {
- 		int idle_timeout;
--		gboolean uhid_enabled;
-+		gboolean uhid_enabled, uhid_destroy;
- 
- 		idle_timeout = g_key_file_get_integer(config, "General",
- 							"IdleTimeout", &err);
-@@ -114,6 +116,15 @@ static int input_init(void)
- 			input_enable_userspace_hid(uhid_enabled);
- 		} else
- 			g_clear_error(&err);
-+
-+		uhid_destroy = g_key_file_get_boolean(config, "General",
-+							"UHIDDestroy", &err);
-+		if (!err) {
-+			DBG("input.conf: UHIDDestroy=%s", uhid_destroy ?
-+							"true" : "false");
-+			bt_hog_set_uhid_destroy(uhid_destroy);
-+		} else
-+			g_clear_error(&err);
+@@ -1565,6 +1572,25 @@ static void primary_cb(uint8_t status, GSList *services, void *user_data)
  	}
+ }
  
- 	btd_profile_register(&input_profile);
++static void destroy_uhid(struct bt_hog *hog)
++{
++	struct uhid_event ev = {
++		.type = UHID_DESTROY
++	};
++	int err;
++
++	if (hog->uhid_created) {
++		err = bt_uhid_send(hog->uhid, &ev);
++		if (err < 0) {
++			error("bt_uhid_send: %s", strerror(-err));
++			return;
++		}
++		hog->uhid_created = false;
++
++		DBG("HoG destroyed uHID device");
++	}
++}
++
+ bool bt_hog_attach(struct bt_hog *hog, void *gatt)
+ {
+ 	GSList *l;
+@@ -1651,6 +1677,9 @@ void bt_hog_detach(struct bt_hog *hog)
+ 	queue_foreach(hog->gatt_op, (void *) cancel_gatt_req, NULL);
+ 	g_attrib_unref(hog->attrib);
+ 	hog->attrib = NULL;
++
++	if (uhid_destroy)
++		destroy_uhid(hog);
+ }
+ 
+ int bt_hog_set_control_point(struct bt_hog *hog, bool suspend)
+diff --git a/profiles/input/hog-lib.h b/profiles/input/hog-lib.h
+index 415dc63..de8c42f 100644
+--- a/profiles/input/hog-lib.h
++++ b/profiles/input/hog-lib.h
+@@ -39,3 +39,4 @@ void bt_hog_detach(struct bt_hog *hog);
+ 
+ int bt_hog_set_control_point(struct bt_hog *hog, bool suspend);
+ int bt_hog_send_report(struct bt_hog *hog, void *data, size_t size, int type);
++void bt_hog_set_uhid_destroy(bool state);
 -- 
 2.7.4
 
