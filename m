@@ -1,28 +1,118 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+MIME-Version: 1.0
+In-Reply-To: <CAGXr9JG_dKSjD31DW5=0TH5Y9YD_oFdpQ6t-MTek_2hCd7GzNg@mail.gmail.com>
+References: <1488235227-27632-1-git-send-email-juha.kuikka@synapse.com>
+ <1488235227-27632-2-git-send-email-juha.kuikka@synapse.com> <CAGXr9JG_dKSjD31DW5=0TH5Y9YD_oFdpQ6t-MTek_2hCd7GzNg@mail.gmail.com>
 From: Juha Kuikka <juha.kuikka@synapse.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: juha.kuikka@gmail.com, pgynther@google.com, luiz.dentz@gmail.com,
-        Juha Kuikka <juha.kuikka@synapse.com>
-Subject: [PATCH v2 0/3] Optionally destroy uHID devices on disconnect
-Date: Tue, 28 Feb 2017 17:06:53 -0800
-Message-Id: <1488330416-10463-1-git-send-email-juha.kuikka@synapse.com>
+Date: Tue, 28 Feb 2017 16:01:18 -0800
+Message-ID: <CAKHsmFqKO9ZnOkhTyWytvQE7qOKe3vVV=DqCWoRMfifJLS-LnQ@mail.gmail.com>
+Subject: Re: [PATCH] hog: Destroy uHID device when disconnected
+To: Petri Gynther <pgynther@google.com>
+Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        Juha Kuikka <juha.kuikka@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Changes since v1:
- * Add UHIDDestroy configuration option and make it control uHID lifetime
+Hi Petry,
 
-Juha Kuikka (3):
-  input: Add UHIDDestroy configuration option
-  input: Add UHIDDestroy option into input.conf
-  hog: Optionally destroy uHID device when disconnected
+On Mon, Feb 27, 2017 at 6:17 PM, Petri Gynther <pgynther@google.com> wrote:
+> Hi Juha,
+>
+> On Mon, Feb 27, 2017 at 2:40 PM, Juha Kuikka <juha.kuikka@synapse.com> wrote:
+>>
+>> Unlink bluetooth classic HID, HoG persists the uHID device after across
+>> connections. This is fine for stateless devices but some device utilize hidraw
+>> to configure them upon connection and with the persisting uHID device,
+>> reconnections are hidden from them.
+>>
+>> Similarly, applications such as game emulators may be using the presence of the
+>> HID or the accompanying input event devices to indicate that it is available,
+>> thus changing behavior.
+>>
+>> This patch destroys the uHID device upon disconnection, it gets re-created upon
+>> reconnection, just like on initial connection.
+>
+> For HID and HoG remote controls, the reconnect latency is important
+> for user experience. Thus, it is desirable that the uHID device is
+> persistent across reconnects until next reboot.
 
- profiles/input/hog-lib.c  | 29 +++++++++++++++++++++++++++++
- profiles/input/hog-lib.h  |  1 +
- profiles/input/input.conf |  4 ++++
- profiles/input/manager.c  | 13 ++++++++++++-
- 4 files changed, 46 insertions(+), 1 deletion(-)
+I see. That makes sense, this way the whole pipeline is guaranteed to
+be already open when the connection forms, leading to less dropped
+button presses I suppose.
 
--- 
-2.7.4
+> How about adding a new config item to profiles/input/input.conf to
+> control this (default = persistent uHID devices)?
 
+Works for me. Something like this maybe? Excuse the quick patch, I
+will send a revision to the set.
+
+diff --git a/profiles/input/hog-lib.c b/profiles/input/hog-lib.c
+index f41055b..2b954b3 100644
+--- a/profiles/input/hog-lib.c
++++ b/profiles/input/hog-lib.c
+@@ -129,6 +129,13 @@ struct gatt_request {
+        void *user_data;
+ };
+
++static bool persist_uhid = true;
++
++void bt_hog_set_persist_uhid(bool state)
++{
++       persist_uhid = state;
++}
++
+ static struct gatt_request *create_request(struct bt_hog *hog,
+                                                        void *user_data)
+ {
+diff --git a/profiles/input/hog-lib.h b/profiles/input/hog-lib.h
+index 415dc63..7e81547 100644
+--- a/profiles/input/hog-lib.h
++++ b/profiles/input/hog-lib.h
+@@ -39,3 +39,4 @@ void bt_hog_detach(struct bt_hog *hog);
+
+ int bt_hog_set_control_point(struct bt_hog *hog, bool suspend);
+ int bt_hog_send_report(struct bt_hog *hog, void *data, size_t size, int type);
++void bt_hog_set_persist_uhid(bool state);
+diff --git a/profiles/input/manager.c b/profiles/input/manager.c
+index 1d31b06..129b7b5 100644
+--- a/profiles/input/manager.c
++++ b/profiles/input/manager.c
+@@ -43,6 +43,8 @@
+ #include "device.h"
+ #include "server.h"
+
++#include "profiles/input/hog-lib.h"
++
+ static int hid_server_probe(struct btd_profile *p, struct btd_adapter *adapter)
+ {
+        return server_start(btd_adapter_get_address(adapter));
+@@ -96,7 +98,7 @@ static int input_init(void)
+        config = load_config_file(CONFIGDIR "/input.conf");
+        if (config) {
+                int idle_timeout;
+-               gboolean uhid_enabled;
++               gboolean uhid_enabled, persist_uhid;
+
+                idle_timeout = g_key_file_get_integer(config, "General",
+                                                        "IdleTimeout", &err);
+@@ -114,6 +116,15 @@ static int input_init(void)
+                        input_enable_userspace_hid(uhid_enabled);
+                } else
+                        g_clear_error(&err);
++
++               persist_uhid = g_key_file_get_boolean(config, "General",
++                                                       "PersistUHID", &err);
++               if (!err) {
++                       DBG("input.conf: PersistUHID=%s", persist_uhid ?
++                                                       "true" : "false");
++                       bt_hog_set_persist_uhid(persist_uhid);
++               } else
++                       g_clear_error(&err);
+        }
+
+        btd_profile_register(&input_profile);
+
+Thanks,
+ - Juha
