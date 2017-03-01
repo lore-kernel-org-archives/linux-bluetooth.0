@@ -1,11 +1,11 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <1488330416-10463-4-git-send-email-juha.kuikka@synapse.com>
-References: <1488330416-10463-1-git-send-email-juha.kuikka@synapse.com> <1488330416-10463-4-git-send-email-juha.kuikka@synapse.com>
+In-Reply-To: <1488330416-10463-3-git-send-email-juha.kuikka@synapse.com>
+References: <1488330416-10463-1-git-send-email-juha.kuikka@synapse.com> <1488330416-10463-3-git-send-email-juha.kuikka@synapse.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 1 Mar 2017 12:58:59 +0200
-Message-ID: <CABBYNZ+XivaqFmfGvXfkS4vY7WBRHkU9FhpkgYPkaP-4GYArgQ@mail.gmail.com>
-Subject: Re: [PATCH v2 3/3] hog: Optionally destroy uHID device when disconnected
+Date: Wed, 1 Mar 2017 12:21:24 +0200
+Message-ID: <CABBYNZ+L1ozuxvxdg_6ytoHjgckGn1t=gw6VHs=NY7zZT-gJEg@mail.gmail.com>
+Subject: Re: [PATCH v2 2/3] input: Add UHIDDestroy option into input.conf
 To: Juha Kuikka <juha.kuikka@synapse.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
         Juha Kuikka <juha.kuikka@gmail.com>,
@@ -17,97 +17,30 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 Hi Juha,
 
 On Wed, Mar 1, 2017 at 3:06 AM, Juha Kuikka <juha.kuikka@synapse.com> wrote:
-> Unlink bluetooth classic HID, HoG persists the uHID device after across
-> connections. This is fine for stateless devices that require fast reconnections
-> but some device utilize hidraw to configure them upon connection and with the
-> persisting uHID device, reconnections are hidden from them.
->
-> Similarly, applications such as game emulators may be using the presence of the
-> HID or the accompanying input event devices to indicate that it is available,
-> thus changing behavior.
->
-> This patch introduces a configuration option that, when set, destroys the uHID
-> device upon disconnection, it gets re-created upon reconnection, just like on
-> initial connection.
+> UHIDDestroy controls whether uHID device is destroyed on HID/HoG disconnect.
+> Defaults to false.
 > ---
->  profiles/input/hog-lib.c | 29 +++++++++++++++++++++++++++++
->  profiles/input/hog-lib.h |  1 +
->  2 files changed, 30 insertions(+)
+>  profiles/input/input.conf | 4 ++++
+>  1 file changed, 4 insertions(+)
 >
-> diff --git a/profiles/input/hog-lib.c b/profiles/input/hog-lib.c
-> index dab385f..b2a371e 100644
-> --- a/profiles/input/hog-lib.c
-> +++ b/profiles/input/hog-lib.c
-> @@ -129,6 +129,13 @@ struct gatt_request {
->         void *user_data;
->  };
->
-> +static bool uhid_destroy = false;
+> diff --git a/profiles/input/input.conf b/profiles/input/input.conf
+> index 3e1d65a..4a93e42 100644
+> --- a/profiles/input/input.conf
+> +++ b/profiles/input/input.conf
+> @@ -11,3 +11,7 @@
+>  # Enable HID protocol handling in userspace input profile
+>  # Defaults to false (HIDP handled in HIDP kernel module)
+>  #UserspaceHID=true
 > +
-> +void bt_hog_set_uhid_destroy(bool state)
-> +{
-> +       uhid_destroy = state;
-> +}
-> +
->  static struct gatt_request *create_request(struct bt_hog *hog,
->                                                         void *user_data)
->  {
-> @@ -1565,6 +1572,25 @@ static void primary_cb(uint8_t status, GSList *services, void *user_data)
->         }
->  }
->
-> +static void destroy_uhid(struct bt_hog *hog)
-> +{
-> +       struct uhid_event ev = {
-> +               .type = UHID_DESTROY
-> +       };
-> +       int err;
-> +
-> +       if (hog->uhid_created) {
-> +               err = bt_uhid_send(hog->uhid, &ev);
-> +               if (err < 0) {
-> +                       error("bt_uhid_send: %s", strerror(-err));
-> +                       return;
-> +               }
-> +               hog->uhid_created = false;
-> +
-> +               DBG("HoG destroyed uHID device");
-> +       }
-> +}
-> +
->  bool bt_hog_attach(struct bt_hog *hog, void *gatt)
->  {
->         GSList *l;
-> @@ -1651,6 +1677,9 @@ void bt_hog_detach(struct bt_hog *hog)
->         queue_foreach(hog->gatt_op, (void *) cancel_gatt_req, NULL);
->         g_attrib_unref(hog->attrib);
->         hog->attrib = NULL;
-> +
-> +       if (uhid_destroy)
-> +               destroy_uhid(hog);
-
-It probably make sense to check if hog->uhid_created.
-
->  }
->
->  int bt_hog_set_control_point(struct bt_hog *hog, bool suspend)
-> diff --git a/profiles/input/hog-lib.h b/profiles/input/hog-lib.h
-> index 415dc63..de8c42f 100644
-> --- a/profiles/input/hog-lib.h
-> +++ b/profiles/input/hog-lib.h
-> @@ -39,3 +39,4 @@ void bt_hog_detach(struct bt_hog *hog);
->
->  int bt_hog_set_control_point(struct bt_hog *hog, bool suspend);
->  int bt_hog_send_report(struct bt_hog *hog, void *data, size_t size, int type);
-> +void bt_hog_set_uhid_destroy(bool state);
-
-Ive made this per instance.
-
+> +# Destroy uHID device on HID/HoG disconnect
+> +# Defaults to false (uHID device is persistent across reconnects)
+> +#UHIDDestroy=true
 > --
 > 2.7.4
 
-I would consider doing this in the bt_uhid instance
-
+Id follow the prefix of UserspaceHID here since it should apply to any
+uHID instance including classic and please merge this into the first
+patch.
 
 
 -- 
