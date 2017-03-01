@@ -1,82 +1,28 @@
-Return-Path: <colin.king@canonical.com>
-From: Colin King <colin.king@canonical.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: kernel-janitors@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] Bluetooth: fix assignments on error variable err
-Date: Wed,  1 Mar 2017 15:10:53 +0000
-Message-Id: <20170301151053.25779-1-colin.king@canonical.com>
+Return-Path: <netdev-owner@vger.kernel.org>
+To: Network Development <netdev@vger.kernel.org>
+Cc: linux-wpan@vger.kernel.org, linux-bluetooth@vger.kernel.org
+From: Stefan Schmidt <stefan@osg.samsung.com>
+Subject: IoT networking protocols workshop at Netdev 2.1
+Message-ID: <2eec62e4-ed80-442b-05e0-b96bb6bcf310@osg.samsung.com>
+Date: Wed, 1 Mar 2017 16:08:53 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=utf-8; format=flowed
+Sender: netdev-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Colin Ian King <colin.king@canonical.com>
+Hello.
 
-Variable err is being initialized to zero and then later being
-set to the error return from the call to hci_req_run_skb; hence
-we can remove the redundant initialization to zero.
+At the next Netdev edition in April I will chair a workshop on IoT 
+related topics in Linux networking. A full abstract can be found here:
+http://www.netdevconf.org/2.1/session.html?schmidt
 
-Also on two occassions err is not being set from the error return
-from the call to hci_req_run_skb, so add these missing assignments.
+I started to contact people I know having an interest and opinion on 
+this and will work on an initial agenda soon.
 
-Signed-off-by: Colin Ian King <colin.king@canonical.com>
----
- net/bluetooth/amp.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+Obviously I don't know all people for this so here is your chance to be 
+part of it. Contact me directly if you either want to have short 
+timeslot (~10min) in this workshop to speak about a relevant topic or if 
+you have input that should be worked in because you are unable to attend.
 
-diff --git a/net/bluetooth/amp.c b/net/bluetooth/amp.c
-index 02a4ccc..ebcab5b 100644
---- a/net/bluetooth/amp.c
-+++ b/net/bluetooth/amp.c
-@@ -263,7 +263,7 @@ void amp_read_loc_assoc_frag(struct hci_dev *hdev, u8 phy_handle)
- 	struct hci_cp_read_local_amp_assoc cp;
- 	struct amp_assoc *loc_assoc = &hdev->loc_assoc;
- 	struct hci_request req;
--	int err = 0;
-+	int err;
- 
- 	BT_DBG("%s handle %d", hdev->name, phy_handle);
- 
-@@ -282,7 +282,7 @@ void amp_read_loc_assoc(struct hci_dev *hdev, struct amp_mgr *mgr)
- {
- 	struct hci_cp_read_local_amp_assoc cp;
- 	struct hci_request req;
--	int err = 0;
-+	int err;
- 
- 	memset(&hdev->loc_assoc, 0, sizeof(struct amp_assoc));
- 	memset(&cp, 0, sizeof(cp));
-@@ -292,7 +292,7 @@ void amp_read_loc_assoc(struct hci_dev *hdev, struct amp_mgr *mgr)
- 	set_bit(READ_LOC_AMP_ASSOC, &mgr->state);
- 	hci_req_init(&req, hdev);
- 	hci_req_add(&req, HCI_OP_READ_LOCAL_AMP_ASSOC, sizeof(cp), &cp);
--	hci_req_run_skb(&req, read_local_amp_assoc_complete);
-+	err = hci_req_run_skb(&req, read_local_amp_assoc_complete);
- 	if (err < 0)
- 		a2mp_send_getampassoc_rsp(hdev, A2MP_STATUS_INVALID_CTRL_ID);
- }
-@@ -303,7 +303,7 @@ void amp_read_loc_assoc_final_data(struct hci_dev *hdev,
- 	struct hci_cp_read_local_amp_assoc cp;
- 	struct amp_mgr *mgr = hcon->amp_mgr;
- 	struct hci_request req;
--	int err = 0;
-+	int err;
- 
- 	cp.phy_handle = hcon->handle;
- 	cp.len_so_far = cpu_to_le16(0);
-@@ -314,7 +314,7 @@ void amp_read_loc_assoc_final_data(struct hci_dev *hdev,
- 	/* Read Local AMP Assoc final link information data */
- 	hci_req_init(&req, hdev);
- 	hci_req_add(&req, HCI_OP_READ_LOCAL_AMP_ASSOC, sizeof(cp), &cp);
--	hci_req_run_skb(&req, read_local_amp_assoc_complete);
-+	err = hci_req_run_skb(&req, read_local_amp_assoc_complete);
- 	if (err < 0)
- 		a2mp_send_getampassoc_rsp(hdev, A2MP_STATUS_INVALID_CTRL_ID);
- }
--- 
-2.10.2
+regards
+Stefan Schmidt
