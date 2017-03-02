@@ -1,51 +1,60 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+MIME-Version: 1.0
+In-Reply-To: <2190B102-4AAC-499B-A4E7-1FE0435F7C7B@gmail.com>
+References: <0FD5C3A6-1C8B-482C-BC83-36DB5ED94551@gmail.com> <2190B102-4AAC-499B-A4E7-1FE0435F7C7B@gmail.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: patrik.flykt@linux.intel.com, aar@pengutronix.de,
-        jukka.rissanen@linux.intel.com, linux-wpan@vger.kernel.org,
-        netdev@vger.kernel.org
-Subject: [PATCH v6 0/6] Bluetooth: 6LoWPAN: Fix lladdr length
-Date: Thu,  2 Mar 2017 15:23:29 +0200
-Message-Id: <20170302132335.21192-1-luiz.dentz@gmail.com>
+Date: Thu, 2 Mar 2017 10:01:33 +0200
+Message-ID: <CABBYNZKJrCsi=nJXcLZhFbntCXPSBJVPe_cx3XqFYWBE7nJcwA@mail.gmail.com>
+Subject: Re: Allow non-root user to access BLE DBus interface (systemd)
+To: Travis Griggs <travisgriggs@gmail.com>
+Cc: Bluez mailing list <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Travis,
 
-These patches fixes lladdr length to be 6 bytes long and not 8 which cause
-neighbor advertisement to be sent with wrong lladdr including FF:FE filler
-bytes for eui64.
+On Wed, Mar 1, 2017 at 7:27 PM, Travis Griggs <travisgriggs@gmail.com> wrot=
+e:
+>
+>> On Mar 1, 2017, at 8:35 AM, Travis Griggs <travisgriggs@gmail.com> wrote=
+:
+>>
+>> This is not directly bluez/ble related, but rather derived from their us=
+e. I=E2=80=99ve been prototyping my BLE peripheral behavior running as root=
+. Now I=E2=80=99m hardening things and partitioning the BLE app to a non-ro=
+ot user. My service now errors out with the following:
+>>
+>> dbus.exceptions.DBusException: org.freedesktop.DBus.Error.AccessDenied: =
+Rejected send message, 2 matched rule
+>> s; type=3D"method_call", sender=3D":1.6797" (uid=3D107 pid=3D17300 comm=
+=3D"/usr/bin/python3 -u /opt/pilot/bleMainloop ") interface=3D"org.freedesk=
+top.DBus.Objec
+>> tManager" member=3D"GetManagedObjects" error name=3D"(unset)" requested_=
+reply=3D"0" destination=3D":1.2" (uid=3D0 pid=3D1373 comm=3D"/usr/lib/bluet=
+ooth/bluetoothd
+>> -d -E --noplugin=3D* =E2=80=9C)
 
-Note: This does not fix some of the existing crashes which I hope to address
-in a different set.
+These interfaces have never been blocked, in fact that how
+bluetoothctl access BlueZ so you probably have something wrong with
+your configuration.
 
-v2: Make all code paths that generate a link-local from lladdr use the same
-code.
-v3: Use lowpan_iphc_uncompress_eui48_lladdr to generate the remote ip address.
-v4: Handle comments from Stefan Schmidt.
-v5: Add patch to fix IID format for Bluetooth
-v6: Fix addrconf_ifid_eui48 to follow IID format for Bluetooth
+>> I see that there=E2=80=99s a bluetooth.conf in /etc/dbus-1/system.d. Do =
+I need to tune something in this file to allow my app to still use the BLE =
+DBus services? Any examples or pointers would be appreciated.
+>>
+>> (sorry if this ended up a repeat post)
+>
+> The same question in another forum if you want to earn Stack points:
+>
+> http://unix.stackexchange.com/questions/348441/how-to-allow-non-root-syst=
+emd-service-to-use-dbus-for-ble-operation--
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth=
+" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-Alexander Aring (2):
-  6lowpan: iphc: override l2 packet information
-  ipv6: addrconf: fix 48 bit 6lowpan autoconfiguration
 
-Luiz Augusto von Dentz (2):
-  6lowpan: Use netdev addr_len to determine lladdr len
-  6lowpan: Fix IID format for Bluetooth
 
-Patrik Flykt (2):
-  bluetooth: Set 6 byte device addresses
-  6lowpan: Set MAC address length according to LOWPAN_LLTYPE
-
- include/net/6lowpan.h   |  15 ++++++
- include/net/addrconf.h  |   7 ++-
- net/6lowpan/core.c      |  11 +++-
- net/6lowpan/iphc.c      |  57 +++++++++++++++++----
- net/bluetooth/6lowpan.c | 130 ++++++++----------------------------------------
- net/ipv6/addrconf.c     |  17 +++++--
- 6 files changed, 110 insertions(+), 127 deletions(-)
-
--- 
-2.9.3
-
+--=20
+Luiz Augusto von Dentz
