@@ -13,121 +13,34 @@ Cc: Tony Lindgren <tony@atomide.com>,
 	linux-serial@vger.kernel.org,
 	devicetree@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 07/10] serdev: add serdev_device_wait_until_sent
-Date: Sat,  4 Mar 2017 12:58:30 +0100
-Message-Id: <20170304115833.3538-8-sre@kernel.org>
+Subject: [PATCH 06/10] tty: serial: omap: add UPF_BOOT_AUTOCONF flag for DT init
+Date: Sat,  4 Mar 2017 12:58:29 +0100
+Message-Id: <20170304115833.3538-7-sre@kernel.org>
 In-Reply-To: <20170304115833.3538-1-sre@kernel.org>
 References: <20170304115833.3538-1-sre@kernel.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add method, which waits until the transmission buffer has been sent.
+The UPF_BOOT_AUTOCONF flag is needed for proper
+flow control support.
 
 Signed-off-by: Sebastian Reichel <sre@kernel.org>
 ---
- drivers/tty/serdev/core.c           | 11 +++++++++++
- drivers/tty/serdev/serdev-ttyport.c | 15 ++++++++++++++-
- include/linux/serdev.h              |  3 +++
- 3 files changed, 28 insertions(+), 1 deletion(-)
+ drivers/tty/serial/omap-serial.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/drivers/tty/serdev/core.c b/drivers/tty/serdev/core.c
-index f4c6c90add78..a63b74031e22 100644
---- a/drivers/tty/serdev/core.c
-+++ b/drivers/tty/serdev/core.c
-@@ -173,6 +173,17 @@ void serdev_device_set_flow_control(struct serdev_device *serdev, bool enable)
- }
- EXPORT_SYMBOL_GPL(serdev_device_set_flow_control);
+diff --git a/drivers/tty/serial/omap-serial.c b/drivers/tty/serial/omap-serial.c
+index 6c6f82ad8d5c..a4734649a0f0 100644
+--- a/drivers/tty/serial/omap-serial.c
++++ b/drivers/tty/serial/omap-serial.c
+@@ -1597,6 +1597,9 @@ static struct omap_uart_port_info *of_get_uart_port_info(struct device *dev)
  
-+void serdev_device_wait_until_sent(struct serdev_device *serdev, long timeout)
-+{
-+	struct serdev_controller *ctrl = serdev->ctrl;
+ 	of_property_read_u32(dev->of_node, "clock-frequency",
+ 					 &omap_up_info->uartclk);
 +
-+	if (!ctrl || !ctrl->ops->wait_until_sent)
-+		return;
++	omap_up_info->flags = UPF_BOOT_AUTOCONF;
 +
-+	ctrl->ops->wait_until_sent(ctrl, timeout);
-+}
-+EXPORT_SYMBOL_GPL(serdev_device_wait_until_sent);
-+
- static int serdev_drv_probe(struct device *dev)
- {
- 	const struct serdev_device_driver *sdrv = to_serdev_device_driver(dev->driver);
-diff --git a/drivers/tty/serdev/serdev-ttyport.c b/drivers/tty/serdev/serdev-ttyport.c
-index d05393594f15..db2bc601e554 100644
---- a/drivers/tty/serdev/serdev-ttyport.c
-+++ b/drivers/tty/serdev/serdev-ttyport.c
-@@ -14,6 +14,7 @@
- #include <linux/serdev.h>
- #include <linux/tty.h>
- #include <linux/tty_driver.h>
-+#include <linux/poll.h>
- 
- #define SERPORT_ACTIVE		1
- 
-@@ -47,10 +48,13 @@ static void ttyport_write_wakeup(struct tty_port *port)
- 	struct serport *serport = serdev_controller_get_drvdata(ctrl);
- 
- 	if (!test_and_clear_bit(TTY_DO_WRITE_WAKEUP, &port->tty->flags))
--		return;
-+		goto out;
- 
- 	if (test_bit(SERPORT_ACTIVE, &serport->flags))
- 		serdev_controller_write_wakeup(ctrl);
-+
-+out:
-+	wake_up_interruptible_poll(&port->tty->write_wait, POLLOUT);
+ 	return omap_up_info;
  }
  
- static const struct tty_port_client_operations client_ops = {
-@@ -167,6 +171,14 @@ static void ttyport_set_flow_control(struct serdev_controller *ctrl, bool enable
- 	tty_set_termios(tty, &ktermios);
- }
- 
-+static void ttyport_wait_until_sent(struct serdev_controller *ctrl, long timeout)
-+{
-+	struct serport *serport = serdev_controller_get_drvdata(ctrl);
-+	struct tty_struct *tty = serport->tty;
-+
-+	tty_wait_until_sent(tty, timeout);
-+}
-+
- static const struct serdev_controller_ops ctrl_ops = {
- 	.write_buf = ttyport_write_buf,
- 	.write_flush = ttyport_write_flush,
-@@ -175,6 +187,7 @@ static const struct serdev_controller_ops ctrl_ops = {
- 	.close = ttyport_close,
- 	.set_flow_control = ttyport_set_flow_control,
- 	.set_baudrate = ttyport_set_baudrate,
-+	.wait_until_sent = ttyport_wait_until_sent,
- };
- 
- struct device *serdev_tty_port_register(struct tty_port *port,
-diff --git a/include/linux/serdev.h b/include/linux/serdev.h
-index 9519da6253a8..a308b206d204 100644
---- a/include/linux/serdev.h
-+++ b/include/linux/serdev.h
-@@ -81,6 +81,7 @@ struct serdev_controller_ops {
- 	void (*close)(struct serdev_controller *);
- 	void (*set_flow_control)(struct serdev_controller *, bool);
- 	unsigned int (*set_baudrate)(struct serdev_controller *, unsigned int);
-+	void (*wait_until_sent)(struct serdev_controller *, long);
- };
- 
- /**
-@@ -186,6 +187,7 @@ int serdev_device_open(struct serdev_device *);
- void serdev_device_close(struct serdev_device *);
- unsigned int serdev_device_set_baudrate(struct serdev_device *, unsigned int);
- void serdev_device_set_flow_control(struct serdev_device *, bool);
-+void serdev_device_wait_until_sent(struct serdev_device *, long);
- int serdev_device_write_buf(struct serdev_device *, const unsigned char *, size_t);
- void serdev_device_write_flush(struct serdev_device *);
- int serdev_device_write_room(struct serdev_device *);
-@@ -223,6 +225,7 @@ static inline unsigned int serdev_device_set_baudrate(struct serdev_device *sdev
- 	return 0;
- }
- static inline void serdev_device_set_flow_control(struct serdev_device *sdev, bool enable) {}
-+static inline void serdev_device_wait_until_sent(struct serdev_device *sdev, long timeout) {}
- static inline int serdev_device_write_buf(struct serdev_device *sdev, const unsigned char *buf, size_t count)
- {
- 	return -ENODEV;
 -- 
 2.11.0
