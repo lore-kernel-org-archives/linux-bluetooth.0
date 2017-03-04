@@ -13,105 +13,119 @@ Cc: Tony Lindgren <tony@atomide.com>,
 	linux-serial@vger.kernel.org,
 	devicetree@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 08/10] serdev: add serdev_device_get_cts
-Date: Sat,  4 Mar 2017 12:58:31 +0100
-Message-Id: <20170304115833.3538-9-sre@kernel.org>
+Subject: [PATCH 07/10] serdev: add serdev_device_wait_until_sent
+Date: Sat,  4 Mar 2017 12:58:30 +0100
+Message-Id: <20170304115833.3538-8-sre@kernel.org>
 In-Reply-To: <20170304115833.3538-1-sre@kernel.org>
 References: <20170304115833.3538-1-sre@kernel.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add method to get current CTS line state.
+Add method, which waits until the transmission buffer has been sent.
 
 Signed-off-by: Sebastian Reichel <sre@kernel.org>
 ---
  drivers/tty/serdev/core.c           | 11 +++++++++++
- drivers/tty/serdev/serdev-ttyport.c | 15 +++++++++++++++
- include/linux/serdev.h              |  6 ++++++
- 3 files changed, 32 insertions(+)
+ drivers/tty/serdev/serdev-ttyport.c | 15 ++++++++++++++-
+ include/linux/serdev.h              |  3 +++
+ 3 files changed, 28 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/tty/serdev/core.c b/drivers/tty/serdev/core.c
-index a63b74031e22..36eb3dfb1477 100644
+index f4c6c90add78..a63b74031e22 100644
 --- a/drivers/tty/serdev/core.c
 +++ b/drivers/tty/serdev/core.c
-@@ -184,6 +184,17 @@ void serdev_device_wait_until_sent(struct serdev_device *serdev, long timeout)
+@@ -173,6 +173,17 @@ void serdev_device_set_flow_control(struct serdev_device *serdev, bool enable)
  }
- EXPORT_SYMBOL_GPL(serdev_device_wait_until_sent);
+ EXPORT_SYMBOL_GPL(serdev_device_set_flow_control);
  
-+bool serdev_device_get_cts(struct serdev_device *serdev)
++void serdev_device_wait_until_sent(struct serdev_device *serdev, long timeout)
 +{
 +	struct serdev_controller *ctrl = serdev->ctrl;
 +
-+	if (!ctrl || !ctrl->ops->get_cts)
-+		return false;
++	if (!ctrl || !ctrl->ops->wait_until_sent)
++		return;
 +
-+	return ctrl->ops->get_cts(ctrl);
++	ctrl->ops->wait_until_sent(ctrl, timeout);
 +}
-+EXPORT_SYMBOL_GPL(serdev_device_get_cts);
++EXPORT_SYMBOL_GPL(serdev_device_wait_until_sent);
 +
  static int serdev_drv_probe(struct device *dev)
  {
  	const struct serdev_device_driver *sdrv = to_serdev_device_driver(dev->driver);
 diff --git a/drivers/tty/serdev/serdev-ttyport.c b/drivers/tty/serdev/serdev-ttyport.c
-index db2bc601e554..3eaca7560e2e 100644
+index d05393594f15..db2bc601e554 100644
 --- a/drivers/tty/serdev/serdev-ttyport.c
 +++ b/drivers/tty/serdev/serdev-ttyport.c
-@@ -179,6 +179,20 @@ static void ttyport_wait_until_sent(struct serdev_controller *ctrl, long timeout
- 	tty_wait_until_sent(tty, timeout);
+@@ -14,6 +14,7 @@
+ #include <linux/serdev.h>
+ #include <linux/tty.h>
+ #include <linux/tty_driver.h>
++#include <linux/poll.h>
+ 
+ #define SERPORT_ACTIVE		1
+ 
+@@ -47,10 +48,13 @@ static void ttyport_write_wakeup(struct tty_port *port)
+ 	struct serport *serport = serdev_controller_get_drvdata(ctrl);
+ 
+ 	if (!test_and_clear_bit(TTY_DO_WRITE_WAKEUP, &port->tty->flags))
+-		return;
++		goto out;
+ 
+ 	if (test_bit(SERPORT_ACTIVE, &serport->flags))
+ 		serdev_controller_write_wakeup(ctrl);
++
++out:
++	wake_up_interruptible_poll(&port->tty->write_wait, POLLOUT);
  }
  
-+static bool ttyport_get_cts(struct serdev_controller *ctrl)
+ static const struct tty_port_client_operations client_ops = {
+@@ -167,6 +171,14 @@ static void ttyport_set_flow_control(struct serdev_controller *ctrl, bool enable
+ 	tty_set_termios(tty, &ktermios);
+ }
+ 
++static void ttyport_wait_until_sent(struct serdev_controller *ctrl, long timeout)
 +{
 +	struct serport *serport = serdev_controller_get_drvdata(ctrl);
 +	struct tty_struct *tty = serport->tty;
-+	int status;
 +
-+	if (!tty->ops->tiocmget)
-+		return false;
-+
-+	status = tty->ops->tiocmget(tty);
-+
-+	return !!(status & TIOCM_CTS);
++	tty_wait_until_sent(tty, timeout);
 +}
 +
  static const struct serdev_controller_ops ctrl_ops = {
  	.write_buf = ttyport_write_buf,
  	.write_flush = ttyport_write_flush,
-@@ -188,6 +202,7 @@ static const struct serdev_controller_ops ctrl_ops = {
+@@ -175,6 +187,7 @@ static const struct serdev_controller_ops ctrl_ops = {
+ 	.close = ttyport_close,
  	.set_flow_control = ttyport_set_flow_control,
  	.set_baudrate = ttyport_set_baudrate,
- 	.wait_until_sent = ttyport_wait_until_sent,
-+	.get_cts = ttyport_get_cts,
++	.wait_until_sent = ttyport_wait_until_sent,
  };
  
  struct device *serdev_tty_port_register(struct tty_port *port,
 diff --git a/include/linux/serdev.h b/include/linux/serdev.h
-index a308b206d204..b0c47402d84a 100644
+index 9519da6253a8..a308b206d204 100644
 --- a/include/linux/serdev.h
 +++ b/include/linux/serdev.h
-@@ -82,6 +82,7 @@ struct serdev_controller_ops {
+@@ -81,6 +81,7 @@ struct serdev_controller_ops {
+ 	void (*close)(struct serdev_controller *);
  	void (*set_flow_control)(struct serdev_controller *, bool);
  	unsigned int (*set_baudrate)(struct serdev_controller *, unsigned int);
- 	void (*wait_until_sent)(struct serdev_controller *, long);
-+	bool (*get_cts)(struct serdev_controller *);
++	void (*wait_until_sent)(struct serdev_controller *, long);
  };
  
  /**
-@@ -188,6 +189,7 @@ void serdev_device_close(struct serdev_device *);
+@@ -186,6 +187,7 @@ int serdev_device_open(struct serdev_device *);
+ void serdev_device_close(struct serdev_device *);
  unsigned int serdev_device_set_baudrate(struct serdev_device *, unsigned int);
  void serdev_device_set_flow_control(struct serdev_device *, bool);
- void serdev_device_wait_until_sent(struct serdev_device *, long);
-+bool serdev_device_get_cts(struct serdev_device *);
++void serdev_device_wait_until_sent(struct serdev_device *, long);
  int serdev_device_write_buf(struct serdev_device *, const unsigned char *, size_t);
  void serdev_device_write_flush(struct serdev_device *);
  int serdev_device_write_room(struct serdev_device *);
-@@ -226,6 +228,10 @@ static inline unsigned int serdev_device_set_baudrate(struct serdev_device *sdev
+@@ -223,6 +225,7 @@ static inline unsigned int serdev_device_set_baudrate(struct serdev_device *sdev
+ 	return 0;
  }
  static inline void serdev_device_set_flow_control(struct serdev_device *sdev, bool enable) {}
- static inline void serdev_device_wait_until_sent(struct serdev_device *sdev, long timeout) {}
-+static inline bool serdev_device_get_cts(struct serdev_device *serdev)
-+{
-+	return false;
-+}
++static inline void serdev_device_wait_until_sent(struct serdev_device *sdev, long timeout) {}
  static inline int serdev_device_write_buf(struct serdev_device *sdev, const unsigned char *buf, size_t count)
  {
  	return -ENODEV;
