@@ -1,131 +1,151 @@
-Return-Path: <netdev-owner@vger.kernel.org>
-Subject: Re: [PATCH v6 6/6] 6lowpan: Fix IID format for Bluetooth
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-References: <20170302132335.21192-1-luiz.dentz@gmail.com>
- <20170302132335.21192-7-luiz.dentz@gmail.com>
-From: Alexander Aring <aar@pengutronix.de>
-Cc: linux-bluetooth@vger.kernel.org, patrik.flykt@linux.intel.com,
-        jukka.rissanen@linux.intel.com, linux-wpan@vger.kernel.org,
-        netdev@vger.kernel.org
-Message-ID: <eaf424c0-731a-2bab-0050-35d0a1091fcb@pengutronix.de>
-Date: Mon, 6 Mar 2017 21:03:24 +0100
+Return-Path: <Dean_Jenkins@mentor.com>
+From: Dean Jenkins <Dean_Jenkins@mentor.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: Dean Jenkins <Dean_Jenkins@mentor.com>, Yichen Zhao
+	<zhaoyichen@google.com>, "Gustavo F . Padovan" <gustavo@padovan.org>, Johan
+ Hedberg <johan.hedberg@gmail.com>, <linux-bluetooth@vger.kernel.org>
+Subject: [PATCH V1 0/2] Avoid bt_accept_unlink() double unlinking 
+Date: Mon, 6 Mar 2017 18:31:40 +0000
+Message-ID: <1488825102-29594-1-git-send-email-Dean_Jenkins@mentor.com>
 MIME-Version: 1.0
-In-Reply-To: <20170302132335.21192-7-luiz.dentz@gmail.com>
-Content-Type: text/plain; charset=windows-1252
-Sender: netdev-owner@vger.kernel.org
+Content-Type: text/plain
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+This is a patchset to manage a race condition between bt_accept_dequeue() and
+bt_accept_unlink() that leads to double unlinking resulting in a NULL pointer
+dereference crash.
 
-Hi,
+This issue has been highlighted in the following mailing list threads:
 
-sorry, I decided now to take a look into the patch... Currently I have
-no time to do anything... normally. That's why I simple said "everything
-okay" in irc.
+http://www.spinics.net/lists/linux-bluetooth/msg67218.html
+"[PATCH] Bluetooth: Fix l2cap_sock_teardown_cb race condition with
+bt_accept_dequeue" by Yichen Zhao
 
-On 03/02/2017 02:23 PM, Luiz Augusto von Dentz wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> According to RFC 7668 U/L bit shall not be used:
-> 
-> https://wiki.tools.ietf.org/html/rfc7668#section-3.2.2 [Page 10]:
-> 
->    In the figure, letter 'b' represents a bit from the
->    Bluetooth device address, copied as is without any changes on any
->    bit.  This means that no bit in the IID indicates whether the
->    underlying Bluetooth device address is public or random.
-> 
->    |0              1|1              3|3              4|4              6|
->    |0              5|6              1|2              7|8              3|
->    +----------------+----------------+----------------+----------------+
->    |bbbbbbbbbbbbbbbb|bbbbbbbb11111111|11111110bbbbbbbb|bbbbbbbbbbbbbbbb|
->    +----------------+----------------+----------------+----------------+
-> 
-> Because of this the code cannot figure out the address type from the IP
-> address anymore thus it makes no sense to use peer_lookup_ba as it needs
-> the peer address type.
-> 
-> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> Reviewed-by: Stefan Schmidt <stefan@osg.samsung.com>
-> Acked-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
-> ---
->  include/net/6lowpan.h   |  4 ---
->  include/net/addrconf.h  |  7 ++++-
->  net/bluetooth/6lowpan.c | 79 ++++++++-----------------------------------------
->  3 files changed, 18 insertions(+), 72 deletions(-)
-> 
-> diff --git a/include/net/6lowpan.h b/include/net/6lowpan.h
-> index c5792cb..a713780 100644
-> --- a/include/net/6lowpan.h
-> +++ b/include/net/6lowpan.h
-> @@ -211,10 +211,6 @@ static inline void lowpan_iphc_uncompress_eui48_lladdr(struct in6_addr *ipaddr,
->  	ipaddr->s6_addr[11] = 0xFF;
->  	ipaddr->s6_addr[12] = 0xFE;
->  	memcpy(&ipaddr->s6_addr[13], lladdr + 3, 3);
-> -	/* second bit-flip (Universe/Local)
-> -	 * is done according RFC2464
-> -	 */
-> -	ipaddr->s6_addr[8] ^= 0x02;
->  }
->  
->  #ifdef DEBUG
-> diff --git a/include/net/addrconf.h b/include/net/addrconf.h
-> index 17c6fd8..3931fd2 100644
-> --- a/include/net/addrconf.h
-> +++ b/include/net/addrconf.h
-> @@ -129,7 +129,12 @@ static inline int addrconf_ifid_eui48(u8 *eui, struct net_device *dev)
->  	} else {
->  		eui[3] = 0xFF;
->  		eui[4] = 0xFE;
-> -		eui[0] ^= 2;
-> +
-> +		/*
-> +		 * According to RFC 7668 U/L bit shall not be toggled.
-> +		 */
-> +		if (dev->type != ARPHRD_6LOWPAN)
-> +			eui[0] ^= 2;
->  	}
->  	return 0;
->  }
+https://www.spinics.net/lists/linux-bluetooth/msg69647.html
+"L2CAP l2cap_sock_teardown_cb() race condition with RFCOMM
+rfcomm_accept_connection()" by Dean Jenkins
 
-I don't know why you make this in such function which is called by a lot
-of others dev->types which are not ARPHRD_6LOWPAN.
 
-What addrconf does now is a switch case over dev->type and then calling
-addrconf_ifid_eui48 for some cases and recheck again dev->type for a
-special case of ARPHRD_6LOWPAN.
+Reproduction of crash
+---------------------
 
-ARPHRD_6LOWPAN is also somehow wrong because you need check on ARPHRD_6LOWPAN and
-LLTYPE_BTLE. As I mentioned the IPv6-over-foo adaptation describes how
-to generate IID and not the dev->addr_len.
+On our commercial highly modified ARM kernel 3.14 a rare crash was seen:
 
----
+Unable to handle kernel NULL pointer dereference at virtual address 0000013c
+pgd = 80004000
+[0000013c] *pgd=00000000
+Internal error: Oops: 17 [#1] PREEMPT SMP ARM
+CPU: 1 PID: 1085 Comm: krfcommd Not tainted 3.14.51-03614-g82f0eab #1
+[17685.267230] task: aaa5d080 ti: aabd0000 task.ti: aabd0000
+PC is at bt_accept_unlink+0x34/0x78 [bluetooth]
+LR is at bt_accept_dequeue+0x4c/0xe0 [bluetooth]
+pc : [<7f37d1d0>]    lr : [<7f37d260>]    psr: 600d0013
+sp : aabd1e20  ip : aabd1e30  fp : aabd1e2c
+r10: b316f3bc  r9 : aab39e00  r8 : af4135c0
+r7 : aab39fc0  r6 : 9f81a600  r5 : b4786bc0  r4 : b4786a00
+r3 : 0000013c  r2 : b4786bc0  r1 : b4786bc0  r0 : b4786a00
+Flags: nZCv  IRQs on  FIQs on  Mode SVC_32  ISA ARM  Segment kernel
+Control: 10c5387d  Table: 388e404a  DAC: 00000015
+Process krfcommd (pid: 1085, stack limit = 0xaabd0238)
+Backtrace: 
+[<7f37d19c>] (bt_accept_unlink [bluetooth]) from [<7f37d260>] (bt_accept_dequeue+0x4c/0xe0 [bluetooth])
+[<7f37d214>] (bt_accept_dequeue [bluetooth]) from [<7f39ed64>] (l2cap_sock_accept+0x9c/0x14c [bluetooth])
+[<7f39ecc8>] (l2cap_sock_accept [bluetooth]) from [<80441a90>] (kernel_accept+0x54/0x94)
+[<80441a3c>] (kernel_accept) from [<7f3d0934>] (rfcomm_run+0x1d8/0x1088 [rfcomm])
+[<7f3d075c>] (rfcomm_run [rfcomm]) from [<8004209c>] (kthread+0xec/0x100)
+[<80041fb0>] (kthread) from [<8000e1d0>] (ret_from_fork+0x14/0x24)
+Code: e58031c0 e58031c4 e59031c8 e2833f4f (e1d320b0) 
+Kernel panic - not syncing: Fatal exception
 
-Second thing is we bitflip u/l and then we bitflip again because we
-don't want it and do it again...
+bt_accept_dequeue() is the victim of another thread calling bt_accept_unlink()
+which causes an attempt to double unlink the same sk and this crashes.
 
----
+The probability of failure can be increased by a adding a 1 second msleep here:
 
-Anyway, I see it will working for you... but it's very confusing for me.
-Don't use addrconf_ifid_eui48 here, grab 2-3 code lines from which does:
+diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
+index cfb2fab..3d3772a 100644
+--- a/net/bluetooth/af_bluetooth.c
++++ b/net/bluetooth/af_bluetooth.c
+@@ -184,6 +184,8 @@ struct sock *bt_accept_dequeue(struct sock *parent, struct socket *newsock)
+ 	list_for_each_entry_safe(s, n, &bt_sk(parent)->accept_q, accept_q) {
+		sk = (struct sock *)s;
+ 
++		/* increase probability of failure by sleeping */
++		msleep(1000);
+		lock_sock(sk);
+ 
+		/* FIXME: Is this check still needed */
 
-1. copy first mac addr bytes
-2. set FF FE
-3. copy last mac addr bytes
+The 1 second sleep is only for test purposes and suspect it can be reduced and
+still trigger the crash. Therefore, the failure is hard to reproduce without
+adding some artificial manipulation of the timing of the threads.
 
-and this according LLTYPE_BTLE and not dev->addr_len....
+With the 1 second sleep test code in place, the kernel will crash every-time
+the PTS test suite runs testcase RFCOMM/DEVA-DEVB/RFC/BV-13C
 
----
+This testcase performs pairing then requests a RFCOMM connection with the kernel
+and establishes a RFCOMM connection. The test does a remote line status exchange
+then immediately drops the RF connection by doing a HCI RESET command on the
+testing equipment. No DISCs are seen on RFCOMM and no L2CAP channels are
+requested to disconnect. In the kernel under test, this causes the RFCOMM and
+L2CAP layers to proceed to clean up but causes both RFCOMM and L2CAP layers to
+unlink the same sk with causes a NULL pointer crash in bt_accept_unlink().
 
-For me it's not acceptable because you doing dev->type handling which is
-already evaluated before and other subsystems will do such check as
-well. We can avoid this check on others subsystems. If your IID is
-different generated than a normal EUI48, then simple don't use
-addrconf_ifid_eui48.
+For testing, the patches were ported on top of Linux 4.10.1 on a PC with some
+msleep debug added. The PTS testcase was run which showed that the fix worked by
+outputting the following debug in dmesg and no crash occurred:
 
----
+bt_accept_dequeue: sk ffff939d7fdac400, already unlinked
 
-We already talked about to place the 8 IID bytes into 6lowpan netdev private
-space. If we do that later, we need to touch addrconf_ifid_eui48
-again..
 
-- Alex
+Description of issue
+--------------------
+
+The issue is that bt_accept_dequeue() is not prevented from running in parallel
+with bt_accept_unlink(). There is sk locking, but this can cause the
+list_for_each_entry_safe sk loop in bt_accept_dequeue() to wait for the sk lock
+to become available. If bt_accept_dequeue() waits and then wakes-up, the sk
+pointer can become stale because bt_accept_unlink() might of been called by the
+parallel thread.
+
+An alternative solution could be to lock the parent list as attempted by
+Yichen Zhao's patch. However, this parent locking would need to be applied in
+all possible thread combinations of bt_accept_dequeue() and bt_accept_unlink().
+Also the parent locking may be conditional as sk may or may not be in the parent
+list at the time of deciding whether to apply the parent lock and that is
+undesirable as the code becomes complex.
+
+Therefore, avoid the crash by detecting an attempt at unlinking the same sk
+twice.
+
+
+Solution
+--------
+
+1. Patch "Bluetooth: Handle bt_accept_enqueue() socket atomically"
+
+Ensure that the socket is in the parent list with the parent member set. Do
+this by adding sk locking in bt_accept_enqueue(). Therefore, it should not be
+possible to have a socket in the parent list with a NULL parent member.
+
+2. Patch "Bluetooth: Avoid bt_accept_unlink() double unlinking"
+
+Add a defensive test into bt_accept_dequeue() to check that sk has a non-NULL
+parent member otherwise sk has already been unlinked so ignore this now stale
+sk pointer.
+
+
+The following patches will apply cleanly to bluetooth-next master branch
+with head commit:
+
+8f91566 btmrvl: fix spelling mistake: "actived" -> "activated"
+
+Dean Jenkins (2):
+  Bluetooth: Handle bt_accept_enqueue() socket atomically
+  Bluetooth: Avoid bt_accept_unlink() double unlinking
+
+ net/bluetooth/af_bluetooth.c | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
+
+-- 
+2.7.4
