@@ -4,148 +4,89 @@ To: Marcel Holtmann <marcel@holtmann.org>
 CC: Dean Jenkins <Dean_Jenkins@mentor.com>, Yichen Zhao
 	<zhaoyichen@google.com>, "Gustavo F . Padovan" <gustavo@padovan.org>, Johan
  Hedberg <johan.hedberg@gmail.com>, <linux-bluetooth@vger.kernel.org>
-Subject: [PATCH V1 0/2] Avoid bt_accept_unlink() double unlinking 
-Date: Mon, 6 Mar 2017 18:31:40 +0000
-Message-ID: <1488825102-29594-1-git-send-email-Dean_Jenkins@mentor.com>
+Subject: [PATCH V1 2/2] Bluetooth: Avoid bt_accept_unlink() double unlinking
+Date: Mon, 6 Mar 2017 18:31:42 +0000
+Message-ID: <1488825102-29594-3-git-send-email-Dean_Jenkins@mentor.com>
+In-Reply-To: <1488825102-29594-1-git-send-email-Dean_Jenkins@mentor.com>
+References: <1488825102-29594-1-git-send-email-Dean_Jenkins@mentor.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is a patchset to manage a race condition between bt_accept_dequeue() and
-bt_accept_unlink() that leads to double unlinking resulting in a NULL pointer
-dereference crash.
+There is a race condition between a thread calling bt_accept_dequeue()
+and a different thread calling bt_accept_unlink(). Protection against
+concurrency is implemented using sk locking. However, sk locking causes
+serialisation of the bt_accept_dequeue() and bt_accept_unlink() threads.
+This serialisation can cause bt_accept_dequeue() to obtain the sk from the
+parent list but becomes blocked waiting for the sk lock held by the
+bt_accept_unlink() thread. bt_accept_unlink() unlinks sk and this thread
+releases the sk lock unblocking bt_accept_dequeue() which potentially runs
+bt_accept_unlink() again on the same sk causing a crash. The attempt to
+double unlink the same sk from the parent list can cause a NULL pointer
+dereference crash due to bt_sk(sk)->parent becoming NULL on the first
+unlink, followed by the second unlink trying to execute
+bt_sk(sk)->parent->sk_ack_backlog-- in bt_accept_unlink() which crashes.
 
-This issue has been highlighted in the following mailing list threads:
+When sk is in the parent list, bt_sk(sk)->parent will be not be NULL.
+When sk is removed from the parent list, bt_sk(sk)->parent is set to
+NULL. Therefore, add a defensive check for bt_sk(sk)->parent not being
+NULL to ensure that sk is still in the parent list after the sk lock has
+been taken in bt_accept_dequeue().
 
-http://www.spinics.net/lists/linux-bluetooth/msg67218.html
-"[PATCH] Bluetooth: Fix l2cap_sock_teardown_cb race condition with
-bt_accept_dequeue" by Yichen Zhao
+In addition, in bt_accept_dequeue() increase the sk reference count to
+protect against early freeing of sk. Early freeing can be possible if the
+bt_accept_unlink() thread calls l2cap_sock_kill() or rfcomm_sock_kill()
+functions before bt_accept_dequeue() gets the sk lock.
 
-https://www.spinics.net/lists/linux-bluetooth/msg69647.html
-"L2CAP l2cap_sock_teardown_cb() race condition with RFCOMM
-rfcomm_accept_connection()" by Dean Jenkins
+For test purposes, the probability of failure can be increased by putting
+a msleep of 1 second in bt_accept_dequeue() between getting the sk and
+waiting for the sk lock. This exposes the fact that the loop
+list_for_each_safe(p, n, &bt_sk(parent)->accept_q) is not safe from
+threads that unlink sk from the list in parallel with the loop which can
+cause sk to become stale within the loop.
 
-
-Reproduction of crash
----------------------
-
-On our commercial highly modified ARM kernel 3.14 a rare crash was seen:
-
-Unable to handle kernel NULL pointer dereference at virtual address 0000013c
-pgd = 80004000
-[0000013c] *pgd=00000000
-Internal error: Oops: 17 [#1] PREEMPT SMP ARM
-CPU: 1 PID: 1085 Comm: krfcommd Not tainted 3.14.51-03614-g82f0eab #1
-[17685.267230] task: aaa5d080 ti: aabd0000 task.ti: aabd0000
-PC is at bt_accept_unlink+0x34/0x78 [bluetooth]
-LR is at bt_accept_dequeue+0x4c/0xe0 [bluetooth]
-pc : [<7f37d1d0>]    lr : [<7f37d260>]    psr: 600d0013
-sp : aabd1e20  ip : aabd1e30  fp : aabd1e2c
-r10: b316f3bc  r9 : aab39e00  r8 : af4135c0
-r7 : aab39fc0  r6 : 9f81a600  r5 : b4786bc0  r4 : b4786a00
-r3 : 0000013c  r2 : b4786bc0  r1 : b4786bc0  r0 : b4786a00
-Flags: nZCv  IRQs on  FIQs on  Mode SVC_32  ISA ARM  Segment kernel
-Control: 10c5387d  Table: 388e404a  DAC: 00000015
-Process krfcommd (pid: 1085, stack limit = 0xaabd0238)
-Backtrace: 
-[<7f37d19c>] (bt_accept_unlink [bluetooth]) from [<7f37d260>] (bt_accept_dequeue+0x4c/0xe0 [bluetooth])
-[<7f37d214>] (bt_accept_dequeue [bluetooth]) from [<7f39ed64>] (l2cap_sock_accept+0x9c/0x14c [bluetooth])
-[<7f39ecc8>] (l2cap_sock_accept [bluetooth]) from [<80441a90>] (kernel_accept+0x54/0x94)
-[<80441a3c>] (kernel_accept) from [<7f3d0934>] (rfcomm_run+0x1d8/0x1088 [rfcomm])
-[<7f3d075c>] (rfcomm_run [rfcomm]) from [<8004209c>] (kthread+0xec/0x100)
-[<80041fb0>] (kthread) from [<8000e1d0>] (ret_from_fork+0x14/0x24)
-Code: e58031c0 e58031c4 e59031c8 e2833f4f (e1d320b0) 
-Kernel panic - not syncing: Fatal exception
-
-bt_accept_dequeue() is the victim of another thread calling bt_accept_unlink()
-which causes an attempt to double unlink the same sk and this crashes.
-
-The probability of failure can be increased by a adding a 1 second msleep here:
+Signed-off-by: Dean Jenkins <Dean_Jenkins@mentor.com>
+---
+ net/bluetooth/af_bluetooth.c | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
 diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
-index cfb2fab..3d3772a 100644
+index e489c54..9ce3f0b 100644
 --- a/net/bluetooth/af_bluetooth.c
 +++ b/net/bluetooth/af_bluetooth.c
-@@ -184,6 +184,8 @@ struct sock *bt_accept_dequeue(struct sock *parent, struct socket *newsock)
+@@ -165,6 +165,9 @@ void bt_accept_enqueue(struct sock *parent, struct sock *sk)
+ }
+ EXPORT_SYMBOL(bt_accept_enqueue);
+ 
++/* Calling function must hold the sk lock.
++ * bt_sk(sk)->parent must be non-NULL meaning sk is in the parent list.
++ */
+ void bt_accept_unlink(struct sock *sk)
+ {
+ 	BT_DBG("sk %p state %d", sk, sk->sk_state);
+@@ -186,8 +189,23 @@ struct sock *bt_accept_dequeue(struct sock *parent, struct socket *newsock)
  	list_for_each_entry_safe(s, n, &bt_sk(parent)->accept_q, accept_q) {
-		sk = (struct sock *)s;
+ 		sk = (struct sock *)s;
  
-+		/* increase probability of failure by sleeping */
-+		msleep(1000);
-		lock_sock(sk);
++		/* Prevent early freeing of sk due to unlink and sock_kill */
++		sock_hold(sk);
+ 		lock_sock(sk);
  
-		/* FIXME: Is this check still needed */
-
-The 1 second sleep is only for test purposes and suspect it can be reduced and
-still trigger the crash. Therefore, the failure is hard to reproduce without
-adding some artificial manipulation of the timing of the threads.
-
-With the 1 second sleep test code in place, the kernel will crash every-time
-the PTS test suite runs testcase RFCOMM/DEVA-DEVB/RFC/BV-13C
-
-This testcase performs pairing then requests a RFCOMM connection with the kernel
-and establishes a RFCOMM connection. The test does a remote line status exchange
-then immediately drops the RF connection by doing a HCI RESET command on the
-testing equipment. No DISCs are seen on RFCOMM and no L2CAP channels are
-requested to disconnect. In the kernel under test, this causes the RFCOMM and
-L2CAP layers to proceed to clean up but causes both RFCOMM and L2CAP layers to
-unlink the same sk with causes a NULL pointer crash in bt_accept_unlink().
-
-For testing, the patches were ported on top of Linux 4.10.1 on a PC with some
-msleep debug added. The PTS testcase was run which showed that the fix worked by
-outputting the following debug in dmesg and no crash occurred:
-
-bt_accept_dequeue: sk ffff939d7fdac400, already unlinked
-
-
-Description of issue
---------------------
-
-The issue is that bt_accept_dequeue() is not prevented from running in parallel
-with bt_accept_unlink(). There is sk locking, but this can cause the
-list_for_each_entry_safe sk loop in bt_accept_dequeue() to wait for the sk lock
-to become available. If bt_accept_dequeue() waits and then wakes-up, the sk
-pointer can become stale because bt_accept_unlink() might of been called by the
-parallel thread.
-
-An alternative solution could be to lock the parent list as attempted by
-Yichen Zhao's patch. However, this parent locking would need to be applied in
-all possible thread combinations of bt_accept_dequeue() and bt_accept_unlink().
-Also the parent locking may be conditional as sk may or may not be in the parent
-list at the time of deciding whether to apply the parent lock and that is
-undesirable as the code becomes complex.
-
-Therefore, avoid the crash by detecting an attempt at unlinking the same sk
-twice.
-
-
-Solution
---------
-
-1. Patch "Bluetooth: Handle bt_accept_enqueue() socket atomically"
-
-Ensure that the socket is in the parent list with the parent member set. Do
-this by adding sk locking in bt_accept_enqueue(). Therefore, it should not be
-possible to have a socket in the parent list with a NULL parent member.
-
-2. Patch "Bluetooth: Avoid bt_accept_unlink() double unlinking"
-
-Add a defensive test into bt_accept_dequeue() to check that sk has a non-NULL
-parent member otherwise sk has already been unlinked so ignore this now stale
-sk pointer.
-
-
-The following patches will apply cleanly to bluetooth-next master branch
-with head commit:
-
-8f91566 btmrvl: fix spelling mistake: "actived" -> "activated"
-
-Dean Jenkins (2):
-  Bluetooth: Handle bt_accept_enqueue() socket atomically
-  Bluetooth: Avoid bt_accept_unlink() double unlinking
-
- net/bluetooth/af_bluetooth.c | 20 ++++++++++++++++++++
- 1 file changed, 20 insertions(+)
-
++		/* Check sk has not already been unlinked via
++		 * bt_accept_unlink() due to serialisation caused by sk locking
++		 */
++		if (!bt_sk(sk)->parent) {
++			BT_DBG("sk %p, already unlinked", sk);
++			release_sock(sk);
++			sock_put(sk);
++			continue;
++		}
++
++		/* sk is safely in the parent list so reduce reference count */
++		sock_put(sk);
++
+ 		/* FIXME: Is this check still needed */
+ 		if (sk->sk_state == BT_CLOSED) {
+ 			bt_accept_unlink(sk);
 -- 
 2.7.4
