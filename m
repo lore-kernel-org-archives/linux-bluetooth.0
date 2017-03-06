@@ -4,89 +4,45 @@ To: Marcel Holtmann <marcel@holtmann.org>
 CC: Dean Jenkins <Dean_Jenkins@mentor.com>, Yichen Zhao
 	<zhaoyichen@google.com>, "Gustavo F . Padovan" <gustavo@padovan.org>, Johan
  Hedberg <johan.hedberg@gmail.com>, <linux-bluetooth@vger.kernel.org>
-Subject: [PATCH V1 2/2] Bluetooth: Avoid bt_accept_unlink() double unlinking
-Date: Mon, 6 Mar 2017 18:31:42 +0000
-Message-ID: <1488825102-29594-3-git-send-email-Dean_Jenkins@mentor.com>
+Subject: [PATCH V1 1/2] Bluetooth: Handle bt_accept_enqueue() socket atomically
+Date: Mon, 6 Mar 2017 18:31:41 +0000
+Message-ID: <1488825102-29594-2-git-send-email-Dean_Jenkins@mentor.com>
 In-Reply-To: <1488825102-29594-1-git-send-email-Dean_Jenkins@mentor.com>
 References: <1488825102-29594-1-git-send-email-Dean_Jenkins@mentor.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-There is a race condition between a thread calling bt_accept_dequeue()
-and a different thread calling bt_accept_unlink(). Protection against
-concurrency is implemented using sk locking. However, sk locking causes
-serialisation of the bt_accept_dequeue() and bt_accept_unlink() threads.
-This serialisation can cause bt_accept_dequeue() to obtain the sk from the
-parent list but becomes blocked waiting for the sk lock held by the
-bt_accept_unlink() thread. bt_accept_unlink() unlinks sk and this thread
-releases the sk lock unblocking bt_accept_dequeue() which potentially runs
-bt_accept_unlink() again on the same sk causing a crash. The attempt to
-double unlink the same sk from the parent list can cause a NULL pointer
-dereference crash due to bt_sk(sk)->parent becoming NULL on the first
-unlink, followed by the second unlink trying to execute
-bt_sk(sk)->parent->sk_ack_backlog-- in bt_accept_unlink() which crashes.
+There is a small risk that bt_accept_unlink() runs concurrently with
+bt_accept_enqueue() on the same socket. This scenario could potentially
+lead to a NULL pointer dereference of the socket's parent member because
+the socket can be on the list but the socket's parent member is not yet
+updated by bt_accept_enqueue().
 
-When sk is in the parent list, bt_sk(sk)->parent will be not be NULL.
-When sk is removed from the parent list, bt_sk(sk)->parent is set to
-NULL. Therefore, add a defensive check for bt_sk(sk)->parent not being
-NULL to ensure that sk is still in the parent list after the sk lock has
-been taken in bt_accept_dequeue().
-
-In addition, in bt_accept_dequeue() increase the sk reference count to
-protect against early freeing of sk. Early freeing can be possible if the
-bt_accept_unlink() thread calls l2cap_sock_kill() or rfcomm_sock_kill()
-functions before bt_accept_dequeue() gets the sk lock.
-
-For test purposes, the probability of failure can be increased by putting
-a msleep of 1 second in bt_accept_dequeue() between getting the sk and
-waiting for the sk lock. This exposes the fact that the loop
-list_for_each_safe(p, n, &bt_sk(parent)->accept_q) is not safe from
-threads that unlink sk from the list in parallel with the loop which can
-cause sk to become stale within the loop.
+Therefore, add socket locking inside bt_accept_enqueue() so that the
+socket is added to the list AND the parent's socket address is set in the
+socket's parent member. The socket locking ensures that the socket is on
+the list with a valid non-NULL parent member.
 
 Signed-off-by: Dean Jenkins <Dean_Jenkins@mentor.com>
 ---
- net/bluetooth/af_bluetooth.c | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
+ net/bluetooth/af_bluetooth.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
 diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
-index e489c54..9ce3f0b 100644
+index cfb2fab..e489c54 100644
 --- a/net/bluetooth/af_bluetooth.c
 +++ b/net/bluetooth/af_bluetooth.c
-@@ -165,6 +165,9 @@ void bt_accept_enqueue(struct sock *parent, struct sock *sk)
+@@ -157,8 +157,10 @@ void bt_accept_enqueue(struct sock *parent, struct sock *sk)
+ 	BT_DBG("parent %p, sk %p", parent, sk);
+ 
+ 	sock_hold(sk);
++	lock_sock(sk);
+ 	list_add_tail(&bt_sk(sk)->accept_q, &bt_sk(parent)->accept_q);
+ 	bt_sk(sk)->parent = parent;
++	release_sock(sk);
+ 	parent->sk_ack_backlog++;
  }
  EXPORT_SYMBOL(bt_accept_enqueue);
- 
-+/* Calling function must hold the sk lock.
-+ * bt_sk(sk)->parent must be non-NULL meaning sk is in the parent list.
-+ */
- void bt_accept_unlink(struct sock *sk)
- {
- 	BT_DBG("sk %p state %d", sk, sk->sk_state);
-@@ -186,8 +189,23 @@ struct sock *bt_accept_dequeue(struct sock *parent, struct socket *newsock)
- 	list_for_each_entry_safe(s, n, &bt_sk(parent)->accept_q, accept_q) {
- 		sk = (struct sock *)s;
- 
-+		/* Prevent early freeing of sk due to unlink and sock_kill */
-+		sock_hold(sk);
- 		lock_sock(sk);
- 
-+		/* Check sk has not already been unlinked via
-+		 * bt_accept_unlink() due to serialisation caused by sk locking
-+		 */
-+		if (!bt_sk(sk)->parent) {
-+			BT_DBG("sk %p, already unlinked", sk);
-+			release_sock(sk);
-+			sock_put(sk);
-+			continue;
-+		}
-+
-+		/* sk is safely in the parent list so reduce reference count */
-+		sock_put(sk);
-+
- 		/* FIXME: Is this check still needed */
- 		if (sk->sk_state == BT_CLOSED) {
- 			bt_accept_unlink(sk);
 -- 
 2.7.4
