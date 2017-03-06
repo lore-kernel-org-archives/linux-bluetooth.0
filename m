@@ -1,48 +1,33 @@
-Return-Path: <Dean_Jenkins@mentor.com>
-From: Dean Jenkins <Dean_Jenkins@mentor.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: Dean Jenkins <Dean_Jenkins@mentor.com>, Yichen Zhao
-	<zhaoyichen@google.com>, "Gustavo F . Padovan" <gustavo@padovan.org>, Johan
- Hedberg <johan.hedberg@gmail.com>, <linux-bluetooth@vger.kernel.org>
-Subject: [PATCH V1 1/2] Bluetooth: Handle bt_accept_enqueue() socket atomically
-Date: Mon, 6 Mar 2017 18:31:41 +0000
-Message-ID: <1488825102-29594-2-git-send-email-Dean_Jenkins@mentor.com>
-In-Reply-To: <1488825102-29594-1-git-send-email-Dean_Jenkins@mentor.com>
-References: <1488825102-29594-1-git-send-email-Dean_Jenkins@mentor.com>
+Return-Path: <tony@atomide.com>
+Date: Mon, 6 Mar 2017 08:08:42 -0800
+From: Tony Lindgren <tony@atomide.com>
+To: Sebastian Reichel <sre@kernel.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Jiri Slaby <jslaby@suse.com>, Mark Rutland <mark.rutland@arm.com>,
+	linux-bluetooth@vger.kernel.org, linux-serial@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 02/10] ARM: dts: N900: Add bluetooth
+Message-ID: <20170306160841.GH20572@atomide.com>
+References: <20170304115833.3538-1-sre@kernel.org>
+ <20170304115833.3538-3-sre@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170304115833.3538-3-sre@kernel.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-There is a small risk that bt_accept_unlink() runs concurrently with
-bt_accept_enqueue() on the same socket. This scenario could potentially
-lead to a NULL pointer dereference of the socket's parent member because
-the socket can be on the list but the socket's parent member is not yet
-updated by bt_accept_enqueue().
+* Sebastian Reichel <sre@kernel.org> [170304 04:00]:
+> Add bcm2048 node and its system clock to the N900 device tree file.
+> Apart from that a reference to the new clock has been added to
+> wl1251 (which uses it, too).
+> 
+> Signed-off-by: Sebastian Reichel <sre@kernel.org>
 
-Therefore, add socket locking inside bt_accept_enqueue() so that the
-socket is added to the list AND the parent's socket address is set in the
-socket's parent member. The socket locking ensures that the socket is on
-the list with a valid non-NULL parent member.
+Picking this patch into omap-for-v4.12/dt thanks.
 
-Signed-off-by: Dean Jenkins <Dean_Jenkins@mentor.com>
----
- net/bluetooth/af_bluetooth.c | 2 ++
- 1 file changed, 2 insertions(+)
+Regards,
 
-diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
-index cfb2fab..e489c54 100644
---- a/net/bluetooth/af_bluetooth.c
-+++ b/net/bluetooth/af_bluetooth.c
-@@ -157,8 +157,10 @@ void bt_accept_enqueue(struct sock *parent, struct sock *sk)
- 	BT_DBG("parent %p, sk %p", parent, sk);
- 
- 	sock_hold(sk);
-+	lock_sock(sk);
- 	list_add_tail(&bt_sk(sk)->accept_q, &bt_sk(parent)->accept_q);
- 	bt_sk(sk)->parent = parent;
-+	release_sock(sk);
- 	parent->sk_ack_backlog++;
- }
- EXPORT_SYMBOL(bt_accept_enqueue);
--- 
-2.7.4
+Tony
