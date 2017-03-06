@@ -1,32 +1,45 @@
-Return-Path: <tony@atomide.com>
-Date: Mon, 6 Mar 2017 08:08:26 -0800
-From: Tony Lindgren <tony@atomide.com>
-To: Sebastian Reichel <sre@kernel.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Jiri Slaby <jslaby@suse.com>, Mark Rutland <mark.rutland@arm.com>,
-	linux-bluetooth@vger.kernel.org, linux-serial@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 01/10] ARM: dts: N9/N950: add bluetooth
-Message-ID: <20170306160826.GG20572@atomide.com>
-References: <20170304115833.3538-1-sre@kernel.org>
- <20170304115833.3538-2-sre@kernel.org>
+Return-Path: <javier@osg.samsung.com>
+Subject: Re: [PATCH] Bluetooth: btqcomsmd: fix compile-test dependency
+To: Arnd Bergmann <arnd@arndb.de>, Marcel Holtmann <marcel@holtmann.org>,
+ Gustavo Padovan <gustavo@padovan.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>
+References: <20170301224907.1263804-1-arnd@arndb.de>
+Cc: Bjorn Andersson <bjorn.andersson@sonymobile.com>,
+ Loic Poulain <loic.poulain@intel.com>, linux-bluetooth@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+From: Javier Martinez Canillas <javier@osg.samsung.com>
+Message-ID: <9a54c8a2-f0e4-d2fb-de66-18346056f368@osg.samsung.com>
+Date: Mon, 6 Mar 2017 12:35:43 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170304115833.3538-2-sre@kernel.org>
+In-Reply-To: <20170301224907.1263804-1-arnd@arndb.de>
+Content-Type: text/plain; charset=windows-1252
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-* Sebastian Reichel <sre@kernel.org> [170304 04:00]:
-> The Nokia N950 and N9 have a wl1271 (with nokia bootloader) bluetooth
-> module connected to second UART.
+Hello Arnd,
+
+On 03/01/2017 07:48 PM, Arnd Bergmann wrote:
+> compile-testing fails when QCOM_SMD is a loadable module:
 > 
-> Signed-off-by: Sebastian Reichel <sre@kernel.org>
+> drivers/bluetooth/built-in.o: In function `btqcomsmd_send':
+> btqca.c:(.text+0xa8): undefined reference to `qcom_smd_send'
+> drivers/bluetooth/built-in.o: In function `btqcomsmd_probe':
+> btqca.c:(.text+0x3ec): undefined reference to `qcom_wcnss_open_channel'
+> btqca.c:(.text+0x46c): undefined reference to `qcom_smd_set_drvdata'
+> 
+> This clarifies the dependency to allow compile-testing only when
+> SMD is completely disabled, otherwise the dependency on QCOM_SMD
+> will make sure we can link against it.
+> 
+> Fixes: e27ee2b16bad ("Bluetooth: btqcomsmd: Allow driver to build if COMPILE_TEST is enabled")
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> ---
 
-Picking this patch into omap-for-v4.12/dt thanks.
+Thanks for the fix. The patch looks good to me.
 
-Regards,
+Reviewed-by: Javier Martinez Canillas <javier@osg.samsung.com>
 
-Tony
+Best regards,
+-- 
+Javier Martinez Canillas
+Open Source Group
+Samsung Research America
