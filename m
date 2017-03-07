@@ -1,42 +1,90 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Date: Tue, 7 Mar 2017 12:07:23 -0800
-From: Kyle McMartin <kyle@infradead.org>
-To: "jaya.p.g" <jaya.p.g@linux.intel.com>
-Cc: linux-bluetooth@vger.kernel.org, tedd.an@intel.com,
-        anand.kalyanakrishnan@intel.com
-Subject: Re: [PATCH 1/3] linux-firmware: Update firmware patch for Intel
- Bluetooth, 7265
-Message-ID: <20170307200723.GA13400@bombadil.infradead.org>
-References: <58B956D3.4070003@linux.intel.com>
- <58BD5CDD.5030003@linux.intel.com>
+Return-Path: <robh+dt@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <58BD5CDD.5030003@linux.intel.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <20170307155508.olbiecapfs7ep6xm@earth>
+References: <20170304115833.3538-1-sre@kernel.org> <20170304115833.3538-8-sre@kernel.org>
+ <CAL_Jsq+BCE1u6Ysz0FOdh--wHm-PZxqcmqTgQMyDcvQNkYp3gw@mail.gmail.com> <20170307155508.olbiecapfs7ep6xm@earth>
+From: Rob Herring <robh+dt@kernel.org>
+Date: Tue, 7 Mar 2017 10:46:06 -0600
+Message-ID: <CAL_JsqLLJw_k2pYuoLkYchu1HBCOL+jcBmvXgcqMuxjQ7Ce-jQ@mail.gmail.com>
+Subject: Re: [PATCH 07/10] serdev: add serdev_device_wait_until_sent
+To: Sebastian Reichel <sre@kernel.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>, Tony Lindgren <tony@atomide.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Jiri Slaby <jslaby@suse.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	"open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+	"linux-serial@vger.kernel.org" <linux-serial@vger.kernel.org>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Mar 06, 2017 at 06:28:05PM +0530, jaya.p.g wrote:
-> Subject: [PATCH 1/3] linux-firmware: Update firmware patch for Intel Bluetooth, 7265
-> Date: Fri, 3 Mar 2017 17:13:15 +0530
-> From: jaya.p.g <jaya.p.g@linux.intel.com>
-> Organization: intel
-> To: tedd.an@intel.com
-> CC: anand.kalyanakrishnan@intel.com
-> 
-> From: Jaya P G <jaya.p.g@linux.intel.com>
-> Date: Tue, 28 Feb 2017 18:01:37 +0530
-> Subject: [PATCH 1/3] linux-firmware: Update firmware patch for Intel Bluetooth
->  7265
-> 
-> This patch updates the firmware patch for Intel Bluetooth 7265 (D1)
-> also, it is known as Intel StP D1
-> 
-> StP D1 FW Patch Version: 28
-> 
-> Release Version: 19.50
-> 
-> Signed-off-by: Jaya P G <jaya.p.g@linux.intel.com>
+On Tue, Mar 7, 2017 at 9:55 AM, Sebastian Reichel <sre@kernel.org> wrote:
+> Hi,
+>
+> On Tue, Mar 07, 2017 at 09:34:49AM -0600, Rob Herring wrote:
+>> On Sat, Mar 4, 2017 at 5:58 AM, Sebastian Reichel <sre@kernel.org> wrote:
+>> > Add method, which waits until the transmission buffer has been sent.
+>> >
+>> > Signed-off-by: Sebastian Reichel <sre@kernel.org>
+>> > ---
+>> >  drivers/tty/serdev/core.c           | 11 +++++++++++
+>> >  drivers/tty/serdev/serdev-ttyport.c | 15 ++++++++++++++-
+>> >  include/linux/serdev.h              |  3 +++
+>> >  3 files changed, 28 insertions(+), 1 deletion(-)
+>> >
+>> > diff --git a/drivers/tty/serdev/core.c b/drivers/tty/serdev/core.c
+>> > index f4c6c90add78..a63b74031e22 100644
+>> > --- a/drivers/tty/serdev/core.c
+>> > +++ b/drivers/tty/serdev/core.c
+>> > @@ -173,6 +173,17 @@ void serdev_device_set_flow_control(struct serdev_device *serdev, bool enable)
+>> >  }
+>> >  EXPORT_SYMBOL_GPL(serdev_device_set_flow_control);
+>> >
+>> > +void serdev_device_wait_until_sent(struct serdev_device *serdev, long timeout)
+>> > +{
+>> > +       struct serdev_controller *ctrl = serdev->ctrl;
+>> > +
+>> > +       if (!ctrl || !ctrl->ops->wait_until_sent)
+>> > +               return;
+>> > +
+>> > +       ctrl->ops->wait_until_sent(ctrl, timeout);
+>> > +}
+>> > +EXPORT_SYMBOL_GPL(serdev_device_wait_until_sent);
+>> > +
+>> >  static int serdev_drv_probe(struct device *dev)
+>> >  {
+>> >         const struct serdev_device_driver *sdrv = to_serdev_device_driver(dev->driver);
+>> > diff --git a/drivers/tty/serdev/serdev-ttyport.c b/drivers/tty/serdev/serdev-ttyport.c
+>> > index d05393594f15..db2bc601e554 100644
+>> > --- a/drivers/tty/serdev/serdev-ttyport.c
+>> > +++ b/drivers/tty/serdev/serdev-ttyport.c
+>> > @@ -14,6 +14,7 @@
+>> >  #include <linux/serdev.h>
+>> >  #include <linux/tty.h>
+>> >  #include <linux/tty_driver.h>
+>> > +#include <linux/poll.h>
+>> >
+>> >  #define SERPORT_ACTIVE         1
+>> >
+>> > @@ -47,10 +48,13 @@ static void ttyport_write_wakeup(struct tty_port *port)
+>> >         struct serport *serport = serdev_controller_get_drvdata(ctrl);
+>> >
+>> >         if (!test_and_clear_bit(TTY_DO_WRITE_WAKEUP, &port->tty->flags))
+>> > -               return;
+>> > +               goto out;
+>> >
+>> >         if (test_bit(SERPORT_ACTIVE, &serport->flags))
+>> >                 serdev_controller_write_wakeup(ctrl);
+>> > +
+>> > +out:
+>> > +       wake_up_interruptible_poll(&port->tty->write_wait, POLLOUT);
+>>
+>> Shouldn't this be separate patch?
+>
+> That change is needed for tty_wait_until_sent to work correctly, which
+> starts with a wait_event_interruptible_timeout() on write_wait.
 
-applied.
+Okay.
 
-cheers, kyle
+Acked-by: Rob Herring <robh@kernel.org>
