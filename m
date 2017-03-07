@@ -1,38 +1,82 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-From: Juha Kuikka <juha.kuikka@gmail.com>
-Date: Tue, 7 Mar 2017 14:41:03 -0800
-Message-ID: <CAKvrXUrUGtWuOyS0NEajGX8fbJB8xSRCNMCUufu4nXBYje9LyA@mail.gmail.com>
-Subject: mSBC codec issue on a headset
-To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain; charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 10.2 \(3259\))
+Subject: Re: [PATCH 10/10] Bluetooth: add nokia driver
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20170307210837.w5fdwc2sy3xmzci7@earth>
+Date: Tue, 7 Mar 2017 22:20:27 +0100
+Cc: Rob Herring <robh+dt@kernel.org>,
+        "Gustavo F. Padovan" <gustavo@padovan.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Tony Lindgren <tony@atomide.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Jiri Slaby <jslaby@suse.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+        "linux-serial@vger.kernel.org" <linux-serial@vger.kernel.org>,
+        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Message-Id: <65D9766C-9BED-42D5-931C-65044530E215@holtmann.org>
+References: <20170304115833.3538-1-sre@kernel.org>
+ <20170304115833.3538-11-sre@kernel.org>
+ <CAL_Jsq+PvqS_tU6wRzpcsdESYxOOU_JJqsacEc9qLDs2PB2VLw@mail.gmail.com>
+ <20170307210837.w5fdwc2sy3xmzci7@earth>
+To: Sebastian Reichel <sre@kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Sebastian,
 
-I am implementing HFP support including mSBC. I am using the SBC-1.3 [1] codec.
+>>> This adds a driver for the Nokia H4+ protocol, which is used
+>>> at least on the Nokia N9, N900 & N950.
+>>> 
+>>> Signed-off-by: Sebastian Reichel <sre@kernel.org>
+>>> ---
+>>> .../devicetree/bindings/net/nokia-bluetooth.txt    |  51 ++
+>> 
+>> This should be separate and before the dts files.
+>> 
+>>> drivers/bluetooth/Kconfig                          |  12 +
+>>> drivers/bluetooth/Makefile                         |   2 +
+>>> drivers/bluetooth/hci_nokia.c                      | 839 +++++++++++++++++++++
+>>> 4 files changed, 904 insertions(+)
+>>> create mode 100644 Documentation/devicetree/bindings/net/nokia-bluetooth.txt
+>>> create mode 100644 drivers/bluetooth/hci_nokia.c
+>>> 
+>>> diff --git a/Documentation/devicetree/bindings/net/nokia-bluetooth.txt b/Documentation/devicetree/bindings/net/nokia-bluetooth.txt
+>>> new file mode 100644
+>>> index 000000000000..6c80a92f31e2
+>>> --- /dev/null
+>>> +++ b/Documentation/devicetree/bindings/net/nokia-bluetooth.txt
+>>> @@ -0,0 +1,51 @@
+>>> +Nokia Bluetooth Chips
+>>> +---------------------
+>>> +
+>>> +Nokia phones often come with UART connected bluetooth chips from different
+>>> +vendors and modified device API. Those devices speak a protocol named H4+
+>>> +by Nokia, which is similar to the H4 protocol from the Bluetooth standard.
+>>> +In addition to the H4 protocol it specifies two more UART status lines for
+>>> +wakeup of UART transceivers to improve power management and a few new packet
+>>> +types used to negotiate uart speed.
+>>> +
+>>> +Required properties:
+>>> +
+>>> + - compatible: should be one of the following:
+>>> +   * "nokia,brcm,bcm2048"
+>>> +   * "nokia,ti,wl1271-bluetooth"
+>> 
+>> Drop the chip vendors' prefix here. I don't really want to start a
+>> pattern of 2 vendor prefixes.
+> 
+> Right, I think we discussed this before, but I don't remember the
+> result. How about
+> 
+> - compatible: should contain "nokia,h4p-bluetooth" as well as one of the following:
+> * "brcm,bcm2048-nokia"
+> * "ti,wl1271-blueooth-nokia”
 
-Two headsets I am currently using are:
-Jabra Halo Smart
-LG HBS-750
+I never liked the term “h4p”. It is fundamentally just “bluetooth”. What are our plans for Broadcom, Intel etc. Bluetooth UARTs?
 
-My problem is that the Jabra headset starts adding noise to the audio
-output after a period, while the LG headset works a-ok for prolonged
-periods of time.
+Regards
 
-My test is about 13s long wave file that is being looped. On Jabra the
-noise always starts at about 25s (could be right at the edge of the
-loop, hard to tell) and never goes away.
-
-Obviously if I use sbcenc/dec with the audio, it works normally.
-
-I have minimized my test so the only unknowns for me are the codec and
-the headset.
-
-Any ideas on what to try? I can provide any logs required.
-
-Thanks,
- - Juha
-
-[1] http://www.kernel.org/pub/linux/bluetooth/sbc-1.3.tar.xz
+Marcel
