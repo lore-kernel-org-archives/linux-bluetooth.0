@@ -1,80 +1,105 @@
-Return-Path: <robh+dt@kernel.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20170304115833.3538-8-sre@kernel.org>
-References: <20170304115833.3538-1-sre@kernel.org> <20170304115833.3538-8-sre@kernel.org>
-From: Rob Herring <robh+dt@kernel.org>
-Date: Tue, 7 Mar 2017 09:34:49 -0600
-Message-ID: <CAL_Jsq+BCE1u6Ysz0FOdh--wHm-PZxqcmqTgQMyDcvQNkYp3gw@mail.gmail.com>
-Subject: Re: [PATCH 07/10] serdev: add serdev_device_wait_until_sent
-To: Sebastian Reichel <sre@kernel.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>, Tony Lindgren <tony@atomide.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Jiri Slaby <jslaby@suse.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	"open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-	"linux-serial@vger.kernel.org" <linux-serial@vger.kernel.org>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+In-Reply-To: <cdefb429-7549-5454-b53f-b4cd3628fbae@felipetonello.com>
+References: <20170216180315.30531-1-eu@felipetonello.com> <CABBYNZL7W15pdvZLezBO146RXw8ADNXcatiuU2XhEA9A0tzSMA@mail.gmail.com>
+ <cdefb429-7549-5454-b53f-b4cd3628fbae@felipetonello.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Tue, 7 Mar 2017 11:15:29 +0200
+Message-ID: <CABBYNZKG_dieHOT017EPCCzMmbeHtBwcWY_1GMxXq6HUigKpTw@mail.gmail.com>
+Subject: Re: [PATCH v2 BlueZ 0/7] Improvements on connection parameters update
+To: Felipe Ferreri Tonello <eu@felipetonello.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Sat, Mar 4, 2017 at 5:58 AM, Sebastian Reichel <sre@kernel.org> wrote:
-> Add method, which waits until the transmission buffer has been sent.
->
-> Signed-off-by: Sebastian Reichel <sre@kernel.org>
-> ---
->  drivers/tty/serdev/core.c           | 11 +++++++++++
->  drivers/tty/serdev/serdev-ttyport.c | 15 ++++++++++++++-
->  include/linux/serdev.h              |  3 +++
->  3 files changed, 28 insertions(+), 1 deletion(-)
->
-> diff --git a/drivers/tty/serdev/core.c b/drivers/tty/serdev/core.c
-> index f4c6c90add78..a63b74031e22 100644
-> --- a/drivers/tty/serdev/core.c
-> +++ b/drivers/tty/serdev/core.c
-> @@ -173,6 +173,17 @@ void serdev_device_set_flow_control(struct serdev_device *serdev, bool enable)
->  }
->  EXPORT_SYMBOL_GPL(serdev_device_set_flow_control);
->
-> +void serdev_device_wait_until_sent(struct serdev_device *serdev, long timeout)
-> +{
-> +       struct serdev_controller *ctrl = serdev->ctrl;
-> +
-> +       if (!ctrl || !ctrl->ops->wait_until_sent)
-> +               return;
-> +
-> +       ctrl->ops->wait_until_sent(ctrl, timeout);
-> +}
-> +EXPORT_SYMBOL_GPL(serdev_device_wait_until_sent);
-> +
->  static int serdev_drv_probe(struct device *dev)
->  {
->         const struct serdev_device_driver *sdrv = to_serdev_device_driver(dev->driver);
-> diff --git a/drivers/tty/serdev/serdev-ttyport.c b/drivers/tty/serdev/serdev-ttyport.c
-> index d05393594f15..db2bc601e554 100644
-> --- a/drivers/tty/serdev/serdev-ttyport.c
-> +++ b/drivers/tty/serdev/serdev-ttyport.c
-> @@ -14,6 +14,7 @@
->  #include <linux/serdev.h>
->  #include <linux/tty.h>
->  #include <linux/tty_driver.h>
-> +#include <linux/poll.h>
->
->  #define SERPORT_ACTIVE         1
->
-> @@ -47,10 +48,13 @@ static void ttyport_write_wakeup(struct tty_port *port)
->         struct serport *serport = serdev_controller_get_drvdata(ctrl);
->
->         if (!test_and_clear_bit(TTY_DO_WRITE_WAKEUP, &port->tty->flags))
-> -               return;
-> +               goto out;
->
->         if (test_bit(SERPORT_ACTIVE, &serport->flags))
->                 serdev_controller_write_wakeup(ctrl);
-> +
-> +out:
-> +       wake_up_interruptible_poll(&port->tty->write_wait, POLLOUT);
+Hi Felipe,
 
-Shouldn't this be separate patch?
+On Tue, Feb 21, 2017 at 11:40 AM, Felipe Ferreri Tonello
+<eu@felipetonello.com> wrote:
+> Hi Luiz,
+>
+> On 20/02/17 15:21, Luiz Augusto von Dentz wrote:
+>> Hi Felipe,
+>>
+>> On Thu, Feb 16, 2017 at 8:03 PM, Felipe F. Tonello <eu@felipetonello.com> wrote:
+>>> This is one of the parts of a series of patches related to connection
+>>> parameters update.
+>>>
+>>> This initial implementation adds supports to GAP Peripheral Preferred
+>>> Connection Parameters (PPCP) characteristic and the Slave Connection Interval
+>>> Range Advertising Data (AD).
+>>
+>>
+>> Are there any devices implementing these? Id like to do a some testing
+>> but haven't find anything implementing this, or well I can generate
+>> the PPCP but the SCRAD is probably a waste of AD since that is pretty
+>> limited in size.
+>
+> PPCP not that I know of. But the AD there are devices, including in the
+> unit-eir there is one.
+>
+> The PPCP and AD is important specially for MIDI devices who require
+> low-latency.
+>
+> I did test it here, it will be nice if you could as well.
 
-Rob
+Lets try to get some points resolved here, Ive briefly chatted with
+Johan regarding this last week and he said that we might have to
+introduce a new command to add new parameters to the kernel, as oppose
+to reuse load.
+
+We might have to choose between these 2 options:
+
+1. Reload all the settings, and then move on to implement the new command.
+2. Don't bother with old kernels and just make it work with newer one
+with proper support.
+
+>>
+>>> There is a problem described in #4 that due to a limitation of the BlueZ API
+>>> it is not possible to update the current connection with specific parameters.
+>>> I am working on a socket option API to allow something similar. Hopefully I
+>>> will be able to write something that covers this use-case as well. This
+>>> problem also applies to patch #6.
+>>>
+>>> Changes from v1:
+>>>  * Added Slave Connection Interval Range AD support;
+>>>  * Unit tests for connection interval.
+>>>
+>>> Felipe F. Tonello (7):
+>>>   profiles/gap: Some code cleanup
+>>>   src/adapter: Added connection parameter load/store functions
+>>>   src/device: Added function to set connection parameters
+>>>   profiles/gap: Added support for PPCP characteristic
+>>>   src/eir: Added support for Slave Connection Interval Range AD
+>>>   src/adapter: Store Slave Connection Interval Range
+>>>   unit/test-eir: Added tests for connection interval
+>>>
+>>>  profiles/gap/gas.c | 111 +++++++++++++++++++++++++++++++++++++++++++----------
+>>>  src/adapter.c      |  46 +++++++++++++++++++++-
+>>>  src/adapter.h      |   9 +++++
+>>>  src/device.c       |  16 ++++++++
+>>>  src/device.h       |   4 ++
+>>>  src/eir.c          |   7 ++++
+>>>  src/eir.h          |   3 ++
+>>>  unit/test-eir.c    |  26 +++++++++++--
+>>>  8 files changed, 196 insertions(+), 26 deletions(-)
+>>>
+>>> --
+>>> 2.11.1
+>>>
+>>> --
+>>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>>> the body of a message to majordomo@vger.kernel.org
+>>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>>
+>>
+>>
+>
+> --
+> Felipe
+
+
+
+-- 
+Luiz Augusto von Dentz
