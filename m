@@ -1,89 +1,38 @@
-Return-Path: <sre@kernel.org>
-Date: Wed, 8 Mar 2017 00:06:09 +0100
-From: Sebastian Reichel <sre@kernel.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Rob Herring <robh+dt@kernel.org>,
-	"Gustavo F. Padovan" <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Tony Lindgren <tony@atomide.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Jiri Slaby <jslaby@suse.com>, Mark Rutland <mark.rutland@arm.com>,
-	"open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-	"linux-serial@vger.kernel.org" <linux-serial@vger.kernel.org>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH 10/10] Bluetooth: add nokia driver
-Message-ID: <20170307230609.kpw3y2pkfka6kgo5@earth>
-References: <20170304115833.3538-1-sre@kernel.org>
- <20170304115833.3538-11-sre@kernel.org>
- <CAL_Jsq+PvqS_tU6wRzpcsdESYxOOU_JJqsacEc9qLDs2PB2VLw@mail.gmail.com>
- <20170307210837.w5fdwc2sy3xmzci7@earth>
- <65D9766C-9BED-42D5-931C-65044530E215@holtmann.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="yjbcw4gvvbbzjx7v"
-In-Reply-To: <65D9766C-9BED-42D5-931C-65044530E215@holtmann.org>
+From: Juha Kuikka <juha.kuikka@gmail.com>
+Date: Tue, 7 Mar 2017 14:41:03 -0800
+Message-ID: <CAKvrXUrUGtWuOyS0NEajGX8fbJB8xSRCNMCUufu4nXBYje9LyA@mail.gmail.com>
+Subject: mSBC codec issue on a headset
+To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi,
 
---yjbcw4gvvbbzjx7v
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I am implementing HFP support including mSBC. I am using the SBC-1.3 [1] codec.
 
-Hi Marcel,
+Two headsets I am currently using are:
+Jabra Halo Smart
+LG HBS-750
 
-On Tue, Mar 07, 2017 at 10:20:27PM +0100, Marcel Holtmann wrote:
->> [...]
->>
->> - compatible: should contain "nokia,h4p-bluetooth" as well as one of the=
- following:
->> * "brcm,bcm2048-nokia"
->> * "ti,wl1271-blueooth-nokia=E2=80=9D
->=20
-> I never liked the term =E2=80=9Ch4p=E2=80=9D. It is fundamentally just
-> =E2=80=9Cbluetooth=E2=80=9D.
+My problem is that the Jabra headset starts adding noise to the audio
+output after a period, while the LG headset works a-ok for prolonged
+periods of time.
 
-It's not me, that came up with the term, Nokia called their protocol
-H4+ (for DT people not familiar with bluetooth - the standard
-bluetooth UART protocol is named H4). I agree, that H4+ is
-ambiguous, but with the "nokia," prefix it should be clear what
-protocol is meant. I don't really mind, though. We can also just
-list the individual chips and add all compatible strings to the
-driver.
+My test is about 13s long wave file that is being looped. On Jabra the
+noise always starts at about 25s (could be right at the edge of the
+loop, hard to tell) and never goes away.
 
-FWIW I remove the term from the driver leaving only a single
-instance in the header ("AKA H4+").
+Obviously if I use sbcenc/dec with the audio, it works normally.
 
-> What are our plans for Broadcom, Intel etc. Bluetooth UARTs?
+I have minimized my test so the only unknowns for me are the codec and
+the headset.
 
-I think drivers, that need extra resources (like GPIOs) can switch to
-serdev exclusively. The kernel needs ACPI/DT/boardcode data for those
-devices anyways.
+Any ideas on what to try? I can provide any logs required.
 
-Iirc Rob is working on serdev patches for Broadcom and TI BT, so he may
-provide more information.
+Thanks,
+ - Juha
 
--- Sebastian
-
---yjbcw4gvvbbzjx7v
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCgAdFiEE72YNB0Y/i3JqeVQT2O7X88g7+poFAli/PN4ACgkQ2O7X88g7
-+pplCA//RECW46Q3/61zbH1prx80b7exC1YSCIfcaEvTnzmmwrFM4tTjVB/KdSXL
-IhV06OCdcOwr9c1viXO6L4KRevFEA8V46rH0XMpQFUPmgSB/HGYVb+12tlTjcXNO
-pU0qKLqGAjqGM9kY/xhzoELnnIhwcRvkonpyx8dRNJSobgodOJvatJLgYQkqs74u
-wO26/W8DhuRTYpYU4XZEmURlcNil1NYHIRSm7hEaDooAg1jsLj9yqXRImzhnXrGo
-A0dkpvlmybHrhKJHzJXTlj2MsbjqGlapaJa2Kbi8qc7O6jgm0F65qsD0Tzbggcaj
-5XB8FAIjWOYdD6qXh2vopZ0lJU5cHpWZvajdS3LbLIsW6BE/6rJPj+ej34XzGN0y
-enA27o2y/uPuI2q6YzhtI1sGbdk2NxsytZXSZsPfOnsB9p1cBefmcISEWoPfwuUj
-tKVofnkhfHpaq/j+VhkkvtsuVIM2knLzSNAKojBQ4VrRvKtlgInflq1EiU4Wc8GY
-qtSgCk3m6vXDa2ctiqvVGO6qMliniNkLx5I2K8pUghTBAYRxa4dTWoVG0Re6RWqp
-evj9gzigQvWV2pKPsIWWrZ/9LEB2OF3xPp6T4rBl6rbEJQMCH5dY+hg1zgo2FxKe
-m0C4PUyNMVFB28J6MZbF11Bu4IsTgnHhLuQsKoVwcAycr8boFWc=
-=Io95
------END PGP SIGNATURE-----
-
---yjbcw4gvvbbzjx7v--
+[1] http://www.kernel.org/pub/linux/bluetooth/sbc-1.3.tar.xz
