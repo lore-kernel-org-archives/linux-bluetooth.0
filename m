@@ -1,33 +1,59 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Subject: Re: mSBC codec issue on a headset
-To: Juha Kuikka <juha.kuikka@gmail.com>,
-        linux-bluetooth <linux-bluetooth@vger.kernel.org>
-References: <CAKvrXUrUGtWuOyS0NEajGX8fbJB8xSRCNMCUufu4nXBYje9LyA@mail.gmail.com>
-From: =?UTF-8?B?RnLDqWTDqXJpYyBEYWxsZWF1?=
-        <frederic.dalleau@collabora.co.uk>
-Message-ID: <ddf3666c-4fc6-f057-2118-65f9b7a4673c@collabora.co.uk>
-Date: Wed, 8 Mar 2017 20:21:42 +0100
+Return-Path: <robh+dt@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CAKvrXUrUGtWuOyS0NEajGX8fbJB8xSRCNMCUufu4nXBYje9LyA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <20170307211243.zecbitmkbozd3s2j@earth>
+References: <20170304115833.3538-1-sre@kernel.org> <20170304115833.3538-9-sre@kernel.org>
+ <CAL_Jsq+6NCC35zBMhvNhXug2sYmBqBoJ20pgdREhvRPGzePNkw@mail.gmail.com> <20170307211243.zecbitmkbozd3s2j@earth>
+From: Rob Herring <robh+dt@kernel.org>
+Date: Wed, 8 Mar 2017 09:13:56 -0600
+Message-ID: <CAL_JsqL86La9R=mcnC9Hgba9yWV8Zpbewpiir5_=P7pwiDqkXA@mail.gmail.com>
+Subject: Re: [PATCH 08/10] serdev: add serdev_device_get_cts
+To: Sebastian Reichel <sre@kernel.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>, Tony Lindgren <tony@atomide.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Jiri Slaby <jslaby@suse.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	"open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+	"linux-serial@vger.kernel.org" <linux-serial@vger.kernel.org>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Juha,
-
-> My problem is that the Jabra headset starts adding noise to the audio
-> output after a period, while the LG headset works a-ok for prolonged
-> periods of time.
+On Tue, Mar 7, 2017 at 3:12 PM, Sebastian Reichel <sre@kernel.org> wrote:
+> Hi Rob,
 >
-> My test is about 13s long wave file that is being looped. On Jabra the
-> noise always starts at about 25s (could be right at the edge of the
-> loop, hard to tell) and never goes away.
+> On Tue, Mar 07, 2017 at 10:03:37AM -0600, Rob Herring wrote:
+>> On Sat, Mar 4, 2017 at 5:58 AM, Sebastian Reichel <sre@kernel.org> wrote:
+>> > Add method to get current CTS line state.
+>> >
+>> > Signed-off-by: Sebastian Reichel <sre@kernel.org>
+>> > ---
+>> >  drivers/tty/serdev/core.c           | 11 +++++++++++
+>> >  drivers/tty/serdev/serdev-ttyport.c | 15 +++++++++++++++
+>> >  include/linux/serdev.h              |  6 ++++++
+>> >  3 files changed, 32 insertions(+)
+>> >
+>> > diff --git a/drivers/tty/serdev/core.c b/drivers/tty/serdev/core.c
+>> > index a63b74031e22..36eb3dfb1477 100644
+>> > --- a/drivers/tty/serdev/core.c
+>> > +++ b/drivers/tty/serdev/core.c
+>> > @@ -184,6 +184,17 @@ void serdev_device_wait_until_sent(struct serdev_device *serdev, long timeout)
+>> >  }
+>> >  EXPORT_SYMBOL_GPL(serdev_device_wait_until_sent);
+>> >
+>> > +bool serdev_device_get_cts(struct serdev_device *serdev)
+>>
+>> I wonder if this should just be the wait for cts in the core. I think
+>> that would be the common use for reading the CTS state. IIRC, I saw
+>> some other device needing the same thing.
+>
+> mh. I think it fits nicely to serdev_device_set_rts(). But I guess
+> it makes sense to have the wait feature directly in serdev. So I
+> suggest to add the function in addition to the simple get_cts
+> function. Does that make sense to you?
 
-Some kind of description of the noise you hear could help.
+Sure. You should be able to implement that just in the core. Then the
+host driver stays simple and we're not duplicating the wait in host
+drivers (not that we expect to have lots of host drivers).
 
-If it looks like (hear like) small gaps are inserted between packets, 
-this could indicates timing issues ? If it hear like the audio data are 
-wrong, this could indicate codec issues.
-
-Regards,
-Fred
+Rob
