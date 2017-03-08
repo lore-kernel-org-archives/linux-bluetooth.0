@@ -1,12 +1,12 @@
 Return-Path: <robh+dt@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20170307211243.zecbitmkbozd3s2j@earth>
-References: <20170304115833.3538-1-sre@kernel.org> <20170304115833.3538-9-sre@kernel.org>
- <CAL_Jsq+6NCC35zBMhvNhXug2sYmBqBoJ20pgdREhvRPGzePNkw@mail.gmail.com> <20170307211243.zecbitmkbozd3s2j@earth>
+In-Reply-To: <20170307210837.w5fdwc2sy3xmzci7@earth>
+References: <20170304115833.3538-1-sre@kernel.org> <20170304115833.3538-11-sre@kernel.org>
+ <CAL_Jsq+PvqS_tU6wRzpcsdESYxOOU_JJqsacEc9qLDs2PB2VLw@mail.gmail.com> <20170307210837.w5fdwc2sy3xmzci7@earth>
 From: Rob Herring <robh+dt@kernel.org>
-Date: Wed, 8 Mar 2017 09:13:56 -0600
-Message-ID: <CAL_JsqL86La9R=mcnC9Hgba9yWV8Zpbewpiir5_=P7pwiDqkXA@mail.gmail.com>
-Subject: Re: [PATCH 08/10] serdev: add serdev_device_get_cts
+Date: Wed, 8 Mar 2017 08:26:33 -0600
+Message-ID: <CAL_JsqJwqoTkFGKGx4g5Fvq=R1SnQ=bB0z0=UxNA2uGTJ6ngOA@mail.gmail.com>
+Subject: Re: [PATCH 10/10] Bluetooth: add nokia driver
 To: Sebastian Reichel <sre@kernel.org>
 Cc: Marcel Holtmann <marcel@holtmann.org>, Gustavo Padovan <gustavo@padovan.org>,
 	Johan Hedberg <johan.hedberg@gmail.com>, Tony Lindgren <tony@atomide.com>,
@@ -19,41 +19,74 @@ Cc: Marcel Holtmann <marcel@holtmann.org>, Gustavo Padovan <gustavo@padovan.org>
 Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, Mar 7, 2017 at 3:12 PM, Sebastian Reichel <sre@kernel.org> wrote:
+On Tue, Mar 7, 2017 at 3:08 PM, Sebastian Reichel <sre@kernel.org> wrote:
 > Hi Rob,
 >
-> On Tue, Mar 07, 2017 at 10:03:37AM -0600, Rob Herring wrote:
+> On Tue, Mar 07, 2017 at 10:30:51AM -0600, Rob Herring wrote:
 >> On Sat, Mar 4, 2017 at 5:58 AM, Sebastian Reichel <sre@kernel.org> wrote:
->> > Add method to get current CTS line state.
+>> > This adds a driver for the Nokia H4+ protocol, which is used
+>> > at least on the Nokia N9, N900 & N950.
 >> >
 >> > Signed-off-by: Sebastian Reichel <sre@kernel.org>
 >> > ---
->> >  drivers/tty/serdev/core.c           | 11 +++++++++++
->> >  drivers/tty/serdev/serdev-ttyport.c | 15 +++++++++++++++
->> >  include/linux/serdev.h              |  6 ++++++
->> >  3 files changed, 32 insertions(+)
->> >
->> > diff --git a/drivers/tty/serdev/core.c b/drivers/tty/serdev/core.c
->> > index a63b74031e22..36eb3dfb1477 100644
->> > --- a/drivers/tty/serdev/core.c
->> > +++ b/drivers/tty/serdev/core.c
->> > @@ -184,6 +184,17 @@ void serdev_device_wait_until_sent(struct serdev_device *serdev, long timeout)
->> >  }
->> >  EXPORT_SYMBOL_GPL(serdev_device_wait_until_sent);
->> >
->> > +bool serdev_device_get_cts(struct serdev_device *serdev)
+>> >  .../devicetree/bindings/net/nokia-bluetooth.txt    |  51 ++
 >>
->> I wonder if this should just be the wait for cts in the core. I think
->> that would be the common use for reading the CTS state. IIRC, I saw
->> some other device needing the same thing.
+>> This should be separate and before the dts files.
+>>
+>> >  drivers/bluetooth/Kconfig                          |  12 +
+>> >  drivers/bluetooth/Makefile                         |   2 +
+>> >  drivers/bluetooth/hci_nokia.c                      | 839 +++++++++++++++++++++
+>> >  4 files changed, 904 insertions(+)
+>> >  create mode 100644 Documentation/devicetree/bindings/net/nokia-bluetooth.txt
+>> >  create mode 100644 drivers/bluetooth/hci_nokia.c
+>> >
+>> > diff --git a/Documentation/devicetree/bindings/net/nokia-bluetooth.txt b/Documentation/devicetree/bindings/net/nokia-bluetooth.txt
+>> > new file mode 100644
+>> > index 000000000000..6c80a92f31e2
+>> > --- /dev/null
+>> > +++ b/Documentation/devicetree/bindings/net/nokia-bluetooth.txt
+>> > @@ -0,0 +1,51 @@
+>> > +Nokia Bluetooth Chips
+>> > +---------------------
+>> > +
+>> > +Nokia phones often come with UART connected bluetooth chips from different
+>> > +vendors and modified device API. Those devices speak a protocol named H4+
+>> > +by Nokia, which is similar to the H4 protocol from the Bluetooth standard.
+>> > +In addition to the H4 protocol it specifies two more UART status lines for
+>> > +wakeup of UART transceivers to improve power management and a few new packet
+>> > +types used to negotiate uart speed.
+>> > +
+>> > +Required properties:
+>> > +
+>> > + - compatible: should be one of the following:
+>> > +   * "nokia,brcm,bcm2048"
+>> > +   * "nokia,ti,wl1271-bluetooth"
+>>
+>> Drop the chip vendors' prefix here. I don't really want to start a
+>> pattern of 2 vendor prefixes.
 >
-> mh. I think it fits nicely to serdev_device_set_rts(). But I guess
-> it makes sense to have the wait feature directly in serdev. So I
-> suggest to add the function in addition to the simple get_cts
-> function. Does that make sense to you?
+> Right, I think we discussed this before, but I don't remember the
+> result. How about
+>
+> - compatible: should contain "nokia,h4p-bluetooth" as well as one of the following:
+>  * "brcm,bcm2048-nokia"
+>  * "ti,wl1271-blueooth-nokia"
 
-Sure. You should be able to implement that just in the core. Then the
-host driver stays simple and we're not duplicating the wait in host
-drivers (not that we expect to have lots of host drivers).
+Sure, that's fine (other than the typo).
+
+> For the driver it should be enough to know "nokia,h4p-bluetooth"
+> actually. The device identifies itself in the negotiation reply.
+>
+>> > + - reset-gpios: GPIO specifier, used to reset the BT module
+>>
+>> Need to state active state.
+>
+> ok. Any suggestion about the wording? The BT chips use usually
+> active low reset pin. The driver handles all GPIOs as active
+> high with the DT binding translating this transparently.
+
+Just having "active low" in there is enough.
+
+Personally I find the GPIO translating confusing...
 
 Rob
