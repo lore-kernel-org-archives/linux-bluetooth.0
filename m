@@ -1,40 +1,108 @@
-Return-Path: <geliangtang@gmail.com>
-From: Geliang Tang <geliangtang@gmail.com>
+Return-Path: <andriy.shevchenko@linux.intel.com>
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 To: Marcel Holtmann <marcel@holtmann.org>,
 	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>
-Cc: Geliang Tang <geliangtang@gmail.com>,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] Bluetooth: bluecard: use setup_timer
-Date: Sat, 11 Mar 2017 08:46:58 +0800
-Message-Id: <e0af154c08327dbf266e641b135e4ef340913feb.1489061552.git.geliangtang@gmail.com>
-In-Reply-To: <3afa5498142ef68256023257dad37b9f8352e65e.1489060803.git.geliangtang@gmail.com>
-References: <3afa5498142ef68256023257dad37b9f8352e65e.1489060803.git.geliangtang@gmail.com>
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Jarkko Nikula <jarkko.nikula@linux.intel.com>
+Subject: [PATCH v1] Bluetooth: hci_bcm: Support platform enumeration
+Date: Fri, 10 Mar 2017 14:28:20 +0200
+Message-Id: <20170310122820.7584-1-andriy.shevchenko@linux.intel.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Use setup_timer() instead of init_timer() to simplify the code.
+Until now the driver supports only ACPI enumeration. Nevertheless
+Intel Edison SoM has Broadcom Wi-Fi + BT chip and neither ACPI nor DT
+enumeration mechanism.
 
-Signed-off-by: Geliang Tang <geliangtang@gmail.com>
+Enable pure platform driver in order to support Intel Edison SoM.
+
+Cc: Jarkko Nikula <jarkko.nikula@linux.intel.com>
+Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 ---
- drivers/bluetooth/bluecard_cs.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ drivers/bluetooth/hci_bcm.c | 50 ++++++++++++++++++++++++++++++---------------
+ 1 file changed, 33 insertions(+), 17 deletions(-)
 
-diff --git a/drivers/bluetooth/bluecard_cs.c b/drivers/bluetooth/bluecard_cs.c
-index c0b3b55..007c0a4 100644
---- a/drivers/bluetooth/bluecard_cs.c
-+++ b/drivers/bluetooth/bluecard_cs.c
-@@ -695,9 +695,8 @@ static int bluecard_open(struct bluecard_info *info)
+diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
+index 5262a2077d7a..a26a4ca6968b 100644
+--- a/drivers/bluetooth/hci_bcm.c
++++ b/drivers/bluetooth/hci_bcm.c
+@@ -697,28 +697,14 @@ static int bcm_resource(struct acpi_resource *ares, void *data)
+ 	/* Always tell the ACPI core to skip this resource */
+ 	return 1;
+ }
++#endif /* CONFIG_ACPI */
  
- 	spin_lock_init(&(info->lock));
+-static int bcm_acpi_probe(struct bcm_device *dev)
++static int bcm_platform_probe(struct bcm_device *dev)
+ {
+ 	struct platform_device *pdev = dev->pdev;
+-	LIST_HEAD(resources);
+-	const struct dmi_system_id *dmi_id;
+-	const struct acpi_gpio_mapping *gpio_mapping = acpi_bcm_int_last_gpios;
+-	const struct acpi_device_id *id;
+-	int ret;
  
--	init_timer(&(info->timer));
--	info->timer.function = &bluecard_activity_led_timeout;
--	info->timer.data = (u_long)info;
-+	setup_timer(&(info->timer), &bluecard_activity_led_timeout,
-+		    (u_long)info);
+ 	dev->name = dev_name(&pdev->dev);
  
- 	skb_queue_head_init(&(info->txq));
+-	/* Retrieve GPIO data */
+-	id = acpi_match_device(pdev->dev.driver->acpi_match_table, &pdev->dev);
+-	if (id)
+-		gpio_mapping = (const struct acpi_gpio_mapping *) id->driver_data;
+-
+-	ret = acpi_dev_add_driver_gpios(ACPI_COMPANION(&pdev->dev),
+-					gpio_mapping);
+-	if (ret)
+-		return ret;
+-
+ 	dev->clk = devm_clk_get(&pdev->dev, NULL);
+ 
+ 	dev->device_wakeup = devm_gpiod_get_optional(&pdev->dev,
+@@ -755,6 +741,33 @@ static int bcm_acpi_probe(struct bcm_device *dev)
+ 		return -EINVAL;
+ 	}
+ 
++	return 0;
++}
++
++#ifdef CONFIG_ACPI
++static int bcm_acpi_probe(struct bcm_device *dev)
++{
++	struct platform_device *pdev = dev->pdev;
++	LIST_HEAD(resources);
++	const struct dmi_system_id *dmi_id;
++	const struct acpi_gpio_mapping *gpio_mapping = acpi_bcm_int_last_gpios;
++	const struct acpi_device_id *id;
++	int ret;
++
++	/* Retrieve GPIO data */
++	id = acpi_match_device(pdev->dev.driver->acpi_match_table, &pdev->dev);
++	if (id)
++		gpio_mapping = (const struct acpi_gpio_mapping *) id->driver_data;
++
++	ret = acpi_dev_add_driver_gpios(ACPI_COMPANION(&pdev->dev),
++					gpio_mapping);
++	if (ret)
++		return ret;
++
++	ret = bcm_platform_probe(dev);
++	if (ret)
++		return ret;
++
+ 	/* Retrieve UART ACPI info */
+ 	ret = acpi_dev_get_resources(ACPI_COMPANION(&dev->pdev->dev),
+ 				     &resources, bcm_resource, dev);
+@@ -789,7 +802,10 @@ static int bcm_probe(struct platform_device *pdev)
+ 
+ 	dev->pdev = pdev;
+ 
+-	ret = bcm_acpi_probe(dev);
++	if (has_acpi_companion(&pdev->dev))
++		ret = bcm_acpi_probe(dev);
++	else
++		ret = bcm_platform_probe(dev);
+ 	if (ret)
+ 		return ret;
  
 -- 
-2.9.3
+2.11.0
