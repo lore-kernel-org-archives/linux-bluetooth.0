@@ -1,108 +1,48 @@
-Return-Path: <andriy.shevchenko@linux.intel.com>
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	Jarkko Nikula <jarkko.nikula@linux.intel.com>
-Subject: [PATCH v1] Bluetooth: hci_bcm: Support platform enumeration
-Date: Fri, 10 Mar 2017 14:28:20 +0200
-Message-Id: <20170310122820.7584-1-andriy.shevchenko@linux.intel.com>
+Return-Path: <Dean_Jenkins@mentor.com>
+From: Dean Jenkins <Dean_Jenkins@mentor.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: Dean Jenkins <Dean_Jenkins@mentor.com>, Yichen Zhao
+	<zhaoyichen@google.com>, "Gustavo F . Padovan" <gustavo@padovan.org>, "Johan
+ Hedberg" <johan.hedberg@gmail.com>, <linux-bluetooth@vger.kernel.org>
+Subject: [PATCH V2 1/2] Bluetooth: Handle bt_accept_enqueue() socket atomically
+Date: Fri, 10 Mar 2017 11:34:45 +0000
+Message-ID: <1489145686-23077-2-git-send-email-Dean_Jenkins@mentor.com>
+In-Reply-To: <1489145686-23077-1-git-send-email-Dean_Jenkins@mentor.com>
+References: <1489145686-23077-1-git-send-email-Dean_Jenkins@mentor.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Until now the driver supports only ACPI enumeration. Nevertheless
-Intel Edison SoM has Broadcom Wi-Fi + BT chip and neither ACPI nor DT
-enumeration mechanism.
+There is a small risk that bt_accept_unlink() runs concurrently with
+bt_accept_enqueue() on the same socket. This scenario could potentially
+lead to a NULL pointer dereference of the socket's parent member because
+the socket can be on the list but the socket's parent member is not yet
+updated by bt_accept_enqueue().
 
-Enable pure platform driver in order to support Intel Edison SoM.
+Therefore, add socket locking inside bt_accept_enqueue() so that the
+socket is added to the list AND the parent's socket address is set in the
+socket's parent member. The socket locking ensures that the socket is on
+the list with a valid non-NULL parent member.
 
-Cc: Jarkko Nikula <jarkko.nikula@linux.intel.com>
-Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Signed-off-by: Dean Jenkins <Dean_Jenkins@mentor.com>
 ---
- drivers/bluetooth/hci_bcm.c | 50 ++++++++++++++++++++++++++++++---------------
- 1 file changed, 33 insertions(+), 17 deletions(-)
+ net/bluetooth/af_bluetooth.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
-index 5262a2077d7a..a26a4ca6968b 100644
---- a/drivers/bluetooth/hci_bcm.c
-+++ b/drivers/bluetooth/hci_bcm.c
-@@ -697,28 +697,14 @@ static int bcm_resource(struct acpi_resource *ares, void *data)
- 	/* Always tell the ACPI core to skip this resource */
- 	return 1;
+diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
+index 69e1f7d..a374fd2 100644
+--- a/net/bluetooth/af_bluetooth.c
++++ b/net/bluetooth/af_bluetooth.c
+@@ -159,8 +159,10 @@ void bt_accept_enqueue(struct sock *parent, struct sock *sk)
+ 	BT_DBG("parent %p, sk %p", parent, sk);
+ 
+ 	sock_hold(sk);
++	lock_sock(sk);
+ 	list_add_tail(&bt_sk(sk)->accept_q, &bt_sk(parent)->accept_q);
+ 	bt_sk(sk)->parent = parent;
++	release_sock(sk);
+ 	parent->sk_ack_backlog++;
  }
-+#endif /* CONFIG_ACPI */
- 
--static int bcm_acpi_probe(struct bcm_device *dev)
-+static int bcm_platform_probe(struct bcm_device *dev)
- {
- 	struct platform_device *pdev = dev->pdev;
--	LIST_HEAD(resources);
--	const struct dmi_system_id *dmi_id;
--	const struct acpi_gpio_mapping *gpio_mapping = acpi_bcm_int_last_gpios;
--	const struct acpi_device_id *id;
--	int ret;
- 
- 	dev->name = dev_name(&pdev->dev);
- 
--	/* Retrieve GPIO data */
--	id = acpi_match_device(pdev->dev.driver->acpi_match_table, &pdev->dev);
--	if (id)
--		gpio_mapping = (const struct acpi_gpio_mapping *) id->driver_data;
--
--	ret = acpi_dev_add_driver_gpios(ACPI_COMPANION(&pdev->dev),
--					gpio_mapping);
--	if (ret)
--		return ret;
--
- 	dev->clk = devm_clk_get(&pdev->dev, NULL);
- 
- 	dev->device_wakeup = devm_gpiod_get_optional(&pdev->dev,
-@@ -755,6 +741,33 @@ static int bcm_acpi_probe(struct bcm_device *dev)
- 		return -EINVAL;
- 	}
- 
-+	return 0;
-+}
-+
-+#ifdef CONFIG_ACPI
-+static int bcm_acpi_probe(struct bcm_device *dev)
-+{
-+	struct platform_device *pdev = dev->pdev;
-+	LIST_HEAD(resources);
-+	const struct dmi_system_id *dmi_id;
-+	const struct acpi_gpio_mapping *gpio_mapping = acpi_bcm_int_last_gpios;
-+	const struct acpi_device_id *id;
-+	int ret;
-+
-+	/* Retrieve GPIO data */
-+	id = acpi_match_device(pdev->dev.driver->acpi_match_table, &pdev->dev);
-+	if (id)
-+		gpio_mapping = (const struct acpi_gpio_mapping *) id->driver_data;
-+
-+	ret = acpi_dev_add_driver_gpios(ACPI_COMPANION(&pdev->dev),
-+					gpio_mapping);
-+	if (ret)
-+		return ret;
-+
-+	ret = bcm_platform_probe(dev);
-+	if (ret)
-+		return ret;
-+
- 	/* Retrieve UART ACPI info */
- 	ret = acpi_dev_get_resources(ACPI_COMPANION(&dev->pdev->dev),
- 				     &resources, bcm_resource, dev);
-@@ -789,7 +802,10 @@ static int bcm_probe(struct platform_device *pdev)
- 
- 	dev->pdev = pdev;
- 
--	ret = bcm_acpi_probe(dev);
-+	if (has_acpi_companion(&pdev->dev))
-+		ret = bcm_acpi_probe(dev);
-+	else
-+		ret = bcm_platform_probe(dev);
- 	if (ret)
- 		return ret;
- 
+ EXPORT_SYMBOL(bt_accept_enqueue);
 -- 
-2.11.0
+2.7.4
