@@ -1,40 +1,66 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: "Felipe F. Tonello" <eu@felipetonello.com>
+Date: Mon, 13 Mar 2017 11:19:52 -0600
+From: Tal <jkarni@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC][PATCH v3 BlueZ 0/3] Connection Update improvements
-Date: Mon, 13 Mar 2017 17:54:09 +0000
-Message-Id: <20170313175412.11365-1-eu@felipetonello.com>
+Subject: Integration (-ish) testing with BlueZ D-Bus API
+Message-ID: <20170313171952.sqmm6fhqranalkf7@Tal>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="4jl2ukjrio6ociie"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-These changes should improve applications who want to update the connection
-parameters for both master and slave devices.
 
-Note: Connection Parameters Request Link Layer Control Procedure (>=4.1) is
-not supported in BlueZ yet. I will work on this later as this RFC is approved.
+--4jl2ukjrio6ociie
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Changes from v2:
- * Added new MGMT command (patch #3)
- * Roll back to first socket option implementation, details are on the patch
-   iself.
 
-Changes from v1:
- * Use simpler user-space API
- * Added patch #1
+Hey list,
 
-Felipe F. Tonello (3):
-  Bluetooth: L2CAP: Refactor L2CAP_CONN_PARAM_UPDATE_REQ into a function
-  Bluetooth: L2CAP: Add BT_LE_CONN_PARAM socket option
-  Bluetooth: mgmt: Added new MGMT_OP_UPDATE_CONN_PARAM command
+  I just wrote a little Haskell library wrapping the GATT API [0]. It's been a
+surprisingly smooth experience - thanks for the API and documentation!
 
- include/net/bluetooth/bluetooth.h |   8 +++
- include/net/bluetooth/l2cap.h     |   3 ++
- include/net/bluetooth/mgmt.h      |  10 ++++
- net/bluetooth/l2cap_core.c        |  36 ++++++++-----
- net/bluetooth/l2cap_sock.c        | 101 +++++++++++++++++++++++++++++++++++++
- net/bluetooth/mgmt.c              | 103 +++++++++++++++++++++++++-------------
- 6 files changed, 212 insertions(+), 49 deletions(-)
+  One issue that remains, though, is decent testing. Right now the tests limit
+themselves to calling d-bus methods and just checking that they don't throw an
+error. I don't see how I can do more than that - check that BlueZ in fact
+registered an application with the data I'm expecting, or check that it's
+handling notifications, etc. (Without, that is, pulling out my phone and trying
+it manually.) Tapping into dbus-monitor in some cases would provide some help,
+but everyone who wants to run the tests would need there dbus config files, the
+tests would have to run as root, I'd have to do fairly fragile parsing of the
+logs that would still only approximate the properties I really want to check
+for.
 
--- 
-2.12.0
+  If I could register an application on a computer and interact with it as if
+it were a remote peripheral (essentially having the computer be both the
+central and the peripheral), then testing would be much easier and more
+comprehensive. In this particular case, I know the communication would only go
+as far as DBus, and not through the hardware layers of the bluetooth stack, but
+that's okay.
 
+  Is this at all possible?
+
+[0] http://hackage.haskell.org/package/ble
+
+--
+Julian K. Arni
+Haskell Consultant, Turing Jump
+https://turingjump.com
+
+
+--4jl2ukjrio6ociie
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBCAAGBQJYxtS0AAoJEGGSd4xJPRK2R8MIAIao/WNGM7aMPOr7Yex15c5F
+D59Fl3RuMIJDD32ev16yu9p9LG3JGq2I9CwGqBFQvcxDz7ApRQiHLg73zXMAJ8zz
+gLdPGx+elx46ky9JtnZBzxPtPayRt4R1ntIfG9ky8Mv5hyRlTl8TO6ufqz8d2s9L
+iNNlH7UcGgd+gxtduzkKBvKFzM2MW+B6Ki1EAvsfmbr8MgxQMuwVaLRGtmI5kWs0
+bPiD4M/bo+XFBtrk+3xxGez+fHNFezxGkp9882qv3igJbumoKr+xTJTOhEcIR7pv
+Kk7fI20bQQCCYKPxz8LDy0Gjtxvb02ZhLXpX7zwMymuC+lVlULQQb9QMXRoCEzw=
+=iArC
+-----END PGP SIGNATURE-----
+
+--4jl2ukjrio6ociie--
