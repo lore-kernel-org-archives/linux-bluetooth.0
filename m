@@ -1,85 +1,47 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: "Felipe F. Tonello" <eu@felipetonello.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC][PATCH v4 BlueZ 1/4] Bluetooth: L2CAP: Refactor L2CAP_CONN_PARAM_UPDATE_REQ into a function
-Date: Tue, 14 Mar 2017 18:30:55 +0000
-Message-Id: <20170314183058.25555-2-eu@felipetonello.com>
-In-Reply-To: <20170314183058.25555-1-eu@felipetonello.com>
-References: <20170314183058.25555-1-eu@felipetonello.com>
+Subject: [RFC][PATCH v4 BlueZ 0/4] Connection Update improvements
+Date: Tue, 14 Mar 2017 18:30:54 +0000
+Message-Id: <20170314183058.25555-1-eu@felipetonello.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This signaling command is useful for any connection parameter change
-procedure, thus it is important to allow access to it from outside this
-translation unit.
+These changes should improve applications who want to update the connection
+parameters for both master and slave devices.
 
-Signed-off-by: Felipe F. Tonello <eu@felipetonello.com>
----
- include/net/bluetooth/l2cap.h |  3 +++
- net/bluetooth/l2cap_core.c    | 31 ++++++++++++++++++++-----------
- 2 files changed, 23 insertions(+), 11 deletions(-)
+Note: Connection Parameters Request Link Layer Control Procedure (>=4.1) is
+not supported in BlueZ yet. I will work on this later as this RFC is approved.
 
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index 5ee3c689c863..0073a01c61e9 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -948,4 +948,7 @@ void l2cap_conn_put(struct l2cap_conn *conn);
- int l2cap_register_user(struct l2cap_conn *conn, struct l2cap_user *user);
- void l2cap_unregister_user(struct l2cap_conn *conn, struct l2cap_user *user);
- 
-+void l2cap_le_conn_update_req(struct l2cap_conn *conn, u8 min_interval,
-+		u8 max_interval, u8 latency, u8 supv_timeout);
-+
- #endif /* __L2CAP_H */
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index fc7f321a3823..27a38b4543e1 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -1483,6 +1483,22 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
- 	mutex_unlock(&conn->chan_lock);
- }
- 
-+/* This command shall only be send if the connection role is master */
-+void l2cap_le_conn_update_req(struct l2cap_conn *conn, u8 min_interval,
-+		u8 max_interval, u8 latency, u8 supv_timeout)
-+{
-+	struct l2cap_conn_param_update_req req;
-+
-+	req.min = cpu_to_le16(min_interval);
-+	req.max = cpu_to_le16(max_interval);
-+	req.latency = cpu_to_le16(latency);
-+	req.to_multiplier = cpu_to_le16(supv_timeout);
-+
-+	l2cap_send_cmd(conn, l2cap_get_ident(conn),
-+		       L2CAP_CONN_PARAM_UPDATE_REQ, sizeof(req), &req);
-+}
-+
-+
- static void l2cap_le_conn_ready(struct l2cap_conn *conn)
- {
- 	struct hci_conn *hcon = conn->hcon;
-@@ -1503,17 +1519,10 @@ static void l2cap_le_conn_ready(struct l2cap_conn *conn)
- 	 */
- 	if (hcon->role == HCI_ROLE_SLAVE &&
- 	    (hcon->le_conn_interval < hcon->le_conn_min_interval ||
--	     hcon->le_conn_interval > hcon->le_conn_max_interval)) {
--		struct l2cap_conn_param_update_req req;
--
--		req.min = cpu_to_le16(hcon->le_conn_min_interval);
--		req.max = cpu_to_le16(hcon->le_conn_max_interval);
--		req.latency = cpu_to_le16(hcon->le_conn_latency);
--		req.to_multiplier = cpu_to_le16(hcon->le_supv_timeout);
--
--		l2cap_send_cmd(conn, l2cap_get_ident(conn),
--			       L2CAP_CONN_PARAM_UPDATE_REQ, sizeof(req), &req);
--	}
-+	     hcon->le_conn_interval > hcon->le_conn_max_interval))
-+		l2cap_le_conn_update_req(conn, hcon->le_conn_min_interval,
-+			hcon->le_conn_max_interval, hcon->le_conn_latency,
-+			hcon->le_supv_timeout);
- }
- 
- static void l2cap_conn_ready(struct l2cap_conn *conn)
+Changes from v3:
+ * Remove role check in refactored function
+ * Added handler for Connection Parameter Update Response
+ * Use Update Request when updating the connection parameters in slave
+ * Fix MGMT command name to ADD instead of UPDATE
+
+Changes from v2:
+ * Added new MGMT command
+ * Roll back to first socket option implementation, details are on the patch
+   iself.
+
+Changes from v1:
+ * Use simpler user-space API
+ * Added patch #1
+
+Felipe F. Tonello (4):
+  Bluetooth: L2CAP: Refactor L2CAP_CONN_PARAM_UPDATE_REQ into a function
+  Bluetooth: L2CAP: Add handler for Connection Parameter Update Response
+  Bluetooth: L2CAP: Add BT_LE_CONN_PARAM socket option
+  Bluetooth: mgmt: Added new MGMT_OP_ADD_CONN_PARAM command
+
+ include/net/bluetooth/bluetooth.h |   8 +++
+ include/net/bluetooth/l2cap.h     |   5 ++
+ include/net/bluetooth/mgmt.h      |  10 ++++
+ net/bluetooth/l2cap_core.c        |  76 +++++++++++++++++++++++----
+ net/bluetooth/l2cap_sock.c        | 106 ++++++++++++++++++++++++++++++++++++++
+ net/bluetooth/mgmt.c              | 103 +++++++++++++++++++++++-------------
+ 6 files changed, 261 insertions(+), 47 deletions(-)
+
 -- 
 2.12.0
 
