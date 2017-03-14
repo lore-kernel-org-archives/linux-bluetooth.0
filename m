@@ -1,101 +1,127 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <20170313175412.11365-2-eu@felipetonello.com>
-References: <20170313175412.11365-1-eu@felipetonello.com> <20170313175412.11365-2-eu@felipetonello.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 14 Mar 2017 15:08:14 +0200
-Message-ID: <CABBYNZKvw-CuNKyRXC-MR+sC1Wx0vJsEQQrkYpgHE5s946zDGg@mail.gmail.com>
-Subject: Re: [RFC][PATCH v3 BlueZ 1/3] Bluetooth: L2CAP: Refactor
- L2CAP_CONN_PARAM_UPDATE_REQ into a function
-To: "Felipe F. Tonello" <eu@felipetonello.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 2/2] client: Use selected attribute when selecting by UUID
+Date: Tue, 14 Mar 2017 13:52:41 +0200
+Message-Id: <20170314115241.18886-2-luiz.dentz@gmail.com>
+In-Reply-To: <20170314115241.18886-1-luiz.dentz@gmail.com>
+References: <20170314115241.18886-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Felipe,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Mon, Mar 13, 2017 at 7:54 PM, Felipe F. Tonello <eu@felipetonello.com> wrote:
-> This signaling command is useful for any connection parameter change
-> procedure, thus it is important to allow access to it from outside this
-> translation unit.
->
-> Signed-off-by: Felipe F. Tonello <eu@felipetonello.com>
-> ---
->  include/net/bluetooth/l2cap.h |  3 +++
->  net/bluetooth/l2cap_core.c    | 36 +++++++++++++++++++++++-------------
->  2 files changed, 26 insertions(+), 13 deletions(-)
->
-> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-> index 5ee3c689c863..ab9ad42d8ed0 100644
-> --- a/include/net/bluetooth/l2cap.h
-> +++ b/include/net/bluetooth/l2cap.h
-> @@ -948,4 +948,7 @@ void l2cap_conn_put(struct l2cap_conn *conn);
->  int l2cap_register_user(struct l2cap_conn *conn, struct l2cap_user *user);
->  void l2cap_unregister_user(struct l2cap_conn *conn, struct l2cap_user *user);
->
-> +void l2cap_le_conn_req(struct l2cap_conn *conn, u8 min_interval,
-> +               u8 max_interval, u8 latency, u8 supv_timeout);
-> +
->  #endif /* __L2CAP_H */
-> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> index fc7f321a3823..50bf68074b44 100644
-> --- a/net/bluetooth/l2cap_core.c
-> +++ b/net/bluetooth/l2cap_core.c
-> @@ -1483,6 +1483,24 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
->         mutex_unlock(&conn->chan_lock);
->  }
->
-> +void l2cap_le_conn_req(struct l2cap_conn *conn, u8 min_interval,
-> +               u8 max_interval, u8 latency, u8 supv_timeout)
-> +{
-> +       struct l2cap_conn_param_update_req req;
-> +
-> +       if (conn->hcon->role != HCI_ROLE_SLAVE)
-> +               return;
-> +
-> +       req.min = cpu_to_le16(min_interval);
-> +       req.max = cpu_to_le16(max_interval);
-> +       req.latency = cpu_to_le16(latency);
-> +       req.to_multiplier = cpu_to_le16(supv_timeout);
-> +
-> +       l2cap_send_cmd(conn, l2cap_get_ident(conn),
-> +                      L2CAP_CONN_PARAM_UPDATE_REQ, sizeof(req), &req);
-> +}
-> +
-> +
->  static void l2cap_le_conn_ready(struct l2cap_conn *conn)
->  {
->         struct hci_conn *hcon = conn->hcon;
-> @@ -1501,19 +1519,11 @@ static void l2cap_le_conn_ready(struct l2cap_conn *conn)
->          * been configured for this connection. If not, then trigger
->          * the connection update procedure.
->          */
-> -       if (hcon->role == HCI_ROLE_SLAVE &&
-> -           (hcon->le_conn_interval < hcon->le_conn_min_interval ||
-> -            hcon->le_conn_interval > hcon->le_conn_max_interval)) {
-> -               struct l2cap_conn_param_update_req req;
-> -
-> -               req.min = cpu_to_le16(hcon->le_conn_min_interval);
-> -               req.max = cpu_to_le16(hcon->le_conn_max_interval);
-> -               req.latency = cpu_to_le16(hcon->le_conn_latency);
-> -               req.to_multiplier = cpu_to_le16(hcon->le_supv_timeout);
-> -
-> -               l2cap_send_cmd(conn, l2cap_get_ident(conn),
-> -                              L2CAP_CONN_PARAM_UPDATE_REQ, sizeof(req), &req);
-> -       }
-> +       if (hcon->le_conn_interval < hcon->le_conn_min_interval ||
-> +           hcon->le_conn_interval > hcon->le_conn_max_interval)
-> +               l2cap_le_conn_req(conn, hcon->le_conn_min_interval,
-> +                       hcon->le_conn_max_interval, hcon->le_conn_latency,
-> +                       hcon->le_supv_timeout);
->  }
->
->  static void l2cap_conn_ready(struct l2cap_conn *conn)
-> --
-> 2.12.0
+There could be multiple instances of the same UUID, like e.g CCC and CEP,
+so instead of matching the first one found from the beginning this uses
+the current selected attribute as parent looking up existing child
+attributes first.
+---
+ client/gatt.c | 26 +++++++++++++++++++-------
+ client/gatt.h |  2 +-
+ client/main.c |  4 ++--
+ 3 files changed, 22 insertions(+), 10 deletions(-)
 
-Reviewed-By: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-
+diff --git a/client/gatt.c b/client/gatt.c
+index f7a2f0c..79bc7a3 100644
+--- a/client/gatt.c
++++ b/client/gatt.c
+@@ -314,7 +314,8 @@ static GDBusProxy *select_attribute(const char *path)
+ 	return select_proxy(path, descriptors);
+ }
+ 
+-static GDBusProxy *select_proxy_by_uuid(const char *uuid, GList *source)
++static GDBusProxy *select_proxy_by_uuid(GDBusProxy *parent, const char *uuid,
++					GList *source)
+ {
+ 	GList *l;
+ 	const char *value;
+@@ -323,6 +324,10 @@ static GDBusProxy *select_proxy_by_uuid(const char *uuid, GList *source)
+ 	for (l = source; l; l = g_list_next(l)) {
+ 		GDBusProxy *proxy = l->data;
+ 
++		if (parent && !g_str_has_prefix(g_dbus_proxy_get_path(proxy),
++						g_dbus_proxy_get_path(parent)))
++			continue;
++
+ 		if (g_dbus_proxy_get_property(proxy, "UUID", &iter) == FALSE)
+ 			continue;
+ 
+@@ -335,27 +340,34 @@ static GDBusProxy *select_proxy_by_uuid(const char *uuid, GList *source)
+ 	return NULL;
+ }
+ 
+-static GDBusProxy *select_attribute_by_uuid(const char *uuid)
++static GDBusProxy *select_attribute_by_uuid(GDBusProxy *parent,
++							const char *uuid)
+ {
+ 	GDBusProxy *proxy;
+ 
+-	proxy = select_proxy_by_uuid(uuid, services);
++	proxy = select_proxy_by_uuid(parent, uuid, services);
+ 	if (proxy)
+ 		return proxy;
+ 
+-	proxy = select_proxy_by_uuid(uuid, characteristics);
++	proxy = select_proxy_by_uuid(parent, uuid, characteristics);
+ 	if (proxy)
+ 		return proxy;
+ 
+-	return select_proxy_by_uuid(uuid, descriptors);
++	return select_proxy_by_uuid(parent, uuid, descriptors);
+ }
+ 
+-GDBusProxy *gatt_select_attribute(const char *arg)
++GDBusProxy *gatt_select_attribute(GDBusProxy *parent, const char *arg)
+ {
+ 	if (arg[0] == '/')
+ 		return select_attribute(arg);
+ 
+-	return select_attribute_by_uuid(arg);
++	if (parent) {
++		GDBusProxy *proxy = select_attribute_by_uuid(parent, arg);
++		if (proxy)
++			return proxy;
++	}
++
++	return select_attribute_by_uuid(parent, arg);
+ }
+ 
+ static char *attribute_generator(const char *text, int state, GList *source)
+diff --git a/client/gatt.h b/client/gatt.h
+index 689bb4d..7a91975 100644
+--- a/client/gatt.h
++++ b/client/gatt.h
+@@ -31,7 +31,7 @@ void gatt_add_descriptor(GDBusProxy *proxy);
+ void gatt_remove_descriptor(GDBusProxy *proxy);
+ 
+ void gatt_list_attributes(const char *device);
+-GDBusProxy *gatt_select_attribute(const char *path);
++GDBusProxy *gatt_select_attribute(GDBusProxy *parent, const char *path);
+ char *gatt_attribute_generator(const char *text, int state);
+ 
+ void gatt_read_attribute(GDBusProxy *proxy);
+diff --git a/client/main.c b/client/main.c
+index d01e5fa..857c111 100644
+--- a/client/main.c
++++ b/client/main.c
+@@ -1704,7 +1704,7 @@ static void cmd_select_attribute(const char *arg)
+ 		return;
+ 	}
+ 
+-	proxy = gatt_select_attribute(arg);
++	proxy = gatt_select_attribute(default_attr, arg);
+ 	if (proxy)
+ 		set_default_attribute(proxy);
+ }
+@@ -1720,7 +1720,7 @@ static struct GDBusProxy *find_attribute(const char *arg)
+ 		return NULL;
+ 	}
+ 
+-	proxy = gatt_select_attribute(arg);
++	proxy = gatt_select_attribute(default_attr, arg);
+ 	if (!proxy) {
+ 		rl_printf("Attribute %s not available\n", arg);
+ 		return NULL;
 -- 
-Luiz Augusto von Dentz
+2.9.3
+
