@@ -1,224 +1,224 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Subject: Re: [RFC][PATCH v3 BlueZ 3/3] Bluetooth: mgmt: Added new
- MGMT_OP_UPDATE_CONN_PARAM command
+Subject: Re: [RFC][PATCH v3 BlueZ 2/3] Bluetooth: L2CAP: Add BT_LE_CONN_PARAM
+ socket option
 To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 References: <20170313175412.11365-1-eu@felipetonello.com>
- <20170313175412.11365-4-eu@felipetonello.com>
- <CABBYNZKsTz_LGXwGW7jHK3vC4Hc1UFe6oTFv4hfO1sX6FZ0iow@mail.gmail.com>
+ <20170313175412.11365-3-eu@felipetonello.com>
+ <CABBYNZLpOC4pDubo493of+nPUVsJ44PwXWHj-o+MBCcuH1cBJQ@mail.gmail.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 From: Felipe Ferreri Tonello <eu@felipetonello.com>
-Message-ID: <86c21170-e18f-1c22-b2f5-aef15ccf6863@felipetonello.com>
-Date: Tue, 14 Mar 2017 16:32:37 +0000
+Message-ID: <e6193712-b669-c68b-586c-f61e8cc66955@felipetonello.com>
+Date: Tue, 14 Mar 2017 16:15:51 +0000
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZKsTz_LGXwGW7jHK3vC4Hc1UFe6oTFv4hfO1sX6FZ0iow@mail.gmail.com>
+In-Reply-To: <CABBYNZLpOC4pDubo493of+nPUVsJ44PwXWHj-o+MBCcuH1cBJQ@mail.gmail.com>
 Content-Type: multipart/mixed;
- boundary="------------71522814FBA4A119550F5E24"
+ boundary="------------AD9FBA6DB61386A1E4805C5F"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 This is a multi-part message in MIME format.
---------------71522814FBA4A119550F5E24
+--------------AD9FBA6DB61386A1E4805C5F
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
 
 Hi Luiz,
 
-On 14/03/17 13:36, Luiz Augusto von Dentz wrote:
+On 14/03/17 13:17, Luiz Augusto von Dentz wrote:
 > Hi Felipe,
 > 
 > On Mon, Mar 13, 2017 at 7:54 PM, Felipe F. Tonello <eu@felipetonello.com> wrote:
->> This command is similar to MGMT_OP_LOAD_CONN_PARAM with the exception
->> that it only updates one connection parameter and it doesn't cleanup
->> previous parameters set.
+>> There is a need for certain LE profiles (MIDI for example) to change the
+>> current connection's parameters. In order to do that, this patch
+>> introduces a new BT_LE_CONN_PARAM socket option for SOL_BLUETOOTH
+>> protocol which allow user-space l2cap sockets to update the current
+>> connection.
 >>
->> This is useful for applications to update one specific connection
->> parameter and not caring about other cached connection parameters.
+>> It necessary to expose all the connection parameters to user-space
+>> because user-space are exposed to those values anyway, via PPCP
+>> characteristic or Slave Connection Interval AD, for instance. Also it is
+>> useful for tools to set particular values for because of profile
+>> requirements.
+>>
+>> If ROLE is SLAVE, then it will also send a L2CAP_CONN_PARAM_UPDATE_REQ
+>> signaling command to the MASTER, triggering proper 4.0 parameter update
+>> procedure.
+>>
+>> This option will also send a MGMT_EV_NEW_CONN_PARAM event with the
+>> store_hint set so the user-space application can store the connection
+>> parameters for persistence reasons.
+>>
+>> Note: Connection Parameters Request Link Layer Control Procedure is not
+>> supported by BlueZ yet.
 >>
 >> Signed-off-by: Felipe F. Tonello <eu@felipetonello.com>
 >> ---
->>  include/net/bluetooth/mgmt.h |  10 +++++
->>  net/bluetooth/mgmt.c         | 104 ++++++++++++++++++++++++++++---------------
->>  2 files changed, 77 insertions(+), 37 deletions(-)
+>>  include/net/bluetooth/bluetooth.h |   8 +++
+>>  net/bluetooth/l2cap_sock.c        | 101 ++++++++++++++++++++++++++++++++++++++
+>>  net/bluetooth/mgmt.c              |   1 +
+>>  3 files changed, 110 insertions(+)
 >>
->> diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
->> index 72a456bbbcd5..f81003fb32f1 100644
->> --- a/include/net/bluetooth/mgmt.h
->> +++ b/include/net/bluetooth/mgmt.h
->> @@ -604,6 +604,16 @@ struct mgmt_cp_set_appearance {
->>  } __packed;
->>  #define MGMT_SET_APPEARANCE_SIZE       2
+>> diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+>> index 01487192f628..ce5b3abd3b27 100644
+>> --- a/include/net/bluetooth/bluetooth.h
+>> +++ b/include/net/bluetooth/bluetooth.h
+>> @@ -122,6 +122,14 @@ struct bt_voice {
+>>  #define BT_SNDMTU              12
+>>  #define BT_RCVMTU              13
 >>
->> +#define MGMT_OP_UPDATE_CONN_PARAM      0x0044
->> +struct mgmt_cp_update_conn_param {
->> +       struct mgmt_addr_info addr;
->> +       __le16 min_interval;
->> +       __le16 max_interval;
->> +       __le16 latency;
->> +       __le16 timeout;
->> +} __packed;
->> +#define MGMT_UPDATE_CONN_PARAM_SIZE    (MGMT_ADDR_INFO_SIZE + 8)
+>> +#define BT_LE_CONN_PARAM       14
+>> +struct bt_le_conn_param {
+>> +       __u16 min_interval;
+>> +       __u16 max_interval;
+>> +       __u16 latency;
+>> +       __u16 supervision_timeout;
+>> +};
 >> +
+>>  __printf(1, 2)
+>>  void bt_info(const char *fmt, ...);
+>>  __printf(1, 2)
+>> diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+>> index f307b145ea54..8c2e6f29869f 100644
+>> --- a/net/bluetooth/l2cap_sock.c
+>> +++ b/net/bluetooth/l2cap_sock.c
+>> @@ -515,6 +515,47 @@ static int l2cap_sock_getsockopt(struct socket *sock, int level, int optname,
+>>         lock_sock(sk);
+>>
+>>         switch (optname) {
+>> +       case BT_LE_CONN_PARAM: {
+>> +               struct bt_le_conn_param conn_param;
+>> +               struct hci_conn_params *params;
+>> +               struct hci_conn *hcon;
+>> +               struct hci_dev *hdev;
+>> +
+>> +               if (!chan->conn) {
+>> +                       err = -ENOTCONN;
+>> +                       break;
+>> +               }
+>> +
+>> +               hcon = chan->conn->hcon;
+>> +               hdev = hcon->hdev;
+>> +               hci_dev_lock(hdev);
+>> +
+>> +               params = hci_conn_params_lookup(hdev, &hcon->dst,
+>> +                       hcon->dst_type);
+>> +
+>> +               memset(&conn_param, 0, sizeof(conn_param));
+>> +
+>> +               if (params) {
+>> +                       conn_param.min_interval = params->conn_min_interval;
+>> +                       conn_param.max_interval = params->conn_max_interval;
+>> +                       conn_param.latency = params->conn_latency;
+>> +                       conn_param.supervision_timeout =
+>> +                               params->supervision_timeout;
+>> +               } else {
+>> +                       conn_param.min_interval = hdev->le_conn_min_interval;
+>> +                       conn_param.max_interval = hdev->le_conn_max_interval;
+>> +                       conn_param.latency = hdev->le_conn_latency;
+>> +                       conn_param.supervision_timeout = hdev->le_supv_timeout;
+>> +               }
+>> +
+>> +               hci_dev_unlock(hdev);
+>> +
+>> +               len = min_t(unsigned int, len, sizeof(conn_param));
+>> +               if (copy_to_user(optval, (char *) &conn_param, len))
+>> +                       err = -EFAULT;
+>> +
+>> +               break;
+>> +       }
+>>         case BT_SECURITY:
+>>                 if (chan->chan_type != L2CAP_CHAN_CONN_ORIENTED &&
+>>                     chan->chan_type != L2CAP_CHAN_FIXED &&
+>> @@ -762,6 +803,66 @@ static int l2cap_sock_setsockopt(struct socket *sock, int level, int optname,
+>>         lock_sock(sk);
+>>
+>>         switch (optname) {
+>> +       case BT_LE_CONN_PARAM: {
+>> +               struct bt_le_conn_param conn_param;
+>> +               struct hci_conn_params *hci_param;
+>> +               struct hci_conn *hcon;
+>> +               struct hci_dev *hdev;
+>> +
+>> +               len = min_t(unsigned int, sizeof(conn_param), optlen);
+>> +               if (copy_from_user((char *) &conn_param, optval, len)) {
+>> +                       err = -EFAULT;
+>> +                       break;
+>> +               }
+>> +
+>> +               if (!chan->conn) {
+>> +                       err = -ENOTCONN;
+>> +                       break;
+>> +               }
+>> +
+>> +               err = hci_check_conn_params(conn_param.min_interval,
+>> +                       conn_param.max_interval, conn_param.latency,
+>> +                       conn_param.supervision_timeout);
+>> +               if (err < 0) {
+>> +                       BT_ERR("Ignoring invalid connection parameters");
+>> +                       break;
+>> +               }
+>> +
+>> +               hcon = chan->conn->hcon;
+>> +               hdev = hcon->hdev;
+>> +
+>> +               hci_dev_lock(hdev);
+>> +
+>> +               /* We add new param in case it doesn't exist.
+>> +                * hci_param will be updated in hci_le_conn_update(). */
+>> +               hci_param = hci_conn_params_add(hdev, &hcon->dst,
+>> +                       hcon->dst_type);
+>> +               if (!hci_param) {
+>> +                       err = -ENOMEM;
+>> +                       BT_ERR("Failed to add connection parameters");
+>> +                       hci_dev_unlock(hcon->hdev);
+>> +                       break;
+>> +               }
+>> +
+>> +               hci_dev_unlock(hdev);
+>> +
+>> +               /* Send a L2CAP connection parameters update request, if
+>> +                * the host role is slave. */
+>> +               l2cap_le_conn_req(chan->conn, conn_param.min_interval,
+>> +                       conn_param.max_interval, conn_param.latency,
+>> +                       conn_param.supervision_timeout);
 > 
-> Id really like it to be named add instead of update since this may be
-> a new entry. Regarding the AD, the tricky part about it is that in
-> case of passive scanning + auto reconnect the userspace may not have
-> enough time to set since the kernel should start connecting to it
-> immediately, also we don't want to keep adding the same parameters
-> over and over, perhaps not even if they change, since they only really
-> matter if the device is going to be connected we can just cache the
-> last parameters and only propagate to the kernel before connecting.
-> Again this only matters for devices not marked to auto-connect, which
-> in most cases is limited to devices that have never been connected
-> before, for the devices marked to auto-connect the kernel should
-> probably be parsing the AD.
+> I thought we already discuss doing something like this should require
+> us to wait for the response from the remote, if it doesn't accept the
+> new parameters or suggests something else then it needs to be stored
+> accordingly. Also perhaps the socket options should only work as
+> overwrite values for the current connection and not affect the stored
+> values because this may be relevant for only a certain cid/PSM and if
+> that is not reconnected there is no reason to reapply the same
+> parameters all the time.
 
-We can probably check if the parameters are set in that particular
-connection, if so, we don't send this to user-space.
+Ok.
 
 > 
->>  #define MGMT_EV_CMD_COMPLETE           0x0001
->>  struct mgmt_ev_cmd_complete {
->>         __le16  opcode;
+>> +               /* this function also updates the hci_param value */
+>> +               hci_le_conn_update(hcon, conn_param.min_interval,
+>> +                       conn_param.max_interval, conn_param.latency,
+>> +                       conn_param.supervision_timeout);
+>> +
+>> +               mgmt_new_conn_param(hdev, &hcon->dst, hcon->dst_type, true,
+>> +                       conn_param.min_interval, conn_param.max_interval,
+>> +                       conn_param.latency, conn_param.supervision_timeout);
+>> +               break;
+>> +       }
+>> +
+>>         case BT_SECURITY:
+>>                 if (chan->chan_type != L2CAP_CHAN_CONN_ORIENTED &&
+>>                     chan->chan_type != L2CAP_CHAN_FIXED &&
 >> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
->> index 0f44af559ae6..b9546bab3b07 100644
+>> index 1fba2a03f8ae..0f44af559ae6 100644
 >> --- a/net/bluetooth/mgmt.c
 >> +++ b/net/bluetooth/mgmt.c
->> @@ -106,6 +106,7 @@ static const u16 mgmt_commands[] = {
->>         MGMT_OP_START_LIMITED_DISCOVERY,
->>         MGMT_OP_READ_EXT_INFO,
->>         MGMT_OP_SET_APPEARANCE,
->> +       MGMT_OP_UPDATE_CONN_PARAM,
->>  };
->>
->>  static const u16 mgmt_events[] = {
->> @@ -5462,6 +5463,69 @@ static int remove_device(struct sock *sk, struct hci_dev *hdev,
->>         return err;
->>  }
->>
->> +/* This function requires the caller holds hdev->lock */
->> +static u8 really_update_conn_param(struct hci_dev *hdev,
->> +                                  struct mgmt_cp_update_conn_param *param)
->> +{
->> +       struct hci_conn_params *hci_param;
->> +       u16 min, max, latency, timeout;
->> +       u8 addr_type;
->> +
->> +       if (param->addr.type == BDADDR_LE_PUBLIC)
->> +               addr_type = ADDR_LE_DEV_PUBLIC;
->> +       else if (param->addr.type == BDADDR_LE_RANDOM)
->> +               addr_type = ADDR_LE_DEV_RANDOM;
->> +       else
->> +               return MGMT_STATUS_INVALID_PARAMS;
->> +
->> +       min = le16_to_cpu(param->min_interval);
->> +       max = le16_to_cpu(param->max_interval);
->> +       latency = le16_to_cpu(param->latency);
->> +       timeout = le16_to_cpu(param->timeout);
->> +
->> +       BT_DBG("min 0x%04x max 0x%04x latency 0x%04x timeout 0x%04x",
->> +              min, max, latency, timeout);
->> +
->> +       if (hci_check_conn_params(min, max, latency, timeout) < 0) {
->> +               BT_ERR("Ignoring invalid connection parameters");
->> +               return MGMT_STATUS_INVALID_PARAMS;
->> +       }
->> +
->> +       hci_param = hci_conn_params_add(hdev, &param->addr.bdaddr,
->> +                                       addr_type);
->> +       if (!hci_param) {
->> +               BT_ERR("Failed to add connection parameters");
->> +               return MGMT_STATUS_FAILED;
->> +       }
->> +
->> +       hci_param->conn_min_interval = min;
->> +       hci_param->conn_max_interval = max;
->> +       hci_param->conn_latency = latency;
->> +       hci_param->supervision_timeout = timeout;
->> +
->> +       return 0;
->> +}
->> +
->> +static int update_conn_param(struct sock *sk, struct hci_dev *hdev, void *data,
->> +                            u16 len)
->> +{
->> +       struct mgmt_cp_update_conn_param *cp = data;
->> +       u8 cmd_status;
->> +
->> +       if (!lmp_le_capable(hdev))
->> +               return mgmt_cmd_status(sk, hdev->id, MGMT_OP_UPDATE_CONN_PARAM,
->> +                                      MGMT_STATUS_NOT_SUPPORTED);
->> +
->> +       hci_dev_lock(hdev);
->> +
->> +       cmd_status = really_update_conn_param(hdev, cp);
->> +
->> +       hci_dev_unlock(hdev);
->> +
->> +       return mgmt_cmd_complete(sk, hdev->id, MGMT_OP_UPDATE_CONN_PARAM,
->> +                                cmd_status, NULL, 0);
->> +}
->> +
->>  static int load_conn_param(struct sock *sk, struct hci_dev *hdev, void *data,
->>                            u16 len)
->>  {
->> @@ -5500,47 +5564,12 @@ static int load_conn_param(struct sock *sk, struct hci_dev *hdev, void *data,
->>
->>         for (i = 0; i < param_count; i++) {
->>                 struct mgmt_conn_param *param = &cp->params[i];
->> -               struct hci_conn_params *hci_param;
->> -               u16 min, max, latency, timeout;
->> -               u8 addr_type;
->>
->>                 BT_DBG("Adding %pMR (type %u)", &param->addr.bdaddr,
->>                        param->addr.type);
->>
->> -               if (param->addr.type == BDADDR_LE_PUBLIC) {
->> -                       addr_type = ADDR_LE_DEV_PUBLIC;
->> -               } else if (param->addr.type == BDADDR_LE_RANDOM) {
->> -                       addr_type = ADDR_LE_DEV_RANDOM;
->> -               } else {
->> -                       BT_ERR("Ignoring invalid connection parameters");
->> -                       continue;
->> -               }
->> -
->> -               min = le16_to_cpu(param->min_interval);
->> -               max = le16_to_cpu(param->max_interval);
->> -               latency = le16_to_cpu(param->latency);
->> -               timeout = le16_to_cpu(param->timeout);
->> -
->> -               BT_DBG("min 0x%04x max 0x%04x latency 0x%04x timeout 0x%04x",
->> -                      min, max, latency, timeout);
->> -
->> -               if (hci_check_conn_params(min, max, latency, timeout) < 0) {
->> -                       BT_ERR("Ignoring invalid connection parameters");
->> -                       continue;
->> -               }
->> -
->> -               hci_param = hci_conn_params_add(hdev, &param->addr.bdaddr,
->> -                                               addr_type);
->> -               if (!hci_param) {
->> -                       BT_ERR("Failed to add connection parameters");
->> -                       continue;
->> -               }
->> -
->> -               hci_param->conn_min_interval = min;
->> -               hci_param->conn_max_interval = max;
->> -               hci_param->conn_latency = latency;
->> -               hci_param->supervision_timeout = timeout;
->> -               hci_param->conn_config = BT_LE_CONN_CONFIG_CUSTOM_LATENCY;
->> +               really_update_conn_param(hdev,
->> +                       (struct mgmt_cp_update_conn_param *)param);
+>> @@ -5540,6 +5540,7 @@ static int load_conn_param(struct sock *sk, struct hci_dev *hdev, void *data,
+>>                 hci_param->conn_max_interval = max;
+>>                 hci_param->conn_latency = latency;
+>>                 hci_param->supervision_timeout = timeout;
+>> +               hci_param->conn_config = BT_LE_CONN_CONFIG_CUSTOM_LATENCY;
 >>         }
 >>
 >>         hci_dev_unlock(hdev);
->> @@ -6539,6 +6568,7 @@ static const struct hci_mgmt_handler mgmt_handlers[] = {
->>         { read_ext_controller_info,MGMT_READ_EXT_INFO_SIZE,
->>                                                 HCI_MGMT_UNTRUSTED },
->>         { set_appearance,          MGMT_SET_APPEARANCE_SIZE },
->> +       { update_conn_param,       MGMT_UPDATE_CONN_PARAM_SIZE },
->>  };
->>
->>  void mgmt_index_added(struct hci_dev *hdev)
 >> --
 >> 2.12.0
 >>
@@ -233,7 +233,7 @@ connection, if so, we don't send this to user-space.
 -- 
 Felipe
 
---------------71522814FBA4A119550F5E24
+--------------AD9FBA6DB61386A1E4805C5F
 Content-Type: application/pgp-keys;
  name="0x92698E6A.asc"
 Content-Transfer-Encoding: 7bit
@@ -355,4 +355,4 @@ SkAyCfQaSw==
 =JwBB
 -----END PGP PUBLIC KEY BLOCK-----
 
---------------71522814FBA4A119550F5E24--
+--------------AD9FBA6DB61386A1E4805C5F--
