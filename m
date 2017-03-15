@@ -7,10 +7,8 @@ Cc: linux-kernel@vger.kernel.org,
 	Johan Hedberg <johan.hedberg@gmail.com>,
 	John Keeping <john@metanate.com>
 Subject: [PATCH] Bluetooth: hci_bcm: Fix clock (un)prepare
-Date: Wed, 15 Mar 2017 12:20:05 +0000
-Message-Id: <20170315122005.7702-2-john@metanate.com>
-In-Reply-To: <20170315122005.7702-1-john@metanate.com>
-References: <20170315122005.7702-1-john@metanate.com>
+Date: Wed, 15 Mar 2017 12:20:04 +0000
+Message-Id: <20170315122005.7702-1-john@metanate.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 The hci_bcm driver currently does not prepare/unprepare the clock and
