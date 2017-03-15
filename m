@@ -1,44 +1,58 @@
-Return-Path: <john@metanate.com>
-From: John Keeping <john@metanate.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	John Keeping <john@metanate.com>
-Subject: [PATCH] Bluetooth: hci_bcm: Fix clock (un)prepare
-Date: Wed, 15 Mar 2017 12:20:04 +0000
-Message-Id: <20170315122005.7702-1-john@metanate.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Date: Tue, 14 Mar 2017 20:11:36 -0600
+From: Tal <jkarni@gmail.com>
+To: Barry Byford <31baz66@gmail.com>
+Cc: Bluez mailing list <linux-bluetooth@vger.kernel.org>
+Subject: Re: Integration (-ish) testing with BlueZ D-Bus API
+Message-ID: <20170315021136.qvam4ceik5baeqje@Tal>
+References: <20170313171952.sqmm6fhqranalkf7@Tal>
+ <CAAu3APZTmCs8iFWTOEaF8Z-9p+wnUHc5744MS+Th3bBVWC3eTw@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="frirthqhcng3axeg"
+In-Reply-To: <CAAu3APZTmCs8iFWTOEaF8Z-9p+wnUHc5744MS+Th3bBVWC3eTw@mail.gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The hci_bcm driver currently does not prepare/unprepare the clock and
-goes directly to enable, but as the documentation for clk_enable says,
-clk_prepare must be called before clk_enable.
 
-Signed-off-by: John Keeping <john@metanate.com>
----
- drivers/bluetooth/hci_bcm.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+--frirthqhcng3axeg
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
-index 5262a2077d7a..c7d3c6842bcf 100644
---- a/drivers/bluetooth/hci_bcm.c
-+++ b/drivers/bluetooth/hci_bcm.c
-@@ -146,13 +146,13 @@ static bool bcm_device_exists(struct bcm_device *device)
- static int bcm_gpio_set_power(struct bcm_device *dev, bool powered)
- {
- 	if (powered && !IS_ERR(dev->clk) && !dev->clk_enabled)
--		clk_enable(dev->clk);
-+		clk_prepare_enable(dev->clk);
- 
- 	gpiod_set_value(dev->shutdown, powered);
- 	gpiod_set_value(dev->device_wakeup, powered);
- 
- 	if (!powered && !IS_ERR(dev->clk) && dev->clk_enabled)
--		clk_disable(dev->clk);
-+		clk_disable_unprepare(dev->clk);
- 
- 	dev->clk_enabled = powered;
- 
--- 
-2.12.0.377.gf910686b23.dirty
+Hi Barry,
+
+On Mon, Mar 13, 2017 at 06:33:23PM +0000, Barry Byford wrote:
+> Hello Julian,
+>
+> This sounds like the functionality of the DBUS Mock library.
+> https://github.com/martinpitt/python-dbusmock
+>
+> There is a BlueZ example/template in the library although they are
+> slightly out of date with the latest BlueZ.
+> I have started to work on updating and adding some GATT functionality
+> although have not got that far.
+> However it does allow me to run integration tests on GitHub.
+>
+
+I think this will do nicely, thanks!
+
+--
+Julian K. Arni
+Haskell Consultant, Turing Jump
+https://turingjump.com
+
+--frirthqhcng3axeg
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBCAAGBQJYyKLYAAoJEGGSd4xJPRK2Mw0IAIwblme35bt3Us1wNkYosoFp
+EOOplAuCMt1ZmremXR0kV8u61987cY2f3cR68JdWDVLTk3ZkjMhJpuTVf2x1KYeR
+SXnopZn25q8bpqsyo7UaZk83fNNtxgbeL90m35UlArpEPPyJbJ/k41pCW/uxyJPa
+ti2DA/HSkiJ5SGTe2wLxo4wBYkTYPFPURHZfEOHhqAJ11H/cKkak5dF03t7OkdN0
+oD624ZdqEABCThaabfSpFzh8gHKIvX5r622DPAwesusXjIg1jOWp5WJaJCG0EbGq
+u3w5/je0eY0Jzr2Z4wnBQez0Rsn61nRS9hZbYOS0C5rvOT0ckLb8HQ/5arFXO9k=
+=CIoN
+-----END PGP SIGNATURE-----
+
+--frirthqhcng3axeg--
