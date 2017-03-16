@@ -1,10 +1,10 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
 From: Luke McKee <hojuruku@gmail.com>
-Date: Fri, 17 Mar 2017 05:11:40 +0700
-Message-ID: <CAENjB=J_Qf_6hzOLXFMfrSrwVC6tp+dJhS+h=m2-HHgbQxFHag@mail.gmail.com>
-Subject: Re: Lower Level Host Stack bug - 0x1a (remote host feature) using
- EDR+SCO to non-capable Taiwanese/Chinese devices
+Date: Thu, 16 Mar 2017 23:45:17 +0700
+Message-ID: <CAENjB=+c1MqfkgWC+q7HUT1tKtKtKZoJk-dZ8GYX=CarhrUr5Q@mail.gmail.com>
+Subject: Lower Level Host Stack bug - 0x1a (remote host feature) using EDR+SCO
+ to non-capable Taiwanese/Chinese devices
 To: linux-bluetooth@vger.kernel.org
 Cc: georg@chini.tk, kubax.t.pawlak@intel.com, madingzhi@163.com,
         rimi@szaodasen.com, conwise@conwise.com.tw
@@ -12,281 +12,237 @@ Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 16 March 2017 at 23:45, Luke McKee <hojuruku@gmail.com> wrote:
->
-> This bug at first sight appears to be a regression of this bug:
-> https://lists.freedesktop.org/archives/pulseaudio-discuss/2015-March/023305.html
-> reported by Georg Chini that's well known of by many pulseaudio users
-> but I believe it's a new one, brought about by incompatibility of many
-> Taiwanese Bluetooth stacks that support EDR only for A2DP / EDR
-> connection-less streams.   Many thanks for to Georg for support given
-> on #pulseaudio given to me (hojuruku)
->
-> The feedback from hcidump is near identical to the previous bug,
-> because but after even applying a patch to hci_event.c from George
-> (included below) however it didn't attempt a reconnect, so the cause
-> may be different, but the symptoms are the same.
->
-> The HSP or HFP protocols don't work due to the reliance on SCO with
-> this device and all other TW based hardware I have laying around here
-> (headphones / speakers)
-> https://www.mikrocontroller.net/attachment/193445/CW6626-Datasheet-DS6626V1.1.pdf
-> FYI this is the speaker:
-> http://www.szaodasen.com/en/productmore.asp?id=119&pid=6&i=119 It also
-> has a rfcomm profile and a proprietary app to remote control,
-> configure it set the clock etc. I might ask how to sniff rfcomm
-> connections later ;)
->
-> Unlike the previous issues this bluetooth speaker supports eSCO, but
-> not eSCO with a EDR packet type. This is affecting 4.9.13
+This bug at first sight appears to be a regression of this bug:
+https://lists.freedesktop.org/archives/pulseaudio-discuss/2015-March/023305.html
+reported by Georg Chini that's well known of by many pulseaudio users
+but I believe it's a new one, brought about by incompatibility of many
+Taiwanese Bluetooth stacks that support EDR only for A2DP / EDR
+connection-less streams.   Many thanks for to Georg for support given
+on #pulseaudio given to me (hojuruku)
 
-I have confirmed what's going on. bluez isn't honoring the SDP where
-the device claims it doesn't support EDR packet types for SCO (see
-previous email http://marc.info/?l=linux-bluetooth&m=148968308621534&w=2)
+The feedback from hcidump is near identical to the previous bug,
+because but after even applying a patch to hci_event.c from George
+(included below) however it didn't attempt a reconnect, so the cause
+may be different, but the symptoms are the same.
 
-I set up android-x86.org under qemu to use the same bluetooth adapter
-and did a snoop and analysed in wireshark. If the controller supports
-EDR, bluez will try and ONLY use EDR for SCO without checking if the
-remote device (SDP) supports it.
+The HSP or HFP protocols don't work due to the reliance on SCO with
+this device and all other TW based hardware I have laying around here
+(headphones / speakers)
+https://www.mikrocontroller.net/attachment/193445/CW6626-Datasheet-DS6626V1.1.pdf
+FYI this is the speaker:
+http://www.szaodasen.com/en/productmore.asp?id=119&pid=6&i=119 It also
+has a rfcomm profile and a proprietary app to remote control,
+configure it set the clock etc. I might ask how to sniff rfcomm
+connections later ;)
 
-This is why SCO doesn't work - it's a linux kernel issue to do with
-sco.c as suggested in a relevant bug report
-(https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=788466)
-If esco exists bluez is assuming it supports esco over EDR - which
-this device doesn't support. That's the new bug.
-Legacy non EDR SCO/esco would use these packet types?
-http://www.dziwior.org/Bluetooth/SCO.html HV1 HV2 HV3
+Unlike the previous issues this bluetooth speaker supports eSCO, but
+not eSCO with a EDR packet type. This is affecting 4.9.13
 
+The symptoms in userspace and hcidump are nearly identical but I have
+verified the appropriate patches have been applied to work around the
+issue of eSCO not being present in the bluetooth headset, as that's
+not the problem here.
 
-Command Opcode: Setup Synchronous Connection (0x0428)
+https://www.freedesktop.org/wiki/Software/PulseAudio/Documentation/User/Bluetooth/
 
-No.     Time           Source                Destination
-Protocol Length Info
-    299 70.114149      controller            host
-HCI_EVT  7      Sent Number of Completed Packets
+"The "Protocol not supported" problem
 
-Frame 299: 7 bytes on wire (56 bits), 7 bytes captured (56 bits)
-    Encapsulation type: Bluetooth without transport layer (102)
-    Arrival Time: Mar 17, 2017 03:58:40.549821000 ICT
-    [Time shift for this packet: 0.000000000 seconds]
-    Epoch Time: 1489697920.549821000 seconds
-    [Time delta from previous captured frame: 0.135330000 seconds]
-    [Time delta from previous displayed frame: 0.135330000 seconds]
-    [Time since reference or first frame: 70.114149000 seconds]
-    Frame Number: 299
-    Frame Length: 7 bytes (56 bits)
-    Capture Length: 7 bytes (56 bits)
-    [Frame is marked: False]
-    [Frame is ignored: False]
-    Point-to-Point Direction: Sent (0)
-    [Protocols in frame: bluetooth:hci_h1:bthci_evt]
-Bluetooth
-    [Source: controller]
-    [Destination: host]
-Bluetooth HCI H1 Sent HCI Event
-    [Direction: Sent (0)]
-Bluetooth HCI Event - Number of Completed Packets
-    Event Code: Number of Completed Packets (0x13)
-    Parameter Total Length: 5
-    Number of Connection Handles: 1
-    Connection Handle: 0x000b
-    Number of Completed Packets: 1
+There was some regression in the kernel that was introduced in 3.12
+and fixed in 3.18 that caused failure when trying to activate HSP/HFP
+with some headsets. This problem can be identified by this error
+message in pulseaudio log:
 
-No.     Time           Source                Destination
-Protocol Length Info
-    300 70.735628      host                  controller
-HCI_CMD  20     Rcvd Setup Synchronous Connection
+backend-native.c: connect(): Protocol not supported"
 
-Frame 300: 20 bytes on wire (160 bits), 20 bytes captured (160 bits)
-    Encapsulation type: Bluetooth without transport layer (102)
-    Arrival Time: Mar 17, 2017 03:58:41.171300000 ICT
-    [Time shift for this packet: 0.000000000 seconds]
-    Epoch Time: 1489697921.171300000 seconds
-    [Time delta from previous captured frame: 0.621479000 seconds]
-    [Time delta from previous displayed frame: 0.621479000 seconds]
-    [Time since reference or first frame: 70.735628000 seconds]
-    Frame Number: 300
-    Frame Length: 20 bytes (160 bits)
-    Capture Length: 20 bytes (160 bits)
-    [Frame is marked: False]
-    [Frame is ignored: False]
-    Point-to-Point Direction: Received (1)
-    [Protocols in frame: bluetooth:hci_h1:bthci_cmd]
-Bluetooth
-    [Source: host]
-    [Destination: controller]
-Bluetooth HCI H1 Rcvd HCI Command
-    [Direction: Rcvd (1)]
-Bluetooth HCI Command - Setup Synchronous Connection
-    Command Opcode: Setup Synchronous Connection (0x0428)
-        0000 01.. .... .... = Opcode Group Field: Link Control Commands (0x01)
-        .... ..00 0010 1000 = Opcode Command Field: Setup Synchronous
-Connection (0x028)
-    Parameter Total Length: 17
-    Connection Handle: 0x000b
-    Tx Bandwidth (bytes/s): 8000
-    Rx Bandwidth (bytes/s): 8000
-    Max. Latency (ms): 10
-    0000 00.. .... .... = Unused bits: 0x00
-    .... ..00 .... .... = Input Coding: Linear (0)
-    .... .... 01.. .... = Input Data Format: 2's complement (1)
-    .... .... ..1. .... = Input Sample Size: 16 bit (only for Linear PCM) (1)
-    .... .... ...0 00.. = Linear PCM Bit Position: 0
-    .... .... .... ..00 = Air Coding Format: CVSD (0)
-    Retransmission Effort: At least 1 retransmission, optimize for
-power consumption (1)
-    .... .... .... ...0 = Packet Type HV1: false (0)
-    .... .... .... ..0. = Packet Type HV2: false (0)
-    .... .... .... .0.. = Packet Type HV3: false (0)
-    .... .... .... 0... = Packet Type EV3: false (0)
-    .... .... ...0 .... = Packet Type EV4: false (0)
-    .... .... ..0. .... = Packet Type EV5: false (0)
-    .... .... .0.. .... = Packet Type 2-EV3: false (0)
-    .... .... 1... .... = Packet Type 3-EV3: true (1)
-    .... ...1 .... .... = Packet Type 2-EV5: true (1)
-    .... ..1. .... .... = Packet Type 3-EV5: true (1)
-    [Response in frame: 301]
-    [Command-Response Delta: 2.746 ms]
+Here is a decent bug report for the 2015 bug mentioned above:
+https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=788466
 
-No.     Time           Source                Destination
-Protocol Length Info
-    301 70.738374      controller            host
-HCI_EVT  6      Sent Command Status (Setup Synchronous Connection)
+This is not just a pulseaudio issue, bluez-alsa (for 5.x bluez
+https://github.com/Arkq/bluez-alsa) reports the same:
 
-Frame 301: 6 bytes on wire (48 bits), 6 bytes captured (48 bits)
-    Encapsulation type: Bluetooth without transport layer (102)
-    Arrival Time: Mar 17, 2017 03:58:41.174046000 ICT
-    [Time shift for this packet: 0.000000000 seconds]
-    Epoch Time: 1489697921.174046000 seconds
-    [Time delta from previous captured frame: 0.002746000 seconds]
-    [Time delta from previous displayed frame: 0.002746000 seconds]
-    [Time since reference or first frame: 70.738374000 seconds]
-    Frame Number: 301
-    Frame Length: 6 bytes (48 bits)
-    Capture Length: 6 bytes (48 bits)
-    [Frame is marked: False]
-    [Frame is ignored: False]
-    Point-to-Point Direction: Sent (0)
-    [Protocols in frame: bluetooth:hci_h1:bthci_evt]
-Bluetooth
-    [Source: controller]
-    [Destination: host]
-Bluetooth HCI H1 Sent HCI Event
-    [Direction: Sent (0)]
-Bluetooth HCI Event - Command Status
-    Event Code: Command Status (0x0f)
-    Parameter Total Length: 4
-    Status: Unsupported Remote/LMP Feature (0x1a)
-    Number of Allowed Command Packets: 1
-    Command Opcode: Setup Synchronous Connection (0x0428)
-        0000 01.. .... .... = Opcode Group Field: Link Control Commands (0x01)
-        .... ..00 0010 1000 = Opcode Command Field: Setup Synchronous
-Connection (0x028)
-    [Command in frame: 300]
-    [Command-Response Delta: 2.746 ms]
+bluealsa: Couldn't open SCO link: Protocol not supported
 
-No.     Time           Source                Destination
-Protocol Length Info
-    302 70.741203      30:21:57:95:5a:3a (JY-17) ChengHon_00:00:2e
-(Standard PC (i440FX + PIIX, 1996)) L2CAP    16     Rcvd Disconnection
-Request (SCID: 0x0040, DCID: 0x0040, PSM: 0x0001, Service: SDP)
+Both bluealsa & puleaudio work fine with ACL/A2DP. Also did a test to
+make sure after a cold boot with only a HSP profile connection
+attempted, used the distro kernel (sabayon) and the same kernel
+bluetooth kernel configuration as Georg who worked around the old
+issue with eSCO not being supported by the speaker.
 
-Frame 302: 16 bytes on wire (128 bits), 16 bytes captured (128 bits)
-    Encapsulation type: Bluetooth without transport layer (102)
-    Arrival Time: Mar 17, 2017 03:58:41.176875000 ICT
-    [Time shift for this packet: 0.000000000 seconds]
-    Epoch Time: 1489697921.176875000 seconds
-    [Time delta from previous captured frame: 0.002829000 seconds]
-    [Time delta from previous displayed frame: 0.002829000 seconds]
-    [Time since reference or first frame: 70.741203000 seconds]
-    Frame Number: 302
-    Frame Length: 16 bytes (128 bits)
-    Capture Length: 16 bytes (128 bits)
-    [Frame is marked: False]
-    [Frame is ignored: False]
-    Point-to-Point Direction: Received (1)
-    [Protocols in frame: bluetooth:hci_h1:bthci_acl:btl2cap]
-Bluetooth
-    [Source: 30:21:57:95:5a:3a (30:21:57:95:5a:3a)]
-    [Destination: ChengHon_00:00:2e (00:19:86:00:00:2e)]
-Bluetooth HCI H1 Rcvd ACL Data
-    [Direction: Rcvd (1)]
-Bluetooth HCI ACL Packet
-    .... 0000 0000 1011 = Connection Handle: 0x00b
-    ..00 .... .... .... = PB Flag: First Non-automatically Flushable Packet (0)
-    00.. .... .... .... = BC Flag: Point-To-Point (0)
-    Data Total Length: 12
-    [Connect in frame: 239]
-    [Source BD_ADDR: 30:21:57:95:5a:3a (30:21:57:95:5a:3a)]
-    [Source Device Name: JY-17]
-    [Source Role: Slave (2)]
-    [Destination BD_ADDR: ChengHon_00:00:2e (00:19:86:00:00:2e)]
-    [Destination Device Name: Standard PC (i440FX + PIIX, 1996)]
-    [Destination Role: Master (1)]
-    [Last Role Change in Frame: 238]
-    [Current Mode: Active Mode (0)]
-    [Last Mode Change in Frame: 239]
-Bluetooth L2CAP Protocol
-    Length: 8
-    CID: L2CAP Signaling Channel (0x0001)
-    Command: Disconnection Request
-        Command Code: Disconnection Request (0x06)
-        Command Identifier: 0x06
-        Command Length: 4
-        Destination CID: Dynamically Allocated Channel (0x0040)
-        Source CID: Dynamically Allocated Channel (0x0040)
-    [PSM: SDP (0x0001)]
-    [Connect in frame: 253]
+This is on 4.9.13 sabayon.org sources that's pretty close to mainline,
+and my own sensible kernel configuration for a Haswell. The distro
+kernel also has the same problems. I can test again on vanilla if
+requested.
 
-No.     Time           Source                Destination
-Protocol Length Info
-    303 70.820773      ChengHon_00:00:2e (Standard PC (i440FX + PIIX,
-1996)) 30:21:57:95:5a:3a (JY-17) L2CAP    16     Sent Disconnection
-Response (SCID: 0x0040, DCID: 0x0040, PSM: 0x0001, Service: SDP)
+hcidump of the failure:
+< HCI Command: Setup Synchronous Connection (0x01|0x0028) plen 17
+     handle 12 voice setting 0x0060 ptype 0x0380
+ > HCI Event: Command Status (0x0f) plen 4
+     Setup Synchronous Connection (0x01|0x0028) status 0x1a ncmd 1
+     Error: Unsupported Remote Feature / Unsupported LMP Feature
+ > HCI Event: Max Slots Change (0x1b) plen 3
+     handle 12 slots 1
+ > HCI Event: Mode Change (0x14) plen 6
+     status 0x00 handle 12 mode 0x02 interval 800
+     Mode: Sniff
 
-Frame 303: 16 bytes on wire (128 bits), 16 bytes captured (128 bits)
-    Encapsulation type: Bluetooth without transport layer (102)
-    Arrival Time: Mar 17, 2017 03:58:41.256445000 ICT
-    [Time shift for this packet: 0.000000000 seconds]
-    Epoch Time: 1489697921.256445000 seconds
-    [Time delta from previous captured frame: 0.079570000 seconds]
-    [Time delta from previous displayed frame: 0.079570000 seconds]
-    [Time since reference or first frame: 70.820773000 seconds]
-    Frame Number: 303
-    Frame Length: 16 bytes (128 bits)
-    Capture Length: 16 bytes (128 bits)
-    [Frame is marked: False]
-    [Frame is ignored: False]
-    Point-to-Point Direction: Sent (0)
-    [Protocols in frame: bluetooth:hci_h1:bthci_acl:btl2cap]
-Bluetooth
-    [Source: ChengHon_00:00:2e (00:19:86:00:00:2e)]
-    [Destination: 30:21:57:95:5a:3a (30:21:57:95:5a:3a)]
-Bluetooth HCI H1 Sent ACL Data
-    [Direction: Sent (0)]
-Bluetooth HCI ACL Packet
-    .... 0000 0000 1011 = Connection Handle: 0x00b
-    ..10 .... .... .... = PB Flag: First Automatically Flushable Packet (2)
-    00.. .... .... .... = BC Flag: Point-To-Point (0)
-    Data Total Length: 12
-    [Connect in frame: 239]
-    [Source BD_ADDR: ChengHon_00:00:2e (00:19:86:00:00:2e)]
-    [Source Device Name: Standard PC (i440FX + PIIX, 1996)]
-    [Source Role: Master (1)]
-    [Destination BD_ADDR: 30:21:57:95:5a:3a (30:21:57:95:5a:3a)]
-    [Destination Device Name: JY-17]
-    [Destination Role: Slave (2)]
-    [Last Role Change in Frame: 238]
-    [Current Mode: Active Mode (0)]
-    [Last Mode Change in Frame: 239]
-Bluetooth L2CAP Protocol
-    Length: 8
-    CID: L2CAP Signaling Channel (0x0001)
-    Command: Disconnection Response
-        Command Code: Disconnection Response (0x07)
-        Command Identifier: 0x06
-        Command Length: 4
-        Destination CID: Dynamically Allocated Channel (0x0040)
-        Source CID: Dynamically Allocated Channel (0x0040)
-    [PSM: SDP (0x0001)]
-    [Connect in frame: 253]
+bluetoothd:
+bluetoothd[2477]: src/profile.c:ext_connect() Headset Voice gateway
+connected to 30:21:57:95:5A:3A
+bluetoothd[2477]: src/service.c:change_state() 0x563d7d550920: device
+30:21:57:95:5A:3A profile Headset Voice gateway state changed:
+disconnected -> connecting (0)
+bluetoothd[2477]: src/service.c:change_state() 0x563d7d550920: device
+30:21:57:95:5A:3A profile Headset Voice gateway state changed:
+connecting -> connected (0)
+bluetoothd[2477]: src/device.c:device_profile_connected() Headset
+Voice gateway Success (0)
+bluetoothd[2477]: src/service.c:btd_service_ref() 0x563d7d550920: ref=3
+bluetoothd[2477]: plugins/policy.c:service_cb() Added Headset Voice
+gateway reconnect 0
+bluetoothd[2477]: src/device.c:att_disconnected_cb()
+bluetoothd[2477]: src/device.c:att_disconnected_cb() Success (0)
+bluetoothd[2477]: src/gatt-client.c:btd_gatt_client_disconnected()
+Device disconnected. Cleaning up.
+bluetoothd[2477]: src/device.c:att_disconnected_cb() Automatic
+connection disabled
+bluetoothd[2477]: attrib/gattrib.c:g_attrib_unref() 0x563d7d545c30:
+g_attrib_unref=0
+
+hciconfig -a
+
+hci0: Type: Primary  Bus: USB
+BD Address: 00:19:86:00:00:2E  ACL MTU: 1021:7  SCO MTU: 64:1
+UP RUNNING
+RX bytes:2505067 acl:176 sco:0 events:357072 errors:0
+TX bytes:430951824 acl:713834 sco:0 commands:103 errors:0
+Features: 0xff 0xff 0x8f 0xfe 0x9b 0xff 0x79 0x83
+Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+Link policy: RSWITCH HOLD SNIFF PARK
+Link mode: SLAVE ACCEPT
+Name: 'hojuruku'
+Class: 0x0c0104
+Service Classes: Rendering, Capturing
+Device Class: Computer, Desktop workstation
+HCI Version: 2.1 (0x4)  Revision: 0x5332
+LMP Version: 2.1 (0x4)  Subversion: 0x420e
+Manufacturer: Broadcom Corporation (15)
+
+lsusb
+Bus 003 Device 007: ID 0a5c:2148 Broadcom Corp. BCM92046DG-CL1ROM
+Bluetooth 2.1 Adapter
+
+loading btusb with the option to tweak the SCO MTU made no difference either.
+
+hcitool info 30:21:57:95:5A:3A
+Requesting information ...
+BD Address:  30:21:57:95:5A:3A
+Device Name: JY-17
+LMP Version: 3.0 (0x5) LMP Subversion: 0x1f4
+Manufacturer: CONWISE Technology Corporation Ltd (66)
+Features page 0: 0xbf 0x3a 0x85 0xfa 0x98 0x1d 0x59 0x87
+<3-slot packets> <5-slot packets> <encryption> <slot offset>
+<timing accuracy> <role switch> <sniff mode> <RSSI> <SCO link>
+<HV2 packets> <HV3 packets> <CVSD> <power control>
+<broadcast encrypt> <EDR ACL 2 Mbps> <enhanced iscan>
+<interlaced iscan> <interlaced pscan> <inquiry with RSSI>
+<extended SCO> <AFH cap. slave> <AFH class. slave>
+<3-slot EDR ACL> <5-slot EDR ACL> <pause encryption>
+<AFH cap. master> <AFH class. master> <extended inquiry>
+<simple pairing> <encapsulated PDU> <non-flush flag> <LSTO>
+<inquiry TX power> <EPC> <extended features>
+Features page 1: 0x01 0x00 0x00 0x00 0x00 0x00 0x00 0x00
+
+ hciconfig
+hci0: Type: Primary  Bus: USB
+BD Address: 00:19:86:00:00:2E  ACL MTU: 1021:7  SCO MTU: 64:1
+UP RUNNING
+RX bytes:2505684 acl:176 sco:0 events:357085 errors:0
+TX bytes:430951868 acl:713834 sco:0 commands:111 errors:0
+
+^^ As you can see A2DP profile works fine using sbc ^^
+
+hciconfig hci0 features
+hci0: Type: Primary  Bus: USB
+BD Address: 00:19:86:00:00:2E  ACL MTU: 1021:7  SCO MTU: 64:1
+Features page 0: 0xff 0xff 0x8f 0xfe 0x9b 0xff 0x79 0x83
+<3-slot packets> <5-slot packets> <encryption> <slot offset>
+<timing accuracy> <role switch> <hold mode> <sniff mode>
+<park state> <RSSI> <channel quality> <SCO link> <HV2 packets>
+<HV3 packets> <u-law log> <A-law log> <CVSD> <paging scheme>
+<power control> <transparent SCO> <broadcast encrypt>
+<EDR ACL 2 Mbps> <EDR ACL 3 Mbps> <enhanced iscan>
+<interlaced iscan> <interlaced pscan> <inquiry with RSSI>
+<extended SCO> <EV4 packets> <EV5 packets> <AFH cap. slave>
+<AFH class. slave> <3-slot EDR ACL> <5-slot EDR ACL>
+<sniff subrating> <pause encryption> <AFH cap. master>
+<AFH class. master> <EDR eSCO 2 Mbps> <EDR eSCO 3 Mbps>
+<3-slot EDR eSCO> <extended inquiry> <simple pairing>
+<encapsulated PDU> <err. data report> <non-flush flag> <LSTO>
+<inquiry TX power> <extended features>
+Features page 1: 0x01 0x00 0x00 0x00 0x00 0x00 0x00 0x00
+
+Similar bug - only userspace errors reported
+https://bugs.launchpad.net/ubuntu/+source/linux/+bug/1331748
+
+This one is very interesting, it shows a hcidump of it retrying until
+a connection is made with a DIFFERENT pkgtype. The patch seems applied
+to 4.9.13 yet my system borks after only once unsuccessful attempt to
+connect with a 0x1a remote feature not supported error.
+https://marc.info/?l=linux-bluetooth&m=144076356407749&w=1
+
+2015-05-18 01:27:57.336610 > HCI Event: Synchronous Connect Complete
+(0x2c) plen 17
+    status 0x1a handle 0 bdaddr 30:7C:30:B3:A8:86 type SCO
+    Error: Unsupported Remote Feature / Unsupported LMP Feature
+2015-05-18 01:27:57.336685 < HCI Command: Setup Synchronous Connection
+(0x01|0x0028) plen 17
+    handle 256 voice setting 0x0060 ptype 0x03c8
+2015-05-18 01:27:57.337603 > HCI Event: Command Status (0x0f) plen 4
+    Setup Synchronous Connection (0x01|0x0028) status 0x00 ncmd 1
+2015-05-18 01:27:57.342608 > HCI Event: Max Slots Change (0x1b) plen 3
+    handle 256 slots 1
+2015-05-18 01:27:57.377631 > HCI Event: Synchronous Connect Complete
+(0x2c) plen 17
+    status 0x00 handle 257 bdaddr 30:7C:30:B3:A8:86 type eSCO
+    Air mode: CVSD
+
+Thanks in advance to anyone willing provide a patch for me to test. In
+the meantime I'll try and track down a bluetooth 2.0 non EDR capable
+dongle that works to prove my theory, as people did last time with a
+non eSCO capable dongle.
+
+These patches only make 4.9.13 have the identical fix to George's
+proposed patch to 3.17 and didn't solve the issue
+(https://lists.freedesktop.org/archives/pulseaudio-discuss/2015-March/023366.html)
+
+diff -u  /usr/src/linux/net/bluetooth/hci_conn.c /usr/src/hci_conn.c
+--- /usr/src/linux/net/bluetooth/hci_conn.c 2016-12-12 02:17:54.000000000 +0700
++++ /usr/src/hci_conn.c 2017-03-16 14:53:44.211312575 +0700
+@@ -45,8 +45,8 @@
+  { EDR_ESCO_MASK & ~ESCO_2EV3, 0x000a, 0x01 }, /* S3 */
+  { EDR_ESCO_MASK & ~ESCO_2EV3, 0x0007, 0x01 }, /* S2 */
+  { EDR_ESCO_MASK | ESCO_EV3,   0x0007, 0x01 }, /* S1 */
+- { EDR_ESCO_MASK | ESCO_HV3,   0xffff, 0x01 }, /* D1 */
+- { EDR_ESCO_MASK | ESCO_HV1,   0xffff, 0x01 }, /* D0 */
++ { EDR_ESCO_MASK | ESCO_HV3,   0xffff, 0xff }, /* D1 */
++ { EDR_ESCO_MASK | ESCO_HV1,   0xffff, 0xff }, /* D0 */
+ };
+
+ static const struct sco_param sco_param_cvsd[] = {
+
+--- /usr/src/linux/net/bluetooth/hci_event.c 2016-12-12 02:17:54.000000000 +0700
++++ /usr/src/hci_event.c 2017-03-16 15:53:52.569396159 +0700
+@@ -1519,8 +1519,13 @@
+  if (sco) {
+  sco->state = BT_CLOSED;
+
+- hci_connect_cfm(sco, status);
++/* hci_connect_cfm(sco, status);
+  hci_conn_del(sco);
++ */
++ if (!hci_setup_sync(sco, handle)) {
++ hci_connect_cfm(sco, status);
++ hci_conn_del(sco);
++ }
+  }
+  }
