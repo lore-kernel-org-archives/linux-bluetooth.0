@@ -1,68 +1,212 @@
-Return-Path: <sre@kernel.org>
-Date: Sat, 18 Mar 2017 01:58:24 +0100
-From: Sebastian Reichel <sre@kernel.org>
-To: Pavel Machek <pavel@ucw.cz>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Rob Herring <robh+dt@kernel.org>, Tony Lindgren <tony@atomide.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Jiri Slaby <jslaby@suse.com>, Mark Rutland <mark.rutland@arm.com>,
-	linux-bluetooth@vger.kernel.org, linux-serial@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 01/10] ARM: dts: N9/N950: add bluetooth
-Message-ID: <20170318005824.ax2pgx4sl4tbwz6o@earth>
-References: <20170304115833.3538-1-sre@kernel.org>
- <20170304115833.3538-2-sre@kernel.org>
- <20170317152529.GA8723@amd>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="xygpnfdwh4gfkf27"
-In-Reply-To: <20170317152529.GA8723@amd>
+In-Reply-To: <20170314183058.25555-5-eu@felipetonello.com>
+References: <20170314183058.25555-1-eu@felipetonello.com> <20170314183058.25555-5-eu@felipetonello.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Fri, 17 Mar 2017 19:44:29 +0200
+Message-ID: <CABBYNZJ6LJpTaMYyOu+eUhzD_ADaw8jHURJLdP61276tCX=Y5w@mail.gmail.com>
+Subject: Re: [RFC][PATCH v4 BlueZ 4/4] Bluetooth: mgmt: Added new
+ MGMT_OP_ADD_CONN_PARAM command
+To: "Felipe F. Tonello" <eu@felipetonello.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Felipe,
 
---xygpnfdwh4gfkf27
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On Tue, Mar 14, 2017 at 8:30 PM, Felipe F. Tonello <eu@felipetonello.com> wrote:
+> This command is similar to MGMT_OP_LOAD_CONN_PARAM with the exception
+> that it only updates one connection parameter and it doesn't cleanup
+> previous parameters set.
+>
+> This is useful for applications to update one specific connection
+> parameter and not caring about other cached connection parameters.
+>
+> Signed-off-by: Felipe F. Tonello <eu@felipetonello.com>
+> ---
+>  include/net/bluetooth/mgmt.h |  10 +++++
+>  net/bluetooth/mgmt.c         | 103 ++++++++++++++++++++++++++++---------------
+>  2 files changed, 77 insertions(+), 36 deletions(-)
+>
+> diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+> index 72a456bbbcd5..34e5fae8c9d5 100644
+> --- a/include/net/bluetooth/mgmt.h
+> +++ b/include/net/bluetooth/mgmt.h
+> @@ -604,6 +604,16 @@ struct mgmt_cp_set_appearance {
+>  } __packed;
+>  #define MGMT_SET_APPEARANCE_SIZE       2
+>
+> +#define MGMT_OP_ADD_CONN_PARAM         0x0044
+> +struct mgmt_cp_add_conn_param {
+> +       struct mgmt_addr_info addr;
+> +       __le16 min_interval;
+> +       __le16 max_interval;
+> +       __le16 latency;
+> +       __le16 timeout;
+> +} __packed;
+> +#define MGMT_ADD_CONN_PARAM_SIZE       (MGMT_ADDR_INFO_SIZE + 8)
 
-Hi,
+I do remember mentioning that this command shall accept multiple
+setting at time, just like load.
 
-On Fri, Mar 17, 2017 at 04:25:29PM +0100, Pavel Machek wrote:
-> Hi!
->=20
-> > The Nokia N950 and N9 have a wl1271 (with nokia bootloader) bluetooth
-> > module connected to second UART.
->=20
-> I don't get it. We are describing hardware, what does it have to do
-> with bootloader? Is there something not described here, because it is
-> already initialized by bootloader?
+> +
+>  #define MGMT_EV_CMD_COMPLETE           0x0001
+>  struct mgmt_ev_cmd_complete {
+>         __le16  opcode;
+> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+> index 1fba2a03f8ae..b8e86bf1fe1b 100644
+> --- a/net/bluetooth/mgmt.c
+> +++ b/net/bluetooth/mgmt.c
+> @@ -106,6 +106,7 @@ static const u16 mgmt_commands[] = {
+>         MGMT_OP_START_LIMITED_DISCOVERY,
+>         MGMT_OP_READ_EXT_INFO,
+>         MGMT_OP_SET_APPEARANCE,
+> +       MGMT_OP_ADD_CONN_PARAM,
+>  };
+>
+>  static const u16 mgmt_events[] = {
+> @@ -5462,6 +5463,69 @@ static int remove_device(struct sock *sk, struct hci_dev *hdev,
+>         return err;
+>  }
+>
+> +/* This function requires the caller holds hdev->lock */
+> +static u8 really_add_conn_param(struct hci_dev *hdev,
+> +                               struct mgmt_cp_add_conn_param *param)
+> +{
+> +       struct hci_conn_params *hci_param;
+> +       u16 min, max, latency, timeout;
+> +       u8 addr_type;
+> +
+> +       if (param->addr.type == BDADDR_LE_PUBLIC)
+> +               addr_type = ADDR_LE_DEV_PUBLIC;
+> +       else if (param->addr.type == BDADDR_LE_RANDOM)
+> +               addr_type = ADDR_LE_DEV_RANDOM;
+> +       else
+> +               return MGMT_STATUS_INVALID_PARAMS;
+> +
+> +       min = le16_to_cpu(param->min_interval);
+> +       max = le16_to_cpu(param->max_interval);
+> +       latency = le16_to_cpu(param->latency);
+> +       timeout = le16_to_cpu(param->timeout);
+> +
+> +       BT_DBG("min 0x%04x max 0x%04x latency 0x%04x timeout 0x%04x",
+> +              min, max, latency, timeout);
+> +
+> +       if (hci_check_conn_params(min, max, latency, timeout) < 0) {
+> +               BT_ERR("Ignoring invalid connection parameters");
+> +               return MGMT_STATUS_INVALID_PARAMS;
+> +       }
+> +
+> +       hci_param = hci_conn_params_add(hdev, &param->addr.bdaddr,
+> +                                       addr_type);
+> +       if (!hci_param) {
+> +               BT_ERR("Failed to add connection parameters");
+> +               return MGMT_STATUS_FAILED;
+> +       }
+> +
+> +       hci_param->conn_min_interval = min;
+> +       hci_param->conn_max_interval = max;
+> +       hci_param->conn_latency = latency;
+> +       hci_param->supervision_timeout = timeout;
+> +
+> +       return 0;
+> +}
+> +
+> +static int add_conn_param(struct sock *sk, struct hci_dev *hdev, void *data,
+> +                            u16 len)
+> +{
+> +       struct mgmt_cp_add_conn_param *cp = data;
+> +       u8 cmd_status;
+> +
+> +       if (!lmp_le_capable(hdev))
+> +               return mgmt_cmd_status(sk, hdev->id, MGMT_OP_ADD_CONN_PARAM,
+> +                                      MGMT_STATUS_NOT_SUPPORTED);
+> +
+> +       hci_dev_lock(hdev);
+> +
+> +       cmd_status = really_add_conn_param(hdev, cp);
+> +
+> +       hci_dev_unlock(hdev);
+> +
+> +       return mgmt_cmd_complete(sk, hdev->id, MGMT_OP_ADD_CONN_PARAM,
+> +                                cmd_status, NULL, 0);
+> +}
+> +
+>  static int load_conn_param(struct sock *sk, struct hci_dev *hdev, void *data,
+>                            u16 len)
+>  {
+> @@ -5500,46 +5564,12 @@ static int load_conn_param(struct sock *sk, struct hci_dev *hdev, void *data,
+>
+>         for (i = 0; i < param_count; i++) {
+>                 struct mgmt_conn_param *param = &cp->params[i];
+> -               struct hci_conn_params *hci_param;
+> -               u16 min, max, latency, timeout;
+> -               u8 addr_type;
+>
+>                 BT_DBG("Adding %pMR (type %u)", &param->addr.bdaddr,
+>                        param->addr.type);
+>
+> -               if (param->addr.type == BDADDR_LE_PUBLIC) {
+> -                       addr_type = ADDR_LE_DEV_PUBLIC;
+> -               } else if (param->addr.type == BDADDR_LE_RANDOM) {
+> -                       addr_type = ADDR_LE_DEV_RANDOM;
+> -               } else {
+> -                       BT_ERR("Ignoring invalid connection parameters");
+> -                       continue;
+> -               }
+> -
+> -               min = le16_to_cpu(param->min_interval);
+> -               max = le16_to_cpu(param->max_interval);
+> -               latency = le16_to_cpu(param->latency);
+> -               timeout = le16_to_cpu(param->timeout);
+> -
+> -               BT_DBG("min 0x%04x max 0x%04x latency 0x%04x timeout 0x%04x",
+> -                      min, max, latency, timeout);
+> -
+> -               if (hci_check_conn_params(min, max, latency, timeout) < 0) {
+> -                       BT_ERR("Ignoring invalid connection parameters");
+> -                       continue;
+> -               }
+> -
+> -               hci_param = hci_conn_params_add(hdev, &param->addr.bdaddr,
+> -                                               addr_type);
+> -               if (!hci_param) {
+> -                       BT_ERR("Failed to add connection parameters");
+> -                       continue;
+> -               }
+> -
+> -               hci_param->conn_min_interval = min;
+> -               hci_param->conn_max_interval = max;
+> -               hci_param->conn_latency = latency;
+> -               hci_param->supervision_timeout = timeout;
+> +               really_add_conn_param(hdev,
+> +                       (struct mgmt_cp_add_conn_param *)param);
 
-This is about the wl1271 "bootloader"/low-level interface. The same
-chip exists with a TI low-level interface, which requires a
-different driver/firmware.
+Once Add support more than one setting the only real difference from
+Load should be that Load does reset the settings before adding,
+everything else remains the same.
 
--- Sebastian
+>         }
+>
+>         hci_dev_unlock(hdev);
+> @@ -6538,6 +6568,7 @@ static const struct hci_mgmt_handler mgmt_handlers[] = {
+>         { read_ext_controller_info,MGMT_READ_EXT_INFO_SIZE,
+>                                                 HCI_MGMT_UNTRUSTED },
+>         { set_appearance,          MGMT_SET_APPEARANCE_SIZE },
+> +       { add_conn_param,          MGMT_ADD_CONN_PARAM_SIZE },
+>  };
+>
+>  void mgmt_index_added(struct hci_dev *hdev)
+> --
+> 2.12.0
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
---xygpnfdwh4gfkf27
-Content-Type: application/pgp-signature; name="signature.asc"
 
------BEGIN PGP SIGNATURE-----
 
-iQIzBAABCgAdFiEE72YNB0Y/i3JqeVQT2O7X88g7+poFAljMhioACgkQ2O7X88g7
-+pq9xBAAlRf1BMRW1SR5qz7WsJXVvbK5+fD5G07NvDI2jX13p5PY/pQcnm4BlGMi
-jK3wSkN1+t/6G5YoKS3zkP5qkbtvR0g4k3qtYeLIWHDMJFy5mptfeloPRc8LF3yO
-YiXSrWAt0ye/jSecjZJMRU7unobms/x4xkJ56pM5pxUUTJOJwwiZm5xSEj3CfXC0
-vRC005rDWi9+S3RsjKis9AqEwahp0opaIURavutL+4+uz0H4qCzhlIrXw9x6Rn0q
-r1O0lNfVqRdygvPokzN3WzyH3y/vR7NtWBCFJbOVr7+/7S8RQa7w10+AOVFbohWU
-qbD5DllS/pgB2SvkQi8aIQKf7879JU71jh1BrcwRrUPaFRC6/ZfcRfobZ3IwaeSz
-v+l/dDo7OWA8nBYRPdf4SRXHH4bHtQooZJMww6Y+fTE1ETnrBbhH2aro+HoMbQWE
-hDUaB34tFPZwI7dSkeHsGGQ+/YTkhcD9Ywjk8EC71PIddqDtN5Aha6YpNaDGwlss
-9Tx2QvvovYRwhLi4je+KIFrMoM1Do6xqyt5/0xVfkIHwDI3eCfO6YK3Tnnaxuevn
-N20yxh5VSB6QdIGD2hnuhgV1JiEM2YUdOGZCt23zNfP0vzG+nyVCYoNU7+C4wDLZ
-OQLOXCeOOehFdeYtAykmjfQuSgR5I/WBxZ1SxZaUgvsVMat6HXo=
-=MAbP
------END PGP SIGNATURE-----
-
---xygpnfdwh4gfkf27--
+-- 
+Luiz Augusto von Dentz
