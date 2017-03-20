@@ -1,23 +1,47 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Date: Tue, 21 Mar 2017 04:24:59 +0000 (UTC)
-From: Hong-Rong Lin <physicist96@yahoo.com.tw>
-Reply-To: Hong-Rong Lin <physicist96@yahoo.com.tw>
-To: Bluez mailing list <linux-bluetooth@vger.kernel.org>
-Message-ID: <2110608880.23841.1490070299317@mail.yahoo.com>
-In-Reply-To: <383246131.23319.1490069965384@mail.yahoo.com>
-References: <383246131.23319.1490069965384.ref@mail.yahoo.com> <383246131.23319.1490069965384@mail.yahoo.com>
-Subject: Does Bluez 5.35 or 4.97 support Intercom Profile (ICP)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <bjorn.andersson@linaro.org>
+From: Bjorn Andersson <bjorn.andersson@linaro.org>
+To: Andy Gross <andy.gross@linaro.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Eugene Krasnikov <k.eugene.e@gmail.com>,
+	Kalle Valo <kvalo@codeaurora.org>,
+	David Brown <david.brown@linaro.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Arnd Bergmann <arnd@arndb.de>,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	wcn36xx@lists.infradead.org,
+	linux-wireless@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org,
+	linux-soc@vger.kernel.org
+Subject: [PATCH 3/3] soc: qcom: smd-rpm: Add msm8996 compatibility
+Date: Mon, 20 Mar 2017 16:35:44 -0700
+Message-Id: <20170320233544.1656-3-bjorn.andersson@linaro.org>
+In-Reply-To: <20170320233544.1656-1-bjorn.andersson@linaro.org>
+References: <20170320233544.1656-1-bjorn.andersson@linaro.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello Everyone,
+With the RPM driver transitioned to RPMSG we can reuse the SMD-RPM
+driver ontop of GLINK for 8996, without any modifications.
 
+Signed-off-by: Bjorn Andersson <bjorn.andersson@linaro.org>
+---
+ drivers/soc/qcom/smd-rpm.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-
-We would like to implement walkie-talkie function with ICP profile, and will use Bluez 4.97 or 5.35 to do it. Does anybody know if Bluez 5.35 or 4.97 support Intercom Profile (ICP)?
-
-
-
-Thank you very much!!
+diff --git a/drivers/soc/qcom/smd-rpm.c b/drivers/soc/qcom/smd-rpm.c
+index 0dcf1bf33126..c2346752b3ea 100644
+--- a/drivers/soc/qcom/smd-rpm.c
++++ b/drivers/soc/qcom/smd-rpm.c
+@@ -225,6 +225,7 @@ static const struct of_device_id qcom_smd_rpm_of_match[] = {
+ 	{ .compatible = "qcom,rpm-apq8084" },
+ 	{ .compatible = "qcom,rpm-msm8916" },
+ 	{ .compatible = "qcom,rpm-msm8974" },
++	{ .compatible = "qcom,rpm-msm8996" },
+ 	{}
+ };
+ MODULE_DEVICE_TABLE(of, qcom_smd_rpm_of_match);
+-- 
+2.12.0
