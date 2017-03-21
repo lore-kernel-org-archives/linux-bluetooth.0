@@ -1,38 +1,58 @@
-Return-Path: <colin.king@canonical.com>
-From: Colin King <colin.king@canonical.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
-Subject: [PATCH] btmrvl: fix spelling mistake: "unregester" -> "unregister"
-Date: Tue, 21 Mar 2017 12:20:28 +0000
-Message-Id: <20170321122028.16224-1-colin.king@canonical.com>
+Return-Path: <kvalo@codeaurora.org>
+From: Kalle Valo <kvalo@codeaurora.org>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Bjorn Andersson <bjorn.andersson@linaro.org>,  "Gustavo F. Padovan" <gustavo@padovan.org>,  Johan Hedberg <johan.hedberg@gmail.com>,  Eugene Krasnikov <k.eugene.e@gmail.com>,  Andy Gross <andy.gross@linaro.org>,  David Brown <david.brown@linaro.org>,  "David S. Miller" <davem@davemloft.net>,  Arnd Bergmann <arnd@arndb.de>,  "open list\:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,  LKML <linux-kernel@vger.kernel.org>,  wcn36xx@lists.infradead.org,  linux-wireless <linux-wireless@vger.kernel.org>,  Network Development <netdev@vger.kernel.org>,  linux-arm-msm@vger.kernel.org,  linux-soc@vger.kernel.org
+Subject: Re: [PATCH 1/3] soc: qcom: smd: Transition client drivers from smd to rpmsg
+References: <20170320233544.1656-1-bjorn.andersson@linaro.org>
+	<3DCEF38C-F8FC-4941-936F-921247E13B78@holtmann.org>
+Date: Tue, 21 Mar 2017 14:17:02 +0200
+In-Reply-To: <3DCEF38C-F8FC-4941-936F-921247E13B78@holtmann.org> (Marcel
+	Holtmann's message of "Tue, 21 Mar 2017 09:20:01 +0100")
+Message-ID: <87zige6czl.fsf@kamboji.qca.qualcomm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Colin Ian King <colin.king@canonical.com>
+Marcel Holtmann <marcel@holtmann.org> writes:
 
-trivial fix to spelling mistake in debug message
+>> By moving these client drivers to use RPMSG instead of the direct SMD
+>> API we can reuse them ontop of the newly added GLINK wire-protocol
+>> support found in the 820 and 835 Qualcomm platforms.
+>> 
+>> As the new (RPMSG-based) and old SMD implementations are mutually
+>> exclusive we have to change all client drivers in one commit, to make
+>> sure we have a working system before and after this transition.
+>> 
+>> Signed-off-by: Bjorn Andersson <bjorn.andersson@linaro.org>
+>> ---
+>> 
+>> Based on v4.11-rc3 with Arnd's Kconfig dependency fixes for BT_QCOMSMD
+>> (https://lkml.org/lkml/2017/3/20/1038).
+>> 
+>> drivers/bluetooth/Kconfig                  |  2 +-
+>> drivers/bluetooth/btqcomsmd.c              | 32 +++++++++----------
+>> drivers/net/wireless/ath/wcn36xx/Kconfig   |  2 +-
+>> drivers/net/wireless/ath/wcn36xx/main.c    |  6 ++--
+>> drivers/net/wireless/ath/wcn36xx/smd.c     | 10 +++---
+>> drivers/net/wireless/ath/wcn36xx/smd.h     |  6 ++--
+>> drivers/net/wireless/ath/wcn36xx/wcn36xx.h |  2 +-
+>> drivers/soc/qcom/Kconfig                   |  4 +--
+>> drivers/soc/qcom/smd-rpm.c                 | 43 +++++++++++++------------
+>> drivers/soc/qcom/wcnss_ctrl.c              | 50 +++++++++++++++++-------------
+>> include/linux/soc/qcom/wcnss_ctrl.h        | 11 ++++---
+>> net/qrtr/Kconfig                           |  2 +-
+>> net/qrtr/smd.c                             | 42 ++++++++++++-------------
+>> 13 files changed, 108 insertions(+), 104 deletions(-)
+>
+> I think that it is best if Dave takes these directly then and I pull
+> them back down later into our trees. Including the Kconfig fix that I
+> will ACK as well.
+>
+> Acked-by: Marcel Holtmann <marcel@holtmann.org>
 
-Signed-off-by: Colin Ian King <colin.king@canonical.com>
----
- drivers/bluetooth/btmrvl_sdio.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Sounds good to me.
 
-diff --git a/drivers/bluetooth/btmrvl_sdio.c b/drivers/bluetooth/btmrvl_sdio.c
-index 08e01f002bad..7d052ce2052b 100644
---- a/drivers/bluetooth/btmrvl_sdio.c
-+++ b/drivers/bluetooth/btmrvl_sdio.c
-@@ -1574,7 +1574,7 @@ static void btmrvl_sdio_remove(struct sdio_func *func)
- 							MODULE_SHUTDOWN_REQ);
- 				btmrvl_sdio_disable_host_int(card);
- 			}
--			BT_DBG("unregester dev");
-+			BT_DBG("unregister dev");
- 			card->priv->surprise_removed = true;
- 			btmrvl_sdio_unregister_dev(card);
- 			btmrvl_remove_card(card->priv);
+Acked-by: Kalle Valo <kvalo@codeaurora.org>
+
 -- 
-2.11.0
+Kalle Valo
