@@ -1,39 +1,38 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-To: linux-bluetooth@vger.kernel.org
+Return-Path: <colin.king@canonical.com>
+From: Colin King <colin.king@canonical.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Subject: [PATCH] btmrvl: fix spelling mistake: "unregester" -> "unregister"
+Date: Tue, 21 Mar 2017 12:20:28 +0000
+Message-Id: <20170321122028.16224-1-colin.king@canonical.com>
 MIME-Version: 1.0
-Subject: way of woking / how to develop new features (roadmap)
-Message-ID: <OFB1F3144F.CCE46262-ONC12580EA.0051B938-C12580EA.0053A564@continental-corporation.com>
-From: Mike.Stahl@continental-corporation.com
-Date: Tue, 21 Mar 2017 16:13:37 +0100
-Content-Type: text/plain; charset="US-ASCII"
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Dear community members, 
+From: Colin Ian King <colin.king@canonical.com>
 
-I just joined this mailing list and I have a couple of questions regarding 
-the way of working in this community.
+trivial fix to spelling mistake in debug message
 
-1. Is there any documentation that explains how to contribute to the open 
-source development (i.e. is there a kind of guideline for a BlueZ software 
-engineer)?
+Signed-off-by: Colin Ian King <colin.king@canonical.com>
+---
+ drivers/bluetooth/btmrvl_sdio.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-2. How is the development of new profile features (or profile version 
-upgrades) organized for BlueZ: 
-   a) How does the community discuss and agree on the features that should 
-be developed next? 
-   b) What are the typical steps to integrate new/additional functionality 
-into Bluez?
-   c) Does a kind of roadmap exist for Bluetooth profiles/features? 
-   d) Are there working groups for specific topics in order to coordinate 
-development activities and to share experience? 
-
-3. What is the focus of current BlueZ development? This question basically 
-goes to all community members. Feedback from everybody who likes to answer 
-is very welcome!
-
-Thank you in anticipation!
-
-Best regards 
-
-Mike
+diff --git a/drivers/bluetooth/btmrvl_sdio.c b/drivers/bluetooth/btmrvl_sdio.c
+index 08e01f002bad..7d052ce2052b 100644
+--- a/drivers/bluetooth/btmrvl_sdio.c
++++ b/drivers/bluetooth/btmrvl_sdio.c
+@@ -1574,7 +1574,7 @@ static void btmrvl_sdio_remove(struct sdio_func *func)
+ 							MODULE_SHUTDOWN_REQ);
+ 				btmrvl_sdio_disable_host_int(card);
+ 			}
+-			BT_DBG("unregester dev");
++			BT_DBG("unregister dev");
+ 			card->priv->surprise_removed = true;
+ 			btmrvl_sdio_unregister_dev(card);
+ 			btmrvl_remove_card(card->priv);
+-- 
+2.11.0
