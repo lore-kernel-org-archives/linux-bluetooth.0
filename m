@@ -15,82 +15,69 @@ Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>,
 	linux-serial@vger.kernel.org,
 	devicetree@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCHv2 08/11] dt-bindings: net: bluetooth: Add nokia-bluetooth
-Date: Tue, 21 Mar 2017 23:32:13 +0100
-Message-Id: <20170321223216.11733-9-sre@kernel.org>
+Subject: [PATCHv2 07/11] serdev: add helpers for cts and rts handling
+Date: Tue, 21 Mar 2017 23:32:12 +0100
+Message-Id: <20170321223216.11733-8-sre@kernel.org>
 In-Reply-To: <20170321223216.11733-1-sre@kernel.org>
 References: <20170321223216.11733-1-sre@kernel.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add binding document for serial bluetooth chips using
-Nokia H4+ protocol.
+Add serdev helper functions for handling of cts and rts
+lines using the serdev's tiocm functions.
 
 Signed-off-by: Sebastian Reichel <sre@kernel.org>
 ---
-Changes since PATCHv1:
- * change compatible strings
- * mention active high/low state for GPIOs
----
- .../devicetree/bindings/net/nokia-bluetooth.txt    | 51 ++++++++++++++++++++++
- 1 file changed, 51 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/net/nokia-bluetooth.txt
+ include/linux/serdev.h | 31 +++++++++++++++++++++++++++++++
+ 1 file changed, 31 insertions(+)
 
-diff --git a/Documentation/devicetree/bindings/net/nokia-bluetooth.txt b/Documentation/devicetree/bindings/net/nokia-bluetooth.txt
-new file mode 100644
-index 000000000000..42be7dc9a70b
---- /dev/null
-+++ b/Documentation/devicetree/bindings/net/nokia-bluetooth.txt
-@@ -0,0 +1,51 @@
-+Nokia Bluetooth Chips
-+---------------------
+diff --git a/include/linux/serdev.h b/include/linux/serdev.h
+index 3ad1d695f947..8cdce2ea0d51 100644
+--- a/include/linux/serdev.h
++++ b/include/linux/serdev.h
+@@ -16,6 +16,7 @@
+ #include <linux/types.h>
+ #include <linux/device.h>
+ #include <asm-generic/termios.h>
++#include <linux/delay.h>
+ 
+ struct serdev_controller;
+ struct serdev_device;
+@@ -254,6 +255,36 @@ static inline int serdev_device_write_room(struct serdev_device *sdev)
+ 
+ #endif /* CONFIG_SERIAL_DEV_BUS */
+ 
++static inline bool serdev_device_get_cts(struct serdev_device *serdev)
++{
++	int status = serdev_device_get_tiocm(serdev);
++	return !!(status & TIOCM_CTS);
++}
 +
-+Nokia phones often come with UART connected bluetooth chips from different
-+vendors and modified device API. Those devices speak a protocol named H4+
-+(also known as h4p) by Nokia, which is similar to the H4 protocol from the
-+Bluetooth standard. In addition to the H4 protocol it specifies two more
-+UART status lines for wakeup of UART transceivers to improve power management
-+and a few new packet types used to negotiate uart speed.
++static inline int serdev_device_wait_for_cts(struct serdev_device *serdev, bool state, int timeout_ms)
++{
++	unsigned long timeout;
++	bool signal;
 +
-+Required properties:
++	timeout = jiffies + msecs_to_jiffies(timeout_ms);
++	while (!time_after(jiffies, timeout)) {
++		signal = serdev_device_get_cts(serdev);
++		if (signal == state)
++			return 0;
++		usleep_range(1000, 2000);
++	}
 +
-+ - compatible: should contain "nokia,h4p-bluetooth" as well as one of the following:
-+   * "brcm,bcm2048-nokia"
-+   * "ti,wl1271-bluetooth-nokia"
-+ - reset-gpios: GPIO specifier, used to reset the BT module (active low)
-+ - bluetooth-wakeup-gpios: GPIO specifier, used to wakeup the BT module (active high)
-+ - host-wakeup-gpios: GPIO specifier, used to wakeup the host processor (active high)
-+ - clock-names: should be "sysclk"
-+ - clocks: should contain a clock specifier for every name in clock-names
++	return -ETIMEDOUT;
++}
 +
-+Optional properties:
++static inline int serdev_device_set_rts(struct serdev_device *serdev, bool enable)
++{
++	if (enable)
++		return serdev_device_set_tiocm(serdev, TIOCM_OUT2 | TIOCM_RTS, 0);
++	else
++		return serdev_device_set_tiocm(serdev, 0, TIOCM_OUT2 | TIOCM_RTS);
++}
 +
-+ - None
-+
-+Example:
-+
-+/ {
-+       /* controlled (enabled/disabled) directly by BT module */
-+       bluetooth_clk: vctcxo {
-+               compatible = "fixed-clock";
-+               #clock-cells = <0>;
-+               clock-frequency = <38400000>;
-+       };
-+};
-+
-+&uart2 {
-+       pinctrl-names = "default";
-+       pinctrl-0 = <&uart2_pins>;
-+
-+       bluetooth {
-+               compatible = "ti,wl1271-bluetooth-nokia", "nokia,h4p-bluetooth";
-+
-+               reset-gpios = <&gpio1 26 GPIO_ACTIVE_LOW>; /* gpio26 */
-+               host-wakeup-gpios = <&gpio4 5 GPIO_ACTIVE_HIGH>; /* gpio101 */
-+               bluetooth-wakeup-gpios = <&gpio2 5 GPIO_ACTIVE_HIGH>; /* gpio37 */
-+
-+               clocks = <&bluetooth_clk>;
-+               clock-names = "sysclk";
-+       };
-+};
+ /*
+  * serdev hooks into TTY core
+  */
 -- 
 2.11.0
