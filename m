@@ -1,71 +1,39 @@
-Return-Path: <sre@kernel.org>
-From: Sebastian Reichel <sre@kernel.org>
-To: Sebastian Reichel <sre@kernel.org>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Rob Herring <robh+dt@kernel.org>
-Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>,
-	Pavel Machek <pavel@ucw.cz>,
-	Tony Lindgren <tony@atomide.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Jiri Slaby <jslaby@suse.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	linux-bluetooth@vger.kernel.org,
-	linux-serial@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCHv2 00/11] Nokia H4+ support
-Date: Tue, 21 Mar 2017 23:32:05 +0100
-Message-Id: <20170321223216.11733-1-sre@kernel.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+To: linux-bluetooth@vger.kernel.org
+MIME-Version: 1.0
+Subject: way of woking / how to develop new features (roadmap)
+Message-ID: <OFB1F3144F.CCE46262-ONC12580EA.0051B938-C12580EA.0053A564@continental-corporation.com>
+From: Mike.Stahl@continental-corporation.com
+Date: Tue, 21 Mar 2017 16:13:37 +0100
+Content-Type: text/plain; charset="US-ASCII"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Dear community members, 
 
-This is the second revision from the Nokia H4+ bluetooth patchset. I fixed all
-comments I received and verified that scanning for bluetooth devices still
-works on N950.
+I just joined this mailing list and I have a couple of questions regarding 
+the way of working in this community.
 
-The patchset is based upon 4.11-rc1 and is also available from
-the following branch:
+1. Is there any documentation that explains how to contribute to the open 
+source development (i.e. is there a kind of guideline for a BlueZ software 
+engineer)?
 
-https://git.kernel.org/pub/scm/linux/kernel/git/sre/linux-n900.git nokia-bt-serdev-v2
+2. How is the development of new profile features (or profile version 
+upgrades) organized for BlueZ: 
+   a) How does the community discuss and agree on the features that should 
+be developed next? 
+   b) What are the typical steps to integrate new/additional functionality 
+into Bluez?
+   c) Does a kind of roadmap exist for Bluetooth profiles/features? 
+   d) Are there working groups for specific topics in order to coordinate 
+development activities and to share experience? 
 
--- Sebastian
+3. What is the focus of current BlueZ development? This question basically 
+goes to all community members. Feedback from everybody who likes to answer 
+is very welcome!
 
-Rob Herring (1):
-  Bluetooth: hci_uart: add serdev driver support library
+Thank you in anticipation!
 
-Sebastian Reichel (10):
-  Bluetooth: hci_uart: add support for word alignment
-  Bluetooth: hci_serdev: do not open device in hci open
-  tty: serial: omap: add UPF_BOOT_AUTOCONF flag for DT init
-  serdev: add serdev_device_wait_until_sent
-  serdev: implement get/set tiocm
-  serdev: add helpers for cts and rts handling
-  dt-bindings: net: bluetooth: Add nokia-bluetooth
-  Bluetooth: add nokia driver
-  ARM: dts: N900: Add bluetooth
-  ARM: dts: N9/N950: add bluetooth
+Best regards 
 
- .../devicetree/bindings/net/nokia-bluetooth.txt    |  51 ++
- arch/arm/boot/dts/omap3-n900.dts                   |  23 +-
- arch/arm/boot/dts/omap3-n950-n9.dtsi               |  32 +
- drivers/bluetooth/Kconfig                          |  12 +
- drivers/bluetooth/Makefile                         |   3 +
- drivers/bluetooth/hci_h4.c                         |  17 +
- drivers/bluetooth/hci_ldisc.c                      |   4 +
- drivers/bluetooth/hci_nokia.c                      | 819 +++++++++++++++++++++
- drivers/bluetooth/hci_serdev.c                     | 355 +++++++++
- drivers/bluetooth/hci_uart.h                       |   7 +
- drivers/tty/serdev/core.c                          |  33 +
- drivers/tty/serdev/serdev-ttyport.c                |  39 +-
- drivers/tty/serial/omap-serial.c                   |   3 +
- include/linux/serdev.h                             |  47 ++
- 14 files changed, 1442 insertions(+), 3 deletions(-)
- create mode 100644 Documentation/devicetree/bindings/net/nokia-bluetooth.txt
- create mode 100644 drivers/bluetooth/hci_nokia.c
- create mode 100644 drivers/bluetooth/hci_serdev.c
-
--- 
-2.11.0
+Mike
