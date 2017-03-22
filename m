@@ -1,5 +1,5 @@
 Return-Path: <andy.gross@linaro.org>
-Date: Wed, 22 Mar 2017 16:54:04 -0500
+Date: Wed, 22 Mar 2017 16:53:39 -0500
 From: Andy Gross <andy.gross@linaro.org>
 To: Bjorn Andersson <bjorn.andersson@linaro.org>
 Cc: Marcel Holtmann <marcel@holtmann.org>,
@@ -13,18 +13,21 @@ Cc: Marcel Holtmann <marcel@holtmann.org>,
 	linux-kernel@vger.kernel.org, wcn36xx@lists.infradead.org,
 	linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
 	linux-arm-msm@vger.kernel.org, linux-soc@vger.kernel.org
-Subject: Re: [PATCH 3/3] soc: qcom: smd-rpm: Add msm8996 compatibility
-Message-ID: <20170322215404.GC22585@hector.attlocal.net>
+Subject: Re: [PATCH 2/3] soc: qcom: smd: Remove standalone driver
+Message-ID: <20170322215339.GB22585@hector.attlocal.net>
 References: <20170320233544.1656-1-bjorn.andersson@linaro.org>
- <20170320233544.1656-3-bjorn.andersson@linaro.org>
+ <20170320233544.1656-2-bjorn.andersson@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170320233544.1656-3-bjorn.andersson@linaro.org>
+In-Reply-To: <20170320233544.1656-2-bjorn.andersson@linaro.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Mar 20, 2017 at 04:35:44PM -0700, Bjorn Andersson wrote:
-> With the RPM driver transitioned to RPMSG we can reuse the SMD-RPM
-> driver ontop of GLINK for 8996, without any modifications.
+On Mon, Mar 20, 2017 at 04:35:43PM -0700, Bjorn Andersson wrote:
+> Remove the standalone SMD implementation as we have transitioned the
+> client drivers to use the RPMSG based one.
+> 
+> Also remove all dependencies on QCOM_SMD from Kconfig files, in order to
+> keep them selectable in the absence of the removed symbol.
 > 
 > Signed-off-by: Bjorn Andersson <bjorn.andersson@linaro.org>
 
