@@ -1,11 +1,11 @@
 Return-Path: <robh+dt@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20170321223216.11733-10-sre@kernel.org>
-References: <20170321223216.11733-1-sre@kernel.org> <20170321223216.11733-10-sre@kernel.org>
+In-Reply-To: <20170322005837.6047-1-sre@kernel.org>
+References: <20170321223216.11733-7-sre@kernel.org> <20170322005837.6047-1-sre@kernel.org>
 From: Rob Herring <robh+dt@kernel.org>
-Date: Wed, 22 Mar 2017 16:26:28 -0500
-Message-ID: <CAL_Jsq+UXxocmpSJwJ8dVY0ZSLn1Rk+GfTRKP7Wqvo-_cE4qPg@mail.gmail.com>
-Subject: Re: [PATCHv2 09/11] Bluetooth: add nokia driver
+Date: Wed, 22 Mar 2017 16:18:25 -0500
+Message-ID: <CAL_Jsq+7-TUiGoOEZZveyT-vzHT-TKYw3sQb8f0NqKp5UEdtWw@mail.gmail.com>
+Subject: Re: [PATCHv2.1] serdev: implement get/set tiocm
 To: Sebastian Reichel <sre@kernel.org>
 Cc: Marcel Holtmann <marcel@holtmann.org>, Gustavo Padovan <gustavo@padovan.org>,
 	Johan Hedberg <johan.hedberg@gmail.com>, Samuel Thibault <samuel.thibault@ens-lyon.org>,
@@ -19,31 +19,22 @@ Cc: Marcel Holtmann <marcel@holtmann.org>, Gustavo Padovan <gustavo@padovan.org>
 Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, Mar 21, 2017 at 5:32 PM, Sebastian Reichel <sre@kernel.org> wrote:
-> This adds a driver for the Nokia H4+ protocol, which is used
-> at least on the Nokia N9, N900 & N950.
+On Tue, Mar 21, 2017 at 7:58 PM, Sebastian Reichel <sre@kernel.org> wrote:
+> Add method for getting and setting tiocm.
 >
 > Signed-off-by: Sebastian Reichel <sre@kernel.org>
 > ---
+> Changes since PATCHv2:
+>  * fix serdev_device_set_tiocm inline definition for disabled SERDEV
+>  * use <linux/termios.h> instead of <asm-generic/termios.h>
+> ---
+>  drivers/tty/serdev/core.c           | 22 ++++++++++++++++++++++
+>  drivers/tty/serdev/serdev-ttyport.c | 24 ++++++++++++++++++++++++
+>  include/linux/serdev.h              | 13 +++++++++++++
+>  3 files changed, 59 insertions(+)
 
-> +       btdev->wakeup_host = devm_gpiod_get(dev, "host-wakeup", GPIOD_IN);
-> +       if (IS_ERR(btdev->wakeup_host)) {
-> +               err = PTR_ERR(btdev->wakeup_host);
-> +               dev_err(dev, "could not get host wakeup gpio: %d", err);
-> +               return err;
-> +       }
-> +
-> +       btdev->wake_irq = gpiod_to_irq(btdev->wakeup_host);
+I'm not that big of a fan of {set,get}_tiocm, but I guess it is fine.
 
-Missed this in the binding review, but generally, we make these
-interrupts rather than gpios in the binding.
+Acked-by: Rob Herring <robh@kernel.org>
 
-> +
-> +       err = devm_request_threaded_irq(dev, btdev->wake_irq, NULL,
-> +               wakeup_handler,
-> +               IRQF_TRIGGER_RISING | IRQF_TRIGGER_FALLING | IRQF_ONESHOT,
-> +               "wakeup", btdev);
-> +       if (err) {
-> +               dev_err(dev, "could request wakeup irq: %d", err);
-> +               return err;
-> +       }
+Rob
