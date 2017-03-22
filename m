@@ -1,11 +1,11 @@
 Return-Path: <robh+dt@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20170322005837.6047-1-sre@kernel.org>
-References: <20170321223216.11733-7-sre@kernel.org> <20170322005837.6047-1-sre@kernel.org>
+In-Reply-To: <20170321223216.11733-11-sre@kernel.org>
+References: <20170321223216.11733-1-sre@kernel.org> <20170321223216.11733-11-sre@kernel.org>
 From: Rob Herring <robh+dt@kernel.org>
-Date: Wed, 22 Mar 2017 16:18:25 -0500
-Message-ID: <CAL_Jsq+7-TUiGoOEZZveyT-vzHT-TKYw3sQb8f0NqKp5UEdtWw@mail.gmail.com>
-Subject: Re: [PATCHv2.1] serdev: implement get/set tiocm
+Date: Wed, 22 Mar 2017 16:06:38 -0500
+Message-ID: <CAL_JsqLBNSWdbiO2A11c=BDWAKvWVGjOWafaNT+1OxoZgvH+fg@mail.gmail.com>
+Subject: Re: [PATCHv2 10/11] ARM: dts: N900: Add bluetooth
 To: Sebastian Reichel <sre@kernel.org>
 Cc: Marcel Holtmann <marcel@holtmann.org>, Gustavo Padovan <gustavo@padovan.org>,
 	Johan Hedberg <johan.hedberg@gmail.com>, Samuel Thibault <samuel.thibault@ens-lyon.org>,
@@ -19,22 +19,18 @@ Cc: Marcel Holtmann <marcel@holtmann.org>, Gustavo Padovan <gustavo@padovan.org>
 Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, Mar 21, 2017 at 7:58 PM, Sebastian Reichel <sre@kernel.org> wrote:
-> Add method for getting and setting tiocm.
+On Tue, Mar 21, 2017 at 5:32 PM, Sebastian Reichel <sre@kernel.org> wrote:
+> Add bcm2048 node and its system clock to the N900 device tree file.
+> Apart from that a reference to the new clock has been added to
+> wl1251 (which uses it, too).
 >
+> Acked-by: Pavel Machek <pavel@ucw.cz>
 > Signed-off-by: Sebastian Reichel <sre@kernel.org>
 > ---
-> Changes since PATCHv2:
->  * fix serdev_device_set_tiocm inline definition for disabled SERDEV
->  * use <linux/termios.h> instead of <asm-generic/termios.h>
+> Changes since PATCHv1:
+>  - update compatible string
 > ---
->  drivers/tty/serdev/core.c           | 22 ++++++++++++++++++++++
->  drivers/tty/serdev/serdev-ttyport.c | 24 ++++++++++++++++++++++++
->  include/linux/serdev.h              | 13 +++++++++++++
->  3 files changed, 59 insertions(+)
-
-I'm not that big of a fan of {set,get}_tiocm, but I guess it is fine.
+>  arch/arm/boot/dts/omap3-n900.dts | 23 +++++++++++++++++++++--
+>  1 file changed, 21 insertions(+), 2 deletions(-)
 
 Acked-by: Rob Herring <robh@kernel.org>
-
-Rob
