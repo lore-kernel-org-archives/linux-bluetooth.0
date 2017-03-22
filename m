@@ -1,39 +1,49 @@
-Return-Path: <andy.gross@linaro.org>
-Date: Wed, 22 Mar 2017 16:52:24 -0500
-From: Andy Gross <andy.gross@linaro.org>
-To: Bjorn Andersson <bjorn.andersson@linaro.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Eugene Krasnikov <k.eugene.e@gmail.com>,
-	Kalle Valo <kvalo@codeaurora.org>,
-	David Brown <david.brown@linaro.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Arnd Bergmann <arnd@arndb.de>, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org, wcn36xx@lists.infradead.org,
-	linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org, linux-soc@vger.kernel.org
-Subject: Re: [PATCH 1/3] soc: qcom: smd: Transition client drivers from smd
- to rpmsg
-Message-ID: <20170322215224.GA22585@hector.attlocal.net>
-References: <20170320233544.1656-1-bjorn.andersson@linaro.org>
+Return-Path: <robh+dt@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170320233544.1656-1-bjorn.andersson@linaro.org>
+In-Reply-To: <20170321223216.11733-10-sre@kernel.org>
+References: <20170321223216.11733-1-sre@kernel.org> <20170321223216.11733-10-sre@kernel.org>
+From: Rob Herring <robh+dt@kernel.org>
+Date: Wed, 22 Mar 2017 16:26:28 -0500
+Message-ID: <CAL_Jsq+UXxocmpSJwJ8dVY0ZSLn1Rk+GfTRKP7Wqvo-_cE4qPg@mail.gmail.com>
+Subject: Re: [PATCHv2 09/11] Bluetooth: add nokia driver
+To: Sebastian Reichel <sre@kernel.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>, Samuel Thibault <samuel.thibault@ens-lyon.org>,
+	Pavel Machek <pavel@ucw.cz>, Tony Lindgren <tony@atomide.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Jiri Slaby <jslaby@suse.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	"open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+	"linux-serial@vger.kernel.org" <linux-serial@vger.kernel.org>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Mar 20, 2017 at 04:35:42PM -0700, Bjorn Andersson wrote:
-> By moving these client drivers to use RPMSG instead of the direct SMD
-> API we can reuse them ontop of the newly added GLINK wire-protocol
-> support found in the 820 and 835 Qualcomm platforms.
-> 
-> As the new (RPMSG-based) and old SMD implementations are mutually
-> exclusive we have to change all client drivers in one commit, to make
-> sure we have a working system before and after this transition.
-> 
-> Signed-off-by: Bjorn Andersson <bjorn.andersson@linaro.org>
+On Tue, Mar 21, 2017 at 5:32 PM, Sebastian Reichel <sre@kernel.org> wrote:
+> This adds a driver for the Nokia H4+ protocol, which is used
+> at least on the Nokia N9, N900 & N950.
+>
+> Signed-off-by: Sebastian Reichel <sre@kernel.org>
 > ---
 
-For the qcom/smd parts:
+> +       btdev->wakeup_host = devm_gpiod_get(dev, "host-wakeup", GPIOD_IN);
+> +       if (IS_ERR(btdev->wakeup_host)) {
+> +               err = PTR_ERR(btdev->wakeup_host);
+> +               dev_err(dev, "could not get host wakeup gpio: %d", err);
+> +               return err;
+> +       }
+> +
+> +       btdev->wake_irq = gpiod_to_irq(btdev->wakeup_host);
 
-Acked-by: Andy Gross <andy.gross@linaro.org>
+Missed this in the binding review, but generally, we make these
+interrupts rather than gpios in the binding.
+
+> +
+> +       err = devm_request_threaded_irq(dev, btdev->wake_irq, NULL,
+> +               wakeup_handler,
+> +               IRQF_TRIGGER_RISING | IRQF_TRIGGER_FALLING | IRQF_ONESHOT,
+> +               "wakeup", btdev);
+> +       if (err) {
+> +               dev_err(dev, "could request wakeup irq: %d", err);
+> +               return err;
+> +       }
