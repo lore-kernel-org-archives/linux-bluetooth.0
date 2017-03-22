@@ -1,92 +1,72 @@
-Return-Path: <sre@kernel.org>
-Date: Wed, 22 Mar 2017 23:48:30 +0100
-From: Sebastian Reichel <sre@kernel.org>
-To: Rob Herring <robh+dt@kernel.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Samuel Thibault <samuel.thibault@ens-lyon.org>,
-	Pavel Machek <pavel@ucw.cz>, Tony Lindgren <tony@atomide.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Jiri Slaby <jslaby@suse.com>, Mark Rutland <mark.rutland@arm.com>,
-	"open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-	"linux-serial@vger.kernel.org" <linux-serial@vger.kernel.org>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCHv2 09/11] Bluetooth: add nokia driver
-Message-ID: <20170322224830.bzlsrrl65nx6olou@earth>
-References: <20170321223216.11733-1-sre@kernel.org>
- <20170321223216.11733-10-sre@kernel.org>
- <CAL_Jsq+UXxocmpSJwJ8dVY0ZSLn1Rk+GfTRKP7Wqvo-_cE4qPg@mail.gmail.com>
+Return-Path: <bjorn.andersson@linaro.org>
+Date: Wed, 22 Mar 2017 14:57:33 -0700
+From: Bjorn Andersson <bjorn.andersson@linaro.org>
+To: David Miller <davem@davemloft.net>
+Cc: marcel@holtmann.org, gustavo@padovan.org, johan.hedberg@gmail.com,
+	k.eugene.e@gmail.com, kvalo@codeaurora.org, andy.gross@linaro.org,
+	david.brown@linaro.org, arnd@arndb.de,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+	wcn36xx@lists.infradead.org, linux-wireless@vger.kernel.org,
+	netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+	linux-soc@vger.kernel.org
+Subject: Re: [PATCH 1/3] soc: qcom: smd: Transition client drivers from smd
+ to rpmsg
+Message-ID: <20170322215733.GH20094@minitux>
+References: <20170320233544.1656-1-bjorn.andersson@linaro.org>
+ <20170322.114439.679826829857326050.davem@davemloft.net>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="rccjul55cibclxh4"
-In-Reply-To: <CAL_Jsq+UXxocmpSJwJ8dVY0ZSLn1Rk+GfTRKP7Wqvo-_cE4qPg@mail.gmail.com>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170322.114439.679826829857326050.davem@davemloft.net>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+On Wed 22 Mar 11:44 PDT 2017, David Miller wrote:
 
---rccjul55cibclxh4
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-Hi,
-
-On Wed, Mar 22, 2017 at 04:26:28PM -0500, Rob Herring wrote:
-> On Tue, Mar 21, 2017 at 5:32 PM, Sebastian Reichel <sre@kernel.org> wrote:
-> > This adds a driver for the Nokia H4+ protocol, which is used
-> > at least on the Nokia N9, N900 & N950.
-> >
-> > Signed-off-by: Sebastian Reichel <sre@kernel.org>
+> From: Bjorn Andersson <bjorn.andersson@linaro.org>
+> Date: Mon, 20 Mar 2017 16:35:42 -0700
+> 
+> > By moving these client drivers to use RPMSG instead of the direct SMD
+> > API we can reuse them ontop of the newly added GLINK wire-protocol
+> > support found in the 820 and 835 Qualcomm platforms.
+> > 
+> > As the new (RPMSG-based) and old SMD implementations are mutually
+> > exclusive we have to change all client drivers in one commit, to make
+> > sure we have a working system before and after this transition.
+> > 
+> > Signed-off-by: Bjorn Andersson <bjorn.andersson@linaro.org>
 > > ---
->=20
-> > +       btdev->wakeup_host =3D devm_gpiod_get(dev, "host-wakeup", GPIOD=
-_IN);
-> > +       if (IS_ERR(btdev->wakeup_host)) {
-> > +               err =3D PTR_ERR(btdev->wakeup_host);
-> > +               dev_err(dev, "could not get host wakeup gpio: %d", err);
-> > +               return err;
-> > +       }
-> > +
-> > +       btdev->wake_irq =3D gpiod_to_irq(btdev->wakeup_host);
->=20
-> Missed this in the binding review, but generally, we make these
-> interrupts rather than gpios in the binding.
+> > 
+> > Based on v4.11-rc3 with Arnd's Kconfig dependency fixes for BT_QCOMSMD
+> > (https://lkml.org/lkml/2017/3/20/1038).
+> 
+> Just some questions since I'm supposed to merge this into my net-next
+> tree.
+> 
+> What is the status of the Kconfig dependency fix and how will I be
+> getting it?
+> 
 
-I also read the state of the GPIO. AFAIK it's not possible to read
-the state of an IRQ, so I can't switch to IRQ.
+There are two Kconfig dependencies in play here, the first is
+c3104aae5d8c ("remoteproc: qcom: fix QCOM_SMD dependencies"), this was
+picked up by Linus yesterday and will as such be in v4.10-rc4.
 
-> > +
-> > +       err =3D devm_request_threaded_irq(dev, btdev->wake_irq, NULL,
-> > +               wakeup_handler,
-> > +               IRQF_TRIGGER_RISING | IRQF_TRIGGER_FALLING | IRQF_ONESH=
-OT,
-> > +               "wakeup", btdev);
-> > +       if (err) {
-> > +               dev_err(dev, "could request wakeup irq: %d", err);
-> > +               return err;
-> > +       }
+The other dependency, is the one Marcel wants you to pick up here is
+https://patchwork.kernel.org/patch/9635385/. It's on LKML, but if you
+want I can resend it with you as direct recipient, with Marcel's ack.
 
--- Sebastian
+Likely Arnd would like this fix to be sent upstream for v4.11 already.
 
---rccjul55cibclxh4
-Content-Type: application/pgp-signature; name="signature.asc"
+> Second, should I merge all three of these patches to net-next or just
+> this one?
+> 
 
------BEGIN PGP SIGNATURE-----
+I would like all three to be merged in this cycle and in addition I have
+a couple of patches coming up that will cause some minor conflicts with
+patch 2 - so I would prefer if patch 2 was available in a tag I can
+merge into my tree.
 
-iQIzBAABCgAdFiEE72YNB0Y/i3JqeVQT2O7X88g7+poFAljS/zsACgkQ2O7X88g7
-+pq/Ww//UADQNmd/5kZQubaCvi54xIxmQy26acsz4jjiuAANnzDRIePzRZiW6Nei
-d6AiW54GVz42LAkJ5LGKsExmxtjdhUA+ILMnTXJwuCKtN+PGWUFsGLWurXAlkEbw
-JZydDy21+hcepGJyFuKiMa7sIDw7xg5wTIhMZ4PyVNLazWQvq+CS9wfW00820upn
-M5cHlfDhCgdPu6ghMsKP+JQtmNxhytkPpAzRdpxsTT7JBY2k6SsU6ts5HgCsu4mm
-/NbVCFTWc2hmJ4rgM5AohTOo7xbyDL6uC8DT+wrlzcDY+VtGdK7dRkpOUqk5xSY1
-eGmATnv8UB5yFX4RqFLoCVQAsQTN3JTXnFAG7u3bEoGJRIRRCmatfRsFmSA/Qt5a
-Hf7LUXbkc2CKkl8QB9DUzq5k/NahbPTMmA7n/HQPuYYB0kvWLbi2l0VnI1P0nwrg
-07sk2GmFHq/gUWBmpaii5JpApZ1UIMMEb5X5PyyBYDi/Ayu1o8+ajaXKuqEZwAKW
-FlZZhwDF1WvTybaWS/MRSqlEoTF68rYVO33qzvXtj1nEbbrdNdpV50ajWIIQmia5
-61N0QAtLMwNv/i6QpYc1368yOMJY2JZQsQ/S7oAsmHtxlSNKbbgEyYZX9HyWADtX
-s+6Z4sN7PS4xQQikH/NwgU4L/15Tnlz3K5FK7WZDpAWWbDL9Zyc=
-=2jsv
------END PGP SIGNATURE-----
+Would it be possible for you to prepare merge all 4 (these 3 and the
+bluetooth fix) and prepare a tag for Andy, Marcel and myself to include
+in our trees?
 
---rccjul55cibclxh4--
+Regards,
+Bjorn
