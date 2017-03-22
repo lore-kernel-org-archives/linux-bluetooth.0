@@ -1,5 +1,5 @@
 Return-Path: <pavel@ucw.cz>
-Date: Wed, 22 Mar 2017 10:40:35 +0100
+Date: Wed, 22 Mar 2017 10:39:39 +0100
 From: Pavel Machek <pavel@ucw.cz>
 To: Sebastian Reichel <sre@kernel.org>
 Cc: Marcel Holtmann <marcel@holtmann.org>,
@@ -12,44 +12,59 @@ Cc: Marcel Holtmann <marcel@holtmann.org>,
 	Jiri Slaby <jslaby@suse.com>, Mark Rutland <mark.rutland@arm.com>,
 	linux-bluetooth@vger.kernel.org, linux-serial@vger.kernel.org,
 	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCHv2.1] serdev: implement get/set tiocm
-Message-ID: <20170322094035.GE26771@amd>
-References: <20170321223216.11733-7-sre@kernel.org>
- <20170322005837.6047-1-sre@kernel.org>
+Subject: Re: [PATCHv2 05/11] serdev: add serdev_device_wait_until_sent
+Message-ID: <20170322093939.GD26771@amd>
+References: <20170321223216.11733-1-sre@kernel.org>
+ <20170321223216.11733-6-sre@kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="//IivP0gvsAy3Can"
-In-Reply-To: <20170322005837.6047-1-sre@kernel.org>
+	protocol="application/pgp-signature"; boundary="Q0rSlbzrZN6k9QnT"
+In-Reply-To: <20170321223216.11733-6-sre@kernel.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 
---//IivP0gvsAy3Can
+--Q0rSlbzrZN6k9QnT
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed 2017-03-22 01:58:37, Sebastian Reichel wrote:
-> Add method for getting and setting tiocm.
->=20
-> Signed-off-by: Sebastian Reichel <sre@kernel.org>
+Hi!
+
+> @@ -47,10 +48,13 @@ static void ttyport_write_wakeup(struct tty_port *por=
+t)
+>  	struct serport *serport =3D serdev_controller_get_drvdata(ctrl);
+> =20
+>  	if (!test_and_clear_bit(TTY_DO_WRITE_WAKEUP, &port->tty->flags))
+> -		return;
+> +		goto out;
+> =20
+>  	if (test_bit(SERPORT_ACTIVE, &serport->flags))
+>  		serdev_controller_write_wakeup(ctrl);
+> +
+> +out:
+
+I'd do "if (test_and_clear_bit() && test_bit()) serdev_()"
+here. Otherwise it looks fine.
 
 Acked-by: Pavel Machek <pavel@ucw.cz>
 
+									Pavel
+								=09
 --=20
 (english) http://www.livejournal.com/~pavelmachek
 (cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blo=
 g.html
 
---//IivP0gvsAy3Can
+--Q0rSlbzrZN6k9QnT
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: Digital signature
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1
 
-iEYEARECAAYFAljSRpMACgkQMOfwapXb+vKsqgCfSRdLTO+WZr4U0ESLgNQ0V+Fq
-DvgAoJo8WUoLfTavYlUtZtFZJTSQi2ne
-=Yg9l
+iEYEARECAAYFAljSRlsACgkQMOfwapXb+vLJBQCfRozd4ckjK/dqrfKBryXwMeAx
+aAcAnijtnM9S8FxpfTfaiHL6LWex2sZP
+=n4jE
 -----END PGP SIGNATURE-----
 
---//IivP0gvsAy3Can--
+--Q0rSlbzrZN6k9QnT--
