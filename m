@@ -1,52 +1,48 @@
-Return-Path: <davem@davemloft.net>
-Date: Wed, 22 Mar 2017 19:23:04 -0700 (PDT)
-Message-Id: <20170322.192304.1068066587902221771.davem@davemloft.net>
-To: marcel@holtmann.org
-Cc: bjorn.andersson@linaro.org, gustavo@padovan.org,
- johan.hedberg@gmail.com, k.eugene.e@gmail.com, kvalo@codeaurora.org,
- andy.gross@linaro.org, david.brown@linaro.org, arnd@arndb.de,
- linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
- wcn36xx@lists.infradead.org, linux-wireless@vger.kernel.org,
- netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org,
- linux-soc@vger.kernel.org
-Subject: Re: [PATCH 1/3] soc: qcom: smd: Transition client drivers from smd
- to rpmsg
-From: David Miller <davem@davemloft.net>
-In-Reply-To: <21FCFC89-07EE-49EE-81C2-A138DD4C5F99@holtmann.org>
-References: <20170320233544.1656-1-bjorn.andersson@linaro.org>
-	<20170322.114439.679826829857326050.davem@davemloft.net>
-	<21FCFC89-07EE-49EE-81C2-A138DD4C5F99@holtmann.org>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
+Return-Path: <tony@atomide.com>
+Date: Wed, 22 Mar 2017 16:55:10 -0700
+From: Tony Lindgren <tony@atomide.com>
+To: Rob Herring <robh+dt@kernel.org>
+Cc: Sebastian Reichel <sre@kernel.org>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Samuel Thibault <samuel.thibault@ens-lyon.org>,
+	Pavel Machek <pavel@ucw.cz>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Jiri Slaby <jslaby@suse.com>, Mark Rutland <mark.rutland@arm.com>,
+	"open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+	"linux-serial@vger.kernel.org" <linux-serial@vger.kernel.org>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCHv2 10/11] ARM: dts: N900: Add bluetooth
+Message-ID: <20170322235509.GH10760@atomide.com>
+References: <20170321223216.11733-1-sre@kernel.org>
+ <20170321223216.11733-11-sre@kernel.org>
+ <CAL_JsqLBNSWdbiO2A11c=BDWAKvWVGjOWafaNT+1OxoZgvH+fg@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CAL_JsqLBNSWdbiO2A11c=BDWAKvWVGjOWafaNT+1OxoZgvH+fg@mail.gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Marcel Holtmann <marcel@holtmann.org>
-Date: Wed, 22 Mar 2017 20:23:15 +0100
+* Rob Herring <robh+dt@kernel.org> [170322 14:09]:
+> On Tue, Mar 21, 2017 at 5:32 PM, Sebastian Reichel <sre@kernel.org> wrote:
+> > Add bcm2048 node and its system clock to the N900 device tree file.
+> > Apart from that a reference to the new clock has been added to
+> > wl1251 (which uses it, too).
+> >
+> > Acked-by: Pavel Machek <pavel@ucw.cz>
+> > Signed-off-by: Sebastian Reichel <sre@kernel.org>
+> > ---
+> > Changes since PATCHv1:
+> >  - update compatible string
+> > ---
+> >  arch/arm/boot/dts/omap3-n900.dts | 23 +++++++++++++++++++++--
+> >  1 file changed, 21 insertions(+), 2 deletions(-)
+> 
+> Acked-by: Rob Herring <robh@kernel.org>
 
-> Hi Dave,
-> 
->>> By moving these client drivers to use RPMSG instead of the direct SMD
->>> API we can reuse them ontop of the newly added GLINK wire-protocol
->>> support found in the 820 and 835 Qualcomm platforms.
->>> 
->>> As the new (RPMSG-based) and old SMD implementations are mutually
->>> exclusive we have to change all client drivers in one commit, to make
->>> sure we have a working system before and after this transition.
->>> 
->>> Signed-off-by: Bjorn Andersson <bjorn.andersson@linaro.org>
->>> ---
->>> 
->>> Based on v4.11-rc3 with Arnd's Kconfig dependency fixes for BT_QCOMSMD
->>> (https://lkml.org/lkml/2017/3/20/1038).
->> 
->> Just some questions since I'm supposed to merge this into my net-next
->> tree.
->> 
->> What is the status of the Kconfig dependency fix and how will I be
->> getting it?
-> 
-> I acked that one separately and added you:
-> 
-> [PATCH v2] Bluetooth: btqcomsmd: fix compile-test dependency
+Picking patches 10 and 11 into omap-for-v4.12/dt-v2.
 
-I applied this to my 'net' tree, thanks.
+Regards,
+
+Tony
