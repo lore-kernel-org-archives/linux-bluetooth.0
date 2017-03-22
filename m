@@ -1,53 +1,159 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: "Wong, Joshua Weng Onn" <joshua.weng.onn.wong@intel.com>
-To: Bluez mailing list <linux-bluetooth@vger.kernel.org>
-CC: "Wong, Mun choy" <mun.choy.wong@intel.com>,
-        "Zulqarnain, Adam" <adam.zulqarnain@intel.com>,
-        "avinashk@marvell.com" <avinashk@marvell.com>
-Subject: Unexpected SMP Command 0x17
-Date: Wed, 22 Mar 2017 02:47:51 +0000
-Message-ID: <E3B98393E6037849B63EA428240A651360654F@PGSMSX103.gar.corp.intel.com>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <sre@kernel.org>
+From: Sebastian Reichel <sre@kernel.org>
+To: Sebastian Reichel <sre@kernel.org>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Rob Herring <robh+dt@kernel.org>
+Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>,
+	Pavel Machek <pavel@ucw.cz>,
+	Tony Lindgren <tony@atomide.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Jiri Slaby <jslaby@suse.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	linux-bluetooth@vger.kernel.org,
+	linux-serial@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCHv2.1] serdev: implement get/set tiocm
+Date: Wed, 22 Mar 2017 01:58:37 +0100
+Message-Id: <20170322005837.6047-1-sre@kernel.org>
+In-Reply-To: <20170321223216.11733-7-sre@kernel.org>
+References: <20170321223216.11733-7-sre@kernel.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgYWxsLA0KDQpJIGFtIHNlZWluZyBhbiBlcnJvciBkdXJpbmcgdGhlIExFIHBhaXJpbmcgcHJv
-Y2VzcyB3aGljaCBtYWtlcyB0aGUgcGFpcmluZyB0byBmYWlsLiBJIGhhdmUgdHdvIERVVHMgd2hp
-Y2ggdXNlcyB0aGUgTWFydmVsbCA4OFc4ODk3Lg0KSGVyZSBhcmUgbXkgQlQgc2V0dGluZ3MgZm9y
-IGJvdGggbWFzdGVyIGFuZCBzbGF2ZToNCg0KTWFzdGVyOg0KJCBidG1nbXQgaW5mbw0KY3VycmVu
-dCBzZXR0aW5nczogcG93ZXJlZCBjb25uZWN0YWJsZSBkaXNjb3ZlcmFibGUgYm9uZGFibGUgc3Nw
-IGJyL2VkciBsZSBzZWN1cmUtY29ubg0KDQpTbGF2ZToNCiQgYnRtZ210IGluZm8NCkN1cnJlbnQg
-c2V0dGluZ3M6IHBvd2VyZWQgY29ubmVjdGFibGUgYm9uZGFibGUgbGUgYWR2ZXJ0aXNpbmcgc2Vj
-dXJlLWNvbm4NCg0KV2hlbiBJIGluaXRpYXRlIHRoZSBwYWlyaW5nIHByb2Nlc3MgZnJvbSB0aGUg
-bWFzdGVyLCBJIG9ic2VydmVkIHRoZSBtZXNzYWdlOg0KIkJsdWV0b290aDogaGNpMCB1bmV4cGVj
-dGVkIFNNUCBjb21tYW5kIDB4MGEgZnJvbSA3NDpjNjozYjphYjo2ODplYSINCg0KV2hlcmUgNzQ6
-YzY6M2I6YWI6Njg6ZWEgaXMgdGhlIGFkZHJlc3Mgb2YgdGhlIHNsYXZlIGRldmljZS4NCg0KSW4g
-dGhlIGJ0bW9uIGxvZyBvZiB0aGUgbWFzdGVyIGRldmljZSwgaXQgaXMgb2JzZXJ2ZWQgdGhhdCBh
-ZnRlciB0aGUgU2xhdmUgZGV2aWNlIGhhcyB0cmFuc21pdHRlZCB0aGUga2V5cywgdGhlIE1hc3Rl
-ciBkb2VzIG5vdCB0cmFuc21pdCBpdC4gSGVuY2UsIHRoZSBTbGF2ZSBpcyBub3QgcmVjZWl2aW5n
-IHRoZSBrZXlzIGFuZCB0aHVzIGRpc2Nvbm5lY3RzIHRoZSBsaW5rIGFuZCBwYWlyaW5nIGlzIGZh
-aWxlZC4NCg0KPiBBQ0wgRGF0YSBSWDogSGFuZGxlIDEyOCBmbGFncyAweDAyIGRsZW4gMjEgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgW2hjaTBdIDEyNC44MDEwOTgNCiAgICAgIFNNUDog
-RW5jcnlwdGlvbiBJbmZvcm1hdGlvbiAoMHgwNikgbGVuIDE2DQogICAgICAgIExvbmcgdGVybSBr
-ZXk6IDlhYzY5MWU5NmU4NWU4MmNhNjhmNGI2ZDJhYmVjODBmDQo+IEhDSSBFdmVudDogRW5jcnlw
-dGlvbiBDaGFuZ2UgKDB4MDgpIHBsZW4gNCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBb
-aGNpMF0gMTI0LjgwMTI2MQ0KICAgICAgICBTdGF0dXM6IFN1Y2Nlc3MgKDB4MDApDQogICAgICAg
-IEhhbmRsZTogMTI4DQogICAgICAgIEVuY3J5cHRpb246IEVuYWJsZWQgd2l0aCBBRVMtQ0NNICgw
-eDAxKQ0KPiBBQ0wgRGF0YSBSWDogSGFuZGxlIDEyOCBmbGFncyAweDAyIGRsZW4gMTUgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgW2hjaTBdIDEyNC44MTI3NjENCiAgICAgIFNNUDogTWFz
-dGVyIElkZW50aWZpY2F0aW9uICgweDA3KSBsZW4gMTANCiAgICAgICAgRURJVjogMHhlYTNmDQog
-ICAgICAgIFJhbmQ6IDB4ODA2ZTU0MmE3OGY1NWQ3Yw0KPiBBQ0wgRGF0YSBSWDogSGFuZGxlIDEy
-OCBmbGFncyAweDAyIGRsZW4gMjEgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgW2hjaTBd
-IDEyNC44MTI3ODINCiAgICAgIFNNUDogU2lnbmluZyBJbmZvcm1hdGlvbiAoMHgwYSkgbGVuIDE2
-DQogICAgICAgIFNpZ25hdHVyZSBrZXk6IDQ0NTFiOGFlMGVmZjkwZjBhNDdmYjk2YmU1MzQ3OWZi
-DQo+IEhDSSBFdmVudDogRGlzY29ubmVjdCBDb21wbGV0ZSAoMHgwNSkgcGxlbiA0ICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICBbaGNpMF0gMTU0LjgzOTU5MQ0KICAgICAgICBTdGF0dXM6IFN1
-Y2Nlc3MgKDB4MDApDQogICAgICAgIEhhbmRsZTogMTI4DQogICAgICAgIFJlYXNvbjogUmVtb3Rl
-IFVzZXIgVGVybWluYXRlZCBDb25uZWN0aW9uICgweDEzKQ0KDQo9PiBBdCB0aGlzIHBvaW50LCBN
-YXN0ZXIgc2hvdWxkIHN0YXJ0IHNlbmRpbmcgTFRLIHRvIHNsYXZlLCBidXQgTWFzdGVyIGRvZXNu
-J3Qgc2VuZCB0aGUgTFRLIHNvIFNsYXZlIGRpc2Nvbm5lY3RzIHRoZSBsaW5rIGFuZCBwYWlyaW5n
-IGlzIGZhaWxlZC4NCg0KV2hhdCBjb3VsZCBwb3NzaWJseSBjYXVzZSB0aGUgbWFzdGVyIHRvIG5v
-dCBzZW5kIHRoZSBMVEs/IE15IGtlcm5lbCB2ZXJzaW9uIGlzIHY0LjEuMjcgYW5kIGJsdWV6IHN0
-YWNrIGlzIHY1LjQwLiBJIHdvdWxkIGFwcHJlY2lhdGUgYWR2aWNlIG9uIHRoaXMuDQoNClRoYW5r
-IHlvdS4NCg0Kfkpvc2h1YQ0K
+Add method for getting and setting tiocm.
+
+Signed-off-by: Sebastian Reichel <sre@kernel.org>
+---
+Changes since PATCHv2:
+ * fix serdev_device_set_tiocm inline definition for disabled SERDEV
+ * use <linux/termios.h> instead of <asm-generic/termios.h>
+---
+ drivers/tty/serdev/core.c           | 22 ++++++++++++++++++++++
+ drivers/tty/serdev/serdev-ttyport.c | 24 ++++++++++++++++++++++++
+ include/linux/serdev.h              | 13 +++++++++++++
+ 3 files changed, 59 insertions(+)
+
+diff --git a/drivers/tty/serdev/core.c b/drivers/tty/serdev/core.c
+index a63b74031e22..1e1cbae3a0ea 100644
+--- a/drivers/tty/serdev/core.c
++++ b/drivers/tty/serdev/core.c
+@@ -184,6 +184,28 @@ void serdev_device_wait_until_sent(struct serdev_device *serdev, long timeout)
+ }
+ EXPORT_SYMBOL_GPL(serdev_device_wait_until_sent);
+ 
++int serdev_device_get_tiocm(struct serdev_device *serdev)
++{
++	struct serdev_controller *ctrl = serdev->ctrl;
++
++	if (!ctrl || !ctrl->ops->get_tiocm)
++		return -ENOTSUPP;
++
++	return ctrl->ops->get_tiocm(ctrl);
++}
++EXPORT_SYMBOL_GPL(serdev_device_get_tiocm);
++
++int serdev_device_set_tiocm(struct serdev_device *serdev, int set, int clear)
++{
++	struct serdev_controller *ctrl = serdev->ctrl;
++
++	if (!ctrl || !ctrl->ops->set_tiocm)
++		return -ENOTSUPP;
++
++	return ctrl->ops->set_tiocm(ctrl, set, clear);
++}
++EXPORT_SYMBOL_GPL(serdev_device_set_tiocm);
++
+ static int serdev_drv_probe(struct device *dev)
+ {
+ 	const struct serdev_device_driver *sdrv = to_serdev_device_driver(dev->driver);
+diff --git a/drivers/tty/serdev/serdev-ttyport.c b/drivers/tty/serdev/serdev-ttyport.c
+index db2bc601e554..c5bdb901ff11 100644
+--- a/drivers/tty/serdev/serdev-ttyport.c
++++ b/drivers/tty/serdev/serdev-ttyport.c
+@@ -179,6 +179,28 @@ static void ttyport_wait_until_sent(struct serdev_controller *ctrl, long timeout
+ 	tty_wait_until_sent(tty, timeout);
+ }
+ 
++static int ttyport_get_tiocm(struct serdev_controller *ctrl)
++{
++	struct serport *serport = serdev_controller_get_drvdata(ctrl);
++	struct tty_struct *tty = serport->tty;
++
++	if (!tty->ops->tiocmget)
++		return -ENOTSUPP;
++
++	return tty->driver->ops->tiocmget(tty);
++}
++
++static int ttyport_set_tiocm(struct serdev_controller *ctrl, unsigned int set, unsigned int clear)
++{
++	struct serport *serport = serdev_controller_get_drvdata(ctrl);
++	struct tty_struct *tty = serport->tty;
++
++	if (!tty->ops->tiocmset)
++		return -ENOTSUPP;
++
++	return tty->driver->ops->tiocmset(tty, set, clear);
++}
++
+ static const struct serdev_controller_ops ctrl_ops = {
+ 	.write_buf = ttyport_write_buf,
+ 	.write_flush = ttyport_write_flush,
+@@ -188,6 +210,8 @@ static const struct serdev_controller_ops ctrl_ops = {
+ 	.set_flow_control = ttyport_set_flow_control,
+ 	.set_baudrate = ttyport_set_baudrate,
+ 	.wait_until_sent = ttyport_wait_until_sent,
++	.get_tiocm = ttyport_get_tiocm,
++	.set_tiocm = ttyport_set_tiocm,
+ };
+ 
+ struct device *serdev_tty_port_register(struct tty_port *port,
+diff --git a/include/linux/serdev.h b/include/linux/serdev.h
+index a308b206d204..e29a270f603c 100644
+--- a/include/linux/serdev.h
++++ b/include/linux/serdev.h
+@@ -15,6 +15,7 @@
+ 
+ #include <linux/types.h>
+ #include <linux/device.h>
++#include <linux/termios.h>
+ 
+ struct serdev_controller;
+ struct serdev_device;
+@@ -82,6 +83,8 @@ struct serdev_controller_ops {
+ 	void (*set_flow_control)(struct serdev_controller *, bool);
+ 	unsigned int (*set_baudrate)(struct serdev_controller *, unsigned int);
+ 	void (*wait_until_sent)(struct serdev_controller *, long);
++	int (*get_tiocm)(struct serdev_controller *);
++	int (*set_tiocm)(struct serdev_controller *, unsigned int, unsigned int);
+ };
+ 
+ /**
+@@ -188,6 +191,8 @@ void serdev_device_close(struct serdev_device *);
+ unsigned int serdev_device_set_baudrate(struct serdev_device *, unsigned int);
+ void serdev_device_set_flow_control(struct serdev_device *, bool);
+ void serdev_device_wait_until_sent(struct serdev_device *, long);
++int serdev_device_get_tiocm(struct serdev_device *);
++int serdev_device_set_tiocm(struct serdev_device *, int, int);
+ int serdev_device_write_buf(struct serdev_device *, const unsigned char *, size_t);
+ void serdev_device_write_flush(struct serdev_device *);
+ int serdev_device_write_room(struct serdev_device *);
+@@ -226,6 +231,14 @@ static inline unsigned int serdev_device_set_baudrate(struct serdev_device *sdev
+ }
+ static inline void serdev_device_set_flow_control(struct serdev_device *sdev, bool enable) {}
+ static inline void serdev_device_wait_until_sent(struct serdev_device *sdev, long timeout) {}
++static inline int serdev_device_get_tiocm(struct serdev_device *serdev)
++{
++	return -ENOTSUPP;
++}
++static inline int serdev_device_set_tiocm(struct serdev_device *serdev, int set, int clear)
++{
++	return -ENOTSUPP;
++}
+ static inline int serdev_device_write_buf(struct serdev_device *sdev, const unsigned char *buf, size_t count)
+ {
+ 	return -ENODEV;
+-- 
+2.11.0
