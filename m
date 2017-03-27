@@ -1,33 +1,27 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: hyuk0512.lee@samsung.com
-To: linux-bluetooth@vger.kernel.org
-Cc: Lee Hyuk <hyuk0512.lee@samsung.com>
-Subject: [PATCH BlueZ] tools: Fix the sock handle leak
-Date: Tue, 28 Mar 2017 10:12:14 +0900
-Message-id: <1490663534-30177-1-git-send-email-hyuk0512.lee@samsung.com>
-References: <CGME20170328011217epcas5p22d24014478494faeb29c66c21cd21fb2@epcas5p2.samsung.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <davem@davemloft.net>
+Date: Mon, 27 Mar 2017 16:04:00 -0700 (PDT)
+Message-Id: <20170327.160400.1285256003980361221.davem@davemloft.net>
+To: bjorn.andersson@linaro.org
+Cc: marcel@holtmann.org, gustavo@padovan.org, johan.hedberg@gmail.com,
+ k.eugene.e@gmail.com, kvalo@codeaurora.org, andy.gross@linaro.org,
+ david.brown@linaro.org, arnd@arndb.de, linux-bluetooth@vger.kernel.org,
+ linux-kernel@vger.kernel.org, wcn36xx@lists.infradead.org,
+ linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
+ linux-arm-msm@vger.kernel.org, linux-soc@vger.kernel.org
+Subject: Re: [PATCH 1/3] soc: qcom: smd: Transition client drivers from smd
+ to rpmsg
+From: David Miller <davem@davemloft.net>
+In-Reply-To: <20170327225836.GL20094@minitux>
+References: <20170322215733.GH20094@minitux>
+	<20170323.165613.802100008000968298.davem@davemloft.net>
+	<20170327225836.GL20094@minitux>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Lee Hyuk <hyuk0512.lee@samsung.com>
+From: Bjorn Andersson <bjorn.andersson@linaro.org>
+Date: Mon, 27 Mar 2017 15:58:37 -0700
 
-This patch adds function "close" for fixing the socket handle leak.
----
- tools/rfcomm.c | 1 +
- 1 file changed, 1 insertion(+)
+> I'm sorry, but I can't figure out how to reproduce this.
 
-diff --git a/tools/rfcomm.c b/tools/rfcomm.c
-index 809c240..03359be 100644
---- a/tools/rfcomm.c
-+++ b/tools/rfcomm.c
-@@ -310,6 +310,7 @@ static void cmd_connect(int ctl, int dev, bdaddr_t *bdaddr, int argc, char **arg
- 
- 		if (setsockopt(sk, SOL_SOCKET, SO_LINGER, &l, sizeof(l)) < 0) {
- 			perror("Can't set linger option");
-+			close(sk);
- 			return;
- 		}
- 	}
--- 
-1.9.1
-
+All of my builds are "make allmodconfig" so it should be easy to reproduce.
