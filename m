@@ -1,58 +1,38 @@
-Return-Path: <gabriel@delvelabs.ca>
-MIME-Version: 1.0
-In-Reply-To: <B6C3E5EF-5E94-4F83-881C-30BAE481111A@holtmann.org>
-References: <20170220173222.20592-1-gabriel@delvelabs.ca> <B6C3E5EF-5E94-4F83-881C-30BAE481111A@holtmann.org>
-From: Gabriel Tremblay <gabriel@delvelabs.ca>
-Date: Mon, 27 Mar 2017 10:31:30 -0400
-Message-ID: <CACfom3X4-2sasChqZ9PpqNZ-eCPfibrruLGzEzb+hSf6dqv_0w@mail.gmail.com>
-Subject: Re: [PATCH] bluetooth: Added support for Rivet Networks Killer 1535
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: "Gustavo F. Padovan" <gustavo@padovan.org>, linux-bluetooth@vger.kernel.org,
-	Johan Hedberg <johan.hedberg@gmail.com>
-Content-Type: multipart/alternative; boundary=001a11448a2e08c794054bb73353
+Return-Path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 10.2 \(3259\))
+Subject: Re: [PATCH 1/3] btusb: wake system up when receives a wake irq
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1487917471-5501-1-git-send-email-jeffy.chen@rock-chips.com>
+Date: Mon, 27 Mar 2017 16:30:15 +0200
+Cc: Amitkumar Karwar <akarwar@marvell.com>,
+        Brian Norris <briannorris@chromium.org>,
+        Rajat Jain <rajatja@google.com>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        "Gustavo F. Padovan" <gustavo@padovan.org>,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Message-Id: <516F5219-FE0B-4578-88A6-62479A8A9BAD@holtmann.org>
+References: <1487917471-5501-1-git-send-email-jeffy.chen@rock-chips.com>
+To: Jeffy Chen <jeffy.chen@rock-chips.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---001a11448a2e08c794054bb73353
-Content-Type: text/plain; charset=UTF-8
+Hi Jeffy,
 
-Thanks
+> Currrently we are disabling this wake irq after receiving it. If this
+> happens before we finish suspend and the pm event check is disabled,
+> the system will continue suspending, and this irq would not work again.
+> 
+> We may need to abort system suspend to avoid that.
+> 
+> Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
+> ---
+> 
+> drivers/bluetooth/btusb.c | 2 ++
+> 1 file changed, 2 insertions(+)
 
-On Mar 27, 2017 10:26 AM, "Marcel Holtmann" <marcel@holtmann.org> wrote:
+the first two patches have been applied to bluetooth-next tree.
 
-> Hi Gabriel,
->
-> > ---
-> > drivers/bluetooth/btusb.c | 1 +
-> > 1 file changed, 1 insertion(+)
->
-> patch has been applied to bluetooth-next tree.
->
-> Regards
->
-> Marcel
->
->
+Regards
 
---001a11448a2e08c794054bb73353
-Content-Type: text/html; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"auto">Thanks</div><div class=3D"gmail_extra"><br><div class=3D"=
-gmail_quote">On Mar 27, 2017 10:26 AM, &quot;Marcel Holtmann&quot; &lt;<a h=
-ref=3D"mailto:marcel@holtmann.org">marcel@holtmann.org</a>&gt; wrote:<br ty=
-pe=3D"attribution"><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 =
-.8ex;border-left:1px #ccc solid;padding-left:1ex">Hi Gabriel,<br>
-<br>
-&gt; ---<br>
-&gt; drivers/bluetooth/btusb.c | 1 +<br>
-&gt; 1 file changed, 1 insertion(+)<br>
-<br>
-patch has been applied to bluetooth-next tree.<br>
-<br>
-Regards<br>
-<br>
-Marcel<br>
-<br>
-</blockquote></div></div>
-
---001a11448a2e08c794054bb73353--
+Marcel
