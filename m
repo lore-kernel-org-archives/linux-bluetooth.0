@@ -1,57 +1,30 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 10.2 \(3259\))
-Subject: Re: [PATCH v7 0/6] Bluetooth: 6LoWPAN: Fix lladdr length
+Subject: Re: [PATCH] Bluetooth: bluecard: use setup_timer
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20170312081938.11700-1-luiz.dentz@gmail.com>
-Date: Mon, 27 Mar 2017 16:11:31 +0200
-Cc: linux-bluetooth@vger.kernel.org, patrik.flykt@linux.intel.com,
-        aar@pengutronix.de, jukka.rissanen@linux.intel.com,
-        linux-wpan@vger.kernel.org, netdev@vger.kernel.org
-Message-Id: <2401EDE0-D958-4158-B862-29091259BBC5@holtmann.org>
-References: <20170312081938.11700-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>
+In-Reply-To: <e0af154c08327dbf266e641b135e4ef340913feb.1489061552.git.geliangtang@gmail.com>
+Date: Mon, 27 Mar 2017 16:11:28 +0200
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Message-Id: <96F9530E-0D92-4728-B394-6B5402D0F38B@holtmann.org>
+References: <3afa5498142ef68256023257dad37b9f8352e65e.1489060803.git.geliangtang@gmail.com>
+ <e0af154c08327dbf266e641b135e4ef340913feb.1489061552.git.geliangtang@gmail.com>
+To: Geliang Tang <geliangtang@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Geliang,
 
-> These patches fixes lladdr length to be 6 bytes long and not 8 which cause
-> neighbor advertisement to be sent with wrong lladdr including FF:FE filler
-> bytes for eui64.
+> Use setup_timer() instead of init_timer() to simplify the code.
 > 
-> Note: This does not fix some of the existing crashes which I hope to address
-> in a different set.
-> 
-> v2: Make all code paths that generate a link-local from lladdr use the same
-> code.
-> v3: Use lowpan_iphc_uncompress_eui48_lladdr to generate the remote ip address.
-> v4: Handle comments from Stefan Schmidt.
-> v5: Add patch to fix IID format for Bluetooth
-> v6: Fix addrconf_ifid_eui48 to follow IID format for Bluetooth
-> v7: Rework addrconf_ifid_6lowpan so it doesn't use addrconf_ifid_eui48
-> 
-> Alexander Aring (2):
->  6lowpan: iphc: override l2 packet information
->  ipv6: addrconf: fix 48 bit 6lowpan autoconfiguration
-> 
-> Luiz Augusto von Dentz (2):
->  6lowpan: Use netdev addr_len to determine lladdr len
->  6lowpan: Fix IID format for Bluetooth
-> 
-> Patrik Flykt (2):
->  bluetooth: Set 6 byte device addresses
->  6lowpan: Set MAC address length according to LOWPAN_LLTYPE
-> 
-> include/net/6lowpan.h   |  15 ++++++
-> net/6lowpan/core.c      |  11 +++-
-> net/6lowpan/iphc.c      |  57 +++++++++++++++++----
-> net/bluetooth/6lowpan.c | 130 ++++++++----------------------------------------
-> net/ipv6/addrconf.c     |  23 ++++++---
-> 5 files changed, 109 insertions(+), 127 deletions(-)
+> Signed-off-by: Geliang Tang <geliangtang@gmail.com>
+> ---
+> drivers/bluetooth/bluecard_cs.c | 5 ++---
+> 1 file changed, 2 insertions(+), 3 deletions(-)
 
-all 6 patches have been applied to bluetooth-next tree.
+patch has been applied to bluetooth-next tree.
 
 Regards
 
