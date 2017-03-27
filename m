@@ -1,31 +1,49 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain; charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 10.2 \(3259\))
-Subject: Re: [PATCH v1] Bluetooth: hci_bcm: Support platform enumeration
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20170310122820.7584-1-andriy.shevchenko@linux.intel.com>
-Date: Mon, 27 Mar 2017 16:01:08 +0200
-Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org,
-        Jarkko Nikula <jarkko.nikula@linux.intel.com>
-Message-Id: <5C21C940-1B45-4949-BF3E-9417DE5AAC71@holtmann.org>
-References: <20170310122820.7584-1-andriy.shevchenko@linux.intel.com>
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+MIME-Version: 1.0
+In-Reply-To: <1490577507-28351-2-git-send-email-hyuk0512@gmail.com>
+References: <CGME20170327011834epcas1p33f7e12ea5b0032ded858aa6f611aa016@epcas1p3.samsung.com>
+ <1490577507-28351-1-git-send-email-hyuk0512@gmail.com> <1490577507-28351-2-git-send-email-hyuk0512@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Mon, 27 Mar 2017 13:54:36 +0300
+Message-ID: <CABBYNZJvVzP7JzHWqvF1ng3x0sb+7GpNWMAGsa5sATaX7mMBUA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] src/adapter: Add the NULL check for response
+To: hyuk0512@gmail.com
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        Lee Hyuk <hyuk0512.lee@samsung.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andy,
+Hi,
 
-> Until now the driver supports only ACPI enumeration. Nevertheless
-> Intel Edison SoM has Broadcom Wi-Fi + BT chip and neither ACPI nor DT
-> enumeration mechanism.
-> 
-> Enable pure platform driver in order to support Intel Edison SoM.
+On Mon, Mar 27, 2017 at 4:18 AM,  <hyuk0512@gmail.com> wrote:
+> From: Lee Hyuk <hyuk0512.lee@samsung.com>
+>
+> The response can be NULL pointer. It should be checked.
+> ---
+>  src/adapter.c | 3 +++
+>  1 file changed, 3 insertions(+)
+>
+> diff --git a/src/adapter.c b/src/adapter.c
+> index 3dac7d6..472b817 100644
+> --- a/src/adapter.c
+> +++ b/src/adapter.c
+> @@ -1227,6 +1227,9 @@ static void passive_scanning_complete(uint8_t status, uint16_t length,
+>         struct btd_adapter *adapter = user_data;
+>         const struct mgmt_cp_start_discovery *rp = param;
+>
+> +       if (!rp)
+> +               return;
+> +
+>         DBG("status 0x%02x", status);
+>
+>         if (length < sizeof(*rp)) {
+> --
+> 1.9.1
 
-explain to me what this the case. Didn’t we enabled also DT for Edison? And I assumed in general we planned to move away from platform drivers in favour of DT.
+It looks like you might have a broken kernel in this regard since
+Start Discovery shall always return the parameters given and in case
+it doesn't it is probably a nice thing to log an error.
 
-Regards
-
-Marcel
-
+-- 
+Luiz Augusto von Dentz
