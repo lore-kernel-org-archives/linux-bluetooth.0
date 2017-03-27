@@ -1,36 +1,34 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 10.2 \(3259\))
-Subject: Re: [PATCH] Bluetooth: fix assignments on error variable err
+Subject: Re: [PATCH 1/4] Bluetooth: Use switch statement for Intel hardware
+ variants
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20170301151053.25779-1-colin.king@canonical.com>
-Date: Mon, 27 Mar 2017 16:23:09 +0200
-Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-        kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
-Message-Id: <76DB816F-492D-468E-B7C0-AE83BAF0EA65@holtmann.org>
-References: <20170301151053.25779-1-colin.king@canonical.com>
-To: Colin King <colin.king@canonical.com>
+In-Reply-To: <20170306153826.13509ae8@fedora-linux-22.shared>
+Date: Mon, 27 Mar 2017 16:21:35 +0200
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Message-Id: <71C8F4F5-7013-47E7-9739-9EA52BEF602F@holtmann.org>
+References: <20170306153826.13509ae8@fedora-linux-22.shared>
+To: Tedd Ho-Jeong An <tedd.an@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Colin,
+Hi Tedd,
 
-> Variable err is being initialized to zero and then later being
-> set to the error return from the call to hci_req_run_skb; hence
-> we can remove the redundant initialization to zero.
+> Multiple new hardware variants are planned and the simple if statement
+> would get really complicated and unreadable. So instead replace it with
+> a simple switch statement.
 > 
-> Also on two occassions err is not being set from the error return
-> from the call to hci_req_run_skb, so add these missing assignments.
+> The change is applied to both USB and UART.
 > 
-> Signed-off-by: Colin Ian King <colin.king@canonical.com>
+> Based-on-patch-by: Marcel Holtmann <marcel@holtmann.org>
+> Signed-off-by: Tedd Ho-Jeong An <tedd.an@intel.com>
 > ---
-> net/bluetooth/amp.c | 10 +++++-----
-> 1 file changed, 5 insertions(+), 5 deletions(-)
+> drivers/bluetooth/btusb.c     | 10 +++++++---
+> drivers/bluetooth/hci_intel.c | 17 +++++++++++------
+> 2 files changed, 18 insertions(+), 9 deletions(-)
 
-patch has been applied to bluetooth-next tree.
+all 4 patches have been applied to bluetooth-next tree.
 
 Regards
 
