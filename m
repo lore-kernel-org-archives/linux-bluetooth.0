@@ -1,34 +1,52 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <linux-kernel-owner@vger.kernel.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 10.2 \(3259\))
-Subject: Re: [PATCH] Bluetooth: hci_bcm: Fix clock (un)prepare
+Subject: Re: [PATCH 05/18] net, bluetooth: convert rfcomm_dlc.refcnt from
+ atomic_t to refcount_t
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20170315122005.7702-2-john@metanate.com>
-Date: Mon, 27 Mar 2017 16:07:25 +0200
-Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        "Gustavo F. Padovan" <gustavo@padovan.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>
-Message-Id: <7BBF08AA-EFD1-4330-BAA0-F6B2EEF5D63E@holtmann.org>
-References: <20170315122005.7702-1-john@metanate.com>
- <20170315122005.7702-2-john@metanate.com>
-To: John Keeping <john@metanate.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1489749179-12063-6-git-send-email-elena.reshetova@intel.com>
+Date: Mon, 27 Mar 2017 16:05:34 +0200
+Cc: Network Development <netdev@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        linux-decnet-user@lists.sourceforge.net,
+        "David S. Miller" <davem@davemloft.net>,
+        James Morris <jmorris@namei.org>,
+        Patrick McHardy <kaber@trash.net>,
+        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
+        Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>, 3chas3@gmail.com,
+        ralf@linux-mips.org, stephen@networkplumber.org,
+        jchapman@katalix.com, jhs@mojatatu.com,
+        bridge@lists.linux-foundation.org, linux-hams@vger.kernel.org,
+        linux-x25@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        Johan Hedberg <johan.hedberg@gmail.com>, peterz@infradead.org,
+        keescook@chromium.org, Hans Liljestrand <ishkamiel@gmail.com>,
+        David Windsor <dwindsor@gmail.com>
+Message-Id: <54BFC171-C8E2-47BB-811D-6E9832246256@holtmann.org>
+References: <1489749179-12063-1-git-send-email-elena.reshetova@intel.com>
+ <1489749179-12063-6-git-send-email-elena.reshetova@intel.com>
+To: Elena Reshetova <elena.reshetova@intel.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi John,
+Hi Elena,
 
-> The hci_bcm driver currently does not prepare/unprepare the clock and
-> goes directly to enable, but as the documentation for clk_enable says,
-> clk_prepare must be called before clk_enable.
+> refcount_t type and corresponding API should be
+> used instead of atomic_t when the variable is used as
+> a reference counter. This allows to avoid accidental
+> refcounter overflows that might lead to use-after-free
+> situations.
 > 
-> Signed-off-by: John Keeping <john@metanate.com>
+> Signed-off-by: Elena Reshetova <elena.reshetova@intel.com>
+> Signed-off-by: Hans Liljestrand <ishkamiel@gmail.com>
+> Signed-off-by: Kees Cook <keescook@chromium.org>
+> Signed-off-by: David Windsor <dwindsor@gmail.com>
 > ---
-> drivers/bluetooth/hci_bcm.c | 4 ++--
-> 1 file changed, 2 insertions(+), 2 deletions(-)
+> include/net/bluetooth/rfcomm.h | 8 +++++---
+> net/bluetooth/rfcomm/core.c    | 4 ++--
+> 2 files changed, 7 insertions(+), 5 deletions(-)
 
 patch has been applied to bluetooth-next tree.
 
 Regards
 
 Marcel
-
