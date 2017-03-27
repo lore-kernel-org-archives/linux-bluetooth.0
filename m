@@ -1,26 +1,34 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 10.2 \(3259\))
-Subject: Re: [PATCH] Bluetooth: Change initial min and max interval
+Subject: Re: [PATCH] Bluetooth: fix assignments on error variable err
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20170223141702.32390-1-jonashg@axis.com>
-Date: Mon, 27 Mar 2017 16:24:58 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <5FC2D3D4-F74B-4B15-B4E6-50B9CEC4FBD0@holtmann.org>
-References: <20170223141702.32390-1-jonashg@axis.com>
-To: jonas.holmberg@axis.com
+In-Reply-To: <20170301151053.25779-1-colin.king@canonical.com>
+Date: Mon, 27 Mar 2017 16:23:09 +0200
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+        kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
+Message-Id: <76DB816F-492D-468E-B7C0-AE83BAF0EA65@holtmann.org>
+References: <20170301151053.25779-1-colin.king@canonical.com>
+To: Colin King <colin.king@canonical.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jonas,
+Hi Colin,
 
-> Use the initial connection interval recommended in Bluetooth
-> Specification v4.2 (30ms - 50ms).
+> Variable err is being initialized to zero and then later being
+> set to the error return from the call to hci_req_run_skb; hence
+> we can remove the redundant initialization to zero.
 > 
-> Signed-off-by: Jonas Holmberg <jonashg@axis.com>
+> Also on two occassions err is not being set from the error return
+> from the call to hci_req_run_skb, so add these missing assignments.
+> 
+> Signed-off-by: Colin Ian King <colin.king@canonical.com>
 > ---
-> net/bluetooth/hci_core.c | 4 ++--
-> 1 file changed, 2 insertions(+), 2 deletions(-)
+> net/bluetooth/amp.c | 10 +++++-----
+> 1 file changed, 5 insertions(+), 5 deletions(-)
 
 patch has been applied to bluetooth-next tree.
 
