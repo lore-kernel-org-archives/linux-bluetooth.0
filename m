@@ -1,38 +1,36 @@
-Return-Path: <linux-kernel-owner@vger.kernel.org>
-Content-Type: text/plain; charset=us-ascii
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Content-Type: text/plain; charset=utf-8
 Mime-Version: 1.0 (Mac OS X Mail 10.2 \(3259\))
-Subject: Re: [PATCH 1/3] btusb: wake system up when receives a wake irq
+Subject: Re: [PATCH] bluetooth: btrtl: Change message for missing config file
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1487917471-5501-1-git-send-email-jeffy.chen@rock-chips.com>
-Date: Mon, 27 Mar 2017 16:30:15 +0200
-Cc: Amitkumar Karwar <akarwar@marvell.com>,
-        Brian Norris <briannorris@chromium.org>,
-        Rajat Jain <rajatja@google.com>,
+In-Reply-To: <20170220020457.577-1-Larry.Finger@lwfinger.net>
+Date: Mon, 27 Mar 2017 16:27:53 +0200
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
-        "Gustavo F. Padovan" <gustavo@padovan.org>,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Message-Id: <516F5219-FE0B-4578-88A6-62479A8A9BAD@holtmann.org>
-References: <1487917471-5501-1-git-send-email-jeffy.chen@rock-chips.com>
-To: Jeffy Chen <jeffy.chen@rock-chips.com>
-Sender: linux-kernel-owner@vger.kernel.org
+        linux-bluetooth@vger.kernel.org
+Message-Id: <582A264E-0FFC-4266-9DDF-A9E5C8EED160@holtmann.org>
+References: <20170220020457.577-1-Larry.Finger@lwfinger.net>
+To: Larry Finger <Larry.Finger@lwfinger.net>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jeffy,
+Hi Larry,
 
-> Currrently we are disabling this wake irq after receiving it. If this
-> happens before we finish suspend and the pm event check is disabled,
-> the system will continue suspending, and this irq would not work again.
+> The message concerning missing config files for 8723b, 8821a, and
+> 8761a should have been issued with BT_INFO() rather than BT_ERR() as
+> this condition is not fatal. After looking at that code, I have
+> reworked the logic to log such messages only if the device needs such a
+> config file. At the moment, only the 8822b fits that description.
 > 
-> We may need to abort system suspend to avoid that.
-> 
-> Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
+> Signed-off-by: Larry Finger <Larry.Finger@lwfinger.net>
+> Acked-by: 陆朱伟 <alex_lu@realsil.com.cn>
 > ---
-> 
-> drivers/bluetooth/btusb.c | 2 ++
-> 1 file changed, 2 insertions(+)
+> drivers/bluetooth/btrtl.c | 13 ++++++++-----
+> 1 file changed, 8 insertions(+), 5 deletions(-)
 
-the first two patches have been applied to bluetooth-next tree.
+patch has been applied to bluetooth-next tree.
 
 Regards
 
 Marcel
+
