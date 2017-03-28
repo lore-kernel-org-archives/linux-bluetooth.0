@@ -4,62 +4,45 @@ To: Marcel Holtmann <marcel@holtmann.org>
 CC: Dean Jenkins <Dean_Jenkins@mentor.com>, "Gustavo F . Padovan"
 	<gustavo@padovan.org>, Johan Hedberg <johan.hedberg@gmail.com>,
 	<linux-bluetooth@vger.kernel.org>
-Subject: [RFC V1 06/16] Bluetooth: hci_ldisc: Add protocol check to hci_uart_dequeue()
-Date: Tue, 28 Mar 2017 18:50:19 +0100
-Message-ID: <1490723429-28870-7-git-send-email-Dean_Jenkins@mentor.com>
+Subject: [RFC V1 05/16] Bluetooth: hci_ldisc: Add protocol check to hci_uart_send_frame()
+Date: Tue, 28 Mar 2017 18:50:18 +0100
+Message-ID: <1490723429-28870-6-git-send-email-Dean_Jenkins@mentor.com>
 In-Reply-To: <1490723429-28870-1-git-send-email-Dean_Jenkins@mentor.com>
 References: <1490723429-28870-1-git-send-email-Dean_Jenkins@mentor.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Before attempting to dequeue a Data Link protocol encapsulated message,
-check that the Data Link protocol is still bound to the HCI UART driver.
-This makes the code consistent with the usage of the other proto
-function pointers.
+Before attempting to send a HCI message, check that the Data Link
+protocol is still bound to the HCI UART driver. This makes the code
+consistent with the usage of the other proto function pointers.
 
-Therefore, add a check for HCI_UART_PROTO_READY into hci_uart_dequeue()
-and return NULL if the Data Link protocol is not bound.
+Therefore, add a check for HCI_UART_PROTO_READY into hci_uart_send_frame()
+and return -EUNATCH if the Data Link protocol is not bound.
 
-This is needed for robustness as there is a scheduling race condition.
-hci_uart_write_work() is scheduled to run via work queue hu->write_work
-from hci_uart_tx_wakeup(). Therefore, there is a delay between
-scheduling hci_uart_write_work() to run and hci_uart_dequeue() running
-whereby the Data Link protocol layer could become unbound during the
-scheduling delay. In this case, without the check, the call to the
-unbound Data Link protocol layer dequeue function can crash.
-
-It is noted that hci_uart_tty_close() has a
-"cancel_work_sync(&hu->write_work)" statement but this only reduces
-the window of the race condition because it is possible for a new
-work-item to be added to work queue hu->write_work after the call to
-cancel_work_sync(). For example, Data Link layer retransmissions can
-be added to the work queue after the cancel_work_sync() has finished.
+This also allows hci_send_frame() to report the error of an unbound
+Data Link protocol layer. Therefore, it assists with diagnostics into
+why HCI messages are being sent when the Data Link protocol is not
+bound and avoids potential crashes.
 
 Signed-off-by: Dean Jenkins <Dean_Jenkins@mentor.com>
 ---
- drivers/bluetooth/hci_ldisc.c | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
+ drivers/bluetooth/hci_ldisc.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
 diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
-index eeea305..c4b801b 100644
+index c78c9dc..eeea305 100644
 --- a/drivers/bluetooth/hci_ldisc.c
 +++ b/drivers/bluetooth/hci_ldisc.c
-@@ -113,10 +113,12 @@ static inline struct sk_buff *hci_uart_dequeue(struct hci_uart *hu)
- {
- 	struct sk_buff *skb = hu->tx_skb;
+@@ -255,6 +255,9 @@ static int hci_uart_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
+ 	BT_DBG("%s: type %d len %d", hdev->name, hci_skb_pkt_type(skb),
+ 	       skb->len);
  
--	if (!skb)
--		skb = hu->proto->dequeue(hu);
--	else
-+	if (!skb) {
-+		if (test_bit(HCI_UART_PROTO_READY, &hu->flags))
-+			skb = hu->proto->dequeue(hu);
-+	} else {
- 		hu->tx_skb = NULL;
-+	}
++	if (!test_bit(HCI_UART_PROTO_READY, &hu->flags))
++		return -EUNATCH;
++
+ 	hu->proto->enqueue(hu, skb);
  
- 	return skb;
- }
+ 	hci_uart_tx_wakeup(hu);
 -- 
 2.7.4
