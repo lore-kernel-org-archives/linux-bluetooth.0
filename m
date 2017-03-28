@@ -1,41 +1,48 @@
 Return-Path: <bjorn.andersson@linaro.org>
-Date: Mon, 27 Mar 2017 22:49:22 -0700
 From: Bjorn Andersson <bjorn.andersson@linaro.org>
-To: David Miller <davem@davemloft.net>
-Cc: marcel@holtmann.org, gustavo@padovan.org, johan.hedberg@gmail.com,
-	k.eugene.e@gmail.com, kvalo@codeaurora.org, andy.gross@linaro.org,
-	david.brown@linaro.org, arnd@arndb.de,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-	wcn36xx@lists.infradead.org, linux-wireless@vger.kernel.org,
-	netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+To: Andy Gross <andy.gross@linaro.org>,
+	"David S. Miller" <davem@davemloft.net>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Eugene Krasnikov <k.eugene.e@gmail.com>,
+	Kalle Valo <kvalo@codeaurora.org>,
+	David Brown <david.brown@linaro.org>,
+	Arnd Bergmann <arnd@arndb.de>,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	wcn36xx@lists.infradead.org,
+	linux-wireless@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org,
 	linux-soc@vger.kernel.org
-Subject: Re: [PATCH 1/3] soc: qcom: smd: Transition client drivers from smd
- to rpmsg
-Message-ID: <20170328054922.GH70446@Bjorns-MacBook-Pro-2.local>
-References: <20170322215733.GH20094@minitux>
- <20170323.165613.802100008000968298.davem@davemloft.net>
- <20170327225836.GL20094@minitux>
- <20170327.160400.1285256003980361221.davem@davemloft.net>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170327.160400.1285256003980361221.davem@davemloft.net>
+Subject: [PATCH v2 3/3] soc: qcom: smd-rpm: Add msm8996 compatibility
+Date: Mon, 27 Mar 2017 22:26:35 -0700
+Message-Id: <20170328052635.26670-3-bjorn.andersson@linaro.org>
+In-Reply-To: <20170328052635.26670-1-bjorn.andersson@linaro.org>
+References: <20170328052635.26670-1-bjorn.andersson@linaro.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon 27 Mar 16:04 PDT 2017, David Miller wrote:
+With the RPM driver transitioned to RPMSG we can reuse the SMD-RPM
+driver ontop of GLINK for 8996, without any modifications.
 
-> From: Bjorn Andersson <bjorn.andersson@linaro.org>
-> Date: Mon, 27 Mar 2017 15:58:37 -0700
-> 
-> > I'm sorry, but I can't figure out how to reproduce this.
-> 
-> All of my builds are "make allmodconfig" so it should be easy to reproduce.
+Acked-by: Andy Gross <andy.gross@linaro.org>
+Signed-off-by: Bjorn Andersson <bjorn.andersson@linaro.org>
+---
+ drivers/soc/qcom/smd-rpm.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Thanks, turns out that while it was possible to select CONFIG_SMD_RPM
-and CONFIG_QCOM_WCNSS_CTRL drivers/soc/Makefile does not traverse into
-qcom/ unless CONFIG_ARCH_QCOM was set.
-
-So I just sent out version 2 of the three patches, where I add an
-explicit dependency on ARCH_QCOM for those two options.
-
-Regards,
-Bjorn
+diff --git a/drivers/soc/qcom/smd-rpm.c b/drivers/soc/qcom/smd-rpm.c
+index 0dcf1bf33126..c2346752b3ea 100644
+--- a/drivers/soc/qcom/smd-rpm.c
++++ b/drivers/soc/qcom/smd-rpm.c
+@@ -225,6 +225,7 @@ static const struct of_device_id qcom_smd_rpm_of_match[] = {
+ 	{ .compatible = "qcom,rpm-apq8084" },
+ 	{ .compatible = "qcom,rpm-msm8916" },
+ 	{ .compatible = "qcom,rpm-msm8974" },
++	{ .compatible = "qcom,rpm-msm8996" },
+ 	{}
+ };
+ MODULE_DEVICE_TABLE(of, qcom_smd_rpm_of_match);
+-- 
+2.12.0
