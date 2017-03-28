@@ -1,55 +1,53 @@
-Return-Path: <luiz.dentz@gmail.com>
-MIME-Version: 1.0
-In-Reply-To: <20170328121129.18421-1-colin.king@canonical.com>
-References: <20170328121129.18421-1-colin.king@canonical.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 28 Mar 2017 16:32:37 +0300
-Message-ID: <CABBYNZ+cnZZPS9juCJE4F9X6rfXRHRHp-TNiV3dxE_dpDbe-=w@mail.gmail.com>
-Subject: Re: [PATCH] 6lowpan: fix assignment of peer_addr
-To: Colin King <colin.king@canonical.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>, "David S . Miller" <davem@davemloft.net>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	"open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>, kernel-janitors@vger.kernel.org,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Return-Path: <arnd@arndb.de>
+From: Arnd Bergmann <arnd@arndb.de>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>
+Cc: Arnd Bergmann <arnd@arndb.de>,
+	"David S. Miller" <davem@davemloft.net>,
+	Stefan Schmidt <stefan@osg.samsung.com>,
+	Jukka Rissanen <jukka.rissanen@linux.intel.com>,
+	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Patrik Flykt <patrik.flykt@linux.intel.com>,
+	Alexander Aring <aar@pengutronix.de>,
+	Glenn Ruben Bakke <glennrubenbakke@nordicsemi.no>,
+	linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] 6lowpan: set peer_addr correctly again
+Date: Tue, 28 Mar 2017 15:29:08 +0200
+Message-Id: <20170328132935.382216-1-arnd@arndb.de>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Colin,
+A bugfix accidentally changed one line to return the peer_addr
+from setup_header, causing it to become unused:
 
-On Tue, Mar 28, 2017 at 3:11 PM, Colin King <colin.king@canonical.com> wrote:
-> From: Colin Ian King <colin.king@canonical.com>
->
-> The data from peer->chan->dst is not being copied to peer_addr, the
-> current code just updates the pointer and not the contents of what
-> it points to.  Fix this with the intended assignment.
->
-> Detected by CoverityScan, CID#1422111 ("Parse warning
-> (PW.PARAM_SET_BUT_NOT_USED)")
->
-> Fixes: fb6f2f606ce8 ("6lowpan: Fix IID format for Bluetooth")
-> Signed-off-by: Colin Ian King <colin.king@canonical.com>
-> ---
->  net/bluetooth/6lowpan.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
-> index 24348c8579dd..ba28c7b1557f 100644
-> --- a/net/bluetooth/6lowpan.c
-> +++ b/net/bluetooth/6lowpan.c
-> @@ -432,7 +432,7 @@ static int setup_header(struct sk_buff *skb, struct net_device *netdev,
->                 }
->
->                 daddr = peer->lladdr;
-> -               peer_addr = &peer->chan->dst;
-> +               *peer_addr = peer->chan->dst;
->                 *peer_addr_type = peer->chan->dst_type;
->                 lowpan_cb(skb)->chan = peer->chan;
->
-> --
-> 2.11.0
+net/bluetooth/6lowpan.c: In function 'setup_header':
+net/bluetooth/6lowpan.c:402:14: error: parameter 'peer_addr' set but not used [-Werror=unused-but-set-parameter]
 
-Reviewed-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+The only user of the variable is a subsequent printk(), and
+it is not otherwise initialized, so reverting the changed line
+looks like the right fix.
 
+Fixes: fb6f2f606ce8 ("6lowpan: Fix IID format for Bluetooth")
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+---
+ net/bluetooth/6lowpan.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
+index 24348c8579dd..ba28c7b1557f 100644
+--- a/net/bluetooth/6lowpan.c
++++ b/net/bluetooth/6lowpan.c
+@@ -432,7 +432,7 @@ static int setup_header(struct sk_buff *skb, struct net_device *netdev,
+ 		}
+ 
+ 		daddr = peer->lladdr;
+-		peer_addr = &peer->chan->dst;
++		*peer_addr = peer->chan->dst;
+ 		*peer_addr_type = peer->chan->dst_type;
+ 		lowpan_cb(skb)->chan = peer->chan;
+ 
 -- 
-Luiz Augusto von Dentz
+2.9.0
