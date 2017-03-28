@@ -4,57 +4,59 @@ To: Marcel Holtmann <marcel@holtmann.org>
 CC: Dean Jenkins <Dean_Jenkins@mentor.com>, "Gustavo F . Padovan"
 	<gustavo@padovan.org>, Johan Hedberg <johan.hedberg@gmail.com>,
 	<linux-bluetooth@vger.kernel.org>
-Subject: [RFC V1 10/16] Bluetooth: hci_ldisc: hci_uart_tty_close() detach tty after last msg
-Date: Tue, 28 Mar 2017 18:50:23 +0100
-Message-ID: <1490723429-28870-11-git-send-email-Dean_Jenkins@mentor.com>
+Subject: [RFC V1 09/16] Bluetooth: hci_ldisc: Tidy-up HCI_UART_REGISTERED in hci_uart_tty_close()
+Date: Tue, 28 Mar 2017 18:50:22 +0100
+Message-ID: <1490723429-28870-10-git-send-email-Dean_Jenkins@mentor.com>
 In-Reply-To: <1490723429-28870-1-git-send-email-Dean_Jenkins@mentor.com>
 References: <1490723429-28870-1-git-send-email-Dean_Jenkins@mentor.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-hci_uart_tty_close() is detaching the tty prematurely which prevents
-the Data Link protocol layer from using the tty serial port in the
-call to hci_unregister_dev().
+The code in hci_uart_tty_close is over complex in handling flag
+HCI_UART_REGISTERED as it is unnecessary to check that hdev is NULL.
+This is because hdev is only valid when HCI_UART_REGISTERED is in
+the set state.
 
-Consequently, when hci_unregister_dev() attempts to send a HCI RESET
-command, the BCSP layer attempts to retransmit the message many times
-and the command is timed-out after HCI_CMD_TIMEOUT (2) seconds.
-Nothing was physically transmitted because the tty was detached too
-early.
-
-Therefore, move the detach statement "tty->disc_data = NULL" to after
-hci_unregister_dev() so that the HCI RESET command maybe sent and
-acknowledged.
+Therefore, remove all "if (hdev)" checks and instead check for flag
+HCI_UART_REGISTERED being in the set state.
 
 Signed-off-by: Dean Jenkins <Dean_Jenkins@mentor.com>
 ---
- drivers/bluetooth/hci_ldisc.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ drivers/bluetooth/hci_ldisc.c | 17 +++++++----------
+ 1 file changed, 7 insertions(+), 10 deletions(-)
 
 diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
-index 2d5c6f0..e7d1b8b 100644
+index 9e3604d..2d5c6f0 100644
 --- a/drivers/bluetooth/hci_ldisc.c
 +++ b/drivers/bluetooth/hci_ldisc.c
-@@ -493,9 +493,6 @@ static void hci_uart_tty_close(struct tty_struct *tty)
- 
- 	BT_DBG("tty %p", tty);
- 
--	/* Detach from the tty */
--	tty->disc_data = NULL;
--
- 	if (!hu)
+@@ -500,20 +500,17 @@ static void hci_uart_tty_close(struct tty_struct *tty)
  		return;
  
-@@ -517,6 +514,9 @@ static void hci_uart_tty_close(struct tty_struct *tty)
- 		hu->proto->close(hu);
- 	}
+ 	hdev = hu->hdev;
+-	if (hdev)
++	if (test_bit(HCI_UART_REGISTERED, &hu->flags))
+ 		hci_uart_close(hdev);
  
-+	/* Detach from the tty */
-+	tty->disc_data = NULL;
-+
- 	clear_bit(HCI_UART_PROTO_SET, &hu->flags);
+ 	cancel_work_sync(&hu->write_work);
  
- 	if (test_and_clear_bit(HCI_UART_REGISTERED, &hu->flags)) {
+-	if (hdev) {
+-		if (test_bit(HCI_UART_REGISTERED, &hu->flags))
+-			/* Note hci_unregister_dev() may try to send a
+-			 * HCI RESET command. If the transmission fails then
+-			 * hci_unregister_dev() waits HCI_CMD_TIMEOUT
+-			 * (2) seconds for the timeout to occur.
+-			 */
+-			hci_unregister_dev(hdev);
+-	}
++	if (test_bit(HCI_UART_REGISTERED, &hu->flags))
++		/* Note hci_unregister_dev() may try to send a HCI RESET
++		 * command. If the transmission fails then hci_unregister_dev()
++		 * waits HCI_CMD_TIMEOUT (2) seconds for the timeout to occur.
++		 */
++		hci_unregister_dev(hdev);
+ 
+ 	if (test_bit(HCI_UART_PROTO_READY, &hu->flags)) {
+ 		clear_bit(HCI_UART_PROTO_READY, &hu->flags);
 -- 
 2.7.4
