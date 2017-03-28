@@ -15,48 +15,66 @@ Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>,
 	linux-serial@vger.kernel.org,
 	devicetree@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCHv3 08/10] Bluetooth: hci_serdev: allow modular drivers
-Date: Tue, 28 Mar 2017 17:59:37 +0200
-Message-Id: <20170328155939.31566-9-sre@kernel.org>
+Subject: [PATCHv3 07/10] Bluetooth: hci_serdev: do not open device in hci open
+Date: Tue, 28 Mar 2017 17:59:36 +0200
+Message-Id: <20170328155939.31566-8-sre@kernel.org>
 In-Reply-To: <20170328155939.31566-1-sre@kernel.org>
 References: <20170328155939.31566-1-sre@kernel.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-For bluetooth protocol driver only supporting serdev it makes
-sense to follow common practice and built them into their own
-module.
+The device driver may need to communicate with the UART
+device while the Bluetooth device is closed (e.g. due
+to interrupts).
 
-Such modules need access to hci_uart_register_device and
-hci_uart_tx_wakeup for using the common protocol helpers.
-
+Acked-by: Pavel Machek <pavel@ucw.cz>
 Signed-off-by: Sebastian Reichel <sre@kernel.org>
 ---
-New patch since patchset v2.
----
- drivers/bluetooth/hci_ldisc.c  | 1 +
- drivers/bluetooth/hci_serdev.c | 1 +
- 2 files changed, 2 insertions(+)
+ drivers/bluetooth/hci_serdev.c | 12 +++---------
+ 1 file changed, 3 insertions(+), 9 deletions(-)
 
-diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
-index 0ec8a94bd712..17bcbc13623f 100644
---- a/drivers/bluetooth/hci_ldisc.c
-+++ b/drivers/bluetooth/hci_ldisc.c
-@@ -134,6 +134,7 @@ int hci_uart_tx_wakeup(struct hci_uart *hu)
- 
- 	return 0;
- }
-+EXPORT_SYMBOL_GPL(hci_uart_tx_wakeup);
- 
- static void hci_uart_write_work(struct work_struct *work)
- {
 diff --git a/drivers/bluetooth/hci_serdev.c b/drivers/bluetooth/hci_serdev.c
-index 3b8ac0ece3fb..7de0edc0ff8c 100644
+index f5ccb2c7ef92..3b8ac0ece3fb 100644
 --- a/drivers/bluetooth/hci_serdev.c
 +++ b/drivers/bluetooth/hci_serdev.c
-@@ -353,3 +353,4 @@ int hci_uart_register_device(struct hci_uart *hu,
- 	p->close(hu);
- 	return err;
+@@ -104,13 +104,9 @@ static void hci_uart_write_work(struct work_struct *work)
+ /* Initialize device */
+ static int hci_uart_open(struct hci_dev *hdev)
+ {
+-	struct hci_uart *hu  = hci_get_drvdata(hdev);
+-
+ 	BT_DBG("%s %p", hdev->name, hdev);
+ 
+-	serdev_device_set_client_ops(hu->serdev, &hci_serdev_client_ops);
+-
+-	return serdev_device_open(hu->serdev);
++	return 0;
  }
-+EXPORT_SYMBOL_GPL(hci_uart_register_device);
+ 
+ /* Reset device */
+@@ -136,15 +132,11 @@ static int hci_uart_flush(struct hci_dev *hdev)
+ /* Close device */
+ static int hci_uart_close(struct hci_dev *hdev)
+ {
+-	struct hci_uart *hu  = hci_get_drvdata(hdev);
+-
+ 	BT_DBG("hdev %p", hdev);
+ 
+ 	hci_uart_flush(hdev);
+ 	hdev->flush = NULL;
+ 
+-	serdev_device_close(hu->serdev);
+-
+ 	return 0;
+ }
+ 
+@@ -289,6 +281,8 @@ int hci_uart_register_device(struct hci_uart *hu,
+ 
+ 	BT_DBG("");
+ 
++	serdev_device_set_client_ops(hu->serdev, &hci_serdev_client_ops);
++
+ 	err = p->open(hu);
+ 	if (err)
+ 		return err;
 -- 
 2.11.0
