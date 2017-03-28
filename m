@@ -1,47 +1,53 @@
-Return-Path: <colin.king@canonical.com>
-From: Colin King <colin.king@canonical.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: kernel-janitors@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] 6lowpan: fix assignment of peer_addr
-Date: Tue, 28 Mar 2017 13:11:29 +0100
-Message-Id: <20170328121129.18421-1-colin.king@canonical.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Content-Type: text/plain; charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+Subject: Re: [PATCH v1] Bluetooth: hci_bcm: Support platform enumeration
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1490689193.708.24.camel@linux.intel.com>
+Date: Tue, 28 Mar 2017 13:11:59 +0200
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Bluez mailing list <linux-bluetooth@vger.kernel.org>,
+        Jarkko Nikula <jarkko.nikula@linux.intel.com>
+Message-Id: <6A2447FE-C178-4F13-8BF9-66B83B1B7B5A@holtmann.org>
+References: <20170310122820.7584-1-andriy.shevchenko@linux.intel.com>
+ <5C21C940-1B45-4949-BF3E-9417DE5AAC71@holtmann.org>
+ <1490635125.708.21.camel@linux.intel.com>
+ <F9B2AE00-087D-4F2F-9F74-30CF991AF641@holtmann.org>
+ <1490689193.708.24.camel@linux.intel.com>
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Colin Ian King <colin.king@canonical.com>
+Hi Andy,
 
-The data from peer->chan->dst is not being copied to peer_addr, the
-current code just updates the pointer and not the contents of what
-it points to.  Fix this with the intended assignment.
+>>>>> Until now the driver supports only ACPI enumeration.
+>>>>> Nevertheless
+>>>>> Intel Edison SoM has Broadcom Wi-Fi + BT chip and neither ACPI
+>>>>> nor
+>>>>> DT
+>>>>> enumeration mechanism.
+>>>>> 
+>>>>> Enable pure platform driver in order to support Intel Edison
+>>>>> SoM.
+>>>> 
+>>>> explain to me what this the case. Didn’t we enabled also DT for
+>>>> Edison? And I assumed in general we planned to move away from
+>>>> platform
+>>>> drivers in favour of DT.
+>>> 
+>>> Nope. It's SFI based device which basically means platform data
+>>> only.
+>> 
+>> hold on, but SFI can be enumerated like ACPI. What am I missing here?
+> 
+> You missed a whole point. :-)
+> 
+> SFI so useless that you may just forget about it.
 
-Detected by CoverityScan, CID#1422111 ("Parse warning
-(PW.PARAM_SET_BUT_NOT_USED)")
+my memory of MRST is still present ;)
 
-Fixes: fb6f2f606ce8 ("6lowpan: Fix IID format for Bluetooth")
-Signed-off-by: Colin Ian King <colin.king@canonical.com>
----
- net/bluetooth/6lowpan.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Regards
 
-diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
-index 24348c8579dd..ba28c7b1557f 100644
---- a/net/bluetooth/6lowpan.c
-+++ b/net/bluetooth/6lowpan.c
-@@ -432,7 +432,7 @@ static int setup_header(struct sk_buff *skb, struct net_device *netdev,
- 		}
- 
- 		daddr = peer->lladdr;
--		peer_addr = &peer->chan->dst;
-+		*peer_addr = peer->chan->dst;
- 		*peer_addr_type = peer->chan->dst_type;
- 		lowpan_cb(skb)->chan = peer->chan;
- 
--- 
-2.11.0
+Marcel
+
