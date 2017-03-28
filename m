@@ -15,83 +15,48 @@ Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>,
 	linux-serial@vger.kernel.org,
 	devicetree@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCHv3 09/10] dt-bindings: net: bluetooth: Add nokia-bluetooth
-Date: Tue, 28 Mar 2017 17:59:38 +0200
-Message-Id: <20170328155939.31566-10-sre@kernel.org>
+Subject: [PATCHv3 08/10] Bluetooth: hci_serdev: allow modular drivers
+Date: Tue, 28 Mar 2017 17:59:37 +0200
+Message-Id: <20170328155939.31566-9-sre@kernel.org>
 In-Reply-To: <20170328155939.31566-1-sre@kernel.org>
 References: <20170328155939.31566-1-sre@kernel.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add binding document for serial bluetooth chips using
-Nokia H4+ protocol.
+For bluetooth protocol driver only supporting serdev it makes
+sense to follow common practice and built them into their own
+module.
 
-Acked-by: Rob Herring <robh@kernel.org>
+Such modules need access to hci_uart_register_device and
+hci_uart_tx_wakeup for using the common protocol helpers.
+
 Signed-off-by: Sebastian Reichel <sre@kernel.org>
-
-Changes since PATCHv1:
- * change compatible strings
- * mention active high/low state for GPIOs
 ---
- .../devicetree/bindings/net/nokia-bluetooth.txt    | 51 ++++++++++++++++++++++
- 1 file changed, 51 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/net/nokia-bluetooth.txt
+New patch since patchset v2.
+---
+ drivers/bluetooth/hci_ldisc.c  | 1 +
+ drivers/bluetooth/hci_serdev.c | 1 +
+ 2 files changed, 2 insertions(+)
 
-diff --git a/Documentation/devicetree/bindings/net/nokia-bluetooth.txt b/Documentation/devicetree/bindings/net/nokia-bluetooth.txt
-new file mode 100644
-index 000000000000..42be7dc9a70b
---- /dev/null
-+++ b/Documentation/devicetree/bindings/net/nokia-bluetooth.txt
-@@ -0,0 +1,51 @@
-+Nokia Bluetooth Chips
-+---------------------
-+
-+Nokia phones often come with UART connected bluetooth chips from different
-+vendors and modified device API. Those devices speak a protocol named H4+
-+(also known as h4p) by Nokia, which is similar to the H4 protocol from the
-+Bluetooth standard. In addition to the H4 protocol it specifies two more
-+UART status lines for wakeup of UART transceivers to improve power management
-+and a few new packet types used to negotiate uart speed.
-+
-+Required properties:
-+
-+ - compatible: should contain "nokia,h4p-bluetooth" as well as one of the following:
-+   * "brcm,bcm2048-nokia"
-+   * "ti,wl1271-bluetooth-nokia"
-+ - reset-gpios: GPIO specifier, used to reset the BT module (active low)
-+ - bluetooth-wakeup-gpios: GPIO specifier, used to wakeup the BT module (active high)
-+ - host-wakeup-gpios: GPIO specifier, used to wakeup the host processor (active high)
-+ - clock-names: should be "sysclk"
-+ - clocks: should contain a clock specifier for every name in clock-names
-+
-+Optional properties:
-+
-+ - None
-+
-+Example:
-+
-+/ {
-+       /* controlled (enabled/disabled) directly by BT module */
-+       bluetooth_clk: vctcxo {
-+               compatible = "fixed-clock";
-+               #clock-cells = <0>;
-+               clock-frequency = <38400000>;
-+       };
-+};
-+
-+&uart2 {
-+       pinctrl-names = "default";
-+       pinctrl-0 = <&uart2_pins>;
-+
-+       bluetooth {
-+               compatible = "ti,wl1271-bluetooth-nokia", "nokia,h4p-bluetooth";
-+
-+               reset-gpios = <&gpio1 26 GPIO_ACTIVE_LOW>; /* gpio26 */
-+               host-wakeup-gpios = <&gpio4 5 GPIO_ACTIVE_HIGH>; /* gpio101 */
-+               bluetooth-wakeup-gpios = <&gpio2 5 GPIO_ACTIVE_HIGH>; /* gpio37 */
-+
-+               clocks = <&bluetooth_clk>;
-+               clock-names = "sysclk";
-+       };
-+};
+diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
+index 0ec8a94bd712..17bcbc13623f 100644
+--- a/drivers/bluetooth/hci_ldisc.c
++++ b/drivers/bluetooth/hci_ldisc.c
+@@ -134,6 +134,7 @@ int hci_uart_tx_wakeup(struct hci_uart *hu)
+ 
+ 	return 0;
+ }
++EXPORT_SYMBOL_GPL(hci_uart_tx_wakeup);
+ 
+ static void hci_uart_write_work(struct work_struct *work)
+ {
+diff --git a/drivers/bluetooth/hci_serdev.c b/drivers/bluetooth/hci_serdev.c
+index 3b8ac0ece3fb..7de0edc0ff8c 100644
+--- a/drivers/bluetooth/hci_serdev.c
++++ b/drivers/bluetooth/hci_serdev.c
+@@ -353,3 +353,4 @@ int hci_uart_register_device(struct hci_uart *hu,
+ 	p->close(hu);
+ 	return err;
+ }
++EXPORT_SYMBOL_GPL(hci_uart_register_device);
 -- 
 2.11.0
