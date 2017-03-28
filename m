@@ -1,49 +1,41 @@
-Return-Path: <andriy.shevchenko@linux.intel.com>
-Message-ID: <1490689193.708.24.camel@linux.intel.com>
-Subject: Re: [PATCH v1] Bluetooth: hci_bcm: Support platform enumeration
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: "Gustavo F. Padovan" <gustavo@padovan.org>, Johan Hedberg
- <johan.hedberg@gmail.com>, Bluez mailing list
- <linux-bluetooth@vger.kernel.org>,  Jarkko Nikula
- <jarkko.nikula@linux.intel.com>
-Date: Tue, 28 Mar 2017 11:19:53 +0300
-In-Reply-To: <F9B2AE00-087D-4F2F-9F74-30CF991AF641@holtmann.org>
-References: <20170310122820.7584-1-andriy.shevchenko@linux.intel.com>
-	 <5C21C940-1B45-4949-BF3E-9417DE5AAC71@holtmann.org>
-	 <1490635125.708.21.camel@linux.intel.com>
-	 <F9B2AE00-087D-4F2F-9F74-30CF991AF641@holtmann.org>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Return-Path: <bjorn.andersson@linaro.org>
+Date: Mon, 27 Mar 2017 22:49:22 -0700
+From: Bjorn Andersson <bjorn.andersson@linaro.org>
+To: David Miller <davem@davemloft.net>
+Cc: marcel@holtmann.org, gustavo@padovan.org, johan.hedberg@gmail.com,
+	k.eugene.e@gmail.com, kvalo@codeaurora.org, andy.gross@linaro.org,
+	david.brown@linaro.org, arnd@arndb.de,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+	wcn36xx@lists.infradead.org, linux-wireless@vger.kernel.org,
+	netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+	linux-soc@vger.kernel.org
+Subject: Re: [PATCH 1/3] soc: qcom: smd: Transition client drivers from smd
+ to rpmsg
+Message-ID: <20170328054922.GH70446@Bjorns-MacBook-Pro-2.local>
+References: <20170322215733.GH20094@minitux>
+ <20170323.165613.802100008000968298.davem@davemloft.net>
+ <20170327225836.GL20094@minitux>
+ <20170327.160400.1285256003980361221.davem@davemloft.net>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170327.160400.1285256003980361221.davem@davemloft.net>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, 2017-03-27 at 20:00 +0200, Marcel Holtmann wrote:
-> Hi Andy,
+On Mon 27 Mar 16:04 PDT 2017, David Miller wrote:
+
+> From: Bjorn Andersson <bjorn.andersson@linaro.org>
+> Date: Mon, 27 Mar 2017 15:58:37 -0700
 > 
-> > > > Until now the driver supports only ACPI enumeration.
-> > > > Nevertheless
-> > > > Intel Edison SoM has Broadcom Wi-Fi + BT chip and neither ACPI
-> > > > nor
-> > > > DT
-> > > > enumeration mechanism.
-> > > > 
-> > > > Enable pure platform driver in order to support Intel Edison
-> > > > SoM.
-> > > 
-> > > explain to me what this the case. Didn’t we enabled also DT for
-> > > Edison? And I assumed in general we planned to move away from
-> > > platform
-> > > drivers in favour of DT.
-> > 
-> > Nope. It's SFI based device which basically means platform data
-> > only.
+> > I'm sorry, but I can't figure out how to reproduce this.
 > 
-> hold on, but SFI can be enumerated like ACPI. What am I missing here?
+> All of my builds are "make allmodconfig" so it should be easy to reproduce.
 
-You missed a whole point. :-)
+Thanks, turns out that while it was possible to select CONFIG_SMD_RPM
+and CONFIG_QCOM_WCNSS_CTRL drivers/soc/Makefile does not traverse into
+qcom/ unless CONFIG_ARCH_QCOM was set.
 
-SFI so useless that you may just forget about it.
+So I just sent out version 2 of the three patches, where I add an
+explicit dependency on ARCH_QCOM for those two options.
 
--- 
-Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Intel Finland Oy
+Regards,
+Bjorn
