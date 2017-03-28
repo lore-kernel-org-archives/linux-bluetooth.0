@@ -1,39 +1,49 @@
-Return-Path: <netdev-owner@vger.kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Subject: Re: [PATCH] 6lowpan: fix assignment of peer_addr
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20170328121129.18421-1-colin.king@canonical.com>
-Date: Tue, 28 Mar 2017 15:36:31 +0200
-Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Bluez mailing list <linux-bluetooth@vger.kernel.org>,
-        netdev@vger.kernel.org, kernel-janitors@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Message-Id: <CCFA5E70-E7CA-40C0-B051-FE7FFE74D16E@holtmann.org>
-References: <20170328121129.18421-1-colin.king@canonical.com>
-To: Colin King <colin.king@canonical.com>
-Sender: netdev-owner@vger.kernel.org
+Return-Path: <luiz.von.dentz@intel.com>
+MIME-Version: 1.0
+In-Reply-To: <368A8A18-0B9B-4733-86EF-D44C8E9CAE36@holtmann.org>
+References: <20170328132935.382216-1-arnd@arndb.de> <368A8A18-0B9B-4733-86EF-D44C8E9CAE36@holtmann.org>
+From: "Von Dentz, Luiz" <luiz.von.dentz@intel.com>
+Date: Tue, 28 Mar 2017 16:42:50 +0300
+Message-ID: <CACumGO+QvuyDg21yogaUn1WCHv2S3=_DXD+My0Q6ANYE1NYKzg@mail.gmail.com>
+Subject: Re: [PATCH] 6lowpan: set peer_addr correctly again
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Arnd Bergmann <arnd@arndb.de>, "Gustavo F. Padovan" <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>, "David S. Miller" <davem@davemloft.net>,
+	Stefan Schmidt <stefan@osg.samsung.com>, Jukka Rissanen <jukka.rissanen@linux.intel.com>,
+	Eric Dumazet <edumazet@google.com>, Patrik Flykt <patrik.flykt@linux.intel.com>,
+	Alexander Aring <aar@pengutronix.de>, Glenn Ruben Bakke <glennrubenbakke@nordicsemi.no>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Colin,
+Hi Marcel,
 
-> The data from peer->chan->dst is not being copied to peer_addr, the
-> current code just updates the pointer and not the contents of what
-> it points to.  Fix this with the intended assignment.
-> 
-> Detected by CoverityScan, CID#1422111 ("Parse warning
-> (PW.PARAM_SET_BUT_NOT_USED)")
-> 
-> Fixes: fb6f2f606ce8 ("6lowpan: Fix IID format for Bluetooth")
-> Signed-off-by: Colin Ian King <colin.king@canonical.com>
-> ---
-> net/bluetooth/6lowpan.c | 2 +-
-> 1 file changed, 1 insertion(+), 1 deletion(-)
+On Tue, Mar 28, 2017 at 4:37 PM, Marcel Holtmann <marcel@holtmann.org> wrot=
+e:
+> Hi Arnd,
+>
+>> A bugfix accidentally changed one line to return the peer_addr
+>> from setup_header, causing it to become unused:
+>>
+>> net/bluetooth/6lowpan.c: In function 'setup_header':
+>> net/bluetooth/6lowpan.c:402:14: error: parameter 'peer_addr' set but not=
+ used [-Werror=3Dunused-but-set-parameter]
+>>
+>> The only user of the variable is a subsequent printk(), and
+>> it is not otherwise initialized, so reverting the changed line
+>> looks like the right fix.
+>>
+>> Fixes: fb6f2f606ce8 ("6lowpan: Fix IID format for Bluetooth")
+>> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+>> ---
+>> net/bluetooth/6lowpan.c | 2 +-
+>> 1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> I took Colin=E2=80=99s patch since it showed up first in my inbox.
 
-patch has been applied to bluetooth-next tree.
+Thanks, I might be missing something since the error doesn't show up for me=
+:
 
-Regards
-
-Marcel
+  CC [M]  net/bluetooth/6lowpan.o
+  LD [M]  net/bluetooth/bluetooth_6lowpan.o
