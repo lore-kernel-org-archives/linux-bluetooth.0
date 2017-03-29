@@ -1,35 +1,38 @@
-Return-Path: <robh+dt@kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <20170328155939.31566-1-sre@kernel.org>
-References: <20170328155939.31566-1-sre@kernel.org>
-From: Rob Herring <robh+dt@kernel.org>
-Date: Wed, 29 Mar 2017 16:17:05 -0500
-Message-ID: <CAL_JsqJcQ9ANtt71KRitOJ9spKD1SaeoL4RDftiCEPs8TjLJGA@mail.gmail.com>
-Subject: Re: [PATCHv3 00/10] Nokia H4+ support
-To: Sebastian Reichel <sre@kernel.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>, Samuel Thibault <samuel.thibault@ens-lyon.org>,
-	Pavel Machek <pavel@ucw.cz>, Tony Lindgren <tony@atomide.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Jiri Slaby <jslaby@suse.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	"open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-	"linux-serial@vger.kernel.org" <linux-serial@vger.kernel.org>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Return-Path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+Subject: Re: [PATCH 0/2] Bluetooth: fix hci-uart crashes
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20170329161528.17843-1-johan@kernel.org>
+Date: Wed, 29 Mar 2017 20:57:45 +0200
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Message-Id: <FF455D51-6F43-4218-A09A-065E2026DFC8@holtmann.org>
+References: <20170329161528.17843-1-johan@kernel.org>
+To: Johan Hovold <johan@kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, Mar 28, 2017 at 10:59 AM, Sebastian Reichel <sre@kernel.org> wrote:
-> Hi,
->
-> Here is PATCHv3 for the Nokia bluetooth patchset. I addressed all comments from
-> Rob and Pavel regarding the serdev patches and dropped the *.dts patches, since
-> they were queued by Tony. I also changed the patch order, so that the serdev
-> patches come first. All of them have Acked-by from Rob, so I think it makes
-> sense to merge them to serdev subsystem (now) and provide an immutable branch
-> for the bluetooth subsystem.
+Hi Johan,
 
-Greg doesn't read cover letters generally and since the serdev patches
-are Cc rather than To him, he's probably not planning to pick them up.
+> Not every tty has a class device and this could be used to trigger
+> NULL-pointer dereferences in two hci-uart drivers that lacked the
+> required sanity checks.
+> 
+> Johan
+> 
+> 
+> Johan Hovold (2):
+>  Bluetooth: hci_bcm: add missing tty-device sanity check
+>  Bluetooth: hci_intel: add missing tty-device sanity check
+> 
+> drivers/bluetooth/hci_bcm.c   |  5 ++++-
+> drivers/bluetooth/hci_intel.c | 13 ++++++++++++-
+> 2 files changed, 16 insertions(+), 2 deletions(-)
 
-Rob
+bot patches have been applied to bluetooth-next tree.
+
+Regards
+
+Marcel
