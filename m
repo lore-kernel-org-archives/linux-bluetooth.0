@@ -1,31 +1,33 @@
-Return-Path: <jhovold@gmail.com>
-Sender: Johan Hovold <jhovold@gmail.com>
-From: Johan Hovold <johan@kernel.org>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Johan Hovold <johan@kernel.org>
-Subject: [PATCH 0/2] Bluetooth: fix hci-uart crashes
-Date: Wed, 29 Mar 2017 18:15:26 +0200
-Message-Id: <20170329161528.17843-1-johan@kernel.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+Subject: Re: [PATCH] Bluetooth: btmrvl: cleanup code in return from
+ btmrvl_sdio_suspend()
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <SG2PR0302MB257551E9937B577EF80ACA15CA320@SG2PR0302MB2575.apcprd03.prod.outlook.com>
+Date: Wed, 29 Mar 2017 08:58:14 +0200
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        Prasanna Karthik <pkarthik@outlook.com>
+Message-Id: <ABC86811-0916-4FFB-A2DC-559307E38A6F@holtmann.org>
+References: <SG2PR0302MB257551E9937B577EF80ACA15CA320@SG2PR0302MB2575.apcprd03.prod.outlook.com>
+To: prasanna karthik <prasannakarthik@outlook.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Not every tty has a class device and this could be used to trigger
-NULL-pointer dereferences in two hci-uart drivers that lacked the
-required sanity checks.
+Hi Prasanna,
 
-Johan
+> Else is not generally useful after a break or return
+> 
+> Signed-off-by: Prasanna Karthik <pkarthik@outlook.com>
+> ---
+> drivers/bluetooth/btmrvl_sdio.c | 6 +++---
+> 1 file changed, 3 insertions(+), 3 deletions(-)
 
+patch has been applied to bluetooth-next tree.
 
-Johan Hovold (2):
-  Bluetooth: hci_bcm: add missing tty-device sanity check
-  Bluetooth: hci_intel: add missing tty-device sanity check
+Regards
 
- drivers/bluetooth/hci_bcm.c   |  5 ++++-
- drivers/bluetooth/hci_intel.c | 13 ++++++++++++-
- 2 files changed, 16 insertions(+), 2 deletions(-)
+Marcel
 
--- 
-2.12.2
