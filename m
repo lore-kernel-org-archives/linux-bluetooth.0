@@ -1,43 +1,44 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: bugzilla-daemon@bugzilla.kernel.org
-To: linux-bluetooth@kernel.org
-Subject: [Bug 64671] hci0 command 0x1009 tx timeout, bluez can't find adapter
-Date: Wed, 29 Mar 2017 22:58:46 +0000
-Message-ID: <bug-64671-62941-nTF3OemNBO@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-64671-62941@https.bugzilla.kernel.org/>
-References: <bug-64671-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+Subject: Re: [PATCHv3 00/10] Nokia H4+ support
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <CAL_JsqJcQ9ANtt71KRitOJ9spKD1SaeoL4RDftiCEPs8TjLJGA@mail.gmail.com>
+Date: Wed, 29 Mar 2017 23:33:26 +0200
+Cc: Sebastian Reichel <sre@kernel.org>,
+        "Gustavo F. Padovan" <gustavo@padovan.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Samuel Thibault <samuel.thibault@ens-lyon.org>,
+        Pavel Machek <pavel@ucw.cz>, Tony Lindgren <tony@atomide.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Jiri Slaby <jslaby@suse.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+        "linux-serial@vger.kernel.org" <linux-serial@vger.kernel.org>,
+        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "David S. Miller" <davem@davemloft.net>
+Message-Id: <C1A408F2-1DF8-4F49-B399-B936542DE6BC@holtmann.org>
+References: <20170328155939.31566-1-sre@kernel.org>
+ <CAL_JsqJcQ9ANtt71KRitOJ9spKD1SaeoL4RDftiCEPs8TjLJGA@mail.gmail.com>
+To: Rob Herring <robh+dt@kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-https://bugzilla.kernel.org/show_bug.cgi?id=64671
+Hi Rob,
 
---- Comment #9 from MOHAMMAD RASIM (mohammad.rasim96@gmail.com) ---
-(In reply to Maxim Moseychuk from comment #8)
-> (In reply to Ongun Kanat from comment #7)
-> > I've got same behavior on 4.9.8 kernel on PC with Atheros AR3012 card.
+>> Here is PATCHv3 for the Nokia bluetooth patchset. I addressed all comments from
+>> Rob and Pavel regarding the serdev patches and dropped the *.dts patches, since
+>> they were queued by Tony. I also changed the patch order, so that the serdev
+>> patches come first. All of them have Acked-by from Rob, so I think it makes
+>> sense to merge them to serdev subsystem (now) and provide an immutable branch
+>> for the bluetooth subsystem.
 > 
-> (In reply to MOHAMMAD RASIM from comment #6)
-> > I have the same issue and the same dmesg error.
-> > 
-> > My adapter is:
-> > Broadcom Corporation BCM4313 802.11bgn Wireless Network Adapter [14e4:4727]
-> > (rev 01)
-> > I had the problem on archlinux but now I'm running linux mint and have the
-> > same problem.
-> > 
-> > Current kernel:
-> > Linux mohammad-mint 4.4.0-21-generic #37-Ubuntu SMP Mon Apr 18 18:33:37 UTC
-> > 2016 x86_64 x86_64 x86_64 GNU/Linux
-> 
-> Can someone test my patch? This bug not always reproduce, and i need help
-> for test 1-2 week.
-> 
-> I can send raw patch, branch on github or PKGBUILD for archlinux.
+> Greg doesn't read cover letters generally and since the serdev patches
+> are Cc rather than To him, he's probably not planning to pick them up.
 
-I can test the patch can you send it please?
+I wonder actually if we should merge all of these via bluetooth-next tree with proper Ack from Greg. However it would be good to also get buy in from Dave for merging this ultimately through net-next.
 
--- 
-You are receiving this mail because:
-You are the assignee for the bug.
+Regards
+
+Marcel
