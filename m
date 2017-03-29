@@ -1,44 +1,35 @@
-Return-Path: <linux-kernel-owner@vger.kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Subject: Re: [PATCHv3 00/10] Nokia H4+ support
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CAL_JsqJcQ9ANtt71KRitOJ9spKD1SaeoL4RDftiCEPs8TjLJGA@mail.gmail.com>
-Date: Wed, 29 Mar 2017 23:33:26 +0200
-Cc: Sebastian Reichel <sre@kernel.org>,
-        "Gustavo F. Padovan" <gustavo@padovan.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Samuel Thibault <samuel.thibault@ens-lyon.org>,
-        Pavel Machek <pavel@ucw.cz>, Tony Lindgren <tony@atomide.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Jiri Slaby <jslaby@suse.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-        "linux-serial@vger.kernel.org" <linux-serial@vger.kernel.org>,
-        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "David S. Miller" <davem@davemloft.net>
-Message-Id: <C1A408F2-1DF8-4F49-B399-B936542DE6BC@holtmann.org>
+Return-Path: <robh+dt@kernel.org>
+MIME-Version: 1.0
+In-Reply-To: <20170328155939.31566-1-sre@kernel.org>
 References: <20170328155939.31566-1-sre@kernel.org>
- <CAL_JsqJcQ9ANtt71KRitOJ9spKD1SaeoL4RDftiCEPs8TjLJGA@mail.gmail.com>
-To: Rob Herring <robh+dt@kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
+From: Rob Herring <robh+dt@kernel.org>
+Date: Wed, 29 Mar 2017 16:17:05 -0500
+Message-ID: <CAL_JsqJcQ9ANtt71KRitOJ9spKD1SaeoL4RDftiCEPs8TjLJGA@mail.gmail.com>
+Subject: Re: [PATCHv3 00/10] Nokia H4+ support
+To: Sebastian Reichel <sre@kernel.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>, Samuel Thibault <samuel.thibault@ens-lyon.org>,
+	Pavel Machek <pavel@ucw.cz>, Tony Lindgren <tony@atomide.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Jiri Slaby <jslaby@suse.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	"open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+	"linux-serial@vger.kernel.org" <linux-serial@vger.kernel.org>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Rob,
+On Tue, Mar 28, 2017 at 10:59 AM, Sebastian Reichel <sre@kernel.org> wrote:
+> Hi,
+>
+> Here is PATCHv3 for the Nokia bluetooth patchset. I addressed all comments from
+> Rob and Pavel regarding the serdev patches and dropped the *.dts patches, since
+> they were queued by Tony. I also changed the patch order, so that the serdev
+> patches come first. All of them have Acked-by from Rob, so I think it makes
+> sense to merge them to serdev subsystem (now) and provide an immutable branch
+> for the bluetooth subsystem.
 
->> Here is PATCHv3 for the Nokia bluetooth patchset. I addressed all comments from
->> Rob and Pavel regarding the serdev patches and dropped the *.dts patches, since
->> they were queued by Tony. I also changed the patch order, so that the serdev
->> patches come first. All of them have Acked-by from Rob, so I think it makes
->> sense to merge them to serdev subsystem (now) and provide an immutable branch
->> for the bluetooth subsystem.
-> 
-> Greg doesn't read cover letters generally and since the serdev patches
-> are Cc rather than To him, he's probably not planning to pick them up.
+Greg doesn't read cover letters generally and since the serdev patches
+are Cc rather than To him, he's probably not planning to pick them up.
 
-I wonder actually if we should merge all of these via bluetooth-next tree with proper Ack from Greg. However it would be good to also get buy in from Dave for merging this ultimately through net-next.
-
-Regards
-
-Marcel
+Rob
