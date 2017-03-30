@@ -1,45 +1,77 @@
-Return-Path: <root@localhost.localdomain>
-From: Xinming Hu <huxm@marvell.com>
-To: Linux Bluetooth <linux-bluetooth@vger.kernel.org>
-CC: Marcel Holtmann <marcel@holtmann.org>,
-        Amitkumar Karwar
-	<akarwar@marvell.com>, Cathy Luo <cluo@marvell.com>,
-        Xinming Hu
-	<huxm@marvell.com>, Guenter Roeck <groeck@chromium.org>
-Subject: [PATCH 1/2] Bluetooth: btmrvl: disable platform wakeup interrupt in suspend failure path
-Date: Thu, 30 Mar 2017 20:52:43 +0800
-Message-ID: <1490878364-2735-1-git-send-email-huxm@marvell.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+Subject: Re: [RFC V1 07/16] Bluetooth: hci_ldisc: Add protocol check to
+ hci_uart_tx_wakeup()
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1490723429-28870-8-git-send-email-Dean_Jenkins@mentor.com>
+Date: Thu, 30 Mar 2017 12:11:34 +0200
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-bluetooth@vger.kernel.org
+Message-Id: <55813485-14F7-4AB0-8AF4-2D9FE0792019@holtmann.org>
+References: <1490723429-28870-1-git-send-email-Dean_Jenkins@mentor.com>
+ <1490723429-28870-8-git-send-email-Dean_Jenkins@mentor.com>
+To: Dean Jenkins <Dean_Jenkins@mentor.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Host sleep handshake with device might been fail, disable platform wakeup
-interrupt in this case.
+Hi Dean,
 
-Signed-off-by: Xinming Hu <huxm@marvell.com>
-Signed-off-by: Guenter Roeck <groeck@chromium.org>
-Signed-off-by: Amitkumar Karwar <akarwar@marvell.com>
----
- drivers/bluetooth/btmrvl_sdio.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+> Before attempting to schedule a work-item onto hu->write_work in
+> hci_uart_tx_wakeup(), check that the Data Link protocol layer is
+> still bound to the HCI UART driver.
+> 
+> Failure to perform this protocol check causes a race condition between
+> the work queue hu->write_work running hci_uart_write_work() and the
+> Data Link protocol layer being unbound (closed) in hci_uart_tty_close().
+> 
+> Note hci_uart_tty_close() does have a "cancel_work_sync(&hu->write_work)"
+> but it is ineffective because it cannot prevent work-items being added
+> to hu->write_work after cancel_work_sync() has run.
+> 
+> Therefore, add a check for HCI_UART_PROTO_READY into hci_uart_tx_wakeup()
+> which prevents scheduling of the work queue when HCI_UART_PROTO_READY
+> is in the clear state. However, note a small race condition remains
+> because the hci_uart_tx_wakeup() thread can run in parallel with the
+> hci_uart_tty_close() thread so it is possible that a schedule of
+> hu->write_work can occur when HCI_UART_PROTO_READY is cleared. A complete
+> solution needs locking of the threads which is implemented in a future
+> commit.
+> 
+> Signed-off-by: Dean Jenkins <Dean_Jenkins@mentor.com>
+> ---
+> drivers/bluetooth/hci_ldisc.c | 6 +++++-
+> 1 file changed, 5 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
+> index c4b801b..a1bb4d64b9 100644
+> --- a/drivers/bluetooth/hci_ldisc.c
+> +++ b/drivers/bluetooth/hci_ldisc.c
+> @@ -125,15 +125,19 @@ static inline struct sk_buff *hci_uart_dequeue(struct hci_uart *hu)
+> 
+> int hci_uart_tx_wakeup(struct hci_uart *hu)
+> {
+> +	if (!test_bit(HCI_UART_PROTO_READY, &hu->flags))
+> +		goto no_schedule;
+> +
+> 	if (test_and_set_bit(HCI_UART_SENDING, &hu->tx_state)) {
+> 		set_bit(HCI_UART_TX_WAKEUP, &hu->tx_state);
+> -		return 0;
+> +		goto no_schedule;
+> 	}
+> 
+> 	BT_DBG("");
+> 
+> 	schedule_work(&hu->write_work);
+> 
+> +no_schedule:
+> 	return 0;
+> }
 
-diff --git a/drivers/bluetooth/btmrvl_sdio.c b/drivers/bluetooth/btmrvl_sdio.c
-index 08e01f0..6166888 100644
---- a/drivers/bluetooth/btmrvl_sdio.c
-+++ b/drivers/bluetooth/btmrvl_sdio.c
-@@ -1625,6 +1625,13 @@ static int btmrvl_sdio_suspend(struct device *dev)
- 	if (priv->adapter->hs_state != HS_ACTIVATED) {
- 		if (btmrvl_enable_hs(priv)) {
- 			BT_ERR("HS not activated, suspend failed!");
-+			/* Disable platform specific wakeup interrupt */
-+			if (card->plt_wake_cfg &&
-+			    card->plt_wake_cfg->irq_bt >= 0) {
-+				disable_irq_wake(card->plt_wake_cfg->irq_bt);
-+				disable_irq(card->plt_wake_cfg->irq_bt);
-+			}
-+
- 			priv->adapter->is_suspending = false;
- 			return -EBUSY;
- 		}
--- 
-1.8.1.4
+so instead of calling no_schedule label, just keep calling return 0 directly.
+
+Regards
+
+Marcel
+
