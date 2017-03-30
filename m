@@ -1,75 +1,97 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Subject: Re: [RFC V1 07/16] Bluetooth: hci_ldisc: Add protocol check to
- hci_uart_tx_wakeup()
+Subject: Re: [RFC V1 04/16] Bluetooth: hci_ldisc: Add HCI RESET comment to
+ hci_unregister_dev() call
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1490723429-28870-8-git-send-email-Dean_Jenkins@mentor.com>
-Date: Thu, 30 Mar 2017 12:11:34 +0200
+In-Reply-To: <1490723429-28870-5-git-send-email-Dean_Jenkins@mentor.com>
+Date: Thu, 30 Mar 2017 12:11:36 +0200
 Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
         linux-bluetooth@vger.kernel.org
-Message-Id: <55813485-14F7-4AB0-8AF4-2D9FE0792019@holtmann.org>
+Message-Id: <5EAAF4AF-1814-4FC2-83D7-701C93F6B779@holtmann.org>
 References: <1490723429-28870-1-git-send-email-Dean_Jenkins@mentor.com>
- <1490723429-28870-8-git-send-email-Dean_Jenkins@mentor.com>
+ <1490723429-28870-5-git-send-email-Dean_Jenkins@mentor.com>
 To: Dean Jenkins <Dean_Jenkins@mentor.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Dean,
 
-> Before attempting to schedule a work-item onto hu->write_work in
-> hci_uart_tx_wakeup(), check that the Data Link protocol layer is
-> still bound to the HCI UART driver.
+> This commit relates to the HCI UART quirk HCI_QUIRK_RESET_ON_CLOSE
+> which is enabled by default and can be disabled by setting hdev_flags
+> flag HCI_UART_RESET_ON_INIT via ioctl HCIUARTSETFLAGS from userland.
 > 
-> Failure to perform this protocol check causes a race condition between
-> the work queue hu->write_work running hci_uart_write_work() and the
-> Data Link protocol layer being unbound (closed) in hci_uart_tty_close().
+> The implementation of HCI_QUIRK_RESET_ON_CLOSE is broken for the BCSP
+> Data Link protocol layer because it can be seen that
+> hci_unregister_dev() takes 2 seconds to run due to BCSP communications
+> failure. Suspect that sending of the HCI RESET command is broken
+> for the other Data Link protocols as well.
 > 
-> Note hci_uart_tty_close() does have a "cancel_work_sync(&hu->write_work)"
-> but it is ineffective because it cannot prevent work-items being added
-> to hu->write_work after cancel_work_sync() has run.
+> Therefore, add a comment to inform that the call to
+> hci_unregister_dev() in hci_uart_tty_close() may send a HCI RESET
+> command. This transmission needs the HCI UART driver to remain
+> operational including having the Data Link protocol being bound to
+> the HCI UART driver. If the transmission fails, then
+> hci_unregister_dev() waits HCI_CMD_TIMEOUT (2) seconds for the
+> timeout to occur which is undesirable.
 > 
-> Therefore, add a check for HCI_UART_PROTO_READY into hci_uart_tx_wakeup()
-> which prevents scheduling of the work queue when HCI_UART_PROTO_READY
-> is in the clear state. However, note a small race condition remains
-> because the hci_uart_tx_wakeup() thread can run in parallel with the
-> hci_uart_tty_close() thread so it is possible that a schedule of
-> hu->write_work can occur when HCI_UART_PROTO_READY is cleared. A complete
-> solution needs locking of the threads which is implemented in a future
-> commit.
+> The current software has a call to hci_unregister_dev(hdev) in
+> hci_uart_tty_close() which can cause an attempt at sending the
+> command HCI RESET to occur through the following callstack:
+> 
+> hci_uart_tty_close()
+> hci_unregister_dev()
+> hci_dev_do_close()
+> __hci_req_sync() to queue up command HCI RESET
+> which adds a work-item to the hdev->workqueue and waits 2 seconds
+> for a response
+> 
+> Subsequently
+> hdev->workqueue runs and processes the work-item by calling
+> hci_cmd_work()
+> hci_send_frame()
+> hci_uart_send_frame() to enqueue into the Data Link protocol layer
+> 
+> No protocol response comes so hci_unregister_dev() takes 2 seconds to
+> run!
+> 
+> In fact, this hidden transmission of the HCI RESET command is most
+> likely the root cause of why hci_uart_tty_close() crashed in the past
+> and was "fixed" with multiple workarounds in the past.
+> 
+> The underlying design flaw is that hci_uart_tty_close() is interfering
+> with various aspects of transmitting and receiving HCI messages
+> whilst hci_unregister_dev() is trying to use the Data Link protocol
+> to send the HCI RESET command. Consequently, the design flaw
+> causes the Data Link protocol to retransmit as no reply comes from
+> the Bluetooth Radio module over the UART link.
+> 
+> Over the many years of "fixes", this caused the logic in
+> hci_uart_tty_close() to become over-complex.
 > 
 > Signed-off-by: Dean Jenkins <Dean_Jenkins@mentor.com>
 > ---
-> drivers/bluetooth/hci_ldisc.c | 6 +++++-
-> 1 file changed, 5 insertions(+), 1 deletion(-)
+> drivers/bluetooth/hci_ldisc.c | 6 ++++++
+> 1 file changed, 6 insertions(+)
 > 
 > diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
-> index c4b801b..a1bb4d64b9 100644
+> index 1887ad4..c78c9dc 100644
 > --- a/drivers/bluetooth/hci_ldisc.c
 > +++ b/drivers/bluetooth/hci_ldisc.c
-> @@ -125,15 +125,19 @@ static inline struct sk_buff *hci_uart_dequeue(struct hci_uart *hu)
-> 
-> int hci_uart_tx_wakeup(struct hci_uart *hu)
-> {
-> +	if (!test_bit(HCI_UART_PROTO_READY, &hu->flags))
-> +		goto no_schedule;
-> +
-> 	if (test_and_set_bit(HCI_UART_SENDING, &hu->tx_state)) {
-> 		set_bit(HCI_UART_TX_WAKEUP, &hu->tx_state);
-> -		return 0;
-> +		goto no_schedule;
-> 	}
-> 
-> 	BT_DBG("");
-> 
-> 	schedule_work(&hu->write_work);
-> 
-> +no_schedule:
-> 	return 0;
-> }
+> @@ -499,6 +499,12 @@ static void hci_uart_tty_close(struct tty_struct *tty)
+> 	if (test_and_clear_bit(HCI_UART_PROTO_READY, &hu->flags)) {
+> 		if (hdev) {
+> 			if (test_bit(HCI_UART_REGISTERED, &hu->flags))
+> +				/* Note hci_unregister_dev() may try to send
+> +				 * a HCI RESET command. If the transmission
+> +				 * fails then hci_unregister_dev() waits
+> +				 * HCI_CMD_TIMEOUT (2) seconds for the timeout
+> +				 * to occur.
+> +				 */
+> 				hci_unregister_dev(hdev);
 
-so instead of calling no_schedule label, just keep calling return 0 directly.
+lets put { } around this if statement. I know it is no needed, but we generally do that for clarity.
 
 Regards
 
