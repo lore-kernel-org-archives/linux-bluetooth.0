@@ -1,54 +1,53 @@
-Return-Path: <huxm@marvell.com>
-From: Xinming Hu <huxm@marvell.com>
-To: Guenter Roeck <groeck@google.com>
-CC: Linux Bluetooth <linux-bluetooth@vger.kernel.org>,
-        Marcel Holtmann
-	<marcel@holtmann.org>,
-        Amitkumar Karwar <akarwar@marvell.com>, Cathy Luo
-	<cluo@marvell.com>,
-        Guenter Roeck <groeck@chromium.org>
-Subject: RE: [EXT] Re: [PATCH 2/2] Bluetooth: btmrvl: remove unnecessary
- wakeup interrupt number sanity check
-Date: Thu, 30 Mar 2017 13:17:15 +0000
-Message-ID: <aa6d3cab51e14de2b467e9da07296275@SC-EXCH02.marvell.com>
-References: <1490878364-2735-1-git-send-email-huxm@marvell.com>
- <1490878364-2735-2-git-send-email-huxm@marvell.com>
- <CABXOdTeG0G0Fjww49U0fbyPzpo9czP21YoTdUwyQ+ar4A756cg@mail.gmail.com>
-In-Reply-To: <CABXOdTeG0G0Fjww49U0fbyPzpo9czP21YoTdUwyQ+ar4A756cg@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
+Return-Path: <groeck@google.com>
 MIME-Version: 1.0
+In-Reply-To: <1490878364-2735-2-git-send-email-huxm@marvell.com>
+References: <1490878364-2735-1-git-send-email-huxm@marvell.com> <1490878364-2735-2-git-send-email-huxm@marvell.com>
+From: Guenter Roeck <groeck@google.com>
+Date: Thu, 30 Mar 2017 05:57:50 -0700
+Message-ID: <CABXOdTeG0G0Fjww49U0fbyPzpo9czP21YoTdUwyQ+ar4A756cg@mail.gmail.com>
+Subject: Re: [PATCH 2/2] Bluetooth: btmrvl: remove unnecessary wakeup
+ interrupt number sanity check
+To: Xinming Hu <huxm@marvell.com>
+Cc: Linux Bluetooth <linux-bluetooth@vger.kernel.org>, Marcel Holtmann <marcel@holtmann.org>,
+	Amitkumar Karwar <akarwar@marvell.com>, Cathy Luo <cluo@marvell.com>,
+	Guenter Roeck <groeck@chromium.org>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgR3VlbnRlciwNCg0KPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBHdWVu
-dGVyIFJvZWNrIFttYWlsdG86Z3JvZWNrQGdvb2dsZS5jb21dDQo+IFNlbnQ6IDIwMTflubQz5pyI
-MzDml6UgMjA6NTgNCj4gVG86IFhpbm1pbmcgSHUNCj4gQ2M6IExpbnV4IEJsdWV0b290aDsgTWFy
-Y2VsIEhvbHRtYW5uOyBBbWl0a3VtYXIgS2Fyd2FyOyBDYXRoeSBMdW87IEd1ZW50ZXINCj4gUm9l
-Y2sNCj4gU3ViamVjdDogW0VYVF0gUmU6IFtQQVRDSCAyLzJdIEJsdWV0b290aDogYnRtcnZsOiBy
-ZW1vdmUgdW5uZWNlc3Nhcnkgd2FrZXVwDQo+IGludGVycnVwdCBudW1iZXIgc2FuaXR5IGNoZWNr
-DQo+IA0KPiBFeHRlcm5hbCBFbWFpbA0KPiANCj4gLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQ0KPiBPbiBUaHUsIE1h
-ciAzMCwgMjAxNyBhdCA1OjUyIEFNLCBYaW5taW5nIEh1IDxodXhtQG1hcnZlbGwuY29tPiB3cm90
-ZToNCj4gPiBTYW5pdHkgY2hlY2sgb2YgaW50ZXJydXB0IG51bWJlciBpbiBpbnRlcnJ1cHQgaGFu
-ZGxlciBpcyB1bm5lY2Vzc2FyeQ0KPiA+IGFuZCBjb25mdXNpb24sIHJlbW92ZSBpdC4NCj4gPg0K
-PiA+IFNpZ25lZC1vZmYtYnk6IFhpbm1pbmcgSHUgPGh1eG1AbWFydmVsbC5jb20+DQo+ID4gU2ln
-bmVkLW9mZi1ieTogR3VlbnRlciBSb2VjayA8Z3JvZWNrQGNocm9taXVtLm9yZz4NCj4gDQo+IERv
-IHlvdSBwb3NzaWJseSBtZWFuICJSZXBvcnRlZC1ieToiID8NCg0KVGhlIHBhdGNoIGlzIHByZXBh
-cmVkIGJhc2VkIG9uIHlvdXIgc3VnZ2VzdGlvbnMgb24gaHR0cHM6Ly9pc3N1ZXRyYWNrZXIuZ29v
-Z2xlLmNvbS9pc3N1ZXMvMzU2NDc2NTINCg0KVGhhbmtzDQpTaW1vbg0KPiANCj4gPiBTaWduZWQt
-b2ZmLWJ5OiBBbWl0a3VtYXIgS2Fyd2FyIDxha2Fyd2FyQG1hcnZlbGwuY29tPg0KPiA+IC0tLQ0K
-PiA+ICBkcml2ZXJzL2JsdWV0b290aC9idG1ydmxfc2Rpby5jIHwgOSArKystLS0tLS0NCj4gPiAg
-MSBmaWxlIGNoYW5nZWQsIDMgaW5zZXJ0aW9ucygrKSwgNiBkZWxldGlvbnMoLSkNCj4gPg0KPiA+
-IGRpZmYgLS1naXQgYS9kcml2ZXJzL2JsdWV0b290aC9idG1ydmxfc2Rpby5jDQo+ID4gYi9kcml2
-ZXJzL2JsdWV0b290aC9idG1ydmxfc2Rpby5jIGluZGV4IDYxNjY4ODguLjdhMjY5NjEgMTAwNjQ0
-DQo+ID4gLS0tIGEvZHJpdmVycy9ibHVldG9vdGgvYnRtcnZsX3NkaW8uYw0KPiA+ICsrKyBiL2Ry
-aXZlcnMvYmx1ZXRvb3RoL2J0bXJ2bF9zZGlvLmMNCj4gPiBAQCAtNjIsMTIgKzYyLDkgQEAgc3Rh
-dGljIGlycXJldHVybl90IGJ0bXJ2bF93YWtlX2lycV9idChpbnQgaXJxLCB2b2lkDQo+ID4gKnBy
-aXYpICB7DQo+ID4gICAgICAgICBzdHJ1Y3QgYnRtcnZsX3BsdF93YWtlX2NmZyAqY2ZnID0gcHJp
-djsNCj4gPg0KPiA+IC0gICAgICAgaWYgKGNmZy0+aXJxX2J0ID49IDApIHsNCj4gPiAtICAgICAg
-ICAgICAgICAgcHJfaW5mbygiJXM6IHdha2UgYnkgYnQiLCBfX2Z1bmNfXyk7DQo+ID4gLSAgICAg
-ICAgICAgICAgIGNmZy0+d2FrZV9ieV9idCA9IHRydWU7DQo+ID4gLSAgICAgICAgICAgICAgIGRp
-c2FibGVfaXJxX25vc3luYyhpcnEpOw0KPiA+IC0gICAgICAgfQ0KPiA+IC0NCj4gPiArICAgICAg
-IHByX2luZm8oIiVzOiB3YWtlIGJ5IGJ0IiwgX19mdW5jX18pOw0KPiA+ICsgICAgICAgY2ZnLT53
-YWtlX2J5X2J0ID0gdHJ1ZTsNCj4gPiArICAgICAgIGRpc2FibGVfaXJxX25vc3luYyhpcnEpOw0K
-PiA+ICAgICAgICAgcmV0dXJuIElSUV9IQU5ETEVEOw0KPiA+ICB9DQo+ID4NCj4gPiAtLQ0KPiA+
-IDEuOC4xLjQNCj4gPg0K
+On Thu, Mar 30, 2017 at 5:52 AM, Xinming Hu <huxm@marvell.com> wrote:
+> Sanity check of interrupt number in interrupt handler is unnecessary and
+> confusion, remove it.
+>
+> Signed-off-by: Xinming Hu <huxm@marvell.com>
+> Signed-off-by: Guenter Roeck <groeck@chromium.org>
+
+Do you possibly mean "Reported-by:" ?
+
+> Signed-off-by: Amitkumar Karwar <akarwar@marvell.com>
+> ---
+>  drivers/bluetooth/btmrvl_sdio.c | 9 +++------
+>  1 file changed, 3 insertions(+), 6 deletions(-)
+>
+> diff --git a/drivers/bluetooth/btmrvl_sdio.c b/drivers/bluetooth/btmrvl_sdio.c
+> index 6166888..7a26961 100644
+> --- a/drivers/bluetooth/btmrvl_sdio.c
+> +++ b/drivers/bluetooth/btmrvl_sdio.c
+> @@ -62,12 +62,9 @@ static irqreturn_t btmrvl_wake_irq_bt(int irq, void *priv)
+>  {
+>         struct btmrvl_plt_wake_cfg *cfg = priv;
+>
+> -       if (cfg->irq_bt >= 0) {
+> -               pr_info("%s: wake by bt", __func__);
+> -               cfg->wake_by_bt = true;
+> -               disable_irq_nosync(irq);
+> -       }
+> -
+> +       pr_info("%s: wake by bt", __func__);
+> +       cfg->wake_by_bt = true;
+> +       disable_irq_nosync(irq);
+>         return IRQ_HANDLED;
+>  }
+>
+> --
+> 1.8.1.4
+>
