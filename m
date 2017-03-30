@@ -1,50 +1,43 @@
-Return-Path: <root@localhost.localdomain>
+Return-Path: <huxm@marvell.com>
 From: Xinming Hu <huxm@marvell.com>
-To: Linux Bluetooth <linux-bluetooth@vger.kernel.org>
-CC: Marcel Holtmann <marcel@holtmann.org>,
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: Linux Bluetooth <linux-bluetooth@vger.kernel.org>,
         Amitkumar Karwar
 	<akarwar@marvell.com>, Cathy Luo <cluo@marvell.com>,
-        Xinming Hu
-	<huxm@marvell.com>, Guenter Roeck <groeck@chromium.org>
-Subject: [PATCH v2 2/2] Bluetooth: btmrvl: remove unnecessary wakeup interrupt number sanity check
-Date: Thu, 30 Mar 2017 22:37:16 +0800
-Message-ID: <1490884636-18684-2-git-send-email-huxm@marvell.com>
-In-Reply-To: <1490884636-18684-1-git-send-email-huxm@marvell.com>
-References: <1490884636-18684-1-git-send-email-huxm@marvell.com>
+        Guenter Roeck
+	<groeck@chromium.org>
+Subject: RE: [PATCH 2/2] Bluetooth: btmrvl: remove unnecessary wakeup
+ interrupt number sanity check
+Date: Thu, 30 Mar 2017 14:38:03 +0000
+Message-ID: <ce41eb13e7c74123a022ae1951684ac9@SC-EXCH02.marvell.com>
+References: <1490878364-2735-1-git-send-email-huxm@marvell.com>
+ <1490878364-2735-2-git-send-email-huxm@marvell.com>
+ <19C158FE-9A3F-4B4C-9173-ECAC99304B4A@holtmann.org>
+In-Reply-To: <19C158FE-9A3F-4B4C-9173-ECAC99304B4A@holtmann.org>
+Content-Type: text/plain; charset="gb2312"
 MIME-Version: 1.0
-Content-Type: text/plain
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Sanity check of interrupt number in interrupt handler is unnecessary and
-confusion, remove it.
-
-Signed-off-by: Xinming Hu <huxm@marvell.com>
-Signed-off-by: Guenter Roeck <groeck@chromium.org>
-Signed-off-by: Amitkumar Karwar <akarwar@marvell.com>
----
-v2: fix apply error in v1
----
- drivers/bluetooth/btmrvl_sdio.c | 8 +++-----
- 1 file changed, 3 insertions(+), 5 deletions(-)
-
-diff --git a/drivers/bluetooth/btmrvl_sdio.c b/drivers/bluetooth/btmrvl_sdio.c
-index 95e40ec..eb794f0 100644
---- a/drivers/bluetooth/btmrvl_sdio.c
-+++ b/drivers/bluetooth/btmrvl_sdio.c
-@@ -64,11 +64,9 @@ static irqreturn_t btmrvl_wake_irq_bt(int irq, void *priv)
- 	struct btmrvl_sdio_card *card = priv;
- 	struct btmrvl_plt_wake_cfg *cfg = card->plt_wake_cfg;
- 
--	if (cfg->irq_bt >= 0) {
--		pr_info("%s: wake by bt", __func__);
--		cfg->wake_by_bt = true;
--		disable_irq_nosync(irq);
--	}
-+	pr_info("%s: wake by bt", __func__);
-+	cfg->wake_by_bt = true;
-+	disable_irq_nosync(irq);
- 
- 	pm_wakeup_event(&card->func->dev, 0);
- 	pm_system_wakeup();
--- 
-1.8.1.4
+SGkgTWFyY2VsLA0KDQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IGxpbnV4
+LWJsdWV0b290aC1vd25lckB2Z2VyLmtlcm5lbC5vcmcNCj4gW21haWx0bzpsaW51eC1ibHVldG9v
+dGgtb3duZXJAdmdlci5rZXJuZWwub3JnXSBPbiBCZWhhbGYgT2YgTWFyY2VsDQo+IEhvbHRtYW5u
+DQo+IFNlbnQ6IDIwMTfE6jPUwjMwyNUgMjI6MjENCj4gVG86IFhpbm1pbmcgSHUNCj4gQ2M6IExp
+bnV4IEJsdWV0b290aDsgQW1pdGt1bWFyIEthcndhcjsgQ2F0aHkgTHVvOyBHdWVudGVyIFJvZWNr
+DQo+IFN1YmplY3Q6IFJlOiBbUEFUQ0ggMi8yXSBCbHVldG9vdGg6IGJ0bXJ2bDogcmVtb3ZlIHVu
+bmVjZXNzYXJ5IHdha2V1cA0KPiBpbnRlcnJ1cHQgbnVtYmVyIHNhbml0eSBjaGVjaw0KPiANCj4g
+SGkgWGlubWluZywNCj4gDQo+ID4gU2FuaXR5IGNoZWNrIG9mIGludGVycnVwdCBudW1iZXIgaW4g
+aW50ZXJydXB0IGhhbmRsZXIgaXMgdW5uZWNlc3NhcnkNCj4gPiBhbmQgY29uZnVzaW9uLCByZW1v
+dmUgaXQuDQo+ID4NCj4gPiBTaWduZWQtb2ZmLWJ5OiBYaW5taW5nIEh1IDxodXhtQG1hcnZlbGwu
+Y29tPg0KPiA+IFNpZ25lZC1vZmYtYnk6IEd1ZW50ZXIgUm9lY2sgPGdyb2Vja0BjaHJvbWl1bS5v
+cmc+DQo+ID4gU2lnbmVkLW9mZi1ieTogQW1pdGt1bWFyIEthcndhciA8YWthcndhckBtYXJ2ZWxs
+LmNvbT4NCj4gPiAtLS0NCj4gPiBkcml2ZXJzL2JsdWV0b290aC9idG1ydmxfc2Rpby5jIHwgOSAr
+KystLS0tLS0NCj4gPiAxIGZpbGUgY2hhbmdlZCwgMyBpbnNlcnRpb25zKCspLCA2IGRlbGV0aW9u
+cygtKQ0KPiANCj4gcGF0Y2ggZG9lcyBub3QgYXBwbHkgdG8gYmx1ZXRvb3RoLW5leHQgdHJlZS4N
+Cj4gDQo+IGVycm9yOiBkcml2ZXJzL2JsdWV0b290aC9idG1ydmxfc2Rpby5jOiBwYXRjaCBkb2Vz
+IG5vdCBhcHBseSBQYXRjaCBmYWlsZWQgYXQNCj4gMDAwMiBCbHVldG9vdGg6IGJ0bXJ2bDogcmVt
+b3ZlIHVubmVjZXNzYXJ5IHdha2V1cCBpbnRlcnJ1cHQgbnVtYmVyIHNhbml0eQ0KPiBjaGVjaw0K
+DQpSZXNvbHZlZCBpbiB2Mi4NCg0KVGhhbmtzDQpTaW1vbg0KPiANCj4gUmVnYXJkcw0KPiANCj4g
+TWFyY2VsDQo+IA0KPiAtLQ0KPiBUbyB1bnN1YnNjcmliZSBmcm9tIHRoaXMgbGlzdDogc2VuZCB0
+aGUgbGluZSAidW5zdWJzY3JpYmUgbGludXgtYmx1ZXRvb3RoIiBpbg0KPiB0aGUgYm9keSBvZiBh
+IG1lc3NhZ2UgdG8gbWFqb3Jkb21vQHZnZXIua2VybmVsLm9yZyBNb3JlIG1ham9yZG9tbyBpbmZv
+DQo+IGF0ICBodHRwOi8vdmdlci5rZXJuZWwub3JnL21ham9yZG9tby1pbmZvLmh0bWwNCg==
