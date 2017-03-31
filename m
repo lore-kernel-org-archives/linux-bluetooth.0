@@ -1,29 +1,52 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: bugzilla-daemon@bugzilla.kernel.org
-To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 190831] Intel Bluetooth 8260 breaks with latest firmware
-Date: Wed, 01 Feb 2017 06:41:40 +0000
-Message-ID: <bug-190831-62941-42VFNQeLur@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-190831-62941@https.bugzilla.kernel.org/>
-References: <bug-190831-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
+Return-Path: <konrad.zapalowicz@canonical.com>
+From: Konrad Zapalowicz <konrad.zapalowicz@canonical.com>
+To: marcel@holtmann.org
+Cc: luiz.von.dentz@intel.com,
+	linux-bluetooth@vger.kernel.org,
+	=?UTF-8?q?Konrad=20Zapa=C5=82owicz?= <konrad.zapalowicz@canonical.com>
+Subject: [PATCH v2] core: replace sizeof(filename) with PATH_MAX
+Date: Fri, 31 Mar 2017 16:44:34 +0200
+Message-Id: <1490971474-9719-1-git-send-email-bergo.torino@gmail.com>
+In-Reply-To: <1490958237-9299-1-git-send-email-bergo.torino@gmail.com>
+References: <1490958237-9299-1-git-send-email-bergo.torino@gmail.com>
 MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-https://bugzilla.kernel.org/show_bug.cgi?id=190831
+From: Konrad Zapałowicz <konrad.zapalowicz@canonical.com>
 
---- Comment #40 from Gurenko Alex <lord.phoenix.rus@gmail.com> ---
-(In reply to Robert E. Yawn from comment #39)
-> Interesting.  According to the official specs, the Bose QuietComfort 35
-> supports BT 4.1: https://www.cnet.com/products/bose-quietcomfort-35/specs/
-> 
-> It's possible that the issue maybe cropping up with certain hardware combos,
-> too.  For example, I'm running Dell Precision Workstation 5510.  It uses the
-> Int 8260 wifi/BT 4.1 combo with a Skylake CPU.
+This commit replaces sizeof(filename) with PATH_MAX to match the common
+scheme which is used in other places.
+---
+ src/adapter.c     | 2 +-
+ src/shared/util.c | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-I'm using Lenovo T460p with same combo, but laptop-grade CPU (i7-6820HQ).
-
+diff --git a/src/adapter.c b/src/adapter.c
+index 3dac7d6..3935460 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -7107,7 +7107,7 @@ static void store_csrk(struct btd_adapter *adapter, const bdaddr_t *peer,
+ 
+ 	ba2str(peer, device_addr);
+ 
+-	snprintf(filename, sizeof(filename), STORAGEDIR "/%s/%s/info",
++	snprintf(filename, PATH_MAX, STORAGEDIR "/%s/%s/info",
+ 					adapter_dir(adapter), device_addr);
+ 
+ 	key_file = g_key_file_new();
+diff --git a/src/shared/util.c b/src/shared/util.c
+index 7878552..4b59fad 100644
+--- a/src/shared/util.c
++++ b/src/shared/util.c
+@@ -117,7 +117,7 @@ unsigned char util_get_dt(const char *parent, const char *name)
+ 	char filename[PATH_MAX];
+ 	struct stat st;
+ 
+-	snprintf(filename, sizeof(filename), "%s/%s", parent, name);
++	snprintf(filename, PATH_MAX, "%s/%s", parent, name);
+ 	if (lstat(filename, &st) == 0 && S_ISDIR(st.st_mode))
+ 		return DT_DIR;
+ 
 -- 
-You are receiving this mail because:
-You are the assignee for the bug.
+2.7.4
