@@ -1,33 +1,49 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] build: Make btmgmt tools installable
-Date: Fri, 31 Mar 2017 16:58:23 +0300
-Message-Id: <20170331135823.21883-1-luiz.dentz@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <gregkh@linuxfoundation.org>
+Date: Fri, 31 Mar 2017 15:33:53 +0200
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Rob Herring <robh+dt@kernel.org>, Sebastian Reichel <sre@kernel.org>,
+	"Gustavo F. Padovan" <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Samuel Thibault <samuel.thibault@ens-lyon.org>,
+	Pavel Machek <pavel@ucw.cz>, Tony Lindgren <tony@atomide.com>,
+	Jiri Slaby <jslaby@suse.com>, Mark Rutland <mark.rutland@arm.com>,
+	"open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+	"linux-serial@vger.kernel.org" <linux-serial@vger.kernel.org>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"David S. Miller" <davem@davemloft.net>
+Subject: Re: [PATCHv3 00/10] Nokia H4+ support
+Message-ID: <20170331133353.GA32267@kroah.com>
+References: <20170328155939.31566-1-sre@kernel.org>
+ <CAL_JsqJcQ9ANtt71KRitOJ9spKD1SaeoL4RDftiCEPs8TjLJGA@mail.gmail.com>
+ <C1A408F2-1DF8-4F49-B399-B936542DE6BC@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <C1A408F2-1DF8-4F49-B399-B936542DE6BC@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+On Wed, Mar 29, 2017 at 11:33:26PM +0200, Marcel Holtmann wrote:
+> Hi Rob,
+> 
+> >> Here is PATCHv3 for the Nokia bluetooth patchset. I addressed all comments from
+> >> Rob and Pavel regarding the serdev patches and dropped the *.dts patches, since
+> >> they were queued by Tony. I also changed the patch order, so that the serdev
+> >> patches come first. All of them have Acked-by from Rob, so I think it makes
+> >> sense to merge them to serdev subsystem (now) and provide an immutable branch
+> >> for the bluetooth subsystem.
+> > 
+> > Greg doesn't read cover letters generally and since the serdev patches
+> > are Cc rather than To him, he's probably not planning to pick them up.
+> 
+> I wonder actually if we should merge all of these via bluetooth-next
+> tree with proper Ack from Greg. However it would be good to also get
+> buy in from Dave for merging this ultimately through net-next.
 
----
- Makefile.tools | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+I don't really care where it goes.  I can take the whole thing in my
+tty/serial tree now if no one objects and I get an ack from the relevant
+maintainers {hint...}
 
-diff --git a/Makefile.tools b/Makefile.tools
-index 55d392e..73b2eef 100644
---- a/Makefile.tools
-+++ b/Makefile.tools
-@@ -348,7 +348,9 @@ EXTRA_DIST += tools/hid2hci.1
- endif
- 
- if READLINE
--noinst_PROGRAMS += tools/btmgmt tools/obex-client-tool tools/obex-server-tool \
-+bin_PROGRAMS += tools/btmgmt
-+
-+noinst_PROGRAMS += tools/obex-client-tool tools/obex-server-tool \
- 			tools/bluetooth-player tools/obexctl
- 
- tools_obex_client_tool_SOURCES = $(gobex_sources) $(btio_sources) \
--- 
-2.9.3
+thanks,
 
+greg k-h
