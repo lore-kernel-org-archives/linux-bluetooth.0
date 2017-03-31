@@ -1,38 +1,52 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <linux-kernel-owner@vger.kernel.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Subject: Re: [PATCH v3 1/2] Bluetooth: btmrvl: disable platform wakeup
- interrupt in suspend failure path
+Subject: Re: [PATCH] bluetooth: 6lowpan: fix delay work init in
+ add_peer_chan()
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1490941952-9048-1-git-send-email-huxm@marvell.com>
-Date: Fri, 31 Mar 2017 12:11:11 +0200
-Cc: Linux Bluetooth <linux-bluetooth@vger.kernel.org>,
-        Amitkumar Karwar <akarwar@marvell.com>,
-        Cathy Luo <cluo@marvell.com>
-Message-Id: <983D9481-551B-463E-8BCE-9C52017E7CE2@holtmann.org>
-References: <1490941952-9048-1-git-send-email-huxm@marvell.com>
-To: Xinming Hu <huxm@marvell.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <20170329061054.4300-1-michael.scott@linaro.org>
+Date: Fri, 31 Mar 2017 12:10:44 +0200
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jukka Rissanen <jukka.rissanen@linux.intel.com>,
+        linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Message-Id: <6B40174C-6834-4C3D-BF41-92119E78E353@holtmann.org>
+References: <20170329061054.4300-1-michael.scott@linaro.org>
+To: Michael Scott <michael.scott@linaro.org>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Xinming,
+Hi Michael,
 
-> Host sleep handshake with device might been fail, disable platform wakeup
-> interrupt in this case.
+> When adding 6lowpan devices very rapidly we sometimes see a crash:
+> [23122.306615] CPU: 2 PID: 0 Comm: swapper/2 Not tainted 4.9.0-43-arm64 #1 Debian 4.9.9.linaro.43-1
+> [23122.315400] Hardware name: HiKey Development Board (DT)
+> [23122.320623] task: ffff800075443080 task.stack: ffff800075484000
+> [23122.326551] PC is at expire_timers+0x70/0x150
+> [23122.330907] LR is at run_timer_softirq+0xa0/0x1a0
+> [23122.335616] pc : [<ffff000008142dd8>] lr : [<ffff000008142f58>] pstate: 600001c5
 > 
-> Reported-by: Guenter Roeck <groeck@chromium.org>
-> Signed-off-by: Xinming Hu <huxm@marvell.com>
-> Signed-off-by: Amitkumar Karwar <akarwar@marvell.com>
+> This was due to add_peer_chan() unconditionally initializing the
+> lowpan_btle_dev->notify_peers delayed work structure, even if the
+> lowpan_btle_dev passed into add_peer_chan() had previously been
+> initialized.
+> 
+> Normally, this would go unnoticed as the delayed work timer is set for
+> 100 msec, however when calling add_peer_chan() faster than 100 msec it
+> clears out a previously queued delay work causing the crash above.
+> 
+> To fix this, let add_peer_chan() know when a new lowpan_btle_dev is passed
+> in so that it only performs the delay work initialization when needed.
+> 
+> Signed-off-by: Michael Scott <michael.scott@linaro.org>
 > ---
-> v2: same as v1
-> v3: use Reported-by (Guenter)
-> ---
-> drivers/bluetooth/btmrvl_sdio.c | 7 +++++++
-> 1 file changed, 7 insertions(+)
+> net/bluetooth/6lowpan.c | 10 +++++++---
+> 1 file changed, 7 insertions(+), 3 deletions(-)
 
-both patches have been applied to bluetooth-next tree.
+patch has been applied to bluetooth-next tree.
 
 Regards
 
 Marcel
-
