@@ -1,52 +1,38 @@
-Return-Path: <konrad.zapalowicz@canonical.com>
-From: Konrad Zapalowicz <konrad.zapalowicz@canonical.com>
-To: marcel@holtmann.org
-Cc: luiz.von.dentz@intel.com,
-	linux-bluetooth@vger.kernel.org,
-	=?UTF-8?q?Konrad=20Zapa=C5=82owicz?= <konrad.zapalowicz@canonical.com>
-Subject: [PATCH] core: replace sizeof(filename) with PATH_MAX
-Date: Fri, 31 Mar 2017 13:03:57 +0200
-Message-Id: <1490958237-9299-1-git-send-email-bergo.torino@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+Subject: Re: [PATCH v3 1/2] Bluetooth: btmrvl: disable platform wakeup
+ interrupt in suspend failure path
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1490941952-9048-1-git-send-email-huxm@marvell.com>
+Date: Fri, 31 Mar 2017 12:11:11 +0200
+Cc: Linux Bluetooth <linux-bluetooth@vger.kernel.org>,
+        Amitkumar Karwar <akarwar@marvell.com>,
+        Cathy Luo <cluo@marvell.com>
+Message-Id: <983D9481-551B-463E-8BCE-9C52017E7CE2@holtmann.org>
+References: <1490941952-9048-1-git-send-email-huxm@marvell.com>
+To: Xinming Hu <huxm@marvell.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Konrad Zapałowicz <konrad.zapalowicz@canonical.com>
+Hi Xinming,
 
-This commit replaces sizeof(filename) with PATH_MAX to match the common
-scheme which is used in other places.
+> Host sleep handshake with device might been fail, disable platform wakeup
+> interrupt in this case.
+> 
+> Reported-by: Guenter Roeck <groeck@chromium.org>
+> Signed-off-by: Xinming Hu <huxm@marvell.com>
+> Signed-off-by: Amitkumar Karwar <akarwar@marvell.com>
+> ---
+> v2: same as v1
+> v3: use Reported-by (Guenter)
+> ---
+> drivers/bluetooth/btmrvl_sdio.c | 7 +++++++
+> 1 file changed, 7 insertions(+)
 
-Signed-off-by: Konrad Zapałowicz <konrad.zapalowicz@canonical.com>
----
- src/adapter.c     | 2 +-
- src/shared/util.c | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+both patches have been applied to bluetooth-next tree.
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 3dac7d6..3935460 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -7107,7 +7107,7 @@ static void store_csrk(struct btd_adapter *adapter, const bdaddr_t *peer,
- 
- 	ba2str(peer, device_addr);
- 
--	snprintf(filename, sizeof(filename), STORAGEDIR "/%s/%s/info",
-+	snprintf(filename, PATH_MAX, STORAGEDIR "/%s/%s/info",
- 					adapter_dir(adapter), device_addr);
- 
- 	key_file = g_key_file_new();
-diff --git a/src/shared/util.c b/src/shared/util.c
-index 7878552..4b59fad 100644
---- a/src/shared/util.c
-+++ b/src/shared/util.c
-@@ -117,7 +117,7 @@ unsigned char util_get_dt(const char *parent, const char *name)
- 	char filename[PATH_MAX];
- 	struct stat st;
- 
--	snprintf(filename, sizeof(filename), "%s/%s", parent, name);
-+	snprintf(filename, PATH_MAX, "%s/%s", parent, name);
- 	if (lstat(filename, &st) == 0 && S_ISDIR(st.st_mode))
- 		return DT_DIR;
- 
--- 
-2.7.4
+Regards
+
+Marcel
+
