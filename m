@@ -6,46 +6,43 @@ CC: Marcel Holtmann <marcel@holtmann.org>,
 	<akarwar@marvell.com>, Cathy Luo <cluo@marvell.com>,
         Xinming Hu
 	<huxm@marvell.com>
-Subject: [PATCH v3 2/2] Bluetooth: btmrvl: remove unnecessary wakeup interrupt number sanity check
-Date: Fri, 31 Mar 2017 14:32:32 +0800
-Message-ID: <1490941952-9048-2-git-send-email-huxm@marvell.com>
-In-Reply-To: <1490941952-9048-1-git-send-email-huxm@marvell.com>
-References: <1490941952-9048-1-git-send-email-huxm@marvell.com>
+Subject: [PATCH v3 1/2] Bluetooth: btmrvl: disable platform wakeup interrupt in suspend failure path
+Date: Fri, 31 Mar 2017 14:32:31 +0800
+Message-ID: <1490941952-9048-1-git-send-email-huxm@marvell.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Sanity check of interrupt number in interrupt handler is unnecessary and
-confusion, remove it.
+Host sleep handshake with device might been fail, disable platform wakeup
+interrupt in this case.
 
 Reported-by: Guenter Roeck <groeck@chromium.org>
 Signed-off-by: Xinming Hu <huxm@marvell.com>
 Signed-off-by: Amitkumar Karwar <akarwar@marvell.com>
 ---
-v2: fix apply error in v1
+v2: same as v1
 v3: use Reported-by (Guenter)
 ---
- drivers/bluetooth/btmrvl_sdio.c | 8 +++-----
- 1 file changed, 3 insertions(+), 5 deletions(-)
+ drivers/bluetooth/btmrvl_sdio.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
 diff --git a/drivers/bluetooth/btmrvl_sdio.c b/drivers/bluetooth/btmrvl_sdio.c
-index 95e40ec..eb794f0 100644
+index 2424ea2..95e40ec 100644
 --- a/drivers/bluetooth/btmrvl_sdio.c
 +++ b/drivers/bluetooth/btmrvl_sdio.c
-@@ -64,11 +64,9 @@ static irqreturn_t btmrvl_wake_irq_bt(int irq, void *priv)
- 	struct btmrvl_sdio_card *card = priv;
- 	struct btmrvl_plt_wake_cfg *cfg = card->plt_wake_cfg;
- 
--	if (cfg->irq_bt >= 0) {
--		pr_info("%s: wake by bt", __func__);
--		cfg->wake_by_bt = true;
--		disable_irq_nosync(irq);
--	}
-+	pr_info("%s: wake by bt", __func__);
-+	cfg->wake_by_bt = true;
-+	disable_irq_nosync(irq);
- 
- 	pm_wakeup_event(&card->func->dev, 0);
- 	pm_system_wakeup();
+@@ -1630,6 +1630,13 @@ static int btmrvl_sdio_suspend(struct device *dev)
+ 	if (priv->adapter->hs_state != HS_ACTIVATED) {
+ 		if (btmrvl_enable_hs(priv)) {
+ 			BT_ERR("HS not activated, suspend failed!");
++			/* Disable platform specific wakeup interrupt */
++			if (card->plt_wake_cfg &&
++			    card->plt_wake_cfg->irq_bt >= 0) {
++				disable_irq_wake(card->plt_wake_cfg->irq_bt);
++				disable_irq(card->plt_wake_cfg->irq_bt);
++			}
++
+ 			priv->adapter->is_suspending = false;
+ 			return -EBUSY;
+ 		}
 -- 
 1.8.1.4
