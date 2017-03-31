@@ -1,101 +1,51 @@
-Return-Path: <luiz.dentz@gmail.com>
+Return-Path: <root@localhost.localdomain>
+From: Xinming Hu <huxm@marvell.com>
+To: Linux Bluetooth <linux-bluetooth@vger.kernel.org>
+CC: Marcel Holtmann <marcel@holtmann.org>,
+        Amitkumar Karwar
+	<akarwar@marvell.com>, Cathy Luo <cluo@marvell.com>,
+        Xinming Hu
+	<huxm@marvell.com>
+Subject: [PATCH v3 2/2] Bluetooth: btmrvl: remove unnecessary wakeup interrupt number sanity check
+Date: Fri, 31 Mar 2017 14:32:32 +0800
+Message-ID: <1490941952-9048-2-git-send-email-huxm@marvell.com>
+In-Reply-To: <1490941952-9048-1-git-send-email-huxm@marvell.com>
+References: <1490941952-9048-1-git-send-email-huxm@marvell.com>
 MIME-Version: 1.0
-In-Reply-To: <20170329061018.4243-1-michael.scott@linaro.org>
-References: <20170329061018.4243-1-michael.scott@linaro.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Fri, 31 Mar 2017 11:33:37 +0300
-Message-ID: <CABBYNZ+=W6kvxrmaTWktNTtc76hoDgYuZOK9QF5QNd+5+MSjNA@mail.gmail.com>
-Subject: Re: [PATCH] bluetooth: 6lowpan: fix use after free in chan_suspend/resume
-To: Michael Scott <michael.scott@linaro.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>, "David S . Miller" <davem@davemloft.net>,
-	Jukka Rissanen <jukka.rissanen@linux.intel.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>, linux-wpan@vger.kernel.org,
-	"open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Michael,
+Sanity check of interrupt number in interrupt handler is unnecessary and
+confusion, remove it.
 
-On Wed, Mar 29, 2017 at 9:10 AM, Michael Scott <michael.scott@linaro.org> wrote:
-> A status field in the skb_cb struct was storing a channel status
-> based on channel suspend/resume events.  This stored status was
-> then used to return EAGAIN if there were packet sending issues
-> in snd_pkt().
->
-> The issue is that the skb has been freed by the time the callback
-> to 6lowpan's suspend/resume was called.  So, this generates a
-> "use after free" issue that was noticed while running kernel tests
-> with KASAN debug enabled.
->
-> Let's eliminate the status field entirely as we can use the channel
-> tx_credits to indicate whether we should return EAGAIN when handling
-> packets.
->
-> Signed-off-by: Michael Scott <michael.scott@linaro.org>
-> ---
->  net/bluetooth/6lowpan.c | 21 +++------------------
->  1 file changed, 3 insertions(+), 18 deletions(-)
->
-> diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
-> index d491529332f4..e27be3ca0a0c 100644
-> --- a/net/bluetooth/6lowpan.c
-> +++ b/net/bluetooth/6lowpan.c
-> @@ -38,7 +38,6 @@ struct skb_cb {
->         struct in6_addr addr;
->         struct in6_addr gw;
->         struct l2cap_chan *chan;
-> -       int status;
->  };
->  #define lowpan_cb(skb) ((struct skb_cb *)((skb)->cb))
->
-> @@ -528,7 +527,7 @@ static int send_pkt(struct l2cap_chan *chan, struct sk_buff *skb,
->         }
->
->         if (!err)
-> -               err = lowpan_cb(skb)->status;
-> +               err = (!chan->tx_credits ? -EAGAIN : 0);
->
->         if (err < 0) {
->                 if (err == -EAGAIN)
-> @@ -964,26 +963,12 @@ static struct sk_buff *chan_alloc_skb_cb(struct l2cap_chan *chan,
->
->  static void chan_suspend_cb(struct l2cap_chan *chan)
->  {
-> -       struct sk_buff *skb = chan->data;
-> -
-> -       BT_DBG("chan %p conn %p skb %p", chan, chan->conn, skb);
-> -
-> -       if (!skb)
-> -               return;
-> -
-> -       lowpan_cb(skb)->status = -EAGAIN;
-> +       BT_DBG("chan %p suspend", chan);
->  }
->
->  static void chan_resume_cb(struct l2cap_chan *chan)
->  {
-> -       struct sk_buff *skb = chan->data;
-> -
-> -       BT_DBG("chan %p conn %p skb %p", chan, chan->conn, skb);
-> -
-> -       if (!skb)
-> -               return;
-> -
-> -       lowpan_cb(skb)->status = 0;
-> +       BT_DBG("chan %p resume", chan);
->  }
->
->  static long chan_get_sndtimeo_cb(struct l2cap_chan *chan)
-> --
-> 2.11.0
+Reported-by: Guenter Roeck <groeck@chromium.org>
+Signed-off-by: Xinming Hu <huxm@marvell.com>
+Signed-off-by: Amitkumar Karwar <akarwar@marvell.com>
+---
+v2: fix apply error in v1
+v3: use Reported-by (Guenter)
+---
+ drivers/bluetooth/btmrvl_sdio.c | 8 +++-----
+ 1 file changed, 3 insertions(+), 5 deletions(-)
 
-It should be possible to queue the packets on l2cap_chan_send, Im not
-sure why we have this suspend logic in the first place so perhaps
-Jukka can shed some light here.
-
-
-
+diff --git a/drivers/bluetooth/btmrvl_sdio.c b/drivers/bluetooth/btmrvl_sdio.c
+index 95e40ec..eb794f0 100644
+--- a/drivers/bluetooth/btmrvl_sdio.c
++++ b/drivers/bluetooth/btmrvl_sdio.c
+@@ -64,11 +64,9 @@ static irqreturn_t btmrvl_wake_irq_bt(int irq, void *priv)
+ 	struct btmrvl_sdio_card *card = priv;
+ 	struct btmrvl_plt_wake_cfg *cfg = card->plt_wake_cfg;
+ 
+-	if (cfg->irq_bt >= 0) {
+-		pr_info("%s: wake by bt", __func__);
+-		cfg->wake_by_bt = true;
+-		disable_irq_nosync(irq);
+-	}
++	pr_info("%s: wake by bt", __func__);
++	cfg->wake_by_bt = true;
++	disable_irq_nosync(irq);
+ 
+ 	pm_wakeup_event(&card->func->dev, 0);
+ 	pm_system_wakeup();
 -- 
-Luiz Augusto von Dentz
+1.8.1.4
