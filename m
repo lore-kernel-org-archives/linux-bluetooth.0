@@ -1,49 +1,29 @@
-Return-Path: <gregkh@linuxfoundation.org>
-Date: Fri, 31 Mar 2017 15:33:53 +0200
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Rob Herring <robh+dt@kernel.org>, Sebastian Reichel <sre@kernel.org>,
-	"Gustavo F. Padovan" <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Samuel Thibault <samuel.thibault@ens-lyon.org>,
-	Pavel Machek <pavel@ucw.cz>, Tony Lindgren <tony@atomide.com>,
-	Jiri Slaby <jslaby@suse.com>, Mark Rutland <mark.rutland@arm.com>,
-	"open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-	"linux-serial@vger.kernel.org" <linux-serial@vger.kernel.org>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"David S. Miller" <davem@davemloft.net>
-Subject: Re: [PATCHv3 00/10] Nokia H4+ support
-Message-ID: <20170331133353.GA32267@kroah.com>
-References: <20170328155939.31566-1-sre@kernel.org>
- <CAL_JsqJcQ9ANtt71KRitOJ9spKD1SaeoL4RDftiCEPs8TjLJGA@mail.gmail.com>
- <C1A408F2-1DF8-4F49-B399-B936542DE6BC@holtmann.org>
+Return-Path: <konrad.zapalowicz@canonical.com>
+Date: Fri, 31 Mar 2017 13:32:18 +0200
+From: Konrad Zapalowicz <konrad.zapalowicz@canonical.com>
+To: Bastien Nocera <hadess@hadess.net>
+Cc: marcel@holtmann.org, luiz.von.dentz@intel.com,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] core: replace sizeof(filename) with PATH_MAX
+Message-ID: <20170331113218.GA28779@annapurna>
+References: <1490958237-9299-1-git-send-email-bergo.torino@gmail.com>
+ <1490959289.13868.12.camel@hadess.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <C1A408F2-1DF8-4F49-B399-B936542DE6BC@holtmann.org>
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <1490959289.13868.12.camel@hadess.net>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, Mar 29, 2017 at 11:33:26PM +0200, Marcel Holtmann wrote:
-> Hi Rob,
-> 
-> >> Here is PATCHv3 for the Nokia bluetooth patchset. I addressed all comments from
-> >> Rob and Pavel regarding the serdev patches and dropped the *.dts patches, since
-> >> they were queued by Tony. I also changed the patch order, so that the serdev
-> >> patches come first. All of them have Acked-by from Rob, so I think it makes
-> >> sense to merge them to serdev subsystem (now) and provide an immutable branch
-> >> for the bluetooth subsystem.
+On 03/31, Bastien Nocera wrote:
+> On Fri, 2017-03-31 at 13:03 +0200, Konrad Zapalowicz wrote:
+> > From: Konrad Zapałowicz <konrad.zapalowicz@canonical.com>
 > > 
-> > Greg doesn't read cover letters generally and since the serdev patches
-> > are Cc rather than To him, he's probably not planning to pick them up.
+> > This commit replaces sizeof(filename) with PATH_MAX to match the
+> > common
+> > scheme which is used in other places.
 > 
-> I wonder actually if we should merge all of these via bluetooth-next
-> tree with proper Ack from Greg. However it would be good to also get
-> buy in from Dave for merging this ultimately through net-next.
+> I wonder why g_strdup_printf() isn't used instead. Would allow ignoring
+> PATH_MAX.
 
-I don't really care where it goes.  I can take the whole thing in my
-tty/serial tree now if no one objects and I get an ack from the relevant
-maintainers {hint...}
-
-thanks,
-
-greg k-h
+I guess it is because it is easier. With g_strdup_printf() one would
+have to take care about freeing memory. This is not a case with having
+filename as an atomatic variable.
