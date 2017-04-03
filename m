@@ -1,142 +1,41 @@
-Return-Path: <Dean_Jenkins@mentor.com>
-Subject: Re: [RFC V1 00/16] hci_ldisc hci_uart_tty_close() fixes
-To: Marcel Holtmann <marcel@holtmann.org>
-References: <1490723429-28870-1-git-send-email-Dean_Jenkins@mentor.com>
- <AA3DD0DD-5CAC-4ADD-9B0C-4E652C93E4D6@holtmann.org>
-CC: "Gustavo F. Padovan" <gustavo@padovan.org>, Johan Hedberg
-	<johan.hedberg@gmail.com>, <linux-bluetooth@vger.kernel.org>
-From: Dean Jenkins <Dean_Jenkins@mentor.com>
-Message-ID: <ee49f939-1094-0ae0-0fa7-6c5cad112527@mentor.com>
-Date: Mon, 3 Apr 2017 16:09:14 +0100
-MIME-Version: 1.0
-In-Reply-To: <AA3DD0DD-5CAC-4ADD-9B0C-4E652C93E4D6@holtmann.org>
-Content-Type: text/plain; charset="windows-1252"; format=flowed
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: aar@pengutronix.de, jukka.rissanen@linux.intel.com,
+        linux-wpan@vger.kernel.org
+Subject: [PATCH 3/3] Bluetooth: L2CAP: Don't return -EAGAIN if out of credits
+Date: Mon,  3 Apr 2017 17:48:57 +0300
+Message-Id: <20170403144857.4661-3-luiz.dentz@gmail.com>
+In-Reply-To: <20170403144857.4661-1-luiz.dentz@gmail.com>
+References: <20170403144857.4661-1-luiz.dentz@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On 30/03/17 11:11, Marcel Holtmann wrote:
-> Hi Dean,
->
->> This is RFC patchset V1 which reorganises hci_uart_tty_close() to overcome a
->> design flaw. I would like some comments on the changes.
->>
->> Design Flaw
->> ===========
->>
->> An example callstack is as follows
->>
->> Have Bluetooth running using a BCSP based UART Bluetooth Radio Module.
->>
->> Now kill the userland hciattach program by doing
->> killall hciattach
-> is there any chance we can convert BCSP support to run fully inside the kernel with the new parts we have put in. And with that then also use btattach. The split of some parts of BCSP in userspace seems never been a good idea.
+Just keep queueing them into TX queue since the caller might just have
+to do the same and there is no impact in adding another packet to the
+TX queue even if there aren't any credits to transmit them.
 
-I am not aware of "the new parts we [you] have put in" to the kernel 
-because I am working with the older 3.14 kernel with userland components 
-that are not Bluez based but the kernel issue is observable. Is there a 
-web page where I can find out about your design changes for the new parts ?
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+---
+ net/bluetooth/l2cap_core.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
-My efforts are to improve the latest upstream kernel to eliminate this 
-kernel design flaw in HCI UART LDISC (Note TTY LDISC is also broken but 
-not fixed by my patchset).
-
-I see that "btattach" is at 
-https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/tools/btattach.c, 
-however, I am unable to identify whether Linux distributions such as 
-Ubuntu have a bluez package that contains "btattach". Is "btattach" a 
-replacement for "hciattach" ?
-
-
->
-> I am a bit reluctant to change major hci_ldisc pieces because of just one broken protocol. Running BCSP fully in the kernel seems a better solution to deal with some of these issues.
-
-The kernel BCSP software in the kernel is not broken although it is not 
-fully implemented as you already highlighted. The issue is that HCI UART 
-LDISC (and TTY LDISC) has a broken procedure for closing down the HCI 
-UART device via hci_uart_tty_close().
-
-This means that I don't see how your suggestion helps to resolve the 
-kernel design flaw which is related to closing down any of the Bluetooth 
-Data Link protocol layers such as H4, H5, and BCSP (I use BCSP). This 
-flaw seems to me to be a long standing Bluetooth kernel Data Link 
-protocol layer closedown issue and is unrelated to how the Data Link 
-protocol layer is established (connected). Therefore, having BCSP partly 
-in userland is irrelevant to this kernel design flaw. Even with BCSP 
-fully in the kernel, the protocol closedown issue will remain present I 
-think.
-
-I might try to build "btattach" and have a go to use it. If you look 
-inside the source code of "btattach" and "hciattach" you can see the 
-problem area in closing down an established Bluetooth Data Link protocol 
-layer by the use of:
-
-     if (ioctl(fd, TIOCSETD, &ldisc) < 0) {
-         perror("Failed set serial line discipline");
-         close(fd);
-         return -1;
-     }
-
-This userland call is the problem area as this asynchronous ioctl 
-TIOCSETD can cause hci_uart_tty_close() to run and I think it can cause 
-trouble for ALL the Bluetooth Data Link protocol layers such as H4, H5 
-and BCSP.
-
-The design flaw is exposed after the Data Link protocol layer has been 
-established (connected) and ioctl TIOCSETD is used from userland. In my 
-example, I killed "hciattach" which is an abnormal scenario but it still 
-needs good handling. I think I have strace evidence of TIOCSETD being 
-used due to SIGTERM.
-
-The design flaw is because TIOCSETD can trigger the sending of a HCI 
-RESET command during closedown of HCI UART LDISC, TTY LDISC and the Data 
-Link protocol layer. I only have experience of BCSP but I suspect H4 and 
-H5 have retransmission procedures similar to BCSP so would also be 
-susceptible to this issue of trying to send a HCI RESET command whilst 
-closing down the needed data path to the UART driver which causes 
-sending of the HCI RESET command to be unsuccessful.
-
-I think the callstack is:
-
-Userland ioctl TIOCSETD executes causing =>
-Kernel ioctl system call which runs
-tty_ioctl()
-tiocsetd()
-tty_set_ldisc()
-tty_ldisc_close()
-hci_uart_tty_close()
-hci_unregister_dev()
-hci_dev_do_close()
-__hci_req_sync() which tries to send a HCI RESET command which depends on
-HCI_QUIRK_RESET_ON_CLOSE being enabled and that is the default condition
-
-I believe It will affect the closure of any of the Bluetooth Data Link 
-protocol layers.
-
-Note that not enabling HCI_QUIRK_RESET_ON_CLOSE does not fully help 
-because if Data Link protocol layer retransmissions are occurring when 
-hci_uart_tty_close() runs then the various race conditions are still 
-present in hci_uart_tty_close().
-
-I suspect evidence of the design flaw can be observed by measuring the 
-execution time of the userland ioctl TIOCSETD calls. I predict that 
-sometimes it will take 2 seconds for TIOCSETD to complete due to being 
-blocked waiting for the unsuccessful attempt at sending the HCI RESET 
-command because the HCI command time-out expires. I believe this will be 
-independent of the underlying Bluetooth Data Link protocol layer.
-
-Do you have any suggestions for moving forward in accepting my proposed 
-changes ? I will try to provide more observable evidence of the issue on 
-kernel v.4.10 on a Linux PC.
-
-Thanks for your time in looking at my proposed patches.
-
-Best regards,
-Dean
-
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index fc7f321..3a202b0 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -2458,9 +2458,6 @@ int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len)
+ 		if (len > chan->omtu)
+ 			return -EMSGSIZE;
+ 
+-		if (!chan->tx_credits)
+-			return -EAGAIN;
+-
+ 		__skb_queue_head_init(&seg_queue);
+ 
+ 		err = l2cap_segment_le_sdu(chan, &seg_queue, msg, len);
 -- 
-Dean Jenkins
-Embedded Software Engineer
-Linux Transportation Solutions
-Mentor Embedded Software Division
-Mentor Graphics (UK) Ltd.
+2.9.3
+
