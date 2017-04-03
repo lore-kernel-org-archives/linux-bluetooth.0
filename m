@@ -1,69 +1,47 @@
-Return-Path: <luiz.dentz@gmail.com>
-MIME-Version: 1.0
-In-Reply-To: <1490971474-9719-1-git-send-email-bergo.torino@gmail.com>
-References: <1490958237-9299-1-git-send-email-bergo.torino@gmail.com> <1490971474-9719-1-git-send-email-bergo.torino@gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 3 Apr 2017 14:08:24 +0300
-Message-ID: <CABBYNZLNGfZuw3qAXj5wTtNPXdxL3qTYD87TRZRBS1owN6U=FQ@mail.gmail.com>
-Subject: Re: [PATCH v2] core: replace sizeof(filename) with PATH_MAX
-To: Konrad Zapalowicz <konrad.zapalowicz@canonical.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto Von Dentz <luiz.von.dentz@intel.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Message-ID: <1491211440.13868.19.camel@hadess.net>
+Subject: Re: Possible crashing bug in bluez 5.44
+From: Bastien Nocera <hadess@hadess.net>
+To: Cysioland <me@cysioland.pl>, linux-bluetooth@vger.kernel.org
+Date: Mon, 03 Apr 2017 11:24:00 +0200
+In-Reply-To: <05483ac0-282d-5f1d-55ed-e2dadcb60dd1@cysioland.pl>
+References: <bbe1720b-5d67-2257-1be1-d1051790dbc4@cysioland.pl>
+         <05483ac0-282d-5f1d-55ed-e2dadcb60dd1@cysioland.pl>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Konrad,
+On Sat, 2017-04-01 at 11:15 +0200, Cysioland wrote:
+> Hello,
+> 
+> I've encountered a possible bug when trying to connect my Bluetooth
+> headset via A2DP. Pairing is fine, but when it tries to connect the
+> bluetoothd segfaults, with the following stacktrace:
+> 
+> #0 0x0000000000469d60 n/a (bluetoothd)
+> #1 0x00000000004472d3 n/a (bluetoothd)
+> #2 0x000000000047a31d n/a (bluetoothd)
+> #3 0x0000000000447405 n/a (bluetoothd)
+> #4 0x00007f8ac61cf45a g_main_context_dispatch (libglib-2.0.so.0)
+> #5 0x00007f8ac61cf810 n/a (libglib-2.0.so.0)
+> #6 0x00007f8ac61cfb32 g_main_loop_run (libglib-2.0.so.0)
+> #7 0x000000000040b6b2 n/a (bluetoothd)
+> #8 0x00007f8ac57a5511 __libc_start_main (libc.so.6)
+> #9 0x000000000040bf0a n/a (bluetoothd)
 
-On Fri, Mar 31, 2017 at 5:44 PM, Konrad Zapalowicz
-<konrad.zapalowicz@canonical.com> wrote:
-> From: Konrad Zapa=C5=82owicz <konrad.zapalowicz@canonical.com>
->
-> This commit replaces sizeof(filename) with PATH_MAX to match the common
-> scheme which is used in other places.
-> ---
->  src/adapter.c     | 2 +-
->  src/shared/util.c | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/src/adapter.c b/src/adapter.c
-> index 3dac7d6..3935460 100644
-> --- a/src/adapter.c
-> +++ b/src/adapter.c
-> @@ -7107,7 +7107,7 @@ static void store_csrk(struct btd_adapter *adapter,=
- const bdaddr_t *peer,
->
->         ba2str(peer, device_addr);
->
-> -       snprintf(filename, sizeof(filename), STORAGEDIR "/%s/%s/info",
-> +       snprintf(filename, PATH_MAX, STORAGEDIR "/%s/%s/info",
->                                         adapter_dir(adapter), device_addr=
-);
->
->         key_file =3D g_key_file_new();
-> diff --git a/src/shared/util.c b/src/shared/util.c
-> index 7878552..4b59fad 100644
-> --- a/src/shared/util.c
-> +++ b/src/shared/util.c
-> @@ -117,7 +117,7 @@ unsigned char util_get_dt(const char *parent, const c=
-har *name)
->         char filename[PATH_MAX];
->         struct stat st;
->
-> -       snprintf(filename, sizeof(filename), "%s/%s", parent, name);
-> +       snprintf(filename, PATH_MAX, "%s/%s", parent, name);
->         if (lstat(filename, &st) =3D=3D 0 && S_ISDIR(st.st_mode))
->                 return DT_DIR;
->
-> --
-> 2.7.4
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth=
-" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+You'll need to install debugging symbols, this is unusable
+unfortunately.
 
-Applied, thanks.
+> I've installed bluez via Arch Linux packages, and after downgrading
+> to
+> 5.43 the bug no longer appears. I recall seeing lots of work done
+> between these two on A2DP, so I suspect a regression there.
+> 
+> Relevant Arch bug, where they told me to hit here:
+> https://bugs.archlinux.org/task/53442
+> 
+> Should I report it to your Bugzilla? Do you need any more info or
+> help?
 
---=20
-Luiz Augusto von Dentz
+Cheers
