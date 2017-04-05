@@ -1,33 +1,56 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Subject: Re: [PATCH 1/3] Bluetooth: 6lowpan: Remove unnecessary peer lookup
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20170403144857.4661-1-luiz.dentz@gmail.com>
-Date: Wed, 5 Apr 2017 15:47:15 +0200
-Cc: Linux Bluetooth <linux-bluetooth@vger.kernel.org>,
-        Alexander Aring <aar@pengutronix.de>,
-        Jukka Rissanen <jukka.rissanen@linux.intel.com>,
-        linux-wpan@vger.kernel.org
-Message-Id: <6D8C6EC7-4E52-4C4B-8A2D-728880DDF938@holtmann.org>
+Return-Path: <linux-wpan-owner@vger.kernel.org>
+Message-ID: <1491395056.3437.8.camel@linux.intel.com>
+Subject: Re: [PATCH 3/3] Bluetooth: L2CAP: Don't return -EAGAIN if out of
+ credits
+From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        linux-bluetooth@vger.kernel.org
+Cc: aar@pengutronix.de, linux-wpan@vger.kernel.org
+Date: Wed, 05 Apr 2017 15:24:16 +0300
+In-Reply-To: <20170403144857.4661-3-luiz.dentz@gmail.com>
 References: <20170403144857.4661-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+         <20170403144857.4661-3-luiz.dentz@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Luiz,
 
-> During chan_recv_cb there is already a peer lookup which can be passed
-> to recv_pkt directly instead of the channel.
+On Mon, 2017-04-03 at 17:48 +0300, Luiz Augusto von Dentz wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> Just keep queueing them into TX queue since the caller might just
+> have
+> to do the same and there is no impact in adding another packet to the
+> TX queue even if there aren't any credits to transmit them.
 > 
 > Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 > ---
-> net/bluetooth/6lowpan.c | 15 ++++-----------
-> 1 file changed, 4 insertions(+), 11 deletions(-)
+>  net/bluetooth/l2cap_core.c | 3 ---
+>  1 file changed, 3 deletions(-)
+> 
+> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> index fc7f321..3a202b0 100644
+> --- a/net/bluetooth/l2cap_core.c
+> +++ b/net/bluetooth/l2cap_core.c
+> @@ -2458,9 +2458,6 @@ int l2cap_chan_send(struct l2cap_chan *chan,
+> struct msghdr *msg, size_t len)
+>  		if (len > chan->omtu)
+>  			return -EMSGSIZE;
+>  
+> -		if (!chan->tx_credits)
+> -			return -EAGAIN;
+> -
+>  		__skb_queue_head_init(&seg_queue);
+>  
+>  		err = l2cap_segment_le_sdu(chan, &seg_queue, msg,
+> len);
 
-all 3 patches have been applied to bluetooth-next tree.
 
-Regards
+Acked-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
 
-Marcel
+
+Cheers,
+Jukka
 
