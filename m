@@ -11,66 +11,65 @@ Cc: linux-arm-kernel@lists.infradead.org,
 	Satish Patel <satish.patel@linaro.org>,
 	netdev@vger.kernel.org,
 	devicetree@vger.kernel.org
-Subject: [PATCH 2/4] bluetooth: hci_uart: remove unused hci_uart_init_tty
-Date: Wed,  5 Apr 2017 13:30:03 -0500
-Message-Id: <20170405183005.20570-3-robh@kernel.org>
+Subject: [PATCH 1/4] dt-bindings: net: Add TI WiLink shared transport binding
+Date: Wed,  5 Apr 2017 13:30:02 -0500
+Message-Id: <20170405183005.20570-2-robh@kernel.org>
 In-Reply-To: <20170405183005.20570-1-robh@kernel.org>
 References: <20170405183005.20570-1-robh@kernel.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-There are no users of hci_uart_init_tty, so remove it.
+Add serial slave device binding for the TI WiLink series of Bluetooth/FM/GPS
+devices.
 
 Signed-off-by: Rob Herring <robh@kernel.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>
-Cc: Gustavo Padovan <gustavo@padovan.org>
-Cc: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
+Cc: Mark Rutland <mark.rutland@arm.com>
+Cc: netdev@vger.kernel.org
+Cc: devicetree@vger.kernel.org
 ---
- drivers/bluetooth/hci_ldisc.c | 19 -------------------
- drivers/bluetooth/hci_uart.h  |  1 -
- 2 files changed, 20 deletions(-)
+ .../devicetree/bindings/net/ti,wilink-st.txt       | 35 ++++++++++++++++++++++
+ 1 file changed, 35 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/net/ti,wilink-st.txt
 
-diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
-index 17bcbc13623f..cec4438ede01 100644
---- a/drivers/bluetooth/hci_ldisc.c
-+++ b/drivers/bluetooth/hci_ldisc.c
-@@ -319,25 +319,6 @@ void hci_uart_set_speeds(struct hci_uart *hu, unsigned int init_speed,
- 	hu->oper_speed = oper_speed;
- }
- 
--void hci_uart_init_tty(struct hci_uart *hu)
--{
--	struct tty_struct *tty = hu->tty;
--	struct ktermios ktermios;
--
--	/* Bring the UART into a known 8 bits no parity hw fc state */
--	ktermios = tty->termios;
--	ktermios.c_iflag &= ~(IGNBRK | BRKINT | PARMRK | ISTRIP |
--			      INLCR | IGNCR | ICRNL | IXON);
--	ktermios.c_oflag &= ~OPOST;
--	ktermios.c_lflag &= ~(ECHO | ECHONL | ICANON | ISIG | IEXTEN);
--	ktermios.c_cflag &= ~(CSIZE | PARENB);
--	ktermios.c_cflag |= CS8;
--	ktermios.c_cflag |= CRTSCTS;
--
--	/* tty_set_termios() return not checked as it is always 0 */
--	tty_set_termios(tty, &ktermios);
--}
--
- void hci_uart_set_baudrate(struct hci_uart *hu, unsigned int speed)
- {
- 	struct tty_struct *tty = hu->tty;
-diff --git a/drivers/bluetooth/hci_uart.h b/drivers/bluetooth/hci_uart.h
-index 1b41c661bbb8..2b05e557fad0 100644
---- a/drivers/bluetooth/hci_uart.h
-+++ b/drivers/bluetooth/hci_uart.h
-@@ -114,7 +114,6 @@ int hci_uart_register_device(struct hci_uart *hu, const struct hci_uart_proto *p
- 
- int hci_uart_tx_wakeup(struct hci_uart *hu);
- int hci_uart_init_ready(struct hci_uart *hu);
--void hci_uart_init_tty(struct hci_uart *hu);
- void hci_uart_set_baudrate(struct hci_uart *hu, unsigned int speed);
- void hci_uart_set_flow_control(struct hci_uart *hu, bool enable);
- void hci_uart_set_speeds(struct hci_uart *hu, unsigned int init_speed,
+diff --git a/Documentation/devicetree/bindings/net/ti,wilink-st.txt b/Documentation/devicetree/bindings/net/ti,wilink-st.txt
+new file mode 100644
+index 000000000000..cbad73a84ac4
+--- /dev/null
++++ b/Documentation/devicetree/bindings/net/ti,wilink-st.txt
+@@ -0,0 +1,35 @@
++TI WiLink 7/8 (wl12xx/wl18xx) Shared Transport BT/FM/GPS devices
++
++TI WiLink devices have a UART interface for providing Bluetooth, FM radio,
++and GPS over what's called "shared transport". The shared transport is
++standard BT HCI protocol with additional channels for the other functions.
++
++These devices also have a separate WiFi interface as described in
++wireless/ti,wlcore.txt.
++
++This bindings follows the UART slave device binding in
++../serial/slave-device.txt.
++
++Required properties:
++ - compatible: should be one of the following:
++    "ti,wl1271-st"
++    "ti,wl1273-st"
++    "ti,wl1831-st"
++    "ti,wl1835-st"
++    "ti,wl1837-st"
++
++Optional properties:
++ - enable-gpios : GPIO signal controlling enabling of BT. Active high.
++ - vio-supply : Vio input supply (1.8V)
++ - vbat-supply : Vbat input supply (2.9-4.8V)
++
++Example:
++
++&serial0 {
++	compatible = "ns16550a";
++	...
++	bluetooth {
++		compatible = "ti,wl1835-st";
++		enable-gpios = <&gpio1 7 GPIO_ACTIVE_HIGH>;
++	};
++};
 -- 
 2.10.1
