@@ -1,95 +1,69 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Message-ID: <1491394992.3437.6.camel@linux.intel.com>
-Subject: Re: [PATCH 1/3] Bluetooth: 6lowpan: Remove unnecessary peer lookup
-From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-bluetooth@vger.kernel.org
-Cc: aar@pengutronix.de, linux-wpan@vger.kernel.org
-Date: Wed, 05 Apr 2017 15:23:12 +0300
-In-Reply-To: <20170403144857.4661-1-luiz.dentz@gmail.com>
-References: <20170403144857.4661-1-luiz.dentz@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <sudeepta.bhuyan@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <CABBYNZ+pj_rpchfYs37Sj0Goddi1CL6VMU=C9wuh7=QxTHFnJA@mail.gmail.com>
+References: <CA+TC0NoAX-B362BS=s-kk3bhi4k75ygYV_Lix6F9vDoJsTMS-w@mail.gmail.com>
+ <5A0CB2AD-B99B-4929-A641-423CF8C7799C@holtmann.org> <CABBYNZ+pj_rpchfYs37Sj0Goddi1CL6VMU=C9wuh7=QxTHFnJA@mail.gmail.com>
+From: sudeepta bhuyan <sudeepta.bhuyan@gmail.com>
+Date: Wed, 5 Apr 2017 16:55:26 +0530
+Message-ID: <CA+TC0NpPLOJ=CVNdxHD+uRE7QBZ9X=hY6LDSN_VZQqPRYgC_Kg@mail.gmail.com>
+Subject: Re: Re-connect to BLE device in response to ADV_DIRECT_IND
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
-
-On Mon, 2017-04-03 at 17:48 +0300, Luiz Augusto von Dentz wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> During chan_recv_cb there is already a peer lookup which can be
-> passed
-> to recv_pkt directly instead of the channel.
-> 
-> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> ---
->  net/bluetooth/6lowpan.c | 15 ++++-----------
->  1 file changed, 4 insertions(+), 11 deletions(-)
-> 
-> diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
-> index b39da8d..2063e96 100644
-> --- a/net/bluetooth/6lowpan.c
-> +++ b/net/bluetooth/6lowpan.c
-> @@ -269,27 +269,20 @@ static int give_skb_to_upper(struct sk_buff
-> *skb, struct net_device *dev)
->  }
->  
->  static int iphc_decompress(struct sk_buff *skb, struct net_device
-> *netdev,
-> -			   struct l2cap_chan *chan)
-> +			   struct lowpan_peer *peer)
->  {
->  	const u8 *saddr;
->  	struct lowpan_btle_dev *dev;
-> -	struct lowpan_peer *peer;
->  
->  	dev = lowpan_btle_dev(netdev);
->  
-> -	rcu_read_lock();
-> -	peer = __peer_lookup_chan(dev, chan);
-> -	rcu_read_unlock();
-> -	if (!peer)
-> -		return -EINVAL;
-> -
->  	saddr = peer->lladdr;
->  
->  	return lowpan_header_decompress(skb, netdev, netdev-
-> >dev_addr, saddr);
->  }
->  
->  static int recv_pkt(struct sk_buff *skb, struct net_device *dev,
-> -		    struct l2cap_chan *chan)
-> +		    struct lowpan_peer *peer)
->  {
->  	struct sk_buff *local_skb;
->  	int ret;
-> @@ -342,7 +335,7 @@ static int recv_pkt(struct sk_buff *skb, struct
-> net_device *dev,
->  
->  		local_skb->dev = dev;
->  
-> -		ret = iphc_decompress(local_skb, dev, chan);
-> +		ret = iphc_decompress(local_skb, dev, peer);
->  		if (ret < 0) {
->  			kfree_skb(local_skb);
->  			goto drop;
-> @@ -388,7 +381,7 @@ static int chan_recv_cb(struct l2cap_chan *chan,
-> struct sk_buff *skb)
->  	if (!dev || !dev->netdev)
->  		return -ENOENT;
->  
-> -	err = recv_pkt(skb, dev->netdev, chan);
-> +	err = recv_pkt(skb, dev->netdev, peer);
->  	if (err) {
->  		BT_DBG("recv pkt %d", err);
->  		err = -EAGAIN;
+Thanks Marcel and  Luiz
+My application was always in active discovery mode. After disabling
+active discovery, auto connect started to work. I have read that this
+is an issue with linux kernel version < 3.17.
 
 
-Acked-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+Sudeepta
 
-
-Cheers,
-Jukka
-
-
+On Wed, Apr 5, 2017 at 4:46 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi Sudeepta,
+>
+> On Wed, Apr 5, 2017 at 4:14 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
+>> Hi Sudeepta,
+>>
+>>> I'm a BlueZ newbie and wanted your help regarding a problem that I'm
+>>> facing with a BLE project.
+>>>
+>>> I'm running BlueZ 5.42 in my linux machine and have written a
+>>> bluetooth application which communicates with a BLE device.
+>>> The application uses bluez dbus APIs for pairing and connecting to the
+>>> BLE device (device-api.txt and adapter-api.txt).
+>>> The BLE device is programmed to disconnect if left idle and send
+>>> ADV_DIRECT_IND if woken up.
+>>>
+>>> Using hcidump tool, I see that bluetoothd on my machine indeed
+>>> receives the ADV_DIRECT_IND message from the BLE device. However I'm
+>>> not able to figure out how my application can be made aware that such
+>>> an advertisement has been received and it should now reconnect to the
+>>> BLE device.
+>>>
+>>> I do not see any dbus API or signal using which the application can be
+>>> made aware of this event.
+>>>
+>>> Could you suggest me a solution to this? Are there any low level
+>>> settings/configuration which would make bluetoothd automatically
+>>> reconnect to the BLE device if it receives an ADV_DIRECT_IND?
+>>
+>> the kernel will auto-connect that device if it is in its auto-connect list. I think there are options via D-Bus to enable the auto-connect feature for certain devices.
+>
+> The applications needs to register itself with RegisterApplication and
+> have a matching GattProfile in order for bluetoothd to add a device to
+> the auto-connect list:
+>
+> https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/doc/gatt-api.txt
+>
+> Note, if device.Disconnect is called it will remove the device from
+> the auto-connect list, in that case device.Connect has to be called
+> manually in order to add the device back.
+>
+>
+>
+> --
+> Luiz Augusto von Dentz
