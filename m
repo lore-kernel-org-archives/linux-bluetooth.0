@@ -1,46 +1,49 @@
-Return-Path: <robherring2@gmail.com>
-From: Rob Herring <robh@kernel.org>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	linux-bluetooth@vger.kernel.org
-Cc: linux-arm-kernel@lists.infradead.org,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Wei Xu <xuwei5@hisilicon.com>,
-	Eyal Reizer <eyalr@ti.com>,
-	Satish Patel <satish.patel@linaro.org>,
-	netdev@vger.kernel.org,
-	devicetree@vger.kernel.org
-Subject: [PATCH 0/4] TI Bluetooth serdev support
-Date: Wed,  5 Apr 2017 13:30:01 -0500
-Message-Id: <20170405183005.20570-1-robh@kernel.org>
+Return-Path: <robh+dt@kernel.org>
+MIME-Version: 1.0
+In-Reply-To: <20170331133353.GA32267@kroah.com>
+References: <20170328155939.31566-1-sre@kernel.org> <CAL_JsqJcQ9ANtt71KRitOJ9spKD1SaeoL4RDftiCEPs8TjLJGA@mail.gmail.com>
+ <C1A408F2-1DF8-4F49-B399-B936542DE6BC@holtmann.org> <20170331133353.GA32267@kroah.com>
+From: Rob Herring <robh+dt@kernel.org>
+Date: Wed, 5 Apr 2017 13:16:58 -0500
+Message-ID: <CAL_Jsq+NU3M5yuBpK1UGgzCVvq0eABMApCqEe3_d5+tDaABsgQ@mail.gmail.com>
+Subject: Re: [PATCHv3 00/10] Nokia H4+ support
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Sebastian Reichel <sre@kernel.org>,
+	"Gustavo F. Padovan" <gustavo@padovan.org>, Johan Hedberg <johan.hedberg@gmail.com>,
+	Samuel Thibault <samuel.thibault@ens-lyon.org>, Pavel Machek <pavel@ucw.cz>,
+	Tony Lindgren <tony@atomide.com>, Jiri Slaby <jslaby@suse.com>, Mark Rutland <mark.rutland@arm.com>,
+	"open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+	"linux-serial@vger.kernel.org" <linux-serial@vger.kernel.org>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This series adds serdev support to the HCI LL protocol used on TI BT
-modules and enables support on HiKey board with with the WL1835 module.
-With this the custom TI UIM daemon and btattach are no longer needed.
+On Fri, Mar 31, 2017 at 8:33 AM, Greg Kroah-Hartman
+<gregkh@linuxfoundation.org> wrote:
+> On Wed, Mar 29, 2017 at 11:33:26PM +0200, Marcel Holtmann wrote:
+>> Hi Rob,
+>>
+>> >> Here is PATCHv3 for the Nokia bluetooth patchset. I addressed all comments from
+>> >> Rob and Pavel regarding the serdev patches and dropped the *.dts patches, since
+>> >> they were queued by Tony. I also changed the patch order, so that the serdev
+>> >> patches come first. All of them have Acked-by from Rob, so I think it makes
+>> >> sense to merge them to serdev subsystem (now) and provide an immutable branch
+>> >> for the bluetooth subsystem.
+>> >
+>> > Greg doesn't read cover letters generally and since the serdev patches
+>> > are Cc rather than To him, he's probably not planning to pick them up.
+>>
+>> I wonder actually if we should merge all of these via bluetooth-next
+>> tree with proper Ack from Greg. However it would be good to also get
+>> buy in from Dave for merging this ultimately through net-next.
+>
+> I don't really care where it goes.  I can take the whole thing in my
+> tty/serial tree now if no one objects and I get an ack from the relevant
+> maintainers {hint...}
 
-The series is available on this git branch[1]. Patch 2 is just clean-up
-and can be applied independently. Patch 3 is dependent on the series
-"Nokia H4+ support". I'd suggest both series are merged thru the BT tree.
+I think it is better if it goes thru BT tree. I have another driver
+converted that is dependent on this series. There's a couple other
+serdev changes on the list too, but this shouldn't depend on them.
 
 Rob
-
-[1] git://git.kernel.org/pub/scm/linux/kernel/git/robh/linux.git ti-bluetooth
-
-Rob Herring (4):
-  dt-bindings: net: Add TI WiLink shared transport binding
-  bluetooth: hci_uart: remove unused hci_uart_init_tty
-  bluetooth: hci_uart: add LL protocol serdev driver support
-  arm64: dts: hikey: add WL1835 Bluetooth device node
-
- .../devicetree/bindings/net/ti,wilink-st.txt       |  35 +++
- arch/arm64/boot/dts/hisilicon/hi6220-hikey.dts     |   5 +
- drivers/bluetooth/hci_ldisc.c                      |  19 --
- drivers/bluetooth/hci_ll.c                         | 261 ++++++++++++++++++++-
- drivers/bluetooth/hci_uart.h                       |   1 -
- 5 files changed, 300 insertions(+), 21 deletions(-)
- create mode 100644 Documentation/devicetree/bindings/net/ti,wilink-st.txt
-
---
-2.10.1
