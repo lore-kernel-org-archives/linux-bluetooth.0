@@ -1,41 +1,93 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Subject: Re: [RFC V1 00/16] hci_ldisc hci_uart_tty_close() fixes
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <ca51d648-55b9-fca8-d4b4-f19aa637197f@mentor.com>
-Date: Thu, 6 Apr 2017 09:23:44 +0200
-Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org
-Message-Id: <0D00FB91-A9A7-4307-B0BA-1B49BD1114A2@holtmann.org>
-References: <1490723429-28870-1-git-send-email-Dean_Jenkins@mentor.com>
- <AA3DD0DD-5CAC-4ADD-9B0C-4E652C93E4D6@holtmann.org>
- <ee49f939-1094-0ae0-0fa7-6c5cad112527@mentor.com>
- <119BB9FC-C735-405B-9A77-E9F102393B7D@holtmann.org>
- <3662704c-dfd4-67db-a2f9-45c949c45c6c@mentor.com>
- <ca51d648-55b9-fca8-d4b4-f19aa637197f@mentor.com>
-To: Dean Jenkins <Dean_Jenkins@mentor.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <pavel@ucw.cz>
+Date: Wed, 5 Apr 2017 22:28:56 +0200
+From: Pavel Machek <pavel@ucw.cz>
+To: Rob Herring <robh+dt@kernel.org>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Sebastian Reichel <sre@kernel.org>,
+	"Gustavo F. Padovan" <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Samuel Thibault <samuel.thibault@ens-lyon.org>,
+	Tony Lindgren <tony@atomide.com>, Jiri Slaby <jslaby@suse.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	"open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+	"linux-serial@vger.kernel.org" <linux-serial@vger.kernel.org>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"David S. Miller" <davem@davemloft.net>
+Subject: Re: [PATCHv3 00/10] Nokia H4+ support
+Message-ID: <20170405202856.GA4854@amd>
+References: <20170328155939.31566-1-sre@kernel.org>
+ <CAL_JsqJcQ9ANtt71KRitOJ9spKD1SaeoL4RDftiCEPs8TjLJGA@mail.gmail.com>
+ <C1A408F2-1DF8-4F49-B399-B936542DE6BC@holtmann.org>
+ <20170331133353.GA32267@kroah.com>
+ <CAL_Jsq+NU3M5yuBpK1UGgzCVvq0eABMApCqEe3_d5+tDaABsgQ@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="bp/iNruPH9dso1Pn"
+In-Reply-To: <CAL_Jsq+NU3M5yuBpK1UGgzCVvq0eABMApCqEe3_d5+tDaABsgQ@mail.gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Dean,
 
->>> If this is an issue in 4.10, then lets get this fixed / hardened.
->>> 
->> 
->> If I manage to produce some more useful results then I will post them.
->> 
-> 
-> I have now managed to crash the h4 Data Link protocol layer via hci_uart_tty_close().
-> 
-> This confirms that there is a design flaw in hci_uart_tty_close() which is independent of the Bluetooth Data Link protocol layers.
-> 
-> I don't have a Bluetooth Radio Module that uses h4 protocol so I used my BCSP enabled Bluetooth Radio Module that has a USB to serial interface. I realise that this is a weird setup but it is OK for this testcase because we need the h4 protocol to be timing out for transmissions. Also the BCSP Bluetooth Radio Module may send BCSP frames which will exercise the h4 receive path although rejection of the frames should occur which is as expected.
+--bp/iNruPH9dso1Pn
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-can you send me a patch set with my minor comments addressed. Then I have another look at it.
+On Wed 2017-04-05 13:16:58, Rob Herring wrote:
+> On Fri, Mar 31, 2017 at 8:33 AM, Greg Kroah-Hartman
+> <gregkh@linuxfoundation.org> wrote:
+> > On Wed, Mar 29, 2017 at 11:33:26PM +0200, Marcel Holtmann wrote:
+> >> Hi Rob,
+> >>
+> >> >> Here is PATCHv3 for the Nokia bluetooth patchset. I addressed all c=
+omments from
+> >> >> Rob and Pavel regarding the serdev patches and dropped the *.dts pa=
+tches, since
+> >> >> they were queued by Tony. I also changed the patch order, so that t=
+he serdev
+> >> >> patches come first. All of them have Acked-by from Rob, so I think =
+it makes
+> >> >> sense to merge them to serdev subsystem (now) and provide an immuta=
+ble branch
+> >> >> for the bluetooth subsystem.
+> >> >
+> >> > Greg doesn't read cover letters generally and since the serdev patch=
+es
+> >> > are Cc rather than To him, he's probably not planning to pick them u=
+p.
+> >>
+> >> I wonder actually if we should merge all of these via bluetooth-next
+> >> tree with proper Ack from Greg. However it would be good to also get
+> >> buy in from Dave for merging this ultimately through net-next.
+> >
+> > I don't really care where it goes.  I can take the whole thing in my
+> > tty/serial tree now if no one objects and I get an ack from the relevant
+> > maintainers {hint...}
+>=20
+> I think it is better if it goes thru BT tree. I have another driver
+> converted that is dependent on this series. There's a couple other
+> serdev changes on the list too, but this shouldn't depend on them.
 
-Regards
+I believe BT tree makes sense. Still it would be nice to get Greg's
+ACK ...?
 
-Marcel
+									Pavel
+--=20
+(english) http://www.livejournal.com/~pavelmachek
+(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blo=
+g.html
 
+--bp/iNruPH9dso1Pn
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: Digital signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAljlU4gACgkQMOfwapXb+vKSlgCgwAQ1xUEux3FwJeXT4ckoyptX
+dQcAn067vq0A19O5wzzsEfdsYi0a8fQE
+=/bfW
+-----END PGP SIGNATURE-----
+
+--bp/iNruPH9dso1Pn--
