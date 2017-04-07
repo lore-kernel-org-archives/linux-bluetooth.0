@@ -4,57 +4,51 @@ To: Marcel Holtmann <marcel@holtmann.org>
 CC: Dean Jenkins <Dean_Jenkins@mentor.com>, "Gustavo F . Padovan"
 	<gustavo@padovan.org>, Johan Hedberg <johan.hedberg@gmail.com>,
 	<linux-bluetooth@vger.kernel.org>
-Subject: [PATCH V2 12/16] Bluetooth: hci_ldisc: hci_uart_tty_close() detach tty after last msg
-Date: Fri, 7 Apr 2017 18:04:34 +0100
-Message-ID: <1491584678-27228-13-git-send-email-Dean_Jenkins@mentor.com>
+Subject: [PATCH V2 11/16] Bluetooth: hci_ldisc: hci_uart_tty_close() move hci_uart_close()
+Date: Fri, 7 Apr 2017 18:04:33 +0100
+Message-ID: <1491584678-27228-12-git-send-email-Dean_Jenkins@mentor.com>
 In-Reply-To: <1491584678-27228-1-git-send-email-Dean_Jenkins@mentor.com>
 References: <1491584678-27228-1-git-send-email-Dean_Jenkins@mentor.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-hci_uart_tty_close() is detaching the tty prematurely which prevents
-the Data Link protocol layer from using the tty serial port in the
-call to hci_unregister_dev().
+In hci_uart_tty_close() move hci_uart_close() to after the call to
+hci_unregister_dev() to avoid the tty flush in hci_uart_close()
+and clearance of HCI_RUNNING from corrupting the Data Link protocol
+layer's communication stream.
 
-Consequently, when hci_unregister_dev() attempts to send a HCI RESET
-command, the BCSP layer attempts to retransmit the message many times
-and the command is timed-out after HCI_CMD_TIMEOUT (2) seconds.
-Nothing was physically transmitted because the tty was detached too
-early.
-
-Therefore, move the detach statement "tty->disc_data = NULL" to after
-hci_unregister_dev() so that the HCI RESET command maybe sent and
-acknowledged.
+In fact, perform hci_uart_close() at the end of hci_uart_tty_close()
+where the Data Link protocol layer has been closed so that no
+more data can be written in the tty layer. This makes the flush
+clear out any non-sent data from the tty layer although this
+is probably unnecessary.
 
 Signed-off-by: Dean Jenkins <Dean_Jenkins@mentor.com>
 ---
- drivers/bluetooth/hci_ldisc.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ drivers/bluetooth/hci_ldisc.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
 diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
-index b2b6515..761282f 100644
+index 4a32fd2..b2b6515 100644
 --- a/drivers/bluetooth/hci_ldisc.c
 +++ b/drivers/bluetooth/hci_ldisc.c
-@@ -513,9 +513,6 @@ static void hci_uart_tty_close(struct tty_struct *tty)
- 
- 	BT_DBG("tty %p", tty);
- 
--	/* Detach from the tty */
--	tty->disc_data = NULL;
--
- 	if (!hu)
+@@ -520,8 +520,6 @@ static void hci_uart_tty_close(struct tty_struct *tty)
  		return;
  
-@@ -539,6 +536,9 @@ static void hci_uart_tty_close(struct tty_struct *tty)
- 		hu->proto->close(hu);
- 	}
+ 	hdev = hu->hdev;
+-	if (test_bit(HCI_UART_REGISTERED, &hu->flags))
+-		hci_uart_close(hdev);
  
-+	/* Detach from the tty */
-+	tty->disc_data = NULL;
-+
+ 	cancel_work_sync(&hu->write_work);
+ 
+@@ -544,6 +542,7 @@ static void hci_uart_tty_close(struct tty_struct *tty)
  	clear_bit(HCI_UART_PROTO_SET, &hu->flags);
  
  	if (test_and_clear_bit(HCI_UART_REGISTERED, &hu->flags)) {
++		hci_uart_close(hdev);
+ 		hu->hdev = NULL;
+ 		hci_free_dev(hdev);
+ 	}
 -- 
 2.7.4
