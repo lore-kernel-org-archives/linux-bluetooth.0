@@ -4,74 +4,59 @@ To: Marcel Holtmann <marcel@holtmann.org>
 CC: Dean Jenkins <Dean_Jenkins@mentor.com>, "Gustavo F . Padovan"
 	<gustavo@padovan.org>, Johan Hedberg <johan.hedberg@gmail.com>,
 	<linux-bluetooth@vger.kernel.org>
-Subject: [PATCH V2 14/16] Bluetooth: hci_ldisc: hci_uart_tty_close() free hu->tx_skb
-Date: Fri, 7 Apr 2017 18:04:36 +0100
-Message-ID: <1491584678-27228-15-git-send-email-Dean_Jenkins@mentor.com>
+Subject: [PATCH V2 13/16] Bluetooth: hci_ldisc: hci_uart_tty_close() move cancel_work_sync()
+Date: Fri, 7 Apr 2017 18:04:35 +0100
+Message-ID: <1491584678-27228-14-git-send-email-Dean_Jenkins@mentor.com>
 In-Reply-To: <1491584678-27228-1-git-send-email-Dean_Jenkins@mentor.com>
 References: <1491584678-27228-1-git-send-email-Dean_Jenkins@mentor.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-There is a race condition for accessing hu->tx_skb between
-hci_uart_flush() and hci_uart_dequeue() which runs in
-hci_uart_write_work() from the work queue hu->write_work. This race
-condition exists because there is no locking between these 2 threads
-to protect hu->tx_skb. Consequently a call to hci_uart_flush() might
-be able to free hu->tx_skb whilst hci_uart_write_work() is using
-hu->tx_skb which is undesirable as a crash could occur.
+The current location of cancel_work_sync() in hci_uart_tty_close()
+before the call to hci_unregister_dev(hdev) may momentarily interfere
+with the execution of hci_uart_tty_close() by waiting for an active call
+to hci_uart_write_work() to finish. However, its current location is
+ineffective at preventing a race condition described next.
 
-Performing any flushing in the transmission path between the Data Link
-protocol layer and the UART port may corrupt the data. So freeing
-hu->tx_skb or not freeing hu->tx_skb makes little difference to having
-intact data or corrupted data. So it is OK not to free hu->tx_skb.
+cancel_work_sync() is needed to try to prevent hci_uart_write_work() from
+running whilst the Data Link protocol layer is being unbound (closed).
+However, it is weak as a race condition exists between
+hci_uart_write_work() being scheduled via hci_uart_tx_wakeup() and
+closure of the Data Link protocol layer. In particular, the Data Link
+protocol layer may have a retransmission timer which will independently
+call hci_uart_tx_wakeup().
 
-Instead, move the freeing of hu->tx_skb to the end of
-hci_uart_tty_close() from hci_uart_flush(). This eliminates the race
-condition because the Data Link protocol layer is in the unbound state
-and ensures hu->tx_skb is freed before hu is freed. Also use a temporary
-pointer to allow hu->tx_skb to be set to NULL before freeing hu->tx_skb.
+To minimise the race condition, cancel_work_sync() needs to be as close
+as possible to the code that closes down the Data Link protocol layer.
+Therefore, move the cancel_work_sync() statement to be just before
+the code which unbinds (closes) the Data Link protocol layer.
 
 Signed-off-by: Dean Jenkins <Dean_Jenkins@mentor.com>
 ---
- drivers/bluetooth/hci_ldisc.c | 11 +++++++----
- 1 file changed, 7 insertions(+), 4 deletions(-)
+ drivers/bluetooth/hci_ldisc.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
 diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
-index 236c8e7..fbf830a 100644
+index 761282f..236c8e7 100644
 --- a/drivers/bluetooth/hci_ldisc.c
 +++ b/drivers/bluetooth/hci_ldisc.c
-@@ -237,10 +237,6 @@ static int hci_uart_flush(struct hci_dev *hdev)
+@@ -518,8 +518,6 @@ static void hci_uart_tty_close(struct tty_struct *tty)
  
- 	BT_DBG("hdev %p tty %p", hdev, tty);
+ 	hdev = hu->hdev;
  
--	if (hu->tx_skb) {
--		kfree_skb(hu->tx_skb); hu->tx_skb = NULL;
--	}
+-	cancel_work_sync(&hu->write_work);
 -
- 	/* Flush any pending characters in the driver and discipline. */
- 	tty_ldisc_flush(tty);
- 	tty_driver_flush_buffer(tty);
-@@ -510,6 +506,7 @@ static void hci_uart_tty_close(struct tty_struct *tty)
- 	struct hci_uart *hu = tty->disc_data;
- 	struct hci_dev *hdev;
- 	unsigned long flags;
-+	struct sk_buff *temp_skb;
+ 	if (test_bit(HCI_UART_REGISTERED, &hu->flags)) {
+ 		/* Note hci_unregister_dev() may try to send a HCI RESET
+ 		 * command. If the transmission fails then hci_unregister_dev()
+@@ -533,6 +531,7 @@ static void hci_uart_tty_close(struct tty_struct *tty)
+ 		clear_bit(HCI_UART_PROTO_READY, &hu->flags);
+ 		write_unlock_irqrestore(&hu->proto_lock, flags);
  
- 	BT_DBG("tty %p", tty);
- 
-@@ -546,6 +543,12 @@ static void hci_uart_tty_close(struct tty_struct *tty)
- 		hci_free_dev(hdev);
++		cancel_work_sync(&hu->write_work);
+ 		hu->proto->close(hu);
  	}
- 
-+	if (hu->tx_skb) {
-+		temp_skb = hu->tx_skb;
-+		hu->tx_skb = NULL;
-+		kfree_skb(temp_skb);
-+	}
-+
- 	kfree(hu);
- }
  
 -- 
 2.7.4
