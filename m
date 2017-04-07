@@ -1,57 +1,34 @@
-Return-Path: <dcbw@redhat.com>
-Message-ID: <1491595758.2136.28.camel@redhat.com>
-Subject: Re: [PATCH v2 3/4] bluetooth: hci_uart: add LL protocol serdev
- driver support
-From: Dan Williams <dcbw@redhat.com>
-To: Rob Herring <robh@kernel.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>, "open list:BLUETOOTH DRIVERS"
- <linux-bluetooth@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org"
- <linux-arm-kernel@lists.infradead.org>, Gustavo Padovan
- <gustavo@padovan.org>,  Johan Hedberg <johan.hedberg@gmail.com>, Mark
- Rutland <mark.rutland@arm.com>, Wei Xu <xuwei5@hisilicon.com>,  Eyal Reizer
- <eyalr@ti.com>, Satish Patel <satish.patel@linaro.org>, netdev
- <netdev@vger.kernel.org>, "devicetree@vger.kernel.org"
- <devicetree@vger.kernel.org>
-Date: Fri, 07 Apr 2017 15:09:18 -0500
-In-Reply-To: <CAL_Jsq+aM+xxbu=3v8_w9Ce+=t_pXmVWuisnckA8_8LOS-ftVA@mail.gmail.com>
-References: <20170407143516.9945-1-robh@kernel.org>
-	 <1491584978.2136.21.camel@redhat.com>
-	 <CAL_Jsq+aM+xxbu=3v8_w9Ce+=t_pXmVWuisnckA8_8LOS-ftVA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Mario Lang <mlang@delysid.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Mario Lang <mlang@delysid.org>
+Subject: [PATCH BlueZ] Use STOPPING=1 when shutting down
+Date: Fri,  7 Apr 2017 21:57:02 +0200
+Message-Id: <20170407195702.9990-1-mlang@delysid.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, 2017-04-07 at 13:48 -0500, Rob Herring wrote:
-> On Fri, Apr 7, 2017 at 12:09 PM, Dan Williams <dcbw@redhat.com>
-> wrote:
-> > On Fri, 2017-04-07 at 09:35 -0500, Rob Herring wrote:
-> > > Turns out that the LL protocol and the TI-ST are the same thing
-> > > AFAICT.
-> > > The TI-ST adds firmware loading, GPIO control, and shared access
-> > > for
-> > > NFC, FM radio, etc. For now, we're only implementing what is
-> > > needed
-> > > for
-> > > BT. This mirrors other drivers like BCM and Intel, but uses the
-> > > new
-> > > serdev bus.
-> > > 
-> > > The firmware loading is greatly simplified by using existing
-> > > infrastructure to send commands. It may be a bit slower than the
-> > > original code using synchronous functions, but the real
-> > > bottleneck is
-> > > likely doing firmware load at 115.2kbps.
-> > 
-> > Is there no way to put the TI-specific stuff into a TI UART module
-> > rather than building it into the generic one?
-> 
-> In case it's not clear, all of HCI_LL is the TI specific part, not
-> just what I'm adding. So you are talking about putting each UART BT
-> protocol into a separate module. I'd assume that is doable, but seems
-> orthogonal to this patch set. I'd also assume there was some reason
-> that was not done already.
+Quoting sd_notify(3):
 
-Ok, thanks for the explanation.  Wasn't clear at all from the file
-paths in the source tree; it looked generic.
+STOPPING=1
+    Tells the service manager that the service is beginning its shutdown.
+---
+ src/main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Dan
+diff --git a/src/main.c b/src/main.c
+index bcc1e6f..122b028 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -707,7 +707,7 @@ int main(int argc, char *argv[])
+ 
+ 	g_main_loop_run(event_loop);
+ 
+-	sd_notify(0, "STATUS=Quitting");
++	sd_notify(0, "STOPPING=1\nSTATUS=Quitting");
+ 
+ 	g_source_remove(signal);
+ 
+-- 
+2.9.3
+
