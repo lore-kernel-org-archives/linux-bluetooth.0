@@ -4,59 +4,57 @@ To: Marcel Holtmann <marcel@holtmann.org>
 CC: Dean Jenkins <Dean_Jenkins@mentor.com>, "Gustavo F . Padovan"
 	<gustavo@padovan.org>, Johan Hedberg <johan.hedberg@gmail.com>,
 	<linux-bluetooth@vger.kernel.org>
-Subject: [PATCH V2 13/16] Bluetooth: hci_ldisc: hci_uart_tty_close() move cancel_work_sync()
-Date: Fri, 7 Apr 2017 18:04:35 +0100
-Message-ID: <1491584678-27228-14-git-send-email-Dean_Jenkins@mentor.com>
+Subject: [PATCH V2 12/16] Bluetooth: hci_ldisc: hci_uart_tty_close() detach tty after last msg
+Date: Fri, 7 Apr 2017 18:04:34 +0100
+Message-ID: <1491584678-27228-13-git-send-email-Dean_Jenkins@mentor.com>
 In-Reply-To: <1491584678-27228-1-git-send-email-Dean_Jenkins@mentor.com>
 References: <1491584678-27228-1-git-send-email-Dean_Jenkins@mentor.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The current location of cancel_work_sync() in hci_uart_tty_close()
-before the call to hci_unregister_dev(hdev) may momentarily interfere
-with the execution of hci_uart_tty_close() by waiting for an active call
-to hci_uart_write_work() to finish. However, its current location is
-ineffective at preventing a race condition described next.
+hci_uart_tty_close() is detaching the tty prematurely which prevents
+the Data Link protocol layer from using the tty serial port in the
+call to hci_unregister_dev().
 
-cancel_work_sync() is needed to try to prevent hci_uart_write_work() from
-running whilst the Data Link protocol layer is being unbound (closed).
-However, it is weak as a race condition exists between
-hci_uart_write_work() being scheduled via hci_uart_tx_wakeup() and
-closure of the Data Link protocol layer. In particular, the Data Link
-protocol layer may have a retransmission timer which will independently
-call hci_uart_tx_wakeup().
+Consequently, when hci_unregister_dev() attempts to send a HCI RESET
+command, the BCSP layer attempts to retransmit the message many times
+and the command is timed-out after HCI_CMD_TIMEOUT (2) seconds.
+Nothing was physically transmitted because the tty was detached too
+early.
 
-To minimise the race condition, cancel_work_sync() needs to be as close
-as possible to the code that closes down the Data Link protocol layer.
-Therefore, move the cancel_work_sync() statement to be just before
-the code which unbinds (closes) the Data Link protocol layer.
+Therefore, move the detach statement "tty->disc_data = NULL" to after
+hci_unregister_dev() so that the HCI RESET command maybe sent and
+acknowledged.
 
 Signed-off-by: Dean Jenkins <Dean_Jenkins@mentor.com>
 ---
- drivers/bluetooth/hci_ldisc.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ drivers/bluetooth/hci_ldisc.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
-index 761282f..236c8e7 100644
+index b2b6515..761282f 100644
 --- a/drivers/bluetooth/hci_ldisc.c
 +++ b/drivers/bluetooth/hci_ldisc.c
-@@ -518,8 +518,6 @@ static void hci_uart_tty_close(struct tty_struct *tty)
+@@ -513,9 +513,6 @@ static void hci_uart_tty_close(struct tty_struct *tty)
  
- 	hdev = hu->hdev;
+ 	BT_DBG("tty %p", tty);
  
--	cancel_work_sync(&hu->write_work);
+-	/* Detach from the tty */
+-	tty->disc_data = NULL;
 -
- 	if (test_bit(HCI_UART_REGISTERED, &hu->flags)) {
- 		/* Note hci_unregister_dev() may try to send a HCI RESET
- 		 * command. If the transmission fails then hci_unregister_dev()
-@@ -533,6 +531,7 @@ static void hci_uart_tty_close(struct tty_struct *tty)
- 		clear_bit(HCI_UART_PROTO_READY, &hu->flags);
- 		write_unlock_irqrestore(&hu->proto_lock, flags);
+ 	if (!hu)
+ 		return;
  
-+		cancel_work_sync(&hu->write_work);
+@@ -539,6 +536,9 @@ static void hci_uart_tty_close(struct tty_struct *tty)
  		hu->proto->close(hu);
  	}
  
++	/* Detach from the tty */
++	tty->disc_data = NULL;
++
+ 	clear_bit(HCI_UART_PROTO_SET, &hu->flags);
+ 
+ 	if (test_and_clear_bit(HCI_UART_REGISTERED, &hu->flags)) {
 -- 
 2.7.4
