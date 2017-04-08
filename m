@@ -1,64 +1,40 @@
-Return-Path: <gregkh@linuxfoundation.org>
-Date: Sat, 8 Apr 2017 18:57:40 +0200
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: Sebastian Reichel <sre@kernel.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Samuel Thibault <samuel.thibault@ens-lyon.org>,
-	Pavel Machek <pavel@ucw.cz>, Tony Lindgren <tony@atomide.com>,
-	Jiri Slaby <jslaby@suse.com>, Mark Rutland <mark.rutland@arm.com>,
-	linux-bluetooth@vger.kernel.org, linux-serial@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCHv3 02/10] serdev: add serdev_device_wait_until_sent
-Message-ID: <20170408165740.GA20058@kroah.com>
-References: <20170328155939.31566-1-sre@kernel.org>
- <20170328155939.31566-3-sre@kernel.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170328155939.31566-3-sre@kernel.org>
+In-Reply-To: <20170408071834.GA12144@x1c>
+References: <CAAu3APbw0JyPfKUi6PZ4Nr2Uh5WXtDprDVFBTj3xr+801b9L6w@mail.gmail.com>
+ <CAAu3APbMKQY2dnD=TUAb_3BqFKk0s2bzuFFLX8=h-1g7gm8G=Q@mail.gmail.com> <20170408071834.GA12144@x1c>
+From: Barry Byford <31baz66@gmail.com>
+Date: Sat, 8 Apr 2017 08:57:47 +0100
+Message-ID: <CAAu3APZQnDvwPF-gatJQ9MX9N1-oBREciP+XYHDumDAcK4tkfg@mail.gmail.com>
+Subject: Re: Serial Port connection with DBus API
+To: Bluez mailing list <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, Mar 28, 2017 at 05:59:31PM +0200, Sebastian Reichel wrote:
-> Add method, which waits until the transmission buffer has been sent.
-> Note, that the change in ttyport_write_wakeup is related, since
-> tty_wait_until_sent will hang without that change.
-> 
-> Acked-by: Rob Herring <robh@kernel.org>
-> Acked-by: Pavel Machek <pavel@ucw.cz>
-> Signed-off-by: Sebastian Reichel <sre@kernel.org>
-> ---
-> Changes since PATCHv2:
->  * Avoid goto in ttyport_write_wakeup
-> ---
->  drivers/tty/serdev/core.c           | 11 +++++++++++
->  drivers/tty/serdev/serdev-ttyport.c | 18 ++++++++++++++----
->  include/linux/serdev.h              |  3 +++
->  3 files changed, 28 insertions(+), 4 deletions(-)
-> 
-> diff --git a/drivers/tty/serdev/core.c b/drivers/tty/serdev/core.c
-> index f4c6c90add78..a63b74031e22 100644
-> --- a/drivers/tty/serdev/core.c
-> +++ b/drivers/tty/serdev/core.c
-> @@ -173,6 +173,17 @@ void serdev_device_set_flow_control(struct serdev_device *serdev, bool enable)
->  }
->  EXPORT_SYMBOL_GPL(serdev_device_set_flow_control);
->  
-> +void serdev_device_wait_until_sent(struct serdev_device *serdev, long timeout)
-> +{
-> +	struct serdev_controller *ctrl = serdev->ctrl;
-> +
-> +	if (!ctrl || !ctrl->ops->wait_until_sent)
-> +		return;
-> +
-> +	ctrl->ops->wait_until_sent(ctrl, timeout);
-> +}
-> +EXPORT_SYMBOL_GPL(serdev_device_wait_until_sent);
+Hi Johan,
 
-Is this still needed now that we have serdev_device_write() with an
-unlimited timeout available?
+On 8 April 2017 at 08:18, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi Barry,
+>
+> On Fri, Apr 07, 2017, Barry Byford wrote:
+>> = bluetoothd: Invalid value for profile option Channel
+>
+> Let's look at your code:
+>
+>> >             'Channel': GLib.Variant('i', 1),
+>
+> Yep, that's wrong. The expected D-Bus type for 'Channel' is UINT16,
+> which is 'q' and not 'i'.
 
-thanks,
+Works like a charm. Thanks.
 
-greg k-h
+
+>> = bluetoothd: RFCOMM server failed for SerialPort: socket(STREAM,
+>> RFCOMM): Protocol not supported (93)
+>
+> That usually means that your kernel is incorrectly configured and
+> lacking RFCOMM support.
+
+Ah! Sounds like more of an issue. Gives me something to investigate.
+Thanks again.
