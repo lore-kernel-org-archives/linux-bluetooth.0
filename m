@@ -1,9 +1,10 @@
 Return-Path: <sre@kernel.org>
-Date: Tue, 11 Apr 2017 01:10:42 +0200
+Date: Mon, 10 Apr 2017 19:10:45 +0200
 From: Sebastian Reichel <sre@kernel.org>
-To: Marcel Holtmann <marcel@holtmann.org>
+To: Rob Herring <robh+dt@kernel.org>
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	"Gustavo F. Padovan" <gustavo@padovan.org>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
 	Johan Hedberg <johan.hedberg@gmail.com>,
 	Samuel Thibault <samuel.thibault@ens-lyon.org>,
 	Pavel Machek <pavel@ucw.cz>, Tony Lindgren <tony@atomide.com>,
@@ -12,88 +13,131 @@ Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	"linux-serial@vger.kernel.org" <linux-serial@vger.kernel.org>,
 	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
 	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Rob Herring <robh+dt@kernel.org>
-Subject: Re: [PATCHv3 00/10] Nokia H4+ support
-Message-ID: <20170410231041.vz35anezpzhscu4t@earth>
+	Andrey Smirnov <andrew.smirnov@gmail.com>
+Subject: Re: [PATCHv3 02/10] serdev: add serdev_device_wait_until_sent
+Message-ID: <20170410171045.xzqr2n5hzyfzyyru@earth>
 References: <20170328155939.31566-1-sre@kernel.org>
- <CAL_JsqJcQ9ANtt71KRitOJ9spKD1SaeoL4RDftiCEPs8TjLJGA@mail.gmail.com>
- <C1A408F2-1DF8-4F49-B399-B936542DE6BC@holtmann.org>
- <20170331133353.GA32267@kroah.com>
- <CAL_Jsq+NU3M5yuBpK1UGgzCVvq0eABMApCqEe3_d5+tDaABsgQ@mail.gmail.com>
+ <20170328155939.31566-3-sre@kernel.org>
+ <20170408165740.GA20058@kroah.com>
+ <CAL_JsqLK=pbF7Nx-2w98t62N53zbL1oGZpGEbZUK-xg5ms4AZw@mail.gmail.com>
+ <20170410140313.GA31894@kroah.com>
+ <CAL_JsqJCjob6NDfHe0r7X3dXPEniKh5vChXhBxfyHZRu7Fov7A@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="dipfilb2pjqlqp5r"
-In-Reply-To: <CAL_Jsq+NU3M5yuBpK1UGgzCVvq0eABMApCqEe3_d5+tDaABsgQ@mail.gmail.com>
+	protocol="application/pgp-signature"; boundary="qftuitvjemplad6x"
+In-Reply-To: <CAL_JsqJCjob6NDfHe0r7X3dXPEniKh5vChXhBxfyHZRu7Fov7A@mail.gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 
---dipfilb2pjqlqp5r
+--qftuitvjemplad6x
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
 Hi,
 
-On Wed, Apr 05, 2017 at 01:16:58PM -0500, Rob Herring wrote:
-> On Fri, Mar 31, 2017 at 8:33 AM, Greg Kroah-Hartman
+On Mon, Apr 10, 2017 at 11:12:39AM -0500, Rob Herring wrote:
+> On Mon, Apr 10, 2017 at 9:03 AM, Greg Kroah-Hartman
 > <gregkh@linuxfoundation.org> wrote:
-> > On Wed, Mar 29, 2017 at 11:33:26PM +0200, Marcel Holtmann wrote:
-> >> Hi Rob,
-> >>
-> >> >> Here is PATCHv3 for the Nokia bluetooth patchset. I addressed all c=
-omments from
-> >> >> Rob and Pavel regarding the serdev patches and dropped the *.dts pa=
-tches, since
-> >> >> they were queued by Tony. I also changed the patch order, so that t=
-he serdev
-> >> >> patches come first. All of them have Acked-by from Rob, so I think =
-it makes
-> >> >> sense to merge them to serdev subsystem (now) and provide an immuta=
-ble branch
-> >> >> for the bluetooth subsystem.
+> > On Mon, Apr 10, 2017 at 08:46:57AM -0500, Rob Herring wrote:
+> >> On Sat, Apr 8, 2017 at 11:57 AM, Greg Kroah-Hartman
+> >> <gregkh@linuxfoundation.org> wrote:
+> >> > On Tue, Mar 28, 2017 at 05:59:31PM +0200, Sebastian Reichel wrote:
+> >> >> Add method, which waits until the transmission buffer has been sent.
+> >> >> Note, that the change in ttyport_write_wakeup is related, since
+> >> >> tty_wait_until_sent will hang without that change.
+> >> >>
+> >> >> Acked-by: Rob Herring <robh@kernel.org>
+> >> >> Acked-by: Pavel Machek <pavel@ucw.cz>
+> >> >> Signed-off-by: Sebastian Reichel <sre@kernel.org>
+> >> >> ---
+> >> >> Changes since PATCHv2:
+> >> >>  * Avoid goto in ttyport_write_wakeup
+> >> >> ---
+> >> >>  drivers/tty/serdev/core.c           | 11 +++++++++++
+> >> >>  drivers/tty/serdev/serdev-ttyport.c | 18 ++++++++++++++----
+> >> >>  include/linux/serdev.h              |  3 +++
+> >> >>  3 files changed, 28 insertions(+), 4 deletions(-)
+> >> >>
+> >> >> diff --git a/drivers/tty/serdev/core.c b/drivers/tty/serdev/core.c
+> >> >> index f4c6c90add78..a63b74031e22 100644
+> >> >> --- a/drivers/tty/serdev/core.c
+> >> >> +++ b/drivers/tty/serdev/core.c
+> >> >> @@ -173,6 +173,17 @@ void serdev_device_set_flow_control(struct ser=
+dev_device *serdev, bool enable)
+> >> >>  }
+> >> >>  EXPORT_SYMBOL_GPL(serdev_device_set_flow_control);
+> >> >>
+> >> >> +void serdev_device_wait_until_sent(struct serdev_device *serdev, l=
+ong timeout)
+> >> >> +{
+> >> >> +     struct serdev_controller *ctrl =3D serdev->ctrl;
+> >> >> +
+> >> >> +     if (!ctrl || !ctrl->ops->wait_until_sent)
+> >> >> +             return;
+> >> >> +
+> >> >> +     ctrl->ops->wait_until_sent(ctrl, timeout);
+> >> >> +}
+> >> >> +EXPORT_SYMBOL_GPL(serdev_device_wait_until_sent);
 > >> >
-> >> > Greg doesn't read cover letters generally and since the serdev patch=
-es
-> >> > are Cc rather than To him, he's probably not planning to pick them u=
-p.
+> >> > Is this still needed now that we have serdev_device_write() with an
+> >> > unlimited timeout available?
 > >>
-> >> I wonder actually if we should merge all of these via bluetooth-next
-> >> tree with proper Ack from Greg. However it would be good to also get
-> >> buy in from Dave for merging this ultimately through net-next.
+> >> Yes, because only this waits until the data is on the wire.
 > >
-> > I don't really care where it goes.  I can take the whole thing in my
-> > tty/serial tree now if no one objects and I get an ack from the relevant
-> > maintainers {hint...}
+> > What "wire" is that?  The serial wire?  How do you know this?  Many usb
+> > to serial devices have no way to determine this, given that there is
+> > another uart hanging off of the end of a USB connection.
 >=20
-> I think it is better if it goes thru BT tree. I have another driver
-> converted that is dependent on this series. There's a couple other
-> serdev changes on the list too, but this shouldn't depend on them.
+> Okay, maybe it's just out of linux s/w buffers for h/w which you don't
+> know. It is the same semantics as tty_wait_until_sent which is
+> documented as: "Wait for characters pending in a tty driver to hit the
+> wire, or for a timeout to occur (eg due to flow control)"
 
-Is this waiting for something, or could it be queued to
-bluetooth-next then? It would be nice to finally have
-this in 4.12 :)
+For embedded h/w it usually means the serial wire. tty_wait_until_sent()
+first waits for the tty buffer to be empty and then calls wait_until_sent()
+in the driver providing the tty. In case of serial-core that is
+implemented by uart_wait_until_sent(), which waits for the serial
+driver's tx_empty() operation becoming true (grepping for
+".tx_empty" returned 81 hits for me). Also at least some of the usb to
+serial adapters seem to support this using usb_serial_generic_wait_until_se=
+nt()
+and ".tx_empty":
+
+$ git grep "\.tx_empty"
+cp210x.c:       .tx_empty               =3D cp210x_tx_empty,
+f81534.c:       .tx_empty =3D             f81534_tx_empty,
+ftdi_sio.c:     .tx_empty =3D             ftdi_tx_empty,
+io_ti.c:        .tx_empty               =3D edge_tx_empty,
+io_ti.c:        .tx_empty               =3D edge_tx_empty,
+mxuport.c:      .tx_empty               =3D mxuport_tx_empty,
+ti_usb_3410_5052.c:     .tx_empty               =3D ti_tx_empty,
+ti_usb_3410_5052.c:     .tx_empty               =3D ti_tx_empty,
+
+The other ones will only wait for empty s/w buffer, but that's
+already the case for tty_wait_until_sent(), so IMHO a different
+problem.
 
 -- Sebastian
 
---dipfilb2pjqlqp5r
+--qftuitvjemplad6x
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAABCgAdFiEE72YNB0Y/i3JqeVQT2O7X88g7+poFAljsEO4ACgkQ2O7X88g7
-+prlVw/8D5yHLn3bud/tGu5Vxk2egECRmepJuyttsUYiZJZnL23cxCcD5jIiFV69
-FnrDbIUqhOCrDRHGI4Iz1nzYSBQj+XhN/TTY9ZrfPEqZ5vicKpLFjqPZ0U/Oksfw
-Ok2uGpFzneXo9LJp7nMBK2+d8hxDR1bYb/x0bmwDbRJGfWzkhf55aJHXijU21pa8
-2hguISP3yavnNCHv/mymGms+rRBjW23FF6fOEDwpexC3zO4HDy39Dw6Age0qzjWl
-kHOFbTeG1Hw2ZD3w9OW7ROBIIEhG8zKSC/XseMFI8af5LR/7paL9BmLITug8qkh9
-lbzlulq/t3cxAxX7RQeSait1bUjyOQmbHn9KWLYvL1Z05R3YlzHE3Io9Dz7HBoml
-hI6/IgvTI7mafzKgnL48cvJPv7Tkpk0l5g72Iw7/MGPnVGAuvhAxlWuD6GzfFYrt
-IHdso9aWvybdwfHQifu4j+nZxrE26lBok0B3fTAM8nQrl1EUHVDK428f3vR4Rp9n
-RUbr9Ms+yPBWFEUN5VABVPqlKAcVDLPdB3ACm2YPEOF0FUJvc3n8k6AtYbKb9csA
-QE17f+iEyhEhH2mOb7clb4+1At97fKu3WpsKF8FWpgNQXfu8RB3XNzpg+7ZdUHaw
-4sfu+LmCPmRvLn0cLVwFaA5MXs0UvwH2Sm+2F6VE5qKBEydIJYU=
-=S+Rs
+iQIzBAABCgAdFiEE72YNB0Y/i3JqeVQT2O7X88g7+poFAljrvJMACgkQ2O7X88g7
++pqfyQ//eRgPEGVb9ShFmv8yUuzo4/CiSl9cgKiDcOaDDw+NPYQ36FO5kbN4ScMy
+mkCtpMzZi5BvX5c0fhDxCFsp9aQiLX5R5EvjmgYf2TSO5gNmgiglA1HFPOG85Xl8
+TCY8g40W8knLD2pEfKPWrYOKTU5QmTBu/rgnBElv3IsUhE/sfTzJJNrfof6XhcPZ
+VlMrjQvwnA6XBMTpIM+Wo3RHzD9cGub4inGYPoVCS7E5saZvIKdR1G0QYtSejp/i
+edyJcTTJe+wnwTVxT+RL05orfBEffOpWWrOQQxwcOAJjdXobG3lp/mGmGzlvR5aU
+5XLjfZPK8mjzmZuoGOX7fVEFtRqZ0m8P0fp2/YOcXmomUspmD7fYda7yv2SCrjzb
+Fy2kbdpLoEQxbNQoKU7EZle2ffcI7WanAeV4iJO789NMoUV3Jf2KwnGTmHXY8sNS
+nOLKs1DWuZQ5PKkC6pOMv1Bw3ZZeE9RLcujMihoaXCFdVaFh8T3yHS/x0DpRj1Rm
+47EShWDWqWCA+FiWbgAY8Uo9ZkYcY1yX2ajAdjdXZj79XoYl0qd2UcM7lFnJi/g5
+6zxgucgoRyMNl/xiUnUo3tQUJQ1WWaVmBW3lmHUBBv5ErydN0LU4NJOeRCfFDCIl
+LrKgs+xktNSr+JPTE5+aPPIA996EsL5PlNUKEigK6ZYA35UdIeo=
+=0rjz
 -----END PGP SIGNATURE-----
 
---dipfilb2pjqlqp5r--
+--qftuitvjemplad6x--
