@@ -3,9 +3,9 @@ From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: patrik.flykt@linux.intel.com, aar@pengutronix.de,
         jukka.rissanen@linux.intel.com, linux-wpan@vger.kernel.org
-Subject: [PATCH 3/6] Bluetooth: 6lowpan: Use netif APIs to flow control
-Date: Tue, 11 Apr 2017 22:21:00 +0300
-Message-Id: <20170411192103.3209-3-luiz.dentz@gmail.com>
+Subject: [PATCH 4/6] Bluetooth: L2CAP: Add l2cap_le_flowctl_send
+Date: Tue, 11 Apr 2017 22:21:01 +0300
+Message-Id: <20170411192103.3209-4-luiz.dentz@gmail.com>
 In-Reply-To: <20170411192103.3209-1-luiz.dentz@gmail.com>
 References: <20170411192103.3209-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -13,47 +13,67 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Rely on netif_wake_queue and netif_stop_queue to flow control when
-transmit resources are unavailable.
+Consolidate code sending data to LE CoC channels and adds proper
+accounting of packets sent, the remaining credits and how many packets
+are queued.
 
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
- net/bluetooth/6lowpan.c | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+ net/bluetooth/l2cap_core.c | 27 +++++++++++++++++++--------
+ 1 file changed, 19 insertions(+), 8 deletions(-)
 
-diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
-index 22bd936..dc7fda3 100644
---- a/net/bluetooth/6lowpan.c
-+++ b/net/bluetooth/6lowpan.c
-@@ -867,12 +867,28 @@ static struct sk_buff *chan_alloc_skb_cb(struct l2cap_chan *chan,
- 
- static void chan_suspend_cb(struct l2cap_chan *chan)
- {
-+	struct lowpan_btle_dev *dev;
-+
- 	BT_DBG("chan %p suspend", chan);
-+
-+	dev = lookup_dev(chan->conn);
-+	if (!dev || !dev->netdev)
-+		return;
-+
-+	netif_stop_queue(dev->netdev);
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 3a202b0..f88ac995 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -2425,6 +2425,22 @@ static int l2cap_segment_le_sdu(struct l2cap_chan *chan,
+ 	return 0;
  }
  
- static void chan_resume_cb(struct l2cap_chan *chan)
++static void l2cap_le_flowctl_send(struct l2cap_chan *chan)
++{
++	int sent = 0;
++
++	BT_DBG("chan %p", chan);
++
++	while (chan->tx_credits && !skb_queue_empty(&chan->tx_q)) {
++		l2cap_do_send(chan, skb_dequeue(&chan->tx_q));
++		chan->tx_credits--;
++		sent++;
++	}
++
++	BT_DBG("Sent %d credits %u queued %u", sent, chan->tx_credits,
++	       skb_queue_len(&chan->tx_q));
++}
++
+ int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len)
  {
-+	struct lowpan_btle_dev *dev;
-+
- 	BT_DBG("chan %p resume", chan);
-+
-+	dev = lookup_dev(chan->conn);
-+	if (!dev || !dev->netdev)
-+		return;
-+
-+	netif_wake_queue(dev->netdev);
- }
+ 	struct sk_buff *skb;
+@@ -2472,10 +2488,7 @@ int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len)
  
- static long chan_get_sndtimeo_cb(struct l2cap_chan *chan)
+ 		skb_queue_splice_tail_init(&seg_queue, &chan->tx_q);
+ 
+-		while (chan->tx_credits && !skb_queue_empty(&chan->tx_q)) {
+-			l2cap_do_send(chan, skb_dequeue(&chan->tx_q));
+-			chan->tx_credits--;
+-		}
++		l2cap_le_flowctl_send(chan);
+ 
+ 		if (!chan->tx_credits)
+ 			chan->ops->suspend(chan);
+@@ -5567,10 +5580,8 @@ static inline int l2cap_le_credits(struct l2cap_conn *conn,
+ 
+ 	chan->tx_credits += credits;
+ 
+-	while (chan->tx_credits && !skb_queue_empty(&chan->tx_q)) {
+-		l2cap_do_send(chan, skb_dequeue(&chan->tx_q));
+-		chan->tx_credits--;
+-	}
++	/* Resume sending */
++	l2cap_le_flowctl_send(chan);
+ 
+ 	if (chan->tx_credits)
+ 		chan->ops->resume(chan);
 -- 
 2.9.3
 
