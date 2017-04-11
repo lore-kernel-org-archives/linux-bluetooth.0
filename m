@@ -1,79 +1,48 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <linux-wpan-owner@vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: patrik.flykt@linux.intel.com, aar@pengutronix.de,
         jukka.rissanen@linux.intel.com, linux-wpan@vger.kernel.org
-Subject: [PATCH 4/6] Bluetooth: L2CAP: Add l2cap_le_flowctl_send
-Date: Tue, 11 Apr 2017 22:21:01 +0300
-Message-Id: <20170411192103.3209-4-luiz.dentz@gmail.com>
+Subject: [PATCH 2/6] Bluetooth: 6lowpan: Don't drop packets when run out of credits
+Date: Tue, 11 Apr 2017 22:20:59 +0300
+Message-Id: <20170411192103.3209-2-luiz.dentz@gmail.com>
 In-Reply-To: <20170411192103.3209-1-luiz.dentz@gmail.com>
 References: <20170411192103.3209-1-luiz.dentz@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Consolidate code sending data to LE CoC channels and adds proper
-accounting of packets sent, the remaining credits and how many packets
-are queued.
+Since l2cap_chan_send will now queue the packets there is no point in
+checking the credits anymore.
 
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
- net/bluetooth/l2cap_core.c | 27 +++++++++++++++++++--------
- 1 file changed, 19 insertions(+), 8 deletions(-)
+ net/bluetooth/6lowpan.c | 11 ++---------
+ 1 file changed, 2 insertions(+), 9 deletions(-)
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 3a202b0..f88ac995 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -2425,6 +2425,22 @@ static int l2cap_segment_le_sdu(struct l2cap_chan *chan,
- 	return 0;
- }
+diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
+index 5b91e85..22bd936 100644
+--- a/net/bluetooth/6lowpan.c
++++ b/net/bluetooth/6lowpan.c
+@@ -478,15 +478,8 @@ static int send_pkt(struct l2cap_chan *chan, struct sk_buff *skb,
+ 		return 0;
+ 	}
  
-+static void l2cap_le_flowctl_send(struct l2cap_chan *chan)
-+{
-+	int sent = 0;
-+
-+	BT_DBG("chan %p", chan);
-+
-+	while (chan->tx_credits && !skb_queue_empty(&chan->tx_q)) {
-+		l2cap_do_send(chan, skb_dequeue(&chan->tx_q));
-+		chan->tx_credits--;
-+		sent++;
-+	}
-+
-+	BT_DBG("Sent %d credits %u queued %u", sent, chan->tx_credits,
-+	       skb_queue_len(&chan->tx_q));
-+}
-+
- int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len)
- {
- 	struct sk_buff *skb;
-@@ -2472,10 +2488,7 @@ int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len)
- 
- 		skb_queue_splice_tail_init(&seg_queue, &chan->tx_q);
- 
--		while (chan->tx_credits && !skb_queue_empty(&chan->tx_q)) {
--			l2cap_do_send(chan, skb_dequeue(&chan->tx_q));
--			chan->tx_credits--;
--		}
-+		l2cap_le_flowctl_send(chan);
- 
- 		if (!chan->tx_credits)
- 			chan->ops->suspend(chan);
-@@ -5567,10 +5580,8 @@ static inline int l2cap_le_credits(struct l2cap_conn *conn,
- 
- 	chan->tx_credits += credits;
- 
--	while (chan->tx_credits && !skb_queue_empty(&chan->tx_q)) {
--		l2cap_do_send(chan, skb_dequeue(&chan->tx_q));
--		chan->tx_credits--;
+-	if (!err)
+-		err = (!chan->tx_credits ? -EAGAIN : 0);
+-
+-	if (err < 0) {
+-		if (err == -EAGAIN)
+-			netdev->stats.tx_dropped++;
+-		else
+-			netdev->stats.tx_errors++;
 -	}
-+	/* Resume sending */
-+	l2cap_le_flowctl_send(chan);
++	if (err < 0)
++		netdev->stats.tx_errors++;
  
- 	if (chan->tx_credits)
- 		chan->ops->resume(chan);
+ 	return err;
+ }
 -- 
 2.9.3
 
