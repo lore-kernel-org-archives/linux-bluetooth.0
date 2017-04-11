@@ -1,38 +1,59 @@
-Return-Path: <linux-wpan-owner@vger.kernel.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: patrik.flykt@linux.intel.com, aar@pengutronix.de,
         jukka.rissanen@linux.intel.com, linux-wpan@vger.kernel.org
-Subject: [PATCH 1/6] 6lowpan: Don't set IFF_NO_QUEUE
-Date: Tue, 11 Apr 2017 22:20:58 +0300
-Message-Id: <20170411192103.3209-1-luiz.dentz@gmail.com>
-Sender: linux-wpan-owner@vger.kernel.org
+Subject: [PATCH 3/6] Bluetooth: 6lowpan: Use netif APIs to flow control
+Date: Tue, 11 Apr 2017 22:21:00 +0300
+Message-Id: <20170411192103.3209-3-luiz.dentz@gmail.com>
+In-Reply-To: <20170411192103.3209-1-luiz.dentz@gmail.com>
+References: <20170411192103.3209-1-luiz.dentz@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-There is no point in setting IFF_NO_QUEUE should already have taken
-care of setting it if tx_queue_len is not set, in fact this may
-actually disable queue for interfaces that require it and do set
-tx_queue_len.
+Rely on netif_wake_queue and netif_stop_queue to flow control when
+transmit resources are unavailable.
 
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
- net/6lowpan/core.c | 1 -
- 1 file changed, 1 deletion(-)
+ net/bluetooth/6lowpan.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-diff --git a/net/6lowpan/core.c b/net/6lowpan/core.c
-index 5f9909a..40d3d72 100644
---- a/net/6lowpan/core.c
-+++ b/net/6lowpan/core.c
-@@ -35,7 +35,6 @@ int lowpan_register_netdevice(struct net_device *dev,
+diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
+index 22bd936..dc7fda3 100644
+--- a/net/bluetooth/6lowpan.c
++++ b/net/bluetooth/6lowpan.c
+@@ -867,12 +867,28 @@ static struct sk_buff *chan_alloc_skb_cb(struct l2cap_chan *chan,
  
- 	dev->type = ARPHRD_6LOWPAN;
- 	dev->mtu = IPV6_MIN_MTU;
--	dev->priv_flags |= IFF_NO_QUEUE;
+ static void chan_suspend_cb(struct l2cap_chan *chan)
+ {
++	struct lowpan_btle_dev *dev;
++
+ 	BT_DBG("chan %p suspend", chan);
++
++	dev = lookup_dev(chan->conn);
++	if (!dev || !dev->netdev)
++		return;
++
++	netif_stop_queue(dev->netdev);
+ }
  
- 	lowpan_dev(dev)->lltype = lltype;
+ static void chan_resume_cb(struct l2cap_chan *chan)
+ {
++	struct lowpan_btle_dev *dev;
++
+ 	BT_DBG("chan %p resume", chan);
++
++	dev = lookup_dev(chan->conn);
++	if (!dev || !dev->netdev)
++		return;
++
++	netif_wake_queue(dev->netdev);
+ }
  
+ static long chan_get_sndtimeo_cb(struct l2cap_chan *chan)
 -- 
 2.9.3
 
