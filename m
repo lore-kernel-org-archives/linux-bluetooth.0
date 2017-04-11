@@ -1,60 +1,65 @@
-Return-Path: <arend.vanspriel@broadcom.com>
-Subject: Re: [PATCHv4 0/2] cfg80211: mac80211: BTCOEX feature support
-To: c_traja@qti.qualcomm.com, linux-wireless@vger.kernel.org
-References: <1491905730-16392-1-git-send-email-c_traja@qti.qualcomm.com>
-Cc: ath10k@lists.infradead.org, johannes@sipsolutions.net,
- tamizhchelvam@codeaurora.org, linux-bluetooth@vger.kernel.org,
- Marcel Holtmann <marcel@holtmann.org>
-From: Arend Van Spriel <arend.vanspriel@broadcom.com>
-Message-ID: <50d867d1-740c-85b9-2bab-6ef49c4d87c1@broadcom.com>
-Date: Tue, 11 Apr 2017 14:02:37 +0200
-MIME-Version: 1.0
-In-Reply-To: <1491905730-16392-1-git-send-email-c_traja@qti.qualcomm.com>
-Content-Type: text/plain; charset=windows-1252
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+Subject: Re: [PATCHv3 00/10] Nokia H4+ support
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20170410231041.vz35anezpzhscu4t@earth>
+Date: Tue, 11 Apr 2017 13:36:44 +0200
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "Gustavo F. Padovan" <gustavo@padovan.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Samuel Thibault <samuel.thibault@ens-lyon.org>,
+        Pavel Machek <pavel@ucw.cz>, Tony Lindgren <tony@atomide.com>,
+        Jiri Slaby <jslaby@suse.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+        "linux-serial@vger.kernel.org" <linux-serial@vger.kernel.org>,
+        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Rob Herring <robh+dt@kernel.org>
+Message-Id: <4FEFA1D8-BE23-40FB-BAA3-3EC910FE9F96@holtmann.org>
+References: <20170328155939.31566-1-sre@kernel.org>
+ <CAL_JsqJcQ9ANtt71KRitOJ9spKD1SaeoL4RDftiCEPs8TjLJGA@mail.gmail.com>
+ <C1A408F2-1DF8-4F49-B399-B936542DE6BC@holtmann.org>
+ <20170331133353.GA32267@kroah.com>
+ <CAL_Jsq+NU3M5yuBpK1UGgzCVvq0eABMApCqEe3_d5+tDaABsgQ@mail.gmail.com>
+ <20170410231041.vz35anezpzhscu4t@earth>
+To: Sebastian Reichel <sre@kernel.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-+ linux-bluetooth, Marcel
+Hi Sebastian,
 
-On 11-4-2017 12:15, c_traja@qti.qualcomm.com wrote:
-> From: Tamizh chelvam <c_traja@qti.qualcomm.com>
+>>>>>> Here is PATCHv3 for the Nokia bluetooth patchset. I addressed all comments from
+>>>>>> Rob and Pavel regarding the serdev patches and dropped the *.dts patches, since
+>>>>>> they were queued by Tony. I also changed the patch order, so that the serdev
+>>>>>> patches come first. All of them have Acked-by from Rob, so I think it makes
+>>>>>> sense to merge them to serdev subsystem (now) and provide an immutable branch
+>>>>>> for the bluetooth subsystem.
+>>>>> 
+>>>>> Greg doesn't read cover letters generally and since the serdev patches
+>>>>> are Cc rather than To him, he's probably not planning to pick them up.
+>>>> 
+>>>> I wonder actually if we should merge all of these via bluetooth-next
+>>>> tree with proper Ack from Greg. However it would be good to also get
+>>>> buy in from Dave for merging this ultimately through net-next.
+>>> 
+>>> I don't really care where it goes.  I can take the whole thing in my
+>>> tty/serial tree now if no one objects and I get an ack from the relevant
+>>> maintainers {hint...}
+>> 
+>> I think it is better if it goes thru BT tree. I have another driver
+>> converted that is dependent on this series. There's a couple other
+>> serdev changes on the list too, but this shouldn't depend on them.
 > 
-> This patchset add support for BTCOEX feature to enable/disable and
-> modifying btcoex priority value via nl80211
+> Is this waiting for something, or could it be queued to
+> bluetooth-next then? It would be nice to finally have
+> this in 4.12 :)
 
-So you make a distinction between WMM ACs, but what about the different
-types/profiles of BT traffic?
+I would prefer if we can get an ACK from Greg. Then I merge it through the bluetooth-next tree.
 
-Regards,
-Arend
+Regards
 
-> Tamizh chelvam (2):
->   cfg80211: Add support to enable or disable btcoex and set
->     btcoex_priority
->   mac80211: Add support to enable or disable btcoex and set btcoex
->     priority value
-> 
-> v4 :
->   * Moved btcoex_priority_support_flag enum to nl80211.h and renamed it.
->   * fixed typo.
-> 
-> v3 :
->   * Introduced NL80211_EXT_FEATURE_BTCOEX_PRIORITY to expose
->     btcoex priority support and removed bool variable.
-> 
-> v2 :
->   * Introduced NL80211_CMD_SET_BTCOEX to enable/disable btcoex and
->     to set/modify btcoex_priority.
->   * Added bool variable in wiphy structure to advertise btcoex_priority
->     feature and removed BITMAP calculation for btcoex_priority value.
-> 
->  include/net/cfg80211.h       |    6 +++++
->  include/net/mac80211.h       |    5 +++++
->  include/uapi/linux/nl80211.h |   50 ++++++++++++++++++++++++++++++++++++++++++
->  net/mac80211/cfg.c           |    9 ++++++++
->  net/mac80211/driver-ops.h    |   15 +++++++++++++
->  net/mac80211/trace.h         |   20 +++++++++++++++++
->  net/wireless/nl80211.c       |   45 +++++++++++++++++++++++++++++++++++++
->  net/wireless/rdev-ops.h      |   13 +++++++++++
->  net/wireless/trace.h         |   17 ++++++++++++++
->  9 files changed, 180 insertions(+)
-> 
+Marcel
+
