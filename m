@@ -1,36 +1,52 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Subject: Re: [PATCH 1/6] 6lowpan: Don't set IFF_NO_QUEUE
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20170411192103.3209-1-luiz.dentz@gmail.com>
-Date: Wed, 12 Apr 2017 21:58:45 +0200
-Cc: Linux Bluetooth <linux-bluetooth@vger.kernel.org>,
-        Patrik Flykt <patrik.flykt@linux.intel.com>,
-        Alexander Aring <aar@pengutronix.de>,
-        Jukka Rissanen <jukka.rissanen@linux.intel.com>,
+Message-ID: <1492005529.2926.20.camel@linux.intel.com>
+Subject: Re: [PATCH 6/6] bluetooth: Do not set IFF_POINTOPOINT
+From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        linux-bluetooth@vger.kernel.org
+Cc: patrik.flykt@linux.intel.com, aar@pengutronix.de,
         linux-wpan@vger.kernel.org
-Message-Id: <CD68D4DF-AEF7-4142-9999-B2FDD0E9A44C@holtmann.org>
+Date: Wed, 12 Apr 2017 16:58:49 +0300
+In-Reply-To: <20170411192103.3209-6-luiz.dentz@gmail.com>
 References: <20170411192103.3209-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+         <20170411192103.3209-6-luiz.dentz@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
 
-> There is no point in setting IFF_NO_QUEUE should already have taken
-> care of setting it if tx_queue_len is not set, in fact this may
-> actually disable queue for interfaces that require it and do set
-> tx_queue_len.
+On Tue, 2017-04-11 at 22:21 +0300, Luiz Augusto von Dentz wrote:
+> From: Patrik Flykt <patrik.flykt@linux.intel.com>
 > 
-> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> The IPv6 stack needs to send and receive Neighbor Discovery
+> messages. Remove the IFF_POINTOPOINT flag.
+> 
+> Signed-off-by: Patrik Flykt <patrik.flykt@linux.intel.com>
+> Reviewed-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 > ---
-> net/6lowpan/core.c | 1 -
-> 1 file changed, 1 deletion(-)
+>  net/bluetooth/6lowpan.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+> 
+> diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
+> index a4deba6..6089599 100644
+> --- a/net/bluetooth/6lowpan.c
+> +++ b/net/bluetooth/6lowpan.c
+> @@ -592,8 +592,7 @@ static void netdev_setup(struct net_device *dev)
+>  {
+>  	dev->hard_header_len	= 0;
+>  	dev->needed_tailroom	= 0;
+> -	dev->flags		= IFF_RUNNING | IFF_POINTOPOINT |
+> -				  IFF_MULTICAST;
+> +	dev->flags		= IFF_RUNNING | IFF_MULTICAST;
+>  	dev->watchdog_timeo	= 0;
+>  	dev->tx_queue_len	= DEFAULT_TX_QUEUE_LEN;
+>  
 
-all 6 patches have been applied to bluetooth-next tree.
 
-Regards
+Acked-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
 
-Marcel
+
+Cheers,
+Jukka
 
