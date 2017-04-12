@@ -1,42 +1,76 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: =?UTF-8?q?=C5=81ukasz=20Rymanowski?=
-        <lukasz.rymanowski@codecoup.pl>
+MIME-Version: 1.0
+From: Sudha S <sudhas.raghavan@gmail.com>
+Date: Wed, 12 Apr 2017 14:45:58 +0530
+Message-ID: <CAK8T_aW_zbOZxKR762D77a7sSZMAJno-12i9gj-31WFmnZ4o5A@mail.gmail.com>
+Subject: Errors with SelectConfiguration callback implementation with bluez
 To: linux-bluetooth@vger.kernel.org
-Cc: =?UTF-8?q?=C5=81ukasz=20Rymanowski?=
-        <lukasz.rymanowski@codecoup.pl>
-Subject: [PATCH BlueZ 1/5] monitor: Add description for filter in scan parameters
-Date: Wed, 12 Apr 2017 14:13:32 +0200
-Message-Id: <20170412121336.783-1-lukasz.rymanowski@codecoup.pl>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-< HCI Command: LE Set Scan Parameters (0x08|0x000b) plen 7
-        Type: Active (0x01)
-        Interval: 30.000 msec (0x0030)
-        Window: 30.000 msec (0x0030)
-        Own address type: Public (0x00)
-        Filter policy: Accept all advertisement, inc. directed unresolved RPA (0x02)
----
- monitor/packet.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+Hi ,
 
-diff --git a/monitor/packet.c b/monitor/packet.c
-index 5d927f5..219542e 100644
---- a/monitor/packet.c
-+++ b/monitor/packet.c
-@@ -6309,6 +6309,12 @@ static void le_set_scan_parameters_cmd(const void *data, uint8_t size)
- 	case 0x01:
- 		str = "Ignore not in white list";
- 		break;
-+	case 0x02:
-+		str = "Accept all advertisement, inc. directed unresolved RPA";
-+		break;
-+	case 0x03:
-+		str = "Ignore not in white list, exc. directed unresolved RPA";
-+		break;
- 	default:
- 		str = "Reserved";
- 		break;
--- 
-2.9.3
+  I am a Bluez newbie and wanted your help with an issue that I am facing .
+My linux system is running bluez 5.42 . The bluetooth application is
+implementing media-api.txt api's to stream audio to a bluetooth
+speaker .
+The Registration to end point is succesfful with SBC as the codec.
+Once this is successful, the application registers for the
+SelectConfiguration and SetConfiguration callback . These are defined
+in a xml .
+In my application, I am receiving the "SelectConfiguation" callback .
+With this , a reply is sent to bluez with the selected parameters .
 
+However I am getting the following errors :
+-------------------------------------------------------------------------------------------------------
+../bluez-5.42/profiles/audio/media.c:media_endpoint_async_call()
+Calling SelectConfiguration: name = :1.1 path =
+/MediaEndpoint/A2DPSource
+ Endpoint replied with an error: org.freedesktop.DBus.Error.NoReply
+../bluez-5.42/profiles/audio/a2dp.c:select_cb() Endpoint replied an
+invalid configuration
+
+Request your inputs on this .
+
+The code snippet when sending a reply to the "SelectConfiguration"
+
+static void handle_method_call(GDBusConnection *conn,
+                       const gchar *sender,
+                       const gchar *object_path,
+                       const gchar *interface_name,
+                       const gchar *method_name,
+                       GVariant *parameters,
+                       GDBusMethodInvocation *invocation,
+                       gpointer user_data)
+
+{
+
+  if (!g_strcmp0(method_name, "SelectConfiguration")) {
+    printf("SelectConfiguration received !!!!!!!!!");
+
+   GVariantBuilder *c;
+    GVariant* arr;
+
+    c = g_variant_builder_new(G_VARIANT_TYPE ("ay"));
+    g_variant_builder_add(c , "y", 0x21);
+    g_variant_builder_add(c , "y", 0x15);
+    g_variant_builder_add(c , "y", 2);
+    g_variant_builder_add(c , "y", 32);
+    arr = g_variant_builder_end (c);
+   GVariant* tupleParam = g_variant_new_tuple(&arr, 1);
+   GDBusMessage *reply;
+   reply = g_dbus_message_new_method_reply
+(g_dbus_method_invocation_get_message (invocation));
+   g_dbus_message_set_body(reply, tupleParam);
+  GError* error = NULL;
+  bool result = g_dbus_connection_send_message(mGdbusConnection,
+                                               reply,
+                                               G_DBUS_SEND_MESSAGE_FLAGS_NONE,
+                                               NULL,
+                                               &error);
+
+}
+
+Thanks ,
+Sudha.S
