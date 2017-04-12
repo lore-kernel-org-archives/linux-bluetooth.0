@@ -1,68 +1,57 @@
-Return-Path: <linux-wpan-owner@vger.kernel.org>
-Message-ID: <1492005420.2926.17.camel@linux.intel.com>
-Subject: Re: [PATCH 3/6] Bluetooth: 6lowpan: Use netif APIs to flow control
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Message-ID: <1492005377.2926.16.camel@linux.intel.com>
+Subject: Re: [PATCH 2/6] Bluetooth: 6lowpan: Don't drop packets when run out
+ of credits
 From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
 To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
         linux-bluetooth@vger.kernel.org
 Cc: patrik.flykt@linux.intel.com, aar@pengutronix.de,
         linux-wpan@vger.kernel.org
-Date: Wed, 12 Apr 2017 16:57:00 +0300
-In-Reply-To: <20170411192103.3209-3-luiz.dentz@gmail.com>
+Date: Wed, 12 Apr 2017 16:56:17 +0300
+In-Reply-To: <20170411192103.3209-2-luiz.dentz@gmail.com>
 References: <20170411192103.3209-1-luiz.dentz@gmail.com>
-         <20170411192103.3209-3-luiz.dentz@gmail.com>
+         <20170411192103.3209-2-luiz.dentz@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
-Sender: linux-wpan-owner@vger.kernel.org
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Luiz,
 
-
-On Tue, 2017-04-11 at 22:21 +0300, Luiz Augusto von Dentz wrote:
+On Tue, 2017-04-11 at 22:20 +0300, Luiz Augusto von Dentz wrote:
 > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 > 
-> Rely on netif_wake_queue and netif_stop_queue to flow control when
-> transmit resources are unavailable.
+> Since l2cap_chan_send will now queue the packets there is no point in
+> checking the credits anymore.
 > 
 > Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 > ---
->  net/bluetooth/6lowpan.c | 16 ++++++++++++++++
->  1 file changed, 16 insertions(+)
+>  net/bluetooth/6lowpan.c | 11 ++---------
+>  1 file changed, 2 insertions(+), 9 deletions(-)
 > 
 > diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
-> index 22bd936..dc7fda3 100644
+> index 5b91e85..22bd936 100644
 > --- a/net/bluetooth/6lowpan.c
 > +++ b/net/bluetooth/6lowpan.c
-> @@ -867,12 +867,28 @@ static struct sk_buff *chan_alloc_skb_cb(struct
-> l2cap_chan *chan,
+> @@ -478,15 +478,8 @@ static int send_pkt(struct l2cap_chan *chan,
+> struct sk_buff *skb,
+>  		return 0;
+>  	}
 >  
->  static void chan_suspend_cb(struct l2cap_chan *chan)
->  {
-> +	struct lowpan_btle_dev *dev;
-> +
->  	BT_DBG("chan %p suspend", chan);
-> +
-> +	dev = lookup_dev(chan->conn);
-> +	if (!dev || !dev->netdev)
-> +		return;
-> +
-> +	netif_stop_queue(dev->netdev);
+> -	if (!err)
+> -		err = (!chan->tx_credits ? -EAGAIN : 0);
+> -
+> -	if (err < 0) {
+> -		if (err == -EAGAIN)
+> -			netdev->stats.tx_dropped++;
+> -		else
+> -			netdev->stats.tx_errors++;
+> -	}
+> +	if (err < 0)
+> +		netdev->stats.tx_errors++;
+>  
+>  	return err;
 >  }
->  
->  static void chan_resume_cb(struct l2cap_chan *chan)
->  {
-> +	struct lowpan_btle_dev *dev;
-> +
->  	BT_DBG("chan %p resume", chan);
-> +
-> +	dev = lookup_dev(chan->conn);
-> +	if (!dev || !dev->netdev)
-> +		return;
-> +
-> +	netif_wake_queue(dev->netdev);
->  }
->  
->  static long chan_get_sndtimeo_cb(struct l2cap_chan *chan)
 
 
 Acked-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
@@ -70,5 +59,4 @@ Acked-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
 
 Cheers,
 Jukka
-
 
