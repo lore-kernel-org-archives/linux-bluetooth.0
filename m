@@ -1,16 +1,14 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Message-ID: <1492005377.2926.16.camel@linux.intel.com>
-Subject: Re: [PATCH 2/6] Bluetooth: 6lowpan: Don't drop packets when run out
- of credits
+Message-ID: <1492005346.2926.15.camel@linux.intel.com>
+Subject: Re: [PATCH 1/6] 6lowpan: Don't set IFF_NO_QUEUE
 From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
 To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
         linux-bluetooth@vger.kernel.org
 Cc: patrik.flykt@linux.intel.com, aar@pengutronix.de,
         linux-wpan@vger.kernel.org
-Date: Wed, 12 Apr 2017 16:56:17 +0300
-In-Reply-To: <20170411192103.3209-2-luiz.dentz@gmail.com>
+Date: Wed, 12 Apr 2017 16:55:46 +0300
+In-Reply-To: <20170411192103.3209-1-luiz.dentz@gmail.com>
 References: <20170411192103.3209-1-luiz.dentz@gmail.com>
-         <20170411192103.3209-2-luiz.dentz@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -21,38 +19,29 @@ Hi Luiz,
 On Tue, 2017-04-11 at 22:20 +0300, Luiz Augusto von Dentz wrote:
 > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 > 
-> Since l2cap_chan_send will now queue the packets there is no point in
-> checking the credits anymore.
+> There is no point in setting IFF_NO_QUEUE should already have taken
+> care of setting it if tx_queue_len is not set, in fact this may
+> actually disable queue for interfaces that require it and do set
+> tx_queue_len.
 > 
 > Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 > ---
->  net/bluetooth/6lowpan.c | 11 ++---------
->  1 file changed, 2 insertions(+), 9 deletions(-)
+>  net/6lowpan/core.c | 1 -
+>  1 file changed, 1 deletion(-)
 > 
-> diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
-> index 5b91e85..22bd936 100644
-> --- a/net/bluetooth/6lowpan.c
-> +++ b/net/bluetooth/6lowpan.c
-> @@ -478,15 +478,8 @@ static int send_pkt(struct l2cap_chan *chan,
-> struct sk_buff *skb,
->  		return 0;
->  	}
+> diff --git a/net/6lowpan/core.c b/net/6lowpan/core.c
+> index 5f9909a..40d3d72 100644
+> --- a/net/6lowpan/core.c
+> +++ b/net/6lowpan/core.c
+> @@ -35,7 +35,6 @@ int lowpan_register_netdevice(struct net_device
+> *dev,
 >  
-> -	if (!err)
-> -		err = (!chan->tx_credits ? -EAGAIN : 0);
-> -
-> -	if (err < 0) {
-> -		if (err == -EAGAIN)
-> -			netdev->stats.tx_dropped++;
-> -		else
-> -			netdev->stats.tx_errors++;
-> -	}
-> +	if (err < 0)
-> +		netdev->stats.tx_errors++;
+>  	dev->type = ARPHRD_6LOWPAN;
+>  	dev->mtu = IPV6_MIN_MTU;
+> -	dev->priv_flags |= IFF_NO_QUEUE;
 >  
->  	return err;
->  }
-
+>  	lowpan_dev(dev)->lltype = lltype;
+>  
 
 Acked-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
 
