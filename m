@@ -5,108 +5,186 @@ Cc: linux-kernel@vger.kernel.org,
 	Marcel Holtmann <marcel@holtmann.org>,
 	Johan Hedberg <johan.hedberg@gmail.com>,
 	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Subject: [PATCH v5 BlueZ 4/4] Bluetooth: Handle Slave Connection Interval Range AD
-Date: Thu, 13 Apr 2017 13:22:03 +0100
-Message-Id: <20170413122203.4247-5-eu@felipetonello.com>
+Subject: [PATCH v5 BlueZ 3/4] Bluetooth: L2CAP: Add BT_LE_CONN_PARAM socket option
+Date: Thu, 13 Apr 2017 13:22:02 +0100
+Message-Id: <20170413122203.4247-4-eu@felipetonello.com>
 In-Reply-To: <20170413122203.4247-1-eu@felipetonello.com>
 References: <20170413122203.4247-1-eu@felipetonello.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The Slave Connection Interval Range data type contains the Peripheral's
-preferred connection interval range, for all logical connections.
+There is a need for certain LE profiles (MIDI for example) to change the
+current connection's parameters. In order to do that, this patch
+introduces a new BT_LE_CONN_PARAM socket option for SOL_BLUETOOTH
+protocol which allow user-space l2cap sockets to update the current
+connection.
 
-It is useful to parse it in the Kernel so there is no multiple calls to
-MGMT interface to update the device connection parameters and subsequent
-connection command call to this device will use proper connection
-parameters. This saves context-switches and eliminates user-space to
-update the connection parameters each time a device is found or
-bluetoothd is restarted and so on. Also, there is no need for the
-user-space to know care about it because if the slave device wishes to
-persist with these parameters, it should use the L2CAP connection
-parameters upade request upon a completed connection.
+It necessary to expose all the connection parameters to user-space
+because user-space are exposed to those values anyway, via PPCP
+characteristic or particular profile specification.
+
+If ROLE is SLAVE, then it will send a L2CAP_CONN_PARAM_UPDATE_REQ
+signaling command to the MASTER, triggering proper LE parameter update
+procedure. The connection parameters update will only occur upon a
+successful L2CAP_CONN_PARAM_UPDATE_RSP sent by the MASTER.
+
+If ROLE is MASTER, then immediately update the connection parameters.
+
+Once the connection parameters are effective, a MGMT_EV_NEW_CONN_PARAM
+event with the store_hint set is sent to user-space so an application
+can store the connection parameters for persistence reasons.
 
 Signed-off-by: Felipe F. Tonello <eu@felipetonello.com>
 ---
- net/bluetooth/mgmt.c | 53 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 53 insertions(+)
+ include/net/bluetooth/bluetooth.h |   8 +++
+ net/bluetooth/l2cap_sock.c        | 110 ++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 118 insertions(+)
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 1fba2a03f8ae..ea5d6c85f173 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -7442,6 +7442,46 @@ static bool is_filter_match(struct hci_dev *hdev, s8 rssi, u8 *eir,
- 	return true;
- }
+diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+index 01487192f628..ce5b3abd3b27 100644
+--- a/include/net/bluetooth/bluetooth.h
++++ b/include/net/bluetooth/bluetooth.h
+@@ -122,6 +122,14 @@ struct bt_voice {
+ #define BT_SNDMTU		12
+ #define BT_RCVMTU		13
  
-+static bool has_eir_slave_conn_int(const u8 *eir_data, u8 eir_len,
-+				   u16 *min_conn, u16 *max_conn)
-+{
-+	u16 len = 0;
-+	const u8 EIR_SLAVE_CONN_INT = 0x12; /* Slave Connection Interval Range */
++#define BT_LE_CONN_PARAM	14
++struct bt_le_conn_param {
++	__u16 min_interval;
++	__u16 max_interval;
++	__u16 latency;
++	__u16 supervision_timeout;
++};
 +
-+	while (len < eir_len - 1) {
-+		u8 field_len = eir_data[0];
-+		const u8 *data;
-+		u8 data_len;
+ __printf(1, 2)
+ void bt_info(const char *fmt, ...);
+ __printf(1, 2)
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index 507b80d59dec..1e096bd9ddde 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -515,6 +515,47 @@ static int l2cap_sock_getsockopt(struct socket *sock, int level, int optname,
+ 	lock_sock(sk);
+ 
+ 	switch (optname) {
++	case BT_LE_CONN_PARAM: {
++		struct bt_le_conn_param conn_param;
++		struct hci_conn_params *params;
++		struct hci_conn *hcon;
++		struct hci_dev *hdev;
 +
-+		/* Check for the end of EIR */
-+		if (field_len == 0)
++		if (!chan->conn) {
++			err = -ENOTCONN;
 +			break;
++		}
 +
-+		len += field_len + 1;
++		hcon = chan->conn->hcon;
++		hdev = hcon->hdev;
++		hci_dev_lock(hdev);
 +
-+		/* Do not continue EIR Data parsing if got
-+		 * incorrect length
++		params = hci_conn_params_lookup(hdev, &hcon->dst,
++						hcon->dst_type);
++
++		memset(&conn_param, 0, sizeof(conn_param));
++
++		if (params) {
++			conn_param.min_interval = params->conn_min_interval;
++			conn_param.max_interval = params->conn_max_interval;
++			conn_param.latency = params->conn_latency;
++			conn_param.supervision_timeout =
++				params->supervision_timeout;
++		} else {
++			conn_param.min_interval = hdev->le_conn_min_interval;
++			conn_param.max_interval = hdev->le_conn_max_interval;
++			conn_param.latency = hdev->le_conn_latency;
++			conn_param.supervision_timeout = hdev->le_supv_timeout;
++		}
++
++		hci_dev_unlock(hdev);
++
++		len = min_t(unsigned int, len, sizeof(conn_param));
++		if (copy_to_user(optval, (char *)&conn_param, len))
++			err = -EFAULT;
++
++		break;
++	}
+ 	case BT_SECURITY:
+ 		if (chan->chan_type != L2CAP_CHAN_CONN_ORIENTED &&
+ 		    chan->chan_type != L2CAP_CHAN_FIXED &&
+@@ -762,6 +803,75 @@ static int l2cap_sock_setsockopt(struct socket *sock, int level, int optname,
+ 	lock_sock(sk);
+ 
+ 	switch (optname) {
++	case BT_LE_CONN_PARAM: {
++		struct bt_le_conn_param conn_param;
++		struct hci_conn_params *hci_param;
++		struct hci_conn *hcon;
++		struct hci_dev *hdev;
++
++		len = min_t(unsigned int, sizeof(conn_param), optlen);
++		if (copy_from_user((char *)&conn_param, optval, len)) {
++			err = -EFAULT;
++			break;
++		}
++
++		if (!chan->conn) {
++			err = -ENOTCONN;
++			break;
++		}
++
++		err = hci_check_conn_params(conn_param.min_interval,
++					    conn_param.max_interval,
++					    conn_param.latency,
++					    conn_param.supervision_timeout);
++		if (err < 0) {
++			BT_ERR("Ignoring invalid connection parameters");
++			break;
++		}
++
++		hcon = chan->conn->hcon;
++		hdev = hcon->hdev;
++
++		hci_dev_lock(hdev);
++
++		/* we add new param in case it doesn't exist */
++		hci_param = hci_conn_params_add(hdev, &hcon->dst,
++						hcon->dst_type);
++		if (!hci_param) {
++			err = -ENOMEM;
++			BT_ERR("Failed to add connection parameters");
++			hci_dev_unlock(hcon->hdev);
++			break;
++		}
++
++		hci_dev_unlock(hdev);
++
++		/* Send a L2CAP connection parameters update request, if
++		 * the host role is slave.
 +		 */
-+		if (len > eir_len)
-+			break;
++		if (hcon->role == HCI_ROLE_SLAVE) {
++			l2cap_le_conn_update_req(chan->conn,
++						 conn_param.min_interval,
++						 conn_param.max_interval,
++						 conn_param.latency,
++						 conn_param.supervision_timeout);
++		} else {
++			/* this function also updates the hci_param value */
++			hci_le_conn_update(hcon, conn_param.min_interval,
++					   conn_param.max_interval,
++					   conn_param.latency,
++					   conn_param.supervision_timeout);
 +
-+		data = &eir_data[2];
-+		data_len = field_len - 1;
-+
-+		if (eir_data[1] == EIR_SLAVE_CONN_INT) {
-+			if (data_len < 4)
-+				break;
-+			*min_conn = le16_to_cpu(&data[0]);
-+			*max_conn = le16_to_cpu(&data[2]);
-+			return true;
++			/* don't set the `store' hint */
++			mgmt_new_conn_param(hdev, &hcon->dst, hcon->dst_type,
++					    false, conn_param.min_interval,
++					    conn_param.max_interval,
++					    conn_param.latency,
++					    conn_param.supervision_timeout);
 +		}
-+
-+		eir_data += field_len + 1;
++		break;
 +	}
 +
-+	return false;
-+}
-+
- void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
- 		       u8 addr_type, u8 *dev_class, s8 rssi, u32 flags,
- 		       u8 *eir, u16 eir_len, u8 *scan_rsp, u8 scan_rsp_len)
-@@ -7449,6 +7489,7 @@ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
- 	char buf[512];
- 	struct mgmt_ev_device_found *ev = (void *)buf;
- 	size_t ev_size;
-+	struct hci_conn *hcon;
- 
- 	/* Don't send events for a non-kernel initiated discovery. With
- 	 * LE one exception is if we have pend_le_reports > 0 in which
-@@ -7521,6 +7562,18 @@ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
- 	ev->eir_len = cpu_to_le16(eir_len + scan_rsp_len);
- 	ev_size = sizeof(*ev) + eir_len + scan_rsp_len;
- 
-+	/* Search for Slave Connection Interval AD */
-+	hcon = hci_conn_hash_lookup_le(hdev, bdaddr, addr_type);
-+	if (hcon) {
-+		u16 min_conn_int, max_conn_int;
-+
-+		if (has_eir_slave_conn_int(ev->eir, ev->eir_len,
-+					   &min_conn_int, &max_conn_int)) {
-+			hcon->le_conn_min_interval = min_conn_int;
-+			hcon->le_conn_max_interval = max_conn_int;
-+		}
-+	}
-+
- 	mgmt_event(MGMT_EV_DEVICE_FOUND, hdev, ev, ev_size, NULL);
- }
- 
+ 	case BT_SECURITY:
+ 		if (chan->chan_type != L2CAP_CHAN_CONN_ORIENTED &&
+ 		    chan->chan_type != L2CAP_CHAN_FIXED &&
 -- 
 2.12.2
