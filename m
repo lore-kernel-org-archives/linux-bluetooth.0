@@ -1,45 +1,112 @@
-Return-Path: <robherring2@gmail.com>
-From: Rob Herring <robh@kernel.org>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	linux-bluetooth@vger.kernel.org
-Cc: linux-arm-kernel@lists.infradead.org,
-	Gustavo Padovan <gustavo@padovan.org>,
+Return-Path: <eu@felipetonello.com>
+From: "Felipe F. Tonello" <eu@felipetonello.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	Marcel Holtmann <marcel@holtmann.org>,
 	Johan Hedberg <johan.hedberg@gmail.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Wei Xu <xuwei5@hisilicon.com>,
-	Eyal Reizer <eyalr@ti.com>,
-	Satish Patel <satish.patel@linaro.org>,
-	netdev@vger.kernel.org,
-	devicetree@vger.kernel.org
-Subject: [PATCH v3 0/4] TI Bluetooth serdev support
-Date: Thu, 13 Apr 2017 10:03:49 -0500
-Message-Id: <20170413150353.7389-1-robh@kernel.org>
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Subject: [PATCH v5 BlueZ 4/4] Bluetooth: Handle Slave Connection Interval Range AD
+Date: Thu, 13 Apr 2017 13:22:03 +0100
+Message-Id: <20170413122203.4247-5-eu@felipetonello.com>
+In-Reply-To: <20170413122203.4247-1-eu@felipetonello.com>
+References: <20170413122203.4247-1-eu@felipetonello.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This series adds serdev support to the HCI LL protocol used on TI BT
-modules and enables support on HiKey board with with the WL1835 module.
-With this the custom TI UIM daemon and btattach are no longer needed.
+The Slave Connection Interval Range data type contains the Peripheral's
+preferred connection interval range, for all logical connections.
 
-The series is available on this git branch[1]. This version is rebased on 
-bluetooth-next tree containing its dependencies.
+It is useful to parse it in the Kernel so there is no multiple calls to
+MGMT interface to update the device connection parameters and subsequent
+connection command call to this device will use proper connection
+parameters. This saves context-switches and eliminates user-space to
+update the connection parameters each time a device is found or
+bluetoothd is restarted and so on. Also, there is no need for the
+user-space to know care about it because if the slave device wishes to
+persist with these parameters, it should use the L2CAP connection
+parameters upade request upon a completed connection.
 
-Rob
+Signed-off-by: Felipe F. Tonello <eu@felipetonello.com>
+---
+ net/bluetooth/mgmt.c | 53 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 53 insertions(+)
 
-[1] git://git.kernel.org/pub/scm/linux/kernel/git/robh/linux.git ti-bluetooth
-
-Rob Herring (4):
-  dt-bindings: net: Add TI WiLink shared transport binding
-  bluetooth: hci_uart: remove unused hci_uart_init_tty
-  bluetooth: hci_uart: add LL protocol serdev driver support
-  arm64: dts: hikey: add WL1835 Bluetooth device node
-
- .../devicetree/bindings/net/ti,wilink-st.txt       |  35 +++
- arch/arm64/boot/dts/hisilicon/hi6220-hikey.dts     |   5 +
- drivers/bluetooth/hci_ldisc.c                      |  19 --
- drivers/bluetooth/hci_ll.c                         | 262 ++++++++++++++++++++-
- drivers/bluetooth/hci_uart.h                       |   1 -
- 5 files changed, 301 insertions(+), 21 deletions(-)
- create mode 100644 Documentation/devicetree/bindings/net/ti,wilink-st.txt
-
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 1fba2a03f8ae..ea5d6c85f173 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -7442,6 +7442,46 @@ static bool is_filter_match(struct hci_dev *hdev, s8 rssi, u8 *eir,
+ 	return true;
+ }
+ 
++static bool has_eir_slave_conn_int(const u8 *eir_data, u8 eir_len,
++				   u16 *min_conn, u16 *max_conn)
++{
++	u16 len = 0;
++	const u8 EIR_SLAVE_CONN_INT = 0x12; /* Slave Connection Interval Range */
++
++	while (len < eir_len - 1) {
++		u8 field_len = eir_data[0];
++		const u8 *data;
++		u8 data_len;
++
++		/* Check for the end of EIR */
++		if (field_len == 0)
++			break;
++
++		len += field_len + 1;
++
++		/* Do not continue EIR Data parsing if got
++		 * incorrect length
++		 */
++		if (len > eir_len)
++			break;
++
++		data = &eir_data[2];
++		data_len = field_len - 1;
++
++		if (eir_data[1] == EIR_SLAVE_CONN_INT) {
++			if (data_len < 4)
++				break;
++			*min_conn = le16_to_cpu(&data[0]);
++			*max_conn = le16_to_cpu(&data[2]);
++			return true;
++		}
++
++		eir_data += field_len + 1;
++	}
++
++	return false;
++}
++
+ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+ 		       u8 addr_type, u8 *dev_class, s8 rssi, u32 flags,
+ 		       u8 *eir, u16 eir_len, u8 *scan_rsp, u8 scan_rsp_len)
+@@ -7449,6 +7489,7 @@ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+ 	char buf[512];
+ 	struct mgmt_ev_device_found *ev = (void *)buf;
+ 	size_t ev_size;
++	struct hci_conn *hcon;
+ 
+ 	/* Don't send events for a non-kernel initiated discovery. With
+ 	 * LE one exception is if we have pend_le_reports > 0 in which
+@@ -7521,6 +7562,18 @@ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+ 	ev->eir_len = cpu_to_le16(eir_len + scan_rsp_len);
+ 	ev_size = sizeof(*ev) + eir_len + scan_rsp_len;
+ 
++	/* Search for Slave Connection Interval AD */
++	hcon = hci_conn_hash_lookup_le(hdev, bdaddr, addr_type);
++	if (hcon) {
++		u16 min_conn_int, max_conn_int;
++
++		if (has_eir_slave_conn_int(ev->eir, ev->eir_len,
++					   &min_conn_int, &max_conn_int)) {
++			hcon->le_conn_min_interval = min_conn_int;
++			hcon->le_conn_max_interval = max_conn_int;
++		}
++	}
++
+ 	mgmt_event(MGMT_EV_DEVICE_FOUND, hdev, ev, ev_size, NULL);
+ }
+ 
 -- 
-2.11.0
+2.12.2
