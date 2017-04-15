@@ -1,5 +1,5 @@
 Return-Path: <sre@kernel.org>
-Date: Sat, 15 Apr 2017 21:48:54 +0200
+Date: Sat, 15 Apr 2017 21:38:18 +0200
 From: Sebastian Reichel <sre@kernel.org>
 To: Rob Herring <robh@kernel.org>
 Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org,
@@ -9,83 +9,110 @@ Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org,
 	Mark Rutland <mark.rutland@arm.com>, Wei Xu <xuwei5@hisilicon.com>,
 	Eyal Reizer <eyalr@ti.com>, Satish Patel <satish.patel@linaro.org>,
 	netdev@vger.kernel.org, devicetree@vger.kernel.org
-Subject: Re: [PATCH v3 3/4] bluetooth: hci_uart: add LL protocol serdev
- driver support
-Message-ID: <20170415194854.byado7bxupbdhivp@earth>
+Subject: Re: [PATCH v3 1/4] dt-bindings: net: Add TI WiLink shared transport
+ binding
+Message-ID: <20170415193817.r57lubkln72vvjcn@earth>
 References: <20170413150353.7389-1-robh@kernel.org>
- <20170413150353.7389-4-robh@kernel.org>
+ <20170413150353.7389-2-robh@kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="agbrdpyrwwvtb7cb"
-In-Reply-To: <20170413150353.7389-4-robh@kernel.org>
+	protocol="application/pgp-signature"; boundary="mcpuvkep2cnkpc7f"
+In-Reply-To: <20170413150353.7389-2-robh@kernel.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 
---agbrdpyrwwvtb7cb
+--mcpuvkep2cnkpc7f
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
 Hi,
 
-On Thu, Apr 13, 2017 at 10:03:52AM -0500, Rob Herring wrote:
-> +static int read_local_version(struct hci_dev *hdev)
-> +{
-> +	int err = 0;
-> +	unsigned short version = 0;
-> +	struct sk_buff *skb;
-> +	struct hci_rp_read_local_version *ver;
+On Thu, Apr 13, 2017 at 10:03:50AM -0500, Rob Herring wrote:
+> Add serial slave device binding for the TI WiLink series of Bluetooth/FM/=
+GPS
+> devices.
+>=20
+> Signed-off-by: Rob Herring <robh@kernel.org>
+> Cc: Mark Rutland <mark.rutland@arm.com>
+> Cc: netdev@vger.kernel.org
+> Cc: devicetree@vger.kernel.org
+> ---
+> v3:
+> - rebase on bluetooth-next
+>=20
+>  .../devicetree/bindings/net/ti,wilink-st.txt       | 35 ++++++++++++++++=
+++++++
+>  1 file changed, 35 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/net/ti,wilink-st.txt
+>=20
+> diff --git a/Documentation/devicetree/bindings/net/ti,wilink-st.txt b/Doc=
+umentation/devicetree/bindings/net/ti,wilink-st.txt
+> new file mode 100644
+> index 000000000000..cbad73a84ac4
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/net/ti,wilink-st.txt
+> @@ -0,0 +1,35 @@
+> +TI WiLink 7/8 (wl12xx/wl18xx) Shared Transport BT/FM/GPS devices
 > +
-> +	skb = __hci_cmd_sync(hdev, HCI_OP_READ_LOCAL_VERSION, 0, NULL, HCI_INIT_TIMEOUT);
-> +	if (IS_ERR(skb)) {
-> +		bt_dev_err(hdev, "Reading TI version information failed (%ld)",
-> +			   PTR_ERR(skb));
-> +		err = PTR_ERR(skb);
-> +		goto out;
+> +TI WiLink devices have a UART interface for providing Bluetooth, FM radi=
+o,
+> +and GPS over what's called "shared transport". The shared transport is
+> +standard BT HCI protocol with additional channels for the other function=
+s.
+> +
+> +These devices also have a separate WiFi interface as described in
+> +wireless/ti,wlcore.txt.
+> +
+> +This bindings follows the UART slave device binding in
+> +../serial/slave-device.txt.
+> +
+> +Required properties:
+> + - compatible: should be one of the following:
+> +    "ti,wl1271-st"
+> +    "ti,wl1273-st"
+> +    "ti,wl1831-st"
+> +    "ti,wl1835-st"
+> +    "ti,wl1837-st"
+> +
+> +Optional properties:
+> + - enable-gpios : GPIO signal controlling enabling of BT. Active high.
+> + - vio-supply : Vio input supply (1.8V)
+> + - vbat-supply : Vbat input supply (2.9-4.8V)
+> +
+> +Example:
+> +
+> +&serial0 {
+> +	compatible =3D "ns16550a";
+> +	...
+> +	bluetooth {
+> +		compatible =3D "ti,wl1835-st";
+> +		enable-gpios =3D <&gpio1 7 GPIO_ACTIVE_HIGH>;
+> +	};
+> +};
 
-If __hci_cmd_sync() fails the code tries to kfree_skb() an error pointer
-resulting in NULL pointer dereference warning + strack trace. This
-can just return err instead.
-
-> +	}
-> +	if (skb->len != sizeof(*ver)) {
-> +		err = -EILSEQ;
-> +		goto out;
-> +	}
-> +
-> +	ver = (struct hci_rp_read_local_version *)skb->data;
-> +	if (le16_to_cpu(ver->manufacturer) != 13) {
-> +		err = -ENODEV;
-> +		goto out;
-> +	}
-> +
-> +	version = le16_to_cpu(ver->lmp_subver);
-> +
-> +out:
-> +	if (err) bt_dev_err(hdev, "Failed to read TI version info: %d", err);
-> +	kfree_skb(skb);
-> +	return err ? err : version;
-> +}
+Reviewed-by: Sebastian Reichel <sre@kernel.org>
 
 -- Sebastian
 
---agbrdpyrwwvtb7cb
+--mcpuvkep2cnkpc7f
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAABCgAdFiEE72YNB0Y/i3JqeVQT2O7X88g7+poFAljyeSQACgkQ2O7X88g7
-+poEEA/5AYD6nBWwKDCfL7FxsyOf67BEnX+lmrbC/YuheR5Ms+jNTUd6aV3eri4q
-wUKuDQ2/kO8NJG2abB+PYQLwkHfWuGbOyOr0eIdRi7nNRFje2IJIZQ3IItlqP1do
-1H9YiKv5nCo8Q6RKuhr4onYXjGC1SRLLqIioKBIfVK834jadUi/jxllAU4RRdls3
-qqXbGjqLlLhFaMzDTK7OQRKQRlMHoPLUoM4W4qp205fLmBF61AYiTEi3FNdaYi1G
-ShkmzFTnaEpyLtvFlU/dFm50suZgZZ1FN8jrg45P2pJw7XMXiYGP1mA3+EqKNPik
-QT984FMAkObCObHHc1+R5AHeXg16N3P3ReQbGnVJ4yzzaFoGNRWqnT+tYrSVNXAz
-YADpppKu8HCv0wShcxU6l/4PPLKHlqGD1GRFvF+qV1M6Rszwxx4sd3rOl9LPev0K
-EbLXxl4vJUYeLz7xBuG3yLTIFvTdLxw1G9aCvP/AE9gL1Nb9IIT3HXpnCyCL9nDm
-5jRaxyL1IcOGJoO+lCsk1ckmXwzn//2HoTfJdig1ZklcdKJUFPjSAAzirVPZV8cS
-18OqUxWcAetrOyaE4MCiw5GXoP11N38Kc9ner04XOk8I2zGiIrBSK5nM1o3DkU6T
-H4qxH0fCaCDfI2e1TwiZ1g/ToShgE0PvbnFEivpXzPHY3fYvWgo=
-=mBSk
+iQIzBAABCgAdFiEE72YNB0Y/i3JqeVQT2O7X88g7+poFAljydqcACgkQ2O7X88g7
++poIAQ/+IVVT4w5FCkq5wlBYNb9AhYbE9+9Kt9o6RM+FMShesp5yOq61F5IfUTJJ
+vSsnwFjnwnyc78KUw4Rp2Q1WjUvo71B5r3nM0NrFkp0HU+Idf+gQL3N8jieIUl4b
+rSL1+lpEK5EsR7Uv8SS7huB5DnwGT1cL7goSF4l/TCPhiOEU6eJrSZrD8sYhtYGz
+yXHpxjojKhJiLP8ZVCPnD7QBi/BjiExCsjIoWR45WBhxVpMVxWu0ZaK5p5S8sGLw
+IrEjHgXwQ2PACbAAgsWQe1kOqD5/2mJ9a1PbhrIfCvcg89cMDwDb8Wojf+nnIAQ5
+dWl7dqfMffCYEFjlWhSXXhEZ+MVJOzQwncU4R1ZNRFZiZ6MKcPJUrXxPgD+V58xo
+5nsbp7u0BDu71/rJ3XAUX+M0ygMvy/7VJ8uXqYxKlPp5RyRCXxSV8Dgf1l2LDiMd
+NBClFKwqvq+il7oB8sVK1/4Lpwxyf2+HF3mT8rrUAjsJ7mrXSeQtoqB7T6aiv7nT
+L3jTzCyYHo6/NNVqk0ENaRh32Kv6JvNMN2GK1Jm9R9IHDw6gevSOo29xRIWTtoz+
+n7hfeImJYSR/imFOJLdh87Gq/+OdtDkAKMUr5G07tYOtEHzm3YZnP1GrJPiC6LTJ
+zSMcCuO2URcPTri25mmhgQMTh9GCAgd4ZOJ/+uv1Q/EA1Kd4IVo=
+=y9TH
 -----END PGP SIGNATURE-----
 
---agbrdpyrwwvtb7cb--
+--mcpuvkep2cnkpc7f--
