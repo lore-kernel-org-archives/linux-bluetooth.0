@@ -1,79 +1,42 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <sre@kernel.org>
 From: Sebastian Reichel <sre@kernel.org>
 To: Sebastian Reichel <sre@kernel.org>,
-        Tony Lindgren <tony@atomide.com>
-Cc: Rob Herring <robh+dt@kernel.org>, linux-bluetooth@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-omap@vger.kernel.org
-Subject: [PATCH] ARM: dts: omap4-droid4: add bluetooth
-Date: Sun, 16 Apr 2017 00:18:32 +0200
-Message-Id: <20170415221832.16175-1-sre@kernel.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+	Marcel Holtmann <marcel@holtmann.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	Rob Herring <robh+dt@kernel.org>
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] Bluetooth: hci_ll: Fix NULL pointer deref on FW upload failure
+Date: Sat, 15 Apr 2017 23:54:13 +0200
+Message-Id: <20170415215413.15648-1-sre@kernel.org>
+In-Reply-To: <20170415194854.byado7bxupbdhivp@earth>
+References: <20170415194854.byado7bxupbdhivp@earth>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Droid 4 has wl1835 connected to the OMAP's UART4 port, which is
-used for Bluetooth and most likely can also be used for controlling
-the FM radio and GPS receivers.
+Avoid NULL pointer dereference occurring due to freeing
+skb containing an error pointer. It can easily be triggered
+by using the driver with broken uart (i.e. due to misconfigured
+pinmuxing).
 
+Fixes: 371805522f87 ("bluetooth: hci_uart: add LL protocol serdev driver support")
 Signed-off-by: Sebastian Reichel <sre@kernel.org>
 ---
-Hi,
+ drivers/bluetooth/hci_ll.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-Thanks to the work of Rob adding Bluetooth support for Droid 4 was
-straight forward :) I did a short test scanning for available devices
-using bluetoothctl. For that I had to rebind the bluetooth device,
-since it has been initialized before rootfs/firmware was available
-(builtin driver):
-
-echo serial0-0 > /sys/bus/serial/drivers/hci-ti/unbind
-echo serial0-0 > /sys/bus/serial/drivers/hci-ti/bind
-
-According to my research the FM module should be functional on
-Droid 4 and the wl1835's GPS is also used. Rob, do you have a
-plans for supporting the extra resources?
-
--- Sebastian
----
- arch/arm/boot/dts/omap4-droid4-xt894.dts | 20 ++++++++++++++++++++
- 1 file changed, 20 insertions(+)
-
-diff --git a/arch/arm/boot/dts/omap4-droid4-xt894.dts b/arch/arm/boot/dts/omap4-droid4-xt894.dts
-index e0fdfe6cc78c..2495faf79a43 100644
---- a/arch/arm/boot/dts/omap4-droid4-xt894.dts
-+++ b/arch/arm/boot/dts/omap4-droid4-xt894.dts
-@@ -395,6 +395,15 @@
- 		>;
- 	};
- 
-+	uart4_pins: pinmux_uart4_pins {
-+		pinctrl-single,pins = <
-+		OMAP4_IOPAD(0x15c, PIN_INPUT | MUX_MODE0)		/* uart4_rx */
-+		OMAP4_IOPAD(0x15e, PIN_OUTPUT | MUX_MODE0)		/* uart4_tx */
-+		OMAP4_IOPAD(0x110, PIN_INPUT_PULLUP | MUX_MODE5)	/* uart4_cts */
-+		OMAP4_IOPAD(0x112, PIN_OUTPUT_PULLUP | MUX_MODE5)	/* uart4_rts */
-+		>;
-+	};
-+
- 	mcbsp2_pins: pinmux_mcbsp2_pins {
- 		pinctrl-single,pins = <
- 			OMAP4_IOPAD(0x0f6, PIN_INPUT | MUX_MODE0)	/* abe_mcbsp2_clkx */
-@@ -429,6 +438,17 @@
- 			       &omap4_pmx_core 0x17c>;
- };
- 
-+&uart4 {
-+	pinctrl-names = "default";
-+	pinctrl-0 = <&uart4_pins>;
-+
-+	bluetooth {
-+		compatible = "ti,wl1835-st";
-+		enable-gpios = <&gpio6 14 GPIO_ACTIVE_HIGH>; /* gpio 174 */
-+		max-speed = <3686400>;
-+	};
-+};
-+
- &usbhsehci {
- 	phys = <&hsusb1_phy>;
- };
+diff --git a/drivers/bluetooth/hci_ll.c b/drivers/bluetooth/hci_ll.c
+index 485e8eb04542..adc444f309a3 100644
+--- a/drivers/bluetooth/hci_ll.c
++++ b/drivers/bluetooth/hci_ll.c
+@@ -537,8 +537,7 @@ static int read_local_version(struct hci_dev *hdev)
+ 	if (IS_ERR(skb)) {
+ 		bt_dev_err(hdev, "Reading TI version information failed (%ld)",
+ 			   PTR_ERR(skb));
+-		err = PTR_ERR(skb);
+-		goto out;
++		return PTR_ERR(skb);
+ 	}
+ 	if (skb->len != sizeof(*ver)) {
+ 		err = -EILSEQ;
 -- 
 2.11.0
-
