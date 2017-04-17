@@ -1,33 +1,67 @@
-Return-Path: <netdev-owner@vger.kernel.org>
-Date: Mon, 17 Apr 2017 15:02:17 -0400 (EDT)
-Message-Id: <20170417.150217.1911065261318715863.davem@davemloft.net>
-To: johan.hedberg@gmail.com
-Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: pull request: bluetooth-next 2017-04-14
-From: David Miller <davem@davemloft.net>
-In-Reply-To: <20170414181212.GA27363@x1c.P-661HNU-F1>
-References: <20170414181212.GA27363@x1c.P-661HNU-F1>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Sender: netdev-owner@vger.kernel.org
+Return-Path: <linux-wpan-owner@vger.kernel.org>
+To: Network Development <netdev@vger.kernel.org>
+From: Alexander Aring <aar@pengutronix.de>
+Subject: bluetooth 6lowpan interfaces are not virtual anymore
+Cc: Jukka Rissanen <jukka.rissanen@linux.intel.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>,
+        Linux Bluetooth <linux-bluetooth@vger.kernel.org>
+Message-ID: <2d178eb8-3fbc-3385-6e0c-fa9941713959@pengutronix.de>
+Date: Mon, 17 Apr 2017 19:56:12 +0200
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@gmail.com>
-Date: Fri, 14 Apr 2017 21:12:12 +0300
+Hi,
 
-> Here's the main batch of Bluetooth & 802.15.4 patches for the 4.12
-> kernel.
-> 
->  - Many fixes to 6LoWPAN, in particular for BLE
->  - New CA8210 IEEE 802.15.4 device driver (accounting for most of the
->    lines of code added in this pull request)
->  - Added Nokia Bluetooth (UART) HCI driver
->  - Some serdev & TTY changes that are dependencies for the Nokia
->    driver (with acks from relevant maintainers and an agreement that
->    these come through the bluetooth tree)
->  - Support for new Intel Bluetooth device
->  - Various other minor cleanups/fixes here and there
-> 
-> Please let me know if there are any issues pulling. Thanks.
+bluetooth-next contains patches which introduces a queue for bluetooth
+6LoWPAN interfaces. [0]
 
-Applied, thanks.
+At first, the current behaviour is now that 802.15.4 6LoWPAN interfaces
+are virtual and bluetooth 6LoWPAN interfaces are not virtual anymore.
+To have a different handling in both subsystems is _definitely_ wrong.
+
+What does the 6LoWPAN interface?
+
+It will do a protocol change (an adaptation, because 6LoWPAN should
+provide the same functionality as IPv6) from IPv6 to 6LoWPAN (tx) and
+vice versa for (rx). In my opinion this should be handled as a virtual
+interface and not as an interface with a queue.
+
+What makes a queue on 6LoWPAN interfaces?
+
+It will queue IPv6 packets which waits for it adaptation (the protocol
+change) with some additional qdisc handling.
+If finally the xmit_do callback will occur it will replace IPv6 header
+with 6LoWPAN, etc. After that it should be queued into some queue on
+link layer side which should be do the transmit finally.
+
+Why I think bluetooth introduced a queue handling on 6LoWPAN interfaces?
+
+Because I think they don't like their own *qdisc* handling on their link
+layer interface. I write *qdisc* here because, they have no net_devices
+and use some kind of own qdisc handling.
+
+My question: is this correct?
+
+How to fix that (In my opinion):
+
+So commit [0] says something "out of credits" that's what I think it's
+the *qdisc* handling. If you cannot queue anymore -> you need to drop
+it. If you don't like how the current behaviour is, you need to change
+your *qdisc* handling on your link layer interface. Introducing queue at
+6LoWPAN interfaces will introduce "buffer bloating".
+
+---
+
+I don't care what bluetooth does with the 6LoWPAN interface. If bluetooth
+people wants such behaviour, then I am okay with that.
+
+I will bookmark this mail for the time when somebody reverts it to a
+virtual interface again. I think somebody will change it again, or maybe
+somebody will argument why we need a queue here. 
+
+- Alex
+
+[0] https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git/commit/?id=814f1b243d2c63928f6aa72d66bec0e5fae2f4a9
