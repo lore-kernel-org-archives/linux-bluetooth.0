@@ -1,67 +1,39 @@
-Return-Path: <linux-wpan-owner@vger.kernel.org>
-To: Network Development <netdev@vger.kernel.org>
-From: Alexander Aring <aar@pengutronix.de>
-Subject: bluetooth 6lowpan interfaces are not virtual anymore
-Cc: Jukka Rissanen <jukka.rissanen@linux.intel.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>,
-        Linux Bluetooth <linux-bluetooth@vger.kernel.org>
-Message-ID: <2d178eb8-3fbc-3385-6e0c-fa9941713959@pengutronix.de>
-Date: Mon, 17 Apr 2017 19:56:12 +0200
+Return-Path: <linux-kernel-owner@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Sender: linux-wpan-owner@vger.kernel.org
+In-Reply-To: <20170416152650.5376wwhhdcbpdba5@earth>
+References: <20170415221832.16175-1-sre@kernel.org> <CAEz3QY0duPa91TT3e86xA=tDGppiq0UXmDzuUm2i6cXbBi9CgQ@mail.gmail.com>
+ <20170416152650.5376wwhhdcbpdba5@earth>
+From: Rob Herring <robh+dt@kernel.org>
+Date: Mon, 17 Apr 2017 07:51:18 -0500
+Message-ID: <CAL_JsqLkGXN3hjocJ3-X8f7e0Az28-LeXNpMwnSeUwGtG5m4Hg@mail.gmail.com>
+Subject: Re: [PATCH] ARM: dts: omap4-droid4: add bluetooth
+To: Sebastian Reichel <sre@kernel.org>
+Cc: Michael Scott <michael.scott@linaro.org>,
+        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+        linux-omap <linux-omap@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Tony Lindgren <tony@atomide.com>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+On Sun, Apr 16, 2017 at 10:26 AM, Sebastian Reichel <sre@kernel.org> wrote:
+> Hi Michael,
+>
+> On Sat, Apr 15, 2017 at 07:00:29PM -0700, Michael Scott wrote:
+>> On Apr 15, 2017 3:18 PM, "Sebastian Reichel" <sre@kernel.org> wrote:
+>>> Droid 4 has wl1835 connected to the OMAP's UART4 port, which is
+>>
+>> Technically, I believe the Droid 4 has WL1283 WLAN chip.
+>>
+>> - Mike
+>
+> iFixit [0] has a nice photo in step 15, which clearly shows,
+> that its a WL1285C, with 1835 looking similar I didn't notice
+> Rob's binding does not cover wl128x. I will resend with proper
+> compatible value (+ patches for the driver and binding).
 
-bluetooth-next contains patches which introduces a queue for bluetooth
-6LoWPAN interfaces. [0]
+I only documented what was publicly available as some parts have
+failed to materialize. Any idea what the differences are?
 
-At first, the current behaviour is now that 802.15.4 6LoWPAN interfaces
-are virtual and bluetooth 6LoWPAN interfaces are not virtual anymore.
-To have a different handling in both subsystems is _definitely_ wrong.
-
-What does the 6LoWPAN interface?
-
-It will do a protocol change (an adaptation, because 6LoWPAN should
-provide the same functionality as IPv6) from IPv6 to 6LoWPAN (tx) and
-vice versa for (rx). In my opinion this should be handled as a virtual
-interface and not as an interface with a queue.
-
-What makes a queue on 6LoWPAN interfaces?
-
-It will queue IPv6 packets which waits for it adaptation (the protocol
-change) with some additional qdisc handling.
-If finally the xmit_do callback will occur it will replace IPv6 header
-with 6LoWPAN, etc. After that it should be queued into some queue on
-link layer side which should be do the transmit finally.
-
-Why I think bluetooth introduced a queue handling on 6LoWPAN interfaces?
-
-Because I think they don't like their own *qdisc* handling on their link
-layer interface. I write *qdisc* here because, they have no net_devices
-and use some kind of own qdisc handling.
-
-My question: is this correct?
-
-How to fix that (In my opinion):
-
-So commit [0] says something "out of credits" that's what I think it's
-the *qdisc* handling. If you cannot queue anymore -> you need to drop
-it. If you don't like how the current behaviour is, you need to change
-your *qdisc* handling on your link layer interface. Introducing queue at
-6LoWPAN interfaces will introduce "buffer bloating".
-
----
-
-I don't care what bluetooth does with the 6LoWPAN interface. If bluetooth
-people wants such behaviour, then I am okay with that.
-
-I will bookmark this mail for the time when somebody reverts it to a
-virtual interface again. I think somebody will change it again, or maybe
-somebody will argument why we need a queue here. 
-
-- Alex
-
-[0] https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git/commit/?id=814f1b243d2c63928f6aa72d66bec0e5fae2f4a9
+Rob
