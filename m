@@ -1,90 +1,78 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Date: Wed, 19 Apr 2017 16:51:51 +0300
-From: Dan Carpenter <dan.carpenter@oracle.com>
-To: bjorn.andersson@sonymobile.com
-Cc: linux-bluetooth@vger.kernel.org
-Subject: [bug report] Bluetooth: Introduce Qualcomm WCNSS SMD based HCI driver
-Message-ID: <20170419135151.ho3jodg6fsnmsz4m@mwanda>
+Return-Path: <linux-wpan-owner@vger.kernel.org>
+From: Michael Richardson <mcr@sandelman.ca>
+To: Alexander Aring <aar@pengutronix.de>
+cc: Network Development <netdev@vger.kernel.org>,
+        Jukka Rissanen <jukka.rissanen@linux.intel.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        "linux-wpan\@vger.kernel.org" <linux-wpan@vger.kernel.org>,
+        Linux Bluetooth <linux-bluetooth@vger.kernel.org>
+Subject: Re: bluetooth 6lowpan interfaces are not virtual anymore
+In-Reply-To: <2d178eb8-3fbc-3385-6e0c-fa9941713959@pengutronix.de>
+References: <2d178eb8-3fbc-3385-6e0c-fa9941713959@pengutronix.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: multipart/signed; boundary="=-=-=";
+        micalg=pgp-sha256; protocol="application/pgp-signature"
+Date: Tue, 18 Apr 2017 12:59:43 -0400
+Message-ID: <28530.1492534783@obiwan.sandelman.ca>
+Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello Bjorn Andersson,
+--=-=-=
+Content-Type: text/plain
 
-The patch 1511cc750c3d: "Bluetooth: Introduce Qualcomm WCNSS SMD
-based HCI driver" from Aug 12, 2016, leads to the following static
-checker warning:
 
-	net/bluetooth/hci_core.c:3349 hci_send_frame()
-	error: double free of 'skb'
+Alexander Aring <aar@pengutronix.de> wrote:
+    > What does the 6LoWPAN interface?
 
-net/bluetooth/hci_core.c
-    68  static int btqcomsmd_send(struct hci_dev *hdev, struct sk_buff *skb)
-    69  {
-    70          struct btqcomsmd *btq = hci_get_drvdata(hdev);
-    71          int ret;
-    72  
-    73          switch (hci_skb_pkt_type(skb)) {
-    74          case HCI_ACLDATA_PKT:
-    75                  ret = rpmsg_send(btq->acl_channel, skb->data, skb->len);
-    76                  hdev->stat.acl_tx++;
-    77                  hdev->stat.byte_tx += skb->len;
-    78                  break;
-    79          case HCI_COMMAND_PKT:
-    80                  ret = rpmsg_send(btq->cmd_channel, skb->data, skb->len);
-    81                  hdev->stat.cmd_tx++;
-    82                  break;
-    83          default:
-    84                  ret = -EILSEQ;
-    85                  break;
-    86          }
-    87  
-    88          kfree_skb(skb);
-    89  
-    90          return ret;
-    91  }
-    92  
+    > It will do a protocol change (an adaptation, because 6LoWPAN should
+    > provide the same functionality as IPv6) from IPv6 to 6LoWPAN (tx) and
+    > vice versa for (rx). In my opinion this should be handled as a virtual
+    > interface and not as an interface with a queue.
 
-This function is called from:
+I wonder if modeling all the 6lowpan work as a virtual interface is even
+the right abstraction anymore.  I think that it was certainly a good model at
+the time the interface was created, given no other clear thing to do.
 
-net/bluetooth/hci_core.c
-  3320  static void hci_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
-  3321  {
-  3322          int err;
-  3323  
-  3324          BT_DBG("%s type %d len %d", hdev->name, hci_skb_pkt_type(skb),
-  3325                 skb->len);
-  3326  
-  3327          /* Time stamp */
-  3328          __net_timestamp(skb);
-  3329  
-  3330          /* Send copy to monitor */
-  3331          hci_send_to_monitor(hdev, skb);
-  3332  
-  3333          if (atomic_read(&hdev->promisc)) {
-  3334                  /* Send copy to the sockets */
-  3335                  hci_send_to_sock(hdev, skb);
-  3336          }
-  3337  
-  3338          /* Get rid of skb owner, prior to sending to the driver. */
-  3339          skb_orphan(skb);
-  3340  
-  3341          if (!test_bit(HCI_RUNNING, &hdev->flags)) {
-  3342                  kfree_skb(skb);
-  3343                  return;
-  3344          }
-  3345  
-  3346          err = hdev->send(hdev, skb);
-  3347          if (err < 0) {
-  3348                  BT_ERR("%s sending frame failed (%d)", hdev->name, err);
-  3349                  kfree_skb(skb);
+We don't model IPv6 ND (or IPv4 ARP) or fragmentation in general as a
+virtual interface on top of a raw interface.
 
-It expects that "skb" is freed on success but not on failure.  I think
-ti_st_send_frame() has a similar bug.
+Really, it's a set of operations that happens on a packet.
+802.15.4 is notable for it's current lack of an ethertype (IEEE is fixing
+that though), so you can't actually run different protocols on the
+same PANID.
+BT does have a variety of different protocols, and IPv6 is only one.
 
-  3350          }
-  3351  }
+In a classic SVR4 STREAMS works, it would have been just another module.
+(No, I'm not a fan of *STREAMS* or of SVR4 in general,  although I liked
+some of the ideas).
 
-regards,
-dan carpenter
+At this time, things like PANID and channel are set on the wpanX interface.
+If they were set on the 6lowpan interface, such that one could (in theory,
+assuming the hardware could do it, which some can, and some can not) then
+one could have multiple 6lowpan interfaces on top of the same wpanX.
+Or one could run some non-IP protocol like pre-IP Zigbee on one PANID
+while one runs 6lowpan on another.  THEN, a virtual interface would make
+sense for the same reason VLAN interfaces make sense.
+
+
+--
+]               Never tell me the odds!                 | ipv6 mesh networks [
+]   Michael Richardson, Sandelman Software Works        | network architect  [
+]     mcr@sandelman.ca  http://www.sandelman.ca/        |   ruby on rails    [
+
+
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEbsyLEzg/qUTA43uogItw+93Q3WUFAlj2Rf8ACgkQgItw+93Q
+3WWnQQgAgkXo44pEodfLnFpGEo4hSX/79hZhA2np/WAx0tLbZlYwfgnAExG5II/2
+j+eWevu5kW62oCaP3A7YckJ2WZXhiMI4UGqEPEJIC614GK7cZ8tQImflXnklpUO1
+kjeecZchtGUuBV7ZgD7AT2z83k2IU7r3nAf3msLB7YnISvS3HKlGaI8M901T6JZG
+wrjjJikMVklZw9809cVj09AT4YKTtOiwNzIvGKZ4J/qCqapcfrj/5chPwoxGuiUh
+JK2eKe5QUb37Bknso7i2gDf1LM5Oy1QlljzWPJ0b47gqppCKOwhIUvxbrcZygN8y
+NUrrQM+G68yn5UYszmUdjkFWXE32hA==
+=ntFW
+-----END PGP SIGNATURE-----
+--=-=-=--
