@@ -1,76 +1,54 @@
 Return-Path: <robh@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CAHCN7x+G_jbQTDfyPBZ4Er8vz46tEojrWf29Eztq56c9zBnMeA@mail.gmail.com>
-References: <20170413150353.7389-1-robh@kernel.org> <20170413150353.7389-2-robh@kernel.org>
- <CAHCN7x+HhwmXGxZn_31LuzdkEdoAnOSxukAdXULrGbSeKmrtRQ@mail.gmail.com>
- <CAHCN7xLHZmS_3+JygQgRxi_tX0mXL22D1Nj9T8jkrMz3-8eQDg@mail.gmail.com> <CAHCN7x+G_jbQTDfyPBZ4Er8vz46tEojrWf29Eztq56c9zBnMeA@mail.gmail.com>
+In-Reply-To: <CAHCN7xLNcD1rmifEOyPhG2rpB_C81hsyzV9W2q6kCQkKa69sZg@mail.gmail.com>
+References: <20170413150353.7389-1-robh@kernel.org> <20170413150353.7389-4-robh@kernel.org>
+ <CAHCN7xLNcD1rmifEOyPhG2rpB_C81hsyzV9W2q6kCQkKa69sZg@mail.gmail.com>
 From: Rob Herring <robh@kernel.org>
-Date: Wed, 19 Apr 2017 15:49:28 -0500
-Message-ID: <CAL_JsqLdeVnYRROmgj37Yh09h9eHtPWT8UhS_uTwjGj2FT2TYQ@mail.gmail.com>
-Subject: Re: [PATCH v3 1/4] dt-bindings: net: Add TI WiLink shared transport binding
+Date: Wed, 19 Apr 2017 15:47:23 -0500
+Message-ID: <CAL_JsqKv=pYRTxE4H81DTiUqzgSU0tVDPKBQ+WPo=VJOBNTu9Q@mail.gmail.com>
+Subject: Re: [PATCH v3 3/4] bluetooth: hci_uart: add LL protocol serdev driver support
 To: Adam Ford <aford173@gmail.com>
-Cc: Mark Rutland <mark.rutland@arm.com>, Johan Hedberg <johan.hedberg@gmail.com>,
-	Wei Xu <xuwei5@hisilicon.com>, Eyal Reizer <eyalr@ti.com>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-	"open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>, Gustavo Padovan <gustavo@padovan.org>,
-	Marcel Holtmann <marcel@holtmann.org>, Satish Patel <satish.patel@linaro.org>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, netdev <netdev@vger.kernel.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	"open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, Johan Hedberg <johan.hedberg@gmail.com>,
+	Gustavo Padovan <gustavo@padovan.org>, Satish Patel <satish.patel@linaro.org>,
+	Wei Xu <xuwei5@hisilicon.com>, Eyal Reizer <eyalr@ti.com>, netdev <netdev@vger.kernel.org>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Sun, Apr 16, 2017 at 9:09 AM, Adam Ford <aford173@gmail.com> wrote:
+On Mon, Apr 17, 2017 at 3:11 PM, Adam Ford <aford173@gmail.com> wrote:
+> On Thu, Apr 13, 2017 at 10:03 AM, Rob Herring <robh@kernel.org> wrote:
+>> Turns out that the LL protocol and the TI-ST are the same thing AFAICT.
+>> The TI-ST adds firmware loading, GPIO control, and shared access for
+>> NFC, FM radio, etc. For now, we're only implementing what is needed for
+>> BT. This mirrors other drivers like BCM and Intel, but uses the new
+>> serdev bus.
+>>
+>> The firmware loading is greatly simplified by using existing
+>> infrastructure to send commands. It may be a bit slower than the
+>> original code using synchronous functions, but the real bottleneck is
+>> likely doing firmware load at 115.2kbps.
 >
->
-> On Apr 13, 2017 10:04 AM, "Rob Herring" <robh@kernel.org> wrote:
->
-> Add serial slave device binding for the TI WiLink series of Bluetooth/FM/GPS
-> devices.
->
-> Signed-off-by: Rob Herring <robh@kernel.org>
-> Cc: Mark Rutland <mark.rutland@arm.com>
-> Cc: netdev@vger.kernel.org
-> Cc: devicetree@vger.kernel.org
-> ---
-> v3:
-> - rebase on bluetooth-next
->
->  .../devicetree/bindings/net/ti,wilink-st.txt       | 35
-> ++++++++++++++++++++++
->  1 file changed, 35 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/net/ti,wilink-st.txt
->
-> diff --git a/Documentation/devicetree/bindings/net/ti,wilink-st.txt
-> b/Documentation/devicetree/bindings/net/ti,wilink-st.txt
-> new file mode 100644
-> index 000000000000..cbad73a84ac4
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/net/ti,wilink-st.txt
-> @@ -0,0 +1,35 @@
-> +TI WiLink 7/8 (wl12xx/wl18xx) Shared Transport BT/FM/GPS devices
-> +
-> +TI WiLink devices have a UART interface for providing Bluetooth, FM radio,
-> +and GPS over what's called "shared transport". The shared transport is
-> +standard BT HCI protocol with additional channels for the other functions.
-> +
-> +These devices also have a separate WiFi interface as described in
-> +wireless/ti,wlcore.txt.
-> +
-> +This bindings follows the UART slave device binding in
-> +../serial/slave-device.txt.
-> +
-> +Required properties:
-> + - compatible: should be one of the following:
-> +    "ti,wl1271-st"
-> +    "ti,wl1273-st"
-> +    "ti,wl1831-st"
-> +    "ti,wl1835-st"
-> +    "ti,wl1837-st"
-> +
->
->
-> Would you expect the wl1283 chipset too?
+> I am using pdata-quirks to drive my wl1283 Bluetooth on a DM3730.  I
+> have the Bluetooth set to 3000000 baud in pdata quirks.  Looking at
+> the binding, I don't see an option to set the baudrate.  Is there (or
+> will there) be a way to set the baud rate of the Bluetooth?
 
-Probably, but I left it out as there's no public information.
+If you read hci_ti_probe, you will see it is already there. The
+default is 3Mbps and the DT can override that with "max-speed". The
+intent is that 3Mbps is the max the device can do and max-speed is
+only for board or host limitations. Though I just checked the
+datasheet on the 1835 and it can go up to 4364kbps. No datasheets for
+wl1283, so I have no idea what the max is.
 
-> I can help test this if you like after the holiday weekend. I have a board
-> with WL1283 and currently using pdata-quirks to support it.
+>> +static int hci_ti_probe(struct serdev_device *serdev)
+>> +{
+>> +       struct hci_uart *hu;
+>> +       struct ll_device *lldev;
+>> +       u32 max_speed = 3000000;
+
+[...]
+
+>> +       of_property_read_u32(serdev->dev.of_node, "max-speed", &max_speed);
+>> +       hci_uart_set_speeds(hu, 115200, max_speed);
