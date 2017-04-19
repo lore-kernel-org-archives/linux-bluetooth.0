@@ -1,51 +1,90 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Szymon Janc <szymon.janc@codecoup.pl>
-To: =?utf-8?B?xYF1a2Fzeg==?= Rymanowski
-        <lukasz.rymanowski@codecoup.pl>
+Date: Wed, 19 Apr 2017 16:51:51 +0300
+From: Dan Carpenter <dan.carpenter@oracle.com>
+To: bjorn.andersson@sonymobile.com
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ v2 1/5] monitor: Add description for filter in scan parameters
-Date: Wed, 19 Apr 2017 16:12:26 +0200
-Message-ID: <2270039.JPxRPnK7gO@ix>
-In-Reply-To: <20170412124127.31486-1-lukasz.rymanowski@codecoup.pl>
-References: <20170412124127.31486-1-lukasz.rymanowski@codecoup.pl>
+Subject: [bug report] Bluetooth: Introduce Qualcomm WCNSS SMD based HCI driver
+Message-ID: <20170419135151.ho3jodg6fsnmsz4m@mwanda>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi =C5=81ukasz,
+Hello Bjorn Andersson,
 
-On Wednesday, 12 April 2017 14:41:23 CEST =C5=81ukasz Rymanowski wrote:
-> < HCI Command: LE Set Scan Parameters (0x08|0x000b) plen 7
->         Type: Active (0x01)
->         Interval: 30.000 msec (0x0030)
->         Window: 30.000 msec (0x0030)
->         Own address type: Public (0x00)
->         Filter policy: Accept all advertisement, inc. directed unresolved
-> RPA (0x02) ---
->  monitor/packet.c | 6 ++++++
->  1 file changed, 6 insertions(+)
->=20
-> diff --git a/monitor/packet.c b/monitor/packet.c
-> index 5d927f5..219542e 100644
-> --- a/monitor/packet.c
-> +++ b/monitor/packet.c
-> @@ -6309,6 +6309,12 @@ static void le_set_scan_parameters_cmd(const void
-> *data, uint8_t size) case 0x01:
->  		str =3D "Ignore not in white list";
->  		break;
-> +	case 0x02:
-> +		str =3D "Accept all advertisement, inc. directed unresolved RPA";
-> +		break;
-> +	case 0x03:
-> +		str =3D "Ignore not in white list, exc. directed unresolved RPA";
-> +		break;
->  	default:
->  		str =3D "Reserved";
->  		break;
+The patch 1511cc750c3d: "Bluetooth: Introduce Qualcomm WCNSS SMD
+based HCI driver" from Aug 12, 2016, leads to the following static
+checker warning:
 
-All patches applied, thanks.
+	net/bluetooth/hci_core.c:3349 hci_send_frame()
+	error: double free of 'skb'
 
-=2D-=20
-pozdrawiam
-Szymon Janc
+net/bluetooth/hci_core.c
+    68  static int btqcomsmd_send(struct hci_dev *hdev, struct sk_buff *skb)
+    69  {
+    70          struct btqcomsmd *btq = hci_get_drvdata(hdev);
+    71          int ret;
+    72  
+    73          switch (hci_skb_pkt_type(skb)) {
+    74          case HCI_ACLDATA_PKT:
+    75                  ret = rpmsg_send(btq->acl_channel, skb->data, skb->len);
+    76                  hdev->stat.acl_tx++;
+    77                  hdev->stat.byte_tx += skb->len;
+    78                  break;
+    79          case HCI_COMMAND_PKT:
+    80                  ret = rpmsg_send(btq->cmd_channel, skb->data, skb->len);
+    81                  hdev->stat.cmd_tx++;
+    82                  break;
+    83          default:
+    84                  ret = -EILSEQ;
+    85                  break;
+    86          }
+    87  
+    88          kfree_skb(skb);
+    89  
+    90          return ret;
+    91  }
+    92  
+
+This function is called from:
+
+net/bluetooth/hci_core.c
+  3320  static void hci_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
+  3321  {
+  3322          int err;
+  3323  
+  3324          BT_DBG("%s type %d len %d", hdev->name, hci_skb_pkt_type(skb),
+  3325                 skb->len);
+  3326  
+  3327          /* Time stamp */
+  3328          __net_timestamp(skb);
+  3329  
+  3330          /* Send copy to monitor */
+  3331          hci_send_to_monitor(hdev, skb);
+  3332  
+  3333          if (atomic_read(&hdev->promisc)) {
+  3334                  /* Send copy to the sockets */
+  3335                  hci_send_to_sock(hdev, skb);
+  3336          }
+  3337  
+  3338          /* Get rid of skb owner, prior to sending to the driver. */
+  3339          skb_orphan(skb);
+  3340  
+  3341          if (!test_bit(HCI_RUNNING, &hdev->flags)) {
+  3342                  kfree_skb(skb);
+  3343                  return;
+  3344          }
+  3345  
+  3346          err = hdev->send(hdev, skb);
+  3347          if (err < 0) {
+  3348                  BT_ERR("%s sending frame failed (%d)", hdev->name, err);
+  3349                  kfree_skb(skb);
+
+It expects that "skb" is freed on success but not on failure.  I think
+ti_st_send_frame() has a similar bug.
+
+  3350          }
+  3351  }
+
+regards,
+dan carpenter
