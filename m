@@ -1,110 +1,82 @@
-Return-Path: <linux-wpan-owner@vger.kernel.org>
-Subject: Re: bluetooth 6lowpan interfaces are not virtual anymore
-To: Michael Richardson <mcr@sandelman.ca>
-References: <2d178eb8-3fbc-3385-6e0c-fa9941713959@pengutronix.de>
- <28530.1492534783@obiwan.sandelman.ca>
-Cc: Network Development <netdev@vger.kernel.org>,
-        Jukka Rissanen <jukka.rissanen@linux.intel.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>,
-        Linux Bluetooth <linux-bluetooth@vger.kernel.org>
-From: Alexander Aring <aar@pengutronix.de>
-Message-ID: <11cf222a-0c1f-4136-091d-719ee68824e1@pengutronix.de>
-Date: Wed, 19 Apr 2017 20:01:13 +0200
-MIME-Version: 1.0
-In-Reply-To: <28530.1492534783@obiwan.sandelman.ca>
-Content-Type: text/plain; charset=windows-1252
-Sender: linux-wpan-owner@vger.kernel.org
+Return-Path: <arnd@arndb.de>
+From: Arnd Bergmann <arnd@arndb.de>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>
+Cc: Sebastian Reichel <sre@kernel.org>,
+	Rob Herring <robh@kernel.org>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Bjorn Andersson <bjorn.andersson@linaro.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Kalle Valo <kvalo@codeaurora.org>,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] blutooth: try to improve CONFIG_SERIAL_DEV_BUS dependency
+Date: Wed, 19 Apr 2017 19:50:18 +0200
+Message-Id: <20170419175051.4177480-1-arnd@arndb.de>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Michael,
+With CONFIG_SERIAL_DEV_BUS=m, the hci_serdev.o file does not actually
+get built into hci_uart.o as the Makefile doesn't pick it up, leading
+to a link error with anything referring to it:
 
-On 04/18/2017 06:59 PM, Michael Richardson wrote:
-> 
-> Alexander Aring <aar@pengutronix.de> wrote:
->     > What does the 6LoWPAN interface?
-> 
->     > It will do a protocol change (an adaptation, because 6LoWPAN should
->     > provide the same functionality as IPv6) from IPv6 to 6LoWPAN (tx) and
->     > vice versa for (rx). In my opinion this should be handled as a virtual
->     > interface and not as an interface with a queue.
-> 
-> I wonder if modeling all the 6lowpan work as a virtual interface is even
-> the right abstraction anymore.  I think that it was certainly a good model at
-> the time the interface was created, given no other clear thing to do.
-> 
-> We don't model IPv6 ND (or IPv4 ARP) or fragmentation in general as a
-> virtual interface on top of a raw interface.
-> 
-> Really, it's a set of operations that happens on a packet.
-> 802.15.4 is notable for it's current lack of an ethertype (IEEE is fixing
-> that though), so you can't actually run different protocols on the
-> same PANID.
-> BT does have a variety of different protocols, and IPv6 is only one.
-> 
-> In a classic SVR4 STREAMS works, it would have been just another module.
-> (No, I'm not a fan of *STREAMS* or of SVR4 in general,  although I liked
-> some of the ideas).
-> 
+ERROR: "hci_uart_register_device" [drivers/bluetooth/hci_nokia.ko] undefined!
+scripts/Makefile.modpost:91: recipe for target '__modpost' failed
 
-ok, I see you complain about "having a virtual on top of wpan
-interface", or?
+Changing this in the Makefile would cause another problem when
+hci_uart itself is built-in and cannot reference symbols from the
+serdev module.
 
-I wanted to talk at first about the queue handling which is introduced
-when 6LoWPAN is not a virtual interface anymore. Or do you want to have
-a queue in front of 6lowpan adaptation (see other mail reply with ASCII
-graphics).
+This tries to address both problems by introducing a new hidden
+Kconfig symbol that controls both the compilation of hci_serdev.o
+and whether the Nokia driver can be selected. This seems to address
+the problem for me, though there might be a better way to do it.
 
-My definition of virtual interfaces:
- - Virtual interfaces: has no queue.
- - Non Virtual interfaces: has queue(s).
-
-> At this time, things like PANID and channel are set on the wpanX interface.
-> If they were set on the 6lowpan interface, such that one could (in theory,
-> assuming the hardware could do it, which some can, and some can not) then
-> one could have multiple 6lowpan interfaces on top of the same wpanX.
-> Or one could run some non-IP protocol like pre-IP Zigbee on one PANID
-> while one runs 6lowpan on another.  THEN, a virtual interface would make
-> sense for the same reason VLAN interfaces make sense.
-> 
-
-We can change that you can run multiple interfaces on one PHY. Currently
-we just allow one, because address filtering. Disable address filtering
--> we will loose ACK handling on hardware.
-
-I can try to implement all stuff in software "for fun, maybe see what we
-can do to handle ACK in software, etc" Then you can run multiple wpan
-interfaces on different "source PANID". Then we need some additonal
-parameter for creating 6lowpan interfaces in case of 802.15.4 to add a
-destination PANID. Last one should not big deal, because this doesn't
-require to turn address filtering off.
-
-One question would be:
-It's fine to have it as _per_ interface setting or do you want to have
-that on sendmsg(2) level?
-
+Fixes: 7bb318680e86 ("Bluetooth: add nokia driver")
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 ---
+ drivers/bluetooth/Kconfig  | 8 +++++++-
+ drivers/bluetooth/Makefile | 2 +-
+ 2 files changed, 8 insertions(+), 2 deletions(-)
 
-You complain also, maybe... because currently it's hard to deal with
-configuration 6lowpan interfaces with 802.15.4 interfaces. Because you
-need to have both down to change address filtering etc.
-
-What we can do there is "make it easier" if wpan interface goes down,
-then upper 6LoWPAN interface goes also down (we can do that). But here
-is the question - a userspace programm can do the same job.
-
-For setting channels/panid for 6lowpan interfaces -> we can make that
-nl802154 will also accept net_device namens for 802.15.4 6lowpan
-interfaces which makes changes to the "lower" wpan interface -> should
-be possible.
-
-Let me known if you like to have such solution, which should make it
-just simpler to dealing with ifdown/ifup and changing interface naming
-stuff.
-
-Currently, we forbid much stuff - We can do some changes (tx parameters)
-when interface is up, just need to besure we don't changes paramters
-while transmit. But make everything at first forbidden and then allows
-more will usally not break UAPI. :-)
-
-- Alex
+diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
+index 8aafbed9e160..737d93ef27c5 100644
+--- a/drivers/bluetooth/Kconfig
++++ b/drivers/bluetooth/Kconfig
+@@ -76,6 +76,12 @@ config BT_HCIUART
+ 	  Say Y here to compile support for Bluetooth UART devices into the
+ 	  kernel or say M to compile it as module (hci_uart).
+ 
++config BT_HCIUART_SERDEV
++	bool
++	depends on SERIAL_DEV_BUS && BT_HCIUART
++	depends on SERIAL_DEV_BUS=y || SERIAL_DEV_BUS=BT_HCIUART
++	default y
++
+ config BT_HCIUART_H4
+ 	bool "UART (H4) protocol support"
+ 	depends on BT_HCIUART
+@@ -89,7 +95,7 @@ config BT_HCIUART_H4
+ config BT_HCIUART_NOKIA
+ 	tristate "UART Nokia H4+ protocol support"
+ 	depends on BT_HCIUART
+-	depends on SERIAL_DEV_BUS
++	depends on BT_HCIUART_SERDEV
+ 	depends on PM
+ 	help
+ 	  Nokia H4+ is serial protocol for communication between Bluetooth
+diff --git a/drivers/bluetooth/Makefile b/drivers/bluetooth/Makefile
+index a7f237320f4b..e693ca6eeed9 100644
+--- a/drivers/bluetooth/Makefile
++++ b/drivers/bluetooth/Makefile
+@@ -31,7 +31,7 @@ btmrvl-y			:= btmrvl_main.o
+ btmrvl-$(CONFIG_DEBUG_FS)	+= btmrvl_debugfs.o
+ 
+ hci_uart-y				:= hci_ldisc.o
+-hci_uart-$(CONFIG_SERIAL_DEV_BUS)	+= hci_serdev.o
++hci_uart-$(CONFIG_BT_HCIUART_SERDEV)	+= hci_serdev.o
+ hci_uart-$(CONFIG_BT_HCIUART_H4)	+= hci_h4.o
+ hci_uart-$(CONFIG_BT_HCIUART_BCSP)	+= hci_bcsp.o
+ hci_uart-$(CONFIG_BT_HCIUART_LL)	+= hci_ll.o
+-- 
+2.9.0
