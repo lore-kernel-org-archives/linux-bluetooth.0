@@ -1,54 +1,52 @@
-Return-Path: <robh@kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <CAHCN7xLNcD1rmifEOyPhG2rpB_C81hsyzV9W2q6kCQkKa69sZg@mail.gmail.com>
-References: <20170413150353.7389-1-robh@kernel.org> <20170413150353.7389-4-robh@kernel.org>
- <CAHCN7xLNcD1rmifEOyPhG2rpB_C81hsyzV9W2q6kCQkKa69sZg@mail.gmail.com>
-From: Rob Herring <robh@kernel.org>
-Date: Wed, 19 Apr 2017 15:47:23 -0500
-Message-ID: <CAL_JsqKv=pYRTxE4H81DTiUqzgSU0tVDPKBQ+WPo=VJOBNTu9Q@mail.gmail.com>
-Subject: Re: [PATCH v3 3/4] bluetooth: hci_uart: add LL protocol serdev driver support
-To: Adam Ford <aford173@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	"open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>, Mark Rutland <mark.rutland@arm.com>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, Johan Hedberg <johan.hedberg@gmail.com>,
-	Gustavo Padovan <gustavo@padovan.org>, Satish Patel <satish.patel@linaro.org>,
-	Wei Xu <xuwei5@hisilicon.com>, Eyal Reizer <eyalr@ti.com>, netdev <netdev@vger.kernel.org>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
-Content-Type: text/plain; charset=UTF-8
+Return-Path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+Subject: Re: [PATCH] blutooth: try to improve CONFIG_SERIAL_DEV_BUS dependency
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20170419175051.4177480-1-arnd@arndb.de>
+Date: Wed, 19 Apr 2017 22:09:33 +0200
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Sebastian Reichel <sre@kernel.org>,
+        Rob Herring <robh@kernel.org>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Kalle Valo <kvalo@codeaurora.org>,
+        Linux Bluetooth <linux-bluetooth@vger.kernel.org>,
+        linux-kernel@vger.kernel.org
+Message-Id: <4F901B46-50C3-4932-9923-8E4FF69191B9@holtmann.org>
+References: <20170419175051.4177480-1-arnd@arndb.de>
+To: Arnd Bergmann <arnd@arndb.de>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Apr 17, 2017 at 3:11 PM, Adam Ford <aford173@gmail.com> wrote:
-> On Thu, Apr 13, 2017 at 10:03 AM, Rob Herring <robh@kernel.org> wrote:
->> Turns out that the LL protocol and the TI-ST are the same thing AFAICT.
->> The TI-ST adds firmware loading, GPIO control, and shared access for
->> NFC, FM radio, etc. For now, we're only implementing what is needed for
->> BT. This mirrors other drivers like BCM and Intel, but uses the new
->> serdev bus.
->>
->> The firmware loading is greatly simplified by using existing
->> infrastructure to send commands. It may be a bit slower than the
->> original code using synchronous functions, but the real bottleneck is
->> likely doing firmware load at 115.2kbps.
->
-> I am using pdata-quirks to drive my wl1283 Bluetooth on a DM3730.  I
-> have the Bluetooth set to 3000000 baud in pdata quirks.  Looking at
-> the binding, I don't see an option to set the baudrate.  Is there (or
-> will there) be a way to set the baud rate of the Bluetooth?
+Hi Arnd,
 
-If you read hci_ti_probe, you will see it is already there. The
-default is 3Mbps and the DT can override that with "max-speed". The
-intent is that 3Mbps is the max the device can do and max-speed is
-only for board or host limitations. Though I just checked the
-datasheet on the 1835 and it can go up to 4364kbps. No datasheets for
-wl1283, so I have no idea what the max is.
+> With CONFIG_SERIAL_DEV_BUS=m, the hci_serdev.o file does not actually
+> get built into hci_uart.o as the Makefile doesn't pick it up, leading
+> to a link error with anything referring to it:
+> 
+> ERROR: "hci_uart_register_device" [drivers/bluetooth/hci_nokia.ko] undefined!
+> scripts/Makefile.modpost:91: recipe for target '__modpost' failed
+> 
+> Changing this in the Makefile would cause another problem when
+> hci_uart itself is built-in and cannot reference symbols from the
+> serdev module.
+> 
+> This tries to address both problems by introducing a new hidden
+> Kconfig symbol that controls both the compilation of hci_serdev.o
+> and whether the Nokia driver can be selected. This seems to address
+> the problem for me, though there might be a better way to do it.
+> 
+> Fixes: 7bb318680e86 ("Bluetooth: add nokia driver")
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> ---
+> drivers/bluetooth/Kconfig  | 8 +++++++-
+> drivers/bluetooth/Makefile | 2 +-
+> 2 files changed, 8 insertions(+), 2 deletions(-)
 
->> +static int hci_ti_probe(struct serdev_device *serdev)
->> +{
->> +       struct hci_uart *hu;
->> +       struct ll_device *lldev;
->> +       u32 max_speed = 3000000;
+patch has been applied to bluetooth-next tree.
 
-[...]
+Regards
 
->> +       of_property_read_u32(serdev->dev.of_node, "max-speed", &max_speed);
->> +       hci_uart_set_speeds(hu, 115200, max_speed);
+Marcel
