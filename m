@@ -4,116 +4,42 @@ To: Marcel Holtmann <marcel@holtmann.org>
 CC: Dean Jenkins <Dean_Jenkins@mentor.com>, "Gustavo F . Padovan"
 	<gustavo@padovan.org>, Johan Hedberg <johan.hedberg@gmail.com>,
 	<linux-bluetooth@vger.kernel.org>
-Subject: [PATCH V3 0/3] hci_ldisc hci_uart_init_work() fixes
-Date: Thu, 20 Apr 2017 18:06:38 +0100
-Message-ID: <1492708001-30228-1-git-send-email-Dean_Jenkins@mentor.com>
+Subject: [PATCH V3 3/3] Bluetooth: hci_ldisc: Add missing clear HCI_UART_PROTO_READY
+Date: Thu, 20 Apr 2017 18:06:41 +0100
+Message-ID: <1492708001-30228-4-git-send-email-Dean_Jenkins@mentor.com>
+In-Reply-To: <1492708001-30228-1-git-send-email-Dean_Jenkins@mentor.com>
+References: <1492708001-30228-1-git-send-email-Dean_Jenkins@mentor.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Ensure that HCI_UART_PROTO_READY is cleared before close(hu) is
+called which closes the Data Link protocol layer.
 
-To make things easier for you, I am going to break up my V2 patchset of 16
-patches into smaller patchsets. I think this approach will increase the
-probability of you taking the patches and providing me feedback. Therefore, you
-can concentrate on a few tightly related patches in one go.
+Therefore, add the missing bit clear of HCI_UART_PROTO_READY to
+hci_uart_init_work() so that the flag is cleared when
+hci_register_dev fails.
 
-This is patchset V3 which are needed fixes before hci_uart_tty_close() can be
-reorganised to overcome a design flaw related to the proper closure of the
-Data Link protocol layer. In the worst case scenario a kernel crash occurs.
+Without the fix, the functions of the Data Link protocol layer could
+potentially be accessed after that layer has been closed. This
+could lead to a crash as memory would have been freed in that layer.
 
-Previous Discussions
-====================
+Signed-off-by: Dean Jenkins <Dean_Jenkins@mentor.com>
+---
+ drivers/bluetooth/hci_ldisc.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Please refer to the discussion on my patchset V2 that can be found here:
-https://www.spinics.net/lists/linux-bluetooth/msg70183.html
-
-Please refer to the discussion on my RFC patchset V1 that can be found here:
-https://www.spinics.net/lists/linux-bluetooth/msg70077.html
-
-
-Changes between V2 and V3
-=========================
-
-1. Only presenting the first 3 patches of the V2 patchset. These changes relate
-   mainly to handling of the failure to register the hdev device for the h5
-   Protocol Data layer protocol.
-
-2. The remaining 13 patches will be put into smaller patchsets after this first
-   patchset has been accepted.
-
-3. Changed the patchset title from "hci_ldisc hci_uart_tty_close() fixes" to
-   "hci_ldisc hci_uart_init_work() fixes" because this patchset does not modify
-   hci_uart_tty_close().
-   
-
-Changes between V1 and V2
-=========================
-
-1. Implemented some minor code style changes that were suggested by Marcel
-Holtmann.
-2. Reordered some of the patches to better group together related changes.
-
-Analysis
-========
-
-hci_uart_init_work() is used with the h5 Data Link layer protocol. Static code
-inspection reveals issues. Instead of testing with h5, test code was used to
-show that a kernel crash occurs in HCI LDISC.
-
-hci_uart_init_work() is used to register the HCI UART device and sets the
-HCI_UART_REGISTERED flag after the h5 protocol has reached the H5_ACTIVE state
-and calls hci_uart_init_ready(). This procedure is armed by setting the
-HCI_UART_INIT_PENDING flag via hci_uart_tty_ioctl() using HCIUARTSETFLAGS.
-
-During my analysis, it became clear that the hci_uart_init_work() function was
-incomplete. Initially, it caused me confusion in how the design allowed
-HCI_UART_REGISTERED to be set despite hci_register_dev() failing.
-
-
-Test code was added to:
-a) set flag HCI_UART_INIT_PENDING - used with h5 to delay hdev registration
-b) call hci_uart_init_ready() - simulates h5 reaching the H5_ACTIVE state
-c) force hci_register_dev() to fail
-
-This testcase caused a kernel crash because hdev was freed in
-hci_uart_init_work() but the HCI_UART_REGISTERED flag was set. Therefore,
-the HCI_UART_REGISTERED flag is erroneously set on the failure of
-hci_register_dev(). This is fixed in the following patch by adding a missing
-return statement:
-
-  Bluetooth: hci_ldisc: Add missing return in hci_uart_init_work()
-
-
-Analysis of hu->hdev showed that the hdev member of hu could remain present
-despite hdev having been freed. This is potentially dangerous as there is a risk
-of using hu->hdev after hdev was freed. This is fixed in patch:
-
-  Bluetooth: hci_ldisc: Ensure hu->hdev set to NULL before freeing hdev
-
-
-Analysis of the flag HCI_UART_PROTO_READY showed an inconsistency for
-hci_register_dev() failing in hci_uart_init_work(). The oversight is that
-HCI_UART_PROTO_READY must be cleared before the close "proto" function pointer
-is called as per hci_uart_set_proto() and hci_uart_tty_close(). This is fixed
-in patch:
-
-  Bluetooth: hci_ldisc: Add missing clear HCI_UART_PROTO_READY
-
-
-Patch list
-==========
-
-The patches were rebased onto the bluetooth-next/master branch commit:
-6493b63 ieee802154: don't select COMMON_CLK
-
-Dean Jenkins (3):
-  Bluetooth: hci_ldisc: Add missing return in hci_uart_init_work()
-  Bluetooth: hci_ldisc: Ensure hu->hdev set to NULL before freeing hdev
-  Bluetooth: hci_ldisc: Add missing clear HCI_UART_PROTO_READY
-
- drivers/bluetooth/hci_ldisc.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
-
+diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
+index b1096d1..c53513c 100644
+--- a/drivers/bluetooth/hci_ldisc.c
++++ b/drivers/bluetooth/hci_ldisc.c
+@@ -188,6 +188,7 @@ static void hci_uart_init_work(struct work_struct *work)
+ 		hdev = hu->hdev;
+ 		hu->hdev = NULL;
+ 		hci_free_dev(hdev);
++		clear_bit(HCI_UART_PROTO_READY, &hu->flags);
+ 		hu->proto->close(hu);
+ 		return;
+ 	}
 -- 
 2.7.4
