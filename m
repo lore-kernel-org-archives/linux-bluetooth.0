@@ -1,118 +1,66 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-From: Andrew - <hidefromkgb@gmail.com>
-Date: Sun, 23 Apr 2017 04:59:58 +0200
-Message-ID: <CAAo+LNOdoGnR1uiFA+mc=P_wZKWk59S27VUTJyNvDF7_YyH=KA@mail.gmail.com>
-Subject: MS Designer Keyboard fails to reconnect
-To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Content-Type: multipart/mixed; boundary=001a1145bd0aaf5290054dccaf3b
+In-Reply-To: <20170422052644.GA31652@x1c>
+References: <CAAu3APbw0JyPfKUi6PZ4Nr2Uh5WXtDprDVFBTj3xr+801b9L6w@mail.gmail.com>
+ <CAAu3APbMKQY2dnD=TUAb_3BqFKk0s2bzuFFLX8=h-1g7gm8G=Q@mail.gmail.com>
+ <20170408071834.GA12144@x1c> <CAAu3APahskA_b2Ydt8TzUWBQnkuC10UwjZ37RaOyhAt4s1iyiQ@mail.gmail.com>
+ <20170422052644.GA31652@x1c>
+From: Barry Byford <31baz66@gmail.com>
+Date: Sat, 22 Apr 2017 21:46:16 +0100
+Message-ID: <CAAu3APZxRDoZhCU7QtWVNd05HbKzadoX=886r_REiebvmMj6vQ@mail.gmail.com>
+Subject: Re: Serial Port connection with DBus API
+To: Bluez mailing list <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---001a1145bd0aaf5290054dccaf3b
-Content-Type: text/plain; charset=UTF-8
+On 22 April 2017 at 06:26, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi Barry,
+>
+> On Fri, Apr 21, 2017, Barry Byford wrote:
+>> >> >             'Channel': GLib.Variant('i', 1),
+> ...
+>> However I'm now seeing this error appear in btmon when I try to bind
+>> to the RFCOMM socket:
+>>
+>> = bluetoothd: RFCOMM server failed for SerialPort: rfcomm_bind:
+>> Address already in use (98)
+>
+> I think that means that you already have some other service listening on
+> RFCOMM channel 1. Try using some other channel, or identify and stop the
+> other service that's using channel 1.
 
-Hello. I`m stuck again, requesting assistance. Using BlueZ 5.44 @
-ArchLinux 4.10.11 - clean install, without any legacy stuff that was
-the source of my problems back then.
+Turns out it was me that was creating the other service. :-(
 
-My MS Designer Keyboard is now pairing and connecting correctly. I`m
-typing this message with it. But once it disconnects (either after 600
-sec idle or by invoking org.bluez.Device1.Disconnect manually),
-nothing can make it properly reconnect except deleting it in
-bluetoothctl or Blueman and pairing again.
+Depending which order I bind to the socket or RegisterProfile, depends
+if I get the error in Bluetoothd or sockets.
 
-I`ve attached 2 packet dumps: "begin" is what happens on pairing, and
-"reconnect" is when I try to continue typing after 10++ minute idle.
-No matter which keys I press, nothing like the first two packets of
-"reconnect" (a proper key-down / key-up response) gets captured. The
-manual disconnect situation is identical to what`s going on in
-"reconnect".
+I can register the Serial Port profile successfully which allows me to
+connect from the (Bluedot) Android app and I can see information being
+sent to my Linux board in btmon. However I don't seem to be able to
+get at that information in my script.
 
-Can you please tell me what I need to do to make it work?
+Looking at this a bit more, maybe the socket connection should be
+created from the 'fd' parameter passed to NewConnection. However when
+I try to get the socket with this:
 
---001a1145bd0aaf5290054dccaf3b
-Content-Type: application/x-pcapng; name="begin.pcapng"
-Content-Disposition: attachment; filename="begin.pcapng"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: file0
+def NewConnection(self, path, fd, properties):
+  self.server_sock = socket.fromfd(fd, socket.AF_BLUETOOTH, socket.SOCK_STREAM,
+                                                       socket.BTPROTO_RFCOMM)
+  data = self.server_sock.recv(1024)
 
-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
---001a1145bd0aaf5290054dccaf3b
-Content-Type: application/x-pcapng; name="reconnect.pcapng"
-Content-Disposition: attachment; filename="reconnect.pcapng"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: file2
+It gives the following:
 
-H4sIAOuh+1gAA61WXWgTWRQ+dzKTpsk0TWbabH52tyMUrPTHpFRYscqsW0HYRJusouCiTddgg9aG
-2ILC0oel+CBoLbhbXPShcfFhH0ZYRFTEny0sq30Rf/rmgrtYfVphq/tazyQzmZvkTqzgQJLDzXfO
-+b5zzz133E1N7r0AkOjvDBP8XTEeB7RAPHt04rjS1xOL9sRi3bHuL1NfbechBAMTo7nv0jmlY082
-nzk2ks4fXqf09vT2bIDSo8fTY23Hz/3iCg8cuGH4yERmfGxsfCQK0IgIJ/4j2uQBw1/H9Btx5xMC
-vJEeTUbQjpSWCKcqEngxQeQz/LKefobvgdkntr7A8O2ifB8/vVDwoO0xfHmBBxXkIqYae33qYsGN
-tttYI6LCgYGpxu4+fbEyrpdHuIWNUthRxDaj3WzG9SgNMFSCRBmx98/UxvYobB5TM7WcCWFj1/9Y
-n/MuCjs3OlfoRbvXxG7p5DDsdF9q7ezdNo6EIysTsJUnJH13dm2qb/p3/ftMroS+VYpVvY/kTlwL
-oR0qx5SQK7kxu3Hf/D3nlanvc8vf3rLZx43ou9q9mf8jrtXTOUBhnyN2DdprzLhNSmgINwcMWtjo
-InwOXcT4f4BRqxOP4trHqBWt4dBilYZmXudW1kDXVViKa2G0w+X8MsEmNyWU+Avsuo4tVdU1oHCq
-TV23kUQtp4DC7PnDiP2Qno8JiZo9s+v5zYhdbc+HGmvj0r3QR2HlkwlNRlsu11HUh4W59UVsdf+c
-RZ92tNtNLiHlUxWG1zUshtUr4tOrl2//PD71MtkU6HLlxAevh83+oTlGTjHqGlKYeuZe7KjEukoU
-WXvgXNqh+dD2GWucCg3g0Ie6wEUZeP+5nTRen7MlvOMTYOF/rcRb8d0O5h6Thzs1EfS7w+AuC0TF
-G8bkrlLYzY2DWhvabRaXAEgY2zOQOZY9dDSTV77OnBgeS+cPFv2qub1CfzY3gall6+QgW7vnnoOF
-vz1pF9/H1D50c7Cu9i8obHh5UGtFu9XiIoJL58Lt552uVmLgqznNLL+fE53n/5HkqvPQ52Qym9Ra
-0G6x8ngwEw8+gu8h0GGeE1r/q1+SdfXTZ+rtsyQ9k3VeQUzGg99JMA8EXZiPBEUU6g6CNZNpjvm/
-7Dj6KzjSc7Tzm5TGfM/wO/0YqDnYiq5SsDxH6XyvsylNQluy8jWCgL6SBziwZgddk7bpVN2a0HfM
-b4XUR7lj6H7p/DOledH2WnrxkCJn2ZrRFffMD+cr7m/E+5C8ABLnwvq0o2fxnmTVZz36UrNVr48b
-QTh0ueI9btaH7s8N6BNAO2CsEVnxqnQisPqTruuln87XzlOZPU9P/32BsQeEec/+O7dgo5930e8J
-LP2xwoKNft5W/yb0qdVf+ULCOp//XV7Q/Gj7TU1bcCCrVtlYvXjj2sKqa/Y8/bBuzWguyy/+YXEp
-S9Cx7wBzRF/ZzAwAAA==
---001a1145bd0aaf5290054dccaf3b--
+Exception while handling org.bluez.Profile1.NewConnection()
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.5/dist-packages/pydbus/registration.py",
+line 81, in call_method
+    result = method(*parameters, **kwargs)
+  File "BTclassic.py", line 67, in NewConnection
+    data = self.server_sock.recv(1024)
+OSError: [Errno 88] Socket operation on non-socket
+
+I had been following test/test-hfp as the basic structure but that
+doesn't seem to be working for me.
+
+Not sure where to go next with this
