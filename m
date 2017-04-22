@@ -1,66 +1,45 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+To: linux-bluetooth@vger.kernel.org
+From: Lukas Wagner <lwagner94@posteo.at>
+Subject: Segfault when pairing A2DP device
+Message-ID: <a489fffc-6960-fbe9-a15e-0aba90adec39@posteo.at>
+Date: Sat, 22 Apr 2017 15:13:38 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170422052644.GA31652@x1c>
-References: <CAAu3APbw0JyPfKUi6PZ4Nr2Uh5WXtDprDVFBTj3xr+801b9L6w@mail.gmail.com>
- <CAAu3APbMKQY2dnD=TUAb_3BqFKk0s2bzuFFLX8=h-1g7gm8G=Q@mail.gmail.com>
- <20170408071834.GA12144@x1c> <CAAu3APahskA_b2Ydt8TzUWBQnkuC10UwjZ37RaOyhAt4s1iyiQ@mail.gmail.com>
- <20170422052644.GA31652@x1c>
-From: Barry Byford <31baz66@gmail.com>
-Date: Sat, 22 Apr 2017 21:46:16 +0100
-Message-ID: <CAAu3APZxRDoZhCU7QtWVNd05HbKzadoX=886r_REiebvmMj6vQ@mail.gmail.com>
-Subject: Re: Serial Port connection with DBus API
-To: Bluez mailing list <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 22 April 2017 at 06:26, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> Hi Barry,
->
-> On Fri, Apr 21, 2017, Barry Byford wrote:
->> >> >             'Channel': GLib.Variant('i', 1),
-> ...
->> However I'm now seeing this error appear in btmon when I try to bind
->> to the RFCOMM socket:
->>
->> = bluetoothd: RFCOMM server failed for SerialPort: rfcomm_bind:
->> Address already in use (98)
->
-> I think that means that you already have some other service listening on
-> RFCOMM channel 1. Try using some other channel, or identify and stop the
-> other service that's using channel 1.
+Hello,
 
-Turns out it was me that was creating the other service. :-(
+when I try to pair my Bose QC35 Headset, bluetoothd crashes with the
+following stack trace:
 
-Depending which order I bind to the socket or RegisterProfile, depends
-if I get the error in Bluetoothd or sockets.
+#0  0x000000000048d932 ba2str (bluetoothd)
+#1  0x00000000004882d1 update_bredr_services (bluetoothd)
+#2  0x0000000000488b9e browse_cb (bluetoothd)
+#3  0x000000000045e6cc search_completed_cb (bluetoothd)
+#4  0x00000000004a03f2 sdp_process (bluetoothd)
+#5  0x000000000045e780 search_process_cb (bluetoothd)
+#6  0x00007f28aca7545a g_main_context_dispatch (libglib-2.0.so.0)
+#7  0x00007f28aca75810 n/a (libglib-2.0.so.0)
+#8  0x00007f28aca75b32 g_main_loop_run (libglib-2.0.so.0)
+#9  0x000000000044d267 main (bluetoothd)
+#10 0x00007f28ac04b511 __libc_start_main (libc.so.6)
+#11 0x000000000040ad6a _start (bluetoothd)
 
-I can register the Serial Port profile successfully which allows me to
-connect from the (Bluedot) Android app and I can see information being
-sent to my Linux board in btmon. However I don't seem to be able to
-get at that information in my script.
+Coredump: http://wikisend.com/download/366074/core
 
-Looking at this a bit more, maybe the socket connection should be
-created from the 'fd' parameter passed to NewConnection. However when
-I try to get the socket with this:
+Version: bluez 5.44-17-g677a3456a
 
-def NewConnection(self, path, fd, properties):
-  self.server_sock = socket.fromfd(fd, socket.AF_BLUETOOTH, socket.SOCK_STREAM,
-                                                       socket.BTPROTO_RFCOMM)
-  data = self.server_sock.recv(1024)
+Steps to reproduce:
+	- Remove (if already paired) bluetooth headset
+	- Pair in bluetoothctl
 
-It gives the following:
+I believe this might be related to the bug reported here:
+http://marc.info/?l=linux-bluetooth&m=149121146509800&w=2
 
-Exception while handling org.bluez.Profile1.NewConnection()
-Traceback (most recent call last):
-  File "/usr/local/lib/python3.5/dist-packages/pydbus/registration.py",
-line 81, in call_method
-    result = method(*parameters, **kwargs)
-  File "BTclassic.py", line 67, in NewConnection
-    data = self.server_sock.recv(1024)
-OSError: [Errno 88] Socket operation on non-socket
+Please let me know any more information on this.
+I'm also willing to do some debugging myself if anybody can point me
+in the right direction.
 
-I had been following test/test-hfp as the basic structure but that
-doesn't seem to be working for me.
-
-Not sure where to go next with this
+Cheers
