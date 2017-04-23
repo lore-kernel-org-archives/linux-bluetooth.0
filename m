@@ -1,9 +1,9 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 3/3] client: Always start an agent
-Date: Sun, 23 Apr 2017 23:14:57 +0300
-Message-Id: <20170423201457.7963-3-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 2/3] monitor: Fix not decoding control frames
+Date: Sun, 23 Apr 2017 23:14:56 +0300
+Message-Id: <20170423201457.7963-2-luiz.dentz@gmail.com>
 In-Reply-To: <20170423201457.7963-1-luiz.dentz@gmail.com>
 References: <20170423201457.7963-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,49 +11,33 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Always register agent with default capability.
+In order to enable decoding control frames packet_monitor needs to check
+if the index is set to HCI_DEV_NONE since that will call packet_ctrl_open
+which setups the ctrl and assign it a cookie.
 ---
- client/main.c | 13 +++++++------
- 1 file changed, 7 insertions(+), 6 deletions(-)
+ monitor/packet.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
 
-diff --git a/client/main.c b/client/main.c
-index 8c9d5c3..255cbd5 100644
---- a/client/main.c
-+++ b/client/main.c
-@@ -2355,10 +2355,10 @@ static gboolean option_version = FALSE;
- static gboolean parse_agent(const char *key, const char *value,
- 					gpointer user_data, GError **error)
- {
--	if (value)
--		auto_register_agent = g_strdup(value);
--	else
--		auto_register_agent = g_strdup("");
-+	if (!value)
-+		return FALSE;
-+
-+	auto_register_agent = g_strdup(value);
+diff --git a/monitor/packet.c b/monitor/packet.c
+index 89423d1..2e09dda 100644
+--- a/monitor/packet.c
++++ b/monitor/packet.c
+@@ -3866,10 +3866,11 @@ void packet_monitor(struct timeval *tv, struct ucred *cred,
+ 	uint16_t manufacturer;
+ 	const char *ident;
  
- 	return TRUE;
- }
-@@ -2366,8 +2366,7 @@ static gboolean parse_agent(const char *key, const char *value,
- static GOptionEntry options[] = {
- 	{ "version", 'v', 0, G_OPTION_ARG_NONE, &option_version,
- 				"Show version information and exit" },
--	{ "agent", 'a', G_OPTION_FLAG_OPTIONAL_ARG,
--				G_OPTION_ARG_CALLBACK, parse_agent,
-+	{ "agent", 'a', 0, G_OPTION_ARG_CALLBACK, parse_agent,
- 				"Register agent handler", "CAPABILITY" },
- 	{ NULL },
- };
-@@ -2385,6 +2384,8 @@ int main(int argc, char *argv[])
- 	GDBusClient *client;
- 	guint signal;
+-	if (index_filter && index_number != index)
+-		return;
+-
+-	index_current = index;
++	if (index != HCI_DEV_NONE) {
++		if (index_filter && index_number != index)
++			return;
++		index_current = index;
++	}
  
-+	auto_register_agent = g_strdup("");
-+
- 	context = g_option_context_new(NULL);
- 	g_option_context_add_main_entries(context, options, NULL);
- 
+ 	if (tv && time_offset == ((time_t) -1))
+ 		time_offset = tv->tv_sec;
 -- 
 2.9.3
 
