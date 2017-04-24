@@ -1,24 +1,60 @@
-Return-Path: <netdev-owner@vger.kernel.org>
-Date: Mon, 24 Apr 2017 14:06:29 -0400 (EDT)
-Message-Id: <20170424.140629.55318670589360443.davem@davemloft.net>
-To: johan.hedberg@gmail.com
-Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: pull request: bluetooth-next 2017-04-22
-From: David Miller <davem@davemloft.net>
-In-Reply-To: <20170422131302.GA17928@x1c>
-References: <20170422131302.GA17928@x1c>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Sender: netdev-owner@vger.kernel.org
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+Subject: Re: [PATCH v3] Bluetooth: convert smp and selftest to crypto kpp API
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1493036000-30800-1-git-send-email-salvatore.benedetto@intel.com>
+Date: Mon, 24 Apr 2017 18:59:01 +0200
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+        Linux Bluetooth <linux-bluetooth@vger.kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Johan Hedberg <johan.hedberg@gmail.com>
+Message-Id: <0E31966D-F53A-40F5-824B-6C6D26FE6426@holtmann.org>
+References: <1493036000-30800-1-git-send-email-salvatore.benedetto@intel.com>
+To: Salvatore Benedetto <salvatore.benedetto@intel.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@gmail.com>
-Date: Sat, 22 Apr 2017 16:13:02 +0300
+Hi Salvatore,
 
-> Here are some more Bluetooth patches (and one 802.15.4 patch) in the
-> bluetooth-next tree targeting the 4.12 kernel. Most of them are pure
-> fixes.
+> * Convert both smp and selftest to crypto kpp API
+> * Remove module ecc as no more required
+> * Add ecdh_helper functions for wrapping kpp async calls
 > 
-> Please let me know if there are any issues pulling. Thanks.
+> This patch has been tested *only* with selftest, which is called on
+> module loading.
+> 
+> Signed-off-by: Salvatore Benedetto <salvatore.benedetto@intel.com>
+> ---
+> 
+> Somehow I forgot to send this patch.
+> 
+> Changes from v2
+> - Based on bluetooth-next
+> - Update code to latest API: remove crypto_kpp_set_params and use
+>   crypto_ecdh_encode_key
+> - Removed include guards from internal header as requested by Johan
+> - Added CRYPTO_ECDH dependecy to bluetooth Kconfig
+> - Rename compute_ecdh_shared_secret and generate_ecdh_key_pair to
+>   compute_ecdh_secret and generate_ecdh_keys respectively
+> 
+> net/bluetooth/Kconfig       |   1 +
+> net/bluetooth/Makefile      |   2 +-
+> net/bluetooth/ecc.c         | 816 --------------------------------------------
+> net/bluetooth/ecc.h         |  54 ---
+> net/bluetooth/ecdh_helper.c | 223 ++++++++++++
+> net/bluetooth/ecdh_helper.h |  27 ++
+> net/bluetooth/selftest.c    |   6 +-
+> net/bluetooth/smp.c         |   8 +-
+> 8 files changed, 259 insertions(+), 878 deletions(-)
+> delete mode 100644 net/bluetooth/ecc.c
+> delete mode 100644 net/bluetooth/ecc.h
+> create mode 100644 net/bluetooth/ecdh_helper.c
+> create mode 100644 net/bluetooth/ecdh_helper.h
 
-Pulled, thank you.
+patch has been applied to bluetooth-next tree.
+
+Regards
+
+Marcel
+
