@@ -1,402 +1,197 @@
-Return-Path: <linux-wpan-owner@vger.kernel.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <f3c04860-651e-c9f3-e7ab-db609d105436@pengutronix.de>
-References: <2d178eb8-3fbc-3385-6e0c-fa9941713959@pengutronix.de>
- <CABBYNZLqTvd5cnG4fKJgPKJGvS6hsk8vOM+7NQ_RhLJ-WOszmg@mail.gmail.com> <f3c04860-651e-c9f3-e7ab-db609d105436@pengutronix.de>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 24 Apr 2017 13:35:10 +0300
-Message-ID: <CABBYNZJqChBfB4jNCN3edmKSfhNd-haTKOjeYy1toK-Mn=qzoA@mail.gmail.com>
-Subject: Re: bluetooth 6lowpan interfaces are not virtual anymore
-To: Alexander Aring <aar@pengutronix.de>
-Cc: Network Development <netdev@vger.kernel.org>,
-        Jukka Rissanen <jukka.rissanen@linux.intel.com>,
-        "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>,
-        Linux Bluetooth <linux-bluetooth@vger.kernel.org>,
-        Michael Richardson <mcr@sandelman.ca>
+In-Reply-To: <20170424082524.GD1084@annapurna>
+References: <20170406125150.GF12069@annapurna> <CABBYNZJAs_kSpMk43okA1ZhJow_YZvuTqPPt-Oud2_5yOCD8jA@mail.gmail.com>
+ <20170424082524.GD1084@annapurna>
+From: Luke McKee <hojuruku@gmail.com>
+Date: Mon, 24 Apr 2017 17:16:43 +0700
+Message-ID: <CAENjB=KEy=70fG=RQC7xMKm2jrVVJjiHSkr7DXAD_HRYc+jspg@mail.gmail.com>
+Subject: Re: Regression in bluez 5.44, bluetoothd crashes
+To: Konrad Zapalowicz <konrad.zapalowicz@canonical.com>,
+        linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=UTF-8
-Sender: linux-wpan-owner@vger.kernel.org
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alex,
+You sound like a legend even though I'm a gentoo.org user working on
+our bugs mostly ;)
+https://bugs.gentoo.org/show_bug.cgi?id=613224
 
-On Wed, Apr 19, 2017 at 8:43 PM, Alexander Aring <aar@pengutronix.de> wrote:
-> Hi,
->
-> at first I want to clarify what my definition of virtual and non virtual
-> interface is:
->
-> - virtual interfaces: has no queue(s)
-> - non virtual interfaces: has a queue(s)
->
-> I did some "big" ASCII graphic what I think it will do now.
-> At first the virtual interface:
->
-> --- snip ---
->
-> Transmit side only! Case of virtual interface.
->
-> IPv6 Stack
->
->                 +-----------------------------+
->                 |    IPv6 Packet (ND, etc)    |
->                 +--------------+--------------+
->                                |
->       -------------------------+---------------------------------
-> 6LoWPAN Interface              |
->                                |
->                 +--------------v--------------+
->                 | Adaptation (IPv6 to 6Lo)    |
->                 +--------------+--------------+
->     +--------------------------+
->     |
->     | -----------------------------------------------------------
-> Link|Layer (802.15.4/hci_dev/etc)
->     |
->     |                  SKB Queue (With kind of discipline)
->     |           +----------------+---------------+-------------+
->     +----------->      SKB1      |     SKBN      |     ...     +----+
->                 +----------------+---------------+-------------+    |
->                                                                     |
->                                                                     |
->       ------------------------------------------------------------  |
-> Real Transeiver Hardware                                            |
->                                        +----------------------------+
->                                        |
->               +------------------------v-----------------------+
->               |        Framebuffers (YOUR hardware resource)   |
->               +------------------------------------------------+
->
-> --- snap ---
->
-> The non virtual interface:
->
-> --- snip ---
->
-> Transmit side only! Case of non virtual interface.
->
-> IPv6 Stack
->
->                 +-----------------------------+
->                 |    IPv6 Packet (ND, etc)    |
->                 +--------------+--------------+
->                                |
->       -------------------------+---------------------------------
-> 6LoWPAN Interface              |
->                                |
->     +--------------------------+
->     |                                                              /> Will be queued if you stop the queue
->     |                  SKB Queue (With kind of discipline)      /--   Because Link Layer is full/software limitation
->     |           +----------------+---------------+-------------+
->     +----------->      SKB1      |     SKBN      |     ...     +----+
->                 +----------------+---------------+-------------+    |
->                                                                     |
->                                +------------------------------------+
->                                |
->                 +--------------v--------------+
->                 | Adaptation (IPv6 to 6Lo)    |
->                 +--------------+--------------+
->     +--------------------------+
->     |
->     | -----------------------------------------------------------
-> Link|Layer (802.15.4/hci_dev/etc)
->     |                                                              -> software limitation (tx credits?)
->     |                  SKB Queue (With kind of discipline)     ---/   Right position to make different handling (for virtual case).
->     |           +----------------+---------------+------------/+
->     +----------->      SKB1      |     SKBN      |     ...     +----+
->                 +----------------+---------------+-------------+    |
->                                                                     |
->                                                                     |
->       ------------------------------------------------------------  |
-> Real Transeiver Hardware                                            |
->                                        +----------------------------+
->                                        |
->               +------------------------v-----------------------+
->               |        Framebuffers (YOUR hardware resource)   |
->               +------------------------------------------------+
->
->
-> --- snap ---
->
-> Adding a queue to a interface which does a protocol translation only is
-> in my opinion: wrong.
->
-> At least if you want to try to make a more efficient qdisc handling,
-> means dropping skb's in queue when userspace sends too much. You will
-> change it back, control two queues seems to be difficult.
+I have a nagging problem bluetooth requesting EDR to a device that
+only supports EDR (high bandwidth) transport for communications for
+connectionless mode (ADR from memory) not SCO.
 
-It is wrong only if you look at 6LoWPAN interface as being owned by
-6lowpan modules, but it doesn't, in fact it won't anything by itself
-so it basically acts as a library to that perform 6LoWPAN operation on
-the packet level, thus why it is possible to switch from virtual to
-real interface. Also in terms of 15.4, the 6LoWPAN interfaces you
-depicted above is also no controlled by 6LoWPAN itself, in fact it
-seeems to represent links in 15.4, and I also assume these links may
-not use 6LoWPAN.
+Looking at the HCI dump it really looks like a linux bluetooth bug,
+not a embedded firmware issue.
 
-> On 04/18/2017 12:43 PM, Luiz Augusto von Dentz wrote:
->> Hi Alex,
+https://www.spinics.net/lists/linux-bluetooth/msg69931.html
+
+On 24 April 2017 at 15:25, Konrad Zapalowicz
+<konrad.zapalowicz@canonical.com> wrote:
+> On 04/06, Luiz Augusto von Dentz wrote:
+>> Hi Konrad,
 >>
->> On Mon, Apr 17, 2017 at 8:56 PM, Alexander Aring <aar@pengutronix.de> wrote:
->>> Hi,
->>>
->>> bluetooth-next contains patches which introduces a queue for bluetooth
->>> 6LoWPAN interfaces. [0]
->>>
->>> At first, the current behaviour is now that 802.15.4 6LoWPAN interfaces
->>> are virtual and bluetooth 6LoWPAN interfaces are not virtual anymore.
->>> To have a different handling in both subsystems is _definitely_ wrong.
+>> On Thu, Apr 6, 2017 at 3:51 PM, Konrad Zapalowicz
+>> <konrad.zapalowicz@canonical.com> wrote:
+>> > Hey,
+>> >
+>> > I see a regression in 5.44 when testing Sony SBH52 headset. It fails to
+>> > connect profiles but the worst thing is that the bluetoothd crashes
+>> > (logs below).
+>> >
+>> > I have git bisect'ed it down to the commit f2483bbfd. It works fine if
+>> > I remove it.
 >>
->> Well 15.4 and Bluetooth have very different handling, iirc in 15.4 you
->> do have a real interface which has, in fact, queueing support:
+>> That is because the very next patch fix it:
 >>
->> net/mac802154/iface.c:ieee802154_if_setup:
->> dev->tx_queue_len = 300;
+>> commit 4a8c33b1f76edf2dfe33b9956014cc2746ae71d8
+>> Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>> Date:   Mon Nov 14 13:30:09 2016 +0200
+>>
+>>     core/adapter: Fix using wrong address type to listen ATT
+>>
+>>     bdaddr_type shall only matter for controllers supporting LE otherwise
+>>     it may cause BDADDR_BREDR to be used for things like LE ATT socket
+>>     listen breaking reconnections.
 >>
 >
-> Is l2cap_chan_send a call with is synchronized which wait for it so
-> after that the "l2cap bluetooth *frame*. etc." is send?
+> Is your suggestion that I might be missing the above patch? I have it
+> included, I'm using regular 5.44 release.
 >
-> I looked at the code [0]. It will queue it in some skb queue, so far I
-> see. Hard to see it in this code, but I see some queueing and workqueue
-> scheduling [1] in the function which will be called by l2cap_chan_send.
-
-There is a tx_queue per channel but that doesn't mean there is a per
-channel and introducing one when we can use the net qdisc support
-seems useless to me.
-
-> This queue should have the same meaning like our queue in IEEE
-> 802.15.4 interface which you mentioned above.
-> At this point, we have no difference. There exists already a queue for
-> your real transeiver hardware.
-
-The queue here is per channel, btw the queue size is not decided by us
-it is the remote side that provides the tx credits so to some extend
-the tx_queue is actually the remote queue in case of CoC. When testing
-this it was quite clear this does not work in practice, with IPv6 at
-least, because the remote side may not have enough credits for a
-single packet (MPS * tx_credits < MTU) which means without proper
-queueing support we would be dropping every packet.
-
->>> What does the 6LoWPAN interface?
->>>
->>> It will do a protocol change (an adaptation, because 6LoWPAN should
->>> provide the same functionality as IPv6) from IPv6 to 6LoWPAN (tx) and
->>> vice versa for (rx). In my opinion this should be handled as a virtual
->>> interface and not as an interface with a queue.
+>> > Stacktrace:
+>> >
+>> > (gdb) c
+>> > Continuing.
+>> >
+>> > Program received signal SIGSEGV, Segmentation fault.
+>> > strlen () at ../sysdeps/x86_64/strlen.S:106
+>> > 106     ../sysdeps/x86_64/strlen.S: No such file or directory.
+>> > (gdb) bt
+>> > #0  strlen () at ../sysdeps/x86_64/strlen.S:106
+>> > #1  0x00007f92806179a1 in _IO_vfprintf_internal (s=s@entry=0x557f37ad5520, format=<optimized out>, format@entry=0x557f36cd515c "%s:%s() %s err %d", ap=0x7ffc0b7a86d0)
+>> >     at vfprintf.c:1637
+>> > #2  0x00007f92806dffc6 in ___vfprintf_chk (fp=fp@entry=0x557f37ad5520, flag=flag@entry=1, format=format@entry=0x557f36cd515c "%s:%s() %s err %d",
+>> >     ap=ap@entry=0x7ffc0b7a86d0) at vfprintf_chk.c:33
+>> > #3  0x00007f92806c9028 in __GI___vsyslog_chk (pri=<optimized out>, pri@entry=7, flag=flag@entry=1, fmt=fmt@entry=0x557f36cd515c "%s:%s() %s err %d",
+>> >     ap=ap@entry=0x7ffc0b7a86d0) at ../misc/syslog.c:222
+>> > #4  0x0000557f36c6735b in vsyslog (__ap=0x7ffc0b7a86d0, __fmt=0x557f36cd515c "%s:%s() %s err %d", __pri=7) at /usr/include/x86_64-linux-gnu/bits/syslog.h:47
+>> > #5  btd_debug (index=index@entry=65535, format=format@entry=0x557f36cd515c "%s:%s() %s err %d") at src/log.c:252
+>> > #6  0x0000557f36c94d88 in device_svc_resolved (dev=0x557f36c90e60 <browse_request_exit>, bdaddr_type=0 '\000', err=-111) at src/device.c:2214
+>> > #7  0x0000557f36c97adb in search_cb (user_data=<optimized out>, err=-111, recs=<optimized out>) at src/device.c:4516
+>> > #8  browse_cb (recs=<optimized out>, err=-111, user_data=<optimized out>) at src/device.c:4549
+>> > #9  0x0000557f36c73551 in connect_watch (chan=0x557f37ae0350, cond=<optimized out>, user_data=0x557f37ae0060) at src/sdp-client.c:286
+>> > #10 0x00007f928124f6ea in g_main_context_dispatch () from target:/lib/x86_64-linux-gnu/libglib-2.0.so.0
+>> > #11 0x00007f928124faa0 in ?? () from target:/lib/x86_64-linux-gnu/libglib-2.0.so.0
+>> > #12 0x00007f928124fdc2 in g_main_loop_run () from target:/lib/x86_64-linux-gnu/libglib-2.0.so.0
+>> > #13 0x0000557f36c353cc in main (argc=<optimized out>, argv=<optimized out>) at src/main.c:708
+>> > (gdb)
 >>
->> Then we need a real netif for Bluetooth as well, one that does
->> queueing since introducing for l2cap_chan makes no sense when most of
->> time the userspace has a socket which does its own queueing. Btw, I
->> have the opinion that doing a second interface just to make Bluetooth
->> behave like 15.4 is very wasteful since we don't have any other
->> network support except for bnep, which in fact does the same thing
->> regarding queueing.
+>> Ok, so this seem to be SDP causing and error, 111 connection refused.
 >>
->
-> If bnep just generates some ethernet frames and you put L2CAP around,
-> then it should be virtual too. If it queue skbs for sending out for the
-> hci_dev. Then it ends in a similar queue handling like "non virtual
-> 6LoWPAN interface".
-
-BNEP does not use the same L2CAP channel mode, in fact there is no
-queueing whatsoever since it use basic mode, and considering it has
-been working for this long I don't think there is a real problem in it
-using the net qdisc infra, actually I don't quite get this virtual to
-non-virtual complaint, IMO this is only valid if you do have a
-tunnel-like design where there are multiple interfaces involved so
-there is no point in having qdisc enabled in all of them but we only
-have one interface in Bluetooth.
-
-> What you mean with second interface? At least you need a capable
-> net_device interface to offer an IP connection from userspace.
->
->>> What makes a queue on 6LoWPAN interfaces?
->>>
->>> It will queue IPv6 packets which waits for it adaptation (the protocol
->>> change) with some additional qdisc handling.
->>> If finally the xmit_do callback will occur it will replace IPv6 header
->>> with 6LoWPAN, etc. After that it should be queued into some queue on
->>> link layer side which should be do the transmit finally.
+>> > Syslog:
+>> >
+>> > bluetoothd: src/device.c:bonding_request_new() Requesting bonding for 68:76:4F:6C:31:E9
+>> > bluetoothd: src/agent.c:agent_ref() 0x557f37ae5120: ref=3
+>> > bluetoothd: src/agent.c:agent_unref() 0x557f37ae5120: ref=2
+>> > bluetoothd: src/adapter.c:suspend_discovery()
+>> > bluetoothd: src/adapter.c:adapter_bonding_attempt() hci0 bdaddr 68:76:4F:6C:31:E9 type 0 io_cap 0x01
+>> > bluetoothd: src/adapter.c:add_whitelist_complete() 68:76:4F:6C:31:E9 added to kernel whitelist
+>> > bluetoothd: src/adapter.c:connected_callback() hci0 device 68:76:4F:6C:31:E9 connected eir_len 12
+>> > bluetoothd: src/adapter.c:new_link_key_callback() hci0 new key for 68:76:4F:6C:31:E9 type 4 pin_len 0 store_hint 1
+>> > bluetoothd: src/device.c:device_set_bonded()
+>> > bluetoothd: src/device.c:device_bonding_complete() bonding 0x557f37acc860 status 0x00
+>> > bluetoothd: src/device.c:device_bonding_complete() Proceeding with service discovery
+>> > bluetoothd: src/agent.c:agent_unref() 0x557f37ae5120: ref=1
+>> > bluetoothd: src/adapter.c:resume_discovery()
+>> > bluetoothd: src/adapter.c:pair_device_complete() Success (0x00)
+>> > bluetoothd: src/adapter.c:bonding_attempt_complete() hci0 bdaddr 68:76:4F:6C:31:E9 type 0 status 0x0
+>> > bluetoothd: src/device.c:device_bonding_complete() bonding (nil) status 0x00
+>> > bluetoothd: src/adapter.c:resume_discovery()
+>> > bluetoothd: src/gatt-database.c:connect_cb() New incoming BR/EDR ATT connection
+>> > bluetoothd: attrib/gattrib.c:g_attrib_ref() 0x557f37ae4b40: g_attrib_ref=1
+>> > bluetoothd: src/device.c:load_gatt_db() Restoring 68:76:4F:6C:31:E9 gatt database from file
+>> > bluetoothd: No cache for 68:76:4F:6C:31:E9
+>> > bluetoothd: src/gatt-client.c:btd_gatt_client_connected() Device connected.
+>> > bluetoothd: src/adapter.c:dev_disconnected() Device 68:76:4F:6C:31:E9 disconnected, reason 3
+>> > bluetoothd: src/adapter.c:adapter_remove_connection()
+>> > bluetoothd: plugins/policy.c:disconnect_cb() reason 3
+>> > bluetoothd: src/adapter.c:bonding_attempt_complete() hci0 bdaddr 68:76:4F:6C:31:E9 type 0 status 0xe
+>> > bluetoothd: src/device.c:device_bonding_complete() bonding (nil) status 0x0e
+>> > bluetoothd: src/device.c:device_bonding_failed() status 14
+>> > bluetoothd: src/adapter.c:resume_discovery()
+>> > bluetoothd: src/device.c:gatt_debug() Primary service discovery failed. ATT ECODE: 0x00
+>> > bluetoothd: src/device.c:gatt_debug() Failed to initialize gatt-client
+>> > bluetoothd: src/device.c:gatt_client_ready_cb() status: failed, error: 0
+>> > bluetoothd: src/device.c:device_svc_resolved() /org/bluez/hci0/dev_68_76_4F_6C_31_E9 err -5
+>> > bluetoothd: src/device.c:att_disconnected_cb()
+>> > bluetoothd: src/device.c:att_disconnected_cb() Connection reset by peer (104)
+>> > bluetoothd: src/gatt-client.c:btd_gatt_client_disconnected() Device disconnected. Cleaning up.
+>> > bluetoothd: src/device.c:att_disconnected_cb() Automatic connection disabled
+>> > bluetoothd: attrib/gattrib.c:g_attrib_unref() 0x557f37ae4b40: g_attrib_unref=0
+>> > bluetoothd: src/device.c:btd_device_set_trusted() trusted 1
+>> > bluetoothd: src/device.c:connect_profiles() /org/bluez/hci0/dev_68_76_4F_6C_31_E9 (all), client :1.256
+>> > bluetoothd: src/device.c:connect_profiles() Resolving services for /org/bluez/hci0/dev_68_76_4F_6C_31_E9
+>> > bluetoothd: src/gatt-database.c:connect_cb() New incoming BR/EDR ATT connection
+>> > bluetoothd: attrib/gattrib.c:g_attrib_ref() 0x557f37ae4b40: g_attrib_ref=1
+>> > bluetoothd: src/device.c:load_gatt_db() Restoring 68:76:4F:6C:31:E9 gatt database from file
+>> > bluetoothd: No cache for 68:76:4F:6C:31:E9
+>> > bluetoothd: src/gatt-client.c:btd_gatt_client_connected() Device connected.
+>> > bluetoothd: 89:48:53:01:00:27: error updating services: Connection refused (111)
 >>
->> In case of Bluetooth it does the Link Layer using L2CAP, which is not
->> exactly at Link Layer, in fact it is one of the major problems of
->> having this in Kernel space since it is similar of doing IP over TCP
->> tunnel.
+>> Interesting, the device is connecting ATT over BR/EDR which is weird
+>> if that is a headset, and we can see the 111, though the address
+>> printed seems wrong, I wonder if that is why it crashes.
+>
+> The address thing is something to check further. I have no such device
+> in a range whatsoever.
+>
 >>
->
-> aha, but this has nothing to do to decide that you have a 6LoWPAN queue,
-> or? I think this is one reason why you want a "6lowtun" interface. To
-> handle L2CAP in userspace.
-
-Indeed it is one of main reasons.
-
->>> Why I think bluetooth introduced a queue handling on 6LoWPAN interfaces?
->>>
->>> Because I think they don't like their own *qdisc* handling on their link
->>> layer interface. I write *qdisc* here because, they have no net_devices
->>> and use some kind of own qdisc handling.
+>> > There is one interestig thing that I have noticed examining the the
+>> > btmon output. The bluez is repeatedly (literally till the end) sending
+>> > the Information Request (Extended Feature Mask) and the headset is
+>> > answering Not Supported. For the same headset bluez 5.43 sends this
+>> > request only once. The bluez 5.44 works fine with a Phillips headset
+>> > that answers Success to this knd of Information Response.
 >>
->> No we don't, and except we do change the whole architecture of
->> Bluetooth to work as a net_device I don't think we can have a similar
->> design as 15.4. Anyway Bluetooth is not really designed to carry IP,
->> the L2CAP and other profiles above are mostly a Bluetooth thing so
->> having a net_device would not buy us much more than queueing for bnep
->> and ipsp.
+>> Well this is the information request is sent by the kernel, so if you
+>> haven't change it between versions that should not change between
+>> daemon versions, but ATT is not a fixed channel on BR/EDR so I wonder
+>> if the information request is actually sent because ATT is being
+>> connected.
+>
+> Could be, good point.
+>
 >>
->
-> At least, having a queue and don't put anything anymore into the queue
-> when "tx credits" is at zero (because queue is full). _Is_ a kind of
-> qdisc handling.
-
-The tx_credits operate at L2CAP segment level (MPS), so it is at a
-completely different level, there are no guarantees the credits will
-attend to a single IP packet.
-
-In case you are curious when testing with qdisc disabled the interface
-will basically turn down as soon as there are no credits left which
-makes even pings be dropped.
-
->>> My question: is this correct?
->>>
->>> How to fix that (In my opinion):
->>>
->>> So commit [0] says something "out of credits" that's what I think it's
->>> the *qdisc* handling. If you cannot queue anymore -> you need to drop
->>> it. If you don't like how the current behaviour is, you need to change
->>> your *qdisc* handling on your link layer interface. Introducing queue at
->>> 6LoWPAN interfaces will introduce "buffer bloating".
+>> > Additionaly to Information Request (Ext Feature Mask) bluez 5.44 keeps
+>> > repeating ATT Read By Group Type Request, GATT Primary Service
+>> > Declaration which in case of Phillips device happens only once. Bluez
+>> > 5.43 does not send it whatsoever.
 >>
->> That is not what the code comments says, eg. netif_stop_queue:
+>> I suspect it doesn't even connect over ATT in 5.43, anyway that should
+>> only happen once but I can see from the logs that it fails and
+>> disconnects and then connects again.
+>
+> I'll capture some logs with 5.43 and share later this week. This looks
+> interesting to follow.
+>
+> Thanks for your comments,
+> K
+>
 >>
->>  * Stop upper layers calling the device hard_start_xmit routine.
->>  * Used for flow control when transmit resources are unavailable.
+>> > Let me know if I can in any way help debugging this issue further.
+>> >
+>> > Thanks,
+>> > Konrad
+>> > --
+>> > To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>> > the body of a message to majordomo@vger.kernel.org
+>> > More majordomo info at  http://vger.kernel.org/majordomo-info.html
 >>
->
-> This comments are correct so long you operate on "real hardware
-> resources" which 6LoWPAN interfaces doesn't do. In case so far I see, it
-> will call l2cap_chan_send which putting some L2CAP protocol on it (to
-> provide data) and somewhere queue it for transmit to fill "real hardware
-> resources" e.g. framebuffers.
-
-The interface in question is created by Bluetooth 6lowpan module, the
-TX and RX is responsibility of the implementation of the interface
-which I assume it to avoid leaking this sort of details to 6LoWPAN
-itself or having yet another level of indirection where the 6LoWPAN
-would need to define another API/callbacks to interface with the
-modules trying to use it.
-
-> Your "resource" which is unavailable is the link layer queue, but this
-> is just a software limitation by bluetooth, which you can change by
-> software to make a different handling, than just adding more software queues.
->
-> What _virtual_ 6LoWPAN interface does is:
->
-> Input: IPv6 -> Output: 6LoWPAN, without any queueing in front of that.
->
->> The fact 15.4, and bnep, uses these APIs makes me believe this is the
->> proper way of using qdisc handling, the only difference here is at
->> what level we would be using them.
 >>
->
-> On 15.4 we use it for link layer interface queue, but we don't put
-> another queue in 6LoWPAN. See my aboves ASCII arts which shows the
-> different when 6LoWPAN is virtual and not virtual.
->
-> ---
->
-> We have already qdisc problems in our case. In 15.4 it "just works" for
-> now, but we need more handling there to send not garbage if one frame
-> gets dropped there, see [2].
->
-> In my opinion, if bluetooth people will hit similar issues, you will
-> change it back that 6LoWPAN has no queue anymore. Otherwise it will very
-> hard to decide which skbs you drop or not - because you need to deal
-> with two queues.
->
-> To make 6LoWPAN non virtual anymore and just adding a queue will occur
-> that you don't drop much anymore... but the queue at link layer
-> (hci_dev) will work as before and this occurs buffer bloating only.
->
->>> ---
->>>
->>> I don't care what bluetooth does with the 6LoWPAN interface. If bluetooth
->>> people wants such behaviour, then I am okay with that.
->>>
->>> I will bookmark this mail for the time when somebody reverts it to a
->>> virtual interface again. I think somebody will change it again, or maybe
->>> somebody will argument why we need a queue here.
 >>
->> From what I could grasp from the code except if 6LoWPAN start creating
->> its own interface, which it doesn't currently, it should never assume
->> any specific behavior for an interface. 6LoWPAN right now only have
->> helper functions which the interface code call on TX/RX, and by
->> looking at code under 15.4 the only thing we would be doing is to set
->> skb->dev = wdev; (wdev being the real device) as Bluetooth don't use
->> 6lowpan fragmentation.
->>
->
-> yep, there is a lot of work do make a better framework, but has nothing
-> do to why bluetooth introduced a second queue on 6lowpan interfaces.
->
->> Btw, another big different in terms of design that it seems 15.4 does
->> create interfaces to each and every link, in Bluetooth the interface
->> is per adapter so it is in fact multi-link, I guess in practice 15.4
->> shall only have one 6lowpan link since it is connected to mesh, but in
->> Bluetooth we may have more than one Link and I don't think it would be
->> a good idea to have each of these links as a different interface,
->> especially not with the same mac address as it seems to be what 15.4
->> code is doing:
->>
->> /* Set the lowpan hardware address to the wpan hardware address. */
->> memcpy(ldev->dev_addr, wdev->dev_addr, IEEE802154_ADDR_LEN);
->>
->
-> Of course we need the same mac address there (at first), because we
-> have an address filter on hardware.
->
-> (Be aware that you _cannot_ change the mac address (dev->dev_addr) while IP
->  capable net device is up. They assume the mac address is read only if net
->  device is up.)
->
-> There is currently an idea to provide multiple links, but then hardware
-> need to go into promiscuous mode (disable address filtering) but then we
-> will lose some hardware offloading stuff e.g. ACK handling.
-> If we have that, we can provide multiple links with different mac
-> addresses, at least this will be handled as multiple wpan interfaces for
-> one PHY.
-
-We do need multi-link from the start, and it has been decided it
-wouldn't be with multiple interfaces but with a single one.
-
->> So at least with IPSP/RFC-7668 the topology is completely different
->> from what we can see in 15.4, it may happen that this changes with
->> upcoming changes to Bluetooth, adding yet another topology that we
->> will need to support. Personally I wouldn't mind if 15.4 and Bluetooth
->> had more in common, at least at 6lowpan level, so we wouldn't have the
->> need to create separated modules just to deal with their differences,
->> but in reality, these technologies are competing for the same market
->> so I don't think it will happen, unfortunately.
->>
->
-> You already have separated modules, this is .e.g IPHC stuff and 6lowpan
-> specific implementation for bluetooth. In net/bluetooth/6lowpan.c you
-> can put your changes for make specific bluetooth handling.
->
-> This discussion moved currently to a more complex question about how to
-> make the whole 6lowpan architecture...
->
-> I think I tried to explain so much as possible what a queue on top of
-> 6lowpan interface will do, at least if you want to make a better queue
-> handling (when dropping skb's inside the queue(s)) then you will fail
-> and revert that change (I think). But then I can say "I told you so" :-)
->
-> - Alex
->
-> [0] http://lxr.free-electrons.com/source/net/bluetooth/l2cap_core.c#L2455
-> [1] http://lxr.free-electrons.com/source/net/bluetooth/hci_core.c#L3490
-> [2] http://www.spinics.net/lists/linux-wpan/msg03679.html
-
-
-
--- 
-Luiz Augusto von Dentz
+>> --
+>> Luiz Augusto von Dentz
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
