@@ -1,298 +1,276 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CAAu3APZxRDoZhCU7QtWVNd05HbKzadoX=886r_REiebvmMj6vQ@mail.gmail.com>
-References: <CAAu3APbw0JyPfKUi6PZ4Nr2Uh5WXtDprDVFBTj3xr+801b9L6w@mail.gmail.com>
- <CAAu3APbMKQY2dnD=TUAb_3BqFKk0s2bzuFFLX8=h-1g7gm8G=Q@mail.gmail.com>
- <20170408071834.GA12144@x1c> <CAAu3APahskA_b2Ydt8TzUWBQnkuC10UwjZ37RaOyhAt4s1iyiQ@mail.gmail.com>
- <20170422052644.GA31652@x1c> <CAAu3APZxRDoZhCU7QtWVNd05HbKzadoX=886r_REiebvmMj6vQ@mail.gmail.com>
-From: Barry Byford <31baz66@gmail.com>
-Date: Tue, 25 Apr 2017 22:48:32 +0100
-Message-ID: <CAAu3APYz+fP-f2S3XqV1EJLs4d=4-URTMG-bffNZmZNFQE+ROQ@mail.gmail.com>
-Subject: Re: Serial Port connection with DBus API
-To: Bluez mailing list <linux-bluetooth@vger.kernel.org>
-Content-Type: multipart/mixed; boundary=94eb2c0bc3e26525ba054e04af8e
+In-Reply-To: <CABBYNZKT+et1yaaxBZjHXumb2zDc3VUL7pVQ6wVGXZRiHOzFTw@mail.gmail.com>
+References: <1493121371-29377-1-git-send-email-marcin.kraglak@tieto.com>
+ <1493121371-29377-2-git-send-email-marcin.kraglak@tieto.com> <CABBYNZKT+et1yaaxBZjHXumb2zDc3VUL7pVQ6wVGXZRiHOzFTw@mail.gmail.com>
+From: Marcin Kraglak <marcin.kraglak@tieto.com>
+Date: Tue, 25 Apr 2017 21:26:02 +0200
+Message-ID: <CABD6X-L2GuzAG67auhbDZeCNk-GTtRBt3UG=BrY+qi0sOC=7Yw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 2/2] core/gatt-client: Add support for Includes property
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---94eb2c0bc3e26525ba054e04af8e
-Content-Type: text/plain; charset=UTF-8
+Hi Luiz,
 
-I don't feel I'm making progress on this so I've attached the output
-from btmon in the hope that someone has the time to cast an eye over
-it.
-
-The values that are received into NewConnection are:
-object device = /org/bluez/hci0/dev_64_BC_0C_F6_22_F8
- fd = 0
-dict fd_properties = {}
-
-if I do a os.isatty(fd) then I get returned True
-if I do a os.ttyname(fd) then I get returned /dev/pts/0
-
-That device is the terminal I'm running the Python code in and not the
-serial port.
-
-I feel like I'm missing something obvious but I can't spot it so any
-suggestions would be welcome.
-
-Thanks,
-Barry
-
-
-On 22 April 2017 at 21:46, Barry Byford <31baz66@gmail.com> wrote:
-> On 22 April 2017 at 06:26, Johan Hedberg <johan.hedberg@gmail.com> wrote:
->> Hi Barry,
+On 25 April 2017 at 20:51, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
+> Hi Marcin,
+>
+> On Tue, Apr 25, 2017 at 2:56 PM, Marcin Kraglak
+> <marcin.kraglak@tieto.com> wrote:
+>> Add implementation of Includes property in GATT service interface.
+>> ---
+>>  src/gatt-client.c | 144 +++++++++++++++++++++++++++++++++++++++++++++++++++---
+>>  1 file changed, 136 insertions(+), 8 deletions(-)
 >>
->> On Fri, Apr 21, 2017, Barry Byford wrote:
->>> >> >             'Channel': GLib.Variant('i', 1),
->> ...
->>> However I'm now seeing this error appear in btmon when I try to bind
->>> to the RFCOMM socket:
->>>
->>> = bluetoothd: RFCOMM server failed for SerialPort: rfcomm_bind:
->>> Address already in use (98)
+>> diff --git a/src/gatt-client.c b/src/gatt-client.c
+>> index 114981c..15219e2 100644
+>> --- a/src/gatt-client.c
+>> +++ b/src/gatt-client.c
+>> @@ -72,6 +72,15 @@ struct service {
+>>         bt_uuid_t uuid;
+>>         char *path;
+>>         struct queue *chrcs;
+>> +       struct queue *incl_services;
+>> +};
+>> +
+>> +struct incl_service {
+>> +       uint16_t handle;
+>> +       uint16_t start_handle;
+>> +       uint16_t end_handle;
+>> +       struct service *service;
+>> +       struct service *incl_service;
+>
+> This looks wrong, either we have the struct service representing the
+> including or we create a new as above but not both.
+>
+>>  };
 >>
->> I think that means that you already have some other service listening on
->> RFCOMM channel 1. Try using some other channel, or identify and stop the
->> other service that's using channel 1.
+>>  typedef bool (*async_dbus_op_complete_t)(void *data);
+>> @@ -1398,10 +1407,39 @@ static gboolean service_get_primary(const GDBusPropertyTable *property,
+>>         return TRUE;
+>>  }
+>>
+>> +static void append_incl_service_path(void *data, void *user_data)
+>> +{
+>> +       struct incl_service *incl_service = data;
+>> +       DBusMessageIter *array = user_data;
+>> +
+>> +       if (!incl_service->incl_service)
+>> +               return;
+>> +
+>> +       dbus_message_iter_append_basic(array, DBUS_TYPE_OBJECT_PATH,
+>> +                                       &incl_service->incl_service->path);
+>> +}
+>> +
+>> +static gboolean service_get_includes(const GDBusPropertyTable *property,
+>> +                                       DBusMessageIter *iter, void *data)
+>> +{
+>> +       struct service *service = data;
+>> +       DBusMessageIter array;
+>> +
+>> +       dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY, "{o}", &array);
+>> +
+>> +       queue_foreach(service->incl_services, append_incl_service_path, &array);
+>> +
+>> +       dbus_message_iter_close_container(iter, &array);
+>> +
+>> +       return TRUE;
+>> +
+>> +}
+>> +
+>>  static const GDBusPropertyTable service_properties[] = {
+>>         { "UUID", "s", service_get_uuid },
+>>         { "Device", "o", service_get_device },
+>>         { "Primary", "b", service_get_primary },
+>> +       { "Includes", "ao", service_get_includes },
+>>         { }
+>>  };
+>>
+>> @@ -1410,10 +1448,40 @@ static void service_free(void *data)
+>>         struct service *service = data;
+>>
+>>         queue_destroy(service->chrcs, NULL);  /* List should be empty here */
+>> +       queue_destroy(service->incl_services, NULL);
+>>         g_free(service->path);
+>>         free(service);
+>>  }
+>>
+>> +static bool match_service_handle(const void *a, const void *b)
+>> +{
+>> +       const struct service *service = a;
+>> +       uint16_t start_handle = PTR_TO_UINT(b);
+>> +
+>> +       return service->start_handle == start_handle;
+>> +}
+>> +
+>> +static void add_included_service(struct gatt_db_attribute *attrib,
+>> +                                                       void *user_data)
+>> +{
+>> +       struct service *service = user_data;
+>> +       struct incl_service *incl_service;
+>> +       struct btd_gatt_client *client = service->client;
+>> +
+>> +       incl_service = new0(struct incl_service, 1);
+>> +       incl_service->service = service;
+>> +
+>> +       gatt_db_attribute_get_incl_data(attrib, &incl_service->handle,
+>> +                                       &incl_service->start_handle,
+>> +                                       &incl_service->end_handle);
 >
-> Turns out it was me that was creating the other service. :-(
->
-> Depending which order I bind to the socket or RegisterProfile, depends
-> if I get the error in Bluetoothd or sockets.
->
-> I can register the Serial Port profile successfully which allows me to
-> connect from the (Bluedot) Android app and I can see information being
-> sent to my Linux board in btmon. However I don't seem to be able to
-> get at that information in my script.
->
-> Looking at this a bit more, maybe the socket connection should be
-> created from the 'fd' parameter passed to NewConnection. However when
-> I try to get the socket with this:
->
-> def NewConnection(self, path, fd, properties):
->   self.server_sock = socket.fromfd(fd, socket.AF_BLUETOOTH, socket.SOCK_STREAM,
->                                                        socket.BTPROTO_RFCOMM)
->   data = self.server_sock.recv(1024)
->
-> It gives the following:
->
-> Exception while handling org.bluez.Profile1.NewConnection()
-> Traceback (most recent call last):
->   File "/usr/local/lib/python3.5/dist-packages/pydbus/registration.py",
-> line 81, in call_method
->     result = method(*parameters, **kwargs)
->   File "BTclassic.py", line 67, in NewConnection
->     data = self.server_sock.recv(1024)
-> OSError: [Errno 88] Socket operation on non-socket
->
-> I had been following test/test-hfp as the basic structure but that
-> doesn't seem to be working for me.
->
-> Not sure where to go next with this
+> This only seems to be useful for matching the included services,
+> actually once we find what is the service why don't we keep the list
+> of only the struct service as the only thing we use is the path.
+Because included service may not be in the service list yet. We can
+omit handle, end handle and not store it, but start handle is needed
+for matching when included service will be registered.
 
---94eb2c0bc3e26525ba054e04af8e
-Content-Type: application/octet-stream; name="btmon.log"
-Content-Disposition: attachment; filename="btmon.log"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_j1y22ody0
+>
+>> +       incl_service->incl_service = queue_find(client->services,
+>> +                               match_service_handle,
+>> +                               UINT_TO_PTR(incl_service->start_handle));
+>> +
+>> +       queue_push_tail(service->incl_services, incl_service);
+>> +}
+>> +
+>>  static struct service *service_create(struct gatt_db_attribute *attr,
+>>                                                 struct btd_gatt_client *client)
+>>  {
+>> @@ -1423,6 +1491,7 @@ static struct service *service_create(struct gatt_db_attribute *attr,
+>>
+>>         service = new0(struct service, 1);
+>>         service->chrcs = queue_new();
+>> +       service->incl_services = queue_new();
+>>         service->client = client;
+>>
+>>         gatt_db_attribute_get_service_data(attr, &service->start_handle,
+>> @@ -1434,6 +1503,8 @@ static struct service *service_create(struct gatt_db_attribute *attr,
+>>         service->path = g_strdup_printf("%s/service%04x", device_path,
+>>                                                         service->start_handle);
+>>
+>> +       gatt_db_service_foreach_incl(attr, add_included_service, service);
+>> +
+>>         if (!g_dbus_register_interface(btd_get_dbus_connection(), service->path,
+>>                                                 GATT_SERVICE_IFACE,
+>>                                                 NULL, NULL,
+>> @@ -1459,6 +1530,63 @@ static struct service *service_create(struct gatt_db_attribute *attr,
+>>         return service;
+>>  }
+>>
+>> +static void incl_service_on_unregister(void *data, void *user_data)
+>> +{
+>> +       struct incl_service *incl_service = (struct incl_service *) data;
+>> +       struct service *service = (struct service *) user_data;
+>> +
+>> +       if (incl_service->incl_service == service) {
+>> +               incl_service->incl_service = NULL;
+>> +
+>> +               g_dbus_emit_property_changed(btd_get_dbus_connection(),
+>> +                                               incl_service->service->path,
+>> +                                               GATT_SERVICE_IFACE,
+>> +                                               "Includes");
+>> +       }
+>> +}
+>> +
+>> +static void incl_service_on_register(void *data, void *user_data)
+>> +{
+>> +       struct incl_service *incl_service = (struct incl_service *) data;
+>> +       struct service *service = (struct service *) user_data;
+>> +
+>> +       if (!incl_service->incl_service &&
+>> +                       incl_service->start_handle == service->start_handle) {
+>> +               incl_service->incl_service = service;
+>> +
+>> +               g_dbus_emit_property_changed(btd_get_dbus_connection(),
+>> +                                               incl_service->service->path,
+>> +                                               GATT_SERVICE_IFACE,
+>> +                                               "Includes");
+>> +       }
+>> +}
+>> +
+>> +struct foreach_incl_service_data {
+>> +       queue_foreach_func_t func;
+>> +       void *user_data;
+>> +};
+>> +
+>> +static void incl_service_cb(void *data, void *user_data)
+>> +{
+>> +       struct service *service = (struct service *) data;
+>> +       struct foreach_incl_service_data *incl_data =
+>> +                               (struct foreach_incl_service_data *) user_data;
+>> +
+>> +       queue_foreach(service->incl_services, incl_data->func,
+>> +                                                       incl_data->user_data);
+>> +}
+>> +
+>> +static void client_foreach_incl_service(struct btd_gatt_client *client,
+>> +                               queue_foreach_func_t func, void *user_data)
+>> +{
+>> +       struct foreach_incl_service_data incl_data = {
+>> +               .user_data = user_data,
+>> +               .func = func,
+>> +       };
+>> +
+>> +       queue_foreach(client->services, incl_service_cb, &incl_data);
+>> +}
+>> +
+>>  static void unregister_service(void *data)
+>>  {
+>>         struct service *service = data;
+>> @@ -1466,6 +1594,11 @@ static void unregister_service(void *data)
+>>         DBG("Removing GATT service: %s", service->path);
+>>
+>>         queue_remove_all(service->chrcs, NULL, NULL, unregister_characteristic);
+>> +       queue_remove_all(service->incl_services, NULL, NULL, free);
+>> +
+>> +       /* Make sure that no one included service points to this one */
+>> +       client_foreach_incl_service(service->client,
+>> +                                       incl_service_on_unregister, service);
+>>
+>>         g_dbus_unregister_interface(btd_get_dbus_connection(), service->path,
+>>                                                         GATT_SERVICE_IFACE);
+>> @@ -1564,6 +1697,9 @@ static void export_service(struct gatt_db_attribute *attr, void *user_data)
+>>                 return;
+>>         }
+>>
+>> +       /* Check if any included service points to this one */
+>> +       client_foreach_incl_service(client, incl_service_on_register, service);
+>> +
+>>         queue_push_tail(client->services, service);
+>>  }
+>>
+>> @@ -1691,14 +1827,6 @@ void btd_gatt_client_service_added(struct btd_gatt_client *client,
+>>         export_service(attrib, client);
+>>  }
+>>
+>> -static bool match_service_handle(const void *a, const void *b)
+>> -{
+>> -       const struct service *service = a;
+>> -       uint16_t start_handle = PTR_TO_UINT(b);
+>> -
+>> -       return service->start_handle == start_handle;
+>> -}
+>> -
+>>  void btd_gatt_client_service_removed(struct btd_gatt_client *client,
+>>                                         struct gatt_db_attribute *attrib)
+>>  {
+>> --
+>> 2.4.3
+>>
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
+>
+>
+> --
+> Luiz Augusto von Dentz
 
-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
-ABgDGAMAAAIA
---94eb2c0bc3e26525ba054e04af8e--
+
+
+-- 
+BR
+Marcin Kraglak
