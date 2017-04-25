@@ -1,58 +1,92 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <CAAu3APa3nWu_t+aRREFbQ3-VfLhJWLhgqmSadhMec57rbyw7SQ@mail.gmail.com>
-References: <CAF6QkFKyKtJA-TVQnpDCb1inrSMXLkSd14WNJzRREAZbTnf-Ng@mail.gmail.com>
- <CAAu3APa3nWu_t+aRREFbQ3-VfLhJWLhgqmSadhMec57rbyw7SQ@mail.gmail.com>
-From: "sayandasgupta12@gmail.com" <sayandasgupta12@gmail.com>
-Date: Tue, 25 Apr 2017 21:53:15 +0530
-Message-ID: <CAF6QkFKuZzGm=RbsukCQ9ZyQfR0J5aURc1TWEtWm4tFQg-nrhg@mail.gmail.com>
-Subject: Re: SENDING GATT NOTIFICATION USING DBUS
-To: Barry Byford <31baz66@gmail.com>
-Cc: Bluez mailing list <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Salvatore Benedetto <salvatore.benedetto@intel.com>
+To: gustavo@padovan.org, linux-bluetooth@vger.kernel.org
+Cc: herbert@gondor.apana.org.au, marcel@holtmann.org,
+        johan.hedberg@gmail.com,
+        Salvatore Benedetto <salvatore.benedetto@intel.com>
+Subject: [PATCH] Bluetooth: allocate data for kpp on heap
+Date: Tue, 25 Apr 2017 16:59:47 +0100
+Message-Id: <1493135987-2618-1-git-send-email-salvatore.benedetto@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Barry,
+Bluetooth would crash when computing ECDH keys with kpp
+if VMAP_STACK is enabled. Fix by allocating data passed
+to kpp on heap.
 
-I did look at it. But I want a solution in C and not python. I am not
-conversant with Python. How do it convert this into C. I am a beginner
-in bluez. Can you help me on this .
+Fixes: 58771c1c ("Bluetooth: convert smp and selftest to crypto kpp
+API")
+Signed-off-by: Salvatore Benedetto <salvatore.benedetto@intel.com>
+---
+ net/bluetooth/ecdh_helper.c |  6 ++++--
+ net/bluetooth/selftest.c    | 16 +++++++++++-----
+ 2 files changed, 15 insertions(+), 7 deletions(-)
 
-On Tue, Apr 25, 2017 at 7:59 PM, Barry Byford <31baz66@gmail.com> wrote:
-> Hello,
->
-> On 25 April 2017 at 11:43, sayandasgupta12@gmail.com
-> <sayandasgupta12@gmail.com> wrote:
->> I am trying to send GATT notification in bluez 5.43 using DBUS. But
->> currently the gatt-service.c doesn't provide any details how to send
->> it using DBUS. Currently
->>
->> static DBusMessage *chr_start_notify(DBusConnection *conn, DBusMessage
->> *msg, void *user_data)
->>
->>     return g_dbus_create_error(msg, DBUS_ERROR_NOT_SUPPORTED, "Not Supported")
->>
->>
->> is given like this as no characteristic supports notification in the
->> given code. But I am trying to build a custom service which has
->> notifiable characteristics. How should i handle it. What should be the
->> code that i need to write inside char_start_notify to achieve it.
->
-> Have you taken a look at test/example-gatt-server?
->
-> The notifications are done with the PropertiesChanged signal on the
-> value of the characteristic
-> https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/doc/gatt-api.txt#n121
-> https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/test/example-gatt-server#n200
->
-> And in the example are issued with:
-> https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/test/example-gatt-server#n297
-> https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/test/example-gatt-server#n399
->
-> Hope that helps
->
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->> the body of a message to majordomo@vger.kernel.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+diff --git a/net/bluetooth/ecdh_helper.c b/net/bluetooth/ecdh_helper.c
+index b6d9aa1..8018447 100644
+--- a/net/bluetooth/ecdh_helper.c
++++ b/net/bluetooth/ecdh_helper.c
+@@ -59,7 +59,7 @@ bool compute_ecdh_secret(const u8 public_key[64], const u8 private_key[32],
+ 	struct ecdh p;
+ 	struct ecdh_completion result;
+ 	struct scatterlist src, dst;
+-	u8 tmp[64];
++	u8 *tmp = kmalloc(64, GFP_KERNEL);
+ 	u8 *buf;
+ 	unsigned int buf_len;
+ 	int err = -ENOMEM;
+@@ -68,7 +68,7 @@ bool compute_ecdh_secret(const u8 public_key[64], const u8 private_key[32],
+ 	if (IS_ERR(tfm)) {
+ 		pr_err("alg: kpp: Failed to load tfm for kpp: %ld\n",
+ 		       PTR_ERR(tfm));
+-		return false;
++		goto free_tmp;
+ 	}
+ 
+ 	req = kpp_request_alloc(tfm, GFP_KERNEL);
+@@ -128,6 +128,8 @@ bool compute_ecdh_secret(const u8 public_key[64], const u8 private_key[32],
+ 	kpp_request_free(req);
+ free_kpp:
+ 	crypto_free_kpp(tfm);
++free_tmp:
++	kfree(tmp);
+ 	return (err == 0);
+ }
+ 
+diff --git a/net/bluetooth/selftest.c b/net/bluetooth/selftest.c
+index efef281..9a72f8f 100644
+--- a/net/bluetooth/selftest.c
++++ b/net/bluetooth/selftest.c
+@@ -142,18 +142,24 @@ static int __init test_ecdh_sample(const u8 priv_a[32], const u8 priv_b[32],
+ 				   const u8 pub_a[64], const u8 pub_b[64],
+ 				   const u8 dhkey[32])
+ {
+-	u8 dhkey_a[32], dhkey_b[32];
++	u8 *dhkey_a = kmalloc(64, GFP_KERNEL);
++	u8 *dhkey_b = &dhkey_a[32];
++	int ret = 0;
+ 
+ 	compute_ecdh_secret(pub_b, priv_a, dhkey_a);
+ 	compute_ecdh_secret(pub_a, priv_b, dhkey_b);
+ 
+-	if (memcmp(dhkey_a, dhkey, 32))
+-		return -EINVAL;
++	if (memcmp(dhkey_a, dhkey, 32)) {
++		ret = -EINVAL;
++		goto out;
++	}
+ 
+ 	if (memcmp(dhkey_b, dhkey, 32))
+-		return -EINVAL;
++		ret = -EINVAL;
+ 
+-	return 0;
++out:
++	kfree(dhkey_a);
++	return ret;
+ }
+ 
+ static char test_ecdh_buffer[32];
+-- 
+2.7.4
+
