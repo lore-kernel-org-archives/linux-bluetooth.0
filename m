@@ -1,72 +1,101 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <szymon.janc@codecoup.pl>
+From: Szymon Janc <szymon.janc@codecoup.pl>
+To: Salvatore Benedetto <salvatore.benedetto@intel.com>
+Cc: gustavo@padovan.org, linux-bluetooth@vger.kernel.org, herbert@gondor.apana.org.au, marcel@holtmann.org, johan.hedberg@gmail.com
+Subject: Re: [PATCH] Bluetooth: allocate data for kpp on heap
+Date: Tue, 25 Apr 2017 10:38:05 -0700
+Message-ID: <1899161.UMzm0Rcsma@ix>
+In-Reply-To: <1493135987-2618-1-git-send-email-salvatore.benedetto@intel.com>
+References: <1493135987-2618-1-git-send-email-salvatore.benedetto@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <1493121371-29377-1-git-send-email-marcin.kraglak@tieto.com>
-References: <1493121371-29377-1-git-send-email-marcin.kraglak@tieto.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 25 Apr 2017 21:21:50 +0300
-Message-ID: <CABBYNZJ9E8Dt=OiAisRf1fZ4CewLfY=Axi82wpxSpCogpcgd5Q@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/2] shared/gatt-client: Remove services after
- Service Changed indication
-To: Marcin Kraglak <marcin.kraglak@tieto.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcin,
+Hi,
 
-On Tue, Apr 25, 2017 at 2:56 PM, Marcin Kraglak
-<marcin.kraglak@tieto.com> wrote:
-> Clear services in range of Service Changed indication.
-> From specification, Version 4.2 [Vol 3, Part G] 2.5.2 Attribute Caching:
-> "The client, upon receiving a Handle Value Indication containing the range of
-> affected Attribute Handles, shall consider the attribute cache invalid over
-> the affected Attribute Handle range".
+On Tuesday, 25 April 2017 08:59:47 PDT Salvatore Benedetto wrote:
+> Bluetooth would crash when computing ECDH keys with kpp
+> if VMAP_STACK is enabled. Fix by allocating data passed
+> to kpp on heap.
+> 
+> Fixes: 58771c1c ("Bluetooth: convert smp and selftest to crypto kpp
+> API")
+> Signed-off-by: Salvatore Benedetto <salvatore.benedetto@intel.com>
 > ---
->  src/shared/gatt-client.c | 7 ++++---
->  1 file changed, 4 insertions(+), 3 deletions(-)
->
-> diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
-> index 0134721..7d23702 100644
-> --- a/src/shared/gatt-client.c
-> +++ b/src/shared/gatt-client.c
-> @@ -1475,8 +1475,6 @@ static void service_changed_complete(struct discovery_op *op, bool success,
->                 util_debug(client->debug_callback, client->debug_data,
->                         "Failed to discover services within changed range - "
->                         "error: 0x%02x", att_ecode);
-> -
-> -               gatt_db_clear_range(client->db, start_handle, end_handle);
->         }
->
->         /* Notify the upper layer of changed services */
-> @@ -1514,7 +1512,8 @@ static void service_changed_failure(struct discovery_op *op)
->  {
->         struct bt_gatt_client *client = op->client;
->
-> -       gatt_db_clear_range(client->db, op->start, op->end);
-> +       util_debug(client->debug_callback, client->debug_data,
-> +                                       "Failed to process Service Changed");
->  }
->
->  static void process_service_changed(struct bt_gatt_client *client,
-> @@ -1523,6 +1522,8 @@ static void process_service_changed(struct bt_gatt_client *client,
->  {
->         struct discovery_op *op;
->
-> +       gatt_db_clear_range(client->db, start_handle, end_handle);
-> +
->         op = discovery_op_create(client, start_handle, end_handle,
->                                                 service_changed_complete,
->                                                 service_changed_failure);
-> --
-> 2.4.3
+>  net/bluetooth/ecdh_helper.c |  6 ++++--
+>  net/bluetooth/selftest.c    | 16 +++++++++++-----
+>  2 files changed, 15 insertions(+), 7 deletions(-)
+> 
+> diff --git a/net/bluetooth/ecdh_helper.c b/net/bluetooth/ecdh_helper.c
+> index b6d9aa1..8018447 100644
+> --- a/net/bluetooth/ecdh_helper.c
+> +++ b/net/bluetooth/ecdh_helper.c
+> @@ -59,7 +59,7 @@ bool compute_ecdh_secret(const u8 public_key[64], const u8
+> private_key[32], struct ecdh p;
+>  	struct ecdh_completion result;
+>  	struct scatterlist src, dst;
+> -	u8 tmp[64];
+> +	u8 *tmp = kmalloc(64, GFP_KERNEL);
 
-The code used to do exactly that, but it turn out it very inefficient
-with devices that just loose the entire database when rebooted so we
-started doing cache validation so we don't remove the services upfront
-but check if the service range has changed so we prevent rediscovering
-everything.
+Should this be checked for null?
+
+>  	u8 *buf;
+>  	unsigned int buf_len;
+>  	int err = -ENOMEM;
+> @@ -68,7 +68,7 @@ bool compute_ecdh_secret(const u8 public_key[64], const u8
+> private_key[32], if (IS_ERR(tfm)) {
+>  		pr_err("alg: kpp: Failed to load tfm for kpp: %ld\n",
+>  		       PTR_ERR(tfm));
+> -		return false;
+> +		goto free_tmp;
+>  	}
+> 
+>  	req = kpp_request_alloc(tfm, GFP_KERNEL);
+> @@ -128,6 +128,8 @@ bool compute_ecdh_secret(const u8 public_key[64], const
+> u8 private_key[32], kpp_request_free(req);
+>  free_kpp:
+>  	crypto_free_kpp(tfm);
+> +free_tmp:
+> +	kfree(tmp);
+>  	return (err == 0);
+>  }
+> 
+> diff --git a/net/bluetooth/selftest.c b/net/bluetooth/selftest.c
+> index efef281..9a72f8f 100644
+> --- a/net/bluetooth/selftest.c
+> +++ b/net/bluetooth/selftest.c
+> @@ -142,18 +142,24 @@ static int __init test_ecdh_sample(const u8
+> priv_a[32], const u8 priv_b[32], const u8 pub_a[64], const u8 pub_b[64],
+>  				   const u8 dhkey[32])
+>  {
+> -	u8 dhkey_a[32], dhkey_b[32];
+> +	u8 *dhkey_a = kmalloc(64, GFP_KERNEL);
+> +	u8 *dhkey_b = &dhkey_a[32];
+> +	int ret = 0;
+> 
+>  	compute_ecdh_secret(pub_b, priv_a, dhkey_a);
+>  	compute_ecdh_secret(pub_a, priv_b, dhkey_b);
+> 
+> -	if (memcmp(dhkey_a, dhkey, 32))
+> -		return -EINVAL;
+> +	if (memcmp(dhkey_a, dhkey, 32)) {
+> +		ret = -EINVAL;
+> +		goto out;
+> +	}
+> 
+>  	if (memcmp(dhkey_b, dhkey, 32))
+> -		return -EINVAL;
+> +		ret = -EINVAL;
+> 
+> -	return 0;
+> +out:
+> +	kfree(dhkey_a);
+> +	return ret;
+>  }
+> 
+>  static char test_ecdh_buffer[32];
 
 
 -- 
-Luiz Augusto von Dentz
+pozdrawiam
+Szymon Janc
