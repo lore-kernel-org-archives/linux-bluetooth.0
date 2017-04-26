@@ -2,8 +2,8 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Subject: [PATCH BlueZ v2] core/gatt-client: Add support for Includes property
-Date: Wed, 26 Apr 2017 14:32:13 +0200
-Message-Id: <1493209933-10790-1-git-send-email-marcin.kraglak@tieto.com>
+Date: Wed, 26 Apr 2017 11:51:32 +0200
+Message-Id: <1493200292-24112-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
@@ -11,11 +11,11 @@ Add implementation of Includes property in GATT service interface.
 Include services are updated after exporting all services, when new service
 has been added or service was removed.
 ---
- src/gatt-client.c | 113 ++++++++++++++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 106 insertions(+), 7 deletions(-)
+ src/gatt-client.c | 112 ++++++++++++++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 105 insertions(+), 7 deletions(-)
 
 diff --git a/src/gatt-client.c b/src/gatt-client.c
-index 114981c..b86bfe6 100644
+index 114981c..00f9d6a 100644
 --- a/src/gatt-client.c
 +++ b/src/gatt-client.c
 @@ -72,6 +72,7 @@ struct service {
@@ -109,7 +109,7 @@ index 114981c..b86bfe6 100644
  
  	g_dbus_unregister_interface(btd_get_dbus_connection(), service->path,
  							GATT_SERVICE_IFACE);
-@@ -1567,11 +1612,71 @@ static void export_service(struct gatt_db_attribute *attr, void *user_data)
+@@ -1567,11 +1612,70 @@ static void export_service(struct gatt_db_attribute *attr, void *user_data)
  	queue_push_tail(client->services, service);
  }
  
@@ -150,7 +150,6 @@ index 114981c..b86bfe6 100644
 +	queue_push_tail(service->incl_services, incl_service);
 +	update_data->changed = true;
 +}
-+
 +static void update_included_services(void *data, void *user_data)
 +{
 +	struct btd_gatt_client *client = user_data;
@@ -181,17 +180,17 @@ index 114981c..b86bfe6 100644
  }
  
  struct btd_gatt_client *btd_gatt_client_new(struct btd_device *device)
-@@ -1689,14 +1794,8 @@ void btd_gatt_client_service_added(struct btd_gatt_client *client,
+@@ -1689,14 +1793,8 @@ void btd_gatt_client_service_added(struct btd_gatt_client *client,
  		return;
  
  	export_service(attrib, client);
 -}
--
+ 
 -static bool match_service_handle(const void *a, const void *b)
 -{
 -	const struct service *service = a;
 -	uint16_t start_handle = PTR_TO_UINT(b);
- 
+-
 -	return service->start_handle == start_handle;
 +	queue_foreach(client->services, update_included_services, client);
  }
