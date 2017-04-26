@@ -1,78 +1,49 @@
-Return-Path: <netdev-owner@vger.kernel.org>
-From: Michael Richardson <mcr@sandelman.ca>
-To: Alexander Aring <aar@pengutronix.de>
-cc: Network Development <netdev@vger.kernel.org>,
-        Jukka Rissanen <jukka.rissanen@linux.intel.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        "linux-wpan\@vger.kernel.org" <linux-wpan@vger.kernel.org>,
-        Linux Bluetooth <linux-bluetooth@vger.kernel.org>
-Subject: Re: bluetooth 6lowpan interfaces are not virtual anymore
-In-reply-to: <11cf222a-0c1f-4136-091d-719ee68824e1@pengutronix.de>
-References: <2d178eb8-3fbc-3385-6e0c-fa9941713959@pengutronix.de> <28530.1492534783@obiwan.sandelman.ca> <11cf222a-0c1f-4136-091d-719ee68824e1@pengutronix.de>
-MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
-        micalg=pgp-sha1; protocol="application/pgp-signature"
-Date: Wed, 26 Apr 2017 10:55:46 -0400
-Message-ID: <383.1493218546@dooku.sandelman.ca>
-Sender: netdev-owner@vger.kernel.org
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+Subject: Re: [PATCH BlueZ] shared/att: Fix responding to unknown command
+ opcode
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20170426141917.9727-1-luiz.dentz@gmail.com>
+Date: Wed, 26 Apr 2017 16:49:43 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <EDC2CC27-E6A3-4D22-8363-2C9552A599C8@holtmann.org>
+References: <20170426141917.9727-1-luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---=-=-=
-Content-Type: text/plain
+Hi Luiz,
 
+> In case of receiving an unknown command no response shall be generated.
+> ---
+> src/shared/att.c | 2 +-
+> 1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/src/shared/att.c b/src/shared/att.c
+> index 3071b51..10e182f 100644
+> --- a/src/shared/att.c
+> +++ b/src/shared/att.c
+> @@ -148,7 +148,7 @@ static enum att_op_type get_op_type(uint8_t opcode)
+> 			return att_opcode_type_table[i].type;
+> 	}
+> 
+> -	return ATT_OP_TYPE_UNKNOWN;
+> +	return opcode & ATT_OP_CMD_MASK ? ATT_OP_TYPE_CMD : ATT_OP_TYPE_UNKNOWN;
+> }
 
-Alexander Aring <aar@pengutronix.de> wrote:
-    >> In a classic SVR4 STREAMS works, it would have been just another
-    >> module.  (No, I'm not a fan of *STREAMS* or of SVR4 in general,
-    >> although I liked some of the ideas).
-    >>
+for readability I would use this:
 
-    > ok, I see you complain about "having a virtual on top of wpan
-    > interface", or?
+	return (opcode & ATT_OP_CMD_MASK) ? ATT_OP_TYPE_CMD : ATT_OP_TYPE_UNKNOWN;
 
-    > I wanted to talk at first about the queue handling which is introduced
-    > when 6LoWPAN is not a virtual interface anymore. Or do you want to have
-    > a queue in front of 6lowpan adaptation (see other mail reply with ASCII
-    > graphics).
+Or just do this:
 
-I would like to have a single queue, as close to the hardware as possible,
-such that BQL can do it's thing easily.  Should we rethink outgoing fragment
-handling for 6lowpan?  Clearly the BT people had a need.
-I don't think they've had a chance to respond to your complaints.
+	if (opcode & ATT_OP_CMD_MASK)
+		return ATT_OP_TYPE_CMD;
 
-    > We can change that you can run multiple interfaces on one
-    > PHY. Currently we just allow one, because address filtering. Disable
-    > address filtering
-    > we will loose ACK handling on hardware.
+	return ATT_OP_TYPE_UNKNOWN;
 
-Yes, that's a limitation of some hardware, and if you enable multiple PANIDs,
-that might be the consequence....
+Regards
 
-    > I can try to implement all stuff in software "for fun, maybe see what
-    > we can do to handle ACK in software, etc" Then you can run multiple
+Marcel
 
-I'm not asking you to do it, I'm asking, now that we've gotten to a certain
-point, we have a better idea what the various requirements are, and can we
-re-evaluate things and maybe tweak some things.
-
---
-]               Never tell me the odds!                 | ipv6 mesh networks [
-]   Michael Richardson, Sandelman Software Works        | network architect  [
-]     mcr@sandelman.ca  http://www.sandelman.ca/        |   ruby on rails    [
-
-
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
-
-iQEcBAEBAgAGBQJZALTyAAoJEJVM4Vb9/EKQ504H/2SdMvdYquJkjDINEKDVJkkL
-qD/fHdqpLiNHWsv5ZlqYbzo7tNus7ecVm5SJJkG/nPKBtjgI6no94u3dEs7rF65U
-2PgNfwZH360MSyTqt+ckeyBTOg/6JxTzzlpRyHu1JYl88X4MKHDEOeKA4f+YlucV
-O3QxcHwyBQgeZrmJEiJqgD8L2XjkRgCXQZcCLMHMEEZmHnmLvdvJwi2UI+BCrI4G
-AoE61AQc7kajq5GWIgtLY1XyRdGnMgNfCK32PhaSxO4hbgCz26HKqGO98V+TbIdi
-BGyC/0YnQTUvr557QNU+m92q+cP049oROx+QFlTXxqJyXUdkuINbNgYXU1sCyxM=
-=OPgp
------END PGP SIGNATURE-----
---=-=-=--
