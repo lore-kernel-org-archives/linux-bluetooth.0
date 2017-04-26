@@ -1,52 +1,68 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Subject: Re: [PATCH] Bluetooth: allocate data for kpp on heap
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1899161.UMzm0Rcsma@ix>
-Date: Thu, 27 Apr 2017 12:30:32 +0200
-Cc: Salvatore Benedetto <salvatore.benedetto@intel.com>,
-        "Gustavo F. Padovan" <gustavo@padovan.org>,
-        Linux Bluetooth <linux-bluetooth@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Johan Hedberg <johan.hedberg@gmail.com>
-Message-Id: <60E99099-4EB9-4DB6-AF06-22354A875D6B@holtmann.org>
-References: <1493135987-2618-1-git-send-email-salvatore.benedetto@intel.com>
- <1899161.UMzm0Rcsma@ix>
-To: Szymon Janc <szymon.janc@codecoup.pl>
+MIME-Version: 1.0
+In-Reply-To: <20170426190728.GA14369@x1c>
+References: <CAAu3APbw0JyPfKUi6PZ4Nr2Uh5WXtDprDVFBTj3xr+801b9L6w@mail.gmail.com>
+ <CAAu3APbMKQY2dnD=TUAb_3BqFKk0s2bzuFFLX8=h-1g7gm8G=Q@mail.gmail.com>
+ <20170408071834.GA12144@x1c> <CAAu3APahskA_b2Ydt8TzUWBQnkuC10UwjZ37RaOyhAt4s1iyiQ@mail.gmail.com>
+ <20170422052644.GA31652@x1c> <CAAu3APZxRDoZhCU7QtWVNd05HbKzadoX=886r_REiebvmMj6vQ@mail.gmail.com>
+ <CAAu3APYz+fP-f2S3XqV1EJLs4d=4-URTMG-bffNZmZNFQE+ROQ@mail.gmail.com> <20170426190728.GA14369@x1c>
+From: Barry Byford <31baz66@gmail.com>
+Date: Wed, 26 Apr 2017 23:47:35 +0100
+Message-ID: <CAAu3APZoH-paWg1gqaT_mNwsiG8r6sUz=L2csvAY9=AjFCgJ6A@mail.gmail.com>
+Subject: Re: Serial Port connection with DBus API
+To: Bluez mailing list <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hello Johan,
 
->> Bluetooth would crash when computing ECDH keys with kpp
->> if VMAP_STACK is enabled. Fix by allocating data passed
->> to kpp on heap.
->> 
->> Fixes: 58771c1c ("Bluetooth: convert smp and selftest to crypto kpp
->> API")
->> Signed-off-by: Salvatore Benedetto <salvatore.benedetto@intel.com>
->> ---
->> net/bluetooth/ecdh_helper.c |  6 ++++--
->> net/bluetooth/selftest.c    | 16 +++++++++++-----
->> 2 files changed, 15 insertions(+), 7 deletions(-)
->> 
->> diff --git a/net/bluetooth/ecdh_helper.c b/net/bluetooth/ecdh_helper.c
->> index b6d9aa1..8018447 100644
->> --- a/net/bluetooth/ecdh_helper.c
->> +++ b/net/bluetooth/ecdh_helper.c
->> @@ -59,7 +59,7 @@ bool compute_ecdh_secret(const u8 public_key[64], const u8
->> private_key[32], struct ecdh p;
->> 	struct ecdh_completion result;
->> 	struct scatterlist src, dst;
->> -	u8 tmp[64];
->> +	u8 *tmp = kmalloc(64, GFP_KERNEL);
-> 
-> Should this be checked for null?
+Thank you very much for taking the time to respond. It is very much appreciated.
 
-possible yes, how do other crypto users did this when they converted to VMAP_STACK support. We should do exactly the same as others did.
+On 26 April 2017 at 20:07, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi Barry,
+>
+> On Tue, Apr 25, 2017, Barry Byford wrote:
+>> I don't feel I'm making progress on this so I've attached the output
+>> from btmon in the hope that someone has the time to cast an eye over
+>> it.
+>>
+>> The values that are received into NewConnection are:
+>> object device = /org/bluez/hci0/dev_64_BC_0C_F6_22_F8
+>>  fd = 0
+>> dict fd_properties = {}
+>>
+>> if I do a os.isatty(fd) then I get returned True
+>> if I do a os.ttyname(fd) then I get returned /dev/pts/0
+>
+> Our test/test-profile script does the following:
+>
+>         def NewConnection(self, path, fd, properties):
+>                 self.fd = fd.take()
 
-Regards
+Yes I had seen this and it confused me. fd has a signature of 'h'
+which is a gint32 according to
+https://developer.gnome.org/glib/stable/gvariant-format-strings.html
+Integers have no method take() as part of it.
 
-Marcel
+> Are you doing something similar? Otherwise it looks like file descriptor
+> passing is somehow broken in your system.
+On my system I don't have dbus-python as I am using the preferred
+pydbus library.
+I say preferred based on the comments at the bottom of
+https://www.freedesktop.org/wiki/Software/DBusBindings/
 
+Following your posting I have configured a new system and ran
+test/test-profile using dbus-python
+
+Running on the new system fd comes in to NewConnection as type 'dbus.UnixFd'
+This type of object does have a take() method
+https://dbus.freedesktop.org/doc/dbus-python/api/dbus.types.UnixFd-class.html
+
+This seems to be consistent with type 'h' defined here
+https://dbus.freedesktop.org/doc/dbus-specification.html#basic-types
+
+I think this moves my investigation away from BlueZ and on to the
+various Python DBus implementations.
+
+Thanks again for your input.
