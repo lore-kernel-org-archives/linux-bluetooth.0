@@ -1,44 +1,94 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Date: Wed, 26 Apr 2017 22:07:28 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Barry Byford <31baz66@gmail.com>
-Cc: Bluez mailing list <linux-bluetooth@vger.kernel.org>
-Subject: Re: Serial Port connection with DBus API
-Message-ID: <20170426190728.GA14369@x1c>
-References: <CAAu3APbw0JyPfKUi6PZ4Nr2Uh5WXtDprDVFBTj3xr+801b9L6w@mail.gmail.com>
- <CAAu3APbMKQY2dnD=TUAb_3BqFKk0s2bzuFFLX8=h-1g7gm8G=Q@mail.gmail.com>
- <20170408071834.GA12144@x1c>
- <CAAu3APahskA_b2Ydt8TzUWBQnkuC10UwjZ37RaOyhAt4s1iyiQ@mail.gmail.com>
- <20170422052644.GA31652@x1c>
- <CAAu3APZxRDoZhCU7QtWVNd05HbKzadoX=886r_REiebvmMj6vQ@mail.gmail.com>
- <CAAu3APYz+fP-f2S3XqV1EJLs4d=4-URTMG-bffNZmZNFQE+ROQ@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <CAAu3APYz+fP-f2S3XqV1EJLs4d=4-URTMG-bffNZmZNFQE+ROQ@mail.gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <linux-wpan-owner@vger.kernel.org>
+Message-ID: <1493225552.3165.5.camel@linux.intel.com>
+Subject: Re: bluetooth 6lowpan interfaces are not virtual anymore
+From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+To: Michael Richardson <mcr@sandelman.ca>,
+        Alexander Aring <aar@pengutronix.de>
+Cc: Network Development <netdev@vger.kernel.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>,
+        Linux Bluetooth <linux-bluetooth@vger.kernel.org>
+Date: Wed, 26 Apr 2017 19:52:32 +0300
+In-Reply-To: <383.1493218546@dooku.sandelman.ca>
+References: <2d178eb8-3fbc-3385-6e0c-fa9941713959@pengutronix.de>
+         <28530.1492534783@obiwan.sandelman.ca>
+         <11cf222a-0c1f-4136-091d-719ee68824e1@pengutronix.de>
+         <383.1493218546@dooku.sandelman.ca>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Barry,
+Hi Michael,
 
-On Tue, Apr 25, 2017, Barry Byford wrote:
-> I don't feel I'm making progress on this so I've attached the output
-> from btmon in the hope that someone has the time to cast an eye over
-> it.
+On Wed, 2017-04-26 at 10:55 -0400, Michael Richardson wrote:
+> Alexander Aring <aar@pengutronix.de> wrote:
+>     >> In a classic SVR4 STREAMS works, it would have been just
+> another
+>     >> module.  (No, I'm not a fan of *STREAMS* or of SVR4 in
+> general,
+>     >> although I liked some of the ideas).
+>     >>
 > 
-> The values that are received into NewConnection are:
-> object device = /org/bluez/hci0/dev_64_BC_0C_F6_22_F8
->  fd = 0
-> dict fd_properties = {}
+>     > ok, I see you complain about "having a virtual on top of wpan
+>     > interface", or?
 > 
-> if I do a os.isatty(fd) then I get returned True
-> if I do a os.ttyname(fd) then I get returned /dev/pts/0
+>     > I wanted to talk at first about the queue handling which is
+> introduced
+>     > when 6LoWPAN is not a virtual interface anymore. Or do you want
+> to have
+>     > a queue in front of 6lowpan adaptation (see other mail reply
+> with ASCII
+>     > graphics).
+> 
+> I would like to have a single queue, as close to the hardware as
+> possible,
+> such that BQL can do it's thing easily.  Should we rethink outgoing
+> fragment
+> handling for 6lowpan?  Clearly the BT people had a need.
+> I don't think they've had a chance to respond to your complaints.
 
-Our test/test-profile script does the following:
+Note that the BT fragmentation (or actually it is called segmentation
+in BT) is totally different what 802.15.4 is doing. I do not think
+there is any need to add fragmentation handling into 6lo.
 
-        def NewConnection(self, path, fd, properties):
-                self.fd = fd.take()
+Actually the 6lowpan kernel module could probably be simplified to be a
+library. We did this in Zephyr where we have compress() and
+uncompress() functions that do all the magic.  
 
-Are you doing something similar? Otherwise it looks like file descriptor
-passing is somehow broken in your system.
+> 
+>     > We can change that you can run multiple interfaces on one
+>     > PHY. Currently we just allow one, because address filtering.
+> Disable
+>     > address filtering
+>     > we will loose ACK handling on hardware.
+> 
+> Yes, that's a limitation of some hardware, and if you enable multiple
+> PANIDs,
+> that might be the consequence....
+> 
+>     > I can try to implement all stuff in software "for fun, maybe
+> see what
+>     > we can do to handle ACK in software, etc" Then you can run
+> multiple
+> 
+> I'm not asking you to do it, I'm asking, now that we've gotten to a
+> certain
+> point, we have a better idea what the various requirements are, and
+> can we
+> re-evaluate things and maybe tweak some things.
+> 
+> --
+> ]               Never tell me the odds!                 | ipv6 mesh
+> networks [
+> ]   Michael Richardson, Sandelman Software Works        | network
+> architect  [
+> ]     mcr@sandelman.ca  http://www.sandelman.ca/        |   ruby on
+> rails    [
+> 
 
-Johan
+
+Cheers,
+Jukka
+
+
