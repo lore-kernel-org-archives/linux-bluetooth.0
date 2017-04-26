@@ -1,80 +1,59 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <netdev-owner@vger.kernel.org>
 From: Michael Richardson <mcr@sandelman.ca>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-cc: Alexander Aring <aar@pengutronix.de>,
-        Network Development <netdev@vger.kernel.org>,
+To: Alexander Aring <aar@pengutronix.de>
+cc: Network Development <netdev@vger.kernel.org>,
         Jukka Rissanen <jukka.rissanen@linux.intel.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
         "linux-wpan\@vger.kernel.org" <linux-wpan@vger.kernel.org>,
         Linux Bluetooth <linux-bluetooth@vger.kernel.org>
 Subject: Re: bluetooth 6lowpan interfaces are not virtual anymore
-In-reply-to: <CABBYNZJqChBfB4jNCN3edmKSfhNd-haTKOjeYy1toK-Mn=qzoA@mail.gmail.com>
-References: <2d178eb8-3fbc-3385-6e0c-fa9941713959@pengutronix.de> <CABBYNZLqTvd5cnG4fKJgPKJGvS6hsk8vOM+7NQ_RhLJ-WOszmg@mail.gmail.com> <f3c04860-651e-c9f3-e7ab-db609d105436@pengutronix.de> <CABBYNZJqChBfB4jNCN3edmKSfhNd-haTKOjeYy1toK-Mn=qzoA@mail.gmail.com>
+In-reply-to: <11cf222a-0c1f-4136-091d-719ee68824e1@pengutronix.de>
+References: <2d178eb8-3fbc-3385-6e0c-fa9941713959@pengutronix.de> <28530.1492534783@obiwan.sandelman.ca> <11cf222a-0c1f-4136-091d-719ee68824e1@pengutronix.de>
 MIME-Version: 1.0
 Content-Type: multipart/signed; boundary="=-=-=";
         micalg=pgp-sha1; protocol="application/pgp-signature"
-Date: Wed, 26 Apr 2017 11:05:52 -0400
-Message-ID: <1193.1493219152@dooku.sandelman.ca>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Wed, 26 Apr 2017 10:55:46 -0400
+Message-ID: <383.1493218546@dooku.sandelman.ca>
+Sender: netdev-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 --=-=-=
 Content-Type: text/plain
 
 
-I said that BT people hadn't replied, but it was next in my inbox :-)
+Alexander Aring <aar@pengutronix.de> wrote:
+    >> In a classic SVR4 STREAMS works, it would have been just another
+    >> module.  (No, I'm not a fan of *STREAMS* or of SVR4 in general,
+    >> although I liked some of the ideas).
+    >>
 
-Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
-    >> At least if you want to try to make a more efficient qdisc handling,
-    >> means dropping skb's in queue when userspace sends too much. You will
-    >> change it back, control two queues seems to be difficult.
+    > ok, I see you complain about "having a virtual on top of wpan
+    > interface", or?
 
-    > It is wrong only if you look at 6LoWPAN interface as being owned by
-    > 6lowpan modules, but it doesn't, in fact it won't anything by itself so
-    > it basically acts as a library to that perform 6LoWPAN operation on the
-    > packet level, thus why it is possible to switch from virtual to real
-    > interface. Also in terms of 15.4, the 6LoWPAN interfaces you depicted
-    > above is also no controlled by 6LoWPAN itself, in fact it seeems to
-    > represent links in 15.4, and I also assume these links may not use
-    > 6LoWPAN.
+    > I wanted to talk at first about the queue handling which is introduced
+    > when 6LoWPAN is not a virtual interface anymore. Or do you want to have
+    > a queue in front of 6lowpan adaptation (see other mail reply with ASCII
+    > graphics).
 
-At present I do not think we support any 15.4 links which are not 6lowpan in the Kernel.
-Perhaps a userspace can open the device in raw mode and do stuff with it
-directly.  Do such users exist right now?
+I would like to have a single queue, as close to the hardware as possible,
+such that BQL can do it's thing easily.  Should we rethink outgoing fragment
+handling for 6lowpan?  Clearly the BT people had a need.
+I don't think they've had a chance to respond to your complaints.
 
-    >> This queue should have the same meaning like our queue in IEEE
-    >> 802.15.4 interface which you mentioned above.  At this point, we have
-    >> no difference. There exists already a queue for your real transeiver
-    >> hardware.
+    > We can change that you can run multiple interfaces on one
+    > PHY. Currently we just allow one, because address filtering. Disable
+    > address filtering
+    > we will loose ACK handling on hardware.
 
-    > The queue here is per channel, btw the queue size is not decided by us
-    > it is the remote side that provides the tx credits so to some extend
-    > the tx_queue is actually the remote queue in case of CoC. When testing
-    > this it was quite clear this does not work in practice, with IPv6 at
-    > least, because the remote side may not have enough credits for a single
-    > packet (MPS * tx_credits < MTU) which means without proper queueing
-    > support we would be dropping every packet.
+Yes, that's a limitation of some hardware, and if you enable multiple PANIDs,
+that might be the consequence....
 
-Would a longer amortization interval help this?
-It seems that if there isn't bandwidth to send the packet, that userspace has
-to learn about this fact...
+    > I can try to implement all stuff in software "for fun, maybe see what
+    > we can do to handle ACK in software, etc" Then you can run multiple
 
-    >> At least, having a queue and don't put anything anymore into the queue
-    >> when "tx credits" is at zero (because queue is full). _Is_ a kind of
-    >> qdisc handling.
-
-    > The tx_credits operate at L2CAP segment level (MPS), so it is at a
-    > completely different level, there are no guarantees the credits will
-    > attend to a single IP packet.
-
-That seems like a problem.
-I think that we need to either send the entire packet, or none.
-Spreading the credits across two packets would just make the system stutter,
-as an upper layer retransmits packets that were half-sent, but then delayed.
-
-Is there someway we can wait, at the IP packet queue level, until there are
-sufficient credits to send all the fragments?  That way, the IP qdisc layer
-can decide to abort(drop,defer) an IP packet from the queue in favour of a more
-important packet.
+I'm not asking you to do it, I'm asking, now that we've gotten to a certain
+point, we have a better idea what the various requirements are, and can we
+re-evaluate things and maybe tweak some things.
 
 --
 ]               Never tell me the odds!                 | ipv6 mesh networks [
@@ -88,12 +67,12 @@ Content-Type: application/pgp-signature; name="signature.asc"
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1
 
-iQEcBAEBAgAGBQJZALdQAAoJEJVM4Vb9/EKQkngH/2anNuQZEDvLZHuQ4QvoL6YH
-vK+lZujnd0FcbIu8mCKiO3rWJFZCr2EXju7k0cehMDDKf/v5NwiPpKcxeBbgE9K/
-9/34yn3g5Hua49NehmzwcBIAmSAljpr19Ijr37mbi37RUHT4JJ/15dSJtrJ8Hb+y
-SPZXGZFC85TzpMpC9gYLcb/EBsxhe8XWrpjOdn3TlO8Hk9QA85mfd4JwWy/q7+v7
-8W9WHIuGzdeigZ7ytse8oynrW1BRIR8SjxqGC57hIpfaJsPJbdn+FUoXvXEiw8f1
-3yLjtQfVafTLygpQdFNEKIvhgaLkh/jZyJUNMvGx3zMywPKH0w4QQ3ERg+gAWRg=
-=+mov
+iQEcBAEBAgAGBQJZALTyAAoJEJVM4Vb9/EKQ504H/2SdMvdYquJkjDINEKDVJkkL
+qD/fHdqpLiNHWsv5ZlqYbzo7tNus7ecVm5SJJkG/nPKBtjgI6no94u3dEs7rF65U
+2PgNfwZH360MSyTqt+ckeyBTOg/6JxTzzlpRyHu1JYl88X4MKHDEOeKA4f+YlucV
+O3QxcHwyBQgeZrmJEiJqgD8L2XjkRgCXQZcCLMHMEEZmHnmLvdvJwi2UI+BCrI4G
+AoE61AQc7kajq5GWIgtLY1XyRdGnMgNfCK32PhaSxO4hbgCz26HKqGO98V+TbIdi
+BGyC/0YnQTUvr557QNU+m92q+cP049oROx+QFlTXxqJyXUdkuINbNgYXU1sCyxM=
+=OPgp
 -----END PGP SIGNATURE-----
 --=-=-=--
