@@ -1,78 +1,57 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?=
-        <frederic.danis.oss@gmail.com>
-To: sre@kernel.org
-Cc: linux-bluetooth@vger.kernel.org, frederic.danis.oss@gmail.com
-Subject: [PATCH] Bluetooth: Add module license for HCI UART Nokia H4+
-Date: Fri, 28 Apr 2017 13:26:11 +0200
-Message-Id: <1493378771-22557-1-git-send-email-frederic.danis.oss@gmail.com>
+Return-Path: <luiz.dentz@gmail.com>
 MIME-Version: 1.0
+In-Reply-To: <EDC2CC27-E6A3-4D22-8363-2C9552A599C8@holtmann.org>
+References: <20170426141917.9727-1-luiz.dentz@gmail.com> <EDC2CC27-E6A3-4D22-8363-2C9552A599C8@holtmann.org>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Thu, 27 Apr 2017 16:02:07 +0300
+Message-ID: <CABBYNZLuSKfjkABZ2hV=_xg58KZvA49m0Aqykb0iAWk6JQnwgA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] shared/att: Fix responding to unknown command opcode
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Fix the following error preventing to load Nokia H4+ module:
-  kernel: [  826.461619] hci_nokia: module license 'unspecified' taints kernel.
-  kernel: [  826.461629] Disabling lock debugging due to kernel taint
-  kernel: [  826.461836] hci_nokia: Unknown symbol gpiod_get_value_cansleep (err 0)
-  kernel: [  826.461876] hci_nokia: Unknown symbol devm_kmalloc (err 0)
-  kernel: [  826.461908] hci_nokia: Unknown symbol gpiod_set_value (err 0)
-  kernel: [  826.461937] hci_nokia: Unknown symbol serdev_device_set_baudrate (err 0)
-  kernel: [  826.461994] hci_nokia: Unknown symbol gpiod_set_value_cansleep (err 0)
-  kernel: [  826.462021] hci_nokia: Unknown symbol hci_uart_tx_wakeup (err 0)
-  kernel: [  826.462043] hci_nokia: Unknown symbol serdev_device_set_flow_control (err 0)
-  kernel: [  826.462064] hci_nokia: Unknown symbol gpiod_to_irq (err 0)
-  kernel: [  826.462085] hci_nokia: Unknown symbol serdev_device_open (err 0)
-  kernel: [  826.462106] hci_nokia: Unknown symbol gpiod_get_value (err 0)
-  kernel: [  826.462150] hci_nokia: Unknown symbol clk_prepare (err 0)
-  kernel: [  826.462182] hci_nokia: Unknown symbol pm_runtime_enable (err 0)
-  kernel: [  826.462204] hci_nokia: Unknown symbol h4_recv_buf (err 0)
-  kernel: [  826.462246] hci_nokia: Unknown symbol serdev_device_write_flush (err 0)
-  kernel: [  826.462268] hci_nokia: Unknown symbol serdev_device_get_tiocm (err 0)
-  kernel: [  826.462298] hci_nokia: Unknown symbol driver_unregister (err 0)
-  kernel: [  826.462318] hci_nokia: Unknown symbol serdev_device_wait_until_sent (err 0)
-  kernel: [  826.462347] hci_nokia: Unknown symbol __serdev_device_driver_register (err 0)
-  kernel: [  826.462384] hci_nokia: Unknown symbol serdev_device_set_tiocm (err 0)
-  kernel: [  826.462417] hci_nokia: Unknown symbol clk_get_rate (err 0)
-  kernel: [  826.462454] hci_nokia: Unknown symbol __pm_runtime_resume (err 0)
-  kernel: [  826.462486] hci_nokia: Unknown symbol serdev_device_close (err 0)
-  kernel: [  826.462524] hci_nokia: Unknown symbol cancel_work_sync (err 0)
-  kernel: [  826.462546] hci_nokia: Unknown symbol btbcm_set_bdaddr (err 0)
-  kernel: [  826.462567] hci_nokia: Unknown symbol clk_disable (err 0)
-  kernel: [  826.462610] hci_nokia: Unknown symbol __pm_runtime_disable (err 0)
-  kernel: [  826.462632] hci_nokia: Unknown symbol hci_uart_register_device (err 0)
-  kernel: [  826.462653] hci_nokia: Unknown symbol clk_enable (err 0)
-  kernel: [  826.462675] hci_nokia: Unknown symbol __pm_runtime_idle (err 0)
-  kernel: [  826.462700] hci_nokia: Unknown symbol clk_unprepare (err 0)
+Hi Marcel,
 
-Signed-off-by: Frédéric Danis <frederic.danis.oss@gmail.com>
----
- drivers/bluetooth/hci_nokia.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+On Wed, Apr 26, 2017 at 5:49 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Luiz,
+>
+>> In case of receiving an unknown command no response shall be generated.
+>> ---
+>> src/shared/att.c | 2 +-
+>> 1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/src/shared/att.c b/src/shared/att.c
+>> index 3071b51..10e182f 100644
+>> --- a/src/shared/att.c
+>> +++ b/src/shared/att.c
+>> @@ -148,7 +148,7 @@ static enum att_op_type get_op_type(uint8_t opcode)
+>>                       return att_opcode_type_table[i].type;
+>>       }
+>>
+>> -     return ATT_OP_TYPE_UNKNOWN;
+>> +     return opcode & ATT_OP_CMD_MASK ? ATT_OP_TYPE_CMD : ATT_OP_TYPE_UNKNOWN;
+>> }
+>
+> for readability I would use this:
+>
+>         return (opcode & ATT_OP_CMD_MASK) ? ATT_OP_TYPE_CMD : ATT_OP_TYPE_UNKNOWN;
+>
+> Or just do this:
+>
+>         if (opcode & ATT_OP_CMD_MASK)
+>                 return ATT_OP_TYPE_CMD;
+>
+>         return ATT_OP_TYPE_UNKNOWN;
 
-diff --git a/drivers/bluetooth/hci_nokia.c b/drivers/bluetooth/hci_nokia.c
-index 4038daf..c563f3c 100644
---- a/drivers/bluetooth/hci_nokia.c
-+++ b/drivers/bluetooth/hci_nokia.c
-@@ -36,6 +36,8 @@
- #include "hci_uart.h"
- #include "btbcm.h"
- 
-+#define VERSION "0.1"
-+
- #define NOKIA_ID_BCM2048	0x04
- #define NOKIA_ID_TI1271		0x31
- 
-@@ -818,3 +820,8 @@ static struct serdev_device_driver nokia_bluetooth_serdev_driver = {
- };
- 
- module_serdev_device_driver(nokia_bluetooth_serdev_driver);
-+
-+MODULE_AUTHOR("Sebastian Reichel <sre@kernel.org>-");
-+MODULE_DESCRIPTION("Bluetooth HCI UART Nokia H4+ driver ver " VERSION);
-+MODULE_VERSION(VERSION);
-+MODULE_LICENSE("GPL");
+Ive made these modifications above and applied the patch.
+
+> Regards
+>
+> Marcel
+>
+
+
+
 -- 
-2.7.4
-
+Luiz Augusto von Dentz
