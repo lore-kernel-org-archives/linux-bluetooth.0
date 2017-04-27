@@ -1,57 +1,52 @@
-Return-Path: <luiz.dentz@gmail.com>
-MIME-Version: 1.0
-In-Reply-To: <EDC2CC27-E6A3-4D22-8363-2C9552A599C8@holtmann.org>
-References: <20170426141917.9727-1-luiz.dentz@gmail.com> <EDC2CC27-E6A3-4D22-8363-2C9552A599C8@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 27 Apr 2017 16:02:07 +0300
-Message-ID: <CABBYNZLuSKfjkABZ2hV=_xg58KZvA49m0Aqykb0iAWk6JQnwgA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] shared/att: Fix responding to unknown command opcode
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+Subject: Re: [PATCH] Bluetooth: allocate data for kpp on heap
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1899161.UMzm0Rcsma@ix>
+Date: Thu, 27 Apr 2017 12:30:32 +0200
+Cc: Salvatore Benedetto <salvatore.benedetto@intel.com>,
+        "Gustavo F. Padovan" <gustavo@padovan.org>,
+        Linux Bluetooth <linux-bluetooth@vger.kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Johan Hedberg <johan.hedberg@gmail.com>
+Message-Id: <60E99099-4EB9-4DB6-AF06-22354A875D6B@holtmann.org>
+References: <1493135987-2618-1-git-send-email-salvatore.benedetto@intel.com>
+ <1899161.UMzm0Rcsma@ix>
+To: Szymon Janc <szymon.janc@codecoup.pl>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Szymon,
 
-On Wed, Apr 26, 2017 at 5:49 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Luiz,
->
->> In case of receiving an unknown command no response shall be generated.
+>> Bluetooth would crash when computing ECDH keys with kpp
+>> if VMAP_STACK is enabled. Fix by allocating data passed
+>> to kpp on heap.
+>> 
+>> Fixes: 58771c1c ("Bluetooth: convert smp and selftest to crypto kpp
+>> API")
+>> Signed-off-by: Salvatore Benedetto <salvatore.benedetto@intel.com>
 >> ---
->> src/shared/att.c | 2 +-
->> 1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/src/shared/att.c b/src/shared/att.c
->> index 3071b51..10e182f 100644
->> --- a/src/shared/att.c
->> +++ b/src/shared/att.c
->> @@ -148,7 +148,7 @@ static enum att_op_type get_op_type(uint8_t opcode)
->>                       return att_opcode_type_table[i].type;
->>       }
->>
->> -     return ATT_OP_TYPE_UNKNOWN;
->> +     return opcode & ATT_OP_CMD_MASK ? ATT_OP_TYPE_CMD : ATT_OP_TYPE_UNKNOWN;
->> }
->
-> for readability I would use this:
->
->         return (opcode & ATT_OP_CMD_MASK) ? ATT_OP_TYPE_CMD : ATT_OP_TYPE_UNKNOWN;
->
-> Or just do this:
->
->         if (opcode & ATT_OP_CMD_MASK)
->                 return ATT_OP_TYPE_CMD;
->
->         return ATT_OP_TYPE_UNKNOWN;
+>> net/bluetooth/ecdh_helper.c |  6 ++++--
+>> net/bluetooth/selftest.c    | 16 +++++++++++-----
+>> 2 files changed, 15 insertions(+), 7 deletions(-)
+>> 
+>> diff --git a/net/bluetooth/ecdh_helper.c b/net/bluetooth/ecdh_helper.c
+>> index b6d9aa1..8018447 100644
+>> --- a/net/bluetooth/ecdh_helper.c
+>> +++ b/net/bluetooth/ecdh_helper.c
+>> @@ -59,7 +59,7 @@ bool compute_ecdh_secret(const u8 public_key[64], const u8
+>> private_key[32], struct ecdh p;
+>> 	struct ecdh_completion result;
+>> 	struct scatterlist src, dst;
+>> -	u8 tmp[64];
+>> +	u8 *tmp = kmalloc(64, GFP_KERNEL);
+> 
+> Should this be checked for null?
 
-Ive made these modifications above and applied the patch.
+possible yes, how do other crypto users did this when they converted to VMAP_STACK support. We should do exactly the same as others did.
 
-> Regards
->
-> Marcel
->
+Regards
 
+Marcel
 
-
--- 
-Luiz Augusto von Dentz
