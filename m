@@ -1,34 +1,39 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: zero kpp input for key generation
-Date: Sun, 30 Apr 2017 03:48:33 -0700
-Message-Id: <20170430104833.16108-1-marcel@holtmann.org>
+Subject: [PATCH BlueZ] shared/att: Respond to any opcode that is not command
+Date: Fri, 28 Apr 2017 21:24:37 +0300
+Message-Id: <20170428182437.23502-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When generating new ECDH keys with kpp, the shared secret input needs to
-be set to NULL. Fix this by including kpp_request_set_input call.
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Fixes: 58771c1c ("Bluetooth: convert smp and selftest to crypto kpp
-API")
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+Although get_op_type does now check for the command mask it must
+respond to anything other than ATT_OP_TYPE_CMD since there is no mask
+for response opcode.
 ---
- net/bluetooth/ecdh_helper.c | 1 +
- 1 file changed, 1 insertion(+)
+ src/shared/att.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/net/bluetooth/ecdh_helper.c b/net/bluetooth/ecdh_helper.c
-index 579684bfc322..2a65ca3fa8fa 100644
---- a/net/bluetooth/ecdh_helper.c
-+++ b/net/bluetooth/ecdh_helper.c
-@@ -191,6 +191,7 @@ bool generate_ecdh_keys(u8 public_key[64], u8 private_key[32])
- 			goto free_all;
+diff --git a/src/shared/att.c b/src/shared/att.c
+index 494b10d..2dc9d8b 100644
+--- a/src/shared/att.c
++++ b/src/shared/att.c
+@@ -841,10 +841,10 @@ static void handle_notify(struct bt_att *att, uint8_t opcode, uint8_t *pdu,
+ 	}
  
- 		sg_init_one(&dst, tmp, 64);
-+		kpp_request_set_input(req, NULL, 0);
- 		kpp_request_set_output(req, &dst, 64);
- 		kpp_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
- 					 ecdh_complete, &result);
+ 	/*
+-	 * If this was a request and no handler was registered for it, respond
+-	 * with "Not Supported"
++	 * If this was not a command and no handler was registered for it,
++	 * respond with "Not Supported"
+ 	 */
+-	if (!found && get_op_type(opcode) == ATT_OP_TYPE_REQ)
++	if (!found && get_op_type(opcode) != ATT_OP_TYPE_CMD)
+ 		respond_not_supported(att, opcode);
+ 
+ 	bt_att_unref(att);
 -- 
 2.9.3
 
