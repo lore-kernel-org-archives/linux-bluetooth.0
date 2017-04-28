@@ -1,61 +1,57 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain; charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Subject: Re: [PATCH] Bluetooth: Add module license for HCI UART Nokia H4+
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1493378771-22557-1-git-send-email-frederic.danis.oss@gmail.com>
-Date: Fri, 28 Apr 2017 18:06:36 +0200
-Cc: Sebastian Reichel <sre@kernel.org>, linux-bluetooth@vger.kernel.org
-Message-Id: <7AE12B9F-95F6-47C4-9844-20091DDF8A1A@holtmann.org>
-References: <1493378771-22557-1-git-send-email-frederic.danis.oss@gmail.com>
-To: =?utf-8?Q?Fr=C3=A9d=C3=A9ric_Danis?= <frederic.danis.oss@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <Dean_Jenkins@mentor.com>
+From: Dean Jenkins <Dean_Jenkins@mentor.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: Dean Jenkins <Dean_Jenkins@mentor.com>, "Gustavo F . Padovan"
+	<gustavo@padovan.org>, Johan Hedberg <johan.hedberg@gmail.com>,
+	<linux-bluetooth@vger.kernel.org>
+Subject: [PATCH V1 3/3] Bluetooth: hci_ldisc: Add protocol check to hci_uart_tx_wakeup()
+Date: Fri, 28 Apr 2017 13:57:26 +0100
+Message-ID: <1493384246-15381-4-git-send-email-Dean_Jenkins@mentor.com>
+In-Reply-To: <1493384246-15381-1-git-send-email-Dean_Jenkins@mentor.com>
+References: <1493384246-15381-1-git-send-email-Dean_Jenkins@mentor.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Fred,
+Before attempting to schedule a work-item onto hu->write_work in
+hci_uart_tx_wakeup(), check that the Data Link protocol layer is
+still bound to the HCI UART driver.
 
-> Fix the following error preventing to load Nokia H4+ module:
->  kernel: [  826.461619] hci_nokia: module license 'unspecified' taints kernel.
->  kernel: [  826.461629] Disabling lock debugging due to kernel taint
->  kernel: [  826.461836] hci_nokia: Unknown symbol gpiod_get_value_cansleep (err 0)
->  kernel: [  826.461876] hci_nokia: Unknown symbol devm_kmalloc (err 0)
->  kernel: [  826.461908] hci_nokia: Unknown symbol gpiod_set_value (err 0)
->  kernel: [  826.461937] hci_nokia: Unknown symbol serdev_device_set_baudrate (err 0)
->  kernel: [  826.461994] hci_nokia: Unknown symbol gpiod_set_value_cansleep (err 0)
->  kernel: [  826.462021] hci_nokia: Unknown symbol hci_uart_tx_wakeup (err 0)
->  kernel: [  826.462043] hci_nokia: Unknown symbol serdev_device_set_flow_control (err 0)
->  kernel: [  826.462064] hci_nokia: Unknown symbol gpiod_to_irq (err 0)
->  kernel: [  826.462085] hci_nokia: Unknown symbol serdev_device_open (err 0)
->  kernel: [  826.462106] hci_nokia: Unknown symbol gpiod_get_value (err 0)
->  kernel: [  826.462150] hci_nokia: Unknown symbol clk_prepare (err 0)
->  kernel: [  826.462182] hci_nokia: Unknown symbol pm_runtime_enable (err 0)
->  kernel: [  826.462204] hci_nokia: Unknown symbol h4_recv_buf (err 0)
->  kernel: [  826.462246] hci_nokia: Unknown symbol serdev_device_write_flush (err 0)
->  kernel: [  826.462268] hci_nokia: Unknown symbol serdev_device_get_tiocm (err 0)
->  kernel: [  826.462298] hci_nokia: Unknown symbol driver_unregister (err 0)
->  kernel: [  826.462318] hci_nokia: Unknown symbol serdev_device_wait_until_sent (err 0)
->  kernel: [  826.462347] hci_nokia: Unknown symbol __serdev_device_driver_register (err 0)
->  kernel: [  826.462384] hci_nokia: Unknown symbol serdev_device_set_tiocm (err 0)
->  kernel: [  826.462417] hci_nokia: Unknown symbol clk_get_rate (err 0)
->  kernel: [  826.462454] hci_nokia: Unknown symbol __pm_runtime_resume (err 0)
->  kernel: [  826.462486] hci_nokia: Unknown symbol serdev_device_close (err 0)
->  kernel: [  826.462524] hci_nokia: Unknown symbol cancel_work_sync (err 0)
->  kernel: [  826.462546] hci_nokia: Unknown symbol btbcm_set_bdaddr (err 0)
->  kernel: [  826.462567] hci_nokia: Unknown symbol clk_disable (err 0)
->  kernel: [  826.462610] hci_nokia: Unknown symbol __pm_runtime_disable (err 0)
->  kernel: [  826.462632] hci_nokia: Unknown symbol hci_uart_register_device (err 0)
->  kernel: [  826.462653] hci_nokia: Unknown symbol clk_enable (err 0)
->  kernel: [  826.462675] hci_nokia: Unknown symbol __pm_runtime_idle (err 0)
->  kernel: [  826.462700] hci_nokia: Unknown symbol clk_unprepare (err 0)
-> 
-> Signed-off-by: Frédéric Danis <frederic.danis.oss@gmail.com>
-> ---
-> drivers/bluetooth/hci_nokia.c | 7 +++++++
-> 1 file changed, 7 insertions(+)
+Failure to perform this protocol check causes a race condition between
+the work queue hu->write_work running hci_uart_write_work() and the
+Data Link protocol layer being unbound (closed) in hci_uart_tty_close().
 
-patch has been applied to bluetooth-next tree.
+Note hci_uart_tty_close() does have a "cancel_work_sync(&hu->write_work)"
+but it is ineffective because it cannot prevent work-items being added
+to hu->write_work after cancel_work_sync() has run.
 
-Regards
+Therefore, add a check for HCI_UART_PROTO_READY into hci_uart_tx_wakeup()
+which prevents scheduling of the work queue when HCI_UART_PROTO_READY
+is in the clear state. However, note a small race condition remains
+because the hci_uart_tx_wakeup() thread can run in parallel with the
+hci_uart_tty_close() thread so it is possible that a schedule of
+hu->write_work can occur when HCI_UART_PROTO_READY is cleared. A complete
+solution needs locking of the threads which is implemented in a future
+commit.
 
-Marcel
+Signed-off-by: Dean Jenkins <Dean_Jenkins@mentor.com>
+---
+ drivers/bluetooth/hci_ldisc.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
+diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
+index 6f9e406..2edd305 100644
+--- a/drivers/bluetooth/hci_ldisc.c
++++ b/drivers/bluetooth/hci_ldisc.c
+@@ -125,6 +125,9 @@ static inline struct sk_buff *hci_uart_dequeue(struct hci_uart *hu)
+ 
+ int hci_uart_tx_wakeup(struct hci_uart *hu)
+ {
++	if (!test_bit(HCI_UART_PROTO_READY, &hu->flags))
++		return 0;
++
+ 	if (test_and_set_bit(HCI_UART_SENDING, &hu->tx_state)) {
+ 		set_bit(HCI_UART_TX_WAKEUP, &hu->tx_state);
+ 		return 0;
+-- 
+2.7.4
