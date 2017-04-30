@@ -1,108 +1,116 @@
-Return-Path: <netdev-owner@vger.kernel.org>
-Date: Sun, 30 Apr 2017 17:09:28 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: davem@davemloft.net
-Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: pull request: bluetooth-next 2017-04-30
-Message-ID: <20170430140928.GA2753@x1c>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-        protocol="application/pgp-signature"; boundary="Kj7319i9nmIyA2yE"
-Sender: netdev-owner@vger.kernel.org
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Add selftest for ECDH key generation
+Date: Sun, 30 Apr 2017 04:20:26 -0700
+Message-Id: <20170430112026.3747-1-marcel@holtmann.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Since the ECDH key generation takes a different path, it needs to be
+tested as well. For this generate the public debug key from the private
+debug key and compare both.
 
---Kj7319i9nmIyA2yE
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+This also moves the seeding of the private key into the SMP calling code
+to allow for easier re-use of the ECDH key generation helper.
 
-Hi Dave,
-
-Here's one last batch of Bluetooth patches in the bluetooth-next tree
-targeting the 4.12 kernel.
-
- - Remove custom ECDH implementation and use new KPP API instead
- - Add protocol checks to hci_ldisc
- - Add module license to HCI UART Nokia H4+ driver
- - Minor fix for 32bit user space - 64 bit kernel combination
-
-Please let me know if there are any issues pulling. Thanks.
-
-Johan
-
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
-The following changes since commit e3a724edeec3836ed44675a6587a6db7b6b68dbe:
+ net/bluetooth/ecdh_helper.c |  3 ---
+ net/bluetooth/smp.c         | 38 ++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 38 insertions(+), 3 deletions(-)
 
-  sparc64: Support cbcond instructions in eBPF JIT. (2017-04-24 15:56:21 -0=
-700)
+diff --git a/net/bluetooth/ecdh_helper.c b/net/bluetooth/ecdh_helper.c
+index 2a65ca3fa8fa..24d4e60f8c48 100644
+--- a/net/bluetooth/ecdh_helper.c
++++ b/net/bluetooth/ecdh_helper.c
+@@ -22,7 +22,6 @@
+  */
+ #include "ecdh_helper.h"
+ 
+-#include <linux/random.h>
+ #include <linux/scatterlist.h>
+ #include <crypto/kpp.h>
+ #include <crypto/ecdh.h>
+@@ -181,8 +180,6 @@ bool generate_ecdh_keys(u8 public_key[64], u8 private_key[32])
+ 		if (tries++ >= max_tries)
+ 			goto free_all;
+ 
+-		get_random_bytes(private_key, 32);
+-
+ 		/* Set private Key */
+ 		p.key = (char *)private_key;
+ 		crypto_ecdh_encode_key(buf, buf_len, &p);
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index 40e921a9cc17..14585edc9439 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -569,6 +569,9 @@ int smp_generate_oob(struct hci_dev *hdev, u8 hash[16], u8 rand[16])
+ 		smp->debug_key = true;
+ 	} else {
+ 		while (true) {
++			/* Seed private key with random number */
++			get_random_bytes(smp->local_sk, 32);
++
+ 			/* Generate local key pair for Secure Connections */
+ 			if (!generate_ecdh_keys(smp->local_pk, smp->local_sk))
+ 				return -EIO;
+@@ -1895,6 +1898,9 @@ static u8 sc_send_public_key(struct smp_chan *smp)
+ 		set_bit(SMP_FLAG_DEBUG_KEY, &smp->flags);
+ 	} else {
+ 		while (true) {
++			/* Seed private key with random number */
++			get_random_bytes(smp->local_sk, 32);
++
+ 			/* Generate local key pair for Secure Connections */
+ 			if (!generate_ecdh_keys(smp->local_pk, smp->local_sk))
+ 				return SMP_UNSPECIFIED;
+@@ -3483,6 +3489,32 @@ void smp_unregister(struct hci_dev *hdev)
+ 
+ #if IS_ENABLED(CONFIG_BT_SELFTEST_SMP)
+ 
++static inline void swap_digits(u64 *in, u64 *out, unsigned int ndigits)
++{
++	int i;
++
++	for (i = 0; i < ndigits; i++)
++		out[i] = __swab64(in[ndigits - 1 - i]);
++}
++
++static int __init test_debug_key(void)
++{
++	u8 pk[64], sk[32];
++
++	swap_digits((u64 *)debug_sk, (u64 *)sk, 4);
++
++	if (!generate_ecdh_keys(pk, sk))
++		return -EINVAL;
++
++	if (memcmp(sk, debug_sk, 32))
++		return -EINVAL;
++
++	if (memcmp(pk, debug_pk, 64))
++		return -EINVAL;
++
++	return 0;
++}
++
+ static int __init test_ah(struct crypto_cipher *tfm_aes)
+ {
+ 	const u8 irk[16] = {
+@@ -3738,6 +3770,12 @@ static int __init run_selftests(struct crypto_cipher *tfm_aes,
+ 
+ 	calltime = ktime_get();
+ 
++	err = test_debug_key();
++	if (err) {
++		BT_ERR("debug_key test failed");
++		goto done;
++	}
++
+ 	err = test_ah(tfm_aes);
+ 	if (err) {
+ 		BT_ERR("smp_ah test failed");
+-- 
+2.9.3
 
-are available in the git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.gi=
-t for-upstream
-
-for you to fetch changes up to 71653eb64bcca6110c42aadfd50b8d54d3a88079:
-
-  Bluetooth: Add selftest for ECDH key generation (2017-04-30 16:52:43 +030=
-0)
-
-----------------------------------------------------------------
-Dean Jenkins (3):
-      Bluetooth: hci_ldisc: Add protocol check to hci_uart_send_frame()
-      Bluetooth: hci_ldisc: Add protocol check to hci_uart_dequeue()
-      Bluetooth: hci_ldisc: Add protocol check to hci_uart_tx_wakeup()
-
-Fr=E9d=E9ric Danis (1):
-      Bluetooth: Add module license for HCI UART Nokia H4+
-
-Marcel Holtmann (2):
-      Bluetooth: zero kpp input for key generation
-      Bluetooth: Add selftest for ECDH key generation
-
-Salvatore Benedetto (2):
-      Bluetooth: convert smp and selftest to crypto kpp API
-      Bluetooth: allocate data for kpp on heap
-
-Szymon Janc (1):
-      Bluetooth: Fix user channel for 32bit userspace on 64bit kernel
-
- drivers/bluetooth/hci_ldisc.c |  14 +-
- drivers/bluetooth/hci_nokia.c |   7 +
- net/bluetooth/Kconfig         |   1 +
- net/bluetooth/Makefile        |   2 +-
- net/bluetooth/ecc.c           | 816 --------------------------------------=
-----
- net/bluetooth/ecc.h           |  54 ---
- net/bluetooth/ecdh_helper.c   | 231 ++++++++++++
- net/bluetooth/ecdh_helper.h   |  27 ++
- net/bluetooth/hci_sock.c      |   3 +-
- net/bluetooth/selftest.c      |  28 +-
- net/bluetooth/smp.c           |  46 ++-
- 11 files changed, 342 insertions(+), 887 deletions(-)
- delete mode 100644 net/bluetooth/ecc.c
- delete mode 100644 net/bluetooth/ecc.h
- create mode 100644 net/bluetooth/ecdh_helper.c
- create mode 100644 net/bluetooth/ecdh_helper.h
-
---Kj7319i9nmIyA2yE
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIcBAEBAgAGBQJZBfAXAAoJECQj9vv5qNQS6EwP/j6D9+AzDZ/v8FYuk/wlxLbO
-av7QnLplZipKhl3BUZxuLyTcl4kAbxiv+dEA3IHhBO5puBQkbmPb2/1SJvwSOFB5
-wgsWp9PVKzXwBW4Uty57izIP3NxPfmhf20lesiyBRpbbzVKiJ1+cC46w3/RpSJ+a
-PrYudLOqOPkOTE0PFCFSZOMjpcouJQSAItse495QCcs8UcjTCt4FV3ni3GveCv47
-XDCCWISI+1B9VcDle5/GV6gHeXpAThyxF1OhCZITUR9Ezlk/zmwtDizOOFWBxUg+
-2b0H0a9W/gISUzou9hbqFLgA2u4eLl9Xo25IMjrAZOt2dVi2fkUWgokhblgP/mM8
-GxtDuDaGUHOmAoVtE50D2Xwc/Kzg+aXmIrZccVENMbAAOg3H9INoIjYY9XhXfGVd
-bYU0w07SogSiZkYAt3QXO/4bWN9z1d9ChOADxqeil0U3Ekbf0GQgLcyUfL09ijSf
-6s0nhrZpitM4Qglor37iamVgwrm5G8woR4izeX0wnTD0ImnZcg2PpvFJkINYhSGt
-ZIzL5+T0hyjeqYKqhoOaWhPEqiyl0s0xlacHIU9iHUtuy02P/HRWpumgLbF+K0J/
-71zt+Z7vITgn3OyjB/isGbVqZsPbxrDeC2jmvTW/20AjnSjNj4IECt4lkAP+4gbJ
-jUmvNlJprI2L78i6G80O
-=kD8S
------END PGP SIGNATURE-----
-
---Kj7319i9nmIyA2yE--
