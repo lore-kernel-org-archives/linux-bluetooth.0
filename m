@@ -1,28 +1,82 @@
-Return-Path: <netdev-owner@vger.kernel.org>
-Date: Sun, 30 Apr 2017 23:03:36 -0400 (EDT)
-Message-Id: <20170430.230336.142225761153252889.davem@davemloft.net>
-To: johan.hedberg@gmail.com
-Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: pull request: bluetooth-next 2017-04-30
-From: David Miller <davem@davemloft.net>
-In-Reply-To: <20170430140928.GA2753@x1c>
-References: <20170430140928.GA2753@x1c>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Sender: netdev-owner@vger.kernel.org
+Return-Path: <sre@kernel.org>
+Date: Sun, 30 Apr 2017 18:04:30 +0200
+From: Sebastian Reichel <sre@kernel.org>
+To: Adam Ford <aford173@gmail.com>
+Cc: Rob Herring <robh@kernel.org>, Marcel Holtmann <marcel@holtmann.org>,
+	linux-bluetooth@vger.kernel.org,
+	Mark Rutland <mark.rutland@arm.com>, devicetree@vger.kernel.org,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	Satish Patel <satish.patel@linaro.org>,
+	Wei Xu <xuwei5@hisilicon.com>, Eyal Reizer <eyalr@ti.com>,
+	netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH 0/4] TI Bluetooth serdev support
+Message-ID: <20170430160430.rmyuo6sdrkrjxjg6@earth>
+References: <20170405183005.20570-1-robh@kernel.org>
+ <CAHCN7xJUxZm1qKAxT0kaK6qoDg+HWOJK7sTH-q9za4HJuUwe8Q@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="ittejsuw3bnkg4rp"
+In-Reply-To: <CAHCN7xJUxZm1qKAxT0kaK6qoDg+HWOJK7sTH-q9za4HJuUwe8Q@mail.gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@gmail.com>
-Date: Sun, 30 Apr 2017 17:09:28 +0300
 
-> Here's one last batch of Bluetooth patches in the bluetooth-next tree
-> targeting the 4.12 kernel.
-> 
->  - Remove custom ECDH implementation and use new KPP API instead
->  - Add protocol checks to hci_ldisc
->  - Add module license to HCI UART Nokia H4+ driver
->  - Minor fix for 32bit user space - 64 bit kernel combination
-> 
-> Please let me know if there are any issues pulling. Thanks.
+--ittejsuw3bnkg4rp
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Pulled, thanks Johan.
+Hi,
+
+On Sun, Apr 30, 2017 at 10:14:20AM -0500, Adam Ford wrote:
+> On Wed, Apr 5, 2017 at 1:30 PM, Rob Herring <robh@kernel.org> wrote:
+> > This series adds serdev support to the HCI LL protocol used on TI BT
+> > modules and enables support on HiKey board with with the WL1835 module.
+> > With this the custom TI UIM daemon and btattach are no longer needed.
+>=20
+> Without UIM daemon, what instruction do you use to load the BT firmware?
+>=20
+> I was thinking 'hciattach' but I was having trouble.  I was hoping you
+> might have some insight.
+>=20
+>  hciattach -t 30 -s 115200 /dev/ttymxc1 texas 3000000 flow  Just
+> returns a timeout.
+>=20
+> I modified my i.MX6 device tree per the binding documentation and
+> setup the regulators and enable GPIO pins.
+
+If you configured everything correctly no userspace interaction is
+required. The driver should request the firmware automatically once
+you power up the bluetooth device.
+
+Apart from DT changes make sure, that the following options are
+enabled and check dmesg for any hints.
+
+CONFIG_SERIAL_DEV_BUS
+CONFIG_SERIAL_DEV_CTRL_TTYPORT
+CONFIG_BT_HCIUART
+CONFIG_BT_HCIUART_LL
+
+-- Sebastian
+
+--ittejsuw3bnkg4rp
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCgAdFiEE72YNB0Y/i3JqeVQT2O7X88g7+poFAlkGCwwACgkQ2O7X88g7
++prHRA/+J6rOroKLlBvWLgILb8/Biu8/OLi/9hB6q4yOOiSv934FwERd9OyZ8eCd
+pQiZQL9GRCN+DE+PvfE3iVh7m6DBQZ8Mq/GyI1tlDwt/oYdTgGw8qhelK33Kxdyd
+nm/SJwlahlj4FybH0wrnXwj7lyDnuPbtR55RRiw/5cOwmoeGMyFqWh09mcoOQedU
+xYM6wzVQvIdQTUanMRh4hHic6gtylwHPVNeg6wDDXCbQf2PBVrt5cxzQymVzZFaP
+fsm9aTSzPzf0R7OvkmKr0klI1xjrLNsUU3Sp1VkmOi9XDN/cl+GXHd8WL/QGoxCD
+K9jMaYTPjClzKYFsZa02GZ+Wur1L0T0uwC5icISnatzheyEXWixc0wiyZxsXXQqd
+kJLY5JVoyWh6q9i9rUsPqOTuEexDhTBnZslJWvslP0TZ2vIxCzN/hZCrwOmC28NI
+Ph++2SZO8cBUrgEhADhuEi6Gx68R0hDDQvfxi482pjnULAFFr8lU9m+mKlXTDWdg
+SypyhFEKR3GvS7TzDhgw1qb6dho9z37nFUnRApfxR7BfLcJxv+KSUIhU+teWRAgk
+1qdvofxh1jH0sNOG8upizrh41z4gx6DBcgCZb7I+RB/x/nEB8pgIeerEu5c8K8G4
+swoetuqD5vcs6ZpNHvKGlfR4qKF7UAX3Fyk8a6Xw1Ohhk3O4wlU=
+=Nh8c
+-----END PGP SIGNATURE-----
+
+--ittejsuw3bnkg4rp--
