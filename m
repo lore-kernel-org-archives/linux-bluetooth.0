@@ -1,82 +1,65 @@
-Return-Path: <sre@kernel.org>
-Date: Sun, 30 Apr 2017 18:04:30 +0200
-From: Sebastian Reichel <sre@kernel.org>
-To: Adam Ford <aford173@gmail.com>
-Cc: Rob Herring <robh@kernel.org>, Marcel Holtmann <marcel@holtmann.org>,
-	linux-bluetooth@vger.kernel.org,
-	Mark Rutland <mark.rutland@arm.com>, devicetree@vger.kernel.org,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Satish Patel <satish.patel@linaro.org>,
-	Wei Xu <xuwei5@hisilicon.com>, Eyal Reizer <eyalr@ti.com>,
-	netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH 0/4] TI Bluetooth serdev support
-Message-ID: <20170430160430.rmyuo6sdrkrjxjg6@earth>
-References: <20170405183005.20570-1-robh@kernel.org>
- <CAHCN7xJUxZm1qKAxT0kaK6qoDg+HWOJK7sTH-q9za4HJuUwe8Q@mail.gmail.com>
+Return-Path: <aford173@gmail.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="ittejsuw3bnkg4rp"
-In-Reply-To: <CAHCN7xJUxZm1qKAxT0kaK6qoDg+HWOJK7sTH-q9za4HJuUwe8Q@mail.gmail.com>
+In-Reply-To: <20170405183005.20570-1-robh@kernel.org>
+References: <20170405183005.20570-1-robh@kernel.org>
+From: Adam Ford <aford173@gmail.com>
+Date: Sun, 30 Apr 2017 10:14:20 -0500
+Message-ID: <CAHCN7xJUxZm1qKAxT0kaK6qoDg+HWOJK7sTH-q9za4HJuUwe8Q@mail.gmail.com>
+Subject: Re: [PATCH 0/4] TI Bluetooth serdev support
+To: Rob Herring <robh@kernel.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org,
+	Mark Rutland <mark.rutland@arm.com>, devicetree@vger.kernel.org,
+	Johan Hedberg <johan.hedberg@gmail.com>, Gustavo Padovan <gustavo@padovan.org>,
+	Satish Patel <satish.patel@linaro.org>, Wei Xu <xuwei5@hisilicon.com>,
+	Eyal Reizer <eyalr@ti.com>, netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+On Wed, Apr 5, 2017 at 1:30 PM, Rob Herring <robh@kernel.org> wrote:
+> This series adds serdev support to the HCI LL protocol used on TI BT
+> modules and enables support on HiKey board with with the WL1835 module.
+> With this the custom TI UIM daemon and btattach are no longer needed.
 
---ittejsuw3bnkg4rp
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Without UIM daemon, what instruction do you use to load the BT firmware?
 
-Hi,
+I was thinking 'hciattach' but I was having trouble.  I was hoping you
+might have some insight.
 
-On Sun, Apr 30, 2017 at 10:14:20AM -0500, Adam Ford wrote:
-> On Wed, Apr 5, 2017 at 1:30 PM, Rob Herring <robh@kernel.org> wrote:
-> > This series adds serdev support to the HCI LL protocol used on TI BT
-> > modules and enables support on HiKey board with with the WL1835 module.
-> > With this the custom TI UIM daemon and btattach are no longer needed.
->=20
-> Without UIM daemon, what instruction do you use to load the BT firmware?
->=20
-> I was thinking 'hciattach' but I was having trouble.  I was hoping you
-> might have some insight.
->=20
->  hciattach -t 30 -s 115200 /dev/ttymxc1 texas 3000000 flow  Just
-> returns a timeout.
->=20
-> I modified my i.MX6 device tree per the binding documentation and
-> setup the regulators and enable GPIO pins.
+ hciattach -t 30 -s 115200 /dev/ttymxc1 texas 3000000 flow  Just
+returns a timeout.
 
-If you configured everything correctly no userspace interaction is
-required. The driver should request the firmware automatically once
-you power up the bluetooth device.
+I modified my i.MX6 device tree per the binding documentation and
+setup the regulators and enable GPIO pins.
 
-Apart from DT changes make sure, that the following options are
-enabled and check dmesg for any hints.
-
-CONFIG_SERIAL_DEV_BUS
-CONFIG_SERIAL_DEV_CTRL_TTYPORT
-CONFIG_BT_HCIUART
-CONFIG_BT_HCIUART_LL
-
--- Sebastian
-
---ittejsuw3bnkg4rp
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCgAdFiEE72YNB0Y/i3JqeVQT2O7X88g7+poFAlkGCwwACgkQ2O7X88g7
-+prHRA/+J6rOroKLlBvWLgILb8/Biu8/OLi/9hB6q4yOOiSv934FwERd9OyZ8eCd
-pQiZQL9GRCN+DE+PvfE3iVh7m6DBQZ8Mq/GyI1tlDwt/oYdTgGw8qhelK33Kxdyd
-nm/SJwlahlj4FybH0wrnXwj7lyDnuPbtR55RRiw/5cOwmoeGMyFqWh09mcoOQedU
-xYM6wzVQvIdQTUanMRh4hHic6gtylwHPVNeg6wDDXCbQf2PBVrt5cxzQymVzZFaP
-fsm9aTSzPzf0R7OvkmKr0klI1xjrLNsUU3Sp1VkmOi9XDN/cl+GXHd8WL/QGoxCD
-K9jMaYTPjClzKYFsZa02GZ+Wur1L0T0uwC5icISnatzheyEXWixc0wiyZxsXXQqd
-kJLY5JVoyWh6q9i9rUsPqOTuEexDhTBnZslJWvslP0TZ2vIxCzN/hZCrwOmC28NI
-Ph++2SZO8cBUrgEhADhuEi6Gx68R0hDDQvfxi482pjnULAFFr8lU9m+mKlXTDWdg
-SypyhFEKR3GvS7TzDhgw1qb6dho9z37nFUnRApfxR7BfLcJxv+KSUIhU+teWRAgk
-1qdvofxh1jH0sNOG8upizrh41z4gx6DBcgCZb7I+RB/x/nEB8pgIeerEu5c8K8G4
-swoetuqD5vcs6ZpNHvKGlfR4qKF7UAX3Fyk8a6Xw1Ohhk3O4wlU=
-=Nh8c
------END PGP SIGNATURE-----
-
---ittejsuw3bnkg4rp--
+adam
+>
+> The series is available on this git branch[1]. Patch 2 is just clean-up
+> and can be applied independently. Patch 3 is dependent on the series
+> "Nokia H4+ support". I'd suggest both series are merged thru the BT tree.
+>
+> Rob
+>
+> [1] git://git.kernel.org/pub/scm/linux/kernel/git/robh/linux.git ti-bluetooth
+>
+> Rob Herring (4):
+>   dt-bindings: net: Add TI WiLink shared transport binding
+>   bluetooth: hci_uart: remove unused hci_uart_init_tty
+>   bluetooth: hci_uart: add LL protocol serdev driver support
+>   arm64: dts: hikey: add WL1835 Bluetooth device node
+>
+>  .../devicetree/bindings/net/ti,wilink-st.txt       |  35 +++
+>  arch/arm64/boot/dts/hisilicon/hi6220-hikey.dts     |   5 +
+>  drivers/bluetooth/hci_ldisc.c                      |  19 --
+>  drivers/bluetooth/hci_ll.c                         | 261 ++++++++++++++++++++-
+>  drivers/bluetooth/hci_uart.h                       |   1 -
+>  5 files changed, 300 insertions(+), 21 deletions(-)
+>  create mode 100644 Documentation/devicetree/bindings/net/ti,wilink-st.txt
+>
+> --
+> 2.10.1
+>
+>
+> _______________________________________________
+> linux-arm-kernel mailing list
+> linux-arm-kernel@lists.infradead.org
+> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
