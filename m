@@ -1,44 +1,48 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 2/3] unit/test-gatt: Add test for unknown request
-Date: Mon,  1 May 2017 18:56:59 +0300
-Message-Id: <20170501155700.23761-2-luiz.dentz@gmail.com>
-In-Reply-To: <20170501155700.23761-1-luiz.dentz@gmail.com>
-References: <20170501155700.23761-1-luiz.dentz@gmail.com>
+Subject: [PATCH v2 1/3] shared/att: Respond to any opcode that is not command
+Date: Mon,  1 May 2017 18:56:58 +0300
+Message-Id: <20170501155700.23761-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This send an unknown request (0xbf) to test if a response is sent since
-the spec mandates the server to always respond to all requests it
-receives:
-
-BLUETOOTH SPECIFICATION Version 5.0 | Vol 3, Part F page 2173
-
-  'A client may send attribute protocol requests to a server, and the
-  server shall respond to all requests that it receives.'
+Although get_op_type does now check for the command mask it must
+respond to anything other than ATT_OP_TYPE_CMD since there is no mask
+for response opcode.
 ---
- unit/test-gatt.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ src/shared/att.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/unit/test-gatt.c b/unit/test-gatt.c
-index c7a8fa5..371cb46 100644
---- a/unit/test-gatt.c
-+++ b/unit/test-gatt.c
-@@ -4461,5 +4461,11 @@ int main(int argc, char *argv[])
- 			raw_pdu(0x18, 0x01),
- 			raw_pdu(0x01, 0x18, 0x25, 0x00, 0x06));
+diff --git a/src/shared/att.c b/src/shared/att.c
+index 494b10d..ca2d051 100644
+--- a/src/shared/att.c
++++ b/src/shared/att.c
+@@ -149,7 +149,7 @@ static enum att_op_type get_op_type(uint8_t opcode)
+ 	}
  
-+	define_test_server("/robustness/unkown-request",
-+			test_server, service_db_1, NULL,
-+			raw_pdu(0x03, 0x00, 0x02),
-+			raw_pdu(0xbf, 0x00),
-+			raw_pdu(0x01, 0xbf, 0x00, 0x00, 0x06));
-+
- 	return tester_run();
+ 	if (opcode & ATT_OP_CMD_MASK)
+-		return ATT_OP_CMD_MASK;
++		return ATT_OP_TYPE_CMD;
+ 
+ 	return ATT_OP_TYPE_UNKNOWN;
  }
+@@ -841,10 +841,10 @@ static void handle_notify(struct bt_att *att, uint8_t opcode, uint8_t *pdu,
+ 	}
+ 
+ 	/*
+-	 * If this was a request and no handler was registered for it, respond
+-	 * with "Not Supported"
++	 * If this was not a command and no handler was registered for it,
++	 * respond with "Not Supported"
+ 	 */
+-	if (!found && get_op_type(opcode) == ATT_OP_TYPE_REQ)
++	if (!found && get_op_type(opcode) != ATT_OP_TYPE_CMD)
+ 		respond_not_supported(att, opcode);
+ 
+ 	bt_att_unref(att);
 -- 
 2.9.3
 
