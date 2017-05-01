@@ -1,37 +1,70 @@
-Return-Path: <netdev-owner@vger.kernel.org>
-Date: Mon, 1 May 2017 21:42:21 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: David Miller <davem@davemloft.net>
-Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: pull request: bluetooth-next 2017-04-30
-Message-ID: <20170501184221.GA2093@x1c>
-References: <20170430140928.GA2753@x1c>
- <20170430.230336.142225761153252889.davem@davemloft.net>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170430.230336.142225761153252889.davem@davemloft.net>
-Sender: netdev-owner@vger.kernel.org
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2 3/3] unit/test-gatt: Add test for unknown request
+Date: Mon,  1 May 2017 18:57:00 +0300
+Message-Id: <20170501155700.23761-3-luiz.dentz@gmail.com>
+In-Reply-To: <20170501155700.23761-1-luiz.dentz@gmail.com>
+References: <20170501155700.23761-1-luiz.dentz@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Dave,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Sun, Apr 30, 2017, David Miller wrote:
-> From: Johan Hedberg <johan.hedberg@gmail.com>
-> Date: Sun, 30 Apr 2017 17:09:28 +0300
-> 
-> > Here's one last batch of Bluetooth patches in the bluetooth-next tree
-> > targeting the 4.12 kernel.
-> > 
-> >  - Remove custom ECDH implementation and use new KPP API instead
-> >  - Add protocol checks to hci_ldisc
-> >  - Add module license to HCI UART Nokia H4+ driver
-> >  - Minor fix for 32bit user space - 64 bit kernel combination
-> > 
-> > Please let me know if there are any issues pulling. Thanks.
-> 
-> Pulled, thanks Johan.
+This send an unknown command (0xff) to test that no response is sent
+since the spec mandates the server to not respond to commands:
 
-Thanks, however I don't see the patches in net-next yet. I have seen
-other patches go in there since your response though. Cause for concern?
+BLUETOOTH SPECIFICATION Version 5.0 | Vol 3, Part F page 2179
 
-Johan
+  'If a server receives a command that it does not support, indicated
+  by the Command Flag of the PDU set to one, then the server shall
+  ignore the Command.'
+---
+ unit/test-gatt.c | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
+
+diff --git a/unit/test-gatt.c b/unit/test-gatt.c
+index 371cb46..e0d29c7 100644
+--- a/unit/test-gatt.c
++++ b/unit/test-gatt.c
+@@ -90,6 +90,11 @@ struct context {
+ 		.size = sizeof(data(args)),			\
+ 	}
+ 
++#define false_pdu()						\
++	{							\
++		.valid = false,					\
++	}
++
+ #define define_test(name, function, type, bt_uuid, db,			\
+ 		test_step, args...)					\
+ 	do {								\
+@@ -403,6 +408,13 @@ static gboolean send_pdu(gpointer user_data)
+ 	if (pdu->valid && (pdu->size == 0)) {
+ 		test_debug("(no action expected)", "GATT: ");
+ 		context->pdu_offset++;
++
++		/* Quit the context if we processed the last PDU */
++		if (!context->data->pdu_list[context->pdu_offset].valid) {
++			context_quit(context);
++			return FALSE;
++		}
++
+ 		return send_pdu(context);
+ 	}
+ 
+@@ -4467,5 +4479,11 @@ int main(int argc, char *argv[])
+ 			raw_pdu(0xbf, 0x00),
+ 			raw_pdu(0x01, 0xbf, 0x00, 0x00, 0x06));
+ 
++	define_test_server("/robustness/unkown-command",
++			test_server, service_db_1, NULL,
++			raw_pdu(0x03, 0x00, 0x02),
++			raw_pdu(0xff, 0x00),
++			raw_pdu());
++
+ 	return tester_run();
+ }
+-- 
+2.9.3
+
