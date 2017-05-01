@@ -1,77 +1,101 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Subject: Re: [PATCH] Bluetooth: Add support for Intel Bluetooth device
- 9460/9560 [8087:0aaa]
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20170501133512.6fc88b81@fedora-linux-22.shared>
-Date: Tue, 2 May 2017 05:08:11 +0200
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "jaya.p.g" <jaya.p.g@linux.intel.com>
-Message-Id: <202602ED-263B-4501-B8FE-EEEFBA46D038@holtmann.org>
-References: <20170501133512.6fc88b81@fedora-linux-22.shared>
-To: Tedd Ho-Jeong An <tedd.an@intel.com>
+Date: Mon, 1 May 2017 13:35:12 -0700
+From: Tedd Ho-Jeong An <tedd.an@intel.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Cc: "jaya.p.g" <jaya.p.g@linux.intel.com>,
+        Tedd Ho-Jeong An <tedd.an@intel.com>
+Subject: [PATCH] Bluetooth: Add support for Intel Bluetooth device 9460/9560
+ [8087:0aaa]
+Message-ID: <20170501133512.6fc88b81@fedora-linux-22.shared>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Tedd,
+From: Tedd Ho-Jeong An <tedd.an@intel.com>
 
-> This patch adds support for Intel Bluetooth device 9460/9560 also known
-> as Jefferson Peak (JfP). The firmware downloading mechanism is same as
-> previous generation. So include the new USB product identifier and
-> whitelist the hardware variant.
-> 
-> T:  Bus=01 Lev=01 Prnt=01 Port=09 Cnt=04 Dev#=  5 Spd=12   MxCh= 0
-> D:  Ver= 2.01 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-> P:  Vendor=8087 ProdID=0aaa Rev= 0.02
-> C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
-> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=81(I) Atr=03(Int.) MxPS=  64 Ivl=1ms
-> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> I:  If#= 1 Alt= 6 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-> 
-> Bootloader version:
-> < HCI Command: Intel Read Version (0x3f|0x0005) plen 0
->> HCI Event: Command Complete (0x0e) plen 13
->      Intel Read Version (0x3f|0x0005) ncmd 32
->        Status: Success (0x00)
->        Hardware platform: 0x37
->        Hardware variant: 0x11
->        Hardware revision: 0.0
->        Firmware variant: 0x06
->        Firmware revision: 0.1
->        Firmware build: 42-52.2015
->        Firmware patch: 0
-> 
-> Signed-off-by: Tedd Ho-Jeong An <tedd.an@intel.com>
-> ---
-> drivers/bluetooth/btusb.c | 4 ++++
-> 1 file changed, 4 insertions(+)
+This patch adds support for Intel Bluetooth device 9460/9560 also known
+as Jefferson Peak (JfP). The firmware downloading mechanism is same as
+previous generation. So include the new USB product identifier and
+whitelist the hardware variant.
 
-patch has been applied to bluetooth-next tree.
+T:  Bus=01 Lev=01 Prnt=01 Port=09 Cnt=04 Dev#=  5 Spd=12   MxCh= 0
+D:  Ver= 2.01 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=8087 ProdID=0aaa Rev= 0.02
+C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
+I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=81(I) Atr=03(Int.) MxPS=  64 Ivl=1ms
+E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+I:  If#= 1 Alt= 6 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
 
-Regards
+Bootloader version:
+< HCI Command: Intel Read Version (0x3f|0x0005) plen 0
+> HCI Event: Command Complete (0x0e) plen 13
+      Intel Read Version (0x3f|0x0005) ncmd 32
+        Status: Success (0x00)
+        Hardware platform: 0x37
+        Hardware variant: 0x11
+        Hardware revision: 0.0
+        Firmware variant: 0x06
+        Firmware revision: 0.1
+        Firmware build: 42-52.2015
+        Firmware patch: 0
 
-Marcel
+Signed-off-by: Tedd Ho-Jeong An <tedd.an@intel.com>
+---
+ drivers/bluetooth/btusb.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 7fa373b..278e811 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -336,6 +336,7 @@ static const struct usb_device_id blacklist_table[] = {
+ 	{ USB_DEVICE(0x8087, 0x0a2a), .driver_info = BTUSB_INTEL },
+ 	{ USB_DEVICE(0x8087, 0x0a2b), .driver_info = BTUSB_INTEL_NEW },
+ 	{ USB_DEVICE(0x8087, 0x0aa7), .driver_info = BTUSB_INTEL },
++	{ USB_DEVICE(0x8087, 0x0aaa), .driver_info = BTUSB_INTEL_NEW },
+ 
+ 	/* Other Intel Bluetooth devices */
+ 	{ USB_VENDOR_AND_INTERFACE_INFO(0x8087, 0xe0, 0x01, 0x01),
+@@ -2036,6 +2037,7 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
+ 	switch (ver.hw_variant) {
+ 	case 0x0b:	/* SfP */
+ 	case 0x0c:	/* WsP */
++	case 0x11:	/* JfP */
+ 	case 0x12:	/* ThP */
+ 		break;
+ 	default:
+@@ -2138,6 +2140,8 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
+ 	 * Currently the supported hardware variants are:
+ 	 *   11 (0x0b) for iBT3.0 (LnP/SfP)
+ 	 *   12 (0x0c) for iBT3.5 (WsP)
++	 *   17 (0x11) for iBT3.5 (JfP)
++	 *   18 (0x12) for iBT3.5 (ThP)
+ 	 */
+ 	snprintf(fwname, sizeof(fwname), "intel/ibt-%u-%u.sfi",
+ 		 le16_to_cpu(ver.hw_variant),
+-- 
+2.4.11
 
