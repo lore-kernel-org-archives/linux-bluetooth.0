@@ -1,47 +1,28 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <1488330416-10463-3-git-send-email-juha.kuikka@synapse.com>
-References: <1488330416-10463-1-git-send-email-juha.kuikka@synapse.com> <1488330416-10463-3-git-send-email-juha.kuikka@synapse.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 1 Mar 2017 12:21:24 +0200
-Message-ID: <CABBYNZ+L1ozuxvxdg_6ytoHjgckGn1t=gw6VHs=NY7zZT-gJEg@mail.gmail.com>
-Subject: Re: [PATCH v2 2/3] input: Add UHIDDestroy option into input.conf
-To: Juha Kuikka <juha.kuikka@synapse.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Juha Kuikka <juha.kuikka@gmail.com>,
-        Petri Gynther <pgynther@google.com>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <netdev-owner@vger.kernel.org>
+Date: Sun, 30 Apr 2017 23:03:36 -0400 (EDT)
+Message-Id: <20170430.230336.142225761153252889.davem@davemloft.net>
+To: johan.hedberg@gmail.com
+Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: pull request: bluetooth-next 2017-04-30
+From: David Miller <davem@davemloft.net>
+In-Reply-To: <20170430140928.GA2753@x1c>
+References: <20170430140928.GA2753@x1c>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Sender: netdev-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Juha,
+From: Johan Hedberg <johan.hedberg@gmail.com>
+Date: Sun, 30 Apr 2017 17:09:28 +0300
 
-On Wed, Mar 1, 2017 at 3:06 AM, Juha Kuikka <juha.kuikka@synapse.com> wrote:
-> UHIDDestroy controls whether uHID device is destroyed on HID/HoG disconnect.
-> Defaults to false.
-> ---
->  profiles/input/input.conf | 4 ++++
->  1 file changed, 4 insertions(+)
->
-> diff --git a/profiles/input/input.conf b/profiles/input/input.conf
-> index 3e1d65a..4a93e42 100644
-> --- a/profiles/input/input.conf
-> +++ b/profiles/input/input.conf
-> @@ -11,3 +11,7 @@
->  # Enable HID protocol handling in userspace input profile
->  # Defaults to false (HIDP handled in HIDP kernel module)
->  #UserspaceHID=true
-> +
-> +# Destroy uHID device on HID/HoG disconnect
-> +# Defaults to false (uHID device is persistent across reconnects)
-> +#UHIDDestroy=true
-> --
-> 2.7.4
+> Here's one last batch of Bluetooth patches in the bluetooth-next tree
+> targeting the 4.12 kernel.
+> 
+>  - Remove custom ECDH implementation and use new KPP API instead
+>  - Add protocol checks to hci_ldisc
+>  - Add module license to HCI UART Nokia H4+ driver
+>  - Minor fix for 32bit user space - 64 bit kernel combination
+> 
+> Please let me know if there are any issues pulling. Thanks.
 
-Id follow the prefix of UserspaceHID here since it should apply to any
-uHID instance including classic and please merge this into the first
-patch.
-
-
--- 
-Luiz Augusto von Dentz
+Pulled, thanks Johan.
