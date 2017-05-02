@@ -1,53 +1,53 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Skip vendor diagnostic configuration for HCI User Channel
-Date: Tue,  2 May 2017 12:43:31 -0700
-Message-Id: <20170502194331.9874-1-marcel@holtmann.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <dan.carpenter@oracle.com>
+Date: Tue, 2 May 2017 21:34:21 +0300
+From: Dan Carpenter <dan.carpenter@oracle.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Salvatore Benedetto <salvatore.benedetto@intel.com>,
+        "Gustavo F. Padovan" <gustavo@padovan.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Linux Bluetooth <linux-bluetooth@vger.kernel.org>,
+        kernel-janitors@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: add a check for kmalloc() failure
+Message-ID: <20170502183421.7tiazcibqcqfh2w7@mwanda>
+References: <20170502092903.u7no6pizkakf454o@mwanda>
+ <26554315-C6A5-4B85-B535-E6EB91499A61@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <26554315-C6A5-4B85-B535-E6EB91499A61@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When the HCI User Channel access is requested, then do not try to
-undermine it with vendor diagnostic configuration. The exclusive user
-is required to configure its own vendor diagnostic in that case and
-can not rely on the host stack support.
+On Tue, May 02, 2017 at 07:58:11PM +0200, Marcel Holtmann wrote:
+> Hi Dan,
+> 
+> > We should check to see if this kmalloc() fails.
+> > 
+> > Fixes: e7c404c96c74 ("Bluetooth: allocate data for kpp on heap")
+> > Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+> > 
+> > diff --git a/net/bluetooth/ecdh_helper.c b/net/bluetooth/ecdh_helper.c
+> > index 80184476ff74..c8535845813d 100644
+> > --- a/net/bluetooth/ecdh_helper.c
+> > +++ b/net/bluetooth/ecdh_helper.c
+> > @@ -59,11 +59,15 @@ bool compute_ecdh_secret(const u8 public_key[64], const u8 private_key[32],
+> > 	struct ecdh p;
+> > 	struct ecdh_completion result;
+> > 	struct scatterlist src, dst;
+> > -	u8 *tmp = kmalloc(64, GFP_KERNEL);
+> > +	u8 *tmp;
+> > 	u8 *buf;
+> > 	unsigned int buf_len;
+> > 	int err = -ENOMEM;
+> > 
+> > +	tmp = kmalloc(64, GFP_KERNEL);
+> > +	if (!tmp)
+> > +		goto out;
+> > +
+> 
+> I thought that I already fixed this. Is this issue still present in bluetooth-next tree?
+> 
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
----
- net/bluetooth/hci_core.c | 11 ++++++-----
- 1 file changed, 6 insertions(+), 5 deletions(-)
+Ah yeah.  You already fixed this.
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 43fecd59dfef..7655b4005dfb 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -148,13 +148,13 @@ static ssize_t vendor_diag_write(struct file *file, const char __user *user_buf,
- 		return -EINVAL;
- 
- 	/* When the diagnostic flags are not persistent and the transport
--	 * is not active, then there is no need for the vendor callback.
--	 *
--	 * Instead just store the desired value. If needed the setting
--	 * will be programmed when the controller gets powered on.
-+	 * is not active or in user channel operation, then there is no need
-+	 * for the vendor callback. Instead just store the desired value and
-+	 * the setting will be programmed when the controller gets powered on.
- 	 */
- 	if (test_bit(HCI_QUIRK_NON_PERSISTENT_DIAG, &hdev->quirks) &&
--	    !test_bit(HCI_RUNNING, &hdev->flags))
-+	    (!test_bit(HCI_RUNNING, &hdev->flags) ||
-+	     hci_dev_test_flag(hdev, HCI_USER_CHANNEL)))
- 		goto done;
- 
- 	hci_req_sync_lock(hdev);
-@@ -1419,6 +1419,7 @@ static int hci_dev_do_open(struct hci_dev *hdev)
- 	 * completed.
- 	 */
- 	if (test_bit(HCI_QUIRK_NON_PERSISTENT_DIAG, &hdev->quirks) &&
-+	    !hci_dev_test_flag(hdev, HCI_USER_CHANNEL) &&
- 	    hci_dev_test_flag(hdev, HCI_VENDOR_DIAG) && hdev->set_diag)
- 		ret = hdev->set_diag(hdev, true);
- 
--- 
-2.9.3
-
+regards,
+dan carpenter
