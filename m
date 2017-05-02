@@ -1,66 +1,61 @@
-Return-Path: <tobias.regnery@gmail.com>
-From: Tobias Regnery <tobias.regnery@gmail.com>
-To: robh@kernel.org,
-	marcel@holtmann.org
-Cc: gustavo@padovan.org,
-	johan.hedberg@gmail.com,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Tobias Regnery <tobias.regnery@gmail.com>
-Subject: [PATCH] bluetooth: hci_uart: fix kconfig dependency
-Date: Tue,  2 May 2017 15:15:01 +0200
-Message-Id: <20170502131501.15851-1-tobias.regnery@gmail.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+MIME-Version: 1.0
+In-Reply-To: <20170501155700.23761-1-luiz.dentz@gmail.com>
+References: <20170501155700.23761-1-luiz.dentz@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Tue, 2 May 2017 14:24:54 +0300
+Message-ID: <CABBYNZ+6wy5p06R0quC18bkfRCe6JEM1PkKWfPJ_5CcV+3BWiA@mail.gmail.com>
+Subject: Re: [PATCH v2 1/3] shared/att: Respond to any opcode that is not command
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-We see the following link error with CONFIG_BT_HCIUART=y,
-CONFIG_BT_HCIUART_LL=y and CONFIG_SERIAL_DEV_BUS=m:
-
-drivers/built-in.o: In function 'll_close':
-supp.c:(.text+0x55add4): undefined reference to 'serdev_device_close'
-supp.c:(.text+0x55add4): relocation truncated to fit: R_AARCH64_CALL26 against undefined symbol 'serdev_device_close'
-drivers/built-in.o: In function 'll_open':
-supp.c:(.text+0x55aed0): undefined reference to 'serdev_device_open'
-supp.c:(.text+0x55aed0): relocation truncated to fit: R_AARCH64_CALL26 against undefined symbol 'serdev_device_open'
-drivers/built-in.o: In function `hci_ti_probe':
-supp.c:(.text+0x55b00c): undefined reference to 'hci_uart_register_device'
-supp.c:(.text+0x55b00c): relocation truncated to fit: R_AARCH64_CALL26 against undefined symbol 'hci_uart_register_device'
-drivers/built-in.o: In function `ll_setup':
-supp.c:(.text+0x55b08c): undefined reference to 'serdev_device_set_flow_control'
-supp.c:(.text+0x55b08c): relocation truncated to fit: R_AARCH64_CALL26 against undefined symbol 'serdev_device_set_flow_control'
-supp.c:(.text+0x55b324): undefined reference to 'serdev_device_set_baudrate'
-supp.c:(.text+0x55b324): relocation truncated to fit: R_AARCH64_CALL26 against undefined symbol 'serdev_device_set_baudrate'
-drivers/built-in.o: In function 'll_init':
-supp.c:(.init.text+0x1b508): undefined reference to '__serdev_device_driver_register'
-supp.c:(.init.text+0x1b508): relocation truncated to fit: R_AARCH64_CALL26 against undefined symbol '__serdev_device_driver_register'
-
-Fix this by dependig BT_HCIUART_LL on the BT_HCIUART_SERDEV symbol.
-This implies a dependency on BT_HCIUART and hci_ll.c is only compiled in
-if SERIAl_DEV_BUS is built in or SERIAL_DEV_BUS and BT_HCIUART are
-modules.
-
-Fixes: 371805522f87 ("bluetooth: hci_uart: add LL protocol serdev driver support")
-Signed-off-by: Tobias Regnery <tobias.regnery@gmail.com>
----
 Hi,
 
-I'm not sure if this is the right fix because the dependencies are quite
-complicated but at least the build failure goes away with this change.
+On Mon, May 1, 2017 at 6:56 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> Although get_op_type does now check for the command mask it must
+> respond to anything other than ATT_OP_TYPE_CMD since there is no mask
+> for response opcode.
+> ---
+>  src/shared/att.c | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
+>
+> diff --git a/src/shared/att.c b/src/shared/att.c
+> index 494b10d..ca2d051 100644
+> --- a/src/shared/att.c
+> +++ b/src/shared/att.c
+> @@ -149,7 +149,7 @@ static enum att_op_type get_op_type(uint8_t opcode)
+>         }
+>
+>         if (opcode & ATT_OP_CMD_MASK)
+> -               return ATT_OP_CMD_MASK;
+> +               return ATT_OP_TYPE_CMD;
+>
+>         return ATT_OP_TYPE_UNKNOWN;
+>  }
+> @@ -841,10 +841,10 @@ static void handle_notify(struct bt_att *att, uint8_t opcode, uint8_t *pdu,
+>         }
+>
+>         /*
+> -        * If this was a request and no handler was registered for it, respond
+> -        * with "Not Supported"
+> +        * If this was not a command and no handler was registered for it,
+> +        * respond with "Not Supported"
+>          */
+> -       if (!found && get_op_type(opcode) == ATT_OP_TYPE_REQ)
+> +       if (!found && get_op_type(opcode) != ATT_OP_TYPE_CMD)
+>                 respond_not_supported(att, opcode);
+>
+>         bt_att_unref(att);
+> --
+> 2.9.3
 
- drivers/bluetooth/Kconfig | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Applied.
 
-diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
-index 737d93ef27c5..e5fd24d90b0a 100644
---- a/drivers/bluetooth/Kconfig
-+++ b/drivers/bluetooth/Kconfig
-@@ -131,7 +131,7 @@ config BT_HCIUART_ATH3K
- 
- config BT_HCIUART_LL
- 	bool "HCILL protocol support"
--	depends on BT_HCIUART
-+	depends on BT_HCIUART_SERDEV
- 	help
- 	  HCILL (HCI Low Level) is a serial protocol for communication
- 	  between Bluetooth device and host. This protocol is required for
+
 -- 
-2.11.0
+Luiz Augusto von Dentz
