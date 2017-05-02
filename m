@@ -1,47 +1,53 @@
-Return-Path: <sebastian.reichel@collabora.co.uk>
-From: Sebastian Reichel <sebastian.reichel@collabora.co.uk>
-To: Sebastian Reichel <sre@kernel.org>,
-	Tony Lindgren <tony@atomide.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Rob Herring <robh+dt@kernel.org>,
-	Kalle Valo <kvalo@codeaurora.org>
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-wireless@vger.kernel.org,
-	linux-omap@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Sebastian Reichel <sebastian.reichel@collabora.co.uk>
-Subject: [PATCHv2 0/4] Motorola Droid 4: Add WL1285C support
-Date: Wed,  3 May 2017 16:22:22 +0200
-Message-Id: <20170503142226.32380-1-sebastian.reichel@collabora.co.uk>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Skip vendor diagnostic configuration for HCI User Channel
+Date: Tue,  2 May 2017 12:43:31 -0700
+Message-Id: <20170502194331.9874-1-marcel@holtmann.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+When the HCI User Channel access is requested, then do not try to
+undermine it with vendor diagnostic configuration. The exclusive user
+is required to configure its own vendor diagnostic in that case and
+can not rely on the host stack support.
 
-Motorola Droid 4 uses a WL1285C, as visible on iFixit [0]. This
-fixes the DT file to use correct compatible for the wifi node
-and adds the bluetooth node.
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ net/bluetooth/hci_core.c | 11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
 
-[0] https://www.ifixit.com/Teardown/Motorola+Droid+4+Teardown/7759#s31961
-
-Changes to PATCHv1:
- - use proper compatible value for bluetooth / shared transport
- - add patches fixing wlcore compatible for Droid 4
-
--- Sebastian
-
-Sebastian Reichel (4):
-  wlcore: add wl1285 compatible
-  ARM: dts: omap4-droid4: Use wl1285 for wifi compatible
-  Bluetooth: hci_ll: Add compatible values for more WL chips
-  ARM: dts: omap4-droid4: Add bluetooth
-
- .../devicetree/bindings/net/ti,wilink-st.txt       |  6 ++++++
- .../devicetree/bindings/net/wireless/ti,wlcore.txt |  1 +
- arch/arm/boot/dts/omap4-droid4-xt894.dts           | 22 +++++++++++++++++++++-
- drivers/bluetooth/hci_ll.c                         |  8 ++++++++
- drivers/net/wireless/ti/wlcore/sdio.c              |  1 +
- drivers/net/wireless/ti/wlcore/spi.c               |  1 +
- 6 files changed, 38 insertions(+), 1 deletion(-)
-
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 43fecd59dfef..7655b4005dfb 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -148,13 +148,13 @@ static ssize_t vendor_diag_write(struct file *file, const char __user *user_buf,
+ 		return -EINVAL;
+ 
+ 	/* When the diagnostic flags are not persistent and the transport
+-	 * is not active, then there is no need for the vendor callback.
+-	 *
+-	 * Instead just store the desired value. If needed the setting
+-	 * will be programmed when the controller gets powered on.
++	 * is not active or in user channel operation, then there is no need
++	 * for the vendor callback. Instead just store the desired value and
++	 * the setting will be programmed when the controller gets powered on.
+ 	 */
+ 	if (test_bit(HCI_QUIRK_NON_PERSISTENT_DIAG, &hdev->quirks) &&
+-	    !test_bit(HCI_RUNNING, &hdev->flags))
++	    (!test_bit(HCI_RUNNING, &hdev->flags) ||
++	     hci_dev_test_flag(hdev, HCI_USER_CHANNEL)))
+ 		goto done;
+ 
+ 	hci_req_sync_lock(hdev);
+@@ -1419,6 +1419,7 @@ static int hci_dev_do_open(struct hci_dev *hdev)
+ 	 * completed.
+ 	 */
+ 	if (test_bit(HCI_QUIRK_NON_PERSISTENT_DIAG, &hdev->quirks) &&
++	    !hci_dev_test_flag(hdev, HCI_USER_CHANNEL) &&
+ 	    hci_dev_test_flag(hdev, HCI_VENDOR_DIAG) && hdev->set_diag)
+ 		ret = hdev->set_diag(hdev, true);
+ 
 -- 
-2.11.0
+2.9.3
+
