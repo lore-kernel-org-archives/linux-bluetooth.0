@@ -1,53 +1,61 @@
-Return-Path: <dan.carpenter@oracle.com>
-Date: Tue, 2 May 2017 21:34:21 +0300
-From: Dan Carpenter <dan.carpenter@oracle.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Salvatore Benedetto <salvatore.benedetto@intel.com>,
+Return-Path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+Subject: Re: [PATCH] bluetooth: hci_uart: fix kconfig dependency
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20170502131501.15851-1-tobias.regnery@gmail.com>
+Date: Tue, 2 May 2017 20:07:14 +0200
+Cc: Rob Herring <robh@kernel.org>,
         "Gustavo F. Padovan" <gustavo@padovan.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Linux Bluetooth <linux-bluetooth@vger.kernel.org>,
-        kernel-janitors@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: add a check for kmalloc() failure
-Message-ID: <20170502183421.7tiazcibqcqfh2w7@mwanda>
-References: <20170502092903.u7no6pizkakf454o@mwanda>
- <26554315-C6A5-4B85-B535-E6EB91499A61@holtmann.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <26554315-C6A5-4B85-B535-E6EB91499A61@holtmann.org>
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Message-Id: <A632A059-D8DF-4D7E-B76E-6D1208C93C73@holtmann.org>
+References: <20170502131501.15851-1-tobias.regnery@gmail.com>
+To: Tobias Regnery <tobias.regnery@gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, May 02, 2017 at 07:58:11PM +0200, Marcel Holtmann wrote:
-> Hi Dan,
-> 
-> > We should check to see if this kmalloc() fails.
-> > 
-> > Fixes: e7c404c96c74 ("Bluetooth: allocate data for kpp on heap")
-> > Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
-> > 
-> > diff --git a/net/bluetooth/ecdh_helper.c b/net/bluetooth/ecdh_helper.c
-> > index 80184476ff74..c8535845813d 100644
-> > --- a/net/bluetooth/ecdh_helper.c
-> > +++ b/net/bluetooth/ecdh_helper.c
-> > @@ -59,11 +59,15 @@ bool compute_ecdh_secret(const u8 public_key[64], const u8 private_key[32],
-> > 	struct ecdh p;
-> > 	struct ecdh_completion result;
-> > 	struct scatterlist src, dst;
-> > -	u8 *tmp = kmalloc(64, GFP_KERNEL);
-> > +	u8 *tmp;
-> > 	u8 *buf;
-> > 	unsigned int buf_len;
-> > 	int err = -ENOMEM;
-> > 
-> > +	tmp = kmalloc(64, GFP_KERNEL);
-> > +	if (!tmp)
-> > +		goto out;
-> > +
-> 
-> I thought that I already fixed this. Is this issue still present in bluetooth-next tree?
-> 
+Hi Tobias,
 
-Ah yeah.  You already fixed this.
+> We see the following link error with CONFIG_BT_HCIUART=y,
+> CONFIG_BT_HCIUART_LL=y and CONFIG_SERIAL_DEV_BUS=m:
+> 
+> drivers/built-in.o: In function 'll_close':
+> supp.c:(.text+0x55add4): undefined reference to 'serdev_device_close'
+> supp.c:(.text+0x55add4): relocation truncated to fit: R_AARCH64_CALL26 against undefined symbol 'serdev_device_close'
+> drivers/built-in.o: In function 'll_open':
+> supp.c:(.text+0x55aed0): undefined reference to 'serdev_device_open'
+> supp.c:(.text+0x55aed0): relocation truncated to fit: R_AARCH64_CALL26 against undefined symbol 'serdev_device_open'
+> drivers/built-in.o: In function `hci_ti_probe':
+> supp.c:(.text+0x55b00c): undefined reference to 'hci_uart_register_device'
+> supp.c:(.text+0x55b00c): relocation truncated to fit: R_AARCH64_CALL26 against undefined symbol 'hci_uart_register_device'
+> drivers/built-in.o: In function `ll_setup':
+> supp.c:(.text+0x55b08c): undefined reference to 'serdev_device_set_flow_control'
+> supp.c:(.text+0x55b08c): relocation truncated to fit: R_AARCH64_CALL26 against undefined symbol 'serdev_device_set_flow_control'
+> supp.c:(.text+0x55b324): undefined reference to 'serdev_device_set_baudrate'
+> supp.c:(.text+0x55b324): relocation truncated to fit: R_AARCH64_CALL26 against undefined symbol 'serdev_device_set_baudrate'
+> drivers/built-in.o: In function 'll_init':
+> supp.c:(.init.text+0x1b508): undefined reference to '__serdev_device_driver_register'
+> supp.c:(.init.text+0x1b508): relocation truncated to fit: R_AARCH64_CALL26 against undefined symbol '__serdev_device_driver_register'
+> 
+> Fix this by dependig BT_HCIUART_LL on the BT_HCIUART_SERDEV symbol.
+> This implies a dependency on BT_HCIUART and hci_ll.c is only compiled in
+> if SERIAl_DEV_BUS is built in or SERIAL_DEV_BUS and BT_HCIUART are
+> modules.
+> 
+> Fixes: 371805522f87 ("bluetooth: hci_uart: add LL protocol serdev driver support")
+> Signed-off-by: Tobias Regnery <tobias.regnery@gmail.com>
+> ---
+> Hi,
+> 
+> I'm not sure if this is the right fix because the dependencies are quite
+> complicated but at least the build failure goes away with this change.
+> 
+> drivers/bluetooth/Kconfig | 2 +-
+> 1 file changed, 1 insertion(+), 1 deletion(-)
 
-regards,
-dan carpenter
+patch has been applied to bluetooth-next tree.
+
+Regards
+
+Marcel
