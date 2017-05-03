@@ -10,59 +10,59 @@ Cc: linux-bluetooth@vger.kernel.org,
 	linux-omap@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Sebastian Reichel <sebastian.reichel@collabora.co.uk>
-Subject: [PATCHv2 4/4] ARM: dts: omap4-droid4: Add bluetooth
-Date: Wed,  3 May 2017 16:22:26 +0200
-Message-Id: <20170503142226.32380-5-sebastian.reichel@collabora.co.uk>
+Subject: [PATCHv2 3/4] Bluetooth: hci_ll: Add compatible values for more WL chips
+Date: Wed,  3 May 2017 16:22:25 +0200
+Message-Id: <20170503142226.32380-4-sebastian.reichel@collabora.co.uk>
 In-Reply-To: <20170503142226.32380-1-sebastian.reichel@collabora.co.uk>
 References: <20170503142226.32380-1-sebastian.reichel@collabora.co.uk>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Droid 4 has WL 1285C connected to the OMAP's UART4 port, which is
-used for Bluetooth and most likely can also be used for controlling
-the FM radio and GPS receivers.
+Add compatible values for WiLink chips from 128x and 180x series.
+Also the DT binding already contained compatible values for the 127x
+series, but the driver did not. This brings the list on par with
+the list from wlcore (the wifi driver).
 
 Signed-off-by: Sebastian Reichel <sebastian.reichel@collabora.co.uk>
 ---
- arch/arm/boot/dts/omap4-droid4-xt894.dts | 20 ++++++++++++++++++++
- 1 file changed, 20 insertions(+)
+ Documentation/devicetree/bindings/net/ti,wilink-st.txt | 6 ++++++
+ drivers/bluetooth/hci_ll.c                             | 8 ++++++++
+ 2 files changed, 14 insertions(+)
 
-diff --git a/arch/arm/boot/dts/omap4-droid4-xt894.dts b/arch/arm/boot/dts/omap4-droid4-xt894.dts
-index c09b51d6ccf7..bd7f1cc55371 100644
---- a/arch/arm/boot/dts/omap4-droid4-xt894.dts
-+++ b/arch/arm/boot/dts/omap4-droid4-xt894.dts
-@@ -453,6 +453,15 @@
- 		OMAP4_IOPAD(0x1c8, PIN_INPUT_PULLUP | MUX_MODE7)
- 		>;
- 	};
-+
-+	uart4_pins: pinmux_uart4_pins {
-+		pinctrl-single,pins = <
-+		OMAP4_IOPAD(0x15c, PIN_INPUT | MUX_MODE0)		/* uart4_rx */
-+		OMAP4_IOPAD(0x15e, PIN_OUTPUT | MUX_MODE0)		/* uart4_tx */
-+		OMAP4_IOPAD(0x110, PIN_INPUT_PULLUP | MUX_MODE5)	/* uart4_cts */
-+		OMAP4_IOPAD(0x112, PIN_OUTPUT_PULLUP | MUX_MODE5)	/* uart4_rts */
-+		>;
-+	};
- };
+diff --git a/Documentation/devicetree/bindings/net/ti,wilink-st.txt b/Documentation/devicetree/bindings/net/ti,wilink-st.txt
+index cbad73a84ac4..b1a421e2fde3 100644
+--- a/Documentation/devicetree/bindings/net/ti,wilink-st.txt
++++ b/Documentation/devicetree/bindings/net/ti,wilink-st.txt
+@@ -14,6 +14,12 @@ Required properties:
+  - compatible: should be one of the following:
+     "ti,wl1271-st"
+     "ti,wl1273-st"
++    "ti,wl1281-st"
++    "ti,wl1283-st"
++    "ti,wl1285-st"
++    "ti,wl1801-st"
++    "ti,wl1805-st"
++    "ti,wl1807-st"
+     "ti,wl1831-st"
+     "ti,wl1835-st"
+     "ti,wl1837-st"
+diff --git a/drivers/bluetooth/hci_ll.c b/drivers/bluetooth/hci_ll.c
+index adc444f309a3..d2f32a994daa 100644
+--- a/drivers/bluetooth/hci_ll.c
++++ b/drivers/bluetooth/hci_ll.c
+@@ -740,6 +740,14 @@ static void hci_ti_remove(struct serdev_device *serdev)
+ }
  
- &omap4_pmx_wkup {
-@@ -469,6 +478,17 @@
- 			       &omap4_pmx_core 0x17c>;
- };
- 
-+&uart4 {
-+	pinctrl-names = "default";
-+	pinctrl-0 = <&uart4_pins>;
-+
-+	bluetooth {
-+		compatible = "ti,wl1285-st";
-+		enable-gpios = <&gpio6 14 GPIO_ACTIVE_HIGH>; /* gpio 174 */
-+		max-speed = <3686400>;
-+	};
-+};
-+
- &usbhsehci {
- 	phys = <&hsusb1_phy>;
- };
+ static const struct of_device_id hci_ti_of_match[] = {
++	{ .compatible = "ti,wl1271-st" },
++	{ .compatible = "ti,wl1273-st" },
++	{ .compatible = "ti,wl1281-st" },
++	{ .compatible = "ti,wl1283-st" },
++	{ .compatible = "ti,wl1285-st" },
++	{ .compatible = "ti,wl1801-st" },
++	{ .compatible = "ti,wl1805-st" },
++	{ .compatible = "ti,wl1807-st" },
+ 	{ .compatible = "ti,wl1831-st" },
+ 	{ .compatible = "ti,wl1835-st" },
+ 	{ .compatible = "ti,wl1837-st" },
 -- 
 2.11.0
