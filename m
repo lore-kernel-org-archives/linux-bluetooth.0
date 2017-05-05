@@ -1,96 +1,136 @@
-Return-Path: <aford173@gmail.com>
+Return-Path: <linux-wpan-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20170430160430.rmyuo6sdrkrjxjg6@earth>
-References: <20170405183005.20570-1-robh@kernel.org> <CAHCN7xJUxZm1qKAxT0kaK6qoDg+HWOJK7sTH-q9za4HJuUwe8Q@mail.gmail.com>
- <20170430160430.rmyuo6sdrkrjxjg6@earth>
-From: Adam Ford <aford173@gmail.com>
-Date: Fri, 5 May 2017 09:51:33 -0500
-Message-ID: <CAHCN7x+Mq=b6RN-ezU0400W=H=D7DR+Es1FHtT4GyozpVd8ALA@mail.gmail.com>
-Subject: Re: [PATCH 0/4] TI Bluetooth serdev support
-To: Sebastian Reichel <sre@kernel.org>
-Cc: Rob Herring <robh@kernel.org>, Marcel Holtmann <marcel@holtmann.org>,
-	linux-bluetooth@vger.kernel.org, Mark Rutland <mark.rutland@arm.com>,
-	devicetree@vger.kernel.org, Johan Hedberg <johan.hedberg@gmail.com>,
-	Gustavo Padovan <gustavo@padovan.org>, Satish Patel <satish.patel@linaro.org>,
-	Wei Xu <xuwei5@hisilicon.com>, Eyal Reizer <eyalr@ti.com>, netdev@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=UTF-8;
+ format=flowed
+Date: Fri, 05 May 2017 09:55:54 +0200
+From: Andreas Bardoutsos <bardoutsos@ceid.upatras.gr>
+To: JANARDHANACHARI KELLA <eni.chari@gmail.com>
+Cc: Jiri Pirko <jiri@resnulli.us>,
+        Michael Richardson <mcr@sandelman.ca>,
+        netdev <netdev@vger.kernel.org>, netdev-owner@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
+        unstrung-hackers@lists.sandelman.ca
+Subject: Re: [Unstrung-hackers] [RFC net-next] ipv6:
+ =?UTF-8?Q?ext=5Fheader=3A=20add=20function=20to=20handle=20RPL=20extensio?=
+ =?UTF-8?Q?n=20header=20option=20=30x=36=33?=
+In-Reply-To: <CAAK7Ti9iFFqM7vMyveNfaNeCi6PmAGptXdTYgEzh2gsMptqi4w@mail.gmail.com>
+References: <dca567582f1979384fb1f3c3d1411349@ceid.upatras.gr>
+ <20170504160042.GB2385@nanopsycho>
+ <CAAK7Ti9iFFqM7vMyveNfaNeCi6PmAGptXdTYgEzh2gsMptqi4w@mail.gmail.com>
+Message-ID: <96b9f3bc67da7c16249600990c2df4cc@ceid.upatras.gr>
+Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Sun, Apr 30, 2017 at 11:04 AM, Sebastian Reichel <sre@kernel.org> wrote:
-> Hi,
->
-> On Sun, Apr 30, 2017 at 10:14:20AM -0500, Adam Ford wrote:
->> On Wed, Apr 5, 2017 at 1:30 PM, Rob Herring <robh@kernel.org> wrote:
->> > This series adds serdev support to the HCI LL protocol used on TI BT
->> > modules and enables support on HiKey board with with the WL1835 module.
->> > With this the custom TI UIM daemon and btattach are no longer needed.
->>
->> Without UIM daemon, what instruction do you use to load the BT firmware?
->>
->> I was thinking 'hciattach' but I was having trouble.  I was hoping you
->> might have some insight.
->>
->>  hciattach -t 30 -s 115200 /dev/ttymxc1 texas 3000000 flow  Just
->> returns a timeout.
->>
->> I modified my i.MX6 device tree per the binding documentation and
->> setup the regulators and enable GPIO pins.
->
-> If you configured everything correctly no userspace interaction is
-> required. The driver should request the firmware automatically once
-> you power up the bluetooth device.
->
-> Apart from DT changes make sure, that the following options are
-> enabled and check dmesg for any hints.
->
-> CONFIG_SERIAL_DEV_BUS
-> CONFIG_SERIAL_DEV_CTRL_TTYPORT
-> CONFIG_BT_HCIUART
-> CONFIG_BT_HCIUART_LL
->
+Yes I think we have faced the same problem,communication with RPL 
+supporting devices was failing otherwise.Your patch is also more 
+complete since it also implements #ifdef .About the comment,yes I have 
+run checkpatch twice with no errors,but ok :)
 
+Στις 2017-05-05 08:59, JANARDHANACHARI KELLA έγραψε:
+> I was inserted this patch manually. It was working. on 4.9 kernel.
+> 
+> check this bellow link for your ref.
+> 
+> https://github.com/mwasilak/bluetooth-next/commit/f29c632ef6a6a1777815c97fd2f326faccc704f7
+> [2]
+> 
+> On Thu, May 4, 2017 at 9:30 PM, Jiri Pirko <jiri@resnulli.us> wrote:
+> 
+>> Thu, May 04, 2017 at 05:17:18PM CEST, bardoutsos@ceid.upatras.gr
+>> wrote:
+>>> Signed-off-by: Andreas Bardoutsos <bardoutsos@ceid.upatras.gr>
+>>> ---
+>>> Hi all!
+>>> 
+>>> I have added a dump function(always return true) to recognise RPL
+>> extension
+>>> header(RFC6553)
+>>> Otherwise packet was dropped by kernel resulting in failing
+>> communication in
+>>> RPL DAG's between
+>>> linux running border routers and devices in the graph.For example
+>>> communication
+>>> with contiki OS running devices was previously impossible.
+>>> 
+>>> include/uapi/linux/in6.h | 1 +
+>>> net/ipv6/exthdrs.c | 13 +++++++++++++
+>>> 2 files changed, 14 insertions(+)
+>>> 
+>>> diff --git a/include/uapi/linux/in6.h b/include/uapi/linux/in6.h
+>>> index 46444f8fbee4..5cc12d309dfe 100644
+>>> --- a/include/uapi/linux/in6.h
+>>> +++ b/include/uapi/linux/in6.h
+>>> @@ -146,6 +146,7 @@ struct in6_flowlabel_req {
+>>> #define IPV6_TLV_CALIPSO 7 /* RFC 5570 */
+>>> #define IPV6_TLV_JUMBO 194
+>>> #define IPV6_TLV_HAO 201 /* home address option */
+>>> +#define IPV6_TLV_RPL 99 /* RFC 6553 */
+>>> 
+>>> /*
+>>> * IPV6 socket options
+>>> diff --git a/net/ipv6/exthdrs.c b/net/ipv6/exthdrs.c
+>>> index b636f1da9aec..82ed60d3180e 100644
+>>> --- a/net/ipv6/exthdrs.c
+>>> +++ b/net/ipv6/exthdrs.c
+>>> @@ -785,6 +785,15 @@ static bool ipv6_hop_calipso(struct sk_buff
+>> *skb, int
+>>> optoff)
+>>> return false;
+>>> }
+>>> 
+>>> +/* RPL RFC 6553 */
+>>> +
+>>> +static bool ipv6_hop_rpl(struct sk_buff *skb, int optoff)
+>>> +{
+>>> + /*Dump function which always return true
+>>> + *when rpl option is detected*/
+>> 
+>> This is definitelly wrong formatting of comment. Did you run
+>> checkpatch?
+>> 
+>>> + return true;
+>>> +}
+>>> +
+>>> static const struct tlvtype_proc tlvprochopopt_lst[] = {
+>>> {
+>>> .type = IPV6_TLV_ROUTERALERT,
+>>> @@ -798,6 +807,10 @@ static const struct tlvtype_proc
+>> tlvprochopopt_lst[] = {
+>>> .type = IPV6_TLV_CALIPSO,
+>>> .func = ipv6_hop_calipso,
+>>> },
+>>> + {
+>>> + .type = IPV6_TLV_RPL,
+>>> + .func = ipv6_hop_rpl,
+>>> + },
+>>> { -1, }
+>>> };
+>>> 
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe
+>> linux-wpan" in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at http://vger.kernel.org/majordomo-info.html
+>> [1]
+> 
+> --
+> 
+> Sincerely Your's
+> 
+> Janardhanachari Kella
+> 
+> Contact:+91-9908469599
+> E-mail: eni.chari@gmail.com
+> 
+> 
+> Links:
+> ------
+> [1] http://vger.kernel.org/majordomo-info.html
+> [2]
+> https://github.com/mwasilak/bluetooth-next/commit/f29c632ef6a6a1777815c97fd2f326faccc704f7
+> 
+> _______________________________________________
+> Unstrung-hackers mailing list
+> Unstrung-hackers@lists.sandelman.ca
+> https://lists.sandelman.ca/mailman/listinfo/unstrung-hackers
 
-I have enabled those flags, and I have updated my device tree.
-I am testing this on an OMAP3630 (DM3730) board with a WL1283.  I am
-getting a lot of timeout errors.  I tested this against the original
-implemention I had in pdata-quirks.c using the ti-st driver, uim & and
-the btwilink driver.
-
-I pulled in some of the newer patches to enable the wl1283-st, but I
-am obviously missing something.
-
-I   58.717651] Bluetooth: hci0: Reading TI version information failed
-(-110)
-[   58.724853] Bluetooth: hci0: download firmware failed, retrying...
-[   60.957641] Bluetooth: hci0 command 0x1001 tx timeout
-[   68.957641] Bluetooth: hci0: Reading TI version information failed
-(-110)
-[   68.964843] Bluetooth: hci0: download firmware failed, retrying...
-[   69.132171] Bluetooth: Unknown HCI packet type 06
-[   69.138244] Bluetooth: Unknown HCI packet type 0c
-[   69.143249] Bluetooth: Unknown HCI packet type 40
-[   69.148498] Bluetooth: Unknown HCI packet type 20
-[   69.153533] Bluetooth: Data length is too large
-[   69.158569] Bluetooth: Unknown HCI packet type a0
-[   69.163574] Bluetooth: Unknown HCI packet type 00
-[   69.168731] Bluetooth: Unknown HCI packet type 00
-[   69.173736] Bluetooth: Unknown HCI packet type 34
-[   69.178924] Bluetooth: Unknown HCI packet type 91
-[   71.197631] Bluetooth: hci0 command 0x1001 tx timeout
-[   79.197662] Bluetooth: hci0: Reading TI version information failed (-110)
-
-Since the pdata-quirks and original ti-st drivers work together, I
-know the hardware is fine.  The only change to the device tree is the
-addition of the Bluetooth container:
-
-bluetooth {
-  compatible = "ti,wl1283-st";
-  enable-gpios = <&gpio6 2 GPIO_ACTIVE_HIGH>;
-};
-
-Any thoughts or suggestions to try?  I get similar behavior on an
-i.MX6 board with a wl1837-st module as well.
-
-adam
-> -- Sebastian
