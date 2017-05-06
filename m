@@ -1,123 +1,139 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <linux-wpan-owner@vger.kernel.org>
+Date: Sat, 6 May 2017 12:37:48 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Andreas Bardoutsos <bardoutsos@ceid.upatras.gr>
+Cc: JANARDHANACHARI KELLA <eni.chari@gmail.com>,
+        Michael Richardson <mcr@sandelman.ca>,
+        netdev <netdev@vger.kernel.org>, netdev-owner@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
+        unstrung-hackers@lists.sandelman.ca
+Subject: Re: [Unstrung-hackers] [RFC net-next] ipv6: ext_header: add function
+ to handle RPL extension header option 0x63
+Message-ID: <20170506103748.GB2017@nanopsycho>
+References: <dca567582f1979384fb1f3c3d1411349@ceid.upatras.gr>
+ <20170504160042.GB2385@nanopsycho>
+ <CAAK7Ti9iFFqM7vMyveNfaNeCi6PmAGptXdTYgEzh2gsMptqi4w@mail.gmail.com>
+ <96b9f3bc67da7c16249600990c2df4cc@ceid.upatras.gr>
 MIME-Version: 1.0
-In-Reply-To: <8474DEA7-88A2-4AE7-953E-64AC24B1881F@gmail.com>
-References: <8474DEA7-88A2-4AE7-953E-64AC24B1881F@gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 8 May 2017 11:01:53 +0300
-Message-ID: <CABBYNZJm0ViS8PZmHRno4T_rOjcJzvQbMfDMmAZ9W5xf-d9Bkg@mail.gmail.com>
-Subject: Re: BLE Advertisement frustrations with pydbus
-To: Travis Griggs <travisgriggs@gmail.com>
-Cc: Bluez mailing list <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <96b9f3bc67da7c16249600990c2df4cc@ceid.upatras.gr>
+Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Travis,
+Fri, May 05, 2017 at 09:55:54AM CEST, bardoutsos@ceid.upatras.gr wrote:
+>Yes I think we have faced the same problem,communication with RPL supporting
+>devices was failing otherwise.Your patch is also more complete since it also
+>implements #ifdef .About the comment,yes I have run checkpatch twice with no
+>errors,but ok :)
 
-On Sat, May 6, 2017 at 1:28 AM, Travis Griggs <travisgriggs@gmail.com> wrot=
-e:
-> I=E2=80=99m trying to switch to using pydbus (instead of deprecated dbus-=
-python, which the bluez examples are based on). I=E2=80=99m running on stre=
-tch with bluez 5.43. My code is at the bottom (and here -> https://gist.git=
-hub.com/travisgriggs/d8e14dcccf46751804456dc74da1e5e6). I=E2=80=99m running=
- into a problem when I try to RegisterAdvertisement. What I can=E2=80=99t s=
-eem to discern is what is different between this and the old approach. The =
-bluetooth driver fails around advertising:c:175
->
->     DBusMessageIter iter;
->     const char *msg_type;
->
->     if (!g_dbus_proxy_get_property(proxy, "Type", &iter))
->         return false;
->
-> The g_dbus_proxy_get_property() call fails. What I don=E2=80=99t understa=
-nd though is this. If I modify my program to NOT RegisterAdvertisement(), b=
-ut just sit there with the advertisement object on the bus, I can do the fo=
-llowing:
->
-> $ sudo busctl get-property :1.5 /nic/twigpilot org.bluez.LEAdvertisement1=
- Type
-> s =E2=80=9Cperipheral"
->
-> So I *am* able to get the Type using busctl. Why is that bluetoothd canno=
-t? Using busctl introspect, I see that the pydbus variant automagically mak=
-es a lot more available than the dubs-python variant did.
->
-> Any hints? Pointers? Help?
+Top-posting is highly annoying. Please stop with that.
 
-Does pydbus have ObjectManager support? What about GetAll properties?
-You could perhaps try to sniff the message with eavesdrop option:
-
-https://wiki.ubuntu.com/DebuggingDBus
-
-> TIA
 >
-> =E2=80=94=E2=80=94
+>Στις 2017-05-05 08:59, JANARDHANACHARI KELLA έγραψε:
+>> I was inserted this patch manually. It was working. on 4.9 kernel.
+>> 
+>> check this bellow link for your ref.
+>> 
+>> https://github.com/mwasilak/bluetooth-next/commit/f29c632ef6a6a1777815c97fd2f326faccc704f7
+>> [2]
+>> 
+>> On Thu, May 4, 2017 at 9:30 PM, Jiri Pirko <jiri@resnulli.us> wrote:
+>> 
+>> > Thu, May 04, 2017 at 05:17:18PM CEST, bardoutsos@ceid.upatras.gr
+>> > wrote:
+>> > > Signed-off-by: Andreas Bardoutsos <bardoutsos@ceid.upatras.gr>
+>> > > ---
+>> > > Hi all!
+>> > > 
+>> > > I have added a dump function(always return true) to recognise RPL
+>> > extension
+>> > > header(RFC6553)
+>> > > Otherwise packet was dropped by kernel resulting in failing
+>> > communication in
+>> > > RPL DAG's between
+>> > > linux running border routers and devices in the graph.For example
+>> > > communication
+>> > > with contiki OS running devices was previously impossible.
+>> > > 
+>> > > include/uapi/linux/in6.h | 1 +
+>> > > net/ipv6/exthdrs.c | 13 +++++++++++++
+>> > > 2 files changed, 14 insertions(+)
+>> > > 
+>> > > diff --git a/include/uapi/linux/in6.h b/include/uapi/linux/in6.h
+>> > > index 46444f8fbee4..5cc12d309dfe 100644
+>> > > --- a/include/uapi/linux/in6.h
+>> > > +++ b/include/uapi/linux/in6.h
+>> > > @@ -146,6 +146,7 @@ struct in6_flowlabel_req {
+>> > > #define IPV6_TLV_CALIPSO 7 /* RFC 5570 */
+>> > > #define IPV6_TLV_JUMBO 194
+>> > > #define IPV6_TLV_HAO 201 /* home address option */
+>> > > +#define IPV6_TLV_RPL 99 /* RFC 6553 */
+>> > > 
+>> > > /*
+>> > > * IPV6 socket options
+>> > > diff --git a/net/ipv6/exthdrs.c b/net/ipv6/exthdrs.c
+>> > > index b636f1da9aec..82ed60d3180e 100644
+>> > > --- a/net/ipv6/exthdrs.c
+>> > > +++ b/net/ipv6/exthdrs.c
+>> > > @@ -785,6 +785,15 @@ static bool ipv6_hop_calipso(struct sk_buff
+>> > *skb, int
+>> > > optoff)
+>> > > return false;
+>> > > }
+>> > > 
+>> > > +/* RPL RFC 6553 */
+>> > > +
+>> > > +static bool ipv6_hop_rpl(struct sk_buff *skb, int optoff)
+>> > > +{
+>> > > + /*Dump function which always return true
+>> > > + *when rpl option is detected*/
+>> > 
+>> > This is definitelly wrong formatting of comment. Did you run
+>> > checkpatch?
+>> > 
+>> > > + return true;
+>> > > +}
+>> > > +
+>> > > static const struct tlvtype_proc tlvprochopopt_lst[] = {
+>> > > {
+>> > > .type = IPV6_TLV_ROUTERALERT,
+>> > > @@ -798,6 +807,10 @@ static const struct tlvtype_proc
+>> > tlvprochopopt_lst[] = {
+>> > > .type = IPV6_TLV_CALIPSO,
+>> > > .func = ipv6_hop_calipso,
+>> > > },
+>> > > + {
+>> > > + .type = IPV6_TLV_RPL,
+>> > > + .func = ipv6_hop_rpl,
+>> > > + },
+>> > > { -1, }
+>> > > };
+>> > > 
+>> > --
+>> > To unsubscribe from this list: send the line "unsubscribe
+>> > linux-wpan" in
+>> > the body of a message to majordomo@vger.kernel.org
+>> > More majordomo info at http://vger.kernel.org/majordomo-info.html
+>> > [1]
+>> 
+>> --
+>> 
+>> Sincerely Your's
+>> 
+>> Janardhanachari Kella
+>> 
+>> Contact:+91-9908469599
+>> E-mail: eni.chari@gmail.com
+>> 
+>> 
+>> Links:
+>> ------
+>> [1] http://vger.kernel.org/majordomo-info.html
+>> [2]
+>> https://github.com/mwasilak/bluetooth-next/commit/f29c632ef6a6a1777815c97fd2f326faccc704f7
+>> 
+>> _______________________________________________
+>> Unstrung-hackers mailing list
+>> Unstrung-hackers@lists.sandelman.ca
+>> https://lists.sandelman.ca/mailman/listinfo/unstrung-hackers
 >
-> #!/usr/bin/env python3
->
-> import pydbus
-> from gi.repository import GLib
->
-> class Advertisement(object):
->     """
->       <node>
->         <interface name=3D"org.bluez.LEAdvertisement1">
->           <method name=3D"Release">
->             <annotation name=3D"org.freedesktop.DBus.Method.NoReply" valu=
-e=3D"true"/>
->           </method>
->           <annotation name=3D"org.freedesktop.DBus.Properties.PropertiesC=
-hanged" value=3D"const"/>
->           <property name=3D"Type" type=3D"s" access=3D"read"/>
->           <property name=3D"ServiceUUIDs" type=3D"as" access=3D"read"/>
->           <property name=3D"ManufacturerData" type=3D"a{sv}" access=3D"re=
-ad"/>
->           <property name=3D"SolicitUUIDs" type=3D"as" access=3D"read"/>
->           <property name=3D"ServiceData" type=3D"a{sv}" access=3D"read"/>
->           <property name=3D"IncludeTxPower" type=3D"b" access=3D"read"/>
->         </interface>
->       </node>
->     """
->
->     def __init__(self, bus):
->         self.Type =3D 'peripheral'
->         self.ServiceUUIDs =3D []
->         self.ManufacturerData =3D {}
->         self.SolicitUUIDs =3D []
->         self.ServiceData =3D {}
->         self.IncludeTxPower =3D False
->         bus.register_object('/nic/twigpilot', self, None)
->
->     def Release(self):
->         print('{}: Advertisement Released!'.format(self))
->
->
-> def main():
->     bus =3D pydbus.SystemBus()
->     adaptor =3D bus.get('org.bluez', '/org/bluez/hci0')
->     adaptor.Powered =3D True
->     adaptor.Alias =3D 'SeeMe'
->
->     advertisement =3D Advertisement(bus)
->     advertisement.IncludeTxPower =3D True
->
->     #adaptor.RegisterAdvertisement('/nic/twigpilot', {})
->
->     loop =3D GLib.MainLoop()
->     try:
->         loop.run()
->     except KeyboardInterrupt:
->         loop.quit()
->
-> if __name__ =3D=3D '__main__':
->     main()--
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth=
-" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-
---=20
-Luiz Augusto von Dentz
