@@ -1,139 +1,54 @@
-Return-Path: <linux-wpan-owner@vger.kernel.org>
-Date: Sat, 6 May 2017 12:37:48 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Andreas Bardoutsos <bardoutsos@ceid.upatras.gr>
-Cc: JANARDHANACHARI KELLA <eni.chari@gmail.com>,
-        Michael Richardson <mcr@sandelman.ca>,
-        netdev <netdev@vger.kernel.org>, netdev-owner@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
-        unstrung-hackers@lists.sandelman.ca
-Subject: Re: [Unstrung-hackers] [RFC net-next] ipv6: ext_header: add function
- to handle RPL extension header option 0x63
-Message-ID: <20170506103748.GB2017@nanopsycho>
-References: <dca567582f1979384fb1f3c3d1411349@ceid.upatras.gr>
- <20170504160042.GB2385@nanopsycho>
- <CAAK7Ti9iFFqM7vMyveNfaNeCi6PmAGptXdTYgEzh2gsMptqi4w@mail.gmail.com>
- <96b9f3bc67da7c16249600990c2df4cc@ceid.upatras.gr>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Date: Sat, 6 May 2017 03:26:34 +0200
+From: Sebastian Reichel <sre@kernel.org>
+To: Travis Griggs <travisgriggs@gmail.com>
+Cc: Bluez mailing list <linux-bluetooth@vger.kernel.org>
+Subject: Re: bluez5.44 and Debian?
+Message-ID: <20170506012634.vtnewlnj6nexpliq@earth>
+References: <DB5F6CBF-43D4-492C-8542-346887D7C881@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <96b9f3bc67da7c16249600990c2df4cc@ceid.upatras.gr>
-Sender: linux-wpan-owner@vger.kernel.org
+Content-Type: multipart/signed; micalg=pgp-sha512;
+        protocol="application/pgp-signature"; boundary="zo7j2tmnb3nzlfvy"
+In-Reply-To: <DB5F6CBF-43D4-492C-8542-346887D7C881@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Fri, May 05, 2017 at 09:55:54AM CEST, bardoutsos@ceid.upatras.gr wrote:
->Yes I think we have faced the same problem,communication with RPL supporting
->devices was failing otherwise.Your patch is also more complete since it also
->implements #ifdef .About the comment,yes I have run checkpatch twice with no
->errors,but ok :)
 
-Top-posting is highly annoying. Please stop with that.
+--zo7j2tmnb3nzlfvy
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
->
->Στις 2017-05-05 08:59, JANARDHANACHARI KELLA έγραψε:
->> I was inserted this patch manually. It was working. on 4.9 kernel.
->> 
->> check this bellow link for your ref.
->> 
->> https://github.com/mwasilak/bluetooth-next/commit/f29c632ef6a6a1777815c97fd2f326faccc704f7
->> [2]
->> 
->> On Thu, May 4, 2017 at 9:30 PM, Jiri Pirko <jiri@resnulli.us> wrote:
->> 
->> > Thu, May 04, 2017 at 05:17:18PM CEST, bardoutsos@ceid.upatras.gr
->> > wrote:
->> > > Signed-off-by: Andreas Bardoutsos <bardoutsos@ceid.upatras.gr>
->> > > ---
->> > > Hi all!
->> > > 
->> > > I have added a dump function(always return true) to recognise RPL
->> > extension
->> > > header(RFC6553)
->> > > Otherwise packet was dropped by kernel resulting in failing
->> > communication in
->> > > RPL DAG's between
->> > > linux running border routers and devices in the graph.For example
->> > > communication
->> > > with contiki OS running devices was previously impossible.
->> > > 
->> > > include/uapi/linux/in6.h | 1 +
->> > > net/ipv6/exthdrs.c | 13 +++++++++++++
->> > > 2 files changed, 14 insertions(+)
->> > > 
->> > > diff --git a/include/uapi/linux/in6.h b/include/uapi/linux/in6.h
->> > > index 46444f8fbee4..5cc12d309dfe 100644
->> > > --- a/include/uapi/linux/in6.h
->> > > +++ b/include/uapi/linux/in6.h
->> > > @@ -146,6 +146,7 @@ struct in6_flowlabel_req {
->> > > #define IPV6_TLV_CALIPSO 7 /* RFC 5570 */
->> > > #define IPV6_TLV_JUMBO 194
->> > > #define IPV6_TLV_HAO 201 /* home address option */
->> > > +#define IPV6_TLV_RPL 99 /* RFC 6553 */
->> > > 
->> > > /*
->> > > * IPV6 socket options
->> > > diff --git a/net/ipv6/exthdrs.c b/net/ipv6/exthdrs.c
->> > > index b636f1da9aec..82ed60d3180e 100644
->> > > --- a/net/ipv6/exthdrs.c
->> > > +++ b/net/ipv6/exthdrs.c
->> > > @@ -785,6 +785,15 @@ static bool ipv6_hop_calipso(struct sk_buff
->> > *skb, int
->> > > optoff)
->> > > return false;
->> > > }
->> > > 
->> > > +/* RPL RFC 6553 */
->> > > +
->> > > +static bool ipv6_hop_rpl(struct sk_buff *skb, int optoff)
->> > > +{
->> > > + /*Dump function which always return true
->> > > + *when rpl option is detected*/
->> > 
->> > This is definitelly wrong formatting of comment. Did you run
->> > checkpatch?
->> > 
->> > > + return true;
->> > > +}
->> > > +
->> > > static const struct tlvtype_proc tlvprochopopt_lst[] = {
->> > > {
->> > > .type = IPV6_TLV_ROUTERALERT,
->> > > @@ -798,6 +807,10 @@ static const struct tlvtype_proc
->> > tlvprochopopt_lst[] = {
->> > > .type = IPV6_TLV_CALIPSO,
->> > > .func = ipv6_hop_calipso,
->> > > },
->> > > + {
->> > > + .type = IPV6_TLV_RPL,
->> > > + .func = ipv6_hop_rpl,
->> > > + },
->> > > { -1, }
->> > > };
->> > > 
->> > --
->> > To unsubscribe from this list: send the line "unsubscribe
->> > linux-wpan" in
->> > the body of a message to majordomo@vger.kernel.org
->> > More majordomo info at http://vger.kernel.org/majordomo-info.html
->> > [1]
->> 
->> --
->> 
->> Sincerely Your's
->> 
->> Janardhanachari Kella
->> 
->> Contact:+91-9908469599
->> E-mail: eni.chari@gmail.com
->> 
->> 
->> Links:
->> ------
->> [1] http://vger.kernel.org/majordomo-info.html
->> [2]
->> https://github.com/mwasilak/bluetooth-next/commit/f29c632ef6a6a1777815c97fd2f326faccc704f7
->> 
->> _______________________________________________
->> Unstrung-hackers mailing list
->> Unstrung-hackers@lists.sandelman.ca
->> https://lists.sandelman.ca/mailman/listinfo/unstrung-hackers
->
+Hi,
+
+On Fri, May 05, 2017 at 04:25:51PM -0700, Travis Griggs wrote:
+> Does anyone know why bluez 5.44 (which was pushed in February) is
+> still not available in debian-unstable? I thought unstable was
+> usually pretty current.
+
+Debian is currently preparing the stretch release, so Debian
+maintainers avoid uploading new packages to unstable except
+for fixing release-critical bugs.
+
+-- Sebastian
+
+--zo7j2tmnb3nzlfvy
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCgAdFiEE72YNB0Y/i3JqeVQT2O7X88g7+poFAlkNJkcACgkQ2O7X88g7
++pqtBhAAo5LIVuXXvsXOfyXc9K4PAM0Yut73MTN8U/VwKwot+I72Pa5HpyXqxBIK
+5w5FiE3v7UE6niUZcSLpSdlwLjCvZnmBx0dRkt6kFvwjFOa8pVIv0GigzBPlhYK1
+uKoHCUIHTZIMnmh3WPLT5Kk5xS91u8rlHmbArm+BaOdqQBHGeLcccmjLuoFvEWfH
+IYmoXsacRkHxuJVf1okTVXTFXIQozEMHXh2sKowEtioAde9AINWjM9G13a10FSE6
+uvGCGHm9bGUMRkuTx3TtEzIupQuPDgJWjcBm2mgD8mHKHDgrc5rbjnAObCHlnW1E
+0xyKY6Cq7/An8lvy7uY1hVD237CK27wdFPN2KkJbE2458Q/O8Yjbjsad17SmOorP
+JNAF5RLazh1lkHjGGSKIbd6Yd8IefrqB/zJ4j9kCPSun8QGPZDM1+3dmryHMTAiS
+PLKxmYSO3IA+h3C+026brebC1JwffVC3ixlQmweGz75DOBIuW0zFcbl4sRvl9ZvR
+M79/mXnBtdGvmBXxoGlUMH+pHXU4kUrtLYjo5XaW/Z1PJZgDgHRZiR//KptMegIa
+rDje9igGtfVYymxpL9ovUAIzVbr2ZzBoFJJdyGmskNOASv2+YwX0bt2h7mRjmfUz
+sPR7kVyw0zgJ24LYY4VSMvmMGBIkGU0eKS8y2aFRiBqqHtULgHY=
+=LFxD
+-----END PGP SIGNATURE-----
+
+--zo7j2tmnb3nzlfvy--
