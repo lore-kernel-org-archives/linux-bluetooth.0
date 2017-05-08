@@ -1,135 +1,83 @@
 Return-Path: <sre@kernel.org>
-Date: Mon, 8 May 2017 21:07:50 +0200
+Date: Mon, 8 May 2017 20:28:33 +0200
 From: Sebastian Reichel <sre@kernel.org>
-To: Adam Ford <aford173@gmail.com>
-Cc: Rob Herring <robh@kernel.org>, Marcel Holtmann <marcel@holtmann.org>,
-	linux-bluetooth@vger.kernel.org,
-	Mark Rutland <mark.rutland@arm.com>, devicetree@vger.kernel.org,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Satish Patel <satish.patel@linaro.org>,
-	Wei Xu <xuwei5@hisilicon.com>, Eyal Reizer <eyalr@ti.com>,
-	netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH 0/4] TI Bluetooth serdev support
-Message-ID: <20170508190749.sev2wtecjnaneyng@earth>
-References: <20170405183005.20570-1-robh@kernel.org>
- <CAHCN7xJUxZm1qKAxT0kaK6qoDg+HWOJK7sTH-q9za4HJuUwe8Q@mail.gmail.com>
- <20170430160430.rmyuo6sdrkrjxjg6@earth>
- <CAHCN7x+Mq=b6RN-ezU0400W=H=D7DR+Es1FHtT4GyozpVd8ALA@mail.gmail.com>
+To: Tobias Regnery <tobias.regnery@gmail.com>
+Cc: marcel@holtmann.org, johan.hedberg@gmail.com,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: hci_nokia: select BT_HCIUART_H4
+Message-ID: <20170508182833.ctfvhdmu6oxy72ty@earth>
+References: <20170508093911.25228-1-tobias.regnery@gmail.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="nk6pi2aia4evfmot"
-In-Reply-To: <CAHCN7x+Mq=b6RN-ezU0400W=H=D7DR+Es1FHtT4GyozpVd8ALA@mail.gmail.com>
+	protocol="application/pgp-signature"; boundary="fgivigjbvamfgq3o"
+In-Reply-To: <20170508093911.25228-1-tobias.regnery@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 
---nk6pi2aia4evfmot
+--fgivigjbvamfgq3o
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
 Hi,
 
-On Fri, May 05, 2017 at 09:51:33AM -0500, Adam Ford wrote:
-> On Sun, Apr 30, 2017 at 11:04 AM, Sebastian Reichel <sre@kernel.org> wrot=
-e:
-> > On Sun, Apr 30, 2017 at 10:14:20AM -0500, Adam Ford wrote:
-> >> On Wed, Apr 5, 2017 at 1:30 PM, Rob Herring <robh@kernel.org> wrote:
-> >> > This series adds serdev support to the HCI LL protocol used on TI BT
-> >> > modules and enables support on HiKey board with with the WL1835 modu=
-le.
-> >> > With this the custom TI UIM daemon and btattach are no longer needed.
-> >>
-> >> Without UIM daemon, what instruction do you use to load the BT firmwar=
-e?
-> >>
-> >> I was thinking 'hciattach' but I was having trouble.  I was hoping you
-> >> might have some insight.
-> >>
-> >>  hciattach -t 30 -s 115200 /dev/ttymxc1 texas 3000000 flow  Just
-> >> returns a timeout.
-> >>
-> >> I modified my i.MX6 device tree per the binding documentation and
-> >> setup the regulators and enable GPIO pins.
-> >
-> > If you configured everything correctly no userspace interaction is
-> > required. The driver should request the firmware automatically once
-> > you power up the bluetooth device.
-> >
-> > Apart from DT changes make sure, that the following options are
-> > enabled and check dmesg for any hints.
-> >
-> > CONFIG_SERIAL_DEV_BUS
-> > CONFIG_SERIAL_DEV_CTRL_TTYPORT
-> > CONFIG_BT_HCIUART
-> > CONFIG_BT_HCIUART_LL
+On Mon, May 08, 2017 at 11:39:11AM +0200, Tobias Regnery wrote:
+> We see the following build failure with CONFIG_BT_HCIUART_NOKIA=3Dy and
+> CONFIG_BT_HCIUART_H4=3Dn:
 >=20
-> I have enabled those flags, and I have updated my device tree.
-> I am testing this on an OMAP3630 (DM3730) board with a WL1283.  I am
-> getting a lot of timeout errors.  I tested this against the original
-> implemention I had in pdata-quirks.c using the ti-st driver, uim & and
-> the btwilink driver.
+> drivers/bluetooth/hci_nokia.c: In function 'nokia_recv':
+> drivers/bluetooth/hci_nokia.c:644:18: error: implicit declaration of func=
+tion 'h4_recv_buf' [-Werror=3Dimplicit-function-declaration]
+> ...
 >=20
-> I pulled in some of the newer patches to enable the wl1283-st, but I
-> am obviously missing something.
+> Fix this by selecting the BT_HCIUART_H4 symbol like all the other users
+> of the protocoll.
 >=20
-> I   58.717651] Bluetooth: hci0: Reading TI version information failed
-> (-110)
-> [   58.724853] Bluetooth: hci0: download firmware failed, retrying...
-> [   60.957641] Bluetooth: hci0 command 0x1001 tx timeout
-> [   68.957641] Bluetooth: hci0: Reading TI version information failed
-> (-110)
-> [   68.964843] Bluetooth: hci0: download firmware failed, retrying...
-> [   69.132171] Bluetooth: Unknown HCI packet type 06
-> [   69.138244] Bluetooth: Unknown HCI packet type 0c
-> [   69.143249] Bluetooth: Unknown HCI packet type 40
-> [   69.148498] Bluetooth: Unknown HCI packet type 20
-> [   69.153533] Bluetooth: Data length is too large
-> [   69.158569] Bluetooth: Unknown HCI packet type a0
-> [   69.163574] Bluetooth: Unknown HCI packet type 00
-> [   69.168731] Bluetooth: Unknown HCI packet type 00
-> [   69.173736] Bluetooth: Unknown HCI packet type 34
-> [   69.178924] Bluetooth: Unknown HCI packet type 91
-> [   71.197631] Bluetooth: hci0 command 0x1001 tx timeout
-> [   79.197662] Bluetooth: hci0: Reading TI version information failed (-1=
-10)
->
-> Since the pdata-quirks and original ti-st drivers work together, I
-> know the hardware is fine.  The only change to the device tree is the
-> addition of the Bluetooth container:
->=20
-> bluetooth {
->   compatible =3D "ti,wl1283-st";
->   enable-gpios =3D <&gpio6 2 GPIO_ACTIVE_HIGH>;
-> };
->=20
-> Any thoughts or suggestions to try? I get similar behavior on an
-> i.MX6 board with a wl1837-st module as well.
+> Fixes: 7bb318680e86 ("Bluetooth: add nokia driver")
+> Signed-off-by: Tobias Regnery <tobias.regnery@gmail.com>
 
-Looks like its loosing bytes. I suggest to have a look at
-pinmuxing (esp. for cts & rts) and maybe add some debug
-prints to see where it starts failing.
+Reviewed-by: Sebastian Reichel <sre@kernel.org>
 
 -- Sebastian
 
---nk6pi2aia4evfmot
+> ---
+>  drivers/bluetooth/Kconfig | 1 +
+>  1 file changed, 1 insertion(+)
+>=20
+> diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
+> index e5fd24d90b0a..35952a94875e 100644
+> --- a/drivers/bluetooth/Kconfig
+> +++ b/drivers/bluetooth/Kconfig
+> @@ -97,6 +97,7 @@ config BT_HCIUART_NOKIA
+>  	depends on BT_HCIUART
+>  	depends on BT_HCIUART_SERDEV
+>  	depends on PM
+> +	select BT_HCIUART_H4
+>  	help
+>  	  Nokia H4+ is serial protocol for communication between Bluetooth
+>  	  device and host. This protocol is required for Bluetooth devices
+> --=20
+> 2.11.0
+>=20
+
+--fgivigjbvamfgq3o
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAABCgAdFiEE72YNB0Y/i3JqeVQT2O7X88g7+poFAlkQwgMACgkQ2O7X88g7
-+prkYg/9HPpijKg7yAvn9TUkoxzUZvv40F8eyuy5laslRSewycr8tOR2O3mHn97w
-E1Zjb1uiK+4zYf7QfoR+qqvRiSn3iPTKF+170o8sScM4rhjhc/gajqhIHyHObKUs
-3nvmDkwBHQ0p7thYqdNviWFauuAj6S5it568ZadAs0OwRhmoqAvoR9ltCUoE8hEC
-aBVdgLMkXWGfEdbx5sRQmH3XfCZqI9LndOuoTlrT95I5QZPj5qVwLUOkAXgiDEOh
-nHjMceaW1k2GJfMMEfjN+yY5/i+XvlIZ0OcWDRXJn3NRwvWn1wCnpLwEnJCVXoPv
-MAd8uFMM/S8inZ9PVrUn9ZJObqBbyL/yl+D+q0wgUJNKEH+9PNSuFtyGLm8hILlR
-24z1YaorF2bgEWknJNVh0XvhBTB6IMFhY4c+Vpd+dw2HexM20Cn1V7AZuC1jiCGf
-hJHOJpm+TGOXx8p3Oy6XE4TXbO1SGxBlm65IDE5lklVQaUVIAqSc2eJlS+PMwceW
-UaclAe5m1HWYPQPooFLcvcty59VBW+WICCBqNJ421yMYafwEqzjAuIsSEaI6L2h6
-9weshLTzmyDWKdAGCcelmyNiIuj+hNFYMv1iiqEfOIh4+MrJMTkfOB6QftLHPPj0
-LiGRK8E04i1Ag3uIPlqqKxCRjV6ZYk6yR6zX+Ix0/GvGOkyHmac=
-=KzB2
+iQIzBAABCgAdFiEE72YNB0Y/i3JqeVQT2O7X88g7+poFAlkQuNEACgkQ2O7X88g7
++poBpQ//Yx/Wbr4LHxyuSq4DOTKUTQYR9sZILEPQOvya6ggAY4x1ztpnUpMNyWey
+Vch/5wxhqgMS4s6uL+o6rWE6UuArDBqDAx1HJAGlogayI7jsAGlt+7kpxvA4yaiH
+RPdc61EPoxw+NHeAkH+H/R6Jn3A+S/4QpKxaDgurAs3ALrzwJWeEDq49kOmTfQ7x
+yyLO93JRDVhjMku/s6TsUmMG7TL+MUZPBph9odFVu7IFBROffi/hqr9pc+5Coom8
+S39+VuFfdSBsTPkgCOtDu/KDCQIQtFaYBZ/81lepzNpM42PLrJKeRvN61ZN9o7dc
+xuzsOOZx2QzjJqUQOzStLIJJ9aglkski+XYb1kwCfGsQIn+UirZpkrVA54WmQxJH
+Sz9kO/8OMycyWJ9/Z9MiQIdRbVqAMGEqdZekNoIemidTzjfWU3HNm5VE4nrGXGgO
+HtTjc89U8JtuNZjiOQIDJ4PBQhdy47/DD620upeFrrRBrz1AUC9v6vngiug3zc8z
+LRIVhANGrqwMGboEm7jOxL0blVKZUeLT+Az1Jo+994GrK1NrR3M7emc3vIyVTl3v
+2XYrPQDAaBhw/qWyUUAXeMzrSxi22k/QnHKfePksBlnUcAbNzzYBq4SHuEoOciKT
+IPZzdvIO8UQTjrOWxeKB120ygnFnnJqL8SpFJuDxVPNNVMhIVM8=
+=z+bt
 -----END PGP SIGNATURE-----
 
---nk6pi2aia4evfmot--
+--fgivigjbvamfgq3o--
