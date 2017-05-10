@@ -1,9 +1,9 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 06/10] unit/test-gatt: Adjust the PDUs to the new behavior
-Date: Wed, 10 May 2017 15:48:31 +0300
-Message-Id: <20170510124835.17462-7-luiz.dentz@gmail.com>
+Subject: [PATCH v2 02/10] shared/gatt-db: Add gatt_db_service_insert_included
+Date: Wed, 10 May 2017 15:48:27 +0300
+Message-Id: <20170510124835.17462-3-luiz.dentz@gmail.com>
 In-Reply-To: <20170510124835.17462-1-luiz.dentz@gmail.com>
 References: <20170510124835.17462-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,69 +11,100 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-The new behavior of bt_gatt_client is to discovery the entire range
-(0x0001-0xffff) not service by service.
+This introduces gatt_db_service_insert_included which is a variant of
+gatt_db_service_add_included containing the handle where it should be
+inserted.
 ---
- unit/test-gatt.c | 20 ++++++--------------
- 1 file changed, 6 insertions(+), 14 deletions(-)
+ src/shared/gatt-db.c | 40 ++++++++++++++++++++++++++++++++--------
+ src/shared/gatt-db.h |  4 ++++
+ 2 files changed, 36 insertions(+), 8 deletions(-)
 
-diff --git a/unit/test-gatt.c b/unit/test-gatt.c
-index e0d29c7..3a784e9 100644
---- a/unit/test-gatt.c
-+++ b/unit/test-gatt.c
-@@ -134,10 +134,8 @@ struct context {
- 		raw_pdu(0x01, 0x10, 0x09, 0x00, 0x0a),			\
- 		raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x01, 0x28),	\
- 		raw_pdu(0x01, 0x10, 0x01, 0x00, 0x0a),			\
--		raw_pdu(0x08, 0x01, 0x00, 0x04, 0x00, 0x02, 0x28),	\
-+		raw_pdu(0x08, 0x01, 0x00, 0x08, 0x00, 0x02, 0x28),	\
- 		raw_pdu(0x01, 0x08, 0x01, 0x00, 0x0a),			\
--		raw_pdu(0x08, 0x05, 0x00, 0x08, 0x00, 0x02, 0x28),	\
--		raw_pdu(0x01, 0x08, 0x05, 0x00, 0x0a),			\
- 		raw_pdu(0x08, 0x01, 0x00, 0x04, 0x00, 0x03, 0x28),	\
- 		raw_pdu(0x09, 0x07, 0x02, 0x00, 0x02, 0x03, 0x00, 0x00,	\
- 				0x2a),					\
-@@ -163,10 +161,8 @@ struct context {
- 		raw_pdu(0x01, 0x10, 0x0b, 0x00, 0x0a),			\
- 		raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x01, 0x28),	\
- 		raw_pdu(0x01, 0x10, 0x01, 0x00, 0x0a),			\
--		raw_pdu(0x08, 0x01, 0x00, 0x04, 0x00, 0x02, 0x28),	\
-+		raw_pdu(0x08, 0x01, 0x00, 0x0a, 0x00, 0x02, 0x28),	\
- 		raw_pdu(0x01, 0x08, 0x01, 0x00, 0x0a),			\
--		raw_pdu(0x08, 0x05, 0x00, 0x0a, 0x00, 0x02, 0x28),	\
--		raw_pdu(0x01, 0x08, 0x05, 0x00, 0x0a),			\
- 		raw_pdu(0x08, 0x01, 0x00, 0x04, 0x00, 0x03, 0x28),	\
- 		raw_pdu(0x09, 0x07, 0x02, 0x00, 0x02, 0x03, 0x00, 0x00,	\
- 				0x2a),					\
-@@ -193,10 +189,8 @@ struct context {
- 		raw_pdu(0x01, 0x10, 0x21, 0x03, 0x0a),			\
- 		raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x01, 0x28),	\
- 		raw_pdu(0x01, 0x10, 0x01, 0x00, 0x0a),			\
--		raw_pdu(0x08, 0x00, 0x01, 0x21, 0x01, 0x02, 0x28),	\
-+		raw_pdu(0x08, 0x00, 0x01, 0x20, 0x03, 0x02, 0x28),	\
- 		raw_pdu(0x01, 0x08, 0x00, 0x01, 0x0a),			\
--		raw_pdu(0x08, 0x00, 0x03, 0x20, 0x03, 0x02, 0x28),	\
--		raw_pdu(0x01, 0x08, 0x00, 0x03, 0x0a),			\
- 		raw_pdu(0x08, 0x00, 0x01, 0x21, 0x01, 0x03, 0x28),	\
- 		raw_pdu(0x09, 0x07, 0x10, 0x01, 0x02, 0x11, 0x01, 0x00,	\
- 			0x2a, 0x20, 0x01, 0x02, 0x21, 0x01, 0x01, 0x2a),\
-@@ -249,13 +243,11 @@ struct context {
- 		raw_pdu(0x01, 0x10, 0x11, 0x00, 0x0a)
+diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
+index efd61f9..2cb80ec 100644
+--- a/src/shared/gatt-db.c
++++ b/src/shared/gatt-db.c
+@@ -834,19 +834,15 @@ gatt_db_service_add_descriptor(struct gatt_db_attribute *attrib,
+ 					user_data);
+ }
  
- #define INCLUDE_DISC_SMALL_DB						\
--		raw_pdu(0x08, 0x10, 0xf0, 0x18, 0xf0, 0x02, 0x28),	\
-+		raw_pdu(0x08, 0x01, 0x00, 0xff, 0xff, 0x02, 0x28),	\
- 		raw_pdu(0x09, 0x08, 0x11, 0xf0, 0x01, 0x00, 0x0f, 0x00,	\
- 			0x0a, 0x18),					\
--		raw_pdu(0x08, 0x12, 0xf0, 0x18, 0xf0, 0x02, 0x28),	\
--		raw_pdu(0x01, 0x08, 0x12, 0xf0, 0x0a),			\
--		raw_pdu(0x08, 0x01, 0x00, 0x10, 0x00, 0x02, 0x28),	\
--		raw_pdu(0x01, 0x08, 0x01, 0x00, 0x0a)
-+		raw_pdu(0x08, 0x12, 0xf0, 0xff, 0xff, 0x02, 0x28),	\
-+		raw_pdu(0x01, 0x08, 0x12, 0xf0, 0x0a)
+-struct gatt_db_attribute *
+-gatt_db_service_add_included(struct gatt_db_attribute *attrib,
++static struct gatt_db_attribute *
++service_insert_included(struct gatt_db_service *service, uint16_t handle,
+ 					struct gatt_db_attribute *include)
+ {
+-	struct gatt_db_service *service, *included;
++	struct gatt_db_service *included;
+ 	uint8_t value[MAX_INCLUDED_VALUE_LEN];
+ 	uint16_t included_handle, len = 0;
+ 	int index;
  
- #define CHARACTERISTIC_DISC_SMALL_DB					\
- 		raw_pdu(0x08, 0x10, 0xf0, 0x18, 0xf0, 0x03, 0x28),	\
+-	if (!attrib || !include)
+-		return NULL;
+-
+-	service = attrib->service;
+ 	included = include->service;
+ 
+ 	/* Adjust include to point to the first attribute */
+@@ -873,7 +869,14 @@ gatt_db_service_add_included(struct gatt_db_attribute *attrib,
+ 	if (!index)
+ 		return NULL;
+ 
+-	service->attributes[index] = new_attribute(service, 0,
++	/* Check if handle is in within service range */
++	if (handle && handle <= service->attributes[0]->handle)
++		return NULL;
++
++	if (!handle)
++		handle = get_handle_at_index(service, index - 1) + 1;
++
++	service->attributes[index] = new_attribute(service, handle,
+ 							&included_service_uuid,
+ 							value, len);
+ 	if (!service->attributes[index])
+@@ -889,6 +892,27 @@ gatt_db_service_add_included(struct gatt_db_attribute *attrib,
+ 	return attribute_update(service, index);
+ }
+ 
++struct gatt_db_attribute *
++gatt_db_service_add_included(struct gatt_db_attribute *attrib,
++					struct gatt_db_attribute *include)
++{
++	if (!attrib || !include)
++		return NULL;
++
++	return service_insert_included(attrib->service, 0, include);
++}
++
++struct gatt_db_attribute *
++gatt_db_service_insert_included(struct gatt_db_attribute *attrib,
++				uint16_t handle,
++				struct gatt_db_attribute *include)
++{
++	if (!attrib || !handle || !include)
++		return NULL;
++
++	return service_insert_included(attrib->service, handle, include);
++}
++
+ bool gatt_db_service_set_active(struct gatt_db_attribute *attrib, bool active)
+ {
+ 	struct gatt_db_service *service;
+diff --git a/src/shared/gatt-db.h b/src/shared/gatt-db.h
+index f8277fd..19583e7 100644
+--- a/src/shared/gatt-db.h
++++ b/src/shared/gatt-db.h
+@@ -96,6 +96,10 @@ gatt_db_service_insert_descriptor(struct gatt_db_attribute *attrib,
+ struct gatt_db_attribute *
+ gatt_db_service_add_included(struct gatt_db_attribute *attrib,
+ 					struct gatt_db_attribute *include);
++struct gatt_db_attribute *
++gatt_db_service_insert_included(struct gatt_db_attribute *attrib,
++				uint16_t handle,
++				struct gatt_db_attribute *include);
+ 
+ bool gatt_db_service_set_active(struct gatt_db_attribute *attrib, bool active);
+ bool gatt_db_service_get_active(struct gatt_db_attribute *attrib);
 -- 
 2.9.3
 
