@@ -1,9 +1,9 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 01/10] shared/gatt-db: Add gatt_db_get_service
-Date: Wed, 10 May 2017 15:48:26 +0300
-Message-Id: <20170510124835.17462-2-luiz.dentz@gmail.com>
+Subject: [PATCH v2 06/10] unit/test-gatt: Adjust the PDUs to the new behavior
+Date: Wed, 10 May 2017 15:48:31 +0300
+Message-Id: <20170510124835.17462-7-luiz.dentz@gmail.com>
 In-Reply-To: <20170510124835.17462-1-luiz.dentz@gmail.com>
 References: <20170510124835.17462-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,70 +11,69 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds gatt_db_get_service which can be used to lookup service by
-handle.
+The new behavior of bt_gatt_client is to discovery the entire range
+(0x0001-0xffff) not service by service.
 ---
- src/shared/gatt-db.c | 21 ++++++++++++++++++---
- src/shared/gatt-db.h |  3 +++
- 2 files changed, 21 insertions(+), 3 deletions(-)
+ unit/test-gatt.c | 20 ++++++--------------
+ 1 file changed, 6 insertions(+), 14 deletions(-)
 
-diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
-index 8ef6f3b..efd61f9 100644
---- a/src/shared/gatt-db.c
-+++ b/src/shared/gatt-db.c
-@@ -1316,20 +1316,35 @@ static bool find_service_for_handle(const void *data, const void *user_data)
- 	return (start <= handle) && (handle <= end);
- }
+diff --git a/unit/test-gatt.c b/unit/test-gatt.c
+index e0d29c7..3a784e9 100644
+--- a/unit/test-gatt.c
++++ b/unit/test-gatt.c
+@@ -134,10 +134,8 @@ struct context {
+ 		raw_pdu(0x01, 0x10, 0x09, 0x00, 0x0a),			\
+ 		raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x01, 0x28),	\
+ 		raw_pdu(0x01, 0x10, 0x01, 0x00, 0x0a),			\
+-		raw_pdu(0x08, 0x01, 0x00, 0x04, 0x00, 0x02, 0x28),	\
++		raw_pdu(0x08, 0x01, 0x00, 0x08, 0x00, 0x02, 0x28),	\
+ 		raw_pdu(0x01, 0x08, 0x01, 0x00, 0x0a),			\
+-		raw_pdu(0x08, 0x05, 0x00, 0x08, 0x00, 0x02, 0x28),	\
+-		raw_pdu(0x01, 0x08, 0x05, 0x00, 0x0a),			\
+ 		raw_pdu(0x08, 0x01, 0x00, 0x04, 0x00, 0x03, 0x28),	\
+ 		raw_pdu(0x09, 0x07, 0x02, 0x00, 0x02, 0x03, 0x00, 0x00,	\
+ 				0x2a),					\
+@@ -163,10 +161,8 @@ struct context {
+ 		raw_pdu(0x01, 0x10, 0x0b, 0x00, 0x0a),			\
+ 		raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x01, 0x28),	\
+ 		raw_pdu(0x01, 0x10, 0x01, 0x00, 0x0a),			\
+-		raw_pdu(0x08, 0x01, 0x00, 0x04, 0x00, 0x02, 0x28),	\
++		raw_pdu(0x08, 0x01, 0x00, 0x0a, 0x00, 0x02, 0x28),	\
+ 		raw_pdu(0x01, 0x08, 0x01, 0x00, 0x0a),			\
+-		raw_pdu(0x08, 0x05, 0x00, 0x0a, 0x00, 0x02, 0x28),	\
+-		raw_pdu(0x01, 0x08, 0x05, 0x00, 0x0a),			\
+ 		raw_pdu(0x08, 0x01, 0x00, 0x04, 0x00, 0x03, 0x28),	\
+ 		raw_pdu(0x09, 0x07, 0x02, 0x00, 0x02, 0x03, 0x00, 0x00,	\
+ 				0x2a),					\
+@@ -193,10 +189,8 @@ struct context {
+ 		raw_pdu(0x01, 0x10, 0x21, 0x03, 0x0a),			\
+ 		raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x01, 0x28),	\
+ 		raw_pdu(0x01, 0x10, 0x01, 0x00, 0x0a),			\
+-		raw_pdu(0x08, 0x00, 0x01, 0x21, 0x01, 0x02, 0x28),	\
++		raw_pdu(0x08, 0x00, 0x01, 0x20, 0x03, 0x02, 0x28),	\
+ 		raw_pdu(0x01, 0x08, 0x00, 0x01, 0x0a),			\
+-		raw_pdu(0x08, 0x00, 0x03, 0x20, 0x03, 0x02, 0x28),	\
+-		raw_pdu(0x01, 0x08, 0x00, 0x03, 0x0a),			\
+ 		raw_pdu(0x08, 0x00, 0x01, 0x21, 0x01, 0x03, 0x28),	\
+ 		raw_pdu(0x09, 0x07, 0x10, 0x01, 0x02, 0x11, 0x01, 0x00,	\
+ 			0x2a, 0x20, 0x01, 0x02, 0x21, 0x01, 0x01, 0x2a),\
+@@ -249,13 +243,11 @@ struct context {
+ 		raw_pdu(0x01, 0x10, 0x11, 0x00, 0x0a)
  
--struct gatt_db_attribute *gatt_db_get_attribute(struct gatt_db *db,
-+struct gatt_db_attribute *gatt_db_get_service(struct gatt_db *db,
- 							uint16_t handle)
- {
- 	struct gatt_db_service *service;
--	int i;
+ #define INCLUDE_DISC_SMALL_DB						\
+-		raw_pdu(0x08, 0x10, 0xf0, 0x18, 0xf0, 0x02, 0x28),	\
++		raw_pdu(0x08, 0x01, 0x00, 0xff, 0xff, 0x02, 0x28),	\
+ 		raw_pdu(0x09, 0x08, 0x11, 0xf0, 0x01, 0x00, 0x0f, 0x00,	\
+ 			0x0a, 0x18),					\
+-		raw_pdu(0x08, 0x12, 0xf0, 0x18, 0xf0, 0x02, 0x28),	\
+-		raw_pdu(0x01, 0x08, 0x12, 0xf0, 0x0a),			\
+-		raw_pdu(0x08, 0x01, 0x00, 0x10, 0x00, 0x02, 0x28),	\
+-		raw_pdu(0x01, 0x08, 0x01, 0x00, 0x0a)
++		raw_pdu(0x08, 0x12, 0xf0, 0xff, 0xff, 0x02, 0x28),	\
++		raw_pdu(0x01, 0x08, 0x12, 0xf0, 0x0a)
  
- 	if (!db || !handle)
- 		return NULL;
- 
- 	service = queue_find(db->services, find_service_for_handle,
--							UINT_TO_PTR(handle));
-+						UINT_TO_PTR(handle));
- 	if (!service)
- 		return NULL;
- 
-+	return service->attributes[0];
-+}
-+
-+struct gatt_db_attribute *gatt_db_get_attribute(struct gatt_db *db,
-+							uint16_t handle)
-+{
-+	struct gatt_db_attribute *attrib;
-+	struct gatt_db_service *service;
-+	int i;
-+
-+	attrib = gatt_db_get_service(db, handle);
-+	if (!attrib)
-+		return NULL;
-+
-+	service = attrib->service;
-+
- 	for (i = 0; i < service->num_handles; i++) {
- 		if (!service->attributes[i])
- 			continue;
-diff --git a/src/shared/gatt-db.h b/src/shared/gatt-db.h
-index 134ec63..f8277fd 100644
---- a/src/shared/gatt-db.h
-+++ b/src/shared/gatt-db.h
-@@ -170,6 +170,9 @@ unsigned int gatt_db_register(struct gatt_db *db,
- 					gatt_db_destroy_func_t destroy);
- bool gatt_db_unregister(struct gatt_db *db, unsigned int id);
- 
-+struct gatt_db_attribute *gatt_db_get_service(struct gatt_db *db,
-+							uint16_t handle);
-+
- struct gatt_db_attribute *gatt_db_get_attribute(struct gatt_db *db,
- 							uint16_t handle);
- 
+ #define CHARACTERISTIC_DISC_SMALL_DB					\
+ 		raw_pdu(0x08, 0x10, 0xf0, 0x18, 0xf0, 0x03, 0x28),	\
 -- 
 2.9.3
 
