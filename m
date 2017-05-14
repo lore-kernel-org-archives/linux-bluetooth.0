@@ -1,92 +1,122 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CA+M2ft9OM_rZhmZy7hxEffE2mw5kGEjvS0WcJcKxkkt_jcxtRQ@mail.gmail.com>
-References: <CA+M2ft9OM_rZhmZy7hxEffE2mw5kGEjvS0WcJcKxkkt_jcxtRQ@mail.gmail.com>
+In-Reply-To: <1494638013-6662-1-git-send-email-ricardo.salveti@linaro.org>
+References: <1494638013-6662-1-git-send-email-ricardo.salveti@linaro.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Sun, 14 May 2017 19:19:28 +0300
-Message-ID: <CABBYNZLAD5Z_FP96weVpCMezdjU+Ebu8BQcY1bNdwf8-r2Dxcw@mail.gmail.com>
-Subject: Re: Clarification on deprecated tools (e.g. hciconfig)
-To: John Hendy <jw.hendy@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Sun, 14 May 2017 19:00:32 +0300
+Message-ID: <CABBYNZ+mv6v_UN-LFzGCnpzk7EFWUhrHh0KGSwfSv1Pq5Pya1g@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: Check for available le pkts before sending frame
+To: Ricardo Salveti <ricardo.salveti@linaro.org>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        Johan Hedberg <johan.hedberg@intel.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi John,
+Hi Ricardo,
 
-On Sun, May 14, 2017 at 1:55 AM, John Hendy <jw.hendy@gmail.com> wrote:
-> Hello,
+On Sat, May 13, 2017 at 4:13 AM, Ricardo Salveti
+<ricardo.salveti@linaro.org> wrote:
+> hci_sched_le only checks for the available le pkts before iterating over
+> the channel data queue, allowing hci data buffer overflow when quota is
+> larger than cnt (hci_chan_sent uses both le_cnt and acl_cnt when
+> calculating quota, both of which are only updated after hci_sched_le is
+> done with the channel data queue).
 >
+> Bug found when using wl1835mod (96boards HiKey) with multiple BT LE
+> connections:
+>> HCI Event: Number of Completed Packets (0x13) plen 5
+>         Num handles: 1
+>         Handle: 1025
+>         Count: 2
+>> HCI Event: Data Buffer Overflow (0x1a) plen 1
+>         Link type: ACL (0x01)
+>> HCI Event: Data Buffer Overflow (0x1a) plen 1
+>         Link type: ACL (0x01)
+>> HCI Event: Data Buffer Overflow (0x1a) plen 1
+>         Link type: ACL (0x01)
+>> HCI Event: Data Buffer Overflow (0x1a) plen 1
+>         Link type: ACL (0x01)
+>> HCI Event: Data Buffer Overflow (0x1a) plen 1
+>         Link type: ACL (0x01)
 >
-> I use arch linux and noticed that the wiki states that some tools such
-> as hciconfig are deprecated:[1]
+> Signed-off-by: Ricardo Salveti <ricardo.salveti@linaro.org>
+> ---
+>  net/bluetooth/hci_core.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >
-> ### begin_quote
+> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> index 0568677..58e9ab2 100644
+> --- a/net/bluetooth/hci_core.c
+> +++ b/net/bluetooth/hci_core.c
+> @@ -3938,7 +3938,7 @@ static void hci_sched_le(struct hci_dev *hdev)
+>         tmp = cnt;
+>         while (cnt && (chan = hci_chan_sent(hdev, LE_LINK, &quote))) {
+>                 u32 priority = (skb_peek(&chan->data_q))->priority;
+> -               while (quote-- && (skb = skb_peek(&chan->data_q))) {
+> +               while (cnt && quote-- && (skb = skb_peek(&chan->data_q))) {
+>                         BT_DBG("chan %p skb %p len %d priority %u", chan, skb,
+>                                skb->len, skb->priority);
 >
-> Some tools such as hcitool and hciconfig have been deprecated
-> upstream, and are no longer included in bluez-utils. Since these tools
-> will no longer be updated, it is recommended that scripts be updated
-> to avoid using them. If you still desire to use them, install
-> bluez-utils-compat. See FS#53110 and the Bluez mailing list for more
-> information. [2] [3]
->
-> ### end_quote
->
-> The bluez mailing list post is for a patch with the following heading:
->
-> ### begin_quote
->
-> This marks the following tools as deprecated as they are not longer
-> maintained or have been replaced by other tools:
->
->   hciattach hciconfig hcitool hcidump rfcomm sdptool ciptool gatttool
->
-> ### end_quote
->
-> Is there a source of clarification on which of these tools is simply
-> "not [no?] longer maintained" vs. "replaced"? I don't auto-enable BT
-> on my computer and I'd like to switch to whatever I should be using if
-> for no other reason than the news is fresh now. Perhaps in a year this
-> method will be completely obsolete; by then I'll have forgotten all
-> about this and wonder what's wrong.
-
-All the tools using raw socket shall be considered deprecated, these
-tools may interfere with the so called Management interface since they
-can alter the controller state in a way that other applications cannot
-detect. Note that for the most part bluetoothctl will be able to do
-pretty much everything you want and more, for those operations not
-support over D-Bus that are usually at HCI level you may want to use
-btmgmt although we may actually turn hciconfig, hcitool, etc to either
-use btmgmt to maintain backward compatibility until distros do the
-switch.
-
-> I'd be happy to update the arch wiki to point to any new information
-> provided. For what it's worth, I think the information would be
-> relevant in a widely accessible place (the official bluez site in my
-> opinion); this question has already popped up in various places. [4]
-> [5] [6] [7]
-
-I guess the most practical solution would be to switch everything to
-use bluetoothctl as much as possible, going with raw or mgmt socket
-should only be mentioned as a last resort in case something went
-wrong.
-
->
-> Many thanks,
-> John
->
-> [1] https://wiki.archlinux.org/index.php/bluetooth
-> [2] https://bugs.archlinux.org/task/53110
-> [3] https://www.spinics.net/lists/linux-bluetooth/msg69239.html
-> [4] https://www.mail-archive.com/gentoo-user@lists.gentoo.org/msg166798.html
-> [5] https://github.com/chrippa/ds4drv/issues/123
-> [6] https://unix.stackexchange.com/questions/352494
-> [7] https://www.reddit.com/r/archlinux/comments/5x9yle
 > --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> 2.7.4
 
+This does indeed seems wrong but I think this can also affect the
+quote since hci_chan_sent does attempt to access the acl_cnt/le_cnt
+which may lead to return the wrong quote, though checking cnt would
+fix that as well, because of this perhaps we should actually have the
+cnt as a pointer so we can update the real cnt in place similarly to
+what is done for ACL_LINK/acl_cnt:
+
+ net/bluetooth/hci_core.c | 17 ++++++-----------
+ 1 file changed, 6 insertions(+), 11 deletions(-)
+
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 7655b40..8c4c785 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -3955,7 +3955,7 @@ static void hci_sched_le(struct hci_dev *hdev)
+ {
+  struct hci_chan *chan;
+  struct sk_buff *skb;
+- int quote, cnt, tmp;
++ int quote, *cnt, tmp;
+
+  BT_DBG("%s", hdev->name);
+
+@@ -3970,9 +3970,9 @@ static void hci_sched_le(struct hci_dev *hdev)
+  hci_link_tx_to(hdev, LE_LINK);
+  }
+
+- cnt = hdev->le_pkts ? hdev->le_cnt : hdev->acl_cnt;
+- tmp = cnt;
+- while (cnt && (chan = hci_chan_sent(hdev, LE_LINK, &quote))) {
++ cnt = hdev->le_pkts ? &hdev->le_cnt : &hdev->acl_cnt;
++ tmp = *cnt;
++ while (*cnt && (chan = hci_chan_sent(hdev, LE_LINK, &quote))) {
+  u32 priority = (skb_peek(&chan->data_q))->priority;
+  while (quote-- && (skb = skb_peek(&chan->data_q))) {
+  BT_DBG("chan %p skb %p len %d priority %u", chan, skb,
+@@ -3987,18 +3987,13 @@ static void hci_sched_le(struct hci_dev *hdev)
+  hci_send_frame(hdev, skb);
+  hdev->le_last_tx = jiffies;
+
+- cnt--;
++ *cnt--;
+  chan->sent++;
+  chan->conn->sent++;
+  }
+  }
+
+- if (hdev->le_pkts)
+- hdev->le_cnt = cnt;
+- else
+- hdev->acl_cnt = cnt;
+-
+- if (cnt != tmp)
++ if (*cnt != tmp)
+  hci_prio_recalculate(hdev, LE_LINK);
+ }
 
 
 -- 
