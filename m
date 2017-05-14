@@ -1,81 +1,63 @@
-Return-Path: <xiaolou4617@gmail.com>
-From: linzhang <xiaolou4617@gmail.com>
-To: marcel@holtmann.org,
-	gustavo@padovan.org,
-	johan.hedberg@gmail.com,
-	davem@davemloft.net
-Cc: dmitry.tarnyagin@lockless.no,
-	sameo@linux.intel.com,
-	nhorman@tuxdriver.com,
-	linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-wireless@vger.kernel.org,
-	linzhang <xiaolou4617@gmail.com>
-Subject: [PATCH] net: socket: mark socket protocol handler structs as const
-Date: Mon, 15 May 2017 10:26:47 +0800
-Message-Id: <1494815207-9378-1-git-send-email-xiaolou4617@gmail.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+MIME-Version: 1.0
+In-Reply-To: <EA26EA18-6833-47B2-808A-85D43E9768EE@sense.com>
+References: <CA+M2ft9OM_rZhmZy7hxEffE2mw5kGEjvS0WcJcKxkkt_jcxtRQ@mail.gmail.com>
+ <CABBYNZLAD5Z_FP96weVpCMezdjU+Ebu8BQcY1bNdwf8-r2Dxcw@mail.gmail.com> <EA26EA18-6833-47B2-808A-85D43E9768EE@sense.com>
+From: Barry Byford <31baz66@gmail.com>
+Date: Sun, 14 May 2017 21:55:39 +0100
+Message-ID: <CAAu3APYYQ3dZXgw3Ba+39TVt3eDmycdPG8ZrRnZ9-oVX+ML1JQ@mail.gmail.com>
+Subject: Re: Clarification on deprecated tools (e.g. hciconfig)
+To: Jonah Petri <jonah@sense.com>
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        John Hendy <jw.hendy@gmail.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Signed-off-by: linzhang <xiaolou4617@gmail.com>
----
- net/bluetooth/af_bluetooth.c | 2 +-
- net/caif/caif_socket.c       | 2 +-
- net/kcm/kcmsock.c            | 2 +-
- net/nfc/af_nfc.c             | 2 +-
- 4 files changed, 4 insertions(+), 4 deletions(-)
+On 14 May 2017 at 18:25, Jonah Petri <jonah@sense.com> wrote:
+>
+>> On May 14, 2017, at 12:19 PM, Luiz Augusto von Dentz <luiz.dentz@gmail.c=
+om> wrote:
+>>> I'd be happy to update the arch wiki to point to any new information
+>>> provided. For what it's worth, I think the information would be
+>>> relevant in a widely accessible place (the official bluez site in my
+>>> opinion); this question has already popped up in various places. [4]
+>>> [5] [6] [7]
+>>
+>> I guess the most practical solution would be to switch everything to
+>> use bluetoothctl as much as possible, going with raw or mgmt socket
+>> should only be mentioned as a last resort in case something went
+>> wrong.
+>
+> Is bluetoothctl scriptable?  It doesn=E2=80=99t seem to be able to take c=
+ommands in anything but interactive mode.  As far as I can tell, where I us=
+ed to do =E2=80=9Chciconfig hci0 up=E2=80=9D as one line in a shell script,=
+ I now need to write a fully-fledged dbus application to bring up the inter=
+face.  Is my conclusion correct?
 
-diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
-index 42d0997..8a8f77a 100644
---- a/net/bluetooth/af_bluetooth.c
-+++ b/net/bluetooth/af_bluetooth.c
-@@ -733,7 +733,7 @@ void bt_procfs_cleanup(struct net *net, const char *name)
- EXPORT_SYMBOL(bt_procfs_init);
- EXPORT_SYMBOL(bt_procfs_cleanup);
- 
--static struct net_proto_family bt_sock_family_ops = {
-+static const struct net_proto_family bt_sock_family_ops = {
- 	.owner	= THIS_MODULE,
- 	.family	= PF_BLUETOOTH,
- 	.create	= bt_sock_create,
-diff --git a/net/caif/caif_socket.c b/net/caif/caif_socket.c
-index adcad34..4674d17 100644
---- a/net/caif/caif_socket.c
-+++ b/net/caif/caif_socket.c
-@@ -1099,7 +1099,7 @@ static int caif_create(struct net *net, struct socket *sock, int protocol,
- }
- 
- 
--static struct net_proto_family caif_family_ops = {
-+static const struct net_proto_family caif_family_ops = {
- 	.family = PF_CAIF,
- 	.create = caif_create,
- 	.owner = THIS_MODULE,
-diff --git a/net/kcm/kcmsock.c b/net/kcm/kcmsock.c
-index deca20f..da49191 100644
---- a/net/kcm/kcmsock.c
-+++ b/net/kcm/kcmsock.c
-@@ -1985,7 +1985,7 @@ static int kcm_create(struct net *net, struct socket *sock,
- 	return 0;
- }
- 
--static struct net_proto_family kcm_family_ops = {
-+static const struct net_proto_family kcm_family_ops = {
- 	.family = PF_KCM,
- 	.create = kcm_create,
- 	.owner  = THIS_MODULE,
-diff --git a/net/nfc/af_nfc.c b/net/nfc/af_nfc.c
-index 54e40fa..d3e594e 100644
---- a/net/nfc/af_nfc.c
-+++ b/net/nfc/af_nfc.c
-@@ -48,7 +48,7 @@ static int nfc_sock_create(struct net *net, struct socket *sock, int proto,
- 	return rc;
- }
- 
--static struct net_proto_family nfc_sock_family_ops = {
-+static const struct net_proto_family nfc_sock_family_ops = {
- 	.owner  = THIS_MODULE,
- 	.family = PF_NFC,
- 	.create = nfc_sock_create,
--- 
-1.8.3.1
+You can do some scripting like the following with bluetoothctl:
+
+bluetoothctl << EOF
+power on
+EOF
+
+
+You can also do DBus on the command line. Depending on your system it
+might need to be gdbus, dbus-send or busctl etc.
+
+For example with busctl on my system I can do:
+
+busctl call org.bluez /org/bluez/hci0 org.freedesktop.DBus.Properties
+Set ssv org.bluez.Adapter1 Powered b true
+
+busctl call org.bluez /org/bluez/hci0 org.freedesktop.DBus.Properties
+Set ssv org.bluez.Adapter1 Powered b false
+
+
+>
+> Jonah--
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth=
+" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
