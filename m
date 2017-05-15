@@ -1,74 +1,81 @@
-Return-Path: <christopher.spinrath@rwth-aachen.de>
-From: Christopher Spinrath <christopher.spinrath@rwth-aachen.de>
-Subject: [RFC] btmrvl-sdio: FW failed to be active in time!
-To: Marcel Holtmann <marcel@holtmann.org>, Gustavo Padovan
-	<gustavo@padovan.org>, Johan Hedberg <johan.hedberg@gmail.com>
-CC: <linux-bluetooth@vger.kernel.org>, <christopher.spinrath@rwth-aachen.de>,
-	Uli Middelberg <uli@middelberg.de>
-Date: Mon, 15 May 2017 22:00:18 +0200
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Message-ID: <f6a3862d156d4552b2c2a32769909ba3@rwthex-s1-b.rwth-ad.de>
+Return-Path: <xiaolou4617@gmail.com>
+From: linzhang <xiaolou4617@gmail.com>
+To: marcel@holtmann.org,
+	gustavo@padovan.org,
+	johan.hedberg@gmail.com,
+	davem@davemloft.net
+Cc: dmitry.tarnyagin@lockless.no,
+	sameo@linux.intel.com,
+	nhorman@tuxdriver.com,
+	linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-wireless@vger.kernel.org,
+	linzhang <xiaolou4617@gmail.com>
+Subject: [PATCH] net: socket: mark socket protocol handler structs as const
+Date: Mon, 15 May 2017 10:26:47 +0800
+Message-Id: <1494815207-9378-1-git-send-email-xiaolou4617@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi all,
-
-I'm trying to get the on-board wifi/bt chip on my Utilite Pro (an ARM 
-imx6q based device) working. It is an AW-NH387 chip which is based on 
-Marvell's SD8787 chipset.
-
-Unfortunately, the btmrvl{,-sdio} fails to probe with the following error:
-
-	Bluetooth: FW failed to be active in time!
-	Bluetooth: Downloading firmware failed!
-
-The vendor kernel comes with a workaround which also works with recent 
-mainline kernels (e.g. v4.12-rc1): It removes the SD8787 Bluetooth AMP 
-device from the btmrvl_sdio_ids array in btmrvl_sdio.c (see below for a 
-diff against v4.12-rc1). Note that only the AMP device is removed -- the 
-plain SD8787 Bluetooth device entry is still there.
-
-This coincides with the fact that the latest firmware for the sd8787 in 
-linux-firmware does not support the Bluetooth AMP device [1]. So my 
-guess is that the firmware gets messed up when probing for the 
-unsupported AMP device.
-
-Now to my actual question: how do I get this properly supported upstream?
-
-I don't see how I could prevent Linux from probing the AMP device 
-depending on the firmware version or some other condition (i.e. a module 
-parameter). And removing the device entry from the btmrvl_sdio_ids array 
-feels wrong because it is actually correct -- the device is on the sdio bus.
-
-Any help would be very much appreciated!
-
-Cheers,
-Christopher
-
-P.S.: I were also unable to find any other devicetree based board in the 
-upstream tree that uses the sd8787 over sdio, although there is e.g. a 
-dedicated sd8787 mmc-pwrseq driver...
-
-[1] 
-https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/commit/mrvl/sd8787_uapsta.bin?id=690541ee758104fc0e7f4c17af962fa669be1524
-
+Signed-off-by: linzhang <xiaolou4617@gmail.com>
 ---
+ net/bluetooth/af_bluetooth.c | 2 +-
+ net/caif/caif_socket.c       | 2 +-
+ net/kcm/kcmsock.c            | 2 +-
+ net/nfc/af_nfc.c             | 2 +-
+ 4 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/bluetooth/btmrvl_sdio.c 
-b/drivers/bluetooth/btmrvl_sdio.c
-index eb794f0..0635a3d 100644
---- a/drivers/bluetooth/btmrvl_sdio.c
-+++ b/drivers/bluetooth/btmrvl_sdio.c
-@@ -295,9 +295,11 @@ static const struct sdio_device_id 
-btmrvl_sdio_ids[] = {
-	/* Marvell SD8787 Bluetooth device */
-	{ SDIO_DEVICE(SDIO_VENDOR_ID_MARVELL, 0x911A),
-			.driver_data = (unsigned long)&btmrvl_sdio_sd8787 },
-+#if 0
-	/* Marvell SD8787 Bluetooth AMP device */
-	{ SDIO_DEVICE(SDIO_VENDOR_ID_MARVELL, 0x911B),
-			.driver_data = (unsigned long)&btmrvl_sdio_sd8787 },
-+#endif
-	/* Marvell SD8797 Bluetooth device */
-	{ SDIO_DEVICE(SDIO_VENDOR_ID_MARVELL, 0x912A),
-			.driver_data = (unsigned long)&btmrvl_sdio_sd8797 },
+diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
+index 42d0997..8a8f77a 100644
+--- a/net/bluetooth/af_bluetooth.c
++++ b/net/bluetooth/af_bluetooth.c
+@@ -733,7 +733,7 @@ void bt_procfs_cleanup(struct net *net, const char *name)
+ EXPORT_SYMBOL(bt_procfs_init);
+ EXPORT_SYMBOL(bt_procfs_cleanup);
+ 
+-static struct net_proto_family bt_sock_family_ops = {
++static const struct net_proto_family bt_sock_family_ops = {
+ 	.owner	= THIS_MODULE,
+ 	.family	= PF_BLUETOOTH,
+ 	.create	= bt_sock_create,
+diff --git a/net/caif/caif_socket.c b/net/caif/caif_socket.c
+index adcad34..4674d17 100644
+--- a/net/caif/caif_socket.c
++++ b/net/caif/caif_socket.c
+@@ -1099,7 +1099,7 @@ static int caif_create(struct net *net, struct socket *sock, int protocol,
+ }
+ 
+ 
+-static struct net_proto_family caif_family_ops = {
++static const struct net_proto_family caif_family_ops = {
+ 	.family = PF_CAIF,
+ 	.create = caif_create,
+ 	.owner = THIS_MODULE,
+diff --git a/net/kcm/kcmsock.c b/net/kcm/kcmsock.c
+index deca20f..da49191 100644
+--- a/net/kcm/kcmsock.c
++++ b/net/kcm/kcmsock.c
+@@ -1985,7 +1985,7 @@ static int kcm_create(struct net *net, struct socket *sock,
+ 	return 0;
+ }
+ 
+-static struct net_proto_family kcm_family_ops = {
++static const struct net_proto_family kcm_family_ops = {
+ 	.family = PF_KCM,
+ 	.create = kcm_create,
+ 	.owner  = THIS_MODULE,
+diff --git a/net/nfc/af_nfc.c b/net/nfc/af_nfc.c
+index 54e40fa..d3e594e 100644
+--- a/net/nfc/af_nfc.c
++++ b/net/nfc/af_nfc.c
+@@ -48,7 +48,7 @@ static int nfc_sock_create(struct net *net, struct socket *sock, int proto,
+ 	return rc;
+ }
+ 
+-static struct net_proto_family nfc_sock_family_ops = {
++static const struct net_proto_family nfc_sock_family_ops = {
+ 	.owner  = THIS_MODULE,
+ 	.family = PF_NFC,
+ 	.create = nfc_sock_create,
+-- 
+1.8.3.1
