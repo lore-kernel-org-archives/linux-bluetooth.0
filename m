@@ -1,9 +1,9 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Krasi Georgiev <krasi.root@gmail.com>
 Content-Type: text/plain; charset=utf-8
-Subject: How to use  GattProfile1
-Message-Id: <4CF902B9-8221-45E7-9868-52BF18A5EC5D@gmail.com>
-Date: Tue, 16 May 2017 14:42:47 +0300
+Subject: Some pointers how to use  GattProfile1
+Message-Id: <059FF3E6-1D59-44D7-A9D3-1428FA5DDE66@gmail.com>
+Date: Tue, 16 May 2017 14:21:54 +0300
 To: linux-bluetooth@vger.kernel.org
 Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -34,26 +34,8 @@ Linux 4.4.50+   armv6l
 
 
 I tried making the call using with gdbus, but couldn=E2=80=99t figure =
-out how to structure the  osa{sv} paramters
+out how to structure the  osa{sv}=20
 also tried dbus-send , but the tool doesn=E2=80=99t seem to support this =
-structures (no nesting)
+structures as well
 
-
-I am using golang godbus bindings and the call gets executed without an =
-error , but the bluetooth adapter doesn=E2=80=99t auto connect
-
-
-here is the gist
-=
-https://gist.githubusercontent.com/krasi-georgiev/56f88cd18893578fa83c328f=
-038479d6/raw/25f11f2fd7b55d82590732fa8f253febda623645/main.go
-
-go get github.com/godbus/dbus
-wget =
-https://gist.githubusercontent.com/krasi-georgiev/56f88cd18893578fa83c328f=
-038479d6/raw/25f11f2fd7b55d82590732fa8f253febda623645/main.go
-go run main.go
-
-
-I would really appreciate some useful info.
-Thanks=
+I would really appreciate some pointers.=
