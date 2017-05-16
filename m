@@ -1,28 +1,135 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-From: Natalya Rozhnova <rozhnova.natalya@gmail.com>
-Date: Tue, 16 May 2017 10:49:27 +0200
-Message-ID: <CAMybWM3jHv75hrixjk3Ep8Er7Qkw8T5peKTN6SNE3qJLg9n2eg@mail.gmail.com>
-Subject: Understanding Bluez mgmt events
-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <CABBYNZ+mv6v_UN-LFzGCnpzk7EFWUhrHh0KGSwfSv1Pq5Pya1g@mail.gmail.com>
+References: <1494638013-6662-1-git-send-email-ricardo.salveti@linaro.org> <CABBYNZ+mv6v_UN-LFzGCnpzk7EFWUhrHh0KGSwfSv1Pq5Pya1g@mail.gmail.com>
+From: Ricardo Salveti de Araujo <ricardo.salveti@linaro.org>
+Date: Mon, 15 May 2017 23:58:08 -0300
+Message-ID: <CADcgrGvtmQUzBMdZE_MD8zDte_fVKx-1LWfyjB9WWfqyofZROA@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: Check for available le pkts before sending frame
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        Johan Hedberg <johan.hedberg@intel.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello,
+Hi Luiz,
 
-I'm trying to understand the mgmt events in Bluez.
-If I understand correctly, the MGMT_OP_... commands are first sent as following:
+On Sun, May 14, 2017 at 1:00 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi Ricardo,
+>
+> On Sat, May 13, 2017 at 4:13 AM, Ricardo Salveti
+> <ricardo.salveti@linaro.org> wrote:
+>> hci_sched_le only checks for the available le pkts before iterating over
+>> the channel data queue, allowing hci data buffer overflow when quota is
+>> larger than cnt (hci_chan_sent uses both le_cnt and acl_cnt when
+>> calculating quota, both of which are only updated after hci_sched_le is
+>> done with the channel data queue).
+>>
+>> Bug found when using wl1835mod (96boards HiKey) with multiple BT LE
+>> connections:
+>>> HCI Event: Number of Completed Packets (0x13) plen 5
+>>         Num handles: 1
+>>         Handle: 1025
+>>         Count: 2
+>>> HCI Event: Data Buffer Overflow (0x1a) plen 1
+>>         Link type: ACL (0x01)
+>>> HCI Event: Data Buffer Overflow (0x1a) plen 1
+>>         Link type: ACL (0x01)
+>>> HCI Event: Data Buffer Overflow (0x1a) plen 1
+>>         Link type: ACL (0x01)
+>>> HCI Event: Data Buffer Overflow (0x1a) plen 1
+>>         Link type: ACL (0x01)
+>>> HCI Event: Data Buffer Overflow (0x1a) plen 1
+>>         Link type: ACL (0x01)
+>>
+>> Signed-off-by: Ricardo Salveti <ricardo.salveti@linaro.org>
+>> ---
+>>  net/bluetooth/hci_core.c | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+>> index 0568677..58e9ab2 100644
+>> --- a/net/bluetooth/hci_core.c
+>> +++ b/net/bluetooth/hci_core.c
+>> @@ -3938,7 +3938,7 @@ static void hci_sched_le(struct hci_dev *hdev)
+>>         tmp = cnt;
+>>         while (cnt && (chan = hci_chan_sent(hdev, LE_LINK, &quote))) {
+>>                 u32 priority = (skb_peek(&chan->data_q))->priority;
+>> -               while (quote-- && (skb = skb_peek(&chan->data_q))) {
+>> +               while (cnt && quote-- && (skb = skb_peek(&chan->data_q))) {
+>>                         BT_DBG("chan %p skb %p len %d priority %u", chan, skb,
+>>                                skb->len, skb->priority);
+>>
+>> --
+>> 2.7.4
+>
+> This does indeed seems wrong but I think this can also affect the
+> quote since hci_chan_sent does attempt to access the acl_cnt/le_cnt
+> which may lead to return the wrong quote, though checking cnt would
+> fix that as well, because of this perhaps we should actually have the
+> cnt as a pointer so we can update the real cnt in place similarly to
+> what is done for ACL_LINK/acl_cnt:
 
-mgmt_send(adapter->mgmt, MGMT_OP_START_DISCOVERY, ...)
+This is indeed better as it fixes quote and is similar to acl_cnt.
 
-And then it should trigger a corresponding event like
-MGMT_EV_DISCOVERING, MGMT_EV_DEVICE_FOUND etc.
+>  net/bluetooth/hci_core.c | 17 ++++++-----------
+>  1 file changed, 6 insertions(+), 11 deletions(-)
+>
+> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> index 7655b40..8c4c785 100644
+> --- a/net/bluetooth/hci_core.c
+> +++ b/net/bluetooth/hci_core.c
+> @@ -3955,7 +3955,7 @@ static void hci_sched_le(struct hci_dev *hdev)
+>  {
+>   struct hci_chan *chan;
+>   struct sk_buff *skb;
+> - int quote, cnt, tmp;
+> + int quote, *cnt, tmp;
+>
+>   BT_DBG("%s", hdev->name);
+>
+> @@ -3970,9 +3970,9 @@ static void hci_sched_le(struct hci_dev *hdev)
+>   hci_link_tx_to(hdev, LE_LINK);
+>   }
+>
+> - cnt = hdev->le_pkts ? hdev->le_cnt : hdev->acl_cnt;
+> - tmp = cnt;
+> - while (cnt && (chan = hci_chan_sent(hdev, LE_LINK, &quote))) {
+> + cnt = hdev->le_pkts ? &hdev->le_cnt : &hdev->acl_cnt;
+> + tmp = *cnt;
+> + while (*cnt && (chan = hci_chan_sent(hdev, LE_LINK, &quote))) {
+>   u32 priority = (skb_peek(&chan->data_q))->priority;
+>   while (quote-- && (skb = skb_peek(&chan->data_q))) {
+>   BT_DBG("chan %p skb %p len %d priority %u", chan, skb,
+> @@ -3987,18 +3987,13 @@ static void hci_sched_le(struct hci_dev *hdev)
+>   hci_send_frame(hdev, skb);
+>   hdev->le_last_tx = jiffies;
+>
+> - cnt--;
+> + *cnt--;
 
-I'm quite lost in understanding who, where and how generates these
-MGMT_EV... events...
-Could anybody please explain this on a simple example or showing a
-piece of code in bluez sources where it is done...
+This needs to be (*cnt)--; instead.
 
-Thanks in advance for any help,
-Natalya
+>   chan->sent++;
+>   chan->conn->sent++;
+>   }
+>   }
+>
+> - if (hdev->le_pkts)
+> - hdev->le_cnt = cnt;
+> - else
+> - hdev->acl_cnt = cnt;
+> -
+> - if (cnt != tmp)
+> + if (*cnt != tmp)
+>   hci_prio_recalculate(hdev, LE_LINK);
+>  }
+
+Tested with my suggested change and it fixes the original issue. Mind
+sending the updated patch instead then?
+
+Thanks!
+-- 
+Ricardo Salveti
