@@ -1,65 +1,68 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Subject: Re: Determining whether a Bluetooth device supports pairing
+Subject: Re: [RFC] btmrvl-sdio: FW failed to be active in time!
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20170512154514.5a51d896.john@metanate.com>
-Date: Thu, 18 May 2017 16:56:14 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <5C9B4D2C-2410-4FB9-9BBF-F6FDB60BB6B6@holtmann.org>
-References: <20170512154514.5a51d896.john@metanate.com>
-To: John Keeping <john@metanate.com>
+In-Reply-To: <f6a3862d156d4552b2c2a32769909ba3@rwthex-s1-b.rwth-ad.de>
+Date: Thu, 18 May 2017 16:52:56 +0200
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+        Uli Middelberg <uli@middelberg.de>
+Message-Id: <2B69CC60-4F5B-4236-81B8-5BB242D89795@holtmann.org>
+References: <f6a3862d156d4552b2c2a32769909ba3@rwthex-s1-b.rwth-ad.de>
+To: Christopher Spinrath <christopher.spinrath@rwth-aachen.de>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi John,
+Hi Christopher,
 
-> I have a BLE MIDI keyboard which does not support pairing, and so far as
-> I can tell there is no way to determine this via the BlueZ DBus API.
+> I'm trying to get the on-board wifi/bt chip on my Utilite Pro (an ARM imx6q based device) working. It is an AW-NH387 chip which is based on Marvell's SD8787 chipset.
 > 
-> If I try to pair I get the following hcidump trace which does indicate
-> that the device doesn't support pairing:
+> Unfortunately, the btmrvl{,-sdio} fails to probe with the following error:
 > 
-> -- >8 --
-> < ACL data: handle 64 flags 0x00 dlen 11
->    SMP: Pairing Request (0x01)
->      capability 0x03 oob 0x00 auth req 0x09
->      max key size 0x10 init key dist 0x0d resp key dist 0x0f
->      Capability: NoInputNoOutput (OOB data not present)
->      Authentication: Bonding (No MITM Protection)
->      Initiator Key Distribution:  LTK  CSRK
->      Responder Key Distribution:  LTK IRK CSRK
->> ACL data: handle 64 flags 0x02 dlen 6
->    SMP: Pairing Failed (0x05)
->      reason 0x05
->      Reason Pairing Not Supported
-> < HCI Command: Disconnect (0x01|0x0006) plen 3
->    handle 64 reason 0x05
->    Reason: Authentication Failure
->> HCI Event: Command Status (0x0f) plen 4
->    Disconnect (0x01|0x0006) status 0x00 ncmd 1
->> HCI Event: Number of Completed Packets (0x13) plen 5
->    handle 64 packets 1
->> HCI Event: Disconn Complete (0x05) plen 4
->    status 0x00 handle 64 reason 0x16
->    Reason: Connection Terminated by Local Host
-> -- 8< --
+> 	Bluetooth: FW failed to be active in time!
+> 	Bluetooth: Downloading firmware failed!
 > 
-> It seems that if pairing fails, the kernel disconnects from the device
-> and the DBus method returns AuthenticationFailed, but I can't see any
-> way to figure out whether or not a device supports pairing without
-> trying to pair with it.
+> The vendor kernel comes with a workaround which also works with recent mainline kernels (e.g. v4.12-rc1): It removes the SD8787 Bluetooth AMP device from the btmrvl_sdio_ids array in btmrvl_sdio.c (see below for a diff against v4.12-rc1). Note that only the AMP device is removed -- the plain SD8787 Bluetooth device entry is still there.
 > 
-> Am I missing some method for determining whether or not a device
-> supports pairing?  Or do we need to handle SMP_PAIRING_NOTSUPP
-> specially?
+> This coincides with the fact that the latest firmware for the sd8787 in linux-firmware does not support the Bluetooth AMP device [1]. So my guess is that the firmware gets messed up when probing for the unsupported AMP device.
 > 
-> I'm happy to work up some patches if the latter, but I'd like to make
-> sure I'm heading in a sensible direction before starting on that!
+> Now to my actual question: how do I get this properly supported upstream?
+> 
+> I don't see how I could prevent Linux from probing the AMP device depending on the firmware version or some other condition (i.e. a module parameter). And removing the device entry from the btmrvl_sdio_ids array feels wrong because it is actually correct -- the device is on the sdio bus.
+> 
+> Any help would be very much appreciated!
+> 
+> Cheers,
+> Christopher
+> 
+> P.S.: I were also unable to find any other devicetree based board in the upstream tree that uses the sd8787 over sdio, although there is e.g. a dedicated sd8787 mmc-pwrseq driver...
+> 
+> [1] https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/commit/mrvl/sd8787_uapsta.bin?id=690541ee758104fc0e7f4c17af962fa669be1524
+> 
+> ---
+> 
+> diff --git a/drivers/bluetooth/btmrvl_sdio.c b/drivers/bluetooth/btmrvl_sdio.c
+> index eb794f0..0635a3d 100644
+> --- a/drivers/bluetooth/btmrvl_sdio.c
+> +++ b/drivers/bluetooth/btmrvl_sdio.c
+> @@ -295,9 +295,11 @@ static const struct sdio_device_id btmrvl_sdio_ids[] = {
+> 	/* Marvell SD8787 Bluetooth device */
+> 	{ SDIO_DEVICE(SDIO_VENDOR_ID_MARVELL, 0x911A),
+> 			.driver_data = (unsigned long)&btmrvl_sdio_sd8787 },
+> +#if 0
+> 	/* Marvell SD8787 Bluetooth AMP device */
+> 	{ SDIO_DEVICE(SDIO_VENDOR_ID_MARVELL, 0x911B),
+> 			.driver_data = (unsigned long)&btmrvl_sdio_sd8787 },
+> +#endif
+> 	/* Marvell SD8797 Bluetooth device */
+> 	{ SDIO_DEVICE(SDIO_VENDOR_ID_MARVELL, 0x912A),
+> 			.driver_data = (unsigned long)&btmrvl_sdio_sd8797 },
 
-I do not remember any indication from the Bluetooth Core specification that would tell you in advance if you support pairing or not. Mainly since most devices actually just support pairing. Can you show us the btmon trace output of the advertising reports.
+fundamentally Marvell has to tell us how to probe this SDIO function and not crashing. If they expose the SDIO function, we should be able to probe it and check support for it.
 
-One thing that I can think of is that Pair Device should return a reasonable error code so that bluetoothd can detect non-supported pairing and treat it as non-bonded device. Best would be a full btmon -w trace.log trace with a recent kernel that also monitors mgmt commands and events.
+Also any chance you can run btmon -w trace.log and then load the kernel module. Maybe it is something in the HCI init phase that we could work out.
 
 Regards
 
