@@ -1,69 +1,65 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Subject: Re: [PATCH] bluetooth: hci_ll: add proper SERDEV dependency
+Subject: Re: Determining whether a Bluetooth device supports pairing
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20170511114223.2744939-1-arnd@arndb.de>
-Date: Thu, 18 May 2017 16:58:46 +0200
-Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Rob Herring <robh@kernel.org>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Andy Gross <andy.gross@linaro.org>,
-        Loic Poulain <loic.poulain@intel.com>,
-        Sebastian Reichel <sre@kernel.org>,
-        Javier Martinez Canillas <javier@osg.samsung.com>,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Message-Id: <F0016B65-D5E6-4487-9932-8B1A1064224F@holtmann.org>
-References: <20170511114223.2744939-1-arnd@arndb.de>
-To: Arnd Bergmann <arnd@arndb.de>
+In-Reply-To: <20170512154514.5a51d896.john@metanate.com>
+Date: Thu, 18 May 2017 16:56:14 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <5C9B4D2C-2410-4FB9-9BBF-F6FDB60BB6B6@holtmann.org>
+References: <20170512154514.5a51d896.john@metanate.com>
+To: John Keeping <john@metanate.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arnd,
+Hi John,
 
-> When SERDEV is a loadable module, and the HCI code is built-in, we
-> get a link error:
+> I have a BLE MIDI keyboard which does not support pairing, and so far as
+> I can tell there is no way to determine this via the BlueZ DBus API.
 > 
-> drivers/bluetooth/built-in.o: In function `ll_close':
-> hci_ll.c:(.text+0x278d): undefined reference to `serdev_device_close'
-> drivers/bluetooth/built-in.o: In function `hci_ti_probe':
-> hci_ll.c:(.text+0x283c): undefined reference to `hci_uart_register_device'
-> drivers/bluetooth/built-in.o: In function `ll_setup':
-> hci_ll.c:(.text+0x289e): undefined reference to `serdev_device_set_flow_control'
-> hci_ll.c:(.text+0x2b9c): undefined reference to `serdev_device_set_baudrate'
-> drivers/bluetooth/built-in.o: In function `ll_open':
-> hci_ll.c:(.text+0x2c77): undefined reference to `serdev_device_open'
-> drivers/bluetooth/built-in.o: In function `ll_init':
-> (.init.text+0x10d): undefined reference to `__serdev_device_driver_register'
+> If I try to pair I get the following hcidump trace which does indicate
+> that the device doesn't support pairing:
 > 
-> We already have CONFIG_BT_HCIUART_SERDEV as a Kconfig symbol that is
-> set when the serdev code is reachable by a driver. Unlike the nokia
-> driver, this one can also be built when serdev is completely disabled,
-> so we add a dependency on serdev either being usable or disabled here.
+> -- >8 --
+> < ACL data: handle 64 flags 0x00 dlen 11
+>    SMP: Pairing Request (0x01)
+>      capability 0x03 oob 0x00 auth req 0x09
+>      max key size 0x10 init key dist 0x0d resp key dist 0x0f
+>      Capability: NoInputNoOutput (OOB data not present)
+>      Authentication: Bonding (No MITM Protection)
+>      Initiator Key Distribution:  LTK  CSRK
+>      Responder Key Distribution:  LTK IRK CSRK
+>> ACL data: handle 64 flags 0x02 dlen 6
+>    SMP: Pairing Failed (0x05)
+>      reason 0x05
+>      Reason Pairing Not Supported
+> < HCI Command: Disconnect (0x01|0x0006) plen 3
+>    handle 64 reason 0x05
+>    Reason: Authentication Failure
+>> HCI Event: Command Status (0x0f) plen 4
+>    Disconnect (0x01|0x0006) status 0x00 ncmd 1
+>> HCI Event: Number of Completed Packets (0x13) plen 5
+>    handle 64 packets 1
+>> HCI Event: Disconn Complete (0x05) plen 4
+>    status 0x00 handle 64 reason 0x16
+>    Reason: Connection Terminated by Local Host
+> -- 8< --
 > 
-> Fixes: 371805522f87 ("bluetooth: hci_uart: add LL protocol serdev driver support")
-> Cc: Rob Herring <robh@kernel.org>
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-> ---
-> drivers/bluetooth/Kconfig | 1 +
-> 1 file changed, 1 insertion(+)
+> It seems that if pairing fails, the kernel disconnects from the device
+> and the DBus method returns AuthenticationFailed, but I can't see any
+> way to figure out whether or not a device supports pairing without
+> trying to pair with it.
 > 
-> diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
-> index a63130ef2b98..b2cf0ae6b62d 100644
-> --- a/drivers/bluetooth/Kconfig
-> +++ b/drivers/bluetooth/Kconfig
-> @@ -133,6 +133,7 @@ config BT_HCIUART_ATH3K
-> config BT_HCIUART_LL
-> 	bool "HCILL protocol support"
-> 	depends on BT_HCIUART
-> +	depends on BT_HCIUART_SERDEV || SERIAL_DEV_BUS=n
-> 	help
-> 	  HCILL (HCI Low Level) is a serial protocol for communication
-> 	  between Bluetooth device and host. This protocol is required for
+> Am I missing some method for determining whether or not a device
+> supports pairing?  Or do we need to handle SMP_PAIRING_NOTSUPP
+> specially?
+> 
+> I'm happy to work up some patches if the latter, but I'd like to make
+> sure I'm heading in a sensible direction before starting on that!
 
-this does not apply against bluetooth-next tree. Can you respin it with the acks.
+I do not remember any indication from the Bluetooth Core specification that would tell you in advance if you support pairing or not. Mainly since most devices actually just support pairing. Can you show us the btmon trace output of the advertising reports.
+
+One thing that I can think of is that Pair Device should return a reasonable error code so that bluetoothd can detect non-supported pairing and treat it as non-bonded device. Best would be a full btmon -w trace.log trace with a recent kernel that also monitors mgmt commands and events.
 
 Regards
 
