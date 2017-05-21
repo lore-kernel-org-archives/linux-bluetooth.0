@@ -1,56 +1,33 @@
-Return-Path: <elfring@users.sourceforge.net>
-To: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
- "David S. Miller" <davem@davemloft.net>,
- Gustavo Padovan <gustavo@padovan.org>,
- Johan Hedberg <johan.hedberg@gmail.com>,
- Marcel Holtmann <marcel@holtmann.org>
-From: SF Markus Elfring <elfring@users.sourceforge.net>
-Subject: [PATCH] Bluetooth: Delete error messages for failed memory
- allocations in two functions
-Cc: LKML <linux-kernel@vger.kernel.org>, kernel-janitors@vger.kernel.org
-Message-ID: <0afbfdb7-48f1-4d15-d5bd-8ea40b1eb52a@users.sourceforge.net>
-Date: Mon, 22 May 2017 08:54:49 +0200
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+To: linux-bluetooth@vger.kernel.org
+From: "s.achterop@rug.nl" <s.achterop@rug.nl>
+Subject: How to create multiple rfcomm devices with a set name
+Message-ID: <c41a61c1-73f9-3e9a-ae18-c778a7db09f9@rug.nl>
+Date: Sun, 21 May 2017 16:35:50 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=iso-8859-15; format=flowed
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Markus Elfring <elfring@users.sourceforge.net>
-Date: Mon, 22 May 2017 08:42:28 +0200
+   Dear list,
 
-Omit two extra messages for memory allocation failures in these functions.
+I created a number of robot-vehicles that are controlled using bluetooth/rfcomm.
+They are all controlled	via a single PC	that uses different /dev/rfcommx devices.
 
-This issue was detected by using the Coccinelle software.
+Earlier I used /etc/bluetooth/rfcomm.conf with lines such as:
+     rfcomm117 {bind yes; device 10:00:E8:6C:EC:98; channel 1; comment "dtpa_117"; }
+The name of the	robot is dtpa_117, and by connecting to	rfcomm117 I know I am talking via rfcomm to dtpa_117.
 
-Link: http://events.linuxfoundation.org/sites/events/files/slides/LCJ16-Refactor_Strings-WSang_0.pdf
-Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
----
- net/bluetooth/ecdh_helper.c | 11 +++--------
- 1 file changed, 3 insertions(+), 8 deletions(-)
+Now with debian/stretch	and ubuntu/16.04 (and rfcomm.conf not working anymore) i need something simular.
+My question is how do I create a rfcomm-device that matches the above rule.
+I only can create rfcomm0 devices.
 
-diff --git a/net/bluetooth/ecdh_helper.c b/net/bluetooth/ecdh_helper.c
-index 24d4e60f8c48..c7b1a9aee579 100644
---- a/net/bluetooth/ecdh_helper.c
-+++ b/net/bluetooth/ecdh_helper.c
-@@ -92,8 +92,6 @@ bool compute_ecdh_secret(const u8 public_key[64], const u8 private_key[32],
--	if (!buf) {
--		pr_err("alg: kpp: Failed to allocate %d bytes for buf\n",
--		       buf_len);
-+	if (!buf)
- 		goto free_req;
--	}
-+
- 	crypto_ecdh_encode_key(buf, buf_len, &p);
- 
- 	/* Set A private Key */
-@@ -173,8 +171,5 @@ bool generate_ecdh_keys(u8 public_key[64], u8 private_key[32])
--	if (!buf) {
--		pr_err("alg: kpp: Failed to allocate %d bytes for buf\n",
--		       buf_len);
-+	if (!buf)
- 		goto free_req;
--	}
- 
- 	do {
- 		if (tries++ >= max_tries)
--- 
-2.13.0
+My second question is how to create these devices automatically, using the information from the rfcomm.conf file.
+Can this be done via udev rules? Or via	a systemd service?
+I already searched quite a lot in the mailing list and on the net, but now got more or less stuck.
+
+   Hopefully someone can	give me	a pointer on these two questions,
+      Thanks in advance,
+       	 Sietse	Achterop
+          University of Groningen, The Netherlands.
+
