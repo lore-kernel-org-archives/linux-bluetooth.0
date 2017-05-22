@@ -1,45 +1,41 @@
-Return-Path: <dan.carpenter@oracle.com>
-Date: Tue, 23 May 2017 08:34:00 +0300
-From: Dan Carpenter <dan.carpenter@oracle.com>
-To: marcel@holtmann.org
-Cc: linux-bluetooth@vger.kernel.org, Laura Abbott <labbott@redhat.com>
-Subject: [bug report] Bluetooth: Fix memory leaking when hdev->send returns
- an error
-Message-ID: <20170523053400.GA3371@elgon.mountain>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Return-Path: <guodong.xu@linaro.org>
+From: Guodong Xu <guodong.xu@linaro.org>
+To: marcel@holtmann.org,
+	gustavo@padovan.org,
+	johan.hedberg@gmail.com,
+	robh@kernel.org
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	Guodong Xu <guodong.xu@linaro.org>
+Subject: [PATCH] Bluetooth: hci_ll: Fix download_firmware() return when __hci_cmd_sync fails
+Date: Mon, 22 May 2017 21:50:42 +0800
+Message-Id: <20170522135042.10921-1-guodong.xu@linaro.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello Marcel Holtmann,
+When __hci_cmd_sync() fails, download_firmware() should also fail, and
+the same error value should be returned as PTR_ERR(skb).
 
-The patch cdc52faac5f3: "Bluetooth: Fix memory leaking when
-hdev->send returns an error" from Jul 6, 2014, leads to the following
-static checker warning:
+Without this fix, download_firmware() will return a success when it actually
+failed in __hci_cmd_sync().
 
-	net/bluetooth/hci_core.c:3385 hci_send_frame()
-	warn: 'skb' was already freed.
+Fixes: 371805522f87 ("bluetooth: hci_uart: add LL protocol serdev driver support")
+Signed-off-by: Guodong Xu <guodong.xu@linaro.org>
+---
+ drivers/bluetooth/hci_ll.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-net/bluetooth/hci_core.c
-  3377          if (!test_bit(HCI_RUNNING, &hdev->flags)) {
-  3378                  kfree_skb(skb);
-  3379                  return;
-  3380          }
-  3381  
-  3382          err = hdev->send(hdev, skb);
-  3383          if (err < 0) {
-  3384                  BT_ERR("%s sending frame failed (%d)", hdev->name, err);
-  3385                  kfree_skb(skb);
-  3386          }
-
-
-The ti_st_send_frame() frees skb on error.  I'm surprised this bug
-wasn't found by KAsan when we found acf91ec384dd ("Bluetooth: btwilink:
-Save the packet type before sending").
-
-I don't totally understand how skb is freed on the success path either.
-bfusb_send_frame(), dtl1_hci_send_frame() and btqcomsmd_send() have
-calls to kfree_skb() but I can't find the calls in bpa10x_send_frame()
-or the other ->send functions.
-
-regards,
-dan carpenter
+diff --git a/drivers/bluetooth/hci_ll.c b/drivers/bluetooth/hci_ll.c
+index adc444f..200288c 100644
+--- a/drivers/bluetooth/hci_ll.c
++++ b/drivers/bluetooth/hci_ll.c
+@@ -624,6 +624,7 @@ static int download_firmware(struct ll_device *lldev)
+ 			skb = __hci_cmd_sync(lldev->hu.hdev, cmd->opcode, cmd->plen, &cmd->speed, HCI_INIT_TIMEOUT);
+ 			if (IS_ERR(skb)) {
+ 				bt_dev_err(lldev->hu.hdev, "send command failed\n");
++				err = PTR_ERR(skb);
+ 				goto out_rel_fw;
+ 			}
+ 			kfree_skb(skb);
+-- 
+2.10.2
