@@ -1,41 +1,199 @@
-Return-Path: <guodong.xu@linaro.org>
-From: Guodong Xu <guodong.xu@linaro.org>
-To: marcel@holtmann.org,
-	gustavo@padovan.org,
-	johan.hedberg@gmail.com,
-	robh@kernel.org
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	Guodong Xu <guodong.xu@linaro.org>
-Subject: [PATCH] Bluetooth: hci_ll: Fix download_firmware() return when __hci_cmd_sync fails
-Date: Mon, 22 May 2017 21:50:42 +0800
-Message-Id: <20170522135042.10921-1-guodong.xu@linaro.org>
+Return-Path: <john@metanate.com>
+Date: Mon, 22 May 2017 12:15:03 +0100
+From: John Keeping <john@metanate.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: Determining whether a Bluetooth device supports pairing
+Message-ID: <20170522121503.126355ed.john@metanate.com>
+In-Reply-To: <5C9B4D2C-2410-4FB9-9BBF-F6FDB60BB6B6@holtmann.org>
+References: <20170512154514.5a51d896.john@metanate.com>
+	<5C9B4D2C-2410-4FB9-9BBF-F6FDB60BB6B6@holtmann.org>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="MP_/sMtLXh3L29O.oa0yUw3HImu"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When __hci_cmd_sync() fails, download_firmware() should also fail, and
-the same error value should be returned as PTR_ERR(skb).
+--MP_/sMtLXh3L29O.oa0yUw3HImu
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-Without this fix, download_firmware() will return a success when it actually
-failed in __hci_cmd_sync().
+Hi Marcel,
 
-Fixes: 371805522f87 ("bluetooth: hci_uart: add LL protocol serdev driver support")
-Signed-off-by: Guodong Xu <guodong.xu@linaro.org>
----
- drivers/bluetooth/hci_ll.c | 1 +
- 1 file changed, 1 insertion(+)
+On Thu, 18 May 2017 16:56:14 +0200, Marcel Holtmann wrote:
 
-diff --git a/drivers/bluetooth/hci_ll.c b/drivers/bluetooth/hci_ll.c
-index adc444f..200288c 100644
---- a/drivers/bluetooth/hci_ll.c
-+++ b/drivers/bluetooth/hci_ll.c
-@@ -624,6 +624,7 @@ static int download_firmware(struct ll_device *lldev)
- 			skb = __hci_cmd_sync(lldev->hu.hdev, cmd->opcode, cmd->plen, &cmd->speed, HCI_INIT_TIMEOUT);
- 			if (IS_ERR(skb)) {
- 				bt_dev_err(lldev->hu.hdev, "send command failed\n");
-+				err = PTR_ERR(skb);
- 				goto out_rel_fw;
- 			}
- 			kfree_skb(skb);
--- 
-2.10.2
+> > Am I missing some method for determining whether or not a device
+> > supports pairing?  Or do we need to handle SMP_PAIRING_NOTSUPP
+> > specially?
+> 
+> I do not remember any indication from the Bluetooth Core specification
+> that would tell you in advance if you support pairing or not. Mainly
+> since most devices actually just support pairing. Can you show us the
+> btmon trace output of the advertising reports.
+
+Here's the advertising report and scan response:
+
+-- >8 --
+> HCI Event: LE Meta Event (0x3e) plen 33
+      LE Advertising Report (0x02)
+        Num reports: 1
+        Event type: Connectable undirected - ADV_IND (0x00)
+        Address type: Public (0x00)
+        Address: A0:E6:F8:4A:AE:AD (Texas Instruments)
+        Data length: 21
+        Flags: 0x06
+          LE General Discoverable Mode
+          BR/EDR Not Supported
+        128-bit Service UUIDs (complete): 1 entry
+          Vendor specific (03b80e5a-ede8-4b33-a751-6ce34ec4c700)
+        RSSI: -66 dBm (0xbe)
+> HCI Event: LE Meta Event (0x3e) plen 42
+      LE Advertising Report (0x02)
+        Num reports: 1
+        Event type: Scan response - SCAN_RSP (0x04)
+        Address type: Public (0x00)
+        Address: A0:E6:F8:4A:AE:AD (Texas Instruments)
+        Data length: 30
+        Name (complete): Akai LPK25 Wireless
+        Slave Conn. Interval: 0x000a - 0x0014
+        TX power: 0 dBm
+        RSSI: -67 dBm (0xbd)
+-- 8< --
+
+> One thing that I can think of is that Pair Device should return a
+> reasonable error code so that bluetoothd can detect non-supported
+> pairing and treat it as non-bonded device. Best would be a full btmon
+> -w trace.log trace with a recent kernel that also monitors mgmt
+> commands and events.
+
+I've attached the full trace, but I think this is the interesting
+section:
+
+-- >8 --
+@ MGMT Command: Pair Device (0x0019) plen 8
+        LE Address: A0:E6:F8:4A:AE:AD (Texas Instruments)
+        Capability: KeyboardDisplay (0x04)
+< ACL Data TX: Handle 3585 flags 0x00 dlen 11
+      SMP: Pairing Request (0x01) len 6
+        IO capability: KeyboardDisplay (0x04)
+        OOB data: Authentication data not present (0x00)
+        Authentication requirement: Bonding, MITM, SC, No Keypresses, CT2 (0x2d)
+        Max encryption key size: 16
+        Initiator key distribution: EncKey Sign LinkKey (0x0d)
+        Responder key distribution: EncKey IdKey Sign LinkKey (0x0f)
+> HCI Event: Number of Completed Packets (0x13) plen 5
+        Num handles: 1
+        Handle: 3585
+        Count: 1
+> ACL Data RX: Handle 3585 flags 0x02 dlen 6
+      SMP: Pairing Failed (0x05) len 1
+        Reason: Pairing not supported (0x05)
+@ MGMT Event: Authentication Failed (0x0011) plen 8
+        LE Address: A0:E6:F8:4A:AE:AD (Texas Instruments)
+        Status: Authentication Failed (0x05)
+@ MGMT Event: Command Complete (0x0001) plen 10
+      Pair Device (0x0019) plen 7
+        Status: Authentication Failed (0x05)
+        LE Address: A0:E6:F8:4A:AE:AD (Texas Instruments)
+< HCI Command: Disconnect (0x01|0x0006) plen 3
+        Handle: 3585
+        Reason: Authentication Failure (0x05)
+> HCI Event: Command Status (0x0f) plen 4
+      Disconnect (0x01|0x0006) ncmd 1
+        Status: Success (0x00)
+> HCI Event: Disconnect Complete (0x05) plen 4
+        Status: Success (0x00)
+        Handle: 3585
+        Reason: Connection Terminated By Local Host (0x16)
+@ MGMT Event: Device Disconnected (0x000c) plen 8
+        LE Address: A0:E6:F8:4A:AE:AD (Texas Instruments)
+        Reason: Connection terminated by local host (0x02)
+-- 8< --
+
+
+Regards,
+John
+
+--MP_/sMtLXh3L29O.oa0yUw3HImu
+Content-Type: application/octet-stream; name=lpk25.log
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename=lpk25.log
+
+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
+AQ==
+
+--MP_/sMtLXh3L29O.oa0yUw3HImu--
