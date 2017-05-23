@@ -1,34 +1,20 @@
-Return-Path: <linux-kernel-owner@vger.kernel.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 Content-Type: text/plain; charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Subject: Re: [PATCH] Bluetooth: btintel: Add MODULE_FIRMWARE entries for iBT
- 3.5 controllers
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20170523164625.21298-1-j@bitron.ch>
-Date: Tue, 23 May 2017 10:56:21 -0700
-Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-        linux-kernel@vger.kernel.org
-Message-Id: <158ADB44-39C4-4CD8-8827-90CAF6E80B13@holtmann.org>
-References: <20170523164625.21298-1-j@bitron.ch>
-To: =?utf-8?Q?J=C3=BCrg_Billeter?= <j@bitron.ch>
-Sender: linux-kernel-owner@vger.kernel.org
+Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
+Subject: Re: How to use GattProfile1
+From: Krasi Georgiev <krasi.root@gmail.com>
+In-Reply-To: <4AE62BC6-BD11-44C7-9A0E-BC3159ED80DF@gmail.com>
+Date: Tue, 23 May 2017 20:55:37 +0300
+Cc: Barry Byford <31baz66@gmail.com>,
+        Bluez mailing list <linux-bluetooth@vger.kernel.org>
+Message-Id: <4C907B25-D8E4-462C-89FA-AB312A27CBE9@gmail.com>
+References: <4CF902B9-8221-45E7-9868-52BF18A5EC5D@gmail.com> <CAAu3APYsHqAK=Kk-fzQmhhBOfnayTDB_N_Q2yCuOhr+akvxfLg@mail.gmail.com> <C1394BB3-3C11-410C-916F-80A7863C0A2B@gmail.com> <969738CC-B335-4E2F-BF3C-441110279871@gmail.com> <CAAu3APard0ZM-+++qm8938+iWkUUfNkjvq1M9cLqngtZYJAzRg@mail.gmail.com> <F1876BDF-4DC0-4CB0-A20F-2E64E24A3B92@gmail.com> <CABBYNZ+R7dV5i+BQowigf5eddB4yxSki+xLeLFYBrN4Sfe8mJA@mail.gmail.com> <4AE62BC6-BD11-44C7-9A0E-BC3159ED80DF@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Juerg,
 
-> The iBT 3.5 controllers (Intel 8265, Windstorm Peak) need
-> intel/ibt-12-16.sfi and intel/ibt-12-16.ddc firmware files from
-> linux-firmware repository.
-> 
-> Signed-off-by: Jürg Billeter <j@bitron.ch>
-> ---
-> drivers/bluetooth/btintel.c | 2 ++
-> 1 file changed, 2 insertions(+)
-
-patch has been applied to bluetooth-next tree.
-
-Regards
-
-Marcel
+Great talk from Szymon by the way I learned a lot combined with with =
+reading the docs.
+I really hope my question is not too stupid.=20
+I am stuck at this step in  my app and can=E2=80=99t continue.=
