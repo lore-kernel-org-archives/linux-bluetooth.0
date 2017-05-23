@@ -1,133 +1,71 @@
-Return-Path: <netdev-owner@vger.kernel.org>
-Date: Tue, 23 May 2017 17:11:20 -0700
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: davem@davemloft.net
-Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: pull request: bluetooth-next 2017-05-23
-Message-ID: <20170524001120.GA3971@x1c.Skamania.guest>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-        protocol="application/pgp-signature"; boundary="YZ5djTAD1cGYuMQK"
-Sender: netdev-owner@vger.kernel.org
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: mcchou@chromium.org
+To: linux-bluetooth@vger.kernel.org
+Cc: josephsih@chromium.org, sonnysasaka@chromium.org, rkc@chromium.org,
+        Miao-chen Chou <mcchou@chromium.org>
+Subject: [PATCH v2] device: Clear GATT DB after disconnection for unpaired device
+Date: Tue, 23 May 2017 12:56:50 -0700
+Message-Id: <20170523195650.29695-1-mcchou@chromium.org>
+In-Reply-To: <20170523191112.190500-1-mcchou@chromium.org>
+References: <20170523191112.190500-1-mcchou@chromium.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+From: Miao-chen Chou <mcchou@chromium.org>
 
---YZ5djTAD1cGYuMQK
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+This patch adds gatt_db_cleanup() function to clear client-role GATT DB for the
+unpaired device. According to Core Specification v4.2 [1] and v5.0 [2], the
+attributes should be cleared between unbonded devices after disconnection, since
+the attributes are no long valid.
 
-Hi Dave,
-
-Here's the first Bluetooth & 802.15.4 pull request targeting the 4.13
-kernel release.
-
- - Bluetooth 5.0 improvements (Data Length Extensions and alternate PHY)
- - Support for new Intel Bluetooth adapter [[8087:0aaa]
- - Various fixes to ieee802154 code
- - Various fixes to HCI UART code
-
-Please let me know if there are any issues pulling. Thanks.
-
-Johan
-
+[1] Page 525, Section 2.5.2 Attribute Caching, Part G, Volume 3: "For clients
+that do not have a trusted relationship with the server, the attribute cache is
+valid only during the connection."
+[2] Page 2227, Section 2.5.2 Attribute Caching, Part G, Volume 3: "For clients
+that do not have a trusted relationship with the server, the attribute cache is
+valid only during the connection."
 ---
-The following changes since commit 1fc4d180b3c6bed0e7f5160bcd553aec89594962:
+ src/device.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
-  Merge branch 'phy-marvell-cleanups' (2017-05-17 16:27:52 -0400)
+diff --git a/src/device.c b/src/device.c
+index 1b05561e4..9a6135e47 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -267,6 +267,7 @@ struct pending_sdp_query {
 
-are available in the git repository at:
+ static int device_browse_gatt(struct btd_device *device, DBusMessage *msg);
+ static int device_browse_sdp(struct btd_device *device, DBusMessage *msg);
++static void store_gatt_db(struct btd_device *device);
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.gi=
-t for-upstream
+ static struct pending_sdp_query *pending_sdp_query_new(DBusConnection *conn,
+ 				DBusMessage *msg, const struct btd_device *dev)
+@@ -546,6 +547,15 @@ static void browse_request_free(struct browse_req *req)
+ 	g_free(req);
+ }
 
-for you to fetch changes up to 7dab5467647be42736dcabcd5d035c7b571f4653:
++static void gatt_db_cleanup(struct btd_device* device)
++{
++	if (!device->db)
++		return;
++
++	gatt_db_clear(device->db);
++	store_gatt_db(device);
++}
++
+ static void gatt_client_cleanup(struct btd_device *device)
+ {
+ 	if (!device->client)
+@@ -578,6 +588,9 @@ static void attio_cleanup(struct btd_device *device)
+ 		device->att_io = NULL;
+ 	}
 
-  net: ieee802154: fix potential null pointer dereference (2017-05-23 20:12=
-:53 +0200)
++	if (device->bredr_state.bonded || device->le_state.bonded)
++		gatt_db_cleanup(device);
++
+ 	gatt_client_cleanup(device);
+ 	gatt_server_cleanup(device);
 
-----------------------------------------------------------------
-Alexander Aring (1):
-      MAINTAINERS: update my mail address
+--
+2.13.0.219.gdb65acc882-goog
 
-Dean Jenkins (1):
-      Bluetooth: hci_ldisc: Use rwlocking to avoid closing proto races
-
-Guodong Xu (1):
-      Bluetooth: hci_ll: Fix download_firmware() return when __hci_cmd_sync=
- fails
-
-Gustavo A. R. Silva (1):
-      net: ieee802154: fix potential null pointer dereference
-
-J=FCrg Billeter (1):
-      Bluetooth: btintel: Add MODULE_FIRMWARE entries for iBT 3.5 controlle=
-rs
-
-Lin Zhang (2):
-      net: ieee802154: remove explicit set skb->sk
-      net: ieee802154: fix net_device reference release too early
-
-Loic Poulain (1):
-      Bluetooth: btwilink: Fix unexpected skb free
-
-Marcel Holtmann (5):
-      Bluetooth: Set LE Suggested Default Data Length to maximum
-      Bluetooth: Enable LE Channel Selection Algorithm event
-      Bluetooth: Enable LE PHY Update Complete event
-      Bluetooth: Set LE Default PHY preferences
-      Bluetooth: Skip vendor diagnostic configuration for HCI User Channel
-
-Markus Elfring (3):
-      Bluetooth: Delete error messages for failed memory allocations in two=
- functions
-      ieee802154: ca8210: Delete an error message for a failed memory alloc=
-ation in ca8210_probe()
-      ieee802154: ca8210: Delete an error message for a failed memory alloc=
-ation in ca8210_skb_rx()
-
-Tedd Ho-Jeong An (1):
-      Bluetooth: Add support for Intel Bluetooth device 9460/9560 [8087:0aa=
-a]
-
-Tobias Regnery (2):
-      Bluetooth: hci_uart: fix kconfig dependency
-      Bluetooth: hci_nokia: select BT_HCIUART_H4
-
- MAINTAINERS                     |  4 ++--
- drivers/bluetooth/Kconfig       |  3 ++-
- drivers/bluetooth/btintel.c     |  2 ++
- drivers/bluetooth/btusb.c       |  4 ++++
- drivers/bluetooth/btwilink.c    |  1 -
- drivers/bluetooth/hci_ldisc.c   | 40 ++++++++++++++++++++++++++++++-----
- drivers/bluetooth/hci_ll.c      |  1 +
- drivers/bluetooth/hci_uart.h    |  1 +
- drivers/net/ieee802154/ca8210.c | 12 ++++-------
- include/net/bluetooth/hci.h     |  8 +++++++
- net/bluetooth/ecdh_helper.c     | 11 +++-------
- net/bluetooth/hci_core.c        | 46 ++++++++++++++++++++++++++++++++++++-=
-----
- net/ieee802154/socket.c         | 10 ++++-----
- 13 files changed, 107 insertions(+), 36 deletions(-)
-
---YZ5djTAD1cGYuMQK
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIcBAEBAgAGBQJZJM+oAAoJECQj9vv5qNQSudIP/iej5TKN1QXWlRgFeJPy3f9d
-vsA0mNU8J5xK5B26N8V/9xhutu7vW7GIlS5xKu1I5vDGY9ZFw20qRXvYAtJXEuUF
-/5nQA2XpiTwVkwzvU/aoHZK7I4kuiWUJa0YEfeeLWVEf+P7APlkXPaDsokeesXbL
-IgRiGi3/KCvoOq0n/Ce8zBG2ehx0+qWLG/Bh/ItR9HZICKnjVZ9kVVLV16c195wt
-5zoPACippXiPSdV3KXQJTYsXX7vLA+3uWS6MIxqKo+F8VSptwtNfMDNNbDAQMCqB
-1wRKr6a1DKQADKnpVJ26SNpRclIwlL40XdaiaKNxDVzPJZPFndr8PomCV+lfq+BY
-vvdQbUCDVEDPdlkBKzrFpcA/i26JbZZ+HmZLZ6INIVbdL4rhswC58My+lJ3hIxuN
-E8v1ugOFeNaQ4Mb18y56j9CUYTtl52MXZDGq7eIPIjBbElGyTxlXFO+F/VjAmfwD
-vHwGLxj4SYQooFKDY4UZmECydKDiTUaQQzP5Dz51Xd7z+N9o7ONFo2YCvtSsQGtY
-2POxw6iqWLjn4RQm/dY7Paw662alH1854J2o3yB7xxEaYue6oQ4sKiaFnfkjkOLY
-GQeqf8D/rQ1+KPNirMa2/wGhsWUZA++7U7wzwPHXqqwJrg7w7cJVFwEOW+H4Ghex
-vM5bIAMwVbvwb598i+Cf
-=PJlE
------END PGP SIGNATURE-----
-
---YZ5djTAD1cGYuMQK--
