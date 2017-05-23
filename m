@@ -1,20 +1,36 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain; charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
-Subject: Re: How to use GattProfile1
-From: Krasi Georgiev <krasi.root@gmail.com>
-In-Reply-To: <4AE62BC6-BD11-44C7-9A0E-BC3159ED80DF@gmail.com>
-Date: Tue, 23 May 2017 20:55:37 +0300
-Cc: Barry Byford <31baz66@gmail.com>,
-        Bluez mailing list <linux-bluetooth@vger.kernel.org>
-Message-Id: <4C907B25-D8E4-462C-89FA-AB312A27CBE9@gmail.com>
-References: <4CF902B9-8221-45E7-9868-52BF18A5EC5D@gmail.com> <CAAu3APYsHqAK=Kk-fzQmhhBOfnayTDB_N_Q2yCuOhr+akvxfLg@mail.gmail.com> <C1394BB3-3C11-410C-916F-80A7863C0A2B@gmail.com> <969738CC-B335-4E2F-BF3C-441110279871@gmail.com> <CAAu3APard0ZM-+++qm8938+iWkUUfNkjvq1M9cLqngtZYJAzRg@mail.gmail.com> <F1876BDF-4DC0-4CB0-A20F-2E64E24A3B92@gmail.com> <CABBYNZ+R7dV5i+BQowigf5eddB4yxSki+xLeLFYBrN4Sfe8mJA@mail.gmail.com> <4AE62BC6-BD11-44C7-9A0E-BC3159ED80DF@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <j@bitron.ch>
+From: =?UTF-8?q?J=C3=BCrg=20Billeter?= <j@bitron.ch>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	=?UTF-8?q?J=C3=BCrg=20Billeter?= <j@bitron.ch>
+Subject: [PATCH] Bluetooth: btintel: Add MODULE_FIRMWARE entries for iBT 3.5 controllers
+Date: Tue, 23 May 2017 18:46:25 +0200
+Message-Id: <20170523164625.21298-1-j@bitron.ch>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+The iBT 3.5 controllers (Intel 8265, Windstorm Peak) need
+intel/ibt-12-16.sfi and intel/ibt-12-16.ddc firmware files from
+linux-firmware repository.
 
-Great talk from Szymon by the way I learned a lot combined with with =
-reading the docs.
-I really hope my question is not too stupid.=20
-I am stuck at this step in  my app and can=E2=80=99t continue.=
+Signed-off-by: J=C3=BCrg Billeter <j@bitron.ch>
+---
+ drivers/bluetooth/btintel.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
+index fce154855718..d32e109bd5cb 100644
+--- a/drivers/bluetooth/btintel.c
++++ b/drivers/bluetooth/btintel.c
+@@ -575,3 +575,5 @@ MODULE_VERSION(VERSION);
+ MODULE_LICENSE("GPL");
+ MODULE_FIRMWARE("intel/ibt-11-5.sfi");
+ MODULE_FIRMWARE("intel/ibt-11-5.ddc");
++MODULE_FIRMWARE("intel/ibt-12-16.sfi");
++MODULE_FIRMWARE("intel/ibt-12-16.ddc");
+--=20
+2.13.0
