@@ -1,71 +1,28 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: mcchou@chromium.org
-To: linux-bluetooth@vger.kernel.org
-Cc: josephsih@chromium.org, sonnysasaka@chromium.org, rkc@chromium.org,
-        Miao-chen Chou <mcchou@chromium.org>
-Subject: [PATCH v2] device: Clear GATT DB after disconnection for unpaired device
-Date: Tue, 23 May 2017 12:56:50 -0700
-Message-Id: <20170523195650.29695-1-mcchou@chromium.org>
-In-Reply-To: <20170523191112.190500-1-mcchou@chromium.org>
-References: <20170523191112.190500-1-mcchou@chromium.org>
+Content-Type: text/plain; charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
+Subject: Re: How to use GattProfile1
+From: Krasi Georgiev <krasi.root@gmail.com>
+In-Reply-To: <CABBYNZK04wxSH78f0maAMHtR-2ra8Kh_nQKkrAY1R8G19ba8TA@mail.gmail.com>
+Date: Tue, 23 May 2017 22:36:38 +0300
+Cc: Barry Byford <31baz66@gmail.com>,
+        Bluez mailing list <linux-bluetooth@vger.kernel.org>
+Message-Id: <5CDE162E-4828-4485-BF95-50C67DB93B77@gmail.com>
+References: <4CF902B9-8221-45E7-9868-52BF18A5EC5D@gmail.com> <CAAu3APYsHqAK=Kk-fzQmhhBOfnayTDB_N_Q2yCuOhr+akvxfLg@mail.gmail.com> <C1394BB3-3C11-410C-916F-80A7863C0A2B@gmail.com> <969738CC-B335-4E2F-BF3C-441110279871@gmail.com> <CAAu3APard0ZM-+++qm8938+iWkUUfNkjvq1M9cLqngtZYJAzRg@mail.gmail.com> <F1876BDF-4DC0-4CB0-A20F-2E64E24A3B92@gmail.com> <CABBYNZ+R7dV5i+BQowigf5eddB4yxSki+xLeLFYBrN4Sfe8mJA@mail.gmail.com> <4AE62BC6-BD11-44C7-9A0E-BC3159ED80DF@gmail.com> <4C907B25-D8E4-462C-89FA-AB312A27CBE9@gmail.com> <CABBYNZK04wxSH78f0maAMHtR-2ra8Kh_nQKkrAY1R8G19ba8TA@mail.gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Miao-chen Chou <mcchou@chromium.org>
+Are you sure about this? I am a bit confused. I have manually connected =
+to few devices but none will auto-connect when I switch it off/on or =
+remove if from the range  and than bring back in.
 
-This patch adds gatt_db_cleanup() function to clear client-role GATT DB for the
-unpaired device. According to Core Specification v4.2 [1] and v5.0 [2], the
-attributes should be cleared between unbonded devices after disconnection, since
-the attributes are no long valid.
+Szymon=E2=80=99s video suggests that I need to create an object that =
+implements a  Gatt  profile=20
+https://youtu.be/VMDyebKT5c4?t=3D1439
+minute 24
 
-[1] Page 525, Section 2.5.2 Attribute Caching, Part G, Volume 3: "For clients
-that do not have a trusted relationship with the server, the attribute cache is
-valid only during the connection."
-[2] Page 2227, Section 2.5.2 Attribute Caching, Part G, Volume 3: "For clients
-that do not have a trusted relationship with the server, the attribute cache is
-valid only during the connection."
----
- src/device.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+I tried but can=E2=80=99t find out the correct dbus calls sequence.
 
-diff --git a/src/device.c b/src/device.c
-index 1b05561e4..9a6135e47 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -267,6 +267,7 @@ struct pending_sdp_query {
-
- static int device_browse_gatt(struct btd_device *device, DBusMessage *msg);
- static int device_browse_sdp(struct btd_device *device, DBusMessage *msg);
-+static void store_gatt_db(struct btd_device *device);
-
- static struct pending_sdp_query *pending_sdp_query_new(DBusConnection *conn,
- 				DBusMessage *msg, const struct btd_device *dev)
-@@ -546,6 +547,15 @@ static void browse_request_free(struct browse_req *req)
- 	g_free(req);
- }
-
-+static void gatt_db_cleanup(struct btd_device* device)
-+{
-+	if (!device->db)
-+		return;
-+
-+	gatt_db_clear(device->db);
-+	store_gatt_db(device);
-+}
-+
- static void gatt_client_cleanup(struct btd_device *device)
- {
- 	if (!device->client)
-@@ -578,6 +588,9 @@ static void attio_cleanup(struct btd_device *device)
- 		device->att_io = NULL;
- 	}
-
-+	if (device->bredr_state.bonded || device->le_state.bonded)
-+		gatt_db_cleanup(device);
-+
- 	gatt_client_cleanup(device);
- 	gatt_server_cleanup(device);
-
---
-2.13.0.219.gdb65acc882-goog
-
+If anyone can give me a simple example (using dbus calls) that would be =
+amazing.=
