@@ -1,28 +1,64 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain; charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
-Subject: Re: How to use GattProfile1
-From: Krasi Georgiev <krasi.root@gmail.com>
-In-Reply-To: <CABBYNZK04wxSH78f0maAMHtR-2ra8Kh_nQKkrAY1R8G19ba8TA@mail.gmail.com>
-Date: Tue, 23 May 2017 22:36:38 +0300
-Cc: Barry Byford <31baz66@gmail.com>,
-        Bluez mailing list <linux-bluetooth@vger.kernel.org>
-Message-Id: <5CDE162E-4828-4485-BF95-50C67DB93B77@gmail.com>
-References: <4CF902B9-8221-45E7-9868-52BF18A5EC5D@gmail.com> <CAAu3APYsHqAK=Kk-fzQmhhBOfnayTDB_N_Q2yCuOhr+akvxfLg@mail.gmail.com> <C1394BB3-3C11-410C-916F-80A7863C0A2B@gmail.com> <969738CC-B335-4E2F-BF3C-441110279871@gmail.com> <CAAu3APard0ZM-+++qm8938+iWkUUfNkjvq1M9cLqngtZYJAzRg@mail.gmail.com> <F1876BDF-4DC0-4CB0-A20F-2E64E24A3B92@gmail.com> <CABBYNZ+R7dV5i+BQowigf5eddB4yxSki+xLeLFYBrN4Sfe8mJA@mail.gmail.com> <4AE62BC6-BD11-44C7-9A0E-BC3159ED80DF@gmail.com> <4C907B25-D8E4-462C-89FA-AB312A27CBE9@gmail.com> <CABBYNZK04wxSH78f0maAMHtR-2ra8Kh_nQKkrAY1R8G19ba8TA@mail.gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <c41a61c1-73f9-3e9a-ae18-c778a7db09f9@rug.nl>
+References: <c41a61c1-73f9-3e9a-ae18-c778a7db09f9@rug.nl>
+From: Barry Byford <31baz66@gmail.com>
+Date: Tue, 23 May 2017 20:21:47 +0100
+Message-ID: <CAAu3APZXiidEnqO0XbS=+oAp0nLzxY2wFfpRFXiL=98Psw+C+Q@mail.gmail.com>
+Subject: Re: How to create multiple rfcomm devices with a set name
+To: "s.achterop@rug.nl" <s.achterop@rug.nl>
+Cc: Bluez mailing list <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Are you sure about this? I am a bit confused. I have manually connected =
-to few devices but none will auto-connect when I switch it off/on or =
-remove if from the range  and than bring back in.
+Hello Sietse,
 
-Szymon=E2=80=99s video suggests that I need to create an object that =
-implements a  Gatt  profile=20
-https://youtu.be/VMDyebKT5c4?t=3D1439
-minute 24
+On 21 May 2017 at 15:35, s.achterop@rug.nl <s.achterop@rug.nl> wrote:
+>   Dear list,
+>
+> I created a number of robot-vehicles that are controlled using
+> bluetooth/rfcomm.
+> They are all controlled via a single PC that uses different /dev/rfcommx
+> devices.
+>
+> Earlier I used /etc/bluetooth/rfcomm.conf with lines such as:
+>     rfcomm117 {bind yes; device 10:00:E8:6C:EC:98; channel 1; comment
+> "dtpa_117"; }
+> The name of the robot is dtpa_117, and by connecting to rfcomm117 I know I
+> am talking via rfcomm to dtpa_117.
+>
+> Now with debian/stretch and ubuntu/16.04 (and rfcomm.conf not working
+> anymore) i need something simular.
+> My question is how do I create a rfcomm-device that matches the above rule.
+> I only can create rfcomm0 devices.
 
-I tried but can=E2=80=99t find out the correct dbus calls sequence.
+Not sure I have all the answers to your questions. I think you need to
+use Profile API.
+https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/doc/profile-api.txt
 
-If anyone can give me a simple example (using dbus calls) that would be =
-amazing.=
+There is an example in bluez/test:
+https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/test/test-profile
+
+I've also got an example using it with the Serial Port Profile:
+https://gist.github.com/ukBaz/217875c83c2535d22a16ba38fc8f2a91
+
+Hope that helps move you forward.
+
+>
+> My second question is how to create these devices automatically, using the
+> information from the rfcomm.conf file.
+> Can this be done via udev rules? Or via a systemd service?
+> I already searched quite a lot in the mailing list and on the net, but now
+> got more or less stuck.
+>
+>   Hopefully someone can give me a pointer on these two questions,
+>      Thanks in advance,
+>          Sietse Achterop
+>          University of Groningen, The Netherlands.
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
+> in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
