@@ -1,64 +1,57 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <c41a61c1-73f9-3e9a-ae18-c778a7db09f9@rug.nl>
-References: <c41a61c1-73f9-3e9a-ae18-c778a7db09f9@rug.nl>
-From: Barry Byford <31baz66@gmail.com>
-Date: Tue, 23 May 2017 20:21:47 +0100
-Message-ID: <CAAu3APZXiidEnqO0XbS=+oAp0nLzxY2wFfpRFXiL=98Psw+C+Q@mail.gmail.com>
-Subject: Re: How to create multiple rfcomm devices with a set name
-To: "s.achterop@rug.nl" <s.achterop@rug.nl>
-Cc: Bluez mailing list <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+From: mcchou@chromium.org
+To: linux-bluetooth@vger.kernel.org
+Cc: josephsih@chromium.org, sonnysasaka@chromium.org, rkc@chromium.org,
+        Miao-chen Chou <mcchou@chromium.org>
+Subject: [PATCH] device: Clear GATT DB after disconnection for unpaired device
+Date: Tue, 23 May 2017 12:11:12 -0700
+Message-Id: <20170523191112.190500-1-mcchou@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello Sietse,
+From: Miao-chen Chou <mcchou@chromium.org>
 
-On 21 May 2017 at 15:35, s.achterop@rug.nl <s.achterop@rug.nl> wrote:
->   Dear list,
->
-> I created a number of robot-vehicles that are controlled using
-> bluetooth/rfcomm.
-> They are all controlled via a single PC that uses different /dev/rfcommx
-> devices.
->
-> Earlier I used /etc/bluetooth/rfcomm.conf with lines such as:
->     rfcomm117 {bind yes; device 10:00:E8:6C:EC:98; channel 1; comment
-> "dtpa_117"; }
-> The name of the robot is dtpa_117, and by connecting to rfcomm117 I know I
-> am talking via rfcomm to dtpa_117.
->
-> Now with debian/stretch and ubuntu/16.04 (and rfcomm.conf not working
-> anymore) i need something simular.
-> My question is how do I create a rfcomm-device that matches the above rule.
-> I only can create rfcomm0 devices.
+This patch adds gatt_db_cleanup() function to clear client-role GATT DB for the
+unpaired device.
+---
+ src/device.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-Not sure I have all the answers to your questions. I think you need to
-use Profile API.
-https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/doc/profile-api.txt
+diff --git a/src/device.c b/src/device.c
+index 1b05561e4..da24a9430 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -267,6 +267,7 @@ struct pending_sdp_query {
 
-There is an example in bluez/test:
-https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/test/test-profile
+ static int device_browse_gatt(struct btd_device *device, DBusMessage *msg);
+ static int device_browse_sdp(struct btd_device *device, DBusMessage *msg);
++static void store_gatt_db(struct btd_device *device);
 
-I've also got an example using it with the Serial Port Profile:
-https://gist.github.com/ukBaz/217875c83c2535d22a16ba38fc8f2a91
+ static struct pending_sdp_query *pending_sdp_query_new(DBusConnection *conn,
+ 				DBusMessage *msg, const struct btd_device *dev)
+@@ -546,6 +547,14 @@ static void browse_request_free(struct browse_req *req)
+ 	g_free(req);
+ }
 
-Hope that helps move you forward.
++static void gatt_db_cleanup(struct btd_device* device)
++{
++	if (device->bredr_state.bonded || device->le_state.bonded)
++		return;
++	gatt_db_clear(device->db);
++	store_gatt_db(device);
++}
++
+ static void gatt_client_cleanup(struct btd_device *device)
+ {
+ 	if (!device->client)
+@@ -578,6 +587,7 @@ static void attio_cleanup(struct btd_device *device)
+ 		device->att_io = NULL;
+ 	}
 
->
-> My second question is how to create these devices automatically, using the
-> information from the rfcomm.conf file.
-> Can this be done via udev rules? Or via a systemd service?
-> I already searched quite a lot in the mailing list and on the net, but now
-> got more or less stuck.
->
->   Hopefully someone can give me a pointer on these two questions,
->      Thanks in advance,
->          Sietse Achterop
->          University of Groningen, The Netherlands.
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
-> in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
++	gatt_db_cleanup(device);
+ 	gatt_client_cleanup(device);
+ 	gatt_server_cleanup(device);
+
+--
+2.13.0.219.gdb65acc882-goog
+
