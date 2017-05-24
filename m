@@ -1,28 +1,44 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-From: Josh Van Tol <josh@afdengineering.com>
-Date: Wed, 24 May 2017 17:28:11 -0500
-Message-ID: <CABdDuZ0vRS=xkvaXTr7Fax_MxR5hxX4j-mok-ck7c-ZdSv9Vug@mail.gmail.com>
-Subject: Questions about GATT server example in /test/example-gatt-server.py -
- Generice access service can't be overidden
-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <5CDE162E-4828-4485-BF95-50C67DB93B77@gmail.com>
+References: <4CF902B9-8221-45E7-9868-52BF18A5EC5D@gmail.com>
+ <CAAu3APYsHqAK=Kk-fzQmhhBOfnayTDB_N_Q2yCuOhr+akvxfLg@mail.gmail.com>
+ <C1394BB3-3C11-410C-916F-80A7863C0A2B@gmail.com> <969738CC-B335-4E2F-BF3C-441110279871@gmail.com>
+ <CAAu3APard0ZM-+++qm8938+iWkUUfNkjvq1M9cLqngtZYJAzRg@mail.gmail.com>
+ <F1876BDF-4DC0-4CB0-A20F-2E64E24A3B92@gmail.com> <CABBYNZ+R7dV5i+BQowigf5eddB4yxSki+xLeLFYBrN4Sfe8mJA@mail.gmail.com>
+ <4AE62BC6-BD11-44C7-9A0E-BC3159ED80DF@gmail.com> <4C907B25-D8E4-462C-89FA-AB312A27CBE9@gmail.com>
+ <CABBYNZK04wxSH78f0maAMHtR-2ra8Kh_nQKkrAY1R8G19ba8TA@mail.gmail.com> <5CDE162E-4828-4485-BF95-50C67DB93B77@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Wed, 24 May 2017 15:02:21 +0300
+Message-ID: <CABBYNZKkodmXy+4eRXh_4RA9yci25cEtaNMoywEUk9XZ+GL4LQ@mail.gmail.com>
+Subject: Re: How to use GattProfile1
+To: Krasi Georgiev <krasi.root@gmail.com>
+Cc: Barry Byford <31baz66@gmail.com>,
+        Bluez mailing list <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I'm trying to build a custom device using BlueZ, and have been using
-the examples and tests that are included with BlueZ as a starting
-point.
+Hi Krasi,
 
-The problem I'm running into is that I'd like to provide my own
-implementation of the Generic Access Service (UUID '1800') but I get
-the error:
-Failed to register application: org.bluez.Error.Failed: Failed to
-create entry in database
+On Tue, May 23, 2017 at 10:36 PM, Krasi Georgiev <krasi.root@gmail.com> wro=
+te:
+> Are you sure about this? I am a bit confused. I have manually connected t=
+o few devices but none will auto-connect when I switch it off/on or remove =
+if from the range  and than bring back in.
+>
+> Szymon=E2=80=99s video suggests that I need to create an object that impl=
+ements a  Gatt  profile
+> https://youtu.be/VMDyebKT5c4?t=3D1439
+> minute 24
+>
+> I tried but can=E2=80=99t find out the correct dbus calls sequence.
+>
+> If anyone can give me a simple example (using dbus calls) that would be a=
+mazing.
 
-I would presume that this is because there's already such a service
-registered. Can anyone give me a pointer as to the proper way to
-un-register the existing service (or prevent it from being installed)?
+Have you actually tried using bluetoothctl? Do you have the bluetoothd
+logs when connecting to these devices?
 
-Regards,
-Josh van Tol
+--=20
+Luiz Augusto von Dentz
