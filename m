@@ -1,142 +1,202 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain; charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Subject: Re: Unexpected SMP Command 0x0a
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <E3B98393E6037849B63EA428240A651306125616@PGSMSX103.gar.corp.intel.com>
-Date: Fri, 26 May 2017 13:42:24 -0700
-Cc: "Wong, Mun choy" <mun.choy.wong@intel.com>,
-        "Zulqarnain, Adam" <adam.zulqarnain@intel.com>,
-        Avinash Kadam <avinashk@marvell.com>,
-        Bluez mailing list <linux-bluetooth@vger.kernel.org>
-Message-Id: <D631CDDE-4EA4-4BF2-855F-E3C23CB2B6A8@holtmann.org>
-References: <E3B98393E6037849B63EA428240A651362A579@PGSMSX103.gar.corp.intel.com>
- <E3B98393E6037849B63EA428240A651306125351@PGSMSX103.gar.corp.intel.com>
- <753A4460-944B-47FA-9381-F5E4FE619B28@holtmann.org>
- <E3B98393E6037849B63EA428240A651306125616@PGSMSX103.gar.corp.intel.com>
-To: "Wong, Joshua Weng Onn" <joshua.weng.onn.wong@intel.com>
+MIME-Version: 1.0
+In-Reply-To: <CACumGOKBCN9VOK+xetL_b8FxaR3cyPraBgg3QTnYJri6_xNPuw@mail.gmail.com>
+References: <20170523195650.29695-1-mcchou@chromium.org> <20170525001054.92520-1-mcchou@chromium.org>
+ <CACumGO+-WFY9QQWTJJ8NfZzYdeVskY=7fbpC8K+of_Y49fhGHQ@mail.gmail.com>
+ <CAHgsZ+hyvPHdD0X0sp-8DkbG=GbY79_J=_ttpCfbPue_WJ5R9g@mail.gmail.com> <CACumGOKBCN9VOK+xetL_b8FxaR3cyPraBgg3QTnYJri6_xNPuw@mail.gmail.com>
+From: Miao-chen Chou <mcchou@google.com>
+Date: Fri, 26 May 2017 11:10:25 -0700
+Message-ID: <CAHgsZ+icer9T3rMmof4f_v9W4xMp2oVyF2k9X8y0Nn84Gw0mNg@mail.gmail.com>
+Subject: Re: [PATCH v3] device: Clear GATT DB after disconnection for unpaired device
+To: "Von Dentz, Luiz" <luiz.von.dentz@intel.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        josephsih@chromium.org, sonnysasaka@chromium.org,
+        Rahul Chaturvedi <rkc@chromium.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Joshua,
+Hi Luiz,
 
->>> I would like to follow up with this issue.
->>> 
->>>>>>>>>> Yes, for secure connection the LTK is generated locally.
->>>>>>>>>> But issue here is observed that after Pairing is complete the
->>>>>>>>>> key distribution is not completed from Master.
->>>>>>>>>> 
->>>>>>>>>> i.e. After Slave sends the  "Signature key:" but Master doesn't
->>>>>>>>>> share any key.  Attached logs.
->>>>>>>>> I get that and that is clear from the logs. Something is
->>>>>>>>> stalling here and because of that, you run into the 30 seconds
->>>>>>>>> SMP
->>>> timeout.
->>>>>>>>> We just need to know if the 4.9 kernel is doing this correctly.
->>>>>>>>> If so, then you can bi-sect that patch that fixes. Without proof
->>>>>>>>> that
->>>>>>>>> 4.9 is also broken, nobody will even bother to chase this down.
->>>>>>>> 
->>>>>>>> I think the problem here is race between ACL data and HCI events
->>>>>>>> on USB dongle...  We get initial slave keys but those get dropped
->>>>>>>> due to encryption changed event not being received yet. Since
->>>>>>>> keys were silently dropped we later on get unexpected SMP PDU
->> and
->>>>>>>> ignoring remaining keys as well which eventually leads to SMP
->>>> timeout.
->>>>>>>> 
->>>>>>>> If this is USB dongle (using btusd) then only (AFAIK) solution
->>>>>>>> would be to have a workaround for this inside chip (it would
->>>>>>>> delay ACL data received right after encryption change giving host
->>>>>>>> time to handle encpryption
->>>>>> change event).
->>>>>>>> Bluetooth specification for USB transport is unfortunatelly kinda
->>>> broken.
->>>>>>>> 
->>>>>>>> --
->>>>>>>> pozdrawiam
->>>>>>>> Szymon Janc
->>>>>>> 
->>>>>>> Thank you for your reply. Your inputs are valuable to us in
->>>>>>> helping to debug the
->>>>>> issue. Yes, we are indeed using the btusb kernel module and it is
->>>>>> using a USB interface (Bluetooth over USB).
->>>>>>> 
->>>>>>> I noticed that when btmgmt settings are set to turn 'bredr off',
->>>>>>> the 'ssp' mode
->>>>>> also turns off. Is this behavior expected to occur?
->>>>>>> My current settings are 'powered connectable discoverable bondable
->>>>>>> le
->>>>>> secure-connâ
->>>>>> 
->>>>>> the SSP (Secure Simple Pairing) is a BR/EDR only feature. So when
->>>>>> you disable BR/EDR, it will be disabled as well.
->>>>> 
->>>>> Thank you for your reply. It looks like I have understood this
->>>>> incorrectly as initially I read somewhere that LE adopts the SSP
->>>>> model in v4.1. Looks like this is not the case.
->>>>> 
->>>>> From the specification, I noted that SSP was introduced in BR/EDR in
->>>>> v2.1 which makes it a BR/EDR only feature.
->>>>> 
->>>>> I finally understand why ssp mode is disabled when I turned bredr
->>>>> off via btmgmt. Thank you for your clarification!
->>>> 
->>> 
->>> I notice a strange behavior during the LE Secure Connection pairing. This
->> occurs at the LE Start Encryption event as seen in the following log:
->>> 
->>> 
->>> < HCI Command: LE Start Encryption (0x08|0x0019) plen 28       [hci0]
->>> 55.230548
->>>        Handle: 128
->>>        Random number: 0x0000000000000000
->>>        Encrypted diversifier: 0x0000
->>>        Long term key: 0e01142be9ddab9e6e6cef545562adc4
->>>> HCI Event: Command Status (0x0f) plen 4                      [hci0] 55.234468
->>>      LE Start Encryption (0x08|0x0019) ncmd 1
->>>        Status: Success (0x00)
->>>> ACL Data RX: Handle 128 flags 0x02 dlen 21                   [hci0] 55.500569
->>>      SMP: Signing Information (0x0a) len 16
->>>        Signature key: 1d916d5951791a271416a161cda981d6
->>>> HCI Event: Encryption Change (0x08) plen 4                   [hci0] 55.513836
->>>        Status: Success (0x00)
->>>        Handle: 128
->>>        Encryption: Enabled with AES-CCM (0x01)
->>> 
->>> 
->>> As noticed from the logs above, the "SMP: Signing Information (0x0a)"
->>> command appears first before the "Encryption Change (0x08)" HCI event.
->> On a LE successful pairing, the encryption change should occur before the
->> signing information command as can be observed in the following log
->> below. I was able to successfully perform a LE pairing through forced trial.
->> The successful LE pairing only occurs 1 out of 10 times.
->> 
->> the problem is that we will need to wait for the Encryption Change before
->> we can accept any key distribution from the remote side. So is this on an
->> USB dongle? The over the air packet might be actually encrypted, but on the
->> USB HCI transport we see it as non-encrypted and drop it.
->> 
->> So what hardware is this actually? Do you happen to have newer firmware
->> for this hardware that fixes this race in the HCI lower transport.
-> 
-> Thank you for your inputs. We appreciate it very much.
-> 
-> The module we are using is a M.2 form factor (E-Key, 2230 package). The Bluetooth interface is USB 2.0. We are using a Marvell 88W8897 SoC running the pcie8897_uapsta.bin firmware version 7.p77. This is the latest firmware version and we do not have any newer firmware. The link to the firmware is as follows:
-> https://kernel.googlesource.com/pub/scm/linux/kernel/git/firmware/linux-firmware/+/05e2f3a4acf4174ec507a3464a374ecb1b4ec011
-> 
-> We are using kernel 4.1.27 on our system running the btusb driver.
-> We have also tried the LE pairing on kernel 4.9 and kernel 4.10. In both of these kernels, the race condition occurs and the pairing fails.
-> It looks like we will need to contact Marvell on the race condition in HCI lower transport. 
+The user space apps follow the procedure defined in the spec to
+re-register the notification after re-connection for the unpaired
+device. Skipping the error doesn't seem to be a good workaround, since
+no notification is wanted unless the user space apps explicitly ask
+for it, and there can be other implicit notifications even if we skip
+one. Also, the Service Changed Characteristic does not matter in the
+case of unpaired devices, and there is no such check in BlueZ
+currently as well.
 
-so this is an USB only problem. And now that you say you are seeing this on Marvell hardware, then it might be the case that they still have not addressed this issue in their firmware. I think they should be aware of it, but it is pretty much a firmware problem and Marvell needs to address.
+For other system supporting auto-connect, keeping the caches for
+unpaired device after disconnection can also be wrong in practice. For
+instance, the local device can connect to a different device which has
+the exact same address but with totally different GATT services, and
+the caching doesn't help in this case.
 
-> Apart from that, should the LE pairing work normally on other transports e.g. UART/SDIO?
+The first workaround that I mentioned is to prevent re-register
+subscribed notification clients and clear them, and the second
+workaround is to clear the subscribed notification during
+disconnection so that there won't be any clients to be re-registered
+for notification upon re-connection.
 
+Thanks,
+Miao
 
-So UART and SDIO are not affected since they are a single "endpoint" and fully sequential transport protocol for HCI. With USB the difference is that HCI events and HCI data is using two independent "endpoints". In USB, the firmware needs to make sure the the HCI event is delivered to the host (meaning the host polled the URBs) on the interrupt endpoint before it fills the bulk endpoints for the HCI data packets.
-
-Regards
-
-Marcel
-
+On Fri, May 26, 2017 at 1:42 AM, Von Dentz, Luiz
+<luiz.von.dentz@intel.com> wrote:
+> Hi Miao,
+>
+> On Fri, May 26, 2017 at 10:20 AM, Miao-chen Chou <mcchou@google.com> wrot=
+e:
+>> Hi,
+>>
+>> Thanks for your comments. Indeed the auto-connection(reconnection)
+>> policy is not enabled in Chrome OS. However, the caching for unpaired
+>> device is causing registration failures when users try to register for
+>> the notification after reconnecting to the device which was unpaired
+>> in the previous connection, and there is no such failure on Mac and
+>> Android afaIk. Please correct me if I was wrong, but I didn't find any
+>> logic checking whether the service changed characteristic was
+>> presented in the previous connection. The problem we are trying to
+>> solve here is that BlueZ returns operation failed error on registering
+>> for notification after reconnecting to an unpaired device. And this is
+>> caused by the caching which should be reset according to the spec.
+>>
+>> [Scenario]
+>> connect to the remote device without pairing
+>> register for notification
+>> disconnect from the remote device
+>> reconnect without pairing
+>> register for notification  --> operation failure with "Already
+>> notifying" error message
+>
+> Well you could just ignore if already notifying, or that still doesn't
+> notify? That error perhaps is misleading as it doesn't change anything
+> perhaps we should return no error. Btw, if Im not mistake we do
+> re-enable the notifications when reconnecting:
+>
+> bluetoothd[8777]: src/gatt-client.c:register_notify() Re-register
+> subscribed notification client
+>
+> < ACL Data TX: Handle 3585 flags 0x00 dlen 9
+>       ATT: Write Request (0x12) len 4
+>         Handle: 0x0011
+>           Data: 0100
+>
+>> Other possible workarounds without clearing GATT DB are
+>> 1) Skip re-register notify in btd_gatt_client_connected() and clear
+>> chrc->notify_clients and client->all_notify_clients for unpaired
+>> devices.
+>> 2) Clear chrc->service->client->all_notify_clients in
+>> btd_gatt_client_disconnected() for unpaired devices.
+>
+> See above, I think we can just remove the error of already registered
+> since we it should already be registered is just a NOP.
+>
+>> Any comments are appreciated.
+>>
+>> Thanks,
+>> Miao
+>>
+>> On Thu, May 25, 2017 at 12:44 AM, Von Dentz, Luiz
+>> <luiz.von.dentz@intel.com> wrote:
+>>> Hi,
+>>>
+>>> On Thu, May 25, 2017 at 3:10 AM,  <mcchou@chromium.org> wrote:
+>>>> From: Miao-chen Chou <mcchou@chromium.org>
+>>>>
+>>>> This patch adds gatt_db_cleanup() function to clear client-role GATT D=
+B for the
+>>>> unpaired device. According to Core Specification v4.2 [1] and v5.0 [2]=
+, the
+>>>> attributes should be cleared between unbonded devices after disconnect=
+ion, since
+>>>> the attributes are no long valid.
+>>>>
+>>>> [1] Page 525, Section 2.5.2 Attribute Caching, Part G, Volume 3: "For =
+clients
+>>>> that do not have a trusted relationship with the server, the attribute=
+ cache is
+>>>> valid only during the connection."
+>>>> [2] Page 2227, Section 2.5.2 Attribute Caching, Part G, Volume 3: "For=
+ clients
+>>>> that do not have a trusted relationship with the server, the attribute=
+ cache is
+>>>> valid only during the connection."
+>>>
+>>> This ignores the fact that devices which don't implement service
+>>> changed characteristic shall not change its database so the discovery
+>>> may be skipped:
+>>>
+>>> BLUETOOTH SPECIFICATION Version 5.0 | Vol 3, Part C
+>>> page 2079
+>>> "If the client had previously determined that the server did not have
+>>> the =C2=ABService Changed=C2=BB characteristic then service discovery m=
+ay be
+>>> skipped."
+>>>
+>>> Also note that we do persist the cache to be able to persist
+>>> configuration such as notifications and indications, perhaps in chrome
+>>> you don't really have a use for it but in systems where reconnection
+>>> is supported, afaik chrome OS doesn't, it is a must have since
+>>> notifications and indications would not work during the discovery if
+>>> we remove the cache. And please remember that discovery is a very slow
+>>> procedure, in most cases it takes a good 3-5 seconds to rediscover,
+>>> depending on db size it may take over 10 seconds and until it is
+>>> completed no attribute can be accessed.
+>>>
+>>> We could, however, have a config option to select the behavior of the
+>>> cache or have an option for auto-connect so disabling it also disable
+>>> caching.
+>>>
+>>>> ---
+>>>>  src/device.c | 13 +++++++++++++
+>>>>  1 file changed, 13 insertions(+)
+>>>>
+>>>> diff --git a/src/device.c b/src/device.c
+>>>> index 1b05561e4..f8cde0b43 100644
+>>>> --- a/src/device.c
+>>>> +++ b/src/device.c
+>>>> @@ -267,6 +267,7 @@ struct pending_sdp_query {
+>>>>
+>>>>  static int device_browse_gatt(struct btd_device *device, DBusMessage =
+*msg);
+>>>>  static int device_browse_sdp(struct btd_device *device, DBusMessage *=
+msg);
+>>>> +static void store_gatt_db(struct btd_device *device);
+>>>>
+>>>>  static struct pending_sdp_query *pending_sdp_query_new(DBusConnection=
+ *conn,
+>>>>                                 DBusMessage *msg, const struct btd_dev=
+ice *dev)
+>>>> @@ -546,6 +547,15 @@ static void browse_request_free(struct browse_req=
+ *req)
+>>>>         g_free(req);
+>>>>  }
+>>>>
+>>>> +static void gatt_db_cleanup(struct btd_device* device)
+>>>> +{
+>>>> +       if (!device->db)
+>>>> +               return;
+>>>> +
+>>>> +       gatt_db_clear(device->db);
+>>>> +       store_gatt_db(device);
+>>>> +}
+>>>> +
+>>>>  static void gatt_client_cleanup(struct btd_device *device)
+>>>>  {
+>>>>         if (!device->client)
+>>>> @@ -578,6 +588,9 @@ static void attio_cleanup(struct btd_device *devic=
+e)
+>>>>                 device->att_io =3D NULL;
+>>>>         }
+>>>>
+>>>> +       if (!device->bredr_state.bonded && !device->le_state.bonded)
+>>>> +               gatt_db_cleanup(device);
+>>>> +
+>>>>         gatt_client_cleanup(device);
+>>>>         gatt_server_cleanup(device);
+>>>>
+>>>> --
+>>>> 2.13.0.219.gdb65acc882-goog
+>>>>
