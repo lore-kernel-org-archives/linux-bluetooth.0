@@ -1,49 +1,152 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-To: linux-bluetooth@vger.kernel.org
-From: Stefan Seyfried <stefan.seyfried@googlemail.com>
-Subject: [BUG] unit/test-gatt failure uninitialized pointer(?)
-Message-ID: <2992e569-78e1-ea64-52b5-a2df11a6c948@message-id.googlemail.com>
-Date: Fri, 26 May 2017 09:45:18 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <CACumGO+-WFY9QQWTJJ8NfZzYdeVskY=7fbpC8K+of_Y49fhGHQ@mail.gmail.com>
+References: <20170523195650.29695-1-mcchou@chromium.org> <20170525001054.92520-1-mcchou@chromium.org>
+ <CACumGO+-WFY9QQWTJJ8NfZzYdeVskY=7fbpC8K+of_Y49fhGHQ@mail.gmail.com>
+From: Miao-chen Chou <mcchou@google.com>
+Date: Fri, 26 May 2017 00:20:13 -0700
+Message-ID: <CAHgsZ+hyvPHdD0X0sp-8DkbG=GbY79_J=_ttpCfbPue_WJ5R9g@mail.gmail.com>
+Subject: Re: [PATCH v3] device: Clear GATT DB after disconnection for unpaired device
+To: "Von Dentz, Luiz" <luiz.von.dentz@intel.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        josephsih@chromium.org, sonnysasaka@chromium.org,
+        Rahul Chaturvedi <rkc@chromium.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi all,
+Hi,
 
-in the Open Build Service packages for openSUSE are built in VMs without network connection. This leads to failure in "make check". Debugging found:
+Thanks for your comments. Indeed the auto-connection(reconnection)
+policy is not enabled in Chrome OS. However, the caching for unpaired
+device is causing registration failures when users try to register for
+the notification after reconnecting to the device which was unpaired
+in the previous connection, and there is no such failure on Mac and
+Android afaIk. Please correct me if I was wrong, but I didn't find any
+logic checking whether the service changed characteristic was
+presented in the previous connection. The problem we are trying to
+solve here is that BlueZ returns operation failed error on registering
+for notification after reconnecting to an unpaired device. And this is
+caused by the caching which should be reset according to the spec.
 
-/robustness/unkown-request - init
-/robustness/unkown-request - setup
-/robustness/unkown-request - setup complete
-/robustness/unkown-request - run
+[Scenario]
+connect to the remote device without pairing
+register for notification
+disconnect from the remote device
+reconnect without pairing
+register for notification  --> operation failure with "Already
+notifying" error message
 
-Program received signal SIGSEGV, Segmentation fault.
-0x0000555555598225 in timeout_cb (user_data=0x5555557c82f0) at src/shared/att.c:405
-405             if (att->pending_req && att->pending_req->id == timeout->id) {
-(gdb) print att->pending_req->id
-Cannot access memory at address 0x4545454545454545
-(gdb) print att->pending_req  
-$1 = (struct att_send_op *) 0x4545454545454545
-(gdb) print timeout->id
-$2 = 12
-(gdb) bt
-#0  0x0000555555598225 in timeout_cb (user_data=0x5555557c82f0) at src/shared/att.c:405
-#1  0x00005555555a499d in timeout_callback (user_data=<optimized out>) at src/shared/timeout-glib.c:34
-#2  0x00007ffff7b101d3 in ?? () from /usr/lib64/libglib-2.0.so.0
-#3  0x00007ffff7b0f75a in g_main_context_dispatch () from /usr/lib64/libglib-2.0.so.0
-#4  0x00007ffff7b0fb10 in ?? () from /usr/lib64/libglib-2.0.so.0
-#5  0x00007ffff7b0fe32 in g_main_loop_run () from /usr/lib64/libglib-2.0.so.0
-#6  0x0000555555597e84 in tester_run () at src/shared/tester.c:830
-#7  0x0000555555594a4c in main (argc=<optimized out>, argv=<optimized out>) at unit/test-gatt.c:4474
-(gdb) 
+Other possible workarounds without clearing GATT DB are
+1) Skip re-register notify in btd_gatt_client_connected() and clear
+chrc->notify_clients and client->all_notify_clients for unpaired
+devices.
+2) Clear chrc->service->client->all_notify_clients in
+btd_gatt_client_disconnected() for unpaired devices.
 
-This started after I tried to update the package to bluez-5.45, it
-still happens with current bluez git master.
+Any comments are appreciated.
 
-Hope this helps, I am now commenting out this test for now.
--- 
-Stefan Seyfried
+Thanks,
+Miao
 
-"For a successful technology, reality must take precedence over
- public relations, for nature cannot be fooled." -- Richard Feynman
+On Thu, May 25, 2017 at 12:44 AM, Von Dentz, Luiz
+<luiz.von.dentz@intel.com> wrote:
+> Hi,
+>
+> On Thu, May 25, 2017 at 3:10 AM,  <mcchou@chromium.org> wrote:
+>> From: Miao-chen Chou <mcchou@chromium.org>
+>>
+>> This patch adds gatt_db_cleanup() function to clear client-role GATT DB =
+for the
+>> unpaired device. According to Core Specification v4.2 [1] and v5.0 [2], =
+the
+>> attributes should be cleared between unbonded devices after disconnectio=
+n, since
+>> the attributes are no long valid.
+>>
+>> [1] Page 525, Section 2.5.2 Attribute Caching, Part G, Volume 3: "For cl=
+ients
+>> that do not have a trusted relationship with the server, the attribute c=
+ache is
+>> valid only during the connection."
+>> [2] Page 2227, Section 2.5.2 Attribute Caching, Part G, Volume 3: "For c=
+lients
+>> that do not have a trusted relationship with the server, the attribute c=
+ache is
+>> valid only during the connection."
+>
+> This ignores the fact that devices which don't implement service
+> changed characteristic shall not change its database so the discovery
+> may be skipped:
+>
+> BLUETOOTH SPECIFICATION Version 5.0 | Vol 3, Part C
+> page 2079
+> "If the client had previously determined that the server did not have
+> the =C2=ABService Changed=C2=BB characteristic then service discovery may=
+ be
+> skipped."
+>
+> Also note that we do persist the cache to be able to persist
+> configuration such as notifications and indications, perhaps in chrome
+> you don't really have a use for it but in systems where reconnection
+> is supported, afaik chrome OS doesn't, it is a must have since
+> notifications and indications would not work during the discovery if
+> we remove the cache. And please remember that discovery is a very slow
+> procedure, in most cases it takes a good 3-5 seconds to rediscover,
+> depending on db size it may take over 10 seconds and until it is
+> completed no attribute can be accessed.
+>
+> We could, however, have a config option to select the behavior of the
+> cache or have an option for auto-connect so disabling it also disable
+> caching.
+>
+>> ---
+>>  src/device.c | 13 +++++++++++++
+>>  1 file changed, 13 insertions(+)
+>>
+>> diff --git a/src/device.c b/src/device.c
+>> index 1b05561e4..f8cde0b43 100644
+>> --- a/src/device.c
+>> +++ b/src/device.c
+>> @@ -267,6 +267,7 @@ struct pending_sdp_query {
+>>
+>>  static int device_browse_gatt(struct btd_device *device, DBusMessage *m=
+sg);
+>>  static int device_browse_sdp(struct btd_device *device, DBusMessage *ms=
+g);
+>> +static void store_gatt_db(struct btd_device *device);
+>>
+>>  static struct pending_sdp_query *pending_sdp_query_new(DBusConnection *=
+conn,
+>>                                 DBusMessage *msg, const struct btd_devic=
+e *dev)
+>> @@ -546,6 +547,15 @@ static void browse_request_free(struct browse_req *=
+req)
+>>         g_free(req);
+>>  }
+>>
+>> +static void gatt_db_cleanup(struct btd_device* device)
+>> +{
+>> +       if (!device->db)
+>> +               return;
+>> +
+>> +       gatt_db_clear(device->db);
+>> +       store_gatt_db(device);
+>> +}
+>> +
+>>  static void gatt_client_cleanup(struct btd_device *device)
+>>  {
+>>         if (!device->client)
+>> @@ -578,6 +588,9 @@ static void attio_cleanup(struct btd_device *device)
+>>                 device->att_io =3D NULL;
+>>         }
+>>
+>> +       if (!device->bredr_state.bonded && !device->le_state.bonded)
+>> +               gatt_db_cleanup(device);
+>> +
+>>         gatt_client_cleanup(device);
+>>         gatt_server_cleanup(device);
+>>
+>> --
+>> 2.13.0.219.gdb65acc882-goog
+>>
