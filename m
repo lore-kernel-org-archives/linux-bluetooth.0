@@ -1,83 +1,307 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <dca64414-003d-235e-0cb8-d6b706f00f83@message-id.googlemail.com>
-References: <2992e569-78e1-ea64-52b5-a2df11a6c948@message-id.googlemail.com> <dca64414-003d-235e-0cb8-d6b706f00f83@message-id.googlemail.com>
-From: Felipe Tonello <eu@felipetonello.com>
-Date: Sun, 28 May 2017 18:55:03 +0100
-Message-ID: <CAGrhNMwEi+sHSs2zDVT2PL8HsxEWTthNJSvgO5Qo4+7Paf2OQA@mail.gmail.com>
-Subject: Re: [BUG] unit/test-midi spurious failure
-To: Stefan Seyfried <stefan.seyfried@googlemail.com>
-Cc: Bluez mailing list <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <CAMDKGBXesKCZkdXgLzT_ZKQPL3pN-5KSr_pjtDFuiSD3XwH9vg@mail.gmail.com>
+References: <20170523195650.29695-1-mcchou@chromium.org> <20170525001054.92520-1-mcchou@chromium.org>
+ <CACumGO+-WFY9QQWTJJ8NfZzYdeVskY=7fbpC8K+of_Y49fhGHQ@mail.gmail.com>
+ <CAHgsZ+hyvPHdD0X0sp-8DkbG=GbY79_J=_ttpCfbPue_WJ5R9g@mail.gmail.com>
+ <CACumGOKBCN9VOK+xetL_b8FxaR3cyPraBgg3QTnYJri6_xNPuw@mail.gmail.com>
+ <CAHgsZ+icer9T3rMmof4f_v9W4xMp2oVyF2k9X8y0Nn84Gw0mNg@mail.gmail.com> <CAMDKGBXesKCZkdXgLzT_ZKQPL3pN-5KSr_pjtDFuiSD3XwH9vg@mail.gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Sun, 28 May 2017 11:39:40 +0300
+Message-ID: <CABBYNZLFi2a8j6qjfNqrFTC-ic_6iH=UNwZ_ri_jOvQ01VtCbw@mail.gmail.com>
+Subject: Re: [PATCH v3] device: Clear GATT DB after disconnection for unpaired device
+To: =?UTF-8?Q?Giovanni_Ortu=C3=B1o?= <ortuno@chromium.org>
+Cc: Miao-chen Chou <mcchou@google.com>,
+        "Von Dentz, Luiz" <luiz.von.dentz@intel.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        josephsih@chromium.org, sonnysasaka@chromium.org,
+        Rahul Chaturvedi <rkc@chromium.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Stefan,
+Hi,
 
-On Fri, May 26, 2017 at 9:17 AM, Stefan Seyfried
-<stefan.seyfried@googlemail.com> wrote:
-> Hi all,
+On Sun, May 28, 2017 at 7:54 AM, Giovanni Ortu=C3=B1o <ortuno@chromium.org>=
+ wrote:
+> On Fri, May 26, 2017 at 11:10 AM, Miao-chen Chou <mcchou@google.com> wrot=
+e:
+>> Hi Luiz,
+>>
+>> The user space apps follow the procedure defined in the spec to
+>> re-register the notification after re-connection for the unpaired
+>> device. Skipping the error doesn't seem to be a good workaround, since
+>> no notification is wanted unless the user space apps explicitly ask
+>> for it, and there can be other implicit notifications even if we skip
+>> one. Also, the Service Changed Characteristic does not matter in the
+>> case of unpaired devices, and there is no such check in BlueZ
+>> currently as well.
+>>
 >
-> I get spurious failures in unit/test-midi
->
-> Debugging gives:
->
-> ALSA SysEx events to Raw BLE packets - init
-> ALSA SysEx events to Raw BLE packets - setup
-> ALSA SysEx events to Raw BLE packets - setup complete
-> ALSA SysEx events to Raw BLE packets - run
-> **
-> ERROR:unit/test-midi.c:287:compare_events: assertion failed (ev1->data.ext.len == ev2->data.ext.len): (5 == 4)
->
-> Program received signal SIGABRT, Aborted.
-> 0x00007ffff746a8d7 in raise () from /lib64/libc.so.6
-> Missing separate debuginfos, use: zypper install libasound2-debuginfo-1.1.2-1.2.x86_64 libglib-2_0-0-debuginfo-2.48.2-1.10.x86_64 libpcre1-debuginfo-8.33-4.51.x86_64
-> (gdb) bt
-> #0  0x00007ffff746a8d7 in raise () from /lib64/libc.so.6
-> #1  0x00007ffff746bcaa in abort () from /lib64/libc.so.6
-> #2  0x00007ffff7b3bbc5 in g_assertion_message () from /usr/lib64/libglib-2.0.so.0
-> #3  0x00007ffff7b3bf61 in g_assertion_message_cmpnum () from /usr/lib64/libglib-2.0.so.0
-> #4  0x000055555555662c in compare_events (ev1=0x55555575bb20 <event4>, ev2=0x7fffffffe590) at unit/test-midi.c:285
-> #5  0x000055555555693b in compare_events_cb (parser=0x7fffffffe660, user_data=0x7fffffffe640) at unit/test-midi.c:577
-> #6  0x0000555555556bcb in test_midi_writer (data=0x55555575bb00 <midi4>) at unit/test-midi.c:603
-> #7  0x0000555555557878 in run_callback (user_data=0x555555763600) at src/shared/tester.c:415
-> #8  0x00007ffff7b18015 in g_main_context_dispatch () from /usr/lib64/libglib-2.0.so.0
-> #9  0x00007ffff7b18388 in ?? () from /usr/lib64/libglib-2.0.so.0
-> #10 0x00007ffff7b1864a in g_main_loop_run () from /usr/lib64/libglib-2.0.so.0
-> #11 0x0000555555558721 in tester_run () at src/shared/tester.c:830
-> #12 0x0000555555556429 in main (argc=1, argv=0x7fffffffe9c8) at unit/test-midi.c:631
-> (gdb)
->
-> It does not happen every time, but maybe once in 10 runs,
-> the assertion failure numbers are different:
-> ERROR:unit/test-midi.c:287:compare_events: assertion failed (ev1->data.ext.len == ev2->data.ext.len): (1024 == 1023)
-> Aborted (core dumped)
-> ERROR:unit/test-midi.c:287:compare_events: assertion failed (ev1->data.ext.len == ev2->data.ext.len): (5 == 4)
-> Aborted (core dumped)
->
-> About one in four runs fails:
->
-> #!/bin/bash
-> G=0; B=0;
-> for i in `seq 1 1000`; do
->   if unit/test-midi; then
->     G=$((G+1)
->   else
->     B=$((B+1))
->   fi
-> done
-> echo "good: $G bad: $B"
->
-> good: 730 bad: 270
->
-> I have no idea what this means, if this is an error in the
-> test code or a sign something is wrong with the testing system.
->
-> It started to happen with bluez-5.45, still happens with git master.
+> +1
 
-Does it happen on BlueZ 5.44? If so, then I believe it is a bug in the
-MIDI code.
+BlueZ only re-register if the application had called StartNotify, and
+by _design_ StartNotify persists across reconnection, if the app do
+StopNotify at any point it would not re-register, so what you are
+describing is either a bug or Chrome OS does not call StopNotify thus
+causing bluetoothd still to believe the app want to re-register
+automatically. So the app has all the control here, the only real
+different is that we don't disable the notification on disconnect
+since StartNotify works on top of CCC and we support multiple clients,
+which should be clear by now.
 
-Thanks for finding it out.
+Btw, I did comment earlier that we could a config option to discard
+cache on disconnect.
 
-Felipe
+>> For other system supporting auto-connect, keeping the caches for
+>> unpaired device after disconnection can also be wrong in practice. For
+>> instance, the local device can connect to a different device which has
+>> the exact same address but with totally different GATT services, and
+>> the caching doesn't help in this case.
+
+That is only possible with random addresses, which afaik we don't
+cache since they are considered temporary the whole object is
+destroyed when disconnected:
+
+
+commit ecf2495781f735a7604df7d5d5b2d8ad5330c480
+Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Date:   Fri Jul 1 17:24:15 2016 +0300
+
+    core/device: Don't persist private devices
+
+    Device which address is private should not be allowed to reset the
+    temporary flag since its settings cannot be stored and the address
+    may never be used again after disconnecting.
+
+>> The first workaround that I mentioned is to prevent re-register
+>> subscribed notification clients and clear them, and the second
+>> workaround is to clear the subscribed notification during
+>> disconnection so that there won't be any clients to be re-registered
+>> for notification upon re-connection.
+
+StartNotify don't work like that, we used to remove the services but
+that caused many problems if the connection is not stable which is
+especially problematic if you have to rediscover the attributes over
+and over again.
+
+>> Thanks,
+>> Miao
+>>
+>> On Fri, May 26, 2017 at 1:42 AM, Von Dentz, Luiz
+>> <luiz.von.dentz@intel.com> wrote:
+>>> Hi Miao,
+>>>
+>>> On Fri, May 26, 2017 at 10:20 AM, Miao-chen Chou <mcchou@google.com> wr=
+ote:
+>>>> Hi,
+>>>>
+>>>> Thanks for your comments. Indeed the auto-connection(reconnection)
+>>>> policy is not enabled in Chrome OS. However, the caching for unpaired
+>>>> device is causing registration failures when users try to register for
+>>>> the notification after reconnecting to the device which was unpaired
+>>>> in the previous connection, and there is no such failure on Mac and
+>>>> Android afaIk. Please correct me if I was wrong, but I didn't find any
+>>>> logic checking whether the service changed characteristic was
+>>>> presented in the previous connection. The problem we are trying to
+>>>> solve here is that BlueZ returns operation failed error on registering
+>>>> for notification after reconnecting to an unpaired device. And this is
+>>>> caused by the caching which should be reset according to the spec.
+>>>>
+>>>> [Scenario]
+>>>> connect to the remote device without pairing
+>>>> register for notification
+>>>> disconnect from the remote device
+>>>> reconnect without pairing
+>>>> register for notification  --> operation failure with "Already
+>>>> notifying" error message
+>>>
+>>> Well you could just ignore if already notifying, or that still doesn't
+>>> notify? That error perhaps is misleading as it doesn't change anything
+>>> perhaps we should return no error. Btw, if Im not mistake we do
+>>> re-enable the notifications when reconnecting:
+>>>
+>>> bluetoothd[8777]: src/gatt-client.c:register_notify() Re-register
+>>> subscribed notification client
+>>>
+>>> < ACL Data TX: Handle 3585 flags 0x00 dlen 9
+>>>       ATT: Write Request (0x12) len 4
+>>>         Handle: 0x0011
+>>>           Data: 0100
+>>>
+>>>> Other possible workarounds without clearing GATT DB are
+>>>> 1) Skip re-register notify in btd_gatt_client_connected() and clear
+>>>> chrc->notify_clients and client->all_notify_clients for unpaired
+>>>> devices.
+>>>> 2) Clear chrc->service->client->all_notify_clients in
+>>>> btd_gatt_client_disconnected() for unpaired devices.
+>>>
+>>> See above, I think we can just remove the error of already registered
+>>> since we it should already be registered is just a NOP.
+>>>
+>>>> Any comments are appreciated.
+>>>>
+>>>> Thanks,
+>>>> Miao
+>>>>
+>>>> On Thu, May 25, 2017 at 12:44 AM, Von Dentz, Luiz
+>>>> <luiz.von.dentz@intel.com> wrote:
+>>>>> Hi,
+>>>>>
+>>>>> On Thu, May 25, 2017 at 3:10 AM,  <mcchou@chromium.org> wrote:
+>>>>>> From: Miao-chen Chou <mcchou@chromium.org>
+>>>>>>
+>>>>>> This patch adds gatt_db_cleanup() function to clear client-role GATT=
+ DB for the
+>>>>>> unpaired device. According to Core Specification v4.2 [1] and v5.0 [=
+2], the
+>>>>>> attributes should be cleared between unbonded devices after disconne=
+ction, since
+>>>>>> the attributes are no long valid.
+>>>>>>
+>>>>>> [1] Page 525, Section 2.5.2 Attribute Caching, Part G, Volume 3: "Fo=
+r clients
+>>>>>> that do not have a trusted relationship with the server, the attribu=
+te cache is
+>>>>>> valid only during the connection."
+>>>>>> [2] Page 2227, Section 2.5.2 Attribute Caching, Part G, Volume 3: "F=
+or clients
+>>>>>> that do not have a trusted relationship with the server, the attribu=
+te cache is
+>>>>>> valid only during the connection."
+>>>>>
+>>>>> This ignores the fact that devices which don't implement service
+>>>>> changed characteristic shall not change its database so the discovery
+>>>>> may be skipped:
+>>>>>
+>>>>> BLUETOOTH SPECIFICATION Version 5.0 | Vol 3, Part C
+>>>>> page 2079
+>>>>> "If the client had previously determined that the server did not have
+>>>>> the =C2=ABService Changed=C2=BB characteristic then service discovery=
+ may be
+>>>>> skipped."
+>>>>>
+>
+> I think this spec quote is being taken out of context. That paragraph
+> specifically talks about
+> rebonding and as I understand it does not apply to all devices:
+
+I do believe many OSes, including iOS, do cache service discovery
+persistently if Service Changed is no found:
+
+https://github.com/01org/corelibs-arduino101/issues/96
+
+
+>> If a higher layer determines the bond no longer exists on the server, th=
+e client must,
+>> after user interaction to confirm the remote device, re-bond, perform se=
+rvice discovery
+>> and re-configure the server. If the client had previously determined tha=
+t the server did
+>> not have the =C2=ABService Changed=C2=BB characteristic then service dis=
+covery may be skipped.
+>
+>
+>>>>> Also note that we do persist the cache to be able to persist
+>>>>> configuration such as notifications and indications, perhaps in chrom=
+e
+>>>>> you don't really have a use for it but in systems where reconnection
+>>>>> is supported, afaik chrome OS doesn't, it is a must have since
+>>>>> notifications and indications would not work during the discovery if
+>>>>> we remove the cache. And please remember that discovery is a very slo=
+w
+>>>>> procedure, in most cases it takes a good 3-5 seconds to rediscover,
+>>>>> depending on db size it may take over 10 seconds and until it is
+>>>>> completed no attribute can be accessed.
+>>>>>
+>
+> We recognize that rediscovery is an expensive procedure and we do have
+> projects that
+> struggle because of this but as Miao-Chen stated not following the
+> spec is not the right
+> solution. Besides, there are other initiatives inside the Bluetooth SIG t=
+hat
+> would allow caching of the database thus solving this problem across
+> all platforms
+> while still following the spec.
+
+The spec don't say cache cannot be persited, or that you must discard
+the cache completely on disconnect, otherwise we would have a
+qualification test testing this, and no new spec will fix this for
+existing devices although we do intend to take advantage of new
+improvements in this area.
+
+For StartNotify please see above, we might add a config option to
+disable caching for non-bonding devices, other systems might still
+want to do more than just recognize this as a problem.
+
+>>>>> We could, however, have a config option to select the behavior of the
+>>>>> cache or have an option for auto-connect so disabling it also disable
+>>>>> caching.
+>>>>>
+>>>>>> ---
+>>>>>>  src/device.c | 13 +++++++++++++
+>>>>>>  1 file changed, 13 insertions(+)
+>>>>>>
+>>>>>> diff --git a/src/device.c b/src/device.c
+>>>>>> index 1b05561e4..f8cde0b43 100644
+>>>>>> --- a/src/device.c
+>>>>>> +++ b/src/device.c
+>>>>>> @@ -267,6 +267,7 @@ struct pending_sdp_query {
+>>>>>>
+>>>>>>  static int device_browse_gatt(struct btd_device *device, DBusMessag=
+e *msg);
+>>>>>>  static int device_browse_sdp(struct btd_device *device, DBusMessage=
+ *msg);
+>>>>>> +static void store_gatt_db(struct btd_device *device);
+>>>>>>
+>>>>>>  static struct pending_sdp_query *pending_sdp_query_new(DBusConnecti=
+on *conn,
+>>>>>>                                 DBusMessage *msg, const struct btd_d=
+evice *dev)
+>>>>>> @@ -546,6 +547,15 @@ static void browse_request_free(struct browse_r=
+eq *req)
+>>>>>>         g_free(req);
+>>>>>>  }
+>>>>>>
+>>>>>> +static void gatt_db_cleanup(struct btd_device* device)
+>>>>>> +{
+>>>>>> +       if (!device->db)
+>>>>>> +               return;
+>>>>>> +
+>>>>>> +       gatt_db_clear(device->db);
+>>>>>> +       store_gatt_db(device);
+>>>>>> +}
+>>>>>> +
+>>>>>>  static void gatt_client_cleanup(struct btd_device *device)
+>>>>>>  {
+>>>>>>         if (!device->client)
+>>>>>> @@ -578,6 +588,9 @@ static void attio_cleanup(struct btd_device *dev=
+ice)
+>>>>>>                 device->att_io =3D NULL;
+>>>>>>         }
+>>>>>>
+>>>>>> +       if (!device->bredr_state.bonded && !device->le_state.bonded)
+>>>>>> +               gatt_db_cleanup(device);
+>>>>>> +
+>>>>>>         gatt_client_cleanup(device);
+>>>>>>         gatt_server_cleanup(device);
+>>>>>>
+>>>>>> --
+>>>>>> 2.13.0.219.gdb65acc882-goog
+>>>>>>
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-bluetoot=
+h" in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth=
+" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
+--=20
+Luiz Augusto von Dentz
