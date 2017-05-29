@@ -1,12 +1,11 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20170524105424.6708-1-luiz.dentz@gmail.com>
-References: <20170524105424.6708-1-luiz.dentz@gmail.com>
+In-Reply-To: <20170525103712.19143-1-luiz.dentz@gmail.com>
+References: <20170525103712.19143-1-luiz.dentz@gmail.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 29 May 2017 16:16:06 +0300
-Message-ID: <CABBYNZJ_LHJw2rhhFd5pQg5MakR7vCH4DzeDgZBntafqDXEQaQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] shared/gatt-client: Fix not removing services that
- had disappeared
+Date: Mon, 29 May 2017 16:15:37 +0300
+Message-ID: <CABBYNZ+ZcFxdj1Bc7_m5rt_RQ8FP9+yUTXPs_iNC0KvEzKaFbQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] client: Fix using RegisterProfile
 To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -14,147 +13,307 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
 
-On Wed, May 24, 2017 at 1:54 PM, Luiz Augusto von Dentz
+On Thu, May 25, 2017 at 1:37 PM, Luiz Augusto von Dentz
 <luiz.dentz@gmail.com> wrote:
 > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 >
-> If a service cannot be found in the middle of the database the current
-> logic don't clear its range leaving it still active which cause upper
-> layer to its attributes are still available.
+> RegisterProfile no longer works for registering GattProfile instances
+> as this functionality has been moved to RegisterApplication.
 >
-> In order to fix the code now loads existing services into the pending
-> list and remove the services left at the end of the discovery:
+> In order to make this more clear this replaces the (un)register-profile
+> with (un)register-application and enable ObjectManager, here is an
+> example how to register for 12345678-1234-5678-1234-56789abcdef1:
 >
-> src/device.c:gatt_debug() Primary services found: 2
-> src/device.c:gatt_debug() start: 0x0001, end: 0x0005, uuid: 00001800-0000-1000-8000-00805f9b34fb
-> src/device.c:gatt_debug() start: 0x0100, end: 0x0104, uuid: 0000180a-0000-1000-8000-00805f9b34fb
-> src/device.c:gatt_debug() Secondary service discovery failed. ATT ECODE: 0x0a
-> src/device.c:gatt_debug() Characteristics found: 2
-> src/device.c:gatt_debug() start: 0x0101, end: 0x0102, value: 0x0102, props: 0x02, uuid: 00002a24-0000-1
-> src/device.c:gatt_debug() start: 0x0103, end: 0x0104, value: 0x0104, props: 0x02, uuid: 00002a29-0000-1
-> src/device.c:gatt_debug() service disappeared: start 0x0006 end 0x000a
-> src/device.c:gatt_service_removed() start: 0x0006, end: 0x000a
+> [bluetooth]# register-application 12345678-1234-5678-1234-56789abcdef1
+> Application registered
+>
+> bluetoothd[8777]: src/gatt-database.c:manager_register_app() Registering application: :1.483:/
+> bluetoothd[8777]: src/gatt-database.c:proxy_added_cb() Object received: /org/bluez/application, iface: org.bluez.GattProfile1
+> bluetoothd[8777]: src/gatt-database.c:proxy_added_cb() Object received: /org/bluez/agent, iface: org.bluez.Agent1
+> bluetoothd[8777]: src/gatt-database.c:profile_add() Added ":1.483/org/bluez/application/12345678-1234-5678-1234-56789abcdef1"
+> bluetoothd[8777]: src/gatt-database.c:client_ready_cb() GATT application registered: :1.483:/
+>
+> [bluetooth]# unregister-application
+> Application unregistered
+>
+> bluetoothd[8777]: src/gatt-database.c:profile_remove() Removed ":1.483/org/bluez/application/12345678-1234-5678-1234-56789abcdef1"
+> bluetoothd[8777]: src/gatt-database.c:profile_release() Releasing ":1.483"
 > ---
->  src/shared/gatt-client.c | 64 +++++++++++++++++++++++++++++++++++++++++++++++-
->  1 file changed, 63 insertions(+), 1 deletion(-)
+>  client/gatt.c | 94 +++++++++++++++++++++++++++++++++++++----------------------
+>  client/gatt.h |  5 ++--
+>  client/main.c | 13 +++++----
+>  3 files changed, 68 insertions(+), 44 deletions(-)
 >
-> diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
-> index 7557600..b8f70c8 100644
-> --- a/src/shared/gatt-client.c
-> +++ b/src/shared/gatt-client.c
-> @@ -323,6 +323,7 @@ struct discovery_op {
->         uint16_t last;
->         uint16_t svc_first;
->         uint16_t svc_last;
-> +       unsigned int db_id;
->         int ref_count;
->         discovery_op_complete_func_t complete_func;
->         discovery_op_fail_func_t failure_func;
-> @@ -330,6 +331,9 @@ struct discovery_op {
+> diff --git a/client/gatt.c b/client/gatt.c
+> index 79bc7a3..40d3f6a 100644
+> --- a/client/gatt.c
+> +++ b/client/gatt.c
+> @@ -37,12 +37,13 @@
+>  #include <readline/history.h>
+>  #include <glib.h>
 >
->  static void discovery_op_free(struct discovery_op *op)
+> +#include "src/shared/queue.h"
+>  #include "gdbus/gdbus.h"
+>  #include "monitor/uuid.h"
+>  #include "display.h"
+>  #include "gatt.h"
+>
+> -#define PROFILE_PATH "/org/bluez/profile"
+> +#define APP_PATH "/org/bluez/app"
+>  #define PROFILE_INTERFACE "org.bluez.GattProfile1"
+>
+>  /* String display constants */
+> @@ -54,6 +55,7 @@ static GList *services;
+>  static GList *characteristics;
+>  static GList *descriptors;
+>  static GList *managers;
+> +static GList *uuids;
+>
+>  static void print_service(GDBusProxy *proxy, const char *description)
 >  {
-> +       if (op->db_id > 0)
-> +               gatt_db_unregister(op->client->db, op->db_id);
-> +
->         queue_destroy(op->pending_svcs, NULL);
->         queue_destroy(op->pending_chrcs, free);
->         queue_destroy(op->ext_prop_desc, NULL);
-> @@ -339,6 +343,30 @@ static void discovery_op_free(struct discovery_op *op)
->  static void discovery_op_complete(struct discovery_op *op, bool success,
->                                                                 uint8_t err)
->  {
-> +       const struct queue_entry *svc;
-> +
-> +       /*
-> +        * Unregister remove callback so it is not called when clearing unused
-> +        * range.
-> +        */
-> +       gatt_db_unregister(op->client->db, op->db_id);
-> +       op->db_id = 0;
-> +
-> +       /* Remove services pending */
-> +       for (svc = queue_get_entries(op->pending_svcs); svc; svc = svc->next) {
-> +               struct gatt_db_attribute *attr = svc->data;
-> +               uint16_t start, end;
-> +
-> +               gatt_db_attribute_get_service_data(attr, &start, &end,
-> +                                                       NULL, NULL);
-> +
-> +               util_debug(op->client->debug_callback, op->client->debug_data,
-> +                               "service disappeared: start 0x%04x end 0x%04x",
-> +                               start, end);
-> +
-> +               gatt_db_remove_service(op->client->db, attr);
-> +       }
-> +
->         /* Reset remaining range */
->         if (op->last != UINT16_MAX)
->                 gatt_db_clear_range(op->client->db, op->last + 1, UINT16_MAX);
-> @@ -347,6 +375,22 @@ static void discovery_op_complete(struct discovery_op *op, bool success,
->         op->complete_func(op, success, err);
+> @@ -626,21 +628,13 @@ void gatt_notify_attribute(GDBusProxy *proxy, bool enable)
+>                                                 g_dbus_proxy_get_path(proxy));
 >  }
 >
-> +static void discovery_load_services(struct gatt_db_attribute *attr,
-> +                                                       void *user_data)
-> +{
-> +       struct discovery_op *op = user_data;
-> +
-> +       queue_push_tail(op->pending_svcs, attr);
-> +}
-> +
-> +static void discovery_service_changed(struct gatt_db_attribute *attr,
-> +                                                       void *user_data)
-> +{
-> +       struct discovery_op *op = user_data;
-> +
-> +       queue_remove(op->pending_svcs, attr);
-> +}
-> +
->  static struct discovery_op *discovery_op_create(struct bt_gatt_client *client,
->                                 uint16_t start, uint16_t end,
->                                 discovery_op_complete_func_t complete_func,
-> @@ -365,6 +409,19 @@ static struct discovery_op *discovery_op_create(struct bt_gatt_client *client,
->         op->end = end;
->         op->last = gatt_db_isempty(client->db) ? 0 : UINT16_MAX;
+> -static void register_profile_setup(DBusMessageIter *iter, void *user_data)
+> +static void register_app_setup(DBusMessageIter *iter, void *user_data)
+>  {
+> -       wordexp_t *w = user_data;
+> -       DBusMessageIter uuids, opt;
+> -       const char *path = PROFILE_PATH;
+> -       size_t i;
+> +       DBusMessageIter opt;
+> +       const char *path = "/";
 >
-> +       /* Load existing services as pending */
-> +       gatt_db_foreach_service_in_range(client->db, NULL,
-> +                                        discovery_load_services, op,
-> +                                        start, end);
-> +
-> +       /*
-> +        * Services are only added when set active in which case they are no
-> +        * longer pending so it is safe to remove either way.
-> +        */
-> +       op->db_id = gatt_db_register(client->db, discovery_service_changed,
-> +                                               discovery_service_changed,
-> +                                               op, NULL);
-> +
->         return op;
+>         dbus_message_iter_append_basic(iter, DBUS_TYPE_OBJECT_PATH, &path);
+>
+> -       dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY, "s", &uuids);
+> -       for (i = 0; i < w->we_wordc; i++)
+> -               dbus_message_iter_append_basic(&uuids, DBUS_TYPE_STRING,
+> -                                                       &w->we_wordv[i]);
+> -       dbus_message_iter_close_container(iter, &uuids);
+> -
+>         dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
+>                                         DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
+>                                         DBUS_TYPE_STRING_AS_STRING
+> @@ -651,19 +645,19 @@ static void register_profile_setup(DBusMessageIter *iter, void *user_data)
+>
 >  }
 >
-> @@ -840,7 +897,9 @@ static void discovery_found_service(struct discovery_op *op,
->                         op->svc_first = start;
->                 if (op->svc_last < end)
->                         op->svc_last = end;
-> -       }
-> +       } else
-> +               /* Remove from pending if active */
-> +               queue_remove(op->pending_svcs, attr);
+> -static void register_profile_reply(DBusMessage *message, void *user_data)
+> +static void register_app_reply(DBusMessage *message, void *user_data)
+>  {
+>         DBusError error;
 >
->         /* Update last handle */
->         if (end > op->last)
-> @@ -916,6 +975,9 @@ static void discover_secondary_cb(bool success, uint8_t att_ecode,
+>         dbus_error_init(&error);
+>
+>         if (dbus_set_error_from_message(&error, message) == TRUE) {
+> -               rl_printf("Failed to register profile: %s\n", error.name);
+> +               rl_printf("Failed to register application: %s\n", error.name);
+>                 dbus_error_free(&error);
+>                 return;
 >         }
 >
->  next:
-> +       if (queue_isempty(op->pending_svcs))
-> +               goto done;
+> -       rl_printf("Profile registered\n");
+> +       rl_printf("Application registered\n");
+>  }
+>
+>  void gatt_add_manager(GDBusProxy *proxy)
+> @@ -688,7 +682,7 @@ static int match_proxy(const void *a, const void *b)
+>  static DBusMessage *release_profile(DBusConnection *conn,
+>                                         DBusMessage *msg, void *user_data)
+>  {
+> -       g_dbus_unregister_interface(conn, PROFILE_PATH, PROFILE_INTERFACE);
+> +       g_dbus_unregister_interface(conn, APP_PATH, PROFILE_INTERFACE);
+>
+>         return dbus_message_new_method_return(msg);
+>  }
+> @@ -698,10 +692,33 @@ static const GDBusMethodTable methods[] = {
+>         { }
+>  };
+>
+> -void gatt_register_profile(DBusConnection *conn, GDBusProxy *proxy,
+> -                                                               wordexp_t *w)
+> +static gboolean get_uuids(const GDBusPropertyTable *property,
+> +                                       DBusMessageIter *iter, void *data)
+> +{
+> +       DBusMessageIter entry;
+> +       GList *uuid;
 > +
->         client->discovery_req = bt_gatt_discover_included_services(client->att,
->                                                         op->svc_first,
->                                                         op->svc_last,
+> +       dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
+> +                               DBUS_TYPE_STRING_AS_STRING, &entry);
+> +
+> +       for (uuid = uuids; uuid; uuid = g_list_next(uuid->next))
+> +               dbus_message_iter_append_basic(&entry, DBUS_TYPE_STRING,
+> +                                                       &uuid->data);
+> +
+> +       dbus_message_iter_close_container(iter, &entry);
+> +
+> +       return TRUE;
+> +}
+> +
+> +static const GDBusPropertyTable properties[] = {
+> +       { "UUIDs", "as", get_uuids },
+> +       { }
+> +};
+> +
+> +void gatt_register_app(DBusConnection *conn, GDBusProxy *proxy, wordexp_t *w)
+>  {
+>         GList *l;
+> +       unsigned int i;
+>
+>         l = g_list_find_custom(managers, proxy, match_proxy);
+>         if (!l) {
+> @@ -709,23 +726,27 @@ void gatt_register_profile(DBusConnection *conn, GDBusProxy *proxy,
+>                 return;
+>         }
+>
+> -       if (g_dbus_register_interface(conn, PROFILE_PATH,
+> +       if (g_dbus_register_interface(conn, APP_PATH,
+>                                         PROFILE_INTERFACE, methods,
+> -                                       NULL, NULL, NULL, NULL) == FALSE) {
+> -               rl_printf("Failed to register profile object\n");
+> +                                       NULL, properties, NULL, NULL) == FALSE) {
+> +               rl_printf("Failed to register application object\n");
+>                 return;
+>         }
+>
+> -       if (g_dbus_proxy_method_call(l->data, "RegisterProfile",
+> -                                               register_profile_setup,
+> -                                               register_profile_reply, w,
+> +       for (i = 0; i < w->we_wordc; i++)
+> +               uuids = g_list_append(uuids, g_strdup(w->we_wordv[i]));
+> +
+> +       if (g_dbus_proxy_method_call(l->data, "RegisterApplication",
+> +                                               register_app_setup,
+> +                                               register_app_reply, w,
+>                                                 NULL) == FALSE) {
+> -               rl_printf("Failed register profile\n");
+> +               rl_printf("Failed register application\n");
+> +               g_dbus_unregister_interface(conn, APP_PATH, PROFILE_INTERFACE);
+>                 return;
+>         }
+>  }
+>
+> -static void unregister_profile_reply(DBusMessage *message, void *user_data)
+> +static void unregister_app_reply(DBusMessage *message, void *user_data)
+>  {
+>         DBusConnection *conn = user_data;
+>         DBusError error;
+> @@ -733,24 +754,27 @@ static void unregister_profile_reply(DBusMessage *message, void *user_data)
+>         dbus_error_init(&error);
+>
+>         if (dbus_set_error_from_message(&error, message) == TRUE) {
+> -               rl_printf("Failed to unregister profile: %s\n", error.name);
+> +               rl_printf("Failed to unregister application: %s\n", error.name);
+>                 dbus_error_free(&error);
+>                 return;
+>         }
+>
+> -       rl_printf("Profile unregistered\n");
+> +       g_list_free_full(uuids, g_free);
+> +       uuids = NULL;
+> +
+> +       rl_printf("Application unregistered\n");
+>
+> -       g_dbus_unregister_interface(conn, PROFILE_PATH, PROFILE_INTERFACE);
+> +       g_dbus_unregister_interface(conn, APP_PATH, PROFILE_INTERFACE);
+>  }
+>
+> -static void unregister_profile_setup(DBusMessageIter *iter, void *user_data)
+> +static void unregister_app_setup(DBusMessageIter *iter, void *user_data)
+>  {
+> -       const char *path = PROFILE_PATH;
+> +       const char *path = "/";
+>
+>         dbus_message_iter_append_basic(iter, DBUS_TYPE_OBJECT_PATH, &path);
+>  }
+>
+> -void gatt_unregister_profile(DBusConnection *conn, GDBusProxy *proxy)
+> +void gatt_unregister_app(DBusConnection *conn, GDBusProxy *proxy)
+>  {
+>         GList *l;
+>
+> @@ -760,9 +784,9 @@ void gatt_unregister_profile(DBusConnection *conn, GDBusProxy *proxy)
+>                 return;
+>         }
+>
+> -       if (g_dbus_proxy_method_call(l->data, "UnregisterProfile",
+> -                                               unregister_profile_setup,
+> -                                               unregister_profile_reply, conn,
+> +       if (g_dbus_proxy_method_call(l->data, "UnregisterApplication",
+> +                                               unregister_app_setup,
+> +                                               unregister_app_reply, conn,
+>                                                 NULL) == FALSE) {
+>                 rl_printf("Failed unregister profile\n");
+>                 return;
+> diff --git a/client/gatt.h b/client/gatt.h
+> index 7a91975..4c9fd5b 100644
+> --- a/client/gatt.h
+> +++ b/client/gatt.h
+> @@ -41,6 +41,5 @@ void gatt_notify_attribute(GDBusProxy *proxy, bool enable);
+>  void gatt_add_manager(GDBusProxy *proxy);
+>  void gatt_remove_manager(GDBusProxy *proxy);
+>
+> -void gatt_register_profile(DBusConnection *conn, GDBusProxy *proxy,
+> -                                                               wordexp_t *w);
+> -void gatt_unregister_profile(DBusConnection *conn, GDBusProxy *proxy);
+> +void gatt_register_app(DBusConnection *conn, GDBusProxy *proxy, wordexp_t *w);
+> +void gatt_unregister_app(DBusConnection *conn, GDBusProxy *proxy);
+> diff --git a/client/main.c b/client/main.c
+> index 255cbd5..2f269af 100644
+> --- a/client/main.c
+> +++ b/client/main.c
+> @@ -1814,7 +1814,7 @@ static void cmd_notify(const char *arg)
+>         gatt_notify_attribute(default_attr, enable ? true : false);
+>  }
+>
+> -static void cmd_register_profile(const char *arg)
+> +static void cmd_register_app(const char *arg)
+>  {
+>         wordexp_t w;
+>
+> @@ -1831,17 +1831,17 @@ static void cmd_register_profile(const char *arg)
+>                 return;
+>         }
+>
+> -       gatt_register_profile(dbus_conn, default_ctrl->proxy, &w);
+> +       gatt_register_app(dbus_conn, default_ctrl->proxy, &w);
+>
+>         wordfree(&w);
+>  }
+>
+> -static void cmd_unregister_profile(const char *arg)
+> +static void cmd_unregister_app(const char *arg)
+>  {
+>         if (check_default_ctrl() == FALSE)
+>                 return;
+>
+> -       gatt_unregister_profile(dbus_conn, default_ctrl->proxy);
+> +       gatt_unregister_app(dbus_conn, default_ctrl->proxy);
+>  }
+>
+>  static void cmd_version(const char *arg)
+> @@ -2138,9 +2138,9 @@ static const struct {
+>         { "write",        "<data=[xx xx ...]>", cmd_write,
+>                                                 "Write attribute value" },
+>         { "notify",       "<on/off>", cmd_notify, "Notify attribute value" },
+> -       { "register-profile", "<UUID ...>", cmd_register_profile,
+> +       { "register-application", "<UUID ...>", cmd_register_app,
+>                                                 "Register profile to connect" },
+> -       { "unregister-profile", NULL, cmd_unregister_profile,
+> +       { "unregister-application", NULL, cmd_unregister_app,
+>                                                 "Unregister profile" },
+>         { "version",      NULL,       cmd_version, "Display version" },
+>         { "quit",         NULL,       cmd_quit, "Quit program" },
+> @@ -2407,6 +2407,7 @@ int main(int argc, char *argv[])
+>
+>         main_loop = g_main_loop_new(NULL, FALSE);
+>         dbus_conn = g_dbus_setup_bus(DBUS_BUS_SYSTEM, NULL, NULL);
+> +       g_dbus_attach_object_manager(dbus_conn);
+>
+>         setlinebuf(stdout);
+>         rl_attempted_completion_function = cmd_completion;
 > --
 > 2.9.4
 >
