@@ -1,47 +1,29 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Subject: Re: [BUG] unit/test-gatt failure uninitialized pointer(?)
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+References: <2992e569-78e1-ea64-52b5-a2df11a6c948@message-id.googlemail.com>
+ <CABBYNZ+90yuLCDhEskujMK0jbqAM=VoGQYj6AQqz=Np8wyEhnw@mail.gmail.com>
+ <fa6ffb78-74c9-6797-5a69-c46948341b2a@message-id.googlemail.com>
+ <a26a80a9-f727-785b-4baa-62a9dc83bf56@message-id.googlemail.com>
+ <CABBYNZ+7_+6jxuazNgSo61+KprWD8dcyrkcapTA5HjDuCze7Pg@mail.gmail.com>
+ <55f07989-54e8-7e31-9a0c-536f1febf633@message-id.googlemail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+From: Stefan Seyfried <stefan.seyfried@googlemail.com>
+Message-ID: <2239b6c8-febb-3040-0315-b39b2c391cc3@message-id.googlemail.com>
+Date: Mon, 29 May 2017 14:45:42 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170526085837.14705-1-luiz.dentz@gmail.com>
-References: <20170526085837.14705-1-luiz.dentz@gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 29 May 2017 16:15:10 +0300
-Message-ID: <CABBYNZL+o9GmWykziW7yGRrVvv_vJZCPwXj2NR3qFuhiUwZ_1A@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] core/gatt: Don't return an error if notification is
- already enabled
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <55f07989-54e8-7e31-9a0c-536f1febf633@message-id.googlemail.com>
+Content-Type: text/plain; charset=utf-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+On 29.05.2017 14:10, Stefan Seyfried wrote:
+> It should probably be reproducible by unloading and blacklisting the af_alg module on your machine.
 
-On Fri, May 26, 2017 at 11:58 AM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> In case the client is already subscribed and attempt to register again
-> just return success as the handling should be the same as success.
-> ---
->  src/gatt-client.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/src/gatt-client.c b/src/gatt-client.c
-> index b86bfe6..6c67841 100644
-> --- a/src/gatt-client.c
-> +++ b/src/gatt-client.c
-> @@ -1173,7 +1173,7 @@ static DBusMessage *characteristic_start_notify(DBusConnection *conn,
->         client = queue_find(chrc->notify_clients, match_notify_sender, sender);
->         if (client)
->                 return client->notify_id ?
-> -                               btd_error_failed(msg, "Already notifying") :
-> +                               g_dbus_create_reply(msg, DBUS_TYPE_INVALID) :
->                                 btd_error_in_progress(msg);
->
->         client = notify_client_create(chrc, sender);
-> --
-> 2.9.4
-
-Applied.
-
+I just tried this and this reproduces the infinite hang just fine. It does not crash the test, though.
 
 -- 
-Luiz Augusto von Dentz
+Stefan Seyfried
+
+"For a successful technology, reality must take precedence over
+ public relations, for nature cannot be fooled." -- Richard Feynman
