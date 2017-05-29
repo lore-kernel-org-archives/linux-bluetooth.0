@@ -1,97 +1,124 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Subject: Re: [BUG] unit/test-gatt failure uninitialized pointer(?)
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <a26a80a9-f727-785b-4baa-62a9dc83bf56@message-id.googlemail.com>
 References: <2992e569-78e1-ea64-52b5-a2df11a6c948@message-id.googlemail.com>
  <CABBYNZ+90yuLCDhEskujMK0jbqAM=VoGQYj6AQqz=Np8wyEhnw@mail.gmail.com>
- <fa6ffb78-74c9-6797-5a69-c46948341b2a@message-id.googlemail.com>
- <a26a80a9-f727-785b-4baa-62a9dc83bf56@message-id.googlemail.com>
- <CABBYNZ+7_+6jxuazNgSo61+KprWD8dcyrkcapTA5HjDuCze7Pg@mail.gmail.com>
+ <fa6ffb78-74c9-6797-5a69-c46948341b2a@message-id.googlemail.com> <a26a80a9-f727-785b-4baa-62a9dc83bf56@message-id.googlemail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Mon, 29 May 2017 14:42:21 +0300
+Message-ID: <CABBYNZ+7_+6jxuazNgSo61+KprWD8dcyrkcapTA5HjDuCze7Pg@mail.gmail.com>
+Subject: Re: [BUG] unit/test-gatt failure uninitialized pointer(?)
+To: Stefan Seyfried <stefan.seyfried@googlemail.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-From: Stefan Seyfried <stefan.seyfried@googlemail.com>
-Message-ID: <55f07989-54e8-7e31-9a0c-536f1febf633@message-id.googlemail.com>
-Date: Mon, 29 May 2017 14:10:43 +0200
-MIME-Version: 1.0
-In-Reply-To: <CABBYNZ+7_+6jxuazNgSo61+KprWD8dcyrkcapTA5HjDuCze7Pg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Stefan,
 
-On 29.05.2017 13:42, Luiz Augusto von Dentz wrote:
-> unit/test-gatt -p  /robustness/unkown-request
+On Mon, May 29, 2017 at 12:06 PM, Stefan Seyfried
+<stefan.seyfried@googlemail.com> wrote:
+> On 29.05.2017 09:14, Stefan Seyfried wrote:
+>> I did not yet use valgrind inside the OBS build VM, but I can try to do that, that might give additional hints.
+>
+> /robustness/unkown-request - init
+> /robustness/unkown-request - setup
+> /robustness/unkown-request - setup complete
+> /robustness/unkown-request - run
+> ==12262== Invalid read of size 8
+> ==12262==    at 0x13FF29: timeout_cb (att.c:405)
+> ==12262==    by 0x14C45C: timeout_callback (timeout-glib.c:34)
+> ==12262==    by 0x4E86412: ??? (in /usr/lib64/libglib-2.0.so.0.5200.2)
+> ==12262==    by 0x4E85994: g_main_context_dispatch (in /usr/lib64/libglib-2.0.so.0.5200.2)
+> ==12262==    by 0x4E85D57: ??? (in /usr/lib64/libglib-2.0.so.0.5200.2)
+> ==12262==    by 0x4E86071: g_main_loop_run (in /usr/lib64/libglib-2.0.so.0.5200.2)
+> ==12262==    by 0x13FBAB: tester_run (tester.c:830)
+> ==12262==    by 0x13C83D: main (test-gatt.c:4488)
+> ==12262==  Address 0x5a9c970 is 32 bytes inside a block of size 192 free'd
+> ==12262==    at 0x4C2D27B: free (in /usr/lib64/valgrind/vgpreload_memcheck-amd64-linux.so)
+> ==12262==    by 0x1414EB: can_read_data (att.c:920)
+> ==12262==    by 0x14C022: watch_callback (io-glib.c:170)
+> ==12262==    by 0x4E85994: g_main_context_dispatch (in /usr/lib64/libglib-2.0.so.0.5200.2)
+> ==12262==    by 0x4E85D57: ??? (in /usr/lib64/libglib-2.0.so.0.5200.2)
+> ==12262==    by 0x4E86071: g_main_loop_run (in /usr/lib64/libglib-2.0.so.0.5200.2)
+> ==12262==    by 0x13FBAB: tester_run (tester.c:830)
+> ==12262==    by 0x13C83D: main (test-gatt.c:4488)
+> ==12262==  Block was alloc'd at
+> ==12262==    at 0x4C2C04F: malloc (in /usr/lib64/valgrind/vgpreload_memcheck-amd64-linux.so)
+> ==12262==    by 0x13E90D: btd_malloc (util.c:45)
+> ==12262==    by 0x14052E: bt_att_new (att.c:1000)
+> ==12262==    by 0x13E3F1: create_context.constprop.27 (test-gatt.c:670)
+> ==12262==    by 0x13ED57: run_callback (tester.c:415)
+> ==12262==    by 0x4E85994: g_main_context_dispatch (in /usr/lib64/libglib-2.0.so.0.5200.2)
+> ==12262==    by 0x4E85D57: ??? (in /usr/lib64/libglib-2.0.so.0.5200.2)
+> ==12262==    by 0x4E86071: g_main_loop_run (in /usr/lib64/libglib-2.0.so.0.5200.2)
+> ==12262==    by 0x13FBAB: tester_run (tester.c:830)
+> ==12262==    by 0x13C83D: main (test-gatt.c:4488)
+> ==12262==
+> ==12262== Invalid read of size 8
+> ==12262==    at 0x13FF39: timeout_cb (att.c:408)
+> ==12262==    by 0x14C45C: timeout_callback (timeout-glib.c:34)
+> ==12262==    by 0x4E86412: ??? (in /usr/lib64/libglib-2.0.so.0.5200.2)
+> ==12262==    by 0x4E85994: g_main_context_dispatch (in /usr/lib64/libglib-2.0.so.0.5200.2)
+> ==12262==    by 0x4E85D57: ??? (in /usr/lib64/libglib-2.0.so.0.5200.2)
+> ==12262==    by 0x4E86071: g_main_loop_run (in /usr/lib64/libglib-2.0.so.0.5200.2)
+> ==12262==    by 0x13FBAB: tester_run (tester.c:830)
+> ==12262==    by 0x13C83D: main (test-gatt.c:4488)
+> ==12262==  Address 0x5a9c980 is 48 bytes inside a block of size 192 free'd
+> ==12262==    at 0x4C2D27B: free (in /usr/lib64/valgrind/vgpreload_memcheck-amd64-linux.so)
+> ==12262==    by 0x1414EB: can_read_data (att.c:920)
+> ==12262==    by 0x14C022: watch_callback (io-glib.c:170)
+> ==12262==    by 0x4E85994: g_main_context_dispatch (in /usr/lib64/libglib-2.0.so.0.5200.2)
+> ==12262==    by 0x4E85D57: ??? (in /usr/lib64/libglib-2.0.so.0.5200.2)
+> ==12262==    by 0x4E86071: g_main_loop_run (in /usr/lib64/libglib-2.0.so.0.5200.2)
+> ==12262==    by 0x13FBAB: tester_run (tester.c:830)
+> ==12262==    by 0x13C83D: main (test-gatt.c:4488)
+> ==12262==  Block was alloc'd at
+> ==12262==    at 0x4C2C04F: malloc (in /usr/lib64/valgrind/vgpreload_memcheck-amd64-linux.so)
+> ==12262==    by 0x13E90D: btd_malloc (util.c:45)
+> ==12262==    by 0x14052E: bt_att_new (att.c:1000)
+> ==12262==    by 0x13E3F1: create_context.constprop.27 (test-gatt.c:670)
+> ==12262==    by 0x13ED57: run_callback (tester.c:415)
+> ==12262==    by 0x4E85994: g_main_context_dispatch (in /usr/lib64/libglib-2.0.so.0.5200.2)
+> ==12262==    by 0x4E85D57: ??? (in /usr/lib64/libglib-2.0.so.0.5200.2)
+> ==12262==    by 0x4E86071: g_main_loop_run (in /usr/lib64/libglib-2.0.so.0.5200.2)
+> ==12262==    by 0x13FBAB: tester_run (tester.c:830)
+> ==12262==    by 0x13C83D: main (test-gatt.c:4488)
+> ==12262==
+>
+> it does not crash under valgrind, but also does not finish, I aborted it with ctrl-C after a few minutes.
+>
+> It seems to hit a 30 seconds timeout btw, if that's of any use:
+>
+> abuild@susi:~/rpmbuild/BUILD/bluez-5.45> time unit/test-gatt >/dev/null
+> Segmentation fault (core dumped)
+>
+> real    0m30.061s
+> user    0m0.044s
+> sys     0m0.024s
 
-This hangs for apparently infinite time, but does not crash. So you are probably right, that some previous test does
-create a timeout handler which is triggered by this infinite wait and then crashes the test.
+That test in specific does not do any request, it only respond so I
+think it is perhaps some of the previous test. Just confirm this you
+can run just /robustness/unkown-request test alone with:
 
-This test VMs are not slow, so it's not a performance problem. They just have limited connectivity.
+unit/test-gatt -p  /robustness/unkown-request
 
-I debugged this with strace and found the following difference:
+Btw, it may as well be that this problem has been around since the
+beginning but we only find out about it now with addition of more test
+which makes the entire set to be over 30 seconds on slow hosts.
 
-Working:
+> Hope this sheds some light on the issue.
+>
+> Best regards,
+>
+>         Stefan
+> --
+> Stefan Seyfried
+>
+> "For a successful technology, reality must take precedence over
+>  public relations, for nature cannot be fooled." -- Richard Feynman
 
-13:55:57 write(1, "\33[1;39m/robustness/unkown-reques"..., 55/robustness/unkown-request - run
-) = 55 <0.000053>
-13:55:57 socketpair(AF_UNIX, SOCK_SEQPACKET|SOCK_CLOEXEC, 0, [5, 6]) = 0 <0.000051>
-13:55:57 fstat(5, {st_dev=makedev(0, 9), st_ino=281430, st_mode=S_IFSOCK|0777, st_nlink=1, st_uid=10329, st_gid=100,
-st_blksize=4096, st_blocks=0, st_size=0, st_atime=0, st_mtime=0, st_ctime=0}) = 0 <0.000049>
-13:55:57 fcntl(5, F_GETFL)              = 0x2 (flags O_RDWR) <0.000049>
-13:55:57 socket(AF_ALG, SOCK_SEQPACKET|SOCK_CLOEXEC, 0) = 7 <0.000048>
-13:55:57 bind(7, {sa_family=AF_ALG,
-sa_data="skcipher\0\0\0\0\0\0\0\0\0\0\0\0\0\0ecb(aes)\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"},
-88) = 0 <0.000071>
-13:55:57 open("/dev/urandom", O_RDONLY) = 8 <0.000054>
-13:55:57 socket(AF_ALG, SOCK_SEQPACKET|SOCK_CLOEXEC, 0) = 9 <0.000062>
-13:55:57 bind(9, {sa_family=AF_ALG,
-sa_data="hash\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0cmac(aes)\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"},
-88) = 0 <0.000061>
-13:55:57 getsockopt(5, SOL_SOCKET, SO_DOMAIN, [1], [4]) = 0 <0.000052>
-13:55:57 fstat(6, {st_dev=makedev(0, 9), st_ino=281431, st_mode=S_IFSOCK|0777, st_nlink=1, st_uid=10329, st_gid=100,
-st_blksize=4096, st_blocks=0, st_size=0, st_atime=0, st_mtime=0, st_ctime=0}) = 0 <0.000049>
-13:55:57 fcntl(6, F_GETFL)              = 0x2 (flags O_RDWR) <0.000050>
 
-Not working:
 
-11:54:59 write(1, "\33[1;39m/robustness/unkown-reques"..., 55/robustness/unkown-request - run
-) = 55 <0.000354>
-11:54:59 socketpair(AF_UNIX, SOCK_SEQPACKET|SOCK_CLOEXEC, 0, [5, 6]) = 0 <0.000224>
-11:54:59 fstat(5, {st_dev=makedev(0, 9), st_ino=26139, st_mode=S_IFSOCK|0777, st_nlink=1, st_uid=399, st_gid=399,
-st_blksize=4096, st_blocks=0, st_size=0, st_atime=0, st_mtime=0, st_ctime=0}) = 0 <0.000174>
-11:54:59 fcntl(5, F_GETFL)              = 0x2 (flags O_RDWR) <0.000079>
-11:54:59 socket(AF_ALG, SOCK_SEQPACKET|SOCK_CLOEXEC, 0) = -1 EAFNOSUPPORT (Address family not supported by protocol)
-<0.000287>
-11:54:59 getsockopt(5, SOL_SOCKET, SO_DOMAIN, [1], [4]) = 0 <0.000191>
-11:54:59 fstat(6, {st_dev=makedev(0, 9), st_ino=26140, st_mode=S_IFSOCK|0777, st_nlink=1, st_uid=399, st_gid=399,
-st_blksize=4096, st_blocks=0, st_size=0, st_atime=0, st_mtime=0, st_ctime=0}) = 0 <0.000062>
-11:54:59 fcntl(6, F_GETFL)              = 0x2 (flags O_RDWR) <0.000223>
-11:54:59 write(6, "\2\27\0", 3)         = 3 <0.000061>
-11:54:59 poll([{fd=3, events=POLLIN}, {fd=4, events=POLLIN}, {fd=5, events=POLLIN}, {fd=6, events=POLLIN}], 4, -1) = 1
-([{fd=5, revents=POLLIN}]) <0.000208>
-11:54:59 read(5, "\2\27\0", 23)         = 3 <0.000062>
-11:54:59 poll([{fd=3, events=POLLIN}, {fd=4, events=POLLIN}, {fd=5, events=POLLIN|POLLOUT}, {fd=6, events=POLLIN}], 4,
--1) = 1 ([{fd=5, revents=POLLOUT}]) <0.000040>
-11:54:59 writev(5, [{iov_base="\3\0\2", iov_len=3}], 1) = 3 <0.000060>
-11:54:59 poll([{fd=3, events=POLLIN}, {fd=4, events=POLLIN}, {fd=5, events=POLLIN|POLLOUT}, {fd=6, events=POLLIN}], 4,
--1) = 2 ([{fd=5, revents=POLLOUT}, {fd=6, revents=POLLIN}]) <0.000054>
-11:54:59 read(6, "\3\0\2", 512)         = 3 <0.000035>
-11:54:59 poll([{fd=3, events=POLLIN}, {fd=4, events=POLLIN}, {fd=5, events=POLLIN}, {fd=6, events=POLLIN}], 4, 0) = 0
-(Timeout) <0.000198>
-11:54:59 write(6, "\277\0", 2)          = 2 <0.000208>
-11:54:59 poll([{fd=3, events=POLLIN}, {fd=4, events=POLLIN}, {fd=5, events=POLLIN}, {fd=6, events=POLLIN}], 4, -1) = 1
-([{fd=5, revents=POLLIN}]) <0.000203>
-11:54:59 read(5, "\277\0", 23)          = 2 <0.000197>
-11:54:59 poll([{fd=3, events=POLLIN}, {fd=4, events=POLLIN}, {fd=5, events=POLLIN}, {fd=6, events=POLLIN}], 4, -1
-
-So it seems the VM has no support for AF_ALG and thus the test hangs infinitely, the old timeout kicks in and crashes
-the test.
-
-It should probably be reproducible by unloading and blacklisting the af_alg module on your machine.
-
-Best regards,
-
-	Stefan
 -- 
-Stefan Seyfried
-
-"For a successful technology, reality must take precedence over
- public relations, for nature cannot be fooled." -- Richard Feynman
+Luiz Augusto von Dentz
