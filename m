@@ -1,28 +1,37 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-To: <linux-bluetooth@vger.kernel.org>
-From: Felix Schulthess <felix.schulthess@scs.ch>
-Subject: Finding MTU of current BLE connection
-Message-ID: <1a2056c8-7d1b-a209-daab-39abf6cf5db4@scs.ch>
-Date: Tue, 30 May 2017 16:53:42 +0200
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ] shared/gatt-client: Fix removing services with no attributes
+Date: Tue, 30 May 2017 14:45:39 +0300
+Message-Id: <20170530114539.4441-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi all,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-I am trying to figure out the MTU of a BLE connection while it is
-active. If I understand the Core Specification correctly, this can be
-accomplished with the "Exchange MTU Request" as specified in Vol. 3,
-Part F, Section 3.4.2.
+If a service has no attributes, like IPSS, just mark it as active and
+skip doing any attribute discover.
+---
+ src/shared/gatt-client.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-1. I know one can send HCI commands with the hcitool. Is it also
-possible to issue the request specified above using any of the existing
-hciconfig, hcitool, hciXXX tools to find the MTU?
+diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
+index b8f70c8..58ab0b8 100644
+--- a/src/shared/gatt-client.c
++++ b/src/shared/gatt-client.c
+@@ -890,7 +890,11 @@ static void discovery_found_service(struct discovery_op *op,
+ {
+ 	/* Skip if service already active */
+ 	if (!gatt_db_service_get_active(attr)) {
+-		queue_push_tail(op->pending_svcs, attr);
++		/* Skip if there are no attributes */
++		if (end == start)
++			gatt_db_service_set_active(attr, true);
++		else
++			queue_push_tail(op->pending_svcs, attr);
+ 
+ 		/* Update discovery range */
+ 		if (!op->svc_first || op->svc_first > start)
+-- 
+2.9.4
 
-2. There is a connection of which I know that its MTU is 512. Still,
-running 'hciconfig hci0 dev' reports 'ACL MTU: 310:10'. Why is that so?
-
-I use Bluez 5.44 on Debian Linux, Kernel version 4.9.18.
-
-Best, Felix
