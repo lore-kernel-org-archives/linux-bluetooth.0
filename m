@@ -1,103 +1,75 @@
-Return-Path: <monstr@monstr.eu>
-Reply-To: monstr@monstr.eu
-Subject: Re: BT led trigger
-To: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org
-References: <0d6dd864-4c1b-5b78-ad67-98343ee42950@monstr.eu>
- <224A641D-142D-4C11-BA6A-8AE1D338752D@holtmann.org>
-From: Michal Simek <monstr@monstr.eu>
-Message-ID: <3891fa14-043d-abf8-786c-1a2a82925283@monstr.eu>
-Date: Wed, 31 May 2017 19:57:45 +0200
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <224A641D-142D-4C11-BA6A-8AE1D338752D@holtmann.org>
-Content-Type: multipart/signed; micalg=pgp-sha1;
- protocol="application/pgp-signature";
- boundary="6HW3ETKD9ogidWL49mspiMhbD1pJ6OqSA"
+From: Mark Spruiell <mes@zeroc.com>
+Date: Wed, 31 May 2017 10:53:24 -0700
+Message-ID: <CABOZqngNPTEnvJvtvLn0UcTsGt7+Tsorptjav2ohAyDaUYTY5A@mail.gmail.com>
+Subject: Segfault in BlueZ 5.45
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---6HW3ETKD9ogidWL49mspiMhbD1pJ6OqSA
-Content-Type: multipart/mixed; boundary="14ETBD4WsjM8XR6n15UccdwNRNOKHbMe6";
- protected-headers="v1"
-From: Michal Simek <monstr@monstr.eu>
-Reply-To: monstr@monstr.eu
-To: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org
-Message-ID: <3891fa14-043d-abf8-786c-1a2a82925283@monstr.eu>
-Subject: Re: BT led trigger
-References: <0d6dd864-4c1b-5b78-ad67-98343ee42950@monstr.eu>
- <224A641D-142D-4C11-BA6A-8AE1D338752D@holtmann.org>
-In-Reply-To: <224A641D-142D-4C11-BA6A-8AE1D338752D@holtmann.org>
+I built BlueZ 5.45 from source on Ubuntu 16.04 and ran the daemon in
+the foreground with
 
---14ETBD4WsjM8XR6n15UccdwNRNOKHbMe6
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+$ sudo src/bluetoothd -d -n
 
-Hi Marcel, +linux-bluetooth,
+I then ran a program that uses the ConnectProfile API to connect to
+another device. It succeeds most of the time but occasionally crashes
+with a segfault. Here is the stack trace:
 
-On 31.5.2017 19:34, Marcel Holtmann wrote:
-> Hi Michal,
->=20
->> I have found your name in connection to net/bluetooth/leds.c trigger.
->> I understand that this trigger will show status of hci controller
->> and this is just working fine. I have tested it without any issue.
->> I am curious if we could use this trigger to handle also gpio signal
->> which is enabling BT. I am using ti chip where we have bt_en connected=
+#0  sprintf (__fmt=<optimized out>, __s=<optimized out>) at
+/usr/include/x86_64-linux-gnu/bits/stdio2.h:33
+#1  ba2str (ba=0x5f46305f43445f52, str=str@entry=0x7fffdeb4c350 "") at
+lib/bluetooth.c:79
+#2  0x0000000000469ac3 in update_bredr_services
+(req=req@entry=0x23a59c0, recs=recs@entry=0x23a60e0)
+    at src/device.c:4305
+#3  0x000000000046a1d2 in browse_cb (recs=0x23a60e0, err=0,
+user_data=0x23a59c0) at src/device.c:4536
+#4  0x0000000000447403 in search_completed_cb (type=<optimized out>,
+status=<optimized out>, rsp=<optimized out>,
+    size=<optimized out>, user_data=0x23a0810) at src/sdp-client.c:205
+#5  0x000000000047a88d in sdp_process (session=<optimized out>) at
+lib/sdp.c:4354
+#6  0x0000000000447545 in search_process_cb (chan=<optimized out>,
+cond=<optimized out>, user_data=0x23a0810)
+    at src/sdp-client.c:230
+#7  0x00007f8cbe0b704a in g_main_context_dispatch () from
+/lib/x86_64-linux-gnu/libglib-2.0.so.0
+#8  0x00007f8cbe0b73f0 in ?? () from /lib/x86_64-linux-gnu/libglib-2.0.so.0
+#9  0x00007f8cbe0b7712 in g_main_loop_run () from
+/lib/x86_64-linux-gnu/libglib-2.0.so.0
+#10 0x000000000040b38e in main (argc=1, argv=0x7fffdeb4e898) at src/main.c:708
 
->> to gpio.
->> I have seen that people are handling this from userspace by exporting
->> gpio and writing values there but it looks pretty bad to me.
->>
->> Have you ever tried to use bt led trigger also for handling gpio enabl=
-e
->> signals? Or is there any other nice way how to handle it?
->=20
-> that is the wrong approach. See how hci_intel.c, hci_bcm.c, hci_nokia.c=
- and others are dealing with the GPIO pins in the background. There is no=
- need for any user space hacks anymore.
+The call to ConnectProfile is always to the same remote device
+address, which is paired and trusted.
 
-I use TI wl1831 over uart with flow control which is using hci_ll.c.
-I understand handling when you have specific driver that you need to
-handle it. But if this is just over uart where from simply running
-"hciattach -n /dev/ttyS1 texas"
-I can detect this chip.
+I tried it with BlueZ 5.44 and got a crash similar to this report:
 
-> Also please use linux-bluetooth@vger.kernel.org for these kinds of ques=
-tions.
+http://marc.info/?l=linux-bluetooth&m=149286683912995&w=2
 
-Sorry about it now. Fixed now.
+Here is the stack trace from 5.44:
 
-Also I have seen that in bluez that hciattach is deprecated tool.
-https://git.kernel.org/pub/scm/bluetooth/bluez.git/commit/?id=3Db1eb2c4c
-And there are new tools which should replace them
-https://git.kernel.org/pub/scm/bluetooth/bluez.git/commit/?id=3D301904d6
+#0  browse_cb (recs=0xc78d90, err=0, user_data=0xc77510) at src/device.c:4523
+#1  0x0000000000447423 in search_completed_cb (type=<optimized out>,
+status=<optimized out>, rsp=<optimized out>,
+    size=<optimized out>, user_data=0xc6dcc0) at src/sdp-client.c:205
+#2  0x000000000047a65d in sdp_process (session=<optimized out>) at
+lib/sdp.c:4354
+#3  0x0000000000447565 in search_process_cb (chan=<optimized out>,
+cond=<optimized out>, user_data=0xc6dcc0)
+    at src/sdp-client.c:230
+#4  0x00007f1cfa74b04a in g_main_context_dispatch () from
+/lib/x86_64-linux-gnu/libglib-2.0.so.0
+#5  0x00007f1cfa74b3f0 in ?? () from /lib/x86_64-linux-gnu/libglib-2.0.so.0
+#6  0x00007f1cfa74b712 in g_main_loop_run () from
+/lib/x86_64-linux-gnu/libglib-2.0.so.0
+#7  0x000000000040b38e in main (argc=1, argv=0x7ffd26bdf7f8) at src/main.c:708
 
-Should I use btattach instead?
+This problem has not occurred yet with BlueZ 5.43.
+
+Let me know if you need any other information.
 
 Thanks,
-Michal
-
---=20
-Michal Simek, Ing. (M.Eng), OpenPGP -> KeyID: FE3D1F91
-w: www.monstr.eu p: +42-0-721842854
-Maintainer of Linux kernel - Xilinx Microblaze
-Maintainer of Linux kernel - Xilinx Zynq ARM and ZynqMP ARM64 SoCs
-U-Boot custodian - Xilinx Microblaze/Zynq/ZynqMP SoCs
-
-
-
---14ETBD4WsjM8XR6n15UccdwNRNOKHbMe6--
-
---6HW3ETKD9ogidWL49mspiMhbD1pJ6OqSA
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.22 (GNU/Linux)
-
-iEYEARECAAYFAlkvBBkACgkQykllyylKDCH0PQCglkQ+TpE8UzTomnM/VbTatHv+
-CasAn172qZd8SsXTPKYLOn5oVHzsvJcd
-=3Qh/
------END PGP SIGNATURE-----
-
---6HW3ETKD9ogidWL49mspiMhbD1pJ6OqSA--
+Mark
