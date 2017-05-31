@@ -1,143 +1,130 @@
-Return-Path: <joshua.weng.onn.wong@intel.com>
-From: "Wong, Joshua Weng Onn" <joshua.weng.onn.wong@intel.com>
+Return-Path: <garsilva@embeddedor.com>
+Date: Tue, 30 May 2017 22:36:29 -0500
+Message-ID: <20170530223629.Horde.l1icLUD-56lD-xqEDjo6CDT@gator4166.hostgator.com>
+From: "Gustavo A. R. Silva" <garsilva@embeddedor.com>
 To: Marcel Holtmann <marcel@holtmann.org>
-CC: "Wong, Mun choy" <mun.choy.wong@intel.com>, "Zulqarnain, Adam"
-	<adam.zulqarnain@intel.com>, Avinash Kadam <avinashk@marvell.com>, "Bluez
- mailing list" <linux-bluetooth@vger.kernel.org>
-Subject: RE: Unexpected SMP Command 0x0a
-Date: Wed, 31 May 2017 07:25:06 +0000
-Message-ID: <E3B98393E6037849B63EA428240A651306131540@PGSMSX103.gar.corp.intel.com>
-References: <E3B98393E6037849B63EA428240A651362A579@PGSMSX103.gar.corp.intel.com>
- <E3B98393E6037849B63EA428240A651306125351@PGSMSX103.gar.corp.intel.com>
- <753A4460-944B-47FA-9381-F5E4FE619B28@holtmann.org>
- <E3B98393E6037849B63EA428240A651306125616@PGSMSX103.gar.corp.intel.com>
- <D631CDDE-4EA4-4BF2-855F-E3C23CB2B6A8@holtmann.org>
-In-Reply-To: <D631CDDE-4EA4-4BF2-855F-E3C23CB2B6A8@holtmann.org>
-Content-Type: text/plain; charset="utf-8"
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>, Johan Hedberg
+ <johan.hedberg@gmail.com>, "David S. Miller" <davem@davemloft.net>, "open
+ list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [net-bluetooth] question about potential null pointer
+ dereference
+References: <20170530112328.Horde.PY1jf3InPf-6SU3kH9l7mtw@gator4166.hostgator.com>
+ <62DD828F-D88E-4916-BD0B-347E433ACCE6@holtmann.org>
+ <20170530222953.Horde.lmsiZcFwJeJ7pN4QQZ_Fyk7@gator4166.hostgator.com>
+In-Reply-To: <20170530222953.Horde.lmsiZcFwJeJ7pN4QQZ_Fyk7@gator4166.hostgator.com>
+Content-Type: text/plain; charset=utf-8; format=flowed; DelSp=Yes
 MIME-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgTWFyY2VsLA0KDQo+ID4+PiBJIHdvdWxkIGxpa2UgdG8gZm9sbG93IHVwIHdpdGggdGhpcyBp
-c3N1ZS4NCj4gPj4+DQo+ID4+Pj4+Pj4+Pj4gWWVzLCBmb3Igc2VjdXJlIGNvbm5lY3Rpb24gdGhl
-IExUSyBpcyBnZW5lcmF0ZWQgbG9jYWxseS4NCj4gPj4+Pj4+Pj4+PiBCdXQgaXNzdWUgaGVyZSBp
-cyBvYnNlcnZlZCB0aGF0IGFmdGVyIFBhaXJpbmcgaXMgY29tcGxldGUgdGhlDQo+ID4+Pj4+Pj4+
-Pj4ga2V5IGRpc3RyaWJ1dGlvbiBpcyBub3QgY29tcGxldGVkIGZyb20gTWFzdGVyLg0KPiA+Pj4+
-Pj4+Pj4+DQo+ID4+Pj4+Pj4+Pj4gaS5lLiBBZnRlciBTbGF2ZSBzZW5kcyB0aGUgICJTaWduYXR1
-cmUga2V5OiIgYnV0IE1hc3Rlcg0KPiA+Pj4+Pj4+Pj4+IGRvZXNuJ3Qgc2hhcmUgYW55IGtleS4g
-IEF0dGFjaGVkIGxvZ3MuDQo+ID4+Pj4+Pj4+PiBJIGdldCB0aGF0IGFuZCB0aGF0IGlzIGNsZWFy
-IGZyb20gdGhlIGxvZ3MuIFNvbWV0aGluZyBpcw0KPiA+Pj4+Pj4+Pj4gc3RhbGxpbmcgaGVyZSBh
-bmQgYmVjYXVzZSBvZiB0aGF0LCB5b3UgcnVuIGludG8gdGhlIDMwIHNlY29uZHMNCj4gPj4+Pj4+
-Pj4+IFNNUA0KPiA+Pj4+IHRpbWVvdXQuDQo+ID4+Pj4+Pj4+PiBXZSBqdXN0IG5lZWQgdG8ga25v
-dyBpZiB0aGUgNC45IGtlcm5lbCBpcyBkb2luZyB0aGlzIGNvcnJlY3RseS4NCj4gPj4+Pj4+Pj4+
-IElmIHNvLCB0aGVuIHlvdSBjYW4gYmktc2VjdCB0aGF0IHBhdGNoIHRoYXQgZml4ZXMuIFdpdGhv
-dXQNCj4gPj4+Pj4+Pj4+IHByb29mIHRoYXQNCj4gPj4+Pj4+Pj4+IDQuOSBpcyBhbHNvIGJyb2tl
-biwgbm9ib2R5IHdpbGwgZXZlbiBib3RoZXIgdG8gY2hhc2UgdGhpcyBkb3duLg0KPiA+Pj4+Pj4+
-Pg0KPiA+Pj4+Pj4+PiBJIHRoaW5rIHRoZSBwcm9ibGVtIGhlcmUgaXMgcmFjZSBiZXR3ZWVuIEFD
-TCBkYXRhIGFuZCBIQ0kNCj4gPj4+Pj4+Pj4gZXZlbnRzIG9uIFVTQiBkb25nbGUuLi4gIFdlIGdl
-dCBpbml0aWFsIHNsYXZlIGtleXMgYnV0IHRob3NlDQo+ID4+Pj4+Pj4+IGdldCBkcm9wcGVkIGR1
-ZSB0byBlbmNyeXB0aW9uIGNoYW5nZWQgZXZlbnQgbm90IGJlaW5nIHJlY2VpdmVkDQo+ID4+Pj4+
-Pj4+IHlldC4gU2luY2Uga2V5cyB3ZXJlIHNpbGVudGx5IGRyb3BwZWQgd2UgbGF0ZXIgb24gZ2V0
-DQo+ID4+Pj4+Pj4+IHVuZXhwZWN0ZWQgU01QIFBEVQ0KPiA+PiBhbmQNCj4gPj4+Pj4+Pj4gaWdu
-b3JpbmcgcmVtYWluaW5nIGtleXMgYXMgd2VsbCB3aGljaCBldmVudHVhbGx5IGxlYWRzIHRvIFNN
-UA0KPiA+Pj4+IHRpbWVvdXQuDQo+ID4+Pj4+Pj4+DQo+ID4+Pj4+Pj4+IElmIHRoaXMgaXMgVVNC
-IGRvbmdsZSAodXNpbmcgYnR1c2QpIHRoZW4gb25seSAoQUZBSUspIHNvbHV0aW9uDQo+ID4+Pj4+
-Pj4+IHdvdWxkIGJlIHRvIGhhdmUgYSB3b3JrYXJvdW5kIGZvciB0aGlzIGluc2lkZSBjaGlwIChp
-dCB3b3VsZA0KPiA+Pj4+Pj4+PiBkZWxheSBBQ0wgZGF0YSByZWNlaXZlZCByaWdodCBhZnRlciBl
-bmNyeXB0aW9uIGNoYW5nZSBnaXZpbmcNCj4gPj4+Pj4+Pj4gaG9zdCB0aW1lIHRvIGhhbmRsZSBl
-bmNwcnlwdGlvbg0KPiA+Pj4+Pj4gY2hhbmdlIGV2ZW50KS4NCj4gPj4+Pj4+Pj4gQmx1ZXRvb3Ro
-IHNwZWNpZmljYXRpb24gZm9yIFVTQiB0cmFuc3BvcnQgaXMgdW5mb3J0dW5hdGVsbHkNCj4gPj4+
-Pj4+Pj4ga2luZGENCj4gPj4+PiBicm9rZW4uDQo+ID4+Pj4+Pj4+DQo+ID4+Pj4+Pj4+IC0tDQo+
-ID4+Pj4+Pj4+IHBvemRyYXdpYW0NCj4gPj4+Pj4+Pj4gU3p5bW9uIEphbmMNCj4gPj4+Pj4+Pg0K
-PiA+Pj4+Pj4+IFRoYW5rIHlvdSBmb3IgeW91ciByZXBseS4gWW91ciBpbnB1dHMgYXJlIHZhbHVh
-YmxlIHRvIHVzIGluDQo+ID4+Pj4+Pj4gaGVscGluZyB0byBkZWJ1ZyB0aGUNCj4gPj4+Pj4+IGlz
-c3VlLiBZZXMsIHdlIGFyZSBpbmRlZWQgdXNpbmcgdGhlIGJ0dXNiIGtlcm5lbCBtb2R1bGUgYW5k
-IGl0IGlzDQo+ID4+Pj4+PiB1c2luZyBhIFVTQiBpbnRlcmZhY2UgKEJsdWV0b290aCBvdmVyIFVT
-QikuDQo+ID4+Pj4+Pj4NCj4gPj4+Pj4+PiBJIG5vdGljZWQgdGhhdCB3aGVuIGJ0bWdtdCBzZXR0
-aW5ncyBhcmUgc2V0IHRvIHR1cm4gJ2JyZWRyIG9mZicsDQo+ID4+Pj4+Pj4gdGhlICdzc3AnIG1v
-ZGUNCj4gPj4+Pj4+IGFsc28gdHVybnMgb2ZmLiBJcyB0aGlzIGJlaGF2aW9yIGV4cGVjdGVkIHRv
-IG9jY3VyPw0KPiA+Pj4+Pj4+IE15IGN1cnJlbnQgc2V0dGluZ3MgYXJlICdwb3dlcmVkIGNvbm5l
-Y3RhYmxlIGRpc2NvdmVyYWJsZQ0KPiA+Pj4+Pj4+IGJvbmRhYmxlIGxlDQo+ID4+Pj4+PiBzZWN1
-cmUtY29ubsOiwoDCmQ0KPiA+Pj4+Pj4NCj4gPj4+Pj4+IHRoZSBTU1AgKFNlY3VyZSBTaW1wbGUg
-UGFpcmluZykgaXMgYSBCUi9FRFIgb25seSBmZWF0dXJlLiBTbyB3aGVuDQo+ID4+Pj4+PiB5b3Ug
-ZGlzYWJsZSBCUi9FRFIsIGl0IHdpbGwgYmUgZGlzYWJsZWQgYXMgd2VsbC4NCj4gPj4+Pj4NCj4g
-Pj4+Pj4gVGhhbmsgeW91IGZvciB5b3VyIHJlcGx5LiBJdCBsb29rcyBsaWtlIEkgaGF2ZSB1bmRl
-cnN0b29kIHRoaXMNCj4gPj4+Pj4gaW5jb3JyZWN0bHkgYXMgaW5pdGlhbGx5IEkgcmVhZCBzb21l
-d2hlcmUgdGhhdCBMRSBhZG9wdHMgdGhlIFNTUA0KPiA+Pj4+PiBtb2RlbCBpbiB2NC4xLiBMb29r
-cyBsaWtlIHRoaXMgaXMgbm90IHRoZSBjYXNlLg0KPiA+Pj4+Pg0KPiA+Pj4+PiBGcm9tIHRoZSBz
-cGVjaWZpY2F0aW9uLCBJIG5vdGVkIHRoYXQgU1NQIHdhcyBpbnRyb2R1Y2VkIGluIEJSL0VEUg0K
-PiA+Pj4+PiBpbg0KPiA+Pj4+PiB2Mi4xIHdoaWNoIG1ha2VzIGl0IGEgQlIvRURSIG9ubHkgZmVh
-dHVyZS4NCj4gPj4+Pj4NCj4gPj4+Pj4gSSBmaW5hbGx5IHVuZGVyc3RhbmQgd2h5IHNzcCBtb2Rl
-IGlzIGRpc2FibGVkIHdoZW4gSSB0dXJuZWQgYnJlZHINCj4gPj4+Pj4gb2ZmIHZpYSBidG1nbXQu
-IFRoYW5rIHlvdSBmb3IgeW91ciBjbGFyaWZpY2F0aW9uIQ0KPiA+Pj4+DQo+ID4+Pg0KPiA+Pj4g
-SSBub3RpY2UgYSBzdHJhbmdlIGJlaGF2aW9yIGR1cmluZyB0aGUgTEUgU2VjdXJlIENvbm5lY3Rp
-b24gcGFpcmluZy4NCj4gPj4+IFRoaXMNCj4gPj4gb2NjdXJzIGF0IHRoZSBMRSBTdGFydCBFbmNy
-eXB0aW9uIGV2ZW50IGFzIHNlZW4gaW4gdGhlIGZvbGxvd2luZyBsb2c6DQo+ID4+Pg0KPiA+Pj4N
-Cj4gPj4+IDwgSENJIENvbW1hbmQ6IExFIFN0YXJ0IEVuY3J5cHRpb24gKDB4MDh8MHgwMDE5KSBw
-bGVuIDI4ICAgICAgIFtoY2kwXQ0KPiA+Pj4gNTUuMjMwNTQ4DQo+ID4+PiAgICAgICAgSGFuZGxl
-OiAxMjgNCj4gPj4+ICAgICAgICBSYW5kb20gbnVtYmVyOiAweDAwMDAwMDAwMDAwMDAwMDANCj4g
-Pj4+ICAgICAgICBFbmNyeXB0ZWQgZGl2ZXJzaWZpZXI6IDB4MDAwMA0KPiA+Pj4gICAgICAgIExv
-bmcgdGVybSBrZXk6IDBlMDExNDJiZTlkZGFiOWU2ZTZjZWY1NDU1NjJhZGM0DQo+ID4+Pj4gSENJ
-IEV2ZW50OiBDb21tYW5kIFN0YXR1cyAoMHgwZikgcGxlbiA0ICAgICAgICAgICAgICAgICAgICAg
-IFtoY2kwXQ0KPiA1NS4yMzQ0NjgNCj4gPj4+ICAgICAgTEUgU3RhcnQgRW5jcnlwdGlvbiAoMHgw
-OHwweDAwMTkpIG5jbWQgMQ0KPiA+Pj4gICAgICAgIFN0YXR1czogU3VjY2VzcyAoMHgwMCkNCj4g
-Pj4+PiBBQ0wgRGF0YSBSWDogSGFuZGxlIDEyOCBmbGFncyAweDAyIGRsZW4gMjEgICAgICAgICAg
-ICAgICAgICAgW2hjaTBdDQo+IDU1LjUwMDU2OQ0KPiA+Pj4gICAgICBTTVA6IFNpZ25pbmcgSW5m
-b3JtYXRpb24gKDB4MGEpIGxlbiAxNg0KPiA+Pj4gICAgICAgIFNpZ25hdHVyZSBrZXk6IDFkOTE2
-ZDU5NTE3OTFhMjcxNDE2YTE2MWNkYTk4MWQ2DQo+ID4+Pj4gSENJIEV2ZW50OiBFbmNyeXB0aW9u
-IENoYW5nZSAoMHgwOCkgcGxlbiA0ICAgICAgICAgICAgICAgICAgIFtoY2kwXQ0KPiA1NS41MTM4
-MzYNCj4gPj4+ICAgICAgICBTdGF0dXM6IFN1Y2Nlc3MgKDB4MDApDQo+ID4+PiAgICAgICAgSGFu
-ZGxlOiAxMjgNCj4gPj4+ICAgICAgICBFbmNyeXB0aW9uOiBFbmFibGVkIHdpdGggQUVTLUNDTSAo
-MHgwMSkNCj4gPj4+DQo+ID4+Pg0KPiA+Pj4gQXMgbm90aWNlZCBmcm9tIHRoZSBsb2dzIGFib3Zl
-LCB0aGUgIlNNUDogU2lnbmluZyBJbmZvcm1hdGlvbiAoMHgwYSkiDQo+ID4+PiBjb21tYW5kIGFw
-cGVhcnMgZmlyc3QgYmVmb3JlIHRoZSAiRW5jcnlwdGlvbiBDaGFuZ2UgKDB4MDgpIiBIQ0kNCj4g
-ZXZlbnQuDQo+ID4+IE9uIGEgTEUgc3VjY2Vzc2Z1bCBwYWlyaW5nLCB0aGUgZW5jcnlwdGlvbiBj
-aGFuZ2Ugc2hvdWxkIG9jY3VyIGJlZm9yZQ0KPiA+PiB0aGUgc2lnbmluZyBpbmZvcm1hdGlvbiBj
-b21tYW5kIGFzIGNhbiBiZSBvYnNlcnZlZCBpbiB0aGUgZm9sbG93aW5nDQo+ID4+IGxvZyBiZWxv
-dy4gSSB3YXMgYWJsZSB0byBzdWNjZXNzZnVsbHkgcGVyZm9ybSBhIExFIHBhaXJpbmcgdGhyb3Vn
-aCBmb3JjZWQNCj4gdHJpYWwuDQo+ID4+IFRoZSBzdWNjZXNzZnVsIExFIHBhaXJpbmcgb25seSBv
-Y2N1cnMgMSBvdXQgb2YgMTAgdGltZXMuDQo+ID4+DQo+ID4+IHRoZSBwcm9ibGVtIGlzIHRoYXQg
-d2Ugd2lsbCBuZWVkIHRvIHdhaXQgZm9yIHRoZSBFbmNyeXB0aW9uIENoYW5nZQ0KPiA+PiBiZWZv
-cmUgd2UgY2FuIGFjY2VwdCBhbnkga2V5IGRpc3RyaWJ1dGlvbiBmcm9tIHRoZSByZW1vdGUgc2lk
-ZS4gU28gaXMNCj4gPj4gdGhpcyBvbiBhbiBVU0IgZG9uZ2xlPyBUaGUgb3ZlciB0aGUgYWlyIHBh
-Y2tldCBtaWdodCBiZSBhY3R1YWxseQ0KPiA+PiBlbmNyeXB0ZWQsIGJ1dCBvbiB0aGUgVVNCIEhD
-SSB0cmFuc3BvcnQgd2Ugc2VlIGl0IGFzIG5vbi1lbmNyeXB0ZWQgYW5kDQo+IGRyb3AgaXQuDQo+
-ID4+DQo+ID4+IFNvIHdoYXQgaGFyZHdhcmUgaXMgdGhpcyBhY3R1YWxseT8gRG8geW91IGhhcHBl
-biB0byBoYXZlIG5ld2VyDQo+ID4+IGZpcm13YXJlIGZvciB0aGlzIGhhcmR3YXJlIHRoYXQgZml4
-ZXMgdGhpcyByYWNlIGluIHRoZSBIQ0kgbG93ZXIgdHJhbnNwb3J0Lg0KPiA+DQo+ID4gVGhhbmsg
-eW91IGZvciB5b3VyIGlucHV0cy4gV2UgYXBwcmVjaWF0ZSBpdCB2ZXJ5IG11Y2guDQo+ID4NCj4g
-PiBUaGUgbW9kdWxlIHdlIGFyZSB1c2luZyBpcyBhIE0uMiBmb3JtIGZhY3RvciAoRS1LZXksIDIy
-MzAgcGFja2FnZSkuIFRoZQ0KPiBCbHVldG9vdGggaW50ZXJmYWNlIGlzIFVTQiAyLjAuIFdlIGFy
-ZSB1c2luZyBhIE1hcnZlbGwgODhXODg5NyBTb0MNCj4gcnVubmluZyB0aGUgcGNpZTg4OTdfdWFw
-c3RhLmJpbiBmaXJtd2FyZSB2ZXJzaW9uIDcucDc3LiBUaGlzIGlzIHRoZSBsYXRlc3QNCj4gZmly
-bXdhcmUgdmVyc2lvbiBhbmQgd2UgZG8gbm90IGhhdmUgYW55IG5ld2VyIGZpcm13YXJlLiBUaGUg
-bGluayB0byB0aGUNCj4gZmlybXdhcmUgaXMgYXMgZm9sbG93czoNCj4gPiBodHRwczovL2tlcm5l
-bC5nb29nbGVzb3VyY2UuY29tL3B1Yi9zY20vbGludXgva2VybmVsL2dpdC9maXJtd2FyZS9saW51
-DQo+ID4geC1maXJtd2FyZS8rLzA1ZTJmM2E0YWNmNDE3NGVjNTA3YTM0NjRhMzc0ZWNiMWI0ZWMw
-MTENCj4gPg0KPiA+IFdlIGFyZSB1c2luZyBrZXJuZWwgNC4xLjI3IG9uIG91ciBzeXN0ZW0gcnVu
-bmluZyB0aGUgYnR1c2IgZHJpdmVyLg0KPiA+IFdlIGhhdmUgYWxzbyB0cmllZCB0aGUgTEUgcGFp
-cmluZyBvbiBrZXJuZWwgNC45IGFuZCBrZXJuZWwgNC4xMC4gSW4gYm90aCBvZg0KPiB0aGVzZSBr
-ZXJuZWxzLCB0aGUgcmFjZSBjb25kaXRpb24gb2NjdXJzIGFuZCB0aGUgcGFpcmluZyBmYWlscy4N
-Cj4gPiBJdCBsb29rcyBsaWtlIHdlIHdpbGwgbmVlZCB0byBjb250YWN0IE1hcnZlbGwgb24gdGhl
-IHJhY2UgY29uZGl0aW9uIGluIEhDSQ0KPiBsb3dlciB0cmFuc3BvcnQuDQo+IA0KPiBzbyB0aGlz
-IGlzIGFuIFVTQiBvbmx5IHByb2JsZW0uIEFuZCBub3cgdGhhdCB5b3Ugc2F5IHlvdSBhcmUgc2Vl
-aW5nIHRoaXMgb24NCj4gTWFydmVsbCBoYXJkd2FyZSwgdGhlbiBpdCBtaWdodCBiZSB0aGUgY2Fz
-ZSB0aGF0IHRoZXkgc3RpbGwgaGF2ZSBub3QNCj4gYWRkcmVzc2VkIHRoaXMgaXNzdWUgaW4gdGhl
-aXIgZmlybXdhcmUuIEkgdGhpbmsgdGhleSBzaG91bGQgYmUgYXdhcmUgb2YgaXQsDQo+IGJ1dCBp
-dCBpcyBwcmV0dHkgbXVjaCBhIGZpcm13YXJlIHByb2JsZW0gYW5kIE1hcnZlbGwgbmVlZHMgdG8g
-YWRkcmVzcy4NCj4gDQo+ID4gQXBhcnQgZnJvbSB0aGF0LCBzaG91bGQgdGhlIExFIHBhaXJpbmcg
-d29yayBub3JtYWxseSBvbiBvdGhlciB0cmFuc3BvcnRzDQo+IGUuZy4gVUFSVC9TRElPPw0KPiAN
-Cj4gDQo+IFNvIFVBUlQgYW5kIFNESU8gYXJlIG5vdCBhZmZlY3RlZCBzaW5jZSB0aGV5IGFyZSBh
-IHNpbmdsZSAiZW5kcG9pbnQiIGFuZA0KPiBmdWxseSBzZXF1ZW50aWFsIHRyYW5zcG9ydCBwcm90
-b2NvbCBmb3IgSENJLiBXaXRoIFVTQiB0aGUgZGlmZmVyZW5jZSBpcyB0aGF0DQo+IEhDSSBldmVu
-dHMgYW5kIEhDSSBkYXRhIGlzIHVzaW5nIHR3byBpbmRlcGVuZGVudCAiZW5kcG9pbnRzIi4gSW4g
-VVNCLCB0aGUNCj4gZmlybXdhcmUgbmVlZHMgdG8gbWFrZSBzdXJlIHRoZSB0aGUgSENJIGV2ZW50
-IGlzIGRlbGl2ZXJlZCB0byB0aGUgaG9zdA0KPiAobWVhbmluZyB0aGUgaG9zdCBwb2xsZWQgdGhl
-IFVSQnMpIG9uIHRoZSBpbnRlcnJ1cHQgZW5kcG9pbnQgYmVmb3JlIGl0IGZpbGxzDQo+IHRoZSBi
-dWxrIGVuZHBvaW50cyBmb3IgdGhlIEhDSSBkYXRhIHBhY2tldHMuDQoNClRoYW5rIHlvdSBmb3Ig
-eW91ciByZXBseS4gSSBhcHByZWNpYXRlIGl0IHZlcnkgbXVjaC4NCldlIGhhdmUgb3BlbmVkIGEg
-Y2FzZSBvbiB0aGlzIHdpdGggTWFydmVsbCBhbmQgcmVwb3J0ZWQgb24gdGhlIGlzc3VlIHdpdGgg
-dHdvIGVuZHBvaW50cyBmb3IgQlQvVVNCLg0KSSBoYXZlIHNlbnQgdGhlbSB0aGUgbG9ncyBmb3Ig
-dGhlIG1hc3RlciBhbmQgc2xhdmUgZGV2aWNlcyBkdXJpbmcgdGhlIExFIHBhaXJpbmcgcHJvY2Vz
-cy4NCg0KVGhhbmsgeW91IGZvciB5b3VyIGhlbHAuIEkgd2lsbCB1cGRhdGUgeW91IG9uIHRoaXMg
-b25jZSBNYXJ2ZWxsIGhhcyBjb21lIHVwIHdpdGggYSBmaXguDQoNCkJlc3QgcmVnYXJkcywNCkpv
-c2h1YQ0KDQo=
+Hi Marcel,
+
+Quoting "Gustavo A. R. Silva" <garsilva@embeddedor.com>:
+
+> Hi Marcel,
+>
+> Quoting Marcel Holtmann <marcel@holtmann.org>:
+>
+>> Hi Gustavo,
+>>
+>>> While looking into Coverity ID 1357456 I ran into the following  
+>>> piece of code at net/bluetooth/smp.c:166
+>>>
+>>> 166/* The following functions map to the LE SC SMP crypto functions
+>>> 167 * AES-CMAC, f4, f5, f6, g2 and h6.
+>>> 168 */
+>>> 169
+>>> 170static int aes_cmac(struct crypto_shash *tfm, const u8 k[16],  
+>>> const u8 *m,
+>>> 171                    size_t len, u8 mac[16])
+>>> 172{
+>>> 173        uint8_t tmp[16], mac_msb[16], msg_msb[CMAC_MSG_MAX];
+>>> 174        SHASH_DESC_ON_STACK(desc, tfm);
+>>> 175        int err;
+>>> 176
+>>> 177        if (len > CMAC_MSG_MAX)
+>>> 178                return -EFBIG;
+>>> 179
+>>> 180        if (!tfm) {
+>>> 181                BT_ERR("tfm %p", tfm);
+>>> 182                return -EINVAL;
+>>> 183        }
+>>> 184
+
+BTW, what do you think about removing the IF block above?
+
+>>> 185        desc->tfm = tfm;
+>>> 186        desc->flags = 0;
+>>> 187
+>>> 188        /* Swap key and message from LSB to MSB */
+>>> 189        swap_buf(k, tmp, 16);
+>>> 190        swap_buf(m, msg_msb, len);
+>>> 191
+>>> 192        SMP_DBG("msg (len %zu) %*phN", len, (int) len, m);
+>>> 193        SMP_DBG("key %16phN", k);
+>>> 194
+>>> 195        err = crypto_shash_setkey(tfm, tmp, 16);
+>>> 196        if (err) {
+>>> 197                BT_ERR("cipher setkey failed: %d", err);
+>>> 198                return err;
+>>> 199        }
+>>> 200
+>>> 201        err = crypto_shash_digest(desc, msg_msb, len, mac_msb);
+>>> 202        shash_desc_zero(desc);
+>>> 203        if (err) {
+>>> 204                BT_ERR("Hash computation error %d", err);
+>>> 205                return err;
+>>> 206        }
+>>> 207
+>>> 208        swap_buf(mac_msb, mac, 16);
+>>> 209
+>>> 210        SMP_DBG("mac %16phN", mac);
+>>> 211
+>>> 212        return 0;
+>>> 213}
+>>>
+>>> The issue here is that line 180 implies that pointer tfm might be  
+>>> NULL. If this is the case, there is a potential NULL pointer  
+>>> dereference at line 174 once pointer tfm is indirectly  
+>>> dereferenced inside macro SHASH_DESC_ON_STACK().
+>>>
+>>> My question is if there is any chance that pointer tfm maybe be  
+>>> NULL when calling macro SHASH_DESC_ON_STACK()?
+>>
+>> I think the part you are after is this:
+>>
+>>        smp->tfm_cmac = crypto_alloc_shash("cmac(aes)", 0, 0);
+>>        if (IS_ERR(smp->tfm_cmac)) {
+>>                BT_ERR("Unable to create CMAC crypto context");
+>>                crypto_free_cipher(smp->tfm_aes);
+>>                kzfree(smp);
+>>                return NULL;
+>>        }
+>>
+>
+> Yeah, this makes it all clear.
+>
+>> So the tfm_cmac is part of the smp structure. However if there is  
+>> no cipher, we destroy the smp structure and essentially run without  
+>> SMP support. So it can not really be called anyway.
+>>
+>
+> What I take from this is that as a general rule, I should first try  
+> to identify whether the code I'm debugging is reachable or not,  
+> depending on the specific structures and variables I'm interested in.
+>
+>> Maybe commenting this might be a good idea.
+>>
+>
+> Yep, it wouldn't hurt.
+>
+> In the meantime I will triage and document this as a false positive.
+>
+> Thank you very much for the clarification, Marcel,
+> I really appreciate it.
+> --
+> Gustavo A. R. Silva
+
+Thanks
+--
+Gustavo A. R. Silva
