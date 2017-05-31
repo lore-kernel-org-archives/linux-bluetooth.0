@@ -1,75 +1,168 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-From: Mark Spruiell <mes@zeroc.com>
-Date: Wed, 31 May 2017 10:53:24 -0700
-Message-ID: <CABOZqngNPTEnvJvtvLn0UcTsGt7+Tsorptjav2ohAyDaUYTY5A@mail.gmail.com>
-Subject: Segfault in BlueZ 5.45
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Subject: [PATCH -v2] core/gatt: Add KeepCache config option
+Date: Wed, 31 May 2017 15:30:51 +0300
+Message-Id: <20170531123051.12524-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I built BlueZ 5.45 from source on Ubuntu 16.04 and ran the daemon in
-the foreground with
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-$ sudo src/bluetoothd -d -n
+This adds [GATT] KeepCache config option to main.conf which can be used
+to adjust the cache behavior of attributes found over GATT.
+---
+v2: Add enum for possible cache values, and change on/off to yes/no.
 
-I then ran a program that uses the ConnectProfile API to connect to
-another device. It succeeds most of the time but occasionally crashes
-with a segfault. Here is the stack trace:
+ src/device.c  | 67 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ src/main.c    |  2 +-
+ src/main.conf |  6 ++++++
+ 3 files changed, 74 insertions(+), 1 deletion(-)
 
-#0  sprintf (__fmt=<optimized out>, __s=<optimized out>) at
-/usr/include/x86_64-linux-gnu/bits/stdio2.h:33
-#1  ba2str (ba=0x5f46305f43445f52, str=str@entry=0x7fffdeb4c350 "") at
-lib/bluetooth.c:79
-#2  0x0000000000469ac3 in update_bredr_services
-(req=req@entry=0x23a59c0, recs=recs@entry=0x23a60e0)
-    at src/device.c:4305
-#3  0x000000000046a1d2 in browse_cb (recs=0x23a60e0, err=0,
-user_data=0x23a59c0) at src/device.c:4536
-#4  0x0000000000447403 in search_completed_cb (type=<optimized out>,
-status=<optimized out>, rsp=<optimized out>,
-    size=<optimized out>, user_data=0x23a0810) at src/sdp-client.c:205
-#5  0x000000000047a88d in sdp_process (session=<optimized out>) at
-lib/sdp.c:4354
-#6  0x0000000000447545 in search_process_cb (chan=<optimized out>,
-cond=<optimized out>, user_data=0x23a0810)
-    at src/sdp-client.c:230
-#7  0x00007f8cbe0b704a in g_main_context_dispatch () from
-/lib/x86_64-linux-gnu/libglib-2.0.so.0
-#8  0x00007f8cbe0b73f0 in ?? () from /lib/x86_64-linux-gnu/libglib-2.0.so.0
-#9  0x00007f8cbe0b7712 in g_main_loop_run () from
-/lib/x86_64-linux-gnu/libglib-2.0.so.0
-#10 0x000000000040b38e in main (argc=1, argv=0x7fffdeb4e898) at src/main.c:708
+diff --git a/src/device.c b/src/device.c
+index 50e7f23..203515e 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -261,6 +261,14 @@ static const uint16_t uuid_list[] = {
+ 	0
+ };
+ 
++typedef enum {
++	GATT_CACHE_ALWAYS,
++	GATT_CACHE_YES,
++	GATT_CACHE_NO,
++} gatt_cache_t;
++
++static gatt_cache_t gatt_cache;
++
+ static int device_browse_gatt(struct btd_device *device, DBusMessage *msg);
+ static int device_browse_sdp(struct btd_device *device, DBusMessage *msg);
+ 
+@@ -522,11 +530,33 @@ static void browse_request_free(struct browse_req *req)
+ 	g_free(req);
+ }
+ 
++static bool gatt_cache_is_enabled(struct btd_device *device)
++{
++	switch (gatt_cache) {
++	case GATT_CACHE_YES:
++		return device_is_paired(device, device->bdaddr_type);
++	case GATT_CACHE_NO:
++		return false;
++	case GATT_CACHE_ALWAYS:
++	default:
++		return true;
++	}
++}
++
++static void gatt_cache_cleanup(struct btd_device *device)
++{
++	if (gatt_cache_is_enabled(device))
++		return;
++
++	gatt_db_clear(device->db);
++}
++
+ static void gatt_client_cleanup(struct btd_device *device)
+ {
+ 	if (!device->client)
+ 		return;
+ 
++	gatt_cache_cleanup(device);
+ 	bt_gatt_client_set_service_changed(device->client, NULL, NULL, NULL);
+ 	bt_gatt_client_set_ready_handler(device->client, NULL, NULL, NULL);
+ 	bt_gatt_client_unref(device->client);
+@@ -2124,6 +2154,9 @@ static void store_gatt_db(struct btd_device *device)
+ 		return;
+ 	}
+ 
++	if (!gatt_cache_is_enabled(device))
++		return;
++
+ 	ba2str(btd_adapter_get_address(adapter), src_addr);
+ 	ba2str(&device->bdaddr, dst_addr);
+ 
+@@ -3291,6 +3324,9 @@ static void load_gatt_db(struct btd_device *device, const char *local,
+ 	char **keys, filename[PATH_MAX];
+ 	GKeyFile *key_file;
+ 
++	if (!gatt_cache_is_enabled(device))
++		return;
++
+ 	DBG("Restoring %s gatt database from file", peer);
+ 
+ 	snprintf(filename, PATH_MAX, STORAGEDIR "/%s/cache/%s", local, peer);
+@@ -6121,9 +6157,40 @@ struct btd_service *btd_device_get_service(struct btd_device *dev,
+ 
+ void btd_device_init(void)
+ {
++	GKeyFile *conf;
++	GError *err = NULL;
++	char *cache;
++
+ 	dbus_conn = btd_get_dbus_connection();
+ 	service_state_cb_id = btd_service_add_state_cb(
+ 						service_state_changed, NULL);
++
++	conf = btd_get_main_conf();
++	if (!conf) {
++		gatt_cache = GATT_CACHE_ALWAYS;
++		return;
++	}
++
++	cache = g_key_file_get_string(conf, "GATT", "KeepCache", &err);
++	if (!err) {
++		DBG("%s", err->message);
++		g_clear_error(&err);
++		gatt_cache = GATT_CACHE_ALWAYS;
++		return;
++	}
++
++	if (!strcmp(cache, "always")) {
++		gatt_cache = GATT_CACHE_ALWAYS;
++	} else if (!strcmp(cache, "yes")) {
++		gatt_cache = GATT_CACHE_YES;
++	} else if (!strcmp(cache, "no")) {
++		gatt_cache = GATT_CACHE_NO;
++	} else {
++		DBG("Invalid value for KeepCache=%s", cache);
++		gatt_cache = GATT_CACHE_ALWAYS;
++	}
++
++	g_free(cache);
+ }
+ 
+ void btd_device_cleanup(void)
+diff --git a/src/main.c b/src/main.c
+index bcc1e6f..bdc8b50 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -151,7 +151,7 @@ done:
+ 
+ static void check_config(GKeyFile *config)
+ {
+-	const char *valid_groups[] = { "General", "Policy", NULL };
++	const char *valid_groups[] = { "General", "Policy", "GATT", NULL };
+ 	char **keys;
+ 	int i;
+ 
+diff --git a/src/main.conf b/src/main.conf
+index a649276..7658558 100644
+--- a/src/main.conf
++++ b/src/main.conf
+@@ -71,6 +71,12 @@
+ # Defaults to "off"
+ # Privacy = off
+ 
++[GATT]
++# Keep cache of service discovery regardless of pairing state.
++# Possible values: always, yes, no
++# Default: always
++#KeepCache = always
++
+ [Policy]
+ #
+ # The ReconnectUUIDs defines the set of remote services that should try
+-- 
+2.9.4
 
-The call to ConnectProfile is always to the same remote device
-address, which is paired and trusted.
-
-I tried it with BlueZ 5.44 and got a crash similar to this report:
-
-http://marc.info/?l=linux-bluetooth&m=149286683912995&w=2
-
-Here is the stack trace from 5.44:
-
-#0  browse_cb (recs=0xc78d90, err=0, user_data=0xc77510) at src/device.c:4523
-#1  0x0000000000447423 in search_completed_cb (type=<optimized out>,
-status=<optimized out>, rsp=<optimized out>,
-    size=<optimized out>, user_data=0xc6dcc0) at src/sdp-client.c:205
-#2  0x000000000047a65d in sdp_process (session=<optimized out>) at
-lib/sdp.c:4354
-#3  0x0000000000447565 in search_process_cb (chan=<optimized out>,
-cond=<optimized out>, user_data=0xc6dcc0)
-    at src/sdp-client.c:230
-#4  0x00007f1cfa74b04a in g_main_context_dispatch () from
-/lib/x86_64-linux-gnu/libglib-2.0.so.0
-#5  0x00007f1cfa74b3f0 in ?? () from /lib/x86_64-linux-gnu/libglib-2.0.so.0
-#6  0x00007f1cfa74b712 in g_main_loop_run () from
-/lib/x86_64-linux-gnu/libglib-2.0.so.0
-#7  0x000000000040b38e in main (argc=1, argv=0x7ffd26bdf7f8) at src/main.c:708
-
-This problem has not occurred yet with BlueZ 5.43.
-
-Let me know if you need any other information.
-
-Thanks,
-Mark
