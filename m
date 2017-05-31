@@ -1,145 +1,56 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] core/gatt: Add KeepCache config option
-Date: Wed, 31 May 2017 13:56:39 +0300
-Message-Id: <20170531105640.3132-1-luiz.dentz@gmail.com>
+From: Boris Passerat de la chapelle <bpasserat@h2ad.net>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Krasi Georgiev <krasi.root@gmail.com>
+CC: Barry Byford <31baz66@gmail.com>,
+        Bluez mailing list <linux-bluetooth@vger.kernel.org>
+Subject: RE: How to use GattProfile1
+Date: Wed, 31 May 2017 09:33:47 +0000
+Message-ID: <39cb9ea22f14454d83b6e62e59bdc955@sjbsvr074.groupe.local>
+References: <4CF902B9-8221-45E7-9868-52BF18A5EC5D@gmail.com>
+ <CAAu3APYsHqAK=Kk-fzQmhhBOfnayTDB_N_Q2yCuOhr+akvxfLg@mail.gmail.com>
+ <C1394BB3-3C11-410C-916F-80A7863C0A2B@gmail.com>
+ <969738CC-B335-4E2F-BF3C-441110279871@gmail.com>
+ <CAAu3APard0ZM-+++qm8938+iWkUUfNkjvq1M9cLqngtZYJAzRg@mail.gmail.com>
+ <F1876BDF-4DC0-4CB0-A20F-2E64E24A3B92@gmail.com>
+ <CABBYNZ+R7dV5i+BQowigf5eddB4yxSki+xLeLFYBrN4Sfe8mJA@mail.gmail.com>
+ <4AE62BC6-BD11-44C7-9A0E-BC3159ED80DF@gmail.com>
+ <4C907B25-D8E4-462C-89FA-AB312A27CBE9@gmail.com>
+ <CABBYNZK04wxSH78f0maAMHtR-2ra8Kh_nQKkrAY1R8G19ba8TA@mail.gmail.com>
+ <5CDE162E-4828-4485-BF95-50C67DB93B77@gmail.com>
+ <CABBYNZKkodmXy+4eRXh_4RA9yci25cEtaNMoywEUk9XZ+GL4LQ@mail.gmail.com>
+ <758C2FAB-DBF1-4B88-866D-F036B23B3C95@gmail.com>
+ <CABBYNZLVjXXmbfTb2Uo9KvE2D83c1PU7f2p=t6JawfeyUfN2+w@mail.gmail.com>
+ <3290BB41-234F-4D7B-BF37-0CC2966CB416@gmail.com>
+ <CABBYNZKoACnV5rOQ1dJH56Uien-CdMy7CUfgvZEGdJvuLXKBgQ@mail.gmail.com>
+ <5D01EC8C-E51B-4F89-8F9B-5D7946674116@gmail.com>
+ <CABBYNZ+P8fzQP_v5dtWTHhXthE7JhsJeLBts4+_eweVDBMZpSQ@mail.gmail.com>
+ <329D353B-8799-434A-9049-AE8904429A78@gmail.com>
+ <CABBYNZJPrNfN-ns60zts863J=0Ec-np5AQb9aguS67fF0ZNbkA@mail.gmail.com>
+In-Reply-To: <CABBYNZJPrNfN-ns60zts863J=0Ec-np5AQb9aguS67fF0ZNbkA@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-
-This adds [GATT] KeepCache config option to main.conf which can be used
-to adjust the cache behavior of attributes found over GATT.
----
- src/device.c  | 46 ++++++++++++++++++++++++++++++++++++++++++++++
- src/main.c    |  2 +-
- src/main.conf |  6 ++++++
- 3 files changed, 53 insertions(+), 1 deletion(-)
-
-diff --git a/src/device.c b/src/device.c
-index 50e7f23..dfb7b1f 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -261,6 +261,8 @@ static const uint16_t uuid_list[] = {
- 	0
- };
- 
-+static char *gatt_cache;
-+
- static int device_browse_gatt(struct btd_device *device, DBusMessage *msg);
- static int device_browse_sdp(struct btd_device *device, DBusMessage *msg);
- 
-@@ -522,11 +524,32 @@ static void browse_request_free(struct browse_req *req)
- 	g_free(req);
- }
- 
-+static bool gatt_keep_cache(struct btd_device *device)
-+{
-+	if (!strcmp(gatt_cache, "always"))
-+		return true;
-+
-+	if (!strcmp(gatt_cache, "on") &&
-+			device_is_paired(device, device->bdaddr_type))
-+		return true;
-+
-+	return false;
-+}
-+
-+static void gatt_cache_cleanup(struct btd_device *device)
-+{
-+	if (gatt_keep_cache(device))
-+		return;
-+
-+	gatt_db_clear(device->db);
-+}
-+
- static void gatt_client_cleanup(struct btd_device *device)
- {
- 	if (!device->client)
- 		return;
- 
-+	gatt_cache_cleanup(device);
- 	bt_gatt_client_set_service_changed(device->client, NULL, NULL, NULL);
- 	bt_gatt_client_set_ready_handler(device->client, NULL, NULL, NULL);
- 	bt_gatt_client_unref(device->client);
-@@ -2124,6 +2147,9 @@ static void store_gatt_db(struct btd_device *device)
- 		return;
- 	}
- 
-+	if (!gatt_keep_cache(device))
-+		return;
-+
- 	ba2str(btd_adapter_get_address(adapter), src_addr);
- 	ba2str(&device->bdaddr, dst_addr);
- 
-@@ -3291,6 +3317,9 @@ static void load_gatt_db(struct btd_device *device, const char *local,
- 	char **keys, filename[PATH_MAX];
- 	GKeyFile *key_file;
- 
-+	if (!gatt_keep_cache(device))
-+		return;
-+
- 	DBG("Restoring %s gatt database from file", peer);
- 
- 	snprintf(filename, PATH_MAX, STORAGEDIR "/%s/cache/%s", local, peer);
-@@ -6121,9 +6150,26 @@ struct btd_service *btd_device_get_service(struct btd_device *dev,
- 
- void btd_device_init(void)
- {
-+	GKeyFile *conf;
-+	GError *err = NULL;
-+
- 	dbus_conn = btd_get_dbus_connection();
- 	service_state_cb_id = btd_service_add_state_cb(
- 						service_state_changed, NULL);
-+
-+	conf = btd_get_main_conf();
-+	if (!conf) {
-+		gatt_cache = g_strdup("always");
-+		return;
-+	}
-+
-+	gatt_cache = g_key_file_get_string(conf, "GATT", "KeepCache", &err);
-+	if (!err)
-+		return;
-+
-+	DBG("%s", err->message);
-+	g_clear_error(&err);
-+	gatt_cache = g_strdup("always");
- }
- 
- void btd_device_cleanup(void)
-diff --git a/src/main.c b/src/main.c
-index bcc1e6f..bdc8b50 100644
---- a/src/main.c
-+++ b/src/main.c
-@@ -151,7 +151,7 @@ done:
- 
- static void check_config(GKeyFile *config)
- {
--	const char *valid_groups[] = { "General", "Policy", NULL };
-+	const char *valid_groups[] = { "General", "Policy", "GATT", NULL };
- 	char **keys;
- 	int i;
- 
-diff --git a/src/main.conf b/src/main.conf
-index a649276..948ae6d 100644
---- a/src/main.conf
-+++ b/src/main.conf
-@@ -71,6 +71,12 @@
- # Defaults to "off"
- # Privacy = off
- 
-+[GATT]
-+# Keep cache of service discovery regardless of pairing state.
-+# Possible values: always, on, off
-+# Default: always
-+#KeepCache = always
-+
- [Policy]
- #
- # The ReconnectUUIDs defines the set of remote services that should try
--- 
-2.9.4
-
+SGksDQoNCkkgYW0gd2l0aCB0aGUgc2FtZSBwcm9ibGVtIGFzIEtyYXNpICwgaW1wb3NzaWJsZSB0
+byBnZXQgYXV0byBjb25uZWN0aW9uIHdpdGggbXkgZGV2aWNlcy4NCg0KRXZlcnl0aGluZyB3YXMg
+d29ya2luZyBmaW5lIHVwIHRvIGJsdWV6IDUuNDEgZnJvbSBibHVleiA1LjQyIEkgaGF2ZSBubyBh
+dXRvIGNvbm5lY3Rpb24gd2l0aCB0aGUgZGV2aWNlcy4NCg0KSSByZXZlcnRlZCAgY29tbWl0IDg5
+Y2E3MzVlNTc0MTdlYzI5NmE0MWQ4YzMxZDBkMGQ1YzY2Y2UyYTkgYW5kIEkgY2FuIGdldCB0aGUg
+YXV0byBjb25uZWN0aW9uIHdvcmtpbmcuDQoNCkJvcmlzDQoNCg0KDQotLS0tLU1lc3NhZ2UgZCdv
+cmlnaW5lLS0tLS0NCkRlwqA6IGxpbnV4LWJsdWV0b290aC1vd25lckB2Z2VyLmtlcm5lbC5vcmcg
+W21haWx0bzpsaW51eC1ibHVldG9vdGgtb3duZXJAdmdlci5rZXJuZWwub3JnXSBEZSBsYSBwYXJ0
+IGRlIEx1aXogQXVndXN0byB2b24gRGVudHoNCkVudm95w6nCoDogamV1ZGkgMjUgbWFpIDIwMTcg
+MTU6MDINCsOAwqA6IEtyYXNpIEdlb3JnaWV2IDxrcmFzaS5yb290QGdtYWlsLmNvbT4NCkNjwqA6
+IEJhcnJ5IEJ5Zm9yZCA8MzFiYXo2NkBnbWFpbC5jb20+OyBCbHVleiBtYWlsaW5nIGxpc3QgPGxp
+bnV4LWJsdWV0b290aEB2Z2VyLmtlcm5lbC5vcmc+DQpPYmpldMKgOiBSZTogSG93IHRvIHVzZSBH
+YXR0UHJvZmlsZTENCg0KSGkgS3Jhc2ksDQoNCk9uIFRodSwgTWF5IDI1LCAyMDE3IGF0IDM6NTYg
+UE0sIEtyYXNpIEdlb3JnaWV2IDxrcmFzaS5yb290QGdtYWlsLmNvbT4gd3JvdGU6DQo+IEkgY2Fu
+4oCZdCBzZWUgaXQsIHdoZXJlIGRpZCB5b3Ugc2VuZCBpdCAsIG1heWJlIGZvcmdvdCB0byBhdHRh
+Y2ggaXQ/DQoNCmh0dHA6Ly9tYXJjLmluZm8vP2w9bGludXgtYmx1ZXRvb3RoJm09MTQ5NTcwODY0
+MDAxNjQwJnc9Mg0KDQotLQ0KTHVpeiBBdWd1c3RvIHZvbiBEZW50eg0KLS0NClRvIHVuc3Vic2Ny
+aWJlIGZyb20gdGhpcyBsaXN0OiBzZW5kIHRoZSBsaW5lICJ1bnN1YnNjcmliZSBsaW51eC1ibHVl
+dG9vdGgiIGluIHRoZSBib2R5IG9mIGEgbWVzc2FnZSB0byBtYWpvcmRvbW9Admdlci5rZXJuZWwu
+b3JnIE1vcmUgbWFqb3Jkb21vIGluZm8gYXQgIGh0dHA6Ly92Z2VyLmtlcm5lbC5vcmcvbWFqb3Jk
+b21vLWluZm8uaHRtbA0K
