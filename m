@@ -1,90 +1,118 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: =?UTF-8?q?Micha=C5=82=20Narajowski?=
-        <michal.narajowski@codecoup.pl>
-To: linux-bluetooth@vger.kernel.org
-Cc: =?UTF-8?q?Micha=C5=82=20Narajowski?=
-        <michal.narajowski@codecoup.pl>
-Subject: [PATCH BlueZ 01/31] monitor: Add LE Enhanced Receiver Test decoding
-Date: Tue,  6 Jun 2017 11:40:48 +0200
-Message-Id: <20170606094120.14541-2-michal.narajowski@codecoup.pl>
-In-Reply-To: <20170606094120.14541-1-michal.narajowski@codecoup.pl>
-References: <20170606094120.14541-1-michal.narajowski@codecoup.pl>
+Content-Type: text/plain; charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
+Subject: Re: How to use GattProfile1
+From: Krasi Georgiev <krasi.root@gmail.com>
+In-Reply-To: <39cb9ea22f14454d83b6e62e59bdc955@sjbsvr074.groupe.local>
+Date: Sun, 4 Jun 2017 16:15:03 +0300
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Barry Byford <31baz66@gmail.com>,
+        Bluez mailing list <linux-bluetooth@vger.kernel.org>
+Message-Id: <8D8EB08D-CA68-400C-A987-8ADA4B45E2C2@gmail.com>
+References: <4CF902B9-8221-45E7-9868-52BF18A5EC5D@gmail.com>
+ <CAAu3APYsHqAK=Kk-fzQmhhBOfnayTDB_N_Q2yCuOhr+akvxfLg@mail.gmail.com>
+ <C1394BB3-3C11-410C-916F-80A7863C0A2B@gmail.com> <969738CC-B335-4E2F-BF3C-441110279871@gmail.com>
+ <CAAu3APard0ZM-+++qm8938+iWkUUfNkjvq1M9cLqngtZYJAzRg@mail.gmail.com>
+ <F1876BDF-4DC0-4CB0-A20F-2E64E24A3B92@gmail.com> <CABBYNZ+R7dV5i+BQowigf5eddB4yxSki+xLeLFYBrN4Sfe8mJA@mail.gmail.com>
+ <4AE62BC6-BD11-44C7-9A0E-BC3159ED80DF@gmail.com> <4C907B25-D8E4-462C-89FA-AB312A27CBE9@gmail.com>
+ <CABBYNZK04wxSH78f0maAMHtR-2ra8Kh_nQKkrAY1R8G19ba8TA@mail.gmail.com>
+ <5CDE162E-4828-4485-BF95-50C67DB93B77@gmail.com> <CABBYNZKkodmXy+4eRXh_4RA9yci25cEtaNMoywEUk9XZ+GL4LQ@mail.gmail.com>
+ <758C2FAB-DBF1-4B88-866D-F036B23B3C95@gmail.com> <CABBYNZLVjXXmbfTb2Uo9KvE2D83c1PU7f2p=t6JawfeyUfN2+w@mail.gmail.com>
+ <3290BB41-234F-4D7B-BF37-0CC2966CB416@gmail.com> <CABBYNZKoACnV5rOQ1dJH56Uien-CdMy7CUfgvZEGdJvuLXKBgQ@mail.gmail.com>
+ <5D01EC8C-E51B-4F89-8F9B-5D7946674116@gmail.com> <CABBYNZ+P8fzQP_v5dtWTHhXthE7JhsJeLBts4+_eweVDBMZpSQ@mail.gmail.com>
+ <329D353B-8799-434A-9049-AE8904429A78@gmail.com> <CABBYNZJPrNfN-ns60zts863J=0Ec-np5AQb9aguS67fF0ZNbkA@mail.gmail.com>
+ <39cb9ea22f14454d83b6e62e59bdc955@sjbsvr074.groupe.local>
+To: Boris Passerat de la chapelle <bpasserat@h2ad.net>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-< HCI Command: LE Enhanced Receiver Test (0x08|0x0033) plen 3
-        RX channel: 0x01
-        PHY: LE 1M (0x01)
-        Modulation index: Stable (0x01)
----
- monitor/bt.h     |  7 +++++++
- monitor/packet.c | 28 +++++++++++++++++++++++++++-
- 2 files changed, 34 insertions(+), 1 deletion(-)
+just tried with the latest master and I still can=E2=80=99t get it to =
+auto connect
 
-diff --git a/monitor/bt.h b/monitor/bt.h
-index c2045bb..2aed400 100644
---- a/monitor/bt.h
-+++ b/monitor/bt.h
-@@ -2161,6 +2161,13 @@ struct bt_hci_cmd_le_set_phy {
- 	uint16_t phy_opts;
- } __attribute__((packed));
- 
-+#define BT_HCI_CMD_LE_ENHANCED_RECEIVER_TEST			0x2033
-+struct bt_hci_cmd_le_enhanced_receiver_test {
-+	uint8_t rx_channel;
-+	uint8_t phy;
-+	uint8_t modulation_index;
-+} __attribute__((packed));
-+
- #define BT_HCI_EVT_INQUIRY_COMPLETE		0x01
- struct bt_hci_evt_inquiry_complete {
- 	uint8_t  status;
-diff --git a/monitor/packet.c b/monitor/packet.c
-index 7d1c5e8..e3fcd2f 100644
---- a/monitor/packet.c
-+++ b/monitor/packet.c
-@@ -6876,6 +6876,30 @@ static void le_set_phy_cmd(const void *data, uint8_t size)
- 	print_field("PHY options preference: %s (0x%4.4x)", str, cmd->phy_opts);
- }
- 
-+static void le_enhanced_receiver_test_cmd(const void *data, uint8_t size)
-+{
-+	const struct bt_hci_cmd_le_enhanced_receiver_test *cmd = data;
-+	const char *str;
-+
-+	print_field("RX channel frequency: %d MHz (0x%2.2x)",
-+				(cmd->rx_channel * 2) + 2402, cmd->rx_channel);
-+	print_le_phy("PHY", cmd->phy);
-+
-+	switch (cmd->modulation_index) {
-+	case 0x00:
-+		str = "Standard";
-+		break;
-+	case 0x01:
-+		str = "Stable";
-+		break;
-+	default:
-+		str = "Reserved";
-+		break;
-+	}
-+
-+	print_field("Modulation index: %s (0x%2.2x)", str, cmd->modulation_index);
-+}
-+
- struct opcode_data {
- 	uint16_t opcode;
- 	int bit;
-@@ -7579,7 +7603,9 @@ static const struct opcode_data opcode_table[] = {
- 				status_rsp, 1, true },
- 	{ 0x2032, 286, "LE Set PHY",
- 				le_set_phy_cmd, 7, true},
--	{ 0x2033, 287, "LE Enhanced Receiver Test" },
-+	{ 0x2033, 287, "LE Enhanced Receiver Test",
-+				le_enhanced_receiver_test_cmd, 3, true,
-+				status_rsp, 1, true },
- 	{ 0x2034, 288, "LE Enhanced Transmitter Test" },
- 	{ 0x2035, 289, "LE Set Advertising Set Random Address" },
- 	{ 0x2036, 290, "LE Set Extended Advertising Parameters" },
--- 
-2.9.3
 
+Here is what happens so let me know if I am doing in the correct =
+sequence
+
+
+[bluetooth]# devices
+Device 34:31:11:00:CD:7A Samsung Galaxy S IV
+Device 04:52:C7:57:85:84 Bose Mini II SoundLink
+Device FF:FF:50:00:53:B6 iTAG
+
+[bluetooth]# power on
+Changing power on succeeded
+[CHG] Controller B8:27:EB:D5:54:1C Powered: yes
+[bluetooth]# connect FF:FF:50:00:53:B6
+Attempting to connect to FF:FF:50:00:53:B6
+[CHG] Device FF:FF:50:00:53:B6 Connected: yes
+Connection successful
+[NEW] Primary Service
+	/org/bluez/hci0/dev_FF_FF_50_00_53_B6/service0006
+	0000180f-0000-1000-8000-00805f9b34fb
+	Battery Service
+[NEW] Characteristic
+	/org/bluez/hci0/dev_FF_FF_50_00_53_B6/service0006/char0007
+	00002a19-0000-1000-8000-00805f9b34fb
+	Battery Level
+[NEW] Primary Service
+	/org/bluez/hci0/dev_FF_FF_50_00_53_B6/service0009
+	00001802-0000-1000-8000-00805f9b34fb
+	Immediate Alert
+[NEW] Characteristic
+	/org/bluez/hci0/dev_FF_FF_50_00_53_B6/service0009/char000a
+	00002a06-0000-1000-8000-00805f9b34fb
+	Alert Level
+[NEW] Primary Service
+	/org/bluez/hci0/dev_FF_FF_50_00_53_B6/service000c
+	0000ffe0-0000-1000-8000-00805f9b34fb
+	Unknown
+[NEW] Characteristic
+	/org/bluez/hci0/dev_FF_FF_50_00_53_B6/service000c/char000d
+	0000ffe1-0000-1000-8000-00805f9b34fb
+	Unknown
+[CHG] Device FF:FF:50:00:53:B6 UUIDs: =
+00001800-0000-1000-8000-00805f9b34fb
+[CHG] Device FF:FF:50:00:53:B6 UUIDs: =
+00001802-0000-1000-8000-00805f9b34fb
+[CHG] Device FF:FF:50:00:53:B6 UUIDs: =
+0000180f-0000-1000-8000-00805f9b34fb
+[CHG] Device FF:FF:50:00:53:B6 UUIDs: =
+0000ffe0-0000-1000-8000-00805f9b34fb
+[CHG] Device FF:FF:50:00:53:B6 ServicesResolved: yes
+[CHG] Device FF:FF:50:00:53:B6 Icon is nil
+[CHG] Device FF:FF:50:00:53:B6 Appearance is nil
+
+[iTAG            ]# register-application =
+0000180f-0000-1000-8000-00805f9b34fb
+Application registered
+[CHG] Device FF:FF:50:00:53:B6 ServicesResolved: no
+[CHG] Device FF:FF:50:00:53:B6 Connected: no
+
+
+Here i power cycled the iTag and waited few minutes but bluetoothctl =
+didn=E2=80=99t reconnect so I did it manually.
+
+
+[bluetooth]# info FF:FF:50:00:53:B6
+Device FF:FF:50:00:53:B6
+	Name: iTAG
+	Alias: iTAG
+	Paired: no
+	Trusted: yes
+	Blocked: no
+	Connected: no
+	LegacyPairing: no
+	UUID: Generic Access Profile    =
+(00001800-0000-1000-8000-00805f9b34fb)
+	UUID: Immediate Alert           =
+(00001802-0000-1000-8000-00805f9b34fb)
+	UUID: Battery Service           =
+(0000180f-0000-1000-8000-00805f9b34fb)
+	UUID: Unknown                   =
+(0000ffe0-0000-1000-8000-00805f9b34fb)
+[bluetooth]# connect FF:FF:50:00:53:B6
+Attempting to connect to FF:FF:50:00:53:B6
+[CHG] Device FF:FF:50:00:53:B6 Connected: yes
+Connection successful
+[CHG] Device FF:FF:50:00:53:B6 ServicesResolved: yes
+[iTAG            ]#=
