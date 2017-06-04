@@ -4,11 +4,11 @@ Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
 Subject: Re: How to use GattProfile1
 From: Krasi Georgiev <krasi.root@gmail.com>
 In-Reply-To: <39cb9ea22f14454d83b6e62e59bdc955@sjbsvr074.groupe.local>
-Date: Sun, 4 Jun 2017 16:15:03 +0300
+Date: Sun, 4 Jun 2017 16:14:09 +0300
 Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
         Barry Byford <31baz66@gmail.com>,
         Bluez mailing list <linux-bluetooth@vger.kernel.org>
-Message-Id: <8D8EB08D-CA68-400C-A987-8ADA4B45E2C2@gmail.com>
+Message-Id: <7F3C370F-E4C2-4098-AFE0-3F4BF4B117BC@gmail.com>
 References: <4CF902B9-8221-45E7-9868-52BF18A5EC5D@gmail.com>
  <CAAu3APYsHqAK=Kk-fzQmhhBOfnayTDB_N_Q2yCuOhr+akvxfLg@mail.gmail.com>
  <C1394BB3-3C11-410C-916F-80A7863C0A2B@gmail.com> <969738CC-B335-4E2F-BF3C-441110279871@gmail.com>
@@ -115,4 +115,5 @@ Attempting to connect to FF:FF:50:00:53:B6
 [CHG] Device FF:FF:50:00:53:B6 Connected: yes
 Connection successful
 [CHG] Device FF:FF:50:00:53:B6 ServicesResolved: yes
-[iTAG            ]#=
+[iTAG            ]#
+
