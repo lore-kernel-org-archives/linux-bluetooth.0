@@ -4,72 +4,68 @@ From: =?UTF-8?q?Micha=C5=82=20Narajowski?=
 To: linux-bluetooth@vger.kernel.org
 Cc: =?UTF-8?q?Micha=C5=82=20Narajowski?=
         <michal.narajowski@codecoup.pl>
-Subject: [PATCH BlueZ 21/31] monitor: Add LE Add Device To Periodic Advertiser List decoding
-Date: Tue,  6 Jun 2017 11:41:10 +0200
-Message-Id: <20170606094120.14541-24-michal.narajowski@codecoup.pl>
+Subject: [PATCH BlueZ 25/31] monitor: Add LE Read Transmit Power decoding
+Date: Tue,  6 Jun 2017 11:41:14 +0200
+Message-Id: <20170606094120.14541-28-michal.narajowski@codecoup.pl>
 In-Reply-To: <20170606094120.14541-1-michal.narajowski@codecoup.pl>
 References: <20170606094120.14541-1-michal.narajowski@codecoup.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-< HCI Command: LE Add Device To Periodic Advertiser List (0x08|0x0047) plen 8
-        Adv address type: Random (0x01)
-        Adv address: 07:06:05:04:03:02 (Non-Resolvable)
-        SID: 0x08
 ---
  monitor/bt.h     |  7 +++++++
  monitor/packet.c | 13 ++++++++++++-
  2 files changed, 19 insertions(+), 1 deletion(-)
 
 diff --git a/monitor/bt.h b/monitor/bt.h
-index 65c69c0..5a932d8 100644
+index df89ea7..8447868 100644
 --- a/monitor/bt.h
 +++ b/monitor/bt.h
-@@ -2331,6 +2331,13 @@ struct bt_hci_cmd_le_periodic_adv_term_sync {
- 	uint16_t  sync_handle;
+@@ -2353,6 +2353,13 @@ struct bt_hci_rsp_le_read_dev_periodic_adv_list_size {
+ 	uint8_t  list_size;
  } __attribute__ ((packed));
  
-+#define BT_HCI_CMD_LE_ADD_DEV_PERIODIC_ADV_LIST		0x2047
-+struct bt_hci_cmd_le_add_dev_periodic_adv_list {
-+	uint8_t  addr_type;
-+	uint8_t  addr[6];
-+	uint8_t  sid;
++#define BT_HCI_CMD_LE_READ_TX_POWER		0x204b
++struct bt_hci_rsp_le_read_tx_power {
++	uint8_t  status;
++	uint8_t  min_tx_power;
++	uint8_t  max_tx_power;
 +} __attribute__ ((packed));
 +
  #define BT_HCI_EVT_INQUIRY_COMPLETE		0x01
  struct bt_hci_evt_inquiry_complete {
  	uint8_t  status;
 diff --git a/monitor/packet.c b/monitor/packet.c
-index 35172f4..f09c9b1 100644
+index 64847fa..0d2a012 100644
 --- a/monitor/packet.c
 +++ b/monitor/packet.c
-@@ -7591,6 +7591,15 @@ static void le_periodic_adv_term_sync_cmd(const void *data, uint8_t size)
- 	print_field("Sync handle: 0x%4.4x", cmd->sync_handle);
+@@ -7617,6 +7617,15 @@ static void le_read_periodic_adv_list_size_rsp(const void *data, uint8_t size)
+ 	print_field("List size: 0x%2.2x", rsp->list_size);
  }
  
-+static void le_add_dev_periodic_adv_list_cmd(const void *data, uint8_t size)
++static void le_read_tx_power_rsp(const void *data, uint8_t size)
 +{
-+	const struct bt_hci_cmd_le_add_dev_periodic_adv_list *cmd = data;
++	const struct bt_hci_rsp_le_read_tx_power *rsp = data;
 +
-+	print_addr_type("Adv address type", cmd->addr_type);
-+	print_addr("Adv address", cmd->addr, cmd->addr_type);
-+	print_field("SID: 0x%2.2x", cmd->sid);
++	print_status(rsp->status);
++	print_field("Min Tx power: %d dBm", rsp->min_tx_power);
++	print_field("Max Tx power: %d dBm", rsp->max_tx_power);
 +}
 +
  struct opcode_data {
  	uint16_t opcode;
  	int bit;
-@@ -8354,7 +8363,9 @@ static const struct opcode_data opcode_table[] = {
- 	{ 0x2046, 306, "LE Periodic Advertising Terminate Sync",
- 				le_periodic_adv_term_sync_cmd, 2, true,
- 				status_rsp, 1, true },
--	{ 0x2047, 307, "LE Add Device To Periodic Advertiser List" },
-+	{ 0x2047, 307, "LE Add Device To Periodic Advertiser List",
-+				le_add_dev_periodic_adv_list_cmd, 8, true,
-+				status_rsp, 1, true },
- 	{ 0x2048, 308, "LE Remove Device From Periodic Advertiser List" },
- 	{ 0x2049, 309, "LE Clear Periodic Advertiser List" },
- 	{ 0x204a, 310, "LE Read Periodic Advertiser List Size" },
+@@ -8392,7 +8401,9 @@ static const struct opcode_data opcode_table[] = {
+ 	{ 0x204a, 310, "LE Read Periodic Advertiser List Size",
+ 				null_cmd, 0, true,
+ 				le_read_periodic_adv_list_size_rsp, 2, true },
+-	{ 0x204b, 311, "LE Read Transmit Power" },
++	{ 0x204b, 311, "LE Read Transmit Power",
++				null_cmd, 0, true,
++				le_read_tx_power_rsp, 3, true },
+ 	{ 0x204c, 312, "LE Read RF Path Compensation" },
+ 	{ 0x204d, 313, "LE Write RF Path Compensation" },
+ 	{ 0x204e, 314, "LE Set Privacy Mode" },
 -- 
 2.9.3
 
