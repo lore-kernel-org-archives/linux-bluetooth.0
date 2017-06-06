@@ -4,66 +4,174 @@ From: =?UTF-8?q?Micha=C5=82=20Narajowski?=
 To: linux-bluetooth@vger.kernel.org
 Cc: =?UTF-8?q?Micha=C5=82=20Narajowski?=
         <michal.narajowski@codecoup.pl>
-Subject: [PATCH BlueZ 08/31] monitor: Add LE Read Maximum Advertising Data Length decoding
-Date: Tue,  6 Jun 2017 11:40:57 +0200
-Message-Id: <20170606094120.14541-11-michal.narajowski@codecoup.pl>
+Subject: [PATCH BlueZ 15/31] monitor: Add LE Set Extended Scan Parameters decoding
+Date: Tue,  6 Jun 2017 11:41:04 +0200
+Message-Id: <20170606094120.14541-18-michal.narajowski@codecoup.pl>
 In-Reply-To: <20170606094120.14541-1-michal.narajowski@codecoup.pl>
 References: <20170606094120.14541-1-michal.narajowski@codecoup.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+< HCI Command: LE Set Extended Scan Parameters (0x08|0x0041) plen 13
+        Own address type: Random (0x01)
+        Filter policy: Reserved (0x09)
+        PHYs: 0x05
+          LE 1M
+          LE Coded
+        Entry 0
+          Type: Reserved (0x03)
+          Interval: 491.250 msec (0x0312)
+          Window: 320.625 msec (0x0201)
+        Entry 1
+          Type: Active (0x01)
+          Interval: 0.625 msec (0x0001)
+          Window: 0.625 msec (0x0001)
 ---
- monitor/bt.h     |  6 ++++++
- monitor/packet.c | 12 +++++++++++-
- 2 files changed, 17 insertions(+), 1 deletion(-)
+ monitor/bt.h     |  12 +++++++
+ monitor/packet.c | 100 ++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 111 insertions(+), 1 deletion(-)
 
 diff --git a/monitor/bt.h b/monitor/bt.h
-index 8dd0d57..b91fbe5 100644
+index c44aad7..fd61c53 100644
 --- a/monitor/bt.h
 +++ b/monitor/bt.h
-@@ -2234,6 +2234,12 @@ struct bt_hci_cmd_ext_adv_set {
- 	uint8_t  max_events;
+@@ -2274,6 +2274,18 @@ struct bt_hci_cmd_le_set_periodic_adv_enable {
+ 	uint8_t  handle;
  } __attribute__ ((packed));
  
-+#define BT_HCI_CMD_LE_READ_MAX_ADV_DATA_LEN			0x203a
-+struct bt_hci_rsp_le_read_max_adv_data_len {
-+	uint8_t  status;
-+	uint16_t  max_len;
++#define BT_HCI_CMD_LE_SET_EXT_SCAN_PARAMS		0x2041
++struct bt_hci_cmd_le_set_ext_scan_params {
++	uint8_t  own_addr_type;
++	uint8_t  filter_policy;
++	uint8_t  num_phys;
++} __attribute__ ((packed));
++struct bt_hci_le_scan_phy {
++	uint8_t  type;
++	uint16_t  interval;
++	uint16_t  window;
 +} __attribute__ ((packed));
 +
  #define BT_HCI_EVT_INQUIRY_COMPLETE		0x01
  struct bt_hci_evt_inquiry_complete {
  	uint8_t  status;
 diff --git a/monitor/packet.c b/monitor/packet.c
-index f109b4f..afebf7d 100644
+index 1c113ff..78b780f 100644
 --- a/monitor/packet.c
 +++ b/monitor/packet.c
-@@ -7221,6 +7221,14 @@ static void le_set_ext_adv_enable_cmd(const void *data, uint8_t size)
- 	}
+@@ -7333,6 +7333,102 @@ static void le_set_periodic_adv_enable_cmd(const void *data, uint8_t size)
+ 	print_handle(cmd->handle);
  }
  
-+static void le_read_max_adv_data_len_rsp(const void *data, uint8_t size)
-+{
-+	const struct bt_hci_rsp_le_read_max_adv_data_len *rsp = data;
++static const struct {
++	uint8_t bit;
++	const char *str;
++} ext_scan_phys_table[] = {
++	{  0, "LE 1M"		},
++	{  2, "LE Coded"		},
++	{ }
++};
 +
-+	print_status(rsp->status);
-+	print_field("Max length: %d", rsp->max_len);
++static int print_ext_scan_phys(uint8_t flags)
++{
++	uint8_t mask = flags;
++	int bits_set = 0;
++	int i;
++
++	print_field("PHYs: 0x%2.2x", flags);
++
++	for (i = 0; ext_scan_phys_table[i].str; i++) {
++		if (flags & (1 << ext_scan_phys_table[i].bit)) {
++			print_field("  %s", ext_scan_phys_table[i].str);
++			mask &= ~(1 << ext_scan_phys_table[i].bit);
++			++bits_set;
++		}
++	}
++
++	if (mask)
++		print_text(COLOR_UNKNOWN_ADV_FLAG, "  Unknown scanning PHYs"
++							" (0x%2.2x)", mask);
++	return bits_set;
++}
++
++static void print_scan_filter_policy(uint8_t policy)
++{
++	const char *str;
++
++	switch (policy) {
++	case 0x00:
++		str = "Accept all advertisement";
++		break;
++	case 0x01:
++		str = "Ignore not in white list";
++		break;
++	case 0x02:
++		str = "Accept all advertisement, inc. directed unresolved RPA";
++		break;
++	case 0x03:
++		str = "Ignore not in white list, exc. directed unresolved RPA";
++		break;
++	default:
++		str = "Reserved";
++		break;
++	}
++
++	print_field("Filter policy: %s (0x%2.2x)", str, policy);
++}
++
++static void print_scan_type(const char* label, uint8_t type)
++{
++	const char *str;
++
++	switch (type) {
++	case 0x00:
++		str = "Passive";
++		break;
++	case 0x01:
++		str = "Active";
++		break;
++	default:
++		str = "Reserved";
++		break;
++	}
++
++	print_field("%s: %s (0x%2.2x)", label, str, type);
++}
++
++static void le_set_ext_scan_params_cmd(const void *data, uint8_t size)
++{
++	const struct bt_hci_cmd_le_set_ext_scan_params *cmd = data;
++	const struct bt_hci_le_scan_phy *scan_phy;
++	int num_structs;
++	int i;
++
++	print_own_addr_type(cmd->own_addr_type);
++	print_scan_filter_policy(cmd->filter_policy);
++	num_structs = print_ext_scan_phys(cmd->num_phys);
++
++	for (i = 0; i < num_structs; ++i) {
++		print_field("Entry %d", i);
++		scan_phy = data + 3 + i * sizeof(struct bt_hci_le_scan_phy);
++
++		print_scan_type("  Type", scan_phy->type);
++		print_slot_625("  Interval", scan_phy->interval);
++		print_slot_625("  Window", scan_phy->window);
++	}
 +}
 +
  struct opcode_data {
  	uint16_t opcode;
  	int bit;
-@@ -7945,7 +7953,9 @@ static const struct opcode_data opcode_table[] = {
- 	{ 0x2039, 293, "LE Set Extended Advertising Enable",
- 				le_set_ext_adv_enable_cmd, 2, false,
+@@ -8078,7 +8174,9 @@ static const struct opcode_data opcode_table[] = {
+ 	{ 0x2040, 300, "LE Set Periodic Advertising Enable",
+ 				le_set_periodic_adv_enable_cmd, 2, true,
  				status_rsp, 1, true },
--	{ 0x203a, 294, "LE Read Maximum Advertising Data Length" },
-+	{ 0x203a, 294, "LE Read Maximum Advertising Data Length",
-+				null_cmd, 0, true,
-+				le_read_max_adv_data_len_rsp, 3, true },
- 	{ 0x203b, 295, "LE Read Number of Supported Advertising Sets" },
- 	{ 0x203c, 296, "LE Remove Advertising Set" },
- 	{ 0x203d, 297, "LE Clear Advertising Sets" },
+-	{ 0x2041, 301, "LE Set Extended Scan Parameters" },
++	{ 0x2041, 301, "LE Set Extended Scan Parameters",
++				le_set_ext_scan_params_cmd, 3, false,
++				status_rsp, 1, true },
+ 	{ 0x2042, 302, "LE Set Extended Scan Enable" },
+ 	{ 0x2043, 303, "LE Extended Create Connection" },
+ 	{ 0x2044, 304, "LE Periodic Advertising Create Sync" },
 -- 
 2.9.3
 
