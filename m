@@ -1,45 +1,221 @@
-Return-Path: <andriy.shevchenko@linux.intel.com>
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Subject: [PATCH v1 1/2] Bluetooth: hci_bcm: Switch to devm_acpi_dev_add_driver_gpios()
-Date: Tue,  6 Jun 2017 17:47:17 +0300
-Message-Id: <20170606144718.77620-1-andriy.shevchenko@linux.intel.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+MIME-Version: 1.0
+In-Reply-To: <20170606094120.14541-32-michal.narajowski@codecoup.pl>
+References: <20170606094120.14541-1-michal.narajowski@codecoup.pl> <20170606094120.14541-32-michal.narajowski@codecoup.pl>
+From: =?UTF-8?Q?=C5=81ukasz_Rymanowski?= <lukasz.rymanowski@codecoup.pl>
+Date: Tue, 6 Jun 2017 16:10:25 +0200
+Message-ID: <CAExxLLDD1nG1mGNmd_MdBwQZf8YAqZzB2BVmtc16HjvBi1qmuw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 29/31] monitor: Add LE Extended Advertising Report
+ Event decoding
+To: =?UTF-8?Q?Micha=C5=82_Narajowski?= <michal.narajowski@codecoup.pl>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Switch to use managed variant of acpi_dev_add_driver_gpios() to simplify
-error path and fix potentially wrong assingment if ->probe() fails.
+Hi Micha=C5=82,
 
-Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
----
- drivers/bluetooth/hci_bcm.c | 5 +----
- 1 file changed, 1 insertion(+), 4 deletions(-)
+On 6 June 2017 at 11:41, Micha=C5=82 Narajowski
+<michal.narajowski@codecoup.pl> wrote:
+>
+> ---
+>  monitor/bt.h     | 19 ++++++++++++
+>  monitor/packet.c | 89 ++++++++++++++++++++++++++++++++++++++++++++++++++=
+++----
+>  2 files changed, 103 insertions(+), 5 deletions(-)
+>
+> diff --git a/monitor/bt.h b/monitor/bt.h
+> index 3e88d36..f9bdf44 100644
+> --- a/monitor/bt.h
+> +++ b/monitor/bt.h
+> @@ -2990,6 +2990,25 @@ struct bt_hci_evt_le_phy_update_complete {
+>         uint8_t  rx_phy;
+>  } __attribute__ ((packed));
+>
+> +#define BT_HCI_EVT_LE_EXT_ADV_REPORT   0x0d
+> +struct bt_hci_evt_le_ext_adv_report {
+> +       uint8_t  num_reports;
+> +} __attribute__ ((packed));
+> +struct bt_hci_le_ext_adv_report {
+> +       uint8_t  event_type;
 
-diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
-index f87bfdfee4ff..e2096c7803b3 100644
---- a/drivers/bluetooth/hci_bcm.c
-+++ b/drivers/bluetooth/hci_bcm.c
-@@ -762,8 +762,7 @@ static int bcm_acpi_probe(struct bcm_device *dev)
- 	if (id)
- 		gpio_mapping = (const struct acpi_gpio_mapping *) id->driver_data;
- 
--	ret = acpi_dev_add_driver_gpios(ACPI_COMPANION(&pdev->dev),
--					gpio_mapping);
-+	ret = devm_acpi_dev_add_driver_gpios(&pdev->dev, gpio_mapping);
- 	if (ret)
- 		return ret;
- 
-@@ -834,8 +833,6 @@ static int bcm_remove(struct platform_device *pdev)
- 	list_del(&dev->list);
- 	mutex_unlock(&bcm_device_lock);
- 
--	acpi_dev_remove_driver_gpios(ACPI_COMPANION(&pdev->dev));
--
- 	dev_info(&pdev->dev, "%s device unregistered.\n", dev->name);
- 
- 	return 0;
--- 
-2.11.0
+
+event type is 16 bits long and it needs legacy decoding.
+
+>
+> +       uint8_t  addr_type;
+> +       uint8_t  addr[6];
+> +       uint8_t  primary_phy;
+> +       uint8_t  secondary_phy;
+> +       uint8_t  sid;
+> +       uint8_t  tx_power;
+> +       int8_t   rssi;
+> +       uint16_t interval;
+> +       uint8_t  direct_addr_type;
+> +       uint8_t  direct_addr[6];
+> +       uint8_t  data_len;
+> +} __attribute__ ((packed));
+> +
+>  #define BT_HCI_EVT_LE_CHAN_SELECT_ALG          0x14
+>  struct bt_hci_evt_le_chan_select_alg {
+>         uint16_t handle;
+> diff --git a/monitor/packet.c b/monitor/packet.c
+> index dbb920f..5e4f081 100644
+> --- a/monitor/packet.c
+> +++ b/monitor/packet.c
+> @@ -2304,7 +2304,7 @@ static void print_num_reports(uint8_t num_reports)
+>         print_field("Num reports: %d", num_reports);
+>  }
+>
+> -static void print_adv_event_type(uint8_t type)
+> +static void print_adv_event_type(const char *label, uint8_t type)
+>  {
+>         const char *str;
+>
+> @@ -2329,7 +2329,7 @@ static void print_adv_event_type(uint8_t type)
+>                 break;
+>         }
+>
+> -       print_field("Event type: %s (0x%2.2x)", str, type);
+> +       print_field("%s: %s (0x%2.2x)", label, str, type);
+>  }
+>
+>  static void print_rssi(int8_t rssi)
+> @@ -9417,7 +9417,7 @@ static void le_adv_report_evt(const void *data, uin=
+t8_t size)
+>         print_num_reports(evt->num_reports);
+>
+>  report:
+> -       print_adv_event_type(evt->event_type);
+> +       print_adv_event_type("Event type", evt->event_type);
+>         print_peer_addr_type("Address type", evt->addr_type);
+>         print_addr("Address", evt->addr, evt->addr_type);
+>         print_field("Data length: %d", evt->data_len);
+> @@ -9535,7 +9535,7 @@ static void le_direct_adv_report_evt(const void *da=
+ta, uint8_t size)
+>
+>         print_num_reports(evt->num_reports);
+>
+> -       print_adv_event_type(evt->event_type);
+> +       print_adv_event_type("Event type", evt->event_type);
+>         print_peer_addr_type("Address type", evt->addr_type);
+>         print_addr("Address", evt->addr, evt->addr_type);
+>         print_addr_type("Direct address type", evt->direct_addr_type);
+> @@ -9556,6 +9556,84 @@ static void le_phy_update_complete_evt(const void =
+*data, uint8_t size)
+>         print_le_phy("RX PHY", evt->rx_phy);
+>  }
+>
+> +static void le_ext_adv_report_evt(const void *data, uint8_t size)
+> +{
+> +       const struct bt_hci_evt_le_ext_adv_report *evt =3D data;
+> +       const struct bt_hci_le_ext_adv_report *report;
+> +       const char *str;
+> +       int i;
+> +
+> +       print_num_reports(evt->num_reports);
+> +
+> +       data +=3D sizeof(evt->num_reports);
+> +
+> +       for (i =3D 0; i < evt->num_reports; ++i) {
+> +               report =3D data;
+> +               print_field("Entry %d", i);
+> +               print_adv_event_type("  Event type", report->event_type);
+> +               print_peer_addr_type("  Address type", report->addr_type)=
+;
+> +               print_addr("  Address", report->addr, report->addr_type);
+> +
+> +               switch (report->primary_phy) {
+> +               case 0x01:
+> +                       str =3D "LE 1M";
+> +                       break;
+> +               case 0x03:
+> +                       str =3D "LE Coded";
+> +                       break;
+> +               default:
+> +                       str =3D "Reserved";
+> +                       break;
+> +               }
+> +
+> +               print_field("  Primary PHY: %s", str);
+> +
+> +               switch (report->secondary_phy) {
+> +               case 0x00:
+> +                       str =3D "No packets";
+> +                       break;
+> +               case 0x01:
+> +                       str =3D "LE 1M";
+> +                       break;
+> +               case 0x02:
+> +                       str =3D "LE 2M";
+> +                       break;
+> +               case 0x03:
+> +                       str =3D "LE Coded";
+> +                       break;
+> +               default:
+> +                       str =3D "Reserved";
+> +                       break;
+> +               }
+> +
+> +               print_field("  Secondary PHY: %s", str);
+> +
+> +               if (report->sid =3D=3D 0xff)
+> +                       print_field("  SID: no ADI field (0x%2.2x)", repo=
+rt->sid);
+> +               else if (report->sid > 0x0f)
+> +                       print_field("  SID: Reserved (0x%2.2x)", report->=
+sid);
+> +               else
+> +                       print_field("  SID: 0x%2.2x", report->sid);
+> +
+> +               print_field("  TX power: %d dBm", report->tx_power);
+> +
+> +               if (report->rssi =3D=3D 127)
+> +                       print_field("  RSSI: not available (0x%2.2x)", (u=
+int8_t) report->rssi);
+> +               else if (report->rssi >=3D -127 && report->rssi <=3D 20)
+> +                       print_field("  RSSI: %d dBm (0x%2.2x)", report->r=
+ssi, (uint8_t) report->rssi);
+> +               else
+> +                       print_field("  RSSI: reserved (0x%2.2x)", (uint8_=
+t) report->rssi);
+> +
+> +               print_slot_125("  Periodic advertising invteral", report-=
+>interval);
+> +               print_peer_addr_type("  Direct address type", report->dir=
+ect_addr_type);
+> +               print_addr("  Direct address", report->direct_addr, repor=
+t->direct_addr_type);
+> +               print_field("  Data length: 0x%2.2x", report->data_len);
+> +               data +=3D sizeof(struct bt_hci_le_ext_adv_report);
+> +               packet_hexdump(data, report->data_len);
+> +               data +=3D report->data_len;
+> +       }
+> +}
+> +
+>  static void le_chan_select_alg_evt(const void *data, uint8_t size)
+>  {
+>         const struct bt_hci_evt_le_chan_select_alg *evt =3D data;
+> @@ -9646,7 +9724,8 @@ static const struct subevent_data le_meta_event_tab=
+le[] =3D {
+>                                 le_direct_adv_report_evt, 1, false },
+>         { 0x0c, "LE PHY Update Complete",
+>                                 le_phy_update_complete_evt, 5, true},
+> -       { 0x0d, "LE Extended Advertising Report" },
+> +       { 0x0d, "LE Extended Advertising Report",
+> +                               le_ext_adv_report_evt, 1, false},
+>         { 0x0e, "LE Periodic Advertising Sync Established" },
+>         { 0x0f, "LE Periodic Advertising Report" },
+>         { 0x10, "LE Periodic Advertising Sync Lost" },
+> --
+> 2.9.3
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth=
+" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+Best regads
+=C5=81ukasz
