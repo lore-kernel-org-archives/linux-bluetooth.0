@@ -4,111 +4,99 @@ From: =?UTF-8?q?Micha=C5=82=20Narajowski?=
 To: linux-bluetooth@vger.kernel.org
 Cc: =?UTF-8?q?Micha=C5=82=20Narajowski?=
         <michal.narajowski@codecoup.pl>
-Subject: [PATCH BlueZ 05/31] monitor: Add LE Set Extended Advertising Data decoding
-Date: Tue,  6 Jun 2017 11:40:54 +0200
-Message-Id: <20170606094120.14541-8-michal.narajowski@codecoup.pl>
+Subject: [PATCH BlueZ 18/31] monitor: Add LE Periodic Advertising Create Sync decoding
+Date: Tue,  6 Jun 2017 11:41:07 +0200
+Message-Id: <20170606094120.14541-21-michal.narajowski@codecoup.pl>
 In-Reply-To: <20170606094120.14541-1-michal.narajowski@codecoup.pl>
 References: <20170606094120.14541-1-michal.narajowski@codecoup.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-< HCI Command: LE Set Extended Advertising Data (0x08|0x0037) plen 9
-        Handle: 0x01
-        Operation: Complete extended advertising data
-        Fragment preference: Fragment all
-        Data length: 0x05
-        a0 a1 a2 a3 a4                                   .....
+< HCI Command: LE Periodic Advertising Create Sync (0x08|0x0044) plen 14
+        Filter policy: Use Periodic Advertiser List (0x01)
+        SID: 0x02
+        Adv address type: Reserved (0xff)
+        Adv address: 00-00-00-00-00-00
+        Skip: 0x0201
+        Sync timeout: 25630 msec (0x0a03)
+        Unused: 0x0a
 ---
- monitor/bt.h     |  8 ++++++++
- monitor/packet.c | 49 ++++++++++++++++++++++++++++++++++++++++++++++++-
- 2 files changed, 56 insertions(+), 1 deletion(-)
+ monitor/bt.h     | 11 +++++++++++
+ monitor/packet.c | 32 +++++++++++++++++++++++++++++++-
+ 2 files changed, 42 insertions(+), 1 deletion(-)
 
 diff --git a/monitor/bt.h b/monitor/bt.h
-index e903366..ba9ee99 100644
+index d98d4b6..014cde6 100644
 --- a/monitor/bt.h
 +++ b/monitor/bt.h
-@@ -2205,6 +2205,14 @@ struct bt_hci_rsp_le_set_ext_adv_params {
- 	uint8_t  tx_power;
+@@ -2313,6 +2313,17 @@ struct bt_hci_le_ext_create_conn {
+ 	uint16_t  max_length;
  } __attribute__ ((packed));
  
-+#define BT_HCI_CMD_LE_SET_EXT_ADV_DATA			0x2037
-+struct bt_hci_cmd_le_set_ext_adv_data {
-+	uint8_t  handle;
-+	uint8_t  operation;
-+	uint8_t  fragment_preference;
-+	uint8_t  data_len;
-+	uint8_t  data[0];
++#define BT_HCI_CMD_LE_PERIODIC_ADV_CREATE_SYNC		0x2044
++struct bt_hci_cmd_le_periodic_adv_create_sync {
++	uint8_t  filter_policy;
++	uint8_t  sid;
++	uint8_t  addr_type;
++	uint8_t  addr[6];
++	uint16_t  skip;
++	uint16_t  sync_timeout;
++	uint8_t  unused;
 +} __attribute__ ((packed));
- 
++
  #define BT_HCI_EVT_INQUIRY_COMPLETE		0x01
  struct bt_hci_evt_inquiry_complete {
+ 	uint8_t  status;
 diff --git a/monitor/packet.c b/monitor/packet.c
-index 35ffde9..5e20002 100644
+index 3278abf..273f06f 100644
 --- a/monitor/packet.c
 +++ b/monitor/packet.c
-@@ -7093,6 +7093,51 @@ static void le_set_ext_adv_params_rsp(const void *data, uint8_t size)
- 	print_field("Selected Tx power: 0x%2.2x", rsp->tx_power);
+@@ -7556,6 +7556,34 @@ static void le_ext_create_conn_cmd(const void *data, uint8_t size)
+ 	}
  }
  
-+static void le_set_ext_adv_data_cmd(const void *data, uint8_t size)
++static void le_periodic_adv_create_sync_cmd(const void *data, uint8_t size)
 +{
-+	const struct bt_hci_cmd_le_set_ext_adv_data *cmd = data;
++	const struct bt_hci_cmd_le_periodic_adv_create_sync *cmd = data;
 +	const char *str;
 +
-+	print_field("Handle: 0x%2.2x", cmd->handle);
-+
-+	switch (cmd->operation) {
++	switch (cmd->filter_policy) {
 +	case 0x00:
-+		str = "Immediate fragment";
++		str = "Use specified advertising parameters";
 +		break;
 +	case 0x01:
-+		str = "First fragment";
-+		break;
-+	case 0x02:
-+		str = "Last fragment";
-+		break;
-+	case 0x03:
-+		str = "Complete extended advertising data";
-+		break;
-+	case 0x04:
-+		str = "Unchanged data";
++		str = "Use Periodic Advertiser List";
 +		break;
 +	default:
 +		str = "Reserved";
 +		break;
 +	}
-+	print_field("Operation: %s", str);
 +
-+	switch (cmd->fragment_preference) {
-+	case 0x00:
-+		str = "Fragment all";
-+		break;
-+	case 0x01:
-+		str = "Minimize fragmentation";
-+		break;
-+	default:
-+		str = "Reserved";
-+		break;
-+	}
-+	print_field("Fragment preference: %s", str);
-+	print_field("Data length: 0x%2.2x", cmd->data_len);
-+	packet_print_ad(cmd->data, size - sizeof(*cmd));
++	print_field("Filter policy: %s (0x%2.2x)", str, cmd->filter_policy);
++	print_field("SID: 0x%2.2x", cmd->sid);
++	print_addr_type("Adv address type", cmd->addr_type);
++	print_addr("Adv address", cmd->addr, cmd->addr_type);
++	print_field("Skip: 0x%4.4x", cmd->skip);
++	print_field("Sync timeout: %d msec (0x%4.4x)",
++					le16_to_cpu(cmd->sync_timeout) * 10,
++					le16_to_cpu(cmd->sync_timeout));
++	print_field("Unused: 0x%2.2x", cmd->unused);
 +}
 +
  struct opcode_data {
  	uint16_t opcode;
  	int bit;
-@@ -7808,7 +7853,9 @@ static const struct opcode_data opcode_table[] = {
- 	{ 0x2036, 290, "LE Set Extended Advertising Parameters",
- 				le_set_ext_adv_params_cmd, 25, true,
- 				le_set_ext_adv_params_rsp, 2, true },
--	{ 0x2037, 291, "LE Set Extended Advertising Data" },
-+	{ 0x2037, 291, "LE Set Extended Advertising Data",
-+				le_set_ext_adv_data_cmd, 4, false,
+@@ -8310,7 +8338,9 @@ static const struct opcode_data opcode_table[] = {
+ 	{ 0x2043, 303, "LE Extended Create Connection",
+ 				le_ext_create_conn_cmd, 10, false,
+ 				status_rsp, 1, true },
+-	{ 0x2044, 304, "LE Periodic Advertising Create Sync" },
++	{ 0x2044, 304, "LE Periodic Advertising Create Sync",
++				le_periodic_adv_create_sync_cmd, 14, true,
 +				status_rsp, 1, true },
- 	{ 0x2038, 292, "LE Set Extended Scan Response Data" },
- 	{ 0x2039, 293, "LE Set Extended Advertising Enable" },
- 	{ 0x203a, 294, "LE Read Maximum Advertising Data Length" },
+ 	{ 0x2045, 305, "LE Periodic Advertising Create Sync Cancel" },
+ 	{ 0x2046, 306, "LE Periodic Advertising Terminate Sync" },
+ 	{ 0x2047, 307, "LE Add Device To Periodic Advertiser List" },
 -- 
 2.9.3
 
