@@ -4,105 +4,95 @@ From: =?UTF-8?q?Micha=C5=82=20Narajowski?=
 To: linux-bluetooth@vger.kernel.org
 Cc: =?UTF-8?q?Micha=C5=82=20Narajowski?=
         <michal.narajowski@codecoup.pl>
-Subject: [PATCH BlueZ 12/31] monitor: Add LE Set Periodic Advertising Parameters decoding
-Date: Tue,  6 Jun 2017 11:41:01 +0200
-Message-Id: <20170606094120.14541-15-michal.narajowski@codecoup.pl>
+Subject: [PATCH BlueZ 13/31] monitor: Add LE Set Periodic Advertising Data decoding
+Date: Tue,  6 Jun 2017 11:41:02 +0200
+Message-Id: <20170606094120.14541-16-michal.narajowski@codecoup.pl>
 In-Reply-To: <20170606094120.14541-1-michal.narajowski@codecoup.pl>
 References: <20170606094120.14541-1-michal.narajowski@codecoup.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-< HCI Command: LE Set Periodic Advertising Parameters (0x08|0x003e) plen 7
+< HCI Command: LE Set Periodic Advertising Data (0x08|0x003f) plen 7
         Handle: 1
-        Min interval: 2.50 msec (0x0002)
-        Max interval: 318.75 msec (0x00ff)
-        Properties: 0x00ff
-          Include TxPower
-          Unknown advertising properties (0x00bf)
+        Handle: 0x01
+        Operation: Last fragment
+        Data length: 0x04
+        ff 00 ff 00                                      ....
 ---
- monitor/bt.h     |  8 ++++++++
- monitor/packet.c | 42 +++++++++++++++++++++++++++++++++++++++++-
- 2 files changed, 49 insertions(+), 1 deletion(-)
+ monitor/bt.h     |  7 +++++++
+ monitor/packet.c | 34 +++++++++++++++++++++++++++++++++-
+ 2 files changed, 40 insertions(+), 1 deletion(-)
 
 diff --git a/monitor/bt.h b/monitor/bt.h
-index 6d2a76e..c0068ca 100644
+index c0068ca..d093162 100644
 --- a/monitor/bt.h
 +++ b/monitor/bt.h
-@@ -2253,6 +2253,14 @@ struct bt_hci_cmd_le_remove_adv_set {
+@@ -2261,6 +2261,13 @@ struct bt_hci_cmd_le_set_periodic_adv_params {
+ 	uint16_t  properties;
+ } __attribute__ ((packed));
  
- #define BT_HCI_CMD_LE_CLEAR_ADV_SETS			0x203d
- 
-+#define BT_HCI_CMD_LE_SET_PERIODIC_ADV_PARAMS			0x203e
-+struct bt_hci_cmd_le_set_periodic_adv_params {
++#define BT_HCI_CMD_LE_SET_PERIODIC_ADV_DATA			0x203f
++struct bt_hci_cmd_le_set_periodic_adv_data {
 +	uint8_t  handle;
-+	uint16_t  min_interval;
-+	uint16_t  max_interval;
-+	uint16_t  properties;
++	uint8_t  operation;
++	uint8_t  data_len;
 +} __attribute__ ((packed));
 +
  #define BT_HCI_EVT_INQUIRY_COMPLETE		0x01
  struct bt_hci_evt_inquiry_complete {
  	uint8_t  status;
 diff --git a/monitor/packet.c b/monitor/packet.c
-index 9caaeaf..7a5b62f 100644
+index 7a5b62f..0a1d17c 100644
 --- a/monitor/packet.c
 +++ b/monitor/packet.c
-@@ -7244,6 +7244,44 @@ static void le_remove_adv_set_cmd(const void *data, uint8_t size)
- 	print_handle(cmd->handle);
+@@ -7282,6 +7282,36 @@ static void le_set_periodic_adv_params_cmd(const void *data, uint8_t size)
+ 	print_periodic_adv_properties(cmd->properties);
  }
  
-+static const struct {
-+	uint8_t bit;
++static void le_set_periodic_adv_data_cmd(const void *data, uint8_t size)
++{
++	const struct bt_hci_cmd_le_set_periodic_adv_data *cmd = data;
 +	const char *str;
-+} periodic_adv_properties_table[] = {
-+	{  6, "Include TxPower"		},
-+	{ }
-+};
-+
-+static void print_periodic_adv_properties(uint16_t flags)
-+{
-+	uint16_t mask = flags;
-+	int i;
-+
-+	print_field("Properties: 0x%4.4x", flags);
-+
-+	for (i = 0; periodic_adv_properties_table[i].str; i++) {
-+		if (flags & (1 << periodic_adv_properties_table[i].bit)) {
-+			print_field("  %s", periodic_adv_properties_table[i].str);
-+			mask &= ~(1 << periodic_adv_properties_table[i].bit);
-+		}
-+	}
-+
-+	if (mask)
-+		print_text(COLOR_UNKNOWN_ADV_FLAG, "  Unknown advertising properties"
-+							" (0x%4.4x)", mask);
-+}
-+
-+
-+static void le_set_periodic_adv_params_cmd(const void *data, uint8_t size)
-+{
-+	const struct bt_hci_cmd_le_set_periodic_adv_params *cmd = data;
 +
 +	print_handle(cmd->handle);
-+	print_slot_125("Min interval", cmd->min_interval);
-+	print_slot_125("Max interval", cmd->max_interval);
-+	print_periodic_adv_properties(cmd->properties);
++
++	print_field("Handle: 0x%2.2x", cmd->handle);
++	switch (cmd->operation) {
++	case 0x00:
++		str = "Immediate fragment";
++		break;
++	case 0x01:
++		str = "First fragment";
++		break;
++	case 0x02:
++		str = "Last fragment";
++		break;
++	case 0x03:
++		str = "Complete ext advertising data";
++		break;
++	default:
++		str = "Reserved";
++		break;
++	}
++	print_field("Operation: %s", str);
++	print_field("Data length: 0x%2.2x", cmd->data_len);
++	packet_hexdump(data + 3, size - 3);
 +}
 +
  struct opcode_data {
  	uint16_t opcode;
  	int bit;
-@@ -7980,7 +8018,9 @@ static const struct opcode_data opcode_table[] = {
- 	{ 0x203d, 297, "LE Clear Advertising Sets",
- 				null_cmd, 0, true,
+@@ -8021,7 +8051,9 @@ static const struct opcode_data opcode_table[] = {
+ 	{ 0x203e, 298, "LE Set Periodic Advertising Parameters",
+ 				le_set_periodic_adv_params_cmd, 7, true,
  				status_rsp, 1, true },
--	{ 0x203e, 298, "LE Set Periodic Advertising Parameters" },
-+	{ 0x203e, 298, "LE Set Periodic Advertising Parameters",
-+				le_set_periodic_adv_params_cmd, 7, true,
+-	{ 0x203f, 299, "LE Set Periodic Advertising Data" },
++	{ 0x203f, 299, "LE Set Periodic Advertising Data",
++				le_set_periodic_adv_data_cmd, 3, false,
 +				status_rsp, 1, true },
- 	{ 0x203f, 299, "LE Set Periodic Advertising Data" },
  	{ 0x2040, 300, "LE Set Periodic Advertising Enable" },
  	{ 0x2041, 301, "LE Set Extended Scan Parameters" },
+ 	{ 0x2042, 302, "LE Set Extended Scan Enable" },
 -- 
 2.9.3
 
