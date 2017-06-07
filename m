@@ -1,55 +1,31 @@
-Return-Path: <ulf.hansson@linaro.org>
-From: Ulf Hansson <ulf.hansson@linaro.org>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Cc: linux-arm-kernel@lists.infradead.org,
-	Daniel Lezcano <daniel.lezcano@linaro.org>,
-	Wei Xu <xuwei5@hisilicon.com>,
-	Rob Herring <robh@kernel.org>,
-	John Stultz <john.stultz@linaro.org>,
-	Satish Patel <satish.patel@linaro.org>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Olof Johansson <olof@lixom.net>,
-	Ulf Hansson <ulf.hansson@linaro.org>
-Subject: [PATCH 0/3] arm64: hi6220-hikey: Fix Bluetooth support
-Date: Wed,  7 Jun 2017 11:08:19 +0200
-Message-Id: <1496826502-1339-1-git-send-email-ulf.hansson@linaro.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@codecoup.pl>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] monitor/avdtp: Correct bit mask for TSEP
+Date: Wed,  7 Jun 2017 10:39:44 +0200
+Message-Id: <20170607083944.9188-1-grzegorz.kolodziejczyk@codecoup.pl>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The commit ea452678734e ("arm64: dts: hikey: Fix WiFi support") indeed managed
-to fix the WiFi support for the Hikey board. However, it also caused the
-Bluetooth to break.
+According to AVDP specification 1.3 (8.6.2 Stream End Point Discovery
+Response), TSEP bit is on 3rd position of 3rd frame byte.
+---
+ monitor/avdtp.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-The reason to the problem is because part of the fixes for WiFi, involved
-explicitly to start manage the external clock for the TI WiLink chip, as it's
-needed to properly power on/off WiFi. Then, because the Bluetooth driver,
-hci_ll, don't manage the clock, it fails to initialize Bluetooth.
-
-This small series add support and DT bindings for the external clock, now
-properly managed by the hci_ll driver during power on/off. On top of that, the
-external clock is added to the Bluetooth DT node in the Hikey DTS file.
-
-The regression has been reported by John Stultz, running a Hikey board with
-UEFI based boot. I have confirmed that there is no regressions with u-boot as
-we still don't have bluetooth working on that set up. I intend to fix that as
-well, although in second step and not being part of a fixup series.
-
-John, can you please confirm/test this on your Hikey board using UEFI!?
-
-Perhaps this can go in via the bluetooth git, when respective patches has got
-an ack. Or whatever you think is best.
-
-Ulf Hansson (3):
-  dt-bindings: net: Add binding for the external clock for TI WiLink
-  Bluetooth: hci_ll: Add support for the external clock
-  arm64: dts: hikey: Add external clock to the Bluetooth node
-
- Documentation/devicetree/bindings/net/ti,wilink-st.txt |  6 ++++++
- arch/arm64/boot/dts/hisilicon/hi6220-hikey.dts         |  2 ++
- drivers/bluetooth/hci_ll.c                             | 14 +++++++++++++-
- 3 files changed, 21 insertions(+), 1 deletion(-)
-
+diff --git a/monitor/avdtp.c b/monitor/avdtp.c
+index 006daf3..f5ef4c0 100644
+--- a/monitor/avdtp.c
++++ b/monitor/avdtp.c
+@@ -368,7 +368,7 @@ static bool avdtp_discover(struct avdtp_frame *avdtp_frame)
+ 			print_field("%*cMedia Type: %s (0x%02x)", 2, ' ',
+ 					mediatype2str(info >> 4), info >> 4);
+ 			print_field("%*cSEP Type: %s (0x%02x)", 2, ' ',
+-						info & 0x04 ? "SNK" : "SRC",
++						info & 0x08 ? "SNK" : "SRC",
+ 						(info >> 3) & 0x01);
+ 			print_field("%*cIn use: %s", 2, ' ',
+ 						seid & 0x02 ? "Yes" : "No");
 -- 
-2.7.4
+2.9.3
+
