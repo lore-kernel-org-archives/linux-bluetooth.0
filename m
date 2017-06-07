@@ -1,138 +1,57 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Subject: Re: [PATCH BlueZ 1/2] monitor: Add LE Set Extended Scan Parameters
- decoding
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20170606094120.14541-3-michal.narajowski@codecoup.pl>
-Date: Thu, 8 Jun 2017 10:38:24 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <F7778D21-46FC-40A4-BA71-E4B7AC73BB9F@holtmann.org>
-References: <20170606094120.14541-1-michal.narajowski@codecoup.pl>
- <20170606094120.14541-3-michal.narajowski@codecoup.pl>
-To: =?utf-8?Q?Micha=C5=82_Narajowski?= <michal.narajowski@codecoup.pl>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <daniel.lezcano@linaro.org>
+Subject: Re: [PATCH 0/3] arm64: hi6220-hikey: Fix Bluetooth support
+To: John Stultz <john.stultz@linaro.org>, Ulf Hansson <ulf.hansson@linaro.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+ Gustavo Padovan <gustavo@padovan.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>, linux-bluetooth@vger.kernel.org,
+ "linux-arm-kernel@lists.infradead.org"
+ <linux-arm-kernel@lists.infradead.org>, Wei Xu <xuwei5@hisilicon.com>,
+ Rob Herring <robh@kernel.org>, Satish Patel <satish.patel@linaro.org>,
+ Arnd Bergmann <arnd@arndb.de>, Olof Johansson <olof@lixom.net>
+References: <1496826502-1339-1-git-send-email-ulf.hansson@linaro.org>
+ <CALAqxLVYH8+shjfxkjr5uFzKLznqtRZq2noEa9mcZET9hBNf2g@mail.gmail.com>
+From: Daniel Lezcano <daniel.lezcano@linaro.org>
+Message-ID: <738b3232-d725-1642-3c54-374b4d159b62@linaro.org>
+Date: Wed, 7 Jun 2017 21:14:51 +0200
+MIME-Version: 1.0
+In-Reply-To: <CALAqxLVYH8+shjfxkjr5uFzKLznqtRZq2noEa9mcZET9hBNf2g@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Michal,
-
-> ---
-> monitor/bt.h     | 12 +++++++
-> monitor/packet.c | 98 +++++++++++++++++++++++++++++++++++++++++++++++++++++++-
-> 2 files changed, 109 insertions(+), 1 deletion(-)
+On 07/06/2017 21:07, John Stultz wrote:
+> On Wed, Jun 7, 2017 at 2:08 AM, Ulf Hansson <ulf.hansson@linaro.org> wrote:
+>> The commit ea452678734e ("arm64: dts: hikey: Fix WiFi support") indeed managed
+>> to fix the WiFi support for the Hikey board. However, it also caused the
+>> Bluetooth to break.
+>>
+>> The reason to the problem is because part of the fixes for WiFi, involved
+>> explicitly to start manage the external clock for the TI WiLink chip, as it's
+>> needed to properly power on/off WiFi. Then, because the Bluetooth driver,
+>> hci_ll, don't manage the clock, it fails to initialize Bluetooth.
+>>
+>> This small series add support and DT bindings for the external clock, now
+>> properly managed by the hci_ll driver during power on/off. On top of that, the
+>> external clock is added to the Bluetooth DT node in the Hikey DTS file.
+>>
+>> The regression has been reported by John Stultz, running a Hikey board with
+>> UEFI based boot. I have confirmed that there is no regressions with u-boot as
+>> we still don't have bluetooth working on that set up. I intend to fix that as
+>> well, although in second step and not being part of a fixup series.
+>>
+>> John, can you please confirm/test this on your Hikey board using UEFI!?
 > 
-> diff --git a/monitor/bt.h b/monitor/bt.h
-> index 660564a..5ec3e5e 100644
-> --- a/monitor/bt.h
-> +++ b/monitor/bt.h
-> @@ -2272,6 +2272,18 @@ struct bt_hci_cmd_le_set_periodic_adv_enable {
-> 	uint8_t  handle;
-> } __attribute__ ((packed));
+> Yes. This does resolve the issue! Bluetooth and wifi are now working
+> together again as they were before ea452678734e.
 > 
-> +#define BT_HCI_CMD_LE_SET_EXT_SCAN_PARAMS		0x2041
-> +struct bt_hci_cmd_le_set_ext_scan_params {
-> +	uint8_t  own_addr_type;
-> +	uint8_t  filter_policy;
-> +	uint8_t  phys;
-> +} __attribute__ ((packed));
-> +struct bt_hci_le_scan_phy {
-> +	uint8_t  type;
-> +	uint16_t  interval;
-> +	uint16_t  window;
+> For the whole set:
+> Tested-by: John Stultz <john.stultz@linaro.org>
 
-some of the indentation went wrong here.
+Great ! Thanks John for testing.
 
-> +} __attribute__ ((packed));
-> +
-> #define BT_HCI_EVT_INQUIRY_COMPLETE		0x01
-> struct bt_hci_evt_inquiry_complete {
-> 	uint8_t  status;
-> diff --git a/monitor/packet.c b/monitor/packet.c
-> index 8ffda90..fb6aee2 100644
-> --- a/monitor/packet.c
-> +++ b/monitor/packet.c
-> @@ -7336,6 +7336,101 @@ static void le_set_periodic_adv_enable_cmd(const void *data, uint8_t size)
-> 	print_handle(cmd->handle);
-> }
-> 
-> +static const struct {
-> +	uint8_t bit;
-> +	const char *str;
-> +} ext_scan_phys_table[] = {
-> +	{  0, "LE 1M"		},
-> +	{  2, "LE Coded"		},
-> +	{ }
-> +};
-> +
-> +static int print_ext_scan_phys(uint8_t flags)
-> +{
-> +	uint8_t mask = flags;
-> +	int bits_set = 0;
-> +	int i;
-> +
-> +	print_field("PHYs: 0x%2.2x", flags);
-> +
-> +	for (i = 0; ext_scan_phys_table[i].str; i++) {
-> +		if (flags & (1 << ext_scan_phys_table[i].bit)) {
-> +			print_field("  %s", ext_scan_phys_table[i].str);
-> +			mask &= ~(1 << ext_scan_phys_table[i].bit);
-> +			++bits_set;
-> +		}
-> +	}
-> +
-> +	if (mask)
-> +		print_text(COLOR_UNKNOWN_ADV_FLAG, "  Unknown scanning PHYs"
-> +							" (0x%2.2x)", mask);
-> +	return bits_set;
-> +}
-> +
-> +static void print_scan_filter_policy(uint8_t policy)
-> +{
-> +	const char *str;
-> +
-> +	switch (policy) {
-> +	case 0x00:
-> +		str = "Accept all advertisement";
-> +		break;
-> +	case 0x01:
-> +		str = "Ignore not in white list";
-> +		break;
-> +	case 0x02:
-> +		str = "Accept all advertisement, inc. directed unresolved RPA";
-> +		break;
-> +	case 0x03:
-> +		str = "Ignore not in white list, exc. directed unresolved RPA";
-> +		break;
-> +	default:
-> +		str = "Reserved";
-> +		break;
-> +	}
-> +
-> +	print_field("Filter policy: %s (0x%2.2x)", str, policy);
-> +}
-> +
-> +static void print_scan_type(uint8_t type)
-> +{
-> +	const char *str;
-> +
-> +	switch (type) {
-> +	case 0x00:
-> +		str = "Passive";
-> +		break;
-> +	case 0x01:
-> +		str = "Active";
-> +		break;
-> +	default:
-> +		str = "Reserved";
-> +		break;
-> +	}
-> +
-> +	print_field("Type: %s (0x%2.2x)", str, type);
-> +}
 
-Then lets please use them also for the other the legacy commands.
+-- 
+ <http://www.linaro.org/> Linaro.org │ Open source software for ARM SoCs
 
-Regards
-
-Marcel
-
+Follow Linaro:  <http://www.facebook.com/pages/Linaro> Facebook |
+<http://twitter.com/#!/linaroorg> Twitter |
+<http://www.linaro.org/linaro-blog/> Blog
