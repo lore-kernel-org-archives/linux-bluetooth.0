@@ -1,44 +1,41 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: nsathish41@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Cc: Sathish Narasimman <sathish.narasimman@intel.com>
-Subject: [PATCH BlueZ 1/2] obexd/map: Do not send parent folder in dummy
-Date: Fri,  9 Jun 2017 10:53:27 +0530
-Message-Id: <1496985808-17492-1-git-send-email-nsathish41@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <robh+dt@kernel.org>
+MIME-Version: 1.0
+In-Reply-To: <20170608205845.4903-1-sebastian.reichel@collabora.co.uk>
+References: <20170608205845.4903-1-sebastian.reichel@collabora.co.uk>
+From: Rob Herring <robh+dt@kernel.org>
+Date: Thu, 8 Jun 2017 16:02:11 -0500
+Message-ID: <CAL_JsqKh0MMiKjPbzcy+4tCagvyYHM72fyCfYaiWcpBc2ZCy1w@mail.gmail.com>
+Subject: Re: [PATCHv3] Bluetooth: hci_ll: Add compatible values for more WL chips
+To: Sebastian Reichel <sebastian.reichel@collabora.co.uk>
+Cc: Sebastian Reichel <sre@kernel.org>, Marcel Holtmann <marcel@holtmann.org>,
+	"open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>, linux-omap <linux-omap@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Sathish Narasimman <sathish.narasimman@intel.com>
+On Thu, Jun 8, 2017 at 3:58 PM, Sebastian Reichel
+<sebastian.reichel@collabora.co.uk> wrote:
+> Add compatible values for WiLink chips from 128x and 180x series.
+> Also the DT binding already contained compatible values for the 127x
+> series, but the driver did not. This brings the list on par with
+> the list from wlcore (the wifi driver).
+>
+> Signed-off-by: Sebastian Reichel <sebastian.reichel@collabora.co.uk>
+> ---
+> Hi,
+>
+> This patch originally was part of the "Motorola Droid 4: Add WL1285C support"
+> series. It can be queued standalone via the bluetooth tree, though.
+>
+> Changes since PATCHv2:
+>  * none
+> Changes since PATCHv1:
+>  * patch did not exist
+>
+> -- Sebastian
+> ---
+>  Documentation/devicetree/bindings/net/ti,wilink-st.txt | 6 ++++++
+>  drivers/bluetooth/hci_ll.c                             | 8 ++++++++
+>  2 files changed, 14 insertions(+)
 
-In messages-dummy it is not necessary to add parent folder in the
-response to folder-lisintg. when tested with some carkit the present
-method is not working when navigating to different folders. so removing
-it.
----
- obexd/plugins/messages-dummy.c | 10 ----------
- 1 file changed, 10 deletions(-)
-
-diff --git a/obexd/plugins/messages-dummy.c b/obexd/plugins/messages-dummy.c
-index 765f08d..33056e2 100644
---- a/obexd/plugins/messages-dummy.c
-+++ b/obexd/plugins/messages-dummy.c
-@@ -155,16 +155,6 @@ static void return_folder_listing(struct folder_listing_data *fld, GSList *list)
- 	uint16_t num = 0;
- 	uint16_t offs = 0;
- 
--	/* XXX: This isn't really documented for MAP. I need to take a look how
--	 * other implementations choose to deal with parent folder.
--	 */
--	if (session->cwd[0] != 0 && fld->offset == 0) {
--		num++;
--		fld->callback(session, -EAGAIN, 0, "..", fld->user_data);
--	} else {
--		offs++;
--	}
--
- 	for (cur = list; offs < fld->offset; offs++) {
- 		cur = cur->next;
- 		if (cur == NULL)
--- 
-2.7.4
-
+Reviewed-by: Rob Herring <robh@kernel.org>
