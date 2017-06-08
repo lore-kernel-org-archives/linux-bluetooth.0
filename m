@@ -1,262 +1,136 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Subject: Re: [PATCH BlueZ 04/31] monitor: Add LE Set Extended Advertising
- Parameters decoding
+Subject: Re: [PATCH BlueZ 1/2] monitor: Add LE Set Extended Scan Parameters
+ decoding
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20170606094120.14541-7-michal.narajowski@codecoup.pl>
-Date: Thu, 8 Jun 2017 10:44:42 +0200
+In-Reply-To: <20170606094120.14541-3-michal.narajowski@codecoup.pl>
+Date: Thu, 8 Jun 2017 10:38:24 +0200
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <014038C0-53CA-4C78-83F9-21ED2173B678@holtmann.org>
+Message-Id: <F7778D21-46FC-40A4-BA71-E4B7AC73BB9F@holtmann.org>
 References: <20170606094120.14541-1-michal.narajowski@codecoup.pl>
- <20170606094120.14541-7-michal.narajowski@codecoup.pl>
+ <20170606094120.14541-3-michal.narajowski@codecoup.pl>
 To: =?utf-8?Q?Micha=C5=82_Narajowski?= <michal.narajowski@codecoup.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Michal,
 
-> < HCI Command: LE Set Extended Advertising Parameters (0x08|0x0036) plen 25
->        Handle: 0x01
->        Properties: 0x0000
->        Min advertising interval: 20.000 msec (0x0020)
->        Max advertising interval: 159.375 msec (0x00ff)
->        Channel map: 37, 38, 39 (0x07)
->        Own address type: Random (0x01)
->        Peer address type: Public (0x00)
->        Peer address: 00:00:00:00:00:00 (OUI 00-00-00)
->        Filter policy: Allow Scan Request from Any, Allow Connect Request from Any (0x00)
->        Tx power: 0xff
->        Primary PHY: LE 1M
->        Secondary max skip: 0x00
->        Secondary PHY: LE Coded (0x03)
->        SID: 0x06
->        Scan request notifications: Disabled
 > ---
-> monitor/bt.h     |  24 +++++++++
-> monitor/packet.c | 158 ++++++++++++++++++++++++++++++++++++++++++++++++++++++-
-> 2 files changed, 181 insertions(+), 1 deletion(-)
+> monitor/bt.h     | 12 +++++++
+> monitor/packet.c | 98 +++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+> 2 files changed, 109 insertions(+), 1 deletion(-)
 > 
 > diff --git a/monitor/bt.h b/monitor/bt.h
-> index d2e3e16..e903366 100644
+> index 660564a..5ec3e5e 100644
 > --- a/monitor/bt.h
 > +++ b/monitor/bt.h
-> @@ -2182,6 +2182,30 @@ struct bt_hci_cmd_le_set_adv_set_rand_addr {
-> 	uint8_t  bdaddr[6];
+> @@ -2272,6 +2272,18 @@ struct bt_hci_cmd_le_set_periodic_adv_enable {
+> 	uint8_t  handle;
 > } __attribute__ ((packed));
 > 
-> +#define BT_HCI_CMD_LE_SET_EXT_ADV_PARAMS			0x2036
-> +struct bt_hci_cmd_le_set_ext_adv_params {
-> +	uint8_t  handle;
-> +	uint16_t evt_properties;
-> +	uint8_t  min_interval[3];
-> +	uint8_t  max_interval[3];
-> +	uint8_t  channel_map;
+> +#define BT_HCI_CMD_LE_SET_EXT_SCAN_PARAMS		0x2041
+> +struct bt_hci_cmd_le_set_ext_scan_params {
 > +	uint8_t  own_addr_type;
-> +	uint8_t  peer_addr_type;
-> +	uint8_t  peer_addr[6];
 > +	uint8_t  filter_policy;
-> +	uint8_t  tx_power;
-> +	uint8_t  primary_phy;
-> +	uint8_t  secondary_max_skip;
-> +	uint8_t  secondary_phy;
-> +	uint8_t  sid;
-> +	uint8_t  notif_enable;
+> +	uint8_t  phys;
 > +} __attribute__ ((packed));
-> +struct bt_hci_rsp_le_set_ext_adv_params {
-> +	uint8_t  status;
-> +	uint8_t  tx_power;
+> +struct bt_hci_le_scan_phy {
+> +	uint8_t  type;
+> +	uint16_t  interval;
+> +	uint16_t  window;
+
+some of the indentation went wrong here.
+
 > +} __attribute__ ((packed));
-> +
 > +
 > #define BT_HCI_EVT_INQUIRY_COMPLETE		0x01
 > struct bt_hci_evt_inquiry_complete {
 > 	uint8_t  status;
 > diff --git a/monitor/packet.c b/monitor/packet.c
-> index 771b7bb..35ffde9 100644
+> index 8ffda90..fb6aee2 100644
 > --- a/monitor/packet.c
 > +++ b/monitor/packet.c
-> @@ -6939,6 +6939,160 @@ static void le_set_adv_set_rand_addr(const void *data, uint8_t size)
-> 	print_addr("Advertising random address", cmd->bdaddr, 0x00);
+> @@ -7336,6 +7336,101 @@ static void le_set_periodic_adv_enable_cmd(const void *data, uint8_t size)
+> 	print_handle(cmd->handle);
 > }
 > 
 > +static const struct {
 > +	uint8_t bit;
 > +	const char *str;
-> +} ext_adv_properties_table[] = {
-> +	{  0, "Connectable"		},
-> +	{  1, "Scannable"		},
-> +	{  2, "Directed"	},
-> +	{  3, "High Duty Cycle Directed Connectable"	},
-> +	{  4, "Use legacy advertising PDUs"	},
-> +	{  5, "Anonymous advertising"	},
-> +	{  6, "Include TxPower"		},
+> +} ext_scan_phys_table[] = {
+> +	{  0, "LE 1M"		},
+> +	{  2, "LE Coded"		},
 > +	{ }
 > +};
 > +
-> +static void print_ext_adv_properties(uint16_t flags)
+> +static int print_ext_scan_phys(uint8_t flags)
 > +{
-> +	uint16_t mask = flags;
+> +	uint8_t mask = flags;
+> +	int bits_set = 0;
 > +	int i;
 > +
-> +	print_field("Properties: 0x%4.4x", flags);
+> +	print_field("PHYs: 0x%2.2x", flags);
 > +
-> +	for (i = 0; ext_adv_properties_table[i].str; i++) {
-> +		if (flags & (1 << ext_adv_properties_table[i].bit)) {
-> +			print_field("  %s", ext_adv_properties_table[i].str);
-> +			mask &= ~(1 << ext_adv_properties_table[i].bit);
+> +	for (i = 0; ext_scan_phys_table[i].str; i++) {
+> +		if (flags & (1 << ext_scan_phys_table[i].bit)) {
+> +			print_field("  %s", ext_scan_phys_table[i].str);
+> +			mask &= ~(1 << ext_scan_phys_table[i].bit);
+> +			++bits_set;
 > +		}
 > +	}
 > +
 > +	if (mask)
-> +		print_text(COLOR_UNKNOWN_ADV_FLAG, "  Unknown advertising properties"
-> +							" (0x%4.4x)", mask);
+> +		print_text(COLOR_UNKNOWN_ADV_FLAG, "  Unknown scanning PHYs"
+> +							" (0x%2.2x)", mask);
+> +	return bits_set;
 > +}
 > +
-> +static void print_ext_slot_625(const char *label, const uint8_t value[3])
+> +static void print_scan_filter_policy(uint8_t policy)
 > +{
-> +	uint32_t value_cpu = value[0];
-> +
-> +	value_cpu |= value[1] << 8;
-> +	value_cpu |= value[2] << 16;
-> +
-> +	 print_field("%s: %.3f msec (0x%4.4x)", label,
-> +				 value_cpu * 0.625, value_cpu);
-> +}
-
-and here is another formatting snafu.
-
-> +
-> +
-
-And here again.
-
-> +static void le_set_ext_adv_params_cmd(const void *data, uint8_t size)
-> +{
-> +	const struct bt_hci_cmd_le_set_ext_adv_params *cmd = data;
 > +	const char *str;
 > +
-> +	print_field("Handle: 0x%2.2x", cmd->handle);
-> +	print_ext_adv_properties(le16_to_cpu(cmd->evt_properties));
-> +
-> +	print_ext_slot_625("Min advertising interval", cmd->min_interval);
-> +	print_ext_slot_625("Max advertising interval", cmd->max_interval);
-> +
-> +	switch (cmd->channel_map) {
+> +	switch (policy) {
+> +	case 0x00:
+> +		str = "Accept all advertisement";
+> +		break;
 > +	case 0x01:
-> +		str = "37";
+> +		str = "Ignore not in white list";
 > +		break;
 > +	case 0x02:
-> +		str = "38";
+> +		str = "Accept all advertisement, inc. directed unresolved RPA";
 > +		break;
 > +	case 0x03:
-> +		str = "37, 38";
-> +		break;
-> +	case 0x04:
-> +		str = "39";
-> +		break;
-> +	case 0x05:
-> +		str = "37, 39";
-> +		break;
-> +	case 0x06:
-> +		str = "38, 39";
-> +		break;
-> +	case 0x07:
-> +		str = "37, 38, 39";
+> +		str = "Ignore not in white list, exc. directed unresolved RPA";
 > +		break;
 > +	default:
 > +		str = "Reserved";
 > +		break;
 > +	}
 > +
-> +	print_field("Channel map: %s (0x%2.2x)", str, cmd->channel_map);
-> +
-> +	print_own_addr_type(cmd->own_addr_type);
-> +	print_peer_addr_type("Peer address type", cmd->peer_addr_type);
-> +	print_addr("Peer address", cmd->peer_addr, cmd->peer_addr_type);
-> +
-> +	switch (cmd->filter_policy) {
-> +	case 0x00:
-> +		str = "Allow Scan Request from Any, "
-> +			"Allow Connect Request from Any";
-> +		break;
-> +	case 0x01:
-> +		str = "Allow Scan Request from White List Only, "
-> +			"Allow Connect Request from Any";
-> +		break;
-> +	case 0x02:
-> +		str = "Allow Scan Request from Any, "
-> +			"Allow Connect Request from White List Only";
-> +		break;
-> +	case 0x03:
-> +		str = "Allow Scan Request from White List Only, "
-> +			"Allow Connect Request from White List Only";
-> +		break;
-> +	default:
-> +		str = "Reserved";
-> +		break;
-> +	}
-> +
-> +	print_field("Filter policy: %s (0x%2.2x)", str, cmd->filter_policy);
-> +	print_field("Tx power: 0x%2.2x", cmd->tx_power);
-> +
-> +	switch (cmd->primary_phy) {
-> +	case 0x01:
-> +		str = "LE 1M";
-> +		break;
-> +	case 0x03:
-> +		str = "LE Coded";
-> +		break;
-> +	default:
-> +		str = "Reserved";
-> +		break;
-> +	}
-> +
-> +	print_field("Primary PHY: %s", str);
-> +	print_field("Secondary max skip: 0x%2.2x", cmd->secondary_max_skip);
-> +	print_le_phy("Secondary PHY", cmd->secondary_phy);
-> +	print_field("SID: 0x%2.2x", cmd->sid);
-> +
-> +
-
-And here.
-
-> +	switch (cmd->notif_enable) {
-> +	case 0x00:
-> +		str = "Disabled";
-> +		break;
-> +	case 0x01:
-> +		str = "Enabled";
-> +		break;
-> +	default:
-> +		str = "Reserved";
-> +		break;
-> +	}
-> +	print_field("Scan request notifications: %s", str);
+> +	print_field("Filter policy: %s (0x%2.2x)", str, policy);
 > +}
 > +
-> +static void le_set_ext_adv_params_rsp(const void *data, uint8_t size)
+> +static void print_scan_type(uint8_t type)
 > +{
-> +	const struct bt_hci_rsp_le_set_ext_adv_params *rsp = data;
+> +	const char *str;
 > +
-> +	print_status(rsp->status);
-> +	print_field("Selected Tx power: 0x%2.2x", rsp->tx_power);
+> +	switch (type) {
+> +	case 0x00:
+> +		str = "Passive";
+> +		break;
+> +	case 0x01:
+> +		str = "Active";
+> +		break;
+> +	default:
+> +		str = "Reserved";
+> +		break;
+> +	}
+> +
+> +	print_field("Type: %s (0x%2.2x)", str, type);
 > +}
-> +
-> struct opcode_data {
-> 	uint16_t opcode;
-> 	int bit;
-> @@ -7651,7 +7805,9 @@ static const struct opcode_data opcode_table[] = {
-> 	{ 0x2035, 289, "LE Set Advertising Set Random Address",
-> 				le_set_adv_set_rand_addr, 7, true,
-> 				status_rsp, 1, true },
-> -	{ 0x2036, 290, "LE Set Extended Advertising Parameters" },
-> +	{ 0x2036, 290, "LE Set Extended Advertising Parameters",
-> +				le_set_ext_adv_params_cmd, 25, true,
-> +				le_set_ext_adv_params_rsp, 2, true },
-> 	{ 0x2037, 291, "LE Set Extended Advertising Data" },
-> 	{ 0x2038, 292, "LE Set Extended Scan Response Data" },
-> 	{ 0x2039, 293, "LE Set Extended Advertising Enable" },
+
+Then lets please use them also for the other the legacy commands.
 
 Regards
 
