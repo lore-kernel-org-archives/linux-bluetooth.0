@@ -1,112 +1,64 @@
-Return-Path: <sedat.dilek@gmail.com>
-MIME-Version: 1.0
-Reply-To: sedat.dilek@gmail.com
-In-Reply-To: <1083ECDC-2292-4372-B85D-DA551EB3FB38@holtmann.org>
-References: <CA+icZUWf1EyPJDOTO-xos=QwQ0DWLOg3goiSX_X2C01QpVqU1w@mail.gmail.com>
- <D83A359C-829A-4DBC-B5CE-1B077CE6B0E4@holtmann.org> <CA+icZUUD92VO52MtynBBQFFPxWkj=pvhm0yDkMYNamvVG4ry9Q@mail.gmail.com>
- <1083ECDC-2292-4372-B85D-DA551EB3FB38@holtmann.org>
-From: Sedat Dilek <sedat.dilek@gmail.com>
-Date: Fri, 9 Jun 2017 18:17:39 +0200
-Message-ID: <CA+icZUVT-fJwamHBSUfHW1KOQU6gx3OeKWgbo7B5oTYmK5dm7g@mail.gmail.com>
-Subject: Re: [Linux-4.9.30] Broadcom BCM20702 bluetooth in ThinkPad-T530 not usable
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: "Gustavo F. Padovan" <gustavo@padovan.org>, Johan Hedberg <johan.hedberg@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [RFC] Bluetooth: Send HCI Set Event Mask Page 2 command only when needed
+Date: Fri,  9 Jun 2017 18:11:09 +0200
+Message-Id: <20170609161109.4475-1-marcel@holtmann.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, Jun 9, 2017 at 6:11 PM, Marcel Holtmann <marcel@holtmann.org> wrote=
-:
-> Hi Sedat,
->
->>>> I have some problems using my BCM20702 adapter on my Debian/stretch
->>>> 9.0 AMD64 system with Linux v4.9.30 on a ThinkPad-T530 notebook.
->>>>
->>>
->>> can you run =E2=80=9Cbtmon -w trace.log=E2=80=9D and attach that log. I=
- think that I know what is going on, but I want to confirm this.
->>>
->>
->> attached is a 2nd hcidump and the requested trace.log.
->
-> so here is the problem:
->
-> < HCI Command: Set Event Mask Page 2 (0x03|0x0063) plen 8
->         Mask: 0x0000000000000000
->> HCI Event: Command Complete (0x0e) plen 4
->       Set Event Mask Page 2 (0x03|0x0063) ncmd 1
->         Status: Unknown HCI Command (0x01)
->
-> This controller just does not support this command. Problem is that earli=
-er it told us it did.
->
-> < HCI Command: Read Local Supported Commands (0x04|0x0002) plen 0
->> HCI Event: Command Complete (0x0e) plen 68
->       Read Local Supported Commands (0x04|0x0002) ncmd 1
->         Status: Success (0x00)
->         Commands: 162 entries
->           ...
->           Set Event Mask Page 2 (Octet 22 - Bit 2)
->           ...
->
-> Can you provide the output of /sys/kernel/debug/usb/devices that relates =
-to this USB dongle.
->
-> I posted a RFC patch that you might want to try. If that works, I just ne=
-ed to include a proper commit message. If it works, please send also the bt=
-mon -w trace.log for success part.
->
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ net/bluetooth/hci_core.c | 17 +++++++++++++++--
+ 1 file changed, 15 insertions(+), 2 deletions(-)
 
-Hi Marcel,
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 7655b4005dfb..b7f3a0e5835e 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -548,6 +548,7 @@ static void hci_set_event_mask_page_2(struct hci_request *req)
+ {
+ 	struct hci_dev *hdev = req->hdev;
+ 	u8 events[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
++	bool changed = false;
+ 
+ 	/* If Connectionless Slave Broadcast master role is supported
+ 	 * enable all necessary events for it.
+@@ -557,6 +558,7 @@ static void hci_set_event_mask_page_2(struct hci_request *req)
+ 		events[1] |= 0x80;	/* Synchronization Train Complete */
+ 		events[2] |= 0x10;	/* Slave Page Response Timeout */
+ 		events[2] |= 0x20;	/* CSB Channel Map Change */
++		changed = true;
+ 	}
+ 
+ 	/* If Connectionless Slave Broadcast slave role is supported
+@@ -567,13 +569,24 @@ static void hci_set_event_mask_page_2(struct hci_request *req)
+ 		events[2] |= 0x02;	/* CSB Receive */
+ 		events[2] |= 0x04;	/* CSB Timeout */
+ 		events[2] |= 0x08;	/* Truncated Page Complete */
++		changed = true;
+ 	}
+ 
+ 	/* Enable Authenticated Payload Timeout Expired event if supported */
+-	if (lmp_ping_capable(hdev) || hdev->le_features[0] & HCI_LE_PING)
++	if (lmp_ping_capable(hdev) || hdev->le_features[0] & HCI_LE_PING) {
+ 		events[2] |= 0x80;
++		changed = true;
++	}
+ 
+-	hci_req_add(req, HCI_OP_SET_EVENT_MASK_PAGE_2, sizeof(events), events);
++	/* Some Broadcom based controllers indicate support for Set Event
++	 * Mask Page 2 command, but then actually do not support it. Since
++	 * the default value is all bits set to zero, the command is only
++	 * required if the event mask has to be changed. In case no change
++	 * to the event mask is needed, then skip this command.
++	 */
++	if (changed)
++		hci_req_add(req, HCI_OP_SET_EVENT_MASK_PAGE_2,
++			    sizeof(events), events);
+ }
+ 
+ static int hci_init3_req(struct hci_request *req, unsigned long opt)
+-- 
+2.9.4
 
-[ /sys/kernel/debug/usb/devices ]
-
-T:  Bus=3D01 Lev=3D02 Prnt=3D02 Port=3D03 Cnt=3D03 Dev#=3D  9 Spd=3D12   Mx=
-Ch=3D 0
-D:  Ver=3D 2.00 Cls=3Dff(vend.) Sub=3D01 Prot=3D01 MxPS=3D64 #Cfgs=3D  1
-P:  Vendor=3D0a5c ProdID=3D21e6 Rev=3D 1.12
-S:  Manufacturer=3DBroadcom Corp
-S:  Product=3DBCM20702A0
-S:  SerialNumber=3DF82FA8E8CFC0
-C:* #Ifs=3D 4 Cfg#=3D 1 Atr=3De0 MxPwr=3D  0mA
-I:* If#=3D 0 Alt=3D 0 #EPs=3D 3 Cls=3Dff(vend.) Sub=3D01 Prot=3D01 Driver=
-=3Dbtusb
-E:  Ad=3D81(I) Atr=3D03(Int.) MxPS=3D  16 Ivl=3D1ms
-E:  Ad=3D82(I) Atr=3D02(Bulk) MxPS=3D  64 Ivl=3D0ms
-E:  Ad=3D02(O) Atr=3D02(Bulk) MxPS=3D  64 Ivl=3D0ms
-I:* If#=3D 1 Alt=3D 0 #EPs=3D 2 Cls=3Dff(vend.) Sub=3D01 Prot=3D01 Driver=
-=3Dbtusb
-E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D   0 Ivl=3D1ms
-E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D   0 Ivl=3D1ms
-I:  If#=3D 1 Alt=3D 1 #EPs=3D 2 Cls=3Dff(vend.) Sub=3D01 Prot=3D01 Driver=
-=3Dbtusb
-E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D   9 Ivl=3D1ms
-E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D   9 Ivl=3D1ms
-I:  If#=3D 1 Alt=3D 2 #EPs=3D 2 Cls=3Dff(vend.) Sub=3D01 Prot=3D01 Driver=
-=3Dbtusb
-E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D  17 Ivl=3D1ms
-E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D  17 Ivl=3D1ms
-I:  If#=3D 1 Alt=3D 3 #EPs=3D 2 Cls=3Dff(vend.) Sub=3D01 Prot=3D01 Driver=
-=3Dbtusb
-E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D  25 Ivl=3D1ms
-E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D  25 Ivl=3D1ms
-I:  If#=3D 1 Alt=3D 4 #EPs=3D 2 Cls=3Dff(vend.) Sub=3D01 Prot=3D01 Driver=
-=3Dbtusb
-E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D  33 Ivl=3D1ms
-E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D  33 Ivl=3D1ms
-I:  If#=3D 1 Alt=3D 5 #EPs=3D 2 Cls=3Dff(vend.) Sub=3D01 Prot=3D01 Driver=
-=3Dbtusb
-E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D  49 Ivl=3D1ms
-E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D  49 Ivl=3D1ms
-I:* If#=3D 2 Alt=3D 0 #EPs=3D 2 Cls=3Dff(vend.) Sub=3Dff Prot=3Dff Driver=
-=3Dbtusb
-E:  Ad=3D84(I) Atr=3D02(Bulk) MxPS=3D  32 Ivl=3D0ms
-E:  Ad=3D04(O) Atr=3D02(Bulk) MxPS=3D  32 Ivl=3D0ms
-I:* If#=3D 3 Alt=3D 0 #EPs=3D 0 Cls=3Dfe(app. ) Sub=3D01 Prot=3D01 Driver=
-=3D(none)
-
-Can you point me to your RFC patch?
-
-Thanks.
-
-- Sedat -
