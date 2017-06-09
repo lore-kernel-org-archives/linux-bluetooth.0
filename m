@@ -1,77 +1,76 @@
-Return-Path: <Jason@zx2c4.com>
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-To: linux-kernel@vger.kernel.org,
-	kernel-hardening@lists.openwall.com
-Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>,
-	Anna Schumaker <anna.schumaker@netapp.com>,
-	David Howells <dhowells@redhat.com>,
-	David Safford <safford@us.ibm.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Gilad Ben-Yossef <gilad@benyossef.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	"J. Bruce Fields" <bfields@fieldses.org>,
-	Jeff Layton <jlayton@poochiereds.net>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Mimi Zohar <zohar@linux.vnet.ibm.com>,
-	Trond Myklebust <trond.myklebust@primarydata.com>,
-	keyrings@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org,
-	linux-nfs@vger.kernel.org,
-	linux-wireless@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH 0/6] Constant Time Memory Comparisons Are Important
-Date: Sat, 10 Jun 2017 04:59:06 +0200
-Message-Id: <20170610025912.6499-1-Jason@zx2c4.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+Subject: Re: [RFC/PATCH] Bluetooth: SMP: Fail gracefully if device doesn't
+ support pairing
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20170601153550.1578-1-john@metanate.com>
+Date: Fri, 9 Jun 2017 19:02:53 +0200
+Cc: linux-bluetooth@vger.kernel.org,
+        "Gustavo F. Padovan" <gustavo@padovan.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>
+Message-Id: <B397B494-6BB4-4068-96DB-276EA821C983@holtmann.org>
+References: <20170601153550.1578-1-john@metanate.com>
+To: John Keeping <john@metanate.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Whenever you're comparing two MACs, it's important to do this using
-crypto_memneq instead of memcmp. With memcmp, you leak timing information,
-which could then be used to iteratively forge a MAC. This is far too basic
-of a mistake for us to have so pervasively in the year 2017, so let's begin
-cleaning this stuff up. The following 6 locations were found with some
-simple regex greps, but I'm sure more lurk below the surface. If you
-maintain some code or know somebody who maintains some code that deals
-with MACs, tell them to double check which comparison function they're
-using.
+Hi John,
 
-Jason A. Donenfeld (6):
-  sunrpc: use constant time memory comparison for mac
-  net/ipv6: use constant time memory comparison for mac
-  ccree: use constant time memory comparison for macs and tags
-  security/keys: use constant time memory comparison for macs
-  bluetooth/smp: use constant time memory comparison for secret values
-  mac80211/wpa: use constant time memory comparison for MACs
+> If a device does not support pairing, we have no way of knowing this
+> except by trying and seeing if it returns a "pairing not supported"
+> error.
+> 
+> Handle this response specially so that we don't drop the connection when
+> an attempt at pairing fails because the device doesn't support pairing.
+> Also pass a specific failure value back to userspace to allow detection
+> of this case as distinct from an authentication failure during pairing.
+> 
+> Signed-off-by: John Keeping <john@metanate.com>
+> ---
+> I'm not particularly happy with the use of
+> HCI_ERROR_PAIRING_NOT_SUPPORTED here since this is actually "pairing
+> with unit key is not supported" so I don't think it's technically the
+> right thing to return here.  But I can't see a more appropriate HCI
+> error to which to map the SMP_PAIRING_NOTSUPP reason.
+> 
+> include/net/bluetooth/hci.h |  1 +
+> net/bluetooth/smp.c         | 23 ++++++++++++++++++++---
+> 2 files changed, 21 insertions(+), 3 deletions(-)
+> 
+> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+> index fe98f0a5bef0..0917385a95eb 100644
+> --- a/include/net/bluetooth/hci.h
+> +++ b/include/net/bluetooth/hci.h
+> @@ -463,6 +463,7 @@ enum {
+> #define HCI_ERROR_PAIRING_NOT_ALLOWED	0x18
+> #define HCI_ERROR_INVALID_LL_PARAMS	0x1e
+> #define HCI_ERROR_UNSPECIFIED		0x1f
+> +#define HCI_ERROR_PAIRING_NOT_SUPPORTED	0x29
+> #define HCI_ERROR_ADVERTISING_TIMEOUT	0x3c
+> 
+> /* Flow control modes */
+> diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+> index 14585edc9439..41f246a69178 100644
+> --- a/net/bluetooth/smp.c
+> +++ b/net/bluetooth/smp.c
+> @@ -813,7 +813,10 @@ static void smp_failure(struct l2cap_conn *conn, u8 reason)
+> 		smp_send_cmd(conn, SMP_CMD_PAIRING_FAIL, sizeof(reason),
+> 			     &reason);
+> 
+> -	mgmt_auth_failed(hcon, HCI_ERROR_AUTH_FAILURE);
+> +	if (reason == SMP_PAIRING_NOTSUPP)
+> +		mgmt_auth_failed(hcon, HCI_ERROR_PAIRING_NOT_SUPPORTED);
+> +	else
+> +		mgmt_auth_failed(hcon, HCI_ERROR_AUTH_FAILURE);
 
-Cc: Anna Schumaker <anna.schumaker@netapp.com>
-Cc: David Howells <dhowells@redhat.com>
-Cc: David Safford <safford@us.ibm.com>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Gilad Ben-Yossef <gilad@benyossef.com>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Gustavo Padovan <gustavo@padovan.org>
-Cc: "J. Bruce Fields" <bfields@fieldses.org>
-Cc: Jeff Layton <jlayton@poochiereds.net>
-Cc: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: Johannes Berg <johannes@sipsolutions.net>
-Cc: Marcel Holtmann <marcel@holtmann.org>
-Cc: Mimi Zohar <zohar@linux.vnet.ibm.com>
-Cc: Trond Myklebust <trond.myklebust@primarydata.com>
-Cc: keyrings@vger.kernel.org
-Cc: linux-bluetooth@vger.kernel.org
-Cc: linux-nfs@vger.kernel.org
-Cc: linux-wireless@vger.kernel.org
-Cc: netdev@vger.kernel.org
+actually this is a bug. This should have been always MGMT_STATUS_AUTH_FAILED. Handing the ev->status to mgmt_auth_failed is something we should have never done. Luckily HCI_ERROR_AUTH_FAILURE and MGMT_STATUS_AUTH_FAILED are the same error code number. And the Core spec defines usage of error code Authentication Failure (0x05) in Simple Pairing Complete cases.
 
- drivers/staging/ccree/ssi_fips_ll.c   | 17 ++++++++-------
- net/bluetooth/smp.c                   | 39 ++++++++++++++++++-----------------
- net/ipv6/seg6_hmac.c                  |  3 ++-
- net/mac80211/wpa.c                    |  9 ++++----
- net/sunrpc/auth_gss/gss_krb5_crypto.c |  3 ++-
- security/keys/trusted.c               |  7 ++++---
- 6 files changed, 42 insertions(+), 36 deletions(-)
+So I propose that first we fix the usage of HCI_ERROR_AUTH_FAILURE and replace it with MGMT_STATUS_ versions.
 
--- 
-2.13.1
+And then we use a new MGMT_STATUS_ code or use MGMT_STATUS_NOT_SUPPORTED to indicate the different error.
+
+Regards
+
+Marcel
+
