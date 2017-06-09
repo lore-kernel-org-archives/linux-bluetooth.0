@@ -2,8 +2,8 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Subject: [PATCH v3] core/gatt: Add GATT.Cache config option
-Date: Fri,  9 Jun 2017 16:02:58 +0300
-Message-Id: <20170609130258.23401-1-luiz.dentz@gmail.com>
+Date: Fri,  9 Jun 2017 16:02:48 +0300
+Message-Id: <20170609130249.23290-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
