@@ -1,63 +1,48 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <linux-kernel-owner@vger.kernel.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Subject: Re: [PATCH 0/3] arm64: hi6220-hikey: Fix Bluetooth support
+Subject: Re: [PATCHv3] Bluetooth: hci_ll: Add compatible values for more WL
+ chips
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1496826502-1339-1-git-send-email-ulf.hansson@linaro.org>
-Date: Fri, 9 Jun 2017 07:49:13 +0200
-Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        Wei Xu <xuwei5@hisilicon.com>, Rob Herring <robh@kernel.org>,
-        John Stultz <john.stultz@linaro.org>,
-        Satish Patel <satish.patel@linaro.org>,
-        Arnd Bergmann <arnd@arndb.de>, Olof Johansson <olof@lixom.net>
-Message-Id: <85B2CA30-73CC-41A9-8CE5-937825D85952@holtmann.org>
-References: <1496826502-1339-1-git-send-email-ulf.hansson@linaro.org>
-To: Ulf Hansson <ulf.hansson@linaro.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <20170608205845.4903-1-sebastian.reichel@collabora.co.uk>
+Date: Fri, 9 Jun 2017 07:49:09 +0200
+Cc: Sebastian Reichel <sre@kernel.org>,
+        Rob Herring <robh+dt@kernel.org>,
+        linux-bluetooth@vger.kernel.org, linux-omap@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Message-Id: <377C5292-109E-4B78-992A-6552759A95A9@holtmann.org>
+References: <20170608205845.4903-1-sebastian.reichel@collabora.co.uk>
+To: Sebastian Reichel <sebastian.reichel@collabora.co.uk>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ulf,
+Hi Sebastian,
 
-> The commit ea452678734e ("arm64: dts: hikey: Fix WiFi support") indeed managed
-> to fix the WiFi support for the Hikey board. However, it also caused the
-> Bluetooth to break.
+> Add compatible values for WiLink chips from 128x and 180x series.
+> Also the DT binding already contained compatible values for the 127x
+> series, but the driver did not. This brings the list on par with
+> the list from wlcore (the wifi driver).
 > 
-> The reason to the problem is because part of the fixes for WiFi, involved
-> explicitly to start manage the external clock for the TI WiLink chip, as it's
-> needed to properly power on/off WiFi. Then, because the Bluetooth driver,
-> hci_ll, don't manage the clock, it fails to initialize Bluetooth.
+> Signed-off-by: Sebastian Reichel <sebastian.reichel@collabora.co.uk>
+> ---
+> Hi,
 > 
-> This small series add support and DT bindings for the external clock, now
-> properly managed by the hci_ll driver during power on/off. On top of that, the
-> external clock is added to the Bluetooth DT node in the Hikey DTS file.
+> This patch originally was part of the "Motorola Droid 4: Add WL1285C support"
+> series. It can be queued standalone via the bluetooth tree, though.
 > 
-> The regression has been reported by John Stultz, running a Hikey board with
-> UEFI based boot. I have confirmed that there is no regressions with u-boot as
-> we still don't have bluetooth working on that set up. I intend to fix that as
-> well, although in second step and not being part of a fixup series.
+> Changes since PATCHv2:
+> * none
+> Changes since PATCHv1:
+> * patch did not exist
 > 
-> John, can you please confirm/test this on your Hikey board using UEFI!?
-> 
-> Perhaps this can go in via the bluetooth git, when respective patches has got
-> an ack. Or whatever you think is best.
-> 
-> Ulf Hansson (3):
->  dt-bindings: net: Add binding for the external clock for TI WiLink
->  Bluetooth: hci_ll: Add support for the external clock
->  arm64: dts: hikey: Add external clock to the Bluetooth node
-> 
-> Documentation/devicetree/bindings/net/ti,wilink-st.txt |  6 ++++++
-> arch/arm64/boot/dts/hisilicon/hi6220-hikey.dts         |  2 ++
-> drivers/bluetooth/hci_ll.c                             | 14 +++++++++++++-
-> 3 files changed, 21 insertions(+), 1 deletion(-)
+> -- Sebastian
+> ---
+> Documentation/devicetree/bindings/net/ti,wilink-st.txt | 6 ++++++
+> drivers/bluetooth/hci_ll.c                             | 8 ++++++++
+> 2 files changed, 14 insertions(+)
 
-all 3 patches have been applied to bluetooth-next tree.
+patch has been applied to bluetooth-next tree.
 
 Regards
 
 Marcel
-
