@@ -1,23 +1,23 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2] Bluetooth: btbcm: Read controller features during configuration
-Date: Sat, 10 Jun 2017 14:33:16 +0200
-Message-Id: <20170610123316.41707-1-marcel@holtmann.org>
+Subject: [PATCH] Bluetooth: btbcm: Read controller features during configuration
+Date: Sat, 10 Jun 2017 14:32:29 +0200
+Message-Id: <20170610123229.41513-1-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Read the Broadcom specific controller features during configuration and
 print them for informational purposes.
 
-  < HCI Command: Broadcom Read Controller Features (0x3f|0x006e) plen 0
-  > HCI Event: Command Complete (0x0e) plen 12
-        Broadcom Read Controller Features (0x3f|0x006e) ncmd 1
-          Status: Success (0x00)
-          Features: 0x07 0x00 0x00 0x00 0x00 0x00 0x00 0x00
-            Multi-AV transport bandwidth reducer
-            WBS SBC
-            FW LC-PLC
+< HCI Command: Broadcom Read Controller Features (0x3f|0x006e) plen 0
+> HCI Event: Command Complete (0x0e) plen 12
+      Broadcom Read Controller Features (0x3f|0x006e) ncmd 1
+        Status: Success (0x00)
+        Features: 0x07 0x00 0x00 0x00 0x00 0x00 0x00 0x00
+          Multi-AV transport bandwidth reducer
+          WBS SBC
+          FW LC-PLC
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
