@@ -1,42 +1,90 @@
-Return-Path: <linux-kernel-owner@vger.kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Subject: Re: [PATCH 5/6] bluetooth/smp: use constant time memory comparison
- for secret values
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20170610025912.6499-6-Jason@zx2c4.com>
-Date: Sat, 10 Jun 2017 15:49:28 +0200
-Cc: LKML <linux-kernel@vger.kernel.org>,
-        kernel-hardening@lists.openwall.com,
-        "Gustavo F. Padovan" <gustavo@padovan.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org, stable@vger.kernel.org
-Message-Id: <85B759DF-F6A8-46C3-89E6-C8AFDEA1E907@holtmann.org>
-References: <20170610025912.6499-1-Jason@zx2c4.com>
- <20170610025912.6499-6-Jason@zx2c4.com>
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Sender: linux-kernel-owner@vger.kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2] Bluetooth: btbcm: Read controller features during configuration
+Date: Sat, 10 Jun 2017 14:33:16 +0200
+Message-Id: <20170610123316.41707-1-marcel@holtmann.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jason,
+Read the Broadcom specific controller features during configuration and
+print them for informational purposes.
 
-> This file is filled with complex cryptography. Thus, the comparisons of
-> MACs and secret keys and curve points and so forth should not add timing
-> attacks, which could either result in a direct forgery, or, given the
-> complexity, some other type of attack.
-> 
-> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
-> Cc: Marcel Holtmann <marcel@holtmann.org>
-> Cc: Gustavo Padovan <gustavo@padovan.org>
-> Cc: Johan Hedberg <johan.hedberg@gmail.com>
-> Cc: linux-bluetooth@vger.kernel.org
-> Cc: stable@vger.kernel.org
-> ---
-> net/bluetooth/smp.c | 39 ++++++++++++++++++++-------------------
-> 1 file changed, 20 insertions(+), 19 deletions(-)
+  < HCI Command: Broadcom Read Controller Features (0x3f|0x006e) plen 0
+  > HCI Event: Command Complete (0x0e) plen 12
+        Broadcom Read Controller Features (0x3f|0x006e) ncmd 1
+          Status: Success (0x00)
+          Features: 0x07 0x00 0x00 0x00 0x00 0x00 0x00 0x00
+            Multi-AV transport bandwidth reducer
+            WBS SBC
+            FW LC-PLC
 
-patch has been applied to bluetooth-next tree.
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ drivers/bluetooth/btbcm.c | 36 ++++++++++++++++++++++++++++++++++++
+ 1 file changed, 36 insertions(+)
 
-Regards
+diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
+index ba3dd2eafc09..24f8c4e93f4e 100644
+--- a/drivers/bluetooth/btbcm.c
++++ b/drivers/bluetooth/btbcm.c
+@@ -246,6 +246,27 @@ static struct sk_buff *btbcm_read_verbose_config(struct hci_dev *hdev)
+ 	return skb;
+ }
+ 
++static struct sk_buff *btbcm_read_controller_features(struct hci_dev *hdev)
++{
++	struct sk_buff *skb;
++
++	skb = __hci_cmd_sync(hdev, 0xfc6e, 0, NULL, HCI_INIT_TIMEOUT);
++	if (IS_ERR(skb)) {
++		BT_ERR("%s: BCM: Read controller features failed (%ld)",
++		       hdev->name, PTR_ERR(skb));
++		return skb;
++	}
++
++	if (skb->len != 9) {
++		BT_ERR("%s: BCM: Controller features length mismatch",
++		       hdev->name);
++		kfree_skb(skb);
++		return ERR_PTR(-EIO);
++	}
++
++	return skb;
++}
++
+ static struct sk_buff *btbcm_read_usb_product(struct hci_dev *hdev)
+ {
+ 	struct sk_buff *skb;
+@@ -417,6 +438,14 @@ int btbcm_setup_patchram(struct hci_dev *hdev)
+ 	BT_INFO("%s: BCM: chip id %u", hdev->name, skb->data[1]);
+ 	kfree_skb(skb);
+ 
++	/* Read Controller Features */
++	skb = btbcm_read_controller_features(hdev);
++	if (IS_ERR(skb))
++		return PTR_ERR(skb);
++
++	BT_INFO("%s: BCM: features 0x%2.2x", hdev->name, skb->data[1]);
++	kfree_skb(skb);
++
+ 	/* Read Local Name */
+ 	skb = btbcm_read_local_name(hdev);
+ 	if (IS_ERR(skb))
+@@ -540,6 +569,13 @@ int btbcm_setup_apple(struct hci_dev *hdev)
+ 		kfree_skb(skb);
+ 	}
+ 
++	/* Read Controller Features */
++	skb = btbcm_read_controller_features(hdev);
++	if (!IS_ERR(skb)) {
++		BT_INFO("%s: BCM: features 0x%2.2x", hdev->name, skb->data[1]);
++		kfree_skb(skb);
++	}
++
+ 	/* Read Local Name */
+ 	skb = btbcm_read_local_name(hdev);
+ 	if (!IS_ERR(skb)) {
+-- 
+2.9.4
 
-Marcel
