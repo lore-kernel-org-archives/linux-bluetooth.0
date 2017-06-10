@@ -1,43 +1,42 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Szymon Janc <szymon.janc@codecoup.pl>
-To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@codecoup.pl>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] monitor/avdtp: Correct bit mask for TSEP
-Date: Sat, 10 Jun 2017 21:21:19 +0200
-Message-ID: <2027586.XSW9BB2509@ix>
-In-Reply-To: <20170607083944.9188-1-grzegorz.kolodziejczyk@codecoup.pl>
-References: <20170607083944.9188-1-grzegorz.kolodziejczyk@codecoup.pl>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+Subject: Re: [PATCH 5/6] bluetooth/smp: use constant time memory comparison
+ for secret values
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20170610025912.6499-6-Jason@zx2c4.com>
+Date: Sat, 10 Jun 2017 15:49:28 +0200
+Cc: LKML <linux-kernel@vger.kernel.org>,
+        kernel-hardening@lists.openwall.com,
+        "Gustavo F. Padovan" <gustavo@padovan.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-bluetooth@vger.kernel.org, stable@vger.kernel.org
+Message-Id: <85B759DF-F6A8-46C3-89E6-C8AFDEA1E907@holtmann.org>
+References: <20170610025912.6499-1-Jason@zx2c4.com>
+ <20170610025912.6499-6-Jason@zx2c4.com>
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Grzegorz,
+Hi Jason,
 
-On Wednesday, 7 June 2017 10:39:44 CEST Grzegorz Kolodziejczyk wrote:
-> According to AVDP specification 1.3 (8.6.2 Stream End Point Discovery
-> Response), TSEP bit is on 3rd position of 3rd frame byte.
-> ---
->  monitor/avdtp.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> This file is filled with complex cryptography. Thus, the comparisons of
+> MACs and secret keys and curve points and so forth should not add timing
+> attacks, which could either result in a direct forgery, or, given the
+> complexity, some other type of attack.
 > 
-> diff --git a/monitor/avdtp.c b/monitor/avdtp.c
-> index 006daf3..f5ef4c0 100644
-> --- a/monitor/avdtp.c
-> +++ b/monitor/avdtp.c
-> @@ -368,7 +368,7 @@ static bool avdtp_discover(struct avdtp_frame
-> *avdtp_frame) print_field("%*cMedia Type: %s (0x%02x)", 2, ' ',
->  					mediatype2str(info >> 4), info >> 4);
->  			print_field("%*cSEP Type: %s (0x%02x)", 2, ' ',
-> -						info & 0x04 ? "SNK" : "SRC",
-> +						info & 0x08 ? "SNK" : "SRC",
->  						(info >> 3) & 0x01);
->  			print_field("%*cIn use: %s", 2, ' ',
->  						seid & 0x02 ? "Yes" : "No");
+> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+> Cc: Marcel Holtmann <marcel@holtmann.org>
+> Cc: Gustavo Padovan <gustavo@padovan.org>
+> Cc: Johan Hedberg <johan.hedberg@gmail.com>
+> Cc: linux-bluetooth@vger.kernel.org
+> Cc: stable@vger.kernel.org
+> ---
+> net/bluetooth/smp.c | 39 ++++++++++++++++++++-------------------
+> 1 file changed, 20 insertions(+), 19 deletions(-)
 
+patch has been applied to bluetooth-next tree.
 
-Applied, thanks.
+Regards
 
--- 
-pozdrawiam
-Szymon Janc
+Marcel
