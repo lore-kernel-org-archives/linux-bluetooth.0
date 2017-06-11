@@ -1,14 +1,13 @@
-Return-Path: <egrumbach@gmail.com>
+Return-Path: <emil.lenngren@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <CAO1O6see6yDr-hDVNPi9Kv9wO6p-98w7YhsnnwnVOVCSEGVksw@mail.gmail.com>
+In-Reply-To: <CANUX_P2b0Bx+-E_OBQ0reGW0=d6819qc=r83K0kTv0xMo8mtLQ@mail.gmail.com>
 References: <20170610025912.6499-1-Jason@zx2c4.com> <878tkzq6wi.fsf@purkki.adurom.net>
- <CAGXu5jKp=X7-eKo+HgzS3uqncx5yy-u=tJNqV9K8GOgJ=-C7iA@mail.gmail.com>
- <CANUX_P2b0Bx+-E_OBQ0reGW0=d6819qc=r83K0kTv0xMo8mtLQ@mail.gmail.com> <CAO1O6see6yDr-hDVNPi9Kv9wO6p-98w7YhsnnwnVOVCSEGVksw@mail.gmail.com>
-From: Emmanuel Grumbach <egrumbach@gmail.com>
-Date: Mon, 12 Jun 2017 08:03:33 +0300
-Message-ID: <CANUX_P1n0=rK+biS7M0-vxP5Uhk5rU+qj4_9jtdRF9Yh219PVA@mail.gmail.com>
+ <CAGXu5jKp=X7-eKo+HgzS3uqncx5yy-u=tJNqV9K8GOgJ=-C7iA@mail.gmail.com> <CANUX_P2b0Bx+-E_OBQ0reGW0=d6819qc=r83K0kTv0xMo8mtLQ@mail.gmail.com>
+From: Emil Lenngren <emil.lenngren@gmail.com>
+Date: Sun, 11 Jun 2017 23:30:33 +0200
+Message-ID: <CAO1O6see6yDr-hDVNPi9Kv9wO6p-98w7YhsnnwnVOVCSEGVksw@mail.gmail.com>
 Subject: Re: [PATCH 0/6] Constant Time Memory Comparisons Are Important
-To: Emil Lenngren <emil.lenngren@gmail.com>
+To: Emmanuel Grumbach <egrumbach@gmail.com>
 Cc: Kees Cook <keescook@chromium.org>, Kalle Valo <kvalo@codeaurora.org>,
 	"Jason A. Donenfeld" <Jason@zx2c4.com>, LKML <linux-kernel@vger.kernel.org>,
 	"kernel-hardening@lists.openwall.com" <kernel-hardening@lists.openwall.com>,
@@ -26,30 +25,27 @@ Cc: Kees Cook <keescook@chromium.org>, Kalle Valo <kvalo@codeaurora.org>,
 Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Jun 12, 2017 at 12:30 AM, Emil Lenngren <emil.lenngren@gmail.com> wrote:
-> 2017-06-11 22:48 GMT+02:00 Emmanuel Grumbach <egrumbach@gmail.com>:
->> On Sun, Jun 11, 2017 at 4:36 PM, Kees Cook <keescook@chromium.org> wrote:
->>>
->>> On Sun, Jun 11, 2017 at 1:13 AM, Kalle Valo <kvalo@codeaurora.org> wrote:
->>> > "Jason A. Donenfeld" <Jason@zx2c4.com> writes:
->>> >
->>> >> Whenever you're comparing two MACs, it's important to do this using
->>> >> crypto_memneq instead of memcmp. With memcmp, you leak timing information,
->>> >> which could then be used to iteratively forge a MAC.
->>> >
->>> > Do you have any pointers where I could learn more about this?
->>>
->>> While not using C specifically, this talks about the problem generally:
->>> https://www.chosenplaintext.ca/articles/beginners-guide-constant-time-cryptography.html
->>>
+2017-06-11 22:48 GMT+02:00 Emmanuel Grumbach <egrumbach@gmail.com>:
+> On Sun, Jun 11, 2017 at 4:36 PM, Kees Cook <keescook@chromium.org> wrote:
 >>
->> Sorry for the stupid question, but the MAC address is in plaintext in
->> the air anyway or easily accessible via user space tools. I fail to
->> see what it is so secret about a MAC address in that code where that
->> same MAC address is accessible via myriads of ways.
+>> On Sun, Jun 11, 2017 at 1:13 AM, Kalle Valo <kvalo@codeaurora.org> wrote:
+>> > "Jason A. Donenfeld" <Jason@zx2c4.com> writes:
+>> >
+>> >> Whenever you're comparing two MACs, it's important to do this using
+>> >> crypto_memneq instead of memcmp. With memcmp, you leak timing information,
+>> >> which could then be used to iteratively forge a MAC.
+>> >
+>> > Do you have any pointers where I could learn more about this?
+>>
+>> While not using C specifically, this talks about the problem generally:
+>> https://www.chosenplaintext.ca/articles/beginners-guide-constant-time-cryptography.html
+>>
 >
-> I think you're mixing up Media Access Control (MAC) addresses with
-> Message Authentication Code (MAC). The second one is a cryptographic
-> signature of a message.
+> Sorry for the stupid question, but the MAC address is in plaintext in
+> the air anyway or easily accessible via user space tools. I fail to
+> see what it is so secret about a MAC address in that code where that
+> same MAC address is accessible via myriads of ways.
 
-Obviously... Sorry for the noise.
+I think you're mixing up Media Access Control (MAC) addresses with
+Message Authentication Code (MAC). The second one is a cryptographic
+signature of a message.
