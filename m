@@ -1,98 +1,41 @@
-Return-Path: <acho@suse.com>
-Message-ID: <1497257025.3326.3.camel@suse.com>
-Subject: Re: [PATCH v4 1/3] Bluetooth: bnep: fix possible might sleep error
- in bnep_session
-From: AL Yu-Chen Cho <acho@suse.com>
-To: Jeffy Chen <jeffy.chen@rock-chips.com>, linux-bluetooth@vger.kernel.org
-Cc: Brian Norris <briannorris@chromium.org>, Douglas Anderson
- <dianders@chromium.org>, Johan Hedberg <johan.hedberg@intel.com>, Peter
- Hurley <peter@hurleysoftware.com>, Johan Hedberg <johan.hedberg@gmail.com>,
-  netdev@vger.kernel.org, linux-kernel@vger.kernel.org, "David S. Miller"
- <davem@davemloft.net>, Marcel Holtmann <marcel@holtmann.org>, Gustavo
- Padovan <gustavo@padovan.org>
-Date: Mon, 12 Jun 2017 16:43:45 +0800
-In-Reply-To: <1487033725-7208-1-git-send-email-jeffy.chen@rock-chips.com>
-References: <1487033725-7208-1-git-send-email-jeffy.chen@rock-chips.com>
+Return-Path: <sedat.dilek@gmail.com>
+MIME-Version: 1.0
+Reply-To: sedat.dilek@gmail.com
+In-Reply-To: <CA+icZUXaGZ73kj8R8AKCoakyCXf14sj0i4nJc7HER27SfM_YKQ@mail.gmail.com>
+References: <CA+icZUWf1EyPJDOTO-xos=QwQ0DWLOg3goiSX_X2C01QpVqU1w@mail.gmail.com>
+ <D83A359C-829A-4DBC-B5CE-1B077CE6B0E4@holtmann.org> <CA+icZUUD92VO52MtynBBQFFPxWkj=pvhm0yDkMYNamvVG4ry9Q@mail.gmail.com>
+ <1083ECDC-2292-4372-B85D-DA551EB3FB38@holtmann.org> <CA+icZUVT-fJwamHBSUfHW1KOQU6gx3OeKWgbo7B5oTYmK5dm7g@mail.gmail.com>
+ <984B6D8C-483D-46C7-A746-2BB28B262F87@holtmann.org> <CA+icZUXaGZ73kj8R8AKCoakyCXf14sj0i4nJc7HER27SfM_YKQ@mail.gmail.com>
+From: Sedat Dilek <sedat.dilek@gmail.com>
+Date: Mon, 12 Jun 2017 10:26:55 +0200
+Message-ID: <CA+icZUWd-qpToPpkP-UhPswH2_nyC8YxqwBiU-7=ivcia5RAHQ@mail.gmail.com>
+Subject: Re: [Linux-4.9.30] Broadcom BCM20702 bluetooth in ThinkPad-T530 not usable
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>, Johan Hedberg <johan.hedberg@gmail.com>,
+	linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, 2017-02-14 at 08:55 +0800, Jeffy Chen wrote:
-> It looks like bnep_session has same pattern as the issue reported in
-> old rfcomm:
-> 
-> 	while (1) {
-> 		set_current_state(TASK_INTERRUPTIBLE);
-> 		if (condition)
-> 			break;
-> 		// may call might_sleep here
-> 		schedule();
-> 	}
-> 	__set_current_state(TASK_RUNNING);
-> 
-> Which fixed at:
-> 	dfb2fae Bluetooth: Fix nested sleeps
-> 
-> So let's fix it at the same way, also follow the suggestion of:
-> https://lwn.net/Articles/628628/
-> 
-> Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
-> Reviewed-by: Brian Norris <briannorris@chromium.org>
-Reviewed-by: AL Yu-Chen Cho <acho@suse.com>
-> ---
-> 
-> Changes in v3:
-> Add brian's Reviewed-by.
-> 
-> Changes in v2:
-> Remove unnecessary memory barrier before wake_up_* functions.
-> 
->  net/bluetooth/bnep/core.c | 11 +++++------
->  1 file changed, 5 insertions(+), 6 deletions(-)
-> 
-> diff --git a/net/bluetooth/bnep/core.c b/net/bluetooth/bnep/core.c
-> index fbf251f..4d6b94d 100644
-> --- a/net/bluetooth/bnep/core.c
-> +++ b/net/bluetooth/bnep/core.c
-> @@ -484,16 +484,16 @@ static int bnep_session(void *arg)
->  	struct net_device *dev = s->dev;
->  	struct sock *sk = s->sock->sk;
->  	struct sk_buff *skb;
-> -	wait_queue_t wait;
-> +	DEFINE_WAIT_FUNC(wait, woken_wake_function);
->  
->  	BT_DBG("");
->  
->  	set_user_nice(current, -15);
->  
-> -	init_waitqueue_entry(&wait, current);
->  	add_wait_queue(sk_sleep(sk), &wait);
->  	while (1) {
-> -		set_current_state(TASK_INTERRUPTIBLE);
-> +		/* Ensure session->terminate is updated */
-> +		smp_mb__before_atomic();
->  
->  		if (atomic_read(&s->terminate))
->  			break;
-> @@ -515,9 +515,8 @@ static int bnep_session(void *arg)
->  				break;
->  		netif_wake_queue(dev);
->  
-> -		schedule();
-> +		wait_woken(&wait, TASK_INTERRUPTIBLE,
-> MAX_SCHEDULE_TIMEOUT);
->  	}
-> -	__set_current_state(TASK_RUNNING);
->  	remove_wait_queue(sk_sleep(sk), &wait);
->  
->  	/* Cleanup session */
-> @@ -666,7 +665,7 @@ int bnep_del_connection(struct bnep_conndel_req
-> *req)
->  	s = __bnep_get_session(req->dst);
->  	if (s) {
->  		atomic_inc(&s->terminate);
-> -		wake_up_process(s->task);
-> +		wake_up_interruptible(sk_sleep(s->sock->sk));
->  	} else
->  		err = -ENOENT;
->  
+On Mon, Jun 12, 2017 at 10:03 AM, Sedat Dilek <sedat.dilek@gmail.com> wrote:
+> Hi Marcel,
+>
+> I have rebuilt net/bluetooth and drivers/bluetooth kernel-modules
+> "the-debian-kernel-way".
+> For build-instructions see attached howto file.
+
+It is sufficient just to rebuild net/bluetooth exactly bluetooth.ko
+kernel-module and copy this new file.
+To be on the safe side I rebooted into my system.
+
+>
+> Can you please give appropriate credits like...
+>
+>      Reported-by:Sedat Dilek <sedat.dilek@gmail.com
+>      Tested-by: Sedat Dilek <sedat.dilek@gmail.com>
+>
+
+Missed ">"...
+
+Reported-by:Sedat Dilek <sedat.dilek@gmail.com>
+
+- Sedat -
