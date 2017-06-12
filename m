@@ -2,131 +2,98 @@ Return-Path: <szymon.janc@codecoup.pl>
 From: Szymon Janc <szymon.janc@codecoup.pl>
 To: Marcel Holtmann <marcel@holtmann.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Send HCI Set Event Mask Page 2 command only when needed
-Date: Mon, 12 Jun 2017 11:49:42 +0200
-Message-ID: <1992748.27soL1zDpt@ix>
-In-Reply-To: <20170609164356.7330-1-marcel@holtmann.org>
-References: <20170609164356.7330-1-marcel@holtmann.org>
+Subject: Re: [PATCH] Bluetooth: btbcm: Read controller features during configuration
+Date: Mon, 12 Jun 2017 11:49:07 +0200
+Message-ID: <3850709.UsqOsZgzJe@ix>
+In-Reply-To: <20170610123229.41513-1-marcel@holtmann.org>
+References: <20170610123229.41513-1-marcel@holtmann.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Marcel,
 
-On Friday, 9 June 2017 18:43:56 CEST Marcel Holtmann wrote:
-> The Broadcom BCM20702 Bluetooth controller in ThinkPad-T530 devices
-> report support for the Set Event Mask Page 2 command, but actually do
-> return an error when trying to use it.
+On Saturday, 10 June 2017 14:32:29 CEST Marcel Holtmann wrote:
+> Read the Broadcom specific controller features during configuration and
+> print them for informational purposes.
 > 
->   < HCI Command: Read Local Supported Commands (0x04|0x0002) plen 0
+> < HCI Command: Broadcom Read Controller Features (0x3f|0x006e) plen 0
 > 
->   > HCI Event: Command Complete (0x0e) plen 68
+> > HCI Event: Command Complete (0x0e) plen 12
 > 
->        Read Local Supported Commands (0x04|0x0002) ncmd 1
->          Status: Success (0x00)
->          Commands: 162 entries
->            ...
->            Set Event Mask Page 2 (Octet 22 - Bit 2)
->            ...
-> 
->   < HCI Command: Set Event Mask Page 2 (0x03|0x0063) plen 8
->          Mask: 0x0000000000000000
-> 
->   > HCI Event: Command Complete (0x0e) plen 4
-> 
->        Set Event Mask Page 2 (0x03|0x0063) ncmd 1
->          Status: Unknown HCI Command (0x01)
-> 
-> Since these controllers do not support any feature that would require
-> the event mask page 2 to be modified, it is safe to not send this
-> command at all. The default value is all bits set to zero.
-> 
-> T:  Bus=01 Lev=02 Prnt=02 Port=03 Cnt=03 Dev#=  9 Spd=12   MxCh= 0
-> D:  Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-> P:  Vendor=0a5c ProdID=21e6 Rev= 1.12
-> S:  Manufacturer=Broadcom Corp
-> S:  Product=BCM20702A0
-> S:  SerialNumber=F82FA8E8CFC0
-> C:* #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=  0mA
-> I:* If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> I:* If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> I:  If#= 1 Alt= 1 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> I:  If#= 1 Alt= 2 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> I:  If#= 1 Alt= 3 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> I:  If#= 1 Alt= 4 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> I:  If#= 1 Alt= 5 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> I:* If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=btusb
-> E:  Ad=84(I) Atr=02(Bulk) MxPS=  32 Ivl=0ms
-> E:  Ad=04(O) Atr=02(Bulk) MxPS=  32 Ivl=0ms
-> I:* If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
+>       Broadcom Read Controller Features (0x3f|0x006e) ncmd 1
+>         Status: Success (0x00)
+>         Features: 0x07 0x00 0x00 0x00 0x00 0x00 0x00 0x00
+>           Multi-AV transport bandwidth reducer
+>           WBS SBC
+>           FW LC-PLC
 > 
 > Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 > ---
->  net/bluetooth/hci_core.c | 17 +++++++++++++++--
->  1 file changed, 15 insertions(+), 2 deletions(-)
+>  drivers/bluetooth/btbcm.c | 36 ++++++++++++++++++++++++++++++++++++
+>  1 file changed, 36 insertions(+)
 > 
-> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> index 7655b4005dfb..93806b959039 100644
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -548,6 +548,7 @@ static void hci_set_event_mask_page_2(struct hci_request
-> *req) {
->  	struct hci_dev *hdev = req->hdev;
->  	u8 events[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
-> +	bool changed = false;
-> 
->  	/* If Connectionless Slave Broadcast master role is supported
->  	 * enable all necessary events for it.
-> @@ -557,6 +558,7 @@ static void hci_set_event_mask_page_2(struct hci_request
-> *req) events[1] |= 0x80;	/* Synchronization Train Complete */
->  		events[2] |= 0x10;	/* Slave Page Response Timeout */
->  		events[2] |= 0x20;	/* CSB Channel Map Change */
-> +		changed = true;
->  	}
-> 
->  	/* If Connectionless Slave Broadcast slave role is supported
-> @@ -567,13 +569,24 @@ static void hci_set_event_mask_page_2(struct
-> hci_request *req) events[2] |= 0x02;	/* CSB Receive */
->  		events[2] |= 0x04;	/* CSB Timeout */
->  		events[2] |= 0x08;	/* Truncated Page Complete */
-> +		changed = true;
->  	}
-> 
->  	/* Enable Authenticated Payload Timeout Expired event if supported */
-> -	if (lmp_ping_capable(hdev) || hdev->le_features[0] & HCI_LE_PING)
-> +	if (lmp_ping_capable(hdev) || hdev->le_features[0] & HCI_LE_PING) {
->  		events[2] |= 0x80;
-> +		changed = true;
-> +	}
-> 
-> -	hci_req_add(req, HCI_OP_SET_EVENT_MASK_PAGE_2, sizeof(events), events);
-> +	/* Some Broadcom based controllers indicate support for Set Event
-> +	 * Mask Page 2 command, but then actually do not support it. Since
-> +	 * the default value is all bits set to zero, the command is only
-> +	 * required if the event mask has to be changed. In case no change
-> +	 * to the event mask is needed, skip this command.
-> +	 */
-> +	if (changed)
-> +		hci_req_add(req, HCI_OP_SET_EVENT_MASK_PAGE_2,
-> +			    sizeof(events), events);
+> diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
+> index ba3dd2eafc09..24f8c4e93f4e 100644
+> --- a/drivers/bluetooth/btbcm.c
+> +++ b/drivers/bluetooth/btbcm.c
+> @@ -246,6 +246,27 @@ static struct sk_buff *btbcm_read_verbose_config(struct
+> hci_dev *hdev) return skb;
 >  }
 > 
->  static int hci_init3_req(struct hci_request *req, unsigned long opt)
+> +static struct sk_buff *btbcm_read_controller_features(struct hci_dev *hdev)
+> +{
+> +	struct sk_buff *skb;
+> +
+> +	skb = __hci_cmd_sync(hdev, 0xfc6e, 0, NULL, HCI_INIT_TIMEOUT);
+> +	if (IS_ERR(skb)) {
+> +		BT_ERR("%s: BCM: Read controller features failed (%ld)",
+> +		       hdev->name, PTR_ERR(skb));
+> +		return skb;
+> +	}
+> +
+> +	if (skb->len != 9) {
+> +		BT_ERR("%s: BCM: Controller features length mismatch",
+> +		       hdev->name);
+> +		kfree_skb(skb);
+> +		return ERR_PTR(-EIO);
+> +	}
+> +
+> +	return skb;
+> +}
+> +
+>  static struct sk_buff *btbcm_read_usb_product(struct hci_dev *hdev)
+>  {
+>  	struct sk_buff *skb;
+> @@ -417,6 +438,14 @@ int btbcm_setup_patchram(struct hci_dev *hdev)
+>  	BT_INFO("%s: BCM: chip id %u", hdev->name, skb->data[1]);
+>  	kfree_skb(skb);
+> 
+> +	/* Read Controller Features */
+> +	skb = btbcm_read_controller_features(hdev);
+> +	if (IS_ERR(skb))
+> +		return PTR_ERR(skb);
+> +
+> +	BT_INFO("%s: BCM: features 0x%2.2x", hdev->name, skb->data[1]);
+> +	kfree_skb(skb);
+> +
+>  	/* Read Local Name */
+>  	skb = btbcm_read_local_name(hdev);
+>  	if (IS_ERR(skb))
+> @@ -540,6 +569,13 @@ int btbcm_setup_apple(struct hci_dev *hdev)
+>  		kfree_skb(skb);
+>  	}
+> 
+> +	/* Read Controller Features */
+> +	skb = btbcm_read_controller_features(hdev);
+> +	if (!IS_ERR(skb)) {
+> +		BT_INFO("%s: BCM: features 0x%2.2x", hdev->name, skb->data[1]);
+> +		kfree_skb(skb);
+> +	}
+> +
+>  	/* Read Local Name */
+>  	skb = btbcm_read_local_name(hdev);
+>  	if (!IS_ERR(skb)) {
 
 Applied to bluetooth-next tree. Thanks.
 
