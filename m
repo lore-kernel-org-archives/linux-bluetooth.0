@@ -1,96 +1,32 @@
-Return-Path: <john@metanate.com>
-Date: Tue, 13 Jun 2017 11:56:58 +0100
-From: John Keeping <john@metanate.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org, "Gustavo F. Padovan"
- <gustavo@padovan.org>, Johan Hedberg <johan.hedberg@gmail.com>
-Subject: Re: [RFC/PATCH] Bluetooth: SMP: Fail gracefully if device doesn't
- support pairing
-Message-ID: <20170613115658.0ad18f0d.john@metanate.com>
-In-Reply-To: <B397B494-6BB4-4068-96DB-276EA821C983@holtmann.org>
-References: <20170601153550.1578-1-john@metanate.com>
-	<B397B494-6BB4-4068-96DB-276EA821C983@holtmann.org>
+Return-Path: <rvaswani@nvidia.com>
+From: Rohit Vaswani <rvaswani@nvidia.com>
+To: Jeffy Chen <jeffy.chen@rock-chips.com>, "linux-bluetooth@vger.kernel.org"
+	<linux-bluetooth@vger.kernel.org>
+CC: Brian Norris <briannorris@chromium.org>, Douglas Anderson
+	<dianders@chromium.org>, Johan Hedberg <johan.hedberg@intel.com>, "Peter
+ Hurley" <peter@hurleysoftware.com>, Jeffy Chen <jeffy.chen@rock-chips.com>,
+	Johan Hedberg <johan.hedberg@gmail.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>,
+	Marcel Holtmann <marcel@holtmann.org>, Gustavo Padovan <gustavo@padovan.org>
+Subject: Bluetooth: might sleep error in hidp_session_thread
+Date: Mon, 12 Jun 2017 18:31:36 +0000
+Message-ID: <7be134d7f9904082a35a9cc926ec24d3@HQMAIL106.nvidia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset="us-ascii"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Jeffy,
 
-On Fri, 9 Jun 2017 19:02:53 +0200, Marcel Holtmann wrote:
+I was looking into the patch from Jeffy Chen from February 14 2017  :=20
+ [v4,3/3] Bluetooth: hidp: fix possible might sleep error in hidp_session_t=
+hread: https://patchwork.kernel.org/patch/9570931/
 
-> > If a device does not support pairing, we have no way of knowing this
-> > except by trying and seeing if it returns a "pairing not supported"
-> > error.
-> > 
-> > Handle this response specially so that we don't drop the connection when
-> > an attempt at pairing fails because the device doesn't support pairing.
-> > Also pass a specific failure value back to userspace to allow detection
-> > of this case as distinct from an authentication failure during pairing.
-> > 
-> > Signed-off-by: John Keeping <john@metanate.com>
-> > ---
-> > I'm not particularly happy with the use of
-> > HCI_ERROR_PAIRING_NOT_SUPPORTED here since this is actually "pairing
-> > with unit key is not supported" so I don't think it's technically the
-> > right thing to return here.  But I can't see a more appropriate HCI
-> > error to which to map the SMP_PAIRING_NOTSUPP reason.
-> > 
-> > include/net/bluetooth/hci.h |  1 +
-> > net/bluetooth/smp.c         | 23 ++++++++++++++++++++---
-> > 2 files changed, 21 insertions(+), 3 deletions(-)
-> > 
-> > diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-> > index fe98f0a5bef0..0917385a95eb 100644
-> > --- a/include/net/bluetooth/hci.h
-> > +++ b/include/net/bluetooth/hci.h
-> > @@ -463,6 +463,7 @@ enum {
-> > #define HCI_ERROR_PAIRING_NOT_ALLOWED	0x18
-> > #define HCI_ERROR_INVALID_LL_PARAMS	0x1e
-> > #define HCI_ERROR_UNSPECIFIED		0x1f
-> > +#define HCI_ERROR_PAIRING_NOT_SUPPORTED	0x29
-> > #define HCI_ERROR_ADVERTISING_TIMEOUT	0x3c
-> > 
-> > /* Flow control modes */
-> > diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-> > index 14585edc9439..41f246a69178 100644
-> > --- a/net/bluetooth/smp.c
-> > +++ b/net/bluetooth/smp.c
-> > @@ -813,7 +813,10 @@ static void smp_failure(struct l2cap_conn *conn, u8 reason)
-> > 		smp_send_cmd(conn, SMP_CMD_PAIRING_FAIL, sizeof(reason),
-> > 			     &reason);
-> > 
-> > -	mgmt_auth_failed(hcon, HCI_ERROR_AUTH_FAILURE);
-> > +	if (reason == SMP_PAIRING_NOTSUPP)
-> > +		mgmt_auth_failed(hcon, HCI_ERROR_PAIRING_NOT_SUPPORTED);
-> > +	else
-> > +		mgmt_auth_failed(hcon, HCI_ERROR_AUTH_FAILURE);  
-> 
-> actually this is a bug. This should have been always
-> MGMT_STATUS_AUTH_FAILED. Handing the ev->status to mgmt_auth_failed is
-> something we should have never done. Luckily HCI_ERROR_AUTH_FAILURE
-> and MGMT_STATUS_AUTH_FAILED are the same error code number. And the
-> Core spec defines usage of error code Authentication Failure (0x05) in
-> Simple Pairing Complete cases.
+We faced a similar issue and this patch seems to fix the problem in our pre=
+liminary test.
+I am trying to check if there was a reason this wasn't merged earlier ?
 
-Are you sure about this?  I have just checked and it seems that
-mgmt_auth_failed expects an HCI status value which it then maps to a
-MGMT status value via mgmt_status_table.
+Thanks,
+Rohit
 
-> So I propose that first we fix the usage of HCI_ERROR_AUTH_FAILURE and
-> replace it with MGMT_STATUS_ versions.
-
-Does this mean that mgmt_auth_failed should take a MGMT_STATUS_ value
-and remove the mapping via mgmt_status_table?  That seems sensible, but
-it looks like all of the mgmt_ functions currently take an HCI status
-and map it to a MGMT_STATUS_ so changing just mgmt_auth_failed would
-make this inconsistent.
-
-Changing all of the mgmt_ functions to take a MGMT_STATUS_ directly
-would be quite a big change, but it sounds like you're suggesting that
-there should be a public mgmt_status_from_hci() function and the mapping
-from HCI status to MGMT status should move to the caller.  Is that the
-direction you want to go?
-
-
-Regards,
-John
+nvpublic
