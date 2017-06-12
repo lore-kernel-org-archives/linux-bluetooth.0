@@ -1,130 +1,289 @@
-Return-Path: <sedat.dilek@gmail.com>
-MIME-Version: 1.0
-Reply-To: sedat.dilek@gmail.com
-In-Reply-To: <CA+icZUWd-qpToPpkP-UhPswH2_nyC8YxqwBiU-7=ivcia5RAHQ@mail.gmail.com>
-References: <CA+icZUWf1EyPJDOTO-xos=QwQ0DWLOg3goiSX_X2C01QpVqU1w@mail.gmail.com>
- <D83A359C-829A-4DBC-B5CE-1B077CE6B0E4@holtmann.org> <CA+icZUUD92VO52MtynBBQFFPxWkj=pvhm0yDkMYNamvVG4ry9Q@mail.gmail.com>
- <1083ECDC-2292-4372-B85D-DA551EB3FB38@holtmann.org> <CA+icZUVT-fJwamHBSUfHW1KOQU6gx3OeKWgbo7B5oTYmK5dm7g@mail.gmail.com>
- <984B6D8C-483D-46C7-A746-2BB28B262F87@holtmann.org> <CA+icZUXaGZ73kj8R8AKCoakyCXf14sj0i4nJc7HER27SfM_YKQ@mail.gmail.com>
- <CA+icZUWd-qpToPpkP-UhPswH2_nyC8YxqwBiU-7=ivcia5RAHQ@mail.gmail.com>
-From: Sedat Dilek <sedat.dilek@gmail.com>
-Date: Mon, 12 Jun 2017 12:40:18 +0200
-Message-ID: <CA+icZUVrv3tAvvYGqUB1tBY1mCqTkMoM+fWpPenYz5Z_toJiAg@mail.gmail.com>
-Subject: Re: [Linux-4.9.30] Broadcom BCM20702 bluetooth in ThinkPad-T530 not usable
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: "Gustavo F. Padovan" <gustavo@padovan.org>, Johan Hedberg <johan.hedberg@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: multipart/mixed; boundary="f403043edda40522f20551c0f23d"
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: nsathish41@gmail.com
+To: linux-bluetooth@vger.kernel.org
+Cc: Sathish Narasimman <sathish.narasimman@intel.com>
+Subject: [PATCH v2 BlueZ 2/2] obexd/map: msg dummy implement message listing
+Date: Mon, 12 Jun 2017 15:49:28 +0530
+Message-Id: <1497262768-4988-2-git-send-email-nsathish41@gmail.com>
+In-Reply-To: <1497262768-4988-1-git-send-email-nsathish41@gmail.com>
+References: <1497262768-4988-1-git-send-email-nsathish41@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---f403043edda40522f20551c0f23d
-Content-Type: text/plain; charset="UTF-8"
+From: Sathish Narasimman <sathish.narasimman@intel.com>
 
-For the sake of completeness...
+For messages dummy, message listing functionality in implemented in
+this patch. The inputs for message listing is derived from the
+mlisting.xml file that is to be present in each folder(inbox, sent,
+drafts)
 
-Marcel's patch is now in bluetooth-next aka bluetooth-4.13, see [1].
+> ACL Data RX: Handle 256 flags 0x02 dlen 78
+      Channel: 64 len 74 [PSM 3 mode 0] {chan 0}
+      RFCOMM: Unnumbered Info with Header Check (UIH) (0xef)
+         Address: 0x83 cr 1 dlci 0x20
+         Control: 0xff poll/final 1
+         Length: 69
+         FCS: 0xc4
+         Credits: 1
+        83 00 45 cb 00 00 00 02 01 00 0d 00 73 00 65 00  ..E.........s.e.
+        6e 00 74 00 00 42 00 18 78 2d 62 74 2f 4d 41 50  n.t..B..x-bt/MAP
+        2d 6d 73 67 2d 6c 69 73 74 69 6e 67 00 4c 00 18  -msg-listing.L..
+        01 02 00 0b 02 02 00 00 13 01 ff 06 01 00 07 00  ................
+        08 00 09 01 00 c4                                ......
+< ACL Data TX: Handle 256 flags 0x00 dlen 1017
+      Channel: 65 len 1013 [PSM 3 mode 0] {chan 0}
+      RFCOMM: Unnumbered Info with Header Check (UIH) (0xef)
+         Address: 0x81 cr 0 dlci 0x20
+         Control: 0xef poll/final 0
+         Length: 28675
+         FCS: 0x02
+        90 08 63 4c 00 21 12 02 00 0b 19 15 32 30 31 37  ..cL.!......2017
+        30 36 31 32 54 31 32 32 35 31 33 2d 20 35 33 30  0612T122513- 530
+        00 0d 01 00 48 08 3f 3c 4d 41 50 2d 6d 73 67 2d  ....H.?<MAP-msg-
+        6c 69 73 74 69 6e 67 20 76 65 72 73 69 6f 6e 3d  listing version=
+        22 31 2e 30 22 3e 3c 6d 73 67 20 68 61 6e 64 6c  "1.0"><msg handl
+        65 3d 22 30 34 30 30 30 30 30 30 30 30 30 30 30  e="0400000000000
+        30 31 32 22 20 73 75 62 6a 65 63 74 3d 22 4e 6f  012" subject="No
+        22 20 64 61 74 65 74 69 6d 65 3d 22 32 30 31 37  " datetime="2017
+        30 35 32 34 54 31 37 30 31 35 37 22 20 73 65 6e  0524T170157" sen
+        64 65 72 5f 61 64 64 72 65 73 73 69 6e 67 3d 22  der_addressing="
+        22 20 72 65 63 69 70 69 65 6e 74 5f 61 64 64 72  " recipient_addr
+        65 73 73 69 6e 67 3d 22 35 34 33 32 31 22 20 74  essing="54321" t
+        79 70 65 3d 22 53 4d 53 5f 47 53 4d 22 20 72 65  ype="SMS_GSM" re
+        63 65 70 74 69 6f 6e 5f 73 74 61 74 75 73 3d 22  ception_status="
+        63 6f 6d 70 6c 65 74 65 22 20 61 74 74 61 63 68  complete" attach
+        6d 65 6e 74 5f 73 69 7a 65 3d 22 30 22 2f 3e 0a  ment_size="0"/>.
 
-Attached is a backported version for Debian/strech v4.9.30 kernel.
+	... and more
+---
+ obexd/plugins/messages-dummy.c | 186 ++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 185 insertions(+), 1 deletion(-)
 
-Thanks.
+diff --git a/obexd/plugins/messages-dummy.c b/obexd/plugins/messages-dummy.c
+index 33056e2..3eca9ef 100644
+--- a/obexd/plugins/messages-dummy.c
++++ b/obexd/plugins/messages-dummy.c
+@@ -27,6 +27,7 @@
+ 
+ #include <sys/types.h>
+ #include <dirent.h>
++#include <stdio.h>
+ #include <errno.h>
+ #include <stdlib.h>
+ #include <string.h>
+@@ -35,6 +36,8 @@
+ 
+ #include "messages.h"
+ 
++#define MSG_LIST_XML "mlisting.xml"
++
+ static char *root_folder = NULL;
+ 
+ struct session {
+@@ -52,6 +55,20 @@ struct folder_listing_data {
+ 	void *user_data;
+ };
+ 
++struct message_listing_data {
++	struct session *session;
++	const char *name;
++	uint16_t max;
++	uint16_t offset;
++	uint8_t subject_len;
++	uint16_t size;
++	char *path;
++	FILE *fp;
++	const struct messages_filter *filter;
++	messages_get_messages_listing_cb callback;
++	void *user_data;
++};
++
+ /* NOTE: Neither IrOBEX nor MAP specs says that folder listing needs to
+  * be sorted (in IrOBEX examples it is not). However existing implementations
+  * seem to follow the fig. 3-2 from MAP specification v1.0, and I've seen a
+@@ -319,6 +336,139 @@ int messages_get_folder_listing(void *s, const char *name, uint16_t max,
+ 	return 0;
+ }
+ 
++static void max_msg_element(GMarkupParseContext *ctxt, const char *element,
++				const char **names, const char **values,
++				gpointer user_data, GError **gerr)
++{
++	struct message_listing_data *mld = user_data;
++	const char *key;
++	int i;
++
++	for (i = 0, key = names[i]; key; key = names[++i]) {
++		if (g_strcmp0(names[i], "handle") == 0) {
++			mld->size++;
++			break;
++		}
++	}
++}
++
++static void msg_element(GMarkupParseContext *ctxt, const char *element,
++				const char **names, const char **values,
++				gpointer user_data, GError **gerr)
++{
++	struct message_listing_data *mld = user_data;
++	struct messages_message *entry = NULL;
++	int i;
++
++	entry = g_new0(struct messages_message, 1);
++	if (mld->filter->parameter_mask == 0) {
++		entry->mask = (entry->mask | PMASK_SUBJECT \
++			| PMASK_DATETIME | PMASK_RECIPIENT_ADDRESSING \
++			| PMASK_SENDER_ADDRESSING \
++			| PMASK_ATTACHMENT_SIZE | PMASK_TYPE \
++			| PMASK_RECEPTION_STATUS);
++	} else
++		entry->mask = mld->filter->parameter_mask;
++
++	for (i = 0 ; names[i]; ++i) {
++		if (g_strcmp0(names[i], "handle") == 0) {
++			entry->handle = g_strdup(values[i]);
++			mld->size++;
++			continue;
++		}
++		if (g_strcmp0(names[i], "attachment_size") == 0) {
++			entry->attachment_size = g_strdup(values[i]);
++			continue;
++		}
++		if (g_strcmp0(names[i], "datetime") == 0) {
++			entry->datetime = g_strdup(values[i]);
++			continue;
++		}
++		if (g_strcmp0(names[i], "subject") == 0) {
++			entry->subject = g_strdup(values[i]);
++			continue;
++		}
++		if (g_strcmp0(names[i], "recipient_addressing") == 0) {
++			entry->recipient_addressing = g_strdup(values[i]);
++			continue;
++		}
++		if (g_strcmp0(names[i], "sender_addressing") == 0) {
++			entry->sender_addressing = g_strdup(values[i]);
++			continue;
++		}
++		if (g_strcmp0(names[i], "type") == 0) {
++			entry->type = g_strdup(values[i]);
++			continue;
++		}
++		if (g_strcmp0(names[i], "reception_status") == 0)
++			entry->reception_status = g_strdup(values[i]);
++	}
++
++	if (mld->size > mld->offset)
++		mld->callback(mld->session, -EAGAIN, mld->size, 0, entry, mld->user_data);
++
++	g_free(entry->reception_status);
++	g_free(entry->type);
++	g_free(entry->sender_addressing);
++	g_free(entry->subject);
++	g_free(entry->datetime);
++	g_free(entry->attachment_size);
++	g_free(entry->handle);
++	g_free(entry);
++}
++
++static const GMarkupParser msg_parser = {
++        msg_element,
++        NULL,
++        NULL,
++        NULL,
++        NULL
++};
++
++static const GMarkupParser max_msg_parser = {
++        max_msg_element,
++        NULL,
++        NULL,
++        NULL,
++        NULL
++};
++
++static gboolean get_messages_listing(void *d)
++{
++
++	struct message_listing_data *mld = d;
++	/* 1024 is the maximum size of the line which is calculated to be more
++	 * sufficient*/
++	char buffer[1024];
++	GMarkupParseContext *ctxt;
++	size_t len;
++
++	while (fgets(buffer, 1024, mld->fp)) {
++		len = strlen(buffer);
++
++		if (mld->max == 0) {
++			ctxt = g_markup_parse_context_new(&max_msg_parser, 0, mld, NULL);
++			g_markup_parse_context_parse(ctxt, buffer, len, NULL);
++			g_markup_parse_context_free(ctxt);
++		} else {
++			ctxt = g_markup_parse_context_new(&msg_parser, 0, mld, NULL);
++			g_markup_parse_context_parse(ctxt, buffer, len, NULL);
++			g_markup_parse_context_free(ctxt);
++		}
++	}
++
++	if (mld->max == 0) {
++		mld->callback(mld->session, 0, mld->size, 0, NULL, mld->user_data);
++		goto done;
++	}
++
++	mld->callback(mld->session, 0, mld->size, 0, NULL, mld->user_data);
++
++done:
++	fclose(mld->fp);
++	return FALSE;
++}
++
+ int messages_get_messages_listing(void *session, const char *name,
+ 				uint16_t max, uint16_t offset,
+ 				uint8_t subject_len,
+@@ -326,7 +476,41 @@ int messages_get_messages_listing(void *session, const char *name,
+ 				messages_get_messages_listing_cb callback,
+ 				void *user_data)
+ {
+-	return -ENOSYS;
++	struct message_listing_data *mld;
++	struct session *s =  session;
++	char *path;
++
++	mld = g_new0(struct message_listing_data, 1);
++	mld->session = s;
++	mld->name = name;
++	mld->max = max;
++	mld->offset = offset;
++	mld->subject_len = subject_len;
++	mld->callback = callback;
++	mld->filter = filter;
++	mld->user_data = user_data;
++
++	path = g_build_filename(s->cwd_absolute, MSG_LIST_XML, NULL);
++	mld->fp = fopen(path, "r");
++	if (mld->fp == NULL) {
++		g_free(path);
++		messages_set_folder(s, mld->name, 0);
++		path = g_build_filename(s->cwd_absolute, MSG_LIST_XML, NULL);
++		mld->fp = fopen(path, "r");
++		if (mld->fp == NULL) {
++			int err = -errno;
++			DBG("fopen(): %d, %s", -err, strerror(-err));
++			g_free(path);
++			return -EBADR;
++		}
++	}
++
++
++	g_idle_add_full(G_PRIORITY_DEFAULT_IDLE, get_messages_listing,
++								mld, g_free);
++	g_free(path);
++
++	return 0;
+ }
+ 
+ int messages_get_message(void *session, const char *handle,
+-- 
+2.7.4
 
-- Sedat -
-
-[1] https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git/patch/?id=313f6888c8fbb1bc8b36c9012ce4e1de848df696
-
---f403043edda40522f20551c0f23d
-Content-Type: text/x-diff; charset="US-ASCII";
-	name="Bluetooth-Send-HCI-Set-Event-Mask-Page-2-command-only-when-needed-for-4-9-30.patch"
-Content-Disposition: attachment;
-	filename="Bluetooth-Send-HCI-Set-Event-Mask-Page-2-command-only-when-needed-for-4-9-30.patch"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_j3u0c14t0
-
-RnJvbSAzMTNmNjg4OGM4ZmJiMWJjOGIzNmM5MDEyY2U0ZTFkZTg0OGRmNjk2IE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBNYXJjZWwgSG9sdG1hbm4gPG1hcmNlbEBob2x0bWFubi5vcmc+
-CkRhdGU6IEZyaSwgOSBKdW4gMjAxNyAxODo0Mzo1NiArMDIwMApTdWJqZWN0OiBbNC45LjMwXSBC
-bHVldG9vdGg6IFNlbmQgSENJIFNldCBFdmVudCBNYXNrIFBhZ2UgMiBjb21tYW5kIG9ubHkgd2hl
-biBuZWVkZWQKClRoZSBCcm9hZGNvbSBCQ00yMDcwMiBCbHVldG9vdGggY29udHJvbGxlciBpbiBU
-aGlua1BhZC1UNTMwIGRldmljZXMKcmVwb3J0IHN1cHBvcnQgZm9yIHRoZSBTZXQgRXZlbnQgTWFz
-ayBQYWdlIDIgY29tbWFuZCwgYnV0IGFjdHVhbGx5IGRvCnJldHVybiBhbiBlcnJvciB3aGVuIHRy
-eWluZyB0byB1c2UgaXQuCgogIDwgSENJIENvbW1hbmQ6IFJlYWQgTG9jYWwgU3VwcG9ydGVkIENv
-bW1hbmRzICgweDA0fDB4MDAwMikgcGxlbiAwCiAgPiBIQ0kgRXZlbnQ6IENvbW1hbmQgQ29tcGxl
-dGUgKDB4MGUpIHBsZW4gNjgKICAgICAgIFJlYWQgTG9jYWwgU3VwcG9ydGVkIENvbW1hbmRzICgw
-eDA0fDB4MDAwMikgbmNtZCAxCiAgICAgICAgIFN0YXR1czogU3VjY2VzcyAoMHgwMCkKICAgICAg
-ICAgQ29tbWFuZHM6IDE2MiBlbnRyaWVzCiAgICAgICAgICAgLi4uCiAgICAgICAgICAgU2V0IEV2
-ZW50IE1hc2sgUGFnZSAyIChPY3RldCAyMiAtIEJpdCAyKQogICAgICAgICAgIC4uLgoKICA8IEhD
-SSBDb21tYW5kOiBTZXQgRXZlbnQgTWFzayBQYWdlIDIgKDB4MDN8MHgwMDYzKSBwbGVuIDgKICAg
-ICAgICAgTWFzazogMHgwMDAwMDAwMDAwMDAwMDAwCiAgPiBIQ0kgRXZlbnQ6IENvbW1hbmQgQ29t
-cGxldGUgKDB4MGUpIHBsZW4gNAogICAgICAgU2V0IEV2ZW50IE1hc2sgUGFnZSAyICgweDAzfDB4
-MDA2MykgbmNtZCAxCiAgICAgICAgIFN0YXR1czogVW5rbm93biBIQ0kgQ29tbWFuZCAoMHgwMSkK
-ClNpbmNlIHRoZXNlIGNvbnRyb2xsZXJzIGRvIG5vdCBzdXBwb3J0IGFueSBmZWF0dXJlIHRoYXQg
-d291bGQgcmVxdWlyZQp0aGUgZXZlbnQgbWFzayBwYWdlIDIgdG8gYmUgbW9kaWZpZWQsIGl0IGlz
-IHNhZmUgdG8gbm90IHNlbmQgdGhpcwpjb21tYW5kIGF0IGFsbC4gVGhlIGRlZmF1bHQgdmFsdWUg
-aXMgYWxsIGJpdHMgc2V0IHRvIHplcm8uCgpUOiAgQnVzPTAxIExldj0wMiBQcm50PTAyIFBvcnQ9
-MDMgQ250PTAzIERldiM9ICA5IFNwZD0xMiAgIE14Q2g9IDAKRDogIFZlcj0gMi4wMCBDbHM9ZmYo
-dmVuZC4pIFN1Yj0wMSBQcm90PTAxIE14UFM9NjQgI0NmZ3M9ICAxClA6ICBWZW5kb3I9MGE1YyBQ
-cm9kSUQ9MjFlNiBSZXY9IDEuMTIKUzogIE1hbnVmYWN0dXJlcj1Ccm9hZGNvbSBDb3JwClM6ICBQ
-cm9kdWN0PUJDTTIwNzAyQTAKUzogIFNlcmlhbE51bWJlcj1GODJGQThFOENGQzAKQzoqICNJZnM9
-IDQgQ2ZnIz0gMSBBdHI9ZTAgTXhQd3I9ICAwbUEKSToqIElmIz0gMCBBbHQ9IDAgI0VQcz0gMyBD
-bHM9ZmYodmVuZC4pIFN1Yj0wMSBQcm90PTAxIERyaXZlcj1idHVzYgpFOiAgQWQ9ODEoSSkgQXRy
-PTAzKEludC4pIE14UFM9ICAxNiBJdmw9MW1zCkU6ICBBZD04MihJKSBBdHI9MDIoQnVsaykgTXhQ
-Uz0gIDY0IEl2bD0wbXMKRTogIEFkPTAyKE8pIEF0cj0wMihCdWxrKSBNeFBTPSAgNjQgSXZsPTBt
-cwpJOiogSWYjPSAxIEFsdD0gMCAjRVBzPSAyIENscz1mZih2ZW5kLikgU3ViPTAxIFByb3Q9MDEg
-RHJpdmVyPWJ0dXNiCkU6ICBBZD04MyhJKSBBdHI9MDEoSXNvYykgTXhQUz0gICAwIEl2bD0xbXMK
-RTogIEFkPTAzKE8pIEF0cj0wMShJc29jKSBNeFBTPSAgIDAgSXZsPTFtcwpJOiAgSWYjPSAxIEFs
-dD0gMSAjRVBzPSAyIENscz1mZih2ZW5kLikgU3ViPTAxIFByb3Q9MDEgRHJpdmVyPWJ0dXNiCkU6
-ICBBZD04MyhJKSBBdHI9MDEoSXNvYykgTXhQUz0gICA5IEl2bD0xbXMKRTogIEFkPTAzKE8pIEF0
-cj0wMShJc29jKSBNeFBTPSAgIDkgSXZsPTFtcwpJOiAgSWYjPSAxIEFsdD0gMiAjRVBzPSAyIENs
-cz1mZih2ZW5kLikgU3ViPTAxIFByb3Q9MDEgRHJpdmVyPWJ0dXNiCkU6ICBBZD04MyhJKSBBdHI9
-MDEoSXNvYykgTXhQUz0gIDE3IEl2bD0xbXMKRTogIEFkPTAzKE8pIEF0cj0wMShJc29jKSBNeFBT
-PSAgMTcgSXZsPTFtcwpJOiAgSWYjPSAxIEFsdD0gMyAjRVBzPSAyIENscz1mZih2ZW5kLikgU3Vi
-PTAxIFByb3Q9MDEgRHJpdmVyPWJ0dXNiCkU6ICBBZD04MyhJKSBBdHI9MDEoSXNvYykgTXhQUz0g
-IDI1IEl2bD0xbXMKRTogIEFkPTAzKE8pIEF0cj0wMShJc29jKSBNeFBTPSAgMjUgSXZsPTFtcwpJ
-OiAgSWYjPSAxIEFsdD0gNCAjRVBzPSAyIENscz1mZih2ZW5kLikgU3ViPTAxIFByb3Q9MDEgRHJp
-dmVyPWJ0dXNiCkU6ICBBZD04MyhJKSBBdHI9MDEoSXNvYykgTXhQUz0gIDMzIEl2bD0xbXMKRTog
-IEFkPTAzKE8pIEF0cj0wMShJc29jKSBNeFBTPSAgMzMgSXZsPTFtcwpJOiAgSWYjPSAxIEFsdD0g
-NSAjRVBzPSAyIENscz1mZih2ZW5kLikgU3ViPTAxIFByb3Q9MDEgRHJpdmVyPWJ0dXNiCkU6ICBB
-ZD04MyhJKSBBdHI9MDEoSXNvYykgTXhQUz0gIDQ5IEl2bD0xbXMKRTogIEFkPTAzKE8pIEF0cj0w
-MShJc29jKSBNeFBTPSAgNDkgSXZsPTFtcwpJOiogSWYjPSAyIEFsdD0gMCAjRVBzPSAyIENscz1m
-Zih2ZW5kLikgU3ViPWZmIFByb3Q9ZmYgRHJpdmVyPWJ0dXNiCkU6ICBBZD04NChJKSBBdHI9MDIo
-QnVsaykgTXhQUz0gIDMyIEl2bD0wbXMKRTogIEFkPTA0KE8pIEF0cj0wMihCdWxrKSBNeFBTPSAg
-MzIgSXZsPTBtcwpJOiogSWYjPSAzIEFsdD0gMCAjRVBzPSAwIENscz1mZShhcHAuICkgU3ViPTAx
-IFByb3Q9MDEgRHJpdmVyPShub25lKQoKU2lnbmVkLW9mZi1ieTogTWFyY2VsIEhvbHRtYW5uIDxt
-YXJjZWxAaG9sdG1hbm4ub3JnPgpSZXBvcnRlZC1ieTogU2VkYXQgRGlsZWsgPHNlZGF0LmRpbGVr
-QGdtYWlsLmNvbT4KVGVzdGVkLWJ5OiBTZWRhdCBEaWxlayA8c2VkYXQuZGlsZWtAZ21haWwuY29t
-PgpTaWduZWQtb2ZmLWJ5OiBTenltb24gSmFuYyA8c3p5bW9uLmphbmNAY29kZWNvdXAucGw+Ci0t
-LQpbIEJhY2twb3J0ZWQgdG8gZml0IExpbnV4IHY0LjkuMzAuIC1kaWxla3MgXQoKIG5ldC9ibHVl
-dG9vdGgvaGNpX2NvcmUuYyB8IDE3ICsrKysrKysrKysrKysrKy0tCiAxIGZpbGUgY2hhbmdlZCwg
-MTUgaW5zZXJ0aW9ucygrKSwgMiBkZWxldGlvbnMoLSkKCmRpZmYgLS1naXQgYS9uZXQvYmx1ZXRv
-b3RoL2hjaV9jb3JlLmMgYi9uZXQvYmx1ZXRvb3RoL2hjaV9jb3JlLmMKaW5kZXggM2FjODllOS4u
-NTA0OTQzMyAxMDA2NDQKLS0tIGEvbmV0L2JsdWV0b290aC9oY2lfY29yZS5jCisrKyBiL25ldC9i
-bHVldG9vdGgvaGNpX2NvcmUuYwpAQCAtNTQ4LDYgKzU0OCw3IEBAIHN0YXRpYyB2b2lkIGhjaV9z
-ZXRfZXZlbnRfbWFza19wYWdlXzIoc3RydWN0IGhjaV9yZXF1ZXN0ICpyZXEpCiB7CiAJc3RydWN0
-IGhjaV9kZXYgKmhkZXYgPSByZXEtPmhkZXY7CiAJdTggZXZlbnRzWzhdID0geyAweDAwLCAweDAw
-LCAweDAwLCAweDAwLCAweDAwLCAweDAwLCAweDAwLCAweDAwIH07CisJYm9vbCBjaGFuZ2VkID0g
-ZmFsc2U7CiAKIAkvKiBJZiBDb25uZWN0aW9ubGVzcyBTbGF2ZSBCcm9hZGNhc3QgbWFzdGVyIHJv
-bGUgaXMgc3VwcG9ydGVkCiAJICogZW5hYmxlIGFsbCBuZWNlc3NhcnkgZXZlbnRzIGZvciBpdC4K
-QEAgLTU1Nyw2ICs1NTgsNyBAQCBzdGF0aWMgdm9pZCBoY2lfc2V0X2V2ZW50X21hc2tfcGFnZV8y
-KHN0cnVjdCBoY2lfcmVxdWVzdCAqcmVxKQogCQlldmVudHNbMV0gfD0gMHg4MDsJLyogU3luY2hy
-b25pemF0aW9uIFRyYWluIENvbXBsZXRlICovCiAJCWV2ZW50c1syXSB8PSAweDEwOwkvKiBTbGF2
-ZSBQYWdlIFJlc3BvbnNlIFRpbWVvdXQgKi8KIAkJZXZlbnRzWzJdIHw9IDB4MjA7CS8qIENTQiBD
-aGFubmVsIE1hcCBDaGFuZ2UgKi8KKwkJY2hhbmdlZCA9IHRydWU7CiAJfQogCiAJLyogSWYgQ29u
-bmVjdGlvbmxlc3MgU2xhdmUgQnJvYWRjYXN0IHNsYXZlIHJvbGUgaXMgc3VwcG9ydGVkCkBAIC01
-NzAsMTAgKzU3MiwyMCBAQCBzdGF0aWMgdm9pZCBoY2lfc2V0X2V2ZW50X21hc2tfcGFnZV8yKHN0
-cnVjdCBoY2lfcmVxdWVzdCAqcmVxKQogCX0KIAogCS8qIEVuYWJsZSBBdXRoZW50aWNhdGVkIFBh
-eWxvYWQgVGltZW91dCBFeHBpcmVkIGV2ZW50IGlmIHN1cHBvcnRlZCAqLwotCWlmIChsbXBfcGlu
-Z19jYXBhYmxlKGhkZXYpIHx8IGhkZXYtPmxlX2ZlYXR1cmVzWzBdICYgSENJX0xFX1BJTkcpCisJ
-aWYgKGxtcF9waW5nX2NhcGFibGUoaGRldikgfHwgaGRldi0+bGVfZmVhdHVyZXNbMF0gJiBIQ0lf
-TEVfUElORykgewogCQlldmVudHNbMl0gfD0gMHg4MDsKKwkJY2hhbmdlZCA9IHRydWU7CisJfQog
-Ci0JaGNpX3JlcV9hZGQocmVxLCBIQ0lfT1BfU0VUX0VWRU5UX01BU0tfUEFHRV8yLCBzaXplb2Yo
-ZXZlbnRzKSwgZXZlbnRzKTsKKwkvKiBTb21lIEJyb2FkY29tIGJhc2VkIGNvbnRyb2xsZXJzIGlu
-ZGljYXRlIHN1cHBvcnQgZm9yIFNldCBFdmVudAorCSAqIE1hc2sgUGFnZSAyIGNvbW1hbmQsIGJ1
-dCB0aGVuIGFjdHVhbGx5IGRvIG5vdCBzdXBwb3J0IGl0LiBTaW5jZQorCSAqIHRoZSBkZWZhdWx0
-IHZhbHVlIGlzIGFsbCBiaXRzIHNldCB0byB6ZXJvLCB0aGUgY29tbWFuZCBpcyBvbmx5CisJICog
-cmVxdWlyZWQgaWYgdGhlIGV2ZW50IG1hc2sgaGFzIHRvIGJlIGNoYW5nZWQuIEluIGNhc2Ugbm8g
-Y2hhbmdlCisJICogdG8gdGhlIGV2ZW50IG1hc2sgaXMgbmVlZGVkLCBza2lwIHRoaXMgY29tbWFu
-ZC4KKwkgKi8KKwlpZiAoY2hhbmdlZCkKKwkJaGNpX3JlcV9hZGQocmVxLCBIQ0lfT1BfU0VUX0VW
-RU5UX01BU0tfUEFHRV8yLAorCQkJICAgIHNpemVvZihldmVudHMpLCBldmVudHMpOwogfQogCiBz
-dGF0aWMgaW50IGhjaV9pbml0M19yZXEoc3RydWN0IGhjaV9yZXF1ZXN0ICpyZXEsIHVuc2lnbmVk
-IGxvbmcgb3B0KQo=
---f403043edda40522f20551c0f23d--
