@@ -1,37 +1,103 @@
-Return-Path: <fourdollars@gmail.com>
-From: "Shih-Yuan Lee (FourDollars)" <sylee@canonical.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>
-Subject: [PATCH] Bluetooth: btusb: Add support for 0489:0xe0a2 QCA_ROME device
-Date: Wed, 14 Jun 2017 14:42:00 +0800
-Message-Id: <1497422520-26184-1-git-send-email-sylee@canonical.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v3] core/gatt: Add GATT.Cache config option
+In-Reply-To: <20170609130258.23401-1-luiz.dentz@gmail.com>
+References: <20170609130258.23401-1-luiz.dentz@gmail.com>
+Date: Tue, 13 Jun 2017 10:44:00 -0700
+Message-ID: <87h8zjg4v3.fsf@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-T:  Bus=01 Lev=01 Prnt=01 Port=06 Cnt=03 Dev#=  3 Spd=12  MxCh= 0
-D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=0489 ProdID=e0a2 Rev=00.01
-C:  #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
-I:  If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+Hi Luiz,
 
-Signed-off-by: Shih-Yuan Lee (FourDollars) <sylee@canonical.com>
----
- drivers/bluetooth/btusb.c | 1 +
- 1 file changed, 1 insertion(+)
+Luiz Augusto von Dentz <luiz.dentz@gmail.com> writes:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> This adds GATT.Cache config option to main.conf which can be used
+> to adjust the cache expected behavior of attributes found over GATT.
+> ---
+>  src/device.c  | 28 ++++++++++++++++++++++++++++
+>  src/hcid.h    |  7 +++++++
+>  src/main.c    | 26 +++++++++++++++++++++++++-
+>  src/main.conf |  6 ++++++
+>  4 files changed, 66 insertions(+), 1 deletion(-)
+>
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 7fa373b..a337f56 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -266,6 +266,7 @@ static const struct usb_device_id blacklist_table[] = {
- 	{ USB_DEVICE(0x0cf3, 0xe301), .driver_info = BTUSB_QCA_ROME },
- 	{ USB_DEVICE(0x0cf3, 0xe360), .driver_info = BTUSB_QCA_ROME },
- 	{ USB_DEVICE(0x0489, 0xe092), .driver_info = BTUSB_QCA_ROME },
-+	{ USB_DEVICE(0x0489, 0xe0a2), .driver_info = BTUSB_QCA_ROME },
- 	{ USB_DEVICE(0x04ca, 0x3011), .driver_info = BTUSB_QCA_ROME },
- 
- 	/* Broadcom BCM2035 */
--- 
-2.7.4
+[...]
+
+>
+> +static void parse_gatt_cache(const char *cache)
+> +{
+> +	if (!strcmp(cache, "always")) {
+> +		main_opts.gatt_cache = BT_GATT_CACHE_ALWAYS;
+> +	} else if (!strcmp(cache, "yes")) {
+> +		main_opts.gatt_cache = BT_GATT_CACHE_YES;
+> +	} else if (!strcmp(cache, "no")) {
+> +		main_opts.gatt_cache = BT_GATT_CACHE_NO;
+> +	} else {
+> +		DBG("Invalid value for KeepCache=%s", cache);
+> +	}
+
+[optional] I wonder if making this return the enum, and return the
+default if 'cache' is NULL, would make the code clearer.
+
+> +}
+> +
+>  static void check_config(GKeyFile *config)
+>  {
+> -	const char *valid_groups[] = { "General", "Policy", NULL };
+> +	const char *valid_groups[] = { "General", "Policy", "GATT", NULL };
+>  	char **keys;
+>  	int i;
+>
+> @@ -357,6 +370,17 @@ static void parse_config(GKeyFile *config)
+>  		g_clear_error(&err);
+>  	else
+>  		main_opts.fast_conn = boolean;
+> +
+> +	str = g_key_file_get_string(config, "GATT", "Cache", &err);
+> +	if (err) {
+> +		g_clear_error(&err);
+> +		main_opts.gatt_cache = BT_GATT_CACHE_ALWAYS;
+> +		return;
+> +	}
+> +
+> +	parse_gatt_cache(str);
+> +
+> +	g_free(str);
+>  }
+>
+>  static void init_defaults(void)
+> diff --git a/src/main.conf b/src/main.conf
+> index a649276..7807a8f 100644
+> --- a/src/main.conf
+> +++ b/src/main.conf
+> @@ -71,6 +71,12 @@
+>  # Defaults to "off"
+>  # Privacy = off
+>
+> +[GATT]
+> +# GATT attribute cache.
+> +# Possible values: always, yes, no
+> +# Default: always
+> +#Cache = always
+> +
+>  [Policy]
+>  #
+>  # The ReconnectUUIDs defines the set of remote services that should try
+> --
+> 2.9.4
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+Cheers,
+--
+Vinicius
