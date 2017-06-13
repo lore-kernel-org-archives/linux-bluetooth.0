@@ -1,249 +1,198 @@
-Return-Path: <sedat.dilek@gmail.com>
-MIME-Version: 1.0
-Reply-To: sedat.dilek@gmail.com
-In-Reply-To: <CA+icZUVrv3tAvvYGqUB1tBY1mCqTkMoM+fWpPenYz5Z_toJiAg@mail.gmail.com>
-References: <CA+icZUWf1EyPJDOTO-xos=QwQ0DWLOg3goiSX_X2C01QpVqU1w@mail.gmail.com>
- <D83A359C-829A-4DBC-B5CE-1B077CE6B0E4@holtmann.org> <CA+icZUUD92VO52MtynBBQFFPxWkj=pvhm0yDkMYNamvVG4ry9Q@mail.gmail.com>
- <1083ECDC-2292-4372-B85D-DA551EB3FB38@holtmann.org> <CA+icZUVT-fJwamHBSUfHW1KOQU6gx3OeKWgbo7B5oTYmK5dm7g@mail.gmail.com>
- <984B6D8C-483D-46C7-A746-2BB28B262F87@holtmann.org> <CA+icZUXaGZ73kj8R8AKCoakyCXf14sj0i4nJc7HER27SfM_YKQ@mail.gmail.com>
- <CA+icZUWd-qpToPpkP-UhPswH2_nyC8YxqwBiU-7=ivcia5RAHQ@mail.gmail.com> <CA+icZUVrv3tAvvYGqUB1tBY1mCqTkMoM+fWpPenYz5Z_toJiAg@mail.gmail.com>
-From: Sedat Dilek <sedat.dilek@gmail.com>
-Date: Tue, 13 Jun 2017 17:03:30 +0200
-Message-ID: <CA+icZUWWwG0c75YPi8_0W=HLrO22tFewp4bKQtXMs+p4EkJdgg@mail.gmail.com>
-Subject: Re: [Linux-4.9.30] Broadcom BCM20702 bluetooth in ThinkPad-T530 not usable
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: "Gustavo F. Padovan" <gustavo@padovan.org>, Johan Hedberg <johan.hedberg@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: multipart/mixed; boundary="f403043ecdf01a36ef0551d8bda9"
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: =?UTF-8?q?Micha=C5=82=20Narajowski?=
+        <michal.narajowski@codecoup.pl>
+To: linux-bluetooth@vger.kernel.org
+Cc: =?UTF-8?q?Micha=C5=82=20Narajowski?=
+        <michal.narajowski@codecoup.pl>
+Subject: [PATCH BlueZ v2 3/7] monitor: Add LE Set Periodic Advertising commands decoding
+Date: Tue, 13 Jun 2017 15:18:13 +0200
+Message-Id: <20170613131817.18516-4-michal.narajowski@codecoup.pl>
+In-Reply-To: <20170613131817.18516-1-michal.narajowski@codecoup.pl>
+References: <20170613131817.18516-1-michal.narajowski@codecoup.pl>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---f403043ecdf01a36ef0551d8bda9
-Content-Type: text/plain; charset="UTF-8"
+monitor: Add LE Set Periodic Advertising Parameters decoding
 
-My latest howto and the two patches from bluetooth-next to fix the
-issue on Debian/stretch AMD64.
+< HCI Command: LE Set Periodic Advertising Parameters (0x08|0x003e) plen 7
+        Handle: 1
+        Min interval: 2.50 msec (0x0002)
+        Max interval: 318.75 msec (0x00ff)
+        Properties: 0x00ff
+          Include TxPower
+          Unknown advertising properties (0x00bf)
 
-- Sedat -
+monitor: Add LE Set Periodic Advertising Data decoding
 
---f403043ecdf01a36ef0551d8bda9
-Content-Type: text/plain; charset="US-ASCII";
-	name="howto-fix-bluetooth-BCM20702A0-not-supporting-HCI_Set_Event_Mask_Page_2-command-debian-stretch.txt"
-Content-Disposition: attachment;
-	filename="howto-fix-bluetooth-BCM20702A0-not-supporting-HCI_Set_Event_Mask_Page_2-command-debian-stretch.txt"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_j3vp5uwb1
+< HCI Command: LE Set Periodic Advertising Data (0x08|0x003f) plen 7
+        Handle: 1
+        Handle: 0x01
+        Operation: Last fragment
+        Data length: 0x04
+        ff 00 ff 00                                      ....
 
-SVNTVUU6IEEgQnJvYWRjb20gQkNNMjA3MDJBMCBibHVldG9vdGggZG9uZ2xlIGluIGEgVGhpbmtQ
-YWQtVDUzMCBkb2VzIG5vdCByZWFsbHkgc3VwcG9ydCBIQ0lfU2V0X0V2ZW50X01hc2tfUGFnZV8y
-IGNvbW1hbmQgYW5kIGlzIG5vdCB1c2FibGUuCgpIRUxQLTE6IFNlZSBkaXNjdXNzaW9uIG9uIGxp
-bnV4LWJsdWV0b290aCBNYWlsaW5nLWxpc3Qgd2l0aCB0aGUgdG9waWMKSEVMUC0xOiAiW0xpbnV4
-LTQuOS4zMF0gQnJvYWRjb20gQkNNMjA3MDIgYmx1ZXRvb3RoIGluIFRoaW5rUGFkLVQ1MzAgbm90
-IHVzYWJsZSIKSEVMUC0yOiBCdWlsZC1pbnN0cnVjdGlvbnMgYWRhcHRlZCBmcm9tIDxodHRwczov
-L2dpdGh1Yi5jb20vbmV1cm9iaW4vTVQ3NjMwRS9pc3N1ZXMvNj4KCk5PVEUtMTogTXkgc3lzdGVt
-IGlzIGEgRGViaWFuL3N0cmV0Y2ggOS4wIHdpdGggbGludXgtaW1hZ2UtNC45LjAtMy1hbWQ2NCAo
-NC45LjMwLTEpIHBhY2thZ2UgaW5zdGFsbGVkLgpOT1RFLTI6IERlYmlhbiBkb2VzIG5vdCBzaGlw
-IGEgZml0dGluZyBmaXJtd2FyZSwgc2VlIDxodHRwczovL2J1Z3MuZGViaWFuLm9yZy9jZ2ktYmlu
-L2J1Z3JlcG9ydC5jZ2k/YnVnPTgwMTA4ND4uCgpQUkVSRVE6IFlvdSBuZWVkIGEgZmlybXdhcmUg
-ZmlsZSBmcm9tIDxodHRwczovL2dpdGh1Yi5jb20vd2ludGVyaGVhcnQvYnJvYWRjb20tYnQtZmly
-bXdhcmU+LgpQUkVSRVE6IFlvdSBzaG91bGQgaGF2ZSBhIC9saWIvZmlybXdhcmUvYnJjbS9CQ00y
-MDcwMkExLTBhNWMtMjFlNi5oY2QKClBBVENILTE6ICJbUEFUQ0hdIEJsdWV0b290aDogU2VuZCBI
-Q0kgU2V0IEV2ZW50IE1hc2sgUGFnZSAyIGNvbW1hbmQgb25seSB3aGVuIG5lZWRlZCIKUEFUQ0gt
-MTogPGh0dHBzOi8vZ2l0Lmtlcm5lbC5vcmcvcHViL3NjbS9saW51eC9rZXJuZWwvZ2l0L2JsdWV0
-b290aC9ibHVldG9vdGgtbmV4dC5naXQvcGF0Y2gvP2lkPTMxM2Y2ODg4YzhmYmIxYmM4YjM2Yzkw
-MTJjZTRlMWRlODQ4ZGY2OTY+ClBBVENILTE6IEJhY2twb3J0IGZvciBMaW51eCB2NC45LjMwIHNl
-ZSA8aHR0cDovL21hcmMuaW5mby8/bD1saW51eC1ibHVldG9vdGgmbT0xNDk3MjY0MDIyMjA2Nzcm
-dz0yPgpQQVRDSC0yOiAiW1BBVENIXSBCbHVldG9vdGg6IGJ0YmNtOiBSZWFkIGNvbnRyb2xsZXIg
-ZmVhdHVyZXMgZHVyaW5nIGNvbmZpZ3VyYXRpb24iClBBVENILTI6IDxodHRwczovL2dpdC5rZXJu
-ZWwub3JnL3B1Yi9zY20vbGludXgva2VybmVsL2dpdC9ibHVldG9vdGgvYmx1ZXRvb3RoLW5leHQu
-Z2l0L2NvbW1pdC8/aWQ9NDI4NGVjYmVkYTgxMDgzZjRjN2EzY2UzMjViNGE5ZDY3NTY1N2U2MT4K
-UEFUQ0gtMzogIltQQVRDSF0gQmx1ZXRvb3RoOiBidHVzYjogc2V0IEhDSV9RVUlSS19CUk9LRU5f
-TE9DQUxfQ09NTUFORFMgZm9yIDB4MGE1YzoweDIxZjMiClBBVENILTM6IFNhbXBsZSBwYXRjaCB0
-byBkZW1vbnN0cmF0ZSBIQ0lfUVVJUktfQlJPS0VOX0xPQ0FMX0NPTU1BTkRTIHVzYWdlLCBzZWUg
-PGh0dHBzOi8vd3d3LnNwaW5pY3MubmV0L2xpc3RzL2xpbnV4LWJsdWV0b290aC9tc2c3MDQzNi5o
-dG1sPgoKWyBDSEVDSyBTVEFUVVMgQU5EIFNUT1AgQkxVRVRPT1RIIFNFUlZJQ0UgXQoKc3VkbyBz
-eXN0ZW1jdGwgc3RhdHVzIGJsdWV0b290aC5zZXJ2aWNlCnN1ZG8gc3lzdGVtY3RsIHN0b3AgYmx1
-ZXRvb3RoLnNlcnZpY2UKClsgRE9XTkxPQUQgREVCSUFOLUtFUk5FTCBIRUFERVJTIEFORCBUT09M
-UyBdICAKCnN1ZG8gYXB0LWdldCBpbnN0YWxsIGJ1aWxkLWVzc2VudGlhbCBsaW51eC1oZWFkZXJz
-LSQodW5hbWUgLXIpCnN1ZG8gYXB0LWdldCBidWlsZC1kZXAgbGludXgtaW1hZ2UtJCh1bmFtZSAt
-cikKClsgQ1JFQVRFIEEgQlVJTEQtRU5WSVJPTk1FTlQgXQoKbWtkaXIgLXAgfi9zcmMvbGludXgt
-a2VybmVsCmNkIH4vc3JjL2xpbnV4LWtlcm5lbAoKWyBET1dOTE9BRCBBTkQgVU5QQUNLIERFQklB
-Ti1LRVJORUwgU09VUkNFUyBdCgphcHQtZ2V0IHNvdXJjZSBsaW51eC1pbWFnZS0kKHVuYW1lIC1y
-KSAtZApkcGtnLXNvdXJjZSAteCAqLmRzYwoKWyBQUkVQQVJFLCBHRU5FUkFURSBBTkQgQ09QWSBC
-TFVFVE9PVEguS08gQU5EIEJUQkNNLktPIEtFUk5FTC1NT0RVTEVTIF0KCktWRVI9IjQuOS4zMCIK
-Y2QgbGludXgtJEtWRVIKClsgUEFUQ0gtMSBSRVFVSVJFUyBBIFJFQlVJTEQgT0YgQkxVRVRPT1RI
-LktPIEtFUk5FTC1NT0RVTEUgXQpwYXRjaCAtTnAxIC1pIC4uL3BhdGNoZXMvYmx1ZXRvb3RoLWZp
-eGVzLTQuOS4zMC8xLTItQmx1ZXRvb3RoLVNlbmQtSENJLVNldC1FdmVudC1NYXNrLVBhZ2UtMi1j
-b21tYW5kLW9ubHktd2hlbi1uZWVkZWQtZm9yLTQtOS0zMC5wYXRjaAoKWyBQQVRDSC0yIFJFUVVJ
-UkVTIEEgUkVCVUlMRCBPRiBCVEJDTS5LTyBLRVJORUwtTU9EVUxFIF0KcGF0Y2ggLU5wMSAtaSAu
-Li9wYXRjaGVzL2JsdWV0b290aC1maXhlcy00LjkuMzAvMi0yLUJsdWV0b290aC1idGJjbS1SZWFk
-LWNvbnRyb2xsZXItZmVhdHVyZXMtZHVyaW5nLWNvbmZpZ3VyYXRpb24ucGF0Y2ggCgpjcCAtYXYg
-L2Jvb3QvY29uZmlnLSQodW5hbWUgLXIpIC5jb25maWcKY3AgLWF2IC91c3Ivc3JjL2xpbnV4LWhl
-YWRlcnMtJCh1bmFtZSAtcikvTW9kdWxlLnN5bXZlcnMgLi8KCm1ha2UgcHJlcGFyZQptYWtlIG1v
-ZHVsZXNfcHJlcGFyZQptYWtlIE09c2NyaXB0cy9tb2QKbWFrZSBNPW5ldC9ibHVldG9vdGggbW9k
-dWxlcwptYWtlIE09ZHJpdmVycy9ibHVldG9vdGggbW9kdWxlcwoKS1BBVEhfTU9EVUxFUz0iL2xp
-Yi9tb2R1bGVzLyQodW5hbWUgLXIpL2tlcm5lbCIKc3VkbyBjcCAtYXYgbmV0L2JsdWV0b290aC9i
-bHVldG9vdGgua28gJEtQQVRIX01PRFVMRVMvbmV0L2JsdWV0b290aC8Kc3VkbyBjcCAtYXYgZHJp
-dmVycy9ibHVldG9vdGgvYnRiY20ua28gJEtQQVRIX01PRFVMRVMvZHJpdmVycy9ibHVldG9vdGgv
-CnN1ZG8gY2hvd24gcm9vdDpyb290ICRLUEFUSF9NT0RVTEVTL25ldC9ibHVldG9vdGgvYmx1ZXRv
-b3RoLmtvICRLUEFUSF9NT0RVTEVTL2RyaXZlcnMvYmx1ZXRvb3RoL2J0YmNtLmtvIApsbCAkS1BB
-VEhfTU9EVUxFUy9uZXQvYmx1ZXRvb3RoL2JsdWV0b290aC5rbyAkS1BBVEhfTU9EVUxFUy9kcml2
-ZXJzL2JsdWV0b290aC9idGJjbS5rbwoKWyBTVEFSVCBCTFVFVE9PVEggU0VSVklDRSBdCgpzdWRv
-IHN5c3RlbWN0bCBzdGFydCBibHVldG9vdGguc2VydmljZQoKWyBBTFRFUk5BVElWRUxZIE1PTklU
-T1IgSENJMCBdCgpbIFNFU1NJT04gIzEgXQoKbW9kcHJvYmUgLXIgLXYgYnR1c2IKbW9kcHJvYmUg
-LXYgYnR1c2IKCnJma2lsbCBsaXN0IGJsdWV0b290aAooIHJma2lsbCB1bmJsb2NrIGJsdWV0b290
-aCApCgpoY2ljb25maWcgaGNpMCB1cAoKYmx1ZXRvb3RoY3RsCiggbGlzdCAmIHNob3cgKQoKWyBT
-RVNTSU9OICMyIF0KClsgQlRNT04gQlRTTk9PUC1GT1JNQVQgXQpidG1vbiAtdyBidG1vbS13X2Jj
-bTIwNzAyLWZpeGVkLmxvZwoKWyBDT05WRVJUIFRPIEFTQ0lJIFRFWFQgXQpidG1vZCAtciBidG1v
-bS13X2JjbTIwNzAyLWZpeGVkLmxvZyA+IGJ0bW9tLXdfYmNtMjA3MDItZml4ZWQudHh0CgpbIFNV
-Q0NFU1MgXQoKVGhlIGJsdWV0b290aCBkb25nbGUgc2hvdWxkIG5vdyB3b3JrIQoKCi1kaWxla3Mg
-Ly8gMTMtSlVOLTIwMTcK
---f403043ecdf01a36ef0551d8bda9
-Content-Type: text/x-diff; charset="US-ASCII";
-	name="1-2-Bluetooth-Send-HCI-Set-Event-Mask-Page-2-command-only-when-needed-for-4-9-30.patch"
-Content-Disposition: attachment;
-	filename="1-2-Bluetooth-Send-HCI-Set-Event-Mask-Page-2-command-only-when-needed-for-4-9-30.patch"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_j3vp5xgs2
+monitor: Add LE Set Periodic Advertising Enable decoding
 
-RnJvbSAzMTNmNjg4OGM4ZmJiMWJjOGIzNmM5MDEyY2U0ZTFkZTg0OGRmNjk2IE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBNYXJjZWwgSG9sdG1hbm4gPG1hcmNlbEBob2x0bWFubi5vcmc+
-CkRhdGU6IEZyaSwgOSBKdW4gMjAxNyAxODo0Mzo1NiArMDIwMApTdWJqZWN0OiBbNC45LjMwXSBC
-bHVldG9vdGg6IFNlbmQgSENJIFNldCBFdmVudCBNYXNrIFBhZ2UgMiBjb21tYW5kIG9ubHkgd2hl
-biBuZWVkZWQKClRoZSBCcm9hZGNvbSBCQ00yMDcwMiBCbHVldG9vdGggY29udHJvbGxlciBpbiBU
-aGlua1BhZC1UNTMwIGRldmljZXMKcmVwb3J0IHN1cHBvcnQgZm9yIHRoZSBTZXQgRXZlbnQgTWFz
-ayBQYWdlIDIgY29tbWFuZCwgYnV0IGFjdHVhbGx5IGRvCnJldHVybiBhbiBlcnJvciB3aGVuIHRy
-eWluZyB0byB1c2UgaXQuCgogIDwgSENJIENvbW1hbmQ6IFJlYWQgTG9jYWwgU3VwcG9ydGVkIENv
-bW1hbmRzICgweDA0fDB4MDAwMikgcGxlbiAwCiAgPiBIQ0kgRXZlbnQ6IENvbW1hbmQgQ29tcGxl
-dGUgKDB4MGUpIHBsZW4gNjgKICAgICAgIFJlYWQgTG9jYWwgU3VwcG9ydGVkIENvbW1hbmRzICgw
-eDA0fDB4MDAwMikgbmNtZCAxCiAgICAgICAgIFN0YXR1czogU3VjY2VzcyAoMHgwMCkKICAgICAg
-ICAgQ29tbWFuZHM6IDE2MiBlbnRyaWVzCiAgICAgICAgICAgLi4uCiAgICAgICAgICAgU2V0IEV2
-ZW50IE1hc2sgUGFnZSAyIChPY3RldCAyMiAtIEJpdCAyKQogICAgICAgICAgIC4uLgoKICA8IEhD
-SSBDb21tYW5kOiBTZXQgRXZlbnQgTWFzayBQYWdlIDIgKDB4MDN8MHgwMDYzKSBwbGVuIDgKICAg
-ICAgICAgTWFzazogMHgwMDAwMDAwMDAwMDAwMDAwCiAgPiBIQ0kgRXZlbnQ6IENvbW1hbmQgQ29t
-cGxldGUgKDB4MGUpIHBsZW4gNAogICAgICAgU2V0IEV2ZW50IE1hc2sgUGFnZSAyICgweDAzfDB4
-MDA2MykgbmNtZCAxCiAgICAgICAgIFN0YXR1czogVW5rbm93biBIQ0kgQ29tbWFuZCAoMHgwMSkK
-ClNpbmNlIHRoZXNlIGNvbnRyb2xsZXJzIGRvIG5vdCBzdXBwb3J0IGFueSBmZWF0dXJlIHRoYXQg
-d291bGQgcmVxdWlyZQp0aGUgZXZlbnQgbWFzayBwYWdlIDIgdG8gYmUgbW9kaWZpZWQsIGl0IGlz
-IHNhZmUgdG8gbm90IHNlbmQgdGhpcwpjb21tYW5kIGF0IGFsbC4gVGhlIGRlZmF1bHQgdmFsdWUg
-aXMgYWxsIGJpdHMgc2V0IHRvIHplcm8uCgpUOiAgQnVzPTAxIExldj0wMiBQcm50PTAyIFBvcnQ9
-MDMgQ250PTAzIERldiM9ICA5IFNwZD0xMiAgIE14Q2g9IDAKRDogIFZlcj0gMi4wMCBDbHM9ZmYo
-dmVuZC4pIFN1Yj0wMSBQcm90PTAxIE14UFM9NjQgI0NmZ3M9ICAxClA6ICBWZW5kb3I9MGE1YyBQ
-cm9kSUQ9MjFlNiBSZXY9IDEuMTIKUzogIE1hbnVmYWN0dXJlcj1Ccm9hZGNvbSBDb3JwClM6ICBQ
-cm9kdWN0PUJDTTIwNzAyQTAKUzogIFNlcmlhbE51bWJlcj1GODJGQThFOENGQzAKQzoqICNJZnM9
-IDQgQ2ZnIz0gMSBBdHI9ZTAgTXhQd3I9ICAwbUEKSToqIElmIz0gMCBBbHQ9IDAgI0VQcz0gMyBD
-bHM9ZmYodmVuZC4pIFN1Yj0wMSBQcm90PTAxIERyaXZlcj1idHVzYgpFOiAgQWQ9ODEoSSkgQXRy
-PTAzKEludC4pIE14UFM9ICAxNiBJdmw9MW1zCkU6ICBBZD04MihJKSBBdHI9MDIoQnVsaykgTXhQ
-Uz0gIDY0IEl2bD0wbXMKRTogIEFkPTAyKE8pIEF0cj0wMihCdWxrKSBNeFBTPSAgNjQgSXZsPTBt
-cwpJOiogSWYjPSAxIEFsdD0gMCAjRVBzPSAyIENscz1mZih2ZW5kLikgU3ViPTAxIFByb3Q9MDEg
-RHJpdmVyPWJ0dXNiCkU6ICBBZD04MyhJKSBBdHI9MDEoSXNvYykgTXhQUz0gICAwIEl2bD0xbXMK
-RTogIEFkPTAzKE8pIEF0cj0wMShJc29jKSBNeFBTPSAgIDAgSXZsPTFtcwpJOiAgSWYjPSAxIEFs
-dD0gMSAjRVBzPSAyIENscz1mZih2ZW5kLikgU3ViPTAxIFByb3Q9MDEgRHJpdmVyPWJ0dXNiCkU6
-ICBBZD04MyhJKSBBdHI9MDEoSXNvYykgTXhQUz0gICA5IEl2bD0xbXMKRTogIEFkPTAzKE8pIEF0
-cj0wMShJc29jKSBNeFBTPSAgIDkgSXZsPTFtcwpJOiAgSWYjPSAxIEFsdD0gMiAjRVBzPSAyIENs
-cz1mZih2ZW5kLikgU3ViPTAxIFByb3Q9MDEgRHJpdmVyPWJ0dXNiCkU6ICBBZD04MyhJKSBBdHI9
-MDEoSXNvYykgTXhQUz0gIDE3IEl2bD0xbXMKRTogIEFkPTAzKE8pIEF0cj0wMShJc29jKSBNeFBT
-PSAgMTcgSXZsPTFtcwpJOiAgSWYjPSAxIEFsdD0gMyAjRVBzPSAyIENscz1mZih2ZW5kLikgU3Vi
-PTAxIFByb3Q9MDEgRHJpdmVyPWJ0dXNiCkU6ICBBZD04MyhJKSBBdHI9MDEoSXNvYykgTXhQUz0g
-IDI1IEl2bD0xbXMKRTogIEFkPTAzKE8pIEF0cj0wMShJc29jKSBNeFBTPSAgMjUgSXZsPTFtcwpJ
-OiAgSWYjPSAxIEFsdD0gNCAjRVBzPSAyIENscz1mZih2ZW5kLikgU3ViPTAxIFByb3Q9MDEgRHJp
-dmVyPWJ0dXNiCkU6ICBBZD04MyhJKSBBdHI9MDEoSXNvYykgTXhQUz0gIDMzIEl2bD0xbXMKRTog
-IEFkPTAzKE8pIEF0cj0wMShJc29jKSBNeFBTPSAgMzMgSXZsPTFtcwpJOiAgSWYjPSAxIEFsdD0g
-NSAjRVBzPSAyIENscz1mZih2ZW5kLikgU3ViPTAxIFByb3Q9MDEgRHJpdmVyPWJ0dXNiCkU6ICBB
-ZD04MyhJKSBBdHI9MDEoSXNvYykgTXhQUz0gIDQ5IEl2bD0xbXMKRTogIEFkPTAzKE8pIEF0cj0w
-MShJc29jKSBNeFBTPSAgNDkgSXZsPTFtcwpJOiogSWYjPSAyIEFsdD0gMCAjRVBzPSAyIENscz1m
-Zih2ZW5kLikgU3ViPWZmIFByb3Q9ZmYgRHJpdmVyPWJ0dXNiCkU6ICBBZD04NChJKSBBdHI9MDIo
-QnVsaykgTXhQUz0gIDMyIEl2bD0wbXMKRTogIEFkPTA0KE8pIEF0cj0wMihCdWxrKSBNeFBTPSAg
-MzIgSXZsPTBtcwpJOiogSWYjPSAzIEFsdD0gMCAjRVBzPSAwIENscz1mZShhcHAuICkgU3ViPTAx
-IFByb3Q9MDEgRHJpdmVyPShub25lKQoKU2lnbmVkLW9mZi1ieTogTWFyY2VsIEhvbHRtYW5uIDxt
-YXJjZWxAaG9sdG1hbm4ub3JnPgpSZXBvcnRlZC1ieTogU2VkYXQgRGlsZWsgPHNlZGF0LmRpbGVr
-QGdtYWlsLmNvbT4KVGVzdGVkLWJ5OiBTZWRhdCBEaWxlayA8c2VkYXQuZGlsZWtAZ21haWwuY29t
-PgpTaWduZWQtb2ZmLWJ5OiBTenltb24gSmFuYyA8c3p5bW9uLmphbmNAY29kZWNvdXAucGw+Ci0t
-LQpbIEJhY2twb3J0ZWQgdG8gZml0IExpbnV4IHY0LjkuMzAuIC1kaWxla3MgXQoKIG5ldC9ibHVl
-dG9vdGgvaGNpX2NvcmUuYyB8IDE3ICsrKysrKysrKysrKysrKy0tCiAxIGZpbGUgY2hhbmdlZCwg
-MTUgaW5zZXJ0aW9ucygrKSwgMiBkZWxldGlvbnMoLSkKCmRpZmYgLS1naXQgYS9uZXQvYmx1ZXRv
-b3RoL2hjaV9jb3JlLmMgYi9uZXQvYmx1ZXRvb3RoL2hjaV9jb3JlLmMKaW5kZXggM2FjODllOS4u
-NTA0OTQzMyAxMDA2NDQKLS0tIGEvbmV0L2JsdWV0b290aC9oY2lfY29yZS5jCisrKyBiL25ldC9i
-bHVldG9vdGgvaGNpX2NvcmUuYwpAQCAtNTQ4LDYgKzU0OCw3IEBAIHN0YXRpYyB2b2lkIGhjaV9z
-ZXRfZXZlbnRfbWFza19wYWdlXzIoc3RydWN0IGhjaV9yZXF1ZXN0ICpyZXEpCiB7CiAJc3RydWN0
-IGhjaV9kZXYgKmhkZXYgPSByZXEtPmhkZXY7CiAJdTggZXZlbnRzWzhdID0geyAweDAwLCAweDAw
-LCAweDAwLCAweDAwLCAweDAwLCAweDAwLCAweDAwLCAweDAwIH07CisJYm9vbCBjaGFuZ2VkID0g
-ZmFsc2U7CiAKIAkvKiBJZiBDb25uZWN0aW9ubGVzcyBTbGF2ZSBCcm9hZGNhc3QgbWFzdGVyIHJv
-bGUgaXMgc3VwcG9ydGVkCiAJICogZW5hYmxlIGFsbCBuZWNlc3NhcnkgZXZlbnRzIGZvciBpdC4K
-QEAgLTU1Nyw2ICs1NTgsNyBAQCBzdGF0aWMgdm9pZCBoY2lfc2V0X2V2ZW50X21hc2tfcGFnZV8y
-KHN0cnVjdCBoY2lfcmVxdWVzdCAqcmVxKQogCQlldmVudHNbMV0gfD0gMHg4MDsJLyogU3luY2hy
-b25pemF0aW9uIFRyYWluIENvbXBsZXRlICovCiAJCWV2ZW50c1syXSB8PSAweDEwOwkvKiBTbGF2
-ZSBQYWdlIFJlc3BvbnNlIFRpbWVvdXQgKi8KIAkJZXZlbnRzWzJdIHw9IDB4MjA7CS8qIENTQiBD
-aGFubmVsIE1hcCBDaGFuZ2UgKi8KKwkJY2hhbmdlZCA9IHRydWU7CiAJfQogCiAJLyogSWYgQ29u
-bmVjdGlvbmxlc3MgU2xhdmUgQnJvYWRjYXN0IHNsYXZlIHJvbGUgaXMgc3VwcG9ydGVkCkBAIC01
-NzAsMTAgKzU3MiwyMCBAQCBzdGF0aWMgdm9pZCBoY2lfc2V0X2V2ZW50X21hc2tfcGFnZV8yKHN0
-cnVjdCBoY2lfcmVxdWVzdCAqcmVxKQogCX0KIAogCS8qIEVuYWJsZSBBdXRoZW50aWNhdGVkIFBh
-eWxvYWQgVGltZW91dCBFeHBpcmVkIGV2ZW50IGlmIHN1cHBvcnRlZCAqLwotCWlmIChsbXBfcGlu
-Z19jYXBhYmxlKGhkZXYpIHx8IGhkZXYtPmxlX2ZlYXR1cmVzWzBdICYgSENJX0xFX1BJTkcpCisJ
-aWYgKGxtcF9waW5nX2NhcGFibGUoaGRldikgfHwgaGRldi0+bGVfZmVhdHVyZXNbMF0gJiBIQ0lf
-TEVfUElORykgewogCQlldmVudHNbMl0gfD0gMHg4MDsKKwkJY2hhbmdlZCA9IHRydWU7CisJfQog
-Ci0JaGNpX3JlcV9hZGQocmVxLCBIQ0lfT1BfU0VUX0VWRU5UX01BU0tfUEFHRV8yLCBzaXplb2Yo
-ZXZlbnRzKSwgZXZlbnRzKTsKKwkvKiBTb21lIEJyb2FkY29tIGJhc2VkIGNvbnRyb2xsZXJzIGlu
-ZGljYXRlIHN1cHBvcnQgZm9yIFNldCBFdmVudAorCSAqIE1hc2sgUGFnZSAyIGNvbW1hbmQsIGJ1
-dCB0aGVuIGFjdHVhbGx5IGRvIG5vdCBzdXBwb3J0IGl0LiBTaW5jZQorCSAqIHRoZSBkZWZhdWx0
-IHZhbHVlIGlzIGFsbCBiaXRzIHNldCB0byB6ZXJvLCB0aGUgY29tbWFuZCBpcyBvbmx5CisJICog
-cmVxdWlyZWQgaWYgdGhlIGV2ZW50IG1hc2sgaGFzIHRvIGJlIGNoYW5nZWQuIEluIGNhc2Ugbm8g
-Y2hhbmdlCisJICogdG8gdGhlIGV2ZW50IG1hc2sgaXMgbmVlZGVkLCBza2lwIHRoaXMgY29tbWFu
-ZC4KKwkgKi8KKwlpZiAoY2hhbmdlZCkKKwkJaGNpX3JlcV9hZGQocmVxLCBIQ0lfT1BfU0VUX0VW
-RU5UX01BU0tfUEFHRV8yLAorCQkJICAgIHNpemVvZihldmVudHMpLCBldmVudHMpOwogfQogCiBz
-dGF0aWMgaW50IGhjaV9pbml0M19yZXEoc3RydWN0IGhjaV9yZXF1ZXN0ICpyZXEsIHVuc2lnbmVk
-IGxvbmcgb3B0KQo=
---f403043ecdf01a36ef0551d8bda9
-Content-Type: text/x-diff; charset="US-ASCII";
-	name="2-2-Bluetooth-btbcm-Read-controller-features-during-configuration.patch"
-Content-Disposition: attachment;
-	filename="2-2-Bluetooth-btbcm-Read-controller-features-during-configuration.patch"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_j3vp60i63
+< HCI Command: LE Set Periodic Advertising Enable (0x08|0x0040) plen 2
+        Enable: Enabled
+        Handle: 2
+---
+ monitor/bt.h     |  21 ++++++++++++
+ monitor/packet.c | 102 +++++++++++++++++++++++++++++++++++++++++++++++++++++--
+ 2 files changed, 120 insertions(+), 3 deletions(-)
 
-RnJvbSA0Mjg0ZWNiZWRhODEwODNmNGM3YTNjZTMyNWI0YTlkNjc1NjU3ZTYxIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBNYXJjZWwgSG9sdG1hbm4gPG1hcmNlbEBob2x0bWFubi5vcmc+
-CkRhdGU6IFNhdCwgMTAgSnVuIDIwMTcgMTQ6MzM6MTYgKzAyMDAKU3ViamVjdDogQmx1ZXRvb3Ro
-OiBidGJjbTogUmVhZCBjb250cm9sbGVyIGZlYXR1cmVzIGR1cmluZyBjb25maWd1cmF0aW9uCgpS
-ZWFkIHRoZSBCcm9hZGNvbSBzcGVjaWZpYyBjb250cm9sbGVyIGZlYXR1cmVzIGR1cmluZyBjb25m
-aWd1cmF0aW9uIGFuZApwcmludCB0aGVtIGZvciBpbmZvcm1hdGlvbmFsIHB1cnBvc2VzLgoKICA8
-IEhDSSBDb21tYW5kOiBCcm9hZGNvbSBSZWFkIENvbnRyb2xsZXIgRmVhdHVyZXMgKDB4M2Z8MHgw
-MDZlKSBwbGVuIDAKICA+IEhDSSBFdmVudDogQ29tbWFuZCBDb21wbGV0ZSAoMHgwZSkgcGxlbiAx
-MgogICAgICAgIEJyb2FkY29tIFJlYWQgQ29udHJvbGxlciBGZWF0dXJlcyAoMHgzZnwweDAwNmUp
-IG5jbWQgMQogICAgICAgICAgU3RhdHVzOiBTdWNjZXNzICgweDAwKQogICAgICAgICAgRmVhdHVy
-ZXM6IDB4MDcgMHgwMCAweDAwIDB4MDAgMHgwMCAweDAwIDB4MDAgMHgwMAogICAgICAgICAgICBN
-dWx0aS1BViB0cmFuc3BvcnQgYmFuZHdpZHRoIHJlZHVjZXIKICAgICAgICAgICAgV0JTIFNCQwog
-ICAgICAgICAgICBGVyBMQy1QTEMKClNpZ25lZC1vZmYtYnk6IE1hcmNlbCBIb2x0bWFubiA8bWFy
-Y2VsQGhvbHRtYW5uLm9yZz4KU2lnbmVkLW9mZi1ieTogU3p5bW9uIEphbmMgPHN6eW1vbi5qYW5j
-QGNvZGVjb3VwLnBsPgotLS0KIGRyaXZlcnMvYmx1ZXRvb3RoL2J0YmNtLmMgfCAzNiArKysrKysr
-KysrKysrKysrKysrKysrKysrKysrKysrKysrKysKIDEgZmlsZSBjaGFuZ2VkLCAzNiBpbnNlcnRp
-b25zKCspCgpkaWZmIC0tZ2l0IGEvZHJpdmVycy9ibHVldG9vdGgvYnRiY20uYyBiL2RyaXZlcnMv
-Ymx1ZXRvb3RoL2J0YmNtLmMKaW5kZXggYmEzZGQyZS4uMjRmOGM0ZSAxMDA2NDQKLS0tIGEvZHJp
-dmVycy9ibHVldG9vdGgvYnRiY20uYworKysgYi9kcml2ZXJzL2JsdWV0b290aC9idGJjbS5jCkBA
-IC0yNDYsNiArMjQ2LDI3IEBAIHN0YXRpYyBzdHJ1Y3Qgc2tfYnVmZiAqYnRiY21fcmVhZF92ZXJi
-b3NlX2NvbmZpZyhzdHJ1Y3QgaGNpX2RldiAqaGRldikKIAlyZXR1cm4gc2tiOwogfQogCitzdGF0
-aWMgc3RydWN0IHNrX2J1ZmYgKmJ0YmNtX3JlYWRfY29udHJvbGxlcl9mZWF0dXJlcyhzdHJ1Y3Qg
-aGNpX2RldiAqaGRldikKK3sKKwlzdHJ1Y3Qgc2tfYnVmZiAqc2tiOworCisJc2tiID0gX19oY2lf
-Y21kX3N5bmMoaGRldiwgMHhmYzZlLCAwLCBOVUxMLCBIQ0lfSU5JVF9USU1FT1VUKTsKKwlpZiAo
-SVNfRVJSKHNrYikpIHsKKwkJQlRfRVJSKCIlczogQkNNOiBSZWFkIGNvbnRyb2xsZXIgZmVhdHVy
-ZXMgZmFpbGVkICglbGQpIiwKKwkJICAgICAgIGhkZXYtPm5hbWUsIFBUUl9FUlIoc2tiKSk7CisJ
-CXJldHVybiBza2I7CisJfQorCisJaWYgKHNrYi0+bGVuICE9IDkpIHsKKwkJQlRfRVJSKCIlczog
-QkNNOiBDb250cm9sbGVyIGZlYXR1cmVzIGxlbmd0aCBtaXNtYXRjaCIsCisJCSAgICAgICBoZGV2
-LT5uYW1lKTsKKwkJa2ZyZWVfc2tiKHNrYik7CisJCXJldHVybiBFUlJfUFRSKC1FSU8pOworCX0K
-KworCXJldHVybiBza2I7Cit9CisKIHN0YXRpYyBzdHJ1Y3Qgc2tfYnVmZiAqYnRiY21fcmVhZF91
-c2JfcHJvZHVjdChzdHJ1Y3QgaGNpX2RldiAqaGRldikKIHsKIAlzdHJ1Y3Qgc2tfYnVmZiAqc2ti
-OwpAQCAtNDE3LDYgKzQzOCwxNCBAQCBpbnQgYnRiY21fc2V0dXBfcGF0Y2hyYW0oc3RydWN0IGhj
-aV9kZXYgKmhkZXYpCiAJQlRfSU5GTygiJXM6IEJDTTogY2hpcCBpZCAldSIsIGhkZXYtPm5hbWUs
-IHNrYi0+ZGF0YVsxXSk7CiAJa2ZyZWVfc2tiKHNrYik7CiAKKwkvKiBSZWFkIENvbnRyb2xsZXIg
-RmVhdHVyZXMgKi8KKwlza2IgPSBidGJjbV9yZWFkX2NvbnRyb2xsZXJfZmVhdHVyZXMoaGRldik7
-CisJaWYgKElTX0VSUihza2IpKQorCQlyZXR1cm4gUFRSX0VSUihza2IpOworCisJQlRfSU5GTygi
-JXM6IEJDTTogZmVhdHVyZXMgMHglMi4yeCIsIGhkZXYtPm5hbWUsIHNrYi0+ZGF0YVsxXSk7CisJ
-a2ZyZWVfc2tiKHNrYik7CisKIAkvKiBSZWFkIExvY2FsIE5hbWUgKi8KIAlza2IgPSBidGJjbV9y
-ZWFkX2xvY2FsX25hbWUoaGRldik7CiAJaWYgKElTX0VSUihza2IpKQpAQCAtNTQwLDYgKzU2OSwx
-MyBAQCBpbnQgYnRiY21fc2V0dXBfYXBwbGUoc3RydWN0IGhjaV9kZXYgKmhkZXYpCiAJCWtmcmVl
-X3NrYihza2IpOwogCX0KIAorCS8qIFJlYWQgQ29udHJvbGxlciBGZWF0dXJlcyAqLworCXNrYiA9
-IGJ0YmNtX3JlYWRfY29udHJvbGxlcl9mZWF0dXJlcyhoZGV2KTsKKwlpZiAoIUlTX0VSUihza2Ip
-KSB7CisJCUJUX0lORk8oIiVzOiBCQ006IGZlYXR1cmVzIDB4JTIuMngiLCBoZGV2LT5uYW1lLCBz
-a2ItPmRhdGFbMV0pOworCQlrZnJlZV9za2Ioc2tiKTsKKwl9CisKIAkvKiBSZWFkIExvY2FsIE5h
-bWUgKi8KIAlza2IgPSBidGJjbV9yZWFkX2xvY2FsX25hbWUoaGRldik7CiAJaWYgKCFJU19FUlIo
-c2tiKSkgewotLSAKY2dpdCB2MS4xCgo=
---f403043ecdf01a36ef0551d8bda9--
+diff --git a/monitor/bt.h b/monitor/bt.h
+index aa55579..5eb07d6 100644
+--- a/monitor/bt.h
++++ b/monitor/bt.h
+@@ -2253,6 +2253,27 @@ struct bt_hci_cmd_le_remove_adv_set {
+ 
+ #define BT_HCI_CMD_LE_CLEAR_ADV_SETS			0x203d
+ 
++#define BT_HCI_CMD_LE_SET_PERIODIC_ADV_PARAMS			0x203e
++struct bt_hci_cmd_le_set_periodic_adv_params {
++	uint8_t  handle;
++	uint16_t min_interval;
++	uint16_t max_interval;
++	uint16_t properties;
++} __attribute__ ((packed));
++
++#define BT_HCI_CMD_LE_SET_PERIODIC_ADV_DATA			0x203f
++struct bt_hci_cmd_le_set_periodic_adv_data {
++	uint8_t  handle;
++	uint8_t  operation;
++	uint8_t  data_len;
++} __attribute__ ((packed));
++
++#define BT_HCI_CMD_LE_SET_PERIODIC_ADV_ENABLE			0x2040
++struct bt_hci_cmd_le_set_periodic_adv_enable {
++	uint8_t  enable;
++	uint8_t  handle;
++} __attribute__ ((packed));
++
+ #define BT_HCI_EVT_INQUIRY_COMPLETE		0x01
+ struct bt_hci_evt_inquiry_complete {
+ 	uint8_t  status;
+diff --git a/monitor/packet.c b/monitor/packet.c
+index 8827f5e..cccc69c 100644
+--- a/monitor/packet.c
++++ b/monitor/packet.c
+@@ -7280,6 +7280,96 @@ static void le_remove_adv_set_cmd(const void *data, uint8_t size)
+ 	print_handle(cmd->handle);
+ }
+ 
++static const struct {
++	uint8_t bit;
++	const char *str;
++} periodic_adv_properties_table[] = {
++	{  6, "Include TxPower"		},
++	{ }
++};
++
++static void print_periodic_adv_properties(uint16_t flags)
++{
++	uint16_t mask = flags;
++	int i;
++
++	print_field("Properties: 0x%4.4x", flags);
++
++	for (i = 0; periodic_adv_properties_table[i].str; i++) {
++		if (flags & (1 << periodic_adv_properties_table[i].bit)) {
++			print_field("  %s",
++					periodic_adv_properties_table[i].str);
++			mask &= ~(1 << periodic_adv_properties_table[i].bit);
++		}
++	}
++
++	if (mask)
++		print_text(COLOR_UNKNOWN_ADV_FLAG,
++				"  Unknown advertising properties (0x%4.4x)",
++									mask);
++}
++
++static void le_set_periodic_adv_params_cmd(const void *data, uint8_t size)
++{
++	const struct bt_hci_cmd_le_set_periodic_adv_params *cmd = data;
++
++	print_handle(cmd->handle);
++	print_slot_125("Min interval", cmd->min_interval);
++	print_slot_125("Max interval", cmd->max_interval);
++	print_periodic_adv_properties(cmd->properties);
++}
++
++static void le_set_periodic_adv_data_cmd(const void *data, uint8_t size)
++{
++	const struct bt_hci_cmd_le_set_periodic_adv_data *cmd = data;
++	const char *str;
++
++	print_handle(cmd->handle);
++
++	print_field("Handle: 0x%2.2x", cmd->handle);
++	switch (cmd->operation) {
++	case 0x00:
++		str = "Immediate fragment";
++		break;
++	case 0x01:
++		str = "First fragment";
++		break;
++	case 0x02:
++		str = "Last fragment";
++		break;
++	case 0x03:
++		str = "Complete ext advertising data";
++		break;
++	default:
++		str = "Reserved";
++		break;
++	}
++	print_field("Operation: %s", str);
++	print_field("Data length: 0x%2.2x", cmd->data_len);
++	packet_hexdump(data + 3, size - 3);
++}
++
++static void le_set_periodic_adv_enable_cmd(const void *data, uint8_t size)
++{
++	const struct bt_hci_cmd_le_set_periodic_adv_enable *cmd = data;
++	const char *str;
++
++	switch (cmd->enable) {
++	case 0x00:
++		str = "Disable";
++		break;
++	case 0x01:
++		str = "Enabled";
++		break;
++	default:
++		str = "Reserved";
++		break;
++	}
++
++	print_field("Enable: %s", str);
++	print_handle(cmd->handle);
++}
++
+ struct opcode_data {
+ 	uint16_t opcode;
+ 	int bit;
+@@ -8016,9 +8106,15 @@ static const struct opcode_data opcode_table[] = {
+ 	{ 0x203d, 297, "LE Clear Advertising Sets",
+ 				null_cmd, 0, true,
+ 				status_rsp, 1, true },
+-	{ 0x203e, 298, "LE Set Periodic Advertising Parameters" },
+-	{ 0x203f, 299, "LE Set Periodic Advertising Data" },
+-	{ 0x2040, 300, "LE Set Periodic Advertising Enable" },
++	{ 0x203e, 298, "LE Set Periodic Advertising Parameters",
++				le_set_periodic_adv_params_cmd, 7, true,
++				status_rsp, 1, true },
++	{ 0x203f, 299, "LE Set Periodic Advertising Data",
++				le_set_periodic_adv_data_cmd, 3, false,
++				status_rsp, 1, true },
++	{ 0x2040, 300, "LE Set Periodic Advertising Enable",
++				le_set_periodic_adv_enable_cmd, 2, true,
++				status_rsp, 1, true },
+ 	{ 0x2041, 301, "LE Set Extended Scan Parameters" },
+ 	{ 0x2042, 302, "LE Set Extended Scan Enable" },
+ 	{ 0x2043, 303, "LE Extended Create Connection" },
+-- 
+2.9.3
+
