@@ -1,69 +1,35 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-To: <linux-bluetooth@vger.kernel.org>
-From: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
-Subject: [PATCH BlueZ 0/3] client: Improve help command
-Message-ID: <3520047b-7832-35e2-d1fa-fb7f5c0d058d@jp.fujitsu.com>
-Date: Thu, 15 Jun 2017 20:35:52 +0900
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"; format=flowed
+From: mohammed rilwan <rilwan03@gmail.com>
+Date: Thu, 15 Jun 2017 13:35:16 +0530
+Message-ID: <CAMaUp9ZGPv2EzzpHsnmEnc8stK=S1ob+LaGAoYDhKGLaj2=-WQ@mail.gmail.com>
+Subject: bluetooth sco connection
+To: linux-bluetooth@vger.kernel.org,
+        General PulseAudio Discussion
+        <pulseaudio-discuss@lists.freedesktop.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This adds alias-related help messages and makes more readable in whole.
-The help command outputs the following messages before applying these
-patches:
+sco connection fails on ubuntu 17.04 with external bluetooth dongle
+where as a2dp works well.Tried with several dongles-broadcom,mediatek.
+With inbuilt dongle everything works fine.
 
-[bluetooth]# help
-Available commands:
-   list                       List available controllers
-   show [ctrl]                Controller information
-   select <ctrl>              Select default controller
-   devices                    List available devices
-   paired-devices             List paired devices
-   power <on/off>             Set controller power
-   pairable <on/off>          Set controller pairable mode
-   discoverable <on/off>      Set controller discoverable mode
-   agent <on/off/capability>  Enable/disable agent with given capability
-   default-agent              Set agent as the default one
-   advertise <on/off/type>    Enable/disable advertising with given type
-   set-advertise-uuids [uuid1 uuid2 ...] Set advertise uuids
-   set-advertise-service [uuid][data=[xx xx ...] Set advertise service data
-   set-advertise-manufacturer [id][data=[xx xx ...] Set advertise manufacturer data
+Any help please.
+while getting call i am getting below log -
 
+Jun 15 13:23:56 sat rtkit-daemon[1239]: Supervising 3 threads of 1
+processes of 1 users.
+Jun 15 13:23:56 sat rtkit-daemon[1239]: Successfully made thread 26213
+of process 1697 (n/a) owned by '1000' RT at priority 5.
+Jun 15 13:23:56 sat rtkit-daemon[1239]: Supervising 4 threads of 1
+processes of 1 users.
+Jun 15 13:23:56 sat dbus[778]: [system] Rejected send message, 3
+matched rules; type="method_return", sender=":1.99" (uid=1000 pid=1697
+comm="/usr/bin/pulseaudio --start --log-target=syslog ")
+interface="(unset)" member="(unset)" error name="(unset)"
+requested_reply="0" destination=":1.125" (uid=0 pid=2294
+comm="/usr/sbin/ofonod -P ril --nodetach ")
 
-As below after applying this patches:
-
-[bluetooth]# help
-Available commands:
-   list                       List available controllers
-   show [ctrl]                Controller information
-   select <ctrl>              Select default controller
-   devices                    List available devices
-   paired-devices             List paired devices
-   system-alias <name>        Set controller alias
-   reset-alias                Reset controller alias
-   power <on/off>             Set controller power
-   pairable <on/off>          Set controller pairable mode
-   discoverable <on/off>      Set controller discoverable mode
-   agent <on/off/capability>  Enable/disable agent with given capability
-   default-agent              Set agent as the default one
-   advertise <on/off/type>    Enable/disable advertising with given type
-   set-advertise-uuids [uuid1 uuid2 ...]
-                              Set advertise uuids
-   set-advertise-service [uuid][data=[xx xx ...]
-                              Set advertise service data
-   set-advertise-manufacturer [id][data=[xx xx ...]
-                              Set advertise manufacturer data
-
-
-ERAMOTO Masaya (3):
-   client: Compare a input string and each command only once
-   client: Add a description to all commands
-   client: Output a long message by two lines
-
-  client/main.c | 37 +++++++++++++++++++++++++------------
-  1 file changed, 25 insertions(+), 12 deletions(-)
-
--- 
-2.7.4
-
+Thanks
+Rilwan
