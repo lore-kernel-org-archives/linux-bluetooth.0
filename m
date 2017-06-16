@@ -1,94 +1,102 @@
-Return-Path: <marcos@scriven.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Boris Passerat de la chapelle <bpasserat@h2ad.net>
+To: Krasi Georgiev <krasi.root@gmail.com>
+CC: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Barry Byford <31baz66@gmail.com>,
+        Bluez mailing list <linux-bluetooth@vger.kernel.org>
+Subject: RE: How to use GattProfile1
+Date: Fri, 16 Jun 2017 06:16:44 +0000
+Message-ID: <e94749f41d154deaae22adedd952591b@sjbsvr074.groupe.local>
+References: <4CF902B9-8221-45E7-9868-52BF18A5EC5D@gmail.com>
+ <CAAu3APYsHqAK=Kk-fzQmhhBOfnayTDB_N_Q2yCuOhr+akvxfLg@mail.gmail.com>
+ <C1394BB3-3C11-410C-916F-80A7863C0A2B@gmail.com>
+ <969738CC-B335-4E2F-BF3C-441110279871@gmail.com>
+ <CAAu3APard0ZM-+++qm8938+iWkUUfNkjvq1M9cLqngtZYJAzRg@mail.gmail.com>
+ <F1876BDF-4DC0-4CB0-A20F-2E64E24A3B92@gmail.com>
+ <CABBYNZ+R7dV5i+BQowigf5eddB4yxSki+xLeLFYBrN4Sfe8mJA@mail.gmail.com>
+ <4AE62BC6-BD11-44C7-9A0E-BC3159ED80DF@gmail.com>
+ <4C907B25-D8E4-462C-89FA-AB312A27CBE9@gmail.com>
+ <CABBYNZK04wxSH78f0maAMHtR-2ra8Kh_nQKkrAY1R8G19ba8TA@mail.gmail.com>
+ <5CDE162E-4828-4485-BF95-50C67DB93B77@gmail.com>
+ <CABBYNZKkodmXy+4eRXh_4RA9yci25cEtaNMoywEUk9XZ+GL4LQ@mail.gmail.com>
+ <758C2FAB-DBF1-4B88-866D-F036B23B3C95@gmail.com>
+ <CABBYNZLVjXXmbfTb2Uo9KvE2D83c1PU7f2p=t6JawfeyUfN2+w@mail.gmail.com>
+ <3290BB41-234F-4D7B-BF37-0CC2966CB416@gmail.com>
+ <CABBYNZKoACnV5rOQ1dJH56Uien-CdMy7CUfgvZEGdJvuLXKBgQ@mail.gmail.com>
+ <5D01EC8C-E51B-4F89-8F9B-5D7946674116@gmail.com>
+ <CABBYNZ+P8fzQP_v5dtWTHhXthE7JhsJeLBts4+_eweVDBMZpSQ@mail.gmail.com>
+ <329D353B-8799-434A-9049-AE8904429A78@gmail.com>
+ <CABBYNZJPrNfN-ns60zts863J=0Ec-np5AQb9aguS67fF0ZNbkA@mail.gmail.com>
+ <39cb9ea22f14454d83b6e62e59bdc955@sjbsvr074.groupe.local>
+ <8D8EB08D-CA68-400C-A987-8ADA4B45E2C2@gmail.com>
+ <D2B39265-DEFC-42F9-B022-F0FB1CD853F9@gmail.com>
+In-Reply-To: <D2B39265-DEFC-42F9-B022-F0FB1CD853F9@gmail.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <15900B5C-F25F-4077-B1BA-A4C3F59FD95C@holtmann.org>
-References: <CA+zKUVLFdP4ho91ZkykW0gnEQw-3gOFLPd0YnuqLLp2UqROcfQ@mail.gmail.com>
- <15900B5C-F25F-4077-B1BA-A4C3F59FD95C@holtmann.org>
-From: Marcos Scriven <marcos@scriven.org>
-Date: Fri, 16 Jun 2017 09:31:43 +0100
-Message-ID: <CA+zKUV+N5PZ9AP+GNTUFWCMG4cHwJ6EKU9pig_76ggTDACE0XA@mail.gmail.com>
-Subject: Re: Questions on event masks (specifically in tools/3dsp.c)
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Thanks Marcel
-
-I did try btmon, but was only seeing other devices about the house,
-nothing that looked liked the 3D glasses, no matter how many times I
-press the sync button on the glasses.
-
-As the glasses were quite cheap, I went ahead and opened them up, to
-find it's based on the Broadcom 20730, which is only Bluetooth 3.0
-according to the datasheet:
-http://www.cypress.com/file/298211/download
-
-It specifically mentioned 3D glasses support in section 1.3:
-
-"The CYW20730, combined with the CYW20702, provides full system
-support for 3D glasses on televisions. The CYW20702 gets frame
-synchronization signals from the TV, converts them into proprietary
-timing control messages, then passes these messages to the CYW20730.
-The CYW20730 uses these messages to synchronize the shutter control
-for the 3D glasses with the television frames."
-
-However, there's no such CYW20702 chip on the board, but instead a
-Sitronix ST9902:
-http://www.datasheetspdf.com/datasheet/download.php?id=948278
-
-The description for that is:
-
-"ST9902 is an integrated circuit for liquid-crystal shutter glasses
-driver. It combines a DC/DC converter that generates a specified
-voltage level as the output voltage source to the four-channel analog
-switches. Each analog switch has a dedicated input control pin and a
-dedicated output analog pin. The analog switches can be used as the
-lens driver in a 3D glasses system application. 16K-byte EEPROM is
-suitable for the MCU-based system, which can use EEPROM as a code or
-data storage unit. ST9902 chip is integrated into a 16-pin QFN package
-and only a few external passive components are require"
-
-So that seems to be just a simple I2C controller for the shutters
-themselves, whereas the companion CYW20702 looks like a full Bluetooth
-4.0 processor.
-
-I thus have no idea how this is even works, the datasheet for the
-CYW20730 doesn't explain how it would work to control 3D glasses
-without the CYW20702 - I'm presuming it must therefore have been
-programmed by the manufacturer of the glasses. Would you agree that
-means it could only support the legacy 3D glasses profile?
-
-It would also seem it's BR/EDR only - but should I then still see
-output in btmon, or is that Bluetooth LE only?
-
-Thanks
-
-Marcos
-
-On Fri, Jun 16, 2017 at 6:29 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Marcos,
->
->> (NB I've resent this as plain text)
->>
->> I've been trying out /tools/3dsp.c on a Raspberry Pi 3. There's some
->> background in this thread that Marcel mentioned
->> http://www.spinics.net/lists/linux-bluetooth/msg62198.html
->>
->> The Raspberry Pi uses the Broadcom bcm43438 chip, which according to
->> the registration documents does support connectionless slave broadcast
->>
->> I don't see any errors, but nothing seems to happen, so have been
->> taking a close look at the code, especially the start_glasses method.
->>
->> In there I see the event masks:
->> https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/tools/3dsp.c#n316
->>
->> uint8_t evtmask1[] = { 0x1c, 0xe0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
->> uint8_t evtmask2[] = { 0x00, 0xc0, 0x74, 0x00, 0x00, 0x00, 0x00, 0x00 };
->
-> run btmon -w trace.log and post the binary trace.log file. Also look at Bluetooth 4.1 or later core spec.
->
-> Regards
->
-> Marcel
->
+SXQgaXMgd29ya2luZyBvbiBteSBzeXN0ZW0gd2l0aCBhIHNtYWxsIHBhdGNoIG9uIGJsdWV6IDUu
+NDUuDQpJIGdvdCBpdCB3b3JraW5nIHdpdGhvdXQgcGF0Y2ggdXAgdG8gYmx1ZXogNS40MSAuDQoN
+Cg0KDQoNCi0tLS0tTWVzc2FnZSBkJ29yaWdpbmUtLS0tLQ0KRGXCoDogS3Jhc2kgR2VvcmdpZXYg
+W21haWx0bzprcmFzaS5yb290QGdtYWlsLmNvbV0gDQpFbnZvecOpwqA6IGpldWRpIDE1IGp1aW4g
+MjAxNyAyMjo0NA0Kw4DCoDogQm9yaXMgUGFzc2VyYXQgZGUgbGEgY2hhcGVsbGUgPGJwYXNzZXJh
+dEBoMmFkLm5ldD4NCkNjwqA6IEx1aXogQXVndXN0byB2b24gRGVudHogPGx1aXouZGVudHpAZ21h
+aWwuY29tPjsgQmFycnkgQnlmb3JkIDwzMWJhejY2QGdtYWlsLmNvbT47IEJsdWV6IG1haWxpbmcg
+bGlzdCA8bGludXgtYmx1ZXRvb3RoQHZnZXIua2VybmVsLm9yZz4NCk9iamV0wqA6IFJlOiBIb3cg
+dG8gdXNlIEdhdHRQcm9maWxlMQ0KDQpDYW4gc29tZW9uZSBlbHNlIHRyeSBpZiB0aGUgYXV0byBj
+b25uZWN0IHdvcmtzLCBvciBhbSBJIGRvaW5nIGl0IGluY29ycmVjdGx5ID8NCg0KPiBPbiA0IEp1
+biAyMDE3LCBhdCAxNjoxNSwgS3Jhc2kgR2VvcmdpZXYgPGtyYXNpLnJvb3RAZ21haWwuY29tPiB3
+cm90ZToNCj4gDQo+IGp1c3QgdHJpZWQgd2l0aCB0aGUgbGF0ZXN0IG1hc3RlciBhbmQgSSBzdGls
+bCBjYW7igJl0IGdldCBpdCB0byBhdXRvIA0KPiBjb25uZWN0DQo+IA0KPiANCj4gSGVyZSBpcyB3
+aGF0IGhhcHBlbnMgc28gbGV0IG1lIGtub3cgaWYgSSBhbSBkb2luZyBpbiB0aGUgY29ycmVjdCAN
+Cj4gc2VxdWVuY2UNCj4gDQo+IA0KPiBbYmx1ZXRvb3RoXSMgZGV2aWNlcw0KPiBEZXZpY2UgMzQ6
+MzE6MTE6MDA6Q0Q6N0EgU2Ftc3VuZyBHYWxheHkgUyBJViBEZXZpY2UgMDQ6NTI6Qzc6NTc6ODU6
+ODQgDQo+IEJvc2UgTWluaSBJSSBTb3VuZExpbmsgRGV2aWNlIEZGOkZGOjUwOjAwOjUzOkI2IGlU
+QUcNCj4gDQo+IFtibHVldG9vdGhdIyBwb3dlciBvbg0KPiBDaGFuZ2luZyBwb3dlciBvbiBzdWNj
+ZWVkZWQNCj4gW0NIR10gQ29udHJvbGxlciBCODoyNzpFQjpENTo1NDoxQyBQb3dlcmVkOiB5ZXMg
+W2JsdWV0b290aF0jIGNvbm5lY3QgDQo+IEZGOkZGOjUwOjAwOjUzOkI2IEF0dGVtcHRpbmcgdG8g
+Y29ubmVjdCB0byBGRjpGRjo1MDowMDo1MzpCNiBbQ0hHXSANCj4gRGV2aWNlIEZGOkZGOjUwOjAw
+OjUzOkI2IENvbm5lY3RlZDogeWVzIENvbm5lY3Rpb24gc3VjY2Vzc2Z1bCBbTkVXXSANCj4gUHJp
+bWFyeSBTZXJ2aWNlDQo+IAkvb3JnL2JsdWV6L2hjaTAvZGV2X0ZGX0ZGXzUwXzAwXzUzX0I2L3Nl
+cnZpY2UwMDA2DQo+IAkwMDAwMTgwZi0wMDAwLTEwMDAtODAwMC0wMDgwNWY5YjM0ZmINCj4gCUJh
+dHRlcnkgU2VydmljZQ0KPiBbTkVXXSBDaGFyYWN0ZXJpc3RpYw0KPiAJL29yZy9ibHVlei9oY2kw
+L2Rldl9GRl9GRl81MF8wMF81M19CNi9zZXJ2aWNlMDAwNi9jaGFyMDAwNw0KPiAJMDAwMDJhMTkt
+MDAwMC0xMDAwLTgwMDAtMDA4MDVmOWIzNGZiDQo+IAlCYXR0ZXJ5IExldmVsDQo+IFtORVddIFBy
+aW1hcnkgU2VydmljZQ0KPiAJL29yZy9ibHVlei9oY2kwL2Rldl9GRl9GRl81MF8wMF81M19CNi9z
+ZXJ2aWNlMDAwOQ0KPiAJMDAwMDE4MDItMDAwMC0xMDAwLTgwMDAtMDA4MDVmOWIzNGZiDQo+IAlJ
+bW1lZGlhdGUgQWxlcnQNCj4gW05FV10gQ2hhcmFjdGVyaXN0aWMNCj4gCS9vcmcvYmx1ZXovaGNp
+MC9kZXZfRkZfRkZfNTBfMDBfNTNfQjYvc2VydmljZTAwMDkvY2hhcjAwMGENCj4gCTAwMDAyYTA2
+LTAwMDAtMTAwMC04MDAwLTAwODA1ZjliMzRmYg0KPiAJQWxlcnQgTGV2ZWwNCj4gW05FV10gUHJp
+bWFyeSBTZXJ2aWNlDQo+IAkvb3JnL2JsdWV6L2hjaTAvZGV2X0ZGX0ZGXzUwXzAwXzUzX0I2L3Nl
+cnZpY2UwMDBjDQo+IAkwMDAwZmZlMC0wMDAwLTEwMDAtODAwMC0wMDgwNWY5YjM0ZmINCj4gCVVu
+a25vd24NCj4gW05FV10gQ2hhcmFjdGVyaXN0aWMNCj4gCS9vcmcvYmx1ZXovaGNpMC9kZXZfRkZf
+RkZfNTBfMDBfNTNfQjYvc2VydmljZTAwMGMvY2hhcjAwMGQNCj4gCTAwMDBmZmUxLTAwMDAtMTAw
+MC04MDAwLTAwODA1ZjliMzRmYg0KPiAJVW5rbm93bg0KPiBbQ0hHXSBEZXZpY2UgRkY6RkY6NTA6
+MDA6NTM6QjYgVVVJRHM6IA0KPiAwMDAwMTgwMC0wMDAwLTEwMDAtODAwMC0wMDgwNWY5YjM0ZmIN
+Cj4gW0NIR10gRGV2aWNlIEZGOkZGOjUwOjAwOjUzOkI2IFVVSURzOiANCj4gMDAwMDE4MDItMDAw
+MC0xMDAwLTgwMDAtMDA4MDVmOWIzNGZiDQo+IFtDSEddIERldmljZSBGRjpGRjo1MDowMDo1MzpC
+NiBVVUlEczogDQo+IDAwMDAxODBmLTAwMDAtMTAwMC04MDAwLTAwODA1ZjliMzRmYg0KPiBbQ0hH
+XSBEZXZpY2UgRkY6RkY6NTA6MDA6NTM6QjYgVVVJRHM6IA0KPiAwMDAwZmZlMC0wMDAwLTEwMDAt
+ODAwMC0wMDgwNWY5YjM0ZmINCj4gW0NIR10gRGV2aWNlIEZGOkZGOjUwOjAwOjUzOkI2IFNlcnZp
+Y2VzUmVzb2x2ZWQ6IHllcyBbQ0hHXSBEZXZpY2UgDQo+IEZGOkZGOjUwOjAwOjUzOkI2IEljb24g
+aXMgbmlsIFtDSEddIERldmljZSBGRjpGRjo1MDowMDo1MzpCNiANCj4gQXBwZWFyYW5jZSBpcyBu
+aWwNCj4gDQo+IFtpVEFHICAgICAgICAgICAgXSMgcmVnaXN0ZXItYXBwbGljYXRpb24gMDAwMDE4
+MGYtMDAwMC0xMDAwLTgwMDAtMDA4MDVmOWIzNGZiDQo+IEFwcGxpY2F0aW9uIHJlZ2lzdGVyZWQN
+Cj4gW0NIR10gRGV2aWNlIEZGOkZGOjUwOjAwOjUzOkI2IFNlcnZpY2VzUmVzb2x2ZWQ6IG5vIFtD
+SEddIERldmljZSANCj4gRkY6RkY6NTA6MDA6NTM6QjYgQ29ubmVjdGVkOiBubw0KPiANCj4gDQo+
+IEhlcmUgaSBwb3dlciBjeWNsZWQgdGhlIGlUYWcgYW5kIHdhaXRlZCBmZXcgbWludXRlcyBidXQg
+Ymx1ZXRvb3RoY3RsIGRpZG7igJl0IHJlY29ubmVjdCBzbyBJIGRpZCBpdCBtYW51YWxseS4NCj4g
+DQo+IA0KPiBbYmx1ZXRvb3RoXSMgaW5mbyBGRjpGRjo1MDowMDo1MzpCNg0KPiBEZXZpY2UgRkY6
+RkY6NTA6MDA6NTM6QjYNCj4gCU5hbWU6IGlUQUcNCj4gCUFsaWFzOiBpVEFHDQo+IAlQYWlyZWQ6
+IG5vDQo+IAlUcnVzdGVkOiB5ZXMNCj4gCUJsb2NrZWQ6IG5vDQo+IAlDb25uZWN0ZWQ6IG5vDQo+
+IAlMZWdhY3lQYWlyaW5nOiBubw0KPiAJVVVJRDogR2VuZXJpYyBBY2Nlc3MgUHJvZmlsZSAgICAo
+MDAwMDE4MDAtMDAwMC0xMDAwLTgwMDAtMDA4MDVmOWIzNGZiKQ0KPiAJVVVJRDogSW1tZWRpYXRl
+IEFsZXJ0ICAgICAgICAgICAoMDAwMDE4MDItMDAwMC0xMDAwLTgwMDAtMDA4MDVmOWIzNGZiKQ0K
+PiAJVVVJRDogQmF0dGVyeSBTZXJ2aWNlICAgICAgICAgICAoMDAwMDE4MGYtMDAwMC0xMDAwLTgw
+MDAtMDA4MDVmOWIzNGZiKQ0KPiAJVVVJRDogVW5rbm93biAgICAgICAgICAgICAgICAgICAoMDAw
+MGZmZTAtMDAwMC0xMDAwLTgwMDAtMDA4MDVmOWIzNGZiKQ0KPiBbYmx1ZXRvb3RoXSMgY29ubmVj
+dCBGRjpGRjo1MDowMDo1MzpCNiBBdHRlbXB0aW5nIHRvIGNvbm5lY3QgdG8gDQo+IEZGOkZGOjUw
+OjAwOjUzOkI2IFtDSEddIERldmljZSBGRjpGRjo1MDowMDo1MzpCNiBDb25uZWN0ZWQ6IHllcyAN
+Cj4gQ29ubmVjdGlvbiBzdWNjZXNzZnVsIFtDSEddIERldmljZSBGRjpGRjo1MDowMDo1MzpCNiBT
+ZXJ2aWNlc1Jlc29sdmVkOiANCj4geWVzDQo+IFtpVEFHICAgICAgICAgICAgXSMNCg0K
