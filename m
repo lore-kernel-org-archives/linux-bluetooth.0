@@ -1,55 +1,157 @@
-Return-Path: <tgagneret@witekio.com>
-From: Thomas Gagneret <tgagneret@witekio.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Cc: Thomas Gagneret <tgagneret@witekio.com>
-Subject: [PATCH] Bluetooth : Fix possible NULL pointer dereference
-Date: Sat, 17 Jun 2017 17:45:00 +0200
-Message-Id: <20170617154500.15790-1-tgagneret@witekio.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Subject: [PATCH] Device API : overload device connect dbus method to allow
+ transport arg (manage priority between LE and BR/EDR connect)
+References: <a40f6085-e8b2-972a-9df8-cdcc928deb98@nokia.com>
+To: linux-bluetooth@vger.kernel.org
+From: Eric Khach <eric.khach@nokia.com>
+Message-ID: <79794ec3-94a8-3808-9c6b-fb5d4569c481@nokia.com>
+Date: Fri, 16 Jun 2017 17:21:28 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <a40f6085-e8b2-972a-9df8-cdcc928deb98@nokia.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If we disconnect a device before completing the connection, connection
-will no longer be available in connection list, thus conn will be NULL.
 
-Signed-off-by: Thomas Gagneret <tgagneret@witekio.com>
+Hello,
+
+This patch overloads device connect dbus method so that it allows a new 
+argument : transport. This new argument lets user decide which transport 
+to use between LE and BR/EDR.
+
+The decision tree is the same as before, except for the last criterion 
+where timestamps for LE and BR/EDR are equal. In this case, BR/EDR used 
+to always take precedence but with this patch, it depends on the 
+optional argument.
+
+This argument defaults to BR/EDR and so the method works as before when 
+no argument is sent.
+
+This is useful in case a device has to be able to connect to both BR/EDR 
+and LE devices but has to force LE in some cases.
+
 ---
- net/bluetooth/hci_conn.c | 15 ++++++---------
- 1 file changed, 6 insertions(+), 9 deletions(-)
+  doc/device-api.txt | 10 ++++++----
+  src/device.c       | 31 ++++++++++++++++++++++++-------
+  2 files changed, 30 insertions(+), 11 deletions(-)
 
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index dc59eae54717..901731c16136 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -723,20 +723,17 @@ static void create_le_conn_complete(struct hci_dev *hdev, u8 status, u16 opcode)
- 	hci_dev_lock(hdev);
- 
- 	conn = hci_lookup_le_connect(hdev);
-+	if (!conn)
-+		goto done;
- 
- 	if (!status) {
- 		hci_connect_le_scan_cleanup(conn);
--		goto done;
-+	} else {
-+		BT_ERR("HCI request failed to create LE connection: status 0x%2.2x",
-+			status);
-+		hci_le_conn_failed(conn, status);
- 	}
- 
--	BT_ERR("HCI request failed to create LE connection: status 0x%2.2x",
--	       status);
--
--	if (!conn)
--		goto done;
--
--	hci_le_conn_failed(conn, status);
--
- done:
- 	hci_dev_unlock(hdev);
- }
+diff --git a/doc/device-api.txt b/doc/device-api.txt
+index 13b2881..375e998 100644
+--- a/doc/device-api.txt
++++ b/doc/device-api.txt
+@@ -9,7 +9,7 @@ Service		org.bluez
+  Interface	org.bluez.Device1
+  Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX
+
+-Methods		void Connect()
++Methods		void Connect(string transport (optional))
+
+  			This is a generic method to connect any profiles
+  			the remote device supports that can be connected
+@@ -31,9 +31,11 @@ Methods		void Connect()
+  				bearers are bonded or both are skip and check
+  				latest seen bearer.
+
+-				3. Connect last seen bearer, in case the
+-				timestamps are the same BR/EDR takes
+-				precedence.
++				3. Connect last seen bearer. In case the
++				timestamps are the same, transport type set in
++				optional argument (either "bredr" or "le") will
++				take precedence. In case argument is not set,
++				transport defaults to BR/EDR.
+
+  			Possible errors: org.bluez.Error.NotReady
+  					 org.bluez.Error.Failed
+diff --git a/src/device.c b/src/device.c
+index 43795fa..4eafda5 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -1744,7 +1744,7 @@ resolve_services:
+  #define NVAL_TIME ((time_t) -1)
+  #define SEEN_TRESHHOLD 300
+
+-static uint8_t select_conn_bearer(struct btd_device *dev)
++static uint8_t select_conn_bearer(struct btd_device *dev, uint8_t 
+transport_priority)
+  {
+  	time_t bredr_last = NVAL_TIME, le_last = NVAL_TIME;
+  	time_t current = time(NULL);
+@@ -1781,11 +1781,14 @@ static uint8_t select_conn_bearer(struct 
+btd_device *dev)
+  		return dev->bdaddr_type;
+
+  	/*
+-	 * Prefer BR/EDR if time is the same since it might be from an
+-	 * advertisement with BR/EDR flag set.
++	 * If time is the same since it might be from an
++	 * advertisement with BR/EDR flag set, use priority set
++	 * by user (defaults to BR/EDR in case it is not set by user).
+  	 */
+-	if (bredr_last <= le_last)
++	if (bredr_last < le_last)
+  		return BDADDR_BREDR;
++	else if(bredr_last == le_last)
++		return transport_priority;
+
+  	return dev->bdaddr_type;
+  }
+@@ -1794,7 +1797,19 @@ static DBusMessage *dev_connect(DBusConnection 
+*conn, DBusMessage *msg,
+  							void *user_data)
+  {
+  	struct btd_device *dev = user_data;
+-	uint8_t bdaddr_type;
++	uint8_t bdaddr_type, transport_priority = BDADDR_BREDR;
++
++	if (dbus_message_has_signature(msg, "s")){
++		const char *transport;
++		if (dbus_message_get_args(msg, NULL, DBUS_TYPE_STRING, &transport,
++							DBUS_TYPE_INVALID) != NULL){
++
++			if (strcmp(transport, "le") == 0)
++				transport_priority = dev->bdaddr_type;
++			else if (strcmp(transport, "bredr") != 0)
++				return btd_error_invalid_args(msg);
++		}
++	}
+
+  	if (dev->bredr_state.connected) {
+  		/*
+@@ -1810,7 +1825,7 @@ static DBusMessage *dev_connect(DBusConnection 
+*conn, DBusMessage *msg,
+  	} else if (dev->le_state.connected && dev->bredr)
+  		bdaddr_type = BDADDR_BREDR;
+  	else
+-		bdaddr_type = select_conn_bearer(dev);
++		bdaddr_type = select_conn_bearer(dev, transport_priority);
+
+  	if (bdaddr_type != BDADDR_BREDR) {
+  		int err;
+@@ -2397,7 +2412,7 @@ static DBusMessage *pair_device(DBusConnection 
+*conn, DBusMessage *msg,
+  	else if (device->le_state.bonded)
+  		bdaddr_type = BDADDR_BREDR;
+  	else
+-		bdaddr_type = select_conn_bearer(device);
++		bdaddr_type = select_conn_bearer(device, BDADDR_BREDR);
+
+  	state = get_state(device, bdaddr_type);
+
+@@ -2525,6 +2540,8 @@ static DBusMessage *cancel_pairing(DBusConnection 
+*conn, DBusMessage *msg,
+
+  static const GDBusMethodTable device_methods[] = {
+  	{ GDBUS_ASYNC_METHOD("Disconnect", NULL, NULL, dev_disconnect) },
++	{ GDBUS_ASYNC_METHOD("Connect", GDBUS_ARGS({ "transport", "s" }),
++						NULL, dev_connect) },
+  	{ GDBUS_ASYNC_METHOD("Connect", NULL, NULL, dev_connect) },
+  	{ GDBUS_ASYNC_METHOD("ConnectProfile", GDBUS_ARGS({ "UUID", "s" }),
+  						NULL, connect_profile) },
 -- 
-2.13.1
+2.7.4
+
+
+Eric KHACH
+eric.khach@nokia.com
+khacheric@gmail.com
