@@ -1,117 +1,55 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <tgagneret@witekio.com>
+From: Thomas Gagneret <tgagneret@witekio.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Cc: Thomas Gagneret <tgagneret@witekio.com>
+Subject: [PATCH] Bluetooth : Fix possible NULL pointer dereference
+Date: Sat, 17 Jun 2017 17:45:00 +0200
+Message-Id: <20170617154500.15790-1-tgagneret@witekio.com>
 MIME-Version: 1.0
-In-Reply-To: <CAHgsZ+jB9E-5Cmyu5rimPT=k_n=ZyCUyEmjaxMFTxUDy69AeBA@mail.gmail.com>
-References: <20170609130258.23401-1-luiz.dentz@gmail.com> <87h8zjg4v3.fsf@intel.com>
- <CAHgsZ+jB9E-5Cmyu5rimPT=k_n=ZyCUyEmjaxMFTxUDy69AeBA@mail.gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Sat, 17 Jun 2017 22:40:53 +0300
-Message-ID: <CABBYNZK_DQxYFowC2vX_DtnM9NCd0Yn+CzOV2mzLoCMRiMAbJA@mail.gmail.com>
-Subject: Re: [PATCH v3] core/gatt: Add GATT.Cache config option
-To: Miao-chen Chou <mcchou@chromium.org>
-Cc: Vinicius Costa Gomes <vinicius.gomes@intel.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+If we disconnect a device before completing the connection, connection
+will no longer be available in connection list, thus conn will be NULL.
 
-On Thu, Jun 15, 2017 at 5:31 AM, Miao-chen Chou <mcchou@chromium.org> wrote:
-> Hi Luiz,
->
-> Thanks for the patch. It'd be better if a bit more description is
-> added to main.conf about the difference between "always" and "yes"
-> options in terms of unpair/paired devices. The fix looks good to me.
+Signed-off-by: Thomas Gagneret <tgagneret@witekio.com>
+---
+ net/bluetooth/hci_conn.c | 15 ++++++---------
+ 1 file changed, 6 insertions(+), 9 deletions(-)
 
-Ive added some description for the options.
-
-> Thanks,
-> Miao
->
-> On Tue, Jun 13, 2017 at 10:44 AM, Vinicius Costa Gomes
-> <vinicius.gomes@intel.com> wrote:
->> Hi Luiz,
->>
->> Luiz Augusto von Dentz <luiz.dentz@gmail.com> writes:
->>> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->>>
->>> This adds GATT.Cache config option to main.conf which can be used
->>> to adjust the cache expected behavior of attributes found over GATT.
->>> ---
->>>  src/device.c  | 28 ++++++++++++++++++++++++++++
->>>  src/hcid.h    |  7 +++++++
->>>  src/main.c    | 26 +++++++++++++++++++++++++-
->>>  src/main.conf |  6 ++++++
->>>  4 files changed, 66 insertions(+), 1 deletion(-)
->>>
->>
->> [...]
->>
->>>
->>> +static void parse_gatt_cache(const char *cache)
->>> +{
->>> +     if (!strcmp(cache, "always")) {
->>> +             main_opts.gatt_cache = BT_GATT_CACHE_ALWAYS;
->>> +     } else if (!strcmp(cache, "yes")) {
->>> +             main_opts.gatt_cache = BT_GATT_CACHE_YES;
->>> +     } else if (!strcmp(cache, "no")) {
->>> +             main_opts.gatt_cache = BT_GATT_CACHE_NO;
->>> +     } else {
->>> +             DBG("Invalid value for KeepCache=%s", cache);
->>> +     }
->>
->> [optional] I wonder if making this return the enum, and return the
->> default if 'cache' is NULL, would make the code clearer.
-
-Done.
-
->>> +}
->>> +
->>>  static void check_config(GKeyFile *config)
->>>  {
->>> -     const char *valid_groups[] = { "General", "Policy", NULL };
->>> +     const char *valid_groups[] = { "General", "Policy", "GATT", NULL };
->>>       char **keys;
->>>       int i;
->>>
->>> @@ -357,6 +370,17 @@ static void parse_config(GKeyFile *config)
->>>               g_clear_error(&err);
->>>       else
->>>               main_opts.fast_conn = boolean;
->>> +
->>> +     str = g_key_file_get_string(config, "GATT", "Cache", &err);
->>> +     if (err) {
->>> +             g_clear_error(&err);
->>> +             main_opts.gatt_cache = BT_GATT_CACHE_ALWAYS;
->>> +             return;
->>> +     }
->>> +
->>> +     parse_gatt_cache(str);
->>> +
->>> +     g_free(str);
->>>  }
->>>
->>>  static void init_defaults(void)
->>> diff --git a/src/main.conf b/src/main.conf
->>> index a649276..7807a8f 100644
->>> --- a/src/main.conf
->>> +++ b/src/main.conf
->>> @@ -71,6 +71,12 @@
->>>  # Defaults to "off"
->>>  # Privacy = off
->>>
->>> +[GATT]
->>> +# GATT attribute cache.
->>> +# Possible values: always, yes, no
->>> +# Default: always
->>> +#Cache = always
->>> +
->>>  [Policy]
->>>  #
->>>  # The ReconnectUUIDs defines the set of remote services that should try
->>> --
-
-Applied after a few changes mentioned above.
-
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index dc59eae54717..901731c16136 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -723,20 +723,17 @@ static void create_le_conn_complete(struct hci_dev *hdev, u8 status, u16 opcode)
+ 	hci_dev_lock(hdev);
+ 
+ 	conn = hci_lookup_le_connect(hdev);
++	if (!conn)
++		goto done;
+ 
+ 	if (!status) {
+ 		hci_connect_le_scan_cleanup(conn);
+-		goto done;
++	} else {
++		BT_ERR("HCI request failed to create LE connection: status 0x%2.2x",
++			status);
++		hci_le_conn_failed(conn, status);
+ 	}
+ 
+-	BT_ERR("HCI request failed to create LE connection: status 0x%2.2x",
+-	       status);
+-
+-	if (!conn)
+-		goto done;
+-
+-	hci_le_conn_failed(conn, status);
+-
+ done:
+ 	hci_dev_unlock(hdev);
+ }
 -- 
-Luiz Augusto von Dentz
+2.13.1
