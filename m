@@ -1,187 +1,200 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Subject: Re: [PATCH] Device API : overload device connect dbus method to allow
- transport arg (manage priority between LE and BR/EDR connect)
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-References: <a40f6085-e8b2-972a-9df8-cdcc928deb98@nokia.com>
- <79794ec3-94a8-3808-9c6b-fb5d4569c481@nokia.com>
- <CABBYNZJZQSem+6JbER+zRtwaAynK1UPvknr8YG8hbEK1Ayp8oA@mail.gmail.com>
-From: Eric Khach <eric.khach@nokia.com>
-Message-ID: <ed1a2090-d30c-d2d8-2b15-3e9aa12dfcf9@nokia.com>
-Date: Mon, 19 Jun 2017 09:47:42 +0200
-MIME-Version: 1.0
-In-Reply-To: <CABBYNZJZQSem+6JbER+zRtwaAynK1UPvknr8YG8hbEK1Ayp8oA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
+Subject: Re: How to use GattProfile1
+From: Krasi Georgiev <krasi.root@gmail.com>
+In-Reply-To: <1e64e9b3168f4eab9ae9fbde7d0ff4db@sjbsvr074.groupe.local>
+Date: Sun, 18 Jun 2017 14:23:26 +0300
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Barry Byford <31baz66@gmail.com>,
+        Bluez mailing list <linux-bluetooth@vger.kernel.org>
+Message-Id: <53A75B02-DCB0-406C-A901-95B240DAEE23@gmail.com>
+References: <4CF902B9-8221-45E7-9868-52BF18A5EC5D@gmail.com>
+ <CAAu3APYsHqAK=Kk-fzQmhhBOfnayTDB_N_Q2yCuOhr+akvxfLg@mail.gmail.com>
+ <C1394BB3-3C11-410C-916F-80A7863C0A2B@gmail.com> <969738CC-B335-4E2F-BF3C-441110279871@gmail.com>
+ <CAAu3APard0ZM-+++qm8938+iWkUUfNkjvq1M9cLqngtZYJAzRg@mail.gmail.com>
+ <F1876BDF-4DC0-4CB0-A20F-2E64E24A3B92@gmail.com> <CABBYNZ+R7dV5i+BQowigf5eddB4yxSki+xLeLFYBrN4Sfe8mJA@mail.gmail.com>
+ <4AE62BC6-BD11-44C7-9A0E-BC3159ED80DF@gmail.com> <4C907B25-D8E4-462C-89FA-AB312A27CBE9@gmail.com>
+ <CABBYNZK04wxSH78f0maAMHtR-2ra8Kh_nQKkrAY1R8G19ba8TA@mail.gmail.com>
+ <5CDE162E-4828-4485-BF95-50C67DB93B77@gmail.com> <CABBYNZKkodmXy+4eRXh_4RA9yci25cEtaNMoywEUk9XZ+GL4LQ@mail.gmail.com>
+ <758C2FAB-DBF1-4B88-866D-F036B23B3C95@gmail.com> <CABBYNZLVjXXmbfTb2Uo9KvE2D83c1PU7f2p=t6JawfeyUfN2+w@mail.gmail.com>
+ <3290BB41-234F-4D7B-BF37-0CC2966CB416@gmail.com> <CABBYNZKoACnV5rOQ1dJH56Uien-CdMy7CUfgvZEGdJvuLXKBgQ@mail.gmail.com>
+ <5D01EC8C-E51B-4F89-8F9B-5D7946674116@gmail.com> <CABBYNZ+P8fzQP_v5dtWTHhXthE7JhsJeLBts4+_eweVDBMZpSQ@mail.gmail.com>
+ <329D353B-8799-434A-9049-AE8904429A78@gmail.com> <CABBYNZJPrNfN-ns60zts863J=0Ec-np5AQb9aguS67fF0ZNbkA@mail.gmail.com>
+ <39cb9ea22f14454d83b6e62e59bdc955@sjbsvr074.groupe.local> <8D8EB08D-CA68-400C-A987-8ADA4B45E2C2@gmail.com>
+ <D2B39265-DEFC-42F9-B022-F0FB1CD853F9@gmail.com> <e94749f41d154deaae22adedd952591b@sjbsvr074.groupe.local>
+ <D41DBE81-331C-430D-9D88-A097D46971F6@gmail.com> <1e64e9b3168f4eab9ae9fbde7d0ff4db@sjbsvr074.groupe.local>
+To: Boris Passerat de la chapelle <bpasserat@h2ad.net>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Thanks
+yes it works even the latest HEAD with bluetoothctl
+=
+https://git.kernel.org/pub/scm/bluetooth/bluez.git/commit/?id=3D2179f571e1=
+94c2c4635f3501d448a8a934c2c998
 
-On 17/06/2017 21:49, Luiz Augusto von Dentz wrote:
-> Hi Eric,
-> 
-> On Fri, Jun 16, 2017 at 6:21 PM, Eric Khach <eric.khach@nokia.com> wrote:
->>
->> Hello,
->>
->> This patch overloads device connect dbus method so that it allows a new
->> argument : transport. This new argument lets user decide which transport to
->> use between LE and BR/EDR.
->>
->> The decision tree is the same as before, except for the last criterion where
->> timestamps for LE and BR/EDR are equal. In this case, BR/EDR used to always
->> take precedence but with this patch, it depends on the optional argument.
->>
->> This argument defaults to BR/EDR and so the method works as before when no
->> argument is sent.
->>
->> This is useful in case a device has to be able to connect to both BR/EDR and
->> LE devices but has to force LE in some cases.
-> 
-> D-Bus does not support method overloading, we would probably break
-> client with that. That said we do have plans to introduce bearer
-> specific interfaces, which those you would be able to specify which
-> bearer to connect.
 
-Alright, thanks for the answer. When do you think the new interfaces 
-will be available ?
+I was testing with=20
+=
+https://git.kernel.org/pub/scm/bluetooth/bluez.git/commit/?id=3Df585e7ac8d=
+a3ba20fc465e3c255d2a88b7390977
+client: Fix using RegisterProfile
+and this one didn=E2=80=99t work, so something after that fixed the =
+problem.
 
->> ---
->>   doc/device-api.txt | 10 ++++++----
->>   src/device.c       | 31 ++++++++++++++++++++++++-------
->>   2 files changed, 30 insertions(+), 11 deletions(-)
->>
->> diff --git a/doc/device-api.txt b/doc/device-api.txt
->> index 13b2881..375e998 100644
->> --- a/doc/device-api.txt
->> +++ b/doc/device-api.txt
->> @@ -9,7 +9,7 @@ Service         org.bluez
->>   Interface      org.bluez.Device1
->>   Object path    [variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX
->>
->> -Methods                void Connect()
->> +Methods                void Connect(string transport (optional))
->>
->>                          This is a generic method to connect any profiles
->>                          the remote device supports that can be connected
->> @@ -31,9 +31,11 @@ Methods              void Connect()
->>                                  bearers are bonded or both are skip and
->> check
->>                                  latest seen bearer.
->>
->> -                               3. Connect last seen bearer, in case the
->> -                               timestamps are the same BR/EDR takes
->> -                               precedence.
->> +                               3. Connect last seen bearer. In case the
->> +                               timestamps are the same, transport type set
->> in
->> +                               optional argument (either "bredr" or "le")
->> will
->> +                               take precedence. In case argument is not
->> set,
->> +                               transport defaults to BR/EDR.
->>
->>                          Possible errors: org.bluez.Error.NotReady
->>                                           org.bluez.Error.Failed
->> diff --git a/src/device.c b/src/device.c
->> index 43795fa..4eafda5 100644
->> --- a/src/device.c
->> +++ b/src/device.c
->> @@ -1744,7 +1744,7 @@ resolve_services:
->>   #define NVAL_TIME ((time_t) -1)
->>   #define SEEN_TRESHHOLD 300
->>
->> -static uint8_t select_conn_bearer(struct btd_device *dev)
->> +static uint8_t select_conn_bearer(struct btd_device *dev, uint8_t
->> transport_priority)
->>   {
->>          time_t bredr_last = NVAL_TIME, le_last = NVAL_TIME;
->>          time_t current = time(NULL);
->> @@ -1781,11 +1781,14 @@ static uint8_t select_conn_bearer(struct btd_device
->> *dev)
->>                  return dev->bdaddr_type;
->>
->>          /*
->> -        * Prefer BR/EDR if time is the same since it might be from an
->> -        * advertisement with BR/EDR flag set.
->> +        * If time is the same since it might be from an
->> +        * advertisement with BR/EDR flag set, use priority set
->> +        * by user (defaults to BR/EDR in case it is not set by user).
->>           */
->> -       if (bredr_last <= le_last)
->> +       if (bredr_last < le_last)
->>                  return BDADDR_BREDR;
->> +       else if(bredr_last == le_last)
->> +               return transport_priority;
->>
->>          return dev->bdaddr_type;
->>   }
->> @@ -1794,7 +1797,19 @@ static DBusMessage *dev_connect(DBusConnection *conn,
->> DBusMessage *msg,
->>                                                          void *user_data)
->>   {
->>          struct btd_device *dev = user_data;
->> -       uint8_t bdaddr_type;
->> +       uint8_t bdaddr_type, transport_priority = BDADDR_BREDR;
->> +
->> +       if (dbus_message_has_signature(msg, "s")){
->> +               const char *transport;
->> +               if (dbus_message_get_args(msg, NULL, DBUS_TYPE_STRING,
->> &transport,
->> +                                                       DBUS_TYPE_INVALID)
->> != NULL){
->> +
->> +                       if (strcmp(transport, "le") == 0)
->> +                               transport_priority = dev->bdaddr_type;
->> +                       else if (strcmp(transport, "bredr") != 0)
->> +                               return btd_error_invalid_args(msg);
->> +               }
->> +       }
->>
->>          if (dev->bredr_state.connected) {
->>                  /*
->> @@ -1810,7 +1825,7 @@ static DBusMessage *dev_connect(DBusConnection *conn,
->> DBusMessage *msg,
->>          } else if (dev->le_state.connected && dev->bredr)
->>                  bdaddr_type = BDADDR_BREDR;
->>          else
->> -               bdaddr_type = select_conn_bearer(dev);
->> +               bdaddr_type = select_conn_bearer(dev, transport_priority);
->>
->>          if (bdaddr_type != BDADDR_BREDR) {
->>                  int err;
->> @@ -2397,7 +2412,7 @@ static DBusMessage *pair_device(DBusConnection *conn,
->> DBusMessage *msg,
->>          else if (device->le_state.bonded)
->>                  bdaddr_type = BDADDR_BREDR;
->>          else
->> -               bdaddr_type = select_conn_bearer(device);
->> +               bdaddr_type = select_conn_bearer(device, BDADDR_BREDR);
->>
->>          state = get_state(device, bdaddr_type);
->>
->> @@ -2525,6 +2540,8 @@ static DBusMessage *cancel_pairing(DBusConnection
->> *conn, DBusMessage *msg,
->>
->>   static const GDBusMethodTable device_methods[] = {
->>          { GDBUS_ASYNC_METHOD("Disconnect", NULL, NULL, dev_disconnect) },
->> +       { GDBUS_ASYNC_METHOD("Connect", GDBUS_ARGS({ "transport", "s" }),
->> +                                               NULL, dev_connect) },
->>          { GDBUS_ASYNC_METHOD("Connect", NULL, NULL, dev_connect) },
->>          { GDBUS_ASYNC_METHOD("ConnectProfile", GDBUS_ARGS({ "UUID", "s" }),
->>                                                  NULL, connect_profile) },
->> --
->> 2.7.4
->>
->>
->> Eric KHACH
->> eric.khach@nokia.com
->> khacheric@gmail.com
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
->> in
->> the body of a message to majordomo@vger.kernel.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> 
-> 
-> 
+
+> On 16 Jun 2017, at 17:54, Boris Passerat de la chapelle =
+<bpasserat@h2ad.net> wrote:
+>=20
+>> Strange
+>=20
+>> I compiled bluetoothctl after the patch that should fix it.
+>=20
+>> Did you do the steps similar to my bluetoothctl logs?=20
+>=20
+> I did not use bluetoothctl as RegisterApplication was not available =
+yet.
+> In my application I have these  steps :
+>=20
+> 0. - RegisterApplication with UUID
+> 1. - scan device
+> 2. - pair wanted device
+> 3. - once services resolved do some actions=20
+> 4. - device disconnect
+> 5. - device power up and here I have automatic reconnection=20
+>=20
+>> What device did you auto connect to ?
+>=20
+> I connect medical devices as :
+> =
+http://www.andonline.com/medical/products/details.php?catname=3DBlood_Pres=
+sure&product_num=3DUA-651BLE
+> =
+http://www.andonline.com/medical/products/details.php?catname=3DScales&pro=
+duct_num=3DUC-350BLE
+> and 5 or 6 other devices
+>=20
+> =46rom 5.41 I have to revert this commit on bluez :  =
+89ca735e57417ec296a41d8c31d0d0d5c66ce2a9
+>=20
+>=20
+>=20
+>> On 16 Jun 2017, at 09:16, Boris Passerat de la chapelle =
+<bpasserat@h2ad.net> wrote:
+>>=20
+>> It is working on my system with a small patch on bluez 5.45.
+>> I got it working without patch up to bluez 5.41 .
+>>=20
+>>=20
+>>=20
+>>=20
+>> -----Message d'origine-----
+>> De : Krasi Georgiev [mailto:krasi.root@gmail.com] Envoy=C3=A9 : jeudi =
+15=20
+>> juin 2017 22:44 =C3=80 : Boris Passerat de la chapelle =
+<bpasserat@h2ad.net>=20
+>> Cc : Luiz Augusto von Dentz <luiz.dentz@gmail.com>; Barry Byford=20
+>> <31baz66@gmail.com>; Bluez mailing list=20
+>> <linux-bluetooth@vger.kernel.org> Objet : Re: How to use GattProfile1
+>>=20
+>> Can someone else try if the auto connect works, or am I doing it =
+incorrectly ?
+>>=20
+>>> On 4 Jun 2017, at 16:15, Krasi Georgiev <krasi.root@gmail.com> =
+wrote:
+>>>=20
+>>> just tried with the latest master and I still can=E2=80=99t get it =
+to auto=20
+>>> connect
+>>>=20
+>>>=20
+>>> Here is what happens so let me know if I am doing in the correct=20
+>>> sequence
+>>>=20
+>>>=20
+>>> [bluetooth]# devices
+>>> Device 34:31:11:00:CD:7A Samsung Galaxy S IV Device =
+04:52:C7:57:85:84=20
+>>> Bose Mini II SoundLink Device FF:FF:50:00:53:B6 iTAG
+>>>=20
+>>> [bluetooth]# power on
+>>> Changing power on succeeded
+>>> [CHG] Controller B8:27:EB:D5:54:1C Powered: yes [bluetooth]# connect
+>>> FF:FF:50:00:53:B6 Attempting to connect to FF:FF:50:00:53:B6 [CHG]=20=
+
+>>> Device FF:FF:50:00:53:B6 Connected: yes Connection successful [NEW]=20=
+
+>>> Primary Service
+>>> 	/org/bluez/hci0/dev_FF_FF_50_00_53_B6/service0006
+>>> 	0000180f-0000-1000-8000-00805f9b34fb
+>>> 	Battery Service
+>>> [NEW] Characteristic
+>>> 	/org/bluez/hci0/dev_FF_FF_50_00_53_B6/service0006/char0007
+>>> 	00002a19-0000-1000-8000-00805f9b34fb
+>>> 	Battery Level
+>>> [NEW] Primary Service
+>>> 	/org/bluez/hci0/dev_FF_FF_50_00_53_B6/service0009
+>>> 	00001802-0000-1000-8000-00805f9b34fb
+>>> 	Immediate Alert
+>>> [NEW] Characteristic
+>>> 	/org/bluez/hci0/dev_FF_FF_50_00_53_B6/service0009/char000a
+>>> 	00002a06-0000-1000-8000-00805f9b34fb
+>>> 	Alert Level
+>>> [NEW] Primary Service
+>>> 	/org/bluez/hci0/dev_FF_FF_50_00_53_B6/service000c
+>>> 	0000ffe0-0000-1000-8000-00805f9b34fb
+>>> 	Unknown
+>>> [NEW] Characteristic
+>>> 	/org/bluez/hci0/dev_FF_FF_50_00_53_B6/service000c/char000d
+>>> 	0000ffe1-0000-1000-8000-00805f9b34fb
+>>> 	Unknown
+>>> [CHG] Device FF:FF:50:00:53:B6 UUIDs:=20
+>>> 00001800-0000-1000-8000-00805f9b34fb
+>>> [CHG] Device FF:FF:50:00:53:B6 UUIDs:=20
+>>> 00001802-0000-1000-8000-00805f9b34fb
+>>> [CHG] Device FF:FF:50:00:53:B6 UUIDs:=20
+>>> 0000180f-0000-1000-8000-00805f9b34fb
+>>> [CHG] Device FF:FF:50:00:53:B6 UUIDs:=20
+>>> 0000ffe0-0000-1000-8000-00805f9b34fb
+>>> [CHG] Device FF:FF:50:00:53:B6 ServicesResolved: yes [CHG] Device
+>>> FF:FF:50:00:53:B6 Icon is nil [CHG] Device FF:FF:50:00:53:B6=20
+>>> Appearance is nil
+>>>=20
+>>> [iTAG            ]# register-application =
+0000180f-0000-1000-8000-00805f9b34fb
+>>> Application registered
+>>> [CHG] Device FF:FF:50:00:53:B6 ServicesResolved: no [CHG] Device
+>>> FF:FF:50:00:53:B6 Connected: no
+>>>=20
+>>>=20
+>>> Here i power cycled the iTag and waited few minutes but bluetoothctl =
+didn=E2=80=99t reconnect so I did it manually.
+>>>=20
+>>>=20
+>>> [bluetooth]# info FF:FF:50:00:53:B6
+>>> Device FF:FF:50:00:53:B6
+>>> 	Name: iTAG
+>>> 	Alias: iTAG
+>>> 	Paired: no
+>>> 	Trusted: yes
+>>> 	Blocked: no
+>>> 	Connected: no
+>>> 	LegacyPairing: no
+>>> 	UUID: Generic Access Profile    =
+(00001800-0000-1000-8000-00805f9b34fb)
+>>> 	UUID: Immediate Alert           =
+(00001802-0000-1000-8000-00805f9b34fb)
+>>> 	UUID: Battery Service           =
+(0000180f-0000-1000-8000-00805f9b34fb)
+>>> 	UUID: Unknown                   =
+(0000ffe0-0000-1000-8000-00805f9b34fb)
+>>> [bluetooth]# connect FF:FF:50:00:53:B6 Attempting to connect to
+>>> FF:FF:50:00:53:B6 [CHG] Device FF:FF:50:00:53:B6 Connected: yes=20
+>>> Connection successful [CHG] Device FF:FF:50:00:53:B6 =
+ServicesResolved:
+>>> yes
+>>> [iTAG            ]#
+>>=20
+>=20
+
