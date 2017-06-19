@@ -1,30 +1,39 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: "Koginov  Gleb" <gkoginov@student.ethz.ch>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: BLE propagation delay of 50ms for devices next to each other - is
- this normal?
-Date: Mon, 19 Jun 2017 13:40:49 +0000
-Message-ID: <CE225A6C8248A541A98682EC87ACADD3025B7E0A@MBX111.d.ethz.ch>
-References: <CE225A6C8248A541A98682EC87ACADD3025B7D53@MBX111.d.ethz.ch>
-In-Reply-To: <CE225A6C8248A541A98682EC87ACADD3025B7D53@MBX111.d.ethz.ch>
-Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
+In-Reply-To: <fa395eee-ee8e-4878-7736-d2d281e06689@jp.fujitsu.com>
+References: <fa395eee-ee8e-4878-7736-d2d281e06689@jp.fujitsu.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Mon, 19 Jun 2017 14:55:02 +0300
+Message-ID: <CABBYNZ+iku5yyLj+k0TgA075Jg1Bw7=WMD1GgLmrUqWdvHhOuw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v2 0/3] client: Improve help command
+To: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello,
+Hi Eramoto,
 
-I have a BLE sensor (TI CC2650STK) that I connect to my raspberry pi 3b via Bluetooth low-energy. The device is set up to run at 7.5ms connection interval with notifications. The pi side uses BlueZ stack.
+On Mon, Jun 19, 2017 at 2:22 PM, ERAMOTO Masaya
+<eramoto.masaya@jp.fujitsu.com> wrote:
+> This adds alias-related help messages and makes more readable in whole.
+>
+> Changes since v1:
+>  -rebase patches
+>
+>
+> ERAMOTO Masaya (3):
+>   client: Compare a input string and each command only once
+>   client: Add a description to all commands
+>   client: Output a long message by two lines
+>
+>  client/main.c | 37 +++++++++++++++++++++++++------------
+>  1 file changed, 25 insertions(+), 12 deletions(-)
+>
+> --
+> 2.7.4
 
-When comparing the signal received from this device to a similar sensor, but wired through I2C, I am seeing an identical signal shape but a propagation delay of roughly 50ms. This is considerably more than what I would expect to see for a regular BLE propagation delay (considering the two devices lie right next to each other). The following stackoverflow post contains a plot showing exactly what the two signals look like:
+Applied, thanks.
 
-https://stackoverflow.com/questions/44136728/bluez-is-propagation-delay-of-50ms-normal-for-ble/44164015#44164015
-Unfortunately nobody was able to help with this matter so far.
-
-So far I've re-checked the firmware on the sensor side and everything should be correct - no buffering happens.
-Is there, perhaps, some level of buffering happening on the BlueZ side? Otherwise would anyone be able to suggest the possible source of these issues?
-
-Thank you!
-
-Regards,
-Gleb
+-- 
+Luiz Augusto von Dentz
