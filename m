@@ -1,44 +1,96 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20170613115712.31349-1-grzegorz.kolodziejczyk@codecoup.pl>
-References: <20170613115712.31349-1-grzegorz.kolodziejczyk@codecoup.pl>
+In-Reply-To: <3520047b-7832-35e2-d1fa-fb7f5c0d058d@jp.fujitsu.com>
+References: <3520047b-7832-35e2-d1fa-fb7f5c0d058d@jp.fujitsu.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 19 Jun 2017 11:25:01 +0300
-Message-ID: <CABBYNZKDb0M7YVvDZcteBmhgT5B4gCGkeKjtUS2-5k-O-fZr5g@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] shared/gatt-client: Correct att err variable
-To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@codecoup.pl>
+Date: Mon, 19 Jun 2017 11:17:56 +0300
+Message-ID: <CABBYNZKTLGxtvdJxELo9ut5YGbZ9rVDb+B02bOpiFabnLb-rgg@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 0/3] client: Improve help command
+To: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Grzegorz,
+Hi Eramoto,
 
-On Tue, Jun 13, 2017 at 2:57 PM, Grzegorz Kolodziejczyk
-<grzegorz.kolodziejczyk@codecoup.pl> wrote:
-> According to Core specification version 5.0 (Vol 3, Part F, 3.4.1.1)
-> error code size is one byte.
-> ---
->  src/shared/gatt-client.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+On Thu, Jun 15, 2017 at 2:35 PM, ERAMOTO Masaya
+<eramoto.masaya@jp.fujitsu.com> wrote:
+> This adds alias-related help messages and makes more readable in whole.
+> The help command outputs the following messages before applying these
+> patches:
 >
-> diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
-> index 58ab0b8..fbf90ff 100644
-> --- a/src/shared/gatt-client.c
-> +++ b/src/shared/gatt-client.c
-> @@ -1239,7 +1239,7 @@ static void enable_ccc_callback(uint8_t opcode, const void *pdu,
->                                         uint16_t length, void *user_data)
->  {
->         struct notify_data *notify_data = user_data;
-> -       uint16_t att_ecode;
-> +       uint8_t att_ecode;
+> [bluetooth]# help
+> Available commands:
+>   list                       List available controllers
+>   show [ctrl]                Controller information
+>   select <ctrl>              Select default controller
+>   devices                    List available devices
+>   paired-devices             List paired devices
+>   power <on/off>             Set controller power
+>   pairable <on/off>          Set controller pairable mode
+>   discoverable <on/off>      Set controller discoverable mode
+>   agent <on/off/capability>  Enable/disable agent with given capability
+>   default-agent              Set agent as the default one
+>   advertise <on/off/type>    Enable/disable advertising with given type
+>   set-advertise-uuids [uuid1 uuid2 ...] Set advertise uuids
+>   set-advertise-service [uuid][data=[xx xx ...] Set advertise service data
+>   set-advertise-manufacturer [id][data=[xx xx ...] Set advertise
+> manufacturer data
 >
->         assert(notify_data->chrc->ccc_write_id);
+>
+> As below after applying this patches:
+>
+> [bluetooth]# help
+> Available commands:
+>   list                       List available controllers
+>   show [ctrl]                Controller information
+>   select <ctrl>              Select default controller
+>   devices                    List available devices
+>   paired-devices             List paired devices
+>   system-alias <name>        Set controller alias
+>   reset-alias                Reset controller alias
+>   power <on/off>             Set controller power
+>   pairable <on/off>          Set controller pairable mode
+>   discoverable <on/off>      Set controller discoverable mode
+>   agent <on/off/capability>  Enable/disable agent with given capability
+>   default-agent              Set agent as the default one
+>   advertise <on/off/type>    Enable/disable advertising with given type
+>   set-advertise-uuids [uuid1 uuid2 ...]
+>                              Set advertise uuids
+>   set-advertise-service [uuid][data=[xx xx ...]
+>                              Set advertise service data
+>   set-advertise-manufacturer [id][data=[xx xx ...]
+>                              Set advertise manufacturer data
+>
+
+It seems the patches don't apply upstream:
+
+Applying: client: Compare a input string and each command only once
+error: patch failed: client/main.c:1854
+error: client/main.c: patch does not apply
+
+Could you please rebase them and resend.
+
+
+> ERAMOTO Masaya (3):
+>   client: Compare a input string and each command only once
+>   client: Add a description to all commands
+>   client: Output a long message by two lines
+>
+>  client/main.c | 37 +++++++++++++++++++++++++------------
+>  1 file changed, 25 insertions(+), 12 deletions(-)
 >
 > --
-> 2.9.4
+> 2.7.4
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
+> in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-Applied, thanks.
+
 
 -- 
 Luiz Augusto von Dentz
