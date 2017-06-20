@@ -1,167 +1,122 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Sathish Narasimman <nsathish41@gmail.com>
+From: =?UTF-8?q?Micha=C5=82=20Narajowski?=
+        <michal.narajowski@codecoup.pl>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] obexd/map: msg dummy implemnt MSE message viewing
-Date: Tue, 20 Jun 2017 16:01:42 +0530
-Message-Id: <1497954702-31647-1-git-send-email-nsathish41@gmail.com>
+Cc: =?UTF-8?q?Micha=C5=82=20Narajowski?=
+        <michal.narajowski@codecoup.pl>
+Subject: [PATCH BlueZ v3 6/7] monitor: Add LE RF commands decoding
+Date: Tue, 20 Jun 2017 09:53:30 +0200
+Message-Id: <20170620075331.13897-7-michal.narajowski@codecoup.pl>
+In-Reply-To: <20170620075331.13897-1-michal.narajowski@codecoup.pl>
+References: <20170620075331.13897-1-michal.narajowski@codecoup.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Sathish Narasimman <sathish.narasimman@intel.com>
+This patch adds decoding for following commands:
 
-Messages viewing functionality is implemented in the patch. Which
-reads the message from MSE using message handle provided by MCE.
+LE Read Transmit Power
+LE Read RF Path Compensation
+LE Write RF Path Compensation
 
-> ACL Data RX: Handle 256 flags 0x02 dlen 93
-      Channel: 64 len 89 [PSM 3 mode 0] {chan 0}
-      RFCOMM: Unnumbered Info with Header Check (UIH) (0xef)
-         Address: 0x83 cr 1 dlci 0x20
-         Control: 0xef poll/final 0
-         Length: 85
-         FCS: 0xd8
-        82 00 55 cb 00 00 00 01 01 00 25 00 30 00 34 00  ..U.......%.0.4.
-        30 00 30 00 30 00 30 00 30 00 30 00 30 00 30 00  0.0.0.0.0.0.0.0.
-        30 00 30 00 30 00 30 00 30 00 37 00 00 42 00 16  0.0.0.0.0.7..B..
-        78 2d 62 74 2f 6d 65 73 73 61 67 65 53 74 61 74  x-bt/messageStat
-        75 73 00 c3 00 00 00 01 4c 00 09 17 01 00 18 01  us......L.......
-        01 49 00 04 30 d8                                .I..0.
-< ACL Data TX: Handle 256 flags 0x00 dlen 11
-      Channel: 65 len 7 [PSM 3 mode 0] {chan 0}
-      RFCOMM: Unnumbered Info with Header Check (UIH) (0xef)
-         Address: 0x81 cr 0 dlci 0x20
-         Control: 0xef poll/final 0
-         Length: 3
-         FCS: 0x02
-        a0 00 03 02                                      ....
-> ACL Data RX: Handle 256 flags 0x02 dlen 82
-      Channel: 64 len 78 [PSM 3 mode 0] {chan 0}
-      RFCOMM: Unnumbered Info with Header Check (UIH) (0xef)
-         Address: 0x83 cr 1 dlci 0x20
-         Control: 0xff poll/final 1
-         Length: 73
-         FCS: 0xc4
-         Credits: 1
-        83 00 49 cb 00 00 00 01 01 00 25 00 30 00 34 00  ..I.......%.0.4.
-        30 00 30 00 30 00 30 00 30 00 30 00 30 00 30 00  0.0.0.0.0.0.0.0.
-        30 00 30 00 30 00 30 00 30 00 37 00 00 42 00 10  0.0.0.0.0.7..B..
-        78 2d 62 74 2f 6d 65 73 73 61 67 65 00 4c 00 0c  x-bt/message.L..
-        0a 01 01 14 01 01 15 01 00 c4                    ..........
-< ACL Data TX: Handle 256 flags 0x00 dlen 305
-      Channel: 65 len 301 [PSM 3 mode 0] {chan 0}
-      RFCOMM: Unnumbered Info with Header Check (UIH) (0xef)
-         Address: 0x81 cr 0 dlci 0x20
-         Control: 0xef poll/final 0
-         Length: 10241
-         FCS: 0x02
-        90 01 28 48 01 25 42 45 47 49 4e 3a 42 4d 53 47  ..(H.%BEGIN:BMSG
-        0d 0a 56 45 52 53 49 4f 4e 3a 31 2e 30 0d 0a 53  ..VERSION:1.0..S
-        54 41 54 55 53 3a 52 45 41 44 0d 0a 54 59 50 45  TATUS:READ..TYPE
-        3a 53 4d 53 5f 47 53 4d 0d 0a 46 4f 4c 44 45 52  :SMS_GSM..FOLDER
-        3a 74 65 6c 65 63 6f 6d 2f 6d 73 67 2f 49 4e 42  :telecom/msg/INB
-        4f 58 0d 0a 42 45 47 49 4e 3a 56 43 41 52 44 0d  OX..BEGIN:VCARD.
-        0a 56 45 52 53 49 4f 4e 3a 33 2e 30 0d 0a 46 4e  .VERSION:3.0..FN
-        3a 0d 0a 4e 3a 0d 0a 54 45 4c 3a 31 32 31 0d 0a  :..N:..TEL:121..
-        45 4e 44 3a 56 43 41 52 44 0d 0a 42 45 47 49 4e  END:VCARD..BEGIN
-        3a 42 45 4e 56 0d 0a 42 45 47 49 4e 3a 42 42 4f  :BENV..BEGIN:BBO
-        44 59 0d 0a 43 48 41 52 53 45 54 3a 55 54 46 2d  DY..CHARSET:UTF-
-        38 0d 0a 4c 45 4e 47 54 48 3a 37 35 0d 0a 42 45  8..LENGTH:75..BE
-        47 49 4e 3a 4d 53 47 0d 0a 54 68 69 73 20 69 73  GIN:MSG..This is
-        20 6e 6f 74 20 61 20 76 61 6c 69 64 20 6b 65 79   not a valid key
-        77 6f 72 64 2c 20 70 6c 65 61 73 65 20 73 65 6e  word, please sen
-        64 20 48 45 4c 50 20 74 6f 20 31 32 31 2e 0d 0a  d HELP to 121...
-        45 4e 44 3a 4d 53 47 0d 0a 45 4e 44 3a 42 42 4f  END:MSG..END:BBO
-        44 59 0d 0a 45 4e 44 3a 42 45 4e 56 0d 0a 45 4e  DY..END:BENV..EN
-        44 3a 42 4d 53 47 0d 0a 02                       D:BMSG...
+< HCI Command: LE Write RF Path Compensation (0x08|0x004d) plen 4
+        RF Tx Path Compensation Value: 0x0201
+        RF Rx Path Compensation Value: 0x0403
 ---
- obexd/plugins/messages-dummy.c | 54 ++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 52 insertions(+), 2 deletions(-)
+ monitor/bt.h     | 20 ++++++++++++++++++++
+ monitor/packet.c | 42 +++++++++++++++++++++++++++++++++++++++---
+ 2 files changed, 59 insertions(+), 3 deletions(-)
 
-diff --git a/obexd/plugins/messages-dummy.c b/obexd/plugins/messages-dummy.c
-index 3eca9ef..9d9bcac 100644
---- a/obexd/plugins/messages-dummy.c
-+++ b/obexd/plugins/messages-dummy.c
-@@ -69,6 +69,15 @@ struct message_listing_data {
- 	void *user_data;
- };
+diff --git a/monitor/bt.h b/monitor/bt.h
+index 7fe5673..61308e9 100644
+--- a/monitor/bt.h
++++ b/monitor/bt.h
+@@ -2353,6 +2353,26 @@ struct bt_hci_rsp_le_read_dev_periodic_adv_list_size {
+ 	uint8_t  list_size;
+ } __attribute__ ((packed));
  
-+struct message_view_data {
-+	struct session *session;
-+	const char *handle;
-+	char *path;
-+	FILE *fp;
-+	messages_get_message_cb callback;
-+	void *user_data;
-+};
++#define BT_HCI_CMD_LE_READ_TX_POWER		0x204b
++struct bt_hci_rsp_le_read_tx_power {
++	uint8_t  status;
++	uint8_t  min_tx_power;
++	uint8_t  max_tx_power;
++} __attribute__ ((packed));
 +
- /* NOTE: Neither IrOBEX nor MAP specs says that folder listing needs to
-  * be sorted (in IrOBEX examples it is not). However existing implementations
-  * seem to follow the fig. 3-2 from MAP specification v1.0, and I've seen a
-@@ -433,6 +442,24 @@ static const GMarkupParser max_msg_parser = {
-         NULL
- };
++#define BT_HCI_CMD_LE_READ_RF_PATH_COMPENSATION		0x204c
++struct bt_hci_rsp_le_read_rf_path_comp {
++	uint8_t  status;
++	uint16_t rf_tx_path_comp;
++	uint16_t rf_rx_path_comp;
++} __attribute__ ((packed));
++
++#define BT_HCI_CMD_LE_WRITE_RF_PATH_COMPENSATION		0x204d
++struct bt_hci_cmd_le_write_rf_path_comp {
++	uint16_t rf_tx_path_comp;
++	uint16_t rf_rx_path_comp;
++} __attribute__ ((packed));
++
+ #define BT_HCI_EVT_INQUIRY_COMPLETE		0x01
+ struct bt_hci_evt_inquiry_complete {
+ 	uint8_t  status;
+diff --git a/monitor/packet.c b/monitor/packet.c
+index 9a75e43..582320b 100644
+--- a/monitor/packet.c
++++ b/monitor/packet.c
+@@ -7623,6 +7623,36 @@ static void le_read_periodic_adv_list_size_rsp(const void *data, uint8_t size)
+ 	print_field("List size: 0x%2.2x", rsp->list_size);
+ }
  
-+static gboolean get_messages(void *d)
++static void le_read_tx_power_rsp(const void *data, uint8_t size)
 +{
-+	struct message_view_data *mvd = d;
-+	/* 1024 is the maximum size of the line which is calculated to be more
-+	 * sufficient*/
-+	char buffer[1024];
++	const struct bt_hci_rsp_le_read_tx_power *rsp = data;
 +
-+	while (fgets(buffer, 1024, mvd->fp))
-+		mvd->callback(mvd->session, -EAGAIN, 0, buffer , mvd->user_data);
-+
-+	mvd->callback(mvd->session, 0, 0, NULL , mvd->user_data);
-+
-+	g_free(mvd->path);
-+	fclose(mvd->fp);
-+
-+	return FALSE;
++	print_status(rsp->status);
++	print_field("Min Tx power: %d dBm", rsp->min_tx_power);
++	print_field("Max Tx power: %d dBm", rsp->max_tx_power);
 +}
 +
- static gboolean get_messages_listing(void *d)
- {
- 
-@@ -518,7 +545,26 @@ int messages_get_message(void *session, const char *handle,
- 					messages_get_message_cb callback,
- 					void *user_data)
- {
--	return -ENOSYS;
-+	struct session *s =  session;
-+	struct message_view_data *mvd;
++static void le_read_rf_path_comp_rsp(const void *data, uint8_t size)
++{
++	const struct bt_hci_rsp_le_read_rf_path_comp *rsp = data;
 +
-+	mvd = g_new0(struct message_view_data, 1);
-+	mvd->session = s;
-+	mvd->handle = handle;
-+	mvd->callback = callback;
-+	mvd->user_data = user_data;
++	print_status(rsp->status);
++	print_field("RF Tx Path Compensation Value: 0x%4.4x",
++							rsp->rf_tx_path_comp);
++	print_field("RF Rx Path Compensation Value: 0x%4.4x",
++							rsp->rf_rx_path_comp);
++}
 +
-+	mvd->path = g_build_filename(s->cwd_absolute, handle, NULL);
-+	mvd->fp = fopen(mvd->path, "r");
-+	if (mvd->fp == NULL) {
-+		int err = -errno;
-+		DBG("fopen(): %d, %s", -err, strerror(-err));
-+		g_free(mvd->path);
-+		return -ENOENT;
-+	}
++static void le_write_rf_path_comp_cmd(const void *data, uint8_t size)
++{
++	const struct bt_hci_cmd_le_write_rf_path_comp *cmd = data;
 +
-+	g_idle_add_full(G_PRIORITY_DEFAULT_IDLE, get_messages, mvd, g_free);
-+	return 0;
- }
- 
- int messages_update_inbox(void *session, messages_status_cb callback,
-@@ -530,7 +576,11 @@ int messages_update_inbox(void *session, messages_status_cb callback,
- int messages_set_read(void *session, const char *handle, uint8_t value,
- 				messages_status_cb callback, void *user_data)
- {
--	return -ENOSYS;
-+	struct session *s = session;
++	print_field("RF Tx Path Compensation Value: 0x%4.4x",
++							cmd->rf_tx_path_comp);
++	print_field("RF Rx Path Compensation Value: 0x%4.4x",
++							cmd->rf_rx_path_comp);
++}
 +
-+	callback(s, 0, user_data);
-+
-+	return 0;
- }
- 
- int messages_set_delete(void *session, const char *handle, uint8_t value,
+ struct opcode_data {
+ 	uint16_t opcode;
+ 	int bit;
+@@ -8398,9 +8428,15 @@ static const struct opcode_data opcode_table[] = {
+ 	{ 0x204a, 310, "LE Read Periodic Advertiser List Size",
+ 				null_cmd, 0, true,
+ 				le_read_periodic_adv_list_size_rsp, 2, true },
+-	{ 0x204b, 311, "LE Read Transmit Power" },
+-	{ 0x204c, 312, "LE Read RF Path Compensation" },
+-	{ 0x204d, 313, "LE Write RF Path Compensation" },
++	{ 0x204b, 311, "LE Read Transmit Power",
++				null_cmd, 0, true,
++				le_read_tx_power_rsp, 3, true },
++	{ 0x204c, 312, "LE Read RF Path Compensation",
++				null_cmd, 0, true,
++				le_read_rf_path_comp_rsp, 5, true },
++	{ 0x204d, 313, "LE Write RF Path Compensation",
++				le_write_rf_path_comp_cmd, 4, true,
++				status_rsp, 1, true },
+ 	{ 0x204e, 314, "LE Set Privacy Mode" },
+ 	{ }
+ };
 -- 
-2.7.4
+2.9.3
 
