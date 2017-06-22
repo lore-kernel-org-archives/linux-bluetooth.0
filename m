@@ -1,104 +1,63 @@
-Return-Path: <jeffy.chen@rock-chips.com>
-Message-ID: <594C8F0D.4000100@rock-chips.com>
-Date: Fri, 23 Jun 2017 11:46:21 +0800
-From: jeffy <jeffy.chen@rock-chips.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+From: Bryan Varner <bryan@varnernet.com>
+Subject: QCA ROME (btqca) driver issues? bt stack issues? kernel HID output
+ points to bt device latency issues...
+Message-ID: <69492e80-3da0-db04-b41c-2f601ba2f48e@varnernet.com>
+Date: Thu, 22 Jun 2017 18:12:13 -0400
 MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: LKML <linux-kernel@vger.kernel.org>, xiyou.wangcong@gmail.com,
-	Brian Norris <briannorris@chromium.org>,
-	Douglas Anderson <dianders@chromium.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	"Gustavo F. Padovan" <gustavo@padovan.org>, open@263.net,
-	list@263.net:BLUETOOTH DRIVERS <linux-bluetooth@vger.kernel.org>,
-	Oliver Neukum <oliver@neukum.org>
-Subject: Re: [RFC PATCH] Bluetooth: btusb: Fix memory leak in play_deferred
-References: <1498126243-4771-1-git-send-email-jeffy.chen@rock-chips.com> <65CF80EF-EA58-4126-889D-07A8FF9D52DB@holtmann.org>
-In-Reply-To: <65CF80EF-EA58-4126-889D-07A8FF9D52DB@holtmann.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=utf-8; format=flowed
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi all,
 
-thanx for your comments.
+Over the last few days with a new laptop, I've been having many issues 
+with the on-board bt.
 
-On 06/22/2017 06:21 PM, Marcel Holtmann wrote:
-> Hi Jeffy,
->
->> Currently in play_deferred, we are calling usb_submit_urb directly to
->> submit deferred tx urb after unanchor it.
->>
->> So the usb_giveback_urb_bh would failed to unref it in usb_unanchor_urb
->> and cause memory leak:
->> unreferenced object 0xffffffc0ce0fa400 (size 256):
->> ...
->>   backtrace:
->>     [<ffffffc00034a9a8>] __save_stack_trace+0x48/0x6c
->>     [<ffffffc00034b088>] create_object+0x138/0x254
->>     [<ffffffc0009d5504>] kmemleak_alloc+0x58/0x8c
->>     [<ffffffc000345f78>] __kmalloc+0x1d4/0x2a0
->>     [<ffffffc0006765bc>] usb_alloc_urb+0x30/0x60
->>     [<ffffffbffc128598>] alloc_ctrl_urb+0x38/0x120 [btusb]
->>     [<ffffffbffc129e7c>] btusb_send_frame+0x64/0xf8 [btusb]
->>
->> Use submit_tx_urb instead for better error handling and avoid the leak.
->>
->> Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
->> ---
->>
->> drivers/bluetooth/btusb.c | 3 ++-
->> 1 file changed, 2 insertions(+), 1 deletion(-)
->>
->> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
->> index 278e811..b469f9b 100644
->> --- a/drivers/bluetooth/btusb.c
->> +++ b/drivers/bluetooth/btusb.c
->> @@ -3254,11 +3254,12 @@ static int btusb_suspend(struct usb_interface *intf, pm_message_t message)
->>
->> static void play_deferred(struct btusb_data *data)
->> {
->> +	struct hci_dev *hdev = data->hdev;
->> 	struct urb *urb;
->> 	int err;
->>
->> 	while ((urb = usb_get_from_anchor(&data->deferred))) {
->> -		err = usb_submit_urb(urb, GFP_ATOMIC);
->> +		err = submit_tx_urb(hdev, urb);
->> 		if (err < 0)
->> 			break;
->
-> so why not just fix the memory leak here and instead call submit_tx_urb. I am not sure that is actually the right approach. Why anchor this URB now to the TX anchor now? Is that actually safe?
->
-the current flow is:
-   submit_or_queue_tx_urb
-     if (!suspending)
-       submit_tx_urb
-     else
-       put into deferred anchor
-       wake btusb
+* My bt keyboard begins to repeat keys randomly.
+* Mouse behavior is completely erratic, and connections don't last more 
+than a couple minutes.
 
-   retry the deferred urbs in deferred anchor(using usb_submit_urb) 
-after resumed
+I've had an HID driver dev look at kernel output logs of HID data. It 
+appears packets relating to key-ups from the keyboard and other mouse 
+data has huge latency issues. The kernel is receiving key-down events 
+and sometimes there is a pause of several hundred or thousand ms before 
+the keyup event comes in to the HID drivers. This happens even if I'm 
+just typing normally (believe me, I'm not holding the keys down when 
+this happens). Regarding the mouse, it looks like the mouse is also 
+dropping events, and then the mouse forces an L2CAP disconnect and 
+renegotiation (according to btmon dumps).
 
-so i think there are 2 problems here:
-1/ error handling, compare submit_tx_urb to usb_submit_urb, it freed 
-urb->setup_packet when failed to submit
-2/ memory leak:
-in usb_submit_urb, we ref that urb
-in __usb_hcd_giveback_urb, we unanchor it, and then unref it.
+Wireless network (802.11 -- also on this Dell branded ROME based card) 
+seems to be rock-steady.
 
-so i think the usb_submit_urb expected the urb not just be referenced, 
-but also anchored? or referenced, but the caller would unref it himself 
-later?
 
-and for tx_anchor, we put urb in it, and kill them all during suspending 
-to prevent transfer. so i guess it would be safe to put deferred urb in 
-to it after resume too?
-but i don't know much about usb/btusb, so i could be wrong all about that :)
+I'm running a locally built kernel 4.11.6 SMP  with bluez 5.43-2 (debian 
+9 package).
 
-> Regards
->
-> Marcel
->
->
->
->
+# dmesg | grep 'qca'
+[    3.546077] Bluetooth: hci0: using rampatch file: 
+qca/rampatch_usb_00000302.bin
+[    3.561669] ath10k_pci 0000:02:00.0: qca6174 hw3.2 target 0x05030000 
+chip_id 0x00340aff sub 1028:0310
+[    3.575096] Bluetooth: hci0: using NVM file: qca/nvm_usb_00000302.bin
+
+
+
+
+In order to isolate the issue a bit, I've plugged in an old bt host 
+adapter I had laying around that I knew worked well on other machines.
+The same keyboard and mouse are working perfectly with it (and have in 
+the past). The btmon output from this older host adapter looks quite 
+different from the output I get from the qca device. The mouse sends a 
+steady stream of mode change events when not sending actual data, they 
+keyboard behaves properly, and I've yet to loose a mouse connection.
+
+I'd love to get the onboard BT working better, because I hate carrying 
+around dongles.
+What can I do to help?
+
+Regards,
+-Bryan Varner
+
