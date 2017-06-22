@@ -1,69 +1,56 @@
-Return-Path: <linux-kernel-owner@vger.kernel.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Date: Thu, 22 Jun 2017 13:20:25 +0300
+From: Matias Karhumaa <matias.karhumaa@gmail.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] obexd: Fix null pointer dereference.
+Message-ID: <20170622102024.GA4634@makarhum-e6330>
+References: <20170621061358.GA17661@makarhum-e6330>
+ <20170621094148.GA27878@x1c>
+ <CABBYNZLfN-u0xOqut3f35jaX5xRwusY5SW0oL1M_XzOF283oLQ@mail.gmail.com>
+ <CABBYNZJOO+v0FHh2F65iMk6kDZedwG2bOXRn5Ycr4uu=qx9NHw@mail.gmail.com>
+ <20170622043241.GA31744@makarhum-e6330>
+ <20170622061810.GA30856@x1c.home>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Subject: Re: [RFC PATCH] Bluetooth: btusb: Fix memory leak in play_deferred
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1498126243-4771-1-git-send-email-jeffy.chen@rock-chips.com>
-Date: Thu, 22 Jun 2017 12:21:05 +0200
-Cc: LKML <linux-kernel@vger.kernel.org>, xiyou.wangcong@gmail.com,
-        Brian Norris <briannorris@chromium.org>,
-        Douglas Anderson <dianders@chromium.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        "Gustavo F. Padovan" <gustavo@padovan.org>,
-        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-        Oliver Neukum <oliver@neukum.org>
-Message-Id: <65CF80EF-EA58-4126-889D-07A8FF9D52DB@holtmann.org>
-References: <1498126243-4771-1-git-send-email-jeffy.chen@rock-chips.com>
-To: Jeffy Chen <jeffy.chen@rock-chips.com>
-Sender: linux-kernel-owner@vger.kernel.org
+In-Reply-To: <20170622061810.GA30856@x1c.home>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jeffy,
+On Thu, Jun 22, 2017 at 09:18:10AM +0300, Johan Hedberg wrote:
+> Hi Matias,
+> 
+> On Thu, Jun 22, 2017, Matias Karhumaa wrote:
+> > > >> It seems to me that the bug is with opp.c passing the service_data to
+> > > >> manager_request_authorization(), and service_data is expected to be the
+> > > >> obex_transfer object. However, currently the code creates this object
+> > > >> only upon CONNECT (in opp_connect).
+> > > >>
+> > > >> I think one possible way to solve this would be to trigger a call to
+> > > >> os->service->connect if CONNECT hasn't been explicitly issued, however
+> > > >> then the code needs to track this in some other way since service_data
+> > > >> seems too unreliable.
+> > > 
+> > > How about the following:
+> > > 
+> > > https://gist.github.com/Vudentz/1736d6af9608b9332b93858d92a3feff
+> > 
+> > Your fix seems solid to me and fixes the crash with OPP. I checked ftp.c
+> > also and saw potentially similar problem in ftp_chkput. Should we call
+> > os->service->connect also in case of OBEX_FTP?
+> 
+> OPP is the only service where the specification allows skipping the
+> connect step. This is why os->service gets pre-initialized to OPP (in
+> the obex_session_start function). Also, if the OPP plugin isn't
+> available os->service will be NULL before CONNECT, and that's something
+> the code already seems to check for (e.g. in cmd_put). So unless I've
+> misunderstood something, you shouldn't be able get to a situation where
+> os->service points at FTP but CONNECT hasn't been issued.
 
-> Currently in play_deferred, we are calling usb_submit_urb directly to
-> submit deferred tx urb after unanchor it.
-> 
-> So the usb_giveback_urb_bh would failed to unref it in usb_unanchor_urb
-> and cause memory leak:
-> unreferenced object 0xffffffc0ce0fa400 (size 256):
-> ...
->  backtrace:
->    [<ffffffc00034a9a8>] __save_stack_trace+0x48/0x6c
->    [<ffffffc00034b088>] create_object+0x138/0x254
->    [<ffffffc0009d5504>] kmemleak_alloc+0x58/0x8c
->    [<ffffffc000345f78>] __kmalloc+0x1d4/0x2a0
->    [<ffffffc0006765bc>] usb_alloc_urb+0x30/0x60
->    [<ffffffbffc128598>] alloc_ctrl_urb+0x38/0x120 [btusb]
->    [<ffffffbffc129e7c>] btusb_send_frame+0x64/0xf8 [btusb]
-> 
-> Use submit_tx_urb instead for better error handling and avoid the leak.
-> 
-> Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
-> ---
-> 
-> drivers/bluetooth/btusb.c | 3 ++-
-> 1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index 278e811..b469f9b 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -3254,11 +3254,12 @@ static int btusb_suspend(struct usb_interface *intf, pm_message_t message)
-> 
-> static void play_deferred(struct btusb_data *data)
-> {
-> +	struct hci_dev *hdev = data->hdev;
-> 	struct urb *urb;
-> 	int err;
-> 
-> 	while ((urb = usb_get_from_anchor(&data->deferred))) {
-> -		err = usb_submit_urb(urb, GFP_ATOMIC);
-> +		err = submit_tx_urb(hdev, urb);
-> 		if (err < 0)
-> 			break;
+Ok, understood. Actually I tried to do FTP PUT without CONNECT and I can
+confirm that it works as you explained.
 
-so why not just fix the memory leak here and instead call submit_tx_urb. I am not sure that is actually the right approach. Why anchor this URB now to the TX anchor now? Is that actually safe?
+I will create a patch from the gist.
 
-Regards
-
-Marcel
+Best regards,
+Matias Karhumaa
