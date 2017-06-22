@@ -4,87 +4,196 @@ From: =?UTF-8?q?Micha=C5=82=20Narajowski?=
 To: linux-bluetooth@vger.kernel.org
 Cc: =?UTF-8?q?Micha=C5=82=20Narajowski?=
         <michal.narajowski@codecoup.pl>
-Subject: [PATCH BlueZ v4 7/8] monitor: Add LE Set Privacy Mode decoding
-Date: Thu, 22 Jun 2017 10:55:21 +0200
-Message-Id: <20170622085522.2936-8-michal.narajowski@codecoup.pl>
+Subject: [PATCH BlueZ v4 3/8] monitor: Add LE Set Periodic Advertising commands decoding
+Date: Thu, 22 Jun 2017 10:55:17 +0200
+Message-Id: <20170622085522.2936-4-michal.narajowski@codecoup.pl>
 In-Reply-To: <20170622085522.2936-1-michal.narajowski@codecoup.pl>
 References: <20170622085522.2936-1-michal.narajowski@codecoup.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-< HCI Command: LE Set Privacy Mode (0x08|0x004e) plen 8
-        Peer Identity address type: Random (0x01)
-        Peer Identity address: 07:06:05:04:03:02 (Non-Resolvable)
-        Privacy Mode: Reserved (0x08)
+This patch adds decoding for following commands:
+
+LE Set Periodic Advertising Parameters
+LE Set Periodic Advertising Data
+LE Set Periodic Advertising Enable
+
+< HCI Command: LE Set Periodic Advertising Parameters (0x08|0x003e) plen 7
+        Handle: 1
+        Min interval: 2.50 msec (0x0002)
+        Max interval: 318.75 msec (0x00ff)
+        Properties: 0x00ff
+          Include TxPower
+          Unknown advertising properties (0x00bf)
+
+< HCI Command: LE Set Periodic Advertising Data (0x08|0x003f) plen 7
+        Handle: 1
+        Handle: 0x01
+        Operation: Last fragment
+        Data length: 0x04
+        ff 00 ff 00                                      ....
+
+< HCI Command: LE Set Periodic Advertising Enable (0x08|0x0040) plen 2
+        Enable: Enabled
+        Handle: 2
 ---
- monitor/bt.h     |  7 +++++++
- monitor/packet.c | 28 +++++++++++++++++++++++++++-
- 2 files changed, 34 insertions(+), 1 deletion(-)
+ monitor/bt.h     |  22 ++++++++++++
+ monitor/packet.c | 102 +++++++++++++++++++++++++++++++++++++++++++++++++++++--
+ 2 files changed, 121 insertions(+), 3 deletions(-)
 
 diff --git a/monitor/bt.h b/monitor/bt.h
-index e8e6cb4..fe105b2 100644
+index aa55579..0160dcc 100644
 --- a/monitor/bt.h
 +++ b/monitor/bt.h
-@@ -2374,6 +2374,13 @@ struct bt_hci_cmd_le_write_rf_path_comp {
- 	uint16_t rf_rx_path_comp;
- } __attribute__ ((packed));
+@@ -2253,6 +2253,28 @@ struct bt_hci_cmd_le_remove_adv_set {
  
-+#define BT_HCI_CMD_LE_SET_PRIV_MODE		0x204e
-+struct bt_hci_cmd_le_set_priv_mode {
-+	uint8_t  peer_id_addr_type;
-+	uint8_t  peer_id_addr[6];
-+	uint8_t  priv_mode;
+ #define BT_HCI_CMD_LE_CLEAR_ADV_SETS			0x203d
+ 
++#define BT_HCI_CMD_LE_SET_PERIODIC_ADV_PARAMS			0x203e
++struct bt_hci_cmd_le_set_periodic_adv_params {
++	uint8_t  handle;
++	uint16_t min_interval;
++	uint16_t max_interval;
++	uint16_t properties;
++} __attribute__ ((packed));
++
++#define BT_HCI_CMD_LE_SET_PERIODIC_ADV_DATA			0x203f
++struct bt_hci_cmd_le_set_periodic_adv_data {
++	uint8_t  handle;
++	uint8_t  operation;
++	uint8_t  data_len;
++	uint8_t  data[0];
++} __attribute__ ((packed));
++
++#define BT_HCI_CMD_LE_SET_PERIODIC_ADV_ENABLE			0x2040
++struct bt_hci_cmd_le_set_periodic_adv_enable {
++	uint8_t  enable;
++	uint8_t  handle;
 +} __attribute__ ((packed));
 +
  #define BT_HCI_EVT_INQUIRY_COMPLETE		0x01
  struct bt_hci_evt_inquiry_complete {
  	uint8_t  status;
 diff --git a/monitor/packet.c b/monitor/packet.c
-index 57a1862..c7b0c4e 100644
+index 8827f5e..053b2f7 100644
 --- a/monitor/packet.c
 +++ b/monitor/packet.c
-@@ -7653,6 +7653,30 @@ static void le_write_rf_path_comp_cmd(const void *data, uint8_t size)
- 							cmd->rf_rx_path_comp);
+@@ -7280,6 +7280,96 @@ static void le_remove_adv_set_cmd(const void *data, uint8_t size)
+ 	print_handle(cmd->handle);
  }
  
-+static void le_set_priv_mode_cmd(const void *data, uint8_t size)
++static const struct {
++	uint8_t bit;
++	const char *str;
++} periodic_adv_properties_table[] = {
++	{  6, "Include TxPower"		},
++	{ }
++};
++
++static void print_periodic_adv_properties(uint16_t flags)
 +{
-+	const struct bt_hci_cmd_le_set_priv_mode *cmd = data;
++	uint16_t mask = flags;
++	int i;
++
++	print_field("Properties: 0x%4.4x", flags);
++
++	for (i = 0; periodic_adv_properties_table[i].str; i++) {
++		if (flags & (1 << periodic_adv_properties_table[i].bit)) {
++			print_field("  %s",
++					periodic_adv_properties_table[i].str);
++			mask &= ~(1 << periodic_adv_properties_table[i].bit);
++		}
++	}
++
++	if (mask)
++		print_text(COLOR_UNKNOWN_ADV_FLAG,
++				"  Unknown advertising properties (0x%4.4x)",
++									mask);
++}
++
++static void le_set_periodic_adv_params_cmd(const void *data, uint8_t size)
++{
++	const struct bt_hci_cmd_le_set_periodic_adv_params *cmd = data;
++
++	print_handle(cmd->handle);
++	print_slot_125("Min interval", cmd->min_interval);
++	print_slot_125("Max interval", cmd->max_interval);
++	print_periodic_adv_properties(cmd->properties);
++}
++
++static void le_set_periodic_adv_data_cmd(const void *data, uint8_t size)
++{
++	const struct bt_hci_cmd_le_set_periodic_adv_data *cmd = data;
 +	const char *str;
 +
-+	print_addr_type("Peer Identity address type", cmd->peer_id_addr_type);
-+	print_addr("Peer Identity address", cmd->peer_id_addr,
-+							cmd->peer_id_addr_type);
++	print_handle(cmd->handle);
 +
-+	switch (cmd->priv_mode) {
++	print_field("Handle: 0x%2.2x", cmd->handle);
++	switch (cmd->operation) {
 +	case 0x00:
-+		str = "Use Network Privacy";
++		str = "Immediate fragment";
 +		break;
 +	case 0x01:
-+		str = "Use Device Privacy";
++		str = "First fragment";
++		break;
++	case 0x02:
++		str = "Last fragment";
++		break;
++	case 0x03:
++		str = "Complete ext advertising data";
++		break;
++	default:
++		str = "Reserved";
++		break;
++	}
++	print_field("Operation: %s", str);
++	print_field("Data length: 0x%2.2x", cmd->data_len);
++	print_eir(cmd->data, cmd->data_len, true);
++}
++
++static void le_set_periodic_adv_enable_cmd(const void *data, uint8_t size)
++{
++	const struct bt_hci_cmd_le_set_periodic_adv_enable *cmd = data;
++	const char *str;
++
++	switch (cmd->enable) {
++	case 0x00:
++		str = "Disable";
++		break;
++	case 0x01:
++		str = "Enabled";
 +		break;
 +	default:
 +		str = "Reserved";
 +		break;
 +	}
 +
-+	print_field("Privacy Mode: %s (0x%2.2x)", str, cmd->priv_mode);
++	print_field("Enable: %s", str);
++	print_handle(cmd->handle);
 +}
 +
  struct opcode_data {
  	uint16_t opcode;
  	int bit;
-@@ -8437,7 +8461,9 @@ static const struct opcode_data opcode_table[] = {
- 	{ 0x204d, 313, "LE Write RF Path Compensation",
- 				le_write_rf_path_comp_cmd, 4, true,
+@@ -8016,9 +8106,15 @@ static const struct opcode_data opcode_table[] = {
+ 	{ 0x203d, 297, "LE Clear Advertising Sets",
+ 				null_cmd, 0, true,
  				status_rsp, 1, true },
--	{ 0x204e, 314, "LE Set Privacy Mode" },
-+	{ 0x204e, 314, "LE Set Privacy Mode",
-+				le_set_priv_mode_cmd, 8, true,
+-	{ 0x203e, 298, "LE Set Periodic Advertising Parameters" },
+-	{ 0x203f, 299, "LE Set Periodic Advertising Data" },
+-	{ 0x2040, 300, "LE Set Periodic Advertising Enable" },
++	{ 0x203e, 298, "LE Set Periodic Advertising Parameters",
++				le_set_periodic_adv_params_cmd, 7, true,
 +				status_rsp, 1, true },
- 	{ }
- };
- 
++	{ 0x203f, 299, "LE Set Periodic Advertising Data",
++				le_set_periodic_adv_data_cmd, 3, false,
++				status_rsp, 1, true },
++	{ 0x2040, 300, "LE Set Periodic Advertising Enable",
++				le_set_periodic_adv_enable_cmd, 2, true,
++				status_rsp, 1, true },
+ 	{ 0x2041, 301, "LE Set Extended Scan Parameters" },
+ 	{ 0x2042, 302, "LE Set Extended Scan Enable" },
+ 	{ 0x2043, 303, "LE Extended Create Connection" },
 -- 
 2.9.3
 
