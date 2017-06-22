@@ -1,139 +1,57 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Boris Passerat de la chapelle <bpasserat@h2ad.net>
-To: Krasi Georgiev <krasi.root@gmail.com>
-CC: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Barry Byford <31baz66@gmail.com>,
-        Bluez mailing list <linux-bluetooth@vger.kernel.org>
-Subject: RE: How to use GattProfile1
-Date: Thu, 22 Jun 2017 15:34:01 +0000
-Message-ID: <45170bfef9c54f8d949af973733519a4@sjbsvr074.groupe.local>
-References: <4CF902B9-8221-45E7-9868-52BF18A5EC5D@gmail.com>
- <CAAu3APYsHqAK=Kk-fzQmhhBOfnayTDB_N_Q2yCuOhr+akvxfLg@mail.gmail.com>
- <C1394BB3-3C11-410C-916F-80A7863C0A2B@gmail.com>
- <969738CC-B335-4E2F-BF3C-441110279871@gmail.com>
- <CAAu3APard0ZM-+++qm8938+iWkUUfNkjvq1M9cLqngtZYJAzRg@mail.gmail.com>
- <F1876BDF-4DC0-4CB0-A20F-2E64E24A3B92@gmail.com>
- <CABBYNZ+R7dV5i+BQowigf5eddB4yxSki+xLeLFYBrN4Sfe8mJA@mail.gmail.com>
- <4AE62BC6-BD11-44C7-9A0E-BC3159ED80DF@gmail.com>
- <4C907B25-D8E4-462C-89FA-AB312A27CBE9@gmail.com>
- <CABBYNZK04wxSH78f0maAMHtR-2ra8Kh_nQKkrAY1R8G19ba8TA@mail.gmail.com>
- <5CDE162E-4828-4485-BF95-50C67DB93B77@gmail.com>
- <CABBYNZKkodmXy+4eRXh_4RA9yci25cEtaNMoywEUk9XZ+GL4LQ@mail.gmail.com>
- <758C2FAB-DBF1-4B88-866D-F036B23B3C95@gmail.com>
- <CABBYNZLVjXXmbfTb2Uo9KvE2D83c1PU7f2p=t6JawfeyUfN2+w@mail.gmail.com>
- <3290BB41-234F-4D7B-BF37-0CC2966CB416@gmail.com>
- <CABBYNZKoACnV5rOQ1dJH56Uien-CdMy7CUfgvZEGdJvuLXKBgQ@mail.gmail.com>
- <5D01EC8C-E51B-4F89-8F9B-5D7946674116@gmail.com>
- <CABBYNZ+P8fzQP_v5dtWTHhXthE7JhsJeLBts4+_eweVDBMZpSQ@mail.gmail.com>
- <329D353B-8799-434A-9049-AE8904429A78@gmail.com>
- <CABBYNZJPrNfN-ns60zts863J=0Ec-np5AQb9aguS67fF0ZNbkA@mail.gmail.com>
- <39cb9ea22f14454d83b6e62e59bdc955@sjbsvr074.groupe.local>
- <8D8EB08D-CA68-400C-A987-8ADA4B45E2C2@gmail.com>
- <D2B39265-DEFC-42F9-B022-F0FB1CD853F9@gmail.com>
- <e94749f41d154deaae22adedd952591b@sjbsvr074.groupe.local>
- <D41DBE81-331C-430D-9D88-A097D46971F6@gmail.com>
- <1e64e9b3168f4eab9ae9fbde7d0ff4db@sjbsvr074.groupe.local>
- <53A75B02-DCB0-406C-A901-95B240DAEE23@gmail.com>
-In-Reply-To: <53A75B02-DCB0-406C-A901-95B240DAEE23@gmail.com>
-Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
+In-Reply-To: <20170622105020.GA5388@makarhum-e6330>
+References: <20170622105020.GA5388@makarhum-e6330>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Thu, 22 Jun 2017 14:23:39 +0300
+Message-ID: <CABBYNZJx1UHamquWV=RTvG6DZg-LAW-Rv_3q_eHoh6=PMZCFVg@mail.gmail.com>
+Subject: Re: [PATCH v2] obexd: Fix null pointer dereference.
+To: Matias Karhumaa <matias.karhumaa@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-PlRoYW5rcw0KPnllcyBpdCB3b3JrcyBldmVuIHRoZSBsYXRlc3QgSEVBRCB3aXRoIGJsdWV0b290
-aGN0bA0KPmh0dHBzOi8vZ2l0Lmtlcm5lbC5vcmcvcHViL3NjbS9ibHVldG9vdGgvYmx1ZXouZ2l0
-L2NvbW1pdC8/aWQ9MjE3OWY1NzFlMTk0YzJjNDYzNWYzNTAxZDQ0OGE4YTkzNGMyYzk5OA0KDQpZ
-ZXMgSSB0ZXN0ZWQgd2l0aCBIRUFEIGFuZCBub3cgaXQgaXMgZmluZS4NCkkgYWxzbyB0ZXN0ZWQg
-d2l0aCBteSBhcHBsaWNhdGlvbiBhbmQgMyBkaWZmZXJlbnQgZGV2aWNlcyBhbmQgaXQgaXMgd29y
-a2luZyBmaW5lLg0KDQo+SSB3YXMgdGVzdGluZyB3aXRoIA0KPmh0dHBzOi8vZ2l0Lmtlcm5lbC5v
-cmcvcHViL3NjbS9ibHVldG9vdGgvYmx1ZXouZ2l0L2NvbW1pdC8/aWQ9ZjU4NWU3YWM4ZGEzYmEy
-MGZjNDY1ZTNjMjU1ZDJhODhiNzM5MDk3Nw0KPmNsaWVudDogRml4IHVzaW5nIFJlZ2lzdGVyUHJv
-ZmlsZQ0KPmFuZCB0aGlzIG9uZSBkaWRu4oCZdCB3b3JrLCBzbyBzb21ldGhpbmcgYWZ0ZXIgdGhh
-dCBmaXhlZCB0aGUgcHJvYmxlbS4NCg0KDQo+IE9uIDE2IEp1biAyMDE3LCBhdCAxNzo1NCwgQm9y
-aXMgUGFzc2VyYXQgZGUgbGEgY2hhcGVsbGUgPGJwYXNzZXJhdEBoMmFkLm5ldD4gd3JvdGU6DQo+
-IA0KPj4gU3RyYW5nZQ0KPiANCj4+IEkgY29tcGlsZWQgYmx1ZXRvb3RoY3RsIGFmdGVyIHRoZSBw
-YXRjaCB0aGF0IHNob3VsZCBmaXggaXQuDQo+IA0KPj4gRGlkIHlvdSBkbyB0aGUgc3RlcHMgc2lt
-aWxhciB0byBteSBibHVldG9vdGhjdGwgbG9ncz8gDQo+IA0KPiBJIGRpZCBub3QgdXNlIGJsdWV0
-b290aGN0bCBhcyBSZWdpc3RlckFwcGxpY2F0aW9uIHdhcyBub3QgYXZhaWxhYmxlIHlldC4NCj4g
-SW4gbXkgYXBwbGljYXRpb24gSSBoYXZlIHRoZXNlICBzdGVwcyA6DQo+IA0KPiAwLiAtIFJlZ2lz
-dGVyQXBwbGljYXRpb24gd2l0aCBVVUlEDQo+IDEuIC0gc2NhbiBkZXZpY2UNCj4gMi4gLSBwYWly
-IHdhbnRlZCBkZXZpY2UNCj4gMy4gLSBvbmNlIHNlcnZpY2VzIHJlc29sdmVkIGRvIHNvbWUgYWN0
-aW9ucyANCj4gNC4gLSBkZXZpY2UgZGlzY29ubmVjdA0KPiA1LiAtIGRldmljZSBwb3dlciB1cCBh
-bmQgaGVyZSBJIGhhdmUgYXV0b21hdGljIHJlY29ubmVjdGlvbiANCj4gDQo+PiBXaGF0IGRldmlj
-ZSBkaWQgeW91IGF1dG8gY29ubmVjdCB0byA/DQo+IA0KPiBJIGNvbm5lY3QgbWVkaWNhbCBkZXZp
-Y2VzIGFzIDoNCj4gaHR0cDovL3d3dy5hbmRvbmxpbmUuY29tL21lZGljYWwvcHJvZHVjdHMvZGV0
-YWlscy5waHA/Y2F0bmFtZT1CbG9vZF9QcmVzc3VyZSZwcm9kdWN0X251bT1VQS02NTFCTEUNCj4g
-aHR0cDovL3d3dy5hbmRvbmxpbmUuY29tL21lZGljYWwvcHJvZHVjdHMvZGV0YWlscy5waHA/Y2F0
-bmFtZT1TY2FsZXMmcHJvZHVjdF9udW09VUMtMzUwQkxFDQo+IGFuZCA1IG9yIDYgb3RoZXIgZGV2
-aWNlcw0KPiANCj4gRnJvbSA1LjQxIEkgaGF2ZSB0byByZXZlcnQgdGhpcyBjb21taXQgb24gYmx1
-ZXogOiAgODljYTczNWU1NzQxN2VjMjk2YTQxZDhjMzFkMGQwZDVjNjZjZTJhOQ0KPiANCj4gDQo+
-IA0KPj4gT24gMTYgSnVuIDIwMTcsIGF0IDA5OjE2LCBCb3JpcyBQYXNzZXJhdCBkZSBsYSBjaGFw
-ZWxsZSA8YnBhc3NlcmF0QGgyYWQubmV0PiB3cm90ZToNCj4+IA0KPj4gSXQgaXMgd29ya2luZyBv
-biBteSBzeXN0ZW0gd2l0aCBhIHNtYWxsIHBhdGNoIG9uIGJsdWV6IDUuNDUuDQo+PiBJIGdvdCBp
-dCB3b3JraW5nIHdpdGhvdXQgcGF0Y2ggdXAgdG8gYmx1ZXogNS40MSAuDQo+PiANCj4+IA0KPj4g
-DQo+PiANCj4+IC0tLS0tTWVzc2FnZSBkJ29yaWdpbmUtLS0tLQ0KPj4gRGUgOiBLcmFzaSBHZW9y
-Z2lldiBbbWFpbHRvOmtyYXNpLnJvb3RAZ21haWwuY29tXSBFbnZvecOpIDogamV1ZGkgMTUgDQo+
-PiBqdWluIDIwMTcgMjI6NDQgw4AgOiBCb3JpcyBQYXNzZXJhdCBkZSBsYSBjaGFwZWxsZSA8YnBh
-c3NlcmF0QGgyYWQubmV0PiANCj4+IENjIDogTHVpeiBBdWd1c3RvIHZvbiBEZW50eiA8bHVpei5k
-ZW50ekBnbWFpbC5jb20+OyBCYXJyeSBCeWZvcmQgDQo+PiA8MzFiYXo2NkBnbWFpbC5jb20+OyBC
-bHVleiBtYWlsaW5nIGxpc3QgDQo+PiA8bGludXgtYmx1ZXRvb3RoQHZnZXIua2VybmVsLm9yZz4g
-T2JqZXQgOiBSZTogSG93IHRvIHVzZSBHYXR0UHJvZmlsZTENCj4+IA0KPj4gQ2FuIHNvbWVvbmUg
-ZWxzZSB0cnkgaWYgdGhlIGF1dG8gY29ubmVjdCB3b3Jrcywgb3IgYW0gSSBkb2luZyBpdCBpbmNv
-cnJlY3RseSA/DQo+PiANCj4+PiBPbiA0IEp1biAyMDE3LCBhdCAxNjoxNSwgS3Jhc2kgR2Vvcmdp
-ZXYgPGtyYXNpLnJvb3RAZ21haWwuY29tPiB3cm90ZToNCj4+PiANCj4+PiBqdXN0IHRyaWVkIHdp
-dGggdGhlIGxhdGVzdCBtYXN0ZXIgYW5kIEkgc3RpbGwgY2Fu4oCZdCBnZXQgaXQgdG8gYXV0byAN
-Cj4+PiBjb25uZWN0DQo+Pj4gDQo+Pj4gDQo+Pj4gSGVyZSBpcyB3aGF0IGhhcHBlbnMgc28gbGV0
-IG1lIGtub3cgaWYgSSBhbSBkb2luZyBpbiB0aGUgY29ycmVjdCANCj4+PiBzZXF1ZW5jZQ0KPj4+
-IA0KPj4+IA0KPj4+IFtibHVldG9vdGhdIyBkZXZpY2VzDQo+Pj4gRGV2aWNlIDM0OjMxOjExOjAw
-OkNEOjdBIFNhbXN1bmcgR2FsYXh5IFMgSVYgRGV2aWNlIDA0OjUyOkM3OjU3Ojg1Ojg0IA0KPj4+
-IEJvc2UgTWluaSBJSSBTb3VuZExpbmsgRGV2aWNlIEZGOkZGOjUwOjAwOjUzOkI2IGlUQUcNCj4+
-PiANCj4+PiBbYmx1ZXRvb3RoXSMgcG93ZXIgb24NCj4+PiBDaGFuZ2luZyBwb3dlciBvbiBzdWNj
-ZWVkZWQNCj4+PiBbQ0hHXSBDb250cm9sbGVyIEI4OjI3OkVCOkQ1OjU0OjFDIFBvd2VyZWQ6IHll
-cyBbYmx1ZXRvb3RoXSMgY29ubmVjdA0KPj4+IEZGOkZGOjUwOjAwOjUzOkI2IEF0dGVtcHRpbmcg
-dG8gY29ubmVjdCB0byBGRjpGRjo1MDowMDo1MzpCNiBbQ0hHXSANCj4+PiBEZXZpY2UgRkY6RkY6
-NTA6MDA6NTM6QjYgQ29ubmVjdGVkOiB5ZXMgQ29ubmVjdGlvbiBzdWNjZXNzZnVsIFtORVddIA0K
-Pj4+IFByaW1hcnkgU2VydmljZQ0KPj4+IAkvb3JnL2JsdWV6L2hjaTAvZGV2X0ZGX0ZGXzUwXzAw
-XzUzX0I2L3NlcnZpY2UwMDA2DQo+Pj4gCTAwMDAxODBmLTAwMDAtMTAwMC04MDAwLTAwODA1Zjli
-MzRmYg0KPj4+IAlCYXR0ZXJ5IFNlcnZpY2UNCj4+PiBbTkVXXSBDaGFyYWN0ZXJpc3RpYw0KPj4+
-IAkvb3JnL2JsdWV6L2hjaTAvZGV2X0ZGX0ZGXzUwXzAwXzUzX0I2L3NlcnZpY2UwMDA2L2NoYXIw
-MDA3DQo+Pj4gCTAwMDAyYTE5LTAwMDAtMTAwMC04MDAwLTAwODA1ZjliMzRmYg0KPj4+IAlCYXR0
-ZXJ5IExldmVsDQo+Pj4gW05FV10gUHJpbWFyeSBTZXJ2aWNlDQo+Pj4gCS9vcmcvYmx1ZXovaGNp
-MC9kZXZfRkZfRkZfNTBfMDBfNTNfQjYvc2VydmljZTAwMDkNCj4+PiAJMDAwMDE4MDItMDAwMC0x
-MDAwLTgwMDAtMDA4MDVmOWIzNGZiDQo+Pj4gCUltbWVkaWF0ZSBBbGVydA0KPj4+IFtORVddIENo
-YXJhY3RlcmlzdGljDQo+Pj4gCS9vcmcvYmx1ZXovaGNpMC9kZXZfRkZfRkZfNTBfMDBfNTNfQjYv
-c2VydmljZTAwMDkvY2hhcjAwMGENCj4+PiAJMDAwMDJhMDYtMDAwMC0xMDAwLTgwMDAtMDA4MDVm
-OWIzNGZiDQo+Pj4gCUFsZXJ0IExldmVsDQo+Pj4gW05FV10gUHJpbWFyeSBTZXJ2aWNlDQo+Pj4g
-CS9vcmcvYmx1ZXovaGNpMC9kZXZfRkZfRkZfNTBfMDBfNTNfQjYvc2VydmljZTAwMGMNCj4+PiAJ
-MDAwMGZmZTAtMDAwMC0xMDAwLTgwMDAtMDA4MDVmOWIzNGZiDQo+Pj4gCVVua25vd24NCj4+PiBb
-TkVXXSBDaGFyYWN0ZXJpc3RpYw0KPj4+IAkvb3JnL2JsdWV6L2hjaTAvZGV2X0ZGX0ZGXzUwXzAw
-XzUzX0I2L3NlcnZpY2UwMDBjL2NoYXIwMDBkDQo+Pj4gCTAwMDBmZmUxLTAwMDAtMTAwMC04MDAw
-LTAwODA1ZjliMzRmYg0KPj4+IAlVbmtub3duDQo+Pj4gW0NIR10gRGV2aWNlIEZGOkZGOjUwOjAw
-OjUzOkI2IFVVSURzOiANCj4+PiAwMDAwMTgwMC0wMDAwLTEwMDAtODAwMC0wMDgwNWY5YjM0ZmIN
-Cj4+PiBbQ0hHXSBEZXZpY2UgRkY6RkY6NTA6MDA6NTM6QjYgVVVJRHM6IA0KPj4+IDAwMDAxODAy
-LTAwMDAtMTAwMC04MDAwLTAwODA1ZjliMzRmYg0KPj4+IFtDSEddIERldmljZSBGRjpGRjo1MDow
-MDo1MzpCNiBVVUlEczogDQo+Pj4gMDAwMDE4MGYtMDAwMC0xMDAwLTgwMDAtMDA4MDVmOWIzNGZi
-DQo+Pj4gW0NIR10gRGV2aWNlIEZGOkZGOjUwOjAwOjUzOkI2IFVVSURzOiANCj4+PiAwMDAwZmZl
-MC0wMDAwLTEwMDAtODAwMC0wMDgwNWY5YjM0ZmINCj4+PiBbQ0hHXSBEZXZpY2UgRkY6RkY6NTA6
-MDA6NTM6QjYgU2VydmljZXNSZXNvbHZlZDogeWVzIFtDSEddIERldmljZQ0KPj4+IEZGOkZGOjUw
-OjAwOjUzOkI2IEljb24gaXMgbmlsIFtDSEddIERldmljZSBGRjpGRjo1MDowMDo1MzpCNiANCj4+
-PiBBcHBlYXJhbmNlIGlzIG5pbA0KPj4+IA0KPj4+IFtpVEFHICAgICAgICAgICAgXSMgcmVnaXN0
-ZXItYXBwbGljYXRpb24gMDAwMDE4MGYtMDAwMC0xMDAwLTgwMDAtMDA4MDVmOWIzNGZiDQo+Pj4g
-QXBwbGljYXRpb24gcmVnaXN0ZXJlZA0KPj4+IFtDSEddIERldmljZSBGRjpGRjo1MDowMDo1MzpC
-NiBTZXJ2aWNlc1Jlc29sdmVkOiBubyBbQ0hHXSBEZXZpY2UNCj4+PiBGRjpGRjo1MDowMDo1MzpC
-NiBDb25uZWN0ZWQ6IG5vDQo+Pj4gDQo+Pj4gDQo+Pj4gSGVyZSBpIHBvd2VyIGN5Y2xlZCB0aGUg
-aVRhZyBhbmQgd2FpdGVkIGZldyBtaW51dGVzIGJ1dCBibHVldG9vdGhjdGwgZGlkbuKAmXQgcmVj
-b25uZWN0IHNvIEkgZGlkIGl0IG1hbnVhbGx5Lg0KPj4+IA0KPj4+IA0KPj4+IFtibHVldG9vdGhd
-IyBpbmZvIEZGOkZGOjUwOjAwOjUzOkI2DQo+Pj4gRGV2aWNlIEZGOkZGOjUwOjAwOjUzOkI2DQo+
-Pj4gCU5hbWU6IGlUQUcNCj4+PiAJQWxpYXM6IGlUQUcNCj4+PiAJUGFpcmVkOiBubw0KPj4+IAlU
-cnVzdGVkOiB5ZXMNCj4+PiAJQmxvY2tlZDogbm8NCj4+PiAJQ29ubmVjdGVkOiBubw0KPj4+IAlM
-ZWdhY3lQYWlyaW5nOiBubw0KPj4+IAlVVUlEOiBHZW5lcmljIEFjY2VzcyBQcm9maWxlICAgICgw
-MDAwMTgwMC0wMDAwLTEwMDAtODAwMC0wMDgwNWY5YjM0ZmIpDQo+Pj4gCVVVSUQ6IEltbWVkaWF0
-ZSBBbGVydCAgICAgICAgICAgKDAwMDAxODAyLTAwMDAtMTAwMC04MDAwLTAwODA1ZjliMzRmYikN
-Cj4+PiAJVVVJRDogQmF0dGVyeSBTZXJ2aWNlICAgICAgICAgICAoMDAwMDE4MGYtMDAwMC0xMDAw
-LTgwMDAtMDA4MDVmOWIzNGZiKQ0KPj4+IAlVVUlEOiBVbmtub3duICAgICAgICAgICAgICAgICAg
-ICgwMDAwZmZlMC0wMDAwLTEwMDAtODAwMC0wMDgwNWY5YjM0ZmIpDQo+Pj4gW2JsdWV0b290aF0j
-IGNvbm5lY3QgRkY6RkY6NTA6MDA6NTM6QjYgQXR0ZW1wdGluZyB0byBjb25uZWN0IHRvDQo+Pj4g
-RkY6RkY6NTA6MDA6NTM6QjYgW0NIR10gRGV2aWNlIEZGOkZGOjUwOjAwOjUzOkI2IENvbm5lY3Rl
-ZDogeWVzIA0KPj4+IENvbm5lY3Rpb24gc3VjY2Vzc2Z1bCBbQ0hHXSBEZXZpY2UgRkY6RkY6NTA6
-MDA6NTM6QjYgU2VydmljZXNSZXNvbHZlZDoNCj4+PiB5ZXMNCj4+PiBbaVRBRyAgICAgICAgICAg
-IF0jDQo+PiANCj4gDQoNCg==
+Hi Matias,
+
+On Thu, Jun 22, 2017 at 1:50 PM, Matias Karhumaa
+<matias.karhumaa@gmail.com> wrote:
+> By sending OPP Put request before CONNECT we were able to cause
+> SIGSEGV in obexd. Crash was caused by null pointer dereference.
+> Crash was found using Synopsys Defensics Obex Server test suite.
+>
+> This was fixed by calling os->service->connect if CONNECT was not
+> done before.
+> ---
+>  obexd/src/obex.c | 11 +++++++++++
+>  1 file changed, 11 insertions(+)
+>
+> diff --git a/obexd/src/obex.c b/obexd/src/obex.c
+> index 788bffc..be79a77 100644
+> --- a/obexd/src/obex.c
+> +++ b/obexd/src/obex.c
+> @@ -864,6 +864,17 @@ static void cmd_put(GObex *obex, GObexPacket *req, gpointer user_data)
+>                 return;
+>         }
+>
+> +       /* OPP session don't require CONNECT, in which case just call connect
+> +        * callback to register the transfer.
+> +        */
+> +       if (!os->service_data && os->service->service == OBEX_OPP) {
+> +               os->service_data = os->service->connect(os, &err);
+> +               if (err < 0) {
+> +                       os_set_response(os, err);
+> +                       return;
+> +               }
+> +       }
+> +
+>         parse_type(os, req);
+>
+>         if (os->driver == NULL) {
+> --
+> 2.7.4
+
+Applied, thanks.
+
+-- 
+Luiz Augusto von Dentz
