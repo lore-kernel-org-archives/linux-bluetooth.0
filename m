@@ -1,46 +1,35 @@
-Return-Path: <jeffy.chen@rock-chips.com>
-Message-ID: <594D0BDE.10102@rock-chips.com>
-Date: Fri, 23 Jun 2017 20:38:54 +0800
-From: jeffy <jeffy.chen@rock-chips.com>
-MIME-Version: 1.0
-To: Rohit Vaswani <rvaswani@nvidia.com>,
- "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-CC: Brian Norris <briannorris@chromium.org>,
- Douglas Anderson <dianders@chromium.org>,
- Johan Hedberg <johan.hedberg@intel.com>,
- Peter Hurley <peter@hurleysoftware.com>,
- Johan Hedberg <johan.hedberg@gmail.com>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "David S. Miller" <davem@davemloft.net>,
- Marcel Holtmann <marcel@holtmann.org>,
- Gustavo Padovan <gustavo@padovan.org>
-Subject: Re: Bluetooth: might sleep error in hidp_session_thread
-References: <7be134d7f9904082a35a9cc926ec24d3@HQMAIL106.nvidia.com>
-In-Reply-To: <7be134d7f9904082a35a9cc926ec24d3@HQMAIL106.nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Return-Path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+Subject: Re: [PATCH] Bluetooth: hci_serdev: make hci_serdev_client_ops static
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20170623083738.8836-1-colin.king@canonical.com>
+Date: Fri, 23 Jun 2017 10:55:53 +0200
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+        kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
+Message-Id: <F2C49C06-F6D7-4598-87DE-F4BC98A546F7@holtmann.org>
+References: <20170623083738.8836-1-colin.king@canonical.com>
+To: Colin King <colin.king@canonical.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Rohit,
+Hi Colin,
 
-Thanx for your reply, and sorry to the delay, somehow your mail was 
-marked as spam by the mail server :(
+> The structure hci_serdev_client_ops does not need to be in global scope
+> and is not modified, so make it static.
+> 
+> Cleans up sparse warning:
+> "symbol 'hci_serdev_client_ops' was not declared. Should it be static?"
+> 
+> Signed-off-by: Colin Ian King <colin.king@canonical.com>
+> ---
+> drivers/bluetooth/hci_serdev.c | 4 ++--
+> 1 file changed, 2 insertions(+), 2 deletions(-)
 
-On 06/13/2017 02:31 AM, Rohit Vaswani wrote:
-> Hi Jeffy,
->
-> I was looking into the patch from Jeffy Chen from February 14 2017  :
->   [v4,3/3] Bluetooth: hidp: fix possible might sleep error in hidp_session_thread: https://patchwork.kernel.org/patch/9570931/
->
-> We faced a similar issue and this patch seems to fix the problem in our preliminary test.
-> I am trying to check if there was a reason this wasn't merged earlier ?
+patch has been applied to bluetooth-next tree.
 
-hmm, i'm not sure why, but please feel free to add your test-by~
->
-> Thanks,
-> Rohit
->
-> nvpublic
->
->
->
+Regards
+
+Marcel
