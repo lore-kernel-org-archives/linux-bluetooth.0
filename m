@@ -1,49 +1,52 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Subject: Re: QCA ROME (btqca) driver issues? bt stack issues? kernel HID
- output points to bt device latency issues...
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <69492e80-3da0-db04-b41c-2f601ba2f48e@varnernet.com>
-Date: Fri, 23 Jun 2017 10:48:57 +0200
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Message-Id: <A512C492-7675-493B-942D-B9C3C69DAB82@holtmann.org>
-References: <69492e80-3da0-db04-b41c-2f601ba2f48e@varnernet.com>
-To: Bryan Varner <bryan@varnernet.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <colin.king@canonical.com>
+From: Colin King <colin.king@canonical.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Cc: kernel-janitors@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] Bluetooth: hci_serdev: make hci_serdev_client_ops static
+Date: Fri, 23 Jun 2017 09:37:38 +0100
+Message-Id: <20170623083738.8836-1-colin.king@canonical.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bryan,
+From: Colin Ian King <colin.king@canonical.com>
 
-> Over the last few days with a new laptop, I've been having many issues with the on-board bt.
-> 
-> * My bt keyboard begins to repeat keys randomly.
-> * Mouse behavior is completely erratic, and connections don't last more than a couple minutes.
-> 
-> I've had an HID driver dev look at kernel output logs of HID data. It appears packets relating to key-ups from the keyboard and other mouse data has huge latency issues. The kernel is receiving key-down events and sometimes there is a pause of several hundred or thousand ms before the keyup event comes in to the HID drivers. This happens even if I'm just typing normally (believe me, I'm not holding the keys down when this happens). Regarding the mouse, it looks like the mouse is also dropping events, and then the mouse forces an L2CAP disconnect and renegotiation (according to btmon dumps).
-> 
-> Wireless network (802.11 -- also on this Dell branded ROME based card) seems to be rock-steady.
-> 
-> 
-> I'm running a locally built kernel 4.11.6 SMP  with bluez 5.43-2 (debian 9 package).
-> 
-> # dmesg | grep 'qca'
-> [    3.546077] Bluetooth: hci0: using rampatch file: qca/rampatch_usb_00000302.bin
-> [    3.561669] ath10k_pci 0000:02:00.0: qca6174 hw3.2 target 0x05030000 chip_id 0x00340aff sub 1028:0310
-> [    3.575096] Bluetooth: hci0: using NVM file: qca/nvm_usb_00000302.bin
-> 
-> 
-> 
-> 
-> In order to isolate the issue a bit, I've plugged in an old bt host adapter I had laying around that I knew worked well on other machines.
-> The same keyboard and mouse are working perfectly with it (and have in the past). The btmon output from this older host adapter looks quite different from the output I get from the qca device. The mouse sends a steady stream of mode change events when not sending actual data, they keyboard behaves properly, and I've yet to loose a mouse connection.
-> 
-> I'd love to get the onboard BT working better, because I hate carrying around dongles.
-> What can I do to help?
+The structure hci_serdev_client_ops does not need to be in global scope
+and is not modified, so make it static.
 
-send around btmon -w trace.log so that we can see what is going on there.
+Cleans up sparse warning:
+"symbol 'hci_serdev_client_ops' was not declared. Should it be static?"
 
-Regards
+Signed-off-by: Colin Ian King <colin.king@canonical.com>
+---
+ drivers/bluetooth/hci_serdev.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Marcel
-
+diff --git a/drivers/bluetooth/hci_serdev.c b/drivers/bluetooth/hci_serdev.c
+index 7de0edc0ff8c..aea930101dd2 100644
+--- a/drivers/bluetooth/hci_serdev.c
++++ b/drivers/bluetooth/hci_serdev.c
+@@ -31,7 +31,7 @@
+ 
+ #include "hci_uart.h"
+ 
+-struct serdev_device_ops hci_serdev_client_ops;
++static struct serdev_device_ops hci_serdev_client_ops;
+ 
+ static inline void hci_uart_tx_complete(struct hci_uart *hu, int pkt_type)
+ {
+@@ -268,7 +268,7 @@ static int hci_uart_receive_buf(struct serdev_device *serdev, const u8 *data,
+ 	return count;
+ }
+ 
+-struct serdev_device_ops hci_serdev_client_ops = {
++static struct serdev_device_ops hci_serdev_client_ops = {
+ 	.receive_buf = hci_uart_receive_buf,
+ 	.write_wakeup = hci_uart_write_wakeup,
+ };
+-- 
+2.11.0
