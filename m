@@ -1,95 +1,81 @@
-Return-Path: <jeffy.chen@rock-chips.com>
-From: Jeffy Chen <jeffy.chen@rock-chips.com>
-To: linux-kernel@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org
-Cc: rvaswani@nvidia.com,
-	briannorris@chromium.org,
-	dmitry.torokhov@gmail.com,
-	dianders@chromium.org,
-	acho@suse.com,
-	Jeffy Chen <jeffy.chen@rock-chips.com>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	netdev@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>
-Subject: [RESEND PATCH v4 1/3] Bluetooth: bnep: fix possible might sleep error in bnep_session
-Date: Tue, 27 Jun 2017 17:34:42 +0800
-Message-Id: <1498556084-25346-1-git-send-email-jeffy.chen@rock-chips.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Subject: Re: what to do with brcm_patchram_plus?
+To: Ian Molton <ian@mnementh.co.uk>
+References: <7cef65c9-b831-b0bb-8029-38fcd99e75aa@mnementh.co.uk>
+ <1f37eeff-7ce8-9242-13bc-0c718b1acefa@intel.com>
+ <e3ade999-25c1-a28f-02d6-85dbcc583017@mnementh.co.uk>
+From: Loic Poulain <loic.poulain@intel.com>
+Cc: linux-bluetooth@vger.kernel.org
+Message-ID: <b99e7bff-6113-b77e-3798-fe87c92de952@intel.com>
+Date: Tue, 27 Jun 2017 10:30:45 +0200
+MIME-Version: 1.0
+In-Reply-To: <e3ade999-25c1-a28f-02d6-85dbcc583017@mnementh.co.uk>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-It looks like bnep_session has same pattern as the issue reported in
-old rfcomm:
+Hi Ian,
 
-	while (1) {
-		set_current_state(TASK_INTERRUPTIBLE);
-		if (condition)
-			break;
-		// may call might_sleep here
-		schedule();
-	}
-	__set_current_state(TASK_RUNNING);
+> OK, so it looks like it is capable of loading the firmware - thats a big
+> step. sadly,
+>
+> hciconfig hci0 up
+>
+> results in:
+>
+> Bluetooth: hci0: BCM: chip id 94
+> Bluetooth: hci0: BCM (001.002.009) build 0022
+> Bluetooth: hci0: BCM (001.002.009) build 0022
+> Can't init device hci0: No such device (19)
 
-Which fixed at:
-	dfb2fae Bluetooth: Fix nested sleeps
+Good, Looking at the hci_bcm/btbcm driver, seems that you go through the 
+the bcm_setup procedure
+and successfully load the firmware, you rename it BCM.hcd, right ?
 
-So let's fix it at the same way, also follow the suggestion of:
-https://lwn.net/Articles/628628/
+However I think the bcm_setup failed because of:
 
-Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
-Reviewed-by: Brian Norris <briannorris@chromium.org>
-Reviewed-by: AL Yu-Chen Cho <acho@suse.com>
----
+err = bcm_request_irq(bcm);
+if (!err)
+         err = bcm_setup_sleep(hu);
 
-Changes in v4: None
-Changes in v2: None
+return err;
 
- net/bluetooth/bnep/core.c | 11 +++++------
- 1 file changed, 5 insertions(+), 6 deletions(-)
+bcm_request_irq fails since there is no platform device attached to this 
+uart/tty (no acpi nor DT entry).
+So the driver is unable to retrieve resources like gpios/irq, 
+bcm_request_irq returns -ENODEV.
 
-diff --git a/net/bluetooth/bnep/core.c b/net/bluetooth/bnep/core.c
-index fbf251f..4d6b94d 100644
---- a/net/bluetooth/bnep/core.c
-+++ b/net/bluetooth/bnep/core.c
-@@ -484,16 +484,16 @@ static int bnep_session(void *arg)
- 	struct net_device *dev = s->dev;
- 	struct sock *sk = s->sock->sk;
- 	struct sk_buff *skb;
--	wait_queue_t wait;
-+	DEFINE_WAIT_FUNC(wait, woken_wake_function);
- 
- 	BT_DBG("");
- 
- 	set_user_nice(current, -15);
- 
--	init_waitqueue_entry(&wait, current);
- 	add_wait_queue(sk_sleep(sk), &wait);
- 	while (1) {
--		set_current_state(TASK_INTERRUPTIBLE);
-+		/* Ensure session->terminate is updated */
-+		smp_mb__before_atomic();
- 
- 		if (atomic_read(&s->terminate))
- 			break;
-@@ -515,9 +515,8 @@ static int bnep_session(void *arg)
- 				break;
- 		netif_wake_queue(dev);
- 
--		schedule();
-+		wait_woken(&wait, TASK_INTERRUPTIBLE, MAX_SCHEDULE_TIMEOUT);
- 	}
--	__set_current_state(TASK_RUNNING);
- 	remove_wait_queue(sk_sleep(sk), &wait);
- 
- 	/* Cleanup session */
-@@ -666,7 +665,7 @@ int bnep_del_connection(struct bnep_conndel_req *req)
- 	s = __bnep_get_session(req->dst);
- 	if (s) {
- 		atomic_inc(&s->terminate);
--		wake_up_process(s->task);
-+		wake_up_interruptible(sk_sleep(s->sock->sk));
- 	} else
- 		err = -ENOENT;
- 
--- 
-2.1.4
+This should NOT be a problem, since the driver supports this case 
+(without power control).
+However, the bcm_setup procedure returns the err value set by 
+bcm_request_irq.
+
+Would you be able to apply the following change to your kernel/module 
+and retry ?
+
+diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
+index f87bfdf..b6e94ab 100644
+--- a/drivers/bluetooth/hci_bcm.c
++++ b/drivers/bluetooth/hci_bcm.c
+@@ -423,7 +423,7 @@ static int bcm_setup(struct hci_uart *hu)
+         if (!err)
+                 err = bcm_setup_sleep(hu);
+
+-       return err;
++       return 0;
+  }
+
+
+Regards,
+Loic
+
+> however, I can use the old hciattach method to attach to the uart and it
+> works - thus the firmware is running.
+>
+> I'll prod this a bit tomorrow - in the meantime, is there a known
+> current/good firmware for this chip? (43430a)
+>
+> Thanks,
+>
+> -Ian
+
