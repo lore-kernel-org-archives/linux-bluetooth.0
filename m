@@ -1,78 +1,59 @@
-Return-Path: <htejun@gmail.com>
-Sender: Tejun Heo <htejun@gmail.com>
-Date: Tue, 27 Jun 2017 13:39:46 -0400
-From: Tejun Heo <tj@kernel.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Dominik Brodowski <linux@dominikbrodowski.net>,
-	"Gustavo F. Padovan" <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	LKML <linux-kernel@vger.kernel.org>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: 4.12.0-rc6+: WQ_MEM_RECLAIM hci0:hci_power_off is flushing
- !WQ_MEM_RECLAIM events:btusb_work
-Message-ID: <20170627173946.GE2289@htj.duckdns.org>
-References: <20170625182149.GA18000@light.dominikbrodowski.net>
- <20170627152032.GA2289@htj.duckdns.org>
- <83EA7A09-DDFB-4CEB-8F45-52BFDCE3C6DF@holtmann.org>
-MIME-Version: 1.0
+Return-Path: <netdev-owner@vger.kernel.org>
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <83EA7A09-DDFB-4CEB-8F45-52BFDCE3C6DF@holtmann.org>
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+Subject: Re: [RESEND PATCH v4 1/3] Bluetooth: bnep: fix possible might sleep
+ error in bnep_session
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1498556084-25346-1-git-send-email-jeffy.chen@rock-chips.com>
+Date: Tue, 27 Jun 2017 19:32:52 +0200
+Cc: LKML <linux-kernel@vger.kernel.org>,
+        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+        rvaswani@nvidia.com, Brian Norris <briannorris@chromium.org>,
+        dmitry.torokhov@gmail.com,
+        Douglas Anderson <dianders@chromium.org>, acho@suse.com,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Network Development <netdev@vger.kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        "Gustavo F. Padovan" <gustavo@padovan.org>
+Message-Id: <0815411E-62D7-42DC-A0BF-78FD150C0949@holtmann.org>
+References: <1498556084-25346-1-git-send-email-jeffy.chen@rock-chips.com>
+To: Jeffy Chen <jeffy.chen@rock-chips.com>
+Sender: netdev-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello, Marcel.
+Hi Jeffy,
 
-On Tue, Jun 27, 2017 at 07:28:40PM +0200, Marcel Holtmann wrote:
-> >> On my Dell XPS 13 9343 (x86_64), the following warning was logged right
-> >> after a resume from suspend-to-mem (not on *every* resume, though, so it
-> >> might be hard to reproduce). The kernel is v4.12.0-rc6+ as of 94a6df251dd0,
-> >> and I don't really use bluetooth, though the drivers are loaded:
-> >> 
-> >> PM: Finishing wakeup.
-> >> OOM killer enabled.
-> >> Restarting tasks ... done.
-> >> Bluetooth: hci0: read Intel version: 370710018002030d00
-> >> Bluetooth: hci0: Intel Bluetooth firmware file: intel/ibt-hw-37.7.10-fw-1.80.2.3.d.bseq
-> >> Bluetooth: hci0: Intel Bluetooth firmware patch completed and activated
-> >> ... <more, unrelated messages>
-> >> workqueue: WQ_MEM_RECLAIM hci0:hci_power_off is flushing !WQ_MEM_RECLAIM events:btusb_work
-> > 
-> > So, WQ_MEM_RECLAIM has to be transitive; otherwise, it doesn't mean
-> > anything.  I have a hard time believing that bluetooth actually needs
-> > WQ_MEM_RECLAIM unless people mount nfs through a bluetooth tethered
-> > phone.  Would it be possible to remove WQ_MEM_RECLAIM from these
-> > workqueues?
+> It looks like bnep_session has same pattern as the issue reported in
+> old rfcomm:
 > 
-> frankly I do not remember. We used what was recommended to use. I
-> know that the only requirement in one case is that it is a truly
-> single workqueue.
+> 	while (1) {
+> 		set_current_state(TASK_INTERRUPTIBLE);
+> 		if (condition)
+> 			break;
+> 		// may call might_sleep here
+> 		schedule();
+> 	}
+> 	__set_current_state(TASK_RUNNING);
+> 
+> Which fixed at:
+> 	dfb2fae Bluetooth: Fix nested sleeps
+> 
+> So let's fix it at the same way, also follow the suggestion of:
+> https://lwn.net/Articles/628628/
+> 
+> Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
+> Reviewed-by: Brian Norris <briannorris@chromium.org>
+> Reviewed-by: AL Yu-Chen Cho <acho@suse.com>
+> ---
+> 
+> Changes in v4: None
+> Changes in v2: None
+> 
+> net/bluetooth/bnep/core.c | 11 +++++------
+> 1 file changed, 5 insertions(+), 6 deletions(-)
 
-Heh, I don't remember either.  I wonder whether there is an existing
-dependency chain from network side which triggers the warning.
-Dominik, can you please see whether the following patch makes the
-warning go away while not triggering new ones?
+all 3 patches have been applied to bluetooth-next tree.
 
-Thanks.
+Regards
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 05686776a5fb..85ec6f7afbf7 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -3047,15 +3047,14 @@ int hci_register_dev(struct hci_dev *hdev)
- 
- 	BT_DBG("%p name %s bus %d", hdev, hdev->name, hdev->bus);
- 
--	hdev->workqueue = alloc_workqueue("%s", WQ_HIGHPRI | WQ_UNBOUND |
--					  WQ_MEM_RECLAIM, 1, hdev->name);
-+	hdev->workqueue = alloc_ordered_workqueue("%s", WQ_HIGHPRI, hdev->name);
- 	if (!hdev->workqueue) {
- 		error = -ENOMEM;
- 		goto err;
- 	}
- 
--	hdev->req_workqueue = alloc_workqueue("%s", WQ_HIGHPRI | WQ_UNBOUND |
--					      WQ_MEM_RECLAIM, 1, hdev->name);
-+	hdev->req_workqueue = alloc_ordered_workqueue("%s", WQ_HIGHPRI,
-+						      hdev->name);
- 	if (!hdev->req_workqueue) {
- 		destroy_workqueue(hdev->workqueue);
- 		error = -ENOMEM;
+Marcel
