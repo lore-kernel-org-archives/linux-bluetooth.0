@@ -1,60 +1,78 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Subject: Re: what to do with brcm_patchram_plus?
-To: Loic Poulain <loic.poulain@intel.com>
-Cc: linux-bluetooth@vger.kernel.org
-References: <7cef65c9-b831-b0bb-8029-38fcd99e75aa@mnementh.co.uk>
- <1f37eeff-7ce8-9242-13bc-0c718b1acefa@intel.com>
- <e3ade999-25c1-a28f-02d6-85dbcc583017@mnementh.co.uk>
- <b99e7bff-6113-b77e-3798-fe87c92de952@intel.com>
-From: Ian Molton <ian@mnementh.co.uk>
-Message-ID: <4e20b9ff-601c-a6ba-a381-470d14cc8343@mnementh.co.uk>
-Date: Tue, 27 Jun 2017 15:48:14 +0100
+Return-Path: <jeffy.chen@rock-chips.com>
+Message-ID: <595228D7.1070807@rock-chips.com>
+Date: Tue, 27 Jun 2017 17:43:51 +0800
+From: jeffy <jeffy.chen@rock-chips.com>
 MIME-Version: 1.0
-In-Reply-To: <b99e7bff-6113-b77e-3798-fe87c92de952@intel.com>
-Content-Type: text/plain; charset=utf-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+To: Rohit Vaswani <rvaswani@nvidia.com>,
+ "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+CC: Brian Norris <briannorris@chromium.org>,
+ Douglas Anderson <dianders@chromium.org>,
+ Johan Hedberg <johan.hedberg@intel.com>,
+ Peter Hurley <peter@hurleysoftware.com>,
+ Johan Hedberg <johan.hedberg@gmail.com>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "David S. Miller" <davem@davemloft.net>,
+ Marcel Holtmann <marcel@holtmann.org>,
+ Gustavo Padovan <gustavo@padovan.org>
+Subject: Re: Bluetooth: might sleep error in hidp_session_thread
+References: <7be134d7f9904082a35a9cc926ec24d3@HQMAIL106.nvidia.com> <594D0BDE.10102@rock-chips.com> <cc75d14021724c2d8b74a92482d67b7b@HQMAIL105.nvidia.com>
+In-Reply-To: <cc75d14021724c2d8b74a92482d67b7b@HQMAIL105.nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 27/06/17 09:30, Loic Poulain wrote:
-> Hi Ian,
+Hi Rohit,
 
-Hi!
+On 06/24/2017 02:00 AM, Rohit Vaswani wrote:
+> I don't have a way to reply back to the older message; but you can use by tested-by for the below patch and re-send:
+>
+ok, i've resent it, thanks for your test by~
 
-> Would you be able to apply the following change to your
-> kernel/module and retry ?
-> 
-> diff --git a/drivers/bluetooth/hci_bcm.c
-> b/drivers/bluetooth/hci_bcm.c index f87bfdf..b6e94ab 100644 ---
-> a/drivers/bluetooth/hci_bcm.c +++ b/drivers/bluetooth/hci_bcm.c @@
-> -423,7 +423,7 @@ static int bcm_setup(struct hci_uart *hu) if (!err) 
-> err = bcm_setup_sleep(hu);
-> 
-> -       return err; +       return 0; }
+and for replying to an old message, i've figured it out when i tried to 
+do that recently:
 
-I suspected as much, something on those lines - yes, your patch makes it
-work.
+1/ download the mbox file from the patchwork 
+link(https://patchwork.kernel.org/patch/***)
+2/ rename it to .mbox
+3/ import into thunerbird(using ImportExportTools)
 
-hciconfig
-hci0: Type: Primary Bus: UART
-BD Address: 43:43:A1:12:1F:AC ACL MTU: 1021:8 SCO MTU: 64:1
-UP RUNNING PSCAN ISCAN
-RX bytes:8823 acl:150 sco:0 events:333 errors:0
-TX bytes:26178 acl:150 sco:0 commands:173 errors:0
+hope that helps ;)
 
-
-Its considerably more reliable at scanning thus far, too.
-
-Any idea on the below point?
-
->> I'll prod this a bit tomorrow - in the meantime, is there a known 
->> current/good firmware for this chip? (43430a)
-Mine seems to function, md5sum:
-
-00b4a75a3bc247f96eb07f12b28dd061 /lib/firmware/brcm/BCM.hcd
-
-ls -l /lib/firmware/brcm/BCM.hcd
--rwxr-xr-x 1 root root 14265 Jun 26 18:23 /lib/firmware/brcm/BCM.hcd
-
-PS. Are my emails coming out OK now? I think it's fixed :)
-
--Ian
+> For patch: [v4,3/3] Bluetooth: hidp: fix possible might sleep error in hidp_session_thread
+>
+> Tested-by: Rohit Vaswani <rvaswani@nvidia.com>
+>
+> -Rohit
+>
+> -----Original Message-----
+> From: jeffy [mailto:jeffy.chen@rock-chips.com]
+> Sent: Friday, June 23, 2017 05:39
+> To: Rohit Vaswani; linux-bluetooth@vger.kernel.org
+> Cc: Brian Norris; Douglas Anderson; Johan Hedberg; Peter Hurley; Johan Hedberg; netdev@vger.kernel.org; linux-kernel@vger.kernel.org; David S. Miller; Marcel Holtmann; Gustavo Padovan
+> Subject: Re: Bluetooth: might sleep error in hidp_session_thread
+>
+> Hi Rohit,
+>
+> Thanx for your reply, and sorry to the delay, somehow your mail was marked as spam by the mail server :(
+>
+> On 06/13/2017 02:31 AM, Rohit Vaswani wrote:
+>> Hi Jeffy,
+>>
+>> I was looking into the patch from Jeffy Chen from February 14 2017  :
+>>    [v4,3/3] Bluetooth: hidp: fix possible might sleep error in
+>> hidp_session_thread: https://patchwork.kernel.org/patch/9570931/
+>>
+>> We faced a similar issue and this patch seems to fix the problem in our preliminary test.
+>> I am trying to check if there was a reason this wasn't merged earlier ?
+>
+> hmm, i'm not sure why, but please feel free to add your test-by~
+>>
+>> Thanks,
+>> Rohit
+>>
+>> nvpublic
+>>
+>>
+>>
+>
+>
