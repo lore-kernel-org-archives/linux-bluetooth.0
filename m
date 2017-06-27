@@ -1,78 +1,112 @@
 Return-Path: <jeffy.chen@rock-chips.com>
-Message-ID: <595228D7.1070807@rock-chips.com>
-Date: Tue, 27 Jun 2017 17:43:51 +0800
-From: jeffy <jeffy.chen@rock-chips.com>
-MIME-Version: 1.0
-To: Rohit Vaswani <rvaswani@nvidia.com>,
- "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-CC: Brian Norris <briannorris@chromium.org>,
- Douglas Anderson <dianders@chromium.org>,
- Johan Hedberg <johan.hedberg@intel.com>,
- Peter Hurley <peter@hurleysoftware.com>,
- Johan Hedberg <johan.hedberg@gmail.com>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "David S. Miller" <davem@davemloft.net>,
- Marcel Holtmann <marcel@holtmann.org>,
- Gustavo Padovan <gustavo@padovan.org>
-Subject: Re: Bluetooth: might sleep error in hidp_session_thread
-References: <7be134d7f9904082a35a9cc926ec24d3@HQMAIL106.nvidia.com> <594D0BDE.10102@rock-chips.com> <cc75d14021724c2d8b74a92482d67b7b@HQMAIL105.nvidia.com>
-In-Reply-To: <cc75d14021724c2d8b74a92482d67b7b@HQMAIL105.nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: Jeffy Chen <jeffy.chen@rock-chips.com>
+To: linux-kernel@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org
+Cc: rvaswani@nvidia.com,
+	briannorris@chromium.org,
+	dmitry.torokhov@gmail.com,
+	dianders@chromium.org,
+	acho@suse.com,
+	Jeffy Chen <jeffy.chen@rock-chips.com>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	netdev@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Gustavo Padovan <gustavo@padovan.org>
+Subject: [RESEND PATCH v4 2/3] Bluetooth: cmtp: fix possible might sleep error in cmtp_session
+Date: Tue, 27 Jun 2017 17:34:43 +0800
+Message-Id: <1498556084-25346-2-git-send-email-jeffy.chen@rock-chips.com>
+In-Reply-To: <1498556084-25346-1-git-send-email-jeffy.chen@rock-chips.com>
+References: <1498556084-25346-1-git-send-email-jeffy.chen@rock-chips.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Rohit,
+It looks like cmtp_session has same pattern as the issue reported in
+old rfcomm:
 
-On 06/24/2017 02:00 AM, Rohit Vaswani wrote:
-> I don't have a way to reply back to the older message; but you can use by tested-by for the below patch and re-send:
->
-ok, i've resent it, thanks for your test by~
+	while (1) {
+		set_current_state(TASK_INTERRUPTIBLE);
+		if (condition)
+			break;
+		// may call might_sleep here
+		schedule();
+	}
+	__set_current_state(TASK_RUNNING);
 
-and for replying to an old message, i've figured it out when i tried to 
-do that recently:
+Which fixed at:
+	dfb2fae Bluetooth: Fix nested sleeps
 
-1/ download the mbox file from the patchwork 
-link(https://patchwork.kernel.org/patch/***)
-2/ rename it to .mbox
-3/ import into thunerbird(using ImportExportTools)
+So let's fix it at the same way, also follow the suggestion of:
+https://lwn.net/Articles/628628/
 
-hope that helps ;)
+Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
+Reviewed-by: Brian Norris <briannorris@chromium.org>
+Reviewed-by: AL Yu-Chen Cho <acho@suse.com>
 
-> For patch: [v4,3/3] Bluetooth: hidp: fix possible might sleep error in hidp_session_thread
->
-> Tested-by: Rohit Vaswani <rvaswani@nvidia.com>
->
-> -Rohit
->
-> -----Original Message-----
-> From: jeffy [mailto:jeffy.chen@rock-chips.com]
-> Sent: Friday, June 23, 2017 05:39
-> To: Rohit Vaswani; linux-bluetooth@vger.kernel.org
-> Cc: Brian Norris; Douglas Anderson; Johan Hedberg; Peter Hurley; Johan Hedberg; netdev@vger.kernel.org; linux-kernel@vger.kernel.org; David S. Miller; Marcel Holtmann; Gustavo Padovan
-> Subject: Re: Bluetooth: might sleep error in hidp_session_thread
->
-> Hi Rohit,
->
-> Thanx for your reply, and sorry to the delay, somehow your mail was marked as spam by the mail server :(
->
-> On 06/13/2017 02:31 AM, Rohit Vaswani wrote:
->> Hi Jeffy,
->>
->> I was looking into the patch from Jeffy Chen from February 14 2017  :
->>    [v4,3/3] Bluetooth: hidp: fix possible might sleep error in
->> hidp_session_thread: https://patchwork.kernel.org/patch/9570931/
->>
->> We faced a similar issue and this patch seems to fix the problem in our preliminary test.
->> I am trying to check if there was a reason this wasn't merged earlier ?
->
-> hmm, i'm not sure why, but please feel free to add your test-by~
->>
->> Thanks,
->> Rohit
->>
->> nvpublic
->>
->>
->>
->
->
+---
+
+Changes in v4: None
+Changes in v2:
+Remove unnecessary memory barrier before wake_up_* functions.
+
+ net/bluetooth/cmtp/core.c | 17 ++++++++++-------
+ 1 file changed, 10 insertions(+), 7 deletions(-)
+
+diff --git a/net/bluetooth/cmtp/core.c b/net/bluetooth/cmtp/core.c
+index 9e59b66..1152ce3 100644
+--- a/net/bluetooth/cmtp/core.c
++++ b/net/bluetooth/cmtp/core.c
+@@ -280,16 +280,16 @@ static int cmtp_session(void *arg)
+ 	struct cmtp_session *session = arg;
+ 	struct sock *sk = session->sock->sk;
+ 	struct sk_buff *skb;
+-	wait_queue_t wait;
++	DEFINE_WAIT_FUNC(wait, woken_wake_function);
+ 
+ 	BT_DBG("session %p", session);
+ 
+ 	set_user_nice(current, -15);
+ 
+-	init_waitqueue_entry(&wait, current);
+ 	add_wait_queue(sk_sleep(sk), &wait);
+ 	while (1) {
+-		set_current_state(TASK_INTERRUPTIBLE);
++		/* Ensure session->terminate is updated */
++		smp_mb__before_atomic();
+ 
+ 		if (atomic_read(&session->terminate))
+ 			break;
+@@ -306,9 +306,8 @@ static int cmtp_session(void *arg)
+ 
+ 		cmtp_process_transmit(session);
+ 
+-		schedule();
++		wait_woken(&wait, TASK_INTERRUPTIBLE, MAX_SCHEDULE_TIMEOUT);
+ 	}
+-	__set_current_state(TASK_RUNNING);
+ 	remove_wait_queue(sk_sleep(sk), &wait);
+ 
+ 	down_write(&cmtp_session_sem);
+@@ -393,7 +392,7 @@ int cmtp_add_connection(struct cmtp_connadd_req *req, struct socket *sock)
+ 		err = cmtp_attach_device(session);
+ 		if (err < 0) {
+ 			atomic_inc(&session->terminate);
+-			wake_up_process(session->task);
++			wake_up_interruptible(sk_sleep(session->sock->sk));
+ 			up_write(&cmtp_session_sem);
+ 			return err;
+ 		}
+@@ -431,7 +430,11 @@ int cmtp_del_connection(struct cmtp_conndel_req *req)
+ 
+ 		/* Stop session thread */
+ 		atomic_inc(&session->terminate);
+-		wake_up_process(session->task);
++
++		/* Ensure session->terminate is updated */
++		smp_mb__after_atomic();
++
++		wake_up_interruptible(sk_sleep(session->sock->sk));
+ 	} else
+ 		err = -ENOENT;
+ 
+-- 
+2.1.4
