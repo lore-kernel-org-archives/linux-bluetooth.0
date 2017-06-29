@@ -1,314 +1,195 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Subject: Re: [PATCH BlueZ 2/9] client: Add register-service command
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        <linux-bluetooth@vger.kernel.org>
-References: <20170628125423.26208-1-luiz.dentz@gmail.com>
- <20170628125423.26208-3-luiz.dentz@gmail.com>
-From: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
-Message-ID: <391bb377-2bad-c53f-4a98-96d7a6f7e233@jp.fujitsu.com>
-Date: Fri, 30 Jun 2017 14:50:22 +0900
+Return-Path: <ian@mnementh.co.uk>
+To: linux-bluetooth@vger.kernel.org
+Cc: Loic Poulain <loic.poulain@intel.com>, marcel@holtmann.org
+From: Ian Molton <ian@mnementh.co.uk>
+Subject: BCM43430 BT driver almost working...
+Message-ID: <c4cf0689-d28e-492d-399e-968a70488e22@mnementh.co.uk>
+Date: Thu, 29 Jun 2017 19:06:42 +0100
 MIME-Version: 1.0
-In-Reply-To: <20170628125423.26208-3-luiz.dentz@gmail.com>
-Content-Type: text/plain; charset="utf-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi guys,
 
-On 2017年06月28日 21:54, Luiz Augusto von Dentz wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> This adds register-service command which can be used to add GATT services
-> to the application:
-> 
-> [bluetooth]# register-service 00001820-0000-1000-8000-00805f9b34fb
-> [NEW] Primary Service
-> 	/org/bluez/app/service0x92a150
-> 	00001820-0000-1000-8000-00805f9b34fb
-> 	Internet Protocol Support
-> [bluetooth]# register-application
-> [CHG] Controller 00:1B:DC:07:31:88 UUIDs: 00001112-0000-1000-8000-00805f9b34fb
-> [CHG] Controller 00:1B:DC:07:31:88 UUIDs: 00001801-0000-1000-8000-00805f9b34fb
-> [CHG] Controller 00:1B:DC:07:31:88 UUIDs: 0000110e-0000-1000-8000-00805f9b34fb
-> [CHG] Controller 00:1B:DC:07:31:88 UUIDs: 0000112d-0000-1000-8000-00805f9b34fb
-> [CHG] Controller 00:1B:DC:07:31:88 UUIDs: 00001800-0000-1000-8000-00805f9b34fb
-> [CHG] Controller 00:1B:DC:07:31:88 UUIDs: 00001820-0000-1000-8000-00805f9b34fb
-> [CHG] Controller 00:1B:DC:07:31:88 UUIDs: 00001200-0000-1000-8000-00805f9b34fb
-> [CHG] Controller 00:1B:DC:07:31:88 UUIDs: 0000110c-0000-1000-8000-00805f9b34fb
-> [CHG] Controller 00:1B:DC:07:31:88 UUIDs: 0000110a-0000-1000-8000-00805f9b34fb
-> [CHG] Controller 00:1B:DC:07:31:88 UUIDs: 0000110b-0000-1000-8000-00805f9b34fb
-> 
-> Note: register-application still has to be called at the end to register
-> with bluetoothd as everything is done with ObjectManager.
-> ---
->  client/gatt.c | 140 +++++++++++++++++++++++++++++++++++++++++++++++++---------
->  client/gatt.h |   3 ++
->  client/main.c |  24 ++++++++++
->  3 files changed, 145 insertions(+), 22 deletions(-)
-> 
-> diff --git a/client/gatt.c b/client/gatt.c
-> index 8b7a9c6..282f07e 100644
-> --- a/client/gatt.c
-> +++ b/client/gatt.c
-> @@ -45,22 +45,55 @@
->  
->  #define APP_PATH "/org/bluez/app"
->  #define PROFILE_INTERFACE "org.bluez.GattProfile1"
-> +#define SERVICE_INTERFACE "org.bluez.GattService1"
->  
->  /* String display constants */
->  #define COLORED_NEW	COLOR_GREEN "NEW" COLOR_OFF
->  #define COLORED_CHG	COLOR_YELLOW "CHG" COLOR_OFF
->  #define COLORED_DEL	COLOR_RED "DEL" COLOR_OFF
->  
-> +struct service {
-> +	DBusConnection *conn;
-> +	char *path;
-> +	char *uuid;
-> +	bool primary;
-> +};
-> +
-> +static GList *local_services;
->  static GList *services;
->  static GList *characteristics;
->  static GList *descriptors;
->  static GList *managers;
->  static GList *uuids;
->  
-> -static void print_service(GDBusProxy *proxy, const char *description)
-> +static void print_service(struct service *service, const char *description)
->  {
-> +	const char *text;
-> +
-> +	text = uuidstr_to_str(service->uuid);
-> +	if (!text)
-> +		rl_printf("%s%s%s%s Service\n\t%s\n\t%s\n",
-> +					description ? "[" : "",
-> +					description ? : "",
-> +					description ? "] " : "",
-> +					service->primary ? "Primary" :
-> +					"Secondary",
-> +					service->path, service->uuid);
-> +	else
-> +		rl_printf("%s%s%s%s Service\n\t%s\n\t%s\n\t%s\n",
-> +					description ? "[" : "",
-> +					description ? : "",
-> +					description ? "] " : "",
-> +					service->primary ? "Primary" :
-> +					"Secondary",
-> +					service->path, service->uuid, text);
-> +}
-> +
-> +static void print_service_proxy(GDBusProxy *proxy, const char *description)
-> +{
-> +	struct service service;
->  	DBusMessageIter iter;
-> -	const char *uuid, *text;
-> +	const char *uuid;
->  	dbus_bool_t primary;
->  
->  	if (g_dbus_proxy_get_property(proxy, "UUID", &iter) == FALSE)
-> @@ -73,30 +106,18 @@ static void print_service(GDBusProxy *proxy, const char *description)
->  
->  	dbus_message_iter_get_basic(&iter, &primary);
->  
-> -	text = uuidstr_to_str(uuid);
-> -	if (!text)
-> -		rl_printf("%s%s%s%s Service\n\t%s\n\t%s\n",
-> -					description ? "[" : "",
-> -					description ? : "",
-> -					description ? "] " : "",
-> -					primary ? "Primary" : "Secondary",
-> -					g_dbus_proxy_get_path(proxy),
-> -					uuid);
-> -	else
-> -		rl_printf("%s%s%s%s Service\n\t%s\n\t%s\n\t%s\n",
-> -					description ? "[" : "",
-> -					description ? : "",
-> -					description ? "] " : "",
-> -					primary ? "Primary" : "Secondary",
-> -					g_dbus_proxy_get_path(proxy),
-> -					uuid, text);
-> +	service.path = (char *) g_dbus_proxy_get_path(proxy);
-> +	service.uuid = (char *) uuid;
-> +	service.primary = primary;
-> +
-> +	print_service(&service, description);
->  }
->  
->  void gatt_add_service(GDBusProxy *proxy)
->  {
->  	services = g_list_append(services, proxy);
->  
-> -	print_service(proxy, COLORED_NEW);
-> +	print_service_proxy(proxy, COLORED_NEW);
->  }
->  
->  void gatt_remove_service(GDBusProxy *proxy)
-> @@ -109,7 +130,7 @@ void gatt_remove_service(GDBusProxy *proxy)
->  
->  	services = g_list_delete_link(services, l);
->  
-> -	print_service(proxy, COLORED_DEL);
-> +	print_service_proxy(proxy, COLORED_DEL);
->  }
->  
->  static void print_characteristic(GDBusProxy *proxy, const char *description)
-> @@ -272,7 +293,7 @@ static void list_attributes(const char *path, GList *source)
->  			continue;
->  
->  		if (source == services) {
-> -			print_service(proxy, NULL);
-> +			print_service_proxy(proxy, NULL);
->  			list_attributes(proxy_path, characteristics);
->  		} else if (source == characteristics) {
->  			print_characteristic(proxy, NULL);
-> @@ -798,3 +819,78 @@ void gatt_unregister_app(DBusConnection *conn, GDBusProxy *proxy)
->  		return;
->  	}
->  }
-> +
-> +static void service_free(void *data)
-> +{
-> +	struct service *service = data;
-> +
-> +	g_free(service->path);
-> +	g_free(service->uuid);
-> +	g_free(service);
-> +}
-> +
-> +static gboolean service_get_uuid(const GDBusPropertyTable *property,
-> +					DBusMessageIter *iter, void *data)
-> +{
-> +	struct service *service = data;
-> +
-> +	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &service->uuid);
-> +
-> +	return TRUE;
-> +}
-> +
-> +static gboolean service_get_primary(const GDBusPropertyTable *property,
-> +					DBusMessageIter *iter, void *data)
-> +{
-> +	struct service *service = data;
-> +	dbus_bool_t primary;
-> +
-> +	primary = service->primary ? TRUE : FALSE;
-> +
-> +	dbus_message_iter_append_basic(iter, DBUS_TYPE_BOOLEAN, &primary);
-> +
-> +	return TRUE;
-> +}
-> +
-> +static const GDBusPropertyTable service_properties[] = {
-> +	{ "UUID", "s", service_get_uuid },
-> +	{ "Primary", "b", service_get_primary },
-> +	{ }
-> +};
-> +
-> +void gatt_register_service(DBusConnection *conn, GDBusProxy *proxy,
-> +								wordexp_t *w)
-> +{
-> +	struct service *service;
-> +	bool primary = true;
-> +
-> +	if (w->we_wordc > 1) {
-> +		if (!strcmp(w->we_wordv[1], "yes")) {
-> +			primary = true;
-> +		} else if (!strcmp(w->we_wordv[1], "no")) {
-> +			primary = false;
-> +		} else {
-> +			rl_printf("Invalid option: %s\n", w->we_wordv[0]);
-> +			return;
-> +		}
-> +	}
-> +
-> +	service = g_new0(struct service, 1);
-> +	service->conn = conn;
-> +	service->uuid = g_strdup(w->we_wordv[0]);
-> +	service->path = g_strdup_printf("%s/service%p", APP_PATH, service);
-> +	service->primary = primary;
-> +
-> +	if (g_dbus_register_interface(conn, service->path,
-> +					SERVICE_INTERFACE, NULL, NULL,
-> +					service_properties, service,
-> +					service_free) == FALSE) {
-> +		rl_printf("Failed to register service object\n");
-> +		service_free(service);
-> +		return;
-> +	}
-> +
-> +	rl_printf("Service registered at %s\n", service->path);
-> +
-> +	local_services = g_list_append(local_services, service);
-> +}
-> diff --git a/client/gatt.h b/client/gatt.h
-> index 4c9fd5b..7f116df 100644
-> --- a/client/gatt.h
-> +++ b/client/gatt.h
-> @@ -43,3 +43,6 @@ void gatt_remove_manager(GDBusProxy *proxy);
->  
->  void gatt_register_app(DBusConnection *conn, GDBusProxy *proxy, wordexp_t *w);
->  void gatt_unregister_app(DBusConnection *conn, GDBusProxy *proxy);
-> +
-> +void gatt_register_service(DBusConnection *conn, GDBusProxy *proxy,
-> +								wordexp_t *w);
-> diff --git a/client/main.c b/client/main.c
-> index 31d06b8..2bcf02c 100644
-> --- a/client/main.c
-> +++ b/client/main.c
-> @@ -1839,6 +1839,28 @@ static void cmd_unregister_app(const char *arg)
->  	gatt_unregister_app(dbus_conn, default_ctrl->proxy);
->  }
->  
-> +static void cmd_register_service(const char *arg)
-> +{
-> +	wordexp_t w;
-> +
-> +	if (check_default_ctrl() == FALSE)
-> +		return;
-> +
-> +	if (wordexp(arg, &w, WRDE_NOCMD)) {
-> +		rl_printf("Invalid argument\n");
-> +		return;
-> +	}
-> +
-> +	if (w.we_wordc == 0) {
-> +		rl_printf("Missing argument\n");
-> +		return;
+I've been fiddling with the BCM43430 driver a bit today, and have
+managed to get it to work with device tree supplying the GPIO.
 
-It seems that the memory of the variable w leaks.
+I've created a dt entry that looks like:
 
-> +	}
-> +
-> +	gatt_register_service(dbus_conn, default_ctrl->proxy, &w);
-> +
-> +	wordfree(&w);
-> +}
-> +
->  static void cmd_version(const char *arg)
->  {
->  	rl_printf("Version %s\n", VERSION);
-> @@ -2141,6 +2163,8 @@ static const struct {
->  						"Register profile to connect" },
->  	{ "unregister-application", NULL, cmd_unregister_app,
->  						"Unregister profile" },
-> +	{ "register-service", "<UUID> <primary=yes/no>", cmd_register_service,
-> +					"Register application service" },
+bt_brcm {
+                compatible = "brcm,b43430a1";
+                wakeup-gpios = <&gpio5 4 GPIO_ACTIVE_HIGH>;
+                ttydev = <&uart2>;
+                status = "ok";
+        };
+};
 
- - It seems that the second argument is optional.
- - I can not determine whether it needs string 'primary=' from the help message.
+This allows me to get the code to correlate the UART and the GPIOs,
+thus: (forgive the very messy patch - this is my WIP, for illustration
+only...)
 
-So, if you do not restrict the description length, would you change to the 
-following description:
+The code below *works* - toggles the power GPIO, loads firmware, and
+attaches fine.
 
-	{ "register-service", "<UUID> [yes/no]", cmd_register_service,
-		"Register application service. If no, register as secondary" },
+However, if I uncomment the line containing:
 
->  	{ "version",      NULL,       cmd_version, "Display version" },
->  	{ "quit",         NULL,       cmd_quit, "Quit program" },
->  	{ "exit",         NULL,       cmd_quit, "Quit program" },
-> 
+    err = bcm_setup_sleep(hu);
 
-Regards,
-Eramoto
+The driver dies, with timeouts, thus:
+
+Bluetooth: hci0: BCM: chip id 94
+Bluetooth: hci0: BCM43430A1 (001.002.009) build 0000
+Bluetooth: hci0: BCM: failed to write clock (-56)
+Bluetooth: hci0: BCM (001.002.009) build 0182
+Bluetooth: hci0 command 0x0c56 tx timeout
+Bluetooth: hci0 command 0x0c7a tx timeout
+Bluetooth: hci0 command 0x0c6d tx timeout
+Bluetooth: hci0 command 0x2008 tx timeout
+Bluetooth: hci0 command 0x2009 tx timeout
+
+The "Bluetooth: hci0: BCM: failed to write clock (-56)" is a red herring
+- it works fine despite this - just the bcm_setup_sleep() function seems
+to trip it up.
+
+Any thoughts?
+
+-Ian
+
+diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
+index f87bfdfee4ff..a164397ee2d7 100644
+--- a/drivers/bluetooth/hci_bcm.c
++++ b/drivers/bluetooth/hci_bcm.c
+@@ -34,6 +34,7 @@
+ #include <linux/interrupt.h>
+ #include <linux/dmi.h>
+ #include <linux/pm_runtime.h>
++#include <linux/of.h>
+
+ #include <net/bluetooth/bluetooth.h>
+ #include <net/bluetooth/hci_core.h>
+@@ -50,6 +51,7 @@ struct bcm_device {
+        struct list_head        list;
+
+        struct platform_device  *pdev;
++       struct device_node      *of_ttydev;
+
+        const char              *name;
+        struct gpio_desc        *device_wakeup;
+@@ -145,6 +147,8 @@ static bool bcm_device_exists(struct bcm_device *device)
+
+ static int bcm_gpio_set_power(struct bcm_device *dev, bool powered)
+ {
++
++       printk("----------brcm: powered: %d\n", powered);
+        if (powered && !IS_ERR(dev->clk) && !dev->clk_enabled)
+                clk_prepare_enable(dev->clk);
+
+@@ -203,7 +207,6 @@ static int bcm_request_irq(struct bcm_data *bcm)
+
+ unlock:
+        mutex_unlock(&bcm_device_lock);
+-
+        return err;
+ }
+
+@@ -279,6 +282,7 @@ static int bcm_open(struct hci_uart *hu)
+
+        bt_dev_dbg(hu->hdev, "hu %p", hu);
+
++printk("-----brcm open\n");
+        bcm = kzalloc(sizeof(*bcm), GFP_KERNEL);
+        if (!bcm)
+                return -ENOMEM;
+@@ -298,7 +302,9 @@ static int bcm_open(struct hci_uart *hu)
+                 * platform device (saved during device probe) and
+                 * parent of tty device used by hci_uart
+                 */
+-               if (hu->tty->dev->parent == dev->pdev->dev.parent) {
++               if (hu->tty->dev->parent == dev->pdev->dev.parent ||
++                       hu->tty->dev->parent->of_node == dev->of_ttydev) {
++
+                        bcm->dev = dev;
+                        hu->init_speed = dev->init_speed;
+ #ifdef CONFIG_PM
+@@ -319,6 +325,7 @@ static int bcm_close(struct hci_uart *hu)
+        struct bcm_data *bcm = hu->priv;
+        struct bcm_device *bdev = bcm->dev;
+
++printk("--a--- %s\n", __func__);
+        bt_dev_dbg(hu->hdev, "hu %p", hu);
+
+        /* Protect bcm->dev against removal of the device or driver */
+@@ -366,6 +373,7 @@ static int bcm_setup(struct hci_uart *hu)
+        unsigned int speed;
+        int err;
+
++printk("--a--- %s\n", __func__);
+        bt_dev_dbg(hu->hdev, "hu %p", hu);
+
+        hu->hdev->set_diag = bcm_set_diag;
+@@ -420,10 +428,10 @@ static int bcm_setup(struct hci_uart *hu)
+                return err;
+
+        err = bcm_request_irq(bcm);
+-       if (!err)
+-               err = bcm_setup_sleep(hu);
++//     if (!err)
++//             err = bcm_setup_sleep(hu);
+
+-       return err;
++       return 0;
+ }
+
+ #define BCM_RECV_LM_DIAG \
+@@ -705,17 +713,26 @@ static int bcm_resource(struct acpi_resource
+*ares, void *data)
+ static int bcm_platform_probe(struct bcm_device *dev)
+ {
+        struct platform_device *pdev = dev->pdev;
++       const __be32 *np;
+
+        dev->name = dev_name(&pdev->dev);
+
+        dev->clk = devm_clk_get(&pdev->dev, NULL);
+
+-       dev->device_wakeup = devm_gpiod_get_optional(&pdev->dev,
+-                                                    "device-wakeup",
+-                                                    GPIOD_OUT_LOW);
++       dev->device_wakeup = gpiod_get(&pdev->dev, "wakeup",
+GPIOD_OUT_HIGH);
++
++       np = of_get_property(dev_of_node(&pdev->dev), "ttydev", NULL);
++       dev->of_ttydev = of_find_node_by_phandle(be32_to_cpup(np));
++
++
++//     dev->device_wakeup = devm_gpiod_get_optional(&pdev->dev,
++//                                                  "device-wakeup",
++//                                                  GPIOD_OUT_LOW);
+        if (IS_ERR(dev->device_wakeup))
+                return PTR_ERR(dev->device_wakeup);
+
++       printk("bcmbt------- %p\n", dev->device_wakeup);
++
+        dev->shutdown = devm_gpiod_get_optional(&pdev->dev, "shutdown",
+                                                GPIOD_OUT_LOW);
+        if (IS_ERR(dev->shutdown))
+@@ -886,12 +903,22 @@ static const struct dev_pm_ops bcm_pm_ops = {
+        SET_RUNTIME_PM_OPS(bcm_suspend_device, bcm_resume_device, NULL)
+ };
+
++static struct of_device_id bcm_of_match[] = {
++       { .compatible = "brcm,b43430a1", },
++       { }
++};
++
+ static struct platform_driver bcm_driver = {
+        .probe = bcm_probe,
+        .remove = bcm_remove,
+        .driver = {
+                .name = "hci_bcm",
+                .acpi_match_table = ACPI_PTR(bcm_acpi_match),
++               .of_match_table = bcm_of_match,
+                .pm = &bcm_pm_ops,
+        },
+ };
+                                                              13
