@@ -1,60 +1,35 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <f612968b-a3c5-c047-80c5-5f3b6ad711ac@gslab.com>
-References: <f612968b-a3c5-c047-80c5-5f3b6ad711ac@gslab.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 29 Jun 2017 15:51:21 +0300
-Message-ID: <CABBYNZKwMAW91wv1SemxUxMYgQPr6-ymzryr5cACFSs6=Eny4g@mail.gmail.com>
-Subject: Re: How to make GATT only accessible over LE connection
-To: Ravi Minnikanti <ravi.minnikanti@gslab.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+Subject: Re: [PATCH] bluetooth: Add entry for BCM43430 UART bluetooth
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20170628191055.1283-1-ian@mnementh.co.uk>
+Date: Thu, 29 Jun 2017 14:40:37 +0200
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        loic.poulain@intel.com, linux-bluetooth@vger.kernel.org
+Message-Id: <C3A12BF2-2377-4253-8729-D13986847FAF@holtmann.org>
+References: <20170628191055.1283-1-ian@mnementh.co.uk>
+To: Ian Molton <ian@mnementh.co.uk>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ravi,
+Hi Ian,
 
-On Thu, Jun 29, 2017 at 3:28 PM, Ravi Minnikanti
-<ravi.minnikanti@gslab.com> wrote:
-> Hello,
->
-> I have a GATT service implemented with "encrypt-write" characteristic flags
-> on a dual-mode chipset. It works well over a LE connection with AES-CCM
-> encryption.
-> But, my GATT characteristics are accessible over BR/EDR connection which
-> uses a Link key encryption.
+> 	This patch adds the device ID for the bluetooth chip used in the
+> Broadcom BCM43430 SDIO WiFi / UART BT chip.
+> 
+> 	Successfully tested using Firmware version 0x0182
+> 
+> Signed-off-by: Ian Molton <ian@mnementh.co.uk>
+> Reported-by: Loic Poulain <loic.poulain@intel.com>
+> ---
+> drivers/bluetooth/btbcm.c | 1 +
+> 1 file changed, 1 insertion(+)
 
-It shouldn't make any difference in terms of security, or you are
-really referring to 'secure-write' that is the one that would require
-the so called LE secure connections.
+patch has been applied to bluetooth-next tree.
 
-> Can someone please help me to know, Is there any way I can make my GATT only
-> accessible over a LE connection ?
+Regards
 
-Im not sure having the GATT database behaving differently for the
-bearers is a good idea, to start with this makes things like cross
-pairing not very reliable since depending on what bearer the
-connection comes in we would have to emit service changed cleaning or
-restoring the range, those ranges may have CCC subscriptions which
-afaik are not bearer specific.
+Marcel
 
-Perhaps a better idea would be to disable GATT over BR/EDR? For that
-we could arrange a config option.
-
-> I understand that this cannot be done from bluez and should be done at
-> kernel.
->
-> Thanks,
->
-> Ravi
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
-> in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-
--- 
-Luiz Augusto von Dentz
