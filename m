@@ -1,44 +1,84 @@
-Return-Path: <hdegoede@redhat.com>
-From: Hans de Goede <hdegoede@redhat.com>
+Return-Path: <mjurczyk@google.com>
+From: Mateusz Jurczyk <mjurczyk@google.com>
 To: Marcel Holtmann <marcel@holtmann.org>,
 	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>
-Cc: Hans de Goede <hdegoede@redhat.com>,
-	linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: hci_bcm: Add active_low irq polarity quirk for Asus T100CHI
-Date: Thu, 29 Jun 2017 14:21:32 +0200
-Message-Id: <20170629122132.4537-1-hdegoede@redhat.com>
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>
+Cc: linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] Bluetooth: Add sockaddr length checks before accessing sa_family in bind and connect handlers
+Date: Thu, 29 Jun 2017 14:04:59 +0200
+Message-Id: <20170629120459.16937-1-mjurczyk@google.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Just like the T100TA the host-wake irq on the Asus T100CHI is
-active low. Having a quirk for this is actually extra important on the
-T100CHI as it ships with a bluetooth keyboard dock, which does not
-work properly without this quirk.
+Verify that the caller-provided sockaddr structure is large enough to
+contain the sa_family field, before accessing it in bind() and connect()
+handlers of the Bluetooth sockets. Since neither syscall enforces a minimum
+size of the corresponding memory region, very short sockaddrs (zero or one
+byte long) result in operating on uninitialized memory while referencing
+sa_family.
 
-Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+Signed-off-by: Mateusz Jurczyk <mjurczyk@google.com>
 ---
- drivers/bluetooth/hci_bcm.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ net/bluetooth/l2cap_sock.c  | 5 +++--
+ net/bluetooth/rfcomm/sock.c | 3 ++-
+ net/bluetooth/sco.c         | 6 ++----
+ 3 files changed, 7 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
-index f87bfdfee4ff..fc4575c69dbd 100644
---- a/drivers/bluetooth/hci_bcm.c
-+++ b/drivers/bluetooth/hci_bcm.c
-@@ -657,6 +657,15 @@ static const struct dmi_system_id bcm_wrong_irq_dmi_table[] = {
- 		},
- 		.driver_data = &acpi_active_low,
- 	},
-+	{
-+		.ident = "Asus T100CHI",
-+		.matches = {
-+			DMI_EXACT_MATCH(DMI_SYS_VENDOR,
-+					"ASUSTeK COMPUTER INC."),
-+			DMI_EXACT_MATCH(DMI_PRODUCT_NAME, "T100CHI"),
-+		},
-+		.driver_data = &acpi_active_low,
-+	},
- 	{	/* Handle ThinkPad 8 tablets with BCM2E55 chipset ACPI ID */
- 		.ident = "Lenovo ThinkPad 8",
- 		.matches = {
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index 507b80d59dec..67a8642f57ea 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -87,7 +87,8 @@ static int l2cap_sock_bind(struct socket *sock, struct sockaddr *addr, int alen)
+ 
+ 	BT_DBG("sk %p", sk);
+ 
+-	if (!addr || addr->sa_family != AF_BLUETOOTH)
++	if (!addr || alen < offsetofend(struct sockaddr, sa_family) ||
++	    addr->sa_family != AF_BLUETOOTH)
+ 		return -EINVAL;
+ 
+ 	memset(&la, 0, sizeof(la));
+@@ -181,7 +182,7 @@ static int l2cap_sock_connect(struct socket *sock, struct sockaddr *addr,
+ 
+ 	BT_DBG("sk %p", sk);
+ 
+-	if (!addr || alen < sizeof(addr->sa_family) ||
++	if (!addr || alen < offsetofend(struct sockaddr, sa_family) ||
+ 	    addr->sa_family != AF_BLUETOOTH)
+ 		return -EINVAL;
+ 
+diff --git a/net/bluetooth/rfcomm/sock.c b/net/bluetooth/rfcomm/sock.c
+index ac3c650cb234..2025b45a8bf8 100644
+--- a/net/bluetooth/rfcomm/sock.c
++++ b/net/bluetooth/rfcomm/sock.c
+@@ -339,7 +339,8 @@ static int rfcomm_sock_bind(struct socket *sock, struct sockaddr *addr, int addr
+ 	struct sock *sk = sock->sk;
+ 	int len, err = 0;
+ 
+-	if (!addr || addr->sa_family != AF_BLUETOOTH)
++	if (!addr || addr_len < offsetofend(struct sockaddr, sa_family) ||
++	    addr->sa_family != AF_BLUETOOTH)
+ 		return -EINVAL;
+ 
+ 	memset(&sa, 0, sizeof(sa));
+diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
+index 728e0c8dc8e7..795e920a3281 100644
+--- a/net/bluetooth/sco.c
++++ b/net/bluetooth/sco.c
+@@ -524,10 +524,8 @@ static int sco_sock_bind(struct socket *sock, struct sockaddr *addr,
+ 
+ 	BT_DBG("sk %p %pMR", sk, &sa->sco_bdaddr);
+ 
+-	if (!addr || addr->sa_family != AF_BLUETOOTH)
+-		return -EINVAL;
+-
+-	if (addr_len < sizeof(struct sockaddr_sco))
++	if (!addr || addr_len < sizeof(struct sockaddr_sco) ||
++	    addr->sa_family != AF_BLUETOOTH)
+ 		return -EINVAL;
+ 
+ 	lock_sock(sk);
 -- 
-2.13.0
+2.13.2.725.g09c95d1e9-goog
