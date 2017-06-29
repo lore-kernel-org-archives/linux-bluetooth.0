@@ -1,84 +1,40 @@
-Return-Path: <mjurczyk@google.com>
-From: Mateusz Jurczyk <mjurczyk@google.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>
-Cc: linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] Bluetooth: Add sockaddr length checks before accessing sa_family in bind and connect handlers
-Date: Thu, 29 Jun 2017 14:04:59 +0200
-Message-Id: <20170629120459.16937-1-mjurczyk@google.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Austin Riffle <ARiffle@efji.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Clarification regarding Bluetooth 3.0 and BD/EDR in BlueZ 5
+Date: Thu, 29 Jun 2017 01:45:00 +0000
+Message-ID: <4C851F03BEE04A418B7A2D283DDCAB5D27BCA402@EFJDFWMB01.EFJDFW.local>
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Verify that the caller-provided sockaddr structure is large enough to
-contain the sa_family field, before accessing it in bind() and connect()
-handlers of the Bluetooth sockets. Since neither syscall enforces a minimum
-size of the corresponding memory region, very short sockaddrs (zero or one
-byte long) result in operating on uninitialized memory while referencing
-sa_family.
+Hello
 
-Signed-off-by: Mateusz Jurczyk <mjurczyk@google.com>
----
- net/bluetooth/l2cap_sock.c  | 5 +++--
- net/bluetooth/rfcomm/sock.c | 3 ++-
- net/bluetooth/sco.c         | 6 ++----
- 3 files changed, 7 insertions(+), 7 deletions(-)
+I am looking at using BlueZ 5 as the Bluetooth protocol stack on my platfor=
+m. I do not have an exact version number for BlueZ yet as I am still in ver=
+y early development. However, I am currently in the process of upgrading ou=
+r Linux kernel to 4.12 so I believe I should be able to use the latest and =
+greatest BlueZ 5.45 if that helps with my question.
 
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index 507b80d59dec..67a8642f57ea 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -87,7 +87,8 @@ static int l2cap_sock_bind(struct socket *sock, struct sockaddr *addr, int alen)
- 
- 	BT_DBG("sk %p", sk);
- 
--	if (!addr || addr->sa_family != AF_BLUETOOTH)
-+	if (!addr || alen < offsetofend(struct sockaddr, sa_family) ||
-+	    addr->sa_family != AF_BLUETOOTH)
- 		return -EINVAL;
- 
- 	memset(&la, 0, sizeof(la));
-@@ -181,7 +182,7 @@ static int l2cap_sock_connect(struct socket *sock, struct sockaddr *addr,
- 
- 	BT_DBG("sk %p", sk);
- 
--	if (!addr || alen < sizeof(addr->sa_family) ||
-+	if (!addr || alen < offsetofend(struct sockaddr, sa_family) ||
- 	    addr->sa_family != AF_BLUETOOTH)
- 		return -EINVAL;
- 
-diff --git a/net/bluetooth/rfcomm/sock.c b/net/bluetooth/rfcomm/sock.c
-index ac3c650cb234..2025b45a8bf8 100644
---- a/net/bluetooth/rfcomm/sock.c
-+++ b/net/bluetooth/rfcomm/sock.c
-@@ -339,7 +339,8 @@ static int rfcomm_sock_bind(struct socket *sock, struct sockaddr *addr, int addr
- 	struct sock *sk = sock->sk;
- 	int len, err = 0;
- 
--	if (!addr || addr->sa_family != AF_BLUETOOTH)
-+	if (!addr || addr_len < offsetofend(struct sockaddr, sa_family) ||
-+	    addr->sa_family != AF_BLUETOOTH)
- 		return -EINVAL;
- 
- 	memset(&sa, 0, sizeof(sa));
-diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-index 728e0c8dc8e7..795e920a3281 100644
---- a/net/bluetooth/sco.c
-+++ b/net/bluetooth/sco.c
-@@ -524,10 +524,8 @@ static int sco_sock_bind(struct socket *sock, struct sockaddr *addr,
- 
- 	BT_DBG("sk %p %pMR", sk, &sa->sco_bdaddr);
- 
--	if (!addr || addr->sa_family != AF_BLUETOOTH)
--		return -EINVAL;
--
--	if (addr_len < sizeof(struct sockaddr_sco))
-+	if (!addr || addr_len < sizeof(struct sockaddr_sco) ||
-+	    addr->sa_family != AF_BLUETOOTH)
- 		return -EINVAL;
- 
- 	lock_sock(sk);
--- 
-2.13.2.725.g09c95d1e9-goog
+Regarding the information found on the BlueZ website (see: http://www.bluez=
+.org/profiles/) that states the lower level host stack supports "Core speci=
+fication 4.2. Not (yet) 3.0+HS", what exactly does "Not (yet)" mean?
+
+One device that my platform will be required to interface with is listed as=
+ only supporting BD/EDR. Does BlueZ 5 support anything earlier than 4.0? Ad=
+ditionally, I do eventually plan on certifying through Bluetooth SIG if it =
+makes any difference.
+
+Austin
+
+This e-mail transmission, and any documents, files or previous e-mail messa=
+ges attached to it, may contain confidential information. If you are not th=
+e intended recipient, or a person responsible for delivering it to the inte=
+nded recipient, you are hereby notified that any disclosure, distribution, =
+review, copy or use of any of the information contained in or attached to t=
+his message is STRICTLY PROHIBITED. If you have received this transmission =
+in error, please immediately notify us by reply e-mail, and destroy the ori=
+ginal transmission and its attachments without reading them or saving them =
+to disk. Thank you.
+
