@@ -1,35 +1,27 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Subject: Re: [PATCH] Bluetooth: hci_bcm: Add active_low irq polarity quirk for
- Asus T100CHI
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20170629122132.4537-1-hdegoede@redhat.com>
-Date: Thu, 29 Jun 2017 14:36:09 +0200
-Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org
-Message-Id: <88ED8683-E111-4490-A7B2-A924BD9FB9FE@holtmann.org>
-References: <20170629122132.4537-1-hdegoede@redhat.com>
-To: Hans de Goede <hdegoede@redhat.com>
+From: Ravi Minnikanti <ravi.minnikanti@gslab.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: How to make GATT only accessible over LE connection
+Message-ID: <f612968b-a3c5-c047-80c5-5f3b6ad711ac@gslab.com>
+Date: Thu, 29 Jun 2017 17:58:14 +0530
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Hans,
+Hello,
 
-> Just like the T100TA the host-wake irq on the Asus T100CHI is
-> active low. Having a quirk for this is actually extra important on the
-> T100CHI as it ships with a bluetooth keyboard dock, which does not
-> work properly without this quirk.
-> 
-> Signed-off-by: Hans de Goede <hdegoede@redhat.com>
-> ---
-> drivers/bluetooth/hci_bcm.c | 9 +++++++++
-> 1 file changed, 9 insertions(+)
+I have a GATT service implemented with "encrypt-write" characteristic 
+flags on a dual-mode chipset. It works well over a LE connection with 
+AES-CCM encryption.
+But, my GATT characteristics are accessible over BR/EDR connection which 
+uses a Link key encryption.
+Can someone please help me to know, Is there any way I can make my GATT 
+only accessible over a LE connection ?
+I understand that this cannot be done from bluez and should be done at 
+kernel.
 
-patch has been applied to bluetooth-next tree.
+Thanks,
 
-Regards
-
-Marcel
+Ravi
 
