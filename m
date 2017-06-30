@@ -1,86 +1,101 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Subject: Re: BCM43430 BT driver almost working...
-To: Ian Molton <ian@mnementh.co.uk>
-References: <c4cf0689-d28e-492d-399e-968a70488e22@mnementh.co.uk>
- <d65a5225-84f5-11ae-d9ab-2175480552d8@intel.com>
- <d0c4a580-82ac-d710-8678-f147ce81a9ce@mnementh.co.uk>
-Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org
-From: Loic Poulain <loic.poulain@intel.com>
-Message-ID: <5ab11044-dd06-9aef-b355-86e5b58a7a6e@intel.com>
-Date: Fri, 30 Jun 2017 19:59:45 +0200
+Return-Path: <shapiroc@google.com>
 MIME-Version: 1.0
-In-Reply-To: <d0c4a580-82ac-d710-8678-f147ce81a9ce@mnementh.co.uk>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <5A47203A-A671-4854-9EAB-B09B15AF7680@holtmann.org>
+References: <20170630172920.1968-1-shapiroc@chromium.org> <5A47203A-A671-4854-9EAB-B09B15AF7680@holtmann.org>
+From: Charles Shapiro <shapiroc@google.com>
+Date: Fri, 30 Jun 2017 11:55:12 -0600
+Message-ID: <CALM0h1m69=96tC+rM_-rXhc-9Kytaw_mZzc99vKXYZvVyjCXjg@mail.gmail.com>
+Subject: Re: [PATCH] Support to change set file via arg
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org, Simon Glass <sjg@chromium.org>
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ian,
+(Removing HTML formatting on email thread so it doesn't get blocked).
 
-On 30/06/2017 18:35, Ian Molton wrote:
+For ChromeOS, we're working towards having a single build/image based
+on a reference board that then supports multiple models created by
+OEMs.
 
->> bcm_setup_sleep enable low power mode, so I think problem is
->> that the wakeup gpio is not correctly drove.
->> -> Are you sure that you don't toggle the power gpio instead of the
->> wakeup one.
+Some of the bluetooth config differs on a per model basis, so we need
+to have multiple *.conf files ship on the actual image.
+
+We then modify the init script to check the model at runtime and pass
+the appropriate *.conf file to bluetoothd when it is started.
+
+On Fri, Jun 30, 2017 at 11:42 AM, Marcel Holtmann <marcel@holtmann.org> wro=
+te:
+> Hi Shapiro,
 >
-> Possibly not - AFAIK, I only have one GPIO on this board, so I *assume*
-> its the power one. I'll see if I can find out if wakeup/irq are connected.
+>> Currently, there is an expectation of the main.conf file at a specific
+>> location.  This prevents system builds that support more than one
+>> platform.
+>>
+>> This adds support so the main.conf file can be specified as a command
+>> line arg instead, so systems can manage multiple conf files as necessary
+>> and pass the appropriate conf file when the daemon is started.
+>>
+>> Signed-off-by: C Shapiro <shapiroc@chromium.org>
+>> ---
+>> src/bluetoothd.8.in |  4 ++++
+>> src/main.c          | 12 +++++++++++-
+>> 2 files changed, 15 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/src/bluetoothd.8.in b/src/bluetoothd.8.in
+>> index 97ef3ec94..d61dcc5b3 100644
+>> --- a/src/bluetoothd.8.in
+>> +++ b/src/bluetoothd.8.in
+>> @@ -27,6 +27,10 @@ Print bluetoothd options and exit.
+>> Enable logging in foreground. Directs log output to the controlling term=
+inal \
+>> in addition to syslog.
+>> .TP
+>> +.B -f, --configfile
+>> +Specifies an explicit config file path instead of relying on the defaul=
+t path \
+>> +(@CONFIGDIR@/main.conf) for the config file.
+>> +.TP
+>> .B -d, --debug=3D<file1>:<file2>:...
+>> Sets how much information bluetoothd sends to the log destination (usual=
+ly \
+>> syslog's "daemon" facility). If the file options are omitted, then debug=
+ging \
+>> diff --git a/src/main.c b/src/main.c
+>> index bcc1e6fae..87bdb66cb 100644
+>> --- a/src/main.c
+>> +++ b/src/main.c
+>> @@ -490,6 +490,7 @@ static guint setup_signalfd(void)
+>> static char *option_debug =3D NULL;
+>> static char *option_plugin =3D NULL;
+>> static char *option_noplugin =3D NULL;
+>> +static char *option_configfile =3D NULL;
+>> static gboolean option_compat =3D FALSE;
+>> static gboolean option_detach =3D TRUE;
+>> static gboolean option_version =3D FALSE;
+>> @@ -505,6 +506,9 @@ static void free_options(void)
+>>
+>>       g_free(option_noplugin);
+>>       option_noplugin =3D NULL;
+>> +
+>> +     g_free(option_configfile);
+>> +     option_configfile =3D NULL;
+>> }
+>>
+>> static void disconnect_dbus(void)
+>> @@ -577,6 +581,9 @@ static GOptionEntry options[] =3D {
+>>                               "Specify plugins to load", "NAME,..," },
+>>       { "noplugin", 'P', 0, G_OPTION_ARG_STRING, &option_noplugin,
+>>                               "Specify plugins not to load", "NAME,..." =
+},
+>> +     { "configfile", 'f', 0, G_OPTION_ARG_STRING, &option_configfile,
+>> +                             "Specify an explicit path to the config fi=
+le",
+>> +                             "FILE=E2=80=9D},
 >
-> *HOWEVER* the code checks for success of bcm_request_irq() when deciding
-> to execute bcm_setup_sleep(). This makes sense to me, as I'd expect the
-> hardware to want to interrupt the host when it wakes up.
-
-Yes, but there is no IRQ assigned to your bcm_device.
-Actually seems you find an other "issue", the bcm_request_irq() returns
-an error only on request_irq failure. However in your case, you never
-assigned the bcm->irq, so bcm_request_irq does not even try to request
-the irq and returns success.
-
-You should try the following:
-
-diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
-index be53238..586f3d0 100644
---- a/drivers/bluetooth/hci_bcm.c
-+++ b/drivers/bluetooth/hci_bcm.c
-@@ -185,22 +185,24 @@ static int bcm_request_irq(struct bcm_data *bcm)
-  		goto unlock;
-  	}
-
--	if (bdev->irq > 0) {
--		err = devm_request_irq(&bdev->pdev->dev, bdev->irq,
--				       bcm_host_wake, IRQF_TRIGGER_RISING,
--				       "host_wake", bdev);
--		if (err)
--			goto unlock;
--
--		device_init_wakeup(&bdev->pdev->dev, true);
--
--		pm_runtime_set_autosuspend_delay(&bdev->pdev->dev,
--						 BCM_AUTOSUSPEND_DELAY);
--		pm_runtime_use_autosuspend(&bdev->pdev->dev);
--		pm_runtime_set_active(&bdev->pdev->dev);
--		pm_runtime_enable(&bdev->pdev->dev);
-+	if (bdev->irq <= 0) {
-+		err = -EOPNOTSUPP;
-+		goto unlock;
-  	}
-
-+	err = devm_request_irq(&bdev->pdev->dev, bdev->irq, bcm_host_wake,
-+			       IRQF_TRIGGER_RISING, "host_wake", bdev);
-+	if (err)
-+		goto unlock;
-+
-+	device_init_wakeup(&bdev->pdev->dev, true);
-+
-+	pm_runtime_set_autosuspend_delay(&bdev->pdev->dev,
-+					 BCM_AUTOSUSPEND_DELAY);
-+	pm_runtime_use_autosuspend(&bdev->pdev->dev);
-+	pm_runtime_set_active(&bdev->pdev->dev);
-+	pm_runtime_enable(&bdev->pdev->dev);
-+
-  unlock:
-  	mutex_unlock(&bcm_device_lock);
-
-
-Regards,
-Loic
+> I am failing to understand why this is needed. What problem are you tryin=
+g to solve here? Can you give an example.
+>
+> Regards
+>
+> Marcel
+>
