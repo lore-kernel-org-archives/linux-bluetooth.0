@@ -1,75 +1,43 @@
 Return-Path: <ian@mnementh.co.uk>
 Subject: Re: BCM43430 BT driver almost working...
-To: Loic Poulain <loic.poulain@intel.com>
-Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org
+From: Ian Molton <ian@mnementh.co.uk>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Loic Poulain <loic.poulain@intel.com>, linux-bluetooth@vger.kernel.org
 References: <c4cf0689-d28e-492d-399e-968a70488e22@mnementh.co.uk>
  <d65a5225-84f5-11ae-d9ab-2175480552d8@intel.com>
  <d0c4a580-82ac-d710-8678-f147ce81a9ce@mnementh.co.uk>
- <5ab11044-dd06-9aef-b355-86e5b58a7a6e@intel.com>
-From: Ian Molton <ian@mnementh.co.uk>
-Message-ID: <0f4e3b7f-e290-3b5b-207c-7f51f38aeef1@mnementh.co.uk>
-Date: Fri, 30 Jun 2017 22:13:46 +0100
+ <F9B6438D-2D83-46BD-AE63-DBECB3A0B9A1@holtmann.org>
+ <4078da55-c5d8-7c2d-d954-9da790982b22@mnementh.co.uk>
+Message-ID: <5efb7448-9208-f6e3-0c87-6b077a439b5c@mnementh.co.uk>
+Date: Fri, 30 Jun 2017 21:53:31 +0100
 MIME-Version: 1.0
-In-Reply-To: <5ab11044-dd06-9aef-b355-86e5b58a7a6e@intel.com>
+In-Reply-To: <4078da55-c5d8-7c2d-d954-9da790982b22@mnementh.co.uk>
 Content-Type: text/plain; charset=utf-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 30/06/17 18:59, Loic Poulain wrote:
-> Yes, but there is no IRQ assigned to your bcm_device.
-> Actually seems you find an other "issue", the bcm_request_irq() returns
-> an error only on request_irq failure. However in your case, you never
-> assigned the bcm->irq, so bcm_request_irq does not even try to request
-> the irq and returns success.
-
-Yes, thats what I was getting at.
-
-I solved it by setting err to -EINVAL to begin with, rather than 0, as a
-temporary hack, as I wasn't sure of the original functions intent.
-
-Your solution is cleaner, so I've tested it, it works.
-
-> You should try the following:
+On 30/06/17 18:14, Ian Molton wrote:
+> On 30/06/17 18:02, Marcel Holtmann wrote:
+>> If you have an embedded board with a proper DT definition, and the
+>> UART is hard-wired to the Bluetooth chip, then go for serdev. It
+>> means no btattach is needed. The kernel will enumerate this properly
+>> for you. That is the way forward. Someone needed to adapt the
+>> hci_bcm.c driver for this anyway. It just happens that you are the
+>> first one.
 > 
-> diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
-> index be53238..586f3d0 100644
-> --- a/drivers/bluetooth/hci_bcm.c
-> +++ b/drivers/bluetooth/hci_bcm.c
-> @@ -185,22 +185,24 @@ static int bcm_request_irq(struct bcm_data *bcm)
->          goto unlock;
->      }
-> 
-> -    if (bdev->irq > 0) {
-> -        err = devm_request_irq(&bdev->pdev->dev, bdev->irq,
-> -                       bcm_host_wake, IRQF_TRIGGER_RISING,
-> -                       "host_wake", bdev);
-> -        if (err)
-> -            goto unlock;
-> -
-> -        device_init_wakeup(&bdev->pdev->dev, true);
-> -
-> -        pm_runtime_set_autosuspend_delay(&bdev->pdev->dev,
-> -                         BCM_AUTOSUSPEND_DELAY);
-> -        pm_runtime_use_autosuspend(&bdev->pdev->dev);
-> -        pm_runtime_set_active(&bdev->pdev->dev);
-> -        pm_runtime_enable(&bdev->pdev->dev);
-> +    if (bdev->irq <= 0) {
-> +        err = -EOPNOTSUPP;
-> +        goto unlock;
->      }
-> 
-> +    err = devm_request_irq(&bdev->pdev->dev, bdev->irq, bcm_host_wake,
-> +                   IRQF_TRIGGER_RISING, "host_wake", bdev);
-> +    if (err)
-> +        goto unlock;
-> +
-> +    device_init_wakeup(&bdev->pdev->dev, true);
-> +
-> +    pm_runtime_set_autosuspend_delay(&bdev->pdev->dev,
-> +                     BCM_AUTOSUSPEND_DELAY);
-> +    pm_runtime_use_autosuspend(&bdev->pdev->dev);
-> +    pm_runtime_set_active(&bdev->pdev->dev);
-> +    pm_runtime_enable(&bdev->pdev->dev);
-> +
->  unlock:
->      mutex_unlock(&bcm_device_lock);
-> 
+> Right - I'll follow that route and add serdev support to hci_bcm.c then!
+
+Hmm. ok, this gets to be a bitof a rabbit-hole.
+
+the hci-nokia driver is *extremely* similar in operation to the hci_bcm
+driver, other than being serdev based. even the firmware loading is
+"broadcom style", so I dont really see why it needs another driver,
+other than its been coded to one chip and a few small nokia-specific
+bits in it.
+
+It seems there is a fair bit of commonality among the h4 based bluetooth
+drivers - probably better to abstract it out and make a h4 core around
+which the other serdev and ldisc drivers could sit?
+
+I'll have a look at that on Monday.
+
+-Ian
