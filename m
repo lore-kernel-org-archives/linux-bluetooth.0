@@ -1,10 +1,10 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: C Shapiro <shapiroc@google.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Simon Glass <sjg@chromium.org>, C Shapiro <shapiroc@chromium.org>
+Cc: Simon Glass <sjg@chromium.org>, C Shapiro <shapiroc@chromium.com>
 Subject: [PATCH] Support to change set file via arg
-Date: Fri, 30 Jun 2017 11:29:20 -0600
-Message-Id: <20170630172920.1968-1-shapiroc@chromium.org>
+Date: Fri, 30 Jun 2017 11:27:04 -0600
+Message-Id: <20170630172704.189585-1-shapiroc@chromium.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
@@ -16,7 +16,7 @@ This adds support so the main.conf file can be specified as a command
 line arg instead, so systems can manage multiple conf files as necessary
 and pass the appropriate conf file when the daemon is started.
 
-Signed-off-by: C Shapiro <shapiroc@chromium.org>
+Signed-off-by: C Shapiro <shapiroc@chromium.com>
 ---
  src/bluetoothd.8.in |  4 ++++
  src/main.c          | 12 +++++++++++-
