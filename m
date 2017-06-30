@@ -1,9 +1,9 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 2/8] client: Add generic way to request input from user
-Date: Fri, 30 Jun 2017 13:18:28 +0300
-Message-Id: <20170630101834.23095-3-luiz.dentz@gmail.com>
+Subject: [PATCH v2 1/8] client: Allow register-application without any UUID
+Date: Fri, 30 Jun 2017 13:18:27 +0300
+Message-Id: <20170630101834.23095-2-luiz.dentz@gmail.com>
 In-Reply-To: <20170630101834.23095-1-luiz.dentz@gmail.com>
 References: <20170630101834.23095-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,114 +11,86 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds rl_prompt_input which can be used by different parts to ask
-user input.
+This means that GattProfile1 should not be registered but there could still
+be services that needs registered with bluetoothd.
 ---
- client/display.c | 58 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- client/display.h |  5 +++++
- client/main.c    |  3 +++
- 3 files changed, 66 insertions(+)
+ client/gatt.c | 24 +++++++++++++++---------
+ client/main.c |  7 +------
+ 2 files changed, 16 insertions(+), 15 deletions(-)
 
-diff --git a/client/display.c b/client/display.c
-index d85b9d0..1dc4294 100644
---- a/client/display.c
-+++ b/client/display.c
-@@ -34,6 +34,11 @@
- 
- #include "display.h"
- 
-+static char *saved_prompt = NULL;
-+static int saved_point = 0;
-+static rl_prompt_input_func saved_func = NULL;
-+static void *saved_user_data = NULL;
-+
- void rl_printf(const char *fmt, ...)
- {
- 	va_list args;
-@@ -104,3 +109,56 @@ void rl_hexdump(const unsigned char *buf, size_t len)
- 		rl_printf("%s\n", str);
+diff --git a/client/gatt.c b/client/gatt.c
+index 40d3f6a..8b7a9c6 100644
+--- a/client/gatt.c
++++ b/client/gatt.c
+@@ -726,16 +726,19 @@ void gatt_register_app(DBusConnection *conn, GDBusProxy *proxy, wordexp_t *w)
+ 		return;
  	}
- }
+ 
+-	if (g_dbus_register_interface(conn, APP_PATH,
+-					PROFILE_INTERFACE, methods,
+-					NULL, properties, NULL, NULL) == FALSE) {
+-		rl_printf("Failed to register application object\n");
+-		return;
+-	}
+-
+ 	for (i = 0; i < w->we_wordc; i++)
+ 		uuids = g_list_append(uuids, g_strdup(w->we_wordv[i]));
+ 
++	if (uuids) {
++		if (g_dbus_register_interface(conn, APP_PATH,
++						PROFILE_INTERFACE, methods,
++						NULL, properties, NULL,
++						NULL) == FALSE) {
++			rl_printf("Failed to register application object\n");
++			return;
++		}
++	}
 +
-+void rl_prompt_input(const char *label, const char *msg,
-+				rl_prompt_input_func func, void *user_data)
-+{
-+	char prompt[256];
+ 	if (g_dbus_proxy_method_call(l->data, "RegisterApplication",
+ 						register_app_setup,
+ 						register_app_reply, w,
+@@ -759,11 +762,14 @@ static void unregister_app_reply(DBusMessage *message, void *user_data)
+ 		return;
+ 	}
+ 
++	rl_printf("Application unregistered\n");
 +
-+	/* Normal use should not prompt for user input to the value a second
-+	 * time before it releases the prompt, but we take a safe action. */
-+	if (saved_prompt)
++	if (!uuids)
 +		return;
 +
-+	saved_point = rl_point;
-+	saved_prompt = strdup(rl_prompt);
-+	saved_func = func;
-+	saved_user_data = user_data;
-+
-+	memset(prompt, 0, sizeof(prompt));
-+	snprintf(prompt, sizeof(prompt), COLOR_RED "[%s]" COLOR_OFF " %s ",
-+								label, msg);
-+	rl_set_prompt(prompt);
-+
-+	rl_replace_line("", 0);
-+	rl_redisplay();
-+}
-+
-+int rl_release_prompt(const char *input)
-+{
-+	rl_prompt_input_func func;
-+	void *user_data;
-+
-+	if (!saved_prompt)
-+		return -1;
-+
-+	/* This will cause rl_expand_prompt to re-run over the last prompt, but
-+	 * our prompt doesn't expand anyway. */
-+	rl_set_prompt(saved_prompt);
-+	rl_replace_line("", 0);
-+	rl_point = saved_point;
-+	rl_redisplay();
-+
-+	free(saved_prompt);
-+	saved_prompt = NULL;
-+
-+	func = saved_func;
-+	user_data = saved_user_data;
-+
-+	saved_func = NULL;
-+	saved_user_data = NULL;
-+
-+	func(input, user_data);
-+
-+	return 0;
-+}
-diff --git a/client/display.h b/client/display.h
-index 88dbbd0..e991d19 100644
---- a/client/display.h
-+++ b/client/display.h
-@@ -31,3 +31,8 @@
+ 	g_list_free_full(uuids, g_free);
+ 	uuids = NULL;
  
- void rl_printf(const char *fmt, ...) __attribute__((format(printf, 1, 2)));
- void rl_hexdump(const unsigned char *buf, size_t len);
-+
-+typedef void (*rl_prompt_input_func) (const char *input, void *user_data);
-+void rl_prompt_input(const char *label, const char *msg,
-+				rl_prompt_input_func func, void *user_data);
-+int rl_release_prompt(const char *input);
+-	rl_printf("Application unregistered\n");
+-
+ 	g_dbus_unregister_interface(conn, APP_PATH, PROFILE_INTERFACE);
+ }
+ 
 diff --git a/client/main.c b/client/main.c
-index 31d06b8..c42bf50 100644
+index 578dde9..31d06b8 100644
 --- a/client/main.c
 +++ b/client/main.c
-@@ -2223,6 +2223,9 @@ static void rl_handler(char *input)
- 	if (agent_input(dbus_conn, input) == TRUE)
- 		goto done;
+@@ -1826,11 +1826,6 @@ static void cmd_register_app(const char *arg)
+ 		return;
+ 	}
  
-+	if (!rl_release_prompt(input))
-+		goto done;
-+
- 	add_history(input);
+-	if (w.we_wordc == 0) {
+-		rl_printf("Missing argument\n");
+-		return;
+-	}
+-
+ 	gatt_register_app(dbus_conn, default_ctrl->proxy, &w);
  
- 	cmd = strtok_r(input, " ", &arg);
+ 	wordfree(&w);
+@@ -2142,7 +2137,7 @@ static const struct {
+ 	{ "write",        "<data=[xx xx ...]>", cmd_write,
+ 						"Write attribute value" },
+ 	{ "notify",       "<on/off>", cmd_notify, "Notify attribute value" },
+-	{ "register-application", "<UUID ...>", cmd_register_app,
++	{ "register-application", "[UUID ...]", cmd_register_app,
+ 						"Register profile to connect" },
+ 	{ "unregister-application", NULL, cmd_unregister_app,
+ 						"Unregister profile" },
 -- 
 2.9.4
 
