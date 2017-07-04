@@ -1,103 +1,50 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 01/10] doc/gatt-api: Add AcquireWrite and AcquireNotify
-Date: Tue,  4 Jul 2017 18:09:28 +0300
-Message-Id: <20170704150937.11701-2-luiz.dentz@gmail.com>
-In-Reply-To: <20170704150937.11701-1-luiz.dentz@gmail.com>
-References: <20170704150937.11701-1-luiz.dentz@gmail.com>
+Subject: [PATCH v2 00/10] gatt: Add AcquireWrite and AcquireNotify
+Date: Tue,  4 Jul 2017 18:09:27 +0300
+Message-Id: <20170704150937.11701-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This enables write and notify exclusive access via file descriptors in
-case the characteristic is actually trying to emulate a byte stream
-transfer or have a protocol on top of GATT.
----
- doc/gatt-api.txt | 62 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 62 insertions(+)
+This set adds 2 new methods to GattCharacteristics1, thse deal with
+attributes that attempts to emulate a byte stream transfer, or a protocol
+on top of GATT, using write without response and notifications.
 
-diff --git a/doc/gatt-api.txt b/doc/gatt-api.txt
-index 6c98b87..3f4a3ca 100644
---- a/doc/gatt-api.txt
-+++ b/doc/gatt-api.txt
-@@ -91,6 +91,56 @@ Methods		array{byte} ReadValue(dict options)
- 					 org.bluez.Error.NotAuthorized
- 					 org.bluez.Error.NotSupported
- 
-+		fd, uint16 AcquireWrite() [experimental] (Client only)
-+
-+			Acquire write file descriptor and MTU and lock
-+			write access to the characteristic.
-+
-+			Only works with characteristic that has
-+			WriteAcquired property which relies on
-+			write-without-response Flag.
-+
-+			To release the lock the client shall close the file
-+			descriptor, a HUP is generated in case the device
-+			is disconnected.
-+
-+			Note: the MTU can only be negotiated once and is
-+			symmetric therefore this method may be delayed in
-+			order to have the exchange MTU completed, because of
-+			that the file descriptor is closed during
-+			reconnections as the MTU has to be renegotiated.
-+
-+			Possible Errors: org.bluez.Error.Failed
-+					 org.bluez.Error.NotSupported
-+
-+		fd, uint16 AcquireNotify() [experimental] (Client only)
-+
-+			Acquire notify file descriptor and MTU and lock
-+			notifications to the characteristic.
-+
-+			Only works with characteristic that has NotifyAcquired
-+			which relies on notify Flag and no other client have
-+			called StartNotify.
-+
-+			Notification are enabled during this procedure so
-+			StartNotify shall not be called, any notification
-+			will be dispatched via file descriptor therefore the
-+			Value property is no affected during the time where
-+			notify has been acquired.
-+
-+			To release the lock the client shall close the file
-+			descriptor, a HUP is generated in case the device
-+			is disconnected.
-+
-+			Note: the MTU can only be negotiated once and is
-+			symmetric therefore this method may be delayed in
-+			order to have the exchange MTU completed, because of
-+			that the file descriptor is closed during
-+			reconnections as the MTU has to be renegotiated.
-+
-+			Possible Errors: org.bluez.Error.Failed
-+					 org.bluez.Error.NotSupported
-+
- 		void StartNotify()
- 
- 			Starts a notification session from this characteristic
-@@ -125,6 +175,18 @@ Properties	string UUID [read-only]
- 			when a notification or indication is received, upon
- 			which a PropertiesChanged signal will be emitted.
- 
-+		boolean WriteAcquired [read-only, optional]
-+
-+			True, if this characteristic has been acquire by any
-+			client using AcquireWrite. This properties is ommited
-+			in case write-without-response flag is not set.
-+
-+		boolean NotifyAcquired [read-only, optional]
-+
-+			True, if this characteristic has been acquire by any
-+			client using AcquireNotify. This properties is ommited
-+			in case notify flag is not set.
-+
- 		boolean Notifying [read-only, optional]
- 
- 			True, if notifications or indications on this
+v2:
+- Rename WriteLocked and NotifyLocked to WriteAcquired and NotifyAcquired
+- Make WriteAcquired and NotifyAcquired optional so they only appear if
+the required flags are supported.
+- Make sure O_CLOEXEC and O_NONBLOCK are set in the flags passed to pipe2.
+
+Luiz Augusto von Dentz (10):
+  doc/gatt-api: Add AcquireWrite and AcquireNotify
+  shared/gatt-client: Allow multiple ready callbacks
+  gatt: Add implementation of AcquireWrite
+  gatt: Add implementation of WriteAcquired
+  client: Add acquire-write command
+  client: Add release-write command
+  gatt: Add implementation of AcquireNotify
+  gatt: Add implementation of NotifyAcquired
+  client: Add acquire-notify command
+  client: Add release-notify command
+
+ Makefile.tools           |   4 +-
+ client/gatt.c            | 209 +++++++++++++++++++++++++++
+ client/gatt.h            |   6 +
+ client/main.c            |  48 +++++++
+ doc/gatt-api.txt         |  62 ++++++++
+ peripheral/gatt.c        |   4 +-
+ src/device.c             |  16 ++-
+ src/gatt-client.c        | 367 +++++++++++++++++++++++++++++++++++++++++++++++
+ src/shared/gatt-client.c |  60 ++++++--
+ src/shared/gatt-client.h |   4 +-
+ tools/btgatt-client.c    |   2 +-
+ unit/test-gatt.c         |   4 +-
+ 12 files changed, 759 insertions(+), 27 deletions(-)
+
 -- 
 2.9.4
 
