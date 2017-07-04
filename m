@@ -1,50 +1,33 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 00/10] gatt: Add AcquireWrite and AcquireNotify
-Date: Tue,  4 Jul 2017 18:09:27 +0300
-Message-Id: <20170704150937.11701-1-luiz.dentz@gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+Subject: Re: [PATCH] Bluetooth: hci_bcm: Make bcm_request_irq fail if no IRQ
+ resource
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1499165876-18999-1-git-send-email-loic.poulain@gmail.com>
+Date: Tue, 4 Jul 2017 14:12:44 +0200
+Cc: "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+        ian@mnementh.co.uk
+Message-Id: <8D4F453F-AF1B-4E7F-A9C6-5AF5D5B6524A@holtmann.org>
+References: <1499165876-18999-1-git-send-email-loic.poulain@gmail.com>
+To: Loic Poulain <loic.poulain@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Loic,
 
-This set adds 2 new methods to GattCharacteristics1, thse deal with
-attributes that attempts to emulate a byte stream transfer, or a protocol
-on top of GATT, using write without response and notifications.
+> In case of no IRQ resource associated to the bcm_device, requesting
+> IRQ should return an error in order to not enable low power mgmt.
+> 
+> Signed-off-by: Loic Poulain <loic.poulain@gmail.com>
+> Reported-by: Ian Molton <ian@mnementh.co.uk>
+> ---
+> drivers/bluetooth/hci_bcm.c | 30 ++++++++++++++++--------------
+> 1 file changed, 16 insertions(+), 14 deletions(-)
 
-v2:
-- Rename WriteLocked and NotifyLocked to WriteAcquired and NotifyAcquired
-- Make WriteAcquired and NotifyAcquired optional so they only appear if
-the required flags are supported.
-- Make sure O_CLOEXEC and O_NONBLOCK are set in the flags passed to pipe2.
+patch has been applied to bluetooth-next tree.
 
-Luiz Augusto von Dentz (10):
-  doc/gatt-api: Add AcquireWrite and AcquireNotify
-  shared/gatt-client: Allow multiple ready callbacks
-  gatt: Add implementation of AcquireWrite
-  gatt: Add implementation of WriteAcquired
-  client: Add acquire-write command
-  client: Add release-write command
-  gatt: Add implementation of AcquireNotify
-  gatt: Add implementation of NotifyAcquired
-  client: Add acquire-notify command
-  client: Add release-notify command
+Regards
 
- Makefile.tools           |   4 +-
- client/gatt.c            | 209 +++++++++++++++++++++++++++
- client/gatt.h            |   6 +
- client/main.c            |  48 +++++++
- doc/gatt-api.txt         |  62 ++++++++
- peripheral/gatt.c        |   4 +-
- src/device.c             |  16 ++-
- src/gatt-client.c        | 367 +++++++++++++++++++++++++++++++++++++++++++++++
- src/shared/gatt-client.c |  60 ++++++--
- src/shared/gatt-client.h |   4 +-
- tools/btgatt-client.c    |   2 +-
- unit/test-gatt.c         |   4 +-
- 12 files changed, 759 insertions(+), 27 deletions(-)
-
--- 
-2.9.4
+Marcel
 
