@@ -1,72 +1,47 @@
-Return-Path: <loic.poulain@gmail.com>
-From: Loic Poulain <loic.poulain@gmail.com>
-To: marcel@holtmann.org
-Cc: linux-bluetooth@vger.kernel.org,
-	ian@mnementh.co.uk,
-	Loic Poulain <loic.poulain@gmail.com>
-Subject: [PATCH] Bluetooth: hci_bcm: Make bcm_request_irq fail if no IRQ resource
-Date: Tue,  4 Jul 2017 12:57:56 +0200
-Message-Id: <1499165876-18999-1-git-send-email-loic.poulain@gmail.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Subject: Re: [PATCH BlueZ] client: Fix memory leak due to the option to
+ register an agent
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+References: <e75606ee-1e0f-5225-21d7-d6129202d9ac@jp.fujitsu.com>
+From: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
+Message-ID: <22ba2dcc-325a-ea3a-85c9-48c47c4a4292@jp.fujitsu.com>
+Date: Tue, 4 Jul 2017 16:21:10 +0900
+MIME-Version: 1.0
+In-Reply-To: <e75606ee-1e0f-5225-21d7-d6129202d9ac@jp.fujitsu.com>
+Content-Type: text/plain; charset="utf-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-In case of no IRQ resource associated to the bcm_device, requesting
-IRQ should return an error in order to not enable low power mgmt.
+Hi Luiz,
 
-Signed-off-by: Loic Poulain <loic.poulain@gmail.com>
-Reported-by: Ian Molton <ian@mnementh.co.uk>
----
- drivers/bluetooth/hci_bcm.c | 30 ++++++++++++++++--------------
- 1 file changed, 16 insertions(+), 14 deletions(-)
+Would you apply my patch to git master branch if there are not any problems?
+I confirmed that it was applied to the latest master branch with no problem.
 
-diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
-index be53238..fab6f73 100644
---- a/drivers/bluetooth/hci_bcm.c
-+++ b/drivers/bluetooth/hci_bcm.c
-@@ -176,7 +176,7 @@ static irqreturn_t bcm_host_wake(int irq, void *data)
- static int bcm_request_irq(struct bcm_data *bcm)
- {
- 	struct bcm_device *bdev = bcm->dev;
--	int err = 0;
-+	int err;
- 
- 	/* If this is not a platform device, do not enable PM functionalities */
- 	mutex_lock(&bcm_device_lock);
-@@ -185,21 +185,23 @@ static int bcm_request_irq(struct bcm_data *bcm)
- 		goto unlock;
- 	}
- 
--	if (bdev->irq > 0) {
--		err = devm_request_irq(&bdev->pdev->dev, bdev->irq,
--				       bcm_host_wake, IRQF_TRIGGER_RISING,
--				       "host_wake", bdev);
--		if (err)
--			goto unlock;
-+	if (bdev->irq <= 0) {
-+		err = -EOPNOTSUPP;
-+		goto unlock;
-+	}
- 
--		device_init_wakeup(&bdev->pdev->dev, true);
-+	err = devm_request_irq(&bdev->pdev->dev, bdev->irq, bcm_host_wake,
-+			       IRQF_TRIGGER_RISING, "host_wake", bdev);
-+	if (err)
-+		goto unlock;
- 
--		pm_runtime_set_autosuspend_delay(&bdev->pdev->dev,
--						 BCM_AUTOSUSPEND_DELAY);
--		pm_runtime_use_autosuspend(&bdev->pdev->dev);
--		pm_runtime_set_active(&bdev->pdev->dev);
--		pm_runtime_enable(&bdev->pdev->dev);
--	}
-+	device_init_wakeup(&bdev->pdev->dev, true);
-+
-+	pm_runtime_set_autosuspend_delay(&bdev->pdev->dev,
-+					 BCM_AUTOSUSPEND_DELAY);
-+	pm_runtime_use_autosuspend(&bdev->pdev->dev);
-+	pm_runtime_set_active(&bdev->pdev->dev);
-+	pm_runtime_enable(&bdev->pdev->dev);
- 
- unlock:
- 	mutex_unlock(&bcm_device_lock);
--- 
-1.9.1
+Regards,
+Eramoto
+
+On 2017年06月21日 19:07, ERAMOTO Masaya wrote:
+> When bluetoothctl runs with the command line option "-a <capability>", it
+> does not free the variable auto_register_agent registering the initial
+> agent and allocates new memory for it.
+> 
+> This frees the allocated memory before allocating new memory.
+> (The related commit id is 6db3470c2ea161b4b808ad1fc80dfd7e014fd359.)
+> 
+> ---
+>  client/main.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/client/main.c b/client/main.c
+> index 2f269af..9b01dfb 100644
+> --- a/client/main.c
+> +++ b/client/main.c
+> @@ -2358,6 +2358,7 @@ static gboolean parse_agent(const char *key, const char *value,
+>  	if (!value)
+>  		return FALSE;
+>  
+> +	g_free(auto_register_agent);
+>  	auto_register_agent = g_strdup(value);
+>  
+>  	return TRUE;
+> 
