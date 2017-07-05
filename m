@@ -1,105 +1,30 @@
-Return-Path: <shapiroc@google.com>
-From: C Shapiro <shapiroc@chromium.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Simon Glass <shapiroc@chromium.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Marcel Holtmann <marcel@holtmann.org>
-Subject: [PATCH v2] Support to change set file via arg
-Date: Wed,  5 Jul 2017 10:16:02 -0600
-Message-Id: <20170705161602.95344-1-shapiroc@chromium.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Heiko Abraham <heiko.abraham@hella-gutmann.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Bluetooth Certification Testing L2CAP eRTM Test Failing
+Date: Wed, 5 Jul 2017 16:06:25 +0000
+Message-ID: <52FEDDCD-B2BB-4D85-A510-2E080C85D483@hella-gutmann.com>
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-ChromeOS is currently shifting to a more dynamic build system where a
-single build will be created/managed/deployed to support multiple models
-that were all created based on a single reference board.
+Hi,
 
-This is being done for general cost/maintenance savings around the sheer
-number of builds that are currently managed for ChromeOS.
+I am trying to qualify our Bluez 5.45 stack as a host subsystem with the
+Bluetooth Sig. Right now I am running into an issue with eRTM. It looks
+like eRTM is not well supported.
 
-To support this, we're changing our build images to have all of the
-configuration available for all of the models supported by a given
-build.
+I use kernel 3.12.74 and BlueZ 5.45 on an ARM platform.
 
-For the bluetooth stack, models have different product id values in the
-DeviceID field for the main.conf config file.
+Can anyone tell me, if eRTM works well with kernel 3.12.x?
 
-E.g.
-https://chromium.git.corp.google.com/chromiumos/overlays/board-overlays/+/master/overlay-pyro/chromeos-base/chromeos-bsp-pyro/files/main.conf
-https://chromium.git.corp.google.com/chromiumos/overlays/board-overlays/+/master/overlay-reef/chromeos-base/chromeos-bsp-reef/files/main.conf
-https://chromium.git.corp.google.com/chromiumos/overlays/board-overlays/+/master/overlay-snappy/chromeos-base/chromeos-bsp-snappy/files/main.conf
 
-This change allows the config file to be passed as a runtime argument to
-bluetoothd, which allows the ChromeOS init script to determine the model
-at runtime and then pass the appropriate model specific config file.
+Best Regards
+Heiko Abraham
 
-Signed-off-by: C Shapiro <shapiroc@chromium.org>
-Reviewed-by: Simon Glass <sjg@chromium.org>
----
-Changes in v2:
-- Updates the commit message with a better explanation of the usage.
+________________________________
 
- src/bluetoothd.8.in |  4 ++++
- src/main.c          | 12 +++++++++++-
- 2 files changed, 15 insertions(+), 1 deletion(-)
-
-diff --git a/src/bluetoothd.8.in b/src/bluetoothd.8.in
-index 97ef3ec94..d61dcc5b3 100644
---- a/src/bluetoothd.8.in
-+++ b/src/bluetoothd.8.in
-@@ -27,6 +27,10 @@ Print bluetoothd options and exit.
- Enable logging in foreground. Directs log output to the controlling terminal \
- in addition to syslog.
- .TP
-+.B -f, --configfile
-+Specifies an explicit config file path instead of relying on the default path \
-+(@CONFIGDIR@/main.conf) for the config file.
-+.TP
- .B -d, --debug=<file1>:<file2>:...
- Sets how much information bluetoothd sends to the log destination (usually \
- syslog's "daemon" facility). If the file options are omitted, then debugging \
-diff --git a/src/main.c b/src/main.c
-index bcc1e6fae..87bdb66cb 100644
---- a/src/main.c
-+++ b/src/main.c
-@@ -490,6 +490,7 @@ static guint setup_signalfd(void)
- static char *option_debug = NULL;
- static char *option_plugin = NULL;
- static char *option_noplugin = NULL;
-+static char *option_configfile = NULL;
- static gboolean option_compat = FALSE;
- static gboolean option_detach = TRUE;
- static gboolean option_version = FALSE;
-@@ -505,6 +506,9 @@ static void free_options(void)
- 
- 	g_free(option_noplugin);
- 	option_noplugin = NULL;
-+
-+	g_free(option_configfile);
-+	option_configfile = NULL;
- }
- 
- static void disconnect_dbus(void)
-@@ -577,6 +581,9 @@ static GOptionEntry options[] = {
- 				"Specify plugins to load", "NAME,..," },
- 	{ "noplugin", 'P', 0, G_OPTION_ARG_STRING, &option_noplugin,
- 				"Specify plugins not to load", "NAME,..." },
-+	{ "configfile", 'f', 0, G_OPTION_ARG_STRING, &option_configfile,
-+				"Specify an explicit path to the config file",
-+				"FILE"},
- 	{ "compat", 'C', 0, G_OPTION_ARG_NONE, &option_compat,
- 				"Provide deprecated command line interfaces" },
- 	{ "experimental", 'E', 0, G_OPTION_ARG_NONE, &option_experimental,
-@@ -636,7 +643,10 @@ int main(int argc, char *argv[])
- 
- 	sd_notify(0, "STATUS=Starting up");
- 
--	main_conf = load_config(CONFIGDIR "/main.conf");
-+	if (option_configfile)
-+		main_conf = load_config(option_configfile);
-+	else
-+		main_conf = load_config(CONFIGDIR "/main.conf");
- 
- 	parse_config(main_conf);
- 
--- 
-2.13.2.725.g09c95d1e9-goog
+--
+Hella Gutmann Solutions GmbH * Unternehmensform: Gesellschaft mit beschraenkter Haftung *
+Firmensitz: 79241 Ihringen * Eingetragen im Handelsregister: AG Freiburg i.Br., HRB 290194 * Geschaeftsfuehrer: Andreas Habeck * USt-IdNr.: DE142208666
