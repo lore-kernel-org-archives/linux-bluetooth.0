@@ -1,59 +1,34 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Subject: Re: [PATCH v2] Support to change set file via arg
-To: C Shapiro <shapiroc@chromium.org>,
-        <linux-bluetooth@vger.kernel.org>
-References: <20170705161602.95344-1-shapiroc@chromium.org>
-CC: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Marcel Holtmann <marcel@holtmann.org>
-From: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
-Message-ID: <1c5fb2d7-8671-b5f7-9773-0454ee3ca7da@jp.fujitsu.com>
-Date: Thu, 6 Jul 2017 13:21:05 +0900
+To: linux-bluetooth@vger.kernel.org
+From: Ian Molton <ian@mnementh.co.uk>
+Subject: bdaddr
+Message-ID: <c81eae29-b2bd-f1df-9066-d51591ac6d8f@mnementh.co.uk>
+Date: Wed, 5 Jul 2017 20:05:36 +0100
 MIME-Version: 1.0
-In-Reply-To: <20170705161602.95344-1-shapiroc@chromium.org>
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=utf-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Charles,
+Hi guys,
 
-On 07/06/2017 01:16 AM, C Shapiro wrote:
-> ChromeOS is currently shifting to a more dynamic build system where a
-> single build will be created/managed/deployed to support multiple models
-> that were all created based on a single reference board.
-> 
-> This is being done for general cost/maintenance savings around the sheer
-> number of builds that are currently managed for ChromeOS.
+When changing the BDADDR why must I down/up the device after doing so?
+is it not possible/sensible to change it whilst remaining up?
 
-I could not understand whether there were any merits except maintenance
-of your ChromeOS.
-Are there any merits for other software/users (e.g. container, etc.)?
+Could it be possible to allow the BDADDR to be written whilst the device
+is down, and inject it when it comes up? Would a patch to do this be
+acceptable?
 
-> For the bluetooth stack, models have different product id values in the
-> DeviceID field for the main.conf config file.
+Otherwise, the sequence for programming the BDADDR looks a bit naff;
 
-Why do not you pass DeviceID as an argument instead of a config file?
+hciconfig hci0 up
+bdaddr -i hci0 <foo>
+hciconfig hci0 down
+hciconfig hci0 up
 
-> E.g.
-> https://chromium.git.corp.google.com/chromiumos/overlays/board-overlays/+/master/overlay-pyro/chromeos-base/chromeos-bsp-pyro/files/main.conf
-> https://chromium.git.corp.google.com/chromiumos/overlays/board-overlays/+/master/overlay-reef/chromeos-base/chromeos-bsp-reef/files/main.conf
-> https://chromium.git.corp.google.com/chromiumos/overlays/board-overlays/+/master/overlay-snappy/chromeos-base/chromeos-bsp-snappy/files/main.conf
+To me, it would make more sense if I could do:
 
-I could not access without an account.
-How can I sign up?
+hciconfig hci0 down
+bdaddr -i hci0 <foo>
+hciconfig hci0 up
 
-> This change allows the config file to be passed as a runtime argument to
-> bluetoothd, which allows the ChromeOS init script to determine the model
-> at runtime and then pass the appropriate model specific config file.
-
-Why do not you change only ChromeOS init scirpt?
-
-For example, in ChromeOS init scirpt,
- 1. Determine the model.
- 2. Run ln command with --force option to link /etc/bluetooth/main.conf to 
-    the appropriate config file.
-
-
-Thank you for reading this to the end :)
-
-Regards,
-Eramoto
+-Ian
