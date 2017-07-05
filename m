@@ -1,60 +1,92 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Subject: Re: DBUS API: Retrieve current MTU used by remote device
-To: <linux-bluetooth@vger.kernel.org>
-References: <0fef8015e74a2a96af45c36e9c67dc36@labapart.com>
-From: Felix Schulthess <felix.schulthess@scs.ch>
-Message-ID: <c9a595e3-b09b-04ae-7040-d85aba5ec2ea@scs.ch>
-Date: Wed, 5 Jul 2017 09:44:35 +0200
 MIME-Version: 1.0
-In-Reply-To: <0fef8015e74a2a96af45c36e9c67dc36@labapart.com>
-Content-Type: text/plain; charset="windows-1252"
+From: Daniel Mary-Beth Sherwood <daniel.james.sherwood@googlemail.com>
+Date: Wed, 5 Jul 2017 08:41:52 +0100
+Message-ID: <CAC9jHiekNXEPqE3BDNXGwsThBUcKo1N2-VRa8nkvPfVYmf78eQ@mail.gmail.com>
+Subject: Detection of RFCOMM TTY disconnection
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA256
+Hi
 
-Dear all, dear Oliver,
+I am trying to write an application using RFCOMM and have everything
+working fine except for being able to detect RFCOMM remote
+disconnection when the RFCOMM TTY is used.
 
-On 05.07.2017 00:45, Olivier MARTIN wrote:
+If the raw RFCOMM socket is used, then as soon as the remote end
+disconnects the profile, the socket receives an error, however if the
+TTY is instantiated, then the behaviour seems to be different.
+1) Firstly, the socket itself has already been marked as closed so it
+is not possible to monitor it for errors.
+2) If a client is reading from the TTY, then the active read() returns 0.
+3) If a client if polling the TTY (for POLLERR | POLLHUP), then no
+notification appears to occur.
 
-> I looked into the Bluez DBUS API documentation but I have not found
-> a way to retrieve the MTU size used for the connection between
-> Bluez and a Bluetooth device.
+Due to the architecture of the application, the process reading the
+TTY is completely separate from the process managing the state of the
+Bluetooth stack and there is no simple way to communicate the
+disconnection between these processes.
 
-I am also trying to solve this Problem. Cf. my mail earlier on this
-list. I suppose that you, Oliver, did not receive it, so I quote:
+I have reproduced this behaviour using standard Bluez tools on the
+following platform as shown below:
+* Platform - Raspberry Pi 3
+* OS - Raspbian
+* Kernel - 4.9.28
+* Bluez - 5.43
 
-> I am trying to figure out the MTU of a BLE connection while it is 
-> active. If I understand the Core Specification correctly, this can 
-> be accomplished with the "Exchange MTU Request" as specified in
-> Vol. 3, Part F, Section 3.4.2.
-> 
-> 1. I know one can send HCI commands with the hcitool. Is it also 
-> possible to issue the request specified above using any of the 
-> existing hciconfig, hcitool, hciXXX tools to find the MTU?
-> 
-> 2. There is a connection of which I know that its MTU is 512.
-> Still, running 'hciconfig hci0 dev' reports 'ACL MTU: 310:10'. Why
-> is that so?
+ 1) Add SP profile using sdptool
 
-If you figure out how to determine the MTU, I would definitely be
-interested. Keep me (i.e. the list) posted.
+     >sudo sdptool add SP
 
-Best, Felix
------BEGIN PGP SIGNATURE-----
+ 2) Start rfcomm command
 
-iQIzBAEBCAAdFiEE1nG8hohXK+pQzdzfeVlSCSL32xIFAllcmOMACgkQeVlSCSL3
-2xI4dA/+PNrN3gZRe4eC2ufPPlYlQmqI/PymTZzUG9PCeFyA48kKFpnyjkTEccnQ
-yuFkgeY4Yin3yxAtXuTNVv8zNpD74jg7s6TzQddKwevDV58KjbhiI1wDzVMTVmKE
-L7tEr0MDJmHVXhSiF3teiu6ucC1lMSzoSww8/6j/FQVHbzZ5IAoYGx3QxDWRBw3P
-BLxG8FQOqcpx8yC31q1LCEJ1RGtPkV9IN/uCbO4lfNyx3A9CEHI9ZNXuIgwxAChh
-6n1Yik7JE7bE84G2ayaGYKQiOZGaCsnPTJINpFpIYGr1Pncy001IFgW4EoWKgCez
-XHyB/ILIJVEHQ/vV/RA9VhEPuvnCFl05Lk2LdOz7NYTIdpeZUuNSm5ZGedmjA0bu
-9Ip+h6I30aUY62uCq2ilnar/cbkaBL4WTbUucUrhG6AgUcVCahNB/M701xeAvp+e
-Jj5dhNUDerG29uSwCWJpWVTYSvBHp/ZCu9/XKI84xCX42hbL2+Ucc3zYAJT5DLAu
-QM172bxkr/kOoXJRy1z7i6nEU84dwODirgMROhZICGZRWE+stWxWs0GraMaFsapU
-GK4X3T/cQLfnSZffENK8her9+aOxxZIQ0W8C6IYOuPTHw+8TxfIb1lC1xro1wg8I
-Dn6ImMjVXznM/EIc56sEIM8ueZOfarxQPUSjOiYjH8zyA5YNTJA=
-=6SAE
------END PGP SIGNATURE-----
+    >sudo rfcomm listen hci0 1
+    Waiting for connection on channel 1
+
+3) Remote connect from PC - rfcomm command reports
+
+    Connection from <ADDRESS> to /dev/rfcomm0
+    Press CTRL-C for hangup
+
+4) Start terminal
+
+    >miniterm.py /dev/rfcomm0
+    --- Miniterm on /dev/rfcomm0  9600,8,N,1 ---
+    --- Quit: Ctrl +] | Menu: Ctrl+T | Help: Ctrl+T followed by Ctrl+H ---
+
+ 5) Data transfer then works as expected
+
+ 6) Remote disconnect from PC - miniterm command reports
+
+     --- exit ---
+    Exception in thread rx:
+    Traceback (most recent call last):
+      File "/usr/lib/python2.7/threading.py", line 801, in __bootstrap_inner
+        self.run()
+      File "/usr/lib/python2.7/threading.py", line 754, in run
+        self.__target(*self.__args, **self.__kwargs)
+      File "/usr/bin/miniterm.py", line 452, in reader
+        data = self.serial.read(self.serial.in_waiting or 1)
+      File "/usr/lib/python2.7/dist-packages/serial/serialposix.py",
+line 490, in read
+        'device reports readiness to read but returned no data '
+    SerialException: device reports readiness to read but returned no
+data (device disconnected or multiple access on port?)
+
+7) At this point, rfcomm command is still running, /dev/rfcomm0 still
+exists and miniterm can open it again without reporting any errors
+(but not transfer any data).
+
+The Bluez rfcomm tool does appear to be attempting to be notified when
+the TTY is disconnected (see lines 563-570 of tools/rfcomm.c however
+it appears that the TTY never generated any error or hangup events.
+
+Could someone clarify whether this is the expected behaviour - or
+whether this is a bug in Bluez/Kernel that should be investigated
+further.
+
+Cheers
+
+Daniel Sherwood
