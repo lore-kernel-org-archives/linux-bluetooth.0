@@ -5,10 +5,11 @@ To: Marcel Holtmann <marcel@holtmann.org>,
 	Johan Hedberg <johan.hedberg@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	Dmitry Tunin <hanipouspilot@gmail.com>
-Subject: [PATCH v2] Add support of all Foxconn (105b) Broadcom devices
-Date: Thu,  6 Jul 2017 14:41:13 +0300
-Message-Id: <1499341273-13026-1-git-send-email-hanipouspilot@gmail.com>
+	Dmitry Tunin <hanipouspilot@gmail.com>,
+	stable@vger.kernel.org
+Subject: [PATCH] Add support of all Foxconn (105b) Broadcom devices
+Date: Thu,  6 Jul 2017 14:29:53 +0300
+Message-Id: <1499340593-12739-1-git-send-email-hanipouspilot@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 There is another device
@@ -28,21 +29,21 @@ I:  If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
 Since we have Cls=ff, we can add all of them.
 
 Signed-off-by: Dmitry Tunin <hanipouspilot@gmail.com>
+Cc: stable@vger.kernel.org
 ---
- drivers/bluetooth/btusb.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ drivers/bluetooth/btusb.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index fa24d69..b1e01b0 100644
+index fa24d69..bf95c13 100644
 --- a/drivers/bluetooth/btusb.c
 +++ b/drivers/bluetooth/btusb.c
-@@ -131,7 +131,8 @@ static const struct usb_device_id btusb_table[] = {
+@@ -131,7 +131,7 @@ static const struct usb_device_id btusb_table[] = {
  	{ USB_DEVICE(0x19ff, 0x0239), .driver_info = BTUSB_BCM_PATCHRAM },
  
  	/* Broadcom BCM43142A0 (Foxconn/Lenovo) */
 -	{ USB_DEVICE(0x105b, 0xe065), .driver_info = BTUSB_BCM_PATCHRAM },
 +	{ USB_VENDOR_AND_INTERFACE_INFO(0x105b, 0xff, 0x01, 0x01),
-+	  .driver_info = BTUSB_BCM_PATCHRAM },
  
  	/* Broadcom BCM920703 (HTC Vive) */
  	{ USB_VENDOR_AND_INTERFACE_INFO(0x0bb4, 0xff, 0x01, 0x01),
