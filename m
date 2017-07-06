@@ -1,72 +1,45 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Anurag B <biradar.a@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Anurag Biradar <biradar.a@samsung.com>
-Subject: [PATCH 1/1] src/device: Fix bluetoothd crash
-Date: Fri, 07 Jul 2017 12:06:08 +0530
-Message-id: <1499409368-30953-1-git-send-email-biradar.a@samsung.com>
-References: <CGME20170707062831epcas5p3c96636f9ce52067e27c00e82dafb73d0@epcas5p3.samsung.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+Subject: Re: [PATCH v2] Add support of all Foxconn (105b) Broadcom devices
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1499341273-13026-1-git-send-email-hanipouspilot@gmail.com>
+Date: Thu, 6 Jul 2017 23:21:15 +0200
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+        linux-kernel@vger.kernel.org
+Message-Id: <4EFAF480-7A01-457C-A671-23353F50BA36@holtmann.org>
+References: <1499341273-13026-1-git-send-email-hanipouspilot@gmail.com>
+To: Dmitry Tunin <hanipouspilot@gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Anurag Biradar <biradar.a@samsung.com>
+Hi Dmitry,
 
-DUT was trying to connect with carkit and due to some reason connection
-got aborted. SDP search got error and browse request was freed but
-device->browse is still pointing to freed memory. During clean up
-bluez removes all device and while removing it find reference to
-browse_req and it tries to free again which leads to the crash.
+> There is another device
+> 
+> T:  Bus=01 Lev=02 Prnt=02 Port=00 Cnt=01 Dev#=  3 Spd=12  MxCh= 0
+> D:  Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+> P:  Vendor=105b ProdID=e066 Rev=01.12
+> S:  Manufacturer=Broadcom Corp
+> S:  Product=BCM20702A0
+> S:  SerialNumber=342387DAE35E
+> C:  #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=0mA
+> I:  If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
+> I:  If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
+> I:  If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
+> I:  If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
+> 
+> Since we have Cls=ff, we can add all of them.
+> 
+> Signed-off-by: Dmitry Tunin <hanipouspilot@gmail.com>
+> ---
+> drivers/bluetooth/btusb.c | 3 ++-
+> 1 file changed, 2 insertions(+), 1 deletion(-)
 
-Assign NULL to device browse_req before freeing the browse_req.
+patch has been applied to bluetooth-next tree.
 
-Log:
+Regards
 
-bluetooth: src/service.c:change_state() 0xb700a650: device XX:XX:XX:XX:XX:XX
-           profile a2dp-sink state changed: connecting -> disconnected (-11)
-bluetooth: src/device.c:device_profile_connected()
-			a2dp-sink Resource temporarily unavailable (11)
-bluetooth: src/device.c:device_profile_connected() returning response to :1.300
-bluetooth: src/device.c:device_browse_sdp()
-bluetooth: src/device.c:browse_request_free()
-
---Browse req is freed but device->browse is still pointing to freed memory --
-
-While turning OFF freeing each devices:
-bluetoothd[2024]: src/adapter.c:adapter_remove()
-		Removing adapter /org/bluez/hci0
-bluetoothd[2024]: src/device.c:device_remove()
-		Removing device /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX
-bluetoothd[2024]: src/device.c:browse_request_cancel()
-
-(gdb)
-0  0xb6f981ae in queue_remove_if (queue=0xb7007d70,
-     function=0xb6f9a319 <match_disconn_id>, user_data=0xb7001ae0)
-     at src/shared/queue.c:289
-1  0xb6f9a87a in bt_att_unregister_disconnect (att=<optimized out>,
-     id=<optimized out>) at src/shared/att.c:1161
-2  0xb6f81bf6 in attio_cleanup (device=0xb6d4d810) at src/device.c:742
-3  0xb6f81c3c in browse_request_cancel (req=0xb6fe3038) at src/device.c:777
-4  0xb6f87066 in device_remove (device=0xb700ac00, remove_stored=0)
-     at src/device.c:5238
-5  0xb6f6b80c in adapter_remove (adapter=adapter@entry=0xb6fff2f0)
-     at src/adapter.c:7822
-6  0xb6f79068 in adapter_cleanup () at src/adapter.c:11707
----
- src/device.c |    1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/src/device.c b/src/device.c
-index 6a9936a..73b2c44 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -5118,6 +5118,7 @@ static int device_browse_sdp(struct btd_device *device, DBusMessage *msg)
- 				&device->bdaddr, &uuid, browse_cb, req, NULL,
- 				req->sdp_flags);
- 	if (err < 0) {
-+		device->browse = NULL;
- 		browse_request_free(req);
- 		return err;
- 	}
--- 
-1.7.9.5
-
+Marcel
