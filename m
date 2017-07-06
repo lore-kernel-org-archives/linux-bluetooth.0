@@ -1,51 +1,53 @@
-Return-Path: <hanipouspilot@gmail.com>
-From: Dmitry Tunin <hanipouspilot@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+MIME-Version: 1.0
+In-Reply-To: <222dcd39-0ee0-2467-bb41-90d66e9a7715@jp.fujitsu.com>
+References: <1499252831-29074-1-git-send-email-nsathish41@gmail.com> <222dcd39-0ee0-2467-bb41-90d66e9a7715@jp.fujitsu.com>
+From: Sathish Narasimman <nsathish41@gmail.com>
+Date: Thu, 6 Jul 2017 12:43:20 +0530
+Message-ID: <CAOVXEJLp6qDJmknCW6PWk1rfgHz2NAXz=HVDMYmaPXeh6FqCXQ@mail.gmail.com>
+Subject: Re: [PATCH] obexd/map: msg dummy implement MSE message viewing
+To: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
 Cc: linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Dmitry Tunin <hanipouspilot@gmail.com>,
-	stable@vger.kernel.org
-Subject: [PATCH] Add support of all Foxconn (105b) Broadcom devices
-Date: Thu,  6 Jul 2017 14:29:53 +0300
-Message-Id: <1499340593-12739-1-git-send-email-hanipouspilot@gmail.com>
+        Sathish Narasimman <sathish.narasimman@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-There is another device
+Thanks, Eramoto, Will update the patch.
 
-T:  Bus=01 Lev=02 Prnt=02 Port=00 Cnt=01 Dev#=  3 Spd=12  MxCh= 0
-D:  Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=105b ProdID=e066 Rev=01.12
-S:  Manufacturer=Broadcom Corp
-S:  Product=BCM20702A0
-S:  SerialNumber=342387DAE35E
-C:  #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=0mA
-I:  If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
-I:  If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
-I:  If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
-I:  If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
+--
+Sathish
+Thanks & Regards,
+Sathish N
 
-Since we have Cls=ff, we can add all of them.
 
-Signed-off-by: Dmitry Tunin <hanipouspilot@gmail.com>
-Cc: stable@vger.kernel.org
----
- drivers/bluetooth/btusb.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index fa24d69..bf95c13 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -131,7 +131,7 @@ static const struct usb_device_id btusb_table[] = {
- 	{ USB_DEVICE(0x19ff, 0x0239), .driver_info = BTUSB_BCM_PATCHRAM },
- 
- 	/* Broadcom BCM43142A0 (Foxconn/Lenovo) */
--	{ USB_DEVICE(0x105b, 0xe065), .driver_info = BTUSB_BCM_PATCHRAM },
-+	{ USB_VENDOR_AND_INTERFACE_INFO(0x105b, 0xff, 0x01, 0x01),
- 
- 	/* Broadcom BCM920703 (HTC Vive) */
- 	{ USB_VENDOR_AND_INTERFACE_INFO(0x0bb4, 0xff, 0x01, 0x01),
--- 
-2.7.4
+On Thu, Jul 6, 2017 at 10:45 AM, ERAMOTO Masaya
+<eramoto.masaya@jp.fujitsu.com> wrote:
+> Hi Sathish,
+>
+>> @@ -518,7 +545,26 @@ int messages_get_message(void *session, const char *handle,
+>>                                       messages_get_message_cb callback,
+>>                                       void *user_data)
+>>  {
+>> -     return -ENOSYS;
+>> +     struct session *s =  session;
+>> +     struct message_view_data *mvd;
+>> +
+>> +     mvd = g_new0(struct message_view_data, 1);
+>> +     mvd->session = s;
+>> +     mvd->handle = handle;
+>> +     mvd->callback = callback;
+>> +     mvd->user_data = user_data;
+>> +
+>> +     mvd->path = g_build_filename(s->cwd_absolute, handle, NULL);
+>> +     mvd->fp = fopen(mvd->path, "r");
+>> +     if (mvd->fp == NULL) {
+>> +             int err = -errno;
+>> +             DBG("fopen(): %d, %s", -err, strerror(-err));
+>> +             g_free(mvd->path);
+>> +             return -ENOENT;
+>
+> I think the memory of mvd leaks when fopen fails.
+>
+> Regards,
+> Eramoto
