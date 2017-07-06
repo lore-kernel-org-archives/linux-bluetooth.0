@@ -1,72 +1,51 @@
-Return-Path: <hdegoede@redhat.com>
-From: Hans de Goede <hdegoede@redhat.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>
-Cc: Hans de Goede <hdegoede@redhat.com>,
-	linux-bluetooth@vger.kernel.org
-Subject: [PATCH] bluetooth: btusb: Add support for BCM2045 HCI with vend:prod ids set to 0000:0000
-Date: Thu,  6 Jul 2017 16:08:45 +0200
-Message-Id: <20170706140845.11508-1-hdegoede@redhat.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+MIME-Version: 1.0
+In-Reply-To: <52FEDDCD-B2BB-4D85-A510-2E080C85D483@hella-gutmann.com>
+References: <52FEDDCD-B2BB-4D85-A510-2E080C85D483@hella-gutmann.com>
+From: Josh Van Tol <josh@afdengineering.com>
+Date: Thu, 6 Jul 2017 08:08:16 -0500
+Message-ID: <CABdDuZ2M+t+eOsF0tpH7Eaqk4c7fTx78C5w714knA08EUAGaPA@mail.gmail.com>
+Subject: Re: Bluetooth Certification Testing L2CAP eRTM Test Failing
+To: Heiko Abraham <heiko.abraham@hella-gutmann.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The GPD Pocket is shipping with a BCM2045 USB HCI with its vend:prod
-ids set to 0000:0000 and also has its interface class set to 255 (Vendor
-Specific Class).
+I don't have a specific answer to this question, but I do find myself
+in a similar situation of trying to figure out which functions of
+BlueZ 5 might or might not work when used with an older kernel,
+3.12.70 in my case. I haven't found a specific source of information
+on this topic, only scattered references to the fact that some BlueZ 5
+features only work with newer (4.1+?) kernels. Is there a
+comprehensive source for this info?
 
-Which, well sucks. Luckily it does advertise usable manufacturer and
-product strings, so this commit adds 0000:0000 to the usb_device_id
-table, with a special flag of BTUSB_BCM2045_0000_0000, if this flag
-is set btusb_probe will check the strings and if they don't match
-return -ENODEV.
+Regards,
+Josh van Tol
 
-This is not pretty, but it fixes bluetooth not working under Linux.
-
-Reported-and-tested-by: Christopher Williamson <home@chrisaw.com>
-Signed-off-by: Hans de Goede <hdegoede@redhat.com>
----
- drivers/bluetooth/btusb.c | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
-
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 7fa373b428f8..9c3201c0525d 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -66,6 +66,7 @@ static struct usb_driver btusb_driver;
- #define BTUSB_BCM2045		0x40000
- #define BTUSB_IFNUM_2		0x80000
- #define BTUSB_CW6622		0x100000
-+#define BTUSB_BCM2045_0000_0000	0x200000
- 
- static const struct usb_device_id btusb_table[] = {
- 	/* Generic Bluetooth USB device */
-@@ -124,6 +125,10 @@ static const struct usb_device_id btusb_table[] = {
- 	/* Canyon CN-BTU1 with HID interfaces */
- 	{ USB_DEVICE(0x0c10, 0x0000) },
- 
-+	/* Broadcom BCM2045 with the prod:vend ids not filled GRRR */
-+	{ USB_DEVICE(0x0000, 0x0000),
-+	  .driver_info = BTUSB_BCM2045 | BTUSB_BCM2045_0000_0000 },
-+
- 	/* Broadcom BCM20702A0 */
- 	{ USB_DEVICE(0x413c, 0x8197) },
- 
-@@ -2887,6 +2892,16 @@ static int btusb_probe(struct usb_interface *intf,
- 	if (id->driver_info == BTUSB_IGNORE)
- 		return -ENODEV;
- 
-+	if (id->driver_info & BTUSB_BCM2045_0000_0000) {
-+		struct usb_device *udev = interface_to_usbdev(intf);
-+
-+		/* Device with prod:vend id set to 0000:0000, check strings */
-+		if (!udev->manufacturer || !udev->product ||
-+		    strcmp(udev->manufacturer, "Broadcom Corp") != 0 ||
-+		    strcmp(udev->product, "BCM2045A0") != 0)
-+			return -ENODEV;
-+	}
-+
- 	if (id->driver_info & BTUSB_ATH3012) {
- 		struct usb_device *udev = interface_to_usbdev(intf);
- 
--- 
-2.13.0
+On Wed, Jul 5, 2017 at 11:11 AM Heiko Abraham
+<heiko.abraham@hella-gutmann.com> wrote:
+>
+> Hi,
+>
+> I am trying to qualify our Bluez 5.45 stack as a host subsystem with the
+> Bluetooth Sig. Right now I am running into an issue with eRTM. It looks
+> like eRTM is not well supported.
+>
+> I use kernel 3.12.74 and BlueZ 5.45 on an ARM platform.
+>
+> Can anyone tell me, if eRTM works well with kernel 3.12.x?
+>
+>
+> Best Regards
+> Heiko Abraham
+>
+> ________________________________
+>
+> --
+> Hella Gutmann Solutions GmbH * Unternehmensform: Gesellschaft mit beschraenkter Haftung *
+> Firmensitz: 79241 Ihringen * Eingetragen im Handelsregister: AG Freiburg i.Br., HRB 290194 * Geschaeftsfuehrer: Andreas Habeck * USt-IdNr.: DE142208666
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
