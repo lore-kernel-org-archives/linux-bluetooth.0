@@ -1,85 +1,37 @@
-Return-Path: <shapiroc@chromium.org>
-MIME-Version: 1.0
-In-Reply-To: <1c5fb2d7-8671-b5f7-9773-0454ee3ca7da@jp.fujitsu.com>
-References: <20170705161602.95344-1-shapiroc@chromium.org> <1c5fb2d7-8671-b5f7-9773-0454ee3ca7da@jp.fujitsu.com>
-From: C Shapiro <shapiroc@chromium.org>
-Date: Thu, 6 Jul 2017 09:46:27 -0600
-Message-ID: <CALM0h1kjYUQrcxu_uOzMNMqVkntzSTjcjox17kqOeBxG2yFo7Q@mail.gmail.com>
-Subject: Re: [PATCH v2] Support to change set file via arg
-To: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Marcel Holtmann <marcel@holtmann.org>,
-	Simon Glass <sjg@chromium.org>
-Content-Type: text/plain; charset="UTF-8"
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+Subject: Re: [PATCH] bluetooth: btusb: Add support for BCM2045 HCI with
+ vend:prod ids set to 0000:0000
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20170706140845.11508-1-hdegoede@redhat.com>
+Date: Thu, 6 Jul 2017 17:22:22 +0200
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-bluetooth@vger.kernel.org
+Message-Id: <B5854943-47D2-494F-9D56-80226FE66F38@holtmann.org>
+References: <20170706140845.11508-1-hdegoede@redhat.com>
+To: Hans de Goede <hdegoede@redhat.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Eramoto,
-Thanks for the feedback...below are responses to the questions:
+Hi Hans,
 
-Are there any merits for other software/users (e.g. container, etc.)?
- - As more platforms implement verified boot and need to support many
-platforms, this will become more common (e.g. Android)
+> The GPD Pocket is shipping with a BCM2045 USB HCI with its vend:prod
+> ids set to 0000:0000 and also has its interface class set to 255 (Vendor
+> Specific Class).
+> 
+> Which, well sucks. Luckily it does advertise usable manufacturer and
+> product strings, so this commit adds 0000:0000 to the usb_device_id
+> table, with a special flag of BTUSB_BCM2045_0000_0000, if this flag
+> is set btusb_probe will check the strings and if they don't match
+> return -ENODEV.
+> 
+> This is not pretty, but it fixes bluetooth not working under Linux.
 
-Why do not you pass DeviceID as an argument instead of a config file?
- - This would be viable also, but then this arg could contradict the
-config file setting and allowing the config file to be passed is more
-powerful overall.
+can you send around /sys/kernel/debug/usb/devices for this device.
 
-How can I sign up?
- - Sorry, I accidentally gave the wrong links.
- - https://chromium.googlesource.com/chromiumos/overlays/board-overlays/+/master/overlay-pyro/chromeos-base/chromeos-bsp-pyro/files/main.conf
- - https://chromium.googlesource.com/chromiumos/overlays/board-overlays/+/master/overlay-reef/chromeos-base/chromeos-bsp-reef/files/main.conf
- - https://chromium.googlesource.com/chromiumos/overlays/board-overlays/+/master/overlay-snappy/chromeos-base/chromeos-bsp-snappy/files/main.conf
+Regards
 
-Why do not you change only ChromeOS init script?
- - ChromeOS uses verified boot with a read only file system, so we
-can't change any of the files at runtime.
+Marcel
 
-Thanks,
-Charles
-
-On Wed, Jul 5, 2017 at 10:21 PM, ERAMOTO Masaya
-<eramoto.masaya@jp.fujitsu.com> wrote:
-> Hi Charles,
->
-> On 07/06/2017 01:16 AM, C Shapiro wrote:
->> ChromeOS is currently shifting to a more dynamic build system where a
->> single build will be created/managed/deployed to support multiple models
->> that were all created based on a single reference board.
->>
->> This is being done for general cost/maintenance savings around the sheer
->> number of builds that are currently managed for ChromeOS.
->
-> I could not understand whether there were any merits except maintenance
-> of your ChromeOS.
-> Are there any merits for other software/users (e.g. container, etc.)?
->
->> For the bluetooth stack, models have different product id values in the
->> DeviceID field for the main.conf config file.
->
-> Why do not you pass DeviceID as an argument instead of a config file?
->
->> E.g.
->> https://chromium.git.corp.google.com/chromiumos/overlays/board-overlays/+/master/overlay-pyro/chromeos-base/chromeos-bsp-pyro/files/main.conf
->> https://chromium.git.corp.google.com/chromiumos/overlays/board-overlays/+/master/overlay-reef/chromeos-base/chromeos-bsp-reef/files/main.conf
->> https://chromium.git.corp.google.com/chromiumos/overlays/board-overlays/+/master/overlay-snappy/chromeos-base/chromeos-bsp-snappy/files/main.conf
->
-> I could not access without an account.
-> How can I sign up?
->
->> This change allows the config file to be passed as a runtime argument to
->> bluetoothd, which allows the ChromeOS init script to determine the model
->> at runtime and then pass the appropriate model specific config file.
->
-> Why do not you change only ChromeOS init scirpt?
->
-> For example, in ChromeOS init scirpt,
->  1. Determine the model.
->  2. Run ln command with --force option to link /etc/bluetooth/main.conf to
->     the appropriate config file.
->
->
-> Thank you for reading this to the end :)
->
-> Regards,
-> Eramoto
