@@ -1,41 +1,79 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <1499357295-22470-1-git-send-email-s.syam@samsung.com>
-References: <CGME20170706160048epcas5p2e073fb00c373bc8b9fe0413505b5f65b@epcas5p2.samsung.com>
- <1499357295-22470-1-git-send-email-s.syam@samsung.com>
+In-Reply-To: <1499409368-30953-1-git-send-email-biradar.a@samsung.com>
+References: <CGME20170707062831epcas5p3c96636f9ce52067e27c00e82dafb73d0@epcas5p3.samsung.com>
+ <1499409368-30953-1-git-send-email-biradar.a@samsung.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Fri, 7 Jul 2017 10:43:51 +0300
-Message-ID: <CABBYNZJ1pvf9aYhZ5Z7w=vdBT0D4y=wtj-5N3Mz_BoiYOWbLhA@mail.gmail.com>
-Subject: Re: [PATCH 1/1] obexd: Fix memory leak in phonebook-dummy
-To: Syam Sidhardhan <s.syam@samsung.com>
+Date: Fri, 7 Jul 2017 10:43:19 +0300
+Message-ID: <CABBYNZLff6sizUiXWJQHAy2xDD0OuBb=-V1gkH7kk+V_4CG+gQ@mail.gmail.com>
+Subject: Re: [PATCH 1/1] src/device: Fix bluetoothd crash
+To: Anurag B <biradar.a@samsung.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Syam,
+Hi Anurag,
 
-On Thu, Jul 6, 2017 at 7:08 PM, Syam Sidhardhan <s.syam@samsung.com> wrote:
-> g_build_filename() returns a newly-allocated string
-> that must be freed with g_free().
+On Fri, Jul 7, 2017 at 9:36 AM, Anurag B <biradar.a@samsung.com> wrote:
+> From: Anurag Biradar <biradar.a@samsung.com>
+>
+> DUT was trying to connect with carkit and due to some reason connection
+> got aborted. SDP search got error and browse request was freed but
+> device->browse is still pointing to freed memory. During clean up
+> bluez removes all device and while removing it find reference to
+> browse_req and it tries to free again which leads to the crash.
+>
+> Assign NULL to device browse_req before freeing the browse_req.
+>
+> Log:
+>
+> bluetooth: src/service.c:change_state() 0xb700a650: device XX:XX:XX:XX:XX:XX
+>            profile a2dp-sink state changed: connecting -> disconnected (-11)
+> bluetooth: src/device.c:device_profile_connected()
+>                         a2dp-sink Resource temporarily unavailable (11)
+> bluetooth: src/device.c:device_profile_connected() returning response to :1.300
+> bluetooth: src/device.c:device_browse_sdp()
+> bluetooth: src/device.c:browse_request_free()
+>
+> --Browse req is freed but device->browse is still pointing to freed memory --
+>
+> While turning OFF freeing each devices:
+> bluetoothd[2024]: src/adapter.c:adapter_remove()
+>                 Removing adapter /org/bluez/hci0
+> bluetoothd[2024]: src/device.c:device_remove()
+>                 Removing device /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX
+> bluetoothd[2024]: src/device.c:browse_request_cancel()
+>
+> (gdb)
+> 0  0xb6f981ae in queue_remove_if (queue=0xb7007d70,
+>      function=0xb6f9a319 <match_disconn_id>, user_data=0xb7001ae0)
+>      at src/shared/queue.c:289
+> 1  0xb6f9a87a in bt_att_unregister_disconnect (att=<optimized out>,
+>      id=<optimized out>) at src/shared/att.c:1161
+> 2  0xb6f81bf6 in attio_cleanup (device=0xb6d4d810) at src/device.c:742
+> 3  0xb6f81c3c in browse_request_cancel (req=0xb6fe3038) at src/device.c:777
+> 4  0xb6f87066 in device_remove (device=0xb700ac00, remove_stored=0)
+>      at src/device.c:5238
+> 5  0xb6f6b80c in adapter_remove (adapter=adapter@entry=0xb6fff2f0)
+>      at src/adapter.c:7822
+> 6  0xb6f79068 in adapter_cleanup () at src/adapter.c:11707
 > ---
->  obexd/plugins/phonebook-dummy.c |    3 +++
->  1 file changed, 3 insertions(+)
+>  src/device.c |    1 +
+>  1 file changed, 1 insertion(+)
 >
-> diff --git a/obexd/plugins/phonebook-dummy.c b/obexd/plugins/phonebook-dummy.c
-> index 29ae889..b9e3a0d 100644
-> --- a/obexd/plugins/phonebook-dummy.c
-> +++ b/obexd/plugins/phonebook-dummy.c
-> @@ -524,6 +524,9 @@ void *phonebook_get_entry(const char *folder, const char *id,
->         filename = g_build_filename(root_folder, folder, id, NULL);
->
->         fd = open(filename, O_RDONLY);
-> +
-> +       g_free(filename);
-> +
->         if (fd < 0) {
->                 DBG("open(): %s(%d)", strerror(errno), errno);
->                 if (err)
+> diff --git a/src/device.c b/src/device.c
+> index 6a9936a..73b2c44 100644
+> --- a/src/device.c
+> +++ b/src/device.c
+> @@ -5118,6 +5118,7 @@ static int device_browse_sdp(struct btd_device *device, DBusMessage *msg)
+>                                 &device->bdaddr, &uuid, browse_cb, req, NULL,
+>                                 req->sdp_flags);
+>         if (err < 0) {
+> +               device->browse = NULL;
+>                 browse_request_free(req);
+>                 return err;
+>         }
 > --
 > 1.7.9.5
 
