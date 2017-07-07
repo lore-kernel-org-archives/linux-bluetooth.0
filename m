@@ -1,100 +1,94 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: btusb: Add workaround for Broadcom devices without product id
-Date: Fri,  7 Jul 2017 13:29:10 +0200
-Message-Id: <20170707112910.49651-1-marcel@holtmann.org>
+MIME-Version: 1.0
+In-Reply-To: <20170707100714.27827-1-luiz.dentz@gmail.com>
+References: <20170707100714.27827-1-luiz.dentz@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Fri, 7 Jul 2017 14:14:50 +0300
+Message-ID: <CABBYNZ+FucPNnDmZ+WQj2m9wx1bENg5vBc1uMscXdEymP-m1tw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] device: Fix crash freeing device
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The GPD Pocket is shipping with a BCM2045 USB HCI with its vendor and
-product information set to 0000:0000 and also has its interface class
-set to 255 (Vendor Specific Class). Luckily it does advertise usable
-manufacturer and product strings.
+Hi,
 
-T:  Bus=01 Lev=01 Prnt=01 Port=02 Cnt=02 Dev#=  3 Spd=12   MxCh= 0
-D:  Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=0000 ProdID=0000 Rev= 1.12
-S:  Manufacturer=Broadcom Corp
-S:  Product=BCM2045A0
-S:  SerialNumber=AC83F30677CB
-C:* #Ifs= 4 Cfg#= 1 Atr=80 MxPwr=100mA
-I:* If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
-E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-I:* If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-I:  If#= 1 Alt= 1 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-I:  If#= 1 Alt= 2 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-I:  If#= 1 Alt= 3 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-I:  If#= 1 Alt= 4 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-I:  If#= 1 Alt= 5 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-I:* If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
-E:  Ad=84(I) Atr=02(Bulk) MxPS=  32 Ivl=0ms
-E:  Ad=04(O) Atr=02(Bulk) MxPS=  32 Ivl=0ms
-I:* If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
+On Fri, Jul 7, 2017 at 1:07 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> Calling gatt_db_register with NULL pointers makes no sense since it does
+> nothing when the callbacks are NULL so the callback are still reachable
+> causing invalid memory to accessed:
+>
+> Invalid read of size 8
+>    at 0x50EAFDC: g_slist_find_custom (in /usr/lib64/libglib-2.0.so.0.5000.3)
+>    by 0x46CDA1: gatt_service_removed (device.c:3563)
+>    by 0x4896F8: queue_foreach (queue.c:220)
+>    by 0x4951FB: notify_service_changed (gatt-db.c:268)
+>    by 0x4951FB: gatt_db_service_destroy (gatt-db.c:279)
+>    by 0x4898F5: queue_remove_all (queue.c:336)
+>    by 0x4952E2: gatt_db_clear_range (gatt-db.c:461)
+>    by 0x48F32B: discovery_op_unref (gatt-client.c:447)
+>    by 0x4979AA: bt_gatt_request_unref (gatt-helpers.c:594)
+>    by 0x490489: bt_gatt_client_cancel_all (gatt-client.c:2083)
+>    by 0x4904D8: bt_gatt_client_free (gatt-client.c:1752)
+>    by 0x46CF70: gatt_client_cleanup (device.c:561)
+>    by 0x46D01A: attio_cleanup (device.c:586)
+>  Address 0x86cb940 is 0 bytes inside a block of size 16 free'd
+>    at 0x4C2ED4A: free (vg_replace_malloc.c:530)
+>    by 0x50D16CD: g_free (in /usr/lib64/libglib-2.0.so.0.5000.3)
+>    by 0x50EA743: g_slice_free_chain_with_offset (in /usr/lib64/libglib-2.0.so.0.5000.3)
+>    by 0x46D18C: device_free (device.c:638)
+>    by 0x485B05: remove_interface (object.c:667)
+>    by 0x485FF9: g_dbus_unregister_interface (object.c:1391)
+>    by 0x45EFA9: btd_adapter_remove_device (adapter.c:1200)
+>    by 0x45FBC3: dev_disconnected (adapter.c:6800)
+>    by 0x48A1A5: request_complete (mgmt.c:261)
+>    by 0x48AC0B: can_read_data (mgmt.c:353)
+>    by 0x496954: watch_callback (io-glib.c:170)
+>    by 0x50CBE51: g_main_context_dispatch (in /usr/lib64/libglib-2.0.so.0.5000.3)
+> ---
+>  src/device.c | 7 ++++---
+>  1 file changed, 4 insertions(+), 3 deletions(-)
+>
+> diff --git a/src/device.c b/src/device.c
+> index 9736bb6..fb9c0e7 100644
+> --- a/src/device.c
+> +++ b/src/device.c
+> @@ -225,6 +225,7 @@ struct btd_device {
+>          * attribute cache support can be built.
+>          */
+>         struct gatt_db *db;                     /* GATT db cache */
+> +       unsigned int db_id;
+>         struct bt_gatt_client *client;          /* GATT client instance */
+>         struct bt_gatt_server *server;          /* GATT server instance */
+>         unsigned int gatt_ready_id;
+> @@ -644,7 +645,7 @@ static void device_free(gpointer user_data)
+>         g_slist_free_full(device->svc_callbacks, svc_dev_remove);
+>
+>         /* Reset callbacks since the device is going to be freed */
+> -       gatt_db_register(device->db, NULL, NULL, NULL, NULL);
+> +       gatt_db_unregister(device->db, device->db_id);
+>
+>         attio_cleanup(device);
+>
+> @@ -3666,8 +3667,8 @@ static struct btd_device *device_new(struct btd_adapter *adapter,
+>         device->adapter = adapter;
+>         device->temporary = true;
+>
+> -       gatt_db_register(device->db, gatt_service_added, gatt_service_removed,
+> -                                                               device, NULL);
+> +       device->db_id = gatt_db_register(device->db, gatt_service_added,
+> +                                       gatt_service_removed, device, NULL);
+>
+>         return btd_device_ref(device);
+>  }
+> --
+> 2.9.4
 
-Reported-by: Christopher Williamson <home@chrisaw.com>
-Signed-off-by: Hans de Goede <hdegoede@redhat.com>
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
----
- drivers/bluetooth/btusb.c | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
+Applied.
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index b1e01b057a7c..3b344a4004a5 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -66,6 +66,7 @@ static struct usb_driver btusb_driver;
- #define BTUSB_BCM2045		0x40000
- #define BTUSB_IFNUM_2		0x80000
- #define BTUSB_CW6622		0x100000
-+#define BTUSB_BCM_NO_PRODID	0x200000
- 
- static const struct usb_device_id btusb_table[] = {
- 	/* Generic Bluetooth USB device */
-@@ -170,6 +171,10 @@ static const struct usb_device_id btusb_table[] = {
- 	{ USB_VENDOR_AND_INTERFACE_INFO(0x0930, 0xff, 0x01, 0x01),
- 	  .driver_info = BTUSB_BCM_PATCHRAM },
- 
-+	/* Broadcom devices with missing product id */
-+	{ USB_DEVICE_AND_INTERFACE_INFO(0x0000, 0x0000, 0xff, 0x01, 0x01),
-+	  .driver_info = BTUSB_BCM_PATCHRAM | BTUSB_BCM_NO_PRODID },
-+
- 	/* Intel Bluetooth USB Bootloader (RAM module) */
- 	{ USB_DEVICE(0x8087, 0x0a5a),
- 	  .driver_info = BTUSB_INTEL_BOOT | BTUSB_BROKEN_ISOC },
-@@ -2893,6 +2898,18 @@ static int btusb_probe(struct usb_interface *intf,
- 	if (id->driver_info == BTUSB_IGNORE)
- 		return -ENODEV;
- 
-+	if (id->driver_info & BTUSB_BCM_NO_PRODID) {
-+		struct usb_device *udev = interface_to_usbdev(intf);
-+
-+		/* For the broken Broadcom devices that show 0000:0000
-+		 * as USB vendor and product information, check that the
-+		 * manufacturer string identifies them as Broadcom based
-+		 * devices.
-+		 */
-+		if (strcmp(udev->manufacturer, "Broadcom Corp"))
-+			return -ENODEV;
-+	}
-+
- 	if (id->driver_info & BTUSB_ATH3012) {
- 		struct usb_device *udev = interface_to_usbdev(intf);
- 
+
 -- 
-2.9.4
-
+Luiz Augusto von Dentz
