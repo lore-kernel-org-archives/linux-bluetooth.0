@@ -1,50 +1,81 @@
 Return-Path: <ian@mnementh.co.uk>
-Subject: Re: PATCH: Nokia HCI driver minor issues
-To: Sebastian Reichel <sebastian.reichel@collabora.co.uk>
-Cc: linux-bluetooth@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>
-References: <c9907efa-aff0-fa9e-7cdf-868e02203d95@mnementh.co.uk>
- <20170708104932.ig3ncqhznjodhqdc@earth>
+Subject: Re: PATCH: RFC: Broadcom serdev driver
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+ Loic Poulain <loic.poulain@gmail.com>, Rob Herring <robh@kernel.org>
+References: <afbbb4ed-d1aa-2ae8-33c5-1fab8e360551@mnementh.co.uk>
+ <A31E83F8-3A6E-49DC-BF1A-0FA1C6E10552@holtmann.org>
+ <a7a41abf-0dc2-03d7-a529-ade49f326bb5@mnementh.co.uk>
+ <E30A8409-1953-4B47-9C3B-D8EE46CFCF9E@holtmann.org>
 From: Ian Molton <ian@mnementh.co.uk>
-Message-ID: <86ff7b23-1215-67c1-fee3-d2da93cce016@mnementh.co.uk>
-Date: Sat, 8 Jul 2017 14:32:37 +0100
+Message-ID: <e9f07754-39bc-8fb0-0abf-eb0b8692c2eb@mnementh.co.uk>
+Date: Sat, 8 Jul 2017 14:27:01 +0100
 MIME-Version: 1.0
-In-Reply-To: <20170708104932.ig3ncqhznjodhqdc@earth>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <E30A8409-1953-4B47-9C3B-D8EE46CFCF9E@holtmann.org>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 08/07/17 11:49, Sebastian Reichel wrote:
-> Hi,
+On 08/07/17 11:25, Marcel Holtmann wrote:
+> Hi Ian,
+
+Hi Marcel,
+
+>> In hci_uart_setup() in hci_serdev.c, there is the following:
+>>
+>>
+>>        if (hu->init_speed)
+>>                speed = hu->init_speed;
+>>        else if (hu->proto->init_speed)
+>>                speed = hu->proto->init_speed;
+>>        else
+>>                speed = 0;
+>>
+>>        if (speed)
+>>                serdev_device_set_baudrate(hu->serdev, speed);
+>>
+>>        /* Operational speed if any */
+>>        if (hu->oper_speed)
+>>                speed = hu->oper_speed;
+>>        else if (hu->proto->oper_speed)
+>>                speed = hu->proto->oper_speed;
+>>        else
+>>                speed = 0;
+>>
+>>        if (hu->proto->set_baudrate && speed) {
+>>                err = hu->proto->set_baudrate(hu, speed);
+>>                if (err)
+>>                        BT_ERR("%s: failed to set baudrate", hdev->name);
+>>                else
+>>                        serdev_device_set_baudrate(hu->serdev, speed);
+>>        }
+>>
+>>        if (hu->proto->setup)
+>>                return hu->proto->setup(hu);
+>>
+>>
+>> The problem is that it attempts to set the baudrate to oper_speed
+>> *prior* to calling the driver's setup() hook.
+>>
+>> It *seems* simple enough that we could move the setup call to prior to
+>> the change to oper_speed, but I am unsure how this might affect other
+>> drivers.
+>>
+>> I can test this on my driver (and implement the set_baudrate command
+>> properly as a result.
+>>
+>> I can send a patch to this effect if you want?
 > 
-> On Fri, Jul 07, 2017 at 11:03:28PM +0100, Ian Molton wrote:
->> I've collected a couple of patches together over the last week, they
->> might be of use.
->>
->> I'm not entirely certain the 2nd one is the *correct* fix, as I could
->> only test my (very similar) driver I've based off this one, but it WFM.
->>
->> --Ian
-> 
-> Please always send using get-send-email(1) mail style.
+> the hci_bcm.c on ACPI based Baytrail platforms is capable of dealing with this. What is different here?
 
-I always do when sending a patch thats final. This was just for comments.
->> -------------------------------------------------------------------
->> From 3e5182a84717acd5eadd645294a008bcf27201a0 Mon Sep 17 00:00:00 2001
->> From: Ian Molton <ian@mnementh.co.uk>
->> Date: Tue, 4 Jul 2017 15:01:46 +0100
->> Subject: [PATCH 1/3] Bluetooth: Nokia HCIUART driver should depend on H4
->>
->> 	The Nokia H4+ driver causes a build error if BT_HCIUART_H4
->> is not configured. Make it depend on this symbol.
->>
->>
->> Signed-off-by: Ian Molton <ian@mnementh.co.uk>
-> 
-> You are on an old branch. Current mainline selects BT_HCIUART_H4.
+hci_bcm.c changes speed for itself during bcm_setup(), after loading the
+firmware. This doesnt work for at least the 43430 I have here (SDIO
+based WiFi with UART BT). If oper_speed != 115200 it fails to
+communicate after FW load.
 
-Wow, thats recent, yeah, mainline has that fixed *since* 4.12. FML :)
+This occurred with hci_bcm.c as well as with my driver.
 
-> Reviewed-by: Sebastian Reichel <sebastian.reichel@collabora.co.uk>
-
-I'll update and resend the other two patches - Thanks for the review!
+Perhaps we could introduce a flag, say, HCI_SLOW_INIT or something to
+prevent hci_serdev.c from changing speed prior to FW loading? It could
+also be a dt property. What do you think?
 
 -Ian
