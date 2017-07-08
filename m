@@ -1,17 +1,44 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Subject: Re: [PATCH 2/4] bluetooth: Nokia: Use new
- hci_uart_unregister_device() function.
 From: Ian Molton <ian@mnementh.co.uk>
 To: linux-bluetooth@vger.kernel.org
-References: <20170708162906.24158-2-ian@mnementh.co.uk>
-Message-ID: <534daf20-11d7-c090-2f6d-c1fb7b760047@mnementh.co.uk>
-Date: Sat, 8 Jul 2017 17:30:37 +0100
-MIME-Version: 1.0
+Subject: [PATCH 3/4] bluetooth: hci_ll: Use new hci_uart_unregister_device() function.
+Date: Sat,  8 Jul 2017 17:29:06 +0100
+Message-Id: <20170708162906.24158-3-ian@mnementh.co.uk>
 In-Reply-To: <20170708162906.24158-2-ian@mnementh.co.uk>
-Content-Type: text/plain; charset=utf-8
+References: <20170708162906.24158-2-ian@mnementh.co.uk>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-And this one. God damn you, send-email!
+Convert hci_ll to use hci_uart_unregister_device().
 
--Ian
+This simplifies the _remove() handler as well as fixes a
+potential race condition on unload.
+
+Signed-off-by: Ian Molton <ian@mnementh.co.uk>
+---
+ drivers/bluetooth/hci_ll.c | 8 +-------
+ 1 file changed, 1 insertion(+), 7 deletions(-)
+
+diff --git a/drivers/bluetooth/hci_ll.c b/drivers/bluetooth/hci_ll.c
+index c982943f0747..1b898445a0b8 100644
+--- a/drivers/bluetooth/hci_ll.c
++++ b/drivers/bluetooth/hci_ll.c
+@@ -742,14 +742,8 @@ static int hci_ti_probe(struct serdev_device *serdev)
+ static void hci_ti_remove(struct serdev_device *serdev)
+ {
+ 	struct ll_device *lldev = serdev_device_get_drvdata(serdev);
+-	struct hci_uart *hu = &lldev->hu;
+-	struct hci_dev *hdev = hu->hdev;
+ 
+-	cancel_work_sync(&hu->write_work);
+-
+-	hci_unregister_dev(hdev);
+-	hci_free_dev(hdev);
+-	hu->proto->close(hu);
++	hci_uart_unregister_device(&lldev->hu);
+ }
+ 
+ static const struct of_device_id hci_ti_of_match[] = {
+-- 
+2.11.0
+
