@@ -1,23 +1,24 @@
-Return-Path: <ian@mnementh.co.uk>
-From: Ian Molton <ian@mnementh.co.uk>
-To: linux-bluetooth@vger.kernel.org
-Cc: sebastian.reichel@collabora.co.uk,
-	marcel@holtmann.org,
-	ohad@bencohen.org
-Subject: Further _remove() cleanup for hci_uart drivers
-Date: Sat,  8 Jul 2017 15:29:46 +0100
-Message-Id: <20170708142949.13496-1-ian@mnementh.co.uk>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+Subject: Re: PATCH: Nokia bluetooth patches
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20170708134335.10896-1-ian@mnementh.co.uk>
+Date: Sat, 8 Jul 2017 16:14:35 +0200
+Cc: linux-bluetooth@vger.kernel.org, sebastian.reichel@collabora.co.uk
+Message-Id: <FFE298C0-332F-4604-8D58-A1E180BE1CD6@holtmann.org>
+References: <20170708134335.10896-1-ian@mnementh.co.uk>
+To: Ian Molton <ian@mnementh.co.uk>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Ian,
 
-Here are three untested patches. They introduce a common function
-hci_uart_unregister_device().
+> Please apply these two small fixes for hci_nokia.c
 
-This cleans up hci_nokia.c further, and fixes a cut-n-paste error that
-introduced the same race condition to hci_ll.c (or perhaps the other
-way around).
+both patches have been applied to bluetooth-next tree.
 
-HTH,
+Regards
 
--Ian
+Marcel
+
