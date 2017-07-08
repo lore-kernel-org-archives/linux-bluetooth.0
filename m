@@ -1,19 +1,17 @@
-Return-Path: <ian@mnementh.co.uk>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Subject: Re: [PATCH 2/4] bluetooth: Nokia: Use new
+ hci_uart_unregister_device() function.
 From: Ian Molton <ian@mnementh.co.uk>
 To: linux-bluetooth@vger.kernel.org
-Cc: sebastian.reichel@collabora.co.uk,
-	marcel@holtmann.org,
-	ohad@bencohen.org
-Subject: PATCH (No really this time) - Fix hci_serdev drivers _remove() path
-Date: Sat,  8 Jul 2017 17:37:40 +0100
-Message-Id: <20170708163743.24394-1-ian@mnementh.co.uk>
+References: <20170708162906.24158-2-ian@mnementh.co.uk>
+Message-ID: <534daf20-11d7-c090-2f6d-c1fb7b760047@mnementh.co.uk>
+Date: Sat, 8 Jul 2017 17:30:37 +0100
+MIME-Version: 1.0
+In-Reply-To: <20170708162906.24158-2-ian@mnementh.co.uk>
+Content-Type: text/plain; charset=utf-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
-
-Sorry for all that noise folks - I guess having a stray > character create a
-file called --compose is a bit of a bummer :)
-
-This patch series should cover what has been discussed thus far, please apply!
+And this one. God damn you, send-email!
 
 -Ian
