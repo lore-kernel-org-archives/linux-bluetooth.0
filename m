@@ -1,29 +1,31 @@
 Return-Path: <sebastian.reichel@collabora.co.uk>
-Date: Sat, 8 Jul 2017 21:31:54 +0200
+Date: Sat, 8 Jul 2017 21:31:00 +0200
 From: Sebastian Reichel <sebastian.reichel@collabora.co.uk>
 To: Ian Molton <ian@mnementh.co.uk>
 Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org, ohad@bencohen.org
-Subject: Re: [PATCH 2/3] bluetooth: Nokia: Use new
- hci_uart_unregister_device() function.
-Message-ID: <20170708193154.f2owsq3yaxrr47od@earth>
+Subject: Re: [PATCH 1/3] bluetooth: Introduce hci_uart_unregister_device()
+Message-ID: <20170708193100.wdmgwvu5gw3u6bg2@earth>
 References: <20170708163743.24394-1-ian@mnementh.co.uk>
- <20170708163743.24394-3-ian@mnementh.co.uk>
+ <20170708163743.24394-2-ian@mnementh.co.uk>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="jllmrb3alxnod5tr"
-In-Reply-To: <20170708163743.24394-3-ian@mnementh.co.uk>
+	protocol="application/pgp-signature"; boundary="bvgz2gvtat6z2jr2"
+In-Reply-To: <20170708163743.24394-2-ian@mnementh.co.uk>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 
---jllmrb3alxnod5tr
+--bvgz2gvtat6z2jr2
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
 Hi,
 
-On Sat, Jul 08, 2017 at 05:37:42PM +0100, Ian Molton wrote:
-> Simplify _remove() path for hci_nokia.c
+On Sat, Jul 08, 2017 at 05:37:41PM +0100, Ian Molton wrote:
+> Several drivers have the same (and incorrect) code in their
+> _remove() handler.
+>=20
+> Coalesce this into a shared function.
 >=20
 > Signed-off-by: Ian Molton <ian@mnementh.co.uk>
 > ---
@@ -32,59 +34,65 @@ Reviewed-by: Sebastian Reichel <sebastian.reichel@collabora.co.uk>
 
 -- Sebastian
 
->  drivers/bluetooth/hci_nokia.c | 10 +---------
->  1 file changed, 1 insertion(+), 9 deletions(-)
+>  drivers/bluetooth/hci_serdev.c | 12 ++++++++++++
+>  drivers/bluetooth/hci_uart.h   |  1 +
+>  2 files changed, 13 insertions(+)
 >=20
-> diff --git a/drivers/bluetooth/hci_nokia.c b/drivers/bluetooth/hci_nokia.c
-> index 6dbb1f6ff6bd..3539fd03f47e 100644
-> --- a/drivers/bluetooth/hci_nokia.c
-> +++ b/drivers/bluetooth/hci_nokia.c
-> @@ -767,16 +767,8 @@ static int nokia_bluetooth_serdev_probe(struct serde=
-v_device *serdev)
->  static void nokia_bluetooth_serdev_remove(struct serdev_device *serdev)
->  {
->  	struct nokia_bt_dev *btdev =3D serdev_device_get_drvdata(serdev);
-> -	struct hci_uart *hu =3D &btdev->hu;
-> -	struct hci_dev *hdev =3D hu->hdev;
-> =20
-> -
-> -	hci_unregister_dev(hdev);
-> -	hci_free_dev(hdev);
-> -
-> -	cancel_work_sync(&hu->write_work);
-> -
-> -	hu->proto->close(hu);
-> +	hci_uart_unregister_device(&btdev->hu);
+> diff --git a/drivers/bluetooth/hci_serdev.c b/drivers/bluetooth/hci_serde=
+v.c
+> index aea930101dd2..abc70b5e5647 100644
+> --- a/drivers/bluetooth/hci_serdev.c
+> +++ b/drivers/bluetooth/hci_serdev.c
+> @@ -354,3 +354,15 @@ int hci_uart_register_device(struct hci_uart *hu,
+>  	return err;
 >  }
+>  EXPORT_SYMBOL_GPL(hci_uart_register_device);
+> +
+> +void hci_uart_unregister_device(struct hci_uart *hu) {
+> +	struct hci_dev *hdev =3D hu->hdev;
+> +
+> +	hci_unregister_dev(hdev);
+> +	hci_free_dev(hdev);
+> +
+> +	cancel_work_sync(&hu->write_work);
+> +
+> +	hu->proto->close(hu);
+> +}
+> +EXPORT_SYMBOL_GPL(hci_uart_unregister_device);
+> diff --git a/drivers/bluetooth/hci_uart.h b/drivers/bluetooth/hci_uart.h
+> index c6e9e1cf63f8..d9cd95d81149 100644
+> --- a/drivers/bluetooth/hci_uart.h
+> +++ b/drivers/bluetooth/hci_uart.h
+> @@ -112,6 +112,7 @@ struct hci_uart {
+>  int hci_uart_register_proto(const struct hci_uart_proto *p);
+>  int hci_uart_unregister_proto(const struct hci_uart_proto *p);
+>  int hci_uart_register_device(struct hci_uart *hu, const struct hci_uart_=
+proto *p);
+> +void hci_uart_unregister_device(struct hci_uart *hu);
 > =20
->  static int nokia_bluetooth_runtime_suspend(struct device *dev)
+>  int hci_uart_tx_wakeup(struct hci_uart *hu);
+>  int hci_uart_init_ready(struct hci_uart *hu);
 > --=20
 > 2.11.0
->=20
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth=
-" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
---jllmrb3alxnod5tr
+--bvgz2gvtat6z2jr2
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAABCgAdFiEE72YNB0Y/i3JqeVQT2O7X88g7+poFAllhMyoACgkQ2O7X88g7
-+pratRAAoNjHNiphGD+7O71BsTTkn0Tp9ujnIw6fHK9Dz9HmcQ6y4C0xZyujQXYB
-k1jv8sm7nxj5PFUyEnZ9urUi7benebkATFaBBZjY5DNMiLJ3MWpDTYWMRXFXY1S5
-E1jGqMuwsuasoYfmweT5tjFREJ18lmrl820ffcaPH4QC9lKx4i7P37cOJSVYBqxo
-PmKs58Y0VvjDwdeUe256SWn0B0OLlpxGGfbWhidzoG7AMcRRxxqaPAk9cEGsc6RT
-6N3wuPcWN9pT6DV1cXoxfROQ1aRA4P5w/zEWB85NAP2hnLVbkuLsdc8yN/L174VB
-ep2mFROtAqK/rTIaffZY0501uz1vTTyRYC7zrSo2XbozALaXdpRBQ1PJPe7SZIOj
-bWOexLOeW7f8lj5Xb9h1XixJA5UcjhdbIWeJmbff6IjyxzvwI12s0/gQSIGrTDaX
-qQTrIwoj008lE2NxwucqpkwmD1SyDkjdIjTSDjCreemHaHacYcZN4+dIDXz4s6L2
-Fujm4MXlqFyuw0tzgd2K2qlpkvxcqnswMfNmMNHCishYDbrHueMSZH8UDrI4R41I
-c30reWLBGn8953A4A7m1sOe02t407RSTL4DOQtHpYuzEdsI4MDN2LgojhzMXXJoJ
-z6AOi+72aBu5/XCosd7ngD7Ax375lgAKG8K1YIojx+Lzuj9DWlY=
-=VPZA
+iQIzBAABCgAdFiEE72YNB0Y/i3JqeVQT2O7X88g7+poFAllhMu4ACgkQ2O7X88g7
++pppQQ/6AgHGPAG5DO9+MoC5a/cVbXbAixQmgvLWyYAtmABN76UMNsINFXR83xd4
+C7b538R251rkdl16h0yRVPkgGuPAXjG0c+5sF6WJjzxXzLSpxU2Z5bgAmX2k21ZB
+IjDVVBmsDGwpN9k045t+X3ZftfqXJqddjY9AgHrTzEVkp/ThYc7Mw033/xSotNvY
+xLbsLPuQIyn2+MwSIkVD627zWSm1LPpF95h3y8xh2N870xrAq0eAqm5cqwtuGqHL
+Z6sWS+nM/OUWRD4RHc2XxsNkKYIjYIBHMBI6J0VfavrOoXBpfsAy7ju3ZE5BcXlf
++pYsjMHX6pdQRxfd6Gl3TDC49m8MIBo+wm2WMQCH6Z1dU0wwhKASRRue2AUFf1LI
+Me43fSKA+sKEcWg2A5K5Ts2PzhssBbLHlcwfeu6YS8+OH3CiEgPYSA67SqE2mfoo
+4qG98aWl4gPeXNwaOGkxUA+IimKFC+ilHIUwbjNDpgZc7p8pjGAG5IJ9Uj7uxjLA
+/xjyW3nkWfqpXk7xyJQngmGDp2etDKIGnDfofdqT538P3Sf8KSmZmXxoEjS9mMgX
+zEs1ZmunCoFWfaxJV83a3AKxxSrtRHP/AcVrBWlGvWNNwYW71yHnWqXKQGMEiRk+
+vN2y8m6MykspO0lS7pM8Dis0o0qWl0ya8+KtiZs9crcgJkqYzY8=
+=q9I/
 -----END PGP SIGNATURE-----
 
---jllmrb3alxnod5tr--
+--bvgz2gvtat6z2jr2--
