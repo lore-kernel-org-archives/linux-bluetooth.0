@@ -1,50 +1,101 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Olivier Blin <olivier.blin@softathome.com>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: =?UTF-8?q?Lo=C3=AFc=20Yhuel?= <loic.yhuel@softathome.com>,
-        Olivier Blin <olivier.blin@softathome.com>
-Subject: [PATCH BlueZ] Fix out-of-tree build with absolute source path
-Date: Mon, 10 Jul 2017 13:59:57 +0200
-Message-Id: <20170710115957.15708-1-olivier.blin@softathome.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Subject: [PATCH v3] Bluetooth: btusb: Add workaround for Broadcom devices without product id
+Date: Sun,  9 Jul 2017 22:00:54 +0200
+Message-Id: <20170709200054.66393-1-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When running out-of-tree build using /abs/path/to/bluez/configure, the
-generated Makefile uses /abs/path/to/bluez as VPATH.
-Using ../configure, VPATH is set to ..
+The GPD Pocket is shipping with a BCM2045 USB HCI with its vendor and
+product information set to 0000:0000 and also has its interface class
+set to 255 (Vendor Specific Class). Luckily it does advertise usable
+manufacturer and product strings.
 
-The first case generates incorrect symlinks in the lib/bluetooth
-directory inside the build dir, because the rule prepended
-abs_top_builddir to the absolute target path.
+T:  Bus=01 Lev=01 Prnt=01 Port=02 Cnt=02 Dev#=  3 Spd=12   MxCh= 0
+D:  Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=0000 ProdID=0000 Rev= 1.12
+S:  Manufacturer=Broadcom Corp
+S:  Product=BCM2045A0
+S:  SerialNumber=AC83F30677CB
+C:* #Ifs= 4 Cfg#= 1 Atr=80 MxPwr=100mA
+I:* If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+I:* If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+I:  If#= 1 Alt= 1 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+I:  If#= 1 Alt= 2 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+I:  If#= 1 Alt= 3 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+I:  If#= 1 Alt= 4 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+I:  If#= 1 Alt= 5 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+I:* If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
+E:  Ad=84(I) Atr=02(Bulk) MxPS=  32 Ivl=0ms
+E:  Ad=04(O) Atr=02(Bulk) MxPS=  32 Ivl=0ms
+I:* If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
 
-For example, with sources in "/home/dev/bluez" and a build in
-"/home/dev/bluez build", it generates the following incorrect symlink:
-    'bluez build/lib/bluetooth/bluetooth.h'
-    -> '/home/dev/bluez build//home/dev/bluez/lib/bluetooth.h'
-
-To handle both absolute and relative source dir, use abspath on the
-make prerequisite.
-
-Also-by: Loïc Yhuel <loic.yhuel@softathome.com>
+Reported-by: Christopher Williamson <home@chrisaw.com>
+Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- Makefile.am | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/bluetooth/btusb.c | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
-diff --git a/Makefile.am b/Makefile.am
-index 84e67a42c..237b05d78 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -494,7 +494,7 @@ $(lib_libbluetooth_la_OBJECTS): $(local_headers)
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index b1e01b057a7c..aa32075c3882 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -66,6 +66,7 @@ static struct usb_driver btusb_driver;
+ #define BTUSB_BCM2045		0x40000
+ #define BTUSB_IFNUM_2		0x80000
+ #define BTUSB_CW6622		0x100000
++#define BTUSB_BCM_NO_PRODID	0x200000
  
- lib/bluetooth/%.h: lib/%.h
- 	$(AM_V_at)$(MKDIR_P) lib/bluetooth
--	$(AM_V_GEN)$(LN_S) -f "$(abs_top_builddir)"/$< $@
-+	$(AM_V_GEN)$(LN_S) -f "$(abspath $<)" $@
+ static const struct usb_device_id btusb_table[] = {
+ 	/* Generic Bluetooth USB device */
+@@ -170,6 +171,10 @@ static const struct usb_device_id btusb_table[] = {
+ 	{ USB_VENDOR_AND_INTERFACE_INFO(0x0930, 0xff, 0x01, 0x01),
+ 	  .driver_info = BTUSB_BCM_PATCHRAM },
  
- if COVERAGE
- clean-coverage:
++	/* Broadcom devices with missing product id */
++	{ USB_DEVICE_AND_INTERFACE_INFO(0x0000, 0x0000, 0xff, 0x01, 0x01),
++	  .driver_info = BTUSB_BCM_PATCHRAM | BTUSB_BCM_NO_PRODID },
++
+ 	/* Intel Bluetooth USB Bootloader (RAM module) */
+ 	{ USB_DEVICE(0x8087, 0x0a5a),
+ 	  .driver_info = BTUSB_INTEL_BOOT | BTUSB_BROKEN_ISOC },
+@@ -2893,6 +2898,19 @@ static int btusb_probe(struct usb_interface *intf,
+ 	if (id->driver_info == BTUSB_IGNORE)
+ 		return -ENODEV;
+ 
++	if (id->driver_info & BTUSB_BCM_NO_PRODID) {
++		struct usb_device *udev = interface_to_usbdev(intf);
++
++		/* For the broken Broadcom devices that show 0000:0000
++		 * as USB vendor and product information, check that the
++		 * manufacturer string identifies them as Broadcom based
++		 * devices.
++		 */
++		if (!udev->manufacturer ||
++		    strcmp(udev->manufacturer, "Broadcom Corp"))
++			return -ENODEV;
++	}
++
+ 	if (id->driver_info & BTUSB_ATH3012) {
+ 		struct usb_device *udev = interface_to_usbdev(intf);
+ 
 -- 
-2.13.2
+2.9.4
 
