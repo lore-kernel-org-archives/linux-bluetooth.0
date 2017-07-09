@@ -1,9 +1,9 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3] Bluetooth: btusb: Add workaround for Broadcom devices without product id
-Date: Sun,  9 Jul 2017 22:00:54 +0200
-Message-Id: <20170709200054.66393-1-marcel@holtmann.org>
+Subject: [PATCH v2] Bluetooth: btusb: Add workaround for Broadcom devices without product id
+Date: Sun,  9 Jul 2017 22:00:02 +0200
+Message-Id: <20170709200002.63696-1-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
@@ -50,11 +50,11 @@ Reported-by: Christopher Williamson <home@chrisaw.com>
 Signed-off-by: Hans de Goede <hdegoede@redhat.com>
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- drivers/bluetooth/btusb.c | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
+ drivers/bluetooth/btusb.c | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
 
 diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index b1e01b057a7c..aa32075c3882 100644
+index b1e01b057a7c..3b344a4004a5 100644
 --- a/drivers/bluetooth/btusb.c
 +++ b/drivers/bluetooth/btusb.c
 @@ -66,6 +66,7 @@ static struct usb_driver btusb_driver;
@@ -76,7 +76,7 @@ index b1e01b057a7c..aa32075c3882 100644
  	/* Intel Bluetooth USB Bootloader (RAM module) */
  	{ USB_DEVICE(0x8087, 0x0a5a),
  	  .driver_info = BTUSB_INTEL_BOOT | BTUSB_BROKEN_ISOC },
-@@ -2893,6 +2898,19 @@ static int btusb_probe(struct usb_interface *intf,
+@@ -2893,6 +2898,18 @@ static int btusb_probe(struct usb_interface *intf,
  	if (id->driver_info == BTUSB_IGNORE)
  		return -ENODEV;
  
@@ -88,8 +88,7 @@ index b1e01b057a7c..aa32075c3882 100644
 +		 * manufacturer string identifies them as Broadcom based
 +		 * devices.
 +		 */
-+		if (!udev->manufacturer ||
-+		    strcmp(udev->manufacturer, "Broadcom Corp"))
++		if (strcmp(udev->manufacturer, "Broadcom Corp"))
 +			return -ENODEV;
 +	}
 +
