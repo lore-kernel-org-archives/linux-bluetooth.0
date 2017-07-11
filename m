@@ -1,32 +1,29 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Heiko Abraham <heiko.abraham@hella-gutmann.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Quality issue with Bluetooth-SIG
-Date: Wed, 12 Jul 2017 08:07:45 +0000
-Message-ID: <059FABA9-CC68-4295-8391-C2EA7C202BC7@hella-gutmann.com>
-Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Date: Tue, 11 Jul 2017 12:57:58 +0200
+From: Olivier MARTIN <olivier@labapart.com>
+To: luiz.dentz@gmail.com, linux-bluetooth@vger.kernel.org
+Cc: felix.schulthess@scs.ch
+Subject: Re: DBUS API: Retrieve current MTU used by remote device
+In-Reply-To: <9c9da882-fd5b-dfa1-447e-a6f05b341f97@scs.ch>
+References: <0fef8015e74a2a96af45c36e9c67dc36@labapart.com>
+ <9c9da882-fd5b-dfa1-447e-a6f05b341f97@scs.ch>
+Message-ID: <555fcf1d1c17c058942d01ca964de616@labapart.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Thanks Luiz for the answer, but I am guessing WriteValue() uses Long 
+Write. But it looks like not all BLE devices support Long Read/Write 
+(including Bluez until recently - v5.39 - April 2016). It also seems 
+some/all(?) Android devices do not support it.
 
-if an new version of BlueZ is release, are any tests running on it?
+I did not find this information but is a device that does not support 
+Long Write; would the application still receive GATT packets sent by 
+Long Write in a defragmented manner?
 
-Currently I see, that BlueZ 5.43, 5.45 or 4.101 with different versions of Linux Kernel (3.8, 3.12, 3.18) all failed with the Bluetooth-SIG test.
-I only look for Bluetooth Classic and RFCOMM. (Problems with eRTM, L2CAP_DISCONNECT)
-
-My assumption is, that a lot of Mainline LTS kernels not pass the Bluetooth-SIG by default.
-Any suggestions for the best kernel/BlueZ combinations? An newer Kernel like 4.x sometimes not possible (OpenGL ES support).
-
-
-Regards,
-Heiko Abraham
-
---
-
-________________________________
-
---
-Hella Gutmann Solutions GmbH * Unternehmensform: Gesellschaft mit beschraenkter Haftung *
-Firmensitz: 79241 Ihringen * Eingetragen im Handelsregister: AG Freiburg i.Br., HRB 290194 * Geschaeftsfuehrer: Andreas Habeck * USt-IdNr.: DE142208666
+The workaround often uses is to leave the GATT server fragmenting itself 
+the packets to send to the GATT client with an arbitrary packet length 
+value. Knowing the MTU uses between the two GATT devices could improve 
+the throughput.
