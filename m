@@ -3,8 +3,8 @@ MIME-Version: 1.0
 In-Reply-To: <27C5C78B-0335-4E25-82CF-D01233D76A85@holtmann.org>
 References: <1499340593-12739-1-git-send-email-hanipouspilot@gmail.com> <27C5C78B-0335-4E25-82CF-D01233D76A85@holtmann.org>
 From: Dmitry Tunin <hanipouspilot@gmail.com>
-Date: Sun, 16 Jul 2017 10:56:58 +0300
-Message-ID: <CANoib0GLMPBMi8hNbTewxScDQW7NLKJZUbYM3hDG6teKX7UhGA@mail.gmail.com>
+Date: Sun, 16 Jul 2017 10:53:47 +0300
+Message-ID: <CANoib0FTjt6B58XA95seTFyjihTFcmEWDhLwYTHKHmBGTeeCoQ@mail.gmail.com>
 Subject: Re: [PATCH] Add support of all Foxconn (105b) Broadcom devices
 To: Marcel Holtmann <marcel@holtmann.org>
 Cc: "Gustavo F. Padovan" <gustavo@padovan.org>, Johan Hedberg <johan.hedberg@gmail.com>,
@@ -14,10 +14,16 @@ Cc: "Gustavo F. Padovan" <gustavo@padovan.org>, Johan Hedberg <johan.hedberg@gma
 Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The one that is in your tree is correct. I see the problem. I added
-the Cc: stable... to the first one and it got through there.
-My apologies, I received the patch by mail and forwarded it. In a
-second I found out the crap and  fixed it.
+Hi Marcel,
+
+This one https://github.com/0day-ci/linux/commits/Dmitry-Tunin/Add-support-of-all-Foxconn-105b-Broadcom-devices/20170708-021656
+is really garbled. But I wrote to you in a couple of minutes after I
+sent it. And then sent the v2.
+It looks like you applied a wrong one.
+
+Regards,
+
+Dmitry
 
 2017-07-16 10:15 GMT+03:00 Marcel Holtmann <marcel@holtmann.org>:
 > Hi Dmitry,
