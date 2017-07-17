@@ -1,127 +1,53 @@
-Return-Path: <linux-kernel-owner@vger.kernel.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Subject: Re: [PATCH] bluetooth/smp: ensure RNG is properly seeded before ECDH
- use
+Subject: Re: [PATCH] gatt-server: Implement NegotiatedMTU property on Device1
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20170716172246.6767-1-Jason@zx2c4.com>
-Date: Mon, 17 Jul 2017 22:36:24 +0200
-Cc: "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        "Gustavo F. Padovan" <gustavo@padovan.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>
-Message-Id: <75F097E6-5D96-4F97-8E3A-D3D66A165B98@holtmann.org>
-References: <20170716172246.6767-1-Jason@zx2c4.com>
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Sender: linux-kernel-owner@vger.kernel.org
+In-Reply-To: <F04ADABE-DEA1-4003-9E95-E9FE8B8C94F4@sense.com>
+Date: Mon, 17 Jul 2017 20:08:18 +0200
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Message-Id: <1A61FCA4-F476-456F-AAAE-3C7753885BD4@holtmann.org>
+References: <CF389661-A1F2-4A25-96CD-0070FE33A1DE@sense.com>
+ <CABBYNZKZCEQvA7fxqc5JtmBGGarqPRCntwFkRy4GZns35F1zvQ@mail.gmail.com>
+ <8E72D5C7-FA44-4B06-82D7-2FCB22E26778@holtmann.org>
+ <F04ADABE-DEA1-4003-9E95-E9FE8B8C94F4@sense.com>
+To: Jonah Petri <jonah@sense.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jason,
+Hi Jonah,
 
-> This protocol uses lots of complex cryptography that relies on securely
-> generated random numbers. Thus, it's important that the RNG is actually
-> seeded before use. Fortuantely, it appears we're always operating in
-> process context (there are many GFP_KERNEL allocations and other
-> sleeping operations), and so we can simply demand that the RNG is seeded
-> before we use it.
+>>>> --- a/doc/device-api.txt
+>>>> +++ b/doc/device-api.txt
+>>>> @@ -234,3 +234,8 @@ Properties  string Address [readonly]
+>>>>              array{byte} AdvertisingFlags [readonly, experimental]
+>>>> 
+>>>>                      The Advertising Data Flags of the remote device.
+>>>> +
+>>>> +               int16 NegotiatedMTU [readonly, optional, experimental]
+>>>> +
+>>>> +                       The ATT MTU negotiated with the connected host.
+>>>> +                       Available only once MTU negotiation is complete.
+>>> 
+>>> Despite being odd that we start exposing transport specific details on
+>>> device interface, there maybe a chance this is useful if we can
+>>> properly detect BR/EDR MTU not only LE, though this means checking the
+>>> via bt_att API not bt_gatt_server. Obviously, this would have to be
+>>> exposed even before it is negotiated since LE start with 23 but on
+>>> BR/EDR this is negotiated via L2CAP signaling, and perhaps it should
+>>> not really be MTU that we expose but the actual payload without the
+>>> headers that bluetoothd takes care of adding.
+>> 
+>> I think that exposing max payload is a better idea.
 > 
-> We take two strategies in this commit. The first is for the library code
-> that's called from other modules like hci or mgmt: here we just change
-> the call to get_random_bytes_wait, and return the result of the wait to
-> the caller, along with the other error codes of those functions like
-> usual. Then there's the SMP protocol handler itself, which makes many
-> many many calls to get_random_bytes during different phases. For this,
-> rather than have to change all the calls to get_random_bytes_wait and
-> propagate the error result, it's actually enough to just put a single
-> call to wait_for_random_bytes() at the beginning of the handler, to
-> ensure that all the subsequent invocations are safe, without having to
-> actually change them. Likewise, for the random address changing
-> function, we'd rather know early on in the function whether the RNG
-> initialization has been interrupted, rather than later, so we call
-> wait_for_random_bytes() at the top, so that later on the call to
-> get_random_bytes() is acceptable.
+> I am fine with the revised naming, and revising the exposed device attribute to represent the max ATT payload.  However, how can a dbus client know whether the MTU negotiation has occurred or not?  The point of the patch is to allow for clients to take advantage of a larger negotiated MTU.
 > 
-> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
-> Cc: Marcel Holtmann <marcel@holtmann.org>
-> Cc: Gustavo Padovan <gustavo@padovan.org>
-> Cc: Johan Hedberg <johan.hedberg@gmail.com>
-> ---
-> net/bluetooth/hci_request.c |  6 ++++++
-> net/bluetooth/smp.c         | 18 ++++++++++++++----
-> 2 files changed, 20 insertions(+), 4 deletions(-)
-> 
-> diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
-> index b73ac149de34..6bd916cece6c 100644
-> --- a/net/bluetooth/hci_request.c
-> +++ b/net/bluetooth/hci_request.c
-> @@ -1406,6 +1406,12 @@ int hci_update_random_address(struct hci_request *req, bool require_privacy,
-> 	struct hci_dev *hdev = req->hdev;
-> 	int err;
-> 
-> +	if (require_privacy) {
-> +		err = wait_for_random_bytes();
-> +		if (unlikely(err))
-> +			return err;
-> +	}
-> +
-> 	/* If privacy is enabled use a resolvable private address. If
-> 	 * current RPA has expired or there is something else than
-> 	 * the current RPA in use, then generate a new one.
+> The negotiation of the MTU can be a significant event to the client interacting via dbus, so how should the completion of that negotiation be exposed, if not via an attribute as I proposed above?  Some boolean "MaxPayloadNegotiationCompleted" method?
 
-so this one is rather pointless. You are not protecting the RPA, you are protecting the NRPA. Since the NRPA is non-resolvable, it has not cryptographic meaning whatsoever. Even a bad random number is good here. So lets scrap this one.
-
-> diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-> index a0ef89772c36..75c1f30156d4 100644
-> --- a/net/bluetooth/smp.c
-> +++ b/net/bluetooth/smp.c
-> @@ -538,7 +538,9 @@ int smp_generate_rpa(struct hci_dev *hdev, const u8 irk[16], bdaddr_t *rpa)
-> 
-> 	smp = chan->data;
-> 
-> -	get_random_bytes(&rpa->b[3], 3);
-> +	err = get_random_bytes_wait(&rpa->b[3], 3);
-> +	if (unlikely(err))
-> +		return err;
-> 
-> 	rpa->b[5] &= 0x3f;	/* Clear two most significant bits */
-> 	rpa->b[5] |= 0x40;	/* Set second most significant bit */
-> @@ -571,7 +573,9 @@ int smp_generate_oob(struct hci_dev *hdev, u8 hash[16], u8 rand[16])
-> 	} else {
-> 		while (true) {
-> 			/* Seed private key with random number */
-> -			get_random_bytes(smp->local_sk, 32);
-> +			err = get_random_bytes_wait(smp->local_sk, 32);
-> +			if (unlikely(err))
-> +				return err;
-> 
-> 			/* Generate local key pair for Secure Connections */
-> 			if (!generate_ecdh_keys(smp->local_pk, smp->local_sk))
-> @@ -590,7 +594,9 @@ int smp_generate_oob(struct hci_dev *hdev, u8 hash[16], u8 rand[16])
-> 	SMP_DBG("OOB Public Key Y: %32phN", smp->local_pk + 32);
-> 	SMP_DBG("OOB Private Key:  %32phN", smp->local_sk);
-> 
-> -	get_random_bytes(smp->local_rand, 16);
-> +	err = get_random_bytes_wait(smp->local_rand, 16);
-> +	if (unlikely(err))
-> +		return err;
-> 
-> 	err = smp_f4(smp->tfm_cmac, smp->local_pk, smp->local_pk,
-> 		     smp->local_rand, 0, hash);
-> @@ -2832,7 +2838,11 @@ static int smp_sig_channel(struct l2cap_chan *chan, struct sk_buff *skb)
-> 	struct hci_conn *hcon = conn->hcon;
-> 	struct smp_chan *smp;
-> 	__u8 code, reason;
-> -	int err = 0;
-> +	int err;
-> +
-> +	err = wait_for_random_bytes();
-> +	if (unlikely(err))
-> +		return err;
-
-Frankly if you are doing this here anyway, then also waiting for random number seeding (when it is a LE controller) during HCI init is plenty. A powered down controller will not do any cryptographic operations.
-
-I mean we can even use HCI LE Rand function to feed the RNG even further. Actually checking if enough random bytes are available, if not, call HCI LE Rand, seed it, repeat until enough randomness is available.
+there will be PropertiesChanged signal once the MTU has been altered. Otherwise it will start out with 23 in case of LE or the minimum of whatever L2CAP has configured for BR/EDR. We do the same for RFCOMM btw. where it takes the minimum value from the two MTUs.
 
 Regards
 
 Marcel
+
