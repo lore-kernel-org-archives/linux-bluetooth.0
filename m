@@ -1,48 +1,125 @@
-Return-Path: <luiz.dentz@gmail.com>
-MIME-Version: 1.0
-In-Reply-To: <8FC80CB5-4A7C-4F53-BFF6-7B679F21F3C4@holtmann.org>
-References: <20170718164627.20114-1-luiz.dentz@gmail.com> <20170718164627.20114-3-luiz.dentz@gmail.com>
- <8FC80CB5-4A7C-4F53-BFF6-7B679F21F3C4@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 19 Jul 2017 09:49:52 +0300
-Message-ID: <CABBYNZ+FtXJSs7DFEy1pYVk90Ufui8444jE15y5PbWmzwQF3Fw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 3/7] monitor: Filter duplicated advertisements
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Return-Path: <stephen@networkplumber.org>
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: yisen.zhuang@huawei.com,
+	salil.mehta@huawei.com,
+	davem@davemloft.net,
+	marcel@holtmann.org,
+	gustavo@padovan.org,
+	johan.hedberg@gmail.com
+Cc: netdev@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org,
+	Stephen Hemminger <sthemmin@microsoft.com>
+Subject: [PATCH net-next 3/3] net: make dev_close and related functions void
+Date: Tue, 18 Jul 2017 15:59:27 -0700
+Message-Id: <20170718225927.15944-4-sthemmin@microsoft.com>
+In-Reply-To: <20170718225927.15944-1-sthemmin@microsoft.com>
+References: <20170718225927.15944-1-sthemmin@microsoft.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+There is no useful return value from dev_close. All paths return 0.
+Change dev_close and helper functions to void.
 
-On Tue, Jul 18, 2017 at 10:04 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Luiz,
->
->> This reduces the verbosity and give a precise picture of how unique
->> each report is.
->> ---
->> monitor/intel.c  |  28 +++---
->> monitor/packet.c | 277 ++++++++++++++++++++++++++++++++++++-------------------
->> monitor/vendor.h |   2 +-
->> 3 files changed, 198 insertions(+), 109 deletions(-)
->>
->> diff --git a/monitor/intel.c b/monitor/intel.c
->> index 1ca9a95..9da188a 100644
->> --- a/monitor/intel.c
->> +++ b/monitor/intel.c
->> @@ -499,11 +499,11 @@ const struct vendor_ocf *intel_vendor_ocf(uint16_t ocf)
->>       return NULL;
->> }
->>
->> -static void startup_evt(const void *data, uint8_t size)
->> +static void startup_evt(uint8_t index, const void *data, uint8_t size)
->> {
->> }
->
-> NAK. I avoid this and want to keep avoiding it. There are different ways to get the actual index number if you need it. And also FYI, the index is a uint16_t.
+Signed-off-by: Stephen Hemminger <sthemmin@microsoft.com>
+---
+ include/linux/netdevice.h |  4 ++--
+ net/core/dev.c            | 26 +++++++++++---------------
+ 2 files changed, 13 insertions(+), 17 deletions(-)
 
-I haven't figure out any other way to pass down the index number, or
-do you want some like l2cap_frame so it can carry information such as
-the index.
-
+diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+index c60351b84323..614642eb7eb7 100644
+--- a/include/linux/netdevice.h
++++ b/include/linux/netdevice.h
+@@ -2432,8 +2432,8 @@ struct net_device *dev_get_by_name_rcu(struct net *net, const char *name);
+ struct net_device *__dev_get_by_name(struct net *net, const char *name);
+ int dev_alloc_name(struct net_device *dev, const char *name);
+ int dev_open(struct net_device *dev);
+-int dev_close(struct net_device *dev);
+-int dev_close_many(struct list_head *head, bool unlink);
++void dev_close(struct net_device *dev);
++void dev_close_many(struct list_head *head, bool unlink);
+ void dev_disable_lro(struct net_device *dev);
+ int dev_loopback_xmit(struct net *net, struct sock *sk, struct sk_buff *newskb);
+ int dev_queue_xmit(struct sk_buff *skb);
+diff --git a/net/core/dev.c b/net/core/dev.c
+index 467420eda02e..d1b9c9b6c970 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -1413,7 +1413,7 @@ int dev_open(struct net_device *dev)
+ }
+ EXPORT_SYMBOL(dev_open);
+ 
+-static int __dev_close_many(struct list_head *head)
++static void __dev_close_many(struct list_head *head)
+ {
+ 	struct net_device *dev;
+ 
+@@ -1455,23 +1455,18 @@ static int __dev_close_many(struct list_head *head)
+ 		dev->flags &= ~IFF_UP;
+ 		netpoll_poll_enable(dev);
+ 	}
+-
+-	return 0;
+ }
+ 
+-static int __dev_close(struct net_device *dev)
++static void __dev_close(struct net_device *dev)
+ {
+-	int retval;
+ 	LIST_HEAD(single);
+ 
+ 	list_add(&dev->close_list, &single);
+-	retval = __dev_close_many(&single);
++	__dev_close_many(&single);
+ 	list_del(&single);
+-
+-	return retval;
+ }
+ 
+-int dev_close_many(struct list_head *head, bool unlink)
++void dev_close_many(struct list_head *head, bool unlink)
+ {
+ 	struct net_device *dev, *tmp;
+ 
+@@ -1488,8 +1483,6 @@ int dev_close_many(struct list_head *head, bool unlink)
+ 		if (unlink)
+ 			list_del_init(&dev->close_list);
+ 	}
+-
+-	return 0;
+ }
+ EXPORT_SYMBOL(dev_close_many);
+ 
+@@ -1502,7 +1495,7 @@ EXPORT_SYMBOL(dev_close_many);
+  *	is then deactivated and finally a %NETDEV_DOWN is sent to the notifier
+  *	chain.
+  */
+-int dev_close(struct net_device *dev)
++void dev_close(struct net_device *dev)
+ {
+ 	if (dev->flags & IFF_UP) {
+ 		LIST_HEAD(single);
+@@ -1511,7 +1504,6 @@ int dev_close(struct net_device *dev)
+ 		dev_close_many(&single, true);
+ 		list_del(&single);
+ 	}
+-	return 0;
+ }
+ EXPORT_SYMBOL(dev_close);
+ 
+@@ -6725,8 +6717,12 @@ int __dev_change_flags(struct net_device *dev, unsigned int flags)
+ 	 */
+ 
+ 	ret = 0;
+-	if ((old_flags ^ flags) & IFF_UP)
+-		ret = ((old_flags & IFF_UP) ? __dev_close : __dev_open)(dev);
++	if ((old_flags ^ flags) & IFF_UP) {
++		if (old_flags & IFF_UP)
++			__dev_close(dev);
++		else
++			ret = __dev_open(dev);
++	}
+ 
+ 	if ((flags ^ dev->gflags) & IFF_PROMISC) {
+ 		int inc = (flags & IFF_PROMISC) ? 1 : -1;
 -- 
-Luiz Augusto von Dentz
+2.11.0
