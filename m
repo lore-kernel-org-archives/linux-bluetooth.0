@@ -9,32 +9,35 @@ To: yisen.zhuang@huawei.com,
 Cc: netdev@vger.kernel.org,
 	linux-bluetooth@vger.kernel.org,
 	Stephen Hemminger <sthemmin@microsoft.com>
-Subject: [PATCH net-next 2/3] hns: remove useless void cast
-Date: Tue, 18 Jul 2017 15:59:26 -0700
-Message-Id: <20170718225927.15944-3-sthemmin@microsoft.com>
+Subject: [PATCH net-next 1/3] bluetooth: 6lowpan dev_close never returns error
+Date: Tue, 18 Jul 2017 15:59:25 -0700
+Message-Id: <20170718225927.15944-2-sthemmin@microsoft.com>
 In-Reply-To: <20170718225927.15944-1-sthemmin@microsoft.com>
 References: <20170718225927.15944-1-sthemmin@microsoft.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-There is no need to cast away return value of dev_close.
+The function dev_close in current kernel will never return an
+error. Later changes will make it void.
 
 Signed-off-by: Stephen Hemminger <sthemmin@microsoft.com>
 ---
- drivers/net/ethernet/hisilicon/hns/hns_ethtool.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ net/bluetooth/6lowpan.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-diff --git a/drivers/net/ethernet/hisilicon/hns/hns_ethtool.c b/drivers/net/ethernet/hisilicon/hns/hns_ethtool.c
-index a8db27e86a11..78cb20c67aa6 100644
---- a/drivers/net/ethernet/hisilicon/hns/hns_ethtool.c
-+++ b/drivers/net/ethernet/hisilicon/hns/hns_ethtool.c
-@@ -595,7 +595,7 @@ static void hns_nic_self_test(struct net_device *ndev,
- 		set_bit(NIC_STATE_TESTING, &priv->state);
+diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
+index ab3b654b05cc..e542b8959d88 100644
+--- a/net/bluetooth/6lowpan.c
++++ b/net/bluetooth/6lowpan.c
+@@ -621,9 +621,7 @@ static void ifdown(struct net_device *netdev)
+ 	int err;
  
- 		if (if_running)
--			(void)dev_close(ndev);
-+			dev_close(ndev);
+ 	rtnl_lock();
+-	err = dev_close(netdev);
+-	if (err < 0)
+-		BT_INFO("iface %s cannot be closed (%d)", netdev->name, err);
++	dev_close(netdev);
+ 	rtnl_unlock();
+ }
  
- 		for (i = 0; i < SELF_TEST_TPYE_NUM; i++) {
- 			if (!st_param[i][1])
 -- 
 2.11.0
