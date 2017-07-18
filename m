@@ -9,35 +9,26 @@ To: yisen.zhuang@huawei.com,
 Cc: netdev@vger.kernel.org,
 	linux-bluetooth@vger.kernel.org,
 	Stephen Hemminger <sthemmin@microsoft.com>
-Subject: [PATCH net-next 1/3] bluetooth: 6lowpan dev_close never returns error
-Date: Tue, 18 Jul 2017 15:59:25 -0700
-Message-Id: <20170718225927.15944-2-sthemmin@microsoft.com>
-In-Reply-To: <20170718225927.15944-1-sthemmin@microsoft.com>
-References: <20170718225927.15944-1-sthemmin@microsoft.com>
+Subject: [PATCH net-next 0/3] net: make dev_close void
+Date: Tue, 18 Jul 2017 15:59:24 -0700
+Message-Id: <20170718225927.15944-1-sthemmin@microsoft.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The function dev_close in current kernel will never return an
-error. Later changes will make it void.
+Noticed while working on other changes. Why is dev_close()
+returning int, it should be void.  Should also change
+ndo_close to be void, but that requires more work and someone
+with more coccinelle foo (smpl) than me.
 
-Signed-off-by: Stephen Hemminger <sthemmin@microsoft.com>
----
- net/bluetooth/6lowpan.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+Stephen Hemminger (3):
+  bluetooth: 6lowpan dev_close never returns error
+  hns: remove useless void cast
+  net: make dev_close and related functions void
 
-diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
-index ab3b654b05cc..e542b8959d88 100644
---- a/net/bluetooth/6lowpan.c
-+++ b/net/bluetooth/6lowpan.c
-@@ -621,9 +621,7 @@ static void ifdown(struct net_device *netdev)
- 	int err;
- 
- 	rtnl_lock();
--	err = dev_close(netdev);
--	if (err < 0)
--		BT_INFO("iface %s cannot be closed (%d)", netdev->name, err);
-+	dev_close(netdev);
- 	rtnl_unlock();
- }
- 
+ drivers/net/ethernet/hisilicon/hns/hns_ethtool.c |  2 +-
+ include/linux/netdevice.h                        |  4 ++--
+ net/bluetooth/6lowpan.c                          |  4 +---
+ net/core/dev.c                                   | 26 ++++++++++--------------
+ 4 files changed, 15 insertions(+), 21 deletions(-)
+
 -- 
 2.11.0
