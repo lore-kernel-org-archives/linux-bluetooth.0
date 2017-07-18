@@ -1,46 +1,79 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Subject: Re: [PATCH] gatt-server: Implement NegotiatedMTU property on Device1
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <C263BD82-A6D4-4325-BA01-2DD7A1F68532@sense.com>
-Date: Tue, 18 Jul 2017 08:42:05 +0200
-Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Message-Id: <E9CF469C-80A3-4EB6-A46B-85F46BEC8D24@holtmann.org>
-References: <CF389661-A1F2-4A25-96CD-0070FE33A1DE@sense.com>
- <CABBYNZKZCEQvA7fxqc5JtmBGGarqPRCntwFkRy4GZns35F1zvQ@mail.gmail.com>
- <8E72D5C7-FA44-4B06-82D7-2FCB22E26778@holtmann.org>
- <F04ADABE-DEA1-4003-9E95-E9FE8B8C94F4@sense.com>
- <1A61FCA4-F476-456F-AAAE-3C7753885BD4@holtmann.org>
- <C263BD82-A6D4-4325-BA01-2DD7A1F68532@sense.com>
-To: Jonah Petri <jonah@sense.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <jeffy.chen@rock-chips.com>
+From: Jeffy Chen <jeffy.chen@rock-chips.com>
+To: linux-kernel@vger.kernel.org
+Cc: xiyou.wangcong@gmail.com,
+	briannorris@chromium.org,
+	dianders@chromium.org,
+	Jeffy Chen <jeffy.chen@rock-chips.com>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	linux-bluetooth@vger.kernel.org
+Subject: [PATCH v3] Bluetooth: btusb: Fix memory leak in play_deferred
+Date: Tue, 18 Jul 2017 14:34:32 +0800
+Message-Id: <1500359672-29185-1-git-send-email-jeffy.chen@rock-chips.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jonah,
+Currently we are calling usb_submit_urb directly to submit deferred tx
+urbs after unanchor them.
 
->>>> I think that exposing max payload is a better idea.
->>> 
->>> I am fine with the revised naming, and revising the exposed device attribute to represent the max ATT payload.  However, how can a dbus client know whether the MTU negotiation has occurred or not?  The point of the patch is to allow for clients to take advantage of a larger negotiated MTU.
->>> 
->>> The negotiation of the MTU can be a significant event to the client interacting via dbus, so how should the completion of that negotiation be exposed, if not via an attribute as I proposed above?  Some boolean "MaxPayloadNegotiationCompleted" method?
->> 
->> there will be PropertiesChanged signal once the MTU has been altered. Otherwise it will start out with 23 in case of LE or the minimum of whatever L2CAP has configured for BR/EDR. We do the same for RFCOMM btw. where it takes the minimum value from the two MTUs.
->> 
-> 
-> I understand.  However, there is no way for a dbus client to tell the difference between these two scenarios:
-> 
-> 1) The MTU has been negotiated to 23  (in the case of LE)
-> 2) The MTU negotiation has not been completed
-> 
-> I expect many clients making use of this information will want to wait until the MTU negotiation is complete, and then begin normal operation.  A single attribute representing the current MTU seems to not be sufficient to implement such a dbus client.
+So the usb_giveback_urb_bh would failed to unref it in usb_unanchor_urb
+and cause memory leak:
+unreferenced object 0xffffffc0ce0fa400 (size 256):
+...
+  backtrace:
+    [<ffffffc00034a9a8>] __save_stack_trace+0x48/0x6c
+    [<ffffffc00034b088>] create_object+0x138/0x254
+    [<ffffffc0009d5504>] kmemleak_alloc+0x58/0x8c
+    [<ffffffc000345f78>] __kmalloc+0x1d4/0x2a0
+    [<ffffffc0006765bc>] usb_alloc_urb+0x30/0x60
+    [<ffffffbffc128598>] alloc_ctrl_urb+0x38/0x120 [btusb]
+    [<ffffffbffc129e7c>] btusb_send_frame+0x64/0xf8 [btusb]
 
-the other option is to leave the property out until the MTU has been negotiated. So in case of LE and Exchange MTU has not yet happened, that property does not exist. In BR/EDR it will always exist since L2CAP has finished already.
+Put those urbs in tx_anchor to avoid the leak, and also fix the error
+handling.
 
-So clients can start whenever they see the PropertiesChanged signal or get the property in the first place.
+Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
+---
 
-Regards
+Changes in v3:
+Put the deferred urbs in tx_anchor.
 
-Marcel
+Changes in v2:
+Call usb_free_urb instead of reusing submit_tx_urb.
 
+ drivers/bluetooth/btusb.c | 16 ++++++++++++----
+ 1 file changed, 12 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 0d533b2..9af679c 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -3266,13 +3266,21 @@ static void play_deferred(struct btusb_data *data)
+ 	int err;
+ 
+ 	while ((urb = usb_get_from_anchor(&data->deferred))) {
++		usb_anchor_urb(urb, &data->tx_anchor);
++
+ 		err = usb_submit_urb(urb, GFP_ATOMIC);
+-		if (err < 0)
+-			break;
++		if (err < 0) {
++			if (err != -EPERM && err != -ENODEV)
++				BT_ERR("%s urb %p submission failed (%d)",
++				       data->hdev->name, urb, -err);
++			kfree(urb->setup_packet);
++			usb_unanchor_urb(urb);
++		} else {
++			data->tx_in_flight++;
++		}
+ 
+-		data->tx_in_flight++;
++		usb_free_urb(urb);
+ 	}
+-	usb_scuttle_anchored_urbs(&data->deferred);
+ }
+ 
+ static int btusb_resume(struct usb_interface *intf)
+-- 
+2.1.4
