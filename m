@@ -1,60 +1,89 @@
 Return-Path: <jeffy.chen@rock-chips.com>
-Message-ID: <596DDB63.6010206@rock-chips.com>
-Date: Tue, 18 Jul 2017 17:56:51 +0800
-From: jeffy <jeffy.chen@rock-chips.com>
-MIME-Version: 1.0
-To: Oliver Neukum <oneukum@suse.com>,
- Marcel Holtmann <marcel@holtmann.org>
-CC: briannorris@chromium.org, dianders@chromium.org,
- Johan Hedberg <johan.hedberg@gmail.com>,
- xiyou.wangcong@gmail.com, "Gustavo F. Padovan" <gustavo@padovan.org>,
- linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH v2] Bluetooth: btusb: Fix memory leak in play_deferred
-References: <1500343579-9831-1-git-send-email-jeffy.chen@rock-chips.com>    <6E21F79E-93AA-4461-BA6B-67715501714F@holtmann.org>   <1500363015.16072.5.camel@suse.com> <596DC200.1080006@rock-chips.com>  <1500367310.502.0.camel@suse.com> <596DD6AE.2030704@rock-chips.com> <1500370901.502.6.camel@suse.com>
-In-Reply-To: <1500370901.502.6.camel@suse.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: Jeffy Chen <jeffy.chen@rock-chips.com>
+To: linux-kernel@vger.kernel.org
+Cc: xiyou.wangcong@gmail.com,
+	briannorris@chromium.org,
+	dianders@chromium.org,
+	Jeffy Chen <jeffy.chen@rock-chips.com>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	linux-bluetooth@vger.kernel.org
+Subject: [PATCH v4] Bluetooth: btusb: Fix memory leak in play_deferred
+Date: Tue, 18 Jul 2017 17:53:37 +0800
+Message-Id: <1500371617-5460-1-git-send-email-jeffy.chen@rock-chips.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Oliver,
+Currently we are calling usb_submit_urb directly to submit deferred tx
+urbs after unanchor them.
 
-On 07/18/2017 05:41 PM, Oliver Neukum wrote:
-> Am Dienstag, den 18.07.2017, 17:36 +0800 schrieb jeffy:
->> Hi Oliver,
->>
->> On 07/18/2017 04:41 PM, Oliver Neukum wrote:
->>>
->>> Am Dienstag, den 18.07.2017, 16:08 +0800 schrieb jeffy:
->>>>
->>>>>
->>>>> I am afraid not. We cannot silently drop one part of a transmission.
->>>>> I am afraid that the correct algorithm, if we encounter an error at
->>>>> that stage, is to abort the operation and report an error.
->>>>>
->>>> so i should break the loop when error happens right?
->>>
->>> Yes
->> ok, i'll do that.
->>>
->>>
->>>>
->>>>
->>>> and i uploaded 2 version of patches, which one do you prefer to go on?
->>>
->>> Where to?
->> https://patchwork.kernel.org/patch/9847037
->> and
->> https://patchwork.kernel.org/patch/9846617
->
-> I think that as soon as one URB fails, you should not even try
-> to submit any other deferred URBs. You are taking one out from
-> the middle of a sequence. That cannot be right.
-ok, that make sense.
+So the usb_giveback_urb_bh would failed to unref it in usb_unanchor_urb
+and cause memory leak:
+unreferenced object 0xffffffc0ce0fa400 (size 256):
+...
+  backtrace:
+    [<ffffffc00034a9a8>] __save_stack_trace+0x48/0x6c
+    [<ffffffc00034b088>] create_object+0x138/0x254
+    [<ffffffc0009d5504>] kmemleak_alloc+0x58/0x8c
+    [<ffffffc000345f78>] __kmalloc+0x1d4/0x2a0
+    [<ffffffc0006765bc>] usb_alloc_urb+0x30/0x60
+    [<ffffffbffc128598>] alloc_ctrl_urb+0x38/0x120 [btusb]
+    [<ffffffbffc129e7c>] btusb_send_frame+0x64/0xf8 [btusb]
 
-new patch sent :)
->
-> 	Regards
-> 		Oliver
->
->
->
->
+Put those urbs in tx_anchor to avoid the leak, and also fix the error
+handling.
+
+Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
+---
+
+Changes in v4:
+Drop the rest deferred urbs when error happens.
+
+Changes in v3:
+Put the deferred urbs in tx_anchor.
+
+Changes in v2:
+Call usb_free_urb instead of reusing submit_tx_urb.
+
+ drivers/bluetooth/btusb.c | 21 +++++++++++++++++++--
+ 1 file changed, 19 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 0d533b2..dbf4a05 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -3266,13 +3266,30 @@ static void play_deferred(struct btusb_data *data)
+ 	int err;
+ 
+ 	while ((urb = usb_get_from_anchor(&data->deferred))) {
++		usb_anchor_urb(urb, &data->tx_anchor);
++
+ 		err = usb_submit_urb(urb, GFP_ATOMIC);
+-		if (err < 0)
++		if (err < 0) {
++			if (err != -EPERM && err != -ENODEV)
++				BT_ERR("%s urb %p submission failed (%d)",
++				       data->hdev->name, urb, -err);
++			kfree(urb->setup_packet);
++			usb_unanchor_urb(urb);
++			usb_free_urb(urb);
+ 			break;
++		}
+ 
+ 		data->tx_in_flight++;
++		usb_free_urb(urb);
++	}
++
++	/* Cleanup the rest deferred urbs. */
++	while ((urb = usb_get_from_anchor(&data->deferred))) {
++		BT_ERR("%s urb %p submission failed (%d)",
++		       data->hdev->name, urb, -err);
++		kfree(urb->setup_packet);
++		usb_free_urb(urb);
+ 	}
+-	usb_scuttle_anchored_urbs(&data->deferred);
+ }
+ 
+ static int btusb_resume(struct usb_interface *intf)
+-- 
+2.1.4
