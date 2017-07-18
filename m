@@ -1,62 +1,106 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Return-Path: <shapiroc@google.com>
+From: C Shapiro <shapiroc@chromium.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/7] monitor: Add AD/EIR types for mesh
-Date: Tue, 18 Jul 2017 19:46:21 +0300
-Message-Id: <20170718164627.20114-1-luiz.dentz@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Cc: Simon Glass <shapiroc@chromium.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Eramoto Masaya <eramoto.masaya@jp.fujitsu.com>
+Subject: [PATCH v3] Support to change set file via arg
+Date: Tue, 18 Jul 2017 09:49:55 -0600
+Message-Id: <20170718154955.83197-1-shapiroc@chromium.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+ChromeOS is currently shifting to a more dynamic build system where a
+single build will be created/managed/deployed to support multiple models
+that were all created based on a single reference board.
 
-Print out mesh type and payload:
+This is being done for general cost/maintenance savings around the sheer
+number of builds that are currently managed for ChromeOS.
 
-> HCI Event: LE Meta Event (0x3e) plen 33
-      LE Advertising Report (0x02)
-        Num reports: 1
-        Event type: Non connectable undirected - ADV_NONCONN_IND (0x03)
-        Address type: Random (0x01)
-        Address: 29:D0:F2:61:17:B0 (Non-Resolvable)
-        Data length: 21
-        Mesh Data: 59a7ddee2e1f580463521b98c40c2a3b5086c6
-        RSSI: -72 dBm (0xb8)
+To support this, we're changing our build images to have all of the
+configuration available for all of the models supported by a given
+build.
+
+For the bluetooth stack, models have different product id values in the
+DeviceID field for the main.conf config file.
+
+E.g.
+ - https://chromium.googlesource.com/chromiumos/overlays/board-overlays/+/master/overlay-pyro/chromeos-base/chromeos-bsp-pyro/files/main.conf
+ - https://chromium.googlesource.com/chromiumos/overlays/board-overlays/+/master/overlay-reef/chromeos-base/chromeos-bsp-reef/files/main.conf
+ - https://chromium.googlesource.com/chromiumos/overlays/board-overlays/+/master/overlay-snappy/chromeos-base/chromeos-bsp-snappy/files/main.conf
+
+This change allows the config file to be passed as a runtime argument to
+bluetoothd, which allows the ChromeOS init script to determine the model
+at runtime and then pass the appropriate model specific config file.
+
+Signed-off-by: C Shapiro <shapiroc@chromium.org>
+Reviewed-by: Simon Glass <sjg@chromium.org>
 ---
- monitor/packet.c | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+Changes in v3:
+- Fix the commit message with correct links to the example usage.
 
-diff --git a/monitor/packet.c b/monitor/packet.c
-index a3d188a..cc24165 100644
---- a/monitor/packet.c
-+++ b/monitor/packet.c
-@@ -3259,6 +3259,9 @@ static void print_fec(uint8_t fec)
- #define BT_EIR_TRANSPORT_DISCOVERY	0x26
- #define BT_EIR_LE_SUPPORTED_FEATURES	0x27
- #define BT_EIR_CHANNEL_MAP_UPDATE_IND	0x28
-+#define BT_EIR_MESH_DATA		0x29
-+#define BT_EIR_MESH_PROV		0x2a
-+#define BT_EIR_MESH_BEACON		0x2b
- #define BT_EIR_3D_INFO_DATA		0x3d
- #define BT_EIR_MANUFACTURER_DATA	0xff
+ src/bluetoothd.8.in |  4 ++++
+ src/main.c          | 12 +++++++++++-
+ 2 files changed, 15 insertions(+), 1 deletion(-)
+
+diff --git a/src/bluetoothd.8.in b/src/bluetoothd.8.in
+index 97ef3ec94..d61dcc5b3 100644
+--- a/src/bluetoothd.8.in
++++ b/src/bluetoothd.8.in
+@@ -27,6 +27,10 @@ Print bluetoothd options and exit.
+ Enable logging in foreground. Directs log output to the controlling terminal \
+ in addition to syslog.
+ .TP
++.B -f, --configfile
++Specifies an explicit config file path instead of relying on the default path \
++(@CONFIGDIR@/main.conf) for the config file.
++.TP
+ .B -d, --debug=<file1>:<file2>:...
+ Sets how much information bluetoothd sends to the log destination (usually \
+ syslog's "daemon" facility). If the file options are omitted, then debugging \
+diff --git a/src/main.c b/src/main.c
+index bcc1e6fae..87bdb66cb 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -490,6 +490,7 @@ static guint setup_signalfd(void)
+ static char *option_debug = NULL;
+ static char *option_plugin = NULL;
+ static char *option_noplugin = NULL;
++static char *option_configfile = NULL;
+ static gboolean option_compat = FALSE;
+ static gboolean option_detach = TRUE;
+ static gboolean option_version = FALSE;
+@@ -505,6 +506,9 @@ static void free_options(void)
  
-@@ -3720,6 +3723,18 @@ static void print_eir(const uint8_t *eir, uint8_t eir_len, bool le)
- 			print_field("  Path Loss Threshold: %d", data[1]);
- 			break;
+ 	g_free(option_noplugin);
+ 	option_noplugin = NULL;
++
++	g_free(option_configfile);
++	option_configfile = NULL;
+ }
  
-+		case BT_EIR_MESH_DATA:
-+			print_hex_field("Mesh Data", data, data_len);
-+			break;
-+
-+		case BT_EIR_MESH_PROV:
-+			print_hex_field("Mesh Provisioning", data, data_len);
-+			break;
-+
-+		case BT_EIR_MESH_BEACON:
-+			print_hex_field("Mesh Beacon", data, data_len);
-+			break;
-+
- 		case BT_EIR_MANUFACTURER_DATA:
- 			if (data_len < 2)
- 				break;
+ static void disconnect_dbus(void)
+@@ -577,6 +581,9 @@ static GOptionEntry options[] = {
+ 				"Specify plugins to load", "NAME,..," },
+ 	{ "noplugin", 'P', 0, G_OPTION_ARG_STRING, &option_noplugin,
+ 				"Specify plugins not to load", "NAME,..." },
++	{ "configfile", 'f', 0, G_OPTION_ARG_STRING, &option_configfile,
++				"Specify an explicit path to the config file",
++				"FILE"},
+ 	{ "compat", 'C', 0, G_OPTION_ARG_NONE, &option_compat,
+ 				"Provide deprecated command line interfaces" },
+ 	{ "experimental", 'E', 0, G_OPTION_ARG_NONE, &option_experimental,
+@@ -636,7 +643,10 @@ int main(int argc, char *argv[])
+ 
+ 	sd_notify(0, "STATUS=Starting up");
+ 
+-	main_conf = load_config(CONFIGDIR "/main.conf");
++	if (option_configfile)
++		main_conf = load_config(option_configfile);
++	else
++		main_conf = load_config(CONFIGDIR "/main.conf");
+ 
+ 	parse_config(main_conf);
+ 
 -- 
-2.9.4
-
+2.13.2.932.g7449e964c-goog
