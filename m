@@ -1,53 +1,35 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-To: linux-bluetooth@vger.kernel.org
-From: Jacek Chmiel <jacek@kontakt.io>
-Subject: Zephyr Controller with legacy tools
-Message-ID: <895cbd85-4813-b2fe-031d-47ca08d72ccd@kontakt.io>
-Date: Tue, 18 Jul 2017 10:53:34 +0200
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <oneukum@suse.com>
+Message-ID: <1500367310.502.0.camel@suse.com>
+Subject: Re: [RFC PATCH v2] Bluetooth: btusb: Fix memory leak in
+ play_deferred
+From: Oliver Neukum <oneukum@suse.com>
+To: jeffy <jeffy.chen@rock-chips.com>, Marcel Holtmann <marcel@holtmann.org>
+Cc: briannorris@chromium.org, dianders@chromium.org, Johan Hedberg
+	 <johan.hedberg@gmail.com>, xiyou.wangcong@gmail.com, "Gustavo F. Padovan"
+	 <gustavo@padovan.org>, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Date: Tue, 18 Jul 2017 10:41:50 +0200
+In-Reply-To: <596DC200.1080006@rock-chips.com>
+References: <1500343579-9831-1-git-send-email-jeffy.chen@rock-chips.com>
+	  <6E21F79E-93AA-4461-BA6B-67715501714F@holtmann.org>
+	 <1500363015.16072.5.camel@suse.com> <596DC200.1080006@rock-chips.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi all,
+Am Dienstag, den 18.07.2017, 16:08 +0800 schrieb jeffy:
+> > I am afraid not. We cannot silently drop one part of a transmission.
+> > I am afraid that the correct algorithm, if we encounter an error at
+> > that stage, is to abort the operation and report an error.
+> >
+> so i should break the loop when error happens right?
 
-We are trying to use Zephyr (https://www.zephyrproject.org) nrf52 hci
-example as BLE scanning device. We were able to sucessfully run the
-example according to this tutorial:
-https://devzone.nordicsemi.com/blogs/1059/nrf5x-support-within-the-zephyr-project-rtos/
+Yes
 
+> 
+> and i uploaded 2 version of patches, which one do you prefer to go on?
 
-We've successfully set up and communicate with Zephyr based controller
-using ubuntu 16.06 with kernel 4.8.0 and newest bluez release.
+Where to?
 
-Unfortunately our target final design is using embedded linux with quite
-old kernel (3.10.93). On this kernel, latest bluez release lacks btmgmt
-interface used in the example above. We are trying to use legacy tools
-like hciattach, hciconfig, hcitool to run scanning on nrf52 with zephyr
-hci example.
-
-After running:
-$ hciattach  ttyACM0 any -s 1000000 flow
-
-we can see new hci device as:
-
-hci0:	Type: BR/EDR  Bus: UART
-	BD Address: 00:00:00:00:00:00  ACL MTU: 0:0  SCO MTU: 0:0
-	DOWN INIT RUNNING
-	RX bytes:0 acl:0 sco:0 events:0 errors:0
-	TX bytes:8 acl:0 sco:0 commands:2 errors:0
-
-Unfortunatelly we cannot get interface 'up'
-
-./hciconfig hci0 up
-Can't init device hci0: Cannot assign requested address (99)
-
-so we cannot also start scanning
-./hcitool -i hci0 lescan
-Invalid device: Network is down
-
-What I'm asking for is some advice on how to debug this problem and
-bring Zephyr based controller up.
-
-Thanks in advance,
-Jacek
+	Regards
+		Oliver
