@@ -1,55 +1,97 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <9849e4169bcd4e919628054345b533e5@labapart.com>
-References: <9849e4169bcd4e919628054345b533e5@labapart.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 18 Jul 2017 15:23:32 +0300
-Message-ID: <CABBYNZKT_PYo6ahosHXLOizRLcYwZgTzFOF32R6wb5M67Wf8-A@mail.gmail.com>
-Subject: Re: AcquireWrite & AcquireNotify
-To: Olivier MARTIN <olivier@labapart.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+Subject: Re: [PATCH v4] Bluetooth: btusb: Fix memory leak in play_deferred
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1500371617-5460-1-git-send-email-jeffy.chen@rock-chips.com>
+Date: Tue, 18 Jul 2017 11:58:43 +0200
+Cc: LKML <linux-kernel@vger.kernel.org>, xiyou.wangcong@gmail.com,
+        Brian Norris <briannorris@chromium.org>,
+        Douglas Anderson <dianders@chromium.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        "Gustavo F. Padovan" <gustavo@padovan.org>,
+        linux-bluetooth@vger.kernel.org
+Message-Id: <1D20F27F-CCF1-46DA-8D94-A76CE1C9748F@holtmann.org>
+References: <1500371617-5460-1-git-send-email-jeffy.chen@rock-chips.com>
+To: Jeffy Chen <jeffy.chen@rock-chips.com>,
+        Oliver Neukum <oliver@neukum.org>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Olivier,
+Hi Oliver,
 
-On Tue, Jul 18, 2017 at 12:14 AM, Olivier MARTIN <olivier@labapart.com> wrote:
-> Hi all,
-> After exchanging a couple of emails about MTU on the mailing-list last week,
-> Luiz suggested the new functions AcquireWrite() & AcquireNotify() would do
-> the job. I wanted to give a try and I changed my application protocol to
-> take advantage of them.
->
-> But I have just realized they are both for the client side but I am using
-> Bluez on the GATT server side. I am a bit worry to come back to my initial
-> issue where I was thinking I will need the MTU... How can I send the longest
-> GATT notification from the GATT server (in the context of a DBUS-based
-> application)?
+> Currently we are calling usb_submit_urb directly to submit deferred tx
+> urbs after unanchor them.
+> 
+> So the usb_giveback_urb_bh would failed to unref it in usb_unanchor_urb
+> and cause memory leak:
+> unreferenced object 0xffffffc0ce0fa400 (size 256):
+> ...
+>  backtrace:
+>    [<ffffffc00034a9a8>] __save_stack_trace+0x48/0x6c
+>    [<ffffffc00034b088>] create_object+0x138/0x254
+>    [<ffffffc0009d5504>] kmemleak_alloc+0x58/0x8c
+>    [<ffffffc000345f78>] __kmalloc+0x1d4/0x2a0
+>    [<ffffffc0006765bc>] usb_alloc_urb+0x30/0x60
+>    [<ffffffbffc128598>] alloc_ctrl_urb+0x38/0x120 [btusb]
+>    [<ffffffbffc129e7c>] btusb_send_frame+0x64/0xf8 [btusb]
+> 
+> Put those urbs in tx_anchor to avoid the leak, and also fix the error
+> handling.
+> 
+> Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
+> ---
+> 
+> Changes in v4:
+> Drop the rest deferred urbs when error happens.
+> 
+> Changes in v3:
+> Put the deferred urbs in tx_anchor.
+> 
+> Changes in v2:
+> Call usb_free_urb instead of reusing submit_tx_urb.
+> 
+> drivers/bluetooth/btusb.c | 21 +++++++++++++++++++--
+> 1 file changed, 19 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index 0d533b2..dbf4a05 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -3266,13 +3266,30 @@ static void play_deferred(struct btusb_data *data)
+> 	int err;
+> 
+> 	while ((urb = usb_get_from_anchor(&data->deferred))) {
+> +		usb_anchor_urb(urb, &data->tx_anchor);
+> +
+> 		err = usb_submit_urb(urb, GFP_ATOMIC);
+> -		if (err < 0)
+> +		if (err < 0) {
+> +			if (err != -EPERM && err != -ENODEV)
+> +				BT_ERR("%s urb %p submission failed (%d)",
+> +				       data->hdev->name, urb, -err);
+> +			kfree(urb->setup_packet);
+> +			usb_unanchor_urb(urb);
+> +			usb_free_urb(urb);
+> 			break;
+> +		}
+> 
+> 		data->tx_in_flight++;
+> +		usb_free_urb(urb);
+> +	}
+> +
+> +	/* Cleanup the rest deferred urbs. */
+> +	while ((urb = usb_get_from_anchor(&data->deferred))) {
+> +		BT_ERR("%s urb %p submission failed (%d)",
+> +		       data->hdev->name, urb, -err);
+> +		kfree(urb->setup_packet);
+> +		usb_free_urb(urb);
+> 	}
+> -	usb_scuttle_anchored_urbs(&data->deferred);
+> }
 
-Well the server don't really need to restrict access since it is only
-accessed by bluetoothd, though the notification is not 1:1, so if you
-change the Value bluetoothd will send the data to all connected peers
-with notifications enabled.
+if you think this is a valid approach, please provide an ack.
 
-I guess the right the most efficient thing to do would make fd passing
-for the server as well, though AcquireWrite/AcquireRead would not work
-as intended there since the one passing down the fd would be the
-application itself not bluetoothd. For things like WriteValue we end
-up extending the parameters with a dictionary and then have server
-only options, like Device an MTU, though the fd has still to be
-returned, but this may not be a bad idea after all since the app would
-be able to control exactly where it wants bluetoothd to write to.
+Regards
 
-> Thanks in advance,
-> Olivier
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
-> in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-
--- 
-Luiz Augusto von Dentz
+Marcel
