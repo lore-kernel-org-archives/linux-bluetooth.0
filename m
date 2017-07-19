@@ -1,24 +1,79 @@
-Return-Path: <davem@davemloft.net>
-Date: Wed, 19 Jul 2017 16:42:38 -0700 (PDT)
-Message-Id: <20170719.164238.1674311177016256652.davem@davemloft.net>
-To: stephen@networkplumber.org
-Cc: yisen.zhuang@huawei.com, salil.mehta@huawei.com, marcel@holtmann.org,
- gustavo@padovan.org, johan.hedberg@gmail.com, netdev@vger.kernel.org,
- linux-bluetooth@vger.kernel.org, sthemmin@microsoft.com
-Subject: Re: [PATCH net-next 0/3] net: make dev_close void
-From: David Miller <davem@davemloft.net>
-In-Reply-To: <20170718225927.15944-1-sthemmin@microsoft.com>
-References: <20170718225927.15944-1-sthemmin@microsoft.com>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
+Return-Path: <gustavo@embeddedor.com>
+Date: Wed, 19 Jul 2017 17:49:31 -0500
+From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+	"Gustavo A. R. Silva" <gustavo@embeddedor.com>
+Subject: [PATCH] bluetooth: btwilink: remove unnecessary static in
+ bt_ti_probe()
+Message-ID: <20170719224931.GA16225@embeddedgus>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Stephen Hemminger <stephen@networkplumber.org>
-Date: Tue, 18 Jul 2017 15:59:24 -0700
+Remove unnecessary static on local variable hst.
+Such variable is initialized before being used,
+on every execution path throughout the function.
+The static has no benefit and, removing it reduces
+the object file size.
 
-> Noticed while working on other changes. Why is dev_close()
-> returning int, it should be void.  Should also change
-> ndo_close to be void, but that requires more work and someone
-> with more coccinelle foo (smpl) than me.
+This issue was detected using Coccinelle and the
+following semantic patch:
 
-Series applied, thanks.
+@bad exists@
+position p;
+identifier x;
+type T;
+@@
+
+static T x@p;
+...
+x = <+...x...+>
+
+@@
+identifier x;
+expression e;
+type T;
+position p != bad.p;
+@@
+
+-static
+ T x@p;
+ ... when != x
+     when strict
+?x = e;
+
+In the following log you can see the difference in the object file size.
+This log is the output of the size command, before and after the code
+change:
+
+before:
+   text    data     bss     dec     hex filename
+   4029    2528     128    6685    1a1d drivers/bluetooth/btwilink.o
+
+after:
+   text    data     bss     dec     hex filename
+   4007    2472      64    6543    198f drivers/bluetooth/btwilink.o
+
+Signed-off-by: Gustavo A. R. Silva <gustavo@embeddedor.com>
+---
+ drivers/bluetooth/btwilink.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/bluetooth/btwilink.c b/drivers/bluetooth/btwilink.c
+index 85a3978..0cdb896 100644
+--- a/drivers/bluetooth/btwilink.c
++++ b/drivers/bluetooth/btwilink.c
+@@ -276,7 +276,7 @@ static int ti_st_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
+ 
+ static int bt_ti_probe(struct platform_device *pdev)
+ {
+-	static struct ti_st *hst;
++	struct ti_st *hst;
+ 	struct hci_dev *hdev;
+ 	int err;
+ 
+-- 
+2.5.0
