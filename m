@@ -1,12 +1,12 @@
 Return-Path: <luiz.dentz@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <34016F68-631B-40AF-84D9-6DBDD285D3B7@holtmann.org>
-References: <20170718164627.20114-1-luiz.dentz@gmail.com> <20170718164627.20114-7-luiz.dentz@gmail.com>
- <34016F68-631B-40AF-84D9-6DBDD285D3B7@holtmann.org>
+In-Reply-To: <8FC80CB5-4A7C-4F53-BFF6-7B679F21F3C4@holtmann.org>
+References: <20170718164627.20114-1-luiz.dentz@gmail.com> <20170718164627.20114-3-luiz.dentz@gmail.com>
+ <8FC80CB5-4A7C-4F53-BFF6-7B679F21F3C4@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 19 Jul 2017 11:47:49 +0300
-Message-ID: <CABBYNZJpY3bMwVrJRtsOJa7yaSExAcViC-_PYBvoggU2jwi-Og@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 7/7] monitor: Add option to show only mesh advertisements
+Date: Wed, 19 Jul 2017 09:49:52 +0300
+Message-ID: <CABBYNZ+FtXJSs7DFEy1pYVk90Ufui8444jE15y5PbWmzwQF3Fw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 3/7] monitor: Filter duplicated advertisements
 To: Marcel Holtmann <marcel@holtmann.org>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
@@ -14,254 +14,35 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Marcel,
 
-On Tue, Jul 18, 2017 at 10:10 PM, Marcel Holtmann <marcel@holtmann.org> wro=
-te:
+On Tue, Jul 18, 2017 at 10:04 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
 > Hi Luiz,
 >
->> This adds -M/--mesh [nid] option to show only mesh advertisements which
->> is very convenient when monitoring noisy environments.
+>> This reduces the verbosity and give a precise picture of how unique
+>> each report is.
 >> ---
->> monitor/main.c   | 17 +++++++++++-
->> monitor/packet.c | 80 ++++++++++++++++++++++++++++++++++++++++++++------=
-------
->> monitor/packet.h |  2 ++
->> 3 files changed, 82 insertions(+), 17 deletions(-)
+>> monitor/intel.c  |  28 +++---
+>> monitor/packet.c | 277 ++++++++++++++++++++++++++++++++++++-------------------
+>> monitor/vendor.h |   2 +-
+>> 3 files changed, 198 insertions(+), 109 deletions(-)
 >>
->> diff --git a/monitor/main.c b/monitor/main.c
->> index b4e9a6a..fb7d5f5 100644
->> --- a/monitor/main.c
->> +++ b/monitor/main.c
->> @@ -71,6 +71,7 @@ static void usage(void)
->>               "\t-S, --sco              Dump SCO traffic\n"
->>               "\t-A, --a2dp             Dump A2DP stream traffic\n"
->>               "\t-E, --ellisys [ip]     Send Ellisys HCI Injection\n"
->> +             "\t-M, --mesh [nid]       Dump Mesh traffic only\n"
->>               "\t-h, --help             Show help options\n");
+>> diff --git a/monitor/intel.c b/monitor/intel.c
+>> index 1ca9a95..9da188a 100644
+>> --- a/monitor/intel.c
+>> +++ b/monitor/intel.c
+>> @@ -499,11 +499,11 @@ const struct vendor_ocf *intel_vendor_ocf(uint16_t ocf)
+>>       return NULL;
 >> }
 >>
->> @@ -88,6 +89,7 @@ static const struct option main_options[] =3D {
->>       { "sco",     no_argument,       NULL, 'S' },
->>       { "a2dp",    no_argument,       NULL, 'A' },
->>       { "ellisys", required_argument, NULL, 'E' },
->> +     { "mesh",    optional_argument, NULL, 'M' },
->>       { "todo",    no_argument,       NULL, '#' },
->>       { "version", no_argument,       NULL, 'v' },
->>       { "help",    no_argument,       NULL, 'h' },
->> @@ -104,6 +106,7 @@ int main(int argc, char *argv[])
->>       const char *tty =3D NULL;
->>       unsigned int tty_speed =3D B115200;
->>       unsigned short ellisys_port =3D 0;
->> +     int mesh_nid =3D -1;
->>       const char *str;
->>       int exit_status;
->>       sigset_t mask;
->> @@ -115,7 +118,7 @@ int main(int argc, char *argv[])
->>       for (;;) {
->>               int opt;
->>
->> -             opt =3D getopt_long(argc, argv, "d:r:w:a:s:p:i:tTSAE:vh",
->> +             opt =3D getopt_long(argc, argv, "d:r:w:a:s:p:i:tTSAE:M::vh=
-",
->>                                               main_options, NULL);
->>               if (opt < 0)
->>                       break;
->> @@ -176,6 +179,18 @@ int main(int argc, char *argv[])
->>                       ellisys_server =3D optarg;
->>                       ellisys_port =3D 24352;
->>                       break;
->> +             case 'M':
->> +                     if (optarg) {
->> +                             mesh_nid =3D atoi(optarg);
->
-> you also need to support hex input here as well.
->
->> +                             if (mesh_nid < 0 || mesh_nid > 0x7f) {
->> +                                     fprintf(stderr, "Invalid NID: %s\n=
-",
->> +                                                             optarg);
->> +                                     return EXIT_FAILURE;
->> +                             }
->> +                             packet_set_mesh_nid(mesh_nid);
->> +                     }
->> +                     filter_mask |=3D PACKET_FILTER_MESH_ONLY;
->> +                     break;
->>               case '#':
->>                       packet_todo();
->>                       lmp_todo();
->> diff --git a/monitor/packet.c b/monitor/packet.c
->> index 678d7a7..c2ba66f 100644
->> --- a/monitor/packet.c
->> +++ b/monitor/packet.c
->> @@ -111,6 +111,7 @@ static unsigned long filter_mask =3D 0;
->> static bool index_filter =3D false;
->> static uint16_t index_number =3D 0;
->> static uint16_t index_current =3D 0;
->> +static int mesh_nid =3D -1;
->>
->> #define UNKNOWN_MANUFACTURER 0xffff
->>
->> @@ -268,6 +269,11 @@ void packet_select_index(uint16_t index)
->>       index_number =3D index;
->> }
->>
->> +void packet_set_mesh_nid(uint8_t nid)
->> +{
->> +     mesh_nid =3D nid;
->> +}
->> +
->> #define print_space(x) printf("%*c", (x), ' ');
->>
->> #define MAX_INDEX 16
->> @@ -8850,6 +8856,25 @@ rssi:
->>       }
->> }
->>
->> +static bool le_adv_report_filter(uint8_t index, const void *data, uint8=
-_t size)
->> +{
->> +     const struct bt_hci_evt_le_adv_report *evt =3D data;
->> +
->> +     if (!packet_has_filter(PACKET_FILTER_MESH_ONLY))
->> +             return false;
->> +
->> +     switch (evt->data[1]) {
->> +     case BT_EIR_MESH_DATA:
->> +             if (mesh_nid > 0 && ((evt->data[2] & 0xfe) !=3D mesh_nid))
->> +                     return true;
->
-> fall through comment is missing and also mesh_nid > 0 is wrong. Then usin=
-g uint8_t mesh_nid would be fine. Which is actually what I think we should =
-be doing anyway in the first place. This a cryptographic hash. Chances are =
-super slim that we get 0x00 here.
->
->> +     case BT_EIR_MESH_PROV:
->> +     case BT_EIR_MESH_BEACON:
->> +             return false;
->> +     }
->> +
->> +     return true;
->> +}
->> +
->> static void le_conn_update_complete_evt(uint8_t index, const void *data,=
- uint8_t size)
+>> -static void startup_evt(const void *data, uint8_t size)
+>> +static void startup_evt(uint8_t index, const void *data, uint8_t size)
 >> {
->>       const struct bt_hci_evt_le_conn_update_complete *evt =3D data;
->> @@ -8998,6 +9023,7 @@ struct subevent_data {
->>       void (*func) (uint8_t index, const void *data, uint8_t size);
->>       uint8_t size;
->>       bool fixed;
->> +     bool (*filter) (uint8_t index, const void *data, uint8_t size);
->> };
->>
->> static void print_subevent(const struct subevent_data *subevent_data,
->> @@ -9039,7 +9065,8 @@ static const struct subevent_data le_meta_event_ta=
-ble[] =3D {
->>       { 0x01, "LE Connection Complete",
->>                               le_conn_complete_evt, 18, true },
->>       { 0x02, "LE Advertising Report",
->> -                             le_adv_report_evt, 1, false },
->> +                             le_adv_report_evt, 1, false,
->> +                             le_adv_report_filter },
->>       { 0x03, "LE Connection Update Complete",
->>                               le_conn_update_complete_evt, 9, true },
->>       { 0x04, "LE Read Remote Used Features",
->> @@ -9072,29 +9099,45 @@ static const struct subevent_data le_meta_event_=
-table[] =3D {
->>       { }
->> };
->>
->> -static void le_meta_event_evt(uint8_t index, const void *data, uint8_t =
-size)
->> +static const struct subevent_data *le_meta_event_find(uint8_t subevent)
->> {
->> -     uint8_t subevent =3D *((const uint8_t *) data);
->> -     struct subevent_data unknown;
->> -     const struct subevent_data *subevent_data =3D &unknown;
->>       int i;
->>
->> -     unknown.subevent =3D subevent;
->> -     unknown.str =3D "Unknown";
->> -     unknown.func =3D NULL;
->> -     unknown.size =3D 0;
->> -     unknown.fixed =3D true;
->> -
->>       for (i =3D 0; le_meta_event_table[i].str; i++) {
->> -             if (le_meta_event_table[i].subevent =3D=3D subevent) {
->> -                     subevent_data =3D &le_meta_event_table[i];
->> -                     break;
->> -             }
->> +             if (le_meta_event_table[i].subevent =3D=3D subevent)
->> +                     return &le_meta_event_table[i];
->> +     }
->> +
->> +     return NULL;
->> +}
->> +
->> +static void le_meta_event_evt(uint8_t index, const void *data, uint8_t =
-size)
->> +{
->> +     uint8_t subevent =3D *((const uint8_t *) data);
->> +     const struct subevent_data *subevent_data;
->> +
->> +     subevent_data =3D le_meta_event_find(subevent);
->> +     if (!subevent_data) {
->> +             print_indent(6, COLOR_HCI_EVENT_UNKNOWN, "", "", COLOR_OFF=
-,
->> +                                             " (0x%2.2x)", subevent);
->> +             return;
->>       }
->>
->>       print_subevent(subevent_data, index, data + 1, size - 1);
 >> }
->>
->> +static bool le_meta_event_filter(uint8_t index, const void *data, uint8=
-_t size)
->> +{
->> +     uint8_t subevent =3D *((const uint8_t *) data);
->> +     const struct subevent_data *subevent_data;
->> +
->> +     subevent_data =3D le_meta_event_find(subevent);
->> +     if (!subevent_data || !subevent_data->filter)
->> +             return false;
->> +
->> +     return subevent_data->filter(index, data + 1, size - 1);
->> +}
->> +
->> static void vendor_evt(uint8_t index, const void *data, uint8_t size)
->> {
->>       uint8_t subevent =3D *((const uint8_t *) data);
->> @@ -9135,6 +9178,7 @@ struct event_data {
->>       void (*func) (uint8_t index, const void *data, uint8_t size);
->>       uint8_t size;
->>       bool fixed;
->> +     bool (*filter) (uint8_t index, const void *data, uint8_t size);
->> };
->>
->> static const struct event_data event_table[] =3D {
->> @@ -9241,7 +9285,8 @@ static const struct event_data event_table[] =3D {
->>       { 0x3d, "Remote Host Supported Features",
->>                               remote_host_features_notify_evt, 14, true =
-},
->>       { 0x3e, "LE Meta Event",
->> -                             le_meta_event_evt, 1, false },
->> +                             le_meta_event_evt, 1, false,
->> +                             le_meta_event_filter },
 >
-> I really do not like this. Lets not add another function to these tables.=
- Figure something else out. And frankly, I rather have a btmon --mesh comma=
-nd that focus purely on mesh advertising bearer. If not, then just leave al=
-l packets unfiltered.
+> NAK. I avoid this and want to keep avoiding it. There are different ways to get the actual index number if you need it. And also FYI, the index is a uint16_t.
 
-I thought about that too, but there could be other related packets,
-for example GATT proxy.
+I haven't figure out any other way to pass down the index number, or
+do you want some like l2cap_frame so it can carry information such as
+the index.
 
-> Also we could just figure out on how to use BPF on the monitoring socket.=
- Doing this outside the kernel seems pointless.
-
-I will look into that, didn't know BPF could be used with any packet
-based socket, well if it does then I completely agree with you, if it
-doesn't then we might want something that could work with older
-kernels.
-
---=20
+-- 
 Luiz Augusto von Dentz
