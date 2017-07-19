@@ -2,8 +2,10 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Subject: [PATCH v2 3/6] monitor: Filter duplicated advertisements
-Date: Wed, 19 Jul 2017 16:09:36 +0300
-Message-Id: <20170719130939.24893-1-luiz.dentz@gmail.com>
+Date: Wed, 19 Jul 2017 16:09:05 +0300
+Message-Id: <20170719130909.24702-3-luiz.dentz@gmail.com>
+In-Reply-To: <20170719130909.24702-1-luiz.dentz@gmail.com>
+References: <20170719130909.24702-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
