@@ -1,37 +1,34 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Subject: Re: kernel smp.c functions not called by Bluetootl LE controller
+Subject: Re: [PATCH] hciattach: bcm43xx: fix the delay timer for firmware
+ download
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <38d8a549-4335-cf0b-9273-d9ef9b51ac0b@rub.de>
-Date: Thu, 20 Jul 2017 20:24:50 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <19307C37-EF03-4E42-AFAD-06855DCB7A3F@holtmann.org>
-References: <38d8a549-4335-cf0b-9273-d9ef9b51ac0b@rub.de>
-To: Martin Grothe <martin.grothe@rub.de>
+In-Reply-To: <1500556499-2146-1-git-send-email-maxin.john@gmail.com>
+Date: Thu, 20 Jul 2017 20:23:44 +0200
+Cc: "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+        Andy Duan <fugang.duan@nxp.com>,
+        "Maxin B. John" <maxin.john@intel.com>
+Message-Id: <0F93CDF6-8019-4744-B02B-0C9BD44F9D0B@holtmann.org>
+References: <1500556499-2146-1-git-send-email-maxin.john@gmail.com>
+To: maxin.john@gmail.com
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Martin,
+Hi Maxin,
 
-> I try to call printk (with priority KERN_ALERT) functions placed in the
-> net/bluetooth/smp.c file of my linux kernel 4.9.35 in order to get
-> output from specifc functions like:
+> From the log in .bcm43xx_load_firmware():
+>        /* Wait 50ms to let the firmware placed in download mode */
+>        nanosleep(&tm_mode, NULL);
 > 
-> static int smp_cmd_public_key()
+> But timespec tm_mode is real is 50us. Correct the delayed timer count.
 > 
-> But during a pairing with another bluetooth LE device the output of
-> these function is never shown in /var/log/kern.log
-> 
-> Is there any way to verify, that the LE Controller accesses the Security
-> Manager Protocol source code the Linux Kernel?
-> 
-> As far as I understood the Core Specification, in BT 4.0 an above the
-> Security Manager is always integrated in the Link Manager, when it comes
-> to BR/EDR. But for LE the SM is integrated in the Host part and not the
-> Controller. Thus LE Controller should access the smp.c in the Linux kernel.
+> Signed-off-by: Fugang Duan <fugang.duan@nxp.com>
+> Signed-off-by: Maxin B. John <maxin.john@intel.com>
 
-just run btmon and you see all the security manager exchanges.
+we are not using signed offs for user space code. So I fixed that up and applied the patch.
+
+However I would prefer if we stop using hciattach and focus on hci_bcm.c support with btattach and serdev.
 
 Regards
 
