@@ -1,98 +1,164 @@
-Return-Path: <jeffy.chen@rock-chips.com>
-From: Jeffy Chen <jeffy.chen@rock-chips.com>
-To: linux-kernel@vger.kernel.org,
-	oneukum@suse.com
-Cc: xiyou.wangcong@gmail.com,
-	briannorris@chromium.org,
-	dianders@chromium.org,
-	Jeffy Chen <jeffy.chen@rock-chips.com>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	linux-bluetooth@vger.kernel.org
-Subject: [PATCH v6] Bluetooth: btusb: Fix memory leak in play_deferred
-Date: Thu, 20 Jul 2017 18:53:50 +0800
-Message-Id: <1500548030-20556-1-git-send-email-jeffy.chen@rock-chips.com>
+Return-Path: <luiz.dentz@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <64470655-51FF-4B41-ADCD-7B94EB7E9B80@holtmann.org>
+References: <20170719130909.24702-1-luiz.dentz@gmail.com> <20170719130909.24702-3-luiz.dentz@gmail.com>
+ <64470655-51FF-4B41-ADCD-7B94EB7E9B80@holtmann.org>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Thu, 20 Jul 2017 13:25:01 +0300
+Message-ID: <CABBYNZ+Hbee9T=F7gCP=ejMRHjW1+obxZEh1NGwtK+WnPJYNOg@mail.gmail.com>
+Subject: Re: [PATCH v2 3/6] monitor: Filter duplicated advertisements
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Currently we are calling usb_submit_urb directly to submit deferred tx
-urbs after unanchor them.
+Hi Marcel,
 
-So the usb_giveback_urb_bh would failed to unref it in usb_unanchor_urb
-and cause memory leak:
-unreferenced object 0xffffffc0ce0fa400 (size 256):
-...
-  backtrace:
-    [<ffffffc00034a9a8>] __save_stack_trace+0x48/0x6c
-    [<ffffffc00034b088>] create_object+0x138/0x254
-    [<ffffffc0009d5504>] kmemleak_alloc+0x58/0x8c
-    [<ffffffc000345f78>] __kmalloc+0x1d4/0x2a0
-    [<ffffffc0006765bc>] usb_alloc_urb+0x30/0x60
-    [<ffffffbffc128598>] alloc_ctrl_urb+0x38/0x120 [btusb]
-    [<ffffffbffc129e7c>] btusb_send_frame+0x64/0xf8 [btusb]
+On Wed, Jul 19, 2017 at 8:43 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Luiz,
+>
+>> This reduces the verbosity and give a precise picture of how unique
+>> each report is.
+>> ---
+>> monitor/packet.c | 89 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>> 1 file changed, 89 insertions(+)
+>>
+>> diff --git a/monitor/packet.c b/monitor/packet.c
+>> index cc24165..4ed0faa 100644
+>> --- a/monitor/packet.c
+>> +++ b/monitor/packet.c
+>> @@ -42,7 +42,9 @@
+>> #include "lib/hci.h"
+>> #include "lib/hci_lib.h"
+>>
+>> +#include "src/shared/mainloop.h"
+>> #include "src/shared/util.h"
+>> +#include "src/shared/queue.h"
+>> #include "src/shared/btsnoop.h"
+>> #include "display.h"
+>> #include "bt.h"
+>> @@ -100,6 +102,9 @@
+>>
+>> #define COLOR_PHY_PACKET              COLOR_BLUE
+>>
+>> +#define ADV_TIMEOUT                  3000
+>> +#define ADV_MAX_CACHE                        100
+>> +
+>> static time_t time_offset = ((time_t) -1);
+>> static int priority_level = BTSNOOP_PRIORITY_INFO;
+>> static unsigned long filter_mask = 0;
+>> @@ -267,11 +272,20 @@ void packet_select_index(uint16_t index)
+>>
+>> #define MAX_INDEX 16
+>>
+>> +struct adv_data {
+>> +     struct bt_hci_evt_le_adv_report evt;
+>> +     void *data;
+>> +     size_t frame;
+>> +     int timeout;
+>> +     struct queue *cache;
+>> +};
+>> +
+>> struct index_data {
+>>       uint8_t  type;
+>>       uint8_t  bdaddr[6];
+>>       uint16_t manufacturer;
+>>       size_t  frame;
+>> +     struct queue *adv_cache;
+>> };
+>>
+>> static struct index_data index_list[MAX_INDEX];
+>> @@ -8587,12 +8601,86 @@ static void le_conn_complete_evt(const void *data, uint8_t size)
+>>               assign_handle(le16_to_cpu(evt->handle), 0x01);
+>> }
+>>
+>> +static void adv_free(void *data)
+>> +{
+>> +     struct adv_data *adv = data;
+>> +
+>> +     free(adv->data);
+>> +     free(adv);
+>> +}
+>> +
+>> +static bool match_adv(const void *data, const void *user_data)
+>> +{
+>> +     const struct adv_data *adv = data;
+>> +     const struct bt_hci_evt_le_adv_report *evt = user_data;
+>> +
+>> +     if (memcmp(&adv->evt, evt, sizeof(*evt)))
+>> +             return false;
+>> +
+>> +     return memcmp(adv->data, evt->data, evt->data_len) == 0;
+>> +}
+>> +
+>> +static void adv_timeout(int id, void *data)
+>> +{
+>> +     struct adv_data *adv = data;
+>> +
+>> +     /* Remove from check (adv is freed after returning) */
+>> +     queue_remove(adv->cache, adv);
+>> +
+>> +     mainloop_remove_timeout(adv->timeout);
+>> +}
+>> +
+>> static void le_adv_report_evt(const void *data, uint8_t size)
+>> {
+>>       const struct bt_hci_evt_le_adv_report *evt = data;
+>> +     struct index_data *idata = &index_list[index_current];
+>> +     struct adv_data *match;
+>> +     struct adv_data *adv;
+>>       uint8_t evt_len;
+>>       int8_t *rssi;
+>>
+>> +     if (!idata->adv_cache)
+>> +             idata->adv_cache = queue_new();
+>> +
+>> +     adv = queue_remove_if(idata->adv_cache, match_adv, (void *) evt);
+>> +     if (adv) {
+>> +             /* Update cache and modify expire timeout */
+>> +             if (mainloop_modify_timeout(adv->timeout, ADV_TIMEOUT) < 0) {
+>> +                     mainloop_remove_timeout(adv->timeout);
+>> +                     adv->timeout = mainloop_add_timeout(ADV_TIMEOUT,
+>> +                                                     adv_timeout, adv,
+>> +                                                     adv_free);
+>> +             }
+>> +             queue_push_head(idata->adv_cache, adv);
+>> +             print_field("Duplicate of #%zu", adv->frame);
+>> +             size = 0;
+>> +             goto rssi;
+>> +     }
+>> +
+>> +     match = new0(struct adv_data, 1);
+>> +     match->evt = *evt;
+>> +
+>> +     match->data = malloc(evt->data_len);
+>> +     memcpy(match->data, evt->data, evt->data_len);
+>> +
+>> +     match->cache = idata->adv_cache;
+>> +     match->frame = idata->frame;
+>> +     match->timeout = mainloop_add_timeout(ADV_TIMEOUT, adv_timeout, match,
+>> +                                             adv_free);
+>> +     if (match->timeout <= 0) {
+>> +             print_field("Cannot cache: %s (%d)", strerror(-match->timeout),
+>> +                                                     match->timeout);
+>> +             adv_free(match);
+>> +             goto print;
+>> +     }
+>
+> for a tool like btmon since is clearly the wrong approach. If the wire is verbose, then so be it. If someone wants to filter via BPF, that is fine, but this magic is not scalable.
 
-Put those urbs in tx_anchor to avoid the leak, and also fix the error
-handling.
+Wireshark and the like seems to be able to detect duplicated
+referencing the frame it has occurred which is what Im attempting to
+do here.
 
-Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
----
+There doesn't seems to be a way to save context in BPF, the filter
+runs on each packet, and even if we could build things like a packet
+cache in BPF asm might not be the most trivial thing to maintain.
 
-Changes in v6:
-Don't print error msg when dropping urbs, since we already log it when
-failed to submit.
+The scalable part I don't really get it, there are limits for both
+number of entries and time they stay in cache so the lookups are quite
+cheap actually and we can actually reduce the number even further if
+we just maintain the last adv per address.
 
-Changes in v5:
-Fix compile warning reported by "kbuild test robot":
-drivers/bluetooth/btusb.c:3288:3: warning: 'err' may be used uninitialized in this function [-Wmaybe-uninitialized]
-This 'err' would be set in the send loop, and would be used in the
-cleanup rest urb code outside the loop.
-
-Changes in v4:
-Drop the rest deferred urbs when error happens.
-
-Changes in v3:
-Put the deferred urbs in tx_anchor.
-
-Changes in v2:
-Call usb_free_urb instead of reusing submit_tx_urb.
-
- drivers/bluetooth/btusb.c | 19 +++++++++++++++++--
- 1 file changed, 17 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 0d533b2..fa3de4f 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -3266,13 +3266,28 @@ static void play_deferred(struct btusb_data *data)
- 	int err;
- 
- 	while ((urb = usb_get_from_anchor(&data->deferred))) {
-+		usb_anchor_urb(urb, &data->tx_anchor);
-+
- 		err = usb_submit_urb(urb, GFP_ATOMIC);
--		if (err < 0)
-+		if (err < 0) {
-+			if (err != -EPERM && err != -ENODEV)
-+				BT_ERR("%s urb %p submission failed (%d)",
-+				       data->hdev->name, urb, -err);
-+			kfree(urb->setup_packet);
-+			usb_unanchor_urb(urb);
-+			usb_free_urb(urb);
- 			break;
-+		}
- 
- 		data->tx_in_flight++;
-+		usb_free_urb(urb);
-+	}
-+
-+	/* Cleanup the rest deferred urbs. */
-+	while ((urb = usb_get_from_anchor(&data->deferred))) {
-+		kfree(urb->setup_packet);
-+		usb_free_urb(urb);
- 	}
--	usb_scuttle_anchored_urbs(&data->deferred);
- }
- 
- static int btusb_resume(struct usb_interface *intf)
 -- 
-2.1.4
+Luiz Augusto von Dentz
