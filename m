@@ -1,62 +1,42 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3 1/6] monitor: Add AD/EIR types for mesh
-Date: Thu, 20 Jul 2017 14:36:12 +0300
-Message-Id: <20170720113617.6895-1-luiz.dentz@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <linux-kernel-owner@vger.kernel.org>
+Message-ID: <59708C48.3020500@rock-chips.com>
+Date: Thu, 20 Jul 2017 18:56:08 +0800
+From: jeffy <jeffy.chen@rock-chips.com>
+MIME-Version: 1.0
+To: Oliver Neukum <oneukum@suse.com>, linux-kernel@vger.kernel.org
+CC: briannorris@chromium.org, dianders@chromium.org,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        xiyou.wangcong@gmail.com, Marcel Holtmann <marcel@holtmann.org>,
+        Gustavo Padovan <gustavo@padovan.org>,
+        linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v5] Bluetooth: btusb: Fix memory leak in play_deferred
+References: <1500511321-16092-1-git-send-email-jeffy.chen@rock-chips.com> <1500541861.10409.2.camel@suse.com>
+In-Reply-To: <1500541861.10409.2.camel@suse.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Oliver,
 
-Print out mesh type and payload:
-
-> HCI Event: LE Meta Event (0x3e) plen 33
-      LE Advertising Report (0x02)
-        Num reports: 1
-        Event type: Non connectable undirected - ADV_NONCONN_IND (0x03)
-        Address type: Random (0x01)
-        Address: 29:D0:F2:61:17:B0 (Non-Resolvable)
-        Data length: 21
-        Mesh Data: 59a7ddee2e1f580463521b98c40c2a3b5086c6
-        RSSI: -72 dBm (0xb8)
----
- monitor/packet.c | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
-
-diff --git a/monitor/packet.c b/monitor/packet.c
-index a3d188a..cc24165 100644
---- a/monitor/packet.c
-+++ b/monitor/packet.c
-@@ -3259,6 +3259,9 @@ static void print_fec(uint8_t fec)
- #define BT_EIR_TRANSPORT_DISCOVERY	0x26
- #define BT_EIR_LE_SUPPORTED_FEATURES	0x27
- #define BT_EIR_CHANNEL_MAP_UPDATE_IND	0x28
-+#define BT_EIR_MESH_DATA		0x29
-+#define BT_EIR_MESH_PROV		0x2a
-+#define BT_EIR_MESH_BEACON		0x2b
- #define BT_EIR_3D_INFO_DATA		0x3d
- #define BT_EIR_MANUFACTURER_DATA	0xff
- 
-@@ -3720,6 +3723,18 @@ static void print_eir(const uint8_t *eir, uint8_t eir_len, bool le)
- 			print_field("  Path Loss Threshold: %d", data[1]);
- 			break;
- 
-+		case BT_EIR_MESH_DATA:
-+			print_hex_field("Mesh Data", data, data_len);
-+			break;
-+
-+		case BT_EIR_MESH_PROV:
-+			print_hex_field("Mesh Provisioning", data, data_len);
-+			break;
-+
-+		case BT_EIR_MESH_BEACON:
-+			print_hex_field("Mesh Beacon", data, data_len);
-+			break;
-+
- 		case BT_EIR_MANUFACTURER_DATA:
- 			if (data_len < 2)
- 				break;
--- 
-2.9.4
-
+On 07/20/2017 05:11 PM, Oliver Neukum wrote:
+>> >+		if (err < 0) {
+>> >+			if (err != -EPERM && err != -ENODEV)
+>> >+				BT_ERR("%s urb %p submission failed (%d)",
+>> >+				       data->hdev->name, urb, -err);
+>> >+			kfree(urb->setup_packet);
+>> >+			usb_unanchor_urb(urb);
+>> >+			usb_free_urb(urb);
+>> >  			break;
+>> >+		}
+>> >
+>> >  		data->tx_in_flight++;
+>> >+		usb_free_urb(urb);
+>> >+	}
+>> >+
+>> >+	/* Cleanup the rest deferred urbs. */
+>> >+	while ((urb = usb_get_from_anchor(&data->deferred))) {
+>> >+		BT_ERR("%s urb %p submission failed (%d)",
+> This looks very good, except for this message, which is incorrect.
+>
+hmm, since we already print error log when submission failed before, 
+i'll remove this, thanks.
