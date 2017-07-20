@@ -1,187 +1,42 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Subject: Re: [PATCH v2 3/6] monitor: Filter duplicated advertisements
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CABBYNZ+WLXGw_22ffa97B+oTm5nkyZdFgAsri0pHgznd0qyx+w@mail.gmail.com>
-Date: Fri, 21 Jul 2017 08:33:48 +0200
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Message-Id: <791FB615-59BE-4C67-AE20-E5344CA4F919@holtmann.org>
-References: <20170719130909.24702-1-luiz.dentz@gmail.com>
- <20170719130909.24702-3-luiz.dentz@gmail.com>
- <64470655-51FF-4B41-ADCD-7B94EB7E9B80@holtmann.org>
- <CABBYNZ+Hbee9T=F7gCP=ejMRHjW1+obxZEh1NGwtK+WnPJYNOg@mail.gmail.com>
- <9215524F-06D4-4958-B0FA-B667903E996A@holtmann.org>
- <CABBYNZ+WLXGw_22ffa97B+oTm5nkyZdFgAsri0pHgznd0qyx+w@mail.gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <ian@mnementh.co.uk>
+Subject: Re: [PATCH] hciattach: bcm43xx: fix the delay timer for firmware
+ download
+To: Marcel Holtmann <marcel@holtmann.org>, maxin.john@gmail.com
+Cc: "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+ Andy Duan <fugang.duan@nxp.com>, "Maxin B. John" <maxin.john@intel.com>
+References: <1500556499-2146-1-git-send-email-maxin.john@gmail.com>
+ <0F93CDF6-8019-4744-B02B-0C9BD44F9D0B@holtmann.org>
+From: Ian Molton <ian@mnementh.co.uk>
+Message-ID: <768de172-bf01-e9ea-a4c9-ea8f46cf5f1d@mnementh.co.uk>
+Date: Thu, 20 Jul 2017 23:28:23 +0100
+MIME-Version: 1.0
+In-Reply-To: <0F93CDF6-8019-4744-B02B-0C9BD44F9D0B@holtmann.org>
+Content-Type: text/plain; charset=windows-1252
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
-
->>>>> This reduces the verbosity and give a precise picture of how unique
->>>>> each report is.
->>>>> ---
->>>>> monitor/packet.c | 89 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
->>>>> 1 file changed, 89 insertions(+)
->>>>> 
->>>>> diff --git a/monitor/packet.c b/monitor/packet.c
->>>>> index cc24165..4ed0faa 100644
->>>>> --- a/monitor/packet.c
->>>>> +++ b/monitor/packet.c
->>>>> @@ -42,7 +42,9 @@
->>>>> #include "lib/hci.h"
->>>>> #include "lib/hci_lib.h"
->>>>> 
->>>>> +#include "src/shared/mainloop.h"
->>>>> #include "src/shared/util.h"
->>>>> +#include "src/shared/queue.h"
->>>>> #include "src/shared/btsnoop.h"
->>>>> #include "display.h"
->>>>> #include "bt.h"
->>>>> @@ -100,6 +102,9 @@
->>>>> 
->>>>> #define COLOR_PHY_PACKET              COLOR_BLUE
->>>>> 
->>>>> +#define ADV_TIMEOUT                  3000
->>>>> +#define ADV_MAX_CACHE                        100
->>>>> +
->>>>> static time_t time_offset = ((time_t) -1);
->>>>> static int priority_level = BTSNOOP_PRIORITY_INFO;
->>>>> static unsigned long filter_mask = 0;
->>>>> @@ -267,11 +272,20 @@ void packet_select_index(uint16_t index)
->>>>> 
->>>>> #define MAX_INDEX 16
->>>>> 
->>>>> +struct adv_data {
->>>>> +     struct bt_hci_evt_le_adv_report evt;
->>>>> +     void *data;
->>>>> +     size_t frame;
->>>>> +     int timeout;
->>>>> +     struct queue *cache;
->>>>> +};
->>>>> +
->>>>> struct index_data {
->>>>>     uint8_t  type;
->>>>>     uint8_t  bdaddr[6];
->>>>>     uint16_t manufacturer;
->>>>>     size_t  frame;
->>>>> +     struct queue *adv_cache;
->>>>> };
->>>>> 
->>>>> static struct index_data index_list[MAX_INDEX];
->>>>> @@ -8587,12 +8601,86 @@ static void le_conn_complete_evt(const void *data, uint8_t size)
->>>>>             assign_handle(le16_to_cpu(evt->handle), 0x01);
->>>>> }
->>>>> 
->>>>> +static void adv_free(void *data)
->>>>> +{
->>>>> +     struct adv_data *adv = data;
->>>>> +
->>>>> +     free(adv->data);
->>>>> +     free(adv);
->>>>> +}
->>>>> +
->>>>> +static bool match_adv(const void *data, const void *user_data)
->>>>> +{
->>>>> +     const struct adv_data *adv = data;
->>>>> +     const struct bt_hci_evt_le_adv_report *evt = user_data;
->>>>> +
->>>>> +     if (memcmp(&adv->evt, evt, sizeof(*evt)))
->>>>> +             return false;
->>>>> +
->>>>> +     return memcmp(adv->data, evt->data, evt->data_len) == 0;
->>>>> +}
->>>>> +
->>>>> +static void adv_timeout(int id, void *data)
->>>>> +{
->>>>> +     struct adv_data *adv = data;
->>>>> +
->>>>> +     /* Remove from check (adv is freed after returning) */
->>>>> +     queue_remove(adv->cache, adv);
->>>>> +
->>>>> +     mainloop_remove_timeout(adv->timeout);
->>>>> +}
->>>>> +
->>>>> static void le_adv_report_evt(const void *data, uint8_t size)
->>>>> {
->>>>>     const struct bt_hci_evt_le_adv_report *evt = data;
->>>>> +     struct index_data *idata = &index_list[index_current];
->>>>> +     struct adv_data *match;
->>>>> +     struct adv_data *adv;
->>>>>     uint8_t evt_len;
->>>>>     int8_t *rssi;
->>>>> 
->>>>> +     if (!idata->adv_cache)
->>>>> +             idata->adv_cache = queue_new();
->>>>> +
->>>>> +     adv = queue_remove_if(idata->adv_cache, match_adv, (void *) evt);
->>>>> +     if (adv) {
->>>>> +             /* Update cache and modify expire timeout */
->>>>> +             if (mainloop_modify_timeout(adv->timeout, ADV_TIMEOUT) < 0) {
->>>>> +                     mainloop_remove_timeout(adv->timeout);
->>>>> +                     adv->timeout = mainloop_add_timeout(ADV_TIMEOUT,
->>>>> +                                                     adv_timeout, adv,
->>>>> +                                                     adv_free);
->>>>> +             }
->>>>> +             queue_push_head(idata->adv_cache, adv);
->>>>> +             print_field("Duplicate of #%zu", adv->frame);
->>>>> +             size = 0;
->>>>> +             goto rssi;
->>>>> +     }
->>>>> +
->>>>> +     match = new0(struct adv_data, 1);
->>>>> +     match->evt = *evt;
->>>>> +
->>>>> +     match->data = malloc(evt->data_len);
->>>>> +     memcpy(match->data, evt->data, evt->data_len);
->>>>> +
->>>>> +     match->cache = idata->adv_cache;
->>>>> +     match->frame = idata->frame;
->>>>> +     match->timeout = mainloop_add_timeout(ADV_TIMEOUT, adv_timeout, match,
->>>>> +                                             adv_free);
->>>>> +     if (match->timeout <= 0) {
->>>>> +             print_field("Cannot cache: %s (%d)", strerror(-match->timeout),
->>>>> +                                                     match->timeout);
->>>>> +             adv_free(match);
->>>>> +             goto print;
->>>>> +     }
->>>> 
->>>> for a tool like btmon since is clearly the wrong approach. If the wire is verbose, then so be it. If someone wants to filter via BPF, that is fine, but this magic is not scalable.
->>> 
->>> Wireshark and the like seems to be able to detect duplicated
->>> referencing the frame it has occurred which is what Im attempting to
->>> do here.
->> 
->> but these are not actually duplicates. These are frames from the controller that it received, because you told it to. I am really disliking this approach a lot in btmon. If you want to build a dedicated meshmon tool that enables full duty cycle passive scanning and detects duplicates, then fine, but not in btmon.
+On 20/07/17 19:23, Marcel Holtmann wrote:
 > 
-> Im not so fond of forking tools like this, most of the MGMT commands
-> and HCI traffic is pretty low profile including outgoing adv traffic
-> etc, but perhaps you want to combine outputs of meshmon with btmon.
+> However I would prefer if we stop using hciattach and focus on hci_bcm.c support with btattach and serdev.
 
-I think that a meshmon is needed. It also needs to be able to drive special hardware to switch into full duty cycle scanning on all 3 channels. So fundamentally 3 Zephyr controller with our mesh specific extensions is what you want meshmon to drive. Since that is the only way to actually do a proper analysis of the full network. So whatever we hack into btmon right now is just a bandaid.
+I can resubmit my serdev driver if you like? It needs a little cleanup
+but its been solid here over the last week or two. Mostly its missing
+some runtime PM support (I cant test that as my device is crippled and
+has no host-wakeup or device-suspend lines).
 
-And I am still holding my position, if you do full duty cycle scanning without duplicate filtering, then that is what you get. Tons of advertising reports from all around you. Frankly it would make more sense to have some filter options on ADV_NONCONN_IND and AD type than trying to come with a magic hammer of reducing all duplicates. Reality is that mesh packets will only repeated for really short period of time.
+I cant see a nice way to integrate it with the existing driver due to
+the fact that it differs markedly in the routines that need pointers to
+the serio structures.
 
->>> There doesn't seems to be a way to save context in BPF, the filter
->>> runs on each packet, and even if we could build things like a packet
->>> cache in BPF asm might not be the most trivial thing to maintain.
->>> 
->>> The scalable part I don't really get it, there are limits for both
->>> number of entries and time they stay in cache so the lookups are quite
->>> cheap actually and we can actually reduce the number even further if
->>> we just maintain the last adv per address.
->> 
->> Today it is this filter, in a month it is another and by the end of the year we have 50 custom filter hacks included. I really do not want that. If BPF is limited right now, then lets try to extend it.
-> 
-> I don't think BPF can do duplicate filtering or rate limit alone, it
-> is stateless, but anyway if you want to sit and hope someone
-> transforms BPF into stateful programs rather than simple filters I
-> guess we will be waiting for a long while.
+The non-serio version uses a linked list that it traverses during
+startup to reconcile the port with the tty. Its a much uglier way to do
+it, but kinda by necessity.
 
-I am pretty sure it can store states or hashes somehow. And if not it can be extended.
+Is there any particular issue with having both drivers in-tree?
 
-Regards
+A lot of legacy hardware will *never* use the serio method as it doesn't
+have the information available from firmware as to which serio device it
+should attach to. I guess some of the ACPI versions might be adaptable,
+but that would require some kind of ACPI->serio mapping that I'm not
+sure exists at present? ICBW though?
 
-Marcel
-
+-Ian
