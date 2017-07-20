@@ -1,94 +1,100 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-From: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
-Subject: [PATCH BlueZ] plugins: Fix reconnect_interval for cases of improper
- main.conf
-Message-ID: <01a05144-a446-cf88-4f16-ce230c27474c@jp.fujitsu.com>
-Date: Thu, 20 Jul 2017 15:22:19 +0900
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <jeffy.chen@rock-chips.com>
+From: Jeffy Chen <jeffy.chen@rock-chips.com>
+To: linux-kernel@vger.kernel.org,
+	oneukum@suse.com
+Cc: xiyou.wangcong@gmail.com,
+	briannorris@chromium.org,
+	dianders@chromium.org,
+	Jeffy Chen <jeffy.chen@rock-chips.com>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	linux-bluetooth@vger.kernel.org
+Subject: [PATCH v5] Bluetooth: btusb: Fix memory leak in play_deferred
+Date: Thu, 20 Jul 2017 08:42:01 +0800
+Message-Id: <1500511321-16092-1-git-send-email-jeffy.chen@rock-chips.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-There are two problems:
+Currently we are calling usb_submit_urb directly to submit deferred tx
+urbs after unanchor them.
 
- - When main.conf is not found, bluetoothd copies short the default set
-   of reconnecting intervals to reconnect_interval. It does not match
-   the reconnct_interval_len used as the array length.
-   So if a link of device is disconnected, bluetoothd is run over
-   reconnect_interval as time proceeds and will not time out as expected.
+So the usb_giveback_urb_bh would failed to unref it in usb_unanchor_urb
+and cause memory leak:
+unreferenced object 0xffffffc0ce0fa400 (size 256):
+...
+  backtrace:
+    [<ffffffc00034a9a8>] __save_stack_trace+0x48/0x6c
+    [<ffffffc00034b088>] create_object+0x138/0x254
+    [<ffffffc0009d5504>] kmemleak_alloc+0x58/0x8c
+    [<ffffffc000345f78>] __kmalloc+0x1d4/0x2a0
+    [<ffffffc0006765bc>] usb_alloc_urb+0x30/0x60
+    [<ffffffbffc128598>] alloc_ctrl_urb+0x38/0x120 [btusb]
+    [<ffffffbffc129e7c>] btusb_send_frame+0x64/0xf8 [btusb]
 
-   bluetooothd with --debug option outputed the following log in my box:
+Put those urbs in tx_anchor to avoid the leak, and also fix the error
+handling.
 
-     plugins/policy.c:reconnect_set_timer() attempt 1/7 1 seconds
-     plugins/policy.c:reconnect_timeout() Reconnecting profiles
-     plugins/policy.c:conn_fail_cb() status 4
-     plugins/policy.c:reconnect_set_timer() attempt 2/7 2 seconds
-     plugins/policy.c:reconnect_timeout() Reconnecting profiles
-     plugins/policy.c:conn_fail_cb() status 4
-     plugins/policy.c:reconnect_set_timer() attempt 3/7 0 seconds
-     plugins/policy.c:reconnect_timeout() Reconnecting profiles
-     plugins/policy.c:conn_fail_cb() status 4
-     plugins/policy.c:reconnect_set_timer() attempt 4/7 0 seconds
-
- - When ReconnectIntervals in main.conf includes invalid characters,
-   reconnct_interval_len value is bigger than the default array length.
-   So if ReconnectAttempts value in main.conf is bigger than
-   reconnct_interval_len value and a link of device is disconnected,
-   bluetoothd is run over reconnect_interval as time proceeds and will 
-   not time out as expected.
-
-   bluetooothd with --debug option outputed the following log in my box,
-   if ReconnectAttempts value was 28 and ReconnectIntervals was inproper:
-
-     ...
-     plugins/policy.c:reconnect_set_timer() attempt 6/28 32 seconds
-     plugins/policy.c:reconnect_timeout() Reconnecting profiles
-     plugins/policy.c:conn_fail_cb() status 4
-     plugins/policy.c:reconnect_set_timer() attempt 7/28 64 seconds
-     plugins/policy.c:reconnect_timeout() Reconnecting profiles
-     plugins/policy.c:conn_fail_cb() status 4
-     plugins/policy.c:reconnect_set_timer() attempt 8/28 0 seconds
-     ...
-     plugins/policy.c:reconnect_set_timer() attempt 25/28 1 seconds
-     plugins/policy.c:reconnect_timeout() Reconnecting profiles
-     plugins/policy.c:conn_fail_cb() status 4
-     plugins/policy.c:reconnect_set_timer() attempt 26/28 3 seconds
-     plugins/policy.c:reconnect_timeout() Reconnecting profiles
-     plugins/policy.c:conn_fail_cb() status 4
-     plugins/policy.c:reconnect_set_timer() attempt 27/28 110683472 seconds
-
-This fix properly uses the default set of reconnecting intervals.
+Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
 ---
- plugins/policy.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/plugins/policy.c b/plugins/policy.c
-index c54878a..1f5a506 100644
---- a/plugins/policy.c
-+++ b/plugins/policy.c
-@@ -778,7 +778,7 @@ static int policy_init(void)
- 		reconnect_intervals_len = sizeof(default_intervals) /
- 						sizeof(*reconnect_intervals);
- 		reconnect_intervals = g_memdup(default_intervals,
--						reconnect_intervals_len);
-+						sizeof(default_intervals));
- 		goto done;
- 	}
+Changes in v5:
+Fix compile warning reported by "kbuild test robot":
+drivers/bluetooth/btusb.c:3288:3: warning: 'err' may be used uninitialized in this function [-Wmaybe-uninitialized]
+This 'err' would be set in the send loop, and would be used in the
+cleanup rest urb code outside the loop.
+
+Changes in v4:
+Drop the rest deferred urbs when error happens.
+
+Changes in v3:
+Put the deferred urbs in tx_anchor.
+
+Changes in v2:
+Call usb_free_urb instead of reusing submit_tx_urb.
+
+ drivers/bluetooth/btusb.c | 23 ++++++++++++++++++++---
+ 1 file changed, 20 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 0d533b2..91fdd60 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -3263,16 +3263,33 @@ static int btusb_suspend(struct usb_interface *intf, pm_message_t message)
+ static void play_deferred(struct btusb_data *data)
+ {
+ 	struct urb *urb;
+-	int err;
++	int err = 0;
  
-@@ -806,9 +806,10 @@ static int policy_init(void)
- 					&gerr);
- 	if (gerr) {
- 		g_clear_error(&gerr);
--		reconnect_intervals_len = sizeof(default_intervals);
-+		reconnect_intervals_len = sizeof(default_intervals) /
-+						sizeof(*reconnect_intervals);
- 		reconnect_intervals = g_memdup(default_intervals,
--						reconnect_intervals_len);
-+						sizeof(default_intervals));
- 	}
+ 	while ((urb = usb_get_from_anchor(&data->deferred))) {
++		usb_anchor_urb(urb, &data->tx_anchor);
++
+ 		err = usb_submit_urb(urb, GFP_ATOMIC);
+-		if (err < 0)
++		if (err < 0) {
++			if (err != -EPERM && err != -ENODEV)
++				BT_ERR("%s urb %p submission failed (%d)",
++				       data->hdev->name, urb, -err);
++			kfree(urb->setup_packet);
++			usb_unanchor_urb(urb);
++			usb_free_urb(urb);
+ 			break;
++		}
  
- 	auto_enable = g_key_file_get_boolean(conf, "Policy", "AutoEnable",
+ 		data->tx_in_flight++;
++		usb_free_urb(urb);
++	}
++
++	/* Cleanup the rest deferred urbs. */
++	while ((urb = usb_get_from_anchor(&data->deferred))) {
++		BT_ERR("%s urb %p submission failed (%d)",
++		       data->hdev->name, urb, -err);
++		kfree(urb->setup_packet);
++		usb_free_urb(urb);
+ 	}
+-	usb_scuttle_anchored_urbs(&data->deferred);
+ }
+ 
+ static int btusb_resume(struct usb_interface *intf)
 -- 
-2.7.4
-
+2.1.4
