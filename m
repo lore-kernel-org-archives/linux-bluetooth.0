@@ -1,43 +1,150 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: maxin.john@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Cc: Andy Duan <fugang.duan@nxp.com>,
-        "Maxin B. John" <maxin.john@intel.com>
-Subject: [PATCH] hciattach: bcm43xx: fix the delay timer for firmware download
-Date: Thu, 20 Jul 2017 16:14:59 +0300
-Message-Id: <1500556499-2146-1-git-send-email-maxin.john@gmail.com>
+From: Martin Grothe <martin.grothe@rub.de>
+Subject: kernel smp.c functions not called by Bluetootl LE controller
+Message-ID: <38d8a549-4335-cf0b-9273-d9ef9b51ac0b@rub.de>
+Date: Thu, 20 Jul 2017 14:59:55 +0200
+MIME-Version: 1.0
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256; boundary="------------ms050309040601080408030804"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andy Duan <fugang.duan@nxp.com>
+This is a cryptographically signed message in MIME format.
 
->From the log in .bcm43xx_load_firmware():
-        /* Wait 50ms to let the firmware placed in download mode */
-        nanosleep(&tm_mode, NULL);
+--------------ms050309040601080408030804
+Content-Type: text/plain; charset=utf-8
+Content-Language: de-DE
+Content-Transfer-Encoding: quoted-printable
 
-But timespec tm_mode is real is 50us. Correct the delayed timer count.
+Hi,
+I try to call printk (with priority KERN_ALERT) functions placed in the
+net/bluetooth/smp.c file of my linux kernel 4.9.35 in order to get
+output from specifc functions like:
 
-Signed-off-by: Fugang Duan <fugang.duan@nxp.com>
-Signed-off-by: Maxin B. John <maxin.john@intel.com>
----
- tools/hciattach_bcm43xx.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+static int smp_cmd_public_key()
 
-diff --git a/tools/hciattach_bcm43xx.c b/tools/hciattach_bcm43xx.c
-index 81f38cb..ac1b3c1 100644
---- a/tools/hciattach_bcm43xx.c
-+++ b/tools/hciattach_bcm43xx.c
-@@ -228,8 +228,8 @@ static int bcm43xx_set_speed(int fd, struct termios *ti, uint32_t speed)
- static int bcm43xx_load_firmware(int fd, const char *fw)
- {
- 	unsigned char cmd[] = { HCI_COMMAND_PKT, 0x2e, 0xfc, 0x00 };
--	struct timespec tm_mode = { 0, 50000 };
--	struct timespec tm_ready = { 0, 2000000 };
-+	struct timespec tm_mode = { 0, 50000000 };
-+	struct timespec tm_ready = { 0, 200000000 };
- 	unsigned char resp[CC_MIN_SIZE];
- 	unsigned char tx_buf[1024];
- 	int len, fd_fw, n;
--- 
-2.4.0
+But during a pairing with another bluetooth LE device the output of
+these function is never shown in /var/log/kern.log
 
+Is there any way to verify, that the LE Controller accesses the Security
+Manager Protocol source code the Linux Kernel?
+
+As far as I understood the Core Specification, in BT 4.0 an above the
+Security Manager is always integrated in the Link Manager, when it comes
+to BR/EDR. But for LE the SM is integrated in the Host part and not the
+Controller. Thus LE Controller should access the smp.c in the Linux kerne=
+l.
+
+Kind Regards,
+Martin Grothe
+
+
+--------------ms050309040601080408030804
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
+
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCC
+ELkwggTVMIIDvaADAgECAghQTsb1PRG0ZDANBgkqhkiG9w0BAQsFADBxMQswCQYDVQQGEwJE
+RTEcMBoGA1UEChMTRGV1dHNjaGUgVGVsZWtvbSBBRzEfMB0GA1UECxMWVC1UZWxlU2VjIFRy
+dXN0IENlbnRlcjEjMCEGA1UEAxMaRGV1dHNjaGUgVGVsZWtvbSBSb290IENBIDIwHhcNMTQw
+NzIyMTIwODI2WhcNMTkwNzA5MjM1OTAwWjBaMQswCQYDVQQGEwJERTETMBEGA1UEChMKREZO
+LVZlcmVpbjEQMA4GA1UECxMHREZOLVBLSTEkMCIGA1UEAxMbREZOLVZlcmVpbiBQQ0EgR2xv
+YmFsIC0gRzAxMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA6ZvDZ4X5Da71jVTD
+llA1PWLpbkztlNcAW5UidNQg6zSP1uzAMQQLmYHiphTSUqAoI4SLdIkEXlvg4njBeMsWyyg1
+OXstkEXQ7aAAeny/Sg4bAMOG6VwrMRF7DPOCJEOMHDiLamgAmu7cT3ir0sYTm3at7t4m6O8B
+r3QPwQmi9mvOvdPNFDBP9eXjpMhim4IaAycwDQJlYE3t0QkjKpY1WCfTdsZxtpAdxO3/NYZ9
+bzOz2w/FEcKKg6GUXUFr2NIQ9Uz9ylGs2b3vkoO72uuLFlZWQ8/h1RM9ph8nMM1JVNvJEzSa
+cXXFbOqnC5j5IZ0nrz6jOTlIaoytyZn7wxLyvQIDAQABo4IBhjCCAYIwDgYDVR0PAQH/BAQD
+AgEGMB0GA1UdDgQWBBRJt8bP6D0ff+pEexMp9/EKcD7eZDAfBgNVHSMEGDAWgBQxw3kbuvVT
+1xfgiXotF2wKsyudMzASBgNVHRMBAf8ECDAGAQH/AgECMGIGA1UdIARbMFkwEQYPKwYBBAGB
+rSGCLAEBBAICMBEGDysGAQQBga0hgiwBAQQDADARBg8rBgEEAYGtIYIsAQEEAwEwDwYNKwYB
+BAGBrSGCLAEBBDANBgsrBgEEAYGtIYIsHjA+BgNVHR8ENzA1MDOgMaAvhi1odHRwOi8vcGtp
+MDMzNi50ZWxlc2VjLmRlL3JsL0RUX1JPT1RfQ0FfMi5jcmwweAYIKwYBBQUHAQEEbDBqMCwG
+CCsGAQUFBzABhiBodHRwOi8vb2NzcDAzMzYudGVsZXNlYy5kZS9vY3NwcjA6BggrBgEFBQcw
+AoYuaHR0cDovL3BraTAzMzYudGVsZXNlYy5kZS9jcnQvRFRfUk9PVF9DQV8yLmNlcjANBgkq
+hkiG9w0BAQsFAAOCAQEAYyAo/ZwhhnK+OUZZOTIlvKkBmw3Myn1BnIZtCm4ssxNZdbEzkhth
+Jxb/w7LVNYL7hCoBSb1mu2YvssIGXW4/buMBWlvKQ2NclbbhMacf1QdfTeZlgk4y+cN8ekvN
+TVx07iHydQLsUj7SyWrTkCNuSWc1vn9NVqTszC/Pt6GXqHI+ybxA1lqkCD3WvILDt7cyjrEs
+jmpttzUCGc/1OURYY6ckABCwu/xOr24vOLulV0k/2G5QbyyXltwdRpplic+uzPLl2Z9Tsz6h
+L5Kp2AvGhB8Exuse6J99tXulAvEkxSRjETTMWpMgKnmIOiVCkKllO3yG0xIVIyn8LNrMOVtU
+FzCCBZEwggR5oAMCAQICBxekJHW1yvgwDQYJKoZIhvcNAQELBQAwWjELMAkGA1UEBhMCREUx
+EzARBgNVBAoTCkRGTi1WZXJlaW4xEDAOBgNVBAsTB0RGTi1QS0kxJDAiBgNVBAMTG0RGTi1W
+ZXJlaW4gUENBIEdsb2JhbCAtIEcwMTAeFw0xNDA1MjcxNDUzMjVaFw0xOTA3MDkyMzU5MDBa
+MIGuMQswCQYDVQQGEwJERTEcMBoGA1UECBMTTm9yZHJoZWluLVdlc3RmYWxlbjEPMA0GA1UE
+BxMGQm9jaHVtMSEwHwYDVQQKExhSdWhyLVVuaXZlcnNpdGFldCBCb2NodW0xJDAiBgNVBAMT
+G1J1aHItVW5pdmVyc2l0YWV0IEJvY2h1bSBDQTEnMCUGCSqGSIb3DQEJARYYcnViY2FAcnVo
+ci11bmktYm9jaHVtLmRlMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtIGt9mPn
+TWezxFORNckfxxbD4S+6e+QRP2Yc9mNhRO68OriMqdX4tExeysXlOU+iIoSUpssBLLWiEmPn
+HVwUWd1rK0884nzc0iRP1DQjqtKZ7ffZkOdpX5Aobd1pVqGfrqKs1dw8zLZvOORe4+HUI8Sw
+WQwyZZIMP7c36RmUQLP7Q+OYC7hfYQvkf+Gnvb7ADBChob+aqof3ePChqsBpkKE3SMuUiD18
+44egELSa9rahkXTEwbvhmd1KSFnmmk3TJKamE347y4FFJaY5DShfWh8jrbgAQ1yMWadps+/r
+VpfSIj+aCLGUNEcjsL2sPUVjLp4sZf2j5mj4DcwM55/tTQIDAQABo4ICBTCCAgEwEgYDVR0T
+AQH/BAgwBgEB/wIBATAOBgNVHQ8BAf8EBAMCAQYwEQYDVR0gBAowCDAGBgRVHSAAMB0GA1Ud
+DgQWBBS7Kbg7XwQk44twe2B/Nm8XYcuukjAfBgNVHSMEGDAWgBRJt8bP6D0ff+pEexMp9/EK
+cD7eZDAjBgNVHREEHDAagRhydWJjYUBydWhyLXVuaS1ib2NodW0uZGUwgYgGA1UdHwSBgDB+
+MD2gO6A5hjdodHRwOi8vY2RwMS5wY2EuZGZuLmRlL2dsb2JhbC1yb290LWNhL3B1Yi9jcmwv
+Y2FjcmwuY3JsMD2gO6A5hjdodHRwOi8vY2RwMi5wY2EuZGZuLmRlL2dsb2JhbC1yb290LWNh
+L3B1Yi9jcmwvY2FjcmwuY3JsMIHXBggrBgEFBQcBAQSByjCBxzAzBggrBgEFBQcwAYYnaHR0
+cDovL29jc3AucGNhLmRmbi5kZS9PQ1NQLVNlcnZlci9PQ1NQMEcGCCsGAQUFBzAChjtodHRw
+Oi8vY2RwMS5wY2EuZGZuLmRlL2dsb2JhbC1yb290LWNhL3B1Yi9jYWNlcnQvY2FjZXJ0LmNy
+dDBHBggrBgEFBQcwAoY7aHR0cDovL2NkcDIucGNhLmRmbi5kZS9nbG9iYWwtcm9vdC1jYS9w
+dWIvY2FjZXJ0L2NhY2VydC5jcnQwDQYJKoZIhvcNAQELBQADggEBAC7X1UserO56Dmauc3V2
++E3iY522sDt4VqGL1J9FjPVO3LZYOidi1jm7qmYh8zeR6LK7k7EzOMWO2wiIVAJiQBMYzUF/
+47Q8oVBQgFCeTNR1TvZ8hf+XnfKhRmawLhT3EvkZaGQPyJVFNVRmJT7ToR3zdjz28CKREckH
+da14pD/axFRrqxCkFlGPgsF/tHY1WItLNDQgC7sTYPIouxatKoc+zLgfYfISF+V6Rmx2Zdwj
+dZOvzlqBzHDjiRG0ARw15+AvjSOFg4kj+Zwmakd8K7o3YBA9Rm01blS9tBR/vin3ANuDsTfz
+9eUjwy22RcGm7+TLiLaptCqASTU667B+JVQwggZHMIIFL6ADAgECAgwdAZZbpRdv6ajEjSow
+DQYJKoZIhvcNAQELBQAwga4xCzAJBgNVBAYTAkRFMRwwGgYDVQQIExNOb3JkcmhlaW4tV2Vz
+dGZhbGVuMQ8wDQYDVQQHEwZCb2NodW0xITAfBgNVBAoTGFJ1aHItVW5pdmVyc2l0YWV0IEJv
+Y2h1bTEkMCIGA1UEAxMbUnVoci1Vbml2ZXJzaXRhZXQgQm9jaHVtIENBMScwJQYJKoZIhvcN
+AQkBFhhydWJjYUBydWhyLXVuaS1ib2NodW0uZGUwHhcNMTcwNDAzMDk0MTMyWhcNMTkwNzA5
+MjM1OTAwWjB1MQswCQYDVQQGEwJERTEhMB8GA1UECgwYUnVoci1Vbml2ZXJzaXRhZXQgQm9j
+aHVtMSswKQYDVQQLDCJDaGFpciBmb3IgTmV0d29yayBhbmQgRGF0YXNlY3VyaXR5MRYwFAYD
+VQQDDA1NYXJ0aW4gR3JvdGhlMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0nYl
+C/ccd892TMPnCSgCq3IK529DKQUGXHocMgfXDNYZU+MDPU8DtTdutC75VGl0UKcFj0lH6XRw
+oLcEoNhH80Fb8OJZ8JJx8cFVjVZskWPY2bYr7ZiYkAOWiN8rK6Ei0tzAKZhSn0bqwiUf27K0
+EWKuSs9M4420vdH6SaY9OzuIPxcfguZrE3zmsuByX2DnWSyBNuMfyPiPGruJKAEp3XLBYxyJ
+QJzFaNnvxTrMr6cxCgxXDw0HdqtC/90/ZecIFTV3J0TqlkG0HcsumOutAewN+6fLFXPDODNK
+/k/kSKaJaqn5qCLCelWQnjf8DjKJ3A82vz6nXrM+qov2L3UPwwIDAQABo4ICmzCCApcwQAYD
+VR0gBDkwNzARBg8rBgEEAYGtIYIsAQEEAwUwEQYPKwYBBAGBrSGCLAIBBAMBMA8GDSsGAQQB
+ga0hgiwBAQQwCQYDVR0TBAIwADAOBgNVHQ8BAf8EBAMCBeAwHQYDVR0lBBYwFAYIKwYBBQUH
+AwIGCCsGAQUFBwMEMB0GA1UdDgQWBBSO8QhcSN1B9GdlXnitLuchFumWXTAfBgNVHSMEGDAW
+gBS7Kbg7XwQk44twe2B/Nm8XYcuukjB5BgNVHREEcjBwgRRtYXJ0aW4uZ3JvdGhlQHJ1Yi5k
+ZYEgbWFydGluLmdyb3RoZUBydWhyLXVuaS1ib2NodW0uZGWBFE1hcnRpbi5Hcm90aGVAcnVi
+LmRlgSBNYXJ0aW4uR3JvdGhlQHJ1aHItdW5pLWJvY2h1bS5kZTCBhQYDVR0fBH4wfDA8oDqg
+OIY2aHR0cDovL2NkcDEucGNhLmRmbi5kZS91bmktYm9jaHVtLWNhL3B1Yi9jcmwvY2Fjcmwu
+Y3JsMDygOqA4hjZodHRwOi8vY2RwMi5wY2EuZGZuLmRlL3VuaS1ib2NodW0tY2EvcHViL2Ny
+bC9jYWNybC5jcmwwgdUGCCsGAQUFBwEBBIHIMIHFMDMGCCsGAQUFBzABhidodHRwOi8vb2Nz
+cC5wY2EuZGZuLmRlL09DU1AtU2VydmVyL09DU1AwRgYIKwYBBQUHMAKGOmh0dHA6Ly9jZHAx
+LnBjYS5kZm4uZGUvdW5pLWJvY2h1bS1jYS9wdWIvY2FjZXJ0L2NhY2VydC5jcnQwRgYIKwYB
+BQUHMAKGOmh0dHA6Ly9jZHAyLnBjYS5kZm4uZGUvdW5pLWJvY2h1bS1jYS9wdWIvY2FjZXJ0
+L2NhY2VydC5jcnQwDQYJKoZIhvcNAQELBQADggEBACt8V+asQRcO5kvw1AGgNqlqIzpC6udY
+UYGuV9S20ySLnAm1/jzZqzKtoPqju85OrmMjpnUv4WKNGu5syjHZxgys+9dvkPXIXI+KsdIJ
+tFBztXNihuuAthUwYiQuyINmCJ0xd3G37Ny2p61bIAihkwNaS50oaftwO0yybZRENlxT5khq
+EWKZsfpERXRLUpZyoiGatgjCYagLpLqmhavnuL+nPIAeVVsJTXR3PkTgUCHaE9EJD2sDABEY
+kg5edjKsa9M9VtAzKcOfB4iwPEYVGbnERzexjsRCceAil33SnpP06dKcl24bsQD+jCqvFNAu
+/s7JxXOzcCL2Fe3TD3KhPDExggRuMIIEagIBATCBvzCBrjELMAkGA1UEBhMCREUxHDAaBgNV
+BAgTE05vcmRyaGVpbi1XZXN0ZmFsZW4xDzANBgNVBAcTBkJvY2h1bTEhMB8GA1UEChMYUnVo
+ci1Vbml2ZXJzaXRhZXQgQm9jaHVtMSQwIgYDVQQDExtSdWhyLVVuaXZlcnNpdGFldCBCb2No
+dW0gQ0ExJzAlBgkqhkiG9w0BCQEWGHJ1YmNhQHJ1aHItdW5pLWJvY2h1bS5kZQIMHQGWW6UX
+b+moxI0qMA0GCWCGSAFlAwQCAQUAoIICfzAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwG
+CSqGSIb3DQEJBTEPFw0xNzA3MjAxMjU5NTVaMC8GCSqGSIb3DQEJBDEiBCATBl0+yN97pAYq
+78P4SCgOiJSfvoNHFDYdcAnYFY9/TzBsBgkqhkiG9w0BCQ8xXzBdMAsGCWCGSAFlAwQBKjAL
+BglghkgBZQMEAQIwCgYIKoZIhvcNAwcwDgYIKoZIhvcNAwICAgCAMA0GCCqGSIb3DQMCAgFA
+MAcGBSsOAwIHMA0GCCqGSIb3DQMCAgEoMIHQBgkrBgEEAYI3EAQxgcIwgb8wga4xCzAJBgNV
+BAYTAkRFMRwwGgYDVQQIExNOb3JkcmhlaW4tV2VzdGZhbGVuMQ8wDQYDVQQHEwZCb2NodW0x
+ITAfBgNVBAoTGFJ1aHItVW5pdmVyc2l0YWV0IEJvY2h1bTEkMCIGA1UEAxMbUnVoci1Vbml2
+ZXJzaXRhZXQgQm9jaHVtIENBMScwJQYJKoZIhvcNAQkBFhhydWJjYUBydWhyLXVuaS1ib2No
+dW0uZGUCDB0BllulF2/pqMSNKjCB0gYLKoZIhvcNAQkQAgsxgcKggb8wga4xCzAJBgNVBAYT
+AkRFMRwwGgYDVQQIExNOb3JkcmhlaW4tV2VzdGZhbGVuMQ8wDQYDVQQHEwZCb2NodW0xITAf
+BgNVBAoTGFJ1aHItVW5pdmVyc2l0YWV0IEJvY2h1bTEkMCIGA1UEAxMbUnVoci1Vbml2ZXJz
+aXRhZXQgQm9jaHVtIENBMScwJQYJKoZIhvcNAQkBFhhydWJjYUBydWhyLXVuaS1ib2NodW0u
+ZGUCDB0BllulF2/pqMSNKjANBgkqhkiG9w0BAQEFAASCAQBzXPNWI/eWECNhx3GkowSdhwTa
+4Srl0iCEcY2fn1Tnty272jlkEjhrUPp3ZVFFkS7pb2ShA2HM43PdwEINtAaqSDL7vbwwv0WC
+838DHVxO922+UDuOZaCy6xE5yRZE8e29VUZ3h7TNsRuMjSZnjv+SlmNPBtWstChFeR8yF8FY
+xka1uhTFk8mzAXPYkwpEKtNwukN9b1KOaUSqBQYldeXjY9nvs4GMKdnNwx0w6OFhIsCO9U/L
+xIOk849zwzByCmo3qqdxHh1frRZ6li+zJsMxQ5yJLtRLW+3SAxWtQodnEA19nfvozpkcRRXz
+AzNqrToVjQndKX6DP9Y5MwWjqjXxAAAAAAAA
+--------------ms050309040601080408030804--
