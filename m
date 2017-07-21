@@ -1,91 +1,75 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Subject: Re: kernel smp.c functions not called by Bluetootl LE controller
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <89D1DA64-12E6-43B1-8C82-E8CA32BA2AE2@holtmann.org>
-Date: Fri, 21 Jul 2017 13:41:01 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <282CA1D1-674A-4216-B838-710D1609EDDA@holtmann.org>
-References: <38d8a549-4335-cf0b-9273-d9ef9b51ac0b@rub.de>
- <19307C37-EF03-4E42-AFAD-06855DCB7A3F@holtmann.org>
- <c27d57e1-9f43-8c7c-f352-23ea513771b0@rub.de>
- <89D1DA64-12E6-43B1-8C82-E8CA32BA2AE2@holtmann.org>
-To: Martin Grothe <martin.grothe@rub.de>
+MIME-Version: 1.0
+In-Reply-To: <20170721105919.7777-1-luiz.dentz@gmail.com>
+References: <20170721105919.7777-1-luiz.dentz@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Fri, 21 Jul 2017 14:32:51 +0300
+Message-ID: <CABBYNZKETf6MAYkwUx2YXwaR9kiTrymsrXpFXE5E-09w_Fe11w@mail.gmail.com>
+Subject: Re: [PATCH v4 1/5] monitor: Add AD/EIR types for mesh
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Martin,
+Hi,
 
->>>> I try to call printk (with priority KERN_ALERT) functions placed in the
->>>> net/bluetooth/smp.c file of my linux kernel 4.9.35 in order to get
->>>> output from specifc functions like:
->>>> 
->>>> static int smp_cmd_public_key()
->>>> 
->>>> But during a pairing with another bluetooth LE device the output of
->>>> these function is never shown in /var/log/kern.log
->>>> 
->>>> Is there any way to verify, that the LE Controller accesses the Security
->>>> Manager Protocol source code the Linux Kernel?
->>>> 
->>>> As far as I understood the Core Specification, in BT 4.0 an above the
->>>> Security Manager is always integrated in the Link Manager, when it comes
->>>> to BR/EDR. But for LE the SM is integrated in the Host part and not the
->>>> Controller. Thus LE Controller should access the smp.c in the Linux kernel.
->>> 
->>> just run btmon and you see all the security manager exchanges.
->>> 
->>> Regards
->>> 
->>> Marcel
->>> 
->> Hi Marcel,
->> I tested it, and I saw some basic SMP messages, like:
->> 
->> Sent Pairing Request: Bonding, MITM, Initiator Key(s): LTK CSRK ,
->> Responder Key(s): LTK IRK CSRK
->> 
->> I get a response and a confirmation of the pairing afterwards, but I
->> don't see the key exchange, or the messages from Authentication Stage 1
->> or 2.
->> 
->> Is there any way to log parts of the smp.c functions into kern.log?
-> 
-> just send the file created via "btmon -w trace.log" and I can tell you what is going on here. My guess is that you do not have LE SC enabled. That means legacy pairing is happening which does not using public key exchange.
+On Fri, Jul 21, 2017 at 1:59 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> Print out mesh type and payload:
+>
+>> HCI Event: LE Meta Event (0x3e) plen 33
+>       LE Advertising Report (0x02)
+>         Num reports: 1
+>         Event type: Non connectable undirected - ADV_NONCONN_IND (0x03)
+>         Address type: Random (0x01)
+>         Address: 29:D0:F2:61:17:B0 (Non-Resolvable)
+>         Data length: 21
+>         Mesh Data: 59a7ddee2e1f580463521b98c40c2a3b5086c6
+>         RSSI: -72 dBm (0xb8)
+> ---
+>  monitor/packet.c | 15 +++++++++++++++
+>  1 file changed, 15 insertions(+)
+>
+> diff --git a/monitor/packet.c b/monitor/packet.c
+> index a3d188a..cc24165 100644
+> --- a/monitor/packet.c
+> +++ b/monitor/packet.c
+> @@ -3259,6 +3259,9 @@ static void print_fec(uint8_t fec)
+>  #define BT_EIR_TRANSPORT_DISCOVERY     0x26
+>  #define BT_EIR_LE_SUPPORTED_FEATURES   0x27
+>  #define BT_EIR_CHANNEL_MAP_UPDATE_IND  0x28
+> +#define BT_EIR_MESH_DATA               0x29
+> +#define BT_EIR_MESH_PROV               0x2a
+> +#define BT_EIR_MESH_BEACON             0x2b
+>  #define BT_EIR_3D_INFO_DATA            0x3d
+>  #define BT_EIR_MANUFACTURER_DATA       0xff
+>
+> @@ -3720,6 +3723,18 @@ static void print_eir(const uint8_t *eir, uint8_t eir_len, bool le)
+>                         print_field("  Path Loss Threshold: %d", data[1]);
+>                         break;
+>
+> +               case BT_EIR_MESH_DATA:
+> +                       print_hex_field("Mesh Data", data, data_len);
+> +                       break;
+> +
+> +               case BT_EIR_MESH_PROV:
+> +                       print_hex_field("Mesh Provisioning", data, data_len);
+> +                       break;
+> +
+> +               case BT_EIR_MESH_BEACON:
+> +                       print_hex_field("Mesh Beacon", data, data_len);
+> +                       break;
+> +
+>                 case BT_EIR_MANUFACTURER_DATA:
+>                         if (data_len < 2)
+>                                 break;
+> --
+> 2.9.4
 
-< ACL Data TX: Handle 3585 flags 0x00 dlen 11
-      SMP: Pairing Request (0x01) len 6
-        IO capability: DisplayYesNo (0x01)
-        OOB data: Authentication data not present (0x00)
-        Authentication requirement: Bonding, MITM, SC, No Keypresses (0x0d)
-        Max encryption key size: 16
-        Initiator key distribution: EncKey Sign (0x05)
-        Responder key distribution: EncKey IdKey Sign (0x07)
-> ACL Data RX: Handle 3585 flags 0x02 dlen 11
-      SMP: Pairing Response (0x02) len 6
-        IO capability: NoInputNoOutput (0x03)
-        OOB data: Authentication data not present (0x00)
-        Authentication requirement: Bonding, No MITM, Legacy, No Keypresses (0x01)
-        Max encryption key size: 16
-        Initiator key distribution: Sign (0x04)
-        Responder key distribution: EncKey IdKey (0x03)
+Applied.
 
-So while your Linux side supports LE SC, your remote side only supports legacy pairing. Which means no public key exchange will happen,
 
-The LTK information is distributed instead of locally derived as with LE SC that uses ECDH.
-
-> ACL Data RX: Handle 3585 flags 0x02 dlen 21
-      SMP: Encryption Information (0x06) len 16
-        Long term key: 8eb620e0cf2f490b9a174777d45c57b3
-> ACL Data RX: Handle 3585 flags 0x02 dlen 15
-      SMP: Master Identification (0x07) len 10
-        EDIV: 0x4be8
-        Rand: 0xf9cd7eb564bf38b9
-
-Btw. I have yet to see a LE HID device that uses LE SC.
-
-Regards
-
-Marcel
-
+-- 
+Luiz Augusto von Dentz
