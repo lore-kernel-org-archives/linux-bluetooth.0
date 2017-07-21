@@ -1,75 +1,59 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <20170721105919.7777-1-luiz.dentz@gmail.com>
-References: <20170721105919.7777-1-luiz.dentz@gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Fri, 21 Jul 2017 14:32:51 +0300
-Message-ID: <CABBYNZKETf6MAYkwUx2YXwaR9kiTrymsrXpFXE5E-09w_Fe11w@mail.gmail.com>
-Subject: Re: [PATCH v4 1/5] monitor: Add AD/EIR types for mesh
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+Subject: Re: kernel smp.c functions not called by Bluetootl LE controller
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <c27d57e1-9f43-8c7c-f352-23ea513771b0@rub.de>
+Date: Fri, 21 Jul 2017 13:29:07 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <89D1DA64-12E6-43B1-8C82-E8CA32BA2AE2@holtmann.org>
+References: <38d8a549-4335-cf0b-9273-d9ef9b51ac0b@rub.de>
+ <19307C37-EF03-4E42-AFAD-06855DCB7A3F@holtmann.org>
+ <c27d57e1-9f43-8c7c-f352-23ea513771b0@rub.de>
+To: Martin Grothe <martin.grothe@rub.de>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Martin,
 
-On Fri, Jul 21, 2017 at 1:59 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> Print out mesh type and payload:
->
->> HCI Event: LE Meta Event (0x3e) plen 33
->       LE Advertising Report (0x02)
->         Num reports: 1
->         Event type: Non connectable undirected - ADV_NONCONN_IND (0x03)
->         Address type: Random (0x01)
->         Address: 29:D0:F2:61:17:B0 (Non-Resolvable)
->         Data length: 21
->         Mesh Data: 59a7ddee2e1f580463521b98c40c2a3b5086c6
->         RSSI: -72 dBm (0xb8)
-> ---
->  monitor/packet.c | 15 +++++++++++++++
->  1 file changed, 15 insertions(+)
->
-> diff --git a/monitor/packet.c b/monitor/packet.c
-> index a3d188a..cc24165 100644
-> --- a/monitor/packet.c
-> +++ b/monitor/packet.c
-> @@ -3259,6 +3259,9 @@ static void print_fec(uint8_t fec)
->  #define BT_EIR_TRANSPORT_DISCOVERY     0x26
->  #define BT_EIR_LE_SUPPORTED_FEATURES   0x27
->  #define BT_EIR_CHANNEL_MAP_UPDATE_IND  0x28
-> +#define BT_EIR_MESH_DATA               0x29
-> +#define BT_EIR_MESH_PROV               0x2a
-> +#define BT_EIR_MESH_BEACON             0x2b
->  #define BT_EIR_3D_INFO_DATA            0x3d
->  #define BT_EIR_MANUFACTURER_DATA       0xff
->
-> @@ -3720,6 +3723,18 @@ static void print_eir(const uint8_t *eir, uint8_t eir_len, bool le)
->                         print_field("  Path Loss Threshold: %d", data[1]);
->                         break;
->
-> +               case BT_EIR_MESH_DATA:
-> +                       print_hex_field("Mesh Data", data, data_len);
-> +                       break;
-> +
-> +               case BT_EIR_MESH_PROV:
-> +                       print_hex_field("Mesh Provisioning", data, data_len);
-> +                       break;
-> +
-> +               case BT_EIR_MESH_BEACON:
-> +                       print_hex_field("Mesh Beacon", data, data_len);
-> +                       break;
-> +
->                 case BT_EIR_MANUFACTURER_DATA:
->                         if (data_len < 2)
->                                 break;
-> --
-> 2.9.4
+>>> I try to call printk (with priority KERN_ALERT) functions placed in the
+>>> net/bluetooth/smp.c file of my linux kernel 4.9.35 in order to get
+>>> output from specifc functions like:
+>>> 
+>>> static int smp_cmd_public_key()
+>>> 
+>>> But during a pairing with another bluetooth LE device the output of
+>>> these function is never shown in /var/log/kern.log
+>>> 
+>>> Is there any way to verify, that the LE Controller accesses the Security
+>>> Manager Protocol source code the Linux Kernel?
+>>> 
+>>> As far as I understood the Core Specification, in BT 4.0 an above the
+>>> Security Manager is always integrated in the Link Manager, when it comes
+>>> to BR/EDR. But for LE the SM is integrated in the Host part and not the
+>>> Controller. Thus LE Controller should access the smp.c in the Linux kernel.
+>> 
+>> just run btmon and you see all the security manager exchanges.
+>> 
+>> Regards
+>> 
+>> Marcel
+>> 
+> Hi Marcel,
+> I tested it, and I saw some basic SMP messages, like:
+> 
+> Sent Pairing Request: Bonding, MITM, Initiator Key(s): LTK CSRK ,
+> Responder Key(s): LTK IRK CSRK
+> 
+> I get a response and a confirmation of the pairing afterwards, but I
+> don't see the key exchange, or the messages from Authentication Stage 1
+> or 2.
+> 
+> Is there any way to log parts of the smp.c functions into kern.log?
 
-Applied.
+just send the file created via "btmon -w trace.log" and I can tell you what is going on here. My guess is that you do not have LE SC enabled. That means legacy pairing is happening which does not using public key exchange.
 
+Regards
 
--- 
-Luiz Augusto von Dentz
+Marcel
+
