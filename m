@@ -1,48 +1,62 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v4 2/5] monitor: Add decoding of GATT Mesh Services
-Date: Fri, 21 Jul 2017 13:59:16 +0300
-Message-Id: <20170721105919.7777-2-luiz.dentz@gmail.com>
-In-Reply-To: <20170721105919.7777-1-luiz.dentz@gmail.com>
-References: <20170721105919.7777-1-luiz.dentz@gmail.com>
+Subject: [PATCH v4 1/5] monitor: Add AD/EIR types for mesh
+Date: Fri, 21 Jul 2017 13:59:15 +0300
+Message-Id: <20170721105919.7777-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds UUIDs of GATT Mesh Provisioning Service and Mesh Proxy
-Service.
----
- monitor/uuid.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+Print out mesh type and payload:
 
-diff --git a/monitor/uuid.c b/monitor/uuid.c
-index fb0b210..9839d03 100644
---- a/monitor/uuid.c
-+++ b/monitor/uuid.c
-@@ -170,7 +170,9 @@ static const struct {
- 	{ 0x1824, "Transport Discovery"				},
- 	{ 0x1825, "Object Transfer"				},
- 	{ 0x1826, "Fitness Machine"				},
--	/* 0x1827 to 0x27ff undefined */
-+	{ 0x1827, "Mesh Provisioning"				},
-+	{ 0x1828, "Mesh Proxy"					},
-+	/* 0x1829 to 0x27ff undefined */
- 	{ 0x2800, "Primary Service"				},
- 	{ 0x2801, "Secondary Service"				},
- 	{ 0x2802, "Include"					},
-@@ -397,6 +399,10 @@ static const struct {
- 	{ 0x2ad8, "Supported Power Range"			},
- 	{ 0x2ad9, "Fitness Machine Control Point"		},
- 	{ 0x2ada, "Fitness Machine Status"			},
-+	{ 0x2adb, "Mesh Provisioning Data In"			},
-+	{ 0x2adc, "Mesh Provisioning Data Out"			},
-+	{ 0x2add, "Mesh Proxy Data In"				},
-+	{ 0x2ade, "Mesh Proxy Data Out"				},
- 	/* vendor defined */
- 	{ 0xfeff, "GN Netcom"					},
- 	{ 0xfefe, "GN ReSound A/S"				},
+> HCI Event: LE Meta Event (0x3e) plen 33
+      LE Advertising Report (0x02)
+        Num reports: 1
+        Event type: Non connectable undirected - ADV_NONCONN_IND (0x03)
+        Address type: Random (0x01)
+        Address: 29:D0:F2:61:17:B0 (Non-Resolvable)
+        Data length: 21
+        Mesh Data: 59a7ddee2e1f580463521b98c40c2a3b5086c6
+        RSSI: -72 dBm (0xb8)
+---
+ monitor/packet.c | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
+
+diff --git a/monitor/packet.c b/monitor/packet.c
+index a3d188a..cc24165 100644
+--- a/monitor/packet.c
++++ b/monitor/packet.c
+@@ -3259,6 +3259,9 @@ static void print_fec(uint8_t fec)
+ #define BT_EIR_TRANSPORT_DISCOVERY	0x26
+ #define BT_EIR_LE_SUPPORTED_FEATURES	0x27
+ #define BT_EIR_CHANNEL_MAP_UPDATE_IND	0x28
++#define BT_EIR_MESH_DATA		0x29
++#define BT_EIR_MESH_PROV		0x2a
++#define BT_EIR_MESH_BEACON		0x2b
+ #define BT_EIR_3D_INFO_DATA		0x3d
+ #define BT_EIR_MANUFACTURER_DATA	0xff
+ 
+@@ -3720,6 +3723,18 @@ static void print_eir(const uint8_t *eir, uint8_t eir_len, bool le)
+ 			print_field("  Path Loss Threshold: %d", data[1]);
+ 			break;
+ 
++		case BT_EIR_MESH_DATA:
++			print_hex_field("Mesh Data", data, data_len);
++			break;
++
++		case BT_EIR_MESH_PROV:
++			print_hex_field("Mesh Provisioning", data, data_len);
++			break;
++
++		case BT_EIR_MESH_BEACON:
++			print_hex_field("Mesh Beacon", data, data_len);
++			break;
++
+ 		case BT_EIR_MANUFACTURER_DATA:
+ 			if (data_len < 2)
+ 				break;
 -- 
 2.9.4
 
