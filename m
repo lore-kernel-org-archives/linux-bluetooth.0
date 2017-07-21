@@ -1,70 +1,73 @@
 Return-Path: <linux-kernel-owner@vger.kernel.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Subject: Re: bluetooth in v4.13-rc1: lock init missing somewhere?
+Subject: Re: [PATCH] bluetooth: document config options
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20170721085551.GA22993@amd>
-Date: Fri, 21 Jul 2017 11:57:36 +0200
-Cc: =?utf-8?Q?Pali_Roh=C3=A1r?= <pali.rohar@gmail.com>,
-        Sebastian Reichel <sre@kernel.org>,
-        kernel list <linux-kernel@vger.kernel.org>,
-        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
-        linux-omap@vger.kernel.org, tony@atomide.com, khilman@kernel.org,
-        aaro.koskinen@iki.fi, ivo.g.dimitrov.75@gmail.com,
-        patrikbachan@gmail.com, serge@hallyn.com, abcloriens@gmail.com,
+In-Reply-To: <20170721074957.GA12640@amd>
+Date: Fri, 21 Jul 2017 11:55:51 +0200
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
         linux-bluetooth@vger.kernel.org,
-        "Gustavo F. Padovan" <gustavo@padovan.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>
-Message-Id: <022531FF-11AA-4D6B-A92B-146F5E6BE31F@holtmann.org>
-References: <20170721085551.GA22993@amd>
+        kernel list <linux-kernel@vger.kernel.org>,
+        Netdev list <netdev@vger.kernel.org>
+Message-Id: <CDF602D5-78C6-4F97-9C12-3E6AD3AA6C37@holtmann.org>
+References: <20170721074957.GA12640@amd>
 To: Pavel Machek <pavel@ucw.cz>
 Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Pavel,
 
-> Is bluetooth expected to work on n900?
+> Kernel config options should include useful help text; I had to look
+> up the terms on wikipedia.
 > 
-> It looks like lock init is missing somewhere:
+> Signed-off-by: Pavel Machek <pavel@ucw.cz>
 > 
-> [  402.901031] of_get_named_gpiod_flags: parsed
-> 'bluetooth-wakeup-gpios' property of node
-> '/ocp@68000000/serial@4806c000/bluetooth[0]' - status (0)
-> [  403.042022] BUG: rwlock bad magic on CPU#0, kworker/u3:0/3898,
-> c34b8848
-> [  403.042053] CPU: 0 PID: 3898 Comm: kworker/u3:0 Tainted: G        W
-> 4.13.0-rc1-12941-g013595c-dirty #92
-> [  403.042083] Hardware name: Nokia RX-51 board
-> [  403.042114] Workqueue: hci0 hci_power_on
-> [  403.042205] [<c010d5dc>] (unwind_backtrace) from [<c010ae18>]
-> (show_stack+0x10/0x14)
-> [  403.042327] [<c010ae18>] (show_stack) from [<c0154d74>]
-> (do_raw_read_lock+0x20/0x2c)
-> [  403.042358] [<c0154d74>] (do_raw_read_lock) from [<c04ea070>]
-> (hci_uart_tx_wakeup+0x14/0x84)
-> [  403.042419] [<c04ea070>] (hci_uart_tx_wakeup) from [<bf00089c>]
-> (nokia_setup+0x210/0x640 [hci_nokia])
-> [  403.042449] [<bf00089c>] (nokia_setup [hci_nokia]) from
-> [<c04ea6fc>] (hci_uart_setup+0x7c/0x15c)
-> [  403.042480] [<c04ea6fc>] (hci_uart_setup) from [<c063c1a0>]
-> (hci_dev_do_open+0x420/0x5a0)
-> [  403.042510] [<c063c1a0>] (hci_dev_do_open) from [<c063db40>]
-> (hci_power_on+0x30/0x228)
-> [  403.042541] [<c063db40>] (hci_power_on) from [<c013ad5c>]
-> (process_one_work+0x10c/0x330)
-> [  403.042572] [<c013ad5c>] (process_one_work) from [<c013b120>]
-> (worker_thread+0x168/0x498)
-> [  403.042602] [<c013b120>] (worker_thread) from [<c014035c>]
-> (kthread+0x10c/0x148)
-> [  403.042633] [<c014035c>] (kthread) from [<c01076b8>]
-> (ret_from_fork+0x14/0x3c)
-> root@n900:/my/modules#
-> 
-> If I put the driver built-in, firmware loading failed. But I can't get
-> it to "hciconfig up" phase even with driver being modular. .. that
-> worked at one point IIRC.
+> diff --git a/net/bluetooth/Kconfig b/net/bluetooth/Kconfig
+> index 68f951b..133c8a6 100644
+> --- a/net/bluetooth/Kconfig
+> +++ b/net/bluetooth/Kconfig
+> @@ -45,6 +45,8 @@ config BT_BREDR
+> 	bool "Bluetooth Classic (BR/EDR) features"
+> 	depends on BT
+> 	default y
+> +	help
+> +	  Support Bluetooth version 1 and 2 connections.
 
-any chance you can test this with "btmgmt power on" and have "btmon" run in the background. I wonder how far it gets with the init sequence.
+so this is actually not correct. Version 5.0 is also Bluetooth BR/EDR.
+
+I am fine if use the terms "Basic Rate" and "Enhanced Data Rate" in the description, but the version numbers are kinda not how this works. So some alternative wording needs to be used:
+
+"Bluetooth Classic includes support for Basic Rate (BR) available with Bluetooth version 1.0b or later and support for Enhanced Data Rate (EDR) available with Bluetooth version 2.0 or later."
+
+> source "net/bluetooth/rfcomm/Kconfig"
+> 
+> @@ -58,11 +60,17 @@ config BT_HS
+> 	bool "Bluetooth High Speed (HS) features"
+> 	depends on BT_BREDR
+> 	default y
+> +	help
+> +	  Bluetooth 3 introduces high-speed mode where bluetooth endpoints
+> +	  negotiate fast connection over WIFI. This controls its support.
+
+Again, while Bluetooth version 3.0 introduces HS support, it is not what is selecting this.
+
+I think here we can write something like this:
+
+"Bluetooth High Speed includes support for off-loading Bluetooth connections via 802.11 physical layer available with Bluetooth version 3.0 or later."
+
+> 
+> config BT_LE
+> 	bool "Bluetooth Low Energy (LE) features"
+> 	depends on BT
+> 	default y
+> +	help
+> +	  Bluetooth 4 introduces special low-energy protocol, designed
+> +	  for simple devices. This controls its support.
+
+I think here it is also better to have an alternative text:
+
+"Bluetooth Low Energy includes support low-energy physical layer available with Bluetooth version 4.0 or later."
 
 Regards
 
