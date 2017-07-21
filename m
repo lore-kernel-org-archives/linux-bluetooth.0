@@ -1,106 +1,100 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <01a05144-a446-cf88-4f16-ce230c27474c@jp.fujitsu.com>
-References: <01a05144-a446-cf88-4f16-ce230c27474c@jp.fujitsu.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Fri, 21 Jul 2017 15:04:41 +0300
-Message-ID: <CABBYNZLuM=2tQwJ2FYnz__LL_HhOWJWh98+SmCy=PnHL8MmtSA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] plugins: Fix reconnect_interval for cases of
- improper main.conf
-To: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+Subject: Re: kernel smp.c functions not called by Bluetootl LE controller
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <44d10705-617e-d988-c1e5-c5f4d9a98f57@rub.de>
+Date: Fri, 21 Jul 2017 13:49:25 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <162B269A-BBAE-4F9C-986A-C3E07188797F@holtmann.org>
+References: <38d8a549-4335-cf0b-9273-d9ef9b51ac0b@rub.de>
+ <19307C37-EF03-4E42-AFAD-06855DCB7A3F@holtmann.org>
+ <c27d57e1-9f43-8c7c-f352-23ea513771b0@rub.de>
+ <89D1DA64-12E6-43B1-8C82-E8CA32BA2AE2@holtmann.org>
+ <282CA1D1-674A-4216-B838-710D1609EDDA@holtmann.org>
+ <44d10705-617e-d988-c1e5-c5f4d9a98f57@rub.de>
+To: Martin Grothe <martin.grothe@rub.de>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Eramoto,
+Hi Martin,
 
-On Thu, Jul 20, 2017 at 9:22 AM, ERAMOTO Masaya
-<eramoto.masaya@jp.fujitsu.com> wrote:
-> There are two problems:
->
->  - When main.conf is not found, bluetoothd copies short the default set
->    of reconnecting intervals to reconnect_interval. It does not match
->    the reconnct_interval_len used as the array length.
->    So if a link of device is disconnected, bluetoothd is run over
->    reconnect_interval as time proceeds and will not time out as expected.
->
->    bluetooothd with --debug option outputed the following log in my box:
->
->      plugins/policy.c:reconnect_set_timer() attempt 1/7 1 seconds
->      plugins/policy.c:reconnect_timeout() Reconnecting profiles
->      plugins/policy.c:conn_fail_cb() status 4
->      plugins/policy.c:reconnect_set_timer() attempt 2/7 2 seconds
->      plugins/policy.c:reconnect_timeout() Reconnecting profiles
->      plugins/policy.c:conn_fail_cb() status 4
->      plugins/policy.c:reconnect_set_timer() attempt 3/7 0 seconds
->      plugins/policy.c:reconnect_timeout() Reconnecting profiles
->      plugins/policy.c:conn_fail_cb() status 4
->      plugins/policy.c:reconnect_set_timer() attempt 4/7 0 seconds
->
->  - When ReconnectIntervals in main.conf includes invalid characters,
->    reconnct_interval_len value is bigger than the default array length.
->    So if ReconnectAttempts value in main.conf is bigger than
->    reconnct_interval_len value and a link of device is disconnected,
->    bluetoothd is run over reconnect_interval as time proceeds and will
->    not time out as expected.
->
->    bluetooothd with --debug option outputed the following log in my box,
->    if ReconnectAttempts value was 28 and ReconnectIntervals was inproper:
->
->      ...
->      plugins/policy.c:reconnect_set_timer() attempt 6/28 32 seconds
->      plugins/policy.c:reconnect_timeout() Reconnecting profiles
->      plugins/policy.c:conn_fail_cb() status 4
->      plugins/policy.c:reconnect_set_timer() attempt 7/28 64 seconds
->      plugins/policy.c:reconnect_timeout() Reconnecting profiles
->      plugins/policy.c:conn_fail_cb() status 4
->      plugins/policy.c:reconnect_set_timer() attempt 8/28 0 seconds
->      ...
->      plugins/policy.c:reconnect_set_timer() attempt 25/28 1 seconds
->      plugins/policy.c:reconnect_timeout() Reconnecting profiles
->      plugins/policy.c:conn_fail_cb() status 4
->      plugins/policy.c:reconnect_set_timer() attempt 26/28 3 seconds
->      plugins/policy.c:reconnect_timeout() Reconnecting profiles
->      plugins/policy.c:conn_fail_cb() status 4
->      plugins/policy.c:reconnect_set_timer() attempt 27/28 110683472 seconds
->
-> This fix properly uses the default set of reconnecting intervals.
-> ---
->  plugins/policy.c | 7 ++++---
->  1 file changed, 4 insertions(+), 3 deletions(-)
->
-> diff --git a/plugins/policy.c b/plugins/policy.c
-> index c54878a..1f5a506 100644
-> --- a/plugins/policy.c
-> +++ b/plugins/policy.c
-> @@ -778,7 +778,7 @@ static int policy_init(void)
->                 reconnect_intervals_len = sizeof(default_intervals) /
->                                                 sizeof(*reconnect_intervals);
->                 reconnect_intervals = g_memdup(default_intervals,
-> -                                               reconnect_intervals_len);
-> +                                               sizeof(default_intervals));
->                 goto done;
->         }
->
-> @@ -806,9 +806,10 @@ static int policy_init(void)
->                                         &gerr);
->         if (gerr) {
->                 g_clear_error(&gerr);
-> -               reconnect_intervals_len = sizeof(default_intervals);
-> +               reconnect_intervals_len = sizeof(default_intervals) /
-> +                                               sizeof(*reconnect_intervals);
->                 reconnect_intervals = g_memdup(default_intervals,
-> -                                               reconnect_intervals_len);
-> +                                               sizeof(default_intervals));
->         }
->
->         auto_enable = g_key_file_get_boolean(conf, "Policy", "AutoEnable",
-> --
-> 2.7.4
+>>>>>> I try to call printk (with priority KERN_ALERT) functions placed in the
+>>>>>> net/bluetooth/smp.c file of my linux kernel 4.9.35 in order to get
+>>>>>> output from specifc functions like:
+>>>>>> 
+>>>>>> static int smp_cmd_public_key()
+>>>>>> 
+>>>>>> But during a pairing with another bluetooth LE device the output of
+>>>>>> these function is never shown in /var/log/kern.log
+>>>>>> 
+>>>>>> Is there any way to verify, that the LE Controller accesses the Security
+>>>>>> Manager Protocol source code the Linux Kernel?
+>>>>>> 
+>>>>>> As far as I understood the Core Specification, in BT 4.0 an above the
+>>>>>> Security Manager is always integrated in the Link Manager, when it comes
+>>>>>> to BR/EDR. But for LE the SM is integrated in the Host part and not the
+>>>>>> Controller. Thus LE Controller should access the smp.c in the Linux kernel.
+>>>>> 
+>>>>> just run btmon and you see all the security manager exchanges.
+>>>>> 
+>>>>> Regards
+>>>>> 
+>>>>> Marcel
+>>>>> 
+>>>> Hi Marcel,
+>>>> I tested it, and I saw some basic SMP messages, like:
+>>>> 
+>>>> Sent Pairing Request: Bonding, MITM, Initiator Key(s): LTK CSRK ,
+>>>> Responder Key(s): LTK IRK CSRK
+>>>> 
+>>>> I get a response and a confirmation of the pairing afterwards, but I
+>>>> don't see the key exchange, or the messages from Authentication Stage 1
+>>>> or 2.
+>>>> 
+>>>> Is there any way to log parts of the smp.c functions into kern.log?
+>>> 
+>>> just send the file created via "btmon -w trace.log" and I can tell you what is going on here. My guess is that you do not have LE SC enabled. That means legacy pairing is happening which does not using public key exchange.
+>> 
+>> < ACL Data TX: Handle 3585 flags 0x00 dlen 11
+>>      SMP: Pairing Request (0x01) len 6
+>>        IO capability: DisplayYesNo (0x01)
+>>        OOB data: Authentication data not present (0x00)
+>>        Authentication requirement: Bonding, MITM, SC, No Keypresses (0x0d)
+>>        Max encryption key size: 16
+>>        Initiator key distribution: EncKey Sign (0x05)
+>>        Responder key distribution: EncKey IdKey Sign (0x07)
+>>> ACL Data RX: Handle 3585 flags 0x02 dlen 11
+>>      SMP: Pairing Response (0x02) len 6
+>>        IO capability: NoInputNoOutput (0x03)
+>>        OOB data: Authentication data not present (0x00)
+>>        Authentication requirement: Bonding, No MITM, Legacy, No Keypresses (0x01)
+>>        Max encryption key size: 16
+>>        Initiator key distribution: Sign (0x04)
+>>        Responder key distribution: EncKey IdKey (0x03)
+>> 
+>> So while your Linux side supports LE SC, your remote side only supports legacy pairing. Which means no public key exchange will happen,
+>> 
+>> The LTK information is distributed instead of locally derived as with LE SC that uses ECDH.
+>> 
+>>> ACL Data RX: Handle 3585 flags 0x02 dlen 21
+>>      SMP: Encryption Information (0x06) len 16
+>>        Long term key: 8eb620e0cf2f490b9a174777d45c57b3
+>>> ACL Data RX: Handle 3585 flags 0x02 dlen 15
+>>      SMP: Master Identification (0x07) len 10
+>>        EDIV: 0x4be8
+>>        Rand: 0xf9cd7eb564bf38b9
+>> 
+>> Btw. I have yet to see a LE HID device that uses LE SC.
+> 
+> Thanks again for the help.
+> 
+> Is there any BE/EDR controller out there, which is open source/hardware
+> and which source code can be modified?
 
-Applied, thanks.
+for LE, the support is inside the host. For BR/EDR it is in the controller. I do not know of any open source controller for BR/EDR. We only have open source code for LE controller in Zephyr.
 
+Regards
 
--- 
-Luiz Augusto von Dentz
+Marcel
+
