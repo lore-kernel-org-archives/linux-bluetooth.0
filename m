@@ -1,177 +1,71 @@
-Return-Path: <martin.grothe@rub.de>
-Subject: Re: kernel smp.c functions not called by Bluetootl LE controller
+Return-Path: <ian@mnementh.co.uk>
+Subject: Re: [PATCH] hciattach: bcm43xx: fix the delay timer for firmware
+ download
 To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-References: <38d8a549-4335-cf0b-9273-d9ef9b51ac0b@rub.de>
- <19307C37-EF03-4E42-AFAD-06855DCB7A3F@holtmann.org>
-From: Martin Grothe <martin.grothe@rub.de>
-Message-ID: <c27d57e1-9f43-8c7c-f352-23ea513771b0@rub.de>
-Date: Fri, 21 Jul 2017 13:17:51 +0200
+Cc: maxin.john@gmail.com,
+ "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+ Andy Duan <fugang.duan@nxp.com>, "Maxin B. John" <maxin.john@intel.com>
+References: <1500556499-2146-1-git-send-email-maxin.john@gmail.com>
+ <0F93CDF6-8019-4744-B02B-0C9BD44F9D0B@holtmann.org>
+ <768de172-bf01-e9ea-a4c9-ea8f46cf5f1d@mnementh.co.uk>
+ <C7827387-1AD3-41C9-9F1B-FF4A57940AB9@holtmann.org>
+From: Ian Molton <ian@mnementh.co.uk>
+Message-ID: <aee49b83-5191-23c2-45b3-b695fc6d5a9c@mnementh.co.uk>
+Date: Fri, 21 Jul 2017 12:15:39 +0100
 MIME-Version: 1.0
-In-Reply-To: <19307C37-EF03-4E42-AFAD-06855DCB7A3F@holtmann.org>
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256; boundary="------------ms080307020903080206050801"
+In-Reply-To: <C7827387-1AD3-41C9-9F1B-FF4A57940AB9@holtmann.org>
+Content-Type: text/plain; charset=windows-1252
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is a cryptographically signed message in MIME format.
+On 21/07/17 07:40, Marcel Holtmann wrote:
+> Hi Ian,
+> 
+>>> However I would prefer if we stop using hciattach and focus on
+>>> hci_bcm.c support with btattach and serdev.
+>> 
+>> I can resubmit my serdev driver if you like? It needs a little
+>> cleanup but its been solid here over the last week or two. Mostly
+>> its missing some runtime PM support (I cant test that as my device
+>> is crippled and has no host-wakeup or device-suspend lines).
+> 
+> I am not going to assign a new N_HCI UART type to the same hardware.
+> It all needs to go through the same type. So I still think for now it
+> should be in the same hci_bcm.c file.
 
---------------ms080307020903080206050801
-Content-Type: text/plain; charset=utf-8
-Content-Language: de-DE
-Content-Transfer-Encoding: quoted-printable
+If I have it share the UART type, that should be no problem. Its highly
+unlikely for anyone to have both drivers coexist on a OF platform.
 
-Am 20.07.2017 um 20:24 schrieb Marcel Holtmann:
-> Hi Martin,
->=20
->> I try to call printk (with priority KERN_ALERT) functions placed in th=
-e
->> net/bluetooth/smp.c file of my linux kernel 4.9.35 in order to get
->> output from specifc functions like:
->>
->> static int smp_cmd_public_key()
->>
->> But during a pairing with another bluetooth LE device the output of
->> these function is never shown in /var/log/kern.log
->>
->> Is there any way to verify, that the LE Controller accesses the Securi=
-ty
->> Manager Protocol source code the Linux Kernel?
->>
->> As far as I understood the Core Specification, in BT 4.0 an above the
->> Security Manager is always integrated in the Link Manager, when it com=
-es
->> to BR/EDR. But for LE the SM is integrated in the Host part and not th=
-e
->> Controller. Thus LE Controller should access the smp.c in the Linux ke=
-rnel.
->=20
-> just run btmon and you see all the security manager exchanges.
->=20
-> Regards
->=20
-> Marcel
->=20
-Hi Marcel,
-I tested it, and I saw some basic SMP messages, like:
+I could set it up so that you can select one *or* the other in Kconfig.
 
-Sent Pairing Request: Bonding, MITM, Initiator Key(s): LTK CSRK ,
-Responder Key(s): LTK IRK CSRK
+>> I cant see a nice way to integrate it with the existing driver due
+>> to the fact that it differs markedly in the routines that need
+>> pointers to the serio structures.
+> 
+> We want to actually turn all legacy N_HCI drivers into serdev
+> drivers. So that the only think you write are serdev drivers.
 
-I get a response and a confirmation of the pairing afterwards, but I
-don't see the key exchange, or the messages from Authentication Stage 1
-or 2.
+I cannot see a nice way to do this.
 
-Is there any way to log parts of the smp.c functions into kern.log?
+> So that is really the way to go here. Convert everything into serdev
+> drivers. Have a look at his current work.
 
-Kind Regards
-Martin
+It really isnt.
 
+serdev drivers are for platforms that have the port -> subdevice
+mappings available at probe time.
 
---------------ms080307020903080206050801
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
+> https://git.kernel.org/pub/scm/linux/kernel/git/robh/linux.git/log/?h=serdev-ldisc
 
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCC
-ELkwggTVMIIDvaADAgECAghQTsb1PRG0ZDANBgkqhkiG9w0BAQsFADBxMQswCQYDVQQGEwJE
-RTEcMBoGA1UEChMTRGV1dHNjaGUgVGVsZWtvbSBBRzEfMB0GA1UECxMWVC1UZWxlU2VjIFRy
-dXN0IENlbnRlcjEjMCEGA1UEAxMaRGV1dHNjaGUgVGVsZWtvbSBSb290IENBIDIwHhcNMTQw
-NzIyMTIwODI2WhcNMTkwNzA5MjM1OTAwWjBaMQswCQYDVQQGEwJERTETMBEGA1UEChMKREZO
-LVZlcmVpbjEQMA4GA1UECxMHREZOLVBLSTEkMCIGA1UEAxMbREZOLVZlcmVpbiBQQ0EgR2xv
-YmFsIC0gRzAxMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA6ZvDZ4X5Da71jVTD
-llA1PWLpbkztlNcAW5UidNQg6zSP1uzAMQQLmYHiphTSUqAoI4SLdIkEXlvg4njBeMsWyyg1
-OXstkEXQ7aAAeny/Sg4bAMOG6VwrMRF7DPOCJEOMHDiLamgAmu7cT3ir0sYTm3at7t4m6O8B
-r3QPwQmi9mvOvdPNFDBP9eXjpMhim4IaAycwDQJlYE3t0QkjKpY1WCfTdsZxtpAdxO3/NYZ9
-bzOz2w/FEcKKg6GUXUFr2NIQ9Uz9ylGs2b3vkoO72uuLFlZWQ8/h1RM9ph8nMM1JVNvJEzSa
-cXXFbOqnC5j5IZ0nrz6jOTlIaoytyZn7wxLyvQIDAQABo4IBhjCCAYIwDgYDVR0PAQH/BAQD
-AgEGMB0GA1UdDgQWBBRJt8bP6D0ff+pEexMp9/EKcD7eZDAfBgNVHSMEGDAWgBQxw3kbuvVT
-1xfgiXotF2wKsyudMzASBgNVHRMBAf8ECDAGAQH/AgECMGIGA1UdIARbMFkwEQYPKwYBBAGB
-rSGCLAEBBAICMBEGDysGAQQBga0hgiwBAQQDADARBg8rBgEEAYGtIYIsAQEEAwEwDwYNKwYB
-BAGBrSGCLAEBBDANBgsrBgEEAYGtIYIsHjA+BgNVHR8ENzA1MDOgMaAvhi1odHRwOi8vcGtp
-MDMzNi50ZWxlc2VjLmRlL3JsL0RUX1JPT1RfQ0FfMi5jcmwweAYIKwYBBQUHAQEEbDBqMCwG
-CCsGAQUFBzABhiBodHRwOi8vb2NzcDAzMzYudGVsZXNlYy5kZS9vY3NwcjA6BggrBgEFBQcw
-AoYuaHR0cDovL3BraTAzMzYudGVsZXNlYy5kZS9jcnQvRFRfUk9PVF9DQV8yLmNlcjANBgkq
-hkiG9w0BAQsFAAOCAQEAYyAo/ZwhhnK+OUZZOTIlvKkBmw3Myn1BnIZtCm4ssxNZdbEzkhth
-Jxb/w7LVNYL7hCoBSb1mu2YvssIGXW4/buMBWlvKQ2NclbbhMacf1QdfTeZlgk4y+cN8ekvN
-TVx07iHydQLsUj7SyWrTkCNuSWc1vn9NVqTszC/Pt6GXqHI+ybxA1lqkCD3WvILDt7cyjrEs
-jmpttzUCGc/1OURYY6ckABCwu/xOr24vOLulV0k/2G5QbyyXltwdRpplic+uzPLl2Z9Tsz6h
-L5Kp2AvGhB8Exuse6J99tXulAvEkxSRjETTMWpMgKnmIOiVCkKllO3yG0xIVIyn8LNrMOVtU
-FzCCBZEwggR5oAMCAQICBxekJHW1yvgwDQYJKoZIhvcNAQELBQAwWjELMAkGA1UEBhMCREUx
-EzARBgNVBAoTCkRGTi1WZXJlaW4xEDAOBgNVBAsTB0RGTi1QS0kxJDAiBgNVBAMTG0RGTi1W
-ZXJlaW4gUENBIEdsb2JhbCAtIEcwMTAeFw0xNDA1MjcxNDUzMjVaFw0xOTA3MDkyMzU5MDBa
-MIGuMQswCQYDVQQGEwJERTEcMBoGA1UECBMTTm9yZHJoZWluLVdlc3RmYWxlbjEPMA0GA1UE
-BxMGQm9jaHVtMSEwHwYDVQQKExhSdWhyLVVuaXZlcnNpdGFldCBCb2NodW0xJDAiBgNVBAMT
-G1J1aHItVW5pdmVyc2l0YWV0IEJvY2h1bSBDQTEnMCUGCSqGSIb3DQEJARYYcnViY2FAcnVo
-ci11bmktYm9jaHVtLmRlMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtIGt9mPn
-TWezxFORNckfxxbD4S+6e+QRP2Yc9mNhRO68OriMqdX4tExeysXlOU+iIoSUpssBLLWiEmPn
-HVwUWd1rK0884nzc0iRP1DQjqtKZ7ffZkOdpX5Aobd1pVqGfrqKs1dw8zLZvOORe4+HUI8Sw
-WQwyZZIMP7c36RmUQLP7Q+OYC7hfYQvkf+Gnvb7ADBChob+aqof3ePChqsBpkKE3SMuUiD18
-44egELSa9rahkXTEwbvhmd1KSFnmmk3TJKamE347y4FFJaY5DShfWh8jrbgAQ1yMWadps+/r
-VpfSIj+aCLGUNEcjsL2sPUVjLp4sZf2j5mj4DcwM55/tTQIDAQABo4ICBTCCAgEwEgYDVR0T
-AQH/BAgwBgEB/wIBATAOBgNVHQ8BAf8EBAMCAQYwEQYDVR0gBAowCDAGBgRVHSAAMB0GA1Ud
-DgQWBBS7Kbg7XwQk44twe2B/Nm8XYcuukjAfBgNVHSMEGDAWgBRJt8bP6D0ff+pEexMp9/EK
-cD7eZDAjBgNVHREEHDAagRhydWJjYUBydWhyLXVuaS1ib2NodW0uZGUwgYgGA1UdHwSBgDB+
-MD2gO6A5hjdodHRwOi8vY2RwMS5wY2EuZGZuLmRlL2dsb2JhbC1yb290LWNhL3B1Yi9jcmwv
-Y2FjcmwuY3JsMD2gO6A5hjdodHRwOi8vY2RwMi5wY2EuZGZuLmRlL2dsb2JhbC1yb290LWNh
-L3B1Yi9jcmwvY2FjcmwuY3JsMIHXBggrBgEFBQcBAQSByjCBxzAzBggrBgEFBQcwAYYnaHR0
-cDovL29jc3AucGNhLmRmbi5kZS9PQ1NQLVNlcnZlci9PQ1NQMEcGCCsGAQUFBzAChjtodHRw
-Oi8vY2RwMS5wY2EuZGZuLmRlL2dsb2JhbC1yb290LWNhL3B1Yi9jYWNlcnQvY2FjZXJ0LmNy
-dDBHBggrBgEFBQcwAoY7aHR0cDovL2NkcDIucGNhLmRmbi5kZS9nbG9iYWwtcm9vdC1jYS9w
-dWIvY2FjZXJ0L2NhY2VydC5jcnQwDQYJKoZIhvcNAQELBQADggEBAC7X1UserO56Dmauc3V2
-+E3iY522sDt4VqGL1J9FjPVO3LZYOidi1jm7qmYh8zeR6LK7k7EzOMWO2wiIVAJiQBMYzUF/
-47Q8oVBQgFCeTNR1TvZ8hf+XnfKhRmawLhT3EvkZaGQPyJVFNVRmJT7ToR3zdjz28CKREckH
-da14pD/axFRrqxCkFlGPgsF/tHY1WItLNDQgC7sTYPIouxatKoc+zLgfYfISF+V6Rmx2Zdwj
-dZOvzlqBzHDjiRG0ARw15+AvjSOFg4kj+Zwmakd8K7o3YBA9Rm01blS9tBR/vin3ANuDsTfz
-9eUjwy22RcGm7+TLiLaptCqASTU667B+JVQwggZHMIIFL6ADAgECAgwdAZZbpRdv6ajEjSow
-DQYJKoZIhvcNAQELBQAwga4xCzAJBgNVBAYTAkRFMRwwGgYDVQQIExNOb3JkcmhlaW4tV2Vz
-dGZhbGVuMQ8wDQYDVQQHEwZCb2NodW0xITAfBgNVBAoTGFJ1aHItVW5pdmVyc2l0YWV0IEJv
-Y2h1bTEkMCIGA1UEAxMbUnVoci1Vbml2ZXJzaXRhZXQgQm9jaHVtIENBMScwJQYJKoZIhvcN
-AQkBFhhydWJjYUBydWhyLXVuaS1ib2NodW0uZGUwHhcNMTcwNDAzMDk0MTMyWhcNMTkwNzA5
-MjM1OTAwWjB1MQswCQYDVQQGEwJERTEhMB8GA1UECgwYUnVoci1Vbml2ZXJzaXRhZXQgQm9j
-aHVtMSswKQYDVQQLDCJDaGFpciBmb3IgTmV0d29yayBhbmQgRGF0YXNlY3VyaXR5MRYwFAYD
-VQQDDA1NYXJ0aW4gR3JvdGhlMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0nYl
-C/ccd892TMPnCSgCq3IK529DKQUGXHocMgfXDNYZU+MDPU8DtTdutC75VGl0UKcFj0lH6XRw
-oLcEoNhH80Fb8OJZ8JJx8cFVjVZskWPY2bYr7ZiYkAOWiN8rK6Ei0tzAKZhSn0bqwiUf27K0
-EWKuSs9M4420vdH6SaY9OzuIPxcfguZrE3zmsuByX2DnWSyBNuMfyPiPGruJKAEp3XLBYxyJ
-QJzFaNnvxTrMr6cxCgxXDw0HdqtC/90/ZecIFTV3J0TqlkG0HcsumOutAewN+6fLFXPDODNK
-/k/kSKaJaqn5qCLCelWQnjf8DjKJ3A82vz6nXrM+qov2L3UPwwIDAQABo4ICmzCCApcwQAYD
-VR0gBDkwNzARBg8rBgEEAYGtIYIsAQEEAwUwEQYPKwYBBAGBrSGCLAIBBAMBMA8GDSsGAQQB
-ga0hgiwBAQQwCQYDVR0TBAIwADAOBgNVHQ8BAf8EBAMCBeAwHQYDVR0lBBYwFAYIKwYBBQUH
-AwIGCCsGAQUFBwMEMB0GA1UdDgQWBBSO8QhcSN1B9GdlXnitLuchFumWXTAfBgNVHSMEGDAW
-gBS7Kbg7XwQk44twe2B/Nm8XYcuukjB5BgNVHREEcjBwgRRtYXJ0aW4uZ3JvdGhlQHJ1Yi5k
-ZYEgbWFydGluLmdyb3RoZUBydWhyLXVuaS1ib2NodW0uZGWBFE1hcnRpbi5Hcm90aGVAcnVi
-LmRlgSBNYXJ0aW4uR3JvdGhlQHJ1aHItdW5pLWJvY2h1bS5kZTCBhQYDVR0fBH4wfDA8oDqg
-OIY2aHR0cDovL2NkcDEucGNhLmRmbi5kZS91bmktYm9jaHVtLWNhL3B1Yi9jcmwvY2Fjcmwu
-Y3JsMDygOqA4hjZodHRwOi8vY2RwMi5wY2EuZGZuLmRlL3VuaS1ib2NodW0tY2EvcHViL2Ny
-bC9jYWNybC5jcmwwgdUGCCsGAQUFBwEBBIHIMIHFMDMGCCsGAQUFBzABhidodHRwOi8vb2Nz
-cC5wY2EuZGZuLmRlL09DU1AtU2VydmVyL09DU1AwRgYIKwYBBQUHMAKGOmh0dHA6Ly9jZHAx
-LnBjYS5kZm4uZGUvdW5pLWJvY2h1bS1jYS9wdWIvY2FjZXJ0L2NhY2VydC5jcnQwRgYIKwYB
-BQUHMAKGOmh0dHA6Ly9jZHAyLnBjYS5kZm4uZGUvdW5pLWJvY2h1bS1jYS9wdWIvY2FjZXJ0
-L2NhY2VydC5jcnQwDQYJKoZIhvcNAQELBQADggEBACt8V+asQRcO5kvw1AGgNqlqIzpC6udY
-UYGuV9S20ySLnAm1/jzZqzKtoPqju85OrmMjpnUv4WKNGu5syjHZxgys+9dvkPXIXI+KsdIJ
-tFBztXNihuuAthUwYiQuyINmCJ0xd3G37Ny2p61bIAihkwNaS50oaftwO0yybZRENlxT5khq
-EWKZsfpERXRLUpZyoiGatgjCYagLpLqmhavnuL+nPIAeVVsJTXR3PkTgUCHaE9EJD2sDABEY
-kg5edjKsa9M9VtAzKcOfB4iwPEYVGbnERzexjsRCceAil33SnpP06dKcl24bsQD+jCqvFNAu
-/s7JxXOzcCL2Fe3TD3KhPDExggRuMIIEagIBATCBvzCBrjELMAkGA1UEBhMCREUxHDAaBgNV
-BAgTE05vcmRyaGVpbi1XZXN0ZmFsZW4xDzANBgNVBAcTBkJvY2h1bTEhMB8GA1UEChMYUnVo
-ci1Vbml2ZXJzaXRhZXQgQm9jaHVtMSQwIgYDVQQDExtSdWhyLVVuaXZlcnNpdGFldCBCb2No
-dW0gQ0ExJzAlBgkqhkiG9w0BCQEWGHJ1YmNhQHJ1aHItdW5pLWJvY2h1bS5kZQIMHQGWW6UX
-b+moxI0qMA0GCWCGSAFlAwQCAQUAoIICfzAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwG
-CSqGSIb3DQEJBTEPFw0xNzA3MjExMTE3NTFaMC8GCSqGSIb3DQEJBDEiBCBfKkEo4meQ+LY9
-WuMAOzo+GlAixwTED1H+rzzuFC929DBsBgkqhkiG9w0BCQ8xXzBdMAsGCWCGSAFlAwQBKjAL
-BglghkgBZQMEAQIwCgYIKoZIhvcNAwcwDgYIKoZIhvcNAwICAgCAMA0GCCqGSIb3DQMCAgFA
-MAcGBSsOAwIHMA0GCCqGSIb3DQMCAgEoMIHQBgkrBgEEAYI3EAQxgcIwgb8wga4xCzAJBgNV
-BAYTAkRFMRwwGgYDVQQIExNOb3JkcmhlaW4tV2VzdGZhbGVuMQ8wDQYDVQQHEwZCb2NodW0x
-ITAfBgNVBAoTGFJ1aHItVW5pdmVyc2l0YWV0IEJvY2h1bTEkMCIGA1UEAxMbUnVoci1Vbml2
-ZXJzaXRhZXQgQm9jaHVtIENBMScwJQYJKoZIhvcNAQkBFhhydWJjYUBydWhyLXVuaS1ib2No
-dW0uZGUCDB0BllulF2/pqMSNKjCB0gYLKoZIhvcNAQkQAgsxgcKggb8wga4xCzAJBgNVBAYT
-AkRFMRwwGgYDVQQIExNOb3JkcmhlaW4tV2VzdGZhbGVuMQ8wDQYDVQQHEwZCb2NodW0xITAf
-BgNVBAoTGFJ1aHItVW5pdmVyc2l0YWV0IEJvY2h1bTEkMCIGA1UEAxMbUnVoci1Vbml2ZXJz
-aXRhZXQgQm9jaHVtIENBMScwJQYJKoZIhvcNAQkBFhhydWJjYUBydWhyLXVuaS1ib2NodW0u
-ZGUCDB0BllulF2/pqMSNKjANBgkqhkiG9w0BAQEFAASCAQA7PAihdzSP77BEu+4fQevNwAnU
-XrW0Cm5isclY1KibSXrYnSKUDId5+DwLywAwNHfR+iGzXfOFSRJcrTZkXM3XMmjomyETXzH3
-FbSSwso0vup0954pchqheSQ1MfU08rExmkdkdIRmS4WCEaILSk89BlR9SOkYY2jhKUcdTiSl
-RcHvIRcbpeUOcJoQqtrixSRptX2s+wXDVBvmJWJXAjuEaj208a9MT/G19eZnoMgk6kiJXtla
-qHKVFf12AjRYJDaCWEpYsg3GmxV9JbTlFGhervjT2boDFIH9abDbQ532OUrNHie/25BqBZED
-54QWqH5KjJZusFRpMJqclVjYpyDiAAAAAAAA
---------------ms080307020903080206050801--
+I hate to sound peevish, but that really does not look like a good idea.
+
+Part of the point of serdev drivers is to keep the ttydev out of the
+hands of userspace. This code explicitly overrides that.
+
+This already looks a lot more complex than my serdev driver.
+
+A far better approach would be to teach ACPI platforms how to chreate
+their own serdev devices.
+
+Platforms with zero hardware info available should NOT be using serdev.
+
+-Ian
