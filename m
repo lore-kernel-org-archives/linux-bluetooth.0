@@ -1,237 +1,106 @@
-Return-Path: <robsonde@gmail.com>
-From: Derek Robson <robsonde@gmail.com>
-To: marcel@holtmann.org,
-	gustavo@padovan.org,
-	johan.hedberg@gmail.com
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Derek Robson <robsonde@gmail.com>
-Subject: [PATCH] Bluetooth: Style fix - align block comments
-Date: Sat, 22 Jul 2017 13:47:07 +1200
-Message-Id: <20170722014707.10485-1-robsonde@gmail.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+MIME-Version: 1.0
+In-Reply-To: <01a05144-a446-cf88-4f16-ce230c27474c@jp.fujitsu.com>
+References: <01a05144-a446-cf88-4f16-ce230c27474c@jp.fujitsu.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Fri, 21 Jul 2017 15:04:41 +0300
+Message-ID: <CABBYNZLuM=2tQwJ2FYnz__LL_HhOWJWh98+SmCy=PnHL8MmtSA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] plugins: Fix reconnect_interval for cases of
+ improper main.conf
+To: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Fixed alignment of all block comments.
-Found using checkpatch
+Hi Eramoto,
 
-Signed-off-by: Derek Robson <robsonde@gmail.com>
----
- drivers/bluetooth/ath3k.c       |  3 ++-
- drivers/bluetooth/bt3c_cs.c     |  8 +++++---
- drivers/bluetooth/btmrvl_sdio.c |  6 ++++--
- drivers/bluetooth/btsdio.c      |  3 ++-
- drivers/bluetooth/btuart_cs.c   |  8 +++++---
- drivers/bluetooth/btusb.c       | 15 ++++++++++-----
- drivers/bluetooth/btwilink.c    |  6 +++---
- drivers/bluetooth/hci_ldisc.c   |  3 ++-
- drivers/bluetooth/hci_ll.c      |  3 ++-
- 9 files changed, 35 insertions(+), 20 deletions(-)
+On Thu, Jul 20, 2017 at 9:22 AM, ERAMOTO Masaya
+<eramoto.masaya@jp.fujitsu.com> wrote:
+> There are two problems:
+>
+>  - When main.conf is not found, bluetoothd copies short the default set
+>    of reconnecting intervals to reconnect_interval. It does not match
+>    the reconnct_interval_len used as the array length.
+>    So if a link of device is disconnected, bluetoothd is run over
+>    reconnect_interval as time proceeds and will not time out as expected.
+>
+>    bluetooothd with --debug option outputed the following log in my box:
+>
+>      plugins/policy.c:reconnect_set_timer() attempt 1/7 1 seconds
+>      plugins/policy.c:reconnect_timeout() Reconnecting profiles
+>      plugins/policy.c:conn_fail_cb() status 4
+>      plugins/policy.c:reconnect_set_timer() attempt 2/7 2 seconds
+>      plugins/policy.c:reconnect_timeout() Reconnecting profiles
+>      plugins/policy.c:conn_fail_cb() status 4
+>      plugins/policy.c:reconnect_set_timer() attempt 3/7 0 seconds
+>      plugins/policy.c:reconnect_timeout() Reconnecting profiles
+>      plugins/policy.c:conn_fail_cb() status 4
+>      plugins/policy.c:reconnect_set_timer() attempt 4/7 0 seconds
+>
+>  - When ReconnectIntervals in main.conf includes invalid characters,
+>    reconnct_interval_len value is bigger than the default array length.
+>    So if ReconnectAttempts value in main.conf is bigger than
+>    reconnct_interval_len value and a link of device is disconnected,
+>    bluetoothd is run over reconnect_interval as time proceeds and will
+>    not time out as expected.
+>
+>    bluetooothd with --debug option outputed the following log in my box,
+>    if ReconnectAttempts value was 28 and ReconnectIntervals was inproper:
+>
+>      ...
+>      plugins/policy.c:reconnect_set_timer() attempt 6/28 32 seconds
+>      plugins/policy.c:reconnect_timeout() Reconnecting profiles
+>      plugins/policy.c:conn_fail_cb() status 4
+>      plugins/policy.c:reconnect_set_timer() attempt 7/28 64 seconds
+>      plugins/policy.c:reconnect_timeout() Reconnecting profiles
+>      plugins/policy.c:conn_fail_cb() status 4
+>      plugins/policy.c:reconnect_set_timer() attempt 8/28 0 seconds
+>      ...
+>      plugins/policy.c:reconnect_set_timer() attempt 25/28 1 seconds
+>      plugins/policy.c:reconnect_timeout() Reconnecting profiles
+>      plugins/policy.c:conn_fail_cb() status 4
+>      plugins/policy.c:reconnect_set_timer() attempt 26/28 3 seconds
+>      plugins/policy.c:reconnect_timeout() Reconnecting profiles
+>      plugins/policy.c:conn_fail_cb() status 4
+>      plugins/policy.c:reconnect_set_timer() attempt 27/28 110683472 seconds
+>
+> This fix properly uses the default set of reconnecting intervals.
+> ---
+>  plugins/policy.c | 7 ++++---
+>  1 file changed, 4 insertions(+), 3 deletions(-)
+>
+> diff --git a/plugins/policy.c b/plugins/policy.c
+> index c54878a..1f5a506 100644
+> --- a/plugins/policy.c
+> +++ b/plugins/policy.c
+> @@ -778,7 +778,7 @@ static int policy_init(void)
+>                 reconnect_intervals_len = sizeof(default_intervals) /
+>                                                 sizeof(*reconnect_intervals);
+>                 reconnect_intervals = g_memdup(default_intervals,
+> -                                               reconnect_intervals_len);
+> +                                               sizeof(default_intervals));
+>                 goto done;
+>         }
+>
+> @@ -806,9 +806,10 @@ static int policy_init(void)
+>                                         &gerr);
+>         if (gerr) {
+>                 g_clear_error(&gerr);
+> -               reconnect_intervals_len = sizeof(default_intervals);
+> +               reconnect_intervals_len = sizeof(default_intervals) /
+> +                                               sizeof(*reconnect_intervals);
+>                 reconnect_intervals = g_memdup(default_intervals,
+> -                                               reconnect_intervals_len);
+> +                                               sizeof(default_intervals));
+>         }
+>
+>         auto_enable = g_key_file_get_boolean(conf, "Policy", "AutoEnable",
+> --
+> 2.7.4
 
-diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
-index b793853ff05f..204afe66de92 100644
---- a/drivers/bluetooth/ath3k.c
-+++ b/drivers/bluetooth/ath3k.c
-@@ -140,7 +140,8 @@ MODULE_DEVICE_TABLE(usb, ath3k_table);
- 
- #define BTUSB_ATH3012		0x80
- /* This table is to load patch and sysconfig files
-- * for AR3012 */
-+ * for AR3012
-+ */
- static const struct usb_device_id ath3k_blist_tbl[] = {
- 
- 	/* Atheros AR3012 with sflash firmware*/
-diff --git a/drivers/bluetooth/bt3c_cs.c b/drivers/bluetooth/bt3c_cs.c
-index 32dcac017395..194788739a83 100644
---- a/drivers/bluetooth/bt3c_cs.c
-+++ b/drivers/bluetooth/bt3c_cs.c
-@@ -684,14 +684,16 @@ static int bt3c_config(struct pcmcia_device *link)
- 	unsigned long try;
- 
- 	/* First pass: look for a config entry that looks normal.
--	   Two tries: without IO aliases, then with aliases */
-+	 * Two tries: without IO aliases, then with aliases
-+	 */
- 	for (try = 0; try < 2; try++)
- 		if (!pcmcia_loop_config(link, bt3c_check_config, (void *) try))
- 			goto found_port;
- 
- 	/* Second pass: try to find an entry that isn't picky about
--	   its base address, then try to grab any standard serial port
--	   address, and finally try to get any free port. */
-+	 * its base address, then try to grab any standard serial port
-+	 * address, and finally try to get any free port.
-+	 */
- 	if (!pcmcia_loop_config(link, bt3c_check_config_notpicky, NULL))
- 		goto found_port;
- 
-diff --git a/drivers/bluetooth/btmrvl_sdio.c b/drivers/bluetooth/btmrvl_sdio.c
-index eb794f08b238..03341ce98c32 100644
---- a/drivers/bluetooth/btmrvl_sdio.c
-+++ b/drivers/bluetooth/btmrvl_sdio.c
-@@ -1455,7 +1455,8 @@ static void btmrvl_sdio_dump_firmware(struct btmrvl_private *priv)
- 	fw_dump_ptr = fw_dump_data;
- 
- 	/* Dump all the memory data into single file, a userspace script will
--	   be used to split all the memory data to multiple files*/
-+	 * be used to split all the memory data to multiple files
-+	 */
- 	BT_INFO("== btmrvl firmware dump to /sys/class/devcoredump start");
- 	for (idx = 0; idx < dump_num; idx++) {
- 		struct memory_type_mapping *entry = &mem_type_mapping_tbl[idx];
-@@ -1482,7 +1483,8 @@ static void btmrvl_sdio_dump_firmware(struct btmrvl_private *priv)
- 	}
- 
- 	/* fw_dump_data will be free in device coredump release function
--	   after 5 min*/
-+	 * after 5 min
-+	 */
- 	dev_coredumpv(&card->func->dev, fw_dump_data, fw_dump_len, GFP_KERNEL);
- 	BT_INFO("== btmrvl firmware dump to /sys/class/devcoredump end");
- }
-diff --git a/drivers/bluetooth/btsdio.c b/drivers/bluetooth/btsdio.c
-index 1cb958e199eb..c8e945d19ffe 100644
---- a/drivers/bluetooth/btsdio.c
-+++ b/drivers/bluetooth/btsdio.c
-@@ -144,7 +144,8 @@ static int btsdio_rx_packet(struct btsdio_data *data)
- 	if (!skb) {
- 		/* Out of memory. Prepare a read retry and just
- 		 * return with the expectation that the next time
--		 * we're called we'll have more memory. */
-+		 * we're called we'll have more memory.
-+		 */
- 		return -ENOMEM;
- 	}
- 
-diff --git a/drivers/bluetooth/btuart_cs.c b/drivers/bluetooth/btuart_cs.c
-index 7df79bb12350..310e9c2e09b6 100644
---- a/drivers/bluetooth/btuart_cs.c
-+++ b/drivers/bluetooth/btuart_cs.c
-@@ -614,14 +614,16 @@ static int btuart_config(struct pcmcia_device *link)
- 	int try;
- 
- 	/* First pass: look for a config entry that looks normal.
--	   Two tries: without IO aliases, then with aliases */
-+	 * Two tries: without IO aliases, then with aliases
-+	 */
- 	for (try = 0; try < 2; try++)
- 		if (!pcmcia_loop_config(link, btuart_check_config, &try))
- 			goto found_port;
- 
- 	/* Second pass: try to find an entry that isn't picky about
--	   its base address, then try to grab any standard serial port
--	   address, and finally try to get any free port. */
-+	 * its base address, then try to grab any standard serial port
-+	 * address, and finally try to get any free port.
-+	 */
- 	if (!pcmcia_loop_config(link, btuart_check_config_notpicky, NULL))
- 		goto found_port;
- 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index fa24d693af24..6582e6df5dee 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -656,7 +656,8 @@ static void btusb_intr_complete(struct urb *urb)
- 	err = usb_submit_urb(urb, GFP_ATOMIC);
- 	if (err < 0) {
- 		/* -EPERM: urb is being killed;
--		 * -ENODEV: device got disconnected */
-+		 * -ENODEV: device got disconnected
-+		 */
- 		if (err != -EPERM && err != -ENODEV)
- 			BT_ERR("%s urb %p failed to resubmit (%d)",
- 			       hdev->name, urb, -err);
-@@ -745,7 +746,8 @@ static void btusb_bulk_complete(struct urb *urb)
- 	err = usb_submit_urb(urb, GFP_ATOMIC);
- 	if (err < 0) {
- 		/* -EPERM: urb is being killed;
--		 * -ENODEV: device got disconnected */
-+		 * -ENODEV: device got disconnected
-+		 */
- 		if (err != -EPERM && err != -ENODEV)
- 			BT_ERR("%s urb %p failed to resubmit (%d)",
- 			       hdev->name, urb, -err);
-@@ -840,7 +842,8 @@ static void btusb_isoc_complete(struct urb *urb)
- 	err = usb_submit_urb(urb, GFP_ATOMIC);
- 	if (err < 0) {
- 		/* -EPERM: urb is being killed;
--		 * -ENODEV: device got disconnected */
-+		 * -ENODEV: device got disconnected
-+		 */
- 		if (err != -EPERM && err != -ENODEV)
- 			BT_ERR("%s urb %p failed to resubmit (%d)",
- 			       hdev->name, urb, -err);
-@@ -952,7 +955,8 @@ static void btusb_diag_complete(struct urb *urb)
- 	err = usb_submit_urb(urb, GFP_ATOMIC);
- 	if (err < 0) {
- 		/* -EPERM: urb is being killed;
--		 * -ENODEV: device got disconnected */
-+		 * -ENODEV: device got disconnected
-+		 */
- 		if (err != -EPERM && err != -ENODEV)
- 			BT_ERR("%s urb %p failed to resubmit (%d)",
- 			       hdev->name, urb, -err);
-@@ -2896,7 +2900,8 @@ static int btusb_probe(struct usb_interface *intf,
- 		struct usb_device *udev = interface_to_usbdev(intf);
- 
- 		/* Old firmware would otherwise let ath3k driver load
--		 * patch and sysconfig files */
-+		 * patch and sysconfig files
-+		 */
- 		if (le16_to_cpu(udev->descriptor.bcdDevice) <= 0x0001)
- 			return -ENODEV;
- 	}
-diff --git a/drivers/bluetooth/btwilink.c b/drivers/bluetooth/btwilink.c
-index 85a3978b064f..70e4c5a5598e 100644
---- a/drivers/bluetooth/btwilink.c
-+++ b/drivers/bluetooth/btwilink.c
-@@ -93,8 +93,7 @@ static void st_reg_completion_cb(void *priv_data, int data)
- 	complete(&lhst->wait_reg_completion);
- }
- 
--/* Called by Shared Transport layer when receive data is
-- * available */
-+/* Called by Shared Transport layer when receive data is available */
- static long st_receive(void *priv_data, struct sk_buff *skb)
- {
- 	struct ti_st *lhst = priv_data;
-@@ -198,7 +197,8 @@ static int ti_st_open(struct hci_dev *hdev)
- 		}
- 
- 		/* Is ST registration callback
--		 * called with ERROR status? */
-+		 * called with ERROR status?
-+		 */
- 		if (hst->reg_status != 0) {
- 			BT_ERR("ST registration completed with invalid "
- 					"status %d", hst->reg_status);
-diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
-index 8397b716fa65..a746627e784e 100644
---- a/drivers/bluetooth/hci_ldisc.c
-+++ b/drivers/bluetooth/hci_ldisc.c
-@@ -457,7 +457,8 @@ static int hci_uart_tty_open(struct tty_struct *tty)
- 	BT_DBG("tty %p", tty);
- 
- 	/* Error if the tty has no write op instead of leaving an exploitable
--	   hole */
-+	 * hole
-+	 */
- 	if (tty->ops->write == NULL)
- 		return -EOPNOTSUPP;
- 
-diff --git a/drivers/bluetooth/hci_ll.c b/drivers/bluetooth/hci_ll.c
-index c982943f0747..5cf04a4b69fc 100644
---- a/drivers/bluetooth/hci_ll.c
-+++ b/drivers/bluetooth/hci_ll.c
-@@ -622,7 +622,8 @@ static int download_firmware(struct ll_device *lldev)
- 			cmd = (struct hci_command *)action_ptr;
- 			if (cmd->opcode == 0xff36) {
- 				/* ignore remote change
--				 * baud rate HCI VS command */
-+				 * baud rate HCI VS command
-+				 */
- 				bt_dev_warn(lldev->hu.hdev, "change remote baud rate command in firmware");
- 				break;
- 			}
+Applied, thanks.
+
+
 -- 
-2.13.2
+Luiz Augusto von Dentz
