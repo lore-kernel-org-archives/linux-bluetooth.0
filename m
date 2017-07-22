@@ -1,60 +1,39 @@
-Return-Path: <netdev-owner@vger.kernel.org>
+Return-Path: <linux-kernel-owner@vger.kernel.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Subject: Re: [PATCH net-next 1/3] bluetooth: 6lowpan dev_close never returns
- error
+Subject: Re: [PATCH] Bluetooth: Style fix - align block comments
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <201707211821.oD6w3YMa%fengguang.wu@intel.com>
-Date: Sat, 22 Jul 2017 08:42:37 +0200
-Cc: Stephen Hemminger <stephen@networkplumber.org>, kbuild-all@01.org,
-        yisen.zhuang@huawei.com, salil.mehta@huawei.com,
-        "David S. Miller" <davem@davemloft.net>,
-        "Gustavo F. Padovan" <gustavo@padovan.org>,
+In-Reply-To: <20170722014707.10485-1-robsonde@gmail.com>
+Date: Sat, 22 Jul 2017 08:41:05 +0200
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
-        netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        Stephen Hemminger <sthemmin@microsoft.com>
-Message-Id: <9F800AAB-D2D1-4131-A6CD-01B16CAEF78D@holtmann.org>
-References: <201707211821.oD6w3YMa%fengguang.wu@intel.com>
-To: kbuild test robot <lkp@intel.com>
-Sender: netdev-owner@vger.kernel.org
+        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+        linux-kernel@vger.kernel.org
+Message-Id: <2469432F-B100-4F7B-BE3E-0E0AE6FBFBD0@holtmann.org>
+References: <20170722014707.10485-1-robsonde@gmail.com>
+To: Derek Robson <robsonde@gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Stephen,
+Hi Derek,
 
-> [auto build test WARNING on net-next/master]
+> Fixed alignment of all block comments.
+> Found using checkpatch
 > 
-> url:    https://github.com/0day-ci/linux/commits/Stephen-Hemminger/net-make-dev_close-void/20170720-090123
-> config: x86_64-randconfig-a0-07211734 (attached as .config)
-> compiler: gcc-4.4 (Debian 4.4.7-8) 4.4.7
-> reproduce:
->        # save the attached .config to linux build tree
->        make ARCH=x86_64 
-> 
-> All warnings (new ones prefixed by >>):
-> 
->   net/bluetooth/6lowpan.c: In function 'ifdown':
->>> net/bluetooth/6lowpan.c:621: warning: unused variable 'err'
-> 
-> vim +/err +621 net/bluetooth/6lowpan.c
-> 
-> 18722c24 Jukka Rissanen    2013-12-11  618  
-> 7f118253 Jukka Rissanen    2014-06-18  619  static void ifdown(struct net_device *netdev)
-> 7f118253 Jukka Rissanen    2014-06-18  620  {
-> 7f118253 Jukka Rissanen    2014-06-18 @621  	int err;
-> 7f118253 Jukka Rissanen    2014-06-18  622  
-> 7f118253 Jukka Rissanen    2014-06-18  623  	rtnl_lock();
-> ca74f73e Stephen Hemminger 2017-07-18  624  	dev_close(netdev);
-> 7f118253 Jukka Rissanen    2014-06-18  625  	rtnl_unlock();
-> 7f118253 Jukka Rissanen    2014-06-18  626  }
-> 7f118253 Jukka Rissanen    2014-06-18  627  
-> 
-> :::::: The code at line 621 was first introduced by commit
-> :::::: 7f118253820fc3ad38659485adb3ebdfe64820e1 Bluetooth: 6LoWPAN: Remove network devices when unloading
-> 
-> :::::: TO: Jukka Rissanen <jukka.rissanen@linux.intel.com>
-> :::::: CC: Marcel Holtmann <marcel@holtmann.org>
+> Signed-off-by: Derek Robson <robsonde@gmail.com>
+> ---
+> drivers/bluetooth/ath3k.c       |  3 ++-
+> drivers/bluetooth/bt3c_cs.c     |  8 +++++---
+> drivers/bluetooth/btmrvl_sdio.c |  6 ++++--
+> drivers/bluetooth/btsdio.c      |  3 ++-
+> drivers/bluetooth/btuart_cs.c   |  8 +++++---
+> drivers/bluetooth/btusb.c       | 15 ++++++++++-----
+> drivers/bluetooth/btwilink.c    |  6 +++---
+> drivers/bluetooth/hci_ldisc.c   |  3 ++-
+> drivers/bluetooth/hci_ll.c      |  3 ++-
+> 9 files changed, 35 insertions(+), 20 deletions(-)
 
-are you going to send a fix for this?
+patch has been applied to bluetooth-next tree.
 
 Regards
 
