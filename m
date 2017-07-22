@@ -1,81 +1,51 @@
-Return-Path: <sre@kernel.org>
-Date: Sat, 22 Jul 2017 21:03:23 +0200
-From: Sebastian Reichel <sre@kernel.org>
+Return-Path: <ian@mnementh.co.uk>
+Subject: Re: [PATCH] hciattach: bcm43xx: fix the delay timer for firmware
+ download
 To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: hci_nokia: select BT_BCM for
- btbcm_set_bdaddr()
-Message-ID: <20170722190323.mt5mrnioql7z2uj2@earth>
-References: <20170722095747.101069-1-marcel@holtmann.org>
+Cc: maxin.john@gmail.com,
+ "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+ Andy Duan <fugang.duan@nxp.com>, "Maxin B. John" <maxin.john@intel.com>
+References: <1500556499-2146-1-git-send-email-maxin.john@gmail.com>
+ <0F93CDF6-8019-4744-B02B-0C9BD44F9D0B@holtmann.org>
+ <768de172-bf01-e9ea-a4c9-ea8f46cf5f1d@mnementh.co.uk>
+ <C7827387-1AD3-41C9-9F1B-FF4A57940AB9@holtmann.org>
+ <aee49b83-5191-23c2-45b3-b695fc6d5a9c@mnementh.co.uk>
+ <79177492-9A36-4378-A914-A7073C1DD24A@holtmann.org>
+From: Ian Molton <ian@mnementh.co.uk>
+Message-ID: <58d4171b-287e-2406-135e-e34e166aae41@mnementh.co.uk>
+Date: Sat, 22 Jul 2017 17:06:23 +0100
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="xhbnegvsou255quw"
-In-Reply-To: <20170722095747.101069-1-marcel@holtmann.org>
+In-Reply-To: <79177492-9A36-4378-A914-A7073C1DD24A@holtmann.org>
+Content-Type: text/plain; charset=windows-1252
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+On 21/07/17 12:27, Marcel Holtmann wrote:
 
---xhbnegvsou255quw
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+>> A far better approach would be to teach ACPI platforms how to chreate
+>> their own serdev devices.
+> 
+> I agree that ACPI and even pure platform devices should create serdev nodes.
 
-Hi,
+Then my driver will work as is (if the irq/sleep dt entries are
+implemented. I can do a respin with these added, and it can use the same
+DT labels as the Nokia driver does. No need for modifying the old driver
+at all.
 
-On Sat, Jul 22, 2017 at 11:57:47AM +0200, Marcel Holtmann wrote:
-> The Nokia devices require the setup of its Public Bluetooth Device
-> Address and for that it is required to depend on vendor specific
-> commands. For Broadcom based Nokia devices, that is part of btbcm
-> module and can be selected via BT_BCM config option.
->=20
-> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+>> Platforms with zero hardware info available should NOT be using serdev.
+> 
+> Actually there will be development hardware that comes via USB-TTY converters
+> and we need to make this work somehow. I am not going to write two drivers for
+> each hardware in the future. And we are using development boards often for
+> hardware testing and bringup.
 
-Reviewed-by: Sebastian Reichel <sebastian.reichel@collabora.co.uk>
+That should work.
 
--- Sebastian
+I havent looked, but it seems to me that all we need to do is allow
+serial port drivers to register a DT structure for the BT subdevice
+attached to them when they probe, if such a function doesnt already exist.
 
-> ---
->  drivers/bluetooth/Kconfig | 1 +
->  1 file changed, 1 insertion(+)
->=20
-> diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
-> index 35952a94875e..3a6ead603e49 100644
-> --- a/drivers/bluetooth/Kconfig
-> +++ b/drivers/bluetooth/Kconfig
-> @@ -98,6 +98,7 @@ config BT_HCIUART_NOKIA
->  	depends on BT_HCIUART_SERDEV
->  	depends on PM
->  	select BT_HCIUART_H4
-> +	select BT_BCM
->  	help
->  	  Nokia H4+ is serial protocol for communication between Bluetooth
->  	  device and host. This protocol is required for Bluetooth devices
-> --=20
-> 2.13.3
->=20
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth=
-" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+I dont see what other glue we would need - perhaps the USB ones might
+need a callback to allow them to send USB packets to control the wakeup
+lines etc.
 
---xhbnegvsou255quw
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCgAdFiEE72YNB0Y/i3JqeVQT2O7X88g7+poFAllzoXcACgkQ2O7X88g7
-+pqRWA/+O8fl5AUTRdYhREJqJYoKjYj44k0KeWxoMU62+fhfLe/JuYvcqbn+DUU+
-GMB3T8GLmMW0H12UHlgpBHS8dpqfDBCRbJcIxwGN1Xm7CBgI+qpfwNqDF2G0YKkN
-7gq8bDg7HDfNzPARMe0WFy3njgOzUYjm2HcqQm/GTfJ1wiYH62brVaSouwZaknoJ
-a4cqdLHUCENDhAxeePw6wd4Mbv2I+wYRBPT7xGFRghiRIfPKZSDSwpEMaBXpIa51
-aD0TAblTcTpUeDin/CctRmkSQ/t72mxnWahvCSqeSOP0YzC91s/eqEvRaIH62PZJ
-XOTv01A5fmCO8mUexx3Y6qTtK/oPxudHxpwedFQ+cao7Rr8wuZSqvCIb+RgLwRLr
-iRqloFvzWl/LozxVq4DxmoIPFe8SONnyxkQCKnUYQI+HBLNtmS2vlmrqgzWsUh6c
-FyMjoEPTXzJkUpofq/4mTDPwCDGjOHUxP8gLk1HvLuVQO27KxXJjGoemUu3UI0jY
-jME9esIh5MxxYtca7K6shYbL77qO/ZZpfYt+KZ8lhxAp5lm3jEClkzP0/hvUZg9i
-2ITwezjBxmiukSY85W3j5OOzHGLBBGRvTtCoAfv+4XsT4pVHZyI90An9T9gZAMYo
-RiQeu3RoBIM1Z/7ROCg70jAg20t93VLKPkFqwk331SBljuZ2dBM=
-=m/Cn
------END PGP SIGNATURE-----
-
---xhbnegvsou255quw--
+-Ian
