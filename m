@@ -5,9 +5,9 @@ Subject: Re: [PATCH] Bluetooth: hci_nokia: select BT_BCM for
  btbcm_set_bdaddr()
 From: Marcel Holtmann <marcel@holtmann.org>
 In-Reply-To: <20170722211658.fdfcwoqshtrxqvwj@earth>
-Date: Sun, 23 Jul 2017 09:40:20 +0200
+Date: Sun, 23 Jul 2017 09:32:23 +0200
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <0EEC0D61-D68F-4EDD-86C6-7447676AC232@holtmann.org>
+Message-Id: <6FFF415F-F875-481B-A6D6-3DD7159C7DDD@holtmann.org>
 References: <20170722095747.101069-1-marcel@holtmann.org>
  <20170722190323.mt5mrnioql7z2uj2@earth>
  <DC17CA45-3AB5-4272-A12A-1C7BD4811258@holtmann.org>
@@ -34,7 +34,9 @@ Hi Sebastian,
 > also seems to be missing for hci_ll, though. So the required command
 > is completly unknown?
 
-actually a bunch of the TI HCI vendor command documents are public. We just need to figure out which one does the job. For the WiLink it is HCI_VS_Write_BD_Addr (0xFC06) which just takes the BD_ADDR as parameter.
+are these a TI address or a Nokia address? I doubt Nokia would have actually shipped any hardware using an IEEE assigned address to TI.
+
+Where do we have the firmware files for the Nokia devices? Don't they contain a command for setting the BD_ADDR. Also the original Nokia driver had code to re-write that command inline while loading the firmware.
 
 Regards
 
