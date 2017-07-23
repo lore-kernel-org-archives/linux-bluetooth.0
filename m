@@ -1,95 +1,134 @@
-Return-Path: <sebastian.reichel@collabora.co.uk>
-Date: Mon, 24 Jul 2017 12:23:57 +0200
-From: Sebastian Reichel <sebastian.reichel@collabora.co.uk>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: hci_nokia: select BT_BCM for
- btbcm_set_bdaddr()
-Message-ID: <20170724102357.cj73ujrukrqnl47s@earth>
-References: <20170722095747.101069-1-marcel@holtmann.org>
- <20170722190323.mt5mrnioql7z2uj2@earth>
- <DC17CA45-3AB5-4272-A12A-1C7BD4811258@holtmann.org>
- <20170722211658.fdfcwoqshtrxqvwj@earth>
- <6FFF415F-F875-481B-A6D6-3DD7159C7DDD@holtmann.org>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="6bueoxi5z23qnjqg"
-In-Reply-To: <6FFF415F-F875-481B-A6D6-3DD7159C7DDD@holtmann.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+Subject: Re: bluetooth in v4.13-rc1: lock init missing somewhere?
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20170723082654.GA31857@amd>
+Date: Sun, 23 Jul 2017 20:44:38 +0200
+Cc: =?utf-8?Q?Pali_Roh=C3=A1r?= <pali.rohar@gmail.com>,
+        Sebastian Reichel <sre@kernel.org>,
+        kernel list <linux-kernel@vger.kernel.org>,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+        linux-omap <linux-omap@vger.kernel.org>,
+        Tony Lindgren <tony@atomide.com>, khilman@kernel.org,
+        Aaro Koskinen <aaro.koskinen@iki.fi>,
+        Ivaylo Dimitrov <ivo.g.dimitrov.75@gmail.com>,
+        patrikbachan@gmail.com, serge@hallyn.com, abcloriens@gmail.com,
+        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+        "Gustavo F. Padovan" <gustavo@padovan.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>
+Message-Id: <6609C072-31C4-41DE-986E-D6E9C49CA1DE@holtmann.org>
+References: <20170721085551.GA22993@amd>
+ <022531FF-11AA-4D6B-A92B-146F5E6BE31F@holtmann.org>
+ <20170721111058.GB9448@amd>
+ <D0C772B3-4C90-414C-84E5-1DE14054A40A@holtmann.org>
+ <20170723082654.GA31857@amd>
+To: Pavel Machek <pavel@ucw.cz>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Pavel,
 
---6bueoxi5z23qnjqg
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+>>> I guess output just after boot will be more interesting?
+>>> 
+>>> root@n900:/my/modules# insmod hci_nokia.ko
+>>> root@n900:/my/modules#
+>>> Message from syslogd@localhost at Jul 19 12:24:00 ...
+>>> kernel:[  174.363037] BUG: rwlock bad magic on CPU#0,
+>>> kworker/u3:0/3027, c2665a48
+>>> 
+>>> root@n900:/my/modules# ../bluez-5.26/tools/btmgmt public-addr
+>>> 01:02:03:04:05:06
+>>> Set Public Address for hci0 failed with status 0x0b (Rejected)
+>>> root@n900:/my/modules# ../bluez-5.26/tools/btmgmt power on
+>>> Set Powered for hci0 failed with status 0x11 (Invalid Index)
+>>> root@n900:/my/modules#
+>> 
+>> if you manage to get a recent btmon then it will also decode all the
+>> the unknown packets. That would be interesting since it tells you
+>> exactly what mgmt sends and what also legacy tools do at any given
+>> time.
+> 
+> Let me try:
+> 
+> pavel@n900:/my/bluez$ autoconf
+> configure.ac:4: error: possibly undefined macro: AM_INIT_AUTOMAKE
+>      If this token and others are legitimate, please use m4_pattern_allow.
+>      See the Autoconf documentation.
+> configure.ac:11: error: possibly undefined macro: AM_MAINTAINER_MODE
+> configure.ac:24: error: possibly undefined macro: AM_PROG_CC_C_O
+> configure.ac:25: error: possibly undefined macro: AC_PROG_CC_PIE
+> configure.ac:32: error: possibly undefined macro: AC_DISABLE_STATIC
+> configure.ac:33: error: possibly undefined macro: AC_PROG_LIBTOOL
+> configure.ac:41: error: possibly undefined macro: AM_CONDITIONAL
+> pavel@n900:/my/bluez$ ./configure 
+> ./configure: line 2189: syntax error near unexpected token `foreign'
+> ./configure: line 2189: `AM_INIT_AUTOMAKE(foreign subdir-objects color-tests silent-rules'
+> pavel@n900:/my/bluez$ 
+> 
+> automake; autoconf results in less warnings out of autoconf.
+> 
+> In the end I just deleted the offending line.
+> 
+> But then it ends here:
+> 
+> ./configure: line 4043: AM_PROG_CC_C_O: command not found
+> ./configure: line 4044: AC_PROG_CC_PIE: command not found
+> configure: error: cannot find install-sh, install.sh, or shtool in "."
+> "./.." "./../.."
+> pavel@n900:/my/bluez$
 
-Hi,
+you have you tried ./bootstrap or ./bootstrap-configure?
 
-On Sun, Jul 23, 2017 at 09:32:23AM +0200, Marcel Holtmann wrote:
-> >>>> The Nokia devices require the setup of its Public Bluetooth Device
-> >>>> Address and for that it is required to depend on vendor specific
-> >>>> commands. For Broadcom based Nokia devices, that is part of btbcm
-> >>>> module and can be selected via BT_BCM config option.
-> >>>>=20
-> >>>> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-> >>>=20
-> >>> Reviewed-by: Sebastian Reichel <sebastian.reichel@collabora.co.uk>
-> >>=20
-> >> btw. we need to also provide the set_bdaddr for TI chips.
-> >=20
-> > The TI based chip in Nokia N950 has a proper address configured, so
-> > it works without set_bdaddr (it would still be nice of course). It
-> > also seems to be missing for hci_ll, though. So the required command
-> > is completly unknown?
->=20
-> are these a TI address or a Nokia address? I doubt Nokia would
-> have actually shipped any hardware using an IEEE assigned address
-> to TI.
+>>> While btmon says:
+>>> 
+>>> ...begining of buffer lost :-(
+>> 
+>> I really need to find my patches for the monitor ring-buffer and
+>> replay support so that you can keep these in kernel memory and
+>> configure this with a kernel cmdline option. In theory however
+>> starting btmon before insmod should be plenty to get the full
+>> trace.
+> 
+> That was my fault, not kernel fault. I just relied on scrollback
+> buffer, and it was not big enough.
+> 
+>> 
+>> Actually I just realize that this is special anyway. Since this is Nokia manufacture ID, but Broadcom vendor decoding. I think that we need to add some special handling for this to make sure user space is able to decode this properly.
+>> 
+> 
+> Aha. Ok, I guess I can test out the patches... if I manage to compile
+> it. Adding a hint how to compile from git (-> configure not present)
+> would be nice.
 
-I can check this later.
+you can hack btmon to treat Nokia ID 2 as Broadcom ID 15 and then you would see the decoding.
 
-> Where do we have the firmware files for the Nokia devices?
+>> While we do this the btbcm_set_bdaddr might be actually empty.
+>> 
+>> config BT_HCIUART_NOKIA                                                          
+>>        tristate "UART Nokia H4+ protocol support"                               
+>>        depends on BT_HCIUART                                                    
+>>        depends on BT_HCIUART_SERDEV                                             
+>>        depends on PM                                                            
+>>        select BT_HCIUART_H4                                                     
+>> 
+>> This is missing the select BT_BCM like what we have for the hci_bcm.c support.
+>> 
+>> config BT_HCIUART_BCM                                                            
+>>        bool "Broadcom protocol support"                                         
+>>        depends on BT_HCIUART                                                    
+>>        select BT_HCIUART_H4                                                     
+>>        select BT_BCM
+>> 
+>> Can you try to enable btbcm.ko module and load that first.
+> 
+> Actually, I guess I can just make it build-in. But I'm not sure how it
+> is supposed to help: I'd expect undefined symbols on broken
+> dependency, not silent failure.
 
-For N950 I extracted it out of the following rpm:
+The helper modules are designed to be selected. So they fail gracefully if not. So this is just a bug. Make sure to have btbcm built-in or btbcm.ko available.
 
-http://repo.merproject.org/obs/nemo:/devel:/hw:/ti:/omap3:/n950-n9/latest_a=
-rmv7hl/src/ti-wl1273-bt-firmware-0.23-1.2.Nemo.Adaptation.N950.N9.src.rpm
+Regards
 
-> Don't they contain a command for setting the BD_ADDR.
+Marcel
 
-I did not check, since the firmware file is not device
-specific as far as I know.
-
-> Also the original Nokia driver had code to re-write that command
-> inline while loading the firmware.
-
-The address injection happens in hardware specific code (stock driver
-supports TI, Broadcom & CSR). In opposit to Broadcom and CSR the TI
-specific one does not change the address:
-
-https://github.com/nemomobile/kernel-adaptation-n950-n9/blob/master/drivers=
-/bluetooth/hci_h4p/fw-ti1273.c
-
--- Sebastian
-
---6bueoxi5z23qnjqg
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCgAdFiEE72YNB0Y/i3JqeVQT2O7X88g7+poFAll1yroACgkQ2O7X88g7
-+poTFxAAmNFjizaS1XVpzmWMaKT+4E/+jh8QGnteVyAP7DT3514srRDxctMWvqyF
-QFqbfsXCV2CrfYAnRz6YBy7dIerQN+D4yVjsiWBx6UEeLnJubfO1E3uGKE9sOsg8
-Igz6F1/ELLF/bOQyhVrZgxjLZGNaCVt5JQ0SQl7Fkgt+66EZ4UgawUZ9wBltdLWG
-B5UZcPbz5jpwY1UWpgytHX+BlRiS48JBwBIoTqXvbLv05EVRI74AiXgisAT9lfS6
-ShxtdIysZ00R2GLr6OF+ir2OVXyiL6ftKkk8vk8L9CvOOJ1+TPJwtmtJBbbfBZHd
-sBjw5EksTdpclG15m3S0ubEuV0PjJsATWS8oGHGP4N0j6FWoz2je/WBjdl/pbmtO
-BoI34kp4lxU6D1P63CjbujdTkSuR0IOSuqzLjlZXkDKqRKZ0pvifAp81JxExYwXh
-etUyQXDWK4pqbEYyZ9d/bCQWPHnYWTl5DUs6DLtrszxbSxLrTz8urdUoq/9OLhNU
-Gl8AzRLx1pSZHZD0VwUANiaovS1TgU/kpfuzECi5LFEN0pJWPD+mjwIexhiIlA6g
-nV1tnziyp9aizuVsTX29wepy4CzUtGK4JNbvG/r1VnSWmyBccdtFSEOkCffrLTcB
-EKN42wgaZ8XuQuJCC2cdKQAuzIbBamXgPu4I/AHfsvM23fKUEDk=
-=eRo6
------END PGP SIGNATURE-----
-
---6bueoxi5z23qnjqg--
