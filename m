@@ -1,85 +1,100 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 2/2] client: Print properties changes of LEAdvertisingManager1
-Date: Mon, 24 Jul 2017 17:45:39 +0300
-Message-Id: <20170724144539.27704-2-luiz.dentz@gmail.com>
-In-Reply-To: <20170724144539.27704-1-luiz.dentz@gmail.com>
-References: <20170724144539.27704-1-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 1/2] advertising: Add AdvertisementInstances
+Date: Mon, 24 Jul 2017 17:45:38 +0300
+Message-Id: <20170724144539.27704-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This prints properties changes of org.bluez.LEAdvertisingManager1
-interface:
-
-[bluetooth]# advertise on
-[CHG] Controller B8:8A:60:D8:17:D7 AdvertisementInstances: 0x04
-Advertising object registered
-[bluetooth]# advertise off
-[CHG] Controller B8:8A:60:D8:17:D7 AdvertisementInstances: 0x05
+This indicated to clients the number of advertisement instances left.
 ---
- client/main.c | 36 ++++++++++++++++++++++++++++++++++++
- 1 file changed, 36 insertions(+)
+ doc/advertising-api.txt |  4 ++++
+ src/advertising.c       | 33 ++++++++++++++++++++++++++++++---
+ 2 files changed, 34 insertions(+), 3 deletions(-)
 
-diff --git a/client/main.c b/client/main.c
-index ae7d6b84c..e0336a14c 100644
---- a/client/main.c
-+++ b/client/main.c
-@@ -583,10 +583,25 @@ static void proxy_removed(GDBusProxy *proxy, void *user_data)
- 	}
+diff --git a/doc/advertising-api.txt b/doc/advertising-api.txt
+index 8207b5934..7a29b7095 100644
+--- a/doc/advertising-api.txt
++++ b/doc/advertising-api.txt
+@@ -112,3 +112,7 @@ Methods		RegisterAdvertisement(object advertisement, dict options)
+ 
+ 			Possible errors: org.bluez.Error.InvalidArguments
+ 					 org.bluez.Error.DoesNotExist
++
++Properties	byte AdvertisementInstaces
++
++			Number of available advertisement instances.
+diff --git a/src/advertising.c b/src/advertising.c
+index 1bea0d177..10d8d0119 100644
+--- a/src/advertising.c
++++ b/src/advertising.c
+@@ -160,11 +160,16 @@ static void client_remove(void *data)
+ 	queue_remove(client->manager->clients, client);
+ 
+ 	g_idle_add(client_free_idle_cb, client);
++
++	g_dbus_emit_property_changed(btd_get_dbus_connection(),
++				adapter_get_path(client->manager->adapter),
++				LE_ADVERTISING_MGR_IFACE,
++				"AdvertisementInstances");
  }
  
-+static struct adapter *find_ctrl(GList *source, const char *path)
+ static void client_disconnect_cb(DBusConnection *conn, void *user_data)
+ {
+-	DBG("Client disconnected");
++	DBG("Client dis:b connected");
+ 
+ 	client_remove(user_data);
+ }
+@@ -446,6 +451,11 @@ static void add_adv_callback(uint8_t status, uint16_t length,
+ 									client);
+ 	DBG("Advertisement registered: %s", client->path);
+ 
++	g_dbus_emit_property_changed(btd_get_dbus_connection(),
++				adapter_get_path(client->manager->adapter),
++				LE_ADVERTISING_MGR_IFACE,
++				"AdvertisementInstances");
++
+ done:
+ 	add_client_complete(client, status);
+ }
+@@ -715,6 +725,23 @@ static DBusMessage *unregister_advertisement(DBusConnection *conn,
+ 	return dbus_message_new_method_return(msg);
+ }
+ 
++static gboolean get_instances(const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *data)
 +{
-+	GList *list;
++	struct btd_adv_manager *manager = data;
++	uint8_t instances;
 +
-+	for (list = g_list_first(source); list; list = g_list_next(list)) {
-+		struct adapter *adapter = list->data;
++	instances = manager->max_ads - queue_length(manager->clients);
 +
-+		if (!strcasecmp(g_dbus_proxy_get_path(adapter->proxy), path))
-+			return adapter;
-+	}
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_BYTE, &instances);
 +
-+	return NULL;
++	return TRUE;
 +}
 +
- static void property_changed(GDBusProxy *proxy, const char *name,
- 					DBusMessageIter *iter, void *user_data)
- {
- 	const char *interface;
-+	struct adapter *ctrl;
++static const GDBusPropertyTable properties[] = {
++	{ "AdvertisementInstances", "y", get_instances },
++};
++
+ static const GDBusMethodTable methods[] = {
+ 	{ GDBUS_EXPERIMENTAL_ASYNC_METHOD("RegisterAdvertisement",
+ 					GDBUS_ARGS({ "advertisement", "o" },
+@@ -763,8 +790,8 @@ static void read_adv_features_callback(uint8_t status, uint16_t length,
  
- 	interface = g_dbus_proxy_get_interface(proxy);
- 
-@@ -637,6 +652,27 @@ static void property_changed(GDBusProxy *proxy, const char *name,
- 
- 		print_iter(str, name, iter);
- 		g_free(str);
-+	} else if (!strcmp(interface, "org.bluez.LEAdvertisingManager1")) {
-+		DBusMessageIter addr_iter;
-+		char *str;
-+
-+		ctrl = find_ctrl(ctrl_list, g_dbus_proxy_get_path(proxy));
-+		if (!ctrl)
-+			return;
-+
-+		if (g_dbus_proxy_get_property(ctrl->proxy, "Address",
-+						&addr_iter) == TRUE) {
-+			const char *address;
-+
-+			dbus_message_iter_get_basic(&addr_iter, &address);
-+			str = g_strdup_printf("[" COLORED_CHG
-+						"] Controller %s ",
-+						address);
-+		} else
-+			str = g_strdup("");
-+
-+		print_iter(str, name, iter);
-+		g_free(str);
- 	} else if (proxy == default_attr) {
- 		char *str;
+ 	if (!g_dbus_register_interface(btd_get_dbus_connection(),
+ 					adapter_get_path(manager->adapter),
+-					LE_ADVERTISING_MGR_IFACE,
+-					methods, NULL, NULL, manager, NULL))
++					LE_ADVERTISING_MGR_IFACE, methods,
++					NULL, properties, manager, NULL))
+ 		error("Failed to register " LE_ADVERTISING_MGR_IFACE);
+ }
  
 -- 
 2.13.3
