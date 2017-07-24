@@ -1,70 +1,70 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Subject: Re: [PATCH] Bluetooth: hci_nokia: select BT_BCM for
- btbcm_set_bdaddr()
+Subject: Re: [PATCH v6] Bluetooth: btusb: Fix memory leak in play_deferred
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20170724102357.cj73ujrukrqnl47s@earth>
-Date: Mon, 24 Jul 2017 19:09:08 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <C99B9ECC-75CD-4945-BF49-496B66C19493@holtmann.org>
-References: <20170722095747.101069-1-marcel@holtmann.org>
- <20170722190323.mt5mrnioql7z2uj2@earth>
- <DC17CA45-3AB5-4272-A12A-1C7BD4811258@holtmann.org>
- <20170722211658.fdfcwoqshtrxqvwj@earth>
- <6FFF415F-F875-481B-A6D6-3DD7159C7DDD@holtmann.org>
- <20170724102357.cj73ujrukrqnl47s@earth>
-To: Sebastian Reichel <sebastian.reichel@collabora.co.uk>
+In-Reply-To: <1500548030-20556-1-git-send-email-jeffy.chen@rock-chips.com>
+Date: Mon, 24 Jul 2017 18:56:50 +0200
+Cc: kernel list <linux-kernel@vger.kernel.org>,
+        Oliver Neukum <oneukum@suse.com>, xiyou.wangcong@gmail.com,
+        Brian Norris <briannorris@chromium.org>,
+        Douglas Anderson <dianders@chromium.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        "Gustavo F. Padovan" <gustavo@padovan.org>,
+        linux-bluetooth@vger.kernel.org
+Message-Id: <E78D1D13-F84A-40A2-9296-A360619E780C@holtmann.org>
+References: <1500548030-20556-1-git-send-email-jeffy.chen@rock-chips.com>
+To: Jeffy Chen <jeffy.chen@rock-chips.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Sebastian,
+Hi Jeffy,
 
->>>>>> The Nokia devices require the setup of its Public Bluetooth Device
->>>>>> Address and for that it is required to depend on vendor specific
->>>>>> commands. For Broadcom based Nokia devices, that is part of btbcm
->>>>>> module and can be selected via BT_BCM config option.
->>>>>> 
->>>>>> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
->>>>> 
->>>>> Reviewed-by: Sebastian Reichel <sebastian.reichel@collabora.co.uk>
->>>> 
->>>> btw. we need to also provide the set_bdaddr for TI chips.
->>> 
->>> The TI based chip in Nokia N950 has a proper address configured, so
->>> it works without set_bdaddr (it would still be nice of course). It
->>> also seems to be missing for hci_ll, though. So the required command
->>> is completly unknown?
->> 
->> are these a TI address or a Nokia address? I doubt Nokia would
->> have actually shipped any hardware using an IEEE assigned address
->> to TI.
+> Currently we are calling usb_submit_urb directly to submit deferred tx
+> urbs after unanchor them.
 > 
-> I can check this later.
+> So the usb_giveback_urb_bh would failed to unref it in usb_unanchor_urb
+> and cause memory leak:
+> unreferenced object 0xffffffc0ce0fa400 (size 256):
+> ...
+>  backtrace:
+>    [<ffffffc00034a9a8>] __save_stack_trace+0x48/0x6c
+>    [<ffffffc00034b088>] create_object+0x138/0x254
+>    [<ffffffc0009d5504>] kmemleak_alloc+0x58/0x8c
+>    [<ffffffc000345f78>] __kmalloc+0x1d4/0x2a0
+>    [<ffffffc0006765bc>] usb_alloc_urb+0x30/0x60
+>    [<ffffffbffc128598>] alloc_ctrl_urb+0x38/0x120 [btusb]
+>    [<ffffffbffc129e7c>] btusb_send_frame+0x64/0xf8 [btusb]
 > 
->> Where do we have the firmware files for the Nokia devices?
+> Put those urbs in tx_anchor to avoid the leak, and also fix the error
+> handling.
 > 
-> For N950 I extracted it out of the following rpm:
+> Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
+> ---
 > 
-> http://repo.merproject.org/obs/nemo:/devel:/hw:/ti:/omap3:/n950-n9/latest_armv7hl/src/ti-wl1273-bt-firmware-0.23-1.2.Nemo.Adaptation.N950.N9.src.rpm
+> Changes in v6:
+> Don't print error msg when dropping urbs, since we already log it when
+> failed to submit.
 > 
->> Don't they contain a command for setting the BD_ADDR.
+> Changes in v5:
+> Fix compile warning reported by "kbuild test robot":
+> drivers/bluetooth/btusb.c:3288:3: warning: 'err' may be used uninitialized in this function [-Wmaybe-uninitialized]
+> This 'err' would be set in the send loop, and would be used in the
+> cleanup rest urb code outside the loop.
 > 
-> I did not check, since the firmware file is not device
-> specific as far as I know.
+> Changes in v4:
+> Drop the rest deferred urbs when error happens.
+> 
+> Changes in v3:
+> Put the deferred urbs in tx_anchor.
+> 
+> Changes in v2:
+> Call usb_free_urb instead of reusing submit_tx_urb.
+> 
+> drivers/bluetooth/btusb.c | 19 +++++++++++++++++--
+> 1 file changed, 17 insertions(+), 2 deletions(-)
 
-doen't matter since the old Nokia written driver hacked it from a sysfs file and the address came from the secure flash area.
-
->> Also the original Nokia driver had code to re-write that command
->> inline while loading the firmware.
-> 
-> The address injection happens in hardware specific code (stock driver
-> supports TI, Broadcom & CSR). In opposit to Broadcom and CSR the TI
-> specific one does not change the address:
-> 
-> https://github.com/nemomobile/kernel-adaptation-n950-n9/blob/master/drivers/bluetooth/hci_h4p/fw-ti1273.c
-
-As far as I know they rewrite the Write BD_ADDR command of each vendor at the time before they send to the hardware.
+patch has been applied to bluetooth-next tree.
 
 Regards
 
