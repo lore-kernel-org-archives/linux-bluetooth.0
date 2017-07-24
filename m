@@ -1,149 +1,126 @@
-Return-Path: <shapiroc@google.com>
+Return-Path: <sebastian.reichel@collabora.co.uk>
+Date: Mon, 24 Jul 2017 20:48:10 +0200
+From: Sebastian Reichel <sebastian.reichel@collabora.co.uk>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: hci_nokia: select BT_BCM for
+ btbcm_set_bdaddr()
+Message-ID: <20170724184810.pqpvsgz63tmsjot5@earth>
+References: <20170722095747.101069-1-marcel@holtmann.org>
+ <20170722190323.mt5mrnioql7z2uj2@earth>
+ <DC17CA45-3AB5-4272-A12A-1C7BD4811258@holtmann.org>
+ <20170722211658.fdfcwoqshtrxqvwj@earth>
+ <6FFF415F-F875-481B-A6D6-3DD7159C7DDD@holtmann.org>
+ <20170724102357.cj73ujrukrqnl47s@earth>
+ <C99B9ECC-75CD-4945-BF49-496B66C19493@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CALM0h1=5KQe2NpEc9OiAHOUGQp-rtsoFhGhzyMzOH8uTbX=ysQ@mail.gmail.com>
-References: <20170630172920.1968-1-shapiroc@chromium.org> <5A47203A-A671-4854-9EAB-B09B15AF7680@holtmann.org>
- <CALM0h1m69=96tC+rM_-rXhc-9Kytaw_mZzc99vKXYZvVyjCXjg@mail.gmail.com>
- <CABBYNZ+OwBapaFMFAJMn7xC4+rioXihojyXiGAdJQKC+48wb3Q@mail.gmail.com> <CALM0h1=5KQe2NpEc9OiAHOUGQp-rtsoFhGhzyMzOH8uTbX=ysQ@mail.gmail.com>
-From: Charles Shapiro <shapiroc@google.com>
-Date: Mon, 24 Jul 2017 13:18:37 -0600
-Message-ID: <CALM0h1mh7cHXn7J+-+LyfbPuUvgkFjW8tR-bSaZYP_AU5QFHJQ@mail.gmail.com>
-Subject: Re: [PATCH] Support to change set file via arg
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>, Simon Glass <sjg@chromium.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="26nyvlbyhijdx7d4"
+In-Reply-To: <C99B9ECC-75CD-4945-BF49-496B66C19493@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The links above were invalid...sorry.
 
-Here are the correct links:
-E.g.
- - https://chromium.googlesource.com/chromiumos/overlays/board-overlays/+/m=
-aster/overlay-pyro/chromeos-base/chromeos-bsp-pyro/files/main.conf
- - https://chromium.googlesource.com/chromiumos/overlays/board-overlays/+/m=
-aster/overlay-reef/chromeos-base/chromeos-bsp-reef/files/main.conf
- - https://chromium.googlesource.com/chromiumos/overlays/board-overlays/+/m=
-aster/overlay-snappy/chromeos-base/chromeos-bsp-snappy/files/main.conf
+--26nyvlbyhijdx7d4
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-I also updated the commit with these links and a better explanation of
-the usage.
+Hi,
 
-Thanks,
-Charles
+On Mon, Jul 24, 2017 at 07:09:08PM +0200, Marcel Holtmann wrote:
+> >>>>>> The Nokia devices require the setup of its Public Bluetooth Device
+> >>>>>> Address and for that it is required to depend on vendor specific
+> >>>>>> commands. For Broadcom based Nokia devices, that is part of btbcm
+> >>>>>> module and can be selected via BT_BCM config option.
+> >>>>>>=20
+> >>>>>> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+> >>>>>=20
+> >>>>> Reviewed-by: Sebastian Reichel <sebastian.reichel@collabora.co.uk>
+> >>>>=20
+> >>>> btw. we need to also provide the set_bdaddr for TI chips.
+> >>>=20
+> >>> The TI based chip in Nokia N950 has a proper address configured, so
+> >>> it works without set_bdaddr (it would still be nice of course). It
+> >>> also seems to be missing for hci_ll, though. So the required command
+> >>> is completly unknown?
+> >>=20
+> >> are these a TI address or a Nokia address? I doubt Nokia would
+> >> have actually shipped any hardware using an IEEE assigned address
+> >> to TI.
+> >=20
+> > I can check this later.
+> >=20
+> >> Where do we have the firmware files for the Nokia devices?
+> >=20
+> > For N950 I extracted it out of the following rpm:
+> >=20
+> > http://repo.merproject.org/obs/nemo:/devel:/hw:/ti:/omap3:/n950-n9/late=
+st_armv7hl/src/ti-wl1273-bt-firmware-0.23-1.2.Nemo.Adaptation.N950.N9.src.r=
+pm
+> >=20
+> >> Don't they contain a command for setting the BD_ADDR.
+> >=20
+> > I did not check, since the firmware file is not device
+> > specific as far as I know.
+>=20
+> doen't matter since the old Nokia written driver hacked it from a
+> sysfs file and the address came from the secure flash area.
 
-On Fri, Jun 30, 2017 at 1:04 PM, Charles Shapiro <shapiroc@google.com> wrot=
-e:
-> The product id varies in the DeviceID.
->
-> E.g.
-> https://chromium.git.corp.google.com/chromiumos/overlays/board-overlays/+=
-/master/overlay-pyro/chromeos-base/chromeos-bsp-pyro/files/main.conf
-> https://chromium.git.corp.google.com/chromiumos/overlays/board-overlays/+=
-/master/overlay-reef/chromeos-base/chromeos-bsp-reef/files/main.conf
-> https://chromium.git.corp.google.com/chromiumos/overlays/board-overlays/+=
-/master/overlay-snappy/chromeos-base/chromeos-bsp-snappy/files/main.conf
->
-> Linking is a possibility also, but being able to pass in the config
-> path via a flag seemed reasonable also.
->
-> On Fri, Jun 30, 2017 at 12:57 PM, Luiz Augusto von Dentz
-> <luiz.dentz@gmail.com> wrote:
->> Hi Charles,
->>
->> On Fri, Jun 30, 2017 at 8:55 PM, Charles Shapiro <shapiroc@google.com> w=
-rote:
->>> (Removing HTML formatting on email thread so it doesn't get blocked).
->>>
->>> For ChromeOS, we're working towards having a single build/image based
->>> on a reference board that then supports multiple models created by
->>> OEMs.
->>>
->>> Some of the bluetooth config differs on a per model basis, so we need
->>> to have multiple *.conf files ship on the actual image.
->>>
->>> We then modify the init script to check the model at runtime and pass
->>> the appropriate *.conf file to bluetoothd when it is started.
->>>
->>> On Fri, Jun 30, 2017 at 11:42 AM, Marcel Holtmann <marcel@holtmann.org>=
- wrote:
->>>> Hi Shapiro,
->>>>
->>>>> Currently, there is an expectation of the main.conf file at a specifi=
-c
->>>>> location.  This prevents system builds that support more than one
->>>>> platform.
->>>>>
->>>>> This adds support so the main.conf file can be specified as a command
->>>>> line arg instead, so systems can manage multiple conf files as necess=
-ary
->>>>> and pass the appropriate conf file when the daemon is started.
->>>>>
->>>>> Signed-off-by: C Shapiro <shapiroc@chromium.org>
->>>>> ---
->>>>> src/bluetoothd.8.in |  4 ++++
->>>>> src/main.c          | 12 +++++++++++-
->>>>> 2 files changed, 15 insertions(+), 1 deletion(-)
->>>>>
->>>>> diff --git a/src/bluetoothd.8.in b/src/bluetoothd.8.in
->>>>> index 97ef3ec94..d61dcc5b3 100644
->>>>> --- a/src/bluetoothd.8.in
->>>>> +++ b/src/bluetoothd.8.in
->>>>> @@ -27,6 +27,10 @@ Print bluetoothd options and exit.
->>>>> Enable logging in foreground. Directs log output to the controlling t=
-erminal \
->>>>> in addition to syslog.
->>>>> .TP
->>>>> +.B -f, --configfile
->>>>> +Specifies an explicit config file path instead of relying on the def=
-ault path \
->>>>> +(@CONFIGDIR@/main.conf) for the config file.
->>>>> +.TP
->>>>> .B -d, --debug=3D<file1>:<file2>:...
->>>>> Sets how much information bluetoothd sends to the log destination (us=
-ually \
->>>>> syslog's "daemon" facility). If the file options are omitted, then de=
-bugging \
->>>>> diff --git a/src/main.c b/src/main.c
->>>>> index bcc1e6fae..87bdb66cb 100644
->>>>> --- a/src/main.c
->>>>> +++ b/src/main.c
->>>>> @@ -490,6 +490,7 @@ static guint setup_signalfd(void)
->>>>> static char *option_debug =3D NULL;
->>>>> static char *option_plugin =3D NULL;
->>>>> static char *option_noplugin =3D NULL;
->>>>> +static char *option_configfile =3D NULL;
->>>>> static gboolean option_compat =3D FALSE;
->>>>> static gboolean option_detach =3D TRUE;
->>>>> static gboolean option_version =3D FALSE;
->>>>> @@ -505,6 +506,9 @@ static void free_options(void)
->>>>>
->>>>>       g_free(option_noplugin);
->>>>>       option_noplugin =3D NULL;
->>>>> +
->>>>> +     g_free(option_configfile);
->>>>> +     option_configfile =3D NULL;
->>>>> }
->>>>>
->>>>> static void disconnect_dbus(void)
->>>>> @@ -577,6 +581,9 @@ static GOptionEntry options[] =3D {
->>>>>                               "Specify plugins to load", "NAME,..," }=
-,
->>>>>       { "noplugin", 'P', 0, G_OPTION_ARG_STRING, &option_noplugin,
->>>>>                               "Specify plugins not to load", "NAME,..=
-." },
->>>>> +     { "configfile", 'f', 0, G_OPTION_ARG_STRING, &option_configfile=
-,
->>>>> +                             "Specify an explicit path to the config=
- file",
->>>>> +                             "FILE=E2=80=9D},
->>>>
->>>> I am failing to understand why this is needed. What problem are you tr=
-ying to solve here? Can you give an example.
->>>>
->>
->> Btw, can't you link the main.conf with the board specific config?
->> Still it would be good to know what is that needs changing, is this
->> related to ControllerMode?
->>
->> --
->> Luiz Augusto von Dentz
+The sysfs "just" puts the address into platform_data for their h4p
+driver. It does not take care of applying it to the hardware. That
+is the job of their h4p driver. Here is the code for the sysfs file:
+
+https://github.com/nemomobile/kernel-adaptation-n950-n9/blob/master/arch/ar=
+m/mach-omap2/board-omap-bt.c
+
+> >> Also the original Nokia driver had code to re-write that command
+> >> inline while loading the firmware.
+> >=20
+> > The address injection happens in hardware specific code (stock driver
+> > supports TI, Broadcom & CSR). In opposit to Broadcom and CSR the TI
+> > specific one does not change the address:
+> >=20
+> > https://github.com/nemomobile/kernel-adaptation-n950-n9/blob/master/dri=
+vers/bluetooth/hci_h4p/fw-ti1273.c
+>=20
+> As far as I know they rewrite the Write BD_ADDR command of each
+> vendor at the time before they send to the hardware.
+
+You can clearly see that they modify the address in the hardware
+specific firmware files for Broadcom and CSR:
+
+https://github.com/nemomobile/kernel-adaptation-n950-n9/blob/master/drivers=
+/bluetooth/hci_h4p/fw-bcm.c
+https://github.com/nemomobile/kernel-adaptation-n950-n9/blob/master/drivers=
+/bluetooth/hci_h4p/fw-csr.c
+
+But there is no such code for TI (except for a comment):
+
+/* Check if this is bd_address packet */
+
+I think they just forgot to implement it and since the
+comment has no XXX/TODO/FIXME prefix nobody noticed it.
+
+-- Sebastian
+
+--26nyvlbyhijdx7d4
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCgAdFiEE72YNB0Y/i3JqeVQT2O7X88g7+poFAll2QOgACgkQ2O7X88g7
++prweBAAj5VXVNDgkiJ90bs15hywY7RIhMvdD1VAd1MYvFE2t98nS5jBkPp143WZ
+ghufvC/OHyecOTX9TTQLqq9DQCIK4IgSMH47nu0W/ZQ7oTvsat2ZLoBPAssQioXA
+cZ/3i1JOnpHnlTyKMVFQEMFdsslpZ7OMA/j1pd26uehwIpF2bvSRWjuqLF4o3IPJ
+hYuAmvVk1kHthkiQnekaOEAE979KQ6mdvBNCSDLuwals9mtIgNQnEJ7gbS3xyuQi
+nY3R4i+QvaOU5AuBsp4oTMwsQcP582vw/bV6VwziwLYq9TQ79Qr/52gYZovV7ZuN
+T+O+phUFm567pag09J6nDbu18JhvY+qo+blVC9/eN8wlRKbyTERJDj2V5q9G0336
+bvmgQsKGlBFkpNAEaHqNcUf4cwJdsTAuvLHtdOXh6yYrtjS9mo0h2GvbDrBy+BcU
+EQAJBtg3HfNiYwK3EDhiesnR03wv6X6p05kKIT7AiFTm82xImNXcgZWjjpY5fJly
+nrkXZiEf8Nf7X/jptaOmIfiaU9/uBx2FfYnNRa7HEVblB7PCQWmvkUBcJ9ztXeoK
+CowPqn0Y1IrVJI1O3R6ID8YKWM5MsyfnTcvECRiPgpHNxuojIPJsLXusOHKoXJ8N
+dIc83jZoqojmjgDl9/hmCnVy1sES2/YODZINnlmDO/OMutgGP0M=
+=KaXW
+-----END PGP SIGNATURE-----
+
+--26nyvlbyhijdx7d4--
