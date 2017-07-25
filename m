@@ -1,27 +1,37 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
-        <frederic.dalleau@collabora.com>
+Reply-To: ProklovAV@mail.zabtrans.ru
 To: linux-bluetooth@vger.kernel.org
-Cc: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
-        <frederic.dalleau@collabora.com>
-Subject: [PATCH 0/2] Fixes in monitor mesh
-Date: Wed, 26 Jul 2017 07:40:38 +0200
-Message-Id: <20170726054040.17970-1-frederic.dalleau@collabora.com>
+From: =?UTF-8?B?0J/RgNC+0LrQu9C+0LIg0JDQu9C10LrRgdCw0L3QtNGAINCS0LDQu9C10YA=?=
+         =?UTF-8?B?0YzQtdCy0LjRhw==?= <ProklovAV@mail.zabtrans.ru>
+Subject: Problem with StopDiscovery() via dbus-send
+Message-ID: <5977D982.5070808@mail.zabtrans.ru>
+Date: Wed, 26 Jul 2017 07:51:30 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=koi8-r; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi, I came across those two things, so here are some patches.
-Regards,
+  Hello All,
 
-Frédéric Dalleau (2):
-  monitor: Fix OOB information bit in mesh oob table
-  monitor: Format URI hash using 8 hex digits
+I'm trying to manage Bluetooth using dbus-send command,
 
- monitor/packet.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+I send command for start discovery:
+dbus-send --system --reply-timeout=5000 --type=method_call 
+--dest=org.bluez /org/bluez/hci0 org.bluez.Adapter1.StartDiscovery
 
--- 
-2.11.0
+I see that the scan started, the status is true:
+dbus-send --system --print-reply --dest=org.bluez --type=method_call 
+/org/bluez/hci0 org.freedesktop.DBus.Properties.Get 
+string:org.bluez.Adapter1 string:Discovering
 
+But I can not stop scanning by a command:
+dbus-send --system --reply-timeout=5000 --type=method_call 
+--dest=org.bluez /org/bluez/hci0 org.bluez.Adapter1.StopDiscovery
+
+"Discovering" status true.
+
+Bluez version 5.45
+
+---------------------
+Best regards,
+Aleksandr Proklov
