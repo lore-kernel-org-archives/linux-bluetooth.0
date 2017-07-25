@@ -1,48 +1,43 @@
-Return-Path: <luiz.dentz@gmail.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20170724172523.13135-7-sthemmin@microsoft.com>
-References: <20170724172523.13135-1-sthemmin@microsoft.com> <20170724172523.13135-7-sthemmin@microsoft.com>
+In-Reply-To: <CAMybWM1H9rxVW+np0r0y1cagPudcX15Xht5ZkSkmLn0gwFkCuw@mail.gmail.com>
+References: <CAMybWM1H9rxVW+np0r0y1cagPudcX15Xht5ZkSkmLn0gwFkCuw@mail.gmail.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 25 Jul 2017 15:45:16 +0300
-Message-ID: <CABBYNZJES2ph8SkAisPEm-wsZ6iHjKTYkZ9wffhkk7X6=eKGoA@mail.gmail.com>
-Subject: Re: [PATCH net-next 6/6] 6lowpan: fix set not used warning
-To: Stephen Hemminger <stephen@networkplumber.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>, "Gustavo F. Padovan" <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>, David Miller <davem@davemloft.net>, pablo@netfilter.org,
-	kadlec@blackhole.kfki.hu, fw@strlen.de,
-	"open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>, netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org, Stephen Hemminger <sthemmin@microsoft.com>
+Date: Tue, 25 Jul 2017 15:41:54 +0300
+Message-ID: <CABBYNZ+ZMm8_+cydkoZD0t-9nntyNJSVMjGBbmM3C+CvAkZpaQ@mail.gmail.com>
+Subject: Re: Understanding GATT database
+To: Natalya Rozhnova <rozhnova.natalya@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Stephen,
+Hi Natalya,
 
-On Mon, Jul 24, 2017 at 8:25 PM, Stephen Hemminger
-<stephen@networkplumber.org> wrote:
-> Signed-off-by: Stephen Hemminger <sthemmin@microsoft.com>
-> ---
->  net/bluetooth/6lowpan.c | 3 ---
->  1 file changed, 3 deletions(-)
+On Mon, Jul 24, 2017 at 6:03 PM, Natalya Rozhnova
+<rozhnova.natalya@gmail.com> wrote:
+> Hello,
 >
-> diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
-> index 2af4f1cc0ab4..4e2576fc0c59 100644
-> --- a/net/bluetooth/6lowpan.c
-> +++ b/net/bluetooth/6lowpan.c
-> @@ -273,9 +273,6 @@ static int iphc_decompress(struct sk_buff *skb, struct net_device *netdev,
->                            struct lowpan_peer *peer)
->  {
->         const u8 *saddr;
-> -       struct lowpan_btle_dev *dev;
-> -
-> -       dev = lowpan_btle_dev(netdev);
+> I am trying to understand the difference between the gatt_db stored in
+> the device structure and the one stored in bt_gatt_client structure. I
+> see that the database stored in the device is recovered from the
+> cache. I would like to understand what it is used for if anyway the
+> new one is created during the discover_services phase? Another
+> question that would very probably help me to understand this better:
+> if I copy the device->db to client->db, would it still work or we
+> really need to pass by a communication with a BLE device and compose
+> the database from scratch?
 >
->         saddr = peer->lladdr;
->
-> --
-> 2.11.0
+> Could anybody explain me this please?
 
-Acked-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+The gatt_db is passed over to bt_gatt_client_new, that way the client
+can inspect if the attributes were already in place and skip deep
+discovery:
+
+https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/src/shared/gatt-client.c#n1831
+
+As you can see above the client->db is a reference to device->db, so
+there is just one instance of the db per device.
 
 -- 
 Luiz Augusto von Dentz
