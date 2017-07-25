@@ -1,37 +1,23 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Reply-To: ProklovAV@mail.zabtrans.ru
-To: linux-bluetooth@vger.kernel.org
-From: =?UTF-8?B?0J/RgNC+0LrQu9C+0LIg0JDQu9C10LrRgdCw0L3QtNGAINCS0LDQu9C10YA=?=
-         =?UTF-8?B?0YzQtdCy0LjRhw==?= <ProklovAV@mail.zabtrans.ru>
-Subject: Problem with StopDiscovery() via dbus-send
-Message-ID: <5977D982.5070808@mail.zabtrans.ru>
-Date: Wed, 26 Jul 2017 07:51:30 +0800
-MIME-Version: 1.0
-Content-Type: text/plain; charset=koi8-r; format=flowed
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <davem@davemloft.net>
+Date: Tue, 25 Jul 2017 12:31:52 -0700 (PDT)
+Message-Id: <20170725.123152.631071956708730631.davem@davemloft.net>
+To: stephen@networkplumber.org
+Cc: marcel@holtmann.org, gustavo@padovan.org, johan.hedberg@gmail.com,
+ pablo@netfilter.org, kadlec@blackhole.kfki.hu, fw@strlen.de,
+ netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+ netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+ sthemmin@microsoft.com
+Subject: Re: [PATCH net-next 0/6] network related warning fixes
+From: David Miller <davem@davemloft.net>
+In-Reply-To: <20170724172523.13135-1-sthemmin@microsoft.com>
+References: <20170724172523.13135-1-sthemmin@microsoft.com>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-  Hello All,
+From: Stephen Hemminger <stephen@networkplumber.org>
+Date: Mon, 24 Jul 2017 10:25:17 -0700
 
-I'm trying to manage Bluetooth using dbus-send command,
+> Various fixes for warnings in network code and drivers.
 
-I send command for start discovery:
-dbus-send --system --reply-timeout=5000 --type=method_call 
---dest=org.bluez /org/bluez/hci0 org.bluez.Adapter1.StartDiscovery
-
-I see that the scan started, the status is true:
-dbus-send --system --print-reply --dest=org.bluez --type=method_call 
-/org/bluez/hci0 org.freedesktop.DBus.Properties.Get 
-string:org.bluez.Adapter1 string:Discovering
-
-But I can not stop scanning by a command:
-dbus-send --system --reply-timeout=5000 --type=method_call 
---dest=org.bluez /org/bluez/hci0 org.bluez.Adapter1.StopDiscovery
-
-"Discovering" status true.
-
-Bluez version 5.45
-
----------------------
-Best regards,
-Aleksandr Proklov
+Series applied, thanks Stephen.
