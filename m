@@ -1,40 +1,35 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Subject: Re: [PATCH 2/2] monitor: Format URI hash using 8 hex digits
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20170726054040.17970-3-frederic.dalleau@collabora.com>
-Date: Wed, 26 Jul 2017 09:45:25 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <74268B4F-AF41-49D7-9296-A2FA0E665E24@holtmann.org>
-References: <20170726054040.17970-1-frederic.dalleau@collabora.com>
- <20170726054040.17970-3-frederic.dalleau@collabora.com>
-To: =?utf-8?B?RnLDqWTDqXJpYyBEYWxsZWF1?=
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
         <frederic.dalleau@collabora.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
+        <frederic.dalleau@collabora.com>
+Subject: [PATCH 1/2] monitor: Fix OOB information bit in mesh oob table
+Date: Wed, 26 Jul 2017 07:40:39 +0200
+Message-Id: <20170726054040.17970-2-frederic.dalleau@collabora.com>
+In-Reply-To: <20170726054040.17970-1-frederic.dalleau@collabora.com>
+References: <20170726054040.17970-1-frederic.dalleau@collabora.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Fred,
+The bit 15 should be used for 'On device'.
+---
+ monitor/packet.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> URI hash is a 32 bits value.
-> ---
-> monitor/packet.c | 2 +-
-> 1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/monitor/packet.c b/monitor/packet.c
-> index f72fcab6a..994f5b259 100644
-> --- a/monitor/packet.c
-> +++ b/monitor/packet.c
-> @@ -3551,7 +3551,7 @@ static void print_mesh_beacon(const uint8_t *data, uint8_t len)
-> 			break;
-> 		}
-> 
-> -		print_field("  URI Hash: 0x%4.4x", get_be32(data + 19));
-> +		print_field("  URI Hash: 0x%08x", get_be32(data + 19));
-
-in btmon we use the 0x%8.8x notation then.
-
-Regards
-
-Marcel
+diff --git a/monitor/packet.c b/monitor/packet.c
+index 387be1dcb..f72fcab6a 100644
+--- a/monitor/packet.c
++++ b/monitor/packet.c
+@@ -3514,7 +3514,7 @@ static const struct {
+ 	{ 12, "Inside box"						},
+ 	{ 13, "On piece of paper"					},
+ 	{ 14, "Inside manual"						},
+-	{ 14, "On device"						},
++	{ 15, "On device"						},
+ 	{ }
+ };
+ 
+-- 
+2.11.0
 
