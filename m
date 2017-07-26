@@ -4,32 +4,27 @@ From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
 To: linux-bluetooth@vger.kernel.org
 Cc: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
         <frederic.dalleau@collabora.com>
-Subject: [PATCH v2 1/2] monitor: Fix OOB information bit in mesh oob table
-Date: Wed, 26 Jul 2017 10:16:41 +0200
-Message-Id: <20170726081642.20547-2-frederic.dalleau@collabora.com>
-In-Reply-To: <20170726081642.20547-1-frederic.dalleau@collabora.com>
-References: <20170726081642.20547-1-frederic.dalleau@collabora.com>
+Subject: [PATCH v2 0/2] Fixes in monitor mesh
+Date: Wed, 26 Jul 2017 10:16:40 +0200
+Message-Id: <20170726081642.20547-1-frederic.dalleau@collabora.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The bit 15 should be used for 'On device'.
----
- monitor/packet.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Hi, I came across those two things, so here are some patches.
 
-diff --git a/monitor/packet.c b/monitor/packet.c
-index 387be1dcb..f72fcab6a 100644
---- a/monitor/packet.c
-+++ b/monitor/packet.c
-@@ -3514,7 +3514,7 @@ static const struct {
- 	{ 12, "Inside box"						},
- 	{ 13, "On piece of paper"					},
- 	{ 14, "Inside manual"						},
--	{ 14, "On device"						},
-+	{ 15, "On device"						},
- 	{ }
- };
- 
+v2 updates the format to 8.8x.
+
+Regards,
+
+Frédéric Dalleau (2):
+  monitor: Fix OOB information bit in mesh oob table
+  monitor: Format URI hash using 8 hex digits
+
+ monitor/packet.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
 -- 
 2.11.0
 
