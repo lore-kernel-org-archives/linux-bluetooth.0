@@ -1,28 +1,35 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Reply-To: ProklovAV@mail.zabtrans.ru
-Subject: Re: Problem with StopDiscovery() via dbus-send
-References: <5977D982.5070808@mail.zabtrans.ru>
- <CABBYNZ+GSc0_QvmOLdknYpv-Y6Gvcb6oEQf2AFUc_ZHWqZBZjw@mail.gmail.com>
-To: linux-bluetooth@vger.kernel.org
-From: =?UTF-8?B?0J/RgNC+0LrQu9C+0LIg0JDQu9C10LrRgdCw0L3QtNGAINCS0LDQu9C10YA=?=
-         =?UTF-8?B?0YzQtdCy0LjRhw==?= <ProklovAV@mail.zabtrans.ru>
-Message-ID: <597938D3.1070902@mail.zabtrans.ru>
-Date: Thu, 27 Jul 2017 08:50:27 +0800
-MIME-Version: 1.0
-In-Reply-To: <CABBYNZ+GSc0_QvmOLdknYpv-Y6Gvcb6oEQf2AFUc_ZHWqZBZjw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+Subject: Re: Bluez 5.43 - Problems with btmgmt
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <CANdxJyqO3mPKdsL4iy2JNq8111Ags+9Af-S0Vi+X+1AEdUextQ@mail.gmail.com>
+Date: Wed, 26 Jul 2017 11:25:41 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <354B5E5A-BEFA-434F-AAF3-EBE782D718E3@holtmann.org>
+References: <CANdxJyqO3mPKdsL4iy2JNq8111Ags+9Af-S0Vi+X+1AEdUextQ@mail.gmail.com>
+To: Alvin Lovi <alvinlovi80@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-26.07.2017 16:05, Luiz Augusto von Dentz wrote:
+Hi Alvin,
 
- > It probably has been stopped already since the connection used for
- > StartDiscovery has been terminated. Btw, there are better tools to
- > test this, for instance bluetoothctl> scan [on/off]
- >
+> Hi, I'm trying to use the btmgmt command line tool integrated in the
+> above Bluez version and i've found the following problems/doubts:
+> 
+> 1. btmgmt pair -c  [cap] -t [type] <rem addr.>
+> The tool automatically sends Passkey or PIN negative reply without
+> waiting any user input
+> 
+> 2. btmgmt pair -c 0x04 -t 0x00 <rem addr.>
+> The sniffed pcap gives "IO Capability: Display Yes/NO (0x01)"
+> 
+> 3. I've found the "disconnect" command but i haven't found the
+> "connect" one: is it present or not?
 
-If the process "StartDiscovery" is stopped, why status "Discovering" not 
-changed to "false"?
+can you run btmon at the same time. Recent kernels should also provide proper mgmt tracing capabilities.
 
-I need to start and stop scanning from the Bash script, bluetoothctl has 
-the ability to manage from Bash scripts?
+Regards
+
+Marcel
+
