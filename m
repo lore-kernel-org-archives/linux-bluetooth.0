@@ -4,32 +4,32 @@ From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
 To: linux-bluetooth@vger.kernel.org
 Cc: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
         <frederic.dalleau@collabora.com>
-Subject: [PATCH v2 2/2] monitor: Format URI hash using 8 hex digits
-Date: Wed, 26 Jul 2017 10:16:42 +0200
-Message-Id: <20170726081642.20547-3-frederic.dalleau@collabora.com>
+Subject: [PATCH v2 1/2] monitor: Fix OOB information bit in mesh oob table
+Date: Wed, 26 Jul 2017 10:16:41 +0200
+Message-Id: <20170726081642.20547-2-frederic.dalleau@collabora.com>
 In-Reply-To: <20170726081642.20547-1-frederic.dalleau@collabora.com>
 References: <20170726081642.20547-1-frederic.dalleau@collabora.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-URI hash is a 32 bits value.
+The bit 15 should be used for 'On device'.
 ---
  monitor/packet.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/monitor/packet.c b/monitor/packet.c
-index f72fcab6a..39823691f 100644
+index 387be1dcb..f72fcab6a 100644
 --- a/monitor/packet.c
 +++ b/monitor/packet.c
-@@ -3551,7 +3551,7 @@ static void print_mesh_beacon(const uint8_t *data, uint8_t len)
- 			break;
- 		}
+@@ -3514,7 +3514,7 @@ static const struct {
+ 	{ 12, "Inside box"						},
+ 	{ 13, "On piece of paper"					},
+ 	{ 14, "Inside manual"						},
+-	{ 14, "On device"						},
++	{ 15, "On device"						},
+ 	{ }
+ };
  
--		print_field("  URI Hash: 0x%4.4x", get_be32(data + 19));
-+		print_field("  URI Hash: 0x%8.8x", get_be32(data + 19));
- 		packet_hexdump(data + 23, len - 23);
- 		break;
- 	case 0x01:
 -- 
 2.11.0
 
