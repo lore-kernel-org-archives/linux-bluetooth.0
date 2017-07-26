@@ -1,25 +1,35 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-From: Alvin Lovi <alvinlovi80@gmail.com>
-Date: Wed, 26 Jul 2017 10:32:10 +0200
-Message-ID: <CANdxJyqO3mPKdsL4iy2JNq8111Ags+9Af-S0Vi+X+1AEdUextQ@mail.gmail.com>
-Subject: Bluez 5.43 - Problems with btmgmt
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
+        <frederic.dalleau@collabora.com>
 To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Cc: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
+        <frederic.dalleau@collabora.com>
+Subject: [PATCH v2 2/2] monitor: Format URI hash using 8 hex digits
+Date: Wed, 26 Jul 2017 10:16:42 +0200
+Message-Id: <20170726081642.20547-3-frederic.dalleau@collabora.com>
+In-Reply-To: <20170726081642.20547-1-frederic.dalleau@collabora.com>
+References: <20170726081642.20547-1-frederic.dalleau@collabora.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi, I'm trying to use the btmgmt command line tool integrated in the
-above Bluez version and i've found the following problems/doubts:
+URI hash is a 32 bits value.
+---
+ monitor/packet.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-1. btmgmt pair -c  [cap] -t [type] <rem addr.>
-The tool automatically sends Passkey or PIN negative reply without
-waiting any user input
+diff --git a/monitor/packet.c b/monitor/packet.c
+index f72fcab6a..39823691f 100644
+--- a/monitor/packet.c
++++ b/monitor/packet.c
+@@ -3551,7 +3551,7 @@ static void print_mesh_beacon(const uint8_t *data, uint8_t len)
+ 			break;
+ 		}
+ 
+-		print_field("  URI Hash: 0x%4.4x", get_be32(data + 19));
++		print_field("  URI Hash: 0x%8.8x", get_be32(data + 19));
+ 		packet_hexdump(data + 23, len - 23);
+ 		break;
+ 	case 0x01:
+-- 
+2.11.0
 
-2. btmgmt pair -c 0x04 -t 0x00 <rem addr.>
-The sniffed pcap gives "IO Capability: Display Yes/NO (0x01)"
-
-3. I've found the "disconnect" command but i haven't found the
-"connect" one: is it present or not?
-
-Thanks
