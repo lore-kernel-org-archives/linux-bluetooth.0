@@ -1,40 +1,39 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <ac398a4f-72dd-0d1c-05df-3deac33df599@jp.fujitsu.com>
-References: <ac398a4f-72dd-0d1c-05df-3deac33df599@jp.fujitsu.com>
+In-Reply-To: <20170726081642.20547-1-frederic.dalleau@collabora.com>
+References: <20170726081642.20547-1-frederic.dalleau@collabora.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 27 Jul 2017 17:24:37 +0300
-Message-ID: <CABBYNZJBAwdhZTbaUSdq0jdkQsn=nxYVxkJB_a=njXFtjZc1dQ@mail.gmail.com>
-Subject: Re: [PATCH Bluez 0/6] core: Add checking for Policy/GATT in main.conf
-To: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
+Date: Thu, 27 Jul 2017 17:23:57 +0300
+Message-ID: <CABBYNZL56aF09_c+ACk10OkgSjRd4Lh-h3nfzdTD7U7DCVp+hg@mail.gmail.com>
+Subject: Re: [PATCH v2 0/2] Fixes in monitor mesh
+To: =?UTF-8?B?RnLDqWTDqXJpYyBEYWxsZWF1?=
+        <frederic.dalleau@collabora.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Eramoto,
+Hi Fr=C3=A9d=C3=A9ric,
 
-On Thu, Jul 27, 2017 at 2:18 PM, ERAMOTO Masaya
-<eramoto.masaya@jp.fujitsu.com> wrote:
-> This patches add checking for Policy/GATT in main.conf as below:
->   bluetoothd[XXXX]: Unknown key Cache for group Policy in main.conf
->   bluetoothd[XXXX]: Unknown key Timeout for group GATT in main.conf
+On Wed, Jul 26, 2017 at 11:16 AM, Fr=C3=A9d=C3=A9ric Dalleau
+<frederic.dalleau@collabora.com> wrote:
+> Hi, I came across those two things, so here are some patches.
 >
-> ERAMOTO Masaya (6):
->   core: Add group information to warning message for main.conf
->   core: Split check_config() function
->   core: Fix General options in main.conf
->   core: Add checking for unknown Policy options
->   core: Add checking for unknown GATT options
->   core: Make easier to manage checked groups
+> v2 updates the format to 8.8x.
 >
->  src/main.c | 81 ++++++++++++++++++++++++++++++++++++++++++++------------------
->  1 file changed, 58 insertions(+), 23 deletions(-)
+> Regards,
+>
+> Fr=C3=A9d=C3=A9ric Dalleau (2):
+>   monitor: Fix OOB information bit in mesh oob table
+>   monitor: Format URI hash using 8 hex digits
+>
+>  monitor/packet.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 >
 > --
-> 2.7.4
+> 2.11.0
 
-Great set, applied.
+Applied, thanks.
 
--- 
+--=20
 Luiz Augusto von Dentz
