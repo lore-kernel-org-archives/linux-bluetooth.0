@@ -1,39 +1,45 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <alvinlovi80@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20170726081642.20547-1-frederic.dalleau@collabora.com>
-References: <20170726081642.20547-1-frederic.dalleau@collabora.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 27 Jul 2017 17:23:57 +0300
-Message-ID: <CABBYNZL56aF09_c+ACk10OkgSjRd4Lh-h3nfzdTD7U7DCVp+hg@mail.gmail.com>
-Subject: Re: [PATCH v2 0/2] Fixes in monitor mesh
-To: =?UTF-8?B?RnLDqWTDqXJpYyBEYWxsZWF1?=
-        <frederic.dalleau@collabora.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <354B5E5A-BEFA-434F-AAF3-EBE782D718E3@holtmann.org>
+References: <CANdxJyqO3mPKdsL4iy2JNq8111Ags+9Af-S0Vi+X+1AEdUextQ@mail.gmail.com>
+ <354B5E5A-BEFA-434F-AAF3-EBE782D718E3@holtmann.org>
+From: Alvin Lovi <alvinlovi80@gmail.com>
+Date: Thu, 27 Jul 2017 14:23:51 +0200
+Message-ID: <CANdxJypEyC7xgaVZ7GHOhqf8U=oN+J+RUWyUUo=EuCPuSPtSRg@mail.gmail.com>
+Subject: Re: Bluez 5.43 - Problems with btmgmt
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Fr=C3=A9d=C3=A9ric,
+Hi Marcel,
+thanks for you reply.
 
-On Wed, Jul 26, 2017 at 11:16 AM, Fr=C3=A9d=C3=A9ric Dalleau
-<frederic.dalleau@collabora.com> wrote:
-> Hi, I came across those two things, so here are some patches.
->
-> v2 updates the format to 8.8x.
->
-> Regards,
->
-> Fr=C3=A9d=C3=A9ric Dalleau (2):
->   monitor: Fix OOB information bit in mesh oob table
->   monitor: Format URI hash using 8 hex digits
->
->  monitor/packet.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> --
-> 2.11.0
 
-Applied, thanks.
+On Wed, Jul 26, 2017 at 11:25 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Alvin,
+>
+>> Hi, I'm trying to use the btmgmt command line tool integrated in the
+>> above Bluez version and i've found the following problems/doubts:
+>>
+>> 1. btmgmt pair -c  [cap] -t [type] <rem addr.>
+>> The tool automatically sends Passkey or PIN negative reply without
+>> waiting any user input
+>>
+>> 2. btmgmt pair -c 0x04 -t 0x00 <rem addr.>
+>> The sniffed pcap gives "IO Capability: Display Yes/NO (0x01)"
+>>
+>> 3. I've found the "disconnect" command but i haven't found the
+>> "connect" one: is it present or not?
+>
+> can you run btmon at the same time. Recent kernels should also provide proper mgmt tracing capabilities.
+>
+> Regards
+>
+> Marcel
+>
 
---=20
-Luiz Augusto von Dentz
+How can i use mgmt trace?
+About the question 1. and 2. : any suggestion?
+Thanks
+Alvin
