@@ -1,45 +1,56 @@
-Return-Path: <alvinlovi80@gmail.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <354B5E5A-BEFA-434F-AAF3-EBE782D718E3@holtmann.org>
-References: <CANdxJyqO3mPKdsL4iy2JNq8111Ags+9Af-S0Vi+X+1AEdUextQ@mail.gmail.com>
- <354B5E5A-BEFA-434F-AAF3-EBE782D718E3@holtmann.org>
-From: Alvin Lovi <alvinlovi80@gmail.com>
-Date: Thu, 27 Jul 2017 14:23:51 +0200
-Message-ID: <CANdxJypEyC7xgaVZ7GHOhqf8U=oN+J+RUWyUUo=EuCPuSPtSRg@mail.gmail.com>
-Subject: Re: Bluez 5.43 - Problems with btmgmt
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <597938D3.1070902@mail.zabtrans.ru>
+References: <5977D982.5070808@mail.zabtrans.ru> <CABBYNZ+GSc0_QvmOLdknYpv-Y6Gvcb6oEQf2AFUc_ZHWqZBZjw@mail.gmail.com>
+ <597938D3.1070902@mail.zabtrans.ru>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Thu, 27 Jul 2017 14:33:06 +0300
+Message-ID: <CABBYNZKqH2zvfW=77ZouuR_AHqdq9md3OGqAxuancrL1XtBPNQ@mail.gmail.com>
+Subject: Re: Problem with StopDiscovery() via dbus-send
+To: ProklovAV@mail.zabtrans.ru
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
-thanks for you reply.
+Hi,
+
+On Thu, Jul 27, 2017 at 3:50 AM, =D0=9F=D1=80=D0=BE=D0=BA=D0=BB=D0=BE=D0=B2=
+ =D0=90=D0=BB=D0=B5=D0=BA=D1=81=D0=B0=D0=BD=D0=B4=D1=80 =D0=92=D0=B0=D0=BB=
+=D0=B5=D1=80=D1=8C=D0=B5=D0=B2=D0=B8=D1=87
+<ProklovAV@mail.zabtrans.ru> wrote:
+> 26.07.2017 16:05, Luiz Augusto von Dentz wrote:
+>
+>> It probably has been stopped already since the connection used for
+>> StartDiscovery has been terminated. Btw, there are better tools to
+>> test this, for instance bluetoothctl> scan [on/off]
+>>
+>
+> If the process "StartDiscovery" is stopped, why status "Discovering" not
+> changed to "false"?
+
+It may take some time until it has been stopped completely, but the
+sessions is already released, and even if you could in fact leave it
+running the next time you call dbus-sent it would create a new
+connection so calling StopDiscovery will fail nevertheless.
+
+> I need to start and stop scanning from the Bash script, bluetoothctl has =
+the
+> ability to manage from Bash scripts?
+
+Currently it only runs in interactive mode, but it would have the same
+result since the D-Bus connection would be lost in between runs of
+bluetoothctl.
+
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth=
+"
+> in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
 
-On Wed, Jul 26, 2017 at 11:25 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Alvin,
->
->> Hi, I'm trying to use the btmgmt command line tool integrated in the
->> above Bluez version and i've found the following problems/doubts:
->>
->> 1. btmgmt pair -c  [cap] -t [type] <rem addr.>
->> The tool automatically sends Passkey or PIN negative reply without
->> waiting any user input
->>
->> 2. btmgmt pair -c 0x04 -t 0x00 <rem addr.>
->> The sniffed pcap gives "IO Capability: Display Yes/NO (0x01)"
->>
->> 3. I've found the "disconnect" command but i haven't found the
->> "connect" one: is it present or not?
->
-> can you run btmon at the same time. Recent kernels should also provide proper mgmt tracing capabilities.
->
-> Regards
->
-> Marcel
->
 
-How can i use mgmt trace?
-About the question 1. and 2. : any suggestion?
-Thanks
-Alvin
+--=20
+Luiz Augusto von Dentz
