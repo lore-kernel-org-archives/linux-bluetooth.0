@@ -1,56 +1,81 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Subject: [PATCH Bluez 6/6] core: Make easier to manage checked groups
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+References: <ac398a4f-72dd-0d1c-05df-3deac33df599@jp.fujitsu.com>
+From: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
+Message-ID: <eef350d9-d7dc-019a-7ab6-bc1d8ff7379d@jp.fujitsu.com>
+Date: Thu, 27 Jul 2017 20:24:04 +0900
 MIME-Version: 1.0
-In-Reply-To: <597938D3.1070902@mail.zabtrans.ru>
-References: <5977D982.5070808@mail.zabtrans.ru> <CABBYNZ+GSc0_QvmOLdknYpv-Y6Gvcb6oEQf2AFUc_ZHWqZBZjw@mail.gmail.com>
- <597938D3.1070902@mail.zabtrans.ru>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 27 Jul 2017 14:33:06 +0300
-Message-ID: <CABBYNZKqH2zvfW=77ZouuR_AHqdq9md3OGqAxuancrL1XtBPNQ@mail.gmail.com>
-Subject: Re: Problem with StopDiscovery() via dbus-send
-To: ProklovAV@mail.zabtrans.ru
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <ac398a4f-72dd-0d1c-05df-3deac33df599@jp.fujitsu.com>
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+This makes easier to manage groups which need to be checked for.
+---
+ src/main.c | 23 ++++++++++++++++-------
+ 1 file changed, 16 insertions(+), 7 deletions(-)
 
-On Thu, Jul 27, 2017 at 3:50 AM, =D0=9F=D1=80=D0=BE=D0=BA=D0=BB=D0=BE=D0=B2=
- =D0=90=D0=BB=D0=B5=D0=BA=D1=81=D0=B0=D0=BD=D0=B4=D1=80 =D0=92=D0=B0=D0=BB=
-=D0=B5=D1=80=D1=8C=D0=B5=D0=B2=D0=B8=D1=87
-<ProklovAV@mail.zabtrans.ru> wrote:
-> 26.07.2017 16:05, Luiz Augusto von Dentz wrote:
->
->> It probably has been stopped already since the connection used for
->> StartDiscovery has been terminated. Btw, there are better tools to
->> test this, for instance bluetoothctl> scan [on/off]
->>
->
-> If the process "StartDiscovery" is stopped, why status "Discovering" not
-> changed to "false"?
+diff --git a/src/main.c b/src/main.c
+index 2d00478..f33c64d 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -106,6 +106,17 @@ static const char * const gatt_options[] = {
+ 	NULL
+ };
+ 
++static const struct group_table {
++	const char *name;
++	const char * const *options;
++} valid_groups[] = {
++	{ "General",	supported_options },
++	{ "Policy",	policy_options },
++	{ "GATT",	gatt_options },
++	{ }
++};
++
++
+ GKeyFile *btd_get_main_conf(void)
+ {
+ 	return main_conf;
+@@ -207,9 +218,9 @@ static void check_options(GKeyFile *config, const char *group,
+ 
+ static void check_config(GKeyFile *config)
+ {
+-	const char *valid_groups[] = { "General", "Policy", "GATT", NULL };
+ 	char **keys;
+ 	int i;
++	const struct group_table *group;
+ 
+ 	if (!config)
+ 		return;
+@@ -217,11 +228,10 @@ static void check_config(GKeyFile *config)
+ 	keys = g_key_file_get_groups(config, NULL);
+ 
+ 	for (i = 0; keys != NULL && keys[i] != NULL; i++) {
+-		const char **group;
+ 		bool match = false;
+ 
+-		for (group = valid_groups; *group; group++) {
+-			if (g_str_equal(keys[i], *group)) {
++		for (group = valid_groups; group && group->name ; group++) {
++			if (g_str_equal(keys[i], group->name)) {
+ 				match = true;
+ 				break;
+ 			}
+@@ -233,9 +243,8 @@ static void check_config(GKeyFile *config)
+ 
+ 	g_strfreev(keys);
+ 
+-	check_options(config, "General", supported_options);
+-	check_options(config, "Policy", policy_options);
+-	check_options(config, "GATT", gatt_options);
++	for (group = valid_groups; group && group->name; group++)
++		check_options(config, group->name, group->options);
+ }
+ 
+ static int get_mode(const char *str)
+-- 
+2.7.4
 
-It may take some time until it has been stopped completely, but the
-sessions is already released, and even if you could in fact leave it
-running the next time you call dbus-sent it would create a new
-connection so calling StopDiscovery will fail nevertheless.
 
-> I need to start and stop scanning from the Bash script, bluetoothctl has =
-the
-> ability to manage from Bash scripts?
-
-Currently it only runs in interactive mode, but it would have the same
-result since the D-Bus connection would be lost in between runs of
-bluetoothctl.
-
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth=
-"
-> in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-
---=20
-Luiz Augusto von Dentz
