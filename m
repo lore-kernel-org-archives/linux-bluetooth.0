@@ -1,30 +1,28 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
-Subject: [PATCH Bluez 0/6] core: Add checking for Policy/GATT in main.conf
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Message-ID: <ac398a4f-72dd-0d1c-05df-3deac33df599@jp.fujitsu.com>
-Date: Thu, 27 Jul 2017 20:18:41 +0900
+Reply-To: ProklovAV@mail.zabtrans.ru
+Subject: Re: Problem with StopDiscovery() via dbus-send
+References: <5977D982.5070808@mail.zabtrans.ru>
+ <CABBYNZ+GSc0_QvmOLdknYpv-Y6Gvcb6oEQf2AFUc_ZHWqZBZjw@mail.gmail.com>
+To: linux-bluetooth@vger.kernel.org
+From: =?UTF-8?B?0J/RgNC+0LrQu9C+0LIg0JDQu9C10LrRgdCw0L3QtNGAINCS0LDQu9C10YA=?=
+         =?UTF-8?B?0YzQtdCy0LjRhw==?= <ProklovAV@mail.zabtrans.ru>
+Message-ID: <597938D3.1070902@mail.zabtrans.ru>
+Date: Thu, 27 Jul 2017 08:50:27 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <CABBYNZ+GSc0_QvmOLdknYpv-Y6Gvcb6oEQf2AFUc_ZHWqZBZjw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patches add checking for Policy/GATT in main.conf as below:
-  bluetoothd[XXXX]: Unknown key Cache for group Policy in main.conf
-  bluetoothd[XXXX]: Unknown key Timeout for group GATT in main.conf
+26.07.2017 16:05, Luiz Augusto von Dentz wrote:
 
-ERAMOTO Masaya (6):
-  core: Add group information to warning message for main.conf
-  core: Split check_config() function
-  core: Fix General options in main.conf
-  core: Add checking for unknown Policy options
-  core: Add checking for unknown GATT options
-  core: Make easier to manage checked groups
+ > It probably has been stopped already since the connection used for
+ > StartDiscovery has been terminated. Btw, there are better tools to
+ > test this, for instance bluetoothctl> scan [on/off]
+ >
 
- src/main.c | 81 ++++++++++++++++++++++++++++++++++++++++++++------------------
- 1 file changed, 58 insertions(+), 23 deletions(-)
+If the process "StartDiscovery" is stopped, why status "Discovering" not 
+changed to "false"?
 
--- 
-2.7.4
-
-
+I need to start and stop scanning from the Bash script, bluetoothctl has 
+the ability to manage from Bash scripts?
