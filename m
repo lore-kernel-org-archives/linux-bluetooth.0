@@ -1,48 +1,45 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Subject: [PATCH Bluez 4/6] core: Add checking for unknown Policy options
+From: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
+Subject: [PATCH Bluez 3/6] core: Fix General options in main.conf
 To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 References: <ac398a4f-72dd-0d1c-05df-3deac33df599@jp.fujitsu.com>
-From: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
-Message-ID: <bb030026-3693-73d8-4c00-181f3535300c@jp.fujitsu.com>
-Date: Thu, 27 Jul 2017 20:23:17 +0900
+Message-ID: <7409d04d-99d5-1090-ea5a-6d8770d338f5@jp.fujitsu.com>
+Date: Thu, 27 Jul 2017 20:30:07 +0900
 MIME-Version: 1.0
 In-Reply-To: <ac398a4f-72dd-0d1c-05df-3deac33df599@jp.fujitsu.com>
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This adds to check for unknown Policy options.
+For supported_options struct,
+ - adds FastConnectable.
+   (That was added at 1cd65e52665cfbf939c923baea51748e359abfa5.)
+ - removes AlwaysPairable.
+   (That was removed at 12464916d39fa88f2ade96ccbc1d8efd6ea37789.)
 ---
- src/main.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ src/main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/src/main.c b/src/main.c
-index 90ff6e7..566a64c 100644
+index 7482706..90ff6e7 100644
 --- a/src/main.c
 +++ b/src/main.c
-@@ -93,6 +93,14 @@ static const char * const supported_options[] = {
+@@ -80,7 +80,6 @@ static const char * const supported_options[] = {
+ 	"Name",
+ 	"Class",
+ 	"DiscoverableTimeout",
+-	"AlwaysPairable",
+ 	"PairableTimeout",
+ 	"AutoConnectTimeout",
+ 	"DeviceID",
+@@ -89,6 +88,7 @@ static const char * const supported_options[] = {
+ 	"DebugKeys",
+ 	"ControllerMode",
+ 	"MultiProfile",
++	"FastConnectable",
+ 	"Privacy",
  	NULL
  };
- 
-+static const char * const policy_options[] = {
-+	"ReconnectUUIDs",
-+	"ReconnectAttempts",
-+	"ReconnectIntervals",
-+	"AutoEnable",
-+	NULL
-+};
-+
- GKeyFile *btd_get_main_conf(void)
- {
- 	return main_conf;
-@@ -221,6 +229,7 @@ static void check_config(GKeyFile *config)
- 	g_strfreev(keys);
- 
- 	check_options(config, "General", supported_options);
-+	check_options(config, "Policy", policy_options);
- }
- 
- static int get_mode(const char *str)
 -- 
 2.7.4
 
