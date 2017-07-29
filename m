@@ -1,31 +1,34 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Date: Mon, 24 Jul 2017 21:58:39 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: hci_nokia: select BT_BCM for
- btbcm_set_bdaddr()
-Message-ID: <20170724185839.GA15843@x1c>
-References: <20170722095747.101069-1-marcel@holtmann.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170722095747.101069-1-marcel@holtmann.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <loic.poulain@gmail.com>
+From: Loic Poulain <loic.poulain@gmail.com>
+To: marcel@holtmann.org
+Cc: linux-bluetooth@vger.kernel.org,
+	Loic Poulain <loic.poulain@gmail.com>
+Subject: [PATCH] Bluetooth: hci_uart: Fix uninitialized alignment value
+Date: Sat, 29 Jul 2017 19:32:31 +0200
+Message-Id: <1501349551-4678-1-git-send-email-loic.poulain@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Force alignment value to the default one (1 byte) if uninitialized.
+This fixes hci_ll serdev driver (alignment = 0) and avoid any further
+issues with upcoming drivers.
 
-On Sat, Jul 22, 2017, Marcel Holtmann wrote:
-> The Nokia devices require the setup of its Public Bluetooth Device
-> Address and for that it is required to depend on vendor specific
-> commands. For Broadcom based Nokia devices, that is part of btbcm
-> module and can be selected via BT_BCM config option.
-> 
-> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-> ---
->  drivers/bluetooth/Kconfig | 1 +
->  1 file changed, 1 insertion(+)
+Signed-off-by: Loic Poulain <loic.poulain@gmail.com>
+---
+ drivers/bluetooth/hci_h4.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Applied to bluetooth-next. Thanks.
-
-Johan
+diff --git a/drivers/bluetooth/hci_h4.c b/drivers/bluetooth/hci_h4.c
+index 4e328d7..3b82a87 100644
+--- a/drivers/bluetooth/hci_h4.c
++++ b/drivers/bluetooth/hci_h4.c
+@@ -172,7 +172,7 @@ struct sk_buff *h4_recv_buf(struct hci_dev *hdev, struct sk_buff *skb,
+ 			    const struct h4_recv_pkt *pkts, int pkts_count)
+ {
+ 	struct hci_uart *hu = hci_get_drvdata(hdev);
+-	u8 alignment = hu->alignment;
++	u8 alignment = hu->alignment ? hu->alignment : 1;
+ 
+ 	while (count) {
+ 		int i, len;
+-- 
+1.9.1
