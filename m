@@ -1,212 +1,113 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20170728120754.5263-1-luiz.dentz@gmail.com>
-References: <20170728120754.5263-1-luiz.dentz@gmail.com>
+In-Reply-To: <CALvjcs8Ac-dEdGx9P6udrmcetby0hoyn_bgH_CwkzRoD6SctNQ@mail.gmail.com>
+References: <CALvjcs8Ac-dEdGx9P6udrmcetby0hoyn_bgH_CwkzRoD6SctNQ@mail.gmail.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 31 Jul 2017 19:30:23 +0300
-Message-ID: <CABBYNZLqZ46GAjy4LRiyHnKgaasuSKP+qOHyLdxzcifCHVPEag@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/5] core: Add ResetData filter
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Mon, 31 Jul 2017 16:57:12 +0300
+Message-ID: <CABBYNZK7-BygyHc2cr+d9BV3nT=JR2fF5FGrPDTR2AYMRMo9Aw@mail.gmail.com>
+Subject: Re: Gatt Dbus example and bluetoothctl question when using virtual emulator
+To: Yunhan Wang <yunhanw@google.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Yunhan,
 
-On Fri, Jul 28, 2017 at 3:07 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+On Mon, Jul 31, 2017 at 10:22 AM, Yunhan Wang <yunhanw@google.com> wrote:
+> Hi,
 >
-> Reset service/manufactorer data so the application can see each and
-> every instance of them.
-> ---
->  doc/adapter-api.txt |  5 +++++
->  src/adapter.c       | 40 ++++++++++++++++++++++++++++++++++++----
->  src/device.c        | 12 ++++++++++--
->  src/device.h        |  5 +++--
->  4 files changed, 54 insertions(+), 8 deletions(-)
+> I am doing some experiments to understand Bluez DBUS API using Bluez
+> 5.46, and feel a little bit confused about Gatt Dbus example code and
+> bluetoothctl.
 >
-> diff --git a/doc/adapter-api.txt b/doc/adapter-api.txt
-> index 08de6cd87..03b56119d 100644
-> --- a/doc/adapter-api.txt
-> +++ b/doc/adapter-api.txt
-> @@ -58,6 +58,7 @@ Methods               void StartDiscovery()
->                         int16         RSSI      : RSSI threshold value
->                         uint16        Pathloss  : Pathloss threshold value
->                         string        Transport : type of scan to run
-> +                       bool          ResetData : Reset advertisement data
->
->                         When a remote device is found that advertises any UUID
->                         from UUIDs, it will be reported if:
-> @@ -90,6 +91,10 @@ Methods              void StartDiscovery()
->                         the RSSI delta-threshold, that is imposed by
->                         StartDiscovery by default, will not be applied.
->
-> +                       If ResetData is enabled PropertiesChanged signals will
-> +                       be generated for either ManufacturerData and ServiceData
-> +                       everytime they are discovered.
-> +
->                         When multiple clients call SetDiscoveryFilter, their
->                         filters are internally merged, and notifications about
->                         new devices are sent to all clients. Therefore, each
-> diff --git a/src/adapter.c b/src/adapter.c
-> index 39354602e..a2c8b44b9 100644
-> --- a/src/adapter.c
-> +++ b/src/adapter.c
-> @@ -155,6 +155,7 @@ struct discovery_filter {
->         uint16_t pathloss;
->         int16_t rssi;
->         GSList *uuids;
-> +       bool reset;
->  };
->
->  struct watch_client {
-> @@ -2213,6 +2214,16 @@ static bool parse_transport(DBusMessageIter *value, uint8_t *transport)
->         return true;
->  }
->
-> +static bool parse_reset_data(DBusMessageIter *value, bool *duplicates)
-> +{
-> +       if (dbus_message_iter_get_arg_type(value) != DBUS_TYPE_BOOLEAN)
-> +               return false;
-> +
-> +       dbus_message_iter_get_basic(value, duplicates);
-> +
-> +       return true;
-> +}
-> +
->  static bool parse_discovery_filter_entry(char *key, DBusMessageIter *value,
->                                                 struct discovery_filter *filter)
->  {
-> @@ -2228,6 +2239,9 @@ static bool parse_discovery_filter_entry(char *key, DBusMessageIter *value,
->         if (!strcmp("Transport", key))
->                 return parse_transport(value, &filter->type);
->
-> +       if (!strcmp("ResetData", key))
-> +               return parse_reset_data(value, &filter->reset);
-> +
->         DBG("Unknown key parameter: %s!\n", key);
->         return false;
->  }
-> @@ -2253,6 +2267,7 @@ static bool parse_discovery_filter_dict(struct btd_adapter *adapter,
->         (*filter)->pathloss = DISTANCE_VAL_INVALID;
->         (*filter)->rssi = DISTANCE_VAL_INVALID;
->         (*filter)->type = get_scan_type(adapter);
-> +       (*filter)->reset = false;
->
->         dbus_message_iter_init(msg, &iter);
->         if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_ARRAY ||
-> @@ -2297,8 +2312,9 @@ static bool parse_discovery_filter_dict(struct btd_adapter *adapter,
->             (*filter)->rssi != DISTANCE_VAL_INVALID)
->                 goto invalid_args;
->
-> -       DBG("filtered discovery params: transport: %d rssi: %d pathloss: %d",
-> -           (*filter)->type, (*filter)->rssi, (*filter)->pathloss);
-> +       DBG("filtered discovery params: transport: %d rssi: %d pathloss: %d "
-> +               " reset data: %s ", (*filter)->type, (*filter)->rssi,
-> +               (*filter)->pathloss, (*filter)->reset ? "true" : "false");
->
->         return true;
->
-> @@ -5568,6 +5584,17 @@ static bool is_filter_match(GSList *discovery_filter, struct eir_data *eir_data,
->         return got_match;
->  }
->
-> +static void filter_reset_data(void *data, void *user_data)
-> +{
-> +       struct watch_client *client = data;
-> +       bool *reset = user_data;
-> +
-> +       if (*reset || !client->discovery_filter)
-> +               return;
-> +
-> +       *reset = client->discovery_filter->reset;
-> +}
-> +
->  static void update_found_devices(struct btd_adapter *adapter,
->                                         const bdaddr_t *bdaddr,
->                                         uint8_t bdaddr_type, int8_t rssi,
-> @@ -5579,6 +5606,7 @@ static void update_found_devices(struct btd_adapter *adapter,
->         struct eir_data eir_data;
->         bool name_known, discoverable;
->         char addr[18];
-> +       bool reset = false;
->
->         memset(&eir_data, 0, sizeof(eir_data));
->         eir_parse(&eir_data, data, data_len);
-> @@ -5678,13 +5706,17 @@ static void update_found_devices(struct btd_adapter *adapter,
->
->         device_add_eir_uuids(dev, eir_data.services);
->
-> +       if (adapter->discovery_list)
-> +               g_slist_foreach(adapter->discovery_list, filter_reset_data,
-> +                                                               &reset);
-> +
->         if (eir_data.msd_list) {
-> -               device_set_manufacturer_data(dev, eir_data.msd_list);
-> +               device_set_manufacturer_data(dev, eir_data.msd_list, reset);
->                 adapter_msd_notify(adapter, dev, eir_data.msd_list);
->         }
->
->         if (eir_data.sd_list)
-> -               device_set_service_data(dev, eir_data.sd_list);
-> +               device_set_service_data(dev, eir_data.sd_list, reset);
->
->         if (bdaddr_type != BDADDR_BREDR)
->                 device_set_flags(dev, eir_data.flags);
-> diff --git a/src/device.c b/src/device.c
-> index fb9c0e766..f34d408fa 100644
-> --- a/src/device.c
-> +++ b/src/device.c
-> @@ -1611,8 +1611,12 @@ static void add_manufacturer_data(void *data, void *user_data)
->                                         DEVICE_INTERFACE, "ManufacturerData");
->  }
->
-> -void device_set_manufacturer_data(struct btd_device *dev, GSList *list)
-> +void device_set_manufacturer_data(struct btd_device *dev, GSList *list,
-> +                                                               bool reset)
->  {
-> +       if (reset)
-> +               bt_ad_clear_manufacturer_data(dev->ad);
-> +
->         g_slist_foreach(list, add_manufacturer_data, dev);
->  }
->
-> @@ -1632,8 +1636,12 @@ static void add_service_data(void *data, void *user_data)
->                                         DEVICE_INTERFACE, "ServiceData");
->  }
->
-> -void device_set_service_data(struct btd_device *dev, GSList *list)
-> +void device_set_service_data(struct btd_device *dev, GSList *list,
-> +                                                       bool reset)
->  {
-> +       if (reset)
-> +               bt_ad_clear_service_data(dev->ad);
-> +
->         g_slist_foreach(list, add_service_data, dev);
->  }
->
-> diff --git a/src/device.h b/src/device.h
-> index 3cab366ee..5f56918ed 100644
-> --- a/src/device.h
-> +++ b/src/device.h
-> @@ -76,8 +76,9 @@ void btd_device_gatt_set_service_changed(struct btd_device *device,
->  bool device_attach_att(struct btd_device *dev, GIOChannel *io);
->  void btd_device_add_uuid(struct btd_device *device, const char *uuid);
->  void device_add_eir_uuids(struct btd_device *dev, GSList *uuids);
-> -void device_set_manufacturer_data(struct btd_device *dev, GSList *list);
-> -void device_set_service_data(struct btd_device *dev, GSList *list);
-> +void device_set_manufacturer_data(struct btd_device *dev, GSList *list,
-> +                                                               bool reset);
-> +void device_set_service_data(struct btd_device *dev, GSList *list, bool reset);
->  void device_probe_profile(gpointer a, gpointer b);
->  void device_remove_profile(gpointer a, gpointer b);
->  struct btd_adapter *device_get_adapter(struct btd_device *device);
-> --
-> 2.13.3
+> First, I do sudo bluetoothd --experimental -d, then I create two
+> virtual bt interfaces and bring up example-gatt-server, then
+> example-gatt-client cannot find any new gatt service. Any idea?
 
-Applied.
+You would have to connect so the client could discover the services.
 
+> Also, I have checked all information under org.bluez using d-feet, the
+> gatt service and characteristics from example-gatt-client have not yet
+> been added. I print all infos under ObjectManager for bluez, and
+> cannot find these services and characteristics.
+
+example-gatt-client only discover service over D-Bus, anyway in case
+you refering to example-gatt-server its services are on the client
+side, so they won't show on the bluetoothd D-Bus connection in d-feet
+instead you would have to look at example-gatt-server connection.
+
+> I also try to use register-service, and register-characteristic for
+> hci0 using bluetoothctl,  but I cannot find any added service and
+> characteristics under d-feet and ObjectManager. Any idea?
+
+Same thing, they are under bluetoothctl connection not bluetoothd.
+
+>
+> bluez-5.46$ sudo ./emulator/btvirt -L -l2
+> Bluetooth emulator ver 5.46
+>
+>
+> bluez-5.46/test$ sudo ./example-gatt-server
+> Registering GATT application...
+> GetManagedObjects
+> GATT application registered
+> Battery Level drained: 98
+> Battery Level drained: 96
+> Battery Level drained: 94
+> Battery Level drained: 92
+> Battery Level drained: 90
+> Battery Level drained: 88
+> Battery Level drained: 86
+> Battery Level drained: 84
+>
+> sudo ./example-gatt-client
+> Getting objects...
+> No Heart Rate Service found
+>
+
+example-gatt-client doesnt connect, this is why there is no parameter
+in the first place, so you would have to connect to the device first
+then run it.
+
+> sudo ./client/bluetoothctl
+> [NEW] Controller 00:AA:01:00:00:23 hostname [default]
+> [NEW] Device 00:AA:01:01:00:24 hostname #2
+> Agent registered
+> [bluetooth]# power on
+> Changing power on succeeded
+> [CHG] Controller 00:AA:01:00:00:23 Powered: yes
+> [bluetooth]# register-service 00001820-0000-1000-8000-00805f9b34fb
+> [NEW] Primary Service
+> /org/bluez/app/service0xd5eac0
+> 00001820-0000-1000-8000-00805f9b34fb
+> Internet Protocol Support
+> [/org/bluez/app/service0xd5eac0] Primary (yes/no): yes
+> register-characteristic 00002a06-0000-1000-8000-00805f9b34fb
+> write-without-response
+> [NEW] Characteristic
+> /org/bluez/app/service0xd5eac0/chrc0xd5f150
+> 00002a06-0000-1000-8000-00805f9b34fb
+> Alert Level
+> [/org/bluez/app/service0xd5eac0/chrc0xd5f150] Enter value: 0x1
+> [bluetooth]# register-application
+> [CHG] Controller 00:AA:01:00:00:23 UUIDs: 00001801-0000-1000-8000-00805f9b34fb
+> [CHG] Controller 00:AA:01:00:00:23 UUIDs: 00001820-0000-1000-8000-00805f9b34fb
+> [CHG] Controller 00:AA:01:00:00:23 UUIDs: 0000110e-0000-1000-8000-00805f9b34fb
+> [CHG] Controller 00:AA:01:00:00:23 UUIDs: 00001200-0000-1000-8000-00805f9b34fb
+> [CHG] Controller 00:AA:01:00:00:23 UUIDs: 00001800-0000-1000-8000-00805f9b34fb
+> [CHG] Controller 00:AA:01:00:00:23 UUIDs: 0000110c-0000-1000-8000-00805f9b34fb
+> Application registered
+> [bluetooth]# advertise on
+> Advertising object registered
+
+Now you would have to select the second controller you have created,
+scan and connect, that in turn will discover the service above.
+
+Btw, I just discover a little problem when the controllers are
+dual-mode it seems we don't fallback to the second bearer if the first
+could not be connected, but since you are using single mode only that
+should work just fine.
 
 -- 
 Luiz Augusto von Dentz
