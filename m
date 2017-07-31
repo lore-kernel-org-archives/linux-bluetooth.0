@@ -4,470 +4,120 @@ From: =?UTF-8?q?Micha=C5=82=20Narajowski?=
 To: linux-bluetooth@vger.kernel.org
 Cc: =?UTF-8?q?Micha=C5=82=20Narajowski?=
         <michal.narajowski@codecoup.pl>
-Subject: [PATCH BlueZ v5 11/11] monitor: Refactor print_enable function
-Date: Mon, 31 Jul 2017 15:39:10 +0200
-Message-Id: <20170731133910.26745-12-michal.narajowski@codecoup.pl>
+Subject: [PATCH BlueZ v5 08/11] monitor: Fix connection latency decoding
+Date: Mon, 31 Jul 2017 15:39:07 +0200
+Message-Id: <20170731133910.26745-9-michal.narajowski@codecoup.pl>
 In-Reply-To: <20170731133910.26745-1-michal.narajowski@codecoup.pl>
 References: <20170731133910.26745-1-michal.narajowski@codecoup.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Connection Latency is a number, not time
 ---
- monitor/packet.c | 321 +++++++------------------------------------------------
- 1 file changed, 37 insertions(+), 284 deletions(-)
+ monitor/packet.c | 27 ++++++++++++++++-----------
+ 1 file changed, 16 insertions(+), 11 deletions(-)
 
 diff --git a/monitor/packet.c b/monitor/packet.c
-index e1f69b145..c697890cf 100644
+index fec952a12..fb299084d 100644
 --- a/monitor/packet.c
 +++ b/monitor/packet.c
-@@ -557,6 +557,25 @@ void packet_print_error(const char *label, uint8_t error)
- 	print_error(label, error);
+@@ -2431,6 +2431,12 @@ static void print_window(uint16_t window)
+ 	print_slot_625("Window", window);
  }
  
-+static void print_enable(const char *label, uint8_t enable)
++static void print_conn_latency(const char *label, uint16_t value)
 +{
-+	const char *str;
-+
-+	switch (enable) {
-+	case 0x00:
-+		str = "Disable";
-+		break;
-+	case 0x01:
-+		str = "Enabled";
-+		break;
-+	default:
-+		str = "Reserved";
-+		break;
-+	}
-+
-+	print_field("%s: %s (0x%2.2x)", label, str, enable);
++	print_field("%s: %u (0x%4.4x)", label, le16_to_cpu(value),
++							le16_to_cpu(value));
 +}
 +
- static void print_addr_type(const char *label, uint8_t addr_type)
+ static void print_role(uint8_t role)
  {
  	const char *str;
-@@ -1198,21 +1217,7 @@ static void print_power_level(int8_t level, const char *type)
+@@ -6623,7 +6629,7 @@ static void le_create_conn_cmd(const void *data, uint8_t size)
  
- static void print_sync_flow_control(uint8_t enable)
- {
--	const char *str;
--
--	switch (enable) {
--	case 0x00:
--		str = "Disabled";
--		break;
--	case 0x01:
--		str = "Enabled";
--		break;
--	default:
--		str = "Reserved";
--		break;
--	}
--
--	print_field("Flow control: %s (0x%2.2x)", str, enable);
-+	print_enable("Flow control", enable);
- }
- 
- static void print_host_flow_control(uint8_t enable)
-@@ -1506,40 +1511,12 @@ static void print_pscan_type(uint8_t type)
- 
- static void print_afh_mode(uint8_t mode)
- {
--	const char *str;
--
--	switch (mode) {
--	case 0x00:
--		str = "Disabled";
--		break;
--	case 0x01:
--		str = "Enabled";
--		break;
--	default:
--		str = "Reserved";
--		break;
--	}
--
--	print_field("Mode: %s (0x%2.2x)", str, mode);
-+	print_enable("Mode", mode);
- }
- 
- static void print_erroneous_reporting(uint8_t mode)
- {
--	const char *str;
--
--	switch (mode) {
--	case 0x00:
--		str = "Disabled";
--		break;
--	case 0x01:
--		str = "Enabled";
--		break;
--	default:
--		str = "Reserved";
--		break;
--	}
--
--	print_field("Mode: %s (0x%2.2x)", str, mode);
-+	print_enable("Mode", mode);
- }
- 
- static void print_loopback_mode(uint8_t mode)
-@@ -1566,59 +1543,17 @@ static void print_loopback_mode(uint8_t mode)
- 
- static void print_simple_pairing_mode(uint8_t mode)
- {
--	const char *str;
--
--	switch (mode) {
--	case 0x00:
--		str = "Disabled";
--		break;
--	case 0x01:
--		str = "Enabled";
--		break;
--	default:
--		str = "Reserved";
--		break;
--	}
--
--	print_field("Mode: %s (0x%2.2x)", str, mode);
-+	print_enable("Mode", mode);
- }
- 
- static void print_ssp_debug_mode(uint8_t mode)
- {
--	const char *str;
--
--	switch (mode) {
--	case 0x00:
--		str = "Disabled";
--		break;
--	case 0x01:
--		str = "Enabled";
--		break;
--	default:
--		str = "Reserved";
--		break;
--	}
--
--	print_field("Debug mode: %s (0x%2.2x)", str, mode);
-+	print_enable("Debug Mode", mode);
- }
- 
- static void print_secure_conn_support(uint8_t support)
- {
--	const char *str;
--
--	switch (support) {
--	case 0x00:
--		str = "Disabled";
--		break;
--	case 0x01:
--		str = "Enabled";
--		break;
--	default:
--		str = "Reserved";
--		break;
--	}
--
--	print_field("Support: %s (0x%2.2x)", str, support);
-+	print_enable("Support", support);
- }
- 
- static void print_auth_payload_timeout(uint16_t timeout)
-@@ -1791,21 +1726,7 @@ static void print_link_type(uint8_t link_type)
- 
- static void print_encr_mode(uint8_t encr_mode)
- {
--	const char *str;
--
--	switch (encr_mode) {
--	case 0x00:
--		str = "Disabled";
--		break;
--	case 0x01:
--		str = "Enabled";
--		break;
--	default:
--		str = "Reserved";
--		break;
--	}
--
--	print_field("Encryption: %s (0x%2.2x)", str, encr_mode);
-+	print_enable("Encryption", encr_mode);
- }
- 
- static void print_encr_mode_change(uint8_t encr_mode, uint16_t handle)
-@@ -2248,21 +2169,7 @@ static void print_flow_spec(const char *label, const uint8_t *data)
- 
- static void print_short_range_mode(uint8_t mode)
- {
--	const char *str;
--
--	switch (mode) {
--	case 0x00:
--		str = "Disabled";
--		break;
--	case 0x01:
--		str = "Enabled";
--		break;
--	default:
--		str = "Reserved";
--		break;
--	}
--
--	print_field("Short range mode: %s (0x%2.2x)", str, mode);
-+	print_enable("Short range mode", mode);
- }
- 
- static void print_amp_status(uint8_t amp_status)
-@@ -6358,24 +6265,9 @@ static void get_mws_transport_config_rsp(const void *data, uint8_t size)
- static void set_triggered_clock_capture_cmd(const void *data, uint8_t size)
- {
- 	const struct bt_hci_cmd_set_triggered_clock_capture *cmd = data;
--	const char *str;
- 
+ 	print_slot_125("Min connection interval", cmd->min_interval);
+ 	print_slot_125("Max connection interval", cmd->max_interval);
+-	print_field("Connection latency: 0x%4.4x", le16_to_cpu(cmd->latency));
++	print_conn_latency("Connection latency", cmd->latency);
+ 	print_field("Supervision timeout: %d msec (0x%4.4x)",
+ 					le16_to_cpu(cmd->supv_timeout) * 10,
+ 					le16_to_cpu(cmd->supv_timeout));
+@@ -6662,7 +6668,7 @@ static void le_conn_update_cmd(const void *data, uint8_t size)
  	print_handle(cmd->handle);
--
--	switch (cmd->enable) {
--	case 0x00:
--		str = "Disabled";
--		break;
--	case 0x01:
--		str = "Enabled";
--		break;
--	default:
--		str = "Reserved";
--		break;
--	}
--
--	print_field("Capture: %s (0x%2.2x)", str, cmd->enable);
--
-+	print_enable("Capture", cmd->enable);
- 	print_clock_type(cmd->type);
- 	print_lpo_allowed(cmd->lpo_allowed);
- 	print_field("Clock captures to filter: %u", cmd->num_filter);
-@@ -6499,21 +6391,8 @@ static void le_set_scan_rsp_data_cmd(const void *data, uint8_t size)
- static void le_set_adv_enable_cmd(const void *data, uint8_t size)
- {
- 	const struct bt_hci_cmd_le_set_adv_enable *cmd = data;
--	const char *str;
- 
--	switch (cmd->enable) {
--	case 0x00:
--		str = "Disabled";
--		break;
--	case 0x01:
--		str = "Enabled";
--		break;
--	default:
--		str = "Reserved";
--		break;
--	}
--
--	print_field("Advertising: %s (0x%2.2x)", str, cmd->enable);
-+	print_enable("Advertising", cmd->enable);
- }
- 
- static void print_scan_type(const char *label, uint8_t type)
-@@ -6574,35 +6453,9 @@ static void le_set_scan_parameters_cmd(const void *data, uint8_t size)
- static void le_set_scan_enable_cmd(const void *data, uint8_t size)
- {
- 	const struct bt_hci_cmd_le_set_scan_enable *cmd = data;
--	const char *str;
--
--	switch (cmd->enable) {
--	case 0x00:
--		str = "Disabled";
--		break;
--	case 0x01:
--		str = "Enabled";
--		break;
--	default:
--		str = "Reserved";
--		break;
--	}
--
--	print_field("Scanning: %s (0x%2.2x)", str, cmd->enable);
--
--	switch (cmd->filter_dup) {
--	case 0x00:
--		str = "Disabled";
--		break;
--	case 0x01:
--		str = "Enabled";
--		break;
--	default:
--		str = "Reserved";
--		break;
--	}
- 
--	print_field("Filter duplicates: %s (0x%2.2x)", str, cmd->filter_dup);
-+	print_enable("Scanning", cmd->enable);
-+	print_enable("Filter duplicates", cmd->filter_dup);
- }
- 
- static void le_create_conn_cmd(const void *data, uint8_t size)
-@@ -6950,21 +6803,8 @@ static void le_read_local_resolv_addr_rsp(const void *data, uint8_t size)
- static void le_set_resolv_enable_cmd(const void *data, uint8_t size)
- {
- 	const struct bt_hci_cmd_le_set_resolv_enable *cmd = data;
--	const char *str;
- 
--	switch (cmd->enable) {
--	case 0x00:
--		str = "Disabled";
--		break;
--	case 0x01:
--		str = "Enabled";
--		break;
--	default:
--		str = "Reserved";
--		break;
--	}
--
--	print_field("Address resolution: %s (0x%2.2x)", str, cmd->enable);
-+	print_enable("Address resolution", cmd->enable);
- }
- 
- static void le_set_resolv_timeout_cmd(const void *data, uint8_t size)
-@@ -7298,21 +7138,7 @@ static void le_set_ext_adv_params_cmd(const void *data, uint8_t size)
- 	print_field("Secondary max skip: 0x%2.2x", cmd->secondary_max_skip);
- 	print_le_phy("Secondary PHY", cmd->secondary_phy);
- 	print_field("SID: 0x%2.2x", cmd->sid);
--
--	switch (cmd->notif_enable) {
--	case 0x00:
--		str = "Disabled";
--		break;
--	case 0x01:
--		str = "Enabled";
--		break;
--	default:
--		str = "Reserved";
--		break;
--	}
--
--	print_field("Scan request notifications: %s (0x%2.2x)",
--							str, cmd->notif_enable);
-+	print_enable("Scan request notifications", cmd->notif_enable);
- }
- 
- static void le_set_ext_adv_params_rsp(const void *data, uint8_t size)
-@@ -7423,22 +7249,9 @@ static void le_set_ext_adv_enable_cmd(const void *data, uint8_t size)
- {
- 	const struct bt_hci_cmd_le_set_ext_adv_enable *cmd = data;
- 	const struct bt_hci_cmd_ext_adv_set *adv_set;
--	const char *str;
- 	int i;
- 
--	switch (cmd->enable) {
--	case 0x00:
--		str = "Disable";
--		break;
--	case 0x01:
--		str = "Enabled";
--		break;
--	default:
--		str = "Reserved";
--		break;
--	}
--
--	print_field("Extended advertising: %s (0x%2.2x)", str, cmd->enable);
-+	print_enable("Extended advertising", cmd->enable);
- 
- 	if (cmd->num_of_sets == 0)
- 		print_field("Number of sets: Disable all sets (0x%2.2x)",
-@@ -7555,21 +7368,8 @@ static void le_set_periodic_adv_data_cmd(const void *data, uint8_t size)
- static void le_set_periodic_adv_enable_cmd(const void *data, uint8_t size)
- {
- 	const struct bt_hci_cmd_le_set_periodic_adv_enable *cmd = data;
--	const char *str;
- 
--	switch (cmd->enable) {
--	case 0x00:
--		str = "Disable";
--		break;
--	case 0x01:
--		str = "Enabled";
--		break;
--	default:
--		str = "Reserved";
--		break;
--	}
--
--	print_field("Periodic advertising: %s (0x%2.2x)", str, cmd->enable);
-+	print_enable("Periodic advertising", cmd->enable);
+ 	print_slot_125("Min connection interval", cmd->min_interval);
+ 	print_slot_125("Max connection interval", cmd->max_interval);
+-	print_field("Connection latency: 0x%4.4x", le16_to_cpu(cmd->latency));
++	print_conn_latency("Connection latency", cmd->latency);
+ 	print_field("Supervision timeout: %d msec (0x%4.4x)",
+ 					le16_to_cpu(cmd->supv_timeout) * 10,
+ 					le16_to_cpu(cmd->supv_timeout));
+@@ -6806,7 +6812,7 @@ static void le_conn_param_req_reply_cmd(const void *data, uint8_t size)
  	print_handle(cmd->handle);
+ 	print_slot_125("Min connection interval", cmd->min_interval);
+ 	print_slot_125("Max connection interval", cmd->max_interval);
+-	print_field("Connection latency: 0x%4.4x", le16_to_cpu(cmd->latency));
++	print_conn_latency("Connection latency", cmd->latency);
+ 	print_field("Supervision timeout: %d msec (0x%4.4x)",
+ 					le16_to_cpu(cmd->supv_timeout) * 10,
+ 					le16_to_cpu(cmd->supv_timeout));
+@@ -7695,9 +7701,8 @@ static void print_ext_conn_phys(const void *data, uint8_t flags)
+ 							entry->min_interval);
+ 			print_slot_125("  Max connection interval",
+ 							entry->max_interval);
+-			print_field("  Connection latency: %u (0x%4.4x)",
+-						le16_to_cpu(entry->latency),
+-						le16_to_cpu(entry->latency));
++			print_conn_latency("  Connection latency",
++								entry->latency);
+ 			print_field("  Supervision timeout: %d msec (0x%4.4x)",
+ 					le16_to_cpu(entry->supv_timeout) * 10,
+ 					le16_to_cpu(entry->supv_timeout));
+@@ -9587,7 +9592,7 @@ static void le_conn_complete_evt(const void *data, uint8_t size)
+ 	print_peer_addr_type("Peer address type", evt->peer_addr_type);
+ 	print_addr("Peer address", evt->peer_addr, evt->peer_addr_type);
+ 	print_slot_125("Connection interval", evt->interval);
+-	print_slot_125("Connection latency", evt->latency);
++	print_conn_latency("Connection latency", evt->latency);
+ 	print_field("Supervision timeout: %d msec (0x%4.4x)",
+ 					le16_to_cpu(evt->supv_timeout) * 10,
+ 					le16_to_cpu(evt->supv_timeout));
+@@ -9632,7 +9637,7 @@ static void le_conn_update_complete_evt(const void *data, uint8_t size)
+ 	print_status(evt->status);
+ 	print_handle(evt->handle);
+ 	print_slot_125("Connection interval", evt->interval);
+-	print_slot_125("Connection latency", evt->latency);
++	print_conn_latency("Connection latency", evt->latency);
+ 	print_field("Supervision timeout: %d msec (0x%4.4x)",
+ 					le16_to_cpu(evt->supv_timeout) * 10,
+ 					le16_to_cpu(evt->supv_timeout));
+@@ -9663,7 +9668,7 @@ static void le_conn_param_request_evt(const void *data, uint8_t size)
+ 	print_handle(evt->handle);
+ 	print_slot_125("Min connection interval", evt->min_interval);
+ 	print_slot_125("Max connection interval", evt->max_interval);
+-	print_field("Connection latency: 0x%4.4x", le16_to_cpu(evt->latency));
++	print_conn_latency("Connection latency", evt->latency);
+ 	print_field("Supervision timeout: %d msec (0x%4.4x)",
+ 					le16_to_cpu(evt->supv_timeout) * 10,
+ 					le16_to_cpu(evt->supv_timeout));
+@@ -9708,7 +9713,7 @@ static void le_enhanced_conn_complete_evt(const void *data, uint8_t size)
+ 	print_addr("Local resolvable private address", evt->local_rpa, 0x01);
+ 	print_addr("Peer resolvable private address", evt->peer_rpa, 0x01);
+ 	print_slot_125("Connection interval", evt->interval);
+-	print_slot_125("Connection latency", evt->latency);
++	print_conn_latency("Connection latency", evt->latency);
+ 	print_field("Supervision timeout: %d msec (0x%4.4x)",
+ 					le16_to_cpu(evt->supv_timeout) * 10,
+ 					le16_to_cpu(evt->supv_timeout));
+@@ -11159,7 +11164,7 @@ static void mgmt_print_connection_parameter(const void *data)
+ 	mgmt_print_address(data, address_type);
+ 	print_field("Min connection interval: %u", min_conn_interval);
+ 	print_field("Max connection interval: %u", max_conn_interval);
+-	print_field("Connection latency: %u", conn_latency);
++	print_conn_latency("Connection latency", conn_latency);
+ 	print_field("Supervision timeout: %u", supv_timeout);
  }
  
-@@ -7620,42 +7420,9 @@ static void le_set_ext_scan_params_cmd(const void *data, uint8_t size)
- 	print_ext_scan_phys(cmd->data, cmd->num_phys);
- }
- 
--static void print_enable(const char *label, uint8_t enable)
--{
--	const char *str;
--
--	switch (enable) {
--	case 0x00:
--		str = "Disable";
--		break;
--	case 0x01:
--		str = "Enabled";
--		break;
--	default:
--		str = "Reserved";
--		break;
--	}
--
--	print_field("%s: %s (0x%2.2x)", label, str, enable);
--}
--
- static void print_filter_dup(uint8_t filter_dup)
- {
--	const char *str;
--
--	switch (filter_dup) {
--	case 0x00:
--		str = "Disabled";
--		break;
--	case 0x01:
--		str = "Enabled";
--		break;
--	default:
--		str = "Reserved";
--		break;
--	}
--
--	print_field("Filter duplicates: %s (0x%2.2x)", str, filter_dup);
-+	print_enable("Filter duplicates", filter_dup);
- }
- 
- static void le_set_ext_scan_enable_cmd(const void *data, uint8_t size)
-@@ -11009,21 +10776,7 @@ static void mgmt_print_uuid(const void *data)
- 
- static void mgmt_print_enable(const char *label, uint8_t enable)
- {
--	const char *str;
--
--	switch (enable) {
--	case 0x00:
--		str = "Disabled";
--		break;
--	case 0x01:
--		str = "Enabled";
--		break;
--	default:
--		str = "Reserved";
--		break;
--	}
--
--	print_field("%s: %s (0x%2.2x)", label, str, enable);
-+	print_enable(label, enable);
- }
- 
- static void mgmt_print_io_capability(uint8_t capability)
 -- 
 2.11.0
 
