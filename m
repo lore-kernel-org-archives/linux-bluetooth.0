@@ -1,64 +1,29 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: =?UTF-8?q?Micha=C5=82=20Narajowski?=
-        <michal.narajowski@codecoup.pl>
-To: linux-bluetooth@vger.kernel.org
-Cc: =?UTF-8?q?Micha=C5=82=20Narajowski?=
-        <michal.narajowski@codecoup.pl>
-Subject: [PATCH BlueZ v5 00/11] monitor: Bluetooth 5 HCI commands support
-Date: Mon, 31 Jul 2017 15:38:59 +0200
-Message-Id: <20170731133910.26745-1-michal.narajowski@codecoup.pl>
+Date: Mon, 31 Jul 2017 13:28:58 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Loic Poulain <loic.poulain@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: hci_uart: Fix uninitialized alignment value
+Message-ID: <20170731102858.GA25797@x1c>
+References: <1501349551-4678-1-git-send-email-loic.poulain@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1501349551-4678-1-git-send-email-loic.poulain@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This set adds support for decoding Bluetooth 5 commands as listed below.
+Hi Loic,
 
-Changes since v1:
- -squash patches as requested
- -fix coding style issues and review comments
- -add legacy pdu decoding
+On Sat, Jul 29, 2017, Loic Poulain wrote:
+> Force alignment value to the default one (1 byte) if uninitialized.
+> This fixes hci_ll serdev driver (alignment = 0) and avoid any further
+> issues with upcoming drivers.
+> 
+> Signed-off-by: Loic Poulain <loic.poulain@gmail.com>
+> ---
+>  drivers/bluetooth/hci_h4.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-Changes since v2:
- -commit message cleanups
+Applied to bluetooth-next. Thanks.
 
-Changes since v3:
- -fix decoding of LE Extended Advertising Report Event
- -add support for missing error codes
- -fix decoding of LE Set Periodic Advertising Data
-
-Changes since v4:
- -fix decoding of LE Set Extended Scan Parameters
- -fix decoding of LE Set Extended Scan Enable
- -fix decoding of LE Set Extended Advertising Data
- -fix decoding of LE Set Extended Scan Response Data
- -fix decoding of LE Set Periodic Advertising commands
- -fix decoding of LE Extended Create Connection
- -fix decoding of LE Set Extended Scan Parameters
- -fix decoding of LE Set Extended Scan Enable
- -fix decoding of connection latency
- -refactor printing enable field
- -refactor printing advertising channel map and filter policy
- -fix coding style issues
- -rename Directed Advertising Timeout to Advertising Timeout
-
-Michał Narajowski (11):
-  monitor: Add LE Enhanced Test commands decoding
-  monitor: Add LE Extended Advertising commands decoding
-  monitor: Add LE Set Periodic Advertising commands decoding
-  monitor: Add LE Extended Scan commands decoding
-  monitor: Add LE Periodic Advertising commands decoding
-  monitor: Add LE RF commands decoding
-  monitor: Add LE Set Privacy Mode decoding
-  monitor: Fix connection latency decoding
-  monitor: Add support for missing error codes
-  monitor: Rename Directed Advertising Timeout
-  monitor: Refactor print_enable function
-
- monitor/bt.h     |  256 +++++++++
- monitor/packet.c | 1666 ++++++++++++++++++++++++++++++++++++++++--------------
- 2 files changed, 1483 insertions(+), 439 deletions(-)
-
--- 
-2.11.0
-
+Johan
