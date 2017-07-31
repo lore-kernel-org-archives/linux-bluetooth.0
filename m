@@ -1,119 +1,94 @@
-Return-Path: <stefan.wahren@i2se.com>
-Date: Mon, 31 Jul 2017 21:56:13 +0200 (CEST)
-From: Stefan Wahren <stefan.wahren@i2se.com>
-To: Loic Poulain <loic.poulain@gmail.com>
-Cc: linux-rpi-kernel@lists.infradead.org, linux-bluetooth@vger.kernel.org,
-	rjui@broadcom.com, devicetree@vger.kernel.org, robh+dt@kernel.org,
-	f.fainelli@gmail.com, marcel@holtmann.org
-Message-ID: <1992177380.228440.1501530973443@email.1und1.de>
-In-Reply-To: <1501495414-17103-1-git-send-email-loic.poulain@gmail.com>
-References: <1501495414-17103-1-git-send-email-loic.poulain@gmail.com>
-Subject: Re: [PATCH 1/2] ARM64: dts: bcm2837-rpi-3-b: Add bcm43438 as serial
- slave device
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+From: Nathan Michaels <nathan@humanyze.com>
+Date: Mon, 31 Jul 2017 13:57:10 -0400
+Message-ID: <CAA-8RaURbC=BziuWi1cZ6gjapVjC_KUL7dqPE288naG_uoz-Og@mail.gmail.com>
+Subject: PAN on Raspberry Pi with BlueZ 5.23
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Loic,
+Hi,
 
-> Loic Poulain <loic.poulain@gmail.com> hat am 31. Juli 2017 um 12:03 geschrieben:
-> 
-> 
-> Add BCM43438 as a slave device of uart0 (pl011/ttyAMA0).
-> This allows to automatically insert the bcm43438 to the bluetooth
-> subsystem instead of relying on userspace helpers (hciattach).
-> 
-> Overwrite bootargs to use aux uart (ttyS0) instead of ttyAMA0.
-> 
-> Signed-off-by: Loic Poulain <loic.poulain@gmail.com>
+I'm trying to set up a PAN between two Raspberry Pi 3s running
+Raspbian. Packages and versions are below[1]. When I run the
+test-network script on one of them, I get this error message:
 
-i'm very happy to see this patch series and i can't wait to adapt it for RPI Zero W.
+dbus.exceptions.DBusException:
+org.freedesktop.DBus.Error.UnknownMethod: Method "Connect" with
+signature "s" on interface "org.bluez.Network1" doesn't exist
 
-> ---
->  .../devicetree/bindings/net/broadcom-bluetooth.txt | 29 ++++++++++++++++++++++
->  arch/arm64/boot/dts/broadcom/bcm2837-rpi-3-b.dts   | 17 +++++++++++++
->  2 files changed, 46 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
-> 
-> diff --git a/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt b/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
-> new file mode 100644
-> index 0000000..c51ea1b
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
-> @@ -0,0 +1,29 @@
-> +Broadcom Bluetooth Chips
-> +---------------------
-> +
-> +This documents the binding structure and common properties for serial
-> +attached Broadcom devices.
-> +
-> +Serial attached Broadcom devices shall be a child node of the host UART
-> +device the slave device is attached to.
-> +
-> +Required properties:
-> +
-> + - compatible: should contain one of the following:
-> +   * "brcm,bcm43438-bt"
-> +
-> +Optional properties:
-> +
-> + - max-speed: see Documentation/devicetree/bindings/serial/slave-device.txt
-> +
-> +Example:
-> +
-> +&uart2 {
-> +       pinctrl-names = "default";
-> +       pinctrl-0 = <&uart2_pins>;
-> +
-> +       bluetooth {
-> +               compatible = "brcm,bcm43438-bt";
-> +               max-speed = <921600>;
-> +       };
-> +};
+I've also tried to run "bt-network -c $MASTER_ADDR panu" on the same
+system, and gotten this output:
 
-This binding looks good to me, but please send it as a separate patch at first.
+**
+ERROR:lib/bluez/device.c:165:device_get_dbus_object_path: assertion
+failed: (DEVICE_IS(self))
+Aborted
 
-> diff --git a/arch/arm64/boot/dts/broadcom/bcm2837-rpi-3-b.dts b/arch/arm64/boot/dts/broadcom/bcm2837-rpi-3-b.dts
-> index 972f14d..d0c669a 100644
-> --- a/arch/arm64/boot/dts/broadcom/bcm2837-rpi-3-b.dts
-> +++ b/arch/arm64/boot/dts/broadcom/bcm2837-rpi-3-b.dts
-> @@ -8,6 +8,11 @@
->  	compatible = "raspberrypi,3-model-b", "brcm,bcm2837";
->  	model = "Raspberry Pi 3 Model B";
->  
-> +	chosen {
-> +		/* BCM2835 8250 auxiliar UART instead of pl011 */
-> +		bootargs = "console=ttyS0,115200 earlycon";
-> +	};
-> +
->  	memory {
->  		reg = <0 0x40000000>;
->  	};
-> @@ -39,3 +44,15 @@
->  	status = "okay";
->  	bus-width = <4>;
->  };
-> +
-> +/* UART0 is used to drive bcm43438 bluetooth controller */
-> +&uart0 {
-> +	pinctrl-names = "default";
-> +	pinctrl-0 = <&uart0_gpio32 &gpclk2_gpio43>;
-> +	status = "okay";
-> +
-> +	bluetooth {
-> +		compatible = "brcm,bcm43438-bt";
-> +		max-speed = <921600>;
-> +	};
-> +};
-> -- 
-> 1.9.1
+I have set the link mode on the NAP to "master,accept" and on the PANU
+to "slave,accept" and I've set both interfaces to up using hciconfig.
 
-This also looks good, but this conflicts with the recent changes (which will be applied soon):
+Does anyone know what could be going on? I don't see any packets in
+btmon. My hciconfig for the slave[2] and master[3] are below. I did
+briefly try with an external bluetooth module from a different
+manufacturer, but it didn't seem to do anything different.
 
-[PATCH v2] ARM: dts: bcm283x: Move the BCM2837 DT contents from arm64 to arm.
-[PATCH V2 0/3] ARM: bcm283x: Raspberry Pi Zero W support
 
-Last question: how about another patch to enable serdev support as module for arm64/defconfig?
 
-Best regards
-Stefan
+
+[1]
+ii  bluez                                 5.23-2+rpi2
+             armhf        Bluetooth tools and daemons
+ii  bluez-firmware                        1.2-3+rpi1
+             all          Firmware for Bluetooth devices
+ii  bluez-hcidump                         5.23-2+rpi2
+             armhf        Analyses Bluetooth HCI packets
+ii  bluez-obexd                           5.23-2+rpi2
+             armhf        bluez obex daemon
+ii  bluez-test-scripts                    5.23-2+rpi2
+             all          BlueZ test scripts
+ii  bluez-tools                           0.2.0~20140808-3
+             armhf        Set of tools to manage Bluetooth devices for
+linux
+ii  python-bluez                          0.20-1
+             armhf        Python wrappers around BlueZ for rapid
+bluetooth development
+
+
+[2]
+hci0:   Type: BR/EDR  Bus: UART
+        BD Address: B8:27:EB:6C:CE:26  ACL MTU: 1021:8  SCO MTU: 64:1
+        UP RUNNING PSCAN
+        RX bytes:8330 acl:36 sco:0 events:294 errors:0
+        TX bytes:7029 acl:36 sco:0 commands:213 errors:0
+        Features: 0xbf 0xfe 0xcf 0xfe 0xdb 0xff 0x7b 0x87
+        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+        Link policy: RSWITCH SNIFF
+        Link mode: SLAVE ACCEPT
+        Name: 'raspberrypi'
+        Class: 0x000000
+        Service Classes: Unspecified
+        Device Class: Miscellaneous,
+        HCI Version: 4.1 (0x7)  Revision: 0xb6
+        LMP Version: 4.1 (0x7)  Subversion: 0x2209
+        Manufacturer: Broadcom Corporation (15)
+
+[3]
+hci0:   Type: BR/EDR  Bus: UART
+        BD Address: B8:27:EB:99:1C:22  ACL MTU: 1021:8  SCO MTU: 64:1
+        UP RUNNING PSCAN ISCAN
+        RX bytes:2582 acl:0 sco:0 events:99 errors:0
+        TX bytes:2406 acl:0 sco:0 commands:98 errors:0
+        Features: 0xbf 0xfe 0xcf 0xfe 0xdb 0xff 0x7b 0x87
+        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+        Link policy: RSWITCH SNIFF
+        Link mode: ACCEPT MASTER
+        Name: 'raspberrypi'
+        Class: 0x000000
+        Service Classes: Unspecified
+        Device Class: Miscellaneous,
+        HCI Version: 4.1 (0x7)  Revision: 0xb6
+        LMP Version: 4.1 (0x7)  Subversion: 0x2209
+        Manufacturer: Broadcom Corporation (15)
