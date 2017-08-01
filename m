@@ -1,59 +1,195 @@
-Return-Path: <sebastian.reichel@collabora.co.uk>
-Date: Tue, 1 Aug 2017 10:51:32 +0200
-From: Sebastian Reichel <sebastian.reichel@collabora.co.uk>
-To: Loic Poulain <loic.poulain@gmail.com>
-Cc: robh+dt@kernel.org, rjui@broadcom.com, sbranden@broadcom.com,
-	f.fainelli@gmail.com, marcel@holtmann.org, johan.hedberg@gmail.com,
-	stefan.wahren@i2se.com, linux-rpi-kernel@lists.infradead.org,
-	linux-bluetooth@vger.kernel.org, devicetree@vger.kernel.org
-Subject: Re: [PATCH v2 3/3] Bluetooth: hci_bcm: Add serdev support
-Message-ID: <20170801085132.onmq5wubrv2av2pu@earth>
+Return-Path: <loic.poulain@gmail.com>
+From: Loic Poulain <loic.poulain@gmail.com>
+To: robh+dt@kernel.org,
+	rjui@broadcom.com,
+	sbranden@broadcom.com,
+	f.fainelli@gmail.com,
+	marcel@holtmann.org,
+	johan.hedberg@gmail.com,
+	stefan.wahren@i2se.com
+Cc: linux-rpi-kernel@lists.infradead.org,
+	linux-bluetooth@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	Loic Poulain <loic.poulain@gmail.com>
+Subject: [PATCH v2 3/3] Bluetooth: hci_bcm: Add serdev support
+Date: Tue,  1 Aug 2017 10:38:24 +0200
+Message-Id: <1501576704-26423-3-git-send-email-loic.poulain@gmail.com>
+In-Reply-To: <1501576704-26423-1-git-send-email-loic.poulain@gmail.com>
 References: <1501576704-26423-1-git-send-email-loic.poulain@gmail.com>
- <1501576704-26423-3-git-send-email-loic.poulain@gmail.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="ihkd3ex5jxqc5l4w"
-In-Reply-To: <1501576704-26423-3-git-send-email-loic.poulain@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Add basic support for Broadcom serial slave devices.
+Probe the serial device, retrieve its maximum speed and
+register a new hci uart device.
 
---ihkd3ex5jxqc5l4w
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Tested/compatible with bcm43438 (RPi3).
 
-Hi,
+Signed-off-by: Loic Poulain <loic.poulain@gmail.com>
+---
+v2: dt-bindings as separate patch
+    rebase on upcoming pi3 dts changes
 
-On Tue, Aug 01, 2017 at 10:38:24AM +0200, Loic Poulain wrote:
-> [...]
-> +	err = of_property_read_u32(serdev->dev.of_node, "max-speed", &speed);
-> +	if (!err)
-> +		bcmdev->hu.oper_speed = speed;
-> [...]
+ drivers/bluetooth/hci_bcm.c | 82 ++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 78 insertions(+), 4 deletions(-)
 
-I suggest to use device_property_read_u32() here and include
-<linux/property.h> instead of <linux/of.h>. This way the
-serdev support is not DT specific.
-
--- Sebastian
-
---ihkd3ex5jxqc5l4w
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCgAdFiEE72YNB0Y/i3JqeVQT2O7X88g7+poFAlmAQREACgkQ2O7X88g7
-+pqmvA/+Mmg+SBdDagCAbNvYKJRHG9N2r8l1Aw6pEsGzdHIV8WXJcGm8YAHCAreA
-IRnuRiTK9NuLafWyycoEAaja6G1cpNdUf0lpYYYDdWD4IU+NoMi9hIMew5l1rMGq
-IwH9V1kwt7TjL/xGu8CQ89VJa6rTA+rPcJd+kQuPMjEuegXAJdaZ6a9VpqzZgFv4
-9CUYhfkqXctKeF9Axjt7Fq0IZvatDGBM539mTO42D5Jlt9tPcaqvMZHr3ge6Z5YL
-2WR7X1zCQzjYkPf+E5MKloap/oiyBzPe/DUS4/suw0kzdey6I38SaOEwScS1Pv8/
-scsNM6hEVDcMcApr5qILN8ISTLdZmeFeHmxJTGWHOT2duT2+T7qdS9zfYkG8EpV5
-rnuStJXDyG1QKqvk7YwP0iyWIQWQEshieg1Ta+QnP7TjLx6vhseuU2GmkxAVQnZV
-MYHIMLMvA1GRr6Yh+st/KtloDj+lXniaETwAZL6gMTuZed9iuBlIpOzOkr6uqeyW
-W71lrWRyEAUhIfdpAsCOyDeVQJxoj+WG+1uDKEexZqv3BLpVY+LF6jFGCQSM6xP4
-V8RlNfwjJ8GVzw/565zJzRvCnG6RrzRSsRSGM3KO2nPSVLNV0DBSKEAvsxDpseUQ
-5npwyMYw+AYtbgKctafD1LvHdm8AIajIo5o7oTpO5Yf2pXIuOSs=
-=I8G6
------END PGP SIGNATURE-----
-
---ihkd3ex5jxqc5l4w--
+diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
+index 6b42372..f824738 100644
+--- a/drivers/bluetooth/hci_bcm.c
++++ b/drivers/bluetooth/hci_bcm.c
+@@ -27,6 +27,7 @@
+ #include <linux/firmware.h>
+ #include <linux/module.h>
+ #include <linux/acpi.h>
++#include <linux/of.h>
+ #include <linux/platform_device.h>
+ #include <linux/clk.h>
+ #include <linux/gpio/consumer.h>
+@@ -34,6 +35,7 @@
+ #include <linux/interrupt.h>
+ #include <linux/dmi.h>
+ #include <linux/pm_runtime.h>
++#include <linux/serdev.h>
+ 
+ #include <net/bluetooth/bluetooth.h>
+ #include <net/bluetooth/hci_core.h>
+@@ -46,6 +48,7 @@
+ 
+ #define BCM_AUTOSUSPEND_DELAY	5000 /* default autosleep delay */
+ 
++/* platform device driver resources */
+ struct bcm_device {
+ 	struct list_head	list;
+ 
+@@ -68,6 +71,12 @@ struct bcm_device {
+ #endif
+ };
+ 
++/* serdev driver resources */
++struct bcm_bt_device {
++	struct hci_uart hu;
++};
++
++/* generic bcm uart resources */
+ struct bcm_data {
+ 	struct sk_buff		*rx_skb;
+ 	struct sk_buff_head	txq;
+@@ -289,6 +298,11 @@ static int bcm_open(struct hci_uart *hu)
+ 
+ 	hu->priv = bcm;
+ 
++	if (hu->serdev) {
++		serdev_device_open(hu->serdev);
++		goto out;
++	}
++
+ 	if (!hu->tty->dev)
+ 		goto out;
+ 
+@@ -323,6 +337,9 @@ static int bcm_close(struct hci_uart *hu)
+ 
+ 	bt_dev_dbg(hu->hdev, "hu %p", hu);
+ 
++	if (hu->serdev)
++		serdev_device_close(hu->serdev);
++
+ 	/* Protect bcm->dev against removal of the device or driver */
+ 	mutex_lock(&bcm_device_lock);
+ 	if (bcm_device_exists(bdev)) {
+@@ -397,8 +414,12 @@ static int bcm_setup(struct hci_uart *hu)
+ 	else
+ 		speed = 0;
+ 
+-	if (speed)
+-		hci_uart_set_baudrate(hu, speed);
++	if (speed) {
++		if (hu->serdev)
++			serdev_device_set_baudrate(hu->serdev, speed);
++		else
++			hci_uart_set_baudrate(hu, speed);
++	}
+ 
+ 	/* Operational speed if any */
+ 	if (hu->oper_speed)
+@@ -410,8 +431,12 @@ static int bcm_setup(struct hci_uart *hu)
+ 
+ 	if (speed) {
+ 		err = bcm_set_baudrate(hu, speed);
+-		if (!err)
+-			hci_uart_set_baudrate(hu, speed);
++		if (!err) {
++			if (hu->serdev)
++				serdev_device_set_baudrate(hu->serdev, speed);
++			else
++				hci_uart_set_baudrate(hu, speed);
++		}
+ 	}
+ 
+ finalize:
+@@ -903,9 +928,57 @@ static int bcm_remove(struct platform_device *pdev)
+ 	},
+ };
+ 
++static int bcm_serdev_probe(struct serdev_device *serdev)
++{
++	struct bcm_bt_device *bcmdev;
++	u32 speed;
++	int err;
++
++	bcmdev = devm_kzalloc(&serdev->dev, sizeof(*bcmdev), GFP_KERNEL);
++	if (!bcmdev)
++		return -ENOMEM;
++
++	bcmdev->hu.serdev = serdev;
++	serdev_device_set_drvdata(serdev, bcmdev);
++
++	err = of_property_read_u32(serdev->dev.of_node, "max-speed", &speed);
++	if (!err)
++		bcmdev->hu.oper_speed = speed;
++
++	return hci_uart_register_device(&bcmdev->hu, &bcm_proto);
++}
++
++static void bcm_serdev_remove(struct serdev_device *serdev)
++{
++	struct bcm_bt_device *bcmdev = serdev_device_get_drvdata(serdev);
++
++	hci_uart_unregister_device(&bcmdev->hu);
++}
++
++#ifdef CONFIG_OF
++static const struct of_device_id bcm_bluetooth_of_match[] = {
++	{ .compatible = "brcm,bcm43438-bt" },
++	{ },
++};
++MODULE_DEVICE_TABLE(of, bcm_bluetooth_of_match);
++#endif
++
++static struct serdev_device_driver bcm_serdev_driver = {
++	.probe = bcm_serdev_probe,
++	.remove = bcm_serdev_remove,
++	.driver = {
++		.name = "hci_uart_bcm",
++		.of_match_table = of_match_ptr(bcm_bluetooth_of_match),
++	},
++};
++
+ int __init bcm_init(void)
+ {
++	/* For now, we need to keep both platform device
++	 * driver (ACPI generated) and serdev driver (DT).
++	 */
+ 	platform_driver_register(&bcm_driver);
++	serdev_device_driver_register(&bcm_serdev_driver);
+ 
+ 	return hci_uart_register_proto(&bcm_proto);
+ }
+@@ -913,6 +986,7 @@ int __init bcm_init(void)
+ int __exit bcm_deinit(void)
+ {
+ 	platform_driver_unregister(&bcm_driver);
++	serdev_device_driver_unregister(&bcm_serdev_driver);
+ 
+ 	return hci_uart_unregister_proto(&bcm_proto);
+ }
+-- 
+1.9.1
