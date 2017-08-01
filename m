@@ -1,178 +1,75 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <eramoto.masaya@jp.fujitsu.com>
+Subject: Re: [PATCH v3] Support to change set file via arg
+To: C Shapiro <shapiroc@chromium.org>, <linux-bluetooth@vger.kernel.org>
+CC: Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Marcel Holtmann
+	<marcel@holtmann.org>
+References: <20170718154955.83197-1-shapiroc@chromium.org>
+From: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
+Message-ID: <d57a3a6c-b8ed-3418-1239-12749de19a9d@jp.fujitsu.com>
+Date: Tue, 1 Aug 2017 19:39:16 +0900
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZLhS+-ugFxXKZ6mmk2BvCHmLG8sxWhfdnW1U05OMqqNHA@mail.gmail.com>
-References: <CALvjcs8cbrO1sE_bgKXsLZ6C5omO=Y_duXjkRC1Rww-z156v9w@mail.gmail.com>
- <CABBYNZLhS+-ugFxXKZ6mmk2BvCHmLG8sxWhfdnW1U05OMqqNHA@mail.gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 1 Aug 2017 13:48:15 +0300
-Message-ID: <CABBYNZL98uajaq0+GHyKWBsp_aZPNxQkG0YCimzu0510vVR=cw@mail.gmail.com>
-Subject: Re: how to add local name in scan response when setting
- MGMT_ADV_FLAG_LOCAL_NAME in Bluez
-To: Yunhan Wang <yunhanw@google.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <20170718154955.83197-1-shapiroc@chromium.org>
+Content-Type: text/plain; charset="utf-8"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Yunhan,
+Hi Charles,
 
-On Tue, Aug 1, 2017 at 1:21 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi Yunhan,
->
-> On Tue, Aug 1, 2017 at 10:37 AM, Yunhan Wang <yunhanw@google.com> wrote:
->> Hi
->>
->> I am trying to do some small experiments that add local name in the
->> scan response,  should I use data[0] to store both adv_data and
->> scan_rsp?
->>
->> I tried to add local name(=E2=80=99TEST=E2=80=99) in data[0] under
->> mgmt_cp_add_advertising on
->> https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/src/advertising.=
-c#n484,
->> it seems it does not work, any idea?
->
-> Seems to be a limitation in the kernel, also setting the adapter name
-> doesn't change anything either so it seems it simply does not include
-> any scan response. I guess we would have to add support for that.
+On 07/19/2017 12:49 AM, C Shapiro wrote:
+> ChromeOS is currently shifting to a more dynamic build system where a
+> single build will be created/managed/deployed to support multiple models
+> that were all created based on a single reference board.
+> 
+> This is being done for general cost/maintenance savings around the sheer
+> number of builds that are currently managed for ChromeOS.
+> 
+> To support this, we're changing our build images to have all of the
+> configuration available for all of the models supported by a given
+> build.
+> 
+> For the bluetooth stack, models have different product id values in the
+> DeviceID field for the main.conf config file.
+> 
+> E.g.
+>  - https://chromium.googlesource.com/chromiumos/overlays/board-overlays/+/master/overlay-pyro/chromeos-base/chromeos-bsp-pyro/files/main.conf
+>  - https://chromium.googlesource.com/chromiumos/overlays/board-overlays/+/master/overlay-reef/chromeos-base/chromeos-bsp-reef/files/main.conf
+>  - https://chromium.googlesource.com/chromiumos/overlays/board-overlays/+/master/overlay-snappy/chromeos-base/chromeos-bsp-snappy/files/main.conf
+> 
+> This change allows the config file to be passed as a runtime argument to
+> bluetoothd, which allows the ChromeOS init script to determine the model
+> at runtime and then pass the appropriate model specific config file.
+> 
+> Signed-off-by: C Shapiro <shapiroc@chromium.org>
+> Reviewed-by: Simon Glass <sjg@chromium.org>
+> ---
+> Changes in v3:
+> - Fix the commit message with correct links to the example usage.
+> 
+>  src/bluetoothd.8.in |  4 ++++
+>  src/main.c          | 12 +++++++++++-
+>  2 files changed, 15 insertions(+), 1 deletion(-)
 
-Actually the kernel does seem to set the scan response data, but is empty:
+Could you add the specified main.conf path to the following messages 
+when --configfile command-line option was used.
 
-< HCI Command: LE Set Scan Response Data (0x08|0x0009) plen 32
-#8499 13:40:40.663565
-        Length: 0
-> HCI Event: Command Complete (0x0e) plen 4                         #8500 1=
-3:40:40.664554
-      LE Set Scan Response Data (0x08|0x0009) ncmd 1
-        Status: Success (0x00)
+  Cscope tag: main.conf
+     #   line  filename / context / line
+     1    212  src/main.c <<<unknown>>>
+               warn("Unknown key %s for group %s in main.conf",
+     2    241  src/main.c <<<unknown>>>
+               warn("Unknown group %s in main.conf", keys[i]);
+     3    276  src/main.c <<<unknown>>>
+               DBG("parsing main.conf");
 
->> Thanks
->> Best wishes
->> Yunhan
->>
->> static DBusMessage *refresh_advertisement(struct btd_adv_client *client)
->> {
->> struct mgmt_cp_add_advertising *cp;
->> uint8_t param_len;
->> uint8_t *adv_data;
->> size_t adv_data_len;
->> uint32_t flags =3D 0;
->>
->> uint8_t scan_rsp[] =3D {
->> =E2=80=99T=E2=80=99,
->> =E2=80=99E=E2=80=99,
->> =E2=80=99S=E2=80=99,
->> =E2=80=99T=E2=80=99
->> };
->> size_t scan_rsp_len =3D sizeof(scan_rsp);
->>
->> DBG("Refreshing advertisement: %s", client->path);
->>
->> if (client->type =3D=3D AD_TYPE_PERIPHERAL)
->> flags =3D MGMT_ADV_FLAG_CONNECTABLE | MGMT_ADV_FLAG_DISCOV |
->> MGMT_ADV_FLAG_LOCAL_NAME;
->>
->> if (client->include_tx_power)
->> flags |=3D MGMT_ADV_FLAG_TX_POWER;
->>
->> adv_data =3D bt_ad_generate(client->data, &adv_data_len);
->>
->> if (!adv_data || (adv_data_len > calc_max_adv_len(client, flags))) {
->> error("Advertising data too long or couldn't be generated.");
->>
->> return g_dbus_create_error(client->reg, ERROR_INTERFACE
->> ".InvalidLength",
->> "Advertising data too long.");
->> }
->>
->> param_len =3D sizeof(struct mgmt_cp_add_advertising) + adv_data_len +
->> scan_rsp_len;
->>
->> cp =3D malloc0(param_len);
->>
->> if (!cp) {
->> error("Couldn't allocate for MGMT!");
->>
->> free(adv_data);
->>
->> return btd_error_failed(client->reg, "Failed");
->> }
->>
->> cp->flags =3D htobl(flags);
->> cp->instance =3D client->instance;
->> cp->adv_data_len =3D adv_data_len;
->> cp->scan_rsp_len =3D scan_rsp_len;
->> memcpy(cp->data, adv_data, adv_data_len);
->> memcpy(cp->data + adv_data_len, scan_rsp_data, scan_rsp_len);
->> free(adv_data);
->>
->> if (!mgmt_send(client->manager->mgmt, MGMT_OP_ADD_ADVERTISING,
->> client->manager->mgmt_index, param_len, cp,
->> add_adv_callback, client, NULL)) {
->> DBG("Failed to add Advertising Data");
->>
->> free(cp);
->>
->> return btd_error_failed(client->reg, "Failed");
->> }
->>
->> free(cp);
->>
->> return NULL;
->> }
->>
->> Reference:
->> In lib/mgmt.h,
->>
->> #define MGMT_OP_ADD_ADVERTISING 0x003E
->> struct mgmt_cp_add_advertising {
->> uint8_t  instance;
->> uint32_t flags;
->> uint16_t duration;
->> uint16_t timeout;
->> uint8_t  adv_data_len;
->> uint8_t  scan_rsp_len;
->> uint8_t  data[0];
->> } __packed;
->> From mgmt-api.txt, I am
->>
->> Add Advertising Command
->> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->>
->> Command Code: 0x003e
->> Controller Index: <controller id>
->> Command Parameters: Instance (1 Octet)
->> Flags (4 Octets)
->> Duration (2 Octets)
->> Timeout (2 Octets)
->> Adv_Data_Len (1 Octet)
->> Scan_Rsp_len (1 Octet)
->> Adv_Data (0-255 Octets)
->> Scan_Rsp (0-255 Octets)
->> =E2=80=A6...
->> With the Flags value the type of advertising is controlled and
->> the following flags are defined:
->>
->> 0 Switch into Connectable mode
->> 1 Advertise as Discoverable
->> 2 Advertise as Limited Discoverable
->> 3 Add Flags field to Adv_Data
->> 4 Add TX Power field to Adv_Data
->> 5 Add Appearance field to Scan_Rsp
->> 6 Add Local Name in Scan_Rsp
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-bluetoot=
-h" in
->> the body of a message to majordomo@vger.kernel.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
->
->
-> --
-> Luiz Augusto von Dentz
+I applied this patch and tested my patches (git log 32867836..c15b986e)
+with using this command-line option. At that time, I passed various 
+main.confs composed of different config option settings to it. Using it
+was more useful than editing the fixed main.conf (CONFIGDIR "/main.conf"),
+but it was hard to resolve which output messages is related to any
+main.conf when I tested with each main.conf at once.
+So, I suggest to add the specified main.conf path to these messages. It
+seems we can make resolving easier when we hit a problem with a specified
+main.conf.
 
 
-
---=20
-Luiz Augusto von Dentz
+Regards,
+Eramoto
