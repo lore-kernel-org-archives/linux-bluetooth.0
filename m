@@ -1,158 +1,128 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <netdev-owner@vger.kernel.org>
+Date: Tue, 1 Aug 2017 12:41:56 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: davem@davemloft.net
+Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Subject: pull request: bluetooth-next 2017-08-01
+Message-ID: <20170801094156.GA22557@x1c.lan>
 MIME-Version: 1.0
-In-Reply-To: <CALvjcs8cbrO1sE_bgKXsLZ6C5omO=Y_duXjkRC1Rww-z156v9w@mail.gmail.com>
-References: <CALvjcs8cbrO1sE_bgKXsLZ6C5omO=Y_duXjkRC1Rww-z156v9w@mail.gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 1 Aug 2017 13:21:40 +0300
-Message-ID: <CABBYNZLhS+-ugFxXKZ6mmk2BvCHmLG8sxWhfdnW1U05OMqqNHA@mail.gmail.com>
-Subject: Re: how to add local name in scan response when setting
- MGMT_ADV_FLAG_LOCAL_NAME in Bluez
-To: Yunhan Wang <yunhanw@google.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: multipart/signed; micalg=pgp-sha1;
+        protocol="application/pgp-signature"; boundary="wac7ysb48OaltWcw"
+Sender: netdev-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Yunhan,
 
-On Tue, Aug 1, 2017 at 10:37 AM, Yunhan Wang <yunhanw@google.com> wrote:
-> Hi
->
-> I am trying to do some small experiments that add local name in the
-> scan response,  should I use data[0] to store both adv_data and
-> scan_rsp?
->
-> I tried to add local name(=E2=80=99TEST=E2=80=99) in data[0] under
-> mgmt_cp_add_advertising on
-> https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/src/advertising.c=
-#n484,
-> it seems it does not work, any idea?
+--wac7ysb48OaltWcw
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Seems to be a limitation in the kernel, also setting the adapter name
-doesn't change anything either so it seems it simply does not include
-any scan response. I guess we would have to add support for that.
+Hi Dave,
 
-> Thanks
-> Best wishes
-> Yunhan
->
-> static DBusMessage *refresh_advertisement(struct btd_adv_client *client)
-> {
-> struct mgmt_cp_add_advertising *cp;
-> uint8_t param_len;
-> uint8_t *adv_data;
-> size_t adv_data_len;
-> uint32_t flags =3D 0;
->
-> uint8_t scan_rsp[] =3D {
-> =E2=80=99T=E2=80=99,
-> =E2=80=99E=E2=80=99,
-> =E2=80=99S=E2=80=99,
-> =E2=80=99T=E2=80=99
-> };
-> size_t scan_rsp_len =3D sizeof(scan_rsp);
->
-> DBG("Refreshing advertisement: %s", client->path);
->
-> if (client->type =3D=3D AD_TYPE_PERIPHERAL)
-> flags =3D MGMT_ADV_FLAG_CONNECTABLE | MGMT_ADV_FLAG_DISCOV |
-> MGMT_ADV_FLAG_LOCAL_NAME;
->
-> if (client->include_tx_power)
-> flags |=3D MGMT_ADV_FLAG_TX_POWER;
->
-> adv_data =3D bt_ad_generate(client->data, &adv_data_len);
->
-> if (!adv_data || (adv_data_len > calc_max_adv_len(client, flags))) {
-> error("Advertising data too long or couldn't be generated.");
->
-> return g_dbus_create_error(client->reg, ERROR_INTERFACE
-> ".InvalidLength",
-> "Advertising data too long.");
-> }
->
-> param_len =3D sizeof(struct mgmt_cp_add_advertising) + adv_data_len +
-> scan_rsp_len;
->
-> cp =3D malloc0(param_len);
->
-> if (!cp) {
-> error("Couldn't allocate for MGMT!");
->
-> free(adv_data);
->
-> return btd_error_failed(client->reg, "Failed");
-> }
->
-> cp->flags =3D htobl(flags);
-> cp->instance =3D client->instance;
-> cp->adv_data_len =3D adv_data_len;
-> cp->scan_rsp_len =3D scan_rsp_len;
-> memcpy(cp->data, adv_data, adv_data_len);
-> memcpy(cp->data + adv_data_len, scan_rsp_data, scan_rsp_len);
-> free(adv_data);
->
-> if (!mgmt_send(client->manager->mgmt, MGMT_OP_ADD_ADVERTISING,
-> client->manager->mgmt_index, param_len, cp,
-> add_adv_callback, client, NULL)) {
-> DBG("Failed to add Advertising Data");
->
-> free(cp);
->
-> return btd_error_failed(client->reg, "Failed");
-> }
->
-> free(cp);
->
-> return NULL;
-> }
->
-> Reference:
-> In lib/mgmt.h,
->
-> #define MGMT_OP_ADD_ADVERTISING 0x003E
-> struct mgmt_cp_add_advertising {
-> uint8_t  instance;
-> uint32_t flags;
-> uint16_t duration;
-> uint16_t timeout;
-> uint8_t  adv_data_len;
-> uint8_t  scan_rsp_len;
-> uint8_t  data[0];
-> } __packed;
-> From mgmt-api.txt, I am
->
-> Add Advertising Command
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->
-> Command Code: 0x003e
-> Controller Index: <controller id>
-> Command Parameters: Instance (1 Octet)
-> Flags (4 Octets)
-> Duration (2 Octets)
-> Timeout (2 Octets)
-> Adv_Data_Len (1 Octet)
-> Scan_Rsp_len (1 Octet)
-> Adv_Data (0-255 Octets)
-> Scan_Rsp (0-255 Octets)
-> =E2=80=A6...
-> With the Flags value the type of advertising is controlled and
-> the following flags are defined:
->
-> 0 Switch into Connectable mode
-> 1 Advertise as Discoverable
-> 2 Advertise as Limited Discoverable
-> 3 Add Flags field to Adv_Data
-> 4 Add TX Power field to Adv_Data
-> 5 Add Appearance field to Scan_Rsp
-> 6 Add Local Name in Scan_Rsp
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth=
-" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Here's our first batch of Bluetooth patches for the 4.14 kernel:
 
+ - Several new USB IDs for the btusb driver
+ - Memory leak fix in btusb driver
+ - Cleanups & fixes to hci_nokia, hci_serdev and hci_bcm drivers
+ - Fixed cleanup path in mrf24j40 (802.15.4) driver probe function
+ - A few other smaller cleanups & fixes to drivers
 
+Please let me know if there are any issues pulling. Thanks.
 
---=20
-Luiz Augusto von Dentz
+Johan
+
+---
+The following changes since commit 04d8980b4a9ca178be1c703467f2ed4ac0800e90:
+
+  cxgb4: Update register ranges of T4/T5/T6 adapters (2017-07-19 22:27:03 -0700)
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git for-upstream
+
+for you to fetch changes up to d829b9e230f4138fb6194e854e1bb46f737f1c3d:
+
+  Bluetooth: btusb: add ID for LiteOn 04ca:3016 (2017-08-01 08:28:31 +0300)
+
+----------------------------------------------------------------
+Brian Norris (1):
+      Bluetooth: btusb: add ID for LiteOn 04ca:3016
+
+Christophe JAILLET (1):
+      mrf24j40: Fix en error handling path in 'mrf24j40_probe()'
+
+Dan Carpenter (1):
+      Bluetooth: btrtl: Fix a error code in rtl_load_config()
+
+Derek Robson (1):
+      Bluetooth: Style fix - align block comments
+
+Dmitry Tunin (1):
+      Bluetooth: btusb: Add support of all Foxconn (105b) Broadcom devices
+
+Gustavo A. R. Silva (1):
+      Bluetooth: btwilink: remove unnecessary static in bt_ti_probe()
+
+Ian Molton (5):
+      Bluetooth: hci_nokia: prevent crash on module removal
+      Bluetooth: hci_nokia: remove duplicate call to pm_runtime_disable()
+      Bluetooth: hci_serdev: Introduce hci_uart_unregister_device()
+      Bluetooth: hci_nokia: Use new hci_uart_unregister_device() function
+      Bluetooth: hci_ll: Use new hci_uart_unregister_device() function
+
+Jeffy Chen (1):
+      Bluetooth: btusb: Fix memory leak in play_deferred
+
+Joan Jani (1):
+      Bluetooth: btqca: Fixed a coding style error
+
+Leif Liddy (1):
+      Bluetooth: btusb: fix QCA Rome suspend/resume
+
+Loic Poulain (2):
+      Bluetooth: hci_bcm: Make bcm_request_irq fail if no IRQ resource
+      Bluetooth: hci_uart: Fix uninitialized alignment value
+
+Marcel Holtmann (1):
+      Bluetooth: hci_nokia: select BT_BCM for btbcm_set_bdaddr()
+
+ drivers/bluetooth/Kconfig         |  1 +
+ drivers/bluetooth/ath3k.c         |  3 ++-
+ drivers/bluetooth/bt3c_cs.c       |  8 ++++---
+ drivers/bluetooth/btmrvl_sdio.c   |  6 ++++--
+ drivers/bluetooth/btqca.c         |  2 +-
+ drivers/bluetooth/btrtl.c         |  2 ++
+ drivers/bluetooth/btsdio.c        |  3 ++-
+ drivers/bluetooth/btuart_cs.c     |  8 ++++---
+ drivers/bluetooth/btusb.c         | 44 ++++++++++++++++++++++++++++++++-------
+ drivers/bluetooth/btwilink.c      |  8 +++----
+ drivers/bluetooth/hci_bcm.c       | 30 +++++++++++++-------------
+ drivers/bluetooth/hci_h4.c        |  2 +-
+ drivers/bluetooth/hci_ldisc.c     |  3 ++-
+ drivers/bluetooth/hci_ll.c        | 11 +++-------
+ drivers/bluetooth/hci_nokia.c     | 10 +--------
+ drivers/bluetooth/hci_serdev.c    | 13 ++++++++++++
+ drivers/bluetooth/hci_uart.h      |  1 +
+ drivers/net/ieee802154/mrf24j40.c |  3 ++-
+ 18 files changed, 101 insertions(+), 57 deletions(-)
+
+--wac7ysb48OaltWcw
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIcBAEBAgAGBQJZgEzkAAoJECQj9vv5qNQSZygQAJxl84cjg2Ly6YL1zVpgghb6
+UFCp3BXW9HiTzCw71WhhvS67VYDNuS9JYB0nBvr+1GABDFu7OKWmdHrdCkJWNshO
+Abc9fg7VFICt95uKG4R+DfVYhviSZiF2SZ9Rua8oQWiTVKQV5OuDt8gudgqWybhN
+eVsQRrV0+g4UeKfGrCOMFQXcFVbUdFIjwG45oJX2O91X3Drm3w6+x1njOBa0MB6B
+pyswGJb5H2lXOOxjLMA+JwUstF/af8uYE9b0GZTASXuoo0VMn65pfckl2xLD9pVR
+ajYwI5U6F928Tyqe8zuXfWOlji7g+X5tTuzcGQK7Z24b8pzA5ptfWxYCFNrFqUuA
+QMo5GGLkDFD8hsL06sTuYOqDPme1Qg79pKyAK7RdLCIiw9673u/bzvh43Hi6un1N
+JChNxx13hll4ViocNsk9Op7BGQkf1E56or5O35UxTED/ttAum5JJ/8Krv4twnwwR
+VfZWT2kyaXtQ1WV2uWGq1QmP7DXZ6zQmqas/5rDV/utIqgHvI24+h2/dLuOPbzDm
+tt7IdfpVROK1cIX/uIhLUWyvrqvRm2Fln5gZ/i4jY6pemhkPsguOSlRmJOdRYa+m
+hqmdh1tADmuplTJ62/3WNJs+SGL0iuGf7HvrFZ4dIVXXuXDHvl0FCBngJ0qYArZq
+ubJabOt99NNu2tLMwpEe
+=8+u3
+-----END PGP SIGNATURE-----
+
+--wac7ysb48OaltWcw--
