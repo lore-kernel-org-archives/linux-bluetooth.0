@@ -1,67 +1,138 @@
-Return-Path: <loic.poulain@gmail.com>
-From: Loic Poulain <loic.poulain@gmail.com>
-To: robh+dt@kernel.org,
-	rjui@broadcom.com,
-	sbranden@broadcom.com,
-	f.fainelli@gmail.com,
-	marcel@holtmann.org,
-	johan.hedberg@gmail.com,
-	stefan.wahren@i2se.com
-Cc: linux-rpi-kernel@lists.infradead.org,
-	linux-bluetooth@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	Loic Poulain <loic.poulain@gmail.com>
-Subject: [PATCH v2 1/3] dt-bindings: net: bluetooth: Add broadcom-bluetooth
-Date: Tue,  1 Aug 2017 10:38:22 +0200
-Message-Id: <1501576704-26423-1-git-send-email-loic.poulain@gmail.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+MIME-Version: 1.0
+From: Yunhan Wang <yunhanw@google.com>
+Date: Tue, 1 Aug 2017 00:37:29 -0700
+Message-ID: <CALvjcs8cbrO1sE_bgKXsLZ6C5omO=Y_duXjkRC1Rww-z156v9w@mail.gmail.com>
+Subject: how to add local name in scan response when setting
+ MGMT_ADV_FLAG_LOCAL_NAME in Bluez
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add binding document for serial bluetooth chips using
-Broadcom protocol.
+Hi
 
-Signed-off-by: Loic Poulain <loic.poulain@gmail.com>
----
-v2: dt-bindings as separate patch
-    rebase on upcoming pi3 dts changes
+I am trying to do some small experiments that add local name in the
+scan response,  should I use data[0] to store both adv_data and
+scan_rsp?
 
- .../devicetree/bindings/net/broadcom-bluetooth.txt | 29 ++++++++++++++++++++++
- 1 file changed, 29 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
+I tried to add local name(=E2=80=99TEST=E2=80=99) in data[0] under
+mgmt_cp_add_advertising on
+https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/src/advertising.c#n=
+484,
+it seems it does not work, any idea?
 
-diff --git a/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt b/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
-new file mode 100644
-index 0000000..c51ea1b
---- /dev/null
-+++ b/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
-@@ -0,0 +1,29 @@
-+Broadcom Bluetooth Chips
-+---------------------
-+
-+This documents the binding structure and common properties for serial
-+attached Broadcom devices.
-+
-+Serial attached Broadcom devices shall be a child node of the host UART
-+device the slave device is attached to.
-+
-+Required properties:
-+
-+ - compatible: should contain one of the following:
-+   * "brcm,bcm43438-bt"
-+
-+Optional properties:
-+
-+ - max-speed: see Documentation/devicetree/bindings/serial/slave-device.txt
-+
-+Example:
-+
-+&uart2 {
-+       pinctrl-names = "default";
-+       pinctrl-0 = <&uart2_pins>;
-+
-+       bluetooth {
-+               compatible = "brcm,bcm43438-bt";
-+               max-speed = <921600>;
-+       };
-+};
--- 
-1.9.1
+Thanks
+Best wishes
+Yunhan
+
+static DBusMessage *refresh_advertisement(struct btd_adv_client *client)
+{
+struct mgmt_cp_add_advertising *cp;
+uint8_t param_len;
+uint8_t *adv_data;
+size_t adv_data_len;
+uint32_t flags =3D 0;
+
+uint8_t scan_rsp[] =3D {
+=E2=80=99T=E2=80=99,
+=E2=80=99E=E2=80=99,
+=E2=80=99S=E2=80=99,
+=E2=80=99T=E2=80=99
+};
+size_t scan_rsp_len =3D sizeof(scan_rsp);
+
+DBG("Refreshing advertisement: %s", client->path);
+
+if (client->type =3D=3D AD_TYPE_PERIPHERAL)
+flags =3D MGMT_ADV_FLAG_CONNECTABLE | MGMT_ADV_FLAG_DISCOV |
+MGMT_ADV_FLAG_LOCAL_NAME;
+
+if (client->include_tx_power)
+flags |=3D MGMT_ADV_FLAG_TX_POWER;
+
+adv_data =3D bt_ad_generate(client->data, &adv_data_len);
+
+if (!adv_data || (adv_data_len > calc_max_adv_len(client, flags))) {
+error("Advertising data too long or couldn't be generated.");
+
+return g_dbus_create_error(client->reg, ERROR_INTERFACE
+".InvalidLength",
+"Advertising data too long.");
+}
+
+param_len =3D sizeof(struct mgmt_cp_add_advertising) + adv_data_len +
+scan_rsp_len;
+
+cp =3D malloc0(param_len);
+
+if (!cp) {
+error("Couldn't allocate for MGMT!");
+
+free(adv_data);
+
+return btd_error_failed(client->reg, "Failed");
+}
+
+cp->flags =3D htobl(flags);
+cp->instance =3D client->instance;
+cp->adv_data_len =3D adv_data_len;
+cp->scan_rsp_len =3D scan_rsp_len;
+memcpy(cp->data, adv_data, adv_data_len);
+memcpy(cp->data + adv_data_len, scan_rsp_data, scan_rsp_len);
+free(adv_data);
+
+if (!mgmt_send(client->manager->mgmt, MGMT_OP_ADD_ADVERTISING,
+client->manager->mgmt_index, param_len, cp,
+add_adv_callback, client, NULL)) {
+DBG("Failed to add Advertising Data");
+
+free(cp);
+
+return btd_error_failed(client->reg, "Failed");
+}
+
+free(cp);
+
+return NULL;
+}
+
+Reference:
+In lib/mgmt.h,
+
+#define MGMT_OP_ADD_ADVERTISING 0x003E
+struct mgmt_cp_add_advertising {
+uint8_t  instance;
+uint32_t flags;
+uint16_t duration;
+uint16_t timeout;
+uint8_t  adv_data_len;
+uint8_t  scan_rsp_len;
+uint8_t  data[0];
+} __packed;
+>From mgmt-api.txt, I am
+
+Add Advertising Command
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+Command Code: 0x003e
+Controller Index: <controller id>
+Command Parameters: Instance (1 Octet)
+Flags (4 Octets)
+Duration (2 Octets)
+Timeout (2 Octets)
+Adv_Data_Len (1 Octet)
+Scan_Rsp_len (1 Octet)
+Adv_Data (0-255 Octets)
+Scan_Rsp (0-255 Octets)
+=E2=80=A6...
+With the Flags value the type of advertising is controlled and
+the following flags are defined:
+
+0 Switch into Connectable mode
+1 Advertise as Discoverable
+2 Advertise as Limited Discoverable
+3 Add Flags field to Adv_Data
+4 Add TX Power field to Adv_Data
+5 Add Appearance field to Scan_Rsp
+6 Add Local Name in Scan_Rsp
