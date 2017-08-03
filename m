@@ -1,151 +1,44 @@
-Return-Path: <shapiroc@google.com>
-From: C Shapiro <shapiroc@chromium.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Simon Glass <shapiroc@chromium.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Eramoto Masaya <eramoto.masaya@jp.fujitsu.com>
-Subject: [PATCH v4] Support to change set file via arg
-Date: Thu,  3 Aug 2017 11:20:03 -0600
-Message-Id: <20170803172003.81839-1-shapiroc@chromium.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+Subject: Re: [PATCH v2 2/5] advertising: Add IncludeName property
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20170803133252.30700-2-luiz.dentz@gmail.com>
+Date: Thu, 3 Aug 2017 17:17:31 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <793B8A5D-0ED8-4F44-9D8B-DA5C1B7DB75C@holtmann.org>
+References: <20170803133252.30700-1-luiz.dentz@gmail.com>
+ <20170803133252.30700-2-luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-ChromeOS is currently shifting to a more dynamic build system where a
-single build will be created/managed/deployed to support multiple models
-that were all created based on a single reference board.
+Hi Luiz,
 
-This is being done for general cost/maintenance savings around the sheer
-number of builds that are currently managed for ChromeOS.
+> This adds support to include adapter name, or alias, in the scan
+> response with use of IncludeName property.
+> ---
+> doc/advertising-api.txt |  5 +++++
+> src/advertising.c       | 27 +++++++++++++++++++++++++++
+> 2 files changed, 32 insertions(+)
+> 
+> diff --git a/doc/advertising-api.txt b/doc/advertising-api.txt
+> index 78c1c04e3..8759c1d1c 100644
+> --- a/doc/advertising-api.txt
+> +++ b/doc/advertising-api.txt
+> @@ -66,6 +66,11 @@ Properties	string Type
+> 			Includes the Tx Power in the advertising packet.
+> 			If missing, the Tx Power is not included.
+> 
+> +		bool IncludeName
+> +
+> +			Include adapter Name, or Alias if set, as scan
+> +			response data.
+> +
 
-To support this, we're changing our build images to have all of the
-configuration available for all of the models supported by a given
-build.
+would be an array{string} SystemAdvertisingData or something a lot better. Mapping the mgmt API one to one seems a really pointless idea.
 
-For the bluetooth stack, models have different product id values in the
-DeviceID field for the main.conf config file.
+Regards
 
-E.g.
- - https://chromium.googlesource.com/chromiumos/overlays/board-overlays/+/master/overlay-pyro/chromeos-base/chromeos-bsp-pyro/files/main.conf
- - https://chromium.googlesource.com/chromiumos/overlays/board-overlays/+/master/overlay-reef/chromeos-base/chromeos-bsp-reef/files/main.conf
- - https://chromium.googlesource.com/chromiumos/overlays/board-overlays/+/master/overlay-snappy/chromeos-base/chromeos-bsp-snappy/files/main.conf
+Marcel
 
-This change allows the config file to be passed as a runtime argument to
-bluetoothd, which allows the ChromeOS init script to determine the model
-at runtime and then pass the appropriate model specific config file.
-
-This change is also beneficial in general development since the conf
-file can be easily edited and the src file location then be used
-directly.
-
-Signed-off-by: C Shapiro <shapiroc@chromium.org>
-Reviewed-by: Simon Glass <sjg@chromium.org>
----
-Changes in v4:
-- Based on feedback about the utility of the change for local
-testing/debug, change all of the log messages that reference main.conf
-to log the full path to the instance of main.conf that was used.
-
- src/bluetoothd.8.in |  4 ++++
- src/main.c          | 22 ++++++++++++++++++----
- 2 files changed, 22 insertions(+), 4 deletions(-)
-
-diff --git a/src/bluetoothd.8.in b/src/bluetoothd.8.in
-index 97ef3ec94..d61dcc5b3 100644
---- a/src/bluetoothd.8.in
-+++ b/src/bluetoothd.8.in
-@@ -27,6 +27,10 @@ Print bluetoothd options and exit.
- Enable logging in foreground. Directs log output to the controlling terminal \
- in addition to syslog.
- .TP
-+.B -f, --configfile
-+Specifies an explicit config file path instead of relying on the default path \
-+(@CONFIGDIR@/main.conf) for the config file.
-+.TP
- .B -d, --debug=<file1>:<file2>:...
- Sets how much information bluetoothd sends to the log destination (usually \
- syslog's "daemon" facility). If the file options are omitted, then debugging \
-diff --git a/src/main.c b/src/main.c
-index bcc1e6fae..cf12ca3fe 100644
---- a/src/main.c
-+++ b/src/main.c
-@@ -69,6 +69,7 @@
- 
- struct main_opts main_opts;
- static GKeyFile *main_conf;
-+static char *main_conf_file_path;
- 
- static enum {
- 	MPS_OFF,
-@@ -172,7 +173,8 @@ static void check_config(GKeyFile *config)
- 		}
- 
- 		if (!match)
--			warn("Unknown group %s in main.conf", keys[i]);
-+			warn("Unknown group %s in %s", keys[i],
-+						main_conf_file_path);
- 	}
- 
- 	g_strfreev(keys);
-@@ -192,7 +194,8 @@ static void check_config(GKeyFile *config)
- 		}
- 
- 		if (!found)
--			warn("Unknown key %s in main.conf", keys[i]);
-+			warn("Unknown key %s in %s", keys[i],
-+						main_conf_file_path);
- 	}
- 
- 	g_strfreev(keys);
-@@ -224,7 +227,7 @@ static void parse_config(GKeyFile *config)
- 
- 	check_config(config);
- 
--	DBG("parsing main.conf");
-+	DBG("parsing %s", main_conf_file_path);
- 
- 	val = g_key_file_get_integer(config, "General",
- 						"DiscoverableTimeout", &err);
-@@ -490,6 +493,7 @@ static guint setup_signalfd(void)
- static char *option_debug = NULL;
- static char *option_plugin = NULL;
- static char *option_noplugin = NULL;
-+static char *option_configfile = NULL;
- static gboolean option_compat = FALSE;
- static gboolean option_detach = TRUE;
- static gboolean option_version = FALSE;
-@@ -505,6 +509,9 @@ static void free_options(void)
- 
- 	g_free(option_noplugin);
- 	option_noplugin = NULL;
-+
-+	g_free(option_configfile);
-+	option_configfile = NULL;
- }
- 
- static void disconnect_dbus(void)
-@@ -577,6 +584,9 @@ static GOptionEntry options[] = {
- 				"Specify plugins to load", "NAME,..," },
- 	{ "noplugin", 'P', 0, G_OPTION_ARG_STRING, &option_noplugin,
- 				"Specify plugins not to load", "NAME,..." },
-+	{ "configfile", 'f', 0, G_OPTION_ARG_STRING, &option_configfile,
-+				"Specify an explicit path to the config file",
-+				"FILE"},
- 	{ "compat", 'C', 0, G_OPTION_ARG_NONE, &option_compat,
- 				"Provide deprecated command line interfaces" },
- 	{ "experimental", 'E', 0, G_OPTION_ARG_NONE, &option_experimental,
-@@ -636,8 +646,12 @@ int main(int argc, char *argv[])
- 
- 	sd_notify(0, "STATUS=Starting up");
- 
--	main_conf = load_config(CONFIGDIR "/main.conf");
-+	if (option_configfile)
-+		main_conf_file_path = option_configfile;
-+	else
-+		main_conf_file_path = CONFIGDIR "/main.conf";
- 
-+	main_conf = load_config(main_conf_file_path);
- 	parse_config(main_conf);
- 
- 	if (connect_dbus() < 0) {
--- 
-2.14.0.rc1.383.gd1ce394fe2-goog
