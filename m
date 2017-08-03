@@ -1,9 +1,9 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 4/5] advertising: Add IncludeAppearance property
-Date: Thu,  3 Aug 2017 16:32:51 +0300
-Message-Id: <20170803133252.30700-4-luiz.dentz@gmail.com>
+Subject: [PATCH v2 3/5] client: Add set-advertise-name command
+Date: Thu,  3 Aug 2017 16:32:50 +0300
+Message-Id: <20170803133252.30700-3-luiz.dentz@gmail.com>
 In-Reply-To: <20170803133252.30700-1-luiz.dentz@gmail.com>
 References: <20170803133252.30700-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,380 +11,127 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds support to include appearance in the advertisement data
-with use of IncludeAppearance property.
----
- doc/advertising-api.txt |   6 ++
- src/advertising.c       | 189 ++++++++++++++++++++++++------------------------
- 2 files changed, 100 insertions(+), 95 deletions(-)
+This adds set-advertise-name which enables the use of adapter
+name/alias in the scan response:
 
-diff --git a/doc/advertising-api.txt b/doc/advertising-api.txt
-index 8759c1d1c..fa92233bd 100644
---- a/doc/advertising-api.txt
-+++ b/doc/advertising-api.txt
-@@ -66,6 +66,12 @@ Properties	string Type
- 			Includes the Tx Power in the advertising packet.
- 			If missing, the Tx Power is not included.
+[bluetooth]# set-advertise-name on
+[bluetooth]# advertise on
+
+@ MGMT Command: Add Advertising (0x003e) plen 11
+        Instance: 1
+        Flags: 0x00000043
+          Switch into Connectable mode
+          Advertise as Discoverable
+          Add Local Name in Scan Response
+        Duration: 0
+        Timeout: 0
+        Advertising data length: 0
+        Scan response length: 0
+---
+ client/advertising.c | 21 +++++++++++++++++++++
+ client/advertising.h |  1 +
+ client/main.c        | 22 ++++++++++++++++++++++
+ 3 files changed, 44 insertions(+)
+
+diff --git a/client/advertising.c b/client/advertising.c
+index 81fa85118..67e87c7ca 100644
+--- a/client/advertising.c
++++ b/client/advertising.c
+@@ -49,6 +49,7 @@ static uint16_t ad_manufacturer_id;
+ static uint8_t ad_manufacturer_data[25];
+ static uint8_t ad_manufacturer_data_len = 0;
+ static gboolean ad_tx_power = FALSE;
++static gboolean ad_name = FALSE;
  
-+		uint16 IncludeAppearance
-+
-+			Includes Appearance in the advertising packet.
-+
-+			Possible values: as found on Device.Appearance
-+
- 		bool IncludeName
- 
- 			Include adapter Name, or Alias if set, as scan
-diff --git a/src/advertising.c b/src/advertising.c
-index 1c55ff0aa..73c62f421 100644
---- a/src/advertising.c
-+++ b/src/advertising.c
-@@ -65,6 +65,7 @@ struct btd_adv_client {
- 	uint8_t type; /* Advertising type */
- 	bool include_tx_power;
- 	bool include_name;
-+	bool include_appearance;
- 	struct bt_ad *data;
- 	uint8_t instance;
- };
-@@ -176,45 +177,39 @@ static void client_disconnect_cb(DBusConnection *conn, void *user_data)
- 	client_remove(user_data);
+ static void ad_release(DBusConnection *conn)
+ {
+@@ -252,6 +253,20 @@ static gboolean get_tx_power(const GDBusPropertyTable *property,
+ 	return TRUE;
  }
  
--static bool parse_type(GDBusProxy *proxy, uint8_t *type)
-+static bool parse_type(DBusMessageIter *iter, struct btd_adv_client *client)
- {
--	DBusMessageIter iter;
- 	const char *msg_type;
- 
--	if (!g_dbus_proxy_get_property(proxy, "Type", &iter))
-+	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_STRING)
- 		return false;
- 
--	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_STRING)
--		return false;
--
--	dbus_message_iter_get_basic(&iter, &msg_type);
-+	dbus_message_iter_get_basic(iter, &msg_type);
- 
- 	if (!g_strcmp0(msg_type, "broadcast")) {
--		*type = AD_TYPE_BROADCAST;
-+		client->type = AD_TYPE_BROADCAST;
- 		return true;
- 	}
- 
- 	if (!g_strcmp0(msg_type, "peripheral")) {
--		*type = AD_TYPE_PERIPHERAL;
-+		client->type = AD_TYPE_PERIPHERAL;
- 		return true;
- 	}
- 
- 	return false;
- }
- 
--static bool parse_service_uuids(GDBusProxy *proxy, struct bt_ad *data)
-+static bool parse_service_uuids(DBusMessageIter *iter,
-+					struct btd_adv_client *client)
- {
--	DBusMessageIter iter, ariter;
--
--	if (!g_dbus_proxy_get_property(proxy, "ServiceUUIDs", &iter))
--		return true;
-+	DBusMessageIter ariter;
- 
--	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_ARRAY)
-+	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_ARRAY)
- 		return false;
- 
--	dbus_message_iter_recurse(&iter, &ariter);
-+	dbus_message_iter_recurse(iter, &ariter);
- 
--	bt_ad_clear_service_uuid(data);
-+	bt_ad_clear_service_uuid(client->data);
- 
- 	while (dbus_message_iter_get_arg_type(&ariter) == DBUS_TYPE_STRING) {
- 		const char *uuid_str;
-@@ -227,7 +222,7 @@ static bool parse_service_uuids(GDBusProxy *proxy, struct bt_ad *data)
- 		if (bt_string_to_uuid(&uuid, uuid_str) < 0)
- 			goto fail;
- 
--		if (!bt_ad_add_service_uuid(data, &uuid))
-+		if (!bt_ad_add_service_uuid(client->data, &uuid))
- 			goto fail;
- 
- 		dbus_message_iter_next(&ariter);
-@@ -236,23 +231,21 @@ static bool parse_service_uuids(GDBusProxy *proxy, struct bt_ad *data)
- 	return true;
- 
- fail:
--	bt_ad_clear_service_uuid(data);
-+	bt_ad_clear_service_uuid(client->data);
- 	return false;
- }
- 
--static bool parse_solicit_uuids(GDBusProxy *proxy, struct bt_ad *data)
-+static bool parse_solicit_uuids(DBusMessageIter *iter,
-+					struct btd_adv_client *client)
- {
--	DBusMessageIter iter, ariter;
--
--	if (!g_dbus_proxy_get_property(proxy, "SolicitUUIDs", &iter))
--		return true;
-+	DBusMessageIter ariter;
- 
--	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_ARRAY)
-+	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_ARRAY)
- 		return false;
- 
--	dbus_message_iter_recurse(&iter, &ariter);
-+	dbus_message_iter_recurse(iter, &ariter);
- 
--	bt_ad_clear_solicit_uuid(data);
-+	bt_ad_clear_solicit_uuid(client->data);
- 
- 	while (dbus_message_iter_get_arg_type(&ariter) == DBUS_TYPE_STRING) {
- 		const char *uuid_str;
-@@ -265,7 +258,7 @@ static bool parse_solicit_uuids(GDBusProxy *proxy, struct bt_ad *data)
- 		if (bt_string_to_uuid(&uuid, uuid_str) < 0)
- 			goto fail;
- 
--		if (!bt_ad_add_solicit_uuid(data, &uuid))
-+		if (!bt_ad_add_solicit_uuid(client->data, &uuid))
- 			goto fail;
- 
- 		dbus_message_iter_next(&ariter);
-@@ -274,23 +267,21 @@ static bool parse_solicit_uuids(GDBusProxy *proxy, struct bt_ad *data)
- 	return true;
- 
- fail:
--	bt_ad_clear_solicit_uuid(data);
-+	bt_ad_clear_solicit_uuid(client->data);
- 	return false;
- }
- 
--static bool parse_manufacturer_data(GDBusProxy *proxy, struct bt_ad *data)
-+static bool parse_manufacturer_data(DBusMessageIter *iter,
-+					struct btd_adv_client *client)
- {
--	DBusMessageIter iter, entries;
-+	DBusMessageIter entries;
- 
--	if (!g_dbus_proxy_get_property(proxy, "ManufacturerData", &iter))
--		return true;
--
--	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_ARRAY)
-+	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_ARRAY)
- 		return false;
- 
--	dbus_message_iter_recurse(&iter, &entries);
-+	dbus_message_iter_recurse(iter, &entries);
- 
--	bt_ad_clear_manufacturer_data(data);
-+	bt_ad_clear_manufacturer_data(client->data);
- 
- 	while (dbus_message_iter_get_arg_type(&entries)
- 						== DBUS_TYPE_DICT_ENTRY) {
-@@ -321,8 +312,8 @@ static bool parse_manufacturer_data(GDBusProxy *proxy, struct bt_ad *data)
- 
- 		DBG("Adding ManufacturerData for %04x", manuf_id);
- 
--		if (!bt_ad_add_manufacturer_data(data, manuf_id, manuf_data,
--									len))
-+		if (!bt_ad_add_manufacturer_data(client->data, manuf_id,
-+							manuf_data, len))
- 			goto fail;
- 
- 		dbus_message_iter_next(&entries);
-@@ -331,23 +322,21 @@ static bool parse_manufacturer_data(GDBusProxy *proxy, struct bt_ad *data)
- 	return true;
- 
- fail:
--	bt_ad_clear_manufacturer_data(data);
-+	bt_ad_clear_manufacturer_data(client->data);
- 	return false;
- }
- 
--static bool parse_service_data(GDBusProxy *proxy, struct bt_ad *data)
-+static bool parse_service_data(DBusMessageIter *iter,
-+					struct btd_adv_client *client)
- {
--	DBusMessageIter iter, entries;
-+	DBusMessageIter entries;
- 
--	if (!g_dbus_proxy_get_property(proxy, "ServiceData", &iter))
--		return true;
--
--	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_ARRAY)
-+	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_ARRAY)
- 		return false;
- 
--	dbus_message_iter_recurse(&iter, &entries);
-+	dbus_message_iter_recurse(iter, &entries);
- 
--	bt_ad_clear_service_data(data);
-+	bt_ad_clear_service_data(client->data);
- 
- 	while (dbus_message_iter_get_arg_type(&entries)
- 						== DBUS_TYPE_DICT_ENTRY) {
-@@ -382,7 +371,8 @@ static bool parse_service_data(GDBusProxy *proxy, struct bt_ad *data)
- 
- 		DBG("Adding ServiceData for %s", uuid_str);
- 
--		if (!bt_ad_add_service_data(data, &uuid, service_data, len))
-+		if (!bt_ad_add_service_data(client->data, &uuid, service_data,
-+									len))
- 			goto fail;
- 
- 		dbus_message_iter_next(&entries);
-@@ -391,46 +381,72 @@ static bool parse_service_data(GDBusProxy *proxy, struct bt_ad *data)
- 	return true;
- 
- fail:
--	bt_ad_clear_service_data(data);
-+	bt_ad_clear_service_data(client->data);
- 	return false;
- }
- 
--static bool parse_include_tx_power(GDBusProxy *proxy, bool *included)
-+static bool parse_include_tx_power(DBusMessageIter *iter,
-+					struct btd_adv_client *client)
- {
--	DBusMessageIter iter;
- 	dbus_bool_t b;
- 
--	if (!g_dbus_proxy_get_property(proxy, "IncludeTxPower", &iter))
--		return true;
--
--	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_BOOLEAN)
-+	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_BOOLEAN)
- 		return false;
- 
--	dbus_message_iter_get_basic(&iter, &b);
-+	dbus_message_iter_get_basic(iter, &b);
- 
--	*included = b;
-+	client->include_tx_power = b;
- 
- 	return true;
- }
- 
--static bool parse_include_name(GDBusProxy *proxy, bool *included)
-+static bool parse_include_name(DBusMessageIter *iter,
-+					struct btd_adv_client *client)
- {
--	DBusMessageIter iter;
- 	dbus_bool_t b;
- 
--	if (!g_dbus_proxy_get_property(proxy, "IncludeName", &iter))
--		return true;
-+	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_BOOLEAN)
-+		return false;
-+
-+	dbus_message_iter_get_basic(iter, &b);
-+
-+	if (client->manager->supported_flags & MGMT_ADV_FLAG_LOCAL_NAME)
-+		client->include_name = b;
-+
-+	return true;
++static gboolean include_name_exists(const GDBusPropertyTable *property,
++							void *data)
++{
++	return ad_name;
 +}
 +
-+static bool parse_include_appearance(DBusMessageIter *iter,
-+					struct btd_adv_client *client)
++static gboolean get_include_name(const GDBusPropertyTable *property,
++				DBusMessageIter *iter, void *user_data)
 +{
-+	dbus_bool_t b;
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_BOOLEAN, &ad_name);
++
++	return TRUE;
++}
++
+ static const GDBusPropertyTable ad_props[] = {
+ 	{ "Type", "s", get_type },
+ 	{ "ServiceUUIDs", "as", get_uuids, NULL, uuids_exists },
+@@ -259,6 +274,7 @@ static const GDBusPropertyTable ad_props[] = {
+ 	{ "ManufacturerData", "a{qv}", get_manufacturer_data, NULL,
+ 						manufacturer_data_exists },
+ 	{ "IncludeTxPower", "b", get_tx_power, NULL, tx_power_exists },
++	{ "IncludeName", "b", get_include_name, NULL, include_name_exists },
+ 	{ }
+ };
  
--	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_BOOLEAN)
-+	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_BOOLEAN)
- 		return false;
- 
--	dbus_message_iter_get_basic(&iter, &b);
-+	dbus_message_iter_get_basic(iter, &b);
- 
--	*included = b;
-+	if (client->manager->supported_flags & MGMT_ADV_FLAG_APPEARANCE)
-+		client->include_appearance = b;
- 
- 	return true;
+@@ -453,3 +469,8 @@ void ad_advertise_tx_power(gboolean value)
+ {
+ 	ad_tx_power = value;
+ }
++
++void ad_advertise_name(gboolean value)
++{
++	ad_name = value;
++}
+diff --git a/client/advertising.h b/client/advertising.h
+index 86384656c..a41a2742d 100644
+--- a/client/advertising.h
++++ b/client/advertising.h
+@@ -28,3 +28,4 @@ void ad_advertise_uuids(const char *arg);
+ void ad_advertise_service(const char *arg);
+ void ad_advertise_manufacturer(const char *arg);
+ void ad_advertise_tx_power(gboolean value);
++void ad_advertise_name(gboolean value);
+diff --git a/client/main.c b/client/main.c
+index 17de7f81f..44de8c0a0 100644
+--- a/client/main.c
++++ b/client/main.c
+@@ -2362,6 +2362,26 @@ static void cmd_set_advertise_tx_power(const char *arg)
+ 	rl_printf("Invalid argument\n");
  }
  
-+static struct adv_parser {
-+	const char *name;
-+	bool (*func)(DBusMessageIter *iter, struct btd_adv_client *client);
-+} parsers[] = {
-+	{ "Type", parse_type },
-+	{ "UUIDs", parse_service_uuids },
-+	{ "SolicitUUIDs", parse_solicit_uuids },
-+	{ "ManufacturerData", parse_manufacturer_data },
-+	{ "ServiceData", parse_service_data },
-+	{ "IncludeTxPower", parse_include_tx_power },
-+	{ "IncludeName", parse_include_name },
-+	{ "IncludeAppearance", parse_include_appearance },
-+	{ },
-+};
++static void cmd_set_advertise_name(const char *arg)
++{
++	if (arg == NULL || strlen(arg) == 0) {
++		rl_printf("Missing on/off argument\n");
++		return;
++	}
 +
- static void add_client_complete(struct btd_adv_client *client, uint8_t status)
- {
- 	DBusMessage *reply;
-@@ -520,6 +536,9 @@ static DBusMessage *refresh_advertisement(struct btd_adv_client *client)
- 	if (client->include_name)
- 		flags |= MGMT_ADV_FLAG_LOCAL_NAME;
- 
-+	if (client->include_appearance)
-+		flags |= MGMT_ADV_FLAG_APPEARANCE;
++	if (strcmp(arg, "on") == 0 || strcmp(arg, "yes") == 0) {
++		ad_advertise_name(TRUE);
++		return;
++	}
 +
- 	adv_data = bt_ad_generate(client->data, &adv_data_len);
- 
- 	if (!adv_data || (adv_data_len > calc_max_adv_len(client, flags))) {
-@@ -566,39 +585,19 @@ static DBusMessage *refresh_advertisement(struct btd_adv_client *client)
- 
- static DBusMessage *parse_advertisement(struct btd_adv_client *client)
- {
--	if (!parse_type(client->proxy, &client->type)) {
--		error("Failed to read \"Type\" property of advertisement");
--		goto fail;
--	}
-+	struct adv_parser *parser;
- 
--	if (!parse_service_uuids(client->proxy, client->data)) {
--		error("Property \"ServiceUUIDs\" failed to parse");
--		goto fail;
--	}
-+	for (parser = parsers; parser && parser->name; parser++) {
-+		DBusMessageIter iter;
- 
--	if (!parse_solicit_uuids(client->proxy, client->data)) {
--		error("Property \"SolicitUUIDs\" failed to parse");
--		goto fail;
--	}
-+		if (!g_dbus_proxy_get_property(client->proxy, parser->name,
-+								&iter))
-+			continue;
- 
--	if (!parse_manufacturer_data(client->proxy, client->data)) {
--		error("Property \"ManufacturerData\" failed to parse");
--		goto fail;
--	}
--
--	if (!parse_service_data(client->proxy, client->data)) {
--		error("Property \"ServiceData\" failed to parse");
--		goto fail;
--	}
--
--	if (!parse_include_tx_power(client->proxy, &client->include_tx_power)) {
--		error("Property \"IncludeTxPower\" failed to parse");
--		goto fail;
--	}
--
--	if (!parse_include_name(client->proxy, &client->include_name)) {
--		error("Property \"IncludeName\" failed to parse");
--		goto fail;
-+		if (!parser->func(&iter, client)) {
-+			error("Error parsing %s property", parser->name);
-+			goto fail;
-+		}
- 	}
- 
- 	return refresh_advertisement(client);
++	if (strcmp(arg, "off") == 0 || strcmp(arg, "no") == 0) {
++		ad_advertise_name(FALSE);
++		return;
++	}
++
++	rl_printf("Invalid argument\n");
++}
++
+ static const struct {
+ 	const char *cmd;
+ 	const char *arg;
+@@ -2406,6 +2426,8 @@ static const struct {
+ 	{ "set-advertise-tx-power", "<on/off>",
+ 			cmd_set_advertise_tx_power,
+ 			"Enable/disable TX power to be advertised" },
++	{ "set-advertise-name", "<on/off>", cmd_set_advertise_name,
++			"Enable/disable local name to be advertised" },
+ 	{ "set-scan-filter-uuids", "[uuid1 uuid2 ...]",
+ 			cmd_set_scan_filter_uuids, "Set scan filter uuids" },
+ 	{ "set-scan-filter-rssi", "[rssi]", cmd_set_scan_filter_rssi,
 -- 
 2.13.3
 
