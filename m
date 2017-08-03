@@ -1,70 +1,137 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <57331670-a1aa-3fa5-1280-86aa997dd2a1@jp.fujitsu.com>
-References: <57331670-a1aa-3fa5-1280-86aa997dd2a1@jp.fujitsu.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 3 Aug 2017 12:30:15 +0300
-Message-ID: <CABBYNZKSADLQgVy19VBptrw8jxicVpTSgOp56CDP=q0YeE+kdg@mail.gmail.com>
-Subject: Re: [PATCH Bluez] profiles: Fix memory leak of avrcp player
-To: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 2/2] client: Add set-advertise-name command
+Date: Thu,  3 Aug 2017 10:03:08 +0300
+Message-Id: <20170803070308.30729-2-luiz.dentz@gmail.com>
+In-Reply-To: <20170803070308.30729-1-luiz.dentz@gmail.com>
+References: <20170803070308.30729-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Aram,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Thu, Aug 3, 2017 at 7:10 AM, ERAMOTO Masaya
-<eramoto.masaya@jp.fujitsu.com> wrote:
-> Fix the following problem that occurs in the case of D-Bus fails to
-> register media player path with org.bluez.MediaPlayer1.
+This adds set-advertise-name which enables the use of adapter
+name/alias in the scan response:
 
-Has this actually happened? Im asking because if that does happen it
-probably because the already exists and we might want to return it
-instead, though the fix seems good and I might apply it anyway.
+[bluetooth]# set-advertise-name on
+[bluetooth]# advertise on
 
->  120 (104 direct, 16 indirect) bytes in 1 blocks are definitely lost in loss record 197 of 235
->     at 0x4C2FB55: calloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
->     by 0x50D2770: g_malloc0 (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.4800.2)
->     by 0x43817A: create_ct_player (avrcp.c:3331)
->     by 0x439928: avrcp_addressed_player_changed (avrcp.c:3639)
->     by 0x439928: avrcp_handle_event (avrcp.c:3716)
->     by 0x42F738: control_response (avctp.c:840)
->     by 0x42F738: session_cb (avctp.c:1005)
->     by 0x50CD049: g_main_context_dispatch (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.4800.2)
->     by 0x50CD3EF: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.4800.2)
->     by 0x50CD711: g_main_loop_run (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.4800.2)
->     by 0x40CD10: main (main.c:778)
-> ---
->  profiles/audio/avrcp.c | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
->
-> diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
-> index 2c1434d..eaba210 100644
-> --- a/profiles/audio/avrcp.c
-> +++ b/profiles/audio/avrcp.c
-> @@ -3335,8 +3335,11 @@ static struct avrcp_player *create_ct_player(struct avrcp *session,
->         path = device_get_path(session->dev);
->
->         mp = media_player_controller_create(path, id);
-> -       if (mp == NULL)
-> +       if (mp == NULL) {
-> +               g_slist_free(player->sessions);
-> +               g_free(player);
->                 return NULL;
-> +       }
->
->         media_player_set_callbacks(mp, &ct_cbs, player);
->         player->user_data = mp;
-> --
-> 2.7.4
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+@ MGMT Command: Add Advertising (0x003e) plen 11
+        Instance: 1
+        Flags: 0x00000043
+          Switch into Connectable mode
+          Advertise as Discoverable
+          Add Local Name in Scan Response
+        Duration: 0
+        Timeout: 0
+        Advertising data length: 0
+        Scan response length: 0
+---
+ client/advertising.c | 21 +++++++++++++++++++++
+ client/advertising.h |  1 +
+ client/main.c        | 22 ++++++++++++++++++++++
+ 3 files changed, 44 insertions(+)
 
-
-
+diff --git a/client/advertising.c b/client/advertising.c
+index 81fa85118..67e87c7ca 100644
+--- a/client/advertising.c
++++ b/client/advertising.c
+@@ -49,6 +49,7 @@ static uint16_t ad_manufacturer_id;
+ static uint8_t ad_manufacturer_data[25];
+ static uint8_t ad_manufacturer_data_len = 0;
+ static gboolean ad_tx_power = FALSE;
++static gboolean ad_name = FALSE;
+ 
+ static void ad_release(DBusConnection *conn)
+ {
+@@ -252,6 +253,20 @@ static gboolean get_tx_power(const GDBusPropertyTable *property,
+ 	return TRUE;
+ }
+ 
++static gboolean include_name_exists(const GDBusPropertyTable *property,
++							void *data)
++{
++	return ad_name;
++}
++
++static gboolean get_include_name(const GDBusPropertyTable *property,
++				DBusMessageIter *iter, void *user_data)
++{
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_BOOLEAN, &ad_name);
++
++	return TRUE;
++}
++
+ static const GDBusPropertyTable ad_props[] = {
+ 	{ "Type", "s", get_type },
+ 	{ "ServiceUUIDs", "as", get_uuids, NULL, uuids_exists },
+@@ -259,6 +274,7 @@ static const GDBusPropertyTable ad_props[] = {
+ 	{ "ManufacturerData", "a{qv}", get_manufacturer_data, NULL,
+ 						manufacturer_data_exists },
+ 	{ "IncludeTxPower", "b", get_tx_power, NULL, tx_power_exists },
++	{ "IncludeName", "b", get_include_name, NULL, include_name_exists },
+ 	{ }
+ };
+ 
+@@ -453,3 +469,8 @@ void ad_advertise_tx_power(gboolean value)
+ {
+ 	ad_tx_power = value;
+ }
++
++void ad_advertise_name(gboolean value)
++{
++	ad_name = value;
++}
+diff --git a/client/advertising.h b/client/advertising.h
+index 86384656c..a41a2742d 100644
+--- a/client/advertising.h
++++ b/client/advertising.h
+@@ -28,3 +28,4 @@ void ad_advertise_uuids(const char *arg);
+ void ad_advertise_service(const char *arg);
+ void ad_advertise_manufacturer(const char *arg);
+ void ad_advertise_tx_power(gboolean value);
++void ad_advertise_name(gboolean value);
+diff --git a/client/main.c b/client/main.c
+index 17de7f81f..e4012aab8 100644
+--- a/client/main.c
++++ b/client/main.c
+@@ -2362,6 +2362,26 @@ static void cmd_set_advertise_tx_power(const char *arg)
+ 	rl_printf("Invalid argument\n");
+ }
+ 
++static void cmd_set_advertise_name(const char *arg)
++{
++	if (arg == NULL || strlen(arg) == 0) {
++		rl_printf("Missing on/off argument\n");
++		return;
++	}
++
++	if (strcmp(arg, "on") == 0 || strcmp(arg, "yes") == 0) {
++		ad_advertise_name(TRUE);
++		return;
++	}
++
++	if (strcmp(arg, "off") == 0 || strcmp(arg, "no") == 0) {
++		ad_advertise_name(FALSE);
++		return;
++	}
++
++	rl_printf("Invalid argument\n");
++}
++
+ static const struct {
+ 	const char *cmd;
+ 	const char *arg;
+@@ -2406,6 +2426,8 @@ static const struct {
+ 	{ "set-advertise-tx-power", "<on/off>",
+ 			cmd_set_advertise_tx_power,
+ 			"Enable/disable TX power to be advertised" },
++	{ "set-advertise-name", "<on/off>", cmd_set_advertise_name,
++			"Enable/disable TX power to be advertised" },
+ 	{ "set-scan-filter-uuids", "[uuid1 uuid2 ...]",
+ 			cmd_set_scan_filter_uuids, "Set scan filter uuids" },
+ 	{ "set-scan-filter-rssi", "[rssi]", cmd_set_scan_filter_rssi,
 -- 
-Luiz Augusto von Dentz
+2.13.3
+
