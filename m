@@ -1,47 +1,77 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: mcchou@chromium.org
-To: linux-bluetooth@vger.kernel.org
-Cc: luiz.von.dentz@intel.com, josephsih@chromium.org,
-        dmitrygr@google.com, Miao-chen Chou <mcchou@chromium.org>
-Subject: [PATCH] shared/gatt-db: Fix memory comparison error
-Date: Fri,  4 Aug 2017 14:25:52 -0700
-Message-Id: <20170804212552.185384-1-mcchou@chromium.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+Subject: Re: [PATCH v2 3/3] Bluetooth: hci_bcm: Add serdev support
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <653244764.121525.1501876203800@email.1und1.de>
+Date: Fri, 4 Aug 2017 22:58:02 +0200
+Cc: rjui@broadcom.com, sbranden@broadcom.com,
+        Rob Herring <robh+dt@kernel.org>,
+        Loic Poulain <loic.poulain@gmail.com>, f.fainelli@gmail.com,
+        linux-rpi-kernel@lists.infradead.org,
+        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        devicetree <devicetree@vger.kernel.org>
+Message-Id: <A997C486-989A-4040-9871-773A858D8410@holtmann.org>
+References: <1501576704-26423-1-git-send-email-loic.poulain@gmail.com>
+ <1501576704-26423-3-git-send-email-loic.poulain@gmail.com>
+ <696124D4-A5DA-46FA-A0F0-5DC74363BD23@holtmann.org>
+ <444254163.121186.1501874785594@email.1und1.de>
+ <51D602E3-B21A-402B-A1F5-6241D55448E9@holtmann.org>
+ <1498038890.121361.1501875841550@email.1und1.de>
+ <BB04C3A8-2BFC-44B7-AA84-E0B81F560B8C@holtmann.org>
+ <653244764.121525.1501876203800@email.1und1.de>
+To: Stefan Wahren <stefan.wahren@i2se.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Miao-chen Chou <mcchou@chromium.org>
+Hi Stefan,
 
-This fixes the use of memcmp where the length of comparison is longer than the
-memories to be compared. Since unit/test-gatt make use of gatt-db, if compiled
-with ASan, unit/test-gatt would fail.
----
- src/shared/gatt-db.c | 13 +++++++++----
- 1 file changed, 9 insertions(+), 4 deletions(-)
+>>>>>>> Add basic support for Broadcom serial slave devices.
+>>>>>>> Probe the serial device, retrieve its maximum speed and
+>>>>>>> register a new hci uart device.
+>>>>>>> 
+>>>>>>> Tested/compatible with bcm43438 (RPi3).
+>>>>>>> 
+>>>>>>> Signed-off-by: Loic Poulain <loic.poulain@gmail.com>
+>>>>>>> ...
+>>>>>>> 
+>>>>>>> +static int bcm_serdev_probe(struct serdev_device *serdev)
+>>>>>>> +{
+>>>>>>> +	struct bcm_bt_device *bcmdev;
+>>>>>>> +	u32 speed;
+>>>>>>> +	int err;
+>>>>>>> +
+>>>>>>> +	bcmdev = devm_kzalloc(&serdev->dev, sizeof(*bcmdev), GFP_KERNEL);
+>>>>>>> +	if (!bcmdev)
+>>>>>>> +		return -ENOMEM;
+>>>>>>> +
+>>>>>>> +	bcmdev->hu.serdev = serdev;
+>>>>>>> +	serdev_device_set_drvdata(serdev, bcmdev);
+>>>>>>> +
+>>>>>>> +	err = of_property_read_u32(serdev->dev.of_node, "max-speed", &speed);
+>>>>>>> +	if (!err)
+>>>>>>> +		bcmdev->hu.oper_speed = speed;
+>>>>>>> +
+>>>>>>> +	return hci_uart_register_device(&bcmdev->hu, &bcm_proto);
+>>>>>>> +}
+>>>>>> 
+>>>>>> We do not need any GPIO for reset lines or anything else for the rPI3?
+>>>>>> 
+>>>>> 
+>>>>> unfortunately we don't have full schematics for RPI3, but according to firmware dt-blob.dts [1] there is a GPIO called BT_ON. This GPIO is controlled by the GPIO expander on the RPI3 board. The necessary driver for this expander is still out of tree (last mainlining attempt [2]).
+>>>> 
+>>>> so who handles this GPIO then right now (or any other GPIO for that matter)? I have seen Bluetooth being enabled and operational, but I really want to get this working in a plain upstream Fedora and without using hciattach or btattach.
+>>> 
+>>> The GPU firmware enables the GPIO and keeps this state. The mentioned expander driver should provide the ARM core (Linux) the necessary control.
+>> 
+>> what is the default behavior after reboot. BT_ON enabled or not?
+> 
+> AFAIK: enabled
 
-diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
-index 8ef6f3bca..b7bbaed93 100644
---- a/src/shared/gatt-db.c
-+++ b/src/shared/gatt-db.c
-@@ -1013,10 +1013,15 @@ static void find_by_type(void *data, void *user_data)
- 			continue;
+that would be a funny default since it means that it consumes power even if Bluetooth is never used. We really want to hook this up into the Bluetooth power control of the controller. So that on power down it also disables it and saves as much power as possible.
 
- 		/* TODO: fix for read-callback based attributes */
--		if (search_data->value && memcmp(attribute->value,
--							search_data->value,
--							search_data->value_len))
--			continue;
-+		if (search_data->value) {
-+			if (search_data->value_len != attribute->value_len)
-+				continue;
-+
-+			if (memcmp(attribute->value, search_data->value,
-+					search_data->value_len)) {
-+				 continue;
-+			}
-+		}
+Regards
 
- 		search_data->num_of_res++;
- 		search_data->func(attribute, search_data->user_data);
---
-2.14.0.rc1.383.gd1ce394fe2-goog
+Marcel
 
