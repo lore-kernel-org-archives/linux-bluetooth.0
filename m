@@ -1,9 +1,9 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v4 2/7] advertising: Add SupportedFeatures
-Date: Fri,  4 Aug 2017 15:21:03 +0300
-Message-Id: <20170804122108.26472-2-luiz.dentz@gmail.com>
+Subject: [PATCH v4 3/7] advertising: Add IncludeName property
+Date: Fri,  4 Aug 2017 15:21:04 +0300
+Message-Id: <20170804122108.26472-3-luiz.dentz@gmail.com>
 In-Reply-To: <20170804122108.26472-1-luiz.dentz@gmail.com>
 References: <20170804122108.26472-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,100 +11,88 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds SupportedFeatures so application can detect what features
-are supported by the system.
+This adds support to include adapter name, or alias, in the scan
+response with use of IncludeName property.
 ---
- doc/advertising-api.txt |  8 ++++++++
- src/advertising.c       | 43 +++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 51 insertions(+)
+ doc/advertising-api.txt |  5 +++++
+ src/advertising.c       | 27 +++++++++++++++++++++++++++
+ 2 files changed, 32 insertions(+)
 
 diff --git a/doc/advertising-api.txt b/doc/advertising-api.txt
-index cee6878f6..091c1b325 100644
+index 091c1b325..6853f4601 100644
 --- a/doc/advertising-api.txt
 +++ b/doc/advertising-api.txt
-@@ -116,3 +116,11 @@ Methods		RegisterAdvertisement(object advertisement, dict options)
- Properties	byte AdvertisingInstances
+@@ -66,6 +66,11 @@ Properties	string Type
+ 			Includes the Tx Power in the advertising packet.
+ 			If missing, the Tx Power is not included.
  
- 			Number of available advertisement instances.
++		bool IncludeName
 +
-+		array{string} SupportedFeatures
++			Include adapter Name, or Alias if set, as scan
++			response data.
 +
-+			List of supported features.
-+
-+			Possible values: "Tx Power"
-+					 "Appearance"
-+					 "Local Name"
+ 
+ LE Advertising Manager hierarchy
+ ================================
 diff --git a/src/advertising.c b/src/advertising.c
-index c628f0fd5..a1e497439 100644
+index a1e497439..7a1b083bc 100644
 --- a/src/advertising.c
 +++ b/src/advertising.c
-@@ -48,6 +48,7 @@ struct btd_adv_manager {
- 	uint16_t mgmt_index;
- 	uint8_t max_adv_len;
- 	uint8_t max_ads;
-+	uint32_t supported_flags;
- 	unsigned int instance_bitmap;
+@@ -64,6 +64,7 @@ struct btd_adv_client {
+ 	DBusMessage *reg;
+ 	uint8_t type; /* Advertising type */
+ 	bool include_tx_power;
++	bool include_name;
+ 	struct bt_ad *data;
+ 	uint8_t instance;
  };
- 
-@@ -738,9 +739,50 @@ static gboolean get_instances(const GDBusPropertyTable *property,
- 	return TRUE;
+@@ -412,6 +413,24 @@ static bool parse_include_tx_power(GDBusProxy *proxy, bool *included)
+ 	return true;
  }
  
-+static struct adv_feat {
-+	uint8_t flag;
-+	const char *name;
-+} feats[] = {
-+	{ MGMT_ADV_FLAG_TX_POWER, "tx-power" },
-+	{ MGMT_ADV_FLAG_APPEARANCE, "appearance" },
-+	{ MGMT_ADV_FLAG_LOCAL_NAME, "local-name" },
-+	{ },
-+};
-+
-+static void append_features(struct btd_adv_manager *manager,
-+						DBusMessageIter *iter)
++static bool parse_include_name(GDBusProxy *proxy, bool *included)
 +{
-+	struct adv_feat *feat;
++	DBusMessageIter iter;
++	dbus_bool_t b;
 +
-+	for (feat = feats; feat && feat->name; feat++) {
-+		if (manager->supported_flags & feat->flag)
-+			dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING,
-+								&feat->name);
++	if (!g_dbus_proxy_get_property(proxy, "IncludeName", &iter))
++		return true;
++
++	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_BOOLEAN)
++		return false;
++
++	dbus_message_iter_get_basic(&iter, &b);
++
++	*included = b;
++
++	return true;
++}
++
+ static void add_client_complete(struct btd_adv_client *client, uint8_t status)
+ {
+ 	DBusMessage *reply;
+@@ -498,6 +517,9 @@ static DBusMessage *refresh_advertisement(struct btd_adv_client *client)
+ 	if (client->include_tx_power)
+ 		flags |= MGMT_ADV_FLAG_TX_POWER;
+ 
++	if (client->include_name)
++		flags |= MGMT_ADV_FLAG_LOCAL_NAME;
++
+ 	adv_data = bt_ad_generate(client->data, &adv_data_len);
+ 
+ 	if (!adv_data || (adv_data_len > calc_max_adv_len(client, flags))) {
+@@ -574,6 +596,11 @@ static DBusMessage *parse_advertisement(struct btd_adv_client *client)
+ 		goto fail;
+ 	}
+ 
++	if (!parse_include_name(client->proxy, &client->include_name)) {
++		error("Property \"IncludeName\" failed to parse");
++		goto fail;
 +	}
-+}
 +
-+static gboolean get_supported_features(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *data)
-+{
-+	struct btd_adv_manager *manager = data;
-+	DBusMessageIter entry;
-+
-+	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
-+					DBUS_TYPE_STRING_AS_STRING, &entry);
-+
-+	append_features(manager, &entry);
-+
-+	dbus_message_iter_close_container(iter, &entry);
-+
-+	return TRUE;
-+}
-+
- static const GDBusPropertyTable properties[] = {
- 	{ "AdvertisingInstances", "y", get_instances, NULL, NULL,
- 					G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
-+	{ "SupportedFeatures", "as", get_supported_features, NULL, NULL,
-+					G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
-+	{ }
- };
+ 	return refresh_advertisement(client);
  
- static const GDBusMethodTable methods[] = {
-@@ -785,6 +827,7 @@ static void read_adv_features_callback(uint8_t status, uint16_t length,
- 
- 	manager->max_adv_len = feat->max_adv_data_len;
- 	manager->max_ads = feat->max_instances;
-+	manager->supported_flags = feat->supported_flags;
- 
- 	if (manager->max_ads == 0)
- 		return;
+ fail:
 -- 
 2.13.3
 
