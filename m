@@ -1,77 +1,57 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Subject: Re: [PATCH v2 3/3] Bluetooth: hci_bcm: Add serdev support
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <653244764.121525.1501876203800@email.1und1.de>
-Date: Fri, 4 Aug 2017 22:58:02 +0200
-Cc: rjui@broadcom.com, sbranden@broadcom.com,
-        Rob Herring <robh+dt@kernel.org>,
-        Loic Poulain <loic.poulain@gmail.com>, f.fainelli@gmail.com,
-        linux-rpi-kernel@lists.infradead.org,
-        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        devicetree <devicetree@vger.kernel.org>
-Message-Id: <A997C486-989A-4040-9871-773A858D8410@holtmann.org>
-References: <1501576704-26423-1-git-send-email-loic.poulain@gmail.com>
- <1501576704-26423-3-git-send-email-loic.poulain@gmail.com>
- <696124D4-A5DA-46FA-A0F0-5DC74363BD23@holtmann.org>
- <444254163.121186.1501874785594@email.1und1.de>
- <51D602E3-B21A-402B-A1F5-6241D55448E9@holtmann.org>
- <1498038890.121361.1501875841550@email.1und1.de>
- <BB04C3A8-2BFC-44B7-AA84-E0B81F560B8C@holtmann.org>
- <653244764.121525.1501876203800@email.1und1.de>
-To: Stefan Wahren <stefan.wahren@i2se.com>
+From: Nicolas Werner <nicolas.werner@gmx.net>
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: [RFC][PATCH BlueZ] sixaxis: Differing device name between usb and bluetooth connection
+Date: Fri, 04 Aug 2017 22:29:04 +0200
+Message-ID: <11841060.dynqo2U1Dt@gentooasus>
+In-Reply-To: <2299304.XBxEXHNB4J@gentooasus>
+References: <2299304.XBxEXHNB4J@gentooasus>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Stefan,
-
->>>>>>> Add basic support for Broadcom serial slave devices.
->>>>>>> Probe the serial device, retrieve its maximum speed and
->>>>>>> register a new hci uart device.
->>>>>>> 
->>>>>>> Tested/compatible with bcm43438 (RPi3).
->>>>>>> 
->>>>>>> Signed-off-by: Loic Poulain <loic.poulain@gmail.com>
->>>>>>> ...
->>>>>>> 
->>>>>>> +static int bcm_serdev_probe(struct serdev_device *serdev)
->>>>>>> +{
->>>>>>> +	struct bcm_bt_device *bcmdev;
->>>>>>> +	u32 speed;
->>>>>>> +	int err;
->>>>>>> +
->>>>>>> +	bcmdev = devm_kzalloc(&serdev->dev, sizeof(*bcmdev), GFP_KERNEL);
->>>>>>> +	if (!bcmdev)
->>>>>>> +		return -ENOMEM;
->>>>>>> +
->>>>>>> +	bcmdev->hu.serdev = serdev;
->>>>>>> +	serdev_device_set_drvdata(serdev, bcmdev);
->>>>>>> +
->>>>>>> +	err = of_property_read_u32(serdev->dev.of_node, "max-speed", &speed);
->>>>>>> +	if (!err)
->>>>>>> +		bcmdev->hu.oper_speed = speed;
->>>>>>> +
->>>>>>> +	return hci_uart_register_device(&bcmdev->hu, &bcm_proto);
->>>>>>> +}
->>>>>> 
->>>>>> We do not need any GPIO for reset lines or anything else for the rPI3?
->>>>>> 
->>>>> 
->>>>> unfortunately we don't have full schematics for RPI3, but according to firmware dt-blob.dts [1] there is a GPIO called BT_ON. This GPIO is controlled by the GPIO expander on the RPI3 board. The necessary driver for this expander is still out of tree (last mainlining attempt [2]).
->>>> 
->>>> so who handles this GPIO then right now (or any other GPIO for that matter)? I have seen Bluetooth being enabled and operational, but I really want to get this working in a plain upstream Fedora and without using hciattach or btattach.
->>> 
->>> The GPU firmware enables the GPIO and keeps this state. The mentioned expander driver should provide the ARM core (Linux) the necessary control.
->> 
->> what is the default behavior after reboot. BT_ON enabled or not?
+Am Samstag, 4. Februar 2017, 19:16:28 CEST schrieben Sie:
+> BlueZ sets the device name of Dual Shock 3 controller to "PLAYSTATION(R)3
+> Controller". When you connect the same controller via USB it is set to "Sony
+> PLAYSTATION(R)3 Controller".
 > 
-> AFAIK: enabled
+> It seems that at least some games fail to recognize the controller as a Dual
+> Shock 3/sixaxis controller and don't load the default mapping for
+> PlayStation controllers, if the name doesn't contain the Sony part. Also I
+> don't see a reason to use a different name, when connecting via Bluetooth.
+> 
+> I noticed this with "The Binding of Isaac: Rebirth" and it seems, that Steam
+> also recognizes the controller better after the patch, although I'm not
+> confident, if I can parse the controller configuration dialog correctly. I
+> don't know, if this breaks anything, because it depends on the current
+> name.
+> 
+> The attached patch changes the device name set when pairing to match the
+> device name, when connected via USB.
+> 
+> Nicolas Werner
+> 
+> --- a/plugins/sixaxis.c
+> +++ b/plugins/sixaxis.c
+> @@ -56,7 +56,7 @@
+>         uint16_t version;
+>  } devices[] = {
+>         {
+> -               .name = "PLAYSTATION(R)3 Controller",
+> +               .name = "Sony PLAYSTATION(R)3 Controller",
+>                 .source = 0x0002,
+>                 .vid = 0x054c,
+>                 .pid = 0x0268,
 
-that would be a funny default since it means that it consumes power even if Bluetooth is never used. We really want to hook this up into the Bluetooth power control of the controller. So that on power down it also disables it and saves as much power as possible.
+It seems I'm not the only one with this issue as I recently found this issue 
+(https://bugzilla.kernel.org/show_bug.cgi?id=195225) in the kernel bug 
+tracker. It looks like dual shock 4 controllers have a similar issue.
+
+I asked on IRC and someone recommended to ping this message. Again, I would 
+appreciate some comments on this issue and it would be great if this issue 
+could be fixed.
 
 Regards
-
-Marcel
+	Nicolas Werner
 
