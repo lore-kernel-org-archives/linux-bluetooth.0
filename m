@@ -1,36 +1,49 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <CABBYNZKPf1JOr4BiDEsRibUd37pWC=Y8uVe2Gv_Op5S0qB41XQ@mail.gmail.com>
-References: <CAGfak60obAiVJToyRbPvVmsjO3phw4SpL8Wn_mgucNeSUFOG-g@mail.gmail.com>
- <CABBYNZKPf1JOr4BiDEsRibUd37pWC=Y8uVe2Gv_Op5S0qB41XQ@mail.gmail.com>
-From: Johan Hedberg <johan.hedberg@gmail.com>
-Date: Sat, 5 Aug 2017 09:36:16 +0300
-Message-ID: <CAMQUNB-1XSM0LCWDJN117x3kZ0Nq7C1szsawkL8aj01P90E5JQ@mail.gmail.com>
-Subject: Re: Support for SPP 1.2 Specification in Bluez
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+From: mcchou@chromium.org
+To: linux-bluetooth@vger.kernel.org
+Cc: luiz.von.dentz@intel.com, josephsih@chromium.org,
+        dmitrygr@google.com, Miao-chen Chou <mcchou@chromium.org>
+Subject: [PATCH] shared/gatt-db: Fix memory comparison error
+Date: Fri,  4 Aug 2017 15:19:59 -0700
+Message-Id: <20170804221959.193552-1-mcchou@chromium.org>
+In-Reply-To: <20170804212552.185384-1-mcchou@chromium.org>
+References: <20170804212552.185384-1-mcchou@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+From: Miao-chen Chou <mcchou@chromium.org>
 
-On Fri, Aug 4, 2017 at 3:59 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi Karunakar,
->
-> On Thu, Aug 3, 2017 at 3:37 PM, Karunakar Reddy <karan.tillu@gmail.com> wrote:
->> Hi All,
->>
->> We are looking for bluez stack revision which has support for SPP 1.2
->> specification. As per the information we have collected, it seems to
->> have support for SPP 1.1 only.
->>
->> Are there any plans for Bluez to add support for SPP 1.2?
->
-> Patches are always welcome.
+This fixes the use of memcmp where the length of comparison is longer than the
+memories to be compared. Since unit/test-gatt make use of gatt-db, if compiled
+with ASan, unit/test-gatt would fail.
+---
+ src/shared/gatt-db.c | 13 +++++++++----
+ 1 file changed, 9 insertions(+), 4 deletions(-)
 
-As far as I know we're already compliant. E.g. the SPP SDP record that
-bluetoothd registers when an app uses the Profile D-Bus interface sets
-the SPP version as 1.2.
+diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
+index 8ef6f3bca..2dd73b997 100644
+--- a/src/shared/gatt-db.c
++++ b/src/shared/gatt-db.c
+@@ -1013,10 +1013,15 @@ static void find_by_type(void *data, void *user_data)
+ 			continue;
 
-Johan
+ 		/* TODO: fix for read-callback based attributes */
+-		if (search_data->value && memcmp(attribute->value,
+-							search_data->value,
+-							search_data->value_len))
+-			continue;
++		if (search_data->value) {
++			if (search_data->value_len != attribute->value_len)
++				continue;
++
++			if (memcmp(attribute->value, search_data->value,
++					search_data->value_len)) {
++				continue;
++			}
++		}
+
+ 		search_data->num_of_res++;
+ 		search_data->func(attribute, search_data->user_data);
+--
+2.14.0.rc1.383.gd1ce394fe2-goog
+
