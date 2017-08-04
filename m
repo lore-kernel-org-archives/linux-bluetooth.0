@@ -1,47 +1,37 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+MIME-Version: 1.0
+In-Reply-To: <CAGfak60obAiVJToyRbPvVmsjO3phw4SpL8Wn_mgucNeSUFOG-g@mail.gmail.com>
+References: <CAGfak60obAiVJToyRbPvVmsjO3phw4SpL8Wn_mgucNeSUFOG-g@mail.gmail.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v5 1/7] advertising: Rename AdvertisementInstaces to AdvertisingInstaces
-Date: Fri,  4 Aug 2017 16:22:39 +0300
-Message-Id: <20170804132245.30824-1-luiz.dentz@gmail.com>
+Date: Fri, 4 Aug 2017 15:59:50 +0300
+Message-ID: <CABBYNZKPf1JOr4BiDEsRibUd37pWC=Y8uVe2Gv_Op5S0qB41XQ@mail.gmail.com>
+Subject: Re: Support for SPP 1.2 Specification in Bluez
+To: Karunakar Reddy <karan.tillu@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Karunakar,
 
-This is consitent with tha name of the interface, also make it
-experimental since AdvertisingManager.
----
- doc/advertising-api.txt | 2 +-
- src/advertising.c       | 3 ++-
- 2 files changed, 3 insertions(+), 2 deletions(-)
+On Thu, Aug 3, 2017 at 3:37 PM, Karunakar Reddy <karan.tillu@gmail.com> wrote:
+> Hi All,
+>
+> We are looking for bluez stack revision which has support for SPP 1.2
+> specification. As per the information we have collected, it seems to
+> have support for SPP 1.1 only.
+>
+> Are there any plans for Bluez to add support for SPP 1.2?
 
-diff --git a/doc/advertising-api.txt b/doc/advertising-api.txt
-index 7a29b7095..cee6878f6 100644
---- a/doc/advertising-api.txt
-+++ b/doc/advertising-api.txt
-@@ -113,6 +113,6 @@ Methods		RegisterAdvertisement(object advertisement, dict options)
- 			Possible errors: org.bluez.Error.InvalidArguments
- 					 org.bluez.Error.DoesNotExist
- 
--Properties	byte AdvertisementInstaces
-+Properties	byte AdvertisingInstances
- 
- 			Number of available advertisement instances.
-diff --git a/src/advertising.c b/src/advertising.c
-index c2af3acb4..c628f0fd5 100644
---- a/src/advertising.c
-+++ b/src/advertising.c
-@@ -739,7 +739,8 @@ static gboolean get_instances(const GDBusPropertyTable *property,
- }
- 
- static const GDBusPropertyTable properties[] = {
--	{ "AdvertisementInstances", "y", get_instances },
-+	{ "AdvertisingInstances", "y", get_instances, NULL, NULL,
-+					G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
- };
- 
- static const GDBusMethodTable methods[] = {
+Patches are always welcome.
+
+> Thanks
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
 -- 
-2.13.3
-
+Luiz Augusto von Dentz
