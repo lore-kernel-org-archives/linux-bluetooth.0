@@ -1,75 +1,36 @@
-Return-Path: <linux@rainbow-software.org>
-From: Ondrej Zary <linux@rainbow-software.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Marcel Holtmann <marcel@holtmann.org>
-Subject: [PATCH 2/2] bluecard_cs: fix LED behavior
-Date: Sat,  5 Aug 2017 21:34:45 +0200
-Message-Id: <20170805193445.16411-2-linux@rainbow-software.org>
-In-Reply-To: <20170805193445.16411-1-linux@rainbow-software.org>
-References: <20170805193445.16411-1-linux@rainbow-software.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+MIME-Version: 1.0
+In-Reply-To: <CABBYNZKPf1JOr4BiDEsRibUd37pWC=Y8uVe2Gv_Op5S0qB41XQ@mail.gmail.com>
+References: <CAGfak60obAiVJToyRbPvVmsjO3phw4SpL8Wn_mgucNeSUFOG-g@mail.gmail.com>
+ <CABBYNZKPf1JOr4BiDEsRibUd37pWC=Y8uVe2Gv_Op5S0qB41XQ@mail.gmail.com>
+From: Johan Hedberg <johan.hedberg@gmail.com>
+Date: Sat, 5 Aug 2017 09:36:16 +0300
+Message-ID: <CAMQUNB-1XSM0LCWDJN117x3kZ0Nq7C1szsawkL8aj01P90E5JQ@mail.gmail.com>
+Subject: Re: Support for SPP 1.2 Specification in Bluez
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Keep power LED on during activity.
+Hi,
 
-LED timer races with power LED disabling in hci_close(), resulting in
-power LED left on after closing.
-Stop LED timer before disabling power LED.
+On Fri, Aug 4, 2017 at 3:59 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi Karunakar,
+>
+> On Thu, Aug 3, 2017 at 3:37 PM, Karunakar Reddy <karan.tillu@gmail.com> wrote:
+>> Hi All,
+>>
+>> We are looking for bluez stack revision which has support for SPP 1.2
+>> specification. As per the information we have collected, it seems to
+>> have support for SPP 1.1 only.
+>>
+>> Are there any plans for Bluez to add support for SPP 1.2?
+>
+> Patches are always welcome.
 
-BTW. On cards without an activity LED, the behavior is a bit weird:
-The LED is on after hci_open() but only until the first data transfer.
-Then it's off in idle and on during activity.
-It could be improved by keeping the LED on in idle and flashing during
-activity.
+As far as I know we're already compliant. E.g. the SPP SDP record that
+bluetoothd registers when an app uses the Profile D-Bus interface sets
+the SPP version as 1.2.
 
-Signed-off-by: Ondrej Zary <linux@rainbow-software.org>
----
- drivers/bluetooth/bluecard_cs.c | 13 ++++++++-----
- 1 file changed, 8 insertions(+), 5 deletions(-)
-
-diff --git a/drivers/bluetooth/bluecard_cs.c b/drivers/bluetooth/bluecard_cs.c
-index 5cd1e164fde0..61ac48e1aa55 100644
---- a/drivers/bluetooth/bluecard_cs.c
-+++ b/drivers/bluetooth/bluecard_cs.c
-@@ -161,7 +161,7 @@ static void bluecard_activity_led_timeout(u_long arg)
- 	unsigned int iobase = info->p_dev->resource[0]->start;
- 
- 	if (test_bit(CARD_HAS_ACTIVITY_LED, &(info->hw_state))) {
--		/* Disable activity LED */
-+		/* Disable activity LED, keep power LED enabled */
- 		outb(0x08 | 0x20, iobase + 0x30);
- 	} else {
- 		/* Disable power LED */
-@@ -175,8 +175,8 @@ static void bluecard_enable_activity_led(struct bluecard_info *info)
- 	unsigned int iobase = info->p_dev->resource[0]->start;
- 
- 	if (test_bit(CARD_HAS_ACTIVITY_LED, &(info->hw_state))) {
--		/* Enable activity LED */
--		outb(0x10 | 0x40, iobase + 0x30);
-+		/* Enable activity LED, keep power LED enabled */
-+		outb(0x18 | 0x60, iobase + 0x30);
- 
- 		/* Stop the LED after HZ/4 */
- 		mod_timer(&(info->timer), jiffies + HZ / 4);
-@@ -624,7 +624,7 @@ static int bluecard_hci_open(struct hci_dev *hdev)
- 	if (test_bit(CARD_HAS_PCCARD_ID, &(info->hw_state)))
- 		bluecard_hci_set_baud_rate(hdev, DEFAULT_BAUD_RATE);
- 
--	/* Enable LED */
-+	/* Enable power LED */
- 	outb(0x08 | 0x20, iobase + 0x30);
- 
- 	return 0;
-@@ -638,7 +638,10 @@ static int bluecard_hci_close(struct hci_dev *hdev)
- 
- 	bluecard_hci_flush(hdev);
- 
--	/* Disable LED */
-+	/* Stop LED timer */
-+	del_timer_sync(&(info->timer));
-+
-+	/* Disable power LED */
- 	outb(0x00, iobase + 0x30);
- 
- 	return 0;
--- 
-Ondrej Zary
+Johan
