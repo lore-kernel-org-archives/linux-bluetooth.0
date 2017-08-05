@@ -1,97 +1,84 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-Reply-To: yunhanw@nestlabs.com
-From: Yunhan Wang <yunhanw@nestlabs.com>
-Date: Sun, 6 Aug 2017 01:25:07 -0700
-Message-ID: <CALvjcs-BQKBVRe9oJ_1aG2h5DuH04TyvX8bYJjs92vhSVYDgig@mail.gmail.com>
-Subject: bluetoothctl: how to send notification/indcation from peripheral to central
+Return-Path: <linux@rainbow-software.org>
+From: Ondrej Zary <linux@rainbow-software.org>
 To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
+Cc: Marcel Holtmann <marcel@holtmann.org>
+Subject: [PATCH 1/2] bluecard_cs: Always enable LEDs (fix for Anycom CF-300)
+Date: Sat,  5 Aug 2017 21:34:44 +0200
+Message-Id: <20170805193445.16411-1-linux@rainbow-software.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi
+Anycom CF-300 (HP C8249A) has both power and activity LEDs.
+However the id read in bluecard_open() is 0x73 so the driver does not
+enable the LEDs.
+Remove the CARD_HAS_PCCARD_ID check to enable LEDs.
 
-Has any one been able to send notification from LE peripheral to LE
-central using bluetoothctl?
+Signed-off-by: Ondrej Zary <linux@rainbow-software.org>
+---
+ drivers/bluetooth/bluecard_cs.c | 24 ++++++------------------
+ 1 file changed, 6 insertions(+), 18 deletions(-)
 
-Now I am trying to update "Value" with 0x02 for the below
-characteristic with read and indicate flag, i am expecting a
-notification can be sent from peripheral to central automatically. It
-seems there is no such support in bluetoothctl. Then I do simple code
-change on below, and try to update value via "update-chrc 0x02", well,
-the value has been successfully updated, but there is no
-message/notification sent from peripheral to central automatically. I
-have confirmed that chrc read from central is showing updated value,
-02, correctly. The question is that how can we send characteristic
-notification/indication using bluez dbus API?
-
-btw, I see the video(BlueZ Meets Zephyr made by Luiz)
-https://www.youtube.com/watch?v=SdmZX5q-XDg
-In 30:05, I see Zephyr is sending notification to bluetoothctl
-automatically. How can we just use bluez dbus API to achieve this?
-
-for example,
-In LE peripheral:
-I setup the below characteristic with read and indicate flag
-register-service 00001820-0000-1000-8000-00805f9b34fb
-register-characteristic 00002a06-0000-1000-8000-00805f9b34fb read,indicate
-register-application
-advertise peripheral
-
-In LE central:
-connect 00:AA:01:00:00:23
-select-attribute /org/bluez/hci1/dev_00_AA_01_00_00_23/service000a/char000b
-notify on
-
-The code change snippet
---- a/client/gatt.c
-+++ b/client/gatt.c
--void gatt_register_chrc(DBusConnection *conn, GDBusProxy *proxy, wordexp_t *w)
-+void chrc_set_value1(const char *input, void *user_data, DBusConnection *conn)
-+{
-+    struct chrc *chrc = user_data;
-+
-+    g_free(chrc->value);
-+
-+    chrc->value = str2bytearray((char *) input, &chrc->value_len);
-+    g_dbus_emit_property_changed(conn, chrc->path,
-"org.bluez.GattCharacteristic1", "Value");
-+
-+}
-+struct chrc * gatt_register_chrc(DBusConnection *conn, GDBusProxy
-*proxy, wordexp_t *w)
+diff --git a/drivers/bluetooth/bluecard_cs.c b/drivers/bluetooth/bluecard_cs.c
+index d4b0b655dde6..5cd1e164fde0 100644
+--- a/drivers/bluetooth/bluecard_cs.c
++++ b/drivers/bluetooth/bluecard_cs.c
+@@ -160,9 +160,6 @@ static void bluecard_activity_led_timeout(u_long arg)
+ 	struct bluecard_info *info = (struct bluecard_info *)arg;
+ 	unsigned int iobase = info->p_dev->resource[0]->start;
+ 
+-	if (!test_bit(CARD_HAS_PCCARD_ID, &(info->hw_state)))
+-		return;
+-
+ 	if (test_bit(CARD_HAS_ACTIVITY_LED, &(info->hw_state))) {
+ 		/* Disable activity LED */
+ 		outb(0x08 | 0x20, iobase + 0x30);
+@@ -177,9 +174,6 @@ static void bluecard_enable_activity_led(struct bluecard_info *info)
  {
-        struct service *service;
-        struct chrc *chrc;
-@@ -1489,6 +1500,8 @@ void gatt_register_chrc(DBusConnection *conn,
-GDBusProxy *proxy, wordexp_t *w)
-        print_chrc(chrc, COLORED_NEW);
-
-        rl_prompt_input(chrc->path, "Enter value:", chrc_set_value, chrc);
-+
-+    return chrc;
+ 	unsigned int iobase = info->p_dev->resource[0]->start;
+ 
+-	if (!test_bit(CARD_HAS_PCCARD_ID, &(info->hw_state)))
+-		return;
+-
+ 	if (test_bit(CARD_HAS_ACTIVITY_LED, &(info->hw_state))) {
+ 		/* Enable activity LED */
+ 		outb(0x10 | 0x40, iobase + 0x30);
+@@ -625,16 +619,13 @@ static int bluecard_hci_flush(struct hci_dev *hdev)
+ static int bluecard_hci_open(struct hci_dev *hdev)
+ {
+ 	struct bluecard_info *info = hci_get_drvdata(hdev);
++	unsigned int iobase = info->p_dev->resource[0]->start;
+ 
+ 	if (test_bit(CARD_HAS_PCCARD_ID, &(info->hw_state)))
+ 		bluecard_hci_set_baud_rate(hdev, DEFAULT_BAUD_RATE);
+ 
+-	if (test_bit(CARD_HAS_PCCARD_ID, &(info->hw_state))) {
+-		unsigned int iobase = info->p_dev->resource[0]->start;
+-
+-		/* Enable LED */
+-		outb(0x08 | 0x20, iobase + 0x30);
+-	}
++	/* Enable LED */
++	outb(0x08 | 0x20, iobase + 0x30);
+ 
+ 	return 0;
  }
-
---- a/client/main.c
-+++ b/client/main.c
-+static void cmd_update_chrc(const char *arg)
-+{
-+    chrc_set_value1(arg, default_chrc, dbus_conn);
-+
-+}
-+
- static void cmd_unregister_characteristic(const char *arg)
+@@ -643,15 +634,12 @@ static int bluecard_hci_open(struct hci_dev *hdev)
+ static int bluecard_hci_close(struct hci_dev *hdev)
  {
-        wordexp_t w;
-@@ -2541,6 +2547,9 @@ static const struct {
-        { "register-characteristic", "<UUID> <Flags=read,write,notify...>",
-                                        cmd_register_characteristic,
-                                        "Register application characteristic" },
-+    { "update-chrc", "<value.>",
-+            cmd_update_chrc,
-+            "update chrc value" },
-
-Thanks
-Best wishes
-Yunhan
+ 	struct bluecard_info *info = hci_get_drvdata(hdev);
++	unsigned int iobase = info->p_dev->resource[0]->start;
+ 
+ 	bluecard_hci_flush(hdev);
+ 
+-	if (test_bit(CARD_HAS_PCCARD_ID, &(info->hw_state))) {
+-		unsigned int iobase = info->p_dev->resource[0]->start;
+-
+-		/* Disable LED */
+-		outb(0x00, iobase + 0x30);
+-	}
++	/* Disable LED */
++	outb(0x00, iobase + 0x30);
+ 
+ 	return 0;
+ }
+-- 
+Ondrej Zary
