@@ -11,19 +11,13 @@ Cc: devicetree@vger.kernel.org,
 	linux-bluetooth@vger.kernel.org,
 	linux-rpi-kernel@lists.infradead.org,
 	Loic Poulain <loic.poulain@gmail.com>
-Subject: [PATCH v3 2/3] ARM: dts: bcm2837-rpi-3-b: Add bcm43438 as serial slave
-Date: Mon,  7 Aug 2017 12:39:25 +0200
-Message-Id: <1502102366-2760-2-git-send-email-loic.poulain@gmail.com>
-In-Reply-To: <1502102366-2760-1-git-send-email-loic.poulain@gmail.com>
-References: <1502102366-2760-1-git-send-email-loic.poulain@gmail.com>
+Subject: [PATCH v3 1/3] dt-bindings: net: bluetooth: Add broadcom-bluetooth
+Date: Mon,  7 Aug 2017 12:39:24 +0200
+Message-Id: <1502102366-2760-1-git-send-email-loic.poulain@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add BCM43438 as a slave device of uart0 (pl011/ttyAMA0).
-This allows to automatically insert the bcm43438 to the bluetooth
-subsystem instead of relying on userspace helpers (hciattach).
-
-Overwrite bootargs to use 8250 aux uart (ttyS0) as console instead
-of pl011/ttyAMA0.
+Add binding document for serial bluetooth chips using
+Broadcom protocol.
 
 Signed-off-by: Loic Poulain <loic.poulain@gmail.com>
 ---
@@ -33,37 +27,44 @@ Signed-off-by: Loic Poulain <loic.poulain@gmail.com>
      name refactoring and additional comments
      Add generic host_set_baudrate method
      Use agnostic device_property_read
+ .../devicetree/bindings/net/broadcom-bluetooth.txt | 29 ++++++++++++++++++++++
+ 1 file changed, 29 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
 
- arch/arm/boot/dts/bcm2837-rpi-3-b.dts | 10 ++++++++++
- 1 file changed, 10 insertions(+)
-
-diff --git a/arch/arm/boot/dts/bcm2837-rpi-3-b.dts b/arch/arm/boot/dts/bcm2837-rpi-3-b.dts
-index 20725ca..5abc1df 100644
---- a/arch/arm/boot/dts/bcm2837-rpi-3-b.dts
-+++ b/arch/arm/boot/dts/bcm2837-rpi-3-b.dts
-@@ -8,6 +8,11 @@
- 	compatible = "raspberrypi,3-model-b", "brcm,bcm2837";
- 	model = "Raspberry Pi 3 Model B";
- 
-+	chosen {
-+		/* 8250 auxiliar UART instead of pl011 */
-+		bootargs = "earlyprintk console=ttyS0,115200";
-+	};
+diff --git a/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt b/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
+new file mode 100644
+index 0000000..c51ea1b
+--- /dev/null
++++ b/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
+@@ -0,0 +1,29 @@
++Broadcom Bluetooth Chips
++---------------------
 +
- 	memory {
- 		reg = <0 0x40000000>;
- 	};
-@@ -24,6 +29,11 @@
- 	pinctrl-names = "default";
- 	pinctrl-0 = <&uart0_gpio32 &gpclk2_gpio43>;
- 	status = "okay";
++This documents the binding structure and common properties for serial
++attached Broadcom devices.
 +
-+	bluetooth {
-+		compatible = "brcm,bcm43438-bt";
-+		max-speed = <921600>;
-+	};
- };
- 
- /* uart1 is mapped to the pin header */
++Serial attached Broadcom devices shall be a child node of the host UART
++device the slave device is attached to.
++
++Required properties:
++
++ - compatible: should contain one of the following:
++   * "brcm,bcm43438-bt"
++
++Optional properties:
++
++ - max-speed: see Documentation/devicetree/bindings/serial/slave-device.txt
++
++Example:
++
++&uart2 {
++       pinctrl-names = "default";
++       pinctrl-0 = <&uart2_pins>;
++
++       bluetooth {
++               compatible = "brcm,bcm43438-bt";
++               max-speed = <921600>;
++       };
++};
 -- 
 1.9.1
