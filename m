@@ -1,227 +1,111 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
 Reply-To: yunhanw@nestlabs.com
-In-Reply-To: <CALvjcs8oUUds4FZscy6FkhfSQ=R026h4D6ufNSoV78DUnoAOOA@mail.gmail.com>
-References: <CALvjcs8oUUds4FZscy6FkhfSQ=R026h4D6ufNSoV78DUnoAOOA@mail.gmail.com>
+In-Reply-To: <CALvjcs-BQKBVRe9oJ_1aG2h5DuH04TyvX8bYJjs92vhSVYDgig@mail.gmail.com>
+References: <CALvjcs-BQKBVRe9oJ_1aG2h5DuH04TyvX8bYJjs92vhSVYDgig@mail.gmail.com>
 From: Yunhan Wang <yunhanw@nestlabs.com>
-Date: Mon, 7 Aug 2017 13:56:28 -0700
-Message-ID: <CALvjcs8VLt1qkaR2snb+T=82BPLDzydAZ5_rAfYoOeUSkpPQOw@mail.gmail.com>
-Subject: Re: [PATCH 1/1] client: Fix the selection bug of ad manager
-To: linux-bluetooth@vger.kernel.org,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Mon, 7 Aug 2017 13:55:21 -0700
+Message-ID: <CALvjcs_USSp2kEhH9BODX1v6e3XoN=ToWDiVsptQ1MD4wKCkxg@mail.gmail.com>
+Subject: Re: bluetoothctl: how to send notification/indcation from peripheral
+ to central
+To: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Luiz
 
-Could you help to review this patch and see if we can merge it?
+The above diff is working now. Previously I accidentally create
+multiple bluetoothd so that bluetoothd miss such signal.....I am
+preparing the formal patch for this functionality in bluetoothctl.
 
 Thanks
 Best wishes
 Yunhan
 
-On Thu, Aug 3, 2017 at 2:13 PM, Yunhan Wang <yunhanw@nestlabs.com> wrote:
-> From: Yunhan Wang <yunhanw@google.com>
+On Sun, Aug 6, 2017 at 1:25 AM, Yunhan Wang <yunhanw@nestlabs.com> wrote:
+> Hi
 >
-> If there are multiple adapters, bluetoothctl may choose the wrong
-> advertising manager. In addition, select command cannot update
-> current advertising manager when choosing another adapter. Therefore, we
-> need to introduce default_ad_manager to handle the above situation,
-> which is similar to default_ctrl.
-> ---
->  client/main.c | 93 ++++++++++++++++++++++++++++++++++++++++++++++++++++-------
->  1 file changed, 83 insertions(+), 10 deletions(-)
+> Has any one been able to send notification from LE peripheral to LE
+> central using bluetoothctl?
 >
-> diff --git a/client/main.c b/client/main.c
-> index 17de7f81f..40075f27e 100644
+> Now I am trying to update "Value" with 0x02 for the below
+> characteristic with read and indicate flag, i am expecting a
+> notification can be sent from peripheral to central automatically. It
+> seems there is no such support in bluetoothctl. Then I do simple code
+> change on below, and try to update value via "update-chrc 0x02", well,
+> the value has been successfully updated, but there is no
+> message/notification sent from peripheral to central automatically. I
+> have confirmed that chrc read from central is showing updated value,
+> 02, correctly. The question is that how can we send characteristic
+> notification/indication using bluez dbus API?
+>
+> btw, I see the video(BlueZ Meets Zephyr made by Luiz)
+> https://www.youtube.com/watch?v=SdmZX5q-XDg
+> In 30:05, I see Zephyr is sending notification to bluetoothctl
+> automatically. How can we just use bluez dbus API to achieve this?
+>
+> for example,
+> In LE peripheral:
+> I setup the below characteristic with read and indicate flag
+> register-service 00001820-0000-1000-8000-00805f9b34fb
+> register-characteristic 00002a06-0000-1000-8000-00805f9b34fb read,indicate
+> register-application
+> advertise peripheral
+>
+> In LE central:
+> connect 00:AA:01:00:00:23
+> select-attribute /org/bluez/hci1/dev_00_AA_01_00_00_23/service000a/char000b
+> notify on
+>
+> The code change snippet
+> --- a/client/gatt.c
+> +++ b/client/gatt.c
+> -void gatt_register_chrc(DBusConnection *conn, GDBusProxy *proxy, wordexp_t *w)
+> +void chrc_set_value1(const char *input, void *user_data, DBusConnection *conn)
+> +{
+> +    struct chrc *chrc = user_data;
+> +
+> +    g_free(chrc->value);
+> +
+> +    chrc->value = str2bytearray((char *) input, &chrc->value_len);
+> +    g_dbus_emit_property_changed(conn, chrc->path,
+> "org.bluez.GattCharacteristic1", "Value");
+> +
+> +}
+> +struct chrc * gatt_register_chrc(DBusConnection *conn, GDBusProxy
+> *proxy, wordexp_t *w)
+>  {
+>         struct service *service;
+>         struct chrc *chrc;
+> @@ -1489,6 +1500,8 @@ void gatt_register_chrc(DBusConnection *conn,
+> GDBusProxy *proxy, wordexp_t *w)
+>         print_chrc(chrc, COLORED_NEW);
+>
+>         rl_prompt_input(chrc->path, "Enter value:", chrc_set_value, chrc);
+> +
+> +    return chrc;
+>  }
+>
 > --- a/client/main.c
 > +++ b/client/main.c
-> @@ -65,13 +65,19 @@ struct adapter {
->   GList *devices;
->  };
->
-> +struct LEAdvertisingManager {
-> + GDBusProxy *proxy;
-> + char * address;
-> +};
+> +static void cmd_update_chrc(const char *arg)
+> +{
+> +    chrc_set_value1(arg, default_chrc, dbus_conn);
 > +
->  static struct adapter *default_ctrl;
->  static GDBusProxy *default_dev;
->  static GDBusProxy *default_attr;
-> -static GDBusProxy *ad_manager;
-> +static struct LEAdvertisingManager *default_ad_manager;
->  static GList *ctrl_list;
-> -
-> +static GList *ad_manager_list;
->  static guint input = 0;
-> +static char * adapter_address;
->
->  static const char * const agent_arguments[] = {
->   "on",
-> @@ -522,6 +528,7 @@ static void device_added(GDBusProxy *proxy)
->  static void adapter_added(GDBusProxy *proxy)
->  {
->   struct adapter *adapter = g_malloc0(sizeof(struct adapter));
-> + DBusMessageIter iter;
->
->   adapter->proxy = proxy;
->   ctrl_list = g_list_append(ctrl_list, adapter);
-> @@ -530,6 +537,23 @@ static void adapter_added(GDBusProxy *proxy)
->   default_ctrl = adapter;
->
->   print_adapter(proxy, COLORED_NEW);
-> +
-> + if (g_dbus_proxy_get_property(adapter->proxy, "Address", &iter) == FALSE)
-> + return;
-> +
-> + dbus_message_iter_get_basic(&iter, &adapter_address);
 > +}
 > +
-> +static void ad_manager_added(GDBusProxy *proxy)
-> +{
-> +    struct LEAdvertisingManager *ad_manager = g_malloc0(sizeof(struct
-> LEAdvertisingManager));
-> +    ad_manager->proxy = proxy;
-> +    ad_manager->address = adapter_address;
-> +
-> +    ad_manager_list = g_list_append(ad_manager_list, ad_manager);
-> +
-> +    if(!default_ad_manager)
-> +        default_ad_manager = ad_manager;
->  }
->
->  static void proxy_added(GDBusProxy *proxy, void *user_data)
-> @@ -560,7 +584,7 @@ static void proxy_added(GDBusProxy *proxy, void *user_data)
->   } else if (!strcmp(interface, "org.bluez.GattManager1")) {
->   gatt_add_manager(proxy);
->   } else if (!strcmp(interface, "org.bluez.LEAdvertisingManager1")) {
-> - ad_manager = proxy;
-> +        ad_manager_added(proxy);
->   }
->  }
->
-> @@ -615,6 +639,26 @@ static void adapter_removed(GDBusProxy *proxy)
->   }
->  }
->
-> +static void ad_manager_removed(GDBusProxy *proxy)
-> +{
-> + GList *ll;
-> +
-> + for (ll = g_list_first(ctrl_list); ll; ll = g_list_next(ll)) {
-> +        struct LEAdvertisingManager *ad_manager = ll->data;
-> +
-> + if (ad_manager->proxy == proxy) {
-> + if (default_ad_manager && default_ad_manager->proxy == proxy) {
-> + default_ad_manager = NULL;
-> + }
-> +
-> + ad_manager_list = g_list_remove_link(ad_manager_list, ll);
-> + g_free(ad_manager);
-> + g_list_free(ll);
-> + return;
-> + }
-> + }
-> +}
-> +
->  static void proxy_removed(GDBusProxy *proxy, void *user_data)
+>  static void cmd_unregister_characteristic(const char *arg)
 >  {
->   const char *interface;
-> @@ -649,11 +693,9 @@ static void proxy_removed(GDBusProxy *proxy, void
-> *user_data)
->   } else if (!strcmp(interface, "org.bluez.GattManager1")) {
->   gatt_remove_manager(proxy);
->   } else if (!strcmp(interface, "org.bluez.LEAdvertisingManager1")) {
-> - if (ad_manager == proxy) {
-> - agent_manager = NULL;
-> - ad_unregister(dbus_conn, NULL);
-> +        ad_unregister(dbus_conn, proxy);
-> +        ad_manager_removed(proxy);
->   }
-> - }
->  }
+>         wordexp_t w;
+> @@ -2541,6 +2547,9 @@ static const struct {
+>         { "register-characteristic", "<UUID> <Flags=read,write,notify...>",
+>                                         cmd_register_characteristic,
+>                                         "Register application characteristic" },
+> +    { "update-chrc", "<value.>",
+> +            cmd_update_chrc,
+> +            "update chrc value" },
 >
->  static struct adapter *find_ctrl(GList *source, const char *path)
-> @@ -786,6 +828,21 @@ static struct adapter *find_ctrl_by_address(GList
-> *source, const char *address)
->   return NULL;
->  }
->
-> +static struct LEAdvertisingManager *find_ad_manager_by_address(GList
-> *source, const char *address)
-> +{
-> + GList *list;
-> +
-> + for (list = g_list_first(source); list; list = g_list_next(list)) {
-> + struct LEAdvertisingManager *ad_manager = list->data;
-> + DBusMessageIter iter;
-> +
-> + if (!strcasecmp(ad_manager->address, address))
-> + return ad_manager;
-> + }
-> +
-> + return NULL;
-> +}
-> +
->  static GDBusProxy *find_proxy_by_address(GList *source, const char *address)
->  {
->   GList *list;
-> @@ -923,12 +980,15 @@ static void cmd_select(const char *arg)
->  {
->   struct adapter *adapter;
->
-> + struct LEAdvertisingManager *ad_manager;
-> +
->   if (!arg || !strlen(arg)) {
->   rl_printf("Missing controller address argument\n");
->   return;
->   }
->
->   adapter = find_ctrl_by_address(ctrl_list, arg);
-> +
->   if (!adapter) {
->   rl_printf("Controller %s not available\n", arg);
->   return;
-> @@ -937,7 +997,20 @@ static void cmd_select(const char *arg)
->   if (default_ctrl && default_ctrl->proxy == adapter->proxy)
->   return;
->
-> + ad_manager = find_ad_manager_by_address(ad_manager_list, arg);
-> +
-> + if (!ad_manager) {
-> + rl_printf("Advertising manager %s not available\n", arg);
-> + return;
-> + }
-> +
-> + if (default_ad_manager && default_ad_manager->proxy == ad_manager->proxy)
-> + return;
-> +
->   default_ctrl = adapter;
-> +
-> + default_ad_manager = ad_manager;
-> +
->   print_adapter(adapter->proxy, NULL);
->  }
->
-> @@ -2296,15 +2369,15 @@ static void cmd_advertise(const char *arg)
->   if (parse_argument_advertise(arg, &enable, &type) == FALSE)
->   return;
->
-> - if (!ad_manager) {
-> + if (!default_ad_manager->proxy) {
->   rl_printf("LEAdvertisingManager not found\n");
->   return;
->   }
->
->   if (enable == TRUE)
-> - ad_register(dbus_conn, ad_manager, type);
-> + ad_register(dbus_conn, default_ad_manager->proxy, type);
->   else
-> - ad_unregister(dbus_conn, ad_manager);
-> + ad_unregister(dbus_conn, default_ad_manager->proxy);
->  }
->
->  static char *ad_generator(const char *text, int state)
-> --
-> 2.14.0.rc1.383.gd1ce394fe2-goog
+> Thanks
+> Best wishes
+> Yunhan
