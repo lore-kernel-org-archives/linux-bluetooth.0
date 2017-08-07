@@ -1,205 +1,71 @@
-Return-Path: <pbrobinson@gmail.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <1501495414-17103-2-git-send-email-loic.poulain@gmail.com>
-References: <1501495414-17103-1-git-send-email-loic.poulain@gmail.com> <1501495414-17103-2-git-send-email-loic.poulain@gmail.com>
-From: Peter Robinson <pbrobinson@gmail.com>
-Date: Mon, 7 Aug 2017 07:58:25 +0100
-Message-ID: <CALeDE9MWoNsiJqVhy_+FnbSKUGmikriqty5nrFd8V8ZtRYmTrA@mail.gmail.com>
-Subject: Re: [PATCH 2/2] Bluetooth: hci_bcm: Add serdev support
-To: Loic Poulain <loic.poulain@gmail.com>
-Cc: robh+dt@kernel.org, f.fainelli@gmail.com, rjui@broadcom.com,
-	marcel@holtmann.org, devicetree@vger.kernel.org,
-	linux-rpi-kernel@lists.infradead.org, linux-bluetooth@vger.kernel.org
+In-Reply-To: <11841060.dynqo2U1Dt@gentooasus>
+References: <2299304.XBxEXHNB4J@gentooasus> <11841060.dynqo2U1Dt@gentooasus>
+From: Szymon Janc <szymon.janc@codecoup.pl>
+Date: Mon, 7 Aug 2017 08:56:29 +0200
+Message-ID: <CAAEJBhJ-ho-uvEw0QACzNY6qKkb1EbtTpsRfVhx8jqevFZ8+8A@mail.gmail.com>
+Subject: Re: [RFC][PATCH BlueZ] sixaxis: Differing device name between usb and
+ bluetooth connection
+To: Nicolas Werner <nicolas.werner@gmx.net>
+Cc: Bluez mailing list <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Jul 31, 2017 at 11:03 AM, Loic Poulain <loic.poulain@gmail.com> wrote:
-> Add basic support for Broadcom serial slave devices.
-> Probe the serial device, retrieve its maximum speed and
-> register a new hci uart device.
->
-> Tested/compatible with bcm43438 (RPi3).
->
-> Signed-off-by: Loic Poulain <loic.poulain@gmail.com>
-> ---
->  drivers/bluetooth/hci_bcm.c | 82 ++++++++++++++++++++++++++++++++++++++++++---
->  1 file changed, 78 insertions(+), 4 deletions(-)
->
-> diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
-> index 6b42372..f824738 100644
-> --- a/drivers/bluetooth/hci_bcm.c
-> +++ b/drivers/bluetooth/hci_bcm.c
-> @@ -27,6 +27,7 @@
->  #include <linux/firmware.h>
->  #include <linux/module.h>
->  #include <linux/acpi.h>
-> +#include <linux/of.h>
->  #include <linux/platform_device.h>
->  #include <linux/clk.h>
->  #include <linux/gpio/consumer.h>
-> @@ -34,6 +35,7 @@
->  #include <linux/interrupt.h>
->  #include <linux/dmi.h>
->  #include <linux/pm_runtime.h>
-> +#include <linux/serdev.h>
->
->  #include <net/bluetooth/bluetooth.h>
->  #include <net/bluetooth/hci_core.h>
-> @@ -46,6 +48,7 @@
->
->  #define BCM_AUTOSUSPEND_DELAY  5000 /* default autosleep delay */
->
-> +/* platform device driver resources */
->  struct bcm_device {
->         struct list_head        list;
->
-> @@ -68,6 +71,12 @@ struct bcm_device {
->  #endif
->  };
->
-> +/* serdev driver resources */
-> +struct bcm_bt_device {
-> +       struct hci_uart hu;
-> +};
-> +
-> +/* generic bcm uart resources */
->  struct bcm_data {
->         struct sk_buff          *rx_skb;
->         struct sk_buff_head     txq;
-> @@ -289,6 +298,11 @@ static int bcm_open(struct hci_uart *hu)
->
->         hu->priv = bcm;
->
-> +       if (hu->serdev) {
-> +               serdev_device_open(hu->serdev);
-> +               goto out;
-> +       }
-> +
->         if (!hu->tty->dev)
->                 goto out;
->
-> @@ -323,6 +337,9 @@ static int bcm_close(struct hci_uart *hu)
->
->         bt_dev_dbg(hu->hdev, "hu %p", hu);
->
-> +       if (hu->serdev)
-> +               serdev_device_close(hu->serdev);
-> +
->         /* Protect bcm->dev against removal of the device or driver */
->         mutex_lock(&bcm_device_lock);
->         if (bcm_device_exists(bdev)) {
-> @@ -397,8 +414,12 @@ static int bcm_setup(struct hci_uart *hu)
->         else
->                 speed = 0;
->
-> -       if (speed)
-> -               hci_uart_set_baudrate(hu, speed);
-> +       if (speed) {
-> +               if (hu->serdev)
-> +                       serdev_device_set_baudrate(hu->serdev, speed);
-> +               else
-> +                       hci_uart_set_baudrate(hu, speed);
-> +       }
->
->         /* Operational speed if any */
->         if (hu->oper_speed)
-> @@ -410,8 +431,12 @@ static int bcm_setup(struct hci_uart *hu)
->
->         if (speed) {
->                 err = bcm_set_baudrate(hu, speed);
-> -               if (!err)
-> -                       hci_uart_set_baudrate(hu, speed);
-> +               if (!err) {
-> +                       if (hu->serdev)
-> +                               serdev_device_set_baudrate(hu->serdev, speed);
-> +                       else
-> +                               hci_uart_set_baudrate(hu, speed);
-> +               }
->         }
->
->  finalize:
-> @@ -903,9 +928,57 @@ static int bcm_remove(struct platform_device *pdev)
->         },
->  };
->
-> +static int bcm_serdev_probe(struct serdev_device *serdev)
-> +{
-> +       struct bcm_bt_device *bcmdev;
-> +       u32 speed;
-> +       int err;
-> +
-> +       bcmdev = devm_kzalloc(&serdev->dev, sizeof(*bcmdev), GFP_KERNEL);
-> +       if (!bcmdev)
-> +               return -ENOMEM;
-> +
-> +       bcmdev->hu.serdev = serdev;
-> +       serdev_device_set_drvdata(serdev, bcmdev);
-> +
-> +       err = of_property_read_u32(serdev->dev.of_node, "max-speed", &speed);
-> +       if (!err)
-> +               bcmdev->hu.oper_speed = speed;
-> +
-> +       return hci_uart_register_device(&bcmdev->hu, &bcm_proto);
-> +}
-> +
-> +static void bcm_serdev_remove(struct serdev_device *serdev)
-> +{
-> +       struct bcm_bt_device *bcmdev = serdev_device_get_drvdata(serdev);
-> +
-> +       hci_uart_unregister_device(&bcmdev->hu);
-> +}
+Hi Nicolas,
 
-I'm seeing the following warning when building this with Fedora-26/gcc7:
+On 4 August 2017 at 22:29, Nicolas Werner <nicolas.werner@gmx.net> wrote:
+> Am Samstag, 4. Februar 2017, 19:16:28 CEST schrieben Sie:
+>> BlueZ sets the device name of Dual Shock 3 controller to "PLAYSTATION(R)3
+>> Controller". When you connect the same controller via USB it is set to "Sony
+>> PLAYSTATION(R)3 Controller".
+>>
+>> It seems that at least some games fail to recognize the controller as a Dual
+>> Shock 3/sixaxis controller and don't load the default mapping for
+>> PlayStation controllers, if the name doesn't contain the Sony part. Also I
+>> don't see a reason to use a different name, when connecting via Bluetooth.
+>>
+>> I noticed this with "The Binding of Isaac: Rebirth" and it seems, that Steam
+>> also recognizes the controller better after the patch, although I'm not
+>> confident, if I can parse the controller configuration dialog correctly. I
+>> don't know, if this breaks anything, because it depends on the current
+>> name.
+>>
+>> The attached patch changes the device name set when pairing to match the
+>> device name, when connected via USB.
+>>
+>> Nicolas Werner
+>>
+>> --- a/plugins/sixaxis.c
+>> +++ b/plugins/sixaxis.c
+>> @@ -56,7 +56,7 @@
+>>         uint16_t version;
+>>  } devices[] = {
+>>         {
+>> -               .name = "PLAYSTATION(R)3 Controller",
+>> +               .name = "Sony PLAYSTATION(R)3 Controller",
+>>                 .source = 0x0002,
+>>                 .vid = 0x054c,
+>>                 .pid = 0x0268,
+>
+> It seems I'm not the only one with this issue as I recently found this issue
+> (https://bugzilla.kernel.org/show_bug.cgi?id=195225) in the kernel bug
+> tracker. It looks like dual shock 4 controllers have a similar issue.
+>
+> I asked on IRC and someone recommended to ping this message. Again, I would
+> appreciate some comments on this issue and it would be great if this issue
+> could be fixed.
 
-drivers/bluetooth/hci_bcm.c: In function 'bcm_serdev_remove':
-drivers/bluetooth/hci_bcm.c:953:2: error: implicit declaration of
-function 'hci_uart_unregister_device'; did you mean
-'hci_uart_register_device'? [-Werror=implicit-function-declaration]
-  hci_uart_unregister_device(&bcmdev->hu);
-  ^~~~~~~~~~~~~~~~~~~~~~~~~~
-  hci_uart_register_device
-cc1: some warnings being treated as errors
+I'm not sure where I took original name from (probably this is how DS3
+presents itself over BT).
+Anyway, if this fix the problem I'm fine with changing the name (and
+patch looks OK). Could you send a proper patch created with 'git
+format-patch'?
 
-> +#ifdef CONFIG_OF
-> +static const struct of_device_id bcm_bluetooth_of_match[] = {
-> +       { .compatible = "brcm,bcm43438-bt" },
-> +       { },
-> +};
-> +MODULE_DEVICE_TABLE(of, bcm_bluetooth_of_match);
-> +#endif
-> +
-> +static struct serdev_device_driver bcm_serdev_driver = {
-> +       .probe = bcm_serdev_probe,
-> +       .remove = bcm_serdev_remove,
-> +       .driver = {
-> +               .name = "hci_uart_bcm",
-> +               .of_match_table = of_match_ptr(bcm_bluetooth_of_match),
-> +       },
-> +};
-> +
->  int __init bcm_init(void)
->  {
-> +       /* For now, we need to keep both platform device
-> +        * driver (ACPI generated) and serdev driver (DT).
-> +        */
->         platform_driver_register(&bcm_driver);
-> +       serdev_device_driver_register(&bcm_serdev_driver);
->
->         return hci_uart_register_proto(&bcm_proto);
->  }
-> @@ -913,6 +986,7 @@ int __init bcm_init(void)
->  int __exit bcm_deinit(void)
->  {
->         platform_driver_unregister(&bcm_driver);
-> +       serdev_device_driver_unregister(&bcm_serdev_driver);
->
->         return hci_uart_unregister_proto(&bcm_proto);
->  }
-> --
-> 1.9.1
->
->
-> _______________________________________________
-> linux-rpi-kernel mailing list
-> linux-rpi-kernel@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/linux-rpi-kernel
+As for DS4 this is a bit more trickier since that name is the name
+device use over BT and we would probably have to spoof it...
+
+-- 
+pozdrawiam
+Szymon K. Janc
