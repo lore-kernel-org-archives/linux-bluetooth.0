@@ -1,65 +1,106 @@
-Return-Path: <linux-kernel-owner@vger.kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Subject: Re: [PATCH] bluetooth: document config options
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20170721104228.GA9448@amd>
-Date: Mon, 7 Aug 2017 08:34:18 +0200
-Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org,
-        kernel list <linux-kernel@vger.kernel.org>,
-        Netdev list <netdev@vger.kernel.org>
-Message-Id: <EDDC23EF-C82E-41EE-8530-E86B9B4756A5@holtmann.org>
-References: <20170721074957.GA12640@amd>
- <CDF602D5-78C6-4F97-9C12-3E6AD3AA6C37@holtmann.org>
- <20170721104228.GA9448@amd>
-To: Pavel Machek <pavel@ucw.cz>
-Sender: linux-kernel-owner@vger.kernel.org
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+MIME-Version: 1.0
+Reply-To: yunhanw@nestlabs.com
+From: Yunhan Wang <yunhanw@nestlabs.com>
+Date: Sun, 6 Aug 2017 23:18:22 -0700
+Message-ID: <CALvjcs88qDooFW-L1ANXoNrp9KKwXHh+_NaLLzKhbOQvMDLcTQ@mail.gmail.com>
+Subject: Re: bluetoothctl: how to send notification/indcation from peripheral
+ to central
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Pavel,
+Hi Luiz,
 
->>> Kernel config options should include useful help text; I had to look
->>> up the terms on wikipedia.
->>> 
->>> Signed-off-by: Pavel Machek <pavel@ucw.cz>
->>> 
->>> diff --git a/net/bluetooth/Kconfig b/net/bluetooth/Kconfig
->>> index 68f951b..133c8a6 100644
->>> --- a/net/bluetooth/Kconfig
->>> +++ b/net/bluetooth/Kconfig
->>> @@ -45,6 +45,8 @@ config BT_BREDR
->>> 	bool "Bluetooth Classic (BR/EDR) features"
->>> 	depends on BT
->>> 	default y
->>> +	help
->>> +	  Support Bluetooth version 1 and 2 connections.
->> 
->> so this is actually not correct. Version 5.0 is also Bluetooth BR/EDR.
->> 
->> I am fine if use the terms "Basic Rate" and "Enhanced Data Rate" in the description, but the version numbers are kinda not how this works. So some alternative wording needs to be used:
->> 
->> "Bluetooth Classic includes support for Basic Rate (BR) available with Bluetooth version 1.0b or later and support for Enhanced Data Rate (EDR) available with Bluetooth version 2.0 or later."
->> 
-> 
-> Ok, works for me.
-> 
->>> +	help
->>> +	  Bluetooth 3 introduces high-speed mode where bluetooth endpoints
->>> +	  negotiate fast connection over WIFI. This controls its support.
->> 
->> Again, while Bluetooth version 3.0 introduces HS support, it is not what is selecting this.
->> 
->> I think here we can write something like this:
->> 
->> "Bluetooth High Speed includes support for off-loading Bluetooth connections via 802.11 physical layer available with Bluetooth version 3.0 or later."
->> 
-> 
-> Ok.
+Do you have any idea about this issue?
 
-are you planning to send a patch with updated wording for this?
+Best wishes
+Yunhan
 
-Regards
-
-Marcel
+On Sun, Aug 6, 2017 at 1:25 AM, Yunhan Wang <yunhanw@nestlabs.com> wrote:
+> Hi
+>
+> Has any one been able to send notification from LE peripheral to LE
+> central using bluetoothctl?
+>
+> Now I am trying to update "Value" with 0x02 for the below
+> characteristic with read and indicate flag, i am expecting a
+> notification can be sent from peripheral to central automatically. It
+> seems there is no such support in bluetoothctl. Then I do simple code
+> change on below, and try to update value via "update-chrc 0x02", well,
+> the value has been successfully updated, but there is no
+> message/notification sent from peripheral to central automatically. I
+> have confirmed that chrc read from central is showing updated value,
+> 02, correctly. The question is that how can we send characteristic
+> notification/indication using bluez dbus API?
+>
+> btw, I see the video(BlueZ Meets Zephyr made by Luiz)
+> https://www.youtube.com/watch?v=SdmZX5q-XDg
+> In 30:05, I see Zephyr is sending notification to bluetoothctl
+> automatically. How can we just use bluez dbus API to achieve this?
+>
+> for example,
+> In LE peripheral:
+> I setup the below characteristic with read and indicate flag
+> register-service 00001820-0000-1000-8000-00805f9b34fb
+> register-characteristic 00002a06-0000-1000-8000-00805f9b34fb read,indicate
+> register-application
+> advertise peripheral
+>
+> In LE central:
+> connect 00:AA:01:00:00:23
+> select-attribute /org/bluez/hci1/dev_00_AA_01_00_00_23/service000a/char000b
+> notify on
+>
+> The code change snippet
+> --- a/client/gatt.c
+> +++ b/client/gatt.c
+> -void gatt_register_chrc(DBusConnection *conn, GDBusProxy *proxy, wordexp_t *w)
+> +void chrc_set_value1(const char *input, void *user_data, DBusConnection *conn)
+> +{
+> +    struct chrc *chrc = user_data;
+> +
+> +    g_free(chrc->value);
+> +
+> +    chrc->value = str2bytearray((char *) input, &chrc->value_len);
+> +    g_dbus_emit_property_changed(conn, chrc->path,
+> "org.bluez.GattCharacteristic1", "Value");
+> +
+> +}
+> +struct chrc * gatt_register_chrc(DBusConnection *conn, GDBusProxy
+> *proxy, wordexp_t *w)
+>  {
+>         struct service *service;
+>         struct chrc *chrc;
+> @@ -1489,6 +1500,8 @@ void gatt_register_chrc(DBusConnection *conn,
+> GDBusProxy *proxy, wordexp_t *w)
+>         print_chrc(chrc, COLORED_NEW);
+>
+>         rl_prompt_input(chrc->path, "Enter value:", chrc_set_value, chrc);
+> +
+> +    return chrc;
+>  }
+>
+> --- a/client/main.c
+> +++ b/client/main.c
+> +static void cmd_update_chrc(const char *arg)
+> +{
+> +    chrc_set_value1(arg, default_chrc, dbus_conn);
+> +
+> +}
+> +
+>  static void cmd_unregister_characteristic(const char *arg)
+>  {
+>         wordexp_t w;
+> @@ -2541,6 +2547,9 @@ static const struct {
+>         { "register-characteristic", "<UUID> <Flags=read,write,notify...>",
+>                                         cmd_register_characteristic,
+>                                         "Register application characteristic" },
+> +    { "update-chrc", "<value.>",
+> +            cmd_update_chrc,
+> +            "update chrc value" },
+>
+> Thanks
+> Best wishes
+> Yunhan
