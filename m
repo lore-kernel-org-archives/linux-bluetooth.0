@@ -1,71 +1,63 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v7 2/9] advertising: Rename AdvertisementInstaces to Instances
-Date: Mon,  7 Aug 2017 16:28:13 +0300
-Message-Id: <20170807132820.20334-2-luiz.dentz@gmail.com>
-In-Reply-To: <20170807132820.20334-1-luiz.dentz@gmail.com>
-References: <20170807132820.20334-1-luiz.dentz@gmail.com>
+Subject: [PATCH v7 1/9] advertising: Ensure all instances are reset during init
+Date: Mon,  7 Aug 2017 16:28:12 +0300
+Message-Id: <20170807132820.20334-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This fixes the typo and removes the term advertisement since it is
-implicit given the interface name, also make it experimental since
-AdvertisingManager is still experimental.
+If for some reason bluetoothd crashes or is killed it may leave
+instances behind.
 ---
- doc/advertising-api.txt | 4 ++--
- src/advertising.c       | 9 ++++-----
- 2 files changed, 6 insertions(+), 7 deletions(-)
+ src/advertising.c | 24 +++++++++++++++++++++++-
+ 1 file changed, 23 insertions(+), 1 deletion(-)
 
-diff --git a/doc/advertising-api.txt b/doc/advertising-api.txt
-index 7a29b7095..39ca4c989 100644
---- a/doc/advertising-api.txt
-+++ b/doc/advertising-api.txt
-@@ -113,6 +113,6 @@ Methods		RegisterAdvertisement(object advertisement, dict options)
- 			Possible errors: org.bluez.Error.InvalidArguments
- 					 org.bluez.Error.DoesNotExist
- 
--Properties	byte AdvertisementInstaces
-+Properties	byte Instances
- 
--			Number of available advertisement instances.
-+			Number of available advertising instances.
 diff --git a/src/advertising.c b/src/advertising.c
-index 64d5a27bb..f1fcba8fb 100644
+index c2af3acb4..64d5a27bb 100644
 --- a/src/advertising.c
 +++ b/src/advertising.c
-@@ -179,8 +179,7 @@ static void client_remove(void *data)
- 
- 	g_dbus_emit_property_changed(btd_get_dbus_connection(),
- 				adapter_get_path(client->manager->adapter),
--				LE_ADVERTISING_MGR_IFACE,
--				"AdvertisementInstances");
-+				LE_ADVERTISING_MGR_IFACE, "Instances");
+@@ -144,6 +144,22 @@ static void client_destroy(void *data)
+ 	client_free(data);
  }
  
- static void client_disconnect_cb(DBusConnection *conn, void *user_data)
-@@ -469,8 +468,7 @@ static void add_adv_callback(uint8_t status, uint16_t length,
- 
- 	g_dbus_emit_property_changed(btd_get_dbus_connection(),
- 				adapter_get_path(client->manager->adapter),
--				LE_ADVERTISING_MGR_IFACE,
--				"AdvertisementInstances");
-+				LE_ADVERTISING_MGR_IFACE, "Instances");
- 
- done:
- 	add_client_complete(client, status);
-@@ -755,7 +753,8 @@ static gboolean get_instances(const GDBusPropertyTable *property,
++static void remove_advertising(struct btd_adv_manager *manager,
++						uint8_t instance)
++{
++	struct mgmt_cp_remove_advertising cp;
++
++	if (instance)
++		DBG("instance %u", instance);
++	else
++		DBG("all instances");
++
++	cp.instance = instance;
++
++	mgmt_send(manager->mgmt, MGMT_OP_REMOVE_ADVERTISING,
++			manager->mgmt_index, sizeof(cp), &cp, NULL, NULL, NULL);
++}
++
+ static void client_remove(void *data)
+ {
+ 	struct btd_adv_client *client = data;
+@@ -791,8 +807,14 @@ static void read_adv_features_callback(uint8_t status, uint16_t length,
+ 	if (!g_dbus_register_interface(btd_get_dbus_connection(),
+ 					adapter_get_path(manager->adapter),
+ 					LE_ADVERTISING_MGR_IFACE, methods,
+-					NULL, properties, manager, NULL))
++					NULL, properties, manager, NULL)) {
+ 		error("Failed to register " LE_ADVERTISING_MGR_IFACE);
++		return;
++	}
++
++	/* Reset existing instances */
++	if (feat->num_instances)
++		remove_advertising(manager, 0);
  }
  
- static const GDBusPropertyTable properties[] = {
--	{ "AdvertisementInstances", "y", get_instances },
-+	{ "Instances", "y", get_instances, NULL, NULL,
-+					G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
- };
- 
- static const GDBusMethodTable methods[] = {
+ static struct btd_adv_manager *manager_create(struct btd_adapter *adapter)
 -- 
 2.13.3
 
