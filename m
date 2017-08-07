@@ -1,157 +1,202 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-Reply-To: yunhanw@nestlabs.com
-In-Reply-To: <CABBYNZLfE59FjTj4Y0G69qWFNKcYxD=vA2sRyQhQWM4AJSV3bg@mail.gmail.com>
-References: <CALvjcs88qDooFW-L1ANXoNrp9KKwXHh+_NaLLzKhbOQvMDLcTQ@mail.gmail.com>
- <CABBYNZLfE59FjTj4Y0G69qWFNKcYxD=vA2sRyQhQWM4AJSV3bg@mail.gmail.com>
-From: Yunhan Wang <yunhanw@nestlabs.com>
-Date: Mon, 7 Aug 2017 04:29:55 -0700
-Message-ID: <CALvjcs_QZDkutN88Z5Ve5_efyh68k7FJS_-nj+YCr-h=1BJD5A@mail.gmail.com>
-Subject: Re: bluetoothctl: how to send notification/indcation from peripheral
- to central
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <loic.poulain@gmail.com>
+From: Loic Poulain <loic.poulain@gmail.com>
+To: marcel@holtmann.org,
+	johan.hedberg@gmail.com,
+	robh+dt@kernel.org,
+	rjui@broadcom.com,
+	sbranden@broadcom.com,
+	f.fainelli@gmail.com,
+	stefan.wahren@i2se.com
+Cc: devicetree@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org,
+	linux-rpi-kernel@lists.infradead.org,
+	Loic Poulain <loic.poulain@gmail.com>
+Subject: [PATCH v3 3/3] Bluetooth: hci_bcm: Add serdev support
+Date: Mon,  7 Aug 2017 12:39:26 +0200
+Message-Id: <1502102366-2760-3-git-send-email-loic.poulain@gmail.com>
+In-Reply-To: <1502102366-2760-1-git-send-email-loic.poulain@gmail.com>
+References: <1502102366-2760-1-git-send-email-loic.poulain@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz
+Add basic support for Broadcom serial slave devices.
+Probe the serial device, retrieve its maximum speed and
+register a new hci uart device.
 
-Thanks for your reply. Do you know how to generate PropertiesChanged
-signal after updating 'Value' successfully using C , which
-API/function should I use/try?
+Tested/compatible with bcm43438 (RPi3).
 
-Thanks
-Best wishes
-Yunhan
+Signed-off-by: Loic Poulain <loic.poulain@gmail.com>
+---
+ drivers/bluetooth/hci_bcm.c | 85 +++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 83 insertions(+), 2 deletions(-)
 
-On Mon, Aug 7, 2017 at 2:52 AM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi Yunhan
->
-> On Mon, Aug 7, 2017 at 9:18 AM, Yunhan Wang <yunhanw@nestlabs.com> wrote:
->> Hi Luiz,
->>
->> Do you have any idea about this issue?
->>
->> Best wishes
->> Yunhan
->>
->> On Sun, Aug 6, 2017 at 1:25 AM, Yunhan Wang <yunhanw@nestlabs.com> wrote:
->>> Hi
->>>
->>> Has any one been able to send notification from LE peripheral to LE
->>> central using bluetoothctl?
->>>
->>> Now I am trying to update "Value" with 0x02 for the below
->>> characteristic with read and indicate flag, i am expecting a
->>> notification can be sent from peripheral to central automatically. It
->>>seems there is no such support in bluetoothctl. Then I do simple code
->>> change on below, and try to update value via "update-chrc 0x02", well,
->>> the value has been successfully updated, but there is no
->>> message/notification sent from peripheral to central automatically. I
->>> have confirmed that chrc read from central is showing updated value,
->>> 02, correctly. The question is that how can we send characteristic
->>> notification/indication using bluez dbus API?
->
-> That is up for the application when to generate Value changes, we can
-> introduce a command to just do that, though using bluetoothctl to
-> generate notification is not very user friendly.
->
-> bluetoothd will notice if the application had update its Value, but in
-> order for this to work you have to generate the PropertiesChanged
-> signal.
->
->>> btw, I see the video(BlueZ Meets Zephyr made by Luiz)
->>> https://www.youtube.com/watch?v=SdmZX5q-XDg
->>> In 30:05, I see Zephyr is sending notification to bluetoothctl
->>> automatically.How can we just use bluez dbus API to achieve this?
->
-> That is using HRS and emulating the heart rate measurements.
->
->>> for example,
->>> In LE peripheral:
->>> I setup the below characteristic with read and indicate flag
->>> register-service 00001820-0000-1000-8000-00805f9b34fb
->>> register-characteristic 00002a06-0000-1000-8000-00805f9b34fb read,indicate
->>> register-application
->>> advertise peripheral
->>>
->>> In LE central:
->>> connect 00:AA:01:00:00:23
->>> select-attribute /org/bluez/hci1/dev_00_AA_01_00_00_23/service000a/char000b
->>> notify on
->>>
->>> The code change snippet
->>> --- a/client/gatt.c
->>> +++ b/client/gatt.c
->>> -void gatt_register_chrc(DBusConnection *conn, GDBusProxy *proxy, wordexp_t *w)
->>> +void chrc_set_value1(const char *input, void *user_data, DBusConnection *conn)
->>> +{
->>> +    struct chrc *chrc = user_data;
->>> +
->>> +    g_free(chrc->value);
->>> +
->>> +    chrc->value = str2bytearray((char *) input, &chrc->value_len);
->>> +    g_dbus_emit_property_changed(conn, chrc->path,
->>> "org.bluez.GattCharacteristic1", "Value");
->>> +
->>> +}
->>> +struct chrc * gatt_register_chrc(DBusConnection *conn, GDBusProxy
->>> *proxy, wordexp_t *w)
->>>  {
->>>        struct service *service;
->>>         struct chrc *chrc;
->>> @@ -1489,6 +1500,8 @@ void gatt_register_chrc(DBusConnection *conn,
->>> GDBusProxy *proxy, wordexp_t *w)
->>>         print_chrc(chrc, COLORED_NEW);
->>>
->>>         rl_prompt_input(chrc->path, "Enter value:", chrc_set_value, chrc);
->>> +
->>> +    return chrc;
->>>  }
->>>
->>> --- a/client/main.c
->>> +++ b/client/main.c
->>> +static void cmd_update_chrc(const char *arg)
->>> +{
->>> +    chrc_set_value1(arg, default_chrc, dbus_conn);
->
-> Where does default_chrc comes from? I guess we would need some way to
-> select the server attributes in order to update them, again this is
-> not going to be user friendly since you have to send the notification
-> one by one. Perhaps an easier way to test this is to register standard
-> attributes like HRS and enable simulation, so it would act exactly
-> like zephyr or out example-gatt-server.
->
-> This could perhaps be done automatically in case a know service is
-> registered without any attributes, e.g: HRS, then by the time we
-> register the application bluetoothctl would take care of registering
-> the standard attributes for the service.
->
->>> +
->>> +}
->>> +
->>> static void cmd_unregister_characteristic(const char *arg)
->>>  {
->>>         wordexp_t w;
->>> @@ -2541,6 +2547,9 @@ static const struct {
->>>         { "register-characteristic", "<UUID> <Flags=read,write,notify...>",
->>>                                         cmd_register_characteristic,
->>>                                         "Register application characteristic" },
->>> +    { "update-chrc", "<value.>",
->>> +            cmd_update_chrc,
->>> +            "update chrc value" },
->>>
->>> Thanks
->>> Best wishes
->>> Yunhan
->> --
->>To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->> the body of a message to majordomo@vger.kernel.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
->
->
-> --
-> Luiz Augusto von Dentz
+diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
+index 6b42372..086d73c 100644
+--- a/drivers/bluetooth/hci_bcm.c
++++ b/drivers/bluetooth/hci_bcm.c
+@@ -27,6 +27,8 @@
+ #include <linux/firmware.h>
+ #include <linux/module.h>
+ #include <linux/acpi.h>
++#include <linux/of.h>
++#include <linux/property.h>
+ #include <linux/platform_device.h>
+ #include <linux/clk.h>
+ #include <linux/gpio/consumer.h>
+@@ -34,6 +36,7 @@
+ #include <linux/interrupt.h>
+ #include <linux/dmi.h>
+ #include <linux/pm_runtime.h>
++#include <linux/serdev.h>
+ 
+ #include <net/bluetooth/bluetooth.h>
+ #include <net/bluetooth/hci_core.h>
+@@ -46,6 +49,7 @@
+ 
+ #define BCM_AUTOSUSPEND_DELAY	5000 /* default autosleep delay */
+ 
++/* platform device driver resources */
+ struct bcm_device {
+ 	struct list_head	list;
+ 
+@@ -68,6 +72,12 @@ struct bcm_device {
+ #endif
+ };
+ 
++/* serdev driver resources */
++struct bcm_serdev {
++	struct hci_uart hu;
++};
++
++/* generic bcm uart resources */
+ struct bcm_data {
+ 	struct sk_buff		*rx_skb;
+ 	struct sk_buff_head	txq;
+@@ -79,6 +89,14 @@ struct bcm_data {
+ static DEFINE_MUTEX(bcm_device_lock);
+ static LIST_HEAD(bcm_device_list);
+ 
++static inline void host_set_baudrate(struct hci_uart *hu, unsigned int speed)
++{
++	if (hu->serdev)
++		serdev_device_set_baudrate(hu->serdev, speed);
++	else
++		hci_uart_set_baudrate(hu, speed);
++}
++
+ static int bcm_set_baudrate(struct hci_uart *hu, unsigned int speed)
+ {
+ 	struct hci_dev *hdev = hu->hdev;
+@@ -289,6 +307,14 @@ static int bcm_open(struct hci_uart *hu)
+ 
+ 	hu->priv = bcm;
+ 
++	/* If this is a serdev defined device, then only use
++	 * serdev open primitive and skip the rest.
++	 */
++	if (hu->serdev) {
++		serdev_device_open(hu->serdev);
++		goto out;
++	}
++
+ 	if (!hu->tty->dev)
+ 		goto out;
+ 
+@@ -323,6 +349,12 @@ static int bcm_close(struct hci_uart *hu)
+ 
+ 	bt_dev_dbg(hu->hdev, "hu %p", hu);
+ 
++	/* If this is a serdev defined device, only use serdev
++	 * close primitive and then continue as usual.
++	 */
++	if (hu->serdev)
++		serdev_device_close(hu->serdev);
++
+ 	/* Protect bcm->dev against removal of the device or driver */
+ 	mutex_lock(&bcm_device_lock);
+ 	if (bcm_device_exists(bdev)) {
+@@ -398,7 +430,7 @@ static int bcm_setup(struct hci_uart *hu)
+ 		speed = 0;
+ 
+ 	if (speed)
+-		hci_uart_set_baudrate(hu, speed);
++		host_set_baudrate(hu, speed);
+ 
+ 	/* Operational speed if any */
+ 	if (hu->oper_speed)
+@@ -411,7 +443,7 @@ static int bcm_setup(struct hci_uart *hu)
+ 	if (speed) {
+ 		err = bcm_set_baudrate(hu, speed);
+ 		if (!err)
+-			hci_uart_set_baudrate(hu, speed);
++			host_set_baudrate(hu, speed);
+ 	}
+ 
+ finalize:
+@@ -903,9 +935,57 @@ static int bcm_remove(struct platform_device *pdev)
+ 	},
+ };
+ 
++static int bcm_serdev_probe(struct serdev_device *serdev)
++{
++	struct bcm_serdev *bcmdev;
++	u32 speed;
++	int err;
++
++	bcmdev = devm_kzalloc(&serdev->dev, sizeof(*bcmdev), GFP_KERNEL);
++	if (!bcmdev)
++		return -ENOMEM;
++
++	bcmdev->hu.serdev = serdev;
++	serdev_device_set_drvdata(serdev, bcmdev);
++
++	err = device_property_read_u32(&serdev->dev, "max-speed", &speed);
++	if (!err)
++		bcmdev->hu.oper_speed = speed;
++
++	return hci_uart_register_device(&bcmdev->hu, &bcm_proto);
++}
++
++static void bcm_serdev_remove(struct serdev_device *serdev)
++{
++	struct bcm_serdev *bcmdev = serdev_device_get_drvdata(serdev);
++
++	hci_uart_unregister_device(&bcmdev->hu);
++}
++
++#ifdef CONFIG_OF
++static const struct of_device_id bcm_bluetooth_of_match[] = {
++	{ .compatible = "brcm,bcm43438-bt" },
++	{ },
++};
++MODULE_DEVICE_TABLE(of, bcm_bluetooth_of_match);
++#endif
++
++static struct serdev_device_driver bcm_serdev_driver = {
++	.probe = bcm_serdev_probe,
++	.remove = bcm_serdev_remove,
++	.driver = {
++		.name = "hci_uart_bcm",
++		.of_match_table = of_match_ptr(bcm_bluetooth_of_match),
++	},
++};
++
+ int __init bcm_init(void)
+ {
++	/* For now, we need to keep both platform device
++	 * driver (ACPI generated) and serdev driver (DT).
++	 */
+ 	platform_driver_register(&bcm_driver);
++	serdev_device_driver_register(&bcm_serdev_driver);
+ 
+ 	return hci_uart_register_proto(&bcm_proto);
+ }
+@@ -913,6 +993,7 @@ int __init bcm_init(void)
+ int __exit bcm_deinit(void)
+ {
+ 	platform_driver_unregister(&bcm_driver);
++	serdev_device_driver_unregister(&bcm_serdev_driver);
+ 
+ 	return hci_uart_unregister_proto(&bcm_proto);
+ }
+-- 
+1.9.1
