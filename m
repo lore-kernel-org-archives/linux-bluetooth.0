@@ -1,9 +1,9 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v7 8/9] client: Add set-advertise-name command
-Date: Mon,  7 Aug 2017 16:28:19 +0300
-Message-Id: <20170807132820.20334-8-luiz.dentz@gmail.com>
+Subject: [PATCH v7 9/9] advertising: Consolidate Include* into a single property
+Date: Mon,  7 Aug 2017 16:28:20 +0300
+Message-Id: <20170807132820.20334-9-luiz.dentz@gmail.com>
 In-Reply-To: <20170807132820.20334-1-luiz.dentz@gmail.com>
 References: <20170807132820.20334-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,486 +11,270 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds set-advertise-name which enables the use of adapter
-name/alias in the scan response:
+This makes it easier to add new features and makes the code a lot
+cleaner as well.
 
-[bluetooth]# set-advertise-appearance on
-[bluetooth]# advertise on
-
-@ MGMT Command: Add Advertising (0x003e) plen 11
-        Instance: 1
-        Flags: 0x00000023
-          Switch into Connectable mode
-          Advertise as Discoverable
-          Add Appearance field to Scan Response
-        Duration: 0
-        Timeout: 0
-        Advertising data length: 0
-        Scan response length: 0
+Note: Advertising related APIs are still experimental so it still possible
+to make changes like this.
 ---
- client/advertising.c | 163 ++++++++++++++++++++++++++++++++-------------------
- client/advertising.h |   5 +-
- client/main.c        |  30 ++++++++--
- 3 files changed, 131 insertions(+), 67 deletions(-)
+ client/advertising.c    | 52 +++++++++++-------------------
+ doc/advertising-api.txt | 19 +++--------
+ src/advertising.c       | 86 ++++++++++++++++++-------------------------------
+ 3 files changed, 55 insertions(+), 102 deletions(-)
 
 diff --git a/client/advertising.c b/client/advertising.c
-index 67e87c7ca..a90127b9c 100644
+index a90127b9c..35e582afc 100644
 --- a/client/advertising.c
 +++ b/client/advertising.c
-@@ -28,6 +28,7 @@
- #include <stdio.h>
- #include <stdlib.h>
- #include <stdint.h>
-+#include <stdbool.h>
- #include <readline/readline.h>
- #include <wordexp.h>
- 
-@@ -38,22 +39,36 @@
- #define AD_PATH "/org/bluez/advertising"
- #define AD_IFACE "org.bluez.LEAdvertisement1"
- 
--static gboolean registered = FALSE;
--static char *ad_type = NULL;
--static char **ad_uuids = NULL;
--static size_t ad_uuids_len = 0;
--static char *ad_service_uuid = NULL;
--static uint8_t ad_service_data[25];
--static uint8_t ad_service_data_len = 0;
--static uint16_t ad_manufacturer_id;
--static uint8_t ad_manufacturer_data[25];
--static uint8_t ad_manufacturer_data_len = 0;
--static gboolean ad_tx_power = FALSE;
--static gboolean ad_name = FALSE;
-+struct ad_data {
-+	uint8_t data[25];
-+	uint8_t len;
-+};
-+
-+struct service_data {
-+	char *uuid;
-+	struct ad_data data;
-+};
-+
-+struct manufacturer_data {
-+	uint16_t id;
-+	struct ad_data data;
-+};
-+
-+static struct ad {
-+	bool registered;
-+	char *type;
-+	char **uuids;
-+	size_t uuids_len;
-+	struct service_data service;
-+	struct manufacturer_data manufacturer;
-+	bool tx_power;
-+	bool name;
-+	bool appearance;
-+} ad;
- 
- static void ad_release(DBusConnection *conn)
- {
--	registered = FALSE;
-+	ad.registered = false;
- 
- 	g_dbus_unregister_interface(conn, AD_PATH, AD_IFACE);
- }
-@@ -95,7 +110,7 @@ static void register_reply(DBusMessage *message, void *user_data)
- 	dbus_error_init(&error);
- 
- 	if (dbus_set_error_from_message(&error, message) == FALSE) {
--		registered = TRUE;
-+		ad.registered = true;
- 		rl_printf("Advertising object registered\n");
- 	} else {
- 		rl_printf("Failed to register advertisement: %s\n", error.name);
-@@ -112,8 +127,8 @@ static gboolean get_type(const GDBusPropertyTable *property,
- {
- 	const char *type = "peripheral";
- 
--	if (!ad_type || strlen(ad_type) > 0)
--		type = ad_type;
-+	if (!ad.type || strlen(ad.type) > 0)
-+		type = ad.type;
- 
- 	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &type);
- 
-@@ -122,7 +137,7 @@ static gboolean get_type(const GDBusPropertyTable *property,
- 
- static gboolean uuids_exists(const GDBusPropertyTable *property, void *data)
- {
--	return ad_uuids_len != 0;
-+	return ad.uuids_len != 0;
+@@ -254,49 +254,38 @@ static gboolean get_manufacturer_data(const GDBusPropertyTable *property,
+ 	return TRUE;
  }
  
- static gboolean get_uuids(const GDBusPropertyTable *property,
-@@ -133,9 +148,9 @@ static gboolean get_uuids(const GDBusPropertyTable *property,
- 
- 	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY, "as", &array);
- 
--	for (i = 0; i < ad_uuids_len; i++)
-+	for (i = 0; i < ad.uuids_len; i++)
- 		dbus_message_iter_append_basic(&array, DBUS_TYPE_STRING,
--							&ad_uuids[i]);
-+							&ad.uuids[i]);
- 
- 	dbus_message_iter_close_container(iter, &array);
- 
-@@ -198,19 +213,19 @@ static void dict_append_array(DBusMessageIter *dict, const char *key, int type,
- static gboolean service_data_exists(const GDBusPropertyTable *property,
- 								void *data)
+-static gboolean tx_power_exists(const GDBusPropertyTable *property, void *data)
++static gboolean includes_exists(const GDBusPropertyTable *property, void *data)
  {
--	return ad_service_uuid != NULL;
-+	return ad.service.uuid != NULL;
+-	return ad.tx_power;
++	return ad.tx_power || ad.name || ad.appearance;
  }
  
- static gboolean get_service_data(const GDBusPropertyTable *property,
+-static gboolean get_tx_power(const GDBusPropertyTable *property,
++static gboolean get_includes(const GDBusPropertyTable *property,
  				DBusMessageIter *iter, void *user_data)
  {
- 	DBusMessageIter dict;
--	const uint8_t *data = ad_service_data;
-+	struct ad_data *data = &ad.service.data;
+-	dbus_bool_t b = ad.tx_power;
++	DBusMessageIter array;
  
- 	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY, "{sv}", &dict);
+-	dbus_message_iter_append_basic(iter, DBUS_TYPE_BOOLEAN, &b);
++	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY, "as", &array);
  
--	dict_append_array(&dict, ad_service_uuid, DBUS_TYPE_BYTE, &data,
--							ad_service_data_len);
-+	dict_append_array(&dict, ad.service.uuid, DBUS_TYPE_BYTE, &data->data,
-+								data->len);
+-	return TRUE;
+-}
++	if (ad.tx_power) {
++		const char *str = "tx-power";
  
- 	dbus_message_iter_close_container(iter, &dict);
+-static gboolean include_name_exists(const GDBusPropertyTable *property,
+-							void *data)
+-{
+-	return ad.name;
+-}
++		dbus_message_iter_append_basic(&array, DBUS_TYPE_STRING, &str);
++	}
  
-@@ -220,20 +235,19 @@ static gboolean get_service_data(const GDBusPropertyTable *property,
- static gboolean manufacturer_data_exists(const GDBusPropertyTable *property,
- 								void *data)
- {
--	return ad_manufacturer_id != 0;
-+	return ad.manufacturer.id != 0;
- }
+-static gboolean get_include_name(const GDBusPropertyTable *property,
+-				DBusMessageIter *iter, void *user_data)
+-{
+-	dbus_bool_t b = ad.name;
++	if (ad.name) {
++		const char *str = "local-name";
  
- static gboolean get_manufacturer_data(const GDBusPropertyTable *property,
- 					DBusMessageIter *iter, void *user_data)
- {
- 	DBusMessageIter dict;
--	const uint8_t *data = ad_manufacturer_data;
-+	struct ad_data *data = &ad.manufacturer.data;
+-	dbus_message_iter_append_basic(iter, DBUS_TYPE_BOOLEAN, &b);
++		dbus_message_iter_append_basic(&array, DBUS_TYPE_STRING, &str);
++	}
  
- 	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY, "{qv}", &dict);
+-	return TRUE;
+-}
++	if (ad.appearance) {
++		const char *str = "appearance";
  
--	dict_append_basic_array(&dict, DBUS_TYPE_UINT16, &ad_manufacturer_id,
--					DBUS_TYPE_BYTE, &data,
--					ad_manufacturer_data_len);
-+	dict_append_basic_array(&dict, DBUS_TYPE_UINT16, &ad.manufacturer.id,
-+					DBUS_TYPE_BYTE, &data->data, data->len);
+-static gboolean include_appearance_exists(const GDBusPropertyTable *property,
+-							void *data)
+-{
+-	return ad.appearance;
+-}
++		dbus_message_iter_append_basic(&array, DBUS_TYPE_STRING, &str);
++	}
  
- 	dbus_message_iter_close_container(iter, &dict);
+-static gboolean get_include_appearance(const GDBusPropertyTable *property,
+-				DBusMessageIter *iter, void *user_data)
+-{
+-	dbus_bool_t b = ad.appearance;
++	dbus_message_iter_close_container(iter, &array);
  
-@@ -242,13 +256,15 @@ static gboolean get_manufacturer_data(const GDBusPropertyTable *property,
- 
- static gboolean tx_power_exists(const GDBusPropertyTable *property, void *data)
- {
--	return ad_tx_power;
-+	return ad.tx_power;
- }
- 
- static gboolean get_tx_power(const GDBusPropertyTable *property,
- 				DBusMessageIter *iter, void *user_data)
- {
--	dbus_message_iter_append_basic(iter, DBUS_TYPE_BOOLEAN, &ad_tx_power);
-+	dbus_bool_t b = ad.tx_power;
-+
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_BOOLEAN, &b);
+-	dbus_message_iter_append_basic(iter, DBUS_TYPE_BOOLEAN, &b);
  
  	return TRUE;
  }
-@@ -256,13 +272,31 @@ static gboolean get_tx_power(const GDBusPropertyTable *property,
- static gboolean include_name_exists(const GDBusPropertyTable *property,
- 							void *data)
- {
--	return ad_name;
-+	return ad.name;
- }
- 
- static gboolean get_include_name(const GDBusPropertyTable *property,
- 				DBusMessageIter *iter, void *user_data)
- {
--	dbus_message_iter_append_basic(iter, DBUS_TYPE_BOOLEAN, &ad_name);
-+	dbus_bool_t b = ad.name;
-+
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_BOOLEAN, &b);
-+
-+	return TRUE;
-+}
-+
-+static gboolean include_appearance_exists(const GDBusPropertyTable *property,
-+							void *data)
-+{
-+	return ad.appearance;
-+}
-+
-+static gboolean get_include_appearance(const GDBusPropertyTable *property,
-+				DBusMessageIter *iter, void *user_data)
-+{
-+	dbus_bool_t b = ad.appearance;
-+
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_BOOLEAN, &b);
- 
- 	return TRUE;
- }
-@@ -275,17 +309,19 @@ static const GDBusPropertyTable ad_props[] = {
+@@ -307,10 +296,7 @@ static const GDBusPropertyTable ad_props[] = {
+ 	{ "ServiceData", "a{sv}", get_service_data, NULL, service_data_exists },
+ 	{ "ManufacturerData", "a{qv}", get_manufacturer_data, NULL,
  						manufacturer_data_exists },
- 	{ "IncludeTxPower", "b", get_tx_power, NULL, tx_power_exists },
- 	{ "IncludeName", "b", get_include_name, NULL, include_name_exists },
-+	{ "IncludeAppearance", "b", get_include_appearance, NULL,
-+						include_appearance_exists },
+-	{ "IncludeTxPower", "b", get_tx_power, NULL, tx_power_exists },
+-	{ "IncludeName", "b", get_include_name, NULL, include_name_exists },
+-	{ "IncludeAppearance", "b", get_include_appearance, NULL,
+-						include_appearance_exists },
++	{ "Includes", "as", get_includes, NULL, includes_exists },
  	{ }
  };
  
- void ad_register(DBusConnection *conn, GDBusProxy *manager, const char *type)
- {
--	if (registered == TRUE) {
-+	if (ad.registered) {
- 		rl_printf("Advertisement is already registered\n");
- 		return;
- 	}
+diff --git a/doc/advertising-api.txt b/doc/advertising-api.txt
+index 40e5f4e5c..28f96a81e 100644
+--- a/doc/advertising-api.txt
++++ b/doc/advertising-api.txt
+@@ -61,22 +61,13 @@ Properties	string Type
+ 			Service Data elements to include. The keys are the
+ 			UUID to associate with the data.
  
--	ad_type = g_strdup(type);
-+	ad.type = g_strdup(type);
+-		bool IncludeTxPower
++		array{string} Includes
  
- 	if (g_dbus_register_interface(conn, AD_PATH, AD_IFACE, ad_methods,
- 					NULL, ad_props, NULL, NULL) == FALSE) {
-@@ -316,7 +352,7 @@ static void unregister_reply(DBusMessage *message, void *user_data)
- 	dbus_error_init(&error);
+-			Includes the Tx Power in the advertising packet.
+-			If missing, the Tx Power is not included.
+-
+-		uint16 IncludeAppearance
+-
+-			Includes Appearance in the advertising packet.
+-
+-			Possible values: as found on Device.Appearance
+-
+-		bool IncludeName
+-
+-			Include adapter Name, or Alias if set, as scan
+-			response data.
++			List of features to be included in the advertising
++			packet.
  
- 	if (dbus_set_error_from_message(&error, message) == FALSE) {
--		registered = FALSE;
-+		ad.registered = false;
- 		rl_printf("Advertising object unregistered\n");
- 		if (g_dbus_unregister_interface(conn, AD_PATH,
- 							AD_IFACE) == FALSE)
-@@ -333,7 +369,7 @@ void ad_unregister(DBusConnection *conn, GDBusProxy *manager)
- 	if (!manager)
- 		ad_release(conn);
++			Possible values: as found on
++					LEAdvertisingManager.SupportedIncludes
  
--	if (!registered)
-+	if (!ad.registered)
- 		return;
- 
- 	if (g_dbus_proxy_method_call(manager, "UnregisterAdvertisement",
-@@ -346,34 +382,33 @@ void ad_unregister(DBusConnection *conn, GDBusProxy *manager)
- 
- void ad_advertise_uuids(const char *arg)
- {
--	g_strfreev(ad_uuids);
--	ad_uuids = NULL;
--	ad_uuids_len = 0;
-+	g_strfreev(ad.uuids);
-+	ad.uuids = NULL;
-+	ad.uuids_len = 0;
- 
- 	if (!arg || !strlen(arg))
- 		return;
- 
--	ad_uuids = g_strsplit(arg, " ", -1);
--	if (!ad_uuids) {
-+	ad.uuids = g_strsplit(arg, " ", -1);
-+	if (!ad.uuids) {
- 		rl_printf("Failed to parse input\n");
- 		return;
- 	}
- 
--	ad_uuids_len = g_strv_length(ad_uuids);
-+	ad.uuids_len = g_strv_length(ad.uuids);
+ LE Advertising Manager hierarchy
+ ================================
+diff --git a/src/advertising.c b/src/advertising.c
+index efc790807..940264482 100644
+--- a/src/advertising.c
++++ b/src/advertising.c
+@@ -63,9 +63,7 @@ struct btd_adv_client {
+ 	GDBusProxy *proxy;
+ 	DBusMessage *reg;
+ 	uint8_t type; /* Advertising type */
+-	bool include_tx_power;
+-	bool include_name;
+-	bool include_appearance;
++	uint32_t flags;
+ 	struct bt_ad *data;
+ 	uint8_t instance;
+ };
+@@ -404,49 +402,46 @@ fail:
+ 	return false;
  }
  
- static void ad_clear_service(void)
+-static bool parse_include_tx_power(DBusMessageIter *iter,
+-					struct btd_adv_client *client)
+-{
+-	dbus_bool_t b;
+-
+-	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_BOOLEAN)
+-		return false;
+-
+-	dbus_message_iter_get_basic(iter, &b);
+-
+-	client->include_tx_power = b;
+-
+-	return true;
+-}
++static struct adv_include {
++	uint8_t flag;
++	const char *name;
++} includes[] = {
++	{ MGMT_ADV_FLAG_TX_POWER, "tx-power" },
++	{ MGMT_ADV_FLAG_APPEARANCE, "appearance" },
++	{ MGMT_ADV_FLAG_LOCAL_NAME, "local-name" },
++	{ },
++};
+ 
+-static bool parse_include_name(DBusMessageIter *iter,
++static bool parse_includes(DBusMessageIter *iter,
+ 					struct btd_adv_client *client)
  {
--	g_free(ad_service_uuid);
--	ad_service_uuid = NULL;
--	memset(ad_service_data, 0, sizeof(ad_service_data));
--	ad_service_data_len = 0;
-+	g_free(ad.service.uuid);
-+	memset(&ad.service, 0, sizeof(ad.service));
- }
+-	dbus_bool_t b;
++	DBusMessageIter entries;
  
- void ad_advertise_service(const char *arg)
- {
- 	wordexp_t w;
- 	unsigned int i;
-+	struct ad_data *data;
+-	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_BOOLEAN)
++	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_ARRAY)
+ 		return false;
  
- 	if (wordexp(arg, &w, WRDE_NOCMD)) {
- 		rl_printf("Invalid argument\n");
-@@ -385,13 +420,14 @@ void ad_advertise_service(const char *arg)
- 	if (w.we_wordc == 0)
- 		goto done;
- 
--	ad_service_uuid = g_strdup(w.we_wordv[0]);
-+	ad.service.uuid = g_strdup(w.we_wordv[0]);
-+	data = &ad.service.data;
- 
- 	for (i = 1; i < w.we_wordc; i++) {
- 		long int val;
- 		char *endptr = NULL;
- 
--		if (i >= G_N_ELEMENTS(ad_service_data)) {
-+		if (i >= G_N_ELEMENTS(data->data)) {
- 			rl_printf("Too much data\n");
- 			goto done;
- 		}
-@@ -403,8 +439,8 @@ void ad_advertise_service(const char *arg)
- 			goto done;
- 		}
- 
--		ad_service_data[ad_service_data_len] = val;
--		ad_service_data_len++;
-+		data->data[data->len] = val;
-+		data->len++;
- 	}
- 
- done:
-@@ -413,9 +449,7 @@ done:
- 
- static void ad_clear_manufacturer(void)
- {
--	ad_manufacturer_id = 0;
--	memset(ad_manufacturer_data, 0, sizeof(ad_manufacturer_data));
--	ad_manufacturer_data_len = 0;
-+	memset(&ad.manufacturer, 0, sizeof(ad.manufacturer));
- }
- 
- void ad_advertise_manufacturer(const char *arg)
-@@ -424,6 +458,7 @@ void ad_advertise_manufacturer(const char *arg)
- 	unsigned int i;
- 	char *endptr = NULL;
- 	long int val;
-+	struct ad_data *data;
- 
- 	if (wordexp(arg, &w, WRDE_NOCMD)) {
- 		rl_printf("Invalid argument\n");
-@@ -441,10 +476,11 @@ void ad_advertise_manufacturer(const char *arg)
- 		goto done;
- 	}
- 
--	ad_manufacturer_id = val;
-+	ad.manufacturer.id = val;
-+	data = &ad.manufacturer.data;
- 
- 	for (i = 1; i < w.we_wordc; i++) {
--		if (i >= G_N_ELEMENTS(ad_service_data)) {
-+		if (i >= G_N_ELEMENTS(data->data)) {
- 			rl_printf("Too much data\n");
- 			goto done;
- 		}
-@@ -456,8 +492,8 @@ void ad_advertise_manufacturer(const char *arg)
- 			goto done;
- 		}
- 
--		ad_manufacturer_data[ad_manufacturer_data_len] = val;
--		ad_manufacturer_data_len++;
-+		data->data[data->len] = val;
-+		data->len++;
- 	}
- 
- done:
-@@ -465,12 +501,17 @@ done:
- }
- 
- 
--void ad_advertise_tx_power(gboolean value)
-+void ad_advertise_tx_power(bool value)
-+{
-+	ad.tx_power = value;
-+}
+-	dbus_message_iter_get_basic(iter, &b);
++	dbus_message_iter_recurse(iter, &entries);
 +
-+void ad_advertise_name(bool value)
- {
--	ad_tx_power = value;
-+	ad.name = value;
- }
++	while (dbus_message_iter_get_arg_type(&entries) == DBUS_TYPE_STRING) {
++		const char *str;
++		struct adv_include *inc;
  
--void ad_advertise_name(gboolean value)
-+void ad_advertise_appearance(bool value)
- {
--	ad_name = value;
-+	ad.appearance = value;
- }
-diff --git a/client/advertising.h b/client/advertising.h
-index a41a2742d..77fc1cca5 100644
---- a/client/advertising.h
-+++ b/client/advertising.h
-@@ -27,5 +27,6 @@ void ad_unregister(DBusConnection *conn, GDBusProxy *manager);
- void ad_advertise_uuids(const char *arg);
- void ad_advertise_service(const char *arg);
- void ad_advertise_manufacturer(const char *arg);
--void ad_advertise_tx_power(gboolean value);
--void ad_advertise_name(gboolean value);
-+void ad_advertise_tx_power(bool value);
-+void ad_advertise_name(bool value);
-+void ad_advertise_appearance(bool value);
-diff --git a/client/main.c b/client/main.c
-index 44de8c0a0..0bc2a8896 100644
---- a/client/main.c
-+++ b/client/main.c
-@@ -2350,12 +2350,12 @@ static void cmd_set_advertise_tx_power(const char *arg)
- 	}
+-	if (client->manager->supported_flags & MGMT_ADV_FLAG_LOCAL_NAME)
+-		client->include_name = b;
++		dbus_message_iter_get_basic(&entries, &str);
  
- 	if (strcmp(arg, "on") == 0 || strcmp(arg, "yes") == 0) {
--		ad_advertise_tx_power(TRUE);
-+		ad_advertise_tx_power(true);
- 		return;
- 	}
+-	return true;
+-}
++		for (inc = includes; inc && inc->name; inc++) {
++			if (strcmp(str, inc->name))
++				continue;
  
- 	if (strcmp(arg, "off") == 0 || strcmp(arg, "no") == 0) {
--		ad_advertise_tx_power(FALSE);
-+		ad_advertise_tx_power(false);
- 		return;
- 	}
+-static bool parse_include_appearance(DBusMessageIter *iter,
+-					struct btd_adv_client *client)
+-{
+-	dbus_bool_t b;
++			if (!(client->manager->supported_flags & inc->flag))
++				continue;
  
-@@ -2370,12 +2370,32 @@ static void cmd_set_advertise_name(const char *arg)
- 	}
+-	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_BOOLEAN)
+-		return false;
++			DBG("Including Feature: %s", str);
  
- 	if (strcmp(arg, "on") == 0 || strcmp(arg, "yes") == 0) {
--		ad_advertise_name(TRUE);
-+		ad_advertise_name(true);
- 		return;
- 	}
+-	dbus_message_iter_get_basic(iter, &b);
++			client->flags |= inc->flag;
++		}
  
- 	if (strcmp(arg, "off") == 0 || strcmp(arg, "no") == 0) {
--		ad_advertise_name(FALSE);
-+		ad_advertise_name(false);
-+		return;
+-	if (client->manager->supported_flags & MGMT_ADV_FLAG_APPEARANCE)
+-		client->include_appearance = b;
++		dbus_message_iter_next(&entries);
 +	}
-+
-+	rl_printf("Invalid argument\n");
-+}
-+
-+static void cmd_set_advertise_appearance(const char *arg)
-+{
-+	if (arg == NULL || strlen(arg) == 0) {
-+		rl_printf("Missing value argument\n");
-+		return;
-+	}
-+
-+	if (strcmp(arg, "on") == 0 || strcmp(arg, "yes") == 0) {
-+		ad_advertise_appearance(true);
-+		return;
-+	}
-+
-+	if (strcmp(arg, "off") == 0 || strcmp(arg, "no") == 0) {
-+		ad_advertise_appearance(false);
- 		return;
- 	}
  
-@@ -2428,6 +2448,8 @@ static const struct {
- 			"Enable/disable TX power to be advertised" },
- 	{ "set-advertise-name", "<on/off>", cmd_set_advertise_name,
- 			"Enable/disable local name to be advertised" },
-+	{ "set-advertise-appearance", "<value>", cmd_set_advertise_appearance,
-+			"Set custom appearance to be advertised" },
- 	{ "set-scan-filter-uuids", "[uuid1 uuid2 ...]",
- 			cmd_set_scan_filter_uuids, "Set scan filter uuids" },
- 	{ "set-scan-filter-rssi", "[rssi]", cmd_set_scan_filter_rssi,
+ 	return true;
+ }
+@@ -460,9 +455,7 @@ static struct adv_parser {
+ 	{ "SolicitUUIDs", parse_solicit_uuids },
+ 	{ "ManufacturerData", parse_manufacturer_data },
+ 	{ "ServiceData", parse_service_data },
+-	{ "IncludeTxPower", parse_include_tx_power },
+-	{ "IncludeName", parse_include_name },
+-	{ "IncludeAppearance", parse_include_appearance },
++	{ "Includes", parse_includes },
+ 	{ },
+ };
+ 
+@@ -552,14 +545,7 @@ static DBusMessage *refresh_advertisement(struct btd_adv_client *client)
+ 	if (client->type == AD_TYPE_PERIPHERAL)
+ 		flags = MGMT_ADV_FLAG_CONNECTABLE | MGMT_ADV_FLAG_DISCOV;
+ 
+-	if (client->include_tx_power)
+-		flags |= MGMT_ADV_FLAG_TX_POWER;
+-
+-	if (client->include_name)
+-		flags |= MGMT_ADV_FLAG_LOCAL_NAME;
+-
+-	if (client->include_appearance)
+-		flags |= MGMT_ADV_FLAG_APPEARANCE;
++	flags |= client->flags;
+ 
+ 	adv_data = bt_ad_generate(client->data, &adv_data_len);
+ 
+@@ -800,16 +786,6 @@ static gboolean get_active_instances(const GDBusPropertyTable *property,
+ 	return TRUE;
+ }
+ 
+-static struct adv_include {
+-	uint8_t flag;
+-	const char *name;
+-} includes[] = {
+-	{ MGMT_ADV_FLAG_TX_POWER, "tx-power" },
+-	{ MGMT_ADV_FLAG_APPEARANCE, "appearance" },
+-	{ MGMT_ADV_FLAG_LOCAL_NAME, "local-name" },
+-	{ },
+-};
+-
+ static void append_include(struct btd_adv_manager *manager,
+ 						DBusMessageIter *iter)
+ {
 -- 
 2.13.3
 
