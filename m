@@ -1,77 +1,61 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <20170808084533.2323-1-michal.narajowski@codecoup.pl>
-References: <20170808084533.2323-1-michal.narajowski@codecoup.pl>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 8 Aug 2017 14:20:15 +0300
-Message-ID: <CABBYNZ+_vNbDJMNPZc=2=tX1iDjfuoRN81HBZ2=9HVP7o-D2YA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v6 00/11] monitor: Bluetooth 5 HCI commands support
-To: =?UTF-8?Q?Micha=C5=82_Narajowski?= <michal.narajowski@codecoup.pl>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+Subject: Re: [PATCH] Bluetooth: Add support of 13d3:3494 RTL8723BE device
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1502190542-13243-1-git-send-email-hanipouspilot@gmail.com>
+Date: Tue, 8 Aug 2017 13:15:16 +0200
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+        linux-kernel@vger.kernel.org, 1708692@bugs.launchpad.net,
+        stable@vger.kernel.org
+Message-Id: <359B1D72-A050-4429-9EBD-F445A972B0DF@holtmann.org>
+References: <1502190542-13243-1-git-send-email-hanipouspilot@gmail.com>
+To: Dmitry Tunin <hanipouspilot@gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Michal,
+Hi Dmitry,
 
-On Tue, Aug 8, 2017 at 11:45 AM, Micha=C5=82 Narajowski
-<michal.narajowski@codecoup.pl> wrote:
-> This set adds support for decoding Bluetooth 5 commands as listed below.
->
-> Changes since v1:
->  -squash patches as requested
->  -fix coding style issues and review comments
->  -add legacy pdu decoding
->
-> Changes since v2:
->  -commit message cleanups
->
-> Changes since v3:
->  -fix decoding of LE Extended Advertising Report Event
->  -add support for missing error codes
->  -fix decoding of LE Set Periodic Advertising Data
->
-> Changes since v4:
->  -fix decoding of LE Set Extended Scan Parameters
->  -fix decoding of LE Set Extended Scan Enable
->  -fix decoding of LE Set Extended Advertising Data
->  -fix decoding of LE Set Extended Scan Response Data
->  -fix decoding of LE Set Periodic Advertising commands
->  -fix decoding of LE Extended Create Connection
->  -fix decoding of LE Set Extended Scan Parameters
->  -fix decoding of LE Set Extended Scan Enable
->  -fix decoding of connection latency
->  -refactor printing enable field
->  -refactor printing advertising channel map and filter policy
->  -fix coding style issues
->  -rename Directed Advertising Timeout to Advertising Timeout
->
-> Changes since v5:
->  -fix typo in print_enable()
->  -remove indirect calls to print_enable()
->
-> Micha=C5=82 Narajowski (11):
->   monitor: Add LE Enhanced Test commands decoding
->   monitor: Add LE Extended Advertising commands decoding
->   monitor: Add LE Set Periodic Advertising commands decoding
->   monitor: Add LE Extended Scan commands decoding
->   monitor: Add LE Periodic Advertising commands decoding
->   monitor: Add LE RF commands decoding
->   monitor: Add LE Set Privacy Mode decoding
->   monitor: Fix connection latency decoding
->   monitor: Add support for missing error codes
->   monitor: Rename Directed Advertising Timeout
->   monitor: Refactor print_enable function
->
->  monitor/bt.h     |  256 +++++++++
->  monitor/packet.c | 1676 +++++++++++++++++++++++++++++++++++++++---------=
-------
->  2 files changed, 1463 insertions(+), 469 deletions(-)
->
-> --
-> 2.11.0
+> T: Bus=02 Lev=01 Prnt=01 Port=03 Cnt=03 Dev#= 4 Spd=12 MxCh= 0
+> D: Ver= 2.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs= 1
+> P: Vendor=13d3 ProdID=3494 Rev= 2.00
+> S: Manufacturer=Realtek
+> S: Product=Bluetooth Radio
+> S: SerialNumber=00e04c000001
+> C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=500mA
+> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E: Ad=81(I) Atr=03(Int.) MxPS= 16 Ivl=1ms
+> E: Ad=02(O) Atr=02(Bulk) MxPS= 64 Ivl=0ms
+> E: Ad=82(I) Atr=02(Bulk) MxPS= 64 Ivl=0ms
+> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E: Ad=03(O) Atr=01(Isoc) MxPS= 0 Ivl=1ms
+> E: Ad=83(I) Atr=01(Isoc) MxPS= 0 Ivl=1ms
+> I: If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E: Ad=03(O) Atr=01(Isoc) MxPS= 9 Ivl=1ms
+> E: Ad=83(I) Atr=01(Isoc) MxPS= 9 Ivl=1ms
+> I: If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E: Ad=03(O) Atr=01(Isoc) MxPS= 17 Ivl=1ms
+> E: Ad=83(I) Atr=01(Isoc) MxPS= 17 Ivl=1ms
+> I: If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E: Ad=03(O) Atr=01(Isoc) MxPS= 25 Ivl=1ms
+> E: Ad=83(I) Atr=01(Isoc) MxPS= 25 Ivl=1ms
+> I: If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E: Ad=03(O) Atr=01(Isoc) MxPS= 33 Ivl=1ms
+> E: Ad=83(I) Atr=01(Isoc) MxPS= 33 Ivl=1ms
+> I: If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E: Ad=03(O) Atr=01(Isoc) MxPS= 49 Ivl=1ms
+> E: Ad=83(I) Atr=01(Isoc) MxPS= 49 Ivl=1ms
+> 
+> Signed-off-by: Dmitry Tunin <hanipouspilot@gmail.com>
+> Cc: stable@vger.kernel.org
+> ---
+> drivers/bluetooth/btusb.c | 1 +
+> 1 file changed, 1 insertion(+)
 
-Applied, thanks.
+patch has been applied to bluetooth-next tree.
 
---=20
-Luiz Augusto von Dentz
+Regards
+
+Marcel
