@@ -1,333 +1,304 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <michal.narajowski@codecoup.pl>
 MIME-Version: 1.0
-Reply-To: yunhanw@nestlabs.com
-In-Reply-To: <CALvjcs_0DMU=hFD6FvK+r2i26bx+Zx66+dkxWhUsjGFkpdAS8Q@mail.gmail.com>
-References: <CALvjcs88qDooFW-L1ANXoNrp9KKwXHh+_NaLLzKhbOQvMDLcTQ@mail.gmail.com>
- <CABBYNZLfE59FjTj4Y0G69qWFNKcYxD=vA2sRyQhQWM4AJSV3bg@mail.gmail.com>
- <CALvjcs_QZDkutN88Z5Ve5_efyh68k7FJS_-nj+YCr-h=1BJD5A@mail.gmail.com>
- <CABBYNZJ2mcjy8+LfA51RyqvYRRK7_R=d-xNFusqKUbTnNtwaxg@mail.gmail.com> <CALvjcs_0DMU=hFD6FvK+r2i26bx+Zx66+dkxWhUsjGFkpdAS8Q@mail.gmail.com>
-From: Yunhan Wang <yunhanw@nestlabs.com>
-Date: Tue, 8 Aug 2017 01:40:16 -0700
-Message-ID: <CALvjcs8FcHQ_uG253gwWtX5xpra56wLVQJF+v4pQuZ8j2k-baw@mail.gmail.com>
-Subject: Re: bluetoothctl: how to send notification/indcation from peripheral
- to central
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <684EAE9E-5929-45C5-A3DF-550B580360A8@holtmann.org>
+References: <20170731133910.26745-1-michal.narajowski@codecoup.pl>
+ <20170731133910.26745-5-michal.narajowski@codecoup.pl> <684EAE9E-5929-45C5-A3DF-550B580360A8@holtmann.org>
+From: =?UTF-8?Q?Micha=C5=82_Narajowski?= <michal.narajowski@codecoup.pl>
+Date: Tue, 8 Aug 2017 10:14:58 +0200
+Message-ID: <CAJfb0ntkfdLQ5M97=UwV0ypxfG8Le_nNyx3GHfmVgTRMwPMtaw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v5 04/11] monitor: Add LE Extended Scan commands decoding
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi, Luiz
-May i have another question about this g_dbus_emit_property_changed .
+Hi Marcel,
 
-Please see the below inline comments.
+I added this global new generic in the last patch. I will fix the typo
+here and in the last patch.
 
-Thanks
-Best wishes
-Yunhan
+Best regards
+Micha=C5=82
 
-On Mon, Aug 7, 2017 at 11:49 AM, Yunhan Wang <yunhanw@nestlabs.com> wrote:
-> Hi, Luiz
+2017-08-04 16:27 GMT+02:00 Marcel Holtmann <marcel@holtmann.org>:
+> Hi Michal,
 >
-> This is complete diff I am currently playing.
->
-> diff --git a/client/gatt.c b/client/gatt.c
-> index bd6e6b0af..548c798a2 100644
-> --- a/client/gatt.c
-> +++ b/client/gatt.c
-> @@ -1449,16 +1449,27 @@ static uint8_t *str2bytearray(char *arg, int
-> *val_len)
->         return g_memdup(value, i);
->  }
->
-> -static void chrc_set_value(const char *input, void *user_data)
-> +void chrc_set_value(const char *input, void *user_data)
->  {
->         struct chrc *chrc = user_data;
->
->         g_free(chrc->value);
->
->         chrc->value = str2bytearray((char *) input, &chrc->value_len);
-> +
->  }
->
-> -void gatt_register_chrc(DBusConnection *conn, GDBusProxy *proxy, wordexp_t
-> *w)
-> +void chrc_set_value1(const char *input, void *user_data, DBusConnection
-> *conn)
-> +{
-> +    struct chrc *chrc = user_data;
-> +
-> +    g_free(chrc->value);
-> +
-> +    chrc->value = str2bytearray((char *) input, &chrc->value_len);
-> +    g_dbus_emit_property_changed(conn, chrc->path,
-> "org.bluez.GattCharacteristic1", "Value");
-> +
-For g_dbus_emit_property_changed, it can emit property change signal
-to dbus, and then bluetoothd take care of message delivery, but it
-seems there is no callback to confirm if this indication is sent. In
-contrast, bt_gatt_server_send_indication has the ability to add conf
-callback function. Do you know if we can add a callback to monitor
-whether property_change's signal is processed, especially for
-characteristics under DbusConnection.
-
-> +}
-> +struct chrc * gatt_register_chrc(DBusConnection *conn, GDBusProxy *proxy,
-> wordexp_t *w)
->  {
->         struct service *service;
->         struct chrc *chrc;
-> @@ -1489,6 +1500,8 @@ void gatt_register_chrc(DBusConnection *conn,
-> GDBusProxy *proxy, wordexp_t *w)
->         print_chrc(chrc, COLORED_NEW);
->
->         rl_prompt_input(chrc->path, "Enter value:", chrc_set_value, chrc);
-> +
-> +    return chrc;
->  }
->
->  static struct chrc *chrc_find(const char *pattern)
-> diff --git a/client/gatt.h b/client/gatt.h
-> index 9bab42902..bddba40e4 100644
-> --- a/client/gatt.h
-> +++ b/client/gatt.h
-> @@ -55,10 +55,11 @@ void gatt_register_service(DBusConnection *conn,
-> GDBusProxy *proxy,
->  void gatt_unregister_service(DBusConnection *conn, GDBusProxy *proxy,
->                                                                 wordexp_t
-> *w);
->
-> -void gatt_register_chrc(DBusConnection *conn, GDBusProxy *proxy, wordexp_t
-> *w);
-> +struct chrc * gatt_register_chrc(DBusConnection *conn, GDBusProxy *proxy,
-> wordexp_t *w);
->  void gatt_unregister_chrc(DBusConnection *conn, GDBusProxy *proxy,
->                                                                 wordexp_t
-> *w);
->
->  void gatt_register_desc(DBusConnection *conn, GDBusProxy *proxy, wordexp_t
-> *w);
->  void gatt_unregister_desc(DBusConnection *conn, GDBusProxy *proxy,
->                                                                 wordexp_t
-> *w);
-> +void chrc_set_value1(const char *input, void *user_data, DBusConnection
-> *conn);
-> \ No newline at end of file
-> diff --git a/client/main.c b/client/main.c
-> index 40075f27e..6c5ae231d 100644
-> --- a/client/main.c
-> +++ b/client/main.c
-> @@ -78,7 +78,7 @@ static GList *ctrl_list;
->  static GList *ad_manager_list;
->  static guint input = 0;
->  static char * adapter_address;
-> -
-> +struct chrc * default_chrc;
->  static const char * const agent_arguments[] = {
->         "on",
->         "off",
-> @@ -2147,12 +2147,18 @@ static void cmd_register_characteristic(const char
-> *arg)
->                 goto done;
->         }
->
-> -       gatt_register_chrc(dbus_conn, default_ctrl->proxy, &w);
-> +    default_chrc = gatt_register_chrc(dbus_conn, default_ctrl->proxy, &w);
->
->  done:
->         wordfree(&w);
->  }
->
-> +static void cmd_update_chrc(const char *arg)
-> +{
-> +    chrc_set_value1(arg, default_chrc, dbus_conn);
-> +
-> +}
-> +
->  static void cmd_unregister_characteristic(const char *arg)
->  {
->         wordexp_t w;
-> @@ -2541,6 +2547,9 @@ static const struct {
->         { "register-characteristic", "<UUID> <Flags=read,write,notify...>",
->                                         cmd_register_characteristic,
->                                         "Register application
-> characteristic" },
-> +    { "update-chrc", "<value>",
-> +            cmd_update_chrc,
-> +            "update chrc value" },
->         { "unregister-characteristic", "<UUID/object>",
->                                 cmd_unregister_characteristic,
->                                 "Unregister application characteristic" },
->
->
-> On Mon, Aug 7, 2017 at 6:15 AM, Luiz Augusto von Dentz
-> <luiz.dentz@gmail.com> wrote:
+>> This patch adds decoding for following commands:
 >>
->> Hi Yunhan,
+>> LE Set Extended Scan Parameters
+>> LE Set Extended Scan Enable
+>> LE Extended Create Connection
+>> LE Extended Advertising Report Event
 >>
->> On Mon, Aug 7, 2017 at 2:29 PM, Yunhan Wang <yunhanw@nestlabs.com> wrote:
->> > Hi Luiz
->> >
->> > Thanks for your reply. Do you know how to generate PropertiesChanged
->> > signal after updating 'Value' successfully using C , which
->> > API/function should I use/try?
+>> < HCI Command: LE Set Extended Scan Parameters (0x08|0x0041) plen 13
+>>        Own address type: Public (0x00)
+>>        Filter policy: Accept all advertisement (0x00)
+>>        PHYs: 0x05
+>>        Entry 0: LE 1M
+>>          Type: Active (0x01)
+>>          Interval: 30.000 msec (0x0030)
+>>          Window: 30.000 msec (0x0030)
+>>        Entry 1: LE Coded
+>>          Type: Active (0x01)
+>>          Interval: 30.000 msec (0x0030)
+>>          Window: 30.000 msec (0x0030)
 >>
->> It depends on what binding/library are you using, with libdbus:
+>> < HCI Command: LE Set Extended Scan Enable (0x08|0x0042) plen 6
+>>        Extended scan: Enabled (0x01)
+>>        Filter duplicates: Disabled (0x00)
+>>        Duration: 0 msec (0x0000)
+>>        Period: 0.00 sec (0x0000)
 >>
+>> < HCI Command: LE Extended Create Connection (0x08|0x0043) plen 29
+>>        Filter policy: White list is not used (0x00)
+>>        Own address type: Public (0x00)
+>>        Peer address type: Public (0x00)
+>>        Peer address: 11:22:33:C0:DE:C0 (OUI 11-22-33)
+>>        Initiating PHYs: 0x04
+>>        Entry 0: LE Coded
+>>          Scan interval: 10.000 msec (0x0010)
+>>          Scan window: 10.000 msec (0x0010)
+>>          Min connection interval: 30.00 msec (0x0018)
+>>          Max connection interval: 50.00 msec (0x0028)
+>>          Connection latency: 0 (0x0000)
+>>          Supervision timeout: 2560 msec (0x0100)
+>>          Min connection length: 10.000 msec (0x0010)
+>>          Max connection length: 480.000 msec (0x0300)
+>> ---
+>> monitor/bt.h     |  60 ++++++++
+>> monitor/packet.c | 406 +++++++++++++++++++++++++++++++++++++++++++++++++=
++++---
+>> 2 files changed, 449 insertions(+), 17 deletions(-)
 >>
->> https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/gdbus/object.c#n1654
+>> diff --git a/monitor/bt.h b/monitor/bt.h
+>> index 0160dcc7f..74439b9e5 100644
+>> --- a/monitor/bt.h
+>> +++ b/monitor/bt.h
+>> @@ -2275,6 +2275,47 @@ struct bt_hci_cmd_le_set_periodic_adv_enable {
+>>       uint8_t  handle;
+>> } __attribute__ ((packed));
 >>
->> Which is the code that called if you do  g_dbus_emit_property_changed.
+>> +#define BT_HCI_CMD_LE_SET_EXT_SCAN_PARAMS            0x2041
+>> +struct bt_hci_cmd_le_set_ext_scan_params {
+>> +     uint8_t  own_addr_type;
+>> +     uint8_t  filter_policy;
+>> +     uint8_t  num_phys;
+>> +     uint8_t  data[0];
+>> +} __attribute__ ((packed));
+>> +struct bt_hci_le_scan_phy {
+>> +     uint8_t  type;
+>> +     uint16_t interval;
+>> +     uint16_t window;
+>> +} __attribute__ ((packed));
+>> +
+>> +#define BT_HCI_CMD_LE_SET_EXT_SCAN_ENABLE            0x2042
+>> +struct bt_hci_cmd_le_set_ext_scan_enable {
+>> +     uint8_t  enable;
+>> +     uint8_t  filter_dup;
+>> +     uint16_t duration;
+>> +     uint16_t period;
+>> +} __attribute__ ((packed));
+>> +
+>> +#define BT_HCI_CMD_LE_EXT_CREATE_CONN                0x2043
+>> +struct bt_hci_cmd_le_ext_create_conn {
+>> +     uint8_t  filter_policy;
+>> +     uint8_t  own_addr_type;
+>> +     uint8_t  peer_addr_type;
+>> +     uint8_t  peer_addr[6];
+>> +     uint8_t  phys;
+>> +     uint8_t  data[0];
+>> +} __attribute__ ((packed));
+>> +struct bt_hci_le_ext_create_conn {
+>> +     uint16_t scan_interval;
+>> +     uint16_t scan_window;
+>> +     uint16_t min_interval;
+>> +     uint16_t max_interval;
+>> +     uint16_t latency;
+>> +     uint16_t supv_timeout;
+>> +     uint16_t min_length;
+>> +     uint16_t max_length;
+>> +} __attribute__ ((packed));
+>> +
+>> #define BT_HCI_EVT_INQUIRY_COMPLETE           0x01
+>> struct bt_hci_evt_inquiry_complete {
+>>       uint8_t  status;
+>> @@ -2885,6 +2926,25 @@ struct bt_hci_evt_le_phy_update_complete {
+>>       uint8_t  rx_phy;
+>> } __attribute__ ((packed));
 >>
->> > Thanks
->> > Best wishes
->> > Yunhan
->> >
->> > On Mon, Aug 7, 2017 at 2:52 AM, Luiz Augusto von Dentz
->> > <luiz.dentz@gmail.com> wrote:
->> >> Hi Yunhan
->> >>
->> >> On Mon, Aug 7, 2017 at 9:18 AM, Yunhan Wang <yunhanw@nestlabs.com>
->> >> wrote:
->> >>> Hi Luiz,
->> >>>
->> >>>Do you have any idea about this issue?
->> >>>
->> >>> Best wishes
->> >>> Yunhan
->> >>>
->> >>> On Sun, Aug 6, 2017 at 1:25 AM, Yunhan Wang <yunhanw@nestlabs.com>
->> >>> wrote:
->> >>>> Hi
->> >>>>
->> >>>> Has any one been able to send notification from LE peripheral to LE
->> >>>> central using bluetoothctl?
->> >>>>
->> >>>> Now I am trying to update "Value" with 0x02 for the below
->> >>>> characteristic with read and indicate flag, i am expecting a
->> >>>> notification can be sent from peripheral to central automatically. It
->> >>>>seems there is no such support in bluetoothctl.Then I do simple code
->> >>>> change on below, and try to update value via "update-chrc 0x02",
->> >>>> well,
->> >>>> the value has been successfully updated, but there is no
->> >>>> message/notification sent from peripheral to central automatically. I
->> >>>> have confirmed that chrc read from central is showing updated value,
->> >>>> 02, correctly. The question is that how can we send characteristic
->> >>>> notification/indication using bluez dbus API?
->> >>
->> >> That is up for the application when to generate Value changes, we can
->> >> introduce a command to just do that, though using bluetoothctl to
->> >> generate notification is not very user friendly.
->> >>
->> >> bluetoothd will notice if the application had update its Value, but in
->> >> order for this to work you have to generate the PropertiesChanged
->> >> signal.
->> >>
->> >>>> btw, I see the video(BlueZ Meets Zephyr made by Luiz)
->> >>>> https://www.youtube.com/watch?v=SdmZX5q-XDg
->> >>>> In 30:05,I see Zephyr is sending notification to bluetoothctl
->> >>>> automatically.How can we just use bluez dbus API to achieve this?
->> >>
->> >> That is using HRS and emulating the heart rate measurements.
->> >>
->> >>>> for example,
->> >>>> In LE peripheral:
->> >>>>I setup the below characteristic with read and indicate flag
->> >>>> register-service 00001820-0000-1000-8000-00805f9b34fb
->> >>>> register-characteristic 00002a06-0000-1000-8000-00805f9b34fb
->> >>>> read,indicate
->> >>>> register-application
->> >>>> advertise peripheral
->> >>>>
->> >>>> In LE central:
->> >>>> connect 00:AA:01:00:00:23
->> >>>> select-attribute
->> >>>> /org/bluez/hci1/dev_00_AA_01_00_00_23/service000a/char000b
->> >>>> notify on
->> >>>>
->> >>>> The code change snippet
->> >>>> --- a/client/gatt.c
->> >>>> +++ b/client/gatt.c
->> >>>>-void gatt_register_chrc(DBusConnection *conn, GDBusProxy *proxy,
->> >>>> wordexp_t *w)
->> >>>> +void chrc_set_value1(const char *input, void *user_data,
->> >>>> DBusConnection *conn)
->> >>>> +{
->> >>>> +    struct chrc *chrc = user_data;
->> >>>> +
->> >>>> +    g_free(chrc->value);
->> >>>> +
->> >>>> +    chrc->value = str2bytearray((char *) input, &chrc->value_len);
->> >>>> +    g_dbus_emit_property_changed(conn, chrc->path,
->> >>>> "org.bluez.GattCharacteristic1", "Value");
->> >>>> +
->> >>>> +}
->> >>>> +struct chrc * gatt_register_chrc(DBusConnection *conn, GDBusProxy
->> >>>> *proxy, wordexp_t *w)
->> >>>>  {
->> >>>>        struct service *service;
->> >>>>         struct chrc *chrc;
->> >>>> @@ -1489,6 +1500,8 @@ void gatt_register_chrc(DBusConnection *conn,
->> >>>> GDBusProxy *proxy, wordexp_t *w)
->> >>>>         print_chrc(chrc, COLORED_NEW);
->> >>>>
->> >>>>         rl_prompt_input(chrc->path, "Enter value:", chrc_set_value,
->> >>>> chrc);
->> >>>> +
->> >>>> +    return chrc;
->> >>>>  }
->> >>>>
->> >>>> --- a/client/main.c
->> >>>> +++ b/client/main.c
->> >>>>+static void cmd_update_chrc(const char *arg)
->> >>>> +{
->> >>>> +    chrc_set_value1(arg, default_chrc, dbus_conn);
->> >>
->> >> Where does default_chrc comes from? I guess we would need some way to
->> >> select the server attributes in order to update them, again this is
->> >> not going to be user friendly since you have to send the notification
->> >> one by one. Perhaps an easier way to test this is to register standard
->> >>attributes like HRS and enable simulation, so it would act exactly
->> >> like zephyr or out example-gatt-server.
->> >>
->> >> This could perhaps be done automatically in case a know service is
->> >> registered without any attributes, e.g: HRS, then by the time we
->> >> register the application bluetoothctl would take care of registering
->> >> the standard attributes for the service.
->> >>
->> >>>> +
->> >>>> +}
->> >>>> +
->> >>>> static void cmd_unregister_characteristic(const char *arg)
->> >>>>  {
->> >>>>         wordexp_t w;
->> >>>> @@ -2541,6 +2547,9 @@ static const struct {
->> >>>>         { "register-characteristic", "<UUID>
->> >>>> <Flags=read,write,notify...>",
->> >>>>                                         cmd_register_characteristic,
->> >>>>                                         "Register application
->> >>>> characteristic" },
->> >>>> +    { "update-chrc", "<value.>",
->> >>>> +            cmd_update_chrc,
->> >>>> +            "update chrc value" },
->> >>>>
->> >>>> Thanks
->> >>>> Best wishes
->> >>>> Yunhan
->> >>> --
->> >>>To unsubscribe from this list: send the line "unsubscribe
->> >>> linux-bluetooth" in
->> >>>the body of a message to majordomo@vger.kernel.org
->> >>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->> >>
->> >>
->> >>
->> >> --
->> >>Luiz Augusto of Dentz Luiz Augusto of Dentz
+>> +#define BT_HCI_EVT_LE_EXT_ADV_REPORT 0x0d
+>> +struct bt_hci_evt_le_ext_adv_report {
+>> +     uint8_t  num_reports;
+>> +} __attribute__ ((packed));
+>> +struct bt_hci_le_ext_adv_report {
+>> +     uint16_t event_type;
+>> +     uint8_t  addr_type;
+>> +     uint8_t  addr[6];
+>> +     uint8_t  primary_phy;
+>> +     uint8_t  secondary_phy;
+>> +     uint8_t  sid;
+>> +     uint8_t  tx_power;
+>> +     int8_t   rssi;
+>> +     uint16_t interval;
+>> +     uint8_t  direct_addr_type;
+>> +     uint8_t  direct_addr[6];
+>> +     uint8_t  data_len;
+>> +} __attribute__ ((packed));
+>> +
+>> #define BT_HCI_EVT_LE_ADV_SET_TERM            0x12
+>> struct bt_hci_evt_le_adv_set_term {
+>>       uint8_t  status;
+>> diff --git a/monitor/packet.c b/monitor/packet.c
+>> index f43be9adb..6a602d8a8 100644
+>> --- a/monitor/packet.c
+>> +++ b/monitor/packet.c
+>> @@ -2305,7 +2305,7 @@ static void print_num_reports(uint8_t num_reports)
+>>       print_field("Num reports: %d", num_reports);
+>> }
 >>
+>> -static void print_adv_event_type(uint8_t type)
+>> +static void print_adv_event_type(const char *label, uint8_t type)
+>> {
+>>       const char *str;
 >>
+>> @@ -2330,7 +2330,7 @@ static void print_adv_event_type(uint8_t type)
+>>               break;
+>>       }
 >>
->> -
+>> -     print_field("Event type: %s (0x%2.2x)", str, type);
+>> +     print_field("%s: %s (0x%2.2x)", label, str, type);
+>> }
+>>
+>> static void print_adv_channel_map(const char *label, uint8_t value)
+>> @@ -6506,12 +6506,11 @@ static void le_set_adv_enable_cmd(const void *da=
+ta, uint8_t size)
+>>       print_field("Advertising: %s (0x%2.2x)", str, cmd->enable);
+>> }
+>>
+>> -static void le_set_scan_parameters_cmd(const void *data, uint8_t size)
+>> +static void print_scan_type(const char *label, uint8_t type)
+>> {
+>> -     const struct bt_hci_cmd_le_set_scan_parameters *cmd =3D data;
+>>       const char *str;
+>>
+>> -     switch (cmd->type) {
+>> +     switch (type) {
+>>       case 0x00:
+>>               str =3D "Passive";
+>>               break;
+>> @@ -6523,13 +6522,14 @@ static void le_set_scan_parameters_cmd(const voi=
+d *data, uint8_t size)
+>>               break;
+>>       }
+>>
+>> -     print_field("Type: %s (0x%2.2x)", str, cmd->type);
+>> +     print_field("%s: %s (0x%2.2x)", label, str, type);
+>> +}
+>>
+>> -     print_interval(cmd->interval);
+>> -     print_window(cmd->window);
+>> -     print_own_addr_type(cmd->own_addr_type);
+>> +static void print_scan_filter_policy(uint8_t policy)
+>> +{
+>> +     const char *str;
+>>
+>> -     switch (cmd->filter_policy) {
+>> +     switch (policy) {
+>>       case 0x00:
+>>               str =3D "Accept all advertisement";
+>>               break;
+>> @@ -6547,7 +6547,18 @@ static void le_set_scan_parameters_cmd(const void=
+ *data, uint8_t size)
+>>               break;
+>>       }
+>>
+>> -     print_field("Filter policy: %s (0x%2.2x)", str, cmd->filter_policy=
+);
+>> +     print_field("Filter policy: %s (0x%2.2x)", str, policy);
+>> +}
+>> +
+>> +static void le_set_scan_parameters_cmd(const void *data, uint8_t size)
+>> +{
+>> +     const struct bt_hci_cmd_le_set_scan_parameters *cmd =3D data;
+>> +
+>> +     print_scan_type("Type", cmd->type);
+>> +     print_interval(cmd->interval);
+>> +     print_window(cmd->window);
+>> +     print_own_addr_type(cmd->own_addr_type);
+>> +     print_scan_filter_policy(cmd->filter_policy);
+>> }
+>>
+>> static void le_set_scan_enable_cmd(const void *data, uint8_t size)
+>> @@ -7552,6 +7563,183 @@ static void le_set_periodic_adv_enable_cmd(const=
+ void *data, uint8_t size)
+>>       print_handle(cmd->handle);
+>> }
+>>
+>> +static const struct {
+>> +     uint8_t bit;
+>> +     const char *str;
+>> +} ext_scan_phys_table[] =3D {
+>> +     {  0, "LE 1M"           },
+>> +     {  2, "LE Coded"                },
+>> +     { }
+>> +};
+>> +
+>> +static void print_ext_scan_phys(const void *data, uint8_t flags)
+>> +{
+>> +     const struct bt_hci_le_scan_phy *scan_phy;
+>> +     uint8_t mask =3D flags;
+>> +     int bits_set =3D 0;
+>> +     int i;
+>> +
+>> +     print_field("PHYs: 0x%2.2x", flags);
+>> +
+>> +     for (i =3D 0; ext_scan_phys_table[i].str; i++) {
+>> +             if (flags & (1 << ext_scan_phys_table[i].bit)) {
+>> +                     scan_phy =3D data + bits_set * sizeof(*scan_phy);
+>> +                     mask &=3D ~(1 << ext_scan_phys_table[i].bit);
+>> +
+>> +                     print_field("Entry %d: %s", bits_set,
+>> +                                             ext_scan_phys_table[i].str=
+);
+>> +                     print_scan_type("  Type", scan_phy->type);
+>> +                     print_slot_625("  Interval", scan_phy->interval);
+>> +                     print_slot_625("  Window", scan_phy->window);
+>> +
+>> +                     ++bits_set;
+>> +             }
+>> +     }
+>> +
+>> +     if (mask)
+>> +             print_text(COLOR_UNKNOWN_ADV_FLAG, "  Unknown scanning PHY=
+s"
+>> +                                                     " (0x%2.2x)", mask=
+);
+>> +}
+>> +
+>> +static void le_set_ext_scan_params_cmd(const void *data, uint8_t size)
+>> +{
+>> +     const struct bt_hci_cmd_le_set_ext_scan_params *cmd =3D data;
+>> +
+>> +     print_own_addr_type(cmd->own_addr_type);
+>> +     print_scan_filter_policy(cmd->filter_policy);
+>> +     print_ext_scan_phys(cmd->data, cmd->num_phys);
+>> +}
+>> +
+>> +static void print_enable(const char *label, uint8_t enable)
+>> +{
+>> +     const char *str;
+>> +
+>> +     switch (enable) {
+>> +     case 0x00:
+>> +             str =3D "Disable";
+>> +             break;
 >
+> =E2=80=9CDisabled=E2=80=9D.
+>
+> And didn=E2=80=99t you do this a global new generic one already in an ear=
+lier patch?
+>
+> Regards
+>
+> Marcel
 >
