@@ -1,65 +1,135 @@
-Return-Path: <hanipouspilot@gmail.com>
-From: Dmitry Tunin <hanipouspilot@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	1708692@bugs.launchpad.net,
-	Dmitry Tunin <hanipouspilot@gmail.com>,
-	stable@vger.kernel.org
-Subject: [PATCH] Bluetooth: Add support of 13d3:3494 RTL8723BE device
-Date: Tue,  8 Aug 2017 14:09:02 +0300
-Message-Id: <1502190542-13243-1-git-send-email-hanipouspilot@gmail.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Date: Tue, 8 Aug 2017 13:04:45 +0200
+From: Konrad Zapalowicz <konrad.zapalowicz@canonical.com>
+To: Per =?iso-8859-1?Q?Waag=F8?= <pwaago@cisco.com>
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: SEGFAULT in bluetoothd after pairing
+Message-ID: <20170808110445.GH5294@annapurna>
+References: <7fbe9774-18b2-ae82-38f8-0f75e4ee85ad@cisco.com>
+ <CABBYNZLUEOz0i_VCEeym0HqyNpmfYhehwfhBQb6TJDLj8sDq-g@mail.gmail.com>
+ <ffe831e5-49f6-b877-6bc4-d29b44dd3d3b@cisco.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <ffe831e5-49f6-b877-6bc4-d29b44dd3d3b@cisco.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-T: Bus=02 Lev=01 Prnt=01 Port=03 Cnt=03 Dev#= 4 Spd=12 MxCh= 0
-D: Ver= 2.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs= 1
-P: Vendor=13d3 ProdID=3494 Rev= 2.00
-S: Manufacturer=Realtek
-S: Product=Bluetooth Radio
-S: SerialNumber=00e04c000001
-C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=500mA
-I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E: Ad=81(I) Atr=03(Int.) MxPS= 16 Ivl=1ms
-E: Ad=02(O) Atr=02(Bulk) MxPS= 64 Ivl=0ms
-E: Ad=82(I) Atr=02(Bulk) MxPS= 64 Ivl=0ms
-I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E: Ad=03(O) Atr=01(Isoc) MxPS= 0 Ivl=1ms
-E: Ad=83(I) Atr=01(Isoc) MxPS= 0 Ivl=1ms
-I: If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E: Ad=03(O) Atr=01(Isoc) MxPS= 9 Ivl=1ms
-E: Ad=83(I) Atr=01(Isoc) MxPS= 9 Ivl=1ms
-I: If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E: Ad=03(O) Atr=01(Isoc) MxPS= 17 Ivl=1ms
-E: Ad=83(I) Atr=01(Isoc) MxPS= 17 Ivl=1ms
-I: If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E: Ad=03(O) Atr=01(Isoc) MxPS= 25 Ivl=1ms
-E: Ad=83(I) Atr=01(Isoc) MxPS= 25 Ivl=1ms
-I: If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E: Ad=03(O) Atr=01(Isoc) MxPS= 33 Ivl=1ms
-E: Ad=83(I) Atr=01(Isoc) MxPS= 33 Ivl=1ms
-I: If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E: Ad=03(O) Atr=01(Isoc) MxPS= 49 Ivl=1ms
-E: Ad=83(I) Atr=01(Isoc) MxPS= 49 Ivl=1ms
+On 08/08, Per Waagø wrote:
+> Hi Luiz,
+> 
+> 
+> On 08. aug. 2017 12:46, Luiz Augusto von Dentz wrote:
+> >Hi Per,
+> >
+> >On Tue, Aug 8, 2017 at 1:19 PM, Per Waagø <pwaago@cisco.com> wrote:
+> >>I am working on implementing bluetooth headset support on a system with a
+> >>Marvell 88W8787 chip. Starting with bluez 5.44 bluetoothd is segfaulting
+> >>every time I pair with some headset models. I have done a git bisect and
+> >>found that the behavior was introduced with this commit: "f2483bbfd core:
+> >>Fix passing correct local address type to ATT socket"
+> >>
+> >>This commit changes some initializations of BT_IO_OPT_SOURCE_TYPE that used
+> >>to be hard coded to BDADDR_LE_PUBLIC to be read from the adapter struct
+> >>instead, using the new btd_adapter_get_address_type function. The
+> >>address_type of the adapter is set based on the MGMT_SETTING_LE flag. The
+> >>8787 doesn't support bluetooth LE, so address type is set to BDADDR_BREDR.
+> >>
+> >>Reverting this chunk eliminates the problem:
+> >>--- a/src/gatt-database.c
+> >>+++ b/src/gatt-database.c
+> >>@@ -2603,7 +2603,8 @@ struct btd_gatt_database *btd_gatt_database_new(struct
+> >>btd_adapter *adapter)
+> >>         addr = btd_adapter_get_address(adapter);
+> >>         database->le_io = bt_io_listen(connect_cb, NULL, NULL, NULL, &gerr,
+> >>                                         BT_IO_OPT_SOURCE_BDADDR, addr,
+> >>-                                       BT_IO_OPT_SOURCE_TYPE,
+> >>BDADDR_LE_PUBLIC,
+> >>+                                       BT_IO_OPT_SOURCE_TYPE,
+> >>+ btd_adapter_get_address_type(adapter),
+> >>                                         BT_IO_OPT_CID, ATT_CID,
+> >>                                         BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_LOW,
+> >>                                         BT_IO_OPT_INVALID);
+> >>
+> >>The source type eventually end up as l2_bdaddr_type in the address assigned
+> >>to the listening socket. From the debug logs I see the connect_cb in
+> >>gatt-database.c is called. This does not happen when the source type is set
+> >>to LE_PUBLIC.
+> >The headset is most likely trying to connect ATT over BR/EDR which
+> >perhaps has some unexpected behavior, though we did have some fixes in
+> >this regard so please try with latest upstream.
+> I did my testing on latest upstream as of Friday. I rebased now and retested
+> just to be sure,
+> with the same result.
 
-Signed-off-by: Dmitry Tunin <hanipouspilot@gmail.com>
-Cc: stable@vger.kernel.org
----
- drivers/bluetooth/btusb.c | 1 +
- 1 file changed, 1 insertion(+)
+Exactly same issue as I have observed and reported some time ago
+https://www.spinics.net/lists/linux-bluetooth/msg70176.html
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 24cc838..e1124ba 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -359,6 +359,7 @@ static const struct usb_device_id blacklist_table[] = {
- 	{ USB_DEVICE(0x13d3, 0x3410), .driver_info = BTUSB_REALTEK },
- 	{ USB_DEVICE(0x13d3, 0x3416), .driver_info = BTUSB_REALTEK },
- 	{ USB_DEVICE(0x13d3, 0x3459), .driver_info = BTUSB_REALTEK },
-+	{ USB_DEVICE(0x13d3, 0x3494), .driver_info = BTUSB_REALTEK },
- 
- 	/* Additional Realtek 8821AE Bluetooth devices */
- 	{ USB_DEVICE(0x0b05, 0x17dc), .driver_info = BTUSB_REALTEK },
--- 
-2.7.4
+Mine was with Sony SBH52 headset, Per what kind of headsets are
+triggering this behavior on your side?
+
+Best,
+K
+
+> 
+> >>Unfortunately, I haven't been able to get a sensible stack trace. Debug logs
+> >>from pairing is requested until segfault is pasted at the bottom of the
+> >>email.
+> >>
+> >>Any guidance on how to resolve this issue is highly appreciated.
+> >>
+> >>Best regards,
+> >>
+> >>Per
+> >>
+> >>--
+> >>src/device.c:btd_device_set_temporary() temporary 0
+> >>src/agent.c:agent_ref() 0xda708: ref=2
+> >>src/device.c:bonding_request_new() Requesting bonding for 50:1A:A5:D6:6C:7E
+> >>src/agent.c:agent_ref() 0xda708: ref=3
+> >>src/agent.c:agent_unref() 0xda708: ref=2
+> >>src/adapter.c:suspend_discovery()
+> >>src/adapter.c:adapter_bonding_attempt() hci0 bdaddr 50:1A:A5:D6:6C:7E type 0
+> >>io_cap 0x03
+> >>src/adapter.c:add_whitelist_complete() 50:1A:A5:D6:6C:7E added to kernel
+> >>whitelist
+> >>src/adapter.c:connected_callback() hci0 device 50:1A:A5:D6:6C:7E connected
+> >>eir_len 22
+> >>src/adapter.c:new_link_key_callback() hci0 new key for 50:1A:A5:D6:6C:7E
+> >>type 4 pin_len 0 store_hint 1
+> >>src/device.c:device_set_bonded()
+> >>src/device.c:device_bonding_complete() bonding 0xd8490 status 0x00
+> >>src/device.c:device_bonding_complete() Proceeding with service discovery
+> >>src/agent.c:agent_unref() 0xda708: ref=1
+> >>src/adapter.c:resume_discovery()
+> >>src/adapter.c:pair_device_complete() Success (0x00)
+> >>src/adapter.c:bonding_attempt_complete() hci0 bdaddr 50:1A:A5:D6:6C:7E type
+> >>0 status 0x0
+> >>src/device.c:device_bonding_complete() bonding (nil) status 0x00
+> >>src/adapter.c:resume_discovery()
+> >>src/gatt-database.c:connect_cb() New incoming BR/EDR ATT connection
+> >>attrib/gattrib.c:g_attrib_ref() 0xf7470: g_attrib_ref=1
+> >>src/device.c:load_gatt_db() Restoring 50:1A:A5:D6:6C:7E gatt database from
+> >>file
+> >>No cache for 50:1A:A5:D6:6C:7E
+> >>src/gatt-client.c:btd_gatt_client_connected() Device connected.
+> >>src/device.c:gatt_debug() Primary service discovery failed. ATT ECODE: 0x0a
+> >>src/device.c:gatt_client_ready_cb() status: success, error: 0
+> >>src/gatt-client.c:btd_gatt_client_ready() GATT client ready
+> >>src/gatt-client.c:create_services() Exporting objects for GATT services:
+> >>50:1A:A5:D6:6C:7E
+> >>src/device.c:device_svc_resolved() /org/bluez/hci0/dev_50_1A_A5_D6_6C_7E err
+> >>0
+> >>
+> >>--
+> >>To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
+> >>in
+> >>the body of a message to majordomo@vger.kernel.org
+> >>More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> >
+> >
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
