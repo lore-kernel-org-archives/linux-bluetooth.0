@@ -1,40 +1,77 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Austin Riffle <ARiffle@efji.com>
-To: "'linux-bluetooth@vger.kernel.org'" <linux-bluetooth@vger.kernel.org>
-Subject: Operate on BlueZ provided file descriptor in C
-Date: Thu, 10 Aug 2017 02:06:25 +0000
-Message-ID: <4C851F03BEE04A418B7A2D283DDCAB5D27C95F71@EFJDFWMB01.EFJDFW.local>
-Content-Type: text/plain; charset="us-ascii"
+Return-Path: <robh+dt@kernel.org>
 MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1502102366-2760-1-git-send-email-loic.poulain@gmail.com>
+References: <1502102366-2760-1-git-send-email-loic.poulain@gmail.com>
+From: Rob Herring <robh+dt@kernel.org>
+Date: Wed, 9 Aug 2017 18:16:53 -0500
+Message-ID: <CAL_Jsq+akZpqXMPnSh8KRVchWJpFTrzFi6LpOpJ9FYDCrY1hPQ@mail.gmail.com>
+Subject: Re: [PATCH v3 1/3] dt-bindings: net: bluetooth: Add broadcom-bluetooth
+To: Loic Poulain <loic.poulain@gmail.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>,
+	Ray Jui <rjui@broadcom.com>, Scott Branden <sbranden@broadcom.com>,
+	Florian Fainelli <f.fainelli@gmail.com>, Stefan Wahren <stefan.wahren@i2se.com>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	"open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>, linux-rpi-kernel@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello
+On Mon, Aug 7, 2017 at 5:39 AM, Loic Poulain <loic.poulain@gmail.com> wrote:
+> Add binding document for serial bluetooth chips using
+> Broadcom protocol.
+>
+> Signed-off-by: Loic Poulain <loic.poulain@gmail.com>
+> ---
+>  v2: dt-bindings as separate patch
+>      rebase on upcoming pi3 dts changes
+>  v3: changes in bcm serdev drivers:
+>      name refactoring and additional comments
+>      Add generic host_set_baudrate method
+>      Use agnostic device_property_read
+>  .../devicetree/bindings/net/broadcom-bluetooth.txt | 29 ++++++++++++++++++++++
+>  1 file changed, 29 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
+>
+> diff --git a/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt b/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
+> new file mode 100644
+> index 0000000..c51ea1b
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
+> @@ -0,0 +1,29 @@
+> +Broadcom Bluetooth Chips
+> +---------------------
+> +
+> +This documents the binding structure and common properties for serial
+> +attached Broadcom devices.
+> +
+> +Serial attached Broadcom devices shall be a child node of the host UART
+> +device the slave device is attached to.
+> +
+> +Required properties:
+> +
+> + - compatible: should contain one of the following:
+> +   * "brcm,bcm43438-bt"
+> +
+> +Optional properties:
 
-I am attempting to work with the org.bluez.Profile1 in BlueZ 5.44. When con=
-necting with a new device via the NewConnection DBus method, we get a file =
-descriptor to work with. I am fairly confused on what state this file descr=
-iptor is in, and what I need to do in order to read/write from it. Simply c=
-alling read/write does not behave as expected for me.
+Most Broadcom devices have a couple of GPIOs needing control. Maybe
+they are tied off active on RPi3, but you should document them here
+even if the driver doesn't yet need them. I think they are the same as
+the Nokia BT IIRC. Same goes for any input clocks.
 
-In the file test/test-profile, I see this line of python code:
-
-self.fd =3D fd.take()
-
-I am struggling to find the Linux C equivalent to the take method, as I bel=
-ieve this is what I need to do to operate on the fd. Any advice on how to c=
-onfigure this fd in Linux C code so I can read/write with the fd would be v=
-ery helpful!
-
-Thanks
-Austin
-This e-mail transmission, and any documents, files or previous e-mail messa=
-ges attached to it, may contain confidential information. If you are not th=
-e intended recipient, or a person responsible for delivering it to the inte=
-nded recipient, you are hereby notified that any disclosure, distribution, =
-review, copy or use of any of the information contained in or attached to t=
-his message is STRICTLY PROHIBITED. If you have received this transmission =
-in error, please immediately notify us by reply e-mail, and destroy the ori=
-ginal transmission and its attachments without reading them or saving them =
-to disk. Thank you.
-
+> +
+> + - max-speed: see Documentation/devicetree/bindings/serial/slave-device.txt
+> +
+> +Example:
+> +
+> +&uart2 {
+> +       pinctrl-names = "default";
+> +       pinctrl-0 = <&uart2_pins>;
+> +
+> +       bluetooth {
+> +               compatible = "brcm,bcm43438-bt";
+> +               max-speed = <921600>;
+> +       };
+> +};
+> --
+> 1.9.1
+>
