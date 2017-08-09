@@ -1,73 +1,42 @@
-Return-Path: <robh+dt@kernel.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <1502102366-2760-2-git-send-email-loic.poulain@gmail.com>
-References: <1502102366-2760-1-git-send-email-loic.poulain@gmail.com> <1502102366-2760-2-git-send-email-loic.poulain@gmail.com>
-From: Rob Herring <robh+dt@kernel.org>
-Date: Wed, 9 Aug 2017 18:10:04 -0500
-Message-ID: <CAL_JsqKxA2pgtjmG-cxy5XPWuRWUiia-weRZDSh4++Vn=QZmqA@mail.gmail.com>
-Subject: Re: [PATCH v3 2/3] ARM: dts: bcm2837-rpi-3-b: Add bcm43438 as serial slave
-To: Loic Poulain <loic.poulain@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>,
-	Ray Jui <rjui@broadcom.com>, Scott Branden <sbranden@broadcom.com>,
-	Florian Fainelli <f.fainelli@gmail.com>, Stefan Wahren <stefan.wahren@i2se.com>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-	"open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>, linux-rpi-kernel@lists.infradead.org
+In-Reply-To: <521fe3ec-b1d8-1eda-183a-c2093568b7e3@cisco.com>
+References: <20170809111859.10644-1-luiz.dentz@gmail.com> <521fe3ec-b1d8-1eda-183a-c2093568b7e3@cisco.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Wed, 9 Aug 2017 15:59:43 +0300
+Message-ID: <CABBYNZJ5cF0Gy-8UBiCaD5P1B4rqbS8NWOQ2YwfYjKYckQBL3Q@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] device: Fix crash when connecting ATT with BR/EDR
+ only device
+To: =?UTF-8?Q?Per_Waag=C3=B8?= <pwaago@cisco.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Aug 7, 2017 at 5:39 AM, Loic Poulain <loic.poulain@gmail.com> wrote:
-> Add BCM43438 as a slave device of uart0 (pl011/ttyAMA0).
-> This allows to automatically insert the bcm43438 to the bluetooth
-> subsystem instead of relying on userspace helpers (hciattach).
->
-> Overwrite bootargs to use 8250 aux uart (ttyS0) as console instead
-> of pl011/ttyAMA0.
->
-> Signed-off-by: Loic Poulain <loic.poulain@gmail.com>
-> ---
->  v2: dt-bindings as separate patch
->      rebase on upcoming pi3 dts changes
->  v3: changes in bcm serdev drivers:
->      name refactoring and additional comments
->      Add generic host_set_baudrate method
->      Use agnostic device_property_read
->
->  arch/arm/boot/dts/bcm2837-rpi-3-b.dts | 10 ++++++++++
->  1 file changed, 10 insertions(+)
->
-> diff --git a/arch/arm/boot/dts/bcm2837-rpi-3-b.dts b/arch/arm/boot/dts/bcm2837-rpi-3-b.dts
-> index 20725ca..5abc1df 100644
-> --- a/arch/arm/boot/dts/bcm2837-rpi-3-b.dts
-> +++ b/arch/arm/boot/dts/bcm2837-rpi-3-b.dts
-> @@ -8,6 +8,11 @@
->         compatible = "raspberrypi,3-model-b", "brcm,bcm2837";
->         model = "Raspberry Pi 3 Model B";
->
-> +       chosen {
-> +               /* 8250 auxiliar UART instead of pl011 */
-> +               bootargs = "earlyprintk console=ttyS0,115200";
+Hi Per,
 
-This is an unrelated change. "earlyprintk" is arm32 specific and only
-works with a kernel built with a specific uart type and address. Also,
-stdout-path property is preferred to set the default over "console".
+On Wed, Aug 9, 2017 at 3:17 PM, Per Waag=C3=B8 <pwaago@cisco.com> wrote:
+> Hi Luiz,
+>
+>
+> On 09. aug. 2017 13:18, Luiz Augusto von Dentz wrote:
+>>
+>> From: Luiz Augusto von Dentz<luiz.von.dentz@intel.com>
+>>
+>> The fix introduced in 006213cf4d231ce66de273e96619474bd516359b only
+>> works for dual mode devices, if the device is BR/EDR the address type
+>> would match the type on browsing_req so it still possible to crash.
+>> ---
+>>   src/device.c | 38 +++++++++++++++++++++++---------------
+>>   1 file changed, 23 insertions(+), 15 deletions(-)
+>
+>
+> I have tested the patch. I can't reproduce the crash anymore when it's in=
+,
+> so this solves the problem. Thank you!
 
-> +       };
-> +
->         memory {
->                 reg = <0 0x40000000>;
->         };
-> @@ -24,6 +29,11 @@
->         pinctrl-names = "default";
->         pinctrl-0 = <&uart0_gpio32 &gpclk2_gpio43>;
->         status = "okay";
-> +
-> +       bluetooth {
-> +               compatible = "brcm,bcm43438-bt";
-> +               max-speed = <921600>;
-> +       };
->  };
->
->  /* uart1 is mapped to the pin header */
-> --
-> 1.9.1
->
+Let check if it solves the crashes with other devices as well.
+
+
+--=20
+Luiz Augusto von Dentz
