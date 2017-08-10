@@ -1,126 +1,70 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-From: Barry Byford <31baz66@gmail.com>
-Date: Thu, 10 Aug 2017 18:07:27 +0100
-Message-ID: <CAAu3APaxNENrLz0cp+3kk3FEgExw2bhrrRypUYYwPWXqFJkvqw@mail.gmail.com>
-Subject: Feedback on BlueZ DBus API
-To: Bluez mailing list <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+Subject: Re: [PATCH v3 2/3] ARM: dts: bcm2837-rpi-3-b: Add bcm43438 as serial
+ slave
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <CAL_JsqKxA2pgtjmG-cxy5XPWuRWUiia-weRZDSh4++Vn=QZmqA@mail.gmail.com>
+Date: Thu, 10 Aug 2017 18:15:04 +0200
+Cc: Loic Poulain <loic.poulain@gmail.com>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Ray Jui <rjui@broadcom.com>,
+        Scott Branden <sbranden@broadcom.com>,
+        Florian Fainelli <f.fainelli@gmail.com>,
+        Stefan Wahren <stefan.wahren@i2se.com>,
+        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+        linux-rpi-kernel@lists.infradead.org
+Message-Id: <8186E2A3-D0AC-498F-8229-78862D363F78@holtmann.org>
+References: <1502102366-2760-1-git-send-email-loic.poulain@gmail.com>
+ <1502102366-2760-2-git-send-email-loic.poulain@gmail.com>
+ <CAL_JsqKxA2pgtjmG-cxy5XPWuRWUiia-weRZDSh4++Vn=QZmqA@mail.gmail.com>
+To: Rob Herring <robh+dt@kernel.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello,
+Hi Rob,
 
+>> Add BCM43438 as a slave device of uart0 (pl011/ttyAMA0).
+>> This allows to automatically insert the bcm43438 to the bluetooth
+>> subsystem instead of relying on userspace helpers (hciattach).
+>> 
+>> Overwrite bootargs to use 8250 aux uart (ttyS0) as console instead
+>> of pl011/ttyAMA0.
+>> 
+>> Signed-off-by: Loic Poulain <loic.poulain@gmail.com>
+>> ---
+>> v2: dt-bindings as separate patch
+>>     rebase on upcoming pi3 dts changes
+>> v3: changes in bcm serdev drivers:
+>>     name refactoring and additional comments
+>>     Add generic host_set_baudrate method
+>>     Use agnostic device_property_read
+>> 
+>> arch/arm/boot/dts/bcm2837-rpi-3-b.dts | 10 ++++++++++
+>> 1 file changed, 10 insertions(+)
+>> 
+>> diff --git a/arch/arm/boot/dts/bcm2837-rpi-3-b.dts b/arch/arm/boot/dts/bcm2837-rpi-3-b.dts
+>> index 20725ca..5abc1df 100644
+>> --- a/arch/arm/boot/dts/bcm2837-rpi-3-b.dts
+>> +++ b/arch/arm/boot/dts/bcm2837-rpi-3-b.dts
+>> @@ -8,6 +8,11 @@
+>>        compatible = "raspberrypi,3-model-b", "brcm,bcm2837";
+>>        model = "Raspberry Pi 3 Model B";
+>> 
+>> +       chosen {
+>> +               /* 8250 auxiliar UART instead of pl011 */
+>> +               bootargs = "earlyprintk console=ttyS0,115200";
+> 
+> This is an unrelated change. "earlyprintk" is arm32 specific and only
+> works with a kernel built with a specific uart type and address. Also,
+> stdout-path property is preferred to set the default over "console”.
 
-Over the last couple of years I=E2=80=99ve been doing some work with access=
-ing
-BlueZ from the Python programming language. More recently I=E2=80=99ve been
-trying to create a library to lower the barrier to getting started
-with Bluetooth on Linux. On that library we have recently done a
-retrospective of where we are.
+the whole fun with the serial console on the rPI3 and the bt-miniuart overlay is something we should solve now. What is the upstream story on this since the config.txt and everything around it is confusing and also misleading since it relies on a Raspbian userspace.
 
-(TL;DR https://github.com/ukBaz/python-bluezero/issues/126)
+Do we need to the kernel and init to stay away from the ttyAMA0 to avoid confusing the BT chip? As I mentioned earlier, I can not even get a Fedora 26 with hciattach or btattach to work.
 
-The discussion spilled over to twitter where there was a suggestion
-that some of our concerns should be shared back to the BlueZ project.
-https://twitter.com/sandeepmistry/status/891836962952314880
+Regards
 
+Marcel
 
-I am not sure how relevant our feedback is to the broader user base of
-the BlueZ project. However, it is true that we can=E2=80=99t complain that =
-our
-needs aren=E2=80=99t being addressed by BlueZ if we don=E2=80=99t give feed=
-back.
-
-
-I also accept that part of the issue here is with me as I don=E2=80=99t com=
-e
-from a background where I know about the low level details of
-Bluetooth and the C language. I am coming at this from the direction
-of learning enough to rapidly prototype Python applications that
-contain some Bluetooth functionality.
-
-
-Context:
-
-In my volunteering role as a STEM ambassador I have been a mentor on a
-few school projects for engineering challenges where Bluetooth
-functionality would have been helpful.
-
-These school projects typically use hardware like Raspberry Pi=E2=80=99s, B=
-BC
-micro:bits and tablets/phones where Bluetooth hardware is readily
-available.
-
-My goal is to be able to create workshops that can be run at schools,
-STEM fairs and community maker events that help people get started
-exploring what is possible with Bluetooth and Python.
-
-
-Building From Source:
-
-My first bit of feedback is that things with BlueZ are a lot better
-now than they were a few short years ago. However this is the first
-challenge as it takes a long time for updates to appear in operating
-systems.
-
-The default Raspberry Pi OS is still shipping with BlueZ 5.23 which
-isn=E2=80=99t much use for BLE. Even when Raspbian moves to being a Debian
-Stretch based release, it will be BlueZ 5.43. This means that much of
-the DBus API will be behind the experimental flag and will be missing
-some of the great recent updates such as AcquireWrite, AcquireNotify
-and set name in scan response.
-
-While building from source is something I=E2=80=99ve become comfortable wit=
-h,
-getting organisers of workshop machines and users to do this is often
-too large a barrier to entry.
-
-
-Python DBus Library:
-
-As I=E2=80=99ve written about before on this list, there is not an obvious
-choice when it comes to a Python DBus library. I think the BlueZ
-=E2=80=98test=E2=80=99 Python examples use the dbus-python library. There s=
-eems to be
-concerns about this Python library. Pydbus seems to be a recommended
-library although there seems to be several holes in it for use with
-BlueZ. The owner of the library appears to have moved on to another
-project so updates (or merging of pull requests) seems to be sporadic.
-
-
-Beacons:
-
-Again another topic that has been discussed on this mailing list
-before. There seems to have been a number of people that want to have
-a Linux SBC continuously passively scan for beacons. This is something
-that is not supported by the BlueZ DBus API. I believe the concern is
-with flooding the bus. Could something similar to AcquireNotify be
-done to solve this?
-
-
-Testing:
-
-It would be good to be able to test the Python apps without real
-hardware. It would be good if BlueZ could provide some way of
-mock/fake/stub so that unit testing could be easily done.
-
-The library python-dbusmock showed some promise however the bluez5.py
-template needs some work.
-
-
-Our New Direction - Python Only Solution:
-
-Because of the issues raised above, investigation has started on using
-only Python standard libraries to find a solution for our library.
-This will allow our library to move faster than OS updates allow as it
-will be easy to install directly from PyPI with fewer dependencies.
-
-The current investigation is looking to by-pass bluetoothd by using
-HCI. What we have so far can be seen at:
-https://github.com/TheBubbleworks/python-hcipy
-
-
-Regards,
-
-Barry
