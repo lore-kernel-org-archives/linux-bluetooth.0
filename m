@@ -1,248 +1,48 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CALvjcs-WsTQt4zzgc6VzL_vuGEn3uoA-e-CYucY5j_-UmCfV9g@mail.gmail.com>
-References: <CALvjcs8oUUds4FZscy6FkhfSQ=R026h4D6ufNSoV78DUnoAOOA@mail.gmail.com>
- <CALvjcs8VLt1qkaR2snb+T=82BPLDzydAZ5_rAfYoOeUSkpPQOw@mail.gmail.com> <CALvjcs-WsTQt4zzgc6VzL_vuGEn3uoA-e-CYucY5j_-UmCfV9g@mail.gmail.com>
+In-Reply-To: <CABBYNZJ5cF0Gy-8UBiCaD5P1B4rqbS8NWOQ2YwfYjKYckQBL3Q@mail.gmail.com>
+References: <20170809111859.10644-1-luiz.dentz@gmail.com> <521fe3ec-b1d8-1eda-183a-c2093568b7e3@cisco.com>
+ <CABBYNZJ5cF0Gy-8UBiCaD5P1B4rqbS8NWOQ2YwfYjKYckQBL3Q@mail.gmail.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 10 Aug 2017 14:44:20 +0300
-Message-ID: <CABBYNZJTsU61p55GxDq7gqmaVA2fWTsbYpkxg_uOh0ctA-KP4Q@mail.gmail.com>
-Subject: Re: [PATCH 1/1] client: Fix the selection bug of ad manager
-To: Yunhan Wang <yunhanw@nestlabs.com>
+Date: Thu, 10 Aug 2017 14:38:38 +0300
+Message-ID: <CABBYNZKAu=j6aa4W6sHH3EVi4VswakrwFk+9kxkEyFy9cT3QLQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] device: Fix crash when connecting ATT with BR/EDR
+ only device
+To: =?UTF-8?Q?Per_Waag=C3=B8?= <pwaago@cisco.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Yunhan,
+Hi,
 
-On Thu, Aug 10, 2017 at 7:24 AM, Yunhan Wang <yunhanw@nestlabs.com> wrote:
-> Hi, Luiz
+On Wed, Aug 9, 2017 at 3:59 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi Per,
 >
-> Any suggestion about this fix?
-
-Im unable to apply it, did you use git format-patch + git send-email?
-Also the coding style seems wrong from the looks of it, please check
-the HACKING for the guidelines on how to send patches to the list.
-
-> Thanks
-> Best wishes
-> Yunhan
->
-> On Mon, Aug 7, 2017 at 1:56 PM, Yunhan Wang <yunhanw@nestlabs.com> wrote:
->> Hi Luiz
+> On Wed, Aug 9, 2017 at 3:17 PM, Per Waag=C3=B8 <pwaago@cisco.com> wrote:
+>> Hi Luiz,
 >>
->> Could you help to review this patch and see if we can merge it?
 >>
->> Thanks
->> Best wishes
->> Yunhan
->>
->> On Thu, Aug 3, 2017 at 2:13 PM, Yunhan Wang <yunhanw@nestlabs.com> wrote:
->>> From: Yunhan Wang <yunhanw@google.com>
+>> On 09. aug. 2017 13:18, Luiz Augusto von Dentz wrote:
 >>>
->>> If there are multiple adapters, bluetoothctl may choose the wrong
->>> advertising manager. In addition, select command cannot update
->>> current advertising manager when choosing another adapter. Therefore, we
->>> need to introduce default_ad_manager to handle the above situation,
->>> which is similar to default_ctrl.
+>>> From: Luiz Augusto von Dentz<luiz.von.dentz@intel.com>
+>>>
+>>> The fix introduced in 006213cf4d231ce66de273e96619474bd516359b only
+>>> works for dual mode devices, if the device is BR/EDR the address type
+>>> would match the type on browsing_req so it still possible to crash.
 >>> ---
->>>  client/main.c | 93 ++++++++++++++++++++++++++++++++++++++++++++++++++++-------
->>>  1 file changed, 83 insertions(+), 10 deletions(-)
->>>
->>> diff --git a/client/main.c b/client/main.c
->>> index 17de7f81f..40075f27e 100644
->>> --- a/client/main.c
->>> +++ b/client/main.c
->>> @@ -65,13 +65,19 @@ struct adapter {
->>>   GList *devices;
->>>  };
->>>
->>> +struct LEAdvertisingManager {
->>> + GDBusProxy *proxy;
->>> + char * address;
->>> +};
->>> +
->>>  static struct adapter *default_ctrl;
->>>  static GDBusProxy *default_dev;
->>>  static GDBusProxy *default_attr;
->>> -static GDBusProxy *ad_manager;
->>> +static struct LEAdvertisingManager *default_ad_manager;
->>>  static GList *ctrl_list;
->>> -
->>> +static GList *ad_manager_list;
->>>  static guint input = 0;
->>> +static char * adapter_address;
->>>
->>>  static const char * const agent_arguments[] = {
->>>   "on",
->>> @@ -522,6 +528,7 @@ static void device_added(GDBusProxy *proxy)
->>>  static void adapter_added(GDBusProxy *proxy)
->>>  {
->>>   struct adapter *adapter = g_malloc0(sizeof(struct adapter));
->>> + DBusMessageIter iter;
->>>
->>>   adapter->proxy = proxy;
->>>   ctrl_list = g_list_append(ctrl_list, adapter);
->>> @@ -530,6 +537,23 @@ static void adapter_added(GDBusProxy *proxy)
->>>   default_ctrl = adapter;
->>>
->>>   print_adapter(proxy, COLORED_NEW);
->>> +
->>> + if (g_dbus_proxy_get_property(adapter->proxy, "Address", &iter) == FALSE)
->>> + return;
->>> +
->>> + dbus_message_iter_get_basic(&iter, &adapter_address);
->>> +}
->>> +
->>> +static void ad_manager_added(GDBusProxy *proxy)
->>> +{
->>> +    struct LEAdvertisingManager *ad_manager = g_malloc0(sizeof(struct
->>> LEAdvertisingManager));
->>> +    ad_manager->proxy = proxy;
->>> +    ad_manager->address = adapter_address;
->>> +
->>> +    ad_manager_list = g_list_append(ad_manager_list, ad_manager);
->>> +
->>> +    if(!default_ad_manager)
->>> +        default_ad_manager = ad_manager;
->>>  }
->>>
->>>  static void proxy_added(GDBusProxy *proxy, void *user_data)
->>> @@ -560,7 +584,7 @@ static void proxy_added(GDBusProxy *proxy, void *user_data)
->>>   } else if (!strcmp(interface, "org.bluez.GattManager1")) {
->>>   gatt_add_manager(proxy);
->>>   } else if (!strcmp(interface, "org.bluez.LEAdvertisingManager1")) {
->>> - ad_manager = proxy;
->>> +        ad_manager_added(proxy);
->>>   }
->>>  }
->>>
->>> @@ -615,6 +639,26 @@ static void adapter_removed(GDBusProxy *proxy)
->>>   }
->>>  }
->>>
->>> +static void ad_manager_removed(GDBusProxy *proxy)
->>> +{
->>> + GList *ll;
->>> +
->>> + for (ll = g_list_first(ctrl_list); ll; ll = g_list_next(ll)) {
->>> +        struct LEAdvertisingManager *ad_manager = ll->data;
->>> +
->>> + if (ad_manager->proxy == proxy) {
->>> + if (default_ad_manager && default_ad_manager->proxy == proxy) {
->>> + default_ad_manager = NULL;
->>> + }
->>> +
->>> + ad_manager_list = g_list_remove_link(ad_manager_list, ll);
->>> + g_free(ad_manager);
->>> + g_list_free(ll);
->>> + return;
->>> + }
->>> + }
->>> +}
->>> +
->>>  static void proxy_removed(GDBusProxy *proxy, void *user_data)
->>>  {
->>>   const char *interface;
->>> @@ -649,11 +693,9 @@ static void proxy_removed(GDBusProxy *proxy, void
->>> *user_data)
->>>   } else if (!strcmp(interface, "org.bluez.GattManager1")) {
->>>   gatt_remove_manager(proxy);
->>>   } else if (!strcmp(interface, "org.bluez.LEAdvertisingManager1")) {
->>> - if (ad_manager == proxy) {
->>> - agent_manager = NULL;
->>> - ad_unregister(dbus_conn, NULL);
->>> +        ad_unregister(dbus_conn, proxy);
->>> +        ad_manager_removed(proxy);
->>>   }
->>> - }
->>>  }
->>>
->>>  static struct adapter *find_ctrl(GList *source, const char *path)
->>> @@ -786,6 +828,21 @@ static struct adapter *find_ctrl_by_address(GList
->>> *source, const char *address)
->>>   return NULL;
->>>  }
->>>
->>> +static struct LEAdvertisingManager *find_ad_manager_by_address(GList
->>> *source, const char *address)
->>> +{
->>> + GList *list;
->>> +
->>> + for (list = g_list_first(source); list; list = g_list_next(list)) {
->>> + struct LEAdvertisingManager *ad_manager = list->data;
->>> + DBusMessageIter iter;
->>> +
->>> + if (!strcasecmp(ad_manager->address, address))
->>> + return ad_manager;
->>> + }
->>> +
->>> + return NULL;
->>> +}
->>> +
->>>  static GDBusProxy *find_proxy_by_address(GList *source, const char *address)
->>>  {
->>>   GList *list;
->>> @@ -923,12 +980,15 @@ static void cmd_select(const char *arg)
->>>  {
->>>   struct adapter *adapter;
->>>
->>> + struct LEAdvertisingManager *ad_manager;
->>> +
->>>   if (!arg || !strlen(arg)) {
->>>   rl_printf("Missing controller address argument\n");
->>>   return;
->>>   }
->>>
->>>   adapter = find_ctrl_by_address(ctrl_list, arg);
->>> +
->>>   if (!adapter) {
->>>   rl_printf("Controller %s not available\n", arg);
->>>   return;
->>> @@ -937,7 +997,20 @@ static void cmd_select(const char *arg)
->>>   if (default_ctrl && default_ctrl->proxy == adapter->proxy)
->>>   return;
->>>
->>> + ad_manager = find_ad_manager_by_address(ad_manager_list, arg);
->>> +
->>> + if (!ad_manager) {
->>> + rl_printf("Advertising manager %s not available\n", arg);
->>> + return;
->>> + }
->>> +
->>> + if (default_ad_manager && default_ad_manager->proxy == ad_manager->proxy)
->>> + return;
->>> +
->>>   default_ctrl = adapter;
->>> +
->>> + default_ad_manager = ad_manager;
->>> +
->>>   print_adapter(adapter->proxy, NULL);
->>>  }
->>>
->>> @@ -2296,15 +2369,15 @@ static void cmd_advertise(const char *arg)
->>>   if (parse_argument_advertise(arg, &enable, &type) == FALSE)
->>>   return;
->>>
->>> - if (!ad_manager) {
->>> + if (!default_ad_manager->proxy) {
->>>   rl_printf("LEAdvertisingManager not found\n");
->>>   return;
->>>   }
->>>
->>>   if (enable == TRUE)
->>> - ad_register(dbus_conn, ad_manager, type);
->>> + ad_register(dbus_conn, default_ad_manager->proxy, type);
->>>   else
->>> - ad_unregister(dbus_conn, ad_manager);
->>> + ad_unregister(dbus_conn, default_ad_manager->proxy);
->>>  }
->>>
->>>  static char *ad_generator(const char *text, int state)
->>> --
->>> 2.14.0.rc1.383.gd1ce394fe2-goog
+>>>   src/device.c | 38 +++++++++++++++++++++++---------------
+>>>   1 file changed, 23 insertions(+), 15 deletions(-)
+>>
+>>
+>> I have tested the patch. I can't reproduce the crash anymore when it's i=
+n,
+>> so this solves the problem. Thank you!
+>
+> Let check if it solves the crashes with other devices as well.
 
+Applied.
 
-
--- 
+--=20
 Luiz Augusto von Dentz
