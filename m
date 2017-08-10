@@ -1,67 +1,237 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <4C851F03BEE04A418B7A2D283DDCAB5D27C95F71@EFJDFWMB01.EFJDFW.local>
-References: <4C851F03BEE04A418B7A2D283DDCAB5D27C95F71@EFJDFWMB01.EFJDFW.local>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 10 Aug 2017 13:24:02 +0300
-Message-ID: <CABBYNZJKXF=d1=0skuus1Qr_gCY66b8Jc08ZQi7v3U=E6TLhxA@mail.gmail.com>
-Subject: Re: Operate on BlueZ provided file descriptor in C
-To: Austin Riffle <ARiffle@efji.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Reply-To: yunhanw@nestlabs.com
+In-Reply-To: <CALvjcs8VLt1qkaR2snb+T=82BPLDzydAZ5_rAfYoOeUSkpPQOw@mail.gmail.com>
+References: <CALvjcs8oUUds4FZscy6FkhfSQ=R026h4D6ufNSoV78DUnoAOOA@mail.gmail.com>
+ <CALvjcs8VLt1qkaR2snb+T=82BPLDzydAZ5_rAfYoOeUSkpPQOw@mail.gmail.com>
+From: Yunhan Wang <yunhanw@nestlabs.com>
+Date: Wed, 9 Aug 2017 21:24:46 -0700
+Message-ID: <CALvjcs-WsTQt4zzgc6VzL_vuGEn3uoA-e-CYucY5j_-UmCfV9g@mail.gmail.com>
+Subject: Re: [PATCH 1/1] client: Fix the selection bug of ad manager
+To: linux-bluetooth@vger.kernel.org,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Austin,
+Hi, Luiz
 
-On Thu, Aug 10, 2017 at 5:06 AM, Austin Riffle <ARiffle@efji.com> wrote:
-> Hello
+Any suggestion about this fix?
+
+Thanks
+Best wishes
+Yunhan
+
+On Mon, Aug 7, 2017 at 1:56 PM, Yunhan Wang <yunhanw@nestlabs.com> wrote:
+> Hi Luiz
 >
-> I am attempting to work with the org.bluez.Profile1 in BlueZ 5.44. When c=
-onnecting with a new device via the NewConnection DBus method, we get a fil=
-e descriptor to work with. I am fairly confused on what state this file des=
-criptor is in, and what I need to do in order to read/write from it. Simply=
- calling read/write does not behave as expected for me.
+> Could you help to review this patch and see if we can merge it?
 >
-> In the file test/test-profile, I see this line of python code:
->
-> self.fd =3D fd.take()
->
-> I am struggling to find the Linux C equivalent to the take method, as I b=
-elieve this is what I need to do to operate on the fd. Any advice on how to=
- configure this fd in Linux C code so I can read/write with the fd would be=
- very helpful!
-
-Though the code bellow is not handling the NewConnection it should
-give you clear picture how to deal with file descriptors:
-
-https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/client/gatt.c#n750
-
-Or in case of actual NewConnection you can check how PulseAudio
-implements it for HSP:
-
-https://github.com/pulseaudio/pulseaudio/blob/master/src/modules/bluetooth/=
-backend-native.c#L492
-
 > Thanks
-> Austin
-> This e-mail transmission, and any documents, files or previous e-mail mes=
-sages attached to it, may contain confidential information. If you are not =
-the intended recipient, or a person responsible for delivering it to the in=
-tended recipient, you are hereby notified that any disclosure, distribution=
-, review, copy or use of any of the information contained in or attached to=
- this message is STRICTLY PROHIBITED. If you have received this transmissio=
-n in error, please immediately notify us by reply e-mail, and destroy the o=
-riginal transmission and its attachments without reading them or saving the=
-m to disk. Thank you.
+> Best wishes
+> Yunhan
 >
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth=
-" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-
---=20
-Luiz Augusto von Dentz
+> On Thu, Aug 3, 2017 at 2:13 PM, Yunhan Wang <yunhanw@nestlabs.com> wrote:
+>> From: Yunhan Wang <yunhanw@google.com>
+>>
+>> If there are multiple adapters, bluetoothctl may choose the wrong
+>> advertising manager. In addition, select command cannot update
+>> current advertising manager when choosing another adapter. Therefore, we
+>> need to introduce default_ad_manager to handle the above situation,
+>> which is similar to default_ctrl.
+>> ---
+>>  client/main.c | 93 ++++++++++++++++++++++++++++++++++++++++++++++++++++-------
+>>  1 file changed, 83 insertions(+), 10 deletions(-)
+>>
+>> diff --git a/client/main.c b/client/main.c
+>> index 17de7f81f..40075f27e 100644
+>> --- a/client/main.c
+>> +++ b/client/main.c
+>> @@ -65,13 +65,19 @@ struct adapter {
+>>   GList *devices;
+>>  };
+>>
+>> +struct LEAdvertisingManager {
+>> + GDBusProxy *proxy;
+>> + char * address;
+>> +};
+>> +
+>>  static struct adapter *default_ctrl;
+>>  static GDBusProxy *default_dev;
+>>  static GDBusProxy *default_attr;
+>> -static GDBusProxy *ad_manager;
+>> +static struct LEAdvertisingManager *default_ad_manager;
+>>  static GList *ctrl_list;
+>> -
+>> +static GList *ad_manager_list;
+>>  static guint input = 0;
+>> +static char * adapter_address;
+>>
+>>  static const char * const agent_arguments[] = {
+>>   "on",
+>> @@ -522,6 +528,7 @@ static void device_added(GDBusProxy *proxy)
+>>  static void adapter_added(GDBusProxy *proxy)
+>>  {
+>>   struct adapter *adapter = g_malloc0(sizeof(struct adapter));
+>> + DBusMessageIter iter;
+>>
+>>   adapter->proxy = proxy;
+>>   ctrl_list = g_list_append(ctrl_list, adapter);
+>> @@ -530,6 +537,23 @@ static void adapter_added(GDBusProxy *proxy)
+>>   default_ctrl = adapter;
+>>
+>>   print_adapter(proxy, COLORED_NEW);
+>> +
+>> + if (g_dbus_proxy_get_property(adapter->proxy, "Address", &iter) == FALSE)
+>> + return;
+>> +
+>> + dbus_message_iter_get_basic(&iter, &adapter_address);
+>> +}
+>> +
+>> +static void ad_manager_added(GDBusProxy *proxy)
+>> +{
+>> +    struct LEAdvertisingManager *ad_manager = g_malloc0(sizeof(struct
+>> LEAdvertisingManager));
+>> +    ad_manager->proxy = proxy;
+>> +    ad_manager->address = adapter_address;
+>> +
+>> +    ad_manager_list = g_list_append(ad_manager_list, ad_manager);
+>> +
+>> +    if(!default_ad_manager)
+>> +        default_ad_manager = ad_manager;
+>>  }
+>>
+>>  static void proxy_added(GDBusProxy *proxy, void *user_data)
+>> @@ -560,7 +584,7 @@ static void proxy_added(GDBusProxy *proxy, void *user_data)
+>>   } else if (!strcmp(interface, "org.bluez.GattManager1")) {
+>>   gatt_add_manager(proxy);
+>>   } else if (!strcmp(interface, "org.bluez.LEAdvertisingManager1")) {
+>> - ad_manager = proxy;
+>> +        ad_manager_added(proxy);
+>>   }
+>>  }
+>>
+>> @@ -615,6 +639,26 @@ static void adapter_removed(GDBusProxy *proxy)
+>>   }
+>>  }
+>>
+>> +static void ad_manager_removed(GDBusProxy *proxy)
+>> +{
+>> + GList *ll;
+>> +
+>> + for (ll = g_list_first(ctrl_list); ll; ll = g_list_next(ll)) {
+>> +        struct LEAdvertisingManager *ad_manager = ll->data;
+>> +
+>> + if (ad_manager->proxy == proxy) {
+>> + if (default_ad_manager && default_ad_manager->proxy == proxy) {
+>> + default_ad_manager = NULL;
+>> + }
+>> +
+>> + ad_manager_list = g_list_remove_link(ad_manager_list, ll);
+>> + g_free(ad_manager);
+>> + g_list_free(ll);
+>> + return;
+>> + }
+>> + }
+>> +}
+>> +
+>>  static void proxy_removed(GDBusProxy *proxy, void *user_data)
+>>  {
+>>   const char *interface;
+>> @@ -649,11 +693,9 @@ static void proxy_removed(GDBusProxy *proxy, void
+>> *user_data)
+>>   } else if (!strcmp(interface, "org.bluez.GattManager1")) {
+>>   gatt_remove_manager(proxy);
+>>   } else if (!strcmp(interface, "org.bluez.LEAdvertisingManager1")) {
+>> - if (ad_manager == proxy) {
+>> - agent_manager = NULL;
+>> - ad_unregister(dbus_conn, NULL);
+>> +        ad_unregister(dbus_conn, proxy);
+>> +        ad_manager_removed(proxy);
+>>   }
+>> - }
+>>  }
+>>
+>>  static struct adapter *find_ctrl(GList *source, const char *path)
+>> @@ -786,6 +828,21 @@ static struct adapter *find_ctrl_by_address(GList
+>> *source, const char *address)
+>>   return NULL;
+>>  }
+>>
+>> +static struct LEAdvertisingManager *find_ad_manager_by_address(GList
+>> *source, const char *address)
+>> +{
+>> + GList *list;
+>> +
+>> + for (list = g_list_first(source); list; list = g_list_next(list)) {
+>> + struct LEAdvertisingManager *ad_manager = list->data;
+>> + DBusMessageIter iter;
+>> +
+>> + if (!strcasecmp(ad_manager->address, address))
+>> + return ad_manager;
+>> + }
+>> +
+>> + return NULL;
+>> +}
+>> +
+>>  static GDBusProxy *find_proxy_by_address(GList *source, const char *address)
+>>  {
+>>   GList *list;
+>> @@ -923,12 +980,15 @@ static void cmd_select(const char *arg)
+>>  {
+>>   struct adapter *adapter;
+>>
+>> + struct LEAdvertisingManager *ad_manager;
+>> +
+>>   if (!arg || !strlen(arg)) {
+>>   rl_printf("Missing controller address argument\n");
+>>   return;
+>>   }
+>>
+>>   adapter = find_ctrl_by_address(ctrl_list, arg);
+>> +
+>>   if (!adapter) {
+>>   rl_printf("Controller %s not available\n", arg);
+>>   return;
+>> @@ -937,7 +997,20 @@ static void cmd_select(const char *arg)
+>>   if (default_ctrl && default_ctrl->proxy == adapter->proxy)
+>>   return;
+>>
+>> + ad_manager = find_ad_manager_by_address(ad_manager_list, arg);
+>> +
+>> + if (!ad_manager) {
+>> + rl_printf("Advertising manager %s not available\n", arg);
+>> + return;
+>> + }
+>> +
+>> + if (default_ad_manager && default_ad_manager->proxy == ad_manager->proxy)
+>> + return;
+>> +
+>>   default_ctrl = adapter;
+>> +
+>> + default_ad_manager = ad_manager;
+>> +
+>>   print_adapter(adapter->proxy, NULL);
+>>  }
+>>
+>> @@ -2296,15 +2369,15 @@ static void cmd_advertise(const char *arg)
+>>   if (parse_argument_advertise(arg, &enable, &type) == FALSE)
+>>   return;
+>>
+>> - if (!ad_manager) {
+>> + if (!default_ad_manager->proxy) {
+>>   rl_printf("LEAdvertisingManager not found\n");
+>>   return;
+>>   }
+>>
+>>   if (enable == TRUE)
+>> - ad_register(dbus_conn, ad_manager, type);
+>> + ad_register(dbus_conn, default_ad_manager->proxy, type);
+>>   else
+>> - ad_unregister(dbus_conn, ad_manager);
+>> + ad_unregister(dbus_conn, default_ad_manager->proxy);
+>>  }
+>>
+>>  static char *ad_generator(const char *text, int state)
+>> --
+>> 2.14.0.rc1.383.gd1ce394fe2-goog
