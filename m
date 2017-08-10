@@ -1,70 +1,140 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain; charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Subject: Re: [PATCH v3 2/3] ARM: dts: bcm2837-rpi-3-b: Add bcm43438 as serial
- slave
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CAL_JsqKxA2pgtjmG-cxy5XPWuRWUiia-weRZDSh4++Vn=QZmqA@mail.gmail.com>
-Date: Thu, 10 Aug 2017 18:15:04 +0200
-Cc: Loic Poulain <loic.poulain@gmail.com>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Ray Jui <rjui@broadcom.com>,
-        Scott Branden <sbranden@broadcom.com>,
-        Florian Fainelli <f.fainelli@gmail.com>,
-        Stefan Wahren <stefan.wahren@i2se.com>,
-        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-        linux-rpi-kernel@lists.infradead.org
-Message-Id: <8186E2A3-D0AC-498F-8229-78862D363F78@holtmann.org>
-References: <1502102366-2760-1-git-send-email-loic.poulain@gmail.com>
- <1502102366-2760-2-git-send-email-loic.poulain@gmail.com>
- <CAL_JsqKxA2pgtjmG-cxy5XPWuRWUiia-weRZDSh4++Vn=QZmqA@mail.gmail.com>
-To: Rob Herring <robh+dt@kernel.org>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v8 14/14] client: Enable set-advertise-appearance to set Appearance
+Date: Thu, 10 Aug 2017 16:32:51 +0300
+Message-Id: <20170810133251.23920-14-luiz.dentz@gmail.com>
+In-Reply-To: <20170810133251.23920-1-luiz.dentz@gmail.com>
+References: <20170810133251.23920-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Rob,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
->> Add BCM43438 as a slave device of uart0 (pl011/ttyAMA0).
->> This allows to automatically insert the bcm43438 to the bluetooth
->> subsystem instead of relying on userspace helpers (hciattach).
->> 
->> Overwrite bootargs to use 8250 aux uart (ttyS0) as console instead
->> of pl011/ttyAMA0.
->> 
->> Signed-off-by: Loic Poulain <loic.poulain@gmail.com>
->> ---
->> v2: dt-bindings as separate patch
->>     rebase on upcoming pi3 dts changes
->> v3: changes in bcm serdev drivers:
->>     name refactoring and additional comments
->>     Add generic host_set_baudrate method
->>     Use agnostic device_property_read
->> 
->> arch/arm/boot/dts/bcm2837-rpi-3-b.dts | 10 ++++++++++
->> 1 file changed, 10 insertions(+)
->> 
->> diff --git a/arch/arm/boot/dts/bcm2837-rpi-3-b.dts b/arch/arm/boot/dts/bcm2837-rpi-3-b.dts
->> index 20725ca..5abc1df 100644
->> --- a/arch/arm/boot/dts/bcm2837-rpi-3-b.dts
->> +++ b/arch/arm/boot/dts/bcm2837-rpi-3-b.dts
->> @@ -8,6 +8,11 @@
->>        compatible = "raspberrypi,3-model-b", "brcm,bcm2837";
->>        model = "Raspberry Pi 3 Model B";
->> 
->> +       chosen {
->> +               /* 8250 auxiliar UART instead of pl011 */
->> +               bootargs = "earlyprintk console=ttyS0,115200";
-> 
-> This is an unrelated change. "earlyprintk" is arm32 specific and only
-> works with a kernel built with a specific uart type and address. Also,
-> stdout-path property is preferred to set the default over "console”.
+This enables set-advertise-appearance to use Appearance property:
 
-the whole fun with the serial console on the rPI3 and the bt-miniuart overlay is something we should solve now. What is the upstream story on this since the config.txt and everything around it is confusing and also misleading since it relies on a Raspbian userspace.
+[bluetooth]# set-advertise-appearance 128
+[bluetooth]# advertise on
 
-Do we need to the kernel and init to stay away from the ttyAMA0 to avoid confusing the BT chip? As I mentioned earlier, I can not even get a Fedora 26 with hciattach or btattach to work.
+@ MGMT Command: Add Advertising (0x003e) plen 15
+        Instance: 1
+        Flags: 0x00000003
+          Switch into Connectable mode
+          Advertise as Discoverable
+        Duration: 0
+        Timeout: 0
+        Advertising data length: 4
+        Appearance: Computer (0x0080)
+        Scan response length: 0
+---
+ client/advertising.c | 28 +++++++++++++++++++++++++++-
+ client/advertising.h |  1 +
+ client/main.c        | 11 ++++++++++-
+ 3 files changed, 38 insertions(+), 2 deletions(-)
 
-Regards
-
-Marcel
+diff --git a/client/advertising.c b/client/advertising.c
+index 571b6e619..696621be3 100644
+--- a/client/advertising.c
++++ b/client/advertising.c
+@@ -58,6 +58,7 @@ static struct ad {
+ 	bool registered;
+ 	char *type;
+ 	char *local_name;
++	uint16_t local_appearance;
+ 	char **uuids;
+ 	size_t uuids_len;
+ 	struct service_data service;
+@@ -65,7 +66,9 @@ static struct ad {
+ 	bool tx_power;
+ 	bool name;
+ 	bool appearance;
+-} ad;
++} ad = {
++	.local_appearance = UINT16_MAX,
++};
+ 
+ static void ad_release(DBusConnection *conn)
+ {
+@@ -304,6 +307,20 @@ static gboolean get_local_name(const GDBusPropertyTable *property,
+ 	return TRUE;
+ }
+ 
++static gboolean appearance_exits(const GDBusPropertyTable *property, void *data)
++{
++	return ad.local_appearance != UINT16_MAX ? TRUE : FALSE;
++}
++
++static gboolean get_appearance(const GDBusPropertyTable *property,
++				DBusMessageIter *iter, void *user_data)
++{
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_UINT16,
++							&ad.local_appearance);
++
++	return TRUE;
++}
++
+ static const GDBusPropertyTable ad_props[] = {
+ 	{ "Type", "s", get_type },
+ 	{ "ServiceUUIDs", "as", get_uuids, NULL, uuids_exists },
+@@ -312,6 +329,7 @@ static const GDBusPropertyTable ad_props[] = {
+ 						manufacturer_data_exists },
+ 	{ "Includes", "as", get_includes, NULL, includes_exists },
+ 	{ "LocalName", "s", get_local_name, NULL, local_name_exits },
++	{ "Appearance", "q", get_appearance, NULL, appearance_exits },
+ 	{ }
+ };
+ 
+@@ -524,4 +542,12 @@ void ad_advertise_local_name(const char *name)
+ void ad_advertise_appearance(bool value)
+ {
+ 	ad.appearance = value;
++
++	if (!value)
++		ad.local_appearance = UINT16_MAX;
++}
++
++void ad_advertise_local_appearance(uint16_t value)
++{
++	ad.local_appearance = value;
+ }
+diff --git a/client/advertising.h b/client/advertising.h
+index 255743562..5ea57adb3 100644
+--- a/client/advertising.h
++++ b/client/advertising.h
+@@ -31,3 +31,4 @@ void ad_advertise_tx_power(bool value);
+ void ad_advertise_name(bool value);
+ void ad_advertise_appearance(bool value);
+ void ad_advertise_local_name(const char *name);
++void ad_advertise_local_appearance(uint16_t value);
+diff --git a/client/main.c b/client/main.c
+index 328a5ee3a..6b1c73f99 100644
+--- a/client/main.c
++++ b/client/main.c
+@@ -2384,6 +2384,9 @@ static void cmd_set_advertise_name(const char *arg)
+ 
+ static void cmd_set_advertise_appearance(const char *arg)
+ {
++	long int value;
++	char *endptr = NULL;
++
+ 	if (arg == NULL || strlen(arg) == 0) {
+ 		rl_printf("Missing value argument\n");
+ 		return;
+@@ -2399,7 +2402,13 @@ static void cmd_set_advertise_appearance(const char *arg)
+ 		return;
+ 	}
+ 
+-	rl_printf("Invalid argument\n");
++	value = strtol(arg, &endptr, 0);
++	if (!endptr || *endptr != '\0' || value > UINT16_MAX) {
++		rl_printf("Invalid argument\n");
++		return;
++	}
++
++	ad_advertise_local_appearance(value);
+ }
+ 
+ static const struct {
+-- 
+2.13.4
 
