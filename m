@@ -1,9 +1,9 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v8 14/14] client: Enable set-advertise-appearance to set Appearance
-Date: Thu, 10 Aug 2017 16:32:51 +0300
-Message-Id: <20170810133251.23920-14-luiz.dentz@gmail.com>
+Subject: [PATCH v8 13/14] advertising: Add Appearance property
+Date: Thu, 10 Aug 2017 16:32:50 +0300
+Message-Id: <20170810133251.23920-13-luiz.dentz@gmail.com>
 In-Reply-To: <20170810133251.23920-1-luiz.dentz@gmail.com>
 References: <20170810133251.23920-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,130 +11,104 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This enables set-advertise-appearance to use Appearance property:
-
-[bluetooth]# set-advertise-appearance 128
-[bluetooth]# advertise on
-
-@ MGMT Command: Add Advertising (0x003e) plen 15
-        Instance: 1
-        Flags: 0x00000003
-          Switch into Connectable mode
-          Advertise as Discoverable
-        Duration: 0
-        Timeout: 0
-        Advertising data length: 4
-        Appearance: Computer (0x0080)
-        Scan response length: 0
+With this property applications can select their own appearance to be
+advertised, as opposed to just including the adapter's appearance.
 ---
- client/advertising.c | 28 +++++++++++++++++++++++++++-
- client/advertising.h |  1 +
- client/main.c        | 11 ++++++++++-
- 3 files changed, 38 insertions(+), 2 deletions(-)
+ doc/advertising-api.txt |  6 ++++++
+ src/advertising.c       | 35 +++++++++++++++++++++++++++++++----
+ 2 files changed, 37 insertions(+), 4 deletions(-)
 
-diff --git a/client/advertising.c b/client/advertising.c
-index 571b6e619..696621be3 100644
---- a/client/advertising.c
-+++ b/client/advertising.c
-@@ -58,6 +58,7 @@ static struct ad {
- 	bool registered;
- 	char *type;
- 	char *local_name;
-+	uint16_t local_appearance;
- 	char **uuids;
- 	size_t uuids_len;
- 	struct service_data service;
-@@ -65,7 +66,9 @@ static struct ad {
- 	bool tx_power;
- 	bool name;
- 	bool appearance;
--} ad;
-+} ad = {
-+	.local_appearance = UINT16_MAX,
-+};
+diff --git a/doc/advertising-api.txt b/doc/advertising-api.txt
+index c9bc9a148..36fe130d9 100644
+--- a/doc/advertising-api.txt
++++ b/doc/advertising-api.txt
+@@ -78,6 +78,12 @@ Properties	string Type
+ 			If this property is available 'local-name' cannot be
+ 			present in the Includes.
  
- static void ad_release(DBusConnection *conn)
- {
-@@ -304,6 +307,20 @@ static gboolean get_local_name(const GDBusPropertyTable *property,
- 	return TRUE;
++		uint16 Appearance
++
++			Appearance to be used in the advertising report.
++
++			Possible values: as found on GAP Service.
++
+ LE Advertising Manager hierarchy
+ ================================
+ 
+diff --git a/src/advertising.c b/src/advertising.c
+index e45207071..9eb22b9fd 100644
+--- a/src/advertising.c
++++ b/src/advertising.c
+@@ -62,6 +62,7 @@ struct btd_adv_client {
+ 	char *owner;
+ 	char *path;
+ 	char *name;
++	uint16_t appearance;
+ 	GDBusClient *client;
+ 	GDBusProxy *proxy;
+ 	DBusMessage *reg;
+@@ -472,6 +473,22 @@ static bool parse_local_name(DBusMessageIter *iter,
+ 	return true;
  }
  
-+static gboolean appearance_exits(const GDBusPropertyTable *property, void *data)
++static bool parse_appearance(DBusMessageIter *iter,
++					struct btd_adv_client *client)
 +{
-+	return ad.local_appearance != UINT16_MAX ? TRUE : FALSE;
-+}
++	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_UINT16)
++		return false;
 +
-+static gboolean get_appearance(const GDBusPropertyTable *property,
-+				DBusMessageIter *iter, void *user_data)
-+{
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_UINT16,
-+							&ad.local_appearance);
-+
-+	return TRUE;
-+}
-+
- static const GDBusPropertyTable ad_props[] = {
- 	{ "Type", "s", get_type },
- 	{ "ServiceUUIDs", "as", get_uuids, NULL, uuids_exists },
-@@ -312,6 +329,7 @@ static const GDBusPropertyTable ad_props[] = {
- 						manufacturer_data_exists },
- 	{ "Includes", "as", get_includes, NULL, includes_exists },
- 	{ "LocalName", "s", get_local_name, NULL, local_name_exits },
-+	{ "Appearance", "q", get_appearance, NULL, appearance_exits },
- 	{ }
- };
- 
-@@ -524,4 +542,12 @@ void ad_advertise_local_name(const char *name)
- void ad_advertise_appearance(bool value)
- {
- 	ad.appearance = value;
-+
-+	if (!value)
-+		ad.local_appearance = UINT16_MAX;
-+}
-+
-+void ad_advertise_local_appearance(uint16_t value)
-+{
-+	ad.local_appearance = value;
- }
-diff --git a/client/advertising.h b/client/advertising.h
-index 255743562..5ea57adb3 100644
---- a/client/advertising.h
-+++ b/client/advertising.h
-@@ -31,3 +31,4 @@ void ad_advertise_tx_power(bool value);
- void ad_advertise_name(bool value);
- void ad_advertise_appearance(bool value);
- void ad_advertise_local_name(const char *name);
-+void ad_advertise_local_appearance(uint16_t value);
-diff --git a/client/main.c b/client/main.c
-index 328a5ee3a..6b1c73f99 100644
---- a/client/main.c
-+++ b/client/main.c
-@@ -2384,6 +2384,9 @@ static void cmd_set_advertise_name(const char *arg)
- 
- static void cmd_set_advertise_appearance(const char *arg)
- {
-+	long int value;
-+	char *endptr = NULL;
-+
- 	if (arg == NULL || strlen(arg) == 0) {
- 		rl_printf("Missing value argument\n");
- 		return;
-@@ -2399,7 +2402,13 @@ static void cmd_set_advertise_appearance(const char *arg)
- 		return;
- 	}
- 
--	rl_printf("Invalid argument\n");
-+	value = strtol(arg, &endptr, 0);
-+	if (!endptr || *endptr != '\0' || value > UINT16_MAX) {
-+		rl_printf("Invalid argument\n");
-+		return;
++	if (client->flags & MGMT_ADV_FLAG_APPEARANCE) {
++		error("Appearance already included");
++		return false;
 +	}
 +
-+	ad_advertise_local_appearance(value);
- }
++	dbus_message_iter_get_basic(iter, &client->appearance);
++
++	return true;
++}
++
+ static struct adv_parser {
+ 	const char *name;
+ 	bool (*func)(DBusMessageIter *iter, struct btd_adv_client *client);
+@@ -483,6 +500,7 @@ static struct adv_parser {
+ 	{ "ServiceData", parse_service_data },
+ 	{ "Includes", parse_includes },
+ 	{ "LocalName", parse_local_name },
++	{ "Appearance", parse_appearance },
+ 	{ },
+ };
  
- static const struct {
+@@ -562,10 +580,18 @@ static size_t calc_max_adv_len(struct btd_adv_client *client, uint32_t flags)
+ static uint8_t *generate_adv_data(struct btd_adv_client *client,
+ 						uint32_t *flags, size_t *len)
+ {
+-	if ((*flags & MGMT_ADV_FLAG_APPEARANCE)) {
+-		*flags &= ~MGMT_ADV_FLAG_APPEARANCE;
+-		/* TODO: Get the appearance from the adaptor once supported. */
+-		bt_ad_add_appearance(client->data, 0x0000);
++	if ((*flags & MGMT_ADV_FLAG_APPEARANCE) ||
++					client->appearance != UINT16_MAX) {
++		uint16_t appearance;
++
++		appearance = client->appearance;
++		if (appearance == UINT16_MAX)
++			/* TODO: Get the appearance from the adaptor once
++			 * supported.
++			 */
++			appearance = 0x000;
++
++		bt_ad_add_appearance(client->data, appearance);
+ 	}
+ 
+ 	return bt_ad_generate(client->data, len);
+@@ -753,6 +779,7 @@ static struct btd_adv_client *client_create(struct btd_adv_manager *manager,
+ 		goto fail;
+ 
+ 	client->manager = manager;
++	client->appearance = UINT16_MAX;
+ 
+ 	return client;
+ 
 -- 
 2.13.4
 
