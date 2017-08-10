@@ -1,63 +1,67 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+MIME-Version: 1.0
+In-Reply-To: <7B53A3173656CB4190908401FE75F4F85CC0D1CE@exgmbxfz01.sasken.com>
+References: <7B53A3173656CB4190908401FE75F4F85CC0D1CE@exgmbxfz01.sasken.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v8 01/14] advertising: Ensure all instances are reset during init
-Date: Thu, 10 Aug 2017 16:32:38 +0300
-Message-Id: <20170810133251.23920-1-luiz.dentz@gmail.com>
+Date: Thu, 10 Aug 2017 16:15:54 +0300
+Message-ID: <CABBYNZJncfY1tPqVTXbGG0eUtj9C56hh8YbiBLH3T_pyM=zziw@mail.gmail.com>
+Subject: Re: Query Regaring usage of RegisterApplication Method using Gio Api
+To: Anitha Chandrasekar <anitha.chandrasekar@sasken.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Anitha,
 
-If for some reason bluetoothd crashes or is killed it may leave
-instances behind.
----
- src/advertising.c | 24 +++++++++++++++++++++++-
- 1 file changed, 23 insertions(+), 1 deletion(-)
+On Tue, Aug 8, 2017 at 3:01 PM, Anitha Chandrasekar
+<anitha.chandrasekar@sasken.com> wrote:
+> Hi ,
+>
+> We need to call RegisterApplication function from our application for aut=
+o-connect of devices. We are registering the GattProfile1 object and callin=
+g RegisterApplication method using Gio Api.
+>
+> But we are getting a "No object Found " error every time. Could you pleas=
+e let us know if there is any example code for the same or if you could sug=
+gest the API usage from d-feet tool.
+> d-feet ->
+> I dont see GattProfile1 being listed in d-feet and there is only Register=
+Application api, can I know what input params to be given and usage of it.T=
+hanks in advance.
 
-diff --git a/src/advertising.c b/src/advertising.c
-index c2af3acb4..64d5a27bb 100644
---- a/src/advertising.c
-+++ b/src/advertising.c
-@@ -144,6 +144,22 @@ static void client_destroy(void *data)
- 	client_free(data);
- }
- 
-+static void remove_advertising(struct btd_adv_manager *manager,
-+						uint8_t instance)
-+{
-+	struct mgmt_cp_remove_advertising cp;
-+
-+	if (instance)
-+		DBG("instance %u", instance);
-+	else
-+		DBG("all instances");
-+
-+	cp.instance = instance;
-+
-+	mgmt_send(manager->mgmt, MGMT_OP_REMOVE_ADVERTISING,
-+			manager->mgmt_index, sizeof(cp), &cp, NULL, NULL, NULL);
-+}
-+
- static void client_remove(void *data)
- {
- 	struct btd_adv_client *client = data;
-@@ -791,8 +807,14 @@ static void read_adv_features_callback(uint8_t status, uint16_t length,
- 	if (!g_dbus_register_interface(btd_get_dbus_connection(),
- 					adapter_get_path(manager->adapter),
- 					LE_ADVERTISING_MGR_IFACE, methods,
--					NULL, properties, manager, NULL))
-+					NULL, properties, manager, NULL)) {
- 		error("Failed to register " LE_ADVERTISING_MGR_IFACE);
-+		return;
-+	}
-+
-+	/* Reset existing instances */
-+	if (feat->num_instances)
-+		remove_advertising(manager, 0);
- }
- 
- static struct btd_adv_manager *manager_create(struct btd_adapter *adapter)
--- 
-2.13.4
+You need to implement GattProfile1 in the side of the application and
+that should contain ObjectManager object since that is how bluetoothd
+is able to list the available objects, you should be able to see the
+available interfaces your application have all interfaces in d-feet.
 
+> Regards,
+> Anitha
+>
+> ________________________________
+>
+> SASKEN BUSINESS DISCLAIMER: This message may contain confidential, propri=
+etary or legally privileged information. In case you are not the original i=
+ntended Recipient of the message, you must not, directly or indirectly, use=
+, disclose, distribute, print, or copy any part of this message and you are=
+ requested to delete it and inform the sender. Any views expressed in this =
+message are those of the individual sender unless otherwise stated. Nothing=
+ contained in this message shall be construed as an offer or acceptance of =
+any offer by Sasken Technologies Limited ( formerly known as "Sasken Commun=
+ication Technologies Limited" ) unless sent with that express intent and wi=
+th due authority of Sasken. Sasken has taken enough precautions to prevent =
+the spread of viruses. However the company accepts no liability for any dam=
+age caused by any virus transmitted by this email.
+> Read Disclaimer at http://www.sasken.com/mail-disclaimer/
+>
+> ________________________________
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth=
+" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
+--=20
+Luiz Augusto von Dentz
