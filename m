@@ -1,9 +1,9 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v8 12/14] client: Enable set-advertise-name to set LocalName
-Date: Thu, 10 Aug 2017 16:32:49 +0300
-Message-Id: <20170810133251.23920-12-luiz.dentz@gmail.com>
+Subject: [PATCH v8 11/14] advertising: Add LocalName property
+Date: Thu, 10 Aug 2017 16:32:48 +0300
+Message-Id: <20170810133251.23920-11-luiz.dentz@gmail.com>
 In-Reply-To: <20170810133251.23920-1-luiz.dentz@gmail.com>
 References: <20170810133251.23920-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,114 +11,107 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This enables set-advertise-name to use LocalName property:
-
-[bluetooth]# set-advertise-name blah
-[bluetooth]# advertise on
-
-@ MGMT Command: Add Advertising (0x003e) plen 17
-        Instance: 1
-        Flags: 0x00000003
-          Switch into Connectable mode
-          Advertise as Discoverable
-        Duration: 0
-        Timeout: 0
-        Advertising data length: 0
-        Scan response length: 6
-        Name (complete): blah
+With this property applications can select their own local name to be
+advertised, as opposed to just including the adapter's name.
 ---
- client/advertising.c | 24 ++++++++++++++++++++++++
- client/advertising.h |  1 +
- client/main.c        |  4 ++--
- 3 files changed, 27 insertions(+), 2 deletions(-)
+ doc/advertising-api.txt |  9 +++++++++
+ src/advertising.c       | 29 +++++++++++++++++++++++++++--
+ 2 files changed, 36 insertions(+), 2 deletions(-)
 
-diff --git a/client/advertising.c b/client/advertising.c
-index 35e582afc..571b6e619 100644
---- a/client/advertising.c
-+++ b/client/advertising.c
-@@ -57,6 +57,7 @@ struct manufacturer_data {
- static struct ad {
- 	bool registered;
- 	char *type;
-+	char *local_name;
- 	char **uuids;
- 	size_t uuids_len;
- 	struct service_data service;
-@@ -290,6 +291,19 @@ static gboolean get_includes(const GDBusPropertyTable *property,
- 	return TRUE;
+diff --git a/doc/advertising-api.txt b/doc/advertising-api.txt
+index 65f1331a9..c9bc9a148 100644
+--- a/doc/advertising-api.txt
++++ b/doc/advertising-api.txt
+@@ -69,6 +69,15 @@ Properties	string Type
+ 			Possible values: as found on
+ 					LEAdvertisingManager.SupportedIncludes
+ 
++		string LocalName
++
++			Local name to be used in the advertising report. If the
++			string is too big to fit into the packet it will be
++			truncated.
++
++			If this property is available 'local-name' cannot be
++			present in the Includes.
++
+ LE Advertising Manager hierarchy
+ ================================
+ 
+diff --git a/src/advertising.c b/src/advertising.c
+index 61b17e400..e45207071 100644
+--- a/src/advertising.c
++++ b/src/advertising.c
+@@ -61,6 +61,7 @@ struct btd_adv_client {
+ 	struct btd_adv_manager *manager;
+ 	char *owner;
+ 	char *path;
++	char *name;
+ 	GDBusClient *client;
+ 	GDBusProxy *proxy;
+ 	DBusMessage *reg;
+@@ -114,6 +115,7 @@ static void client_free(void *data)
+ 	if (client->path)
+ 		g_free(client->path);
+ 
++	free(client->name);
+ 	free(client);
  }
  
-+static gboolean local_name_exits(const GDBusPropertyTable *property, void *data)
+@@ -450,6 +452,26 @@ static bool parse_includes(DBusMessageIter *iter,
+ 	return true;
+ }
+ 
++static bool parse_local_name(DBusMessageIter *iter,
++					struct btd_adv_client *client)
 +{
-+	return ad.local_name ? TRUE : FALSE;
++	const char *name;
++
++	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_STRING)
++		return false;
++
++	if (client->flags & MGMT_ADV_FLAG_LOCAL_NAME) {
++		error("Local name already included");
++		return false;
++	}
++
++	dbus_message_iter_get_basic(iter, &name);
++
++	client->name = strdup(name);
++
++	return true;
 +}
 +
-+static gboolean get_local_name(const GDBusPropertyTable *property,
-+				DBusMessageIter *iter, void *user_data)
-+{
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &ad.local_name);
-+
-+	return TRUE;
-+}
-+
- static const GDBusPropertyTable ad_props[] = {
- 	{ "Type", "s", get_type },
- 	{ "ServiceUUIDs", "as", get_uuids, NULL, uuids_exists },
-@@ -297,6 +311,7 @@ static const GDBusPropertyTable ad_props[] = {
- 	{ "ManufacturerData", "a{qv}", get_manufacturer_data, NULL,
- 						manufacturer_data_exists },
- 	{ "Includes", "as", get_includes, NULL, includes_exists },
-+	{ "LocalName", "s", get_local_name, NULL, local_name_exits },
- 	{ }
+ static struct adv_parser {
+ 	const char *name;
+ 	bool (*func)(DBusMessageIter *iter, struct btd_adv_client *client);
+@@ -460,6 +482,7 @@ static struct adv_parser {
+ 	{ "ManufacturerData", parse_manufacturer_data },
+ 	{ "ServiceData", parse_service_data },
+ 	{ "Includes", parse_includes },
++	{ "LocalName", parse_local_name },
+ 	{ },
  };
  
-@@ -495,6 +510,15 @@ void ad_advertise_tx_power(bool value)
- void ad_advertise_name(bool value)
- {
- 	ad.name = value;
-+
-+	if (!value)
-+		free(ad.local_name);
-+}
-+
-+void ad_advertise_local_name(const char *name)
-+{
-+	free(ad.local_name);
-+	ad.local_name = strdup(name);
- }
+@@ -554,14 +577,16 @@ static uint8_t *generate_scan_rsp(struct btd_adv_client *client,
+ 	struct btd_adv_manager *manager = client->manager;
+ 	const char *name;
  
- void ad_advertise_appearance(bool value)
-diff --git a/client/advertising.h b/client/advertising.h
-index 77fc1cca5..255743562 100644
---- a/client/advertising.h
-+++ b/client/advertising.h
-@@ -30,3 +30,4 @@ void ad_advertise_manufacturer(const char *arg);
- void ad_advertise_tx_power(bool value);
- void ad_advertise_name(bool value);
- void ad_advertise_appearance(bool value);
-+void ad_advertise_local_name(const char *name);
-diff --git a/client/main.c b/client/main.c
-index 0bc2a8896..328a5ee3a 100644
---- a/client/main.c
-+++ b/client/main.c
-@@ -2379,7 +2379,7 @@ static void cmd_set_advertise_name(const char *arg)
- 		return;
+-	if (!(*flags & MGMT_ADV_FLAG_LOCAL_NAME)) {
++	if (!(*flags & MGMT_ADV_FLAG_LOCAL_NAME) && !client->name) {
+ 		*len = 0;
+ 		return NULL;
  	}
  
--	rl_printf("Invalid argument\n");
-+	ad_advertise_local_name(arg);
- }
+ 	*flags &= ~MGMT_ADV_FLAG_LOCAL_NAME;
  
- static void cmd_set_advertise_appearance(const char *arg)
-@@ -2446,7 +2446,7 @@ static const struct {
- 	{ "set-advertise-tx-power", "<on/off>",
- 			cmd_set_advertise_tx_power,
- 			"Enable/disable TX power to be advertised" },
--	{ "set-advertise-name", "<on/off>", cmd_set_advertise_name,
-+	{ "set-advertise-name", "<on/off/name>", cmd_set_advertise_name,
- 			"Enable/disable local name to be advertised" },
- 	{ "set-advertise-appearance", "<value>", cmd_set_advertise_appearance,
- 			"Set custom appearance to be advertised" },
+-	name = btd_adapter_get_name(manager->adapter);
++	name = client->name;
++	if (!name)
++		name = btd_adapter_get_name(manager->adapter);
+ 
+ 	bt_ad_add_name(client->scan, name);
+ 
 -- 
 2.13.4
 
