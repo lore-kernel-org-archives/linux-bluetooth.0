@@ -1,48 +1,67 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZJ5cF0Gy-8UBiCaD5P1B4rqbS8NWOQ2YwfYjKYckQBL3Q@mail.gmail.com>
-References: <20170809111859.10644-1-luiz.dentz@gmail.com> <521fe3ec-b1d8-1eda-183a-c2093568b7e3@cisco.com>
- <CABBYNZJ5cF0Gy-8UBiCaD5P1B4rqbS8NWOQ2YwfYjKYckQBL3Q@mail.gmail.com>
+In-Reply-To: <4C851F03BEE04A418B7A2D283DDCAB5D27C95F71@EFJDFWMB01.EFJDFW.local>
+References: <4C851F03BEE04A418B7A2D283DDCAB5D27C95F71@EFJDFWMB01.EFJDFW.local>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 10 Aug 2017 14:38:38 +0300
-Message-ID: <CABBYNZKAu=j6aa4W6sHH3EVi4VswakrwFk+9kxkEyFy9cT3QLQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] device: Fix crash when connecting ATT with BR/EDR
- only device
-To: =?UTF-8?Q?Per_Waag=C3=B8?= <pwaago@cisco.com>
+Date: Thu, 10 Aug 2017 13:24:02 +0300
+Message-ID: <CABBYNZJKXF=d1=0skuus1Qr_gCY66b8Jc08ZQi7v3U=E6TLhxA@mail.gmail.com>
+Subject: Re: Operate on BlueZ provided file descriptor in C
+To: Austin Riffle <ARiffle@efji.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Austin,
 
-On Wed, Aug 9, 2017 at 3:59 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi Per,
+On Thu, Aug 10, 2017 at 5:06 AM, Austin Riffle <ARiffle@efji.com> wrote:
+> Hello
 >
-> On Wed, Aug 9, 2017 at 3:17 PM, Per Waag=C3=B8 <pwaago@cisco.com> wrote:
->> Hi Luiz,
->>
->>
->> On 09. aug. 2017 13:18, Luiz Augusto von Dentz wrote:
->>>
->>> From: Luiz Augusto von Dentz<luiz.von.dentz@intel.com>
->>>
->>> The fix introduced in 006213cf4d231ce66de273e96619474bd516359b only
->>> works for dual mode devices, if the device is BR/EDR the address type
->>> would match the type on browsing_req so it still possible to crash.
->>> ---
->>>   src/device.c | 38 +++++++++++++++++++++++---------------
->>>   1 file changed, 23 insertions(+), 15 deletions(-)
->>
->>
->> I have tested the patch. I can't reproduce the crash anymore when it's i=
-n,
->> so this solves the problem. Thank you!
+> I am attempting to work with the org.bluez.Profile1 in BlueZ 5.44. When c=
+onnecting with a new device via the NewConnection DBus method, we get a fil=
+e descriptor to work with. I am fairly confused on what state this file des=
+criptor is in, and what I need to do in order to read/write from it. Simply=
+ calling read/write does not behave as expected for me.
 >
-> Let check if it solves the crashes with other devices as well.
+> In the file test/test-profile, I see this line of python code:
+>
+> self.fd =3D fd.take()
+>
+> I am struggling to find the Linux C equivalent to the take method, as I b=
+elieve this is what I need to do to operate on the fd. Any advice on how to=
+ configure this fd in Linux C code so I can read/write with the fd would be=
+ very helpful!
 
-Applied.
+Though the code bellow is not handling the NewConnection it should
+give you clear picture how to deal with file descriptors:
+
+https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/client/gatt.c#n750
+
+Or in case of actual NewConnection you can check how PulseAudio
+implements it for HSP:
+
+https://github.com/pulseaudio/pulseaudio/blob/master/src/modules/bluetooth/=
+backend-native.c#L492
+
+> Thanks
+> Austin
+> This e-mail transmission, and any documents, files or previous e-mail mes=
+sages attached to it, may contain confidential information. If you are not =
+the intended recipient, or a person responsible for delivering it to the in=
+tended recipient, you are hereby notified that any disclosure, distribution=
+, review, copy or use of any of the information contained in or attached to=
+ this message is STRICTLY PROHIBITED. If you have received this transmissio=
+n in error, please immediately notify us by reply e-mail, and destroy the o=
+riginal transmission and its attachments without reading them or saving the=
+m to disk. Thank you.
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth=
+" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
 
 --=20
 Luiz Augusto von Dentz
