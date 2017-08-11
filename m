@@ -1,42 +1,36 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Vinicius Costa Gomes <vinicius.gomes@intel.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ] gdbus: Fix calling GetAll while GetManagedObject is pending
-In-Reply-To: <20170811125815.964-1-luiz.dentz@gmail.com>
-References: <20170811125815.964-1-luiz.dentz@gmail.com>
-Date: Fri, 11 Aug 2017 12:56:17 -0700
-Message-ID: <87shgxev4u.fsf@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+Subject: Re: [PATCH][next] Bluetooth: kfree tmp rather than an alias to it
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20170811183304.17580-1-colin.king@canonical.com>
+Date: Fri, 11 Aug 2017 21:20:26 +0200
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+        Netdev list <netdev@vger.kernel.org>,
+        kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
+Message-Id: <5F62B3BB-4288-42A6-8BD6-6E39EEAB7C58@holtmann.org>
+References: <20170811183304.17580-1-colin.king@canonical.com>
+To: Colin King <colin.king@canonical.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Colin,
 
-Luiz Augusto von Dentz <luiz.dentz@gmail.com> writes:
+> While the kfree of dhkey_a is of the same address of tmp, it
+> probably is clearer and more human readable if tmp is kfree'd
+> rather than dhkey_a.
+> 
+> Detected by CoverityScan, CID#1448650 ("Free of address-of expression")
+> Signed-off-by: Colin Ian King <colin.king@canonical.com>
+> ---
+> net/bluetooth/selftest.c | 2 +-
+> 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> If proxies are created while the client is not ready put them into a
-> pending list so only if they are not found in GetManagedObject reply
-> call GetAll.
+patch has been applied to bluetooth-next tree.
 
-I tested this with a hacked gdbus/object.c to get into that
-GetAll/GetManagedObjects condtion, and it works.
+Regards
 
-I just think that it could be simplified somewhat. What I am thinking is
-that we don't need a "pending" list, each proxy can have a 'pending'
-boolean, and instead we add it to proxy_list as soon as it is allocated.
-
-I didn't try it, but it feels like it would work.
-
-What do you think?
-
-If you don't think it would work, or that it would end up harder to
-read, this patch looks good to me.
-
-
-Cheers,
---
-Vinicius
+Marcel
