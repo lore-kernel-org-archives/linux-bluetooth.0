@@ -1,81 +1,81 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 Content-Type: text/plain; charset=utf-8
 Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Subject: Re: [PATCH v3 2/3] ARM: dts: bcm2837-rpi-3-b: Add bcm43438 as serial
- slave
+Subject: Re: [PATCH] net/bluetooth: make bluetooth socket can be created in
+ net namespace
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <392e6d51-33d6-1585-6582-1397a0c64852@gmail.com>
-Date: Mon, 14 Aug 2017 18:02:05 +0200
-Cc: Rob Herring <robh+dt@kernel.org>,
-        Stefan Wahren <stefan.wahren@i2se.com>,
+In-Reply-To: <CAAEJBhKY-8G_9-cwi6HpLBmbFhyBKCnYJ+yvBy_nXxy9G66Wvw@mail.gmail.com>
+Date: Mon, 14 Aug 2017 17:59:42 +0200
+Cc: fupan <fupan.li@windriver.com>,
+        "Gustavo F. Padovan" <gustavo@padovan.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
-        Ray Jui <rjui@broadcom.com>,
-        Scott Branden <sbranden@broadcom.com>,
-        Florian Fainelli <f.fainelli@gmail.com>,
-        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-        linux-rpi-kernel@lists.infradead.org
-Message-Id: <161632C7-EBBF-47F5-86DC-453E10395B54@holtmann.org>
-References: <1502102366-2760-1-git-send-email-loic.poulain@gmail.com>
- <1502102366-2760-2-git-send-email-loic.poulain@gmail.com>
- <CAL_JsqKxA2pgtjmG-cxy5XPWuRWUiia-weRZDSh4++Vn=QZmqA@mail.gmail.com>
- <8186E2A3-D0AC-498F-8229-78862D363F78@holtmann.org>
- <392e6d51-33d6-1585-6582-1397a0c64852@gmail.com>
-To: Loic Poulain <loic.poulain@gmail.com>
+        Bluez mailing list <linux-bluetooth@vger.kernel.org>,
+        linux-kernel@vger.kernel.org
+Message-Id: <74252530-EF31-4CDA-A4E1-9FDD19DC25FA@holtmann.org>
+References: <20170814071640.289327-1-fupan.li@windriver.com>
+ <6EC96C1E-CE98-4CF1-B1B2-1CEC9DBC36EA@holtmann.org>
+ <d0d2f76d-fb23-0688-0038-51582a374c8e@windriver.com>
+ <CAAEJBhKY-8G_9-cwi6HpLBmbFhyBKCnYJ+yvBy_nXxy9G66Wvw@mail.gmail.com>
+To: Szymon Janc <szymon.janc@codecoup.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Loic,
+Hi Szymon,
 
->>>> Add BCM43438 as a slave device of uart0 (pl011/ttyAMA0).
->>>> This allows to automatically insert the bcm43438 to the bluetooth
->>>> subsystem instead of relying on userspace helpers (hciattach).
+>>>> By now kernel only supported creating bluetooth socket in init_net
+>>>> net namespace, which made bluetooth device cannot be accessed in
+>>>> containers, this patch made bluetooth socket can be created in
+>>>> net namespaces to fix this issue.
 >>>> 
->>>> Overwrite bootargs to use 8250 aux uart (ttyS0) as console instead
->>>> of pl011/ttyAMA0.
->>>> 
->>>> Signed-off-by: Loic Poulain <loic.poulain@gmail.com>
+>>>> Signed-off-by: Fupan Li <fupan.li@windriver.com>
 >>>> ---
->>>> v2: dt-bindings as separate patch
->>>>     rebase on upcoming pi3 dts changes
->>>> v3: changes in bcm serdev drivers:
->>>>     name refactoring and additional comments
->>>>     Add generic host_set_baudrate method
->>>>     Use agnostic device_property_read
+>>>> net/bluetooth/af_bluetooth.c | 2 +-
+>>>> net/bluetooth/bnep/sock.c    | 4 ++--
+>>>> net/bluetooth/cmtp/sock.c    | 4 ++--
+>>>> net/bluetooth/hci_sock.c     | 4 ++--
+>>>> net/bluetooth/hidp/sock.c    | 4 ++--
+>>>> net/bluetooth/l2cap_sock.c   | 4 ++--
+>>>> net/bluetooth/rfcomm/core.c  | 2 +-
+>>>> net/bluetooth/rfcomm/sock.c  | 4 ++--
+>>>> net/bluetooth/sco.c          | 4 ++--
+>>>> 9 files changed, 16 insertions(+), 16 deletions(-)
 >>>> 
->>>> arch/arm/boot/dts/bcm2837-rpi-3-b.dts | 10 ++++++++++
->>>> 1 file changed, 10 insertions(+)
+>>>> diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
+>>>> index 91e3ba280706..eec5ac17faee 100644
+>>>> --- a/net/bluetooth/af_bluetooth.c
+>>>> +++ b/net/bluetooth/af_bluetooth.c
+>>>> @@ -113,7 +113,7 @@ static int bt_sock_create(struct net *net, struct
+>>>> socket *sock, int proto,
+>>>> {
+>>>>        int err;
 >>>> 
->>>> diff --git a/arch/arm/boot/dts/bcm2837-rpi-3-b.dts b/arch/arm/boot/dts/bcm2837-rpi-3-b.dts
->>>> index 20725ca..5abc1df 100644
->>>> --- a/arch/arm/boot/dts/bcm2837-rpi-3-b.dts
->>>> +++ b/arch/arm/boot/dts/bcm2837-rpi-3-b.dts
->>>> @@ -8,6 +8,11 @@
->>>>        compatible = "raspberrypi,3-model-b", "brcm,bcm2837";
->>>>        model = "Raspberry Pi 3 Model B";
->>>> 
->>>> +       chosen {
->>>> +               /* 8250 auxiliar UART instead of pl011 */
->>>> +               bootargs = "earlyprintk console=ttyS0,115200";
->>> This is an unrelated change. "earlyprintk" is arm32 specific and only
->>> works with a kernel built with a specific uart type and address. Also,
->>> stdout-path property is preferred to set the default over "console”.
-> I'm going to use stdout-path according to your comment.
-> However one of the goals was to overwrite the bcm283x.dtsi bootargs,
-> I assume the same comment apply on the dtsi (stdpath usage /earlyprintk)
-> which should require update too.
-> 
->> the whole fun with the serial console on the rPI3 and the bt-miniuart overlay is something we should solve now. What is the upstream story on this since the config.txt and everything around it is confusing and also misleading since it relies on a Raspbian userspace.
+>>>> -       if (net != &init_net)
+>>>> +       if (!net_eq(net, current->nsproxy->net_ns))
+>>>>                return -EAFNOSUPPORT;
+>>> 
+>>> before I apply such a patch, what is the actual change here. What impact
+>>> does this have? Are things like Bluetooth mgmt sockets still operating
+>>> correctly after this? We have no support for move a Bluetooth controller
+>>> into a container. The Bluetooth hardware is global.
 >> 
->> Do we need to the kernel and init to stay away from the ttyAMA0 to avoid confusing the BT chip? As I mentioned earlier, I can not even get a Fedora 26 with hciattach or btattach to work.
+>> Hi， Marcel
 >> 
+>> This patch hasn't nothing to do with the Bluetooth hardware, the hardware is
+>> still global.
+>> But before you apply this patch, you cannot access the bluetooth hardware in
+>> a container,
+>> since you cannot create a bluetooth socket if you are not in the init_net
+>> namespace.
+>> After applying this patch, you can access the bluetooth hardware both in the
+>> init_net namespace
+>> and containers.
 > 
-> It is also possible to mux the auxiliary mini UART to drive the Bluetooth
-> controller in order to keep ttyAMA0 as the "legacy" RPi ext-uart/console,
-> however SoC spec says that this mini UART is intented to be used mainly as
-> a console due to shallow FIFOs and no DMA.
+> Does this mean one could sniff BT traffic from container? Or control
+> BT hw from multiple containers?
 
-what upstream kernel tree did you test this with? On a Fedora 26 kernel (now 4.12 based), I still do not have the Bluetooth hardware working.
+from how I read the change, then yes, the container could start another bluetoothd or btmon. As long as you use an user namespace and gain CAP_NET_ADMIN and CAP_NET_RAW privileges.
+
+I am actually not convinced we really want this. More useful seems the fact to create a virtual child hciX controller that then can be moved into container. It would use the parent hciX controller as real hardware. However this most likely only works for BLE since with BR/EDR this is rather complicated and there are actual role limits.
 
 Regards
 
