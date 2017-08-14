@@ -1,50 +1,67 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <87shgxev4u.fsf@intel.com>
-References: <20170811125815.964-1-luiz.dentz@gmail.com> <87shgxev4u.fsf@intel.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 14 Aug 2017 11:23:18 +0300
-Message-ID: <CABBYNZKcTf+86cJXTzrGSeSUDGXb0fZHV_Tvb_9uziqghvZqgQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] gdbus: Fix calling GetAll while GetManagedObject is pending
-To: Vinicius Costa Gomes <vinicius.gomes@intel.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Return-Path: <oneukum@suse.com>
+Message-ID: <1502695528.12678.3.camel@suse.com>
+Subject: Re: [PATCH] bt usb-device initialize as wakeup enable
+From: Oliver Neukum <oneukum@suse.com>
+To: Marcel Holtmann <marcel@holtmann.org>, Sukumar Ghorai
+	 <sukumar.ghorai@intel.com>, Greg Kroah-Hartman <greg@kroah.com>
+Cc: Johan Hedberg <johan.hedberg@gmail.com>, Amit K Bag #
+ <amit.k.bag@intel.com>,  "Gustavo F. Padovan" <gustavo@padovan.org>,
+ linux-bluetooth@vger.kernel.org
+Date: Mon, 14 Aug 2017 09:25:28 +0200
+In-Reply-To: <CB2B50F2-C0C5-4302-96F7-24B952B97665@holtmann.org>
+References: <1502735088-4333-1-git-send-email-sukumar.ghorai@intel.com>
+	 <CB2B50F2-C0C5-4302-96F7-24B952B97665@holtmann.org>
 Content-Type: text/plain; charset="UTF-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
+Mime-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Vinicius,
+Am Montag, den 14.08.2017, 08:10 +0200 schrieb Marcel Holtmann:
+> Hi Sukumar,
+> 
+> > 
+> > BT-Controller connected as platform non-root-hub device and
+> > usb-driver initialize such device with wakeup disabled,
+> > Ref. usb_new_device().
+> > 
+> > At present wakeup-capability get enabled by hid-input device from usb
+> > function driver(e.g. BT HID device) at runtime. Again some functional
+> > driver does not set usb-wakeup capability(e.g LE HID device implement
+> > as HID-over-GATT), and can't wakeup the host on USB.
+> > 
+> > Hence usb-wakeup capability enable form btusc driver as a generic
+> > solution for multiple profile usecase and required for USB remote
+> > wakeup (in-bus wakeup) while host is suspended.
+> > 
+> > Signed-off-by: Sukumar Ghorai <sukumar.ghorai@intel.com>
+> > Signed-off-by: Amit K Bag <amit.k.bag@intel.com>#
+> > ---
+> > drivers/bluetooth/btusb.c | 4 ++++
+> > 1 file changed, 4 insertions(+)
+> > 
+> > diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> > index e1124ba44154..7eeeeb6ffae6 100644
+> > --- a/drivers/bluetooth/btusb.c
+> > +++ b/drivers/bluetooth/btusb.c
+> > @@ -1083,6 +1083,10 @@ static int btusb_open(struct hci_dev *hdev)
+> > 	}
+> > 
+> > 	data->intf->needs_remote_wakeup = 1;
+> > +	/* device specific wakeup source enabled and required for USB
+> > +	 * remote wakeup while host is suspended
+> > +	 */
+> > +	device_init_wakeup(&data->udev->dev, true);
+> > 
+> 
+> is this the right location? Are we repeating this on every hciconfig up / btmgmt poweron operation? Or is this something that should be actually happen only once during USB probe callback?
 
-On Fri, Aug 11, 2017 at 10:56 PM, Vinicius Costa Gomes
-<vinicius.gomes@intel.com> wrote:
-> Hi Luiz,
->
-> Luiz Augusto von Dentz <luiz.dentz@gmail.com> writes:
->
->> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->>
->> If proxies are created while the client is not ready put them into a
->> pending list so only if they are not found in GetManagedObject reply
->> call GetAll.
->
-> I tested this with a hacked gdbus/object.c to get into that
-> GetAll/GetManagedObjects condtion, and it works.
->
-> I just think that it could be simplified somewhat. What I am thinking is
-> that we don't need a "pending" list, each proxy can have a 'pending'
-> boolean, and instead we add it to proxy_list as soon as it is allocated.
+Hi,
 
-Tried that, but that felt a little more complicated than maintaining a
-list since we have to iterate the entire proxy_list to find which ones
-are pending.
+it would be more efficient to do that on probe(). But have you tested this for
+side effects? Will other BT operations now wake up the host?
 
-> I didn't try it, but it feels like it would work.
->
-> What do you think?
->
-> If you don't think it would work, or that it would end up harder to
-> read, this patch looks good to me.
+On a philosophical note it is kind of ugly to solve a generic problem
+in btusb. Arguably wakeup capability should propagate up the device tree
+if you request it. Have you discussed this with Rafael?
 
-Will apply it then.
-
--- 
-Luiz Augusto von Dentz
+	Regards
+		Oliver
