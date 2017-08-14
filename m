@@ -4,92 +4,129 @@ To: linux-bluetooth@vger.kernel.org
 Cc: Brian Gix <brian.gix@intel.com>,
 	marcel@holtmann.org,
 	luiz.dentz@gmail.com
-Subject: [PATCH 5/5] mesh: Add mesh to main bluez build
-Date: Mon, 14 Aug 2017 12:01:19 -0700
-Message-Id: <20170814190119.8684-6-brian.gix@intel.com>
+Subject: [PATCH 3/5] mesh: Baseline Mesh runtime configuration files
+Date: Mon, 14 Aug 2017 12:01:17 -0700
+Message-Id: <20170814190119.8684-4-brian.gix@intel.com>
 In-Reply-To: <20170814190119.8684-1-brian.gix@intel.com>
 References: <20170814190119.8684-1-brian.gix@intel.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- Makefile.tools      | 24 ++++++++++++++++++++++++
- bootstrap-configure |  1 +
- configure.ac        | 18 ++++++++++++++++++
- 3 files changed, 43 insertions(+)
+ mesh/local_node.json | 61 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ mesh/prov_db.json    | 37 +++++++++++++++++++++++++++++++
+ 2 files changed, 98 insertions(+)
+ create mode 100644 mesh/local_node.json
+ create mode 100644 mesh/prov_db.json
 
-diff --git a/Makefile.tools b/Makefile.tools
-index 0fd6dec..f646bb7 100644
---- a/Makefile.tools
-+++ b/Makefile.tools
-@@ -13,6 +13,30 @@ client_bluetoothctl_LDADD = gdbus/libgdbus-internal.la src/libshared-glib.la \
- 				@GLIB_LIBS@ @DBUS_LIBS@ -lreadline
- endif
- 
-+if BTMESH
-+bin_PROGRAMS += mesh/meshctl
-+
-+mesh_meshctl_SOURCES = mesh/main.c \
-+					mesh/node.h mesh/node.c \
-+					mesh/gatt.h mesh/gatt.c \
-+					mesh/crypto.h mesh/crypto.c \
-+					mesh/keys.h \
-+					mesh/net.h mesh/net.c \
-+					mesh/prov.h mesh/prov.c \
-+					mesh/util.h mesh/util.c \
-+					mesh/agent.h mesh/agent.c \
-+					mesh/prov-db.h mesh/prov-db.c \
-+					mesh/config-model.h mesh/config-client.c \
-+					mesh/config-server.c \
-+					mesh/onoff-model.h mesh/onoff-model.c \
-+					client/display.h client/display.c \
-+					monitor/uuid.h monitor/uuid.c
-+mesh_meshctl_LDADD = lib/libbluetooth-internal.la gdbus/libgdbus-internal.la \
-+					src/libshared-glib.la \
-+					@GLIB_LIBS@ @DBUS_LIBS@ -ljson-c -lreadline
-+endif
-+
-+
- if MONITOR
- bin_PROGRAMS += monitor/btmon
- 
-diff --git a/bootstrap-configure b/bootstrap-configure
-index 47926fc..658eef2 100755
---- a/bootstrap-configure
-+++ b/bootstrap-configure
-@@ -23,4 +23,5 @@ fi
- 		--enable-android \
- 		--enable-sixaxis \
- 		--enable-midi \
-+		--enable-mesh \
- 		--disable-datafiles $*
-diff --git a/configure.ac b/configure.ac
-index 89b164b..bbbc760 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -331,6 +331,24 @@ AC_DEFINE_UNQUOTED(CONFIGDIR, "${configdir}",
- 			[Directory for the configuration files])
- AC_SUBST(CONFIGDIR, "${configdir}")
- 
-+AC_ARG_ENABLE(mesh, AC_HELP_STRING([--enable-mesh],
-+			[enable BlueZ for Bluetooth Mesh]),
-+					[enable_mesh=${enableval}])
-+AM_CONDITIONAL(BTMESH, test "${enable_mesh}" = "yes")
-+
-+if (test "${enable_mesh}" == "yes"); then
-+	PKG_CHECK_MODULES(JSONC, json-c, dummy=yes,
-+				AC_MSG_ERROR(json-c is required))
-+	AC_SUBST(JSON_CFLAGS)
-+	AC_SUBST(JSON_LIBS)
-+fi
-+
-+if (test "${enable_mesh}" == "yes"); then
-+	AC_CHECK_HEADERS(readline/readline.h, enable_readline=yes,
-+                AC_MSG_ERROR(readline header files are required))
-+fi
-+AM_CONDITIONAL(READLINE, test "${enable_readline}" = "yes")
-+
- AC_ARG_ENABLE(android, AC_HELP_STRING([--enable-android],
- 			[enable BlueZ for Android]),
- 					[enable_android=${enableval}])
+diff --git a/mesh/local_node.json b/mesh/local_node.json
+new file mode 100644
+index 0000000..6591289
+--- /dev/null
++++ b/mesh/local_node.json
+@@ -0,0 +1,61 @@
++{
++  "$schema":"file:\/\/\/Bluetooth SIG\/Mesh\/schema\/mesh.jsonschema",
++  "meshName":"Intel BT Mesh",
++  "netKeys":[
++    {
++      "index": 0,
++      "keyRefresh": 0
++    }
++  ],
++  "appKeys":[
++    {
++      "index": 0,
++      "boundNetKey": 0
++    },
++    {
++      "index": 1,
++      "boundNetKey": 0
++    }
++  ],
++"node": {
++	"IVindex":"00000005",
++	"IVupdate":"0",
++	"sequenceNumber": 0,
++    "composition": {
++        "cid": "0002",
++        "pid": "0010",
++        "vid": "0001",
++        "crpl": "000a",
++        "features": {
++            "relay": false,
++            "proxy": true,
++            "friend": false,
++            "lowPower": false
++        },
++        "elements": [
++            {
++                "elementIndex": 0,
++                "location": "0001",
++                "models": ["0000", "0001", "1001"]
++            }
++        ]
++    },
++    "configuration":{
++        "netKeys": [0],
++        "appKeys": [ 0, 1],
++        "defaultTTL": 10,
++        "elements": [
++          {
++            "elementIndex": 0,
++            "unicastAddress":"0077",
++            "models": [
++               {
++                 "modelId": "1001",
++                 "bind": [1]
++                }
++            ]
++          }
++        ]
++    }
++  }
++}
+diff --git a/mesh/prov_db.json b/mesh/prov_db.json
+new file mode 100644
+index 0000000..d810a7d
+--- /dev/null
++++ b/mesh/prov_db.json
+@@ -0,0 +1,37 @@
++{
++  "$schema":"file:\/\/\/Bluetooth SIG\/Mesh\/schema\/mesh.jsonschema",
++  "meshName":"Intel BT Mesh",
++  "IVindex":5,
++  "IVupdate":0,
++  "netKeys":[
++    {
++      "index":0,
++      "keyRefresh":0,
++      "key":"18eed9c2a56add85049ffc3c59ad0e12"
++    }
++  ],
++  "appKeys":[
++    {
++      "index":0,
++      "boundNetKey":0,
++      "key":"4f68ad85d9f48ac8589df665b6b49b8a"
++    },
++    {
++      "index":1,
++      "boundNetKey":0,
++      "key":"2aa2a6ded5a0798ceab5787ca3ae39fc"
++    }
++  ],
++  "provisioners":[
++    {
++      "provisionerName":"BT Mesh Provisioner",
++      "unicastAddress":"0077",
++      "allocatedUnicastRange":[
++        {
++          "lowAddress":"0100",
++          "highAddress":"7fff"
++        }
++      ]
++    }
++  ],
++}
 -- 
 2.9.5
