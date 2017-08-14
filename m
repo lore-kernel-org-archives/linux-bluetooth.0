@@ -1,213 +1,60 @@
-Return-Path: <Fupan.Li@windriver.com>
-From: <fupan.li@windriver.com>
-To: <marcel@holtmann.org>, <gustavo@padovan.org>, <johan.hedberg@gmail.com>
-CC: <linux-bluetooth@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: [PATCH] net/bluetooth: make bluetooth socket can be created in net namespace
-Date: Mon, 14 Aug 2017 00:16:40 -0700
-Message-ID: <20170814071640.289327-1-fupan.li@windriver.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+Subject: Re: [PATCH] bt usb-device initialize as wakeup enable
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1502735088-4333-1-git-send-email-sukumar.ghorai@intel.com>
+Date: Mon, 14 Aug 2017 08:10:36 +0200
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-bluetooth@vger.kernel.org,
+        Amit K Bag # <amit.k.bag@intel.com>
+Message-Id: <CB2B50F2-C0C5-4302-96F7-24B952B97665@holtmann.org>
+References: <1502735088-4333-1-git-send-email-sukumar.ghorai@intel.com>
+To: Sukumar Ghorai <sukumar.ghorai@intel.com>,
+        Greg Kroah-Hartman <greg@kroah.com>,
+        Oliver Neukum <oneukum@suse.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Fupan Li <fupan.li@windriver.com>
+Hi Sukumar,
 
-By now kernel only supported creating bluetooth socket in init_net
-net namespace, which made bluetooth device cannot be accessed in
-containers, this patch made bluetooth socket can be created in
-net namespaces to fix this issue.
+> BT-Controller connected as platform non-root-hub device and
+> usb-driver initialize such device with wakeup disabled,
+> Ref. usb_new_device().
+> 
+> At present wakeup-capability get enabled by hid-input device from usb
+> function driver(e.g. BT HID device) at runtime. Again some functional
+> driver does not set usb-wakeup capability(e.g LE HID device implement
+> as HID-over-GATT), and can't wakeup the host on USB.
+> 
+> Hence usb-wakeup capability enable form btusc driver as a generic
+> solution for multiple profile usecase and required for USB remote
+> wakeup (in-bus wakeup) while host is suspended.
+> 
+> Signed-off-by: Sukumar Ghorai <sukumar.ghorai@intel.com>
+> Signed-off-by: Amit K Bag <amit.k.bag@intel.com>#
+> ---
+> drivers/bluetooth/btusb.c | 4 ++++
+> 1 file changed, 4 insertions(+)
+> 
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index e1124ba44154..7eeeeb6ffae6 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -1083,6 +1083,10 @@ static int btusb_open(struct hci_dev *hdev)
+> 	}
+> 
+> 	data->intf->needs_remote_wakeup = 1;
+> +	/* device specific wakeup source enabled and required for USB
+> +	 * remote wakeup while host is suspended
+> +	 */
+> +	device_init_wakeup(&data->udev->dev, true);
+> 
 
-Signed-off-by: Fupan Li <fupan.li@windriver.com>
----
- net/bluetooth/af_bluetooth.c | 2 +-
- net/bluetooth/bnep/sock.c    | 4 ++--
- net/bluetooth/cmtp/sock.c    | 4 ++--
- net/bluetooth/hci_sock.c     | 4 ++--
- net/bluetooth/hidp/sock.c    | 4 ++--
- net/bluetooth/l2cap_sock.c   | 4 ++--
- net/bluetooth/rfcomm/core.c  | 2 +-
- net/bluetooth/rfcomm/sock.c  | 4 ++--
- net/bluetooth/sco.c          | 4 ++--
- 9 files changed, 16 insertions(+), 16 deletions(-)
+is this the right location? Are we repeating this on every hciconfig up / btmgmt poweron operation? Or is this something that should be actually happen only once during USB probe callback?
 
-diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
-index 91e3ba280706..eec5ac17faee 100644
---- a/net/bluetooth/af_bluetooth.c
-+++ b/net/bluetooth/af_bluetooth.c
-@@ -113,7 +113,7 @@ static int bt_sock_create(struct net *net, struct socket *sock, int proto,
- {
- 	int err;
- 
--	if (net != &init_net)
-+	if (!net_eq(net, current->nsproxy->net_ns)) 
- 		return -EAFNOSUPPORT;
- 
- 	if (proto < 0 || proto >= BT_MAX_PROTO)
-diff --git a/net/bluetooth/bnep/sock.c b/net/bluetooth/bnep/sock.c
-index b5116fa9835e..742b8626ebcd 100644
---- a/net/bluetooth/bnep/sock.c
-+++ b/net/bluetooth/bnep/sock.c
-@@ -241,7 +241,7 @@ int __init bnep_sock_init(void)
- 		goto error;
- 	}
- 
--	err = bt_procfs_init(&init_net, "bnep", &bnep_sk_list, NULL);
-+	err = bt_procfs_init(current->nsproxy->net_ns, "bnep", &bnep_sk_list, NULL);
- 	if (err < 0) {
- 		BT_ERR("Failed to create BNEP proc file");
- 		bt_sock_unregister(BTPROTO_BNEP);
-@@ -259,7 +259,7 @@ int __init bnep_sock_init(void)
- 
- void __exit bnep_sock_cleanup(void)
- {
--	bt_procfs_cleanup(&init_net, "bnep");
-+	bt_procfs_cleanup(current->nsproxy->net_ns, "bnep");
- 	bt_sock_unregister(BTPROTO_BNEP);
- 	proto_unregister(&bnep_proto);
- }
-diff --git a/net/bluetooth/cmtp/sock.c b/net/bluetooth/cmtp/sock.c
-index ce86a7bae844..d3d608489219 100644
---- a/net/bluetooth/cmtp/sock.c
-+++ b/net/bluetooth/cmtp/sock.c
-@@ -245,7 +245,7 @@ int cmtp_init_sockets(void)
- 		goto error;
- 	}
- 
--	err = bt_procfs_init(&init_net, "cmtp", &cmtp_sk_list, NULL);
-+	err = bt_procfs_init(current->nsproxy->net_ns, "cmtp", &cmtp_sk_list, NULL);
- 	if (err < 0) {
- 		BT_ERR("Failed to create CMTP proc file");
- 		bt_sock_unregister(BTPROTO_HIDP);
-@@ -263,7 +263,7 @@ int cmtp_init_sockets(void)
- 
- void cmtp_cleanup_sockets(void)
- {
--	bt_procfs_cleanup(&init_net, "cmtp");
-+	bt_procfs_cleanup(current->nsproxy->net_ns, "cmtp");
- 	bt_sock_unregister(BTPROTO_CMTP);
- 	proto_unregister(&cmtp_proto);
- }
-diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
-index 65d734c165bd..549c6c1f273c 100644
---- a/net/bluetooth/hci_sock.c
-+++ b/net/bluetooth/hci_sock.c
-@@ -2038,7 +2038,7 @@ int __init hci_sock_init(void)
- 		goto error;
- 	}
- 
--	err = bt_procfs_init(&init_net, "hci", &hci_sk_list, NULL);
-+	err = bt_procfs_init(current->nsproxy->net_ns, "hci", &hci_sk_list, NULL);
- 	if (err < 0) {
- 		BT_ERR("Failed to create HCI proc file");
- 		bt_sock_unregister(BTPROTO_HCI);
-@@ -2056,7 +2056,7 @@ int __init hci_sock_init(void)
- 
- void hci_sock_cleanup(void)
- {
--	bt_procfs_cleanup(&init_net, "hci");
-+	bt_procfs_cleanup(current->nsproxy->net_ns, "hci");
- 	bt_sock_unregister(BTPROTO_HCI);
- 	proto_unregister(&hci_sk_proto);
- }
-diff --git a/net/bluetooth/hidp/sock.c b/net/bluetooth/hidp/sock.c
-index 008ba439bd62..19d4e9a40905 100644
---- a/net/bluetooth/hidp/sock.c
-+++ b/net/bluetooth/hidp/sock.c
-@@ -275,7 +275,7 @@ int __init hidp_init_sockets(void)
- 		goto error;
- 	}
- 
--	err = bt_procfs_init(&init_net, "hidp", &hidp_sk_list, NULL);
-+	err = bt_procfs_init(current->nsproxy->net_ns, "hidp", &hidp_sk_list, NULL);
- 	if (err < 0) {
- 		BT_ERR("Failed to create HIDP proc file");
- 		bt_sock_unregister(BTPROTO_HIDP);
-@@ -293,7 +293,7 @@ int __init hidp_init_sockets(void)
- 
- void __exit hidp_cleanup_sockets(void)
- {
--	bt_procfs_cleanup(&init_net, "hidp");
-+	bt_procfs_cleanup(current->nsproxy->net_ns, "hidp");
- 	bt_sock_unregister(BTPROTO_HIDP);
- 	proto_unregister(&hidp_proto);
- }
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index 67a8642f57ea..404bb1046c9c 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -1685,7 +1685,7 @@ int __init l2cap_init_sockets(void)
- 		goto error;
- 	}
- 
--	err = bt_procfs_init(&init_net, "l2cap", &l2cap_sk_list,
-+	err = bt_procfs_init(current->nsproxy->net_ns, "l2cap", &l2cap_sk_list,
- 			     NULL);
- 	if (err < 0) {
- 		BT_ERR("Failed to create L2CAP proc file");
-@@ -1704,7 +1704,7 @@ int __init l2cap_init_sockets(void)
- 
- void l2cap_cleanup_sockets(void)
- {
--	bt_procfs_cleanup(&init_net, "l2cap");
-+	bt_procfs_cleanup(current->nsproxy->net_ns, "l2cap");
- 	bt_sock_unregister(BTPROTO_L2CAP);
- 	proto_unregister(&l2cap_proto);
- }
-diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
-index 4a0b41d75c84..b02e6203bb9a 100644
---- a/net/bluetooth/rfcomm/core.c
-+++ b/net/bluetooth/rfcomm/core.c
-@@ -200,7 +200,7 @@ static int rfcomm_l2sock_create(struct socket **sock)
- 
- 	BT_DBG("");
- 
--	err = sock_create_kern(&init_net, PF_BLUETOOTH, SOCK_SEQPACKET, BTPROTO_L2CAP, sock);
-+	err = sock_create_kern(current->nsproxy->net_ns, PF_BLUETOOTH, SOCK_SEQPACKET, BTPROTO_L2CAP, sock);
- 	if (!err) {
- 		struct sock *sk = (*sock)->sk;
- 		sk->sk_data_ready   = rfcomm_l2data_ready;
-diff --git a/net/bluetooth/rfcomm/sock.c b/net/bluetooth/rfcomm/sock.c
-index 1aaccf637479..780146c642b0 100644
---- a/net/bluetooth/rfcomm/sock.c
-+++ b/net/bluetooth/rfcomm/sock.c
-@@ -1076,7 +1076,7 @@ int __init rfcomm_init_sockets(void)
- 		goto error;
- 	}
- 
--	err = bt_procfs_init(&init_net, "rfcomm", &rfcomm_sk_list, NULL);
-+	err = bt_procfs_init(current->nsproxy->net_ns, "rfcomm", &rfcomm_sk_list, NULL);
- 	if (err < 0) {
- 		BT_ERR("Failed to create RFCOMM proc file");
- 		bt_sock_unregister(BTPROTO_RFCOMM);
-@@ -1101,7 +1101,7 @@ int __init rfcomm_init_sockets(void)
- 
- void __exit rfcomm_cleanup_sockets(void)
- {
--	bt_procfs_cleanup(&init_net, "rfcomm");
-+	bt_procfs_cleanup(current->nsproxy->net_ns, "rfcomm");
- 
- 	debugfs_remove(rfcomm_sock_debugfs);
- 
-diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-index 795e920a3281..0c9dcc2a6009 100644
---- a/net/bluetooth/sco.c
-+++ b/net/bluetooth/sco.c
-@@ -1229,7 +1229,7 @@ int __init sco_init(void)
- 		goto error;
- 	}
- 
--	err = bt_procfs_init(&init_net, "sco", &sco_sk_list, NULL);
-+	err = bt_procfs_init(current->nsproxy->net_ns, "sco", &sco_sk_list, NULL);
- 	if (err < 0) {
- 		BT_ERR("Failed to create SCO proc file");
- 		bt_sock_unregister(BTPROTO_SCO);
-@@ -1255,7 +1255,7 @@ int __init sco_init(void)
- 
- void sco_exit(void)
- {
--	bt_procfs_cleanup(&init_net, "sco");
-+	bt_procfs_cleanup(current->nsproxy->net_ns, "sco");	
- 
- 	debugfs_remove(sco_debugfs);
- 
--- 
-2.11.0
+Regards
+
+Marcel
+
