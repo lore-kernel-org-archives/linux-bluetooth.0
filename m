@@ -1,83 +1,102 @@
-Return-Path: <brian.gix@intel.com>
-From: Brian Gix <brian.gix@intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Brian Gix <brian.gix@intel.com>,
-	marcel@holtmann.org,
-	luiz.dentz@gmail.com
-Subject: [PATCH 0/5] MeshCtl - Mesh GATT Client Provisioner
-Date: Mon, 14 Aug 2017 12:01:14 -0700
-Message-Id: <20170814190119.8684-1-brian.gix@intel.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Content-Type: text/plain; charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+Subject: Re: [PATCH v3 2/3] ARM: dts: bcm2837-rpi-3-b: Add bcm43438 as serial
+ slave
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <e001e055-10a5-facd-a8e1-57c1bdb78172@gmail.com>
+Date: Mon, 14 Aug 2017 20:36:34 +0200
+Cc: Rob Herring <robh+dt@kernel.org>,
+        Stefan Wahren <stefan.wahren@i2se.com>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Ray Jui <rjui@broadcom.com>,
+        Scott Branden <sbranden@broadcom.com>,
+        Florian Fainelli <f.fainelli@gmail.com>,
+        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+        linux-rpi-kernel@lists.infradead.org
+Message-Id: <C7112FEE-B67B-496F-A68D-6C47A03199F7@holtmann.org>
+References: <1502102366-2760-1-git-send-email-loic.poulain@gmail.com>
+ <1502102366-2760-2-git-send-email-loic.poulain@gmail.com>
+ <CAL_JsqKxA2pgtjmG-cxy5XPWuRWUiia-weRZDSh4++Vn=QZmqA@mail.gmail.com>
+ <8186E2A3-D0AC-498F-8229-78862D363F78@holtmann.org>
+ <392e6d51-33d6-1585-6582-1397a0c64852@gmail.com>
+ <161632C7-EBBF-47F5-86DC-453E10395B54@holtmann.org>
+ <e001e055-10a5-facd-a8e1-57c1bdb78172@gmail.com>
+To: Loic Poulain <loic.poulain@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-With the recent adoption of the Bluetooth Mesh Profile, we offer this
-GATT Client provisioner tool (meshctl).
+Hi Loic,
 
-Brian Gix / Inga Stotland` (5):
-  mesh: Add BT SIG reserved numbers for Mesh
-  mesh: define APIs for Bluetooth Mesh
-  mesh: Baseline Mesh runtime configuration files
-  mesh: Baseline Mesh implementation
-  mesh: Add mesh to main bluez build
+>>>>>> Add BCM43438 as a slave device of uart0 (pl011/ttyAMA0).
+>>>>>> This allows to automatically insert the bcm43438 to the bluetooth
+>>>>>> subsystem instead of relying on userspace helpers (hciattach).
+>>>>>> 
+>>>>>> Overwrite bootargs to use 8250 aux uart (ttyS0) as console instead
+>>>>>> of pl011/ttyAMA0.
+>>>>>> 
+>>>>>> Signed-off-by: Loic Poulain <loic.poulain@gmail.com>
+>>>>>> ---
+>>>>>> v2: dt-bindings as separate patch
+>>>>>>     rebase on upcoming pi3 dts changes
+>>>>>> v3: changes in bcm serdev drivers:
+>>>>>>     name refactoring and additional comments
+>>>>>>     Add generic host_set_baudrate method
+>>>>>>     Use agnostic device_property_read
+>>>>>> 
+>>>>>> arch/arm/boot/dts/bcm2837-rpi-3-b.dts | 10 ++++++++++
+>>>>>> 1 file changed, 10 insertions(+)
+>>>>>> 
+>>>>>> diff --git a/arch/arm/boot/dts/bcm2837-rpi-3-b.dts b/arch/arm/boot/dts/bcm2837-rpi-3-b.dts
+>>>>>> index 20725ca..5abc1df 100644
+>>>>>> --- a/arch/arm/boot/dts/bcm2837-rpi-3-b.dts
+>>>>>> +++ b/arch/arm/boot/dts/bcm2837-rpi-3-b.dts
+>>>>>> @@ -8,6 +8,11 @@
+>>>>>>        compatible = "raspberrypi,3-model-b", "brcm,bcm2837";
+>>>>>>        model = "Raspberry Pi 3 Model B";
+>>>>>> 
+>>>>>> +       chosen {
+>>>>>> +               /* 8250 auxiliar UART instead of pl011 */
+>>>>>> +               bootargs = "earlyprintk console=ttyS0,115200";
+>>>>> This is an unrelated change. "earlyprintk" is arm32 specific and only
+>>>>> works with a kernel built with a specific uart type and address. Also,
+>>>>> stdout-path property is preferred to set the default over "console”.
+>>> I'm going to use stdout-path according to your comment.
+>>> However one of the goals was to overwrite the bcm283x.dtsi bootargs,
+>>> I assume the same comment apply on the dtsi (stdpath usage /earlyprintk)
+>>> which should require update too.
+>>> 
+>>>> the whole fun with the serial console on the rPI3 and the bt-miniuart overlay is something we should solve now. What is the upstream story on this since the config.txt and everything around it is confusing and also misleading since it relies on a Raspbian userspace.
+>>>> 
+>>>> Do we need to the kernel and init to stay away from the ttyAMA0 to avoid confusing the BT chip? As I mentioned earlier, I can not even get a Fedora 26 with hciattach or btattach to work.
+>>>> 
+>>> It is also possible to mux the auxiliary mini UART to drive the Bluetooth
+>>> controller in order to keep ttyAMA0 as the "legacy" RPi ext-uart/console,
+>>> however SoC spec says that this mini UART is intented to be used mainly as
+>>> a console due to shallow FIFOs and no DMA.
+>> what upstream kernel tree did you test this with? On a Fedora 26 kernel (now 4.12 based), I still do not have the Bluetooth hardware working.
+>> 
+>> Regards
+>> 
+>> Marcel
+>> 
+> 
+> I built kernel, modules and dtb from a bluetooth-next tree (4.12 and 4.13-rc3).
+> Using 32-bit multi_v7_defconfig + some additional confs to enable miniuart (BCM2835AUX...) for console.
+> I push this on a raspbian image.
+> 
+> my boot/config.txt is very simple (no overlay):
+> 
+> kernel=zImage
+> device_tree=bcm2837-rpi-3-b.dtb
+> # hack for miniuart serial clock
+> core_freq=250
+> dtparam=audio=on
 
- Makefile.tools       |   24 +
- bootstrap-configure  |    1 +
- configure.ac         |   18 +
- lib/uuid.h           |   10 +
- mesh/README          |   26 +
- mesh/agent.c         |  276 ++++++
- mesh/agent.h         |   58 ++
- mesh/config-client.c |  667 +++++++++++++++
- mesh/config-model.h  |  119 +++
- mesh/config-server.c |  165 ++++
- mesh/crypto.c        | 1168 ++++++++++++++++++++++++++
- mesh/crypto.h        |  133 +++
- mesh/gatt.c          |  609 ++++++++++++++
- mesh/gatt.h          |   47 ++
- mesh/keys.h          |   43 +
- mesh/local_node.json |   61 ++
- mesh/main.c          | 2269 ++++++++++++++++++++++++++++++++++++++++++++++++++
- mesh/mesh-net.h      |  174 ++++
- mesh/net.c           | 2184 ++++++++++++++++++++++++++++++++++++++++++++++++
- mesh/net.h           |   72 ++
- mesh/node.c          |  879 +++++++++++++++++++
- mesh/node.h          |  146 ++++
- mesh/onoff-model.c   |  306 +++++++
- mesh/onoff-model.h   |   50 ++
- mesh/prov-db.c       | 1599 +++++++++++++++++++++++++++++++++++
- mesh/prov-db.h       |   52 ++
- mesh/prov.c          |  664 +++++++++++++++
- mesh/prov.h          |   43 +
- mesh/prov_db.json    |   37 +
- mesh/util.c          |  369 ++++++++
- mesh/util.h          |   71 ++
- 31 files changed, 12340 insertions(+)
- create mode 100644 mesh/README
- create mode 100644 mesh/agent.c
- create mode 100644 mesh/agent.h
- create mode 100644 mesh/config-client.c
- create mode 100644 mesh/config-model.h
- create mode 100644 mesh/config-server.c
- create mode 100644 mesh/crypto.c
- create mode 100644 mesh/crypto.h
- create mode 100644 mesh/gatt.c
- create mode 100644 mesh/gatt.h
- create mode 100644 mesh/keys.h
- create mode 100644 mesh/local_node.json
- create mode 100644 mesh/main.c
- create mode 100644 mesh/mesh-net.h
- create mode 100644 mesh/net.c
- create mode 100644 mesh/net.h
- create mode 100644 mesh/node.c
- create mode 100644 mesh/node.h
- create mode 100644 mesh/onoff-model.c
- create mode 100644 mesh/onoff-model.h
- create mode 100644 mesh/prov-db.c
- create mode 100644 mesh/prov-db.h
- create mode 100644 mesh/prov.c
- create mode 100644 mesh/prov.h
- create mode 100644 mesh/prov_db.json
- create mode 100644 mesh/util.c
- create mode 100644 mesh/util.h
+I really wonder if the Fedora 26 (which actually uses u-boot as kernel) messes up the DT somehow.
 
--- 
-2.9.5
+Regards
+
+Marcel
+
