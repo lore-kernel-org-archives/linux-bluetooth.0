@@ -1,64 +1,254 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: "Ghorai, Sukumar" <sukumar.ghorai@intel.com>
-To: Oliver Neukum <oneukum@suse.com>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Greg Kroah-Hartman <greg@kroah.com>
-CC: Johan Hedberg <johan.hedberg@gmail.com>,
-        "Bag, Amit K" <amit.k.bag@intel.com>,
-        "Gustavo F. Padovan" <gustavo@padovan.org>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "Wysocki, Rafael J" <rafael.j.wysocki@intel.com>
-Subject: RE: [PATCH] bt usb-device initialize as wakeup enable
-Date: Mon, 14 Aug 2017 11:49:11 +0000
-Message-ID: <D73ECEF0C711E34A8F972E4B87F5400578E534D5@BGSMSX103.gar.corp.intel.com>
-References: <1502735088-4333-1-git-send-email-sukumar.ghorai@intel.com>
-         <CB2B50F2-C0C5-4302-96F7-24B952B97665@holtmann.org>
- <1502695528.12678.3.camel@suse.com>
-In-Reply-To: <1502695528.12678.3.camel@suse.com>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2] gdbus: Fix calling GetAll while GetManagedObject is pending
+Date: Mon, 14 Aug 2017 13:46:02 +0300
+Message-Id: <20170814104602.32013-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Pj4gPg0KPj4gPiBCVC1Db250cm9sbGVyIGNvbm5lY3RlZCBhcyBwbGF0Zm9ybSBub24tcm9vdC1o
-dWIgZGV2aWNlIGFuZA0KPj4gPiB1c2ItZHJpdmVyIGluaXRpYWxpemUgc3VjaCBkZXZpY2Ugd2l0
-aCB3YWtldXAgZGlzYWJsZWQsIFJlZi4NCj4+ID4gdXNiX25ld19kZXZpY2UoKS4NCj4+ID4NCj4+
-ID4gQXQgcHJlc2VudCB3YWtldXAtY2FwYWJpbGl0eSBnZXQgZW5hYmxlZCBieSBoaWQtaW5wdXQg
-ZGV2aWNlIGZyb20NCj4+ID4gdXNiIGZ1bmN0aW9uIGRyaXZlcihlLmcuIEJUIEhJRCBkZXZpY2Up
-IGF0IHJ1bnRpbWUuIEFnYWluIHNvbWUNCj4+ID4gZnVuY3Rpb25hbCBkcml2ZXIgZG9lcyBub3Qg
-c2V0IHVzYi13YWtldXAgY2FwYWJpbGl0eShlLmcgTEUgSElEDQo+PiA+IGRldmljZSBpbXBsZW1l
-bnQgYXMgSElELW92ZXItR0FUVCksIGFuZCBjYW4ndCB3YWtldXAgdGhlIGhvc3Qgb24gVVNCLg0K
-Pj4gPg0KPj4gPiBIZW5jZSB1c2Itd2FrZXVwIGNhcGFiaWxpdHkgZW5hYmxlIGZvcm0gYnR1c2Mg
-ZHJpdmVyIGFzIGEgZ2VuZXJpYw0KPj4gPiBzb2x1dGlvbiBmb3IgbXVsdGlwbGUgcHJvZmlsZSB1
-c2VjYXNlIGFuZCByZXF1aXJlZCBmb3IgVVNCIHJlbW90ZQ0KPj4gPiB3YWtldXAgKGluLWJ1cyB3
-YWtldXApIHdoaWxlIGhvc3QgaXMgc3VzcGVuZGVkLg0KPj4gPg0KPj4gPiBTaWduZWQtb2ZmLWJ5
-OiBTdWt1bWFyIEdob3JhaSA8c3VrdW1hci5naG9yYWlAaW50ZWwuY29tPg0KPj4gPiBTaWduZWQt
-b2ZmLWJ5OiBBbWl0IEsgQmFnIDxhbWl0LmsuYmFnQGludGVsLmNvbT4jDQo+PiA+IC0tLQ0KPj4g
-PiBkcml2ZXJzL2JsdWV0b290aC9idHVzYi5jIHwgNCArKysrDQo+PiA+IDEgZmlsZSBjaGFuZ2Vk
-LCA0IGluc2VydGlvbnMoKykNCj4+ID4NCj4+ID4gZGlmZiAtLWdpdCBhL2RyaXZlcnMvYmx1ZXRv
-b3RoL2J0dXNiLmMgYi9kcml2ZXJzL2JsdWV0b290aC9idHVzYi5jDQo+PiA+IGluZGV4IGUxMTI0
-YmE0NDE1NC4uN2VlZWViNmZmYWU2IDEwMDY0NA0KPj4gPiAtLS0gYS9kcml2ZXJzL2JsdWV0b290
-aC9idHVzYi5jDQo+PiA+ICsrKyBiL2RyaXZlcnMvYmx1ZXRvb3RoL2J0dXNiLmMNCj4+ID4gQEAg
-LTEwODMsNiArMTA4MywxMCBAQCBzdGF0aWMgaW50IGJ0dXNiX29wZW4oc3RydWN0IGhjaV9kZXYg
-KmhkZXYpDQo+PiA+IAl9DQo+PiA+DQo+PiA+IAlkYXRhLT5pbnRmLT5uZWVkc19yZW1vdGVfd2Fr
-ZXVwID0gMTsNCj4+ID4gKwkvKiBkZXZpY2Ugc3BlY2lmaWMgd2FrZXVwIHNvdXJjZSBlbmFibGVk
-IGFuZCByZXF1aXJlZCBmb3IgVVNCDQo+PiA+ICsJICogcmVtb3RlIHdha2V1cCB3aGlsZSBob3N0
-IGlzIHN1c3BlbmRlZA0KPj4gPiArCSAqLw0KPj4gPiArCWRldmljZV9pbml0X3dha2V1cCgmZGF0
-YS0+dWRldi0+ZGV2LCB0cnVlKTsNCj4+ID4NCj4+DQo+PiBpcyB0aGlzIHRoZSByaWdodCBsb2Nh
-dGlvbj8gQXJlIHdlIHJlcGVhdGluZyB0aGlzIG9uIGV2ZXJ5IGhjaWNvbmZpZyB1cCAvIGJ0bWdt
-dA0KPnBvd2Vyb24gb3BlcmF0aW9uPyBPciBpcyB0aGlzIHNvbWV0aGluZyB0aGF0IHNob3VsZCBi
-ZSBhY3R1YWxseSBoYXBwZW4gb25seSBvbmNlDQo+ZHVyaW5nIFVTQiBwcm9iZSBjYWxsYmFjaz8N
-CltTdWt1bWFyXSBhZ3JlZS4uIGRldmljZV93YWtldXBfZW5hYmxlL19kaXNhYmxlKCkgbmVlZCB0
-byBjYWxsIGF0DQpidHVzYl9vcGVuL19jbG9zZSgpIHJlc3BlY3RpdmVseS4gdGhpcyB3aWxsIHRv
-Z2dsZSB0aGUgZmxhZyANCi9zeXMvYnVzL3VzYi9kZXZpY2VzL3h4L3Bvd2VyL3dha2V1cC4gDQpX
-aWxsIGNvcnJlY3QgaW4gcGF0Y2ggdjIuDQoNCj4NCj5IaSwNCj4NCj5pdCB3b3VsZCBiZSBtb3Jl
-IGVmZmljaWVudCB0byBkbyB0aGF0IG9uIHByb2JlKCkuIEJ1dCBoYXZlIHlvdSB0ZXN0ZWQgdGhp
-cyBmb3Igc2lkZQ0KPmVmZmVjdHM/IFdpbGwgb3RoZXIgQlQgb3BlcmF0aW9ucyBub3cgd2FrZSB1
-cCB0aGUgaG9zdD8NCj4NCj5PbiBhIHBoaWxvc29waGljYWwgbm90ZSBpdCBpcyBraW5kIG9mIHVn
-bHkgdG8gc29sdmUgYSBnZW5lcmljIHByb2JsZW0gaW4gYnR1c2IuDQo+QXJndWFibHkgd2FrZXVw
-IGNhcGFiaWxpdHkgc2hvdWxkIHByb3BhZ2F0ZSB1cCB0aGUgZGV2aWNlIHRyZWUgaWYgeW91IHJl
-cXVlc3QgaXQuDQo+SGF2ZSB5b3UgZGlzY3Vzc2VkIHRoaXMgd2l0aCBSYWZhZWw/DQpbU3VrdW1h
-cl0gV2UgbmVlZCB0aGUgYnQtY29udHJvbGxlciB0byBiZSB3YWtlLXVwIGVuYWJsZSwgd2hpbGUg
-aG9zdCBpcyBzdXNwZW5kZWQuDQpBbmQgZXZlbiB3aGVuIG5vIHByb2ZpbGUvcHJvdG9jb2wgaXMg
-ZW5hYmxlZCBhbmQgdG8gYWNjZXB0IHRoZSByZW1vdGUgY29ubmVjdGlvbiwgDQpmb3IgZXhhbXBs
-ZS4NCg0KPg0KPglSZWdhcmRzDQo+CQlPbGl2ZXINCg0K
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+
+If proxies are created while the client is not ready put them into a
+pending list so only if they are not found in GetManagedObject reply
+call GetAll.
+---
+ gdbus/client.c | 96 ++++++++++++++++++++++++++++++++++++----------------------
+ 1 file changed, 59 insertions(+), 37 deletions(-)
+
+diff --git a/gdbus/client.c b/gdbus/client.c
+index a011e19c3..8cabc5590 100644
+--- a/gdbus/client.c
++++ b/gdbus/client.c
+@@ -76,6 +76,8 @@ struct GDBusProxy {
+ 	void *prop_data;
+ 	GDBusProxyFunction removed_func;
+ 	void *removed_data;
++	DBusPendingCall *get_all_call;
++	gboolean pending;
+ };
+ 
+ struct prop_entry {
+@@ -278,6 +280,17 @@ static void update_properties(GDBusProxy *proxy, DBusMessageIter *iter,
+ 	}
+ }
+ 
++static void proxy_added(GDBusClient *client, GDBusProxy *proxy)
++{
++	if (!proxy->pending)
++		return;
++
++	if (client->proxy_added)
++		client->proxy_added(proxy, client->user_data);
++
++	proxy->pending = FALSE;
++}
++
+ static void get_all_properties_reply(DBusPendingCall *call, void *user_data)
+ {
+ 	GDBusProxy *proxy = user_data;
+@@ -286,6 +299,8 @@ static void get_all_properties_reply(DBusPendingCall *call, void *user_data)
+ 	DBusMessageIter iter;
+ 	DBusError error;
+ 
++	g_dbus_client_ref(client);
++
+ 	dbus_error_init(&error);
+ 
+ 	if (dbus_set_error_from_message(&error, reply) == TRUE) {
+@@ -298,15 +313,13 @@ static void get_all_properties_reply(DBusPendingCall *call, void *user_data)
+ 	update_properties(proxy, &iter, FALSE);
+ 
+ done:
+-	if (g_list_find(client->proxy_list, proxy) == NULL) {
+-		if (client->proxy_added)
+-			client->proxy_added(proxy, client->user_data);
+-
+-		client->proxy_list = g_list_append(client->proxy_list, proxy);
+-	}
++	proxy_added(client, proxy);
+ 
+ 	dbus_message_unref(reply);
+ 
++	dbus_pending_call_unref(proxy->get_all_call);
++	proxy->get_all_call = NULL;
++
+ 	g_dbus_client_unref(client);
+ }
+ 
+@@ -315,7 +328,9 @@ static void get_all_properties(GDBusProxy *proxy)
+ 	GDBusClient *client = proxy->client;
+ 	const char *service_name = client->service_name;
+ 	DBusMessage *msg;
+-	DBusPendingCall *call;
++
++	if (proxy->get_all_call)
++		return;
+ 
+ 	msg = dbus_message_new_method_call(service_name, proxy->obj_path,
+ 					DBUS_INTERFACE_PROPERTIES, "GetAll");
+@@ -326,28 +341,24 @@ static void get_all_properties(GDBusProxy *proxy)
+ 							DBUS_TYPE_INVALID);
+ 
+ 	if (g_dbus_send_message_with_reply(client->dbus_conn, msg,
+-							&call, -1) == FALSE) {
++					&proxy->get_all_call, -1) == FALSE) {
+ 		dbus_message_unref(msg);
+ 		return;
+ 	}
+ 
+-	g_dbus_client_ref(client);
+-
+-	dbus_pending_call_set_notify(call, get_all_properties_reply,
+-							proxy, NULL);
+-	dbus_pending_call_unref(call);
++	dbus_pending_call_set_notify(proxy->get_all_call,
++					get_all_properties_reply, proxy, NULL);
+ 
+ 	dbus_message_unref(msg);
+ }
+ 
+-static GDBusProxy *proxy_lookup(GDBusClient *client, const char *path,
++static GDBusProxy *proxy_lookup(GList *list, const char *path,
+ 						const char *interface)
+ {
+-	GList *list;
++	GList *l;
+ 
+-	for (list = g_list_first(client->proxy_list); list;
+-						list = g_list_next(list)) {
+-		GDBusProxy *proxy = list->data;
++	for (l = g_list_first(list); l; l = g_list_next(l)) {
++		GDBusProxy *proxy = l->data;
+ 
+ 		if (g_str_equal(proxy->interface, interface) == TRUE &&
+ 				g_str_equal(proxy->obj_path, path) == TRUE)
+@@ -424,6 +435,7 @@ static GDBusProxy *proxy_new(GDBusClient *client, const char *path,
+ 							proxy->interface,
+ 							properties_changed,
+ 							proxy, NULL);
++	proxy->pending = TRUE;
+ 
+ 	return g_dbus_proxy_ref(proxy);
+ }
+@@ -478,15 +490,19 @@ GDBusProxy *g_dbus_proxy_new(GDBusClient *client, const char *path,
+ 	if (client == NULL)
+ 		return NULL;
+ 
+-	proxy = proxy_lookup(client, path, interface);
++	proxy = proxy_lookup(client->proxy_list, path, interface);
+ 	if (proxy)
+ 		return g_dbus_proxy_ref(proxy);
+ 
++
+ 	proxy = proxy_new(client, path, interface);
+ 	if (proxy == NULL)
+ 		return NULL;
+ 
+-	get_all_properties(proxy);
++	client->proxy_list = g_list_append(client->proxy_list, proxy);
++
++	if (client->connected && !client->get_objects_call)
++		get_all_properties(proxy);
+ 
+ 	return g_dbus_proxy_ref(proxy);
+ }
+@@ -509,6 +525,11 @@ void g_dbus_proxy_unref(GDBusProxy *proxy)
+ 	if (__sync_sub_and_fetch(&proxy->ref_count, 1) > 0)
+ 		return;
+ 
++	if (proxy->get_all_call != NULL) {
++		dbus_pending_call_cancel(proxy->get_all_call);
++		dbus_pending_call_unref(proxy->get_all_call);
++	}
++
+ 	g_hash_table_destroy(proxy->prop_list);
+ 
+ 	g_free(proxy->obj_path);
+@@ -916,15 +937,15 @@ gboolean g_dbus_proxy_set_removed_watch(GDBusProxy *proxy,
+ 	return TRUE;
+ }
+ 
+-static void refresh_properties(GDBusClient *client)
++static void refresh_properties(GList *list)
+ {
+-	GList *list;
++	GList *l;
+ 
+-	for (list = g_list_first(client->proxy_list); list;
+-						list = g_list_next(list)) {
++	for (l = g_list_first(list); l; l = g_list_next(l)) {
+ 		GDBusProxy *proxy = list->data;
+ 
+-		get_all_properties(proxy);
++		if (proxy->pending)
++			get_all_properties(proxy);
+         }
+ }
+ 
+@@ -939,22 +960,21 @@ static void parse_properties(GDBusClient *client, const char *path,
+ 	if (g_str_equal(interface, DBUS_INTERFACE_PROPERTIES) == TRUE)
+ 		return;
+ 
+-	proxy = proxy_lookup(client, path, interface);
+-	if (proxy) {
++	proxy = proxy_lookup(client->proxy_list, path, interface);
++	if (proxy && !proxy->pending) {
+ 		update_properties(proxy, iter, FALSE);
+ 		return;
+ 	}
+ 
+-	proxy = proxy_new(client, path, interface);
+-	if (proxy == NULL)
+-		return;
++	if (!proxy) {
++		proxy = proxy_new(client, path, interface);
++		if (proxy == NULL)
++			return;
++	}
+ 
+ 	update_properties(proxy, iter, FALSE);
+ 
+-	if (client->proxy_added)
+-		client->proxy_added(proxy, client->user_data);
+-
+-	client->proxy_list = g_list_append(client->proxy_list, proxy);
++	proxy_added(client, proxy);
+ }
+ 
+ static void parse_interfaces(GDBusClient *client, const char *path,
+@@ -1103,6 +1123,8 @@ done:
+ 	dbus_pending_call_unref(client->get_objects_call);
+ 	client->get_objects_call = NULL;
+ 
++	refresh_properties(client->proxy_list);
++
+ 	g_dbus_client_unref(client);
+ }
+ 
+@@ -1115,7 +1137,7 @@ static void get_managed_objects(GDBusClient *client)
+ 
+ 	if ((!client->proxy_added && !client->proxy_removed) ||
+ 							!client->root_path) {
+-		refresh_properties(client);
++		refresh_properties(client->proxy_list);
+ 		return;
+ 	}
+ 
+@@ -1152,11 +1174,11 @@ static void service_connect(DBusConnection *conn, void *user_data)
+ 
+ 	client->connected = TRUE;
+ 
++	get_managed_objects(client);
++
+ 	if (client->connect_func)
+ 		client->connect_func(conn, client->connect_data);
+ 
+-	get_managed_objects(client);
+-
+ 	g_dbus_client_unref(client);
+ }
+ 
+-- 
+2.13.4
+
