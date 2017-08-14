@@ -1,82 +1,64 @@
-Return-Path: <szymon.janc@codecoup.pl>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: "Ghorai, Sukumar" <sukumar.ghorai@intel.com>
+To: Oliver Neukum <oneukum@suse.com>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Greg Kroah-Hartman <greg@kroah.com>
+CC: Johan Hedberg <johan.hedberg@gmail.com>,
+        "Bag, Amit K" <amit.k.bag@intel.com>,
+        "Gustavo F. Padovan" <gustavo@padovan.org>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "Wysocki, Rafael J" <rafael.j.wysocki@intel.com>
+Subject: RE: [PATCH] bt usb-device initialize as wakeup enable
+Date: Mon, 14 Aug 2017 11:49:11 +0000
+Message-ID: <D73ECEF0C711E34A8F972E4B87F5400578E534D5@BGSMSX103.gar.corp.intel.com>
+References: <1502735088-4333-1-git-send-email-sukumar.ghorai@intel.com>
+         <CB2B50F2-C0C5-4302-96F7-24B952B97665@holtmann.org>
+ <1502695528.12678.3.camel@suse.com>
+In-Reply-To: <1502695528.12678.3.camel@suse.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <d0d2f76d-fb23-0688-0038-51582a374c8e@windriver.com>
-References: <20170814071640.289327-1-fupan.li@windriver.com>
- <6EC96C1E-CE98-4CF1-B1B2-1CEC9DBC36EA@holtmann.org> <d0d2f76d-fb23-0688-0038-51582a374c8e@windriver.com>
-From: Szymon Janc <szymon.janc@codecoup.pl>
-Date: Mon, 14 Aug 2017 14:46:07 +0200
-Message-ID: <CAAEJBhKY-8G_9-cwi6HpLBmbFhyBKCnYJ+yvBy_nXxy9G66Wvw@mail.gmail.com>
-Subject: Re: [PATCH] net/bluetooth: make bluetooth socket can be created in
- net namespace
-To: fupan <fupan.li@windriver.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, "Gustavo F. Padovan" <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Bluez mailing list <linux-bluetooth@vger.kernel.org>, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
-
-On 14 August 2017 at 11:45, fupan <fupan.li@windriver.com> wrote:
-> On 2017/8/14 17:30, Marcel Holtmann wrote:
->>
->> Hi Fupan,
->>
->>> By now kernel only supported creating bluetooth socket in init_net
->>> net namespace, which made bluetooth device cannot be accessed in
->>> containers, this patch made bluetooth socket can be created in
->>> net namespaces to fix this issue.
->>>
->>> Signed-off-by: Fupan Li <fupan.li@windriver.com>
->>> ---
->>> net/bluetooth/af_bluetooth.c | 2 +-
->>> net/bluetooth/bnep/sock.c    | 4 ++--
->>> net/bluetooth/cmtp/sock.c    | 4 ++--
->>> net/bluetooth/hci_sock.c     | 4 ++--
->>> net/bluetooth/hidp/sock.c    | 4 ++--
->>> net/bluetooth/l2cap_sock.c   | 4 ++--
->>> net/bluetooth/rfcomm/core.c  | 2 +-
->>> net/bluetooth/rfcomm/sock.c  | 4 ++--
->>> net/bluetooth/sco.c          | 4 ++--
->>> 9 files changed, 16 insertions(+), 16 deletions(-)
->>>
->>> diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.=
-c
->>> index 91e3ba280706..eec5ac17faee 100644
->>> --- a/net/bluetooth/af_bluetooth.c
->>> +++ b/net/bluetooth/af_bluetooth.c
->>> @@ -113,7 +113,7 @@ static int bt_sock_create(struct net *net, struct
->>> socket *sock, int proto,
->>> {
->>>         int err;
->>>
->>> -       if (net !=3D &init_net)
->>> +       if (!net_eq(net, current->nsproxy->net_ns))
->>>                 return -EAFNOSUPPORT;
->>
->> before I apply such a patch, what is the actual change here. What impact
->> does this have? Are things like Bluetooth mgmt sockets still operating
->> correctly after this? We have no support for move a Bluetooth controller
->> into a container. The Bluetooth hardware is global.
->
-> Hi=EF=BC=8C Marcel
->
-> This patch hasn't nothing to do with the Bluetooth hardware, the hardware=
- is
-> still global.
-> But before you apply this patch, you cannot access the bluetooth hardware=
- in
-> a container,
-> since you cannot create a bluetooth socket if you are not in the init_net
-> namespace.
-> After applying this patch, you can access the bluetooth hardware both in =
-the
-> init_net namespace
-> and containers.
-
-Does this mean one could sniff BT traffic from container? Or control
-BT hw from multiple containers?
-
---=20
-pozdrawiam
-Szymon K. Janc
+Pj4gPg0KPj4gPiBCVC1Db250cm9sbGVyIGNvbm5lY3RlZCBhcyBwbGF0Zm9ybSBub24tcm9vdC1o
+dWIgZGV2aWNlIGFuZA0KPj4gPiB1c2ItZHJpdmVyIGluaXRpYWxpemUgc3VjaCBkZXZpY2Ugd2l0
+aCB3YWtldXAgZGlzYWJsZWQsIFJlZi4NCj4+ID4gdXNiX25ld19kZXZpY2UoKS4NCj4+ID4NCj4+
+ID4gQXQgcHJlc2VudCB3YWtldXAtY2FwYWJpbGl0eSBnZXQgZW5hYmxlZCBieSBoaWQtaW5wdXQg
+ZGV2aWNlIGZyb20NCj4+ID4gdXNiIGZ1bmN0aW9uIGRyaXZlcihlLmcuIEJUIEhJRCBkZXZpY2Up
+IGF0IHJ1bnRpbWUuIEFnYWluIHNvbWUNCj4+ID4gZnVuY3Rpb25hbCBkcml2ZXIgZG9lcyBub3Qg
+c2V0IHVzYi13YWtldXAgY2FwYWJpbGl0eShlLmcgTEUgSElEDQo+PiA+IGRldmljZSBpbXBsZW1l
+bnQgYXMgSElELW92ZXItR0FUVCksIGFuZCBjYW4ndCB3YWtldXAgdGhlIGhvc3Qgb24gVVNCLg0K
+Pj4gPg0KPj4gPiBIZW5jZSB1c2Itd2FrZXVwIGNhcGFiaWxpdHkgZW5hYmxlIGZvcm0gYnR1c2Mg
+ZHJpdmVyIGFzIGEgZ2VuZXJpYw0KPj4gPiBzb2x1dGlvbiBmb3IgbXVsdGlwbGUgcHJvZmlsZSB1
+c2VjYXNlIGFuZCByZXF1aXJlZCBmb3IgVVNCIHJlbW90ZQ0KPj4gPiB3YWtldXAgKGluLWJ1cyB3
+YWtldXApIHdoaWxlIGhvc3QgaXMgc3VzcGVuZGVkLg0KPj4gPg0KPj4gPiBTaWduZWQtb2ZmLWJ5
+OiBTdWt1bWFyIEdob3JhaSA8c3VrdW1hci5naG9yYWlAaW50ZWwuY29tPg0KPj4gPiBTaWduZWQt
+b2ZmLWJ5OiBBbWl0IEsgQmFnIDxhbWl0LmsuYmFnQGludGVsLmNvbT4jDQo+PiA+IC0tLQ0KPj4g
+PiBkcml2ZXJzL2JsdWV0b290aC9idHVzYi5jIHwgNCArKysrDQo+PiA+IDEgZmlsZSBjaGFuZ2Vk
+LCA0IGluc2VydGlvbnMoKykNCj4+ID4NCj4+ID4gZGlmZiAtLWdpdCBhL2RyaXZlcnMvYmx1ZXRv
+b3RoL2J0dXNiLmMgYi9kcml2ZXJzL2JsdWV0b290aC9idHVzYi5jDQo+PiA+IGluZGV4IGUxMTI0
+YmE0NDE1NC4uN2VlZWViNmZmYWU2IDEwMDY0NA0KPj4gPiAtLS0gYS9kcml2ZXJzL2JsdWV0b290
+aC9idHVzYi5jDQo+PiA+ICsrKyBiL2RyaXZlcnMvYmx1ZXRvb3RoL2J0dXNiLmMNCj4+ID4gQEAg
+LTEwODMsNiArMTA4MywxMCBAQCBzdGF0aWMgaW50IGJ0dXNiX29wZW4oc3RydWN0IGhjaV9kZXYg
+KmhkZXYpDQo+PiA+IAl9DQo+PiA+DQo+PiA+IAlkYXRhLT5pbnRmLT5uZWVkc19yZW1vdGVfd2Fr
+ZXVwID0gMTsNCj4+ID4gKwkvKiBkZXZpY2Ugc3BlY2lmaWMgd2FrZXVwIHNvdXJjZSBlbmFibGVk
+IGFuZCByZXF1aXJlZCBmb3IgVVNCDQo+PiA+ICsJICogcmVtb3RlIHdha2V1cCB3aGlsZSBob3N0
+IGlzIHN1c3BlbmRlZA0KPj4gPiArCSAqLw0KPj4gPiArCWRldmljZV9pbml0X3dha2V1cCgmZGF0
+YS0+dWRldi0+ZGV2LCB0cnVlKTsNCj4+ID4NCj4+DQo+PiBpcyB0aGlzIHRoZSByaWdodCBsb2Nh
+dGlvbj8gQXJlIHdlIHJlcGVhdGluZyB0aGlzIG9uIGV2ZXJ5IGhjaWNvbmZpZyB1cCAvIGJ0bWdt
+dA0KPnBvd2Vyb24gb3BlcmF0aW9uPyBPciBpcyB0aGlzIHNvbWV0aGluZyB0aGF0IHNob3VsZCBi
+ZSBhY3R1YWxseSBoYXBwZW4gb25seSBvbmNlDQo+ZHVyaW5nIFVTQiBwcm9iZSBjYWxsYmFjaz8N
+CltTdWt1bWFyXSBhZ3JlZS4uIGRldmljZV93YWtldXBfZW5hYmxlL19kaXNhYmxlKCkgbmVlZCB0
+byBjYWxsIGF0DQpidHVzYl9vcGVuL19jbG9zZSgpIHJlc3BlY3RpdmVseS4gdGhpcyB3aWxsIHRv
+Z2dsZSB0aGUgZmxhZyANCi9zeXMvYnVzL3VzYi9kZXZpY2VzL3h4L3Bvd2VyL3dha2V1cC4gDQpX
+aWxsIGNvcnJlY3QgaW4gcGF0Y2ggdjIuDQoNCj4NCj5IaSwNCj4NCj5pdCB3b3VsZCBiZSBtb3Jl
+IGVmZmljaWVudCB0byBkbyB0aGF0IG9uIHByb2JlKCkuIEJ1dCBoYXZlIHlvdSB0ZXN0ZWQgdGhp
+cyBmb3Igc2lkZQ0KPmVmZmVjdHM/IFdpbGwgb3RoZXIgQlQgb3BlcmF0aW9ucyBub3cgd2FrZSB1
+cCB0aGUgaG9zdD8NCj4NCj5PbiBhIHBoaWxvc29waGljYWwgbm90ZSBpdCBpcyBraW5kIG9mIHVn
+bHkgdG8gc29sdmUgYSBnZW5lcmljIHByb2JsZW0gaW4gYnR1c2IuDQo+QXJndWFibHkgd2FrZXVw
+IGNhcGFiaWxpdHkgc2hvdWxkIHByb3BhZ2F0ZSB1cCB0aGUgZGV2aWNlIHRyZWUgaWYgeW91IHJl
+cXVlc3QgaXQuDQo+SGF2ZSB5b3UgZGlzY3Vzc2VkIHRoaXMgd2l0aCBSYWZhZWw/DQpbU3VrdW1h
+cl0gV2UgbmVlZCB0aGUgYnQtY29udHJvbGxlciB0byBiZSB3YWtlLXVwIGVuYWJsZSwgd2hpbGUg
+aG9zdCBpcyBzdXNwZW5kZWQuDQpBbmQgZXZlbiB3aGVuIG5vIHByb2ZpbGUvcHJvdG9jb2wgaXMg
+ZW5hYmxlZCBhbmQgdG8gYWNjZXB0IHRoZSByZW1vdGUgY29ubmVjdGlvbiwgDQpmb3IgZXhhbXBs
+ZS4NCg0KPg0KPglSZWdhcmRzDQo+CQlPbGl2ZXINCg0K
