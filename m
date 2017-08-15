@@ -1,133 +1,66 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain; charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Subject: Re: [PATCH v3 2/3] ARM: dts: bcm2837-rpi-3-b: Add bcm43438 as serial
- slave
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <FCD47ED6-F01F-4921-97A3-BBC1D0263747@holtmann.org>
-Date: Tue, 15 Aug 2017 06:39:39 +0200
-Cc: Rob Herring <robh+dt@kernel.org>,
-        Stefan Wahren <stefan.wahren@i2se.com>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Ray Jui <rjui@broadcom.com>,
-        Scott Branden <sbranden@broadcom.com>,
-        Florian Fainelli <f.fainelli@gmail.com>,
-        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-        linux-rpi-kernel@lists.infradead.org
-Message-Id: <330DB7DA-C7E0-4587-A9F3-0FA83C6390EB@holtmann.org>
-References: <1502102366-2760-1-git-send-email-loic.poulain@gmail.com>
- <1502102366-2760-2-git-send-email-loic.poulain@gmail.com>
- <CAL_JsqKxA2pgtjmG-cxy5XPWuRWUiia-weRZDSh4++Vn=QZmqA@mail.gmail.com>
- <8186E2A3-D0AC-498F-8229-78862D363F78@holtmann.org>
- <392e6d51-33d6-1585-6582-1397a0c64852@gmail.com>
- <161632C7-EBBF-47F5-86DC-453E10395B54@holtmann.org>
- <e001e055-10a5-facd-a8e1-57c1bdb78172@gmail.com>
- <FCD47ED6-F01F-4921-97A3-BBC1D0263747@holtmann.org>
-To: Loic Poulain <loic.poulain@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <johan.hedberg@gmail.com>
+Date: Tue, 15 Aug 2017 06:28:19 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v2] Bluetooth: btusb: Add workaround for Broadcom devices
+ without product id
+Message-ID: <20170815032819.GA22568@x1c.home>
+References: <20170814203959.6625-1-marcel@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170814203959.6625-1-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Loic,
+Hi Marcel,
 
->>>>>>> Add BCM43438 as a slave device of uart0 (pl011/ttyAMA0).
->>>>>>> This allows to automatically insert the bcm43438 to the bluetooth
->>>>>>> subsystem instead of relying on userspace helpers (hciattach).
->>>>>>> 
->>>>>>> Overwrite bootargs to use 8250 aux uart (ttyS0) as console instead
->>>>>>> of pl011/ttyAMA0.
->>>>>>> 
->>>>>>> Signed-off-by: Loic Poulain <loic.poulain@gmail.com>
->>>>>>> ---
->>>>>>> v2: dt-bindings as separate patch
->>>>>>>    rebase on upcoming pi3 dts changes
->>>>>>> v3: changes in bcm serdev drivers:
->>>>>>>    name refactoring and additional comments
->>>>>>>    Add generic host_set_baudrate method
->>>>>>>    Use agnostic device_property_read
->>>>>>> 
->>>>>>> arch/arm/boot/dts/bcm2837-rpi-3-b.dts | 10 ++++++++++
->>>>>>> 1 file changed, 10 insertions(+)
->>>>>>> 
->>>>>>> diff --git a/arch/arm/boot/dts/bcm2837-rpi-3-b.dts b/arch/arm/boot/dts/bcm2837-rpi-3-b.dts
->>>>>>> index 20725ca..5abc1df 100644
->>>>>>> --- a/arch/arm/boot/dts/bcm2837-rpi-3-b.dts
->>>>>>> +++ b/arch/arm/boot/dts/bcm2837-rpi-3-b.dts
->>>>>>> @@ -8,6 +8,11 @@
->>>>>>>       compatible = "raspberrypi,3-model-b", "brcm,bcm2837";
->>>>>>>       model = "Raspberry Pi 3 Model B";
->>>>>>> 
->>>>>>> +       chosen {
->>>>>>> +               /* 8250 auxiliar UART instead of pl011 */
->>>>>>> +               bootargs = "earlyprintk console=ttyS0,115200";
->>>>>> This is an unrelated change. "earlyprintk" is arm32 specific and only
->>>>>> works with a kernel built with a specific uart type and address. Also,
->>>>>> stdout-path property is preferred to set the default over "console”.
->>>> I'm going to use stdout-path according to your comment.
->>>> However one of the goals was to overwrite the bcm283x.dtsi bootargs,
->>>> I assume the same comment apply on the dtsi (stdpath usage /earlyprintk)
->>>> which should require update too.
->>>> 
->>>>> the whole fun with the serial console on the rPI3 and the bt-miniuart overlay is something we should solve now. What is the upstream story on this since the config.txt and everything around it is confusing and also misleading since it relies on a Raspbian userspace.
->>>>> 
->>>>> Do we need to the kernel and init to stay away from the ttyAMA0 to avoid confusing the BT chip? As I mentioned earlier, I can not even get a Fedora 26 with hciattach or btattach to work.
->>>>> 
->>>> It is also possible to mux the auxiliary mini UART to drive the Bluetooth
->>>> controller in order to keep ttyAMA0 as the "legacy" RPi ext-uart/console,
->>>> however SoC spec says that this mini UART is intented to be used mainly as
->>>> a console due to shallow FIFOs and no DMA.
->>> what upstream kernel tree did you test this with? On a Fedora 26 kernel (now 4.12 based), I still do not have the Bluetooth hardware working.
->>> 
->>> Regards
->>> 
->>> Marcel
->>> 
->> 
->> I built kernel, modules and dtb from a bluetooth-next tree (4.12 and 4.13-rc3).
->> Using 32-bit multi_v7_defconfig + some additional confs to enable miniuart (BCM2835AUX...) for console.
->> I push this on a raspbian image.
->> 
->> my boot/config.txt is very simple (no overlay):
->> 
->> kernel=zImage
->> device_tree=bcm2837-rpi-3-b.dtb
->> # hack for miniuart serial clock
->> core_freq=250
->> dtparam=audio=on
+On Mon, Aug 14, 2017, Marcel Holtmann wrote:
+> The GPD Pocket is shipping with a BCM2045 USB HCI with its vendor and
+> product information set to 0000:0000 and also has its interface class
+> set to 255 (Vendor Specific Class). Luckily it does advertise usable
+> manufacturer and product strings.
 > 
-> so the Fedora 26 kernel that is based on 4.12 is missing uart0 configuration in DT. Adding it to bcm2837-rpi-3-b.dts will allow for btattach to actually work.
+> T:  Bus=01 Lev=01 Prnt=01 Port=02 Cnt=02 Dev#=  3 Spd=12   MxCh= 0
+> D:  Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+> P:  Vendor=0000 ProdID=0000 Rev= 1.12
+> S:  Manufacturer=Broadcom Corp
+> S:  Product=BCM2045A0
+> S:  SerialNumber=AC83F30677CB
+> C:* #Ifs= 4 Cfg#= 1 Atr=80 MxPwr=100mA
+> I:* If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+> I:* If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+> I:  If#= 1 Alt= 1 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+> I:  If#= 1 Alt= 2 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+> I:  If#= 1 Alt= 3 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+> I:  If#= 1 Alt= 4 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+> I:  If#= 1 Alt= 5 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+> I:* If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
+> E:  Ad=84(I) Atr=02(Bulk) MxPS=  32 Ivl=0ms
+> E:  Ad=04(O) Atr=02(Bulk) MxPS=  32 Ivl=0ms
+> I:* If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
 > 
-> &uart0 {
-> 	pinctrl-names = "default";
-> 	pinctrl-0 = <&uart0_gpio32 &gpclk2_gpio43>;
-> 	status = "okay”;
-> };
-> 
-> It kinda works, but not all of it. This command confuses me.
-> 
-> < HCI Command: Broadcom Write UART Clock Setting (0x3f|0x0045) plen 1
->        01                                               .               
->> HCI Event: Command Complete (0x0e) plen 4
->      Broadcom Write UART Clock Setting (0x3f|0x0045) ncmd 1
->        Status: Unknown HCI Command (0x01)
-> 
-> And I am seeing fun stuff like failed frame assembly.
-> 
-> [  888.687594] Bluetooth: hci0: BCM: chip id 94
-> [  888.687821] Bluetooth: hci0: BCM43430A1 (001.002.009) build 0182
-> [  892.059023] Bluetooth: hci0: Frame reassembly failed (-84)
-> [  892.316936] Bluetooth: hci0: BCM: failed to write clock (-56)
-> [  892.429478] Bluetooth: hci0: BCM (001.002.009) build 0182
-> 
-> Actually not providing the firmware makes the controller work. It however is stuck ad AA:AA:.. default address. Providing the firmware turns the address active. However then it never completes.
+> Reported-by: Christopher Williamson <home@chrisaw.com>
+> Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+> ---
+>  drivers/bluetooth/btusb.c | 18 ++++++++++++++++++
+>  1 file changed, 18 insertions(+)
 
-so here is my suspicion. By default the hci_bcm driver tries to enable an UART operational speed of 4000000. However this hardware does not support it and it does not even support the required command to change the clock. That is why things do not work properly with the hci_bcm driver and btattach. I assume that is why you added max-speed 921600 for the serdev support. What I can figure out that a speed up-to 3000000 (as in some of the hciattach examples) will actually work since that doesn’t use the UART Clock setting to change the clock type.
+Applied to bluetooth-next. Thanks.
 
-So I wonder if using an oper_speed = 4000000 as default is actually a good idea. Maybe we should only do that if we have found a matching ACPI entry. Or if we get a max-speed entry from DT. Otherwise actually default to 115200.
-
-We also really need to convert the ACPI support to use serdev as well. At least the standard tables list them as BTH0 which we could use to identify them as Bluetooth devices. Or we just need to do it based on the _HID string.
-
-Regards
-
-Marcel
-
+Johan
