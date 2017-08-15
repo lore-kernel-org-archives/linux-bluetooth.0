@@ -1,256 +1,73 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <richard@sigma-star.at>
+From: Richard Weinberger <richard@sigma-star.at>
+To: linux-kernel@vger.kernel.org
+Cc: marcel@holtmann.org, gustavo@padovan.org, johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org
+Subject: WARNING: CPU: 3 PID: 2952 at drivers/base/firmware_class.c:1225 _request_firmware+0x329/0x890
+Date: Tue, 15 Aug 2017 11:20:23 +0200
+Message-ID: <2237498.dXpkGoRScD@blindfold>
 MIME-Version: 1.0
-In-Reply-To: <20170815012242.70454-1-yunhanw@google.com>
-References: <20170815012242.70454-1-yunhanw@google.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 15 Aug 2017 12:32:33 +0300
-Message-ID: <CABBYNZL+ZV+Gi+v4pN_XxMG7z_Mi5RLi=5GmuV_CBSc_Wf3gsw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] gdbus: add method to receive reply when property is updated
-To: Yunhan Wang <yunhanw@google.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Yunhan,
+Hi!
 
-On Tue, Aug 15, 2017 at 4:22 AM, Yunhan Wang <yunhanw@google.com> wrote:
-> This add g_dbus_emit_property_changed_with_reply to receive reply when
-> property change is emitted.
-> If no reply is received in the given timeout_milliseconds or reply is
-> recieved, the notification function is called. If destroy function is
-> set, this function would be called after notification function completes.
+My new Thinkpad T470p regularly triggers this warning.
+Seems to happy only after resuming from suspend.
 
-Are you trying to implement what exactly, GATT indications?
+[147242.220708] PM: Finishing wakeup.
+[147242.220711] OOM killer enabled.
+[147242.220711] Restarting tasks ... 
+[147242.221908] Bluetooth: hci0: Bootloader revision 0.0 build 26 week 38 2015
+[147242.222888] [drm] RC6 on
+[147242.227695] Bluetooth: hci0: Device revision is 16
+[147242.227696] Bluetooth: hci0: Secure boot is enabled
+[147242.227697] Bluetooth: hci0: OTP lock is enabled
+[147242.227697] Bluetooth: hci0: API lock is enabled
+[147242.227698] Bluetooth: hci0: Debug lock is disabled
+[147242.227698] Bluetooth: hci0: Minimum firmware build 1 week 10 2014
+[147242.227701] firmware request while host is not available
+[147242.227708] ------------[ cut here ]------------
+[147242.227713] WARNING: CPU: 3 PID: 2952 at drivers/base/firmware_class.c:1225 _request_firmware+0x329/0x890
+[147242.227713] Modules linked in: rndis_wlan rndis_host cdc_ether cdc_phonet usbnet phonet mii cdc_acm nls_utf8 udf crc_itu_t msr fuse tun ppp_deflate bsd_comp ppp_async ppp_generic slhc sr_mod cdrom uas usb_storage option usb_wwan usbserial ctr ccm rfcomm nf_log_ipv6 xt_comment nf_log_ipv4 nf_log_common xt_LOG xt_limit af_packet binfmt_misc ip6t_REJECT nf_reject_ipv6 nf_conntrack_ipv6 nf_defrag_ipv6 ipt_REJECT nf_reject_ipv4 xt_pkttype xt_tcpudp iptable_filter ip6table_mangle nf_conntrack_netbios_ns nf_conntrack_broadcast nf_conntrack_ipv4 nf_defrag_ipv4 ip_tables xt_conntrack nf_conntrack libcrc32c ip6table_filter ip6_tables x_tables bnep snd_hda_codec_hdmi snd_hda_codec_realtek snd_hda_codec_generic arc4 btusb hci_uart btrtl btbcm btqca btintel bluetooth snd_hda_intel snd_hda_codec snd_hda_core snd_hwdep
+[147242.227739]  snd_pcm iwlmvm mac80211 snd_timer intel_rapl x86_pkg_temp_thermal iwlwifi intel_powerclamp cfg80211 coretemp e1000e mei_me ptp kvm_intel iTCO_wdt rtsx_pci_ms thinkpad_acpi iTCO_vendor_support memstick kvm snd irqbypass drbg pcspkr joydev wmi_bmof i2c_i801 pps_core mei shpchp intel_pch_thermal soundcore battery ac ansi_cprng ecdh_generic rfkill crc16 pinctrl_sunrisepoint pinctrl_intel thermal intel_lpss_acpi intel_lpss tpm_crb acpi_pad btrfs xor raid6_pq dm_crypt crct10dif_pclmul crc32_pclmul crc32c_intel ghash_clmulni_intel pcbc rtsx_pci_sdmmc mmc_core aesni_intel aes_x86_64 crypto_simd glue_helper cryptd serio_raw nvme nvme_core i915 xhci_pci rtsx_pci mfd_core i2c_algo_bit drm_kms_helper syscopyarea sysfillrect sysimgblt fb_sys_fops xhci_hcd drm usbcore wmi video i2c_hid button dm_mirror
+[147242.227767]  dm_region_hash dm_log dm_mod sg scsi_mod efivarfs autofs4
+[147242.227771] CPU: 3 PID: 2952 Comm: kworker/u9:0 Tainted: G        W       4.13.0-rc4-rw+ #5
+[147242.227772] Hardware name: LENOVO 20J6CTO1WW/20J6CTO1WW, BIOS R0FET34W (1.14 ) 06/30/2017
+[147242.227783] Workqueue: hci0 hci_power_on [bluetooth]
+[147242.227784] task: ffff88011e47cb00 task.stack: ffffc90008294000
+[147242.227786] RIP: 0010:_request_firmware+0x329/0x890
+[147242.227786] RSP: 0018:ffffc90008297c88 EFLAGS: 00010286
+[147242.227787] RAX: 000000000000002c RBX: ffffc90008297d58 RCX: 0000000000000006
+[147242.227788] RDX: 0000000000000000 RSI: 0000000000000082 RDI: ffff88041f58e010
+[147242.227788] RBP: ffffc90008297ce8 R08: 0000000000000000 R09: 0000000000000ba3
+[147242.227789] R10: 0000000000000004 R11: 0000000000000ba2 R12: ffff8803a731dd40
+[147242.227789] R13: ffffc90008297d40 R14: 0000000000000000 R15: ffffffff81ae61b0
+[147242.227790] FS:  0000000000000000(0000) GS:ffff88041f580000(0000) knlGS:0000000000000000
+[147242.227791] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[147242.227791] CR2: 00007f8f905bb2d8 CR3: 000000032225d000 CR4: 00000000003406e0
+[147242.227792] Call Trace:
+[147242.227795]  request_firmware+0x37/0x50
+[147242.227798]  btusb_setup_intel_new+0x257/0x7c0 [btusb]
+[147242.227806]  ? usb_autopm_put_interface+0x30/0x40 [usbcore]
+[147242.227812]  hci_dev_do_open+0x3ff/0x530 [bluetooth]
+[147242.227814]  ? __switch_to+0x21a/0x440
+[147242.227819]  hci_power_on+0x43/0x220 [bluetooth]
+[147242.227821]  ? __schedule+0x29a/0x8c0
+[147242.227823]  process_one_work+0x13f/0x3a0
+[147242.227824]  worker_thread+0x4d/0x3d0
+[147242.227825]  kthread+0x114/0x150
+[147242.227826]  ? rescuer_thread+0x350/0x350
+[147242.227828]  ? kthread_park+0x60/0x60
+[147242.227829]  ? do_syscall_64+0x6e/0x160
+[147242.227831]  ret_from_fork+0x25/0x30
+[147242.227831] Code: ff 8b 55 c4 48 8b 75 c8 4c 89 e7 e8 12 fb ff ff 41 89 c1 e9 11 ff ff ff e8 25 9c 1c 00 48 c7 c7 18 4e aa 81 31 c0 e8 9a a3 bc ff <0f> ff 41 b9 90 ff ff ff e9 0e fd ff ff 4c 89 f7 e8 72 e8 1b 00 
+[147242.227848] ---[ end trace 2d0d21cf844f8a8d ]---
 
-> ---
->  gdbus/gdbus.h     | 20 +++++++++++--
->  gdbus/object.c    | 87 +++++++++++++++++++++++++++++++++++++++++++++++++++----
->  src/gatt-client.c |  2 +-
->  3 files changed, 100 insertions(+), 9 deletions(-)
->
-> diff --git a/gdbus/gdbus.h b/gdbus/gdbus.h
-> index e37385fa1..8099a9930 100644
-> --- a/gdbus/gdbus.h
-> +++ b/gdbus/gdbus.h
-> @@ -59,6 +59,8 @@ gboolean g_dbus_set_disconnect_function(DBusConnection *connection,
->                                 GDBusWatchFunction function,
->                                 void *user_data, DBusFreeFunction destroy);
->
-> +typedef void (* GDBusResultFunction) (const DBusError *error, void *user_data);
-> +
->  typedef void (* GDBusDestroyFunction) (void *user_data);
->
->  typedef DBusMessage * (* GDBusMethodFunction) (DBusConnection *connection,
-> @@ -314,10 +316,24 @@ void g_dbus_pending_property_error(GDBusPendingReply id, const char *name,
->  void g_dbus_emit_property_changed(DBusConnection *connection,
->                                 const char *path, const char *interface,
->                                 const char *name);
-> +
->  void g_dbus_emit_property_changed_full(DBusConnection *connection,
->                                 const char *path, const char *interface,
->                                 const char *name,
-> -                               GDbusPropertyChangedFlags flags);
-> +                               GDbusPropertyChangedFlags flags,
-> +                               GDBusResultFunction function,
-> +                               void *user_data,
-> +                               GDBusDestroyFunction destroy,
-> +                               int timeout);
-> +
-> +void g_dbus_emit_property_changed_with_reply(DBusConnection *connection,
-> +                               const char *path, const char *interface,
-> +                               const char *name,
-> +                               GDBusResultFunction function,
-> +                               void *user_data,
-> +                               GDBusDestroyFunction destroy,
-> +                               int timeout);
-> +
->  gboolean g_dbus_get_properties(DBusConnection *connection, const char *path,
->                                 const char *interface, DBusMessageIter *iter);
->
-> @@ -341,8 +357,6 @@ gboolean g_dbus_proxy_get_property(GDBusProxy *proxy, const char *name,
->
->  gboolean g_dbus_proxy_refresh_property(GDBusProxy *proxy, const char *name);
->
-> -typedef void (* GDBusResultFunction) (const DBusError *error, void *user_data);
-> -
->  gboolean g_dbus_proxy_set_property_basic(GDBusProxy *proxy,
->                                 const char *name, int type, const void *value,
->                                 GDBusResultFunction function, void *user_data,
-> diff --git a/gdbus/object.c b/gdbus/object.c
-> index afb458764..16d769c9b 100644
-> --- a/gdbus/object.c
-> +++ b/gdbus/object.c
-> @@ -59,6 +59,10 @@ struct generic_data {
->         gboolean pending_prop;
->         char *introspect;
->         struct generic_data *parent;
-> +       GDBusResultFunction function;
-> +       void *user_data;
-> +       GDBusDestroyFunction destroy;
-> +       int timeout;
->  };
->
->  struct interface_data {
-> @@ -84,6 +88,12 @@ struct property_data {
->         DBusMessage *message;
->  };
->
-> +struct process_property_data {
-> +       GDBusResultFunction function;
-> +       void *user_data;
-> +       GDBusDestroyFunction destroy;
-> +};
-> +
->  static int global_flags = 0;
->  static struct generic_data *root;
->  static GSList *pending = NULL;
-> @@ -1651,6 +1661,26 @@ fail:
->         return ret;
->  }
->
-> +static void process_property_reply(DBusPendingCall *call, void *user_data)
-> +{
-> +       struct process_property_data *data = user_data;
-> +       DBusMessage *reply = dbus_pending_call_steal_reply(call);
-> +       DBusError error;
-> +
-> +       dbus_error_init(&error);
-> +
-> +       dbus_set_error_from_message(&error, reply);
-> +
-> +       if (data->function)
-> +               data->function(&error, data->user_data);
-> +
-> +       if (data->destroy)
-> +               data->destroy(data->user_data);
-> +
-> +       dbus_error_free(&error);
-> +       dbus_message_unref(reply);
-> +}
-> +
->  static void process_properties_from_interface(struct generic_data *data,
->                                                 struct interface_data *iface)
->  {
-> @@ -1658,7 +1688,7 @@ static void process_properties_from_interface(struct generic_data *data,
->         DBusMessage *signal;
->         DBusMessageIter iter, dict, array;
->         GSList *invalidated;
-> -
-> +       DBusPendingCall *call;
->         data->pending_prop = FALSE;
->
->         if (iface->pending_prop == NULL)
-> @@ -1713,8 +1743,35 @@ static void process_properties_from_interface(struct generic_data *data,
->         g_slist_free(iface->pending_prop);
->         iface->pending_prop = NULL;
->
-> -       /* Use dbus_connection_send to avoid recursive calls to g_dbus_flush */
-> -       dbus_connection_send(data->conn, signal, NULL);
-> +       if (data->function != NULL)
-> +       {
-> +               struct process_property_data *process_property_data;
-> +
-> +               process_property_data = g_try_new0(struct process_property_data, 1);
-> +               if (process_property_data == NULL)
-> +                       return;
-> +
-> +               process_property_data->function = data->function;
-> +               process_property_data->user_data = data->user_data;
-> +               process_property_data->destroy = data->destroy;
-> +
-> +               /* Use dbus_connection_send to avoid recursive calls to g_dbus_flush */
-> +               if (g_dbus_send_message_with_reply(data->conn, signal,
-> +                                                               &call, data->timeout) == FALSE) {
+Is this known?
 
-This shoudn't work as there is no reply to a signal:
-
-https://dbus.freedesktop.org/doc/dbus-tutorial.html#members
-
-> +                       dbus_message_unref(signal);
-> +                       g_free(process_property_data);
-> +                       return;
-> +               }
-> +
-> +               dbus_pending_call_set_notify(call, process_property_reply, process_property_data, g_free);
-> +               dbus_pending_call_unref(call);
-> +       }
-> +       else
-> +       {
-> +               /* Use dbus_connection_send to avoid recursive calls to g_dbus_flush */
-> +               dbus_connection_send(data->conn, signal, NULL);
-> +       }
-> +
->         dbus_message_unref(signal);
->  }
->
-> @@ -1732,7 +1789,11 @@ static void process_property_changes(struct generic_data *data)
->  void g_dbus_emit_property_changed_full(DBusConnection *connection,
->                                 const char *path, const char *interface,
->                                 const char *name,
-> -                               GDbusPropertyChangedFlags flags)
-> +                               GDbusPropertyChangedFlags flags,
-> +                               GDBusResultFunction function,
-> +                               void *user_data,
-> +                               GDBusDestroyFunction destroy,
-> +                               int timeout)
->  {
->         const GDBusPropertyTable *property;
->         struct generic_data *data;
-> @@ -1770,6 +1831,14 @@ void g_dbus_emit_property_changed_full(DBusConnection *connection,
->         iface->pending_prop = g_slist_prepend(iface->pending_prop,
->                                                 (void *) property);
->
-> +       if (function != NULL)
-> +       {
-> +               data->function = function;
-> +               data->user_data = user_data;
-> +               data->destroy = destroy;
-> +               data->timeout = timeout;
-> +       }
-> +
->         if (flags & G_DBUS_PROPERTY_CHANGED_FLAG_FLUSH)
->                 process_property_changes(data);
->         else
-> @@ -1779,7 +1848,15 @@ void g_dbus_emit_property_changed_full(DBusConnection *connection,
->  void g_dbus_emit_property_changed(DBusConnection *connection, const char *path,
->                                 const char *interface, const char *name)
->  {
-> -       g_dbus_emit_property_changed_full(connection, path, interface, name, 0);
-> +       g_dbus_emit_property_changed_full(connection, path, interface, name, 0, NULL, NULL, NULL, 0);
-> +}
-> +
-> +void g_dbus_emit_property_changed_with_reply(DBusConnection *connection, const char *path,
-> +                               const char *interface, const char *name,
-> +                               GDBusResultFunction function, void *user_data,
-> +                               GDBusDestroyFunction destroy, int timeout)
-> +{
-> +       g_dbus_emit_property_changed_full(connection, path, interface, name, 0, function, user_data, destroy, timeout);
->  }
->
->  gboolean g_dbus_get_properties(DBusConnection *connection, const char *path,
-> diff --git a/src/gatt-client.c b/src/gatt-client.c
-> index 1cd7fbcf5..5fd94657c 100644
-> --- a/src/gatt-client.c
-> +++ b/src/gatt-client.c
-> @@ -878,7 +878,7 @@ static void write_characteristic_cb(struct gatt_db_attribute *attr, int err,
->
->         g_dbus_emit_property_changed_full(btd_get_dbus_connection(),
->                                 chrc->path, GATT_CHARACTERISTIC_IFACE,
-> -                               "Value", G_DBUS_PROPERTY_CHANGED_FLAG_FLUSH);
-> +                               "Value", G_DBUS_PROPERTY_CHANGED_FLAG_FLUSH, NULL, NULL, NULL, 0);
->
->  }
->
-> --
-> 2.14.0.434.g98096fd7a8-goog
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
+Thanks,
+//richard
 
 -- 
-Luiz Augusto von Dentz
+sigma star gmbh - Eduard-Bodem-Gasse 6 - 6020 Innsbruck - Austria
+ATU66964118 - FN 374287y
