@@ -1,83 +1,230 @@
-Return-Path: <linux-kernel-owner@vger.kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Subject: Re: WARNING: CPU: 3 PID: 2952 at drivers/base/firmware_class.c:1225
- _request_firmware+0x329/0x890
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <2237498.dXpkGoRScD@blindfold>
-Date: Tue, 15 Aug 2017 12:22:27 +0200
-Cc: kernel list <linux-kernel@vger.kernel.org>,
-        "Gustavo F. Padovan" <gustavo@padovan.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org
-Message-Id: <C551B3EE-FC6F-4FDA-8B32-270AAC18D958@holtmann.org>
-References: <2237498.dXpkGoRScD@blindfold>
-To: Richard Weinberger <richard@sigma-star.at>,
-        Greg Kroah-Hartman <greg@kroah.com>
-Sender: linux-kernel-owner@vger.kernel.org
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+MIME-Version: 1.0
+In-Reply-To: <CALvjcs9hHdjuk2PR1BTbivt=7Q4VaqBWTf7m5OQ6--hfGp+zuw@mail.gmail.com>
+References: <20170811210957.37181-1-yunhanw@google.com> <CALvjcs9hHdjuk2PR1BTbivt=7Q4VaqBWTf7m5OQ6--hfGp+zuw@mail.gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Tue, 15 Aug 2017 12:51:34 +0300
+Message-ID: <CABBYNZKUghpUHsSjBEYwZpaWE8Mor59m_Z1+yqHq06BuqQ9M2w@mail.gmail.com>
+Subject: Re: [PATCH] client: Fix the selection bug of ad manager
+To: Yunhan Wang <yunhanw@google.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Richard,
+Hi Yunhan,
 
-> My new Thinkpad T470p regularly triggers this warning.
-> Seems to happy only after resuming from suspend.
-> 
-> [147242.220708] PM: Finishing wakeup.
-> [147242.220711] OOM killer enabled.
-> [147242.220711] Restarting tasks ... 
-> [147242.221908] Bluetooth: hci0: Bootloader revision 0.0 build 26 week 38 2015
-> [147242.222888] [drm] RC6 on
-> [147242.227695] Bluetooth: hci0: Device revision is 16
-> [147242.227696] Bluetooth: hci0: Secure boot is enabled
-> [147242.227697] Bluetooth: hci0: OTP lock is enabled
-> [147242.227697] Bluetooth: hci0: API lock is enabled
-> [147242.227698] Bluetooth: hci0: Debug lock is disabled
-> [147242.227698] Bluetooth: hci0: Minimum firmware build 1 week 10 2014
-> [147242.227701] firmware request while host is not available
+On Sat, Aug 12, 2017 at 12:13 AM, Yunhan Wang <yunhanw@google.com> wrote:
+> Hi, Luiz
+>
+> This is the patch regarding advertisement manager selection bug when
+> there existing multiple adapters. I have sued git format-patch and git
+> send-email. Please help to have a review.
+>
+> Thanks
+> Best wishes
+> Yunhan
+>
+> On Fri, Aug 11, 2017 at 2:09 PM, Yunhan Wang <yunhanw@google.com> wrote:
+>> If there are multiple adapters, bluetoothctl may choose the wrong
+>> advertising manager. In addition, select command cannot update
+>> current advertising manager when choosing another adapter. Therefore, we
+>> need to introduce default_ad_manager to handle the above situation,
+>> which is similar to default_ctrl.
+>> ---
+>>  client/main.c | 88 ++++++++++++++++++++++++++++++++++++++++++++++++++++-------
+>>  1 file changed, 78 insertions(+), 10 deletions(-)
+>>
+>> diff --git a/client/main.c b/client/main.c
+>> index 17de7f81f..1af6f576f 100644
+>> --- a/client/main.c
+>> +++ b/client/main.c
+>> @@ -65,11 +65,18 @@ struct adapter {
+>>         GList *devices;
+>>  };
+>>
+>> +struct LEAdvertisingManager {
+>> +       GDBusProxy *proxy;
+>> +       char * address;
+>> +};
 
-seems like the hardware looses power and has to do a full reload of the firmware. Why the firmware is not cached or why the Bluetooth controller looses its power is unclear to me.
+Add the proxy into adapter struct, that way you can access the
+ad_manager directly with default_ctrl and we don't need to maintain 2
+lists.
 
-> [147242.227708] ------------[ cut here ]------------
-> [147242.227713] WARNING: CPU: 3 PID: 2952 at drivers/base/firmware_class.c:1225 _request_firmware+0x329/0x890
-> [147242.227713] Modules linked in: rndis_wlan rndis_host cdc_ether cdc_phonet usbnet phonet mii cdc_acm nls_utf8 udf crc_itu_t msr fuse tun ppp_deflate bsd_comp ppp_async ppp_generic slhc sr_mod cdrom uas usb_storage option usb_wwan usbserial ctr ccm rfcomm nf_log_ipv6 xt_comment nf_log_ipv4 nf_log_common xt_LOG xt_limit af_packet binfmt_misc ip6t_REJECT nf_reject_ipv6 nf_conntrack_ipv6 nf_defrag_ipv6 ipt_REJECT nf_reject_ipv4 xt_pkttype xt_tcpudp iptable_filter ip6table_mangle nf_conntrack_netbios_ns nf_conntrack_broadcast nf_conntrack_ipv4 nf_defrag_ipv4 ip_tables xt_conntrack nf_conntrack libcrc32c ip6table_filter ip6_tables x_tables bnep snd_hda_codec_hdmi snd_hda_codec_realtek snd_hda_codec_generic arc4 btusb hci_uart btrtl btbcm btqca btintel bluetooth snd_hda_intel snd_hda_codec snd_hda_core snd_hwdep
-> [147242.227739]  snd_pcm iwlmvm mac80211 snd_timer intel_rapl x86_pkg_temp_thermal iwlwifi intel_powerclamp cfg80211 coretemp e1000e mei_me ptp kvm_intel iTCO_wdt rtsx_pci_ms thinkpad_acpi iTCO_vendor_support memstick kvm snd irqbypass drbg pcspkr joydev wmi_bmof i2c_i801 pps_core mei shpchp intel_pch_thermal soundcore battery ac ansi_cprng ecdh_generic rfkill crc16 pinctrl_sunrisepoint pinctrl_intel thermal intel_lpss_acpi intel_lpss tpm_crb acpi_pad btrfs xor raid6_pq dm_crypt crct10dif_pclmul crc32_pclmul crc32c_intel ghash_clmulni_intel pcbc rtsx_pci_sdmmc mmc_core aesni_intel aes_x86_64 crypto_simd glue_helper cryptd serio_raw nvme nvme_core i915 xhci_pci rtsx_pci mfd_core i2c_algo_bit drm_kms_helper syscopyarea sysfillrect sysimgblt fb_sys_fops xhci_hcd drm usbcore wmi video i2c_hid button dm_mirror
-> [147242.227767]  dm_region_hash dm_log dm_mod sg scsi_mod efivarfs autofs4
-> [147242.227771] CPU: 3 PID: 2952 Comm: kworker/u9:0 Tainted: G        W       4.13.0-rc4-rw+ #5
-> [147242.227772] Hardware name: LENOVO 20J6CTO1WW/20J6CTO1WW, BIOS R0FET34W (1.14 ) 06/30/2017
-> [147242.227783] Workqueue: hci0 hci_power_on [bluetooth]
-> [147242.227784] task: ffff88011e47cb00 task.stack: ffffc90008294000
-> [147242.227786] RIP: 0010:_request_firmware+0x329/0x890
-> [147242.227786] RSP: 0018:ffffc90008297c88 EFLAGS: 00010286
-> [147242.227787] RAX: 000000000000002c RBX: ffffc90008297d58 RCX: 0000000000000006
-> [147242.227788] RDX: 0000000000000000 RSI: 0000000000000082 RDI: ffff88041f58e010
-> [147242.227788] RBP: ffffc90008297ce8 R08: 0000000000000000 R09: 0000000000000ba3
-> [147242.227789] R10: 0000000000000004 R11: 0000000000000ba2 R12: ffff8803a731dd40
-> [147242.227789] R13: ffffc90008297d40 R14: 0000000000000000 R15: ffffffff81ae61b0
-> [147242.227790] FS:  0000000000000000(0000) GS:ffff88041f580000(0000) knlGS:0000000000000000
-> [147242.227791] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> [147242.227791] CR2: 00007f8f905bb2d8 CR3: 000000032225d000 CR4: 00000000003406e0
-> [147242.227792] Call Trace:
-> [147242.227795]  request_firmware+0x37/0x50
-> [147242.227798]  btusb_setup_intel_new+0x257/0x7c0 [btusb]
-> [147242.227806]  ? usb_autopm_put_interface+0x30/0x40 [usbcore]
-> [147242.227812]  hci_dev_do_open+0x3ff/0x530 [bluetooth]
-> [147242.227814]  ? __switch_to+0x21a/0x440
-> [147242.227819]  hci_power_on+0x43/0x220 [bluetooth]
-> [147242.227821]  ? __schedule+0x29a/0x8c0
-> [147242.227823]  process_one_work+0x13f/0x3a0
-> [147242.227824]  worker_thread+0x4d/0x3d0
-> [147242.227825]  kthread+0x114/0x150
-> [147242.227826]  ? rescuer_thread+0x350/0x350
-> [147242.227828]  ? kthread_park+0x60/0x60
-> [147242.227829]  ? do_syscall_64+0x6e/0x160
-> [147242.227831]  ret_from_fork+0x25/0x30
-> [147242.227831] Code: ff 8b 55 c4 48 8b 75 c8 4c 89 e7 e8 12 fb ff ff 41 89 c1 e9 11 ff ff ff e8 25 9c 1c 00 48 c7 c7 18 4e aa 81 31 c0 e8 9a a3 bc ff <0f> ff 41 b9 90 ff ff ff e9 0e fd ff ff 4c 89 f7 e8 72 e8 1b 00 
-> [147242.227848] ---[ end trace 2d0d21cf844f8a8d ]---
-> 
-> Is this known?
+>>  static struct adapter *default_ctrl;
+>> +static struct LEAdvertisingManager *default_ad_manager;
+>>  static GDBusProxy *default_dev;
+>>  static GDBusProxy *default_attr;
+>> -static GDBusProxy *ad_manager;
+>> +static GList *ad_manager_list;
+>>  static GList *ctrl_list;
+>> +static char *adapter_address;
+>>
+>>  static guint input = 0;
+>>
+>> @@ -522,7 +529,7 @@ static void device_added(GDBusProxy *proxy)
+>>  static void adapter_added(GDBusProxy *proxy)
+>>  {
+>>         struct adapter *adapter = g_malloc0(sizeof(struct adapter));
+>> -
+>> +       DBusMessageIter iter;
+>>         adapter->proxy = proxy;
+>>         ctrl_list = g_list_append(ctrl_list, adapter);
+>>
+>> @@ -530,6 +537,22 @@ static void adapter_added(GDBusProxy *proxy)
+>>                 default_ctrl = adapter;
+>>
+>>         print_adapter(proxy, COLORED_NEW);
+>> +
+>> +       if (g_dbus_proxy_get_property(adapter->proxy, "Address", &iter) == FALSE)
+>> +               return;
+>> +
+>> +       dbus_message_iter_get_basic(&iter, &adapter_address);
+>> +}
+>> +
+>> +static void ad_manager_added(GDBusProxy *proxy)
+>> +{
+>> +       struct LEAdvertisingManager *ad_manager = g_malloc0(sizeof(struct LEAdvertisingManager));
+>> +       ad_manager->proxy = proxy;
+>> +       ad_manager->address = adapter_address;
+>> +       ad_manager_list = g_list_append(ad_manager_list, ad_manager);
+>> +
+>> +       if(!default_ad_manager)
+>> +               default_ad_manager = ad_manager;
+>>  }
+>>
+>>  static void proxy_added(GDBusProxy *proxy, void *user_data)
+>> @@ -560,7 +583,7 @@ static void proxy_added(GDBusProxy *proxy, void *user_data)
+>>         } else if (!strcmp(interface, "org.bluez.GattManager1")) {
+>>                 gatt_add_manager(proxy);
+>>         } else if (!strcmp(interface, "org.bluez.LEAdvertisingManager1")) {
+>> -               ad_manager = proxy;
+>> +               ad_manager_added(proxy);
+>>         }
+>>  }
+>>
+>> @@ -615,6 +638,26 @@ static void adapter_removed(GDBusProxy *proxy)
+>>         }
+>>  }
+>>
+>> +static void ad_manager_removed(GDBusProxy *proxy)
+>> +{
+>> +       GList *ll;
+>> +
+>> +       for (ll = g_list_first(ctrl_list); ll; ll = g_list_next(ll)) {
+>> +               struct LEAdvertisingManager *ad_manager = ll->data;
+>> +
+>> +               if (ad_manager->proxy == proxy) {
+>> +                       if (default_ad_manager && default_ad_manager->proxy == proxy) {
+>> +                               default_ad_manager = NULL;
+>> +                       }
+>> +
+>> +                       ad_manager_list = g_list_remove_link(ad_manager_list, ll);
+>> +                       g_free(ad_manager);
+>> +                       g_list_free(ll);
+>> +                       return;
+>> +               }
+>> +       }
+>> +}
+>> +
+>>  static void proxy_removed(GDBusProxy *proxy, void *user_data)
+>>  {
+>>         const char *interface;
+>> @@ -649,11 +692,9 @@ static void proxy_removed(GDBusProxy *proxy, void *user_data)
+>>         } else if (!strcmp(interface, "org.bluez.GattManager1")) {
+>>                 gatt_remove_manager(proxy);
+>>         } else if (!strcmp(interface, "org.bluez.LEAdvertisingManager1")) {
+>> -               if (ad_manager == proxy) {
+>> -                       agent_manager = NULL;
+>> -                       ad_unregister(dbus_conn, NULL);
+>> +               ad_unregister(dbus_conn, proxy);
+>> +               ad_manager_removed(proxy);
+>>                 }
+>> -       }
+>>  }
+>>
+>>  static struct adapter *find_ctrl(GList *source, const char *path)
+>> @@ -786,6 +827,20 @@ static struct adapter *find_ctrl_by_address(GList *source, const char *address)
+>>         return NULL;
+>>  }
+>>
+>> +static struct LEAdvertisingManager *find_ad_manager_by_address(GList *source, const char *address)
+>> +{
+>> +       GList *list;
+>> +
+>> +       for (list = g_list_first(source); list; list = g_list_next(list)) {
+>> +               struct LEAdvertisingManager *ad_manager = list->data;
+>> +
+>> +               if (!strcasecmp(ad_manager->address, address))
+>> +                       return ad_manager;
+>> +       }
+>> +
+>> +       return NULL;
+>> +}
+>> +
+>>  static GDBusProxy *find_proxy_by_address(GList *source, const char *address)
+>>  {
+>>         GList *list;
+>> @@ -922,6 +977,7 @@ static void cmd_show(const char *arg)
+>>  static void cmd_select(const char *arg)
+>>  {
+>>         struct adapter *adapter;
+>> +       struct LEAdvertisingManager *ad_manager;
+>>
+>>         if (!arg || !strlen(arg)) {
+>>                 rl_printf("Missing controller address argument\n");
+>> @@ -929,6 +985,7 @@ static void cmd_select(const char *arg)
+>>         }
+>>
+>>         adapter = find_ctrl_by_address(ctrl_list, arg);
+>> +
+>>         if (!adapter) {
+>>                 rl_printf("Controller %s not available\n", arg);
+>>                 return;
+>> @@ -937,7 +994,18 @@ static void cmd_select(const char *arg)
+>>         if (default_ctrl && default_ctrl->proxy == adapter->proxy)
+>>                 return;
+>>
+>> +       ad_manager = find_ad_manager_by_address(ad_manager_list, arg);
+>> +
+>> +       if (!ad_manager) {
+>> +               rl_printf("Advertising manager %s not available\n", arg);
+>> +               return;
+>> +       }
+>> +
+>> +       if (default_ad_manager && default_ad_manager->proxy == ad_manager->proxy)
+>> +               return;
+>> +
+>>         default_ctrl = adapter;
+>> +       default_ad_manager = ad_manager;
+>>         print_adapter(adapter->proxy, NULL);
+>>  }
+>>
+>> @@ -2296,15 +2364,15 @@ static void cmd_advertise(const char *arg)
+>>         if (parse_argument_advertise(arg, &enable, &type) == FALSE)
+>>                 return;
+>>
+>> -       if (!ad_manager) {
+>> +       if (!default_ad_manager || !default_ad_manager->proxy) {
+>>                 rl_printf("LEAdvertisingManager not found\n");
+>>                 return;
+>>         }
+>>
+>>         if (enable == TRUE)
+>> -               ad_register(dbus_conn, ad_manager, type);
+>> +               ad_register(dbus_conn, default_ad_manager->proxy, type);
+>>         else
+>> -               ad_unregister(dbus_conn, ad_manager);
+>> +               ad_unregister(dbus_conn, default_ad_manager->proxy);
+>>  }
+>>
+>>  static char *ad_generator(const char *text, int state)
+>> --
+>> 2.14.0.434.g98096fd7a8-goog
+>>
 
-It is not known, but it is also unclear why this happens. Basically the card looses power and thus ends up in bootloader mode.
 
-Regards
 
-Marcel
+-- 
+Luiz Augusto von Dentz
