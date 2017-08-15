@@ -1,281 +1,255 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 2/2] client: Emit PropertiesChanged if advertising changes
-Date: Tue, 15 Aug 2017 11:18:42 +0300
-Message-Id: <20170815081842.14872-2-luiz.dentz@gmail.com>
-In-Reply-To: <20170815081842.14872-1-luiz.dentz@gmail.com>
-References: <20170815081842.14872-1-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 1/2] advertising: Allow changes to properties
+Date: Tue, 15 Aug 2017 11:18:41 +0300
+Message-Id: <20170815081842.14872-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This allows bluetoothd to detect changes done by the user without
-having to rely on advertise command to unregister and register again:
-
-bluetooth]# set-advertise-name blah
-[bluetooth]# advertise on
-
-@ MGMT Command: Add Advertising (0x003e) plen 17
-        Instance: 1
-        Flags: 0x00000003
-          Switch into Connectable mode
-          Advertise as Discoverable
-        Duration: 0
-        Timeout: 0
-        Advertising data length: 0
-        Scan response length: 6
-        Name (complete): blah
-
-[bluetooth]# set-advertise-name bleh
-
-@ MGMT Command: Add Advertising (0x003e) plen 17
-        Instance: 1
-        Flags: 0x00000003
-          Switch into Connectable mode
-          Advertise as Discoverable
-        Duration: 0
-        Timeout: 0
-        Advertising data length: 0
-        Scan response length: 6
-        Name (complete): bleh
+This enables the application to change the advertising object instead of
+having it unregistered and registered once again.
 ---
- client/advertising.c | 49 ++++++++++++++++++++++++++++++++++++++++---------
- client/advertising.h | 16 ++++++++--------
- client/main.c        | 22 +++++++++++-----------
- 3 files changed, 59 insertions(+), 28 deletions(-)
+ src/advertising.c | 156 +++++++++++++++++++++++++++++-------------------------
+ 1 file changed, 85 insertions(+), 71 deletions(-)
 
-diff --git a/client/advertising.c b/client/advertising.c
-index 696621be3..72c4ccb21 100644
---- a/client/advertising.c
-+++ b/client/advertising.c
-@@ -399,7 +399,7 @@ void ad_unregister(DBusConnection *conn, GDBusProxy *manager)
- 	}
- }
+diff --git a/src/advertising.c b/src/advertising.c
+index 9eb22b9fd..f125ca5c8 100644
+--- a/src/advertising.c
++++ b/src/advertising.c
+@@ -21,6 +21,7 @@
  
--void ad_advertise_uuids(const char *arg)
-+void ad_advertise_uuids(DBusConnection *conn, const char *arg)
- {
- 	g_strfreev(ad.uuids);
- 	ad.uuids = NULL;
-@@ -415,6 +415,8 @@ void ad_advertise_uuids(const char *arg)
- 	}
+ #include <stdint.h>
+ #include <stdbool.h>
++#include <errno.h>
  
- 	ad.uuids_len = g_strv_length(ad.uuids);
-+
-+	g_dbus_emit_property_changed(conn, AD_PATH, AD_IFACE, "ServiceUUIDs");
- }
+ #include <dbus/dbus.h>
+ #include <gdbus/gdbus.h>
+@@ -468,6 +469,7 @@ static bool parse_local_name(DBusMessageIter *iter,
  
- static void ad_clear_service(void)
-@@ -423,7 +425,7 @@ static void ad_clear_service(void)
- 	memset(&ad.service, 0, sizeof(ad.service));
- }
+ 	dbus_message_iter_get_basic(iter, &name);
  
--void ad_advertise_service(const char *arg)
-+void ad_advertise_service(DBusConnection *conn, const char *arg)
- {
- 	wordexp_t w;
- 	unsigned int i;
-@@ -462,6 +464,8 @@ void ad_advertise_service(const char *arg)
- 		data->len++;
- 	}
++	free(client->name);
+ 	client->name = strdup(name);
  
-+	g_dbus_emit_property_changed(conn, AD_PATH, AD_IFACE, "ServiceData");
-+
- done:
- 	wordfree(&w);
- }
-@@ -471,7 +475,7 @@ static void ad_clear_manufacturer(void)
- 	memset(&ad.manufacturer, 0, sizeof(ad.manufacturer));
- }
+ 	return true;
+@@ -504,58 +506,6 @@ static struct adv_parser {
+ 	{ },
+ };
  
--void ad_advertise_manufacturer(const char *arg)
-+void ad_advertise_manufacturer(DBusConnection *conn, const char *arg)
- {
- 	wordexp_t w;
- 	unsigned int i;
-@@ -515,39 +519,66 @@ void ad_advertise_manufacturer(const char *arg)
- 		data->len++;
- 	}
- 
-+	g_dbus_emit_property_changed(conn, AD_PATH, AD_IFACE,
-+							"ManufacturerData");
-+
- done:
- 	wordfree(&w);
- }
- 
+-static void add_client_complete(struct btd_adv_client *client, uint8_t status)
+-{
+-	DBusMessage *reply;
 -
--void ad_advertise_tx_power(bool value)
-+void ad_advertise_tx_power(DBusConnection *conn, bool value)
+-	if (status) {
+-		error("Failed to add advertisement: %s (0x%02x)",
+-						mgmt_errstr(status), status);
+-		reply = btd_error_failed(client->reg,
+-					"Failed to register advertisement");
+-		queue_remove(client->manager->clients, client);
+-		g_idle_add(client_free_idle_cb, client);
+-
+-	} else
+-		reply = dbus_message_new_method_return(client->reg);
+-
+-	g_dbus_send_message(btd_get_dbus_connection(), reply);
+-	dbus_message_unref(client->reg);
+-	client->reg = NULL;
+-}
+-
+-static void add_adv_callback(uint8_t status, uint16_t length,
+-					  const void *param, void *user_data)
+-{
+-	struct btd_adv_client *client = user_data;
+-	const struct mgmt_rp_add_advertising *rp = param;
+-
+-	if (status)
+-		goto done;
+-
+-	if (!param || length < sizeof(*rp)) {
+-		status = MGMT_STATUS_FAILED;
+-		goto done;
+-	}
+-
+-	client->instance = rp->instance;
+-
+-	g_dbus_client_set_disconnect_watch(client->client, client_disconnect_cb,
+-									client);
+-	DBG("Advertisement registered: %s", client->path);
+-
+-	g_dbus_emit_property_changed(btd_get_dbus_connection(),
+-				adapter_get_path(client->manager->adapter),
+-				LE_ADVERTISING_MGR_IFACE, "SupportedInstances");
+-
+-	g_dbus_emit_property_changed(btd_get_dbus_connection(),
+-				adapter_get_path(client->manager->adapter),
+-				LE_ADVERTISING_MGR_IFACE, "ActiveInstances");
+-
+-done:
+-	add_client_complete(client, status);
+-}
+-
+ static size_t calc_max_adv_len(struct btd_adv_client *client, uint32_t flags)
  {
-+	if (ad.tx_power == value)
-+		return;
-+
- 	ad.tx_power = value;
-+
-+	g_dbus_emit_property_changed(conn, AD_PATH, AD_IFACE, "Includes");
+ 	size_t max = client->manager->max_adv_len;
+@@ -619,7 +569,7 @@ static uint8_t *generate_scan_rsp(struct btd_adv_client *client,
+ 	return bt_ad_generate(client->scan, len);
  }
  
--void ad_advertise_name(bool value)
-+void ad_advertise_name(DBusConnection *conn, bool value)
+-static DBusMessage *refresh_advertisement(struct btd_adv_client *client)
++static int refresh_adv(struct btd_adv_client *client, mgmt_request_func_t func)
  {
-+	if (ad.name == value)
-+		return;
-+
- 	ad.name = value;
+ 	struct mgmt_cp_add_advertising *cp;
+ 	uint8_t param_len;
+@@ -639,33 +589,24 @@ static DBusMessage *refresh_advertisement(struct btd_adv_client *client)
+ 	adv_data = generate_adv_data(client, &flags, &adv_data_len);
+ 	if (!adv_data || (adv_data_len > calc_max_adv_len(client, flags))) {
+ 		error("Advertising data too long or couldn't be generated.");
+-
+-		return g_dbus_create_error(client->reg, ERROR_INTERFACE
+-						".InvalidLength",
+-						"Advertising data too long.");
++		return -EINVAL;
+ 	}
  
- 	if (!value)
- 		free(ad.local_name);
+ 	scan_rsp = generate_scan_rsp(client, &flags, &scan_rsp_len);
+ 	if (!scan_rsp && scan_rsp_len) {
+ 		error("Scan data couldn't be generated.");
+-
+-		return g_dbus_create_error(client->reg, ERROR_INTERFACE
+-						".InvalidLength",
+-						"Advertising data too long.");
++		return -EINVAL;
+ 	}
+ 
+ 	param_len = sizeof(struct mgmt_cp_add_advertising) + adv_data_len +
+ 							scan_rsp_len;
+ 
+ 	cp = malloc0(param_len);
+-
+ 	if (!cp) {
+ 		error("Couldn't allocate for MGMT!");
+-
+ 		free(adv_data);
+ 		free(scan_rsp);
+-
+-		return btd_error_failed(client->reg, "Failed");
++		return -ENOMEM;
+ 	}
+ 
+ 	cp->flags = htobl(flags);
+@@ -680,22 +621,93 @@ static DBusMessage *refresh_advertisement(struct btd_adv_client *client)
+ 
+ 	if (!mgmt_send(client->manager->mgmt, MGMT_OP_ADD_ADVERTISING,
+ 				client->manager->mgmt_index, param_len, cp,
+-				add_adv_callback, client, NULL)) {
++				func, client, NULL)) {
+ 		error("Failed to add Advertising Data");
+-
+ 		free(cp);
+-
+-		return btd_error_failed(client->reg, "Failed");
++		return -EINVAL;
+ 	}
+ 
+ 	free(cp);
+ 
+-	return NULL;
++	return 0;
++}
 +
-+	g_dbus_emit_property_changed(conn, AD_PATH, AD_IFACE, "Includes");
++static void properties_changed(GDBusProxy *proxy, const char *name,
++					DBusMessageIter *iter, void *user_data)
++{
++	struct btd_adv_client *client = user_data;
++	struct adv_parser *parser;
++
++	for (parser = parsers; parser && parser->name; parser++) {
++		if (strcmp(parser->name, name))
++			continue;
++
++		if (parser->func(iter, client)) {
++			refresh_adv(client, NULL);
++			break;
++		}
++	}
++}
++
++static void add_client_complete(struct btd_adv_client *client, uint8_t status)
++{
++	DBusMessage *reply;
++
++	if (status) {
++		error("Failed to add advertisement: %s (0x%02x)",
++						mgmt_errstr(status), status);
++		reply = btd_error_failed(client->reg,
++					"Failed to register advertisement");
++		queue_remove(client->manager->clients, client);
++		g_idle_add(client_free_idle_cb, client);
++
++	} else
++		reply = dbus_message_new_method_return(client->reg);
++
++	g_dbus_send_message(btd_get_dbus_connection(), reply);
++	dbus_message_unref(client->reg);
++	client->reg = NULL;
++}
++
++static void add_adv_callback(uint8_t status, uint16_t length,
++					  const void *param, void *user_data)
++{
++	struct btd_adv_client *client = user_data;
++	const struct mgmt_rp_add_advertising *rp = param;
++
++	if (status)
++		goto done;
++
++	if (!param || length < sizeof(*rp)) {
++		status = MGMT_STATUS_FAILED;
++		goto done;
++	}
++
++	client->instance = rp->instance;
++
++	g_dbus_client_set_disconnect_watch(client->client, client_disconnect_cb,
++									client);
++	DBG("Advertisement registered: %s", client->path);
++
++	g_dbus_emit_property_changed(btd_get_dbus_connection(),
++				adapter_get_path(client->manager->adapter),
++				LE_ADVERTISING_MGR_IFACE, "SupportedInstances");
++
++	g_dbus_emit_property_changed(btd_get_dbus_connection(),
++				adapter_get_path(client->manager->adapter),
++				LE_ADVERTISING_MGR_IFACE, "ActiveInstances");
++
++	g_dbus_proxy_set_property_watch(client->proxy, properties_changed,
++								client);
++
++done:
++	add_client_complete(client, status);
  }
  
--void ad_advertise_local_name(const char *name)
-+void ad_advertise_local_name(DBusConnection *conn, const char *name)
+ static DBusMessage *parse_advertisement(struct btd_adv_client *client)
  {
-+	if (ad.local_name && !strcmp(name, ad.local_name))
-+		return;
-+
- 	free(ad.local_name);
- 	ad.local_name = strdup(name);
-+
-+	g_dbus_emit_property_changed(conn, AD_PATH, AD_IFACE, "LocalName");
- }
+ 	struct adv_parser *parser;
++	int err;
  
--void ad_advertise_appearance(bool value)
-+void ad_advertise_appearance(DBusConnection *conn, bool value)
- {
-+	if (ad.appearance == value)
-+		return;
-+
- 	ad.appearance = value;
- 
- 	if (!value)
- 		ad.local_appearance = UINT16_MAX;
-+
-+	g_dbus_emit_property_changed(conn, AD_PATH, AD_IFACE, "Includes");
- }
- 
--void ad_advertise_local_appearance(uint16_t value)
-+void ad_advertise_local_appearance(DBusConnection *conn, uint16_t value)
- {
-+	if (ad.local_appearance == value)
-+		return;
-+
- 	ad.local_appearance = value;
-+
-+	g_dbus_emit_property_changed(conn, AD_PATH, AD_IFACE, "Appearance");
- }
-diff --git a/client/advertising.h b/client/advertising.h
-index 5ea57adb3..6868518e7 100644
---- a/client/advertising.h
-+++ b/client/advertising.h
-@@ -24,11 +24,11 @@
- void ad_register(DBusConnection *conn, GDBusProxy *manager, const char *type);
- void ad_unregister(DBusConnection *conn, GDBusProxy *manager);
- 
--void ad_advertise_uuids(const char *arg);
--void ad_advertise_service(const char *arg);
--void ad_advertise_manufacturer(const char *arg);
--void ad_advertise_tx_power(bool value);
--void ad_advertise_name(bool value);
--void ad_advertise_appearance(bool value);
--void ad_advertise_local_name(const char *name);
--void ad_advertise_local_appearance(uint16_t value);
-+void ad_advertise_uuids(DBusConnection *conn, const char *arg);
-+void ad_advertise_service(DBusConnection *conn, const char *arg);
-+void ad_advertise_manufacturer(DBusConnection *conn, const char *arg);
-+void ad_advertise_tx_power(DBusConnection *conn, bool value);
-+void ad_advertise_name(DBusConnection *conn, bool value);
-+void ad_advertise_appearance(DBusConnection *conn, bool value);
-+void ad_advertise_local_name(DBusConnection *conn, const char *name);
-+void ad_advertise_local_appearance(DBusConnection *conn, uint16_t value);
-diff --git a/client/main.c b/client/main.c
-index 6b1c73f99..276e7f184 100644
---- a/client/main.c
-+++ b/client/main.c
-@@ -2329,17 +2329,17 @@ static char *ad_generator(const char *text, int state)
- 
- static void cmd_set_advertise_uuids(const char *arg)
- {
--	ad_advertise_uuids(arg);
-+	ad_advertise_uuids(dbus_conn, arg);
- }
- 
- static void cmd_set_advertise_service(const char *arg)
- {
--	ad_advertise_service(arg);
-+	ad_advertise_service(dbus_conn, arg);
- }
- 
- static void cmd_set_advertise_manufacturer(const char *arg)
- {
--	ad_advertise_manufacturer(arg);
-+	ad_advertise_manufacturer(dbus_conn, arg);
- }
- 
- static void cmd_set_advertise_tx_power(const char *arg)
-@@ -2350,12 +2350,12 @@ static void cmd_set_advertise_tx_power(const char *arg)
+ 	for (parser = parsers; parser && parser->name; parser++) {
+ 		DBusMessageIter iter;
+@@ -710,7 +722,9 @@ static DBusMessage *parse_advertisement(struct btd_adv_client *client)
+ 		}
  	}
  
- 	if (strcmp(arg, "on") == 0 || strcmp(arg, "yes") == 0) {
--		ad_advertise_tx_power(true);
-+		ad_advertise_tx_power(dbus_conn, true);
- 		return;
- 	}
+-	return refresh_advertisement(client);
++	err = refresh_adv(client, add_adv_callback);
++	if (!err)
++		return NULL;
  
- 	if (strcmp(arg, "off") == 0 || strcmp(arg, "no") == 0) {
--		ad_advertise_tx_power(false);
-+		ad_advertise_tx_power(dbus_conn, false);
- 		return;
- 	}
- 
-@@ -2370,16 +2370,16 @@ static void cmd_set_advertise_name(const char *arg)
- 	}
- 
- 	if (strcmp(arg, "on") == 0 || strcmp(arg, "yes") == 0) {
--		ad_advertise_name(true);
-+		ad_advertise_name(dbus_conn, true);
- 		return;
- 	}
- 
- 	if (strcmp(arg, "off") == 0 || strcmp(arg, "no") == 0) {
--		ad_advertise_name(false);
-+		ad_advertise_name(dbus_conn, false);
- 		return;
- 	}
- 
--	ad_advertise_local_name(arg);
-+	ad_advertise_local_name(dbus_conn, arg);
- }
- 
- static void cmd_set_advertise_appearance(const char *arg)
-@@ -2393,12 +2393,12 @@ static void cmd_set_advertise_appearance(const char *arg)
- 	}
- 
- 	if (strcmp(arg, "on") == 0 || strcmp(arg, "yes") == 0) {
--		ad_advertise_appearance(true);
-+		ad_advertise_appearance(dbus_conn, true);
- 		return;
- 	}
- 
- 	if (strcmp(arg, "off") == 0 || strcmp(arg, "no") == 0) {
--		ad_advertise_appearance(false);
-+		ad_advertise_appearance(dbus_conn, false);
- 		return;
- 	}
- 
-@@ -2408,7 +2408,7 @@ static void cmd_set_advertise_appearance(const char *arg)
- 		return;
- 	}
- 
--	ad_advertise_local_appearance(value);
-+	ad_advertise_local_appearance(dbus_conn, value);
- }
- 
- static const struct {
+ fail:
+ 	return btd_error_failed(client->reg, "Failed to parse advertisement.");
 -- 
 2.13.4
 
