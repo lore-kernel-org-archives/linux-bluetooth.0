@@ -1,60 +1,75 @@
-Return-Path: <sukumar.ghorai@intel.com>
-From: Sukumar Ghorai <sukumar.ghorai@intel.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Sukumar Ghorai <sukumar.ghorai@intel.com>,
-	Amit K Bag <amit.k.bag@intel.com>
-Subject: [PATCH] Bluetooth: btusb: driver to enable the usb-wakeup feature
-Date: Wed, 16 Aug 2017 14:46:55 -0700
-Message-Id: <1502920015-6418-1-git-send-email-sukumar.ghorai@intel.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: hci_bcm: Use operation speed of 4Mbps only for ACPI devices
+Date: Wed, 16 Aug 2017 09:53:30 +0200
+Message-Id: <20170816075330.45923-1-marcel@holtmann.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-BT-Controller connected as platform non-root-hub device and
-usb-driver initialize such device with wakeup disabled,
-Ref. usb_new_device().
+Not all Broadcom controller support the 4Mbps operational speed on UART
+devices. This is because the UART clock setting changes might not be
+supported.
 
-At present wakeup-capability get enabled by hid-input device from usb
-function driver(e.g. BT HID device) at runtime. Again some functional
-driver does not set usb-wakeup capability(e.g LE HID device implement
-as HID-over-GATT), and can't wakeup the host on USB.
+  < HCI Command: Broadcom Write UART Clock Setting (0x3f|0x0045) plen 1
+         01                                               .
+  > HCI Event: Command Complete (0x0e) plen 4
+       Broadcom Write UART Clock Setting (0x3f|0x0045) ncmd 1
+         Status: Unknown HCI Command (0x01)
 
-Most of the device operation (such as mass storage) initiated from host
-(except HID) and USB wakeup aligned with host resume procedure. For BT
-device, usb-wakeup capability need to enable form btusc driver as a
-generic solution for multiple profile use case and required for USB remote
-wakeup (in-bus wakeup) while host is suspended. Also usb-wakeup feature
-need to enable/disable with HCI interface up and down.
+To support any operational speed higher than 3Mbps, support for this
+command is required. With that respect it is better to not enforce any
+operational speed by default. Only when its support is known, then allow
+for higher operational speed.
 
-Signed-off-by: Sukumar Ghorai <sukumar.ghorai@intel.com>
-Signed-off-by: Amit K Bag <amit.k.bag@intel.com>
+This patch assigns the 4Mbps opertional speed only for devices
+discovered through ACPI and leave all others at the default 115200.
+
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- drivers/bluetooth/btusb.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ drivers/bluetooth/hci_bcm.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index e8d8a3f61f5b..7a5c06aaa181 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -1088,6 +1088,10 @@ static int btusb_open(struct hci_dev *hdev)
- 	}
+diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
+index 6b42372c53ef..1eb286ade48a 100644
+--- a/drivers/bluetooth/hci_bcm.c
++++ b/drivers/bluetooth/hci_bcm.c
+@@ -59,6 +59,7 @@ struct bcm_device {
+ 	bool			clk_enabled;
  
- 	data->intf->needs_remote_wakeup = 1;
-+	/* device specific wakeup source enabled and required for USB
-+	 * remote wakeup while host is suspended
-+	 */
-+	device_wakeup_enable(&data->udev->dev);
+ 	u32			init_speed;
++	u32			oper_speed;
+ 	int			irq;
+ 	u8			irq_polarity;
  
- 	if (test_and_set_bit(BTUSB_INTR_RUNNING, &data->flags))
- 		goto done;
-@@ -1151,6 +1155,7 @@ static int btusb_close(struct hci_dev *hdev)
- 		goto failed;
+@@ -303,6 +304,7 @@ static int bcm_open(struct hci_uart *hu)
+ 		if (hu->tty->dev->parent == dev->pdev->dev.parent) {
+ 			bcm->dev = dev;
+ 			hu->init_speed = dev->init_speed;
++			hu->oper_speed = dev->oper_speed;
+ #ifdef CONFIG_PM
+ 			dev->hu = hu;
+ #endif
+@@ -699,8 +701,10 @@ static int bcm_resource(struct acpi_resource *ares, void *data)
  
- 	data->intf->needs_remote_wakeup = 0;
-+	device_wakeup_disable(&data->udev->dev);
- 	usb_autopm_put_interface(data->intf);
+ 	case ACPI_RESOURCE_TYPE_SERIAL_BUS:
+ 		sb = &ares->data.uart_serial_bus;
+-		if (sb->type == ACPI_RESOURCE_SERIAL_TYPE_UART)
++		if (sb->type == ACPI_RESOURCE_SERIAL_TYPE_UART) {
+ 			dev->init_speed = sb->default_baud_rate;
++			dev->oper_speed = 4000000;
++		}
+ 		break;
  
- failed:
+ 	default:
+@@ -853,7 +857,6 @@ static const struct hci_uart_proto bcm_proto = {
+ 	.name		= "Broadcom",
+ 	.manufacturer	= 15,
+ 	.init_speed	= 115200,
+-	.oper_speed	= 4000000,
+ 	.open		= bcm_open,
+ 	.close		= bcm_close,
+ 	.flush		= bcm_flush,
 -- 
-2.7.4
+2.13.5
+
