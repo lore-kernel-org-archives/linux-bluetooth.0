@@ -1,37 +1,43 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <johan.hedberg@gmail.com>
+Date: Wed, 16 Aug 2017 18:02:38 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: hci_bcm: Use operation speed of 4Mbps only
+ for ACPI devices
+Message-ID: <20170816150238.GA1577@x1c.home>
+References: <20170816075330.45923-1-marcel@holtmann.org>
 MIME-Version: 1.0
-From: Chris Murphy <chris@colorremedies.com>
-Date: Wed, 16 Aug 2017 09:26:36 -0600
-Message-ID: <CAJCQCtSDo8NuRQuEa0vX2cw9jKiaDRQ0ypY5H+31pQCwWRUSbQ@mail.gmail.com>
-Subject: Re: WARNING: CPU: 3 PID: 2952 at drivers/base/firmware_class.c:1225 _request_firmware+0x329/0x890
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170816075330.45923-1-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Found this thread google searching.
+Hi Marcel,
 
+On Wed, Aug 16, 2017, Marcel Holtmann wrote:
+> Not all Broadcom controller support the 4Mbps operational speed on UART
+> devices. This is because the UART clock setting changes might not be
+> supported.
+> 
+>   < HCI Command: Broadcom Write UART Clock Setting (0x3f|0x0045) plen 1
+>          01                                               .
+>   > HCI Event: Command Complete (0x0e) plen 4
+>        Broadcom Write UART Clock Setting (0x3f|0x0045) ncmd 1
+>          Status: Unknown HCI Command (0x01)
+> 
+> To support any operational speed higher than 3Mbps, support for this
+> command is required. With that respect it is better to not enforce any
+> operational speed by default. Only when its support is known, then allow
+> for higher operational speed.
+> 
+> This patch assigns the 4Mbps opertional speed only for devices
+> discovered through ACPI and leave all others at the default 115200.
+> 
+> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+> ---
+>  drivers/bluetooth/hci_bcm.c | 7 +++++--
+>  1 file changed, 5 insertions(+), 2 deletions(-)
 
-4.13.0-0.rc4.git1.1.fc27.x86_64  Problem sometimes happens with this kernel.
-This translates to git 623ce3456671.
+Applied to bluetooth-next. Thanks.
 
-4.13.0-0.rc3.git0.1.fc27.x86_64 But not this kernel, which translates
-to the actual rc3 release (clean).
-
-It seems to be a regression between those two. The problem only
-happens when waking from suspend to RAM, but it doesn't always happen.
-
-
-    Product Name: HP Spectre Notebook
-    SKU Number: W2K28UA#ABA
-
-
-dmesg, with bluetooth firmware warning and call trace only
-https://drive.google.com/open?id=0B_2Asp8DGjJ9eDFsbHNMelVzelE
-
-dmesg, normal boot
-https://drive.google.com/open?id=0B_2Asp8DGjJ9X3gzYTdTNE4ydm8
-
-
--- 
-Chris Murphy
+Johan
