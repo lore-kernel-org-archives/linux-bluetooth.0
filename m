@@ -1,87 +1,100 @@
-Return-Path: <pbrobinson@gmail.com>
+Return-Path: <luiz.dentz@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <FCD47ED6-F01F-4921-97A3-BBC1D0263747@holtmann.org>
-References: <1502102366-2760-1-git-send-email-loic.poulain@gmail.com>
- <1502102366-2760-2-git-send-email-loic.poulain@gmail.com> <CAL_JsqKxA2pgtjmG-cxy5XPWuRWUiia-weRZDSh4++Vn=QZmqA@mail.gmail.com>
- <8186E2A3-D0AC-498F-8229-78862D363F78@holtmann.org> <392e6d51-33d6-1585-6582-1397a0c64852@gmail.com>
- <161632C7-EBBF-47F5-86DC-453E10395B54@holtmann.org> <e001e055-10a5-facd-a8e1-57c1bdb78172@gmail.com>
- <FCD47ED6-F01F-4921-97A3-BBC1D0263747@holtmann.org>
-From: Peter Robinson <pbrobinson@gmail.com>
-Date: Wed, 16 Aug 2017 13:37:17 +0100
-Message-ID: <CALeDE9MeMHtCD8esCcznHjS+z6o7Ezh9dP1OZq=77DuYNS2=2A@mail.gmail.com>
-Subject: Re: [PATCH v3 2/3] ARM: dts: bcm2837-rpi-3-b: Add bcm43438 as serial slave
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Loic Poulain <loic.poulain@gmail.com>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, Johan Hedberg <johan.hedberg@gmail.com>,
-	Scott Branden <sbranden@broadcom.com>, Ray Jui <rjui@broadcom.com>,
-	"open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>, Rob Herring <robh+dt@kernel.org>,
-	linux-rpi-kernel@lists.infradead.org
+In-Reply-To: <2402684.4YO8nOF4mN@ix>
+References: <20170814190119.8684-1-brian.gix@intel.com> <2402684.4YO8nOF4mN@ix>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Wed, 16 Aug 2017 15:30:34 +0300
+Message-ID: <CABBYNZLtTj0t4Vf8KgCU6wZ0QXM0cmoVd73pGwsLnzWutUoUXQ@mail.gmail.com>
+Subject: Re: [PATCH 0/5] MeshCtl - Mesh GATT Client Provisioner
+To: Szymon Janc <szymon.janc@codecoup.pl>
+Cc: Brian Gix <brian.gix@intel.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>, Marcel Holtmann <marcel@holtmann.org>
 Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
->> I built kernel, modules and dtb from a bluetooth-next tree (4.12 and 4.1=
-3-rc3).
->> Using 32-bit multi_v7_defconfig + some additional confs to enable miniua=
-rt (BCM2835AUX...) for console.
->> I push this on a raspbian image.
+Hi Szymon,
+
+On Wed, Aug 16, 2017 at 3:28 PM, Szymon Janc <szymon.janc@codecoup.pl> wrote:
+> Hi Brian,
+>
+> On Monday, 14 August 2017 21:01:14 CEST Brian Gix wrote:
+>> With the recent adoption of the Bluetooth Mesh Profile, we offer this
+>> GATT Client provisioner tool (meshctl).
 >>
->> my boot/config.txt is very simple (no overlay):
+>> Brian Gix / Inga Stotland` (5):
+>>   mesh: Add BT SIG reserved numbers for Mesh
+>>   mesh: define APIs for Bluetooth Mesh
+>>   mesh: Baseline Mesh runtime configuration files
+>>   mesh: Baseline Mesh implementation
+>>   mesh: Add mesh to main bluez build
 >>
->> kernel=3DzImage
->> device_tree=3Dbcm2837-rpi-3-b.dtb
->> # hack for miniuart serial clock
->> core_freq=3D250
->> dtparam=3Daudio=3Don
+>>  Makefile.tools       |   24 +
+>>  bootstrap-configure  |    1 +
+>>  configure.ac         |   18 +
+>>  lib/uuid.h           |   10 +
+>>  mesh/README          |   26 +
+>>  mesh/agent.c         |  276 ++++++
+>>  mesh/agent.h         |   58 ++
+>>  mesh/config-client.c |  667 +++++++++++++++
+>>  mesh/config-model.h  |  119 +++
+>>  mesh/config-server.c |  165 ++++
+>>  mesh/crypto.c        | 1168 ++++++++++++++++++++++++++
+>>  mesh/crypto.h        |  133 +++
+>>  mesh/gatt.c          |  609 ++++++++++++++
+>>  mesh/gatt.h          |   47 ++
+>>  mesh/keys.h          |   43 +
+>>  mesh/local_node.json |   61 ++
+>>  mesh/main.c          | 2269
+>> ++++++++++++++++++++++++++++++++++++++++++++++++++ mesh/mesh-net.h      |
+>> 174 ++++
+>>  mesh/net.c           | 2184
+>> ++++++++++++++++++++++++++++++++++++++++++++++++ mesh/net.h           |
+>> 72 ++
+>>  mesh/node.c          |  879 +++++++++++++++++++
+>>  mesh/node.h          |  146 ++++
+>>  mesh/onoff-model.c   |  306 +++++++
+>>  mesh/onoff-model.h   |   50 ++
+>>  mesh/prov-db.c       | 1599 +++++++++++++++++++++++++++++++++++
+>>  mesh/prov-db.h       |   52 ++
+>>  mesh/prov.c          |  664 +++++++++++++++
+>>  mesh/prov.h          |   43 +
+>>  mesh/prov_db.json    |   37 +
+>>  mesh/util.c          |  369 ++++++++
+>>  mesh/util.h          |   71 ++
+>>  31 files changed, 12340 insertions(+)
+>>  create mode 100644 mesh/README
+>>  create mode 100644 mesh/agent.c
+>>  create mode 100644 mesh/agent.h
+>>  create mode 100644 mesh/config-client.c
+>>  create mode 100644 mesh/config-model.h
+>>  create mode 100644 mesh/config-server.c
+>>  create mode 100644 mesh/crypto.c
+>>  create mode 100644 mesh/crypto.h
+>>  create mode 100644 mesh/gatt.c
+>>  create mode 100644 mesh/gatt.h
+>>  create mode 100644 mesh/keys.h
+>>  create mode 100644 mesh/local_node.json
+>>  create mode 100644 mesh/main.c
+>>  create mode 100644 mesh/mesh-net.h
+>>  create mode 100644 mesh/net.c
+>>  create mode 100644 mesh/net.h
+>>  create mode 100644 mesh/node.c
+>>  create mode 100644 mesh/node.h
+>>  create mode 100644 mesh/onoff-model.c
+>>  create mode 100644 mesh/onoff-model.h
+>>  create mode 100644 mesh/prov-db.c
+>>  create mode 100644 mesh/prov-db.h
+>>  create mode 100644 mesh/prov.c
+>>  create mode 100644 mesh/prov.h
+>>  create mode 100644 mesh/prov_db.json
+>>  create mode 100644 mesh/util.c
+>>  create mode 100644 mesh/util.h
 >
-> so the Fedora 26 kernel that is based on 4.12 is missing uart0 configurat=
-ion in DT. Adding it to bcm2837-rpi-3-b.dts will allow for btattach to actu=
-ally work.
+> Seems like 4th patch didn't make it to the list. Looking at code size it seems
+> like it is too big and was rejected by vger. Would it be possible to upload
+> this code eg to gihub?
 
-I'm the Fedora maintainer for the Raspberry Pi (and a lot of ARM on
-Fedora in general).
+Or CC you as well.
 
-> &uart0 {
->         pinctrl-names =3D "default";
->         pinctrl-0 =3D <&uart0_gpio32 &gpclk2_gpio43>;
->         status =3D "okay=E2=80=9D;
-> };
->
-> It kinda works, but not all of it. This command confuses me.
-
-With the upstream kernel, some DT bits headed upstream (ie the Fedora
-kernel) plus these patches I get to the "kinda works" too in that it
-sees a BT adapter but doesn't give it a mac address.
-
-> < HCI Command: Broadcom Write UART Clock Setting (0x3f|0x0045) plen 1
->         01                                               .
->> HCI Event: Command Complete (0x0e) plen 4
->       Broadcom Write UART Clock Setting (0x3f|0x0045) ncmd 1
->         Status: Unknown HCI Command (0x01)
->
-> And I am seeing fun stuff like failed frame assembly.
->
-> [  888.687594] Bluetooth: hci0: BCM: chip id 94
-> [  888.687821] Bluetooth: hci0: BCM43430A1 (001.002.009) build 0182
-> [  892.059023] Bluetooth: hci0: Frame reassembly failed (-84)
-> [  892.316936] Bluetooth: hci0: BCM: failed to write clock (-56)
-> [  892.429478] Bluetooth: hci0: BCM (001.002.009) build 0182
->
-> Actually not providing the firmware makes the controller work. It however=
- is stuck ad AA:AA:.. default address. Providing the firmware turns the add=
-ress active. However then it never completes.
-
-I've tried on and off to get the BT working, there seems to lots of
-options and bits needed including some patches to the bluez [1] stuff
-but between not quite upstream kernel bits and numerous distros all
-doing it slightly differently I've never got it to work well.
-
-The yocto [1] bits seem fairly representative of some the patches
-flying around "to get it working" although I'm not sure how many of
-these are actually required and how many are superfluous with this
-patch set. There seems to be a firmware required that's not
-distributed with linux-firmware which would also be nice to resolve.
-
-Peter
-
-[1] https://git.yoctoproject.org/cgit/cgit.cgi/meta-raspberrypi/tree/recipe=
-s-connectivity/bluez5/bluez5
+-- 
+Luiz Augusto von Dentz
