@@ -1,61 +1,183 @@
-Return-Path: <loic.poulain@gmail.com>
-Subject: Re: [PATCH v4 4/4] Bluetooth: hci_bcm: Add serdev support
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: robh+dt@kernel.org, f.fainelli@gmail.com, rjui@broadcom.com,
- Johan Hedberg <johan.hedberg@gmail.com>, stefan.wahren@i2se.com,
- devicetree@vger.kernel.org, linux-bluetooth@vger.kernel.org,
- linux-rpi-kernel@lists.infradead.org
-References: <1502992791-10265-1-git-send-email-loic.poulain@gmail.com>
- <1502992791-10265-4-git-send-email-loic.poulain@gmail.com>
- <C0CDF47D-95D8-4270-A6C2-F83C00954A95@holtmann.org>
-From: Loic Poulain <loic.poulain@gmail.com>
-Message-ID: <77095b0a-8fc7-1d43-ee8f-166c3f05100f@gmail.com>
-Date: Thu, 17 Aug 2017 22:12:21 +0200
+Return-Path: <phil@raspberrypi.org>
+Subject: Re: [PATCH v3 2/3] ARM: dts: bcm2837-rpi-3-b: Add bcm43438 as serial
+ slave
+To: Eric Anholt <eric@anholt.net>, Marcel Holtmann <marcel@holtmann.org>,
+        Loic Poulain <loic.poulain@gmail.com>
+References: <1502102366-2760-1-git-send-email-loic.poulain@gmail.com>
+ <1502102366-2760-2-git-send-email-loic.poulain@gmail.com>
+ <CAL_JsqKxA2pgtjmG-cxy5XPWuRWUiia-weRZDSh4++Vn=QZmqA@mail.gmail.com>
+ <8186E2A3-D0AC-498F-8229-78862D363F78@holtmann.org>
+ <392e6d51-33d6-1585-6582-1397a0c64852@gmail.com>
+ <161632C7-EBBF-47F5-86DC-453E10395B54@holtmann.org>
+ <e001e055-10a5-facd-a8e1-57c1bdb78172@gmail.com>
+ <FCD47ED6-F01F-4921-97A3-BBC1D0263747@holtmann.org>
+ <CALeDE9MeMHtCD8esCcznHjS+z6o7Ezh9dP1OZq=77DuYNS2=2A@mail.gmail.com>
+ <0C198B33-8CB6-4D6A-B89F-35D3CD771135@holtmann.org>
+ <92579650-5eb0-cdf2-405a-7c5be9c54770@gmail.com>
+ <8CF7E37E-BF1C-4E32-AF3A-E44BA2E5A2B9@holtmann.org>
+ <87shgqgo7b.fsf@eliezer.anholt.net>
+Cc: "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Scott Branden <sbranden@broadcom.com>, Ray Jui <rjui@broadcom.com>,
+        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+        Rob Herring <robh+dt@kernel.org>, linux-rpi-kernel@lists.infradead.org
+From: Phil Elwell <phil@raspberrypi.org>
+Message-ID: <a86d58d2-e090-c172-5f76-7ced44fec6d3@raspberrypi.org>
+Date: Thu, 17 Aug 2017 21:08:17 +0100
 MIME-Version: 1.0
-In-Reply-To: <C0CDF47D-95D8-4270-A6C2-F83C00954A95@holtmann.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <87shgqgo7b.fsf@eliezer.anholt.net>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
-
-
-On 17/08/2017 21:48, Marcel Holtmann wrote:
-> Hi Loic,
+On 17/08/2017 17:21, Eric Anholt wrote:
+> Marcel Holtmann <marcel@holtmann.org> writes:
 >
->> Add basic support for Broadcom serial slave devices.
->> Probe the serial device, retrieve its maximum speed and
->> register a new hci uart device.
+>> Hi Loic,
 >>
->> Tested/compatible with bcm43438 (RPi3).
->>
->> Signed-off-by: Loic Poulain <loic.poulain@gmail.com>
->> ---
->> v2: dt-bindings as separate patch
->>      rebase on upcoming pi3 dts changes
->> v3: changes in bcm serdev drivers:
->>      name refactoring and additional comments
->>      Add generic host_set_baudrate method
->>      Use agnostic device_property_read
->> v4: changes in doc and dts:
->>      Add additional params to broadcom bt dt-bindings
->>      Set the max baudrate to 2000000 instead of 921600
->>      use chosen/stdout-path instead of console=
->>      remove useless earlyprintk
->>      same changes in bcm283x.dtsi
->>
->> drivers/bluetooth/hci_bcm.c | 85 +++++++++++++++++++++++++++++++++++++++++++--
->> 1 file changed, 83 insertions(+), 2 deletions(-)
-> I decided to amend your patch with the required Kconfig addition and then just applied 1/4 and 4/4 to bluetooth-next tree.
->
-> For 2/4 and 3/4, I think they should go through the DT tree since they depend on other changes. I can not apply since none of these changes are in any of my parent trees.
->
->
-Thanks for the amend.
+>>>>>> < HCI Command: Broadcom Write UART Clock Setting (0x3f|0x0045) ple=
+n 1
+>>>>>>        01                                               .
+>>>>>>> HCI Event: Command Complete (0x0e) plen 4
+>>>>>>      Broadcom Write UART Clock Setting (0x3f|0x0045) ncmd 1
+>>>>>>        Status: Unknown HCI Command (0x01)
+>>>>>>
+>>>>>> And I am seeing fun stuff like failed frame assembly.
+>>>>>>
+>>>>>> [  888.687594] Bluetooth: hci0: BCM: chip id 94
+>>>>>> [  888.687821] Bluetooth: hci0: BCM43430A1 (001.002.009) build 018=
+2
+>>>>>> [  892.059023] Bluetooth: hci0: Frame reassembly failed (-84)
+>>>>>> [  892.316936] Bluetooth: hci0: BCM: failed to write clock (-56)
+>>>>>> [  892.429478] Bluetooth: hci0: BCM (001.002.009) build 0182
+>>>>>>
+>>>>>> Actually not providing the firmware makes the controller work. It =
+however is stuck ad AA:AA:.. default address. Providing the firmware turn=
+s the address active. However then it never completes.
+>>>>> I've tried on and off to get the BT working, there seems to lots of=
 
-Indeed 2 and 3 depend on the following DT tree changes (Stefan):
-[PATCH v2] ARM: dts: bcm283x: Move the BCM2837 DT contents from arm64 to 
-arm.
-[PATCH V2 0/3] ARM: bcm283x: Raspberry Pi Zero W support
+>>>>> options and bits needed including some patches to the bluez [1] stu=
+ff
+>>>>> but between not quite upstream kernel bits and numerous distros all=
+
+>>>>> doing it slightly differently I've never got it to work well.
+>>>>>
+>>>>> The yocto [1] bits seem fairly representative of some the patches
+>>>>> flying around "to get it working" although I'm not sure how many of=
+
+>>>>> these are actually required and how many are superfluous with this
+>>>>> patch set. There seems to be a firmware required that's not
+>>>>> distributed with linux-firmware which would also be nice to resolve=
+=2E
+>>>> Non of these Yocto patches are actually needed. The culprit is the .=
+oper_speed setting to be 4Mbps. Once you reduce that to 921600 thing will=
+ start to work smoothly. I sent a patch that takes the .oper_speed out co=
+mpletely and only applies it for the ACPI based devices where we know tha=
+t it works.
+>>>>
+>>>> With my patch and the right DT entries for uart0 it actually works w=
+ith =93btattach -B /dev/ttyAMA0 -P bcm=94. It will load the firmware, con=
+figure it and head towards the right path.
+>>>>
+>>>> Obviously btattach is only an interim step here. Loic=92s patches fo=
+r serdev integration and changing the DT to expose uart0 as serial-slave =
+for Bluetooth is the right approach. Once Loic=92s resends the patches we=
+ can get them into bluetooth-next and start merging these towards upstrea=
+m. After that, Bluetooth should work just out of the box like with any US=
+B dongle.
+>>>>
+>>>> And the Yocto patches should be abandoned. If using H:5 (aka 3-Wire)=
+ instead of H:4 is possible, we could consider it, but as long as the UAR=
+T wiring doesn=92t cause any bit errors, it is not worth it.
+>>>>
+>>>> That said, I do see a "Bluetooth: hci0: Frame reassembly failed (-84=
+)=94 error. I need to figure out where that is. Frankly we really need to=
+ hexdump the packet when this happens.
+>>>>
+>>>
+>>> I also meet this Frame reassembly failure, Seems we receive a 0x00 by=
+te from the controller (unknown pkt type).
+>>
+>> that means adding something like this will silence it.
+>>
+>> +#define BCM_RECV_NULL \
+>> +       .type =3D 0x00, \
+>> +       .hlen =3D 0, \
+>> +       .loff =3D 0, \
+>> +       .lsize =3D 0, \
+>> +       .maxlen =3D 0
+>> +
+>> +static int bcm_recv_null(struct hci_dev *hdev, struct sk_buff *skb)
+>> +{
+>> +       kfree_skb(skb);
+>> +       return 0;
+>> +}
+>> +
+>>  static const struct h4_recv_pkt bcm_recv_pkts[] =3D {
+>>         { H4_RECV_ACL,      .recv =3D hci_recv_frame },
+>>         { H4_RECV_SCO,      .recv =3D hci_recv_frame },
+>>         { H4_RECV_EVENT,    .recv =3D hci_recv_frame },
+>>         { BCM_RECV_LM_DIAG, .recv =3D hci_recv_diag  },
+>> +       { BCM_RECV_NULL,    .recv =3D bcm_recv_null  },
+>>  };
+>>
+>> It does silence it indeed. Maybe this is some of their markers to
+>> ensure that the baud rate change worked. Or it is the indication that
+>> the reset completed. Do you happen to know between which commands we
+>> receive it?
+>>
+>>> Regarding the speed, I'm unable to reach 3Mbps, I selected 921600
+>>> because this is the baudrate used by raspbian bt script.
+>>
+>> That is the same I experienced. The 921600 works fine, but trying
+>> 3Mbps doesn=92t. However it seems with hciattach you can crank it up t=
+o
+>> 3Mpbs somehow. Maybe the delay is just to short for the UART switching=
+
+>> in that case.
+>>
+>>> Maybe they had some issues at higher speed (empirical value ?),
+>>> However 2Mbps seems ok on my side (need to double check/adjust).
+>>
+>> We have to make it a DT max-speed param anyway. So I am not that
+>> worried.
+>>
+>>> In a second step, need to check If we can use hardware flow control,
+>>> I heard that pin 16&17 are routed to the bcm RTS/CTS.  Since there is=
+
+>>> no DMA usage, it could help.
+>
+> The BT's CTS/RTS are tied to 3v3/ground.
+>
+>> Eric, any chance you can dig out the recommendation for the Bluetooth
+>> controller usage? I would also like to see the recommended PCM
+>> settings for this hardware. It bet it is somehow wired up to the sound=
+
+>> controller.
+>
+> BT's PCM is connected to gpio 28-31 on the pi3, which you can pinmux to=
+
+> the i2s controller (pcm_gpio28 pin group).
+>
+> I'm not clear on what you're asking for, or where I would go to find
+> anything else.  However, for integration stuff on the board, Phil, Dom,=
+
+> and Gordon at RPi are likely to know more.
+
+Eric is correct - GPIOs 28-31 on the Pi 3B are connected to the PCM funct=
+ion on
+the 43438. We haven't made use of those pins, and we are unlikely to. On =
+the
+Zero W, 30 and 31 are connected to the BT RTS and CTS, but on Pi 3B the f=
+low control
+pins are not connected, hence the baud rate restriction due to the risk o=
+f data
+loss - particularly likely and fatal during firmware uploaded since at bo=
+ot time
+systemd is "aggresively parallel". This is the reason for the BlueZ patch=
+ that
+defers switching to the higher baudrate until after firmware loading is c=
+omplete.
 
 Regards,
-Loic
+
+Phil
