@@ -1,80 +1,66 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+Subject: Re: [PATCH v4 4/4] Bluetooth: hci_bcm: Add serdev support
 From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: hci_bcm: Handle empty packet after firmware loading
-Date: Thu, 17 Aug 2017 21:41:09 +0200
-Message-Id: <20170817194109.80439-1-marcel@holtmann.org>
+In-Reply-To: <1502992791-10265-4-git-send-email-loic.poulain@gmail.com>
+Date: Thu, 17 Aug 2017 21:30:08 +0200
+Cc: Rob Herring <robh+dt@kernel.org>, f.fainelli@gmail.com,
+        Ray Jui <rjui@broadcom.com>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Stefan Wahren <stefan.wahren@i2se.com>,
+        devicetree <devicetree@vger.kernel.org>,
+        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+        linux-rpi-kernel@lists.infradead.org
+Message-Id: <1BB54E03-02E8-45F9-8FBA-739172DDD166@holtmann.org>
+References: <1502992791-10265-1-git-send-email-loic.poulain@gmail.com>
+ <1502992791-10265-4-git-send-email-loic.poulain@gmail.com>
+To: Loic Poulain <loic.poulain@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The Broadcom controller on the Raspberry Pi3 sends an empty packet with
-packet type 0x00 after launching the firmware. This will cause logging
-of errors.
+Hi Loic,
 
-  Bluetooth: hci0: Frame reassembly failed (-84)
+> Add basic support for Broadcom serial slave devices.
+> Probe the serial device, retrieve its maximum speed and
+> register a new hci uart device.
+> 
+> Tested/compatible with bcm43438 (RPi3).
+> 
+> Signed-off-by: Loic Poulain <loic.poulain@gmail.com>
+> ---
+> v2: dt-bindings as separate patch
+>     rebase on upcoming pi3 dts changes
+> v3: changes in bcm serdev drivers:
+>     name refactoring and additional comments
+>     Add generic host_set_baudrate method
+>     Use agnostic device_property_read
+> v4: changes in doc and dts:
+>     Add additional params to broadcom bt dt-bindings
+>     Set the max baudrate to 2000000 instead of 921600
+>     use chosen/stdout-path instead of console=
+>     remove useless earlyprintk
+>     same changes in bcm283x.dtsi
+> 
+> drivers/bluetooth/hci_bcm.c | 85 +++++++++++++++++++++++++++++++++++++++++++--
+> 1 file changed, 83 insertions(+), 2 deletions(-)
 
-Since this seems to be an intented behaviour of the controller, handle
-it gracefully by parsing that empty packet with packet type 0x00 and
-then just simply report it as diagnostic packet.
+you are missing the serdev dependency.
 
-With that change no errors are logging and the packet itself is actually
-recorded in the Bluetooth monitor traces.
+diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
+index 3a6ead603e49..fae5a74dc737 100644
+--- a/drivers/bluetooth/Kconfig
++++ b/drivers/bluetooth/Kconfig
+@@ -168,6 +168,7 @@ config BT_HCIUART_INTEL
+ config BT_HCIUART_BCM
+        bool "Broadcom protocol support"
+        depends on BT_HCIUART
++       depends on BT_HCIUART_SERDEV
+        select BT_HCIUART_H4
+        select BT_BCM
+        help
 
-  < HCI Command: Broadcom Launch RAM (0x3f|0x004e) plen 4
-         Address: 0xffffffff
-  > HCI Event: Command Complete (0x0e) plen 4
-       Broadcom Launch RAM (0x3f|0x004e) ncmd 1
-         Status: Success (0x00)
-  = Vendor Diagnostic (len 0)
-  < HCI Command: Broadcom Update UART Baud Rate (0x3f|0x0018) plen 6
-         00 00 00 10 0e 00                                ......
-  > HCI Event: Command Complete (0x0e) plen 4
-       Broadcom Update UART Baud Rate (0x3f|0x0018) ncmd 1
-         Status: Success (0x00)
-  < HCI Command: Reset (0x03|0x0003) plen 0
-  > HCI Event: Command Complete (0x0e) plen 4
-       Reset (0x03|0x0003) ncmd 1
-         Status: Success (0x00)
+Regards
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
----
- drivers/bluetooth/hci_bcm.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
-
-diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
-index 1eb286ade48a..302789a2bd3a 100644
---- a/drivers/bluetooth/hci_bcm.c
-+++ b/drivers/bluetooth/hci_bcm.c
-@@ -41,6 +41,9 @@
- #include "btbcm.h"
- #include "hci_uart.h"
- 
-+#define BCM_NULL_PKT 0x00
-+#define BCM_NULL_SIZE 0
-+
- #define BCM_LM_DIAG_PKT 0x07
- #define BCM_LM_DIAG_SIZE 63
- 
-@@ -436,11 +439,19 @@ static int bcm_setup(struct hci_uart *hu)
- 	.lsize = 0, \
- 	.maxlen = BCM_LM_DIAG_SIZE
- 
-+#define BCM_RECV_NULL \
-+	.type = BCM_NULL_PKT, \
-+	.hlen = BCM_NULL_SIZE, \
-+	.loff = 0, \
-+	.lsize = 0, \
-+	.maxlen = BCM_NULL_SIZE
-+
- static const struct h4_recv_pkt bcm_recv_pkts[] = {
- 	{ H4_RECV_ACL,      .recv = hci_recv_frame },
- 	{ H4_RECV_SCO,      .recv = hci_recv_frame },
- 	{ H4_RECV_EVENT,    .recv = hci_recv_frame },
- 	{ BCM_RECV_LM_DIAG, .recv = hci_recv_diag  },
-+	{ BCM_RECV_NULL,    .recv = hci_recv_diag  },
- };
- 
- static int bcm_recv(struct hci_uart *hu, const void *data, int count)
--- 
-2.13.5
+Marcel
 
