@@ -10,16 +10,13 @@ Cc: devicetree@vger.kernel.org,
 	linux-bluetooth@vger.kernel.org,
 	linux-rpi-kernel@lists.infradead.org,
 	Loic Poulain <loic.poulain@gmail.com>
-Subject: [PATCH v4 2/4] ARM: dts: bcm283x: Use stdout-path instead of console bootarg
-Date: Thu, 17 Aug 2017 19:59:49 +0200
-Message-Id: <1502992791-10265-2-git-send-email-loic.poulain@gmail.com>
-In-Reply-To: <1502992791-10265-1-git-send-email-loic.poulain@gmail.com>
-References: <1502992791-10265-1-git-send-email-loic.poulain@gmail.com>
+Subject: [PATCH v4 1/4] dt-bindings: net: bluetooth: Add broadcom-bluetooth
+Date: Thu, 17 Aug 2017 19:59:48 +0200
+Message-Id: <1502992791-10265-1-git-send-email-loic.poulain@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add the serial port config to "chosen/stdout-path".
-Create serial0/1 aliases referring to uart0 ant uart1 paths.
-Remove unneeded earlyprintk.
+Add binding document for serial bluetooth chips using
+Broadcom protocol.
 
 Signed-off-by: Loic Poulain <loic.poulain@gmail.com>
 ---
@@ -36,27 +33,50 @@ Signed-off-by: Loic Poulain <loic.poulain@gmail.com>
      remove useless earlyprintk
      same changes in bcm283x.dtsi
 
- arch/arm/boot/dts/bcm283x.dtsi | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ .../devicetree/bindings/net/broadcom-bluetooth.txt | 35 ++++++++++++++++++++++
+ 1 file changed, 35 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
 
-diff --git a/arch/arm/boot/dts/bcm283x.dtsi b/arch/arm/boot/dts/bcm283x.dtsi
-index 431dcfc..013431e 100644
---- a/arch/arm/boot/dts/bcm283x.dtsi
-+++ b/arch/arm/boot/dts/bcm283x.dtsi
-@@ -20,8 +20,13 @@
- 	#address-cells = <1>;
- 	#size-cells = <1>;
- 
-+	aliases {
-+		serial0 = &uart0;
-+		serial1 = &uart1;
-+	};
+diff --git a/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt b/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
+new file mode 100644
+index 0000000..4194ff7
+--- /dev/null
++++ b/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
+@@ -0,0 +1,35 @@
++Broadcom Bluetooth Chips
++---------------------
 +
- 	chosen {
--		bootargs = "earlyprintk console=ttyAMA0";
-+		stdout-path = "serial0:115200n8";
- 	};
- 
- 	thermal-zones {
++This documents the binding structure and common properties for serial
++attached Broadcom devices.
++
++Serial attached Broadcom devices shall be a child node of the host UART
++device the slave device is attached to.
++
++Required properties:
++
++ - compatible: should contain one of the following:
++   * "brcm,bcm43438-bt"
++
++Optional properties:
++
++ - max-speed: see Documentation/devicetree/bindings/serial/slave-device.txt
++ - shutdown-gpios: GPIO specifier, used to enable the BT module
++ - device-wakeup-gpios: GPIO specifier, used to wakeup the controller
++ - host-wakeup-gpios: GPIO specifier, used to wakeup the host processor
++ - clocks: clock specifier if external clock provided to the controller
++ - clock-names: should be "extclk"
++
++
++Example:
++
++&uart2 {
++       pinctrl-names = "default";
++       pinctrl-0 = <&uart2_pins>;
++
++       bluetooth {
++               compatible = "brcm,bcm43438-bt";
++               max-speed = <921600>;
++       };
++};
 -- 
 1.9.1
