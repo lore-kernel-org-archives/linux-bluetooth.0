@@ -1,104 +1,376 @@
-Return-Path: <netdev-owner@vger.kernel.org>
-Date: Fri, 18 Aug 2017 19:16:23 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: davem@davemloft.net
-Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: pull request: bluetooth-next 2017-08-18
-Message-ID: <20170818161623.GA22628@x1c.home>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-        protocol="application/pgp-signature"; boundary="5vNYLRcllDrimb99"
-Sender: netdev-owner@vger.kernel.org
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Yunhan Wang <yunhanw@google.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Yunhan Wang <yunhanw@google.com>
+Subject: [PATCH v2] client: Fix the selection bug of ad manager
+Date: Thu, 17 Aug 2017 19:02:04 -0700
+Message-Id: <20170818020204.68649-1-yunhanw@google.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-
---5vNYLRcllDrimb99
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-
-Hi Dave,
-
-Here's one more bluetooth-next pull request for the 4.14 kernel:
-
- - Multiple fixes for Broadcom controllers
- - Fixes to the bluecard HCI driver
- - New USB ID for Realtek RTL8723BE controller
- - Fix static analyzer warning with kfree
-
-Please let me know if there are any issues pulling. Thanks.
-
-Johan
-
+If there are multiple adapters, bluetoothctl may choose the wrong
+advertising manager. In addition, select command cannot update
+current advertising manager when choosing another adapter. Therefore, we
+need to put advertising manager under adapter structure to resolve this
+issue.
 ---
-The following changes since commit 1afec92be0d7b516a79f4c548a81d17460c8ba73:
+ client/main.c | 93 +++++++++++++++++++++++++++++------------------------------
+ 1 file changed, 46 insertions(+), 47 deletions(-)
 
-  Merge branch 'sctp-remove-typedefs-from-structures-part-5' (2017-08-06 21:33:43 -0700)
+diff --git a/client/main.c b/client/main.c
+index 276e7f184..a2b66fa9a 100644
+--- a/client/main.c
++++ b/client/main.c
+@@ -61,14 +61,14 @@ static GDBusProxy *agent_manager;
+ static char *auto_register_agent = NULL;
+ 
+ struct adapter {
+-	GDBusProxy *proxy;
++	GDBusProxy *adapterProxy;
++	GDBusProxy *advertisingProxy;
+ 	GList *devices;
+ };
+ 
+ static struct adapter *default_ctrl;
+ static GDBusProxy *default_dev;
+ static GDBusProxy *default_attr;
+-static GDBusProxy *ad_manager;
+ static GList *ctrl_list;
+ 
+ static guint input = 0;
+@@ -176,7 +176,7 @@ static void print_adapter(GDBusProxy *proxy, const char *description)
+ 				description ? "] " : "",
+ 				address, name,
+ 				default_ctrl &&
+-				default_ctrl->proxy == proxy ?
++				default_ctrl->adapterProxy == proxy ?
+ 				"[default]" : "");
+ 
+ }
+@@ -455,7 +455,7 @@ static struct adapter *find_parent(GDBusProxy *device)
+ 	for (list = g_list_first(ctrl_list); list; list = g_list_next(list)) {
+ 		struct adapter *adapter = list->data;
+ 
+-		if (device_is_child(device, adapter->proxy) == TRUE)
++		if (device_is_child(device, adapter->adapterProxy) == TRUE)
+ 			return adapter;
+ 	}
+ 	return NULL;
+@@ -521,17 +521,17 @@ static void device_added(GDBusProxy *proxy)
+ 
+ static void adapter_added(GDBusProxy *proxy)
+ {
+-	struct adapter *adapter = g_malloc0(sizeof(struct adapter));
+-
+-	adapter->proxy = proxy;
+-	ctrl_list = g_list_append(ctrl_list, adapter);
+-
+-	if (!default_ctrl)
+-		default_ctrl = adapter;
+-
++	default_ctrl = g_malloc0(sizeof(struct adapter));
++	default_ctrl->adapterProxy = proxy;
++	ctrl_list = g_list_append(ctrl_list, default_ctrl);
+ 	print_adapter(proxy, COLORED_NEW);
+ }
+ 
++static void ad_manager_added(GDBusProxy *proxy)
++{
++	default_ctrl->advertisingProxy = proxy;
++}
++
+ static void proxy_added(GDBusProxy *proxy, void *user_data)
+ {
+ 	const char *interface;
+@@ -560,7 +560,7 @@ static void proxy_added(GDBusProxy *proxy, void *user_data)
+ 	} else if (!strcmp(interface, "org.bluez.GattManager1")) {
+ 		gatt_add_manager(proxy);
+ 	} else if (!strcmp(interface, "org.bluez.LEAdvertisingManager1")) {
+-		ad_manager = proxy;
++		ad_manager_added(proxy);
+ 	}
+ }
+ 
+@@ -598,10 +598,10 @@ static void adapter_removed(GDBusProxy *proxy)
+ 	for (ll = g_list_first(ctrl_list); ll; ll = g_list_next(ll)) {
+ 		struct adapter *adapter = ll->data;
+ 
+-		if (adapter->proxy == proxy) {
++		if (adapter->adapterProxy == proxy) {
+ 			print_adapter(proxy, COLORED_DEL);
+ 
+-			if (default_ctrl && default_ctrl->proxy == proxy) {
++			if (default_ctrl && default_ctrl->adapterProxy == proxy) {
+ 				default_ctrl = NULL;
+ 				set_default_device(NULL, NULL);
+ 			}
+@@ -649,8 +649,7 @@ static void proxy_removed(GDBusProxy *proxy, void *user_data)
+ 	} else if (!strcmp(interface, "org.bluez.GattManager1")) {
+ 		gatt_remove_manager(proxy);
+ 	} else if (!strcmp(interface, "org.bluez.LEAdvertisingManager1")) {
+-		if (ad_manager == proxy) {
+-			agent_manager = NULL;
++		if(!dbus_conn){
+ 			ad_unregister(dbus_conn, NULL);
+ 		}
+ 	}
+@@ -663,7 +662,7 @@ static struct adapter *find_ctrl(GList *source, const char *path)
+ 	for (list = g_list_first(source); list; list = g_list_next(list)) {
+ 		struct adapter *adapter = list->data;
+ 
+-		if (!strcasecmp(g_dbus_proxy_get_path(adapter->proxy), path))
++		if (!strcasecmp(g_dbus_proxy_get_path(adapter->adapterProxy), path))
+ 			return adapter;
+ 	}
+ 
+@@ -680,7 +679,7 @@ static void property_changed(GDBusProxy *proxy, const char *name,
+ 
+ 	if (!strcmp(interface, "org.bluez.Device1")) {
+ 		if (default_ctrl && device_is_child(proxy,
+-					default_ctrl->proxy) == TRUE) {
++					default_ctrl->adapterProxy) == TRUE) {
+ 			DBusMessageIter addr_iter;
+ 			char *str;
+ 
+@@ -733,7 +732,7 @@ static void property_changed(GDBusProxy *proxy, const char *name,
+ 		if (!ctrl)
+ 			return;
+ 
+-		if (g_dbus_proxy_get_property(ctrl->proxy, "Address",
++		if (g_dbus_proxy_get_property(ctrl->adapterProxy, "Address",
+ 						&addr_iter) == TRUE) {
+ 			const char *address;
+ 
+@@ -773,7 +772,7 @@ static struct adapter *find_ctrl_by_address(GList *source, const char *address)
+ 		DBusMessageIter iter;
+ 		const char *str;
+ 
+-		if (g_dbus_proxy_get_property(adapter->proxy,
++		if (g_dbus_proxy_get_property(adapter->adapterProxy,
+ 					"Address", &iter) == FALSE)
+ 			continue;
+ 
+@@ -877,7 +876,7 @@ static void cmd_list(const char *arg)
+ 
+ 	for (list = g_list_first(ctrl_list); list; list = g_list_next(list)) {
+ 		struct adapter *adapter = list->data;
+-		print_adapter(adapter->proxy, NULL);
++		print_adapter(adapter->adapterProxy, NULL);
+ 	}
+ }
+ 
+@@ -892,14 +891,14 @@ static void cmd_show(const char *arg)
+ 		if (check_default_ctrl() == FALSE)
+ 			return;
+ 
+-		proxy = default_ctrl->proxy;
++		proxy = default_ctrl->adapterProxy;
+ 	} else {
+ 		adapter = find_ctrl_by_address(ctrl_list, arg);
+ 		if (!adapter) {
+ 			rl_printf("Controller %s not available\n", arg);
+ 			return;
+ 		}
+-		proxy = adapter->proxy;
++		proxy = adapter->adapterProxy;
+ 	}
+ 
+ 	if (g_dbus_proxy_get_property(proxy, "Address", &iter) == FALSE)
+@@ -934,11 +933,11 @@ static void cmd_select(const char *arg)
+ 		return;
+ 	}
+ 
+-	if (default_ctrl && default_ctrl->proxy == adapter->proxy)
++	if (default_ctrl && default_ctrl->adapterProxy == adapter->adapterProxy)
+ 		return;
+ 
+ 	default_ctrl = adapter;
+-	print_adapter(adapter->proxy, NULL);
++	print_adapter(adapter->adapterProxy, NULL);
+ }
+ 
+ static void cmd_devices(const char *arg)
+@@ -1003,7 +1002,7 @@ static void cmd_system_alias(const char *arg)
+ 
+ 	name = g_strdup(arg);
+ 
+-	if (g_dbus_proxy_set_property_basic(default_ctrl->proxy, "Alias",
++	if (g_dbus_proxy_set_property_basic(default_ctrl->adapterProxy, "Alias",
+ 					DBUS_TYPE_STRING, &name,
+ 					generic_callback, name, g_free) == TRUE)
+ 		return;
+@@ -1020,7 +1019,7 @@ static void cmd_reset_alias(const char *arg)
+ 
+ 	name = g_strdup("");
+ 
+-	if (g_dbus_proxy_set_property_basic(default_ctrl->proxy, "Alias",
++	if (g_dbus_proxy_set_property_basic(default_ctrl->adapterProxy, "Alias",
+ 					DBUS_TYPE_STRING, &name,
+ 					generic_callback, name, g_free) == TRUE)
+ 		return;
+@@ -1041,7 +1040,7 @@ static void cmd_power(const char *arg)
+ 
+ 	str = g_strdup_printf("power %s", powered == TRUE ? "on" : "off");
+ 
+-	if (g_dbus_proxy_set_property_basic(default_ctrl->proxy, "Powered",
++	if (g_dbus_proxy_set_property_basic(default_ctrl->adapterProxy, "Powered",
+ 					DBUS_TYPE_BOOLEAN, &powered,
+ 					generic_callback, str, g_free) == TRUE)
+ 		return;
+@@ -1062,7 +1061,7 @@ static void cmd_pairable(const char *arg)
+ 
+ 	str = g_strdup_printf("pairable %s", pairable == TRUE ? "on" : "off");
+ 
+-	if (g_dbus_proxy_set_property_basic(default_ctrl->proxy, "Pairable",
++	if (g_dbus_proxy_set_property_basic(default_ctrl->adapterProxy, "Pairable",
+ 					DBUS_TYPE_BOOLEAN, &pairable,
+ 					generic_callback, str, g_free) == TRUE)
+ 		return;
+@@ -1084,7 +1083,7 @@ static void cmd_discoverable(const char *arg)
+ 	str = g_strdup_printf("discoverable %s",
+ 				discoverable == TRUE ? "on" : "off");
+ 
+-	if (g_dbus_proxy_set_property_basic(default_ctrl->proxy, "Discoverable",
++	if (g_dbus_proxy_set_property_basic(default_ctrl->adapterProxy, "Discoverable",
+ 					DBUS_TYPE_BOOLEAN, &discoverable,
+ 					generic_callback, str, g_free) == TRUE)
+ 		return;
+@@ -1158,7 +1157,7 @@ static void cmd_scan(const char *arg)
+ 	else
+ 		method = "StopDiscovery";
+ 
+-	if (g_dbus_proxy_method_call(default_ctrl->proxy, method,
++	if (g_dbus_proxy_method_call(default_ctrl->adapterProxy, method,
+ 				NULL, start_discovery_reply,
+ 				GUINT_TO_POINTER(enable), NULL) == FALSE) {
+ 		rl_printf("Failed to %s discovery\n",
+@@ -1334,7 +1333,7 @@ static void cmd_set_scan_filter_commit(void)
+ 	if (check_default_ctrl() == FALSE)
+ 		return;
+ 
+-	if (g_dbus_proxy_method_call(default_ctrl->proxy, "SetDiscoveryFilter",
++	if (g_dbus_proxy_method_call(default_ctrl->adapterProxy, "SetDiscoveryFilter",
+ 		set_discovery_filter_setup, set_discovery_filter_reply,
+ 		&args, NULL) == FALSE) {
+ 		rl_printf("Failed to set discovery filter\n");
+@@ -1442,7 +1441,7 @@ static void cmd_set_scan_filter_clear(const char *arg)
+ 	if (check_default_ctrl() == FALSE)
+ 		return;
+ 
+-	if (g_dbus_proxy_method_call(default_ctrl->proxy, "SetDiscoveryFilter",
++	if (g_dbus_proxy_method_call(default_ctrl->adapterProxy, "SetDiscoveryFilter",
+ 		clear_discovery_filter_setup, set_discovery_filter_reply,
+ 		NULL, NULL) == FALSE) {
+ 		rl_printf("Failed to clear discovery filter\n");
+@@ -1657,7 +1656,7 @@ static void remove_device(GDBusProxy *proxy)
+ 	if (!default_ctrl)
+ 		return;
+ 
+-	if (g_dbus_proxy_method_call(default_ctrl->proxy, "RemoveDevice",
++	if (g_dbus_proxy_method_call(default_ctrl->adapterProxy, "RemoveDevice",
+ 						remove_device_setup,
+ 						remove_device_reply,
+ 						path, g_free) == FALSE) {
+@@ -1998,7 +1997,7 @@ static void cmd_register_app(const char *arg)
+ 		return;
+ 	}
+ 
+-	gatt_register_app(dbus_conn, default_ctrl->proxy, &w);
++	gatt_register_app(dbus_conn, default_ctrl->adapterProxy, &w);
+ 
+ 	wordfree(&w);
+ }
+@@ -2008,7 +2007,7 @@ static void cmd_unregister_app(const char *arg)
+ 	if (check_default_ctrl() == FALSE)
+ 		return;
+ 
+-	gatt_unregister_app(dbus_conn, default_ctrl->proxy);
++	gatt_unregister_app(dbus_conn, default_ctrl->adapterProxy);
+ }
+ 
+ static void cmd_register_service(const char *arg)
+@@ -2028,7 +2027,7 @@ static void cmd_register_service(const char *arg)
+ 		goto done;
+ 	}
+ 
+-	gatt_register_service(dbus_conn, default_ctrl->proxy, &w);
++	gatt_register_service(dbus_conn, default_ctrl->adapterProxy, &w);
+ 
+ done:
+ 	wordfree(&w);
+@@ -2051,7 +2050,7 @@ static void cmd_unregister_service(const char *arg)
+ 		goto done;
+ 	}
+ 
+-	gatt_unregister_service(dbus_conn, default_ctrl->proxy, &w);
++	gatt_unregister_service(dbus_conn, default_ctrl->adapterProxy, &w);
+ 
+ done:
+ 	wordfree(&w);
+@@ -2074,7 +2073,7 @@ static void cmd_register_characteristic(const char *arg)
+ 		goto done;
+ 	}
+ 
+-	gatt_register_chrc(dbus_conn, default_ctrl->proxy, &w);
++	gatt_register_chrc(dbus_conn, default_ctrl->adapterProxy, &w);
+ 
+ done:
+ 	wordfree(&w);
+@@ -2097,7 +2096,7 @@ static void cmd_unregister_characteristic(const char *arg)
+ 		goto done;
+ 	}
+ 
+-	gatt_unregister_chrc(dbus_conn, default_ctrl->proxy, &w);
++	gatt_unregister_chrc(dbus_conn, default_ctrl->adapterProxy, &w);
+ 
+ done:
+ 	wordfree(&w);
+@@ -2120,7 +2119,7 @@ static void cmd_register_descriptor(const char *arg)
+ 		goto done;
+ 	}
+ 
+-	gatt_register_desc(dbus_conn, default_ctrl->proxy, &w);
++	gatt_register_desc(dbus_conn, default_ctrl->adapterProxy, &w);
+ 
+ done:
+ 	wordfree(&w);
+@@ -2143,7 +2142,7 @@ static void cmd_unregister_descriptor(const char *arg)
+ 		goto done;
+ 	}
+ 
+-	gatt_unregister_desc(dbus_conn, default_ctrl->proxy, &w);
++	gatt_unregister_desc(dbus_conn, default_ctrl->adapterProxy, &w);
+ 
+ done:
+ 	wordfree(&w);
+@@ -2211,7 +2210,7 @@ static char *ctrl_generator(const char *text, int state)
+ 
+ 		index++;
+ 
+-		if (g_dbus_proxy_get_property(adapter->proxy,
++		if (g_dbus_proxy_get_property(adapter->adapterProxy,
+ 					"Address", &iter) == FALSE)
+ 			continue;
+ 
+@@ -2296,15 +2295,15 @@ static void cmd_advertise(const char *arg)
+ 	if (parse_argument_advertise(arg, &enable, &type) == FALSE)
+ 		return;
+ 
+-	if (!ad_manager) {
++	if (!default_ctrl || !default_ctrl->advertisingProxy) {
+ 		rl_printf("LEAdvertisingManager not found\n");
+ 		return;
+ 	}
+ 
+ 	if (enable == TRUE)
+-		ad_register(dbus_conn, ad_manager, type);
++		ad_register(dbus_conn, default_ctrl->advertisingProxy, type);
+ 	else
+-		ad_unregister(dbus_conn, ad_manager);
++		ad_unregister(dbus_conn, default_ctrl->advertisingProxy);
+ }
+ 
+ static char *ad_generator(const char *text, int state)
+-- 
+2.14.1.480.gb18f417b89-goog
 
-are available in the git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git for-upstream
-
-for you to fetch changes up to 01d5e44ace8a20fc51e0d530f98acb3c365345a5:
-
-  Bluetooth: hci_bcm: Handle empty packet after firmware loading (2017-08-17 22:51:50 +0300)
-
-----------------------------------------------------------------
-Colin Ian King (1):
-      Bluetooth: kfree tmp rather than an alias to it
-
-Dmitry Tunin (1):
-      Bluetooth: Add support of 13d3:3494 RTL8723BE device
-
-Loic Poulain (2):
-      Bluetooth: hci_bcm: Add serdev support
-      dt-bindings: net: bluetooth: Add broadcom-bluetooth
-
-Marcel Holtmann (4):
-      Bluetooth: btusb: Add workaround for Broadcom devices without product id
-      Bluetooth: hci_bcm: Use operation speed of 4Mbps only for ACPI devices
-      Bluetooth: btbcm: Consolidate the controller information commands
-      Bluetooth: hci_bcm: Handle empty packet after firmware loading
-
-Ondrej Zary (3):
-      Bluetooth: bluecard: Always enable LEDs (fix for Anycom CF-300)
-      Bluetooth: bluecard: fix LED behavior
-      Bluetooth: bluecard: blink LED during continuous activity
-
-Pavel Machek (1):
-      Bluetooth: document config options
-
-Sukumar Ghorai (1):
-      Bluetooth: btusb: driver to enable the usb-wakeup feature
-
- .../devicetree/bindings/net/broadcom-bluetooth.txt |  35 +++++++
- drivers/bluetooth/Kconfig                          |   1 +
- drivers/bluetooth/bluecard_cs.c                    |  58 ++++++------
- drivers/bluetooth/btbcm.c                          |  69 ++++++++------
- drivers/bluetooth/btusb.c                          |  24 +++++
- drivers/bluetooth/hci_bcm.c                        | 103 ++++++++++++++++++++-
- net/bluetooth/Kconfig                              |  12 +++
- net/bluetooth/selftest.c                           |   2 +-
- 8 files changed, 238 insertions(+), 66 deletions(-)
- create mode 100644 Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
-
---5vNYLRcllDrimb99
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIcBAEBAgAGBQJZlxLXAAoJECQj9vv5qNQS0aoP+wf3PTzxiwGsOXSNEA0SoR7c
-D9+yr+lL7paFT9oQ+hHwQX0ZKEDeFWGJ9amf1Sgiwoy8ZbjgN6wcaQ+mMruD+iEN
-0GxDlUyHydsKaZolhAZxr2H7mpdwP2ID8DDbny3lWaA+2b1Nx9woUUAjjDehI4+8
-/dD4rrkUGAC2P/2DA0/jQuEjbiMdosbwNbEC7YxB0xB7/RCbLaErWjp+4/O8YzL3
-lMRT8qhhqYpaQVMJ9AVzTGu3cpEibhWhXoMSCgLJX7ZXpFmxSr1bDh6uzGgA9oPD
-QPla0x3JiqtCk1dHzU0xwCs7pAijqfqbzvBd3AaTgiI5EnL0FJbRowEDu209oIaQ
-PXDEWgT3gvINf6pS/yYlmNOSAF0zP8F6PkYB3SolBv8XP7pzA5NJZRdDK5bBWkYk
-j3km1iWo/p+B8QRPL0lip7AD5oIEcFNQFh+R4HutU9/7ag9Qh3G82SpFDL1WtTAP
-q/EeFmf0qQYZS5332lr2TPXaQJl4lhoer2bDzZgBl7wtD8cGySnMcZonhlBXTnmE
-8buKlkO+xkk7p5u1uBA9how9Z9C0w8FJoUFHA1s1x48qYQtrxDiDFOAV2TGlIL/7
-XE6iWncKJb3n9tPVWJHx+fQtCTzAfnAIdBKVixV2pIGGdKt+94/OWcMMoEHluLyH
-j8YcguWuP8jbMpebfGr/
-=FBYA
------END PGP SIGNATURE-----
-
---5vNYLRcllDrimb99--
