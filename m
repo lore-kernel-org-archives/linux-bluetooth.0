@@ -1,284 +1,85 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+To: linux-bluetooth@vger.kernel.org
+In-Reply-To: 
+From: Andreas Wettergren <murpe79@gmail.com>
+Subject: Re: KORG nanoKONTROL Studio MIDI over Bluetooth problem
+Message-ID: <b56a27b8-afa9-dcd7-e7da-91081bcc6625@gmail.com>
+Date: Sun, 20 Aug 2017 12:59:26 +0200
 MIME-Version: 1.0
-In-Reply-To: <CALvjcs8GBeB6QR+JxfvrG3J-2TC+jKozP9bpVrAkZqhpzgAx1w@mail.gmail.com>
-References: <20170815012242.70454-1-yunhanw@google.com> <CABBYNZL+ZV+Gi+v4pN_XxMG7z_Mi5RLi=5GmuV_CBSc_Wf3gsw@mail.gmail.com>
- <CALvjcs8GBeB6QR+JxfvrG3J-2TC+jKozP9bpVrAkZqhpzgAx1w@mail.gmail.com>
-From: Yunhan Wang <yunhanw@google.com>
-Date: Sun, 20 Aug 2017 20:24:07 -0700
-Message-ID: <CALvjcs8aeOYzdYefZYTNHS-Zbd-J8UHr0S0rQ6PkK_x7fQ1_jQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] gdbus: add method to receive reply when property is updated
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi, Luiz
+Hello,
 
-I wanna setup a callback to check if GATT indication value happens in
-peripheral side, but it seems g_dbus_client_set_proxy_handlers cannot
-see property change for characteristic for peripheral role, for
-example, indication value change. I am also trying to get proxy for
-Gatt characteristics, but it seems it cannot be obtained in peripheral
-side. Do you have any idea to do property change monitor for Gatt
-Characteristic in peripheral side?
+I just got a NanoKontrol Studio and I'm experiencing the same 
+problems/symptoms as Robert did back in May.
 
-Thanks
-Best wishes
-Yunhan
+I get both "MIDI I/O: Failed to read initial request" in the logs, and 
+frequent disconnects.
 
-On Thu, Aug 17, 2017 at 1:02 AM, Yunhan Wang <yunhanw@google.com> wrote:
-> Hi, Luiz
->
-> Yes, I am trying to add callback to monitor GATT indication value
-> change, i think I can use g_dbus_client_set_proxy_handlers to monitor
-> such property change, which is working.
->
-> Thanks
-> Best wishes
-> Yunhan
->
-> On Tue, Aug 15, 2017 at 2:32 AM, Luiz Augusto von Dentz
-> <luiz.dentz@gmail.com> wrote:
->> Hi Yunhan,
->>
->> On Tue, Aug 15, 2017 at 4:22 AM, Yunhan Wang <yunhanw@google.com> wrote:
->>> This add g_dbus_emit_property_changed_with_reply to receive reply when
->>> property change is emitted.
->>> If no reply is received in the given timeout_milliseconds or reply is
->>> recieved, the notification function is called. If destroy function is
->>> set, this function would be called after notification function completes.
->>
->> Are you trying to implement what exactly, GATT indications?
->>
->>> ---
->>>  gdbus/gdbus.h     | 20 +++++++++++--
->>>  gdbus/object.c    | 87 +++++++++++++++++++++++++++++++++++++++++++++++++++----
->>>  src/gatt-client.c |  2 +-
->>>  3 files changed, 100 insertions(+), 9 deletions(-)
->>>
->>> diff --git a/gdbus/gdbus.h b/gdbus/gdbus.h
->>> index e37385fa1..8099a9930 100644
->>> --- a/gdbus/gdbus.h
->>> +++ b/gdbus/gdbus.h
->>> @@ -59,6 +59,8 @@ gboolean g_dbus_set_disconnect_function(DBusConnection *connection,
->>>                                 GDBusWatchFunction function,
->>>                                 void *user_data, DBusFreeFunction destroy);
->>>
->>> +typedef void (* GDBusResultFunction) (const DBusError *error, void *user_data);
->>> +
->>>  typedef void (* GDBusDestroyFunction) (void *user_data);
->>>
->>>  typedef DBusMessage * (* GDBusMethodFunction) (DBusConnection *connection,
->>> @@ -314,10 +316,24 @@ void g_dbus_pending_property_error(GDBusPendingReply id, const char *name,
->>>  void g_dbus_emit_property_changed(DBusConnection *connection,
->>>                                 const char *path, const char *interface,
->>>                                 const char *name);
->>> +
->>>  void g_dbus_emit_property_changed_full(DBusConnection *connection,
->>>                                 const char *path, const char *interface,
->>>                                 const char *name,
->>> -                               GDbusPropertyChangedFlags flags);
->>> +                               GDbusPropertyChangedFlags flags,
->>> +                               GDBusResultFunction function,
->>> +                               void *user_data,
->>> +                               GDBusDestroyFunction destroy,
->>> +                               int timeout);
->>> +
->>> +void g_dbus_emit_property_changed_with_reply(DBusConnection *connection,
->>> +                               const char *path, const char *interface,
->>> +                               const char *name,
->>> +                               GDBusResultFunction function,
->>> +                               void *user_data,
->>> +                               GDBusDestroyFunction destroy,
->>> +                               int timeout);
->>> +
->>>  gboolean g_dbus_get_properties(DBusConnection *connection, const char *path,
->>>                                 const char *interface, DBusMessageIter *iter);
->>>
->>> @@ -341,8 +357,6 @@ gboolean g_dbus_proxy_get_property(GDBusProxy *proxy, const char *name,
->>>
->>>  gboolean g_dbus_proxy_refresh_property(GDBusProxy *proxy, const char *name);
->>>
->>> -typedef void (* GDBusResultFunction) (const DBusError *error, void *user_data);
->>> -
->>>  gboolean g_dbus_proxy_set_property_basic(GDBusProxy *proxy,
->>>                                 const char *name, int type, const void *value,
->>>                                 GDBusResultFunction function, void *user_data,
->>> diff --git a/gdbus/object.c b/gdbus/object.c
->>> index afb458764..16d769c9b 100644
->>> --- a/gdbus/object.c
->>> +++ b/gdbus/object.c
->>> @@ -59,6 +59,10 @@ struct generic_data {
->>>         gboolean pending_prop;
->>>         char *introspect;
->>>         struct generic_data *parent;
->>> +       GDBusResultFunction function;
->>> +       void *user_data;
->>> +       GDBusDestroyFunction destroy;
->>> +       int timeout;
->>>  };
->>>
->>>  struct interface_data {
->>> @@ -84,6 +88,12 @@ struct property_data {
->>>         DBusMessage *message;
->>>  };
->>>
->>> +struct process_property_data {
->>> +       GDBusResultFunction function;
->>> +       void *user_data;
->>> +       GDBusDestroyFunction destroy;
->>> +};
->>> +
->>>  static int global_flags = 0;
->>>  static struct generic_data *root;
->>>  static GSList *pending = NULL;
->>> @@ -1651,6 +1661,26 @@ fail:
->>>         return ret;
->>>  }
->>>
->>> +static void process_property_reply(DBusPendingCall *call, void *user_data)
->>> +{
->>> +       struct process_property_data *data = user_data;
->>> +       DBusMessage *reply = dbus_pending_call_steal_reply(call);
->>> +       DBusError error;
->>> +
->>> +       dbus_error_init(&error);
->>> +
->>> +       dbus_set_error_from_message(&error, reply);
->>> +
->>> +       if (data->function)
->>> +               data->function(&error, data->user_data);
->>> +
->>> +       if (data->destroy)
->>> +               data->destroy(data->user_data);
->>> +
->>> +       dbus_error_free(&error);
->>> +       dbus_message_unref(reply);
->>> +}
->>> +
->>>  static void process_properties_from_interface(struct generic_data *data,
->>>                                                 struct interface_data *iface)
->>>  {
->>> @@ -1658,7 +1688,7 @@ static void process_properties_from_interface(struct generic_data *data,
->>>         DBusMessage *signal;
->>>         DBusMessageIter iter, dict, array;
->>>         GSList *invalidated;
->>> -
->>> +       DBusPendingCall *call;
->>>         data->pending_prop = FALSE;
->>>
->>>         if (iface->pending_prop == NULL)
->>> @@ -1713,8 +1743,35 @@ static void process_properties_from_interface(struct generic_data *data,
->>>         g_slist_free(iface->pending_prop);
->>>         iface->pending_prop = NULL;
->>>
->>> -       /* Use dbus_connection_send to avoid recursive calls to g_dbus_flush */
->>> -       dbus_connection_send(data->conn, signal, NULL);
->>> +       if (data->function != NULL)
->>> +       {
->>> +               struct process_property_data *process_property_data;
->>> +
->>> +               process_property_data = g_try_new0(struct process_property_data, 1);
->>> +               if (process_property_data == NULL)
->>> +                       return;
->>> +
->>> +               process_property_data->function = data->function;
->>> +               process_property_data->user_data = data->user_data;
->>> +               process_property_data->destroy = data->destroy;
->>> +
->>> +               /* Use dbus_connection_send to avoid recursive calls to g_dbus_flush */
->>> +               if (g_dbus_send_message_with_reply(data->conn, signal,
->>> +                                                               &call, data->timeout) == FALSE) {
->>
->> This shoudn't work as there is no reply to a signal:
->>
->> https://dbus.freedesktop.org/doc/dbus-tutorial.html#members
->>
->>> +                       dbus_message_unref(signal);
->>> +                       g_free(process_property_data);
->>> +                       return;
->>> +               }
->>> +
->>> +               dbus_pending_call_set_notify(call, process_property_reply, process_property_data, g_free);
->>> +               dbus_pending_call_unref(call);
->>> +       }
->>> +       else
->>> +       {
->>> +               /* Use dbus_connection_send to avoid recursive calls to g_dbus_flush */
->>> +               dbus_connection_send(data->conn, signal, NULL);
->>> +       }
->>> +
->>>         dbus_message_unref(signal);
->>>  }
->>>
->>> @@ -1732,7 +1789,11 @@ static void process_property_changes(struct generic_data *data)
->>>  void g_dbus_emit_property_changed_full(DBusConnection *connection,
->>>                                 const char *path, const char *interface,
->>>                                 const char *name,
->>> -                               GDbusPropertyChangedFlags flags)
->>> +                               GDbusPropertyChangedFlags flags,
->>> +                               GDBusResultFunction function,
->>> +                               void *user_data,
->>> +                               GDBusDestroyFunction destroy,
->>> +                               int timeout)
->>>  {
->>>         const GDBusPropertyTable *property;
->>>         struct generic_data *data;
->>> @@ -1770,6 +1831,14 @@ void g_dbus_emit_property_changed_full(DBusConnection *connection,
->>>         iface->pending_prop = g_slist_prepend(iface->pending_prop,
->>>                                                 (void *) property);
->>>
->>> +       if (function != NULL)
->>> +       {
->>> +               data->function = function;
->>> +               data->user_data = user_data;
->>> +               data->destroy = destroy;
->>> +               data->timeout = timeout;
->>> +       }
->>> +
->>>         if (flags & G_DBUS_PROPERTY_CHANGED_FLAG_FLUSH)
->>>                 process_property_changes(data);
->>>         else
->>> @@ -1779,7 +1848,15 @@ void g_dbus_emit_property_changed_full(DBusConnection *connection,
->>>  void g_dbus_emit_property_changed(DBusConnection *connection, const char *path,
->>>                                 const char *interface, const char *name)
->>>  {
->>> -       g_dbus_emit_property_changed_full(connection, path, interface, name, 0);
->>> +       g_dbus_emit_property_changed_full(connection, path, interface, name, 0, NULL, NULL, NULL, 0);
->>> +}
->>> +
->>> +void g_dbus_emit_property_changed_with_reply(DBusConnection *connection, const char *path,
->>> +                               const char *interface, const char *name,
->>> +                               GDBusResultFunction function, void *user_data,
->>> +                               GDBusDestroyFunction destroy, int timeout)
->>> +{
->>> +       g_dbus_emit_property_changed_full(connection, path, interface, name, 0, function, user_data, destroy, timeout);
->>>  }
->>>
->>>  gboolean g_dbus_get_properties(DBusConnection *connection, const char *path,
->>> diff --git a/src/gatt-client.c b/src/gatt-client.c
->>> index 1cd7fbcf5..5fd94657c 100644
->>> --- a/src/gatt-client.c
->>> +++ b/src/gatt-client.c
->>> @@ -878,7 +878,7 @@ static void write_characteristic_cb(struct gatt_db_attribute *attr, int err,
->>>
->>>         g_dbus_emit_property_changed_full(btd_get_dbus_connection(),
->>>                                 chrc->path, GATT_CHARACTERISTIC_IFACE,
->>> -                               "Value", G_DBUS_PROPERTY_CHANGED_FLAG_FLUSH);
->>> +                               "Value", G_DBUS_PROPERTY_CHANGED_FLAG_FLUSH, NULL, NULL, NULL, 0);
->>>
->>>  }
->>>
->>> --
->>> 2.14.0.434.g98096fd7a8-goog
->>>
->>> --
->>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->>> the body of a message to majordomo@vger.kernel.org
->>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->>
->>
->>
->> --
->> Luiz Augusto von Dentz
+I've tried playing around with MinInterval/MaxInterval (as well as 
+Latency and Timeout) as suggested by Felipe, but I can't seem to get it 
+working properly.
+
+However, by the logs from btmon, hcidump and bluetoothd, it seems like 
+the main problem is that I keep getting timeouts, and Bluez disconnects 
+for that reason.
+
+The best result so far is that the midi device ports have appeared 
+briefly in aseqdump / Catia (not the CAD package, the one from KXStudio),
+so it would seem there is a chance to get this working if I can just 
+prevent the timeouts/disconnections.
+
+I've tried reading up a bit on what exactly the parameters do, and sort 
+of get the idea, but the details are still a bit hazy.
+I'm just not sure how to proceed in the most rational way at this point.
+(Blindly trying arbitrary numbers is probably not going to work well :) )
+
+My questions are:
+
+@Robert:
+
+Did you get your nanoKontrol Studio to connect/work properly in the end?
+If so, would you care to share which Connection Parameters you used?
+
+@Felipe:
+
+Is there any point in pursuing this at the moment, or do you think "MIDI 
+I/O: Failed to read initial request" might be a showstopper?
+
+This is my understanding so far;
+The interval values are multiplied by 1.25 to get the actual millisecond 
+value, thus 6 => 7.5 ms.
+The latency value is the number of non-responses the stack will tolerate 
+before giving up on the connection.
+The timeout value is in 10 ms increments, so for example 200 => 2000 ms 
+timeout.
+Is the above correct?
+
+Are the rules in chapter 3.6 of Apples design guidelines relevant, or 
+are they not applicable to the Bluez stack?
+(https://developer.apple.com/hardwaredrivers/BluetoothDesignGuidelines.pdf.
+I made a spreadsheet to test for legal combinations, it seems the valid 
+ranges are pretty narrow)
+
+Finally, should I just try bumping MaxInterval (and maybe MinInterval) 
+until I see a change in behavior,
+and leave Latency and Timeout at 0/200?
+
+(I suppose I’ve changed the values a bit haphazardly up til now, a more 
+methodical approach might help, I’ll give that a try.)
+
+I can see that changing timeout changes the period between disconnects,
+but I can't seem to increase it enough to have them go away.
+
+Many thanks for your work on this, and any help will be greatly appreciated.
+
+Best regards
+
+/Andreas
+
+PS. I'm running Debian testing/unstable, Bluez 5.45-1, kernel is 
+4.11.0-2-rt-amd64, BT USB adapter is a Cambridge 0a12:0001, HCI 4.0.
+
+
