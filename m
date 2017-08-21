@@ -1,37 +1,214 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-To: linux-bluetooth@vger.kernel.org
-From: Florian Sievert <caleb@phobeus.de>
-Subject: Segfault on audio pairing
-Message-ID: <4239e483-1df9-8e18-fc07-d3ce755c8b16@phobeus.de>
-Date: Mon, 21 Aug 2017 18:29:39 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <CALvjcs-aQr8GA_E_1-pzBQQp+KUX460xjbzUhxtNJyx8yuH2sg@mail.gmail.com>
+References: <20170821070332.17952-1-yunhanw@google.com> <CALvjcs-aQr8GA_E_1-pzBQQp+KUX460xjbzUhxtNJyx8yuH2sg@mail.gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Mon, 21 Aug 2017 14:00:18 +0300
+Message-ID: <CABBYNZLjcZrpTWm4oCJu--0-TB2oUZUP_WLzjX_Gumv6PrwFOQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] Add method to process cb after emitting property
+To: Yunhan Wang <yunhanw@google.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi all,
+Hi Yunhan,
 
-I run into an issue with bluetooth when trying to connect to an audio
-speaker on my Fedora 26 system. I was able to reproduce this at least on
-two other Fedora systems with different hardware and thus opened up an
-issue in redhat's bugzilla:
+On Mon, Aug 21, 2017 at 10:19 AM, Yunhan Wang <yunhanw@google.com> wrote:
+> Hi, Luiz
+>
+> This is the patch that adds callback capability for
+> g_dbus_emit_property_change, which will trigger callback gunvyion
+> after property change is emitted if callback function is set. Since
+> signal is broadcast, we will not be able to know if property change is
+> received or not, but I hope I can get a kind of async callback to
+> process further, for example, indication. Could you take a look?
 
-https://bugzilla.redhat.com/show_bug.cgi?id=1469961
+I guess the proper way to receive a confirmation is to add a method to
+GattCharacteristic1, e.g. Confirm, which bluetoothd would call upon
+receiving a confirmation. Note that this is most informative since
+bluetoothd will queue indication until they are properly confirmed so
+the process may as well just send them in a batch. Now if you are
+doing a protocol on top of GATT that is a totally different matter,
+and perhaps we should extend the AcquireWrite and AcquireNotify to
+peripheral as well, though in that case you would probably be using
+the confirmation as acks? GATT request/indicate can have up to 30
+seconds to receive a response and considering there may be other users
+indicating there may be other requests on the queue, which is why
+people resort to notification and write without response since those
+do not need to be queued.
 
-While performing a discussion on the fedora user mailing list, some guy
-confirmed the issue as well and pointed out that some similiar Arch
-Linux does exist:
+> Thanks
+> Best wisehs
+> Yunhan
+>
+> On Mon, Aug 21, 2017 at 12:03 AM, Yunhan Wang <yunhanw@google.com> wrote:
+>> This add g_dbus_emit_property_changed_with_callback to process callback functions after
+>> property change is emitted.
+>> ---
+>>  gdbus/gdbus.h     | 18 +++++++++++++++---
+>>  gdbus/object.c    | 39 ++++++++++++++++++++++++++++++++++-----
+>>  src/gatt-client.c |  2 +-
+>>  3 files changed, 50 insertions(+), 9 deletions(-)
+>>
+>> diff --git a/gdbus/gdbus.h b/gdbus/gdbus.h
+>> index e37385fa1..3974b6e8c 100644
+>> --- a/gdbus/gdbus.h
+>> +++ b/gdbus/gdbus.h
+>> @@ -59,6 +59,8 @@ gboolean g_dbus_set_disconnect_function(DBusConnection *connection,
+>>                                 GDBusWatchFunction function,
+>>                                 void *user_data, DBusFreeFunction destroy);
+>>
+>> +typedef void (* GDBusResultFunction) (const DBusError *error, void *user_data);
+>> +
+>>  typedef void (* GDBusDestroyFunction) (void *user_data);
+>>
+>>  typedef DBusMessage * (* GDBusMethodFunction) (DBusConnection *connection,
+>> @@ -314,10 +316,22 @@ void g_dbus_pending_property_error(GDBusPendingReply id, const char *name,
+>>  void g_dbus_emit_property_changed(DBusConnection *connection,
+>>                                 const char *path, const char *interface,
+>>                                 const char *name);
+>> +
+>>  void g_dbus_emit_property_changed_full(DBusConnection *connection,
+>>                                 const char *path, const char *interface,
+>>                                 const char *name,
+>> -                               GDbusPropertyChangedFlags flags);
+>> +                               GDbusPropertyChangedFlags flags,
+>> +                               GDBusResultFunction function,
+>> +                               void *user_data,
+>> +                               GDBusDestroyFunction destroy);
+>> +
+>> +void g_dbus_emit_property_changed_with_callback(DBusConnection *connection,
+>> +                               const char *path, const char *interface,
+>> +                               const char *name,
+>> +                               GDBusResultFunction function,
+>> +                               void *user_data,
+>> +                               GDBusDestroyFunction destroy);
+>> +
+>>  gboolean g_dbus_get_properties(DBusConnection *connection, const char *path,
+>>                                 const char *interface, DBusMessageIter *iter);
+>>
+>> @@ -341,8 +355,6 @@ gboolean g_dbus_proxy_get_property(GDBusProxy *proxy, const char *name,
+>>
+>>  gboolean g_dbus_proxy_refresh_property(GDBusProxy *proxy, const char *name);
+>>
+>> -typedef void (* GDBusResultFunction) (const DBusError *error, void *user_data);
+>> -
+>>  gboolean g_dbus_proxy_set_property_basic(GDBusProxy *proxy,
+>>                                 const char *name, int type, const void *value,
+>>                                 GDBusResultFunction function, void *user_data,
+>> diff --git a/gdbus/object.c b/gdbus/object.c
+>> index afb458764..04c3b4fb4 100644
+>> --- a/gdbus/object.c
+>> +++ b/gdbus/object.c
+>> @@ -59,6 +59,9 @@ struct generic_data {
+>>         gboolean pending_prop;
+>>         char *introspect;
+>>         struct generic_data *parent;
+>> +       GDBusResultFunction function;
+>> +       void *user_data;
+>> +       GDBusDestroyFunction destroy;
+>>  };
+>>
+>>  struct interface_data {
+>> @@ -1002,21 +1005,29 @@ static void remove_pending(struct generic_data *data)
+>>  static gboolean process_changes(gpointer user_data)
+>>  {
+>>         struct generic_data *data = user_data;
+>> -
+>> +       DBusError error;
+>> +       dbus_error_init(&error);
+>>         remove_pending(data);
+>>
+>>         if (data->added != NULL)
+>>                 emit_interfaces_added(data);
+>>
+>>         /* Flush pending properties */
+>> -       if (data->pending_prop == TRUE)
+>> +       if (data->pending_prop == TRUE) {
+>>                 process_property_changes(data);
+>> +               if (data->function != NULL) {
+>> +                       data->function(&error, data->user_data);
+>> +               }
+>>
+>> +               if (data->destroy != NULL) {
+>> +                       data->destroy(data->user_data);
+>> +               }
+>> +       }
+>>         if (data->removed != NULL)
+>>                 emit_interfaces_removed(data);
+>>
+>>         data->process_id = 0;
+>> -
+>> +       dbus_error_free(&error);
+>>         return FALSE;
+>>  }
+>>
+>> @@ -1732,7 +1743,10 @@ static void process_property_changes(struct generic_data *data)
+>>  void g_dbus_emit_property_changed_full(DBusConnection *connection,
+>>                                 const char *path, const char *interface,
+>>                                 const char *name,
+>> -                               GDbusPropertyChangedFlags flags)
+>> +                               GDbusPropertyChangedFlags flags,
+>> +                               GDBusResultFunction function,
+>> +                               void *user_data,
+>> +                               GDBusDestroyFunction destroy)
+>>  {
+>>         const GDBusPropertyTable *property;
+>>         struct generic_data *data;
+>> @@ -1770,6 +1784,13 @@ void g_dbus_emit_property_changed_full(DBusConnection *connection,
+>>         iface->pending_prop = g_slist_prepend(iface->pending_prop,
+>>                                                 (void *) property);
+>>
+>> +       if (function != NULL)
+>> +       {
+>> +               data->function = function;
+>> +               data->user_data = user_data;
+>> +               data->destroy = destroy;
+>> +       }
+>> +
+>>         if (flags & G_DBUS_PROPERTY_CHANGED_FLAG_FLUSH)
+>>                 process_property_changes(data);
+>>         else
+>> @@ -1779,7 +1800,15 @@ void g_dbus_emit_property_changed_full(DBusConnection *connection,
+>>  void g_dbus_emit_property_changed(DBusConnection *connection, const char *path,
+>>                                 const char *interface, const char *name)
+>>  {
+>> -       g_dbus_emit_property_changed_full(connection, path, interface, name, 0);
+>> +       g_dbus_emit_property_changed_full(connection, path, interface, name, 0, NULL, NULL, NULL);
+>> +}
+>> +
+>> +void g_dbus_emit_property_changed_with_callback(DBusConnection *connection, const char *path,
+>> +                               const char *interface, const char *name,
+>> +                               GDBusResultFunction function, void *user_data,
+>> +                               GDBusDestroyFunction destroy)
+>> +{
+>> +       g_dbus_emit_property_changed_full(connection, path, interface, name, 0, function, user_data, destroy);
+>>  }
+>>
+>>  gboolean g_dbus_get_properties(DBusConnection *connection, const char *path,
+>> diff --git a/src/gatt-client.c b/src/gatt-client.c
+>> index 1cd7fbcf5..e70245c19 100644
+>> --- a/src/gatt-client.c
+>> +++ b/src/gatt-client.c
+>> @@ -878,7 +878,7 @@ static void write_characteristic_cb(struct gatt_db_attribute *attr, int err,
+>>
+>>         g_dbus_emit_property_changed_full(btd_get_dbus_connection(),
+>>                                 chrc->path, GATT_CHARACTERISTIC_IFACE,
+>> -                               "Value", G_DBUS_PROPERTY_CHANGED_FLAG_FLUSH);
+>> +                               "Value", G_DBUS_PROPERTY_CHANGED_FLAG_FLUSH, NULL, NULL, NULL);
+>>
+>>  }
+>>
+>> --
+>> 2.14.1.480.gb18f417b89-goog
+>>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-https://bugs.archlinux.org/task/53442
 
-I was pointed to this mailing list to raise the issue and asking for
-further advisory on debugging this segfault. The issue is 100%
-reproducable here on my system and seems just to occur when connecting
-an audio speaker via bluetooth to the system. All other bluetooth
-devices seems to be working fine. Some logs and the segfault are
-attached to the redhat issue. So how may I help to narrow down this
-segfault?
 
-Many thanks in advance,
-Florian
-
+-- 
+Luiz Augusto von Dentz
