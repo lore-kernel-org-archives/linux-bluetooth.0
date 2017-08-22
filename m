@@ -1,25 +1,23 @@
 Return-Path: <robherring2@gmail.com>
-Date: Mon, 21 Aug 2017 21:30:14 -0500
+Date: Mon, 21 Aug 2017 21:29:21 -0500
 From: Rob Herring <robh@kernel.org>
 To: Loic Poulain <loic.poulain@gmail.com>
 Cc: f.fainelli@gmail.com, rjui@broadcom.com, marcel@holtmann.org,
 	johan.hedberg@gmail.com, stefan.wahren@i2se.com,
 	devicetree@vger.kernel.org, linux-bluetooth@vger.kernel.org,
 	linux-rpi-kernel@lists.infradead.org
-Subject: Re: [PATCH v4 2/4] ARM: dts: bcm283x: Use stdout-path instead of
- console bootarg
-Message-ID: <20170822023014.q7cc3v3nlocyjlog@rob-hp-laptop>
+Subject: Re: [PATCH v4 1/4] dt-bindings: net: bluetooth: Add
+ broadcom-bluetooth
+Message-ID: <20170822022921.7o2h3w3crmrjulga@rob-hp-laptop>
 References: <1502992791-10265-1-git-send-email-loic.poulain@gmail.com>
- <1502992791-10265-2-git-send-email-loic.poulain@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1502992791-10265-2-git-send-email-loic.poulain@gmail.com>
+In-Reply-To: <1502992791-10265-1-git-send-email-loic.poulain@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, Aug 17, 2017 at 07:59:49PM +0200, Loic Poulain wrote:
-> Add the serial port config to "chosen/stdout-path".
-> Create serial0/1 aliases referring to uart0 ant uart1 paths.
-> Remove unneeded earlyprintk.
+On Thu, Aug 17, 2017 at 07:59:48PM +0200, Loic Poulain wrote:
+> Add binding document for serial bluetooth chips using
+> Broadcom protocol.
 > 
 > Signed-off-by: Loic Poulain <loic.poulain@gmail.com>
 > ---
@@ -36,7 +34,8 @@ On Thu, Aug 17, 2017 at 07:59:49PM +0200, Loic Poulain wrote:
 >      remove useless earlyprintk
 >      same changes in bcm283x.dtsi
 > 
->  arch/arm/boot/dts/bcm283x.dtsi | 7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
+>  .../devicetree/bindings/net/broadcom-bluetooth.txt | 35 ++++++++++++++++++++++
+>  1 file changed, 35 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
 
 Acked-by: Rob Herring <robh@kernel.org>
