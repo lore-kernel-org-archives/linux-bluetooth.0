@@ -1,30 +1,49 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Yunhan Wang <yunhanw@google.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Yunhan Wang <yunhanw@google.com>
-Subject: [PATCH BlueZ] advertising: Fix UUIDs in adv_parser
-Date: Tue, 22 Aug 2017 23:44:58 -0700
-Message-Id: <20170823064458.36961-1-yunhanw@google.com>
+From: =?utf-8?B?6ZmG5pyx5Lyf?= <alex_lu@realsil.com.cn>
+To: Alex Deucher <alexdeucher@gmail.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "Larry.Finger@lwfinger.net" <Larry.Finger@lwfinger.net>
+Subject: =?utf-8?B?562U5aSNOiDnrZTlpI06IFJUTDg4MjJCRSBCbHVldG9vdGggZGV2aWNl?=
+Date: Wed, 23 Aug 2017 03:22:10 +0000
+Message-ID: <0551C926975A174EA8972327741C7889EDA63901@RS-MBS01.realsil.com.cn>
+References: <CADnq5_PvCCWpx-+zbvxHC_SRG3Yq-n7wqy59ymGb=GUmm3Bkdw@mail.gmail.com>
+ <0551C926975A174EA8972327741C7889EDA6385B@RS-MBS01.realsil.com.cn>
+ <CADnq5_Og8CKNLgk0A=iXLzz=dV0JWX=F7RtmyrsCdWoZcCoJvA@mail.gmail.com>
+In-Reply-To: <CADnq5_Og8CKNLgk0A=iXLzz=dV0JWX=F7RtmyrsCdWoZcCoJvA@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- src/advertising.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/src/advertising.c b/src/advertising.c
-index f125ca5c8..b03c36fb6 100644
---- a/src/advertising.c
-+++ b/src/advertising.c
-@@ -496,7 +496,7 @@ static struct adv_parser {
- 	bool (*func)(DBusMessageIter *iter, struct btd_adv_client *client);
- } parsers[] = {
- 	{ "Type", parse_type },
--	{ "UUIDs", parse_service_uuids },
-+	{ "ServiceUUIDs", parse_service_uuids },
- 	{ "SolicitUUIDs", parse_solicit_uuids },
- 	{ "ManufacturerData", parse_manufacturer_data },
- 	{ "ServiceData", parse_service_data },
--- 
-2.14.1.480.gb18f417b89-goog
-
+SSBoYXZlIG5vIHByb2JsZW0gd2l0aCBpdC4NCg0KVGhhbmtzLA0KQlJzLA0KQWxleCBMdQ0KDQot
+LS0tLemCruS7tuWOn+S7ti0tLS0tDQrlj5Hku7bkuro6IEFsZXggRGV1Y2hlciBbbWFpbHRvOmFs
+ZXhkZXVjaGVyQGdtYWlsLmNvbV0gDQrlj5HpgIHml7bpl7Q6IDIwMTflubQ45pyIMjPml6UgMTA6
+NTMNCuaUtuS7tuS6ujog6ZmG5pyx5LyfDQrmioTpgIE6IGxpbnV4LWJsdWV0b290aEB2Z2VyLmtl
+cm5lbC5vcmc7IExhcnJ5LkZpbmdlckBsd2Zpbmdlci5uZXQNCuS4u+mimDogUmU6IOetlOWkjTog
+UlRMODgyMkJFIEJsdWV0b290aCBkZXZpY2UNCg0KT24gVHVlLCBBdWcgMjIsIDIwMTcgYXQgMTA6
+MjEgUE0sIOmZhuacseS8nyA8YWxleF9sdUByZWFsc2lsLmNvbS5jbj4gd3JvdGU6DQo+IEhpIEFs
+ZXggRGV1Y2hlciwNCj4gVGhlIHJ0bDg4MjFhX2NvbmZpZy5iaW4gaXMgbm90IG5lY2Vzc2FyeS4N
+Cj4gSXQgaXMgdXNlZCBmb3Igc29tZSBzcGVjaWFsIHNldHRpbmdzLCBzdWNoIGFzIGJkYWRkciwg
+c2NvIG92ZXIgcGNtL2hjaSwgZXRjLg0KDQpUaGFua3MgZm9yIGNsYXJpZnlpbmcuICBIb3cgYWJv
+dXQgdGhlIGF0dGFjaGVkIHBhdGNoIHRvIG1ha2UgaXQgY2xlYXIgd2hpY2ggY29uZmlnIGZpcm13
+YXJlcyBhcmUgb3B0aW9uYWw/DQoNCg0KQWxleA0KDQo+DQo+IFRoYW5rcywNCj4gQlJzLA0KPiBB
+bGV4IEx1Lg0KPg0KPiAtLS0tLemCruS7tuWOn+S7ti0tLS0tDQo+IOWPkeS7tuS6ujogQWxleCBE
+ZXVjaGVyIFttYWlsdG86YWxleGRldWNoZXJAZ21haWwuY29tXQ0KPiDlj5HpgIHml7bpl7Q6IDIw
+MTflubQ45pyIMjPml6UgMTA6MDkNCj4g5pS25Lu25Lq6OiBsaW51eC1ibHVldG9vdGhAdmdlci5r
+ZXJuZWwub3JnOyDpmYbmnLHkvJ87IExhcnJ5LkZpbmdlckBsd2Zpbmdlci5uZXQNCj4g5Li76aKY
+OiBSVEw4ODIyQkUgQmx1ZXRvb3RoIGRldmljZQ0KPg0KPiBJIGhhdmUgdGhpcyBkZXZpY2UsIGJ1
+dCB0aGUgZHJpdmVyIHJlcXVpcmVzIGEgZmlybXdhcmUgZmlsZQ0KPiAocnRsODgyMWFfY29uZmln
+LmJpbikgd2hpY2ggZG9lcyBub3Qgc2VlbSB0byBleGlzdC4gIExvb2tpbmcgYXQgdGhlIGNvZGVb
+MV0sIHRoZXJlIGFwcGVhciB0byBiZSBzZXZlcmFsIGZpcm13YXJlIGNvbmZpZyBmaWxlcyBmb3Ig
+dmFyaWFudHMgb2YgdGhpcyBkZXZpY2U6DQo+ICsgc3dpdGNoIChsbXBfc3VidmVyKSB7DQo+ICsg
+Y2FzZSBSVExfUk9NX0xNUF84NzIzQjoNCj4gKyBjZmdfbmFtZSA9ICJydGxfYnQvcnRsODcyM2Jf
+Y29uZmlnLmJpbiI7IGJyZWFrOyBjYXNlDQo+ICsgUlRMX1JPTV9MTVBfODgyMUE6DQo+ICsgY2Zn
+X25hbWUgPSAicnRsX2J0L3J0bDg4MjFhX2NvbmZpZy5iaW4iOyBicmVhazsgY2FzZQ0KPiArIFJU
+TF9ST01fTE1QXzg3NjFBOg0KPiArIGNmZ19uYW1lID0gInJ0bF9idC9ydGw4NzYxYV9jb25maWcu
+YmluIjsgYnJlYWs7IGNhc2UNCj4gKyBSVExfUk9NX0xNUF84ODIyQjoNCj4gKyBjZmdfbmFtZSA9
+ICJydGxfYnQvcnRsODgyMmJfY29uZmlnLmJpbiI7IGJyZWFrOw0KPiBIb3dldmVyLCB0aGUgb25s
+eSBmaWxlIHRoYXQgc2VlbSB0byBhY3R1YWxseSBleGlzdCBpcyBydGw4ODIyYl9jb25maWcuYmlu
+LiAgRG9lcyBhbnlvbmUga25vdyB3aGVyZSB0byBnZXQgdGhlIG90aGVycz8NCj4NCj4gVGhhbmtz
+LA0KPg0KPiBBbGV4DQo+DQo+IFsxXSBodHRwczovL3BhdGNod29yay5rZXJuZWwub3JnL3BhdGNo
+LzkzMjM3NDkvDQo+DQo+IC0tLS0tLVBsZWFzZSBjb25zaWRlciB0aGUgZW52aXJvbm1lbnQgYmVm
+b3JlIHByaW50aW5nIHRoaXMgZS1tYWlsLg0K
