@@ -1,96 +1,89 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Date: Thu, 24 Aug 2017 09:03:19 +0200
-From: Wolfram Schlich <wschlich@gentoo.org>
+From: mcchou@chromium.org
 To: linux-bluetooth@vger.kernel.org
-Subject: files missing in release tarball (esp. profiles/proximity/*)
-Message-ID: <20170824070319.GA31562@bla.fasel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Cc: luiz.von.dentz@intel.com, josephsih@chromium.org,
+        sonnysasaka@chromium.org, Miao-chen Chou <mcchou@chromium.org>
+Subject: [PATCH] adapter: Guard StartDiscovery and StopDiscovery with discovering check
+Date: Wed, 23 Aug 2017 16:55:50 -0700
+Message-Id: <20170823235550.45934-1-mcchou@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+From: Miao-chen Chou <mcchou@chromium.org>
 
-there seem to be quite some differences between the git snapshot
-tarball[1] and the release tarball[2]:
+There is a race condition where a start/stop discovery is requested before the
+previous stop/start discovery finish, and checking the adapter->discovery_list
+is insufficient to guard to race condition. For example, if start_discovery is
+called right after stop discovery, the callback, stop_discovery_complete, may
+not be called before calling start_discovery. Then start_discovery will
+proceed and fail.
 
-1. https://git.kernel.org/pub/scm/bluetooth/bluez.git/snapshot/bluez-5.46.tar.gz
-2. https://www.kernel.org/pub/linux/bluetooth/bluez-5.46.tar.gz
+Test steps:
+Add delay in kernel for the stop discovery callback.
+Check if the start discovery can happen before the completion of the previous
+stop discovery, and the other way around.
 
-A diff -ur between both unpacked tarballs shows:
---8<--
-Only in bluez-5.46-release-tarball: aclocal.m4
-Only in bluez-5.46-git-snapshot-tarball/android: sco-ipc-api.txt
-Only in bluez-5.46-git-snapshot-tarball/android: socket-api.txt
-Only in bluez-5.46-git-snapshot-tarball: bootstrap
-Only in bluez-5.46-git-snapshot-tarball: bootstrap-configure
-Only in bluez-5.46-release-tarball: compile
-Only in bluez-5.46-release-tarball: config.guess
-Only in bluez-5.46-release-tarball: config.h.in
-Only in bluez-5.46-release-tarball: config.sub
-Only in bluez-5.46-release-tarball: configure
-Only in bluez-5.46-release-tarball: depcomp
-Only in bluez-5.46-git-snapshot-tarball/doc: coding-style.txt
-Only in bluez-5.46-git-snapshot-tarball/doc: maintainer-guidelines.txt
-Only in bluez-5.46-git-snapshot-tarball: .gitignore
-Only in bluez-5.46-git-snapshot-tarball: HACKING
-Only in bluez-5.46-release-tarball: install-sh
-Only in bluez-5.46-release-tarball: ltmain.sh
-Only in bluez-5.46-git-snapshot-tarball: .mailmap
-Only in bluez-5.46-release-tarball: Makefile.in
-Only in bluez-5.46-release-tarball: missing
-Only in bluez-5.46-git-snapshot-tarball/obexd/plugins: messages-tracker.c
-Only in bluez-5.46-git-snapshot-tarball/obexd/plugins: phonebook-ebook.c
-Only in bluez-5.46-git-snapshot-tarball/obexd/plugins: phonebook-tracker.c
-Only in bluez-5.46-git-snapshot-tarball/obexd/plugins: syncevolution.c
-Only in bluez-5.46-git-snapshot-tarball/profiles/proximity: immalert.c
-Only in bluez-5.46-git-snapshot-tarball/profiles/proximity: immalert.h
-Only in bluez-5.46-git-snapshot-tarball/profiles/proximity: linkloss.c
-Only in bluez-5.46-git-snapshot-tarball/profiles/proximity: linkloss.h
-Only in bluez-5.46-git-snapshot-tarball/profiles/proximity: main.c
-Only in bluez-5.46-git-snapshot-tarball/profiles/proximity: manager.c
-Only in bluez-5.46-git-snapshot-tarball/profiles/proximity: manager.h
-Only in bluez-5.46-git-snapshot-tarball/profiles/proximity: monitor.c
-Only in bluez-5.46-git-snapshot-tarball/profiles/proximity: monitor.h
-Only in bluez-5.46-git-snapshot-tarball/profiles/proximity: reporter.c
-Only in bluez-5.46-git-snapshot-tarball/profiles/proximity: reporter.h
-Only in bluez-5.46-git-snapshot-tarball/test: exchange-business-cards
-Only in bluez-5.46-git-snapshot-tarball/test: get-managed-objects
-Only in bluez-5.46-git-snapshot-tarball/test: get-obex-capabilities
-Only in bluez-5.46-git-snapshot-tarball/test: list-folders
-Only in bluez-5.46-git-snapshot-tarball/test: simple-obex-agent
-Only in bluez-5.46-release-tarball: test-driver
-Only in bluez-5.46-git-snapshot-tarball/tools: example.psr
-Only in bluez-5.46-git-snapshot-tarball/tools: parse_companies.pl
-Only in bluez-5.46-git-snapshot-tarball/tools: update_compids.sh
-Only in bluez-5.46-git-snapshot-tarball/tools: valgrind.supp
---8<--
+Please refer to https://bugs.chromium.org/p/chromium/issues/detail?id=738237
+for more details.
+---
+ src/adapter.c | 26 +++++++++++++++++++++++---
+ 1 file changed, 23 insertions(+), 3 deletions(-)
 
-Notably the files from obexd/plugins/, profiles/proximity/
-and test/ are missing in the release tarball.
+diff --git a/src/adapter.c b/src/adapter.c
+index 83f38ddbe..395b430d2 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -2119,20 +2119,30 @@ static DBusMessage *start_discovery(DBusConnection *conn,
+ 	struct btd_adapter *adapter = user_data;
+ 	const char *sender = dbus_message_get_sender(msg);
+ 	struct watch_client *client;
+-	bool is_discovering;
++	bool discovery_client_exists;
 
-The program 'bluez-test-proximity' is, for example, effectively
-unusable when using the release tarball because of the missing
-files from profiles/proximity/:
---8<--
-zephyr ~ # /usr/bin/bluez-test-proximity -b AA:BB:CC:DD:EE:FF LinkLossAlertLevel high
-Proximity SetProperty('LinkLossAlertLevel', 'high')
-Traceback (most recent call last):
-  File "/usr/bin/bluez-test-proximity", line 67, in <module>
-    device_prop.Set(PROXIMITY_MONITOR_INTERFACE, args[0], args[1])
-  File "/usr/lib64/python2.7/site-packages/dbus/proxies.py", line 70, in __call__
-    return self._proxy_method(*args, **keywords)
-  File "/usr/lib64/python2.7/site-packages/dbus/proxies.py", line 145, in __call__
-    **keywords)
-  File "/usr/lib64/python2.7/site-packages/dbus/connection.py", line 651, in call_blocking
-    message, timeout)
-dbus.exceptions.DBusException: org.freedesktop.DBus.Error.InvalidArgs: No such interface 'org.bluez.ProximityMonitor1'
-zephyr ~ # 
---8<--
+ 	DBG("sender %s", sender);
 
-Can you fix this (at least profiles/proximity/), please?
+ 	if (!(adapter->current_settings & MGMT_SETTING_POWERED))
+ 		return btd_error_not_ready(msg);
 
-Thank you!
+-	is_discovering = get_discovery_client(adapter, sender, &client);
++	discovery_client_exists = get_discovery_client(
++			adapter, sender, &client);
 
-Cheers,
-Wolfram
+ 	/*
+ 	 * Every client can only start one discovery, if the client
+ 	 * already started a discovery then return an error.
+ 	 */
+-	if (is_discovering)
++	if (discovery_client_exists)
++		return btd_error_busy(msg);
++
++	/*
++	 * adapter->discovery_list being empty but adapter->discovering being
++	 * true indicates that there is a stop discovery operation in progress.
++	 * Prevent a new start discovery request when the previous
++	 * stop discovery is in progress.
++	 */
++	if (!adapter->discovery_list && adapter->discovering)
+ 		return btd_error_busy(msg);
+
+ 	/*
+@@ -2420,6 +2430,16 @@ static DBusMessage *stop_discovery(DBusConnection *conn,
+ 	if (!list)
+ 		return btd_error_failed(msg, "No discovery started");
+
++	/*
++	 * adapter->discovery_list being not empty but adapter->discovering
++	 * being false indicates that there is a start discovery operation in
++	 * progress.
++	 * Prevent a new stop discovery request when the previous start
++	 * discovery is in progress.
++	 */
++	if (!adapter->discovering)
++		return btd_error_busy(msg);
++
+ 	client = list->data;
+
+ 	cp.type = adapter->discovery_type;
+--
+2.14.1.342.g6490525c54-goog
+
