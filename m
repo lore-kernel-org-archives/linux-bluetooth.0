@@ -1,41 +1,62 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <jirislaby@gmail.com>
+Subject: Stable apply request [was: Bluetooth: bnep: fix possible might sleep
+ error in bnep_session]
+To: Marcel Holtmann <marcel@holtmann.org>,
+ Jeffy Chen <jeffy.chen@rock-chips.com>, stable <stable@vger.kernel.org>
+Cc: LKML <linux-kernel@vger.kernel.org>,
+ "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+ rvaswani@nvidia.com, Brian Norris <briannorris@chromium.org>,
+ dmitry.torokhov@gmail.com, Douglas Anderson <dianders@chromium.org>,
+ acho@suse.com, Johan Hedberg <johan.hedberg@gmail.com>,
+ Network Development <netdev@vger.kernel.org>,
+ "David S. Miller" <davem@davemloft.net>,
+ "Gustavo F. Padovan" <gustavo@padovan.org>
+References: <1498556084-25346-1-git-send-email-jeffy.chen@rock-chips.com>
+ <0815411E-62D7-42DC-A0BF-78FD150C0949@holtmann.org>
+From: Jiri Slaby <jslaby@suse.cz>
+Message-ID: <373da46b-41f7-9aa2-946d-75633c9efe86@suse.cz>
+Date: Wed, 23 Aug 2017 09:29:44 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170823064458.36961-1-yunhanw@google.com>
-References: <20170823064458.36961-1-yunhanw@google.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 23 Aug 2017 10:59:03 +0300
-Message-ID: <CABBYNZJJ_roS++qMRY2VhFEv719SWdn33d_AD+AVzA3RK1ohWQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] advertising: Fix UUIDs in adv_parser
-To: Yunhan Wang <yunhanw@google.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <0815411E-62D7-42DC-A0BF-78FD150C0949@holtmann.org>
+Content-Type: text/plain; charset=iso-8859-2
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Yunhan,
+On 06/27/2017, 07:32 PM, Marcel Holtmann wrote:
+>> It looks like bnep_session has same pattern as the issue reported in
+>> old rfcomm:
+>>
+>> 	while (1) {
+>> 		set_current_state(TASK_INTERRUPTIBLE);
+>> 		if (condition)
+>> 			break;
+>> 		// may call might_sleep here
+>> 		schedule();
+>> 	}
+>> 	__set_current_state(TASK_RUNNING);
+>>
+>> Which fixed at:
+>> 	dfb2fae Bluetooth: Fix nested sleeps
+>>
+>> So let's fix it at the same way, also follow the suggestion of:
+>> https://lwn.net/Articles/628628/
 
-On Wed, Aug 23, 2017 at 9:44 AM, Yunhan Wang <yunhanw@google.com> wrote:
-> ---
->  src/advertising.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/src/advertising.c b/src/advertising.c
-> index f125ca5c8..b03c36fb6 100644
-> --- a/src/advertising.c
-> +++ b/src/advertising.c
-> @@ -496,7 +496,7 @@ static struct adv_parser {
->         bool (*func)(DBusMessageIter *iter, struct btd_adv_client *client);
->  } parsers[] = {
->         { "Type", parse_type },
-> -       { "UUIDs", parse_service_uuids },
-> +       { "ServiceUUIDs", parse_service_uuids },
->         { "SolicitUUIDs", parse_solicit_uuids },
->         { "ManufacturerData", parse_manufacturer_data },
->         { "ServiceData", parse_service_data },
-> --
-> 2.14.1.480.gb18f417b89-goog
+...
 
-Applied, thanks.
+> all 3 patches have been applied to bluetooth-next tree.
 
+Hi,
+
+given users are hitting it in at least 4.4 and 4.12, can we have all
+three in all stables where this applies?
+
+5da8e47d849d Bluetooth: hidp: fix possible might sleep error in
+hidp_session_thread
+f06d977309d0 Bluetooth: cmtp: fix possible might sleep error in cmtp_session
+25717382c1dd Bluetooth: bnep: fix possible might sleep error in bnep_session
+
+I am not sure: to stable directly or via net stable?
+
+thanks,
 -- 
-Luiz Augusto von Dentz
+js
+suse labs
