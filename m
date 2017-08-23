@@ -1,35 +1,29 @@
-Return-Path: <linux-kernel-owner@vger.kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Subject: Re: Stable apply request [was: Bluetooth: bnep: fix possible might
- sleep error in bnep_session]
-From: Marcel Holtmann <marcel@holtmann.org>
+Return-Path: <davem@davemloft.net>
+Date: Wed, 23 Aug 2017 11:07:23 -0700 (PDT)
+Message-Id: <20170823.110723.2236835197336811381.davem@davemloft.net>
+To: jslaby@suse.cz
+Cc: marcel@holtmann.org, jeffy.chen@rock-chips.com, stable@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+ rvaswani@nvidia.com, briannorris@chromium.org, dmitry.torokhov@gmail.com,
+ dianders@chromium.org, acho@suse.com, johan.hedberg@gmail.com,
+ netdev@vger.kernel.org, gustavo@padovan.org
+Subject: Re: Stable apply request
+From: David Miller <davem@davemloft.net>
 In-Reply-To: <373da46b-41f7-9aa2-946d-75633c9efe86@suse.cz>
-Date: Wed, 23 Aug 2017 20:14:15 +0200
-Cc: Jeffy Chen <jeffy.chen@rock-chips.com>,
-        stable <stable@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-        rvaswani@nvidia.com, Brian Norris <briannorris@chromium.org>,
-        dmitry.torokhov@gmail.com,
-        Douglas Anderson <dianders@chromium.org>, acho@suse.com,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Network Development <netdev@vger.kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        "Gustavo F. Padovan" <gustavo@padovan.org>
-Message-Id: <E0E7758A-9E4C-4179-8403-D8895424586B@holtmann.org>
 References: <1498556084-25346-1-git-send-email-jeffy.chen@rock-chips.com>
- <0815411E-62D7-42DC-A0BF-78FD150C0949@holtmann.org>
- <373da46b-41f7-9aa2-946d-75633c9efe86@suse.cz>
-To: Jiri Slaby <jslaby@suse.cz>
-Sender: linux-kernel-owner@vger.kernel.org
+	<0815411E-62D7-42DC-A0BF-78FD150C0949@holtmann.org>
+	<373da46b-41f7-9aa2-946d-75633c9efe86@suse.cz>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jiri,
+From: Jiri Slaby <jslaby@suse.cz>
+Date: Wed, 23 Aug 2017 09:29:44 +0200
 
+> On 06/27/2017, 07:32 PM, Marcel Holtmann wrote:
 >>> It looks like bnep_session has same pattern as the issue reported in
 >>> old rfcomm:
->>> 
+>>>
 >>> 	while (1) {
 >>> 		set_current_state(TASK_INTERRUPTIBLE);
 >>> 		if (condition)
@@ -38,10 +32,10 @@ Hi Jiri,
 >>> 		schedule();
 >>> 	}
 >>> 	__set_current_state(TASK_RUNNING);
->>> 
+>>>
 >>> Which fixed at:
 >>> 	dfb2fae Bluetooth: Fix nested sleeps
->>> 
+>>>
 >>> So let's fix it at the same way, also follow the suggestion of:
 >>> https://lwn.net/Articles/628628/
 > 
@@ -61,8 +55,5 @@ Hi Jiri,
 > 
 > I am not sure: to stable directly or via net stable?
 
-as Dave said, just email -stable directly and have Greg pick them up.
-
-Regards
-
-Marcel
+I generally let the wireless family handle their own -stable submissions
+and that includes bluetooth.
