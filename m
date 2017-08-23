@@ -1,35 +1,68 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Date: Wed, 23 Aug 2017 21:38:38 +0200
-From: Konrad Zapalowicz <konrad.zapalowicz@canonical.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: Read by Group Type is denied when issued before Pairing is finsihed
-Message-ID: <20170823193838.GD7309@annapurna>
-MIME-Version: 1.0
+Return-Path: <linux-kernel-owner@vger.kernel.org>
 Content-Type: text/plain; charset=us-ascii
-Sender: linux-bluetooth-owner@vger.kernel.org
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+Subject: Re: Stable apply request [was: Bluetooth: bnep: fix possible might
+ sleep error in bnep_session]
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <373da46b-41f7-9aa2-946d-75633c9efe86@suse.cz>
+Date: Wed, 23 Aug 2017 20:14:15 +0200
+Cc: Jeffy Chen <jeffy.chen@rock-chips.com>,
+        stable <stable@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+        rvaswani@nvidia.com, Brian Norris <briannorris@chromium.org>,
+        dmitry.torokhov@gmail.com,
+        Douglas Anderson <dianders@chromium.org>, acho@suse.com,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Network Development <netdev@vger.kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        "Gustavo F. Padovan" <gustavo@padovan.org>
+Message-Id: <E0E7758A-9E4C-4179-8403-D8895424586B@holtmann.org>
+References: <1498556084-25346-1-git-send-email-jeffy.chen@rock-chips.com>
+ <0815411E-62D7-42DC-A0BF-78FD150C0949@holtmann.org>
+ <373da46b-41f7-9aa2-946d-75633c9efe86@suse.cz>
+To: Jiri Slaby <jslaby@suse.cz>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hey,
+Hi Jiri,
 
-I have stumbled upon a problem with one of the BLE devices that I have
-on my desk. BlueZ (bluetoothctl) failed to discover the primary services
-and the error returned by the Read by Group type request was
-"Insufficient Authentication". It did work when using gatttool though.
+>>> It looks like bnep_session has same pattern as the issue reported in
+>>> old rfcomm:
+>>> 
+>>> 	while (1) {
+>>> 		set_current_state(TASK_INTERRUPTIBLE);
+>>> 		if (condition)
+>>> 			break;
+>>> 		// may call might_sleep here
+>>> 		schedule();
+>>> 	}
+>>> 	__set_current_state(TASK_RUNNING);
+>>> 
+>>> Which fixed at:
+>>> 	dfb2fae Bluetooth: Fix nested sleeps
+>>> 
+>>> So let's fix it at the same way, also follow the suggestion of:
+>>> https://lwn.net/Articles/628628/
+> 
+> ...
+> 
+>> all 3 patches have been applied to bluetooth-next tree.
+> 
+> Hi,
+> 
+> given users are hitting it in at least 4.4 and 4.12, can we have all
+> three in all stables where this applies?
+> 
+> 5da8e47d849d Bluetooth: hidp: fix possible might sleep error in
+> hidp_session_thread
+> f06d977309d0 Bluetooth: cmtp: fix possible might sleep error in cmtp_session
+> 25717382c1dd Bluetooth: bnep: fix possible might sleep error in bnep_session
+> 
+> I am not sure: to stable directly or via net stable?
 
-I have tracked it down and realized that if calling the
-bt_gatt_discover_all_primary_services is delayed until after the pairing
-is finished then the primary services are discovered without any issues.
+as Dave said, just email -stable directly and have Greg pick them up.
 
-The simplified bt for bt_gatt_discover_all_primary_services is:
+Regards
 
-(gdb) bt
-#0  discover_services
-#1  bt_gatt_discover_primary_services
-#2  bt_gatt_discover_all_primary_services 
-#3  exchange_mtu_cb
-
-Now, what would be the best way of approaching this. Calling it could be
-delayed with a timer but would it be an optimal solution - thoughts?
-
-Thanks,
-K
+Marcel
