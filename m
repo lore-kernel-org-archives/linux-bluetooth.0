@@ -1,59 +1,53 @@
-Return-Path: <davem@davemloft.net>
-Date: Wed, 23 Aug 2017 11:07:23 -0700 (PDT)
-Message-Id: <20170823.110723.2236835197336811381.davem@davemloft.net>
-To: jslaby@suse.cz
-Cc: marcel@holtmann.org, jeffy.chen@rock-chips.com, stable@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
- rvaswani@nvidia.com, briannorris@chromium.org, dmitry.torokhov@gmail.com,
- dianders@chromium.org, acho@suse.com, johan.hedberg@gmail.com,
- netdev@vger.kernel.org, gustavo@padovan.org
-Subject: Re: Stable apply request
-From: David Miller <davem@davemloft.net>
-In-Reply-To: <373da46b-41f7-9aa2-946d-75633c9efe86@suse.cz>
-References: <1498556084-25346-1-git-send-email-jeffy.chen@rock-chips.com>
-	<0815411E-62D7-42DC-A0BF-78FD150C0949@holtmann.org>
-	<373da46b-41f7-9aa2-946d-75633c9efe86@suse.cz>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
+Return-Path: <robh+dt@kernel.org>
+MIME-Version: 1.0
+In-Reply-To: <972AD2C1-FE7C-412D-AEC6-FFED22EC4B77@holtmann.org>
+References: <1502992791-10265-1-git-send-email-loic.poulain@gmail.com>
+ <1502992791-10265-3-git-send-email-loic.poulain@gmail.com> <972AD2C1-FE7C-412D-AEC6-FFED22EC4B77@holtmann.org>
+From: Rob Herring <robh+dt@kernel.org>
+Date: Wed, 23 Aug 2017 11:22:10 -0500
+Message-ID: <CAL_Jsq+NnzNyvLXU=_Xv_CVY_Z7_P_D1n5qaASRvNzPQQ=j6YA@mail.gmail.com>
+Subject: Re: [PATCH v4 3/4] ARM: dts: bcm2837-rpi-3-b: Add bcm43438 serial slave
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Loic Poulain <loic.poulain@gmail.com>, Florian Fainelli <f.fainelli@gmail.com>,
+	Ray Jui <rjui@broadcom.com>, Johan Hedberg <johan.hedberg@gmail.com>,
+	Stefan Wahren <stefan.wahren@i2se.com>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	"open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>, linux-rpi-kernel@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Jiri Slaby <jslaby@suse.cz>
-Date: Wed, 23 Aug 2017 09:29:44 +0200
+On Wed, Aug 23, 2017 at 9:22 AM, Marcel Holtmann <marcel@holtmann.org> wrot=
+e:
+> Hi Loic,
+>
+>> Add BCM43438 (bluetooth) as a slave device of uart0 (pl011/ttyAMA0).
+>> This allows to automatically insert the bcm43438 to the bluetooth
+>> subsystem instead of relying on userspace helpers (hciattach).
+>>
+>> Overwrite chosen/stdout-path to use 8250 aux uart as console.
+>>
+>> Signed-off-by: Loic Poulain <loic.poulain@gmail.com>
+>> ---
+>> v2: dt-bindings as separate patch
+>>     rebase on upcoming pi3 dts changes
+>> v3: changes in bcm serdev drivers:
+>>     name refactoring and additional comments
+>>     Add generic host_set_baudrate method
+>>     Use agnostic device_property_read
+>> v4: changes in doc and dts:
+>>     Add additional params to broadcom bt dt-bindings
+>>     Set the max baudrate to 2000000 instead of 921600
+>>     use chosen/stdout-path instead of console=3D
+>>     remove useless earlyprintk
+>>     same changes in bcm283x.dtsi
+>>
+>> arch/arm/boot/dts/bcm2837-rpi-3-b.dts | 10 ++++++++++
+>> 1 file changed, 10 insertions(+)
+>
+> do you mind resending the 2 pending patches with Rob=E2=80=99s ack on it.=
+ And ensure that this goes with DT tree since I can currently not take it s=
+ince net-next has not pulled in the pending DT patches.
 
-> On 06/27/2017, 07:32 PM, Marcel Holtmann wrote:
->>> It looks like bnep_session has same pattern as the issue reported in
->>> old rfcomm:
->>>
->>> 	while (1) {
->>> 		set_current_state(TASK_INTERRUPTIBLE);
->>> 		if (condition)
->>> 			break;
->>> 		// may call might_sleep here
->>> 		schedule();
->>> 	}
->>> 	__set_current_state(TASK_RUNNING);
->>>
->>> Which fixed at:
->>> 	dfb2fae Bluetooth: Fix nested sleeps
->>>
->>> So let's fix it at the same way, also follow the suggestion of:
->>> https://lwn.net/Articles/628628/
-> 
-> ...
-> 
->> all 3 patches have been applied to bluetooth-next tree.
-> 
-> Hi,
-> 
-> given users are hitting it in at least 4.4 and 4.12, can we have all
-> three in all stables where this applies?
-> 
-> 5da8e47d849d Bluetooth: hidp: fix possible might sleep error in
-> hidp_session_thread
-> f06d977309d0 Bluetooth: cmtp: fix possible might sleep error in cmtp_session
-> 25717382c1dd Bluetooth: bnep: fix possible might sleep error in bnep_session
-> 
-> I am not sure: to stable directly or via net stable?
+They will go thru arm-soc via the sub-arch maintainer (Florian I think).
 
-I generally let the wireless family handle their own -stable submissions
-and that includes bluetooth.
+Rob
