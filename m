@@ -1,84 +1,108 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Yunhan Wang <yunhanw@google.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Yunhan Wang <yunhanw@google.com>
-Subject: [PATCH v3 1/3] gatt: Add indication confirm callback using Gatt Confirm method
-Date: Wed, 23 Aug 2017 14:16:10 -0700
-Message-Id: <20170823211610.88789-1-yunhanw@google.com>
+Message-ID: <1503519698.24498.33.camel@hadess.net>
+Subject: Re: [RFC][PATCH BlueZ] sixaxis: Differing device name between usb
+ and bluetooth connection
+From: Bastien Nocera <hadess@hadess.net>
+To: Szymon Janc <szymon.janc@codecoup.pl>,
+        Nicolas Werner <nicolas.werner@gmx.net>
+Cc: Bluez mailing list <linux-bluetooth@vger.kernel.org>
+Date: Wed, 23 Aug 2017 22:21:38 +0200
+In-Reply-To: <CAAEJBhJ-ho-uvEw0QACzNY6qKkb1EbtTpsRfVhx8jqevFZ8+8A@mail.gmail.com>
+References: <2299304.XBxEXHNB4J@gentooasus> <11841060.dynqo2U1Dt@gentooasus>
+         <CAAEJBhJ-ho-uvEw0QACzNY6qKkb1EbtTpsRfVhx8jqevFZ8+8A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- src/gatt-database.c | 16 ++++++++++++----
- 1 file changed, 12 insertions(+), 4 deletions(-)
+On Mon, 2017-08-07 at 08:56 +0200, Szymon Janc wrote:
+> Hi Nicolas,
+> 
+> On 4 August 2017 at 22:29, Nicolas Werner <nicolas.werner@gmx.net>
+> wrote:
+> > Am Samstag, 4. Februar 2017, 19:16:28 CEST schrieben Sie:
+> > > BlueZ sets the device name of Dual Shock 3 controller to
+> > > "PLAYSTATION(R)3
+> > > Controller". When you connect the same controller via USB it is
+> > > set to "Sony
+> > > PLAYSTATION(R)3 Controller".
+> > > 
+> > > It seems that at least some games fail to recognize the
+> > > controller as a Dual
+> > > Shock 3/sixaxis controller and don't load the default mapping for
+> > > PlayStation controllers, if the name doesn't contain the Sony
+> > > part. Also I
+> > > don't see a reason to use a different name, when connecting via
+> > > Bluetooth.
+> > > 
+> > > I noticed this with "The Binding of Isaac: Rebirth" and it seems,
+> > > that Steam
+> > > also recognizes the controller better after the patch, although
+> > > I'm not
+> > > confident, if I can parse the controller configuration dialog
+> > > correctly. I
+> > > don't know, if this breaks anything, because it depends on the
+> > > current
+> > > name.
+> > > 
+> > > The attached patch changes the device name set when pairing to
+> > > match the
+> > > device name, when connected via USB.
+> > > 
+> > > Nicolas Werner
+> > > 
+> > > --- a/plugins/sixaxis.c
+> > > +++ b/plugins/sixaxis.c
+> > > @@ -56,7 +56,7 @@
+> > >         uint16_t version;
+> > >  } devices[] = {
+> > >         {
+> > > -               .name = "PLAYSTATION(R)3 Controller",
+> > > +               .name = "Sony PLAYSTATION(R)3 Controller",
+> > >                 .source = 0x0002,
+> > >                 .vid = 0x054c,
+> > >                 .pid = 0x0268,
+> > 
+> > It seems I'm not the only one with this issue as I recently found
+> > this issue
+> > (https://bugzilla.kernel.org/show_bug.cgi?id=195225) in the kernel
+> > bug
+> > tracker. It looks like dual shock 4 controllers have a similar
+> > issue.
+> > 
+> > I asked on IRC and someone recommended to ping this message. Again,
+> > I would
+> > appreciate some comments on this issue and it would be great if
+> > this issue
+> > could be fixed.
+> 
+> I'm not sure where I took original name from (probably this is how
+> DS3
+> presents itself over BT).
 
-diff --git a/src/gatt-database.c b/src/gatt-database.c
-index 3b4bc7c8d..0969f8d1f 100644
---- a/src/gatt-database.c
-+++ b/src/gatt-database.c
-@@ -867,11 +867,18 @@ struct notify {
- 	const uint8_t *value;
- 	uint16_t len;
- 	bool indicate;
-+	GDBusProxy *proxy;
- };
- 
- static void conf_cb(void *user_data)
- {
-+	GDBusProxy *proxy = user_data;
- 	DBG("GATT server received confirmation");
-+
-+	if (proxy != NULL)
-+	{
-+		g_dbus_proxy_method_call(proxy, "IndicationConf", NULL, NULL, NULL, NULL);
-+	}
- }
- 
- static void send_notification_to_device(void *data, void *user_data)
-@@ -917,7 +924,7 @@ static void send_notification_to_device(void *data, void *user_data)
- 	DBG("GATT server sending indication");
- 	bt_gatt_server_send_indication(server, notify->handle, notify->value,
- 							notify->len, conf_cb,
--							NULL, NULL);
-+							notify->proxy, NULL);
- 
- 	return;
- 
-@@ -930,7 +937,7 @@ remove:
- static void send_notification_to_devices(struct btd_gatt_database *database,
- 					uint16_t handle, const uint8_t *value,
- 					uint16_t len, uint16_t ccc_handle,
--					bool indicate)
-+					bool indicate, GDBusProxy *proxy)
- {
- 	struct notify notify;
- 
-@@ -942,6 +949,7 @@ static void send_notification_to_devices(struct btd_gatt_database *database,
- 	notify.value = value;
- 	notify.len = len;
- 	notify.indicate = indicate;
-+	notify.proxy = proxy;
- 
- 	queue_foreach(database->device_states, send_notification_to_device,
- 								&notify);
-@@ -972,7 +980,7 @@ static void send_service_changed(struct btd_gatt_database *database,
- 	put_le16(end, value + 2);
- 
- 	send_notification_to_devices(database, handle, value, sizeof(value),
--							ccc_handle, true);
-+							ccc_handle, true, NULL);
- }
- 
- static void gatt_db_service_added(struct gatt_db_attribute *attrib,
-@@ -1861,7 +1869,7 @@ static void property_changed_cb(GDBusProxy *proxy, const char *name,
- 				gatt_db_attribute_get_handle(chrc->attrib),
- 				value, len,
- 				gatt_db_attribute_get_handle(chrc->ccc),
--				chrc->props & BT_GATT_CHRC_PROP_INDICATE);
-+				chrc->props & BT_GATT_CHRC_PROP_INDICATE, proxy);
- }
- 
- static bool database_add_ccc(struct external_service *service,
--- 
-2.14.1.342.g6490525c54-goog
+You took it from commit 7d3d42ac10a6482057101667afd603ce1e79b866
 
+As far as I remember, that was the name used by the device when
+connecting via Bluetooth and doing reverse SDP.
+
+> Anyway, if this fix the problem I'm fine with changing the name (and
+> patch looks OK). Could you send a proper patch created with 'git
+> format-patch'?
+
+Changing the name is fine, as it won't be visible when doing scans
+anyway, it'll only appear when the device is already paired.
+
+> As for DS4 this is a bit more trickier since that name is the name
+> device use over BT and we would probably have to spoof it...
+
+There's a thread about adding cable-pairing for those. Look for "Add
+new DS4 controller PID into special case handler".
+
+Trying the PS button+Share button trick to make it visible over
+Bluetooth fails on my system, I'm pretty sure it's a trick to re-pair
+if one of the sides gets out of sync.
+
+I'll probably try to clean that up tomorrow so we can merge it, and
+send my old "cable pairing" agent code again.
+
+Cheers
