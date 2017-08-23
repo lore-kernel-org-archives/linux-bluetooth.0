@@ -2,33 +2,44 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Yunhan Wang <yunhanw@google.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Yunhan Wang <yunhanw@google.com>
-Subject: [PATCH BlueZ] build: use abspath for lib/bluetooth
-Date: Wed, 23 Aug 2017 15:58:39 -0700
-Message-Id: <20170823225839.461-1-yunhanw@google.com>
+Subject: [PATCH v3 3/3] client: Add Confirm implementation
+Date: Wed, 23 Aug 2017 14:16:50 -0700
+Message-Id: <20170823211650.88947-1-yunhanw@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When building from out of tree, and the top build dir was specified as
-an absolute path, the linked headers in ${builddir}/lib/bluetooth were
-broken.  This patch fixes it by relying on make's abspath macro as
-opposed to the path concatenation.
+Add Confirm implementation when indication is received.
 ---
- Makefile.am | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ client/gatt.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-diff --git a/Makefile.am b/Makefile.am
-index eaed632e8..ad638cbb2 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -499,7 +499,7 @@ $(lib_libbluetooth_la_OBJECTS): $(local_headers)
+diff --git a/client/gatt.c b/client/gatt.c
+index bd6e6b0af..ca84479d7 100644
+--- a/client/gatt.c
++++ b/client/gatt.c
+@@ -1405,6 +1405,14 @@ static DBusMessage *chrc_stop_notify(DBusConnection *conn, DBusMessage *msg,
+ 	return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
+ }
  
- lib/bluetooth/%.h: lib/%.h
- 	$(AM_V_at)$(MKDIR_P) lib/bluetooth
--	$(AM_V_GEN)$(LN_S) -f "$(abs_top_builddir)"/$< $@
-+	$(AM_V_GEN)$(LN_S) -f $(abspath $<) $@
++static DBusMessage *chrc_indication_conf(DBusConnection *conn,
++							DBusMessage *msg, void *user_data)
++{
++	struct chrc *chrc = user_data;
++	rl_printf("Attribute %s indication confirm received", chrc->path);
++	return dbus_message_new_method_return(msg);
++}
++
+ static const GDBusMethodTable chrc_methods[] = {
+ 	{ GDBUS_ASYNC_METHOD("ReadValue", GDBUS_ARGS({ "options", "a{sv}" }),
+ 					GDBUS_ARGS({ "value", "ay" }),
+@@ -1414,6 +1422,7 @@ static const GDBusMethodTable chrc_methods[] = {
+ 					NULL, chrc_write_value) },
+ 	{ GDBUS_ASYNC_METHOD("StartNotify", NULL, NULL, chrc_start_notify) },
+ 	{ GDBUS_METHOD("StopNotify", NULL, NULL, chrc_stop_notify) },
++	{ GDBUS_METHOD("Confirm", NULL, NULL, chrc_indication_conf) },
+ 	{ }
+ };
  
- if COVERAGE
- clean-coverage:
 -- 
 2.14.1.342.g6490525c54-goog
 
