@@ -1,37 +1,37 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: =?utf-8?B?6ZmG5pyx5Lyf?= <alex_lu@realsil.com.cn>
-To: Alex Deucher <alexdeucher@gmail.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "Larry.Finger@lwfinger.net" <Larry.Finger@lwfinger.net>
-Subject: =?utf-8?B?562U5aSNOiBSVEw4ODIyQkUgQmx1ZXRvb3RoIGRldmljZQ==?=
-Date: Wed, 23 Aug 2017 02:21:20 +0000
-Message-ID: <0551C926975A174EA8972327741C7889EDA6385B@RS-MBS01.realsil.com.cn>
-References: <CADnq5_PvCCWpx-+zbvxHC_SRG3Yq-n7wqy59ymGb=GUmm3Bkdw@mail.gmail.com>
-In-Reply-To: <CADnq5_PvCCWpx-+zbvxHC_SRG3Yq-n7wqy59ymGb=GUmm3Bkdw@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
+From: Alex Deucher <alexdeucher@gmail.com>
+Date: Tue, 22 Aug 2017 22:09:18 -0400
+Message-ID: <CADnq5_PvCCWpx-+zbvxHC_SRG3Yq-n7wqy59ymGb=GUmm3Bkdw@mail.gmail.com>
+Subject: RTL8822BE Bluetooth device
+To: linux-bluetooth@vger.kernel.org, alex_lu@realsil.com.cn,
+        Larry.Finger@lwfinger.net
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgQWxleCBEZXVjaGVyLA0KVGhlIHJ0bDg4MjFhX2NvbmZpZy5iaW4gaXMgbm90IG5lY2Vzc2Fy
-eS4NCkl0IGlzIHVzZWQgZm9yIHNvbWUgc3BlY2lhbCBzZXR0aW5ncywgc3VjaCBhcyBiZGFkZHIs
-IHNjbyBvdmVyIHBjbS9oY2ksIGV0Yy4NCg0KVGhhbmtzLA0KQlJzLA0KQWxleCBMdS4NCg0KLS0t
-LS3pgq7ku7bljp/ku7YtLS0tLQ0K5Y+R5Lu25Lq6OiBBbGV4IERldWNoZXIgW21haWx0bzphbGV4
-ZGV1Y2hlckBnbWFpbC5jb21dIA0K5Y+R6YCB5pe26Ze0OiAyMDE35bm0OOaciDIz5pelIDEwOjA5
-DQrmlLbku7bkuro6IGxpbnV4LWJsdWV0b290aEB2Z2VyLmtlcm5lbC5vcmc7IOmZhuacseS8nzsg
-TGFycnkuRmluZ2VyQGx3ZmluZ2VyLm5ldA0K5Li76aKYOiBSVEw4ODIyQkUgQmx1ZXRvb3RoIGRl
-dmljZQ0KDQpJIGhhdmUgdGhpcyBkZXZpY2UsIGJ1dCB0aGUgZHJpdmVyIHJlcXVpcmVzIGEgZmly
-bXdhcmUgZmlsZQ0KKHJ0bDg4MjFhX2NvbmZpZy5iaW4pIHdoaWNoIGRvZXMgbm90IHNlZW0gdG8g
-ZXhpc3QuICBMb29raW5nIGF0IHRoZSBjb2RlWzFdLCB0aGVyZSBhcHBlYXIgdG8gYmUgc2V2ZXJh
-bCBmaXJtd2FyZSBjb25maWcgZmlsZXMgZm9yIHZhcmlhbnRzIG9mIHRoaXMgZGV2aWNlOg0KKyBz
-d2l0Y2ggKGxtcF9zdWJ2ZXIpIHsNCisgY2FzZSBSVExfUk9NX0xNUF84NzIzQjoNCisgY2ZnX25h
-bWUgPSAicnRsX2J0L3J0bDg3MjNiX2NvbmZpZy5iaW4iOyBicmVhazsgY2FzZSANCisgUlRMX1JP
-TV9MTVBfODgyMUE6DQorIGNmZ19uYW1lID0gInJ0bF9idC9ydGw4ODIxYV9jb25maWcuYmluIjsg
-YnJlYWs7IGNhc2UgDQorIFJUTF9ST01fTE1QXzg3NjFBOg0KKyBjZmdfbmFtZSA9ICJydGxfYnQv
-cnRsODc2MWFfY29uZmlnLmJpbiI7IGJyZWFrOyBjYXNlIA0KKyBSVExfUk9NX0xNUF84ODIyQjoN
-CisgY2ZnX25hbWUgPSAicnRsX2J0L3J0bDg4MjJiX2NvbmZpZy5iaW4iOyBicmVhazsNCkhvd2V2
-ZXIsIHRoZSBvbmx5IGZpbGUgdGhhdCBzZWVtIHRvIGFjdHVhbGx5IGV4aXN0IGlzIHJ0bDg4MjJi
-X2NvbmZpZy5iaW4uICBEb2VzIGFueW9uZSBrbm93IHdoZXJlIHRvIGdldCB0aGUgb3RoZXJzPw0K
-DQpUaGFua3MsDQoNCkFsZXgNCg0KWzFdIGh0dHBzOi8vcGF0Y2h3b3JrLmtlcm5lbC5vcmcvcGF0
-Y2gvOTMyMzc0OS8NCg0KLS0tLS0tUGxlYXNlIGNvbnNpZGVyIHRoZSBlbnZpcm9ubWVudCBiZWZv
-cmUgcHJpbnRpbmcgdGhpcyBlLW1haWwuDQo=
+I have this device, but the driver requires a firmware file
+(rtl8821a_config.bin) which does not seem to exist.  Looking at the
+code[1], there appear to be several firmware config files for variants
+of this device:
++ switch (lmp_subver) {
++ case RTL_ROM_LMP_8723B:
++ cfg_name = "rtl_bt/rtl8723b_config.bin";
++ break;
++ case RTL_ROM_LMP_8821A:
++ cfg_name = "rtl_bt/rtl8821a_config.bin";
++ break;
++ case RTL_ROM_LMP_8761A:
++ cfg_name = "rtl_bt/rtl8761a_config.bin";
++ break;
++ case RTL_ROM_LMP_8822B:
++ cfg_name = "rtl_bt/rtl8822b_config.bin";
++ break;
+However, the only file that seem to actually exist is
+rtl8822b_config.bin.  Does anyone know where to get the others?
+
+Thanks,
+
+Alex
+
+[1] https://patchwork.kernel.org/patch/9323749/
