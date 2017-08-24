@@ -1,101 +1,164 @@
-Return-Path: <kai.heng.feng@canonical.com>
-From: Kai-Heng Feng <kai.heng.feng@canonical.com>
-To: marcel@holtmann.org
-Cc: gustavo@padovan.org,
-	johan.hedberg@gmail.com,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Kai-Heng Feng <kai.heng.feng@canonical.com>
-Subject: [PATCH v2 1/4] Bluetooth: btusb: Add firmware caching function for already patched Bluetooth chip
-Date: Fri, 25 Aug 2017 15:18:26 +0800
-Message-Id: <20170825071829.1829-1-kai.heng.feng@canonical.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+MIME-Version: 1.0
+In-Reply-To: <CABBYNZKSXXG4mwbSvLqbTP=bZurZGrGb2wnsX8BChgTY13H5tw@mail.gmail.com>
+References: <20170823085125.56361-1-yunhanw@google.com> <CABBYNZL9_VbMEm5ghwpq6OSpjEwm4U_RXc_ULGy==BK_RsuP7Q@mail.gmail.com>
+ <CABBYNZKSXXG4mwbSvLqbTP=bZurZGrGb2wnsX8BChgTY13H5tw@mail.gmail.com>
+From: Yunhan Wang <yunhanw@google.com>
+Date: Thu, 24 Aug 2017 16:57:20 -0700
+Message-ID: <CALvjcs9DOKcgt6Y7BJhWnPhUmkWBDdZtPaa1eDYTAGMwEGYFGw@mail.gmail.com>
+Subject: Re: [PATCH v2] gatt: Add implementation for Gatt method, Confirm
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When a system reboot, the USB power never gets cut off, so the firmware
-is already updated on the Bluetooth chip.
+Hi, Luiz
 
-Several btusb setup functions check firmware updated status before
-download firmware, the loading part will be skipped if it's updated.
-Because the firmware is never asked by request_firmware(),
-firmware_class does not know it needs to be cached before system enters
-sleep.
+Thank you. All fixes have been sent. Please help on review.
 
-Now, system suspend/resume may cause the driver failed to request the
-firmware because it's not in the firmware cache:
+Best wishes
+Yunhan
 
-[   87.539434] firmware request while host is not available
-
-This can be solved by calling request_firmware() even if the chip is
-already updated - now the firmware_class knows what to cache.
-
-In this case, we don't really need to wait for the firmware content, so
-we use the async version of request_firmware().
-
-Signed-off-by: Kai-Heng Feng <kai.heng.feng@canonical.com>
----
-v2: Split patches for different vendors.
-
- drivers/bluetooth/btusb.c | 48 +++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 48 insertions(+)
-
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 7a5c06aaa181..2313d20c6d60 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -1476,6 +1476,54 @@ static void btusb_waker(struct work_struct *work)
- 	usb_autopm_put_interface(data->intf);
- }
- 
-+#ifdef CONFIG_PM_SLEEP
-+static void btusb_request_firmware_done(const struct firmware *firmware,
-+					void *context)
-+{
-+	const char *name = (const char *)context;
-+
-+	if (!firmware) {
-+		BT_WARN("firmware %s will not be cached", name);
-+		goto done;
-+	}
-+
-+	BT_DBG("firmware %s will be cached", name);
-+
-+	release_firmware(firmware);
-+done:
-+	kfree_const(name);
-+}
-+
-+static int btusb_request_firmware_async(struct hci_dev *hdev,
-+					const char *fwname)
-+{
-+	const char *name;
-+	int err;
-+
-+	name = kstrdup_const(fwname, GFP_KERNEL);
-+	if (!name)
-+		return -ENOMEM;
-+
-+	err = request_firmware_nowait(THIS_MODULE, true, name, &hdev->dev,
-+				      GFP_KERNEL, (void *)name,
-+				      btusb_request_firmware_done);
-+	if (err) {
-+		BT_WARN("%s: failed to async request firmware for file: %s (%d)",
-+			hdev->name, name, err);
-+		kfree_const(name);
-+		return err;
-+	}
-+
-+	return 0;
-+}
-+#else
-+static int btusb_request_firmware_async(struct hci_dev *hdev,
-+					const char *fwname)
-+{
-+	return 0;
-+}
-+#endif
-+
- static int btusb_setup_bcm92035(struct hci_dev *hdev)
- {
- 	struct sk_buff *skb;
--- 
-2.14.1
+On Wed, Aug 23, 2017 at 2:20 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi Yunhan,
+>
+> On Wed, Aug 23, 2017 at 12:18 PM, Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+>> Hi Yunhan,
+>>
+>> On Wed, Aug 23, 2017 at 11:51 AM, Yunhan Wang <yunhanw@google.com> wrote:
+>>> ---
+>>>  doc/gatt-api.txt    |  7 +++++++
+>>>  src/gatt-client.c   |  9 +++++++++
+>>>  src/gatt-database.c | 16 ++++++++++++----
+>>>  3 files changed, 28 insertions(+), 4 deletions(-)
+>>>
+>>> diff --git a/doc/gatt-api.txt b/doc/gatt-api.txt
+>>> index c0ad1de25..42b1f55aa 100644
+>>> --- a/doc/gatt-api.txt
+>>> +++ b/doc/gatt-api.txt
+>>> @@ -162,6 +162,13 @@ Methods            array{byte} ReadValue(dict options)
+>>>
+>>>                         Possible Errors: org.bluez.Error.Failed
+>>>
+>>> +               void Confirm()
+>>> +
+>>> +                       This method doesn't expect a reply so it is just a
+>>> +                       confirmation that value was received.
+>>
+>> Documentation should go in a separate patch, make Confirm optional and
+>> server only.
+>>
+>>> +                       Possible Errors: org.bluez.Error.Failed
+>>> +
+>>>  Properties     string UUID [read-only]
+>>>
+>>>                         128-bit characteristic UUID.
+>>> diff --git a/src/gatt-client.c b/src/gatt-client.c
+>>> index 1cd7fbcf5..808d3da1d 100644
+>>> --- a/src/gatt-client.c
+>>> +++ b/src/gatt-client.c
+>>> @@ -1598,6 +1598,13 @@ static DBusMessage *characteristic_stop_notify(DBusConnection *conn,
+>>>         return dbus_message_new_method_return(msg);
+>>>  }
+>>>
+>>> +static DBusMessage *characteristic_indication_conf(DBusConnection *conn,
+>>> +                                       DBusMessage *msg, void *user_data)
+>>> +{
+>>> +       DBG("indication conf received");
+>>> +       return dbus_message_new_method_return(msg);
+>>> +}
+>>> +
+>>>  static const GDBusPropertyTable characteristic_properties[] = {
+>>>         { "UUID", "s", characteristic_get_uuid, NULL, NULL },
+>>>         { "Service", "o", characteristic_get_service, NULL, NULL },
+>>> @@ -1635,6 +1642,8 @@ static const GDBusMethodTable characteristic_methods[] = {
+>>>                                         characteristic_start_notify) },
+>>>         { GDBUS_METHOD("StopNotify", NULL, NULL,
+>>>                                         characteristic_stop_notify) },
+>>> +       { GDBUS_METHOD("Confirm", NULL, NULL,
+>>> +                                  characteristic_indication_conf) },
+>>
+>> Lets make this server only so we don't need to define a methods that
+>> does nothing.
+>>
+>>>         { }
+>>>  };
+>>>
+>>> diff --git a/src/gatt-database.c b/src/gatt-database.c
+>>> index 3b4bc7c8d..0969f8d1f 100644
+>>> --- a/src/gatt-database.c
+>>> +++ b/src/gatt-database.c
+>>> @@ -867,11 +867,18 @@ struct notify {
+>>>         const uint8_t *value;
+>>>         uint16_t len;
+>>>         bool indicate;
+>>> +       GDBusProxy *proxy;
+>>>  };
+>>>
+>>>  static void conf_cb(void *user_data)
+>>>  {
+>>> +       GDBusProxy *proxy = user_data;
+>>>         DBG("GATT server received confirmation");
+>>> +
+>>> +       if (proxy != NULL)
+>>> +       {
+>>> +               g_dbus_proxy_method_call(proxy, "IndicationConf", NULL, NULL, NULL, NULL);
+>>> +       }
+>>>  }
+>>>
+>>>  static void send_notification_to_device(void *data, void *user_data)
+>>> @@ -917,7 +924,7 @@ static void send_notification_to_device(void *data, void *user_data)
+>>>         DBG("GATT server sending indication");
+>>>         bt_gatt_server_send_indication(server, notify->handle, notify->value,
+>>>                                                         notify->len, conf_cb,
+>>> -                                                       NULL, NULL);
+>>> +                                                       notify->proxy, NULL);
+>>>
+>>>         return;
+>>>
+>>> @@ -930,7 +937,7 @@ remove:
+>>>  static void send_notification_to_devices(struct btd_gatt_database *database,
+>>>                                         uint16_t handle, const uint8_t *value,
+>>>                                         uint16_t len, uint16_t ccc_handle,
+>>> -                                       bool indicate)
+>>> +                                       bool indicate, GDBusProxy *proxy)
+>>>  {
+>>>         struct notify notify;
+>>>
+>>> @@ -942,6 +949,7 @@ static void send_notification_to_devices(struct btd_gatt_database *database,
+>>>         notify.value = value;
+>>>         notify.len = len;
+>>>         notify.indicate = indicate;
+>>> +       notify.proxy = proxy;
+>>>
+>>>         queue_foreach(database->device_states, send_notification_to_device,
+>>>                                                                 &notify);
+>>> @@ -972,7 +980,7 @@ static void send_service_changed(struct btd_gatt_database *database,
+>>>         put_le16(end, value + 2);
+>>>
+>>>         send_notification_to_devices(database, handle, value, sizeof(value),
+>>> -                                                       ccc_handle, true);
+>>> +                                                       ccc_handle, true, NULL);
+>>>  }
+>>>
+>>>  static void gatt_db_service_added(struct gatt_db_attribute *attrib,
+>>> @@ -1861,7 +1869,7 @@ static void property_changed_cb(GDBusProxy *proxy, const char *name,
+>>>                                 gatt_db_attribute_get_handle(chrc->attrib),
+>>>                                 value, len,
+>>>                                 gatt_db_attribute_get_handle(chrc->ccc),
+>>> -                               chrc->props & BT_GATT_CHRC_PROP_INDICATE);
+>>> +                               chrc->props & BT_GATT_CHRC_PROP_INDICATE, proxy);
+>>>  }
+>>>
+>>>  static bool database_add_ccc(struct external_service *service,
+>>> --
+>>> 2.14.1.480.gb18f417b89-goog
+>
+> Btw, please add a patch to bluetoothctl implementing the Confirm so we
+> are able to see the confirmations while using it.
+>
+> --
+> Luiz Augusto von Dentz
