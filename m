@@ -1,38 +1,38 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Bastien Nocera <hadess@hadess.net>
 To: linux-bluetooth@vger.kernel.org
-Cc: Florian Weimer <fweimer@redhat.com>
-Subject: [PATCH 1/3] build: Enable BIND_NOW
-Date: Thu, 24 Aug 2017 20:28:22 +0200
-Message-Id: <20170824182824.8465-1-hadess@hadess.net>
+Cc: Bastien Nocera <hadess@hadess.net>
+Subject: [PATCH 2/3] obexd: Fix compilation error on F27
+Date: Thu, 24 Aug 2017 20:28:23 +0200
+Message-Id: <20170824182824.8465-2-hadess@hadess.net>
+In-Reply-To: <20170824182824.8465-1-hadess@hadess.net>
+References: <20170824182824.8465-1-hadess@hadess.net>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Florian Weimer <fweimer@redhat.com>
-
-Partial RELRO means that the object is GNU_RELRO but not BIND_NOW.  This
-reduces the effectiveness of RELRO.  bluez triggers this because it
-enables PIE during the build, and rpmdiff takes this as an indicator
-that the best possible hardening is desired.
-
-https://bugzilla.redhat.com/show_bug.cgi?id=983161
+In file included from obexd/plugins/mas.c:41:0:
+./obexd/src/obex.h:37:1: error: unknown type name ‘ssize_t’; did you mean ‘size_t’?
+ ssize_t obex_get_size(struct obex_session *os);
+ ^~~~~~~
 ---
- acinclude.m4 | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ obexd/src/obex.h | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/acinclude.m4 b/acinclude.m4
-index bc39c6d73..efce2f3cb 100644
---- a/acinclude.m4
-+++ b/acinclude.m4
-@@ -50,7 +50,7 @@ AC_DEFUN([MISC_FLAGS], [
- 		if (test "${enableval}" = "yes" &&
- 				test "${ac_cv_prog_cc_pie}" = "yes"); then
- 			misc_cflags="$misc_cflags -fPIC"
--			misc_ldflags="$misc_ldflags -pie"
-+			misc_ldflags="$misc_ldflags -pie -Wl,-z,now"
- 		fi
- 	])
- 	if (test "$enable_coverage" = "yes"); then
+diff --git a/obexd/src/obex.h b/obexd/src/obex.h
+index fc1674755..67593f11b 100644
+--- a/obexd/src/obex.h
++++ b/obexd/src/obex.h
+@@ -22,6 +22,8 @@
+  *
+  */
+ 
++#include <unistd.h>
++
+ #define OBJECT_SIZE_UNKNOWN -1
+ #define OBJECT_SIZE_DELETE -2
+ 
 -- 
 2.13.5
 
