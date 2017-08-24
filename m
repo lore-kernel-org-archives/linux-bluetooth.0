@@ -1,71 +1,96 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Date: Thu, 24 Aug 2017 09:03:19 +0200
+From: Wolfram Schlich <wschlich@gentoo.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: files missing in release tarball (esp. profiles/proximity/*)
+Message-ID: <20170824070319.GA31562@bla.fasel.org>
 MIME-Version: 1.0
-In-Reply-To: <20170823193838.GD7309@annapurna>
-References: <20170823193838.GD7309@annapurna>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 24 Aug 2017 11:04:49 +0300
-Message-ID: <CABBYNZ+6Rnb8PYKwDv-ObaaZsQn8-h_iVM2hP1dvSHzf5q7a0w@mail.gmail.com>
-Subject: Re: Read by Group Type is denied when issued before Pairing is finsihed
-To: Konrad Zapalowicz <konrad.zapalowicz@canonical.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Konrad,
+Hi,
 
-On Wed, Aug 23, 2017 at 10:38 PM, Konrad Zapalowicz
-<konrad.zapalowicz@canonical.com> wrote:
-> Hey,
->
-> I have stumbled upon a problem with one of the BLE devices that I have
-> on my desk. BlueZ (bluetoothctl) failed to discover the primary services
-> and the error returned by the Read by Group type request was
-> "Insufficient Authentication". It did work when using gatttool though.
->
-> I have tracked it down and realized that if calling the
-> bt_gatt_discover_all_primary_services is delayed until after the pairing
-> is finished then the primary services are discovered without any issues.
->
-> The simplified bt for bt_gatt_discover_all_primary_services is:
->
-> (gdb) bt
-> #0  discover_services
-> #1  bt_gatt_discover_primary_services
-> #2  bt_gatt_discover_all_primary_services
-> #3  exchange_mtu_cb
->
-> Now, what would be the best way of approaching this. Calling it could be
-> delayed with a timer but would it be an optimal solution - thoughts?
+there seem to be quite some differences between the git snapshot
+tarball[1] and the release tarball[2]:
 
-Sounds to me that the device is requiring authentication for primary
-services which is not following the spec:
+1. https://git.kernel.org/pub/scm/bluetooth/bluez.git/snapshot/bluez-5.46.tar.gz
+2. https://www.kernel.org/pub/linux/bluetooth/bluez-5.46.tar.gz
 
-4.4.1 Discover All Primary Services
-...
-Note: The service declaration described in Section 3.1 specifies that the
-service declaration is readable and requires no authentication or authorization,
-therefore insufficient authentication or read not permitted errors
-shall not occur.
+A diff -ur between both unpacked tarballs shows:
+--8<--
+Only in bluez-5.46-release-tarball: aclocal.m4
+Only in bluez-5.46-git-snapshot-tarball/android: sco-ipc-api.txt
+Only in bluez-5.46-git-snapshot-tarball/android: socket-api.txt
+Only in bluez-5.46-git-snapshot-tarball: bootstrap
+Only in bluez-5.46-git-snapshot-tarball: bootstrap-configure
+Only in bluez-5.46-release-tarball: compile
+Only in bluez-5.46-release-tarball: config.guess
+Only in bluez-5.46-release-tarball: config.h.in
+Only in bluez-5.46-release-tarball: config.sub
+Only in bluez-5.46-release-tarball: configure
+Only in bluez-5.46-release-tarball: depcomp
+Only in bluez-5.46-git-snapshot-tarball/doc: coding-style.txt
+Only in bluez-5.46-git-snapshot-tarball/doc: maintainer-guidelines.txt
+Only in bluez-5.46-git-snapshot-tarball: .gitignore
+Only in bluez-5.46-git-snapshot-tarball: HACKING
+Only in bluez-5.46-release-tarball: install-sh
+Only in bluez-5.46-release-tarball: ltmain.sh
+Only in bluez-5.46-git-snapshot-tarball: .mailmap
+Only in bluez-5.46-release-tarball: Makefile.in
+Only in bluez-5.46-release-tarball: missing
+Only in bluez-5.46-git-snapshot-tarball/obexd/plugins: messages-tracker.c
+Only in bluez-5.46-git-snapshot-tarball/obexd/plugins: phonebook-ebook.c
+Only in bluez-5.46-git-snapshot-tarball/obexd/plugins: phonebook-tracker.c
+Only in bluez-5.46-git-snapshot-tarball/obexd/plugins: syncevolution.c
+Only in bluez-5.46-git-snapshot-tarball/profiles/proximity: immalert.c
+Only in bluez-5.46-git-snapshot-tarball/profiles/proximity: immalert.h
+Only in bluez-5.46-git-snapshot-tarball/profiles/proximity: linkloss.c
+Only in bluez-5.46-git-snapshot-tarball/profiles/proximity: linkloss.h
+Only in bluez-5.46-git-snapshot-tarball/profiles/proximity: main.c
+Only in bluez-5.46-git-snapshot-tarball/profiles/proximity: manager.c
+Only in bluez-5.46-git-snapshot-tarball/profiles/proximity: manager.h
+Only in bluez-5.46-git-snapshot-tarball/profiles/proximity: monitor.c
+Only in bluez-5.46-git-snapshot-tarball/profiles/proximity: monitor.h
+Only in bluez-5.46-git-snapshot-tarball/profiles/proximity: reporter.c
+Only in bluez-5.46-git-snapshot-tarball/profiles/proximity: reporter.h
+Only in bluez-5.46-git-snapshot-tarball/test: exchange-business-cards
+Only in bluez-5.46-git-snapshot-tarball/test: get-managed-objects
+Only in bluez-5.46-git-snapshot-tarball/test: get-obex-capabilities
+Only in bluez-5.46-git-snapshot-tarball/test: list-folders
+Only in bluez-5.46-git-snapshot-tarball/test: simple-obex-agent
+Only in bluez-5.46-release-tarball: test-driver
+Only in bluez-5.46-git-snapshot-tarball/tools: example.psr
+Only in bluez-5.46-git-snapshot-tarball/tools: parse_companies.pl
+Only in bluez-5.46-git-snapshot-tarball/tools: update_compids.sh
+Only in bluez-5.46-git-snapshot-tarball/tools: valgrind.supp
+--8<--
 
-Is this a device already on the market? Perhaps we should contact the
-manufacturer since it seems to not comply to the spec when it comes to
-discovery.
+Notably the files from obexd/plugins/, profiles/proximity/
+and test/ are missing in the release tarball.
 
-Delaying is never a nice thing since it affects all devices, but we
-could perhaps attempt to pair if that happens, actually, we usually do
-this for regular Read/Write procedures so in case there is an
-authentication error we pair and try again which might work here as
-well despite not following the spec.
+The program 'bluez-test-proximity' is, for example, effectively
+unusable when using the release tarball because of the missing
+files from profiles/proximity/:
+--8<--
+zephyr ~ # /usr/bin/bluez-test-proximity -b AA:BB:CC:DD:EE:FF LinkLossAlertLevel high
+Proximity SetProperty('LinkLossAlertLevel', 'high')
+Traceback (most recent call last):
+  File "/usr/bin/bluez-test-proximity", line 67, in <module>
+    device_prop.Set(PROXIMITY_MONITOR_INTERFACE, args[0], args[1])
+  File "/usr/lib64/python2.7/site-packages/dbus/proxies.py", line 70, in __call__
+    return self._proxy_method(*args, **keywords)
+  File "/usr/lib64/python2.7/site-packages/dbus/proxies.py", line 145, in __call__
+    **keywords)
+  File "/usr/lib64/python2.7/site-packages/dbus/connection.py", line 651, in call_blocking
+    message, timeout)
+dbus.exceptions.DBusException: org.freedesktop.DBus.Error.InvalidArgs: No such interface 'org.bluez.ProximityMonitor1'
+zephyr ~ # 
+--8<--
 
-> Thanks,
-> K
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Can you fix this (at least profiles/proximity/), please?
 
+Thank you!
 
-
--- 
-Luiz Augusto von Dentz
+Cheers,
+Wolfram
