@@ -1,29 +1,36 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Message-ID: <1503599405.12938.1.camel@hadess.net>
-Subject: Re: [PATCH 1/3] build: Enable BIND_NOW
 From: Bastien Nocera <hadess@hadess.net>
 To: linux-bluetooth@vger.kernel.org
-Cc: Florian Weimer <fweimer@redhat.com>
-Date: Thu, 24 Aug 2017 20:30:05 +0200
+Cc: Bastien Nocera <hadess@hadess.net>
+Subject: [PATCH 3/3] build: Add a few default configure options
+Date: Thu, 24 Aug 2017 20:28:24 +0200
+Message-Id: <20170824182824.8465-3-hadess@hadess.net>
 In-Reply-To: <20170824182824.8465-1-hadess@hadess.net>
 References: <20170824182824.8465-1-hadess@hadess.net>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, 2017-08-24 at 20:28 +0200, Bastien Nocera wrote:
-> From: Florian Weimer <fweimer@redhat.com>
-> 
-> Partial RELRO means that the object is GNU_RELRO but not
-> BIND_NOW.  This
-> reduces the effectiveness of RELRO.  bluez triggers this because it
-> enables PIE during the build, and rpmdiff takes this as an indicator
-> that the best possible hardening is desired.
-> 
-> https://bugzilla.redhat.com/show_bug.cgi?id=983161
+Add 3 optional features that are currently used and distributed in
+the Fedora packages to the default build configuration.
 
-Florian made the comments, I made the patch and sent it. Feel free to
-remove the internal Bugzilla reference before pushing.
+The additional build time is minimal, and it ensures that the build
+gets maximum coverage.
+---
+ bootstrap-configure | 3 +++
+ 1 file changed, 3 insertions(+)
 
-Cheers
+diff --git a/bootstrap-configure b/bootstrap-configure
+index 658eef296..cb19b56bd 100755
+--- a/bootstrap-configure
++++ b/bootstrap-configure
+@@ -24,4 +24,7 @@ fi
+ 		--enable-sixaxis \
+ 		--enable-midi \
+ 		--enable-mesh \
++		--enable-pie \
++		--enable-cups \
++		--enable-library \
+ 		--disable-datafiles $*
+-- 
+2.13.5
+
