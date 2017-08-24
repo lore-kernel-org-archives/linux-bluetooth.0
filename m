@@ -1,185 +1,126 @@
 Return-Path: <linux-kernel-owner@vger.kernel.org>
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Subject: Re: [PATCH 2/2] Bluetooth: btusb: ath3k: Cache firmware for already
- patched Bluetooth chip
+Subject: Re: [PATCH 1/2] Bluetooth: btusb: ath3k: Decide firmware name before
+ checking update status
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20170824090629.13381-2-kai.heng.feng@canonical.com>
-Date: Thu, 24 Aug 2017 11:15:45 +0200
+In-Reply-To: <20170824090629.13381-1-kai.heng.feng@canonical.com>
+Date: Thu, 24 Aug 2017 11:14:27 +0200
 Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Message-Id: <C59A690F-A6F7-4862-91BE-70E144747BA8@holtmann.org>
+        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+        linux-kernel@vger.kernel.org
+Message-Id: <C7E5F271-08C2-49E6-9543-AE1DEA355570@holtmann.org>
 References: <20170824090629.13381-1-kai.heng.feng@canonical.com>
- <20170824090629.13381-2-kai.heng.feng@canonical.com>
 To: Kai-Heng Feng <kai.heng.feng@canonical.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Kai-Heng,
 
-> When a system reboot, the USB power never gets cut off, so the firmware
-> is already updated on the Bluetooth chip.
+> Decide firmware name before checking patch update status. Firmware name is
+> required for caching.
 > 
-> Several btusb setup functions check firmware updated status before
-> download firmware, the loading part will be skipped if it's updated.
-> Because the firmware is never asked by request_firmware(),
-> firmware_class does not know it needs to be cached before system enters
-> sleep.
-> 
-> Now, system suspend/resume may cause the driver failed to request the
-> firmware because it's not in the firmware cache:
-> 
-> [   87.539434] firmware request while host is not available
-> 
-> This can be solved by calling request_firmware() even if the chip is
-> already updated - now the firmware_class knows what to cache.
-> 
-> In this case, we don't really need to wait for the firmware content, so
-> we use the async version of request_firmware().
+> Also, version information in btusb_setup_qca() is being calculated twice,
+> reduce it to one.
 > 
 > Signed-off-by: Kai-Heng Feng <kai.heng.feng@canonical.com>
 > ---
-> drivers/bluetooth/ath3k.c | 49 +++++++++++++++++++++++++++++++++++++++++
-> drivers/bluetooth/btusb.c | 56 +++++++++++++++++++++++++++++++++++++++++++++--
-> 2 files changed, 103 insertions(+), 2 deletions(-)
+> drivers/bluetooth/ath3k.c | 10 +++----
+> drivers/bluetooth/btusb.c | 72 +++++++++++++++++++++++------------------------
+> 2 files changed, 41 insertions(+), 41 deletions(-)
 > 
 > diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
-> index 280849dba51e..27a7415f9fd7 100644
+> index b793853ff05f..280849dba51e 100644
 > --- a/drivers/bluetooth/ath3k.c
 > +++ b/drivers/bluetooth/ath3k.c
-> @@ -208,6 +208,54 @@ static const struct usb_device_id ath3k_blist_tbl[] = {
-> #define TIMEGAP_USEC_MIN	50
-> #define TIMEGAP_USEC_MAX	100
-> 
-> +#ifdef CONFIG_PM_SLEEP
-> +static void ath3k_request_firmware_done(const struct firmware *firmware,
-> +					void *context)
-> +{
-> +	const char *name = (const char *)context;
-> +
-> +	if (!firmware) {
-> +		BT_WARN("firmware %s will not be cached", name);
-> +		goto done;
-> +	}
-> +
-> +	BT_DBG("firmware %s will be cached", name);
-> +
-> +	release_firmware(firmware);
-> +done:
-> +	kfree_const(name);
-> +}
-> +
-> +static int ath3k_request_firmware_async(struct usb_device *udev,
-> +					const char *fwname)
-> +{
-> +	const char *name;
-> +	int err;
-> +
-> +	name = kstrdup_const(fwname, GFP_KERNEL);
-> +	if (!name)
-> +		return -ENOMEM;
-> +
-> +	err = request_firmware_nowait(THIS_MODULE, true, name, &udev->dev,
-> +				      GFP_KERNEL, (void *)name,
-> +				      ath3k_request_firmware_done);
-> +	if (err) {
-> +		BT_WARN("%s %s: failed to async request firmware for file: %s (%d)",
-> +			udev->manufacturer, udev->product, name, err);
-> +		kfree_const(name);
-> +		return err;
-> +	}
-> +
-> +	return 0;
-> +}
-> +#else
-> +static int ath3k_request_firmware_async(struct usb_device *udev,
-> +					const char *fwname)
-> +{
-> +	return 0;
-> +}
-> +#endif
-> +
-> static int ath3k_load_firmware(struct usb_device *udev,
-> 				const struct firmware *firmware)
-> {
-> @@ -420,6 +468,7 @@ static int ath3k_load_patch(struct usb_device *udev)
-> 
-> 	if (fw_state & ATH3K_PATCH_UPDATE) {
-> 		BT_DBG("Patch was already downloaded");
-> +		ath3k_request_firmware_async(udev, filename);
-> 		return 0;
+> @@ -409,11 +409,6 @@ static int ath3k_load_patch(struct usb_device *udev)
+> 		return ret;
 > 	}
 > 
+> -	if (fw_state & ATH3K_PATCH_UPDATE) {
+> -		BT_DBG("Patch was already downloaded");
+> -		return 0;
+> -	}
+> -
+> 	ret = ath3k_get_version(udev, &fw_version);
+> 	if (ret < 0) {
+> 		BT_ERR("Can't get version to change to load ram patch err");
+> @@ -423,6 +418,11 @@ static int ath3k_load_patch(struct usb_device *udev)
+> 	snprintf(filename, ATH3K_NAME_LEN, "ar3k/AthrBT_0x%08x.dfu",
+> 		 le32_to_cpu(fw_version.rom_version));
+> 
+> +	if (fw_state & ATH3K_PATCH_UPDATE) {
+> +		BT_DBG("Patch was already downloaded");
+> +		return 0;
+> +	}
+> +
+> 	ret = request_firmware(&firmware, filename, &udev->dev);
+> 	if (ret < 0) {
+> 		BT_ERR("Patch file not found %s", filename);
 > diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index 732fe6c3e789..7de2156debd8 100644
+> index fa24d693af24..732fe6c3e789 100644
 > --- a/drivers/bluetooth/btusb.c
 > +++ b/drivers/bluetooth/btusb.c
-> @@ -1459,6 +1459,54 @@ static void btusb_waker(struct work_struct *work)
-> 	usb_autopm_put_interface(data->intf);
+> @@ -1518,18 +1518,12 @@ static int btusb_setup_csr(struct hci_dev *hdev)
 > }
 > 
-> +#ifdef CONFIG_PM_SLEEP
-> +static void btusb_request_firmware_done(const struct firmware *firmware,
-> +					void *context)
-> +{
-> +	const char *name = (const char *)context;
-> +
-> +	if (!firmware) {
-> +		BT_WARN("firmware %s will not be cached", name);
-> +		goto done;
-> +	}
-> +
-> +	BT_DBG("firmware %s will be cached", name);
-> +
-> +	release_firmware(firmware);
-> +done:
-> +	kfree_const(name);
-> +}
-> +
-> +static int btusb_request_firmware_async(struct hci_dev *hdev,
-> +					const char *fwname)
-> +{
-> +	const char *name;
-> +	int err;
-> +
-> +	name = kstrdup_const(fwname, GFP_KERNEL);
-> +	if (!name)
-> +		return -ENOMEM;
-> +
-> +	err = request_firmware_nowait(THIS_MODULE, true, name, &hdev->dev,
-> +				      GFP_KERNEL, (void *)name,
-> +				      btusb_request_firmware_done);
-> +	if (err) {
-> +		BT_WARN("%s: failed to async request firmware for file: %s (%d)",
-> +			hdev->name, name, err);
-> +		kfree_const(name);
-> +		return err;
-> +	}
-> +
-> +	return 0;
-> +}
-> +#else
-> +static int btusb_request_firmware_async(struct hci_dev *hdev,
-> +					const char *fwname)
-> +{
-> +	return 0;
-> +}
-> +#endif
-> +
-> static int btusb_setup_bcm92035(struct hci_dev *hdev)
+> static const struct firmware *btusb_setup_intel_get_fw(struct hci_dev *hdev,
+> -						       struct intel_version *ver)
+> +						       const char *fwname,
+> +						       const char *default_fwname)
+> {
+> 	const struct firmware *fw;
+> -	char fwname[64];
+> 	int ret;
+> 
+> -	snprintf(fwname, sizeof(fwname),
+> -		 "intel/ibt-hw-%x.%x.%x-fw-%x.%x.%x.%x.%x.bseq",
+> -		 ver->hw_platform, ver->hw_variant, ver->hw_revision,
+> -		 ver->fw_variant,  ver->fw_revision, ver->fw_build_num,
+> -		 ver->fw_build_ww, ver->fw_build_yy);
+> -
+> 	ret = request_firmware(&fw, fwname, &hdev->dev);
+> 	if (ret < 0) {
+> 		if (ret == -EINVAL) {
+> @@ -1544,11 +1538,9 @@ static const struct firmware *btusb_setup_intel_get_fw(struct hci_dev *hdev,
+> 		/* If the correct firmware patch file is not found, use the
+> 		 * default firmware patch file instead
+> 		 */
+> -		snprintf(fwname, sizeof(fwname), "intel/ibt-hw-%x.%x.bseq",
+> -			 ver->hw_platform, ver->hw_variant);
+> -		if (request_firmware(&fw, fwname, &hdev->dev) < 0) {
+> +		if (request_firmware(&fw, default_fwname, &hdev->dev) < 0) {
+> 			BT_ERR("%s failed to open default Intel fw file: %s",
+> -			       hdev->name, fwname);
+> +			       hdev->name, default_fwname);
+> 			return NULL;
+> 		}
+> 	}
+> @@ -1676,6 +1668,8 @@ static int btusb_setup_intel_patching(struct hci_dev *hdev,
+> static int btusb_setup_intel(struct hci_dev *hdev)
 > {
 > 	struct sk_buff *skb;
-> @@ -1724,6 +1772,8 @@ static int btusb_setup_intel(struct hci_dev *hdev)
-> 	if (ver.fw_patch_num) {
-> 		BT_INFO("%s: Intel device is already patched. patch num: %02x",
-> 			hdev->name, ver.fw_patch_num);
-> +		btusb_request_firmware_async(hdev, fwname);
-> +		btusb_request_firmware_async(hdev, default_fwname);
-> 		goto complete;
-> 	}
+> +	char fwname[64];
+> +	char default_fwname[64];
+> 	const struct firmware *fw;
+> 	const u8 *fw_ptr;
+> 	int disable_patch, err;
+> @@ -1714,6 +1708,15 @@ static int btusb_setup_intel(struct hci_dev *hdev)
+> 		ver.fw_variant,  ver.fw_revision, ver.fw_build_num,
+> 		ver.fw_build_ww, ver.fw_build_yy, ver.fw_patch_num);
+> 
+> +	snprintf(fwname, sizeof(fwname),
+> +		 "intel/ibt-hw-%x.%x.%x-fw-%x.%x.%x.%x.%x.bseq",
+> +		 ver.hw_platform, ver.hw_variant, ver.hw_revision,
+> +		 ver.fw_variant,  ver.fw_revision, ver.fw_build_num,
+> +		 ver.fw_build_ww, ver.fw_build_yy);
+> +
+> +	snprintf(default_fwname, sizeof(default_fwname),
+> +		"intel/ibt-hw-%x.%x.bseq", ver.hw_platform, ver.hw_variant);
+> +
 
-I do not like intermixing of different vendors in a single patch.
+this doesn’t belong in this patch since it is about Intel hardware and not Qualcomm hardware. Split this out if it is needed.
 
 Regards
 
