@@ -1,125 +1,89 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Date: Thu, 24 Aug 2017 10:24:19 +0200
+From: Konrad Zapalowicz <konrad.zapalowicz@canonical.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: Read by Group Type is denied when issued before Pairing is
+ finsihed
+Message-ID: <20170824082419.GE7309@annapurna>
+References: <20170823193838.GD7309@annapurna>
+ <CABBYNZ+6Rnb8PYKwDv-ObaaZsQn8-h_iVM2hP1dvSHzf5q7a0w@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20170823235550.45934-1-mcchou@chromium.org>
-References: <20170823235550.45934-1-mcchou@chromium.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 24 Aug 2017 11:30:48 +0300
-Message-ID: <CABBYNZLddrYozPCdfRDMDM3fD26BqxCd6MiBUpwpK6jgoYYD6Q@mail.gmail.com>
-Subject: Re: [PATCH] adapter: Guard StartDiscovery and StopDiscovery with
- discovering check
-To: Miao-chen Chou <mcchou@chromium.org>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Luiz Augusto Von Dentz <luiz.von.dentz@intel.com>,
-        josephsih@chromium.org, sonnysasaka@chromium.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CABBYNZ+6Rnb8PYKwDv-ObaaZsQn8-h_iVM2hP1dvSHzf5q7a0w@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+On 08/24, Luiz Augusto von Dentz wrote:
+> Hi Konrad,
+> 
+> On Wed, Aug 23, 2017 at 10:38 PM, Konrad Zapalowicz
+> <konrad.zapalowicz@canonical.com> wrote:
+> > Hey,
+> >
+> > I have stumbled upon a problem with one of the BLE devices that I have
+> > on my desk. BlueZ (bluetoothctl) failed to discover the primary services
+> > and the error returned by the Read by Group type request was
+> > "Insufficient Authentication". It did work when using gatttool though.
+> >
+> > I have tracked it down and realized that if calling the
+> > bt_gatt_discover_all_primary_services is delayed until after the pairing
+> > is finished then the primary services are discovered without any issues.
+> >
+> > The simplified bt for bt_gatt_discover_all_primary_services is:
+> >
+> > (gdb) bt
+> > #0  discover_services
+> > #1  bt_gatt_discover_primary_services
+> > #2  bt_gatt_discover_all_primary_services
+> > #3  exchange_mtu_cb
+> >
+> > Now, what would be the best way of approaching this. Calling it could be
+> > delayed with a timer but would it be an optimal solution - thoughts?
+> 
+> Sounds to me that the device is requiring authentication for primary
+> services which is not following the spec:
 
-On Thu, Aug 24, 2017 at 2:55 AM,  <mcchou@chromium.org> wrote:
-> From: Miao-chen Chou <mcchou@chromium.org>
->
-> There is a race condition where a start/stop discovery is requested before the
-> previous stop/start discovery finish, and checking the adapter->discovery_list
-> is insufficient to guard to race condition. For example, if start_discovery is
-> called right after stop discovery, the callback, stop_discovery_complete, may
-> not be called before calling start_discovery. Then start_discovery will
-> proceed and fail.
->
-> Test steps:
-> Add delay in kernel for the stop discovery callback.
-> Check if the start discovery can happen before the completion of the previous
-> stop discovery, and the other way around.
->
-> Please refer to https://bugs.chromium.org/p/chromium/issues/detail?id=738237
-> for more details.
+Yes, this is true as well and it is also my concern. Yet at the same
+time I would love to get this device operational. This is a Transport
+Data Logger btw that I'm playing with. 
 
-It is giving me:
+> 
+> 4.4.1 Discover All Primary Services
+> ...
+> Note: The service declaration described in Section 3.1 specifies that the
+> service declaration is readable and requires no authentication or authorization,
+> therefore insufficient authentication or read not permitted errors
+> shall not occur.
+> 
+> Is this a device already on the market? Perhaps we should contact the
+> manufacturer since it seems to not comply to the spec when it comes to
+> discovery.
+> 
+> Delaying is never a nice thing since it affects all devices, but we
+> could perhaps attempt to pair if that happens, actually, we usually do
+> this for regular Read/Write procedures so in case there is an
+> authentication error we pair and try again which might work here as
+> well despite not following the spec.
 
-You do not have permission to view the requested page.
+In the meantime I have cross-checked with the Android code and it does
+things differently. So the services discovery is started in pairing_cb
+that is being called when the pairing is done. I can't tell however if
+this affects interoperability in any way, i.e. has a negative impact
+over Linux implementation. 
 
-Reason: User is not allowed to view this issue
+Thanks,
+K
 
-> ---
->  src/adapter.c | 26 +++++++++++++++++++++++---
->  1 file changed, 23 insertions(+), 3 deletions(-)
->
-> diff --git a/src/adapter.c b/src/adapter.c
-> index 83f38ddbe..395b430d2 100644
-> --- a/src/adapter.c
-> +++ b/src/adapter.c
-> @@ -2119,20 +2119,30 @@ static DBusMessage *start_discovery(DBusConnection *conn,
->         struct btd_adapter *adapter = user_data;
->         const char *sender = dbus_message_get_sender(msg);
->         struct watch_client *client;
-> -       bool is_discovering;
-> +       bool discovery_client_exists;
-
-Don't really see why to change the name here.
-
->         DBG("sender %s", sender);
->
->         if (!(adapter->current_settings & MGMT_SETTING_POWERED))
->                 return btd_error_not_ready(msg);
->
-> -       is_discovering = get_discovery_client(adapter, sender, &client);
-> +       discovery_client_exists = get_discovery_client(
-> +                       adapter, sender, &client);
->
->         /*
->          * Every client can only start one discovery, if the client
->          * already started a discovery then return an error.
->          */
-> -       if (is_discovering)
-> +       if (discovery_client_exists)
-> +               return btd_error_busy(msg);
-> +
-> +       /*
-> +        * adapter->discovery_list being empty but adapter->discovering being
-> +        * true indicates that there is a stop discovery operation in progress.
-> +        * Prevent a new start discovery request when the previous
-> +        * stop discovery is in progress.
-> +        */
-> +       if (!adapter->discovery_list && adapter->discovering)
-
-Perhaps we should delay the removal of a client if it is the last in
-the list, or actually both start and stop discovery need to wait their
-respective commands to complete before replying, that way the client
-can actually be sure it has started or stopped the discovery and we
-don't have to reply busy.
-
->                 return btd_error_busy(msg);
->
->         /*
-> @@ -2420,6 +2430,16 @@ static DBusMessage *stop_discovery(DBusConnection *conn,
->         if (!list)
->                 return btd_error_failed(msg, "No discovery started");
->
-> +       /*
-> +        * adapter->discovery_list being not empty but adapter->discovering
-> +        * being false indicates that there is a start discovery operation in
-> +        * progress.
-> +        * Prevent a new stop discovery request when the previous start
-> +        * discovery is in progress.
-> +        */
-> +       if (!adapter->discovering)
-> +               return btd_error_busy(msg);
-
-Ditto.
-
->         client = list->data;
->
->         cp.type = adapter->discovery_type;
-> --
-> 2.14.1.342.g6490525c54-goog
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-
--- 
-Luiz Augusto von Dentz
+> 
+> > Thanks,
+> > K
+> > --
+> > To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> > the body of a message to majordomo@vger.kernel.org
+> > More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> 
+> 
+> 
+> -- 
+> Luiz Augusto von Dentz
