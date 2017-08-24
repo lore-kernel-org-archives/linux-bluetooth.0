@@ -1,118 +1,265 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <20170824070319.GA31562@bla.fasel.org>
-References: <20170824070319.GA31562@bla.fasel.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 24 Aug 2017 17:30:05 +0300
-Message-ID: <CABBYNZLsNq5xXErq46nY5D8xBhXNfZH19xFjJjH0FDkTFkkUvw@mail.gmail.com>
-Subject: Re: files missing in release tarball (esp. profiles/proximity/*)
-To: Wolfram Schlich <wschlich@gentoo.org>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ] mesh: Make use of rl_prompt_input
+Date: Thu, 24 Aug 2017 16:38:05 +0300
+Message-Id: <20170824133805.4894-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Wolfram,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Thu, Aug 24, 2017 at 10:03 AM, Wolfram Schlich <wschlich@gentoo.org> wrote:
-> Hi,
->
-> there seem to be quite some differences between the git snapshot
-> tarball[1] and the release tarball[2]:
->
-> 1. https://git.kernel.org/pub/scm/bluetooth/bluez.git/snapshot/bluez-5.46.tar.gz
-> 2. https://www.kernel.org/pub/linux/bluetooth/bluez-5.46.tar.gz
->
-> A diff -ur between both unpacked tarballs shows:
-> --8<--
-> Only in bluez-5.46-release-tarball: aclocal.m4
-> Only in bluez-5.46-git-snapshot-tarball/android: sco-ipc-api.txt
-> Only in bluez-5.46-git-snapshot-tarball/android: socket-api.txt
-> Only in bluez-5.46-git-snapshot-tarball: bootstrap
-> Only in bluez-5.46-git-snapshot-tarball: bootstrap-configure
-> Only in bluez-5.46-release-tarball: compile
-> Only in bluez-5.46-release-tarball: config.guess
-> Only in bluez-5.46-release-tarball: config.h.in
-> Only in bluez-5.46-release-tarball: config.sub
-> Only in bluez-5.46-release-tarball: configure
-> Only in bluez-5.46-release-tarball: depcomp
-> Only in bluez-5.46-git-snapshot-tarball/doc: coding-style.txt
-> Only in bluez-5.46-git-snapshot-tarball/doc: maintainer-guidelines.txt
-> Only in bluez-5.46-git-snapshot-tarball: .gitignore
-> Only in bluez-5.46-git-snapshot-tarball: HACKING
-> Only in bluez-5.46-release-tarball: install-sh
-> Only in bluez-5.46-release-tarball: ltmain.sh
-> Only in bluez-5.46-git-snapshot-tarball: .mailmap
-> Only in bluez-5.46-release-tarball: Makefile.in
-> Only in bluez-5.46-release-tarball: missing
-> Only in bluez-5.46-git-snapshot-tarball/obexd/plugins: messages-tracker.c
-> Only in bluez-5.46-git-snapshot-tarball/obexd/plugins: phonebook-ebook.c
-> Only in bluez-5.46-git-snapshot-tarball/obexd/plugins: phonebook-tracker.c
-> Only in bluez-5.46-git-snapshot-tarball/obexd/plugins: syncevolution.c
-> Only in bluez-5.46-git-snapshot-tarball/profiles/proximity: immalert.c
-> Only in bluez-5.46-git-snapshot-tarball/profiles/proximity: immalert.h
-> Only in bluez-5.46-git-snapshot-tarball/profiles/proximity: linkloss.c
-> Only in bluez-5.46-git-snapshot-tarball/profiles/proximity: linkloss.h
-> Only in bluez-5.46-git-snapshot-tarball/profiles/proximity: main.c
-> Only in bluez-5.46-git-snapshot-tarball/profiles/proximity: manager.c
-> Only in bluez-5.46-git-snapshot-tarball/profiles/proximity: manager.h
-> Only in bluez-5.46-git-snapshot-tarball/profiles/proximity: monitor.c
-> Only in bluez-5.46-git-snapshot-tarball/profiles/proximity: monitor.h
-> Only in bluez-5.46-git-snapshot-tarball/profiles/proximity: reporter.c
-> Only in bluez-5.46-git-snapshot-tarball/profiles/proximity: reporter.h
-> Only in bluez-5.46-git-snapshot-tarball/test: exchange-business-cards
-> Only in bluez-5.46-git-snapshot-tarball/test: get-managed-objects
-> Only in bluez-5.46-git-snapshot-tarball/test: get-obex-capabilities
-> Only in bluez-5.46-git-snapshot-tarball/test: list-folders
-> Only in bluez-5.46-git-snapshot-tarball/test: simple-obex-agent
-> Only in bluez-5.46-release-tarball: test-driver
-> Only in bluez-5.46-git-snapshot-tarball/tools: example.psr
-> Only in bluez-5.46-git-snapshot-tarball/tools: parse_companies.pl
-> Only in bluez-5.46-git-snapshot-tarball/tools: update_compids.sh
-> Only in bluez-5.46-git-snapshot-tarball/tools: valgrind.supp
-> --8<--
->
-> Notably the files from obexd/plugins/, profiles/proximity/
-> and test/ are missing in the release tarball.
->
-> The program 'bluez-test-proximity' is, for example, effectively
-> unusable when using the release tarball because of the missing
-> files from profiles/proximity/:
-> --8<--
-> zephyr ~ # /usr/bin/bluez-test-proximity -b AA:BB:CC:DD:EE:FF LinkLossAlertLevel high
-> Proximity SetProperty('LinkLossAlertLevel', 'high')
-> Traceback (most recent call last):
->   File "/usr/bin/bluez-test-proximity", line 67, in <module>
->     device_prop.Set(PROXIMITY_MONITOR_INTERFACE, args[0], args[1])
->   File "/usr/lib64/python2.7/site-packages/dbus/proxies.py", line 70, in __call__
->     return self._proxy_method(*args, **keywords)
->   File "/usr/lib64/python2.7/site-packages/dbus/proxies.py", line 145, in __call__
->     **keywords)
->   File "/usr/lib64/python2.7/site-packages/dbus/connection.py", line 651, in call_blocking
->     message, timeout)
-> dbus.exceptions.DBusException: org.freedesktop.DBus.Error.InvalidArgs: No such interface 'org.bluez.ProximityMonitor1'
-> zephyr ~ #
-> --8<--
->
-> Can you fix this (at least profiles/proximity/), please?
+This removes unnecessary code to ask user input which is already
+supported by rl_prompt_input.
+---
+ mesh/agent.c | 127 ++++++++++++++---------------------------------------------
+ mesh/main.c  |   4 +-
+ 2 files changed, 31 insertions(+), 100 deletions(-)
 
-The proximity profile is no longer build-in as we these profiles
-should be implemented using the GATT D-Bus API, the files under
-profiles/proximity are a left over of the cleanup and I will probably
-remove them along with documentation and the test script. We may as
-well add a sample application using the D-Bus apply to do the same as
-the plugins was doing.
-
-> Thank you!
->
-> Cheers,
-> Wolfram
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-
+diff --git a/mesh/agent.c b/mesh/agent.c
+index 026f26058..c789b0c1a 100644
+--- a/mesh/agent.c
++++ b/mesh/agent.c
+@@ -38,11 +38,6 @@
+ #include "mesh/util.h"
+ #include "mesh/agent.h"
+ 
+-#define AGENT_PROMPT	COLOR_RED "[agent]" COLOR_OFF " "
+-
+-static char *agent_saved_prompt = NULL;
+-static int agent_saved_point = 0;
+-
+ struct input_request {
+ 	oob_type_t type;
+ 	uint16_t len;
+@@ -52,45 +47,6 @@ struct input_request {
+ 
+ static struct input_request pending_request = {NONE, 0, NULL, NULL};
+ 
+-static void agent_prompt(const char *msg)
+-{
+-	char *prompt;
+-
+-	/* Normal use should not prompt for user input to the agent a second
+-	 * time before it releases the prompt, but we take a safe action. */
+-	if (agent_saved_prompt)
+-		return;
+-
+-	agent_saved_point = rl_point;
+-	agent_saved_prompt = g_strdup(rl_prompt);
+-
+-	rl_set_prompt("");
+-	rl_redisplay();
+-
+-	prompt = g_strdup_printf(AGENT_PROMPT "%s", msg);
+-	rl_set_prompt(prompt);
+-	g_free(prompt);
+-
+-	rl_replace_line("", 0);
+-	rl_redisplay();
+-}
+-
+-static void agent_release_prompt(void)
+-{
+-	if (!agent_saved_prompt)
+-		return;
+-
+-	/* This will cause rl_expand_prompt to re-run over the last prompt, but
+-	 * our prompt doesn't expand anyway. */
+-	rl_set_prompt(agent_saved_prompt);
+-	rl_replace_line("", 0);
+-	rl_point = agent_saved_point;
+-	rl_redisplay();
+-
+-	g_free(agent_saved_prompt);
+-	agent_saved_prompt = NULL;
+-}
+-
+ bool agent_completion(void)
+ {
+ 	if (pending_request.type == NONE)
+@@ -99,28 +55,37 @@ bool agent_completion(void)
+ 	return true;
+ }
+ 
+-static bool response_hexadecimal(const char *input)
++static void reset_input_request(void)
++{
++	pending_request.type = NONE;
++	pending_request.len = 0;
++	pending_request.cb = NULL;
++	pending_request.user_data = NULL;
++}
++
++static void response_hexadecimal(const char *input, void *user_data)
+ {
+ 	uint8_t buf[MAX_HEXADECIMAL_OOB_LEN];
+ 
+ 	if (!str2hex(input, strlen(input), buf, pending_request.len) ) {
+ 		rl_printf("Incorrect input: expecting %d hex octets\n",
+ 			  pending_request.len);
+-		return false;
++		return;
+ 	}
+ 
+ 	if (pending_request.cb)
+ 		pending_request.cb(HEXADECIMAL, buf, pending_request.len,
+ 					pending_request.user_data);
+-	return true;
++
++	reset_input_request();
+ }
+ 
+-static bool response_decimal(const char *input)
++static void response_decimal(const char *input, void *user_data)
+ {
+ 	uint8_t buf[DECIMAL_OOB_LEN];
+ 
+ 	if (strlen(input) > pending_request.len)
+-		return false;
++		return;
+ 
+ 	bt_put_be32(atoi(input), buf);
+ 
+@@ -128,57 +93,16 @@ static bool response_decimal(const char *input)
+ 		pending_request.cb(DECIMAL, buf, DECIMAL_OOB_LEN,
+ 					pending_request.user_data);
+ 
+-	return true;
++	reset_input_request();
+ }
+ 
+-static void response_ascii(const char *input)
++static void response_ascii(const char *input, void *user_data)
+ {
+ 	if (pending_request.cb)
+ 		pending_request.cb(ASCII, (uint8_t *) input, strlen(input),
+ 					pending_request.user_data);
+-}
+-
+-bool agent_input(const char *input)
+-{
+-	bool repeat = false;
+-
+-	if (pending_request.type == NONE)
+-		return false;
+-
+-	switch (pending_request.type) {
+-	case HEXADECIMAL:
+-		if (!response_hexadecimal(input))
+-			repeat = true;
+-		break;
+-	case DECIMAL:
+-		if (!response_decimal(input))
+-			repeat = true;
+-		break;
+-	case ASCII:
+-		response_ascii(input);
+-		break;
+-	case OUTPUT:
+-		repeat = true;
+-	case NONE:
+-	default:
+-		break;
+-	};
+-
+-	if (!repeat) {
+-		pending_request.type = NONE;
+-		pending_request.len = 0;
+-		pending_request.cb = NULL;
+-		pending_request.user_data = NULL;
+-
+-		agent_release_prompt();
+-	}
+ 
+-	return true;
+-}
+-
+-void agent_release(void)
+-{
+-	agent_release_prompt();
++	reset_input_request();
+ }
+ 
+ static bool request_hexadecimal(uint16_t len)
+@@ -187,7 +111,8 @@ static bool request_hexadecimal(uint16_t len)
+ 		return false;
+ 
+ 	rl_printf("Request hexadecimal key (hex %d octets)\n", len);
+-	agent_prompt("Enter key (hex number): ");
++	rl_prompt_input("mesh", "Enter key (hex number):", response_hexadecimal,
++								NULL);
+ 
+ 	return true;
+ }
+@@ -205,7 +130,7 @@ static uint32_t power_ten(uint8_t power)
+ static bool request_decimal(uint16_t len)
+ {
+ 	rl_printf("Request decimal key (0 - %d)\n", power_ten(len) - 1);
+-	agent_prompt("Enter Numeric key: ");
++	rl_prompt_input("mesh", "Enter Numeric key:", response_decimal, NULL);
+ 
+ 	return true;
+ }
+@@ -216,7 +141,8 @@ static bool request_ascii(uint16_t len)
+ 		return false;
+ 
+ 	rl_printf("Request ASCII key (max characters %d)\n", len);
+-	agent_prompt("Enter key (ascii string): ");
++	rl_prompt_input("mesh", "Enter key (ascii string):", response_ascii,
++									NULL);
+ 
+ 	return true;
+ }
+@@ -257,13 +183,18 @@ bool agent_input_request(oob_type_t type, uint16_t max_len, agent_input_cb cb,
+ 	return false;
+ }
+ 
++static void response_output(const char *input, void *user_data)
++{
++	reset_input_request();
++}
++
+ bool agent_output_request(const char* str)
+ {
+ 	if (pending_request.type != NONE)
+ 		return false;
+ 
+ 	pending_request.type = OUTPUT;
+-	agent_prompt(str);
++	rl_prompt_input("mesh", str, response_output, NULL);
+ 	return true;
+ }
+ 
+@@ -272,5 +203,5 @@ void agent_output_request_cancel(void)
+ 	if (pending_request.type != OUTPUT)
+ 		return;
+ 	pending_request.type = NONE;
+-	agent_release_prompt();
++	rl_release_prompt("");
+ }
+diff --git a/mesh/main.c b/mesh/main.c
+index 0a7fc1ee9..b06f4352a 100644
+--- a/mesh/main.c
++++ b/mesh/main.c
+@@ -2005,7 +2005,7 @@ static void rl_handler(char *input)
+ 		goto done;
+ 	}
+ 
+-	if (agent_input(input) == TRUE)
++	if (!rl_release_prompt(input))
+ 		goto done;
+ 
+ 	add_history(input);
+@@ -2263,7 +2263,7 @@ int main(int argc, char *argv[])
+ 	g_list_free(service_list);
+ 	g_list_free_full(ctrl_list, proxy_leak);
+ 
+-	agent_release();
++	rl_release_prompt("");
+ 
+ 	return 0;
+ }
 -- 
-Luiz Augusto von Dentz
+2.13.5
+
