@@ -6,108 +6,146 @@ Cc: gustavo@padovan.org,
 	linux-bluetooth@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Kai-Heng Feng <kai.heng.feng@canonical.com>
-Subject: [PATCH v2 4/4] Bluetooth: ath3k: Cache firmware for Atheros Bluetooth
-Date: Fri, 25 Aug 2017 15:18:29 +0800
-Message-Id: <20170825071829.1829-4-kai.heng.feng@canonical.com>
+Subject: [PATCH v2 3/4] Bluetooth: btusb: Cache firmware for QCA Bluetooth
+Date: Fri, 25 Aug 2017 15:18:28 +0800
+Message-Id: <20170825071829.1829-3-kai.heng.feng@canonical.com>
 In-Reply-To: <20170825071829.1829-1-kai.heng.feng@canonical.com>
 References: <20170825071829.1829-1-kai.heng.feng@canonical.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-For Intel Bluetooth that downloads firmware based on patched status,
-it should still call request_firmware() once if download is not needed.
+For QCA Bluetooth that downloads firmware based on patched status, it
+should still call request_firmware() once if download is not needed.
 
-Verified on DW1707 wireless module (0cf3:e005).
+Also, version information was converted twice, reduce it to one.
+
+Verified on DW1810 wireless module (0cf3:e009).
 
 Signed-off-by: Kai-Heng Feng <kai.heng.feng@canonical.com>
 ---
 v2: Split patches for different vendors.
 
- drivers/bluetooth/ath3k.c | 59 +++++++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 54 insertions(+), 5 deletions(-)
+ drivers/bluetooth/btusb.c | 49 +++++++++++++++++++++++------------------------
+ 1 file changed, 24 insertions(+), 25 deletions(-)
 
-diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
-index 204afe66de92..f7c7077d312b 100644
---- a/drivers/bluetooth/ath3k.c
-+++ b/drivers/bluetooth/ath3k.c
-@@ -209,6 +209,54 @@ static const struct usb_device_id ath3k_blist_tbl[] = {
- #define TIMEGAP_USEC_MIN	50
- #define TIMEGAP_USEC_MAX	100
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 4cb206ecfa7d..ec246302d7e6 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -2662,21 +2662,15 @@ static int btusb_setup_qca_download_fw(struct hci_dev *hdev,
+ }
  
-+#ifdef CONFIG_PM_SLEEP
-+static void ath3k_request_firmware_done(const struct firmware *firmware,
-+					void *context)
-+{
-+	const char *name = (const char *)context;
-+
-+	if (!firmware) {
-+		BT_WARN("firmware %s will not be cached", name);
-+		goto done;
-+	}
-+
-+	BT_DBG("firmware %s will be cached", name);
-+
-+	release_firmware(firmware);
-+done:
-+	kfree_const(name);
-+}
-+
-+static int ath3k_request_firmware_async(struct usb_device *udev,
-+					const char *fwname)
-+{
-+	const char *name;
-+	int err;
-+
-+	name = kstrdup_const(fwname, GFP_KERNEL);
-+	if (!name)
-+		return -ENOMEM;
-+
-+	err = request_firmware_nowait(THIS_MODULE, true, name, &udev->dev,
-+				      GFP_KERNEL, (void *)name,
-+				      ath3k_request_firmware_done);
-+	if (err) {
-+		BT_WARN("%s %s: failed to async request firmware for file: %s (%d)",
-+			udev->manufacturer, udev->product, name, err);
-+		kfree_const(name);
-+		return err;
-+	}
-+
-+	return 0;
-+}
-+#else
-+static int ath3k_request_firmware_async(struct usb_device *udev,
-+					const char *fwname)
-+{
-+	return 0;
-+}
-+#endif
-+
- static int ath3k_load_firmware(struct usb_device *udev,
- 				const struct firmware *firmware)
+ static int btusb_setup_qca_load_rampatch(struct hci_dev *hdev,
+-					 struct qca_version *ver,
++					 const char *fwname,
++					 const struct qca_version *ver,
+ 					 const struct qca_device_info *info)
  {
-@@ -410,11 +458,6 @@ static int ath3k_load_patch(struct usb_device *udev)
- 		return ret;
+ 	struct qca_rampatch_version *rver;
+ 	const struct firmware *fw;
+-	u32 ver_rom, ver_patch;
+ 	u16 rver_rom, rver_patch;
+-	char fwname[64];
+ 	int err;
+ 
+-	ver_rom = le32_to_cpu(ver->rom_version);
+-	ver_patch = le32_to_cpu(ver->patch_version);
+-
+-	snprintf(fwname, sizeof(fwname), "qca/rampatch_usb_%08x.bin", ver_rom);
+-
+ 	err = request_firmware(&fw, fwname, &hdev->dev);
+ 	if (err) {
+ 		BT_ERR("%s: failed to request rampatch file: %s (%d)",
+@@ -2690,11 +2684,11 @@ static int btusb_setup_qca_load_rampatch(struct hci_dev *hdev,
+ 	rver_rom = le16_to_cpu(rver->rom_version);
+ 	rver_patch = le16_to_cpu(rver->patch_version);
+ 
+-	BT_INFO("%s: QCA: patch rome 0x%x build 0x%x, firmware rome 0x%x "
+-		"build 0x%x", hdev->name, rver_rom, rver_patch, ver_rom,
+-		ver_patch);
++	BT_INFO("%s: QCA: patch rome 0x%x build 0x%x, firmware rome 0x%x build 0x%x",
++		hdev->name, rver_rom, rver_patch,
++		ver->rom_version, ver->patch_version);
+ 
+-	if (rver_rom != ver_rom || rver_patch <= ver_patch) {
++	if (rver_rom != ver->rom_version || rver_patch <= ver->patch_version) {
+ 		BT_ERR("%s: rampatch file version did not match with firmware",
+ 		       hdev->name);
+ 		err = -EINVAL;
+@@ -2710,16 +2704,12 @@ static int btusb_setup_qca_load_rampatch(struct hci_dev *hdev,
+ }
+ 
+ static int btusb_setup_qca_load_nvm(struct hci_dev *hdev,
+-				    struct qca_version *ver,
++				    const char *fwname,
+ 				    const struct qca_device_info *info)
+ {
+ 	const struct firmware *fw;
+-	char fwname[64];
+ 	int err;
+ 
+-	snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x.bin",
+-		 le32_to_cpu(ver->rom_version));
+-
+ 	err = request_firmware(&fw, fwname, &hdev->dev);
+ 	if (err) {
+ 		BT_ERR("%s: failed to request NVM file: %s (%d)",
+@@ -2740,7 +2730,7 @@ static int btusb_setup_qca(struct hci_dev *hdev)
+ {
+ 	const struct qca_device_info *info = NULL;
+ 	struct qca_version ver;
+-	u32 ver_rom;
++	char fwname[64];
+ 	u8 status;
+ 	int i, err;
+ 
+@@ -2749,14 +2739,15 @@ static int btusb_setup_qca(struct hci_dev *hdev)
+ 	if (err < 0)
+ 		return err;
+ 
+-	ver_rom = le32_to_cpu(ver.rom_version);
++	ver.rom_version = le32_to_cpu(ver.rom_version);
++	ver.patch_version = le32_to_cpu(ver.patch_version);
+ 	for (i = 0; i < ARRAY_SIZE(qca_devices_table); i++) {
+-		if (ver_rom == qca_devices_table[i].rom_version)
++		if (ver.rom_version == qca_devices_table[i].rom_version)
+ 			info = &qca_devices_table[i];
+ 	}
+ 	if (!info) {
+ 		BT_ERR("%s: don't support firmware rome 0x%x", hdev->name,
+-		       ver_rom);
++		       ver.rom_version);
+ 		return -ENODEV;
  	}
  
--	if (fw_state & ATH3K_PATCH_UPDATE) {
--		BT_DBG("Patch was already downloaded");
--		return 0;
--	}
--
- 	ret = ath3k_get_version(udev, &fw_version);
- 	if (ret < 0) {
- 		BT_ERR("Can't get version to change to load ram patch err");
-@@ -424,6 +467,12 @@ static int ath3k_load_patch(struct usb_device *udev)
- 	snprintf(filename, ATH3K_NAME_LEN, "ar3k/AthrBT_0x%08x.dfu",
- 		 le32_to_cpu(fw_version.rom_version));
+@@ -2765,17 +2756,25 @@ static int btusb_setup_qca(struct hci_dev *hdev)
+ 	if (err < 0)
+ 		return err;
  
-+	if (fw_state & ATH3K_PATCH_UPDATE) {
-+		BT_DBG("Patch was already downloaded");
-+		ath3k_request_firmware_async(udev, filename);
-+		return 0;
-+	}
++	snprintf(fwname, sizeof(fwname), "qca/rampatch_usb_%08x.bin",
++		 ver.rom_version);
 +
- 	ret = request_firmware(&firmware, filename, &udev->dev);
- 	if (ret < 0) {
- 		BT_ERR("Patch file not found %s", filename);
+ 	if (!(status & QCA_PATCH_UPDATED)) {
+-		err = btusb_setup_qca_load_rampatch(hdev, &ver, info);
++		err = btusb_setup_qca_load_rampatch(hdev, fwname, &ver, info);
+ 		if (err < 0)
+ 			return err;
+-	}
++	} else
++		btusb_request_firmware_async(hdev, fwname);
++
++	snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x.bin",
++		 ver.rom_version);
+ 
+ 	if (!(status & QCA_SYSCFG_UPDATED)) {
+-		err = btusb_setup_qca_load_nvm(hdev, &ver, info);
++		err = btusb_setup_qca_load_nvm(hdev, fwname, info);
+ 		if (err < 0)
+ 			return err;
+-	}
++	} else
++		btusb_request_firmware_async(hdev, fwname);
+ 
+ 	return 0;
+ }
 -- 
 2.14.1
