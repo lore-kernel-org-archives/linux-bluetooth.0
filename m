@@ -1,54 +1,60 @@
-Return-Path: <stefan@osg.samsung.com>
-Subject: Re: [PATCH 3/7] ieee802154: 6lowpan: make header_ops const
-To: Bhumika Goyal <bhumirks@gmail.com>, julia.lawall@lip6.fr,
- marcel@holtmann.org, gustavo@padovan.org, johan.hedberg@gmail.com,
- davem@davemloft.net, pablo@netfilter.org, kadlec@blackhole.kfki.hu,
- fw@strlen.de, stephen@networkplumber.org, alex.aring@gmail.com,
- kuznet@ms2.inr.ac.ru, yoshfuji@linux-ipv6.org, santosh.shilimkar@oracle.com,
- trond.myklebust@primarydata.com, anna.schumaker@netapp.com,
- bfields@fieldses.org, jlayton@poochiereds.net,
- linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, netfilter-devel@vger.kernel.org,
- coreteam@netfilter.org, bridge@lists.linux-foundation.org,
- linux-wpan@vger.kernel.org, linux-rdma@vger.kernel.org,
- rds-devel@oss.oracle.com, linux-nfs@vger.kernel.org
+Return-Path: <bhumirks@gmail.com>
+From: Bhumika Goyal <bhumirks@gmail.com>
+To: julia.lawall@lip6.fr,
+	marcel@holtmann.org,
+	gustavo@padovan.org,
+	johan.hedberg@gmail.com,
+	davem@davemloft.net,
+	pablo@netfilter.org,
+	kadlec@blackhole.kfki.hu,
+	fw@strlen.de,
+	stephen@networkplumber.org,
+	alex.aring@gmail.com,
+	stefan@osg.samsung.com,
+	kuznet@ms2.inr.ac.ru,
+	yoshfuji@linux-ipv6.org,
+	santosh.shilimkar@oracle.com,
+	trond.myklebust@primarydata.com,
+	anna.schumaker@netapp.com,
+	bfields@fieldses.org,
+	jlayton@poochiereds.net,
+	linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org,
+	bridge@lists.linux-foundation.org,
+	linux-wpan@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	rds-devel@oss.oracle.com,
+	linux-nfs@vger.kernel.org
+Cc: Bhumika Goyal <bhumirks@gmail.com>
+Subject: [PATCH 7/7] SUNRPC: make kvec const
+Date: Fri, 25 Aug 2017 19:51:47 +0530
+Message-Id: <1503670907-23221-8-git-send-email-bhumirks@gmail.com>
+In-Reply-To: <1503670907-23221-1-git-send-email-bhumirks@gmail.com>
 References: <1503670907-23221-1-git-send-email-bhumirks@gmail.com>
- <1503670907-23221-4-git-send-email-bhumirks@gmail.com>
-From: Stefan Schmidt <stefan@osg.samsung.com>
-Message-ID: <c9ada435-af29-c5e0-b72d-374199f6b6f9@osg.samsung.com>
-Date: Fri, 25 Aug 2017 16:36:37 +0200
-MIME-Version: 1.0
-In-Reply-To: <1503670907-23221-4-git-send-email-bhumirks@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello.
+Make this const as it is only used during a copy operation.
 
-On 08/25/2017 04:21 PM, Bhumika Goyal wrote:
-> Make this const as it is only stored as a reference in a const field of
-> a net_device structure.
-> 
-> Signed-off-by: Bhumika Goyal <bhumirks@gmail.com>
-> ---
->   net/ieee802154/6lowpan/core.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/net/ieee802154/6lowpan/core.c b/net/ieee802154/6lowpan/core.c
-> index de2661c..974765b 100644
-> --- a/net/ieee802154/6lowpan/core.c
-> +++ b/net/ieee802154/6lowpan/core.c
-> @@ -54,7 +54,7 @@
->   
->   static int open_count;
->   
-> -static struct header_ops lowpan_header_ops = {
-> +static const struct header_ops lowpan_header_ops = {
->   	.create	= lowpan_header_create,
->   };
->   
-> 
+Signed-off-by: Bhumika Goyal <bhumirks@gmail.com>
+---
+ net/sunrpc/xdr.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Acked-by: Stefan Schmidt <stefan@osg.samsung.com>
-
-regards
-Stefan Schmidt
+diff --git a/net/sunrpc/xdr.c b/net/sunrpc/xdr.c
+index e34f4ee..a096025 100644
+--- a/net/sunrpc/xdr.c
++++ b/net/sunrpc/xdr.c
+@@ -998,7 +998,7 @@ void xdr_enter_page(struct xdr_stream *xdr, unsigned int len)
+ }
+ EXPORT_SYMBOL_GPL(xdr_enter_page);
+ 
+-static struct kvec empty_iov = {.iov_base = NULL, .iov_len = 0};
++static const struct kvec empty_iov = {.iov_base = NULL, .iov_len = 0};
+ 
+ void
+ xdr_buf_from_iov(struct kvec *iov, struct xdr_buf *buf)
+-- 
+1.9.1
