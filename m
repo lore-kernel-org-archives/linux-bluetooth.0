@@ -1,82 +1,52 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Inga Stotland <inga.stotland@intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Inga Stotland <inga.stotland@intel.com>
-Subject: [PATCH] mesh: move GATT defines to the appropriate header file
-Date: Fri, 25 Aug 2017 16:56:33 -0700
-Message-Id: <20170825235633.23101-1-inga.stotland@intel.com>
+Message-ID: <1503685020.12938.19.camel@hadess.net>
+Subject: Re: [PATCH v2 0/4] BlueZ: Add support for pairing the DS4
+ controller over USB
+From: Bastien Nocera <hadess@hadess.net>
+To: Juha Kuikka <juha.kuikka@gmail.com>,
+        linux-bluetooth@vger.kernel.org
+Cc: juha.kuikka@synapse.com, frank.praznik@gmail.com,
+        roderick.colenbrander@sony.com,
+        Szymon Janc <szymon.janc@codecoup.pl>,
+        Antonio Ospite <ao2@ao2.it>
+Date: Fri, 25 Aug 2017 20:17:00 +0200
+In-Reply-To: <1482971563-15745-1-git-send-email-juha.kuikka@gmail.com>
+References: <1482971563-15745-1-git-send-email-juha.kuikka@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Group mesh GATT definitions in mesh/gatt.h file.
-Also remove unused members in mesh_node structure.
----
- mesh/gatt.h | 11 +++++++++++
- mesh/node.c |  2 --
- mesh/node.h | 11 -----------
- 3 files changed, 11 insertions(+), 13 deletions(-)
+On Wed, 2016-12-28 at 16:32 -0800, Juha Kuikka wrote:
+> This patch set first refactors the sixaxis plugin to more easily
+> support
+> multiple controllers with different protocols.
+> 
+> Secondly support for pairing the Dualshock 4 controller over USB is
+> added.
+> 
+> Last, the PID of the new DS4 controller is added into the input
+> device special
+> case handler which allows this controller to be used.
 
-diff --git a/mesh/gatt.h b/mesh/gatt.h
-index a2aae2540..2878587b1 100644
---- a/mesh/gatt.h
-+++ b/mesh/gatt.h
-@@ -23,6 +23,17 @@
- 
- #include "gdbus/gdbus.h"
- 
-+/* Largest Possible GATT Packet: Provisioning Public Key + type + sar */
-+#define MAX_GATT_SIZE	(64 + 1 + 1)
-+
-+#define GATT_SAR_MASK		0xc0
-+#define GATT_SAR_COMPLETE	0x00
-+#define GATT_SAR_FIRST		0x40
-+#define GATT_SAR_CONTINUE	0x80
-+#define GATT_SAR_LAST		0xc0
-+#define GATT_TYPE_INVALID	0xff
-+#define GATT_TYPE_MASK		0x3f
-+
- uint16_t mesh_gatt_sar(uint8_t **pkt, uint16_t size);
- bool mesh_gatt_is_child(GDBusProxy *proxy, GDBusProxy *parent,
- 			const char *name);
-diff --git a/mesh/node.c b/mesh/node.c
-index 9c004880d..b6685509f 100644
---- a/mesh/node.c
-+++ b/mesh/node.c
-@@ -77,12 +77,10 @@ struct mesh_node {
- 	uint16_t primary;
- 	uint16_t oob;
- 	uint16_t features;
--	uint8_t gatt_pkt[MAX_GATT_SIZE];
- 	uint8_t dev_uuid[16];
- 	uint8_t dev_key[16];
- 	uint8_t num_ele;
- 	uint8_t ttl;
--	uint8_t gatt_size;
- 	bool provisioner;
- 	struct mesh_node_composition *comp;
- };
-diff --git a/mesh/node.h b/mesh/node.h
-index 68c60ebef..1fab80a13 100644
---- a/mesh/node.h
-+++ b/mesh/node.h
-@@ -21,17 +21,6 @@
-  *
-  */
- 
--/* Largest Possible GATT Packet: Provisioning Public Key + type + sar */
--#define MAX_GATT_SIZE	(64 + 1 + 1)
--
--#define GATT_SAR_MASK		0xc0
--#define GATT_SAR_COMPLETE	0x00
--#define GATT_SAR_FIRST		0x40
--#define GATT_SAR_CONTINUE	0x80
--#define GATT_SAR_LAST		0xc0
--#define GATT_TYPE_INVALID	0xff
--#define GATT_TYPE_MASK		0x3f
--
- struct mesh_node;
- 
- #define ACTION_ADD		1
--- 
-2.13.5
+I've redone this patchset on top of my "cable pairing authentication"
+patches:
+https://github.com/hadess/bluez/commits/ds4-cable-pairing
 
+I wanted people to test it out, go through review comments, and fix any
+major problems before sending it out to the list.
+
+The cable pairing authentication needs an agent that supports it. If
+you have GNOME installed, you're in luck. The cable pairing
+authentication has been supported since gnome-bluetooth 3.18.0.
+
+It was implemented in this patch, if you want to try and add support in
+one of the tools around:
+https://git.gnome.org/browse/gnome-bluetooth/commit/?id=2efefd456b5ae3617e618e8d76ca3a121b83570e
+
+TODO items:
+- go through original (Juha's) patchset review comments
+- add cancellation for cable pairing when USB is disconnected
+- tests tests tests
+
+Comments welcome!
