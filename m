@@ -29,33 +29,30 @@ To: julia.lawall@lip6.fr,
 	rds-devel@oss.oracle.com,
 	linux-nfs@vger.kernel.org
 Cc: Bhumika Goyal <bhumirks@gmail.com>
-Subject: [PATCH 1/7] Bluetooth: 6lowpan: make header_ops const
-Date: Fri, 25 Aug 2017 19:51:41 +0530
-Message-Id: <1503670907-23221-2-git-send-email-bhumirks@gmail.com>
-In-Reply-To: <1503670907-23221-1-git-send-email-bhumirks@gmail.com>
-References: <1503670907-23221-1-git-send-email-bhumirks@gmail.com>
+Subject: [PATCH 0/7] net: make some structures const
+Date: Fri, 25 Aug 2017 19:51:40 +0530
+Message-Id: <1503670907-23221-1-git-send-email-bhumirks@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Make this const as it is only stored as a reference in a const field of
-a net_device structure.
+Make these const as they are not modified.
 
-Signed-off-by: Bhumika Goyal <bhumirks@gmail.com>
----
- net/bluetooth/6lowpan.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Bhumika Goyal (7):
+  Bluetooth: 6lowpan: make header_ops const
+  bridge: make ebt_table const
+  ieee802154: 6lowpan: make header_ops const
+  ipv4: make net_protocol const
+  RDS: make rhashtable_params const
+  netfilter: nat: make rhashtable_params const
+  SUNRPC: make kvec const
 
-diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
-index 4e2576f..50fcdd1 100644
---- a/net/bluetooth/6lowpan.c
-+++ b/net/bluetooth/6lowpan.c
-@@ -581,7 +581,7 @@ static int bt_dev_init(struct net_device *dev)
- 	.ndo_start_xmit		= bt_xmit,
- };
- 
--static struct header_ops header_ops = {
-+static const struct header_ops header_ops = {
- 	.create	= header_create,
- };
- 
+ net/bluetooth/6lowpan.c            | 2 +-
+ net/bridge/netfilter/ebtable_nat.c | 2 +-
+ net/ieee802154/6lowpan/core.c      | 2 +-
+ net/ipv4/af_inet.c                 | 4 ++--
+ net/netfilter/nf_nat_core.c        | 2 +-
+ net/rds/bind.c                     | 2 +-
+ net/sunrpc/xdr.c                   | 2 +-
+ 7 files changed, 8 insertions(+), 8 deletions(-)
+
 -- 
 1.9.1
