@@ -1,26 +1,870 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-To: Konrad Zapalowicz <konrad.zapalowicz@canonical.com>
-Message-ID: <150366178770.592.4705205267168519503@david-x220.localdomain>
-From: =?utf-8?b?RGF2aWQgxIxlcGVsw61r?= <d@dcepelik.cz>
-In-Reply-To: <20170825111538.GI7309@annapurna>
+Date: Fri, 25 Aug 2017 13:15:38 +0200
+From: Konrad Zapalowicz <konrad.zapalowicz@canonical.com>
+To: David =?utf-8?B?xIxlcGVsw61r?= <d@dcepelik.cz>
 Cc: linux-bluetooth@vger.kernel.org
-References: <150361093443.32113.1085159792572233585@david-x220.localdomain>
- <20170825111538.GI7309@annapurna>
 Subject: Re: BlueZ segfault with a Jolla phone
-Date: Fri, 25 Aug 2017 13:49:47 +0200
+Message-ID: <20170825111538.GI7309@annapurna>
+References: <150361093443.32113.1085159792572233585@david-x220.localdomain>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <150361093443.32113.1085159792572233585@david-x220.localdomain>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Quoting Konrad Zapalowicz (2017-08-25 13:15:38)
-> Might be fixed in the latest upstream, with 5252296b725 commit. Could
-> you recompile that and give it a try.
+On 08/24, David Čepelík wrote:
+> Hello BlueZ devs,
+> 
+> I have run into a segfault trying to connect to a Jolla
+> phone today.
+> 
+> I am using BlueZ 5.46 as packaged for Arch Linux. I have
+> recompiled the package with debug symbols and ran in gdb
+> and Valgrind. The gdb backtrace and Valgrind output are
+> attached.
+> 
+> The question is, given the number of errors reported by
+> Valgrind, am I looking for a single bug, or is BlueZ
+> rather cavalier when it comes to memory safety?
+> (No offense, just asking.)
+> 
+> From what I was able to find out, the problem is that
+> bluetoothd attempts to print an adapter's address in ba2str,
+> but the argument it gets is rubbish. More precisely, in
+> 
+>         ba2str(btd_adapter_get_address(device->adapter), srcaddr);
+> 
+> device->adapter contains random data.
+> 
+> I'd like to find the issue, any help is appreciated.
 
-Hi Konrad,
+Might be fixed in the latest upstream, with 5252296b725 commit. Could
+you recompile that and give it a try.
 
-thanks for answer. Unfortunately it's a friend's device,
-so I'll try ASAP.
+Best,
+K
 
-                             Cheers
-                             -- David
+> 
+>                               -- David
+
+> (gdb) bt
+> #0  ba2str (ba=0x10, str=str@entry=0x7fffffffbef0 "\200Q3") at lib/bluetooth.c:79
+> #1  0x000000010007ce95 in update_bredr_services (req=req@entry=0x100302dd0, 
+>     recs=recs@entry=0x1003369b0) at src/device.c:4356
+> #2  0x000000010007d625 in browse_cb (recs=0x1003369b0, err=0, user_data=0x100302dd0)
+>     at src/device.c:4587
+> #3  0x00000001000578e0 in search_completed_cb (type=<optimized out>, 
+>     status=<optimized out>, rsp=<optimized out>, size=<optimized out>, 
+>     user_data=0x100300db0) at src/sdp-client.c:205
+> #4  0x000000010008dc2a in sdp_process (session=<optimized out>) at lib/sdp.c:4354
+> #5  0x0000000100057a36 in search_process_cb (chan=<optimized out>, 
+>     cond=<optimized out>, user_data=<optimized out>) at src/sdp-client.c:230
+> #6  0x00007f03896fb8c5 in g_main_context_dispatch () from /usr/lib/libglib-2.0.so.0
+> #7  0x00007f03896fbc88 in ?? () from /usr/lib/libglib-2.0.so.0
+> #8  0x00007f03896fbfa2 in g_main_loop_run () from /usr/lib/libglib-2.0.so.0
+> #9  0x0000000100017e0c in main (argc=<optimized out>, argv=<optimized out>)
+>     at src/main.c:733
+
+> ==30400== Memcheck, a memory error detector
+> ==30400== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+> ==30400== Using Valgrind-3.13.0 and LibVEX; rerun with -h for copyright info
+> ==30400== Command: /usr/lib/bluetooth/bluetoothd
+> ==30400== 
+> ==30400== Invalid read of size 8
+> ==30400==    at 0x1855EA: browse_cb (device.c:4573)
+> ==30400==    by 0x15F8DF: search_completed_cb (sdp-client.c:205)
+> ==30400==    by 0x195C29: sdp_process (sdp.c:4354)
+> ==30400==    by 0x15FA35: search_process_cb (sdp-client.c:230)
+> ==30400==    by 0x4E828C4: g_main_context_dispatch (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82C87: ??? (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82FA1: g_main_loop_run (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x11FE0B: main (main.c:733)
+> ==30400==  Address 0x6c91428 is 8 bytes inside a block of size 64 free'd
+> ==30400==    at 0x4C2D16B: free (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+> ==30400==    by 0x1830B8: gatt_client_ready_cb (device.c:4692)
+> ==30400==    by 0x1A57BE: notify_client_ready.part.11 (gatt-client.c:1129)
+> ==30400==    by 0x1A352F: discovery_op_complete (gatt-client.c:379)
+> ==30400==    by 0x1A4078: discover_primary_cb (gatt-client.c:1101)
+> ==30400==    by 0x1ACDC6: discovery_op_complete (gatt-helpers.c:628)
+> ==30400==    by 0x1ACFF8: read_by_grp_type_cb (gatt-helpers.c:730)
+> ==30400==    by 0x1A2DA0: handle_rsp (att.c:707)
+> ==30400==    by 0x1A2DA0: can_read_data (att.c:879)
+> ==30400==    by 0x1ABCD2: watch_callback (io-glib.c:170)
+> ==30400==    by 0x4E828C4: g_main_context_dispatch (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82C87: ??? (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82FA1: g_main_loop_run (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==  Block was alloc'd at
+> ==30400==    at 0x4C2DF55: calloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+> ==30400==    by 0x4E88080: g_malloc0 (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x17DF2D: browse_request_new.part.26 (device.c:5016)
+> ==30400==    by 0x17DFCD: browse_request_new (device.c:5013)
+> ==30400==    by 0x17DFCD: device_browse_sdp (device.c:5116)
+> ==30400==    by 0x182A31: connect_profiles (device.c:1772)
+> ==30400==    by 0x19AA5A: process_message.isra.6 (object.c:259)
+> ==30400==    by 0x51708D2: ??? (in /usr/lib/libdbus-1.so.3.14.11)
+> ==30400==    by 0x5161F53: dbus_connection_dispatch (in /usr/lib/libdbus-1.so.3.14.11)
+> ==30400==    by 0x197150: message_dispatch (mainloop.c:72)
+> ==30400==    by 0x4E828C4: g_main_context_dispatch (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82C87: ??? (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82FA1: g_main_loop_run (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400== 
+> ==30400== Invalid read of size 4
+> ==30400==    at 0x185610: browse_cb (device.c:4579)
+> ==30400==    by 0x15F8DF: search_completed_cb (sdp-client.c:205)
+> ==30400==    by 0x195C29: sdp_process (sdp.c:4354)
+> ==30400==    by 0x15FA35: search_process_cb (sdp-client.c:230)
+> ==30400==    by 0x4E828C4: g_main_context_dispatch (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82C87: ??? (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82FA1: g_main_loop_run (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x11FE0B: main (main.c:733)
+> ==30400==  Address 0x6c91450 is 48 bytes inside a block of size 64 free'd
+> ==30400==    at 0x4C2D16B: free (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+> ==30400==    by 0x1830B8: gatt_client_ready_cb (device.c:4692)
+> ==30400==    by 0x1A57BE: notify_client_ready.part.11 (gatt-client.c:1129)
+> ==30400==    by 0x1A352F: discovery_op_complete (gatt-client.c:379)
+> ==30400==    by 0x1A4078: discover_primary_cb (gatt-client.c:1101)
+> ==30400==    by 0x1ACDC6: discovery_op_complete (gatt-helpers.c:628)
+> ==30400==    by 0x1ACFF8: read_by_grp_type_cb (gatt-helpers.c:730)
+> ==30400==    by 0x1A2DA0: handle_rsp (att.c:707)
+> ==30400==    by 0x1A2DA0: can_read_data (att.c:879)
+> ==30400==    by 0x1ABCD2: watch_callback (io-glib.c:170)
+> ==30400==    by 0x4E828C4: g_main_context_dispatch (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82C87: ??? (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82FA1: g_main_loop_run (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==  Block was alloc'd at
+> ==30400==    at 0x4C2DF55: calloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+> ==30400==    by 0x4E88080: g_malloc0 (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x17DF2D: browse_request_new.part.26 (device.c:5016)
+> ==30400==    by 0x17DFCD: browse_request_new (device.c:5013)
+> ==30400==    by 0x17DFCD: device_browse_sdp (device.c:5116)
+> ==30400==    by 0x182A31: connect_profiles (device.c:1772)
+> ==30400==    by 0x19AA5A: process_message.isra.6 (object.c:259)
+> ==30400==    by 0x51708D2: ??? (in /usr/lib/libdbus-1.so.3.14.11)
+> ==30400==    by 0x5161F53: dbus_connection_dispatch (in /usr/lib/libdbus-1.so.3.14.11)
+> ==30400==    by 0x197150: message_dispatch (mainloop.c:72)
+> ==30400==    by 0x4E828C4: g_main_context_dispatch (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82C87: ??? (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82FA1: g_main_loop_run (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400== 
+> ==30400== Invalid read of size 8
+> ==30400==    at 0x184E47: update_bredr_services (device.c:4346)
+> ==30400==    by 0x185624: browse_cb (device.c:4587)
+> ==30400==    by 0x15F8DF: search_completed_cb (sdp-client.c:205)
+> ==30400==    by 0x195C29: sdp_process (sdp.c:4354)
+> ==30400==    by 0x15FA35: search_process_cb (sdp-client.c:230)
+> ==30400==    by 0x4E828C4: g_main_context_dispatch (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82C87: ??? (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82FA1: g_main_loop_run (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x11FE0B: main (main.c:733)
+> ==30400==  Address 0x6c91428 is 8 bytes inside a block of size 64 free'd
+> ==30400==    at 0x4C2D16B: free (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+> ==30400==    by 0x1830B8: gatt_client_ready_cb (device.c:4692)
+> ==30400==    by 0x1A57BE: notify_client_ready.part.11 (gatt-client.c:1129)
+> ==30400==    by 0x1A352F: discovery_op_complete (gatt-client.c:379)
+> ==30400==    by 0x1A4078: discover_primary_cb (gatt-client.c:1101)
+> ==30400==    by 0x1ACDC6: discovery_op_complete (gatt-helpers.c:628)
+> ==30400==    by 0x1ACFF8: read_by_grp_type_cb (gatt-helpers.c:730)
+> ==30400==    by 0x1A2DA0: handle_rsp (att.c:707)
+> ==30400==    by 0x1A2DA0: can_read_data (att.c:879)
+> ==30400==    by 0x1ABCD2: watch_callback (io-glib.c:170)
+> ==30400==    by 0x4E828C4: g_main_context_dispatch (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82C87: ??? (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82FA1: g_main_loop_run (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==  Block was alloc'd at
+> ==30400==    at 0x4C2DF55: calloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+> ==30400==    by 0x4E88080: g_malloc0 (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x17DF2D: browse_request_new.part.26 (device.c:5016)
+> ==30400==    by 0x17DFCD: browse_request_new (device.c:5013)
+> ==30400==    by 0x17DFCD: device_browse_sdp (device.c:5116)
+> ==30400==    by 0x182A31: connect_profiles (device.c:1772)
+> ==30400==    by 0x19AA5A: process_message.isra.6 (object.c:259)
+> ==30400==    by 0x51708D2: ??? (in /usr/lib/libdbus-1.so.3.14.11)
+> ==30400==    by 0x5161F53: dbus_connection_dispatch (in /usr/lib/libdbus-1.so.3.14.11)
+> ==30400==    by 0x197150: message_dispatch (mainloop.c:72)
+> ==30400==    by 0x4E828C4: g_main_context_dispatch (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82C87: ??? (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82FA1: g_main_loop_run (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400== 
+> ==30400== Invalid read of size 8
+> ==30400==    at 0x184FE7: update_record (device.c:4324)
+> ==30400==    by 0x184FE7: update_bredr_services (device.c:4416)
+> ==30400==    by 0x185624: browse_cb (device.c:4587)
+> ==30400==    by 0x15F8DF: search_completed_cb (sdp-client.c:205)
+> ==30400==    by 0x195C29: sdp_process (sdp.c:4354)
+> ==30400==    by 0x15FA35: search_process_cb (sdp-client.c:230)
+> ==30400==    by 0x4E828C4: g_main_context_dispatch (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82C87: ??? (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82FA1: g_main_loop_run (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x11FE0B: main (main.c:733)
+> ==30400==  Address 0x6c91448 is 40 bytes inside a block of size 64 free'd
+> ==30400==    at 0x4C2D16B: free (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+> ==30400==    by 0x1830B8: gatt_client_ready_cb (device.c:4692)
+> ==30400==    by 0x1A57BE: notify_client_ready.part.11 (gatt-client.c:1129)
+> ==30400==    by 0x1A352F: discovery_op_complete (gatt-client.c:379)
+> ==30400==    by 0x1A4078: discover_primary_cb (gatt-client.c:1101)
+> ==30400==    by 0x1ACDC6: discovery_op_complete (gatt-helpers.c:628)
+> ==30400==    by 0x1ACFF8: read_by_grp_type_cb (gatt-helpers.c:730)
+> ==30400==    by 0x1A2DA0: handle_rsp (att.c:707)
+> ==30400==    by 0x1A2DA0: can_read_data (att.c:879)
+> ==30400==    by 0x1ABCD2: watch_callback (io-glib.c:170)
+> ==30400==    by 0x4E828C4: g_main_context_dispatch (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82C87: ??? (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82FA1: g_main_loop_run (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==  Block was alloc'd at
+> ==30400==    at 0x4C2DF55: calloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+> ==30400==    by 0x4E88080: g_malloc0 (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x17DF2D: browse_request_new.part.26 (device.c:5016)
+> ==30400==    by 0x17DFCD: browse_request_new (device.c:5013)
+> ==30400==    by 0x17DFCD: device_browse_sdp (device.c:5116)
+> ==30400==    by 0x182A31: connect_profiles (device.c:1772)
+> ==30400==    by 0x19AA5A: process_message.isra.6 (object.c:259)
+> ==30400==    by 0x51708D2: ??? (in /usr/lib/libdbus-1.so.3.14.11)
+> ==30400==    by 0x5161F53: dbus_connection_dispatch (in /usr/lib/libdbus-1.so.3.14.11)
+> ==30400==    by 0x197150: message_dispatch (mainloop.c:72)
+> ==30400==    by 0x4E828C4: g_main_context_dispatch (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82C87: ??? (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82FA1: g_main_loop_run (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400== 
+> ==30400== Invalid read of size 8
+> ==30400==    at 0x18501D: update_record (device.c:4328)
+> ==30400==    by 0x18501D: update_bredr_services (device.c:4416)
+> ==30400==    by 0x185624: browse_cb (device.c:4587)
+> ==30400==    by 0x15F8DF: search_completed_cb (sdp-client.c:205)
+> ==30400==    by 0x195C29: sdp_process (sdp.c:4354)
+> ==30400==    by 0x15FA35: search_process_cb (sdp-client.c:230)
+> ==30400==    by 0x4E828C4: g_main_context_dispatch (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82C87: ??? (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82FA1: g_main_loop_run (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x11FE0B: main (main.c:733)
+> ==30400==  Address 0x6c91448 is 40 bytes inside a block of size 64 free'd
+> ==30400==    at 0x4C2D16B: free (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+> ==30400==    by 0x1830B8: gatt_client_ready_cb (device.c:4692)
+> ==30400==    by 0x1A57BE: notify_client_ready.part.11 (gatt-client.c:1129)
+> ==30400==    by 0x1A352F: discovery_op_complete (gatt-client.c:379)
+> ==30400==    by 0x1A4078: discover_primary_cb (gatt-client.c:1101)
+> ==30400==    by 0x1ACDC6: discovery_op_complete (gatt-helpers.c:628)
+> ==30400==    by 0x1ACFF8: read_by_grp_type_cb (gatt-helpers.c:730)
+> ==30400==    by 0x1A2DA0: handle_rsp (att.c:707)
+> ==30400==    by 0x1A2DA0: can_read_data (att.c:879)
+> ==30400==    by 0x1ABCD2: watch_callback (io-glib.c:170)
+> ==30400==    by 0x4E828C4: g_main_context_dispatch (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82C87: ??? (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82FA1: g_main_loop_run (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==  Block was alloc'd at
+> ==30400==    at 0x4C2DF55: calloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+> ==30400==    by 0x4E88080: g_malloc0 (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x17DF2D: browse_request_new.part.26 (device.c:5016)
+> ==30400==    by 0x17DFCD: browse_request_new (device.c:5013)
+> ==30400==    by 0x17DFCD: device_browse_sdp (device.c:5116)
+> ==30400==    by 0x182A31: connect_profiles (device.c:1772)
+> ==30400==    by 0x19AA5A: process_message.isra.6 (object.c:259)
+> ==30400==    by 0x51708D2: ??? (in /usr/lib/libdbus-1.so.3.14.11)
+> ==30400==    by 0x5161F53: dbus_connection_dispatch (in /usr/lib/libdbus-1.so.3.14.11)
+> ==30400==    by 0x197150: message_dispatch (mainloop.c:72)
+> ==30400==    by 0x4E828C4: g_main_context_dispatch (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82C87: ??? (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82FA1: g_main_loop_run (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400== 
+> ==30400== Invalid write of size 8
+> ==30400==    at 0x18502A: update_record (device.c:4328)
+> ==30400==    by 0x18502A: update_bredr_services (device.c:4416)
+> ==30400==    by 0x185624: browse_cb (device.c:4587)
+> ==30400==    by 0x15F8DF: search_completed_cb (sdp-client.c:205)
+> ==30400==    by 0x195C29: sdp_process (sdp.c:4354)
+> ==30400==    by 0x15FA35: search_process_cb (sdp-client.c:230)
+> ==30400==    by 0x4E828C4: g_main_context_dispatch (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82C87: ??? (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82FA1: g_main_loop_run (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x11FE0B: main (main.c:733)
+> ==30400==  Address 0x6c91448 is 40 bytes inside a block of size 64 free'd
+> ==30400==    at 0x4C2D16B: free (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+> ==30400==    by 0x1830B8: gatt_client_ready_cb (device.c:4692)
+> ==30400==    by 0x1A57BE: notify_client_ready.part.11 (gatt-client.c:1129)
+> ==30400==    by 0x1A352F: discovery_op_complete (gatt-client.c:379)
+> ==30400==    by 0x1A4078: discover_primary_cb (gatt-client.c:1101)
+> ==30400==    by 0x1ACDC6: discovery_op_complete (gatt-helpers.c:628)
+> ==30400==    by 0x1ACFF8: read_by_grp_type_cb (gatt-helpers.c:730)
+> ==30400==    by 0x1A2DA0: handle_rsp (att.c:707)
+> ==30400==    by 0x1A2DA0: can_read_data (att.c:879)
+> ==30400==    by 0x1ABCD2: watch_callback (io-glib.c:170)
+> ==30400==    by 0x4E828C4: g_main_context_dispatch (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82C87: ??? (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82FA1: g_main_loop_run (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==  Block was alloc'd at
+> ==30400==    at 0x4C2DF55: calloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+> ==30400==    by 0x4E88080: g_malloc0 (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x17DF2D: browse_request_new.part.26 (device.c:5016)
+> ==30400==    by 0x17DFCD: browse_request_new (device.c:5013)
+> ==30400==    by 0x17DFCD: device_browse_sdp (device.c:5116)
+> ==30400==    by 0x182A31: connect_profiles (device.c:1772)
+> ==30400==    by 0x19AA5A: process_message.isra.6 (object.c:259)
+> ==30400==    by 0x51708D2: ??? (in /usr/lib/libdbus-1.so.3.14.11)
+> ==30400==    by 0x5161F53: dbus_connection_dispatch (in /usr/lib/libdbus-1.so.3.14.11)
+> ==30400==    by 0x197150: message_dispatch (mainloop.c:72)
+> ==30400==    by 0x4E828C4: g_main_context_dispatch (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82C87: ??? (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82FA1: g_main_loop_run (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400== 
+> ==30400== Invalid read of size 8
+> ==30400==    at 0x18502E: update_record (device.c:4331)
+> ==30400==    by 0x18502E: update_bredr_services (device.c:4416)
+> ==30400==    by 0x185624: browse_cb (device.c:4587)
+> ==30400==    by 0x15F8DF: search_completed_cb (sdp-client.c:205)
+> ==30400==    by 0x195C29: sdp_process (sdp.c:4354)
+> ==30400==    by 0x15FA35: search_process_cb (sdp-client.c:230)
+> ==30400==    by 0x4E828C4: g_main_context_dispatch (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82C87: ??? (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82FA1: g_main_loop_run (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x11FE0B: main (main.c:733)
+> ==30400==  Address 0x6c91428 is 8 bytes inside a block of size 64 free'd
+> ==30400==    at 0x4C2D16B: free (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+> ==30400==    by 0x1830B8: gatt_client_ready_cb (device.c:4692)
+> ==30400==    by 0x1A57BE: notify_client_ready.part.11 (gatt-client.c:1129)
+> ==30400==    by 0x1A352F: discovery_op_complete (gatt-client.c:379)
+> ==30400==    by 0x1A4078: discover_primary_cb (gatt-client.c:1101)
+> ==30400==    by 0x1ACDC6: discovery_op_complete (gatt-helpers.c:628)
+> ==30400==    by 0x1ACFF8: read_by_grp_type_cb (gatt-helpers.c:730)
+> ==30400==    by 0x1A2DA0: handle_rsp (att.c:707)
+> ==30400==    by 0x1A2DA0: can_read_data (att.c:879)
+> ==30400==    by 0x1ABCD2: watch_callback (io-glib.c:170)
+> ==30400==    by 0x4E828C4: g_main_context_dispatch (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82C87: ??? (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82FA1: g_main_loop_run (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==  Block was alloc'd at
+> ==30400==    at 0x4C2DF55: calloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+> ==30400==    by 0x4E88080: g_malloc0 (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x17DF2D: browse_request_new.part.26 (device.c:5016)
+> ==30400==    by 0x17DFCD: browse_request_new (device.c:5013)
+> ==30400==    by 0x17DFCD: device_browse_sdp (device.c:5116)
+> ==30400==    by 0x182A31: connect_profiles (device.c:1772)
+> ==30400==    by 0x19AA5A: process_message.isra.6 (object.c:259)
+> ==30400==    by 0x51708D2: ??? (in /usr/lib/libdbus-1.so.3.14.11)
+> ==30400==    by 0x5161F53: dbus_connection_dispatch (in /usr/lib/libdbus-1.so.3.14.11)
+> ==30400==    by 0x197150: message_dispatch (mainloop.c:72)
+> ==30400==    by 0x4E828C4: g_main_context_dispatch (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82C87: ??? (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82FA1: g_main_loop_run (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400== 
+> ==30400== Invalid read of size 8
+> ==30400==    at 0x1853A0: update_record (device.c:4333)
+> ==30400==    by 0x1853A0: update_bredr_services (device.c:4416)
+> ==30400==    by 0x185624: browse_cb (device.c:4587)
+> ==30400==    by 0x15F8DF: search_completed_cb (sdp-client.c:205)
+> ==30400==    by 0x195C29: sdp_process (sdp.c:4354)
+> ==30400==    by 0x15FA35: search_process_cb (sdp-client.c:230)
+> ==30400==    by 0x4E828C4: g_main_context_dispatch (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82C87: ??? (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82FA1: g_main_loop_run (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x11FE0B: main (main.c:733)
+> ==30400==  Address 0x6c91440 is 32 bytes inside a block of size 64 free'd
+> ==30400==    at 0x4C2D16B: free (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+> ==30400==    by 0x1830B8: gatt_client_ready_cb (device.c:4692)
+> ==30400==    by 0x1A57BE: notify_client_ready.part.11 (gatt-client.c:1129)
+> ==30400==    by 0x1A352F: discovery_op_complete (gatt-client.c:379)
+> ==30400==    by 0x1A4078: discover_primary_cb (gatt-client.c:1101)
+> ==30400==    by 0x1ACDC6: discovery_op_complete (gatt-helpers.c:628)
+> ==30400==    by 0x1ACFF8: read_by_grp_type_cb (gatt-helpers.c:730)
+> ==30400==    by 0x1A2DA0: handle_rsp (att.c:707)
+> ==30400==    by 0x1A2DA0: can_read_data (att.c:879)
+> ==30400==    by 0x1ABCD2: watch_callback (io-glib.c:170)
+> ==30400==    by 0x4E828C4: g_main_context_dispatch (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82C87: ??? (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82FA1: g_main_loop_run (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==  Block was alloc'd at
+> ==30400==    at 0x4C2DF55: calloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+> ==30400==    by 0x4E88080: g_malloc0 (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x17DF2D: browse_request_new.part.26 (device.c:5016)
+> ==30400==    by 0x17DFCD: browse_request_new (device.c:5013)
+> ==30400==    by 0x17DFCD: device_browse_sdp (device.c:5116)
+> ==30400==    by 0x182A31: connect_profiles (device.c:1772)
+> ==30400==    by 0x19AA5A: process_message.isra.6 (object.c:259)
+> ==30400==    by 0x51708D2: ??? (in /usr/lib/libdbus-1.so.3.14.11)
+> ==30400==    by 0x5161F53: dbus_connection_dispatch (in /usr/lib/libdbus-1.so.3.14.11)
+> ==30400==    by 0x197150: message_dispatch (mainloop.c:72)
+> ==30400==    by 0x4E828C4: g_main_context_dispatch (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82C87: ??? (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82FA1: g_main_loop_run (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400== 
+> ==30400== Invalid read of size 8
+> ==30400==    at 0x1853C6: update_record (device.c:4337)
+> ==30400==    by 0x1853C6: update_bredr_services (device.c:4416)
+> ==30400==    by 0x185624: browse_cb (device.c:4587)
+> ==30400==    by 0x15F8DF: search_completed_cb (sdp-client.c:205)
+> ==30400==    by 0x195C29: sdp_process (sdp.c:4354)
+> ==30400==    by 0x15FA35: search_process_cb (sdp-client.c:230)
+> ==30400==    by 0x4E828C4: g_main_context_dispatch (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82C87: ??? (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82FA1: g_main_loop_run (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x11FE0B: main (main.c:733)
+> ==30400==  Address 0x6c91440 is 32 bytes inside a block of size 64 free'd
+> ==30400==    at 0x4C2D16B: free (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+> ==30400==    by 0x1830B8: gatt_client_ready_cb (device.c:4692)
+> ==30400==    by 0x1A57BE: notify_client_ready.part.11 (gatt-client.c:1129)
+> ==30400==    by 0x1A352F: discovery_op_complete (gatt-client.c:379)
+> ==30400==    by 0x1A4078: discover_primary_cb (gatt-client.c:1101)
+> ==30400==    by 0x1ACDC6: discovery_op_complete (gatt-helpers.c:628)
+> ==30400==    by 0x1ACFF8: read_by_grp_type_cb (gatt-helpers.c:730)
+> ==30400==    by 0x1A2DA0: handle_rsp (att.c:707)
+> ==30400==    by 0x1A2DA0: can_read_data (att.c:879)
+> ==30400==    by 0x1ABCD2: watch_callback (io-glib.c:170)
+> ==30400==    by 0x4E828C4: g_main_context_dispatch (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82C87: ??? (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82FA1: g_main_loop_run (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==  Block was alloc'd at
+> ==30400==    at 0x4C2DF55: calloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+> ==30400==    by 0x4E88080: g_malloc0 (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x17DF2D: browse_request_new.part.26 (device.c:5016)
+> ==30400==    by 0x17DFCD: browse_request_new (device.c:5013)
+> ==30400==    by 0x17DFCD: device_browse_sdp (device.c:5116)
+> ==30400==    by 0x182A31: connect_profiles (device.c:1772)
+> ==30400==    by 0x19AA5A: process_message.isra.6 (object.c:259)
+> ==30400==    by 0x51708D2: ??? (in /usr/lib/libdbus-1.so.3.14.11)
+> ==30400==    by 0x5161F53: dbus_connection_dispatch (in /usr/lib/libdbus-1.so.3.14.11)
+> ==30400==    by 0x197150: message_dispatch (mainloop.c:72)
+> ==30400==    by 0x4E828C4: g_main_context_dispatch (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82C87: ??? (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82FA1: g_main_loop_run (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400== 
+> ==30400== Invalid write of size 8
+> ==30400==    at 0x1853D3: update_record (device.c:4337)
+> ==30400==    by 0x1853D3: update_bredr_services (device.c:4416)
+> ==30400==    by 0x185624: browse_cb (device.c:4587)
+> ==30400==    by 0x15F8DF: search_completed_cb (sdp-client.c:205)
+> ==30400==    by 0x195C29: sdp_process (sdp.c:4354)
+> ==30400==    by 0x15FA35: search_process_cb (sdp-client.c:230)
+> ==30400==    by 0x4E828C4: g_main_context_dispatch (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82C87: ??? (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82FA1: g_main_loop_run (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x11FE0B: main (main.c:733)
+> ==30400==  Address 0x6c91440 is 32 bytes inside a block of size 64 free'd
+> ==30400==    at 0x4C2D16B: free (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+> ==30400==    by 0x1830B8: gatt_client_ready_cb (device.c:4692)
+> ==30400==    by 0x1A57BE: notify_client_ready.part.11 (gatt-client.c:1129)
+> ==30400==    by 0x1A352F: discovery_op_complete (gatt-client.c:379)
+> ==30400==    by 0x1A4078: discover_primary_cb (gatt-client.c:1101)
+> ==30400==    by 0x1ACDC6: discovery_op_complete (gatt-helpers.c:628)
+> ==30400==    by 0x1ACFF8: read_by_grp_type_cb (gatt-helpers.c:730)
+> ==30400==    by 0x1A2DA0: handle_rsp (att.c:707)
+> ==30400==    by 0x1A2DA0: can_read_data (att.c:879)
+> ==30400==    by 0x1ABCD2: watch_callback (io-glib.c:170)
+> ==30400==    by 0x4E828C4: g_main_context_dispatch (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82C87: ??? (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82FA1: g_main_loop_run (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==  Block was alloc'd at
+> ==30400==    at 0x4C2DF55: calloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+> ==30400==    by 0x4E88080: g_malloc0 (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x17DF2D: browse_request_new.part.26 (device.c:5016)
+> ==30400==    by 0x17DFCD: browse_request_new (device.c:5013)
+> ==30400==    by 0x17DFCD: device_browse_sdp (device.c:5116)
+> ==30400==    by 0x182A31: connect_profiles (device.c:1772)
+> ==30400==    by 0x19AA5A: process_message.isra.6 (object.c:259)
+> ==30400==    by 0x51708D2: ??? (in /usr/lib/libdbus-1.so.3.14.11)
+> ==30400==    by 0x5161F53: dbus_connection_dispatch (in /usr/lib/libdbus-1.so.3.14.11)
+> ==30400==    by 0x197150: message_dispatch (mainloop.c:72)
+> ==30400==    by 0x4E828C4: g_main_context_dispatch (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82C87: ??? (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82FA1: g_main_loop_run (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400== 
+> ==30400== Invalid read of size 4
+> ==30400==    at 0x185625: browse_cb (device.c:4590)
+> ==30400==    by 0x15F8DF: search_completed_cb (sdp-client.c:205)
+> ==30400==    by 0x195C29: sdp_process (sdp.c:4354)
+> ==30400==    by 0x15FA35: search_process_cb (sdp-client.c:230)
+> ==30400==    by 0x4E828C4: g_main_context_dispatch (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82C87: ??? (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82FA1: g_main_loop_run (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x11FE0B: main (main.c:733)
+> ==30400==  Address 0x6c91450 is 48 bytes inside a block of size 64 free'd
+> ==30400==    at 0x4C2D16B: free (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+> ==30400==    by 0x1830B8: gatt_client_ready_cb (device.c:4692)
+> ==30400==    by 0x1A57BE: notify_client_ready.part.11 (gatt-client.c:1129)
+> ==30400==    by 0x1A352F: discovery_op_complete (gatt-client.c:379)
+> ==30400==    by 0x1A4078: discover_primary_cb (gatt-client.c:1101)
+> ==30400==    by 0x1ACDC6: discovery_op_complete (gatt-helpers.c:628)
+> ==30400==    by 0x1ACFF8: read_by_grp_type_cb (gatt-helpers.c:730)
+> ==30400==    by 0x1A2DA0: handle_rsp (att.c:707)
+> ==30400==    by 0x1A2DA0: can_read_data (att.c:879)
+> ==30400==    by 0x1ABCD2: watch_callback (io-glib.c:170)
+> ==30400==    by 0x4E828C4: g_main_context_dispatch (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82C87: ??? (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82FA1: g_main_loop_run (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==  Block was alloc'd at
+> ==30400==    at 0x4C2DF55: calloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+> ==30400==    by 0x4E88080: g_malloc0 (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x17DF2D: browse_request_new.part.26 (device.c:5016)
+> ==30400==    by 0x17DFCD: browse_request_new (device.c:5013)
+> ==30400==    by 0x17DFCD: device_browse_sdp (device.c:5116)
+> ==30400==    by 0x182A31: connect_profiles (device.c:1772)
+> ==30400==    by 0x19AA5A: process_message.isra.6 (object.c:259)
+> ==30400==    by 0x51708D2: ??? (in /usr/lib/libdbus-1.so.3.14.11)
+> ==30400==    by 0x5161F53: dbus_connection_dispatch (in /usr/lib/libdbus-1.so.3.14.11)
+> ==30400==    by 0x197150: message_dispatch (mainloop.c:72)
+> ==30400==    by 0x4E828C4: g_main_context_dispatch (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82C87: ??? (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82FA1: g_main_loop_run (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400== 
+> ==30400== Invalid write of size 4
+> ==30400==    at 0x185918: browse_cb (device.c:4591)
+> ==30400==    by 0x15F8DF: search_completed_cb (sdp-client.c:205)
+> ==30400==    by 0x195C29: sdp_process (sdp.c:4354)
+> ==30400==    by 0x15FA35: search_process_cb (sdp-client.c:230)
+> ==30400==    by 0x4E828C4: g_main_context_dispatch (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82C87: ??? (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82FA1: g_main_loop_run (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x11FE0B: main (main.c:733)
+> ==30400==  Address 0x6c91450 is 48 bytes inside a block of size 64 free'd
+> ==30400==    at 0x4C2D16B: free (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+> ==30400==    by 0x1830B8: gatt_client_ready_cb (device.c:4692)
+> ==30400==    by 0x1A57BE: notify_client_ready.part.11 (gatt-client.c:1129)
+> ==30400==    by 0x1A352F: discovery_op_complete (gatt-client.c:379)
+> ==30400==    by 0x1A4078: discover_primary_cb (gatt-client.c:1101)
+> ==30400==    by 0x1ACDC6: discovery_op_complete (gatt-helpers.c:628)
+> ==30400==    by 0x1ACFF8: read_by_grp_type_cb (gatt-helpers.c:730)
+> ==30400==    by 0x1A2DA0: handle_rsp (att.c:707)
+> ==30400==    by 0x1A2DA0: can_read_data (att.c:879)
+> ==30400==    by 0x1ABCD2: watch_callback (io-glib.c:170)
+> ==30400==    by 0x4E828C4: g_main_context_dispatch (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82C87: ??? (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82FA1: g_main_loop_run (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==  Block was alloc'd at
+> ==30400==    at 0x4C2DF55: calloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+> ==30400==    by 0x4E88080: g_malloc0 (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x17DF2D: browse_request_new.part.26 (device.c:5016)
+> ==30400==    by 0x17DFCD: browse_request_new (device.c:5013)
+> ==30400==    by 0x17DFCD: device_browse_sdp (device.c:5116)
+> ==30400==    by 0x182A31: connect_profiles (device.c:1772)
+> ==30400==    by 0x19AA5A: process_message.isra.6 (object.c:259)
+> ==30400==    by 0x51708D2: ??? (in /usr/lib/libdbus-1.so.3.14.11)
+> ==30400==    by 0x5161F53: dbus_connection_dispatch (in /usr/lib/libdbus-1.so.3.14.11)
+> ==30400==    by 0x197150: message_dispatch (mainloop.c:72)
+> ==30400==    by 0x4E828C4: g_main_context_dispatch (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82C87: ??? (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82FA1: g_main_loop_run (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400== 
+> ==30400== Invalid read of size 2
+> ==30400==    at 0x185924: browse_cb (device.c:4592)
+> ==30400==    by 0x15F8DF: search_completed_cb (sdp-client.c:205)
+> ==30400==    by 0x195C29: sdp_process (sdp.c:4354)
+> ==30400==    by 0x15FA35: search_process_cb (sdp-client.c:230)
+> ==30400==    by 0x4E828C4: g_main_context_dispatch (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82C87: ??? (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82FA1: g_main_loop_run (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x11FE0B: main (main.c:733)
+> ==30400==  Address 0x6c9145c is 60 bytes inside a block of size 64 free'd
+> ==30400==    at 0x4C2D16B: free (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+> ==30400==    by 0x1830B8: gatt_client_ready_cb (device.c:4692)
+> ==30400==    by 0x1A57BE: notify_client_ready.part.11 (gatt-client.c:1129)
+> ==30400==    by 0x1A352F: discovery_op_complete (gatt-client.c:379)
+> ==30400==    by 0x1A4078: discover_primary_cb (gatt-client.c:1101)
+> ==30400==    by 0x1ACDC6: discovery_op_complete (gatt-helpers.c:628)
+> ==30400==    by 0x1ACFF8: read_by_grp_type_cb (gatt-helpers.c:730)
+> ==30400==    by 0x1A2DA0: handle_rsp (att.c:707)
+> ==30400==    by 0x1A2DA0: can_read_data (att.c:879)
+> ==30400==    by 0x1ABCD2: watch_callback (io-glib.c:170)
+> ==30400==    by 0x4E828C4: g_main_context_dispatch (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82C87: ??? (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82FA1: g_main_loop_run (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==  Block was alloc'd at
+> ==30400==    at 0x4C2DF55: calloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+> ==30400==    by 0x4E88080: g_malloc0 (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x17DF2D: browse_request_new.part.26 (device.c:5016)
+> ==30400==    by 0x17DFCD: browse_request_new (device.c:5013)
+> ==30400==    by 0x17DFCD: device_browse_sdp (device.c:5116)
+> ==30400==    by 0x182A31: connect_profiles (device.c:1772)
+> ==30400==    by 0x19AA5A: process_message.isra.6 (object.c:259)
+> ==30400==    by 0x51708D2: ??? (in /usr/lib/libdbus-1.so.3.14.11)
+> ==30400==    by 0x5161F53: dbus_connection_dispatch (in /usr/lib/libdbus-1.so.3.14.11)
+> ==30400==    by 0x197150: message_dispatch (mainloop.c:72)
+> ==30400==    by 0x4E828C4: g_main_context_dispatch (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82C87: ??? (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82FA1: g_main_loop_run (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400== 
+> ==30400== Invalid read of size 8
+> ==30400==    at 0x185840: browse_cb (device.c:4579)
+> ==30400==    by 0x15F8DF: search_completed_cb (sdp-client.c:205)
+> ==30400==    by 0x195C29: sdp_process (sdp.c:4354)
+> ==30400==    by 0x15FA35: search_process_cb (sdp-client.c:230)
+> ==30400==    by 0x4E828C4: g_main_context_dispatch (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82C87: ??? (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82FA1: g_main_loop_run (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x11FE0B: main (main.c:733)
+> ==30400==  Address 0x6c91448 is 40 bytes inside a block of size 64 free'd
+> ==30400==    at 0x4C2D16B: free (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+> ==30400==    by 0x1830B8: gatt_client_ready_cb (device.c:4692)
+> ==30400==    by 0x1A57BE: notify_client_ready.part.11 (gatt-client.c:1129)
+> ==30400==    by 0x1A352F: discovery_op_complete (gatt-client.c:379)
+> ==30400==    by 0x1A4078: discover_primary_cb (gatt-client.c:1101)
+> ==30400==    by 0x1ACDC6: discovery_op_complete (gatt-helpers.c:628)
+> ==30400==    by 0x1ACFF8: read_by_grp_type_cb (gatt-helpers.c:730)
+> ==30400==    by 0x1A2DA0: handle_rsp (att.c:707)
+> ==30400==    by 0x1A2DA0: can_read_data (att.c:879)
+> ==30400==    by 0x1ABCD2: watch_callback (io-glib.c:170)
+> ==30400==    by 0x4E828C4: g_main_context_dispatch (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82C87: ??? (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82FA1: g_main_loop_run (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==  Block was alloc'd at
+> ==30400==    at 0x4C2DF55: calloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+> ==30400==    by 0x4E88080: g_malloc0 (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x17DF2D: browse_request_new.part.26 (device.c:5016)
+> ==30400==    by 0x17DFCD: browse_request_new (device.c:5013)
+> ==30400==    by 0x17DFCD: device_browse_sdp (device.c:5116)
+> ==30400==    by 0x182A31: connect_profiles (device.c:1772)
+> ==30400==    by 0x19AA5A: process_message.isra.6 (object.c:259)
+> ==30400==    by 0x51708D2: ??? (in /usr/lib/libdbus-1.so.3.14.11)
+> ==30400==    by 0x5161F53: dbus_connection_dispatch (in /usr/lib/libdbus-1.so.3.14.11)
+> ==30400==    by 0x197150: message_dispatch (mainloop.c:72)
+> ==30400==    by 0x4E828C4: g_main_context_dispatch (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82C87: ??? (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82FA1: g_main_loop_run (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400== 
+> ==30400== Invalid read of size 8
+> ==30400==    at 0x184E47: update_bredr_services (device.c:4346)
+> ==30400==    by 0x18566C: search_cb (device.c:4535)
+> ==30400==    by 0x18566C: browse_cb (device.c:4600)
+> ==30400==    by 0x15F8DF: search_completed_cb (sdp-client.c:205)
+> ==30400==    by 0x195C29: sdp_process (sdp.c:4354)
+> ==30400==    by 0x15FA35: search_process_cb (sdp-client.c:230)
+> ==30400==    by 0x4E828C4: g_main_context_dispatch (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82C87: ??? (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82FA1: g_main_loop_run (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x11FE0B: main (main.c:733)
+> ==30400==  Address 0x6c91428 is 8 bytes inside a block of size 64 free'd
+> ==30400==    at 0x4C2D16B: free (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+> ==30400==    by 0x1830B8: gatt_client_ready_cb (device.c:4692)
+> ==30400==    by 0x1A57BE: notify_client_ready.part.11 (gatt-client.c:1129)
+> ==30400==    by 0x1A352F: discovery_op_complete (gatt-client.c:379)
+> ==30400==    by 0x1A4078: discover_primary_cb (gatt-client.c:1101)
+> ==30400==    by 0x1ACDC6: discovery_op_complete (gatt-helpers.c:628)
+> ==30400==    by 0x1ACFF8: read_by_grp_type_cb (gatt-helpers.c:730)
+> ==30400==    by 0x1A2DA0: handle_rsp (att.c:707)
+> ==30400==    by 0x1A2DA0: can_read_data (att.c:879)
+> ==30400==    by 0x1ABCD2: watch_callback (io-glib.c:170)
+> ==30400==    by 0x4E828C4: g_main_context_dispatch (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82C87: ??? (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82FA1: g_main_loop_run (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==  Block was alloc'd at
+> ==30400==    at 0x4C2DF55: calloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+> ==30400==    by 0x4E88080: g_malloc0 (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x17DF2D: browse_request_new.part.26 (device.c:5016)
+> ==30400==    by 0x17DFCD: browse_request_new (device.c:5013)
+> ==30400==    by 0x17DFCD: device_browse_sdp (device.c:5116)
+> ==30400==    by 0x182A31: connect_profiles (device.c:1772)
+> ==30400==    by 0x19AA5A: process_message.isra.6 (object.c:259)
+> ==30400==    by 0x51708D2: ??? (in /usr/lib/libdbus-1.so.3.14.11)
+> ==30400==    by 0x5161F53: dbus_connection_dispatch (in /usr/lib/libdbus-1.so.3.14.11)
+> ==30400==    by 0x197150: message_dispatch (mainloop.c:72)
+> ==30400==    by 0x4E828C4: g_main_context_dispatch (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82C87: ??? (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82FA1: g_main_loop_run (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400== 
+> ==30400== Invalid read of size 8
+> ==30400==    at 0x185686: search_cb (device.c:4544)
+> ==30400==    by 0x185686: browse_cb (device.c:4600)
+> ==30400==    by 0x15F8DF: search_completed_cb (sdp-client.c:205)
+> ==30400==    by 0x195C29: sdp_process (sdp.c:4354)
+> ==30400==    by 0x15FA35: search_process_cb (sdp-client.c:230)
+> ==30400==    by 0x4E828C4: g_main_context_dispatch (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82C87: ??? (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82FA1: g_main_loop_run (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x11FE0B: main (main.c:733)
+> ==30400==  Address 0x6c91440 is 32 bytes inside a block of size 64 free'd
+> ==30400==    at 0x4C2D16B: free (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+> ==30400==    by 0x1830B8: gatt_client_ready_cb (device.c:4692)
+> ==30400==    by 0x1A57BE: notify_client_ready.part.11 (gatt-client.c:1129)
+> ==30400==    by 0x1A352F: discovery_op_complete (gatt-client.c:379)
+> ==30400==    by 0x1A4078: discover_primary_cb (gatt-client.c:1101)
+> ==30400==    by 0x1ACDC6: discovery_op_complete (gatt-helpers.c:628)
+> ==30400==    by 0x1ACFF8: read_by_grp_type_cb (gatt-helpers.c:730)
+> ==30400==    by 0x1A2DA0: handle_rsp (att.c:707)
+> ==30400==    by 0x1A2DA0: can_read_data (att.c:879)
+> ==30400==    by 0x1ABCD2: watch_callback (io-glib.c:170)
+> ==30400==    by 0x4E828C4: g_main_context_dispatch (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82C87: ??? (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82FA1: g_main_loop_run (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==  Block was alloc'd at
+> ==30400==    at 0x4C2DF55: calloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+> ==30400==    by 0x4E88080: g_malloc0 (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x17DF2D: browse_request_new.part.26 (device.c:5016)
+> ==30400==    by 0x17DFCD: browse_request_new (device.c:5013)
+> ==30400==    by 0x17DFCD: device_browse_sdp (device.c:5116)
+> ==30400==    by 0x182A31: connect_profiles (device.c:1772)
+> ==30400==    by 0x19AA5A: process_message.isra.6 (object.c:259)
+> ==30400==    by 0x51708D2: ??? (in /usr/lib/libdbus-1.so.3.14.11)
+> ==30400==    by 0x5161F53: dbus_connection_dispatch (in /usr/lib/libdbus-1.so.3.14.11)
+> ==30400==    by 0x197150: message_dispatch (mainloop.c:72)
+> ==30400==    by 0x4E828C4: g_main_context_dispatch (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82C87: ??? (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82FA1: g_main_loop_run (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400== 
+> ==30400== Invalid read of size 8
+> ==30400==    at 0x18568A: search_cb (device.c:4541)
+> ==30400==    by 0x18568A: browse_cb (device.c:4600)
+> ==30400==    by 0x15F8DF: search_completed_cb (sdp-client.c:205)
+> ==30400==    by 0x195C29: sdp_process (sdp.c:4354)
+> ==30400==    by 0x15FA35: search_process_cb (sdp-client.c:230)
+> ==30400==    by 0x4E828C4: g_main_context_dispatch (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82C87: ??? (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82FA1: g_main_loop_run (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x11FE0B: main (main.c:733)
+> ==30400==  Address 0x6c91448 is 40 bytes inside a block of size 64 free'd
+> ==30400==    at 0x4C2D16B: free (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+> ==30400==    by 0x1830B8: gatt_client_ready_cb (device.c:4692)
+> ==30400==    by 0x1A57BE: notify_client_ready.part.11 (gatt-client.c:1129)
+> ==30400==    by 0x1A352F: discovery_op_complete (gatt-client.c:379)
+> ==30400==    by 0x1A4078: discover_primary_cb (gatt-client.c:1101)
+> ==30400==    by 0x1ACDC6: discovery_op_complete (gatt-helpers.c:628)
+> ==30400==    by 0x1ACFF8: read_by_grp_type_cb (gatt-helpers.c:730)
+> ==30400==    by 0x1A2DA0: handle_rsp (att.c:707)
+> ==30400==    by 0x1A2DA0: can_read_data (att.c:879)
+> ==30400==    by 0x1ABCD2: watch_callback (io-glib.c:170)
+> ==30400==    by 0x4E828C4: g_main_context_dispatch (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82C87: ??? (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82FA1: g_main_loop_run (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==  Block was alloc'd at
+> ==30400==    at 0x4C2DF55: calloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+> ==30400==    by 0x4E88080: g_malloc0 (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x17DF2D: browse_request_new.part.26 (device.c:5016)
+> ==30400==    by 0x17DFCD: browse_request_new (device.c:5013)
+> ==30400==    by 0x17DFCD: device_browse_sdp (device.c:5116)
+> ==30400==    by 0x182A31: connect_profiles (device.c:1772)
+> ==30400==    by 0x19AA5A: process_message.isra.6 (object.c:259)
+> ==30400==    by 0x51708D2: ??? (in /usr/lib/libdbus-1.so.3.14.11)
+> ==30400==    by 0x5161F53: dbus_connection_dispatch (in /usr/lib/libdbus-1.so.3.14.11)
+> ==30400==    by 0x197150: message_dispatch (mainloop.c:72)
+> ==30400==    by 0x4E828C4: g_main_context_dispatch (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82C87: ??? (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82FA1: g_main_loop_run (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400== 
+> ==30400== Invalid write of size 8
+> ==30400==    at 0x185698: search_cb (device.c:4542)
+> ==30400==    by 0x185698: browse_cb (device.c:4600)
+> ==30400==    by 0x15F8DF: search_completed_cb (sdp-client.c:205)
+> ==30400==    by 0x195C29: sdp_process (sdp.c:4354)
+> ==30400==    by 0x15FA35: search_process_cb (sdp-client.c:230)
+> ==30400==    by 0x4E828C4: g_main_context_dispatch (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82C87: ??? (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82FA1: g_main_loop_run (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x11FE0B: main (main.c:733)
+> ==30400==  Address 0x6c91448 is 40 bytes inside a block of size 64 free'd
+> ==30400==    at 0x4C2D16B: free (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+> ==30400==    by 0x1830B8: gatt_client_ready_cb (device.c:4692)
+> ==30400==    by 0x1A57BE: notify_client_ready.part.11 (gatt-client.c:1129)
+> ==30400==    by 0x1A352F: discovery_op_complete (gatt-client.c:379)
+> ==30400==    by 0x1A4078: discover_primary_cb (gatt-client.c:1101)
+> ==30400==    by 0x1ACDC6: discovery_op_complete (gatt-helpers.c:628)
+> ==30400==    by 0x1ACFF8: read_by_grp_type_cb (gatt-helpers.c:730)
+> ==30400==    by 0x1A2DA0: handle_rsp (att.c:707)
+> ==30400==    by 0x1A2DA0: can_read_data (att.c:879)
+> ==30400==    by 0x1ABCD2: watch_callback (io-glib.c:170)
+> ==30400==    by 0x4E828C4: g_main_context_dispatch (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82C87: ??? (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82FA1: g_main_loop_run (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==  Block was alloc'd at
+> ==30400==    at 0x4C2DF55: calloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+> ==30400==    by 0x4E88080: g_malloc0 (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x17DF2D: browse_request_new.part.26 (device.c:5016)
+> ==30400==    by 0x17DFCD: browse_request_new (device.c:5013)
+> ==30400==    by 0x17DFCD: device_browse_sdp (device.c:5116)
+> ==30400==    by 0x182A31: connect_profiles (device.c:1772)
+> ==30400==    by 0x19AA5A: process_message.isra.6 (object.c:259)
+> ==30400==    by 0x51708D2: ??? (in /usr/lib/libdbus-1.so.3.14.11)
+> ==30400==    by 0x5161F53: dbus_connection_dispatch (in /usr/lib/libdbus-1.so.3.14.11)
+> ==30400==    by 0x197150: message_dispatch (mainloop.c:72)
+> ==30400==    by 0x4E828C4: g_main_context_dispatch (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82C87: ??? (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82FA1: g_main_loop_run (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400== 
+> ==30400== Invalid read of size 8
+> ==30400==    at 0x1857D4: search_cb (device.c:4560)
+> ==30400==    by 0x1857D4: browse_cb (device.c:4600)
+> ==30400==    by 0x15F8DF: search_completed_cb (sdp-client.c:205)
+> ==30400==    by 0x195C29: sdp_process (sdp.c:4354)
+> ==30400==    by 0x15FA35: search_process_cb (sdp-client.c:230)
+> ==30400==    by 0x4E828C4: g_main_context_dispatch (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82C87: ??? (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82FA1: g_main_loop_run (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x11FE0B: main (main.c:733)
+> ==30400==  Address 0x6c91440 is 32 bytes inside a block of size 64 free'd
+> ==30400==    at 0x4C2D16B: free (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+> ==30400==    by 0x1830B8: gatt_client_ready_cb (device.c:4692)
+> ==30400==    by 0x1A57BE: notify_client_ready.part.11 (gatt-client.c:1129)
+> ==30400==    by 0x1A352F: discovery_op_complete (gatt-client.c:379)
+> ==30400==    by 0x1A4078: discover_primary_cb (gatt-client.c:1101)
+> ==30400==    by 0x1ACDC6: discovery_op_complete (gatt-helpers.c:628)
+> ==30400==    by 0x1ACFF8: read_by_grp_type_cb (gatt-helpers.c:730)
+> ==30400==    by 0x1A2DA0: handle_rsp (att.c:707)
+> ==30400==    by 0x1A2DA0: can_read_data (att.c:879)
+> ==30400==    by 0x1ABCD2: watch_callback (io-glib.c:170)
+> ==30400==    by 0x4E828C4: g_main_context_dispatch (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82C87: ??? (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82FA1: g_main_loop_run (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==  Block was alloc'd at
+> ==30400==    at 0x4C2DF55: calloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+> ==30400==    by 0x4E88080: g_malloc0 (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x17DF2D: browse_request_new.part.26 (device.c:5016)
+> ==30400==    by 0x17DFCD: browse_request_new (device.c:5013)
+> ==30400==    by 0x17DFCD: device_browse_sdp (device.c:5116)
+> ==30400==    by 0x182A31: connect_profiles (device.c:1772)
+> ==30400==    by 0x19AA5A: process_message.isra.6 (object.c:259)
+> ==30400==    by 0x51708D2: ??? (in /usr/lib/libdbus-1.so.3.14.11)
+> ==30400==    by 0x5161F53: dbus_connection_dispatch (in /usr/lib/libdbus-1.so.3.14.11)
+> ==30400==    by 0x197150: message_dispatch (mainloop.c:72)
+> ==30400==    by 0x4E828C4: g_main_context_dispatch (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82C87: ??? (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82FA1: g_main_loop_run (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400== 
+> ==30400== Invalid read of size 8
+> ==30400==    at 0x1857E0: search_cb (device.c:4563)
+> ==30400==    by 0x1857E0: browse_cb (device.c:4600)
+> ==30400==    by 0x15F8DF: search_completed_cb (sdp-client.c:205)
+> ==30400==    by 0x195C29: sdp_process (sdp.c:4354)
+> ==30400==    by 0x15FA35: search_process_cb (sdp-client.c:230)
+> ==30400==    by 0x4E828C4: g_main_context_dispatch (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82C87: ??? (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82FA1: g_main_loop_run (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x11FE0B: main (main.c:733)
+> ==30400==  Address 0x6c91428 is 8 bytes inside a block of size 64 free'd
+> ==30400==    at 0x4C2D16B: free (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+> ==30400==    by 0x1830B8: gatt_client_ready_cb (device.c:4692)
+> ==30400==    by 0x1A57BE: notify_client_ready.part.11 (gatt-client.c:1129)
+> ==30400==    by 0x1A352F: discovery_op_complete (gatt-client.c:379)
+> ==30400==    by 0x1A4078: discover_primary_cb (gatt-client.c:1101)
+> ==30400==    by 0x1ACDC6: discovery_op_complete (gatt-helpers.c:628)
+> ==30400==    by 0x1ACFF8: read_by_grp_type_cb (gatt-helpers.c:730)
+> ==30400==    by 0x1A2DA0: handle_rsp (att.c:707)
+> ==30400==    by 0x1A2DA0: can_read_data (att.c:879)
+> ==30400==    by 0x1ABCD2: watch_callback (io-glib.c:170)
+> ==30400==    by 0x4E828C4: g_main_context_dispatch (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82C87: ??? (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82FA1: g_main_loop_run (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==  Block was alloc'd at
+> ==30400==    at 0x4C2DF55: calloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+> ==30400==    by 0x4E88080: g_malloc0 (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x17DF2D: browse_request_new.part.26 (device.c:5016)
+> ==30400==    by 0x17DFCD: browse_request_new (device.c:5013)
+> ==30400==    by 0x17DFCD: device_browse_sdp (device.c:5116)
+> ==30400==    by 0x182A31: connect_profiles (device.c:1772)
+> ==30400==    by 0x19AA5A: process_message.isra.6 (object.c:259)
+> ==30400==    by 0x51708D2: ??? (in /usr/lib/libdbus-1.so.3.14.11)
+> ==30400==    by 0x5161F53: dbus_connection_dispatch (in /usr/lib/libdbus-1.so.3.14.11)
+> ==30400==    by 0x197150: message_dispatch (mainloop.c:72)
+> ==30400==    by 0x4E828C4: g_main_context_dispatch (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82C87: ??? (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400==    by 0x4E82FA1: g_main_loop_run (in /usr/lib/libglib-2.0.so.0.5200.3)
+> ==30400== 
+> ==30400== 
+> ==30400== HEAP SUMMARY:
+> ==30400==     in use at exit: 43,207 bytes in 337 blocks
+> ==30400==   total heap usage: 8,283 allocs, 7,946 frees, 682,147 bytes allocated
+> ==30400== 
+> ==30400== LEAK SUMMARY:
+> ==30400==    definitely lost: 16 bytes in 1 blocks
+> ==30400==    indirectly lost: 302 bytes in 11 blocks
+> ==30400==      possibly lost: 0 bytes in 0 blocks
+> ==30400==    still reachable: 42,889 bytes in 325 blocks
+> ==30400==         suppressed: 0 bytes in 0 blocks
+> ==30400== Rerun with --leak-check=full to see details of leaked memory
+> ==30400== 
+> ==30400== For counts of detected and suppressed errors, rerun with: -v
+> ==30400== ERROR SUMMARY: 57 errors from 20 contexts (suppressed: 0 from 0)
+
