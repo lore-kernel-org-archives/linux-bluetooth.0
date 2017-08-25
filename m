@@ -29,33 +29,33 @@ To: julia.lawall@lip6.fr,
 	rds-devel@oss.oracle.com,
 	linux-nfs@vger.kernel.org
 Cc: Bhumika Goyal <bhumirks@gmail.com>
-Subject: [PATCH 6/7] netfilter: nat: make rhashtable_params const
-Date: Fri, 25 Aug 2017 19:51:46 +0530
-Message-Id: <1503670907-23221-7-git-send-email-bhumirks@gmail.com>
+Subject: [PATCH 3/7] ieee802154: 6lowpan: make header_ops const
+Date: Fri, 25 Aug 2017 19:51:43 +0530
+Message-Id: <1503670907-23221-4-git-send-email-bhumirks@gmail.com>
 In-Reply-To: <1503670907-23221-1-git-send-email-bhumirks@gmail.com>
 References: <1503670907-23221-1-git-send-email-bhumirks@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Make this const as it is either used during a copy operation or passed
-to a const argument of the function rhltable_init.
+Make this const as it is only stored as a reference in a const field of
+a net_device structure.
 
 Signed-off-by: Bhumika Goyal <bhumirks@gmail.com>
 ---
- net/netfilter/nf_nat_core.c | 2 +-
+ net/ieee802154/6lowpan/core.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/net/netfilter/nf_nat_core.c b/net/netfilter/nf_nat_core.c
-index b1d3740..df983ea 100644
---- a/net/netfilter/nf_nat_core.c
-+++ b/net/netfilter/nf_nat_core.c
-@@ -198,7 +198,7 @@ static int nf_nat_bysource_cmp(struct rhashtable_compare_arg *arg,
- 	return 0;
- }
+diff --git a/net/ieee802154/6lowpan/core.c b/net/ieee802154/6lowpan/core.c
+index de2661c..974765b 100644
+--- a/net/ieee802154/6lowpan/core.c
++++ b/net/ieee802154/6lowpan/core.c
+@@ -54,7 +54,7 @@
  
--static struct rhashtable_params nf_nat_bysource_params = {
-+static const struct rhashtable_params nf_nat_bysource_params = {
- 	.head_offset = offsetof(struct nf_conn, nat_bysource),
- 	.obj_hashfn = nf_nat_bysource_hash,
- 	.obj_cmpfn = nf_nat_bysource_cmp,
+ static int open_count;
+ 
+-static struct header_ops lowpan_header_ops = {
++static const struct header_ops lowpan_header_ops = {
+ 	.create	= lowpan_header_create,
+ };
+ 
 -- 
 1.9.1
