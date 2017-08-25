@@ -29,9 +29,9 @@ To: julia.lawall@lip6.fr,
 	rds-devel@oss.oracle.com,
 	linux-nfs@vger.kernel.org
 Cc: Bhumika Goyal <bhumirks@gmail.com>
-Subject: [PATCH 3/7] ieee802154: 6lowpan: make header_ops const
-Date: Fri, 25 Aug 2017 19:51:43 +0530
-Message-Id: <1503670907-23221-4-git-send-email-bhumirks@gmail.com>
+Subject: [PATCH 1/7] Bluetooth: 6lowpan: make header_ops const
+Date: Fri, 25 Aug 2017 19:51:41 +0530
+Message-Id: <1503670907-23221-2-git-send-email-bhumirks@gmail.com>
 In-Reply-To: <1503670907-23221-1-git-send-email-bhumirks@gmail.com>
 References: <1503670907-23221-1-git-send-email-bhumirks@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
@@ -41,20 +41,20 @@ a net_device structure.
 
 Signed-off-by: Bhumika Goyal <bhumirks@gmail.com>
 ---
- net/ieee802154/6lowpan/core.c | 2 +-
+ net/bluetooth/6lowpan.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/net/ieee802154/6lowpan/core.c b/net/ieee802154/6lowpan/core.c
-index de2661c..974765b 100644
---- a/net/ieee802154/6lowpan/core.c
-+++ b/net/ieee802154/6lowpan/core.c
-@@ -54,7 +54,7 @@
+diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
+index 4e2576f..50fcdd1 100644
+--- a/net/bluetooth/6lowpan.c
++++ b/net/bluetooth/6lowpan.c
+@@ -581,7 +581,7 @@ static int bt_dev_init(struct net_device *dev)
+ 	.ndo_start_xmit		= bt_xmit,
+ };
  
- static int open_count;
- 
--static struct header_ops lowpan_header_ops = {
-+static const struct header_ops lowpan_header_ops = {
- 	.create	= lowpan_header_create,
+-static struct header_ops header_ops = {
++static const struct header_ops header_ops = {
+ 	.create	= header_create,
  };
  
 -- 
