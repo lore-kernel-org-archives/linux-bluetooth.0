@@ -1,49 +1,66 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: liu peng <pwlp@me.com>
-Content-type: text/plain; charset=utf-8
-MIME-version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Subject: Dose  bluez 4.101 can work BLE good ?
-Message-id: <C6D328E4-4955-468D-A0E8-C0146EFD5D0A@me.com>
-Date: Sun, 27 Aug 2017 22:03:12 +0800
-To: linux-bluetooth@vger.kernel.org
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <greg@kroah.com>
+Date: Sun, 27 Aug 2017 15:10:14 +0200
+From: Greg KH <greg@kroah.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Jiri Slaby <jslaby@suse.cz>, Jeffy Chen <jeffy.chen@rock-chips.com>,
+	stable <stable@vger.kernel.org>,
+	LKML <linux-kernel@vger.kernel.org>,
+	"open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+	rvaswani@nvidia.com, Brian Norris <briannorris@chromium.org>,
+	dmitry.torokhov@gmail.com, Douglas Anderson <dianders@chromium.org>,
+	acho@suse.com, Johan Hedberg <johan.hedberg@gmail.com>,
+	Network Development <netdev@vger.kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	"Gustavo F. Padovan" <gustavo@padovan.org>
+Subject: Re: Stable apply request [was: Bluetooth: bnep: fix possible might
+ sleep error in bnep_session]
+Message-ID: <20170827131014.GA10491@kroah.com>
+References: <1498556084-25346-1-git-send-email-jeffy.chen@rock-chips.com>
+ <0815411E-62D7-42DC-A0BF-78FD150C0949@holtmann.org>
+ <373da46b-41f7-9aa2-946d-75633c9efe86@suse.cz>
+ <E0E7758A-9E4C-4179-8403-D8895424586B@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <E0E7758A-9E4C-4179-8403-D8895424586B@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi all.
+On Wed, Aug 23, 2017 at 08:14:15PM +0200, Marcel Holtmann wrote:
+> Hi Jiri,
+> 
+> >>> It looks like bnep_session has same pattern as the issue reported in
+> >>> old rfcomm:
+> >>> 
+> >>> 	while (1) {
+> >>> 		set_current_state(TASK_INTERRUPTIBLE);
+> >>> 		if (condition)
+> >>> 			break;
+> >>> 		// may call might_sleep here
+> >>> 		schedule();
+> >>> 	}
+> >>> 	__set_current_state(TASK_RUNNING);
+> >>> 
+> >>> Which fixed at:
+> >>> 	dfb2fae Bluetooth: Fix nested sleeps
+> >>> 
+> >>> So let's fix it at the same way, also follow the suggestion of:
+> >>> https://lwn.net/Articles/628628/
+> > 
+> > ...
+> > 
+> >> all 3 patches have been applied to bluetooth-next tree.
+> > 
+> > Hi,
+> > 
+> > given users are hitting it in at least 4.4 and 4.12, can we have all
+> > three in all stables where this applies?
+> > 
+> > 5da8e47d849d Bluetooth: hidp: fix possible might sleep error in
+> > hidp_session_thread
+> > f06d977309d0 Bluetooth: cmtp: fix possible might sleep error in cmtp_session
+> > 25717382c1dd Bluetooth: bnep: fix possible might sleep error in bnep_session
+> > 
+> > I am not sure: to stable directly or via net stable?
+> 
+> as Dave said, just email -stable directly and have Greg pick them up.
 
-There is a question. I did not find an answer and no any idea.
-
-My goal is create bluetooth peripheral and services on a board. And then =
-my iOS App can discover that peripheral and services.My app will write =
-some data to board via bluetooth.
-
-I use Bluez4.101. It run in an embedded ubuntu, the kernel version is =
-3.10. I know the Bluez version is too old. but Bluez5.x needs kernel =
-3.15+. it's impossible to upgrade kernel , It=E2=80=99s a long story.
-
-this problem is.
-
-While I run this below command
-
-hciconfig hci0 leadv
-
-My iOS App can found my peripheral and it's connectable. but when =
-peripheral connected I have call discoverServices. I can not discover =
-any service. I have tried run bluez's test script simple-service and I =
-run sdptool browse local, it list a lot of services. for example:
-
-Service Name: AVRCP TG Service RecHandle: 0x10002 Service Class ID List: =
-"AV Remote Target" (0x110c) Protocol Descriptor List:
-"L2CAP" (0x0100) PSM: 23 "AVCTP" (0x0017) uint16: 0x103 Profile =
-Descriptor List: "AV Remote" (0x110e) Version: 0x0104
-
-Service Name: AVRCP CT Service RecHandle: 0x10003 Service Class ID List: =
-"AV Remote" (0x110e) Protocol Descriptor List: "L2CAP" (0x0100) PSM: 23 =
-"AVCTP" (0x0017) uint16: 0x103 Profile Descriptor List: "AV Remote" =
-(0x110e) Version: 0x0100
-I'm not sure whether I did wrong thing.
-Some one can tell me how to do? Or the bluez 4.101 whether can work to =
-satisfy my requirement?
-
-Thanks.
-
+All now picked up :)
