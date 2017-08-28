@@ -1,35 +1,56 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Subject: Re: [PATCH] Add a new 04ca:3015 QCA_ROME device
+Subject: Re: WARNING: CPU: 3 PID: 2952 at drivers/base/firmware_class.c:1225
+ _request_firmware+0x329/0x890
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <63e310ac-c932-2792-da81-b17ad11bb4f9@gmail.com>
-Date: Mon, 28 Aug 2017 16:19:04 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <913AF3FF-0C88-4D93-9C0B-622EDEFF722E@holtmann.org>
-References: <63e310ac-c932-2792-da81-b17ad11bb4f9@gmail.com>
-To: Ioan Moldovan <ioan.moldovan1999@gmail.com>
+In-Reply-To: <CAAd53p62-yeNc248c3aFjBExD9LmuGiAJ4BEC9gO_M_wKuXohQ@mail.gmail.com>
+Date: Mon, 28 Aug 2017 16:17:37 +0200
+Cc: Chris Murphy <chris@colorremedies.com>,
+        linux-bluetooth@vger.kernel.org
+Message-Id: <DA6048A2-E325-4CFA-A908-9534373E1B9B@holtmann.org>
+References: <CAJCQCtSDo8NuRQuEa0vX2cw9jKiaDRQ0ypY5H+31pQCwWRUSbQ@mail.gmail.com>
+ <CAAd53p62-yeNc248c3aFjBExD9LmuGiAJ4BEC9gO_M_wKuXohQ@mail.gmail.com>
+To: Kai-Heng Feng <kai.heng.feng@canonical.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ioan,
+Hi Kai-Heng,
 
-> This patch adds the 04ca:3015 (from a QCA9377 board) Bluetooth device to the btusb blacklist and makes the kernel use the btqca module instead of btusb.
+>> Found this thread google searching.
+>> 
+>> 
+>> 4.13.0-0.rc4.git1.1.fc27.x86_64  Problem sometimes happens with this kernel.
+>> This translates to git 623ce3456671.
+>> 
+>> 4.13.0-0.rc3.git0.1.fc27.x86_64 But not this kernel, which translates
+>> to the actual rc3 release (clean).
+>> 
+>> It seems to be a regression between those two. The problem only
+>> happens when waking from suspend to RAM, but it doesn't always happen.
 > 
-> This patch is necessary because, without it the 04ca:3015 device defaults to using the btusb driver, which makes the WIFI side of the QCA9377 board unusable (obtains 0 MBps in speedtest, when the 04ca:3015 bluetooth is used with an audio headset).
+> My theory is that if you request firmware when firmware_class is in
+> cache mode consecutively, and the device is changed, you will hit this
+> issue.
+> Can you give this patch a try?
 > 
-> --- btusb.c.orig	2017-08-28 15:46:22.584644604 +0300
-> +++ btusb.c	2017-08-28 15:48:22.989042129 +0300
-> @@ -268,6 +268,7 @@ static const struct usb_device_id blackl
-> 	{ USB_DEVICE(0x0489, 0xe092), .driver_info = BTUSB_QCA_ROME },
-> 	{ USB_DEVICE(0x0489, 0xe0a2), .driver_info = BTUSB_QCA_ROME },
-> 	{ USB_DEVICE(0x04ca, 0x3011), .driver_info = BTUSB_QCA_ROME },
-> +	{ USB_DEVICE(0x04ca, 0x3015), .driver_info = BTUSB_QCA_ROME },
+> diff --git a/drivers/base/firmware_class.c b/drivers/base/firmware_class.c
+> index bfbe1e154128..910dce498f53 100644
+> --- a/drivers/base/firmware_class.c
+> +++ b/drivers/base/firmware_class.c
+> @@ -1177,6 +1177,9 @@ _request_firmware_prepare(struct firmware
+> **firmware_p, const char *name,
 > 
-> 	/* Broadcom BCM2035 */
-> 	{ USB_DEVICE(0x0a5c, 0x2009), .driver_info = BTUSB_BCM92035 },
+>        ret = fw_lookup_and_allocate_buf(name, &fw_cache, &buf, dbuf, size);
+> 
+> +       if (!firmware_enabled() && device && (ret == 0 || ret == 1))
+> +               fw_add_devm_name(device, buf->fw_id);
+> +
+>        /*
+>         * bind with 'buf' now to avoid warning in failure path
+>         * of requesting firmware.
 
-please include the content of /sys/kernel/debug/usb/devices for this hardware and format the commit message correct and use git format-patch to create correct patches.
+if a fix in firmware_class can handle this, then I assume we also do not need all the per driver / hardware workarounds for firmware caching? Or are these other patches also needed?
 
 Regards
 
