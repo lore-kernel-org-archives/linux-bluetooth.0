@@ -1,45 +1,99 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20170823225839.461-1-yunhanw@google.com>
-References: <20170823225839.461-1-yunhanw@google.com>
+In-Reply-To: <20170823211610.88789-1-yunhanw@google.com>
+References: <20170823211610.88789-1-yunhanw@google.com>
 From: Yunhan Wang <yunhanw@google.com>
-Date: Mon, 28 Aug 2017 20:24:48 -0700
-Message-ID: <CALvjcs_F+0Xqk_BJuVXwYYGXv6Po71PPaYTyL81U56BEbLJAaw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] build: use abspath for lib/bluetooth
-To: linux-bluetooth@vger.kernel.org
+Date: Mon, 28 Aug 2017 20:24:03 -0700
+Message-ID: <CALvjcs-cDRCAGToaJbxSGjc0k3GVTU8v65ZDf3nZZt+A5VFC7w@mail.gmail.com>
+Subject: Re: [PATCH v3 1/3] gatt: Add indication confirm callback using Gatt
+ Confirm method
+To: linux-bluetooth@vger.kernel.org,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: Yunhan Wang <yunhanw@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Anyone can help to take a review?
+Hi Luiz
+
+Could you help to take a further review?
 
 Thanks
 Best wishes
 Yunhan
 
-On Wed, Aug 23, 2017 at 3:58 PM, Yunhan Wang <yunhanw@google.com> wrote:
-> When building from out of tree, and the top build dir was specified as
-> an absolute path, the linked headers in ${builddir}/lib/bluetooth were
-> broken.  This patch fixes it by relying on make's abspath macro as
-> opposed to the path concatenation.
+On Wed, Aug 23, 2017 at 2:16 PM, Yunhan Wang <yunhanw@google.com> wrote:
 > ---
->  Makefile.am | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  src/gatt-database.c | 16 ++++++++++++----
+>  1 file changed, 12 insertions(+), 4 deletions(-)
 >
-> diff --git a/Makefile.am b/Makefile.am
-> index eaed632e8..ad638cbb2 100644
-> --- a/Makefile.am
-> +++ b/Makefile.am
-> @@ -499,7 +499,7 @@ $(lib_libbluetooth_la_OBJECTS): $(local_headers)
+> diff --git a/src/gatt-database.c b/src/gatt-database.c
+> index 3b4bc7c8d..0969f8d1f 100644
+> --- a/src/gatt-database.c
+> +++ b/src/gatt-database.c
+> @@ -867,11 +867,18 @@ struct notify {
+>         const uint8_t *value;
+>         uint16_t len;
+>         bool indicate;
+> +       GDBusProxy *proxy;
+>  };
 >
->  lib/bluetooth/%.h: lib/%.h
->         $(AM_V_at)$(MKDIR_P) lib/bluetooth
-> -       $(AM_V_GEN)$(LN_S) -f "$(abs_top_builddir)"/$< $@
-> +       $(AM_V_GEN)$(LN_S) -f $(abspath $<) $@
+>  static void conf_cb(void *user_data)
+>  {
+> +       GDBusProxy *proxy = user_data;
+>         DBG("GATT server received confirmation");
+> +
+> +       if (proxy != NULL)
+> +       {
+> +               g_dbus_proxy_method_call(proxy, "IndicationConf", NULL, NULL, NULL, NULL);
+> +       }
+>  }
 >
->  if COVERAGE
->  clean-coverage:
+>  static void send_notification_to_device(void *data, void *user_data)
+> @@ -917,7 +924,7 @@ static void send_notification_to_device(void *data, void *user_data)
+>         DBG("GATT server sending indication");
+>         bt_gatt_server_send_indication(server, notify->handle, notify->value,
+>                                                         notify->len, conf_cb,
+> -                                                       NULL, NULL);
+> +                                                       notify->proxy, NULL);
+>
+>         return;
+>
+> @@ -930,7 +937,7 @@ remove:
+>  static void send_notification_to_devices(struct btd_gatt_database *database,
+>                                         uint16_t handle, const uint8_t *value,
+>                                         uint16_t len, uint16_t ccc_handle,
+> -                                       bool indicate)
+> +                                       bool indicate, GDBusProxy *proxy)
+>  {
+>         struct notify notify;
+>
+> @@ -942,6 +949,7 @@ static void send_notification_to_devices(struct btd_gatt_database *database,
+>         notify.value = value;
+>         notify.len = len;
+>         notify.indicate = indicate;
+> +       notify.proxy = proxy;
+>
+>         queue_foreach(database->device_states, send_notification_to_device,
+>                                                                 &notify);
+> @@ -972,7 +980,7 @@ static void send_service_changed(struct btd_gatt_database *database,
+>         put_le16(end, value + 2);
+>
+>         send_notification_to_devices(database, handle, value, sizeof(value),
+> -                                                       ccc_handle, true);
+> +                                                       ccc_handle, true, NULL);
+>  }
+>
+>  static void gatt_db_service_added(struct gatt_db_attribute *attrib,
+> @@ -1861,7 +1869,7 @@ static void property_changed_cb(GDBusProxy *proxy, const char *name,
+>                                 gatt_db_attribute_get_handle(chrc->attrib),
+>                                 value, len,
+>                                 gatt_db_attribute_get_handle(chrc->ccc),
+> -                               chrc->props & BT_GATT_CHRC_PROP_INDICATE);
+> +                               chrc->props & BT_GATT_CHRC_PROP_INDICATE, proxy);
+>  }
+>
+>  static bool database_add_ccc(struct external_service *service,
 > --
 > 2.14.1.342.g6490525c54-goog
 >
