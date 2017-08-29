@@ -1,22 +1,48 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Reply-To: ProklovAV@mail.zabtrans.ru
-Subject: Re: Not set name from main.conf
-References: <59A504D3.6070809@mail.zabtrans.ru>
- <59A52C53.3020209@mail.zabtrans.ru>
- <CABBYNZK_oJCjO61zpfuExA5=zwAgoYvhNWuDwr9rH3-uMceAww@mail.gmail.com>
+From: Brian Gix <brian.gix@intel.com>
 To: linux-bluetooth@vger.kernel.org
-From: =?UTF-8?B?0J/RgNC+0LrQu9C+0LIg0JDQu9C10LrRgdCw0L3QtNGAINCS0LDQu9C10YA=?=
-         =?UTF-8?B?0YzQtdCy0LjRhw==?= <ProklovAV@mail.zabtrans.ru>
-Message-ID: <59A5FED0.3010400@mail.zabtrans.ru>
-Date: Wed, 30 Aug 2017 07:54:56 +0800
-MIME-Version: 1.0
-In-Reply-To: <CABBYNZK_oJCjO61zpfuExA5=zwAgoYvhNWuDwr9rH3-uMceAww@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Cc: Brian Gix <brian.gix@intel.com>
+Subject: [PATCH 1/1] mesh: remove hardcoded keys to force randomization
+Date: Tue, 29 Aug 2017 12:51:21 -0700
+Message-Id: <20170829195121.9868-1-brian.gix@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-29.08.2017 18:21, Luiz Augusto von Dentz пишет:
-> bluetoothd --help:
-> -P, --noplugin=NAME,...     Specify plugins not to load
+---
+ mesh/prov_db.json | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
 
-Thank you, i change setting in start script.
+diff --git a/mesh/prov_db.json b/mesh/prov_db.json
+index d810a7d..dbed934 100644
+--- a/mesh/prov_db.json
++++ b/mesh/prov_db.json
+@@ -1,25 +1,22 @@
+ {
+   "$schema":"file:\/\/\/Bluetooth SIG\/Mesh\/schema\/mesh.jsonschema",
+   "meshName":"Intel BT Mesh",
+-  "IVindex":5,
++  "IVindex":1,
+   "IVupdate":0,
+   "netKeys":[
+     {
+       "index":0,
+       "keyRefresh":0,
+-      "key":"18eed9c2a56add85049ffc3c59ad0e12"
+     }
+   ],
+   "appKeys":[
+     {
+       "index":0,
+       "boundNetKey":0,
+-      "key":"4f68ad85d9f48ac8589df665b6b49b8a"
+     },
+     {
+       "index":1,
+       "boundNetKey":0,
+-      "key":"2aa2a6ded5a0798ceab5787ca3ae39fc"
+     }
+   ],
+   "provisioners":[
+-- 
+2.9.5
+
