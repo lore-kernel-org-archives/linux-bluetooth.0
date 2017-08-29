@@ -1,117 +1,47 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <CABBYNZLHeFEEiUatHWJOAhqoU1xG96X_fmLzmzKiRo3+Gky1iA@mail.gmail.com>
-References: <20170823211610.88789-1-yunhanw@google.com> <CALvjcs-cDRCAGToaJbxSGjc0k3GVTU8v65ZDf3nZZt+A5VFC7w@mail.gmail.com>
- <CABBYNZLHeFEEiUatHWJOAhqoU1xG96X_fmLzmzKiRo3+Gky1iA@mail.gmail.com>
 From: Yunhan Wang <yunhanw@google.com>
-Date: Tue, 29 Aug 2017 00:36:17 -0700
-Message-ID: <CALvjcs9oDi-zy7LviZwpdTgGPBnCjJA0saNDzQPngBp1oDduOg@mail.gmail.com>
-Subject: Re: [PATCH v3 1/3] gatt: Add indication confirm callback using Gatt
- Confirm method
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+To: linux-bluetooth@vger.kernel.org
+Cc: Yunhan Wang <yunhanw@google.com>
+Subject: [PATCH v4 3/3] client: Add Confirm implementation
+Date: Tue, 29 Aug 2017 00:35:20 -0700
+Message-Id: <20170829073520.12059-3-yunhanw@google.com>
+In-Reply-To: <20170829073520.12059-1-yunhanw@google.com>
+References: <20170829073520.12059-1-yunhanw@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Ya, thanks. Just fix the typo and resent the patch.
+Add Confirm implementation when indication is received.
+---
+ client/gatt.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-Best wishes
-Yunhan
+diff --git a/client/gatt.c b/client/gatt.c
+index bd6e6b0af..ca84479d7 100644
+--- a/client/gatt.c
++++ b/client/gatt.c
+@@ -1405,6 +1405,14 @@ static DBusMessage *chrc_stop_notify(DBusConnection *conn, DBusMessage *msg,
+ 	return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
+ }
+ 
++static DBusMessage *chrc_indication_conf(DBusConnection *conn,
++							DBusMessage *msg, void *user_data)
++{
++	struct chrc *chrc = user_data;
++	rl_printf("Attribute %s indication confirm received", chrc->path);
++	return dbus_message_new_method_return(msg);
++}
++
+ static const GDBusMethodTable chrc_methods[] = {
+ 	{ GDBUS_ASYNC_METHOD("ReadValue", GDBUS_ARGS({ "options", "a{sv}" }),
+ 					GDBUS_ARGS({ "value", "ay" }),
+@@ -1414,6 +1422,7 @@ static const GDBusMethodTable chrc_methods[] = {
+ 					NULL, chrc_write_value) },
+ 	{ GDBUS_ASYNC_METHOD("StartNotify", NULL, NULL, chrc_start_notify) },
+ 	{ GDBUS_METHOD("StopNotify", NULL, NULL, chrc_stop_notify) },
++	{ GDBUS_METHOD("Confirm", NULL, NULL, chrc_indication_conf) },
+ 	{ }
+ };
+ 
+-- 
+2.14.1.342.g6490525c54-goog
 
-On Tue, Aug 29, 2017 at 12:20 AM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi Yunhan,
->
-> On Tue, Aug 29, 2017 at 6:24 AM, Yunhan Wang <yunhanw@google.com> wrote:
->> Hi Luiz
->>
->> Could you help to take a further review?
->>
->> Thanks
->> Best wishes
->> Yunhan
->>
->> On Wed, Aug 23, 2017 at 2:16 PM, Yunhan Wang <yunhanw@google.com> wrote:
->>> ---
->>>  src/gatt-database.c | 16 ++++++++++++----
->>>  1 file changed, 12 insertions(+), 4 deletions(-)
->>>
->>> diff --git a/src/gatt-database.c b/src/gatt-database.c
->>> index 3b4bc7c8d..0969f8d1f 100644
->>> --- a/src/gatt-database.c
->>> +++ b/src/gatt-database.c
->>> @@ -867,11 +867,18 @@ struct notify {
->>>         const uint8_t *value;
->>>         uint16_t len;
->>>         bool indicate;
->>> +       GDBusProxy *proxy;
->>>  };
->>>
->>>  static void conf_cb(void *user_data)
->>>  {
->>> +       GDBusProxy *proxy = user_data;
->>>         DBG("GATT server received confirmation");
->>> +
->>> +       if (proxy != NULL)
->>> +       {
->>> +               g_dbus_proxy_method_call(proxy, "IndicationConf", NULL, NULL, NULL, NULL);
->
-> This one should be use "Confirm".
->
->>> +       }
->>>  }
->>>
->>>  static void send_notification_to_device(void *data, void *user_data)
->>> @@ -917,7 +924,7 @@ static void send_notification_to_device(void *data, void *user_data)
->>>         DBG("GATT server sending indication");
->>>         bt_gatt_server_send_indication(server, notify->handle, notify->value,
->>>                                                         notify->len, conf_cb,
->>> -                                                       NULL, NULL);
->>> +                                                       notify->proxy, NULL);
->>>
->>>         return;
->>>
->>> @@ -930,7 +937,7 @@ remove:
->>>  static void send_notification_to_devices(struct btd_gatt_database *database,
->>>                                         uint16_t handle, const uint8_t *value,
->>>                                         uint16_t len, uint16_t ccc_handle,
->>> -                                       bool indicate)
->>> +                                       bool indicate, GDBusProxy *proxy)
->>>  {
->>>         struct notify notify;
->>>
->>> @@ -942,6 +949,7 @@ static void send_notification_to_devices(struct btd_gatt_database *database,
->>>         notify.value = value;
->>>         notify.len = len;
->>>         notify.indicate = indicate;
->>> +       notify.proxy = proxy;
->>>
->>>         queue_foreach(database->device_states, send_notification_to_device,
->>>                                                                 &notify);
->>> @@ -972,7 +980,7 @@ static void send_service_changed(struct btd_gatt_database *database,
->>>         put_le16(end, value + 2);
->>>
->>>         send_notification_to_devices(database, handle, value, sizeof(value),
->>> -                                                       ccc_handle, true);
->>> +                                                       ccc_handle, true, NULL);
->>>  }
->>>
->>>  static void gatt_db_service_added(struct gatt_db_attribute *attrib,
->>> @@ -1861,7 +1869,7 @@ static void property_changed_cb(GDBusProxy *proxy, const char *name,
->>>                                 gatt_db_attribute_get_handle(chrc->attrib),
->>>                                 value, len,
->>>                                 gatt_db_attribute_get_handle(chrc->ccc),
->>> -                               chrc->props & BT_GATT_CHRC_PROP_INDICATE);
->>> +                               chrc->props & BT_GATT_CHRC_PROP_INDICATE, proxy);
->>>  }
->>>
->>>  static bool database_add_ccc(struct external_service *service,
->>> --
->>> 2.14.1.342.g6490525c54-goog
->>>
->
->
->
-> --
-> Luiz Augusto von Dentz
