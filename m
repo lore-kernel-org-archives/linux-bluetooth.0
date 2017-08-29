@@ -1,42 +1,96 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-From: Laczen JMS <laczenjms@gmail.com>
-Date: Tue, 29 Aug 2017 15:50:56 +0200
-Message-ID: <CAFxSrVuaqCn8SrQq_QrMUXv0cXkJ=rm7=L3nCOeYNPkP2g-WmQ@mail.gmail.com>
-Subject: usage of meshctl with zephyr node
-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20170829073520.12059-2-yunhanw@google.com>
+References: <20170829073520.12059-1-yunhanw@google.com> <20170829073520.12059-2-yunhanw@google.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Tue, 29 Aug 2017 16:06:13 +0300
+Message-ID: <CABBYNZK_e2Hwmp6AeBCrtJeeGOZ8x+Oznf0CLhBrBeQn9GLxDg@mail.gmail.com>
+Subject: Re: [PATCH v4 2/3] gatt: Add indication confirm callback using Gatt
+ Confirm method
+To: Yunhan Wang <yunhanw@google.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Yunhan,
 
-I have tried to use meshctl with a zephyr node, but I can't figure out
-how to use it. I have a zephyr node that is unprovisioned and I'm
-doing the following:
+On Tue, Aug 29, 2017 at 10:35 AM, Yunhan Wang <yunhanw@google.com> wrote:
+> ---
+>  src/gatt-database.c | 16 ++++++++++++----
+>  1 file changed, 12 insertions(+), 4 deletions(-)
+>
+> diff --git a/src/gatt-database.c b/src/gatt-database.c
+> index 3b4bc7c8d..4af9b81a8 100644
+> --- a/src/gatt-database.c
+> +++ b/src/gatt-database.c
+> @@ -867,11 +867,18 @@ struct notify {
+>         const uint8_t *value;
+>         uint16_t len;
+>         bool indicate;
+> +       GDBusProxy *proxy;
+>  };
+>
+>  static void conf_cb(void *user_data)
+>  {
+> +       GDBusProxy *proxy = user_data;
+>         DBG("GATT server received confirmation");
+> +
+> +       if (proxy != NULL)
+> +       {
+> +               g_dbus_proxy_method_call(proxy, "Confirm", NULL, NULL, NULL, NULL);
+> +       }
+>  }
+>
+>  static void send_notification_to_device(void *data, void *user_data)
+> @@ -917,7 +924,7 @@ static void send_notification_to_device(void *data, void *user_data)
+>         DBG("GATT server sending indication");
+>         bt_gatt_server_send_indication(server, notify->handle, notify->value,
+>                                                         notify->len, conf_cb,
+> -                                                       NULL, NULL);
+> +                                                       notify->proxy, NULL);
+>
+>         return;
+>
+> @@ -930,7 +937,7 @@ remove:
+>  static void send_notification_to_devices(struct btd_gatt_database *database,
+>                                         uint16_t handle, const uint8_t *value,
+>                                         uint16_t len, uint16_t ccc_handle,
+> -                                       bool indicate)
+> +                                       bool indicate, GDBusProxy *proxy)
+>  {
+>         struct notify notify;
+>
+> @@ -942,6 +949,7 @@ static void send_notification_to_devices(struct btd_gatt_database *database,
+>         notify.value = value;
+>         notify.len = len;
+>         notify.indicate = indicate;
+> +       notify.proxy = proxy;
+>
+>         queue_foreach(database->device_states, send_notification_to_device,
+>                                                                 &notify);
+> @@ -972,7 +980,7 @@ static void send_service_changed(struct btd_gatt_database *database,
+>         put_le16(end, value + 2);
+>
+>         send_notification_to_devices(database, handle, value, sizeof(value),
+> -                                                       ccc_handle, true);
+> +                                                       ccc_handle, true, NULL);
+>  }
+>
+>  static void gatt_db_service_added(struct gatt_db_attribute *attrib,
+> @@ -1861,7 +1869,7 @@ static void property_changed_cb(GDBusProxy *proxy, const char *name,
+>                                 gatt_db_attribute_get_handle(chrc->attrib),
+>                                 value, len,
+>                                 gatt_db_attribute_get_handle(chrc->ccc),
+> -                               chrc->props & BT_GATT_CHRC_PROP_INDICATE);
+> +                               chrc->props & BT_GATT_CHRC_PROP_INDICATE, proxy);
+>  }
+>
+>  static bool database_add_ccc(struct external_service *service,
+> --
+> 2.14.1.342.g6490525c54-goog
 
-[meshctl] # discover-unprovisioned on -> works and gives a new
-unprovisioned node (dddd000..)
-[meshctl] # discover-unprovisioned off
-[meshctl] # provision dddd -> works
-[Zephyr Mesh-Node-0100] # configure 0100
-[config: Target = 0100] # add-appkey 0 -> works: Node 0100 AppKey Status Success
-[config: Target = 0100] # bind 0 0 1000 -> works: Node 0100 Model App
-Status Success
-Element 0100 AppIdx 000
-        ModelId 1000
-        Binding successful AppIdx 000
-[config: Target = 0100] # back
-[Zephyr Mesh-Node-0100] # onoff 0100
-[on/off: Target = 0100]# onoff 1 fails (does nothing) The debugging on
-the node gives the following message:
-[bt] [WRN] sdu_recv: No matching AppKey
-adding some extra debugging lines in the node gives the following information:
-(AID(&hdr) != keys->id):
-[bt] [WRN] sdu_recv: Appkey IDs hdr:31 keys:46
+Applied, thanks.
 
-Am I using meshctl incorrect ? I am doubting the bind command.
-
-Thanks, and kind regards,
-
-Jehudi
+-- 
+Luiz Augusto von Dentz
