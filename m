@@ -1,109 +1,80 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CALvjcs-cDRCAGToaJbxSGjc0k3GVTU8v65ZDf3nZZt+A5VFC7w@mail.gmail.com>
-References: <20170823211610.88789-1-yunhanw@google.com> <CALvjcs-cDRCAGToaJbxSGjc0k3GVTU8v65ZDf3nZZt+A5VFC7w@mail.gmail.com>
+In-Reply-To: <59A504D3.6070809@mail.zabtrans.ru>
+References: <59A504D3.6070809@mail.zabtrans.ru>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 29 Aug 2017 10:20:13 +0300
-Message-ID: <CABBYNZLHeFEEiUatHWJOAhqoU1xG96X_fmLzmzKiRo3+Gky1iA@mail.gmail.com>
-Subject: Re: [PATCH v3 1/3] gatt: Add indication confirm callback using Gatt
- Confirm method
-To: Yunhan Wang <yunhanw@google.com>
+Date: Tue, 29 Aug 2017 10:00:09 +0300
+Message-ID: <CABBYNZ+NLeJZDXa3agFfwZ1TSFU27RGwcjGgn-zvN_zi+Oi_TQ@mail.gmail.com>
+Subject: Re: Not set name from main.conf
+To: ProklovAV@mail.zabtrans.ru
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Yunhan,
+Hi Aleksandr,
 
-On Tue, Aug 29, 2017 at 6:24 AM, Yunhan Wang <yunhanw@google.com> wrote:
-> Hi Luiz
+On Tue, Aug 29, 2017 at 9:08 AM, =D0=9F=D1=80=D0=BE=D0=BA=D0=BB=D0=BE=D0=B2=
+ =D0=90=D0=BB=D0=B5=D0=BA=D1=81=D0=B0=D0=BD=D0=B4=D1=80 =D0=92=D0=B0=D0=BB=
+=D0=B5=D1=80=D1=8C=D0=B5=D0=B2=D0=B8=D1=87
+<ProklovAV@mail.zabtrans.ru> wrote:
+>  Hello All,
 >
-> Could you help to take a further review?
+> I set name in main.conf file, in log bluetoothd i see:
+>>
+>> bluetoothd[25627]: src/main.c:parse_config() name=3DPuppyBT
+>> bluetoothd[25627]: src/adapter.c:btd_adapter_new() System name: PuppyBT
 >
-> Thanks
-> Best wishes
-> Yunhan
 >
-> On Wed, Aug 23, 2017 at 2:16 PM, Yunhan Wang <yunhanw@google.com> wrote:
->> ---
->>  src/gatt-database.c | 16 ++++++++++++----
->>  1 file changed, 12 insertions(+), 4 deletions(-)
->>
->> diff --git a/src/gatt-database.c b/src/gatt-database.c
->> index 3b4bc7c8d..0969f8d1f 100644
->> --- a/src/gatt-database.c
->> +++ b/src/gatt-database.c
->> @@ -867,11 +867,18 @@ struct notify {
->>         const uint8_t *value;
->>         uint16_t len;
->>         bool indicate;
->> +       GDBusProxy *proxy;
->>  };
->>
->>  static void conf_cb(void *user_data)
->>  {
->> +       GDBusProxy *proxy = user_data;
->>         DBG("GATT server received confirmation");
->> +
->> +       if (proxy != NULL)
->> +       {
->> +               g_dbus_proxy_method_call(proxy, "IndicationConf", NULL, NULL, NULL, NULL);
+> and later in the log:
+>
+>> bluetoothd[25627]: src/adapter.c:local_name_changed_callback() Name:
+>> PuppyBT
+>> bluetoothd[25627]: src/adapter.c:local_name_changed_callback() Short nam=
+e:
+>> bluetoothd[25627]: src/adapter.c:local_name_changed_callback() Current
+>> alias: PuppyBT
+>> bluetoothd[25627]: plugins/hostname.c:property_changed() static hostname=
+:
+>> pra
+>> bluetoothd[25627]: plugins/hostname.c:property_changed() pretty hostname=
+:
+>> bluetoothd[25627]: plugins/hostname.c:update_name() name: pra
+>> bluetoothd[25627]: src/adapter.c:adapter_set_name() name: pra
+>> bluetoothd[25627]: src/adapter.c:adapter_set_name() alias: pra
+>> bluetoothd[25627]: src/adapter.c:set_name() sending set local name comma=
+nd
+>> for index 0
+>> bluetoothd[25627]: plugins/hostname.c:property_changed() chassis: laptop
+>> bluetoothd[25627]: plugins/hostname.c:update_class() major: 0x01 minor:
+>> 0x03
+>> bluetoothd[25627]: src/adapter.c:local_name_changed_callback() Name: pra
+>> bluetoothd[25627]: src/adapter.c:local_name_changed_callback() Short nam=
+e:
+>> bluetoothd[25627]: src/adapter.c:local_name_changed_callback() Current
+>> alias: pra
+>
+>
+> How to correctly set the device name?
 
-This one should be use "Confirm".
+You should probably disable the hostname plugin if you don't want it
+to set the name and alias, alternatively, you can set a different
+alias using the Alias property with bluetoothctl or your own tool.
 
->> +       }
->>  }
->>
->>  static void send_notification_to_device(void *data, void *user_data)
->> @@ -917,7 +924,7 @@ static void send_notification_to_device(void *data, void *user_data)
->>         DBG("GATT server sending indication");
->>         bt_gatt_server_send_indication(server, notify->handle, notify->value,
->>                                                         notify->len, conf_cb,
->> -                                                       NULL, NULL);
->> +                                                       notify->proxy, NULL);
->>
->>         return;
->>
->> @@ -930,7 +937,7 @@ remove:
->>  static void send_notification_to_devices(struct btd_gatt_database *database,
->>                                         uint16_t handle, const uint8_t *value,
->>                                         uint16_t len, uint16_t ccc_handle,
->> -                                       bool indicate)
->> +                                       bool indicate, GDBusProxy *proxy)
->>  {
->>         struct notify notify;
->>
->> @@ -942,6 +949,7 @@ static void send_notification_to_devices(struct btd_gatt_database *database,
->>         notify.value = value;
->>         notify.len = len;
->>         notify.indicate = indicate;
->> +       notify.proxy = proxy;
->>
->>         queue_foreach(database->device_states, send_notification_to_device,
->>                                                                 &notify);
->> @@ -972,7 +980,7 @@ static void send_service_changed(struct btd_gatt_database *database,
->>         put_le16(end, value + 2);
->>
->>         send_notification_to_devices(database, handle, value, sizeof(value),
->> -                                                       ccc_handle, true);
->> +                                                       ccc_handle, true, NULL);
->>  }
->>
->>  static void gatt_db_service_added(struct gatt_db_attribute *attrib,
->> @@ -1861,7 +1869,7 @@ static void property_changed_cb(GDBusProxy *proxy, const char *name,
->>                                 gatt_db_attribute_get_handle(chrc->attrib),
->>                                 value, len,
->>                                 gatt_db_attribute_get_handle(chrc->ccc),
->> -                               chrc->props & BT_GATT_CHRC_PROP_INDICATE);
->> +                               chrc->props & BT_GATT_CHRC_PROP_INDICATE, proxy);
->>  }
->>
->>  static bool database_add_ccc(struct external_service *service,
->> --
->> 2.14.1.342.g6490525c54-goog
->>
+>
+> Bluez version 5.45
+>
+> ---------------------
+> Best regards,
+> Aleksandr Proklov
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth=
+"
+> in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
 
 
--- 
+--=20
 Luiz Augusto von Dentz
