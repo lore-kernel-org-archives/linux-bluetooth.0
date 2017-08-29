@@ -1,61 +1,30 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CAFxSrVuaqCn8SrQq_QrMUXv0cXkJ=rm7=L3nCOeYNPkP2g-WmQ@mail.gmail.com>
-References: <CAFxSrVuaqCn8SrQq_QrMUXv0cXkJ=rm7=L3nCOeYNPkP2g-WmQ@mail.gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 29 Aug 2017 20:38:27 +0300
-Message-ID: <CABBYNZ+NwigzARcAvBePMGjHVaW6T98o8-ZDejGdy8TRrE9CyQ@mail.gmail.com>
-Subject: Re: usage of meshctl with zephyr node
-To: Laczen JMS <laczenjms@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+From: Anupam Roy <anupamroy4u@gmail.com>
+Date: Tue, 29 Aug 2017 22:22:29 +0530
+Message-ID: <CAM8s=c8JqfCoqZ5-to1ojuNc9rHMHUFR0T9myuY95a5GnPA+zQ@mail.gmail.com>
+Subject: Regarding accept of GATT service
+To: linux-bluetooth@vger.kernel.org
+Cc: "anupam.r@samsung.com" <anupam.r@samsung.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
+  I have a following query regarding accept callback of Bluez profiles.
 
-On Tue, Aug 29, 2017 at 4:50 PM, Laczen JMS <laczenjms@gmail.com> wrote:
-> Hi,
->
-> I have tried to use meshctl with a zephyr node, but I can't figure out
-> how to use it. I have a zephyr node that is unprovisioned and I'm
-> doing the following:
->
-> [meshctl] # discover-unprovisioned on -> works and gives a new
-> unprovisioned node (dddd000..)
-> [meshctl] # discover-unprovisioned off
-> [meshctl] # provision dddd -> works
-> [Zephyr Mesh-Node-0100] # configure 0100
-> [config: Target = 0100] # add-appkey 0 -> works: Node 0100 AppKey Status Success
-> [config: Target = 0100] # bind 0 0 1000 -> works: Node 0100 Model App
-> Status Success
-> Element 0100 AppIdx 000
->         ModelId 1000
->         Binding successful AppIdx 000
-> [config: Target = 0100] # back
-> [Zephyr Mesh-Node-0100] # onoff 0100
+Is it not possible to host multiple  GATT profiles in Bluez who could
+be interested to same remote uuid?  for ex) GATT_UUID ?
 
-I don't thing Zephyr supports onoff model, that might explain why this
-is failing.
+It looks like even though Bluez does probe(.device_probe) of service
+during device enumerations (either during loading of devices of
+previously connected devices or during connect of fresh device), but
+it does not accept (.accept) service to all the profiles who were
+interested in the same remote uuid.
+Bluez only seems to accept service for the first matching service from
+the list of services filled in the device during probing.
 
-> [on/off: Target = 0100]# onoff 1 fails (does nothing) The debugging on
-> the node gives the following message:
-> [bt] [WRN] sdu_recv: No matching AppKey
-> adding some extra debugging lines in the node gives the following information:
-> (AID(&hdr) != keys->id):
-> [bt] [WRN] sdu_recv: Appkey IDs hdr:31 keys:46
->
-> Am I using meshctl incorrect ? I am doubting the bind command.
->
-> Thanks, and kind regards,
->
-> Jehudi
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Any insight to the above query will be helpful. Thank You very much!
 
-
-
--- 
-Luiz Augusto von Dentz
+BR,
+-Anupam Roy
