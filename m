@@ -1,96 +1,57 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <20170829073520.12059-2-yunhanw@google.com>
-References: <20170829073520.12059-1-yunhanw@google.com> <20170829073520.12059-2-yunhanw@google.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 29 Aug 2017 16:06:13 +0300
-Message-ID: <CABBYNZK_e2Hwmp6AeBCrtJeeGOZ8x+Oznf0CLhBrBeQn9GLxDg@mail.gmail.com>
-Subject: Re: [PATCH v4 2/3] gatt: Add indication confirm callback using Gatt
- Confirm method
-To: Yunhan Wang <yunhanw@google.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2 3/3] mesh: Use DuplicateData filter
+Date: Tue, 29 Aug 2017 15:56:52 +0300
+Message-Id: <20170829125652.4344-3-luiz.dentz@gmail.com>
+In-Reply-To: <20170829125652.4344-1-luiz.dentz@gmail.com>
+References: <20170829125652.4344-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Yunhan,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Tue, Aug 29, 2017 at 10:35 AM, Yunhan Wang <yunhanw@google.com> wrote:
-> ---
->  src/gatt-database.c | 16 ++++++++++++----
->  1 file changed, 12 insertions(+), 4 deletions(-)
->
-> diff --git a/src/gatt-database.c b/src/gatt-database.c
-> index 3b4bc7c8d..4af9b81a8 100644
-> --- a/src/gatt-database.c
-> +++ b/src/gatt-database.c
-> @@ -867,11 +867,18 @@ struct notify {
->         const uint8_t *value;
->         uint16_t len;
->         bool indicate;
-> +       GDBusProxy *proxy;
->  };
->
->  static void conf_cb(void *user_data)
->  {
-> +       GDBusProxy *proxy = user_data;
->         DBG("GATT server received confirmation");
-> +
-> +       if (proxy != NULL)
-> +       {
-> +               g_dbus_proxy_method_call(proxy, "Confirm", NULL, NULL, NULL, NULL);
-> +       }
->  }
->
->  static void send_notification_to_device(void *data, void *user_data)
-> @@ -917,7 +924,7 @@ static void send_notification_to_device(void *data, void *user_data)
->         DBG("GATT server sending indication");
->         bt_gatt_server_send_indication(server, notify->handle, notify->value,
->                                                         notify->len, conf_cb,
-> -                                                       NULL, NULL);
-> +                                                       notify->proxy, NULL);
->
->         return;
->
-> @@ -930,7 +937,7 @@ remove:
->  static void send_notification_to_devices(struct btd_gatt_database *database,
->                                         uint16_t handle, const uint8_t *value,
->                                         uint16_t len, uint16_t ccc_handle,
-> -                                       bool indicate)
-> +                                       bool indicate, GDBusProxy *proxy)
->  {
->         struct notify notify;
->
-> @@ -942,6 +949,7 @@ static void send_notification_to_devices(struct btd_gatt_database *database,
->         notify.value = value;
->         notify.len = len;
->         notify.indicate = indicate;
-> +       notify.proxy = proxy;
->
->         queue_foreach(database->device_states, send_notification_to_device,
->                                                                 &notify);
-> @@ -972,7 +980,7 @@ static void send_service_changed(struct btd_gatt_database *database,
->         put_le16(end, value + 2);
->
->         send_notification_to_devices(database, handle, value, sizeof(value),
-> -                                                       ccc_handle, true);
-> +                                                       ccc_handle, true, NULL);
->  }
->
->  static void gatt_db_service_added(struct gatt_db_attribute *attrib,
-> @@ -1861,7 +1869,7 @@ static void property_changed_cb(GDBusProxy *proxy, const char *name,
->                                 gatt_db_attribute_get_handle(chrc->attrib),
->                                 value, len,
->                                 gatt_db_attribute_get_handle(chrc->ccc),
-> -                               chrc->props & BT_GATT_CHRC_PROP_INDICATE);
-> +                               chrc->props & BT_GATT_CHRC_PROP_INDICATE, proxy);
->  }
->
->  static bool database_add_ccc(struct external_service *service,
-> --
-> 2.14.1.342.g6490525c54-goog
+Also use the term duplicate instead of reset to make it more clear
+the intent of the filter.
+---
+ mesh/main.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-Applied, thanks.
-
+diff --git a/mesh/main.c b/mesh/main.c
+index b06f4352a..96ac78544 100644
+--- a/mesh/main.c
++++ b/mesh/main.c
+@@ -1575,7 +1575,7 @@ struct set_discovery_filter_args {
+ 	dbus_int16_t pathloss;
+ 	char **uuids;
+ 	size_t uuids_len;
+-	dbus_bool_t reset;
++	dbus_bool_t duplicate;
+ };
+ 
+ static void set_discovery_filter_setup(DBusMessageIter *iter, void *user_data)
+@@ -1602,9 +1602,9 @@ static void set_discovery_filter_setup(DBusMessageIter *iter, void *user_data)
+ 	if (args->transport != NULL)
+ 		dict_append_entry(&dict, "Transport", DBUS_TYPE_STRING,
+ 						&args->transport);
+-	if (args->reset)
+-		dict_append_entry(&dict, "ResetData", DBUS_TYPE_BOOLEAN,
+-						&args->reset);
++	if (args->duplicate)
++		dict_append_entry(&dict, "DuplicateData", DBUS_TYPE_BOOLEAN,
++						&args->duplicate);
+ 
+ 	dbus_message_iter_close_container(iter, &dict);
+ }
+@@ -1639,7 +1639,7 @@ static void set_scan_filter_commit(void)
+ 	args.transport = filtered_scan_transport;
+ 	args.uuids = filtered_scan_uuids;
+ 	args.uuids_len = filtered_scan_uuids_len;
+-	args.reset = TRUE;
++	args.duplicate = TRUE;
+ 
+ 	if (check_default_ctrl() == FALSE)
+ 		return;
 -- 
-Luiz Augusto von Dentz
+2.13.5
+
