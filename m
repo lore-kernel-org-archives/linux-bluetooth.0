@@ -1,116 +1,77 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <DEBB0CAA2616974FAE35E4B560B9A4373E1D0010@ORSMSX103.amr.corp.intel.com>
+From: "Gix, Brian" <brian.gix@intel.com>
+To: Laczen JMS <laczenjms@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: RE: usage of meshctl with zephyr node
+Date: Tue, 29 Aug 2017 18:13:31 +0000
+Message-ID: <DEBB0CAA2616974FAE35E4B560B9A4373E1D0010@ORSMSX103.amr.corp.intel.com>
 References: <CAFxSrVuaqCn8SrQq_QrMUXv0cXkJ=rm7=L3nCOeYNPkP2g-WmQ@mail.gmail.com>
  <CABBYNZ+NwigzARcAvBePMGjHVaW6T98o8-ZDejGdy8TRrE9CyQ@mail.gmail.com>
- <CAFxSrVvPYA3dnTr16g-N=pCWt9WUX2UEfpg7=sfcSnvQO2BbSg@mail.gmail.com> <DEBB0CAA2616974FAE35E4B560B9A4373E1D0010@ORSMSX103.amr.corp.intel.com>
-From: Laczen JMS <laczenjms@gmail.com>
-Date: Tue, 29 Aug 2017 20:41:00 +0200
-Message-ID: <CAFxSrVvqvb3y9HjD1Zqx0mEw+qxZF8HUDqS1buSaqAhsDNJUEg@mail.gmail.com>
-Subject: Re: usage of meshctl with zephyr node
-To: "Gix, Brian" <brian.gix@intel.com>
-Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+ <CAFxSrVvPYA3dnTr16g-N=pCWt9WUX2UEfpg7=sfcSnvQO2BbSg@mail.gmail.com>
+In-Reply-To: <CAFxSrVvPYA3dnTr16g-N=pCWt9WUX2UEfpg7=sfcSnvQO2BbSg@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Brian,
-
-Thanks for your reply, I was using the wrong appkey, it is working
-now. Congratulations on supporting bluetooth mesh so fast after
-publication of the standard.
-
-Kind regards,
-
-Jehudi
-
-2017-08-29 20:13 GMT+02:00 Gix, Brian <brian.gix@intel.com>:
-> Hi Jehudi,
->
-> The local "OnOff Client" of meshctl is bound to Application Key 001, not 000 (see the local_node.json file).
->
-> I am not certain the Zephyr supports the on/off opcode (even if the Composition data of Zephyr is claiming to support the model) but at a minimum, you should be sending appkey 001, and binding the on/off server to that key.
->
->> -----Original Message-----
->> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
->> owner@vger.kernel.org] On Behalf Of Laczen JMS
->> Sent: Tuesday, August 29, 2017 10:58 AM
->> To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
->> Cc: linux-bluetooth@vger.kernel.org
->> Subject: Re: usage of meshctl with zephyr node
->>
->> Hi Luiz,
->>
->> Thanks for the reply. Zephyr does support the onoff model. Using the silicon
->> lab mesh program for android I can control the onoff server model on the
->> node.
->>
->> What I don't know is if I can use the onoff command in meshctl to control the
->> onoff server model on the node. I am trying to provision, configure and
->> control a node using meshctl. The provisioning works, I am doubting the
->> configuring and controlling.
->>
->> For the configuring I am using: configure nodeID, add-appkey, bind, is this OK
->> ?
->>
->> For the controlling I am using onoff nodeID, onoff 1/0, is this OK?
->>
->> Kind regards,
->>
->> Jehudi
->>
->> 2017-08-29 19:38 GMT+02:00 Luiz Augusto von Dentz
->> <luiz.dentz@gmail.com>:
->> > Hi,
->> >
->> > On Tue, Aug 29, 2017 at 4:50 PM, Laczen JMS <laczenjms@gmail.com>
->> wrote:
->> >> Hi,
->> >>
->> >> I have tried to use meshctl with a zephyr node, but I can't figure
->> >> out how to use it. I have a zephyr node that is unprovisioned and I'm
->> >> doing the following:
->> >>
->> >> [meshctl] # discover-unprovisioned on -> works and gives a new
->> >> unprovisioned node (dddd000..) [meshctl] # discover-unprovisioned off
->> >> [meshctl] # provision dddd -> works [Zephyr Mesh-Node-0100] #
->> >> configure 0100
->> >> [config: Target = 0100] # add-appkey 0 -> works: Node 0100 AppKey
->> >> Status Success
->> >> [config: Target = 0100] # bind 0 0 1000 -> works: Node 0100 Model App
->> >> Status Success Element 0100 AppIdx 000
->> >>         ModelId 1000
->> >>         Binding successful AppIdx 000
->> >> [config: Target = 0100] # back
->> >> [Zephyr Mesh-Node-0100] # onoff 0100
->> >
->> > I don't thing Zephyr supports onoff model, that might explain why this
->> > is failing.
->> >
->> >> [on/off: Target = 0100]# onoff 1 fails (does nothing) The debugging
->> >> on the node gives the following message:
->> >> [bt] [WRN] sdu_recv: No matching AppKey adding some extra debugging
->> >> lines in the node gives the following information:
->> >> (AID(&hdr) != keys->id):
->> >> [bt] [WRN] sdu_recv: Appkey IDs hdr:31 keys:46
->> >>
->> >> Am I using meshctl incorrect ? I am doubting the bind command.
->> >>
->> >> Thanks, and kind regards,
->> >>
->> >> Jehudi
->> >> --
->> >> To unsubscribe from this list: send the line "unsubscribe
->> >> linux-bluetooth" in the body of a message to
->> >> majordomo@vger.kernel.org More majordomo info at
->> >> http://vger.kernel.org/majordomo-info.html
->> >
->> >
->> >
->> > --
->> > Luiz Augusto von Dentz
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->> the body of a message to majordomo@vger.kernel.org More majordomo
->> info at  http://vger.kernel.org/majordomo-info.html
+SGkgSmVodWRpLA0KDQpUaGUgbG9jYWwgIk9uT2ZmIENsaWVudCIgb2YgbWVzaGN0bCBpcyBib3Vu
+ZCB0byBBcHBsaWNhdGlvbiBLZXkgMDAxLCBub3QgMDAwIChzZWUgdGhlIGxvY2FsX25vZGUuanNv
+biBmaWxlKS4NCg0KSSBhbSBub3QgY2VydGFpbiB0aGUgWmVwaHlyIHN1cHBvcnRzIHRoZSBvbi9v
+ZmYgb3Bjb2RlIChldmVuIGlmIHRoZSBDb21wb3NpdGlvbiBkYXRhIG9mIFplcGh5ciBpcyBjbGFp
+bWluZyB0byBzdXBwb3J0IHRoZSBtb2RlbCkgYnV0IGF0IGEgbWluaW11bSwgeW91IHNob3VsZCBi
+ZSBzZW5kaW5nIGFwcGtleSAwMDEsIGFuZCBiaW5kaW5nIHRoZSBvbi9vZmYgc2VydmVyIHRvIHRo
+YXQga2V5Lg0KDQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IGxpbnV4LWJs
+dWV0b290aC1vd25lckB2Z2VyLmtlcm5lbC5vcmcgW21haWx0bzpsaW51eC1ibHVldG9vdGgtDQo+
+IG93bmVyQHZnZXIua2VybmVsLm9yZ10gT24gQmVoYWxmIE9mIExhY3plbiBKTVMNCj4gU2VudDog
+VHVlc2RheSwgQXVndXN0IDI5LCAyMDE3IDEwOjU4IEFNDQo+IFRvOiBMdWl6IEF1Z3VzdG8gdm9u
+IERlbnR6IDxsdWl6LmRlbnR6QGdtYWlsLmNvbT4NCj4gQ2M6IGxpbnV4LWJsdWV0b290aEB2Z2Vy
+Lmtlcm5lbC5vcmcNCj4gU3ViamVjdDogUmU6IHVzYWdlIG9mIG1lc2hjdGwgd2l0aCB6ZXBoeXIg
+bm9kZQ0KPiANCj4gSGkgTHVpeiwNCj4gDQo+IFRoYW5rcyBmb3IgdGhlIHJlcGx5LiBaZXBoeXIg
+ZG9lcyBzdXBwb3J0IHRoZSBvbm9mZiBtb2RlbC4gVXNpbmcgdGhlIHNpbGljb24NCj4gbGFiIG1l
+c2ggcHJvZ3JhbSBmb3IgYW5kcm9pZCBJIGNhbiBjb250cm9sIHRoZSBvbm9mZiBzZXJ2ZXIgbW9k
+ZWwgb24gdGhlDQo+IG5vZGUuDQo+IA0KPiBXaGF0IEkgZG9uJ3Qga25vdyBpcyBpZiBJIGNhbiB1
+c2UgdGhlIG9ub2ZmIGNvbW1hbmQgaW4gbWVzaGN0bCB0byBjb250cm9sIHRoZQ0KPiBvbm9mZiBz
+ZXJ2ZXIgbW9kZWwgb24gdGhlIG5vZGUuIEkgYW0gdHJ5aW5nIHRvIHByb3Zpc2lvbiwgY29uZmln
+dXJlIGFuZA0KPiBjb250cm9sIGEgbm9kZSB1c2luZyBtZXNoY3RsLiBUaGUgcHJvdmlzaW9uaW5n
+IHdvcmtzLCBJIGFtIGRvdWJ0aW5nIHRoZQ0KPiBjb25maWd1cmluZyBhbmQgY29udHJvbGxpbmcu
+DQo+IA0KPiBGb3IgdGhlIGNvbmZpZ3VyaW5nIEkgYW0gdXNpbmc6IGNvbmZpZ3VyZSBub2RlSUQs
+IGFkZC1hcHBrZXksIGJpbmQsIGlzIHRoaXMgT0sNCj4gPw0KPiANCj4gRm9yIHRoZSBjb250cm9s
+bGluZyBJIGFtIHVzaW5nIG9ub2ZmIG5vZGVJRCwgb25vZmYgMS8wLCBpcyB0aGlzIE9LPw0KPiAN
+Cj4gS2luZCByZWdhcmRzLA0KPiANCj4gSmVodWRpDQo+IA0KPiAyMDE3LTA4LTI5IDE5OjM4IEdN
+VCswMjowMCBMdWl6IEF1Z3VzdG8gdm9uIERlbnR6DQo+IDxsdWl6LmRlbnR6QGdtYWlsLmNvbT46
+DQo+ID4gSGksDQo+ID4NCj4gPiBPbiBUdWUsIEF1ZyAyOSwgMjAxNyBhdCA0OjUwIFBNLCBMYWN6
+ZW4gSk1TIDxsYWN6ZW5qbXNAZ21haWwuY29tPg0KPiB3cm90ZToNCj4gPj4gSGksDQo+ID4+DQo+
+ID4+IEkgaGF2ZSB0cmllZCB0byB1c2UgbWVzaGN0bCB3aXRoIGEgemVwaHlyIG5vZGUsIGJ1dCBJ
+IGNhbid0IGZpZ3VyZQ0KPiA+PiBvdXQgaG93IHRvIHVzZSBpdC4gSSBoYXZlIGEgemVwaHlyIG5v
+ZGUgdGhhdCBpcyB1bnByb3Zpc2lvbmVkIGFuZCBJJ20NCj4gPj4gZG9pbmcgdGhlIGZvbGxvd2lu
+ZzoNCj4gPj4NCj4gPj4gW21lc2hjdGxdICMgZGlzY292ZXItdW5wcm92aXNpb25lZCBvbiAtPiB3
+b3JrcyBhbmQgZ2l2ZXMgYSBuZXcNCj4gPj4gdW5wcm92aXNpb25lZCBub2RlIChkZGRkMDAwLi4p
+IFttZXNoY3RsXSAjIGRpc2NvdmVyLXVucHJvdmlzaW9uZWQgb2ZmDQo+ID4+IFttZXNoY3RsXSAj
+IHByb3Zpc2lvbiBkZGRkIC0+IHdvcmtzIFtaZXBoeXIgTWVzaC1Ob2RlLTAxMDBdICMNCj4gPj4g
+Y29uZmlndXJlIDAxMDANCj4gPj4gW2NvbmZpZzogVGFyZ2V0ID0gMDEwMF0gIyBhZGQtYXBwa2V5
+IDAgLT4gd29ya3M6IE5vZGUgMDEwMCBBcHBLZXkNCj4gPj4gU3RhdHVzIFN1Y2Nlc3MNCj4gPj4g
+W2NvbmZpZzogVGFyZ2V0ID0gMDEwMF0gIyBiaW5kIDAgMCAxMDAwIC0+IHdvcmtzOiBOb2RlIDAx
+MDAgTW9kZWwgQXBwDQo+ID4+IFN0YXR1cyBTdWNjZXNzIEVsZW1lbnQgMDEwMCBBcHBJZHggMDAw
+DQo+ID4+ICAgICAgICAgTW9kZWxJZCAxMDAwDQo+ID4+ICAgICAgICAgQmluZGluZyBzdWNjZXNz
+ZnVsIEFwcElkeCAwMDANCj4gPj4gW2NvbmZpZzogVGFyZ2V0ID0gMDEwMF0gIyBiYWNrDQo+ID4+
+IFtaZXBoeXIgTWVzaC1Ob2RlLTAxMDBdICMgb25vZmYgMDEwMA0KPiA+DQo+ID4gSSBkb24ndCB0
+aGluZyBaZXBoeXIgc3VwcG9ydHMgb25vZmYgbW9kZWwsIHRoYXQgbWlnaHQgZXhwbGFpbiB3aHkg
+dGhpcw0KPiA+IGlzIGZhaWxpbmcuDQo+ID4NCj4gPj4gW29uL29mZjogVGFyZ2V0ID0gMDEwMF0j
+IG9ub2ZmIDEgZmFpbHMgKGRvZXMgbm90aGluZykgVGhlIGRlYnVnZ2luZw0KPiA+PiBvbiB0aGUg
+bm9kZSBnaXZlcyB0aGUgZm9sbG93aW5nIG1lc3NhZ2U6DQo+ID4+IFtidF0gW1dSTl0gc2R1X3Jl
+Y3Y6IE5vIG1hdGNoaW5nIEFwcEtleSBhZGRpbmcgc29tZSBleHRyYSBkZWJ1Z2dpbmcNCj4gPj4g
+bGluZXMgaW4gdGhlIG5vZGUgZ2l2ZXMgdGhlIGZvbGxvd2luZyBpbmZvcm1hdGlvbjoNCj4gPj4g
+KEFJRCgmaGRyKSAhPSBrZXlzLT5pZCk6DQo+ID4+IFtidF0gW1dSTl0gc2R1X3JlY3Y6IEFwcGtl
+eSBJRHMgaGRyOjMxIGtleXM6NDYNCj4gPj4NCj4gPj4gQW0gSSB1c2luZyBtZXNoY3RsIGluY29y
+cmVjdCA/IEkgYW0gZG91YnRpbmcgdGhlIGJpbmQgY29tbWFuZC4NCj4gPj4NCj4gPj4gVGhhbmtz
+LCBhbmQga2luZCByZWdhcmRzLA0KPiA+Pg0KPiA+PiBKZWh1ZGkNCj4gPj4gLS0NCj4gPj4gVG8g
+dW5zdWJzY3JpYmUgZnJvbSB0aGlzIGxpc3Q6IHNlbmQgdGhlIGxpbmUgInVuc3Vic2NyaWJlDQo+
+ID4+IGxpbnV4LWJsdWV0b290aCIgaW4gdGhlIGJvZHkgb2YgYSBtZXNzYWdlIHRvDQo+ID4+IG1h
+am9yZG9tb0B2Z2VyLmtlcm5lbC5vcmcgTW9yZSBtYWpvcmRvbW8gaW5mbyBhdA0KPiA+PiBodHRw
+Oi8vdmdlci5rZXJuZWwub3JnL21ham9yZG9tby1pbmZvLmh0bWwNCj4gPg0KPiA+DQo+ID4NCj4g
+PiAtLQ0KPiA+IEx1aXogQXVndXN0byB2b24gRGVudHoNCj4gLS0NCj4gVG8gdW5zdWJzY3JpYmUg
+ZnJvbSB0aGlzIGxpc3Q6IHNlbmQgdGhlIGxpbmUgInVuc3Vic2NyaWJlIGxpbnV4LWJsdWV0b290
+aCIgaW4NCj4gdGhlIGJvZHkgb2YgYSBtZXNzYWdlIHRvIG1ham9yZG9tb0B2Z2VyLmtlcm5lbC5v
+cmcgTW9yZSBtYWpvcmRvbW8NCj4gaW5mbyBhdCAgaHR0cDovL3ZnZXIua2VybmVsLm9yZy9tYWpv
+cmRvbW8taW5mby5odG1sDQo=
