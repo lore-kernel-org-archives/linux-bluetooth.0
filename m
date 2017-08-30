@@ -1,31 +1,65 @@
-Return-Path: <johan.hedberg@gmail.com>
-Date: Wed, 30 Aug 2017 22:13:29 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Add option for disabling legacy ioctl
- interfaces
-Message-ID: <20170830191329.GA13956@x1c.home>
-References: <20170821082908.12296-1-marcel@holtmann.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Subject: Re: Segfault on audio pairing
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Konrad Zapalowicz <konrad.zapalowicz@canonical.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+References: <4239e483-1df9-8e18-fc07-d3ce755c8b16@phobeus.de>
+ <CABBYNZ+xQCSDCN-GmOPNJ4BTBsvoS+KMkAGfqzrJ4AgGZJmWYg@mail.gmail.com>
+ <20170823091739.GA7309@annapurna>
+ <CABBYNZ+1BOM-RssKMNp23rFA4R4HQrsu-cG=rNHM_kpmJkjutw@mail.gmail.com>
+From: Florian Sievert <caleb@phobeus.de>
+Message-ID: <6a441a10-6c11-dcd8-bde2-2f7b18840fdb@phobeus.de>
+Date: Wed, 30 Aug 2017 18:07:45 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170821082908.12296-1-marcel@holtmann.org>
+In-Reply-To: <CABBYNZ+1BOM-RssKMNp23rFA4R4HQrsu-cG=rNHM_kpmJkjutw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi,
 
-On Mon, Aug 21, 2017, Marcel Holtmann wrote:
-> The legacy ioctl interfaces are only useful for BR/EDR operation and
-> since Linux 3.4 no longer needed anyway. This options allows disabling
-> them alltogether and use only management interfaces for setup and
-> control.
-> 
-> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-> ---
->  net/bluetooth/Kconfig    | 10 ++++++++++
->  net/bluetooth/hci_sock.c |  6 ++++++
->  2 files changed, 16 insertions(+)
+the affected devices here are:
+1) Bose Soundlink Mini
+2) Anker SoundCore
 
-Applied to bluetooth-next. Thanks.
+> Hi,
+>
+> On Wed, Aug 23, 2017 at 12:17 PM, Konrad Zapalowicz
+> <konrad.zapalowicz@canonical.com> wrote:
+>> On 08/21, Luiz Augusto von Dentz wrote:
+>>> Hi Florian,
+>>>
+>>> On Mon, Aug 21, 2017 at 7:29 PM, Florian Sievert <caleb@phobeus.de> wrote:
+>>>> Hi all,
+>>>>
+>>>> I run into an issue with bluetooth when trying to connect to an audio
+>>>> speaker on my Fedora 26 system. I was able to reproduce this at least on
+>>>> two other Fedora systems with different hardware and thus opened up an
+>>>> issue in redhat's bugzilla:
+>>>>
+>>>> https://bugzilla.redhat.com/show_bug.cgi?id=1469961
+>>>>
+>>>> While performing a discussion on the fedora user mailing list, some guy
+>>>> confirmed the issue as well and pointed out that some similiar Arch
+>>>> Linux does exist:
+>>>>
+>>>> https://bugs.archlinux.org/task/53442
+>>>>
+>>>> I was pointed to this mailing list to raise the issue and asking for
+>>>> further advisory on debugging this segfault. The issue is 100%
+>>>> reproducable here on my system and seems just to occur when connecting
+>>>> an audio speaker via bluetooth to the system. All other bluetooth
+>>>> devices seems to be working fine. Some logs and the segfault are
+>>>> attached to the redhat issue. So how may I help to narrow down this
+>>>> segfault?
+>>> There have been at least one fix related to some headset that are using GATT:
+>>>
+>>> https://git.kernel.org/pub/scm/bluetooth/bluez.git/commit/?id=5252296b725ef159992be5372f60721bd9adca48
+>> Florian,
+>>
+>> I can add that it fixes a crash that I have been observing with Sony
+>> MDR-1000X and possibly also with Sony SBH52.
+> It might be a good idea to compile a list of affected headsets so we
+> can probably add to the changelog when releasing.
+>
 
-Johan
