@@ -1,47 +1,82 @@
-Return-Path: <frederic.danis.oss@gmail.com>
-Subject: Re: [PATCH v2 1/3] dt-bindings: net: bluetooth: Add
- broadcom-bluetooth
-To: Marcel Holtmann <marcel@holtmann.org>,
- Loic Poulain <loic.poulain@gmail.com>
-Cc: Maxime Ripard <maxime.ripard@free-electrons.com>,
- Stefan Wahren <stefan.wahren@i2se.com>, Rob Herring <robh+dt@kernel.org>,
- Ray Jui <rjui@broadcom.com>, Scott Branden <sbranden@broadcom.com>,
- f.fainelli@gmail.com, Johan Hedberg <johan.hedberg@gmail.com>,
- linux-rpi-kernel@lists.infradead.org,
- "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
- devicetree@vger.kernel.org
-References: <1501576704-26423-1-git-send-email-loic.poulain@gmail.com>
- <20170822074726.e424lflqxn6mb4xd@flea.lan>
- <f2fcf522-cd1e-e748-0ee7-ad28bbf8ae5d@i2se.com>
- <4c23bcb6-1b90-c41e-6e47-7d8315e760ae@gmail.com>
- <9BD5C644-6B89-496C-B442-F276D7A99102@holtmann.org>
-From: =?UTF-8?Q?Fr=c3=a9d=c3=a9ric_Danis?= <frederic.danis.oss@gmail.com>
-Message-ID: <cbd8f439-0575-593e-80d7-8c5d74188236@gmail.com>
-Date: Thu, 31 Aug 2017 21:32:56 +0200
-MIME-Version: 1.0
-In-Reply-To: <9BD5C644-6B89-496C-B442-F276D7A99102@holtmann.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Message-ID: <1504193531.18331.1.camel@gmail.com>
+Subject: bluetoothctl =?UTF-8?Q?=E2=80=9CWaiting?= to connect to
+ =?UTF-8?Q?bluetoothd=E2=80=A6=E2=80=9D?= in udev rule script
+From: Diego Fernandez <aiguo.fernandez@gmail.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Thu, 31 Aug 2017 11:32:11 -0400
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel and Loïc,
+Hi everyone,
 
-Le 23/08/2017 à 16:19, Marcel Holtmann a écrit :
->> This is already partially supported in the hci_bcm driver.
->> Today this driver registers a platform_driver(legacy/ACPI) and a
->> serdev_device_driver (new/DT).
->>
->> The platform driver retrieves the gpios and mainly uses them in pm ops.
->> Once the ACPI for serdev will be supported, this plat driver should be
->> removed.
->>
->> The serdev driver does no support this yet because I used the RPi3
->> as dev platform. But this is something we want to have as well.
-> Making ACPI serdev aware and turning BTH0 into serdev nodes is really the next step. That would allow us to simplify the drivers and remove duplicate code. Do you still have access to ACPI based tablets with Broadcom chips? It would be great if you can take a stab at this.
+I'm writing some scripts to automate fixing some issues with
+PulseAudio, Bluetooth, and A2DP. I've found some useful examples
+online, and I have a script that works when I run it manually. However,
+when udev kicks off the rule, I get the error in $subject, which I
+imagine means that bluetoothctl can't connect to bluetoothd. I also
+tried using hcitool, but that doesn't fix my bluetooth issues.
 
-I have access to an Asus T100TA with Broadcom chipset and I recently 
-started to work on the ACPI part of SerDev.
-I hope to send patches for it soon.
+I tried looking at the code for bluetoothctl, and it seems like it's
+using dbus in the background. If that's the case, I would think that
+setting XDG_RUNTIME_DIR, XAUTHORITY and DISPLAY should be enough.
 
-Regards,
+I originally posted the question here: https://superuser.com/questions/
+1245940/bluetoothctl-waiting-to-connect-to-bluetoothd-in-udev-rule-
+script
 
-Frédéric Danis
+Here are the scripts I have, which I believe should work with any
+bluetooth headset as long as there's only 1 pulseaudio instance running
+and only 1 headset connected:
+
+/etc/udev/rules.d/80-bt-headset.rules
+-------------------------------------------------
+ACTION=="add", SUBSYSTEM=="bluetooth", RUN+="/usr/local/bin/a2dp-fix-
+wrapper"
+-------------------------------------------------
+
+/usr/local/bin/a2dp-fix-wrapper
+-------------------------------------------------
+#!/bin/bash -x
+PID=$(pgrep pulseaudio)
+USER=$(grep -z USER= /proc/$PID/environ | sed 's/.*=//')
+USER_ID=$(id -u $USER)
+HOME=$(echo $(getent passwd $USER )| cut -d : -f 6)
+
+export XDG_RUNTIME_DIR=/run/user/$USER_ID
+export XAUTHORITY=$HOME/.Xauthority
+export DISPLAY=:0
+export PULSE_RUNTIME_PATH=$XDG_RUNTIME_DIR/pulse/
+
+sleep 5
+
+sudo -u $USER -E /usr/local/bin/a2dp-fix &> /udev_output.txt
+-------------------------------------------------
+
+/usr/local/bin/a2dp-fix
+-------------------------------------------------
+#!/bin/bash -x
+bt_device_addr=$(pacmd list-cards | grep -i 'name:.*bluez_card' | sed
+-E 's/.*<?bluez_card\.([A-Z0-9_]+)>?/\1/')
+device_mac=$(echo $bt_device_addr | sed 's/_/:/g')
+
+a2dp_available=$(pacmd list-cards | grep -A30 bluez | grep "A2DP Sink"
+| sed -E 's/.* available: ([a-z]+)\)/\1/g')
+
+if [[ "$a2dp_available" == "no" ]]
+then
+    echo -e "connect $device_mac\nquit" | bluetoothctl
+    sleep 5
+    pacmd set-card-profile bluez_card.$bt_device_addr off
+    pacmd set-card-profile bluez_card.$bt_device_addr a2dp_sink
+    pacmd set-default-sink bluez_sink.$bt_device_addr.a2dp_sink
+fi
+-------------------------------------------------
+
+The following things work:
+* running `/usr/local/bin/a2dp-fix` as current user
+* running `sudo /usr/local/bin/a2dp-fix-wrapper`
+
+Any help would be greatly appreciated!
