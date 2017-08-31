@@ -1,51 +1,3303 @@
-Return-Path: <bigeasy@linutronix.de>
-Date: Thu, 31 Aug 2017 16:52:12 +0200
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: Mart van de Wege <mvdwege@gmail.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@intel.com>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: linux-rt-users@vger.kernel.org, tglx@linutronix.de,
-	Peter Zijlstra <peterz@infradead.org>
-Subject: Possible BT deadlock due to recursive read locking (Was: Re: kernel
- BUG at kernel/locking/rtmutex.c:1059)
-Message-ID: <20170831145211.xlu6cvocqdkzevsl@linutronix.de>
-References: <86val4928u.fsf@gaheris.avalon.lan>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <86val4928u.fsf@gaheris.avalon.lan>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ] build: Cleanup GATT profiles
+Date: Thu, 31 Aug 2017 15:38:07 +0300
+Message-Id: <20170831123807.25138-1-luiz.dentz@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 2017-08-30 23:25:53 [+0200], Mart van de Wege wrote:
-> Hi,
-Hi,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-> The issue persists up to v4.11.12-rt10
-Does
-	CONFIG_RWLOCK_RT_READER_BIASED=y
-make it go away?
+Alert, cyclingspeed, heartrate and proximity can all be implemented
+using the GATT D-Bus API so they no longer need dedicated APIs.
+---
+ Makefile.am                       |   7 +-
+ Makefile.tools                    |   6 +-
+ doc/alert-api.txt                 | 108 -----
+ doc/cyclingspeed-api.txt          |  99 -----
+ doc/heartrate-api.txt             |  77 ----
+ doc/proximity-api.txt             |  56 ---
+ profiles/proximity/immalert.c     | 292 --------------
+ profiles/proximity/immalert.h     |  26 --
+ profiles/proximity/linkloss.c     | 340 ----------------
+ profiles/proximity/linkloss.h     |  26 --
+ profiles/proximity/main.c         |  81 ----
+ profiles/proximity/manager.c      | 196 ---------
+ profiles/proximity/manager.h      |  26 --
+ profiles/proximity/monitor.c      | 822 --------------------------------------
+ profiles/proximity/monitor.h      |  43 --
+ profiles/proximity/proximity.conf |   9 -
+ profiles/proximity/reporter.c     | 270 -------------
+ profiles/proximity/reporter.h     |  46 ---
+ test/test-alert                   | 185 ---------
+ test/test-cyclingspeed            | 197 ---------
+ test/test-heartrate               | 108 -----
+ test/test-proximity               |  70 ----
+ 22 files changed, 4 insertions(+), 3086 deletions(-)
+ delete mode 100644 doc/alert-api.txt
+ delete mode 100644 doc/cyclingspeed-api.txt
+ delete mode 100644 doc/heartrate-api.txt
+ delete mode 100644 doc/proximity-api.txt
+ delete mode 100644 profiles/proximity/immalert.c
+ delete mode 100644 profiles/proximity/immalert.h
+ delete mode 100644 profiles/proximity/linkloss.c
+ delete mode 100644 profiles/proximity/linkloss.h
+ delete mode 100644 profiles/proximity/main.c
+ delete mode 100644 profiles/proximity/manager.c
+ delete mode 100644 profiles/proximity/manager.h
+ delete mode 100644 profiles/proximity/monitor.c
+ delete mode 100644 profiles/proximity/monitor.h
+ delete mode 100644 profiles/proximity/proximity.conf
+ delete mode 100644 profiles/proximity/reporter.c
+ delete mode 100644 profiles/proximity/reporter.h
+ delete mode 100755 test/test-alert
+ delete mode 100755 test/test-cyclingspeed
+ delete mode 100755 test/test-heartrate
+ delete mode 100755 test/test-proximity
 
-> Stacktrace:
-> 
-> Aug 29 17:28:04 localhost kernel: [   46.483810] ------------[ cut here ]------------
-> Aug 29 17:28:04 localhost kernel: [   46.483812] kernel BUG at kernel/locking/rtmutex.c:1059!
+diff --git a/Makefile.am b/Makefile.am
+index eaed632e8..c9c639d88 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -216,7 +216,7 @@ man_MANS = src/bluetoothd.8
+ 
+ EXTRA_DIST += src/genbuiltin src/bluetooth.conf \
+ 			src/main.conf profiles/network/network.conf \
+-			profiles/input/input.conf profiles/proximity/proximity.conf
++			profiles/input/input.conf
+ 
+ test_scripts =
+ unit_tests =
+@@ -254,10 +254,7 @@ EXTRA_DIST += doc/mgmt-api.txt \
+ 		doc/health-api.txt doc/sap-api.txt \
+ 		doc/input-api.txt
+ 
+-EXTRA_DIST += doc/alert-api.txt \
+-		doc/proximity-api.txt doc/heartrate-api.txt \
+-		doc/thermometer-api.txt doc/cyclingspeed-api.txt \
+-		doc/gatt-api.txt doc/advertising-api.txt
++EXTRA_DIST += doc/gatt-api.txt doc/advertising-api.txt
+ 
+ EXTRA_DIST += doc/obex-api.txt doc/obex-agent-api.txt
+ 
+diff --git a/Makefile.tools b/Makefile.tools
+index f6cc80bdf..dde566d6d 100644
+--- a/Makefile.tools
++++ b/Makefile.tools
+@@ -438,13 +438,11 @@ test_scripts += test/sap_client.py test/bluezutils.py \
+ 		test/test-discovery test/test-manager test/test-adapter \
+ 		test/test-device test/simple-agent \
+ 		test/simple-endpoint test/test-sap-server \
+-		test/test-proximity test/test-network \
+-		test/test-thermometer test/test-profile test/test-health \
++		test/test-network test/test-profile test/test-health \
+ 		test/test-health-sink test/service-record.dtd \
+ 		test/service-did.xml test/service-spp.xml test/service-opp.xml \
+ 		test/service-ftp.xml test/simple-player test/test-nap \
+-		test/test-heartrate test/test-alert test/test-hfp \
+-		test/test-cyclingspeed test/opp-client test/ftp-client \
++		test/test-hfp test/opp-client test/ftp-client \
+ 		test/pbap-client test/map-client test/example-advertisement \
+ 		test/example-gatt-server test/example-gatt-client \
+ 		test/test-gatt-profile
+diff --git a/doc/alert-api.txt b/doc/alert-api.txt
+deleted file mode 100644
+index fc427c827..000000000
+--- a/doc/alert-api.txt
++++ /dev/null
+@@ -1,108 +0,0 @@
+-BlueZ D-Bus Alert API description
+-*********************************
+-
+-
+-Introduction
+-------------
+-
+-Currently, there are two different GATT server profiles that depend on
+-receiving alerts or notifications from the platform: Phone Alert Status (PASP)
+-and Alert Notification (ANP). PASP is very specific to mobile phones, and also
+-allows limited control to alerts (i.e. mute once or switch to a silent mode).
+-
+-This document presents a unified API that allows to register and notify alerts,
+-and to control some alerts (using the provided agent object).
+-
+-
+-Alert hierarchy
+-===============
+-
+-Service		org.bluez
+-Interface	org.bluez.Alert1
+-Object path	/org/bluez
+-
+-Methods		void RegisterAlert(string category, object agent)
+-
+-			Register a new alert category and an agent for it. This
+-			means the application will be responsible for notifying
+-			BlueZ of any alerts of that category, using the
+-			NewAlert() method.
+-
+-			Supported ANP categories: simple, email, news, call,
+-				missed-call, sms-mms, voice-mail, schedule,
+-				high-priority, instant-message
+-			Supported PASP categories: ringer, vibrate, display
+-
+-			Possible Errors: org.bluez.Error.InvalidArguments
+-
+-		void NewAlert(string category, uint16 count, string description)
+-
+-			Notify BlueZ of new alert(s) for the given category. The
+-			description is relative to the last received alert and
+-			can be sender name, caller ID, title, or other
+-			information specific to the category.
+-
+-			For ringer, vibrate and display categories, valid
+-			descriptions are "active" and "not active". Alerts from
+-			ringer category also accept "enabled" and "disabled",
+-			depending on whether ringer is in silent mode or not.
+-
+-			Description must not exceed 18 bytes when encoded in
+-			UTF-8 format, otherwise an error is returned. If there
+-			is no description, an empty string should be used.
+-
+-			The count argument contains the number of alerts not
+-			yet acknowledged by the user on the UI. To save D-Bus
+-			traffic, events that may generate multiple alerts at
+-			the same time (like email, sms, news) should trigger a
+-			single NewAlert().
+-
+-			If there are more than 254 new alerts, count must be
+-			set to 255. PASP alerts should always set count to 1.
+-
+-			Possible Errors: org.bluez.Error.InvalidArguments
+-
+-		void UnreadAlert(string category, uint16 count)
+-
+-			Some services (like SMS and e-mail) keep track of
+-			number of unread items. This method allows to update
+-			this counter, so peer devices can be notified using
+-			Alert Notification Profile.
+-
+-			If there are more than 254 unread alerts, count must be
+-			set to 255.
+-
+-			Possible Errors: org.bluez.Error.InvalidArguments
+-
+-Alert Agent hierarchy
+-=====================
+-
+-Service		org.bluez
+-Interface	org.bluez.AlertAgent1
+-Object path	freely definable
+-
+-Methods		void MuteOnce()
+-
+-			This method is only called if "ringer" alert category
+-			is specified when registering the agent.
+-
+-			Mute the ringer once (e.g. during a incoming call). If
+-			ringer is not active, does nothing.
+-
+-		void SetRinger(string mode)
+-
+-			This method is only called if "ringer" alert category
+-			is specified when registering the agent.
+-
+-			Set ringer to the specified mode. If mode is "enabled",
+-			ringer is set to the default mode, as defined by the
+-			current active profile. If mode is "disabled", ringer
+-			will not activate on incoming calls, until it is set
+-			back to "enabled" mode.
+-
+-			Possible Errors: org.bluez.Error.InvalidArguments
+-
+-		void Release()
+-
+-			Release this agent. At this point, it will not be used
+-			by BlueZ anymore and can be destroyed by the owner.
+diff --git a/doc/cyclingspeed-api.txt b/doc/cyclingspeed-api.txt
+deleted file mode 100644
+index a1f1a930a..000000000
+--- a/doc/cyclingspeed-api.txt
++++ /dev/null
+@@ -1,99 +0,0 @@
+-Cycling Speed and Cadence API description
+-*****************************************
+-
+-
+-Cycling Speed and Cadence Manager hierarchy
+-===========================================
+-
+-Service		org.bluez
+-Interface	org.bluez.CyclingSpeedManager1
+-Object path	[variable prefix]/{hci0,hci1,...}
+-
+-Methods		RegisterWatcher(object agent)
+-
+-			Registers a watcher to monitor cycling speed and
+-			cadence measurements.
+-
+-			Possible Errors: org.bluez.Error.InvalidArguments
+-
+-		UnregisterWatcher(object agent)
+-
+-			Unregisters a watcher.
+-
+-Cycling Speed and Cadence Profile hierarchy
+-===========================================
+-
+-Service		org.bluez
+-Interface	org.bluez.CyclingSpeed1
+-Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX
+-
+-Methods		SetCumulativeWheelRevolutions(uint32 value)
+-
+-			Sets cumulative wheel revolutions value if
+-			Cumulative Wheel Revolutions feature is supported.
+-
+-			Possible Errors: org.bluez.Error.NotSupported
+-
+-Properties	string Location (optional) [readwrite]
+-
+-			Current sensor location, if supported.
+-			If Multiple Sensor Locations feature is supported,
+-			this property can be set to one of values read from
+-			SupportedLocations property.
+-
+-			Possible values: "other", "top-of-shoe", "in-shoe",
+-					"hip", "front-wheel", "left-crank",
+-					"right-crank", "left-pedal",
+-					"right-pedal", "front-hub",
+-					"rear-dropout", "chainstay",
+-					"rear-wheel", "rear-hub"
+-
+-		array{string} SupportedLocations (optional) [readonly]
+-
+-			List of locations supported by sensor, only present
+-			if Multiple Sensor Locations feature is supported.
+-
+-		boolean WheelRevolutionDataSupported [readonly]
+-
+-			true if sensor can read and set Cumulative Wheel
+-			Revolutions value, false otherwise.
+-
+-		boolean MultipleLocationsSupported [readonly]
+-
+-			true if sensor supports Multiple Sensor Locations
+-			feature and can set Location, false otherwise.
+-
+-Cycling Speed and Cadence Watcher hierarchy
+-===========================================
+-
+-Service		unique name
+-Interface	org.bluez.CyclingSpeedWatcher1
+-Object path	freely definable
+-
+-Methods		void MeasurementReceived(object device, dict measurement)
+-
+-			This callback is called whenever wheel and/or crank
+-			revolutions measurement is received from sensor.
+-
+-			Measurement:
+-
+-				uint32 WheelRevolutions (optional):
+-
+-					Cumulative number of wheel revolutions.
+-
+-				uint16 LastWheelEventTime (optional):
+-
+-					Time of last event from wheel sensor.
+-					Value is expressed in 1/1024 second
+-					units and can roll over during a ride.
+-
+-				uint16 CrankRevolutions (optional):
+-
+-					Cumulative number of crank revolutions.
+-					This value can occasionally roll over.
+-
+-				uint16 LastCrankEventTime (optional):
+-
+-					Time of last event from crank sensor.
+-					Value is expressed in 1/1024 second
+-					units and can roll over during a ride.
+diff --git a/doc/heartrate-api.txt b/doc/heartrate-api.txt
+deleted file mode 100644
+index 665db126b..000000000
+--- a/doc/heartrate-api.txt
++++ /dev/null
+@@ -1,77 +0,0 @@
+-Heart Rate API description
+-**************************
+-
+-
+-Heart Rate Manager hierarchy
+-============================
+-
+-Service		org.bluez
+-Interface	org.bluez.HeartRateManager1
+-Object path	[variable prefix]/{hci0,hci1,...}
+-
+-Methods		RegisterWatcher(object agent)
+-
+-			Registers a watcher to monitor heart rate measurements.
+-
+-			Possible Errors: org.bluez.Error.InvalidArguments
+-
+-		UnregisterWatcher(object agent)
+-
+-			Unregisters a watcher.
+-
+-Heart Rate Profile hierarchy
+-============================
+-
+-Service		org.bluez
+-Interface	org.bluez.HeartRate1
+-Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX
+-
+-Methods		Reset()
+-
+-			Restart the accumulation of energy expended from zero.
+-
+-			Possible Errors: org.bluez.Error.NotSupported
+-
+-Properties	string Location (optional) [readonly]
+-
+-			Possible values: "other", "chest", "wrist","winger",
+-					"hand", "earlobe", "foot"
+-
+-		boolean ResetSupported [readonly]
+-
+-			True if energy expended is supported.
+-
+-Heart Rate Watcher hierarchy
+-============================
+-
+-Service		unique name
+-Interface	org.bluez.HeartRateWatcher1
+-Object path	freely definable
+-
+-Methods		void MeasurementReceived(object device, dict measurement)
+-
+-			This callback is called whenever a heart rate
+-			measurement is received from the heart rate device.
+-
+-			Measurement:
+-
+-				uint16 Value:
+-
+-					Measurement value expressed in beats per
+-					minute (bpm)
+-
+-				uint16 Energy (optional):
+-
+-					Accumulated energy expended in kilo Joules
+-
+-				boolean Contact (optional):
+-
+-					true if skin contact is detected by sensor,
+-					false otherwise
+-
+-				array{uint16} Interval (optional):
+-
+-					RR-Interval values which represent the time
+-					between two consecutive R waves in an ECG.
+-					Values are ordered starting from oldest to
+-					most recent.
+diff --git a/doc/proximity-api.txt b/doc/proximity-api.txt
+deleted file mode 100644
+index 5322544a9..000000000
+--- a/doc/proximity-api.txt
++++ /dev/null
+@@ -1,56 +0,0 @@
+-BlueZ D-Bus Proximity API description
+-***********************************
+-
+-
+-Proximity Monitor hierarchy
+-===========================
+-
+-Service		org.bluez
+-Interface	org.bluez.ProximityMonitor1
+-Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX
+-
+-Properties	string SignalLevel [readonly]
+-
+-			Alert indicating that a threshold has been reached.
+-			Possible values: "unknown", "good", "regular", "weak"
+-
+-		string LinkLossAlertLevel [readwrite]
+-
+-			Persistent property. Sets the alert level in the
+-			proximity reporter for link loss scenario. Values:
+-			"none", "mild", "high".
+-
+-		string ImmediateAlertLevel [readwrite]
+-
+-			Alert level to be written in the Immediate Alert Level.
+-			Property shared between Path Loss and Find Me.
+-			Values: "none", "mild", "high". Default value is
+-			"none". Applications can disable the alert setting
+-			the value to "none". If the "Target" is not found,
+-			"none" will be emitted after the configured timeout.
+-			When changing the level, signal is the confirmation
+-			that the value was written in the remote.
+-
+-Proximity Reporter hierarchy
+-===========================
+-
+-Shared service used by Proximity Path Loss and Find Me. Allows per device
+-alert level handling.
+-
+-Service		org.bluez
+-Interface	org.bluez.ProximityReporter1
+-Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX
+-
+-Properties	string ImmediateAlertLevel [readonly]
+-
+-			This property indicates that Immediate Alert Level
+-			characteristic in the local Immediate Alert Service
+-			was changed by the remote device. Property shared
+-			between Path Loss and Find Me. Values: "none", "mild",
+-			"high".
+-
+-		string LinkLossAlertLevel [readonly]
+-
+-			This property indicates that Alert Level characteristic
+-			in the local Link Loss Service was changed by the
+-			remote device. Values: "none", "mild", "high".
+diff --git a/profiles/proximity/immalert.c b/profiles/proximity/immalert.c
+deleted file mode 100644
+index 26a0ac941..000000000
+--- a/profiles/proximity/immalert.c
++++ /dev/null
+@@ -1,292 +0,0 @@
+-/*
+- *
+- *  BlueZ - Bluetooth protocol stack for Linux
+- *
+- *  Copyright (C) 2012 Texas Instruments Corporation
+- *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+- */
+-
+-#ifdef HAVE_CONFIG_H
+-#include <config.h>
+-#endif
+-
+-#include <stdbool.h>
+-
+-#include <glib.h>
+-
+-#include <dbus/dbus.h>
+-
+-#include "lib/bluetooth.h"
+-#include "lib/sdp.h"
+-#include "lib/uuid.h"
+-
+-#include "gdbus/gdbus.h"
+-
+-#include "src/log.h"
+-#include "src/adapter.h"
+-#include "attrib/gattrib.h"
+-#include "attrib/att.h"
+-#include "attrib/gatt.h"
+-#include "attrib/att-database.h"
+-#include "attrib/gatt-service.h"
+-#include "src/attrib-server.h"
+-#include "src/device.h"
+-#include "src/profile.h"
+-#include "src/attio.h"
+-#include "src/dbus-common.h"
+-
+-#include "reporter.h"
+-#include "immalert.h"
+-
+-struct imm_alert_adapter {
+-	struct btd_adapter *adapter;
+-	GSList *connected_devices;
+-};
+-
+-struct connected_device {
+-	struct btd_device *device;
+-	struct imm_alert_adapter *adapter;
+-	uint8_t alert_level;
+-	guint callback_id;
+-};
+-
+-static GSList *imm_alert_adapters;
+-
+-static int imdevice_cmp(gconstpointer a, gconstpointer b)
+-{
+-	const struct connected_device *condev = a;
+-	const struct btd_device *device = b;
+-
+-	if (condev->device == device)
+-		return 0;
+-
+-	return -1;
+-}
+-
+-static struct connected_device *
+-find_connected_device(struct imm_alert_adapter *ia, struct btd_device *device)
+-{
+-	GSList *l = g_slist_find_custom(ia->connected_devices, device,
+-								imdevice_cmp);
+-	if (!l)
+-		return NULL;
+-
+-	return l->data;
+-}
+-
+-static int imadapter_cmp(gconstpointer a, gconstpointer b)
+-{
+-	const struct imm_alert_adapter *imadapter = a;
+-	const struct btd_adapter *adapter = b;
+-
+-	if (imadapter->adapter == adapter)
+-		return 0;
+-
+-	return -1;
+-}
+-
+-static struct imm_alert_adapter *
+-find_imm_alert_adapter(struct btd_adapter *adapter)
+-{
+-	GSList *l = g_slist_find_custom(imm_alert_adapters, adapter,
+-								imadapter_cmp);
+-	if (!l)
+-		return NULL;
+-
+-	return l->data;
+-}
+-
+-const char *imm_alert_get_level(struct btd_device *device)
+-{
+-	struct imm_alert_adapter *imadapter;
+-	struct connected_device *condev;
+-
+-	if (!device)
+-		return get_alert_level_string(NO_ALERT);
+-
+-	imadapter = find_imm_alert_adapter(device_get_adapter(device));
+-	if (!imadapter)
+-		return get_alert_level_string(NO_ALERT);
+-
+-	condev = find_connected_device(imadapter, device);
+-	if (!condev)
+-		return get_alert_level_string(NO_ALERT);
+-
+-	return get_alert_level_string(condev->alert_level);
+-}
+-
+-static void imm_alert_emit_alert_signal(struct connected_device *condev,
+-							uint8_t alert_level)
+-{
+-	const char *path, *alert_level_str;
+-
+-	if (!condev)
+-		return;
+-
+-	path = device_get_path(condev->device);
+-	alert_level_str = get_alert_level_string(alert_level);
+-
+-	DBG("alert %s remote %s", alert_level_str, path);
+-
+-	g_dbus_emit_property_changed(btd_get_dbus_connection(), path,
+-			PROXIMITY_REPORTER_INTERFACE, "ImmediateAlertLevel");
+-}
+-
+-static void imm_alert_remove_condev(struct connected_device *condev)
+-{
+-	struct imm_alert_adapter *ia;
+-
+-	if (!condev)
+-		return;
+-
+-	ia = condev->adapter;
+-
+-	if (condev->callback_id && condev->device)
+-		btd_device_remove_attio_callback(condev->device,
+-							condev->callback_id);
+-
+-	if (condev->device)
+-		btd_device_unref(condev->device);
+-
+-	ia->connected_devices = g_slist_remove(ia->connected_devices, condev);
+-	g_free(condev);
+-}
+-
+-/* condev can be NULL */
+-static void imm_alert_disc_cb(gpointer user_data)
+-{
+-	struct connected_device *condev = user_data;
+-
+-	if (!condev)
+-		return;
+-
+-	DBG("immediate alert remove device %p", condev->device);
+-
+-	imm_alert_emit_alert_signal(condev, NO_ALERT);
+-	imm_alert_remove_condev(condev);
+-}
+-
+-static uint8_t imm_alert_alert_lvl_write(struct attribute *a,
+-				struct btd_device *device, gpointer user_data)
+-{
+-	uint8_t value;
+-	struct imm_alert_adapter *ia = user_data;
+-	struct connected_device *condev = NULL;
+-
+-	if (!device)
+-		goto set_error;
+-
+-	condev = find_connected_device(ia, device);
+-
+-	if (a->len == 0) {
+-		DBG("Illegal alert level length");
+-		goto set_error;
+-	}
+-
+-	value = a->data[0];
+-	if (value != NO_ALERT && value != MILD_ALERT && value != HIGH_ALERT) {
+-		DBG("Illegal alert value");
+-		goto set_error;
+-	}
+-
+-	/* Register a disconnect cb if the alert level is non-zero */
+-	if (value != NO_ALERT && !condev) {
+-		condev = g_new0(struct connected_device, 1);
+-		condev->device = btd_device_ref(device);
+-		condev->adapter = ia;
+-		condev->callback_id = btd_device_add_attio_callback(device,
+-					NULL, imm_alert_disc_cb, condev);
+-		ia->connected_devices = g_slist_append(ia->connected_devices,
+-								condev);
+-		DBG("added connected dev %p", device);
+-	}
+-
+-	if (value != NO_ALERT) {
+-		condev->alert_level = value;
+-		imm_alert_emit_alert_signal(condev, value);
+-	}
+-
+-	/*
+-	 * Emit NO_ALERT if the alert level was non-zero before. This is
+-	 * guaranteed when there's a condev.
+-	 */
+-	if (value == NO_ALERT && condev)
+-		imm_alert_disc_cb(condev);
+-
+-	DBG("alert level set to %d by device %p", value, device);
+-	return 0;
+-
+-set_error:
+-	error("Set immediate alert level for dev %p", device);
+-	/* remove alerts by erroneous devices */
+-	imm_alert_disc_cb(condev);
+-	return ATT_ECODE_IO;
+-}
+-
+-void imm_alert_register(struct btd_adapter *adapter)
+-{
+-	gboolean svc_added;
+-	bt_uuid_t uuid;
+-	struct imm_alert_adapter *imadapter;
+-
+-	bt_uuid16_create(&uuid, IMMEDIATE_ALERT_SVC_UUID);
+-
+-	imadapter = g_new0(struct imm_alert_adapter, 1);
+-	imadapter->adapter = adapter;
+-
+-	imm_alert_adapters = g_slist_append(imm_alert_adapters, imadapter);
+-
+-	/* Immediate Alert Service */
+-	svc_added = gatt_service_add(adapter,
+-				GATT_PRIM_SVC_UUID, &uuid,
+-				/* Alert level characteristic */
+-				GATT_OPT_CHR_UUID16, ALERT_LEVEL_CHR_UUID,
+-				GATT_OPT_CHR_PROPS,
+-					GATT_CHR_PROP_WRITE_WITHOUT_RESP,
+-				GATT_OPT_CHR_VALUE_CB, ATTRIB_WRITE,
+-					imm_alert_alert_lvl_write, imadapter,
+-				GATT_OPT_INVALID);
+-
+-	if (!svc_added) {
+-		imm_alert_unregister(adapter);
+-		return;
+-	}
+-
+-	DBG("Immediate Alert service added");
+-}
+-
+-static void remove_condev_list_item(gpointer data, gpointer user_data)
+-{
+-	struct connected_device *condev = data;
+-
+-	imm_alert_remove_condev(condev);
+-}
+-
+-void imm_alert_unregister(struct btd_adapter *adapter)
+-{
+-	struct imm_alert_adapter *imadapter;
+-
+-	imadapter = find_imm_alert_adapter(adapter);
+-	if (!imadapter)
+-		return;
+-
+-	g_slist_foreach(imadapter->connected_devices, remove_condev_list_item,
+-									NULL);
+-
+-	imm_alert_adapters = g_slist_remove(imm_alert_adapters, imadapter);
+-	g_free(imadapter);
+-}
+diff --git a/profiles/proximity/immalert.h b/profiles/proximity/immalert.h
+deleted file mode 100644
+index 1a09fa988..000000000
+--- a/profiles/proximity/immalert.h
++++ /dev/null
+@@ -1,26 +0,0 @@
+-/*
+- *
+- *  BlueZ - Bluetooth protocol stack for Linux
+- *
+- *  Copyright (C) 2012  Texas Instruments Corporation
+- *
+- *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+- */
+-
+-void imm_alert_register(struct btd_adapter *adapter);
+-void imm_alert_unregister(struct btd_adapter *adapter);
+-const char *imm_alert_get_level(struct btd_device *device);
+diff --git a/profiles/proximity/linkloss.c b/profiles/proximity/linkloss.c
+deleted file mode 100644
+index 2f1ab13c3..000000000
+--- a/profiles/proximity/linkloss.c
++++ /dev/null
+@@ -1,340 +0,0 @@
+-/*
+- *
+- *  BlueZ - Bluetooth protocol stack for Linux
+- *
+- *  Copyright (C) 2012 Texas Instruments Corporation
+- *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+- */
+-
+-#ifdef HAVE_CONFIG_H
+-#include <config.h>
+-#endif
+-
+-#include <stdbool.h>
+-
+-#include <glib.h>
+-
+-#include <dbus/dbus.h>
+-
+-#include "lib/bluetooth.h"
+-#include "lib/sdp.h"
+-#include "lib/uuid.h"
+-
+-#include "gdbus/gdbus.h"
+-
+-#include "src/log.h"
+-#include "src/adapter.h"
+-#include "src/device.h"
+-#include "attrib/att-database.h"
+-#include "attrib/gattrib.h"
+-#include "attrib/att.h"
+-#include "attrib/gatt.h"
+-#include "attrib/gatt-service.h"
+-#include "src/attrib-server.h"
+-#include "src/service.h"
+-#include "src/profile.h"
+-#include "src/attio.h"
+-#include "src/dbus-common.h"
+-
+-#include "reporter.h"
+-#include "linkloss.h"
+-
+-struct link_loss_adapter {
+-	struct btd_adapter *adapter;
+-	uint16_t alert_lvl_value_handle;
+-	GSList *connected_devices;
+-};
+-
+-struct connected_device {
+-	struct btd_device *device;
+-	struct link_loss_adapter *adapter;
+-	uint8_t alert_level;
+-	guint callback_id;
+-	guint local_disc_id;
+-};
+-
+-static GSList *link_loss_adapters;
+-
+-static int lldevice_cmp(gconstpointer a, gconstpointer b)
+-{
+-	const struct connected_device *llcondev = a;
+-	const struct btd_device *device = b;
+-
+-	if (llcondev->device == device)
+-		return 0;
+-
+-	return -1;
+-}
+-
+-static struct connected_device *
+-find_connected_device(struct link_loss_adapter *la, struct btd_device *device)
+-{
+-	GSList *l = g_slist_find_custom(la->connected_devices, device,
+-								lldevice_cmp);
+-	if (!l)
+-		return NULL;
+-
+-	return l->data;
+-}
+-
+-static int lladapter_cmp(gconstpointer a, gconstpointer b)
+-{
+-	const struct link_loss_adapter *lladapter = a;
+-	const struct btd_adapter *adapter = b;
+-
+-	if (lladapter->adapter == adapter)
+-		return 0;
+-
+-	return -1;
+-}
+-
+-static struct link_loss_adapter *
+-find_link_loss_adapter(struct btd_adapter *adapter)
+-{
+-	GSList *l = g_slist_find_custom(link_loss_adapters, adapter,
+-							lladapter_cmp);
+-	if (!l)
+-		return NULL;
+-
+-	return l->data;
+-}
+-
+-const char *link_loss_get_alert_level(struct btd_device *device)
+-{
+-	struct link_loss_adapter *lladapter;
+-	struct connected_device *condev;
+-
+-	if (!device)
+-		return get_alert_level_string(NO_ALERT);
+-
+-	lladapter = find_link_loss_adapter(device_get_adapter(device));
+-	if (!lladapter)
+-		return get_alert_level_string(NO_ALERT);
+-
+-	condev = find_connected_device(lladapter, device);
+-	if (!condev)
+-		return get_alert_level_string(NO_ALERT);
+-
+-	return get_alert_level_string(condev->alert_level);
+-}
+-
+-static void link_loss_emit_alert_signal(struct connected_device *condev)
+-{
+-	const char *alert_level_str, *path;
+-
+-	if (!condev->device)
+-		return;
+-
+-	path = device_get_path(condev->device);
+-	alert_level_str = get_alert_level_string(condev->alert_level);
+-
+-	DBG("alert %s remote %s", alert_level_str, path);
+-
+-	g_dbus_emit_property_changed(btd_get_dbus_connection(), path,
+-			PROXIMITY_REPORTER_INTERFACE, "LinkLossAlertLevel");
+-}
+-
+-static uint8_t link_loss_alert_lvl_read(struct attribute *a,
+-				struct btd_device *device, gpointer user_data)
+-{
+-	struct link_loss_adapter *la = user_data;
+-	struct connected_device *condev;
+-	uint8_t alert_level = NO_ALERT;
+-
+-	if (!device)
+-		goto out;
+-
+-	condev = find_connected_device(la, device);
+-	if (!condev)
+-		goto out;
+-
+-	alert_level = condev->alert_level;
+-
+-out:
+-	DBG("return alert level %d for dev %p", alert_level, device);
+-
+-	/* update the alert level according to the requesting device */
+-	attrib_db_update(la->adapter, a->handle, NULL, &alert_level,
+-						sizeof(alert_level), NULL);
+-
+-	return 0;
+-}
+-
+-/* condev can be NULL */
+-static void link_loss_remove_condev(struct connected_device *condev)
+-{
+-	struct link_loss_adapter *la;
+-
+-	if (!condev)
+-		return;
+-
+-	la = condev->adapter;
+-
+-	if (condev->callback_id && condev->device)
+-		btd_device_remove_attio_callback(condev->device,
+-							condev->callback_id);
+-
+-	if (condev->local_disc_id && condev->device)
+-		device_remove_disconnect_watch(condev->device,
+-							condev->local_disc_id);
+-
+-	if (condev->device)
+-		btd_device_unref(condev->device);
+-
+-	la->connected_devices = g_slist_remove(la->connected_devices, condev);
+-	g_free(condev);
+-}
+-
+-static void link_loss_disc_cb(gpointer user_data)
+-{
+-	struct connected_device *condev = user_data;
+-
+-	DBG("alert loss disconnect device %p", condev->device);
+-
+-	/* if an alert-level is set, emit a signal */
+-	if (condev->alert_level != NO_ALERT)
+-		link_loss_emit_alert_signal(condev);
+-
+-	/* we are open for more changes now */
+-	link_loss_remove_condev(condev);
+-}
+-
+-static void link_loss_local_disc(struct btd_device *device,
+-					gboolean removal, void *user_data)
+-{
+-	struct connected_device *condev = user_data;
+-
+-	/* no need to alert on this device - we requested disconnection */
+-	link_loss_remove_condev(condev);
+-
+-	DBG("alert level zeroed for locally disconnecting dev %p", device);
+-}
+-
+-static uint8_t link_loss_alert_lvl_write(struct attribute *a,
+-				struct btd_device *device, gpointer user_data)
+-{
+-	uint8_t value;
+-	struct link_loss_adapter *la = user_data;
+-	struct connected_device *condev = NULL;
+-
+-	if (!device)
+-		goto set_error;
+-
+-	/* condev might remain NULL here if nothing is found */
+-	condev = find_connected_device(la, device);
+-
+-	if (a->len == 0) {
+-		DBG("Illegal alert level length");
+-		goto set_error;
+-	}
+-
+-	value = a->data[0];
+-	if (value != NO_ALERT && value != MILD_ALERT && value != HIGH_ALERT) {
+-		DBG("Illegal alert value");
+-		goto set_error;
+-	}
+-
+-	/* Register a disconnect cb if the alert level is non-zero */
+-	if (value != NO_ALERT && !condev) {
+-		condev = g_new0(struct connected_device, 1);
+-		condev->device = btd_device_ref(device);
+-		condev->adapter = la;
+-		condev->callback_id = btd_device_add_attio_callback(device,
+-					NULL, link_loss_disc_cb, condev);
+-		condev->local_disc_id = device_add_disconnect_watch(device,
+-					link_loss_local_disc, condev, NULL);
+-
+-		la->connected_devices = g_slist_append(la->connected_devices,
+-								condev);
+-	} else if (value == NO_ALERT && condev) {
+-		link_loss_remove_condev(condev);
+-		condev = NULL;
+-	}
+-
+-	DBG("alert level set to %d by device %p", value, device);
+-
+-	if (condev)
+-		condev->alert_level = value;
+-
+-	return 0;
+-
+-set_error:
+-	error("Set link loss alert level for dev %p", device);
+-	/* reset alert level on erroneous devices */
+-	link_loss_remove_condev(condev);
+-	return ATT_ECODE_IO;
+-}
+-
+-void link_loss_register(struct btd_adapter *adapter)
+-{
+-	gboolean svc_added;
+-	bt_uuid_t uuid;
+-	struct link_loss_adapter *lladapter;
+-
+-	bt_uuid16_create(&uuid, LINK_LOSS_SVC_UUID);
+-
+-	lladapter = g_new0(struct link_loss_adapter, 1);
+-	lladapter->adapter = adapter;
+-
+-	link_loss_adapters = g_slist_append(link_loss_adapters, lladapter);
+-
+-	/* Link Loss Service */
+-	svc_added = gatt_service_add(adapter,
+-			GATT_PRIM_SVC_UUID, &uuid,
+-			/* Alert level characteristic */
+-			GATT_OPT_CHR_UUID16, ALERT_LEVEL_CHR_UUID,
+-			GATT_OPT_CHR_PROPS,
+-				GATT_CHR_PROP_READ | GATT_CHR_PROP_WRITE,
+-			GATT_OPT_CHR_VALUE_CB, ATTRIB_READ,
+-				link_loss_alert_lvl_read, lladapter,
+-			GATT_OPT_CHR_VALUE_CB, ATTRIB_WRITE,
+-				link_loss_alert_lvl_write, lladapter,
+-			GATT_OPT_CHR_VALUE_GET_HANDLE,
+-				&lladapter->alert_lvl_value_handle,
+-			GATT_OPT_INVALID);
+-
+-	if (!svc_added)
+-		goto err;
+-
+-	DBG("Link Loss service added");
+-	return;
+-
+-err:
+-	error("Error adding Link Loss service");
+-	link_loss_unregister(adapter);
+-}
+-
+-static void remove_condev_list_item(gpointer data, gpointer user_data)
+-{
+-	struct connected_device *condev = data;
+-
+-	link_loss_remove_condev(condev);
+-}
+-
+-void link_loss_unregister(struct btd_adapter *adapter)
+-{
+-	struct link_loss_adapter *lladapter;
+-	lladapter = find_link_loss_adapter(adapter);
+-	if (!lladapter)
+-		return;
+-
+-	g_slist_foreach(lladapter->connected_devices, remove_condev_list_item,
+-			NULL);
+-
+-	link_loss_adapters = g_slist_remove(link_loss_adapters, lladapter);
+-	g_free(lladapter);
+-}
+diff --git a/profiles/proximity/linkloss.h b/profiles/proximity/linkloss.h
+deleted file mode 100644
+index 0447def31..000000000
+--- a/profiles/proximity/linkloss.h
++++ /dev/null
+@@ -1,26 +0,0 @@
+-/*
+- *
+- *  BlueZ - Bluetooth protocol stack for Linux
+- *
+- *  Copyright (C) 2012  Texas Instruments Corporation
+- *
+- *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+- */
+-
+-void link_loss_register(struct btd_adapter *adapter);
+-void link_loss_unregister(struct btd_adapter *adapter);
+-const char *link_loss_get_alert_level(struct btd_device *device);
+diff --git a/profiles/proximity/main.c b/profiles/proximity/main.c
+deleted file mode 100644
+index 38a51f12e..000000000
+--- a/profiles/proximity/main.c
++++ /dev/null
+@@ -1,81 +0,0 @@
+-/*
+- *
+- *  BlueZ - Bluetooth protocol stack for Linux
+- *
+- *  Copyright (C) 2011  Nokia Corporation
+- *  Copyright (C) 2011  Marcel Holtmann <marcel@holtmann.org>
+- *
+- *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+- */
+-
+-#ifdef HAVE_CONFIG_H
+-#include <config.h>
+-#endif
+-
+-#include <errno.h>
+-#include <stdint.h>
+-#include <glib.h>
+-
+-#include "gdbus/gdbus.h"
+-
+-#include "src/log.h"
+-#include "src/plugin.h"
+-#include "manager.h"
+-
+-static GKeyFile *config = NULL;
+-
+-static GKeyFile *open_config_file(const char *file)
+-{
+-	GError *gerr = NULL;
+-	GKeyFile *keyfile;
+-
+-	keyfile = g_key_file_new();
+-
+-	g_key_file_set_list_separator(keyfile, ',');
+-
+-	if (!g_key_file_load_from_file(keyfile, file, 0, &gerr)) {
+-		if (!g_error_matches(gerr, G_FILE_ERROR, G_FILE_ERROR_NOENT))
+-			error("Parsing %s failed: %s", file, gerr->message);
+-		g_error_free(gerr);
+-		g_key_file_free(keyfile);
+-		return NULL;
+-	}
+-
+-	return keyfile;
+-}
+-
+-static int proximity_init(void)
+-{
+-	config = open_config_file(CONFIGDIR "/proximity.conf");
+-
+-	if (proximity_manager_init(config) < 0)
+-		return -EIO;
+-
+-	return 0;
+-}
+-
+-static void proximity_exit(void)
+-{
+-	if (config)
+-		g_key_file_free(config);
+-
+-	proximity_manager_exit();
+-}
+-
+-BLUETOOTH_PLUGIN_DEFINE(proximity, VERSION,
+-			BLUETOOTH_PLUGIN_PRIORITY_DEFAULT,
+-			proximity_init, proximity_exit)
+diff --git a/profiles/proximity/manager.c b/profiles/proximity/manager.c
+deleted file mode 100644
+index dbb3bda29..000000000
+--- a/profiles/proximity/manager.c
++++ /dev/null
+@@ -1,196 +0,0 @@
+-/*
+- *
+- *  BlueZ - Bluetooth protocol stack for Linux
+- *
+- *  Copyright (C) 2011  Nokia Corporation
+- *  Copyright (C) 2011  Marcel Holtmann <marcel@holtmann.org>
+- *
+- *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+- */
+-
+-#ifdef HAVE_CONFIG_H
+-#include <config.h>
+-#endif
+-
+-#include <stdbool.h>
+-
+-#include <glib.h>
+-
+-#include "lib/bluetooth.h"
+-#include "lib/sdp.h"
+-#include "lib/uuid.h"
+-
+-#include "gdbus/gdbus.h"
+-
+-#include "src/adapter.h"
+-#include "src/device.h"
+-#include "src/profile.h"
+-#include "src/service.h"
+-#include "attrib/att.h"
+-#include "attrib/gattrib.h"
+-#include "attrib/gatt.h"
+-#include "monitor.h"
+-#include "reporter.h"
+-#include "manager.h"
+-
+-static struct enabled enabled  = {
+-	.linkloss = TRUE,
+-	.pathloss = TRUE,
+-	.findme = TRUE,
+-};
+-
+-static int monitor_linkloss_probe(struct btd_service *service)
+-{
+-	struct btd_device *device = btd_service_get_device(service);
+-	struct gatt_primary *linkloss;
+-
+-	linkloss = btd_device_get_primary(device, LINK_LOSS_UUID);
+-	if (linkloss == NULL)
+-		return -1;
+-
+-	return monitor_register_linkloss(device, &enabled, linkloss);
+-}
+-
+-static int monitor_immediate_probe(struct btd_service *service)
+-{
+-	struct btd_device *device = btd_service_get_device(service);
+-	struct gatt_primary *immediate;
+-
+-	immediate = btd_device_get_primary(device, IMMEDIATE_ALERT_UUID);
+-	if (immediate == NULL)
+-		return -1;
+-
+-	return monitor_register_immediate(device, &enabled, immediate);
+-}
+-
+-static int monitor_txpower_probe(struct btd_service *service)
+-{
+-	struct btd_device *device = btd_service_get_device(service);
+-	struct gatt_primary *txpower;
+-
+-	txpower = btd_device_get_primary(device, TX_POWER_UUID);
+-	if (txpower == NULL)
+-		return -1;
+-
+-	return monitor_register_txpower(device, &enabled, txpower);
+-}
+-
+-static void monitor_linkloss_remove(struct btd_service *service)
+-{
+-	struct btd_device *device = btd_service_get_device(service);
+-
+-	monitor_unregister_linkloss(device);
+-}
+-
+-static void monitor_immediate_remove(struct btd_service *service)
+-{
+-	struct btd_device *device = btd_service_get_device(service);
+-
+-	monitor_unregister_immediate(device);
+-}
+-
+-static void monitor_txpower_remove(struct btd_service *service)
+-{
+-	struct btd_device *device = btd_service_get_device(service);
+-
+-	monitor_unregister_txpower(device);
+-}
+-
+-static struct btd_profile pxp_monitor_linkloss_profile = {
+-	.name		= "proximity-linkloss",
+-	.remote_uuid	= LINK_LOSS_UUID,
+-	.device_probe	= monitor_linkloss_probe,
+-	.device_remove	= monitor_linkloss_remove,
+-};
+-
+-static struct btd_profile pxp_monitor_immediate_profile = {
+-	.name		= "proximity-immediate",
+-	.remote_uuid	= IMMEDIATE_ALERT_UUID,
+-	.device_probe	= monitor_immediate_probe,
+-	.device_remove	= monitor_immediate_remove,
+-};
+-
+-static struct btd_profile pxp_monitor_txpower_profile = {
+-	.name		= "proximity-txpower",
+-	.remote_uuid	= TX_POWER_UUID,
+-	.device_probe	= monitor_txpower_probe,
+-	.device_remove	= monitor_txpower_remove,
+-};
+-
+-static struct btd_profile pxp_reporter_profile = {
+-	.name		= "Proximity Reporter GATT Driver",
+-	.remote_uuid	= GATT_UUID,
+-	.device_probe	= reporter_device_probe,
+-	.device_remove	= reporter_device_remove,
+-
+-	.adapter_probe	= reporter_adapter_probe,
+-	.adapter_remove	= reporter_adapter_remove,
+-};
+-
+-static void load_config_file(GKeyFile *config)
+-{
+-	char **list;
+-	int i;
+-
+-	if (config == NULL)
+-		return;
+-
+-	list = g_key_file_get_string_list(config, "General", "Disable",
+-								NULL, NULL);
+-	for (i = 0; list && list[i] != NULL; i++) {
+-		if (g_str_equal(list[i], "FindMe"))
+-			enabled.findme = FALSE;
+-		else if (g_str_equal(list[i], "LinkLoss"))
+-			enabled.linkloss = FALSE;
+-		else if (g_str_equal(list[i], "PathLoss"))
+-			enabled.pathloss = FALSE;
+-	}
+-
+-	g_strfreev(list);
+-}
+-
+-int proximity_manager_init(GKeyFile *config)
+-{
+-	load_config_file(config);
+-
+-	if (btd_profile_register(&pxp_monitor_linkloss_profile) < 0)
+-		goto fail;
+-
+-	if (btd_profile_register(&pxp_monitor_immediate_profile) < 0)
+-		goto fail;
+-
+-	if (btd_profile_register(&pxp_monitor_txpower_profile) < 0)
+-		goto fail;
+-
+-	if (btd_profile_register(&pxp_reporter_profile) < 0)
+-		goto fail;
+-
+-	return 0;
+-
+-fail:
+-	proximity_manager_exit();
+-
+-	return -1;
+-}
+-
+-void proximity_manager_exit(void)
+-{
+-	btd_profile_unregister(&pxp_reporter_profile);
+-	btd_profile_unregister(&pxp_monitor_txpower_profile);
+-	btd_profile_unregister(&pxp_monitor_immediate_profile);
+-	btd_profile_unregister(&pxp_monitor_linkloss_profile);
+-}
+diff --git a/profiles/proximity/manager.h b/profiles/proximity/manager.h
+deleted file mode 100644
+index e65c31d86..000000000
+--- a/profiles/proximity/manager.h
++++ /dev/null
+@@ -1,26 +0,0 @@
+-/*
+- *
+- *  BlueZ - Bluetooth protocol stack for Linux
+- *
+- *  Copyright (C) 2011  Nokia Corporation
+- *  Copyright (C) 2011  Marcel Holtmann <marcel@holtmann.org>
+- *
+- *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+- */
+-
+-int proximity_manager_init(GKeyFile *conf);
+-void proximity_manager_exit(void);
+diff --git a/profiles/proximity/monitor.c b/profiles/proximity/monitor.c
+deleted file mode 100644
+index a583eb7da..000000000
+--- a/profiles/proximity/monitor.c
++++ /dev/null
+@@ -1,822 +0,0 @@
+-/*
+- *
+- *  BlueZ - Bluetooth protocol stack for Linux
+- *
+- *  Copyright (C) 2011  Nokia Corporation
+- *  Copyright (C) 2011  Marcel Holtmann <marcel@holtmann.org>
+- *
+- *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+- */
+-
+-#ifdef HAVE_CONFIG_H
+-#include <config.h>
+-#endif
+-
+-#include <errno.h>
+-#include <fcntl.h>
+-#include <stdint.h>
+-#include <stdbool.h>
+-#include <stdio.h>
+-#include <stdlib.h>
+-#include <sys/stat.h>
+-
+-#include <glib.h>
+-
+-#include "lib/bluetooth.h"
+-#include "lib/sdp.h"
+-#include "lib/uuid.h"
+-
+-#include "gdbus/gdbus.h"
+-
+-#include "src/dbus-common.h"
+-#include "src/adapter.h"
+-#include "src/device.h"
+-#include "src/error.h"
+-#include "src/log.h"
+-#include "attrib/att.h"
+-#include "attrib/gattrib.h"
+-#include "attrib/gatt.h"
+-#include "src/attio.h"
+-#include "src/textfile.h"
+-
+-#include "monitor.h"
+-
+-#define PROXIMITY_INTERFACE "org.bluez.ProximityMonitor1"
+-
+-#define ALERT_LEVEL_CHR_UUID 0x2A06
+-#define POWER_LEVEL_CHR_UUID 0x2A07
+-
+-#define IMMEDIATE_TIMEOUT	5
+-#define TX_POWER_SIZE		1
+-
+-enum {
+-	ALERT_NONE = 0,
+-	ALERT_MILD,
+-	ALERT_HIGH,
+-};
+-
+-struct monitor {
+-	struct btd_device *device;
+-	GAttrib *attrib;
+-	struct att_range *linkloss;
+-	struct att_range *txpower;
+-	struct att_range *immediate;
+-	struct enabled enabled;
+-	char *linklosslevel;		/* Link Loss Alert Level */
+-	char *fallbacklevel;		/* Immediate fallback alert level */
+-	char *immediatelevel;		/* Immediate Alert Level */
+-	char *signallevel;		/* Path Loss RSSI level */
+-	uint16_t linklosshandle;	/* Link Loss Characteristic
+-					 * Value Handle */
+-	uint16_t txpowerhandle;		/* Tx Characteristic Value Handle */
+-	uint16_t immediatehandle;	/* Immediate Alert Value Handle */
+-	guint immediateto;		/* Reset Immediate Alert to "none" */
+-	guint attioid;
+-};
+-
+-static GSList *monitors = NULL;
+-
+-static struct monitor *find_monitor(struct btd_device *device)
+-{
+-	GSList *l;
+-
+-	for (l = monitors; l; l = l->next) {
+-		struct monitor *monitor = l->data;
+-
+-		if (monitor->device == device)
+-			return monitor;
+-	}
+-
+-	return NULL;
+-}
+-
+-static void write_proximity_config(struct btd_device *device, const char *alert,
+-					const char *level)
+-{
+-	char *filename;
+-	GKeyFile *key_file;
+-	char *data;
+-	gsize length = 0;
+-
+-	filename = btd_device_get_storage_path(device, "proximity");
+-	if (!filename) {
+-		warn("Unable to get proximity storage path for device");
+-		return;
+-	}
+-
+-	key_file = g_key_file_new();
+-	g_key_file_load_from_file(key_file, filename, 0, NULL);
+-
+-	if (level)
+-		g_key_file_set_string(key_file, alert, "Level", level);
+-	else
+-		g_key_file_remove_group(key_file, alert, NULL);
+-
+-	data = g_key_file_to_data(key_file, &length, NULL);
+-	if (length > 0) {
+-		create_file(filename, S_IRUSR | S_IWUSR);
+-		g_file_set_contents(filename, data, length, NULL);
+-	}
+-
+-	g_free(data);
+-	g_free(filename);
+-	g_key_file_free(key_file);
+-}
+-
+-static char *read_proximity_config(struct btd_device *device, const char *alert)
+-{
+-	char *filename;
+-	GKeyFile *key_file;
+-	char *str;
+-
+-	filename = btd_device_get_storage_path(device, "proximity");
+-	if (!filename) {
+-		warn("Unable to get proximity storage path for device");
+-		return NULL;
+-	}
+-
+-	key_file = g_key_file_new();
+-	g_key_file_load_from_file(key_file, filename, 0, NULL);
+-
+-	str = g_key_file_get_string(key_file, alert, "Level", NULL);
+-
+-	g_free(filename);
+-	g_key_file_free(key_file);
+-
+-	return str;
+-}
+-
+-static uint8_t str2level(const char *level)
+-{
+-	if (g_strcmp0("high", level) == 0)
+-		return ALERT_HIGH;
+-	else if (g_strcmp0("mild", level) == 0)
+-		return ALERT_MILD;
+-
+-	return ALERT_NONE;
+-}
+-
+-static void linkloss_written(guint8 status, const guint8 *pdu, guint16 plen,
+-							gpointer user_data)
+-{
+-	struct monitor *monitor = user_data;
+-	struct btd_device *device = monitor->device;
+-	const char *path = device_get_path(device);
+-
+-	if (status != 0) {
+-		error("Link Loss Write Request failed: %s",
+-							att_ecode2str(status));
+-		return;
+-	}
+-
+-	if (!dec_write_resp(pdu, plen)) {
+-		error("Link Loss Write Request: protocol error");
+-		return;
+-	}
+-
+-	DBG("Link Loss Alert Level written");
+-
+-	g_dbus_emit_property_changed(btd_get_dbus_connection(), path,
+-				PROXIMITY_INTERFACE, "LinkLossAlertLevel");
+-}
+-
+-static void char_discovered_cb(uint8_t status, GSList *characteristics,
+-								void *user_data)
+-{
+-	struct monitor *monitor = user_data;
+-	struct gatt_char *chr;
+-	uint8_t value = str2level(monitor->linklosslevel);
+-
+-	if (status) {
+-		error("Discover Link Loss handle: %s", att_ecode2str(status));
+-		return;
+-	}
+-
+-	DBG("Setting alert level \"%s\" on Reporter", monitor->linklosslevel);
+-
+-	/* Assume there is a single Alert Level characteristic */
+-	chr = characteristics->data;
+-	monitor->linklosshandle = chr->value_handle;
+-
+-	gatt_write_char(monitor->attrib, monitor->linklosshandle, &value, 1,
+-						linkloss_written, monitor);
+-}
+-
+-static int write_alert_level(struct monitor *monitor)
+-{
+-	struct att_range *linkloss = monitor->linkloss;
+-	bt_uuid_t uuid;
+-
+-	if (monitor->linklosshandle) {
+-		uint8_t value = str2level(monitor->linklosslevel);
+-
+-		gatt_write_char(monitor->attrib, monitor->linklosshandle,
+-					&value, 1, linkloss_written, monitor);
+-		return 0;
+-	}
+-
+-	bt_uuid16_create(&uuid, ALERT_LEVEL_CHR_UUID);
+-
+-	/* FIXME: use cache (requires service changed support) ? */
+-	gatt_discover_char(monitor->attrib, linkloss->start, linkloss->end,
+-					&uuid, char_discovered_cb, monitor);
+-
+-	return 0;
+-}
+-
+-static void tx_power_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
+-							gpointer user_data)
+-{
+-	uint8_t value[TX_POWER_SIZE];
+-	ssize_t vlen;
+-
+-	if (status != 0) {
+-		DBG("Tx Power Level read failed: %s", att_ecode2str(status));
+-		return;
+-	}
+-
+-	vlen = dec_read_resp(pdu, plen, value, sizeof(value));
+-	if (vlen < 0) {
+-		DBG("Protocol error");
+-		return;
+-	}
+-
+-	if (vlen != 1) {
+-		DBG("Invalid length for TX Power value: %zd", vlen);
+-		return;
+-	}
+-
+-	DBG("Tx Power Level: %02x", (int8_t) value[0]);
+-}
+-
+-static void tx_power_handle_cb(uint8_t status, GSList *characteristics,
+-								void *user_data)
+-{
+-	struct monitor *monitor = user_data;
+-	struct gatt_char *chr;
+-
+-	if (status) {
+-		error("Discover Tx Power handle: %s", att_ecode2str(status));
+-		return;
+-	}
+-
+-	chr = characteristics->data;
+-	monitor->txpowerhandle = chr->value_handle;
+-
+-	DBG("Tx Power handle: 0x%04x", monitor->txpowerhandle);
+-
+-	gatt_read_char(monitor->attrib, monitor->txpowerhandle,
+-							tx_power_read_cb, monitor);
+-}
+-
+-static void read_tx_power(struct monitor *monitor)
+-{
+-	struct att_range *txpower = monitor->txpower;
+-	bt_uuid_t uuid;
+-
+-	if (monitor->txpowerhandle != 0) {
+-		gatt_read_char(monitor->attrib, monitor->txpowerhandle,
+-						tx_power_read_cb, monitor);
+-		return;
+-	}
+-
+-	bt_uuid16_create(&uuid, POWER_LEVEL_CHR_UUID);
+-
+-	gatt_discover_char(monitor->attrib, txpower->start, txpower->end,
+-				&uuid, tx_power_handle_cb, monitor);
+-}
+-
+-static gboolean immediate_timeout(gpointer user_data)
+-{
+-	struct monitor *monitor = user_data;
+-	const char *path = device_get_path(monitor->device);
+-
+-	monitor->immediateto = 0;
+-
+-	if (g_strcmp0(monitor->immediatelevel, "none") == 0)
+-		return FALSE;
+-
+-	if (monitor->attrib) {
+-		uint8_t value = ALERT_NONE;
+-		gatt_write_cmd(monitor->attrib, monitor->immediatehandle,
+-				&value, 1, NULL, NULL);
+-	}
+-
+-	g_free(monitor->immediatelevel);
+-	monitor->immediatelevel = g_strdup("none");
+-
+-
+-	g_dbus_emit_property_changed(btd_get_dbus_connection(), path,
+-				PROXIMITY_INTERFACE, "ImmediateAlertLevel");
+-
+-	return FALSE;
+-}
+-
+-static void immediate_written(gpointer user_data)
+-{
+-	struct monitor *monitor = user_data;
+-	const char *path = device_get_path(monitor->device);
+-
+-	g_free(monitor->fallbacklevel);
+-	monitor->fallbacklevel = NULL;
+-
+-
+-	g_dbus_emit_property_changed(btd_get_dbus_connection(), path,
+-				PROXIMITY_INTERFACE, "ImmediateAlertLevel");
+-
+-	monitor->immediateto = g_timeout_add_seconds(IMMEDIATE_TIMEOUT,
+-						immediate_timeout, monitor);
+-}
+-
+-static void write_immediate_alert(struct monitor *monitor)
+-{
+-	uint8_t value = str2level(monitor->immediatelevel);
+-
+-	gatt_write_cmd(monitor->attrib, monitor->immediatehandle, &value, 1,
+-						immediate_written, monitor);
+-}
+-
+-static void immediate_handle_cb(uint8_t status, GSList *characteristics,
+-								void *user_data)
+-{
+-	struct monitor *monitor = user_data;
+-	struct gatt_char *chr;
+-
+-	if (status) {
+-		error("Discover Immediate Alert handle: %s",
+-						att_ecode2str(status));
+-		return;
+-	}
+-
+-	chr = characteristics->data;
+-	monitor->immediatehandle = chr->value_handle;
+-
+-	DBG("Immediate Alert handle: 0x%04x", monitor->immediatehandle);
+-
+-	if (monitor->fallbacklevel)
+-		write_immediate_alert(monitor);
+-}
+-
+-static void discover_immediate_handle(struct monitor *monitor)
+-{
+-	struct att_range *immediate = monitor->immediate;
+-	bt_uuid_t uuid;
+-
+-	bt_uuid16_create(&uuid, ALERT_LEVEL_CHR_UUID);
+-
+-	gatt_discover_char(monitor->attrib, immediate->start, immediate->end,
+-					&uuid, immediate_handle_cb, monitor);
+-}
+-
+-static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
+-{
+-	struct monitor *monitor = user_data;
+-
+-	monitor->attrib = g_attrib_ref(attrib);
+-
+-	if (monitor->enabled.linkloss)
+-		write_alert_level(monitor);
+-
+-	if (monitor->enabled.pathloss)
+-		read_tx_power(monitor);
+-
+-	if (monitor->immediatehandle == 0) {
+-		if(monitor->enabled.pathloss || monitor->enabled.findme)
+-			discover_immediate_handle(monitor);
+-	} else if (monitor->fallbacklevel)
+-		write_immediate_alert(monitor);
+-}
+-
+-static void attio_disconnected_cb(gpointer user_data)
+-{
+-	struct monitor *monitor = user_data;
+-	const char *path = device_get_path(monitor->device);
+-
+-	g_attrib_unref(monitor->attrib);
+-	monitor->attrib = NULL;
+-
+-	if (monitor->immediateto == 0)
+-		return;
+-
+-	g_source_remove(monitor->immediateto);
+-	monitor->immediateto = 0;
+-
+-	if (g_strcmp0(monitor->immediatelevel, "none") == 0)
+-		return;
+-
+-	g_free(monitor->immediatelevel);
+-	monitor->immediatelevel = g_strdup("none");
+-
+-	g_dbus_emit_property_changed(btd_get_dbus_connection(), path,
+-				PROXIMITY_INTERFACE, "ImmediateAlertLevel");
+-}
+-
+-static gboolean level_is_valid(const char *level)
+-{
+-	return (g_str_equal("none", level) ||
+-			g_str_equal("mild", level) ||
+-			g_str_equal("high", level));
+-}
+-
+-static gboolean property_get_link_loss_level(const GDBusPropertyTable *property,
+-					DBusMessageIter *iter, void *data)
+-{
+-	struct monitor *monitor = data;
+-
+-	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING,
+-						&monitor->linklosslevel);
+-
+-	return TRUE;
+-}
+-
+-static void property_set_link_loss_level(const GDBusPropertyTable *property,
+-		DBusMessageIter *iter, GDBusPendingPropertySet id, void *data)
+-{
+-	struct monitor *monitor = data;
+-	const char *level;
+-
+-	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_STRING) {
+-		g_dbus_pending_property_error(id,
+-					ERROR_INTERFACE ".InvalidArguments",
+-					"Invalid arguments in method call");
+-		return;
+-	}
+-
+-	dbus_message_iter_get_basic(iter, &level);
+-
+-	if (!level_is_valid(level)) {
+-		g_dbus_pending_property_error(id,
+-					ERROR_INTERFACE ".InvalidArguments",
+-					"Invalid arguments in method call");
+-		return;
+-	}
+-
+-	if (g_strcmp0(monitor->linklosslevel, level) == 0)
+-		goto done;
+-
+-	g_free(monitor->linklosslevel);
+-	monitor->linklosslevel = g_strdup(level);
+-
+-	write_proximity_config(monitor->device, "LinkLossAlertLevel", level);
+-
+-	if (monitor->attrib)
+-		write_alert_level(monitor);
+-
+-done:
+-	g_dbus_pending_property_success(id);
+-}
+-
+-static gboolean property_exists_link_loss_level(
+-				const GDBusPropertyTable *property, void *data)
+-{
+-	struct monitor *monitor = data;
+-
+-	if (!monitor->enabled.linkloss)
+-		return FALSE;
+-
+-	return TRUE;
+-}
+-
+-static gboolean property_get_immediate_alert_level(
+-					const GDBusPropertyTable *property,
+-					DBusMessageIter *iter, void *data)
+-{
+-	struct monitor *monitor = data;
+-
+-	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING,
+-						&monitor->immediatelevel);
+-
+-	return TRUE;
+-}
+-
+-static void property_set_immediate_alert_level(
+-		const GDBusPropertyTable *property, DBusMessageIter *iter,
+-		GDBusPendingPropertySet id, void *data)
+-{
+-	struct monitor *monitor = data;
+-	struct btd_device *device = monitor->device;
+-	const char *level;
+-
+-	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_STRING) {
+-		g_dbus_pending_property_error(id,
+-					ERROR_INTERFACE ".InvalidArguments",
+-					"Invalid arguments in method call");
+-		return;
+-	}
+-
+-	dbus_message_iter_get_basic(iter, &level);
+-
+-	if (!level_is_valid(level)) {
+-		g_dbus_pending_property_error(id,
+-					ERROR_INTERFACE ".InvalidArguments",
+-					"Invalid arguments in method call");
+-		return;
+-	}
+-
+-	if (g_strcmp0(monitor->immediatelevel, level) == 0)
+-		goto done;
+-
+-	if (monitor->immediateto) {
+-		g_source_remove(monitor->immediateto);
+-		monitor->immediateto = 0;
+-	}
+-
+-	/* Previous Immediate Alert level if connection/write fails */
+-	g_free(monitor->fallbacklevel);
+-	monitor->fallbacklevel = monitor->immediatelevel;
+-
+-	monitor->immediatelevel = g_strdup(level);
+-
+-	/*
+-	 * Means that Link/Path Loss are disabled or there is a pending
+-	 * writting for Find Me(Immediate Alert characteristic value).
+-	 * If enabled, Path Loss always registers a connection callback
+-	 * when the Proximity Monitor starts.
+-	 */
+-	if (monitor->attioid == 0)
+-		monitor->attioid = btd_device_add_attio_callback(device,
+-							attio_connected_cb,
+-							attio_disconnected_cb,
+-							monitor);
+-	else if (monitor->attrib)
+-		write_immediate_alert(monitor);
+-
+-done:
+-	g_dbus_pending_property_success(id);
+-}
+-
+-static gboolean property_exists_immediate_alert_level(
+-				const GDBusPropertyTable *property, void *data)
+-{
+-	struct monitor *monitor = data;
+-
+-	if (!(monitor->enabled.findme || monitor->enabled.pathloss))
+-		return FALSE;
+-
+-	return TRUE;
+-}
+-
+-static gboolean property_get_signal_level(
+-					const GDBusPropertyTable *property,
+-					DBusMessageIter *iter, void *data)
+-{
+-	struct monitor *monitor = data;
+-
+-	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING,
+-						&monitor->signallevel);
+-
+-	return TRUE;
+-}
+-
+-static gboolean property_exists_signal_level(const GDBusPropertyTable *property,
+-								void *data)
+-{
+-	struct monitor *monitor = data;
+-
+-	if (!monitor->enabled.pathloss)
+-		return FALSE;
+-
+-	return TRUE;
+-}
+-
+-static const GDBusPropertyTable monitor_device_properties[] = {
+-	{ "LinkLossAlertLevel", "s", property_get_link_loss_level,
+-					property_set_link_loss_level,
+-					property_exists_link_loss_level },
+-	{ "ImmediateAlertLevel", "s", property_get_immediate_alert_level,
+-					property_set_immediate_alert_level,
+-					property_exists_immediate_alert_level },
+-	{ "SignalLevel", "s", property_get_signal_level, NULL,
+-					property_exists_signal_level },
+-	{ }
+-};
+-
+-static void monitor_destroy(gpointer user_data)
+-{
+-	struct monitor *monitor = user_data;
+-
+-	monitors = g_slist_remove(monitors, monitor);
+-
+-	btd_device_unref(monitor->device);
+-	g_free(monitor->linklosslevel);
+-	g_free(monitor->immediatelevel);
+-	g_free(monitor->signallevel);
+-	g_free(monitor);
+-}
+-
+-static struct monitor *register_monitor(struct btd_device *device)
+-{
+-	const char *path = device_get_path(device);
+-	struct monitor *monitor;
+-	char *level;
+-
+-	monitor = find_monitor(device);
+-	if (monitor != NULL)
+-		return monitor;
+-
+-	level = read_proximity_config(device, "LinkLossAlertLevel");
+-
+-	monitor = g_new0(struct monitor, 1);
+-	monitor->device = btd_device_ref(device);
+-	monitor->linklosslevel = (level ? : g_strdup("high"));
+-	monitor->signallevel = g_strdup("unknown");
+-	monitor->immediatelevel = g_strdup("none");
+-
+-	monitors = g_slist_append(monitors, monitor);
+-
+-	if (g_dbus_register_interface(btd_get_dbus_connection(), path,
+-				PROXIMITY_INTERFACE,
+-				NULL, NULL, monitor_device_properties,
+-				monitor, monitor_destroy) == FALSE) {
+-		error("D-Bus failed to register %s interface",
+-						PROXIMITY_INTERFACE);
+-		monitor_destroy(monitor);
+-		return NULL;
+-	}
+-
+-	DBG("Registered interface %s on path %s", PROXIMITY_INTERFACE, path);
+-
+-	return monitor;
+-}
+-
+-static void update_monitor(struct monitor *monitor)
+-{
+-	if (monitor->txpower != NULL && monitor->immediate != NULL)
+-		monitor->enabled.pathloss = TRUE;
+-	else
+-		monitor->enabled.pathloss = FALSE;
+-
+-	DBG("Link Loss: %s, Path Loss: %s, FindMe: %s",
+-				monitor->enabled.linkloss ? "TRUE" : "FALSE",
+-				monitor->enabled.pathloss ? "TRUE" : "FALSE",
+-				monitor->enabled.findme ? "TRUE" : "FALSE");
+-
+-	if (!monitor->enabled.linkloss && !monitor->enabled.pathloss)
+-		return;
+-
+-	if (monitor->attioid != 0)
+-		return;
+-
+-	monitor->attioid = btd_device_add_attio_callback(monitor->device,
+-							attio_connected_cb,
+-							attio_disconnected_cb,
+-							monitor);
+-}
+-
+-int monitor_register_linkloss(struct btd_device *device,
+-						struct enabled *enabled,
+-						struct gatt_primary *linkloss)
+-{
+-	struct monitor *monitor;
+-
+-	if (!enabled->linkloss)
+-		return 0;
+-
+-	monitor = register_monitor(device);
+-	if (monitor == NULL)
+-		return -1;
+-
+-	monitor->linkloss = g_new0(struct att_range, 1);
+-	monitor->linkloss->start = linkloss->range.start;
+-	monitor->linkloss->end = linkloss->range.end;
+-	monitor->enabled.linkloss = TRUE;
+-
+-	update_monitor(monitor);
+-
+-	return 0;
+-}
+-
+-int monitor_register_txpower(struct btd_device *device,
+-						struct enabled *enabled,
+-						struct gatt_primary *txpower)
+-{
+-	struct monitor *monitor;
+-
+-	if (!enabled->pathloss)
+-		return 0;
+-
+-	monitor = register_monitor(device);
+-	if (monitor == NULL)
+-		return -1;
+-
+-	monitor->txpower = g_new0(struct att_range, 1);
+-	monitor->txpower->start = txpower->range.start;
+-	monitor->txpower->end = txpower->range.end;
+-
+-	update_monitor(monitor);
+-
+-	return 0;
+-}
+-
+-int monitor_register_immediate(struct btd_device *device,
+-						struct enabled *enabled,
+-						struct gatt_primary *immediate)
+-{
+-	struct monitor *monitor;
+-
+-	if (!enabled->pathloss && !enabled->findme)
+-		return 0;
+-
+-	monitor = register_monitor(device);
+-	if (monitor == NULL)
+-		return -1;
+-
+-	monitor->immediate = g_new0(struct att_range, 1);
+-	monitor->immediate->start = immediate->range.start;
+-	monitor->immediate->end = immediate->range.end;
+-	monitor->enabled.findme = enabled->findme;
+-
+-	update_monitor(monitor);
+-
+-	return 0;
+-}
+-
+-static void cleanup_monitor(struct monitor *monitor)
+-{
+-	struct btd_device *device = monitor->device;
+-	const char *path = device_get_path(device);
+-
+-	if (monitor->immediate != NULL || monitor->txpower != NULL)
+-		return;
+-
+-	if (monitor->immediateto != 0) {
+-		g_source_remove(monitor->immediateto);
+-		monitor->immediateto = 0;
+-	}
+-
+-	if (monitor->linkloss != NULL)
+-		return;
+-
+-	if (monitor->attioid != 0) {
+-		btd_device_remove_attio_callback(device, monitor->attioid);
+-		monitor->attioid = 0;
+-	}
+-
+-	if (monitor->attrib != NULL) {
+-		g_attrib_unref(monitor->attrib);
+-		monitor->attrib = NULL;
+-	}
+-
+-	g_dbus_unregister_interface(btd_get_dbus_connection(), path,
+-							PROXIMITY_INTERFACE);
+-}
+-
+-void monitor_unregister_linkloss(struct btd_device *device)
+-{
+-	struct monitor *monitor;
+-
+-	monitor = find_monitor(device);
+-	if (monitor == NULL)
+-		return;
+-
+-	g_free(monitor->linkloss);
+-	monitor->linkloss = NULL;
+-	monitor->enabled.linkloss = FALSE;
+-
+-	cleanup_monitor(monitor);
+-}
+-
+-void monitor_unregister_txpower(struct btd_device *device)
+-{
+-	struct monitor *monitor;
+-
+-	monitor = find_monitor(device);
+-	if (monitor == NULL)
+-		return;
+-
+-	g_free(monitor->txpower);
+-	monitor->txpower = NULL;
+-	monitor->enabled.pathloss = FALSE;
+-
+-	cleanup_monitor(monitor);
+-}
+-
+-void monitor_unregister_immediate(struct btd_device *device)
+-{
+-	struct monitor *monitor;
+-
+-	monitor = find_monitor(device);
+-	if (monitor == NULL)
+-		return;
+-
+-	g_free(monitor->immediate);
+-	monitor->immediate = NULL;
+-	monitor->enabled.findme = FALSE;
+-	monitor->enabled.pathloss = FALSE;
+-
+-	cleanup_monitor(monitor);
+-}
+diff --git a/profiles/proximity/monitor.h b/profiles/proximity/monitor.h
+deleted file mode 100644
+index d9a40c601..000000000
+--- a/profiles/proximity/monitor.h
++++ /dev/null
+@@ -1,43 +0,0 @@
+-/*
+- *
+- *  BlueZ - Bluetooth protocol stack for Linux
+- *
+- *  Copyright (C) 2011  Nokia Corporation
+- *  Copyright (C) 2011  Marcel Holtmann <marcel@holtmann.org>
+- *
+- *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+- */
+-
+-struct enabled {
+-	gboolean linkloss;
+-	gboolean pathloss;
+-	gboolean findme;
+-};
+-
+-int monitor_register_linkloss(struct btd_device *device,
+-						struct enabled *enabled,
+-						struct gatt_primary *linkloss);
+-int monitor_register_txpower(struct btd_device *device,
+-						struct enabled *enabled,
+-						struct gatt_primary *txpower);
+-int monitor_register_immediate(struct btd_device *device,
+-						struct enabled *enabled,
+-						struct gatt_primary *immediate);
+-
+-void monitor_unregister_linkloss(struct btd_device *device);
+-void monitor_unregister_txpower(struct btd_device *device);
+-void monitor_unregister_immediate(struct btd_device *device);
+diff --git a/profiles/proximity/proximity.conf b/profiles/proximity/proximity.conf
+deleted file mode 100644
+index 417610ff7..000000000
+--- a/profiles/proximity/proximity.conf
++++ /dev/null
+@@ -1,9 +0,0 @@
+-# Configuration file for the proximity service
+-
+-# This section contains options which are not specific to any
+-# particular interface
+-[General]
+-
+-# Configuration to allow disabling Proximity services
+-# Allowed values: LinkLoss,PathLoss,FindMe
+-Disable=PathLoss
+diff --git a/profiles/proximity/reporter.c b/profiles/proximity/reporter.c
+deleted file mode 100644
+index 366d96bb3..000000000
+--- a/profiles/proximity/reporter.c
++++ /dev/null
+@@ -1,270 +0,0 @@
+-/*
+- *
+- *  BlueZ - Bluetooth protocol stack for Linux
+- *
+- *  Copyright (C) 2011  Nokia Corporation
+- *  Copyright (C) 2011  Marcel Holtmann <marcel@holtmann.org>
+- *
+- *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+- */
+-
+-#ifdef HAVE_CONFIG_H
+-#include <config.h>
+-#endif
+-
+-#include <stdbool.h>
+-#include <errno.h>
+-
+-#include <glib.h>
+-
+-#include <dbus/dbus.h>
+-
+-#include "lib/bluetooth.h"
+-#include "lib/sdp.h"
+-#include "lib/uuid.h"
+-
+-#include "gdbus/gdbus.h"
+-
+-#include "src/log.h"
+-#include "src/dbus-common.h"
+-#include "src/adapter.h"
+-#include "src/device.h"
+-#include "src/profile.h"
+-#include "src/service.h"
+-#include "src/shared/util.h"
+-#include "attrib/gattrib.h"
+-#include "attrib/att.h"
+-#include "attrib/gatt.h"
+-#include "attrib/att-database.h"
+-#include "src/attrib-server.h"
+-
+-#include "reporter.h"
+-#include "linkloss.h"
+-#include "immalert.h"
+-
+-struct reporter_adapter {
+-	struct btd_adapter *adapter;
+-	GSList *devices;
+-};
+-
+-static GSList *reporter_adapters;
+-
+-static int radapter_cmp(gconstpointer a, gconstpointer b)
+-{
+-	const struct reporter_adapter *radapter = a;
+-	const struct btd_adapter *adapter = b;
+-
+-	if (radapter->adapter == adapter)
+-		return 0;
+-
+-	return -1;
+-}
+-
+-static struct reporter_adapter *
+-find_reporter_adapter(struct btd_adapter *adapter)
+-{
+-	GSList *l = g_slist_find_custom(reporter_adapters, adapter,
+-								radapter_cmp);
+-	if (!l)
+-		return NULL;
+-
+-	return l->data;
+-}
+-
+-const char *get_alert_level_string(uint8_t level)
+-{
+-	switch (level) {
+-	case NO_ALERT:
+-		return "none";
+-	case MILD_ALERT:
+-		return "mild";
+-	case HIGH_ALERT:
+-		return "high";
+-	}
+-
+-	return "unknown";
+-}
+-
+-static void register_tx_power(struct btd_adapter *adapter)
+-{
+-	uint16_t start_handle, h;
+-	const int svc_size = 4;
+-	uint8_t atval[256];
+-	bt_uuid_t uuid;
+-
+-	bt_uuid16_create(&uuid, TX_POWER_SVC_UUID);
+-	start_handle = attrib_db_find_avail(adapter, &uuid, svc_size);
+-	if (start_handle == 0) {
+-		error("Not enough free handles to register service");
+-		return;
+-	}
+-
+-	DBG("start_handle=0x%04x", start_handle);
+-
+-	h = start_handle;
+-
+-	/* Primary service definition */
+-	bt_uuid16_create(&uuid, GATT_PRIM_SVC_UUID);
+-	put_le16(TX_POWER_SVC_UUID, &atval[0]);
+-	attrib_db_add(adapter, h++, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 2);
+-
+-	/* Power level characteristic */
+-	bt_uuid16_create(&uuid, GATT_CHARAC_UUID);
+-	atval[0] = GATT_CHR_PROP_READ | GATT_CHR_PROP_NOTIFY;
+-	put_le16(h + 1, &atval[1]);
+-	put_le16(POWER_LEVEL_CHR_UUID, &atval[3]);
+-	attrib_db_add(adapter, h++, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 5);
+-
+-	/* Power level value */
+-	bt_uuid16_create(&uuid, POWER_LEVEL_CHR_UUID);
+-	atval[0] = 0x00;
+-	attrib_db_add(adapter, h++, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 1);
+-
+-	/* Client characteristic configuration */
+-	bt_uuid16_create(&uuid, GATT_CLIENT_CHARAC_CFG_UUID);
+-	atval[0] = 0x00;
+-	atval[1] = 0x00;
+-	attrib_db_add(adapter, h++, &uuid, ATT_NONE, ATT_NONE, atval, 2);
+-
+-	g_assert(h - start_handle == svc_size);
+-}
+-
+-static gboolean property_get_link_loss_level(const GDBusPropertyTable *property,
+-					DBusMessageIter *iter, void *data)
+-{
+-	struct btd_device *device = data;
+-	const char *level;
+-
+-	level = link_loss_get_alert_level(device);
+-
+-	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &level);
+-
+-	return TRUE;
+-}
+-
+-static gboolean property_get_immediate_alert_level(
+-					const GDBusPropertyTable *property,
+-					DBusMessageIter *iter, void *data)
+-{
+-	struct btd_device *device = data;
+-	const char *level;
+-
+-	level = imm_alert_get_level(device);
+-
+-	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &level);
+-
+-	return TRUE;
+-}
+-
+-static const GDBusPropertyTable reporter_device_properties[] = {
+-	{ "LinkLossAlertLevel", "s", property_get_link_loss_level },
+-	{ "ImmediateAlertLevel", "s", property_get_immediate_alert_level },
+-	{ }
+-};
+-
+-static void unregister_reporter_device(gpointer data, gpointer user_data)
+-{
+-	struct btd_device *device = data;
+-	struct reporter_adapter *radapter = user_data;
+-	const char *path = device_get_path(device);
+-
+-	DBG("unregister on device %s", path);
+-
+-	g_dbus_unregister_interface(btd_get_dbus_connection(), path,
+-					PROXIMITY_REPORTER_INTERFACE);
+-
+-	radapter->devices = g_slist_remove(radapter->devices, device);
+-	btd_device_unref(device);
+-}
+-
+-static void register_reporter_device(struct btd_device *device,
+-					struct reporter_adapter *radapter)
+-{
+-	const char *path = device_get_path(device);
+-
+-	DBG("register on device %s", path);
+-
+-	g_dbus_register_interface(btd_get_dbus_connection(), path,
+-					PROXIMITY_REPORTER_INTERFACE,
+-					NULL, NULL, reporter_device_properties,
+-					device, NULL);
+-
+-	btd_device_ref(device);
+-	radapter->devices = g_slist_prepend(radapter->devices, device);
+-}
+-
+-int reporter_device_probe(struct btd_service *service)
+-{
+-	struct btd_device *device = btd_service_get_device(service);
+-	struct reporter_adapter *radapter;
+-	struct btd_adapter *adapter = device_get_adapter(device);
+-
+-	radapter = find_reporter_adapter(adapter);
+-	if (!radapter)
+-		return -1;
+-
+-	register_reporter_device(device, radapter);
+-
+-	return 0;
+-}
+-
+-void reporter_device_remove(struct btd_service *service)
+-{
+-	struct btd_device *device = btd_service_get_device(service);
+-	struct reporter_adapter *radapter;
+-	struct btd_adapter *adapter = device_get_adapter(device);
+-
+-	radapter = find_reporter_adapter(adapter);
+-	if (!radapter)
+-		return;
+-
+-	unregister_reporter_device(device, radapter);
+-}
+-
+-int reporter_adapter_probe(struct btd_profile *p, struct btd_adapter *adapter)
+-{
+-	struct reporter_adapter *radapter;
+-
+-	radapter = g_new0(struct reporter_adapter, 1);
+-	radapter->adapter = adapter;
+-
+-	link_loss_register(adapter);
+-	register_tx_power(adapter);
+-	imm_alert_register(adapter);
+-
+-	reporter_adapters = g_slist_prepend(reporter_adapters, radapter);
+-	DBG("Proximity Reporter for adapter %p", adapter);
+-
+-	return 0;
+-}
+-
+-void reporter_adapter_remove(struct btd_profile *p,
+-						struct btd_adapter *adapter)
+-{
+-	struct reporter_adapter *radapter = find_reporter_adapter(adapter);
+-	if (!radapter)
+-		return;
+-
+-	g_slist_foreach(radapter->devices, unregister_reporter_device,
+-								radapter);
+-
+-	link_loss_unregister(adapter);
+-	imm_alert_unregister(adapter);
+-
+-	reporter_adapters = g_slist_remove(reporter_adapters, radapter);
+-	g_free(radapter);
+-}
+diff --git a/profiles/proximity/reporter.h b/profiles/proximity/reporter.h
+deleted file mode 100644
+index a8e1aac5d..000000000
+--- a/profiles/proximity/reporter.h
++++ /dev/null
+@@ -1,46 +0,0 @@
+-/*
+- *
+- *  BlueZ - Bluetooth protocol stack for Linux
+- *
+- *  Copyright (C) 2011  Nokia Corporation
+- *  Copyright (C) 2011  Marcel Holtmann <marcel@holtmann.org>
+- *
+- *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+- */
+-
+-#define PROXIMITY_REPORTER_INTERFACE "org.bluez.ProximityReporter1"
+-
+-#define IMMEDIATE_ALERT_SVC_UUID	0x1802
+-#define LINK_LOSS_SVC_UUID		0x1803
+-#define TX_POWER_SVC_UUID		0x1804
+-#define ALERT_LEVEL_CHR_UUID		0x2A06
+-#define POWER_LEVEL_CHR_UUID		0x2A07
+-
+-enum {
+-	NO_ALERT = 0x00,
+-	MILD_ALERT = 0x01,
+-	HIGH_ALERT = 0x02,
+-};
+-
+-void reporter_device_remove(struct btd_service *service);
+-int reporter_device_probe(struct btd_service *service);
+-
+-int reporter_adapter_probe(struct btd_profile *p, struct btd_adapter *adapter);
+-void reporter_adapter_remove(struct btd_profile *p,
+-						struct btd_adapter *adapter);
+-
+-const char *get_alert_level_string(uint8_t level);
+diff --git a/test/test-alert b/test/test-alert
+deleted file mode 100755
+index 43b3cf362..000000000
+--- a/test/test-alert
++++ /dev/null
+@@ -1,185 +0,0 @@
+-#!/usr/bin/python
+-
+-from __future__ import absolute_import, print_function, unicode_literals
+-
+-import optparse
+-import os
+-import sys
+-import dbus
+-import dbus.service
+-import dbus.mainloop.glib
+-try:
+-  from gi.repository import GObject
+-except ImportError:
+-  import gobject as GObject
+-
+-BUS_NAME = 'org.bluez'
+-ALERT_INTERFACE = 'org.bluez.Alert1'
+-ALERT_AGENT_INTERFACE = 'org.bluez.AlertAgent1'
+-BLUEZ_OBJECT_PATH = '/org/bluez'
+-TEST_OBJECT_PATH = '/org/bluez/test'
+-
+-class AlertAgent(dbus.service.Object):
+-	def __init__(self, bus, object_path, alert, mainloop):
+-		dbus.service.Object.__init__(self, bus, object_path)
+-		self.alert = alert
+-		self.mainloop = mainloop
+-
+-	@dbus.service.method(ALERT_AGENT_INTERFACE, in_signature='',
+-							out_signature='')
+-	def MuteOnce(self):
+-		print('method MuteOnce() was called')
+-		self.alert.NewAlert('ringer', 1, 'not active')
+-
+-	@dbus.service.method(ALERT_AGENT_INTERFACE, in_signature='s',
+-							out_signature='')
+-	def SetRinger(self, mode):
+-		print('method SetRinger(%s) was called' % mode)
+-		self.alert.NewAlert('ringer', 1, mode)
+-
+-	@dbus.service.method(ALERT_AGENT_INTERFACE, in_signature='',
+-							out_signature='')
+-	def Release(self):
+-		print('method Release() was called')
+-		self.mainloop.quit()
+-
+-def print_command_line(options):
+-	if not options.verbose:
+-		return False
+-
+-	print('-w: ' + str(options.wait))
+-
+-	if options.times:
+-		print('-t: ' + str(options.times))
+-
+-	if options.register:
+-		print('-r: ' + options.register)
+-	else:
+-		print('-r: ' + str(None))
+-
+-	if options.new_alert:
+-		print('-n:')
+-		for i in options.new_alert:
+-			print('    ' + i[0] + ', ' + i[1] + ', ' + i[2])
+-	else:
+-		print('-n: ' + str(None))
+-
+-	if options.unread_alert:
+-		print('-u:')
+-		for i in options.unread_alert:
+-			print('    ' + i[0] + ', ' + i[1])
+-	else:
+-		print('-u: ' + str(None))
+-
+-	print()
+-
+-	return True
+-
+-def read_count(param):
+-	try:
+-		return int(param)
+-	except ValueError:
+-		print('<count> must be integer, not \"%s\"' % param)
+-		sys.exit(1)
+-
+-def new_alert(alert, params):
+-	if not params:
+-		return False
+-
+-	for param in params:
+-		category = param[0]
+-		count = read_count(param[1])
+-		description = param[2]
+-
+-		alert.NewAlert(category, count, description)
+-
+-def unread_alert(alert, params):
+-	if not params:
+-		return False
+-
+-	for param in params:
+-		category = param[0]
+-		count = read_count(param[1])
+-
+-		alert.UnreadAlert(category, count)
+-
+-option_list = [
+-	optparse.make_option('-v', None,
+-			action = 'store_true',
+-			default = False,
+-			dest = 'verbose',
+-			help = 'verbose'),
+-
+-	optparse.make_option('-w', None,
+-			action = 'store_true',
+-			default = False,
+-			dest = 'wait',
+-			help = 'wait for dbus events'),
+-
+-	optparse.make_option('-t', None,
+-			action = 'store',
+-			default = 1,
+-			type = "int",
+-			dest = 'times',
+-			help = 'repeat UnreadAlert/NewAlert <times> times',
+-			metavar = '<times>'),
+-
+-	optparse.make_option('-r', None,
+-			action = 'store',
+-			dest = 'register',
+-			type = 'string',
+-			metavar = '<category>',
+-			help = 'register alert'),
+-
+-	optparse.make_option('-n', None,
+-			action = 'append',
+-			dest = 'new_alert',
+-			type = 'string',
+-			nargs = 3,
+-			metavar = '<category> <count> <description>',
+-			help = 'send new alert'),
+-
+-	optparse.make_option('-u', None,
+-			action = 'append',
+-			dest = 'unread_alert',
+-			type = 'string',
+-			nargs = 2,
+-			metavar = '<category> <count>',
+-			help = 'send unread alert'),
+-]
+-
+-parser = optparse.OptionParser(option_list=option_list)
+-parser.disable_interspersed_args()
+-(options, args) = parser.parse_args()
+-
+-dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
+-bus = dbus.SystemBus()
+-mainloop = GObject.MainLoop()
+-alert = dbus.Interface(bus.get_object(BUS_NAME, BLUEZ_OBJECT_PATH),
+-								ALERT_INTERFACE)
+-alert_agent = AlertAgent(bus, TEST_OBJECT_PATH, alert, mainloop)
+-
+-print_command_line(options)
+-
+-if not (options.register or options.new_alert or options.unread_alert or
+-								options.wait):
+-	parser.print_usage()
+-	sys.exit(1)
+-
+-if options.register:
+-	alert.RegisterAlert(options.register, TEST_OBJECT_PATH)
+-
+-times = 0
+-while times < options.times:
+-	times += 1
+-
+-	new_alert(alert, options.new_alert)
+-	unread_alert(alert, options.unread_alert)
+-
+-if not options.wait:
+-	sys.exit(0)
+-
+-try:
+-	mainloop.run()
+-except:
+-	pass
+diff --git a/test/test-cyclingspeed b/test/test-cyclingspeed
+deleted file mode 100755
+index 393f79c72..000000000
+--- a/test/test-cyclingspeed
++++ /dev/null
+@@ -1,197 +0,0 @@
+-#!/usr/bin/python
+-
+-from __future__ import absolute_import, print_function, unicode_literals
+-
+-'''
+-Cycling Speed and Cadence test script
+-'''
+-
+-from optparse import OptionParser, make_option
+-import sys
+-import dbus
+-import dbus.service
+-import dbus.mainloop.glib
+-try:
+-  from gi.repository import GObject
+-except ImportError:
+-  import gobject as GObject
+-import bluezutils
+-
+-BUS_NAME = 'org.bluez'
+-CYCLINGSPEED_MANAGER_INTERFACE = 'org.bluez.CyclingSpeedManager1'
+-CYCLINGSPEED_WATCHER_INTERFACE = 'org.bluez.CyclingSpeedWatcher1'
+-CYCLINGSPEED_INTERFACE = 'org.bluez.CyclingSpeed1'
+-
+-class MeasurementQ:
+-	def __init__(self, wrap_v):
+-		self._now = [None, None]
+-		self._prev = [None, None]
+-		self._wrap_v = wrap_v
+-
+-	def can_calc(self):
+-		return ((self._now[0] is not None)
+-			and (self._now[1] is not None)
+-			and (self._prev[0] is not None)
+-			and (self._prev[1] is not None))
+-
+-	def delta_v(self):
+-		delta = self._now[0] - self._prev[0]
+-		if (delta < 0) and (self._wrap_v):
+-			delta = delta + 65536
+-		return delta
+-
+-	def delta_t(self):
+-		delta = self._now[1] - self._prev[1]
+-		if delta < 0:
+-			delta = delta + 65536
+-		return delta
+-
+-	def put(self, data):
+-		self._prev = self._now
+-		self._now = data
+-
+-class Watcher(dbus.service.Object):
+-	_wheel = MeasurementQ(False)
+-	_crank = MeasurementQ(True)
+-	_circumference = None
+-
+-	def enable_calc(self, v):
+-		self._circumference = v
+-
+-	@dbus.service.method(CYCLINGSPEED_WATCHER_INTERFACE,
+-					in_signature="oa{sv}", out_signature="")
+-	def MeasurementReceived(self, device, measure):
+-		print("Measurement received from %s" % device)
+-
+-		rev = None
+-		evt = None
+-		if "WheelRevolutions" in measure:
+-			rev = measure["WheelRevolutions"]
+-			print("WheelRevolutions: ", measure["WheelRevolutions"])
+-		if "LastWheelEventTime" in measure:
+-			evt = measure["LastWheelEventTime"]
+-			print("LastWheelEventTime: ", measure["LastWheelEventTime"])
+-		self._wheel.put( [rev, evt] )
+-
+-		rev = None
+-		evt = None
+-		if "CrankRevolutions" in measure:
+-			rev = measure["CrankRevolutions"]
+-			print("CrankRevolutions: ", measure["CrankRevolutions"])
+-		if "LastCrankEventTime" in measure:
+-			evt = measure["LastCrankEventTime"]
+-			print("LastCrankEventTime: ", measure["LastCrankEventTime"])
+-		self._crank.put( [rev, evt] )
+-
+-		if self._circumference is None:
+-			return
+-
+-		if self._wheel.can_calc():
+-			delta_v = self._wheel.delta_v()
+-			delta_t = self._wheel.delta_t()
+-
+-			if (delta_v >= 0) and (delta_t > 0):
+-				speed = delta_v * self._circumference * 1024 / delta_t # mm/s
+-				speed = speed * 0.0036 # mm/s -> km/h
+-				print("(calculated) Speed: %.2f km/h" % speed)
+-
+-		if self._crank.can_calc():
+-			delta_v = self._crank.delta_v()
+-			delta_t = self._crank.delta_t()
+-
+-			if delta_t > 0:
+-				cadence = delta_v * 1024 / delta_t
+-				print("(calculated) Cadence: %d rpm" % cadence)
+-
+-def properties_changed(interface, changed, invalidated):
+-	if "Location" in changed:
+-		print("Sensor location: %s" % changed["Location"])
+-
+-if __name__ == "__main__":
+-	dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
+-
+-	bus = dbus.SystemBus()
+-
+-	option_list = [
+-		make_option("-i", "--adapter", action="store",
+-			type="string", dest="adapter"),
+-		make_option("-b", "--device", action="store",
+-			type="string", dest="address"),
+-		make_option("-c", "--circumference", action="store",
+-			type="int", dest="circumference"),
+-		]
+-
+-	parser = OptionParser(option_list=option_list)
+-
+-	(options, args) = parser.parse_args()
+-
+-	if not options.address:
+-		print("Usage: %s [-i <adapter>] -b <bdaddr> [-c <value>] [cmd]" % (sys.argv[0]))
+-		print("Possible commands:")
+-		print("\tShowSupportedLocations")
+-		print("\tSetLocation <location>")
+-		print("\tSetCumulativeWheelRevolutions <value>")
+-		sys.exit(1)
+-
+-	managed_objects = bluezutils.get_managed_objects()
+-	adapter = bluezutils.find_adapter_in_objects(managed_objects,
+-								options.adapter)
+-	adapter_path = adapter.object_path
+-
+-	device = bluezutils.find_device_in_objects(managed_objects,
+-								options.address,
+-								options.adapter)
+-	device_path = device.object_path
+-
+-	cscmanager = dbus.Interface(bus.get_object(BUS_NAME, adapter_path),
+-						CYCLINGSPEED_MANAGER_INTERFACE)
+-
+-	watcher_path = "/test/watcher"
+-	watcher = Watcher(bus, watcher_path)
+-	if options.circumference:
+-		watcher.enable_calc(options.circumference)
+-	cscmanager.RegisterWatcher(watcher_path)
+-
+-	csc = dbus.Interface(bus.get_object(BUS_NAME, device_path),
+-							CYCLINGSPEED_INTERFACE)
+-
+-	bus.add_signal_receiver(properties_changed, bus_name=BUS_NAME,
+-				path=device_path,
+-				dbus_interface="org.freedesktop.DBus.Properties",
+-				signal_name="PropertiesChanged")
+-
+-	device_prop = dbus.Interface(bus.get_object(BUS_NAME, device_path),
+-					"org.freedesktop.DBus.Properties")
+-
+-	properties = device_prop.GetAll(CYCLINGSPEED_INTERFACE)
+-
+-	if "Location" in properties:
+-		print("Sensor location: %s" % properties["Location"])
+-	else:
+-		print("Sensor location is not supported")
+-
+-	if len(args) > 0:
+-		if args[0] == "ShowSupportedLocations":
+-			if properties["MultipleLocationsSupported"]:
+-				print("Supported locations: ", properties["SupportedLocations"])
+-			else:
+-				print("Multiple sensor locations not supported")
+-
+-		elif args[0] == "SetLocation":
+-			if properties["MultipleLocationsSupported"]:
+-				device_prop.Set(CYCLINGSPEED_INTERFACE, "Location", args[1])
+-			else:
+-				print("Multiple sensor locations not supported")
+-
+-		elif args[0] == "SetCumulativeWheelRevolutions":
+-			if properties["WheelRevolutionDataSupported"]:
+-				csc.SetCumulativeWheelRevolutions(dbus.UInt32(args[1]))
+-			else:
+-				print("Wheel revolution data not supported")
+-
+-		else:
+-			print("Unknown command")
+-			sys.exit(1)
+-
+-	mainloop = GObject.MainLoop()
+-	mainloop.run()
+diff --git a/test/test-heartrate b/test/test-heartrate
+deleted file mode 100755
+index 5e4e7e5c5..000000000
+--- a/test/test-heartrate
++++ /dev/null
+@@ -1,108 +0,0 @@
+-#!/usr/bin/python
+-
+-from __future__ import absolute_import, print_function, unicode_literals
+-
+-'''
+-Heart Rate Monitor test script
+-'''
+-
+-from optparse import OptionParser, make_option
+-import sys
+-import dbus
+-import dbus.service
+-import dbus.mainloop.glib
+-try:
+-  from gi.repository import GObject
+-except ImportError:
+-  import gobject as GObject
+-import bluezutils
+-
+-BUS_NAME = 'org.bluez'
+-HEARTRATE_MANAGER_INTERFACE = 'org.bluez.HeartRateManager1'
+-HEARTRATE_WATCHER_INTERFACE = 'org.bluez.HeartRateWatcher1'
+-HEARTRATE_INTERFACE = 'org.bluez.HeartRate1'
+-
+-class Watcher(dbus.service.Object):
+-	@dbus.service.method(HEARTRATE_WATCHER_INTERFACE,
+-					in_signature="oa{sv}", out_signature="")
+-	def MeasurementReceived(self, device, measure):
+-		print("Measurement received from %s" % device)
+-		print("Value: ", measure["Value"])
+-
+-		if "Energy" in measure:
+-			print("Energy: ", measure["Energy"])
+-
+-		if "Contact" in measure:
+-			print("Contact: ", measure["Contact"])
+-
+-		if "Interval" in measure:
+-			for i in measure["Interval"]:
+-				print("Interval: ", i)
+-
+-if __name__ == "__main__":
+-	dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
+-
+-	bus = dbus.SystemBus()
+-
+-	option_list = [
+-		make_option("-i", "--adapter", action="store",
+-			type="string", dest="adapter"),
+-		make_option("-b", "--device", action="store",
+-			type="string", dest="address"),
+-		]
+-
+-	parser = OptionParser(option_list=option_list)
+-
+-	(options, args) = parser.parse_args()
+-
+-	if not options.address:
+-		print("Usage: %s [-i <adapter>] -b <bdaddr> [cmd]" % (sys.argv[0]))
+-		print("Possible commands:")
+-		print("\tReset")
+-		sys.exit(1)
+-
+-	managed_objects = bluezutils.get_managed_objects()
+-	adapter = bluezutils.find_adapter_in_objects(managed_objects,
+-								options.adapter)
+-	adapter_path = adapter.object_path
+-
+-	heartrateManager = dbus.Interface(bus.get_object(BUS_NAME,
+-				adapter_path), HEARTRATE_MANAGER_INTERFACE)
+-
+-	path = "/test/watcher"
+-	heartrateManager.RegisterWatcher(path)
+-
+-	device = bluezutils.find_device_in_objects(managed_objects,
+-								options.address,
+-								options.adapter)
+-	device_path = device.object_path
+-
+-	heartrate = dbus.Interface(bus.get_object(BUS_NAME, device_path),
+-							HEARTRATE_INTERFACE)
+-
+-	watcher = Watcher(bus, path)
+-
+-	dev_prop = dbus.Interface(bus.get_object(BUS_NAME, device_path),
+-					"org.freedesktop.DBus.Properties")
+-
+-	properties = dev_prop.GetAll(HEARTRATE_INTERFACE)
+-
+-	if "Location" in properties:
+-		print("Sensor location: %s" % properties["Location"])
+-	else:
+-		print("Sensor location is not supported")
+-
+-	if len(args) > 0:
+-		if args[0] == "Reset":
+-			reset_sup = properties["ResetSupported"]
+-			if reset_sup:
+-				heartrate.Reset()
+-			else:
+-				print("Reset not supported")
+-				sys.exit(1)
+-		else:
+-			print("unknown command")
+-			sys.exit(1)
+-
+-	mainloop = GObject.MainLoop()
+-	mainloop.run()
+diff --git a/test/test-proximity b/test/test-proximity
+deleted file mode 100755
+index 66b7bc24c..000000000
+--- a/test/test-proximity
++++ /dev/null
+@@ -1,70 +0,0 @@
+-#!/usr/bin/python
+-
+-from __future__ import absolute_import, print_function, unicode_literals
+-
+-'''
+-Proximity Monitor test script
+-'''
+-
+-from optparse import OptionParser, make_option
+-import sys
+-import dbus
+-import dbus.mainloop.glib
+-try:
+-  from gi.repository import GObject
+-except ImportError:
+-  import gobject as GObject
+-import bluezutils
+-
+-BUS_NAME = 'org.bluez'
+-PROXIMITY_MONITOR_INTERFACE = 'org.bluez.ProximityMonitor1'
+-
+-def properties_changed(interface, changed, invalidated):
+-	if interface != PROXIMITY_MONITOR_INTERFACE:
+-		return
+-
+-	for name, value in changed.iteritems():
+-		print("Property %s changed:  %s" % (name, str(value)))
+-
+-if __name__ == "__main__":
+-	dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
+-
+-	bus = dbus.SystemBus()
+-
+-	option_list = [
+-		make_option("-i", "--adapter", action="store",
+-			type="string", dest="dev_id"),
+-		make_option("-b", "--device", action="store",
+-			type="string", dest="address"),
+-
+-		]
+-	parser = OptionParser(option_list=option_list)
+-
+-	(options, args) = parser.parse_args()
+-
+-	if (len(args) < 1):
+-		print("Usage: %s <command>" % (sys.argv[0]))
+-		print("")
+-		print("  -b MAC LinkLossAlertLevel <none|mild|high>")
+-		print("  -b MAC ImmediateAlertLevel <none|mild|high>")
+-		sys.exit(1)
+-
+-	device = bluezutils.find_device(options.address, options.dev_id)
+-	device_path = device.object_path
+-
+-	bus.add_signal_receiver(properties_changed, bus_name=BUS_NAME,
+-			path=device_path,
+-			dbus_interface="org.freedesktop.DBus.Properties",
+-			signal_name="PropertiesChanged")
+-
+-	proximity = dbus.Interface(bus.get_object(BUS_NAME, device_path),
+-						PROXIMITY_MONITOR_INTERFACE)
+-
+-	device_prop = dbus.Interface(bus.get_object(BUS_NAME, device_path),
+-					"org.freedesktop.DBus.Properties")
+-
+-	print("Proximity SetProperty('%s', '%s')" % (args[0], args[1]))
+-	device_prop.Set(PROXIMITY_MONITOR_INTERFACE, args[0], args[1])
+-
+-	mainloop = GObject.MainLoop()
+-	mainloop.run()
+-- 
+2.13.5
 
-this is a deadlock on RT however !RT has a hidden problem which not
-yelled at by lockdep. We have the following call path:
-
-| hci_send_monitor_ctrl_event()
-|   read_lock(&hci_sk_list.lock);
-|
-|   hci_send_to_channel()
-|      read_lock(&hci_sk_list.lock);
-
-So both functions acquire the same read_lock. If a write comes along
-between the first read_lock() and second read_lock() then we have a
-deadlock because the write_lock() will lock down further readers from
-acquiring the read-lock until the writer completed its task.
-
-This recursive locking was introduced in 38ceaa00d02d ("Bluetooth: Add
-support for sending MGMT commands and events to monitor").
-
-Sebastian
