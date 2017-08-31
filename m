@@ -1,75 +1,70 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Yunhan Wang <yunhanw@google.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Yunhan Wang <yunhanw@google.com>
-Subject: [PATCH BlueZ] client: Fix default_ctrl change when new adapter is found
-Date: Thu, 31 Aug 2017 20:56:15 -0700
-Message-Id: <20170901035615.95402-1-yunhanw@google.com>
+From: "Gix, Brian" <brian.gix@intel.com>
+To: "Gix, Brian" <brian.gix@intel.com>,
+        Lukasz Rymanowski <lukasz.rymanowski@codecoup.pl>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: RE: [PATCH BlueZ 1/3] mesh: Fix for handling unprovisioned device
+Date: Thu, 31 Aug 2017 23:51:01 +0000
+Message-ID: <DEBB0CAA2616974FAE35E4B560B9A4373E1D2AFE@ORSMSX103.amr.corp.intel.com>
+References: <20170831101257.1644-1-lukasz.rymanowski@codecoup.pl>
+ <DEBB0CAA2616974FAE35E4B560B9A4373E1D2A2F@ORSMSX103.amr.corp.intel.com>
+In-Reply-To: <DEBB0CAA2616974FAE35E4B560B9A4373E1D2A2F@ORSMSX103.amr.corp.intel.com>
+Content-Type: text/plain; charset="iso-8859-2"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When another adapter is found, the default adapter would be changed,
-which is not expected. Default adapter can only be changed by select
-command.
----
- client/main.c | 18 ++++++++++++------
- 1 file changed, 12 insertions(+), 6 deletions(-)
+This is a good fix and should be accepted.
 
-diff --git a/client/main.c b/client/main.c
-index 75696c2c1..29b3978e1 100644
---- a/client/main.c
-+++ b/client/main.c
-@@ -67,6 +67,7 @@ struct adapter {
- };
- 
- static struct adapter *default_ctrl;
-+static struct adapter *cache_ctrl;
- static GDBusProxy *default_dev;
- static GDBusProxy *default_attr;
- static GList *ctrl_list;
-@@ -151,7 +152,7 @@ static void disconnect_handler(DBusConnection *connection, void *user_data)
- 
- 	g_list_free_full(ctrl_list, proxy_leak);
- 	ctrl_list = NULL;
--
-+	cache_ctrl = NULL;
- 	default_ctrl = NULL;
- }
- 
-@@ -521,15 +522,21 @@ static void device_added(GDBusProxy *proxy)
- 
- static void adapter_added(GDBusProxy *proxy)
- {
--	default_ctrl = g_malloc0(sizeof(struct adapter));
--	default_ctrl->proxy = proxy;
--	ctrl_list = g_list_append(ctrl_list, default_ctrl);
-+	struct adapter *adapter = g_malloc0(sizeof(struct adapter));
-+
-+	adapter->proxy = proxy;
-+	cache_ctrl = adapter;
-+	ctrl_list = g_list_append(ctrl_list, adapter);
-+
-+	if (!default_ctrl)
-+		default_ctrl = adapter;
-+
- 	print_adapter(proxy, COLORED_NEW);
- }
- 
- static void ad_manager_added(GDBusProxy *proxy)
- {
--	default_ctrl->ad_proxy = proxy;
-+	cache_ctrl->ad_proxy = proxy;
- }
- 
- static void proxy_added(GDBusProxy *proxy, void *user_data)
-@@ -602,7 +609,6 @@ static void adapter_removed(GDBusProxy *proxy)
- 			print_adapter(proxy, COLORED_DEL);
- 
- 			if (default_ctrl && default_ctrl->proxy == proxy) {
--				default_ctrl = NULL;
- 				set_default_device(NULL, NULL);
- 			}
- 
--- 
-2.14.1.581.gf28d330327-goog
-
+> -----Original Message-----
+> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
+> owner@vger.kernel.org] On Behalf Of Gix, Brian
+> Sent: Thursday, August 31, 2017 4:12 PM
+> To: Lukasz Rymanowski <lukasz.rymanowski@codecoup.pl>; linux-
+> bluetooth@vger.kernel.org
+> Subject: RE: [PATCH BlueZ 1/3] mesh: Fix for handling unprovisioned device
+> 
+> An unprovisioned device that does not advertise the ServiceData for an
+> Unprovisioned Mesh Device does not comply with the specification.  The
+> Service Data is the required method for an unprovisioned device to be
+> recognized.
+> 
+> > -----Original Message-----
+> > From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
+> > owner@vger.kernel.org] On Behalf Of Lukasz Rymanowski
+> > Sent: Thursday, August 31, 2017 3:13 AM
+> > To: linux-bluetooth@vger.kernel.org
+> > Cc: £ukasz Rymanowski <lukasz.rymanowski@codecoup.pl>
+> > Subject: [PATCH BlueZ 1/3] mesh: Fix for handling unprovisioned device
+> >
+> > If there is no ServiceData there is no valid provisioning data for
+> > PB-GATT
+> > ---
+> >  mesh/main.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >
+> > diff --git a/mesh/main.c b/mesh/main.c index b06f4352a..2289d7d10
+> > 100644
+> > --- a/mesh/main.c
+> > +++ b/mesh/main.c
+> > @@ -503,7 +503,7 @@ static bool parse_service_data(GDBusProxy *proxy,
+> > const char *target_uuid,
+> >  	}
+> >
+> >  	if (!g_dbus_proxy_get_property(proxy, "ServiceData", &iter))
+> > -		return true;
+> > +		return false;
+> >
+> >  	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_ARRAY)
+> >  		return false;
+> > --
+> > 2.11.0
+> >
+> > --
+> > To unsubscribe from this list: send the line "unsubscribe
+> > linux-bluetooth" in the body of a message to majordomo@vger.kernel.org
+> > More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org More majordomo
+> info at  http://vger.kernel.org/majordomo-info.html
