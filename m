@@ -1,68 +1,47 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: "Gix, Brian" <brian.gix@intel.com>
-To: Lukasz Rymanowski <lukasz.rymanowski@codecoup.pl>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: [PATCH BlueZ 3/3] mesh: Use security low as default
-Date: Thu, 31 Aug 2017 23:07:51 +0000
-Message-ID: <DEBB0CAA2616974FAE35E4B560B9A4373E1D2A0B@ORSMSX103.amr.corp.intel.com>
-References: <20170831101257.1644-1-lukasz.rymanowski@codecoup.pl>
- <20170831101257.1644-3-lukasz.rymanowski@codecoup.pl>
-In-Reply-To: <20170831101257.1644-3-lukasz.rymanowski@codecoup.pl>
-Content-Type: text/plain; charset="iso-8859-2"
+Return-Path: <frederic.danis.oss@gmail.com>
+Subject: Re: [PATCH v2 1/3] dt-bindings: net: bluetooth: Add
+ broadcom-bluetooth
+To: Marcel Holtmann <marcel@holtmann.org>,
+ Loic Poulain <loic.poulain@gmail.com>
+Cc: Maxime Ripard <maxime.ripard@free-electrons.com>,
+ Stefan Wahren <stefan.wahren@i2se.com>, Rob Herring <robh+dt@kernel.org>,
+ Ray Jui <rjui@broadcom.com>, Scott Branden <sbranden@broadcom.com>,
+ f.fainelli@gmail.com, Johan Hedberg <johan.hedberg@gmail.com>,
+ linux-rpi-kernel@lists.infradead.org,
+ "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+ devicetree@vger.kernel.org
+References: <1501576704-26423-1-git-send-email-loic.poulain@gmail.com>
+ <20170822074726.e424lflqxn6mb4xd@flea.lan>
+ <f2fcf522-cd1e-e748-0ee7-ad28bbf8ae5d@i2se.com>
+ <4c23bcb6-1b90-c41e-6e47-7d8315e760ae@gmail.com>
+ <9BD5C644-6B89-496C-B442-F276D7A99102@holtmann.org>
+From: =?UTF-8?Q?Fr=c3=a9d=c3=a9ric_Danis?= <frederic.danis.oss@gmail.com>
+Message-ID: <cbd8f439-0575-593e-80d7-8c5d74188236@gmail.com>
+Date: Thu, 31 Aug 2017 21:32:56 +0200
 MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <9BD5C644-6B89-496C-B442-F276D7A99102@holtmann.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-It would be an extremely bad idea to set the default Mesh Security to LOW.
+Hi Marcel and Loïc,
 
-If anything, the default security should be raised to HIGH.
+Le 23/08/2017 à 16:19, Marcel Holtmann a écrit :
+>> This is already partially supported in the hci_bcm driver.
+>> Today this driver registers a platform_driver(legacy/ACPI) and a
+>> serdev_device_driver (new/DT).
+>>
+>> The platform driver retrieves the gpios and mainly uses them in pm ops.
+>> Once the ACPI for serdev will be supported, this plat driver should be
+>> removed.
+>>
+>> The serdev driver does no support this yet because I used the RPi3
+>> as dev platform. But this is something we want to have as well.
+> Making ACPI serdev aware and turning BTH0 into serdev nodes is really the next step. That would allow us to simplify the drivers and remove duplicate code. Do you still have access to ACPI based tablets with Broadcom chips? It would be great if you can take a stab at this.
 
-We set it to Medium initially to aid in testability, however, we can show that any mesh that *ever* provisioned even a single node with LOW or MEDIUM security will be permanently compromised.
+I have access to an Asus T100TA with Broadcom chipset and I recently 
+started to work on the ACPI part of SerDev.
+I hope to send patches for it soon.
 
-There is a white paper currently being written in the Mesh Working group which discusses this issue in detail, but the gist of the problem is that it is Extremely Simple to design a Man-in-the-Middle attack which will expose the entire Network Key, the Device Key, and all shared Application keys to any device provisioned with LOW security.
+Regards,
 
-It is not much more difficult to compromise MEDIUM security if the only OOB material is a value between 0-9.
-
-While I believe LOW security does have purpose for manufacturer device testing (to test and validate encryption algorithms) we must be extremely careful that it is never release "In the Wild".
-
-I had honestly intended to change this to HIGH before making the initial push of this code... and leave it up to developers to *temporarily* lower the security level for short term testing on an as-needed basis. Because even MEDIUM is a security compromise we cannot risk for this technology.
-
-I will in fact shortly send a patch to increase the default security level to HIGH.
-
-
-Please note that this is 100% different from standard point-to-point Bluetooth.  In Point-to-Point relationships, a compromised LTK (Long Term Key) requires a simple re-pairing. In Mesh, every single node in the mesh must be reprovisioned.
-
-
-
-> -----Original Message-----
-> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
-> owner@vger.kernel.org] On Behalf Of Lukasz Rymanowski
-> Sent: Thursday, August 31, 2017 3:13 AM
-> To: linux-bluetooth@vger.kernel.org
-> Cc: �ukasz Rymanowski <lukasz.rymanowski@codecoup.pl>
-> Subject: [PATCH BlueZ 3/3] mesh: Use security low as default
-> 
-> ---
->  mesh/prov.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/mesh/prov.c b/mesh/prov.c
-> index 32785dda1..964259cd0 100644
-> --- a/mesh/prov.c
-> +++ b/mesh/prov.c
-> @@ -57,7 +57,7 @@
->  #define MESH_PROV_SEC_LOW	0
-> 
->  /* For Deployment, Security levels below HIGH are *not* recomended */
-> -#define mesh_gatt_prov_security()	MESH_PROV_SEC_MED
-> +#define mesh_gatt_prov_security()	MESH_PROV_SEC_LOW
-> 
->  #define PROV_INVITE	0x00
->  #define PROV_CAPS	0x01
-> --
-> 2.11.0
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org More majordomo
-> info at  http://vger.kernel.org/majordomo-info.html
+Frédéric Danis
