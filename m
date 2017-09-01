@@ -1,101 +1,75 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <a12789e7-54c1-2469-e12e-4235a2327432@jp.fujitsu.com>
-References: <37259a70-d8d0-0cff-5d59-460917c5010f@jp.fujitsu.com>
- <CALvjcs-hCShRT8GSNP0z8HDGOqMOd6xCaRc1JhXhReOf45rX+w@mail.gmail.com> <a12789e7-54c1-2469-e12e-4235a2327432@jp.fujitsu.com>
 From: Yunhan Wang <yunhanw@google.com>
-Date: Thu, 31 Aug 2017 20:58:31 -0700
-Message-ID: <CALvjcs9kyaey8RbuxiGSYQAUuQrJpYc_nWO4cWdOQ0xic1Lo8Q@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] client: Fix default controller in interactive mode
-To: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+To: linux-bluetooth@vger.kernel.org
+Cc: Yunhan Wang <yunhanw@google.com>
+Subject: [PATCH BlueZ] client: Fix default_ctrl change when new adapter is found
+Date: Thu, 31 Aug 2017 20:56:15 -0700
+Message-Id: <20170901035615.95402-1-yunhanw@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi, Luiz and Eramoto
+When another adapter is found, the default adapter would be changed,
+which is not expected. Default adapter can only be changed by select
+command.
+---
+ client/main.c | 18 ++++++++++++------
+ 1 file changed, 12 insertions(+), 6 deletions(-)
 
-Thanks for comments. Just send the patch to address this issue. Please
-kindly have a review.
+diff --git a/client/main.c b/client/main.c
+index 75696c2c1..29b3978e1 100644
+--- a/client/main.c
++++ b/client/main.c
+@@ -67,6 +67,7 @@ struct adapter {
+ };
+ 
+ static struct adapter *default_ctrl;
++static struct adapter *cache_ctrl;
+ static GDBusProxy *default_dev;
+ static GDBusProxy *default_attr;
+ static GList *ctrl_list;
+@@ -151,7 +152,7 @@ static void disconnect_handler(DBusConnection *connection, void *user_data)
+ 
+ 	g_list_free_full(ctrl_list, proxy_leak);
+ 	ctrl_list = NULL;
+-
++	cache_ctrl = NULL;
+ 	default_ctrl = NULL;
+ }
+ 
+@@ -521,15 +522,21 @@ static void device_added(GDBusProxy *proxy)
+ 
+ static void adapter_added(GDBusProxy *proxy)
+ {
+-	default_ctrl = g_malloc0(sizeof(struct adapter));
+-	default_ctrl->proxy = proxy;
+-	ctrl_list = g_list_append(ctrl_list, default_ctrl);
++	struct adapter *adapter = g_malloc0(sizeof(struct adapter));
++
++	adapter->proxy = proxy;
++	cache_ctrl = adapter;
++	ctrl_list = g_list_append(ctrl_list, adapter);
++
++	if (!default_ctrl)
++		default_ctrl = adapter;
++
+ 	print_adapter(proxy, COLORED_NEW);
+ }
+ 
+ static void ad_manager_added(GDBusProxy *proxy)
+ {
+-	default_ctrl->ad_proxy = proxy;
++	cache_ctrl->ad_proxy = proxy;
+ }
+ 
+ static void proxy_added(GDBusProxy *proxy, void *user_data)
+@@ -602,7 +609,6 @@ static void adapter_removed(GDBusProxy *proxy)
+ 			print_adapter(proxy, COLORED_DEL);
+ 
+ 			if (default_ctrl && default_ctrl->proxy == proxy) {
+-				default_ctrl = NULL;
+ 				set_default_device(NULL, NULL);
+ 			}
+ 
+-- 
+2.14.1.581.gf28d330327-goog
 
-Best wishes
-Yunhan
-
-On Thu, Aug 31, 2017 at 1:06 AM, ERAMOTO Masaya
-<eramoto.masaya@jp.fujitsu.com> wrote:
-> Hi Yunhan,
->
-> Thanks for your reply.
->
-> On 08/31/2017 02:02 PM, Yunhan Wang wrote:
->> Hi, ERAMOTO
->>
->> With this change, when second adapter is enumerated.
->> default_ctrl->ad_proxy would be assigned with advertising proxy from
->> second adapter, but default_ctrl->proxy is still first adapter proxy.
->
-> I understood your commit 4e111f3448.
->
->> Yes, when there are two adapters, the newest adapter is chosen as
->> default one.  It is not good when you have adapter A in test, and
->> later attach another adapter B. But if you make all adapters ready
->> before your test is running, then you can use "select" to choose the
->> default adapter.
->
-> I worry about the case that bluetootctl is not run on test phase
-> but on operation phase (end-users may attach adapters freely). In
-> addition, now bluetoothctl seems to be inconsistent when adapters
-> without advertising (e.g. with only BR/EDR) are used.
->
-> Do you have any ideas how to fix this behavior? Or do not we need
-> to worry about above?
->
->
-> Regards,
-> Eramoto
->
->> Thanks
->> Best wishes
->> Yunhan
->>
->> On Wed, Aug 30, 2017 at 9:23 PM, ERAMOTO Masaya
->> <eramoto.masaya@jp.fujitsu.com> wrote:
->>> Since 4e111f3448a126786f3620be1b5ce969456edc65, when a attached adapter
->>> is tried to operate in the interactive mode and another adapter is
->>> attached newly, the default controller is changed to the another adapter.
->>>
->>> In the interactive mode, because the default controller should change by
->>> select command, this patch fixes to not change the default controller
->>> when another adapter is attached.
->>> ---
->>>  client/main.c | 11 ++++++++---
->>>  1 file changed, 8 insertions(+), 3 deletions(-)
->>>
->>> diff --git a/client/main.c b/client/main.c
->>> index 825647d..7ab95dc 100644
->>> --- a/client/main.c
->>> +++ b/client/main.c
->>> @@ -527,9 +527,14 @@ static void device_added(GDBusProxy *proxy)
->>>
->>>  static void adapter_added(GDBusProxy *proxy)
->>>  {
->>> -       default_ctrl = g_malloc0(sizeof(struct adapter));
->>> -       default_ctrl->proxy = proxy;
->>> -       ctrl_list = g_list_append(ctrl_list, default_ctrl);
->>> +       struct adapter *adapter = g_malloc0(sizeof(struct adapter));
->>> +
->>> +       adapter->proxy = proxy;
->>> +       ctrl_list = g_list_append(ctrl_list, adapter);
->>> +
->>> +       if (!default_ctrl)
->>> +               default_ctrl = adapter;
->>> +
->>>         print_adapter(proxy, COLORED_NEW);
->>>  }
->>>
->>> --
->>> 2.7.4
->>>
->>
->>
->
