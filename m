@@ -1,86 +1,101 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Inga Stotland <inga.stotland@intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Inga Stotland <inga.stotland@intel.com>
-Subject: [PATCH BlueZ] mesh: Use correct length for config server response
-Date: Thu, 31 Aug 2017 23:09:12 -0700
-Message-Id: <20170901060912.19744-1-inga.stotland@intel.com>
+MIME-Version: 1.0
+In-Reply-To: <a12789e7-54c1-2469-e12e-4235a2327432@jp.fujitsu.com>
+References: <37259a70-d8d0-0cff-5d59-460917c5010f@jp.fujitsu.com>
+ <CALvjcs-hCShRT8GSNP0z8HDGOqMOd6xCaRc1JhXhReOf45rX+w@mail.gmail.com> <a12789e7-54c1-2469-e12e-4235a2327432@jp.fujitsu.com>
+From: Yunhan Wang <yunhanw@google.com>
+Date: Thu, 31 Aug 2017 20:58:31 -0700
+Message-ID: <CALvjcs9kyaey8RbuxiGSYQAUuQrJpYc_nWO4cWdOQ0xic1Lo8Q@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] client: Fix default controller in interactive mode
+To: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Also check if the length is nonzero before sending response
----
- mesh/config-server.c | 20 +++++++++++---------
- 1 file changed, 11 insertions(+), 9 deletions(-)
+Hi, Luiz and Eramoto
 
-diff --git a/mesh/config-server.c b/mesh/config-server.c
-index 4710ede..8a88645 100644
---- a/mesh/config-server.c
-+++ b/mesh/config-server.c
-@@ -59,8 +59,7 @@ static bool server_msg_recvd(uint16_t src, uint8_t *data,
- 	uint16_t ele_addr;
- 	uint8_t ele_idx;
- 	struct mesh_publication pub;
--
--	int n;
-+	int m, n;
- 
- 	if (mesh_opcode_get(data, len, &opcode, &n)) {
- 		len -= n;
-@@ -73,6 +72,8 @@ static bool server_msg_recvd(uint16_t src, uint8_t *data,
- 	if (!node)
- 		return true;
- 
-+	n = 0;
-+
- 	switch (opcode & ~OP_UNRELIABLE) {
- 	default:
- 		return false;
-@@ -94,6 +95,7 @@ static bool server_msg_recvd(uint16_t src, uint8_t *data,
- 		break;
- 
- 	case OP_CONFIG_MODEL_PUB_SET:
-+
- 		if (len != 11 && len != 13)
- 			return true;
- 
-@@ -110,19 +112,19 @@ static bool server_msg_recvd(uint16_t src, uint8_t *data,
- 		pub.app_idx = get_le16(data + 4);
- 		pub.ttl = data[6];
- 		pub.period = data[7];
--		n = (data[7] & 0x3f);
-+		m = (data[7] & 0x3f);
- 		switch (data[7] >> 6) {
- 		case 0:
--			rl_printf("Period: %d ms\n", n * 100);
-+			rl_printf("Period: %d ms\n", m * 100);
- 			break;
- 		case 2:
--			n *= 10;
-+			m *= 10;
- 			/* fall through */
- 		case 1:
--			rl_printf("Period: %d sec\n", n);
-+			rl_printf("Period: %d sec\n", m);
- 			break;
- 		case 3:
--			rl_printf("Period: %d min\n", n * 10);
-+			rl_printf("Period: %d min\n", m * 10);
- 			break;
- 		}
- 
-@@ -140,9 +142,9 @@ static bool server_msg_recvd(uint16_t src, uint8_t *data,
- 	}
- 
- 	primary = node_get_primary(node);
--	if (src != primary)
-+	if (n && src != primary)
- 		net_access_layer_send(node_get_default_ttl(node), primary,
--					src, APP_IDX_DEV, msg, len);
-+					src, APP_IDX_DEV, msg, n);
- 	return true;
- }
- 
--- 
-2.9.5
+Thanks for comments. Just send the patch to address this issue. Please
+kindly have a review.
 
+Best wishes
+Yunhan
+
+On Thu, Aug 31, 2017 at 1:06 AM, ERAMOTO Masaya
+<eramoto.masaya@jp.fujitsu.com> wrote:
+> Hi Yunhan,
+>
+> Thanks for your reply.
+>
+> On 08/31/2017 02:02 PM, Yunhan Wang wrote:
+>> Hi, ERAMOTO
+>>
+>> With this change, when second adapter is enumerated.
+>> default_ctrl->ad_proxy would be assigned with advertising proxy from
+>> second adapter, but default_ctrl->proxy is still first adapter proxy.
+>
+> I understood your commit 4e111f3448.
+>
+>> Yes, when there are two adapters, the newest adapter is chosen as
+>> default one.  It is not good when you have adapter A in test, and
+>> later attach another adapter B. But if you make all adapters ready
+>> before your test is running, then you can use "select" to choose the
+>> default adapter.
+>
+> I worry about the case that bluetootctl is not run on test phase
+> but on operation phase (end-users may attach adapters freely). In
+> addition, now bluetoothctl seems to be inconsistent when adapters
+> without advertising (e.g. with only BR/EDR) are used.
+>
+> Do you have any ideas how to fix this behavior? Or do not we need
+> to worry about above?
+>
+>
+> Regards,
+> Eramoto
+>
+>> Thanks
+>> Best wishes
+>> Yunhan
+>>
+>> On Wed, Aug 30, 2017 at 9:23 PM, ERAMOTO Masaya
+>> <eramoto.masaya@jp.fujitsu.com> wrote:
+>>> Since 4e111f3448a126786f3620be1b5ce969456edc65, when a attached adapter
+>>> is tried to operate in the interactive mode and another adapter is
+>>> attached newly, the default controller is changed to the another adapter.
+>>>
+>>> In the interactive mode, because the default controller should change by
+>>> select command, this patch fixes to not change the default controller
+>>> when another adapter is attached.
+>>> ---
+>>>  client/main.c | 11 ++++++++---
+>>>  1 file changed, 8 insertions(+), 3 deletions(-)
+>>>
+>>> diff --git a/client/main.c b/client/main.c
+>>> index 825647d..7ab95dc 100644
+>>> --- a/client/main.c
+>>> +++ b/client/main.c
+>>> @@ -527,9 +527,14 @@ static void device_added(GDBusProxy *proxy)
+>>>
+>>>  static void adapter_added(GDBusProxy *proxy)
+>>>  {
+>>> -       default_ctrl = g_malloc0(sizeof(struct adapter));
+>>> -       default_ctrl->proxy = proxy;
+>>> -       ctrl_list = g_list_append(ctrl_list, default_ctrl);
+>>> +       struct adapter *adapter = g_malloc0(sizeof(struct adapter));
+>>> +
+>>> +       adapter->proxy = proxy;
+>>> +       ctrl_list = g_list_append(ctrl_list, adapter);
+>>> +
+>>> +       if (!default_ctrl)
+>>> +               default_ctrl = adapter;
+>>> +
+>>>         print_adapter(proxy, COLORED_NEW);
+>>>  }
+>>>
+>>> --
+>>> 2.7.4
+>>>
+>>
+>>
+>
