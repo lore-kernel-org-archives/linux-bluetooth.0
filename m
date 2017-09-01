@@ -1,57 +1,42 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: "Gix, Brian" <brian.gix@intel.com>
-To: Laczen JMS <laczenjms@gmail.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: Meshctl - Modification to agent.c for easier entering static
- OOB key
-Date: Fri, 1 Sep 2017 15:19:38 +0000
-Message-ID: <DEBB0CAA2616974FAE35E4B560B9A4373E1D300A@ORSMSX103.amr.corp.intel.com>
-References: <CAFxSrVv9LPryt-xEPup-8Pq9eaNjt0J9dqn3+BmbJnBgPQTecw@mail.gmail.com>
-In-Reply-To: <CAFxSrVv9LPryt-xEPup-8Pq9eaNjt0J9dqn3+BmbJnBgPQTecw@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
+From: Laczen JMS <laczenjms@gmail.com>
+Date: Fri, 1 Sep 2017 16:34:23 +0200
+Message-ID: <CAFxSrVv9LPryt-xEPup-8Pq9eaNjt0J9dqn3+BmbJnBgPQTecw@mail.gmail.com>
+Subject: Meshctl - Modification to agent.c for easier entering static OOB key
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgSmVodWRpLA0KDQpXZSBuZWVkIHRvIGJlIGNhcmVmdWwgdGhhdCB3ZSBkbyBub3QgY29tcHJv
-bWlzZSB0aGUgc2VjdXJpdHkgbGV2ZWwgd2hlbiBvcGVyYXRpbmcgd2l0aCBISUdIIHNlY3VyaXR5
-LiANCg0KSElHSCBTZWN1cml0eSBwcm92aXNpb25pbmcgIGlzIGRlZmluZWQgYXMgdGhlIHByb3Zp
-c2lvbmVyIGdldHRpbmcgZWl0aGVyIHRoZSBmdWxsIDY0IGJ5dGVzIG9mIHRoZSBuZXcgZGV2aWNl
-J3MgUHVibGljIEtleSBPdXQtT2YtQmFuZCwgKm9yKiB0aGUgZnVsbCAxNiBieXRlcyBvZiBoaWdo
-IHF1YWxpdHkgU3RhdGljIERhdGEgT3V0LU9mLUJhbmQuDQoNCkFueSAiV2VsbCBLbm93biIga2V5
-cyBvciBzdGF0aWMgZGF0YSwgb3IgU3RhdGljIGRhdGEgdGhhdCBkb2VzIG5vdCB1c2UgYWxsIHRo
-ZSBieXRlcyBhdmFpbGFibGUgY29tcHJvbWlzZXMgdGhlIHNlY3VyaXR5IG9mIE1lc2guDQoNCg0K
-QXMgSSBzYWlkIGluIGFub3RoZXIgdGhyZWFkIGhlcmUsICB0d2Vha3MgdG8gdGhlIGNvZGUgdG8g
-c2ltcGxpZnkgdGVzdGluZyBjYW4gYmUgdmFsdWFibGUgZHVyaW5nIHRoZSBkZXZlbG9wbWVudCBj
-eWNsZSwgYnV0IHdlIHNob3VsZCBub3QgZXZlciByZWxlYXNlIEJsdWVaIE1lc2ggd2l0aCBzZWN1
-cml0eSBjcmlwcGxlZCwgb3IgaXQgY291bGQgaGF2ZSBwZXJtYW5lbnQgcmVwZXJjdXNzaW9ucyB3
-aXRoIHJlc3BlY3QgdG8gdGhlIGxldmVsIG9mIHNlY3VyaXR5IGluIGFueSBNZXNoIHN5c3RlbS4g
-U2VjdXJpdHkgaXMgY29vcGVyYXRpdmUgaW4gTWVzaCwgYW5kIG9uZSBwb29ybHkgc2VjdXJlZCBu
-b2RlIGNhbiBjb21wcm9taXNlIHRoZSBlbnRpcmUgbWVzaC4NCg0KU28gaWYgeW91IHdhbnQgdG8g
-bWFrZSB0d2Vha3MgbGlrZSB0aGlzIGluIHlvdXIgbG9jYWwgc3lzdGVtLCB5b3UgYXJlIGZyZWUg
-dG8gZG8gc28sIGJ1dCBwbGVhc2UgZG9uJ3QgcHV0IHNlY3VyaXR5IGxvd2VyaW5nIHR3ZWFrcyBp
-bnRvIGFueSByZWxlYXNlZCBzeXN0ZW0sIGFuZCBwbGVhc2UgZG9uJ3QgdXBzdHJlYW0gdGhvc2Ug
-dHdlYWtzIGhlcmUuDQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogbGlu
-dXgtYmx1ZXRvb3RoLW93bmVyQHZnZXIua2VybmVsLm9yZyBbbWFpbHRvOmxpbnV4LWJsdWV0b290
-aC0NCj4gb3duZXJAdmdlci5rZXJuZWwub3JnXSBPbiBCZWhhbGYgT2YgTGFjemVuIEpNUw0KPiBT
-ZW50OiBGcmlkYXksIFNlcHRlbWJlciAxLCAyMDE3IDc6MzQgQU0NCj4gVG86IGxpbnV4LWJsdWV0
-b290aEB2Z2VyLmtlcm5lbC5vcmcNCj4gU3ViamVjdDogTWVzaGN0bCAtIE1vZGlmaWNhdGlvbiB0
-byBhZ2VudC5jIGZvciBlYXNpZXIgZW50ZXJpbmcgc3RhdGljIE9PQiBrZXkNCj4gDQo+IEhpLA0K
-PiANCj4gRW50ZXJpbmcgYSBzdGF0aWMgT09CIGtleSBpbiBtZXNoY3RsIHJlcXVpcmVzIGFsbCAx
-NiBieXRlcy4gV2l0aCB0aGUgZm9sbG93aW5nDQo+IGNoYW5nZSBhIHNob3J0ZXIga2V5IGNhbiBi
-ZSBlbnRlcmVkLiBJIGhhdmUgbmV2ZXIgY3JlYXRlZCBhIHBhdGNoLCBzbyBzb3JyeQ0KPiBhYm91
-dCB0aGUgZm9ybWF0Og0KPiANCj4gSW4gYWdlbnQuYyBAIGxpbmUgMTAyOg0KPiBzdGF0aWMgYm9v
-bCByZXNwb25zZV9oZXhhZGVjaW1hbChjb25zdCBjaGFyICppbnB1dCkgew0KPiAgIHVpbnQ4X3Qg
-YnVmW01BWF9IRVhBREVDSU1BTF9PT0JfTEVOXTsNCj4gDQo+ICAgaWYgKCFzdHIyaGV4KGlucHV0
-LCBzdHJsZW4oaW5wdXQpLCBidWYsIHBlbmRpbmdfcmVxdWVzdC5sZW4pICkgew0KPiBybF9wcmlu
-dGYoIkluY29ycmVjdCBpbnB1dDogZXhwZWN0aW5nICVkIGhleCBvY3RldHNcbiIsDQo+IHBlbmRp
-bmdfcmVxdWVzdC5sZW4pOyByZXR1cm4gZmFsc2U7IH0gLi4uDQo+IA0KPiBjaGFuZ2VzIHRvOg0K
-PiANCj4gc3RhdGljIGJvb2wgcmVzcG9uc2VfaGV4YWRlY2ltYWwoY29uc3QgY2hhciAqaW5wdXQp
-IHsNCj4gICB1aW50OF90IGJ1ZltNQVhfSEVYQURFQ0lNQUxfT09CX0xFTl07DQo+IA0KPiAgIG1l
-bXNldChidWYsIDAsIHBlbmRpbmdfcmVxdWVzdC5sZW4pOw0KPiAgIHN0cjJoZXgoaW5wdXQsIHN0
-cmxlbihpbnB1dCksIGJ1Ziwgc3RybGVuKGlucHV0KS8yKTsgLi4uDQo+IA0KPiBLaW5kIHJlZ2Fy
-ZHMsDQo+IA0KPiBKZWh1ZGkNCj4gLS0NCj4gVG8gdW5zdWJzY3JpYmUgZnJvbSB0aGlzIGxpc3Q6
-IHNlbmQgdGhlIGxpbmUgInVuc3Vic2NyaWJlIGxpbnV4LWJsdWV0b290aCIgaW4NCj4gdGhlIGJv
-ZHkgb2YgYSBtZXNzYWdlIHRvIG1ham9yZG9tb0B2Z2VyLmtlcm5lbC5vcmcgTW9yZSBtYWpvcmRv
-bW8NCj4gaW5mbyBhdCAgaHR0cDovL3ZnZXIua2VybmVsLm9yZy9tYWpvcmRvbW8taW5mby5odG1s
-DQo=
+Hi,
+
+Entering a static OOB key in meshctl requires all 16 bytes. With the
+following change a shorter
+key can be entered. I have never created a patch, so sorry about the format:
+
+In agent.c @ line 102:
+static bool response_hexadecimal(const char *input)
+{
+  uint8_t buf[MAX_HEXADECIMAL_OOB_LEN];
+
+  if (!str2hex(input, strlen(input), buf, pending_request.len) ) {
+rl_printf("Incorrect input: expecting %d hex octets\n",
+ pending_request.len);
+return false;
+}
+...
+
+changes to:
+
+static bool response_hexadecimal(const char *input)
+{
+  uint8_t buf[MAX_HEXADECIMAL_OOB_LEN];
+
+  memset(buf, 0, pending_request.len);
+  str2hex(input, strlen(input), buf, strlen(input)/2);
+...
+
+Kind regards,
+
+Jehudi
