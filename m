@@ -1,58 +1,45 @@
-Return-Path: <mvdwege@gmail.com>
-Date: Fri, 1 Sep 2017 10:51:07 +0200
-From: Mart van de Wege <mvdwege@gmail.com>
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg
- <johan.hedberg@intel.com>, Gustavo Padovan <gustavo@padovan.org>,
- linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-rt-users@vger.kernel.org, tglx@linutronix.de, Peter Zijlstra
- <peterz@infradead.org>
-Subject: Re: Possible BT deadlock due to recursive read locking (Was: Re:
- kernel BUG at kernel/locking/rtmutex.c:1059)
-Message-ID: <20170901105107.753617a1@gmail.com>
-In-Reply-To: <20170831145211.xlu6cvocqdkzevsl@linutronix.de>
-References: <86val4928u.fsf@gaheris.avalon.lan>
-	<20170831145211.xlu6cvocqdkzevsl@linutronix.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Andrzej Kaczmarek <andrzej.kaczmarek@codecoup.pl>
+To: linux-bluetooth@vger.kernel.org
+Cc: Andrzej Kaczmarek <andrzej.kaczmarek@codecoup.pl>
+Subject: [PATCH 2/2] monitor: Add handling of nop opcode
+Date: Fri,  1 Sep 2017 10:07:44 +0200
+Message-Id: <20170901080744.11544-2-andrzej.kaczmarek@codecoup.pl>
+In-Reply-To: <20170901080744.11544-1-andrzej.kaczmarek@codecoup.pl>
+References: <20170901080744.11544-1-andrzej.kaczmarek@codecoup.pl>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, 31 Aug 2017 16:52:12 +0200
-Sebastian Andrzej Siewior <bigeasy@linutronix.de> wrote:
+---
+ monitor/packet.c     | 2 ++
+ src/shared/btsnoop.h | 1 +
+ 2 files changed, 3 insertions(+)
 
-> On 2017-08-30 23:25:53 [+0200], Mart van de Wege wrote:
-> > Hi,  
-> Hi,
-> 
-> > The issue persists up to v4.11.12-rt10  
-> Does
-> 	CONFIG_RWLOCK_RT_READER_BIASED=y
-> make it go away?
-> 
-Yes, that does make it go away. -rt8 now boots cleanly, and works fine.
-Building -rt10 now to be sure.
+diff --git a/monitor/packet.c b/monitor/packet.c
+index f214790ac..3145b075b 100644
+--- a/monitor/packet.c
++++ b/monitor/packet.c
+@@ -4110,6 +4110,8 @@ void packet_monitor(struct timeval *tv, struct ucred *cred,
+ 	case BTSNOOP_OPCODE_CTRL_EVENT:
+ 		packet_ctrl_event(tv, cred, index, data, size);
+ 		break;
++	case BTSNOOP_OPCODE_NOP:
++		break;
+ 	default:
+ 		sprintf(extra_str, "(code %d len %d)", opcode, size);
+ 		print_packet(tv, cred, '*', index, NULL, COLOR_ERROR,
+diff --git a/src/shared/btsnoop.h b/src/shared/btsnoop.h
+index 3df8998a3..0038117ad 100644
+--- a/src/shared/btsnoop.h
++++ b/src/shared/btsnoop.h
+@@ -53,6 +53,7 @@
+ #define BTSNOOP_OPCODE_CTRL_CLOSE	15
+ #define BTSNOOP_OPCODE_CTRL_COMMAND	16
+ #define BTSNOOP_OPCODE_CTRL_EVENT	17
++#define BTSNOOP_OPCODE_NOP		65535
+ 
+ #define BTSNOOP_MAX_PACKET_SIZE		(1486 + 4)
+ 
+-- 
+2.14.1
 
-> > Stacktrace:
-> > 
-> > Aug 29 17:28:04 localhost kernel: [   46.483810] ------------[ cut
-> > here ]------------ Aug 29 17:28:04 localhost kernel: [   46.483812]
-> > kernel BUG at kernel/locking/rtmutex.c:1059!  
-> 
-> this is a deadlock on RT however !RT has a hidden problem which not
-> yelled at by lockdep. We have the following call path:
-> 
-> | hci_send_monitor_ctrl_event()
-> |   read_lock(&hci_sk_list.lock);
-> |
-> |   hci_send_to_channel()
-> |      read_lock(&hci_sk_list.lock);
-> 
-> So both functions acquire the same read_lock. If a write comes along
-> between the first read_lock() and second read_lock() then we have a
-> deadlock because the write_lock() will lock down further readers from
-> acquiring the read-lock until the writer completed its task.
-> 
-> This recursive locking was introduced in 38ceaa00d02d ("Bluetooth: Add
-> support for sending MGMT commands and events to monitor").
-> 
-> Sebastian
