@@ -1,101 +1,86 @@
-Return-Path: <netdev-owner@vger.kernel.org>
-Date: Sat, 1 Jul 2017 21:19:50 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: davem@davemloft.net
-Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: pull request: bluetooth-next 2017-07-01
-Message-ID: <20170701181950.GA27217@x1c.home>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-        protocol="application/pgp-signature"; boundary="UlVJffcvxoiEqYs2"
-Sender: netdev-owner@vger.kernel.org
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Inga Stotland <inga.stotland@intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Inga Stotland <inga.stotland@intel.com>
+Subject: [PATCH BlueZ] mesh: Use correct length for config server response
+Date: Thu, 31 Aug 2017 23:09:12 -0700
+Message-Id: <20170901060912.19744-1-inga.stotland@intel.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-
---UlVJffcvxoiEqYs2
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-
-Hi Dave,
-
-Here are some more Bluetooth patches for the 4.13 kernel:
-
- - Added support for Broadcom BCM43430 controllers
- - Added sockaddr length checks before accessing sa_family
- - Fixed possible "might sleep" errors in bnep, cmtp and hidp modules
- - A few other minor fixes
-
-Please let me know if there are any issues pulling. Thanks.
-
-Johan
-
+Also check if the length is nonzero before sending response
 ---
-The following changes since commit 4b943faedfc29eda882851b772c06cecdf78d8e3:
+ mesh/config-server.c | 20 +++++++++++---------
+ 1 file changed, 11 insertions(+), 9 deletions(-)
 
-  udp/v6: prefetch rmem_alloc in udp6_queue_rcv_skb() (2017-06-22 13:44:04 -0400)
+diff --git a/mesh/config-server.c b/mesh/config-server.c
+index 4710ede..8a88645 100644
+--- a/mesh/config-server.c
++++ b/mesh/config-server.c
+@@ -59,8 +59,7 @@ static bool server_msg_recvd(uint16_t src, uint8_t *data,
+ 	uint16_t ele_addr;
+ 	uint8_t ele_idx;
+ 	struct mesh_publication pub;
+-
+-	int n;
++	int m, n;
+ 
+ 	if (mesh_opcode_get(data, len, &opcode, &n)) {
+ 		len -= n;
+@@ -73,6 +72,8 @@ static bool server_msg_recvd(uint16_t src, uint8_t *data,
+ 	if (!node)
+ 		return true;
+ 
++	n = 0;
++
+ 	switch (opcode & ~OP_UNRELIABLE) {
+ 	default:
+ 		return false;
+@@ -94,6 +95,7 @@ static bool server_msg_recvd(uint16_t src, uint8_t *data,
+ 		break;
+ 
+ 	case OP_CONFIG_MODEL_PUB_SET:
++
+ 		if (len != 11 && len != 13)
+ 			return true;
+ 
+@@ -110,19 +112,19 @@ static bool server_msg_recvd(uint16_t src, uint8_t *data,
+ 		pub.app_idx = get_le16(data + 4);
+ 		pub.ttl = data[6];
+ 		pub.period = data[7];
+-		n = (data[7] & 0x3f);
++		m = (data[7] & 0x3f);
+ 		switch (data[7] >> 6) {
+ 		case 0:
+-			rl_printf("Period: %d ms\n", n * 100);
++			rl_printf("Period: %d ms\n", m * 100);
+ 			break;
+ 		case 2:
+-			n *= 10;
++			m *= 10;
+ 			/* fall through */
+ 		case 1:
+-			rl_printf("Period: %d sec\n", n);
++			rl_printf("Period: %d sec\n", m);
+ 			break;
+ 		case 3:
+-			rl_printf("Period: %d min\n", n * 10);
++			rl_printf("Period: %d min\n", m * 10);
+ 			break;
+ 		}
+ 
+@@ -140,9 +142,9 @@ static bool server_msg_recvd(uint16_t src, uint8_t *data,
+ 	}
+ 
+ 	primary = node_get_primary(node);
+-	if (src != primary)
++	if (n && src != primary)
+ 		net_access_layer_send(node_get_default_ttl(node), primary,
+-					src, APP_IDX_DEV, msg, len);
++					src, APP_IDX_DEV, msg, n);
+ 	return true;
+ }
+ 
+-- 
+2.9.5
 
-are available in the git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git for-upstream
-
-for you to fetch changes up to feb16722b5d5f05b7ae1278a43e717c3d35cd512:
-
-  Bluetooth: btbcm: Add entry for BCM43430 UART bluetooth (2017-06-29 14:39:42 +0200)
-
-----------------------------------------------------------------
-Colin Ian King (1):
-      Bluetooth: hci_serdev: make hci_serdev_client_ops static
-
-Hans de Goede (1):
-      Bluetooth: hci_bcm: Add active_low irq polarity quirk for Asus T100CHI
-
-Ian Molton (1):
-      Bluetooth: btbcm: Add entry for BCM43430 UART bluetooth
-
-Jeffy Chen (3):
-      Bluetooth: bnep: fix possible might sleep error in bnep_session
-      Bluetooth: cmtp: fix possible might sleep error in cmtp_session
-      Bluetooth: hidp: fix possible might sleep error in hidp_session_thread
-
-Loic Poulain (1):
-      Bluetooth: hci_bcm: Fix unwanted error reporting if no bcm dev
-
-Mateusz Jurczyk (1):
-      Bluetooth: Add sockaddr length checks before accessing sa_family in bind and connect handlers
-
-Tejun Heo (1):
-      bluetooth: remove WQ_MEM_RECLAIM from hci workqueues
-
- drivers/bluetooth/btbcm.c      |  1 +
- drivers/bluetooth/hci_bcm.c    | 12 ++++++++++--
- drivers/bluetooth/hci_serdev.c |  4 ++--
- net/bluetooth/bnep/core.c      | 11 +++++------
- net/bluetooth/cmtp/core.c      | 17 ++++++++++-------
- net/bluetooth/hci_core.c       |  7 +++----
- net/bluetooth/hidp/core.c      | 33 ++++++++++++++++++++++-----------
- net/bluetooth/l2cap_sock.c     |  5 +++--
- net/bluetooth/rfcomm/sock.c    |  3 ++-
- net/bluetooth/sco.c            |  6 ++----
- 10 files changed, 60 insertions(+), 39 deletions(-)
-
---UlVJffcvxoiEqYs2
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIcBAEBAgAGBQJZV+fGAAoJECQj9vv5qNQS12kQAK0PUjuV1ZcQ08pjsTWDTpxI
-RnkexIrbu3KU9q35ov4fGpZmpu9Gmq3xX10NDucWb7+HZTQa5/efD//qul77rq/m
-+7hyJWGkU79rLjLT7KpeWwIGjO5iglyifyUTTzzflAn9VeF8eHGaQGLyFhxQnaOE
-axVod0sJEpEHLBtxBW/8s2BkEYdPW1PxlkYohrVrlB1hr6QdNXX5T2zM8Zkxksq1
-njdGmuk99ui9pzfIioUXZymybfbVP246thQw0whK6OJI9yD1Dzz97LJnbxthpZsy
-jFPNKFKLPu7QH34VptD9MQ5bTV0DjDMvl8bPj8ijfJQywubxZ5UoiNAPfJ1POgBz
-mMjezQghO/nMh0ssHCz2R/3I2f5je8vDQkPGNqc2YMrL6NldBM8RU7oL7eUlvvO4
-f6PIFDkjKvTA0eghAoGt8EYCgTEVB5MTdB/tBIfFhwqCbnCpafwnLJvK0ncF/tvO
-fGGz3hPVvufd1YGqTZdxm1H6/YVezadNBwLf+4vMwvAfDPO7SgAT/HmZGsIyF9UF
-jTb8T52wt1nANzjeIrMYOI2MvWQ2RoLsHfmc53I1hHEywV1bEW4biCCxGWR0RFrt
-MotDuv1er4xN03d3Oqe917nm6/MMYJaxRGcgwxb1Ga/bKk42Pkrzg33ysqqELN5q
-WCx0svtMqCqJYKxKmQ5C
-=A0h5
------END PGP SIGNATURE-----
-
---UlVJffcvxoiEqYs2--
