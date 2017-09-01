@@ -1,32 +1,30 @@
-Return-Path: <bjorn.andersson@linaro.org>
-From: Bjorn Andersson <bjorn.andersson@linaro.org>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org,
-	Loic Poulain <loic.poulain@linaro.org>
-Subject: [PATCH 0/2] btqcomsmd: Allow specifying board mac address
-Date: Fri,  1 Sep 2017 13:41:16 -0700
-Message-Id: <20170901204118.17123-1-bjorn.andersson@linaro.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Brian Gix <brian.gix@intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Brian Gix <brian.gix@intel.com>
+Subject: [PATCH 1/1] mesh: Enforce HIGH security when provisioning
+Date: Fri,  1 Sep 2017 08:35:46 -0700
+Message-Id: <20170901153546.17111-1-brian.gix@intel.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The btqcomsmd hardware lacks persistent storage of its mac address, so this
-needs to be configured during initialization. The second patch in this series
-reads the mac address from DT and does this, allowing the boot loader to
-populate this board specific information.
+---
+ mesh/prov.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Loic Poulain (2):
-  Bluetooth: make baswap src const
-  Bluetooth: btqcomsmd: BD address setup
-
- drivers/bluetooth/btqcomsmd.c     | 28 ++++++++++++++++++++++++++++
- include/net/bluetooth/bluetooth.h |  2 +-
- net/bluetooth/lib.c               |  4 ++--
- 3 files changed, 31 insertions(+), 3 deletions(-)
-
+diff --git a/mesh/prov.c b/mesh/prov.c
+index 32785dd..f78a876 100644
+--- a/mesh/prov.c
++++ b/mesh/prov.c
+@@ -57,7 +57,7 @@
+ #define MESH_PROV_SEC_LOW	0
+ 
+ /* For Deployment, Security levels below HIGH are *not* recomended */
+-#define mesh_gatt_prov_security()	MESH_PROV_SEC_MED
++#define mesh_gatt_prov_security()	MESH_PROV_SEC_HIGH
+ 
+ #define PROV_INVITE	0x00
+ #define PROV_CAPS	0x01
 -- 
-2.12.0
+2.9.5
+
