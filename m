@@ -1,38 +1,130 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <bjorn.andersson@linaro.org>
+Date: Fri, 1 Sep 2017 15:15:03 -0700
+From: Bjorn Andersson <bjorn.andersson@linaro.org>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	"open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+	Network Development <netdev@vger.kernel.org>,
+	LKML <linux-kernel@vger.kernel.org>, linux-arm-msm@vger.kernel.org,
+	Loic Poulain <loic.poulain@linaro.org>,
+	Rob Herring <robh@kernel.org>
+Subject: Re: [PATCH 2/2] Bluetooth: btqcomsmd: BD address setup
+Message-ID: <20170901221503.GA1165@minitux>
+References: <20170901204118.17123-1-bjorn.andersson@linaro.org>
+ <20170901204118.17123-3-bjorn.andersson@linaro.org>
+ <5EC41247-54CD-4F1D-84EC-E94F80A67805@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <367b3f96-3e2b-3951-70a2-ddf4cefd0fd3@jp.fujitsu.com>
-References: <20170901035615.95402-1-yunhanw@google.com> <a4eb008e-5c19-c13c-bb35-ac840f80be42@jp.fujitsu.com>
- <CALvjcs-3W8skPEH0TyHgwX=TSzrKcMy5ptjeHPbR+kY7x8hVvw@mail.gmail.com> <367b3f96-3e2b-3951-70a2-ddf4cefd0fd3@jp.fujitsu.com>
-From: Yunhan Wang <yunhanw@google.com>
-Date: Fri, 1 Sep 2017 20:54:13 -0700
-Message-ID: <CALvjcs_4NM-h-U4046CF9j_PBLhn_5bpZ_qx_rbz2TduG1KHDA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] client: Fix default_ctrl change when new adapter is found
-To: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <5EC41247-54CD-4F1D-84EC-E94F80A67805@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi, ERAMOTO
+On Fri 01 Sep 13:47 PDT 2017, Marcel Holtmann wrote:
 
-On Fri, Sep 1, 2017 at 12:59 AM, ERAMOTO Masaya
-<eramoto.masaya@jp.fujitsu.com> wrote:
-> Hi Yunhan,
->
-> Thanks for your explanation.
->
-> Btw, could you also tell me about the following fix.
+> Hi Bjorn,
+> 
+> > Bluetooth BD address can be retrieved in the same way as
+> > for wcnss-wlan MAC address. This patch mainly stores the
+> > local-mac-address property and sets the BD address during
+> > hci device setup.
+> > 
+> > Signed-off-by: Loic Poulain <loic.poulain@linaro.org>
+> > Signed-off-by: Bjorn Andersson <bjorn.andersson@linaro.org>
+> > ---
+> > drivers/bluetooth/btqcomsmd.c | 28 ++++++++++++++++++++++++++++
+> > 1 file changed, 28 insertions(+)
+> > 
+> > diff --git a/drivers/bluetooth/btqcomsmd.c b/drivers/bluetooth/btqcomsmd.c
+> > index d00c4fdae924..443bb2099329 100644
+> > --- a/drivers/bluetooth/btqcomsmd.c
+> > +++ b/drivers/bluetooth/btqcomsmd.c
+> > @@ -26,6 +26,7 @@
+> > struct btqcomsmd {
+> > 	struct hci_dev *hdev;
+> > 
+> > +	const bdaddr_t *addr;
+> > 	struct rpmsg_endpoint *acl_channel;
+> > 	struct rpmsg_endpoint *cmd_channel;
+> > };
+> > @@ -100,6 +101,27 @@ static int btqcomsmd_close(struct hci_dev *hdev)
+> > 	return 0;
+> > }
+> > 
+> > +static int btqcomsmd_setup(struct hci_dev *hdev)
+> > +{
+> > +	struct btqcomsmd *btq = hci_get_drvdata(hdev);
+> > +	struct sk_buff *skb;
+> > +
+> > +	skb = __hci_cmd_sync(hdev, HCI_OP_RESET, 0, NULL, HCI_INIT_TIMEOUT);
+> > +	if (IS_ERR(skb))
+> > +		return PTR_ERR(skb);
+> > +	kfree_skb(skb);
+> > +
+> > +	if (btq->addr) {
+> > +		bdaddr_t bdaddr;
+> > +
+> > +		/* btq->addr stored with most significant byte first */
+> > +		baswap(&bdaddr, btq->addr);
+> > +		return qca_set_bdaddr_rome(hdev, &bdaddr);
+> > +	}
+> > +
+> > +	return 0;
+> > +}
+> > +
+> > static int btqcomsmd_probe(struct platform_device *pdev)
+> > {
+> > 	struct btqcomsmd *btq;
+> > @@ -123,6 +145,11 @@ static int btqcomsmd_probe(struct platform_device *pdev)
+> > 	if (IS_ERR(btq->cmd_channel))
+> > 		return PTR_ERR(btq->cmd_channel);
+> > 
+> > +	btq->addr = of_get_property(pdev->dev.of_node, "local-mac-address",
+> > +				    &ret);
+> > +	if (ret != sizeof(bdaddr_t))
+> > +		btq->addr = NULL;
+> > +
+> > 	hdev = hci_alloc_dev();
+> > 	if (!hdev)
+> > 		return -ENOMEM;
+> > @@ -135,6 +162,7 @@ static int btqcomsmd_probe(struct platform_device *pdev)
+> > 	hdev->open = btqcomsmd_open;
+> > 	hdev->close = btqcomsmd_close;
+> > 	hdev->send = btqcomsmd_send;
+> > +	hdev->setup = btqcomsmd_setup;
+> > 	hdev->set_bdaddr = qca_set_bdaddr_rome;
+> 
+> I do not like this patch. Why not just set HCI_QUIRK_INVALID_BDADDR
+> and let a userspace tool deal with reading the BD_ADDR from some
+> storage.
+> 
 
-default_ctrl would be set as NULL in disconnect_handler. Therefore I
-remove this redundant one.
+That's what we currently have, but we regularly get complaints from
+developers using our board (DB410c).
 
+We're maintaining a Debian-based and an OpenEmbedded-based build and at
+least in the past btmgmt was not available in these - so we would have
+to maintain both a custom BlueZ package and then some scripts to inject
+the appropriate mac address.
 
-> bluetoothclt sometimes do core dump when I detach the adapter of default_ctrl
-> and run show command.
+Beyond these reference builds our users tend to build their own system
+images and I was hoping that they would not be forced to have a custom
+hook running each time hci0 is registered.
 
-Could you share your reproduce step for this issue? Could it be
-constantly reproduced?
+> Frankly I do not get this WiFI MAC address or BD_ADDR stored in DT. I
+> assumed the DT is suppose to describe hardware and not some value that
+> is normally retrieved for OTP or alike.
+> 
 
-thanks
-best wishes
-yunhan
+While I share your skepticism here I find it way superior over the
+various cases where this information is hard coded in some firmware file
+that has to be patched for each device - in particular when considering
+the out-of-tree workarounds that follow when said firmware file is not
+allowed to be modified on the device (e.g. in Android).
+
+And note that it's not _stored_ in DT, it's passed from the boot loader
+in DT - and it's still optional, so if an OEM has other means to
+provision the BD_ADDR they can still handle this in user space.
+
+Regards,
+Bjorn
