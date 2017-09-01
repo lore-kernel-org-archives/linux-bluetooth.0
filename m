@@ -1,110 +1,138 @@
-Return-Path: <netdev-owner@vger.kernel.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: "Zhang, Ming" <Ming.Zhang@arris.com>
+To: Yunhan Wang <yunhanw@google.com>,
+        ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: RE: [PATCH BlueZ] client: Fix default_ctrl change when new adapter
+ is found
+Date: Fri, 1 Sep 2017 21:06:17 +0000
+Message-ID: <F61B4D04CD1C194FA7CDCAF0858DC65C01A046EF57@SDCEXMBX2.ARRS.ARRISI.com>
+References: <20170901035615.95402-1-yunhanw@google.com>
+ <a4eb008e-5c19-c13c-bb35-ac840f80be42@jp.fujitsu.com>
+ <CALvjcs-3W8skPEH0TyHgwX=TSzrKcMy5ptjeHPbR+kY7x8hVvw@mail.gmail.com>
+In-Reply-To: <CALvjcs-3W8skPEH0TyHgwX=TSzrKcMy5ptjeHPbR+kY7x8hVvw@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <5EC41247-54CD-4F1D-84EC-E94F80A67805@holtmann.org>
-References: <20170901204118.17123-1-bjorn.andersson@linaro.org>
- <20170901204118.17123-3-bjorn.andersson@linaro.org> <5EC41247-54CD-4F1D-84EC-E94F80A67805@holtmann.org>
-From: Rob Herring <robh@kernel.org>
-Date: Fri, 1 Sep 2017 16:26:53 -0500
-Message-ID: <CAL_JsqK7skzd1c4Y2nxfspA-CeyK4dqjJB2L3tZztT=w8y4==w@mail.gmail.com>
-Subject: Re: [PATCH 2/2] Bluetooth: btqcomsmd: BD address setup
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Bjorn Andersson <bjorn.andersson@linaro.org>,
-        "Gustavo F. Padovan" <gustavo@padovan.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-        Network Development <netdev@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        linux-arm-msm <linux-arm-msm@vger.kernel.org>,
-        Loic Poulain <loic.poulain@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Sender: netdev-owner@vger.kernel.org
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, Sep 1, 2017 at 3:47 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Bjorn,
->
->> Bluetooth BD address can be retrieved in the same way as
->> for wcnss-wlan MAC address. This patch mainly stores the
->> local-mac-address property and sets the BD address during
->> hci device setup.
->>
->> Signed-off-by: Loic Poulain <loic.poulain@linaro.org>
->> Signed-off-by: Bjorn Andersson <bjorn.andersson@linaro.org>
->> ---
->> drivers/bluetooth/btqcomsmd.c | 28 ++++++++++++++++++++++++++++
->> 1 file changed, 28 insertions(+)
->>
->> diff --git a/drivers/bluetooth/btqcomsmd.c b/drivers/bluetooth/btqcomsmd.c
->> index d00c4fdae924..443bb2099329 100644
->> --- a/drivers/bluetooth/btqcomsmd.c
->> +++ b/drivers/bluetooth/btqcomsmd.c
->> @@ -26,6 +26,7 @@
->> struct btqcomsmd {
->>       struct hci_dev *hdev;
->>
->> +     const bdaddr_t *addr;
->>       struct rpmsg_endpoint *acl_channel;
->>       struct rpmsg_endpoint *cmd_channel;
->> };
->> @@ -100,6 +101,27 @@ static int btqcomsmd_close(struct hci_dev *hdev)
->>       return 0;
->> }
->>
->> +static int btqcomsmd_setup(struct hci_dev *hdev)
->> +{
->> +     struct btqcomsmd *btq = hci_get_drvdata(hdev);
->> +     struct sk_buff *skb;
->> +
->> +     skb = __hci_cmd_sync(hdev, HCI_OP_RESET, 0, NULL, HCI_INIT_TIMEOUT);
->> +     if (IS_ERR(skb))
->> +             return PTR_ERR(skb);
->> +     kfree_skb(skb);
->> +
->> +     if (btq->addr) {
->> +             bdaddr_t bdaddr;
->> +
->> +             /* btq->addr stored with most significant byte first */
->> +             baswap(&bdaddr, btq->addr);
->> +             return qca_set_bdaddr_rome(hdev, &bdaddr);
->> +     }
->> +
->> +     return 0;
->> +}
->> +
->> static int btqcomsmd_probe(struct platform_device *pdev)
->> {
->>       struct btqcomsmd *btq;
->> @@ -123,6 +145,11 @@ static int btqcomsmd_probe(struct platform_device *pdev)
->>       if (IS_ERR(btq->cmd_channel))
->>               return PTR_ERR(btq->cmd_channel);
->>
->> +     btq->addr = of_get_property(pdev->dev.of_node, "local-mac-address",
->> +                                 &ret);
->> +     if (ret != sizeof(bdaddr_t))
->> +             btq->addr = NULL;
->> +
->>       hdev = hci_alloc_dev();
->>       if (!hdev)
->>               return -ENOMEM;
->> @@ -135,6 +162,7 @@ static int btqcomsmd_probe(struct platform_device *pdev)
->>       hdev->open = btqcomsmd_open;
->>       hdev->close = btqcomsmd_close;
->>       hdev->send = btqcomsmd_send;
->> +     hdev->setup = btqcomsmd_setup;
->>       hdev->set_bdaddr = qca_set_bdaddr_rome;
->
-> I do not like this patch. Why not just set HCI_QUIRK_INVALID_BDADDR and let a userspace tool deal with reading the BD_ADDR from some storage.
->
-> Frankly I do not get this WiFI MAC address or BD_ADDR stored in DT. I assumed the DT is suppose to describe hardware and not some value that is normally retrieved for OTP or alike.
-
-Use of "local-mac-address" for ethernet at least has existed as long
-at OpenFirmware I think. For some platforms, DT is the only OTP. And
-sometimes, the bootloader (like u-boot) stores MAC addresses and then
-populates them on boot.
-
-Seems like if we just let userspace deal with it, then we're back to a
-btattach tool with every platform's specific way of reading the MAC
-address.
-
-Rob
+SGVsbG8sIA0KDQpDYW4gYW55Ym9keSBnaXZlIGEgaGVscCB3aXRoIEJsdWVaIHV0aWxpdHkgYmx1
+ZXRvb3RoY3RsPyANCi0gInJlYWQiIGFuZCAid3JpdGUiIGNvbW1hbmRzIHNlZW0gbm90IHdvcmtp
+bmc/IGFsd2F5cyByZXBvcnQgIm5vIGF0dHJpYnV0ZSBzZWxlY3RlZCIsIHVzaW5nICJzZWxlY3Qt
+YXR0cmlidXRlIiBmaXJzdCBkb2Vzbid0IGhlbHAuIA0KDQpUaGFua3MsIA0KTWluZw0KDQotLS0t
+LU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KRnJvbTogbGludXgtYmx1ZXRvb3RoLW93bmVyQHZnZXIu
+a2VybmVsLm9yZyBbbWFpbHRvOmxpbnV4LWJsdWV0b290aC1vd25lckB2Z2VyLmtlcm5lbC5vcmdd
+IE9uIEJlaGFsZiBPZiBZdW5oYW4gV2FuZw0KU2VudDogRnJpZGF5LCBTZXB0ZW1iZXIgMDEsIDIw
+MTcgMTI6NDMgQU0NClRvOiBFUkFNT1RPIE1hc2F5YSA8ZXJhbW90by5tYXNheWFAanAuZnVqaXRz
+dS5jb20+DQpDYzogbGludXgtYmx1ZXRvb3RoQHZnZXIua2VybmVsLm9yZw0KU3ViamVjdDogUmU6
+IFtQQVRDSCBCbHVlWl0gY2xpZW50OiBGaXggZGVmYXVsdF9jdHJsIGNoYW5nZSB3aGVuIG5ldyBh
+ZGFwdGVyIGlzIGZvdW5kDQoNCkhpLCBFUkFNT1RPDQoNCmNhY2hlX2N0cmwgaXMgbm90IGFkdmVy
+dGlzaW5nIG1hbmFnZXIsIGNhY2hlX2N0cmwgaXMgdGVtcG9yYXJ5IGFkYXB0ZXIgdGhhdCBzdG9y
+ZSBuZXdlc3QgYWRhcHRlciBpbmZvKHNlZSB0aGUgYmVsb3cgc3RydWN0dXJlIGluZm8pLiBXaGVu
+IHlvdSB1c2Ugc2VsZWN0LCBmaW5kX2N0cmxfYnlfYWRkcmVzcyB3b3VsZCBmaWx0ZXIgeW91ciBw
+cmVmZXJyZWQgYWRhcHRlciBieSB5b3VyIGFkZHJlc3MsIHRoZW4gaWYgaXQgaXMgZGVmYXVsdCwg
+cmV0dXJuLCBvdGhlcndpc2UsIGl0IHdvdWxkIHVwZGF0ZSBkZWZhdWx0X2N0cmwuDQoNCnN0cnVj
+dCBhZGFwdGVyIHsNCkdEQnVzUHJveHkgKnByb3h5Ow0KR0RCdXNQcm94eSAqYWRfcHJveHk7DQpH
+TGlzdCAqZGV2aWNlczsNCn07DQoNCndoZW4gbmV3IGFkYXB0ZXIgaXMgZm91bmQsIHRoZSBwcm94
+eSBoYW5kbGVyIHdvdWxkIGFkZCBhZGFwdGVyIHByb3h5LCBwcm9maWxlIHByb3h5LCBhZHZlcnRp
+c2luZyBwcm94eSBzZXF1ZW50aWFsbHksIGluIHRoaXMgcHJvY2VkdXJlLCBjYWNoZV9jdHJsIHdv
+dWxkIHVwZGF0ZSBhZHZlcnRpc2luZyBtYW5hZ2VyLg0KDQp0aGFua3MNCmJlc3Qgd2lzaGVzDQp5
+dW5oYW4NCg0KT24gRnJpLCBTZXAgMSwgMjAxNyBhdCAxMjoyOCBBTSwgRVJBTU9UTyBNYXNheWEg
+PGVyYW1vdG8ubWFzYXlhQGpwLmZ1aml0c3UuY29tPiB3cm90ZToNCj4gSGkgWXVuaGFuLA0KPg0K
+PiBZb3VyIHBhdGNoIGhhdmUgYSByZWdyZXNzaW9uLCBzaW5jZSBzZWxlY3QgY29tbWFuZCBjYW4g
+bm90IHVwZGF0ZSB0aGUgDQo+IGN1cnJlbnQgYWR2ZXJ0aXNpbmcgbWFuYWdlciAoY2FjaGVfY3Ry
+bCkgd2hlbiBpdCBjaG9vc2VzIGFub3RoZXIgYWRhcHRlci4NCj4NCj4gSSB0aGluayB0aGF0IGl0
+IGlzIGJldHRlciB0byB1c2UgcHJveHktPm9ial9wYXRoIGJlbG93Og0KPg0KPiAtLS0NCj4gIGNs
+aWVudC9tYWluLmMgfCA1NyANCj4gKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
+KysrLS0tLS0tLS0tLS0tLS0tLS0tDQo+ICAxIGZpbGUgY2hhbmdlZCwgMzkgaW5zZXJ0aW9ucygr
+KSwgMTggZGVsZXRpb25zKC0pDQo+DQo+IGRpZmYgLS1naXQgYS9jbGllbnQvbWFpbi5jIGIvY2xp
+ZW50L21haW4uYyBpbmRleCA4MjU2NDdkLi5jNmNiOTk1IA0KPiAxMDA2NDQNCj4gLS0tIGEvY2xp
+ZW50L21haW4uYw0KPiArKysgYi9jbGllbnQvbWFpbi5jDQo+IEBAIC01MjUsMTcgKzUyNSw1MiBA
+QCBzdGF0aWMgdm9pZCBkZXZpY2VfYWRkZWQoR0RCdXNQcm94eSAqcHJveHkpDQo+ICAgICAgICAg
+fQ0KPiAgfQ0KPg0KPiArc3RhdGljIHN0cnVjdCBhZGFwdGVyICpmaW5kX2N0cmwoR0xpc3QgKnNv
+dXJjZSwgY29uc3QgY2hhciAqcGF0aCkgew0KPiArICAgICAgIEdMaXN0ICpsaXN0Ow0KPiArDQo+
+ICsgICAgICAgZm9yIChsaXN0ID0gZ19saXN0X2ZpcnN0KHNvdXJjZSk7IGxpc3Q7IGxpc3QgPSBn
+X2xpc3RfbmV4dChsaXN0KSkgew0KPiArICAgICAgICAgICAgICAgc3RydWN0IGFkYXB0ZXIgKmFk
+YXB0ZXIgPSBsaXN0LT5kYXRhOw0KPiArDQo+ICsgICAgICAgICAgICAgICBpZiAoIXN0cmNhc2Vj
+bXAoZ19kYnVzX3Byb3h5X2dldF9wYXRoKGFkYXB0ZXItPnByb3h5KSwgcGF0aCkpDQo+ICsgICAg
+ICAgICAgICAgICAgICAgICAgIHJldHVybiBhZGFwdGVyOw0KPiArICAgICAgIH0NCj4gKw0KPiAr
+ICAgICAgIHJldHVybiBOVUxMOw0KPiArfQ0KPiArDQo+ICtzdGF0aWMgc3RydWN0IGFkYXB0ZXIg
+KmFkYXB0ZXJfbmV3KEdEQnVzUHJveHkgKnByb3h5KSB7DQo+ICsgICAgICAgc3RydWN0IGFkYXB0
+ZXIgKmFkYXB0ZXIgPSBnX21hbGxvYzAoc2l6ZW9mKHN0cnVjdCBhZGFwdGVyKSk7DQo+ICsNCj4g
+KyAgICAgICBjdHJsX2xpc3QgPSBnX2xpc3RfYXBwZW5kKGN0cmxfbGlzdCwgYWRhcHRlcik7DQo+
+ICsNCj4gKyAgICAgICBpZiAoIWRlZmF1bHRfY3RybCkNCj4gKyAgICAgICAgICAgICAgIGRlZmF1
+bHRfY3RybCA9IGFkYXB0ZXI7DQo+ICsNCj4gKyAgICAgICByZXR1cm4gYWRhcHRlcjsNCj4gK30N
+Cj4gKw0KPiAgc3RhdGljIHZvaWQgYWRhcHRlcl9hZGRlZChHREJ1c1Byb3h5ICpwcm94eSkgIHsN
+Cj4gLSAgICAgICBkZWZhdWx0X2N0cmwgPSBnX21hbGxvYzAoc2l6ZW9mKHN0cnVjdCBhZGFwdGVy
+KSk7DQo+IC0gICAgICAgZGVmYXVsdF9jdHJsLT5wcm94eSA9IHByb3h5Ow0KPiAtICAgICAgIGN0
+cmxfbGlzdCA9IGdfbGlzdF9hcHBlbmQoY3RybF9saXN0LCBkZWZhdWx0X2N0cmwpOw0KPiArICAg
+ICAgIHN0cnVjdCBhZGFwdGVyICpjdHJsOw0KPiArICAgICAgIGN0cmwgPSBmaW5kX2N0cmwoY3Ry
+bF9saXN0LCBnX2RidXNfcHJveHlfZ2V0X3BhdGgocHJveHkpKTsNCj4gKyAgICAgICBpZiAoIWN0
+cmwpDQo+ICsgICAgICAgICAgICAgICBjdHJsID0gYWRhcHRlcl9uZXcocHJveHkpOw0KPiArDQo+
+ICsgICAgICAgY3RybC0+cHJveHkgPSBwcm94eTsNCj4gKw0KPiAgICAgICAgIHByaW50X2FkYXB0
+ZXIocHJveHksIENPTE9SRURfTkVXKTsgIH0NCj4NCj4gIHN0YXRpYyB2b2lkIGFkX21hbmFnZXJf
+YWRkZWQoR0RCdXNQcm94eSAqcHJveHkpICB7DQo+IC0gICAgICAgZGVmYXVsdF9jdHJsLT5hZF9w
+cm94eSA9IHByb3h5Ow0KPiArICAgICAgIHN0cnVjdCBhZGFwdGVyICpjdHJsOw0KPiArICAgICAg
+IGN0cmwgPSBmaW5kX2N0cmwoY3RybF9saXN0LCBnX2RidXNfcHJveHlfZ2V0X3BhdGgocHJveHkp
+KTsNCj4gKyAgICAgICBpZiAoIWN0cmwpDQo+ICsgICAgICAgICAgICAgICBjdHJsID0gYWRhcHRl
+cl9uZXcocHJveHkpOw0KPiArDQo+ICsgICAgICAgY3RybC0+YWRfcHJveHkgPSBwcm94eTsNCj4g
+IH0NCj4NCj4gIHN0YXRpYyB2b2lkIHByb3h5X2FkZGVkKEdEQnVzUHJveHkgKnByb3h5LCB2b2lk
+ICp1c2VyX2RhdGEpIEBAIA0KPiAtNjYxLDIwICs2OTYsNiBAQCBzdGF0aWMgdm9pZCBwcm94eV9y
+ZW1vdmVkKEdEQnVzUHJveHkgKnByb3h5LCB2b2lkICp1c2VyX2RhdGEpDQo+ICAgICAgICAgfQ0K
+PiAgfQ0KPg0KPiAtc3RhdGljIHN0cnVjdCBhZGFwdGVyICpmaW5kX2N0cmwoR0xpc3QgKnNvdXJj
+ZSwgY29uc3QgY2hhciAqcGF0aCkgLXsNCj4gLSAgICAgICBHTGlzdCAqbGlzdDsNCj4gLQ0KPiAt
+ICAgICAgIGZvciAobGlzdCA9IGdfbGlzdF9maXJzdChzb3VyY2UpOyBsaXN0OyBsaXN0ID0gZ19s
+aXN0X25leHQobGlzdCkpIHsNCj4gLSAgICAgICAgICAgICAgIHN0cnVjdCBhZGFwdGVyICphZGFw
+dGVyID0gbGlzdC0+ZGF0YTsNCj4gLQ0KPiAtICAgICAgICAgICAgICAgaWYgKCFzdHJjYXNlY21w
+KGdfZGJ1c19wcm94eV9nZXRfcGF0aChhZGFwdGVyLT5wcm94eSksIHBhdGgpKQ0KPiAtICAgICAg
+ICAgICAgICAgICAgICAgICByZXR1cm4gYWRhcHRlcjsNCj4gLSAgICAgICB9DQo+IC0NCj4gLSAg
+ICAgICByZXR1cm4gTlVMTDsNCj4gLX0NCj4gLQ0KPiAgc3RhdGljIHZvaWQgcHJvcGVydHlfY2hh
+bmdlZChHREJ1c1Byb3h5ICpwcm94eSwgY29uc3QgY2hhciAqbmFtZSwNCj4gICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgIERCdXNNZXNzYWdlSXRlciAqaXRlciwgdm9pZCAN
+Cj4gKnVzZXJfZGF0YSkgIHsNCj4gLS0NCj4gMi43LjQNCj4NCj4NCj4gUmVnYXJkcywNCj4gRXJh
+bW90bw0KPg0KPiBPbiAwOS8wMS8yMDE3IDEyOjU2IFBNLCBZdW5oYW4gV2FuZyB3cm90ZToNCj4+
+IFdoZW4gYW5vdGhlciBhZGFwdGVyIGlzIGZvdW5kLCB0aGUgZGVmYXVsdCBhZGFwdGVyIHdvdWxk
+IGJlIGNoYW5nZWQsIA0KPj4gd2hpY2ggaXMgbm90IGV4cGVjdGVkLiBEZWZhdWx0IGFkYXB0ZXIg
+Y2FuIG9ubHkgYmUgY2hhbmdlZCBieSBzZWxlY3QgDQo+PiBjb21tYW5kLg0KPj4gLS0tDQo+PiAg
+Y2xpZW50L21haW4uYyB8IDE4ICsrKysrKysrKysrKy0tLS0tLQ0KPj4gIDEgZmlsZSBjaGFuZ2Vk
+LCAxMiBpbnNlcnRpb25zKCspLCA2IGRlbGV0aW9ucygtKQ0KPj4NCj4+IGRpZmYgLS1naXQgYS9j
+bGllbnQvbWFpbi5jIGIvY2xpZW50L21haW4uYyBpbmRleCA3NTY5NmMyYzEuLjI5YjM5NzhlMSAN
+Cj4+IDEwMDY0NA0KPj4gLS0tIGEvY2xpZW50L21haW4uYw0KPj4gKysrIGIvY2xpZW50L21haW4u
+Yw0KPj4gQEAgLTY3LDYgKzY3LDcgQEAgc3RydWN0IGFkYXB0ZXIgew0KPj4gIH07DQo+Pg0KPj4g
+IHN0YXRpYyBzdHJ1Y3QgYWRhcHRlciAqZGVmYXVsdF9jdHJsOw0KPj4gK3N0YXRpYyBzdHJ1Y3Qg
+YWRhcHRlciAqY2FjaGVfY3RybDsNCj4+ICBzdGF0aWMgR0RCdXNQcm94eSAqZGVmYXVsdF9kZXY7
+DQo+PiAgc3RhdGljIEdEQnVzUHJveHkgKmRlZmF1bHRfYXR0cjsNCj4+ICBzdGF0aWMgR0xpc3Qg
+KmN0cmxfbGlzdDsNCj4+IEBAIC0xNTEsNyArMTUyLDcgQEAgc3RhdGljIHZvaWQgZGlzY29ubmVj
+dF9oYW5kbGVyKERCdXNDb25uZWN0aW9uIA0KPj4gKmNvbm5lY3Rpb24sIHZvaWQgKnVzZXJfZGF0
+YSkNCj4+DQo+PiAgICAgICBnX2xpc3RfZnJlZV9mdWxsKGN0cmxfbGlzdCwgcHJveHlfbGVhayk7
+DQo+PiAgICAgICBjdHJsX2xpc3QgPSBOVUxMOw0KPj4gLQ0KPj4gKyAgICAgY2FjaGVfY3RybCA9
+IE5VTEw7DQo+PiAgICAgICBkZWZhdWx0X2N0cmwgPSBOVUxMOw0KPj4gIH0NCj4+DQo+PiBAQCAt
+NTIxLDE1ICs1MjIsMjEgQEAgc3RhdGljIHZvaWQgZGV2aWNlX2FkZGVkKEdEQnVzUHJveHkgKnBy
+b3h5KQ0KPj4NCj4+ICBzdGF0aWMgdm9pZCBhZGFwdGVyX2FkZGVkKEdEQnVzUHJveHkgKnByb3h5
+KSAgew0KPj4gLSAgICAgZGVmYXVsdF9jdHJsID0gZ19tYWxsb2MwKHNpemVvZihzdHJ1Y3QgYWRh
+cHRlcikpOw0KPj4gLSAgICAgZGVmYXVsdF9jdHJsLT5wcm94eSA9IHByb3h5Ow0KPj4gLSAgICAg
+Y3RybF9saXN0ID0gZ19saXN0X2FwcGVuZChjdHJsX2xpc3QsIGRlZmF1bHRfY3RybCk7DQo+PiAr
+ICAgICBzdHJ1Y3QgYWRhcHRlciAqYWRhcHRlciA9IGdfbWFsbG9jMChzaXplb2Yoc3RydWN0IGFk
+YXB0ZXIpKTsNCj4+ICsNCj4+ICsgICAgIGFkYXB0ZXItPnByb3h5ID0gcHJveHk7DQo+PiArICAg
+ICBjYWNoZV9jdHJsID0gYWRhcHRlcjsNCj4+ICsgICAgIGN0cmxfbGlzdCA9IGdfbGlzdF9hcHBl
+bmQoY3RybF9saXN0LCBhZGFwdGVyKTsNCj4+ICsNCj4+ICsgICAgIGlmICghZGVmYXVsdF9jdHJs
+KQ0KPj4gKyAgICAgICAgICAgICBkZWZhdWx0X2N0cmwgPSBhZGFwdGVyOw0KPj4gKw0KPj4gICAg
+ICAgcHJpbnRfYWRhcHRlcihwcm94eSwgQ09MT1JFRF9ORVcpOyAgfQ0KPj4NCj4+ICBzdGF0aWMg
+dm9pZCBhZF9tYW5hZ2VyX2FkZGVkKEdEQnVzUHJveHkgKnByb3h5KSAgew0KPj4gLSAgICAgZGVm
+YXVsdF9jdHJsLT5hZF9wcm94eSA9IHByb3h5Ow0KPj4gKyAgICAgY2FjaGVfY3RybC0+YWRfcHJv
+eHkgPSBwcm94eTsNCj4+ICB9DQo+Pg0KPj4gIHN0YXRpYyB2b2lkIHByb3h5X2FkZGVkKEdEQnVz
+UHJveHkgKnByb3h5LCB2b2lkICp1c2VyX2RhdGEpIEBAIA0KPj4gLTYwMiw3ICs2MDksNiBAQCBz
+dGF0aWMgdm9pZCBhZGFwdGVyX3JlbW92ZWQoR0RCdXNQcm94eSAqcHJveHkpDQo+PiAgICAgICAg
+ICAgICAgICAgICAgICAgcHJpbnRfYWRhcHRlcihwcm94eSwgQ09MT1JFRF9ERUwpOw0KPj4NCj4+
+ICAgICAgICAgICAgICAgICAgICAgICBpZiAoZGVmYXVsdF9jdHJsICYmIGRlZmF1bHRfY3RybC0+
+cHJveHkgPT0gcHJveHkpIHsNCj4+IC0gICAgICAgICAgICAgICAgICAgICAgICAgICAgIGRlZmF1
+bHRfY3RybCA9IE5VTEw7DQo+PiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBzZXRfZGVm
+YXVsdF9kZXZpY2UoTlVMTCwgTlVMTCk7DQo+PiAgICAgICAgICAgICAgICAgICAgICAgfQ0KPj4N
+Cj4+DQo+DQotLQ0KVG8gdW5zdWJzY3JpYmUgZnJvbSB0aGlzIGxpc3Q6IHNlbmQgdGhlIGxpbmUg
+InVuc3Vic2NyaWJlIGxpbnV4LWJsdWV0b290aCIgaW4gdGhlIGJvZHkgb2YgYSBtZXNzYWdlIHRv
+IG1ham9yZG9tb0B2Z2VyLmtlcm5lbC5vcmcgTW9yZSBtYWpvcmRvbW8gaW5mbyBhdCAgaHR0cHM6
+Ly9uYTAxLnNhZmVsaW5rcy5wcm90ZWN0aW9uLm91dGxvb2suY29tLz91cmw9aHR0cCUzQSUyRiUy
+RnZnZXIua2VybmVsLm9yZyUyRm1ham9yZG9tby1pbmZvLmh0bWwmZGF0YT0wMSU3QzAxJTdDTWlu
+Zy5aaGFuZyU0MGFycmlzLmNvbSU3Q2QwMTYzZTZiZDg1NDQ0NmNhZjZkMDhkNGYxMGQwNDQ0JTdD
+ZjI3OTI5YWRlNTU0NGQ1NTgzN2FjNTYxNTE5YzMwOTElN0MxJnNkYXRhPWpJaVJUWWhuQjRrZEdB
+bklQUjJkUHRtOGk2aWFsTFFGZnlHZlVTMUJ4RW8lM0QmcmVzZXJ2ZWQ9MA0K
