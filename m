@@ -1,42 +1,228 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Andrzej Kaczmarek <andrzej.kaczmarek@codecoup.pl>
-To: linux-bluetooth@vger.kernel.org
-Cc: Andrzej Kaczmarek <andrzej.kaczmarek@codecoup.pl>
-Subject: [PATCH 1/2] doc/btsnoop: Add nop opcode
-Date: Fri,  1 Sep 2017 10:07:43 +0200
-Message-Id: <20170901080744.11544-1-andrzej.kaczmarek@codecoup.pl>
+Subject: Re: [PATCH BlueZ] client: Fix default_ctrl change when new adapter is
+ found
+To: Yunhan Wang <yunhanw@google.com>
+CC: <linux-bluetooth@vger.kernel.org>
+References: <20170901035615.95402-1-yunhanw@google.com>
+ <a4eb008e-5c19-c13c-bb35-ac840f80be42@jp.fujitsu.com>
+ <CALvjcs-3W8skPEH0TyHgwX=TSzrKcMy5ptjeHPbR+kY7x8hVvw@mail.gmail.com>
+From: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
+Message-ID: <367b3f96-3e2b-3951-70a2-ddf4cefd0fd3@jp.fujitsu.com>
+Date: Fri, 1 Sep 2017 16:59:23 +0900
+MIME-Version: 1.0
+In-Reply-To: <CALvjcs-3W8skPEH0TyHgwX=TSzrKcMy5ptjeHPbR+kY7x8hVvw@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This adds 'no operation' opcode for the cases where we do not want to
-include any particular payload, just the header is valid.
+Hi Yunhan,
 
-For example, when some packets are dropped over TTY implementation can
-pass this information only in some other packet and this won't happen
-until there's actually something to send. With this addition it can
-just send nop after some time to indicate there were packets dropped.
----
- doc/btsnoop.txt | 7 +++++++
- 1 file changed, 7 insertions(+)
+Thanks for your explanation.
 
-diff --git a/doc/btsnoop.txt b/doc/btsnoop.txt
-index 975a53f6d..865b81554 100644
---- a/doc/btsnoop.txt
-+++ b/doc/btsnoop.txt
-@@ -115,6 +115,13 @@ User Logging
- 
- 	User logging information.
- 
-+NOP
-+-----------
-+
-+	Code:        0xffff
-+
-+	No operation.
-+
- 
- TTY-based protocol
- ==================
--- 
-2.14.1
+Btw, could you also tell me about the following fix.
+bluetoothclt sometimes do core dump when I detach the adapter of default_ctrl
+and run show command.
+
+>>> @@ -602,7 +609,6 @@ static void adapter_removed(GDBusProxy *proxy)
+>>>                       print_adapter(proxy, COLORED_DEL);
+>>>
+>>>                       if (default_ctrl && default_ctrl->proxy == proxy) {
+>>> -                             default_ctrl = NULL;
+>>>                               set_default_device(NULL, NULL);
+
+Regards,
+Eramoto
+
+On 09/01/2017 04:42 PM, Yunhan Wang wrote:
+> Hi, ERAMOTO
+> 
+> cache_ctrl is not advertising manager, cache_ctrl is temporary adapter
+> that store newest adapter info(see the below structure info). When you
+> use select, find_ctrl_by_address would filter your preferred adapter
+> by your address, then if it is default, return, otherwise, it would
+> update default_ctrl.
+> 
+> struct adapter {
+> GDBusProxy *proxy;
+> GDBusProxy *ad_proxy;
+> GList *devices;
+> };
+> 
+> when new adapter is found, the proxy handler would add adapter proxy,
+> profile proxy, advertising proxy sequentially, in this procedure,
+> cache_ctrl would update advertising manager.
+> 
+> thanks
+> best wishes
+> yunhan
+> 
+> On Fri, Sep 1, 2017 at 12:28 AM, ERAMOTO Masaya
+> <eramoto.masaya@jp.fujitsu.com> wrote:
+>> Hi Yunhan,
+>>
+>> Your patch have a regression, since select command can not update the current
+>> advertising manager (cache_ctrl) when it chooses another adapter.
+>>
+>> I think that it is better to use proxy->obj_path below:
+>>
+>> ---
+>>  client/main.c | 57 +++++++++++++++++++++++++++++++++++++++------------------
+>>  1 file changed, 39 insertions(+), 18 deletions(-)
+>>
+>> diff --git a/client/main.c b/client/main.c
+>> index 825647d..c6cb995 100644
+>> --- a/client/main.c
+>> +++ b/client/main.c
+>> @@ -525,17 +525,52 @@ static void device_added(GDBusProxy *proxy)
+>>         }
+>>  }
+>>
+>> +static struct adapter *find_ctrl(GList *source, const char *path)
+>> +{
+>> +       GList *list;
+>> +
+>> +       for (list = g_list_first(source); list; list = g_list_next(list)) {
+>> +               struct adapter *adapter = list->data;
+>> +
+>> +               if (!strcasecmp(g_dbus_proxy_get_path(adapter->proxy), path))
+>> +                       return adapter;
+>> +       }
+>> +
+>> +       return NULL;
+>> +}
+>> +
+>> +static struct adapter *adapter_new(GDBusProxy *proxy)
+>> +{
+>> +       struct adapter *adapter = g_malloc0(sizeof(struct adapter));
+>> +
+>> +       ctrl_list = g_list_append(ctrl_list, adapter);
+>> +
+>> +       if (!default_ctrl)
+>> +               default_ctrl = adapter;
+>> +
+>> +       return adapter;
+>> +}
+>> +
+>>  static void adapter_added(GDBusProxy *proxy)
+>>  {
+>> -       default_ctrl = g_malloc0(sizeof(struct adapter));
+>> -       default_ctrl->proxy = proxy;
+>> -       ctrl_list = g_list_append(ctrl_list, default_ctrl);
+>> +       struct adapter *ctrl;
+>> +       ctrl = find_ctrl(ctrl_list, g_dbus_proxy_get_path(proxy));
+>> +       if (!ctrl)
+>> +               ctrl = adapter_new(proxy);
+>> +
+>> +       ctrl->proxy = proxy;
+>> +
+>>         print_adapter(proxy, COLORED_NEW);
+>>  }
+>>
+>>  static void ad_manager_added(GDBusProxy *proxy)
+>>  {
+>> -       default_ctrl->ad_proxy = proxy;
+>> +       struct adapter *ctrl;
+>> +       ctrl = find_ctrl(ctrl_list, g_dbus_proxy_get_path(proxy));
+>> +       if (!ctrl)
+>> +               ctrl = adapter_new(proxy);
+>> +
+>> +       ctrl->ad_proxy = proxy;
+>>  }
+>>
+>>  static void proxy_added(GDBusProxy *proxy, void *user_data)
+>> @@ -661,20 +696,6 @@ static void proxy_removed(GDBusProxy *proxy, void *user_data)
+>>         }
+>>  }
+>>
+>> -static struct adapter *find_ctrl(GList *source, const char *path)
+>> -{
+>> -       GList *list;
+>> -
+>> -       for (list = g_list_first(source); list; list = g_list_next(list)) {
+>> -               struct adapter *adapter = list->data;
+>> -
+>> -               if (!strcasecmp(g_dbus_proxy_get_path(adapter->proxy), path))
+>> -                       return adapter;
+>> -       }
+>> -
+>> -       return NULL;
+>> -}
+>> -
+>>  static void property_changed(GDBusProxy *proxy, const char *name,
+>>                                         DBusMessageIter *iter, void *user_data)
+>>  {
+>> --
+>> 2.7.4
+>>
+>>
+>> Regards,
+>> Eramoto
+>>
+>> On 09/01/2017 12:56 PM, Yunhan Wang wrote:
+>>> When another adapter is found, the default adapter would be changed,
+>>> which is not expected. Default adapter can only be changed by select
+>>> command.
+>>> ---
+>>>  client/main.c | 18 ++++++++++++------
+>>>  1 file changed, 12 insertions(+), 6 deletions(-)
+>>>
+>>> diff --git a/client/main.c b/client/main.c
+>>> index 75696c2c1..29b3978e1 100644
+>>> --- a/client/main.c
+>>> +++ b/client/main.c
+>>> @@ -67,6 +67,7 @@ struct adapter {
+>>>  };
+>>>
+>>>  static struct adapter *default_ctrl;
+>>> +static struct adapter *cache_ctrl;
+>>>  static GDBusProxy *default_dev;
+>>>  static GDBusProxy *default_attr;
+>>>  static GList *ctrl_list;
+>>> @@ -151,7 +152,7 @@ static void disconnect_handler(DBusConnection *connection, void *user_data)
+>>>
+>>>       g_list_free_full(ctrl_list, proxy_leak);
+>>>       ctrl_list = NULL;
+>>> -
+>>> +     cache_ctrl = NULL;
+>>>       default_ctrl = NULL;
+>>>  }
+>>>
+>>> @@ -521,15 +522,21 @@ static void device_added(GDBusProxy *proxy)
+>>>
+>>>  static void adapter_added(GDBusProxy *proxy)
+>>>  {
+>>> -     default_ctrl = g_malloc0(sizeof(struct adapter));
+>>> -     default_ctrl->proxy = proxy;
+>>> -     ctrl_list = g_list_append(ctrl_list, default_ctrl);
+>>> +     struct adapter *adapter = g_malloc0(sizeof(struct adapter));
+>>> +
+>>> +     adapter->proxy = proxy;
+>>> +     cache_ctrl = adapter;
+>>> +     ctrl_list = g_list_append(ctrl_list, adapter);
+>>> +
+>>> +     if (!default_ctrl)
+>>> +             default_ctrl = adapter;
+>>> +
+>>>       print_adapter(proxy, COLORED_NEW);
+>>>  }
+>>>
+>>>  static void ad_manager_added(GDBusProxy *proxy)
+>>>  {
+>>> -     default_ctrl->ad_proxy = proxy;
+>>> +     cache_ctrl->ad_proxy = proxy;
+>>>  }
+>>>
+>>>  static void proxy_added(GDBusProxy *proxy, void *user_data)
+>>> @@ -602,7 +609,6 @@ static void adapter_removed(GDBusProxy *proxy)
+>>>                       print_adapter(proxy, COLORED_DEL);
+>>>
+>>>                       if (default_ctrl && default_ctrl->proxy == proxy) {
+>>> -                             default_ctrl = NULL;
+>>>                               set_default_device(NULL, NULL);
+>>>                       }
+>>>
+>>>
+>>
+> 
+> 
 
