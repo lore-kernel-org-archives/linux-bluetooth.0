@@ -1,87 +1,32 @@
-Return-Path: <netdev-owner@vger.kernel.org>
-Date: Sun, 3 Sep 2017 09:20:55 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: davem@davemloft.net
-Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: pull request: bluetooth-next 2017-09-03
-Message-ID: <20170903062055.GA9569@x1c.home>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-        protocol="application/pgp-signature"; boundary="uAKRQypu60I7Lcqm"
-Sender: netdev-owner@vger.kernel.org
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Message-ID: <1504353762.2859.12.camel@iki.fi>
+Subject: Re: Two guids for Headset HS role?
+From: Tanu Kaskinen <tanuk@iki.fi>
+To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Date: Sat, 02 Sep 2017 15:02:42 +0300
+In-Reply-To: <1504352305.2859.10.camel@iki.fi>
+References: <1504352305.2859.10.camel@iki.fi>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+On Sat, 2017-09-02 at 14:38 +0300, Tanu Kaskinen wrote:
+> PulseAudio currently assumes that HSP HS is identified by guid
+> 00001108-0000-1000-8000-00805f9b34fb, but it seems[1] that the Samsung
+> HS6000 headset uses guid
+> 00001131-0000-1000-8000-00805f9b34fb for the HSP profile. Does anyone
+> know why there are two guids for HSP HS. Should PulseAudio just assume
+> that the two guids mean the same thing?
+> 
+> [1] https://bugs.freedesktop.org/show_bug.cgi?id=93898#c13
 
---uAKRQypu60I7Lcqm
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+I should have done a bit of research into the specification docs before
+sending... It seems that the two uuids are indeed the same thing,
+except that 0x1108 is used both as a service class and profile
+identifier, while 0x1131 is only a service class identifier.
 
-Hi Dave,
+-- 
+Tanu
 
-Here's one last bluetooth-next pull request for the 4.14 kernel:
-
- - NULL pointer fix in ca8210 802.15.4 driver
- - A few "const" fixes
- - New Kconfig option for disabling legacy interfaces
-
-Please let me know if there are any issues pulling. Thanks.
-
-Johan
-
----
-The following changes since commit 01d300c577c72229b0a3b09e194cae52b219d5b3:
-
-  Merge branch 'amd-xgbe-next' (2017-08-18 16:30:17 -0700)
-
-are available in the git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git for-upstream
-
-for you to fetch changes up to 65bce46298d064dff9db1282e17bb26602715819:
-
-  Bluetooth: make baswap src const (2017-09-01 22:49:47 +0200)
-
-----------------------------------------------------------------
-Bhumika Goyal (2):
-      Bluetooth: make device_type const
-      ieee802154: 6lowpan: make header_ops const
-
-Christophe JAILLET (1):
-      ieee802154: ca8210: Fix a potential NULL pointer dereference
-
-Loic Poulain (1):
-      Bluetooth: make baswap src const
-
-Marcel Holtmann (1):
-      Bluetooth: Add option for disabling legacy ioctl interfaces
-
- drivers/net/ieee802154/ca8210.c   |  5 +----
- include/net/bluetooth/bluetooth.h |  2 +-
- net/bluetooth/Kconfig             | 10 ++++++++++
- net/bluetooth/hci_sock.c          |  6 ++++++
- net/bluetooth/hci_sysfs.c         |  4 ++--
- net/bluetooth/lib.c               |  6 +++---
- net/ieee802154/6lowpan/core.c     |  2 +-
- 7 files changed, 24 insertions(+), 11 deletions(-)
-
---uAKRQypu60I7Lcqm
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIcBAEBAgAGBQJZq59HAAoJECQj9vv5qNQSsbQP/38mrRolDq7Qy43Pxe0ZdYyF
-XiregObVTlH9hjCviLghiXSJ8MVpn5C+UNH+MUwH8Ho+e4GUcoeyAdnEfr/+kORF
-XwAHTKyJVnsKp6rwyjlUHhKB10ADE+aZMuk3HDZc3yMSxxygt8Aq/NQ2C8zUrgE1
-bkrbsJSi9JWAMHYnMKOe9To0Ik8+nlzmPkXFjH3jc63tssLL8yVoKx90Unb1eZUr
-pXZOiwsKeS+yHhAVcyV0ZPfO6jTbovZ9/32/MsYM/676bDDJ0GKmj8XubOZpAjZs
-0gqQargrOh9yyp/H1QX0Ii3Ru+s0vOJKjfkFKBcZQPw1bpzttNpuXzzZw9GXv2jQ
-6mCgo7iVJR2NoVGVCLIdhdnxRyIfvQe8ajJzr2roVhroo4OGxTBU7wrgl8sSBRqX
-OI854cbgL/UHFRY07frDsFg5DDsQW1x/c0aAW0BYT+b9TjYatp64z5btUYjj3Hkp
-ttcCGHnqAWwNwWAtWESDzzLA0WYvFTWwXxR2B9s2oVpjaCJP1kMMqpSrrw+0vbGx
-VtGfd6rw0wGUaDI8vP/ZtS7Mac3gPh9N7TO+7pkfHKWq4+NRkgVyhJLpsXhSw/wh
-Imrt+mIJQOS5BzKd6IRoqGlxXkRLeBaPQuttUSnQlincTEZkW1MVCZ5Knf6utTIG
-HTyvjMn/sJ5263lzu6Pi
-=rCUI
------END PGP SIGNATURE-----
-
---uAKRQypu60I7Lcqm--
+https://www.patreon.com/tanuk
