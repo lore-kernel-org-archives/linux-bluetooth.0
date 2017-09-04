@@ -2,171 +2,266 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Bastien Nocera <hadess@hadess.net>
 To: linux-bluetooth@vger.kernel.org
 Cc: Bastien Nocera <hadess@hadess.net>
-Subject: [PATCH 3/9] sixaxis: Ask user whether cable configuration should be allowed
-Date: Mon,  4 Sep 2017 20:12:06 +0200
-Message-Id: <20170904181212.5639-3-hadess@hadess.net>
+Subject: [PATCH 4/9] plugins/sixaxis: Move device discovery to shared header
+Date: Mon,  4 Sep 2017 20:12:07 +0200
+Message-Id: <20170904181212.5639-4-hadess@hadess.net>
 In-Reply-To: <20170904181212.5639-1-hadess@hadess.net>
 References: <20170904181212.5639-1-hadess@hadess.net>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Previously, users doing cable configuration of Sixaxis PS3 controllers
-would only get asked whether a device was allowed to connect to the
-computer when switching it to Bluetooth mode: unplugging it, and
-pressing the PS button.
+Move the struct containing the Sixaxis-compatible devices to a
+header shared with the input profiles code, so as to reduce device
+declaration.
 
-Instead, we should ask the user straight away, through the agent,
-whether the pad should be allowed to connect.
-
-This makes it easier to setup those devices, while keeping security.
+Adding support for new devices should be as easy as adding the device's
+declaration in profiles/input/sixaxis.h
 ---
- plugins/sixaxis.c | 83 +++++++++++++++++++++++++++++++++++++++++--------------
- 1 file changed, 63 insertions(+), 20 deletions(-)
+ plugins/sixaxis.c        | 82 +++++++++++++++++++++------------------------
+ profiles/input/sixaxis.h | 86 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 123 insertions(+), 45 deletions(-)
+ create mode 100644 profiles/input/sixaxis.h
 
 diff --git a/plugins/sixaxis.c b/plugins/sixaxis.c
-index 7d3a8f3ac..c8305d52f 100644
+index c8305d52f..3e8ac06ca 100644
 --- a/plugins/sixaxis.c
 +++ b/plugins/sixaxis.c
-@@ -44,6 +44,7 @@
- 
- #include "src/adapter.h"
- #include "src/device.h"
-+#include "src/agent.h"
+@@ -48,29 +48,7 @@
  #include "src/plugin.h"
  #include "src/log.h"
  #include "src/shared/util.h"
-@@ -71,6 +72,13 @@ static const struct {
- 	},
- };
+-
+-static const struct {
+-	const char *name;
+-	uint16_t source;
+-	uint16_t vid;
+-	uint16_t pid;
+-	uint16_t version;
+-} devices[] = {
+-	{
+-		.name = "Sony PLAYSTATION(R)3 Controller",
+-		.source = 0x0002,
+-		.vid = 0x054c,
+-		.pid = 0x0268,
+-		.version = 0x0000,
+-	},
+-	{
+-		.name = "Navigation Controller",
+-		.source = 0x0002,
+-		.vid = 0x054c,
+-		.pid = 0x042f,
+-		.version = 0x0000,
+-	},
+-};
++#include "profiles/input/sixaxis.h"
  
-+struct authentication_closure {
-+	struct btd_adapter *adapter;
-+	struct btd_device *device;
-+	int fd;
-+	char device_addr[18];
-+};
-+
- static struct udev *ctx = NULL;
- static struct udev_monitor *monitor = NULL;
- static guint watch_id = 0;
-@@ -135,19 +143,51 @@ static int set_master_bdaddr(int fd, const bdaddr_t *bdaddr)
- 	return ret;
+ struct authentication_closure {
+ 	struct btd_adapter *adapter;
+@@ -177,7 +155,13 @@ error:
+ 	g_free(closure);
  }
  
-+static void agent_auth_cb(DBusError *derr,
-+				void *user_data)
-+{
-+	struct authentication_closure *closure = user_data;
-+	char master_addr[18], adapter_addr[18];
-+	bdaddr_t master_bdaddr;
-+	const bdaddr_t *adapter_bdaddr;
-+
-+	if (derr != NULL) {
-+		DBG("Agent replied negatively, removing temporary device");
-+		goto error;
-+	}
-+
-+	btd_device_set_temporary(closure->device, false);
-+
-+	if (get_master_bdaddr(closure->fd, &master_bdaddr) < 0)
-+		goto error;
-+
-+	adapter_bdaddr = btd_adapter_get_address(closure->adapter);
-+	if (bacmp(adapter_bdaddr, &master_bdaddr)) {
-+		if (set_master_bdaddr(closure->fd, adapter_bdaddr) < 0)
-+			goto error;
-+	}
-+
-+	ba2str(&master_bdaddr, master_addr);
-+	ba2str(adapter_bdaddr, adapter_addr);
-+	DBG("remote %s old_master %s new_master %s",
-+				closure->device_addr, master_addr, adapter_addr);
-+
-+error:
-+	close(closure->fd);
-+	g_free(closure);
-+}
-+
- static bool setup_device(int fd, int index, struct btd_adapter *adapter)
+-static bool setup_device(int fd, int index, struct btd_adapter *adapter)
++static bool setup_device(int fd,
++				const char *name,
++				uint16_t source,
++				uint16_t vid,
++				uint16_t pid,
++				uint16_t version,
++				struct btd_adapter *adapter)
  {
--	char device_addr[18], master_addr[18], adapter_addr[18];
--	bdaddr_t device_bdaddr, master_bdaddr;
-+	char device_addr[18];
-+	bdaddr_t device_bdaddr;
- 	const bdaddr_t *adapter_bdaddr;
- 	struct btd_device *device;
-+	struct authentication_closure *closure;
- 
- 	if (get_device_bdaddr(fd, &device_bdaddr) < 0)
- 		return false;
- 
--	if (get_master_bdaddr(fd, &master_bdaddr) < 0)
--		return false;
--
- 	/* This can happen if controller was plugged while already connected
- 	 * eg. to charge up battery. */
- 	device = btd_adapter_find_device(adapter, &device_bdaddr,
-@@ -155,25 +195,14 @@ static bool setup_device(int fd, int index, struct btd_adapter *adapter)
- 	if (device && btd_device_is_connected(device))
- 		return false;
- 
--	adapter_bdaddr = btd_adapter_get_address(adapter);
--
--	if (bacmp(adapter_bdaddr, &master_bdaddr)) {
--		if (set_master_bdaddr(fd, adapter_bdaddr) < 0)
--			return false;
--	}
--
- 	ba2str(&device_bdaddr, device_addr);
--	ba2str(&master_bdaddr, master_addr);
--	ba2str(adapter_bdaddr, adapter_addr);
--	DBG("remote %s old_master %s new_master %s",
--				device_addr, master_addr, adapter_addr);
- 
- 	device = btd_adapter_get_device(adapter, &device_bdaddr, BDADDR_BREDR);
- 
- 	if (g_slist_find_custom(btd_device_get_uuids(device), HID_UUID,
- 						(GCompareFunc)strcasecmp)) {
- 		DBG("device %s already known, skipping", device_addr);
--		return true;
-+		return false;
- 	}
+ 	char device_addr[18];
+ 	bdaddr_t device_bdaddr;
+@@ -207,9 +191,8 @@ static bool setup_device(int fd, int index, struct btd_adapter *adapter)
  
  	info("sixaxis: setting up new device");
-@@ -181,7 +210,20 @@ static bool setup_device(int fd, int index, struct btd_adapter *adapter)
- 	btd_device_device_set_name(device, devices[index].name);
- 	btd_device_set_pnpid(device, devices[index].source, devices[index].vid,
- 				devices[index].pid, devices[index].version);
--	btd_device_set_temporary(device, false);
-+	btd_device_set_temporary(device, true);
-+
-+	closure = g_try_new0(struct authentication_closure, 1);
-+	if (!closure) {
-+		btd_adapter_remove_device(adapter, device);
-+		return false;
-+	}
-+	closure->adapter = adapter;
-+	closure->device = device;
-+	closure->fd = fd;
-+	memcpy(&closure->device_addr, device_addr, sizeof(device_addr));
-+	adapter_bdaddr = btd_adapter_get_address(adapter);
-+	btd_request_authorization_cable_configured(adapter_bdaddr, &device_bdaddr,
-+				HID_UUID, agent_auth_cb, closure);
  
+-	btd_device_device_set_name(device, devices[index].name);
+-	btd_device_set_pnpid(device, devices[index].source, devices[index].vid,
+-				devices[index].pid, devices[index].version);
++	btd_device_device_set_name(device, name);
++	btd_device_set_pnpid(device, source, vid, pid, version);
+ 	btd_device_set_temporary(device, true);
+ 
+ 	closure = g_try_new0(struct authentication_closure, 1);
+@@ -228,12 +211,16 @@ static bool setup_device(int fd, int index, struct btd_adapter *adapter)
  	return true;
  }
-@@ -236,8 +278,9 @@ static void device_added(struct udev_device *udevice)
- 	if (fd < 0)
+ 
+-static int get_supported_device(struct udev_device *udevice, uint16_t *bus)
++static CablePairingType get_pairing_type_for_device(struct udev_device *udevice,
++								uint16_t  *bus,
++								uint16_t  *vid,
++								uint16_t  *pid,
++								char     **name,
++								uint16_t  *source,
++								uint16_t  *version)
+ {
+ 	struct udev_device *hid_parent;
+-	uint16_t vid, pid;
+ 	const char *hid_id;
+-	guint i;
+ 
+ 	hid_parent = udev_device_get_parent_with_subsystem_devtype(udevice,
+ 								"hid", NULL);
+@@ -242,45 +229,50 @@ static int get_supported_device(struct udev_device *udevice, uint16_t *bus)
+ 
+ 	hid_id = udev_device_get_property_value(hid_parent, "HID_ID");
+ 
+-	if (sscanf(hid_id, "%hx:%hx:%hx", bus, &vid, &pid) != 3)
++	if (sscanf(hid_id, "%hx:%hx:%hx", bus, vid, pid) != 3)
+ 		return -1;
+ 
+-	for (i = 0; i < G_N_ELEMENTS(devices); i++) {
+-		if (devices[i].vid == vid && devices[i].pid == pid)
+-			return i;
+-	}
+-
+-	return -1;
++	return get_pairing_type(*vid, *pid, name, source, version);
+ }
+ 
+ static void device_added(struct udev_device *udevice)
+ {
+ 	struct btd_adapter *adapter;
+-	uint16_t bus;
+-	int index;
++	uint16_t bus, vid, pid, source, version;
++	char *name = NULL;
++	CablePairingType type;
+ 	int fd;
+ 
+ 	adapter = btd_adapter_get_default();
+ 	if (!adapter)
  		return;
  
--	setup_device(fd, index, adapter);
--	close(fd);
-+	/* Only close the fd if an authentication is not pending */
-+	if (!setup_device(fd, index, adapter))
-+		close(fd);
+-	index = get_supported_device(udevice, &bus);
+-	if (index < 0)
++	type = get_pairing_type_for_device(udevice,
++						&bus,
++						&vid,
++						&pid,
++						&name,
++						&source,
++						&version);
++	if (type != CABLE_PAIRING_SIXAXIS)
+ 		return;
+ 	if (bus != BUS_USB)
+ 		return;
+ 
+ 	info("sixaxis: compatible device connected: %s (%04X:%04X)",
+-				devices[index].name, devices[index].vid,
+-				devices[index].pid);
++				name, vid, pid);
+ 
+ 	fd = open(udev_device_get_devnode(udevice), O_RDWR);
+-	if (fd < 0)
++	if (fd < 0) {
++		g_free(name);
+ 		return;
++	}
+ 
+ 	/* Only close the fd if an authentication is not pending */
+-	if (!setup_device(fd, index, adapter))
++	if (!setup_device(fd, name, source, vid, pid, version, adapter))
+ 		close(fd);
++
++	g_free(name);
  }
  
  static gboolean monitor_watch(GIOChannel *source, GIOCondition condition,
+diff --git a/profiles/input/sixaxis.h b/profiles/input/sixaxis.h
+new file mode 100644
+index 000000000..589eff3da
+--- /dev/null
++++ b/profiles/input/sixaxis.h
+@@ -0,0 +1,86 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2009,2017  Bastien Nocera <hadess@hadess.net>
++ *  Copyright (C) 2011  Antonio Ospite <ospite@studenti.unina.it>
++ *  Copyright (C) 2013  Szymon Janc <szymon.janc@gmail.com>
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
++
++#ifndef _SIXAXIS_H_
++#define _SIXAXIS_H_
++
++typedef enum {
++	CABLE_PAIRING_UNSUPPORTED = 0,
++	CABLE_PAIRING_SIXAXIS,
++} CablePairingType;
++
++inline CablePairingType
++get_pairing_type(uint16_t   vid,
++		 uint16_t   pid,
++		 char     **name,
++		 uint16_t  *source,
++		 uint16_t  *version)
++{
++	static const struct {
++		const char *name;
++		uint16_t source;
++		uint16_t vid;
++		uint16_t pid;
++		uint16_t version;
++		CablePairingType type;
++	} devices[] = {
++		{
++			.name = "Sony PLAYSTATION(R)3 Controller",
++			.source = 0x0002,
++			.vid = 0x054c,
++			.pid = 0x0268,
++			.version = 0x0000,
++			.type = CABLE_PAIRING_SIXAXIS,
++		},
++		{
++			.name = "Navigation Controller",
++			.source = 0x0002,
++			.vid = 0x054c,
++			.pid = 0x042f,
++			.version = 0x0000,
++			.type = CABLE_PAIRING_SIXAXIS,
++		},
++	};
++	guint i;
++
++	for (i = 0; i < G_N_ELEMENTS(devices); i++) {
++		if (devices[i].vid != vid)
++			continue;
++		if (devices[i].pid != pid)
++			continue;
++
++		if (name)
++			*name = g_strdup(devices[i].name);
++		if (source)
++			*source = devices[i].source;
++		if (version)
++			*version = devices[i].version;
++		return devices[i].type;
++	}
++
++	return CABLE_PAIRING_UNSUPPORTED;
++}
++
++#endif /* _SIXAXIS_H_ */
 -- 
 2.14.1
 
