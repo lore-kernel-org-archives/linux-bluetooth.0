@@ -1,26 +1,62 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Date: Mon, 4 Sep 2017 14:59:53 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: =?utf-8?Q?=C5=81ukasz?= Rymanowski <lukasz.rymanowski@codecoup.pl>
+Return-Path: <ianwmorrison@gmail.com>
+To: marcel@holtmann.org, gustavo@padovan.org, johan.hedberg@gmail.com
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ 1/3] mesh: Fix for handling unprovisioned device
-Message-ID: <20170904115953.GA30887@x1c.lan>
-References: <20170831101257.1644-1-lukasz.rymanowski@codecoup.pl>
+From: Ian W MORRISON <ianwmorrison@gmail.com>
+Subject: [PATCH] Bluetooth: BCM: Add support for MINIX Z83-4 based devices
+Message-ID: <22c4b179-d181-bfc3-8da3-ccba215abbf7@gmail.com>
+Date: Mon, 4 Sep 2017 21:44:17 +1000
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-In-Reply-To: <20170831101257.1644-1-lukasz.rymanowski@codecoup.pl>
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Łukasz,
+The MINIX NEO Z83-4 and MINIX NEO Z83-4 Pro devices use an AP6255 chip
+for wifi and bluetooth. Bluetooth requires an ACPI device id of BCM2EA4
+with BCM4345 rev C0 firmware.
 
-On Thu, Aug 31, 2017, Łukasz Rymanowski wrote:
-> If there is no ServiceData there is no valid provisioning data for
-> PB-GATT
-> ---
->  mesh/main.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+Signed-off-by: ianwmorrison <ianwmorrison@gmail.com>
+---
+ drivers/bluetooth/btbcm.c   | 1 +
+ drivers/bluetooth/hci_bcm.c | 9 +++++++++
+ 2 files changed, 10 insertions(+)
 
-I've applied patches 1 and 2 from this set. Thanks.
-
-Johan
+diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
+index cc4bdef..7de75f1 100644
+--- a/drivers/bluetooth/btbcm.c
++++ b/drivers/bluetooth/btbcm.c
+@@ -327,6 +327,7 @@ static int btbcm_read_info(struct hci_dev *hdev)
+ 	{ 0x4406, "BCM4324B3"	},	/* 002.004.006 */
+ 	{ 0x610c, "BCM4354"	},	/* 003.001.012 */
+ 	{ 0x2209, "BCM43430A1"  },	/* 001.002.009 */
++	{ 0x6119, "BCM4345C0"  },	/* 003.001.025 */
+ 	{ }
+ };
+ 
+diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
+index e254011..8a97810 100644
+--- a/drivers/bluetooth/hci_bcm.c
++++ b/drivers/bluetooth/hci_bcm.c
+@@ -704,6 +704,14 @@ static int bcm_resume(struct device *dev)
+ 		.driver_data = &acpi_active_low,
+ 	},
+ 	{
++		.ident = "MINIX Z83-4",
++		.matches = {
++			DMI_EXACT_MATCH(DMI_SYS_VENDOR, "MINIX"),
++			DMI_MATCH(DMI_PRODUCT_NAME, "Z83-4"),
++		},
++		.driver_data = &acpi_active_low,
++	},
++	{
+ 		.ident = "Asus T100CHI",
+ 		.matches = {
+ 			DMI_EXACT_MATCH(DMI_SYS_VENDOR,
+@@ -926,6 +934,7 @@ static int bcm_remove(struct platform_device *pdev)
+ 	{ "BCM2E71", (kernel_ulong_t)&acpi_bcm_int_last_gpios },
+ 	{ "BCM2E7B", (kernel_ulong_t)&acpi_bcm_int_last_gpios },
+ 	{ "BCM2E7C", (kernel_ulong_t)&acpi_bcm_int_last_gpios },
++	{ "BCM2EA4", (kernel_ulong_t)&acpi_bcm_int_first_gpios },
+ 	{ "BCM2E95", (kernel_ulong_t)&acpi_bcm_int_first_gpios },
+ 	{ "BCM2E96", (kernel_ulong_t)&acpi_bcm_int_first_gpios },
+ 	{ },
+-- 
+1.9.1
