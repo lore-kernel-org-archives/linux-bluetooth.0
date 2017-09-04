@@ -1,26 +1,65 @@
-Return-Path: <netdev-owner@vger.kernel.org>
-Date: Sun, 03 Sep 2017 21:28:36 -0700 (PDT)
-Message-Id: <20170903.212836.20760470787635854.davem@davemloft.net>
-To: johan.hedberg@gmail.com
-Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: pull request: bluetooth-next 2017-09-03
-From: David Miller <davem@davemloft.net>
-In-Reply-To: <20170903062055.GA9569@x1c.home>
-References: <20170903062055.GA9569@x1c.home>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Sender: netdev-owner@vger.kernel.org
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
+Subject: Re: [PATCH BlueZ] client: Fix default_ctrl change when new adapter is
+ found
+To: Yunhan Wang <yunhanw@google.com>
+CC: <linux-bluetooth@vger.kernel.org>
+References: <20170901035615.95402-1-yunhanw@google.com>
+ <a4eb008e-5c19-c13c-bb35-ac840f80be42@jp.fujitsu.com>
+ <CALvjcs-3W8skPEH0TyHgwX=TSzrKcMy5ptjeHPbR+kY7x8hVvw@mail.gmail.com>
+ <367b3f96-3e2b-3951-70a2-ddf4cefd0fd3@jp.fujitsu.com>
+ <CALvjcs_4NM-h-U4046CF9j_PBLhn_5bpZ_qx_rbz2TduG1KHDA@mail.gmail.com>
+Message-ID: <683fdd05-468d-5b70-86f6-f71c5d504c98@jp.fujitsu.com>
+Date: Mon, 4 Sep 2017 09:48:01 +0900
+MIME-Version: 1.0
+In-Reply-To: <CALvjcs_4NM-h-U4046CF9j_PBLhn_5bpZ_qx_rbz2TduG1KHDA@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@gmail.com>
-Date: Sun, 3 Sep 2017 09:20:55 +0300
+Hi Yunhan,
 
-> Here's one last bluetooth-next pull request for the 4.14 kernel:
+On 09/02/2017 12:54 PM, Yunhan Wang wrote:
+> Hi, ERAMOTO
 > 
->  - NULL pointer fix in ca8210 802.15.4 driver
->  - A few "const" fixes
->  - New Kconfig option for disabling legacy interfaces
+> On Fri, Sep 1, 2017 at 12:59 AM, ERAMOTO Masaya
+> <eramoto.masaya@jp.fujitsu.com> wrote:
+>> Hi Yunhan,
+>>
+>> Thanks for your explanation.
+>>
+>> Btw, could you also tell me about the following fix.
 > 
-> Please let me know if there are any issues pulling. Thanks.
+> default_ctrl would be set as NULL in disconnect_handler. Therefore I
+> remove this redundant one.
+> 
 
-Pulled.
+It seems g_dbus_client_unref() calls disconnect_handler() when g_main_loop_run()
+is exited by quit command etc.. So I think here defautl_ctrl should be set as 
+NULL in interactive mode.
+
+> 
+>> bluetoothclt sometimes do core dump when I detach the adapter of default_ctrl
+>> and run show command.
+> 
+> Could you share your reproduce step for this issue? Could it be
+> constantly reproduced?
+
+It is always reproduced with the following steps:
+
+  1. Attach an adapter.
+  2. Run bluetoothctl.
+  3. Detach this adapter.
+  4. Run device command in bluetootctl.
+
+
+Regards,
+Eramoto
+
+> 
+> thanks
+> best wishes
+> yunhan
+> 
+> 
+
