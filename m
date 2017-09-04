@@ -1,54 +1,136 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-To: <linux-bluetooth@vger.kernel.org>
-From: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
-Subject: [PATCH BlueZ 1/2] client: Fix completion for list/pair command
-Message-ID: <611fb226-d99a-166d-a211-521872866d5d@jp.fujitsu.com>
-Date: Tue, 5 Sep 2017 13:50:42 +0900
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+From: Bastien Nocera <hadess@hadess.net>
+To: linux-bluetooth@vger.kernel.org
+Cc: Bastien Nocera <hadess@hadess.net>
+Subject: [PATCH 7/9] plugins/sixaxis: Rename sixaxis specific functions
+Date: Mon,  4 Sep 2017 20:12:10 +0200
+Message-Id: <20170904181212.5639-7-hadess@hadess.net>
+In-Reply-To: <20170904181212.5639-1-hadess@hadess.net>
+References: <20170904181212.5639-1-hadess@hadess.net>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The unexpected generator is used if the input string forward matches
-with the unexpected command string which a generator for completion
-is registered on. Thus,
-  - since 496b6abf743440e937222c62768e0a3b31f47f02, list command
-    generates the unneeded argument, which is device id like that
-    list-attributes command generates.
-  - since b0fe6045b7d9cfdd02a5e419fc9658a0ffa84619, pair command
-    generates the invalid argument, which is on/off like that
-    pairable command generates.
-This patch use the exact matching command.
+And provide wrappers to prepare for the addition of other device types.
 ---
- client/main.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ plugins/sixaxis.c | 39 ++++++++++++++++++++++++++++++++-------
+ 1 file changed, 32 insertions(+), 7 deletions(-)
 
-diff --git a/client/main.c b/client/main.c
-index 87eb131..d487eaf 100644
---- a/client/main.c
-+++ b/client/main.c
-@@ -2578,10 +2578,11 @@ static char **cmd_completion(const char *text, int start, int end)
+diff --git a/plugins/sixaxis.c b/plugins/sixaxis.c
+index 3e8ac06ca..b62834d72 100644
+--- a/plugins/sixaxis.c
++++ b/plugins/sixaxis.c
+@@ -55,13 +55,14 @@ struct authentication_closure {
+ 	struct btd_device *device;
+ 	int fd;
+ 	char device_addr[18];
++	CablePairingType type;
+ };
  
- 	if (start > 0) {
- 		int i;
-+		char *input_cmd;
+ static struct udev *ctx = NULL;
+ static struct udev_monitor *monitor = NULL;
+ static guint watch_id = 0;
  
-+		input_cmd = g_strndup(rl_line_buffer, start -1);
- 		for (i = 0; cmd_table[i].cmd; i++) {
--			if (strncmp(cmd_table[i].cmd,
--					rl_line_buffer, start - 1))
-+			if (strcmp(cmd_table[i].cmd, input_cmd))
- 				continue;
+-static int get_device_bdaddr(int fd, bdaddr_t *bdaddr)
++static int sixaxis_get_device_bdaddr(int fd, bdaddr_t *bdaddr)
+ {
+ 	uint8_t buf[18];
+ 	int ret;
+@@ -82,7 +83,14 @@ static int get_device_bdaddr(int fd, bdaddr_t *bdaddr)
+ 	return 0;
+ }
  
- 			if (!cmd_table[i].gen)
-@@ -2591,6 +2592,7 @@ static char **cmd_completion(const char *text, int start, int end)
- 			matches = rl_completion_matches(text, cmd_table[i].gen);
- 			break;
- 		}
-+		g_free(input_cmd);
- 	} else {
- 		rl_completion_display_matches_hook = NULL;
- 		matches = rl_completion_matches(text, cmd_generator);
+-static int get_master_bdaddr(int fd, bdaddr_t *bdaddr)
++static int get_device_bdaddr(int fd, bdaddr_t *bdaddr, CablePairingType type)
++{
++	if (type == CABLE_PAIRING_SIXAXIS)
++		return sixaxis_get_device_bdaddr(fd, bdaddr);
++	return -1;
++}
++
++static int sixaxis_get_master_bdaddr(int fd, bdaddr_t *bdaddr)
+ {
+ 	uint8_t buf[8];
+ 	int ret;
+@@ -103,7 +111,14 @@ static int get_master_bdaddr(int fd, bdaddr_t *bdaddr)
+ 	return 0;
+ }
+ 
+-static int set_master_bdaddr(int fd, const bdaddr_t *bdaddr)
++static int get_master_bdaddr(int fd, bdaddr_t *bdaddr, CablePairingType type)
++{
++	if (type == CABLE_PAIRING_SIXAXIS)
++		return sixaxis_get_master_bdaddr(fd, bdaddr);
++	return -1;
++}
++
++static int sixaxis_set_master_bdaddr(int fd, const bdaddr_t *bdaddr)
+ {
+ 	uint8_t buf[8];
+ 	int ret;
+@@ -121,6 +136,14 @@ static int set_master_bdaddr(int fd, const bdaddr_t *bdaddr)
+ 	return ret;
+ }
+ 
++static int set_master_bdaddr(int fd, const bdaddr_t *bdaddr,
++					CablePairingType type)
++{
++	if (type == CABLE_PAIRING_SIXAXIS)
++		return sixaxis_set_master_bdaddr(fd, bdaddr);
++	return -1;
++}
++
+ static void agent_auth_cb(DBusError *derr,
+ 				void *user_data)
+ {
+@@ -136,12 +159,12 @@ static void agent_auth_cb(DBusError *derr,
+ 
+ 	btd_device_set_temporary(closure->device, false);
+ 
+-	if (get_master_bdaddr(closure->fd, &master_bdaddr) < 0)
++	if (get_master_bdaddr(closure->fd, &master_bdaddr, closure->type) < 0)
+ 		goto error;
+ 
+ 	adapter_bdaddr = btd_adapter_get_address(closure->adapter);
+ 	if (bacmp(adapter_bdaddr, &master_bdaddr)) {
+-		if (set_master_bdaddr(closure->fd, adapter_bdaddr) < 0)
++		if (set_master_bdaddr(closure->fd, adapter_bdaddr, closure->type) < 0)
+ 			goto error;
+ 	}
+ 
+@@ -161,6 +184,7 @@ static bool setup_device(int fd,
+ 				uint16_t vid,
+ 				uint16_t pid,
+ 				uint16_t version,
++				CablePairingType type,
+ 				struct btd_adapter *adapter)
+ {
+ 	char device_addr[18];
+@@ -169,7 +193,7 @@ static bool setup_device(int fd,
+ 	struct btd_device *device;
+ 	struct authentication_closure *closure;
+ 
+-	if (get_device_bdaddr(fd, &device_bdaddr) < 0)
++	if (get_device_bdaddr(fd, &device_bdaddr, type) < 0)
+ 		return false;
+ 
+ 	/* This can happen if controller was plugged while already connected
+@@ -203,6 +227,7 @@ static bool setup_device(int fd,
+ 	closure->adapter = adapter;
+ 	closure->device = device;
+ 	closure->fd = fd;
++	closure->type = type;
+ 	memcpy(&closure->device_addr, device_addr, sizeof(device_addr));
+ 	adapter_bdaddr = btd_adapter_get_address(adapter);
+ 	btd_request_authorization_cable_configured(adapter_bdaddr, &device_bdaddr,
+@@ -269,7 +294,7 @@ static void device_added(struct udev_device *udevice)
+ 	}
+ 
+ 	/* Only close the fd if an authentication is not pending */
+-	if (!setup_device(fd, name, source, vid, pid, version, adapter))
++	if (!setup_device(fd, name, source, vid, pid, version, type, adapter))
+ 		close(fd);
+ 
+ 	g_free(name);
 -- 
-2.7.4
+2.14.1
 
