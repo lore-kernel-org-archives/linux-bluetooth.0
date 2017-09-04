@@ -2,60 +2,72 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Bastien Nocera <hadess@hadess.net>
 To: linux-bluetooth@vger.kernel.org
 Cc: Bastien Nocera <hadess@hadess.net>
-Subject: [PATCH 5/9] profiles/input: Use sixaxis header to simplify device detection
-Date: Mon,  4 Sep 2017 20:12:08 +0200
-Message-Id: <20170904181212.5639-5-hadess@hadess.net>
+Subject: [PATCH 6/9] profiles/input: Add DS4 devices to the shared header
+Date: Mon,  4 Sep 2017 20:12:09 +0200
+Message-Id: <20170904181212.5639-6-hadess@hadess.net>
 In-Reply-To: <20170904181212.5639-1-hadess@hadess.net>
 References: <20170904181212.5639-1-hadess@hadess.net>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Use the shared header to recognise whether a device is a Sixaxis device
-or not.
+And simplify the detection code in server.c some more.
 ---
- profiles/input/server.c | 10 ++++------
- 1 file changed, 4 insertions(+), 6 deletions(-)
+ profiles/input/server.c  |  7 ++-----
+ profiles/input/sixaxis.h | 17 +++++++++++++++++
+ 2 files changed, 19 insertions(+), 5 deletions(-)
 
 diff --git a/profiles/input/server.c b/profiles/input/server.c
-index eb3fcf843..121c334d3 100644
+index 121c334d3..ef428fefe 100644
 --- a/profiles/input/server.c
 +++ b/profiles/input/server.c
-@@ -43,6 +43,7 @@
- #include "src/device.h"
- #include "src/profile.h"
- 
-+#include "sixaxis.h"
- #include "device.h"
- #include "server.h"
- 
-@@ -123,6 +124,7 @@ static bool dev_is_sixaxis(const bdaddr_t *src, const bdaddr_t *dst)
- {
- 	struct btd_device *device;
- 	uint16_t vid, pid;
-+	CablePairingType type;
- 
- 	device = btd_adapter_find_device(adapter_find(src), dst, BDADDR_BREDR);
- 	if (!device)
-@@ -131,18 +133,14 @@ static bool dev_is_sixaxis(const bdaddr_t *src, const bdaddr_t *dst)
- 	vid = btd_device_get_vendor(device);
+@@ -134,11 +134,8 @@ static bool dev_is_sixaxis(const bdaddr_t *src, const bdaddr_t *dst)
  	pid = btd_device_get_product(device);
  
--	/* DualShock 3 */
--	if (vid == 0x054c && pid == 0x0268)
-+	type = get_pairing_type(vid, pid, NULL, NULL, NULL);
-+	if (type == CABLE_PAIRING_SIXAXIS)
- 		return true;
- 
- 	/* DualShock 4 */
- 	if (vid == 0x054c && pid == 0x05c4)
- 		return true;
- 
--	/* Navigation Controller */
--	if (vid == 0x054c && pid == 0x042f)
+ 	type = get_pairing_type(vid, pid, NULL, NULL, NULL);
+-	if (type == CABLE_PAIRING_SIXAXIS)
 -		return true;
 -
+-	/* DualShock 4 */
+-	if (vid == 0x054c && pid == 0x05c4)
++	if (type == CABLE_PAIRING_SIXAXIS ||
++	    type == CABLE_PAIRING_DS4)
+ 		return true;
+ 
  	return false;
- }
+diff --git a/profiles/input/sixaxis.h b/profiles/input/sixaxis.h
+index 589eff3da..9c074face 100644
+--- a/profiles/input/sixaxis.h
++++ b/profiles/input/sixaxis.h
+@@ -29,6 +29,7 @@
+ typedef enum {
+ 	CABLE_PAIRING_UNSUPPORTED = 0,
+ 	CABLE_PAIRING_SIXAXIS,
++	CABLE_PAIRING_DS4,
+ } CablePairingType;
+ 
+ inline CablePairingType
+@@ -62,6 +63,22 @@ get_pairing_type(uint16_t   vid,
+ 			.version = 0x0000,
+ 			.type = CABLE_PAIRING_SIXAXIS,
+ 		},
++		{
++			.name = "Wireless Controller",
++			.source = 0x0002,
++			.vid = 0x054c,
++			.pid = 0x05c4,
++			.version = 0x0001,
++			.type = CABLE_PAIRING_DS4,
++		},
++		{
++			.name = "Wireless Controller",
++			.source = 0x0002,
++			.vid = 0x054c,
++			.pid = 0x09cc,
++			.version = 0x0001,
++			.type = CABLE_PAIRING_DS4,
++		},
+ 	};
+ 	guint i;
  
 -- 
 2.14.1
