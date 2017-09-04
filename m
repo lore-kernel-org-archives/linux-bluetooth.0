@@ -2,295 +2,60 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Bastien Nocera <hadess@hadess.net>
 To: linux-bluetooth@vger.kernel.org
 Cc: Bastien Nocera <hadess@hadess.net>
-Subject: [PATCH 9/9] plugins/sixaxis: Cancel cable pairing if unplugged
-Date: Mon,  4 Sep 2017 20:12:12 +0200
-Message-Id: <20170904181212.5639-9-hadess@hadess.net>
+Subject: [PATCH 5/9] profiles/input: Use sixaxis header to simplify device detection
+Date: Mon,  4 Sep 2017 20:12:08 +0200
+Message-Id: <20170904181212.5639-5-hadess@hadess.net>
 In-Reply-To: <20170904181212.5639-1-hadess@hadess.net>
 References: <20170904181212.5639-1-hadess@hadess.net>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Cancel pending authorization requests when the device is unplugged
-while a request is pending.
+Use the shared header to recognise whether a device is a Sixaxis device
+or not.
 ---
- plugins/sixaxis.c | 138 ++++++++++++++++++++++++++++++++++++++++++++++++------
- 1 file changed, 123 insertions(+), 15 deletions(-)
+ profiles/input/server.c | 10 ++++------
+ 1 file changed, 4 insertions(+), 6 deletions(-)
 
-diff --git a/plugins/sixaxis.c b/plugins/sixaxis.c
-index eb15acb92..5cae52c68 100644
---- a/plugins/sixaxis.c
-+++ b/plugins/sixaxis.c
-@@ -51,6 +51,8 @@
- #include "profiles/input/sixaxis.h"
+diff --git a/profiles/input/server.c b/profiles/input/server.c
+index eb3fcf843..121c334d3 100644
+--- a/profiles/input/server.c
++++ b/profiles/input/server.c
+@@ -43,6 +43,7 @@
+ #include "src/device.h"
+ #include "src/profile.h"
  
- struct authentication_closure {
-+	guint auth_id;
-+	char *sysfs_path;
- 	struct btd_adapter *adapter;
++#include "sixaxis.h"
+ #include "device.h"
+ #include "server.h"
+ 
+@@ -123,6 +124,7 @@ static bool dev_is_sixaxis(const bdaddr_t *src, const bdaddr_t *dst)
+ {
  	struct btd_device *device;
- 	int fd;
-@@ -58,9 +60,29 @@ struct authentication_closure {
- 	CablePairingType type;
- };
+ 	uint16_t vid, pid;
++	CablePairingType type;
  
-+struct authentication_destroy_closure {
-+	struct authentication_closure *closure;
-+	bool remove_device;
-+};
-+
- static struct udev *ctx = NULL;
- static struct udev_monitor *monitor = NULL;
- static guint watch_id = 0;
-+static GHashTable *pending_auths = NULL; /* key = sysfs_path (const str), value = auth_closure */
-+
-+/* Make sure to unset auth_id if already handled */
-+static void auth_closure_destroy(struct authentication_closure *closure,
-+				bool remove_device)
-+{
-+	if (closure->auth_id)
-+		btd_cancel_authorization(closure->auth_id);
-+
-+	if (remove_device)
-+		btd_adapter_remove_device(closure->adapter, closure->device);
-+	close(closure->fd);
-+	g_free(closure->sysfs_path);
-+	g_free(closure);
-+}
+ 	device = btd_adapter_find_device(adapter_find(src), dst, BDADDR_BREDR);
+ 	if (!device)
+@@ -131,18 +133,14 @@ static bool dev_is_sixaxis(const bdaddr_t *src, const bdaddr_t *dst)
+ 	vid = btd_device_get_vendor(device);
+ 	pid = btd_device_get_product(device);
  
- static int sixaxis_get_device_bdaddr(int fd, bdaddr_t *bdaddr)
- {
-@@ -214,41 +236,83 @@ static int set_master_bdaddr(int fd, const bdaddr_t *bdaddr,
- 	return -1;
- }
+-	/* DualShock 3 */
+-	if (vid == 0x054c && pid == 0x0268)
++	type = get_pairing_type(vid, pid, NULL, NULL, NULL);
++	if (type == CABLE_PAIRING_SIXAXIS)
+ 		return true;
  
-+static bool is_auth_pending(struct authentication_closure *closure)
-+{
-+	GHashTableIter iter;
-+	gpointer value;
-+
-+	g_hash_table_iter_init(&iter, pending_auths);
-+	while (g_hash_table_iter_next(&iter, NULL, &value)) {
-+		struct authentication_closure *c = value;
-+		if (c == closure)
-+			return true;
-+	}
-+	return false;
-+}
-+
-+static gboolean auth_closure_destroy_idle(gpointer user_data)
-+{
-+	struct authentication_destroy_closure *destroy = user_data;
-+
-+	auth_closure_destroy(destroy->closure, destroy->remove_device);
-+	g_free(destroy);
-+
-+	return false;
-+}
-+
- static void agent_auth_cb(DBusError *derr,
- 				void *user_data)
- {
- 	struct authentication_closure *closure = user_data;
-+	struct authentication_destroy_closure *destroy;
- 	char master_addr[18], adapter_addr[18];
- 	bdaddr_t master_bdaddr;
- 	const bdaddr_t *adapter_bdaddr;
-+	bool remove_device = true;
-+
-+	if (!is_auth_pending(closure))
-+		return;
-+
-+	/* Don't try to remove this auth, we're handling it already */
-+	closure->auth_id = 0;
+ 	/* DualShock 4 */
+ 	if (vid == 0x054c && pid == 0x05c4)
+ 		return true;
  
- 	if (derr != NULL) {
- 		DBG("Agent replied negatively, removing temporary device");
--		goto error;
-+		goto out;
- 	}
- 
--	btd_device_set_temporary(closure->device, false);
+-	/* Navigation Controller */
+-	if (vid == 0x054c && pid == 0x042f)
+-		return true;
 -
- 	if (get_master_bdaddr(closure->fd, &master_bdaddr, closure->type) < 0)
--		goto error;
-+		goto out;
- 
- 	adapter_bdaddr = btd_adapter_get_address(closure->adapter);
- 	if (bacmp(adapter_bdaddr, &master_bdaddr)) {
- 		if (set_master_bdaddr(closure->fd, adapter_bdaddr, closure->type) < 0)
--			goto error;
-+			goto out;
- 	}
- 
-+	remove_device = false;
-+	btd_device_set_temporary(closure->device, false);
-+
- 	ba2str(&master_bdaddr, master_addr);
- 	ba2str(adapter_bdaddr, adapter_addr);
- 	DBG("remote %s old_master %s new_master %s",
- 				closure->device_addr, master_addr, adapter_addr);
- 
--error:
--	close(closure->fd);
--	g_free(closure);
-+out:
-+	g_hash_table_steal(pending_auths, closure->sysfs_path);
-+
-+	/* btd_adapter_remove_device() cannot be called in this
-+	 * callback or it would lead to a double-free in while
-+	 * trying to cancel the authentication that's being processed,
-+	 * so clean up in an idle */
-+	destroy = g_new0(struct authentication_destroy_closure, 1);
-+	destroy->closure = closure;
-+	destroy->remove_device = remove_device;
-+	g_idle_add(auth_closure_destroy_idle, destroy);
+ 	return false;
  }
- 
- static bool setup_device(int fd,
-+				const char *sysfs_path,
- 				const char *name,
- 				uint16_t source,
- 				uint16_t vid,
-@@ -296,12 +360,15 @@ static bool setup_device(int fd,
- 	}
- 	closure->adapter = adapter;
- 	closure->device = device;
-+	closure->sysfs_path = g_strdup(sysfs_path);
- 	closure->fd = fd;
- 	closure->type = type;
- 	memcpy(&closure->device_addr, device_addr, sizeof(device_addr));
- 	adapter_bdaddr = btd_adapter_get_address(adapter);
--	btd_request_authorization_cable_configured(adapter_bdaddr, &device_bdaddr,
--				HID_UUID, agent_auth_cb, closure);
-+	closure->auth_id = btd_request_authorization_cable_configured(adapter_bdaddr, &device_bdaddr,
-+								HID_UUID, agent_auth_cb, closure);
-+
-+	g_hash_table_insert(pending_auths, closure->sysfs_path, closure);
- 
- 	return true;
- }
-@@ -310,12 +377,14 @@ static CablePairingType get_pairing_type_for_device(struct udev_device *udevice,
- 								uint16_t  *bus,
- 								uint16_t  *vid,
- 								uint16_t  *pid,
-+								char     **sysfs_path,
- 								char     **name,
- 								uint16_t  *source,
- 								uint16_t  *version)
- {
- 	struct udev_device *hid_parent;
- 	const char *hid_id;
-+	CablePairingType ret;
- 
- 	hid_parent = udev_device_get_parent_with_subsystem_devtype(udevice,
- 								"hid", NULL);
-@@ -327,14 +396,17 @@ static CablePairingType get_pairing_type_for_device(struct udev_device *udevice,
- 	if (sscanf(hid_id, "%hx:%hx:%hx", bus, vid, pid) != 3)
- 		return -1;
- 
--	return get_pairing_type(*vid, *pid, name, source, version);
-+	ret = get_pairing_type(*vid, *pid, name, source, version);
-+	*sysfs_path = g_strdup(udev_device_get_syspath(udevice));
-+
-+	return ret;
- }
- 
- static void device_added(struct udev_device *udevice)
- {
- 	struct btd_adapter *adapter;
- 	uint16_t bus, vid, pid, source, version;
--	char *name = NULL;
-+	char *name = NULL, *sysfs_path = NULL;
- 	CablePairingType type;
- 	int fd;
- 
-@@ -346,6 +418,7 @@ static void device_added(struct udev_device *udevice)
- 						&bus,
- 						&vid,
- 						&pid,
-+						&sysfs_path,
- 						&name,
- 						&source,
- 						&version);
-@@ -355,20 +428,39 @@ static void device_added(struct udev_device *udevice)
- 	if (bus != BUS_USB)
- 		return;
- 
--	info("sixaxis: compatible device connected: %s (%04X:%04X)",
--				name, vid, pid);
-+	info("sixaxis: compatible device connected: %s (%04X:%04X %s)",
-+				name, vid, pid, sysfs_path);
- 
- 	fd = open(udev_device_get_devnode(udevice), O_RDWR);
- 	if (fd < 0) {
- 		g_free(name);
-+		g_free(sysfs_path);
- 		return;
- 	}
- 
- 	/* Only close the fd if an authentication is not pending */
--	if (!setup_device(fd, name, source, vid, pid, version, type, adapter))
-+	if (!setup_device(fd, sysfs_path, name, source, vid, pid, version, type, adapter))
- 		close(fd);
- 
- 	g_free(name);
-+	g_free(sysfs_path);
-+}
-+
-+static void device_removed(struct udev_device *udevice)
-+{
-+	struct authentication_closure *closure;
-+	const char *sysfs_path;
-+
-+	sysfs_path = udev_device_get_syspath(udevice);
-+	if (!sysfs_path)
-+		return;
-+
-+	closure = g_hash_table_lookup(pending_auths, sysfs_path);
-+	if (!closure)
-+		return;
-+
-+	g_hash_table_steal(pending_auths, sysfs_path);
-+	auth_closure_destroy(closure, true);
- }
- 
- static gboolean monitor_watch(GIOChannel *source, GIOCondition condition,
-@@ -382,6 +474,8 @@ static gboolean monitor_watch(GIOChannel *source, GIOCondition condition,
- 
- 	if (!g_strcmp0(udev_device_get_action(udevice), "add"))
- 		device_added(udevice);
-+	else if (!g_strcmp0(udev_device_get_action(udevice), "remove"))
-+		device_removed(udevice);
- 
- 	udev_device_unref(udevice);
- 
-@@ -415,13 +509,27 @@ static int sixaxis_init(void)
- 	watch_id = g_io_add_watch(channel, G_IO_IN, monitor_watch, NULL);
- 	g_io_channel_unref(channel);
- 
-+	pending_auths = g_hash_table_new(g_str_hash,
-+					g_str_equal);
-+
- 	return 0;
- }
- 
- static void sixaxis_exit(void)
- {
-+	GHashTableIter iter;
-+	gpointer value;
-+
- 	DBG("");
- 
-+	g_hash_table_iter_init(&iter, pending_auths);
-+	while (g_hash_table_iter_next(&iter, NULL, &value)) {
-+		struct authentication_closure *closure = value;
-+		auth_closure_destroy(closure, true);
-+	}
-+	g_hash_table_destroy(pending_auths);
-+	pending_auths = NULL;
-+
- 	g_source_remove(watch_id);
- 	watch_id = 0;
  
 -- 
 2.14.1
