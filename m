@@ -1,136 +1,148 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Bastien Nocera <hadess@hadess.net>
 To: linux-bluetooth@vger.kernel.org
-Cc: Bastien Nocera <hadess@hadess.net>
-Subject: [PATCH 7/9] plugins/sixaxis: Rename sixaxis specific functions
-Date: Mon,  4 Sep 2017 20:12:10 +0200
-Message-Id: <20170904181212.5639-7-hadess@hadess.net>
+Cc: Juha Kuikka <juha.kuikka@gmail.com>
+Subject: [PATCH 8/9] plugins/sixaxis: Add support for DualShock 4/PS4 cable pairing
+Date: Mon,  4 Sep 2017 20:12:11 +0200
+Message-Id: <20170904181212.5639-8-hadess@hadess.net>
 In-Reply-To: <20170904181212.5639-1-hadess@hadess.net>
 References: <20170904181212.5639-1-hadess@hadess.net>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-And provide wrappers to prepare for the addition of other device types.
+From: Juha Kuikka <juha.kuikka@gmail.com>
+
+This patch adds support for "pairing" a Dualshock4 controller over USB
+into the sixaxis plugin, similarly to what the Sixaxis/PS3 controller
+supported.
+
+Actual bonding happens on first connection, but the device will be
+marked as trusted when the agent replies.
+
+This patch is based on DS4 supprt for sixpair tool by t0xicCode:
+https://github.com/t0xicCode/sixpair/commit/975c38cb6cd61a2f0be350714f0f64cef5f0432c
 ---
- plugins/sixaxis.c | 39 ++++++++++++++++++++++++++++++++-------
- 1 file changed, 32 insertions(+), 7 deletions(-)
+ plugins/sixaxis.c | 73 ++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 72 insertions(+), 1 deletion(-)
 
 diff --git a/plugins/sixaxis.c b/plugins/sixaxis.c
-index 3e8ac06ca..b62834d72 100644
+index b62834d72..eb15acb92 100644
 --- a/plugins/sixaxis.c
 +++ b/plugins/sixaxis.c
-@@ -55,13 +55,14 @@ struct authentication_closure {
- 	struct btd_device *device;
- 	int fd;
- 	char device_addr[18];
-+	CablePairingType type;
- };
- 
- static struct udev *ctx = NULL;
- static struct udev_monitor *monitor = NULL;
- static guint watch_id = 0;
- 
--static int get_device_bdaddr(int fd, bdaddr_t *bdaddr)
-+static int sixaxis_get_device_bdaddr(int fd, bdaddr_t *bdaddr)
- {
- 	uint8_t buf[18];
- 	int ret;
-@@ -82,7 +83,14 @@ static int get_device_bdaddr(int fd, bdaddr_t *bdaddr)
+@@ -83,10 +83,34 @@ static int sixaxis_get_device_bdaddr(int fd, bdaddr_t *bdaddr)
  	return 0;
  }
  
--static int get_master_bdaddr(int fd, bdaddr_t *bdaddr)
-+static int get_device_bdaddr(int fd, bdaddr_t *bdaddr, CablePairingType type)
++static int ds4_get_device_bdaddr(int fd, bdaddr_t *bdaddr)
 +{
-+	if (type == CABLE_PAIRING_SIXAXIS)
-+		return sixaxis_get_device_bdaddr(fd, bdaddr);
-+	return -1;
++	uint8_t buf[7];
++	int ret;
++
++	memset(buf, 0, sizeof(buf));
++
++	buf[0] = 0x81;
++
++	ret = ioctl(fd, HIDIOCGFEATURE(sizeof(buf)), buf);
++	if (ret < 0) {
++		error("ds4: failed to read device address (%s)",
++		      strerror(errno));
++		return ret;
++	}
++
++	/* address is little-endian on DS4 */
++	bacpy(bdaddr, (bdaddr_t*) (buf + 1));
++
++	return 0;
 +}
 +
-+static int sixaxis_get_master_bdaddr(int fd, bdaddr_t *bdaddr)
+ static int get_device_bdaddr(int fd, bdaddr_t *bdaddr, CablePairingType type)
  {
- 	uint8_t buf[8];
- 	int ret;
-@@ -103,7 +111,14 @@ static int get_master_bdaddr(int fd, bdaddr_t *bdaddr)
+ 	if (type == CABLE_PAIRING_SIXAXIS)
+ 		return sixaxis_get_device_bdaddr(fd, bdaddr);
++	else if (type == CABLE_PAIRING_DS4)
++		return ds4_get_device_bdaddr(fd, bdaddr);
+ 	return -1;
+ }
+ 
+@@ -111,10 +135,34 @@ static int sixaxis_get_master_bdaddr(int fd, bdaddr_t *bdaddr)
  	return 0;
  }
  
--static int set_master_bdaddr(int fd, const bdaddr_t *bdaddr)
-+static int get_master_bdaddr(int fd, bdaddr_t *bdaddr, CablePairingType type)
++static int ds4_get_master_bdaddr(int fd, bdaddr_t *bdaddr)
 +{
-+	if (type == CABLE_PAIRING_SIXAXIS)
-+		return sixaxis_get_master_bdaddr(fd, bdaddr);
-+	return -1;
++	uint8_t buf[16];
++	int ret;
++
++	memset(buf, 0, sizeof(buf));
++
++	buf[0] = 0x12;
++
++	ret = ioctl(fd, HIDIOCGFEATURE(sizeof(buf)), buf);
++	if (ret < 0) {
++		error("ds4: failed to read master address (%s)",
++		      strerror(errno));
++		return ret;
++	}
++
++	/* address is little-endian on DS4 */
++	bacpy(bdaddr, (bdaddr_t*) (buf + 10));
++
++	return 0;
 +}
 +
-+static int sixaxis_set_master_bdaddr(int fd, const bdaddr_t *bdaddr)
+ static int get_master_bdaddr(int fd, bdaddr_t *bdaddr, CablePairingType type)
  {
- 	uint8_t buf[8];
- 	int ret;
-@@ -121,6 +136,14 @@ static int set_master_bdaddr(int fd, const bdaddr_t *bdaddr)
+ 	if (type == CABLE_PAIRING_SIXAXIS)
+ 		return sixaxis_get_master_bdaddr(fd, bdaddr);
++	else if (type == CABLE_PAIRING_DS4)
++		return ds4_get_master_bdaddr(fd, bdaddr);
+ 	return -1;
+ }
+ 
+@@ -136,11 +184,33 @@ static int sixaxis_set_master_bdaddr(int fd, const bdaddr_t *bdaddr)
  	return ret;
  }
  
-+static int set_master_bdaddr(int fd, const bdaddr_t *bdaddr,
-+					CablePairingType type)
++static int ds4_set_master_bdaddr(int fd, const bdaddr_t *bdaddr)
 +{
-+	if (type == CABLE_PAIRING_SIXAXIS)
-+		return sixaxis_set_master_bdaddr(fd, bdaddr);
-+	return -1;
++	uint8_t buf[23];
++	int ret;
++
++	buf[0] = 0x13;
++	bacpy((bdaddr_t*) (buf + 1), bdaddr);
++	/* TODO: we could put the key here but
++	   there is no way to force a re-loading
++	   of link keys to the kernel from here. */
++	memset(buf + 7, 0, 16);
++
++	ret = ioctl(fd, HIDIOCSFEATURE(sizeof(buf)), buf);
++	if (ret < 0)
++		error("ds4: failed to write master address (%s)",
++		      strerror(errno));
++
++	return ret;
 +}
 +
- static void agent_auth_cb(DBusError *derr,
- 				void *user_data)
+ static int set_master_bdaddr(int fd, const bdaddr_t *bdaddr,
+ 					CablePairingType type)
  {
-@@ -136,12 +159,12 @@ static void agent_auth_cb(DBusError *derr,
+ 	if (type == CABLE_PAIRING_SIXAXIS)
+ 		return sixaxis_set_master_bdaddr(fd, bdaddr);
++	else if (type == CABLE_PAIRING_DS4)
++		return ds4_set_master_bdaddr(fd, bdaddr);
+ 	return -1;
+ }
  
- 	btd_device_set_temporary(closure->device, false);
- 
--	if (get_master_bdaddr(closure->fd, &master_bdaddr) < 0)
-+	if (get_master_bdaddr(closure->fd, &master_bdaddr, closure->type) < 0)
- 		goto error;
- 
- 	adapter_bdaddr = btd_adapter_get_address(closure->adapter);
- 	if (bacmp(adapter_bdaddr, &master_bdaddr)) {
--		if (set_master_bdaddr(closure->fd, adapter_bdaddr) < 0)
-+		if (set_master_bdaddr(closure->fd, adapter_bdaddr, closure->type) < 0)
- 			goto error;
- 	}
- 
-@@ -161,6 +184,7 @@ static bool setup_device(int fd,
- 				uint16_t vid,
- 				uint16_t pid,
- 				uint16_t version,
-+				CablePairingType type,
- 				struct btd_adapter *adapter)
- {
- 	char device_addr[18];
-@@ -169,7 +193,7 @@ static bool setup_device(int fd,
- 	struct btd_device *device;
- 	struct authentication_closure *closure;
- 
--	if (get_device_bdaddr(fd, &device_bdaddr) < 0)
-+	if (get_device_bdaddr(fd, &device_bdaddr, type) < 0)
- 		return false;
- 
- 	/* This can happen if controller was plugged while already connected
-@@ -203,6 +227,7 @@ static bool setup_device(int fd,
- 	closure->adapter = adapter;
- 	closure->device = device;
- 	closure->fd = fd;
-+	closure->type = type;
- 	memcpy(&closure->device_addr, device_addr, sizeof(device_addr));
- 	adapter_bdaddr = btd_adapter_get_address(adapter);
- 	btd_request_authorization_cable_configured(adapter_bdaddr, &device_bdaddr,
-@@ -269,7 +294,7 @@ static void device_added(struct udev_device *udevice)
- 	}
- 
- 	/* Only close the fd if an authentication is not pending */
--	if (!setup_device(fd, name, source, vid, pid, version, adapter))
-+	if (!setup_device(fd, name, source, vid, pid, version, type, adapter))
- 		close(fd);
- 
- 	g_free(name);
+@@ -279,7 +349,8 @@ static void device_added(struct udev_device *udevice)
+ 						&name,
+ 						&source,
+ 						&version);
+-	if (type != CABLE_PAIRING_SIXAXIS)
++	if (type != CABLE_PAIRING_SIXAXIS &&
++	    type != CABLE_PAIRING_DS4)
+ 		return;
+ 	if (bus != BUS_USB)
+ 		return;
 -- 
 2.14.1
 
