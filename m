@@ -1,53 +1,29 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Bastien Nocera <hadess@hadess.net>
-To: linux-bluetooth@vger.kernel.org
-Cc: Bastien Nocera <hadess@hadess.net>
-Subject: [PATCH] autopair: Don't handle the iCade
-Date: Mon,  4 Sep 2017 19:54:46 +0200
-Message-Id: <20170904175446.4798-1-hadess@hadess.net>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <bjorn.andersson@linaro.org>
+Date: Mon, 4 Sep 2017 11:01:01 -0700
+From: Bjorn Andersson <bjorn.andersson@linaro.org>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Loic Poulain <loic.poulain@linaro.org>, linux-bluetooth@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org, robh@kernel.org
+Subject: Re: [PATCH v3] Bluetooth: btqcomsmd: BD address setup
+Message-ID: <20170904180101.GC1165@minitux>
+References: <1504521784-9766-1-git-send-email-loic.poulain@linaro.org>
+ <6989AC8D-D666-402E-A99E-930C0B007A9F@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <6989AC8D-D666-402E-A99E-930C0B007A9F@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-We can't easily enter digits other than 1 through 4 (inclusive)
-so leave it up to the agent to figure out a good passcode
-for the iCade.
+On Mon 04 Sep 04:28 PDT 2017, Marcel Holtmann wrote:
+[..]
+> Also please don’t forget
+> Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt file. We
+> need to document things.
+> 
 
-Note that we can not use the VID/PID of the device, as it is not
-yet known at that point.
----
- plugins/autopair.c | 13 ++++++++++++-
- 1 file changed, 12 insertions(+), 1 deletion(-)
+The qcom,wcnss-bt compatible is documented as part of
+Documentation/devicetree/bindings/soc/qcom/qcom,wcnss.txt
 
-diff --git a/plugins/autopair.c b/plugins/autopair.c
-index d44cf539b..a9d2a930a 100644
---- a/plugins/autopair.c
-+++ b/plugins/autopair.c
-@@ -60,13 +60,24 @@ static ssize_t autopair_pincb(struct btd_adapter *adapter,
- {
- 	char addr[18];
- 	char pinstr[7];
-+	char name[25];
- 	uint32_t class;
- 
- 	ba2str(device_get_address(device), addr);
- 
- 	class = btd_device_get_class(device);
- 
--	DBG("device %s 0x%x", addr, class);
-+	device_get_name(device, name, sizeof(name));
-+	name[sizeof(name) - 1] = 0;
-+
-+	DBG("device '%s' (%s) class: 0x%x vid/pid: 0x%X/0x%X",
-+		name, addr, class,
-+		btd_device_get_vendor (device),
-+		btd_device_get_product (device));
-+
-+	/* The iCade shouldn't use random PINs like normal keyboards */
-+	if (name != NULL && strstr(name, "iCade") != NULL)
-+		return 0;
- 
- 	/* This is a class-based pincode guesser. Ignore devices with an
- 	 * unknown class.
--- 
-2.14.1
+Loic, please amend this.
 
+Regards,
+Bjorn
