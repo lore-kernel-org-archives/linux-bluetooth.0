@@ -1,53 +1,54 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain; charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Subject: Re: [PATCH] tools/csr_usb: Fix compilation failure
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20170905083534.19184-1-hadess@hadess.net>
-Date: Tue, 5 Sep 2017 13:51:38 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <FD40CF28-55D4-4091-BAD7-97168812A6B8@holtmann.org>
-References: <20170905083534.19184-1-hadess@hadess.net>
-To: Bastien Nocera <hadess@hadess.net>
+Message-ID: <1504607866.6911.1.camel@hadess.net>
+Subject: Re: [PATCH 4/9] plugins/sixaxis: Move device discovery to shared
+ header
+From: Bastien Nocera <hadess@hadess.net>
+To: Szymon Janc <szymon.janc@codecoup.pl>
+Cc: Bluez mailing list <linux-bluetooth@vger.kernel.org>
+Date: Tue, 05 Sep 2017 12:37:46 +0200
+In-Reply-To: <CAAEJBhJpr_shNrShELVqATj3aiPQTV+saTY=cDXetYn87PQghw@mail.gmail.com>
+References: <20170904181212.5639-1-hadess@hadess.net>
+         <20170904181212.5639-4-hadess@hadess.net>
+         <1504602205.5928.5.camel@hadess.net>
+         <CAAEJBhJpr_shNrShELVqATj3aiPQTV+saTY=cDXetYn87PQghw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bastien,
-
-> GCC's "format-nonliteral" security check is enabled as an error in
-> recent versions of Fedora. Given the reduced scope of use, mark the
-> error as ignorable through pragma.
+On Tue, 2017-09-05 at 11:13 +0200, Szymon Janc wrote:
+> Hi Bastien,
 > 
-> tools/csr_usb.c: In function 'read_value':
-> tools/csr_usb.c:82:2: error: format not a string literal, argument types not checked [-Werror=format-nonliteral]
->  n = fscanf(file, format, &value);
->  ^
-> ---
-> tools/csr_usb.c | 3 +++
-> 1 file changed, 3 insertions(+)
+> On 5 September 2017 at 11:03, Bastien Nocera <hadess@hadess.net>
+> wrote:
+> > On Mon, 2017-09-04 at 20:12 +0200, Bastien Nocera wrote:
+> > > <snip>
+> > > +
+> > > +inline CablePairingType
+> > > +get_pairing_type(uint16_t   vid,
+> > > +              uint16_t   pid,
+> > > +              char     **name,
+> > > +              uint16_t  *source,
+> > > +              uint16_t  *version)
+> > 
+> > I have a slightly updated version of that section. "static" is
+> > missing
+> > in front of the inline function for use with RPM build's strict
+> > linker
+> > settings, and I'm sure the indentation police would like to see
+> > that
+> > function return type and name on the same line ;)
+> > --
+> > To unsubscribe from this list: send the line "unsubscribe linux-
+> > bluetooth" in
+> > the body of a message to majordomo@vger.kernel.org
+> > More majordomo info at  http://vger.kernel.org/majordomo-info.html
 > 
-> diff --git a/tools/csr_usb.c b/tools/csr_usb.c
-> index a1d7324f7..33e9968a2 100644
-> --- a/tools/csr_usb.c
-> +++ b/tools/csr_usb.c
-> @@ -67,6 +67,8 @@ struct usbfs_bulktransfer {
-> #define USBFS_IOCTL_CLAIMINTF	_IOR('U', 15, unsigned int)
-> #define USBFS_IOCTL_RELEASEINTF	_IOR('U', 16, unsigned int)
-> 
-> +#pragma GCC diagnostic push
-> +#pragma GCC diagnostic ignored "-Wformat-nonliteral"
-> static int read_value(const char *name, const char *attr, const char *format)
-> {
-> 	char path[PATH_MAX];
-> @@ -88,6 +90,7 @@ static int read_value(const char *name, const char *attr, const char *format)
-> 	fclose(file);
-> 	return value;
-> }
-> +#pragma GCC diagnostic pop
+> I'm not sure why this is in header in first place ?
 
-can’t we just use __attribute__((format)) somehow to declare this a format specify?
+It should become clear if you look at the rest of the patchset.
 
-Regards
-
-Marcel
-
+As we discussed in Juha's version of this patchset, we want to share
+this code between the sixaxis plugin, and the input profiles code. A
+code header is the easiest way to do this without getting into build
+conditionals.
