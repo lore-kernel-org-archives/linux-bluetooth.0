@@ -2,15 +2,15 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Bastien Nocera <hadess@hadess.net>
 To: linux-bluetooth@vger.kernel.org
 Cc: Bastien Nocera <hadess@hadess.net>
-Subject: [PATCH v3] tools/csr_usb: Fix compilation failure
-Date: Tue,  5 Sep 2017 16:36:14 +0200
-Message-Id: <20170905143614.450-1-hadess@hadess.net>
+Subject: [PATCH] tools/csr_usb: Fix compilation failure
+Date: Tue,  5 Sep 2017 16:32:37 +0200
+Message-Id: <20170905143237.32524-1-hadess@hadess.net>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 GCC's "format-nonliteral" security check is enabled as an error in
-recent versions of Fedora. Given the limited formats, pass a boolean
-to switch between the 2 different formats.
+recent versions of Fedora. Given the reduced scope of use, mark the
+error as ignorable through pragma.
 
 tools/csr_usb.c: In function 'read_value':
 tools/csr_usb.c:82:2: error: format not a string literal, argument types not checked [-Werror=format-nonliteral]
