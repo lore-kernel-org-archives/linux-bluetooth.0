@@ -1,76 +1,85 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Anitha Chandrasekar <anitha.chandrasekar@sasken.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: Query Regaring usage of RegisterApplication Method using Gio Api
-Date: Tue, 5 Sep 2017 12:18:48 +0000
-Message-ID: <7B53A3173656CB4190908401FE75F4F85CC14929@exgmbxfz01.sasken.com>
-References: <7B53A3173656CB4190908401FE75F4F85CC0D1CE@exgmbxfz01.sasken.com>,<CABBYNZJncfY1tPqVTXbGG0eUtj9C56hh8YbiBLH3T_pyM=zziw@mail.gmail.com>,<7B53A3173656CB4190908401FE75F4F85CC14908@exgmbxfz01.sasken.com>
-In-Reply-To: <7B53A3173656CB4190908401FE75F4F85CC14908@exgmbxfz01.sasken.com>
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+Subject: Re: [PATCH v4 2/3] Bluetooth: btqcomsmd: BD address setup
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1504607164-12645-2-git-send-email-loic.poulain@linaro.org>
+Date: Tue, 5 Sep 2017 14:14:15 +0200
+Cc: Johan Hedberg <johan.hedberg@gmail.com>, robh+dt@kernel.org,
+        linux-bluetooth@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+        devicetree@vger.kernel.org, bjorn.andersson@linaro.org
+Message-Id: <773E21D0-9E00-45B5-8454-3AFFAECCBFD7@holtmann.org>
+References: <1504607164-12645-1-git-send-email-loic.poulain@linaro.org>
+ <1504607164-12645-2-git-send-email-loic.poulain@linaro.org>
+To: Loic Poulain <loic.poulain@linaro.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Loic,
 
-Thanks for the reply,
+> This patch implements the hdev setup function.
+> wcnss-bt does not have persistent memory to store
+> an allocated BD address. The device is therefore
+> marked as unconfigured if no BD address has been
+> previously retrieved.
+> 
+> Signed-off-by: Loic Poulain <loic.poulain@linaro.org>
+> ---
+> v2: Set device as unconfigured if default address detected
+>     Add warning if BD addr retrieved from DT
+> v3: if no addr retrieved from DT, unconditionally set
+>     the invalid BD addr flag.
+>     swap and set bdaddr in the platform probe
+> v4: Add dt-bindings documentation
+>     split patch in two parts (setup, dt prop)
+>     use local-bd-address name instead of local-mac-address
+> 
+> drivers/bluetooth/btqcomsmd.c | 25 +++++++++++++++++++++++++
+> 1 file changed, 25 insertions(+)
+> 
+> diff --git a/drivers/bluetooth/btqcomsmd.c b/drivers/bluetooth/btqcomsmd.c
+> index ef730c173d4b..c70fae75c4ad 100644
+> --- a/drivers/bluetooth/btqcomsmd.c
+> +++ b/drivers/bluetooth/btqcomsmd.c
+> @@ -26,6 +26,7 @@
+> struct btqcomsmd {
+> 	struct hci_dev *hdev;
+> 
+> +	bdaddr_t bdaddr;
+> 	struct rpmsg_endpoint *acl_channel;
+> 	struct rpmsg_endpoint *cmd_channel;
+> };
+> @@ -100,6 +101,29 @@ static int btqcomsmd_close(struct hci_dev *hdev)
+> 	return 0;
+> }
+> 
+> +static int btqcomsmd_setup(struct hci_dev *hdev)
+> +{
+> +	struct btqcomsmd *btq = hci_get_drvdata(hdev);
+> +	struct sk_buff *skb;
+> +
+> +	skb = __hci_cmd_sync(hdev, HCI_OP_RESET, 0, NULL, HCI_INIT_TIMEOUT);
+> +	if (IS_ERR(skb))
+> +		return PTR_ERR(skb);
+> +	kfree_skb(skb);
+> +
+> +	/* Device does not have persistent storage for BD address.
+> +	 * Mark the device with invalid BD addr flag if no address
+> +	 * retrieved during probe.
+> +	 */
+> +	if (!bacmp(&btq->bdaddr, BDADDR_ANY)) {
+> +		bt_dev_info(hdev, "No BD address configured");
+> +		set_bit(HCI_QUIRK_INVALID_BDADDR, &hdev->quirks);
+> +		return 0;
+> +	}
+> +
+> +	return qca_set_bdaddr_rome(hdev, &btq->bdaddr);
+> +}
+> +
 
-I could not continue using GIO apis for RegisterApplication, But we proceeded using Gdbus apis exposed by Bluez,
-We see that the RegisterApplication is succeeded, but we are unable to auto connect.
+actually I applied a modified version of your patch that also sets invalid BD address when changing the address fails. I think there is no good reason to fail ->setup(). Let them fix that in userspace since the device is actually functional.
 
-Attached logs "bluetoothd_logs.txt",
+Regards
 
-bluetoothd[1520]: ../bluez-5.43/src/device.c:device_svc_resolved() /org/bluez/hci0/dev_00_1C_05_FF_CA_D9 err 0
-bluetoothd[1520]: ../bluez-5.43/src/gatt-database.c:manager_register_app() Registering application: :1.14:/
-bluetoothd[1520]: ../bluez-5.43/src/gatt-database.c:proxy_added_cb() Object received: /org/bluez/app, iface: org.bluez.GattProfile1
-bluetoothd[1520]: ../bluez-5.43/src/gatt-database.c:profile_add() Added ":1.14/org/bluez/app/00001800-0000-1000-8000-00805f9b34fb"
-bluetoothd[1520]: ../bluez-5.43/src/gatt-database.c:profile_device_probe() :1.14/org/bluez/app/00001800-0000-1000-8000-00805f9b34fb probed
-bluetoothd[1520]: ../bluez-5.43/src/service.c:change_state() 0x5577a0dd0cc0: device 00:1C:05:FF:CA:D9 profile :1.14/org/bluez/app/00001800-0000-1000-8000-00805f9b34fb state changed: unavailable -> disconnected (0)
-bluetoothd[1520]: ../bluez-5.43/src/gatt-database.c:client_ready_cb() GATT application registered: :1.14:/
+Marcel
 
-Any information will be of great help. Awaiting for the reply.
-
-Regards,
-Anitha
-________________________________________
-From: Luiz Augusto von Dentz [luiz.dentz@gmail.com]
-Sent: Thursday, August 10, 2017 6:45 PM
-To: Anitha Chandrasekar
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: Query Regaring usage of RegisterApplication Method using Gio Api
-
-Hi Anitha,
-
-On Tue, Aug 8, 2017 at 3:01 PM, Anitha Chandrasekar
-<anitha.chandrasekar@sasken.com> wrote:
-> Hi ,
->
-> We need to call RegisterApplication function from our application for auto-connect of devices. We are registering the GattProfile1 object and calling RegisterApplication method using Gio Api.
->
-> But we are getting a "No object Found " error every time. Could you please let us know if there is any example code for the same or if you could suggest the API usage from d-feet tool.
-> d-feet ->
-> I dont see GattProfile1 being listed in d-feet and there is only RegisterApplication api, can I know what input params to be given and usage of it.Thanks in advance.
-
-You need to implement GattProfile1 in the side of the application and
-that should contain ObjectManager object since that is how bluetoothd
-is able to list the available objects, you should be able to see the
-available interfaces your application have all interfaces in d-feet.
-
-> Regards,
-> Anitha
->
-> ________________________________
->
-> SASKEN BUSINESS DISCLAIMER: This message may contain confidential, proprietary or legally privileged information. In case you are not the original intended Recipient of the message, you must not, directly or indirectly, use, disclose, distribute, print, or copy any part of this message and you are requested to delete it and inform the sender. Any views expressed in this message are those of the individual sender unless otherwise stated. Nothing contained in this message shall be construed as an offer or acceptance of any offer by Sasken Technologies Limited ( formerly known as "Sasken Communication Technologies Limited" ) unless sent with that express intent and with due authority of Sasken. Sasken has taken enough precautions to prevent the spread of viruses. However the company accepts no liability for any damage caused by any virus transmitted by this email.
-> Read Disclaimer at http://www.sasken.com/mail-disclaimer/
->
-> ________________________________
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-
---
-Luiz Augusto von Dentz
