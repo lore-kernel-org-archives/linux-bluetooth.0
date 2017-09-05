@@ -8,16 +8,18 @@ Cc: linux-bluetooth@vger.kernel.org,
 	devicetree@vger.kernel.org,
 	bjorn.andersson@linaro.org,
 	Loic Poulain <loic.poulain@linaro.org>
-Subject: [PATCH v4 3/3] Bluetooth: btqcomsmd: retieve BD address from DT
-Date: Tue,  5 Sep 2017 12:26:04 +0200
-Message-Id: <1504607164-12645-3-git-send-email-loic.poulain@linaro.org>
+Subject: [PATCH v4 2/3] Bluetooth: btqcomsmd: BD address setup
+Date: Tue,  5 Sep 2017 12:26:03 +0200
+Message-Id: <1504607164-12645-2-git-send-email-loic.poulain@linaro.org>
 In-Reply-To: <1504607164-12645-1-git-send-email-loic.poulain@linaro.org>
 References: <1504607164-12645-1-git-send-email-loic.poulain@linaro.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Retrieve BD address from the DT local-bd-address property.
-This address must be unique and is usually added in the DT
-by the bootloader which has access to the provisioned data.
+This patch implements the hdev setup function.
+wcnss-bt does not have persistent memory to store
+an allocated BD address. The device is therefore
+marked as unconfigured if no BD address has been
+previously retrieved.
 
 Signed-off-by: Loic Poulain <loic.poulain@linaro.org>
 ---
@@ -30,48 +32,58 @@ Signed-off-by: Loic Poulain <loic.poulain@linaro.org>
      split patch in two parts (setup, dt prop)
      use local-bd-address name instead of local-mac-address
 
- drivers/bluetooth/btqcomsmd.c | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+ drivers/bluetooth/btqcomsmd.c | 25 +++++++++++++++++++++++++
+ 1 file changed, 25 insertions(+)
 
 diff --git a/drivers/bluetooth/btqcomsmd.c b/drivers/bluetooth/btqcomsmd.c
-index c70fae75c4ad..08a83cb30af6 100644
+index ef730c173d4b..c70fae75c4ad 100644
 --- a/drivers/bluetooth/btqcomsmd.c
 +++ b/drivers/bluetooth/btqcomsmd.c
-@@ -15,6 +15,8 @@
- #include <linux/module.h>
- #include <linux/slab.h>
- #include <linux/rpmsg.h>
-+#include <linux/of.h>
-+
- #include <linux/soc/qcom/wcnss_ctrl.h>
- #include <linux/platform_device.h>
- 
-@@ -126,6 +128,7 @@ static int btqcomsmd_setup(struct hci_dev *hdev)
- 
- static int btqcomsmd_probe(struct platform_device *pdev)
- {
-+	const bdaddr_t *local_bd_addr;
- 	struct btqcomsmd *btq;
+@@ -26,6 +26,7 @@
+ struct btqcomsmd {
  	struct hci_dev *hdev;
- 	void *wcnss;
-@@ -147,6 +150,18 @@ static int btqcomsmd_probe(struct platform_device *pdev)
- 	if (IS_ERR(btq->cmd_channel))
- 		return PTR_ERR(btq->cmd_channel);
  
-+	/* The local-bd-address DT property is usually injected by the
-+	 * bootloader which has access to the allocated BD address.
++	bdaddr_t bdaddr;
+ 	struct rpmsg_endpoint *acl_channel;
+ 	struct rpmsg_endpoint *cmd_channel;
+ };
+@@ -100,6 +101,29 @@ static int btqcomsmd_close(struct hci_dev *hdev)
+ 	return 0;
+ }
+ 
++static int btqcomsmd_setup(struct hci_dev *hdev)
++{
++	struct btqcomsmd *btq = hci_get_drvdata(hdev);
++	struct sk_buff *skb;
++
++	skb = __hci_cmd_sync(hdev, HCI_OP_RESET, 0, NULL, HCI_INIT_TIMEOUT);
++	if (IS_ERR(skb))
++		return PTR_ERR(skb);
++	kfree_skb(skb);
++
++	/* Device does not have persistent storage for BD address.
++	 * Mark the device with invalid BD addr flag if no address
++	 * retrieved during probe.
 +	 */
-+	local_bd_addr = of_get_property(pdev->dev.of_node, "local-mac-address",
-+					&ret);
-+	if (local_bd_addr && ret == sizeof(bdaddr_t)) {
-+		/* local-bd-address stored with most significant byte first */
-+		baswap(&btq->bdaddr, local_bd_addr);
-+		BT_INFO("BD address %pMR retrieved from device-tree",
-+			&btq->bdaddr);
++	if (!bacmp(&btq->bdaddr, BDADDR_ANY)) {
++		bt_dev_info(hdev, "No BD address configured");
++		set_bit(HCI_QUIRK_INVALID_BDADDR, &hdev->quirks);
++		return 0;
 +	}
 +
- 	hdev = hci_alloc_dev();
- 	if (!hdev)
- 		return -ENOMEM;
++	return qca_set_bdaddr_rome(hdev, &btq->bdaddr);
++}
++
+ static int btqcomsmd_probe(struct platform_device *pdev)
+ {
+ 	struct btqcomsmd *btq;
+@@ -135,6 +159,7 @@ static int btqcomsmd_probe(struct platform_device *pdev)
+ 	hdev->open = btqcomsmd_open;
+ 	hdev->close = btqcomsmd_close;
+ 	hdev->send = btqcomsmd_send;
++	hdev->setup = btqcomsmd_setup;
+ 	hdev->set_bdaddr = qca_set_bdaddr_rome;
+ 
+ 	ret = hci_register_dev(hdev);
 -- 
 2.13.0
