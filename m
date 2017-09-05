@@ -1,54 +1,42 @@
-Return-Path: <loic.poulain@linaro.org>
-From: Loic Poulain <loic.poulain@linaro.org>
-To: marcel@holtmann.org,
-	johan.hedberg@gmail.com,
-	robh+dt@kernel.org
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	bjorn.andersson@linaro.org,
-	Loic Poulain <loic.poulain@linaro.org>
-Subject: [PATCH v4 1/3] dt-bindings: soc: qcom: Add local-bd-address property to WCNSS-BT
-Date: Tue,  5 Sep 2017 12:26:02 +0200
-Message-Id: <1504607164-12645-1-git-send-email-loic.poulain@linaro.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+MIME-Version: 1.0
+In-Reply-To: <1504602205.5928.5.camel@hadess.net>
+References: <20170904181212.5639-1-hadess@hadess.net> <20170904181212.5639-4-hadess@hadess.net>
+ <1504602205.5928.5.camel@hadess.net>
+From: Szymon Janc <szymon.janc@codecoup.pl>
+Date: Tue, 5 Sep 2017 11:13:59 +0200
+Message-ID: <CAAEJBhJpr_shNrShELVqATj3aiPQTV+saTY=cDXetYn87PQghw@mail.gmail.com>
+Subject: Re: [PATCH 4/9] plugins/sixaxis: Move device discovery to shared header
+To: Bastien Nocera <hadess@hadess.net>
+Cc: Bluez mailing list <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add optional local-bd-address property which is a 6-byte array
-storing the assigned BD address. Since having a unique BD address
-is critical, a per-device property value should be allocated.
-This property is usually added by the boot loader which has access
-to the provisioned data.
+Hi Bastien,
 
-Signed-off-by: Loic Poulain <loic.poulain@linaro.org>
----
- v2: Set device as unconfigured if default address detected
-     Add warning if BD addr retrieved from DT
- v3: if no addr retrieved from DT, unconditionally set
-     the invalid BD addr flag.
-     swap and set bdaddr in the platform probe
- v4: Add dt-bindings documentation
-     split patch in two parts (setup, dt prop)
-     use local-bd-address name instead of local-mac-address
+On 5 September 2017 at 11:03, Bastien Nocera <hadess@hadess.net> wrote:
+> On Mon, 2017-09-04 at 20:12 +0200, Bastien Nocera wrote:
+>> <snip>
+>> +
+>> +inline CablePairingType
+>> +get_pairing_type(uint16_t   vid,
+>> +              uint16_t   pid,
+>> +              char     **name,
+>> +              uint16_t  *source,
+>> +              uint16_t  *version)
+>
+> I have a slightly updated version of that section. "static" is missing
+> in front of the inline function for use with RPM build's strict linker
+> settings, and I'm sure the indentation police would like to see that
+> function return type and name on the same line ;)
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
- Documentation/devicetree/bindings/soc/qcom/qcom,wcnss.txt | 6 ++++++
- 1 file changed, 6 insertions(+)
+I'm not sure why this is in header in first place ?
 
-diff --git a/Documentation/devicetree/bindings/soc/qcom/qcom,wcnss.txt b/Documentation/devicetree/bindings/soc/qcom/qcom,wcnss.txt
-index 4ea39e9186a7..1edfcdc6e267 100644
---- a/Documentation/devicetree/bindings/soc/qcom/qcom,wcnss.txt
-+++ b/Documentation/devicetree/bindings/soc/qcom/qcom,wcnss.txt
-@@ -37,6 +37,12 @@ The following properties are defined to the bluetooth node:
- 	Definition: must be:
- 		    "qcom,wcnss-bt"
- 
-+- local-bd-address:
-+	Usage: optional
-+	Value type: <u8 array>
-+	Definition: should specify the unique 6-byte BD address assigned to the
-+		    BT controller. Usually added at runtime by the boot loader.
-+
- == WiFi
- The following properties are defined to the WiFi node:
- 
 -- 
-2.13.0
+pozdrawiam
+Szymon K. Janc
