@@ -8,18 +8,16 @@ Cc: linux-bluetooth@vger.kernel.org,
 	devicetree@vger.kernel.org,
 	bjorn.andersson@linaro.org,
 	Loic Poulain <loic.poulain@linaro.org>
-Subject: [PATCH v4 2/3] Bluetooth: btqcomsmd: BD address setup
-Date: Tue,  5 Sep 2017 12:26:03 +0200
-Message-Id: <1504607164-12645-2-git-send-email-loic.poulain@linaro.org>
-In-Reply-To: <1504607164-12645-1-git-send-email-loic.poulain@linaro.org>
-References: <1504607164-12645-1-git-send-email-loic.poulain@linaro.org>
+Subject: [PATCH v4 1/3] dt-bindings: soc: qcom: Add local-bd-address property to WCNSS-BT
+Date: Tue,  5 Sep 2017 12:26:02 +0200
+Message-Id: <1504607164-12645-1-git-send-email-loic.poulain@linaro.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch implements the hdev setup function.
-wcnss-bt does not have persistent memory to store
-an allocated BD address. The device is therefore
-marked as unconfigured if no BD address has been
-previously retrieved.
+Add optional local-bd-address property which is a 6-byte array
+storing the assigned BD address. Since having a unique BD address
+is critical, a per-device property value should be allocated.
+This property is usually added by the boot loader which has access
+to the provisioned data.
 
 Signed-off-by: Loic Poulain <loic.poulain@linaro.org>
 ---
@@ -32,58 +30,25 @@ Signed-off-by: Loic Poulain <loic.poulain@linaro.org>
      split patch in two parts (setup, dt prop)
      use local-bd-address name instead of local-mac-address
 
- drivers/bluetooth/btqcomsmd.c | 25 +++++++++++++++++++++++++
- 1 file changed, 25 insertions(+)
+ Documentation/devicetree/bindings/soc/qcom/qcom,wcnss.txt | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/drivers/bluetooth/btqcomsmd.c b/drivers/bluetooth/btqcomsmd.c
-index ef730c173d4b..c70fae75c4ad 100644
---- a/drivers/bluetooth/btqcomsmd.c
-+++ b/drivers/bluetooth/btqcomsmd.c
-@@ -26,6 +26,7 @@
- struct btqcomsmd {
- 	struct hci_dev *hdev;
+diff --git a/Documentation/devicetree/bindings/soc/qcom/qcom,wcnss.txt b/Documentation/devicetree/bindings/soc/qcom/qcom,wcnss.txt
+index 4ea39e9186a7..1edfcdc6e267 100644
+--- a/Documentation/devicetree/bindings/soc/qcom/qcom,wcnss.txt
++++ b/Documentation/devicetree/bindings/soc/qcom/qcom,wcnss.txt
+@@ -37,6 +37,12 @@ The following properties are defined to the bluetooth node:
+ 	Definition: must be:
+ 		    "qcom,wcnss-bt"
  
-+	bdaddr_t bdaddr;
- 	struct rpmsg_endpoint *acl_channel;
- 	struct rpmsg_endpoint *cmd_channel;
- };
-@@ -100,6 +101,29 @@ static int btqcomsmd_close(struct hci_dev *hdev)
- 	return 0;
- }
++- local-bd-address:
++	Usage: optional
++	Value type: <u8 array>
++	Definition: should specify the unique 6-byte BD address assigned to the
++		    BT controller. Usually added at runtime by the boot loader.
++
+ == WiFi
+ The following properties are defined to the WiFi node:
  
-+static int btqcomsmd_setup(struct hci_dev *hdev)
-+{
-+	struct btqcomsmd *btq = hci_get_drvdata(hdev);
-+	struct sk_buff *skb;
-+
-+	skb = __hci_cmd_sync(hdev, HCI_OP_RESET, 0, NULL, HCI_INIT_TIMEOUT);
-+	if (IS_ERR(skb))
-+		return PTR_ERR(skb);
-+	kfree_skb(skb);
-+
-+	/* Device does not have persistent storage for BD address.
-+	 * Mark the device with invalid BD addr flag if no address
-+	 * retrieved during probe.
-+	 */
-+	if (!bacmp(&btq->bdaddr, BDADDR_ANY)) {
-+		bt_dev_info(hdev, "No BD address configured");
-+		set_bit(HCI_QUIRK_INVALID_BDADDR, &hdev->quirks);
-+		return 0;
-+	}
-+
-+	return qca_set_bdaddr_rome(hdev, &btq->bdaddr);
-+}
-+
- static int btqcomsmd_probe(struct platform_device *pdev)
- {
- 	struct btqcomsmd *btq;
-@@ -135,6 +159,7 @@ static int btqcomsmd_probe(struct platform_device *pdev)
- 	hdev->open = btqcomsmd_open;
- 	hdev->close = btqcomsmd_close;
- 	hdev->send = btqcomsmd_send;
-+	hdev->setup = btqcomsmd_setup;
- 	hdev->set_bdaddr = qca_set_bdaddr_rome;
- 
- 	ret = hci_register_dev(hdev);
 -- 
 2.13.0
