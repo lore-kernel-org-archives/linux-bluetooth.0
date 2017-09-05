@@ -1,54 +1,77 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Message-ID: <1504607866.6911.1.camel@hadess.net>
-Subject: Re: [PATCH 4/9] plugins/sixaxis: Move device discovery to shared
- header
-From: Bastien Nocera <hadess@hadess.net>
-To: Szymon Janc <szymon.janc@codecoup.pl>
-Cc: Bluez mailing list <linux-bluetooth@vger.kernel.org>
-Date: Tue, 05 Sep 2017 12:37:46 +0200
-In-Reply-To: <CAAEJBhJpr_shNrShELVqATj3aiPQTV+saTY=cDXetYn87PQghw@mail.gmail.com>
-References: <20170904181212.5639-1-hadess@hadess.net>
-         <20170904181212.5639-4-hadess@hadess.net>
-         <1504602205.5928.5.camel@hadess.net>
-         <CAAEJBhJpr_shNrShELVqATj3aiPQTV+saTY=cDXetYn87PQghw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <loic.poulain@linaro.org>
+From: Loic Poulain <loic.poulain@linaro.org>
+To: marcel@holtmann.org,
+	johan.hedberg@gmail.com,
+	robh+dt@kernel.org
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	bjorn.andersson@linaro.org,
+	Loic Poulain <loic.poulain@linaro.org>
+Subject: [PATCH v4 3/3] Bluetooth: btqcomsmd: retieve BD address from DT
+Date: Tue,  5 Sep 2017 12:26:04 +0200
+Message-Id: <1504607164-12645-3-git-send-email-loic.poulain@linaro.org>
+In-Reply-To: <1504607164-12645-1-git-send-email-loic.poulain@linaro.org>
+References: <1504607164-12645-1-git-send-email-loic.poulain@linaro.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, 2017-09-05 at 11:13 +0200, Szymon Janc wrote:
-> Hi Bastien,
-> 
-> On 5 September 2017 at 11:03, Bastien Nocera <hadess@hadess.net>
-> wrote:
-> > On Mon, 2017-09-04 at 20:12 +0200, Bastien Nocera wrote:
-> > > <snip>
-> > > +
-> > > +inline CablePairingType
-> > > +get_pairing_type(uint16_t   vid,
-> > > +              uint16_t   pid,
-> > > +              char     **name,
-> > > +              uint16_t  *source,
-> > > +              uint16_t  *version)
-> > 
-> > I have a slightly updated version of that section. "static" is
-> > missing
-> > in front of the inline function for use with RPM build's strict
-> > linker
-> > settings, and I'm sure the indentation police would like to see
-> > that
-> > function return type and name on the same line ;)
-> > --
-> > To unsubscribe from this list: send the line "unsubscribe linux-
-> > bluetooth" in
-> > the body of a message to majordomo@vger.kernel.org
-> > More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> 
-> I'm not sure why this is in header in first place ?
+Retrieve BD address from the DT local-bd-address property.
+This address must be unique and is usually added in the DT
+by the bootloader which has access to the provisioned data.
 
-It should become clear if you look at the rest of the patchset.
+Signed-off-by: Loic Poulain <loic.poulain@linaro.org>
+---
+ v2: Set device as unconfigured if default address detected
+     Add warning if BD addr retrieved from DT
+ v3: if no addr retrieved from DT, unconditionally set
+     the invalid BD addr flag.
+     swap and set bdaddr in the platform probe
+ v4: Add dt-bindings documentation
+     split patch in two parts (setup, dt prop)
+     use local-bd-address name instead of local-mac-address
 
-As we discussed in Juha's version of this patchset, we want to share
-this code between the sixaxis plugin, and the input profiles code. A
-code header is the easiest way to do this without getting into build
-conditionals.
+ drivers/bluetooth/btqcomsmd.c | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
+
+diff --git a/drivers/bluetooth/btqcomsmd.c b/drivers/bluetooth/btqcomsmd.c
+index c70fae75c4ad..08a83cb30af6 100644
+--- a/drivers/bluetooth/btqcomsmd.c
++++ b/drivers/bluetooth/btqcomsmd.c
+@@ -15,6 +15,8 @@
+ #include <linux/module.h>
+ #include <linux/slab.h>
+ #include <linux/rpmsg.h>
++#include <linux/of.h>
++
+ #include <linux/soc/qcom/wcnss_ctrl.h>
+ #include <linux/platform_device.h>
+ 
+@@ -126,6 +128,7 @@ static int btqcomsmd_setup(struct hci_dev *hdev)
+ 
+ static int btqcomsmd_probe(struct platform_device *pdev)
+ {
++	const bdaddr_t *local_bd_addr;
+ 	struct btqcomsmd *btq;
+ 	struct hci_dev *hdev;
+ 	void *wcnss;
+@@ -147,6 +150,18 @@ static int btqcomsmd_probe(struct platform_device *pdev)
+ 	if (IS_ERR(btq->cmd_channel))
+ 		return PTR_ERR(btq->cmd_channel);
+ 
++	/* The local-bd-address DT property is usually injected by the
++	 * bootloader which has access to the allocated BD address.
++	 */
++	local_bd_addr = of_get_property(pdev->dev.of_node, "local-mac-address",
++					&ret);
++	if (local_bd_addr && ret == sizeof(bdaddr_t)) {
++		/* local-bd-address stored with most significant byte first */
++		baswap(&btq->bdaddr, local_bd_addr);
++		BT_INFO("BD address %pMR retrieved from device-tree",
++			&btq->bdaddr);
++	}
++
+ 	hdev = hci_alloc_dev();
+ 	if (!hdev)
+ 		return -ENOMEM;
+-- 
+2.13.0
