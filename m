@@ -1,67 +1,77 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Yunhan Wang <yunhanw@google.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Yunhan Wang <yunhanw@google.com>
-Subject: [PATCH v2] client: Fix default_ctrl change when new adapter is found
-Date: Tue,  5 Sep 2017 22:27:43 -0700
-Message-Id: <20170906052743.6821-1-yunhanw@google.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <robh+dt@kernel.org>
+MIME-Version: 1.0
+In-Reply-To: <1504637923-21652-3-git-send-email-loic.poulain@linaro.org>
+References: <1504637923-21652-1-git-send-email-loic.poulain@linaro.org> <1504637923-21652-3-git-send-email-loic.poulain@linaro.org>
+From: Rob Herring <robh+dt@kernel.org>
+Date: Tue, 5 Sep 2017 16:47:26 -0500
+Message-ID: <CAL_JsqJhEaZkcBA6qnC3rVduQJ9Yesrz_h9i_WXo1bRaq1NT4Q@mail.gmail.com>
+Subject: Re: [PATCH v5 3/3] Bluetooth: btqcomsmd: retieve BD address from DT
+To: Loic Poulain <loic.poulain@linaro.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>,
+	"open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+	linux-arm-msm <linux-arm-msm@vger.kernel.org>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, Bjorn Andersson <bjorn.andersson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When another adapter is found, the default adapter would be changed,
-which is not expected. Default adapter can only be changed by select
-command.
----
- client/main.c | 17 ++++++++++++-----
- 1 file changed, 12 insertions(+), 5 deletions(-)
+On Tue, Sep 5, 2017 at 1:58 PM, Loic Poulain <loic.poulain@linaro.org> wrote:
+> Retrieve BD address from the DT local-bd-address property.
+> This address must be unique and is usually added in the DT
+> by the bootloader which has access to the provisioned data.
+>
+> Signed-off-by: Loic Poulain <loic.poulain@linaro.org>
+> ---
+>  v2: Set device as unconfigured if default address detected
+>      Add warning if BD addr retrieved from DT
+>  v3: if no addr retrieved from DT, unconditionally set
+>      the invalid BD addr flag.
+>      swap and set bdaddr in the platform probe
+>  v4: Add dt-bindings documentation
+>      split patch in two parts (setup, dt prop)
+>      use local-bd-address name instead of local-mac-address
+>  v5: remove 2/3 merged in bluetooth-next tree
+>      Add bluetooth.txt for common BT bindings
+>      expect local-bd-address in little-endian format
+>
+>  drivers/bluetooth/btqcomsmd.c | 12 ++++++++++++
+>  1 file changed, 12 insertions(+)
+>
+> diff --git a/drivers/bluetooth/btqcomsmd.c b/drivers/bluetooth/btqcomsmd.c
+> index bd810d0..c6d3fd9 100644
+> --- a/drivers/bluetooth/btqcomsmd.c
+> +++ b/drivers/bluetooth/btqcomsmd.c
+> @@ -15,6 +15,8 @@
+>  #include <linux/module.h>
+>  #include <linux/slab.h>
+>  #include <linux/rpmsg.h>
+> +#include <linux/of.h>
+> +
+>  #include <linux/soc/qcom/wcnss_ctrl.h>
+>  #include <linux/platform_device.h>
+>
+> @@ -135,6 +137,7 @@ static int btqcomsmd_setup(struct hci_dev *hdev)
+>
+>  static int btqcomsmd_probe(struct platform_device *pdev)
+>  {
+> +       const bdaddr_t *bdaddr;
+>         struct btqcomsmd *btq;
+>         struct hci_dev *hdev;
+>         void *wcnss;
+> @@ -156,6 +159,15 @@ static int btqcomsmd_probe(struct platform_device *pdev)
+>         if (IS_ERR(btq->cmd_channel))
+>                 return PTR_ERR(btq->cmd_channel);
+>
+> +       /* The local-bd-address DT property is usually injected by the
+> +        * bootloader which has access to the allocated BD address.
+> +        */
+> +       bdaddr = of_get_property(pdev->dev.of_node, "local-bd-address", &ret);
+> +       if (bdaddr && ret == sizeof(bdaddr_t)) {
+> +               BT_INFO("BD address %pMR retrieved from device-tree", bdaddr);
+> +               bacpy(&btq->bdaddr, bdaddr);
+> +       }
 
-diff --git a/client/main.c b/client/main.c
-index 75696c2c1..e76b6fc25 100644
---- a/client/main.c
-+++ b/client/main.c
-@@ -67,6 +67,7 @@ struct adapter {
- };
- 
- static struct adapter *default_ctrl;
-+static struct adapter *cache_ctrl;
- static GDBusProxy *default_dev;
- static GDBusProxy *default_attr;
- static GList *ctrl_list;
-@@ -151,7 +152,7 @@ static void disconnect_handler(DBusConnection *connection, void *user_data)
- 
- 	g_list_free_full(ctrl_list, proxy_leak);
- 	ctrl_list = NULL;
--
-+	cache_ctrl = NULL;
- 	default_ctrl = NULL;
- }
- 
-@@ -521,15 +522,21 @@ static void device_added(GDBusProxy *proxy)
- 
- static void adapter_added(GDBusProxy *proxy)
- {
--	default_ctrl = g_malloc0(sizeof(struct adapter));
--	default_ctrl->proxy = proxy;
--	ctrl_list = g_list_append(ctrl_list, default_ctrl);
-+	struct adapter *adapter = g_malloc0(sizeof(struct adapter));
-+
-+	adapter->proxy = proxy;
-+	cache_ctrl = adapter;
-+	ctrl_list = g_list_append(ctrl_list, adapter);
-+
-+	if (!default_ctrl)
-+		default_ctrl = adapter;
-+
- 	print_adapter(proxy, COLORED_NEW);
- }
- 
- static void ad_manager_added(GDBusProxy *proxy)
- {
--	default_ctrl->ad_proxy = proxy;
-+	cache_ctrl->ad_proxy = proxy;
- }
- 
- static void proxy_added(GDBusProxy *proxy, void *user_data)
--- 
-2.14.1.581.gf28d330327-goog
+Can we put all this into a helper function before we get more
+instances. And use the u8 array property function. We're trying to
+make of_get_property an internal function.
 
+Rob
