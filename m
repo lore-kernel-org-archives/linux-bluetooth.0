@@ -1,46 +1,33 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Bastien Nocera <hadess@hadess.net>
-To: linux-bluetooth@vger.kernel.org
-Cc: Bastien Nocera <hadess@hadess.net>
-Subject: [PATCH] tools/csr_usb: Fix compilation failure
-Date: Tue,  5 Sep 2017 10:35:34 +0200
-Message-Id: <20170905083534.19184-1-hadess@hadess.net>
+Subject: [PATCH BlueZ 2/2] client: Fix indent
+From: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
+To: <linux-bluetooth@vger.kernel.org>
+References: <611fb226-d99a-166d-a211-521872866d5d@jp.fujitsu.com>
+Message-ID: <f678253f-e009-3402-2c79-4f7e7c3d4439@jp.fujitsu.com>
+Date: Tue, 5 Sep 2017 13:54:00 +0900
+MIME-Version: 1.0
+In-Reply-To: <611fb226-d99a-166d-a211-521872866d5d@jp.fujitsu.com>
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-GCC's "format-nonliteral" security check is enabled as an error in
-recent versions of Fedora. Given the reduced scope of use, mark the
-error as ignorable through pragma.
-
-tools/csr_usb.c: In function 'read_value':
-tools/csr_usb.c:82:2: error: format not a string literal, argument types not checked [-Werror=format-nonliteral]
-  n = fscanf(file, format, &value);
-  ^
 ---
- tools/csr_usb.c | 3 +++
- 1 file changed, 3 insertions(+)
+ client/main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/tools/csr_usb.c b/tools/csr_usb.c
-index a1d7324f7..33e9968a2 100644
---- a/tools/csr_usb.c
-+++ b/tools/csr_usb.c
-@@ -67,6 +67,8 @@ struct usbfs_bulktransfer {
- #define USBFS_IOCTL_CLAIMINTF	_IOR('U', 15, unsigned int)
- #define USBFS_IOCTL_RELEASEINTF	_IOR('U', 16, unsigned int)
+diff --git a/client/main.c b/client/main.c
+index d487eaf..68e7635 100644
+--- a/client/main.c
++++ b/client/main.c
+@@ -2192,7 +2192,7 @@ static char *generic_generator(const char *text, int state,
  
-+#pragma GCC diagnostic push
-+#pragma GCC diagnostic ignored "-Wformat-nonliteral"
- static int read_value(const char *name, const char *attr, const char *format)
- {
- 	char path[PATH_MAX];
-@@ -88,6 +90,7 @@ static int read_value(const char *name, const char *attr, const char *format)
- 	fclose(file);
- 	return value;
+ 		if (!strncasecmp(str, text, len))
+ 			return strdup(str);
+-        }
++	}
+ 
+ 	return NULL;
  }
-+#pragma GCC diagnostic pop
- 
- static char *check_device(const char *name)
- {
 -- 
-2.14.1
+2.7.4
 
