@@ -1,52 +1,69 @@
-Return-Path: <loic.poulain@linaro.org>
-From: Loic Poulain <loic.poulain@linaro.org>
-To: marcel@holtmann.org,
-	johan.hedberg@gmail.com,
-	robh+dt@kernel.org
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	bjorn.andersson@linaro.org,
-	lpoulain <loic.poulain@gmail.com>
-Subject: [PATCH v5 1/3] DT: net: document Bluetooth bindings in one place
-Date: Tue,  5 Sep 2017 20:58:41 +0200
-Message-Id: <1504637923-21652-1-git-send-email-loic.poulain@linaro.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+Subject: Re: Bluetooth LE battery reporting?
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <CAAEJBh+bjNrjSvTD-F1LBTKnO36kvDZmavJaRR8ZWhR6pTwz9g@mail.gmail.com>
+Date: Tue, 5 Sep 2017 19:44:16 +0200
+Cc: Bastien Nocera <hadess@hadess.net>,
+        Bluez mailing list <linux-bluetooth@vger.kernel.org>
+Message-Id: <9D01587F-3821-46CF-B8CE-2311BE8E8592@holtmann.org>
+References: <1504627402.6911.48.camel@hadess.net>
+ <CAAEJBh+bjNrjSvTD-F1LBTKnO36kvDZmavJaRR8ZWhR6pTwz9g@mail.gmail.com>
+To: Szymon Janc <szymon.janc@codecoup.pl>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: lpoulain <loic.poulain@gmail.com>
+Hi Szymon,
 
-In the same way as Ethernet, gather the Bluetooth related bindings in
-one file. Introduce the bluetooth-bd-address property which can be used
-to store the assigned BD address.
+>> I'm back looking into Bluetooth LE battery reporting, and I'm a bit
+>> stumped as to what would need to be done to add support for it.
+>> 
+>> First, I've already found a few old implementations:
+>> 
+>> - I cleaned this up a couple of years ago, to try it out, and it spit
+>> debug information as expected. Doesn't compile anymore:
+>> https://gfiber.googlesource.com/vendor/opensource/bluez/+/42bc327d464b1f7c2c73b3fecb2e9a8d3dc01035/profiles/battery/battery.c
+>> 
+>> - chen.ganir@ti.com 's "Add Battery Service GATT Client" patchset that
+>> was posted to the list in 2012 (!)
+>> 
+>> - and finally, there's bluez' very own "bas", the last commit touching it says:
+>> commit b6cb2d3ec320bdfdf1cdcdf750e767d214170efd
+>> Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>> Date:   Wed Nov 11 13:08:52 2015 +0200
+>> 
+>>    bas: Move code from android to profiles
+>> 
+>>    This is a place holder until the code is ported to use shared API so it
+>>    can be shared by android and D-Bus daemon.
+>> 
+>> That last one is compiled, but doesn't seem to be hooked up (?). I
+>> tested this with a Microsoft Arc Touch Mouse SE (the same mouse I
+>> tested that first patch with).
+>> 
+>> Is this all hooked up and I'd just need to export the battery
+>> information through D-Bus?
+>> 
+>> Or does it need fixing, in which case, which plugin could I use as an
+>> example of what porting to that elusive "shared API" should look like?
+>> 
+>> Cheers
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> 
+> I think this should be done as "virtual" battery and reported to
+> system via standard means (upower?).
+> 
+> I was wondering it would be done in similar way uhid is designed (other option
+> would be bluez registering battery via D-Bus API in upower if such API
+> exists...)
 
-Signed-off-by: lpoulain <loic.poulain@gmail.com>
----
- v2: Set device as unconfigured if default address detected
-     Add warning if BD addr retrieved from DT
- v3: if no addr retrieved from DT, unconditionally set
-     the invalid BD addr flag.
-     swap and set bdaddr in the platform probe
- v4: Add dt-bindings documentation
-     split patch in two parts (setup, dt prop)
-     use local-bd-address name instead of local-mac-address
- v5: remove 2/3 merged in bluetooth-next tree
-     Add bluetooth.txt for common BT bindings
-     expect local-bd-address in little-endian format
+for LE HID devices we could just convert their battery service into HID battery events. For non-HID devices, we could create a HID device via uhid anyway and just expose only battery information.
 
- Documentation/devicetree/bindings/net/bluetooth.txt | 5 +++++
- 1 file changed, 5 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/net/bluetooth.txt
+Regards
 
-diff --git a/Documentation/devicetree/bindings/net/bluetooth.txt b/Documentation/devicetree/bindings/net/bluetooth.txt
-new file mode 100644
-index 0000000..94797df
---- /dev/null
-+++ b/Documentation/devicetree/bindings/net/bluetooth.txt
-@@ -0,0 +1,5 @@
-+The following properties are common to the Bluetooth controllers:
-+
-+- local-bd-address: array of 6 bytes, specifies the BD address that was
-+  uniquely assigned to the Bluetooth device, formatted with least significant
-+  byte first (little-endian).
--- 
-1.9.1
+Marcel
+
