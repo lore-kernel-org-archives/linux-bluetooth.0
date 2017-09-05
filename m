@@ -1,132 +1,76 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain; charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Subject: Re: [PATCH] tools/csr_usb: Fix compilation failure
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1504612685.6911.12.camel@hadess.net>
-Date: Tue, 5 Sep 2017 15:05:15 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <852B29E6-9F18-40A5-B870-E408268AC78D@holtmann.org>
-References: <20170905083534.19184-1-hadess@hadess.net>
- <FD40CF28-55D4-4091-BAD7-97168812A6B8@holtmann.org>
- <1504612685.6911.12.camel@hadess.net>
-To: Bastien Nocera <hadess@hadess.net>
+From: Anitha Chandrasekar <anitha.chandrasekar@sasken.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: RE: Query Regaring usage of RegisterApplication Method using Gio Api
+Date: Tue, 5 Sep 2017 12:18:48 +0000
+Message-ID: <7B53A3173656CB4190908401FE75F4F85CC14929@exgmbxfz01.sasken.com>
+References: <7B53A3173656CB4190908401FE75F4F85CC0D1CE@exgmbxfz01.sasken.com>,<CABBYNZJncfY1tPqVTXbGG0eUtj9C56hh8YbiBLH3T_pyM=zziw@mail.gmail.com>,<7B53A3173656CB4190908401FE75F4F85CC14908@exgmbxfz01.sasken.com>
+In-Reply-To: <7B53A3173656CB4190908401FE75F4F85CC14908@exgmbxfz01.sasken.com>
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bastien,
+Hi Luiz,
 
->>> GCC's "format-nonliteral" security check is enabled as an error in
->>> recent versions of Fedora. Given the reduced scope of use, mark the
->>> error as ignorable through pragma.
->>> 
->>> tools/csr_usb.c: In function 'read_value':
->>> tools/csr_usb.c:82:2: error: format not a string literal, argument
->>> types not checked [-Werror=format-nonliteral]
->>> n = fscanf(file, format, &value);
->>> ^
->>> ---
->>> tools/csr_usb.c | 3 +++
->>> 1 file changed, 3 insertions(+)
->>> 
->>> diff --git a/tools/csr_usb.c b/tools/csr_usb.c
->>> index a1d7324f7..33e9968a2 100644
->>> --- a/tools/csr_usb.c
->>> +++ b/tools/csr_usb.c
->>> @@ -67,6 +67,8 @@ struct usbfs_bulktransfer {
->>> #define USBFS_IOCTL_CLAIMINTF	_IOR('U', 15, unsigned int)
->>> #define USBFS_IOCTL_RELEASEINTF	_IOR('U', 16, unsigned int)
->>> 
->>> +#pragma GCC diagnostic push
->>> +#pragma GCC diagnostic ignored "-Wformat-nonliteral"
->>> static int read_value(const char *name, const char *attr, const
->>> char *format)
->>> {
->>> 	char path[PATH_MAX];
->>> @@ -88,6 +90,7 @@ static int read_value(const char *name, const
->>> char *attr, const char *format)
->>> 	fclose(file);
->>> 	return value;
->>> }
->>> +#pragma GCC diagnostic pop
->> 
->> can’t we just use __attribute__((format)) somehow to declare this a
->> format specify?
-> 
-> Sorry, I'm not sure I understand.
-> 
-> gcc already knows that this is a format, but because the format changes
-> depending on the caller, it cannot actually assert whether the format
-> is safe for the arguments passed.
-> 
-> So this would work:
-> vendor = read_value(name, "idVendor", "%04x");
-> 
-> But the compiler can't see that:
-> vendor = read_value(name, "idVendor", "%s");
-> would fail at compile time.
+Thanks for the reply,
 
-since these values are all marked as const, this compiler error is than pretty purely implemented. It could actually traverse this since they are const format strings.
+I could not continue using GIO apis for RegisterApplication, But we proceeded using Gdbus apis exposed by Bluez,
+We see that the RegisterApplication is succeeded, but we are unable to auto connect.
 
-> Would you prefer something like this (untested, but should work):
-> diff --git a/tools/csr_usb.c b/tools/csr_usb.c
-> index a1d7324f7..c5a39899a 100644
-> --- a/tools/csr_usb.c
-> +++ b/tools/csr_usb.c
-> @@ -67,7 +67,7 @@ struct usbfs_bulktransfer {
-> #define USBFS_IOCTL_CLAIMINTF  _IOR('U', 15, unsigned int)
-> #define USBFS_IOCTL_RELEASEINTF        _IOR('U', 16, unsigned int)
-> 
-> -static int read_value(const char *name, const char *attr, const char *format)
-> +static int read_value(const char *name, const char *attr, bool hex_number)
-> {
->        char path[PATH_MAX];
->        FILE *file;
-> @@ -79,7 +79,7 @@ static int read_value(const char *name, const char *attr, const char *format)
->        if (!file)
->                return -1;
-> 
-> -       n = fscanf(file, format, &value);
-> +       n = fscanf(file, hex_number ? "%d" : "%04x", &value);
->        if (n != 1) {
->                fclose(file);
->                return -1;
-> @@ -94,21 +94,21 @@ static char *check_device(const char *name)
->        char path[PATH_MAX];
->        int busnum, devnum, vendor, product;
-> 
-> -       busnum = read_value(name, "busnum", "%d");
-> +       busnum = read_value(name, "busnum", false);
->        if (busnum < 0)
->                return NULL;
-> 
-> -       devnum = read_value(name, "devnum", "%d");
-> +       devnum = read_value(name, "devnum", false);
->        if (devnum < 0)
->                return NULL;
-> 
->        snprintf(path, sizeof(path), "/dev/bus/usb/%03u/%03u", busnum, devnum);
-> 
-> -       vendor = read_value(name, "idVendor", "%04x");
-> +       vendor = read_value(name, "idVendor", true);
->        if (vendor < 0)
->                return NULL;
-> 
-> -       product = read_value(name, "idProduct", "%04x");
-> +       product = read_value(name, "idProduct", true);
->        if (product < 0)
->                return NULL;
+Attached logs "bluetoothd_logs.txt",
 
-So something with your mailer went bogus here. It should be all proper tabs.
+bluetoothd[1520]: ../bluez-5.43/src/device.c:device_svc_resolved() /org/bluez/hci0/dev_00_1C_05_FF_CA_D9 err 0
+bluetoothd[1520]: ../bluez-5.43/src/gatt-database.c:manager_register_app() Registering application: :1.14:/
+bluetoothd[1520]: ../bluez-5.43/src/gatt-database.c:proxy_added_cb() Object received: /org/bluez/app, iface: org.bluez.GattProfile1
+bluetoothd[1520]: ../bluez-5.43/src/gatt-database.c:profile_add() Added ":1.14/org/bluez/app/00001800-0000-1000-8000-00805f9b34fb"
+bluetoothd[1520]: ../bluez-5.43/src/gatt-database.c:profile_device_probe() :1.14/org/bluez/app/00001800-0000-1000-8000-00805f9b34fb probed
+bluetoothd[1520]: ../bluez-5.43/src/service.c:change_state() 0x5577a0dd0cc0: device 00:1C:05:FF:CA:D9 profile :1.14/org/bluez/app/00001800-0000-1000-8000-00805f9b34fb state changed: unavailable -> disconnected (0)
+bluetoothd[1520]: ../bluez-5.43/src/gatt-database.c:client_ready_cb() GATT application registered: :1.14:/
 
-Anyhow, I am fine doing that, but I disliked the true or false parameters if they are not obvious. So maybe adding some like this would be good.
+Any information will be of great help. Awaiting for the reply.
 
-#define read_hex_value(name, file) read_value((name), (file), true)
-#define read_num_value(name, file) read_value((name), (file), false)
+Regards,
+Anitha
+________________________________________
+From: Luiz Augusto von Dentz [luiz.dentz@gmail.com]
+Sent: Thursday, August 10, 2017 6:45 PM
+To: Anitha Chandrasekar
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: Query Regaring usage of RegisterApplication Method using Gio Api
 
-Then the calling code becomes easy to understand again you don’t have to guess what the boolean value is for.
+Hi Anitha,
 
-Regards
+On Tue, Aug 8, 2017 at 3:01 PM, Anitha Chandrasekar
+<anitha.chandrasekar@sasken.com> wrote:
+> Hi ,
+>
+> We need to call RegisterApplication function from our application for auto-connect of devices. We are registering the GattProfile1 object and calling RegisterApplication method using Gio Api.
+>
+> But we are getting a "No object Found " error every time. Could you please let us know if there is any example code for the same or if you could suggest the API usage from d-feet tool.
+> d-feet ->
+> I dont see GattProfile1 being listed in d-feet and there is only RegisterApplication api, can I know what input params to be given and usage of it.Thanks in advance.
 
-Marcel
+You need to implement GattProfile1 in the side of the application and
+that should contain ObjectManager object since that is how bluetoothd
+is able to list the available objects, you should be able to see the
+available interfaces your application have all interfaces in d-feet.
 
+> Regards,
+> Anitha
+>
+> ________________________________
+>
+> SASKEN BUSINESS DISCLAIMER: This message may contain confidential, proprietary or legally privileged information. In case you are not the original intended Recipient of the message, you must not, directly or indirectly, use, disclose, distribute, print, or copy any part of this message and you are requested to delete it and inform the sender. Any views expressed in this message are those of the individual sender unless otherwise stated. Nothing contained in this message shall be construed as an offer or acceptance of any offer by Sasken Technologies Limited ( formerly known as "Sasken Communication Technologies Limited" ) unless sent with that express intent and with due authority of Sasken. Sasken has taken enough precautions to prevent the spread of viruses. However the company accepts no liability for any damage caused by any virus transmitted by this email.
+> Read Disclaimer at http://www.sasken.com/mail-disclaimer/
+>
+> ________________________________
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
+--
+Luiz Augusto von Dentz
