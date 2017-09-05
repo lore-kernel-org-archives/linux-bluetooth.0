@@ -1,79 +1,115 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Subject: Re: [PATCH v4 3/3] Bluetooth: btqcomsmd: retieve BD address from DT
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1504607164-12645-3-git-send-email-loic.poulain@linaro.org>
-Date: Tue, 5 Sep 2017 14:13:20 +0200
-Cc: Johan Hedberg <johan.hedberg@gmail.com>, robh+dt@kernel.org,
-        linux-bluetooth@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-        devicetree@vger.kernel.org, bjorn.andersson@linaro.org
-Message-Id: <2C437D3D-FD64-456D-91D3-322220740A90@holtmann.org>
-References: <1504607164-12645-1-git-send-email-loic.poulain@linaro.org>
- <1504607164-12645-3-git-send-email-loic.poulain@linaro.org>
-To: Loic Poulain <loic.poulain@linaro.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <hadess@hadess.net>
+Message-ID: <1504612685.6911.12.camel@hadess.net>
+Subject: Re: [PATCH] tools/csr_usb: Fix compilation failure
+From: Bastien Nocera <hadess@hadess.net>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Tue, 05 Sep 2017 13:58:05 +0200
+In-Reply-To: <FD40CF28-55D4-4091-BAD7-97168812A6B8@holtmann.org>
+References: <20170905083534.19184-1-hadess@hadess.net>
+	 <FD40CF28-55D4-4091-BAD7-97168812A6B8@holtmann.org>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Loic,
-
-> Retrieve BD address from the DT local-bd-address property.
-> This address must be unique and is usually added in the DT
-> by the bootloader which has access to the provisioned data.
+On Tue, 2017-09-05 at 13:51 +0200, Marcel Holtmann wrote:
+> Hi Bastien,
 > 
-> Signed-off-by: Loic Poulain <loic.poulain@linaro.org>
-> ---
-> v2: Set device as unconfigured if default address detected
->     Add warning if BD addr retrieved from DT
-> v3: if no addr retrieved from DT, unconditionally set
->     the invalid BD addr flag.
->     swap and set bdaddr in the platform probe
-> v4: Add dt-bindings documentation
->     split patch in two parts (setup, dt prop)
->     use local-bd-address name instead of local-mac-address
+> > GCC's "format-nonliteral" security check is enabled as an error in
+> > recent versions of Fedora. Given the reduced scope of use, mark the
+> > error as ignorable through pragma.
+> > 
+> > tools/csr_usb.c: In function 'read_value':
+> > tools/csr_usb.c:82:2: error: format not a string literal, argument
+> > types not checked [-Werror=format-nonliteral]
+> >  n = fscanf(file, format, &value);
+> >  ^
+> > ---
+> > tools/csr_usb.c | 3 +++
+> > 1 file changed, 3 insertions(+)
+> > 
+> > diff --git a/tools/csr_usb.c b/tools/csr_usb.c
+> > index a1d7324f7..33e9968a2 100644
+> > --- a/tools/csr_usb.c
+> > +++ b/tools/csr_usb.c
+> > @@ -67,6 +67,8 @@ struct usbfs_bulktransfer {
+> > #define USBFS_IOCTL_CLAIMINTF	_IOR('U', 15, unsigned int)
+> > #define USBFS_IOCTL_RELEASEINTF	_IOR('U', 16, unsigned int)
+> > 
+> > +#pragma GCC diagnostic push
+> > +#pragma GCC diagnostic ignored "-Wformat-nonliteral"
+> > static int read_value(const char *name, const char *attr, const
+> > char *format)
+> > {
+> > 	char path[PATH_MAX];
+> > @@ -88,6 +90,7 @@ static int read_value(const char *name, const
+> > char *attr, const char *format)
+> > 	fclose(file);
+> > 	return value;
+> > }
+> > +#pragma GCC diagnostic pop
 > 
-> drivers/bluetooth/btqcomsmd.c | 15 +++++++++++++++
-> 1 file changed, 15 insertions(+)
-> 
-> diff --git a/drivers/bluetooth/btqcomsmd.c b/drivers/bluetooth/btqcomsmd.c
-> index c70fae75c4ad..08a83cb30af6 100644
-> --- a/drivers/bluetooth/btqcomsmd.c
-> +++ b/drivers/bluetooth/btqcomsmd.c
-> @@ -15,6 +15,8 @@
-> #include <linux/module.h>
-> #include <linux/slab.h>
-> #include <linux/rpmsg.h>
-> +#include <linux/of.h>
-> +
-> #include <linux/soc/qcom/wcnss_ctrl.h>
-> #include <linux/platform_device.h>
-> 
-> @@ -126,6 +128,7 @@ static int btqcomsmd_setup(struct hci_dev *hdev)
-> 
-> static int btqcomsmd_probe(struct platform_device *pdev)
-> {
-> +	const bdaddr_t *local_bd_addr;
-> 	struct btqcomsmd *btq;
-> 	struct hci_dev *hdev;
-> 	void *wcnss;
-> @@ -147,6 +150,18 @@ static int btqcomsmd_probe(struct platform_device *pdev)
-> 	if (IS_ERR(btq->cmd_channel))
-> 		return PTR_ERR(btq->cmd_channel);
-> 
-> +	/* The local-bd-address DT property is usually injected by the
-> +	 * bootloader which has access to the allocated BD address.
-> +	 */
-> +	local_bd_addr = of_get_property(pdev->dev.of_node, "local-mac-address",
-> +					&ret);
-> +	if (local_bd_addr && ret == sizeof(bdaddr_t)) {
-> +		/* local-bd-address stored with most significant byte first */
-> +		baswap(&btq->bdaddr, local_bd_addr);
+> can’t we just use __attribute__((format)) somehow to declare this a
+> format specify?
 
-actually my preference would be really that the address is coming from DT in the right order. We are defining what local-bd-address means. So lets do that in Bluetooth specified order and not confuse people even more.
+Sorry, I'm not sure I understand.
 
-And btw. I am fine if you just use const bdaddr_t *bdaddr here as temporary variable name.
+gcc already knows that this is a format, but because the format changes
+depending on the caller, it cannot actually assert whether the format
+is safe for the arguments passed.
 
-Regards
+So this would work:
+vendor = read_value(name, "idVendor", "%04x");
 
-Marcel
+But the compiler can't see that:
+vendor = read_value(name, "idVendor", "%s");
+would fail at compile time.
 
+Would you prefer something like this (untested, but should work):
+diff --git a/tools/csr_usb.c b/tools/csr_usb.c
+index a1d7324f7..c5a39899a 100644
+--- a/tools/csr_usb.c
++++ b/tools/csr_usb.c
+@@ -67,7 +67,7 @@ struct usbfs_bulktransfer {
+ #define USBFS_IOCTL_CLAIMINTF  _IOR('U', 15, unsigned int)
+ #define USBFS_IOCTL_RELEASEINTF        _IOR('U', 16, unsigned int)
+ 
+-static int read_value(const char *name, const char *attr, const char *format)
++static int read_value(const char *name, const char *attr, bool hex_number)
+ {
+        char path[PATH_MAX];
+        FILE *file;
+@@ -79,7 +79,7 @@ static int read_value(const char *name, const char *attr, const char *format)
+        if (!file)
+                return -1;
+ 
+-       n = fscanf(file, format, &value);
++       n = fscanf(file, hex_number ? "%d" : "%04x", &value);
+        if (n != 1) {
+                fclose(file);
+                return -1;
+@@ -94,21 +94,21 @@ static char *check_device(const char *name)
+        char path[PATH_MAX];
+        int busnum, devnum, vendor, product;
+ 
+-       busnum = read_value(name, "busnum", "%d");
++       busnum = read_value(name, "busnum", false);
+        if (busnum < 0)
+                return NULL;
+ 
+-       devnum = read_value(name, "devnum", "%d");
++       devnum = read_value(name, "devnum", false);
+        if (devnum < 0)
+                return NULL;
+ 
+        snprintf(path, sizeof(path), "/dev/bus/usb/%03u/%03u", busnum, devnum);
+ 
+-       vendor = read_value(name, "idVendor", "%04x");
++       vendor = read_value(name, "idVendor", true);
+        if (vendor < 0)
+                return NULL;
+ 
+-       product = read_value(name, "idProduct", "%04x");
++       product = read_value(name, "idProduct", true);
+        if (product < 0)
+                return NULL;
