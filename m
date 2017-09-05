@@ -1,32 +1,46 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Message-ID: <1504601609.5928.3.camel@hadess.net>
-Subject: Re: [PATCH] tools/csr_usb: Fix compilation failure
 From: Bastien Nocera <hadess@hadess.net>
 To: linux-bluetooth@vger.kernel.org
-Date: Tue, 05 Sep 2017 10:53:29 +0200
-In-Reply-To: <20170905083534.19184-1-hadess@hadess.net>
-References: <20170905083534.19184-1-hadess@hadess.net>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Cc: Bastien Nocera <hadess@hadess.net>
+Subject: [PATCH] tools/csr_usb: Fix compilation failure
+Date: Tue,  5 Sep 2017 10:35:34 +0200
+Message-Id: <20170905083534.19184-1-hadess@hadess.net>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, 2017-09-05 at 10:35 +0200, Bastien Nocera wrote:
-> GCC's "format-nonliteral" security check is enabled as an error in
-> recent versions of Fedora. Given the reduced scope of use, mark the
-> error as ignorable through pragma.
-> 
-> tools/csr_usb.c: In function 'read_value':
-> tools/csr_usb.c:82:2: error: format not a string literal, argument
-> types not checked [-Werror=format-nonliteral]
->   n = fscanf(file, format, &value);
->   ^
+GCC's "format-nonliteral" security check is enabled as an error in
+recent versions of Fedora. Given the reduced scope of use, mark the
+error as ignorable through pragma.
 
-I also ran into this, which looks suspicious:
-obexd/plugins/bluetooth.c: In function 'register_profile':
-obexd/plugins/bluetooth.c:310:7: error: format not a string literal, argument types not checked [-Werror=format-nonliteral]
-       profile->driver->port);
-       ^~~~~~~
-obexd/plugins/bluetooth.c:314:7: error: format not a string literal, argument types not checked [-Werror=format-nonliteral]
-       profile->driver->name);
-       ^~~~~~~
+tools/csr_usb.c: In function 'read_value':
+tools/csr_usb.c:82:2: error: format not a string literal, argument types not checked [-Werror=format-nonliteral]
+  n = fscanf(file, format, &value);
+  ^
+---
+ tools/csr_usb.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/tools/csr_usb.c b/tools/csr_usb.c
+index a1d7324f7..33e9968a2 100644
+--- a/tools/csr_usb.c
++++ b/tools/csr_usb.c
+@@ -67,6 +67,8 @@ struct usbfs_bulktransfer {
+ #define USBFS_IOCTL_CLAIMINTF	_IOR('U', 15, unsigned int)
+ #define USBFS_IOCTL_RELEASEINTF	_IOR('U', 16, unsigned int)
+ 
++#pragma GCC diagnostic push
++#pragma GCC diagnostic ignored "-Wformat-nonliteral"
+ static int read_value(const char *name, const char *attr, const char *format)
+ {
+ 	char path[PATH_MAX];
+@@ -88,6 +90,7 @@ static int read_value(const char *name, const char *attr, const char *format)
+ 	fclose(file);
+ 	return value;
+ }
++#pragma GCC diagnostic pop
+ 
+ static char *check_device(const char *name)
+ {
+-- 
+2.14.1
+
