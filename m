@@ -8,16 +8,18 @@ Cc: linux-bluetooth@vger.kernel.org,
 	devicetree@vger.kernel.org,
 	bjorn.andersson@linaro.org,
 	Loic Poulain <loic.poulain@linaro.org>
-Subject: [PATCH v6 3/3] Bluetooth: btqcomsmd: retrieve BD address from DT property
-Date: Wed,  6 Sep 2017 14:11:38 +0200
-Message-Id: <1504699898-28011-3-git-send-email-loic.poulain@linaro.org>
+Subject: [PATCH v6 2/3] dt-bindings: soc: qcom: Add local-bd-address property to WCNSS-BT
+Date: Wed,  6 Sep 2017 14:11:37 +0200
+Message-Id: <1504699898-28011-2-git-send-email-loic.poulain@linaro.org>
 In-Reply-To: <1504699898-28011-1-git-send-email-loic.poulain@linaro.org>
 References: <1504699898-28011-1-git-send-email-loic.poulain@linaro.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Retrieve BD address from the local-bd-address property.
-This address must be unique and is usually added in the DT
-by the bootloader which has access to the provisioned data.
+Add optional local-bd-address property which is a 6-byte array
+storing the assigned BD address. Since having a unique BD address
+is critical, a per-device property value should be allocated.
+This property is usually added by the boot loader which has access
+to the provisioned data.
 
 Signed-off-by: Loic Poulain <loic.poulain@linaro.org>
 ---
@@ -34,37 +36,34 @@ Signed-off-by: Loic Poulain <loic.poulain@linaro.org>
      expect local-bd-address in little-endian format
  v6: use of_property_read_u8_array instead of of_get_property
 
- drivers/bluetooth/btqcomsmd.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+ Documentation/devicetree/bindings/soc/qcom/qcom,wcnss.txt | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/drivers/bluetooth/btqcomsmd.c b/drivers/bluetooth/btqcomsmd.c
-index bd810d0..b5716f0 100644
---- a/drivers/bluetooth/btqcomsmd.c
-+++ b/drivers/bluetooth/btqcomsmd.c
-@@ -15,6 +15,8 @@
- #include <linux/module.h>
- #include <linux/slab.h>
- #include <linux/rpmsg.h>
-+#include <linux/of.h>
-+
- #include <linux/soc/qcom/wcnss_ctrl.h>
- #include <linux/platform_device.h>
+diff --git a/Documentation/devicetree/bindings/soc/qcom/qcom,wcnss.txt b/Documentation/devicetree/bindings/soc/qcom/qcom,wcnss.txt
+index 4ea39e9..042a2e4 100644
+--- a/Documentation/devicetree/bindings/soc/qcom/qcom,wcnss.txt
++++ b/Documentation/devicetree/bindings/soc/qcom/qcom,wcnss.txt
+@@ -37,6 +37,11 @@ The following properties are defined to the bluetooth node:
+ 	Definition: must be:
+ 		    "qcom,wcnss-bt"
  
-@@ -156,6 +158,15 @@ static int btqcomsmd_probe(struct platform_device *pdev)
- 	if (IS_ERR(btq->cmd_channel))
- 		return PTR_ERR(btq->cmd_channel);
- 
-+	/* The local-bd-address property is usually injected by the
-+	 * bootloader which has access to the allocated BD address.
-+	 */
-+	if (!of_property_read_u8_array(pdev->dev.of_node, "local-bd-address",
-+				       (u8 *)&btq->bdaddr, sizeof(bdaddr_t))) {
-+		BT_INFO("BD address %pMR retrieved from device-tree",
-+			&btq->bdaddr);
-+	}
++- local-bd-address:
++	Usage: optional
++	Value type: <u8 array>
++	Definition: see Documentation/devicetree/bindings/net/bluetooth.txt
 +
- 	hdev = hci_alloc_dev();
- 	if (!hdev)
- 		return -ENOMEM;
+ == WiFi
+ The following properties are defined to the WiFi node:
+ 
+@@ -91,6 +96,9 @@ smd {
+ 
+ 			bt {
+ 				compatible = "qcom,wcnss-bt";
++
++				/* BD address 00:11:22:33:44:55 */
++				local-bd-address = [ 55 44 33 22 11 00 ];
+ 			};
+ 
+ 			wlan {
 -- 
 1.9.1
