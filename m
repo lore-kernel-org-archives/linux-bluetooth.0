@@ -1,84 +1,81 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <luiz.dentz@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20170906052743.6821-1-yunhanw@google.com>
-References: <20170906052743.6821-1-yunhanw@google.com>
+In-Reply-To: <9D01587F-3821-46CF-B8CE-2311BE8E8592@holtmann.org>
+References: <1504627402.6911.48.camel@hadess.net> <CAAEJBh+bjNrjSvTD-F1LBTKnO36kvDZmavJaRR8ZWhR6pTwz9g@mail.gmail.com>
+ <9D01587F-3821-46CF-B8CE-2311BE8E8592@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 6 Sep 2017 11:33:20 +0300
-Message-ID: <CABBYNZLgHhTk-xKm4wUmPdc+YzYu69a2g64wEKAcSJEKNCBEjQ@mail.gmail.com>
-Subject: Re: [PATCH v2] client: Fix default_ctrl change when new adapter is found
-To: Yunhan Wang <yunhanw@google.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Wed, 6 Sep 2017 11:29:03 +0300
+Message-ID: <CABBYNZLDGJTj+jeKUuRAmm_FznUzAy--zE1YVto2t5Fb4zOQ6w@mail.gmail.com>
+Subject: Re: Bluetooth LE battery reporting?
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Szymon Janc <szymon.janc@codecoup.pl>, Bastien Nocera <hadess@hadess.net>,
+	Bluez mailing list <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Yunhan,
+Hi Marcel,
 
-On Wed, Sep 6, 2017 at 8:27 AM, Yunhan Wang <yunhanw@google.com> wrote:
-> When another adapter is found, the default adapter would be changed,
-> which is not expected. Default adapter can only be changed by select
-> command.
-> ---
->  client/main.c | 17 ++++++++++++-----
->  1 file changed, 12 insertions(+), 5 deletions(-)
+On Tue, Sep 5, 2017 at 8:44 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Szymon,
 >
-> diff --git a/client/main.c b/client/main.c
-> index 75696c2c1..e76b6fc25 100644
-> --- a/client/main.c
-> +++ b/client/main.c
-> @@ -67,6 +67,7 @@ struct adapter {
->  };
+>>> I'm back looking into Bluetooth LE battery reporting, and I'm a bit
+>>> stumped as to what would need to be done to add support for it.
+>>>
+>>> First, I've already found a few old implementations:
+>>>
+>>> - I cleaned this up a couple of years ago, to try it out, and it spit
+>>> debug information as expected. Doesn't compile anymore:
+>>> https://gfiber.googlesource.com/vendor/opensource/bluez/+/42bc327d464b1f7c2c73b3fecb2e9a8d3dc01035/profiles/battery/battery.c
+>>>
+>>> - chen.ganir@ti.com 's "Add Battery Service GATT Client" patchset that
+>>> was posted to the list in 2012 (!)
+>>>
+>>> - and finally, there's bluez' very own "bas", the last commit touching it says:
+>>> commit b6cb2d3ec320bdfdf1cdcdf750e767d214170efd
+>>> Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>>> Date:   Wed Nov 11 13:08:52 2015 +0200
+>>>
+>>>    bas: Move code from android to profiles
+>>>
+>>>    This is a place holder until the code is ported to use shared API so it
+>>>    can be shared by android and D-Bus daemon.
+>>>
+>>> That last one is compiled, but doesn't seem to be hooked up (?). I
+>>> tested this with a Microsoft Arc Touch Mouse SE (the same mouse I
+>>> tested that first patch with).
+>>>
+>>> Is this all hooked up and I'd just need to export the battery
+>>> information through D-Bus?
+>>>
+>>> Or does it need fixing, in which case, which plugin could I use as an
+>>> example of what porting to that elusive "shared API" should look like?
+>>>
+>>> Cheers
+>>> --
+>>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>>> the body of a message to majordomo@vger.kernel.org
+>>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>>
+>> I think this should be done as "virtual" battery and reported to
+>> system via standard means (upower?).
+>>
+>> I was wondering it would be done in similar way uhid is designed (other option
+>> would be bluez registering battery via D-Bus API in upower if such API
+>> exists...)
 >
->  static struct adapter *default_ctrl;
-> +static struct adapter *cache_ctrl;
->  static GDBusProxy *default_dev;
->  static GDBusProxy *default_attr;
->  static GList *ctrl_list;
-> @@ -151,7 +152,7 @@ static void disconnect_handler(DBusConnection *connection, void *user_data)
->
->         g_list_free_full(ctrl_list, proxy_leak);
->         ctrl_list = NULL;
-> -
-> +       cache_ctrl = NULL;
->         default_ctrl = NULL;
->  }
->
-> @@ -521,15 +522,21 @@ static void device_added(GDBusProxy *proxy)
->
->  static void adapter_added(GDBusProxy *proxy)
->  {
-> -       default_ctrl = g_malloc0(sizeof(struct adapter));
-> -       default_ctrl->proxy = proxy;
-> -       ctrl_list = g_list_append(ctrl_list, default_ctrl);
-> +       struct adapter *adapter = g_malloc0(sizeof(struct adapter));
-> +
-> +       adapter->proxy = proxy;
-> +       cache_ctrl = adapter;
+> for LE HID devices we could just convert their battery service into HID battery events. For non-HID devices, we could create a HID device via uhid anyway and just expose only battery information.
 
-Lets not do this, we should never assume any specific order in which
-the proxies are discovered.
+You mean we create USB reports for the battery status? While this is
+possible what if the remote is also doing this already, it would be
+quite hard to detect this but perhaps it is fine since the values
+should be consistent. For non-HID devices that sound pretty easy to do
+though perhaps having the a Battery property in the Device interface
+wouldn't be a bad idea either as that may be more convenient for D-Bus
+clients to read.
 
-> +       ctrl_list = g_list_append(ctrl_list, adapter);
-> +
-> +       if (!default_ctrl)
-> +               default_ctrl = adapter;
-> +
->         print_adapter(proxy, COLORED_NEW);
->  }
+> Regards
 >
->  static void ad_manager_added(GDBusProxy *proxy)
->  {
-> -       default_ctrl->ad_proxy = proxy;
-> +       cache_ctrl->ad_proxy = proxy;
-
-So instead of caching the last controller found this should lookup the
-adapter pointer from the ctrl_list and then update its ad_proxy.
-
->  }
->
->  static void proxy_added(GDBusProxy *proxy, void *user_data)
-> --
-> 2.14.1.581.gf28d330327-goog
+> Marcel
 >
 > --
 > To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
