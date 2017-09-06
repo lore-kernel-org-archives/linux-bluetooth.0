@@ -1,93 +1,242 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain; charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Subject: Re: [PATCH v5 3/3] Bluetooth: btqcomsmd: retieve BD address from DT
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CAL_JsqJhEaZkcBA6qnC3rVduQJ9Yesrz_h9i_WXo1bRaq1NT4Q@mail.gmail.com>
-Date: Wed, 6 Sep 2017 09:04:30 +0200
-Cc: Loic Poulain <loic.poulain@linaro.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-        linux-arm-msm <linux-arm-msm@vger.kernel.org>,
-        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>
-Message-Id: <46A7D7AE-FDBB-424D-8E85-7180FEE24A14@holtmann.org>
-References: <1504637923-21652-1-git-send-email-loic.poulain@linaro.org>
- <1504637923-21652-3-git-send-email-loic.poulain@linaro.org>
- <CAL_JsqJhEaZkcBA6qnC3rVduQJ9Yesrz_h9i_WXo1bRaq1NT4Q@mail.gmail.com>
-To: Rob Herring <robh+dt@kernel.org>
+MIME-Version: 1.0
+In-Reply-To: <F61B4D04CD1C194FA7CDCAF0858DC65C01A046EF57@SDCEXMBX2.ARRS.ARRISI.com>
+References: <20170901035615.95402-1-yunhanw@google.com> <a4eb008e-5c19-c13c-bb35-ac840f80be42@jp.fujitsu.com>
+ <CALvjcs-3W8skPEH0TyHgwX=TSzrKcMy5ptjeHPbR+kY7x8hVvw@mail.gmail.com> <F61B4D04CD1C194FA7CDCAF0858DC65C01A046EF57@SDCEXMBX2.ARRS.ARRISI.com>
+From: Yunhan Wang <yunhanw@google.com>
+Date: Tue, 5 Sep 2017 22:42:45 -0700
+Message-ID: <CALvjcs9jEHwj5CC7tQ95ub8Q4rNan_SYCFxY15JTtM1-bJRXdg@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] client: Fix default_ctrl change when new adapter is found
+To: "Zhang, Ming" <Ming.Zhang@arris.com>
+Cc: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Rob,
+Hi, Ming
 
->> Retrieve BD address from the DT local-bd-address property.
->> This address must be unique and is usually added in the DT
->> by the bootloader which has access to the provisioned data.
->> 
->> Signed-off-by: Loic Poulain <loic.poulain@linaro.org>
+Could you post your command from your peripheral and central? Usually
+when you set the attribute with read,write permission in peripheral,
+then in central, you can select-attribute the characteristic path, and
+read/write.
+
+thanks
+best wishes
+yunhan
+
+On Fri, Sep 1, 2017 at 2:06 PM, Zhang, Ming <Ming.Zhang@arris.com> wrote:
+> Hello,
+>
+> Can anybody give a help with BlueZ utility bluetoothctl?
+> - "read" and "write" commands seem not working? always report "no attribu=
+te selected", using "select-attribute" first doesn't help.
+>
+> Thanks,
+> Ming
+>
+> -----Original Message-----
+> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-owner=
+@vger.kernel.org] On Behalf Of Yunhan Wang
+> Sent: Friday, September 01, 2017 12:43 AM
+> To: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
+> Cc: linux-bluetooth@vger.kernel.org
+> Subject: Re: [PATCH BlueZ] client: Fix default_ctrl change when new adapt=
+er is found
+>
+> Hi, ERAMOTO
+>
+> cache_ctrl is not advertising manager, cache_ctrl is temporary adapter th=
+at store newest adapter info(see the below structure info). When you use se=
+lect, find_ctrl_by_address would filter your preferred adapter by your addr=
+ess, then if it is default, return, otherwise, it would update default_ctrl=
+.
+>
+> struct adapter {
+> GDBusProxy *proxy;
+> GDBusProxy *ad_proxy;
+> GList *devices;
+> };
+>
+> when new adapter is found, the proxy handler would add adapter proxy, pro=
+file proxy, advertising proxy sequentially, in this procedure, cache_ctrl w=
+ould update advertising manager.
+>
+> thanks
+> best wishes
+> yunhan
+>
+> On Fri, Sep 1, 2017 at 12:28 AM, ERAMOTO Masaya <eramoto.masaya@jp.fujits=
+u.com> wrote:
+>> Hi Yunhan,
+>>
+>> Your patch have a regression, since select command can not update the
+>> current advertising manager (cache_ctrl) when it chooses another adapter=
+.
+>>
+>> I think that it is better to use proxy->obj_path below:
+>>
 >> ---
->> v2: Set device as unconfigured if default address detected
->>     Add warning if BD addr retrieved from DT
->> v3: if no addr retrieved from DT, unconditionally set
->>     the invalid BD addr flag.
->>     swap and set bdaddr in the platform probe
->> v4: Add dt-bindings documentation
->>     split patch in two parts (setup, dt prop)
->>     use local-bd-address name instead of local-mac-address
->> v5: remove 2/3 merged in bluetooth-next tree
->>     Add bluetooth.txt for common BT bindings
->>     expect local-bd-address in little-endian format
->> 
->> drivers/bluetooth/btqcomsmd.c | 12 ++++++++++++
->> 1 file changed, 12 insertions(+)
->> 
->> diff --git a/drivers/bluetooth/btqcomsmd.c b/drivers/bluetooth/btqcomsmd.c
->> index bd810d0..c6d3fd9 100644
->> --- a/drivers/bluetooth/btqcomsmd.c
->> +++ b/drivers/bluetooth/btqcomsmd.c
->> @@ -15,6 +15,8 @@
->> #include <linux/module.h>
->> #include <linux/slab.h>
->> #include <linux/rpmsg.h>
->> +#include <linux/of.h>
+>>  client/main.c | 57
+>> +++++++++++++++++++++++++++++++++++++++------------------
+>>  1 file changed, 39 insertions(+), 18 deletions(-)
+>>
+>> diff --git a/client/main.c b/client/main.c index 825647d..c6cb995
+>> 100644
+>> --- a/client/main.c
+>> +++ b/client/main.c
+>> @@ -525,17 +525,52 @@ static void device_added(GDBusProxy *proxy)
+>>         }
+>>  }
+>>
+>> +static struct adapter *find_ctrl(GList *source, const char *path) {
+>> +       GList *list;
 >> +
->> #include <linux/soc/qcom/wcnss_ctrl.h>
->> #include <linux/platform_device.h>
->> 
->> @@ -135,6 +137,7 @@ static int btqcomsmd_setup(struct hci_dev *hdev)
->> 
->> static int btqcomsmd_probe(struct platform_device *pdev)
->> {
->> +       const bdaddr_t *bdaddr;
->>        struct btqcomsmd *btq;
->>        struct hci_dev *hdev;
->>        void *wcnss;
->> @@ -156,6 +159,15 @@ static int btqcomsmd_probe(struct platform_device *pdev)
->>        if (IS_ERR(btq->cmd_channel))
->>                return PTR_ERR(btq->cmd_channel);
->> 
->> +       /* The local-bd-address DT property is usually injected by the
->> +        * bootloader which has access to the allocated BD address.
->> +        */
->> +       bdaddr = of_get_property(pdev->dev.of_node, "local-bd-address", &ret);
->> +       if (bdaddr && ret == sizeof(bdaddr_t)) {
->> +               BT_INFO("BD address %pMR retrieved from device-tree", bdaddr);
->> +               bacpy(&btq->bdaddr, bdaddr);
+>> +       for (list =3D g_list_first(source); list; list =3D g_list_next(l=
+ist)) {
+>> +               struct adapter *adapter =3D list->data;
+>> +
+>> +               if (!strcasecmp(g_dbus_proxy_get_path(adapter->proxy), p=
+ath))
+>> +                       return adapter;
 >> +       }
-> 
-> Can we put all this into a helper function before we get more
-> instances. And use the u8 array property function. We're trying to
-> make of_get_property an internal function.
-
-using of_property_read_u8_array seems sensible since that would shorten this into
-
-	if (!of_property_read_u8_array(pdev->dev.of_node, “local-bd-address”, &btq->bdaddr, 6))
-		bt_dev_info(pdev->dev, “BD address %pMR ..”, &btq->bdaddr);
-
-Creating a Bluetooth internal helper function seems rather pointless at this stage. If more users appears, then we might need to move this into the Bluetooth core to deal with this. However as said before, I am not a big fan of IEEE address assignment via DT since that forces to have the smarts in the boot loader and the boot loader doing the right thing. There are too many boards and DT where this will not be true. In a lot of cases it would make more sense to store the BD address as part of your file system. Since we do support this in a total generic fashion, I rather push for that method and have the QCOM SMD based SoC being the exception.
-
-Regards
-
-Marcel
-
+>> +
+>> +       return NULL;
+>> +}
+>> +
+>> +static struct adapter *adapter_new(GDBusProxy *proxy) {
+>> +       struct adapter *adapter =3D g_malloc0(sizeof(struct adapter));
+>> +
+>> +       ctrl_list =3D g_list_append(ctrl_list, adapter);
+>> +
+>> +       if (!default_ctrl)
+>> +               default_ctrl =3D adapter;
+>> +
+>> +       return adapter;
+>> +}
+>> +
+>>  static void adapter_added(GDBusProxy *proxy)  {
+>> -       default_ctrl =3D g_malloc0(sizeof(struct adapter));
+>> -       default_ctrl->proxy =3D proxy;
+>> -       ctrl_list =3D g_list_append(ctrl_list, default_ctrl);
+>> +       struct adapter *ctrl;
+>> +       ctrl =3D find_ctrl(ctrl_list, g_dbus_proxy_get_path(proxy));
+>> +       if (!ctrl)
+>> +               ctrl =3D adapter_new(proxy);
+>> +
+>> +       ctrl->proxy =3D proxy;
+>> +
+>>         print_adapter(proxy, COLORED_NEW);  }
+>>
+>>  static void ad_manager_added(GDBusProxy *proxy)  {
+>> -       default_ctrl->ad_proxy =3D proxy;
+>> +       struct adapter *ctrl;
+>> +       ctrl =3D find_ctrl(ctrl_list, g_dbus_proxy_get_path(proxy));
+>> +       if (!ctrl)
+>> +               ctrl =3D adapter_new(proxy);
+>> +
+>> +       ctrl->ad_proxy =3D proxy;
+>>  }
+>>
+>>  static void proxy_added(GDBusProxy *proxy, void *user_data) @@
+>> -661,20 +696,6 @@ static void proxy_removed(GDBusProxy *proxy, void *use=
+r_data)
+>>         }
+>>  }
+>>
+>> -static struct adapter *find_ctrl(GList *source, const char *path) -{
+>> -       GList *list;
+>> -
+>> -       for (list =3D g_list_first(source); list; list =3D g_list_next(l=
+ist)) {
+>> -               struct adapter *adapter =3D list->data;
+>> -
+>> -               if (!strcasecmp(g_dbus_proxy_get_path(adapter->proxy), p=
+ath))
+>> -                       return adapter;
+>> -       }
+>> -
+>> -       return NULL;
+>> -}
+>> -
+>>  static void property_changed(GDBusProxy *proxy, const char *name,
+>>                                         DBusMessageIter *iter, void
+>> *user_data)  {
+>> --
+>> 2.7.4
+>>
+>>
+>> Regards,
+>> Eramoto
+>>
+>> On 09/01/2017 12:56 PM, Yunhan Wang wrote:
+>>> When another adapter is found, the default adapter would be changed,
+>>> which is not expected. Default adapter can only be changed by select
+>>> command.
+>>> ---
+>>>  client/main.c | 18 ++++++++++++------
+>>>  1 file changed, 12 insertions(+), 6 deletions(-)
+>>>
+>>> diff --git a/client/main.c b/client/main.c index 75696c2c1..29b3978e1
+>>> 100644
+>>> --- a/client/main.c
+>>> +++ b/client/main.c
+>>> @@ -67,6 +67,7 @@ struct adapter {
+>>>  };
+>>>
+>>>  static struct adapter *default_ctrl;
+>>> +static struct adapter *cache_ctrl;
+>>>  static GDBusProxy *default_dev;
+>>>  static GDBusProxy *default_attr;
+>>>  static GList *ctrl_list;
+>>> @@ -151,7 +152,7 @@ static void disconnect_handler(DBusConnection
+>>> *connection, void *user_data)
+>>>
+>>>       g_list_free_full(ctrl_list, proxy_leak);
+>>>       ctrl_list =3D NULL;
+>>> -
+>>> +     cache_ctrl =3D NULL;
+>>>       default_ctrl =3D NULL;
+>>>  }
+>>>
+>>> @@ -521,15 +522,21 @@ static void device_added(GDBusProxy *proxy)
+>>>
+>>>  static void adapter_added(GDBusProxy *proxy)  {
+>>> -     default_ctrl =3D g_malloc0(sizeof(struct adapter));
+>>> -     default_ctrl->proxy =3D proxy;
+>>> -     ctrl_list =3D g_list_append(ctrl_list, default_ctrl);
+>>> +     struct adapter *adapter =3D g_malloc0(sizeof(struct adapter));
+>>> +
+>>> +     adapter->proxy =3D proxy;
+>>> +     cache_ctrl =3D adapter;
+>>> +     ctrl_list =3D g_list_append(ctrl_list, adapter);
+>>> +
+>>> +     if (!default_ctrl)
+>>> +             default_ctrl =3D adapter;
+>>> +
+>>>       print_adapter(proxy, COLORED_NEW);  }
+>>>
+>>>  static void ad_manager_added(GDBusProxy *proxy)  {
+>>> -     default_ctrl->ad_proxy =3D proxy;
+>>> +     cache_ctrl->ad_proxy =3D proxy;
+>>>  }
+>>>
+>>>  static void proxy_added(GDBusProxy *proxy, void *user_data) @@
+>>> -602,7 +609,6 @@ static void adapter_removed(GDBusProxy *proxy)
+>>>                       print_adapter(proxy, COLORED_DEL);
+>>>
+>>>                       if (default_ctrl && default_ctrl->proxy =3D=3D pr=
+oxy) {
+>>> -                             default_ctrl =3D NULL;
+>>>                               set_default_device(NULL, NULL);
+>>>                       }
+>>>
+>>>
+>>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth=
+" in the body of a message to majordomo@vger.kernel.org More majordomo info=
+ at  https://na01.safelinks.protection.outlook.com/?url=3Dhttp%3A%2F%2Fvger=
+.kernel.org%2Fmajordomo-info.html&data=3D01%7C01%7CMing.Zhang%40arris.com%7=
+Cd0163e6bd854446caf6d08d4f10d0444%7Cf27929ade5544d55837ac561519c3091%7C1&sd=
+ata=3DjIiRTYhnB4kdGAnIPR2dPtm8i6ialLQFfyGfUS1BxEo%3D&reserved=3D0
