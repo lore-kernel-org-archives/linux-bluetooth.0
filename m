@@ -1,81 +1,79 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <1AE5314A-1E01-43B7-AFA3-4D82DA9ED755@sense.com>
-References: <9B25967D-16B8-4335-BE03-8FFD02D400FB@sense.com>
- <CAO1O6sdd9KxagrbboW+9gpc+OBmsJo6S6g09imAoNxRv5tyA3Q@mail.gmail.com>
- <CABBYNZLfbhXfEsb=DY-1mzQdiZVmJ9Ka3GjdGiGYgoaqKhkB+A@mail.gmail.com>
- <5234EF82-463D-4521-ABDB-C68132933BD7@sense.com> <CABBYNZJ3eJBDCv-ZiVw_0WPRKGyHJzH4hE-gGkHXo+pxhU3cZw@mail.gmail.com>
- <1AE5314A-1E01-43B7-AFA3-4D82DA9ED755@sense.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 6 Sep 2017 22:57:48 +0300
-Message-ID: <CABBYNZ+uD+8+izUrGb+_U1JdgYTCormjftVzmPs9OGRAqT=XxA@mail.gmail.com>
-Subject: Re: [PATCH v2] gatt-server: Implement NegotiatedMTU property on Device1
-To: Jonah Petri <jonah@sense.com>
-Cc: Emil Lenngren <emil.lenngren@gmail.com>,
-        Bluez mailing list <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+Subject: Re: [PATCH v6 3/3] Bluetooth: btqcomsmd: retrieve BD address from DT
+ property
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1504699898-28011-3-git-send-email-loic.poulain@linaro.org>
+Date: Wed, 6 Sep 2017 19:24:37 +0200
+Cc: Rob Herring <robh+dt@kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Bluez mailing list <linux-bluetooth@vger.kernel.org>,
+        linux-arm-msm@vger.kernel.org,
+        devicetree <devicetree@vger.kernel.org>,
+        bjorn.andersson@linaro.org
+Message-Id: <AD664D12-31A5-456B-9971-4A76BDC32BA3@holtmann.org>
+References: <1504699898-28011-1-git-send-email-loic.poulain@linaro.org>
+ <1504699898-28011-3-git-send-email-loic.poulain@linaro.org>
+To: Loic Poulain <loic.poulain@linaro.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jonah,
+Hi Loic,
 
-On Wed, Sep 6, 2017 at 6:44 PM, Jonah Petri <jonah@sense.com> wrote:
-> Hello Luiz,
->
-> Thanks for looking at my proposal.
->
->> On Sep 6, 2017, at 10:14 AM, Luiz Augusto von Dentz <luiz.dentz@gmail.co=
-m> wrote:
->>
->> Your implementation is not really LE specific, in fact it will cause
->> the clients to believe they connected over LE if the MTU appears,
->> besides with cross transport pairing and dual mode topology this has
->> to work either way or then we have to disable GATT completely on
->> BR/EDR.
->
-> Of course, yes, my previous implementation is not appropriate for this ne=
-w API.  There's differences of opinion about what the API should be, and I'=
-m proposing a revised API to address feedback from yourself and others.  If=
- there's consensus that my revised API is appropriate, I'll then propose an=
- implementation.
->
->>
->> Also, the AcquireWrite and AcquireNotify should fulfil most of the use
->> cases where GATT is used just as transport to another protocol, is
->> that what you are intending to do?
->
-> I'm merely conforming to an existing protocol, which requires me to only =
-publish GATT attributes which are length <=3D MTU - 3.  This is because we =
-can't depend on Long Read and Long Write support from BTLE clients.  In cas=
-es where a larger MTU has been negotiated, I need to take advantage of it, =
-for optimal throughput.
+> Retrieve BD address from the local-bd-address property.
+> This address must be unique and is usually added in the DT
+> by the bootloader which has access to the provisioned data.
+> 
+> Signed-off-by: Loic Poulain <loic.poulain@linaro.org>
+> ---
+> v2: Set device as unconfigured if default address detected
+>     Add warning if BD addr retrieved from DT
+> v3: if no addr retrieved from DT, unconditionally set
+>     the invalid BD addr flag.
+>     swap and set bdaddr in the platform probe
+> v4: Add dt-bindings documentation
+>     split patch in two parts (setup, dt prop)
+>     use local-bd-address name instead of local-mac-address
+> v5: remove 2/3 merged in bluetooth-next tree
+>     Add bluetooth.txt for common BT bindings
+>     expect local-bd-address in little-endian format
+> v6: use of_property_read_u8_array instead of of_get_property
+> 
+> drivers/bluetooth/btqcomsmd.c | 11 +++++++++++
+> 1 file changed, 11 insertions(+)
+> 
+> diff --git a/drivers/bluetooth/btqcomsmd.c b/drivers/bluetooth/btqcomsmd.c
+> index bd810d0..b5716f0 100644
+> --- a/drivers/bluetooth/btqcomsmd.c
+> +++ b/drivers/bluetooth/btqcomsmd.c
+> @@ -15,6 +15,8 @@
+> #include <linux/module.h>
+> #include <linux/slab.h>
+> #include <linux/rpmsg.h>
+> +#include <linux/of.h>
+> +
+> #include <linux/soc/qcom/wcnss_ctrl.h>
+> #include <linux/platform_device.h>
+> 
+> @@ -156,6 +158,15 @@ static int btqcomsmd_probe(struct platform_device *pdev)
+> 	if (IS_ERR(btq->cmd_channel))
+> 		return PTR_ERR(btq->cmd_channel);
+> 
+> +	/* The local-bd-address property is usually injected by the
+> +	 * bootloader which has access to the allocated BD address.
+> +	 */
+> +	if (!of_property_read_u8_array(pdev->dev.of_node, "local-bd-address",
+> +				       (u8 *)&btq->bdaddr, sizeof(bdaddr_t))) {
+> +		BT_INFO("BD address %pMR retrieved from device-tree",
+> +			&btq->bdaddr);
+> +	}
 
-Im afraid I don't follow what you are saying about publishing GATT
-attributes, the spec doesn't require Long procedures by clients but
-that doesn't mean you should omit attributes where their values are
-bigger than the MTU or anything like that. Im also not sure why
-throughput would be relevant, GATT/ATT is not throughput oriented, it
-is a request/response protocol with 30 seconds timeout and on top of
-that we have yet another request/response IPC.
+any reason you are not using bt_dev_info here? I think it would be important to print the device information prefix.
 
->
-> I didn't design the protocol, but it's out there in the wild, and I need =
-to support it.
->
->>
->> Having an API just for a very specific use case that in the future may
->> actually disappear with OSes adopting L2CAP CoC is not very nice.
->
-> We already have several LE-specific APIs (e.g. LEAdvertisingManager), so =
-I don't understand this objection.  BTLE GATT will be with us essentially f=
-orever.  Also, I've proposed marking this dbus property as experimental, so=
- I don't see the problem with trying it out.  It addresses a real need.
->
-> Best,
->
-> Jonah
+Otherwise the patch set looks good to me. However I would prefer if we get an ack from Rob.
 
+Regards
 
+Marcel
 
---=20
-Luiz Augusto von Dentz
