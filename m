@@ -1,60 +1,51 @@
-Return-Path: <bjorn.andersson@linaro.org>
-Date: Wed, 6 Sep 2017 16:26:10 -0700
-From: Bjorn Andersson <bjorn.andersson@linaro.org>
-To: Loic Poulain <loic.poulain@linaro.org>
-Cc: marcel@holtmann.org, robh+dt@kernel.org, johan.hedberg@gmail.com,
-	linux-bluetooth@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-	devicetree@vger.kernel.org
-Subject: Re: [PATCH v6 1/3] dt-bindings: net: document Bluetooth bindings in
- one place
-Message-ID: <20170906232610.GG1165@minitux>
-References: <1504699898-28011-1-git-send-email-loic.poulain@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1504699898-28011-1-git-send-email-loic.poulain@linaro.org>
+Return-Path: <hadess@hadess.net>
+Message-ID: <1504739780.6911.60.camel@hadess.net>
+Subject: Re: Bluetooth LE battery reporting?
+From: Bastien Nocera <hadess@hadess.net>
+To: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz
+	 <luiz.dentz@gmail.com>
+Cc: Szymon Janc <szymon.janc@codecoup.pl>, Bluez mailing list
+	 <linux-bluetooth@vger.kernel.org>
+Date: Thu, 07 Sep 2017 01:16:20 +0200
+In-Reply-To: <1504708668.6911.56.camel@hadess.net>
+References: <1504627402.6911.48.camel@hadess.net>
+	 <CAAEJBh+bjNrjSvTD-F1LBTKnO36kvDZmavJaRR8ZWhR6pTwz9g@mail.gmail.com>
+	 <9D01587F-3821-46CF-B8CE-2311BE8E8592@holtmann.org>
+	 <CABBYNZLDGJTj+jeKUuRAmm_FznUzAy--zE1YVto2t5Fb4zOQ6w@mail.gmail.com>
+	 <9713FF9C-7E23-448F-AC8B-755F32C461C7@holtmann.org>
+	 <1504708668.6911.56.camel@hadess.net>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed 06 Sep 05:11 PDT 2017, Loic Poulain wrote:
-
-> In the same way as Ethernet, gather the Bluetooth related bindings in
-> one file. Introduce the bluetooth-bd-address property which can be used
-> to store the assigned BD address.
+On Wed, 2017-09-06 at 16:37 +0200, Bastien Nocera wrote:
+> On Wed, 2017-09-06 at 10:40 +0200, Marcel Holtmann wrote:
+> > 
 > 
-> Signed-off-by: Loic Poulain <loic.poulain@linaro.org>
-> ---
->  v2: Set device as unconfigured if default address detected
->      Add warning if BD addr retrieved from DT
->  v3: if no addr retrieved from DT, unconditionally set
->      the invalid BD addr flag.
->      swap and set bdaddr in the platform probe
->  v4: Add dt-bindings documentation
->      split patch in two parts (setup, dt prop)
->      use local-bd-address name instead of local-mac-address
->  v5: remove 2/3 merged in bluetooth-next tree
->      Add bluetooth.txt for common BT bindings
->      expect local-bd-address in little-endian format
->  v6: use of_property_read_u8_array instead of of_get_property
+> <snip>
+> > I assumed that it is forbidden to include HID battery reporting
+> > events via the GATT HID descriptors. I think the standard clearly
+> > says these have to come via battery service and not via HID.
 > 
->  Documentation/devicetree/bindings/net/bluetooth.txt | 5 +++++
->  1 file changed, 5 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/net/bluetooth.txt
-> 
-> diff --git a/Documentation/devicetree/bindings/net/bluetooth.txt b/Documentation/devicetree/bindings/net/bluetooth.txt
-> new file mode 100644
-> index 0000000..94797df
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/net/bluetooth.txt
-> @@ -0,0 +1,5 @@
-> +The following properties are common to the Bluetooth controllers:
-> +
-> +- local-bd-address: array of 6 bytes, specifies the BD address that was
-> +  uniquely assigned to the Bluetooth device, formatted with least significant
-> +  byte first (little-endian).
+> So we're back to implementing battery reporting as a separate
+> profile.
+> What would be a good example/skeleton to use to implement this?
 
-Is there a good reason for making this little endian?
+This is what I managed to do so far:
+https://github.com/hadess/bluez/commits/ble-battery
 
-Sure it's only going to be read and written by computers, but for anyone
-reading the generated DT it sure looks like the values are reversed.
+A first (gentle) pass at a review would be nice, especially if there's
+a better way to get notifications on both the attributes in one go.
 
-Regards,
-Bjorn
+The second question is how I would export this.
+
+I'm currently thinking that exporting a new interface on the device
+itself might be the best idea, and I'll monitor devices directly in
+UPower to export them to desktops. Would that be a good way?
+
+And as UPower will be the likely consumer of this data, I think I'll
+try mapping this set of flags:
+https://www.bluetooth.com/specifications/gatt/viewer?attributeXmlFile=org.bluetooth.characteristic.battery_power_state.xml
+to UPower properties rather than trying to export it as-is.
+
+Cheers
