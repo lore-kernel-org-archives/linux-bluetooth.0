@@ -1,51 +1,81 @@
-Return-Path: <hadess@hadess.net>
-Message-ID: <1504739780.6911.60.camel@hadess.net>
-Subject: Re: Bluetooth LE battery reporting?
-From: Bastien Nocera <hadess@hadess.net>
-To: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz
-	 <luiz.dentz@gmail.com>
-Cc: Szymon Janc <szymon.janc@codecoup.pl>, Bluez mailing list
-	 <linux-bluetooth@vger.kernel.org>
-Date: Thu, 07 Sep 2017 01:16:20 +0200
-In-Reply-To: <1504708668.6911.56.camel@hadess.net>
-References: <1504627402.6911.48.camel@hadess.net>
-	 <CAAEJBh+bjNrjSvTD-F1LBTKnO36kvDZmavJaRR8ZWhR6pTwz9g@mail.gmail.com>
-	 <9D01587F-3821-46CF-B8CE-2311BE8E8592@holtmann.org>
-	 <CABBYNZLDGJTj+jeKUuRAmm_FznUzAy--zE1YVto2t5Fb4zOQ6w@mail.gmail.com>
-	 <9713FF9C-7E23-448F-AC8B-755F32C461C7@holtmann.org>
-	 <1504708668.6911.56.camel@hadess.net>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+MIME-Version: 1.0
+In-Reply-To: <1AE5314A-1E01-43B7-AFA3-4D82DA9ED755@sense.com>
+References: <9B25967D-16B8-4335-BE03-8FFD02D400FB@sense.com>
+ <CAO1O6sdd9KxagrbboW+9gpc+OBmsJo6S6g09imAoNxRv5tyA3Q@mail.gmail.com>
+ <CABBYNZLfbhXfEsb=DY-1mzQdiZVmJ9Ka3GjdGiGYgoaqKhkB+A@mail.gmail.com>
+ <5234EF82-463D-4521-ABDB-C68132933BD7@sense.com> <CABBYNZJ3eJBDCv-ZiVw_0WPRKGyHJzH4hE-gGkHXo+pxhU3cZw@mail.gmail.com>
+ <1AE5314A-1E01-43B7-AFA3-4D82DA9ED755@sense.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Wed, 6 Sep 2017 22:57:48 +0300
+Message-ID: <CABBYNZ+uD+8+izUrGb+_U1JdgYTCormjftVzmPs9OGRAqT=XxA@mail.gmail.com>
+Subject: Re: [PATCH v2] gatt-server: Implement NegotiatedMTU property on Device1
+To: Jonah Petri <jonah@sense.com>
+Cc: Emil Lenngren <emil.lenngren@gmail.com>,
+        Bluez mailing list <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, 2017-09-06 at 16:37 +0200, Bastien Nocera wrote:
-> On Wed, 2017-09-06 at 10:40 +0200, Marcel Holtmann wrote:
-> > 
-> 
-> <snip>
-> > I assumed that it is forbidden to include HID battery reporting
-> > events via the GATT HID descriptors. I think the standard clearly
-> > says these have to come via battery service and not via HID.
-> 
-> So we're back to implementing battery reporting as a separate
-> profile.
-> What would be a good example/skeleton to use to implement this?
+Hi Jonah,
 
-This is what I managed to do so far:
-https://github.com/hadess/bluez/commits/ble-battery
+On Wed, Sep 6, 2017 at 6:44 PM, Jonah Petri <jonah@sense.com> wrote:
+> Hello Luiz,
+>
+> Thanks for looking at my proposal.
+>
+>> On Sep 6, 2017, at 10:14 AM, Luiz Augusto von Dentz <luiz.dentz@gmail.co=
+m> wrote:
+>>
+>> Your implementation is not really LE specific, in fact it will cause
+>> the clients to believe they connected over LE if the MTU appears,
+>> besides with cross transport pairing and dual mode topology this has
+>> to work either way or then we have to disable GATT completely on
+>> BR/EDR.
+>
+> Of course, yes, my previous implementation is not appropriate for this ne=
+w API.  There's differences of opinion about what the API should be, and I'=
+m proposing a revised API to address feedback from yourself and others.  If=
+ there's consensus that my revised API is appropriate, I'll then propose an=
+ implementation.
+>
+>>
+>> Also, the AcquireWrite and AcquireNotify should fulfil most of the use
+>> cases where GATT is used just as transport to another protocol, is
+>> that what you are intending to do?
+>
+> I'm merely conforming to an existing protocol, which requires me to only =
+publish GATT attributes which are length <=3D MTU - 3.  This is because we =
+can't depend on Long Read and Long Write support from BTLE clients.  In cas=
+es where a larger MTU has been negotiated, I need to take advantage of it, =
+for optimal throughput.
 
-A first (gentle) pass at a review would be nice, especially if there's
-a better way to get notifications on both the attributes in one go.
+Im afraid I don't follow what you are saying about publishing GATT
+attributes, the spec doesn't require Long procedures by clients but
+that doesn't mean you should omit attributes where their values are
+bigger than the MTU or anything like that. Im also not sure why
+throughput would be relevant, GATT/ATT is not throughput oriented, it
+is a request/response protocol with 30 seconds timeout and on top of
+that we have yet another request/response IPC.
 
-The second question is how I would export this.
+>
+> I didn't design the protocol, but it's out there in the wild, and I need =
+to support it.
+>
+>>
+>> Having an API just for a very specific use case that in the future may
+>> actually disappear with OSes adopting L2CAP CoC is not very nice.
+>
+> We already have several LE-specific APIs (e.g. LEAdvertisingManager), so =
+I don't understand this objection.  BTLE GATT will be with us essentially f=
+orever.  Also, I've proposed marking this dbus property as experimental, so=
+ I don't see the problem with trying it out.  It addresses a real need.
+>
+> Best,
+>
+> Jonah
 
-I'm currently thinking that exporting a new interface on the device
-itself might be the best idea, and I'll monitor devices directly in
-UPower to export them to desktops. Would that be a good way?
 
-And as UPower will be the likely consumer of this data, I think I'll
-try mapping this set of flags:
-https://www.bluetooth.com/specifications/gatt/viewer?attributeXmlFile=org.bluetooth.characteristic.battery_power_state.xml
-to UPower properties rather than trying to export it as-is.
 
-Cheers
+--=20
+Luiz Augusto von Dentz
