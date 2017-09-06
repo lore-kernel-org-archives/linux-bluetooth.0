@@ -1,214 +1,52 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Jonah Petri <jonah@sense.com>
-Content-Type: text/plain; charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Subject: [PATCH v2] gatt-server: Implement NegotiatedMTU property on Device1
-Message-Id: <9B25967D-16B8-4335-BE03-8FFD02D400FB@sense.com>
-Date: Wed, 6 Sep 2017 07:20:07 -0400
-To: linux-bluetooth@vger.kernel.org
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <jaganath.k.os@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <51322678-6D7A-4747-B932-24CF99F4DA47@holtmann.org>
+References: <CAJzH+boScGTf16artQxnFSK5G=AdDv8xh1kyrZM=OhaQ+_c_JQ@mail.gmail.com>
+ <51322678-6D7A-4747-B932-24CF99F4DA47@holtmann.org>
+From: Jaganath K <jaganath.k.os@gmail.com>
+Date: Wed, 6 Sep 2017 16:32:14 +0530
+Message-ID: <CAJzH+brxbuYQWeJuP1aCskHtgfv6nQLRd9Q_WGr5ZG+UZKsDrg@mail.gmail.com>
+Subject: Re: LE New PHYs implementation
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-[Resending this patch, as I didn=E2=80=99t see any replies in the past =
-month or so=E2=80=A6]
+Hi Marcel,
 
-It can be useful for programs using GATT to be aware of the maximum
-transmittable attribute size, as negotiated by bluetoothd.  This change
-exposes the negotiated size over D-Bus, if such a negotiation has
-occurred.
----
-attrib/gattrib.c         |  6 +++++-
-doc/device-api.txt       | 11 +++++++++++
-src/device.c             | 41 +++++++++++++++++++++++++++++++++++++++++
-src/shared/att.c         | 15 +++++++++++++++
-src/shared/gatt-server.c |  1 +
-src/shared/gatt-server.h |  3 +++
-6 files changed, 76 insertions(+), 1 deletion(-)
+On Fri, Sep 1, 2017 at 6:02 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Jaganath,
+>
+>> Are there any plans to implement LE new PHYs defined in 5.0?
+>>
+>> I think the first step would be to define the kernel API for setting new PHY
+>>
+>> How abt implementing mgmt command or l2cap socket option for "Set PHY"
+>> and mgmt event for "PHY Update".
+>>
+>> I suppose socket option for "Set PHY" would be more convenient for
+>> applications especially for L2CAP CoC usecases like OTS.
+>>
+>> If multiple fds (apps) sets different PHYs then priority should be in
+>> the order of Coded, 2M, 1M since long range would not break 2M use
+>> cases (data rate will be affected) where as other way around might not
+>> work as expected.
+>>
+>> Any leads would be appreciated.
+>
+> I was thinking about using bdaddr_type for it or introducing a phy_type. This is not yet fully thought through. It needs a bit of figuring out what would work best.
 
-diff --git a/attrib/gattrib.c b/attrib/gattrib.c
-index 2e1e39a..f080b6b 100644
---- a/attrib/gattrib.c
-+++ b/attrib/gattrib.c
-@@ -468,7 +468,11 @@ gboolean g_attrib_set_mtu(GAttrib *attrib, int mtu)
+If we use bdaddr_type, i think we would need combinations to use it
+with PUBLIC and RANDOM. So i think introducing phy_type is better.
+Can we add phy_type in struct mgmt_addr_info as a bit field?
+It can be used in Socket Connect for phy preference and
+mgmt_device_connected event to inform user abt the connected phy.
 
-	attrib->buflen =3D mtu;
+>In addition we also need proper reporting in scan reports via mgmt. There either bdaddr_type or maybe an extra flags field to indicate LE coded.
 
--	return bt_att_set_mtu(attrib->att, mtu);
-+	if (bt_att_set_mtu(attrib->att, mtu)) {
-+		bt_att_set_mtu_negotiated(attrib->att, true);
-+		return true;
-+	} else
-+		return false;
-}
+I suppose adding extra flags is better. We can have new DEV_FOUND
+flags to inform abt primary and secondary phys of the scan report
+Also Is it Ok to always scan on LE coded  as well, if the controller supports?
 
-gboolean g_attrib_unregister(GAttrib *attrib, guint id)
-diff --git a/doc/device-api.txt b/doc/device-api.txt
-index 13b2881..fc04011 100644
---- a/doc/device-api.txt
-+++ b/doc/device-api.txt
-@@ -234,3 +234,14 @@ Properties	string Address [readonly]
-		array{byte} AdvertisingFlags [readonly, experimental]
-
-			The Advertising Data Flags of the remote device.
-+
-+		int16 NegotiatedMaxAttributeSize [readonly,
-+		                                  optional,
-+		                                  experimental]
-+
-+			The maximum supported byte size of attributes, =
-as
-+			negotiated between this host and the remote =
-device.
-+			This attribute is only available once the =
-negotiation
-+			is complete.  If the attribute is not available,
-+			clients should assume the default maximum size =
-for
-+			the underlying technology, e.g. 20 bytes for =
-BTLE.
-diff --git a/src/device.c b/src/device.c
-index 8693eb8..cd3983b 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -92,6 +92,8 @@
-#define GATT_INCLUDE_UUID_STR "2802"
-#define GATT_CHARAC_UUID_STR "2803"
-
-+#define ATT_PACKET_HEADER_SIZE 3
-+
-static DBusConnection *dbus_conn =3D NULL;
-static unsigned service_state_cb_id;
-
-@@ -930,6 +932,41 @@ static gboolean dev_property_exists_tx_power(const =
-GDBusPropertyTable *property,
-	return TRUE;
-}
-
-+static gboolean dev_property_get_negotiated_max_att_payload(
-+					const GDBusPropertyTable * =
-property,
-+					DBusMessageIter *iter, void =
-*data)
-+{
-+	const struct btd_device *dev =3D data;
-+	dbus_int16_t val =3D 0;
-+	int err;
-+
-+	/* The spec for this API requires a failure if
-+	 * MTU negotiation is incomplete.
-+	 */
-+	if (!bt_att_is_mtu_negotiated(dev->att))
-+		return FALSE;
-+
-+	val =3D bt_att_get_mtu(dev->att);
-+	// subtract off the ATT header length to get the max payload
-+	val -=3D ATT_PACKET_HEADER_SIZE;
-+
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_INT16, &val);
-+
-+	return TRUE;
-+}
-+
-+static gboolean dev_property_exists_negotiated_max_att_payload(
-+					const GDBusPropertyTable * =
-property,
-+					void *data)
-+{
-+	const struct btd_device *dev =3D data;
-+
-+	/* The spec for this API requires the property
-+	 * be absent until MTU negotiation is incomplete.
-+	 */
-+	return bt_att_is_mtu_negotiated(dev->att);
-+}
-+
-static gboolean
-dev_property_get_svc_resolved(const GDBusPropertyTable *property,
-					DBusMessageIter *iter, void =
-*data)
-@@ -2561,6 +2598,10 @@ static const GDBusPropertyTable =
-device_properties[] =3D {
-				NULL, dev_property_service_data_exist },
-	{ "TxPower", "n", dev_property_get_tx_power, NULL,
-					dev_property_exists_tx_power },
-+	{ "NegotiatedMaxAttributeSize", "n",
-+					=
-dev_property_get_negotiated_max_att_payload,
-+					NULL, =
-dev_property_exists_negotiated_max_att_payload,
-+					=
-G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
-	{ "ServicesResolved", "b", dev_property_get_svc_resolved, NULL, =
-NULL },
-	{ "AdvertisingFlags", "ay", dev_property_get_flags, NULL,
-					dev_property_flags_exist,
-diff --git a/src/shared/att.c b/src/shared/att.c
-index ca2d051..bf20a01 100644
---- a/src/shared/att.c
-+++ b/src/shared/att.c
-@@ -70,6 +70,7 @@ struct bt_att {
-
-	uint8_t *buf;
-	uint16_t mtu;
-+	bool mtu_negotiated;
-
-	unsigned int next_send_id;	/* IDs for "send" ops */
-	unsigned int next_reg_id;	/* IDs for registered callbacks =
-*/
-@@ -1100,6 +1101,20 @@ bool bt_att_set_debug(struct bt_att *att, =
-bt_att_debug_func_t callback,
-	return true;
-}
-
-+bool bt_att_is_mtu_negotiated(struct bt_att *att)
-+{
-+	if (!att)
-+		return false;
-+
-+	return att->mtu_negotiated;
-+}
-+
-+void bt_att_set_mtu_negotiated(struct bt_att *att, bool negotiated)
-+{
-+	if (att && !att->mtu_negotiated)
-+		att->mtu_negotiated =3D negotiated;
-+}
-+
-uint16_t bt_att_get_mtu(struct bt_att *att)
-{
-	if (!att)
-diff --git a/src/shared/gatt-server.c b/src/shared/gatt-server.c
-index 79e01c8..c76ca23 100644
---- a/src/shared/gatt-server.c
-+++ b/src/shared/gatt-server.c
-@@ -1379,6 +1379,7 @@ static void exchange_mtu_cb(uint8_t opcode, const =
-void *pdu,
-	/* Set MTU to be the minimum */
-	server->mtu =3D final_mtu;
-	bt_att_set_mtu(server->att, final_mtu);
-+	bt_att_set_mtu_negotiated(server->att, true);
-
-	util_debug(server->debug_callback, server->debug_data,
-			"MTU exchange complete, with MTU: %u", =
-final_mtu);
-diff --git a/src/shared/gatt-server.h b/src/shared/gatt-server.h
-index 0e480e1..0b99da5 100644
---- a/src/shared/gatt-server.h
-+++ b/src/shared/gatt-server.h
-@@ -31,6 +31,9 @@ struct bt_gatt_server *bt_gatt_server_new(struct =
-gatt_db *db,
-struct bt_gatt_server *bt_gatt_server_ref(struct bt_gatt_server =
-*server);
-void bt_gatt_server_unref(struct bt_gatt_server *server);
-
-+int bt_gatt_server_get_negotiated_mtu(const struct bt_gatt_server =
-*server,
-+					int16_t *mtu);
-+
-typedef void (*bt_gatt_server_destroy_func_t)(void *user_data);
-typedef void (*bt_gatt_server_debug_func_t)(const char *str, void =
-*user_data);
-typedef void (*bt_gatt_server_conf_func_t)(void *user_data);
---=20
-2.10.0
-
+Thanks,
+Jaganath
