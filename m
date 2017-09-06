@@ -1,76 +1,67 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <683fdd05-468d-5b70-86f6-f71c5d504c98@jp.fujitsu.com>
-References: <20170901035615.95402-1-yunhanw@google.com> <a4eb008e-5c19-c13c-bb35-ac840f80be42@jp.fujitsu.com>
- <CALvjcs-3W8skPEH0TyHgwX=TSzrKcMy5ptjeHPbR+kY7x8hVvw@mail.gmail.com>
- <367b3f96-3e2b-3951-70a2-ddf4cefd0fd3@jp.fujitsu.com> <CALvjcs_4NM-h-U4046CF9j_PBLhn_5bpZ_qx_rbz2TduG1KHDA@mail.gmail.com>
- <683fdd05-468d-5b70-86f6-f71c5d504c98@jp.fujitsu.com>
 From: Yunhan Wang <yunhanw@google.com>
-Date: Tue, 5 Sep 2017 22:36:18 -0700
-Message-ID: <CALvjcs_3zY6zx8qvoNR6B7KeyymvEOzaFx1AUT59JmVYWPSqXg@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] client: Fix default_ctrl change when new adapter is found
-To: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+To: linux-bluetooth@vger.kernel.org
+Cc: Yunhan Wang <yunhanw@google.com>
+Subject: [PATCH v2] client: Fix default_ctrl change when new adapter is found
+Date: Tue,  5 Sep 2017 22:27:43 -0700
+Message-Id: <20170906052743.6821-1-yunhanw@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi, ERAMOTO
+When another adapter is found, the default adapter would be changed,
+which is not expected. Default adapter can only be changed by select
+command.
+---
+ client/main.c | 17 ++++++++++++-----
+ 1 file changed, 12 insertions(+), 5 deletions(-)
 
-On Sun, Sep 3, 2017 at 5:48 PM, ERAMOTO Masaya
-<eramoto.masaya@jp.fujitsu.com> wrote:
-> Hi Yunhan,
->
-> On 09/02/2017 12:54 PM, Yunhan Wang wrote:
->> Hi, ERAMOTO
->>
->> On Fri, Sep 1, 2017 at 12:59 AM, ERAMOTO Masaya
->> <eramoto.masaya@jp.fujitsu.com> wrote:
->>> Hi Yunhan,
->>>
->>> Thanks for your explanation.
->>>
->>> Btw, could you also tell me about the following fix.
->>
->> default_ctrl would be set as NULL in disconnect_handler. Therefore I
->> remove this redundant one.
->>
->
-> It seems g_dbus_client_unref() calls disconnect_handler() when g_main_loop_run()
-> is exited by quit command etc.. So I think here defautl_ctrl should be set as
-> NULL in interactive mode.
->
+diff --git a/client/main.c b/client/main.c
+index 75696c2c1..e76b6fc25 100644
+--- a/client/main.c
++++ b/client/main.c
+@@ -67,6 +67,7 @@ struct adapter {
+ };
+ 
+ static struct adapter *default_ctrl;
++static struct adapter *cache_ctrl;
+ static GDBusProxy *default_dev;
+ static GDBusProxy *default_attr;
+ static GList *ctrl_list;
+@@ -151,7 +152,7 @@ static void disconnect_handler(DBusConnection *connection, void *user_data)
+ 
+ 	g_list_free_full(ctrl_list, proxy_leak);
+ 	ctrl_list = NULL;
+-
++	cache_ctrl = NULL;
+ 	default_ctrl = NULL;
+ }
+ 
+@@ -521,15 +522,21 @@ static void device_added(GDBusProxy *proxy)
+ 
+ static void adapter_added(GDBusProxy *proxy)
+ {
+-	default_ctrl = g_malloc0(sizeof(struct adapter));
+-	default_ctrl->proxy = proxy;
+-	ctrl_list = g_list_append(ctrl_list, default_ctrl);
++	struct adapter *adapter = g_malloc0(sizeof(struct adapter));
++
++	adapter->proxy = proxy;
++	cache_ctrl = adapter;
++	ctrl_list = g_list_append(ctrl_list, adapter);
++
++	if (!default_ctrl)
++		default_ctrl = adapter;
++
+ 	print_adapter(proxy, COLORED_NEW);
+ }
+ 
+ static void ad_manager_added(GDBusProxy *proxy)
+ {
+-	default_ctrl->ad_proxy = proxy;
++	cache_ctrl->ad_proxy = proxy;
+ }
+ 
+ static void proxy_added(GDBusProxy *proxy, void *user_data)
+-- 
+2.14.1.581.gf28d330327-goog
 
-Yes, just send patch to fix it.
-
->>
->>> bluetoothclt sometimes do core dump when I detach the adapter of default_ctrl
->>> and run show command.
->>
->> Could you share your reproduce step for this issue? Could it be
->> constantly reproduced?
->
-> It is always reproduced with the following steps:
->
->   1. Attach an adapter.
->   2. Run bluetoothctl.
->   3. Detach this adapter.
->   4. Run device command in bluetootctl.
->
-With the new fix, when you detach adapter, the default_ctrl become
-NULL, you should not see the devices via running devices cmd.
->
-> Regards,
-> Eramoto
->
->>
->> thanks
->> best wishes
->> yunhan
->>
->>
->
-
-thanks
-best wishes
-yunhan
