@@ -1,52 +1,82 @@
-Return-Path: <jaganath.k.os@gmail.com>
-MIME-Version: 1.0
-In-Reply-To: <51322678-6D7A-4747-B932-24CF99F4DA47@holtmann.org>
-References: <CAJzH+boScGTf16artQxnFSK5G=AdDv8xh1kyrZM=OhaQ+_c_JQ@mail.gmail.com>
- <51322678-6D7A-4747-B932-24CF99F4DA47@holtmann.org>
-From: Jaganath K <jaganath.k.os@gmail.com>
-Date: Wed, 6 Sep 2017 16:32:14 +0530
-Message-ID: <CAJzH+brxbuYQWeJuP1aCskHtgfv6nQLRd9Q_WGr5ZG+UZKsDrg@mail.gmail.com>
-Subject: Re: LE New PHYs implementation
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+Subject: Re: Bluetooth LE battery reporting?
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <CABBYNZLDGJTj+jeKUuRAmm_FznUzAy--zE1YVto2t5Fb4zOQ6w@mail.gmail.com>
+Date: Wed, 6 Sep 2017 10:40:02 +0200
+Cc: Szymon Janc <szymon.janc@codecoup.pl>,
+        Bastien Nocera <hadess@hadess.net>,
+        Bluez mailing list <linux-bluetooth@vger.kernel.org>
+Message-Id: <9713FF9C-7E23-448F-AC8B-755F32C461C7@holtmann.org>
+References: <1504627402.6911.48.camel@hadess.net>
+ <CAAEJBh+bjNrjSvTD-F1LBTKnO36kvDZmavJaRR8ZWhR6pTwz9g@mail.gmail.com>
+ <9D01587F-3821-46CF-B8CE-2311BE8E8592@holtmann.org>
+ <CABBYNZLDGJTj+jeKUuRAmm_FznUzAy--zE1YVto2t5Fb4zOQ6w@mail.gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Luiz,
 
-On Fri, Sep 1, 2017 at 6:02 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Jaganath,
->
->> Are there any plans to implement LE new PHYs defined in 5.0?
->>
->> I think the first step would be to define the kernel API for setting new PHY
->>
->> How abt implementing mgmt command or l2cap socket option for "Set PHY"
->> and mgmt event for "PHY Update".
->>
->> I suppose socket option for "Set PHY" would be more convenient for
->> applications especially for L2CAP CoC usecases like OTS.
->>
->> If multiple fds (apps) sets different PHYs then priority should be in
->> the order of Coded, 2M, 1M since long range would not break 2M use
->> cases (data rate will be affected) where as other way around might not
->> work as expected.
->>
->> Any leads would be appreciated.
->
-> I was thinking about using bdaddr_type for it or introducing a phy_type. This is not yet fully thought through. It needs a bit of figuring out what would work best.
+>>>> I'm back looking into Bluetooth LE battery reporting, and I'm a bit
+>>>> stumped as to what would need to be done to add support for it.
+>>>> 
+>>>> First, I've already found a few old implementations:
+>>>> 
+>>>> - I cleaned this up a couple of years ago, to try it out, and it spit
+>>>> debug information as expected. Doesn't compile anymore:
+>>>> https://gfiber.googlesource.com/vendor/opensource/bluez/+/42bc327d464b1f7c2c73b3fecb2e9a8d3dc01035/profiles/battery/battery.c
+>>>> 
+>>>> - chen.ganir@ti.com 's "Add Battery Service GATT Client" patchset that
+>>>> was posted to the list in 2012 (!)
+>>>> 
+>>>> - and finally, there's bluez' very own "bas", the last commit touching it says:
+>>>> commit b6cb2d3ec320bdfdf1cdcdf750e767d214170efd
+>>>> Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>>>> Date:   Wed Nov 11 13:08:52 2015 +0200
+>>>> 
+>>>>   bas: Move code from android to profiles
+>>>> 
+>>>>   This is a place holder until the code is ported to use shared API so it
+>>>>   can be shared by android and D-Bus daemon.
+>>>> 
+>>>> That last one is compiled, but doesn't seem to be hooked up (?). I
+>>>> tested this with a Microsoft Arc Touch Mouse SE (the same mouse I
+>>>> tested that first patch with).
+>>>> 
+>>>> Is this all hooked up and I'd just need to export the battery
+>>>> information through D-Bus?
+>>>> 
+>>>> Or does it need fixing, in which case, which plugin could I use as an
+>>>> example of what porting to that elusive "shared API" should look like?
+>>>> 
+>>>> Cheers
+>>>> --
+>>>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>>>> the body of a message to majordomo@vger.kernel.org
+>>>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>>> 
+>>> I think this should be done as "virtual" battery and reported to
+>>> system via standard means (upower?).
+>>> 
+>>> I was wondering it would be done in similar way uhid is designed (other option
+>>> would be bluez registering battery via D-Bus API in upower if such API
+>>> exists...)
+>> 
+>> for LE HID devices we could just convert their battery service into HID battery events. For non-HID devices, we could create a HID device via uhid anyway and just expose only battery information.
+> 
+> You mean we create USB reports for the battery status? While this is
+> possible what if the remote is also doing this already, it would be
+> quite hard to detect this but perhaps it is fine since the values
+> should be consistent. For non-HID devices that sound pretty easy to do
+> though perhaps having the a Battery property in the Device interface
+> wouldn't be a bad idea either as that may be more convenient for D-Bus
+> clients to read.
 
-If we use bdaddr_type, i think we would need combinations to use it
-with PUBLIC and RANDOM. So i think introducing phy_type is better.
-Can we add phy_type in struct mgmt_addr_info as a bit field?
-It can be used in Socket Connect for phy preference and
-mgmt_device_connected event to inform user abt the connected phy.
+I assumed that it is forbidden to include HID battery reporting events via the GATT HID descriptors. I think the standard clearly says these have to come via battery service and not via HID.
 
->In addition we also need proper reporting in scan reports via mgmt. There either bdaddr_type or maybe an extra flags field to indicate LE coded.
+Regards
 
-I suppose adding extra flags is better. We can have new DEV_FOUND
-flags to inform abt primary and secondary phys of the scan report
-Also Is it Ok to always scan on LE coded  as well, if the controller supports?
+Marcel
 
-Thanks,
-Jaganath
