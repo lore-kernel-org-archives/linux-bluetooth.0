@@ -1,69 +1,60 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain; charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Subject: Re: [PATCH v2] gatt-server: Implement NegotiatedMTU property on
- Device1
-From: Jonah Petri <jonah@sense.com>
-In-Reply-To: <CABBYNZ+uD+8+izUrGb+_U1JdgYTCormjftVzmPs9OGRAqT=XxA@mail.gmail.com>
-Date: Wed, 6 Sep 2017 20:09:23 -0400
-Cc: Emil Lenngren <emil.lenngren@gmail.com>,
-        Bluez mailing list <linux-bluetooth@vger.kernel.org>
-Message-Id: <1FA6F703-9CED-43FC-8CA0-BD3F1680EED9@sense.com>
-References: <9B25967D-16B8-4335-BE03-8FFD02D400FB@sense.com>
- <CAO1O6sdd9KxagrbboW+9gpc+OBmsJo6S6g09imAoNxRv5tyA3Q@mail.gmail.com>
- <CABBYNZLfbhXfEsb=DY-1mzQdiZVmJ9Ka3GjdGiGYgoaqKhkB+A@mail.gmail.com>
- <5234EF82-463D-4521-ABDB-C68132933BD7@sense.com>
- <CABBYNZJ3eJBDCv-ZiVw_0WPRKGyHJzH4hE-gGkHXo+pxhU3cZw@mail.gmail.com>
- <1AE5314A-1E01-43B7-AFA3-4D82DA9ED755@sense.com>
- <CABBYNZ+uD+8+izUrGb+_U1JdgYTCormjftVzmPs9OGRAqT=XxA@mail.gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <bjorn.andersson@linaro.org>
+Date: Wed, 6 Sep 2017 16:26:10 -0700
+From: Bjorn Andersson <bjorn.andersson@linaro.org>
+To: Loic Poulain <loic.poulain@linaro.org>
+Cc: marcel@holtmann.org, robh+dt@kernel.org, johan.hedberg@gmail.com,
+	linux-bluetooth@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+	devicetree@vger.kernel.org
+Subject: Re: [PATCH v6 1/3] dt-bindings: net: document Bluetooth bindings in
+ one place
+Message-ID: <20170906232610.GG1165@minitux>
+References: <1504699898-28011-1-git-send-email-loic.poulain@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1504699898-28011-1-git-send-email-loic.poulain@linaro.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+On Wed 06 Sep 05:11 PDT 2017, Loic Poulain wrote:
 
-> On Sep 6, 2017, at 3:57 PM, Luiz Augusto von Dentz =
-<luiz.dentz@gmail.com> wrote:
->=20
->>>=20
->>> Also, the AcquireWrite and AcquireNotify should fulfil most of the =
-use
->>> cases where GATT is used just as transport to another protocol, is
->>> that what you are intending to do?
->>=20
->> I'm merely conforming to an existing protocol, which requires me to =
-only publish GATT attributes which are length <=3D MTU - 3.  This is =
-because we can't depend on Long Read and Long Write support from BTLE =
-clients.  In cases where a larger MTU has been negotiated, I need to =
-take advantage of it, for optimal throughput.
->=20
-> Im afraid I don't follow what you are saying about publishing GATT
-> attributes, the spec doesn't require Long procedures by clients but
-> that doesn't mean you should omit attributes where their values are
-> bigger than the MTU or anything like that. Im also not sure why
-> throughput would be relevant, GATT/ATT is not throughput oriented, it
-> is a request/response protocol with 30 seconds timeout and on top of
-> that we have yet another request/response IPC.
+> In the same way as Ethernet, gather the Bluetooth related bindings in
+> one file. Introduce the bluetooth-bd-address property which can be used
+> to store the assigned BD address.
+> 
+> Signed-off-by: Loic Poulain <loic.poulain@linaro.org>
+> ---
+>  v2: Set device as unconfigured if default address detected
+>      Add warning if BD addr retrieved from DT
+>  v3: if no addr retrieved from DT, unconditionally set
+>      the invalid BD addr flag.
+>      swap and set bdaddr in the platform probe
+>  v4: Add dt-bindings documentation
+>      split patch in two parts (setup, dt prop)
+>      use local-bd-address name instead of local-mac-address
+>  v5: remove 2/3 merged in bluetooth-next tree
+>      Add bluetooth.txt for common BT bindings
+>      expect local-bd-address in little-endian format
+>  v6: use of_property_read_u8_array instead of of_get_property
+> 
+>  Documentation/devicetree/bindings/net/bluetooth.txt | 5 +++++
+>  1 file changed, 5 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/net/bluetooth.txt
+> 
+> diff --git a/Documentation/devicetree/bindings/net/bluetooth.txt b/Documentation/devicetree/bindings/net/bluetooth.txt
+> new file mode 100644
+> index 0000000..94797df
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/net/bluetooth.txt
+> @@ -0,0 +1,5 @@
+> +The following properties are common to the Bluetooth controllers:
+> +
+> +- local-bd-address: array of 6 bytes, specifies the BD address that was
+> +  uniquely assigned to the Bluetooth device, formatted with least significant
+> +  byte first (little-endian).
 
-The protocol I=E2=80=99m implementing is a fairly typical =
-=E2=80=98uart-on-btle=E2=80=99 protocol, of the sort supported by many =
-BT vendors, especially for embedded MCUs.  Reads of GATT attributes =
-above the MTU - 3 threshold are truncated in the client=E2=80=99s bt =
-stack, but the clients typically don=E2=80=99t realize it, so they get =
-corrupted data.  However, for clients which support a larger MTU, the =
-transfer speeds can be much faster, as the MTU is larger.  (yes, we=E2=80=99=
-re still talking about a few kb/sec, but 4x faster is 4x faster!) =20
+Is there a good reason for making this little endian?
 
-Of course, you=E2=80=99re right that BTLE isn=E2=80=99t exactly the =
-right way to do this.  You don=E2=80=99t need to convince me of this.  =
-But I do have a need for getting the MTU, to implement the protocol =
-without corrupting the data.  Most people implementing the server half =
-of these protocols like this will have the same need.
-
-AcquireWrite and AcquireRead are not useful to me, as I=E2=80=99m =
-implementing a gatt server, and those interfaces are marked as =E2=80=98Cl=
-ient Only=E2=80=99.
+Sure it's only going to be read and written by computers, but for anyone
+reading the generated DT it sure looks like the values are reversed.
 
 Regards,
-Jonah
-
+Bjorn
