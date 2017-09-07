@@ -1,189 +1,108 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+MIME-Version: 1.0
+In-Reply-To: <CAO1O6scnxYL9Jf3ev=+8AdxqXmt1mg2w8cDqARa+v7oBLXop8w@mail.gmail.com>
+References: <9B25967D-16B8-4335-BE03-8FFD02D400FB@sense.com>
+ <CAO1O6sdd9KxagrbboW+9gpc+OBmsJo6S6g09imAoNxRv5tyA3Q@mail.gmail.com>
+ <CABBYNZLfbhXfEsb=DY-1mzQdiZVmJ9Ka3GjdGiGYgoaqKhkB+A@mail.gmail.com>
+ <5234EF82-463D-4521-ABDB-C68132933BD7@sense.com> <CABBYNZJ3eJBDCv-ZiVw_0WPRKGyHJzH4hE-gGkHXo+pxhU3cZw@mail.gmail.com>
+ <1AE5314A-1E01-43B7-AFA3-4D82DA9ED755@sense.com> <CABBYNZ+uD+8+izUrGb+_U1JdgYTCormjftVzmPs9OGRAqT=XxA@mail.gmail.com>
+ <1FA6F703-9CED-43FC-8CA0-BD3F1680EED9@sense.com> <CABBYNZLjRA5e0JuryigV+9wdMdHvLYUoSZpfJ=_Eh2rhfCiGfA@mail.gmail.com>
+ <CAO1O6scnxYL9Jf3ev=+8AdxqXmt1mg2w8cDqARa+v7oBLXop8w@mail.gmail.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] adapter: Fix not waiting for start discovery result
-Date: Thu,  7 Sep 2017 14:59:40 +0300
-Message-Id: <20170907115940.30459-1-luiz.dentz@gmail.com>
+Date: Thu, 7 Sep 2017 14:18:08 +0300
+Message-ID: <CABBYNZ+hDikse562MN5sJu1y7BONou33EDaXd5a-ZNNvCT=-uA@mail.gmail.com>
+Subject: Re: [PATCH v2] gatt-server: Implement NegotiatedMTU property on Device1
+To: Emil Lenngren <emil.lenngren@gmail.com>
+Cc: Jonah Petri <jonah@sense.com>,
+        Bluez mailing list <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Emil,
 
-We should not reply until the start discovery completes otherwise
-clients may attempt to stop the discovery before it even has started.
+On Thu, Sep 7, 2017 at 1:47 PM, Emil Lenngren <emil.lenngren@gmail.com> wro=
+te:
+> Hi
+>
+> 2017-09-07 12:22 GMT+02:00 Luiz Augusto von Dentz <luiz.dentz@gmail.com>:
+>> Hi Jonah,
+>>
+>> On Thu, Sep 7, 2017 at 3:09 AM, Jonah Petri <jonah@sense.com> wrote:
+>>> Hi Luiz,
+>>>
+>>>> On Sep 6, 2017, at 3:57 PM, Luiz Augusto von Dentz <luiz.dentz@gmail.c=
+om> wrote:
+>>>>
+>>>>>>
+>>>>>> Also, the AcquireWrite and AcquireNotify should fulfil most of the u=
+se
+>>>>>> cases where GATT is used just as transport to another protocol, is
+>>>>>> that what you are intending to do?
+>>>>>
+>>>>> I'm merely conforming to an existing protocol, which requires me to o=
+nly publish GATT attributes which are length <=3D MTU - 3.  This is because=
+ we can't depend on Long Read and Long Write support from BTLE clients.  In=
+ cases where a larger MTU has been negotiated, I need to take advantage of =
+it, for optimal throughput.
+>>>>
+>>>> Im afraid I don't follow what you are saying about publishing GATT
+>>>> attributes, the spec doesn't require Long procedures by clients but
+>>>> that doesn't mean you should omit attributes where their values are
+>>>> bigger than the MTU or anything like that. Im also not sure why
+>>>> throughput would be relevant, GATT/ATT is not throughput oriented, it
+>>>> is a request/response protocol with 30 seconds timeout and on top of
+>>>> that we have yet another request/response IPC.
+>>>
+>>> The protocol I=E2=80=99m implementing is a fairly typical =E2=80=98uart=
+-on-btle=E2=80=99 protocol, of the sort supported by many BT vendors, espec=
+ially for embedded MCUs.  Reads of GATT attributes above the MTU - 3 thresh=
+old are truncated in the client=E2=80=99s bt stack, but the clients typical=
+ly don=E2=80=99t realize it, so they get corrupted data.  However, for clie=
+nts which support a larger MTU, the transfer speeds can be much faster, as =
+the MTU is larger.  (yes, we=E2=80=99re still talking about a few kb/sec, b=
+ut 4x faster is 4x faster!)
+>>
+>> I will have to repeat this over and over, there are better solutions
+>> to this than GATT, what we are seeing here is perhaps the lack of
+>> support in Android. After these many years of L2CAP CoC being around
+>> it really beats me why no vendor took the task to just implement it
+>> and contributed to Android instead of working around it via GATT/ATT
+>> and then blaming the peripheral stack for the lack of serial over
+>> GATT/ATT. Not only this would bring proper serial support but things
+>> like IPSP, Object Transfer, and other profiles that do use L2CAP CoC.
+>>
+>>> Of course, you=E2=80=99re right that BTLE isn=E2=80=99t exactly the rig=
+ht way to do this.  You don=E2=80=99t need to convince me of this.  But I d=
+o have a need for getting the MTU, to implement the protocol without corrup=
+ting the data.  Most people implementing the server half of these protocols=
+ like this will have the same need.
+>>>
+>>> AcquireWrite and AcquireRead are not useful to me, as I=E2=80=99m imple=
+menting a gatt server, and those interfaces are marked as =E2=80=98Client O=
+nly=E2=80=99.
+>>
+>> So lets fix that and on the plus side you might get even better
+>> transfer speeds since we can bypass D-Bus entirely.
+>
+>
+> I fully agree that the GATT specification kind of sucks for
+> throughput-applications since it is, as you say, only meant to be used
+> for small data transfers. But we have to remember that there are A LOT
+> of devices and protocols out there that use GATT to stream data
+> instead of L2CAP CoC since that was previously the only way to send
+> data, so this still have to be dealt with. And if one uses Write
+> Without Response and Notifications, GATT is only 1 extra byte overhead
+> compared to L2CAP CoC per packet anyway, so it's not _that_ bad if
+> used optimally.
 
-On top of this it will now block clients so they so not be able to
-queue more requests.
----
- src/adapter.c | 55 +++++++++++++++++++++++++++++++++++++++++++++++--------
- 1 file changed, 47 insertions(+), 8 deletions(-)
+1 extra byte if you don't do any segmentation/reassembly which is
+normally the first thing to add follow by some sort of flow control.
+Also something that most people forget is that L2CAP is connection
+oriented, we can create dedicated socket per application, something
+not possible in GATT/ATT which is why locking was necessary for
+AcquireWrite/AcquireNotify otherwise another application can start
+sending/receiving which may corrupt the data.
 
-diff --git a/src/adapter.c b/src/adapter.c
-index a571b1870..4b9f5a1cd 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -160,6 +160,7 @@ struct discovery_filter {
- 
- struct watch_client {
- 	struct btd_adapter *adapter;
-+	DBusMessage *msg;
- 	char *owner;
- 	guint watch;
- 	struct discovery_filter *discovery_filter;
-@@ -1421,13 +1422,17 @@ static void start_discovery_complete(uint8_t status, uint16_t length,
- 					const void *param, void *user_data)
- {
- 	struct btd_adapter *adapter = user_data;
-+	struct watch_client *client = adapter->discovery_list->data;
- 	const struct mgmt_cp_start_discovery *rp = param;
-+	DBusMessage *reply;
- 
- 	DBG("status 0x%02x", status);
- 
- 	if (length < sizeof(*rp)) {
- 		btd_error(adapter->dev_id,
- 			"Wrong size of start discovery return parameters");
-+		if (client->msg)
-+			goto fail;
- 		return;
- 	}
- 
-@@ -1440,6 +1445,14 @@ static void start_discovery_complete(uint8_t status, uint16_t length,
- 		else
- 			adapter->filtered_discovery = false;
- 
-+		if (client->msg) {
-+			reply = g_dbus_create_reply(client->msg,
-+							DBUS_TYPE_INVALID);
-+			g_dbus_send_message(dbus_conn, reply);
-+			dbus_message_unref(client->msg);
-+			client->msg = NULL;
-+		}
-+
- 		if (adapter->discovering)
- 			return;
- 
-@@ -1449,6 +1462,15 @@ static void start_discovery_complete(uint8_t status, uint16_t length,
- 		return;
- 	}
- 
-+fail:
-+	/* Reply with an error if the first discovery has failed */
-+	if (client->msg) {
-+		reply = btd_error_busy(client->msg);
-+		g_dbus_send_message(dbus_conn, reply);
-+		g_dbus_remove_watch(dbus_conn, client->watch);
-+		return;
-+	}
-+
- 	/*
- 	 * In case the restart of the discovery failed, then just trigger
- 	 * it for the next idle timeout again.
-@@ -1933,7 +1955,7 @@ static bool filters_equal(struct mgmt_cp_start_service_discovery *a,
- 	return true;
- }
- 
--static void update_discovery_filter(struct btd_adapter *adapter)
-+static int update_discovery_filter(struct btd_adapter *adapter)
- {
- 	struct mgmt_cp_start_service_discovery *sd_cp;
- 
-@@ -1942,7 +1964,7 @@ static void update_discovery_filter(struct btd_adapter *adapter)
- 	if (discovery_filter_to_mgmt_cp(adapter, &sd_cp)) {
- 		btd_error(adapter->dev_id,
- 				"discovery_filter_to_mgmt_cp returned error");
--		return;
-+		return -ENOMEM;
- 	}
- 
- 	/*
-@@ -1953,13 +1975,15 @@ static void update_discovery_filter(struct btd_adapter *adapter)
- 	    adapter->discovering != 0) {
- 		DBG("filters were equal, deciding to not restart the scan.");
- 		g_free(sd_cp);
--		return;
-+		return 0;
- 	}
- 
- 	g_free(adapter->current_discovery_filter);
- 	adapter->current_discovery_filter = sd_cp;
- 
- 	trigger_start_discovery(adapter, 0);
-+
-+	return -EINPROGRESS;
- }
- 
- static void discovery_destroy(void *user_data)
-@@ -1980,6 +2004,9 @@ static void discovery_destroy(void *user_data)
- 		client->discovery_filter = NULL;
- 	}
- 
-+	if (client->msg)
-+		dbus_message_unref(client->msg);
-+
- 	g_free(client->owner);
- 	g_free(client);
- 
-@@ -2087,6 +2114,7 @@ static DBusMessage *start_discovery(DBusConnection *conn,
- 	const char *sender = dbus_message_get_sender(msg);
- 	struct watch_client *client;
- 	bool is_discovering;
-+	int err;
- 
- 	DBG("sender %s", sender);
- 
-@@ -2107,12 +2135,14 @@ static DBusMessage *start_discovery(DBusConnection *conn,
- 	 * and trigger scan.
- 	 */
- 	if (client) {
-+		if (client->msg)
-+			return btd_error_busy(msg);
-+
- 		adapter->set_filter_list = g_slist_remove(
- 					     adapter->set_filter_list, client);
- 		adapter->discovery_list = g_slist_prepend(
- 					      adapter->discovery_list, client);
--		update_discovery_filter(adapter);
--		return dbus_message_new_method_return(msg);
-+		goto done;
- 	}
- 
- 	client = g_new0(struct watch_client, 1);
-@@ -2126,14 +2156,23 @@ static DBusMessage *start_discovery(DBusConnection *conn,
- 	adapter->discovery_list = g_slist_prepend(adapter->discovery_list,
- 								client);
- 
-+done:
- 	/*
- 	 * Just trigger the discovery here. In case an already running
- 	 * discovery in idle phase exists, it will be restarted right
- 	 * away.
- 	 */
--	update_discovery_filter(adapter);
-+	err = update_discovery_filter(adapter);
-+	if (!err)
-+		return dbus_message_new_method_return(msg);
- 
--	return dbus_message_new_method_return(msg);
-+	/* If the discovery has to be started wait it complete to reply */
-+	if (err == -EINPROGRESS) {
-+		client->msg = dbus_message_ref(msg);
-+		return NULL;
-+	}
-+
-+	return btd_error_failed(msg, strerror(-err));
- }
- 
- static bool parse_uuids(DBusMessageIter *value, struct discovery_filter *filter)
-@@ -2984,7 +3023,7 @@ static DBusMessage *get_discovery_filters(DBusConnection *conn,
- }
- 
- static const GDBusMethodTable adapter_methods[] = {
--	{ GDBUS_METHOD("StartDiscovery", NULL, NULL, start_discovery) },
-+	{ GDBUS_ASYNC_METHOD("StartDiscovery", NULL, NULL, start_discovery) },
- 	{ GDBUS_METHOD("SetDiscoveryFilter",
- 				GDBUS_ARGS({ "properties", "a{sv}" }), NULL,
- 				set_discovery_filter) },
--- 
-2.13.5
-
+--=20
+Luiz Augusto von Dentz
