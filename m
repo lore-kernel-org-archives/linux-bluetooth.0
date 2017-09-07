@@ -1,121 +1,97 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20170907075830.32641-1-marcin.kraglak@tieto.com>
-References: <20170907075830.32641-1-marcin.kraglak@tieto.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 7 Sep 2017 14:20:51 +0300
-Message-ID: <CABBYNZJPQWL2o1uzJ=Tzmh08S2iCDPkvVe8eTGWtnDKYm02d0Q@mail.gmail.com>
-Subject: Re: [PATCH] meshctl: Add commands autocompletion
-To: Marcin Kraglak <marcin.kraglak@tieto.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <CABBYNZLjRA5e0JuryigV+9wdMdHvLYUoSZpfJ=_Eh2rhfCiGfA@mail.gmail.com>
+References: <9B25967D-16B8-4335-BE03-8FFD02D400FB@sense.com>
+ <CAO1O6sdd9KxagrbboW+9gpc+OBmsJo6S6g09imAoNxRv5tyA3Q@mail.gmail.com>
+ <CABBYNZLfbhXfEsb=DY-1mzQdiZVmJ9Ka3GjdGiGYgoaqKhkB+A@mail.gmail.com>
+ <5234EF82-463D-4521-ABDB-C68132933BD7@sense.com> <CABBYNZJ3eJBDCv-ZiVw_0WPRKGyHJzH4hE-gGkHXo+pxhU3cZw@mail.gmail.com>
+ <1AE5314A-1E01-43B7-AFA3-4D82DA9ED755@sense.com> <CABBYNZ+uD+8+izUrGb+_U1JdgYTCormjftVzmPs9OGRAqT=XxA@mail.gmail.com>
+ <1FA6F703-9CED-43FC-8CA0-BD3F1680EED9@sense.com> <CABBYNZLjRA5e0JuryigV+9wdMdHvLYUoSZpfJ=_Eh2rhfCiGfA@mail.gmail.com>
+From: Emil Lenngren <emil.lenngren@gmail.com>
+Date: Thu, 7 Sep 2017 12:47:26 +0200
+Message-ID: <CAO1O6scnxYL9Jf3ev=+8AdxqXmt1mg2w8cDqARa+v7oBLXop8w@mail.gmail.com>
+Subject: Re: [PATCH v2] gatt-server: Implement NegotiatedMTU property on Device1
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Jonah Petri <jonah@sense.com>,
+        Bluez mailing list <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcin,
+Hi
 
-On Thu, Sep 7, 2017 at 10:58 AM, Marcin Kraglak
-<marcin.kraglak@tieto.com> wrote:
-> ---
->  mesh/main.c | 42 ++++++++++++++++++++++++++++++++++++++++++
->  mesh/util.c |  5 +++++
->  mesh/util.h |  1 +
->  3 files changed, 48 insertions(+)
+2017-09-07 12:22 GMT+02:00 Luiz Augusto von Dentz <luiz.dentz@gmail.com>:
+> Hi Jonah,
 >
-> diff --git a/mesh/main.c b/mesh/main.c
-> index 42506a6..c4ede8b 100644
-> --- a/mesh/main.c
-> +++ b/mesh/main.c
-> @@ -1985,6 +1985,47 @@ static const struct menu_entry meshctl_cmd_table[] = {
->         { }
->  };
+> On Thu, Sep 7, 2017 at 3:09 AM, Jonah Petri <jonah@sense.com> wrote:
+>> Hi Luiz,
+>>
+>>> On Sep 6, 2017, at 3:57 PM, Luiz Augusto von Dentz <luiz.dentz@gmail.co=
+m> wrote:
+>>>
+>>>>>
+>>>>> Also, the AcquireWrite and AcquireNotify should fulfil most of the us=
+e
+>>>>> cases where GATT is used just as transport to another protocol, is
+>>>>> that what you are intending to do?
+>>>>
+>>>> I'm merely conforming to an existing protocol, which requires me to on=
+ly publish GATT attributes which are length <=3D MTU - 3.  This is because =
+we can't depend on Long Read and Long Write support from BTLE clients.  In =
+cases where a larger MTU has been negotiated, I need to take advantage of i=
+t, for optimal throughput.
+>>>
+>>> Im afraid I don't follow what you are saying about publishing GATT
+>>> attributes, the spec doesn't require Long procedures by clients but
+>>> that doesn't mean you should omit attributes where their values are
+>>> bigger than the MTU or anything like that. Im also not sure why
+>>> throughput would be relevant, GATT/ATT is not throughput oriented, it
+>>> is a request/response protocol with 30 seconds timeout and on top of
+>>> that we have yet another request/response IPC.
+>>
+>> The protocol I=E2=80=99m implementing is a fairly typical =E2=80=98uart-=
+on-btle=E2=80=99 protocol, of the sort supported by many BT vendors, especi=
+ally for embedded MCUs.  Reads of GATT attributes above the MTU - 3 thresho=
+ld are truncated in the client=E2=80=99s bt stack, but the clients typicall=
+y don=E2=80=99t realize it, so they get corrupted data.  However, for clien=
+ts which support a larger MTU, the transfer speeds can be much faster, as t=
+he MTU is larger.  (yes, we=E2=80=99re still talking about a few kb/sec, bu=
+t 4x faster is 4x faster!)
 >
-> +static char *cmd_generator(const char *text, int state)
-> +{
-> +       struct menu_entry *cmd_table;
-> +       static int index, len;
-> +       const char *cmd;
-> +
-> +       cmd_table = get_current_cmd_table();
-> +       if (!cmd_table)
-> +               return NULL;
-> +
-> +       if (!state) {
-> +               index = 0;
-> +               len = strlen(text);
-> +       }
-> +
-> +       while ((cmd = cmd_table[index].cmd)) {
-> +               index++;
-> +
-> +               if (!strncmp(cmd, text, len))
-> +                       return strdup(cmd);
-> +       }
-> +
-> +       return NULL;
-> +}
-> +
-> +static char **cmd_completion(const char *text, int start, int end)
-> +{
-> +       char **matches = NULL;
-> +
-> +       if (start > 0)
-> +               goto done;
-> +
-> +       matches = rl_completion_matches(text, cmd_generator);
-> +
-> +done:
-> +       if (!matches)
-> +               rl_attempted_completion_over = 1;
-> +
-> +       return matches;
-> +}
-> +
->  static void rl_handler(char *input)
->  {
->         char *cmd, *arg;
-> @@ -2214,6 +2255,7 @@ int main(int argc, char *argv[])
->         dbus_conn = g_dbus_setup_bus(DBUS_BUS_SYSTEM, NULL, NULL);
+> I will have to repeat this over and over, there are better solutions
+> to this than GATT, what we are seeing here is perhaps the lack of
+> support in Android. After these many years of L2CAP CoC being around
+> it really beats me why no vendor took the task to just implement it
+> and contributed to Android instead of working around it via GATT/ATT
+> and then blaming the peripheral stack for the lack of serial over
+> GATT/ATT. Not only this would bring proper serial support but things
+> like IPSP, Object Transfer, and other profiles that do use L2CAP CoC.
 >
->         setlinebuf(stdout);
-> +       rl_attempted_completion_function = cmd_completion;
+>> Of course, you=E2=80=99re right that BTLE isn=E2=80=99t exactly the righ=
+t way to do this.  You don=E2=80=99t need to convince me of this.  But I do=
+ have a need for getting the MTU, to implement the protocol without corrupt=
+ing the data.  Most people implementing the server half of these protocols =
+like this will have the same need.
+>>
+>> AcquireWrite and AcquireRead are not useful to me, as I=E2=80=99m implem=
+enting a gatt server, and those interfaces are marked as =E2=80=98Client On=
+ly=E2=80=99.
 >
->         rl_erase_empty_line = 1;
->         rl_callback_handler_install(NULL, rl_handler);
-> diff --git a/mesh/util.c b/mesh/util.c
-> index fac4bab..139b1cd 100644
-> --- a/mesh/util.c
-> +++ b/mesh/util.c
-> @@ -191,6 +191,11 @@ void print_cmd_menu(const struct menu_entry *cmd_table)
+> So lets fix that and on the plus side you might get even better
+> transfer speeds since we can bypass D-Bus entirely.
+
+
+I fully agree that the GATT specification kind of sucks for
+throughput-applications since it is, as you say, only meant to be used
+for small data transfers. But we have to remember that there are A LOT
+of devices and protocols out there that use GATT to stream data
+instead of L2CAP CoC since that was previously the only way to send
+data, so this still have to be dealt with. And if one uses Write
+Without Response and Notifications, GATT is only 1 extra byte overhead
+compared to L2CAP CoC per packet anyway, so it's not _that_ bad if
+used optimally.
+
+
 >
->  }
->
-> +struct menu_entry *get_current_cmd_table(void)
-> +{
-> +       return current_cmd_table;
-> +}
-> +
->  void cmd_menu_cleanup(void)
->  {
->         main_cmd_table = NULL;
-> diff --git a/mesh/util.h b/mesh/util.h
-> index 7f729ab..ba226df 100644
-> --- a/mesh/util.h
-> +++ b/mesh/util.h
-> @@ -41,6 +41,7 @@ bool switch_cmd_menu(const char *name);
->  void set_menu_prompt(const char *prefix, const char * node);
->  void process_menu_cmd(const char *cmd, const char *arg);
->  void print_cmd_menu(const struct menu_entry *cmd_table);
-> +struct menu_entry *get_current_cmd_table(void);
->  void cmd_menu_cleanup(void);
->  void print_byte_array(const char *prefix, const void *ptr, int len);
->  bool str2hex(const char *str, uint16_t in_len, uint8_t *out_buf,
 > --
-> 2.9.3
-
-It might be better if we move the menu setup to src/shared and ensure
-both bluetoothctl and meshctl use the same codebase so we avoid having
-to duplicate this for every new command line tool.
-
--- 
-Luiz Augusto von Dentz
+> Luiz Augusto von Dentz
