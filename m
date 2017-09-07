@@ -1,72 +1,86 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Subject: Re: [PATCH] autopair: Don't handle the iCade
-To: Bastien Nocera <hadess@hadess.net>,
-        <linux-bluetooth@vger.kernel.org>
-References: <20170904175446.4798-1-hadess@hadess.net>
-From: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
-Message-ID: <973c2ecf-7916-b070-bbe5-1b92f7565b8c@jp.fujitsu.com>
-Date: Thu, 7 Sep 2017 16:46:44 +0900
-MIME-Version: 1.0
-In-Reply-To: <20170904175446.4798-1-hadess@hadess.net>
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+Subject: Re: [PATCH v6 1/3] dt-bindings: net: document Bluetooth bindings in
+ one place
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20170906232610.GG1165@minitux>
+Date: Thu, 7 Sep 2017 08:14:32 +0200
+Cc: Loic Poulain <loic.poulain@linaro.org>,
+        Rob Herring <robh+dt@kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Bluez mailing list <linux-bluetooth@vger.kernel.org>,
+        linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org
+Message-Id: <41A0C162-4AC5-4969-813D-9E2C7F5D5031@holtmann.org>
+References: <1504699898-28011-1-git-send-email-loic.poulain@linaro.org>
+ <20170906232610.GG1165@minitux>
+To: Bjorn Andersson <bjorn.andersson@linaro.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bastien,
+Hi Bjorn,
 
-On 09/05/2017 02:54 AM, Bastien Nocera wrote:
-> We can't easily enter digits other than 1 through 4 (inclusive)
-> so leave it up to the agent to figure out a good passcode
-> for the iCade.
+>> In the same way as Ethernet, gather the Bluetooth related bindings in
+>> one file. Introduce the bluetooth-bd-address property which can be used
+>> to store the assigned BD address.
+>> 
+>> Signed-off-by: Loic Poulain <loic.poulain@linaro.org>
+>> ---
+>> v2: Set device as unconfigured if default address detected
+>>     Add warning if BD addr retrieved from DT
+>> v3: if no addr retrieved from DT, unconditionally set
+>>     the invalid BD addr flag.
+>>     swap and set bdaddr in the platform probe
+>> v4: Add dt-bindings documentation
+>>     split patch in two parts (setup, dt prop)
+>>     use local-bd-address name instead of local-mac-address
+>> v5: remove 2/3 merged in bluetooth-next tree
+>>     Add bluetooth.txt for common BT bindings
+>>     expect local-bd-address in little-endian format
+>> v6: use of_property_read_u8_array instead of of_get_property
+>> 
+>> Documentation/devicetree/bindings/net/bluetooth.txt | 5 +++++
+>> 1 file changed, 5 insertions(+)
+>> create mode 100644 Documentation/devicetree/bindings/net/bluetooth.txt
+>> 
+>> diff --git a/Documentation/devicetree/bindings/net/bluetooth.txt b/Documentation/devicetree/bindings/net/bluetooth.txt
+>> new file mode 100644
+>> index 0000000..94797df
+>> --- /dev/null
+>> +++ b/Documentation/devicetree/bindings/net/bluetooth.txt
+>> @@ -0,0 +1,5 @@
+>> +The following properties are common to the Bluetooth controllers:
+>> +
+>> +- local-bd-address: array of 6 bytes, specifies the BD address that was
+>> +  uniquely assigned to the Bluetooth device, formatted with least significant
+>> +  byte first (little-endian).
 > 
-> Note that we can not use the VID/PID of the device, as it is not
-> yet known at that point.
-
-Does not the device class of iCade include its unique value or a value 
-for similar devices?
-
-> ---
->  plugins/autopair.c | 13 ++++++++++++-
->  1 file changed, 12 insertions(+), 1 deletion(-)
+> Is there a good reason for making this little endian?
 > 
-> diff --git a/plugins/autopair.c b/plugins/autopair.c
-> index d44cf539b..a9d2a930a 100644
-> --- a/plugins/autopair.c
-> +++ b/plugins/autopair.c
-> @@ -60,13 +60,24 @@ static ssize_t autopair_pincb(struct btd_adapter *adapter,
->  {
->  	char addr[18];
->  	char pinstr[7];
-> +	char name[25];
->  	uint32_t class;
->  
->  	ba2str(device_get_address(device), addr);
->  
->  	class = btd_device_get_class(device);
->  
-> -	DBG("device %s 0x%x", addr, class);
-> +	device_get_name(device, name, sizeof(name));
-> +	name[sizeof(name) - 1] = 0;
-> +
-> +	DBG("device '%s' (%s) class: 0x%x vid/pid: 0x%X/0x%X",
-> +		name, addr, class,
-> +		btd_device_get_vendor (device),
-> +		btd_device_get_product (device));
-> +
-> +	/* The iCade shouldn't use random PINs like normal keyboards */
-> +	if (name != NULL && strstr(name, "iCade") != NULL)
-> +		return 0;
+> Sure it's only going to be read and written by computers, but for anyone
+> reading the generated DT it sure looks like the values are reversed.
 
-If there is not a value identified as iCade in the device class, 
-I think that it is better to use simply device->name instead of 
-copying since the full device name is used.
+the Bluetooth spec has a string notation and defines how it is packed as 6 octet binary.
 
+"On the baseband level the BD_ADDR is represented as 48 bits. On the Link Layer the public and random device address are represented as 48-bit addresses."
 
-Regards,
-Eramoto
+"On the UI level the Bluetooth address shall be represented as 12 hexadecimal characters, possibly divided into sub-parts separated by ‘:’ (e.g., ‘000C3E3A4B69’ or ‘00:0C:3E:3A:4B:69’). On the UI level any number shall have the MSB -> LSB (from left to right) ‘natural’ ordering.”
 
->  
->  	/* This is a class-based pincode guesser. Ignore devices with an
->  	 * unknown class.
-> 
+However on the wire level it is LSB -> MSB. See our ba2str function.
+
+int str2ba(const char *str, bdaddr_t *ba)
+{
+	int i;
+	
+	for (i = 5; i >= 0; i--, str += 3)
+		ba->b[i] = strtol(str, NULL, 16);
+
+	return 0;
+}
+
+I would prefer the boot loader actually providing the BD Address in the correct byte order as the protocol expects and not yet another form. The string representation is just for reference since that is what most people have seen so far.
+
+Regards
+
+Marcel
 
