@@ -1,86 +1,69 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 Content-Type: text/plain; charset=utf-8
 Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Subject: Re: [PATCH v6 1/3] dt-bindings: net: document Bluetooth bindings in
- one place
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20170906232610.GG1165@minitux>
-Date: Thu, 7 Sep 2017 08:14:32 +0200
-Cc: Loic Poulain <loic.poulain@linaro.org>,
-        Rob Herring <robh+dt@kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Bluez mailing list <linux-bluetooth@vger.kernel.org>,
-        linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org
-Message-Id: <41A0C162-4AC5-4969-813D-9E2C7F5D5031@holtmann.org>
-References: <1504699898-28011-1-git-send-email-loic.poulain@linaro.org>
- <20170906232610.GG1165@minitux>
-To: Bjorn Andersson <bjorn.andersson@linaro.org>
+Subject: Re: [PATCH v2] gatt-server: Implement NegotiatedMTU property on
+ Device1
+From: Jonah Petri <jonah@sense.com>
+In-Reply-To: <CABBYNZ+uD+8+izUrGb+_U1JdgYTCormjftVzmPs9OGRAqT=XxA@mail.gmail.com>
+Date: Wed, 6 Sep 2017 20:09:23 -0400
+Cc: Emil Lenngren <emil.lenngren@gmail.com>,
+        Bluez mailing list <linux-bluetooth@vger.kernel.org>
+Message-Id: <1FA6F703-9CED-43FC-8CA0-BD3F1680EED9@sense.com>
+References: <9B25967D-16B8-4335-BE03-8FFD02D400FB@sense.com>
+ <CAO1O6sdd9KxagrbboW+9gpc+OBmsJo6S6g09imAoNxRv5tyA3Q@mail.gmail.com>
+ <CABBYNZLfbhXfEsb=DY-1mzQdiZVmJ9Ka3GjdGiGYgoaqKhkB+A@mail.gmail.com>
+ <5234EF82-463D-4521-ABDB-C68132933BD7@sense.com>
+ <CABBYNZJ3eJBDCv-ZiVw_0WPRKGyHJzH4hE-gGkHXo+pxhU3cZw@mail.gmail.com>
+ <1AE5314A-1E01-43B7-AFA3-4D82DA9ED755@sense.com>
+ <CABBYNZ+uD+8+izUrGb+_U1JdgYTCormjftVzmPs9OGRAqT=XxA@mail.gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bjorn,
+Hi Luiz,
 
->> In the same way as Ethernet, gather the Bluetooth related bindings in
->> one file. Introduce the bluetooth-bd-address property which can be used
->> to store the assigned BD address.
->> 
->> Signed-off-by: Loic Poulain <loic.poulain@linaro.org>
->> ---
->> v2: Set device as unconfigured if default address detected
->>     Add warning if BD addr retrieved from DT
->> v3: if no addr retrieved from DT, unconditionally set
->>     the invalid BD addr flag.
->>     swap and set bdaddr in the platform probe
->> v4: Add dt-bindings documentation
->>     split patch in two parts (setup, dt prop)
->>     use local-bd-address name instead of local-mac-address
->> v5: remove 2/3 merged in bluetooth-next tree
->>     Add bluetooth.txt for common BT bindings
->>     expect local-bd-address in little-endian format
->> v6: use of_property_read_u8_array instead of of_get_property
->> 
->> Documentation/devicetree/bindings/net/bluetooth.txt | 5 +++++
->> 1 file changed, 5 insertions(+)
->> create mode 100644 Documentation/devicetree/bindings/net/bluetooth.txt
->> 
->> diff --git a/Documentation/devicetree/bindings/net/bluetooth.txt b/Documentation/devicetree/bindings/net/bluetooth.txt
->> new file mode 100644
->> index 0000000..94797df
->> --- /dev/null
->> +++ b/Documentation/devicetree/bindings/net/bluetooth.txt
->> @@ -0,0 +1,5 @@
->> +The following properties are common to the Bluetooth controllers:
->> +
->> +- local-bd-address: array of 6 bytes, specifies the BD address that was
->> +  uniquely assigned to the Bluetooth device, formatted with least significant
->> +  byte first (little-endian).
-> 
-> Is there a good reason for making this little endian?
-> 
-> Sure it's only going to be read and written by computers, but for anyone
-> reading the generated DT it sure looks like the values are reversed.
+> On Sep 6, 2017, at 3:57 PM, Luiz Augusto von Dentz =
+<luiz.dentz@gmail.com> wrote:
+>=20
+>>>=20
+>>> Also, the AcquireWrite and AcquireNotify should fulfil most of the =
+use
+>>> cases where GATT is used just as transport to another protocol, is
+>>> that what you are intending to do?
+>>=20
+>> I'm merely conforming to an existing protocol, which requires me to =
+only publish GATT attributes which are length <=3D MTU - 3.  This is =
+because we can't depend on Long Read and Long Write support from BTLE =
+clients.  In cases where a larger MTU has been negotiated, I need to =
+take advantage of it, for optimal throughput.
+>=20
+> Im afraid I don't follow what you are saying about publishing GATT
+> attributes, the spec doesn't require Long procedures by clients but
+> that doesn't mean you should omit attributes where their values are
+> bigger than the MTU or anything like that. Im also not sure why
+> throughput would be relevant, GATT/ATT is not throughput oriented, it
+> is a request/response protocol with 30 seconds timeout and on top of
+> that we have yet another request/response IPC.
 
-the Bluetooth spec has a string notation and defines how it is packed as 6 octet binary.
+The protocol I=E2=80=99m implementing is a fairly typical =
+=E2=80=98uart-on-btle=E2=80=99 protocol, of the sort supported by many =
+BT vendors, especially for embedded MCUs.  Reads of GATT attributes =
+above the MTU - 3 threshold are truncated in the client=E2=80=99s bt =
+stack, but the clients typically don=E2=80=99t realize it, so they get =
+corrupted data.  However, for clients which support a larger MTU, the =
+transfer speeds can be much faster, as the MTU is larger.  (yes, we=E2=80=99=
+re still talking about a few kb/sec, but 4x faster is 4x faster!) =20
 
-"On the baseband level the BD_ADDR is represented as 48 bits. On the Link Layer the public and random device address are represented as 48-bit addresses."
+Of course, you=E2=80=99re right that BTLE isn=E2=80=99t exactly the =
+right way to do this.  You don=E2=80=99t need to convince me of this.  =
+But I do have a need for getting the MTU, to implement the protocol =
+without corrupting the data.  Most people implementing the server half =
+of these protocols like this will have the same need.
 
-"On the UI level the Bluetooth address shall be represented as 12 hexadecimal characters, possibly divided into sub-parts separated by ‘:’ (e.g., ‘000C3E3A4B69’ or ‘00:0C:3E:3A:4B:69’). On the UI level any number shall have the MSB -> LSB (from left to right) ‘natural’ ordering.”
+AcquireWrite and AcquireRead are not useful to me, as I=E2=80=99m =
+implementing a gatt server, and those interfaces are marked as =E2=80=98Cl=
+ient Only=E2=80=99.
 
-However on the wire level it is LSB -> MSB. See our ba2str function.
-
-int str2ba(const char *str, bdaddr_t *ba)
-{
-	int i;
-	
-	for (i = 5; i >= 0; i--, str += 3)
-		ba->b[i] = strtol(str, NULL, 16);
-
-	return 0;
-}
-
-I would prefer the boot loader actually providing the BD Address in the correct byte order as the protocol expects and not yet another form. The string representation is just for reference since that is what most people have seen so far.
-
-Regards
-
-Marcel
+Regards,
+Jonah
 
