@@ -1,41 +1,42 @@
-Return-Path: <frederic.danis.oss@gmail.com>
-From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis.oss@gmail.com>
-To: robh@kernel.org,
-	marcel@holtmann.org,
-	sre@kernel.org,
-	loic.poulain@gmail.com
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-serial@vger.kernel.org,
-	linux-acpi@vger.kernel.org,
-	frederic.danis.oss@gmail.com
-Subject: [RFC 0/3] ACPI serdev support
-Date: Thu,  7 Sep 2017 14:10:11 +0200
-Message-Id: <1504786214-1866-1-git-send-email-frederic.danis.oss@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Message-ID: <1504785933.6911.64.camel@hadess.net>
+Subject: Re: [PATCH] autopair: Don't handle the iCade
+From: Bastien Nocera <hadess@hadess.net>
+To: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>,
+        linux-bluetooth@vger.kernel.org
+Date: Thu, 07 Sep 2017 14:05:33 +0200
+In-Reply-To: <973c2ecf-7916-b070-bbe5-1b92f7565b8c@jp.fujitsu.com>
+References: <20170904175446.4798-1-hadess@hadess.net>
+         <973c2ecf-7916-b070-bbe5-1b92f7565b8c@jp.fujitsu.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add ACPI support for serial attached devices.
+On Thu, 2017-09-07 at 16:46 +0900, ERAMOTO Masaya wrote:
+> Hi Bastien,
+> 
+> On 09/05/2017 02:54 AM, Bastien Nocera wrote:
+> > We can't easily enter digits other than 1 through 4 (inclusive)
+> > so leave it up to the agent to figure out a good passcode
+> > for the iCade.
+> > 
+> > Note that we can not use the VID/PID of the device, as it is not
+> > yet known at that point.
+> 
+> Does not the device class of iCade include its unique value or a
+> value 
+> for similar devices?
 
-Currently, serial devices are not set as enumerated during ACPI scan for SPI
-or i2c buses (but not for UART). This should also be done for UART serial
-devices.
-I renamed *spi_i2c_slave to *serial_slave to reflect this.
+No, the iCade is configured as a keyboard so it can be paired with
+Apple iOS devices which only recognise keyboards. Each keypress and key
+release is a separate keyboard key press/release.
 
-As this is only tested on T100TA with Broadcom BCM2E39, I moved this to a
-specific acpi_match_table.
+In mainline Linux, you can find the hid-icade driver that'll take care
+of transforming those key presses and key releases into joypad events:
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/drivers/hid/hid-icade.c
 
-Frédéric Danis (3):
-  serdev: Add ACPI support
-  ACPI / scan: Fix enumeration for special UART devices
-  Bluetooth: hci_bcm: Add ACPI serdev support for BCM2E39
-
- drivers/acpi/scan.c         | 29 ++++++-------
- drivers/bluetooth/hci_bcm.c | 10 ++++-
- drivers/tty/serdev/core.c   | 99 ++++++++++++++++++++++++++++++++++++++++++---
- include/acpi/acpi_bus.h     |  2 +-
- 4 files changed, 116 insertions(+), 24 deletions(-)
-
--- 
-2.7.4
+As we don't want the autopair keyboard to generate impossible to "type"
+numbers, we need to do this somewhere else. It's done in gnome-
+bluetooth's pairing agent as the device was deemed too niche to have
+this handled in bluez. We still need the quirk however.
