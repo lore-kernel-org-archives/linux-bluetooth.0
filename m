@@ -1,52 +1,257 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Subject: Re: [PATCH v7 3/3] Bluetooth: btqcomsmd: retrieve BD address from DT
- property
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1504879075-587-3-git-send-email-loic.poulain@linaro.org>
-Date: Fri, 8 Sep 2017 17:31:14 +0200
-Cc: Rob Herring <robh+dt@kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Bluez mailing list <linux-bluetooth@vger.kernel.org>,
-        linux-arm-msm@vger.kernel.org,
-        devicetree <devicetree@vger.kernel.org>,
-        bjorn.andersson@linaro.org
-Message-Id: <AA9FCC78-BFEC-4944-B91F-DCDE6F455DBB@holtmann.org>
-References: <1504879075-587-1-git-send-email-loic.poulain@linaro.org>
- <1504879075-587-3-git-send-email-loic.poulain@linaro.org>
-To: Loic Poulain <loic.poulain@linaro.org>
+MIME-Version: 1.0
+In-Reply-To: <CABBYNZ+HSyR-FesC-Csuc14B-OF0Ffj7t9oWsnPrpiOy01CH1w@mail.gmail.com>
+References: <CAFxSrVsWAbw4bRwk8En-O1sX3Afr2_N1Y=Snmdb3QTZeW8niUA@mail.gmail.com>
+ <CABBYNZ+HSyR-FesC-Csuc14B-OF0Ffj7t9oWsnPrpiOy01CH1w@mail.gmail.com>
+From: Laczen JMS <laczenjms@gmail.com>
+Date: Fri, 8 Sep 2017 16:25:07 +0200
+Message-ID: <CAFxSrVsLAjWnswFuGcJ+_u_AXVuWpVU1Lx-uQFJjLm36SSndEw@mail.gmail.com>
+Subject: Re: [PATCH 1/1] mesh: Remove StopNotify method to avoid reading data
+ twice on some mesh nodes
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: multipart/mixed; boundary="001a113deaf40af7190558ae5818"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Loic,
+--001a113deaf40af7190558ae5818
+Content-Type: text/plain; charset="UTF-8"
 
-> Retrieve BD address from the local-bd-address property.
-> This address must be unique and is usually added in the DT
-> by the bootloader which has access to the provisioned data.
-> 
-> Signed-off-by: Loic Poulain <loic.poulain@linaro.org>
-> ---
-> v2: Set device as unconfigured if default address detected
->     Add warning if BD addr retrieved from DT
-> v3: if no addr retrieved from DT, unconditionally set
->     the invalid BD addr flag.
->     swap and set bdaddr in the platform probe
-> v4: Add dt-bindings documentation
->     split patch in two parts (setup, dt prop)
->     use local-bd-address name instead of local-mac-address
-> v5: remove 2/3 merged in bluetooth-next tree
->     Add bluetooth.txt for common BT bindings
->     expect local-bd-address in little-endian format
-> v6: use of_property_read_u8_array instead of of_get_property
-> v7: use dev_info instead of BT_INFO to have dev context
-> 
-> drivers/bluetooth/btqcomsmd.c | 11 +++++++++++
-> 1 file changed, 11 insertions(+)
+Hi Luiz,
 
-all 3 patches have been applied to bluetooth-next tree.
+Probably my analysis of the cause is wrong. I added a rl_printf when
+the StopNotify was called, meshctl shows the following:
 
-Regards
+Notify started
+Notify for Mesh Provisioning Out Data started
+Open-Node: 0x102c470
+Open-Prov: 0xff7000
+Open-Prov: proxy 0xffe830
+GATT-TX:  03 00 10
+Attempting to write /org/bluez/hci0/dev_C3_F0_13_5D_5F_5E/service000a/char000b
+Initiated provisioning
+Characteristic property changed
+/org/bluez/hci0/dev_C3_F0_13_5D_5F_5E/service000a/char000d
+GATT-RX: 03 01 01 00 01 00 00 00 00 00 00 00 00
+Got provisioning data (12 bytes)
+01 01 00 01 00 00 00 00 00 00 00 00
+Provisioning failed
+Calling StopNotify --------------> added by me using rl_printf()
+Characteristic property changed
+/org/bluez/hci0/dev_C3_F0_13_5D_5F_5E/service000a/char000d
+GATT-RX: 03 01 01 00 01 00 00 00 00 00 00 00 00
+Node not found?
+Notify stopped
+Attempting to disconnect from C3:F0:13:5D:5F:5E
+Services resolved no
 
-Marcel
+As you can see the same data is received twice: GATT-RX: 03 01 01 00
+01 ..., just after the Characteristic property changed line. I thought
+that this Characteristic property change was the result of the not
+changing of the node and keeping notifications on.
 
+I also enable btmon during this process (see included file). In the
+log I cannot find the data being send twice.
+
+Kind regards,
+
+Jehudi
+
+2017-09-08 15:47 GMT+02:00 Luiz Augusto von Dentz <luiz.dentz@gmail.com>:
+> Hi Jehudi,
+>
+> On Fri, Sep 8, 2017 at 3:30 PM, Laczen JMS <laczenjms@gmail.com> wrote:
+>> Some mesh nodes do not change (e.g. zephyr) the notification when
+>> given the StopNotify. As a result the data from the notification
+>> channel is processed twice. This patch removes the StopNotify.
+>
+> What do you mean the node do not change? Perhaps this is the result of
+> bluetoothd remembering the subscriptions so you don't have to
+> StopNotify while disconnected, though this should not cause the data
+> to be processed twice otherwise we have a bug somewhere in the daemon.
+>
+>> Kind regards,
+>>
+>> Jehudi
+>>
+>>   diff --git a/mesh/gatt.c b/mesh/gatt.c
+>> index f9615b3..7d3b869 100644
+>> --- a/mesh/gatt.c
+>> +++ b/mesh/gatt.c
+>> @@ -589,15 +589,10 @@ bool mesh_gatt_notify(GDBusProxy *proxy, bool
+>> enable, GDBusReturnFunction cb,
+>>   cb = notify_reply;
+>>   }
+>>   } else {
+>> - if (notify_io) {
+>> - notify_io_destroy();
+>> - if (cb)
+>> - cb(NULL, user_data);
+>> - return true;
+>> - } else {
+>> - method = "StopNotify";
+>> - cb = notify_reply;
+>> - }
+>> + if (notify_io) notify_io_destroy();
+>> + if (cb) cb(NULL, user_data);
+>> +
+>> + return true;
+>>   }
+>>
+>>   if (g_dbus_proxy_method_call(proxy, method, NULL, cb,
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
+>
+>
+> --
+> Luiz Augusto von Dentz
+
+--001a113deaf40af7190558ae5818
+Content-Type: text/x-log; charset="US-ASCII"; name="bt.log"
+Content-Disposition: attachment; filename="bt.log"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_j7bz286r0
+
+PiBIQ0kgRXZlbnQ6IExFIE1ldGEgRXZlbnQgKDB4M2UpIHBsZW4gNDEgICAgICAgICAgICAgICAg
+ICAjMjEgW2hjaTBdIDIyLjcyMTM2NQogICAgICBMRSBBZHZlcnRpc2luZyBSZXBvcnQgKDB4MDIp
+CiAgICAgICAgTnVtIHJlcG9ydHM6IDEKICAgICAgICBFdmVudCB0eXBlOiBDb25uZWN0YWJsZSB1
+bmRpcmVjdGVkIC0gQURWX0lORCAoMHgwMCkKICAgICAgICBBZGRyZXNzIHR5cGU6IFJhbmRvbSAo
+MHgwMSkKICAgICAgICBBZGRyZXNzOiBDMzpGMDoxMzo1RDo1Rjo1RSAoU3RhdGljKQogICAgICAg
+IERhdGEgbGVuZ3RoOiAyOQogICAgICAgIEZsYWdzOiAweDA2CiAgICAgICAgICBMRSBHZW5lcmFs
+IERpc2NvdmVyYWJsZSBNb2RlCiAgICAgICAgICBCUi9FRFIgTm90IFN1cHBvcnRlZAogICAgICAg
+IDE2LWJpdCBTZXJ2aWNlIFVVSURzIChjb21wbGV0ZSk6IDEgZW50cnkKICAgICAgICAgIE1lc2gg
+UHJvdmlzaW9uaW5nICgweDE4MjcpCiAgICAgICAgU2VydmljZSBEYXRhIChVVUlEIDB4MTgyNyk6
+IGRkZGQwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMAogICAgICAgIFJTU0k6IC0zNiBk
+Qm0gKDB4ZGMpCjwgSENJIENvbW1hbmQ6IExFIFNldCBTY2FuIEVuYWJsZSAoMHgwOHwweDAwMGMp
+IHBsZW4gMiAgICAgIzIyIFtoY2kwXSAyMi43MjE1MDEKICAgICAgICBTY2FubmluZzogRGlzYWJs
+ZWQgKDB4MDApCiAgICAgICAgRmlsdGVyIGR1cGxpY2F0ZXM6IERpc2FibGVkICgweDAwKQo+IEhD
+SSBFdmVudDogQ29tbWFuZCBDb21wbGV0ZSAoMHgwZSkgcGxlbiA0ICAgICAgICAgICAgICAgICMy
+MyBbaGNpMF0gMjIuNzIzMjgyCiAgICAgIExFIFNldCBTY2FuIEVuYWJsZSAoMHgwOHwweDAwMGMp
+IG5jbWQgMQogICAgICAgIFN0YXR1czogU3VjY2VzcyAoMHgwMCkKPCBIQ0kgQ29tbWFuZDogTEUg
+Q3JlYXRlIENvbm5lY3Rpb24gKDB4MDh8MHgwMDBkKSBwbGVuIDI1ICAjMjQgW2hjaTBdIDIyLjcy
+MzM2MQogICAgICAgIFNjYW4gaW50ZXJ2YWw6IDYwLjAwMCBtc2VjICgweDAwNjApCiAgICAgICAg
+U2NhbiB3aW5kb3c6IDYwLjAwMCBtc2VjICgweDAwNjApCiAgICAgICAgRmlsdGVyIHBvbGljeTog
+V2hpdGUgbGlzdCBpcyBub3QgdXNlZCAoMHgwMCkKICAgICAgICBQZWVyIGFkZHJlc3MgdHlwZTog
+UmFuZG9tICgweDAxKQogICAgICAgIFBlZXIgYWRkcmVzczogQzM6RjA6MTM6NUQ6NUY6NUUgKFN0
+YXRpYykKICAgICAgICBPd24gYWRkcmVzcyB0eXBlOiBQdWJsaWMgKDB4MDApCiAgICAgICAgTWlu
+IGNvbm5lY3Rpb24gaW50ZXJ2YWw6IDUwLjAwIG1zZWMgKDB4MDAyOCkKICAgICAgICBNYXggY29u
+bmVjdGlvbiBpbnRlcnZhbDogNzAuMDAgbXNlYyAoMHgwMDM4KQogICAgICAgIENvbm5lY3Rpb24g
+bGF0ZW5jeTogMCAoMHgwMDAwKQogICAgICAgIFN1cGVydmlzaW9uIHRpbWVvdXQ6IDQyMCBtc2Vj
+ICgweDAwMmEpCiAgICAgICAgTWluIGNvbm5lY3Rpb24gbGVuZ3RoOiAwLjAwMCBtc2VjICgweDAw
+MDApCiAgICAgICAgTWF4IGNvbm5lY3Rpb24gbGVuZ3RoOiAwLjAwMCBtc2VjICgweDAwMDApCj4g
+SENJIEV2ZW50OiBDb21tYW5kIFN0YXR1cyAoMHgwZikgcGxlbiA0ICAgICAgICAgICAgICAgICAg
+IzI1IFtoY2kwXSAyMi43NDAyNzQKICAgICAgTEUgQ3JlYXRlIENvbm5lY3Rpb24gKDB4MDh8MHgw
+MDBkKSBuY21kIDEKICAgICAgICBTdGF0dXM6IFN1Y2Nlc3MgKDB4MDApCj4gSENJIEV2ZW50OiBM
+RSBNZXRhIEV2ZW50ICgweDNlKSBwbGVuIDE5ICAgICAgICAgICAgICAgICAgIzI2IFtoY2kwXSAy
+NC43MjE0MDMKICAgICAgTEUgQ29ubmVjdGlvbiBDb21wbGV0ZSAoMHgwMSkKICAgICAgICBTdGF0
+dXM6IFN1Y2Nlc3MgKDB4MDApCiAgICAgICAgSGFuZGxlOiA3MAogICAgICAgIFJvbGU6IE1hc3Rl
+ciAoMHgwMCkKICAgICAgICBQZWVyIGFkZHJlc3MgdHlwZTogUmFuZG9tICgweDAxKQogICAgICAg
+IFBlZXIgYWRkcmVzczogQzM6RjA6MTM6NUQ6NUY6NUUgKFN0YXRpYykKICAgICAgICBDb25uZWN0
+aW9uIGludGVydmFsOiA3MC4wMCBtc2VjICgweDAwMzgpCiAgICAgICAgQ29ubmVjdGlvbiBsYXRl
+bmN5OiAwICgweDAwMDApCiAgICAgICAgU3VwZXJ2aXNpb24gdGltZW91dDogNDIwIG1zZWMgKDB4
+MDAyYSkKICAgICAgICBNYXN0ZXIgY2xvY2sgYWNjdXJhY3k6IDB4MDAKQCBEZXZpY2UgQ29ubmVj
+dGVkOiBDMzpGMDoxMzo1RDo1Rjo1RSAoMikgZmxhZ3MgMHgwMDAwCiAgICAgICAgMDIgMDEgMDYg
+MDMgMDMgMjcgMTggMTUgMTYgMjcgMTggZGQgZGQgMDAgMDAgMDAgIC4uLi4uJy4uLicuLi4uLi4K
+ICAgICAgICAwMCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAgICAgICAgICAg
+Li4uLi4uLi4uLi4uLgo8IEhDSSBDb21tYW5kOiBMRSBSZWFkIFJlbW90ZSBVc2VkLi4gKDB4MDh8
+MHgwMDE2KSBwbGVuIDIgICMyNyBbaGNpMF0gMjQuNzIxODg1CiAgICAgICAgSGFuZGxlOiA3MAo+
+IEhDSSBFdmVudDogQ29tbWFuZCBTdGF0dXMgKDB4MGYpIHBsZW4gNCAgICAgICAgICAgICAgICAg
+ICMyOCBbaGNpMF0gMjQuNzI1MzIwCiAgICAgIExFIFJlYWQgUmVtb3RlIFVzZWQgRmVhdHVyZXMg
+KDB4MDh8MHgwMDE2KSBuY21kIDEKICAgICAgICBTdGF0dXM6IFN1Y2Nlc3MgKDB4MDApCj4gSENJ
+IEV2ZW50OiBMRSBNZXRhIEV2ZW50ICgweDNlKSBwbGVuIDEyICAgICAgICAgICAgICAgICAgIzI5
+IFtoY2kwXSAyNC43NTkzMjQKICAgICAgTEUgUmVhZCBSZW1vdGUgVXNlZCBGZWF0dXJlcyAoMHgw
+NCkKICAgICAgICBTdGF0dXM6IFN1Y2Nlc3MgKDB4MDApCiAgICAgICAgSGFuZGxlOiA3MAogICAg
+ICAgIEZlYXR1cmVzOiAweDgxIDB4MDAgMHgwMCAweDAwIDB4MDAgMHgwMCAweDAwIDB4MDAKICAg
+ICAgICAgIExFIEVuY3J5cHRpb24KICAgICAgICAgIEV4dGVuZGVkIFNjYW5uZXIgRmlsdGVyIFBv
+bGljaWVzCjwgQUNMIERhdGEgVFg6IEhhbmRsZSA3MCBmbGFncyAweDAwIGRsZW4gNyAgICAgICAg
+ICAgICAgICAgIzMwIFtoY2kwXSAyNC43NTk4NDcKICAgICAgQVRUOiBFeGNoYW5nZSBNVFUgUmVx
+dWVzdCAoMHgwMikgbGVuIDIKICAgICAgICBDbGllbnQgUlggTVRVOiA1MTcKPiBIQ0kgRXZlbnQ6
+IE51bWJlciBvZiBDb21wbGV0ZWQgUGFja2V0cyAoMHgxMykgcGxlbiA1ICAgICAjMzEgW2hjaTBd
+IDI0LjgyOTQwMgogICAgICAgIE51bSBoYW5kbGVzOiAxCiAgICAgICAgSGFuZGxlOiA3MAogICAg
+ICAgIENvdW50OiAxCj4gQUNMIERhdGEgUlg6IEhhbmRsZSA3MCBmbGFncyAweDAyIGRsZW4gNyAg
+ICAgICAgICAgICAgICAgIzMyIFtoY2kwXSAyNC44OTgxNDEKICAgICAgQVRUOiBFeGNoYW5nZSBN
+VFUgUmVzcG9uc2UgKDB4MDMpIGxlbiAyCiAgICAgICAgU2VydmVyIFJYIE1UVTogNjkKPCBBQ0wg
+RGF0YSBUWDogSGFuZGxlIDcwIGZsYWdzIDB4MDAgZGxlbiA3ICAgICAgICAgICAgICAgICAjMzMg
+W2hjaTBdIDI0Ljg5ODUzNwogICAgICBBVFQ6IFJlYWQgUmVxdWVzdCAoMHgwYSkgbGVuIDIKICAg
+ICAgICBIYW5kbGU6IDB4MDAwMwo+IEhDSSBFdmVudDogTnVtYmVyIG9mIENvbXBsZXRlZCBQYWNr
+ZXRzICgweDEzKSBwbGVuIDUgICAgICMzNCBbaGNpMF0gMjQuOTY4NDA0CiAgICAgICAgTnVtIGhh
+bmRsZXM6IDEKICAgICAgICBIYW5kbGU6IDcwCiAgICAgICAgQ291bnQ6IDEKPiBBQ0wgRGF0YSBS
+WDogSGFuZGxlIDcwIGZsYWdzIDB4MDIgZGxlbiAxMSAgICAgICAgICAgICAgICAjMzUgW2hjaTBd
+IDI1LjA0NDczNQogICAgICBBVFQ6IFJlYWQgUmVzcG9uc2UgKDB4MGIpIGxlbiA2CiAgICAgICAg
+VmFsdWU6IDVhNjU3MDY4Nzk3Mgo8IEFDTCBEYXRhIFRYOiBIYW5kbGUgNzAgZmxhZ3MgMHgwMCBk
+bGVuIDcgICAgICAgICAgICAgICAgICMzNiBbaGNpMF0gMjUuMDQ0OTcwCiAgICAgIEFUVDogUmVh
+ZCBSZXF1ZXN0ICgweDBhKSBsZW4gMgogICAgICAgIEhhbmRsZTogMHgwMDA1Cj4gSENJIEV2ZW50
+OiBOdW1iZXIgb2YgQ29tcGxldGVkIFBhY2tldHMgKDB4MTMpIHBsZW4gNSAgICAgIzM3IFtoY2kw
+XSAyNS4xMDgzNTAKICAgICAgICBOdW0gaGFuZGxlczogMQogICAgICAgIEhhbmRsZTogNzAKICAg
+ICAgICBDb3VudDogMQo+IEFDTCBEYXRhIFJYOiBIYW5kbGUgNzAgZmxhZ3MgMHgwMiBkbGVuIDcg
+ICAgICAgICAgICAgICAgICMzOCBbaGNpMF0gMjUuMTc4MDg4CiAgICAgIEFUVDogUmVhZCBSZXNw
+b25zZSAoMHgwYikgbGVuIDIKICAgICAgICBWYWx1ZTogMDAwMAo8IEFDTCBEYXRhIFRYOiBIYW5k
+bGUgNzAgZmxhZ3MgMHgwMCBkbGVuIDExICAgICAgICAgICAgICAgICMzOSBbaGNpMF0gMjUuMTc4
+Mjk1CiAgICAgIEFUVDogUmVhZCBCeSBHcm91cCBUeXBlIFJlcXVlc3QgKDB4MTApIGxlbiA2CiAg
+ICAgICAgSGFuZGxlIHJhbmdlOiAweDAwMDEtMHhmZmZmCiAgICAgICAgQXR0cmlidXRlIGdyb3Vw
+IHR5cGU6IFByaW1hcnkgU2VydmljZSAoMHgyODAwKQo+IEhDSSBFdmVudDogTnVtYmVyIG9mIENv
+bXBsZXRlZCBQYWNrZXRzICgweDEzKSBwbGVuIDUgICAgICM0MCBbaGNpMF0gMjUuMjQ4MzQ3CiAg
+ICAgICAgTnVtIGhhbmRsZXM6IDEKICAgICAgICBIYW5kbGU6IDcwCiAgICAgICAgQ291bnQ6IDEK
+PiBBQ0wgRGF0YSBSWDogSGFuZGxlIDcwIGZsYWdzIDB4MDIgZGxlbiAyNCAgICAgICAgICAgICAg
+ICAjNDEgW2hjaTBdIDI1LjMxODI4NQogICAgICBBVFQ6IFJlYWQgQnkgR3JvdXAgVHlwZSBSZXNw
+b25zZSAoMHgxMSkgbGVuIDE5CiAgICAgICAgQXR0cmlidXRlIGRhdGEgbGVuZ3RoOiA2CiAgICAg
+ICAgQXR0cmlidXRlIGdyb3VwIGxpc3Q6IDMgZW50cmllcwogICAgICAgIEhhbmRsZSByYW5nZTog
+MHgwMDAxLTB4MDAwNQogICAgICAgIFVVSUQ6IEdlbmVyaWMgQWNjZXNzIFByb2ZpbGUgKDB4MTgw
+MCkKICAgICAgICBIYW5kbGUgcmFuZ2U6IDB4MDAwNi0weDAwMDkKICAgICAgICBVVUlEOiBHZW5l
+cmljIEF0dHJpYnV0ZSBQcm9maWxlICgweDE4MDEpCiAgICAgICAgSGFuZGxlIHJhbmdlOiAweDAw
+MGEtMHgwMDBmCiAgICAgICAgVVVJRDogTWVzaCBQcm92aXNpb25pbmcgKDB4MTgyNykKPCBBQ0wg
+RGF0YSBUWDogSGFuZGxlIDcwIGZsYWdzIDB4MDAgZGxlbiAxMSAgICAgICAgICAgICAgICAjNDIg
+W2hjaTBdIDI1LjMxODYwMwogICAgICBBVFQ6IFJlYWQgQnkgR3JvdXAgVHlwZSBSZXF1ZXN0ICgw
+eDEwKSBsZW4gNgogICAgICAgIEhhbmRsZSByYW5nZTogMHgwMDEwLTB4ZmZmZgogICAgICAgIEF0
+dHJpYnV0ZSBncm91cCB0eXBlOiBQcmltYXJ5IFNlcnZpY2UgKDB4MjgwMCkKPiBIQ0kgRXZlbnQ6
+IE51bWJlciBvZiBDb21wbGV0ZWQgUGFja2V0cyAoMHgxMykgcGxlbiA1ICAgICAjNDMgW2hjaTBd
+IDI1LjM4ODM2OAogICAgICAgIE51bSBoYW5kbGVzOiAxCiAgICAgICAgSGFuZGxlOiA3MAogICAg
+ICAgIENvdW50OiAxCj4gQUNMIERhdGEgUlg6IEhhbmRsZSA3MCBmbGFncyAweDAyIGRsZW4gOSAg
+ICAgICAgICAgICAgICAgIzQ0IFtoY2kwXSAyNS40NjQ3OTMKICAgICAgQVRUOiBFcnJvciBSZXNw
+b25zZSAoMHgwMSkgbGVuIDQKICAgICAgICBSZWFkIEJ5IEdyb3VwIFR5cGUgUmVxdWVzdCAoMHgx
+MCkKICAgICAgICBIYW5kbGU6IDB4MDAxMAogICAgICAgIEVycm9yOiBBdHRyaWJ1dGUgTm90IEZv
+dW5kICgweDBhKQo8IEFDTCBEYXRhIFRYOiBIYW5kbGUgNzAgZmxhZ3MgMHgwMCBkbGVuIDkgICAg
+ICAgICAgICAgICAgICM0NSBbaGNpMF0gMjUuNDc3Mjg1CiAgICAgIEFUVDogV3JpdGUgUmVxdWVz
+dCAoMHgxMikgbGVuIDQKICAgICAgICBIYW5kbGU6IDB4MDAwOQogICAgICAgICAgRGF0YTogMDIw
+MAo+IEhDSSBFdmVudDogTnVtYmVyIG9mIENvbXBsZXRlZCBQYWNrZXRzICgweDEzKSBwbGVuIDUg
+ICAgICM0NiBbaGNpMF0gMjUuNTI4NDEzCiAgICAgICAgTnVtIGhhbmRsZXM6IDEKICAgICAgICBI
+YW5kbGU6IDcwCiAgICAgICAgQ291bnQ6IDEKPiBBQ0wgRGF0YSBSWDogSGFuZGxlIDcwIGZsYWdz
+IDB4MDIgZGxlbiA1ICAgICAgICAgICAgICAgICAjNDcgW2hjaTBdIDI1LjU5ODA3NgogICAgICBB
+VFQ6IFdyaXRlIFJlc3BvbnNlICgweDEzKSBsZW4gMAo8IEFDTCBEYXRhIFRYOiBIYW5kbGUgNzAg
+ZmxhZ3MgMHgwMCBkbGVuIDkgICAgICAgICAgICAgICAgICM0OCBbaGNpMF0gMjUuNTk4MzIzCiAg
+ICAgIEFUVDogV3JpdGUgUmVxdWVzdCAoMHgxMikgbGVuIDQKICAgICAgICBIYW5kbGU6IDB4MDAw
+ZgogICAgICAgICAgRGF0YTogMDEwMAo+IEhDSSBFdmVudDogTnVtYmVyIG9mIENvbXBsZXRlZCBQ
+YWNrZXRzICgweDEzKSBwbGVuIDUgICAgICM0OSBbaGNpMF0gMjUuNjY4MzQ0CiAgICAgICAgTnVt
+IGhhbmRsZXM6IDEKICAgICAgICBIYW5kbGU6IDcwCiAgICAgICAgQ291bnQ6IDEKPiBBQ0wgRGF0
+YSBSWDogSGFuZGxlIDcwIGZsYWdzIDB4MDIgZGxlbiA1ICAgICAgICAgICAgICAgICAjNTAgW2hj
+aTBdIDI1LjczODA1MQogICAgICBBVFQ6IFdyaXRlIFJlc3BvbnNlICgweDEzKSBsZW4gMAo8IEFD
+TCBEYXRhIFRYOiBIYW5kbGUgNzAgZmxhZ3MgMHgwMCBkbGVuIDEwICAgICAgICAgICAgICAgICM1
+MSBbaGNpMF0gMjUuNzQxMjA3CiAgICAgIEFUVDogV3JpdGUgQ29tbWFuZCAoMHg1MikgbGVuIDUK
+ICAgICAgICBIYW5kbGU6IDB4MDAwYwogICAgICAgICAgRGF0YTogMDMwMDEwCj4gSENJIEV2ZW50
+OiBOdW1iZXIgb2YgQ29tcGxldGVkIFBhY2tldHMgKDB4MTMpIHBsZW4gNSAgICAgIzUyIFtoY2kw
+XSAyNS44MDgzNjcKICAgICAgICBOdW0gaGFuZGxlczogMQogICAgICAgIEhhbmRsZTogNzAKICAg
+ICAgICBDb3VudDogMQo+IEFDTCBEYXRhIFJYOiBIYW5kbGUgNzAgZmxhZ3MgMHgwMiBkbGVuIDIw
+ICAgICAgICAgICAgICAgICM1MyBbaGNpMF0gMjUuODg0ODI5CiAgICAgIEFUVDogSGFuZGxlIFZh
+bHVlIE5vdGlmaWNhdGlvbiAoMHgxYikgbGVuIDE1CiAgICAgICAgSGFuZGxlOiAweDAwMGUKICAg
+ICAgICAgIERhdGE6IDAzMDEwMTAwMDEwMDAwMDAwMDAwMDAwMDAwCjwgQUNMIERhdGEgVFg6IEhh
+bmRsZSA3MCBmbGFncyAweDAwIGRsZW4gOSAgICAgICAgICAgICAgICAgIzU0IFtoY2kwXSAyNS44
+ODc5MTIKICAgICAgQVRUOiBXcml0ZSBSZXF1ZXN0ICgweDEyKSBsZW4gNAogICAgICAgIEhhbmRs
+ZTogMHgwMDBmCiAgICAgICAgICBEYXRhOiAwMDAwCj4gSENJIEV2ZW50OiBOdW1iZXIgb2YgQ29t
+cGxldGVkIFBhY2tldHMgKDB4MTMpIHBsZW4gNSAgICAgIzU1IFtoY2kwXSAyNS45NDgzNzIKICAg
+ICAgICBOdW0gaGFuZGxlczogMQogICAgICAgIEhhbmRsZTogNzAKICAgICAgICBDb3VudDogMQo+
+IEFDTCBEYXRhIFJYOiBIYW5kbGUgNzAgZmxhZ3MgMHgwMiBkbGVuIDUgICAgICAgICAgICAgICAg
+ICM1NiBbaGNpMF0gMjYuMDE4MDc4CiAgICAgIEFUVDogV3JpdGUgUmVzcG9uc2UgKDB4MTMpIGxl
+biAwCjwgSENJIENvbW1hbmQ6IERpc2Nvbm5lY3QgKDB4MDF8MHgwMDA2KSBwbGVuIDMgICAgICAg
+ICAgICAgIzU3IFtoY2kwXSAyOC4xMTU2MTUKICAgICAgICBIYW5kbGU6IDcwCiAgICAgICAgUmVh
+c29uOiBSZW1vdGUgVXNlciBUZXJtaW5hdGVkIENvbm5lY3Rpb24gKDB4MTMpCj4gSENJIEV2ZW50
+OiBDb21tYW5kIFN0YXR1cyAoMHgwZikgcGxlbiA0ICAgICAgICAgICAgICAgICAgIzU4IFtoY2kw
+XSAyOC4xMTc0NTgKICAgICAgRGlzY29ubmVjdCAoMHgwMXwweDAwMDYpIG5jbWQgMQogICAgICAg
+IFN0YXR1czogU3VjY2VzcyAoMHgwMCkKPiBIQ0kgRXZlbnQ6IERpc2Nvbm5lY3QgQ29tcGxldGUg
+KDB4MDUpIHBsZW4gNCAgICAgICAgICAgICAjNTkgW2hjaTBdIDI4LjExOTQ2MgogICAgICAgIFN0
+YXR1czogU3VjY2VzcyAoMHgwMCkKICAgICAgICBIYW5kbGU6IDcwCiAgICAgICAgUmVhc29uOiBD
+b25uZWN0aW9uIFRlcm1pbmF0ZWQgQnkgTG9jYWwgSG9zdCAoMHgxNikKQCBEZXZpY2UgRGlzY29u
+bmVjdGVkOiBDMzpGMDoxMzo1RDo1Rjo1RSAoMikgcmVhc29uIDIK
+--001a113deaf40af7190558ae5818--
