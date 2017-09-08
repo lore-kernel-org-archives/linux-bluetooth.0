@@ -8,18 +8,14 @@ Cc: linux-bluetooth@vger.kernel.org,
 	devicetree@vger.kernel.org,
 	bjorn.andersson@linaro.org,
 	Loic Poulain <loic.poulain@linaro.org>
-Subject: [PATCH v7 2/3] dt-bindings: soc: qcom: Add local-bd-address property to WCNSS-BT
-Date: Fri,  8 Sep 2017 15:57:54 +0200
-Message-Id: <1504879075-587-2-git-send-email-loic.poulain@linaro.org>
-In-Reply-To: <1504879075-587-1-git-send-email-loic.poulain@linaro.org>
-References: <1504879075-587-1-git-send-email-loic.poulain@linaro.org>
+Subject: [PATCH v7 1/3] dt-bindings: net: document Bluetooth bindings in one place
+Date: Fri,  8 Sep 2017 15:57:53 +0200
+Message-Id: <1504879075-587-1-git-send-email-loic.poulain@linaro.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add optional local-bd-address property which is a 6-byte array
-storing the assigned BD address. Since having a unique BD address
-is critical, a per-device property value should be allocated.
-This property is usually added by the boot loader which has access
-to the provisioned data.
+In the same way as Ethernet, gather the Bluetooth related bindings in
+one file. Introduce the bluetooth-bd-address property which can be used
+to store the assigned BD address.
 
 Signed-off-by: Loic Poulain <loic.poulain@linaro.org>
 ---
@@ -37,34 +33,20 @@ Signed-off-by: Loic Poulain <loic.poulain@linaro.org>
  v6: use of_property_read_u8_array instead of of_get_property
  v7: use dev_info instead of BT_INFO to have dev context
 
- Documentation/devicetree/bindings/soc/qcom/qcom,wcnss.txt | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ Documentation/devicetree/bindings/net/bluetooth.txt | 5 +++++
+ 1 file changed, 5 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/net/bluetooth.txt
 
-diff --git a/Documentation/devicetree/bindings/soc/qcom/qcom,wcnss.txt b/Documentation/devicetree/bindings/soc/qcom/qcom,wcnss.txt
-index 4ea39e9..042a2e4 100644
---- a/Documentation/devicetree/bindings/soc/qcom/qcom,wcnss.txt
-+++ b/Documentation/devicetree/bindings/soc/qcom/qcom,wcnss.txt
-@@ -37,6 +37,11 @@ The following properties are defined to the bluetooth node:
- 	Definition: must be:
- 		    "qcom,wcnss-bt"
- 
-+- local-bd-address:
-+	Usage: optional
-+	Value type: <u8 array>
-+	Definition: see Documentation/devicetree/bindings/net/bluetooth.txt
+diff --git a/Documentation/devicetree/bindings/net/bluetooth.txt b/Documentation/devicetree/bindings/net/bluetooth.txt
+new file mode 100644
+index 0000000..94797df
+--- /dev/null
++++ b/Documentation/devicetree/bindings/net/bluetooth.txt
+@@ -0,0 +1,5 @@
++The following properties are common to the Bluetooth controllers:
 +
- == WiFi
- The following properties are defined to the WiFi node:
- 
-@@ -91,6 +96,9 @@ smd {
- 
- 			bt {
- 				compatible = "qcom,wcnss-bt";
-+
-+				/* BD address 00:11:22:33:44:55 */
-+				local-bd-address = [ 55 44 33 22 11 00 ];
- 			};
- 
- 			wlan {
++- local-bd-address: array of 6 bytes, specifies the BD address that was
++  uniquely assigned to the Bluetooth device, formatted with least significant
++  byte first (little-endian).
 -- 
 1.9.1
