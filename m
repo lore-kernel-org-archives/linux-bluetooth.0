@@ -1,52 +1,68 @@
-Return-Path: <loic.poulain@linaro.org>
-From: Loic Poulain <loic.poulain@linaro.org>
-To: marcel@holtmann.org,
-	robh+dt@kernel.org,
-	johan.hedberg@gmail.com
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	bjorn.andersson@linaro.org,
-	Loic Poulain <loic.poulain@linaro.org>
-Subject: [PATCH v7 1/3] dt-bindings: net: document Bluetooth bindings in one place
-Date: Fri,  8 Sep 2017 15:57:53 +0200
-Message-Id: <1504879075-587-1-git-send-email-loic.poulain@linaro.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+MIME-Version: 1.0
+In-Reply-To: <CABBYNZ+HSyR-FesC-Csuc14B-OF0Ffj7t9oWsnPrpiOy01CH1w@mail.gmail.com>
+References: <CAFxSrVsWAbw4bRwk8En-O1sX3Afr2_N1Y=Snmdb3QTZeW8niUA@mail.gmail.com>
+ <CABBYNZ+HSyR-FesC-Csuc14B-OF0Ffj7t9oWsnPrpiOy01CH1w@mail.gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Fri, 8 Sep 2017 16:55:27 +0300
+Message-ID: <CABBYNZ+QhwncFFSukBmmP1wriQM=+7FPH6PWq20+EBVy9CVv4A@mail.gmail.com>
+Subject: Re: [PATCH 1/1] mesh: Remove StopNotify method to avoid reading data
+ twice on some mesh nodes
+To: Laczen JMS <laczenjms@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-In the same way as Ethernet, gather the Bluetooth related bindings in
-one file. Introduce the bluetooth-bd-address property which can be used
-to store the assigned BD address.
+Hi,
 
-Signed-off-by: Loic Poulain <loic.poulain@linaro.org>
----
- v2: Set device as unconfigured if default address detected
-     Add warning if BD addr retrieved from DT
- v3: if no addr retrieved from DT, unconditionally set
-     the invalid BD addr flag.
-     swap and set bdaddr in the platform probe
- v4: Add dt-bindings documentation
-     split patch in two parts (setup, dt prop)
-     use local-bd-address name instead of local-mac-address
- v5: remove 2/3 merged in bluetooth-next tree
-     Add bluetooth.txt for common BT bindings
-     expect local-bd-address in little-endian format
- v6: use of_property_read_u8_array instead of of_get_property
- v7: use dev_info instead of BT_INFO to have dev context
+On Fri, Sep 8, 2017 at 4:47 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi Jehudi,
+>
+> On Fri, Sep 8, 2017 at 3:30 PM, Laczen JMS <laczenjms@gmail.com> wrote:
+>> Some mesh nodes do not change (e.g. zephyr) the notification when
+>> given the StopNotify. As a result the data from the notification
+>> channel is processed twice. This patch removes the StopNotify.
+>
+> What do you mean the node do not change? Perhaps this is the result of
+> bluetoothd remembering the subscriptions so you don't have to
+> StopNotify while disconnected, though this should not cause the data
+> to be processed twice otherwise we have a bug somewhere in the daemon.
+>
+>> Kind regards,
+>>
+>> Jehudi
+>>
+>>   diff --git a/mesh/gatt.c b/mesh/gatt.c
+>> index f9615b3..7d3b869 100644
+>> --- a/mesh/gatt.c
+>> +++ b/mesh/gatt.c
+>> @@ -589,15 +589,10 @@ bool mesh_gatt_notify(GDBusProxy *proxy, bool
+>> enable, GDBusReturnFunction cb,
+>>   cb = notify_reply;
+>>   }
+>>   } else {
+>> - if (notify_io) {
+>> - notify_io_destroy();
+>> - if (cb)
+>> - cb(NULL, user_data);
+>> - return true;
+>> - } else {
+>> - method = "StopNotify";
+>> - cb = notify_reply;
+>> - }
+>> + if (notify_io) notify_io_destroy();
+>> + if (cb) cb(NULL, user_data);
+>> +
+>> + return true;
+>>   }
+>>
+>>   if (g_dbus_proxy_method_call(proxy, method, NULL, cb,
 
- Documentation/devicetree/bindings/net/bluetooth.txt | 5 +++++
- 1 file changed, 5 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/net/bluetooth.txt
+Btw please have a look in our HACKING document on how to contribute patches:
 
-diff --git a/Documentation/devicetree/bindings/net/bluetooth.txt b/Documentation/devicetree/bindings/net/bluetooth.txt
-new file mode 100644
-index 0000000..94797df
---- /dev/null
-+++ b/Documentation/devicetree/bindings/net/bluetooth.txt
-@@ -0,0 +1,5 @@
-+The following properties are common to the Bluetooth controllers:
-+
-+- local-bd-address: array of 6 bytes, specifies the BD address that was
-+  uniquely assigned to the Bluetooth device, formatted with least significant
-+  byte first (little-endian).
+https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/HACKING
+
 -- 
-1.9.1
+Luiz Augusto von Dentz
