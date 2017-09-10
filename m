@@ -1,85 +1,204 @@
-Return-Path: <linus971@gmail.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-Sender: linus971@gmail.com
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Sun, 10 Sep 2017 12:26:02 -0700
-Message-ID: <CA+55aFztG626Np=z2WUzeVS1O3nmoTj76QRUBPg0J-FBELO7vw@mail.gmail.com>
-Subject: btusb "firmware request while host is not available" at resume
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Tejun Heo <tj@kernel.org>,
-	Marcel Holtmann <marcel@holtmann.org>, Gustavo Padovan <gustavo@padovan.org>,
-	Sukumar Ghorai <sukumar.ghorai@intel.com>, "Rafael J. Wysocki" <rjw@rjwysocki.net>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	"bluez mailin list (linux-bluetooth@vger.kernel.org)" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <20170907115940.30459-1-luiz.dentz@gmail.com>
+References: <20170907115940.30459-1-luiz.dentz@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Sun, 10 Sep 2017 22:24:04 +0300
+Message-ID: <CABBYNZJSfDM9keDQHzn8OT_1yOM46erjHyB9zED8vsSbikDZYQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] adapter: Fix not waiting for start discovery result
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Cc: Sonny Sasaka <sonnysasaka@chromium.org>,
+        Miao-chen Chou <mcchou@chromium.org>
 Content-Type: text/plain; charset="UTF-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This seems to be a new problem at resume for the Intel btusb driver,
-but I'm not seeing anything in that driver itself that looks like a
-likely trigger, so I wonder if it's some driver core change, a generic
-resume path issue, or a workqueue change that has made it trigger for
-me.
+Hi,
 
-It might also just be a timing difference, maybe it's always been there?
+On Thu, Sep 7, 2017 at 2:59 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> We should not reply until the start discovery completes otherwise
+> clients may attempt to stop the discovery before it even has started.
+>
+> On top of this it will now block clients so they so not be able to
+> queue more requests.
+> ---
+>  src/adapter.c | 55 +++++++++++++++++++++++++++++++++++++++++++++++--------
+>  1 file changed, 47 insertions(+), 8 deletions(-)
+>
+> diff --git a/src/adapter.c b/src/adapter.c
+> index a571b1870..4b9f5a1cd 100644
+> --- a/src/adapter.c
+> +++ b/src/adapter.c
+> @@ -160,6 +160,7 @@ struct discovery_filter {
+>
+>  struct watch_client {
+>         struct btd_adapter *adapter;
+> +       DBusMessage *msg;
+>         char *owner;
+>         guint watch;
+>         struct discovery_filter *discovery_filter;
+> @@ -1421,13 +1422,17 @@ static void start_discovery_complete(uint8_t status, uint16_t length,
+>                                         const void *param, void *user_data)
+>  {
+>         struct btd_adapter *adapter = user_data;
+> +       struct watch_client *client = adapter->discovery_list->data;
+>         const struct mgmt_cp_start_discovery *rp = param;
+> +       DBusMessage *reply;
+>
+>         DBG("status 0x%02x", status);
+>
+>         if (length < sizeof(*rp)) {
+>                 btd_error(adapter->dev_id,
+>                         "Wrong size of start discovery return parameters");
+> +               if (client->msg)
+> +                       goto fail;
+>                 return;
+>         }
+>
+> @@ -1440,6 +1445,14 @@ static void start_discovery_complete(uint8_t status, uint16_t length,
+>                 else
+>                         adapter->filtered_discovery = false;
+>
+> +               if (client->msg) {
+> +                       reply = g_dbus_create_reply(client->msg,
+> +                                                       DBUS_TYPE_INVALID);
+> +                       g_dbus_send_message(dbus_conn, reply);
+> +                       dbus_message_unref(client->msg);
+> +                       client->msg = NULL;
+> +               }
+> +
+>                 if (adapter->discovering)
+>                         return;
+>
+> @@ -1449,6 +1462,15 @@ static void start_discovery_complete(uint8_t status, uint16_t length,
+>                 return;
+>         }
+>
+> +fail:
+> +       /* Reply with an error if the first discovery has failed */
+> +       if (client->msg) {
+> +               reply = btd_error_busy(client->msg);
+> +               g_dbus_send_message(dbus_conn, reply);
+> +               g_dbus_remove_watch(dbus_conn, client->watch);
+> +               return;
+> +       }
+> +
+>         /*
+>          * In case the restart of the discovery failed, then just trigger
+>          * it for the next idle timeout again.
+> @@ -1933,7 +1955,7 @@ static bool filters_equal(struct mgmt_cp_start_service_discovery *a,
+>         return true;
+>  }
+>
+> -static void update_discovery_filter(struct btd_adapter *adapter)
+> +static int update_discovery_filter(struct btd_adapter *adapter)
+>  {
+>         struct mgmt_cp_start_service_discovery *sd_cp;
+>
+> @@ -1942,7 +1964,7 @@ static void update_discovery_filter(struct btd_adapter *adapter)
+>         if (discovery_filter_to_mgmt_cp(adapter, &sd_cp)) {
+>                 btd_error(adapter->dev_id,
+>                                 "discovery_filter_to_mgmt_cp returned error");
+> -               return;
+> +               return -ENOMEM;
+>         }
+>
+>         /*
+> @@ -1953,13 +1975,15 @@ static void update_discovery_filter(struct btd_adapter *adapter)
+>             adapter->discovering != 0) {
+>                 DBG("filters were equal, deciding to not restart the scan.");
+>                 g_free(sd_cp);
+> -               return;
+> +               return 0;
+>         }
+>
+>         g_free(adapter->current_discovery_filter);
+>         adapter->current_discovery_filter = sd_cp;
+>
+>         trigger_start_discovery(adapter, 0);
+> +
+> +       return -EINPROGRESS;
+>  }
+>
+>  static void discovery_destroy(void *user_data)
+> @@ -1980,6 +2004,9 @@ static void discovery_destroy(void *user_data)
+>                 client->discovery_filter = NULL;
+>         }
+>
+> +       if (client->msg)
+> +               dbus_message_unref(client->msg);
+> +
+>         g_free(client->owner);
+>         g_free(client);
+>
+> @@ -2087,6 +2114,7 @@ static DBusMessage *start_discovery(DBusConnection *conn,
+>         const char *sender = dbus_message_get_sender(msg);
+>         struct watch_client *client;
+>         bool is_discovering;
+> +       int err;
+>
+>         DBG("sender %s", sender);
+>
+> @@ -2107,12 +2135,14 @@ static DBusMessage *start_discovery(DBusConnection *conn,
+>          * and trigger scan.
+>          */
+>         if (client) {
+> +               if (client->msg)
+> +                       return btd_error_busy(msg);
+> +
+>                 adapter->set_filter_list = g_slist_remove(
+>                                              adapter->set_filter_list, client);
+>                 adapter->discovery_list = g_slist_prepend(
+>                                               adapter->discovery_list, client);
+> -               update_discovery_filter(adapter);
+> -               return dbus_message_new_method_return(msg);
+> +               goto done;
+>         }
+>
+>         client = g_new0(struct watch_client, 1);
+> @@ -2126,14 +2156,23 @@ static DBusMessage *start_discovery(DBusConnection *conn,
+>         adapter->discovery_list = g_slist_prepend(adapter->discovery_list,
+>                                                                 client);
+>
+> +done:
+>         /*
+>          * Just trigger the discovery here. In case an already running
+>          * discovery in idle phase exists, it will be restarted right
+>          * away.
+>          */
+> -       update_discovery_filter(adapter);
+> +       err = update_discovery_filter(adapter);
+> +       if (!err)
+> +               return dbus_message_new_method_return(msg);
+>
+> -       return dbus_message_new_method_return(msg);
+> +       /* If the discovery has to be started wait it complete to reply */
+> +       if (err == -EINPROGRESS) {
+> +               client->msg = dbus_message_ref(msg);
+> +               return NULL;
+> +       }
+> +
+> +       return btd_error_failed(msg, strerror(-err));
+>  }
+>
+>  static bool parse_uuids(DBusMessageIter *value, struct discovery_filter *filter)
+> @@ -2984,7 +3023,7 @@ static DBusMessage *get_discovery_filters(DBusConnection *conn,
+>  }
+>
+>  static const GDBusMethodTable adapter_methods[] = {
+> -       { GDBUS_METHOD("StartDiscovery", NULL, NULL, start_discovery) },
+> +       { GDBUS_ASYNC_METHOD("StartDiscovery", NULL, NULL, start_discovery) },
+>         { GDBUS_METHOD("SetDiscoveryFilter",
+>                                 GDBUS_ARGS({ "properties", "a{sv}" }), NULL,
+>                                 set_discovery_filter) },
+> --
+> 2.13.5
 
-Does anybody have any ideas? It does't happen on every resume, and the
-machine works despite this (but no bluetooth - the *next* resume might
-bring it back, though).
+Could you guys please check if this does address the problem you are having?
 
-                 Linus
 
---
-
-  ACPI: Low-level resume complete
-  ACPI: EC: EC started
-  PM: Restoring platform NVS memory
-  Enabling non-boot CPUs ...
-  x86: Booting SMP configuration:
-  smpboot: Booting Node 0 Processor 1 APIC 0x2
-   cache: parent cpu1 should not be sleeping
-  CPU1 is up
-  smpboot: Booting Node 0 Processor 2 APIC 0x1
-   cache: parent cpu2 should not be sleeping
-  CPU2 is up
-  smpboot: Booting Node 0 Processor 3 APIC 0x3
-   cache: parent cpu3 should not be sleeping
-  CPU3 is up
-  ACPI: Waking up from system sleep state S3
-  ACPI: EC: event unblocked
-  usb 1-3: reset full-speed USB device number 2 using xhci_hcd
-  usb 1-4: reset full-speed USB device number 3 using xhci_hcd
-  usb 1-5: reset high-speed USB device number 4 using xhci_hcd
-  usb 1-3:1.0: rebind failed: -517
-  usb 1-3:1.1: rebind failed: -517
-  Bluetooth: hci0: Bootloader revision 0.0 build 2 week 52 2014
-  OOM killer enabled.
-  Restarting tasks ...
-  Bluetooth: hci0: Device revision is 5
-  Bluetooth: hci0: Secure boot is enabled
-  Bluetooth: hci0: OTP lock is enabled
-  Bluetooth: hci0: API lock is enabled
-  Bluetooth: hci0: Debug lock is disabled
-  Bluetooth: hci0: Minimum firmware build 1 week 10 2014
-  firmware request while host is not available
-  ------------[ cut here ]------------
-  WARNING: CPU: 2 PID: 621 at drivers/base/firmware_class.c:1250
-_request_firmware+0x460/0x790
-  CPU: 2 PID: 621 Comm: kworker/u9:2 Not tainted 4.13.0-10313-ge860d2c904d1 #11
-  Hardware name: Dell Inc. XPS 13 9350/09JHRY, BIOS 1.4.17 05/10/2017
-  Workqueue: hci0 hci_power_on [bluetooth]
-  task: ffff8d3767895ac0 task.stack: ffff9d3481efc000
-  RIP: 0010:_request_firmware+0x460/0x790
-  Call Trace:
-   request_firmware+0x37/0x50
-   btusb_setup_intel_new+0x227/0x7e0 [btusb]
-   hci_dev_do_open+0x3da/0x570 [bluetooth]
-   hci_power_on+0x52/0x1f0 [bluetooth]
-   process_one_work+0x1db/0x3d0
-   worker_thread+0x47/0x3e0
-   kthread+0x125/0x140
-   ret_from_fork+0x22/0x30
-  ---[ end trace 007b222491432927 ]---
-  Bluetooth: hci0: Failed to load Intel firmware file (-112)
-  [drm] RC6 on
-  done.
-  thermal thermal_zone11: failed to read out thermal zone (-5)
-  PM: suspend exit
+-- 
+Luiz Augusto von Dentz
