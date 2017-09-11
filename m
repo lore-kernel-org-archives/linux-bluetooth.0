@@ -1,57 +1,53 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <CAFxSrVu-vApomoiJzr1CL-_qgdMUcmKWbx1-QdupMY2-ACE4xw@mail.gmail.com>
-References: <20170908221934.11910-1-inga.stotland@intel.com> <CAFxSrVu-vApomoiJzr1CL-_qgdMUcmKWbx1-QdupMY2-ACE4xw@mail.gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 11 Sep 2017 16:10:43 +0300
-Message-ID: <CABBYNZKkJEHgD4nPu46GXaNXum_KYZnbLJxA6A+B6_7CJpbvYA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] mesh: Add characteristic property name check
-To: Laczen JMS <laczenjms@gmail.com>
-Cc: Inga Stotland <inga.stotland@intel.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+Subject: Re: btusb "firmware request while host is not available" at resume
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <CA+55aFzWABZ+KCKT+r+TgyrWfnc+6YE7ZuHhZmgw-cRQXWTQ2w@mail.gmail.com>
+Date: Mon, 11 Sep 2017 07:12:44 +0200
+Cc: Gabriel C <nix.or.die@gmail.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "Luis R. Rodriguez" <mcgrof@kernel.org>, Tejun Heo <tj@kernel.org>,
+        "Gustavo F. Padovan" <gustavo@padovan.org>,
+        Sukumar Ghorai <sukumar.ghorai@intel.com>,
+        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        "bluez mailin list (linux-bluetooth@vger.kernel.org)"
+        <linux-bluetooth@vger.kernel.org>
+Message-Id: <E31F8274-519A-4ED7-90C0-2BB71C9CC3ED@holtmann.org>
+References: <CA+55aFztG626Np=z2WUzeVS1O3nmoTj76QRUBPg0J-FBELO7vw@mail.gmail.com>
+ <20170911012508.GA17754@kroah.com>
+ <9bc9cc83-212a-b39c-75af-b94fe6cab9f4@gmail.com>
+ <d68738f6-b079-0fef-dd9c-dca75e756c42@gmail.com>
+ <CA+55aFzWABZ+KCKT+r+TgyrWfnc+6YE7ZuHhZmgw-cRQXWTQ2w@mail.gmail.com>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Linus,
 
-On Sat, Sep 9, 2017 at 12:07 PM, Laczen JMS <laczenjms@gmail.com> wrote:
-> Hi Inga,
->
-> This solves the issue.
->
-> Kind regards,
->
-> Jehudi
->
-> 2017-09-09 0:19 GMT+02:00 Inga Stotland <inga.stotland@intel.com>:
->> If PropertyChanged signal is not emitted due to a change in
->> characteristic's "Value" property, the characteristic does
->> not need to be processed.
->> ---
->>  mesh/main.c | 5 +++--
->>  1 file changed, 3 insertions(+), 2 deletions(-)
->>
->> diff --git a/mesh/main.c b/mesh/main.c
->> index 42506a6..3a39d8f 100644
->> --- a/mesh/main.c
->> +++ b/mesh/main.c
->> @@ -1295,8 +1295,9 @@ static void property_changed(GDBusProxy *proxy, const char *name,
->>                 rl_printf("Characteristic property changed %s\n",
->>                                                 g_dbus_proxy_get_path(proxy));
->>
->> -               if ((connection.type == CONN_TYPE_PROVISION) ||
->> -                                                       connection.session_open)
->> +               if ((strcmp(name, "Value") == 0) &&
->> +                               ((connection.type == CONN_TYPE_PROVISION) ||
->> +                                               connection.session_open))
->>                         process_mesh_characteristic(proxy);
->>         }
->>  }
->> --
->> 2.9.5
+>> Yes 81f95076281f is to blame.. After reverting it all is fine again.
+>> 
+>> 15 resume cycles on the one laptop , 10 on the other without to hit the
+>> trace.
+> 
+> Yeah, I think that disable/enable_firmware in the suspend/resume path
+> is basically just completely random code. There  is nothing that
+> serializes with anything else, and it has no actual basis for saying
+> "I am now disabled/enabled" except for some entirely random time of
+> whenever the suspend/resume callbacks happen.
+> 
+> I'm going to revert it.
+> 
+> I wonder why 4.13 seemed to work for me. Or maybe it didn't, and I
+> just didn't notice, because I didn't use bluetooth and I wasn't
+> traveling. I test my laptop every release, but I don't necessarily
+> always _use_ it.
 
-Applied, thanks.
+we have a bug report that might go into the similar direction. So the problem is that modern Bluetooth controller require full firmware loading (not just ROM patching) and if the controller has the firmware somehow already loaded, but then looses power and needs a reload, then it is not cached (since it was never requested in the first place).
 
--- 
-Luiz Augusto von Dentz
+Of course if the reload triggers during resume when not file system is available, it can not request the firmware. That will just fail and thus you might see this issue. We have a few RFC patches on the mailing list that I have to review. It is however not that easy all the time to find the right firmware file (at least not for Intel hardware) since the boot loader provides different information than the fully operational firmware. So I need to make sure that request the right firmware (if we do not need it initially) so that it gets cached.
+
+Regards
+
+Marcel
