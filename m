@@ -1,95 +1,55 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20170901060912.19744-1-inga.stotland@intel.com>
-References: <20170901060912.19744-1-inga.stotland@intel.com>
+In-Reply-To: <CAFxSrVu-vApomoiJzr1CL-_qgdMUcmKWbx1-QdupMY2-ACE4xw@mail.gmail.com>
+References: <20170908221934.11910-1-inga.stotland@intel.com> <CAFxSrVu-vApomoiJzr1CL-_qgdMUcmKWbx1-QdupMY2-ACE4xw@mail.gmail.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 11 Sep 2017 16:13:43 +0300
-Message-ID: <CABBYNZ+gBy0AaOQn4+h08kr1mTJP7=b3p1EFj1=yRa0y8+M28w@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] mesh: Use correct length for config server response
-To: Inga Stotland <inga.stotland@intel.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Mon, 11 Sep 2017 16:10:43 +0300
+Message-ID: <CABBYNZKkJEHgD4nPu46GXaNXum_KYZnbLJxA6A+B6_7CJpbvYA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] mesh: Add characteristic property name check
+To: Laczen JMS <laczenjms@gmail.com>
+Cc: Inga Stotland <inga.stotland@intel.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Inga,
+Hi,
 
-On Fri, Sep 1, 2017 at 9:09 AM, Inga Stotland <inga.stotland@intel.com> wrote:
-> Also check if the length is nonzero before sending response
-> ---
->  mesh/config-server.c | 20 +++++++++++---------
->  1 file changed, 11 insertions(+), 9 deletions(-)
+On Sat, Sep 9, 2017 at 12:07 PM, Laczen JMS <laczenjms@gmail.com> wrote:
+> Hi Inga,
 >
-> diff --git a/mesh/config-server.c b/mesh/config-server.c
-> index 4710ede..8a88645 100644
-> --- a/mesh/config-server.c
-> +++ b/mesh/config-server.c
-> @@ -59,8 +59,7 @@ static bool server_msg_recvd(uint16_t src, uint8_t *data,
->         uint16_t ele_addr;
->         uint8_t ele_idx;
->         struct mesh_publication pub;
-> -
-> -       int n;
-> +       int m, n;
+> This solves the issue.
 >
->         if (mesh_opcode_get(data, len, &opcode, &n)) {
->                 len -= n;
-> @@ -73,6 +72,8 @@ static bool server_msg_recvd(uint16_t src, uint8_t *data,
->         if (!node)
->                 return true;
+> Kind regards,
 >
-> +       n = 0;
-> +
->         switch (opcode & ~OP_UNRELIABLE) {
->         default:
->                 return false;
-> @@ -94,6 +95,7 @@ static bool server_msg_recvd(uint16_t src, uint8_t *data,
->                 break;
+> Jehudi
 >
->         case OP_CONFIG_MODEL_PUB_SET:
-> +
->                 if (len != 11 && len != 13)
->                         return true;
->
-> @@ -110,19 +112,19 @@ static bool server_msg_recvd(uint16_t src, uint8_t *data,
->                 pub.app_idx = get_le16(data + 4);
->                 pub.ttl = data[6];
->                 pub.period = data[7];
-> -               n = (data[7] & 0x3f);
-> +               m = (data[7] & 0x3f);
->                 switch (data[7] >> 6) {
->                 case 0:
-> -                       rl_printf("Period: %d ms\n", n * 100);
-> +                       rl_printf("Period: %d ms\n", m * 100);
->                         break;
->                 case 2:
-> -                       n *= 10;
-> +                       m *= 10;
->                         /* fall through */
->                 case 1:
-> -                       rl_printf("Period: %d sec\n", n);
-> +                       rl_printf("Period: %d sec\n", m);
->                         break;
->                 case 3:
-> -                       rl_printf("Period: %d min\n", n * 10);
-> +                       rl_printf("Period: %d min\n", m * 10);
->                         break;
->                 }
->
-> @@ -140,9 +142,9 @@ static bool server_msg_recvd(uint16_t src, uint8_t *data,
->         }
->
->         primary = node_get_primary(node);
-> -       if (src != primary)
-> +       if (n && src != primary)
->                 net_access_layer_send(node_get_default_ttl(node), primary,
-> -                                       src, APP_IDX_DEV, msg, len);
-> +                                       src, APP_IDX_DEV, msg, n);
->         return true;
->  }
->
-> --
-> 2.9.5
+> 2017-09-09 0:19 GMT+02:00 Inga Stotland <inga.stotland@intel.com>:
+>> If PropertyChanged signal is not emitted due to a change in
+>> characteristic's "Value" property, the characteristic does
+>> not need to be processed.
+>> ---
+>>  mesh/main.c | 5 +++--
+>>  1 file changed, 3 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/mesh/main.c b/mesh/main.c
+>> index 42506a6..3a39d8f 100644
+>> --- a/mesh/main.c
+>> +++ b/mesh/main.c
+>> @@ -1295,8 +1295,9 @@ static void property_changed(GDBusProxy *proxy, const char *name,
+>>                 rl_printf("Characteristic property changed %s\n",
+>>                                                 g_dbus_proxy_get_path(proxy));
+>>
+>> -               if ((connection.type == CONN_TYPE_PROVISION) ||
+>> -                                                       connection.session_open)
+>> +               if ((strcmp(name, "Value") == 0) &&
+>> +                               ((connection.type == CONN_TYPE_PROVISION) ||
+>> +                                               connection.session_open))
+>>                         process_mesh_characteristic(proxy);
+>>         }
+>>  }
+>> --
+>> 2.9.5
 
 Applied, thanks.
 
