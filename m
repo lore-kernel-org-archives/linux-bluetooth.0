@@ -1,68 +1,97 @@
-Return-Path: <gregkh@linuxfoundation.org>
-Date: Mon, 11 Sep 2017 06:46:47 -0700
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>,
-	Gabriel C <nix.or.die@gmail.com>,
-	"Luis R. Rodriguez" <mcgrof@kernel.org>, Tejun Heo <tj@kernel.org>,
-	"Gustavo F. Padovan" <gustavo@padovan.org>,
-	Sukumar Ghorai <sukumar.ghorai@intel.com>,
-	"Rafael J. Wysocki" <rjw@rjwysocki.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	"bluez mailin list (linux-bluetooth@vger.kernel.org)" <linux-bluetooth@vger.kernel.org>
-Subject: Re: btusb "firmware request while host is not available" at resume
-Message-ID: <20170911134647.GA3980@kroah.com>
-References: <CA+55aFztG626Np=z2WUzeVS1O3nmoTj76QRUBPg0J-FBELO7vw@mail.gmail.com>
- <20170911012508.GA17754@kroah.com>
- <9bc9cc83-212a-b39c-75af-b94fe6cab9f4@gmail.com>
- <d68738f6-b079-0fef-dd9c-dca75e756c42@gmail.com>
- <CA+55aFzWABZ+KCKT+r+TgyrWfnc+6YE7ZuHhZmgw-cRQXWTQ2w@mail.gmail.com>
- <E31F8274-519A-4ED7-90C0-2BB71C9CC3ED@holtmann.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <E31F8274-519A-4ED7-90C0-2BB71C9CC3ED@holtmann.org>
+In-Reply-To: <20170901060912.19744-1-inga.stotland@intel.com>
+References: <20170901060912.19744-1-inga.stotland@intel.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Mon, 11 Sep 2017 16:13:43 +0300
+Message-ID: <CABBYNZ+gBy0AaOQn4+h08kr1mTJP7=b3p1EFj1=yRa0y8+M28w@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] mesh: Use correct length for config server response
+To: Inga Stotland <inga.stotland@intel.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Sep 11, 2017 at 07:12:44AM +0200, Marcel Holtmann wrote:
-> Hi Linus,
-> 
-> >> Yes 81f95076281f is to blame.. After reverting it all is fine again.
-> >> 
-> >> 15 resume cycles on the one laptop , 10 on the other without to hit the
-> >> trace.
-> > 
-> > Yeah, I think that disable/enable_firmware in the suspend/resume path
-> > is basically just completely random code. There  is nothing that
-> > serializes with anything else, and it has no actual basis for saying
-> > "I am now disabled/enabled" except for some entirely random time of
-> > whenever the suspend/resume callbacks happen.
-> > 
-> > I'm going to revert it.
-> > 
-> > I wonder why 4.13 seemed to work for me. Or maybe it didn't, and I
-> > just didn't notice, because I didn't use bluetooth and I wasn't
-> > traveling. I test my laptop every release, but I don't necessarily
-> > always _use_ it.
-> 
-> we have a bug report that might go into the similar direction. So the
-> problem is that modern Bluetooth controller require full firmware
-> loading (not just ROM patching) and if the controller has the firmware
-> somehow already loaded, but then looses power and needs a reload, then
-> it is not cached (since it was never requested in the first place).
-> 
-> Of course if the reload triggers during resume when not file system is
-> available, it can not request the firmware. That will just fail and
-> thus you might see this issue. We have a few RFC patches on the
-> mailing list that I have to review. It is however not that easy all
-> the time to find the right firmware file (at least not for Intel
-> hardware) since the boot loader provides different information than
-> the fully operational firmware. So I need to make sure that request
-> the right firmware (if we do not need it initially) so that it gets
-> cached.
+Hi Inga,
 
-To confirm, reverting this fixes the problem I was seeing in 4.13.  I've
-queued it up for the next 4.13-stable release as well.
+On Fri, Sep 1, 2017 at 9:09 AM, Inga Stotland <inga.stotland@intel.com> wrote:
+> Also check if the length is nonzero before sending response
+> ---
+>  mesh/config-server.c | 20 +++++++++++---------
+>  1 file changed, 11 insertions(+), 9 deletions(-)
+>
+> diff --git a/mesh/config-server.c b/mesh/config-server.c
+> index 4710ede..8a88645 100644
+> --- a/mesh/config-server.c
+> +++ b/mesh/config-server.c
+> @@ -59,8 +59,7 @@ static bool server_msg_recvd(uint16_t src, uint8_t *data,
+>         uint16_t ele_addr;
+>         uint8_t ele_idx;
+>         struct mesh_publication pub;
+> -
+> -       int n;
+> +       int m, n;
+>
+>         if (mesh_opcode_get(data, len, &opcode, &n)) {
+>                 len -= n;
+> @@ -73,6 +72,8 @@ static bool server_msg_recvd(uint16_t src, uint8_t *data,
+>         if (!node)
+>                 return true;
+>
+> +       n = 0;
+> +
+>         switch (opcode & ~OP_UNRELIABLE) {
+>         default:
+>                 return false;
+> @@ -94,6 +95,7 @@ static bool server_msg_recvd(uint16_t src, uint8_t *data,
+>                 break;
+>
+>         case OP_CONFIG_MODEL_PUB_SET:
+> +
+>                 if (len != 11 && len != 13)
+>                         return true;
+>
+> @@ -110,19 +112,19 @@ static bool server_msg_recvd(uint16_t src, uint8_t *data,
+>                 pub.app_idx = get_le16(data + 4);
+>                 pub.ttl = data[6];
+>                 pub.period = data[7];
+> -               n = (data[7] & 0x3f);
+> +               m = (data[7] & 0x3f);
+>                 switch (data[7] >> 6) {
+>                 case 0:
+> -                       rl_printf("Period: %d ms\n", n * 100);
+> +                       rl_printf("Period: %d ms\n", m * 100);
+>                         break;
+>                 case 2:
+> -                       n *= 10;
+> +                       m *= 10;
+>                         /* fall through */
+>                 case 1:
+> -                       rl_printf("Period: %d sec\n", n);
+> +                       rl_printf("Period: %d sec\n", m);
+>                         break;
+>                 case 3:
+> -                       rl_printf("Period: %d min\n", n * 10);
+> +                       rl_printf("Period: %d min\n", m * 10);
+>                         break;
+>                 }
+>
+> @@ -140,9 +142,9 @@ static bool server_msg_recvd(uint16_t src, uint8_t *data,
+>         }
+>
+>         primary = node_get_primary(node);
+> -       if (src != primary)
+> +       if (n && src != primary)
+>                 net_access_layer_send(node_get_default_ttl(node), primary,
+> -                                       src, APP_IDX_DEV, msg, len);
+> +                                       src, APP_IDX_DEV, msg, n);
+>         return true;
+>  }
+>
+> --
+> 2.9.5
 
-thanks,
+Applied, thanks.
 
-greg k-h
+-- 
+Luiz Augusto von Dentz
