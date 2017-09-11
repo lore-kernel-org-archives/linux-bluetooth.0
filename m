@@ -1,42 +1,130 @@
-Return-Path: <linus971@gmail.com>
-MIME-Version: 1.0
-Sender: linus971@gmail.com
-In-Reply-To: <d68738f6-b079-0fef-dd9c-dca75e756c42@gmail.com>
-References: <CA+55aFztG626Np=z2WUzeVS1O3nmoTj76QRUBPg0J-FBELO7vw@mail.gmail.com>
- <20170911012508.GA17754@kroah.com> <9bc9cc83-212a-b39c-75af-b94fe6cab9f4@gmail.com>
- <d68738f6-b079-0fef-dd9c-dca75e756c42@gmail.com>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Sun, 10 Sep 2017 21:25:08 -0700
-Message-ID: <CA+55aFzWABZ+KCKT+r+TgyrWfnc+6YE7ZuHhZmgw-cRQXWTQ2w@mail.gmail.com>
+Return-Path: <nix.or.die@gmail.com>
 Subject: Re: btusb "firmware request while host is not available" at resume
-To: Gabriel C <nix.or.die@gmail.com>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Luis R. Rodriguez" <mcgrof@kernel.org>,
-	Tejun Heo <tj@kernel.org>, Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>, Sukumar Ghorai <sukumar.ghorai@intel.com>,
-	"Rafael J. Wysocki" <rjw@rjwysocki.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	"bluez mailin list (linux-bluetooth@vger.kernel.org)" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+From: Gabriel C <nix.or.die@gmail.com>
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Linus Torvalds <torvalds@linux-foundation.org>,
+ "Luis R. Rodriguez" <mcgrof@kernel.org>
+Cc: Tejun Heo <tj@kernel.org>, Marcel Holtmann <marcel@holtmann.org>,
+ Gustavo Padovan <gustavo@padovan.org>,
+ Sukumar Ghorai <sukumar.ghorai@intel.com>,
+ "Rafael J. Wysocki" <rjw@rjwysocki.net>,
+ Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+ "bluez mailin list (linux-bluetooth@vger.kernel.org)"
+ <linux-bluetooth@vger.kernel.org>
+References: <CA+55aFztG626Np=z2WUzeVS1O3nmoTj76QRUBPg0J-FBELO7vw@mail.gmail.com>
+ <20170911012508.GA17754@kroah.com>
+ <9bc9cc83-212a-b39c-75af-b94fe6cab9f4@gmail.com>
+Message-ID: <d68738f6-b079-0fef-dd9c-dca75e756c42@gmail.com>
+Date: Mon, 11 Sep 2017 05:49:44 +0200
+MIME-Version: 1.0
+In-Reply-To: <9bc9cc83-212a-b39c-75af-b94fe6cab9f4@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Sun, Sep 10, 2017 at 8:49 PM, Gabriel C <nix.or.die@gmail.com> wrote:
->
-> Yes 81f95076281f is to blame.. After reverting it all is fine again.
->
-> 15 resume cycles on the one laptop , 10 on the other without to hit the
-> trace.
+On 11.09.2017 05:15, Gabriel C wrote:
+> On 11.09.2017 03:25, Greg Kroah-Hartman wrote:
+>> On Sun, Sep 10, 2017 at 12:26:02PM -0700, Linus Torvalds wrote:
+>>> This seems to be a new problem at resume for the Intel btusb driver,
+>>> but I'm not seeing anything in that driver itself that looks like a
+>>> likely trigger, so I wonder if it's some driver core change, a generic
+>>> resume path issue, or a workqueue change that has made it trigger for
+>>> me.
+>>>
+>>> It might also just be a timing difference, maybe it's always been there?
+>>>
+>>> Does anybody have any ideas? It does't happen on every resume, and the
+>>> machine works despite this (but no bluetooth - the *next* resume might
+>>> bring it back, though).
+>>
+>> Ah, it's not just me having this problem.  I don't see it happening in
+>> 4.12, and haven't had the time to bisect it.  I seem to be able to
+>> trigger it every suspend/resume cycle, so I don't know if it's a timing
+>> issue.
+> 
+> 
+> I see the same problem with QCA hardware.. but a bit different.
+> 
+> On first resume cycle the firmware call is fine but the adapter dies a bit later with :
+> 
+> 
+>   'Bluetooth: hci0: Failed to send body at 4 of 1857 (-110)'
+> 
+> On second resume cycle I hit the trace too.
+> 
+> 
+>>
+>>>
+>>>                   Linus
+>>>
+>>> -- 
+>>>
+>>>    ACPI: Low-level resume complete
+>>>    ACPI: EC: EC started
+>>>    PM: Restoring platform NVS memory
+>>>    Enabling non-boot CPUs ...
+>>>    x86: Booting SMP configuration:
+>>>    smpboot: Booting Node 0 Processor 1 APIC 0x2
+>>>     cache: parent cpu1 should not be sleeping
+>>>    CPU1 is up
+>>>    smpboot: Booting Node 0 Processor 2 APIC 0x1
+>>>     cache: parent cpu2 should not be sleeping
+>>>    CPU2 is up
+>>>    smpboot: Booting Node 0 Processor 3 APIC 0x3
+>>>     cache: parent cpu3 should not be sleeping
+>>>    CPU3 is up
+>>>    ACPI: Waking up from system sleep state S3
+>>>    ACPI: EC: event unblocked
+>>>    usb 1-3: reset full-speed USB device number 2 using xhci_hcd
+>>>    usb 1-4: reset full-speed USB device number 3 using xhci_hcd
+>>>    usb 1-5: reset high-speed USB device number 4 using xhci_hcd
+>>>    usb 1-3:1.0: rebind failed: -517
+>>>    usb 1-3:1.1: rebind failed: -517
+>>>    Bluetooth: hci0: Bootloader revision 0.0 build 2 week 52 2014
+>>>    OOM killer enabled.
+>>>    Restarting tasks ...
+>>>    Bluetooth: hci0: Device revision is 5
+>>>    Bluetooth: hci0: Secure boot is enabled
+>>>    Bluetooth: hci0: OTP lock is enabled
+>>>    Bluetooth: hci0: API lock is enabled
+>>>    Bluetooth: hci0: Debug lock is disabled
+>>>    Bluetooth: hci0: Minimum firmware build 1 week 10 2014
+>>>    firmware request while host is not available
+>>>    ------------[ cut here ]------------
+>>>    WARNING: CPU: 2 PID: 621 at drivers/base/firmware_class.c:1250
+>>> _request_firmware+0x460/0x790
+>>>    CPU: 2 PID: 621 Comm: kworker/u9:2 Not tainted 4.13.0-10313-ge860d2c904d1 #11
+>>>    Hardware name: Dell Inc. XPS 13 9350/09JHRY, BIOS 1.4.17 05/10/2017
+>>>    Workqueue: hci0 hci_power_on [bluetooth]
+>>>    task: ffff8d3767895ac0 task.stack: ffff9d3481efc000
+>>>    RIP: 0010:_request_firmware+0x460/0x790
+>>>    Call Trace:
+>>>     request_firmware+0x37/0x50
+>>>     btusb_setup_intel_new+0x227/0x7e0 [btusb]
+>>>     hci_dev_do_open+0x3da/0x570 [bluetooth]
+>>>     hci_power_on+0x52/0x1f0 [bluetooth]
+>>>     process_one_work+0x1db/0x3d0
+>>>     worker_thread+0x47/0x3e0
+>>>     kthread+0x125/0x140
+>>>     ret_from_fork+0x22/0x30
+>>>    ---[ end trace 007b222491432927 ]---
+>>>    Bluetooth: hci0: Failed to load Intel firmware file (-112)
+>>>    [drm] RC6 on
+>>>    done.
+>>>    thermal thermal_zone11: failed to read out thermal zone (-5)
+>>>    PM: suspend exit
+>>
+>> Ah, I'll blame Luis for this, I think it might be due to 81f95076281f
+>> ("firmware: add sanity check on shutdown/suspend")
+>>
+>> Luis, any ideas?  I'll try to revert this and try it out tomorrow when
+>> I get a chance.
+>>
+> 
+> I can revert it an fire up some testing..
+> 
 
-Yeah, I think that disable/enable_firmware in the suspend/resume path
-is basically just completely random code. There  is nothing that
-serializes with anything else, and it has no actual basis for saying
-"I am now disabled/enabled" except for some entirely random time of
-whenever the suspend/resume callbacks happen.
+Yes 81f95076281f is to blame.. After reverting it all is fine again.
 
-I'm going to revert it.
+15 resume cycles on the one laptop , 10 on the other without to hit the trace.
 
-I wonder why 4.13 seemed to work for me. Or maybe it didn't, and I
-just didn't notice, because I didn't use bluetooth and I wasn't
-traveling. I test my laptop every release, but I don't necessarily
-always _use_ it.
-
-               Linus
+Regards
