@@ -1,155 +1,212 @@
-Return-Path: <linux-kernel-owner@vger.kernel.org>
-Content-Type: text/plain; charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Subject: Re: btusb "firmware request while host is not available" at resume
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20170912162729.GC16216@wotan.suse.de>
-Date: Wed, 13 Sep 2017 08:52:15 +0200
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Gabriel C <nix.or.die@gmail.com>, Tejun Heo <tj@kernel.org>,
-        "Gustavo F. Padovan" <gustavo@padovan.org>,
-        Sukumar Ghorai <sukumar.ghorai@intel.com>,
-        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        "bluez mailin list (linux-bluetooth@vger.kernel.org)"
-        <linux-bluetooth@vger.kernel.org>
-Message-Id: <3A938253-4CB7-4D24-82B1-6A2E3B794077@holtmann.org>
-References: <20170911012508.GA17754@kroah.com>
- <9bc9cc83-212a-b39c-75af-b94fe6cab9f4@gmail.com>
- <d68738f6-b079-0fef-dd9c-dca75e756c42@gmail.com>
- <CA+55aFzWABZ+KCKT+r+TgyrWfnc+6YE7ZuHhZmgw-cRQXWTQ2w@mail.gmail.com>
- <E31F8274-519A-4ED7-90C0-2BB71C9CC3ED@holtmann.org>
- <20170911134647.GA3980@kroah.com> <20170911171138.GA16216@wotan.suse.de>
- <20170911192955.GB23729@kroah.com> <20170911200651.GB16216@wotan.suse.de>
- <09F52990-796D-4F19-957B-EEFCA6ADC160@holtmann.org>
- <20170912162729.GC16216@wotan.suse.de>
-To: "Luis R. Rodriguez" <mcgrof@kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+MIME-Version: 1.0
+In-Reply-To: <CABBYNZJSfDM9keDQHzn8OT_1yOM46erjHyB9zED8vsSbikDZYQ@mail.gmail.com>
+References: <20170907115940.30459-1-luiz.dentz@gmail.com> <CABBYNZJSfDM9keDQHzn8OT_1yOM46erjHyB9zED8vsSbikDZYQ@mail.gmail.com>
+From: Sonny Sasaka <sonnysasaka@chromium.org>
+Date: Tue, 12 Sep 2017 14:54:23 -0700
+Message-ID: <CAOxioNmte6Vk7HjUND05Zni8zS+=cZyjGnk60p19q7zSm5eS8g@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] adapter: Fix not waiting for start discovery result
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        Miao-chen Chou <mcchou@chromium.org>
+Content-Type: text/plain; charset="UTF-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luis,
+Hi Luiz,
 
->>>> If something needs to be fixed, can you make a patch showing that?  Or
->>>> do we also need to revert anything else as well to get back to a "better
->>>> working" state?
->>> 
->>> I took a look at the driver and it seems that btusb_setup_intel_new() is
->>> not called after the driver is initialized, rather its called only when
->>> hci_dev_do_open() is called. Its not clear to me how you can end up calling
->>> this on resume but not prior to this on a running system. Feedback from
->>> someone more familiar with bt would be useful.
->>> 
->>> I'd have the call for firmware on probe, no processing would be needed, just
->>> a load to kick the cache into effect would suffice. This may require a bit
->>> of code shift so its best someone more familiar do this.
->>> 
->>> If it confirmed this information is helping avoid these races we can reconsider
->>> re-instating the warn as a firmware dev debugging aid for developers.
->>> 
->>> If the race this warning complained about is indeed possible the same race is
->>> also possible for other usermode helpers. Its *why* the UMH lock was
->>> implemented, it however was never generalized.
->> 
->> we can not load firmware on probe() in most cases. The btusb.ko driver
->> establishes the HCI transport. It is setup in probe() and then started in
->> hci_dev_do_open() and if there is a vendor setup routine like
->> btsub_setup_intel_new(), then it is executed. Most Bluetooth controllers (not
->> all, but most) are doing firmware loading over the HCI transport with vendor
->> specific commands.
->> 
->> And yes, if the firmware was already loaded, we would skip requesting it at
->> all. Which means after suspend/resume cycle where the power to the controller
->> is cut, then we are missing the firmware from the cache. Since we never
->> loaded it in the first place.
-> 
-> I checked and prior to commit 81f95076281f ("firmware: add sanity check on
-> shutdown/suspend") and commit 06a45a93e7d34aa ("firmware: move umh try locks
-> into the umh code") I believe we could end up also failing at a firmware
-> request as well. Can you confirm? I see one bug report which confirms this
-> since v3.13:
-> 
-> https://bugs.launchpad.net/ubuntu/+source/linux/+bug/1356076
-> 
-> For the sync case we had:
-> 
-> -               ret = usermodehelper_read_trylock();
-> -               if (WARN_ON(ret)) {
-> -                       dev_err(device, "firmware: %s will not be loaded\n",
-> -                               name);
-> -                       goto out;
-> -               }
-> 
-> The warning splat in launchpad bug 1356076 is the above case.
-> 
-> For the async case we had:
-> 
-> -               timeout = usermodehelper_read_lock_wait(timeout);
-> -               if (!timeout) {
-> -                       dev_dbg(device, "firmware: %s loading timed out\n",
-> -                               name);
-> -                       ret = -EBUSY;
-> -                       goto out;
-> 
-> This would be the more silent case.
-> 
-> If this is accurate than the error case has just been modified to be
-> a bit clearer, and without being implicated by the UMH lock. This was
-> the design change after all. Nothing more *broken* should have happened.
-> 
-> In other words if fixing your issues goes away by reverting commit
-> 81f95076281f, to be fair you should also try reverting commit 06a45a93e7d34aa
-> which did the actual removal of the UMH lock when we don't use the UMH. *That*
-> was previously the failure trigger point.
-> 
->> So yes, we would have to redo parts of the vendor specific handling to always
->> request the firmware, even if we do not need it right now. And frankly that
->> is not obvious to anybody.
-> 
-> I agree. I thought a bit about the above and tried co come to a clever resolution,
-> for instance one resolution could be to use the MODULE_FIRMWARE() declarations
-> of sorts to then let the firmware API do the pre-fetching for you at init. This
-> would just require a 1 line change to drivers and some already have this.
-> There are two issues with this though, one is that the firmware cache works with
-> devres and devres requires a device already present. Second is firmware names
-> can be very dynamic, so one can only know the firmware name later at boot.
+Thank you for the patch. However I see that the patch doesn't address
+the case where start discovery happens during stop discovery (after
+stop_discovery but before stop_discovery_complete).
 
-I don’t like that idea since we have drivers like btusb.ko that support devices from many manufactures. So the only difference is the firmware loading and setup. After that they behave all the same. So pre-loading all Bluetooth firmwares is pretty crazy.
-
-> Another issues is that most driver developers use the firmware API and without
-> knowing *are* creating a firmware cache entry, whereas a few times they don't
-> need a firmware cache entry. This is more of performance / optimization thing,
-> but something to consider long term as well.
-> 
->> We seem to have some patches for doing exactly
->> that, but I have not gotten to review them in detail since they deal with
->> vendor specific complex setup handling.
-> 
-> Correct me if I'm wrong but some of this work very likely came from the above
-> old errors, not the new ones?
-> 
->> Also this affects more than just Intel since all hardware where firmware
->> loading is skipped if there is already firmware loaded are affected.
-> 
-> Right, its a core firmware API issue, but this issue has been present for a
-> while, it was however in different form. I'm glad we're able to think ahead
-> and address this now though, it would seem there are quite a bit of intrusive
-> changes required to use the API right, I'd hope we could help on the firmware
-> API front to make these changes smaller.
-> 
-> First, I'd like to understand a bit more how a device ends up with firmware
-> loaded, without having gone through the firmware API.
-> 
-> Second, while requesting firmware at probe seems not necessary, would it
-> at least be reasonable to require a struct device and a list of possible
-> firmware that could be used be made available? If so a separate hook could
-> be provided to help pre-load these only onto the firmware cache. Ie, we would
-> not actually look for the firmware but just create a firmware cache instance
-> so that when we suspend we *do* go fetch for these so that they are ready and
-> available upon resume.
-
-The devices come with boatloader mode and operational mode and both are independent. And most of them only fallback when fully power cycling the device. So a simple boot linux and reboot linux would get you into the situation that the firmware is already loaded. There are also some UEFI bioses that can load the firmware. So there are multitudes of possibilities where we can end up with a firmware loaded.
-
-Regards
-
-Marcel
+On Sun, Sep 10, 2017 at 12:24 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi,
+>
+> On Thu, Sep 7, 2017 at 2:59 PM, Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+>> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>>
+>> We should not reply until the start discovery completes otherwise
+>> clients may attempt to stop the discovery before it even has started.
+>>
+>> On top of this it will now block clients so they so not be able to
+>> queue more requests.
+>> ---
+>>  src/adapter.c | 55 +++++++++++++++++++++++++++++++++++++++++++++++--------
+>>  1 file changed, 47 insertions(+), 8 deletions(-)
+>>
+>> diff --git a/src/adapter.c b/src/adapter.c
+>> index a571b1870..4b9f5a1cd 100644
+>> --- a/src/adapter.c
+>> +++ b/src/adapter.c
+>> @@ -160,6 +160,7 @@ struct discovery_filter {
+>>
+>>  struct watch_client {
+>>         struct btd_adapter *adapter;
+>> +       DBusMessage *msg;
+>>         char *owner;
+>>         guint watch;
+>>         struct discovery_filter *discovery_filter;
+>> @@ -1421,13 +1422,17 @@ static void start_discovery_complete(uint8_t status, uint16_t length,
+>>                                         const void *param, void *user_data)
+>>  {
+>>         struct btd_adapter *adapter = user_data;
+>> +       struct watch_client *client = adapter->discovery_list->data;
+>>         const struct mgmt_cp_start_discovery *rp = param;
+>> +       DBusMessage *reply;
+>>
+>>         DBG("status 0x%02x", status);
+>>
+>>         if (length < sizeof(*rp)) {
+>>                 btd_error(adapter->dev_id,
+>>                         "Wrong size of start discovery return parameters");
+>> +               if (client->msg)
+>> +                       goto fail;
+>>                 return;
+>>         }
+>>
+>> @@ -1440,6 +1445,14 @@ static void start_discovery_complete(uint8_t status, uint16_t length,
+>>                 else
+>>                         adapter->filtered_discovery = false;
+>>
+>> +               if (client->msg) {
+>> +                       reply = g_dbus_create_reply(client->msg,
+>> +                                                       DBUS_TYPE_INVALID);
+>> +                       g_dbus_send_message(dbus_conn, reply);
+>> +                       dbus_message_unref(client->msg);
+>> +                       client->msg = NULL;
+>> +               }
+>> +
+>>                 if (adapter->discovering)
+>>                         return;
+>>
+>> @@ -1449,6 +1462,15 @@ static void start_discovery_complete(uint8_t status, uint16_t length,
+>>                 return;
+>>         }
+>>
+>> +fail:
+>> +       /* Reply with an error if the first discovery has failed */
+>> +       if (client->msg) {
+>> +               reply = btd_error_busy(client->msg);
+>> +               g_dbus_send_message(dbus_conn, reply);
+>> +               g_dbus_remove_watch(dbus_conn, client->watch);
+>> +               return;
+>> +       }
+>> +
+>>         /*
+>>          * In case the restart of the discovery failed, then just trigger
+>>          * it for the next idle timeout again.
+>> @@ -1933,7 +1955,7 @@ static bool filters_equal(struct mgmt_cp_start_service_discovery *a,
+>>         return true;
+>>  }
+>>
+>> -static void update_discovery_filter(struct btd_adapter *adapter)
+>> +static int update_discovery_filter(struct btd_adapter *adapter)
+>>  {
+>>         struct mgmt_cp_start_service_discovery *sd_cp;
+>>
+>> @@ -1942,7 +1964,7 @@ static void update_discovery_filter(struct btd_adapter *adapter)
+>>         if (discovery_filter_to_mgmt_cp(adapter, &sd_cp)) {
+>>                 btd_error(adapter->dev_id,
+>>                                 "discovery_filter_to_mgmt_cp returned error");
+>> -               return;
+>> +               return -ENOMEM;
+>>         }
+>>
+>>         /*
+>> @@ -1953,13 +1975,15 @@ static void update_discovery_filter(struct btd_adapter *adapter)
+>>             adapter->discovering != 0) {
+>>                 DBG("filters were equal, deciding to not restart the scan.");
+>>                 g_free(sd_cp);
+>> -               return;
+>> +               return 0;
+>>         }
+>>
+>>         g_free(adapter->current_discovery_filter);
+>>         adapter->current_discovery_filter = sd_cp;
+>>
+>>         trigger_start_discovery(adapter, 0);
+>> +
+>> +       return -EINPROGRESS;
+>>  }
+>>
+>>  static void discovery_destroy(void *user_data)
+>> @@ -1980,6 +2004,9 @@ static void discovery_destroy(void *user_data)
+>>                 client->discovery_filter = NULL;
+>>         }
+>>
+>> +       if (client->msg)
+>> +               dbus_message_unref(client->msg);
+>> +
+>>         g_free(client->owner);
+>>         g_free(client);
+>>
+>> @@ -2087,6 +2114,7 @@ static DBusMessage *start_discovery(DBusConnection *conn,
+>>         const char *sender = dbus_message_get_sender(msg);
+>>         struct watch_client *client;
+>>         bool is_discovering;
+>> +       int err;
+>>
+>>         DBG("sender %s", sender);
+>>
+>> @@ -2107,12 +2135,14 @@ static DBusMessage *start_discovery(DBusConnection *conn,
+>>          * and trigger scan.
+>>          */
+>>         if (client) {
+>> +               if (client->msg)
+>> +                       return btd_error_busy(msg);
+>> +
+>>                 adapter->set_filter_list = g_slist_remove(
+>>                                              adapter->set_filter_list, client);
+>>                 adapter->discovery_list = g_slist_prepend(
+>>                                               adapter->discovery_list, client);
+>> -               update_discovery_filter(adapter);
+>> -               return dbus_message_new_method_return(msg);
+>> +               goto done;
+>>         }
+>>
+>>         client = g_new0(struct watch_client, 1);
+>> @@ -2126,14 +2156,23 @@ static DBusMessage *start_discovery(DBusConnection *conn,
+>>         adapter->discovery_list = g_slist_prepend(adapter->discovery_list,
+>>                                                                 client);
+>>
+>> +done:
+>>         /*
+>>          * Just trigger the discovery here. In case an already running
+>>          * discovery in idle phase exists, it will be restarted right
+>>          * away.
+>>          */
+>> -       update_discovery_filter(adapter);
+>> +       err = update_discovery_filter(adapter);
+>> +       if (!err)
+>> +               return dbus_message_new_method_return(msg);
+>>
+>> -       return dbus_message_new_method_return(msg);
+>> +       /* If the discovery has to be started wait it complete to reply */
+>> +       if (err == -EINPROGRESS) {
+>> +               client->msg = dbus_message_ref(msg);
+>> +               return NULL;
+>> +       }
+>> +
+>> +       return btd_error_failed(msg, strerror(-err));
+>>  }
+>>
+>>  static bool parse_uuids(DBusMessageIter *value, struct discovery_filter *filter)
+>> @@ -2984,7 +3023,7 @@ static DBusMessage *get_discovery_filters(DBusConnection *conn,
+>>  }
+>>
+>>  static const GDBusMethodTable adapter_methods[] = {
+>> -       { GDBUS_METHOD("StartDiscovery", NULL, NULL, start_discovery) },
+>> +       { GDBUS_ASYNC_METHOD("StartDiscovery", NULL, NULL, start_discovery) },
+>>         { GDBUS_METHOD("SetDiscoveryFilter",
+>>                                 GDBUS_ARGS({ "properties", "a{sv}" }), NULL,
+>>                                 set_discovery_filter) },
+>> --
+>> 2.13.5
+>
+> Could you guys please check if this does address the problem you are having?
+>
+>
+> --
+> Luiz Augusto von Dentz
