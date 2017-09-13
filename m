@@ -1,28 +1,32 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Subject: Re: [PATCH BlueZ] sdp: Fix Out-of-bounds heap read in
- service_search_attr_req function
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20170913070140.12576-1-luiz.dentz@gmail.com>
-Date: Wed, 13 Sep 2017 09:08:22 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <25AA664B-4C5C-4D89-88DC-3C84202F7611@holtmann.org>
-References: <20170913070140.12576-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ] sdp: Fix Out-of-bounds heap read in service_search_attr_req function
+Date: Wed, 13 Sep 2017 10:01:40 +0300
+Message-Id: <20170913070140.12576-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-> Check if there is enough data to continue otherwise return an error.
-> ---
-> src/sdpd-request.c | 2 +-
-> 1 file changed, 1 insertion(+), 1 deletion(-)
+Check if there is enough data to continue otherwise return an error.
+---
+ src/sdpd-request.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-patch has been applied.
-
-Regards
-
-Marcel
+diff --git a/src/sdpd-request.c b/src/sdpd-request.c
+index 1eefdce1a..318d04467 100644
+--- a/src/sdpd-request.c
++++ b/src/sdpd-request.c
+@@ -917,7 +917,7 @@ static int service_search_attr_req(sdp_req_t *req, sdp_buf_t *buf)
+ 	} else {
+ 		/* continuation State exists -> get from cache */
+ 		sdp_buf_t *pCache = sdp_get_cached_rsp(cstate);
+-		if (pCache) {
++		if (pCache && cstate->cStateValue.maxBytesSent < pCache->data_size) {
+ 			uint16_t sent = MIN(max, pCache->data_size - cstate->cStateValue.maxBytesSent);
+ 			pResponse = pCache->data;
+ 			memcpy(buf->data, pResponse + cstate->cStateValue.maxBytesSent, sent);
+-- 
+2.13.5
 
