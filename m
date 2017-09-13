@@ -1,225 +1,102 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <CAOxioNmte6Vk7HjUND05Zni8zS+=cZyjGnk60p19q7zSm5eS8g@mail.gmail.com>
-References: <20170907115940.30459-1-luiz.dentz@gmail.com> <CABBYNZJSfDM9keDQHzn8OT_1yOM46erjHyB9zED8vsSbikDZYQ@mail.gmail.com>
- <CAOxioNmte6Vk7HjUND05Zni8zS+=cZyjGnk60p19q7zSm5eS8g@mail.gmail.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 13 Sep 2017 15:11:52 +0300
-Message-ID: <CABBYNZL-uJb7SmPPONWuC_Gk8fawKEoY7UGM11WVKVdE-e4QLg@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] adapter: Fix not waiting for start discovery result
-To: Sonny Sasaka <sonnysasaka@chromium.org>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Miao-chen Chou <mcchou@chromium.org>
-Content-Type: text/plain; charset="UTF-8"
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ] a2dp: Fix possible crash when accepting stream transport
+Date: Wed, 13 Sep 2017 14:42:36 +0300
+Message-Id: <20170913114236.17071-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Sonny,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Wed, Sep 13, 2017 at 12:54 AM, Sonny Sasaka <sonnysasaka@chromium.org> wrote:
-> Hi Luiz,
->
-> Thank you for the patch. However I see that the patch doesn't address
-> the case where start discovery happens during stop discovery (after
-> stop_discovery but before stop_discovery_complete).
+During the course of bt_io_accept the setup can be freed causing the
+callback to be called which can lead to the following crash:
 
-I would considered this a different problem, but yes either multiple
-starts or start/stop in a sequence may cause the states to be out of
-sync so it needs fixing.
+bluetoothd[853]: profiles/audio/a2dp.c:setup_unref() 0x8183c1c0: ref=0
+bluetoothd[853]: profiles/audio/a2dp.c:setup_free() 0x8183c1c0
+...
+bluetoothd[853]: HUP or ERR on socket: Connection reset by peer (104)
+bluetoothd[853]: profiles/audio/a2dp.c:setup_unref() 0x8183c1c0: ref=-80438434
+bluetoothd[853]: profiles/audio/a2dp.c:setup_free() 0x8183c1c0
 
-> On Sun, Sep 10, 2017 at 12:24 PM, Luiz Augusto von Dentz
-> <luiz.dentz@gmail.com> wrote:
->> Hi,
->>
->> On Thu, Sep 7, 2017 at 2:59 PM, Luiz Augusto von Dentz
->> <luiz.dentz@gmail.com> wrote:
->>> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->>>
->>> We should not reply until the start discovery completes otherwise
->>> clients may attempt to stop the discovery before it even has started.
->>>
->>> On top of this it will now block clients so they so not be able to
->>> queue more requests.
->>> ---
->>>  src/adapter.c | 55 +++++++++++++++++++++++++++++++++++++++++++++++--------
->>>  1 file changed, 47 insertions(+), 8 deletions(-)
->>>
->>> diff --git a/src/adapter.c b/src/adapter.c
->>> index a571b1870..4b9f5a1cd 100644
->>> --- a/src/adapter.c
->>> +++ b/src/adapter.c
->>> @@ -160,6 +160,7 @@ struct discovery_filter {
->>>
->>>  struct watch_client {
->>>         struct btd_adapter *adapter;
->>> +       DBusMessage *msg;
->>>         char *owner;
->>>         guint watch;
->>>         struct discovery_filter *discovery_filter;
->>> @@ -1421,13 +1422,17 @@ static void start_discovery_complete(uint8_t status, uint16_t length,
->>>                                         const void *param, void *user_data)
->>>  {
->>>         struct btd_adapter *adapter = user_data;
->>> +       struct watch_client *client = adapter->discovery_list->data;
->>>         const struct mgmt_cp_start_discovery *rp = param;
->>> +       DBusMessage *reply;
->>>
->>>         DBG("status 0x%02x", status);
->>>
->>>         if (length < sizeof(*rp)) {
->>>                 btd_error(adapter->dev_id,
->>>                         "Wrong size of start discovery return parameters");
->>> +               if (client->msg)
->>> +                       goto fail;
->>>                 return;
->>>         }
->>>
->>> @@ -1440,6 +1445,14 @@ static void start_discovery_complete(uint8_t status, uint16_t length,
->>>                 else
->>>                         adapter->filtered_discovery = false;
->>>
->>> +               if (client->msg) {
->>> +                       reply = g_dbus_create_reply(client->msg,
->>> +                                                       DBUS_TYPE_INVALID);
->>> +                       g_dbus_send_message(dbus_conn, reply);
->>> +                       dbus_message_unref(client->msg);
->>> +                       client->msg = NULL;
->>> +               }
->>> +
->>>                 if (adapter->discovering)
->>>                         return;
->>>
->>> @@ -1449,6 +1462,15 @@ static void start_discovery_complete(uint8_t status, uint16_t length,
->>>                 return;
->>>         }
->>>
->>> +fail:
->>> +       /* Reply with an error if the first discovery has failed */
->>> +       if (client->msg) {
->>> +               reply = btd_error_busy(client->msg);
->>> +               g_dbus_send_message(dbus_conn, reply);
->>> +               g_dbus_remove_watch(dbus_conn, client->watch);
->>> +               return;
->>> +       }
->>> +
->>>         /*
->>>          * In case the restart of the discovery failed, then just trigger
->>>          * it for the next idle timeout again.
->>> @@ -1933,7 +1955,7 @@ static bool filters_equal(struct mgmt_cp_start_service_discovery *a,
->>>         return true;
->>>  }
->>>
->>> -static void update_discovery_filter(struct btd_adapter *adapter)
->>> +static int update_discovery_filter(struct btd_adapter *adapter)
->>>  {
->>>         struct mgmt_cp_start_service_discovery *sd_cp;
->>>
->>> @@ -1942,7 +1964,7 @@ static void update_discovery_filter(struct btd_adapter *adapter)
->>>         if (discovery_filter_to_mgmt_cp(adapter, &sd_cp)) {
->>>                 btd_error(adapter->dev_id,
->>>                                 "discovery_filter_to_mgmt_cp returned error");
->>> -               return;
->>> +               return -ENOMEM;
->>>         }
->>>
->>>         /*
->>> @@ -1953,13 +1975,15 @@ static void update_discovery_filter(struct btd_adapter *adapter)
->>>             adapter->discovering != 0) {
->>>                 DBG("filters were equal, deciding to not restart the scan.");
->>>                 g_free(sd_cp);
->>> -               return;
->>> +               return 0;
->>>         }
->>>
->>>         g_free(adapter->current_discovery_filter);
->>>         adapter->current_discovery_filter = sd_cp;
->>>
->>>         trigger_start_discovery(adapter, 0);
->>> +
->>> +       return -EINPROGRESS;
->>>  }
->>>
->>>  static void discovery_destroy(void *user_data)
->>> @@ -1980,6 +2004,9 @@ static void discovery_destroy(void *user_data)
->>>                 client->discovery_filter = NULL;
->>>         }
->>>
->>> +       if (client->msg)
->>> +               dbus_message_unref(client->msg);
->>> +
->>>         g_free(client->owner);
->>>         g_free(client);
->>>
->>> @@ -2087,6 +2114,7 @@ static DBusMessage *start_discovery(DBusConnection *conn,
->>>         const char *sender = dbus_message_get_sender(msg);
->>>         struct watch_client *client;
->>>         bool is_discovering;
->>> +       int err;
->>>
->>>         DBG("sender %s", sender);
->>>
->>> @@ -2107,12 +2135,14 @@ static DBusMessage *start_discovery(DBusConnection *conn,
->>>          * and trigger scan.
->>>          */
->>>         if (client) {
->>> +               if (client->msg)
->>> +                       return btd_error_busy(msg);
->>> +
->>>                 adapter->set_filter_list = g_slist_remove(
->>>                                              adapter->set_filter_list, client);
->>>                 adapter->discovery_list = g_slist_prepend(
->>>                                               adapter->discovery_list, client);
->>> -               update_discovery_filter(adapter);
->>> -               return dbus_message_new_method_return(msg);
->>> +               goto done;
->>>         }
->>>
->>>         client = g_new0(struct watch_client, 1);
->>> @@ -2126,14 +2156,23 @@ static DBusMessage *start_discovery(DBusConnection *conn,
->>>         adapter->discovery_list = g_slist_prepend(adapter->discovery_list,
->>>                                                                 client);
->>>
->>> +done:
->>>         /*
->>>          * Just trigger the discovery here. In case an already running
->>>          * discovery in idle phase exists, it will be restarted right
->>>          * away.
->>>          */
->>> -       update_discovery_filter(adapter);
->>> +       err = update_discovery_filter(adapter);
->>> +       if (!err)
->>> +               return dbus_message_new_method_return(msg);
->>>
->>> -       return dbus_message_new_method_return(msg);
->>> +       /* If the discovery has to be started wait it complete to reply */
->>> +       if (err == -EINPROGRESS) {
->>> +               client->msg = dbus_message_ref(msg);
->>> +               return NULL;
->>> +       }
->>> +
->>> +       return btd_error_failed(msg, strerror(-err));
->>>  }
->>>
->>>  static bool parse_uuids(DBusMessageIter *value, struct discovery_filter *filter)
->>> @@ -2984,7 +3023,7 @@ static DBusMessage *get_discovery_filters(DBusConnection *conn,
->>>  }
->>>
->>>  static const GDBusMethodTable adapter_methods[] = {
->>> -       { GDBUS_METHOD("StartDiscovery", NULL, NULL, start_discovery) },
->>> +       { GDBUS_ASYNC_METHOD("StartDiscovery", NULL, NULL, start_discovery) },
->>>         { GDBUS_METHOD("SetDiscoveryFilter",
->>>                                 GDBUS_ARGS({ "properties", "a{sv}" }), NULL,
->>>                                 set_discovery_filter) },
->>> --
->>> 2.13.5
->>
->> Could you guys please check if this does address the problem you are having?
->>
->>
->> --
->> Luiz Augusto von Dentz
+0  0x80106888 in stream_free ()
+1  0xb7621d49 in g_slist_foreach () from /usr/lib/libglib-2.0.so.0
+2  0xb7621d92 in g_slist_free_full () from /usr/lib/libglib-2.0.so.0
+3  0x80107d09 in avdtp_unref ()
+4  0x8010273b in setup_unref ()
+5  0x80104c54 in transport_cb ()
+6  0x80136a9c in accept_cb ()
+---
+ profiles/audio/a2dp.c | 22 ++++++++++++++++++++++
+ 1 file changed, 22 insertions(+)
 
-
-
+diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
+index 58e1534a4..cf0040076 100644
+--- a/profiles/audio/a2dp.c
++++ b/profiles/audio/a2dp.c
+@@ -104,6 +104,7 @@ struct a2dp_setup {
+ 	gboolean reconfigure;
+ 	gboolean start;
+ 	GSList *cb;
++	GIOChannel *io;
+ 	int ref;
+ };
+ 
+@@ -158,6 +159,11 @@ static void setup_free(struct a2dp_setup *s)
+ {
+ 	DBG("%p", s);
+ 
++	if (s->io) {
++		g_io_channel_shutdown(s->io, TRUE, NULL);
++		g_io_channel_unref(s->io);
++	}
++
+ 	setups = g_slist_remove(setups, s);
+ 	if (s->session)
+ 		avdtp_unref(s->session);
+@@ -1475,6 +1481,7 @@ static void transport_cb(GIOChannel *io, GError *err, gpointer user_data)
+ 
+ 	if (err) {
+ 		error("%s", err->message);
++		if (err)
+ 		goto drop;
+ 	}
+ 
+@@ -1493,6 +1500,9 @@ static void transport_cb(GIOChannel *io, GError *err, gpointer user_data)
+ 
+ 	g_io_channel_set_close_on_unref(io, FALSE);
+ 
++	g_io_channel_unref(setup->io);
++	setup->io = NULL;
++
+ 	setup_unref(setup);
+ 
+ 	return;
+@@ -1537,12 +1547,24 @@ static void confirm_cb(GIOChannel *io, gpointer data)
+ 		if (!setup || !setup->stream)
+ 			goto drop;
+ 
++		if (setup->io) {
++			error("transport channel already exists");
++			goto drop;
++		}
++
+ 		if (!bt_io_accept(io, transport_cb, setup, NULL, &err)) {
+ 			error("bt_io_accept: %s", err->message);
+ 			g_error_free(err);
+ 			goto drop;
+ 		}
+ 
++		/*
++		 * Reference the channel so it can be shutdown properly
++		 * stopping bt_io_accept from calling the callback with invalid
++		 * setup pointer.
++		 */
++		setup->io = g_io_channel_ref(io);
++
+ 		return;
+ 	}
+ 
 -- 
-Luiz Augusto von Dentz
+2.13.5
+
