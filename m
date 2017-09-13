@@ -1,145 +1,97 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2] mesh: Add 'security' command
-Date: Wed, 13 Sep 2017 13:17:20 +0300
-Message-Id: <20170913101720.15104-1-luiz.dentz@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <6087b552-0cbe-962c-74c1-10ad931c4331@jp.fujitsu.com>
+References: <20170913073627.59799-1-yunhanw@google.com> <6087b552-0cbe-962c-74c1-10ad931c4331@jp.fujitsu.com>
+From: Yunhan Wang <yunhanw@google.com>
+Date: Wed, 13 Sep 2017 01:38:16 -0700
+Message-ID: <CALvjcs9-_iYenifNT90DMgE8Y5it+MR0MCrv3SU4jmrJQe0UZw@mail.gmail.com>
+Subject: Re: [PATCH v3] client: Fix default_ctrl change when new adapter is found
+To: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi, ERAMOTO
 
-This adds 'security' command which can be used to display and change
-the provision security level:
+Your patch is better. Could you reformat and resubmit it so that we
+can merge it.
 
-[meshctl]# security
-Provision Security Level set to 1 (medium)
-[meshctl]# security 2
-Provision Security Level set to 2 (high)
+Thanks
+Best wishes
+Yunhan
 
-Note: This doesn't change the default which is still medium.
----
- mesh/main.c | 37 +++++++++++++++++++++++++++++++++++++
- mesh/prov.c | 22 +++++++++++++++++++---
- mesh/prov.h |  2 ++
- 3 files changed, 58 insertions(+), 3 deletions(-)
-
-diff --git a/mesh/main.c b/mesh/main.c
-index 3a39d8f62..5ec76a465 100644
---- a/mesh/main.c
-+++ b/mesh/main.c
-@@ -1721,6 +1721,41 @@ static void cmd_info(const char *arg)
- 	print_property(proxy, "TxPower");
- }
- 
-+static const char *security2str(uint8_t level)
-+{
-+	switch (level) {
-+	case 0:
-+		return "low";
-+	case 1:
-+		return "medium";
-+	case 2:
-+		return "high";
-+	default:
-+		return "invalid";
-+	}
-+}
-+
-+static void cmd_security(const char *arg)
-+{
-+	uint8_t level;
-+	char *end;
-+
-+	if (!arg || arg[0] == '\0') {
-+		level = prov_get_sec_level();
-+		goto done;
-+	}
-+
-+	level = strtol(arg, &end, 10);
-+	if (end == arg || !prov_set_sec_level(level)) {
-+		rl_printf("Invalid security level %s\n", arg);
-+		return;
-+	}
-+
-+done:
-+	rl_printf("Provision Security Level set to %u (%s)\n", level,
-+						security2str(level));
-+}
-+
- static void cmd_connect(const char *arg)
- {
- 	if (check_default_ctrl() == FALSE)
-@@ -1967,6 +2002,8 @@ static const struct menu_entry meshctl_cmd_table[] = {
- 	{ "list",         NULL,       cmd_list, "List available controllers"},
- 	{ "show",         "[ctrl]",   cmd_show, "Controller information"},
- 	{ "select",       "<ctrl>",   cmd_select, "Select default controller"},
-+	{ "security",      "[level=0(low), 1(medium), 2(high)]", cmd_security,
-+				"Display or change provision security level"},
- 	{ "info",         "[dev]",    cmd_info, "Device information"},
- 	{ "connect",      "[net_idx]",cmd_connect, "Connect to mesh network"},
- 	{ "discover-unprovisioned", "<on/off>", cmd_scan_unprovisioned_devices,
-diff --git a/mesh/prov.c b/mesh/prov.c
-index 32785dda1..b293aa5fb 100644
---- a/mesh/prov.c
-+++ b/mesh/prov.c
-@@ -56,8 +56,6 @@
- #define MESH_PROV_SEC_MED	1
- #define MESH_PROV_SEC_LOW	0
- 
--/* For Deployment, Security levels below HIGH are *not* recomended */
--#define mesh_gatt_prov_security()	MESH_PROV_SEC_MED
- 
- #define PROV_INVITE	0x00
- #define PROV_CAPS	0x01
-@@ -84,6 +82,9 @@
- #define PROV_ERR_UNEXPECTED_ERR		0x07
- #define PROV_ERR_CANT_ASSIGN_ADDR	0x08
- 
-+/* For Deployment, Security levels below HIGH are *not* recomended */
-+static uint8_t prov_sec_level = MESH_PROV_SEC_MED;
-+
- /* Expected Provisioning PDU sizes */
- static const uint16_t expected_pdu_size[] = {
- 	1 + 1,					/* PROV_INVITE */
-@@ -463,7 +464,7 @@ bool prov_data_ready(struct mesh_node *node, uint8_t *buf, uint8_t len)
- 			/* Save Capability values */
- 			memcpy(&prov->conf_in.caps, buf, len);
- 
--			sec_level = mesh_gatt_prov_security();
-+			sec_level = prov_sec_level;
- 
- 			if (sec_level == MESH_PROV_SEC_HIGH) {
- 
-@@ -662,3 +663,18 @@ bool prov_complete(struct mesh_node *node, uint8_t status)
- 
- 	return true;
- }
-+
-+bool prov_set_sec_level(uint8_t level)
-+{
-+	if (level > MESH_PROV_SEC_HIGH)
-+		return false;
-+
-+	prov_sec_level = level;
-+
-+	return true;
-+}
-+
-+uint8_t prov_get_sec_level(void)
-+{
-+	return prov_sec_level;
-+}
-diff --git a/mesh/prov.h b/mesh/prov.h
-index 94ce7a1b5..2587df8fb 100644
---- a/mesh/prov.h
-+++ b/mesh/prov.h
-@@ -29,3 +29,5 @@ bool prov_open(struct mesh_node *node, GDBusProxy *prov_in, uint16_t net_idx,
- 		provision_done_cb cb, void *user_data);
- bool prov_data_ready(struct mesh_node *node, uint8_t *buf, uint8_t len);
- bool prov_complete(struct mesh_node *node, uint8_t status);
-+bool prov_set_sec_level(uint8_t level);
-+uint8_t prov_get_sec_level(void);
--- 
-2.13.5
-
+On Wed, Sep 13, 2017 at 1:08 AM, ERAMOTO Masaya
+<eramoto.masaya@jp.fujitsu.com> wrote:
+> Hi Yunhan,
+>
+> On 09/13/2017 04:36 PM, Yunhan Wang wrote:
+>> When another adapter is found, the default adapter would be changed, which is not expected. Default adapter can only be changed by select command.
+>> ---
+>>  client/main.c | 31 +++++++++++++++++++++++++------
+>>  1 file changed, 25 insertions(+), 6 deletions(-)
+>>
+>> diff --git a/client/main.c b/client/main.c
+>> index 75696c2c1..e6737b961 100644
+>> --- a/client/main.c
+>> +++ b/client/main.c
+>> @@ -148,10 +148,8 @@ static void disconnect_handler(DBusConnection *connection, void *user_data)
+>>       printf("\r");
+>>       rl_on_new_line();
+>>       rl_redisplay();
+>> -
+>>       g_list_free_full(ctrl_list, proxy_leak);
+>>       ctrl_list = NULL;
+>> -
+>>       default_ctrl = NULL;
+>>  }
+>>
+>> @@ -521,15 +519,36 @@ static void device_added(GDBusProxy *proxy)
+>>
+>>  static void adapter_added(GDBusProxy *proxy)
+>>  {
+>> -     default_ctrl = g_malloc0(sizeof(struct adapter));
+>> -     default_ctrl->proxy = proxy;
+>> -     ctrl_list = g_list_append(ctrl_list, default_ctrl);
+>> +     struct adapter *adapter = g_malloc0(sizeof(struct adapter));
+>> +
+>> +     adapter->proxy = proxy;
+>> +     ctrl_list = g_list_append(ctrl_list, adapter);
+>> +
+>> +     if (!default_ctrl)
+>> +             default_ctrl = adapter;
+>> +
+>>       print_adapter(proxy, COLORED_NEW);
+>>  }
+>>
+>> +static int match_proxy(const void *a, const void *b)
+>> +{
+>> +     GDBusProxy *proxy1 = (void *) a;
+>> +     GDBusProxy *proxy2 = (void *) b;
+>> +
+>> +     return strcmp(g_dbus_proxy_get_path(proxy1),
+>> +                               g_dbus_proxy_get_path(proxy2));
+>> +}
+>> +
+>>  static void ad_manager_added(GDBusProxy *proxy)
+>>  {
+>> -     default_ctrl->ad_proxy = proxy;
+>> +     GList *list;
+>> +
+>> +     for (list = g_list_first(ctrl_list); list; list = g_list_next(list)) {
+>> +             struct adapter *adapter = list->data;
+>> +
+>> +             if (match_proxy(proxy, adapter->proxy) == 0)
+>> +                     adapter->ad_proxy = proxy;
+>> +     }
+>
+> I think that you should use find_ctrl(), which does the similar thing as
+> match_proxy() and the for loop statement of above ad_manager_added().
+>
+> Let's see ad_manager_added() of my attached patch at the URL:
+>   https://www.spinics.net/lists/linux-bluetooth/msg71731.html
+>
+>
+> Regards,
+> Eramoto
+>
