@@ -1,67 +1,45 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Date: Thu, 14 Sep 2017 13:44:02 +0200
-From: Sebastian Reichel <sre@kernel.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: pulseaudio-discuss@lists.freedesktop.org
-Subject: Bose QC35 HFP/HSP MTU size
-Message-ID: <20170914114402.qbfwd3ceosrrgzqp@earth>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="a2pcb5jslwx6wzdu"
+From: Neacsu Cristian <neacsu.cristianstefan@gmail.com>
+Date: Thu, 14 Sep 2017 12:36:08 +0300
+Message-ID: <CADBWZmW2UuWGa_fbiYfbsnBGqJdgXftbDVzHtjLium_y3WzySA@mail.gmail.com>
+Subject: RFCOMM socket connection is taking a bit too much time
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hello,
 
---a2pcb5jslwx6wzdu
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I would kindly ask you for your support. For some days in a row, I am
+struggling to reduce as much as possible the connection to a bluetooth
+device, without any success. Assuming that the address of the device
+is known and stable, as well as the device in available.
+Opening a socket only [socket(PF_BLUETOOTH, SOCK_STREAM,
+BTPROTO_RFCOMM)] is taking a constant time of 5017 ms on my system
+(every run is 5017 with a variation of maximum 2 ms - highly suspect
+that there is a timeout or so, but I was not able to debug to deep). I
+am using Ubuntu 16.04 and BlueZ 5.46 library.
+I tried all kind of attempts, nonblocking socket, different socket
+types, without any success. I tried as well the default rfcomm tool
+from the blueZ package, scanning the implementation, trying same
+approach, I really cannot decrease this connection time. Are there any
+timeout that I could modify, or so?
+Mainly my code is inspired from "Bluetooth for Programmers" book,
+chapter being presented here
+https://people.csail.mit.edu/albert/bluez-intro/x502.html .
+I doubt that is something wrong with my hardware configuration
+(adapter, device, PC etc.) due to the fact that on windows OS, using
+BlueCove java library, connection to the device is below 2 seconds
+(same conditions - address of the device is already known & the device
+is ready to connect).
+Again I tried as well BlueCove-Bluez linux library (I know it is old,
+and is a pain in the neck to make it work ...) and still the same
+issue (BlueCove-gpl as well with the same long timeout).
+Maybe I am doing something wrong. I would really appreciate a
+suggestion or a direction how I can achieve a better connection time.
 
-Hi,
+Thank you in advance.
 
-Bose QC35 are affected by the attached upgrade notice
-=66rom Pulseaudio 11. The workaround fixes the problem.
-
--- Sebastian
-
-> https://www.freedesktop.org/wiki/Software/PulseAudio/Notes/11.0/
->
-> Improved bluetooth MTU configuration
->
-> The packet size (a.k.a. MTU, "maximum transmission unit") that
-> PulseAudio uses with the bluetooth HSP profile was previously
-> always configured to be 48 bytes. That worked with most hardware,
-> but some adapters require a different packet size. Now PulseAudio
-> asks the kernel what packet size should be used, which fixes the
-> problem.
->
-> However, a new problem appeared: some adapters that used to work
-> with 48 byte packet size don't any more work with the size that
-> the kernel tells PulseAudio to use. If you find that HSP audio
-> stopped working when upgrading to PulseAudio 11.0, you can revert
-> to the old behaviour by passing option "autodetect_mtu=3Dno" to
-> module-bluetooth-discover in /etc/pulse/default.pa. If that fixes
-> the problem, then please report the problem to the BlueZ and/or
-> PulseAudio developers, so that the kernel can be fixed.
-
---a2pcb5jslwx6wzdu
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCgAdFiEE72YNB0Y/i3JqeVQT2O7X88g7+poFAlm6a38ACgkQ2O7X88g7
-+prNtxAAjlYZ8y4rGj+FVl8JK2m+sMhnHXjjciEnaR1RGkPvBEu85ZGueM+a3/P5
-MLyaWou4KhLc+jp0VOfuPhMzyH2DKfMXgevK8W2Serthlf3tTFlpzTvkDi+UdNKF
-iGAuAQLrWfAmhC3CIfQ3FN831JJG5qgKs5I5tNiOEt2tzWNBk60HVKMS8ulOh9dI
-HrCHWyAJbLnR+95+DypY6R1ROAOlxkE9d3v0ufXkVmrEnlaLbNElyuM7MmbXK93U
-Hf614whiACoLQx6UDHEykFE89fu3vnCUWae6pqWuxnEt22g7hc1kkOnO4gH3r54F
-NEhByzEIzzjhLMvXGbdyea2TKREI4V+6NXYalUOftdMQLn+0Dplsv9ZXIFhMqwjL
-lXQ38O39ksFeZ0DFbjho1d1pV+Eg+zNiCOYuNGJxcWTYnx2lL6Q16+GzsHZoMbRH
-Pxs2GXSjHZhYPN3RyLdPwzFt55oqJX9s0v+boerxfDdiXF4rzM/sCpS5wAKED33Y
-lO+G74W9Pz6TEGq8EVYkLNdqUYHfj4Y17E3Hroxm/aXMUl2XR6xwR39Kfi/jlWfr
-QNrT7SYumF42/FJFz6TB7770VEyWdqZS7/oZ997QeELiYFPLRtZdjJOaLbg4SVz4
-p9eJ5uYuEMEbGatjH0xUQJarppVcVcDjyEkZP6GMHkfKBq5rtoQ=
-=bhFD
------END PGP SIGNATURE-----
-
---a2pcb5jslwx6wzdu--
+Kindly regards,
+Cristian-Stefan Neacsu
