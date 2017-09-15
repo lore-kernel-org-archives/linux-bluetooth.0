@@ -1,39 +1,55 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: =?UTF-8?B?0J/RgNC+0LrQu9C+0LIg0JDQu9C10LrRgdCw0L3QtNGAINCS0LDQu9C10YA=?=
-         =?UTF-8?B?0YzQtdCy0LjRhw==?= <ProklovAV@mail.zabtrans.ru>
-Subject: Problem with StopDiscovery() via dbus-send
-Reply-To: ProklovAV@mail.zabtrans.ru
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <59BB4845.60808@mail.zabtrans.ru>
-Date: Fri, 15 Sep 2017 11:25:57 +0800
+From: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ 1/3] adapter: Fix not waiting for start discovery result
+In-Reply-To: <20170914131509.13624-1-luiz.dentz@gmail.com>
+References: <20170914131509.13624-1-luiz.dentz@gmail.com>
+Date: Thu, 14 Sep 2017 17:57:22 -0700
+Message-ID: <87shfoixsd.fsf@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=koi8-r; format=flowed
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-  Hello All,
+Hi Luiz,
 
-Maybe it's a bug?
+Luiz Augusto von Dentz <luiz.dentz@gmail.com> writes:
 
-I'm trying to manage Bluetooth using dbus-send command,
-I send command for start discovery:
-dbus-send --system --reply-timeout=5000 --type=method_call 
---dest=org.bluez /org/bluez/hci0 org.bluez.Adapter1.StartDiscovery
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> We should not reply until the start discovery completes otherwise
+> clients may attempt to stop the discovery before it even has started.
+>
+> On top of this it will now block clients so they so not be able to
+> queue more requests.
+> ---
+>  src/adapter.c | 55 +++++++++++++++++++++++++++++++++++++++++++++++--------
+>  1 file changed, 47 insertions(+), 8 deletions(-)
+>
+> diff --git a/src/adapter.c b/src/adapter.c
+> index a571b1870..4b9f5a1cd 100644
+> --- a/src/adapter.c
+> +++ b/src/adapter.c
+> @@ -160,6 +160,7 @@ struct discovery_filter {
+>
+>  struct watch_client {
+>  	struct btd_adapter *adapter;
+> +	DBusMessage *msg;
+>  	char *owner;
+>  	guint watch;
+>  	struct discovery_filter *discovery_filter;
+> @@ -1421,13 +1422,17 @@ static void start_discovery_complete(uint8_t status, uint16_t length,
+>  					const void *param, void *user_data)
+>  {
+>  	struct btd_adapter *adapter = user_data;
+> +	struct watch_client *client = adapter->discovery_list->data;
+
+What if the client exits the bus after issuing StartDiscovery(), but
+before receiving the reply. It seems that 'adapter->discovery_list'
+could be empty, no?
 
 
-Discovery process NOT stop!!! in btmgmt i see:
-hci0 type 7 discovering off
-hci0 type 7 discovering on
-hci0 type 7 discovering off
-hci0 type 7 discovering on
-hci0 type 7 discovering off
-hci0 type 7 discovering on
-
-and it goes on continuously!
-How can I stop the search process? "StopDiscovery" not work from 
-dbus-send command.
-
-
----------------------
-Best regards,
-Aleksandr Proklov
+Cheers,
+--
+Vinicius
