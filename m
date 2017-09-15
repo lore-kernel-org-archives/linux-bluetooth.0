@@ -1,100 +1,286 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <59BB90DD.1040408@mail.zabtrans.ru>
-References: <59BB4845.60808@mail.zabtrans.ru> <CABBYNZLAqZqsavif1mfWR6vM_u6i1Eo_P1ogK5=6APD56ey3jQ@mail.gmail.com>
- <59BB90DD.1040408@mail.zabtrans.ru>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Fri, 15 Sep 2017 11:46:09 +0300
-Message-ID: <CABBYNZJQRH75iaddKeNFJXqSwWqAxhRjLYHddAuMhxVq_T1V+A@mail.gmail.com>
-Subject: Re: Problem with StopDiscovery() via dbus-send
-To: ProklovAV@mail.zabtrans.ru
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2 3/3] adapter: Refactor code around discovery
+Date: Fri, 15 Sep 2017 11:39:16 +0300
+Message-Id: <20170915083916.27456-3-luiz.dentz@gmail.com>
+In-Reply-To: <20170915083916.27456-1-luiz.dentz@gmail.com>
+References: <20170915083916.27456-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Aleksandr,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Fri, Sep 15, 2017 at 11:35 AM, =D0=9F=D1=80=D0=BE=D0=BA=D0=BB=D0=BE=D0=
-=B2 =D0=90=D0=BB=D0=B5=D0=BA=D1=81=D0=B0=D0=BD=D0=B4=D1=80 =D0=92=D0=B0=D0=
-=BB=D0=B5=D1=80=D1=8C=D0=B5=D0=B2=D0=B8=D1=87
-<ProklovAV@mail.zabtrans.ru> wrote:
-> 15.09.2017 14:27, Luiz Augusto von Dentz =D0=BF=D0=B8=D1=88=D0=B5=D1=82:
->>
->> Hi Aleksandr,
->>
->> On Fri, Sep 15, 2017 at 6:25 AM, =D0=9F=D1=80=D0=BE=D0=BA=D0=BB=D0=BE=D0=
-=B2 =D0=90=D0=BB=D0=B5=D0=BA=D1=81=D0=B0=D0=BD=D0=B4=D1=80 =D0=92=D0=B0=D0=
-=BB=D0=B5=D1=80=D1=8C=D0=B5=D0=B2=D0=B8=D1=87
->> <ProklovAV@mail.zabtrans.ru> wrote:
->>>
->>>   Hello All,
->>>
->>> Maybe it's a bug?
->>>
->>> I'm trying to manage Bluetooth using dbus-send command,
->>> I send command for start discovery:
->>> dbus-send --system --reply-timeout=3D5000 --type=3Dmethod_call
->>> --dest=3Dorg.bluez
->>> /org/bluez/hci0 org.bluez.Adapter1.StartDiscovery
->>
->>
->> dbus-send disconnects from the bus so the discovery is stopped because
->> there is no client to report the devices found.
->>
->
-> Discovery not stopped, see my log from btmgmt. I not start discovery via
-> "btmgmt find". Command "btmgmt stop-find" not help me.
->
-> Now i add to code for stop discovery process:
-> btmgmt power off
-> sleep 2
-> btmgmt power on
+Make it reuse more code by having helpers to stop, remove and free
+clients.
+---
+ src/adapter.c | 162 +++++++++++++++++++++++++---------------------------------
+ 1 file changed, 69 insertions(+), 93 deletions(-)
 
-Ive just a set of patches adressing race condition with StartDiscovery
-and StopDiscovery, please have a try. Also it is not a good idea to
-mix usage of D-Bus with btmgmt, they might not play well together
-especially when it comes to discovery.
+diff --git a/src/adapter.c b/src/adapter.c
+index 23b458013..ceba17e10 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -1737,13 +1737,6 @@ static void invalidate_rssi_and_tx_power(gpointer a)
+ 	device_set_tx_power(dev, 127);
+ }
+ 
+-static void discovery_cleanup(struct btd_adapter *adapter)
+-{
+-	g_slist_free_full(adapter->discovery_found,
+-						invalidate_rssi_and_tx_power);
+-	adapter->discovery_found = NULL;
+-}
+-
+ static gboolean remove_temp_devices(gpointer user_data)
+ {
+ 	struct btd_adapter *adapter = user_data;
+@@ -1765,18 +1758,31 @@ static gboolean remove_temp_devices(gpointer user_data)
+ 	return FALSE;
+ }
+ 
+-static void discovery_destroy(void *user_data)
++static void discovery_cleanup(struct btd_adapter *adapter)
+ {
+-	struct watch_client *client = user_data;
+-	struct btd_adapter *adapter = client->adapter;
++	adapter->discovery_type = 0x00;
+ 
+-	DBG("owner %s", client->owner);
++	if (adapter->discovery_idle_timeout > 0) {
++		g_source_remove(adapter->discovery_idle_timeout);
++		adapter->discovery_idle_timeout = 0;
++	}
+ 
+-	adapter->set_filter_list = g_slist_remove(adapter->set_filter_list,
+-								client);
++	if (adapter->temp_devices_timeout > 0) {
++		g_source_remove(adapter->temp_devices_timeout);
++		adapter->temp_devices_timeout = 0;
++	}
+ 
+-	adapter->discovery_list = g_slist_remove(adapter->discovery_list,
+-								client);
++	g_slist_free_full(adapter->discovery_found,
++						invalidate_rssi_and_tx_power);
++	adapter->discovery_found = NULL;
++
++	adapter->temp_devices_timeout = g_timeout_add_seconds(TEMP_DEV_TIMEOUT,
++						remove_temp_devices, adapter);
++}
++
++static void discovery_free(void *user_data)
++{
++	struct watch_client *client = user_data;
+ 
+ 	if (client->watch)
+ 		g_dbus_remove_watch(dbus_conn, client->watch);
+@@ -1791,6 +1797,21 @@ static void discovery_destroy(void *user_data)
+ 
+ 	g_free(client->owner);
+ 	g_free(client);
++}
++
++static void discovery_remove(struct watch_client *client)
++{
++	struct btd_adapter *adapter = client->adapter;
++
++	DBG("owner %s", client->owner);
++
++	adapter->set_filter_list = g_slist_remove(adapter->set_filter_list,
++								client);
++
++	adapter->discovery_list = g_slist_remove(adapter->discovery_list,
++								client);
++
++	discovery_free(client);
+ 
+ 	/*
+ 	 * If there are other client discoveries in progress, then leave
+@@ -1799,22 +1820,7 @@ static void discovery_destroy(void *user_data)
+ 	if (adapter->discovery_list)
+ 		return;
+ 
+-	adapter->discovery_type = 0x00;
+-
+-	if (adapter->discovery_idle_timeout > 0) {
+-		g_source_remove(adapter->discovery_idle_timeout);
+-		adapter->discovery_idle_timeout = 0;
+-	}
+-
+-	if (adapter->temp_devices_timeout > 0) {
+-		g_source_remove(adapter->temp_devices_timeout);
+-		adapter->temp_devices_timeout = 0;
+-	}
+-
+ 	discovery_cleanup(adapter);
+-
+-	adapter->temp_devices_timeout = g_timeout_add_seconds(TEMP_DEV_TIMEOUT,
+-						remove_temp_devices, adapter);
+ }
+ 
+ static void stop_discovery_complete(uint8_t status, uint16_t length,
+@@ -1850,7 +1856,7 @@ static void stop_discovery_complete(uint8_t status, uint16_t length,
+ 	trigger_passive_scanning(adapter);
+ 
+ done:
+-	discovery_destroy(client);
++	discovery_remove(client);
+ }
+ 
+ static int compare_sender(gconstpointer a, gconstpointer b)
+@@ -2071,30 +2077,16 @@ static int update_discovery_filter(struct btd_adapter *adapter)
+ 	return -EINPROGRESS;
+ }
+ 
+-static void discovery_disconnect(DBusConnection *conn, void *user_data)
++static int discovery_stop(struct watch_client *client)
+ {
+-	struct watch_client *client = user_data;
+ 	struct btd_adapter *adapter = client->adapter;
+ 	struct mgmt_cp_stop_discovery cp;
+ 
+-	DBG("owner %s", client->owner);
+-
+-	adapter->set_filter_list = g_slist_remove(adapter->set_filter_list,
+-								client);
+-
+-	adapter->discovery_list = g_slist_remove(adapter->discovery_list,
+-								client);
+-
+-	/*
+-	 * There is no need for extra cleanup of the client since that
+-	 * will be done by the destroy callback.
+-	 *
+-	 * However in case this is the last client, the discovery in
+-	 * the kernel needs to be disabled.
+-	 */
+-	if (adapter->discovery_list) {
++	/* Check if there are more client discovering */
++	if (g_slist_next(adapter->discovery_list)) {
++		discovery_remove(client);
+ 		update_discovery_filter(adapter);
+-		return;
++		return 0;
+ 	}
+ 
+ 	/*
+@@ -2102,12 +2094,14 @@ static void discovery_disconnect(DBusConnection *conn, void *user_data)
+ 	 * and so it is enough to send out the signal and just return.
+ 	 */
+ 	if (adapter->discovery_enable == 0x00) {
++		discovery_remove(client);
+ 		adapter->discovering = false;
+ 		g_dbus_emit_property_changed(dbus_conn, adapter->path,
+ 					ADAPTER_INTERFACE, "Discovering");
+ 
+ 		trigger_passive_scanning(adapter);
+-		return;
++
++		return 0;
+ 	}
+ 
+ 	cp.type = adapter->discovery_type;
+@@ -2115,6 +2109,17 @@ static void discovery_disconnect(DBusConnection *conn, void *user_data)
+ 	mgmt_send(adapter->mgmt, MGMT_OP_STOP_DISCOVERY,
+ 				adapter->dev_id, sizeof(cp), &cp,
+ 				stop_discovery_complete, client, NULL);
++
++	return -EINPROGRESS;
++}
++
++static void discovery_disconnect(DBusConnection *conn, void *user_data)
++{
++	struct watch_client *client = user_data;
++
++	DBG("owner %s", client->owner);
++
++	discovery_stop(client);
+ }
+ 
+ /*
+@@ -2470,9 +2475,9 @@ static DBusMessage *stop_discovery(DBusConnection *conn,
+ {
+ 	struct btd_adapter *adapter = user_data;
+ 	const char *sender = dbus_message_get_sender(msg);
+-	struct mgmt_cp_stop_discovery cp;
+ 	struct watch_client *client;
+ 	GSList *list;
++	int err;
+ 
+ 	DBG("sender %s", sender);
+ 
+@@ -2489,36 +2494,15 @@ static DBusMessage *stop_discovery(DBusConnection *conn,
+ 	if (client->msg)
+ 		return btd_error_busy(msg);
+ 
+-	if (g_slist_length(adapter->discovery_list) > 1) {
+-		discovery_destroy(client);
+-		update_discovery_filter(adapter);
+-		return dbus_message_new_method_return(msg);
+-	}
+-
+-	cp.type = adapter->discovery_type;
+-
+-	/*
+-	 * In the idle phase of a discovery, there is no need to stop it
+-	 * and so it is enough to send out the signal and just return.
+-	 */
+-	if (adapter->discovery_enable == 0x00) {
+-		discovery_destroy(client);
+-		adapter->discovering = false;
+-		g_dbus_emit_property_changed(dbus_conn, adapter->path,
+-					ADAPTER_INTERFACE, "Discovering");
+-
+-		trigger_passive_scanning(adapter);
+-
++	err = discovery_stop(client);
++	switch (err) {
++	case 0:
+ 		return dbus_message_new_method_return(msg);
++	case -EINPROGRESS:
++		return NULL;
++	default:
++		return btd_error_failed(msg, strerror(-err));
+ 	}
+-
+-	client->msg = dbus_message_ref(msg);
+-
+-	mgmt_send(adapter->mgmt, MGMT_OP_STOP_DISCOVERY,
+-				adapter->dev_id, sizeof(cp), &cp,
+-				stop_discovery_complete, client, NULL);
+-
+-	return NULL;
+ }
+ 
+ static gboolean property_get_address(const GDBusPropertyTable *property,
+@@ -5973,21 +5957,13 @@ static void adapter_stop(struct btd_adapter *adapter)
+ 
+ 	cancel_passive_scanning(adapter);
+ 
+-	while (adapter->set_filter_list) {
+-		struct watch_client *client;
+-
+-		client = adapter->set_filter_list->data;
+-
+-		discovery_destroy(client);
+-	}
++	g_slist_free_full(adapter->set_filter_list, discovery_free);
++	adapter->set_filter_list = NULL;
+ 
+-	while (adapter->discovery_list) {
+-		struct watch_client *client;
++	g_slist_free_full(adapter->discovery_list, discovery_free);
++	adapter->discovery_list = NULL;
+ 
+-		client = adapter->discovery_list->data;
+-
+-		discovery_destroy(client);
+-	}
++	discovery_cleanup(adapter);
+ 
+ 	adapter->filtered_discovery = false;
+ 	adapter->no_scan_restart_delay = false;
+-- 
+2.13.5
 
->
->
->>>
->>> Discovery process NOT stop!!! in btmgmt i see:
->>> hci0 type 7 discovering off
->>> hci0 type 7 discovering on
->>> hci0 type 7 discovering off
->>> hci0 type 7 discovering on
->>> hci0 type 7 discovering off
->>> hci0 type 7 discovering on
->>>
->>> and it goes on continuously!
->>> How can I stop the search process? "StopDiscovery" not work from
->>> dbus-send
->>> command.
->>>
->>>
->>> ---------------------
->>> Best regards,
->>> Aleksandr Proklov
->>> --
->>> To unsubscribe from this list: send the line "unsubscribe
->>> linux-bluetooth"
->>> in
->>> the body of a message to majordomo@vger.kernel.org
->>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->>
->>
->>
->>
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth=
-"
-> in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-
---=20
-Luiz Augusto von Dentz
