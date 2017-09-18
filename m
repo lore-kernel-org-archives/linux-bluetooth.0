@@ -1,9 +1,9 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 10/10] gatt: Update signature of AcquireWrite and AcquireNotify
-Date: Mon, 18 Sep 2017 15:40:01 +0300
-Message-Id: <20170918124001.2617-11-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 07/10] client: Implement AcquireWrite for server
+Date: Mon, 18 Sep 2017 15:39:58 +0300
+Message-Id: <20170918124001.2617-8-luiz.dentz@gmail.com>
 In-Reply-To: <20170918124001.2617-1-luiz.dentz@gmail.com>
 References: <20170918124001.2617-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,139 +11,276 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-It should now contain an argument for the options even though there
-are not options defined for clients.
+This enables IO via file descriptors using AcquireWrite if server
+implements it.
 ---
- client/gatt.c     | 18 ++++++++++++++++--
- mesh/gatt.c       | 23 ++++++++++++++++++++---
- src/gatt-client.c |  6 ++++--
- 3 files changed, 40 insertions(+), 7 deletions(-)
+ client/gatt.c | 166 +++++++++++++++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 158 insertions(+), 8 deletions(-)
 
 diff --git a/client/gatt.c b/client/gatt.c
-index 1ca1159ad..93aec92e7 100644
+index ab74aa695..6401fbd1a 100644
 --- a/client/gatt.c
 +++ b/client/gatt.c
-@@ -778,6 +778,20 @@ static void acquire_write_reply(DBusMessage *message, void *user_data)
- 	write_io.io = pipe_io_new(fd, NULL);
- }
+@@ -32,6 +32,7 @@
+ #include <stdbool.h>
+ #include <sys/uio.h>
+ #include <wordexp.h>
++#include <fcntl.h>
  
-+static void acquire_setup(DBusMessageIter *iter, void *user_data)
-+{
-+	DBusMessageIter dict;
-+
-+	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
-+					DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
-+					DBUS_TYPE_STRING_AS_STRING
-+					DBUS_TYPE_VARIANT_AS_STRING
-+					DBUS_DICT_ENTRY_END_CHAR_AS_STRING,
-+					&dict);
-+
-+	dbus_message_iter_close_container(iter, &dict);
-+}
-+
- void gatt_acquire_write(GDBusProxy *proxy, const char *arg)
+ #include <readline/readline.h>
+ #include <readline/history.h>
+@@ -73,6 +74,8 @@ struct chrc {
+ 	GList *descs;
+ 	int value_len;
+ 	uint8_t *value;
++	uint16_t mtu;
++	struct io *write_io;
+ };
+ 
+ struct service {
+@@ -683,19 +686,25 @@ void gatt_write_attribute(GDBusProxy *proxy, const char *arg)
+ 
+ static bool pipe_read(struct io *io, void *user_data)
  {
- 	const char *iface;
-@@ -789,7 +803,7 @@ void gatt_acquire_write(GDBusProxy *proxy, const char *arg)
- 		return;
- 	}
++	struct chrc *chrc = user_data;
+ 	uint8_t buf[512];
+ 	int fd = io_get_fd(io);
+ 	ssize_t bytes_read;
  
--	if (g_dbus_proxy_method_call(proxy, "AcquireWrite", NULL,
-+	if (g_dbus_proxy_method_call(proxy, "AcquireWrite", acquire_setup,
- 				acquire_write_reply, NULL, NULL) == FALSE) {
- 		rl_printf("Failed to AcquireWrite\n");
- 		return;
-@@ -852,7 +866,7 @@ void gatt_acquire_notify(GDBusProxy *proxy, const char *arg)
- 		return;
- 	}
+-	if (io != notify_io.io)
++	if (io != notify_io.io && !chrc)
+ 		return true;
  
--	if (g_dbus_proxy_method_call(proxy, "AcquireNotify", NULL,
-+	if (g_dbus_proxy_method_call(proxy, "AcquireNotify", acquire_setup,
- 				acquire_notify_reply, NULL, NULL) == FALSE) {
- 		rl_printf("Failed to AcquireNotify\n");
- 		return;
-diff --git a/mesh/gatt.c b/mesh/gatt.c
-index f9615b3e2..001eb17a8 100644
---- a/mesh/gatt.c
-+++ b/mesh/gatt.c
-@@ -386,6 +386,20 @@ static void acquire_write_reply(DBusMessage *message, void *user_data)
- 	pipe_write(write_io, data);
- }
- 
-+static void acquire_setup(DBusMessageIter *iter, void *user_data)
-+{
-+	DBusMessageIter dict;
-+
-+	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
-+					DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
-+					DBUS_TYPE_STRING_AS_STRING
-+					DBUS_TYPE_VARIANT_AS_STRING
-+					DBUS_DICT_ENTRY_END_CHAR_AS_STRING,
-+					&dict);
-+
-+	dbus_message_iter_close_container(iter, &dict);
-+}
-+
- bool mesh_gatt_write(GDBusProxy *proxy, uint8_t *buf, uint16_t len,
- 			GDBusReturnFunction cb, void *user_data)
- {
-@@ -424,8 +438,9 @@ bool mesh_gatt_write(GDBusProxy *proxy, uint8_t *buf, uint16_t len,
- 		return pipe_write(write_io, data);
- 
- 	if (g_dbus_proxy_get_property(proxy, "WriteAcquired", &iter)) {
--		if (g_dbus_proxy_method_call(proxy, "AcquireWrite", NULL,
--				acquire_write_reply, data, NULL) == FALSE) {
-+		if (g_dbus_proxy_method_call(proxy, "AcquireWrite",
-+					acquire_setup, acquire_write_reply,
-+					data, NULL) == FALSE) {
- 			rl_printf("Failed to AcquireWrite\n");
- 			write_data_free(data);
- 			return false;
-@@ -573,6 +588,7 @@ bool mesh_gatt_notify(GDBusProxy *proxy, bool enable, GDBusReturnFunction cb,
- 	struct notify_data *data;
- 	DBusMessageIter iter;
- 	const char *method;
-+	GDBusSetupFunction setup = NULL;
- 
- 	data = g_new0(struct notify_data, 1);
- 	data->proxy = proxy;
-@@ -584,6 +600,7 @@ bool mesh_gatt_notify(GDBusProxy *proxy, bool enable, GDBusReturnFunction cb,
- 		if (g_dbus_proxy_get_property(proxy, "NotifyAcquired", &iter)) {
- 			method = "AcquireNotify";
- 			cb = acquire_notify_reply;
-+			setup = acquire_setup;
- 		} else {
- 			method = "StartNotify";
- 			cb = notify_reply;
-@@ -600,7 +617,7 @@ bool mesh_gatt_notify(GDBusProxy *proxy, bool enable, GDBusReturnFunction cb,
- 		}
- 	}
- 
--	if (g_dbus_proxy_method_call(proxy, method, NULL, cb,
-+	if (g_dbus_proxy_method_call(proxy, method, setup, cb,
- 					data, NULL) == FALSE) {
- 		rl_printf("Failed to %s\n", method);
+ 	bytes_read = read(fd, buf, sizeof(buf));
+ 	if (bytes_read < 0)
  		return false;
-diff --git a/src/gatt-client.c b/src/gatt-client.c
-index d523b883a..32b3a8783 100644
---- a/src/gatt-client.c
-+++ b/src/gatt-client.c
-@@ -1624,11 +1624,13 @@ static const GDBusMethodTable characteristic_methods[] = {
+ 
+-	rl_printf("[" COLORED_CHG "] %s Notification:\n",
+-			g_dbus_proxy_get_path(notify_io.proxy));
++	if (chrc)
++		rl_printf("[" COLORED_CHG "] Attribute %s written:\n",
++							chrc->path);
++	else
++		rl_printf("[" COLORED_CHG "] %s Notification:\n",
++				g_dbus_proxy_get_path(notify_io.proxy));
++
+ 	rl_hexdump(buf, bytes_read);
+ 
+ 	return true;
+@@ -703,6 +712,17 @@ static bool pipe_read(struct io *io, void *user_data)
+ 
+ static bool pipe_hup(struct io *io, void *user_data)
+ {
++	struct chrc *chrc = user_data;
++
++	if (chrc) {
++		rl_printf("Attribute %s Write pipe closed\n", chrc->path);
++		if (chrc->write_io) {
++			io_destroy(chrc->write_io);
++			chrc->write_io = NULL;
++		}
++		return false;
++	}
++
+ 	rl_printf("%s closed\n", io == notify_io.io ? "Notify" : "Write");
+ 
+ 	if (io == notify_io.io)
+@@ -713,7 +733,7 @@ static bool pipe_hup(struct io *io, void *user_data)
+ 	return false;
+ }
+ 
+-static struct io *pipe_io_new(int fd)
++static struct io *pipe_io_new(int fd, void *user_data)
+ {
+ 	struct io *io;
+ 
+@@ -721,9 +741,9 @@ static struct io *pipe_io_new(int fd)
+ 
+ 	io_set_close_on_destroy(io, true);
+ 
+-	io_set_read_handler(io, pipe_read, NULL, NULL);
++	io_set_read_handler(io, pipe_read, user_data, NULL);
+ 
+-	io_set_disconnect_handler(io, pipe_hup, NULL, NULL);
++	io_set_disconnect_handler(io, pipe_hup, user_data, NULL);
+ 
+ 	return io;
+ }
+@@ -754,7 +774,7 @@ static void acquire_write_reply(DBusMessage *message, void *user_data)
+ 
+ 	rl_printf("AcquireWrite success: fd %d MTU %u\n", fd, write_io.mtu);
+ 
+-	write_io.io = pipe_io_new(fd);
++	write_io.io = pipe_io_new(fd, NULL);
+ }
+ 
+ void gatt_acquire_write(GDBusProxy *proxy, const char *arg)
+@@ -817,7 +837,7 @@ static void acquire_notify_reply(DBusMessage *message, void *user_data)
+ 
+ 	rl_printf("AcquireNotify success: fd %d MTU %u\n", fd, notify_io.mtu);
+ 
+-	notify_io.io = pipe_io_new(fd);
++	notify_io.io = pipe_io_new(fd, NULL);
+ }
+ 
+ void gatt_acquire_notify(GDBusProxy *proxy, const char *arg)
+@@ -1302,12 +1322,41 @@ static gboolean chrc_get_flags(const GDBusPropertyTable *property,
+ 	return TRUE;
+ }
+ 
++static gboolean chrc_get_write_acquired(const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *data)
++{
++	struct chrc *chrc = data;
++	dbus_bool_t value;
++
++	value = chrc->write_io ? TRUE : FALSE;
++
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_BOOLEAN, &value);
++
++	return TRUE;
++}
++
++static gboolean chrc_write_acquired_exists(const GDBusPropertyTable *property,
++								void *data)
++{
++	struct chrc *chrc = data;
++	int i;
++
++	for (i = 0; chrc->flags[i]; i++) {
++		if (!strcmp("write-without-response", chrc->flags[i]))
++			return TRUE;
++	}
++
++	return FALSE;
++}
++
+ static const GDBusPropertyTable chrc_properties[] = {
+ 	{ "UUID", "s", chrc_get_uuid, NULL, NULL },
+ 	{ "Service", "o", chrc_get_service, NULL, NULL },
+ 	{ "Value", "ay", chrc_get_value, NULL, NULL },
+ 	{ "Notifying", "b", chrc_get_notifying, NULL, NULL },
+ 	{ "Flags", "as", chrc_get_flags, NULL, NULL },
++	{ "WriteAcquired", "b", chrc_get_write_acquired, NULL,
++					chrc_write_acquired_exists },
+ 	{ }
+ };
+ 
+@@ -1369,6 +1418,105 @@ static DBusMessage *chrc_write_value(DBusConnection *conn, DBusMessage *msg,
+ 	return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
+ }
+ 
++static int parse_options(DBusMessageIter *iter, struct chrc *chrc)
++{
++	DBusMessageIter dict;
++
++	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_ARRAY)
++		return -EINVAL;
++
++	dbus_message_iter_recurse(iter, &dict);
++
++	while (dbus_message_iter_get_arg_type(&dict) == DBUS_TYPE_DICT_ENTRY) {
++		const char *key;
++		DBusMessageIter value, entry;
++		int var;
++
++		dbus_message_iter_recurse(&dict, &entry);
++		dbus_message_iter_get_basic(&entry, &key);
++
++		dbus_message_iter_next(&entry);
++		dbus_message_iter_recurse(&entry, &value);
++
++		var = dbus_message_iter_get_arg_type(&value);
++		if (strcasecmp(key, "Device") == 0) {
++			if (var != DBUS_TYPE_OBJECT_PATH)
++				return -EINVAL;
++		} else if (strcasecmp(key, "MTU") == 0) {
++			if (var != DBUS_TYPE_UINT16)
++				return -EINVAL;
++			dbus_message_iter_get_basic(&value, &chrc->mtu);
++		}
++
++		dbus_message_iter_next(&dict);
++	}
++
++	return 0;
++}
++
++static DBusMessage *chrc_create_pipe(struct chrc *chrc, DBusMessage *msg)
++{
++	int pipefd[2];
++	struct io *io;
++	bool dir;
++	DBusMessage *reply;
++
++	if (pipe2(pipefd, O_DIRECT | O_NONBLOCK | O_CLOEXEC) < 0)
++		return g_dbus_create_error(msg, "org.bluez.Error.Failed", "%s",
++							strerror(errno));
++
++	dir = dbus_message_has_member(msg, "AcquireWrite");
++
++	io = pipe_io_new(pipefd[!dir], chrc);
++	if (!io) {
++		close(pipefd[0]);
++		close(pipefd[1]);
++		return g_dbus_create_error(msg, "org.bluez.Error.Failed", "%s",
++							strerror(errno));
++	}
++
++	reply = g_dbus_create_reply(msg, DBUS_TYPE_UNIX_FD, &pipefd[dir],
++					DBUS_TYPE_UINT16, &chrc->mtu,
++					DBUS_TYPE_INVALID);
++
++	close(pipefd[dir]);
++
++	chrc->write_io = io;
++
++	rl_printf("[" COLORED_CHG "] Attribute %s Write pipe acquired\n",
++							chrc->path);
++
++	return reply;
++}
++
++static DBusMessage *chrc_acquire_write(DBusConnection *conn, DBusMessage *msg,
++							void *user_data)
++{
++	struct chrc *chrc = user_data;
++	DBusMessageIter iter;
++	DBusMessage *reply;
++
++	dbus_message_iter_init(msg, &iter);
++
++	if (chrc->write_io)
++		return g_dbus_create_error(msg,
++					"org.bluez.Error.NotPermitted",
++					NULL);
++
++	if (parse_options(&iter, chrc))
++		return g_dbus_create_error(msg,
++					"org.bluez.Error.InvalidArguments",
++					NULL);
++
++	reply = chrc_create_pipe(chrc, msg);
++
++	if (chrc->write_io)
++		g_dbus_emit_property_changed(conn, chrc->path, CHRC_INTERFACE,
++							"WriteAcquired");
++
++	return reply;
++}
++
+ static DBusMessage *chrc_start_notify(DBusConnection *conn, DBusMessage *msg,
+ 							void *user_data)
+ {
+@@ -1420,6 +1568,8 @@ static const GDBusMethodTable chrc_methods[] = {
+ 	{ GDBUS_ASYNC_METHOD("WriteValue", GDBUS_ARGS({ "value", "ay" },
  						{ "options", "a{sv}" }),
- 					NULL,
- 					characteristic_write_value) },
--	{ GDBUS_EXPERIMENTAL_ASYNC_METHOD("AcquireWrite", NULL,
-+	{ GDBUS_EXPERIMENTAL_ASYNC_METHOD("AcquireWrite",
-+					GDBUS_ARGS({ "options", "a{sv}" }),
- 					GDBUS_ARGS({ "fd", "h" },
- 						{ "mtu", "q" }),
- 					characteristic_acquire_write) },
--	{ GDBUS_EXPERIMENTAL_ASYNC_METHOD("AcquireNotify", NULL,
-+	{ GDBUS_EXPERIMENTAL_ASYNC_METHOD("AcquireNotify",
-+					GDBUS_ARGS({ "options", "a{sv}" }),
- 					GDBUS_ARGS({ "fd", "h" },
- 						{ "mtu", "q" }),
- 					characteristic_acquire_notify) },
+ 					NULL, chrc_write_value) },
++	{ GDBUS_METHOD("AcquireWrite", GDBUS_ARGS({ "options", "a{sv}" }),
++					NULL, chrc_acquire_write) },
+ 	{ GDBUS_ASYNC_METHOD("StartNotify", NULL, NULL, chrc_start_notify) },
+ 	{ GDBUS_METHOD("StopNotify", NULL, NULL, chrc_stop_notify) },
+ 	{ GDBUS_METHOD("Confirm", NULL, NULL, chrc_confirm) },
 -- 
 2.13.5
 
