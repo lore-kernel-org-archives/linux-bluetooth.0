@@ -1,79 +1,55 @@
-Return-Path: <pbrobinson@gmail.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <BAA83E9E-B9BF-48AD-9955-20B599AFA52C@holtmann.org>
-References: <BAA83E9E-B9BF-48AD-9955-20B599AFA52C@holtmann.org>
-From: Peter Robinson <pbrobinson@gmail.com>
-Date: Tue, 19 Sep 2017 00:23:27 +0100
-Message-ID: <CALeDE9PaZvfEwSBOuELNbJxBjR3DfWj61rEBMhYTAF6DJd+bcA@mail.gmail.com>
-Subject: Re: Fedora 27 kernel and RPi3 Bluetooth oops
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org, Loic Poulain <loic.poulain@gmail.com>
+In-Reply-To: <4fb86bd1-b1ed-72aa-7834-adc84642528e@microchip.com>
+References: <CAFxSrVsZcJxkgAFL8yoSK9buoSzFJryNT18mGSRUUq17VPdOEg@mail.gmail.com>
+ <4fb86bd1-b1ed-72aa-7834-adc84642528e@microchip.com>
+From: Laczen JMS <laczenjms@gmail.com>
+Date: Mon, 18 Sep 2017 21:48:06 +0200
+Message-ID: <CAFxSrVufJHhz2TqXKwydXqy3UJWJbeaB+Cf0Ke7x6dh=C-h9JA@mail.gmail.com>
+Subject: Re: meshctl fails on rpi 3
+To: Tudor Ambarus <tudor.ambarus@microchip.com>
+Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Sep 18, 2017 at 6:14 PM, Marcel Holtmann <marcel@holtmann.org> wrot=
-e:
-> Hi,
->
-> the latest Fedora 27 kernel which has all the RPi3 patches applied doesn=
-=E2=80=99t actually work. It provides this backlog.
->
-> [  229.162921] CPU: 1 PID: 582 Comm: kworker/u9:1 Not tainted 4.13.2-300.=
-fc27.armv7hl #1
-> [  229.171285] Hardware name: Generic DT based system
-> [  229.176774] Workqueue: hci0 hci_cmd_work [bluetooth]
-> [  229.176774] Workqueue: hci0 hci_cmd_work [bluetooth]
-> [  229.182117] [<c0312af4>] (unwind_backtrace) from [<c030d264>] (show_st=
-ack+0x18/0x1c)
-> [  229.190374] [<c030d264>] (show_stack) from [<c0b66174>] (dump_stack+0x=
-a0/0xd8)
-> [  229.198122] [<c0b66174>] (dump_stack) from [<c03aeaec>] (register_lock=
-_class+0x298/0x514)
-> [  229.206835] [<c03aeaec>] (register_lock_class) from [<c03b1f9c>] (__lo=
-ck_acquire+0xe4/0x1608)
-> [  229.215952] [<c03b1f9c>] (__lock_acquire) from [<c03b3fd0>] (lock_acqu=
-ire+0x280/0x2dc)
-> [  229.224386] [<c03b3fd0>] (lock_acquire) from [<c0b80ba4>] (_raw_read_l=
-ock+0x4c/0x5c)
-> [  229.232740] [<c0b80ba4>] (_raw_read_lock) from [<bf47903c>] (hci_uart_=
-tx_wakeup+0x1c/0x98 [hci_uart])
-> [  229.242725] [<bf47903c>] (hci_uart_tx_wakeup [hci_uart]) from [<bf47a0=
-e0>] (hci_uart_send_frame+0x54/0x6c [hci_uart])
-> [  229.254485] [<bf47a0e0>] (hci_uart_send_frame [hci_uart]) from [<bf3cb=
-260>] (hci_send_frame+0xc8/0xf4 [bluetooth])
-> [  229.266157] [<bf3cb260>] (hci_send_frame [bluetooth]) from [<bf3cb334>=
-] (hci_cmd_work+0xa8/0x124 [bluetooth])
-> [  229.277005] [<bf3cb334>] (hci_cmd_work [bluetooth]) from [<c036f154>] =
-(process_one_work+0x43c/0x83c)
-> [  229.286689] [<c036f154>] (process_one_work) from [<c0370934>] (worker_=
-thread+0x290/0x40c)
-> [  229.295355] [<c0370934>] (worker_thread) from [<c0376784>] (kthread+0x=
-14c/0x168)
-> [  229.303195] [<c0376784>] (kthread) from [<c03080d0>] (ret_from_fork+0x=
-14/0x24)
->
-> It results in the first HCI command going through and then every other fa=
-iling.
->
-> =3D Index Info: 00:00:00:00:00:00 (Broadcom Corporation)
-> < HCI Command: Broadcom Update UART Baud Rate (0x3f|0x0018) plen 6
->         Encoded baud rate: Not used (0x0000)
->         Explicit baud rate: 2000000 Mbps
->> HCI Event: Command Complete (0x0e) plen 4
->       Broadcom Update UART Baud Rate (0x3f|0x0018) ncmd 1
->         Status: Success (0x00)
-> < HCI Command: Reset (0x03|0x0003) plen 0
->
-> The HCI Reset command actually times out.
->
-> [  231.349802] Bluetooth: hci0 command 0x0c03 tx timeout
->
-> What we really need is some kernel specific debug tracing when driver cha=
-nge baud rate etc. to show up in btmon. Drivers need the capability to inse=
-rt HCI transport level specifics into monitoring interface.
+Hi,
 
-Thanks for noticing this, I've have that exact backlog sitting there
-to send out but I'd just not got to it yet, let me know if there's
-anything that needs tweaking on the Fedora side or patch.
+I can confirm that recompiling the kernel with the crypto settings
+from "test-runner.txt" solves the problem. After recompiling and
+installing the kernel with the crypto settings:
 
-Peter
+CONFIG_CRYPTO_CMAC=y
+CONFIG_CRYPTO_USER_API=y
+CONFIG_CRYPTO_USER_API_HASH=y
+CONFIG_CRYPTO_USER_API_SKCIPHER=y
+
+meshctl can load the json files and connect to the bluetooth mesh.
+
+Kind regards,
+
+Jehudi
+
+2017-09-18 12:50 GMT+02:00 Tudor Ambarus <tudor.ambarus@microchip.com>:
+> Hi, Jehudi,
+>
+> On 09/17/2017 06:41 PM, Laczen JMS wrote:
+>>
+>> After downloading and compiling bluez 5.47 on raspberry pi 3 (raspbian
+>> 2017-09-07), it is not possible to run meshctl on the raspberry pi.
+>> Meshctl fails at loading the prov_db.
+>>
+>> After some further testing I have found that the loading fails in the
+>> crypto functions at binding the AF_ALG in line 178 of crypto.c. Has
+>> this something to do with cryptographic modules being unavailable on
+>> the rpi 3?
+>>
+>> If so, what crypto module is required and what is the best way to add
+>> these modules ?
+>
+>
+> I remember that I ran in similar issues when testing SMP. All worked ok
+> when I had the af-alg user-space interface builtin in the kernel.
+>
+> Hope that helps,
+> ta
