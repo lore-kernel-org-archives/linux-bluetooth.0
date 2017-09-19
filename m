@@ -1,73 +1,42 @@
-Return-Path: <yunhanw@google.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Reply-To: ProklovAV@mail.zabtrans.ru
+Subject: Re: Problem with StopDiscovery() via dbus-send
+References: <59BB4845.60808@mail.zabtrans.ru>
+ <CABBYNZLAqZqsavif1mfWR6vM_u6i1Eo_P1ogK5=6APD56ey3jQ@mail.gmail.com>
+ <59BB90DD.1040408@mail.zabtrans.ru>
+ <CABBYNZJQRH75iaddKeNFJXqSwWqAxhRjLYHddAuMhxVq_T1V+A@mail.gmail.com>
+ <59BF3492.3080503@mail.zabtrans.ru>
+ <CABBYNZLyL4r1b=Kv77uB7dND2M6MUzQ_H3sdDdi-daR1YtHyGw@mail.gmail.com>
+To: linux-bluetooth@vger.kernel.org
+From: =?UTF-8?B?0J/RgNC+0LrQu9C+0LIg0JDQu9C10LrRgdCw0L3QtNGAINCS0LDQu9C10YA=?=
+         =?UTF-8?B?0YzQtdCy0LjRhw==?= <ProklovAV@mail.zabtrans.ru>
+Message-ID: <59C1AF39.5010405@mail.zabtrans.ru>
+Date: Wed, 20 Sep 2017 07:58:49 +0800
 MIME-Version: 1.0
-In-Reply-To: <CALvjcs-b3M9A6sdy80pakUwRHxBueuxpxvrpZt2SBhz=xDTK6g@mail.gmail.com>
-References: <20170823225839.461-1-yunhanw@google.com> <D2A056DB-B533-4CAC-BCB8-19C39760E05F@holtmann.org>
- <CALvjcs-b3M9A6sdy80pakUwRHxBueuxpxvrpZt2SBhz=xDTK6g@mail.gmail.com>
-From: Yunhan Wang <yunhanw@google.com>
-Date: Tue, 19 Sep 2017 22:55:30 -0700
-Message-ID: <CALvjcs-0POiT-inDdF8oxheHL=z6acK5E03QRtUwbHZnxcf37Q@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] build: use abspath for lib/bluetooth
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <CABBYNZLyL4r1b=Kv77uB7dND2M6MUzQ_H3sdDdi-daR1YtHyGw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi, Marcel
 
-Any other concern on this patch?
-
-Thanks
-Best wishes
-Yunhan
-
-On Mon, Sep 18, 2017 at 9:47 PM, Yunhan Wang <yunhanw@google.com> wrote:
-> Hi, Marcel
 >
-> I just run make distcheck, it is working with this change upon latest mas=
-ter.
->
-> Could you help to apply it?
->
-> The below are detailed step.
-> 1. ./configure --prefix=3D/usr --mandir=3D/usr/share/man --sysconfdir=3D/=
-etc
-> --localstatedir=3D/var --enable-experimental
-> --with-systemdsystemunitdir=3D/lib/systemd/system
-> --with-systemduserunitdir=3D/usr/lib/systemd --enable-deprecated
-> --enable-tools --enable-testing --enable-experimental
-> 2. make distcheck
->
-> Thanks
-> Best wishes
-> Yunhan
->
-> On Mon, Aug 28, 2017 at 10:08 PM, Marcel Holtmann <marcel@holtmann.org> w=
-rote:
->> Hi Yunhan,
->>
->>> When building from out of tree, and the top build dir was specified as
->>> an absolute path, the linked headers in ${builddir}/lib/bluetooth were
->>> broken.  This patch fixes it by relying on make's abspath macro as
->>> opposed to the path concatenation.
->>> ---
->>> Makefile.am | 2 +-
->>> 1 file changed, 1 insertion(+), 1 deletion(-)
+>> 15.09.2017 16:46, Luiz Augusto von Dentz пишет:
 >>>
->>> diff --git a/Makefile.am b/Makefile.am
->>> index eaed632e8..ad638cbb2 100644
->>> --- a/Makefile.am
->>> +++ b/Makefile.am
->>> @@ -499,7 +499,7 @@ $(lib_libbluetooth_la_OBJECTS): $(local_headers)
+>>> Ive just a set of patches adressing race condition with StartDiscovery
+>>> and StopDiscovery, please have a try. Also it is not a good idea to
+>>> mix usage of D-Bus with btmgmt, they might not play well together
+>>> especially when it comes to discovery.
 >>>
->>> lib/bluetooth/%.h: lib/%.h
->>>       $(AM_V_at)$(MKDIR_P) lib/bluetooth
->>> -     $(AM_V_GEN)$(LN_S) -f "$(abs_top_builddir)"/$< $@
->>> +     $(AM_V_GEN)$(LN_S) -f $(abspath $<) $@
 >>
->> does =E2=80=9Cfakeroot make distcheck=E2=80=9D still works when doing th=
-is change?
->>
->> Regards
->>
->> Marcel
->>
+
+May be add time delay after the StarDiscovery (for example 60 sec) and 
+bluetoothd automatically turn off the Discovery process?  I do not know 
+when it would be required to start the process for a time longer than 60 
+seconds.
+
+This will help solve the problem with the call StartDiscovery through 
+the script via dbus-send. My method through power off, power on not help 
+me, after power off founded adapters deleted from dbus tree.
+
+My script is finished at 80%. It remains only to make the Discovery and 
+network connection via bluetooth (GN, PANU, PAN).
