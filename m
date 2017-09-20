@@ -1,9 +1,9 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 07/10] client: Implement AcquireWrite for server
-Date: Wed, 20 Sep 2017 10:44:14 +0300
-Message-Id: <20170920074417.30435-8-luiz.dentz@gmail.com>
+Subject: [PATCH v2 08/10] gatt: Implement AcquireNotify for server
+Date: Wed, 20 Sep 2017 10:44:15 +0300
+Message-Id: <20170920074417.30435-9-luiz.dentz@gmail.com>
 In-Reply-To: <20170920074417.30435-1-luiz.dentz@gmail.com>
 References: <20170920074417.30435-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -14,273 +14,212 @@ From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 This enables IO via file descriptors using AcquireWrite if server
 implements it.
 ---
- client/gatt.c | 166 +++++++++++++++++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 158 insertions(+), 8 deletions(-)
+ src/gatt-database.c | 116 +++++++++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 111 insertions(+), 5 deletions(-)
 
-diff --git a/client/gatt.c b/client/gatt.c
-index ab74aa695..6401fbd1a 100644
---- a/client/gatt.c
-+++ b/client/gatt.c
-@@ -32,6 +32,7 @@
- #include <stdbool.h>
- #include <sys/uio.h>
- #include <wordexp.h>
-+#include <fcntl.h>
+diff --git a/src/gatt-database.c b/src/gatt-database.c
+index 239fe5384..4932568dd 100644
+--- a/src/gatt-database.c
++++ b/src/gatt-database.c
+@@ -24,6 +24,7 @@
+ #include <stdint.h>
+ #include <stdlib.h>
+ #include <errno.h>
++#include <unistd.h>
  
- #include <readline/readline.h>
- #include <readline/history.h>
-@@ -73,6 +74,8 @@ struct chrc {
- 	GList *descs;
- 	int value_len;
- 	uint8_t *value;
+ #include "lib/bluetooth.h"
+ #include "lib/sdp.h"
+@@ -118,7 +119,9 @@ struct external_chrc {
+ 	uint8_t props;
+ 	uint8_t ext_props;
+ 	uint32_t perm;
 +	uint16_t mtu;
-+	struct io *write_io;
+ 	struct io *write_io;
++	struct io *notify_io;
+ 	struct gatt_db_attribute *attrib;
+ 	struct gatt_db_attribute *ccc;
+ 	struct queue *pending_reads;
+@@ -152,7 +155,8 @@ struct device_state {
+ 	struct queue *ccc_states;
  };
  
- struct service {
-@@ -683,19 +686,25 @@ void gatt_write_attribute(GDBusProxy *proxy, const char *arg)
+-typedef uint8_t (*btd_gatt_database_ccc_write_t) (uint16_t value,
++typedef uint8_t (*btd_gatt_database_ccc_write_t) (struct bt_att *att,
++							uint16_t value,
+ 							void *user_data);
+ typedef void (*btd_gatt_database_destroy_t) (void *data);
  
- static bool pipe_read(struct io *io, void *user_data)
- {
-+	struct chrc *chrc = user_data;
- 	uint8_t buf[512];
- 	int fd = io_get_fd(io);
- 	ssize_t bytes_read;
+@@ -328,6 +332,7 @@ static void chrc_free(void *data)
+ 	struct external_chrc *chrc = data;
  
--	if (io != notify_io.io)
-+	if (io != notify_io.io && !chrc)
- 		return true;
+ 	io_destroy(chrc->write_io);
++	io_destroy(chrc->notify_io);
  
- 	bytes_read = read(fd, buf, sizeof(buf));
- 	if (bytes_read < 0)
- 		return false;
+ 	queue_destroy(chrc->pending_reads, cancel_pending_read);
+ 	queue_destroy(chrc->pending_writes, cancel_pending_write);
+@@ -792,7 +797,8 @@ static void gatt_ccc_write_cb(struct gatt_db_attribute *attrib,
+ 		goto done;
  
--	rl_printf("[" COLORED_CHG "] %s Notification:\n",
--			g_dbus_proxy_get_path(notify_io.proxy));
-+	if (chrc)
-+		rl_printf("[" COLORED_CHG "] Attribute %s written:\n",
-+							chrc->path);
+ 	if (ccc_cb->callback)
+-		ecode = ccc_cb->callback(get_le16(value), ccc_cb->user_data);
++		ecode = ccc_cb->callback(att, get_le16(value),
++						ccc_cb->user_data);
+ 
+ 	if (!ecode) {
+ 		ccc->value[0] = value[0];
+@@ -1801,12 +1807,34 @@ static bool pipe_hup(struct io *io, void *user_data)
+ 
+ 	if (io == chrc->write_io)
+ 		chrc->write_io = NULL;
 +	else
-+		rl_printf("[" COLORED_CHG "] %s Notification:\n",
-+				g_dbus_proxy_get_path(notify_io.proxy));
-+
- 	rl_hexdump(buf, bytes_read);
++		chrc->notify_io = NULL;
  
- 	return true;
-@@ -703,6 +712,17 @@ static bool pipe_read(struct io *io, void *user_data)
+ 	io_destroy(io);
  
- static bool pipe_hup(struct io *io, void *user_data)
- {
-+	struct chrc *chrc = user_data;
-+
-+	if (chrc) {
-+		rl_printf("Attribute %s Write pipe closed\n", chrc->path);
-+		if (chrc->write_io) {
-+			io_destroy(chrc->write_io);
-+			chrc->write_io = NULL;
-+		}
-+		return false;
-+	}
-+
- 	rl_printf("%s closed\n", io == notify_io.io ? "Notify" : "Write");
- 
- 	if (io == notify_io.io)
-@@ -713,7 +733,7 @@ static bool pipe_hup(struct io *io, void *user_data)
  	return false;
  }
  
--static struct io *pipe_io_new(int fd)
-+static struct io *pipe_io_new(int fd, void *user_data)
++static bool pipe_io_read(struct io *io, void *user_data)
++{
++	struct external_chrc *chrc = user_data;
++	uint8_t buf[512];
++	int fd = io_get_fd(io);
++	ssize_t bytes_read;
++
++	bytes_read = read(fd, buf, sizeof(buf));
++	if (bytes_read < 0)
++		return false;
++
++	send_notification_to_devices(chrc->service->app->database,
++				gatt_db_attribute_get_handle(chrc->attrib),
++				buf, bytes_read,
++				gatt_db_attribute_get_handle(chrc->ccc),
++				false, NULL);
++
++	return true;
++}
++
+ static struct io *pipe_io_new(int fd, void *user_data)
  {
  	struct io *io;
- 
-@@ -721,9 +741,9 @@ static struct io *pipe_io_new(int fd)
+@@ -1815,6 +1843,8 @@ static struct io *pipe_io_new(int fd, void *user_data)
  
  	io_set_close_on_destroy(io, true);
  
--	io_set_read_handler(io, pipe_read, NULL, NULL);
-+	io_set_read_handler(io, pipe_read, user_data, NULL);
- 
--	io_set_disconnect_handler(io, pipe_hup, NULL, NULL);
-+	io_set_disconnect_handler(io, pipe_hup, user_data, NULL);
++	io_set_read_handler(io, pipe_io_read, user_data, NULL);
++
+ 	io_set_disconnect_handler(io, pipe_hup, user_data, NULL);
  
  	return io;
- }
-@@ -754,7 +774,7 @@ static void acquire_write_reply(DBusMessage *message, void *user_data)
- 
- 	rl_printf("AcquireWrite success: fd %d MTU %u\n", fd, write_io.mtu);
- 
--	write_io.io = pipe_io_new(fd);
-+	write_io.io = pipe_io_new(fd, NULL);
+@@ -1915,9 +1945,64 @@ static struct pending_op *acquire_write(struct external_chrc *chrc,
+ 	return NULL;
  }
  
- void gatt_acquire_write(GDBusProxy *proxy, const char *arg)
-@@ -817,7 +837,7 @@ static void acquire_notify_reply(DBusMessage *message, void *user_data)
- 
- 	rl_printf("AcquireNotify success: fd %d MTU %u\n", fd, notify_io.mtu);
- 
--	notify_io.io = pipe_io_new(fd);
-+	notify_io.io = pipe_io_new(fd, NULL);
- }
- 
- void gatt_acquire_notify(GDBusProxy *proxy, const char *arg)
-@@ -1302,12 +1322,41 @@ static gboolean chrc_get_flags(const GDBusPropertyTable *property,
- 	return TRUE;
- }
- 
-+static gboolean chrc_get_write_acquired(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *data)
-+{
-+	struct chrc *chrc = data;
-+	dbus_bool_t value;
+-static uint8_t ccc_write_cb(uint16_t value, void *user_data)
++static void acquire_notify_reply(DBusMessage *message, void *user_data)
+ {
+ 	struct external_chrc *chrc = user_data;
++	DBusError err;
++	int fd;
++	uint16_t mtu;
 +
-+	value = chrc->write_io ? TRUE : FALSE;
++	dbus_error_init(&err);
 +
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_BOOLEAN, &value);
-+
-+	return TRUE;
-+}
-+
-+static gboolean chrc_write_acquired_exists(const GDBusPropertyTable *property,
-+								void *data)
-+{
-+	struct chrc *chrc = data;
-+	int i;
-+
-+	for (i = 0; chrc->flags[i]; i++) {
-+		if (!strcmp("write-without-response", chrc->flags[i]))
-+			return TRUE;
++	if (dbus_set_error_from_message(&err, message) == TRUE) {
++		error("Failed to acquire notify: %s\n", err.name);
++		dbus_error_free(&err);
++		goto retry;
 +	}
 +
-+	return FALSE;
++	if ((dbus_message_get_args(message, NULL, DBUS_TYPE_UNIX_FD, &fd,
++					DBUS_TYPE_UINT16, &mtu,
++					DBUS_TYPE_INVALID) == false)) {
++		error("Invalid AcquirNotify response\n");
++		goto retry;
++	}
++
++	DBG("AcquireNotify success: fd %d MTU %u\n", fd, mtu);
++
++	chrc->notify_io = pipe_io_new(fd, chrc);
++
++	__sync_fetch_and_add(&chrc->ntfy_cnt, 1);
++
++	return;
++
++retry:
++	g_dbus_proxy_method_call(chrc->proxy, "StartNotify", NULL, NULL,
++							NULL, NULL);
++
++	__sync_fetch_and_add(&chrc->ntfy_cnt, 1);
 +}
 +
- static const GDBusPropertyTable chrc_properties[] = {
- 	{ "UUID", "s", chrc_get_uuid, NULL, NULL },
- 	{ "Service", "o", chrc_get_service, NULL, NULL },
- 	{ "Value", "ay", chrc_get_value, NULL, NULL },
- 	{ "Notifying", "b", chrc_get_notifying, NULL, NULL },
- 	{ "Flags", "as", chrc_get_flags, NULL, NULL },
-+	{ "WriteAcquired", "b", chrc_get_write_acquired, NULL,
-+					chrc_write_acquired_exists },
- 	{ }
- };
- 
-@@ -1369,6 +1418,105 @@ static DBusMessage *chrc_write_value(DBusConnection *conn, DBusMessage *msg,
- 	return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
- }
- 
-+static int parse_options(DBusMessageIter *iter, struct chrc *chrc)
++static void acquire_notify_setup(DBusMessageIter *iter, void *user_data)
 +{
 +	DBusMessageIter dict;
++	struct external_chrc *chrc = user_data;
 +
-+	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_ARRAY)
-+		return -EINVAL;
++	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
++					DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
++					DBUS_TYPE_STRING_AS_STRING
++					DBUS_TYPE_VARIANT_AS_STRING
++					DBUS_DICT_ENTRY_END_CHAR_AS_STRING,
++					&dict);
 +
-+	dbus_message_iter_recurse(iter, &dict);
++	dict_append_entry(&dict, "MTU", DBUS_TYPE_UINT16, &chrc->mtu);
 +
-+	while (dbus_message_iter_get_arg_type(&dict) == DBUS_TYPE_DICT_ENTRY) {
-+		const char *key;
-+		DBusMessageIter value, entry;
-+		int var;
++	dbus_message_iter_close_container(iter, &dict);
++}
 +
-+		dbus_message_iter_recurse(&dict, &entry);
-+		dbus_message_iter_get_basic(&entry, &key);
-+
-+		dbus_message_iter_next(&entry);
-+		dbus_message_iter_recurse(&entry, &value);
-+
-+		var = dbus_message_iter_get_arg_type(&value);
-+		if (strcasecmp(key, "Device") == 0) {
-+			if (var != DBUS_TYPE_OBJECT_PATH)
-+				return -EINVAL;
-+		} else if (strcasecmp(key, "MTU") == 0) {
-+			if (var != DBUS_TYPE_UINT16)
-+				return -EINVAL;
-+			dbus_message_iter_get_basic(&value, &chrc->mtu);
++static uint8_t ccc_write_cb(struct bt_att *att, uint16_t value, void *user_data)
++{
++	struct external_chrc *chrc = user_data;
++	DBusMessageIter iter;
+ 
+ 	DBG("External CCC write received with value: 0x%04x", value);
+ 
+@@ -1929,6 +2014,12 @@ static uint8_t ccc_write_cb(uint16_t value, void *user_data)
+ 		if (__sync_sub_and_fetch(&chrc->ntfy_cnt, 1))
+ 			return 0;
+ 
++		if (chrc->notify_io) {
++			io_destroy(chrc->notify_io);
++			chrc->notify_io = NULL;
++			return 0;
 +		}
 +
-+		dbus_message_iter_next(&dict);
+ 		/*
+ 		 * Send request to stop notifying. This is best-effort
+ 		 * operation, so simply ignore the return the value.
+@@ -1949,12 +2040,27 @@ static uint8_t ccc_write_cb(uint16_t value, void *user_data)
+ 		(value == 2 && !(chrc->props & BT_GATT_CHRC_PROP_INDICATE)))
+ 		return BT_ERROR_CCC_IMPROPERLY_CONFIGURED;
+ 
++	if (chrc->notify_io) {
++		__sync_fetch_and_add(&chrc->ntfy_cnt, 1);
++		return 0;
 +	}
 +
-+	return 0;
-+}
++	chrc->mtu = bt_att_get_mtu(att);
 +
-+static DBusMessage *chrc_create_pipe(struct chrc *chrc, DBusMessage *msg)
-+{
-+	int pipefd[2];
-+	struct io *io;
-+	bool dir;
-+	DBusMessage *reply;
-+
-+	if (pipe2(pipefd, O_DIRECT | O_NONBLOCK | O_CLOEXEC) < 0)
-+		return g_dbus_create_error(msg, "org.bluez.Error.Failed", "%s",
-+							strerror(errno));
-+
-+	dir = dbus_message_has_member(msg, "AcquireWrite");
-+
-+	io = pipe_io_new(pipefd[!dir], chrc);
-+	if (!io) {
-+		close(pipefd[0]);
-+		close(pipefd[1]);
-+		return g_dbus_create_error(msg, "org.bluez.Error.Failed", "%s",
-+							strerror(errno));
++	/* Make use of AcquireNotify if supported */
++	if (g_dbus_proxy_get_property(chrc->proxy, "NotifyAcquired", &iter)) {
++		if (g_dbus_proxy_method_call(chrc->proxy, "AcquireNotify",
++						acquire_notify_setup,
++						acquire_notify_reply,
++						chrc, NULL))
++			return 0;
 +	}
 +
-+	reply = g_dbus_create_reply(msg, DBUS_TYPE_UNIX_FD, &pipefd[dir],
-+					DBUS_TYPE_UINT16, &chrc->mtu,
-+					DBUS_TYPE_INVALID);
-+
-+	close(pipefd[dir]);
-+
-+	chrc->write_io = io;
-+
-+	rl_printf("[" COLORED_CHG "] Attribute %s Write pipe acquired\n",
-+							chrc->path);
-+
-+	return reply;
-+}
-+
-+static DBusMessage *chrc_acquire_write(DBusConnection *conn, DBusMessage *msg,
-+							void *user_data)
-+{
-+	struct chrc *chrc = user_data;
-+	DBusMessageIter iter;
-+	DBusMessage *reply;
-+
-+	dbus_message_iter_init(msg, &iter);
-+
-+	if (chrc->write_io)
-+		return g_dbus_create_error(msg,
-+					"org.bluez.Error.NotPermitted",
-+					NULL);
-+
-+	if (parse_options(&iter, chrc))
-+		return g_dbus_create_error(msg,
-+					"org.bluez.Error.InvalidArguments",
-+					NULL);
-+
-+	reply = chrc_create_pipe(chrc, msg);
-+
-+	if (chrc->write_io)
-+		g_dbus_emit_property_changed(conn, chrc->path, CHRC_INTERFACE,
-+							"WriteAcquired");
-+
-+	return reply;
-+}
-+
- static DBusMessage *chrc_start_notify(DBusConnection *conn, DBusMessage *msg,
- 							void *user_data)
- {
-@@ -1420,6 +1568,8 @@ static const GDBusMethodTable chrc_methods[] = {
- 	{ GDBUS_ASYNC_METHOD("WriteValue", GDBUS_ARGS({ "value", "ay" },
- 						{ "options", "a{sv}" }),
- 					NULL, chrc_write_value) },
-+	{ GDBUS_METHOD("AcquireWrite", GDBUS_ARGS({ "options", "a{sv}" }),
-+					NULL, chrc_acquire_write) },
- 	{ GDBUS_ASYNC_METHOD("StartNotify", NULL, NULL, chrc_start_notify) },
- 	{ GDBUS_METHOD("StopNotify", NULL, NULL, chrc_stop_notify) },
- 	{ GDBUS_METHOD("Confirm", NULL, NULL, chrc_confirm) },
+ 	/*
+ 	 * Always call StartNotify for an incoming enable and ignore the return
+ 	 * value for now.
+ 	 */
+-	if (g_dbus_proxy_method_call(chrc->proxy,
+-						"StartNotify", NULL, NULL,
++	if (g_dbus_proxy_method_call(chrc->proxy, "StartNotify", NULL, NULL,
+ 						NULL, NULL) == FALSE)
+ 		return BT_ATT_ERROR_UNLIKELY;
+ 
 -- 
 2.13.5
 
