@@ -1,134 +1,111 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <CABBYNZJ05njFZbt7JQ6_P0Cz-sEK2HbUN0PEsRU8yYUEmx-jdg@mail.gmail.com>
-References: <20170918092325.32406-1-luiz.dentz@gmail.com> <1a507085-2113-dd3b-3bf3-07c55d359a9b@jp.fujitsu.com>
- <CABBYNZJ05njFZbt7JQ6_P0Cz-sEK2HbUN0PEsRU8yYUEmx-jdg@mail.gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 20 Sep 2017 15:49:42 +0300
-Message-ID: <CABBYNZ+H5ruWjn-Fddi-iNDR1xucdBddnNYi60zOG1XhfixGag@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] tools: Only add unique entries to readline history
-To: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+Subject: Re: Fedora 27 kernel and RPi3 Bluetooth oops
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <CALeDE9NgfjdNRn3zCEyP_vCgJVFy9Eaf8QE90-Zc-Q=yJJUQYA@mail.gmail.com>
+Date: Wed, 20 Sep 2017 14:04:53 +0200
+Cc: "bluez mailin list (linux-bluetooth@vger.kernel.org)"
+        <linux-bluetooth@vger.kernel.org>,
+        Loic Poulain <loic.poulain@gmail.com>
+Message-Id: <9C9C1616-C9CA-4542-AC9C-0DBC3107BA61@holtmann.org>
+References: <BAA83E9E-B9BF-48AD-9955-20B599AFA52C@holtmann.org>
+ <CALeDE9PaZvfEwSBOuELNbJxBjR3DfWj61rEBMhYTAF6DJd+bcA@mail.gmail.com>
+ <00A3687E-050A-469F-98B0-C42F872EFE1C@holtmann.org>
+ <CALeDE9Mn9KdvJ7kFK9=86FswmckabFLWryDHkmujsDh9Xow1iQ@mail.gmail.com>
+ <115EE599-9710-437B-9AA8-C4CD8360EF3F@holtmann.org>
+ <CALeDE9NW+4xkGCD5kKsN-41ctPJ6PNp63jQ61Q7dUQMALG3Ojg@mail.gmail.com>
+ <C09F8308-A607-46BC-B084-2E949947E439@holtmann.org>
+ <CALeDE9NgfjdNRn3zCEyP_vCgJVFy9Eaf8QE90-Zc-Q=yJJUQYA@mail.gmail.com>
+To: Peter Robinson <pbrobinson@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Peter,
 
-On Tue, Sep 19, 2017 at 10:08 AM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi Eramoto,
->
-> On Tue, Sep 19, 2017 at 5:14 AM, ERAMOTO Masaya
-> <eramoto.masaya@jp.fujitsu.com> wrote:
->> Hi Luiz,
->>
->> On 09/18/2017 06:23 PM, Luiz Augusto von Dentz wrote:
->>> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->>>
->>> Don't add duplicate commands to historym this is similar to what
->>> HISTCONTROL=ignoredups does.
->>> ---
->>>  client/main.c            | 3 ++-
->>>  tools/bluetooth-player.c | 4 +++-
->>>  tools/btmgmt.c           | 3 ++-
->>>  tools/obex-client-tool.c | 3 ++-
->>>  tools/obexctl.c          | 3 ++-
->>>  5 files changed, 11 insertions(+), 5 deletions(-)
->>>
->>> diff --git a/client/main.c b/client/main.c
->>> index 2cb449fd5..282e84003 100644
->>> --- a/client/main.c
->>> +++ b/client/main.c
->>> @@ -2644,7 +2644,8 @@ static void rl_handler(char *input)
->>>       if (!rl_release_prompt(input))
->>>               goto done;
->>>
->>> -     add_history(input);
->>> +     if (history_search(input, -1))
->>> +             add_history(input);
->>>
->>
->> I think it is better to add g_strstrip(), since this patch adds a
->> command typed all characters to history and then adds the complemented
->> command to history when it have white-space.
->
-> Yep, but as a separate change, this part of handling should really go
-> into a common code so we don't have to keep duplicating this on every
-> tool.
->
->>>       cmd = strtok_r(input, " ", &arg);
->>>       if (!cmd)
->>> diff --git a/tools/bluetooth-player.c b/tools/bluetooth-player.c
->>> index 9e199970d..c95b7497f 100644
->>> --- a/tools/bluetooth-player.c
->>> +++ b/tools/bluetooth-player.c
->>> @@ -1086,7 +1086,9 @@ static void rl_handler(char *input)
->>>               goto done;
->>>
->>>       g_strstrip(input);
->>> -     add_history(input);
->>> +
->>> +     if (history_search(input, -1))
->>> +             add_history(input);
->>>
->>>       argv = g_strsplit(input, " ", -1);
->>>       if (argv == NULL)
->>> diff --git a/tools/btmgmt.c b/tools/btmgmt.c
->>> index e7ea69937..e454d864d 100644
->>> --- a/tools/btmgmt.c
->>> +++ b/tools/btmgmt.c
->>> @@ -4664,7 +4664,8 @@ static void rl_handler(char *input)
->>>       if (prompt_input(input))
->>>               goto done;
->>>
->>> -     add_history(input);
->>> +     if (history_search(input, -1))
->>> +             add_history(input);
->>>
->>>       if (wordexp(input, &w, WRDE_NOCMD))
->>>               goto done;
->>> diff --git a/tools/obex-client-tool.c b/tools/obex-client-tool.c
->>> index d0ba8a651..d74ac77a1 100644
->>> --- a/tools/obex-client-tool.c
->>> +++ b/tools/obex-client-tool.c
->>> @@ -242,7 +242,8 @@ static void parse_line(char *line_read)
->>>               return;
->>>       }
->>>
->>> -     add_history(line_read);
->>> +     if (history_search(input, -1))
->>> +             add_history(input);
->>
->> line_read is correct.
->
-> Good catch, will fix it.
->
->>>
->>>       g_shell_parse_argv(line_read, &argcp, &argvp, NULL);
->>>
->>> diff --git a/tools/obexctl.c b/tools/obexctl.c
->>> index 46943d682..ece50f682 100644
->>> --- a/tools/obexctl.c
->>> +++ b/tools/obexctl.c
->>> @@ -2081,7 +2081,8 @@ static void rl_handler(char *input)
->>>       if (!strlen(input))
->>>               goto done;
->>>
->>> -     add_history(input);
->>> +     if (history_search(input, -1))
->>> +             add_history(input);
->>>
->>>       if (wordexp(input, &w, WRDE_NOCMD))
->>>               goto done;
->>>
->>
->>
->> Regards,
->> Eramoto
->>
+>>>>>>>> the latest Fedora 27 kernel which has all the RPi3 patches applied doesn’t actually work. It provides this backlog.
+>>>>>>>> 
+>>>>>>>> [  229.162921] CPU: 1 PID: 582 Comm: kworker/u9:1 Not tainted 4.13.2-300.fc27.armv7hl #1
+>>>>>>>> [  229.171285] Hardware name: Generic DT based system
+>>>>>>>> [  229.176774] Workqueue: hci0 hci_cmd_work [bluetooth]
+>>>>>>>> [  229.176774] Workqueue: hci0 hci_cmd_work [bluetooth]
+>>>>>>>> [  229.182117] [<c0312af4>] (unwind_backtrace) from [<c030d264>] (show_stack+0x18/0x1c)
+>>>>>>>> [  229.190374] [<c030d264>] (show_stack) from [<c0b66174>] (dump_stack+0xa0/0xd8)
+>>>>>>>> [  229.198122] [<c0b66174>] (dump_stack) from [<c03aeaec>] (register_lock_class+0x298/0x514)
+>>>>>>>> [  229.206835] [<c03aeaec>] (register_lock_class) from [<c03b1f9c>] (__lock_acquire+0xe4/0x1608)
+>>>>>>>> [  229.215952] [<c03b1f9c>] (__lock_acquire) from [<c03b3fd0>] (lock_acquire+0x280/0x2dc)
+>>>>>>>> [  229.224386] [<c03b3fd0>] (lock_acquire) from [<c0b80ba4>] (_raw_read_lock+0x4c/0x5c)
+>>>>>>>> [  229.232740] [<c0b80ba4>] (_raw_read_lock) from [<bf47903c>] (hci_uart_tx_wakeup+0x1c/0x98 [hci_uart])
+>>>>>>>> [  229.242725] [<bf47903c>] (hci_uart_tx_wakeup [hci_uart]) from [<bf47a0e0>] (hci_uart_send_frame+0x54/0x6c [hci_uart])
+>>>>>>>> [  229.254485] [<bf47a0e0>] (hci_uart_send_frame [hci_uart]) from [<bf3cb260>] (hci_send_frame+0xc8/0xf4 [bluetooth])
+>>>>>>>> [  229.266157] [<bf3cb260>] (hci_send_frame [bluetooth]) from [<bf3cb334>] (hci_cmd_work+0xa8/0x124 [bluetooth])
+>>>>>>>> [  229.277005] [<bf3cb334>] (hci_cmd_work [bluetooth]) from [<c036f154>] (process_one_work+0x43c/0x83c)
+>>>>>>>> [  229.286689] [<c036f154>] (process_one_work) from [<c0370934>] (worker_thread+0x290/0x40c)
+>>>>>>>> [  229.295355] [<c0370934>] (worker_thread) from [<c0376784>] (kthread+0x14c/0x168)
+>>>>>>>> [  229.303195] [<c0376784>] (kthread) from [<c03080d0>] (ret_from_fork+0x14/0x24)
+>>>>>>>> 
+>>>>>>>> It results in the first HCI command going through and then every other failing.
+>>>>>>>> 
+>>>>>>>> = Index Info: 00:00:00:00:00:00 (Broadcom Corporation)
+>>>>>>>> < HCI Command: Broadcom Update UART Baud Rate (0x3f|0x0018) plen 6
+>>>>>>>>     Encoded baud rate: Not used (0x0000)
+>>>>>>>>     Explicit baud rate: 2000000 Mbps
+>>>>>>>>> HCI Event: Command Complete (0x0e) plen 4
+>>>>>>>>   Broadcom Update UART Baud Rate (0x3f|0x0018) ncmd 1
+>>>>>>>>     Status: Success (0x00)
+>>>>>>>> < HCI Command: Reset (0x03|0x0003) plen 0
+>>>>>>>> 
+>>>>>>>> The HCI Reset command actually times out.
+>>>>>>>> 
+>>>>>>>> [  231.349802] Bluetooth: hci0 command 0x0c03 tx timeout
+>>>>>>>> 
+>>>>>>>> What we really need is some kernel specific debug tracing when driver change baud rate etc. to show up in btmon. Drivers need the capability to insert HCI transport level specifics into monitoring interface.
+>>>>>>> 
+>>>>>>> Thanks for noticing this, I've have that exact backlog sitting there
+>>>>>>> to send out but I'd just not got to it yet, let me know if there's
+>>>>>>> anything that needs tweaking on the Fedora side or patch.
+>>>>>> 
+>>>>>> does it actually work for you? I didn’t get it running with the F27 kernel. I had issues with the initial baud rate using btattach in some cases. Does this go away if you use 115200 as max baud rate?
+>>>>> 
+>>>>> No, not yet, I got to the point it would see an interface but that
+>>>>> didn't have a MAC address, the patch series has also done something
+>>>>> weird with serial consoles that I need to debug. I was wondering if it
+>>>>> still needs the newer firmware rev that various distros have pulled
+>>>>> in.
+>>>> 
+>>>> is that the AA:AA:AA.. address? If so, we really need to blacklist that one and mark it with quirk for invalid BD_ADDR. However I am not even getting that far since the command above is the first command send to the hardware.
+>>> 
+>>> No, it's all zeros, I'll try and spend some time on it this afternoon
+>>> to reproduce what I was getting.
+>> 
+>> please check if using 115200 baud rate does anything to make this work. At least that is what I had when testing this with btattach. It needed to be 115200 and otherwise it would fail.
+>> 
+>> We can load the firmware at 115200 and only switch later to a higher rate. Maybe there are subtle difference in the default firmwares of the Bluetooth controller in the RPi3.
+>> 
+>> Loic said that he had it working with a bluetooth-next and his patches. That is something I have not succeeded with yet.
+> 
+> So testing on a 32 bit image bluetoothctl doesn't see a controller,
+> but hciconfig shows a controller with a zero mac, on a 64 bit image I
+> see nothing using either method.
+> 
+> # hciconfig
+> hci0:   Type: Primary  Bus: UART
+>        BD Address: 00:00:00:00:00:00  ACL MTU: 0:0  SCO MTU: 0:0
+>        DOWN
+>        RX bytes:14 acl:0 sco:0 events:1 errors:0
+>        TX bytes:14 acl:0 sco:0 commands:2 errors:0
 
-Applied.
+if you run btmon before modprobe hci_uart (if you blacklisted its automatic loading), then you will see the same result as mine. You send 2 commands and received 1 event and then the UART is dead. Have you tried to specify 115200 as max-speed in the DTS?
 
--- 
-Luiz Augusto von Dentz
+> Hans added a script to automatically btattch some bcm controllers for
+> atom devices, maybe we need to add more IDs for udev, not sure if
+> there's a means of making that generic and upstreamable. Also some of
+> the other distro patches I've seen had a different BT firmware, not
+> sure if Loic needed that or not.
+
+The whole point behind serdev is that you no longer need btattach. The UART can be enumerated by the kernel. So that should not be needed and we also want to get rid of it for ACPI based systems as well.
+
+Regards
+
+Marcel
+
