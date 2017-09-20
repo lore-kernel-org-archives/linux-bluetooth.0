@@ -1,40 +1,37 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Bastien Nocera <hadess@hadess.net>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Bastien Nocera <hadess@hadess.net>
-Subject: [PATCH 1/4] build: Always define confdir and statedir
-Date: Wed, 20 Sep 2017 13:48:16 +0200
-Message-Id: <20170920114819.19929-1-hadess@hadess.net>
+Cc: jukka.rissanen@linux.intel.com
+Subject: [PATCH] Bluetooth: 6lowpan: Fix multi-link setup
+Date: Wed, 20 Sep 2017 12:52:53 +0300
+Message-Id: <20170920095253.8634-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-As we will need those paths to lock down on them.
----
- Makefile.am | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-diff --git a/Makefile.am b/Makefile.am
-index 555f301ca..1c38d94e5 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -30,14 +30,14 @@ include_HEADERS =
- AM_CFLAGS = $(WARNING_CFLAGS) $(MISC_CFLAGS)
- AM_LDFLAGS = $(MISC_LDFLAGS)
+If there are more than one node connected and there isn't any route
+information attempt to check if destination address matches any of the
+link-local peer addresses.
+
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+---
+ net/bluetooth/6lowpan.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
+index 4e2576fc0c59..55370c330386 100644
+--- a/net/bluetooth/6lowpan.c
++++ b/net/bluetooth/6lowpan.c
+@@ -190,7 +190,7 @@ static inline struct lowpan_peer *peer_lookup_dst(struct lowpan_btle_dev *dev,
+ 		nexthop = &lowpan_cb(skb)->gw;
  
-+confdir = $(sysconfdir)/bluetooth
-+statedir = $(localstatedir)/lib/bluetooth
-+
- if DATAFILES
- dbusdir = @DBUS_CONFDIR@/dbus-1/system.d
- dbus_DATA = src/bluetooth.conf
- 
--confdir = $(sysconfdir)/bluetooth
- conf_DATA =
--
--statedir = $(localstatedir)/lib/bluetooth
- state_DATA =
- endif
+ 		if (ipv6_addr_any(nexthop))
+-			return NULL;
++			nexthop = daddr;
+ 	} else {
+ 		nexthop = rt6_nexthop(rt, daddr);
  
 -- 
-2.14.1
+2.13.5
 
