@@ -1,40 +1,73 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Subject: Re: [PATCH BlueZ 1/2] client: Fix completion for list/pair command
-From: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-References: <611fb226-d99a-166d-a211-521872866d5d@jp.fujitsu.com>
-CC: <linux-bluetooth@vger.kernel.org>
-Message-ID: <9760d084-355f-1398-d3b6-4ff1c954f6e0@jp.fujitsu.com>
-Date: Wed, 20 Sep 2017 15:54:53 +0900
+Return-Path: <yunhanw@google.com>
 MIME-Version: 1.0
-In-Reply-To: <611fb226-d99a-166d-a211-521872866d5d@jp.fujitsu.com>
-Content-Type: text/plain; charset="utf-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <CALvjcs-b3M9A6sdy80pakUwRHxBueuxpxvrpZt2SBhz=xDTK6g@mail.gmail.com>
+References: <20170823225839.461-1-yunhanw@google.com> <D2A056DB-B533-4CAC-BCB8-19C39760E05F@holtmann.org>
+ <CALvjcs-b3M9A6sdy80pakUwRHxBueuxpxvrpZt2SBhz=xDTK6g@mail.gmail.com>
+From: Yunhan Wang <yunhanw@google.com>
+Date: Tue, 19 Sep 2017 22:55:30 -0700
+Message-ID: <CALvjcs-0POiT-inDdF8oxheHL=z6acK5E03QRtUwbHZnxcf37Q@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] build: use abspath for lib/bluetooth
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi, Marcel
 
-On 09/05/2017 01:50 PM, ERAMOTO Masaya wrote:
-> The unexpected generator is used if the input string forward matches
-> with the unexpected command string which a generator for completion
-> is registered on. Thus,
->   - since 496b6abf743440e937222c62768e0a3b31f47f02, list command
->     generates the unneeded argument, which is device id like that
->     list-attributes command generates.
->   - since b0fe6045b7d9cfdd02a5e419fc9658a0ffa84619, pair command
->     generates the invalid argument, which is on/off like that
->     pairable command generates.
-> This patch use the exact matching command.
-> ---
->  client/main.c | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
+Any other concern on this patch?
 
-Could you help to have a review?
+Thanks
+Best wishes
+Yunhan
 
-By any chance, are you working on this function? And does this patch
-do conflict?
-
-
-Regards,
-Eramoto
-
+On Mon, Sep 18, 2017 at 9:47 PM, Yunhan Wang <yunhanw@google.com> wrote:
+> Hi, Marcel
+>
+> I just run make distcheck, it is working with this change upon latest mas=
+ter.
+>
+> Could you help to apply it?
+>
+> The below are detailed step.
+> 1. ./configure --prefix=3D/usr --mandir=3D/usr/share/man --sysconfdir=3D/=
+etc
+> --localstatedir=3D/var --enable-experimental
+> --with-systemdsystemunitdir=3D/lib/systemd/system
+> --with-systemduserunitdir=3D/usr/lib/systemd --enable-deprecated
+> --enable-tools --enable-testing --enable-experimental
+> 2. make distcheck
+>
+> Thanks
+> Best wishes
+> Yunhan
+>
+> On Mon, Aug 28, 2017 at 10:08 PM, Marcel Holtmann <marcel@holtmann.org> w=
+rote:
+>> Hi Yunhan,
+>>
+>>> When building from out of tree, and the top build dir was specified as
+>>> an absolute path, the linked headers in ${builddir}/lib/bluetooth were
+>>> broken.  This patch fixes it by relying on make's abspath macro as
+>>> opposed to the path concatenation.
+>>> ---
+>>> Makefile.am | 2 +-
+>>> 1 file changed, 1 insertion(+), 1 deletion(-)
+>>>
+>>> diff --git a/Makefile.am b/Makefile.am
+>>> index eaed632e8..ad638cbb2 100644
+>>> --- a/Makefile.am
+>>> +++ b/Makefile.am
+>>> @@ -499,7 +499,7 @@ $(lib_libbluetooth_la_OBJECTS): $(local_headers)
+>>>
+>>> lib/bluetooth/%.h: lib/%.h
+>>>       $(AM_V_at)$(MKDIR_P) lib/bluetooth
+>>> -     $(AM_V_GEN)$(LN_S) -f "$(abs_top_builddir)"/$< $@
+>>> +     $(AM_V_GEN)$(LN_S) -f $(abspath $<) $@
+>>
+>> does =E2=80=9Cfakeroot make distcheck=E2=80=9D still works when doing th=
+is change?
+>>
+>> Regards
+>>
+>> Marcel
+>>
