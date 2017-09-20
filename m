@@ -1,60 +1,103 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <luiz.dentz@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20170920074417.30435-1-luiz.dentz@gmail.com>
-References: <20170920074417.30435-1-luiz.dentz@gmail.com>
+In-Reply-To: <6DC51AD5-E9D5-4874-AAA8-38A4BF7C1668@holtmann.org>
+References: <20170920125445.24792-1-hadess@hadess.net> <20170920125445.24792-2-hadess@hadess.net>
+ <0268513E-AD33-4E4E-A926-2EC695DC1D86@holtmann.org> <1505925333.9350.7.camel@hadess.net>
+ <6DC51AD5-E9D5-4874-AAA8-38A4BF7C1668@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 21 Sep 2017 10:49:10 +0300
-Message-ID: <CABBYNZJTYWfm6BWOTBt4i2XDbKmg_4TW936gUpFCMSvugTE58Q@mail.gmail.com>
-Subject: Re: [PATCH v2 00/10] gatt: Add server support for AcquireWrite and AcquireNotify
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Cc: Jonah Petri <jonah@sense.com>, Yunhan Wang <yunhanw@nestlabs.com>
+Date: Wed, 20 Sep 2017 21:57:54 +0300
+Message-ID: <CABBYNZLeNiw_5A_mBbLm6Uq2B-8+KEhuMKAsVerSAKeS3WbE+g@mail.gmail.com>
+Subject: Re: [PATCH 2/2] hostname: Fix "BlueZ 5.XX" adapter name on startup
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Bastien Nocera <hadess@hadess.net>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+H Bastien,
 
-On Wed, Sep 20, 2017 at 10:44 AM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+On Wed, Sep 20, 2017 at 7:59 PM, Marcel Holtmann <marcel@holtmann.org> wrot=
+e:
+> Hi Bastien,
 >
-> This implements similar mechanist to use dedicated file descriptors
-> for IO bypassing D-Bus.
+>>>> The hostname plugin listens to property changes from systemd-
+>>>> hostnamed
+>>>> but doesn't fetch initial values. This means that unless the
+>>>> PrettyHostname or StaticHostname changes, the default adapter will
+>>>> be
+>>>> called "BlueZ 5.XX" matching the version number.
+>>>>
+>>>> This is the case since the hostname plugin replaced the adaptername
+>>>> plugin in 2012.
+>>>>
+>>>> Fetch the initial values for PrettyHostname,StaticHostname and
+>>>> Chassis when the plugin is initiated, so as to make the values
+>>>> available for adapter setup.
+>>>> ---
+>>>> plugins/hostname.c | 4 ++++
+>>>> 1 file changed, 4 insertions(+)
+>>>>
+>>>> diff --git a/plugins/hostname.c b/plugins/hostname.c
+>>>> index f876d0afb..db9187378 100644
+>>>> --- a/plugins/hostname.c
+>>>> +++ b/plugins/hostname.c
+>>>> @@ -307,6 +307,10 @@ static int hostname_init(void)
+>>>>             hostname_proxy =3D NULL;
+>>>>             g_dbus_client_unref(hostname_client);
+>>>>             hostname_client =3D NULL;
+>>>> +   } else {
+>>>>+           g_dbus_proxy_refresh_property(hostname_proxy,
+>>>> "PrettyHostname");
+>>>> +           g_dbus_proxy_refresh_property(hostname_proxy,
+>>>> "StaticHostname");
+>>>> +           g_dbus_proxy_refresh_property(hostname_proxy,
+>>>> "Chassis");
+>>>>     }
+>>>
+>>> I am 100% certain that I tested this since this would be a really
+>>> dumb plugin otherwise.
+>>
+>> You don't say ;)
+>>
+>>> However is it possible that when calling GetManagedObjects the
+>>> values are not returned correctly?
+>>
+>> get_managed_objects() in gdbus/client.c is never called for this
+>> GDBusClient.
+
+I guess this can only occur if the bus name does not exist, perhaps it
+has not been activated yet, that would explain why calling refresh
+would work since that activate the bus name. I wonder if GetNameOwner
+is not enough to activate a service? Well perhaps we should use
+StartServiceByName then but it doesn't return the bus id so it only
+works if the service has activated since we have subscribed to
+NameOwnerChanged but in case it is already running we still have to
+call GetNameOwner. Btw is this running with dbus-daemon or the new
+dbus-broker? Perhaps the later doesn't active things in the same way
+dbus-daemon would.
+
+
+> Hmmm, you should either come via service_connect callback or when setting=
+ the proxy handlers. Seems setting the property watch is not triggering the=
+ initial GetManagedObjects. And most likely the service_connect is not trig=
+gered correctly either. Something is fishy here and it is too long ago that=
+ I wrote that code to remember. Maybe we changed something and accidentally=
+ broke some expected behavior.
 >
-> Note: The current implementation opens just one fd per characteristic,
-> though it could be possible to have one fd per device.
+> Maybe Luiz and Johan can have a look at this as well, but I have the feel=
+ing this should be a fix in the gdbus code.gdbus
 >
-> v2: Allow any type of write procedure to work when WriteAcquired exists.
+> Regards
 >
-> Luiz Augusto von Dentz (10):
->   gatt: Remove useless debug
->   client: Rework variables for AcquireWrite/AcquireNotify
->   doc/gatt-api: Add server support for AcquireWrite and AcquireNotify
->   shared/gatt-server: Add bt_gatt_server_get_mtu
->   shared/gatt-db: Add gatt_db_attribute_get_user_data
->   gatt: Implement AcquireWrite for server
->   client: Implement AcquireWrite for server
->   gatt: Implement AcquireNotify for server
->   client: Implement AcquireNotify for server
->   gatt: Update signature of AcquireWrite and AcquireNotify
->
->  client/gatt.c            | 319 ++++++++++++++++++++++++++++++++++++++++-------
->  doc/gatt-api.txt         |  36 ++++--
->  mesh/gatt.c              |  23 +++-
->  src/gatt-client.c        |   8 +-
->  src/gatt-database.c      | 258 +++++++++++++++++++++++++++++++++++++-
->  src/shared/gatt-db.c     |   8 ++
->  src/shared/gatt-db.h     |   2 +
->  src/shared/gatt-server.c |   8 ++
->  src/shared/gatt-server.h |   1 +
->  9 files changed, 598 insertions(+), 65 deletions(-)
+> Marcel
 >
 > --
-> 2.13.5
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth=
+" inlinux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-Any other feedback on this? Does it address all the use cases you guys
-have been struggling?
 
 
--- 
+--=20
 Luiz Augusto von Dentz
