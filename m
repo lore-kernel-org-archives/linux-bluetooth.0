@@ -1,103 +1,85 @@
-Return-Path: <luiz.dentz@gmail.com>
+Return-Path: <emil.lenngren@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <6DC51AD5-E9D5-4874-AAA8-38A4BF7C1668@holtmann.org>
-References: <20170920125445.24792-1-hadess@hadess.net> <20170920125445.24792-2-hadess@hadess.net>
- <0268513E-AD33-4E4E-A926-2EC695DC1D86@holtmann.org> <1505925333.9350.7.camel@hadess.net>
- <6DC51AD5-E9D5-4874-AAA8-38A4BF7C1668@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 20 Sep 2017 21:57:54 +0300
-Message-ID: <CABBYNZLeNiw_5A_mBbLm6Uq2B-8+KEhuMKAsVerSAKeS3WbE+g@mail.gmail.com>
-Subject: Re: [PATCH 2/2] hostname: Fix "BlueZ 5.XX" adapter name on startup
+In-Reply-To: <292E97AC-D1B0-440E-BA2D-6C50395C0675@holtmann.org>
+References: <CAO1O6sewvkB=j5cfSXMbjHsZi3BmyD=CqcCFpKypQ6HEvmj99g@mail.gmail.com>
+ <5467450F-B5AA-4BD5-874F-2ABC7F05D821@holtmann.org> <CAO1O6sc321z7A+Fubffjx2N8tUp6zCDRogNKybW1aaRV0cEthw@mail.gmail.com>
+ <5D4329D8-61EB-420B-8985-E4204D272E65@holtmann.org> <CAO1O6sdMd30Nr8SK4XDcv91=x0eMgOKuYyjmJ89f_N5hdM--vg@mail.gmail.com>
+ <292E97AC-D1B0-440E-BA2D-6C50395C0675@holtmann.org>
+From: Emil Lenngren <emil.lenngren@gmail.com>
+Date: Wed, 20 Sep 2017 19:11:33 +0200
+Message-ID: <CAO1O6sePn7Uws6D4t0f-TuJsECynopNBg+Fbz9Y1M9ua8D+Wow@mail.gmail.com>
+Subject: Re: btattach and 3wire doesn't work
 To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Bastien Nocera <hadess@hadess.net>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Cc: Bluez mailing list <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-H Bastien,
-
-On Wed, Sep 20, 2017 at 7:59 PM, Marcel Holtmann <marcel@holtmann.org> wrot=
-e:
-> Hi Bastien,
+2017-09-20 18:54 GMT+02:00 Marcel Holtmann <marcel@holtmann.org>:
+> Hi Emil,
 >
->>>> The hostname plugin listens to property changes from systemd-
->>>> hostnamed
->>>> but doesn't fetch initial values. This means that unless the
->>>> PrettyHostname or StaticHostname changes, the default adapter will
->>>> be
->>>> called "BlueZ 5.XX" matching the version number.
+>>>>>> I'm trying to use the new btattach utility to attach a controller
+>>>>>> which uses the 3-wire UART protocol. The older hciattach works great
+>>>>>> but btattach doesn't.
+>>>>>> This is the command I use including the output:
+>>>>>>
+>>>>>> # btattach -B /dev/ttyS1 -P 3wire -S 500000
+>>>>>> Attaching Primary controller to /dev/ttyS1
+>>>>>> Switched line discipline from 0 to 15
+>>>>>> Failed to get device id: Protocol driver not attached
+>>>>>> No controller attached
+>>>>>>
+>>>>>> By reading the source at
+>>>>>> https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/tools/btattach.c
+>>>>>> I see that it differs a bit from hciattach. Notably, it calls the
+>>>>>> HCIUARTGETDEVICE ioctl function directly after the HCIUARTSETPROTO
+>>>>>> ioctl call. The hciattach utility does not use HCIUARTGETDEVICE at
+>>>>>> all.
+>>>>>>
+>>>>>> The cause of the problem is that when using 3wire, the hci does not
+>>>>>> get registered immediately (which btattach thinks) but instead after
+>>>>>> the handshake is complete.
+>>>>>>
+>>>>>> If I run btattach in gdb and break before the HCIUARTGETDEVICE ioctl
+>>>>>> call, wait a few seconds and then resume, it works as expected. What
+>>>>>> is the purpose of HCIUARTGETDEVICE? I see it's only being used when
+>>>>>> the Raw option is used (which is by the way not mentioned in the Usage
+>>>>>> docs).
+>>>>>>
+>>>>>> Another issue I have is that hciattach/btattach only support a few
+>>>>>> different baud rates. I want to use 750000 bit/s. Is there a purpose
+>>>>>> of only allowing some? Currently I use hciattach with a dummy baud
+>>>>>> rate followed by
+>>>>>> https://gist.github.com/lategoodbye/f2d76134aa6c404cd92c and that
+>>>>>> works.
+>>>>>
+>>>>> which hardware is this? I always wanted to fix some of the 3-wire support to make sure it fully works with btattach and everything is done inside the kernel correctly. Including proper support for hdev->setup for vendor firmware loading etc.
 >>>>
->>>> This is the case since the hostname plugin replaced the adaptername
->>>> plugin in 2012.
 >>>>
->>>> Fetch the initial values for PrettyHostname,StaticHostname and
->>>> Chassis when the plugin is initiated, so as to make the values
->>>> available for adapter setup.
->>>> ---
->>>> plugins/hostname.c | 4 ++++
->>>> 1 file changed, 4 insertions(+)
->>>>
->>>> diff --git a/plugins/hostname.c b/plugins/hostname.c
->>>> index f876d0afb..db9187378 100644
->>>> --- a/plugins/hostname.c
->>>> +++ b/plugins/hostname.c
->>>> @@ -307,6 +307,10 @@ static int hostname_init(void)
->>>>             hostname_proxy =3D NULL;
->>>>             g_dbus_client_unref(hostname_client);
->>>>             hostname_client =3D NULL;
->>>> +   } else {
->>>>+           g_dbus_proxy_refresh_property(hostname_proxy,
->>>> "PrettyHostname");
->>>> +           g_dbus_proxy_refresh_property(hostname_proxy,
->>>> "StaticHostname");
->>>> +           g_dbus_proxy_refresh_property(hostname_proxy,
->>>> "Chassis");
->>>>     }
+>>>> The hardware is an nRF52 device running a generic 3wire
+>>>> implementation. So no custom setup needed here.
+>>>> The 3wire support otherwise in the kernel seems to work very nice as
+>>>> long as I've been testing this. The only thing I miss myself is the
+>>>> lack of the CRC check defined optionally by the 3wire specification.
 >>>
->>> I am 100% certain that I tested this since this would be a really
->>> dumb plugin otherwise.
+>>> who is providing a 3-wire HCI controller firmware for the nRF52? I know with Zephyr and Mynewt you can turn them into a generic HCI controller, but we have not gotten around to add 3-wire support to Zephyr yet.
 >>
->> You don't say ;)
->>
->>> However is it possible that when calling GetManagedObjects the
->>> values are not returned correctly?
->>
->> get_managed_objects() in gdbus/client.c is never called for this
->> GDBusClient.
-
-I guess this can only occur if the bus name does not exist, perhaps it
-has not been activated yet, that would explain why calling refresh
-would work since that activate the bus name. I wonder if GetNameOwner
-is not enough to activate a service? Well perhaps we should use
-StartServiceByName then but it doesn't return the bus id so it only
-works if the service has activated since we have subscribed to
-NameOwnerChanged but in case it is already running we still have to
-call GetNameOwner. Btw is this running with dbus-daemon or the new
-dbus-broker? Perhaps the later doesn't active things in the same way
-dbus-daemon would.
-
-
-> Hmmm, you should either come via service_connect callback or when setting=
- the proxy handlers. Seems setting the property watch is not triggering the=
- initial GetManagedObjects. And most likely the service_connect is not trig=
-gered correctly either. Something is fishy here and it is too long ago that=
- I wrote that code to remember. Maybe we changed something and accidentally=
- broke some expected behavior.
+>> I have written my own implementation according to the Core v5.0
+>> specification. I thought it was more nice to have a 3wire interface
+>> rather than h4 since that adds better error checking, automatic resync
+>> upon chip reset etc.
 >
-> Maybe Luiz and Johan can have a look at this as well, but I have the feel=
-ing this should be a fix in the gdbus code.gdbus
->
-> Regards
->
-> Marcel
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth=
-" inlinux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> any chance you want to open source that and share it. Or consider porting the 3-wire support into Zephyr?
 
+Well that might be possible :)
 
+>
+> Anyway, have you tried --noflowctrl option with btattach. If I remember correctly then 3-wire is requiring that flow control is turned off.
 
---=20
-Luiz Augusto von Dentz
+Does that mean sw flow control or hw flow control? Currently I have hw
+flow control enabled (I hope so at least since I haven't disabled it).
+
+The 3-wire protocol allows both sw flow control and hw flow control.
+sw flow control must however be manually negotiated during the config
+phase of the handshake to allow its use.
+
+/Emil
