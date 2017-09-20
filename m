@@ -1,33 +1,45 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 01/10] gatt: Remove useless debug
-Date: Wed, 20 Sep 2017 10:44:08 +0300
-Message-Id: <20170920074417.30435-2-luiz.dentz@gmail.com>
-In-Reply-To: <20170920074417.30435-1-luiz.dentz@gmail.com>
-References: <20170920074417.30435-1-luiz.dentz@gmail.com>
+Subject: [PATCH v2 00/10] gatt:  Add server support for AcquireWrite and AcquireNotify
+Date: Wed, 20 Sep 2017 10:44:07 +0300
+Message-Id: <20170920074417.30435-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
----
- src/gatt-client.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+This implements similar mechanist to use dedicated file descriptors
+for IO bypassing D-Bus.
 
-diff --git a/src/gatt-client.c b/src/gatt-client.c
-index 419dadb99..d523b883a 100644
---- a/src/gatt-client.c
-+++ b/src/gatt-client.c
-@@ -1229,7 +1229,7 @@ static DBusMessage *characteristic_acquire_write(DBusConnection *conn,
- 	chrc->write_io = new0(struct pipe_io, 1);
- 
- 	if (!bt_gatt_client_is_ready(gatt)) {
--		DBG("GATT not ready, wait until it becomes read");
-+		/* GATT not ready, wait until it becomes ready */
- 		if (!chrc->ready_id)
- 			chrc->ready_id = bt_gatt_client_ready_register(gatt,
- 							characteristic_ready,
+Note: The current implementation opens just one fd per characteristic,
+though it could be possible to have one fd per device.
+
+v2: Allow any type of write procedure to work when WriteAcquired exists.
+
+Luiz Augusto von Dentz (10):
+  gatt: Remove useless debug
+  client: Rework variables for AcquireWrite/AcquireNotify
+  doc/gatt-api: Add server support for AcquireWrite and AcquireNotify
+  shared/gatt-server: Add bt_gatt_server_get_mtu
+  shared/gatt-db: Add gatt_db_attribute_get_user_data
+  gatt: Implement AcquireWrite for server
+  client: Implement AcquireWrite for server
+  gatt: Implement AcquireNotify for server
+  client: Implement AcquireNotify for server
+  gatt: Update signature of AcquireWrite and AcquireNotify
+
+ client/gatt.c            | 319 ++++++++++++++++++++++++++++++++++++++++-------
+ doc/gatt-api.txt         |  36 ++++--
+ mesh/gatt.c              |  23 +++-
+ src/gatt-client.c        |   8 +-
+ src/gatt-database.c      | 258 +++++++++++++++++++++++++++++++++++++-
+ src/shared/gatt-db.c     |   8 ++
+ src/shared/gatt-db.h     |   2 +
+ src/shared/gatt-server.c |   8 ++
+ src/shared/gatt-server.h |   1 +
+ 9 files changed, 598 insertions(+), 65 deletions(-)
+
 -- 
 2.13.5
 
