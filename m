@@ -1,47 +1,50 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Bastien Nocera <hadess@hadess.net>
 To: linux-bluetooth@vger.kernel.org
-Cc: Craig Andrews <candrews@integralblue.com>
-Subject: [PATCH 2/4] systemd: Add PrivateTmp and NoNewPrivileges options
-Date: Wed, 20 Sep 2017 13:48:17 +0200
-Message-Id: <20170920114819.19929-2-hadess@hadess.net>
+Cc: Bastien Nocera <hadess@hadess.net>
+Subject: [PATCH 3/4] systemd: Add more filesystem lockdown
+Date: Wed, 20 Sep 2017 13:48:18 +0200
+Message-Id: <20170920114819.19929-3-hadess@hadess.net>
 In-Reply-To: <20170920114819.19929-1-hadess@hadess.net>
 References: <20170920114819.19929-1-hadess@hadess.net>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Craig Andrews <candrews@integralblue.com>
-
-PrivateTmp makes bluetoothd's /tmp and /var/tmp be inside a different
-namespace. This is useful to secure access to temporary files of the
-process.
-
-NoNewPrivileges ensures that service process and all its children
-can never gain new privileges through execve(), lowering the risk of
-possible privilege escalations.
+We can only access the configuration file as read-only and read-write
+to the Bluetooth cache directory and sub-directories.
 ---
- src/bluetooth.service.in | 6 ++++++
- 1 file changed, 6 insertions(+)
+ Makefile.am              | 2 ++
+ src/bluetooth.service.in | 4 ++++
+ 2 files changed, 6 insertions(+)
 
+diff --git a/Makefile.am b/Makefile.am
+index 1c38d94e5..13ccf9079 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -478,6 +478,8 @@ MAINTAINERCLEANFILES = Makefile.in \
+ 
+ SED_PROCESS = $(AM_V_GEN)$(MKDIR_P) $(dir $@) && \
+ 		$(SED) -e 's,@libexecdir\@,$(libexecdir),g' \
++		       -e 's,@statedir\@,$(statedir),g' \
++		       -e 's,@confdir\@,$(confdir),g' \
+ 		< $< > $@
+ 
+ %.service: %.service.in Makefile
 diff --git a/src/bluetooth.service.in b/src/bluetooth.service.in
-index f799f65f0..a6f3030f9 100644
+index a6f3030f9..7e55b5043 100644
 --- a/src/bluetooth.service.in
 +++ b/src/bluetooth.service.in
-@@ -12,8 +12,14 @@ NotifyAccess=main
- #Restart=on-failure
- CapabilityBoundingSet=CAP_NET_ADMIN CAP_NET_BIND_SERVICE
- LimitNPROC=1
-+
-+# Filesystem lockdown
+@@ -17,6 +17,10 @@ LimitNPROC=1
  ProtectHome=true
  ProtectSystem=full
-+PrivateTmp=true
-+
-+# Privilege escalation
-+NoNewPrivileges=true
+ PrivateTmp=true
++ProtectKernelTunables=true
++ProtectControlGroups=true
++ReadWritePaths=@statedir@
++ReadOnlyPaths=@confdir@
  
- [Install]
- WantedBy=bluetooth.target
+ # Privilege escalation
+ NoNewPrivileges=true
 -- 
 2.14.1
 
