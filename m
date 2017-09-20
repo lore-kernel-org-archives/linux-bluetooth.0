@@ -1,60 +1,134 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Bastien Nocera <hadess@hadess.net>
-To: linux-bluetooth@vger.kernel.org
-Cc: Bastien Nocera <hadess@hadess.net>
-Subject: [PATCH 1/2] hostname: Add more debug in soft failure cases
-Date: Wed, 20 Sep 2017 14:54:44 +0200
-Message-Id: <20170920125445.24792-1-hadess@hadess.net>
+MIME-Version: 1.0
+In-Reply-To: <CABBYNZJ05njFZbt7JQ6_P0Cz-sEK2HbUN0PEsRU8yYUEmx-jdg@mail.gmail.com>
+References: <20170918092325.32406-1-luiz.dentz@gmail.com> <1a507085-2113-dd3b-3bf3-07c55d359a9b@jp.fujitsu.com>
+ <CABBYNZJ05njFZbt7JQ6_P0Cz-sEK2HbUN0PEsRU8yYUEmx-jdg@mail.gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Wed, 20 Sep 2017 15:49:42 +0300
+Message-ID: <CABBYNZ+H5ruWjn-Fddi-iNDR1xucdBddnNYi60zOG1XhfixGag@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] tools: Only add unique entries to readline history
+To: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-So it's easier to debug problems with the hostname plugin.
----
- plugins/hostname.c | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
+Hi,
 
-diff --git a/plugins/hostname.c b/plugins/hostname.c
-index 4f9dfe6d8..f876d0afb 100644
---- a/plugins/hostname.c
-+++ b/plugins/hostname.c
-@@ -82,8 +82,10 @@ static void update_name(struct btd_adapter *adapter, gpointer user_data)
- {
- 	const char *hostname = get_hostname();
- 
--	if (hostname == NULL)
-+	if (hostname == NULL) {
-+		DBG ("No hostname available yet");
- 		return;
-+	}
- 
- 	if (btd_adapter_is_default(adapter)) {
- 		DBG("name: %s", hostname);
-@@ -281,13 +283,16 @@ static int hostname_init(void)
- 
- 	hostname_client = g_dbus_client_new(conn, "org.freedesktop.hostname1",
- 						"/org/freedesktop/hostname1");
--	if (!hostname_client)
-+	if (!hostname_client) {
-+		DBG("Failed to get hostname client");
- 		return -EIO;
-+	}
- 
- 	hostname_proxy = g_dbus_proxy_new(hostname_client,
- 						"/org/freedesktop/hostname1",
- 						"org.freedesktop.hostname1");
- 	if (!hostname_proxy) {
-+		DBG("Failed to get hostname proxy");
- 		g_dbus_client_unref(hostname_client);
- 		hostname_client = NULL;
- 		return -EIO;
-@@ -297,6 +302,7 @@ static int hostname_init(void)
- 
- 	err = btd_register_adapter_driver(&hostname_driver);
- 	if (err < 0) {
-+		DBG("Failed to register adapter driver");
- 		g_dbus_proxy_unref(hostname_proxy);
- 		hostname_proxy = NULL;
- 		g_dbus_client_unref(hostname_client);
+On Tue, Sep 19, 2017 at 10:08 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi Eramoto,
+>
+> On Tue, Sep 19, 2017 at 5:14 AM, ERAMOTO Masaya
+> <eramoto.masaya@jp.fujitsu.com> wrote:
+>> Hi Luiz,
+>>
+>> On 09/18/2017 06:23 PM, Luiz Augusto von Dentz wrote:
+>>> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>>>
+>>> Don't add duplicate commands to historym this is similar to what
+>>> HISTCONTROL=ignoredups does.
+>>> ---
+>>>  client/main.c            | 3 ++-
+>>>  tools/bluetooth-player.c | 4 +++-
+>>>  tools/btmgmt.c           | 3 ++-
+>>>  tools/obex-client-tool.c | 3 ++-
+>>>  tools/obexctl.c          | 3 ++-
+>>>  5 files changed, 11 insertions(+), 5 deletions(-)
+>>>
+>>> diff --git a/client/main.c b/client/main.c
+>>> index 2cb449fd5..282e84003 100644
+>>> --- a/client/main.c
+>>> +++ b/client/main.c
+>>> @@ -2644,7 +2644,8 @@ static void rl_handler(char *input)
+>>>       if (!rl_release_prompt(input))
+>>>               goto done;
+>>>
+>>> -     add_history(input);
+>>> +     if (history_search(input, -1))
+>>> +             add_history(input);
+>>>
+>>
+>> I think it is better to add g_strstrip(), since this patch adds a
+>> command typed all characters to history and then adds the complemented
+>> command to history when it have white-space.
+>
+> Yep, but as a separate change, this part of handling should really go
+> into a common code so we don't have to keep duplicating this on every
+> tool.
+>
+>>>       cmd = strtok_r(input, " ", &arg);
+>>>       if (!cmd)
+>>> diff --git a/tools/bluetooth-player.c b/tools/bluetooth-player.c
+>>> index 9e199970d..c95b7497f 100644
+>>> --- a/tools/bluetooth-player.c
+>>> +++ b/tools/bluetooth-player.c
+>>> @@ -1086,7 +1086,9 @@ static void rl_handler(char *input)
+>>>               goto done;
+>>>
+>>>       g_strstrip(input);
+>>> -     add_history(input);
+>>> +
+>>> +     if (history_search(input, -1))
+>>> +             add_history(input);
+>>>
+>>>       argv = g_strsplit(input, " ", -1);
+>>>       if (argv == NULL)
+>>> diff --git a/tools/btmgmt.c b/tools/btmgmt.c
+>>> index e7ea69937..e454d864d 100644
+>>> --- a/tools/btmgmt.c
+>>> +++ b/tools/btmgmt.c
+>>> @@ -4664,7 +4664,8 @@ static void rl_handler(char *input)
+>>>       if (prompt_input(input))
+>>>               goto done;
+>>>
+>>> -     add_history(input);
+>>> +     if (history_search(input, -1))
+>>> +             add_history(input);
+>>>
+>>>       if (wordexp(input, &w, WRDE_NOCMD))
+>>>               goto done;
+>>> diff --git a/tools/obex-client-tool.c b/tools/obex-client-tool.c
+>>> index d0ba8a651..d74ac77a1 100644
+>>> --- a/tools/obex-client-tool.c
+>>> +++ b/tools/obex-client-tool.c
+>>> @@ -242,7 +242,8 @@ static void parse_line(char *line_read)
+>>>               return;
+>>>       }
+>>>
+>>> -     add_history(line_read);
+>>> +     if (history_search(input, -1))
+>>> +             add_history(input);
+>>
+>> line_read is correct.
+>
+> Good catch, will fix it.
+>
+>>>
+>>>       g_shell_parse_argv(line_read, &argcp, &argvp, NULL);
+>>>
+>>> diff --git a/tools/obexctl.c b/tools/obexctl.c
+>>> index 46943d682..ece50f682 100644
+>>> --- a/tools/obexctl.c
+>>> +++ b/tools/obexctl.c
+>>> @@ -2081,7 +2081,8 @@ static void rl_handler(char *input)
+>>>       if (!strlen(input))
+>>>               goto done;
+>>>
+>>> -     add_history(input);
+>>> +     if (history_search(input, -1))
+>>> +             add_history(input);
+>>>
+>>>       if (wordexp(input, &w, WRDE_NOCMD))
+>>>               goto done;
+>>>
+>>
+>>
+>> Regards,
+>> Eramoto
+>>
+
+Applied.
+
 -- 
-2.14.1
-
+Luiz Augusto von Dentz
