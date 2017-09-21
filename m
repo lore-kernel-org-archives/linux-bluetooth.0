@@ -1,87 +1,51 @@
-Return-Path: <bigeasy@linutronix.de>
-Date: Thu, 21 Sep 2017 15:51:23 +0200
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: Mart van de Wege <mvdwege@gmail.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@intel.com>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: linux-rt-users@vger.kernel.org, tglx@linutronix.de,
-	Peter Zijlstra <peterz@infradead.org>
-Subject: [PATCH] Bluetooth: avoid recursive locking in hci_send_to_channel()
-Message-ID: <20170921135123.rgzacdgfonqftlu7@linutronix.de>
-References: <86val4928u.fsf@gaheris.avalon.lan>
- <20170831145211.xlu6cvocqdkzevsl@linutronix.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <20170831145211.xlu6cvocqdkzevsl@linutronix.de>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Message-ID: <1505996346.12143.1.camel@linux.intel.com>
+Subject: Re: [PATCH] Bluetooth: 6lowpan: Fix multi-link setup
+From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        linux-bluetooth@vger.kernel.org
+Date: Thu, 21 Sep 2017 15:19:06 +0300
+In-Reply-To: <20170920095253.8634-1-luiz.dentz@gmail.com>
+References: <20170920095253.8634-1-luiz.dentz@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Mart reported a deadlock in -RT in the call path:
-  hci_send_monitor_ctrl_event() -> hci_send_to_channel()
+Hi Luiz,
 
-because both functions acquire the same read lock hci_sk_list.lock. This
-is also a mainline issue because the qrwlock implementation is writer
-fair (the traditional rwlock implementation is reader biased).
+On Wed, 2017-09-20 at 12:52 +0300, Luiz Augusto von Dentz wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> If there are more than one node connected and there isn't any route
+> information attempt to check if destination address matches any of
+> the
+> link-local peer addresses.
+> 
+> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> ---
+>  net/bluetooth/6lowpan.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
+> index 4e2576fc0c59..55370c330386 100644
+> --- a/net/bluetooth/6lowpan.c
+> +++ b/net/bluetooth/6lowpan.c
+> @@ -190,7 +190,7 @@ static inline struct lowpan_peer
+> *peer_lookup_dst(struct lowpan_btle_dev *dev,
+>  		nexthop = &lowpan_cb(skb)->gw;
+>  
+>  		if (ipv6_addr_any(nexthop))
+> -			return NULL;
+> +			nexthop = daddr;
+>  	} else {
+>  		nexthop = rt6_nexthop(rt, daddr);
+>  
 
-To avoid the deadlock there is now __hci_send_to_channel() which expects
-the readlock to be held.
 
-Cc: Marcel Holtmann <marcel@holtmann.org>
-Cc: Johan Hedberg <johan.hedberg@intel.com>
-Fixes: 38ceaa00d02d ("Bluetooth: Add support for sending MGMT commands and events to monitor")
-Reported-by: Mart van de Wege <mvdwege@gmail.com>
-Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
----
- net/bluetooth/hci_sock.c | 17 +++++++++++------
- 1 file changed, 11 insertions(+), 6 deletions(-)
+Acked-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
 
-diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
-index 638bf0e1a2e3..f1ee820d871c 100644
---- a/net/bluetooth/hci_sock.c
-+++ b/net/bluetooth/hci_sock.c
-@@ -251,15 +251,13 @@ void hci_send_to_sock(struct hci_dev *hdev, struct sk_buff *skb)
- }
- 
- /* Send frame to sockets with specific channel */
--void hci_send_to_channel(unsigned short channel, struct sk_buff *skb,
--			 int flag, struct sock *skip_sk)
-+static void __hci_send_to_channel(unsigned short channel, struct sk_buff *skb,
-+				  int flag, struct sock *skip_sk)
- {
- 	struct sock *sk;
- 
- 	BT_DBG("channel %u len %d", channel, skb->len);
- 
--	read_lock(&hci_sk_list.lock);
--
- 	sk_for_each(sk, &hci_sk_list.head) {
- 		struct sk_buff *nskb;
- 
-@@ -285,6 +283,13 @@ void hci_send_to_channel(unsigned short channel, struct sk_buff *skb,
- 			kfree_skb(nskb);
- 	}
- 
-+}
-+
-+void hci_send_to_channel(unsigned short channel, struct sk_buff *skb,
-+			 int flag, struct sock *skip_sk)
-+{
-+	read_lock(&hci_sk_list.lock);
-+	__hci_send_to_channel(channel, skb, flag, skip_sk);
- 	read_unlock(&hci_sk_list.lock);
- }
- 
-@@ -388,8 +393,8 @@ void hci_send_monitor_ctrl_event(struct hci_dev *hdev, u16 event,
- 		hdr->index = index;
- 		hdr->len = cpu_to_le16(skb->len - HCI_MON_HDR_SIZE);
- 
--		hci_send_to_channel(HCI_CHANNEL_MONITOR, skb,
--				    HCI_SOCK_TRUSTED, NULL);
-+		__hci_send_to_channel(HCI_CHANNEL_MONITOR, skb,
-+				      HCI_SOCK_TRUSTED, NULL);
- 		kfree_skb(skb);
- 	}
- 
--- 
-2.14.1
+
+Cheers,
+Jukka
+
