@@ -1,32 +1,36 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Marcin Kraglak <marcin.kraglak@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 0/4] Move common client code to bt_shell
-Date: Thu, 21 Sep 2017 13:40:17 -0400
-Message-Id: <20170921174021.20154-1-marcin.kraglak@tieto.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <Tudor.Ambarus@microchip.com>
+From: Tudor Ambarus <tudor.ambarus@microchip.com>
+To: <marcel@holtmann.org>, <linux-bluetooth@vger.kernel.org>
+CC: <linux-crypto@vger.kernel.org>, Tudor Ambarus
+	<tudor.ambarus@microchip.com>
+Subject: [RFC PATCH 0/2] let the crypto subsystem generate the ecc privkey
+Date: Thu, 21 Sep 2017 18:47:40 +0300
+Message-ID: <20170921154742.5631-1-tudor.ambarus@microchip.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is first part of moving common code of client and meshctl to shared
-directory. Next steps would be:
- - functions for switching between menus (needed for meshctl)
- - display functions
- - common support for history
+That Bluetooth SMP knows about the private key is pointless, since the
+detection of debug key usage is actually via the public key portion.
+With this patch set, the Bluetooth SMP will stop keeping a copy of the
+ecdh private key, except when using debug keys. This way we let the
+crypto subsystem to generate and handle the ecdh private key,
+potentially benefiting of hardware ecc private key generation and
+retention.
 
-Marcin Kraglak (4):
-  shared/shell/bt_shell: Add initial implementation
-  client: Use bt_shell to process commands.
-  shared/shell/bt_shell: Add bt_shell_completion
-  client: Use bt_shell_completion
+Tested with selftest and with btmon and smp-tester on top of hci_vhci,
+with ecdh done in both software and hardware (through atmel-ecc driver).
+All tests passed.
 
- Makefile.tools              |   3 +-
- client/main.c               |  93 ++-------------------------
- src/shared/shell/bt_shell.c | 152 ++++++++++++++++++++++++++++++++++++++++++++
- src/shared/shell/bt_shell.h |  43 +++++++++++++
- 4 files changed, 204 insertions(+), 87 deletions(-)
- create mode 100644 src/shared/shell/bt_shell.c
- create mode 100644 src/shared/shell/bt_shell.h
+Tudor Ambarus (2):
+  Bluetooth: move ecdh allocation outside of ecdh_helper
+  Bluetooth: let the crypto subsystem generate the ecc privkey
+
+ net/bluetooth/ecdh_helper.c | 138 ++++++++++++++++++--------------------------
+ net/bluetooth/ecdh_helper.h |   8 ++-
+ net/bluetooth/selftest.c    |  29 +++++++---
+ net/bluetooth/smp.c         | 120 ++++++++++++++++++++++++--------------
+ 4 files changed, 159 insertions(+), 136 deletions(-)
 
 -- 
-2.13.5
-
+2.9.4
