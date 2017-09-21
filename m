@@ -1,72 +1,82 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <yunhanw@google.com>
 MIME-Version: 1.0
-Reply-To: yunhanw@nestlabs.com
-In-Reply-To: <CABBYNZJTYWfm6BWOTBt4i2XDbKmg_4TW936gUpFCMSvugTE58Q@mail.gmail.com>
-References: <20170920074417.30435-1-luiz.dentz@gmail.com> <CABBYNZJTYWfm6BWOTBt4i2XDbKmg_4TW936gUpFCMSvugTE58Q@mail.gmail.com>
-From: Yunhan Wang <yunhanw@nestlabs.com>
-Date: Thu, 21 Sep 2017 11:15:02 -0700
-Message-ID: <CALvjcs9cM-2u6423kg3ybxVkrzCyJfNqFfEUM5KJRPo0MhCLPg@mail.gmail.com>
-Subject: Re: [PATCH v2 00/10] gatt: Add server support for AcquireWrite and AcquireNotify
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Jonah Petri <jonah@sense.com>
+In-Reply-To: <CALvjcs-0POiT-inDdF8oxheHL=z6acK5E03QRtUwbHZnxcf37Q@mail.gmail.com>
+References: <20170823225839.461-1-yunhanw@google.com> <D2A056DB-B533-4CAC-BCB8-19C39760E05F@holtmann.org>
+ <CALvjcs-b3M9A6sdy80pakUwRHxBueuxpxvrpZt2SBhz=xDTK6g@mail.gmail.com> <CALvjcs-0POiT-inDdF8oxheHL=z6acK5E03QRtUwbHZnxcf37Q@mail.gmail.com>
+From: Yunhan Wang <yunhanw@google.com>
+Date: Thu, 21 Sep 2017 11:11:49 -0700
+Message-ID: <CALvjcs8UK5Lik=CvU-vYzZ2=nrQh+BKy21isgs2Xh_yq4q9svA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] build: use abspath for lib/bluetooth
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi, Luiz
+Hi, Marcel
 
-It is pretty good.
+Ping for any other concern?
 
 Thanks
 Best wishes
 Yunhan
 
-On Thu, Sep 21, 2017 at 12:49 AM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi,
+On Tue, Sep 19, 2017 at 10:55 PM, Yunhan Wang <yunhanw@google.com> wrote:
+> Hi, Marcel
 >
-> On Wed, Sep 20, 2017 at 10:44 AM, Luiz Augusto von Dentz
-> <luiz.dentz@gmail.com> wrote:
->> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->>
->> This implements similar mechanist to use dedicated file descriptors
->> for IO bypassing D-Bus.
->>
->> Note: The current implementation opens just one fd per characteristic,
->> though it could be possible to have one fd per device.
->>
->> v2: Allow any type of write procedure to work when WriteAcquired exists.
->>
->> Luiz Augusto von Dentz (10):
->>   gatt: Remove useless debug
->>   client: Rework variables for AcquireWrite/AcquireNotify
->>   doc/gatt-api: Add server support for AcquireWrite and AcquireNotify
->>   shared/gatt-server: Add bt_gatt_server_get_mtu
->>   shared/gatt-db: Add gatt_db_attribute_get_user_data
->>   gatt: Implement AcquireWrite for server
->>   client: Implement AcquireWrite for server
->>   gatt: Implement AcquireNotify for server
->>   client: Implement AcquireNotify for server
->>   gatt: Update signature of AcquireWrite and AcquireNotify
->>
->>  client/gatt.c            | 319 ++++++++++++++++++++++++++++++++++++++++-------
->>  doc/gatt-api.txt         |  36 ++++--
->>  mesh/gatt.c              |  23 +++-
->>  src/gatt-client.c        |   8 +-
->>  src/gatt-database.c      | 258 +++++++++++++++++++++++++++++++++++++-
->>  src/shared/gatt-db.c     |   8 ++
->>  src/shared/gatt-db.h     |   2 +
->>  src/shared/gatt-server.c |   8 ++
->>  src/shared/gatt-server.h |   1 +
->>  9 files changed, 598 insertions(+), 65 deletions(-)
->>
->> --
->> 2.13.5
+> Any other concern on this patch?
 >
-> Any other feedback on this? Does it address all the use cases you guys
-> have been struggling?
+> Thanks
+> Best wishes
+> Yunhan
 >
->
-> --
-> Luiz Augusto von Dentz
+> On Mon, Sep 18, 2017 at 9:47 PM, Yunhan Wang <yunhanw@google.com> wrote:
+>> Hi, Marcel
+>>
+>> I just run make distcheck, it is working with this change upon latest ma=
+ster.
+>>
+>> Could you help to apply it?
+>>
+>> The below are detailed step.
+>> 1. ./configure --prefix=3D/usr --mandir=3D/usr/share/man --sysconfdir=3D=
+/etc
+>> --localstatedir=3D/var --enable-experimental
+>> --with-systemdsystemunitdir=3D/lib/systemd/system
+>> --with-systemduserunitdir=3D/usr/lib/systemd --enable-deprecated
+>> --enable-tools --enable-testing --enable-experimental
+>> 2. make distcheck
+>>
+>> Thanks
+>> Best wishes
+>> Yunhan
+>>
+>> On Mon, Aug 28, 2017 at 10:08 PM, Marcel Holtmann <marcel@holtmann.org> =
+wrote:
+>>> Hi Yunhan,
+>>>
+>>>> When building from out of tree, and the top build dir was specified as
+>>>> an absolute path, the linked headers in ${builddir}/lib/bluetooth were
+>>>> broken.  This patch fixes it by relying on make's abspath macro as
+>>>> opposed to the path concatenation.
+>>>> ---
+>>>> Makefile.am | 2 +-
+>>>> 1 file changed, 1 insertion(+), 1 deletion(-)
+>>>>
+>>>> diff --git a/Makefile.am b/Makefile.am
+>>>> index eaed632e8..ad638cbb2 100644
+>>>> --- a/Makefile.am
+>>>> +++ b/Makefile.am
+>>>> @@ -499,7 +499,7 @@ $(lib_libbluetooth_la_OBJECTS): $(local_headers)
+>>>>
+>>>> lib/bluetooth/%.h: lib/%.h
+>>>>       $(AM_V_at)$(MKDIR_P) lib/bluetooth
+>>>> -     $(AM_V_GEN)$(LN_S) -f "$(abs_top_builddir)"/$< $@
+>>>> +     $(AM_V_GEN)$(LN_S) -f $(abspath $<) $@
+>>>
+>>> does =E2=80=9Cfakeroot make distcheck=E2=80=9D still works when doing t=
+his change?
+>>>
+>>> Regards
+>>>
+>>> Marcel
+>>>
