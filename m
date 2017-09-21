@@ -1,122 +1,87 @@
-Return-Path: <hadess@hadess.net>
-Message-ID: <1506006236.9350.13.camel@hadess.net>
-Subject: Re: Bluetooth LE battery reporting?
-From: Bastien Nocera <hadess@hadess.net>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Szymon Janc
- <szymon.janc@codecoup.pl>,  Bluez mailing list
- <linux-bluetooth@vger.kernel.org>
-Date: Thu, 21 Sep 2017 17:03:56 +0200
-In-Reply-To: <CABBYNZLOCkKnPU0HBkDSwJgus7fwXV80yreET1zG+qF7-oy+rg@mail.gmail.com>
-References: <1504627402.6911.48.camel@hadess.net>
-	 <CAAEJBh+bjNrjSvTD-F1LBTKnO36kvDZmavJaRR8ZWhR6pTwz9g@mail.gmail.com>
-	 <9D01587F-3821-46CF-B8CE-2311BE8E8592@holtmann.org>
-	 <CABBYNZLDGJTj+jeKUuRAmm_FznUzAy--zE1YVto2t5Fb4zOQ6w@mail.gmail.com>
-	 <9713FF9C-7E23-448F-AC8B-755F32C461C7@holtmann.org>
-	 <1504708668.6911.56.camel@hadess.net> <1504739780.6911.60.camel@hadess.net>
-	 <1504793016.6911.70.camel@hadess.net>
-	 <CABBYNZLOCkKnPU0HBkDSwJgus7fwXV80yreET1zG+qF7-oy+rg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Return-Path: <bigeasy@linutronix.de>
+Date: Thu, 21 Sep 2017 15:51:23 +0200
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To: Mart van de Wege <mvdwege@gmail.com>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Johan Hedberg <johan.hedberg@intel.com>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: linux-rt-users@vger.kernel.org, tglx@linutronix.de,
+	Peter Zijlstra <peterz@infradead.org>
+Subject: [PATCH] Bluetooth: avoid recursive locking in hci_send_to_channel()
+Message-ID: <20170921135123.rgzacdgfonqftlu7@linutronix.de>
+References: <86val4928u.fsf@gaheris.avalon.lan>
+ <20170831145211.xlu6cvocqdkzevsl@linutronix.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20170831145211.xlu6cvocqdkzevsl@linutronix.de>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, 2017-09-07 at 17:15 +0300, Luiz Augusto von Dentz wrote:
-> Hi Bastien,
-> 
-> On Thu, Sep 7, 2017 at 5:03 PM, Bastien Nocera <hadess@hadess.net>
-> wrote:
-> > On Thu, 2017-09-07 at 01:16 +0200, Bastien Nocera wrote:
-> > > On Wed, 2017-09-06 at 16:37 +0200, Bastien Nocera wrote:
-> > > > On Wed, 2017-09-06 at 10:40 +0200, Marcel Holtmann wrote:
-> > > > > 
-> > > > 
-> > > > <snip>
-> > > > > I assumed that it is forbidden to include HID battery
-> > > > > reporting
-> > > > > events via the GATT HID descriptors. I think the standard
-> > > > > clearly
-> > > > > says these have to come via battery service and not via HID.
-> > > > 
-> > > > So we're back to implementing battery reporting as a separate
-> > > > profile.
-> > > > What would be a good example/skeleton to use to implement this?
-> > > 
-> > > This is what I managed to do so far:
-> > > https://github.com/hadess/bluez/commits/ble-battery
-> > > 
-> > > A first (gentle) pass at a review would be nice, especially if
-> > > there's
-> > > a better way to get notifications on both the attributes in one
-> > > go.
-> > 
-> > Obviously, the reworked code I wrote at 1 AM didn't work correctly.
-> > I've fixed the copy/paste bugs and pushed it.
-> > 
-> > > The second question is how I would export this.
-> > > 
-> > > I'm currently thinking that exporting a new interface on the
-> > > device
-> > > itself might be the best idea, and I'll monitor devices directly
-> > > in
-> > > UPower to export them to desktops. Would that be a good way?
-> > 
-> > Still unsure about this, comments welcome.
-> > 
-> > > And as UPower will be the likely consumer of this data, I think
-> > > I'll
-> > > try mapping this set of flags:
-> > > https://www.bluetooth.com/specifications/gatt/viewer?attributeXml
-> > > File
-> > > =org.bluetooth.characteristic.battery_power_state.xml
-> > > to UPower properties rather than trying to export it as-is.
-> > 
-> > I've written parsing code for this. Does anyone know of a device
-> > which
-> > would use the Battery Power State characteristic so I could try it
-> > out?
-> > 
-> > Finally, I've realised that my code replicates a lot of the code in
-> > bas.[ch], which is only used by the hog profile plugin. Seeing as
-> > this
-> > does nothing (the Battery Level is at the same level as the HoG
-> > characteristics, not a child of it), I've removed it.
-> 
-> We should probably make similar changes to what was done in dis.c so
-> it can operate with gatt_db directly instead of doing its own
-> discovery.
+Mart reported a deadlock in -RT in the call path:
+  hci_send_monitor_ctrl_event() -> hci_send_to_channel()
 
-This is what I came up with:
-$ gdbus introspect --system --dest org.bluez --object-path /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX --only-properties
-node /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX {
-<snip>
-  interface org.bluez.Battery1 {
-    properties:
-      readonly b Present = true;
-      readonly b Rechargeable = false;
-      readonly n Percentage = 86;
-      readonly s State = '';
-      readonly s WarningLevel = '';
-  };
+because both functions acquire the same read lock hci_sk_list.lock. This
+is also a mainline issue because the qrwlock implementation is writer
+fair (the traditional rwlock implementation is reader biased).
 
-$ gdbus monitor --system --dest org.bluez --object-path /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX 
-Monitoring signals on object /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX owned by org.bluez
-The name org.bluez is owned by :1.645
-/org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX: org.freedesktop.DBus.Properties.PropertiesChanged ('org.bluez.Device1', {'Connected': <true>}, @as [])
-/org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX: org.freedesktop.DBus.Properties.PropertiesChanged ('org.bluez.Battery1', {'Present': <true>, 'Percentage': <int16 100>}, @as [])
-/org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX: org.freedesktop.DBus.Properties.PropertiesChanged ('org.bluez.Device1', {'ServicesResolved': <true>, 'Paired': <true>}, @as [])
-/org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX: org.freedesktop.DBus.Properties.PropertiesChanged ('org.bluez.Battery1', {'Percentage': <int16 99>}, @as [])
-/org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX: org.freedesktop.DBus.Properties.PropertiesChanged ('org.bluez.Battery1', {'Percentage': <int16 98>}, @as [])
-/org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX: org.freedesktop.DBus.Properties.PropertiesChanged ('org.bluez.Battery1', {'Percentage': <int16 97>}, @as [])
+To avoid the deadlock there is now __hci_send_to_channel() which expects
+the readlock to be held.
 
-Code is at:
-https://github.com/hadess/bluez/commits/ble-battery
+Cc: Marcel Holtmann <marcel@holtmann.org>
+Cc: Johan Hedberg <johan.hedberg@intel.com>
+Fixes: 38ceaa00d02d ("Bluetooth: Add support for sending MGMT commands and events to monitor")
+Reported-by: Mart van de Wege <mvdwege@gmail.com>
+Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+---
+ net/bluetooth/hci_sock.c | 17 +++++++++++------
+ 1 file changed, 11 insertions(+), 6 deletions(-)
 
-I've only compile-tested the Battery State reporting, as I don't have a
-device that implements it. If somebody knows of one, let me know and
-I'll look into buying it for testing.
-
-If the general code and interface are agreeable, I'll go ahead and
-implement the UPower side of things, and then the API documentation for
-bluez itself.
-
-Cheers
+diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
+index 638bf0e1a2e3..f1ee820d871c 100644
+--- a/net/bluetooth/hci_sock.c
++++ b/net/bluetooth/hci_sock.c
+@@ -251,15 +251,13 @@ void hci_send_to_sock(struct hci_dev *hdev, struct sk_buff *skb)
+ }
+ 
+ /* Send frame to sockets with specific channel */
+-void hci_send_to_channel(unsigned short channel, struct sk_buff *skb,
+-			 int flag, struct sock *skip_sk)
++static void __hci_send_to_channel(unsigned short channel, struct sk_buff *skb,
++				  int flag, struct sock *skip_sk)
+ {
+ 	struct sock *sk;
+ 
+ 	BT_DBG("channel %u len %d", channel, skb->len);
+ 
+-	read_lock(&hci_sk_list.lock);
+-
+ 	sk_for_each(sk, &hci_sk_list.head) {
+ 		struct sk_buff *nskb;
+ 
+@@ -285,6 +283,13 @@ void hci_send_to_channel(unsigned short channel, struct sk_buff *skb,
+ 			kfree_skb(nskb);
+ 	}
+ 
++}
++
++void hci_send_to_channel(unsigned short channel, struct sk_buff *skb,
++			 int flag, struct sock *skip_sk)
++{
++	read_lock(&hci_sk_list.lock);
++	__hci_send_to_channel(channel, skb, flag, skip_sk);
+ 	read_unlock(&hci_sk_list.lock);
+ }
+ 
+@@ -388,8 +393,8 @@ void hci_send_monitor_ctrl_event(struct hci_dev *hdev, u16 event,
+ 		hdr->index = index;
+ 		hdr->len = cpu_to_le16(skb->len - HCI_MON_HDR_SIZE);
+ 
+-		hci_send_to_channel(HCI_CHANNEL_MONITOR, skb,
+-				    HCI_SOCK_TRUSTED, NULL);
++		__hci_send_to_channel(HCI_CHANNEL_MONITOR, skb,
++				      HCI_SOCK_TRUSTED, NULL);
+ 		kfree_skb(skb);
+ 	}
+ 
+-- 
+2.14.1
