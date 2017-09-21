@@ -1,130 +1,168 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/4] client: Use bt_shell to process commands.
-Date: Thu, 21 Sep 2017 13:40:19 -0400
-Message-Id: <20170921174021.20154-3-marcin.kraglak@tieto.com>
+Subject: [PATCH 1/4] shared/shell/bt_shell: Add initial implementation
+Date: Thu, 21 Sep 2017 13:40:18 -0400
+Message-Id: <20170921174021.20154-2-marcin.kraglak@tieto.com>
 In-Reply-To: <20170921174021.20154-1-marcin.kraglak@tieto.com>
 References: <20170921174021.20154-1-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Use bt_shell to process and print available commands.
+This module will handle command line in applications like bluetoothctl and meshctl.
 ---
- Makefile.tools |  3 ++-
- client/main.c  | 44 ++++++--------------------------------------
- 2 files changed, 8 insertions(+), 39 deletions(-)
+ src/shared/shell/bt_shell.c | 92 +++++++++++++++++++++++++++++++++++++++++++++
+ src/shared/shell/bt_shell.h | 42 +++++++++++++++++++++
+ 2 files changed, 134 insertions(+)
+ create mode 100644 src/shared/shell/bt_shell.c
+ create mode 100644 src/shared/shell/bt_shell.h
 
-diff --git a/Makefile.tools b/Makefile.tools
-index 561302fa1..a3eb5ebc5 100644
---- a/Makefile.tools
-+++ b/Makefile.tools
-@@ -8,7 +8,8 @@ client_bluetoothctl_SOURCES = client/main.c \
- 					client/advertising.h \
- 					client/advertising.c \
- 					client/gatt.h client/gatt.c \
--					monitor/uuid.h monitor/uuid.c
-+					monitor/uuid.h monitor/uuid.c \
-+					src/shared/shell/bt_shell.h src/shared/shell/bt_shell.c
- client_bluetoothctl_LDADD = gdbus/libgdbus-internal.la src/libshared-glib.la \
- 				@GLIB_LIBS@ @DBUS_LIBS@ -lreadline
- endif
-diff --git a/client/main.c b/client/main.c
-index 91b728a12..9113be95b 100644
---- a/client/main.c
-+++ b/client/main.c
-@@ -38,6 +38,7 @@
- #include <readline/history.h>
- #include <glib.h>
- 
+diff --git a/src/shared/shell/bt_shell.c b/src/shared/shell/bt_shell.c
+new file mode 100644
+index 000000000..1f3a57e02
+--- /dev/null
++++ b/src/shared/shell/bt_shell.c
+@@ -0,0 +1,92 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2017  Intel Corporation. All rights reserved.
++ *
++ *
++ *  This library is free software; you can redistribute it and/or
++ *  modify it under the terms of the GNU Lesser General Public
++ *  License as published by the Free Software Foundation; either
++ *  version 2.1 of the License, or (at your option) any later version.
++ *
++ *  This library is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ *  Lesser General Public License for more details.
++ *
++ *  You should have received a copy of the GNU Lesser General Public
++ *  License along with this library; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
++
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++
++#include <stdio.h>
++#include "src/shared/util.h"
++#include "src/shared/queue.h"
 +#include "src/shared/shell/bt_shell.h"
- #include "src/shared/util.h"
- #include "gdbus/gdbus.h"
- #include "monitor/uuid.h"
-@@ -2435,14 +2436,7 @@ static void cmd_set_advertise_appearance(const char *arg)
- 	ad_advertise_local_appearance(dbus_conn, value);
- }
- 
--static const struct {
--	const char *cmd;
--	const char *arg;
--	void (*func) (const char *arg);
--	const char *desc;
--	char * (*gen) (const char *text, int state);
--	void (*disp) (char **matches, int num_matches, int max_length);
--} cmd_table[] = {
-+static const struct bt_shell_menu_entry cmd_table[] = {
- 	{ "list",         NULL,       cmd_list, "List available controllers" },
- 	{ "show",         "[ctrl]",   cmd_show, "Controller information",
- 							ctrl_generator },
-@@ -2630,7 +2624,6 @@ static char **cmd_completion(const char *text, int start, int end)
- static void rl_handler(char *input)
- {
- 	char *cmd, *arg;
--	int i;
- 
- 	if (!input) {
- 		rl_insert_text("quit");
-@@ -2659,41 +2652,14 @@ static void rl_handler(char *input)
- 			arg[len - 1] = '\0';
- 	}
- 
--	for (i = 0; cmd_table[i].cmd; i++) {
--		if (strcmp(cmd, cmd_table[i].cmd))
--			continue;
--
--		if (cmd_table[i].func) {
--			cmd_table[i].func(arg);
--			goto done;
--		}
--	}
--
--	printf("Invalid command\n");
-+	bt_shell_process(cmd, arg);
- done:
- 	free(input);
- }
- 
- static void cmd_help(const char *arg)
- {
--	int i;
--
--	printf("Available commands:\n");
--
--	for (i = 0; cmd_table[i].cmd; i++) {
--		if ((int)strlen(cmd_table[i].arg? : "") <=
--					(int)(25 - strlen(cmd_table[i].cmd)))
--			printf("  %s %-*s %s\n", cmd_table[i].cmd,
--					(int)(25 - strlen(cmd_table[i].cmd)),
--					cmd_table[i].arg ? : "",
--					cmd_table[i].desc ? : "");
--		else
--			printf("  %s %-s\n" "  %s %-25s %s\n",
--					cmd_table[i].cmd,
--					cmd_table[i].arg ? : "",
--					"", "",
--					cmd_table[i].desc ? : "");
--	}
++
++#define CMD_LENGTH	48
++
++static struct {
++	const struct bt_shell_menu_entry *current;
++} bt_shell_data;
++
++bool bt_shell_init(const struct bt_shell_menu_entry *menu)
++{
++	if (bt_shell_data.current || !menu)
++		return false;
++
++	bt_shell_data.current = menu;
++
++	return true;
++}
++
++void bt_shell_cleanup(void)
++{
++	bt_shell_data.current = NULL;
++}
++
++void bt_shell_process(const char *cmd, const char *arg)
++{
++	const struct bt_shell_menu_entry *entry;
++
++	if (!bt_shell_data.current || !cmd)
++		return;
++
++	for (entry = bt_shell_data.current; entry->cmd; entry++) {
++		if (strcmp(cmd, entry->cmd))
++			continue;
++
++		if (entry->func) {
++			entry->func(arg);
++			return;
++		}
++	}
++
++	if (strcmp(cmd, "help")) {
++		printf("Invalid command\n");
++		return;
++	}
++
 +	bt_shell_print_menu();
- }
- 
- static gboolean signal_handler(GIOChannel *channel, GIOCondition condition,
-@@ -2844,6 +2810,7 @@ int main(int argc, char *argv[])
- 	dbus_conn = g_dbus_setup_bus(DBUS_BUS_SYSTEM, NULL, NULL);
- 	g_dbus_attach_object_manager(dbus_conn);
- 
-+	bt_shell_init(cmd_table);
- 	setlinebuf(stdout);
- 	rl_attempted_completion_function = cmd_completion;
- 
-@@ -2874,6 +2841,7 @@ int main(int argc, char *argv[])
- 
- 	rl_message("");
- 	rl_callback_handler_remove();
-+	bt_shell_cleanup();
- 
- 	dbus_connection_unref(dbus_conn);
- 	g_main_loop_unref(main_loop);
++}
++
++void bt_shell_print_menu(void)
++{
++	const struct bt_shell_menu_entry *entry;
++
++	if (!bt_shell_data.current)
++		return;
++
++	printf("Available commands:\n");
++	for (entry = bt_shell_data.current; entry->cmd; entry++) {
++		printf("  %s %-*s %s\n", entry->cmd,
++					(int)(CMD_LENGTH - strlen(entry->cmd)),
++					entry->arg ? : "", entry->desc ? : "");
++	}
++}
+diff --git a/src/shared/shell/bt_shell.h b/src/shared/shell/bt_shell.h
+new file mode 100644
+index 000000000..93d7ed771
+--- /dev/null
++++ b/src/shared/shell/bt_shell.h
+@@ -0,0 +1,42 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2017  Intel Corporation. All rights reserved.
++ *
++ *
++ *  This library is free software; you can redistribute it and/or
++ *  modify it under the terms of the GNU Lesser General Public
++ *  License as published by the Free Software Foundation; either
++ *  version 2.1 of the License, or (at your option) any later version.
++ *
++ *  This library is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ *  Lesser General Public License for more details.
++ *
++ *  You should have received a copy of the GNU Lesser General Public
++ *  License along with this library; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
++
++typedef void (*bt_shell_menu_cb_t)(const char *arg);
++typedef char * (*bt_shell_menu_gen_t)(const char *text, int state);
++typedef void (*bt_shell_menu_disp_t) (char **matches, int num_matches,
++							int max_length);
++
++struct bt_shell_menu_entry {
++	const char *cmd;
++	const char *arg;
++	bt_shell_menu_cb_t func;
++	const char *desc;
++	bt_shell_menu_gen_t gen;
++	bt_shell_menu_disp_t disp;
++};
++
++bool bt_shell_init(const struct bt_shell_menu_entry *menu);
++void bt_shell_cleanup(void);
++
++void bt_shell_process(const char *cmd, const char *arg);
++void bt_shell_print_menu(void);
 -- 
 2.13.5
 
