@@ -1,60 +1,76 @@
-Return-Path: <pbrobinson@gmail.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CAM9fo8O+y85eKZ=YbHFfc1iGtH4KN-fpoA1AoEU7z2uYiNUg+A@mail.gmail.com>
-References: <BAA83E9E-B9BF-48AD-9955-20B599AFA52C@holtmann.org>
- <CALeDE9PaZvfEwSBOuELNbJxBjR3DfWj61rEBMhYTAF6DJd+bcA@mail.gmail.com>
- <00A3687E-050A-469F-98B0-C42F872EFE1C@holtmann.org> <CALeDE9Mn9KdvJ7kFK9=86FswmckabFLWryDHkmujsDh9Xow1iQ@mail.gmail.com>
- <115EE599-9710-437B-9AA8-C4CD8360EF3F@holtmann.org> <CALeDE9NW+4xkGCD5kKsN-41ctPJ6PNp63jQ61Q7dUQMALG3Ojg@mail.gmail.com>
- <C09F8308-A607-46BC-B084-2E949947E439@holtmann.org> <CALeDE9NgfjdNRn3zCEyP_vCgJVFy9Eaf8QE90-Zc-Q=yJJUQYA@mail.gmail.com>
- <9C9C1616-C9CA-4542-AC9C-0DBC3107BA61@holtmann.org> <CAM9fo8O+y85eKZ=YbHFfc1iGtH4KN-fpoA1AoEU7z2uYiNUg+A@mail.gmail.com>
-From: Peter Robinson <pbrobinson@gmail.com>
-Date: Fri, 22 Sep 2017 12:32:52 +0100
-Message-ID: <CALeDE9MtZDi=TkmvrF_WrqHALCEnM4+UK1RAdLT=0io-6yRvaw@mail.gmail.com>
-Subject: Re: Fedora 27 kernel and RPi3 Bluetooth oops
-To: Loic Poulain <loic.poulain@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	"bluez mailin list (linux-bluetooth@vger.kernel.org)" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <CALvjcs9cM-2u6423kg3ybxVkrzCyJfNqFfEUM5KJRPo0MhCLPg@mail.gmail.com>
+References: <20170920074417.30435-1-luiz.dentz@gmail.com> <CABBYNZJTYWfm6BWOTBt4i2XDbKmg_4TW936gUpFCMSvugTE58Q@mail.gmail.com>
+ <CALvjcs9cM-2u6423kg3ybxVkrzCyJfNqFfEUM5KJRPo0MhCLPg@mail.gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Fri, 22 Sep 2017 13:58:44 +0300
+Message-ID: <CABBYNZJYdyDHAdfOn=8o8HJfeCgTQg3tTs-t8pTzOsWP25NGpA@mail.gmail.com>
+Subject: Re: [PATCH v2 00/10] gatt: Add server support for AcquireWrite and AcquireNotify
+To: Yunhan Wang <yunhanw@nestlabs.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        Jonah Petri <jonah@sense.com>
 Content-Type: text/plain; charset="UTF-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, Sep 22, 2017 at 10:09 AM, Loic Poulain <loic.poulain@gmail.com> wrote:
-> Hi Marcel, Peter,
+Hi,
+
+On Thu, Sep 21, 2017 at 9:15 PM, Yunhan Wang <yunhanw@nestlabs.com> wrote:
+> Hi, Luiz
 >
->> > Hans added a script to automatically btattch some bcm controllers for
->> > atom devices, maybe we need to add more IDs for udev, not sure if
->> > there's a means of making that generic and upstreamable. Also some of
->> > the other distro patches I've seen had a different BT firmware, not
->> > sure if Loic needed that or not.
+> It is pretty good.
+>
+> Thanks
+> Best wishes
+> Yunhan
+>
+> On Thu, Sep 21, 2017 at 12:49 AM, Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+>> Hi,
 >>
->> The whole point behind serdev is that you no longer need btattach. The
->> UART can be enumerated by the kernel. So that should not be needed and we
->> also want to get rid of it for ACPI based systems as well.
+>> On Wed, Sep 20, 2017 at 10:44 AM, Luiz Augusto von Dentz
+>> <luiz.dentz@gmail.com> wrote:
+>>> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>>>
+>>> This implements similar mechanist to use dedicated file descriptors
+>>> for IO bypassing D-Bus.
+>>>
+>>> Note: The current implementation opens just one fd per characteristic,
+>>> though it could be possible to have one fd per device.
+>>>
+>>> v2: Allow any type of write procedure to work when WriteAcquired exists.
+>>>
+>>> Luiz Augusto von Dentz (10):
+>>>   gatt: Remove useless debug
+>>>   client: Rework variables for AcquireWrite/AcquireNotify
+>>>   doc/gatt-api: Add server support for AcquireWrite and AcquireNotify
+>>>   shared/gatt-server: Add bt_gatt_server_get_mtu
+>>>   shared/gatt-db: Add gatt_db_attribute_get_user_data
+>>>   gatt: Implement AcquireWrite for server
+>>>   client: Implement AcquireWrite for server
+>>>   gatt: Implement AcquireNotify for server
+>>>   client: Implement AcquireNotify for server
+>>>   gatt: Update signature of AcquireWrite and AcquireNotify
+>>>
+>>>  client/gatt.c            | 319 ++++++++++++++++++++++++++++++++++++++++-------
+>>>  doc/gatt-api.txt         |  36 ++++--
+>>>  mesh/gatt.c              |  23 +++-
+>>>  src/gatt-client.c        |   8 +-
+>>>  src/gatt-database.c      | 258 +++++++++++++++++++++++++++++++++++++-
+>>>  src/shared/gatt-db.c     |   8 ++
+>>>  src/shared/gatt-db.h     |   2 +
+>>>  src/shared/gatt-server.c |   8 ++
+>>>  src/shared/gatt-server.h |   1 +
+>>>  9 files changed, 598 insertions(+), 65 deletions(-)
+>>>
+>>> --
+>>> 2.13.5
 >>
->
-> Since it works with raspbian I had a try with Fedora 26.
->
-> To make this 'simpler', I bypassed u-boot and just loaded my kernel + my
-> dtb:
->
-> - added bcm2837-rpi-3-b.dtb and kernel zImage (Linux 4.13 32-bit) (FAT PART)
+>> Any other feedback on this? Does it address all the use cases you guys
+>> have been struggling?
 
-Where did the kernel come from? Is that the Fedora kernel?
+Applied.
 
-> - modified config.txt (FAT part):
-> # Raspberry Pi 3
-> [pi3]
-> kernel=zImage
-> device_tree=bcm2837-rpi-3-b.dtb
->
-> - added cmdline.txt (FAT part):
-> dwc_otg.lpm_enable=0 root=/dev/mmcblk0p4 rootfstype=ext4 elevator=deadline
-> fsck.repair=yes rootwait splash plymouth.ignore-serial-consoles
->
-> - added modules (rootfs ext4 part)
->
-> That works as expected, my hci device is correctly configured and
-> operational.
-> Maybe u-boot adds some unexpected overlay or applies incorrect config.
-
-It certainly doesn't add overlays by default, it uses the vanilla
-linux kernel DT
+-- 
+Luiz Augusto von Dentz
