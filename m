@@ -1,128 +1,197 @@
-Return-Path: <hadess@hadess.net>
-Message-ID: <1506085983.9350.33.camel@hadess.net>
-Subject: Re: [PATCH 2/2] hostname: Fix "BlueZ 5.XX" adapter name on startup
-From: Bastien Nocera <hadess@hadess.net>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Marcel Holtmann
-	 <marcel@holtmann.org>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Fri, 22 Sep 2017 15:13:03 +0200
-In-Reply-To: <CABBYNZLeNiw_5A_mBbLm6Uq2B-8+KEhuMKAsVerSAKeS3WbE+g@mail.gmail.com>
-References: <20170920125445.24792-1-hadess@hadess.net>
-	 <20170920125445.24792-2-hadess@hadess.net>
-	 <0268513E-AD33-4E4E-A926-2EC695DC1D86@holtmann.org>
-	 <1505925333.9350.7.camel@hadess.net>
-	 <6DC51AD5-E9D5-4874-AAA8-38A4BF7C1668@holtmann.org>
-	 <CABBYNZLeNiw_5A_mBbLm6Uq2B-8+KEhuMKAsVerSAKeS3WbE+g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Subject: [PATCH BlueZ 6/6] client: Use new parse_argument() function
+From: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+References: <d5f5eeb2-9207-ae2e-231e-0826307926a9@jp.fujitsu.com>
+Message-ID: <56950adc-87fe-e44f-631a-c05b555248fb@jp.fujitsu.com>
+Date: Fri, 22 Sep 2017 21:20:54 +0900
+MIME-Version: 1.0
+In-Reply-To: <d5f5eeb2-9207-ae2e-231e-0826307926a9@jp.fujitsu.com>
+Content-Type: text/plain; charset="utf-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, 2017-09-20 at 21:57 +0300, Luiz Augusto von Dentz wrote:
-> H Bastien,
-> 
-> On Wed, Sep 20, 2017 at 7:59 PM, Marcel Holtmann <marcel@holtmann.org
-> > wrote:
-> > Hi Bastien,
-> > 
-> > > > > The hostname plugin listens to property changes from systemd-
-> > > > > hostnamed
-> > > > > but doesn't fetch initial values. This means that unless the
-> > > > > PrettyHostname or StaticHostname changes, the default adapter
-> > > > > will
-> > > > > be
-> > > > > called "BlueZ 5.XX" matching the version number.
-> > > > > 
-> > > > > This is the case since the hostname plugin replaced the
-> > > > > adaptername
-> > > > > plugin in 2012.
-> > > > > 
-> > > > > Fetch the initial values for PrettyHostname,StaticHostname
-> > > > > and
-> > > > > Chassis when the plugin is initiated, so as to make the
-> > > > > values
-> > > > > available for adapter setup.
-> > > > > ---
-> > > > > plugins/hostname.c | 4 ++++
-> > > > > 1 file changed, 4 insertions(+)
-> > > > > 
-> > > > > diff --git a/plugins/hostname.c b/plugins/hostname.c
-> > > > > index f876d0afb..db9187378 100644
-> > > > > --- a/plugins/hostname.c
-> > > > > +++ b/plugins/hostname.c
-> > > > > @@ -307,6 +307,10 @@ static int hostname_init(void)
-> > > > >             hostname_proxy = NULL;
-> > > > >             g_dbus_client_unref(hostname_client);
-> > > > >             hostname_client = NULL;
-> > > > > +   } else {
-> > > > > +           g_dbus_proxy_refresh_property(hostname_proxy,
-> > > > > "PrettyHostname");
-> > > > > +           g_dbus_proxy_refresh_property(hostname_proxy,
-> > > > > "StaticHostname");
-> > > > > +           g_dbus_proxy_refresh_property(hostname_proxy,
-> > > > > "Chassis");
-> > > > >     }
-> > > > 
-> > > > I am 100% certain that I tested this since this would be a
-> > > > really
-> > > > dumb plugin otherwise.
-> > > 
-> > > You don't say ;)
-> > > 
-> > > > However is it possible that when calling GetManagedObjects the
-> > > > values are not returned correctly?
-> > > 
-> > > get_managed_objects() in gdbus/client.c is never called for this
-> > > GDBusClient.
-> 
-> I guess this can only occur if the bus name does not exist, perhaps
-> it
-> has not been activated yet, that would explain why calling refresh
-> would work since that activate the bus name. I wonder if GetNameOwner
-> is not enough to activate a service?
+---
+ client/main.c | 105 ++++++----------------------------------------------------
+ 1 file changed, 10 insertions(+), 95 deletions(-)
 
-It's not enough, GetNameOwner is a call to the daemon, the service
-isn't involved at all. You need to start it by hand.
+diff --git a/client/main.c b/client/main.c
+index 1c34269..b5646b2 100644
+--- a/client/main.c
++++ b/client/main.c
+@@ -883,60 +883,6 @@ static gboolean parse_argument(const char *arg, const char * const *arg_table,
+ 	return FALSE;
+ }
+ 
+-static gboolean parse_argument_on_off(const char *arg, dbus_bool_t *value)
+-{
+-	if (!arg || !strlen(arg)) {
+-		rl_printf("Missing on/off argument\n");
+-		return FALSE;
+-	}
+-
+-	if (!strcmp(arg, "on") || !strcmp(arg, "yes")) {
+-		*value = TRUE;
+-		return TRUE;
+-	}
+-
+-	if (!strcmp(arg, "off") || !strcmp(arg, "no")) {
+-		*value = FALSE;
+-		return TRUE;
+-	}
+-
+-	rl_printf("Invalid argument %s\n", arg);
+-	return FALSE;
+-}
+-
+-static gboolean parse_argument_agent(const char *arg, dbus_bool_t *value,
+-							const char **capability)
+-{
+-	const char * const *opt;
+-
+-	if (arg == NULL || strlen(arg) == 0) {
+-		rl_printf("Missing on/off/capability argument\n");
+-		return FALSE;
+-	}
+-
+-	if (strcmp(arg, "on") == 0 || strcmp(arg, "yes") == 0) {
+-		*value = TRUE;
+-		*capability = "";
+-		return TRUE;
+-	}
+-
+-	if (strcmp(arg, "off") == 0 || strcmp(arg, "no") == 0) {
+-		*value = FALSE;
+-		return TRUE;
+-	}
+-
+-	for (opt = agent_arguments; *opt; opt++) {
+-		if (strcmp(arg, *opt) == 0) {
+-			*value = TRUE;
+-			*capability = *opt;
+-			return TRUE;
+-		}
+-	}
+-
+-	rl_printf("Invalid argument %s\n", arg);
+-	return FALSE;
+-}
+-
+ static void cmd_list(const char *arg)
+ {
+ 	GList *list;
+@@ -1099,7 +1045,7 @@ static void cmd_power(const char *arg)
+ 	dbus_bool_t powered;
+ 	char *str;
+ 
+-	if (parse_argument_on_off(arg, &powered) == FALSE)
++	if (parse_argument(arg, NULL, NULL, &powered, NULL) == FALSE)
+ 		return;
+ 
+ 	if (check_default_ctrl() == FALSE)
+@@ -1120,7 +1066,7 @@ static void cmd_pairable(const char *arg)
+ 	dbus_bool_t pairable;
+ 	char *str;
+ 
+-	if (parse_argument_on_off(arg, &pairable) == FALSE)
++	if (parse_argument(arg, NULL, NULL, &pairable, NULL) == FALSE)
+ 		return;
+ 
+ 	if (check_default_ctrl() == FALSE)
+@@ -1141,7 +1087,7 @@ static void cmd_discoverable(const char *arg)
+ 	dbus_bool_t discoverable;
+ 	char *str;
+ 
+-	if (parse_argument_on_off(arg, &discoverable) == FALSE)
++	if (parse_argument(arg, NULL, NULL, &discoverable, NULL) == FALSE)
+ 		return;
+ 
+ 	if (check_default_ctrl() == FALSE)
+@@ -1163,7 +1109,8 @@ static void cmd_agent(const char *arg)
+ 	dbus_bool_t enable;
+ 	const char *capability;
+ 
+-	if (parse_argument_agent(arg, &enable, &capability) == FALSE)
++	if (parse_argument(arg, agent_arguments, "capability",
++					&enable, &capability) == FALSE)
+ 		return;
+ 
+ 	if (enable == TRUE) {
+@@ -1213,7 +1160,7 @@ static void cmd_scan(const char *arg)
+ 	dbus_bool_t enable;
+ 	const char *method;
+ 
+-	if (parse_argument_on_off(arg, &enable) == FALSE)
++	if (parse_argument(arg, NULL, NULL, &enable, NULL) == FALSE)
+ 		return;
+ 
+ 	if (check_default_ctrl() == FALSE)
+@@ -2041,7 +1988,7 @@ static void cmd_notify(const char *arg)
+ {
+ 	dbus_bool_t enable;
+ 
+-	if (parse_argument_on_off(arg, &enable) == FALSE)
++	if (parse_argument(arg, NULL, NULL, &enable, NULL) == FALSE)
+ 		return;
+ 
+ 	if (!default_attr) {
+@@ -2332,45 +2279,13 @@ static char *capability_generator(const char *text, int state)
+ 	return argument_generator(text, state, agent_arguments);
+ }
+ 
+-static gboolean parse_argument_advertise(const char *arg, dbus_bool_t *value,
+-							const char **type)
+-{
+-	const char * const *opt;
+-
+-	if (arg == NULL || strlen(arg) == 0) {
+-		rl_printf("Missing on/off/type argument\n");
+-		return FALSE;
+-	}
+-
+-	if (strcmp(arg, "on") == 0 || strcmp(arg, "yes") == 0) {
+-		*value = TRUE;
+-		*type = "";
+-		return TRUE;
+-	}
+-
+-	if (strcmp(arg, "off") == 0 || strcmp(arg, "no") == 0) {
+-		*value = FALSE;
+-		return TRUE;
+-	}
+-
+-	for (opt = ad_arguments; *opt; opt++) {
+-		if (strcmp(arg, *opt) == 0) {
+-			*value = TRUE;
+-			*type = *opt;
+-			return TRUE;
+-		}
+-	}
+-
+-	rl_printf("Invalid argument %s\n", arg);
+-	return FALSE;
+-}
+-
+ static void cmd_advertise(const char *arg)
+ {
+ 	dbus_bool_t enable;
+ 	const char *type;
+ 
+-	if (parse_argument_advertise(arg, &enable, &type) == FALSE)
++	if (parse_argument(arg, ad_arguments, "type",
++					&enable, &type) == FALSE)
+ 		return;
+ 
+ 	if (!default_ctrl || !default_ctrl->ad_proxy) {
+@@ -2408,7 +2323,7 @@ static void cmd_set_advertise_tx_power(const char *arg)
+ {
+ 	dbus_bool_t powered;
+ 
+-	if (parse_argument_on_off(arg, &powered) == FALSE)
++	if (parse_argument(arg, NULL, NULL, &powered, NULL) == FALSE)
+ 		return;
+ 
+ 	ad_advertise_tx_power(dbus_conn, powered);
+-- 
+2.7.4
 
-A few bindings will allow you to choose whether to autostart the
-service if the target service doesn't exist when calling remote
-methods.
-
->  Well perhaps we should use
-> StartServiceByName then but it doesn't return the bus id so it only
-> works if the service has activated since we have subscribed to
-> NameOwnerChanged but in case it is already running we still have to
-> call GetNameOwner. Btw is this running with dbus-daemon or the new
-> dbus-broker? Perhaps the later doesn't active things in the same way
-> dbus-daemon would.
-
-It goes without saying that I wouldn't be sending bug reports like this
-one if I was using dbus-broker.
-
-The plugin seems to work correctly in
-df0ad3ecb625b5968522acce8b7d33d68f30b4cb (plus build fixes), and
-systemd-hostnamed is autostarted.
-
-I tried bisecting, but ended up screwing up at some point, and didn't
-fancy restarting again (after about 15 iterations, and having to
-cherry-pick different build fixes every time, sigh), so I started
-testing individual releases.
-
-(4 other working versions)
-5.46 works
-5.47 fails
-
-And after that:
-ef024c2c44b4f0dab3c054d062a911cacef1fdc9 is the first bad commit
-commit ef024c2c44b4f0dab3c054d062a911cacef1fdc9
-Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Date:   Fri Aug 11 15:39:15 2017 +0300
-
-    gdbus: Fix calling GetAll while GetManagedObjects is pending
-    
-    If proxies are created while the client is not ready put them into a
-    pending list so only if they are not found in GetManagedObject reply
-    call GetAll.
-
-:040000 040000 01462de94f24f0f561aab0be34bcfc0935718da7 6917c7faea1135c53fc1d8d9d43d6347952e5d40 M	gdbus
-
-Cheers
