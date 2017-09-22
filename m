@@ -1,22 +1,30 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Hyuk Lee <hyuk0512.lee@samsung.com>
+From: Tomasz Duszynski <tduszyns@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Hyuk Lee <hyuk0512.lee@samsung.com>
-Subject: [PATCH BlueZ] android: Typo fix
-Date: Sun, 24 Sep 2017 12:45:33 +0900
-Message-id: <1506224734-5017-1-git-send-email-hyuk0512.lee@samsung.com>
-References: <CGME20170924034526epcas2p3870504e5a5c5d896ce9698fcae630f85@epcas2p3.samsung.com>
+Subject: [PATCH BlueZ] doc: fix typo
+Date: Fri, 22 Sep 2017 17:56:19 +0200
+Message-Id: <20170922155619.13256-1-tduszyns@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch set fix the typo of android/hidhost.c file.
+s/prevously/previously
+---
+ doc/advertising-api.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Hyuk Lee (1):
-  android: Typo fix
-
- android/hidhost.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
+diff --git a/doc/advertising-api.txt b/doc/advertising-api.txt
+index 36fe130d9..5fc012f06 100644
+--- a/doc/advertising-api.txt
++++ b/doc/advertising-api.txt
+@@ -124,7 +124,7 @@ Methods		RegisterAdvertisement(object advertisement, dict options)
+ 		UnregisterAdvertisement(object advertisement)
+ 
+ 			This unregisters an advertisement that has been
+-			prevously registered.  The object path parameter must
++			previously registered.  The object path parameter must
+ 			match the same value that has been used on registration.
+ 
+ 			Possible errors: org.bluez.Error.InvalidArguments
 -- 
-1.9.1
+2.14.1
 
