@@ -1,107 +1,122 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZLyk6BNNCmyRgT7jdNQqwYRLrW+yX_9KN3EaByqSUFzow@mail.gmail.com>
+In-Reply-To: <CABBYNZLk5BuL9c-8Ly=0yZ0rWa71LwktOrfBeE1B4UT5ch_OTA@mail.gmail.com>
 References: <20170922050002.24002-1-marcin.kraglak@tieto.com>
- <20170922050002.24002-5-marcin.kraglak@tieto.com> <CABBYNZLyk6BNNCmyRgT7jdNQqwYRLrW+yX_9KN3EaByqSUFzow@mail.gmail.com>
+ <20170922050002.24002-2-marcin.kraglak@tieto.com> <e05e1cc3-d78d-ed00-da14-86c7746f7556@jp.fujitsu.com>
+ <CABBYNZLk5BuL9c-8Ly=0yZ0rWa71LwktOrfBeE1B4UT5ch_OTA@mail.gmail.com>
 From: Marcin Kraglak <marcin.kraglak@tieto.com>
-Date: Fri, 22 Sep 2017 04:00:02 -0400
-Message-ID: <CABD6X-LAqGH6r5-OnSmGSxEi=fP-YFU9ssHYb0vO=v+mGdGo8A@mail.gmail.com>
-Subject: Re: [PATCH 4/4] client: Use bt_shell_completion
+Date: Fri, 22 Sep 2017 03:52:49 -0400
+Message-ID: <CABD6X-JMhadihPULzU4cW6hG7SUPtGUyb-5G8GUFZJYK1X4wgA@mail.gmail.com>
+Subject: Re: [PATCH 1/4] shared/bt_shell: Add initial implementation
 To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Cc: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Luiz Eramoto,
 
-On 22 September 2017 at 03:47, Luiz Augusto von Dentz
+On 22 September 2017 at 03:42, Luiz Augusto von Dentz
 <luiz.dentz@gmail.com> wrote:
-> Hi Marcin,
+> Hi Eramoto, Marcin,
 >
-> On Fri, Sep 22, 2017 at 8:00 AM, Marcin Kraglak
-> <marcin.kraglak@tieto.com> wrote:
->> ---
->>  client/main.c | 49 +------------------------------------------------
->>  1 file changed, 1 insertion(+), 48 deletions(-)
+> On Fri, Sep 22, 2017 at 9:27 AM, ERAMOTO Masaya
+> <eramoto.masaya@jp.fujitsu.com> wrote:
+>> Hi Marcin,
 >>
->> diff --git a/client/main.c b/client/main.c
->> index 87019b463..86514f67e 100644
->> --- a/client/main.c
->> +++ b/client/main.c
->> @@ -2564,61 +2564,14 @@ static const struct bt_shell_menu_entry cmd_table[] = {
->>         { }
->>  };
+>>> +#ifdef HAVE_CONFIG_H
+>>> +#include <config.h>
+>>> +#endif
+>>> +
+>>> +#include <stdio.h>
+>>> +#include "src/shared/util.h"
+>>> +#include "src/shared/queue.h"
+>>> +#include "src/shared/bt_shell.h"
+>>> +
+>>> +#define CMD_LENGTH   48
+>>> +
+>>> +static struct {
+>>> +     const struct bt_shell_menu_entry *current;
+>>> +} bt_shell_data;
+>>> +
+>>> +bool bt_shell_init(const struct bt_shell_menu_entry *menu)
+>>> +{
+>>> +     if (bt_shell_data.current || !menu)
+>>> +             return false;
+>>> +
+>>> +     bt_shell_data.current = menu;
+>>> +
+>>> +     return true;
+>>> +}
+>>> +
+>>> +void bt_shell_cleanup(void)
+>>> +{
+>>> +     bt_shell_data.current = NULL;
+>>> +}
+>>> +
+>>> +void bt_shell_process(const char *cmd, const char *arg)
+>>> +{
+>>> +     const struct bt_shell_menu_entry *entry;
+>>> +
+>>> +     if (!bt_shell_data.current || !cmd)
+>>> +             return;
+>>> +
+>>> +     for (entry = bt_shell_data.current; entry->cmd; entry++) {
+>>> +             if (strcmp(cmd, entry->cmd))
+>>> +                     continue;
+>>> +
+>>> +             if (entry->func) {
+>>> +                     entry->func(arg);
+>>> +                     return;
+>>> +             }
+>>> +     }
+>>> +
+>>> +     if (strcmp(cmd, "help")) {
+>>> +             printf("Invalid command\n");
+>>> +             return;
+>>> +     }
+>>> +
+>>> +     bt_shell_print_menu();
+>>> +}
+>>> +
+>>> +void bt_shell_print_menu(void)
+>>> +{
+>>> +     const struct bt_shell_menu_entry *entry;
+>>> +
+>>> +     if (!bt_shell_data.current)
+>>> +             return;
+>>> +
+>>> +     printf("Available commands:\n");
+>>> +     for (entry = bt_shell_data.current; entry->cmd; entry++) {
+>>> +             printf("  %s %-*s %s\n", entry->cmd,
+>>> +                                     (int)(CMD_LENGTH - strlen(entry->cmd)),
+>>> +                                     entry->arg ? : "", entry->desc ? : "");
 >>
->> -static char *cmd_generator(const char *text, int state)
->> -{
->> -       static int index, len;
->> -       const char *cmd;
->> -
->> -       if (!state) {
->> -               index = 0;
->> -               len = strlen(text);
->> -       }
->> -
->> -       while ((cmd = cmd_table[index].cmd)) {
->> -               index++;
->> -
->> -               if (!strncmp(cmd, text, len))
->> -                       return strdup(cmd);
->> -       }
->> -
->> -       return NULL;
->> -}
->> -
->>  static char **cmd_completion(const char *text, int start, int end)
->>  {
->> -       char **matches = NULL;
->> -
->>         if (agent_completion() == TRUE) {
->>                 rl_attempted_completion_over = 1;
->>                 return NULL;
->>         }
 >>
->> -       if (start > 0) {
->> -               int i;
->> -               char *input_cmd;
->> -
->> -               input_cmd = g_strndup(rl_line_buffer, start -1);
->> -               for (i = 0; cmd_table[i].cmd; i++) {
->> -                       if (strcmp(cmd_table[i].cmd, input_cmd))
->> -                               continue;
->> -
->> -                       if (!cmd_table[i].gen)
->> -                               continue;
->> -
->> -                       rl_completion_display_matches_hook = cmd_table[i].disp;
->> -                       matches = rl_completion_matches(text, cmd_table[i].gen);
->> -                       break;
->> -               }
->> -               g_free(input_cmd);
->> -       } else {
->> -               rl_completion_display_matches_hook = NULL;
->> -               matches = rl_completion_matches(text, cmd_generator);
->> -       }
->> -
->> -       if (!matches)
->> -               rl_attempted_completion_over = 1;
->> -
->> -       return matches;
->> +       return bt_shell_completion(text, start, end);
->>  }
+>> I think that it is better to
+>>   - add some white-spaces
+>> or
+>>   - add a new line
+>> between the argument string and the description string, because it is a little
+>> difficult for the help of register-characteristic to read as below:
+>>
+>>   [bluetooth]# help
+>>   Available commands:
+>>   ...
+>>     unregister-service <UUID/object>                  Unregister application service
+>>     register-characteristic <UUID> <Flags=read,write,notify...> Register application characteristic
+>>     unregister-characteristic <UUID/object>           Unregister application characteristic
+>>     register-descriptor <UUID> <Flags=read,write...>  Register application descriptor
 >
-> While this is great as we reuse more code I think we better move the
-> whole input handling into the bt_shell so the application don't even
-> need to call bt_shell_completion, etc.
+> It should probably have the same formatting as bluetoothctl:
+>
+> https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/client/main.c#n2677
 >
 > --
 > Luiz Augusto von Dentz
 
-You mean bt_shell should set rl_attempted_completion_function in
-bt_shell_init() (then bt_shell_completion is not exposed)?
-
-
+Yes, I'll correct it
 
 -- 
 BR
