@@ -1,44 +1,42 @@
-Return-Path: <linux-crypto-owner@vger.kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Subject: Re: [RFC PATCH 0/2] let the crypto subsystem generate the ecc privkey
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20170921154742.5631-1-tudor.ambarus@microchip.com>
-Date: Sun, 24 Sep 2017 21:35:54 +0200
-Cc: "bluez mailin list (linux-bluetooth@vger.kernel.org)"
-        <linux-bluetooth@vger.kernel.org>, linux-crypto@vger.kernel.org
-Message-Id: <FF969547-CA3C-4C5A-8628-5EE8D201C165@holtmann.org>
-References: <20170921154742.5631-1-tudor.ambarus@microchip.com>
-To: Tudor Ambarus <tudor.ambarus@microchip.com>
-Sender: linux-crypto-owner@vger.kernel.org
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+MIME-Version: 1.0
+In-Reply-To: <20170924122814.29703-1-tduszyns@gmail.com>
+References: <20170924122814.29703-1-tduszyns@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Sun, 24 Sep 2017 20:59:28 +0300
+Message-ID: <CABBYNZK=QTw=O481k_PyEmHw5n-UbuuT2N4=325VRonpTh6=DA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] doc: fix typo
+To: Tomasz Duszynski <tduszyns@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Tudor,
+Hi Tomasz,
 
-> That Bluetooth SMP knows about the private key is pointless, since the
-> detection of debug key usage is actually via the public key portion.
-> With this patch set, the Bluetooth SMP will stop keeping a copy of the
-> ecdh private key, except when using debug keys. This way we let the
-> crypto subsystem to generate and handle the ecdh private key,
-> potentially benefiting of hardware ecc private key generation and
-> retention.
-> 
-> Tested with selftest and with btmon and smp-tester on top of hci_vhci,
-> with ecdh done in both software and hardware (through atmel-ecc driver).
-> All tests passed.
-> 
-> Tudor Ambarus (2):
->  Bluetooth: move ecdh allocation outside of ecdh_helper
->  Bluetooth: let the crypto subsystem generate the ecc privkey
-> 
-> net/bluetooth/ecdh_helper.c | 138 ++++++++++++++++++--------------------------
-> net/bluetooth/ecdh_helper.h |   8 ++-
-> net/bluetooth/selftest.c    |  29 +++++++---
-> net/bluetooth/smp.c         | 120 ++++++++++++++++++++++++--------------
-> 4 files changed, 159 insertions(+), 136 deletions(-)
+On Sun, Sep 24, 2017 at 3:28 PM, Tomasz Duszynski <tduszyns@gmail.com> wrote:
+> s/parser/parsed
+> ---
+>  doc/advertising-api.txt | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/doc/advertising-api.txt b/doc/advertising-api.txt
+> index 36fe130d9..e432fb074 100644
+> --- a/doc/advertising-api.txt
+> +++ b/doc/advertising-api.txt
+> @@ -107,7 +107,7 @@ Methods             RegisterAdvertisement(object advertisement, dict options)
+>                         InvalidLength error indicates that the data
+>                         provided generates a data packet which is too long.
+>
+> -                       The properties of this object are parser when it is
+> +                       The properties of this object are parsed when it is
+>                         registered, and any changes are ignored.
+>
+>                         If the same object is registered twice it will result in
+> --
+> 2.14.1
 
-I only saw the cover letter and the patches never made it to the mailing list.
+Could you please merge all the typo fixes?
 
-Regards
-
-Marcel
+-- 
+Luiz Augusto von Dentz
