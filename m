@@ -1,92 +1,30 @@
-Return-Path: <mvdwege@gmail.com>
-Date: Sun, 24 Sep 2017 16:53:54 +0200
-From: Mart van de Wege <mvdwege@gmail.com>
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg
- <johan.hedberg@intel.com>, Gustavo Padovan <gustavo@padovan.org>,
- linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-rt-users@vger.kernel.org, tglx@linutronix.de, Peter Zijlstra
- <peterz@infradead.org>
-Subject: Re: [PATCH] Bluetooth: avoid recursive locking in
- hci_send_to_channel()
-Message-ID: <20170924165354.33a5da4d@gmail.com>
-In-Reply-To: <20170921135123.rgzacdgfonqftlu7@linutronix.de>
-References: <86val4928u.fsf@gaheris.avalon.lan>
-	<20170831145211.xlu6cvocqdkzevsl@linutronix.de>
-	<20170921135123.rgzacdgfonqftlu7@linutronix.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Tomasz Duszynski <tduszyns@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ] doc: fix typo
+Date: Sun, 24 Sep 2017 14:28:14 +0200
+Message-Id: <20170924122814.29703-1-tduszyns@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Confirm that 4.11.12-rt14 with this fix boots normally.
+s/parser/parsed
+---
+ doc/advertising-api.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-On Thu, 21 Sep 2017 15:51:23 +0200
-Sebastian Andrzej Siewior <bigeasy@linutronix.de> wrote:
+diff --git a/doc/advertising-api.txt b/doc/advertising-api.txt
+index 36fe130d9..e432fb074 100644
+--- a/doc/advertising-api.txt
++++ b/doc/advertising-api.txt
+@@ -107,7 +107,7 @@ Methods		RegisterAdvertisement(object advertisement, dict options)
+ 			InvalidLength error indicates that the data
+ 			provided generates a data packet which is too long.
+ 
+-			The properties of this object are parser when it is
++			The properties of this object are parsed when it is
+ 			registered, and any changes are ignored.
+ 
+ 			If the same object is registered twice it will result in
+-- 
+2.14.1
 
-> Mart reported a deadlock in -RT in the call path:
->   hci_send_monitor_ctrl_event() -> hci_send_to_channel()
-> 
-> because both functions acquire the same read lock hci_sk_list.lock.
-> This is also a mainline issue because the qrwlock implementation is
-> writer fair (the traditional rwlock implementation is reader biased).
-> 
-> To avoid the deadlock there is now __hci_send_to_channel() which
-> expects the readlock to be held.
-> 
-> Cc: Marcel Holtmann <marcel@holtmann.org>
-> Cc: Johan Hedberg <johan.hedberg@intel.com>
-> Fixes: 38ceaa00d02d ("Bluetooth: Add support for sending MGMT
-> commands and events to monitor") Reported-by: Mart van de Wege
-> <mvdwege@gmail.com> Signed-off-by: Sebastian Andrzej Siewior
-> <bigeasy@linutronix.de> ---
->  net/bluetooth/hci_sock.c | 17 +++++++++++------
->  1 file changed, 11 insertions(+), 6 deletions(-)
-> 
-> diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
-> index 638bf0e1a2e3..f1ee820d871c 100644
-> --- a/net/bluetooth/hci_sock.c
-> +++ b/net/bluetooth/hci_sock.c
-> @@ -251,15 +251,13 @@ void hci_send_to_sock(struct hci_dev *hdev,
-> struct sk_buff *skb) }
->  
->  /* Send frame to sockets with specific channel */
-> -void hci_send_to_channel(unsigned short channel, struct sk_buff *skb,
-> -			 int flag, struct sock *skip_sk)
-> +static void __hci_send_to_channel(unsigned short channel, struct
-> sk_buff *skb,
-> +				  int flag, struct sock *skip_sk)
->  {
->  	struct sock *sk;
->  
->  	BT_DBG("channel %u len %d", channel, skb->len);
->  
-> -	read_lock(&hci_sk_list.lock);
-> -
->  	sk_for_each(sk, &hci_sk_list.head) {
->  		struct sk_buff *nskb;
->  
-> @@ -285,6 +283,13 @@ void hci_send_to_channel(unsigned short channel,
-> struct sk_buff *skb, kfree_skb(nskb);
->  	}
->  
-> +}
-> +
-> +void hci_send_to_channel(unsigned short channel, struct sk_buff *skb,
-> +			 int flag, struct sock *skip_sk)
-> +{
-> +	read_lock(&hci_sk_list.lock);
-> +	__hci_send_to_channel(channel, skb, flag, skip_sk);
->  	read_unlock(&hci_sk_list.lock);
->  }
->  
-> @@ -388,8 +393,8 @@ void hci_send_monitor_ctrl_event(struct hci_dev
-> *hdev, u16 event, hdr->index = index;
->  		hdr->len = cpu_to_le16(skb->len - HCI_MON_HDR_SIZE);
->  
-> -		hci_send_to_channel(HCI_CHANNEL_MONITOR, skb,
-> -				    HCI_SOCK_TRUSTED, NULL);
-> +		__hci_send_to_channel(HCI_CHANNEL_MONITOR, skb,
-> +				      HCI_SOCK_TRUSTED, NULL);
->  		kfree_skb(skb);
->  	}
->  
