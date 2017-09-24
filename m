@@ -1,36 +1,44 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: bugzilla-daemon@bugzilla.kernel.org
-To: linux-bluetooth@kernel.org
-Subject: [Bug 110901] Macbook8,1 12-inch (Early 2015) Bluetooth not working
-Date: Sun, 24 Sep 2017 22:41:27 +0000
-Message-ID: <bug-110901-62941-JrRP8odJYU@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-110901-62941@https.bugzilla.kernel.org/>
-References: <bug-110901-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <linux-crypto-owner@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+Subject: Re: [RFC PATCH 0/2] let the crypto subsystem generate the ecc privkey
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20170921154742.5631-1-tudor.ambarus@microchip.com>
+Date: Sun, 24 Sep 2017 21:35:54 +0200
+Cc: "bluez mailin list (linux-bluetooth@vger.kernel.org)"
+        <linux-bluetooth@vger.kernel.org>, linux-crypto@vger.kernel.org
+Message-Id: <FF969547-CA3C-4C5A-8628-5EE8D201C165@holtmann.org>
+References: <20170921154742.5631-1-tudor.ambarus@microchip.com>
+To: Tudor Ambarus <tudor.ambarus@microchip.com>
+Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-https://bugzilla.kernel.org/show_bug.cgi?id=110901
+Hi Tudor,
 
---- Comment #46 from Leif Liddy (leif.liddy@gmail.com) ---
-Cool, thanks for the update.
+> That Bluetooth SMP knows about the private key is pointless, since the
+> detection of debug key usage is actually via the public key portion.
+> With this patch set, the Bluetooth SMP will stop keeping a copy of the
+> ecdh private key, except when using debug keys. This way we let the
+> crypto subsystem to generate and handle the ecdh private key,
+> potentially benefiting of hardware ecc private key generation and
+> retention.
+> 
+> Tested with selftest and with btmon and smp-tester on top of hci_vhci,
+> with ecdh done in both software and hardware (through atmel-ecc driver).
+> All tests passed.
+> 
+> Tudor Ambarus (2):
+>  Bluetooth: move ecdh allocation outside of ecdh_helper
+>  Bluetooth: let the crypto subsystem generate the ecc privkey
+> 
+> net/bluetooth/ecdh_helper.c | 138 ++++++++++++++++++--------------------------
+> net/bluetooth/ecdh_helper.h |   8 ++-
+> net/bluetooth/selftest.c    |  29 +++++++---
+> net/bluetooth/smp.c         | 120 ++++++++++++++++++++++++--------------
+> 4 files changed, 159 insertions(+), 136 deletions(-)
 
-I managed to get bluetooth working on a 4.14-rc1 kernel after applying 
+I only saw the cover letter and the patches never made it to the mailing list.
 
-l1k's hci_bcm.c patch
-https://github.com/torvalds/linux/compare/master...l1k:hci_bcm
+Regards
 
-and roadrunner2's hci_bcm.c and hci_ldisc.c patches
-https://github.com/l1k/linux/pull/1/files/61c59e8b2a7f129a339608610069a26f4181c82a..7dd4a90a92b97b017d9210899afcfbe985b10509
-
-There's a pull request to include roadrunner's patches in l1k's repo. Work is
-also being done to port the patches to 4.14 (I just did it manually)
-So, this all be cleaned up in the near future. 
-
-You can read more about the current status on the link Christoph posted:
-https://github.com/Dunedan/mbp-2016-linux/issues/29
-
--- 
-You are receiving this mail because:
-You are the assignee for the bug.
+Marcel
