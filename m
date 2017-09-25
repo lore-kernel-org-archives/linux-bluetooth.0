@@ -1,33 +1,37 @@
-Return-Path: <linux-kernel-owner@vger.kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Subject: Re: [PATCH] Bluetooth: btmrvl: *_err() and *_info() strings should
- end with newlines
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <4f30b7d1f1933dadaa9a9af8adc66b85b67bb573.1506324921.git.arvind.yadav.cs@gmail.com>
-Date: Mon, 25 Sep 2017 15:35:48 +0200
-Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        "bluez mailin list (linux-bluetooth@vger.kernel.org)"
-        <linux-bluetooth@vger.kernel.org>, linux-kernel@vger.kernel.org
-Message-Id: <72948618-3BAB-4AE0-9AF7-B04074D89DD9@holtmann.org>
-References: <4f30b7d1f1933dadaa9a9af8adc66b85b67bb573.1506324921.git.arvind.yadav.cs@gmail.com>
-To: Arvind Yadav <arvind.yadav.cs@gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
+Return-Path: <luiz.dentz@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <20170925121536.GA30279@x1c>
+References: <20170823225839.461-1-yunhanw@google.com> <D2A056DB-B533-4CAC-BCB8-19C39760E05F@holtmann.org>
+ <CALvjcs-b3M9A6sdy80pakUwRHxBueuxpxvrpZt2SBhz=xDTK6g@mail.gmail.com>
+ <CALvjcs-0POiT-inDdF8oxheHL=z6acK5E03QRtUwbHZnxcf37Q@mail.gmail.com>
+ <CALvjcs8UK5Lik=CvU-vYzZ2=nrQh+BKy21isgs2Xh_yq4q9svA@mail.gmail.com>
+ <CALvjcs8rzxTCLP72GoiCmEBw7H=rDzreP+c_NytL-2weCRXT6Q@mail.gmail.com> <20170925121536.GA30279@x1c>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Mon, 25 Sep 2017 16:22:05 +0300
+Message-ID: <CABBYNZL=9f+chXKzvom+UQRxBw8i37Ng2dFu-_54cCuaU0jJrg@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] build: use abspath for lib/bluetooth
+To: Yunhan Wang <yunhanw@google.com>, Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arvind,
+Hi Yunhan,
 
-> pr_err(), dev_err() and pr_info() messages should terminated with
-> a new-line to avoid other messages being concatenated onto the end.
-> 
-> Signed-off-by: Arvind Yadav <arvind.yadav.cs@gmail.com>
-> ---
-> drivers/bluetooth/btmrvl_sdio.c | 6 +++---
-> 1 file changed, 3 insertions(+), 3 deletions(-)
+On Mon, Sep 25, 2017 at 3:15 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi Yunhan,
+>
+> On Sun, Sep 24, 2017, Yunhan Wang wrote:
+>> Can anyone take a further review?
+>
+> I think Marcel is still waiting for confirmation that this works with
+> fakeroot (at least I didn't see that you would have confirmed it). I
+> tried that myself just now and seems to work fine, so no objections from
+> me for merging.
+>
+> Johan
 
-patch has been applied to bluetooth-next tree.
+Applied, thanks.
 
-Regards
-
-Marcel
+-- 
+Luiz Augusto von Dentz
