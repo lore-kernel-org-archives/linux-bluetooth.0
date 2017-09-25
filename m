@@ -1,48 +1,40 @@
-Return-Path: <Tudor.Ambarus@microchip.com>
-Subject: Re: [RESEND RFC PATCH 1/2] Bluetooth: move ecdh allocation outside of
- ecdh_helper
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: <linux-bluetooth@vger.kernel.org>, <linux-crypto@vger.kernel.org>
-References: <20170925102356.4427-1-tudor.ambarus@microchip.com>
- <20170925102356.4427-2-tudor.ambarus@microchip.com>
- <F95FB3E8-B1A5-4EB5-ABB5-50C8BD16D51C@holtmann.org>
-From: Tudor Ambarus <tudor.ambarus@microchip.com>
-Message-ID: <9f64b6c7-6171-6d01-ed7e-64b9009d193d@microchip.com>
-Date: Mon, 25 Sep 2017 19:11:12 +0300
-MIME-Version: 1.0
-In-Reply-To: <F95FB3E8-B1A5-4EB5-ABB5-50C8BD16D51C@holtmann.org>
-Content-Type: text/plain; charset="utf-8"; format=flowed
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Tomasz Duszynski <tduszyns@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ] doc: fix typos
+Date: Mon, 25 Sep 2017 17:53:52 +0200
+Message-Id: <20170925155352.21203-1-tduszyns@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi, Marcel,
+s/parser/parsed
+s/prevously/previously
+---
+ doc/advertising-api.txt | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-On 09/25/2017 04:02 PM, Marcel Holtmann wrote:
+diff --git a/doc/advertising-api.txt b/doc/advertising-api.txt
+index 36fe130d9..7cc183043 100644
+--- a/doc/advertising-api.txt
++++ b/doc/advertising-api.txt
+@@ -107,7 +107,7 @@ Methods		RegisterAdvertisement(object advertisement, dict options)
+ 			InvalidLength error indicates that the data
+ 			provided generates a data packet which is too long.
+ 
+-			The properties of this object are parser when it is
++			The properties of this object are parsed when it is
+ 			registered, and any changes are ignored.
+ 
+ 			If the same object is registered twice it will result in
+@@ -124,7 +124,7 @@ Methods		RegisterAdvertisement(object advertisement, dict options)
+ 		UnregisterAdvertisement(object advertisement)
+ 
+ 			This unregisters an advertisement that has been
+-			prevously registered.  The object path parameter must
++			previously registered.  The object path parameter must
+ 			match the same value that has been used on registration.
+ 
+ 			Possible errors: org.bluez.Error.InvalidArguments
+-- 
+2.14.1
 
->> diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
->> index a0ef897..6532689 100644
->> --- a/net/bluetooth/smp.c
->> +++ b/net/bluetooth/smp.c
-
-[cut]
-
->> @@ -2677,7 +2695,16 @@ static int smp_cmd_public_key(struct l2cap_conn *conn, struct sk_buff *skb)
->> 	SMP_DBG("Remote Public Key X: %32phN", smp->remote_pk);
->> 	SMP_DBG("Remote Public Key Y: %32phN", smp->remote_pk + 32);
->>
->> -	if (!compute_ecdh_secret(smp->remote_pk, smp->local_sk, smp->dhkey))
->> +	if (test_bit(SMP_FLAG_LOCAL_OOB, &smp->flags)) {
->> +		struct smp_dev *smp_dev = chan->data;
->> +
->> +		tfm = smp_dev->tfm_ecdh;
->> +	} else {
->> +		tfm = smp->tfm_ecdh;
->> +	}
-> 
-> this looks all good, but I do not understand the need of this extra if clause here. Can you explain why OOB case is different or maybe add some comment in the code to make this clear.
-
-This particular change should have been in patch 2/2.
-It's needed because I need to compute the shared secret on the
-same tfm on which the private key was set/generated.
-
-Thanks,
-ta
