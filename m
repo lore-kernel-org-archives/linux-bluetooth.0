@@ -1,51 +1,31 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] profile: Fix printing error when disconnecting
-Date: Mon, 25 Sep 2017 15:43:19 +0300
-Message-Id: <20170925124319.24329-1-luiz.dentz@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <johan.hedberg@gmail.com>
+Date: Mon, 25 Sep 2017 15:15:36 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Yunhan Wang <yunhanw@google.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ] build: use abspath for lib/bluetooth
+Message-ID: <20170925121536.GA30279@x1c>
+References: <20170823225839.461-1-yunhanw@google.com>
+ <D2A056DB-B533-4CAC-BCB8-19C39760E05F@holtmann.org>
+ <CALvjcs-b3M9A6sdy80pakUwRHxBueuxpxvrpZt2SBhz=xDTK6g@mail.gmail.com>
+ <CALvjcs-0POiT-inDdF8oxheHL=z6acK5E03QRtUwbHZnxcf37Q@mail.gmail.com>
+ <CALvjcs8UK5Lik=CvU-vYzZ2=nrQh+BKy21isgs2Xh_yq4q9svA@mail.gmail.com>
+ <CALvjcs8rzxTCLP72GoiCmEBw7H=rDzreP+c_NytL-2weCRXT6Q@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CALvjcs8rzxTCLP72GoiCmEBw7H=rDzreP+c_NytL-2weCRXT6Q@mail.gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Yunhan,
 
-Some profiles may shutdown the socket when disconnecting which can
-cause the following error:
+On Sun, Sep 24, 2017, Yunhan Wang wrote:
+> Can anyone take a further review?
 
-bluetoothd[816]: Unable to get io data for hfp_hf: getpeername: Transport endpoint is not connected (107)
----
- src/profile.c | 11 ++---------
- 1 file changed, 2 insertions(+), 9 deletions(-)
+I think Marcel is still waiting for confirmation that this works with
+fakeroot (at least I didn't see that you would have confirmed it). I
+tried that myself just now and seems to work fine, so no objections from
+me for merging.
 
-diff --git a/src/profile.c b/src/profile.c
-index 7c5318caf..b23e89088 100644
---- a/src/profile.c
-+++ b/src/profile.c
-@@ -787,22 +787,15 @@ static gboolean ext_io_disconnected(GIOChannel *io, GIOCondition cond,
- {
- 	struct ext_io *conn = user_data;
- 	struct ext_profile *ext = conn->ext;
--	GError *gerr = NULL;
- 	char addr[18];
- 
- 	if (cond & G_IO_NVAL)
- 		return FALSE;
- 
--	bt_io_get(io, &gerr, BT_IO_OPT_DEST, addr, BT_IO_OPT_INVALID);
--	if (gerr != NULL) {
--		error("Unable to get io data for %s: %s",
--						ext->name, gerr->message);
--		g_error_free(gerr);
--		goto drop;
--	}
-+	ba2str(device_get_address(conn->device), addr);
- 
- 	DBG("%s disconnected from %s", ext->name, addr);
--drop:
-+
- 	if (conn->service) {
- 		if (btd_service_get_state(conn->service) ==
- 						BTD_SERVICE_STATE_CONNECTING)
--- 
-2.13.5
-
+Johan
