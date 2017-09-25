@@ -1,40 +1,33 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Tomasz Duszynski <tduszyns@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] doc: fix typos
-Date: Mon, 25 Sep 2017 17:53:52 +0200
-Message-Id: <20170925155352.21203-1-tduszyns@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+Subject: Re: [PATCH] Bluetooth: btmrvl: *_err() and *_info() strings should
+ end with newlines
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <4f30b7d1f1933dadaa9a9af8adc66b85b67bb573.1506324921.git.arvind.yadav.cs@gmail.com>
+Date: Mon, 25 Sep 2017 15:35:48 +0200
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        "bluez mailin list (linux-bluetooth@vger.kernel.org)"
+        <linux-bluetooth@vger.kernel.org>, linux-kernel@vger.kernel.org
+Message-Id: <72948618-3BAB-4AE0-9AF7-B04074D89DD9@holtmann.org>
+References: <4f30b7d1f1933dadaa9a9af8adc66b85b67bb573.1506324921.git.arvind.yadav.cs@gmail.com>
+To: Arvind Yadav <arvind.yadav.cs@gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-s/parser/parsed
-s/prevously/previously
----
- doc/advertising-api.txt | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Hi Arvind,
 
-diff --git a/doc/advertising-api.txt b/doc/advertising-api.txt
-index 36fe130d9..7cc183043 100644
---- a/doc/advertising-api.txt
-+++ b/doc/advertising-api.txt
-@@ -107,7 +107,7 @@ Methods		RegisterAdvertisement(object advertisement, dict options)
- 			InvalidLength error indicates that the data
- 			provided generates a data packet which is too long.
- 
--			The properties of this object are parser when it is
-+			The properties of this object are parsed when it is
- 			registered, and any changes are ignored.
- 
- 			If the same object is registered twice it will result in
-@@ -124,7 +124,7 @@ Methods		RegisterAdvertisement(object advertisement, dict options)
- 		UnregisterAdvertisement(object advertisement)
- 
- 			This unregisters an advertisement that has been
--			prevously registered.  The object path parameter must
-+			previously registered.  The object path parameter must
- 			match the same value that has been used on registration.
- 
- 			Possible errors: org.bluez.Error.InvalidArguments
--- 
-2.14.1
+> pr_err(), dev_err() and pr_info() messages should terminated with
+> a new-line to avoid other messages being concatenated onto the end.
+> 
+> Signed-off-by: Arvind Yadav <arvind.yadav.cs@gmail.com>
+> ---
+> drivers/bluetooth/btmrvl_sdio.c | 6 +++---
+> 1 file changed, 3 insertions(+), 3 deletions(-)
 
+patch has been applied to bluetooth-next tree.
+
+Regards
+
+Marcel
