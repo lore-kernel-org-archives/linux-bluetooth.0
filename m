@@ -1,52 +1,45 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <yunhanw@google.com>
 MIME-Version: 1.0
-In-Reply-To: <20170925155352.21203-1-tduszyns@gmail.com>
-References: <20170925155352.21203-1-tduszyns@gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 26 Sep 2017 15:07:26 +0300
-Message-ID: <CABBYNZLE2aJ2ehn+AY=v3_j+y0s5xG8wPTV8Gd_2X-Sx1n6fFQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] doc: fix typos
-To: Tomasz Duszynski <tduszyns@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <CABBYNZL=9f+chXKzvom+UQRxBw8i37Ng2dFu-_54cCuaU0jJrg@mail.gmail.com>
+References: <20170823225839.461-1-yunhanw@google.com> <D2A056DB-B533-4CAC-BCB8-19C39760E05F@holtmann.org>
+ <CALvjcs-b3M9A6sdy80pakUwRHxBueuxpxvrpZt2SBhz=xDTK6g@mail.gmail.com>
+ <CALvjcs-0POiT-inDdF8oxheHL=z6acK5E03QRtUwbHZnxcf37Q@mail.gmail.com>
+ <CALvjcs8UK5Lik=CvU-vYzZ2=nrQh+BKy21isgs2Xh_yq4q9svA@mail.gmail.com>
+ <CALvjcs8rzxTCLP72GoiCmEBw7H=rDzreP+c_NytL-2weCRXT6Q@mail.gmail.com>
+ <20170925121536.GA30279@x1c> <CABBYNZL=9f+chXKzvom+UQRxBw8i37Ng2dFu-_54cCuaU0jJrg@mail.gmail.com>
+From: Yunhan Wang <yunhanw@google.com>
+Date: Mon, 25 Sep 2017 15:39:49 -0700
+Message-ID: <CALvjcs-P4U6vV7mx7pyqNQvpFgwypEU7SoW+qPQte=BAS3x-4Q@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] build: use abspath for lib/bluetooth
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Tomasz,
+Thank you. All
 
-On Mon, Sep 25, 2017 at 6:53 PM, Tomasz Duszynski <tduszyns@gmail.com> wrote:
-> s/parser/parsed
-> s/prevously/previously
-> ---
->  doc/advertising-api.txt | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+Best wishes
+Yunhan
+
+On Mon, Sep 25, 2017 at 6:22 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi Yunhan,
 >
-> diff --git a/doc/advertising-api.txt b/doc/advertising-api.txt
-> index 36fe130d9..7cc183043 100644
-> --- a/doc/advertising-api.txt
-> +++ b/doc/advertising-api.txt
-> @@ -107,7 +107,7 @@ Methods             RegisterAdvertisement(object advertisement, dict options)
->                         InvalidLength error indicates that the data
->                         provided generates a data packet which is too long.
+> On Mon, Sep 25, 2017 at 3:15 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+>> Hi Yunhan,
+>>
+>> On Sun, Sep 24, 2017, Yunhan Wang wrote:
+>>> Can anyone take a further review?
+>>
+>> I think Marcel is still waiting for confirmation that this works with
+>> fakeroot (at least I didn't see that you would have confirmed it). I
+>> tried that myself just now and seems to work fine, so no objections from
+>> me for merging.
+>>
+>> Johan
 >
-> -                       The properties of this object are parser when it is
-> +                       The properties of this object are parsed when it is
->                         registered, and any changes are ignored.
+> Applied, thanks.
 >
->                         If the same object is registered twice it will result in
-> @@ -124,7 +124,7 @@ Methods             RegisterAdvertisement(object advertisement, dict options)
->                 UnregisterAdvertisement(object advertisement)
->
->                         This unregisters an advertisement that has been
-> -                       prevously registered.  The object path parameter must
-> +                       previously registered.  The object path parameter must
->                         match the same value that has been used on registration.
->
->                         Possible errors: org.bluez.Error.InvalidArguments
 > --
-> 2.14.1
-
-Applied, thanks.
-
--- 
-Luiz Augusto von Dentz
+> Luiz Augusto von Dentz
