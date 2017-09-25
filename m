@@ -1,11 +1,10 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Subject: [PATCH BlueZ v2 4/5] client: Use existing function for parsing
- argument
+Subject: [PATCH BlueZ v2 3/5] client: Prevent to pass invalid ad type to D-Bus
 From: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
 To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 References: <f2c9e252-ce40-25e7-c814-84247157ce6d@jp.fujitsu.com>
-Message-ID: <42b4c048-887b-6b7c-1aac-d3a12c9d1911@jp.fujitsu.com>
-Date: Mon, 25 Sep 2017 13:33:44 +0900
+Message-ID: <fd572e1e-acdf-2aa0-8fae-bb61b0f6edf0@jp.fujitsu.com>
+Date: Mon, 25 Sep 2017 13:33:25 +0900
 MIME-Version: 1.0
 In-Reply-To: <f2c9e252-ce40-25e7-c814-84247157ce6d@jp.fujitsu.com>
 Content-Type: text/plain; charset="utf-8"
@@ -13,39 +12,23 @@ Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- client/main.c | 16 +++-------------
- 1 file changed, 3 insertions(+), 13 deletions(-)
+ client/advertising.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/client/main.c b/client/main.c
-index 91b728a..3dadd5b 100644
---- a/client/main.c
-+++ b/client/main.c
-@@ -2368,22 +2368,12 @@ static void cmd_set_advertise_manufacturer(const char *arg)
- 
- static void cmd_set_advertise_tx_power(const char *arg)
+diff --git a/client/advertising.c b/client/advertising.c
+index bfdebd5..76cee3d 100644
+--- a/client/advertising.c
++++ b/client/advertising.c
+@@ -131,7 +131,7 @@ static gboolean get_type(const GDBusPropertyTable *property,
  {
--	if (arg == NULL || strlen(arg) == 0) {
--		rl_printf("Missing on/off argument\n");
--		return;
--	}
--
--	if (strcmp(arg, "on") == 0 || strcmp(arg, "yes") == 0) {
--		ad_advertise_tx_power(dbus_conn, true);
--		return;
--	}
-+	dbus_bool_t powered;
+ 	const char *type = "peripheral";
  
--	if (strcmp(arg, "off") == 0 || strcmp(arg, "no") == 0) {
--		ad_advertise_tx_power(dbus_conn, false);
-+	if (parse_argument_on_off(arg, &powered) == FALSE)
- 		return;
--	}
+-	if (!ad.type || strlen(ad.type) > 0)
++	if (ad.type && strlen(ad.type) > 0)
+ 		type = ad.type;
  
--	rl_printf("Invalid argument\n");
-+	ad_advertise_tx_power(dbus_conn, powered);
- }
- 
- static void cmd_set_advertise_name(const char *arg)
+ 	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &type);
 -- 
 2.7.4
+
 
