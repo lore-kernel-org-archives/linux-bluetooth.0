@@ -1,34 +1,52 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Message-ID: <59cb68f2.8403630a.d2376.bab9@mx.google.com>
-Date: Wed, 27 Sep 2017 14:33:33 +0530
-From: Shermin Joy <shermin.joy@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [RFC 0/2] Use address resolution in the controller to enable device
- filtering when peers use RPA
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170925155352.21203-1-tduszyns@gmail.com>
+References: <20170925155352.21203-1-tduszyns@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Tue, 26 Sep 2017 15:07:26 +0300
+Message-ID: <CABBYNZLE2aJ2ehn+AY=v3_j+y0s5xG8wPTV8Gd_2X-Sx1n6fFQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] doc: fix typos
+To: Tomasz Duszynski <tduszyns@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Currently, host cannot not use whitelist if any of the peer devices
-in the pending reports or connections uses RPA. If address
-resolution is enabled in the controller, then the peer using RPA can
-be added to the resolving list if its IRK is known. If all the peers 
-using RPA can be added to the resolving list, then whitelist can be
-enabled.
+Hi Tomasz,
 
-Shermin Joy (2):
-  Add HCI commands to enable address resolution in controller
-  Use whitelist along with resolving list to enable device filtering
+On Mon, Sep 25, 2017 at 6:53 PM, Tomasz Duszynski <tduszyns@gmail.com> wrote:
+> s/parser/parsed
+> s/prevously/previously
+> ---
+>  doc/advertising-api.txt | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/doc/advertising-api.txt b/doc/advertising-api.txt
+> index 36fe130d9..7cc183043 100644
+> --- a/doc/advertising-api.txt
+> +++ b/doc/advertising-api.txt
+> @@ -107,7 +107,7 @@ Methods             RegisterAdvertisement(object advertisement, dict options)
+>                         InvalidLength error indicates that the data
+>                         provided generates a data packet which is too long.
+>
+> -                       The properties of this object are parser when it is
+> +                       The properties of this object are parsed when it is
+>                         registered, and any changes are ignored.
+>
+>                         If the same object is registered twice it will result in
+> @@ -124,7 +124,7 @@ Methods             RegisterAdvertisement(object advertisement, dict options)
+>                 UnregisterAdvertisement(object advertisement)
+>
+>                         This unregisters an advertisement that has been
+> -                       prevously registered.  The object path parameter must
+> +                       previously registered.  The object path parameter must
+>                         match the same value that has been used on registration.
+>
+>                         Possible errors: org.bluez.Error.InvalidArguments
+> --
+> 2.14.1
 
- include/net/bluetooth/hci.h      |  25 +++++
- include/net/bluetooth/hci_core.h |   7 ++
- net/bluetooth/hci_core.c         |  26 +++++
- net/bluetooth/hci_event.c        | 107 ++++++++++++++++++++
- net/bluetooth/hci_request.c      | 213 +++++++++++++++++++++++++++++++++++++--
- net/bluetooth/hci_request.h      |   4 +
- 6 files changed, 371 insertions(+), 11 deletions(-)
+Applied, thanks.
 
 -- 
-1.9.1
-
+Luiz Augusto von Dentz
