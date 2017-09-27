@@ -1,291 +1,184 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Szymon Janc <szymon.janc@codecoup.pl>
+To: Bastien Nocera <hadess@hadess.net>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 3/9] sixaxis: Ask user whether cable configuration should be allowed
+Date: Wed, 27 Sep 2017 11:14:24 +0200
+Message-ID: <5909706.3V1B56IrXH@ix>
+In-Reply-To: <20170904181212.5639-3-hadess@hadess.net>
+References: <20170904181212.5639-1-hadess@hadess.net> <20170904181212.5639-3-hadess@hadess.net>
 MIME-Version: 1.0
-In-Reply-To: <59cb6941.c5a6620a.7783d.deb6@mx.google.com>
-References: <59cb6941.c5a6620a.7783d.deb6@mx.google.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 27 Sep 2017 12:49:38 +0300
-Message-ID: <CABBYNZK0dT=AEqD9iyddzuwAgEchrqh+OwwmB_D1t2tFUrdPxw@mail.gmail.com>
-Subject: Re: [RFC 2/2] Use whitelist along with resolving list to enable
- device filtering
-To: Shermin Joy <shermin.joy@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Bastien,
 
-On Wed, Sep 27, 2017 at 12:04 PM, Shermin Joy <shermin.joy@gmail.com> wrote:
-> Whenever a peer using RPA is to be added to the whitelist, it is added to
-> the resolving list. If its IRK is not known or resolving list is full,
-> then the peer cannot be added to resolving list. If the device cannot
-> be added to resolving list, then the usage of whitelist is not allowed.
-
-I think we are better off using the resolving list in a LRU fashion as
-chances are that new devices would be used more than older devices,
-perhaps it could be so that the resolving list is sorted based on the
-last time it was connected, so devices that are most used are more
-likely to be in the resolving list.
-
-> Signed-off-by: Shermin Joy <shermin.joy@gmail.com>
+On Monday, 4 September 2017 20:12:06 CEST Bastien Nocera wrote:
+> Previously, users doing cable configuration of Sixaxis PS3 controllers
+> would only get asked whether a device was allowed to connect to the
+> computer when switching it to Bluetooth mode: unplugging it, and
+> pressing the PS button.
+> 
+> Instead, we should ask the user straight away, through the agent,
+> whether the pad should be allowed to connect.
+> 
+> This makes it easier to setup those devices, while keeping security.
 > ---
->  include/net/bluetooth/hci_core.h |   4 ++
->  net/bluetooth/hci_core.c         |   8 +++
->  net/bluetooth/hci_request.c      | 149 ++++++++++++++++++++++++++++++++++++---
->  3 files changed, 150 insertions(+), 11 deletions(-)
->
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index 82c9589..5639b6e 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -138,6 +138,7 @@ struct smp_irk {
->         u8 addr_type;
->         u8 val[16];
->         bool in_ll_resolving_list;
-> +       bool changed;
+>  plugins/sixaxis.c | 83
+> +++++++++++++++++++++++++++++++++++++++++-------------- 1 file changed, 63
+> insertions(+), 20 deletions(-)
+> 
+> diff --git a/plugins/sixaxis.c b/plugins/sixaxis.c
+> index 7d3a8f3ac..c8305d52f 100644
+> --- a/plugins/sixaxis.c
+> +++ b/plugins/sixaxis.c
+> @@ -44,6 +44,7 @@
+> 
+>  #include "src/adapter.h"
+>  #include "src/device.h"
+> +#include "src/agent.h"
+>  #include "src/plugin.h"
+>  #include "src/log.h"
+>  #include "src/shared/util.h"
+> @@ -71,6 +72,13 @@ static const struct {
+>  	},
 >  };
->
->  struct link_key {
-> @@ -1539,6 +1540,9 @@ void hci_le_start_enc(struct hci_conn *conn, __le16 ediv, __le64 rand,
->  void hci_copy_identity_address(struct hci_dev *hdev, bdaddr_t *bdaddr,
->                                u8 *bdaddr_type);
->
-> +int hci_req_update_resolving_list(struct hci_dev *hdev,  u8 addr_type,
-> +                                 bdaddr_t *bdaddr, u8 irk[16]);
+> 
+> +struct authentication_closure {
+> +	struct btd_adapter *adapter;
+> +	struct btd_device *device;
+> +	int fd;
+> +	char device_addr[18];
+> +};
 > +
->  #define SCO_AIRMODE_MASK       0x0003
->  #define SCO_AIRMODE_CVSD       0x0000
->  #define SCO_AIRMODE_TRANSP     0x0003
-> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> index ab16e71..c2860f9 100644
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -2215,6 +2215,8 @@ void hci_smp_irks_clear(struct hci_dev *hdev)
->                 list_del_rcu(&k->list);
->                 kfree_rcu(k, rcu);
->         }
-> +
-> +       hci_req_clear_resolving_list(hdev);
+>  static struct udev *ctx = NULL;
+>  static struct udev_monitor *monitor = NULL;
+>  static guint watch_id = 0;
+> @@ -135,19 +143,51 @@ static int set_master_bdaddr(int fd, const bdaddr_t
+> *bdaddr) return ret;
 >  }
->
->  struct link_key *hci_find_link_key(struct hci_dev *hdev, bdaddr_t *bdaddr)
-> @@ -2438,6 +2440,8 @@ struct smp_irk *hci_add_irk(struct hci_dev *hdev, bdaddr_t *bdaddr,
->                 irk->addr_type = addr_type;
->
->                 list_add_rcu(&irk->list, &hdev->identity_resolving_keys);
-> +       } else {
-> +               irk->changed = true;
->         }
->
->         memcpy(irk->val, val, 16);
-> @@ -2491,6 +2495,10 @@ void hci_remove_irk(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 addr_type)
->
->                 BT_DBG("%s removing %pMR", hdev->name, bdaddr);
->
-> +               if (k->in_ll_resolving_list)
-> +                       hci_req_del_from_resolving_list(hdev, addr_type,
-> +                                                       bdaddr);
-> +
->                 list_del_rcu(&k->list);
->                 kfree_rcu(k, rcu);
->         }
-> diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
-> index 6dcc827..3ad0b16 100644
-> --- a/net/bluetooth/hci_request.c
-> +++ b/net/bluetooth/hci_request.c
-> @@ -682,6 +682,7 @@ static u8 update_white_list(struct hci_request *req)
->         struct hci_conn_params *params;
->         struct bdaddr_list *b;
->         uint8_t white_list_entries = 0;
-> +       struct smp_irk *irk;
->
->         /* Go through the current white list programmed into the
->          * controller one by one and check if that address is still
-> @@ -707,9 +708,19 @@ static u8 update_white_list(struct hci_request *req)
->                         continue;
->                 }
->
-> -               if (hci_find_irk_by_addr(hdev, &b->bdaddr, b->bdaddr_type)) {
-> -                       /* White list can not be used with RPAs */
-> -                       return 0x00;
-> +               irk = hci_find_irk_by_addr(hdev, &b->bdaddr, b->bdaddr_type);
-> +               if ((irk) && (!irk->in_ll_resolving_list)) {
-> +                       /* White list can not be used with RPAs if
-> +                        * device is not added in resolving list.
-> +                        */
-> +                       if (!hdev->le_ll_addr_resolve_enabled)
-> +                               return 0x00;
-> +
-> +                       if (hci_req_update_resolving_list(hdev,
-> +                                                         irk->addr_type,
-> +                                                         &irk->bdaddr,
-> +                                                         irk->val))
-> +                               return 0x00;
->                 }
->
->                 white_list_entries++;
-> @@ -735,10 +746,19 @@ static u8 update_white_list(struct hci_request *req)
->                         return 0x00;
->                 }
->
-> -               if (hci_find_irk_by_addr(hdev, &params->addr,
-> -                                        params->addr_type)) {
-> -                       /* White list can not be used with RPAs */
-> -                       return 0x00;
-> +               irk = hci_find_irk_by_addr(hdev, &b->bdaddr, b->bdaddr_type);
-> +               if ((irk) && (!irk->in_ll_resolving_list)) {
-> +                       /* White list can not be used with RPAs if
-> +                        * device is not added in resolving list.
-> +                        */
-> +                       if (!hdev->le_ll_addr_resolve_enabled)
-> +                               return 0x00;
-> +
-> +                       if (hci_req_update_resolving_list(hdev,
-> +                                                         irk->addr_type,
-> +                                                         &irk->bdaddr,
-> +                                                         irk->val))
-> +                               return 0x00;
->                 }
->
->                 white_list_entries++;
-> @@ -759,10 +779,19 @@ static u8 update_white_list(struct hci_request *req)
->                         return 0x00;
->                 }
->
-> -               if (hci_find_irk_by_addr(hdev, &params->addr,
-> -                                        params->addr_type)) {
-> -                       /* White list can not be used with RPAs */
-> -                       return 0x00;
-> +               irk = hci_find_irk_by_addr(hdev, &b->bdaddr, b->bdaddr_type);
-> +               if ((irk) && (!irk->in_ll_resolving_list)) {
-> +                       /* White list can not be used with RPAs if
-> +                        * device is not added in resolving list.
-> +                        */
-> +                       if (!hdev->le_ll_addr_resolve_enabled)
-> +                               return 0x00;
-> +
-> +                       if (hci_req_update_resolving_list(hdev,
-> +                                                         irk->addr_type,
-> +                                                         &irk->bdaddr,
-> +                                                         irk->val))
-> +                               return 0x00;
->                 }
->
->                 white_list_entries++;
-> @@ -787,6 +816,104 @@ static void add_to_resolving_list(struct hci_request *req, u8 addr_type,
->         hci_req_add(req, HCI_OP_LE_ADD_TO_RESOLVING_LIST, sizeof(cp), &cp);
->  }
->
-> +int hci_req_update_resolving_list(struct hci_dev *hdev, u8 addr_type,
-> +                                 bdaddr_t *bdaddr, u8 irk_val[16])
+> 
+> +static void agent_auth_cb(DBusError *derr,
+> +				void *user_data)
 > +{
-> +       struct hci_request req;
-> +       struct hci_cp_le_del_from_resolving_list cp;
-> +       struct bdaddr_list *b;
-> +       struct smp_irk *irk;
-> +       u8 resolving_list_entries;
-> +       bool match;
+> +	struct authentication_closure *closure = user_data;
+> +	char master_addr[18], adapter_addr[18];
+> +	bdaddr_t master_bdaddr;
+> +	const bdaddr_t *adapter_bdaddr;
 > +
-> +       /* Nothing to be done if LL privacy is not supported. */
-> +       if (hdev->le_features[0] & HCI_LE_LL_PRIVACY)
-> +               return -1;
+> +	if (derr != NULL) {
+> +		DBG("Agent replied negatively, removing temporary device");
+> +		goto error;
+> +	}
 > +
-> +       /* Resolving List cannot be updated if address resolution
-> +        * in the controller is enabled and advertisement or scanning
-> +        * or create connection command is ongoing.
-> +        */
-> +       if ((hdev->le_ll_addr_resolve_enabled) &&
-> +           ((hci_dev_test_flag(hdev, HCI_LE_ADV)) ||
-> +           (hci_dev_test_flag(hdev, HCI_LE_SCAN)) ||
-> +           (hci_lookup_le_connect(hdev))))
-> +               return -1;
+> +	btd_device_set_temporary(closure->device, false);
 > +
-> +       hci_req_init(&req, hdev);
+> +	if (get_master_bdaddr(closure->fd, &master_bdaddr) < 0)
+> +		goto error;
 > +
-> +       irk = hci_find_irk_by_addr(hdev, bdaddr, addr_type);
-> +       if (!irk)
-> +               return -1;
+> +	adapter_bdaddr = btd_adapter_get_address(closure->adapter);
+> +	if (bacmp(adapter_bdaddr, &master_bdaddr)) {
+> +		if (set_master_bdaddr(closure->fd, adapter_bdaddr) < 0)
+> +			goto error;
+> +	}
 > +
-> +       if (irk->in_ll_resolving_list) {
-> +               /* If device is present in the resolving list, and IRK
-> +                * has not changed nothing more is to be done.
-> +                */
-> +               if (!irk->changed)
-> +                       return 0;
+> +	ba2str(&master_bdaddr, master_addr);
+> +	ba2str(adapter_bdaddr, adapter_addr);
+> +	DBG("remote %s old_master %s new_master %s",
+> +				closure->device_addr, master_addr, adapter_addr);
 > +
-> +               /* If IRK has changed, remove the device and add it again.*/
-> +               goto remove_device;
-> +       }
-> +
-> +       /* Add device to resolving list., if resolving list is not full.*/
-> +       resolving_list_entries = 0;
-> +       rcu_read_lock();
-> +       list_for_each_entry_rcu(irk, &hdev->identity_resolving_keys, list) {
-> +               if (irk->in_ll_resolving_list)
-> +                       resolving_list_entries++;
-> +       }
-> +       rcu_read_unlock();
-> +
-> +       if (resolving_list_entries < hdev->le_resolving_list_size)
-> +               goto add_device;
-> +
-> +       /* If resolving list is full, go through the current resolving list
-> +        * programmed into the controller one by one and check if that
-> +        * peer is present in the whitelist. The first entry that is not present
-> +        * in whitelist is queued up for deletion.
-> +        */
-> +       resolving_list_entries = 0;
-> +       rcu_read_lock();
-> +       list_for_each_entry_rcu(irk, &hdev->identity_resolving_keys, list) {
-> +               if (!irk->in_ll_resolving_list)
-> +                       continue;
-> +
-> +               match = false;
-> +               list_for_each_entry(b, &hdev->le_white_list, list) {
-> +                       if (bacmp(&irk->bdaddr, &b->bdaddr) == 0 &&
-> +                           irk->addr_type == b->bdaddr_type) {
-> +                               match = true;
-> +                               resolving_list_entries++;
-> +                               break;
-> +                       }
-> +               }
-> +
-> +               /* If the resolving list is still full return, without
-> +                * adding the device.
-> +                */
-> +               if (resolving_list_entries >= hdev->le_resolving_list_size) {
-> +                       rcu_read_unlock();
-> +                       return -1;
-> +               }
-> +
-> +               if (!match)
-> +                       break;
-> +       }
-> +       rcu_read_unlock();
-> +
-> +remove_device:
-> +       cp.peer_bdaddr_type = irk->addr_type;
-> +       bacpy(&cp.peer_bdaddr, &irk->bdaddr);
-> +       hci_req_add(&req, HCI_OP_LE_DEL_FROM_RESOLVING_LIST, sizeof(cp), &cp);
-> +
-> +add_device:
-> +       add_to_resolving_list(&req, addr_type, bdaddr, irk_val);
-> +       hci_req_run(&req, NULL);
-> +       return 0;
+> +error:
+> +	close(closure->fd);
+> +	g_free(closure);
 > +}
 > +
->  void hci_req_del_from_resolving_list(struct hci_dev *hdev, u8 addr_type,
->                                      bdaddr_t *bdaddr)
+>  static bool setup_device(int fd, int index, struct btd_adapter *adapter)
 >  {
-> --
-> 1.9.1
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> -	char device_addr[18], master_addr[18], adapter_addr[18];
+> -	bdaddr_t device_bdaddr, master_bdaddr;
+> +	char device_addr[18];
+> +	bdaddr_t device_bdaddr;
+>  	const bdaddr_t *adapter_bdaddr;
+>  	struct btd_device *device;
+> +	struct authentication_closure *closure;
+> 
+>  	if (get_device_bdaddr(fd, &device_bdaddr) < 0)
+>  		return false;
+> 
+> -	if (get_master_bdaddr(fd, &master_bdaddr) < 0)
+> -		return false;
+> -
+>  	/* This can happen if controller was plugged while already connected
+>  	 * eg. to charge up battery. */
+>  	device = btd_adapter_find_device(adapter, &device_bdaddr,
+> @@ -155,25 +195,14 @@ static bool setup_device(int fd, int index, struct
+> btd_adapter *adapter) if (device && btd_device_is_connected(device))
+>  		return false;
+> 
+> -	adapter_bdaddr = btd_adapter_get_address(adapter);
+> -
+> -	if (bacmp(adapter_bdaddr, &master_bdaddr)) {
+> -		if (set_master_bdaddr(fd, adapter_bdaddr) < 0)
+> -			return false;
+> -	}
+> -
+>  	ba2str(&device_bdaddr, device_addr);
+> -	ba2str(&master_bdaddr, master_addr);
+> -	ba2str(adapter_bdaddr, adapter_addr);
+> -	DBG("remote %s old_master %s new_master %s",
+> -				device_addr, master_addr, adapter_addr);
+> 
+>  	device = btd_adapter_get_device(adapter, &device_bdaddr, BDADDR_BREDR);
+> 
+>  	if (g_slist_find_custom(btd_device_get_uuids(device), HID_UUID,
+>  						(GCompareFunc)strcasecmp)) {
+>  		DBG("device %s already known, skipping", device_addr);
+> -		return true;
+> +		return false;
+>  	}
+> 
+>  	info("sixaxis: setting up new device");
+> @@ -181,7 +210,20 @@ static bool setup_device(int fd, int index, struct
+> btd_adapter *adapter) btd_device_device_set_name(device,
+> devices[index].name);
+>  	btd_device_set_pnpid(device, devices[index].source, devices[index].vid,
+>  				devices[index].pid, devices[index].version);
+> -	btd_device_set_temporary(device, false);
+> +	btd_device_set_temporary(device, true);
+> +
+> +	closure = g_try_new0(struct authentication_closure, 1);
+> +	if (!closure) {
+> +		btd_adapter_remove_device(adapter, device);
+> +		return false;
+> +	}
+> +	closure->adapter = adapter;
+> +	closure->device = device;
+> +	closure->fd = fd;
+> +	memcpy(&closure->device_addr, device_addr, sizeof(device_addr));
+> +	adapter_bdaddr = btd_adapter_get_address(adapter);
+> +	btd_request_authorization_cable_configured(adapter_bdaddr, &device_bdaddr,
+> +				HID_UUID, agent_auth_cb, closure);
+> 
+>  	return true;
+>  }
+> @@ -236,8 +278,9 @@ static void device_added(struct udev_device *udevice)
+>  	if (fd < 0)
+>  		return;
+> 
+> -	setup_device(fd, index, adapter);
+> -	close(fd);
+> +	/* Only close the fd if an authentication is not pending */
+> +	if (!setup_device(fd, index, adapter))
+> +		close(fd);
+>  }
+> 
+>  static gboolean monitor_watch(GIOChannel *source, GIOCondition condition,
 
-
+So user will be asked for consent after DS3 was configured? Not that I have 
+strong opinion on this but did you consider configuring it only after user 
+gave consent?
 
 -- 
-Luiz Augusto von Dentz
+pozdrawiam
+Szymon Janc
