@@ -1,182 +1,284 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Message-ID: <59cb6941.c5a6620a.7783d.deb6@mx.google.com>
-Date: Wed, 27 Sep 2017 14:34:53 +0530
+Message-ID: <59cb6924.4e67620a.9c561.2444@mx.google.com>
+Date: Wed, 27 Sep 2017 14:34:23 +0530
 From: Shermin Joy <shermin.joy@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC 2/2] Use whitelist along with resolving list to enable device
- filtering
+Subject: [RFC 1/2] Add HCI commands to enable address resolution in controller
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Whenever a peer using RPA is to be added to the whitelist, it is added to
-the resolving list. If its IRK is not known or resolving list is full,
-then the peer cannot be added to resolving list. If the device cannot
-be added to resolving list, then the usage of whitelist is not allowed.
+Add HCI commands  : LE Read Resolving List Size,
+LE Add Device to Resolving List, LE Delete Device from Resolving List,
+LE Clear Resolving List, LE Set Address Resolution Enable
 
 Signed-off-by: Shermin Joy <shermin.joy@gmail.com>
 ---
- include/net/bluetooth/hci_core.h |   4 ++
- net/bluetooth/hci_core.c         |   8 +++
- net/bluetooth/hci_request.c      | 149 ++++++++++++++++++++++++++++++++++++---
- 3 files changed, 150 insertions(+), 11 deletions(-)
+ include/net/bluetooth/hci.h      |  25 +++++++++
+ include/net/bluetooth/hci_core.h |   3 ++
+ net/bluetooth/hci_core.c         |  18 +++++++
+ net/bluetooth/hci_event.c        | 107 +++++++++++++++++++++++++++++++++++++++
+ net/bluetooth/hci_request.c      |  64 +++++++++++++++++++++++
+ net/bluetooth/hci_request.h      |   4 ++
+ 6 files changed, 221 insertions(+)
 
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index fe98f0a..1ef3ae8 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -398,6 +398,7 @@ enum {
+ #define HCI_LE_SLAVE_FEATURES		0x08
+ #define HCI_LE_PING			0x10
+ #define HCI_LE_DATA_LEN_EXT		0x20
++#define HCI_LE_LL_PRIVACY		0x40
+ #define HCI_LE_EXT_SCAN_POLICY		0x80
+ #define HCI_LE_CHAN_SEL_ALG2		0x40
+ 
+@@ -1506,6 +1507,30 @@ struct hci_cp_le_set_default_phy {
+ 	__u8    rx_phys;
+ } __packed;
+ 
++#define HCI_OP_LE_ADD_TO_RESOLVING_LIST		0x2027
++struct hci_cp_le_add_to_resolving_list {
++	__u8		peer_bdaddr_type;
++	bdaddr_t	peer_bdaddr;
++	__u8		peer_irk[16];
++	__u8		local_irk[16];
++} __packed;
++
++#define HCI_OP_LE_DEL_FROM_RESOLVING_LIST	0x2028
++struct hci_cp_le_del_from_resolving_list {
++	__u8		peer_bdaddr_type;
++	bdaddr_t	peer_bdaddr;
++} __packed;
++
++#define HCI_OP_LE_CLEAR_RESOLVING_LIST		0x2029
++
++#define HCI_OP_LE_READ_RESOLVING_LIST_SIZE	0x202A
++struct hci_rp_le_read_resolving_list_size {
++	__u8	status;
++	__u8	size;
++} __packed;
++
++#define HCI_OP_LE_SET_ADDR_RESOL_ENABLE		0x202D
++
+ /* ---- HCI Events ---- */
+ #define HCI_EV_INQUIRY_COMPLETE		0x01
+ 
 diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 82c9589..5639b6e 100644
+index 95ccc1e..82c9589 100644
 --- a/include/net/bluetooth/hci_core.h
 +++ b/include/net/bluetooth/hci_core.h
-@@ -138,6 +138,7 @@ struct smp_irk {
+@@ -137,6 +137,7 @@ struct smp_irk {
+ 	bdaddr_t bdaddr;
  	u8 addr_type;
  	u8 val[16];
- 	bool in_ll_resolving_list;
-+	bool changed;
++	bool in_ll_resolving_list;
  };
  
  struct link_key {
-@@ -1539,6 +1540,9 @@ void hci_le_start_enc(struct hci_conn *conn, __le16 ediv, __le64 rand,
- void hci_copy_identity_address(struct hci_dev *hdev, bdaddr_t *bdaddr,
- 			       u8 *bdaddr_type);
+@@ -221,6 +222,7 @@ struct hci_dev {
+ 	__u8		features[HCI_MAX_PAGES][8];
+ 	__u8		le_features[8];
+ 	__u8		le_white_list_size;
++	__u8		le_resolving_list_size;
+ 	__u8		le_states[8];
+ 	__u8		commands[64];
+ 	__u8		hci_ver;
+@@ -259,6 +261,7 @@ struct hci_dev {
+ 	__u8		ssp_debug_mode;
+ 	__u8		hw_error_code;
+ 	__u32		clock;
++	bool		le_ll_addr_resolve_enabled;
  
-+int hci_req_update_resolving_list(struct hci_dev *hdev,  u8 addr_type,
-+				  bdaddr_t *bdaddr, u8 irk[16]);
-+
- #define SCO_AIRMODE_MASK       0x0003
- #define SCO_AIRMODE_CVSD       0x0000
- #define SCO_AIRMODE_TRANSP     0x0003
+ 	__u16		devid_source;
+ 	__u16		devid_vendor;
 diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index ab16e71..c2860f9 100644
+index 6bc679c..ab16e71 100644
 --- a/net/bluetooth/hci_core.c
 +++ b/net/bluetooth/hci_core.c
-@@ -2215,6 +2215,8 @@ void hci_smp_irks_clear(struct hci_dev *hdev)
- 		list_del_rcu(&k->list);
- 		kfree_rcu(k, rcu);
- 	}
+@@ -731,6 +731,24 @@ static int hci_init3_req(struct hci_request *req, unsigned long opt)
+ 			hci_req_add(req, HCI_OP_LE_READ_DEF_DATA_LEN, 0, NULL);
+ 		}
+ 
++		if (hdev->le_features[0] & HCI_LE_LL_PRIVACY) {
++			if (hdev->commands[34] & 0x40)
++				/* Read LE Resolving List Size */
++				hci_req_add(req,
++					    HCI_OP_LE_READ_RESOLVING_LIST_SIZE,
++					    0, NULL);
++			if (hdev->commands[35] & 0x02)
++				/* Enable Address Resolution in Controller */
++				hci_req_add(req,
++					    HCI_OP_LE_SET_ADDR_RESOL_ENABLE,
++					    0, NULL);
++			if (hdev->commands[34] & 0x20)
++				/* Clear LE Resolving List */
++				hci_req_add(req,
++					    HCI_OP_LE_CLEAR_RESOLVING_LIST,
++					    0, NULL);
++		}
 +
-+	hci_req_clear_resolving_list(hdev);
+ 		hci_set_le_support(req);
+ 	}
+ 
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 0b4dba0..3e7bbbe 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -1442,6 +1442,93 @@ static void hci_cc_write_ssp_debug_mode(struct hci_dev *hdev, struct sk_buff *sk
+ 		hdev->ssp_debug_mode = *mode;
  }
  
- struct link_key *hci_find_link_key(struct hci_dev *hdev, bdaddr_t *bdaddr)
-@@ -2438,6 +2440,8 @@ struct smp_irk *hci_add_irk(struct hci_dev *hdev, bdaddr_t *bdaddr,
- 		irk->addr_type = addr_type;
- 
- 		list_add_rcu(&irk->list, &hdev->identity_resolving_keys);
-+	} else {
-+		irk->changed = true;
- 	}
- 
- 	memcpy(irk->val, val, 16);
-@@ -2491,6 +2495,10 @@ void hci_remove_irk(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 addr_type)
- 
- 		BT_DBG("%s removing %pMR", hdev->name, bdaddr);
- 
-+		if (k->in_ll_resolving_list)
-+			hci_req_del_from_resolving_list(hdev, addr_type,
-+							bdaddr);
++static void hci_cc_le_read_resolving_list_size(struct hci_dev *hdev,
++					       struct sk_buff *skb)
++{
++	struct hci_rp_le_read_resolving_list_size *rp = (void *)skb->data;
 +
- 		list_del_rcu(&k->list);
- 		kfree_rcu(k, rcu);
- 	}
++	BT_DBG("%s status 0x%2.2x size %u", hdev->name, rp->status, rp->size);
++
++	if (rp->status)
++		return;
++
++	hdev->le_resolving_list_size = rp->size;
++}
++
++static void hci_cc_le_clear_resolving_list(struct hci_dev *hdev,
++					   struct sk_buff *skb)
++{
++	__u8 status = *((__u8 *)skb->data);
++	struct smp_irk *irk;
++
++	BT_DBG("%s status 0x%2.2x", hdev->name, status);
++
++	if (status)
++		return;
++
++	/* Clear in_ll_resolving_list flag for all entries in the
++	 * identity_resolving_keys list.
++	 */
++	rcu_read_lock();
++	list_for_each_entry_rcu(irk, &hdev->identity_resolving_keys, list) {
++		irk->in_ll_resolving_list = false;
++	}
++	rcu_read_unlock();
++}
++
++static void hci_cc_le_add_to_resolving_list(struct hci_dev *hdev,
++					    struct sk_buff *skb)
++{
++	struct hci_cp_le_add_to_white_list *sent;
++	__u8 status = *((__u8 *)skb->data);
++	struct smp_irk *irk;
++
++	BT_DBG("%s status 0x%2.2x", hdev->name, status);
++
++	if (status)
++		return;
++
++	sent = hci_sent_cmd_data(hdev, HCI_OP_LE_ADD_TO_RESOLVING_LIST);
++	if (!sent)
++		return;
++
++	if (hci_find_irk_by_addr(hdev, &sent->bdaddr, sent->bdaddr_type))
++		irk->in_ll_resolving_list = true;
++}
++
++static void hci_cc_le_del_from_resolving_list(struct hci_dev *hdev,
++					      struct sk_buff *skb)
++{
++	struct hci_cp_le_del_from_white_list *sent;
++	__u8 status = *((__u8 *)skb->data);
++	struct smp_irk *irk;
++
++	BT_DBG("%s status 0x%2.2x", hdev->name, status);
++
++	if (status)
++		return;
++
++	sent = hci_sent_cmd_data(hdev, HCI_OP_LE_DEL_FROM_RESOLVING_LIST);
++	if (!sent)
++		return;
++
++	if (hci_find_irk_by_addr(hdev, &sent->bdaddr, sent->bdaddr_type))
++		irk->in_ll_resolving_list = false;
++}
++
++static void hci_cc_le_set_address_resolution_enable(struct hci_dev *hdev,
++						    struct sk_buff *skb)
++{
++	__u8 status = *((__u8 *)skb->data);
++
++	BT_DBG("%s status 0x%2.2x", hdev->name, status);
++
++	if (status)
++		return;
++
++	hdev->le_ll_addr_resolve_enabled = true;
++}
++
+ static void hci_cs_inquiry(struct hci_dev *hdev, __u8 status)
+ {
+ 	BT_DBG("%s status 0x%2.2x", hdev->name, status);
+@@ -3039,6 +3126,26 @@ static void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *skb,
+ 		hci_cc_write_ssp_debug_mode(hdev, skb);
+ 		break;
+ 
++	case HCI_OP_LE_READ_RESOLVING_LIST_SIZE:
++		hci_cc_le_read_resolving_list_size(hdev, skb);
++		break;
++
++	case HCI_OP_LE_CLEAR_RESOLVING_LIST:
++		hci_cc_le_clear_resolving_list(hdev, skb);
++		break;
++
++	case HCI_OP_LE_ADD_TO_RESOLVING_LIST:
++		hci_cc_le_add_to_resolving_list(hdev, skb);
++		break;
++
++	case HCI_OP_LE_DEL_FROM_RESOLVING_LIST:
++		hci_cc_le_del_from_resolving_list(hdev, skb);
++		break;
++
++	case HCI_OP_LE_SET_ADDR_RESOL_ENABLE:
++		hci_cc_le_set_address_resolution_enable(hdev, skb);
++		break;
++
+ 	default:
+ 		BT_DBG("%s opcode 0x%4.4x", hdev->name, *opcode);
+ 		break;
 diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
-index 6dcc827..3ad0b16 100644
+index b73ac14..6dcc827 100644
 --- a/net/bluetooth/hci_request.c
 +++ b/net/bluetooth/hci_request.c
-@@ -682,6 +682,7 @@ static u8 update_white_list(struct hci_request *req)
- 	struct hci_conn_params *params;
- 	struct bdaddr_list *b;
- 	uint8_t white_list_entries = 0;
-+	struct smp_irk *irk;
- 
- 	/* Go through the current white list programmed into the
- 	 * controller one by one and check if that address is still
-@@ -707,9 +708,19 @@ static u8 update_white_list(struct hci_request *req)
- 			continue;
- 		}
- 
--		if (hci_find_irk_by_addr(hdev, &b->bdaddr, b->bdaddr_type)) {
--			/* White list can not be used with RPAs */
--			return 0x00;
-+		irk = hci_find_irk_by_addr(hdev, &b->bdaddr, b->bdaddr_type);
-+		if ((irk) && (!irk->in_ll_resolving_list)) {
-+			/* White list can not be used with RPAs if
-+			 * device is not added in resolving list.
-+			 */
-+			if (!hdev->le_ll_addr_resolve_enabled)
-+				return 0x00;
-+
-+			if (hci_req_update_resolving_list(hdev,
-+							  irk->addr_type,
-+							  &irk->bdaddr,
-+							  irk->val))
-+				return 0x00;
- 		}
- 
- 		white_list_entries++;
-@@ -735,10 +746,19 @@ static u8 update_white_list(struct hci_request *req)
- 			return 0x00;
- 		}
- 
--		if (hci_find_irk_by_addr(hdev, &params->addr,
--					 params->addr_type)) {
--			/* White list can not be used with RPAs */
--			return 0x00;
-+		irk = hci_find_irk_by_addr(hdev, &b->bdaddr, b->bdaddr_type);
-+		if ((irk) && (!irk->in_ll_resolving_list)) {
-+			/* White list can not be used with RPAs if
-+			 * device is not added in resolving list.
-+			 */
-+			if (!hdev->le_ll_addr_resolve_enabled)
-+				return 0x00;
-+
-+			if (hci_req_update_resolving_list(hdev,
-+							  irk->addr_type,
-+							  &irk->bdaddr,
-+							  irk->val))
-+				return 0x00;
- 		}
- 
- 		white_list_entries++;
-@@ -759,10 +779,19 @@ static u8 update_white_list(struct hci_request *req)
- 			return 0x00;
- 		}
- 
--		if (hci_find_irk_by_addr(hdev, &params->addr,
--					 params->addr_type)) {
--			/* White list can not be used with RPAs */
--			return 0x00;
-+		irk = hci_find_irk_by_addr(hdev, &b->bdaddr, b->bdaddr_type);
-+		if ((irk) && (!irk->in_ll_resolving_list)) {
-+			/* White list can not be used with RPAs if
-+			 * device is not added in resolving list.
-+			 */
-+			if (!hdev->le_ll_addr_resolve_enabled)
-+				return 0x00;
-+
-+			if (hci_req_update_resolving_list(hdev,
-+							  irk->addr_type,
-+							  &irk->bdaddr,
-+							  irk->val))
-+				return 0x00;
- 		}
- 
- 		white_list_entries++;
-@@ -787,6 +816,104 @@ static void add_to_resolving_list(struct hci_request *req, u8 addr_type,
- 	hci_req_add(req, HCI_OP_LE_ADD_TO_RESOLVING_LIST, sizeof(cp), &cp);
+@@ -773,6 +773,70 @@ static u8 update_white_list(struct hci_request *req)
+ 	return 0x01;
  }
  
-+int hci_req_update_resolving_list(struct hci_dev *hdev, u8 addr_type,
-+				  bdaddr_t *bdaddr, u8 irk_val[16])
++static void add_to_resolving_list(struct hci_request *req, u8 addr_type,
++				  bdaddr_t *bdaddr, u8 irk[16])
 +{
-+	struct hci_request req;
++	struct hci_dev *hdev = req->hdev;
++	struct hci_cp_le_add_to_resolving_list cp;
++
++	cp.peer_bdaddr_type = addr_type;
++	bacpy(&cp.peer_bdaddr, bdaddr);
++	memcpy(cp.peer_irk, irk, 16);
++	memcpy(cp.local_irk, hdev->irk, 16);
++
++	hci_req_add(req, HCI_OP_LE_ADD_TO_RESOLVING_LIST, sizeof(cp), &cp);
++}
++
++void hci_req_del_from_resolving_list(struct hci_dev *hdev, u8 addr_type,
++				     bdaddr_t *bdaddr)
++{
 +	struct hci_cp_le_del_from_resolving_list cp;
-+	struct bdaddr_list *b;
-+	struct smp_irk *irk;
-+	u8 resolving_list_entries;
-+	bool match;
++	struct hci_request req;
 +
 +	/* Nothing to be done if LL privacy is not supported. */
 +	if (hdev->le_features[0] & HCI_LE_LL_PRIVACY)
-+		return -1;
++		return;
 +
 +	/* Resolving List cannot be updated if address resolution
 +	 * in the controller is enabled and advertisement or scanning
@@ -186,85 +288,56 @@ index 6dcc827..3ad0b16 100644
 +	    ((hci_dev_test_flag(hdev, HCI_LE_ADV)) ||
 +	    (hci_dev_test_flag(hdev, HCI_LE_SCAN)) ||
 +	    (hci_lookup_le_connect(hdev))))
-+		return -1;
++		return;
 +
 +	hci_req_init(&req, hdev);
++	cp.peer_bdaddr_type = addr_type;
++	bacpy(&cp.peer_bdaddr, bdaddr);
 +
-+	irk = hci_find_irk_by_addr(hdev, bdaddr, addr_type);
-+	if (!irk)
-+		return -1;
-+
-+	if (irk->in_ll_resolving_list) {
-+		/* If device is present in the resolving list, and IRK
-+		 * has not changed nothing more is to be done.
-+		 */
-+		if (!irk->changed)
-+			return 0;
-+
-+		/* If IRK has changed, remove the device and add it again.*/
-+		goto remove_device;
-+	}
-+
-+	/* Add device to resolving list., if resolving list is not full.*/
-+	resolving_list_entries = 0;
-+	rcu_read_lock();
-+	list_for_each_entry_rcu(irk, &hdev->identity_resolving_keys, list) {
-+		if (irk->in_ll_resolving_list)
-+			resolving_list_entries++;
-+	}
-+	rcu_read_unlock();
-+
-+	if (resolving_list_entries < hdev->le_resolving_list_size)
-+		goto add_device;
-+
-+	/* If resolving list is full, go through the current resolving list
-+	 * programmed into the controller one by one and check if that
-+	 * peer is present in the whitelist. The first entry that is not present
-+	 * in whitelist is queued up for deletion.
-+	 */
-+	resolving_list_entries = 0;
-+	rcu_read_lock();
-+	list_for_each_entry_rcu(irk, &hdev->identity_resolving_keys, list) {
-+		if (!irk->in_ll_resolving_list)
-+			continue;
-+
-+		match = false;
-+		list_for_each_entry(b, &hdev->le_white_list, list) {
-+			if (bacmp(&irk->bdaddr, &b->bdaddr) == 0 &&
-+			    irk->addr_type == b->bdaddr_type) {
-+				match = true;
-+				resolving_list_entries++;
-+				break;
-+			}
-+		}
-+
-+		/* If the resolving list is still full return, without
-+		 * adding the device.
-+		 */
-+		if (resolving_list_entries >= hdev->le_resolving_list_size) {
-+			rcu_read_unlock();
-+			return -1;
-+		}
-+
-+		if (!match)
-+			break;
-+	}
-+	rcu_read_unlock();
-+
-+remove_device:
-+	cp.peer_bdaddr_type = irk->addr_type;
-+	bacpy(&cp.peer_bdaddr, &irk->bdaddr);
 +	hci_req_add(&req, HCI_OP_LE_DEL_FROM_RESOLVING_LIST, sizeof(cp), &cp);
-+
-+add_device:
-+	add_to_resolving_list(&req, addr_type, bdaddr, irk_val);
 +	hci_req_run(&req, NULL);
-+	return 0;
 +}
 +
- void hci_req_del_from_resolving_list(struct hci_dev *hdev, u8 addr_type,
- 				     bdaddr_t *bdaddr)
++void hci_req_clear_resolving_list(struct hci_dev *hdev)
++{
++	struct hci_request req;
++
++	/* Nothing to be done if LL privacy is not supported. */
++	if (hdev->le_features[0] & HCI_LE_LL_PRIVACY)
++		return;
++
++	/* Resolving List cannot be updated if address resolution
++	 * in the controller is enabled and advertisement or scanning
++	 * or create connection command is ongoing.
++	 */
++	if ((hdev->le_ll_addr_resolve_enabled) &&
++	    ((hci_dev_test_flag(hdev, HCI_LE_ADV)) ||
++	    (hci_dev_test_flag(hdev, HCI_LE_SCAN)) ||
++	    (hci_lookup_le_connect(hdev))))
++		return;
++
++	hci_req_add(&req, HCI_OP_LE_CLEAR_RESOLVING_LIST, 0, NULL);
++	hci_req_run(&req, NULL);
++}
++
+ static bool scan_use_rpa(struct hci_dev *hdev)
  {
+ 	return hci_dev_test_flag(hdev, HCI_PRIVACY);
+diff --git a/net/bluetooth/hci_request.h b/net/bluetooth/hci_request.h
+index dde77bd..bf12dbf 100644
+--- a/net/bluetooth/hci_request.h
++++ b/net/bluetooth/hci_request.h
+@@ -66,6 +66,10 @@ struct sk_buff *hci_prepare_cmd(struct hci_dev *hdev, u16 opcode, u32 plen,
+ void hci_req_add_le_scan_disable(struct hci_request *req);
+ void hci_req_add_le_passive_scan(struct hci_request *req);
+ 
++void hci_req_del_from_resolving_list(struct hci_dev *hdev, u8 addr_type,
++				     bdaddr_t *bdaddr);
++void hci_req_clear_resolving_list(struct hci_dev *hdev);
++
+ void hci_req_reenable_advertising(struct hci_dev *hdev);
+ void __hci_req_enable_advertising(struct hci_request *req);
+ void __hci_req_disable_advertising(struct hci_request *req);
 -- 
 1.9.1
 
