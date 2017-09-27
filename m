@@ -1,380 +1,270 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Szymon Janc <szymon.janc@codecoup.pl>
-To: Bastien Nocera <hadess@hadess.net>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/9] plugins/sixaxis: Remove LEDs handling
-Date: Wed, 27 Sep 2017 11:07:43 +0200
-Message-ID: <11501873.MWAtCWdrlt@ix>
-In-Reply-To: <20170904181212.5639-1-hadess@hadess.net>
-References: <20170904181212.5639-1-hadess@hadess.net>
+Message-ID: <59cb6941.c5a6620a.7783d.deb6@mx.google.com>
+Date: Wed, 27 Sep 2017 14:34:53 +0530
+From: Shermin Joy <shermin.joy@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [RFC 2/2] Use whitelist along with resolving list to enable device
+ filtering
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bastien,
+Whenever a peer using RPA is to be added to the whitelist, it is added to
+the resolving list. If its IRK is not known or resolving list is full,
+then the peer cannot be added to resolving list. If the device cannot
+be added to resolving list, then the usage of whitelist is not allowed.
 
-On Monday, 4 September 2017 20:12:04 CEST Bastien Nocera wrote:
-> It's done in the kernel since 2014 in linux kernel commit
-> 8025087acf9d2b941bae93b3e0967560e7e03e87
-> ---
->  plugins/sixaxis.c | 295
-> +----------------------------------------------------- 1 file changed, 5
-> insertions(+), 290 deletions(-)
-> 
-> diff --git a/plugins/sixaxis.c b/plugins/sixaxis.c
-> index 7e3c950b4..7d3a8f3ac 100644
-> --- a/plugins/sixaxis.c
-> +++ b/plugins/sixaxis.c
-> @@ -71,17 +71,6 @@ static const struct {
->  	},
->  };
-> 
-> -struct leds_data {
-> -	char *syspath_prefix;
-> -	uint8_t bitmap;
-> -};
-> -
-> -static void leds_data_destroy(struct leds_data *data)
-> -{
-> -	free(data->syspath_prefix);
-> -	free(data);
-> -}
-> -
->  static struct udev *ctx = NULL;
->  static struct udev_monitor *monitor = NULL;
->  static guint watch_id = 0;
-> @@ -146,115 +135,6 @@ static int set_master_bdaddr(int fd, const bdaddr_t
-> *bdaddr) return ret;
->  }
-> 
-> -static uint8_t calc_leds_bitmap(int number)
-> -{
-> -	uint8_t bitmap = 0;
-> -
-> -	/* TODO we could support up to 10 (1 + 2 + 3 + 4) */
-> -	if (number > 7)
-> -		return bitmap;
-> -
-> -	if (number > 4) {
-> -		bitmap |= 0x10;
-> -		number -= 4;
-> -	}
-> -
-> -	bitmap |= 0x01 << number;
-> -
-> -	return bitmap;
-> -}
-> -
-> -static void set_leds_hidraw(int fd, uint8_t leds_bitmap)
-> -{
-> -	/*
-> -	 * the total time the led is active (0xff means forever)
-> -	 * |     duty_length: cycle time in deciseconds (0 - "blink very fast")
-> -	 * |     |     ??? (Maybe a phase shift or duty_length multiplier?)
-> -	 * |     |     |     % of duty_length led is off (0xff means 100%)
-> -	 * |     |     |     |     % of duty_length led is on (0xff means 100%)
-> -	 * |     |     |     |     |
-> -	 * 0xff, 0x27, 0x10, 0x00, 0x32,
-> -	 */
-> -	uint8_t leds_report[] = {
-> -		0x01,
-> -		0x00, 0x00, 0x00, 0x00, 0x00, /* rumble values TBD */
-> -		0x00, 0x00, 0x00, 0x00, 0x00, /* LED_1=0x02, LED_2=0x04 ... */
-> -		0xff, 0x27, 0x10, 0x00, 0x32, /* LED_4 */
-> -		0xff, 0x27, 0x10, 0x00, 0x32, /* LED_3 */
-> -		0xff, 0x27, 0x10, 0x00, 0x32, /* LED_2 */
-> -		0xff, 0x27, 0x10, 0x00, 0x32, /* LED_1 */
-> -		0x00, 0x00, 0x00, 0x00, 0x00,
-> -	};
-> -	int ret;
-> -
-> -	leds_report[10] = leds_bitmap;
-> -
-> -	ret = write(fd, leds_report, sizeof(leds_report));
-> -	if (ret == sizeof(leds_report))
-> -		return;
-> -
-> -	if (ret < 0)
-> -		error("sixaxis: failed to set LEDS (%s)", strerror(errno));
-> -	else
-> -		error("sixaxis: failed to set LEDS (%d bytes written)", ret);
-> -}
-> -
-> -static bool set_leds_sysfs(struct leds_data *data)
-> -{
-> -	int i;
-> -
-> -	if (!data->syspath_prefix)
-> -		return false;
-> -
-> -	/* start from 1, LED0 is never used */
-> -	for (i = 1; i <= 4; i++) {
-> -		char path[PATH_MAX] = { 0 };
-> -		char buf[2] = { 0 };
-> -		int fd;
-> -		int ret;
-> -
-> -		snprintf(path, PATH_MAX, "%s%d/brightness",
-> -						data->syspath_prefix, i);
-> -
-> -		fd = open(path, O_WRONLY);
-> -		if (fd < 0) {
-> -			error("sixaxis: cannot open %s (%s)", path,
-> -							strerror(errno));
-> -			return false;
-> -		}
-> -
-> -		buf[0] = '0' + !!(data->bitmap & (1 << i));
-> -		ret = write(fd, buf, sizeof(buf));
-> -		close(fd);
-> -		if (ret != sizeof(buf))
-> -			return false;
-> -	}
-> -
-> -	return true;
-> -}
-> -
-> -static gboolean setup_leds(GIOChannel *channel, GIOCondition cond,
-> -							gpointer user_data)
-> -{
-> -	struct leds_data *data = user_data;
-> -
-> -	if (!data)
-> -		return FALSE;
-> -
-> -	if (cond & (G_IO_HUP | G_IO_ERR | G_IO_NVAL))
-> -		goto out;
-> -
-> -	if(!set_leds_sysfs(data)) {
-> -		int fd = g_io_channel_unix_get_fd(channel);
-> -		set_leds_hidraw(fd, data->bitmap);
-> -	}
-> -
-> -out:
-> -	leds_data_destroy(data);
-> -
-> -	return FALSE;
-> -}
-> -
->  static bool setup_device(int fd, int index, struct btd_adapter *adapter)
->  {
->  	char device_addr[18], master_addr[18], adapter_addr[18];
-> @@ -269,8 +149,7 @@ static bool setup_device(int fd, int index, struct
-> btd_adapter *adapter) return false;
-> 
->  	/* This can happen if controller was plugged while already connected
-> -	 * eg. to charge up battery.
-> -	 * Don't set LEDs in that case, hence return false */
-> +	 * eg. to charge up battery. */
->  	device = btd_adapter_find_device(adapter, &device_bdaddr,
->  							BDADDR_BREDR);
->  	if (device && btd_device_is_connected(device))
-> @@ -307,152 +186,6 @@ static bool setup_device(int fd, int index, struct
-> btd_adapter *adapter) return true;
->  }
-> 
-> -static int get_js_number(struct udev_device *udevice)
-> -{
-> -	struct udev_list_entry *devices, *dev_list_entry;
-> -	struct udev_enumerate *enumerate;
-> -	struct udev_device *hid_parent;
-> -	const char *hidraw_node;
-> -	const char *hid_id;
-> -	int number = 0;
-> -
-> -	hid_parent = udev_device_get_parent_with_subsystem_devtype(udevice,
-> -								"hid", NULL);
-> -
-> -	/*
-> -	 * Look for HID_UNIQ first for the correct behavior via BT, if
-> -	 * HID_UNIQ is not available it means the USB bus is being used and we
-> -	 * can rely on HID_PHYS.
-> -	 */
-> -	hid_id = udev_device_get_property_value(hid_parent, "HID_UNIQ");
-> -	if (!hid_id)
-> -		hid_id = udev_device_get_property_value(hid_parent,
-> -							"HID_PHYS");
-> -
-> -	hidraw_node = udev_device_get_devnode(udevice);
-> -	if (!hid_id || !hidraw_node)
-> -		return 0;
-> -
-> -	enumerate = udev_enumerate_new(udev_device_get_udev(udevice));
-> -	udev_enumerate_add_match_sysname(enumerate, "js*");
-> -	udev_enumerate_scan_devices(enumerate);
-> -	devices = udev_enumerate_get_list_entry(enumerate);
-> -
-> -	udev_list_entry_foreach(dev_list_entry, devices) {
-> -		struct udev_device *input_parent;
-> -		struct udev_device *js_dev;
-> -		const char *input_id;
-> -		const char *devname;
-> -
-> -		devname = udev_list_entry_get_name(dev_list_entry);
-> -		js_dev = udev_device_new_from_syspath(
-> -						udev_device_get_udev(udevice),
-> -						devname);
-> -
-> -		input_parent = udev_device_get_parent_with_subsystem_devtype(
-> -							js_dev, "input", NULL);
-> -		if (!input_parent)
-> -			goto next;
-> -
-> -		/* check if this is the joystick relative to the hidraw device
-> -		 * above */
-> -		input_id = udev_device_get_sysattr_value(input_parent, "uniq");
-> -
-> -		/*
-> -		 * A strlen() check is needed because input device over USB
-> -		 * have the UNIQ attribute defined but with an empty value.
-> -		 */
-> -		if (!input_id || strlen(input_id) == 0)
-> -			input_id = udev_device_get_sysattr_value(input_parent,
-> -								 "phys");
-> -
-> -		if (!input_id)
-> -			goto next;
-> -
-> -		if (!strcmp(input_id, hid_id)) {
-> -			number = atoi(udev_device_get_sysnum(js_dev));
-> -
-> -			/* joystick numbers start from 0, leds from 1 */
-> -			number++;
-> -
-> -			udev_device_unref(js_dev);
-> -			break;
-> -		}
-> -next:
-> -		udev_device_unref(js_dev);
-> -	}
-> -
-> -	udev_enumerate_unref(enumerate);
-> -
-> -	return number;
-> -}
-> -
-> -static char *get_leds_syspath_prefix(struct udev_device *udevice)
-> -{
-> -	struct udev_list_entry *dev_list_entry;
-> -	struct udev_enumerate *enumerate;
-> -	struct udev_device *hid_parent;
-> -	const char *syspath;
-> -	char *syspath_prefix;
-> -
-> -	hid_parent = udev_device_get_parent_with_subsystem_devtype(udevice,
-> -								"hid", NULL);
-> -
-> -	enumerate = udev_enumerate_new(udev_device_get_udev(udevice));
-> -	udev_enumerate_add_match_parent(enumerate, hid_parent);
-> -	udev_enumerate_add_match_subsystem(enumerate, "leds");
-> -	udev_enumerate_scan_devices(enumerate);
-> -
-> -	dev_list_entry = udev_enumerate_get_list_entry(enumerate);
-> -	if (!dev_list_entry) {
-> -		syspath_prefix = NULL;
-> -		goto out;
-> -	}
-> -
-> -	syspath = udev_list_entry_get_name(dev_list_entry);
-> -
-> -	/*
-> -	 * All the sysfs paths of the LEDs have the same structure, just the
-> -	 * number changes, so strip it and store only the common prefix.
-> -	 *
-> -	 * Subtracting 1 here means assuming that the LED number is a single
-> -	 * digit, this is safe as the kernel driver only exposes 4 LEDs.
-> -	 */
-> -	syspath_prefix = strndup(syspath, strlen(syspath) - 1);
-> -
-> -out:
-> -	udev_enumerate_unref(enumerate);
-> -
-> -	return syspath_prefix;
-> -}
-> -
-> -static struct leds_data *get_leds_data(struct udev_device *udevice)
-> -{
-> -	struct leds_data *data;
-> -	int number;
-> -
-> -	number = get_js_number(udevice);
-> -	DBG("number %d", number);
-> -
-> -	data = malloc0(sizeof(*data));
-> -	if (!data)
-> -		return NULL;
-> -
-> -	data->bitmap = calc_leds_bitmap(number);
-> -	if (data->bitmap == 0) {
-> -		leds_data_destroy(data);
-> -		return NULL;
-> -	}
-> -
-> -	/*
-> -	 * It's OK if this fails, set_leds_hidraw() will be used in
-> -	 * case data->syspath_prefix is NULL.
-> -	 */
-> -	data->syspath_prefix = get_leds_syspath_prefix(udevice);
-> -
-> -	return data;
-> -}
-> -
->  static int get_supported_device(struct udev_device *udevice, uint16_t *bus)
-> {
->  	struct udev_device *hid_parent;
-> @@ -481,7 +214,6 @@ static int get_supported_device(struct udev_device
-> *udevice, uint16_t *bus) static void device_added(struct udev_device
-> *udevice)
->  {
->  	struct btd_adapter *adapter;
-> -	GIOChannel *io;
->  	uint16_t bus;
->  	int index;
->  	int fd;
-> @@ -493,6 +225,8 @@ static void device_added(struct udev_device *udevice)
->  	index = get_supported_device(udevice, &bus);
->  	if (index < 0)
->  		return;
-> +	if (bus != BUS_USB)
-> +		return;
-> 
->  	info("sixaxis: compatible device connected: %s (%04X:%04X)",
->  				devices[index].name, devices[index].vid,
-> @@ -502,27 +236,8 @@ static void device_added(struct udev_device *udevice)
->  	if (fd < 0)
->  		return;
-> 
-> -	io = g_io_channel_unix_new(fd);
-> -
-> -	switch (bus) {
-> -	case BUS_USB:
-> -		if (!setup_device(fd, index, adapter))
-> -			break;
-> -
-> -		/* fall through */
-> -	case BUS_BLUETOOTH:
-> -		/* wait for events before setting leds */
-> -		g_io_add_watch(io, G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL,
-> -				setup_leds, get_leds_data(udevice));
-> -
-> -		break;
-> -	default:
-> -		DBG("uknown bus type (%u)", bus);
-> -		break;
-> -	}
-> -
-> -	g_io_channel_set_close_on_unref(io, TRUE);
-> -	g_io_channel_unref(io);
-> +	setup_device(fd, index, adapter);
-> +	close(fd);
->  }
-> 
->  static gboolean monitor_watch(GIOChannel *source, GIOCondition condition,
+Signed-off-by: Shermin Joy <shermin.joy@gmail.com>
+---
+ include/net/bluetooth/hci_core.h |   4 ++
+ net/bluetooth/hci_core.c         |   8 +++
+ net/bluetooth/hci_request.c      | 149 ++++++++++++++++++++++++++++++++++++---
+ 3 files changed, 150 insertions(+), 11 deletions(-)
 
-
-This patch is now applied, thanks.
-
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 82c9589..5639b6e 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -138,6 +138,7 @@ struct smp_irk {
+ 	u8 addr_type;
+ 	u8 val[16];
+ 	bool in_ll_resolving_list;
++	bool changed;
+ };
+ 
+ struct link_key {
+@@ -1539,6 +1540,9 @@ void hci_le_start_enc(struct hci_conn *conn, __le16 ediv, __le64 rand,
+ void hci_copy_identity_address(struct hci_dev *hdev, bdaddr_t *bdaddr,
+ 			       u8 *bdaddr_type);
+ 
++int hci_req_update_resolving_list(struct hci_dev *hdev,  u8 addr_type,
++				  bdaddr_t *bdaddr, u8 irk[16]);
++
+ #define SCO_AIRMODE_MASK       0x0003
+ #define SCO_AIRMODE_CVSD       0x0000
+ #define SCO_AIRMODE_TRANSP     0x0003
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index ab16e71..c2860f9 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -2215,6 +2215,8 @@ void hci_smp_irks_clear(struct hci_dev *hdev)
+ 		list_del_rcu(&k->list);
+ 		kfree_rcu(k, rcu);
+ 	}
++
++	hci_req_clear_resolving_list(hdev);
+ }
+ 
+ struct link_key *hci_find_link_key(struct hci_dev *hdev, bdaddr_t *bdaddr)
+@@ -2438,6 +2440,8 @@ struct smp_irk *hci_add_irk(struct hci_dev *hdev, bdaddr_t *bdaddr,
+ 		irk->addr_type = addr_type;
+ 
+ 		list_add_rcu(&irk->list, &hdev->identity_resolving_keys);
++	} else {
++		irk->changed = true;
+ 	}
+ 
+ 	memcpy(irk->val, val, 16);
+@@ -2491,6 +2495,10 @@ void hci_remove_irk(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 addr_type)
+ 
+ 		BT_DBG("%s removing %pMR", hdev->name, bdaddr);
+ 
++		if (k->in_ll_resolving_list)
++			hci_req_del_from_resolving_list(hdev, addr_type,
++							bdaddr);
++
+ 		list_del_rcu(&k->list);
+ 		kfree_rcu(k, rcu);
+ 	}
+diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
+index 6dcc827..3ad0b16 100644
+--- a/net/bluetooth/hci_request.c
++++ b/net/bluetooth/hci_request.c
+@@ -682,6 +682,7 @@ static u8 update_white_list(struct hci_request *req)
+ 	struct hci_conn_params *params;
+ 	struct bdaddr_list *b;
+ 	uint8_t white_list_entries = 0;
++	struct smp_irk *irk;
+ 
+ 	/* Go through the current white list programmed into the
+ 	 * controller one by one and check if that address is still
+@@ -707,9 +708,19 @@ static u8 update_white_list(struct hci_request *req)
+ 			continue;
+ 		}
+ 
+-		if (hci_find_irk_by_addr(hdev, &b->bdaddr, b->bdaddr_type)) {
+-			/* White list can not be used with RPAs */
+-			return 0x00;
++		irk = hci_find_irk_by_addr(hdev, &b->bdaddr, b->bdaddr_type);
++		if ((irk) && (!irk->in_ll_resolving_list)) {
++			/* White list can not be used with RPAs if
++			 * device is not added in resolving list.
++			 */
++			if (!hdev->le_ll_addr_resolve_enabled)
++				return 0x00;
++
++			if (hci_req_update_resolving_list(hdev,
++							  irk->addr_type,
++							  &irk->bdaddr,
++							  irk->val))
++				return 0x00;
+ 		}
+ 
+ 		white_list_entries++;
+@@ -735,10 +746,19 @@ static u8 update_white_list(struct hci_request *req)
+ 			return 0x00;
+ 		}
+ 
+-		if (hci_find_irk_by_addr(hdev, &params->addr,
+-					 params->addr_type)) {
+-			/* White list can not be used with RPAs */
+-			return 0x00;
++		irk = hci_find_irk_by_addr(hdev, &b->bdaddr, b->bdaddr_type);
++		if ((irk) && (!irk->in_ll_resolving_list)) {
++			/* White list can not be used with RPAs if
++			 * device is not added in resolving list.
++			 */
++			if (!hdev->le_ll_addr_resolve_enabled)
++				return 0x00;
++
++			if (hci_req_update_resolving_list(hdev,
++							  irk->addr_type,
++							  &irk->bdaddr,
++							  irk->val))
++				return 0x00;
+ 		}
+ 
+ 		white_list_entries++;
+@@ -759,10 +779,19 @@ static u8 update_white_list(struct hci_request *req)
+ 			return 0x00;
+ 		}
+ 
+-		if (hci_find_irk_by_addr(hdev, &params->addr,
+-					 params->addr_type)) {
+-			/* White list can not be used with RPAs */
+-			return 0x00;
++		irk = hci_find_irk_by_addr(hdev, &b->bdaddr, b->bdaddr_type);
++		if ((irk) && (!irk->in_ll_resolving_list)) {
++			/* White list can not be used with RPAs if
++			 * device is not added in resolving list.
++			 */
++			if (!hdev->le_ll_addr_resolve_enabled)
++				return 0x00;
++
++			if (hci_req_update_resolving_list(hdev,
++							  irk->addr_type,
++							  &irk->bdaddr,
++							  irk->val))
++				return 0x00;
+ 		}
+ 
+ 		white_list_entries++;
+@@ -787,6 +816,104 @@ static void add_to_resolving_list(struct hci_request *req, u8 addr_type,
+ 	hci_req_add(req, HCI_OP_LE_ADD_TO_RESOLVING_LIST, sizeof(cp), &cp);
+ }
+ 
++int hci_req_update_resolving_list(struct hci_dev *hdev, u8 addr_type,
++				  bdaddr_t *bdaddr, u8 irk_val[16])
++{
++	struct hci_request req;
++	struct hci_cp_le_del_from_resolving_list cp;
++	struct bdaddr_list *b;
++	struct smp_irk *irk;
++	u8 resolving_list_entries;
++	bool match;
++
++	/* Nothing to be done if LL privacy is not supported. */
++	if (hdev->le_features[0] & HCI_LE_LL_PRIVACY)
++		return -1;
++
++	/* Resolving List cannot be updated if address resolution
++	 * in the controller is enabled and advertisement or scanning
++	 * or create connection command is ongoing.
++	 */
++	if ((hdev->le_ll_addr_resolve_enabled) &&
++	    ((hci_dev_test_flag(hdev, HCI_LE_ADV)) ||
++	    (hci_dev_test_flag(hdev, HCI_LE_SCAN)) ||
++	    (hci_lookup_le_connect(hdev))))
++		return -1;
++
++	hci_req_init(&req, hdev);
++
++	irk = hci_find_irk_by_addr(hdev, bdaddr, addr_type);
++	if (!irk)
++		return -1;
++
++	if (irk->in_ll_resolving_list) {
++		/* If device is present in the resolving list, and IRK
++		 * has not changed nothing more is to be done.
++		 */
++		if (!irk->changed)
++			return 0;
++
++		/* If IRK has changed, remove the device and add it again.*/
++		goto remove_device;
++	}
++
++	/* Add device to resolving list., if resolving list is not full.*/
++	resolving_list_entries = 0;
++	rcu_read_lock();
++	list_for_each_entry_rcu(irk, &hdev->identity_resolving_keys, list) {
++		if (irk->in_ll_resolving_list)
++			resolving_list_entries++;
++	}
++	rcu_read_unlock();
++
++	if (resolving_list_entries < hdev->le_resolving_list_size)
++		goto add_device;
++
++	/* If resolving list is full, go through the current resolving list
++	 * programmed into the controller one by one and check if that
++	 * peer is present in the whitelist. The first entry that is not present
++	 * in whitelist is queued up for deletion.
++	 */
++	resolving_list_entries = 0;
++	rcu_read_lock();
++	list_for_each_entry_rcu(irk, &hdev->identity_resolving_keys, list) {
++		if (!irk->in_ll_resolving_list)
++			continue;
++
++		match = false;
++		list_for_each_entry(b, &hdev->le_white_list, list) {
++			if (bacmp(&irk->bdaddr, &b->bdaddr) == 0 &&
++			    irk->addr_type == b->bdaddr_type) {
++				match = true;
++				resolving_list_entries++;
++				break;
++			}
++		}
++
++		/* If the resolving list is still full return, without
++		 * adding the device.
++		 */
++		if (resolving_list_entries >= hdev->le_resolving_list_size) {
++			rcu_read_unlock();
++			return -1;
++		}
++
++		if (!match)
++			break;
++	}
++	rcu_read_unlock();
++
++remove_device:
++	cp.peer_bdaddr_type = irk->addr_type;
++	bacpy(&cp.peer_bdaddr, &irk->bdaddr);
++	hci_req_add(&req, HCI_OP_LE_DEL_FROM_RESOLVING_LIST, sizeof(cp), &cp);
++
++add_device:
++	add_to_resolving_list(&req, addr_type, bdaddr, irk_val);
++	hci_req_run(&req, NULL);
++	return 0;
++}
++
+ void hci_req_del_from_resolving_list(struct hci_dev *hdev, u8 addr_type,
+ 				     bdaddr_t *bdaddr)
+ {
 -- 
-pozdrawiam
-Szymon Janc
+1.9.1
+
