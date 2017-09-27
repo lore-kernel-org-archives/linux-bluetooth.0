@@ -1,12 +1,13 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Szymon Janc <szymon.janc@codecoup.pl>
 To: Bastien Nocera <hadess@hadess.net>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 3/9] sixaxis: Ask user whether cable configuration should be allowed
-Date: Wed, 27 Sep 2017 11:12:04 +0200
-Message-ID: <1757680.YUP8J5zydk@ix>
-In-Reply-To: <20170904181212.5639-3-hadess@hadess.net>
-References: <20170904181212.5639-1-hadess@hadess.net> <20170904181212.5639-3-hadess@hadess.net>
+Cc: linux-bluetooth@vger.kernel.org,
+        Juha Kuikka <juha.kuikka@gmail.com>
+Subject: Re: [PATCH 8/9] plugins/sixaxis: Add support for DualShock 4/PS4 cable pairing
+Date: Wed, 27 Sep 2017 11:12:01 +0200
+Message-ID: <8659915.mKjsMy947m@ix>
+In-Reply-To: <20170904181212.5639-8-hadess@hadess.net>
+References: <20170904181212.5639-1-hadess@hadess.net> <20170904181212.5639-8-hadess@hadess.net>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -14,173 +15,144 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Bastien,
 
-On Monday, 4 September 2017 20:12:06 CEST Bastien Nocera wrote:
-> Previously, users doing cable configuration of Sixaxis PS3 controllers
-> would only get asked whether a device was allowed to connect to the
-> computer when switching it to Bluetooth mode: unplugging it, and
-> pressing the PS button.
+On Monday, 4 September 2017 20:12:11 CEST Bastien Nocera wrote:
+> From: Juha Kuikka <juha.kuikka@gmail.com>
 > 
-> Instead, we should ask the user straight away, through the agent,
-> whether the pad should be allowed to connect.
+> This patch adds support for "pairing" a Dualshock4 controller over USB
+> into the sixaxis plugin, similarly to what the Sixaxis/PS3 controller
+> supported.
 > 
-> This makes it easier to setup those devices, while keeping security.
-> ---
->  plugins/sixaxis.c | 83
-> +++++++++++++++++++++++++++++++++++++++++-------------- 1 file changed, 63
-> insertions(+), 20 deletions(-)
+> Actual bonding happens on first connection, but the device will be
+> marked as trusted when the agent replies.
+> 
+> This patch is based on DS4 supprt for sixpair tool by t0xicCode:
+> https://github.com/t0xicCode/sixpair/commit/975c38cb6cd61a2f0be350714f0f64ce
+> f5f0432c ---
+>  plugins/sixaxis.c | 73
+> ++++++++++++++++++++++++++++++++++++++++++++++++++++++- 1 file changed, 72
+> insertions(+), 1 deletion(-)
 > 
 > diff --git a/plugins/sixaxis.c b/plugins/sixaxis.c
-> index 7d3a8f3ac..c8305d52f 100644
+> index b62834d72..eb15acb92 100644
 > --- a/plugins/sixaxis.c
 > +++ b/plugins/sixaxis.c
-> @@ -44,6 +44,7 @@
-> 
->  #include "src/adapter.h"
->  #include "src/device.h"
-> +#include "src/agent.h"
->  #include "src/plugin.h"
->  #include "src/log.h"
->  #include "src/shared/util.h"
-> @@ -71,6 +72,13 @@ static const struct {
->  	},
->  };
-> 
-> +struct authentication_closure {
-> +	struct btd_adapter *adapter;
-> +	struct btd_device *device;
-> +	int fd;
-> +	char device_addr[18];
-
-If this is needed only for debug then just convert address to string in place 
-where it is printed.
-
-> +};
-> +
->  static struct udev *ctx = NULL;
->  static struct udev_monitor *monitor = NULL;
->  static guint watch_id = 0;
-> @@ -135,19 +143,51 @@ static int set_master_bdaddr(int fd, const bdaddr_t
-> *bdaddr) return ret;
+> @@ -83,10 +83,34 @@ static int sixaxis_get_device_bdaddr(int fd, bdaddr_t
+> *bdaddr) return 0;
 >  }
 > 
-> +static void agent_auth_cb(DBusError *derr,
-> +				void *user_data)
+> +static int ds4_get_device_bdaddr(int fd, bdaddr_t *bdaddr)
 > +{
-> +	struct authentication_closure *closure = user_data;
-> +	char master_addr[18], adapter_addr[18];
-> +	bdaddr_t master_bdaddr;
-> +	const bdaddr_t *adapter_bdaddr;
+> +	uint8_t buf[7];
+> +	int ret;
 > +
-> +	if (derr != NULL) {
-> +		DBG("Agent replied negatively, removing temporary device");
-> +		goto error;
+> +	memset(buf, 0, sizeof(buf));
+> +
+> +	buf[0] = 0x81;
+> +
+> +	ret = ioctl(fd, HIDIOCGFEATURE(sizeof(buf)), buf);
+> +	if (ret < 0) {
+> +		error("ds4: failed to read device address (%s)",
+> +		      strerror(errno));
+
+Lets prefix all sixaxis error/info logs with "sixaxis:"
+
+> +		return ret;
 > +	}
 > +
-> +	btd_device_set_temporary(closure->device, false);
+> +	/* address is little-endian on DS4 */
+> +	bacpy(bdaddr, (bdaddr_t*) (buf + 1));
 > +
-> +	if (get_master_bdaddr(closure->fd, &master_bdaddr) < 0)
-> +		goto error;
-> +
-> +	adapter_bdaddr = btd_adapter_get_address(closure->adapter);
-> +	if (bacmp(adapter_bdaddr, &master_bdaddr)) {
-> +		if (set_master_bdaddr(closure->fd, adapter_bdaddr) < 0)
-> +			goto error;
-> +	}
-> +
-> +	ba2str(&master_bdaddr, master_addr);
-> +	ba2str(adapter_bdaddr, adapter_addr);
-> +	DBG("remote %s old_master %s new_master %s",
-> +				closure->device_addr, master_addr, adapter_addr);
-> +
-> +error:
-> +	close(closure->fd);
-> +	g_free(closure);
+> +	return 0;
 > +}
 > +
->  static bool setup_device(int fd, int index, struct btd_adapter *adapter)
->  {
-> -	char device_addr[18], master_addr[18], adapter_addr[18];
-> -	bdaddr_t device_bdaddr, master_bdaddr;
-> +	char device_addr[18];
-> +	bdaddr_t device_bdaddr;
->  	const bdaddr_t *adapter_bdaddr;
->  	struct btd_device *device;
-> +	struct authentication_closure *closure;
+>  static int get_device_bdaddr(int fd, bdaddr_t *bdaddr, CablePairingType
+> type) {
+>  	if (type == CABLE_PAIRING_SIXAXIS)
+>  		return sixaxis_get_device_bdaddr(fd, bdaddr);
+> +	else if (type == CABLE_PAIRING_DS4)
+> +		return ds4_get_device_bdaddr(fd, bdaddr);
+>  	return -1;
+>  }
 > 
->  	if (get_device_bdaddr(fd, &device_bdaddr) < 0)
->  		return false;
+> @@ -111,10 +135,34 @@ static int sixaxis_get_master_bdaddr(int fd, bdaddr_t
+> *bdaddr) return 0;
+>  }
 > 
-> -	if (get_master_bdaddr(fd, &master_bdaddr) < 0)
-> -		return false;
-> -
->  	/* This can happen if controller was plugged while already connected
->  	 * eg. to charge up battery. */
->  	device = btd_adapter_find_device(adapter, &device_bdaddr,
-> @@ -155,25 +195,14 @@ static bool setup_device(int fd, int index, struct
-> btd_adapter *adapter) if (device && btd_device_is_connected(device))
->  		return false;
-> 
-> -	adapter_bdaddr = btd_adapter_get_address(adapter);
-> -
-> -	if (bacmp(adapter_bdaddr, &master_bdaddr)) {
-> -		if (set_master_bdaddr(fd, adapter_bdaddr) < 0)
-> -			return false;
-> -	}
-> -
->  	ba2str(&device_bdaddr, device_addr);
-> -	ba2str(&master_bdaddr, master_addr);
-> -	ba2str(adapter_bdaddr, adapter_addr);
-> -	DBG("remote %s old_master %s new_master %s",
-> -				device_addr, master_addr, adapter_addr);
-> 
->  	device = btd_adapter_get_device(adapter, &device_bdaddr, BDADDR_BREDR);
-> 
->  	if (g_slist_find_custom(btd_device_get_uuids(device), HID_UUID,
->  						(GCompareFunc)strcasecmp)) {
->  		DBG("device %s already known, skipping", device_addr);
-> -		return true;
-> +		return false;
->  	}
-> 
->  	info("sixaxis: setting up new device");
-> @@ -181,7 +210,20 @@ static bool setup_device(int fd, int index, struct
-> btd_adapter *adapter) btd_device_device_set_name(device,
-> devices[index].name);
->  	btd_device_set_pnpid(device, devices[index].source, devices[index].vid,
->  				devices[index].pid, devices[index].version);
-> -	btd_device_set_temporary(device, false);
-> +	btd_device_set_temporary(device, true);
+> +static int ds4_get_master_bdaddr(int fd, bdaddr_t *bdaddr)
+> +{
+> +	uint8_t buf[16];
+> +	int ret;
 > +
-> +	closure = g_try_new0(struct authentication_closure, 1);
-
-Just use new0() instead.
-
-> +	if (!closure) {
-> +		btd_adapter_remove_device(adapter, device);
-> +		return false;
+> +	memset(buf, 0, sizeof(buf));
+> +
+> +	buf[0] = 0x12;
+> +
+> +	ret = ioctl(fd, HIDIOCGFEATURE(sizeof(buf)), buf);
+> +	if (ret < 0) {
+> +		error("ds4: failed to read master address (%s)",
+> +		      strerror(errno));
+> +		return ret;
 > +	}
-> +	closure->adapter = adapter;
-> +	closure->device = device;
-> +	closure->fd = fd;
-> +	memcpy(&closure->device_addr, device_addr, sizeof(device_addr));
-> +	adapter_bdaddr = btd_adapter_get_address(adapter);
-> +	btd_request_authorization_cable_configured(adapter_bdaddr, &device_bdaddr,
-> +				HID_UUID, agent_auth_cb, closure);
-> 
->  	return true;
+> +
+> +	/* address is little-endian on DS4 */
+> +	bacpy(bdaddr, (bdaddr_t*) (buf + 10));
+> +
+> +	return 0;
+> +}
+> +
+>  static int get_master_bdaddr(int fd, bdaddr_t *bdaddr, CablePairingType
+> type) {
+>  	if (type == CABLE_PAIRING_SIXAXIS)
+>  		return sixaxis_get_master_bdaddr(fd, bdaddr);
+> +	else if (type == CABLE_PAIRING_DS4)
+> +		return ds4_get_master_bdaddr(fd, bdaddr);
+>  	return -1;
 >  }
-> @@ -236,8 +278,9 @@ static void device_added(struct udev_device *udevice)
->  	if (fd < 0)
+> 
+> @@ -136,11 +184,33 @@ static int sixaxis_set_master_bdaddr(int fd, const
+> bdaddr_t *bdaddr) return ret;
+>  }
+> 
+> +static int ds4_set_master_bdaddr(int fd, const bdaddr_t *bdaddr)
+> +{
+> +	uint8_t buf[23];
+> +	int ret;
+> +
+> +	buf[0] = 0x13;
+> +	bacpy((bdaddr_t*) (buf + 1), bdaddr);
+> +	/* TODO: we could put the key here but
+> +	   there is no way to force a re-loading
+> +	   of link keys to the kernel from here. */
+> +	memset(buf + 7, 0, 16);
+> +
+> +	ret = ioctl(fd, HIDIOCSFEATURE(sizeof(buf)), buf);
+> +	if (ret < 0)
+> +		error("ds4: failed to write master address (%s)",
+> +		      strerror(errno));
+> +
+> +	return ret;
+> +}
+> +
+>  static int set_master_bdaddr(int fd, const bdaddr_t *bdaddr,
+>  					CablePairingType type)
+>  {
+>  	if (type == CABLE_PAIRING_SIXAXIS)
+>  		return sixaxis_set_master_bdaddr(fd, bdaddr);
+> +	else if (type == CABLE_PAIRING_DS4)
+> +		return ds4_set_master_bdaddr(fd, bdaddr);
+>  	return -1;
+>  }
+> 
+> @@ -279,7 +349,8 @@ static void device_added(struct udev_device *udevice)
+>  						&name,
+>  						&source,
+>  						&version);
+> -	if (type != CABLE_PAIRING_SIXAXIS)
+> +	if (type != CABLE_PAIRING_SIXAXIS &&
+> +	    type != CABLE_PAIRING_DS4)
 >  		return;
-> 
-> -	setup_device(fd, index, adapter);
-> -	close(fd);
-> +	/* Only close the fd if an authentication is not pending */
-> +	if (!setup_device(fd, index, adapter))
-> +		close(fd);
->  }
-> 
->  static gboolean monitor_watch(GIOChannel *source, GIOCondition condition,
+>  	if (bus != BUS_USB)
+>  		return;
 
 
 -- 
