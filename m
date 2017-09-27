@@ -3,8 +3,8 @@ From: Szymon Janc <szymon.janc@codecoup.pl>
 To: Bastien Nocera <hadess@hadess.net>
 Cc: linux-bluetooth@vger.kernel.org
 Subject: Re: [PATCH 3/9] sixaxis: Ask user whether cable configuration should be allowed
-Date: Wed, 27 Sep 2017 11:14:24 +0200
-Message-ID: <5909706.3V1B56IrXH@ix>
+Date: Wed, 27 Sep 2017 11:12:04 +0200
+Message-ID: <1757680.YUP8J5zydk@ix>
 In-Reply-To: <20170904181212.5639-3-hadess@hadess.net>
 References: <20170904181212.5639-1-hadess@hadess.net> <20170904181212.5639-3-hadess@hadess.net>
 MIME-Version: 1.0
@@ -50,6 +50,10 @@ On Monday, 4 September 2017 20:12:06 CEST Bastien Nocera wrote:
 > +	struct btd_device *device;
 > +	int fd;
 > +	char device_addr[18];
+
+If this is needed only for debug then just convert address to string in place 
+where it is printed.
+
 > +};
 > +
 >  static struct udev *ctx = NULL;
@@ -148,6 +152,9 @@ On Monday, 4 September 2017 20:12:06 CEST Bastien Nocera wrote:
 > +	btd_device_set_temporary(device, true);
 > +
 > +	closure = g_try_new0(struct authentication_closure, 1);
+
+Just use new0() instead.
+
 > +	if (!closure) {
 > +		btd_adapter_remove_device(adapter, device);
 > +		return false;
@@ -175,9 +182,6 @@ On Monday, 4 September 2017 20:12:06 CEST Bastien Nocera wrote:
 > 
 >  static gboolean monitor_watch(GIOChannel *source, GIOCondition condition,
 
-So user will be asked for consent after DS3 was configured? Not that I have 
-strong opinion on this but did you consider configuring it only after user 
-gave consent?
 
 -- 
 pozdrawiam
