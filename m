@@ -1,400 +1,101 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <frederic.danis.oss@gmail.com>
+Subject: Re: [RFC 1/3] serdev: Add ACPI support
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Rob Herring <robh@kernel.org>, sre@kernel.org, loic.poulain@gmail.com,
+ linux-bluetooth@vger.kernel.org, linux-serial@vger.kernel.org,
+ linux-acpi@vger.kernel.org, johan@kernel.org
+References: <1504786214-1866-1-git-send-email-frederic.danis.oss@gmail.com>
+ <1504786214-1866-2-git-send-email-frederic.danis.oss@gmail.com>
+ <1BC8D5B0-EC18-4F20-9CBC-D73CB1765683@holtmann.org>
+ <55c85c4d-f674-6f00-f112-76d1a70e8e0a@gmail.com>
+ <AC100BF1-B6E9-47ED-95A0-7E7E75C0DE89@holtmann.org>
+ <D48CDCC9-F039-4E80-BA12-5A579E13E09F@holtmann.org>
+From: =?UTF-8?Q?Fr=c3=a9d=c3=a9ric_Danis?= <frederic.danis.oss@gmail.com>
+Message-ID: <6c1a7ba2-ba04-b075-4a04-4f42dfe3a8c7@gmail.com>
+Date: Fri, 29 Sep 2017 14:17:33 +0200
 MIME-Version: 1.0
-Reply-To: yunhanw@nestlabs.com
-In-Reply-To: <CABBYNZLvomAGYvvtm1HzGSPiLPYOCAnX3R6kjsq3GPQzO9EcjQ@mail.gmail.com>
-References: <20170920074417.30435-1-luiz.dentz@gmail.com> <20170920074417.30435-7-luiz.dentz@gmail.com>
- <CALvjcs-THH_Mmuvj7TGDdJOSuhCqPWOPAfCfon=ady8oJ=vCCQ@mail.gmail.com>
- <CABBYNZ+DNnr8KkSQzKrEnbZjdEmbDC47hrO7VQ185+mOwuOn3g@mail.gmail.com>
- <CALvjcs9PLGbPEqN3oz9ndJnBz57Ymiw0mWAF++SSEV1ChNT_hA@mail.gmail.com>
- <CABBYNZJQKWRMGtgUfCYJmDzn7VFh6dmR7GpiyUk7HHOTtR-wCA@mail.gmail.com>
- <CALvjcs8MiNMcEfcOi3in_td7VBJbA-nE-wcZhcEz7VDFwdZR+A@mail.gmail.com> <CABBYNZLvomAGYvvtm1HzGSPiLPYOCAnX3R6kjsq3GPQzO9EcjQ@mail.gmail.com>
-From: Yunhan Wang <yunhanw@nestlabs.com>
-Date: Fri, 29 Sep 2017 20:39:30 -0700
-Message-ID: <CALvjcs8LvwCGo_iKcd5szvHZ-QJkiyobwBv5aSN4P_xOHsdyVA@mail.gmail.com>
-Subject: Re: [PATCH v2 06/10] gatt: Implement AcquireWrite for server
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <D48CDCC9-F039-4E80-BA12-5A579E13E09F@holtmann.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi, Luiz
+Hi Marcel,
 
-On Fri, Sep 29, 2017 at 1:02 AM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi Yunhan,
+Le 29/09/2017 à 14:00, Marcel Holtmann a écrit :
+> Hi Fred,
 >
-> On Fri, Sep 29, 2017 at 10:50 AM, Yunhan Wang <yunhanw@nestlabs.com> wrot=
-e:
->> Hi, Luiz
->>
->> I see. Great! Thanks for your explanation.
->
-> Please comment inline on the list.
->
->> Maybe it is good to have both solutions in current bluez?
->> 1. AcquireWrite, write data passing via fd, mtu passing by DBUS, we
->> can take advantage of fd under high load.
->> 2. Write, write data and mtu passing over DBUS, we still can fully use
->> DBUS under low load.
->
-> Well that is actually a 3 type of transfer since regular WriteValue
-> already exists which defeat a little bit the purpose of WriteAcquired
-> since we can no longer determine if the server supports fd mode or
-> not, I think it is too much and the server has to either to decide if
-> unfragmented D-Bus transfer is fine is not, if not then fd passing
-> shall be the only mechanism.
->
-I agree, it is three type of transfer,
-regular write,
-regular write with mtu support(application is responsible for packet
-fragmentation)
-fd with pipe (application is responsible for packet fragmentation),
+>>>>> +#ifdef CONFIG_ACPI
+>>>>> +static acpi_status acpi_serdev_register_device(struct serdev_controller *ctrl,
+>>>>> +					    struct acpi_device *adev)
+>>>>> +{
+>>>>> +	struct serdev_device *serdev = NULL;
+>>>>> +	int err;
+>>>>> +
+>>>>> +	if (acpi_bus_get_status(adev) || !adev->status.present ||
+>>>>> +	    acpi_device_enumerated(adev))
+>>>>> +		return AE_OK;
+>>>>> +
+>>>>> +	serdev = serdev_device_alloc(ctrl);
+>>>>> +	if (!serdev) {
+>>>>> +		dev_err(&ctrl->dev, "failed to allocate Serial device for %s\n",
+>>>>> +			dev_name(&adev->dev));
+>>>>> +		return AE_NO_MEMORY;
+>>>>> +	}
+>>>>> +
+>>>>> +	ACPI_COMPANION_SET(&serdev->dev, adev);
+>>>>> +	acpi_device_set_enumerated(adev);
+>>>>> +
+>>>>> +	err = serdev_device_add(serdev);
+>>>>> +	if (err) {
+>>>>> +		dev_err(&serdev->dev,
+>>>>> +			"failure adding ACPI device. status %d\n", err);
+>>>>> +		serdev_device_put(serdev);
+>>>>> +	}
+>>>>> +
+>>>>> +	return AE_OK;
+>>>>> +}
+>>>>> +
+>>>>> +static acpi_status acpi_serdev_add_device(acpi_handle handle, u32 level,
+>>>>> +				       void *data, void **return_value)
+>>>>> +{
+>>>>> +	struct serdev_controller *ctrl = data;
+>>>>> +	struct acpi_device *adev;
+>>>>> +
+>>>>> +	if (acpi_bus_get_device(handle, &adev))
+>>>>> +		return AE_OK;
+>>>>> +
+>>>>> +	return acpi_serdev_register_device(ctrl, adev);
+>>>>> +}
+>>>>> +
+>>>>> +static int acpi_serdev_register_devices(struct serdev_controller *ctrl)
+>>>>> +{
+>>>>> +	acpi_status status;
+>>>>> +	acpi_handle handle;
+>>>>> +
+>>>>> +	handle = ACPI_HANDLE(ctrl->dev.parent);
+>>>>> +	if (!handle)
+>>>>> +		return -ENODEV;
+>>>>> +
+>>>>> +	status = acpi_walk_namespace(ACPI_TYPE_DEVICE, handle, 1,
+>>>>> +				     acpi_serdev_add_device, NULL, ctrl, NULL);
+>>>>> +	if (ACPI_FAILURE(status)) {
+>>>>> +		dev_warn(&ctrl->dev, "failed to enumerate Serial slaves\n");
+>>>>> +		return -ENODEV;
+>>>>> +	}
+>>>>> +
+>>>>> +	return 0;
+>>>>> +}
+>>>> how are we ensuring that we only take UART devices into account here?
+>>> acpi_serdev_add_device() callback will only take into account entries without enumerated flag set.
+>>> This flags is set for all entries during ACPI scan, except for SPI and I2C serial devices, and for UART with 2nd patch in the series.
+>> sounds good to me. Can you respin this series with the other comments addressed and maybe add some extra comments in the code or the commit message to make this clear.
+> any updates on this?
 
-now we have two kind of transfer(regular write, acquire write) in
-code, add third one is pretty straightforward and only small code
-change.
+While working on it, I tried to add the PM support 
+(bcm_serdev_driver.driver.pm = &bcm_pm_ops) but it ends up in kernel 
+freeze during suspend to ram test.
+I may have found the problem but do not have access to T100 now to test 
+it (this may take some times as I work on it on spare time).
 
-I read two articles(https://blogs.gnome.org/abustany/2010/05/20/ipc-perform=
-ance-the-return-of-the-report/,
-https://lists.freedesktop.org/archives/dbus/2014-October/016363.html),
-I agree that fd with pipe is more efficent, and eliminate several
-copy, and benefit for byte streaming although there is minor
-vulnerability mentioned in above article,  I hope engineer in
-peripheral application can still have another choice, regular write
-with mtu, when traffic is low or it is experiment purpose. Considering
-these are pretty similar, easy to integrate, engineer still can easily
-switch them between fd with pipe and regular write.
+Regards,
 
-> Considering how easy it was to add support for fd passing on the
-> bluetoothctl I don't thing it is that big of deal really, or there is
-> something else preventing this to happen in your end?
->
-Yes, fd passing is pretty easy and efficent, it is not big deal to
-integrate it, using this way, in my end, for gatt write with response
-from central to peripheral, I can see written value and length in
-https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/client/gatt.c#n688,
-but I cannot see any response back for GATT write from peripheral to
-central. It seems this only support GATT write without response even
-though I have removed the check
-here(https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/client/gatt.c#=
-n1360).
-Any idea?
-
-In contrast, for regular WriteValue, I can see write response  from
-peripheral to central.
-
->> which means the only light change is to add mtu passing over DBUS in 2. =
-Write
->>
->> Finally both solutions can be available to bluez users.
->>
->> Thanks
->> Best wishes
->> Yunhan
->>
->> On Fri, Sep 29, 2017 at 12:22 AM, Luiz Augusto von Dentz
->> <luiz.dentz@gmail.com> wrote:
->>> Hi Yunhan,
->>>
->>> On Fri, Sep 29, 2017 at 10:14 AM, Yunhan Wang <yunhanw@nestlabs.com> wr=
-ote:
->>>> Hi, Luiz
->>>>
->>>> For server, what is the benefit to use fd instead of DBUS to pass
->>>> write value? Isn't it better that we put all bluez client and server
->>>> only chat via DBUS upon bluetoothd? For mtu, definitely we can do it
->>>> using DBUS message, if we use current acquire_write, in server
->>>> application side, we will have to implement callback for
->>>> "AcquireWrite" instead of "WriteValue=E2=80=9C=E3=80=81
->>>
->>> For byte streams passing data over D-Bus is inefficient as that has is
->>> delivered to dbus-daemon before the end application it will always be
->>> slower than sending directly via fd, actually depending on the load on
->>> the system this may impact other processes using D-Bus as the daemon
->>> will be busy processing the WriteValue messages.
->>>
->>>> Thanks
->>>> Best wishes
->>>> Yunhan
->>>>
->>>> On Thu, Sep 28, 2017 at 11:54 PM, Luiz Augusto von Dentz
->>>> <luiz.dentz@gmail.com> wrote:
->>>>> Hi Yunhan,
->>>>>
->>>>> On Fri, Sep 29, 2017 at 8:04 AM, Yunhan Wang <yunhanw@nestlabs.com> w=
-rote:
->>>>>> Hi, Luiz
->>>>>>
->>>>>> May I ask several questions about acquire write implementation?
->>>>>>
->>>>>> On Wed, Sep 20, 2017 at 12:44 AM, Luiz Augusto von Dentz
->>>>>> <luiz.dentz@gmail.com> wrote:
->>>>>>> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->>>>>>>
->>>>>>> This enables IO via file descriptors using AcquireWrite if server
->>>>>>> implements it.
->>>>>>> ---
->>>>>>>  src/gatt-database.c | 142 ++++++++++++++++++++++++++++++++++++++++=
-++++++++++++
->>>>>>>  1 file changed, 142 insertions(+)
->>>>>>>
->>>>>>> diff --git a/src/gatt-database.c b/src/gatt-database.c
->>>>>>> index 61eed71d6..239fe5384 100644
->>>>>>> --- a/src/gatt-database.c
->>>>>>> +++ b/src/gatt-database.c
->>>>>>> @@ -33,6 +33,7 @@
->>>>>>>  #include "gdbus/gdbus.h"
->>>>>>>  #include "src/shared/util.h"
->>>>>>>  #include "src/shared/queue.h"
->>>>>>> +#include "src/shared/io.h"
->>>>>>>  #include "src/shared/att.h"
->>>>>>>  #include "src/shared/gatt-db.h"
->>>>>>>  #include "src/shared/gatt-server.h"
->>>>>>> @@ -117,6 +118,7 @@ struct external_chrc {
->>>>>>>         uint8_t props;
->>>>>>>         uint8_t ext_props;
->>>>>>>         uint32_t perm;
->>>>>>> +       struct io *write_io;
->>>>>>>         struct gatt_db_attribute *attrib;
->>>>>>>         struct gatt_db_attribute *ccc;
->>>>>>>         struct queue *pending_reads;
->>>>>>> @@ -325,6 +327,8 @@ static void chrc_free(void *data)
->>>>>>>  {
->>>>>>>         struct external_chrc *chrc =3D data;
->>>>>>>
->>>>>>> +       io_destroy(chrc->write_io);
->>>>>>> +
->>>>>>>         queue_destroy(chrc->pending_reads, cancel_pending_read);
->>>>>>>         queue_destroy(chrc->pending_writes, cancel_pending_write);
->>>>>>>
->>>>>>> @@ -1789,6 +1793,128 @@ static struct pending_op *send_write(struct=
- btd_device *device,
->>>>>>>         return NULL;
->>>>>>>  }
->>>>>>>
->>>>>>> +static bool pipe_hup(struct io *io, void *user_data)
->>>>>>> +{
->>>>>>> +       struct external_chrc *chrc =3D user_data;
->>>>>>> +
->>>>>>> +       DBG("%p closed\n", io);
->>>>>>> +
->>>>>>> +       if (io =3D=3D chrc->write_io)
->>>>>>> +               chrc->write_io =3D NULL;
->>>>>>> +
->>>>>>> +       io_destroy(io);
->>>>>>> +
->>>>>>> +       return false;
->>>>>>> +}
->>>>>>> +
->>>>>>> +static struct io *pipe_io_new(int fd, void *user_data)
->>>>>>> +{
->>>>>>> +       struct io *io;
->>>>>>> +
->>>>>>> +       io =3D io_new(fd);
->>>>>>> +
->>>>>>> +       io_set_close_on_destroy(io, true);
->>>>>>> +
->>>>>>> +       io_set_disconnect_handler(io, pipe_hup, user_data, NULL);
->>>>>>> +
->>>>>>> +       return io;
->>>>>>> +}
->>>>>>> +
->>>>>>> +static int pipe_io_send(struct io *io, const void *data, size_t le=
-n)
->>>>>>> +{
->>>>>>> +       struct iovec iov;
->>>>>>> +
->>>>>>> +       iov.iov_base =3D (void *) data;
->>>>>>> +       iov.iov_len =3D len;
->>>>>>> +
->>>>>>> +       return io_send(io, &iov, 1);
->>>>>>> +}
->>>>>>> +
->>>>>>> +static void acquire_write_reply(DBusMessage *message, void *user_d=
-ata)
->>>>>>> +{
->>>>>>> +       struct pending_op *op =3D user_data;
->>>>>>> +       struct external_chrc *chrc;
->>>>>>> +       DBusError err;
->>>>>>> +       int fd;
->>>>>>> +       uint16_t mtu;
->>>>>>> +
->>>>>>> +       chrc =3D gatt_db_attribute_get_user_data(op->attrib);
->>>>>>> +       dbus_error_init(&err);
->>>>>>> +
->>>>>>> +       if (dbus_set_error_from_message(&err, message) =3D=3D TRUE)=
- {
->>>>>>> +               error("Failed to acquire write: %s\n", err.name);
->>>>>>> +               dbus_error_free(&err);
->>>>>>> +               goto retry;
->>>>>>> +       }
->>>>>>> +
->>>>>>> +       if ((dbus_message_get_args(message, NULL, DBUS_TYPE_UNIX_FD=
-, &fd,
->>>>>>> +                                       DBUS_TYPE_UINT16, &mtu,
->>>>>>> +                                       DBUS_TYPE_INVALID) =3D=3D f=
-alse)) {
->>>>>>> +               error("Invalid AcquireWrite response\n");
->>>>>>> +               goto retry;
->>>>>>> +       }
->>>>>>> +
->>>>>>> +       DBG("AcquireWrite success: fd %d MTU %u\n", fd, mtu);
->>>>>>> +
->>>>>>> +       chrc->write_io =3D pipe_io_new(fd, chrc);
->>>>>>> +
->>>>>>> +       if (pipe_io_send(chrc->write_io, op->data.iov_base,
->>>>>>> +                               op->data.iov_len) < 0)
->>>>>>> +               goto retry;
->>>>>>> +
->>>>>>> +       return;
->>>>>>> +
->>>>>>> +retry:
->>>>>>> +       send_write(op->device, op->attrib, chrc->proxy, NULL, op->i=
-d,
->>>>>>> +                               op->data.iov_base, op->data.iov_len=
-, 0);
->>>>>>> +}
->>>>>>> +
->>>>>>> +static void acquire_write_setup(DBusMessageIter *iter, void *user_=
-data)
->>>>>>> +{
->>>>>>> +       struct pending_op *op =3D user_data;
->>>>>>> +       DBusMessageIter dict;
->>>>>>> +       struct bt_gatt_server *server;
->>>>>>> +       uint16_t mtu;
->>>>>>> +
->>>>>>> +       dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
->>>>>>> +                                       DBUS_DICT_ENTRY_BEGIN_CHAR_=
-AS_STRING
->>>>>>> +                                       DBUS_TYPE_STRING_AS_STRING
->>>>>>> +                                       DBUS_TYPE_VARIANT_AS_STRING
->>>>>>> +                                       DBUS_DICT_ENTRY_END_CHAR_AS=
-_STRING,
->>>>>>> +                                       &dict);
->>>>>>> +
->>>>>>> +       append_options(&dict, op);
->>>>>>> +
->>>>>>> +       server =3D btd_device_get_gatt_server(op->device);
->>>>>>> +
->>>>>>> +       mtu =3D bt_gatt_server_get_mtu(server);
->>>>>>> +
->>>>>>> +       dict_append_entry(&dict, "MTU", DBUS_TYPE_UINT16, &mtu);
->>>>>>> +
->>>>>>> +       dbus_message_iter_close_container(iter, &dict);
->>>>>>> +}
->>>>>>> +
->>>>>>> +static struct pending_op *acquire_write(struct external_chrc *chrc=
-,
->>>>>>> +                                       struct btd_device *device,
->>>>>>> +                                       struct gatt_db_attribute *a=
-ttrib,
->>>>>>> +                                       unsigned int id,
->>>>>>> +                                       const uint8_t *value, size_=
-t len)
->>>>>>> +{
->>>>>>> +       struct pending_op *op;
->>>>>>> +
->>>>>>> +       op =3D pending_write_new(device, NULL, attrib, id, value, l=
-en, 0);
->>>>>>> +
->>>>>>> +       if (g_dbus_proxy_method_call(chrc->proxy, "AcquireWrite",
->>>>>>> +                                       acquire_write_setup,
->>>>>>> +                                       acquire_write_reply,
->>>>>>> +                                       op, pending_op_free))
->>>>>>> +               return op;
->>>>>>> +
->>>>>>> +       pending_op_free(op);
->>>>>>> +
->>>>>>> +       return NULL;
->>>>>>> +}
->>>>>>> +
->>>>>>>  static uint8_t ccc_write_cb(uint16_t value, void *user_data)
->>>>>>>  {
->>>>>>>         struct external_chrc *chrc =3D user_data;
->>>>>>> @@ -2090,6 +2216,7 @@ static void chrc_write_cb(struct gatt_db_attr=
-ibute *attrib,
->>>>>>>         struct external_chrc *chrc =3D user_data;
->>>>>>>         struct btd_device *device;
->>>>>>>         struct queue *queue;
->>>>>>> +       DBusMessageIter iter;
->>>>>>>
->>>>>>>         if (chrc->attrib !=3D attrib) {
->>>>>>>                 error("Write callback called with incorrect attribu=
-te");
->>>>>>> @@ -2102,6 +2229,21 @@ static void chrc_write_cb(struct gatt_db_att=
-ribute *attrib,
->>>>>>>                 goto fail;
->>>>>>>         }
->>>>>>>
->>>>>>> +       if (chrc->write_io) {
->>>>>>> +               if (pipe_io_send(chrc->write_io, value, len) < 0) {
->>>>>>> +                       error("Unable to write: %s", strerror(errno=
-));
->>>>>>> +                       goto fail;
->>>>>>> +               }
->>>>>>> +
->>>>>>> +               gatt_db_attribute_write_result(attrib, id, 0);
->>>>>>> +               return;
->>>>>>> +       }
->>>>>>> +
->>>>>> Could you elaborate more about this part of codes, why are you using
->>>>>> pipe_io_send to update value instead of dbus?
->>>>>
->>>>> This is doing the write via fd if write_io has been acquired, the
->>>>> whole point is avoiding D-Bus.
->>>>>
->>>>>>> +       if (g_dbus_proxy_get_property(chrc->proxy, "WriteAcquired",=
- &iter)) {
->>>>>>> +               if (acquire_write(chrc, device, attrib, id, value, =
-len))
->>>>>>> +                       return;
->>>>>>> +       }
->>>>>>> +
->>>>>>
->>>>>> Currently my expected scenario is to get MTU when first Gatt Write(
->>>>>> write with response) comes in specific characteristic, for example, =
-I
->>>>>> use iphone as ble central and write value in Characteristic A on Blu=
-ez
->>>>>> peripheral, Bluez peripheral get negotiated MTU when first write com=
-es
->>>>>> in. From this part of codes, it seems it return immediately after
->>>>>> acquire_write is called, how can we move forward and write value to
->>>>>> peripheral application? What is the design idea here?
->>>>>
->>>>> After AcquireWrite the data is sent via fd as well:
->>>>>
->>>>> https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/src/gatt-data=
-base.c#n1891
->>>>>
->>>>>> The below is earlier draft idea for this MTU acquisition in server s=
-ide.
->>>>>> https://www.spinics.net/lists/linux-bluetooth/msg71961.html
->>>>>>
->>>>>>>         if (!(chrc->props & BT_GATT_CHRC_PROP_WRITE_WITHOUT_RESP))
->>>>>>>                 queue =3D chrc->pending_writes;
->>>>>>>         else
->>>>>>> --
->>>>>>> 2.13.5
->>>>>>>
->>>>>>> --
->>>>>>> To unsubscribe from this list: send the line "unsubscribe linux-blu=
-etooth" in
->>>>>>> the body of a message to majordomo@vger.kernel.org
->>>>>>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->>>>>
->>>>>
->>>>>
->>>>> --
->>>>> Luiz Augusto von Dentz
->>>
->>>
->>>
->>> --
->>> Luiz Augusto von Dentz
->
->
->
-> --
-> Luiz Augusto von Dentz
+Fred
