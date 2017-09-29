@@ -1,297 +1,539 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <linux-crypto-owner@vger.kernel.org>
+Subject: Re: [v2 PATCH 5/5] Bluetooth: let the crypto subsystem generate the
+ ecc privkey
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: "bluez mailin list (linux-bluetooth@vger.kernel.org)"
+        <linux-bluetooth@vger.kernel.org>, <linux-crypto@vger.kernel.org>
+References: <20170928141455.15336-1-tudor.ambarus@microchip.com>
+ <20170928141455.15336-6-tudor.ambarus@microchip.com>
+ <5E848FF1-C029-4F16-AE9B-10D71C05E1F0@holtmann.org>
+From: Tudor Ambarus <tudor.ambarus@microchip.com>
+Message-ID: <bb7544d4-a6e1-47bd-e6ed-04c6c8d4bfd5@microchip.com>
+Date: Fri, 29 Sep 2017 09:58:20 +0300
 MIME-Version: 1.0
-In-Reply-To: <CALvjcs_cpF3ZAKjLNdGq+U_+2F43rJQNiF2042dbAVawum+nMw@mail.gmail.com>
-References: <20170920074417.30435-1-luiz.dentz@gmail.com> <20170920074417.30435-9-luiz.dentz@gmail.com>
- <CALvjcs_cpF3ZAKjLNdGq+U_+2F43rJQNiF2042dbAVawum+nMw@mail.gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Fri, 29 Sep 2017 10:03:14 +0300
-Message-ID: <CABBYNZ+40gCRshXM8x1NHc88BJo50JR38g3Qm6Up4DKNdB3ROw@mail.gmail.com>
-Subject: Re: [PATCH v2 08/10] gatt: Implement AcquireNotify for server
-To: Yunhan Wang <yunhanw@nestlabs.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <5E848FF1-C029-4F16-AE9B-10D71C05E1F0@holtmann.org>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Yunhan,
+Hi, Marcel,
 
-On Fri, Sep 29, 2017 at 7:47 AM, Yunhan Wang <yunhanw@nestlabs.com> wrote:
-> Hi, Luiz
->
-> May I have several questions about this feature?
->
-> On Wed, Sep 20, 2017 at 12:44 AM, Luiz Augusto von Dentz
-> <luiz.dentz@gmail.com> wrote:
->> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+On 09/28/2017 07:50 PM, Marcel Holtmann wrote:
+> Hi Tudor,
+> 
+>> That Bluetooth SMP knows about the private key is pointless, since the
+>> detection of debug key usage is actually via the public key portion.
+>> With this patch, the Bluetooth SMP will stop keeping a copy of the
+>> ecdh private key and will let the crypto subsystem to generate and
+>> handle the ecdh private key, potentially benefiting of hardware
+>> ecc private key generation and retention.
 >>
->> This enables IO via file descriptors using AcquireWrite if server
->> implements it.
+>> The loop that tries to generate a correct private key is now removed and
+>> we trust the crypto subsystem to generate a correct private key. This
+>> backup logic should be done in crypto, if really needed.
+>>
+>> Signed-off-by: Tudor Ambarus <tudor.ambarus@microchip.com>
 >> ---
->>  src/gatt-database.c | 116 +++++++++++++++++++++++++++++++++++++++++++++=
-++++---
->>  1 file changed, 111 insertions(+), 5 deletions(-)
+>> net/bluetooth/ecdh_helper.c | 186 ++++++++++++++++++++++++--------------------
+>> net/bluetooth/ecdh_helper.h |   9 ++-
+>> net/bluetooth/selftest.c    |  14 +++-
+>> net/bluetooth/smp.c         |  66 +++++++---------
+>> 4 files changed, 147 insertions(+), 128 deletions(-)
 >>
->> diff --git a/src/gatt-database.c b/src/gatt-database.c
->> index 239fe5384..4932568dd 100644
->> --- a/src/gatt-database.c
->> +++ b/src/gatt-database.c
->> @@ -24,6 +24,7 @@
->>  #include <stdint.h>
->>  #include <stdlib.h>
->>  #include <errno.h>
->> +#include <unistd.h>
+>> diff --git a/net/bluetooth/ecdh_helper.c b/net/bluetooth/ecdh_helper.c
+>> index 16e022f..2155ce8 100644
+>> --- a/net/bluetooth/ecdh_helper.c
+>> +++ b/net/bluetooth/ecdh_helper.c
+>> @@ -49,15 +49,21 @@ static inline void swap_digits(u64 *in, u64 *out, unsigned int ndigits)
+>> 		out[i] = __swab64(in[ndigits - 1 - i]);
+>> }
 >>
->>  #include "lib/bluetooth.h"
->>  #include "lib/sdp.h"
->> @@ -118,7 +119,9 @@ struct external_chrc {
->>         uint8_t props;
->>         uint8_t ext_props;
->>         uint32_t perm;
->> +       uint16_t mtu;
->>         struct io *write_io;
->> +       struct io *notify_io;
->>         struct gatt_db_attribute *attrib;
->>         struct gatt_db_attribute *ccc;
->>         struct queue *pending_reads;
->> @@ -152,7 +155,8 @@ struct device_state {
->>         struct queue *ccc_states;
->>  };
+>> +/* compute_ecdh_secret() - function assumes that the private key was
+>> + *                         already set.
+>> + * @tfm:          KPP tfm handle allocated with crypto_alloc_kpp().
+>> + * @public_key:   pair's ecc public key.
+>> + * secret:        memory where the ecdh computed shared secret will be saved.
+>> + *
+>> + * Return: zero on success; error code in case of error.
+>> + */
+>> int compute_ecdh_secret(struct crypto_kpp *tfm, const u8 public_key[64],
+>> -			const u8 private_key[32], u8 secret[32])
+>> +			u8 secret[32])
+>> {
+>> 	struct kpp_request *req;
+>> -	struct ecdh p;
+>> +	u8 *tmp;
+>> 	struct ecdh_completion result;
+>> 	struct scatterlist src, dst;
+>> -	u8 *tmp, *buf;
+>> -	unsigned int buf_len;
+>> 	int err;
 >>
->> -typedef uint8_t (*btd_gatt_database_ccc_write_t) (uint16_t value,
->> +typedef uint8_t (*btd_gatt_database_ccc_write_t) (struct bt_att *att,
->> +                                                       uint16_t value,
->>                                                         void *user_data)=
-;
->>  typedef void (*btd_gatt_database_destroy_t) (void *data);
+>> 	tmp = kmalloc(64, GFP_KERNEL);
+>> @@ -72,28 +78,6 @@ int compute_ecdh_secret(struct crypto_kpp *tfm, const u8 public_key[64],
 >>
->> @@ -328,6 +332,7 @@ static void chrc_free(void *data)
->>         struct external_chrc *chrc =3D data;
+>> 	init_completion(&result.completion);
 >>
->>         io_destroy(chrc->write_io);
->> +       io_destroy(chrc->notify_io);
+>> -	/* Security Manager Protocol holds digits in litte-endian order
+>> -	 * while ECC API expect big-endian data
+>> -	 */
+>> -	swap_digits((u64 *)private_key, (u64 *)tmp, 4);
+>> -	p.key = (char *)tmp;
+>> -	p.key_size = 32;
+>> -	/* Set curve_id */
+>> -	p.curve_id = ECC_CURVE_NIST_P256;
+>> -	buf_len = crypto_ecdh_key_len(&p);
+>> -	buf = kmalloc(buf_len, GFP_KERNEL);
+>> -	if (!buf) {
+>> -		err = -ENOMEM;
+>> -		goto free_req;
+>> -	}
+>> -
+>> -	crypto_ecdh_encode_key(buf, buf_len, &p);
+>> -
+>> -	/* Set A private Key */
+>> -	err = crypto_kpp_set_secret(tfm, (void *)buf, buf_len);
+>> -	if (err)
+>> -		goto free_all;
+>> -
+>> 	swap_digits((u64 *)public_key, (u64 *)tmp, 4); /* x */
+>> 	swap_digits((u64 *)&public_key[32], (u64 *)&tmp[32], 4); /* y */
 >>
->>         queue_destroy(chrc->pending_reads, cancel_pending_read);
->>         queue_destroy(chrc->pending_writes, cancel_pending_write);
->> @@ -792,7 +797,8 @@ static void gatt_ccc_write_cb(struct gatt_db_attribu=
-te *attrib,
->>                 goto done;
+>> @@ -118,26 +102,76 @@ int compute_ecdh_secret(struct crypto_kpp *tfm, const u8 public_key[64],
+>> 	memcpy(secret, tmp, 32);
 >>
->>         if (ccc_cb->callback)
->> -               ecode =3D ccc_cb->callback(get_le16(value), ccc_cb->user=
-_data);
->> +               ecode =3D ccc_cb->callback(att, get_le16(value),
->> +                                               ccc_cb->user_data);
+>> free_all:
+>> -	kzfree(buf);
+>> -free_req:
+>> 	kpp_request_free(req);
+>> free_tmp:
+>> 	kzfree(tmp);
+>> 	return err;
+>> }
 >>
->>         if (!ecode) {
->>                 ccc->value[0] =3D value[0];
->> @@ -1801,12 +1807,34 @@ static bool pipe_hup(struct io *io, void *user_d=
-ata)
->>
->>         if (io =3D=3D chrc->write_io)
->>                 chrc->write_io =3D NULL;
->> +       else
->> +               chrc->notify_io =3D NULL;
->>
->>         io_destroy(io);
->>
->>         return false;
->>  }
->>
->> +static bool pipe_io_read(struct io *io, void *user_data)
+>> -int generate_ecdh_keys(struct crypto_kpp *tfm, u8 public_key[64],
+>> -		       u8 private_key[32])
+>> +/* set_ecdh_privkey() - set or generate ecc private key.
+>> + *
+>> + * Function generates an ecc private key in the crypto subsystem when receiving
+>> + * a NULL private key or sets the received key when not NULL.
+>> + *
+>> + * @tfm:           KPP tfm handle allocated with crypto_alloc_kpp().
+>> + * @private_key:   user's ecc private key. When not NULL, the key is expected
+>> + *                 in little endian format.
+>> + *
+>> + * Return: zero on success; error code in case of error.
+>> + */
+>> +int set_ecdh_privkey(struct crypto_kpp *tfm, const u8 private_key[32])
 >> +{
->> +       struct external_chrc *chrc =3D user_data;
->> +       uint8_t buf[512];
->> +       int fd =3D io_get_fd(io);
->> +       ssize_t bytes_read;
+>> +	u8 *buf, *tmp = NULL;
+>> +	unsigned int buf_len;
+>> +	int err;
+>> +	struct ecdh p = {0};
 >> +
->> +       bytes_read =3D read(fd, buf, sizeof(buf));
->> +       if (bytes_read < 0)
->> +               return false;
+>> +	p.curve_id = ECC_CURVE_NIST_P256;
 >> +
->> +       send_notification_to_devices(chrc->service->app->database,
->> +                               gatt_db_attribute_get_handle(chrc->attri=
-b),
->> +                               buf, bytes_read,
->> +                               gatt_db_attribute_get_handle(chrc->ccc),
->> +                               false, NULL);
+>> +	if (private_key) {
+>> +		tmp = kmalloc(32, GFP_KERNEL);
+>> +		if (!tmp)
+>> +			return -ENOMEM;
+>> +		swap_digits((u64 *)private_key, (u64 *)tmp, 4);
+>> +		p.key = tmp;
+>> +		p.key_size = 32;
+>> +	}
 >> +
->> +       return true;
+>> +	buf_len = crypto_ecdh_key_len(&p);
+>> +	buf = kmalloc(buf_len, GFP_KERNEL);
+>> +	if (!buf) {
+>> +		err = -ENOMEM;
+>> +		goto free_tmp;
+>> +	}
+>> +
+>> +	err = crypto_ecdh_encode_key(buf, buf_len, &p);
+>> +	if (err)
+>> +		goto free_all;
+>> +
+>> +	err = crypto_kpp_set_secret(tfm, buf, buf_len);
+>> +	/* fall through */
+>> +free_all:
+>> +	kzfree(buf);
+>> +free_tmp:
+>> +	kzfree(tmp);
+>> +	return err;
 >> +}
 >> +
->>  static struct io *pipe_io_new(int fd, void *user_data)
->>  {
->>         struct io *io;
->> @@ -1815,6 +1843,8 @@ static struct io *pipe_io_new(int fd, void *user_d=
-ata)
+>> +/* generate_ecdh_public_key() - function assumes that the private key was
+>> + *                              already set.
+>> + *
+>> + * @tfm:          KPP tfm handle allocated with crypto_alloc_kpp().
+>> + * @public_key:   memory where the computed ecc public key will be saved.
+>> + *
+>> + * Return: zero on success; error code in case of error.
+>> + */
+>> +int generate_ecdh_public_key(struct crypto_kpp *tfm, u8 public_key[64])
+>> {
+>> 	struct kpp_request *req;
+>> -	struct ecdh p;
+>> +	u8 *tmp;
+>> 	struct ecdh_completion result;
+>> 	struct scatterlist dst;
+>> -	u8 *tmp, *buf;
+>> -	unsigned int buf_len;
+>> 	int err;
+>> -	const unsigned short max_tries = 16;
+>> -	unsigned short tries = 0;
 >>
->>         io_set_close_on_destroy(io, true);
+>> 	tmp = kmalloc(64, GFP_KERNEL);
+>> 	if (!tmp)
+>> @@ -150,63 +184,47 @@ int generate_ecdh_keys(struct crypto_kpp *tfm, u8 public_key[64],
+>> 	}
 >>
->> +       io_set_read_handler(io, pipe_io_read, user_data, NULL);
->> +
->>         io_set_disconnect_handler(io, pipe_hup, user_data, NULL);
+>> 	init_completion(&result.completion);
+>> +	sg_init_one(&dst, tmp, 64);
+>> +	kpp_request_set_input(req, NULL, 0);
+>> +	kpp_request_set_output(req, &dst, 64);
+>> +	kpp_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
+>> +				 ecdh_complete, &result);
 >>
->>         return io;
->> @@ -1915,9 +1945,64 @@ static struct pending_op *acquire_write(struct ex=
-ternal_chrc *chrc,
->>         return NULL;
->>  }
+>> -	/* Set curve_id */
+>> -	p.curve_id = ECC_CURVE_NIST_P256;
+>> -	p.key_size = 32;
+>> -	buf_len = crypto_ecdh_key_len(&p);
+>> -	buf = kmalloc(buf_len, GFP_KERNEL);
+>> -	if (!buf)
+>> -		goto free_req;
+>> -
+>> -	do {
+>> -		if (tries++ >= max_tries)
+>> -			goto free_all;
+>> -
+>> -		/* Set private Key */
+>> -		p.key = (char *)private_key;
+>> -		crypto_ecdh_encode_key(buf, buf_len, &p);
+>> -		err = crypto_kpp_set_secret(tfm, buf, buf_len);
+>> -		if (err)
+>> -			goto free_all;
+>> -
+>> -		sg_init_one(&dst, tmp, 64);
+>> -		kpp_request_set_input(req, NULL, 0);
+>> -		kpp_request_set_output(req, &dst, 64);
+>> -		kpp_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
+>> -					 ecdh_complete, &result);
+>> -
+>> -		err = crypto_kpp_generate_public_key(req);
+>> -
+>> -		if (err == -EINPROGRESS) {
+>> -			wait_for_completion(&result.completion);
+>> -			err = result.err;
+>> -		}
+>> -
+>> -		/* Private key is not valid. Regenerate */
+>> -		if (err == -EINVAL)
+>> -			continue;
+>> -
+>> -		if (err < 0)
+>> -			goto free_all;
+>> -		else
+>> -			break;
+>> -
+>> -	} while (true);
+>> -
+>> -	/* Keys are handed back in little endian as expected by Security
+>> -	 * Manager Protocol
+>> +	err = crypto_kpp_generate_public_key(req);
+>> +	if (err == -EINPROGRESS) {
+>> +		wait_for_completion(&result.completion);
+>> +		err = result.err;
+>> +	}
+>> +	if (err < 0)
+>> +		goto free_all;
+>> +
+>> +	/* The public key is handed back in little endian as expected by
+>> +	 * the Security Manager Protocol.
+>> 	 */
+>> 	swap_digits((u64 *)tmp, (u64 *)public_key, 4); /* x */
+>> 	swap_digits((u64 *)&tmp[32], (u64 *)&public_key[32], 4); /* y */
+>> -	swap_digits((u64 *)private_key, (u64 *)tmp, 4);
+>> -	memcpy(private_key, tmp, 32);
 >>
->> -static uint8_t ccc_write_cb(uint16_t value, void *user_data)
->> +static void acquire_notify_reply(DBusMessage *message, void *user_data)
->>  {
->>         struct external_chrc *chrc =3D user_data;
->> +       DBusError err;
->> +       int fd;
->> +       uint16_t mtu;
+>> free_all:
+>> -	kzfree(buf);
+>> -free_req:
+>> 	kpp_request_free(req);
+>> free_tmp:
+>> 	kfree(tmp);
+>> 	return err;
+>> }
 >> +
->> +       dbus_error_init(&err);
->> +
->> +       if (dbus_set_error_from_message(&err, message) =3D=3D TRUE) {
->> +               error("Failed to acquire notify: %s\n", err.name);
->> +               dbus_error_free(&err);
->> +               goto retry;
->> +       }
->> +
->> +       if ((dbus_message_get_args(message, NULL, DBUS_TYPE_UNIX_FD, &fd=
-,
->> +                                       DBUS_TYPE_UINT16, &mtu,
->> +                                       DBUS_TYPE_INVALID) =3D=3D false)=
-) {
->> +               error("Invalid AcquirNotify response\n");
->> +               goto retry;
->> +       }
->> +
->> +       DBG("AcquireNotify success: fd %d MTU %u\n", fd, mtu);
->> +
->> +       chrc->notify_io =3D pipe_io_new(fd, chrc);
->
-> Why do we need to use pipe and notify_io when implementing this
-> feature? I think fd and mtu has been pass using dbus message. Could
-> you clarify more details?
-
-notify_io is the receiving end of the notification, the application
-will write its notifications using the fd which is captured by
-checking if the fd is readable.
-
->
->> +
->> +       __sync_fetch_and_add(&chrc->ntfy_cnt, 1);
->> +
->> +       return;
->> +
->> +retry:
->> +       g_dbus_proxy_method_call(chrc->proxy, "StartNotify", NULL, NULL,
->> +                                                       NULL, NULL);
->> +
->> +       __sync_fetch_and_add(&chrc->ntfy_cnt, 1);
->> +}
->> +
->> +static void acquire_notify_setup(DBusMessageIter *iter, void *user_data=
-)
+>> +/* generate_ecdh_keys() - generate ecc key pair.
+>> + *
+>> + * @tfm:          KPP tfm handle allocated with crypto_alloc_kpp().
+>> + * @public_key:   memory where the computed ecc public key will be saved.
+>> + *
+>> + * Return: zero on success; error code in case of error.
+>> + */
+>> +int generate_ecdh_keys(struct crypto_kpp *tfm, u8 public_key[64])
 >> +{
->> +       DBusMessageIter dict;
->> +       struct external_chrc *chrc =3D user_data;
+>> +	int err;
 >> +
->> +       dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
->> +                                       DBUS_DICT_ENTRY_BEGIN_CHAR_AS_ST=
-RING
->> +                                       DBUS_TYPE_STRING_AS_STRING
->> +                                       DBUS_TYPE_VARIANT_AS_STRING
->> +                                       DBUS_DICT_ENTRY_END_CHAR_AS_STRI=
-NG,
->> +                                       &dict);
+>> +	err = set_ecdh_privkey(tfm, NULL);
+>> +	if (err)
+>> +		return err;
 >> +
->> +       dict_append_entry(&dict, "MTU", DBUS_TYPE_UINT16, &chrc->mtu);
->> +
->> +       dbus_message_iter_close_container(iter, &dict);
+>> +	return generate_ecdh_public_key(tfm, public_key);
 >> +}
+>> diff --git a/net/bluetooth/ecdh_helper.h b/net/bluetooth/ecdh_helper.h
+>> index 50e6676..a6f8d03 100644
+>> --- a/net/bluetooth/ecdh_helper.h
+>> +++ b/net/bluetooth/ecdh_helper.h
+>> @@ -23,7 +23,8 @@
+>> #include <crypto/kpp.h>
+>> #include <linux/types.h>
+>>
+>> -int compute_ecdh_secret(struct crypto_kpp *tfm, const u8 pub_a[64],
+>> -			const u8 priv_b[32], u8 secret[32]);
+>> -int generate_ecdh_keys(struct crypto_kpp *tfm, u8 public_key[64],
+>> -		       u8 private_key[32]);
+>> +int compute_ecdh_secret(struct crypto_kpp *tfm, const u8 pair_public_key[64],
+>> +			u8 secret[32]);
+>> +int set_ecdh_privkey(struct crypto_kpp *tfm, const u8 *private_key);
+>> +int generate_ecdh_public_key(struct crypto_kpp *tfm, u8 public_key[64]);
+>> +int generate_ecdh_keys(struct crypto_kpp *tfm, u8 public_key[64]);
+>> diff --git a/net/bluetooth/selftest.c b/net/bluetooth/selftest.c
+>> index ce99648..2d1519d 100644
+>> --- a/net/bluetooth/selftest.c
+>> +++ b/net/bluetooth/selftest.c
+>> @@ -152,11 +152,11 @@ static int __init test_ecdh_sample(struct crypto_kpp *tfm, const u8 priv_a[32],
+>> 	dhkey_a = &tmp[0];
+>> 	dhkey_b = &tmp[32];
+>>
+>> -	ret = compute_ecdh_secret(tfm, pub_b, priv_a, dhkey_a);
+>> +	ret = set_ecdh_privkey(tfm, priv_a);
+>> 	if (ret)
+>> 		goto out;
+>>
+>> -	ret = compute_ecdh_secret(tfm, pub_a, priv_b, dhkey_b);
+>> +	ret = compute_ecdh_secret(tfm, pub_b, dhkey_a);
+>> 	if (ret)
+>> 		goto out;
+>>
+>> @@ -165,9 +165,17 @@ static int __init test_ecdh_sample(struct crypto_kpp *tfm, const u8 priv_a[32],
+>> 		goto out;
+>> 	}
+>>
+>> +	ret = set_ecdh_privkey(tfm, priv_b);
+>> +	if (ret)
+>> +		goto out;
 >> +
->> +static uint8_t ccc_write_cb(struct bt_att *att, uint16_t value, void *u=
-ser_data)
->> +{
->> +       struct external_chrc *chrc =3D user_data;
->> +       DBusMessageIter iter;
->>
->>         DBG("External CCC write received with value: 0x%04x", value);
->>
->> @@ -1929,6 +2014,12 @@ static uint8_t ccc_write_cb(uint16_t value, void =
-*user_data)
->>                 if (__sync_sub_and_fetch(&chrc->ntfy_cnt, 1))
->>                         return 0;
->>
->> +               if (chrc->notify_io) {
->> +                       io_destroy(chrc->notify_io);
->> +                       chrc->notify_io =3D NULL;
->> +                       return 0;
->> +               }
+>> +	ret = compute_ecdh_secret(tfm, pub_a, dhkey_b);
+>> +	if (ret)
+>> +		goto out;
 >> +
->>                 /*
->>                  * Send request to stop notifying. This is best-effort
->>                  * operation, so simply ignore the return the value.
->> @@ -1949,12 +2040,27 @@ static uint8_t ccc_write_cb(uint16_t value, void=
- *user_data)
->>                 (value =3D=3D 2 && !(chrc->props & BT_GATT_CHRC_PROP_IND=
-ICATE)))
->>                 return BT_ERROR_CCC_IMPROPERLY_CONFIGURED;
+>> 	if (memcmp(dhkey_b, dhkey, 32))
+>> 		ret = -EINVAL;
+>> -
+>> +	/* fall through*/
+>> out:
+>> 	kfree(tmp);
+>> 	return ret;
+>> diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+>> index af7e610..d41449b 100644
+>> --- a/net/bluetooth/smp.c
+>> +++ b/net/bluetooth/smp.c
+>> @@ -84,7 +84,6 @@ enum {
+>> struct smp_dev {
+>> 	/* Secure Connections OOB data */
+>> 	u8			local_pk[64];
+>> -	u8			local_sk[32];
+>> 	u8			local_rand[16];
+>> 	bool			debug_key;
 >>
->> +       if (chrc->notify_io) {
->> +               __sync_fetch_and_add(&chrc->ntfy_cnt, 1);
->> +               return 0;
->> +       }
-> What is the purpose to call __sync_fetch_and_add when there is
-> charc->notify_io? What is the scenario here=EF=BC=9F
-
-This is using the number of subscribed client as a refcount so when
-there is no client left we can drop the notify_io as well.
-
->
->> +
->> +       chrc->mtu =3D bt_att_get_mtu(att);
->> +
->> +       /* Make use of AcquireNotify if supported */
->> +       if (g_dbus_proxy_get_property(chrc->proxy, "NotifyAcquired", &it=
-er)) {
->> +               if (g_dbus_proxy_method_call(chrc->proxy, "AcquireNotify=
-",
->> +                                               acquire_notify_setup,
->> +                                               acquire_notify_reply,
->> +                                               chrc, NULL))
->> +                       return 0;
->> +       }
-> When ble central subscribe this characteristic,  if NotifyAcquired is
-> set in ble peripheral application, then it return, but how can we
-> subscribe this characteristic? May we call "AcquireNotify" when ble
-> central subscribe this characteristic or enable notification?
-
-If NotifyAcquired is supported it will call AcquireNotify, or are you
-saying you tried that? The bluetoothctl has code to utilize this
-feature, you just have to register a characteristic with notify flag.
-
->> +
->>         /*
->>          * Always call StartNotify for an incoming enable and ignore the=
- return
->>          * value for now.
->>          */
->> -       if (g_dbus_proxy_method_call(chrc->proxy,
->> -                                               "StartNotify", NULL, NUL=
-L,
->> +       if (g_dbus_proxy_method_call(chrc->proxy, "StartNotify", NULL, N=
-ULL,
->>                                                 NULL, NULL) =3D=3D FALSE=
-)
->>                 return BT_ATT_ERROR_UNLIKELY;
+>> @@ -126,7 +125,6 @@ struct smp_chan {
 >>
->> --
->> 2.13.5
+>> 	/* Secure Connections variables */
+>> 	u8			local_pk[64];
+>> -	u8			local_sk[32];
+>> 	u8			remote_pk[64];
+>> 	u8			dhkey[32];
+>> 	u8			mackey[16];
+>> @@ -568,24 +566,22 @@ int smp_generate_oob(struct hci_dev *hdev, u8 hash[16], u8 rand[16])
 >>
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-bluetoot=
-h" in
->> the body of a message to majordomo@vger.kernel.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>> 	if (hci_dev_test_flag(hdev, HCI_USE_DEBUG_KEYS)) {
+>> 		BT_DBG("Using debug keys");
+>> +		err = set_ecdh_privkey(smp->tfm_ecdh, debug_sk);
+>> +		if (err)
+>> +			return err;
+>> 		memcpy(smp->local_pk, debug_pk, 64);
+>> -		memcpy(smp->local_sk, debug_sk, 32);
+>> 		smp->debug_key = true;
+> 
+> this all looks good, but I do wonder why not have a helper function here.
+> 
+> 	err = generate_ecdh_debug_keys(smp->tfm_ecdh, smp->local_pk);
+> 
+> And then have that function defined like this:
+> 
+> 	int generate_ecdh_debug_keys(struct crypto_kpp *tfm, u8 public_key[64])
+> 	{
+> 		int err;
+> 
+> 		err = set_ecdh_privkey(tfm, debug_sk);
+> 		if (err)
+> 			return err;
+> 
+> 		memcpy(public_key, debug_pk, 64);
+> 		return 0;
+> 	}
+> 
+> I know this seems duplicate, but I wonder if that reduces the number of functions that have to be public. I prefer having most function static if possible.
+
+You want set_ecdh_privkey() to be static in ecdh_helper.c?
+test_ecdh_sample() and test_debug_key() don't need to copy the public
+key, so they need set_ecdh_privkey() as public.
+
+I can make generate_ecdh_debug_keys() static to smp.c, but we will be
+mixing helpers in smp.c and ecdh_helper.c.
+
+> 
+>> 	} else {
+>> 		while (true) {
+>> -			/* Seed private key with random number */
+>> -			get_random_bytes(smp->local_sk, 32);
+>> -
+>> -			/* Generate local key pair for Secure Connections */
+>> -			err = generate_ecdh_keys(smp->tfm_ecdh, smp->local_pk,
+>> -						 smp->local_sk);
+>> +			/* Generate key pair for Secure Connections */
+>> +			err = generate_ecdh_keys(smp->tfm_ecdh, smp->local_pk);
+>> 			if (err)
+>> 				return err;
+>>
+>> 			/* This is unlikely, but we need to check that
+>> 			 * we didn't accidentially generate a debug key.
+>> 			 */
+>> -			if (crypto_memneq(smp->local_sk, debug_sk, 32))
+>> +			if (crypto_memneq(smp->local_pk, debug_pk, 64))
+>> 				break;
+>> 		}
+>> 		smp->debug_key = false;
+>> @@ -593,7 +589,6 @@ int smp_generate_oob(struct hci_dev *hdev, u8 hash[16], u8 rand[16])
+>>
+>> 	SMP_DBG("OOB Public Key X: %32phN", smp->local_pk);
+>> 	SMP_DBG("OOB Public Key Y: %32phN", smp->local_pk + 32);
+>> -	SMP_DBG("OOB Private Key:  %32phN", smp->local_sk);
+>>
+>> 	get_random_bytes(smp->local_rand, 16);
+>>
+>> @@ -1900,7 +1895,6 @@ static u8 sc_send_public_key(struct smp_chan *smp)
+>> 		smp_dev = chan->data;
+>>
+>> 		memcpy(smp->local_pk, smp_dev->local_pk, 64);
+>> -		memcpy(smp->local_sk, smp_dev->local_sk, 32);
+>> 		memcpy(smp->lr, smp_dev->local_rand, 16);
+>>
+>> 		if (smp_dev->debug_key)
+>> @@ -1911,23 +1905,20 @@ static u8 sc_send_public_key(struct smp_chan *smp)
+>>
+>> 	if (hci_dev_test_flag(hdev, HCI_USE_DEBUG_KEYS)) {
+>> 		BT_DBG("Using debug keys");
+>> +		if (set_ecdh_privkey(smp->tfm_ecdh, debug_sk))
+>> +			return SMP_UNSPECIFIED;
+>> 		memcpy(smp->local_pk, debug_pk, 64);
+>> -		memcpy(smp->local_sk, debug_sk, 32);
+>> 		set_bit(SMP_FLAG_DEBUG_KEY, &smp->flags);
+>> 	} else {
+>> 		while (true) {
+>> -			/* Seed private key with random number */
+>> -			get_random_bytes(smp->local_sk, 32);
+>> -
+>> -			/* Generate local key pair for Secure Connections */
+>> -			if (generate_ecdh_keys(smp->tfm_ecdh, smp->local_pk,
+>> -					       smp->local_sk))
+>> +			/* Generate key pair for Secure Connections */
+>> +			if (generate_ecdh_keys(smp->tfm_ecdh, smp->local_pk))
+>> 				return SMP_UNSPECIFIED;
+>>
+>> 			/* This is unlikely, but we need to check that
+>> 			 * we didn't accidentially generate a debug key.
+>> 			 */
+>> -			if (crypto_memneq(smp->local_sk, debug_sk, 32))
+>> +			if (crypto_memneq(smp->local_pk, debug_pk, 64))
+>> 				break;
+>> 		}
+>> 	}
+>> @@ -1935,7 +1926,6 @@ static u8 sc_send_public_key(struct smp_chan *smp)
+>> done:
+>> 	SMP_DBG("Local Public Key X: %32phN", smp->local_pk);
+>> 	SMP_DBG("Local Public Key Y: %32phN", smp->local_pk + 32);
+>> -	SMP_DBG("Local Private Key:  %32phN", smp->local_sk);
+>>
+>> 	smp_send_cmd(smp->conn, SMP_CMD_PUBLIC_KEY, 64, smp->local_pk);
+>>
+>> @@ -2663,6 +2653,7 @@ static int smp_cmd_public_key(struct l2cap_conn *conn, struct sk_buff *skb)
+>> 	struct l2cap_chan *chan = conn->smp;
+>> 	struct smp_chan *smp = chan->data;
+>> 	struct hci_dev *hdev = hcon->hdev;
+>> +	struct crypto_kpp *tfm_ecdh;
+>> 	struct smp_cmd_pairing_confirm cfm;
+>> 	int err;
+>>
+>> @@ -2695,8 +2686,18 @@ static int smp_cmd_public_key(struct l2cap_conn *conn, struct sk_buff *skb)
+>> 	SMP_DBG("Remote Public Key X: %32phN", smp->remote_pk);
+>> 	SMP_DBG("Remote Public Key Y: %32phN", smp->remote_pk + 32);
+>>
+>> -	if (!compute_ecdh_secret(smp->tfm_ecdh, smp->remote_pk, smp->local_sk,
+>> -				 smp->dhkey))
+>> +	/* Compute the shared secret on the same crypto tfm on which the private
+>> +	 * key was set/generated.
+>> +	 */
+>> +	if (test_bit(SMP_FLAG_LOCAL_OOB, &smp->flags)) {
+>> +		struct smp_dev *smp_dev = chan->data;
+>> +
+>> +		tfm_ecdh = smp_dev->tfm_ecdh;
+>> +	} else {
+>> +		tfm_ecdh = smp->tfm_ecdh;
+>> +	}
+>> +
+>> +	if (compute_ecdh_secret(tfm_ecdh, smp->remote_pk, smp->dhkey))
+>> 		return SMP_UNSPECIFIED;
+>>
+>> 	SMP_DBG("DHKey %32phN", smp->dhkey);
+>> @@ -3522,27 +3523,18 @@ void smp_unregister(struct hci_dev *hdev)
+>>
+>> #if IS_ENABLED(CONFIG_BT_SELFTEST_SMP)
+>>
+>> -static inline void swap_digits(u64 *in, u64 *out, unsigned int ndigits)
+>> -{
+>> -	int i;
+>> -
+>> -	for (i = 0; i < ndigits; i++)
+>> -		out[i] = __swab64(in[ndigits - 1 - i]);
+>> -}
+>> -
+>> static int __init test_debug_key(struct crypto_kpp *tfm_ecdh)
+>> {
+>> -	u8 pk[64], sk[32];
+>> +	u8 pk[64];
+>> 	int err;
+>>
+>> -	swap_digits((u64 *)debug_sk, (u64 *)sk, 4);
+>> -
+>> -	err = generate_ecdh_keys(tfm_ecdh, pk, sk);
+>> +	err = set_ecdh_privkey(tfm_ecdh, debug_sk);
+>> 	if (err)
+>> 		return err;
+>>
+>> -	if (crypto_memneq(sk, debug_sk, 32))
+>> -		return -EINVAL;
+>> +	err = generate_ecdh_public_key(tfm_ecdh, pk);
+>> +	if (err)
+>> +		return err;
+> 
+> And here using the mentioned generate_ecdh_debug_keys() would make things just simple as well.
+
+Copying of the public key is not necessary here,
+generate_ecdh_debug_keys() shouldn't be used.
 
 
-
---=20
-Luiz Augusto von Dentz
+Cheers,
+ta
