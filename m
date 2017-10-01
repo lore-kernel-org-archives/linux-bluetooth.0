@@ -1,89 +1,140 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: "Hermida, Isaac" <Isaac.Hermida@digi.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: how to advertise a GATT service only for LE or BR/EDR?
-Date: Mon, 2 Oct 2017 07:03:15 +0000
-Message-ID: <59D1E4B0.2000106@digi.com>
-References: <59CD26BE.8040803@digi.com>
- <CABBYNZLFyyNQmkAk5JZGWDii_hcx0n68yr-sjeXVUAEHVcOqcw@mail.gmail.com>
- <59CDEBDF.3090200@digi.com>
-In-Reply-To: <59CDEBDF.3090200@digi.com>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
+From: Hans de Goede <hdegoede@redhat.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+        Gustavo Padovan <gustavo@padovan.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>
+Cc: Hans de Goede <hdegoede@redhat.com>,
+        linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: hci_bcm: Fix setting of irq trigger type
+Date: Sun,  1 Oct 2017 17:36:10 +0200
+Message-Id: <20171001153610.2483-1-hdegoede@redhat.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgTHVpeiBldCBhbGwsDQoNCk9uIDA5LzI5LzIwMTcgMDg6NDQgQU0sIEhlcm1pZGEsIElzYWFj
-IHdyb3RlOg0KPiBIaSBMdWl6LA0KPg0KPiBPbiAwOS8yOC8yMDE3IDA4OjIxIFBNLCBMdWl6IEF1
-Z3VzdG8gdm9uIERlbnR6IHdyb3RlOg0KPj4gSGkgSXNhYWMsDQo+Pg0KPj4gT24gVGh1LCBTZXAg
-MjgsIDIwMTcgYXQgNzo0MyBQTSwgSGVybWlkYSwgSXNhYWMgPElzYWFjLkhlcm1pZGFAZGlnaS5j
-b20+IHdyb3RlOg0KPj4+IEhpIGdyb3VwLA0KPj4+DQo+Pj4gQXMgcGFydCBvZiB0aGUgYmx1ZXRv
-b3RoIFNJRyBjZXJ0aWZpY2F0aW9uIHRoZXJlIGFyZSB0d28gdGVzdCBjYXNlcw0KPj4+IC9UUC9H
-QVIvQ0wvQkktMzQtQyBhbmQgL1RQL0dBUi9DTC9CSS0zNS1DICh5b3UgY2FuIHNlZSB0aGV5IGRl
-ZmluZWQgaW4NCj4+PiB1bml0L3Rlc3QtZ2F0dC5jKS4NCj4+PiBDdXJyZW50bHkgSSBhbSBhYmxl
-IHRvIHJ1biB0aGUgInRlc3QvZXhhbXBsZS1nYXR0LXNlcnZlciIgYW5kIHNlZSBteQ0KPj4+IGN1
-c3RvbSBzZXJ2aWNlcyBhbmQgY2hhcmFjdGVyaXN0aWNzLCBidXQgSSBuZWVkIHRvIGRlZmluZSBh
-biBzcGVjaWZpYw0KPj4+IHNlcnZpY2UvY2hhcmFjdGVyaXN0aWMgdG8gYmUgb25seSBhY2Nlc3Np
-YmxlIHRyb3VnaCBMRSBvciBCUi9FRFINCj4+PiB0cmFuc3BvcnQgcGFyYW1ldGVyLiBJIHdhcyBk
-aWdnaW5nIGludG8gdGhlIGNvZGUgYnV0IEkgd2FzIHVuYWJsZSB0bw0KPj4+IGZpbmQgaG93IHRv
-IHNldCBpdCBmb3IgdGhlIEdBVFQgc2VydmVyLg0KPj4+DQo+Pj4gSW4gb3RoZXIgd29yZHMsIHdo
-YXQgSSB3YW50IHRvIGRvIGlzIGxhdW5jaCB0aGUgZ2F0dC1zZXJ2ZXIgYW5kIHRoZW4sDQo+Pj4g
-d2hlbiBpbnNwZWN0aW5nIHRoZSBzZXJ2aWNlcy9jaGFyYWN0ZXJpc3RpYyB3aXRoIGdhdHR0b29s
-LCB0aGUgcmV0dXJuZWQNCj4+PiBsaXN0IHNob3VsZCBiZSBkaWZmZXJlbnQgaWYgSSBydW4gZ2F0
-dHRvb2wgd2l0aCAiLXAgMzEiIG9yIG5vdCAobm90aWNlDQo+Pj4gaG93IHRoZSBnYXR0dG9vbCBw
-cm9tcHQgaXMgc2V0IHRvIExFIG9yIEJSKS4NCj4+Pg0KPj4+ICMgZ2F0dHRvb2wgLUkgLWIgMDA6
-NDA6OUQ6OTg6OTk6QkQgLXAgMA0KPj4+IFswMDo0MDo5RDo5ODo5OTpCRF1bTEVdPiBjb25uZWN0
-DQo+Pj4gQXR0ZW1wdGluZyB0byBjb25uZWN0IHRvIDAwOjQwOjlEOjk4Ojk5OkJEDQo+Pj4gQ29u
-bmVjdGlvbiBzdWNjZXNzZnVsDQo+Pj4gWzAwOjQwOjlEOjk4Ojk5OkJEXVtMRV0+IHByaW1hcnkN
-Cj4+PiBhdHRyIGhhbmRsZTogMHgwMDAxLCBlbmQgZ3JwIGhhbmRsZTogMHgwMDA1IHV1aWQ6DQo+
-Pj4gMDAwMDE4MDAtMDAwMC0xMDAwLTgwMDAtMDA4MDVmOWIzNGZiDQo+Pj4gYXR0ciBoYW5kbGU6
-IDB4MDAwNiwgZW5kIGdycCBoYW5kbGU6IDB4MDAwOSB1dWlkOg0KPj4+IDAwMDAxODAxLTAwMDAt
-MTAwMC04MDAwLTAwODA1ZjliMzRmYg0KPj4+IGF0dHIgaGFuZGxlOiAweDAwMGEsIGVuZCBncnAg
-aGFuZGxlOiAweDAwMGQgdXVpZDoNCj4+PiAwMDAwMTgwZi0wMDAwLTEwMDAtODAwMC0wMDgwNWY5
-YjM0ZmINCj4+PiBhdHRyIGhhbmRsZTogMHgwMDBlLCBlbmQgZ3JwIGhhbmRsZTogMHgwMDFkIHV1
-aWQ6DQo+Pj4gMTIzNDU2NzgtMTIzNC01Njc4LTEyMzQtNTY3ODlhYmNkZWYwDQo+Pj4gYXR0ciBo
-YW5kbGU6IDB4MDAxZSwgZW5kIGdycCBoYW5kbGU6IDB4MDAyNSB1dWlkOg0KPj4+IDAwMDAxODBk
-LTAwMDAtMTAwMC04MDAwLTAwODA1ZjliMzRmYg0KPj4+DQo+Pj4NCj4+PiAjIC90bXAvZ2F0dHRv
-b2wgLUkgLWIgMDA6NDA6OUQ6OTg6OTk6QkQgLXAgMzENCj4+PiBbMDA6NDA6OUQ6OTg6OTk6QkRd
-W0JSXT4gY29ubmVjdA0KPj4+IEF0dGVtcHRpbmcgdG8gY29ubmVjdCB0byAwMDo0MDo5RDo5ODo5
-OTpCRA0KPj4+IENvbm5lY3Rpb24gc3VjY2Vzc2Z1bA0KPj4+IFswMDo0MDo5RDo5ODo5OTpCRF1b
-QlJdPiBwcmltYXJ5DQo+Pj4gYXR0ciBoYW5kbGU6IDB4MDAwMSwgZW5kIGdycCBoYW5kbGU6IDB4
-MDAwNSB1dWlkOg0KPj4+IDAwMDAxODAwLTAwMDAtMTAwMC04MDAwLTAwODA1ZjliMzRmYg0KPj4+
-IGF0dHIgaGFuZGxlOiAweDAwMDYsIGVuZCBncnAgaGFuZGxlOiAweDAwMDkgdXVpZDoNCj4+PiAw
-MDAwMTgwMS0wMDAwLTEwMDAtODAwMC0wMDgwNWY5YjM0ZmINCj4+PiBhdHRyIGhhbmRsZTogMHgw
-MDBhLCBlbmQgZ3JwIGhhbmRsZTogMHgwMDE5IHV1aWQ6DQo+Pj4gMTIzNDU2NzgtMTIzNC01Njc4
-LTEyMzQtNTY3ODlhYmNkZWYwDQo+Pj4gYXR0ciBoYW5kbGU6IDB4MDAxYSwgZW5kIGdycCBoYW5k
-bGU6IDB4MDAxZCB1dWlkOg0KPj4+IDAwMDAxODBmLTAwMDAtMTAwMC04MDAwLTAwODA1ZjliMzRm
-Yg0KPj4+IGF0dHIgaGFuZGxlOiAweDAwMWUsIGVuZCBncnAgaGFuZGxlOiAweDAwMjUgdXVpZDoN
-Cj4+PiAwMDAwMTgwZC0wMDAwLTEwMDAtODAwMC0wMDgwNWY5YjM0ZmINCj4+Pg0KPj4+DQo+Pj4N
-Cj4+PiBJIGFtIHVzaW5nIGJsdWV6IDUuNDEuIElzIHBvc3NpYmxlIHRvIGFkdmVydGlzZSBhIHNl
-cnZpY2Ugb25seSBmb3IgTEUgb3INCj4+PiBCUj8gSSBndWVzcyBpdCBzaG91bGQgYmVjYXVzZSBp
-cyBwYXJ0IG9mIHRoZSBTSUcgY2VydGlmaWNhdGlvbiBhbmQgaXMNCj4+PiBwYXJ0IG9mIHRoZSB1
-bml0L3Rlc3QtZ2F0dC4NCj4+IFRoaXMgbWlnaHQgYmUgYmVjYXVzZSB0aGUgc3BlYyB3YXMgbm8g
-Y2xlYXIgYWJvdXQgdGhlIGRhdGFiYXNlIGJlaW5nDQo+PiBiZWFyZXIgc3BlY2lmaWMsIHdoaWNo
-IGluIG15IG9waW5pb24gdGhpcyBpcyBhIG92ZXJzaWdodCBzaW5jZSB0aGVuIHdlDQo+PiBjYW4n
-dCByZXByZXNlbnQgYXR0cmlidXRlcyBvZiBkdWFsIG1vZGUgZGV2aWNlcyB3aXRoIGEgdW5pZmll
-ZCBvYmplY3QsDQo+PiBhbmQgSSByZWFsbHkgd29uZGVyIGlmIHRoaXMgaGFzIHRvIGJlIGZvcmNl
-ZCB1cCBpbnRvIHRoZSBBUEksIGlmIGl0DQo+PiBkb2VzIHRoZW4gd2Ugd291bGQgaGF2ZSB0byBl
-bmNvZGUgYmVhcmVyIGluZm9ybWF0aW9uIGludG8gdGhlIG9iamVjdA0KPj4gcGF0aCAoYXJnaCEp
-IGZvciBjbGllbnQgYW5kIGZvciBzZXJ2ZXIgd291bGQgcHJvYmFibHkgbmVlZCBhIHByb3BlcnR5
-DQo+PiB0ZWxsaW5nIHdoaWNoIGJlYXJlciB0aGlzIHdvdWxkIGJlIGF2YWlsYWJsZSBhbmQgZW5j
-b2RlIHRoaXMgaW50byB0bw0KPj4gdGhlIGRhdGFiYXNlIHdoaWNoIG1heSBsZWF2ZSBnYXBzIGlu
-IHRoZSBoYW5kbGVzIG9yIGp1c3QgZHVwbGljYXRlDQo+PiBldmVyeXRoaW5nLCBmb3Igc2VydmVy
-IElkIHByb2JhYmx5IGp1c3QgaGlkZSB0aGUgc2VydmljZXMgYmFzZWQgb24gdGhlDQo+PiBiZWFy
-ZXIsIGJ1dCB3ZSBzdGlsbCBuZWVkIHRvIHN0b3JlIHRoZSBDQ0MgY29uZmlndXJhdGlvbiBpbiBh
-IGJlYXJlcg0KPj4gc3BlY2lmaWMgbWFubmVyLg0KPj4NCj4NCj4gU28sIHdoYXQgY2FuIEkgZG8g
-aW4gb3JkZXIgdG8gcGFzcyB0aGF0IHNwZWNpZmljIGJsdWV0b290aCBTSUcgdGVzdHM/DQo+IFRo
-YXQgdGVzdCBjYXNlcyBuZWVkIHRvIGVuc3VyZSB0aGF0IGFuIHNwZWNpZmljIHNlcnZpY2UvY2hh
-ciBpbiBvbmx5DQo+IGFjY2Vzc2libGUgb24gTEUgb3IgQlIsIHNvIHRoZXkgaGFkIHRvIGJlIGRp
-ZmZlcmVudC4NCj4gRG8geW91IGhhdmUgYW55IGlkZWEgb3Igc3VnZ2VzdGlvbj8gSXQgd291bGQg
-YmUgcmVhbGx5IHdlbGNvbWUsIGlmIG5vdCBJDQo+IGhhdmUgbm8gaWRlYSBob3cgdG8gcHJvY2Vl
-ZCB0byBjb21wbGV0ZSB0aGUgU0lHIHZhbGlkYXRpb24gd2l0aCBibHVleiBzdHVmZi4NCj4gSSB3
-YXMgZXZlbiB0cnlpbmcgdG8gbW9kaWZ5IHNvbWUgZmlsZXMgaW50byB0aGUgY29kZSwgYnV0IEkg
-YW0gbm90DQo+IGZhbWlsaWFyIHdpdGggdGhhdCBhbmQgaXQgb2J2aW91c2x5IGRpZCBub3Qgd29y
-ay4EDQoNCkkgdW5kZXJzdGFuZCB0aGUgc2lsZW50IHRvIHRoaXMgbGFzdCBxdWVzdGlvbiBhcyBh
-IG5vLiBTbyBJIGFzc3VtZSB0aGF0IA0KYW55IHVzZXIgdHJ5aW5nIHRvIHBhc3MgdGhpcyB0ZXN0
-IHdpbGwgZmFpbCAoYXQgbGVhc3QgaWYgdXNpbmcgYmx1ZXopLiANClNvIHNob3VsZCB0aGUgc3Bl
-Y2lmaWNhdGlvbiBiZSBjaGFuZ2VkPyBTaG91bGQgYmx1ZXogYWRhcHQgdG8gaXQ/IEluIHRoZSAN
-CmN1cnJlbnQgc3RhdGUgdGhhdCBTSUcgY2VydGlmaWNhdGlvbiBjYW4gbm90IGJlIHBhc3NlZC4=
+This commit fixes 2 issues with host-wake irq trigger type handling
+in hci_bcm:
+
+1) bcm_setup_sleep sets sleep_params.host_wake_active based on
+bcm_device.irq_polarity, but bcm_request_irq was always requesting
+IRQF_TRIGGER_RISING as trigger type independent of irq_polarity.
+
+This was a problem when the irq is described as a GpioInt rather then
+an Interrupt in the DSDT as for GpioInt-s the value passed to request_irq
+is honored. This commit fixes this by requesting the correct trigger
+type depending on bcm_device.irq_polarity.
+
+2) bcm_device.irq_polarity was used to directly store an ACPI polarity
+value (ACPI_ACTIVE_*). This is undesirable because hci_bcm is also
+used with device-tree and checking for something like ACPI_ACTIVE_LOW
+in a non ACPI specific function like bcm_request_irq feels wrong.
+
+This commit fixes this by renaming irq_polarity to irq_active_low
+and changing its type to a bool.
+
+Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+---
+ drivers/bluetooth/hci_bcm.c | 23 ++++++++++-------------
+ 1 file changed, 10 insertions(+), 13 deletions(-)
+
+diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
+index c821234b9668..2285ca673ae3 100644
+--- a/drivers/bluetooth/hci_bcm.c
++++ b/drivers/bluetooth/hci_bcm.c
+@@ -68,7 +68,7 @@ struct bcm_device {
+ 	u32			init_speed;
+ 	u32			oper_speed;
+ 	int			irq;
+-	u8			irq_polarity;
++	bool			irq_active_low;
+ 
+ #ifdef CONFIG_PM
+ 	struct hci_uart		*hu;
+@@ -213,7 +213,9 @@ static int bcm_request_irq(struct bcm_data *bcm)
+ 	}
+ 
+ 	err = devm_request_irq(&bdev->pdev->dev, bdev->irq, bcm_host_wake,
+-			       IRQF_TRIGGER_RISING, "host_wake", bdev);
++			       bdev->irq_active_low ? IRQF_TRIGGER_FALLING :
++						      IRQF_TRIGGER_RISING,
++			       "host_wake", bdev);
+ 	if (err)
+ 		goto unlock;
+ 
+@@ -253,7 +255,7 @@ static int bcm_setup_sleep(struct hci_uart *hu)
+ 	struct sk_buff *skb;
+ 	struct bcm_set_sleep_mode sleep_params = default_sleep_params;
+ 
+-	sleep_params.host_wake_active = !bcm->dev->irq_polarity;
++	sleep_params.host_wake_active = !bcm->dev->irq_active_low;
+ 
+ 	skb = __hci_cmd_sync(hu->hdev, 0xfc27, sizeof(sleep_params),
+ 			     &sleep_params, HCI_INIT_TIMEOUT);
+@@ -690,10 +692,8 @@ static const struct acpi_gpio_mapping acpi_bcm_int_first_gpios[] = {
+ };
+ 
+ #ifdef CONFIG_ACPI
+-static u8 acpi_active_low = ACPI_ACTIVE_LOW;
+-
+ /* IRQ polarity of some chipsets are not defined correctly in ACPI table. */
+-static const struct dmi_system_id bcm_wrong_irq_dmi_table[] = {
++static const struct dmi_system_id bcm_active_low_irq_dmi_table[] = {
+ 	{
+ 		.ident = "Asus T100TA",
+ 		.matches = {
+@@ -701,7 +701,6 @@ static const struct dmi_system_id bcm_wrong_irq_dmi_table[] = {
+ 					"ASUSTeK COMPUTER INC."),
+ 			DMI_EXACT_MATCH(DMI_PRODUCT_NAME, "T100TA"),
+ 		},
+-		.driver_data = &acpi_active_low,
+ 	},
+ 	{
+ 		.ident = "Asus T100CHI",
+@@ -710,7 +709,6 @@ static const struct dmi_system_id bcm_wrong_irq_dmi_table[] = {
+ 					"ASUSTeK COMPUTER INC."),
+ 			DMI_EXACT_MATCH(DMI_PRODUCT_NAME, "T100CHI"),
+ 		},
+-		.driver_data = &acpi_active_low,
+ 	},
+ 	{	/* Handle ThinkPad 8 tablets with BCM2E55 chipset ACPI ID */
+ 		.ident = "Lenovo ThinkPad 8",
+@@ -718,7 +716,6 @@ static const struct dmi_system_id bcm_wrong_irq_dmi_table[] = {
+ 			DMI_EXACT_MATCH(DMI_SYS_VENDOR, "LENOVO"),
+ 			DMI_EXACT_MATCH(DMI_PRODUCT_VERSION, "ThinkPad 8"),
+ 		},
+-		.driver_data = &acpi_active_low,
+ 	},
+ 	{ }
+ };
+@@ -733,13 +730,13 @@ static int bcm_resource(struct acpi_resource *ares, void *data)
+ 	switch (ares->type) {
+ 	case ACPI_RESOURCE_TYPE_EXTENDED_IRQ:
+ 		irq = &ares->data.extended_irq;
+-		dev->irq_polarity = irq->polarity;
++		dev->irq_active_low = irq->polarity == ACPI_ACTIVE_LOW;
+ 		break;
+ 
+ 	case ACPI_RESOURCE_TYPE_GPIO:
+ 		gpio = &ares->data.gpio;
+ 		if (gpio->connection_type == ACPI_RESOURCE_GPIO_TYPE_INT)
+-			dev->irq_polarity = gpio->polarity;
++			dev->irq_active_low = gpio->polarity == ACPI_ACTIVE_LOW;
+ 		break;
+ 
+ 	case ACPI_RESOURCE_TYPE_SERIAL_BUS:
+@@ -834,11 +831,11 @@ static int bcm_acpi_probe(struct bcm_device *dev)
+ 		return ret;
+ 	acpi_dev_free_resource_list(&resources);
+ 
+-	dmi_id = dmi_first_match(bcm_wrong_irq_dmi_table);
++	dmi_id = dmi_first_match(bcm_active_low_irq_dmi_table);
+ 	if (dmi_id) {
+ 		bt_dev_warn(dev, "%s: Overwriting IRQ polarity to active low",
+ 			    dmi_id->ident);
+-		dev->irq_polarity = *(u8 *)dmi_id->driver_data;
++		dev->irq_active_low = true;
+ 	}
+ 
+ 	return 0;
+-- 
+2.14.2
+
