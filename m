@@ -1,140 +1,63 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Hans de Goede <hdegoede@redhat.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-        Gustavo Padovan <gustavo@padovan.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>
-Cc: Hans de Goede <hdegoede@redhat.com>,
-        linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: hci_bcm: Fix setting of irq trigger type
-Date: Sun,  1 Oct 2017 17:36:10 +0200
-Message-Id: <20171001153610.2483-1-hdegoede@redhat.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <sre@kernel.org>
+Date: Sun, 1 Oct 2017 12:35:09 +0200
+From: Sebastian Reichel <sre@kernel.org>
+To: Hans de Goede <hdegoede@redhat.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 2/2] Bluetooth: hci_bcm: Add support for BCM2E7E
+Message-ID: <20171001103509.4jqlt6kuqgxlm5m5@earth>
+References: <20170907202551.26796-1-hdegoede@redhat.com>
+ <20170907202551.26796-2-hdegoede@redhat.com>
+ <aab461af-601b-70c3-f79e-95ce0bdbbc9d@redhat.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="wnaqu636ujkkwqei"
+In-Reply-To: <aab461af-601b-70c3-f79e-95ce0bdbbc9d@redhat.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This commit fixes 2 issues with host-wake irq trigger type handling
-in hci_bcm:
 
-1) bcm_setup_sleep sets sleep_params.host_wake_active based on
-bcm_device.irq_polarity, but bcm_request_irq was always requesting
-IRQF_TRIGGER_RISING as trigger type independent of irq_polarity.
+--wnaqu636ujkkwqei
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-This was a problem when the irq is described as a GpioInt rather then
-an Interrupt in the DSDT as for GpioInt-s the value passed to request_irq
-is honored. This commit fixes this by requesting the correct trigger
-type depending on bcm_device.irq_polarity.
+Hi Hans,
 
-2) bcm_device.irq_polarity was used to directly store an ACPI polarity
-value (ACPI_ACTIVE_*). This is undesirable because hci_bcm is also
-used with device-tree and checking for something like ACPI_ACTIVE_LOW
-in a non ACPI specific function like bcm_request_irq feels wrong.
+On Sun, Oct 01, 2017 at 11:27:45AM +0200, Hans de Goede wrote:
+> This will happen automatically with this patch series,
+> but with the current 4.14 bluetooth stack it will work in
+> USB mode, and if we then merge this series post 4.14
+> bluetooth will stop working without users doing a btattach
+> command from userspace and we will have a regression on
+> our hands.
 
-This commit fixes this by renaming irq_polarity to irq_active_low
-and changing its type to a bool.
+Once the series from Fr=E9d=E9ric Danis lands, you can get
+serial based broadcom bluetooth without btattach:
 
-Signed-off-by: Hans de Goede <hdegoede@redhat.com>
----
- drivers/bluetooth/hci_bcm.c | 23 ++++++++++-------------
- 1 file changed, 10 insertions(+), 13 deletions(-)
+https://www.spinics.net/lists/linux-bluetooth/msg71856.html
 
-diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
-index c821234b9668..2285ca673ae3 100644
---- a/drivers/bluetooth/hci_bcm.c
-+++ b/drivers/bluetooth/hci_bcm.c
-@@ -68,7 +68,7 @@ struct bcm_device {
- 	u32			init_speed;
- 	u32			oper_speed;
- 	int			irq;
--	u8			irq_polarity;
-+	bool			irq_active_low;
- 
- #ifdef CONFIG_PM
- 	struct hci_uart		*hu;
-@@ -213,7 +213,9 @@ static int bcm_request_irq(struct bcm_data *bcm)
- 	}
- 
- 	err = devm_request_irq(&bdev->pdev->dev, bdev->irq, bcm_host_wake,
--			       IRQF_TRIGGER_RISING, "host_wake", bdev);
-+			       bdev->irq_active_low ? IRQF_TRIGGER_FALLING :
-+						      IRQF_TRIGGER_RISING,
-+			       "host_wake", bdev);
- 	if (err)
- 		goto unlock;
- 
-@@ -253,7 +255,7 @@ static int bcm_setup_sleep(struct hci_uart *hu)
- 	struct sk_buff *skb;
- 	struct bcm_set_sleep_mode sleep_params = default_sleep_params;
- 
--	sleep_params.host_wake_active = !bcm->dev->irq_polarity;
-+	sleep_params.host_wake_active = !bcm->dev->irq_active_low;
- 
- 	skb = __hci_cmd_sync(hu->hdev, 0xfc27, sizeof(sleep_params),
- 			     &sleep_params, HCI_INIT_TIMEOUT);
-@@ -690,10 +692,8 @@ static const struct acpi_gpio_mapping acpi_bcm_int_first_gpios[] = {
- };
- 
- #ifdef CONFIG_ACPI
--static u8 acpi_active_low = ACPI_ACTIVE_LOW;
--
- /* IRQ polarity of some chipsets are not defined correctly in ACPI table. */
--static const struct dmi_system_id bcm_wrong_irq_dmi_table[] = {
-+static const struct dmi_system_id bcm_active_low_irq_dmi_table[] = {
- 	{
- 		.ident = "Asus T100TA",
- 		.matches = {
-@@ -701,7 +701,6 @@ static const struct dmi_system_id bcm_wrong_irq_dmi_table[] = {
- 					"ASUSTeK COMPUTER INC."),
- 			DMI_EXACT_MATCH(DMI_PRODUCT_NAME, "T100TA"),
- 		},
--		.driver_data = &acpi_active_low,
- 	},
- 	{
- 		.ident = "Asus T100CHI",
-@@ -710,7 +709,6 @@ static const struct dmi_system_id bcm_wrong_irq_dmi_table[] = {
- 					"ASUSTeK COMPUTER INC."),
- 			DMI_EXACT_MATCH(DMI_PRODUCT_NAME, "T100CHI"),
- 		},
--		.driver_data = &acpi_active_low,
- 	},
- 	{	/* Handle ThinkPad 8 tablets with BCM2E55 chipset ACPI ID */
- 		.ident = "Lenovo ThinkPad 8",
-@@ -718,7 +716,6 @@ static const struct dmi_system_id bcm_wrong_irq_dmi_table[] = {
- 			DMI_EXACT_MATCH(DMI_SYS_VENDOR, "LENOVO"),
- 			DMI_EXACT_MATCH(DMI_PRODUCT_VERSION, "ThinkPad 8"),
- 		},
--		.driver_data = &acpi_active_low,
- 	},
- 	{ }
- };
-@@ -733,13 +730,13 @@ static int bcm_resource(struct acpi_resource *ares, void *data)
- 	switch (ares->type) {
- 	case ACPI_RESOURCE_TYPE_EXTENDED_IRQ:
- 		irq = &ares->data.extended_irq;
--		dev->irq_polarity = irq->polarity;
-+		dev->irq_active_low = irq->polarity == ACPI_ACTIVE_LOW;
- 		break;
- 
- 	case ACPI_RESOURCE_TYPE_GPIO:
- 		gpio = &ares->data.gpio;
- 		if (gpio->connection_type == ACPI_RESOURCE_GPIO_TYPE_INT)
--			dev->irq_polarity = gpio->polarity;
-+			dev->irq_active_low = gpio->polarity == ACPI_ACTIVE_LOW;
- 		break;
- 
- 	case ACPI_RESOURCE_TYPE_SERIAL_BUS:
-@@ -834,11 +831,11 @@ static int bcm_acpi_probe(struct bcm_device *dev)
- 		return ret;
- 	acpi_dev_free_resource_list(&resources);
- 
--	dmi_id = dmi_first_match(bcm_wrong_irq_dmi_table);
-+	dmi_id = dmi_first_match(bcm_active_low_irq_dmi_table);
- 	if (dmi_id) {
- 		bt_dev_warn(dev, "%s: Overwriting IRQ polarity to active low",
- 			    dmi_id->ident);
--		dev->irq_polarity = *(u8 *)dmi_id->driver_data;
-+		dev->irq_active_low = true;
- 	}
- 
- 	return 0;
--- 
-2.14.2
+-- Sebastian
 
+--wnaqu636ujkkwqei
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCgAdFiEE72YNB0Y/i3JqeVQT2O7X88g7+poFAlnQxNoACgkQ2O7X88g7
++prziQ/+OLboWw+8rr9D4/9yGJld6iuZNWE1rEZyQlOmInd0RKi4IeT8drQmAsqn
+QdyiabecVWqfVv9MFcHtLs6x97Wb6VVv3YA7xGE8aW2RPh7FdIf72ZRaM7icTzY6
+RgrVeUtYyZtlxcvHgnFis4N52vlWuxZpTK+M9eSkwGomYXz8DOxCeByp5QgEevs8
+8GvY3bGPhqxTI/FiDdJhKz1rZilOkn9YAFnTld1rA3IosNOSC7F1Sbwx0h0PiHbG
+LY6Km/RaX66gskj9wtEaEiIzgriSw7d61q7evVrluBcj5zFG4VZVil7Xw+zaDZ1h
+K68qRKDpip2trAQr1nEsf5E7aBzTFvzJ8KW0IJV6eTtaM4j/t5GjIyrpd3P0tPLJ
+2AIwsySgCZG2KMGYu9qxltDW6HPv7vgoWAx50ZdULOfMVqWmqyEvsx8V3YiIvrr0
+F3Pl6IrxcKs0fMrVNcFNzXAGUDZV7mKJCorav0BTjWFrIYUb4uT2s+5eB1Qr2UM/
+G4NRiD7pCpEGRVQrgy7ZOyscaZ6TG8Nqa4+wlOw2Uc5Y5EdBs6S9Fs1atXzgyL3t
+kKO8/KqsIijQ9cgVsS1I5/j0Qz2rRI5S2osMWJb0KrWLF6JOdxMDes6tISKR4TuE
+d0YgWuPzxR2KobFvi4sGK01j2jzYCXglSnl9G2fbAyVLSc8RHd8=
+=xbsL
+-----END PGP SIGNATURE-----
+
+--wnaqu636ujkkwqei--
