@@ -1,93 +1,79 @@
-Return-Path: <sre@kernel.org>
-Date: Tue, 3 Oct 2017 00:34:15 +0200
-From: Sebastian Reichel <sre@kernel.org>
-To: Hans de Goede <hdegoede@redhat.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	=?iso-8859-1?Q?Fr=E9d=E9ric?= Danis <frederic.danis.oss@gmail.com>,
-	robh@kernel.org, linux-bluetooth@vger.kernel.org,
-	linux-serial@vger.kernel.org, linux-acpi@vger.kernel.org
-Subject: Re: [PATCH 1/9] Bluetooth: hci_uart_set_flow_control: Fix NULL deref
- when using serdev
-Message-ID: <20171002223415.jmbi4zw7edyuxccl@earth>
-References: <20171002152356.4714-1-hdegoede@redhat.com>
- <20171002152356.4714-2-hdegoede@redhat.com>
+Return-Path: <benjamin.tissoires@gmail.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="a4vtalppzdfi5uwv"
-In-Reply-To: <20171002152356.4714-2-hdegoede@redhat.com>
+In-Reply-To: <20171002201850.13175-1-kernel-team@fedoraproject.org>
+References: <20171002201850.13175-1-kernel-team@fedoraproject.org>
+From: Benjamin Tissoires <benjamin.tissoires@gmail.com>
+Date: Mon, 2 Oct 2017 22:23:28 +0200
+Message-ID: <CAN+gG=ESSNFQugn7W-XvPrqyzt1eDcEcde4_9S4Pc0t=rHmtPw@mail.gmail.com>
+Subject: Re: [PATCH 0/4] Quirks cleanup and hid-generic niceness
+To: Jiri Kosina <jikos@kernel.org>, Marcel Holtmann <marcel@holtmann.org>,
+	Niels Skou Olsen <nolsen@jabra.com>
+Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, linux-input <linux-input@vger.kernel.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Benjamin Tissoires <benjamin.tissoires@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+On Mon, Oct 2, 2017 at 10:18 PM, Fedora Kernel Team
+<kernel-team@fedoraproject.org> wrote:
 
---a4vtalppzdfi5uwv
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Ouch, I happen to be in a git tree of the Fedora kernel, so git
+send-email decided to rewrite the 'from:' field.
+I'll add this to my check list before sending :/
 
-Hi,
+Cheers,
+Benjamin
 
-On Mon, Oct 02, 2017 at 05:23:48PM +0200, Hans de Goede wrote:
-> Fix a NULL pointer deref (hu->tty) when calling hci_uart_set_flow_control
-> on hci_uart-s using serdev.
->=20
-> Signed-off-by: Hans de Goede <hdegoede@redhat.com>
-> ---
->  drivers/bluetooth/hci_ldisc.c | 6 ++++++
->  1 file changed, 6 insertions(+)
->=20
-> diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
-> index a746627e784e..d02f6d029093 100644
-> --- a/drivers/bluetooth/hci_ldisc.c
-> +++ b/drivers/bluetooth/hci_ldisc.c
-> @@ -41,6 +41,7 @@
->  #include <linux/ioctl.h>
->  #include <linux/skbuff.h>
->  #include <linux/firmware.h>
-> +#include <linux/serdev.h>
-> =20
->  #include <net/bluetooth/bluetooth.h>
->  #include <net/bluetooth/hci_core.h>
-> @@ -298,6 +299,11 @@ void hci_uart_set_flow_control(struct hci_uart *hu, =
-bool enable)
->  	unsigned int set =3D 0;
->  	unsigned int clear =3D 0;
-> =20
-> +	if (hu->serdev) {
-> +		serdev_device_set_flow_control(hu->serdev, !enable);
-> +		return;
-> +	}
-
-I think this should also control rts, so that the behaviour is the
-same for serdev and ldisc implementation:
-
-serdev_device_set_rts(serdev, enable);
-
-> +
->  	if (enable) {
->  		/* Disable hardware flow control */
->  		ktermios =3D tty->termios;
-
--- Sebastian
-
---a4vtalppzdfi5uwv
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCgAdFiEE72YNB0Y/i3JqeVQT2O7X88g7+poFAlnSvuEACgkQ2O7X88g7
-+ppKMw/+L8KxKyOIDnYr+OOoqaplzoDgOsr91ccJBh/DXXwz63T7LWiUcPQuYWiO
-eZ0vG7VsYA+10YIfgiLLzesx4TrIv28+HZUK1a7lthGayq/zw5W8pLsoSPoHpx0h
-wHBy+ZoL1JegC+/+OfaqojjVnoEgq0zOY+zt4EDmz4E1LmIpo2gsnOgOkH8xjhr/
-2/P79GTJHHfyjpP9eU/qI2g+Doxpf1hLn0Zst+LlYF+/dR0Lf71eINmWJ5r38Y5Z
-OA6tKA7yMiYvK4sjbYZplI8APzA6rxVUx0fB/oo6IhPoG3LWk9mN/D1htULPO4Hy
-OuuIHTiIp68wn+LjFFBP+eulR42q2fppARTCLbvVLmebKS0yo9VmaW2iNBB7DSAf
-Jgys38SNhmEeLZgFiCqCIXww1ihoMyBwhWerI0vLZE3V4iZm4HVuB6/C5LPNHBXd
-zoMzsHj1NIGLiYEHjOIXZLlPVS0Pr03EAGUYtjfoFodWOR5sCh2Zb5DM/p74A/E4
-Fmzg289zFrFYcPtjo3UZXB8P/crPS34BJbKpPxzO580y4Wpw4JPnIlpajKIdgliT
-gzA4gsMstzaGDTym24VXcW6MEAhjmwU5lVIoeX6sjYR78PH7jYQLWx0412C5sots
-F5PhziJiv6FNMDs21KMc6739PKZ74eWLoDgLVdu9ttSlZR3gRGI=
-=3ZvC
------END PGP SIGNATURE-----
-
---a4vtalppzdfi5uwv--
+> From: Benjamin Tissoires <benjamin.tissoires@redhat.com>
+>
+> Hi,
+>
+> This is the series I was talking about earlier[1].
+>
+> Basically, Jiri, I'd like to see 1-3 applied in for-next at your earliest
+> convenience, and we can discuss about 4/4 without any rush.
+>
+> I have this in my local tree since June, but I made some late minute
+> changes before sending, though the tests showed they are fine (I wouldn't
+> mind a second pair of eyes on it).
+>
+> I am pretty sure we can optimize the things more, but for now this should be
+> just fine and just convert the quirks mechanism in hid-core.
+> For instance, there is a second call of hid_lookup_quirk() in usbhid/hid-core.c
+> that I am not sure about the absolute need.
+>
+> Niels, please have a look at this and tell me if you are OK to rebase your
+> series on top of it.
+>
+> Cheers,
+> Benjamin
+>
+>
+> [1] https://patchwork.kernel.org/patch/9980443/
+>
+> Benjamin Tissoires (4):
+>   HID: core: move the dynamic quirks handling in core
+>   HID: quirks: move the list of special devices into a quirk
+>   HID: core: move the list of ignored devices in hid-quirks.c
+>   HID: core: remove the absolute need of hid_have_special_driver[]
+>
+>  drivers/hid/Makefile            |    2 +-
+>  drivers/hid/hid-core.c          |  925 ++---------------------------
+>  drivers/hid/hid-generic.c       |   68 ++-
+>  drivers/hid/hid-quirks.c        | 1242 +++++++++++++++++++++++++++++++++++++++
+>  drivers/hid/usbhid/Makefile     |    2 +-
+>  drivers/hid/usbhid/hid-core.c   |   10 +-
+>  drivers/hid/usbhid/hid-quirks.c |  401 -------------
+>  include/linux/hid.h             |   21 +-
+>  net/bluetooth/hidp/core.c       |    2 +-
+>  9 files changed, 1388 insertions(+), 1285 deletions(-)
+>  create mode 100644 drivers/hid/hid-quirks.c
+>  delete mode 100644 drivers/hid/usbhid/hid-quirks.c
+>
+> --
+> 2.9.5
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-input" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
