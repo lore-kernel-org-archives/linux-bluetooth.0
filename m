@@ -10,44 +10,42 @@ Cc: Hans de Goede <hdegoede@redhat.com>,
 	linux-bluetooth@vger.kernel.org,
 	linux-serial@vger.kernel.org,
 	linux-acpi@vger.kernel.org
-Subject: [PATCH 1/9] Bluetooth: hci_uart_set_flow_control: Fix NULL deref when using serdev
-Date: Mon,  2 Oct 2017 17:23:48 +0200
-Message-Id: <20171002152356.4714-2-hdegoede@redhat.com>
-In-Reply-To: <20171002152356.4714-1-hdegoede@redhat.com>
-References: <20171002152356.4714-1-hdegoede@redhat.com>
+Subject: [PATCH 0/9] Bluetooth: hci_bcm: Add (runtime)pm support to the serdev drv
+Date: Mon,  2 Oct 2017 17:23:47 +0200
+Message-Id: <20171002152356.4714-1-hdegoede@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Fix a NULL pointer deref (hu->tty) when calling hci_uart_set_flow_control
-on hci_uart-s using serdev.
+Hi All,
 
-Signed-off-by: Hans de Goede <hdegoede@redhat.com>
----
- drivers/bluetooth/hci_ldisc.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+The ACPI subsys is going to move over to instantiating ACPI enumerated
+HCIs as serdevs, rather then as platform devices.
 
-diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
-index a746627e784e..d02f6d029093 100644
---- a/drivers/bluetooth/hci_ldisc.c
-+++ b/drivers/bluetooth/hci_ldisc.c
-@@ -41,6 +41,7 @@
- #include <linux/ioctl.h>
- #include <linux/skbuff.h>
- #include <linux/firmware.h>
-+#include <linux/serdev.h>
- 
- #include <net/bluetooth/bluetooth.h>
- #include <net/bluetooth/hci_core.h>
-@@ -298,6 +299,11 @@ void hci_uart_set_flow_control(struct hci_uart *hu, bool enable)
- 	unsigned int set = 0;
- 	unsigned int clear = 0;
- 
-+	if (hu->serdev) {
-+		serdev_device_set_flow_control(hu->serdev, !enable);
-+		return;
-+	}
-+
- 	if (enable) {
- 		/* Disable hardware flow control */
- 		ktermios = tty->termios;
--- 
-2.14.2
+This means that the serdev driver paths of hci_bcm.c also need to start
+supporting (runtime)pm through GPIOs and a host-wake IRQ.
+
+This series makes most of the code in hci_bcm.c indepdenent from how
+the hci was instantiated and then more or less unifies the platform
+and serdev drivers, adding (runtime)pm / GPIO / IRQ support to the
+serdev driver.
+
+Besides adding (runtime)pm support, GPIO control in general is necessary
+to e.g. keep the ACPI BCM2E7E id used with the BCM4356A2 wifi/bt combo
+on the GPD pocket working after moving over to serdev enumeration.
+
+I've chosen to keep the platform enumeration based code paths in place
+for now. This way we can first merge this series and then, once this
+series is in place, the first 2 patches of Frédéric Danis RFC series
+for ACPI serdev support can be merged without causing any regressions.
+
+Once the ACPI serdev support is merged a follow up patch removing the
+platform-device related code can be submitted.
+
+Note the 2nd patch in this series is a resend of a bug-fix I submitted
+a couple of days ago, I've included that with the series to avoid
+conflicts when applying the series without that fix.
+
+Regards,
+
+Hans
