@@ -1,117 +1,51 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Subject: Re: [PATCH 2/2] Bluetooth: hci_bcm: Add support for BCM2E7E
+To: Sebastian Reichel <sre@kernel.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+        Gustavo Padovan <gustavo@padovan.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-bluetooth@vger.kernel.org
+References: <20170907202551.26796-1-hdegoede@redhat.com>
+ <20170907202551.26796-2-hdegoede@redhat.com>
+ <aab461af-601b-70c3-f79e-95ce0bdbbc9d@redhat.com>
+ <20171001103509.4jqlt6kuqgxlm5m5@earth>
+From: Hans de Goede <hdegoede@redhat.com>
+Message-ID: <aed714df-ec91-cda6-c8fc-f45e40c4a6cb@redhat.com>
+Date: Mon, 2 Oct 2017 17:29:10 +0200
 MIME-Version: 1.0
-In-Reply-To: <59D1E4B0.2000106@digi.com>
-References: <59CD26BE.8040803@digi.com> <CABBYNZLFyyNQmkAk5JZGWDii_hcx0n68yr-sjeXVUAEHVcOqcw@mail.gmail.com>
- <59CDEBDF.3090200@digi.com> <59D1E4B0.2000106@digi.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 2 Oct 2017 19:00:52 +0300
-Message-ID: <CABBYNZKuzJ4ueWufFSEZo7zhVdL5DCF=DuUYQLY-zV0OEuFYRA@mail.gmail.com>
-Subject: Re: how to advertise a GATT service only for LE or BR/EDR?
-To: "Hermida, Isaac" <Isaac.Hermida@digi.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20171001103509.4jqlt6kuqgxlm5m5@earth>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Isaac,
+Hi,
 
-On Mon, Oct 2, 2017 at 10:03 AM, Hermida, Isaac <Isaac.Hermida@digi.com> wrote:
-> Hi Luiz et all,
->
-> On 09/29/2017 08:44 AM, Hermida, Isaac wrote:
->> Hi Luiz,
->>
->> On 09/28/2017 08:21 PM, Luiz Augusto von Dentz wrote:
->>> Hi Isaac,
->>>
->>> On Thu, Sep 28, 2017 at 7:43 PM, Hermida, Isaac <Isaac.Hermida@digi.com> wrote:
->>>> Hi group,
->>>>
->>>> As part of the bluetooth SIG certification there are two test cases
->>>> /TP/GAR/CL/BI-34-C and /TP/GAR/CL/BI-35-C (you can see they defined in
->>>> unit/test-gatt.c).
->>>> Currently I am able to run the "test/example-gatt-server" and see my
->>>> custom services and characteristics, but I need to define an specific
->>>> service/characteristic to be only accessible trough LE or BR/EDR
->>>> transport parameter. I was digging into the code but I was unable to
->>>> find how to set it for the GATT server.
->>>>
->>>> In other words, what I want to do is launch the gatt-server and then,
->>>> when inspecting the services/characteristic with gatttool, the returned
->>>> list should be different if I run gatttool with "-p 31" or not (notice
->>>> how the gatttool prompt is set to LE or BR).
->>>>
->>>> # gatttool -I -b 00:40:9D:98:99:BD -p 0
->>>> [00:40:9D:98:99:BD][LE]> connect
->>>> Attempting to connect to 00:40:9D:98:99:BD
->>>> Connection successful
->>>> [00:40:9D:98:99:BD][LE]> primary
->>>> attr handle: 0x0001, end grp handle: 0x0005 uuid:
->>>> 00001800-0000-1000-8000-00805f9b34fb
->>>> attr handle: 0x0006, end grp handle: 0x0009 uuid:
->>>> 00001801-0000-1000-8000-00805f9b34fb
->>>> attr handle: 0x000a, end grp handle: 0x000d uuid:
->>>> 0000180f-0000-1000-8000-00805f9b34fb
->>>> attr handle: 0x000e, end grp handle: 0x001d uuid:
->>>> 12345678-1234-5678-1234-56789abcdef0
->>>> attr handle: 0x001e, end grp handle: 0x0025 uuid:
->>>> 0000180d-0000-1000-8000-00805f9b34fb
->>>>
->>>>
->>>> # /tmp/gatttool -I -b 00:40:9D:98:99:BD -p 31
->>>> [00:40:9D:98:99:BD][BR]> connect
->>>> Attempting to connect to 00:40:9D:98:99:BD
->>>> Connection successful
->>>> [00:40:9D:98:99:BD][BR]> primary
->>>> attr handle: 0x0001, end grp handle: 0x0005 uuid:
->>>> 00001800-0000-1000-8000-00805f9b34fb
->>>> attr handle: 0x0006, end grp handle: 0x0009 uuid:
->>>> 00001801-0000-1000-8000-00805f9b34fb
->>>> attr handle: 0x000a, end grp handle: 0x0019 uuid:
->>>> 12345678-1234-5678-1234-56789abcdef0
->>>> attr handle: 0x001a, end grp handle: 0x001d uuid:
->>>> 0000180f-0000-1000-8000-00805f9b34fb
->>>> attr handle: 0x001e, end grp handle: 0x0025 uuid:
->>>> 0000180d-0000-1000-8000-00805f9b34fb
->>>>
->>>>
->>>>
->>>> I am using bluez 5.41. Is possible to advertise a service only for LE or
->>>> BR? I guess it should because is part of the SIG certification and is
->>>> part of the unit/test-gatt.
->>> This might be because the spec was no clear about the database being
->>> bearer specific, which in my opinion this is a oversight since then we
->>> can't represent attributes of dual mode devices with a unified object,
->>> and I really wonder if this has to be forced up into the API, if it
->>> does then we would have to encode bearer information into the object
->>> path (argh!) for client and for server would probably need a property
->>> telling which bearer this would be available and encode this into to
->>> the database which may leave gaps in the handles or just duplicate
->>> everything, for server Id probably just hide the services based on the
->>> bearer, but we still need to store the CCC configuration in a bearer
->>> specific manner.
->>>
->>
->> So, what can I do in order to pass that specific bluetooth SIG tests?
->> That test cases need to ensure that an specific service/char in only
->> accessible on LE or BR, so they had to be different.
->> Do you have any idea or suggestion? It would be really welcome, if not I
->> have no idea how to proceed to complete the SIG validation with bluez stuff.
->> I was even trying to modify some files into the code, but I am not
->> familiar with that and it obviously did not work.
->
-> I understand the silent to this last question as a no. So I assume that
-> any user trying to pass this test will fail (at least if using bluez).
-> So should the specification be changed? Should bluez adapt to it? In the
-> current state that SIG certification can not be passed.
+On 01-10-17 12:35, Sebastian Reichel wrote:
+> Hi Hans,
+> 
+> On Sun, Oct 01, 2017 at 11:27:45AM +0200, Hans de Goede wrote:
+>> This will happen automatically with this patch series,
+>> but with the current 4.14 bluetooth stack it will work in
+>> USB mode, and if we then merge this series post 4.14
+>> bluetooth will stop working without users doing a btattach
+>> command from userspace and we will have a regression on
+>> our hands.
+> 
+> Once the series from Frédéric Danis lands, you can get
+> serial based broadcom bluetooth without btattach:
+> 
+> https://www.spinics.net/lists/linux-bluetooth/msg71856.html
 
-That if you want to qualify with GATT over BR/EDR, something that we
-may actually have an option to disable in the future, or perhaps just
-remove it entirely given this tests would possible affect that GATT
-database layout, either by creating handle gaps or duplication. So
-perhaps you could give some feedback if you do intend to use GATT over
-BR/EDR or not? If it turn out no one benefit from it Id just remove
-it.
+Oh, cool. Thank you for pointing this out to me. I still
+believe reverting the workaround for the 0000:0000
+usb-id device is the right thing to do though.
 
--- 
-Luiz Augusto von Dentz
+I've tested Frédéric Danis' series and it needed quite
+some work on one of my devices. I've just submitted
+a 9 patch series to add all the features the platform
+code paths of hci_bcm.c have and which were missing from
+the serdev code paths.
+
+Regards,
+
+Hans
