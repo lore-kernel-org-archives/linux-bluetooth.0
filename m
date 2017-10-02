@@ -10,61 +10,54 @@ Cc: Hans de Goede <hdegoede@redhat.com>,
 	linux-bluetooth@vger.kernel.org,
 	linux-serial@vger.kernel.org,
 	linux-acpi@vger.kernel.org
-Subject: [PATCH 8/9] Bluetooth: hci_bcm: Make suspend/resume functions platform_dev independent
-Date: Mon,  2 Oct 2017 17:23:55 +0200
-Message-Id: <20171002152356.4714-9-hdegoede@redhat.com>
+Subject: [PATCH 7/9] Bluetooth: hci_bcm: Make acpi_probe get irq from ACPI resources
+Date: Mon,  2 Oct 2017 17:23:54 +0200
+Message-Id: <20171002152356.4714-8-hdegoede@redhat.com>
 In-Reply-To: <20171002152356.4714-1-hdegoede@redhat.com>
 References: <20171002152356.4714-1-hdegoede@redhat.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Use dev_get_drvdata instead of platform_get_drvdata in the suspend /
-resume functions. This is a preparation patch for adding (runtime)pm
+The ACPI subsys is going to move over to instantiating ACPI enumerated
+HCIs as serdevs, rather then as platform devices.
+
+So we need to make bcm_acpi_probe() suitable for use on non platform-
+devices too, which means that we cannot rely on platform_get_irq()
+getting called.
+
+This commit modifies bcm_acpi_probe() to directly get the irq from
+the ACPI resources, this is a preparation patch for adding (runtime)pm
 support to the serdev path.
 
 Signed-off-by: Hans de Goede <hdegoede@redhat.com>
 ---
- drivers/bluetooth/hci_bcm.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ drivers/bluetooth/hci_bcm.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
 diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
-index 48a428909958..7191cee5ced0 100644
+index 5c8371d8aace..48a428909958 100644
 --- a/drivers/bluetooth/hci_bcm.c
 +++ b/drivers/bluetooth/hci_bcm.c
-@@ -558,7 +558,7 @@ static struct sk_buff *bcm_dequeue(struct hci_uart *hu)
- #ifdef CONFIG_PM
- static int bcm_suspend_device(struct device *dev)
- {
--	struct bcm_device *bdev = platform_get_drvdata(to_platform_device(dev));
-+	struct bcm_device *bdev = dev_get_drvdata(dev);
+@@ -805,6 +805,7 @@ static int bcm_acpi_probe(struct bcm_device *dev)
+ 	const struct dmi_system_id *dmi_id;
+ 	const struct acpi_gpio_mapping *gpio_mapping = acpi_bcm_int_last_gpios;
+ 	const struct acpi_device_id *id;
++	struct resource_entry *entry;
+ 	int ret;
  
- 	bt_dev_dbg(bdev, "");
+ 	/* Retrieve GPIO data */
+@@ -821,6 +822,13 @@ static int bcm_acpi_probe(struct bcm_device *dev)
+ 				     &resources, bcm_resource, dev);
+ 	if (ret < 0)
+ 		return ret;
++
++	resource_list_for_each_entry(entry, &resources) {
++		if (resource_type(entry->res) == IORESOURCE_IRQ) {
++			dev->irq = entry->res->start;
++			break;
++		}
++	}
+ 	acpi_dev_free_resource_list(&resources);
  
-@@ -581,7 +581,7 @@ static int bcm_suspend_device(struct device *dev)
- 
- static int bcm_resume_device(struct device *dev)
- {
--	struct bcm_device *bdev = platform_get_drvdata(to_platform_device(dev));
-+	struct bcm_device *bdev = dev_get_drvdata(dev);
- 
- 	bt_dev_dbg(bdev, "");
- 
-@@ -606,7 +606,7 @@ static int bcm_resume_device(struct device *dev)
- /* Platform suspend callback */
- static int bcm_suspend(struct device *dev)
- {
--	struct bcm_device *bdev = platform_get_drvdata(to_platform_device(dev));
-+	struct bcm_device *bdev = dev_get_drvdata(dev);
- 	int error;
- 
- 	bt_dev_dbg(bdev, "suspend: is_suspended %d", bdev->is_suspended);
-@@ -638,7 +638,7 @@ static int bcm_suspend(struct device *dev)
- /* Platform resume callback */
- static int bcm_resume(struct device *dev)
- {
--	struct bcm_device *bdev = platform_get_drvdata(to_platform_device(dev));
-+	struct bcm_device *bdev = dev_get_drvdata(dev);
- 
- 	bt_dev_dbg(bdev, "resume: is_suspended %d", bdev->is_suspended);
- 
+ 	dmi_id = dmi_first_match(bcm_active_low_irq_dmi_table);
 -- 
 2.14.2
