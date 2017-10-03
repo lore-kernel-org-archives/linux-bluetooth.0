@@ -1,48 +1,46 @@
-Return-Path: <benjamin.tissoires@redhat.com>
-From: Benjamin Tissoires <benjamin.tissoires@redhat.com>
-To: Jiri Kosina <jikos@kernel.org>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Niels Skou Olsen <nolsen@jabra.com>
-Cc: linux-kernel@vger.kernel.org,
-	linux-input@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org,
-	Benjamin Tissoires <benjamin.tissoires@redhat.com>
-Subject: [PATCH v2 0/4] Quirks cleanup and hid-generic niceness
-Date: Tue,  3 Oct 2017 16:57:25 +0200
-Message-Id: <20171003145729.3135-1-benjamin.tissoires@redhat.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+MIME-Version: 1.0
+In-Reply-To: <20171002114740.9474-1-luiz.dentz@gmail.com>
+References: <20171002114740.9474-1-luiz.dentz@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Tue, 3 Oct 2017 17:50:50 +0300
+Message-ID: <CABBYNZJw+R35a3g+s2qNEXYg7eoKZU_EAMDgXo-EGVgqW_-cNA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] gatt: Fix not replying to Write request
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
 
-Niels found an issue with v1 of the series, while compiling the usbhid module
-as a separate .ko.
+On Mon, Oct 2, 2017 at 2:47 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> When using AcquireWrite the first write would not call
+> gatt_db_attribute_write_result so no reply would be generated.
+> ---
+>  src/gatt-database.c | 2 ++
+>  1 file changed, 2 insertions(+)
+>
+> diff --git a/src/gatt-database.c b/src/gatt-database.c
+> index 4932568dd..e84c19198 100644
+> --- a/src/gatt-database.c
+> +++ b/src/gatt-database.c
+> @@ -1892,6 +1892,8 @@ static void acquire_write_reply(DBusMessage *message, void *user_data)
+>                                 op->data.iov_len) < 0)
+>                 goto retry;
+>
+> +       gatt_db_attribute_write_result(op->attrib, op->id, 0);
+> +
+>         return;
+>
+>  retry:
+> --
+> 2.13.5
+>
+Applied.
 
-Sending a v2 with the proper From: field fixed now.
-
-I also use -M1 to show in 1/4 that usbhid/hid-quirks.c is basically moved to
-hid-quirks.c.
-
-Cheers,
-Benjamin
-
-Benjamin Tissoires (4):
-  HID: core: move the dynamic quirks handling in core
-  HID: quirks: move the list of special devices into a quirk
-  HID: core: move the list of ignored devices in hid-quirks.c
-  HID: core: remove the absolute need of hid_have_special_driver[]
-
- drivers/hid/Makefile            |    2 +-
- drivers/hid/hid-core.c          |  926 ++---------------------------
- drivers/hid/hid-generic.c       |   68 ++-
- drivers/hid/hid-quirks.c        | 1244 +++++++++++++++++++++++++++++++++++++++
- drivers/hid/usbhid/Makefile     |    2 +-
- drivers/hid/usbhid/hid-core.c   |   10 +-
- drivers/hid/usbhid/hid-quirks.c |  401 -------------
- include/linux/hid.h             |   21 +-
- net/bluetooth/hidp/core.c       |    2 +-
- 9 files changed, 1391 insertions(+), 1285 deletions(-)
- create mode 100644 drivers/hid/hid-quirks.c
- delete mode 100644 drivers/hid/usbhid/hid-quirks.c
 
 -- 
-2.9.5
+Luiz Augusto von Dentz
