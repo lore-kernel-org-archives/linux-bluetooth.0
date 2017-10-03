@@ -1,13 +1,19 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
 Reply-To: yunhanw@nestlabs.com
-In-Reply-To: <CABBYNZ+40gCRshXM8x1NHc88BJo50JR38g3Qm6Up4DKNdB3ROw@mail.gmail.com>
-References: <20170920074417.30435-1-luiz.dentz@gmail.com> <20170920074417.30435-9-luiz.dentz@gmail.com>
- <CALvjcs_cpF3ZAKjLNdGq+U_+2F43rJQNiF2042dbAVawum+nMw@mail.gmail.com> <CABBYNZ+40gCRshXM8x1NHc88BJo50JR38g3Qm6Up4DKNdB3ROw@mail.gmail.com>
+In-Reply-To: <CABBYNZK1EhXevECEiFfpa+4+d_ViQrw=6=4w1rgNCa6xQzohpQ@mail.gmail.com>
+References: <20170920074417.30435-1-luiz.dentz@gmail.com> <20170920074417.30435-7-luiz.dentz@gmail.com>
+ <CALvjcs-THH_Mmuvj7TGDdJOSuhCqPWOPAfCfon=ady8oJ=vCCQ@mail.gmail.com>
+ <CABBYNZ+DNnr8KkSQzKrEnbZjdEmbDC47hrO7VQ185+mOwuOn3g@mail.gmail.com>
+ <CALvjcs9PLGbPEqN3oz9ndJnBz57Ymiw0mWAF++SSEV1ChNT_hA@mail.gmail.com>
+ <CABBYNZJQKWRMGtgUfCYJmDzn7VFh6dmR7GpiyUk7HHOTtR-wCA@mail.gmail.com>
+ <CALvjcs8MiNMcEfcOi3in_td7VBJbA-nE-wcZhcEz7VDFwdZR+A@mail.gmail.com>
+ <CABBYNZLvomAGYvvtm1HzGSPiLPYOCAnX3R6kjsq3GPQzO9EcjQ@mail.gmail.com>
+ <CALvjcs8LvwCGo_iKcd5szvHZ-QJkiyobwBv5aSN4P_xOHsdyVA@mail.gmail.com> <CABBYNZK1EhXevECEiFfpa+4+d_ViQrw=6=4w1rgNCa6xQzohpQ@mail.gmail.com>
 From: Yunhan Wang <yunhanw@nestlabs.com>
-Date: Mon, 2 Oct 2017 23:13:41 -0700
-Message-ID: <CALvjcs9edmP48TuAmYApWFWh_k_OTGM=Mws5PZs2VMufEwm0zg@mail.gmail.com>
-Subject: Re: [PATCH v2 08/10] gatt: Implement AcquireNotify for server
+Date: Mon, 2 Oct 2017 17:24:05 -0700
+Message-ID: <CALvjcs9ursPsA2s_ChNu6G9Nqmn2XJxiF7EDFqBF8gPO85m3OA@mail.gmail.com>
+Subject: Re: [PATCH v2 06/10] gatt: Implement AcquireWrite for server
 To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
@@ -16,313 +22,100 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi, Luiz
 
-On Fri, Sep 29, 2017 at 12:03 AM, Luiz Augusto von Dentz
+On Mon, Oct 2, 2017 at 4:57 AM, Luiz Augusto von Dentz
 <luiz.dentz@gmail.com> wrote:
 > Hi Yunhan,
 >
-> On Fri, Sep 29, 2017 at 7:47 AM, Yunhan Wang <yunhanw@nestlabs.com> wrote=
-:
+> On Sat, Sep 30, 2017 at 6:39 AM, Yunhan Wang <yunhanw@nestlabs.com> wrote:
 >> Hi, Luiz
 >>
->> May I have several questions about this feature?
->>
->> On Wed, Sep 20, 2017 at 12:44 AM, Luiz Augusto von Dentz
+>> On Fri, Sep 29, 2017 at 1:02 AM, Luiz Augusto von Dentz
 >> <luiz.dentz@gmail.com> wrote:
->>> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>>> Hi Yunhan,
 >>>
->>> This enables IO via file descriptors using AcquireWrite if server
->>> implements it.
->>> ---
->>>  src/gatt-database.c | 116 ++++++++++++++++++++++++++++++++++++++++++++=
-+++++---
->>>  1 file changed, 111 insertions(+), 5 deletions(-)
+>>> On Fri, Sep 29, 2017 at 10:50 AM, Yunhan Wang <yunhanw@nestlabs.com> wrote:
+>>>> Hi, Luiz
+>>>>
+>>>> I see. Great! Thanks for your explanation.
 >>>
->>> diff --git a/src/gatt-database.c b/src/gatt-database.c
->>> index 239fe5384..4932568dd 100644
->>> --- a/src/gatt-database.c
->>> +++ b/src/gatt-database.c
->>> @@ -24,6 +24,7 @@
->>>  #include <stdint.h>
->>>  #include <stdlib.h>
->>>  #include <errno.h>
->>> +#include <unistd.h>
+>>> Please comment inline on the list.
 >>>
->>>  #include "lib/bluetooth.h"
->>>  #include "lib/sdp.h"
->>> @@ -118,7 +119,9 @@ struct external_chrc {
->>>         uint8_t props;
->>>         uint8_t ext_props;
->>>         uint32_t perm;
->>> +       uint16_t mtu;
->>>         struct io *write_io;
->>> +       struct io *notify_io;
->>>         struct gatt_db_attribute *attrib;
->>>         struct gatt_db_attribute *ccc;
->>>         struct queue *pending_reads;
->>> @@ -152,7 +155,8 @@ struct device_state {
->>>         struct queue *ccc_states;
->>>  };
+>>>> Maybe it is good to have both solutions in current bluez?
+>>>> 1. AcquireWrite, write data passing via fd, mtu passing by DBUS, we
+>>>> can take advantage of fd under high load.
+>>>> 2. Write, write data and mtu passing over DBUS, we still can fully use
+>>>> DBUS under low load.
 >>>
->>> -typedef uint8_t (*btd_gatt_database_ccc_write_t) (uint16_t value,
->>> +typedef uint8_t (*btd_gatt_database_ccc_write_t) (struct bt_att *att,
->>> +                                                       uint16_t value,
->>>                                                         void *user_data=
-);
->>>  typedef void (*btd_gatt_database_destroy_t) (void *data);
+>>> Well that is actually a 3 type of transfer since regular WriteValue
+>>> already exists which defeat a little bit the purpose of WriteAcquired
+>>> since we can no longer determine if the server supports fd mode or
+>>> not, I think it is too much and the server has to either to decide if
+>>> unfragmented D-Bus transfer is fine is not, if not then fd passing
+>>> shall be the only mechanism.
 >>>
->>> @@ -328,6 +332,7 @@ static void chrc_free(void *data)
->>>         struct external_chrc *chrc =3D data;
->>>
->>>         io_destroy(chrc->write_io);
->>> +       io_destroy(chrc->notify_io);
->>>
->>>         queue_destroy(chrc->pending_reads, cancel_pending_read);
->>>         queue_destroy(chrc->pending_writes, cancel_pending_write);
->>> @@ -792,7 +797,8 @@ static void gatt_ccc_write_cb(struct gatt_db_attrib=
-ute *attrib,
->>>                 goto done;
->>>
->>>         if (ccc_cb->callback)
->>> -               ecode =3D ccc_cb->callback(get_le16(value), ccc_cb->use=
-r_data);
->>> +               ecode =3D ccc_cb->callback(att, get_le16(value),
->>> +                                               ccc_cb->user_data);
->>>
->>>         if (!ecode) {
->>>                 ccc->value[0] =3D value[0];
->>> @@ -1801,12 +1807,34 @@ static bool pipe_hup(struct io *io, void *user_=
-data)
->>>
->>>         if (io =3D=3D chrc->write_io)
->>>                 chrc->write_io =3D NULL;
->>> +       else
->>> +               chrc->notify_io =3D NULL;
->>>
->>>         io_destroy(io);
->>>
->>>         return false;
->>>  }
->>>
->>> +static bool pipe_io_read(struct io *io, void *user_data)
->>> +{
->>> +       struct external_chrc *chrc =3D user_data;
->>> +       uint8_t buf[512];
->>> +       int fd =3D io_get_fd(io);
->>> +       ssize_t bytes_read;
->>> +
->>> +       bytes_read =3D read(fd, buf, sizeof(buf));
->>> +       if (bytes_read < 0)
->>> +               return false;
->>> +
->>> +       send_notification_to_devices(chrc->service->app->database,
->>> +                               gatt_db_attribute_get_handle(chrc->attr=
-ib),
->>> +                               buf, bytes_read,
->>> +                               gatt_db_attribute_get_handle(chrc->ccc)=
-,
->>> +                               false, NULL);
->>> +
->>> +       return true;
->>> +}
->>> +
->>>  static struct io *pipe_io_new(int fd, void *user_data)
->>>  {
->>>         struct io *io;
->>> @@ -1815,6 +1843,8 @@ static struct io *pipe_io_new(int fd, void *user_=
-data)
->>>
->>>         io_set_close_on_destroy(io, true);
->>>
->>> +       io_set_read_handler(io, pipe_io_read, user_data, NULL);
->>> +
->>>         io_set_disconnect_handler(io, pipe_hup, user_data, NULL);
->>>
->>>         return io;
->>> @@ -1915,9 +1945,64 @@ static struct pending_op *acquire_write(struct e=
-xternal_chrc *chrc,
->>>         return NULL;
->>>  }
->>>
->>> -static uint8_t ccc_write_cb(uint16_t value, void *user_data)
->>> +static void acquire_notify_reply(DBusMessage *message, void *user_data=
-)
->>>  {
->>>         struct external_chrc *chrc =3D user_data;
->>> +       DBusError err;
->>> +       int fd;
->>> +       uint16_t mtu;
->>> +
->>> +       dbus_error_init(&err);
->>> +
->>> +       if (dbus_set_error_from_message(&err, message) =3D=3D TRUE) {
->>> +               error("Failed to acquire notify: %s\n", err.name);
->>> +               dbus_error_free(&err);
->>> +               goto retry;
->>> +       }
->>> +
->>> +       if ((dbus_message_get_args(message, NULL, DBUS_TYPE_UNIX_FD, &f=
-d,
->>> +                                       DBUS_TYPE_UINT16, &mtu,
->>> +                                       DBUS_TYPE_INVALID) =3D=3D false=
-)) {
->>> +               error("Invalid AcquirNotify response\n");
->>> +               goto retry;
->>> +       }
->>> +
->>> +       DBG("AcquireNotify success: fd %d MTU %u\n", fd, mtu);
->>> +
->>> +       chrc->notify_io =3D pipe_io_new(fd, chrc);
+>> I agree, it is three type of transfer,
+>> regular write,
+>> regular write with mtu support(application is responsible for packet
+>> fragmentation)
+>> fd with pipe (application is responsible for packet fragmentation),
+>
+> There is no advantage on having to call AcquireWrite and then _not_
+> use the fd but WriteValue, so IMO it makes no sense to offer something
+> that has no benefit.
+>
+>> now we have two kind of transfer(regular write, acquire write) in
+>> code, add third one is pretty straightforward and only small code
+>> change.
 >>
->> Why do we need to use pipe and notify_io when implementing this
->> feature? I think fd and mtu has been pass using dbus message. Could
->> you clarify more details?
+>> I read two articles(https://blogs.gnome.org/abustany/2010/05/20/ipc-performance-the-return-of-the-report/,
+>> https://lists.freedesktop.org/archives/dbus/2014-October/016363.html),
+>> I agree that fd with pipe is more efficent, and eliminate several
+>> copy, and benefit for byte streaming although there is minor
+>> vulnerability mentioned in above article,  I hope engineer in
+>> peripheral application can still have another choice, regular write
+>> with mtu, when traffic is low or it is experiment purpose. Considering
+>> these are pretty similar, easy to integrate, engineer still can easily
+>> switch them between fd with pipe and regular write.
 >
-> notify_io is the receiving end of the notification, the application
-> will write its notifications using the fd which is captured by
-> checking if the fd is readable.
+> Regular D-Bus WriteValue and fd passing via AcquireWrite do cover all
+> cases... too many choices is actually a bad thing to an API as it
+> increases the complexity of the code and number of bugs, so normally
+> we target to have as little APIs as possible.
 >
+Ok, Understood. Thank you. Let's keep current design and use fd
+passing via AcquireWrite this way.
+
+>>> Considering how easy it was to add support for fd passing on the
+>>> bluetoothctl I don't thing it is that big of deal really, or there is
+>>> something else preventing this to happen in your end?
+>>>
+>> Yes, fd passing is pretty easy and efficent, it is not big deal to
+>> integrate it, using this way, in my end, for gatt write with response
+>> from central to peripheral, I can see written value and length in
+>> https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/client/gatt.c#n688,
+>> but I cannot see any response back for GATT write from peripheral to
+>> central. It seems this only support GATT write without response even
+>> though I have removed the check
+>> here(https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/client/gatt.c#n1360).
+>> Any idea?
 >>
->>> +
->>> +       __sync_fetch_and_add(&chrc->ntfy_cnt, 1);
->>> +
->>> +       return;
->>> +
->>> +retry:
->>> +       g_dbus_proxy_method_call(chrc->proxy, "StartNotify", NULL, NULL=
-,
->>> +                                                       NULL, NULL);
->>> +
->>> +       __sync_fetch_and_add(&chrc->ntfy_cnt, 1);
->>> +}
->>> +
->>> +static void acquire_notify_setup(DBusMessageIter *iter, void *user_dat=
-a)
->>> +{
->>> +       DBusMessageIter dict;
->>> +       struct external_chrc *chrc =3D user_data;
->>> +
->>> +       dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
->>> +                                       DBUS_DICT_ENTRY_BEGIN_CHAR_AS_S=
-TRING
->>> +                                       DBUS_TYPE_STRING_AS_STRING
->>> +                                       DBUS_TYPE_VARIANT_AS_STRING
->>> +                                       DBUS_DICT_ENTRY_END_CHAR_AS_STR=
-ING,
->>> +                                       &dict);
->>> +
->>> +       dict_append_entry(&dict, "MTU", DBUS_TYPE_UINT16, &chrc->mtu);
->>> +
->>> +       dbus_message_iter_close_container(iter, &dict);
->>> +}
->>> +
->>> +static uint8_t ccc_write_cb(struct bt_att *att, uint16_t value, void *=
-user_data)
->>> +{
->>> +       struct external_chrc *chrc =3D user_data;
->>> +       DBusMessageIter iter;
->>>
->>>         DBG("External CCC write received with value: 0x%04x", value);
->>>
->>> @@ -1929,6 +2014,12 @@ static uint8_t ccc_write_cb(uint16_t value, void=
- *user_data)
->>>                 if (__sync_sub_and_fetch(&chrc->ntfy_cnt, 1))
->>>                         return 0;
->>>
->>> +               if (chrc->notify_io) {
->>> +                       io_destroy(chrc->notify_io);
->>> +                       chrc->notify_io =3D NULL;
->>> +                       return 0;
->>> +               }
->>> +
->>>                 /*
->>>                  * Send request to stop notifying. This is best-effort
->>>                  * operation, so simply ignore the return the value.
->>> @@ -1949,12 +2040,27 @@ static uint8_t ccc_write_cb(uint16_t value, voi=
-d *user_data)
->>>                 (value =3D=3D 2 && !(chrc->props & BT_GATT_CHRC_PROP_IN=
-DICATE)))
->>>                 return BT_ERROR_CCC_IMPROPERLY_CONFIGURED;
->>>
->>> +       if (chrc->notify_io) {
->>> +               __sync_fetch_and_add(&chrc->ntfy_cnt, 1);
->>> +               return 0;
->>> +       }
->> What is the purpose to call __sync_fetch_and_add when there is
->> charc->notify_io? What is the scenario here=EF=BC=9F
+>> In contrast, for regular WriteValue, I can see write response  from
+>> peripheral to central.
 >
-> This is using the number of subscribed client as a refcount so when
-> there is no client left we can drop the notify_io as well.
+> Ive sent a fix for this, the responses shall be generated with either
+> WriteValue or fd write, though we the later we assume that if the data
+> could be written to the pipe then it should be okay to reply right
+> there while with WriteValue we actually wait for the reply (adds
+> latency).
 >
->>
->>> +
->>> +       chrc->mtu =3D bt_att_get_mtu(att);
->>> +
->>> +       /* Make use of AcquireNotify if supported */
->>> +       if (g_dbus_proxy_get_property(chrc->proxy, "NotifyAcquired", &i=
-ter)) {
->>> +               if (g_dbus_proxy_method_call(chrc->proxy, "AcquireNotif=
-y",
->>> +                                               acquire_notify_setup,
->>> +                                               acquire_notify_reply,
->>> +                                               chrc, NULL))
->>> +                       return 0;
->>> +       }
->> When ble central subscribe this characteristic,  if NotifyAcquired is
->> set in ble peripheral application, then it return, but how can we
->> subscribe this characteristic? May we call "AcquireNotify" when ble
->> central subscribe this characteristic or enable notification?
->
-> If NotifyAcquired is supported it will call AcquireNotify, or are you
-> saying you tried that? The bluetoothctl has code to utilize this
-> feature, you just have to register a characteristic with notify flag.
->
-In previous email, I have confirmed AcquireWrite is working, now I
-wanna send indication via fd using AcquireNotify in application, I
-have removed "check" for "notify" in
-https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/client/gatt.c#n1387
-Then I try to use  pipe_io_send to send indication in application, but
-it seems data cannot be sent out from peripheral to central, any idea?
-it seems there is no reference code to send data in bluetoothctl.
+Yes, just tried, write is working now with your fix. Please merge it to master.
 
-static int pipe_io_send(struct io *io, const void *data, size_t len)
-{
-struct iovec iov;
+Thank you.
 
-iov.iov_base =3D (void *) data;
-iov.iov_len =3D len;
-
-return io_send(io, &iov, 1);
-}
-
->>> +
->>>         /*
->>>          * Always call StartNotify for an incoming enable and ignore th=
-e return
->>>          * value for now.
->>>          */
->>> -       if (g_dbus_proxy_method_call(chrc->proxy,
->>> -                                               "StartNotify", NULL, NU=
-LL,
->>> +       if (g_dbus_proxy_method_call(chrc->proxy, "StartNotify", NULL, =
-NULL,
->>>                                                 NULL, NULL) =3D=3D FALS=
-E)
->>>                 return BT_ATT_ERROR_UNLIKELY;
->>>
->>> --
->>> 2.13.5
->>>
->>> --
->>> To unsubscribe from this list: send the line "unsubscribe linux-bluetoo=
-th" in
->>> the body of a message to majordomo@vger.kernel.org
->>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
->
->
-> --
-> Luiz Augusto von Dentz
-
-thansk
-best wishes
-yunhan
+>>>> which means the only light change is to add mtu passing over DBUS in 2. Write
+>>>>
+>>>> Finally both solutions can be available to bluez users.
+>>>>
+>>>> Thanks
+>>>> Best wishes
+>>>> Yunhan
