@@ -1,352 +1,110 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: "Hermida, Isaac" <Isaac.Hermida@digi.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: how to advertise a GATT service only for LE or BR/EDR?
+Date: Tue, 3 Oct 2017 06:54:52 +0000
+Message-ID: <59D3343B.6020103@digi.com>
+References: <59CD26BE.8040803@digi.com>
+ <CABBYNZLFyyNQmkAk5JZGWDii_hcx0n68yr-sjeXVUAEHVcOqcw@mail.gmail.com>
+ <59CDEBDF.3090200@digi.com> <59D1E4B0.2000106@digi.com>
+ <CABBYNZKuzJ4ueWufFSEZo7zhVdL5DCF=DuUYQLY-zV0OEuFYRA@mail.gmail.com>
+In-Reply-To: <CABBYNZKuzJ4ueWufFSEZo7zhVdL5DCF=DuUYQLY-zV0OEuFYRA@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <CALvjcs9edmP48TuAmYApWFWh_k_OTGM=Mws5PZs2VMufEwm0zg@mail.gmail.com>
-References: <20170920074417.30435-1-luiz.dentz@gmail.com> <20170920074417.30435-9-luiz.dentz@gmail.com>
- <CALvjcs_cpF3ZAKjLNdGq+U_+2F43rJQNiF2042dbAVawum+nMw@mail.gmail.com>
- <CABBYNZ+40gCRshXM8x1NHc88BJo50JR38g3Qm6Up4DKNdB3ROw@mail.gmail.com> <CALvjcs9edmP48TuAmYApWFWh_k_OTGM=Mws5PZs2VMufEwm0zg@mail.gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 3 Oct 2017 10:36:54 +0300
-Message-ID: <CABBYNZ+kg0ZdUmp-QqZVXGzpgZLxgLA=DBT9utMwyEEn6FE3Kg@mail.gmail.com>
-Subject: Re: [PATCH v2 08/10] gatt: Implement AcquireNotify for server
-To: Yunhan Wang <yunhanw@nestlabs.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Yunhan,
-
-On Tue, Oct 3, 2017 at 9:13 AM, Yunhan Wang <yunhanw@nestlabs.com> wrote:
-> Hi, Luiz
->
-> On Fri, Sep 29, 2017 at 12:03 AM, Luiz Augusto von Dentz
-> <luiz.dentz@gmail.com> wrote:
->> Hi Yunhan,
->>
->> On Fri, Sep 29, 2017 at 7:47 AM, Yunhan Wang <yunhanw@nestlabs.com> wrot=
-e:
->>> Hi, Luiz
->>>
->>> May I have several questions about this feature?
->>>
->>> On Wed, Sep 20, 2017 at 12:44 AM, Luiz Augusto von Dentz
->>> <luiz.dentz@gmail.com> wrote:
->>>> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->>>>
->>>> This enables IO via file descriptors using AcquireWrite if server
->>>> implements it.
->>>> ---
->>>>  src/gatt-database.c | 116 +++++++++++++++++++++++++++++++++++++++++++=
-++++++---
->>>>  1 file changed, 111 insertions(+), 5 deletions(-)
->>>>
->>>> diff --git a/src/gatt-database.c b/src/gatt-database.c
->>>> index 239fe5384..4932568dd 100644
->>>> --- a/src/gatt-database.c
->>>> +++ b/src/gatt-database.c
->>>> @@ -24,6 +24,7 @@
->>>>  #include <stdint.h>
->>>>  #include <stdlib.h>
->>>>  #include <errno.h>
->>>> +#include <unistd.h>
->>>>
->>>>  #include "lib/bluetooth.h"
->>>>  #include "lib/sdp.h"
->>>> @@ -118,7 +119,9 @@ struct external_chrc {
->>>>         uint8_t props;
->>>>         uint8_t ext_props;
->>>>         uint32_t perm;
->>>> +       uint16_t mtu;
->>>>         struct io *write_io;
->>>> +       struct io *notify_io;
->>>>         struct gatt_db_attribute *attrib;
->>>>         struct gatt_db_attribute *ccc;
->>>>         struct queue *pending_reads;
->>>> @@ -152,7 +155,8 @@ struct device_state {
->>>>         struct queue *ccc_states;
->>>>  };
->>>>
->>>> -typedef uint8_t (*btd_gatt_database_ccc_write_t) (uint16_t value,
->>>> +typedef uint8_t (*btd_gatt_database_ccc_write_t) (struct bt_att *att,
->>>> +                                                       uint16_t value=
-,
->>>>                                                         void *user_dat=
-a);
->>>>  typedef void (*btd_gatt_database_destroy_t) (void *data);
->>>>
->>>> @@ -328,6 +332,7 @@ static void chrc_free(void *data)
->>>>         struct external_chrc *chrc =3D data;
->>>>
->>>>         io_destroy(chrc->write_io);
->>>> +       io_destroy(chrc->notify_io);
->>>>
->>>>         queue_destroy(chrc->pending_reads, cancel_pending_read);
->>>>         queue_destroy(chrc->pending_writes, cancel_pending_write);
->>>> @@ -792,7 +797,8 @@ static void gatt_ccc_write_cb(struct gatt_db_attri=
-bute *attrib,
->>>>                 goto done;
->>>>
->>>>         if (ccc_cb->callback)
->>>> -               ecode =3D ccc_cb->callback(get_le16(value), ccc_cb->us=
-er_data);
->>>> +               ecode =3D ccc_cb->callback(att, get_le16(value),
->>>> +                                               ccc_cb->user_data);
->>>>
->>>>         if (!ecode) {
->>>>                 ccc->value[0] =3D value[0];
->>>> @@ -1801,12 +1807,34 @@ static bool pipe_hup(struct io *io, void *user=
-_data)
->>>>
->>>>         if (io =3D=3D chrc->write_io)
->>>>                 chrc->write_io =3D NULL;
->>>> +       else
->>>> +               chrc->notify_io =3D NULL;
->>>>
->>>>         io_destroy(io);
->>>>
->>>>         return false;
->>>>  }
->>>>
->>>> +static bool pipe_io_read(struct io *io, void *user_data)
->>>> +{
->>>> +       struct external_chrc *chrc =3D user_data;
->>>> +       uint8_t buf[512];
->>>> +       int fd =3D io_get_fd(io);
->>>> +       ssize_t bytes_read;
->>>> +
->>>> +       bytes_read =3D read(fd, buf, sizeof(buf));
->>>> +       if (bytes_read < 0)
->>>> +               return false;
->>>> +
->>>> +       send_notification_to_devices(chrc->service->app->database,
->>>> +                               gatt_db_attribute_get_handle(chrc->att=
-rib),
->>>> +                               buf, bytes_read,
->>>> +                               gatt_db_attribute_get_handle(chrc->ccc=
-),
->>>> +                               false, NULL);
->>>> +
->>>> +       return true;
->>>> +}
->>>> +
->>>>  static struct io *pipe_io_new(int fd, void *user_data)
->>>>  {
->>>>         struct io *io;
->>>> @@ -1815,6 +1843,8 @@ static struct io *pipe_io_new(int fd, void *user=
-_data)
->>>>
->>>>         io_set_close_on_destroy(io, true);
->>>>
->>>> +       io_set_read_handler(io, pipe_io_read, user_data, NULL);
->>>> +
->>>>         io_set_disconnect_handler(io, pipe_hup, user_data, NULL);
->>>>
->>>>         return io;
->>>> @@ -1915,9 +1945,64 @@ static struct pending_op *acquire_write(struct =
-external_chrc *chrc,
->>>>         return NULL;
->>>>  }
->>>>
->>>> -static uint8_t ccc_write_cb(uint16_t value, void *user_data)
->>>> +static void acquire_notify_reply(DBusMessage *message, void *user_dat=
-a)
->>>>  {
->>>>         struct external_chrc *chrc =3D user_data;
->>>> +       DBusError err;
->>>> +       int fd;
->>>> +       uint16_t mtu;
->>>> +
->>>> +       dbus_error_init(&err);
->>>> +
->>>> +       if (dbus_set_error_from_message(&err, message) =3D=3D TRUE) {
->>>> +               error("Failed to acquire notify: %s\n", err.name);
->>>> +               dbus_error_free(&err);
->>>> +               goto retry;
->>>> +       }
->>>> +
->>>> +       if ((dbus_message_get_args(message, NULL, DBUS_TYPE_UNIX_FD, &=
-fd,
->>>> +                                       DBUS_TYPE_UINT16, &mtu,
->>>> +                                       DBUS_TYPE_INVALID) =3D=3D fals=
-e)) {
->>>> +               error("Invalid AcquirNotify response\n");
->>>> +               goto retry;
->>>> +       }
->>>> +
->>>> +       DBG("AcquireNotify success: fd %d MTU %u\n", fd, mtu);
->>>> +
->>>> +       chrc->notify_io =3D pipe_io_new(fd, chrc);
->>>
->>> Why do we need to use pipe and notify_io when implementing this
->>> feature? I think fd and mtu has been pass using dbus message. Could
->>> you clarify more details?
->>
->> notify_io is the receiving end of the notification, the application
->> will write its notifications using the fd which is captured by
->> checking if the fd is readable.
->>
->>>
->>>> +
->>>> +       __sync_fetch_and_add(&chrc->ntfy_cnt, 1);
->>>> +
->>>> +       return;
->>>> +
->>>> +retry:
->>>> +       g_dbus_proxy_method_call(chrc->proxy, "StartNotify", NULL, NUL=
-L,
->>>> +                                                       NULL, NULL);
->>>> +
->>>> +       __sync_fetch_and_add(&chrc->ntfy_cnt, 1);
->>>> +}
->>>> +
->>>> +static void acquire_notify_setup(DBusMessageIter *iter, void *user_da=
-ta)
->>>> +{
->>>> +       DBusMessageIter dict;
->>>> +       struct external_chrc *chrc =3D user_data;
->>>> +
->>>> +       dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
->>>> +                                       DBUS_DICT_ENTRY_BEGIN_CHAR_AS_=
-STRING
->>>> +                                       DBUS_TYPE_STRING_AS_STRING
->>>> +                                       DBUS_TYPE_VARIANT_AS_STRING
->>>> +                                       DBUS_DICT_ENTRY_END_CHAR_AS_ST=
-RING,
->>>> +                                       &dict);
->>>> +
->>>> +       dict_append_entry(&dict, "MTU", DBUS_TYPE_UINT16, &chrc->mtu);
->>>> +
->>>> +       dbus_message_iter_close_container(iter, &dict);
->>>> +}
->>>> +
->>>> +static uint8_t ccc_write_cb(struct bt_att *att, uint16_t value, void =
-*user_data)
->>>> +{
->>>> +       struct external_chrc *chrc =3D user_data;
->>>> +       DBusMessageIter iter;
->>>>
->>>>         DBG("External CCC write received with value: 0x%04x", value);
->>>>
->>>> @@ -1929,6 +2014,12 @@ static uint8_t ccc_write_cb(uint16_t value, voi=
-d *user_data)
->>>>                 if (__sync_sub_and_fetch(&chrc->ntfy_cnt, 1))
->>>>                         return 0;
->>>>
->>>> +               if (chrc->notify_io) {
->>>> +                       io_destroy(chrc->notify_io);
->>>> +                       chrc->notify_io =3D NULL;
->>>> +                       return 0;
->>>> +               }
->>>> +
->>>>                 /*
->>>>                  * Send request to stop notifying. This is best-effort
->>>>                  * operation, so simply ignore the return the value.
->>>> @@ -1949,12 +2040,27 @@ static uint8_t ccc_write_cb(uint16_t value, vo=
-id *user_data)
->>>>                 (value =3D=3D 2 && !(chrc->props & BT_GATT_CHRC_PROP_I=
-NDICATE)))
->>>>                 return BT_ERROR_CCC_IMPROPERLY_CONFIGURED;
->>>>
->>>> +       if (chrc->notify_io) {
->>>> +               __sync_fetch_and_add(&chrc->ntfy_cnt, 1);
->>>> +               return 0;
->>>> +       }
->>> What is the purpose to call __sync_fetch_and_add when there is
->>> charc->notify_io? What is the scenario here=EF=BC=9F
->>
->> This is using the number of subscribed client as a refcount so when
->> there is no client left we can drop the notify_io as well.
->>
->>>
->>>> +
->>>> +       chrc->mtu =3D bt_att_get_mtu(att);
->>>> +
->>>> +       /* Make use of AcquireNotify if supported */
->>>> +       if (g_dbus_proxy_get_property(chrc->proxy, "NotifyAcquired", &=
-iter)) {
->>>> +               if (g_dbus_proxy_method_call(chrc->proxy, "AcquireNoti=
-fy",
->>>> +                                               acquire_notify_setup,
->>>> +                                               acquire_notify_reply,
->>>> +                                               chrc, NULL))
->>>> +                       return 0;
->>>> +       }
->>> When ble central subscribe this characteristic,  if NotifyAcquired is
->>> set in ble peripheral application, then it return, but how can we
->>> subscribe this characteristic? May we call "AcquireNotify" when ble
->>> central subscribe this characteristic or enable notification?
->>
->> If NotifyAcquired is supported it will call AcquireNotify, or are you
->> saying you tried that? The bluetoothctl has code to utilize this
->> feature, you just have to register a characteristic with notify flag.
->>
-> In previous email, I have confirmed AcquireWrite is working, now I
-> wanna send indication via fd using AcquireNotify in application, I
-> have removed "check" for "notify" in
-> https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/client/gatt.c#n13=
-87
-
-Does this means you don't have the notify flag at all, or you are
-using indications? I guess we should enable this for indications as
-well, though it won't have any means to confirm.
-
-> Then I try to use  pipe_io_send to send indication in application, but
-> it seems data cannot be sent out from peripheral to central, any idea?
-> it seems there is no reference code to send data in bluetoothctl.
->
-> static int pipe_io_send(struct io *io, const void *data, size_t len)
-> {
-> struct iovec iov;
->
-> iov.iov_base =3D (void *) data;
-> iov.iov_len =3D len;
->
-> return io_send(io, &iov, 1);
-> }
-
-Isn't this because of the following check:
-https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/src/gatt-database.c=
-#n906
-
-Im afraid you have quite a different use case than we were targeting,
-it seems you do you GATT for acking delivery instead of doing it
-directly over the protocol which is what most solutions I know would
-do when emulating serial over GATT.
-
->>>> +
->>>>         /*
->>>>          * Always call StartNotify for an incoming enable and ignore t=
-he return
->>>>          * value for now.
->>>>          */
->>>> -       if (g_dbus_proxy_method_call(chrc->proxy,
->>>> -                                               "StartNotify", NULL, N=
-ULL,
->>>> +       if (g_dbus_proxy_method_call(chrc->proxy, "StartNotify", NULL,=
- NULL,
->>>>                                                 NULL, NULL) =3D=3D FAL=
-SE)
->>>>                 return BT_ATT_ERROR_UNLIKELY;
->>>>
->>>> --
->>>> 2.13.5
->>>>
->>>> --
->>>> To unsubscribe from this list: send the line "unsubscribe linux-blueto=
-oth" in
->>>> the body of a message to majordomo@vger.kernel.org
->>>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->>
->>
->>
->> --
->> Luiz Augusto von Dentz
->
-> thansk
-> best wishes
-> yunhan
-
-
-
---=20
-Luiz Augusto von Dentz
+SGkgTHVpeiwNCg0KT24gMTAvMDIvMjAxNyAwNjowMCBQTSwgTHVpeiBBdWd1c3RvIHZvbiBEZW50
+eiB3cm90ZToNCj4gSGkgSXNhYWMsDQo+DQo+IE9uIE1vbiwgT2N0IDIsIDIwMTcgYXQgMTA6MDMg
+QU0sIEhlcm1pZGEsIElzYWFjIDxJc2FhYy5IZXJtaWRhQGRpZ2kuY29tPiB3cm90ZToNCj4+IEhp
+IEx1aXogZXQgYWxsLA0KPj4NCj4+IE9uIDA5LzI5LzIwMTcgMDg6NDQgQU0sIEhlcm1pZGEsIElz
+YWFjIHdyb3RlOg0KPj4+IEhpIEx1aXosDQo+Pj4NCj4+PiBPbiAwOS8yOC8yMDE3IDA4OjIxIFBN
+LCBMdWl6IEF1Z3VzdG8gdm9uIERlbnR6IHdyb3RlOg0KPj4+PiBIaSBJc2FhYywNCj4+Pj4NCj4+
+Pj4gT24gVGh1LCBTZXAgMjgsIDIwMTcgYXQgNzo0MyBQTSwgSGVybWlkYSwgSXNhYWMgPElzYWFj
+Lkhlcm1pZGFAZGlnaS5jb20+IHdyb3RlOg0KPj4+Pj4gSGkgZ3JvdXAsDQo+Pj4+Pg0KPj4+Pj4g
+QXMgcGFydCBvZiB0aGUgYmx1ZXRvb3RoIFNJRyBjZXJ0aWZpY2F0aW9uIHRoZXJlIGFyZSB0d28g
+dGVzdCBjYXNlcw0KPj4+Pj4gL1RQL0dBUi9DTC9CSS0zNC1DIGFuZCAvVFAvR0FSL0NML0JJLTM1
+LUMgKHlvdSBjYW4gc2VlIHRoZXkgZGVmaW5lZCBpbg0KPj4+Pj4gdW5pdC90ZXN0LWdhdHQuYyku
+DQo+Pj4+PiBDdXJyZW50bHkgSSBhbSBhYmxlIHRvIHJ1biB0aGUgInRlc3QvZXhhbXBsZS1nYXR0
+LXNlcnZlciIgYW5kIHNlZSBteQ0KPj4+Pj4gY3VzdG9tIHNlcnZpY2VzIGFuZCBjaGFyYWN0ZXJp
+c3RpY3MsIGJ1dCBJIG5lZWQgdG8gZGVmaW5lIGFuIHNwZWNpZmljDQo+Pj4+PiBzZXJ2aWNlL2No
+YXJhY3RlcmlzdGljIHRvIGJlIG9ubHkgYWNjZXNzaWJsZSB0cm91Z2ggTEUgb3IgQlIvRURSDQo+
+Pj4+PiB0cmFuc3BvcnQgcGFyYW1ldGVyLiBJIHdhcyBkaWdnaW5nIGludG8gdGhlIGNvZGUgYnV0
+IEkgd2FzIHVuYWJsZSB0bw0KPj4+Pj4gZmluZCBob3cgdG8gc2V0IGl0IGZvciB0aGUgR0FUVCBz
+ZXJ2ZXIuDQo+Pj4+Pg0KPj4+Pj4gSW4gb3RoZXIgd29yZHMsIHdoYXQgSSB3YW50IHRvIGRvIGlz
+IGxhdW5jaCB0aGUgZ2F0dC1zZXJ2ZXIgYW5kIHRoZW4sDQo+Pj4+PiB3aGVuIGluc3BlY3Rpbmcg
+dGhlIHNlcnZpY2VzL2NoYXJhY3RlcmlzdGljIHdpdGggZ2F0dHRvb2wsIHRoZSByZXR1cm5lZA0K
+Pj4+Pj4gbGlzdCBzaG91bGQgYmUgZGlmZmVyZW50IGlmIEkgcnVuIGdhdHR0b29sIHdpdGggIi1w
+IDMxIiBvciBub3QgKG5vdGljZQ0KPj4+Pj4gaG93IHRoZSBnYXR0dG9vbCBwcm9tcHQgaXMgc2V0
+IHRvIExFIG9yIEJSKS4NCj4+Pj4+DQo+Pj4+PiAjIGdhdHR0b29sIC1JIC1iIDAwOjQwOjlEOjk4
+Ojk5OkJEIC1wIDANCj4+Pj4+IFswMDo0MDo5RDo5ODo5OTpCRF1bTEVdPiBjb25uZWN0DQo+Pj4+
+PiBBdHRlbXB0aW5nIHRvIGNvbm5lY3QgdG8gMDA6NDA6OUQ6OTg6OTk6QkQNCj4+Pj4+IENvbm5l
+Y3Rpb24gc3VjY2Vzc2Z1bA0KPj4+Pj4gWzAwOjQwOjlEOjk4Ojk5OkJEXVtMRV0+IHByaW1hcnkN
+Cj4+Pj4+IGF0dHIgaGFuZGxlOiAweDAwMDEsIGVuZCBncnAgaGFuZGxlOiAweDAwMDUgdXVpZDoN
+Cj4+Pj4+IDAwMDAxODAwLTAwMDAtMTAwMC04MDAwLTAwODA1ZjliMzRmYg0KPj4+Pj4gYXR0ciBo
+YW5kbGU6IDB4MDAwNiwgZW5kIGdycCBoYW5kbGU6IDB4MDAwOSB1dWlkOg0KPj4+Pj4gMDAwMDE4
+MDEtMDAwMC0xMDAwLTgwMDAtMDA4MDVmOWIzNGZiDQo+Pj4+PiBhdHRyIGhhbmRsZTogMHgwMDBh
+LCBlbmQgZ3JwIGhhbmRsZTogMHgwMDBkIHV1aWQ6DQo+Pj4+PiAwMDAwMTgwZi0wMDAwLTEwMDAt
+ODAwMC0wMDgwNWY5YjM0ZmINCj4+Pj4+IGF0dHIgaGFuZGxlOiAweDAwMGUsIGVuZCBncnAgaGFu
+ZGxlOiAweDAwMWQgdXVpZDoNCj4+Pj4+IDEyMzQ1Njc4LTEyMzQtNTY3OC0xMjM0LTU2Nzg5YWJj
+ZGVmMA0KPj4+Pj4gYXR0ciBoYW5kbGU6IDB4MDAxZSwgZW5kIGdycCBoYW5kbGU6IDB4MDAyNSB1
+dWlkOg0KPj4+Pj4gMDAwMDE4MGQtMDAwMC0xMDAwLTgwMDAtMDA4MDVmOWIzNGZiDQo+Pj4+Pg0K
+Pj4+Pj4NCj4+Pj4+ICMgL3RtcC9nYXR0dG9vbCAtSSAtYiAwMDo0MDo5RDo5ODo5OTpCRCAtcCAz
+MQ0KPj4+Pj4gWzAwOjQwOjlEOjk4Ojk5OkJEXVtCUl0+IGNvbm5lY3QNCj4+Pj4+IEF0dGVtcHRp
+bmcgdG8gY29ubmVjdCB0byAwMDo0MDo5RDo5ODo5OTpCRA0KPj4+Pj4gQ29ubmVjdGlvbiBzdWNj
+ZXNzZnVsDQo+Pj4+PiBbMDA6NDA6OUQ6OTg6OTk6QkRdW0JSXT4gcHJpbWFyeQ0KPj4+Pj4gYXR0
+ciBoYW5kbGU6IDB4MDAwMSwgZW5kIGdycCBoYW5kbGU6IDB4MDAwNSB1dWlkOg0KPj4+Pj4gMDAw
+MDE4MDAtMDAwMC0xMDAwLTgwMDAtMDA4MDVmOWIzNGZiDQo+Pj4+PiBhdHRyIGhhbmRsZTogMHgw
+MDA2LCBlbmQgZ3JwIGhhbmRsZTogMHgwMDA5IHV1aWQ6DQo+Pj4+PiAwMDAwMTgwMS0wMDAwLTEw
+MDAtODAwMC0wMDgwNWY5YjM0ZmINCj4+Pj4+IGF0dHIgaGFuZGxlOiAweDAwMGEsIGVuZCBncnAg
+aGFuZGxlOiAweDAwMTkgdXVpZDoNCj4+Pj4+IDEyMzQ1Njc4LTEyMzQtNTY3OC0xMjM0LTU2Nzg5
+YWJjZGVmMA0KPj4+Pj4gYXR0ciBoYW5kbGU6IDB4MDAxYSwgZW5kIGdycCBoYW5kbGU6IDB4MDAx
+ZCB1dWlkOg0KPj4+Pj4gMDAwMDE4MGYtMDAwMC0xMDAwLTgwMDAtMDA4MDVmOWIzNGZiDQo+Pj4+
+PiBhdHRyIGhhbmRsZTogMHgwMDFlLCBlbmQgZ3JwIGhhbmRsZTogMHgwMDI1IHV1aWQ6DQo+Pj4+
+PiAwMDAwMTgwZC0wMDAwLTEwMDAtODAwMC0wMDgwNWY5YjM0ZmINCj4+Pj4+DQo+Pj4+Pg0KPj4+
+Pj4NCj4+Pj4+IEkgYW0gdXNpbmcgYmx1ZXogNS40MS4gSXMgcG9zc2libGUgdG8gYWR2ZXJ0aXNl
+IGEgc2VydmljZSBvbmx5IGZvciBMRSBvcg0KPj4+Pj4gQlI/IEkgZ3Vlc3MgaXQgc2hvdWxkIGJl
+Y2F1c2UgaXMgcGFydCBvZiB0aGUgU0lHIGNlcnRpZmljYXRpb24gYW5kIGlzDQo+Pj4+PiBwYXJ0
+IG9mIHRoZSB1bml0L3Rlc3QtZ2F0dC4NCj4+Pj4gVGhpcyBtaWdodCBiZSBiZWNhdXNlIHRoZSBz
+cGVjIHdhcyBubyBjbGVhciBhYm91dCB0aGUgZGF0YWJhc2UgYmVpbmcNCj4+Pj4gYmVhcmVyIHNw
+ZWNpZmljLCB3aGljaCBpbiBteSBvcGluaW9uIHRoaXMgaXMgYSBvdmVyc2lnaHQgc2luY2UgdGhl
+biB3ZQ0KPj4+PiBjYW4ndCByZXByZXNlbnQgYXR0cmlidXRlcyBvZiBkdWFsIG1vZGUgZGV2aWNl
+cyB3aXRoIGEgdW5pZmllZCBvYmplY3QsDQo+Pj4+IGFuZCBJIHJlYWxseSB3b25kZXIgaWYgdGhp
+cyBoYXMgdG8gYmUgZm9yY2VkIHVwIGludG8gdGhlIEFQSSwgaWYgaXQNCj4+Pj4gZG9lcyB0aGVu
+IHdlIHdvdWxkIGhhdmUgdG8gZW5jb2RlIGJlYXJlciBpbmZvcm1hdGlvbiBpbnRvIHRoZSBvYmpl
+Y3QNCj4+Pj4gcGF0aCAoYXJnaCEpIGZvciBjbGllbnQgYW5kIGZvciBzZXJ2ZXIgd291bGQgcHJv
+YmFibHkgbmVlZCBhIHByb3BlcnR5DQo+Pj4+IHRlbGxpbmcgd2hpY2ggYmVhcmVyIHRoaXMgd291
+bGQgYmUgYXZhaWxhYmxlIGFuZCBlbmNvZGUgdGhpcyBpbnRvIHRvDQo+Pj4+IHRoZSBkYXRhYmFz
+ZSB3aGljaCBtYXkgbGVhdmUgZ2FwcyBpbiB0aGUgaGFuZGxlcyBvciBqdXN0IGR1cGxpY2F0ZQ0K
+Pj4+PiBldmVyeXRoaW5nLCBmb3Igc2VydmVyIElkIHByb2JhYmx5IGp1c3QgaGlkZSB0aGUgc2Vy
+dmljZXMgYmFzZWQgb24gdGhlDQo+Pj4+IGJlYXJlciwgYnV0IHdlIHN0aWxsIG5lZWQgdG8gc3Rv
+cmUgdGhlIENDQyBjb25maWd1cmF0aW9uIGluIGEgYmVhcmVyDQo+Pj4+IHNwZWNpZmljIG1hbm5l
+ci4NCj4+Pj4NCj4+Pg0KPj4+IFNvLCB3aGF0IGNhbiBJIGRvIGluIG9yZGVyIHRvIHBhc3MgdGhh
+dCBzcGVjaWZpYyBibHVldG9vdGggU0lHIHRlc3RzPw0KPj4+IFRoYXQgdGVzdCBjYXNlcyBuZWVk
+IHRvIGVuc3VyZSB0aGF0IGFuIHNwZWNpZmljIHNlcnZpY2UvY2hhciBpbiBvbmx5DQo+Pj4gYWNj
+ZXNzaWJsZSBvbiBMRSBvciBCUiwgc28gdGhleSBoYWQgdG8gYmUgZGlmZmVyZW50Lg0KPj4+IERv
+IHlvdSBoYXZlIGFueSBpZGVhIG9yIHN1Z2dlc3Rpb24/IEl0IHdvdWxkIGJlIHJlYWxseSB3ZWxj
+b21lLCBpZiBub3QgSQ0KPj4+IGhhdmUgbm8gaWRlYSBob3cgdG8gcHJvY2VlZCB0byBjb21wbGV0
+ZSB0aGUgU0lHIHZhbGlkYXRpb24gd2l0aCBibHVleiBzdHVmZi4NCj4+PiBJIHdhcyBldmVuIHRy
+eWluZyB0byBtb2RpZnkgc29tZSBmaWxlcyBpbnRvIHRoZSBjb2RlLCBidXQgSSBhbSBub3QNCj4+
+PiBmYW1pbGlhciB3aXRoIHRoYXQgYW5kIGl0IG9idmlvdXNseSBkaWQgbm90IHdvcmsuDQo+Pg0K
+Pj4gSSB1bmRlcnN0YW5kIHRoZSBzaWxlbnQgdG8gdGhpcyBsYXN0IHF1ZXN0aW9uIGFzIGEgbm8u
+IFNvIEkgYXNzdW1lIHRoYXQNCj4+IGFueSB1c2VyIHRyeWluZyB0byBwYXNzIHRoaXMgdGVzdCB3
+aWxsIGZhaWwgKGF0IGxlYXN0IGlmIHVzaW5nIGJsdWV6KS4NCj4+IFNvIHNob3VsZCB0aGUgc3Bl
+Y2lmaWNhdGlvbiBiZSBjaGFuZ2VkPyBTaG91bGQgYmx1ZXogYWRhcHQgdG8gaXQ/IEluIHRoZQ0K
+Pj4gY3VycmVudCBzdGF0ZSB0aGF0IFNJRyBjZXJ0aWZpY2F0aW9uIGNhbiBub3QgYmUgcGFzc2Vk
+Lg0KPg0KPiBUaGF0IGlmIHlvdSB3YW50IHRvIHF1YWxpZnkgd2l0aCBHQVRUIG92ZXIgQlIvRURS
+LCBzb21ldGhpbmcgdGhhdCB3ZQ0KPiBtYXkgYWN0dWFsbHkgaGF2ZSBhbiBvcHRpb24gdG8gZGlz
+YWJsZSBpbiB0aGUgZnV0dXJlLCBvciBwZXJoYXBzIGp1c3QNCj4gcmVtb3ZlIGl0IGVudGlyZWx5
+IGdpdmVuIHRoaXMgdGVzdHMgd291bGQgcG9zc2libGUgYWZmZWN0IHRoYXQgR0FUVA0KPiBkYXRh
+YmFzZSBsYXlvdXQsIGVpdGhlciBieSBjcmVhdGluZyBoYW5kbGUgZ2FwcyBvciBkdXBsaWNhdGlv
+bi4gU28NCj4gcGVyaGFwcyB5b3UgY291bGQgZ2l2ZSBzb21lIGZlZWRiYWNrIGlmIHlvdSBkbyBp
+bnRlbmQgdG8gdXNlIEdBVFQgb3Zlcg0KPiBCUi9FRFIgb3Igbm90PyBJZiBpdCB0dXJuIG91dCBu
+byBvbmUgYmVuZWZpdCBmcm9tIGl0IElkIGp1c3QgcmVtb3ZlDQo+IGl0Lg0KPg0KDQpUaGFua3Mg
+Zm9yIHRoZSBxdWljayByZXBseS4gSSBkbyBub3Qga25vdyBob3cgYW55IG90aGVyIHBlb3BsZSB3
+YXMgYWJsZSANCnRvIHBhc3MgdGhlc2UgU0lHIGxhYiB0ZXN0cyAoQkktMzQtQyBhbmQgQkktMzUt
+QykuDQpJIGRvIG5vdCBwbGFuIHRvIHVzZSBHQVRUIG92ZXIgQlIvRURSLiBGb3IgbWUganVzdCBy
+ZW1vdmluZyBpdCB3b3VsZCBiZSANCmVub3VnaC4gSWYgeW91IGNhbiBwb2ludCBtZSB3aGVyZS9o
+b3cgdG8gZG8gdGhhdCBpdCB3b3VsZCBiZSBncmVhdCBzbyBJIA0KY2FuIGRpZyBpbiB0aGUgY29k
+ZSAoSSBhbSBub3QgZmFtaWxpYXIgd2l0aCB0aGF0IGNvZGUpLg0KDQpUaHgsDQogICAgSXNhYWM=
