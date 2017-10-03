@@ -1,107 +1,376 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: bugzilla-daemon@bugzilla.kernel.org
-To: linux-bluetooth@kernel.org
-Subject: [Bug 197121] New: Bluetooth regression "no bluetooth adapters found"
- Baytrail T100CHI (SDIO) BCM4324B3
-Date: Tue, 03 Oct 2017 19:08:48 +0000
-Message-ID: <bug-197121-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
 MIME-Version: 1.0
+Reply-To: yunhanw@nestlabs.com
+In-Reply-To: <CABBYNZ+kg0ZdUmp-QqZVXGzpgZLxgLA=DBT9utMwyEEn6FE3Kg@mail.gmail.com>
+References: <20170920074417.30435-1-luiz.dentz@gmail.com> <20170920074417.30435-9-luiz.dentz@gmail.com>
+ <CALvjcs_cpF3ZAKjLNdGq+U_+2F43rJQNiF2042dbAVawum+nMw@mail.gmail.com>
+ <CABBYNZ+40gCRshXM8x1NHc88BJo50JR38g3Qm6Up4DKNdB3ROw@mail.gmail.com>
+ <CALvjcs9edmP48TuAmYApWFWh_k_OTGM=Mws5PZs2VMufEwm0zg@mail.gmail.com> <CABBYNZ+kg0ZdUmp-QqZVXGzpgZLxgLA=DBT9utMwyEEn6FE3Kg@mail.gmail.com>
+From: Yunhan Wang <yunhanw@nestlabs.com>
+Date: Tue, 3 Oct 2017 11:48:45 -0700
+Message-ID: <CALvjcs_xuLEAEok0gGy5W3W+aiNUbO2xCZMtvuoHh5_uJSC6mA@mail.gmail.com>
+Subject: Re: [PATCH v2 08/10] gatt: Implement AcquireNotify for server
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-https://bugzilla.kernel.org/show_bug.cgi?id=197121
+Hi, Luiz
 
-            Bug ID: 197121
-           Summary: Bluetooth regression "no bluetooth adapters found"
-                    Baytrail T100CHI (SDIO) BCM4324B3
-           Product: Drivers
-           Version: 2.5
-    Kernel Version: 4.14-{rc1,rc2,rc3}
-          Hardware: x86-64
-                OS: Linux
-              Tree: Mainline
-            Status: NEW
-          Severity: blocking
-          Priority: P1
-         Component: Bluetooth
-          Assignee: linux-bluetooth@vger.kernel.org
-          Reporter: jbmacbrodie@yahoo.com
-        Regression: No
+On Tue, Oct 3, 2017 at 12:36 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi Yunhan,
+>
+> On Tue, Oct 3, 2017 at 9:13 AM, Yunhan Wang <yunhanw@nestlabs.com> wrote:
+>> Hi, Luiz
+>>
+>> On Fri, Sep 29, 2017 at 12:03 AM, Luiz Augusto von Dentz
+>> <luiz.dentz@gmail.com> wrote:
+>>> Hi Yunhan,
+>>>
+>>> On Fri, Sep 29, 2017 at 7:47 AM, Yunhan Wang <yunhanw@nestlabs.com> wro=
+te:
+>>>> Hi, Luiz
+>>>>
+>>>> May I have several questions about this feature?
+>>>>
+>>>> On Wed, Sep 20, 2017 at 12:44 AM, Luiz Augusto von Dentz
+>>>> <luiz.dentz@gmail.com> wrote:
+>>>>> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>>>>>
+>>>>> This enables IO via file descriptors using AcquireWrite if server
+>>>>> implements it.
+>>>>> ---
+>>>>>  src/gatt-database.c | 116 ++++++++++++++++++++++++++++++++++++++++++=
++++++++---
+>>>>>  1 file changed, 111 insertions(+), 5 deletions(-)
+>>>>>
+>>>>> diff --git a/src/gatt-database.c b/src/gatt-database.c
+>>>>> index 239fe5384..4932568dd 100644
+>>>>> --- a/src/gatt-database.c
+>>>>> +++ b/src/gatt-database.c
+>>>>> @@ -24,6 +24,7 @@
+>>>>>  #include <stdint.h>
+>>>>>  #include <stdlib.h>
+>>>>>  #include <errno.h>
+>>>>> +#include <unistd.h>
+>>>>>
+>>>>>  #include "lib/bluetooth.h"
+>>>>>  #include "lib/sdp.h"
+>>>>> @@ -118,7 +119,9 @@ struct external_chrc {
+>>>>>         uint8_t props;
+>>>>>         uint8_t ext_props;
+>>>>>         uint32_t perm;
+>>>>> +       uint16_t mtu;
+>>>>>         struct io *write_io;
+>>>>> +       struct io *notify_io;
+>>>>>         struct gatt_db_attribute *attrib;
+>>>>>         struct gatt_db_attribute *ccc;
+>>>>>         struct queue *pending_reads;
+>>>>> @@ -152,7 +155,8 @@ struct device_state {
+>>>>>         struct queue *ccc_states;
+>>>>>  };
+>>>>>
+>>>>> -typedef uint8_t (*btd_gatt_database_ccc_write_t) (uint16_t value,
+>>>>> +typedef uint8_t (*btd_gatt_database_ccc_write_t) (struct bt_att *att=
+,
+>>>>> +                                                       uint16_t valu=
+e,
+>>>>>                                                         void *user_da=
+ta);
+>>>>>  typedef void (*btd_gatt_database_destroy_t) (void *data);
+>>>>>
+>>>>> @@ -328,6 +332,7 @@ static void chrc_free(void *data)
+>>>>>         struct external_chrc *chrc =3D data;
+>>>>>
+>>>>>         io_destroy(chrc->write_io);
+>>>>> +       io_destroy(chrc->notify_io);
+>>>>>
+>>>>>         queue_destroy(chrc->pending_reads, cancel_pending_read);
+>>>>>         queue_destroy(chrc->pending_writes, cancel_pending_write);
+>>>>> @@ -792,7 +797,8 @@ static void gatt_ccc_write_cb(struct gatt_db_attr=
+ibute *attrib,
+>>>>>                 goto done;
+>>>>>
+>>>>>         if (ccc_cb->callback)
+>>>>> -               ecode =3D ccc_cb->callback(get_le16(value), ccc_cb->u=
+ser_data);
+>>>>> +               ecode =3D ccc_cb->callback(att, get_le16(value),
+>>>>> +                                               ccc_cb->user_data);
+>>>>>
+>>>>>         if (!ecode) {
+>>>>>                 ccc->value[0] =3D value[0];
+>>>>> @@ -1801,12 +1807,34 @@ static bool pipe_hup(struct io *io, void *use=
+r_data)
+>>>>>
+>>>>>         if (io =3D=3D chrc->write_io)
+>>>>>                 chrc->write_io =3D NULL;
+>>>>> +       else
+>>>>> +               chrc->notify_io =3D NULL;
+>>>>>
+>>>>>         io_destroy(io);
+>>>>>
+>>>>>         return false;
+>>>>>  }
+>>>>>
+>>>>> +static bool pipe_io_read(struct io *io, void *user_data)
+>>>>> +{
+>>>>> +       struct external_chrc *chrc =3D user_data;
+>>>>> +       uint8_t buf[512];
+>>>>> +       int fd =3D io_get_fd(io);
+>>>>> +       ssize_t bytes_read;
+>>>>> +
+>>>>> +       bytes_read =3D read(fd, buf, sizeof(buf));
+>>>>> +       if (bytes_read < 0)
+>>>>> +               return false;
+>>>>> +
+>>>>> +       send_notification_to_devices(chrc->service->app->database,
+>>>>> +                               gatt_db_attribute_get_handle(chrc->at=
+trib),
+>>>>> +                               buf, bytes_read,
+>>>>> +                               gatt_db_attribute_get_handle(chrc->cc=
+c),
+>>>>> +                               false, NULL);
+>>>>> +
+>>>>> +       return true;
+>>>>> +}
+>>>>> +
+>>>>>  static struct io *pipe_io_new(int fd, void *user_data)
+>>>>>  {
+>>>>>         struct io *io;
+>>>>> @@ -1815,6 +1843,8 @@ static struct io *pipe_io_new(int fd, void *use=
+r_data)
+>>>>>
+>>>>>         io_set_close_on_destroy(io, true);
+>>>>>
+>>>>> +       io_set_read_handler(io, pipe_io_read, user_data, NULL);
+>>>>> +
+>>>>>         io_set_disconnect_handler(io, pipe_hup, user_data, NULL);
+>>>>>
+>>>>>         return io;
+>>>>> @@ -1915,9 +1945,64 @@ static struct pending_op *acquire_write(struct=
+ external_chrc *chrc,
+>>>>>         return NULL;
+>>>>>  }
+>>>>>
+>>>>> -static uint8_t ccc_write_cb(uint16_t value, void *user_data)
+>>>>> +static void acquire_notify_reply(DBusMessage *message, void *user_da=
+ta)
+>>>>>  {
+>>>>>         struct external_chrc *chrc =3D user_data;
+>>>>> +       DBusError err;
+>>>>> +       int fd;
+>>>>> +       uint16_t mtu;
+>>>>> +
+>>>>> +       dbus_error_init(&err);
+>>>>> +
+>>>>> +       if (dbus_set_error_from_message(&err, message) =3D=3D TRUE) {
+>>>>> +               error("Failed to acquire notify: %s\n", err.name);
+>>>>> +               dbus_error_free(&err);
+>>>>> +               goto retry;
+>>>>> +       }
+>>>>> +
+>>>>> +       if ((dbus_message_get_args(message, NULL, DBUS_TYPE_UNIX_FD, =
+&fd,
+>>>>> +                                       DBUS_TYPE_UINT16, &mtu,
+>>>>> +                                       DBUS_TYPE_INVALID) =3D=3D fal=
+se)) {
+>>>>> +               error("Invalid AcquirNotify response\n");
+>>>>> +               goto retry;
+>>>>> +       }
+>>>>> +
+>>>>> +       DBG("AcquireNotify success: fd %d MTU %u\n", fd, mtu);
+>>>>> +
+>>>>> +       chrc->notify_io =3D pipe_io_new(fd, chrc);
+>>>>
+>>>> Why do we need to use pipe and notify_io when implementing this
+>>>> feature? I think fd and mtu has been pass using dbus message. Could
+>>>> you clarify more details?
+>>>
+>>> notify_io is the receiving end of the notification, the application
+>>> will write its notifications using the fd which is captured by
+>>> checking if the fd is readable.
+>>>
+>>>>
+>>>>> +
+>>>>> +       __sync_fetch_and_add(&chrc->ntfy_cnt, 1);
+>>>>> +
+>>>>> +       return;
+>>>>> +
+>>>>> +retry:
+>>>>> +       g_dbus_proxy_method_call(chrc->proxy, "StartNotify", NULL, NU=
+LL,
+>>>>> +                                                       NULL, NULL);
+>>>>> +
+>>>>> +       __sync_fetch_and_add(&chrc->ntfy_cnt, 1);
+>>>>> +}
+>>>>> +
+>>>>> +static void acquire_notify_setup(DBusMessageIter *iter, void *user_d=
+ata)
+>>>>> +{
+>>>>> +       DBusMessageIter dict;
+>>>>> +       struct external_chrc *chrc =3D user_data;
+>>>>> +
+>>>>> +       dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
+>>>>> +                                       DBUS_DICT_ENTRY_BEGIN_CHAR_AS=
+_STRING
+>>>>> +                                       DBUS_TYPE_STRING_AS_STRING
+>>>>> +                                       DBUS_TYPE_VARIANT_AS_STRING
+>>>>> +                                       DBUS_DICT_ENTRY_END_CHAR_AS_S=
+TRING,
+>>>>> +                                       &dict);
+>>>>> +
+>>>>> +       dict_append_entry(&dict, "MTU", DBUS_TYPE_UINT16, &chrc->mtu)=
+;
+>>>>> +
+>>>>> +       dbus_message_iter_close_container(iter, &dict);
+>>>>> +}
+>>>>> +
+>>>>> +static uint8_t ccc_write_cb(struct bt_att *att, uint16_t value, void=
+ *user_data)
+>>>>> +{
+>>>>> +       struct external_chrc *chrc =3D user_data;
+>>>>> +       DBusMessageIter iter;
+>>>>>
+>>>>>         DBG("External CCC write received with value: 0x%04x", value);
+>>>>>
+>>>>> @@ -1929,6 +2014,12 @@ static uint8_t ccc_write_cb(uint16_t value, vo=
+id *user_data)
+>>>>>                 if (__sync_sub_and_fetch(&chrc->ntfy_cnt, 1))
+>>>>>                         return 0;
+>>>>>
+>>>>> +               if (chrc->notify_io) {
+>>>>> +                       io_destroy(chrc->notify_io);
+>>>>> +                       chrc->notify_io =3D NULL;
+>>>>> +                       return 0;
+>>>>> +               }
+>>>>> +
+>>>>>                 /*
+>>>>>                  * Send request to stop notifying. This is best-effor=
+t
+>>>>>                  * operation, so simply ignore the return the value.
+>>>>> @@ -1949,12 +2040,27 @@ static uint8_t ccc_write_cb(uint16_t value, v=
+oid *user_data)
+>>>>>                 (value =3D=3D 2 && !(chrc->props & BT_GATT_CHRC_PROP_=
+INDICATE)))
+>>>>>                 return BT_ERROR_CCC_IMPROPERLY_CONFIGURED;
+>>>>>
+>>>>> +       if (chrc->notify_io) {
+>>>>> +               __sync_fetch_and_add(&chrc->ntfy_cnt, 1);
+>>>>> +               return 0;
+>>>>> +       }
+>>>> What is the purpose to call __sync_fetch_and_add when there is
+>>>> charc->notify_io? What is the scenario here=EF=BC=9F
+>>>
+>>> This is using the number of subscribed client as a refcount so when
+>>> there is no client left we can drop the notify_io as well.
+>>>
+>>>>
+>>>>> +
+>>>>> +       chrc->mtu =3D bt_att_get_mtu(att);
+>>>>> +
+>>>>> +       /* Make use of AcquireNotify if supported */
+>>>>> +       if (g_dbus_proxy_get_property(chrc->proxy, "NotifyAcquired", =
+&iter)) {
+>>>>> +               if (g_dbus_proxy_method_call(chrc->proxy, "AcquireNot=
+ify",
+>>>>> +                                               acquire_notify_setup,
+>>>>> +                                               acquire_notify_reply,
+>>>>> +                                               chrc, NULL))
+>>>>> +                       return 0;
+>>>>> +       }
+>>>> When ble central subscribe this characteristic,  if NotifyAcquired is
+>>>> set in ble peripheral application, then it return, but how can we
+>>>> subscribe this characteristic? May we call "AcquireNotify" when ble
+>>>> central subscribe this characteristic or enable notification?
+>>>
+>>> If NotifyAcquired is supported it will call AcquireNotify, or are you
+>>> saying you tried that? The bluetoothctl has code to utilize this
+>>> feature, you just have to register a characteristic with notify flag.
+>>>
+>> In previous email, I have confirmed AcquireWrite is working, now I
+>> wanna send indication via fd using AcquireNotify in application, I
+>> have removed "check" for "notify" in
+>> https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/client/gatt.c#n1=
+387
+>
+> Does this means you don't have the notify flag at all, or you are
+> using indications? I guess we should enable this for indications as
+> well, though it won't have any means to confirm.
+>
+I am using indicate flag that expects the confirmation. In regular
+indication operation, the indication confirmation would be received in
+server side per the code,
+https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/src/gatt-database.c=
+#n935.
+I just send a follow-up patch to add proxy in
+send_notification_to_devices call that fix indication confirmation
+using pipe_io_read. It is working now. Thank you
 
-Bluetooth no longer works in 4.14.  Starting Blueman device manager with kernel
-4.14-rc1 produces the error "No bluetooth adapters found".  Bluetooth has been
-working on the T100CHI since 4.3.5 [patched with bt deviceID until 4.7].  The
-CHI uses bluetooth to connect to its keyboard/touchpad.
+>> Then I try to use  pipe_io_send to send indication in application, but
+>> it seems data cannot be sent out from peripheral to central, any idea?
+>> it seems there is no reference code to send data in bluetoothctl.
+>>
+>> static int pipe_io_send(struct io *io, const void *data, size_t len)
+>> {
+>> struct iovec iov;
+>>
+>> iov.iov_base =3D (void *) data;
+>> iov.iov_len =3D len;
+>>
+>> return io_send(io, &iov, 1);
+>> }
+>
+> Isn't this because of the following check:
+> https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/src/gatt-database=
+.c#n906
+>
+> Im afraid you have quite a different use case than we were targeting,
+> it seems you do you GATT for acking delivery instead of doing it
+> directly over the protocol which is what most solutions I know would
+> do when emulating serial over GATT.
+>
 
-Reverting first bad commit 33cd149e767be9afbab9fcd3d5165a2de62313c8 does not
-fix bluetooth.  (See report below)
+>>>>> +
+>>>>>         /*
+>>>>>          * Always call StartNotify for an incoming enable and ignore =
+the return
+>>>>>          * value for now.
+>>>>>          */
+>>>>> -       if (g_dbus_proxy_method_call(chrc->proxy,
+>>>>> -                                               "StartNotify", NULL, =
+NULL,
+>>>>> +       if (g_dbus_proxy_method_call(chrc->proxy, "StartNotify", NULL=
+, NULL,
+>>>>>                                                 NULL, NULL) =3D=3D FA=
+LSE)
+>>>>>                 return BT_ATT_ERROR_UNLIKELY;
+>>>>>
+>>>>> --
+>>>>> 2.13.5
+>>>>>
+>>>>> --
+>>>>> To unsubscribe from this list: send the line "unsubscribe linux-bluet=
+ooth" in
+>>>>> the body of a message to majordomo@vger.kernel.org
+>>>>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>>>
+>>>
+>>>
+>>> --
+>>> Luiz Augusto von Dentz
+>>
+>> thansk
+>> best wishes
+>> yunhan
+>
+>
+>
+> --
+> Luiz Augusto von Dentz
 
-Excerpt from dmesg 4.13 vs. 4.14 shows that the bluetooth binary blob is not
-being loaded in 4.14.  The Asus T100CHI uses the brcmfmac43241b4-sdio chip.
 
-4.13$ dmesg | grep -i blue
-[    6.158598] Bluetooth: Core ver 2.22
-[    6.158639] Bluetooth: HCI device and connection manager initialized
-[    6.158646] Bluetooth: HCI socket layer initialized
-[    6.158650] Bluetooth: L2CAP socket layer initialized
-[    6.158662] Bluetooth: SCO socket layer initialized
-[    6.176397] Bluetooth: HCI UART driver ver 2.3
-[    6.176401] Bluetooth: HCI UART protocol H4 registered
-[    6.176402] Bluetooth: HCI UART protocol BCSP registered
-[    6.176403] Bluetooth: HCI UART protocol ATH3K registered
-[    6.176405] Bluetooth: HCI UART protocol Three-wire (H5) registered
-[    6.176501] Bluetooth: HCI UART protocol Intel registered
-[    6.196331] Bluetooth: BCM2E71:00: Asus T100CHI: Overwriting IRQ polarity to
-active low
-[    6.196415] Bluetooth: HCI UART protocol Broadcom registered
-[    6.196417] Bluetooth: HCI UART protocol QCA registered
-[    7.321304] Bluetooth: hci0: BCM: chip id 84
-[    7.321309] Bluetooth: hci0: BCM4324B3 (002.004.006) build 0000
-[    7.857971] Bluetooth: hci0: BCM (002.004.006) build 0112
-[    7.935107] Bluetooth: BNEP (Ethernet Emulation) ver 1.3
-[    7.935110] Bluetooth: BNEP filters: protocol multicast
-[    7.935119] Bluetooth: BNEP socket layer initialized
-[   10.429274] Bluetooth: RFCOMM TTY layer initialized
-[   10.429285] Bluetooth: RFCOMM socket layer initialized
-[   10.429297] Bluetooth: RFCOMM ver 1.11
-
-4.14
-[    7.135356] Bluetooth: Core ver 2.22
-[    7.135394] Bluetooth: HCI device and connection manager initialized
-[    7.136202] Bluetooth: HCI socket layer initialized
-[    7.136206] Bluetooth: L2CAP socket layer initialized
-[    7.136220] Bluetooth: SCO socket layer initialized
-[    7.197479] Bluetooth: HCI UART driver ver 2.3
-[    7.197483] Bluetooth: HCI UART protocol H4 registered
-[    7.197484] Bluetooth: HCI UART protocol BCSP registered
-[    7.197485] Bluetooth: HCI UART protocol ATH3K registered
-[    7.197486] Bluetooth: HCI UART protocol Three-wire (H5) registered
-[    7.197610] Bluetooth: HCI UART protocol Intel registered
-[    7.197611] Bluetooth: HCI UART protocol QCA registered
-[   10.658881] Bluetooth: BNEP (Ethernet Emulation) ver 1.3
-[   10.658884] Bluetooth: BNEP filters: protocol multicast
-[   10.658891] Bluetooth: BNEP socket layer initialized
-
-33cd149e767be9afbab9fcd3d5165a2de62313c8 is the first bad commit
-commit 33cd149e767be9afbab9fcd3d5165a2de62313c8
-Author: Loic Poulain <loic.poulain@gmail.com>
-Date:   Thu Aug 17 19:59:51 2017 +0200
-
-    Bluetooth: hci_bcm: Add serdev support
-
-    Add basic support for Broadcom serial slave devices.
-    Probe the serial device, retrieve its maximum speed and
-    register a new hci uart device.
-
-    Tested/compatible with bcm43438 (RPi3).
-
-    Signed-off-by: Loic Poulain <loic.poulain@gmail.com>
-    Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-
-:040000 040000 3af031525c70a2aeece054513df42905b5735e38
-355ed6de455f3063c1ce3ad132fd115705f55b08 M      drivers
-
--- 
-You are receiving this mail because:
-You are the assignee for the bug.
+Thanks
+Best wishes
+Yunhan
