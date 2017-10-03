@@ -1,191 +1,352 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Subject: Re: [PATCH BlueZ] monitor: Fix buffer overflow with unix socket
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-References: <509e62cd-ce83-505c-1038-04a625a8f903@jp.fujitsu.com>
- <CABBYNZK2VQ4FGBSOsDqqJs+ZpY77yG3xJaSiX7xsUSunspy6wg@mail.gmail.com>
-From: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
-Message-ID: <b4a8ef50-c03a-2948-f6cd-334941b59fcd@jp.fujitsu.com>
-Date: Tue, 3 Oct 2017 16:51:34 +0900
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZK2VQ4FGBSOsDqqJs+ZpY77yG3xJaSiX7xsUSunspy6wg@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <CALvjcs9edmP48TuAmYApWFWh_k_OTGM=Mws5PZs2VMufEwm0zg@mail.gmail.com>
+References: <20170920074417.30435-1-luiz.dentz@gmail.com> <20170920074417.30435-9-luiz.dentz@gmail.com>
+ <CALvjcs_cpF3ZAKjLNdGq+U_+2F43rJQNiF2042dbAVawum+nMw@mail.gmail.com>
+ <CABBYNZ+40gCRshXM8x1NHc88BJo50JR38g3Qm6Up4DKNdB3ROw@mail.gmail.com> <CALvjcs9edmP48TuAmYApWFWh_k_OTGM=Mws5PZs2VMufEwm0zg@mail.gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Tue, 3 Oct 2017 10:36:54 +0300
+Message-ID: <CABBYNZ+kg0ZdUmp-QqZVXGzpgZLxgLA=DBT9utMwyEEn6FE3Kg@mail.gmail.com>
+Subject: Re: [PATCH v2 08/10] gatt: Implement AcquireNotify for server
+To: Yunhan Wang <yunhanw@nestlabs.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Yunhan,
 
-On 10/02/2017 05:03 PM, Luiz Augusto von Dentz wrote:
-> Hi Eramoto,
-> 
-> On Fri, Sep 29, 2017 at 7:40 AM, ERAMOTO Masaya
-> <eramoto.masaya@jp.fujitsu.com> wrote:
->> If btmon and btproyx use a unix socket, which has a long pathname,
->> then the buffer overflows occur as below:
+On Tue, Oct 3, 2017 at 9:13 AM, Yunhan Wang <yunhanw@nestlabs.com> wrote:
+> Hi, Luiz
+>
+> On Fri, Sep 29, 2017 at 12:03 AM, Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+>> Hi Yunhan,
 >>
->>  *** strcpy_chk: buffer overflow detected ***: program terminated
->>     at 0x4C3085C: ??? (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
->>     by 0x4C34E46: __strcpy_chk (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
->>     by 0x4084FE: strcpy (string3.h:110)
->>     by 0x4084FE: control_server (control.c:1148)
->>     by 0x4029E9: main (main.c:144)
+>> On Fri, Sep 29, 2017 at 7:47 AM, Yunhan Wang <yunhanw@nestlabs.com> wrot=
+e:
+>>> Hi, Luiz
+>>>
+>>> May I have several questions about this feature?
+>>>
+>>> On Wed, Sep 20, 2017 at 12:44 AM, Luiz Augusto von Dentz
+>>> <luiz.dentz@gmail.com> wrote:
+>>>> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>>>>
+>>>> This enables IO via file descriptors using AcquireWrite if server
+>>>> implements it.
+>>>> ---
+>>>>  src/gatt-database.c | 116 +++++++++++++++++++++++++++++++++++++++++++=
+++++++---
+>>>>  1 file changed, 111 insertions(+), 5 deletions(-)
+>>>>
+>>>> diff --git a/src/gatt-database.c b/src/gatt-database.c
+>>>> index 239fe5384..4932568dd 100644
+>>>> --- a/src/gatt-database.c
+>>>> +++ b/src/gatt-database.c
+>>>> @@ -24,6 +24,7 @@
+>>>>  #include <stdint.h>
+>>>>  #include <stdlib.h>
+>>>>  #include <errno.h>
+>>>> +#include <unistd.h>
+>>>>
+>>>>  #include "lib/bluetooth.h"
+>>>>  #include "lib/sdp.h"
+>>>> @@ -118,7 +119,9 @@ struct external_chrc {
+>>>>         uint8_t props;
+>>>>         uint8_t ext_props;
+>>>>         uint32_t perm;
+>>>> +       uint16_t mtu;
+>>>>         struct io *write_io;
+>>>> +       struct io *notify_io;
+>>>>         struct gatt_db_attribute *attrib;
+>>>>         struct gatt_db_attribute *ccc;
+>>>>         struct queue *pending_reads;
+>>>> @@ -152,7 +155,8 @@ struct device_state {
+>>>>         struct queue *ccc_states;
+>>>>  };
+>>>>
+>>>> -typedef uint8_t (*btd_gatt_database_ccc_write_t) (uint16_t value,
+>>>> +typedef uint8_t (*btd_gatt_database_ccc_write_t) (struct bt_att *att,
+>>>> +                                                       uint16_t value=
+,
+>>>>                                                         void *user_dat=
+a);
+>>>>  typedef void (*btd_gatt_database_destroy_t) (void *data);
+>>>>
+>>>> @@ -328,6 +332,7 @@ static void chrc_free(void *data)
+>>>>         struct external_chrc *chrc =3D data;
+>>>>
+>>>>         io_destroy(chrc->write_io);
+>>>> +       io_destroy(chrc->notify_io);
+>>>>
+>>>>         queue_destroy(chrc->pending_reads, cancel_pending_read);
+>>>>         queue_destroy(chrc->pending_writes, cancel_pending_write);
+>>>> @@ -792,7 +797,8 @@ static void gatt_ccc_write_cb(struct gatt_db_attri=
+bute *attrib,
+>>>>                 goto done;
+>>>>
+>>>>         if (ccc_cb->callback)
+>>>> -               ecode =3D ccc_cb->callback(get_le16(value), ccc_cb->us=
+er_data);
+>>>> +               ecode =3D ccc_cb->callback(att, get_le16(value),
+>>>> +                                               ccc_cb->user_data);
+>>>>
+>>>>         if (!ecode) {
+>>>>                 ccc->value[0] =3D value[0];
+>>>> @@ -1801,12 +1807,34 @@ static bool pipe_hup(struct io *io, void *user=
+_data)
+>>>>
+>>>>         if (io =3D=3D chrc->write_io)
+>>>>                 chrc->write_io =3D NULL;
+>>>> +       else
+>>>> +               chrc->notify_io =3D NULL;
+>>>>
+>>>>         io_destroy(io);
+>>>>
+>>>>         return false;
+>>>>  }
+>>>>
+>>>> +static bool pipe_io_read(struct io *io, void *user_data)
+>>>> +{
+>>>> +       struct external_chrc *chrc =3D user_data;
+>>>> +       uint8_t buf[512];
+>>>> +       int fd =3D io_get_fd(io);
+>>>> +       ssize_t bytes_read;
+>>>> +
+>>>> +       bytes_read =3D read(fd, buf, sizeof(buf));
+>>>> +       if (bytes_read < 0)
+>>>> +               return false;
+>>>> +
+>>>> +       send_notification_to_devices(chrc->service->app->database,
+>>>> +                               gatt_db_attribute_get_handle(chrc->att=
+rib),
+>>>> +                               buf, bytes_read,
+>>>> +                               gatt_db_attribute_get_handle(chrc->ccc=
+),
+>>>> +                               false, NULL);
+>>>> +
+>>>> +       return true;
+>>>> +}
+>>>> +
+>>>>  static struct io *pipe_io_new(int fd, void *user_data)
+>>>>  {
+>>>>         struct io *io;
+>>>> @@ -1815,6 +1843,8 @@ static struct io *pipe_io_new(int fd, void *user=
+_data)
+>>>>
+>>>>         io_set_close_on_destroy(io, true);
+>>>>
+>>>> +       io_set_read_handler(io, pipe_io_read, user_data, NULL);
+>>>> +
+>>>>         io_set_disconnect_handler(io, pipe_hup, user_data, NULL);
+>>>>
+>>>>         return io;
+>>>> @@ -1915,9 +1945,64 @@ static struct pending_op *acquire_write(struct =
+external_chrc *chrc,
+>>>>         return NULL;
+>>>>  }
+>>>>
+>>>> -static uint8_t ccc_write_cb(uint16_t value, void *user_data)
+>>>> +static void acquire_notify_reply(DBusMessage *message, void *user_dat=
+a)
+>>>>  {
+>>>>         struct external_chrc *chrc =3D user_data;
+>>>> +       DBusError err;
+>>>> +       int fd;
+>>>> +       uint16_t mtu;
+>>>> +
+>>>> +       dbus_error_init(&err);
+>>>> +
+>>>> +       if (dbus_set_error_from_message(&err, message) =3D=3D TRUE) {
+>>>> +               error("Failed to acquire notify: %s\n", err.name);
+>>>> +               dbus_error_free(&err);
+>>>> +               goto retry;
+>>>> +       }
+>>>> +
+>>>> +       if ((dbus_message_get_args(message, NULL, DBUS_TYPE_UNIX_FD, &=
+fd,
+>>>> +                                       DBUS_TYPE_UINT16, &mtu,
+>>>> +                                       DBUS_TYPE_INVALID) =3D=3D fals=
+e)) {
+>>>> +               error("Invalid AcquirNotify response\n");
+>>>> +               goto retry;
+>>>> +       }
+>>>> +
+>>>> +       DBG("AcquireNotify success: fd %d MTU %u\n", fd, mtu);
+>>>> +
+>>>> +       chrc->notify_io =3D pipe_io_new(fd, chrc);
+>>>
+>>> Why do we need to use pipe and notify_io when implementing this
+>>> feature? I think fd and mtu has been pass using dbus message. Could
+>>> you clarify more details?
 >>
->>  *** strcpy_chk: buffer overflow detected ***: program terminated
->>     at 0x4C3085C: ??? (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
->>     by 0x4C34E46: __strcpy_chk (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
->>     by 0x401B74: strcpy (string3.h:110)
->>     by 0x401B74: open_unix (btproxy.c:625)
->>     by 0x401B74: main (btproxy.c:901)
-> 
-> Lets have the fixes separately, one for btmon and another for btproxy.
-> 
->> This patch also gives an error and stops running when parsing command-line
->> arguments, if the unix socket pathname is too long.
->> ---
->>  monitor/control.c |  7 ++++++-
->>  monitor/main.c    |  7 +++++++
->>  tools/btproxy.c   | 17 ++++++++++++++---
->>  3 files changed, 27 insertions(+), 4 deletions(-)
+>> notify_io is the receiving end of the notification, the application
+>> will write its notifications using the fd which is captured by
+>> checking if the fd is readable.
 >>
->> diff --git a/monitor/control.c b/monitor/control.c
->> index 9bbdc37..5a1b5e2 100644
->> --- a/monitor/control.c
->> +++ b/monitor/control.c
->> @@ -1130,6 +1130,7 @@ static int server_fd = -1;
->>  void control_server(const char *path)
->>  {
->>         struct sockaddr_un addr;
->> +       size_t len;
->>         int fd;
+>>>
+>>>> +
+>>>> +       __sync_fetch_and_add(&chrc->ntfy_cnt, 1);
+>>>> +
+>>>> +       return;
+>>>> +
+>>>> +retry:
+>>>> +       g_dbus_proxy_method_call(chrc->proxy, "StartNotify", NULL, NUL=
+L,
+>>>> +                                                       NULL, NULL);
+>>>> +
+>>>> +       __sync_fetch_and_add(&chrc->ntfy_cnt, 1);
+>>>> +}
+>>>> +
+>>>> +static void acquire_notify_setup(DBusMessageIter *iter, void *user_da=
+ta)
+>>>> +{
+>>>> +       DBusMessageIter dict;
+>>>> +       struct external_chrc *chrc =3D user_data;
+>>>> +
+>>>> +       dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
+>>>> +                                       DBUS_DICT_ENTRY_BEGIN_CHAR_AS_=
+STRING
+>>>> +                                       DBUS_TYPE_STRING_AS_STRING
+>>>> +                                       DBUS_TYPE_VARIANT_AS_STRING
+>>>> +                                       DBUS_DICT_ENTRY_END_CHAR_AS_ST=
+RING,
+>>>> +                                       &dict);
+>>>> +
+>>>> +       dict_append_entry(&dict, "MTU", DBUS_TYPE_UINT16, &chrc->mtu);
+>>>> +
+>>>> +       dbus_message_iter_close_container(iter, &dict);
+>>>> +}
+>>>> +
+>>>> +static uint8_t ccc_write_cb(struct bt_att *att, uint16_t value, void =
+*user_data)
+>>>> +{
+>>>> +       struct external_chrc *chrc =3D user_data;
+>>>> +       DBusMessageIter iter;
+>>>>
+>>>>         DBG("External CCC write received with value: 0x%04x", value);
+>>>>
+>>>> @@ -1929,6 +2014,12 @@ static uint8_t ccc_write_cb(uint16_t value, voi=
+d *user_data)
+>>>>                 if (__sync_sub_and_fetch(&chrc->ntfy_cnt, 1))
+>>>>                         return 0;
+>>>>
+>>>> +               if (chrc->notify_io) {
+>>>> +                       io_destroy(chrc->notify_io);
+>>>> +                       chrc->notify_io =3D NULL;
+>>>> +                       return 0;
+>>>> +               }
+>>>> +
+>>>>                 /*
+>>>>                  * Send request to stop notifying. This is best-effort
+>>>>                  * operation, so simply ignore the return the value.
+>>>> @@ -1949,12 +2040,27 @@ static uint8_t ccc_write_cb(uint16_t value, vo=
+id *user_data)
+>>>>                 (value =3D=3D 2 && !(chrc->props & BT_GATT_CHRC_PROP_I=
+NDICATE)))
+>>>>                 return BT_ERROR_CCC_IMPROPERLY_CONFIGURED;
+>>>>
+>>>> +       if (chrc->notify_io) {
+>>>> +               __sync_fetch_and_add(&chrc->ntfy_cnt, 1);
+>>>> +               return 0;
+>>>> +       }
+>>> What is the purpose to call __sync_fetch_and_add when there is
+>>> charc->notify_io? What is the scenario here=EF=BC=9F
 >>
->>         if (server_fd >= 0)
->> @@ -1143,9 +1144,13 @@ void control_server(const char *path)
->>                 return;
->>         }
+>> This is using the number of subscribed client as a refcount so when
+>> there is no client left we can drop the notify_io as well.
 >>
->> +       len = strlen(path);
->> +       if (len > sizeof(addr.sun_path) - 1)
->> +               len = sizeof(addr.sun_path) - 1;
->> +
-> 
-> Should we actually fail here or you are truncating the path on btproxy?
+>>>
+>>>> +
+>>>> +       chrc->mtu =3D bt_att_get_mtu(att);
+>>>> +
+>>>> +       /* Make use of AcquireNotify if supported */
+>>>> +       if (g_dbus_proxy_get_property(chrc->proxy, "NotifyAcquired", &=
+iter)) {
+>>>> +               if (g_dbus_proxy_method_call(chrc->proxy, "AcquireNoti=
+fy",
+>>>> +                                               acquire_notify_setup,
+>>>> +                                               acquire_notify_reply,
+>>>> +                                               chrc, NULL))
+>>>> +                       return 0;
+>>>> +       }
+>>> When ble central subscribe this characteristic,  if NotifyAcquired is
+>>> set in ble peripheral application, then it return, but how can we
+>>> subscribe this characteristic? May we call "AcquireNotify" when ble
+>>> central subscribe this characteristic or enable notification?
+>>
+>> If NotifyAcquired is supported it will call AcquireNotify, or are you
+>> saying you tried that? The bluetoothctl has code to utilize this
+>> feature, you just have to register a characteristic with notify flag.
+>>
+> In previous email, I have confirmed AcquireWrite is working, now I
+> wanna send indication via fd using AcquireNotify in application, I
+> have removed "check" for "notify" in
+> https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/client/gatt.c#n13=
+87
 
-We should fail in advance of unlink() since above control_server removes the
-user-specified file and creates the truncated file, which is not user-specified,
-thus will confuse users.
+Does this means you don't have the notify flag at all, or you are
+using indications? I guess we should enable this for indications as
+well, though it won't have any means to confirm.
 
-> 
->>         memset(&addr, 0, sizeof(addr));
->>         addr.sun_family = AF_UNIX;
->> -       strcpy(addr.sun_path, path);
->> +       strncpy(addr.sun_path, path, len);
->>
->>         if (bind(fd, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
->>                 perror("Failed to bind server socket");
->> diff --git a/monitor/main.c b/monitor/main.c
->> index b4e9a6a..68ae821 100644
->> --- a/monitor/main.c
->> +++ b/monitor/main.c
->> @@ -31,6 +31,7 @@
->>  #include <stdlib.h>
->>  #include <string.h>
->>  #include <getopt.h>
->> +#include <sys/un.h>
->>
->>  #include "src/shared/mainloop.h"
->>  #include "src/shared/tty.h"
->> @@ -114,6 +115,7 @@ int main(int argc, char *argv[])
->>
->>         for (;;) {
->>                 int opt;
->> +               struct sockaddr_un addr;
->>
->>                 opt = getopt_long(argc, argv, "d:r:w:a:s:p:i:tTSAE:vh",
->>                                                 main_options, NULL);
->> @@ -141,6 +143,11 @@ int main(int argc, char *argv[])
->>                         analyze_path = optarg;
->>                         break;
->>                 case 's':
->> +                       if (strlen(optarg) >
->> +                                       sizeof(addr.sun_path) - 1) {
->> +                               fprintf(stderr, "Socket too long\n");
->> +                               return EXIT_FAILURE;
-> 
-> If this would fail here Im no sure what is the point of the check on
-> control_server? Btw, the message should probably be "Socket name too
-> long".
+> Then I try to use  pipe_io_send to send indication in application, but
+> it seems data cannot be sent out from peripheral to central, any idea?
+> it seems there is no reference code to send data in bluetoothctl.
+>
+> static int pipe_io_send(struct io *io, const void *data, size_t len)
+> {
+> struct iovec iov;
+>
+> iov.iov_base =3D (void *) data;
+> iov.iov_len =3D len;
+>
+> return io_send(io, &iov, 1);
+> }
 
-I want to add these redundant checks
- - to prevent the regression if reusing control_server()/open_unix()
-   in the future
-and
- - to immediately stop running when parsing command-line arguments.
+Isn't this because of the following check:
+https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/src/gatt-database.c=
+#n906
 
-If we should add the check when reusing control_server()/open_unix(),
-I remove it and send patches.
+Im afraid you have quite a different use case than we were targeting,
+it seems you do you GATT for acking delivery instead of doing it
+directly over the protocol which is what most solutions I know would
+do when emulating serial over GATT.
 
-
-Regards,
-Eramoto
-
-> 
->> +                       }
->>                         control_server(optarg);
->>                         break;
->>                 case 'p':
->> diff --git a/tools/btproxy.c b/tools/btproxy.c
->> index f06661d..abe9ef8 100644
->> --- a/tools/btproxy.c
->> +++ b/tools/btproxy.c
->> @@ -610,6 +610,7 @@ static void server_callback(int fd, uint32_t events, void *user_data)
->>  static int open_unix(const char *path)
->>  {
->>         struct sockaddr_un addr;
->> +       size_t len;
->>         int fd;
+>>>> +
+>>>>         /*
+>>>>          * Always call StartNotify for an incoming enable and ignore t=
+he return
+>>>>          * value for now.
+>>>>          */
+>>>> -       if (g_dbus_proxy_method_call(chrc->proxy,
+>>>> -                                               "StartNotify", NULL, N=
+ULL,
+>>>> +       if (g_dbus_proxy_method_call(chrc->proxy, "StartNotify", NULL,=
+ NULL,
+>>>>                                                 NULL, NULL) =3D=3D FAL=
+SE)
+>>>>                 return BT_ATT_ERROR_UNLIKELY;
+>>>>
+>>>> --
+>>>> 2.13.5
+>>>>
+>>>> --
+>>>> To unsubscribe from this list: send the line "unsubscribe linux-blueto=
+oth" in
+>>>> the body of a message to majordomo@vger.kernel.org
+>>>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 >>
->>         unlink(path);
->> @@ -620,9 +621,13 @@ static int open_unix(const char *path)
->>                 return -1;
->>         }
 >>
->> +       len = strlen(path);
->> +       if (len > sizeof(addr.sun_path) - 1)
->> +               len = sizeof(addr.sun_path) - 1;
->> +
->>         memset(&addr, 0, sizeof(addr));
->>         addr.sun_family = AF_UNIX;
->> -       strcpy(addr.sun_path, path);
->> +       strncpy(addr.sun_path, path, len);
 >>
->>         if (bind(fd, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
->>                 perror("Failed to bind Unix server socket");
->> @@ -797,9 +802,15 @@ int main(int argc, char *argv[])
->>                                 server_address = "0.0.0.0";
->>                         break;
->>                 case 'u':
->> -                       if (optarg)
->> +                       if (optarg) {
->> +                               struct sockaddr_un addr;
->>                                 unix_path = optarg;
->> -                       else
->> +                               if (strlen(unix_path) >
->> +                                               sizeof(addr.sun_path) - 1) {
->> +                                       fprintf(stderr, "Path too long\n");
->> +                                       return EXIT_FAILURE;
->> +                               }
->> +                       } else
->>                                 unix_path = "/tmp/bt-server-bredr";
->>                         break;
->>                 case 'p':
 >> --
->> 2.7.4
->>
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->> the body of a message to majordomo@vger.kernel.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> 
-> 
-> 
+>> Luiz Augusto von Dentz
+>
+> thansk
+> best wishes
+> yunhan
 
+
+
+--=20
+Luiz Augusto von Dentz
