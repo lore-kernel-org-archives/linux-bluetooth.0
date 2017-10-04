@@ -1,103 +1,58 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-From: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
-Subject: [PATCH BlueZ v2 1/2] monitor: Fix buffer overflow with unix socket
-Message-ID: <caa787c0-e9f7-a917-fec9-0edb4e8fa1ec@jp.fujitsu.com>
-Date: Wed, 4 Oct 2017 15:23:03 +0900
+Return-Path: <mcgrof@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <20171004002038.GC5659@wotan.suse.de>
+References: <E31F8274-519A-4ED7-90C0-2BB71C9CC3ED@holtmann.org>
+ <20170911134647.GA3980@kroah.com> <20170911171138.GA16216@wotan.suse.de>
+ <20170911192955.GB23729@kroah.com> <20170911200651.GB16216@wotan.suse.de>
+ <09F52990-796D-4F19-957B-EEFCA6ADC160@holtmann.org> <20170912162729.GC16216@wotan.suse.de>
+ <3A938253-4CB7-4D24-82B1-6A2E3B794077@holtmann.org> <20170913173957.GM16216@wotan.suse.de>
+ <CAAd53p4NEL0XvYjPagYuTjHCJyW5jz20cLsf0GU91KvRax17oQ@mail.gmail.com> <20171004002038.GC5659@wotan.suse.de>
+From: "Luis R. Rodriguez" <mcgrof@kernel.org>
+Date: Tue, 3 Oct 2017 18:21:17 -0700
+Message-ID: <CAB=NE6WEg_FFNxpyDYPj4Bc1wmuDxHv+x5vrpZX1R+Bgx5GExA@mail.gmail.com>
+Subject: Re: btusb "firmware request while host is not available" at resume
+To: Kai-Heng Feng <kai.heng.feng@canonical.com>
+Cc: "Luis R. Rodriguez" <mcgrof@kernel.org>, Marcel Holtmann <marcel@holtmann.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Linus Torvalds <torvalds@linux-foundation.org>,
+	Gabriel C <nix.or.die@gmail.com>, Tejun Heo <tj@kernel.org>,
+	"Gustavo F. Padovan" <gustavo@padovan.org>, Sukumar Ghorai <sukumar.ghorai@intel.com>,
+	"Rafael J. Wysocki" <rjw@rjwysocki.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	"bluez mailin list (linux-bluetooth@vger.kernel.org)" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If btmon uses a unix socket, which has a long pathname, then the
-buffer overflow occurs as below:
+On Tue, Oct 3, 2017 at 5:20 PM, Luis R. Rodriguez <mcgrof@kernel.org> wrote:
+> the ordering devised currently there is:
+>
+>   o device driver pm ops called
+>   o notifier for suspend issued - *going to suspend*
+>   o userspace frozen
+>   o filesystem freeze
+>
+> On the way back up this order is inverted:
+>
+>   o filesystem freeze
+>   o userspace frozen
+>   o notifier for suspend issued - *going to suspend*
+>   o device driver pm ops called
 
- *** strcpy_chk: buffer overflow detected ***: program terminated
-    at 0x4C3085C: ??? (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-    by 0x4C34E46: __strcpy_chk (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-    by 0x4084FE: strcpy (string3.h:110)
-    by 0x4084FE: control_server (control.c:1148)
-    by 0x4029E9: main (main.c:144)
+Fortunately I had it a tad bit wrong, but in a good way. Our ordering
+on our way down is:
 
-This patch also gives an error and stops running when parsing command-line
-arguments if the unix socket pathname is too long. And this patch adds the
-redundant check in control_server() to prevent the regression when reusing
-in the future.
----
-Changes in v2:
- - split v1 patch into this patch for btmon and another patch for btproxy.
- - move the check of pathname length before unlink()
- - fail in control_server() if pathname length is too long.
- - fix error message.
+ o notifier for suspend issued - *going to suspend*
+ o userspace frozen
+ o filesystem freeze (new, being proposed)
+ o device driver pm ops called
 
- monitor/control.c | 9 ++++++++-
- monitor/main.c    | 6 ++++++
- 2 files changed, 14 insertions(+), 1 deletion(-)
+Then on our way up:
 
-diff --git a/monitor/control.c b/monitor/control.c
-index 9bbdc37..1cd79ca 100644
---- a/monitor/control.c
-+++ b/monitor/control.c
-@@ -1130,11 +1130,18 @@ static int server_fd = -1;
- void control_server(const char *path)
- {
- 	struct sockaddr_un addr;
-+	size_t len;
- 	int fd;
- 
- 	if (server_fd >= 0)
- 		return;
- 
-+	len = strlen(path);
-+	if (len > sizeof(addr.sun_path) - 1) {
-+		fprintf(stderr, "Socket name too long\n");
-+		return;
-+	}
-+
- 	unlink(path);
- 
- 	fd = socket(PF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0);
-@@ -1145,7 +1152,7 @@ void control_server(const char *path)
- 
- 	memset(&addr, 0, sizeof(addr));
- 	addr.sun_family = AF_UNIX;
--	strcpy(addr.sun_path, path);
-+	strncpy(addr.sun_path, path, len);
- 
- 	if (bind(fd, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
- 		perror("Failed to bind server socket");
-diff --git a/monitor/main.c b/monitor/main.c
-index b4e9a6a..3e61a46 100644
---- a/monitor/main.c
-+++ b/monitor/main.c
-@@ -31,6 +31,7 @@
- #include <stdlib.h>
- #include <string.h>
- #include <getopt.h>
-+#include <sys/un.h>
- 
- #include "src/shared/mainloop.h"
- #include "src/shared/tty.h"
-@@ -114,6 +115,7 @@ int main(int argc, char *argv[])
- 
- 	for (;;) {
- 		int opt;
-+		struct sockaddr_un addr;
- 
- 		opt = getopt_long(argc, argv, "d:r:w:a:s:p:i:tTSAE:vh",
- 						main_options, NULL);
-@@ -141,6 +143,10 @@ int main(int argc, char *argv[])
- 			analyze_path = optarg;
- 			break;
- 		case 's':
-+			if (strlen(optarg) > sizeof(addr.sun_path) - 1) {
-+				fprintf(stderr, "Socket name too long\n");
-+				return EXIT_FAILURE;
-+			}
- 			control_server(optarg);
- 			break;
- 		case 'p':
--- 
-2.7.4
+  o device driver pm ops called
+  o filesystem thaw
+  o userspace thaw
+  o notifier for resume issued - *thawing*
 
+So the driver callbacks get called *later*, so anything called in
+notifiers do get a chance to quiesce things properly.
+
+  Luis
