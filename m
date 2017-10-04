@@ -1,53 +1,85 @@
-Return-Path: <frederic.danis.oss@gmail.com>
-From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis.oss@gmail.com>
-To: robh@kernel.org,
-	marcel@holtmann.org,
-	sre@kernel.org,
-	loic.poulain@gmail.com,
-	johan@kernel.org,
-	lukas@wunner.de,
-	hdegoede@redhat.com
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-serial@vger.kernel.org,
-	linux-acpi@vger.kernel.org,
-	frederic.danis.oss@gmail.com
-Subject: [PATCH 0/2] ACPI serdev support
-Date: Wed,  4 Oct 2017 10:51:28 +0200
-Message-Id: <1507107090-15992-1-git-send-email-frederic.danis.oss@gmail.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Subject: [PATCH BlueZ v2 2/2] tools/btproxy: Fix buffer overflow with unix
+ socket
+From: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+References: <caa787c0-e9f7-a917-fec9-0edb4e8fa1ec@jp.fujitsu.com>
+Message-ID: <39747053-107c-6fa1-f791-5c8609fe533e@jp.fujitsu.com>
+Date: Wed, 4 Oct 2017 15:25:34 +0900
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <caa787c0-e9f7-a917-fec9-0edb4e8fa1ec@jp.fujitsu.com>
 Content-Type: text/plain; charset="utf-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add ACPI support for serial attached devices.
+btproyx with a unix socket has the similar problem as btmon as below.
+So this patch fixes btproxy by the similar way as btmon.
 
-Currently, serial devices are not set as enumerated during ACPI scan for SPI
-or i2c buses (but not for UART). This should also be done for UART serial
-devices.
-I renamed *spi_i2c_slave* to *serial_bus_slave* to reflect this.
+ *** strcpy_chk: buffer overflow detected ***: program terminated
+    at 0x4C3085C: ??? (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+    by 0x4C34E46: __strcpy_chk (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+    by 0x401B74: strcpy (string3.h:110)
+    by 0x401B74: open_unix (btproxy.c:625)
+    by 0x401B74: main (btproxy.c:901)
+---
+Changes in v2:
+ - split v1 patch into this patch for btproxy and another patch for btmon.
+ - move the check of pathname length before unlink()
+ - fail in open_unix() if pathname length is too long.
 
-For hci_bcm, this needs Hans de Goede's "Bluetooth: hci_bcm: Add (runtime)pm
-support to the serdev drv" patches to work.
+ tools/btproxy.c | 20 +++++++++++++++++---
+ 1 file changed, 17 insertions(+), 3 deletions(-)
 
-Tested on T100TA with Broadcom BCM2E39.
-
-Since RFC:
-  - Add or reword commit messages
-  - Rename *serial_slave* to *serial_bus_slave*
-  - Add specific check for Apple in acpi_is_serial_bus_slave(), thanks to
-    Lukas Wunner
-  - Update comment in acpi_default_enumeration()
-  - Remove patch 3 "Bluetooth: hci_bcm: Add ACPI serdev support for BCM2E39"
-    in favor of patches from Hans de Goede
-
-Frédéric Danis (2):
-  serdev: Add ACPI support
-  ACPI / scan: Fix enumeration for special UART devices
-
- drivers/acpi/scan.c       | 37 ++++++++----------
- drivers/tty/serdev/core.c | 99 ++++++++++++++++++++++++++++++++++++++++++++---
- include/acpi/acpi_bus.h   |  2 +-
- 3 files changed, 112 insertions(+), 26 deletions(-)
-
+diff --git a/tools/btproxy.c b/tools/btproxy.c
+index f06661d..ae0ff74 100644
+--- a/tools/btproxy.c
++++ b/tools/btproxy.c
+@@ -610,8 +610,15 @@ static void server_callback(int fd, uint32_t events, void *user_data)
+ static int open_unix(const char *path)
+ {
+ 	struct sockaddr_un addr;
++	size_t len;
+ 	int fd;
+ 
++	len = strlen(path);
++	if (len > sizeof(addr.sun_path) - 1) {
++		fprintf(stderr, "Path too long\n");
++		return -1;
++	}
++
+ 	unlink(path);
+ 
+ 	fd = socket(PF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0);
+@@ -622,7 +629,7 @@ static int open_unix(const char *path)
+ 
+ 	memset(&addr, 0, sizeof(addr));
+ 	addr.sun_family = AF_UNIX;
+-	strcpy(addr.sun_path, path);
++	strncpy(addr.sun_path, path, len);
+ 
+ 	if (bind(fd, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
+ 		perror("Failed to bind Unix server socket");
+@@ -797,9 +804,16 @@ int main(int argc, char *argv[])
+ 				server_address = "0.0.0.0";
+ 			break;
+ 		case 'u':
+-			if (optarg)
++			if (optarg) {
++				struct sockaddr_un addr;
++
+ 				unix_path = optarg;
+-			else
++				if (strlen(unix_path) >
++						sizeof(addr.sun_path) - 1) {
++					fprintf(stderr, "Path too long\n");
++					return EXIT_FAILURE;
++				}
++			} else
+ 				unix_path = "/tmp/bt-server-bredr";
+ 			break;
+ 		case 'p':
 -- 
 2.7.4
+
+
