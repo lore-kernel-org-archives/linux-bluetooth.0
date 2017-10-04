@@ -1,57 +1,64 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Subject: [PATCH BlueZ v2 2/2] tools/btproxy: Fix buffer overflow with unix
- socket
-From: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
 To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
         "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-References: <caa787c0-e9f7-a917-fec9-0edb4e8fa1ec@jp.fujitsu.com>
-Message-ID: <39747053-107c-6fa1-f791-5c8609fe533e@jp.fujitsu.com>
-Date: Wed, 4 Oct 2017 15:25:34 +0900
+From: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
+Subject: [PATCH BlueZ v2 1/2] monitor: Fix buffer overflow with unix socket
+Message-ID: <caa787c0-e9f7-a917-fec9-0edb4e8fa1ec@jp.fujitsu.com>
+Date: Wed, 4 Oct 2017 15:23:03 +0900
 MIME-Version: 1.0
-In-Reply-To: <caa787c0-e9f7-a917-fec9-0edb4e8fa1ec@jp.fujitsu.com>
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-btproyx with a unix socket has the similar problem as btmon as below.
-So this patch fixes btproxy by the similar way as btmon.
+If btmon uses a unix socket, which has a long pathname, then the
+buffer overflow occurs as below:
 
  *** strcpy_chk: buffer overflow detected ***: program terminated
     at 0x4C3085C: ??? (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
     by 0x4C34E46: __strcpy_chk (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-    by 0x401B74: strcpy (string3.h:110)
-    by 0x401B74: open_unix (btproxy.c:625)
-    by 0x401B74: main (btproxy.c:901)
+    by 0x4084FE: strcpy (string3.h:110)
+    by 0x4084FE: control_server (control.c:1148)
+    by 0x4029E9: main (main.c:144)
+
+This patch also gives an error and stops running when parsing command-line
+arguments if the unix socket pathname is too long. And this patch adds the
+redundant check in control_server() to prevent the regression when reusing
+in the future.
 ---
 Changes in v2:
- - split v1 patch into this patch for btproxy and another patch for btmon.
+ - split v1 patch into this patch for btmon and another patch for btproxy.
  - move the check of pathname length before unlink()
- - fail in open_unix() if pathname length is too long.
+ - fail in control_server() if pathname length is too long.
+ - fix error message.
 
- tools/btproxy.c | 20 +++++++++++++++++---
- 1 file changed, 17 insertions(+), 3 deletions(-)
+ monitor/control.c | 9 ++++++++-
+ monitor/main.c    | 6 ++++++
+ 2 files changed, 14 insertions(+), 1 deletion(-)
 
-diff --git a/tools/btproxy.c b/tools/btproxy.c
-index f06661d..ae0ff74 100644
---- a/tools/btproxy.c
-+++ b/tools/btproxy.c
-@@ -610,8 +610,15 @@ static void server_callback(int fd, uint32_t events, void *user_data)
- static int open_unix(const char *path)
+diff --git a/monitor/control.c b/monitor/control.c
+index 9bbdc37..1cd79ca 100644
+--- a/monitor/control.c
++++ b/monitor/control.c
+@@ -1130,11 +1130,18 @@ static int server_fd = -1;
+ void control_server(const char *path)
  {
  	struct sockaddr_un addr;
 +	size_t len;
  	int fd;
  
+ 	if (server_fd >= 0)
+ 		return;
+ 
 +	len = strlen(path);
 +	if (len > sizeof(addr.sun_path) - 1) {
-+		fprintf(stderr, "Path too long\n");
-+		return -1;
++		fprintf(stderr, "Socket name too long\n");
++		return;
 +	}
 +
  	unlink(path);
  
  	fd = socket(PF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0);
-@@ -622,7 +629,7 @@ static int open_unix(const char *path)
+@@ -1145,7 +1152,7 @@ void control_server(const char *path)
  
  	memset(&addr, 0, sizeof(addr));
  	addr.sun_family = AF_UNIX;
@@ -59,27 +66,38 @@ index f06661d..ae0ff74 100644
 +	strncpy(addr.sun_path, path, len);
  
  	if (bind(fd, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
- 		perror("Failed to bind Unix server socket");
-@@ -797,9 +804,16 @@ int main(int argc, char *argv[])
- 				server_address = "0.0.0.0";
+ 		perror("Failed to bind server socket");
+diff --git a/monitor/main.c b/monitor/main.c
+index b4e9a6a..3e61a46 100644
+--- a/monitor/main.c
++++ b/monitor/main.c
+@@ -31,6 +31,7 @@
+ #include <stdlib.h>
+ #include <string.h>
+ #include <getopt.h>
++#include <sys/un.h>
+ 
+ #include "src/shared/mainloop.h"
+ #include "src/shared/tty.h"
+@@ -114,6 +115,7 @@ int main(int argc, char *argv[])
+ 
+ 	for (;;) {
+ 		int opt;
++		struct sockaddr_un addr;
+ 
+ 		opt = getopt_long(argc, argv, "d:r:w:a:s:p:i:tTSAE:vh",
+ 						main_options, NULL);
+@@ -141,6 +143,10 @@ int main(int argc, char *argv[])
+ 			analyze_path = optarg;
  			break;
- 		case 'u':
--			if (optarg)
-+			if (optarg) {
-+				struct sockaddr_un addr;
-+
- 				unix_path = optarg;
--			else
-+				if (strlen(unix_path) >
-+						sizeof(addr.sun_path) - 1) {
-+					fprintf(stderr, "Path too long\n");
-+					return EXIT_FAILURE;
-+				}
-+			} else
- 				unix_path = "/tmp/bt-server-bredr";
+ 		case 's':
++			if (strlen(optarg) > sizeof(addr.sun_path) - 1) {
++				fprintf(stderr, "Socket name too long\n");
++				return EXIT_FAILURE;
++			}
+ 			control_server(optarg);
  			break;
  		case 'p':
 -- 
 2.7.4
-
 
