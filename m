@@ -1,83 +1,70 @@
-Return-Path: <hdegoede@redhat.com>
-Subject: Re: [PATCH 7/9] Bluetooth: hci_bcm: Make acpi_probe get irq from ACPI
- resources
-To: =?UTF-8?Q?Fr=c3=a9d=c3=a9ric_Danis?= <frederic.danis.oss@gmail.com>,
- Marcel Holtmann <marcel@holtmann.org>, Gustavo Padovan
- <gustavo@padovan.org>, Johan Hedberg <johan.hedberg@gmail.com>
-Cc: Sebastian Reichel <sre@kernel.org>, robh@kernel.org,
- linux-bluetooth@vger.kernel.org, linux-serial@vger.kernel.org,
- linux-acpi@vger.kernel.org
-References: <20171002152356.4714-1-hdegoede@redhat.com>
- <20171002152356.4714-8-hdegoede@redhat.com>
- <c06ae2d7-9628-ad70-2509-eca18ba16f0a@gmail.com>
-From: Hans de Goede <hdegoede@redhat.com>
-Message-ID: <e648b8ea-923a-6053-e43b-3f48e36d1eb9@redhat.com>
-Date: Wed, 4 Oct 2017 15:26:57 +0200
-MIME-Version: 1.0
-In-Reply-To: <c06ae2d7-9628-ad70-2509-eca18ba16f0a@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Message-ID: <1507120856.23708.18.camel@hadess.net>
+Subject: Re: [PATCH 8/9] plugins/sixaxis: Add support for DualShock 4/PS4
+ cable pairing
+From: Bastien Nocera <hadess@hadess.net>
+To: Szymon Janc <szymon.janc@codecoup.pl>
+Cc: linux-bluetooth@vger.kernel.org,
+        Juha Kuikka <juha.kuikka@gmail.com>
+Date: Wed, 04 Oct 2017 14:40:56 +0200
+In-Reply-To: <8659915.mKjsMy947m@ix>
+References: <20170904181212.5639-1-hadess@hadess.net>
+         <20170904181212.5639-8-hadess@hadess.net> <8659915.mKjsMy947m@ix>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
-
-On 03-10-17 19:21, Frédéric Danis wrote:
-> Hi Hans,
+On Wed, 2017-09-27 at 11:12 +0200, Szymon Janc wrote:
+> Hi Bastien,
 > 
-> First of all, many thanks for your work on this, it helped me a lot to get full Bluetooth on my Asus T100.
-
-You're welcome thank you for your patches tying everything
-together, it will be good to have this all finally working
-OOTB.
-
-> Le 02/10/2017 à 17:23, Hans de Goede a écrit :
->> The ACPI subsys is going to move over to instantiating ACPI enumerated
->> HCIs as serdevs, rather then as platform devices.
->>
->> So we need to make bcm_acpi_probe() suitable for use on non platform-
->> devices too, which means that we cannot rely on platform_get_irq()
->> getting called.
->>
->> This commit modifies bcm_acpi_probe() to directly get the irq from
->> the ACPI resources, this is a preparation patch for adding (runtime)pm
->> support to the serdev path.
->>
->> Signed-off-by: Hans de Goede <hdegoede@redhat.com>
->> ---
->>   drivers/bluetooth/hci_bcm.c | 8 ++++++++
->>   1 file changed, 8 insertions(+)
->>
->> diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
->> index 5c8371d8aace..48a428909958 100644
->> --- a/drivers/bluetooth/hci_bcm.c
->> +++ b/drivers/bluetooth/hci_bcm.c
->> @@ -805,6 +805,7 @@ static int bcm_acpi_probe(struct bcm_device *dev)
->>       const struct dmi_system_id *dmi_id;
->>       const struct acpi_gpio_mapping *gpio_mapping = acpi_bcm_int_last_gpios;
->>       const struct acpi_device_id *id;
->> +    struct resource_entry *entry;
->>       int ret;
->>       /* Retrieve GPIO data */
->> @@ -821,6 +822,13 @@ static int bcm_acpi_probe(struct bcm_device *dev)
->>                        &resources, bcm_resource, dev);
->>       if (ret < 0)
->>           return ret;
->> +
->> +    resource_list_for_each_entry(entry, &resources) {
->> +        if (resource_type(entry->res) == IORESOURCE_IRQ) {
->> +            dev->irq = entry->res->start;
->> +            break;
->> +        }
->> +    }
->>       acpi_dev_free_resource_list(&resources);
->>       dmi_id = dmi_first_match(bcm_active_low_irq_dmi_table);
+> On Monday, 4 September 2017 20:12:11 CEST Bastien Nocera wrote:
+> > From: Juha Kuikka <juha.kuikka@gmail.com>
+> > 
+> > This patch adds support for "pairing" a Dualshock4 controller over
+> > USB
+> > into the sixaxis plugin, similarly to what the Sixaxis/PS3
+> > controller
+> > supported.
+> > 
+> > Actual bonding happens on first connection, but the device will be
+> > marked as trusted when the agent replies.
+> > 
+> > This patch is based on DS4 supprt for sixpair tool by t0xicCode:
+> > https://github.com/t0xicCode/sixpair/commit/975c38cb6cd61a2f0be3507
+> > 14f0f64ce
+> > f5f0432c ---
+> >  plugins/sixaxis.c | 73
+> > ++++++++++++++++++++++++++++++++++++++++++++++++++++++- 1 file
+> > changed, 72
+> > insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/plugins/sixaxis.c b/plugins/sixaxis.c
+> > index b62834d72..eb15acb92 100644
+> > --- a/plugins/sixaxis.c
+> > +++ b/plugins/sixaxis.c
+> > @@ -83,10 +83,34 @@ static int sixaxis_get_device_bdaddr(int fd,
+> > bdaddr_t
+> > *bdaddr) return 0;
+> >  }
+> > 
+> > +static int ds4_get_device_bdaddr(int fd, bdaddr_t *bdaddr)
+> > +{
+> > +	uint8_t buf[7];
+> > +	int ret;
+> > +
+> > +	memset(buf, 0, sizeof(buf));
+> > +
+> > +	buf[0] = 0x81;
+> > +
+> > +	ret = ioctl(fd, HIDIOCGFEATURE(sizeof(buf)), buf);
+> > +	if (ret < 0) {
+> > +		error("ds4: failed to read device address (%s)",
+> > +		      strerror(errno));
 > 
-> You should also return 0 in bcm_resource(), otherwise the resources list is empty, ending up with "BCM irq: -22" trace in dmesg.
+> Lets prefix all sixaxis error/info logs with "sixaxis:"
 
-Right, good one. I did not notice that as on the device I was testing with
-the IRQ is specified in the DSDT as a GpioInt rather as an Interrupt.
+Sure, I'll make some changes to mention whether the sixaxis or DS4
+variant of the call was made.
 
-Fixed for v2 of this series.
-
-Regards,
-
-Hans
+Nothing else?
