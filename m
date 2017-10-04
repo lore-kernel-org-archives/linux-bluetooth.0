@@ -1,70 +1,230 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Message-ID: <1507120856.23708.18.camel@hadess.net>
-Subject: Re: [PATCH 8/9] plugins/sixaxis: Add support for DualShock 4/PS4
- cable pairing
+Message-ID: <1507120688.23708.16.camel@hadess.net>
+Subject: Re: [PATCH 3/9] sixaxis: Ask user whether cable configuration
+ should be allowed
 From: Bastien Nocera <hadess@hadess.net>
 To: Szymon Janc <szymon.janc@codecoup.pl>
-Cc: linux-bluetooth@vger.kernel.org,
-        Juha Kuikka <juha.kuikka@gmail.com>
-Date: Wed, 04 Oct 2017 14:40:56 +0200
-In-Reply-To: <8659915.mKjsMy947m@ix>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Wed, 04 Oct 2017 14:38:08 +0200
+In-Reply-To: <5909706.3V1B56IrXH@ix>
 References: <20170904181212.5639-1-hadess@hadess.net>
-         <20170904181212.5639-8-hadess@hadess.net> <8659915.mKjsMy947m@ix>
+         <20170904181212.5639-3-hadess@hadess.net> <5909706.3V1B56IrXH@ix>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, 2017-09-27 at 11:12 +0200, Szymon Janc wrote:
+On Wed, 2017-09-27 at 11:14 +0200, Szymon Janc wrote:
 > Hi Bastien,
 > 
-> On Monday, 4 September 2017 20:12:11 CEST Bastien Nocera wrote:
-> > From: Juha Kuikka <juha.kuikka@gmail.com>
+> On Monday, 4 September 2017 20:12:06 CEST Bastien Nocera wrote:
+> > Previously, users doing cable configuration of Sixaxis PS3
+> > controllers
+> > would only get asked whether a device was allowed to connect to the
+> > computer when switching it to Bluetooth mode: unplugging it, and
+> > pressing the PS button.
 > > 
-> > This patch adds support for "pairing" a Dualshock4 controller over
-> > USB
-> > into the sixaxis plugin, similarly to what the Sixaxis/PS3
-> > controller
-> > supported.
+> > Instead, we should ask the user straight away, through the agent,
+> > whether the pad should be allowed to connect.
 > > 
-> > Actual bonding happens on first connection, but the device will be
-> > marked as trusted when the agent replies.
-> > 
-> > This patch is based on DS4 supprt for sixpair tool by t0xicCode:
-> > https://github.com/t0xicCode/sixpair/commit/975c38cb6cd61a2f0be3507
-> > 14f0f64ce
-> > f5f0432c ---
-> >  plugins/sixaxis.c | 73
-> > ++++++++++++++++++++++++++++++++++++++++++++++++++++++- 1 file
-> > changed, 72
-> > insertions(+), 1 deletion(-)
+> > This makes it easier to setup those devices, while keeping
+> > security.
+> > ---
+> >  plugins/sixaxis.c | 83
+> > +++++++++++++++++++++++++++++++++++++++++-------------- 1 file
+> > changed, 63
+> > insertions(+), 20 deletions(-)
 > > 
 > > diff --git a/plugins/sixaxis.c b/plugins/sixaxis.c
-> > index b62834d72..eb15acb92 100644
+> > index 7d3a8f3ac..c8305d52f 100644
 > > --- a/plugins/sixaxis.c
 > > +++ b/plugins/sixaxis.c
-> > @@ -83,10 +83,34 @@ static int sixaxis_get_device_bdaddr(int fd,
+> > @@ -44,6 +44,7 @@
+> > 
+> >  #include "src/adapter.h"
+> >  #include "src/device.h"
+> > +#include "src/agent.h"
+> >  #include "src/plugin.h"
+> >  #include "src/log.h"
+> >  #include "src/shared/util.h"
+> > @@ -71,6 +72,13 @@ static const struct {
+> >  	},
+> >  };
+> > 
+> > +struct authentication_closure {
+> > +	struct btd_adapter *adapter;
+> > +	struct btd_device *device;
+> > +	int fd;
+> > +	char device_addr[18];
+> > +};
+> > +
+> >  static struct udev *ctx = NULL;
+> >  static struct udev_monitor *monitor = NULL;
+> >  static guint watch_id = 0;
+> > @@ -135,19 +143,51 @@ static int set_master_bdaddr(int fd, const
 > > bdaddr_t
-> > *bdaddr) return 0;
+> > *bdaddr) return ret;
 > >  }
 > > 
-> > +static int ds4_get_device_bdaddr(int fd, bdaddr_t *bdaddr)
+> > +static void agent_auth_cb(DBusError *derr,
+> > +				void *user_data)
 > > +{
-> > +	uint8_t buf[7];
-> > +	int ret;
+> > +	struct authentication_closure *closure = user_data;
+> > +	char master_addr[18], adapter_addr[18];
+> > +	bdaddr_t master_bdaddr;
+> > +	const bdaddr_t *adapter_bdaddr;
 > > +
-> > +	memset(buf, 0, sizeof(buf));
+> > +	if (derr != NULL) {
+> > +		DBG("Agent replied negatively, removing temporary
+> > device");
+> > +		goto error;
+> > +	}
 > > +
-> > +	buf[0] = 0x81;
+> > +	btd_device_set_temporary(closure->device, false);
 > > +
-> > +	ret = ioctl(fd, HIDIOCGFEATURE(sizeof(buf)), buf);
-> > +	if (ret < 0) {
-> > +		error("ds4: failed to read device address (%s)",
-> > +		      strerror(errno));
+> > +	if (get_master_bdaddr(closure->fd, &master_bdaddr) < 0)
+> > +		goto error;
+> > +
+> > +	adapter_bdaddr = btd_adapter_get_address(closure-
+> > >adapter);
+> > +	if (bacmp(adapter_bdaddr, &master_bdaddr)) {
+> > +		if (set_master_bdaddr(closure->fd, adapter_bdaddr)
+> > < 0)
+> > +			goto error;
+> > +	}
+> > +
+> > +	ba2str(&master_bdaddr, master_addr);
+> > +	ba2str(adapter_bdaddr, adapter_addr);
+> > +	DBG("remote %s old_master %s new_master %s",
+> > +				closure->device_addr, master_addr,
+> > adapter_addr);
+> > +
+> > +error:
+> > +	close(closure->fd);
+> > +	g_free(closure);
+> > +}
+> > +
+> >  static bool setup_device(int fd, int index, struct btd_adapter
+> > *adapter)
+> >  {
+> > -	char device_addr[18], master_addr[18], adapter_addr[18];
+> > -	bdaddr_t device_bdaddr, master_bdaddr;
+> > +	char device_addr[18];
+> > +	bdaddr_t device_bdaddr;
+> >  	const bdaddr_t *adapter_bdaddr;
+> >  	struct btd_device *device;
+> > +	struct authentication_closure *closure;
+> > 
+> >  	if (get_device_bdaddr(fd, &device_bdaddr) < 0)
+> >  		return false;
+> > 
+> > -	if (get_master_bdaddr(fd, &master_bdaddr) < 0)
+> > -		return false;
+> > -
+> >  	/* This can happen if controller was plugged while already
+> > connected
+> >  	 * eg. to charge up battery. */
+> >  	device = btd_adapter_find_device(adapter, &device_bdaddr,
+> > @@ -155,25 +195,14 @@ static bool setup_device(int fd, int index,
+> > struct
+> > btd_adapter *adapter) if (device &&
+> > btd_device_is_connected(device))
+> >  		return false;
+> > 
+> > -	adapter_bdaddr = btd_adapter_get_address(adapter);
+> > -
+> > -	if (bacmp(adapter_bdaddr, &master_bdaddr)) {
+> > -		if (set_master_bdaddr(fd, adapter_bdaddr) < 0)
+> > -			return false;
+> > -	}
+> > -
+> >  	ba2str(&device_bdaddr, device_addr);
+> > -	ba2str(&master_bdaddr, master_addr);
+> > -	ba2str(adapter_bdaddr, adapter_addr);
+> > -	DBG("remote %s old_master %s new_master %s",
+> > -				device_addr, master_addr,
+> > adapter_addr);
+> > 
+> >  	device = btd_adapter_get_device(adapter, &device_bdaddr,
+> > BDADDR_BREDR);
+> > 
+> >  	if (g_slist_find_custom(btd_device_get_uuids(device),
+> > HID_UUID,
+> >  						(GCompareFunc)strc
+> > asecmp)) {
+> >  		DBG("device %s already known, skipping",
+> > device_addr);
+> > -		return true;
+> > +		return false;
+> >  	}
+> > 
+> >  	info("sixaxis: setting up new device");
+> > @@ -181,7 +210,20 @@ static bool setup_device(int fd, int index,
+> > struct
+> > btd_adapter *adapter) btd_device_device_set_name(device,
+> > devices[index].name);
+> >  	btd_device_set_pnpid(device, devices[index].source,
+> > devices[index].vid,
+> >  				devices[index].pid,
+> > devices[index].version);
+> > -	btd_device_set_temporary(device, false);
+> > +	btd_device_set_temporary(device, true);
+> > +
+> > +	closure = g_try_new0(struct authentication_closure, 1);
+> > +	if (!closure) {
+> > +		btd_adapter_remove_device(adapter, device);
+> > +		return false;
+> > +	}
+> > +	closure->adapter = adapter;
+> > +	closure->device = device;
+> > +	closure->fd = fd;
+> > +	memcpy(&closure->device_addr, device_addr,
+> > sizeof(device_addr));
+> > +	adapter_bdaddr = btd_adapter_get_address(adapter);
+> > +	btd_request_authorization_cable_configured(adapter_bdaddr,
+> > &device_bdaddr,
+> > +				HID_UUID, agent_auth_cb, closure);
+> > 
+> >  	return true;
+> >  }
+> > @@ -236,8 +278,9 @@ static void device_added(struct udev_device
+> > *udevice)
+> >  	if (fd < 0)
+> >  		return;
+> > 
+> > -	setup_device(fd, index, adapter);
+> > -	close(fd);
+> > +	/* Only close the fd if an authentication is not pending
+> > */
+> > +	if (!setup_device(fd, index, adapter))
+> > +		close(fd);
+> >  }
+> > 
+> >  static gboolean monitor_watch(GIOChannel *source, GIOCondition
+> > condition,
 > 
-> Lets prefix all sixaxis error/info logs with "sixaxis:"
+> So user will be asked for consent after DS3 was configured? Not that
+> I have 
+> strong opinion on this but did you consider configuring it only after
+> user 
+> gave consent?
 
-Sure, I'll make some changes to mention whether the sixaxis or DS4
-variant of the call was made.
+We need to create a temporary device so that it's visible through the
+D-Bus API. The flow is:
+- joypad gets plugged in
+- sixaxis plugin's udev signal watch gets triggered
+- we fetch the device's details (Bluetooth address, name)
+- we create a pairing request which gets passed to front-ends (such as
+the Bluetooth panel in GNOME's Settings)
+- we get the answer back, if the pairing is cancelled, or there wasn't
+an agent to answer the question, we remove the temporary device (the
+device is now charging, and usable through USB), otherwise we write the
+new master to the joypad, so it connects to us when wireless, and mark
+it as trusted so it can connect without any further questions.
 
-Nothing else?
+There's still no way to pair the device without user interaction, as
+before this patchset, but we avoid overwriting the device's
+configuration when we just want to charge it, or use it wired, and the
+"can it connect yes/no" happens when we plug it via USB rather than
+when we finally disconnect it and press the "P" button to connect
+wirelessly.
