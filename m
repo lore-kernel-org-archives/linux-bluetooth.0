@@ -1,68 +1,126 @@
-Return-Path: <linux-serial-owner@vger.kernel.org>
-Subject: Re: [PATCH 1/9] Bluetooth: hci_uart_set_flow_control: Fix NULL deref
- when using serdev
-To: Sebastian Reichel <sre@kernel.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-        Gustavo Padovan <gustavo@padovan.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        =?UTF-8?Q?Fr=c3=a9d=c3=a9ric_Danis?= <frederic.danis.oss@gmail.com>,
-        robh@kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-serial@vger.kernel.org, linux-acpi@vger.kernel.org
-References: <20171002152356.4714-1-hdegoede@redhat.com>
- <20171002152356.4714-2-hdegoede@redhat.com>
- <20171002223415.jmbi4zw7edyuxccl@earth>
-From: Hans de Goede <hdegoede@redhat.com>
-Message-ID: <4cfac353-cd8d-a78e-812b-833720e96451@redhat.com>
-Date: Wed, 4 Oct 2017 20:42:23 +0200
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: "Hermida, Isaac" <Isaac.Hermida@digi.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: how to advertise a GATT service only for LE or BR/EDR?
+Date: Wed, 4 Oct 2017 15:43:53 +0000
+Message-ID: <59D501B9.9030602@digi.com>
+References: <59CD26BE.8040803@digi.com>
+ <CABBYNZLFyyNQmkAk5JZGWDii_hcx0n68yr-sjeXVUAEHVcOqcw@mail.gmail.com>
+ <59CDEBDF.3090200@digi.com> <59D1E4B0.2000106@digi.com>
+ <CABBYNZKuzJ4ueWufFSEZo7zhVdL5DCF=DuUYQLY-zV0OEuFYRA@mail.gmail.com>
+ <59D3343B.6020103@digi.com>
+In-Reply-To: <59D3343B.6020103@digi.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <20171002223415.jmbi4zw7edyuxccl@earth>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Sender: linux-serial-owner@vger.kernel.org
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
-
-On 03-10-17 00:34, Sebastian Reichel wrote:
-> Hi,
-> 
-> On Mon, Oct 02, 2017 at 05:23:48PM +0200, Hans de Goede wrote:
->> Fix a NULL pointer deref (hu->tty) when calling hci_uart_set_flow_control
->> on hci_uart-s using serdev.
->>
->> Signed-off-by: Hans de Goede <hdegoede@redhat.com>
->> ---
->>   drivers/bluetooth/hci_ldisc.c | 6 ++++++
->>   1 file changed, 6 insertions(+)
->>
->> diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
->> index a746627e784e..d02f6d029093 100644
->> --- a/drivers/bluetooth/hci_ldisc.c
->> +++ b/drivers/bluetooth/hci_ldisc.c
->> @@ -41,6 +41,7 @@
->>   #include <linux/ioctl.h>
->>   #include <linux/skbuff.h>
->>   #include <linux/firmware.h>
->> +#include <linux/serdev.h>
->>   
->>   #include <net/bluetooth/bluetooth.h>
->>   #include <net/bluetooth/hci_core.h>
->> @@ -298,6 +299,11 @@ void hci_uart_set_flow_control(struct hci_uart *hu, bool enable)
->>   	unsigned int set = 0;
->>   	unsigned int clear = 0;
->>   
->> +	if (hu->serdev) {
->> +		serdev_device_set_flow_control(hu->serdev, !enable);
->> +		return;
->> +	}
-> 
-> I think this should also control rts, so that the behaviour is the
-> same for serdev and ldisc implementation:
-> 
-> serdev_device_set_rts(serdev, enable);
-
-Good point, fixed for v2 of this set (which I will send out right
-after this mail).
-
-Regards,
-
-Hans
+SGkgTHVpeiwNCg0KT24gMTAvMDMvMjAxNyAwODo1NCBBTSwgSGVybWlkYSwgSXNhYWMgd3JvdGU6
+DQo+IEhpIEx1aXosDQo+DQo+IE9uIDEwLzAyLzIwMTcgMDY6MDAgUE0sIEx1aXogQXVndXN0byB2
+b24gRGVudHogd3JvdGU6DQo+PiBIaSBJc2FhYywNCj4+DQo+PiBPbiBNb24sIE9jdCAyLCAyMDE3
+IGF0IDEwOjAzIEFNLCBIZXJtaWRhLCBJc2FhYyA8SXNhYWMuSGVybWlkYUBkaWdpLmNvbT4gd3Jv
+dGU6DQo+Pj4gSGkgTHVpeiBldCBhbGwsDQo+Pj4NCj4+PiBPbiAwOS8yOS8yMDE3IDA4OjQ0IEFN
+LCBIZXJtaWRhLCBJc2FhYyB3cm90ZToNCj4+Pj4gSGkgTHVpeiwNCj4+Pj4NCj4+Pj4gT24gMDkv
+MjgvMjAxNyAwODoyMSBQTSwgTHVpeiBBdWd1c3RvIHZvbiBEZW50eiB3cm90ZToNCj4+Pj4+IEhp
+IElzYWFjLA0KPj4+Pj4NCj4+Pj4+IE9uIFRodSwgU2VwIDI4LCAyMDE3IGF0IDc6NDMgUE0sIEhl
+cm1pZGEsIElzYWFjIDxJc2FhYy5IZXJtaWRhQGRpZ2kuY29tPiB3cm90ZToNCj4+Pj4+PiBIaSBn
+cm91cCwNCj4+Pj4+Pg0KPj4+Pj4+IEFzIHBhcnQgb2YgdGhlIGJsdWV0b290aCBTSUcgY2VydGlm
+aWNhdGlvbiB0aGVyZSBhcmUgdHdvIHRlc3QgY2FzZXMNCj4+Pj4+PiAvVFAvR0FSL0NML0JJLTM0
+LUMgYW5kIC9UUC9HQVIvQ0wvQkktMzUtQyAoeW91IGNhbiBzZWUgdGhleSBkZWZpbmVkIGluDQo+
+Pj4+Pj4gdW5pdC90ZXN0LWdhdHQuYykuDQo+Pj4+Pj4gQ3VycmVudGx5IEkgYW0gYWJsZSB0byBy
+dW4gdGhlICJ0ZXN0L2V4YW1wbGUtZ2F0dC1zZXJ2ZXIiIGFuZCBzZWUgbXkNCj4+Pj4+PiBjdXN0
+b20gc2VydmljZXMgYW5kIGNoYXJhY3RlcmlzdGljcywgYnV0IEkgbmVlZCB0byBkZWZpbmUgYW4g
+c3BlY2lmaWMNCj4+Pj4+PiBzZXJ2aWNlL2NoYXJhY3RlcmlzdGljIHRvIGJlIG9ubHkgYWNjZXNz
+aWJsZSB0cm91Z2ggTEUgb3IgQlIvRURSDQo+Pj4+Pj4gdHJhbnNwb3J0IHBhcmFtZXRlci4gSSB3
+YXMgZGlnZ2luZyBpbnRvIHRoZSBjb2RlIGJ1dCBJIHdhcyB1bmFibGUgdG8NCj4+Pj4+PiBmaW5k
+IGhvdyB0byBzZXQgaXQgZm9yIHRoZSBHQVRUIHNlcnZlci4NCj4+Pj4+Pg0KPj4+Pj4+IEluIG90
+aGVyIHdvcmRzLCB3aGF0IEkgd2FudCB0byBkbyBpcyBsYXVuY2ggdGhlIGdhdHQtc2VydmVyIGFu
+ZCB0aGVuLA0KPj4+Pj4+IHdoZW4gaW5zcGVjdGluZyB0aGUgc2VydmljZXMvY2hhcmFjdGVyaXN0
+aWMgd2l0aCBnYXR0dG9vbCwgdGhlIHJldHVybmVkDQo+Pj4+Pj4gbGlzdCBzaG91bGQgYmUgZGlm
+ZmVyZW50IGlmIEkgcnVuIGdhdHR0b29sIHdpdGggIi1wIDMxIiBvciBub3QgKG5vdGljZQ0KPj4+
+Pj4+IGhvdyB0aGUgZ2F0dHRvb2wgcHJvbXB0IGlzIHNldCB0byBMRSBvciBCUikuDQo+Pj4+Pj4N
+Cj4+Pj4+PiAjIGdhdHR0b29sIC1JIC1iIDAwOjQwOjlEOjk4Ojk5OkJEIC1wIDANCj4+Pj4+PiBb
+MDA6NDA6OUQ6OTg6OTk6QkRdW0xFXT4gY29ubmVjdA0KPj4+Pj4+IEF0dGVtcHRpbmcgdG8gY29u
+bmVjdCB0byAwMDo0MDo5RDo5ODo5OTpCRA0KPj4+Pj4+IENvbm5lY3Rpb24gc3VjY2Vzc2Z1bA0K
+Pj4+Pj4+IFswMDo0MDo5RDo5ODo5OTpCRF1bTEVdPiBwcmltYXJ5DQo+Pj4+Pj4gYXR0ciBoYW5k
+bGU6IDB4MDAwMSwgZW5kIGdycCBoYW5kbGU6IDB4MDAwNSB1dWlkOg0KPj4+Pj4+IDAwMDAxODAw
+LTAwMDAtMTAwMC04MDAwLTAwODA1ZjliMzRmYg0KPj4+Pj4+IGF0dHIgaGFuZGxlOiAweDAwMDYs
+IGVuZCBncnAgaGFuZGxlOiAweDAwMDkgdXVpZDoNCj4+Pj4+PiAwMDAwMTgwMS0wMDAwLTEwMDAt
+ODAwMC0wMDgwNWY5YjM0ZmINCj4+Pj4+PiBhdHRyIGhhbmRsZTogMHgwMDBhLCBlbmQgZ3JwIGhh
+bmRsZTogMHgwMDBkIHV1aWQ6DQo+Pj4+Pj4gMDAwMDE4MGYtMDAwMC0xMDAwLTgwMDAtMDA4MDVm
+OWIzNGZiDQo+Pj4+Pj4gYXR0ciBoYW5kbGU6IDB4MDAwZSwgZW5kIGdycCBoYW5kbGU6IDB4MDAx
+ZCB1dWlkOg0KPj4+Pj4+IDEyMzQ1Njc4LTEyMzQtNTY3OC0xMjM0LTU2Nzg5YWJjZGVmMA0KPj4+
+Pj4+IGF0dHIgaGFuZGxlOiAweDAwMWUsIGVuZCBncnAgaGFuZGxlOiAweDAwMjUgdXVpZDoNCj4+
+Pj4+PiAwMDAwMTgwZC0wMDAwLTEwMDAtODAwMC0wMDgwNWY5YjM0ZmINCj4+Pj4+Pg0KPj4+Pj4+
+DQo+Pj4+Pj4gIyAvdG1wL2dhdHR0b29sIC1JIC1iIDAwOjQwOjlEOjk4Ojk5OkJEIC1wIDMxDQo+
+Pj4+Pj4gWzAwOjQwOjlEOjk4Ojk5OkJEXVtCUl0+IGNvbm5lY3QNCj4+Pj4+PiBBdHRlbXB0aW5n
+IHRvIGNvbm5lY3QgdG8gMDA6NDA6OUQ6OTg6OTk6QkQNCj4+Pj4+PiBDb25uZWN0aW9uIHN1Y2Nl
+c3NmdWwNCj4+Pj4+PiBbMDA6NDA6OUQ6OTg6OTk6QkRdW0JSXT4gcHJpbWFyeQ0KPj4+Pj4+IGF0
+dHIgaGFuZGxlOiAweDAwMDEsIGVuZCBncnAgaGFuZGxlOiAweDAwMDUgdXVpZDoNCj4+Pj4+PiAw
+MDAwMTgwMC0wMDAwLTEwMDAtODAwMC0wMDgwNWY5YjM0ZmINCj4+Pj4+PiBhdHRyIGhhbmRsZTog
+MHgwMDA2LCBlbmQgZ3JwIGhhbmRsZTogMHgwMDA5IHV1aWQ6DQo+Pj4+Pj4gMDAwMDE4MDEtMDAw
+MC0xMDAwLTgwMDAtMDA4MDVmOWIzNGZiDQo+Pj4+Pj4gYXR0ciBoYW5kbGU6IDB4MDAwYSwgZW5k
+IGdycCBoYW5kbGU6IDB4MDAxOSB1dWlkOg0KPj4+Pj4+IDEyMzQ1Njc4LTEyMzQtNTY3OC0xMjM0
+LTU2Nzg5YWJjZGVmMA0KPj4+Pj4+IGF0dHIgaGFuZGxlOiAweDAwMWEsIGVuZCBncnAgaGFuZGxl
+OiAweDAwMWQgdXVpZDoNCj4+Pj4+PiAwMDAwMTgwZi0wMDAwLTEwMDAtODAwMC0wMDgwNWY5YjM0
+ZmINCj4+Pj4+PiBhdHRyIGhhbmRsZTogMHgwMDFlLCBlbmQgZ3JwIGhhbmRsZTogMHgwMDI1IHV1
+aWQ6DQo+Pj4+Pj4gMDAwMDE4MGQtMDAwMC0xMDAwLTgwMDAtMDA4MDVmOWIzNGZiDQo+Pj4+Pj4N
+Cj4+Pj4+Pg0KPj4+Pj4+DQo+Pj4+Pj4gSSBhbSB1c2luZyBibHVleiA1LjQxLiBJcyBwb3NzaWJs
+ZSB0byBhZHZlcnRpc2UgYSBzZXJ2aWNlIG9ubHkgZm9yIExFIG9yDQo+Pj4+Pj4gQlI/IEkgZ3Vl
+c3MgaXQgc2hvdWxkIGJlY2F1c2UgaXMgcGFydCBvZiB0aGUgU0lHIGNlcnRpZmljYXRpb24gYW5k
+IGlzDQo+Pj4+Pj4gcGFydCBvZiB0aGUgdW5pdC90ZXN0LWdhdHQuDQo+Pj4+PiBUaGlzIG1pZ2h0
+IGJlIGJlY2F1c2UgdGhlIHNwZWMgd2FzIG5vIGNsZWFyIGFib3V0IHRoZSBkYXRhYmFzZSBiZWlu
+Zw0KPj4+Pj4gYmVhcmVyIHNwZWNpZmljLCB3aGljaCBpbiBteSBvcGluaW9uIHRoaXMgaXMgYSBv
+dmVyc2lnaHQgc2luY2UgdGhlbiB3ZQ0KPj4+Pj4gY2FuJ3QgcmVwcmVzZW50IGF0dHJpYnV0ZXMg
+b2YgZHVhbCBtb2RlIGRldmljZXMgd2l0aCBhIHVuaWZpZWQgb2JqZWN0LA0KPj4+Pj4gYW5kIEkg
+cmVhbGx5IHdvbmRlciBpZiB0aGlzIGhhcyB0byBiZSBmb3JjZWQgdXAgaW50byB0aGUgQVBJLCBp
+ZiBpdA0KPj4+Pj4gZG9lcyB0aGVuIHdlIHdvdWxkIGhhdmUgdG8gZW5jb2RlIGJlYXJlciBpbmZv
+cm1hdGlvbiBpbnRvIHRoZSBvYmplY3QNCj4+Pj4+IHBhdGggKGFyZ2ghKSBmb3IgY2xpZW50IGFu
+ZCBmb3Igc2VydmVyIHdvdWxkIHByb2JhYmx5IG5lZWQgYSBwcm9wZXJ0eQ0KPj4+Pj4gdGVsbGlu
+ZyB3aGljaCBiZWFyZXIgdGhpcyB3b3VsZCBiZSBhdmFpbGFibGUgYW5kIGVuY29kZSB0aGlzIGlu
+dG8gdG8NCj4+Pj4+IHRoZSBkYXRhYmFzZSB3aGljaCBtYXkgbGVhdmUgZ2FwcyBpbiB0aGUgaGFu
+ZGxlcyBvciBqdXN0IGR1cGxpY2F0ZQ0KPj4+Pj4gZXZlcnl0aGluZywgZm9yIHNlcnZlciBJZCBw
+cm9iYWJseSBqdXN0IGhpZGUgdGhlIHNlcnZpY2VzIGJhc2VkIG9uIHRoZQ0KPj4+Pj4gYmVhcmVy
+LCBidXQgd2Ugc3RpbGwgbmVlZCB0byBzdG9yZSB0aGUgQ0NDIGNvbmZpZ3VyYXRpb24gaW4gYSBi
+ZWFyZXINCj4+Pj4+IHNwZWNpZmljIG1hbm5lci4NCj4+Pj4+DQo+Pj4+DQo+Pj4+IFNvLCB3aGF0
+IGNhbiBJIGRvIGluIG9yZGVyIHRvIHBhc3MgdGhhdCBzcGVjaWZpYyBibHVldG9vdGggU0lHIHRl
+c3RzPw0KPj4+PiBUaGF0IHRlc3QgY2FzZXMgbmVlZCB0byBlbnN1cmUgdGhhdCBhbiBzcGVjaWZp
+YyBzZXJ2aWNlL2NoYXIgaW4gb25seQ0KPj4+PiBhY2Nlc3NpYmxlIG9uIExFIG9yIEJSLCBzbyB0
+aGV5IGhhZCB0byBiZSBkaWZmZXJlbnQuDQo+Pj4+IERvIHlvdSBoYXZlIGFueSBpZGVhIG9yIHN1
+Z2dlc3Rpb24/IEl0IHdvdWxkIGJlIHJlYWxseSB3ZWxjb21lLCBpZiBub3QgSQ0KPj4+PiBoYXZl
+IG5vIGlkZWEgaG93IHRvIHByb2NlZWQgdG8gY29tcGxldGUgdGhlIFNJRyB2YWxpZGF0aW9uIHdp
+dGggYmx1ZXogc3R1ZmYuDQo+Pj4+IEkgd2FzIGV2ZW4gdHJ5aW5nIHRvIG1vZGlmeSBzb21lIGZp
+bGVzIGludG8gdGhlIGNvZGUsIGJ1dCBJIGFtIG5vdA0KPj4+PiBmYW1pbGlhciB3aXRoIHRoYXQg
+YW5kIGl0IG9idmlvdXNseSBkaWQgbm90IHdvcmsuDQo+Pj4NCj4+PiBJIHVuZGVyc3RhbmQgdGhl
+IHNpbGVudCB0byB0aGlzIGxhc3QgcXVlc3Rpb24gYXMgYSBuby4gU28gSSBhc3N1bWUgdGhhdA0K
+Pj4+IGFueSB1c2VyIHRyeWluZyB0byBwYXNzIHRoaXMgdGVzdCB3aWxsIGZhaWwgKGF0IGxlYXN0
+IGlmIHVzaW5nIGJsdWV6KS4NCj4+PiBTbyBzaG91bGQgdGhlIHNwZWNpZmljYXRpb24gYmUgY2hh
+bmdlZD8gU2hvdWxkIGJsdWV6IGFkYXB0IHRvIGl0PyBJbiB0aGUNCj4+PiBjdXJyZW50IHN0YXRl
+IHRoYXQgU0lHIGNlcnRpZmljYXRpb24gY2FuIG5vdCBiZSBwYXNzZWQuDQo+Pg0KPj4gVGhhdCBp
+ZiB5b3Ugd2FudCB0byBxdWFsaWZ5IHdpdGggR0FUVCBvdmVyIEJSL0VEUiwgc29tZXRoaW5nIHRo
+YXQgd2UNCj4+IG1heSBhY3R1YWxseSBoYXZlIGFuIG9wdGlvbiB0byBkaXNhYmxlIGluIHRoZSBm
+dXR1cmUsIG9yIHBlcmhhcHMganVzdA0KPj4gcmVtb3ZlIGl0IGVudGlyZWx5IGdpdmVuIHRoaXMg
+dGVzdHMgd291bGQgcG9zc2libGUgYWZmZWN0IHRoYXQgR0FUVA0KPj4gZGF0YWJhc2UgbGF5b3V0
+LCBlaXRoZXIgYnkgY3JlYXRpbmcgaGFuZGxlIGdhcHMgb3IgZHVwbGljYXRpb24uIFNvDQo+PiBw
+ZXJoYXBzIHlvdSBjb3VsZCBnaXZlIHNvbWUgZmVlZGJhY2sgaWYgeW91IGRvIGludGVuZCB0byB1
+c2UgR0FUVCBvdmVyDQo+PiBCUi9FRFIgb3Igbm90PyBJZiBpdCB0dXJuIG91dCBubyBvbmUgYmVu
+ZWZpdCBmcm9tIGl0IElkIGp1c3QgcmVtb3ZlDQo+PiBpdC4NCj4+DQo+DQo+IFRoYW5rcyBmb3Ig
+dGhlIHF1aWNrIHJlcGx5LiBJIGRvIG5vdCBrbm93IGhvdyBhbnkgb3RoZXIgcGVvcGxlIHdhcyBh
+YmxlDQo+IHRvIHBhc3MgdGhlc2UgU0lHIGxhYiB0ZXN0cyAoQkktMzQtQyBhbmQgQkktMzUtQyku
+DQo+IEkgZG8gbm90IHBsYW4gdG8gdXNlIEdBVFQgb3ZlciBCUi9FRFIuIEZvciBtZSBqdXN0IHJl
+bW92aW5nIGl0IHdvdWxkIGJlDQo+IGVub3VnaC4gSWYgeW91IGNhbiBwb2ludCBtZSB3aGVyZS9o
+b3cgdG8gZG8gdGhhdCBpdCB3b3VsZCBiZSBncmVhdCBzbyBJDQo+IGNhbiBkaWcgaW4gdGhlIGNv
+ZGUgKEkgYW0gbm90IGZhbWlsaWFyIHdpdGggdGhhdCBjb2RlKS4NCj4NCj4gVGh4LA0KPiAgICAg
+IElzYWFjDQoNCg0KWWVzdGVyZGF5IEkgZGlkIGFwcGx5IHRoZSBwYXRjaCAoZ2F0dDogUmVtb3Zl
+IHN1cHBvcnQgb2YgQVRUIG92ZXIgDQpCUi9FRFIpIG9uIGJsdWV6LTUuNDEgKG15IGN1cnJlbnQg
+dmVyc2lvbikgYW5kIHBhc3NlZCBpdCB0byB0aGUgbGFiLiBJIA0Kd2FzIHdhaXRpbmcgZm9yIHRo
+ZWlyIGZlZWRiYWNrIGJ1dCBJIGRpZCBub3QgZ2V0IGEgcmVwbHkgeWV0LCBzbyBqdXN0IHRvIA0K
+bGV0IHlvdSBrbm93IHRoYXQgSSBnZXQgdGhlIHBhdGNoIGFuZCBhcHBsaWVkIGl0Lg0KQXMgSSBz
+ZWUgaXQsIHRoYXQgcGF0Y2ggcmVtb3ZlZCB0aGUgc3VwcG9ydCBmb3IgQVRUIG92ZXIgQlIvRURS
+LCBzbyBJIA0KZ3Vlc3MgdGhhdCBhbm90aGVyIHdheSB0byBwYXNzIHRoYXQgdGVzdCBpcyBtb2Rp
+ZnlpbmcgdGhlIGZpcm13YXJlIG9mIA0KdGhlIGJsdWV0b290aCBjaGlwIHRvIGRpc2FibGUgaXQg
+YXQgYSBodyBsZXZlbC4NCkFuZCwgaW4gb3JkZXIgdG8gcGFzcyB0aGUgb3RoZXIgdGVzdCBjYXNl
+IChCSS0zNS1DKSwgSSB3aWxsIG5lZWQgdG8gZG8gDQpub3QgYXBwbHkgdGhlIG1lbnRpb25lZCBw
+YXRjaCBhbmQgY3JlYXRlIGEgc2ltaWxhciBvbmUgZm9yIEFUVCBvdmVyIExFLCANCm9yIGlzIHRo
+ZXJlIGFub3RoZXIgd2F5IHRvIGFjY29tcGxpc2ggL1RQL0dBUi9DTC9CSS0zNS1DPw0KDQotLSA=
