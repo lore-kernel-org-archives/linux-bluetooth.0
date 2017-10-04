@@ -1,230 +1,48 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Message-ID: <1507120688.23708.16.camel@hadess.net>
-Subject: Re: [PATCH 3/9] sixaxis: Ask user whether cable configuration
- should be allowed
-From: Bastien Nocera <hadess@hadess.net>
-To: Szymon Janc <szymon.janc@codecoup.pl>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Wed, 04 Oct 2017 14:38:08 +0200
-In-Reply-To: <5909706.3V1B56IrXH@ix>
-References: <20170904181212.5639-1-hadess@hadess.net>
-         <20170904181212.5639-3-hadess@hadess.net> <5909706.3V1B56IrXH@ix>
+MIME-Version: 1.0
+In-Reply-To: <20171003183507.37885-1-yunhanw@google.com>
+References: <20171003183507.37885-1-yunhanw@google.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Wed, 4 Oct 2017 14:19:04 +0300
+Message-ID: <CABBYNZLBLNkyEgimzmB52Uq_SZKVeiHhUJJkR+0b56OtD2Sjvg@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] gatt: Fix sending indications with proxy
+To: Yunhan Wang <yunhanw@google.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, 2017-09-27 at 11:14 +0200, Szymon Janc wrote:
-> Hi Bastien,
-> 
-> On Monday, 4 September 2017 20:12:06 CEST Bastien Nocera wrote:
-> > Previously, users doing cable configuration of Sixaxis PS3
-> > controllers
-> > would only get asked whether a device was allowed to connect to the
-> > computer when switching it to Bluetooth mode: unplugging it, and
-> > pressing the PS button.
-> > 
-> > Instead, we should ask the user straight away, through the agent,
-> > whether the pad should be allowed to connect.
-> > 
-> > This makes it easier to setup those devices, while keeping
-> > security.
-> > ---
-> >  plugins/sixaxis.c | 83
-> > +++++++++++++++++++++++++++++++++++++++++-------------- 1 file
-> > changed, 63
-> > insertions(+), 20 deletions(-)
-> > 
-> > diff --git a/plugins/sixaxis.c b/plugins/sixaxis.c
-> > index 7d3a8f3ac..c8305d52f 100644
-> > --- a/plugins/sixaxis.c
-> > +++ b/plugins/sixaxis.c
-> > @@ -44,6 +44,7 @@
-> > 
-> >  #include "src/adapter.h"
-> >  #include "src/device.h"
-> > +#include "src/agent.h"
-> >  #include "src/plugin.h"
-> >  #include "src/log.h"
-> >  #include "src/shared/util.h"
-> > @@ -71,6 +72,13 @@ static const struct {
-> >  	},
-> >  };
-> > 
-> > +struct authentication_closure {
-> > +	struct btd_adapter *adapter;
-> > +	struct btd_device *device;
-> > +	int fd;
-> > +	char device_addr[18];
-> > +};
-> > +
-> >  static struct udev *ctx = NULL;
-> >  static struct udev_monitor *monitor = NULL;
-> >  static guint watch_id = 0;
-> > @@ -135,19 +143,51 @@ static int set_master_bdaddr(int fd, const
-> > bdaddr_t
-> > *bdaddr) return ret;
-> >  }
-> > 
-> > +static void agent_auth_cb(DBusError *derr,
-> > +				void *user_data)
-> > +{
-> > +	struct authentication_closure *closure = user_data;
-> > +	char master_addr[18], adapter_addr[18];
-> > +	bdaddr_t master_bdaddr;
-> > +	const bdaddr_t *adapter_bdaddr;
-> > +
-> > +	if (derr != NULL) {
-> > +		DBG("Agent replied negatively, removing temporary
-> > device");
-> > +		goto error;
-> > +	}
-> > +
-> > +	btd_device_set_temporary(closure->device, false);
-> > +
-> > +	if (get_master_bdaddr(closure->fd, &master_bdaddr) < 0)
-> > +		goto error;
-> > +
-> > +	adapter_bdaddr = btd_adapter_get_address(closure-
-> > >adapter);
-> > +	if (bacmp(adapter_bdaddr, &master_bdaddr)) {
-> > +		if (set_master_bdaddr(closure->fd, adapter_bdaddr)
-> > < 0)
-> > +			goto error;
-> > +	}
-> > +
-> > +	ba2str(&master_bdaddr, master_addr);
-> > +	ba2str(adapter_bdaddr, adapter_addr);
-> > +	DBG("remote %s old_master %s new_master %s",
-> > +				closure->device_addr, master_addr,
-> > adapter_addr);
-> > +
-> > +error:
-> > +	close(closure->fd);
-> > +	g_free(closure);
-> > +}
-> > +
-> >  static bool setup_device(int fd, int index, struct btd_adapter
-> > *adapter)
-> >  {
-> > -	char device_addr[18], master_addr[18], adapter_addr[18];
-> > -	bdaddr_t device_bdaddr, master_bdaddr;
-> > +	char device_addr[18];
-> > +	bdaddr_t device_bdaddr;
-> >  	const bdaddr_t *adapter_bdaddr;
-> >  	struct btd_device *device;
-> > +	struct authentication_closure *closure;
-> > 
-> >  	if (get_device_bdaddr(fd, &device_bdaddr) < 0)
-> >  		return false;
-> > 
-> > -	if (get_master_bdaddr(fd, &master_bdaddr) < 0)
-> > -		return false;
-> > -
-> >  	/* This can happen if controller was plugged while already
-> > connected
-> >  	 * eg. to charge up battery. */
-> >  	device = btd_adapter_find_device(adapter, &device_bdaddr,
-> > @@ -155,25 +195,14 @@ static bool setup_device(int fd, int index,
-> > struct
-> > btd_adapter *adapter) if (device &&
-> > btd_device_is_connected(device))
-> >  		return false;
-> > 
-> > -	adapter_bdaddr = btd_adapter_get_address(adapter);
-> > -
-> > -	if (bacmp(adapter_bdaddr, &master_bdaddr)) {
-> > -		if (set_master_bdaddr(fd, adapter_bdaddr) < 0)
-> > -			return false;
-> > -	}
-> > -
-> >  	ba2str(&device_bdaddr, device_addr);
-> > -	ba2str(&master_bdaddr, master_addr);
-> > -	ba2str(adapter_bdaddr, adapter_addr);
-> > -	DBG("remote %s old_master %s new_master %s",
-> > -				device_addr, master_addr,
-> > adapter_addr);
-> > 
-> >  	device = btd_adapter_get_device(adapter, &device_bdaddr,
-> > BDADDR_BREDR);
-> > 
-> >  	if (g_slist_find_custom(btd_device_get_uuids(device),
-> > HID_UUID,
-> >  						(GCompareFunc)strc
-> > asecmp)) {
-> >  		DBG("device %s already known, skipping",
-> > device_addr);
-> > -		return true;
-> > +		return false;
-> >  	}
-> > 
-> >  	info("sixaxis: setting up new device");
-> > @@ -181,7 +210,20 @@ static bool setup_device(int fd, int index,
-> > struct
-> > btd_adapter *adapter) btd_device_device_set_name(device,
-> > devices[index].name);
-> >  	btd_device_set_pnpid(device, devices[index].source,
-> > devices[index].vid,
-> >  				devices[index].pid,
-> > devices[index].version);
-> > -	btd_device_set_temporary(device, false);
-> > +	btd_device_set_temporary(device, true);
-> > +
-> > +	closure = g_try_new0(struct authentication_closure, 1);
-> > +	if (!closure) {
-> > +		btd_adapter_remove_device(adapter, device);
-> > +		return false;
-> > +	}
-> > +	closure->adapter = adapter;
-> > +	closure->device = device;
-> > +	closure->fd = fd;
-> > +	memcpy(&closure->device_addr, device_addr,
-> > sizeof(device_addr));
-> > +	adapter_bdaddr = btd_adapter_get_address(adapter);
-> > +	btd_request_authorization_cable_configured(adapter_bdaddr,
-> > &device_bdaddr,
-> > +				HID_UUID, agent_auth_cb, closure);
-> > 
-> >  	return true;
-> >  }
-> > @@ -236,8 +278,9 @@ static void device_added(struct udev_device
-> > *udevice)
-> >  	if (fd < 0)
-> >  		return;
-> > 
-> > -	setup_device(fd, index, adapter);
-> > -	close(fd);
-> > +	/* Only close the fd if an authentication is not pending
-> > */
-> > +	if (!setup_device(fd, index, adapter))
-> > +		close(fd);
-> >  }
-> > 
-> >  static gboolean monitor_watch(GIOChannel *source, GIOCondition
-> > condition,
-> 
-> So user will be asked for consent after DS3 was configured? Not that
-> I have 
-> strong opinion on this but did you consider configuring it only after
-> user 
-> gave consent?
+Hi Yunhan,
 
-We need to create a temporary device so that it's visible through the
-D-Bus API. The flow is:
-- joypad gets plugged in
-- sixaxis plugin's udev signal watch gets triggered
-- we fetch the device's details (Bluetooth address, name)
-- we create a pairing request which gets passed to front-ends (such as
-the Bluetooth panel in GNOME's Settings)
-- we get the answer back, if the pairing is cancelled, or there wasn't
-an agent to answer the question, we remove the temporary device (the
-device is now charging, and usable through USB), otherwise we write the
-new master to the joypad, so it connects to us when wireless, and mark
-it as trusted so it can connect without any further questions.
+On Tue, Oct 3, 2017 at 9:35 PM, Yunhan Wang <yunhanw@google.com> wrote:
+> When using AcquireNotify with indication, the proxy needs to be filled in
+> send_notification_to_devices so as to get indication confirmation in
+> applciation.
+> ---
+>  src/gatt-database.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/src/gatt-database.c b/src/gatt-database.c
+> index 0c84b2569..47304704a 100644
+> --- a/src/gatt-database.c
+> +++ b/src/gatt-database.c
+> @@ -1831,7 +1831,7 @@ static bool pipe_io_read(struct io *io, void *user_data)
+>                                 buf, bytes_read,
+>                                 gatt_db_attribute_get_handle(chrc->ccc),
+>                                 chrc->props & BT_GATT_CHRC_PROP_INDICATE,
+> -                               NULL);
+> +                               chrc->proxy);
+>
+>         return true;
+>  }
+> --
+> 2.14.2.822.g60be5d43e6-goog
 
-There's still no way to pair the device without user interaction, as
-before this patchset, but we avoid overwriting the device's
-configuration when we just want to charge it, or use it wired, and the
-"can it connect yes/no" happens when we plug it via USB rather than
-when we finally disconnect it and press the "P" button to connect
-wirelessly.
+Im not sure this the correct fix, the reason why the proxy is NULL is
+because the fd is being used for io, though the confirmation has no
+effect on the flow control Id expect some inband signalling in this
+case but that might actually require something like a socketpair in
+order to be able to write confirmation back.
+
+-- 
+Luiz Augusto von Dentz
