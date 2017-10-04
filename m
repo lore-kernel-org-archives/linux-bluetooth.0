@@ -1,48 +1,42 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <nolsen@jabra.com>
+From: Niels Skou Olsen <nolsen@jabra.com>
+To: Benjamin Tissoires <benjamin.tissoires@redhat.com>, Jiri Kosina
+	<jikos@kernel.org>, Marcel Holtmann <marcel@holtmann.org>
+CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-input@vger.kernel.org" <linux-input@vger.kernel.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: RE: [PATCH v2 0/4] Quirks cleanup and hid-generic niceness
+Date: Wed, 4 Oct 2017 09:25:09 +0000
+Message-ID: <VI1PR0701MB299142693676DDB3B715160FDA730@VI1PR0701MB2991.eurprd07.prod.outlook.com>
+References: <20171003145729.3135-1-benjamin.tissoires@redhat.com>
+In-Reply-To: <20171003145729.3135-1-benjamin.tissoires@redhat.com>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-In-Reply-To: <20171003183507.37885-1-yunhanw@google.com>
-References: <20171003183507.37885-1-yunhanw@google.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 4 Oct 2017 14:19:04 +0300
-Message-ID: <CABBYNZLBLNkyEgimzmB52Uq_SZKVeiHhUJJkR+0b56OtD2Sjvg@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] gatt: Fix sending indications with proxy
-To: Yunhan Wang <yunhanw@google.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Yunhan,
+On Oct 3, 2017, benjamin.tissoires@redhat.com wrote:
 
-On Tue, Oct 3, 2017 at 9:35 PM, Yunhan Wang <yunhanw@google.com> wrote:
-> When using AcquireNotify with indication, the proxy needs to be filled in
-> send_notification_to_devices so as to get indication confirmation in
-> applciation.
-> ---
->  src/gatt-database.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> Niels found an issue with v1 of the series, while compiling the usbhid mo=
+dule as a
+> separate .ko.
 >
-> diff --git a/src/gatt-database.c b/src/gatt-database.c
-> index 0c84b2569..47304704a 100644
-> --- a/src/gatt-database.c
-> +++ b/src/gatt-database.c
-> @@ -1831,7 +1831,7 @@ static bool pipe_io_read(struct io *io, void *user_data)
->                                 buf, bytes_read,
->                                 gatt_db_attribute_get_handle(chrc->ccc),
->                                 chrc->props & BT_GATT_CHRC_PROP_INDICATE,
-> -                               NULL);
-> +                               chrc->proxy);
+> Sending a v2 with the proper From: field fixed now.
 >
->         return true;
->  }
-> --
-> 2.14.2.822.g60be5d43e6-goog
 
-Im not sure this the correct fix, the reason why the proxy is NULL is
-because the fd is being used for io, though the confirmation has no
-effect on the flow control Id expect some inband signalling in this
-case but that might actually require something like a socketpair in
-order to be able to write confirmation back.
+I have built it on for-next and tested it with no apparent issues. Also, I =
+have
+Rebased/simplified my 2 pending patches on top of it, and will
+submit v2s shortly.
 
--- 
-Luiz Augusto von Dentz
+Thanks,
+Niels
+
+**** GN GROUP NOTICE - AUTOMATICALLY INSERTED**** The information in this e=
+-mail (including attachments, if any) is considered confidential and is int=
+ended only for the recipient(s) listed above. Any review, use, disclosure, =
+distribution or copying of this e-mail is prohibited except by or on behalf=
+ of the intended recipient. If you have received this email in error, pleas=
+e notify me immediately by reply e-mail, delete this e-mail, and do not dis=
+close its contents to anyone. Any opinions expressed in this e-mail are tho=
+se of the individual and not necessarily the GN group. Thank you. *********=
+*********** DISCLAIMER END ************************
