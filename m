@@ -1,69 +1,62 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
-Subject: [PATCH BlueZ 1/2] tools/btmgmt: Add readline support to stop-find
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Message-ID: <5f2959f9-9888-1ac5-6991-106f12d651fe@jp.fujitsu.com>
-Date: Fri, 6 Oct 2017 13:12:12 +0900
+Return-Path: <hdegoede@redhat.com>
+Subject: Re: [PATCH v2 9/9] Bluetooth: hci_bcm: Add (runtime)pm support to the
+ serdev driver
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>,
+ =?UTF-8?Q?Fr=c3=a9d=c3=a9ric_Danis?= <frederic.danis.oss@gmail.com>,
+ Sebastian Reichel <sre@kernel.org>, Rob Herring <robh@kernel.org>,
+ "bluez mailin list (linux-bluetooth@vger.kernel.org)"
+ <linux-bluetooth@vger.kernel.org>, linux-serial@vger.kernel.org,
+ linux-acpi@vger.kernel.org
+References: <20171004184343.7855-1-hdegoede@redhat.com>
+ <20171004184343.7855-9-hdegoede@redhat.com>
+ <DFCF661F-6FE0-4449-A169-D71ED9282074@holtmann.org>
+ <1389d64c-17aa-c6a1-d56f-6c2fe877f247@redhat.com>
+ <17592E57-3A4B-4386-B809-9EA928D38FDD@holtmann.org>
+From: Hans de Goede <hdegoede@redhat.com>
+Message-ID: <2487535c-18b4-c689-3c67-d1261b21feee@redhat.com>
+Date: Thu, 5 Oct 2017 19:53:43 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <17592E57-3A4B-4386-B809-9EA928D38FDD@holtmann.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-So can continue to run btmgmt even if using 'stop-find --help' in the 
-interactive mode.
----
- tools/btmgmt.c | 13 ++++++-------
- 1 file changed, 6 insertions(+), 7 deletions(-)
+Hi,
 
-diff --git a/tools/btmgmt.c b/tools/btmgmt.c
-index e454d86..0f21f48 100644
---- a/tools/btmgmt.c
-+++ b/tools/btmgmt.c
-@@ -2357,13 +2357,12 @@ static void stop_find_rsp(uint8_t status, uint16_t len, const void *param,
- 							void *user_data)
- {
- 	if (status != 0) {
--		fprintf(stderr,
--			"Stop Discovery failed: status 0x%02x (%s)\n",
-+		error("Stop Discovery failed: status 0x%02x (%s)",
- 						status, mgmt_errstr(status));
- 		return noninteractive_quit(EXIT_SUCCESS);
- 	}
- 
--	printf("Discovery stopped\n");
-+	print("Discovery stopped");
- 	discovery = false;
- 
- 	noninteractive_quit(EXIT_SUCCESS);
-@@ -2371,7 +2370,7 @@ static void stop_find_rsp(uint8_t status, uint16_t len, const void *param,
- 
- static void stop_find_usage(void)
- {
--	printf("Usage: btmgmt stop-find [-l|-b]>\n");
-+	print("Usage: btmgmt stop-find [-l|-b]");
- }
- 
- static struct option stop_find_options[] = {
-@@ -2406,7 +2405,7 @@ static void cmd_stop_find(struct mgmt *mgmt, uint16_t index, int argc,
- 		default:
- 			stop_find_usage();
- 			optind = 0;
--			exit(EXIT_SUCCESS);
-+			return noninteractive_quit(EXIT_SUCCESS);
- 		}
- 	}
- 
-@@ -2419,8 +2418,8 @@ static void cmd_stop_find(struct mgmt *mgmt, uint16_t index, int argc,
- 
- 	if (mgmt_send(mgmt, MGMT_OP_STOP_DISCOVERY, index, sizeof(cp), &cp,
- 					     stop_find_rsp, NULL, NULL) == 0) {
--		fprintf(stderr, "Unable to send stop_discovery cmd\n");
--		exit(EXIT_FAILURE);
-+		error("Unable to send stop_discovery cmd");
-+		return noninteractive_quit(EXIT_FAILURE);
- 	}
- }
- 
--- 
-2.7.4
+On 05-10-17 17:15, Marcel Holtmann wrote:
+> Hi Hans,
+> 
+>>>> Make the serdev driver use struct bcm_device as its driver data and share
+>>>> all the pm / GPIO / IRQ related code paths with the platform driver.
+>>>>
+>>>> After this commit the 2 drivers are in essence the same and the serdev
+>>>> driver interface can be used for all ACPI enumerated HCI UARTs.
+>>>>
+>>>> Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+>>>> ---
+>>>> drivers/bluetooth/hci_bcm.c | 118 +++++++++++++++++++++++++-------------------
+>>>> 1 file changed, 68 insertions(+), 50 deletions(-)
+>>> all 9 patches have been applied to bluetooth-next tree.
+>>
+>> Excellent, thank you!
+>>
+>> So I guess this means we can also move forward with getting
+>> the 2 patches from Frédéric Danis merged ? There is a bit
+>> of a bisect-ability problem there, if the acpi pull-req
+>> gets merged first then uart attached bcm bt will stop
+>> working until the bluetooth subsys is also merged.
+>>
+>> But I don't think this will impact a lot of users
+>> (also given the need for a manual btattach so far),
+>> so I don't think this is a big problem... ?
+> 
+> I wonder if we should just do this as all-in-one change for 4.15 kernel. We surely can get the ACPI changes into 4.15 and the Bluetooth changes as well. Then it should just work.
+> 
+> So I am leaning to just adding the revert patch into the bluetooth-next tree and then just add the ACPI PnP ID for the GPD device in the same pull request. And if the ACPI changes make it then nobody will know the difference that we switched from USB to UART.
 
+Yes that should work fine.
+
+Regards,
+
+Hans
