@@ -1,58 +1,93 @@
 Return-Path: <hdegoede@redhat.com>
-Subject: Re: [PATCH 2/2] Bluetooth: hci_bcm: Add support for BCM2E7E
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Sebastian Reichel <sre@kernel.org>,
- "Gustavo F. Padovan" <gustavo@padovan.org>,
- Johan Hedberg <johan.hedberg@gmail.com>, linux-bluetooth@vger.kernel.org
-References: <20170907202551.26796-1-hdegoede@redhat.com>
- <20170907202551.26796-2-hdegoede@redhat.com>
- <aab461af-601b-70c3-f79e-95ce0bdbbc9d@redhat.com>
- <20171001103509.4jqlt6kuqgxlm5m5@earth>
- <aed714df-ec91-cda6-c8fc-f45e40c4a6cb@redhat.com>
- <C0704E2C-0EA2-41B4-A7CB-0E5D0A624C19@holtmann.org>
 From: Hans de Goede <hdegoede@redhat.com>
-Message-ID: <78322c1c-5c71-75b5-00bb-7afa78cf2bbe@redhat.com>
-Date: Thu, 5 Oct 2017 09:46:27 +0200
-MIME-Version: 1.0
-In-Reply-To: <C0704E2C-0EA2-41B4-A7CB-0E5D0A624C19@holtmann.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>
+Cc: Hans de Goede <hdegoede@redhat.com>,
+	=?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis.oss@gmail.com>,
+	Sebastian Reichel <sre@kernel.org>,
+	robh@kernel.org,
+	linux-bluetooth@vger.kernel.org,
+	linux-serial@vger.kernel.org,
+	linux-acpi@vger.kernel.org
+Subject: [PATCH] Revert "Bluetooth: btusb: Add workaround for Broadcom devices without product id"
+Date: Thu,  5 Oct 2017 09:42:51 +0200
+Message-Id: <20171005074251.7274-1-hdegoede@redhat.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Commit 9834e586fa ("Bluetooth: btusb: Add workaround for Broadcom devices
+without product id") was added to deal with the BT part of the BCM4356A2
+on GPD pocket laptops having an usb vid:pid of 0000:0000.
 
-On 04-10-17 21:07, Marcel Holtmann wrote:
-> Hi Hans,
-> 
->>>> This will happen automatically with this patch series,
->>>> but with the current 4.14 bluetooth stack it will work in
->>>> USB mode, and if we then merge this series post 4.14
->>>> bluetooth will stop working without users doing a btattach
->>>> command from userspace and we will have a regression on
->>>> our hands.
->>> Once the series from Frédéric Danis lands, you can get
->>> serial based broadcom bluetooth without btattach:
->>> https://www.spinics.net/lists/linux-bluetooth/msg71856.html
->>
->> Oh, cool. Thank you for pointing this out to me. I still
->> believe reverting the workaround for the 0000:0000
->> usb-id device is the right thing to do though.
->>
->> I've tested Frédéric Danis' series and it needed quite
->> some work on one of my devices. I've just submitted
->> a 9 patch series to add all the features the platform
->> code paths of hci_bcm.c have and which were missing from
->> the serdev code paths.
-> 
-> can you send a revert patch with a proper commit message explaining why we are reverting it and then I take it in with your other patch series.
+After another commit to add support for the BCM UART connected BT ACPI-id
+BCM2E7E used on the GPD win, it turns out that the BT on the GPD pocket is
+connected via both USB and UART. Adding support for the BCM2E7E ACPI-id
+causes it to switch to UART mode.
 
-Hmm, I thought I had already send that? But I cannot find it
-in the archives, so it looks like I prepared it but never
-send it...
+The Windows shipped with the device is using it in UART mode and the
+presence of the BCM2E7E ACPI-id combined with the 0 USB vid:pid also
+indicates that the BT part was never meant to be used in USB mode.
 
-I've send it out now, it would be nice to get the revert
-into 4.14 so that we don't end up with one kernel release
-where we do support the 0000:0000 usb-id.
+But not only is there no need to support the USB mode, supporting it
+actually is troublesome, because with the workaround to support the all 0
+USB vid:pid, BT will just work for end users, until we add support for
+the ACPI-id, after which users need to have userspace doing a btattach,
+which may be considered a regression.
 
-Regards,
+To avoid this regression when switching things over to UART mode as
+intended by the ACPI tables all along, this commit reverts the commit
+adding the workaround to support the all 0 USB vid:pid.
 
-Hans
+This reverts commit 9834e586fa ("Bluetooth: btusb: Add workaround for
+Broadcom devices without product id").
+
+Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+---
+ drivers/bluetooth/btusb.c | 18 ------------------
+ 1 file changed, 18 deletions(-)
+
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 7a5c06aaa181..c054d7bce490 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -66,7 +66,6 @@ static struct usb_driver btusb_driver;
+ #define BTUSB_BCM2045		0x40000
+ #define BTUSB_IFNUM_2		0x80000
+ #define BTUSB_CW6622		0x100000
+-#define BTUSB_BCM_NO_PRODID	0x200000
+ 
+ static const struct usb_device_id btusb_table[] = {
+ 	/* Generic Bluetooth USB device */
+@@ -171,10 +170,6 @@ static const struct usb_device_id btusb_table[] = {
+ 	{ USB_VENDOR_AND_INTERFACE_INFO(0x0930, 0xff, 0x01, 0x01),
+ 	  .driver_info = BTUSB_BCM_PATCHRAM },
+ 
+-	/* Broadcom devices with missing product id */
+-	{ USB_DEVICE_AND_INTERFACE_INFO(0x0000, 0x0000, 0xff, 0x01, 0x01),
+-	  .driver_info = BTUSB_BCM_PATCHRAM | BTUSB_BCM_NO_PRODID },
+-
+ 	/* Intel Bluetooth USB Bootloader (RAM module) */
+ 	{ USB_DEVICE(0x8087, 0x0a5a),
+ 	  .driver_info = BTUSB_INTEL_BOOT | BTUSB_BROKEN_ISOC },
+@@ -2909,19 +2904,6 @@ static int btusb_probe(struct usb_interface *intf,
+ 	if (id->driver_info == BTUSB_IGNORE)
+ 		return -ENODEV;
+ 
+-	if (id->driver_info & BTUSB_BCM_NO_PRODID) {
+-		struct usb_device *udev = interface_to_usbdev(intf);
+-
+-		/* For the broken Broadcom devices that show 0000:0000
+-		 * as USB vendor and product information, check that the
+-		 * manufacturer string identifies them as Broadcom based
+-		 * devices.
+-		 */
+-		if (!udev->manufacturer ||
+-		    strcmp(udev->manufacturer, "Broadcom Corp"))
+-			return -ENODEV;
+-	}
+-
+ 	if (id->driver_info & BTUSB_ATH3012) {
+ 		struct usb_device *udev = interface_to_usbdev(intf);
+ 
+-- 
+2.14.2
