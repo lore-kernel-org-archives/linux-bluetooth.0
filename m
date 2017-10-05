@@ -1,76 +1,58 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <hdegoede@redhat.com>
+Subject: Re: [PATCH 2/2] Bluetooth: hci_bcm: Add support for BCM2E7E
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Sebastian Reichel <sre@kernel.org>,
+ "Gustavo F. Padovan" <gustavo@padovan.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>, linux-bluetooth@vger.kernel.org
+References: <20170907202551.26796-1-hdegoede@redhat.com>
+ <20170907202551.26796-2-hdegoede@redhat.com>
+ <aab461af-601b-70c3-f79e-95ce0bdbbc9d@redhat.com>
+ <20171001103509.4jqlt6kuqgxlm5m5@earth>
+ <aed714df-ec91-cda6-c8fc-f45e40c4a6cb@redhat.com>
+ <C0704E2C-0EA2-41B4-A7CB-0E5D0A624C19@holtmann.org>
+From: Hans de Goede <hdegoede@redhat.com>
+Message-ID: <78322c1c-5c71-75b5-00bb-7afa78cf2bbe@redhat.com>
+Date: Thu, 5 Oct 2017 09:46:27 +0200
 MIME-Version: 1.0
-In-Reply-To: <CALvjcs-EbVqERVoOaHgHXaLKGFY_4P6nY5ZTJ=+Af2+ug21tzQ@mail.gmail.com>
-References: <20171003183507.37885-1-yunhanw@google.com> <CABBYNZLBLNkyEgimzmB52Uq_SZKVeiHhUJJkR+0b56OtD2Sjvg@mail.gmail.com>
- <CALvjcs-EbVqERVoOaHgHXaLKGFY_4P6nY5ZTJ=+Af2+ug21tzQ@mail.gmail.com>
-From: Yunhan Wang <yunhanw@google.com>
-Date: Thu, 5 Oct 2017 01:21:40 -0700
-Message-ID: <CALvjcs9o63HGYCORmNtPaLuxWR2jAw1vndgUZL5jiGs5v4jp2w@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] gatt: Fix sending indications with proxy
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <C0704E2C-0EA2-41B4-A7CB-0E5D0A624C19@holtmann.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi, Luiz
+Hi,
 
-With this change, all are working fine via using AcquireWrite and
-AcquireNotify now in my end. I have not yet see any issue so far. Any
-other concern or better idea?
+On 04-10-17 21:07, Marcel Holtmann wrote:
+> Hi Hans,
+> 
+>>>> This will happen automatically with this patch series,
+>>>> but with the current 4.14 bluetooth stack it will work in
+>>>> USB mode, and if we then merge this series post 4.14
+>>>> bluetooth will stop working without users doing a btattach
+>>>> command from userspace and we will have a regression on
+>>>> our hands.
+>>> Once the series from Frédéric Danis lands, you can get
+>>> serial based broadcom bluetooth without btattach:
+>>> https://www.spinics.net/lists/linux-bluetooth/msg71856.html
+>>
+>> Oh, cool. Thank you for pointing this out to me. I still
+>> believe reverting the workaround for the 0000:0000
+>> usb-id device is the right thing to do though.
+>>
+>> I've tested Frédéric Danis' series and it needed quite
+>> some work on one of my devices. I've just submitted
+>> a 9 patch series to add all the features the platform
+>> code paths of hci_bcm.c have and which were missing from
+>> the serdev code paths.
+> 
+> can you send a revert patch with a proper commit message explaining why we are reverting it and then I take it in with your other patch series.
 
-Thanks
-Best wishes
-Yunhan
+Hmm, I thought I had already send that? But I cannot find it
+in the archives, so it looks like I prepared it but never
+send it...
 
-On Wed, Oct 4, 2017 at 7:55 AM, Yunhan Wang <yunhanw@google.com> wrote:
-> Hi, Luiz
->
-> On Wed, Oct 4, 2017 at 4:19 AM, Luiz Augusto von Dentz
-> <luiz.dentz@gmail.com> wrote:
->> Hi Yunhan,
->>
->> On Tue, Oct 3, 2017 at 9:35 PM, Yunhan Wang <yunhanw@google.com> wrote:
->>> When using AcquireNotify with indication, the proxy needs to be filled in
->>> send_notification_to_devices so as to get indication confirmation in
->>> applciation.
->>> ---
->>>  src/gatt-database.c | 2 +-
->>>  1 file changed, 1 insertion(+), 1 deletion(-)
->>>
->>> diff --git a/src/gatt-database.c b/src/gatt-database.c
->>> index 0c84b2569..47304704a 100644
->>> --- a/src/gatt-database.c
->>> +++ b/src/gatt-database.c
->>> @@ -1831,7 +1831,7 @@ static bool pipe_io_read(struct io *io, void *user_data)
->>>                                 buf, bytes_read,
->>>                                 gatt_db_attribute_get_handle(chrc->ccc),
->>>                                 chrc->props & BT_GATT_CHRC_PROP_INDICATE,
->>> -                               NULL);
->>> +                               chrc->proxy);
->>>
->>>         return true;
->>>  }
->>> --
->>> 2.14.2.822.g60be5d43e6-goog
->>
->> Im not sure this the correct fix, the reason why the proxy is NULL is
->> because the fd is being used for io, though the confirmation has no
->> effect on the flow control Id expect some inband signalling in this
->> case but that might actually require something like a socketpair in
->> order to be able to write confirmation back.
->>
-> I think pipe_io_read should be pretty similar to property_changed_cb
-> in https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/src/gatt-database.c#n2103,
-> both are used to handle the written value from application. Therefore,
-> send_notification_to_devices should be fine here with proxy. For
-> "socketpair", I guess you concern is Confirm? If Confirm is defined in
-> application, then confirmation should be able to be sent back to
-> application. If Confirm is not defined, it should be also fine in
-> https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/src/gatt-database.c#n883.
->> --
->> Luiz Augusto von Dentz
->
-> Thanks
-> Best wishes
-> Yunhan
+I've send it out now, it would be nice to get the revert
+into 4.14 so that we don't end up with one kernel release
+where we do support the 0000:0000 usb-id.
+
+Regards,
+
+Hans
