@@ -1,114 +1,80 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <caa787c0-e9f7-a917-fec9-0edb4e8fa1ec@jp.fujitsu.com>
-References: <caa787c0-e9f7-a917-fec9-0edb4e8fa1ec@jp.fujitsu.com>
+In-Reply-To: <CALvjcs9o63HGYCORmNtPaLuxWR2jAw1vndgUZL5jiGs5v4jp2w@mail.gmail.com>
+References: <20171003183507.37885-1-yunhanw@google.com> <CABBYNZLBLNkyEgimzmB52Uq_SZKVeiHhUJJkR+0b56OtD2Sjvg@mail.gmail.com>
+ <CALvjcs-EbVqERVoOaHgHXaLKGFY_4P6nY5ZTJ=+Af2+ug21tzQ@mail.gmail.com> <CALvjcs9o63HGYCORmNtPaLuxWR2jAw1vndgUZL5jiGs5v4jp2w@mail.gmail.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 5 Oct 2017 16:41:58 +0300
-Message-ID: <CABBYNZ+ZgiPcNNnDjm2ApjonageM7iKjHhcpwC4tjuJp1jyu3Q@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v2 1/2] monitor: Fix buffer overflow with unix socket
-To: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
+Date: Thu, 5 Oct 2017 16:41:10 +0300
+Message-ID: <CABBYNZ+s75ZqgazcLEBfojX0NLuFUp1Bq-tqa4XgQCNiUfy4KQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] gatt: Fix sending indications with proxy
+To: Yunhan Wang <yunhanw@google.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Eramoto,
+Hi Yunhan,
 
-On Wed, Oct 4, 2017 at 9:23 AM, ERAMOTO Masaya
-<eramoto.masaya@jp.fujitsu.com> wrote:
-> If btmon uses a unix socket, which has a long pathname, then the
-> buffer overflow occurs as below:
+On Thu, Oct 5, 2017 at 11:21 AM, Yunhan Wang <yunhanw@google.com> wrote:
+> Hi, Luiz
 >
->  *** strcpy_chk: buffer overflow detected ***: program terminated
->     at 0x4C3085C: ??? (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
->     by 0x4C34E46: __strcpy_chk (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
->     by 0x4084FE: strcpy (string3.h:110)
->     by 0x4084FE: control_server (control.c:1148)
->     by 0x4029E9: main (main.c:144)
+> With this change, all are working fine via using AcquireWrite and
+> AcquireNotify now in my end. I have not yet see any issue so far. Any
+> other concern or better idea?
 >
-> This patch also gives an error and stops running when parsing command-line
-> arguments if the unix socket pathname is too long. And this patch adds the
-> redundant check in control_server() to prevent the regression when reusing
-> in the future.
-> ---
-> Changes in v2:
->  - split v1 patch into this patch for btmon and another patch for btproxy.
->  - move the check of pathname length before unlink()
->  - fail in control_server() if pathname length is too long.
->  - fix error message.
+> Thanks
+> Best wishes
+> Yunhan
 >
->  monitor/control.c | 9 ++++++++-
->  monitor/main.c    | 6 ++++++
->  2 files changed, 14 insertions(+), 1 deletion(-)
->
-> diff --git a/monitor/control.c b/monitor/control.c
-> index 9bbdc37..1cd79ca 100644
-> --- a/monitor/control.c
-> +++ b/monitor/control.c
-> @@ -1130,11 +1130,18 @@ static int server_fd = -1;
->  void control_server(const char *path)
->  {
->         struct sockaddr_un addr;
-> +       size_t len;
->         int fd;
->
->         if (server_fd >= 0)
->                 return;
->
-> +       len = strlen(path);
-> +       if (len > sizeof(addr.sun_path) - 1) {
-> +               fprintf(stderr, "Socket name too long\n");
-> +               return;
-> +       }
-> +
->         unlink(path);
->
->         fd = socket(PF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0);
-> @@ -1145,7 +1152,7 @@ void control_server(const char *path)
->
->         memset(&addr, 0, sizeof(addr));
->         addr.sun_family = AF_UNIX;
-> -       strcpy(addr.sun_path, path);
-> +       strncpy(addr.sun_path, path, len);
->
->         if (bind(fd, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
->                 perror("Failed to bind server socket");
-> diff --git a/monitor/main.c b/monitor/main.c
-> index b4e9a6a..3e61a46 100644
-> --- a/monitor/main.c
-> +++ b/monitor/main.c
-> @@ -31,6 +31,7 @@
->  #include <stdlib.h>
->  #include <string.h>
->  #include <getopt.h>
-> +#include <sys/un.h>
->
->  #include "src/shared/mainloop.h"
->  #include "src/shared/tty.h"
-> @@ -114,6 +115,7 @@ int main(int argc, char *argv[])
->
->         for (;;) {
->                 int opt;
-> +               struct sockaddr_un addr;
->
->                 opt = getopt_long(argc, argv, "d:r:w:a:s:p:i:tTSAE:vh",
->                                                 main_options, NULL);
-> @@ -141,6 +143,10 @@ int main(int argc, char *argv[])
->                         analyze_path = optarg;
->                         break;
->                 case 's':
-> +                       if (strlen(optarg) > sizeof(addr.sun_path) - 1) {
-> +                               fprintf(stderr, "Socket name too long\n");
-> +                               return EXIT_FAILURE;
-> +                       }
->                         control_server(optarg);
->                         break;
->                 case 'p':
-> --
-> 2.7.4
+> On Wed, Oct 4, 2017 at 7:55 AM, Yunhan Wang <yunhanw@google.com> wrote:
+>> Hi, Luiz
+>>
+>> On Wed, Oct 4, 2017 at 4:19 AM, Luiz Augusto von Dentz
+>> <luiz.dentz@gmail.com> wrote:
+>>> Hi Yunhan,
+>>>
+>>> On Tue, Oct 3, 2017 at 9:35 PM, Yunhan Wang <yunhanw@google.com> wrote:
+>>>> When using AcquireNotify with indication, the proxy needs to be filled in
+>>>> send_notification_to_devices so as to get indication confirmation in
+>>>> applciation.
+>>>> ---
+>>>>  src/gatt-database.c | 2 +-
+>>>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>>>
+>>>> diff --git a/src/gatt-database.c b/src/gatt-database.c
+>>>> index 0c84b2569..47304704a 100644
+>>>> --- a/src/gatt-database.c
+>>>> +++ b/src/gatt-database.c
+>>>> @@ -1831,7 +1831,7 @@ static bool pipe_io_read(struct io *io, void *user_data)
+>>>>                                 buf, bytes_read,
+>>>>                                 gatt_db_attribute_get_handle(chrc->ccc),
+>>>>                                 chrc->props & BT_GATT_CHRC_PROP_INDICATE,
+>>>> -                               NULL);
+>>>> +                               chrc->proxy);
+>>>>
+>>>>         return true;
+>>>>  }
+>>>> --
+>>>> 2.14.2.822.g60be5d43e6-goog
+>>>
+>>> Im not sure this the correct fix, the reason why the proxy is NULL is
+>>> because the fd is being used for io, though the confirmation has no
+>>> effect on the flow control Id expect some inband signalling in this
+>>> case but that might actually require something like a socketpair in
+>>> order to be able to write confirmation back.
+>>>
+>> I think pipe_io_read should be pretty similar to property_changed_cb
+>> in https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/src/gatt-database.c#n2103,
+>> both are used to handle the written value from application. Therefore,
+>> send_notification_to_devices should be fine here with proxy. For
+>> "socketpair", I guess you concern is Confirm? If Confirm is defined in
+>> application, then confirmation should be able to be sent back to
+>> application. If Confirm is not defined, it should be also fine in
+>> https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/src/gatt-database.c#n883.
+>>> --
+>>> Luiz Augusto von Dentz
 
 Applied, thanks.
-
 
 -- 
 Luiz Augusto von Dentz
