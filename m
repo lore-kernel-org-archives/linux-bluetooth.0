@@ -1,54 +1,76 @@
-Return-Path: <luiz.dentz@gmail.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <6905BCAA-E12E-4650-8D4B-823B0A63659E@holtmann.org>
-References: <20171003122556.18437-1-luiz.dentz@gmail.com> <6905BCAA-E12E-4650-8D4B-823B0A63659E@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 5 Oct 2017 12:34:48 +0300
-Message-ID: <CABBYNZJvTBUJ3GSs2KdFtK5uNY8wriq1xQrOW0PiwfzYVxnARQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] gatt: Remove support of ATT over BR/EDR
-To: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <CALvjcs-EbVqERVoOaHgHXaLKGFY_4P6nY5ZTJ=+Af2+ug21tzQ@mail.gmail.com>
+References: <20171003183507.37885-1-yunhanw@google.com> <CABBYNZLBLNkyEgimzmB52Uq_SZKVeiHhUJJkR+0b56OtD2Sjvg@mail.gmail.com>
+ <CALvjcs-EbVqERVoOaHgHXaLKGFY_4P6nY5ZTJ=+Af2+ug21tzQ@mail.gmail.com>
+From: Yunhan Wang <yunhanw@google.com>
+Date: Thu, 5 Oct 2017 01:21:40 -0700
+Message-ID: <CALvjcs9o63HGYCORmNtPaLuxWR2jAw1vndgUZL5jiGs5v4jp2w@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] gatt: Fix sending indications with proxy
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi, Luiz
 
-On Wed, Oct 4, 2017 at 10:03 PM, Marcel Holtmann <marcel@holtmann.org> wrot=
-e:
-> Hi Luiz,
+With this change, all are working fine via using AcquireWrite and
+AcquireNotify now in my end. I have not yet see any issue so far. Any
+other concern or better idea?
+
+Thanks
+Best wishes
+Yunhan
+
+On Wed, Oct 4, 2017 at 7:55 AM, Yunhan Wang <yunhanw@google.com> wrote:
+> Hi, Luiz
 >
->> ATT over BR/EDR requires bearer specific access types in order to pass
->> tests such as:
+> On Wed, Oct 4, 2017 at 4:19 AM, Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+>> Hi Yunhan,
 >>
->>  4.5.71 TP/GAR/CL/BI-34-C [Read Characteristic Value =E2=80=93 Invalid T=
-ransport
->>  Access over BR/EDR]
->>  Verify Generic Attribute Profile client behavior when an attempt to use
->>  BR/EDR transport to execute the Read Characteristic Value procedure on
->>  a characteristic contained within a service defined for use only over
->>  LE transport.
+>> On Tue, Oct 3, 2017 at 9:35 PM, Yunhan Wang <yunhanw@google.com> wrote:
+>>> When using AcquireNotify with indication, the proxy needs to be filled in
+>>> send_notification_to_devices so as to get indication confirmation in
+>>> applciation.
+>>> ---
+>>>  src/gatt-database.c | 2 +-
+>>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>>
+>>> diff --git a/src/gatt-database.c b/src/gatt-database.c
+>>> index 0c84b2569..47304704a 100644
+>>> --- a/src/gatt-database.c
+>>> +++ b/src/gatt-database.c
+>>> @@ -1831,7 +1831,7 @@ static bool pipe_io_read(struct io *io, void *user_data)
+>>>                                 buf, bytes_read,
+>>>                                 gatt_db_attribute_get_handle(chrc->ccc),
+>>>                                 chrc->props & BT_GATT_CHRC_PROP_INDICATE,
+>>> -                               NULL);
+>>> +                               chrc->proxy);
+>>>
+>>>         return true;
+>>>  }
+>>> --
+>>> 2.14.2.822.g60be5d43e6-goog
 >>
->> On top of that the CCC are considerer bearer specific so for each bearer
->> supported we would have to maintain different storages:
+>> Im not sure this the correct fix, the reason why the proxy is NULL is
+>> because the fd is being used for io, though the confirmation has no
+>> effect on the flow control Id expect some inband signalling in this
+>> case but that might actually require something like a socketpair in
+>> order to be able to write confirmation back.
 >>
->>  In the case where multiple ATT bearers from the same device are support=
-ed
->>  by the GATT server, each ATT bearer shall be considered to have a separ=
-ate
->>  GATT client instance. Therefore each GATT client shall have a separate
->>  Client Characteristic Configuration.
->> ---
->> src/gatt-database.c | 120 ----------------------------------------------=
-------
->> 1 file changed, 120 deletions(-)
+> I think pipe_io_read should be pretty similar to property_changed_cb
+> in https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/src/gatt-database.c#n2103,
+> both are used to handle the written value from application. Therefore,
+> send_notification_to_devices should be fine here with proxy. For
+> "socketpair", I guess you concern is Confirm? If Confirm is defined in
+> application, then confirmation should be able to be sent back to
+> application. If Confirm is not defined, it should be also fine in
+> https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/src/gatt-database.c#n883.
+>> --
+>> Luiz Augusto von Dentz
 >
-> I do not understand this patch. Why would we be removing support for GATT=
- over BR/EDR?
-
-Both the spec and the testing spec, quoted above, impose API
-requirements to add bearer detail onto the attributes themselves. In
-the other hand, this only affects 4.0 devices which were unable to
-connect LE alongside BR/EDR.
-
---=20
-Luiz Augusto von Dentz
+> Thanks
+> Best wishes
+> Yunhan
