@@ -1,27 +1,85 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Date: Fri, 6 Oct 2017 14:24:06 +0530
-Message-Id: <201710060854.v968s6kT020905@web12.vgs.ws.untd.com>
-From: "R. Rajesh Jeba Anbiah" <ng4rrjanbiah@rediffmail.com>
-To: <linux-bluetooth@vger.kernel.org>
-Subject: "hcitool lescan" can't detect BLE simulators!
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <frederic.danis.oss@gmail.com>
+Subject: Re: [PATCH 0/2] ACPI serdev support
+To: Ian W MORRISON <ianwmorrison@gmail.com>,
+ Marcel Holtmann <marcel@holtmann.org>
+Cc: Rob Herring <robh@kernel.org>, Sebastian Reichel <sre@kernel.org>,
+ Loic Poulain <loic.poulain@gmail.com>, Johan Hovold <johan@kernel.org>,
+ Lukas Wunner <lukas@wunner.de>, Hans de Goede <hdegoede@redhat.com>,
+ "bluez mailin list (linux-bluetooth@vger.kernel.org)"
+ <linux-bluetooth@vger.kernel.org>, linux-serial@vger.kernel.org,
+ linux-acpi@vger.kernel.org, Greg Kroah-Hartman <greg@kroah.com>
+References: <1507107090-15992-1-git-send-email-frederic.danis.oss@gmail.com>
+ <A58D9E0F-99FC-4C13-95E8-F60EC61C18B2@holtmann.org>
+ <25008d7b-db06-49ad-033f-63c0b72d9c34@gmail.com>
+From: =?UTF-8?Q?Fr=c3=a9d=c3=a9ric_Danis?= <frederic.danis.oss@gmail.com>
+Message-ID: <6cd58b2f-1ec8-c709-e983-98321bbfea70@gmail.com>
+Date: Fri, 6 Oct 2017 10:16:37 +0200
+MIME-Version: 1.0
+In-Reply-To: <25008d7b-db06-49ad-033f-63c0b72d9c34@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I hope, this is the right forum, if not kindly excuse and direct me to the right forum.
+Hi Ian,
 
-I have noticed that "hcitool lescan" and "sudo bluetoothctl" can't detect app simulated beacons (For example, using
-https://play.google.com/store/apps/details?id=net.alea.beaconsimulator&hl=en ). These app simulated beacons are successfully getting recognized by Android & iOS based apps.
+Le 06/10/2017 à 09:33, Ian W MORRISON a écrit :
+> On 10/6/17 2:21 AM, Marcel Holtmann wrote:
+>> Hi Fred,
+>>
+>>> Add ACPI support for serial attached devices.
+>>>
+>>> Currently, serial devices are not set as enumerated during ACPI scan for SPI
+>>> or i2c buses (but not for UART). This should also be done for UART serial
+>>> devices.
+>>> I renamed *spi_i2c_slave* to *serial_bus_slave* to reflect this.
+>>>
+>>> For hci_bcm, this needs Hans de Goede's "Bluetooth: hci_bcm: Add (runtime)pm
+>>> support to the serdev drv" patches to work.
+>>>
+>>> Tested on T100TA with Broadcom BCM2E39.
+>>>
+>>> Since RFC:
+>>>   - Add or reword commit messages
+>>>   - Rename *serial_slave* to *serial_bus_slave*
+>>>   - Add specific check for Apple in acpi_is_serial_bus_slave(), thanks to
+>>>     Lukas Wunner
+>>>   - Update comment in acpi_default_enumeration()
+>>>   - Remove patch 3 "Bluetooth: hci_bcm: Add ACPI serdev support for BCM2E39"
+>>>     in favor of patches from Hans de Goede
+>> I already applied Hans’ patch series to bluetooth-next tree. And I have no objections or comments for these changes. They should be reviewed and acked by the appropriate maintainers as well, but from my side this looks good.
+>>
+>> Acked-by: Marcel Holtmann <marcel@holtmann.org>
+>>
+>> What we should discuss on how we get them upstream since besides the Bluetooth subsystem, they cover ACPI and TTY subsystems.
+>>
+>> Regards
+>>
+>> Marcel
+>>
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>>
+> Hi Marcel,
+>
+> I've tested these two patches along with the nine patches (plus revert patch) from Hans's series but cannot get bluetooth to work on some of my devices using these two patches as is, specifically on MINIX Z83-4 based PCs.
+>
+> In order for bluetooth to function on these devices I submitted the patch 'Bluetooth: BCM: Add support for MINIX Z83-4 based devices' as they require the trigger type IRQF_TRIGGER_FALLING. With Hans's new patch series I've had to modify the patch which I've resubmitted as version 2. However when I apply the second patch from Fred's series 'ACPI / scan: Fix enumeration for special UART devices' I have found the bluetooth device (BCM2EA4) is no longer enumerated. Specifically I've found that the removal of the check 'if (ares->data.common_serial_bus.type != ACPI_RESOURCE_SERIAL_TYPE_UART)' causes this failure and if I re-add the 'if' statement then the device is loaded. However a 'btattach' is still required for functioning bluetooth.
 
-Is there any additional check done in BlueZ to skip these app simulated beacons. If so, is there anyway to disable that?
+It seems normal to me that BCM2EA4 is no more enumerated at ACPI level 
+as this is moved to serdev.
+When removing 'if (ares->data.common_serial_bus.type != 
+ACPI_RESOURCE_SERIAL_TYPE_UART)' you stop the serdev module finding the 
+Serial UART information. In this case it will not register the device 
+and it will fall back to previous behavior needing to use btattach to 
+setup Bluetooth.
 
-(I'm on Raspbian GNU/Linux 9 (stretch))
+Can you share:
+- btattach you are currently using,
+- dmesg with with dynamic debug enabled for serdev and hci_uart modules 
+during boot (with Hans's patches, your MINIX Z83-4 patches and mine 
+patches).
 
-TIA
+Regards,
 
-___________________________
-
-Date & Time: Fri Oct  6 2017, 02:24:06 PM IST
-Sent via http://GuideMe.ITgo.com/mail
-
-Use Quick Mail @ GuideMe.ITgo.com
-(It's No Signup... No Password... Mail Service!!)
+Fred
