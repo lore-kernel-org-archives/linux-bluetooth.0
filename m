@@ -1,43 +1,49 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 11.0 \(3445.1.7\))
+Subject: Re: [PATCH] Bluetooth: Convert timers to use timer_setup()
 From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Fix compiler warning with selftest duration calculation
-Date: Fri,  6 Oct 2017 20:42:45 +0200
-Message-Id: <20171006184245.5525-1-marcel@holtmann.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <20171005005429.GA23965@beast>
+Date: Fri, 6 Oct 2017 20:38:45 +0200
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        "Gustavo F. Padovan" <gustavo@padovan.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        "bluez mailin list (linux-bluetooth@vger.kernel.org)"
+        <linux-bluetooth@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>
+Message-Id: <9F279691-3402-48A2-8E5A-982E65ABCBAF@holtmann.org>
+References: <20171005005429.GA23965@beast>
+To: Kees Cook <keescook@chromium.org>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-  CC      net/bluetooth/selftest.o
-net/bluetooth/selftest.c: In function ‘bt_selftest_init’:
-net/bluetooth/selftest.c:246:3: warning: ‘duration’ may be used uninitialized in this function [-Wmaybe-uninitialized]
-   snprintf(test_ecdh_buffer, sizeof(test_ecdh_buffer),
-   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     "PASS (%llu usecs)\n", duration);
-     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-net/bluetooth/selftest.c:203:21: note: ‘duration’ was declared here
-  unsigned long long duration;
-                     ^~~~~~~~
+Hi Kees,
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
----
- net/bluetooth/selftest.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> In preparation for unconditionally passing the struct timer_list pointer to
+> all timer callbacks, switch to using the new timer_setup() and from_timer()
+> to pass the timer pointer explicitly. As already done in hci_qca, add
+> struct hci_uart pointer to priv structure.
+> 
+> Cc: Marcel Holtmann <marcel@holtmann.org>
+> Cc: Gustavo Padovan <gustavo@padovan.org>
+> Cc: Johan Hedberg <johan.hedberg@gmail.com>
+> Cc: linux-bluetooth@vger.kernel.org
+> Cc: Thomas Gleixner <tglx@linutronix.de>
+> Signed-off-by: Kees Cook <keescook@chromium.org>
+> ---
+> This requires commit 686fef928bba ("timer: Prepare to change timer
+> callback argument type") in v4.14-rc3, but should be otherwise
+> stand-alone.
+> ---
+> drivers/bluetooth/bluecard_cs.c |  7 +++----
+> drivers/bluetooth/hci_bcsp.c    | 10 ++++++----
+> drivers/bluetooth/hci_h5.c      | 10 ++++++----
+> drivers/bluetooth/hci_qca.c     | 17 ++++++++---------
+> 4 files changed, 23 insertions(+), 21 deletions(-)
 
-diff --git a/net/bluetooth/selftest.c b/net/bluetooth/selftest.c
-index 2d1519d0affa..03e3c89c3046 100644
---- a/net/bluetooth/selftest.c
-+++ b/net/bluetooth/selftest.c
-@@ -200,7 +200,7 @@ static int __init test_ecdh(void)
- {
- 	struct crypto_kpp *tfm;
- 	ktime_t calltime, delta, rettime;
--	unsigned long long duration;
-+	unsigned long long duration = 0;
- 	int err;
- 
- 	calltime = ktime_get();
--- 
-2.13.6
+patch has been applied to bluetooth-next tree.
 
+Regards
+
+Marcel
