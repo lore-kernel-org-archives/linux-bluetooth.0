@@ -1,62 +1,49 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <linux-serial-owner@vger.kernel.org>
 Content-Type: text/plain;
         charset=utf-8
 Mime-Version: 1.0 (Mac OS X Mail 11.0 \(3445.1.7\))
-Subject: Re: [PATCH v2 9/9] Bluetooth: hci_bcm: Add (runtime)pm support to the
- serdev driver
+Subject: Re: [PATCH 1/2] serdev: Add ACPI support
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <2487535c-18b4-c689-3c67-d1261b21feee@redhat.com>
-Date: Fri, 6 Oct 2017 20:33:31 +0200
-Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        =?utf-8?Q?Fr=C3=A9d=C3=A9ric_Danis?= <frederic.danis.oss@gmail.com>,
+In-Reply-To: <CAL_JsqKDzR9-ptE=SbL0LuQvTKDNT-GZ8buOvffJDyWz6fHfSA@mail.gmail.com>
+Date: Fri, 6 Oct 2017 20:32:27 +0200
+Cc: =?utf-8?Q?Fr=C3=A9d=C3=A9ric_Danis?= <frederic.danis.oss@gmail.com>,
         Sebastian Reichel <sre@kernel.org>,
-        Rob Herring <robh@kernel.org>,
-        "bluez mailin list (linux-bluetooth@vger.kernel.org)"
-        <linux-bluetooth@vger.kernel.org>, linux-serial@vger.kernel.org,
-        linux-acpi@vger.kernel.org
-Message-Id: <C847A01D-EEDF-42D3-B2B1-2FDAA3B16389@holtmann.org>
-References: <20171004184343.7855-1-hdegoede@redhat.com>
- <20171004184343.7855-9-hdegoede@redhat.com>
- <DFCF661F-6FE0-4449-A169-D71ED9282074@holtmann.org>
- <1389d64c-17aa-c6a1-d56f-6c2fe877f247@redhat.com>
- <17592E57-3A4B-4386-B809-9EA928D38FDD@holtmann.org>
- <2487535c-18b4-c689-3c67-d1261b21feee@redhat.com>
-To: Hans de Goede <hdegoede@redhat.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+        Loic Poulain <loic.poulain@gmail.com>,
+        Johan Hovold <johan@kernel.org>,
+        Lukas Wunner <lukas@wunner.de>,
+        Hans de Goede <hdegoede@redhat.com>,
+        Greg Kroah-Hartman <greg@kroah.com>,
+        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+        "linux-serial@vger.kernel.org" <linux-serial@vger.kernel.org>,
+        "linux-acpi@vger.kernel.org" <linux-acpi@vger.kernel.org>
+Message-Id: <BF8AC3FB-72FE-41C3-BE8D-27A32B84F6CB@holtmann.org>
+References: <1507107090-15992-1-git-send-email-frederic.danis.oss@gmail.com>
+ <1507107090-15992-2-git-send-email-frederic.danis.oss@gmail.com>
+ <CAL_JsqKDzR9-ptE=SbL0LuQvTKDNT-GZ8buOvffJDyWz6fHfSA@mail.gmail.com>
+To: Rob Herring <robh@kernel.org>
+Sender: linux-serial-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Hans,
+Hi Rob,
 
->>>>> Make the serdev driver use struct bcm_device as its driver data and share
->>>>> all the pm / GPIO / IRQ related code paths with the platform driver.
->>>>> 
->>>>> After this commit the 2 drivers are in essence the same and the serdev
->>>>> driver interface can be used for all ACPI enumerated HCI UARTs.
->>>>> 
->>>>> Signed-off-by: Hans de Goede <hdegoede@redhat.com>
->>>>> ---
->>>>> drivers/bluetooth/hci_bcm.c | 118 +++++++++++++++++++++++++-------------------
->>>>> 1 file changed, 68 insertions(+), 50 deletions(-)
->>>> all 9 patches have been applied to bluetooth-next tree.
->>> 
->>> Excellent, thank you!
->>> 
->>> So I guess this means we can also move forward with getting
->>> the 2 patches from Frédéric Danis merged ? There is a bit
->>> of a bisect-ability problem there, if the acpi pull-req
->>> gets merged first then uart attached bcm bt will stop
->>> working until the bluetooth subsys is also merged.
->>> 
->>> But I don't think this will impact a lot of users
->>> (also given the need for a manual btattach so far),
->>> so I don't think this is a big problem... ?
->> I wonder if we should just do this as all-in-one change for 4.15 kernel. We surely can get the ACPI changes into 4.15 and the Bluetooth changes as well. Then it should just work.
->> So I am leaning to just adding the revert patch into the bluetooth-next tree and then just add the ACPI PnP ID for the GPD device in the same pull request. And if the ACPI changes make it then nobody will know the difference that we switched from USB to UART.
+>> This patch allows SerDev module to manage serial devices declared as
+>> attached to an UART in ACPI table.
+>> 
+>> acpi_serdev_add_device() callback will only take into account entries
+>> without enumerated flag set. This flags is set for all entries during
+>> ACPI scan, except for SPI and I2C serial devices, and for UART with
+>> 2nd patch in the series.
+>> 
+>> Signed-off-by: Frédéric Danis <frederic.danis.oss@gmail.com>
+>> ---
+>> drivers/tty/serdev/core.c | 99 ++++++++++++++++++++++++++++++++++++++++++++---
+>> 1 file changed, 94 insertions(+), 5 deletions(-)
 > 
-> Yes that should work fine.
+> Reviewed-by: Rob Herring <robh@kernel.org>
 
-I think that is what I am going for. Mainly since the GPD USB hack already seems to be in 4.13 and thus a little to late to fix anyway.
+so how do we get these changes upstream? If the serdev changes alone do not cause any harm, I am almost proposing taking them through bluetooth-next tree and only leave only the ACPI change to the ACPI maintainers.
+
+Greg, any thoughts?
 
 Regards
 
