@@ -2,63 +2,53 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 11.0 \(3445.1.7\))
-Subject: Re: [PATCH v2 1/2] Bluetooth: hci_bcm: Add support for MINIX Z83-4
- based devices
+Subject: Re: [PATCH] Bluetooth: hci_bcm: Correct context of IRQ polarity
+ message
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <252d14ef-693e-fd5d-d720-0eae53e2cbf2@gmail.com>
-Date: Fri, 6 Oct 2017 20:30:06 +0200
-Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+In-Reply-To: <2600bbf4-e5fb-312f-0e29-5b17746844b5@gmail.com>
+Date: Fri, 6 Oct 2017 20:26:33 +0200
+Cc: Ian W MORRISON <ianwmorrison@gmail.com>,
+        "Gustavo F. Padovan" <gustavo@padovan.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org, hdegoede@redhat.com,
-        frederic.danis.oss@gmail.com
-Message-Id: <1D920EEC-CDED-487A-94E4-F31EA5C6C551@holtmann.org>
-References: <252d14ef-693e-fd5d-d720-0eae53e2cbf2@gmail.com>
-To: Ian W MORRISON <ianwmorrison@gmail.com>
+        "bluez mailin list (linux-bluetooth@vger.kernel.org)"
+        <linux-bluetooth@vger.kernel.org>, hdegoede@redhat.com
+Message-Id: <FDC710E6-4D82-487C-98AE-230DFD1F4032@holtmann.org>
+References: <d9ad3bdc-2f94-b3b1-1ec1-786999c1e529@gmail.com>
+ <2600bbf4-e5fb-312f-0e29-5b17746844b5@gmail.com>
+To: =?utf-8?Q?Fr=C3=A9d=C3=A9ric_Danis?= <frederic.danis.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ian,
+Hi Fred,
 
-> The MINIX NEO Z83-4 and MINIX NEO Z83-4 Pro devices use an AP6255 chip
-> for wifi and bluetooth. Bluetooth requires an ACPI device id of BCM2EA4
-> with BCM4345 rev C0 firmware.
+>> As the overwriting of IRQ polarity to active low occurs during the driver
+>> probe using 'bt_dev_warn' to display the warning results in '(null)'
+>> being displayed for the device. This patch uses the underlying 'BT_INFO'
+>> to directly display the warning instead.
+>> 
+>> Signed-off-by: ianwmorrison <ianwmorrison@gmail.com>
+>> ---
+>>  drivers/bluetooth/hci_bcm.c | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>> 
+>> diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
+>> index 77326eeb6146..17c036599407 100644
+>> --- a/drivers/bluetooth/hci_bcm.c
+>> +++ b/drivers/bluetooth/hci_bcm.c
+>> @@ -839,7 +839,7 @@ static int bcm_acpi_probe(struct bcm_device *dev)
+>>    	dmi_id = dmi_first_match(bcm_active_low_irq_dmi_table);
+>>  	if (dmi_id) {
+>> -		bt_dev_warn(dev, "%s: Overwriting IRQ polarity to active low",
+>> +		BT_INFO("%s: Overwriting IRQ polarity to active low",
+>>  			    dmi_id->ident);
+>>  		dev->irq_active_low = true;
+>>  	}
 > 
-> This patch adds the device id and to use trigger type IRQF_TRIGGER_FALLING.
-> 
-> Signed-off-by: ianwmorrison <ianwmorrison@gmail.com>
-> 
-> ---
-> drivers/bluetooth/hci_bcm.c | 8 ++++++++
-> 1 file changed, 8 insertions(+)
-> 
-> diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
-> index ab1455e63b92..77326eeb6146 100644
-> --- a/drivers/bluetooth/hci_bcm.c
-> +++ b/drivers/bluetooth/hci_bcm.c
-> @@ -726,6 +726,13 @@ static const struct dmi_system_id bcm_active_low_irq_dmi_table[] = {
-> 			DMI_EXACT_MATCH(DMI_PRODUCT_VERSION, "ThinkPad 8"),
-> 		},
-> 	},
-> +	{
-> +		.ident = "MINIX Z83-4",
-> +		.matches = {
-> +			DMI_EXACT_MATCH(DMI_SYS_VENDOR, "MINIX"),
-> +			DMI_MATCH(DMI_PRODUCT_NAME, "Z83-4"),
-> +		},
-> +	},
-> 	{ }
-> };
-> 
-> @@ -934,6 +941,7 @@ static const struct acpi_device_id bcm_acpi_match[] = {
-> 	{ "BCM2E7C", (kernel_ulong_t)&acpi_bcm_int_last_gpios },
-> 	{ "BCM2E95", (kernel_ulong_t)&acpi_bcm_int_first_gpios },
-> 	{ "BCM2E96", (kernel_ulong_t)&acpi_bcm_int_first_gpios },
-> +	{ "BCM2EA4", (kernel_ulong_t)&acpi_bcm_int_first_gpios },
-> 	{ },
-> };
-> MODULE_DEVICE_TABLE(acpi, bcm_acpi_match);
+> We can also set the device name before calling bcm_acpi_probe(), i.e. moving "dev->name = dev_name(dev->dev);" from bcm_get_resources() to bcm_probe() and bcm_serdev_probe().
 
-can you actually add an extract of the ACPI table where the IRQ polarity is described wrongly. I like to have that in the commit message so that this becomes some sort of record.
+frankly I have no idea on how this works at all. We are using bt_dev_warn on a bcm_device struct. It is meant to be used on a hci_dev struct. So by pure luck bcm_device->name actually exists.
+
+This should have been a dev_warn(dev->dev, ..) call actually.
 
 Regards
 
