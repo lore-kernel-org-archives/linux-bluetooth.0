@@ -1,49 +1,64 @@
-Return-Path: <linux-serial-owner@vger.kernel.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 Content-Type: text/plain;
-        charset=utf-8
+        charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 11.0 \(3445.1.7\))
-Subject: Re: [PATCH 1/2] serdev: Add ACPI support
+Subject: Re: [PATCH v2 1/2] Bluetooth: hci_bcm: Add support for MINIX Z83-4
+ based devices
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CAL_JsqKDzR9-ptE=SbL0LuQvTKDNT-GZ8buOvffJDyWz6fHfSA@mail.gmail.com>
-Date: Fri, 6 Oct 2017 20:32:27 +0200
-Cc: =?utf-8?Q?Fr=C3=A9d=C3=A9ric_Danis?= <frederic.danis.oss@gmail.com>,
-        Sebastian Reichel <sre@kernel.org>,
-        Loic Poulain <loic.poulain@gmail.com>,
-        Johan Hovold <johan@kernel.org>,
-        Lukas Wunner <lukas@wunner.de>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Greg Kroah-Hartman <greg@kroah.com>,
-        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-        "linux-serial@vger.kernel.org" <linux-serial@vger.kernel.org>,
-        "linux-acpi@vger.kernel.org" <linux-acpi@vger.kernel.org>
-Message-Id: <BF8AC3FB-72FE-41C3-BE8D-27A32B84F6CB@holtmann.org>
-References: <1507107090-15992-1-git-send-email-frederic.danis.oss@gmail.com>
- <1507107090-15992-2-git-send-email-frederic.danis.oss@gmail.com>
- <CAL_JsqKDzR9-ptE=SbL0LuQvTKDNT-GZ8buOvffJDyWz6fHfSA@mail.gmail.com>
-To: Rob Herring <robh@kernel.org>
-Sender: linux-serial-owner@vger.kernel.org
+In-Reply-To: <252d14ef-693e-fd5d-d720-0eae53e2cbf2@gmail.com>
+Date: Fri, 6 Oct 2017 20:30:06 +0200
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-bluetooth@vger.kernel.org, hdegoede@redhat.com,
+        frederic.danis.oss@gmail.com
+Message-Id: <1D920EEC-CDED-487A-94E4-F31EA5C6C551@holtmann.org>
+References: <252d14ef-693e-fd5d-d720-0eae53e2cbf2@gmail.com>
+To: Ian W MORRISON <ianwmorrison@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Rob,
+Hi Ian,
 
->> This patch allows SerDev module to manage serial devices declared as
->> attached to an UART in ACPI table.
->> 
->> acpi_serdev_add_device() callback will only take into account entries
->> without enumerated flag set. This flags is set for all entries during
->> ACPI scan, except for SPI and I2C serial devices, and for UART with
->> 2nd patch in the series.
->> 
->> Signed-off-by: Frédéric Danis <frederic.danis.oss@gmail.com>
->> ---
->> drivers/tty/serdev/core.c | 99 ++++++++++++++++++++++++++++++++++++++++++++---
->> 1 file changed, 94 insertions(+), 5 deletions(-)
+> The MINIX NEO Z83-4 and MINIX NEO Z83-4 Pro devices use an AP6255 chip
+> for wifi and bluetooth. Bluetooth requires an ACPI device id of BCM2EA4
+> with BCM4345 rev C0 firmware.
 > 
-> Reviewed-by: Rob Herring <robh@kernel.org>
+> This patch adds the device id and to use trigger type IRQF_TRIGGER_FALLING.
+> 
+> Signed-off-by: ianwmorrison <ianwmorrison@gmail.com>
+> 
+> ---
+> drivers/bluetooth/hci_bcm.c | 8 ++++++++
+> 1 file changed, 8 insertions(+)
+> 
+> diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
+> index ab1455e63b92..77326eeb6146 100644
+> --- a/drivers/bluetooth/hci_bcm.c
+> +++ b/drivers/bluetooth/hci_bcm.c
+> @@ -726,6 +726,13 @@ static const struct dmi_system_id bcm_active_low_irq_dmi_table[] = {
+> 			DMI_EXACT_MATCH(DMI_PRODUCT_VERSION, "ThinkPad 8"),
+> 		},
+> 	},
+> +	{
+> +		.ident = "MINIX Z83-4",
+> +		.matches = {
+> +			DMI_EXACT_MATCH(DMI_SYS_VENDOR, "MINIX"),
+> +			DMI_MATCH(DMI_PRODUCT_NAME, "Z83-4"),
+> +		},
+> +	},
+> 	{ }
+> };
+> 
+> @@ -934,6 +941,7 @@ static const struct acpi_device_id bcm_acpi_match[] = {
+> 	{ "BCM2E7C", (kernel_ulong_t)&acpi_bcm_int_last_gpios },
+> 	{ "BCM2E95", (kernel_ulong_t)&acpi_bcm_int_first_gpios },
+> 	{ "BCM2E96", (kernel_ulong_t)&acpi_bcm_int_first_gpios },
+> +	{ "BCM2EA4", (kernel_ulong_t)&acpi_bcm_int_first_gpios },
+> 	{ },
+> };
+> MODULE_DEVICE_TABLE(acpi, bcm_acpi_match);
 
-so how do we get these changes upstream? If the serdev changes alone do not cause any harm, I am almost proposing taking them through bluetooth-next tree and only leave only the ACPI change to the ACPI maintainers.
-
-Greg, any thoughts?
+can you actually add an extract of the ACPI table where the IRQ polarity is described wrongly. I like to have that in the commit message so that this becomes some sort of record.
 
 Regards
 
