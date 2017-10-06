@@ -1,50 +1,43 @@
-Return-Path: <rjwysocki@gmail.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Fix compiler warning with selftest duration calculation
+Date: Fri,  6 Oct 2017 20:42:45 +0200
+Message-Id: <20171006184245.5525-1-marcel@holtmann.org>
 MIME-Version: 1.0
-Sender: rjwysocki@gmail.com
-In-Reply-To: <BF8AC3FB-72FE-41C3-BE8D-27A32B84F6CB@holtmann.org>
-References: <1507107090-15992-1-git-send-email-frederic.danis.oss@gmail.com>
- <1507107090-15992-2-git-send-email-frederic.danis.oss@gmail.com>
- <CAL_JsqKDzR9-ptE=SbL0LuQvTKDNT-GZ8buOvffJDyWz6fHfSA@mail.gmail.com> <BF8AC3FB-72FE-41C3-BE8D-27A32B84F6CB@holtmann.org>
-From: "Rafael J. Wysocki" <rafael@kernel.org>
-Date: Sat, 7 Oct 2017 02:03:25 +0200
-Message-ID: <CAJZ5v0gLhnisMn9o00ndnB6fjHt5V7KCy_57UScF=ZfZVF=dxA@mail.gmail.com>
-Subject: Re: [PATCH 1/2] serdev: Add ACPI support
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Rob Herring <robh@kernel.org>, =?UTF-8?B?RnLDqWTDqXJpYyBEYW5pcw==?= <frederic.danis.oss@gmail.com>,
-	Sebastian Reichel <sre@kernel.org>, Loic Poulain <loic.poulain@gmail.com>, Johan Hovold <johan@kernel.org>,
-	Lukas Wunner <lukas@wunner.de>, Hans de Goede <hdegoede@redhat.com>,
-	Greg Kroah-Hartman <greg@kroah.com>,
-	"open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-	"linux-serial@vger.kernel.org" <linux-serial@vger.kernel.org>,
-	"linux-acpi@vger.kernel.org" <linux-acpi@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, Oct 6, 2017 at 8:32 PM, Marcel Holtmann <marcel@holtmann.org> wrote=
-:
-> Hi Rob,
->
->>> This patch allows SerDev module to manage serial devices declared as
->>> attached to an UART in ACPI table.
->>>
->>> acpi_serdev_add_device() callback will only take into account entries
->>> without enumerated flag set. This flags is set for all entries during
->>> ACPI scan, except for SPI and I2C serial devices, and for UART with
->>> 2nd patch in the series.
->>>
->>> Signed-off-by: Fr=C3=A9d=C3=A9ric Danis <frederic.danis.oss@gmail.com>
->>> ---
->>> drivers/tty/serdev/core.c | 99 ++++++++++++++++++++++++++++++++++++++++=
-++++---
->>> 1 file changed, 94 insertions(+), 5 deletions(-)
->>
->> Reviewed-by: Rob Herring <robh@kernel.org>
->
-> so how do we get these changes upstream? If the serdev changes alone do n=
-ot cause any harm, I am almost proposing taking them through bluetooth-next=
- tree and only leave only the ACPI change to the ACPI maintainers.
+  CC      net/bluetooth/selftest.o
+net/bluetooth/selftest.c: In function ‘bt_selftest_init’:
+net/bluetooth/selftest.c:246:3: warning: ‘duration’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+   snprintf(test_ecdh_buffer, sizeof(test_ecdh_buffer),
+   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     "PASS (%llu usecs)\n", duration);
+     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+net/bluetooth/selftest.c:203:21: note: ‘duration’ was declared here
+  unsigned long long duration;
+                     ^~~~~~~~
 
-That would be fine by me.  I can take the serdev patch too, though.
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ net/bluetooth/selftest.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Thanks,
-Rafael
+diff --git a/net/bluetooth/selftest.c b/net/bluetooth/selftest.c
+index 2d1519d0affa..03e3c89c3046 100644
+--- a/net/bluetooth/selftest.c
++++ b/net/bluetooth/selftest.c
+@@ -200,7 +200,7 @@ static int __init test_ecdh(void)
+ {
+ 	struct crypto_kpp *tfm;
+ 	ktime_t calltime, delta, rettime;
+-	unsigned long long duration;
++	unsigned long long duration = 0;
+ 	int err;
+ 
+ 	calltime = ktime_get();
+-- 
+2.13.6
+
