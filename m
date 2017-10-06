@@ -1,46 +1,38 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <kai.heng.feng@canonical.com>
 MIME-Version: 1.0
-In-Reply-To: <20171005131109.13999-1-luiz.dentz@gmail.com>
-References: <20171005131109.13999-1-luiz.dentz@gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Fri, 6 Oct 2017 09:44:43 +0300
-Message-ID: <CABBYNZ+xHeN8+ndSXa9CA_DS3NDNnAVNMfWOd06_XJ4v2YKtUg@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] obex: Fix always searching UUID using 128 bit format
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <20171004002038.GC5659@wotan.suse.de>
+References: <E31F8274-519A-4ED7-90C0-2BB71C9CC3ED@holtmann.org>
+ <20170911134647.GA3980@kroah.com> <20170911171138.GA16216@wotan.suse.de>
+ <20170911192955.GB23729@kroah.com> <20170911200651.GB16216@wotan.suse.de>
+ <09F52990-796D-4F19-957B-EEFCA6ADC160@holtmann.org> <20170912162729.GC16216@wotan.suse.de>
+ <3A938253-4CB7-4D24-82B1-6A2E3B794077@holtmann.org> <20170913173957.GM16216@wotan.suse.de>
+ <CAAd53p4NEL0XvYjPagYuTjHCJyW5jz20cLsf0GU91KvRax17oQ@mail.gmail.com> <20171004002038.GC5659@wotan.suse.de>
+From: Kai-Heng Feng <kai.heng.feng@canonical.com>
+Date: Fri, 6 Oct 2017 12:42:34 +0800
+Message-ID: <CAAd53p6aqQPtHGrY9bspNYNh5dBfc8MF-5H38tt+dR1LGAropg@mail.gmail.com>
+Subject: Re: btusb "firmware request while host is not available" at resume
+To: "Luis R. Rodriguez" <mcgrof@kernel.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Linus Torvalds <torvalds@linux-foundation.org>, Gabriel C <nix.or.die@gmail.com>,
+	Tejun Heo <tj@kernel.org>, "Gustavo F. Padovan" <gustavo@padovan.org>,
+	Sukumar Ghorai <sukumar.ghorai@intel.com>, "Rafael J. Wysocki" <rjw@rjwysocki.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	"bluez mailin list (linux-bluetooth@vger.kernel.org)" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Luis,
 
-On Thu, Oct 5, 2017 at 4:11 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> When discovering the SDP records the code should attempt to use
-> 16 bit format whenever possible.
-> ---
->  obexd/client/bluetooth.c | 2 ++
->  1 file changed, 2 insertions(+)
->
-> diff --git a/obexd/client/bluetooth.c b/obexd/client/bluetooth.c
-> index e35124a0c..0c043e0ac 100644
-> --- a/obexd/client/bluetooth.c
-> +++ b/obexd/client/bluetooth.c
-> @@ -306,6 +306,8 @@ static gboolean service_callback(GIOChannel *io, GIOCondition cond,
->         if (bt_string2uuid(&uuid, session->service) < 0)
->                 goto failed;
->
-> +       sdp_uuid128_to_uuid(&uuid);
-> +
->         search = sdp_list_append(NULL, &uuid);
->         attrid = sdp_list_append(NULL, &range);
->
-> --
-> 2.13.6
->
+On Wed, Oct 4, 2017 at 8:20 AM, Luis R. Rodriguez <mcgrof@kernel.org> wrote:
+> So please retest now that the revert happened: commit
+> f007cad159e99fa2acd3b2e9364fbb32ad28b971 ("Revert "firmware: add sanity check
+> on shutdown/suspend").
 
-Applied.
+I can confirm the issue is gone after the commit.
+Also, thanks for your detailed explanation.
 
--- 
-Luiz Augusto von Dentz
+
+Kai-Heng
+
+>
+>   Luis
