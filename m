@@ -1,66 +1,76 @@
 Return-Path: <ianwmorrison@gmail.com>
-Subject: [RESEND PATCH] Bluetooth: BCM: Add support for MINIX Z83-4 based
- devices
-References: <22c4b179-d181-bfc3-8da3-ccba215abbf7@gmail.com>
-To: marcel@holtmann.org, gustavo@padovan.org, johan.hedberg@gmail.com,
- linux-bluetooth@vger.kernel.org
-Cc: hdegoede@redhat.com, frederic.danis.oss@gmail.com, greg@kroah.com
+Subject: Re: [PATCH 0/2] ACPI serdev support
+To: Marcel Holtmann <marcel@holtmann.org>,
+ =?UTF-8?Q?Fr=c3=a9d=c3=a9ric_Danis?= <frederic.danis.oss@gmail.com>
+Cc: Rob Herring <robh@kernel.org>, Sebastian Reichel <sre@kernel.org>,
+ Loic Poulain <loic.poulain@gmail.com>, Johan Hovold <johan@kernel.org>,
+ Lukas Wunner <lukas@wunner.de>, Hans de Goede <hdegoede@redhat.com>,
+ "bluez mailin list (linux-bluetooth@vger.kernel.org)"
+ <linux-bluetooth@vger.kernel.org>, linux-serial@vger.kernel.org,
+ linux-acpi@vger.kernel.org, Greg Kroah-Hartman <greg@kroah.com>
+References: <1507107090-15992-1-git-send-email-frederic.danis.oss@gmail.com>
+ <A58D9E0F-99FC-4C13-95E8-F60EC61C18B2@holtmann.org>
 From: Ian W MORRISON <ianwmorrison@gmail.com>
-Message-ID: <9e4fb525-49fd-d118-d9d7-9bd08ece87d4@gmail.com>
-Date: Fri, 6 Oct 2017 18:33:56 +1100
+Message-ID: <25008d7b-db06-49ad-033f-63c0b72d9c34@gmail.com>
+Date: Fri, 6 Oct 2017 18:33:42 +1100
 MIME-Version: 1.0
-In-Reply-To: <22c4b179-d181-bfc3-8da3-ccba215abbf7@gmail.com>
+In-Reply-To: <A58D9E0F-99FC-4C13-95E8-F60EC61C18B2@holtmann.org>
 Content-Type: text/plain; charset=utf-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The MINIX NEO Z83-4 and MINIX NEO Z83-4 Pro devices use an AP6255 chip
-for wifi and bluetooth. Bluetooth requires an ACPI device id of BCM2EA4
-with BCM4345 rev C0 firmware.
+On 10/6/17 2:21 AM, Marcel Holtmann wrote:
+> Hi Fred,
+> 
+>> Add ACPI support for serial attached devices.
+>>
+>> Currently, serial devices are not set as enumerated during ACPI scan for SPI
+>> or i2c buses (but not for UART). This should also be done for UART serial
+>> devices.
+>> I renamed *spi_i2c_slave* to *serial_bus_slave* to reflect this.
+>>
+>> For hci_bcm, this needs Hans de Goede's "Bluetooth: hci_bcm: Add (runtime)pm
+>> support to the serdev drv" patches to work.
+>>
+>> Tested on T100TA with Broadcom BCM2E39.
+>>
+>> Since RFC:
+>>  - Add or reword commit messages
+>>  - Rename *serial_slave* to *serial_bus_slave*
+>>  - Add specific check for Apple in acpi_is_serial_bus_slave(), thanks to
+>>    Lukas Wunner
+>>  - Update comment in acpi_default_enumeration()
+>>  - Remove patch 3 "Bluetooth: hci_bcm: Add ACPI serdev support for BCM2E39"
+>>    in favor of patches from Hans de Goede
+> 
+> I already applied Hans’ patch series to bluetooth-next tree. And I have no objections or comments for these changes. They should be reviewed and acked by the appropriate maintainers as well, but from my side this looks good.
+> 
+> Acked-by: Marcel Holtmann <marcel@holtmann.org>
+> 
+> What we should discuss on how we get them upstream since besides the Bluetooth subsystem, they cover ACPI and TTY subsystems.
+> 
+> Regards
+> 
+> Marcel
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> 
 
-Signed-off-by: ianwmorrison <ianwmorrison@gmail.com>
----
- drivers/bluetooth/btbcm.c   | 1 +
- drivers/bluetooth/hci_bcm.c | 9 +++++++++
- 2 files changed, 10 insertions(+)
+Hi Marcel,
 
-diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
-index cc4bdef..7de75f1 100644
---- a/drivers/bluetooth/btbcm.c
-+++ b/drivers/bluetooth/btbcm.c
-@@ -327,6 +327,7 @@ static int btbcm_read_info(struct hci_dev *hdev)
- 	{ 0x4406, "BCM4324B3"	},	/* 002.004.006 */
- 	{ 0x610c, "BCM4354"	},	/* 003.001.012 */
- 	{ 0x2209, "BCM43430A1"  },	/* 001.002.009 */
-+	{ 0x6119, "BCM4345C0"  },	/* 003.001.025 */
- 	{ }
- };
- 
-diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
-index e254011..8a97810 100644
---- a/drivers/bluetooth/hci_bcm.c
-+++ b/drivers/bluetooth/hci_bcm.c
-@@ -704,6 +704,14 @@ static int bcm_resume(struct device *dev)
- 		.driver_data = &acpi_active_low,
- 	},
- 	{
-+		.ident = "MINIX Z83-4",
-+		.matches = {
-+			DMI_EXACT_MATCH(DMI_SYS_VENDOR, "MINIX"),
-+			DMI_MATCH(DMI_PRODUCT_NAME, "Z83-4"),
-+		},
-+		.driver_data = &acpi_active_low,
-+	},
-+	{
- 		.ident = "Asus T100CHI",
- 		.matches = {
- 			DMI_EXACT_MATCH(DMI_SYS_VENDOR,
-@@ -926,6 +934,7 @@ static int bcm_remove(struct platform_device *pdev)
- 	{ "BCM2E71", (kernel_ulong_t)&acpi_bcm_int_last_gpios },
- 	{ "BCM2E7B", (kernel_ulong_t)&acpi_bcm_int_last_gpios },
- 	{ "BCM2E7C", (kernel_ulong_t)&acpi_bcm_int_last_gpios },
-+	{ "BCM2EA4", (kernel_ulong_t)&acpi_bcm_int_first_gpios },
- 	{ "BCM2E95", (kernel_ulong_t)&acpi_bcm_int_first_gpios },
- 	{ "BCM2E96", (kernel_ulong_t)&acpi_bcm_int_first_gpios },
- 	{ },
--- 
-1.9.1
+I've tested these two patches along with the nine patches (plus revert patch) from Hans's series but cannot get bluetooth to work on some of my devices using these two patches as is, specifically on MINIX Z83-4 based PCs. 
+
+In order for bluetooth to function on these devices I submitted the patch 'Bluetooth: BCM: Add support for MINIX Z83-4 based devices' as they require the trigger type IRQF_TRIGGER_FALLING. With Hans's new patch series I've had to modify the patch which I've resubmitted as version 2. However when I apply the second patch from Fred's series 'ACPI / scan: Fix enumeration for special UART devices' I have found the bluetooth device (BCM2EA4) is no longer enumerated. Specifically I've found that the removal of the check 'if (ares->data.common_serial_bus.type != ACPI_RESOURCE_SERIAL_TYPE_UART)' causes this failure and if I re-add the 'if' statement then the device is loaded. However a 'btattach' is still required for functioning bluetooth.
+
+In terms on applying the patches I have some questions. 
+
+Like Hans I too would like one of my patches to be applied to v4.14. A lot of people have been waiting to get bluetooth working on the MINIX Z83-4 family of devices so is it possible to get my original (resend) patch for bluetooth on MINIX Z83-4 based devices applied to v4.14? If so and assuming the nine patches from Hans go into v4.15 I can then send an additional patch to extend his second patch (Bluetooth: hci_bcm: Fix setting of irq trigger type) to delete the extra line '.driver_data = &acpi_active_low,'. 
+
+If the original (resend) version of my patch for MINIX Z83-4 cannot be applied to v4.14 then I would like to request that my second version of my patch for MINIX Z83-4 based devices be applied to bluetooth-next tree so that they are included in v4.15.
+
+Finally I would like to request some help in addressing the issue caused by Fred's 'Fix enumeration for special UART devices' patch so as to prevent a regression.
+
+Regards,
+Ian
