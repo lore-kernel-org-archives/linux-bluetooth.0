@@ -3,35 +3,37 @@ To: marcel@holtmann.org, gustavo@padovan.org, johan.hedberg@gmail.com,
  linux-bluetooth@vger.kernel.org
 Cc: hdegoede@redhat.com, frederic.danis.oss@gmail.com
 From: Ian W MORRISON <ianwmorrison@gmail.com>
-Subject: [PATCH] Bluetooth: hci_bcm: Correct context of IRQ polarity message
-Message-ID: <d9ad3bdc-2f94-b3b1-1ec1-786999c1e529@gmail.com>
-Date: Fri, 6 Oct 2017 18:34:30 +1100
+Subject: [PATCH v2 2/2] Bluetooth: btbcm: Add support for MINIX Z83-4 based
+ devices
+Message-ID: <a94aa782-fcc7-d0b4-683b-2df4319bc2b5@gmail.com>
+Date: Fri, 6 Oct 2017 18:34:18 +1100
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-As the overwriting of IRQ polarity to active low occurs during the driver
-probe using 'bt_dev_warn' to display the warning results in '(null)' 
-being displayed for the device. This patch uses the underlying 'BT_INFO'
-to directly display the warning instead.
+The MINIX NEO Z83-4 and MINIX NEO Z83-4 Pro devices use an AP6255 chip
+for wifi and bluetooth. Bluetooth requires an ACPI device id of BCM2EA4
+with BCM4345 rev C0 firmware.
+
+This patch defines the firmware subversion.
 
 Signed-off-by: ianwmorrison <ianwmorrison@gmail.com>
----
- drivers/bluetooth/hci_bcm.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
-index 77326eeb6146..17c036599407 100644
---- a/drivers/bluetooth/hci_bcm.c
-+++ b/drivers/bluetooth/hci_bcm.c
-@@ -839,7 +839,7 @@ static int bcm_acpi_probe(struct bcm_device *dev)
+---
+ drivers/bluetooth/btbcm.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
+index cc4bdefa6648..06e8bed4f5eb 100644
+--- a/drivers/bluetooth/btbcm.c
++++ b/drivers/bluetooth/btbcm.c
+@@ -327,6 +327,7 @@ static const struct {
+ 	{ 0x4406, "BCM4324B3"	},	/* 002.004.006 */
+ 	{ 0x610c, "BCM4354"	},	/* 003.001.012 */
+ 	{ 0x2209, "BCM43430A1"  },	/* 001.002.009 */
++	{ 0x6119, "BCM4345C0"	},	/* 003.001.025 */
+ 	{ }
+ };
  
- 	dmi_id = dmi_first_match(bcm_active_low_irq_dmi_table);
- 	if (dmi_id) {
--		bt_dev_warn(dev, "%s: Overwriting IRQ polarity to active low",
-+		BT_INFO("%s: Overwriting IRQ polarity to active low",
- 			    dmi_id->ident);
- 		dev->irq_active_low = true;
- 	}
 -- 
 2.11.0
