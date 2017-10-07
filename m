@@ -1,72 +1,93 @@
-Return-Path: <jhovold@gmail.com>
-Sender: Johan Hovold <jhovold@gmail.com>
-Date: Sat, 7 Oct 2017 16:26:31 +0200
-From: Johan Hovold <johan@kernel.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Hans de Goede <hdegoede@redhat.com>,
-	"Gustavo F. Padovan" <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	=?iso-8859-1?Q?Fr=E9d=E9ric?= Danis <frederic.danis.oss@gmail.com>,
-	Sebastian Reichel <sre@kernel.org>, Rob Herring <robh@kernel.org>,
-	"bluez mailin list (linux-bluetooth@vger.kernel.org)" <linux-bluetooth@vger.kernel.org>,
-	linux-serial@vger.kernel.org, linux-acpi@vger.kernel.org
-Subject: Re: [PATCH v2 9/9] Bluetooth: hci_bcm: Add (runtime)pm support to
- the serdev driver
-Message-ID: <20171007142631.GF2618@localhost>
-References: <20171004184343.7855-1-hdegoede@redhat.com>
- <20171004184343.7855-9-hdegoede@redhat.com>
- <DFCF661F-6FE0-4449-A169-D71ED9282074@holtmann.org>
- <1389d64c-17aa-c6a1-d56f-6c2fe877f247@redhat.com>
- <17592E57-3A4B-4386-B809-9EA928D38FDD@holtmann.org>
+Return-Path: <ianwmorrison@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <17592E57-3A4B-4386-B809-9EA928D38FDD@holtmann.org>
+In-Reply-To: <D567DA4A-4443-4A88-B078-50EE458C822A@holtmann.org>
+References: <a4051ac2-1156-751d-ec16-2dbbb30b9258@gmail.com> <D567DA4A-4443-4A88-B078-50EE458C822A@holtmann.org>
+From: Ian W MORRISON <ianwmorrison@gmail.com>
+Date: Sat, 7 Oct 2017 23:06:44 +1100
+Message-ID: <CAFXWsS-VsQvpat=fGbYeR3_STFJ=pTjDr9oUFaS3oHtMPoK8Hw@mail.gmail.com>
+Subject: Re: [PATCH] serdev: Update drivers/tty/serdev/Kconfig for ACPI support
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>, Johan Hedberg <johan.hedberg@gmail.com>,
+	"bluez mailin list (linux-bluetooth@vger.kernel.org)" <linux-bluetooth@vger.kernel.org>, Hans de Goede <hdegoede@redhat.com>,
+	=?UTF-8?B?RnLDqWTDqXJpYyBEYW5pcw==?= <frederic.danis.oss@gmail.com>,
+	Rob Herring <robh@kernel.org>, Sebastian Reichel <sre@kernel.org>, Loic Poulain <loic.poulain@gmail.com>,
+	Johan Hovold <johan@kernel.org>, Lukas Wunner <lukas@wunner.de>, linux-serial@vger.kernel.org,
+	linux-acpi@vger.kernel.org, Greg Kroah-Hartman <greg@kroah.com>,
+	"Rafael J. Wysocki" <rafael@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, Oct 05, 2017 at 05:15:05PM +0200, Marcel Holtmann wrote:
-> Hi Hans,
-> 
-> >>> Make the serdev driver use struct bcm_device as its driver data and share
-> >>> all the pm / GPIO / IRQ related code paths with the platform driver.
-> >>> 
-> >>> After this commit the 2 drivers are in essence the same and the serdev
-> >>> driver interface can be used for all ACPI enumerated HCI UARTs.
-> >>> 
-> >>> Signed-off-by: Hans de Goede <hdegoede@redhat.com>
-> >>> ---
-> >>> drivers/bluetooth/hci_bcm.c | 118 +++++++++++++++++++++++++-------------------
-> >>> 1 file changed, 68 insertions(+), 50 deletions(-)
-> >> all 9 patches have been applied to bluetooth-next tree.
-> > 
-> > Excellent, thank you!
+On 7 October 2017 at 17:42, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Ian,
+>
+>> The current Kconfig for serdev is not compatible when adding ACPI suppor=
+t as it does not work when built as a module as it requires config SERIAL_D=
+EV_CTRL_TTYPORT to be set. This patch makes serdev compiled into the kernel=
+ if selected so that config SERIAL_DEV_CTRL_TTYPORT can be correctly set if=
+ requiring ACPI support.
+>> ---
+>> drivers/tty/serdev/Kconfig | 5 +++--
+>> 1 file changed, 3 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/drivers/tty/serdev/Kconfig b/drivers/tty/serdev/Kconfig
+>> index cdc6b820cf93..a9fb09a9c105 100644
+>> --- a/drivers/tty/serdev/Kconfig
+>> +++ b/drivers/tty/serdev/Kconfig
+>> @@ -2,7 +2,8 @@
+>> # Serial bus device driver configuration
+>> #
+>> menuconfig SERIAL_DEV_BUS
+>> -     tristate "Serial device bus"
+>> +     bool "Serial device bus"
+>> +     default y
+>>       help
+>>         Core support for devices connected via a serial port.
+>>
+>> @@ -11,6 +12,6 @@ if SERIAL_DEV_BUS
+>> config SERIAL_DEV_CTRL_TTYPORT
+>>       bool "Serial device TTY port controller"
+>>       depends on TTY
+>> -     depends on SERIAL_DEV_BUS !=3D m
+>> +     default y
+>
+> actually we made hci_nokia.c be buildable as separate module. We might ne=
+ed to do the same for hci_bcm.c to avoid forcing SERIAL_DEV_BUS into a bool=
+. Or you need to explain the reason behind this change a bit better.
+>
+> Regards
+>
+> Marcel
+>
 
-Nice work here, Hans, allowing serdev to coexist with the
-platform-device hacks until the transition is complete and those hacks
-can finally be removed.
+Hi Marcel,
 
-> > So I guess this means we can also move forward with getting
-> > the 2 patches from Frédéric Danis merged ? There is a bit
-> > of a bisect-ability problem there, if the acpi pull-req
-> > gets merged first then uart attached bcm bt will stop
-> > working until the bluetooth subsys is also merged.
-> > 
-> > But I don't think this will impact a lot of users
-> > (also given the need for a manual btattach so far),
-> > so I don't think this is a big problem... ?
-> 
-> I wonder if we should just do this as all-in-one change for 4.15
-> kernel. We surely can get the ACPI changes into 4.15 and the Bluetooth
-> changes as well. Then it should just work.
+For serdev to support for devices connected via a serial port such as
+a tty (for example an ACPI enumerated BT driver) its code hooks into
+TTY code meaning serdev can no longer be compiled as a module for this
+functionality to work. With CONFIG_SERIAL_DEV_BUS originally being
+defined as a tristate a provision was made when compiling serdev as a
+module to return ENODEV when trying to register a tty port. This
+provision still exists with CONFIG_SERIAL_DEV_BUS defined as a bool
+because CONFIG_SERIAL_DEV_CTRL_TTYPORT actually controls this.
 
-However, there are of course a couple of caveats. Once Frederic's ACPI
-patches land, there will be no more platform child devices. Unless
-serdev support is then compiled in, this means that PM will break
-(silently). And if serdev is enabled, of course the tty class device is
-gone and hciattach (btattach) will fail, but I guess everyone is aware
-of that issue by now.
+My patch also aligns CONFIG_SERIAL_DEV_BUS (serdev) which provides
+"Core serial port support" to CONFIG_SERIAL_NONSTANDARD or
+"Non-standard serial port support" as this seems logical comparison.
+CONFIG_SERIAL_NONSTANDARD is a bool similar to how I've made
+CONFIG_SERIAL_DEV_BUS a bool.
 
-Should BT_HCIUART_BCM start depending on SERIAL_DEV_CTRL_TTYPORT (when
-ACPI is enabled) to avoid such silent breakage once ACPI-support is
-merged?
+Whilst it may be preferable to make hci_bcm.c buildable as separate
+module like hci_nokia.c I don't relate the 'modularity' of bluetooth
+drivers with the 'modularity' of a serial device bus as I see the
+latter more similar to PCI support or ACPI support.
 
-Johan
+Because of the link and/or cross-over between serial port support and
+tty support I believe serdev should be built-in rather than
+modularized if and when it is required.
+
+If this better explains the reason for the patch I can resubmit with
+an updated changelog together with a signoff which I accidentally
+during editing.
+
+Regards,
+Ian
