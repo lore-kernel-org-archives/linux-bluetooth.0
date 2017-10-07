@@ -1,36 +1,29 @@
-Return-Path: <johan.hedberg@gmail.com>
-Date: Sat, 7 Oct 2017 09:45:04 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Fix compiler warning with selftest duration
- calculation
-Message-ID: <20171007064504.GA11714@x1c.home>
-References: <20171006184245.5525-1-marcel@holtmann.org>
+Return-Path: <gregkh@linuxfoundation.org>
+Date: Sat, 7 Oct 2017 08:42:56 +0200
+From: Greg KH <greg@kroah.com>
+To: =?iso-8859-1?Q?Fr=E9d=E9ric?= Danis <frederic.danis.oss@gmail.com>
+Cc: robh@kernel.org, marcel@holtmann.org, sre@kernel.org,
+	loic.poulain@gmail.com, johan@kernel.org, lukas@wunner.de,
+	hdegoede@redhat.com, linux-bluetooth@vger.kernel.org,
+	linux-serial@vger.kernel.org, linux-acpi@vger.kernel.org
+Subject: Re: [PATCH 1/2] serdev: Add ACPI support
+Message-ID: <20171007064256.GA19701@kroah.com>
+References: <1507107090-15992-1-git-send-email-frederic.danis.oss@gmail.com>
+ <1507107090-15992-2-git-send-email-frederic.danis.oss@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <20171006184245.5525-1-marcel@holtmann.org>
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <1507107090-15992-2-git-send-email-frederic.danis.oss@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
-
-On Fri, Oct 06, 2017, Marcel Holtmann wrote:
->   CC      net/bluetooth/selftest.o
-> net/bluetooth/selftest.c: In function â€˜bt_selftest_initâ€™:
-> net/bluetooth/selftest.c:246:3: warning: â€˜durationâ€™ may be used uninitialized in this function [-Wmaybe-uninitialized]
->    snprintf(test_ecdh_buffer, sizeof(test_ecdh_buffer),
->    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->      "PASS (%llu usecs)\n", duration);
->      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> net/bluetooth/selftest.c:203:21: note: â€˜durationâ€™ was declared here
->   unsigned long long duration;
->                      ^~~~~~~~
+On Wed, Oct 04, 2017 at 10:51:29AM +0200, Frédéric Danis wrote:
+> This patch allows SerDev module to manage serial devices declared as
+> attached to an UART in ACPI table.
 > 
-> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-> ---
->  net/bluetooth/selftest.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> acpi_serdev_add_device() callback will only take into account entries
+> without enumerated flag set. This flags is set for all entries during
+> ACPI scan, except for SPI and I2C serial devices, and for UART with
+> 2nd patch in the series.
+> 
+> Signed-off-by: Frédéric Danis <frederic.danis.oss@gmail.com>
 
-Applied to bluetooth-next. Thanks.
-
-Johan
+Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
