@@ -1,48 +1,50 @@
 Return-Path: <ianwmorrison@gmail.com>
-To: marcel@holtmann.org, gustavo@padovan.org, johan.hedberg@gmail.com,
+Subject: Re: [PATCH] Bluetooth: hci_bcm: Correct context of IRQ polarity
+ message
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: =?UTF-8?Q?Fr=c3=a9d=c3=a9ric_Danis?= <frederic.danis.oss@gmail.com>,
+ "Gustavo F. Padovan" <gustavo@padovan.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>,
  "bluez mailin list (linux-bluetooth@vger.kernel.org)"
- <linux-bluetooth@vger.kernel.org>
-Cc: Hans de Goede <hdegoede@redhat.com>,
- =?UTF-8?Q?Fr=c3=a9d=c3=a9ric_Danis?= <frederic.danis.oss@gmail.com>,
- Rob Herring <robh@kernel.org>, Sebastian Reichel <sre@kernel.org>,
- Loic Poulain <loic.poulain@gmail.com>, Johan Hovold <johan@kernel.org>,
- Lukas Wunner <lukas@wunner.de>, linux-serial@vger.kernel.org,
- linux-acpi@vger.kernel.org, Greg Kroah-Hartman <greg@kroah.com>,
- "Rafael J. Wysocki" <rafael@kernel.org>
+ <linux-bluetooth@vger.kernel.org>, hdegoede@redhat.com
+References: <d9ad3bdc-2f94-b3b1-1ec1-786999c1e529@gmail.com>
+ <2600bbf4-e5fb-312f-0e29-5b17746844b5@gmail.com>
+ <FDC710E6-4D82-487C-98AE-230DFD1F4032@holtmann.org>
 From: Ian W MORRISON <ianwmorrison@gmail.com>
-Subject: [PATCH] serdev: Update drivers/tty/serdev/Kconfig for ACPI support
-Message-ID: <a4051ac2-1156-751d-ec16-2dbbb30b9258@gmail.com>
-Date: Sat, 7 Oct 2017 17:16:31 +1100
+Message-ID: <e042f9f1-87c9-944c-3a79-f14b69347823@gmail.com>
+Date: Sat, 7 Oct 2017 17:16:15 +1100
 MIME-Version: 1.0
+In-Reply-To: <FDC710E6-4D82-487C-98AE-230DFD1F4032@holtmann.org>
 Content-Type: text/plain; charset=utf-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The current Kconfig for serdev is not compatible when adding ACPI support as it does not work when built as a module as it requires config SERIAL_DEV_CTRL_TTYPORT to be set. This patch makes serdev compiled into the kernel if selected so that config SERIAL_DEV_CTRL_TTYPORT can be correctly set if requiring ACPI support.
----
- drivers/tty/serdev/Kconfig | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+On 10/7/17 5:26 AM, Marcel Holtmann wrote:
+<snip>
+> 
+> This should have been a dev_warn(dev->dev, ..) call actually.
+> 
+> Regards
+> 
+> Marcel
+> 
 
-diff --git a/drivers/tty/serdev/Kconfig b/drivers/tty/serdev/Kconfig
-index cdc6b820cf93..a9fb09a9c105 100644
---- a/drivers/tty/serdev/Kconfig
-+++ b/drivers/tty/serdev/Kconfig
-@@ -2,7 +2,8 @@
- # Serial bus device driver configuration
- #
- menuconfig SERIAL_DEV_BUS
--	tristate "Serial device bus"
-+	bool "Serial device bus"
-+	default y
- 	help
- 	  Core support for devices connected via a serial port.
- 
-@@ -11,6 +12,6 @@ if SERIAL_DEV_BUS
- config SERIAL_DEV_CTRL_TTYPORT
- 	bool "Serial device TTY port controller"
- 	depends on TTY
--	depends on SERIAL_DEV_BUS != m
-+	default y
- 
- endif
--- 
-2.11.0
+Hi Marcel,
+
+I've changed the call to 'dev_warn' and issued as a revised patch.
+
+Testing shows the following improvements using an extract from dmesg of the affected message:
+
+Without patch:
+[    5.512175] Bluetooth: (null): MINIX Z83-4: Overwriting IRQ polarity to active low
+
+v1 (superseded) patch:
+[    5.592238] Bluetooth: MINIX Z83-4: Overwriting IRQ polarity to active low
+
+v2 patch (with a kernel excluding serdev ACPI support patches):
+[    6.112265] hci_bcm BCM2EA4:00: MINIX Z83-4: Overwriting IRQ polarity to active low
+
+v2 patch (with a kernel including serdev ACPI support patches):
+[    6.367829] hci_uart_bcm serial1-0: MINIX Z83-4: Overwriting IRQ polarity to active low
+
+Regards,
+Ian
