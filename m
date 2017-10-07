@@ -1,29 +1,62 @@
-Return-Path: <gregkh@linuxfoundation.org>
-Date: Sat, 7 Oct 2017 08:42:56 +0200
-From: Greg KH <greg@kroah.com>
-To: =?iso-8859-1?Q?Fr=E9d=E9ric?= Danis <frederic.danis.oss@gmail.com>
-Cc: robh@kernel.org, marcel@holtmann.org, sre@kernel.org,
-	loic.poulain@gmail.com, johan@kernel.org, lukas@wunner.de,
-	hdegoede@redhat.com, linux-bluetooth@vger.kernel.org,
-	linux-serial@vger.kernel.org, linux-acpi@vger.kernel.org
-Subject: Re: [PATCH 1/2] serdev: Add ACPI support
-Message-ID: <20171007064256.GA19701@kroah.com>
-References: <1507107090-15992-1-git-send-email-frederic.danis.oss@gmail.com>
- <1507107090-15992-2-git-send-email-frederic.danis.oss@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <1507107090-15992-2-git-send-email-frederic.danis.oss@gmail.com>
+Return-Path: <linux-serial-owner@vger.kernel.org>
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 11.0 \(3445.1.7\))
+Subject: Re: [PATCH] serdev: Update drivers/tty/serdev/Kconfig for ACPI
+ support
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <a4051ac2-1156-751d-ec16-2dbbb30b9258@gmail.com>
+Date: Sat, 7 Oct 2017 08:42:41 +0200
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        "bluez mailin list (linux-bluetooth@vger.kernel.org)"
+        <linux-bluetooth@vger.kernel.org>,
+        Hans de Goede <hdegoede@redhat.com>,
+        =?utf-8?Q?Fr=C3=A9d=C3=A9ric_Danis?= <frederic.danis.oss@gmail.com>,
+        Rob Herring <robh@kernel.org>,
+        Sebastian Reichel <sre@kernel.org>,
+        Loic Poulain <loic.poulain@gmail.com>,
+        Johan Hovold <johan@kernel.org>,
+        Lukas Wunner <lukas@wunner.de>, linux-serial@vger.kernel.org,
+        linux-acpi@vger.kernel.org, Greg Kroah-Hartman <greg@kroah.com>,
+        "Rafael J. Wysocki" <rafael@kernel.org>
+Message-Id: <D567DA4A-4443-4A88-B078-50EE458C822A@holtmann.org>
+References: <a4051ac2-1156-751d-ec16-2dbbb30b9258@gmail.com>
+To: Ian W MORRISON <ianwmorrison@gmail.com>
+Sender: linux-serial-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, Oct 04, 2017 at 10:51:29AM +0200, Frédéric Danis wrote:
-> This patch allows SerDev module to manage serial devices declared as
-> attached to an UART in ACPI table.
-> 
-> acpi_serdev_add_device() callback will only take into account entries
-> without enumerated flag set. This flags is set for all entries during
-> ACPI scan, except for SPI and I2C serial devices, and for UART with
-> 2nd patch in the series.
-> 
-> Signed-off-by: Frédéric Danis <frederic.danis.oss@gmail.com>
+Hi Ian,
 
-Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> The current Kconfig for serdev is not compatible when adding ACPI support as it does not work when built as a module as it requires config SERIAL_DEV_CTRL_TTYPORT to be set. This patch makes serdev compiled into the kernel if selected so that config SERIAL_DEV_CTRL_TTYPORT can be correctly set if requiring ACPI support.
+> ---
+> drivers/tty/serdev/Kconfig | 5 +++--
+> 1 file changed, 3 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/tty/serdev/Kconfig b/drivers/tty/serdev/Kconfig
+> index cdc6b820cf93..a9fb09a9c105 100644
+> --- a/drivers/tty/serdev/Kconfig
+> +++ b/drivers/tty/serdev/Kconfig
+> @@ -2,7 +2,8 @@
+> # Serial bus device driver configuration
+> #
+> menuconfig SERIAL_DEV_BUS
+> -	tristate "Serial device bus"
+> +	bool "Serial device bus"
+> +	default y
+> 	help
+> 	  Core support for devices connected via a serial port.
+> 
+> @@ -11,6 +12,6 @@ if SERIAL_DEV_BUS
+> config SERIAL_DEV_CTRL_TTYPORT
+> 	bool "Serial device TTY port controller"
+> 	depends on TTY
+> -	depends on SERIAL_DEV_BUS != m
+> +	default y
+
+actually we made hci_nokia.c be buildable as separate module. We might need to do the same for hci_bcm.c to avoid forcing SERIAL_DEV_BUS into a bool. Or you need to explain the reason behind this change a bit better.
+
+Regards
+
+Marcel
+
