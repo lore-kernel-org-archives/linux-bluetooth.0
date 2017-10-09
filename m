@@ -1,99 +1,49 @@
-Return-Path: <linux-serial-owner@vger.kernel.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 Content-Type: text/plain;
-        charset=utf-8
+        charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 11.0 \(3445.1.7\))
-Subject: Re: [PATCH 2/2] ACPI / scan: Fix enumeration for special UART devices
+Subject: Re: [PATCH v2] Bluetooth: hci_bcm: Correct context of IRQ polarity
+ message
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20171009090835.GQ2618@localhost>
-Date: Mon, 9 Oct 2017 20:09:19 +0200
-Cc: Sebastian Reichel <sebastian.reichel@collabora.co.uk>,
-        =?utf-8?Q?Fr=C3=A9d=C3=A9ric_Danis?= <frederic.danis.oss@gmail.com>,
-        robh@kernel.org, loic.poulain@gmail.com, lukas@wunner.de,
-        hdegoede@redhat.com, linux-bluetooth@vger.kernel.org,
-        linux-serial@vger.kernel.org, linux-acpi@vger.kernel.org
-Message-Id: <E19C0643-85AA-4E80-BCDC-0C01EC0F88C2@holtmann.org>
-References: <1507107090-15992-1-git-send-email-frederic.danis.oss@gmail.com>
- <1507107090-15992-3-git-send-email-frederic.danis.oss@gmail.com>
- <20171007151934.GJ2618@localhost> <20171007225311.lvli7rkhv3bebq2j@earth>
- <20171009073526.GL2618@localhost> <20171009085534.c5smytfgckyx7mqy@earth>
- <20171009090835.GQ2618@localhost>
-To: Johan Hovold <johan@kernel.org>
-Sender: linux-serial-owner@vger.kernel.org
+In-Reply-To: <b54325b3-280f-4fc0-b340-8e4b850af603@gmail.com>
+Date: Mon, 9 Oct 2017 20:04:41 +0200
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        "bluez mailin list (linux-bluetooth@vger.kernel.org)"
+        <linux-bluetooth@vger.kernel.org>, hdegoede@redhat.com,
+        frederic.danis.oss@gmail.com
+Message-Id: <556FED38-85C3-4972-9400-509A26A9D566@holtmann.org>
+References: <b54325b3-280f-4fc0-b340-8e4b850af603@gmail.com>
+To: Ian W MORRISON <ianwmorrison@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Ian,
 
->>>>>> UART devices is expected to be enumerated by SerDev subsystem.
->>>>>> 
->>>>>> During ACPI scan, serial devices behind SPI, I2C or UART buses are not
->>>>>> enumerated, allowing them to be enumerated by their respective parents.
->>>>>> 
->>>>>> Rename *spi_i2c_slave* to *serial_bus_slave* as this will be used for serial
->>>>>> devices on serial buses (SPI, I2C or UART).
->>>>>> 
->>>>>> On Macs an empty ResourceTemplate is returned for uart slaves.
->>>>>> Instead the device properties "baud", "parity", "dataBits", "stopBits" are
->>>>>> provided. Add a check for "baud" in acpi_is_serial_bus_slave().
->>>>>> 
->>>>>> Signed-off-by: Frédéric Danis <frederic.danis.oss@gmail.com>
->>>>> 
->>>>> So just to reiterate what I just mentioned in a comment to one of Hans's
->>>>> hci_bcm patches:
->>>>> 
->>>>> This one would silently break PM for such devices on any system which
->>>>> does not have serdev enabled (as the corresponding platform devices
->>>>> would no longer be registered). And with serdev enabled, hciattach
->>>>> (btattach) would start failing as the tty device would no longer be
->>>>> registered (but I assume everyone is aware of that, and fine with it, by
->>>>> now).
->>>>> 
->>>>> Perhaps the hci_bcm driver should start depending on
->>>>> SERIAL_DEV_CTRL_TTYPORT when ACPI is enabled?
->>>> 
->>>> ACPI and DT both need SERIAL_DEV_CTRL_TTYPORT to work properly,
->>>> since SERIAL_DEV_CTRL_TTYPORT is the only controller implemented
->>>> for serdev. If any other controller is implemented that one could
->>>> also be used.
->>> 
->>> Not for hci_bcm, right? This particular driver specifically depends on
->>> SERIAL_DEV_CTRL_TTYPORT for the ACPI devices and not just any (future)
->>> serdev controller (or currently working systems soon breaks silently).
->>> 
->>> I don't think the same is true for the DT case where we do not already
->>> have child nodes defined in firmware (and in fact, this driver did not
->>> really support DT before serdev).
->> 
->> The serdev ACPI support has been added to the core and not to
->> the ttyport and the hci_bcm driver only uses functions from the
->> core. As far as I can see the ACPI part would also work fine with
->> a different serdev controller.
+> As the overwriting of IRQ polarity to active low occurs during the driver probe using 'bt_dev_warn' to display the warning results in '(null)' being displayed for the device. This patch uses 'dev_warn' to correctly display the device in the warning instead.
 > 
-> Indeed, but you need SERIAL_DEV_CTRL_TTYPORT to avoid silently breaking
-> current ACPI setups which breaks when this patch is applied (as these
-> devices all hang off of common serial ports managed by serial core).
+> Signed-off-by: ianwmorrison <ianwmorrison@gmail.com>
+> ---
+> v2: Uses 'dev_warn' (Suggested-by: Marcel Holtmann <marcel@holtmann.org>)
 > 
->> Of course DT and ACPI currently require SERIAL_DEV_CTRL_TTYPORT,
->> since it's the only serdev controller implementation. Also it
->> covers most use cases. When SERIAL_DEV_BUS is selected it's
->> very likely, that you also want SERIAL_DEV_CTRL_TTYPORT.
+> Testing shows the following improvements using an extract from dmesg of the affected message:
 > 
->>>> I wonder if we should just hide SERIAL_DEV_CTRL_TTYPORT and enable
->>>> it together with SERDEV. I suspect that we won't see any other
->>>> controller (it would be a UART device, that is not registered as
->>>> tty device) in the next few years and the extra option seems to
->>>> confuse people.
->>> 
->>> I agree that it is somewhat confusing. But now that we have both,
->>> perhaps simply having SERIAL_DEV_CTRL_TTYPORT default to "y" when
->>> SERIAL_DEV_BUS is selected could be a compromise. The Kconfig entry
->>> might need to be amended as well (e.g. if only to mention that you
->>> need to select a controller as well).
->> 
->> I think we should at least add a default "y" if SERIAL_DEV_BUS.
+> Without patch:
+> [    5.512175] Bluetooth: (null): MINIX Z83-4: Overwriting IRQ polarity to active low
 > 
-> I'm preparing a patch.
+> v1 (superseded) patch:
+> [    5.592238] Bluetooth: MINIX Z83-4: Overwriting IRQ polarity to active low
+> 
+> v2 patch (with a kernel excluding serdev ACPI support patches):
+> [    6.112265] hci_bcm BCM2EA4:00: MINIX Z83-4: Overwriting IRQ polarity to active low
+> 
+> v2 patch (with a kernel including serdev ACPI support patches):
+> [    6.367829] hci_uart_bcm serial1-0: MINIX Z83-4: Overwriting IRQ polarity to active low
+> ---
+> drivers/bluetooth/hci_bcm.c | 2 +-
+> 1 file changed, 1 insertion(+), 1 deletion(-)
 
-yes, please prepare a patch since the discussion spans multiple email threads now. Lets get this back on track and find a patch that we are all happy with.
+patch has been applied to bluetooth-next tree.
 
 Regards
 
