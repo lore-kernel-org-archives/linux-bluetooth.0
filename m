@@ -1,39 +1,49 @@
 Return-Path: <ianwmorrison@gmail.com>
-Subject: Re: [PATCH v2 1/2] serdev: Update drivers/tty/serdev/Kconfig for ACPI
+Subject: [PATCH v3 2/2] serdev: Update drivers/bluetooth/Kconfig for ACPI
  serdev support
-To: Greg KH <gregkh@linuxfoundation.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Johan Hovold <johan@kernel.org>,
- "Gustavo F. Padovan" <gustavo@padovan.org>,
- Johan Hedberg <johan.hedberg@gmail.com>,
- "bluez mailin list (linux-bluetooth@vger.kernel.org)"
- <linux-bluetooth@vger.kernel.org>, hdegoede@redhat.com,
- frederic.danis.oss@gmail.com, robh@kernel.org, sre@kernel.org,
- Loic Poulain <loic.poulain@gmail.com>, lukas@wunner.de,
- linux-serial@vger.kernel.org, linux-acpi@vger.kernel.org, rafael@kernel.org
-References: <82b477ef-757a-c953-45e8-fd68b28286e5@gmail.com>
- <20171008072655.GA3444@kroah.com>
 From: Ian W MORRISON <ianwmorrison@gmail.com>
-Message-ID: <91774c4a-2735-2073-a2bb-a12114dff343@gmail.com>
-Date: Mon, 9 Oct 2017 11:43:46 +1100
+To: Marcel Holtmann <marcel@holtmann.org>, Johan Hovold <johan@kernel.org>,
+ gustavo@padovan.org, johan.hedberg@gmail.com,
+ linux-bluetooth@vger.kernel.org, Hans de Goede <hdegoede@redhat.com>,
+ frederic.danis.oss@gmail.com, robh@kernel.org, sre@kernel.org,
+ loic.poulain@gmail.com, Lukas Wunner <lukas@wunner.de>,
+ linux-serial@vger.kernel.org, linux-acpi@vger.kernel.org, rafael@kernel.org,
+ Greg Kroah-Hartman <greg@kroah.com>
+References: <dc9cecc0-d9ef-109f-5f05-cf77ab16e60e@gmail.com>
+Message-ID: <427a95f6-feda-e93e-9a0f-a05b7b339ee6@gmail.com>
+Date: Mon, 9 Oct 2017 11:43:31 +1100
 MIME-Version: 1.0
-In-Reply-To: <20171008072655.GA3444@kroah.com>
+In-Reply-To: <dc9cecc0-d9ef-109f-5f05-cf77ab16e60e@gmail.com>
 Content-Type: text/plain; charset=utf-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 10/8/17 6:26 PM, Greg KH wrote:
-<snip>
-> 
-> Please properly line-wrap your changelog comments like your editor is
-> asking you to do...
-> 
-> thanks,
-> 
-> greg k-h
-> 
+ACPI and DT both need SERIAL_DEV_CTRL_TTYPORT to work properly
+since SERIAL_DEV_CTRL_TTYPORT is the only controller implemented for
+serdev. This is only possible if serdev support is compiled in as the code
+hooks into TTY. Otherwise PM will silently break as the corresponding
+platform devices would no longer be registered and as the tty class
+device is also gone and hciattach (btattach) will also fail.
 
-Hi Greg,
+This patch set addresses this by making BT_HCIUART_BCM dependent on
+SERIAL_DEV_CTRL_TTYPORT which in turn is dependent on SERIAL_DEV_BUS
+and ensures that if SERIAL_DEV_BUS is selected is the code is build it.
 
-Sorry, I had a brain snap. I purposely removed all the hard line feeds thinking I was sending an email with auto wrap completely forgetting that I was sending a patch with a changelog. I've resent them as v3.
+Signed-off-by: Ian W MORRISON <ianwmorrison@gmail.com>
+---
+ drivers/bluetooth/Kconfig | 1 +
+ 1 file changed, 1 insertion(+)
 
-Regards,
-Ian
+diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
+index fae5a74dc737..8d432ee9f4bd 100644
+--- a/drivers/bluetooth/Kconfig
++++ b/drivers/bluetooth/Kconfig
+@@ -171,6 +171,7 @@ config BT_HCIUART_BCM
+ 	depends on BT_HCIUART_SERDEV
+ 	select BT_HCIUART_H4
+ 	select BT_BCM
++	select SERIAL_DEV_CTRL_TTYPORT
+ 	help
+ 	  The Broadcom protocol support enables Bluetooth HCI over serial
+ 	  port interface for Broadcom Bluetooth controllers.
+-- 
+2.11.0
