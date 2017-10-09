@@ -1,49 +1,65 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <linux-serial-owner@vger.kernel.org>
 Content-Type: text/plain;
-        charset=us-ascii
+        charset=utf-8
 Mime-Version: 1.0 (Mac OS X Mail 11.0 \(3445.1.7\))
-Subject: Re: [PATCH v2] Bluetooth: hci_bcm: Correct context of IRQ polarity
- message
+Subject: Re: [PATCH v2 1/9] Bluetooth: hci_uart_set_flow_control: Fix NULL
+ deref when using serdev
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <b54325b3-280f-4fc0-b340-8e4b850af603@gmail.com>
-Date: Mon, 9 Oct 2017 20:04:41 +0200
-Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+In-Reply-To: <ce49b622-212a-0e6c-2c05-9cfe3db4bd47@redhat.com>
+Date: Mon, 9 Oct 2017 20:01:53 +0200
+Cc: Johan Hovold <johan@kernel.org>,
+        "Gustavo F. Padovan" <gustavo@padovan.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
+        =?utf-8?Q?Fr=C3=A9d=C3=A9ric_Danis?= <frederic.danis.oss@gmail.com>,
+        Sebastian Reichel <sre@kernel.org>,
+        Rob Herring <robh@kernel.org>,
         "bluez mailin list (linux-bluetooth@vger.kernel.org)"
-        <linux-bluetooth@vger.kernel.org>, hdegoede@redhat.com,
-        frederic.danis.oss@gmail.com
-Message-Id: <556FED38-85C3-4972-9400-509A26A9D566@holtmann.org>
-References: <b54325b3-280f-4fc0-b340-8e4b850af603@gmail.com>
-To: Ian W MORRISON <ianwmorrison@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+        <linux-bluetooth@vger.kernel.org>, linux-serial@vger.kernel.org,
+        linux-acpi@vger.kernel.org
+Message-Id: <1C21B27B-2ADD-47E9-8E70-A33BFB0B19E4@holtmann.org>
+References: <20171004184343.7855-1-hdegoede@redhat.com>
+ <20171007143645.GG2618@localhost>
+ <ce49b622-212a-0e6c-2c05-9cfe3db4bd47@redhat.com>
+To: Hans de Goede <hdegoede@redhat.com>
+Sender: linux-serial-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ian,
+Hi Hans,
 
-> As the overwriting of IRQ polarity to active low occurs during the driver probe using 'bt_dev_warn' to display the warning results in '(null)' being displayed for the device. This patch uses 'dev_warn' to correctly display the device in the warning instead.
+>>> Fix a NULL pointer deref (hu->tty) when calling hci_uart_set_flow_control
+>>> on hci_uart-s using serdev.
+>>> 
+>>> Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+>>> ---
+>>> Changes in v2:
+>>> -Also set RTS (Suggested-by: Sebastian Reichel <sre@kernel.org>)
+>>> ---
+>>>  drivers/bluetooth/hci_ldisc.c | 7 +++++++
+>>>  1 file changed, 7 insertions(+)
+>>> 
+>>> diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
+>>> index a746627e784e..eec95019f15c 100644
+>>> --- a/drivers/bluetooth/hci_ldisc.c
+>>> +++ b/drivers/bluetooth/hci_ldisc.c
+>>> @@ -41,6 +41,7 @@
+>>>  #include <linux/ioctl.h>
+>>>  #include <linux/skbuff.h>
+>>>  #include <linux/firmware.h>
+>>> +#include <linux/serdev.h>
+>> I know this is already merged, but do we really want to add a dependency
+>> on serdev from hci_ldisc.c?
+>> There is already a helper function host_set_baudrate() in hci_bcm to
+>> handle another case like this. If more drivers will need to support
+>> both then these could be moved to a common header, but we should at
+>> least try to be consistent here.
 > 
-> Signed-off-by: ianwmorrison <ianwmorrison@gmail.com>
-> ---
-> v2: Uses 'dev_warn' (Suggested-by: Marcel Holtmann <marcel@holtmann.org>)
+> That is a valiud question, Marcel do you want me to do a follow
+> up series which:
 > 
-> Testing shows the following improvements using an extract from dmesg of the affected message:
-> 
-> Without patch:
-> [    5.512175] Bluetooth: (null): MINIX Z83-4: Overwriting IRQ polarity to active low
-> 
-> v1 (superseded) patch:
-> [    5.592238] Bluetooth: MINIX Z83-4: Overwriting IRQ polarity to active low
-> 
-> v2 patch (with a kernel excluding serdev ACPI support patches):
-> [    6.112265] hci_bcm BCM2EA4:00: MINIX Z83-4: Overwriting IRQ polarity to active low
-> 
-> v2 patch (with a kernel including serdev ACPI support patches):
-> [    6.367829] hci_uart_bcm serial1-0: MINIX Z83-4: Overwriting IRQ polarity to active low
-> ---
-> drivers/bluetooth/hci_bcm.c | 2 +-
-> 1 file changed, 1 insertion(+), 1 deletion(-)
+> 1) Reverts this commit; and
+> 2) Add a host_set_flow_control helper to hci_bcm.c ?
 
-patch has been applied to bluetooth-next tree.
+don’t bother with a revert, lets just improve this with follow up patches.
 
 Regards
 
