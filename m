@@ -1,270 +1,164 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <59DB4D93.3050200@digi.com>
-References: <59CD26BE.8040803@digi.com> <CABBYNZLFyyNQmkAk5JZGWDii_hcx0n68yr-sjeXVUAEHVcOqcw@mail.gmail.com>
- <59CDEBDF.3090200@digi.com> <59D1E4B0.2000106@digi.com> <CABBYNZKuzJ4ueWufFSEZo7zhVdL5DCF=DuUYQLY-zV0OEuFYRA@mail.gmail.com>
- <59D3343B.6020103@digi.com> <59D501B9.9030602@digi.com> <CABBYNZJUshJX5nK=bss3yJdvrREaoZ64hKt7zZJcjfB19++NBQ@mail.gmail.com>
- <59DB4D93.3050200@digi.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 9 Oct 2017 14:30:45 +0300
-Message-ID: <CABBYNZJ0+aTeFMBFVYq8p63zDAUfHcNUm9ritaUBDMmCnRaHZQ@mail.gmail.com>
+From: "Hermida, Isaac" <Isaac.Hermida@digi.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Subject: Re: how to advertise a GATT service only for LE or BR/EDR?
-To: "Hermida, Isaac" <Isaac.Hermida@digi.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Date: Mon, 9 Oct 2017 10:21:07 +0000
+Message-ID: <59DB4D93.3050200@digi.com>
+References: <59CD26BE.8040803@digi.com>
+ <CABBYNZLFyyNQmkAk5JZGWDii_hcx0n68yr-sjeXVUAEHVcOqcw@mail.gmail.com>
+ <59CDEBDF.3090200@digi.com> <59D1E4B0.2000106@digi.com>
+ <CABBYNZKuzJ4ueWufFSEZo7zhVdL5DCF=DuUYQLY-zV0OEuFYRA@mail.gmail.com>
+ <59D3343B.6020103@digi.com> <59D501B9.9030602@digi.com>
+ <CABBYNZJUshJX5nK=bss3yJdvrREaoZ64hKt7zZJcjfB19++NBQ@mail.gmail.com>
+In-Reply-To: <CABBYNZJUshJX5nK=bss3yJdvrREaoZ64hKt7zZJcjfB19++NBQ@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Isaac,
-
-On Mon, Oct 9, 2017 at 1:21 PM, Hermida, Isaac <Isaac.Hermida@digi.com> wro=
-te:
-> Hi Luiz,
->
-> On 10/05/2017 11:40 AM, Luiz Augusto von Dentz wrote:
->> Hi Isaac,
->>
->> On Wed, Oct 4, 2017 at 6:43 PM, Hermida, Isaac <Isaac.Hermida@digi.com> =
-wrote:
->>> Hi Luiz,
->>>
->>> On 10/03/2017 08:54 AM, Hermida, Isaac wrote:
->>>> Hi Luiz,
->>>>
->>>> On 10/02/2017 06:00 PM, Luiz Augusto von Dentz wrote:
->>>>> Hi Isaac,
->>>>>
->>>>> On Mon, Oct 2, 2017 at 10:03 AM, Hermida, Isaac <Isaac.Hermida@digi.c=
-om> wrote:
->>>>>> Hi Luiz et all,
->>>>>>
->>>>>> On 09/29/2017 08:44 AM, Hermida, Isaac wrote:
->>>>>>> Hi Luiz,
->>>>>>>
->>>>>>> On 09/28/2017 08:21 PM, Luiz Augusto von Dentz wrote:
->>>>>>>> Hi Isaac,
->>>>>>>>
->>>>>>>> On Thu, Sep 28, 2017 at 7:43 PM, Hermida, Isaac <Isaac.Hermida@dig=
-i.com> wrote:
->>>>>>>>> Hi group,
->>>>>>>>>
->>>>>>>>> As part of the bluetooth SIG certification there are two test cas=
-es
->>>>>>>>> /TP/GAR/CL/BI-34-C and /TP/GAR/CL/BI-35-C (you can see they defin=
-ed in
->>>>>>>>> unit/test-gatt.c).
->>>>>>>>> Currently I am able to run the "test/example-gatt-server" and see=
- my
->>>>>>>>> custom services and characteristics, but I need to define an spec=
-ific
->>>>>>>>> service/characteristic to be only accessible trough LE or BR/EDR
->>>>>>>>> transport parameter. I was digging into the code but I was unable=
- to
->>>>>>>>> find how to set it for the GATT server.
->>>>>>>>>
->>>>>>>>> In other words, what I want to do is launch the gatt-server and t=
-hen,
->>>>>>>>> when inspecting the services/characteristic with gatttool, the re=
-turned
->>>>>>>>> list should be different if I run gatttool with "-p 31" or not (n=
-otice
->>>>>>>>> how the gatttool prompt is set to LE or BR).
->>>>>>>>>
->>>>>>>>> # gatttool -I -b 00:40:9D:98:99:BD -p 0
->>>>>>>>> [00:40:9D:98:99:BD][LE]> connect
->>>>>>>>> Attempting to connect to 00:40:9D:98:99:BD
->>>>>>>>> Connection successful
->>>>>>>>> [00:40:9D:98:99:BD][LE]> primary
->>>>>>>>> attr handle: 0x0001, end grp handle: 0x0005 uuid:
->>>>>>>>> 00001800-0000-1000-8000-00805f9b34fb
->>>>>>>>> attr handle: 0x0006, end grp handle: 0x0009 uuid:
->>>>>>>>> 00001801-0000-1000-8000-00805f9b34fb
->>>>>>>>> attr handle: 0x000a, end grp handle: 0x000d uuid:
->>>>>>>>> 0000180f-0000-1000-8000-00805f9b34fb
->>>>>>>>> attr handle: 0x000e, end grp handle: 0x001d uuid:
->>>>>>>>> 12345678-1234-5678-1234-56789abcdef0
->>>>>>>>> attr handle: 0x001e, end grp handle: 0x0025 uuid:
->>>>>>>>> 0000180d-0000-1000-8000-00805f9b34fb
->>>>>>>>>
->>>>>>>>>
->>>>>>>>> # /tmp/gatttool -I -b 00:40:9D:98:99:BD -p 31
->>>>>>>>> [00:40:9D:98:99:BD][BR]> connect
->>>>>>>>> Attempting to connect to 00:40:9D:98:99:BD
->>>>>>>>> Connection successful
->>>>>>>>> [00:40:9D:98:99:BD][BR]> primary
->>>>>>>>> attr handle: 0x0001, end grp handle: 0x0005 uuid:
->>>>>>>>> 00001800-0000-1000-8000-00805f9b34fb
->>>>>>>>> attr handle: 0x0006, end grp handle: 0x0009 uuid:
->>>>>>>>> 00001801-0000-1000-8000-00805f9b34fb
->>>>>>>>> attr handle: 0x000a, end grp handle: 0x0019 uuid:
->>>>>>>>> 12345678-1234-5678-1234-56789abcdef0
->>>>>>>>> attr handle: 0x001a, end grp handle: 0x001d uuid:
->>>>>>>>> 0000180f-0000-1000-8000-00805f9b34fb
->>>>>>>>> attr handle: 0x001e, end grp handle: 0x0025 uuid:
->>>>>>>>> 0000180d-0000-1000-8000-00805f9b34fb
->>>>>>>>>
->>>>>>>>>
->>>>>>>>>
->>>>>>>>> I am using bluez 5.41. Is possible to advertise a service only fo=
-r LE or
->>>>>>>>> BR? I guess it should because is part of the SIG certification an=
-d is
->>>>>>>>> part of the unit/test-gatt.
->>>>>>>> This might be because the spec was no clear about the database bei=
-ng
->>>>>>>> bearer specific, which in my opinion this is a oversight since the=
-n we
->>>>>>>> can't represent attributes of dual mode devices with a unified obj=
-ect,
->>>>>>>> and I really wonder if this has to be forced up into the API, if i=
-t
->>>>>>>> does then we would have to encode bearer information into the obje=
-ct
->>>>>>>> path (argh!) for client and for server would probably need a prope=
-rty
->>>>>>>> telling which bearer this would be available and encode this into =
-to
->>>>>>>> the database which may leave gaps in the handles or just duplicate
->>>>>>>> everything, for server Id probably just hide the services based on=
- the
->>>>>>>> bearer, but we still need to store the CCC configuration in a bear=
-er
->>>>>>>> specific manner.
->>>>>>>>
->>>>>>>
->>>>>>> So, what can I do in order to pass that specific bluetooth SIG test=
-s?
->>>>>>> That test cases need to ensure that an specific service/char in onl=
-y
->>>>>>> accessible on LE or BR, so they had to be different.
->>>>>>> Do you have any idea or suggestion? It would be really welcome, if =
-not I
->>>>>>> have no idea how to proceed to complete the SIG validation with blu=
-ez stuff.
->>>>>>> I was even trying to modify some files into the code, but I am not
->>>>>>> familiar with that and it obviously did not work.
->>>>>>
->>>>>> I understand the silent to this last question as a no. So I assume t=
-hat
->>>>>> any user trying to pass this test will fail (at least if using bluez=
-).
->>>>>> So should the specification be changed? Should bluez adapt to it? In=
- the
->>>>>> current state that SIG certification can not be passed.
->>>>>
->>>>> That if you want to qualify with GATT over BR/EDR, something that we
->>>>> may actually have an option to disable in the future, or perhaps just
->>>>> remove it entirely given this tests would possible affect that GATT
->>>>> database layout, either by creating handle gaps or duplication. So
->>>>> perhaps you could give some feedback if you do intend to use GATT ove=
-r
->>>>> BR/EDR or not? If it turn out no one benefit from it Id just remove
->>>>> it.
->>>>>
->>>>
->>>> Thanks for the quick reply. I do not know how any other people was abl=
-e
->>>> to pass these SIG lab tests (BI-34-C and BI-35-C).
->>>> I do not plan to use GATT over BR/EDR. For me just removing it would b=
-e
->>>> enough. If you can point me where/how to do that it would be great so =
-I
->>>> can dig in the code (I am not familiar with that code).
->>>>
->>>> Thx,
->>>>       Isaac
->>>
->>>
->>> Yesterday I did apply the patch (gatt: Remove support of ATT over
->>> BR/EDR) on bluez-5.41 (my current version) and passed it to the lab. I
->>> was waiting for their feedback but I did not get a reply yet, so just t=
-o
->>> let you know that I get the patch and applied it.
->>> As I see it, that patch removed the support for ATT over BR/EDR, so I
->>> guess that another way to pass that test is modifying the firmware of
->>> the bluetooth chip to disable it at a hw level.
->>> And, in order to pass the other test case (BI-35-C), I will need to do
->>> not apply the mentioned patch and create a similar one for ATT over LE,
->>> or is there another way to accomplish /TP/GAR/CL/BI-35-C?
->>
->> Id assume you would not have to run those tests if ATT over BR/EDR is
->> not supported:
->>
->> 4.5.72 TP/GAR/CL/BI-35-C [Read Characteristic Value \u2013 Invalid
->> Transport Access over
->> LE]
->> Verify Generic Attribute Profile client behavior when an attempt to
->> use LE transport to execute
->> the Read Characteristic Value procedure on a characteristic contained
->> within a service defined
->> for use only over BR/EDR transport.
->>
->> Without BR/EDR there is no reason to run this test as all the
->> attributes should be valid.
->>
->
->
-> Our product is dual so those tests are mandatory. Additionally, our
-> product is 4.2, no 4.0.
-> The patch you proposed (gatt: Remove support of ATT over BR/EDR) is not
-> valid and will not work (if you want I can add details to the other
-> thread) and it will break other tests needed for the certification. I
-> would suggest to reject it.
-> To put some light in tests BI-34-C and BI-35-C, it consists in define a
-> characteristic only available through the transport layer LE or BR/EDR,
-> so in one case the value can be read, and in the other case it is
-> rejected. I can add more details if needed.
-
-Im pretty sure it is possible since chrome OS has done it:
-
-https://www.bluetooth.org/tpg/QLI_viewQDL.cfm?qid=3D22333
-
-Though I can see the ATT over BR/EDR is in fact mandatory, the ICS says:
-
-C.1: Mandatory IF (SUM ICS 12/2 =E2=80=9CBluetooth Basic Rate Core Host
-Configuration=E2=80=9D OR SUM ICS 12/9
-=E2=80=9CBluetooth Basic Rate and Low Energy Combined Core Host
-Configuration=E2=80=9D) is supported,
-otherwise Excluded.
-
-> Currently the workaround that I am doing is record the type of
-> connection (LE or BR/EDR) and return the error code for one specific
-> characteristic (that I register in my gatt server application), so I
-> customize my application. The lab did not confirm/dismiss it yet, but
-> hopefully it is what they need.
-
-Afaik any service not registered over SDP should not be available over
-BR/EDR, which is perhaps why the current code only does expose GATT
-and GAP service, nothing else. Now I haven't found anything
-prohibiting GATT discovery to happen over BR/EDR, just exchange MTU,
-but the SDP service already carries the handles which I assume is what
-PTS uses given there are tests like:
-
-4.4.15 TP/GAD/SR/BV-07-C [Discover Primary Services using SDP - from Server=
-]
-
-Anyway, the end result is that we cannot completely disable ATT over
-BR/EDR, and might have to push the bearer details up to the
-application.
-
-Note that exposing the connected bearer is not enough in case a device
-connects over both bearers the application will have no means to
-distinguish in which bearer the command is coming from, this appears
-to be a problem to Android HAL as well:
-
-https://android.googlesource.com/platform/hardware/libhardware/+/master/inc=
-lude/hardware/bt_gatt_server.h#71
-
-So probably everyone is passing with a custom application which
-detects, or asks the user input, when to return an error.
-
-> Thanks for the support on this issue. Let me know if I can help in
-> anything, if I need to provide more details, if you want a reply in the
-> patch thread or any other stuff.
-> Regards,
->    Isaac
-
-
-
---=20
-Luiz Augusto von Dentz
+SGkgTHVpeiwNCg0KT24gMTAvMDUvMjAxNyAxMTo0MCBBTSwgTHVpeiBBdWd1c3RvIHZvbiBEZW50
+eiB3cm90ZToNCj4gSGkgSXNhYWMsDQo+DQo+IE9uIFdlZCwgT2N0IDQsIDIwMTcgYXQgNjo0MyBQ
+TSwgSGVybWlkYSwgSXNhYWMgPElzYWFjLkhlcm1pZGFAZGlnaS5jb20+IHdyb3RlOg0KPj4gSGkg
+THVpeiwNCj4+DQo+PiBPbiAxMC8wMy8yMDE3IDA4OjU0IEFNLCBIZXJtaWRhLCBJc2FhYyB3cm90
+ZToNCj4+PiBIaSBMdWl6LA0KPj4+DQo+Pj4gT24gMTAvMDIvMjAxNyAwNjowMCBQTSwgTHVpeiBB
+dWd1c3RvIHZvbiBEZW50eiB3cm90ZToNCj4+Pj4gSGkgSXNhYWMsDQo+Pj4+DQo+Pj4+IE9uIE1v
+biwgT2N0IDIsIDIwMTcgYXQgMTA6MDMgQU0sIEhlcm1pZGEsIElzYWFjIDxJc2FhYy5IZXJtaWRh
+QGRpZ2kuY29tPiB3cm90ZToNCj4+Pj4+IEhpIEx1aXogZXQgYWxsLA0KPj4+Pj4NCj4+Pj4+IE9u
+IDA5LzI5LzIwMTcgMDg6NDQgQU0sIEhlcm1pZGEsIElzYWFjIHdyb3RlOg0KPj4+Pj4+IEhpIEx1
+aXosDQo+Pj4+Pj4NCj4+Pj4+PiBPbiAwOS8yOC8yMDE3IDA4OjIxIFBNLCBMdWl6IEF1Z3VzdG8g
+dm9uIERlbnR6IHdyb3RlOg0KPj4+Pj4+PiBIaSBJc2FhYywNCj4+Pj4+Pj4NCj4+Pj4+Pj4gT24g
+VGh1LCBTZXAgMjgsIDIwMTcgYXQgNzo0MyBQTSwgSGVybWlkYSwgSXNhYWMgPElzYWFjLkhlcm1p
+ZGFAZGlnaS5jb20+IHdyb3RlOg0KPj4+Pj4+Pj4gSGkgZ3JvdXAsDQo+Pj4+Pj4+Pg0KPj4+Pj4+
+Pj4gQXMgcGFydCBvZiB0aGUgYmx1ZXRvb3RoIFNJRyBjZXJ0aWZpY2F0aW9uIHRoZXJlIGFyZSB0
+d28gdGVzdCBjYXNlcw0KPj4+Pj4+Pj4gL1RQL0dBUi9DTC9CSS0zNC1DIGFuZCAvVFAvR0FSL0NM
+L0JJLTM1LUMgKHlvdSBjYW4gc2VlIHRoZXkgZGVmaW5lZCBpbg0KPj4+Pj4+Pj4gdW5pdC90ZXN0
+LWdhdHQuYykuDQo+Pj4+Pj4+PiBDdXJyZW50bHkgSSBhbSBhYmxlIHRvIHJ1biB0aGUgInRlc3Qv
+ZXhhbXBsZS1nYXR0LXNlcnZlciIgYW5kIHNlZSBteQ0KPj4+Pj4+Pj4gY3VzdG9tIHNlcnZpY2Vz
+IGFuZCBjaGFyYWN0ZXJpc3RpY3MsIGJ1dCBJIG5lZWQgdG8gZGVmaW5lIGFuIHNwZWNpZmljDQo+
+Pj4+Pj4+PiBzZXJ2aWNlL2NoYXJhY3RlcmlzdGljIHRvIGJlIG9ubHkgYWNjZXNzaWJsZSB0cm91
+Z2ggTEUgb3IgQlIvRURSDQo+Pj4+Pj4+PiB0cmFuc3BvcnQgcGFyYW1ldGVyLiBJIHdhcyBkaWdn
+aW5nIGludG8gdGhlIGNvZGUgYnV0IEkgd2FzIHVuYWJsZSB0bw0KPj4+Pj4+Pj4gZmluZCBob3cg
+dG8gc2V0IGl0IGZvciB0aGUgR0FUVCBzZXJ2ZXIuDQo+Pj4+Pj4+Pg0KPj4+Pj4+Pj4gSW4gb3Ro
+ZXIgd29yZHMsIHdoYXQgSSB3YW50IHRvIGRvIGlzIGxhdW5jaCB0aGUgZ2F0dC1zZXJ2ZXIgYW5k
+IHRoZW4sDQo+Pj4+Pj4+PiB3aGVuIGluc3BlY3RpbmcgdGhlIHNlcnZpY2VzL2NoYXJhY3Rlcmlz
+dGljIHdpdGggZ2F0dHRvb2wsIHRoZSByZXR1cm5lZA0KPj4+Pj4+Pj4gbGlzdCBzaG91bGQgYmUg
+ZGlmZmVyZW50IGlmIEkgcnVuIGdhdHR0b29sIHdpdGggIi1wIDMxIiBvciBub3QgKG5vdGljZQ0K
+Pj4+Pj4+Pj4gaG93IHRoZSBnYXR0dG9vbCBwcm9tcHQgaXMgc2V0IHRvIExFIG9yIEJSKS4NCj4+
+Pj4+Pj4+DQo+Pj4+Pj4+PiAjIGdhdHR0b29sIC1JIC1iIDAwOjQwOjlEOjk4Ojk5OkJEIC1wIDAN
+Cj4+Pj4+Pj4+IFswMDo0MDo5RDo5ODo5OTpCRF1bTEVdPiBjb25uZWN0DQo+Pj4+Pj4+PiBBdHRl
+bXB0aW5nIHRvIGNvbm5lY3QgdG8gMDA6NDA6OUQ6OTg6OTk6QkQNCj4+Pj4+Pj4+IENvbm5lY3Rp
+b24gc3VjY2Vzc2Z1bA0KPj4+Pj4+Pj4gWzAwOjQwOjlEOjk4Ojk5OkJEXVtMRV0+IHByaW1hcnkN
+Cj4+Pj4+Pj4+IGF0dHIgaGFuZGxlOiAweDAwMDEsIGVuZCBncnAgaGFuZGxlOiAweDAwMDUgdXVp
+ZDoNCj4+Pj4+Pj4+IDAwMDAxODAwLTAwMDAtMTAwMC04MDAwLTAwODA1ZjliMzRmYg0KPj4+Pj4+
+Pj4gYXR0ciBoYW5kbGU6IDB4MDAwNiwgZW5kIGdycCBoYW5kbGU6IDB4MDAwOSB1dWlkOg0KPj4+
+Pj4+Pj4gMDAwMDE4MDEtMDAwMC0xMDAwLTgwMDAtMDA4MDVmOWIzNGZiDQo+Pj4+Pj4+PiBhdHRy
+IGhhbmRsZTogMHgwMDBhLCBlbmQgZ3JwIGhhbmRsZTogMHgwMDBkIHV1aWQ6DQo+Pj4+Pj4+PiAw
+MDAwMTgwZi0wMDAwLTEwMDAtODAwMC0wMDgwNWY5YjM0ZmINCj4+Pj4+Pj4+IGF0dHIgaGFuZGxl
+OiAweDAwMGUsIGVuZCBncnAgaGFuZGxlOiAweDAwMWQgdXVpZDoNCj4+Pj4+Pj4+IDEyMzQ1Njc4
+LTEyMzQtNTY3OC0xMjM0LTU2Nzg5YWJjZGVmMA0KPj4+Pj4+Pj4gYXR0ciBoYW5kbGU6IDB4MDAx
+ZSwgZW5kIGdycCBoYW5kbGU6IDB4MDAyNSB1dWlkOg0KPj4+Pj4+Pj4gMDAwMDE4MGQtMDAwMC0x
+MDAwLTgwMDAtMDA4MDVmOWIzNGZiDQo+Pj4+Pj4+Pg0KPj4+Pj4+Pj4NCj4+Pj4+Pj4+ICMgL3Rt
+cC9nYXR0dG9vbCAtSSAtYiAwMDo0MDo5RDo5ODo5OTpCRCAtcCAzMQ0KPj4+Pj4+Pj4gWzAwOjQw
+OjlEOjk4Ojk5OkJEXVtCUl0+IGNvbm5lY3QNCj4+Pj4+Pj4+IEF0dGVtcHRpbmcgdG8gY29ubmVj
+dCB0byAwMDo0MDo5RDo5ODo5OTpCRA0KPj4+Pj4+Pj4gQ29ubmVjdGlvbiBzdWNjZXNzZnVsDQo+
+Pj4+Pj4+PiBbMDA6NDA6OUQ6OTg6OTk6QkRdW0JSXT4gcHJpbWFyeQ0KPj4+Pj4+Pj4gYXR0ciBo
+YW5kbGU6IDB4MDAwMSwgZW5kIGdycCBoYW5kbGU6IDB4MDAwNSB1dWlkOg0KPj4+Pj4+Pj4gMDAw
+MDE4MDAtMDAwMC0xMDAwLTgwMDAtMDA4MDVmOWIzNGZiDQo+Pj4+Pj4+PiBhdHRyIGhhbmRsZTog
+MHgwMDA2LCBlbmQgZ3JwIGhhbmRsZTogMHgwMDA5IHV1aWQ6DQo+Pj4+Pj4+PiAwMDAwMTgwMS0w
+MDAwLTEwMDAtODAwMC0wMDgwNWY5YjM0ZmINCj4+Pj4+Pj4+IGF0dHIgaGFuZGxlOiAweDAwMGEs
+IGVuZCBncnAgaGFuZGxlOiAweDAwMTkgdXVpZDoNCj4+Pj4+Pj4+IDEyMzQ1Njc4LTEyMzQtNTY3
+OC0xMjM0LTU2Nzg5YWJjZGVmMA0KPj4+Pj4+Pj4gYXR0ciBoYW5kbGU6IDB4MDAxYSwgZW5kIGdy
+cCBoYW5kbGU6IDB4MDAxZCB1dWlkOg0KPj4+Pj4+Pj4gMDAwMDE4MGYtMDAwMC0xMDAwLTgwMDAt
+MDA4MDVmOWIzNGZiDQo+Pj4+Pj4+PiBhdHRyIGhhbmRsZTogMHgwMDFlLCBlbmQgZ3JwIGhhbmRs
+ZTogMHgwMDI1IHV1aWQ6DQo+Pj4+Pj4+PiAwMDAwMTgwZC0wMDAwLTEwMDAtODAwMC0wMDgwNWY5
+YjM0ZmINCj4+Pj4+Pj4+DQo+Pj4+Pj4+Pg0KPj4+Pj4+Pj4NCj4+Pj4+Pj4+IEkgYW0gdXNpbmcg
+Ymx1ZXogNS40MS4gSXMgcG9zc2libGUgdG8gYWR2ZXJ0aXNlIGEgc2VydmljZSBvbmx5IGZvciBM
+RSBvcg0KPj4+Pj4+Pj4gQlI/IEkgZ3Vlc3MgaXQgc2hvdWxkIGJlY2F1c2UgaXMgcGFydCBvZiB0
+aGUgU0lHIGNlcnRpZmljYXRpb24gYW5kIGlzDQo+Pj4+Pj4+PiBwYXJ0IG9mIHRoZSB1bml0L3Rl
+c3QtZ2F0dC4NCj4+Pj4+Pj4gVGhpcyBtaWdodCBiZSBiZWNhdXNlIHRoZSBzcGVjIHdhcyBubyBj
+bGVhciBhYm91dCB0aGUgZGF0YWJhc2UgYmVpbmcNCj4+Pj4+Pj4gYmVhcmVyIHNwZWNpZmljLCB3
+aGljaCBpbiBteSBvcGluaW9uIHRoaXMgaXMgYSBvdmVyc2lnaHQgc2luY2UgdGhlbiB3ZQ0KPj4+
+Pj4+PiBjYW4ndCByZXByZXNlbnQgYXR0cmlidXRlcyBvZiBkdWFsIG1vZGUgZGV2aWNlcyB3aXRo
+IGEgdW5pZmllZCBvYmplY3QsDQo+Pj4+Pj4+IGFuZCBJIHJlYWxseSB3b25kZXIgaWYgdGhpcyBo
+YXMgdG8gYmUgZm9yY2VkIHVwIGludG8gdGhlIEFQSSwgaWYgaXQNCj4+Pj4+Pj4gZG9lcyB0aGVu
+IHdlIHdvdWxkIGhhdmUgdG8gZW5jb2RlIGJlYXJlciBpbmZvcm1hdGlvbiBpbnRvIHRoZSBvYmpl
+Y3QNCj4+Pj4+Pj4gcGF0aCAoYXJnaCEpIGZvciBjbGllbnQgYW5kIGZvciBzZXJ2ZXIgd291bGQg
+cHJvYmFibHkgbmVlZCBhIHByb3BlcnR5DQo+Pj4+Pj4+IHRlbGxpbmcgd2hpY2ggYmVhcmVyIHRo
+aXMgd291bGQgYmUgYXZhaWxhYmxlIGFuZCBlbmNvZGUgdGhpcyBpbnRvIHRvDQo+Pj4+Pj4+IHRo
+ZSBkYXRhYmFzZSB3aGljaCBtYXkgbGVhdmUgZ2FwcyBpbiB0aGUgaGFuZGxlcyBvciBqdXN0IGR1
+cGxpY2F0ZQ0KPj4+Pj4+PiBldmVyeXRoaW5nLCBmb3Igc2VydmVyIElkIHByb2JhYmx5IGp1c3Qg
+aGlkZSB0aGUgc2VydmljZXMgYmFzZWQgb24gdGhlDQo+Pj4+Pj4+IGJlYXJlciwgYnV0IHdlIHN0
+aWxsIG5lZWQgdG8gc3RvcmUgdGhlIENDQyBjb25maWd1cmF0aW9uIGluIGEgYmVhcmVyDQo+Pj4+
+Pj4+IHNwZWNpZmljIG1hbm5lci4NCj4+Pj4+Pj4NCj4+Pj4+Pg0KPj4+Pj4+IFNvLCB3aGF0IGNh
+biBJIGRvIGluIG9yZGVyIHRvIHBhc3MgdGhhdCBzcGVjaWZpYyBibHVldG9vdGggU0lHIHRlc3Rz
+Pw0KPj4+Pj4+IFRoYXQgdGVzdCBjYXNlcyBuZWVkIHRvIGVuc3VyZSB0aGF0IGFuIHNwZWNpZmlj
+IHNlcnZpY2UvY2hhciBpbiBvbmx5DQo+Pj4+Pj4gYWNjZXNzaWJsZSBvbiBMRSBvciBCUiwgc28g
+dGhleSBoYWQgdG8gYmUgZGlmZmVyZW50Lg0KPj4+Pj4+IERvIHlvdSBoYXZlIGFueSBpZGVhIG9y
+IHN1Z2dlc3Rpb24/IEl0IHdvdWxkIGJlIHJlYWxseSB3ZWxjb21lLCBpZiBub3QgSQ0KPj4+Pj4+
+IGhhdmUgbm8gaWRlYSBob3cgdG8gcHJvY2VlZCB0byBjb21wbGV0ZSB0aGUgU0lHIHZhbGlkYXRp
+b24gd2l0aCBibHVleiBzdHVmZi4NCj4+Pj4+PiBJIHdhcyBldmVuIHRyeWluZyB0byBtb2RpZnkg
+c29tZSBmaWxlcyBpbnRvIHRoZSBjb2RlLCBidXQgSSBhbSBub3QNCj4+Pj4+PiBmYW1pbGlhciB3
+aXRoIHRoYXQgYW5kIGl0IG9idmlvdXNseSBkaWQgbm90IHdvcmsuDQo+Pj4+Pg0KPj4+Pj4gSSB1
+bmRlcnN0YW5kIHRoZSBzaWxlbnQgdG8gdGhpcyBsYXN0IHF1ZXN0aW9uIGFzIGEgbm8uIFNvIEkg
+YXNzdW1lIHRoYXQNCj4+Pj4+IGFueSB1c2VyIHRyeWluZyB0byBwYXNzIHRoaXMgdGVzdCB3aWxs
+IGZhaWwgKGF0IGxlYXN0IGlmIHVzaW5nIGJsdWV6KS4NCj4+Pj4+IFNvIHNob3VsZCB0aGUgc3Bl
+Y2lmaWNhdGlvbiBiZSBjaGFuZ2VkPyBTaG91bGQgYmx1ZXogYWRhcHQgdG8gaXQ/IEluIHRoZQ0K
+Pj4+Pj4gY3VycmVudCBzdGF0ZSB0aGF0IFNJRyBjZXJ0aWZpY2F0aW9uIGNhbiBub3QgYmUgcGFz
+c2VkLg0KPj4+Pg0KPj4+PiBUaGF0IGlmIHlvdSB3YW50IHRvIHF1YWxpZnkgd2l0aCBHQVRUIG92
+ZXIgQlIvRURSLCBzb21ldGhpbmcgdGhhdCB3ZQ0KPj4+PiBtYXkgYWN0dWFsbHkgaGF2ZSBhbiBv
+cHRpb24gdG8gZGlzYWJsZSBpbiB0aGUgZnV0dXJlLCBvciBwZXJoYXBzIGp1c3QNCj4+Pj4gcmVt
+b3ZlIGl0IGVudGlyZWx5IGdpdmVuIHRoaXMgdGVzdHMgd291bGQgcG9zc2libGUgYWZmZWN0IHRo
+YXQgR0FUVA0KPj4+PiBkYXRhYmFzZSBsYXlvdXQsIGVpdGhlciBieSBjcmVhdGluZyBoYW5kbGUg
+Z2FwcyBvciBkdXBsaWNhdGlvbi4gU28NCj4+Pj4gcGVyaGFwcyB5b3UgY291bGQgZ2l2ZSBzb21l
+IGZlZWRiYWNrIGlmIHlvdSBkbyBpbnRlbmQgdG8gdXNlIEdBVFQgb3Zlcg0KPj4+PiBCUi9FRFIg
+b3Igbm90PyBJZiBpdCB0dXJuIG91dCBubyBvbmUgYmVuZWZpdCBmcm9tIGl0IElkIGp1c3QgcmVt
+b3ZlDQo+Pj4+IGl0Lg0KPj4+Pg0KPj4+DQo+Pj4gVGhhbmtzIGZvciB0aGUgcXVpY2sgcmVwbHku
+IEkgZG8gbm90IGtub3cgaG93IGFueSBvdGhlciBwZW9wbGUgd2FzIGFibGUNCj4+PiB0byBwYXNz
+IHRoZXNlIFNJRyBsYWIgdGVzdHMgKEJJLTM0LUMgYW5kIEJJLTM1LUMpLg0KPj4+IEkgZG8gbm90
+IHBsYW4gdG8gdXNlIEdBVFQgb3ZlciBCUi9FRFIuIEZvciBtZSBqdXN0IHJlbW92aW5nIGl0IHdv
+dWxkIGJlDQo+Pj4gZW5vdWdoLiBJZiB5b3UgY2FuIHBvaW50IG1lIHdoZXJlL2hvdyB0byBkbyB0
+aGF0IGl0IHdvdWxkIGJlIGdyZWF0IHNvIEkNCj4+PiBjYW4gZGlnIGluIHRoZSBjb2RlIChJIGFt
+IG5vdCBmYW1pbGlhciB3aXRoIHRoYXQgY29kZSkuDQo+Pj4NCj4+PiBUaHgsDQo+Pj4gICAgICAg
+SXNhYWMNCj4+DQo+Pg0KPj4gWWVzdGVyZGF5IEkgZGlkIGFwcGx5IHRoZSBwYXRjaCAoZ2F0dDog
+UmVtb3ZlIHN1cHBvcnQgb2YgQVRUIG92ZXINCj4+IEJSL0VEUikgb24gYmx1ZXotNS40MSAobXkg
+Y3VycmVudCB2ZXJzaW9uKSBhbmQgcGFzc2VkIGl0IHRvIHRoZSBsYWIuIEkNCj4+IHdhcyB3YWl0
+aW5nIGZvciB0aGVpciBmZWVkYmFjayBidXQgSSBkaWQgbm90IGdldCBhIHJlcGx5IHlldCwgc28g
+anVzdCB0bw0KPj4gbGV0IHlvdSBrbm93IHRoYXQgSSBnZXQgdGhlIHBhdGNoIGFuZCBhcHBsaWVk
+IGl0Lg0KPj4gQXMgSSBzZWUgaXQsIHRoYXQgcGF0Y2ggcmVtb3ZlZCB0aGUgc3VwcG9ydCBmb3Ig
+QVRUIG92ZXIgQlIvRURSLCBzbyBJDQo+PiBndWVzcyB0aGF0IGFub3RoZXIgd2F5IHRvIHBhc3Mg
+dGhhdCB0ZXN0IGlzIG1vZGlmeWluZyB0aGUgZmlybXdhcmUgb2YNCj4+IHRoZSBibHVldG9vdGgg
+Y2hpcCB0byBkaXNhYmxlIGl0IGF0IGEgaHcgbGV2ZWwuDQo+PiBBbmQsIGluIG9yZGVyIHRvIHBh
+c3MgdGhlIG90aGVyIHRlc3QgY2FzZSAoQkktMzUtQyksIEkgd2lsbCBuZWVkIHRvIGRvDQo+PiBu
+b3QgYXBwbHkgdGhlIG1lbnRpb25lZCBwYXRjaCBhbmQgY3JlYXRlIGEgc2ltaWxhciBvbmUgZm9y
+IEFUVCBvdmVyIExFLA0KPj4gb3IgaXMgdGhlcmUgYW5vdGhlciB3YXkgdG8gYWNjb21wbGlzaCAv
+VFAvR0FSL0NML0JJLTM1LUM/DQo+DQo+IElkIGFzc3VtZSB5b3Ugd291bGQgbm90IGhhdmUgdG8g
+cnVuIHRob3NlIHRlc3RzIGlmIEFUVCBvdmVyIEJSL0VEUiBpcw0KPiBub3Qgc3VwcG9ydGVkOg0K
+Pg0KPiA0LjUuNzIgVFAvR0FSL0NML0JJLTM1LUMgW1JlYWQgQ2hhcmFjdGVyaXN0aWMgVmFsdWUg
+XHUyMDEzIEludmFsaWQNCj4gVHJhbnNwb3J0IEFjY2VzcyBvdmVyDQo+IExFXQ0KPiBWZXJpZnkg
+R2VuZXJpYyBBdHRyaWJ1dGUgUHJvZmlsZSBjbGllbnQgYmVoYXZpb3Igd2hlbiBhbiBhdHRlbXB0
+IHRvDQo+IHVzZSBMRSB0cmFuc3BvcnQgdG8gZXhlY3V0ZQ0KPiB0aGUgUmVhZCBDaGFyYWN0ZXJp
+c3RpYyBWYWx1ZSBwcm9jZWR1cmUgb24gYSBjaGFyYWN0ZXJpc3RpYyBjb250YWluZWQNCj4gd2l0
+aGluIGEgc2VydmljZSBkZWZpbmVkDQo+IGZvciB1c2Ugb25seSBvdmVyIEJSL0VEUiB0cmFuc3Bv
+cnQuDQo+DQo+IFdpdGhvdXQgQlIvRURSIHRoZXJlIGlzIG5vIHJlYXNvbiB0byBydW4gdGhpcyB0
+ZXN0IGFzIGFsbCB0aGUNCj4gYXR0cmlidXRlcyBzaG91bGQgYmUgdmFsaWQuDQo+DQoNCg0KT3Vy
+IHByb2R1Y3QgaXMgZHVhbCBzbyB0aG9zZSB0ZXN0cyBhcmUgbWFuZGF0b3J5LiBBZGRpdGlvbmFs
+bHksIG91ciANCnByb2R1Y3QgaXMgNC4yLCBubyA0LjAuDQpUaGUgcGF0Y2ggeW91IHByb3Bvc2Vk
+IChnYXR0OiBSZW1vdmUgc3VwcG9ydCBvZiBBVFQgb3ZlciBCUi9FRFIpIGlzIG5vdCANCnZhbGlk
+IGFuZCB3aWxsIG5vdCB3b3JrIChpZiB5b3Ugd2FudCBJIGNhbiBhZGQgZGV0YWlscyB0byB0aGUg
+b3RoZXIgDQp0aHJlYWQpIGFuZCBpdCB3aWxsIGJyZWFrIG90aGVyIHRlc3RzIG5lZWRlZCBmb3Ig
+dGhlIGNlcnRpZmljYXRpb24uIEkgDQp3b3VsZCBzdWdnZXN0IHRvIHJlamVjdCBpdC4NClRvIHB1
+dCBzb21lIGxpZ2h0IGluIHRlc3RzIEJJLTM0LUMgYW5kIEJJLTM1LUMsIGl0IGNvbnNpc3RzIGlu
+IGRlZmluZSBhIA0KY2hhcmFjdGVyaXN0aWMgb25seSBhdmFpbGFibGUgdGhyb3VnaCB0aGUgdHJh
+bnNwb3J0IGxheWVyIExFIG9yIEJSL0VEUiwgDQpzbyBpbiBvbmUgY2FzZSB0aGUgdmFsdWUgY2Fu
+IGJlIHJlYWQsIGFuZCBpbiB0aGUgb3RoZXIgY2FzZSBpdCBpcyANCnJlamVjdGVkLiBJIGNhbiBh
+ZGQgbW9yZSBkZXRhaWxzIGlmIG5lZWRlZC4NCkN1cnJlbnRseSB0aGUgd29ya2Fyb3VuZCB0aGF0
+IEkgYW0gZG9pbmcgaXMgcmVjb3JkIHRoZSB0eXBlIG9mIA0KY29ubmVjdGlvbiAoTEUgb3IgQlIv
+RURSKSBhbmQgcmV0dXJuIHRoZSBlcnJvciBjb2RlIGZvciBvbmUgc3BlY2lmaWMgDQpjaGFyYWN0
+ZXJpc3RpYyAodGhhdCBJIHJlZ2lzdGVyIGluIG15IGdhdHQgc2VydmVyIGFwcGxpY2F0aW9uKSwg
+c28gSSANCmN1c3RvbWl6ZSBteSBhcHBsaWNhdGlvbi4gVGhlIGxhYiBkaWQgbm90IGNvbmZpcm0v
+ZGlzbWlzcyBpdCB5ZXQsIGJ1dCANCmhvcGVmdWxseSBpdCBpcyB3aGF0IHRoZXkgbmVlZC4NClRo
+YW5rcyBmb3IgdGhlIHN1cHBvcnQgb24gdGhpcyBpc3N1ZS4gTGV0IG1lIGtub3cgaWYgSSBjYW4g
+aGVscCBpbiANCmFueXRoaW5nLCBpZiBJIG5lZWQgdG8gcHJvdmlkZSBtb3JlIGRldGFpbHMsIGlm
+IHlvdSB3YW50IGEgcmVwbHkgaW4gdGhlIA0KcGF0Y2ggdGhyZWFkIG9yIGFueSBvdGhlciBzdHVm
+Zi4NClJlZ2FyZHMsDQogICBJc2FhYw==
