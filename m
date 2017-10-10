@@ -1,236 +1,183 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <jhovold@gmail.com>
+Sender: Johan Hovold <jhovold@gmail.com>
+Date: Tue, 10 Oct 2017 17:35:18 +0200
+From: Johan Hovold <johan@kernel.org>
+To: =?iso-8859-1?Q?Fr=E9d=E9ric?= Danis <frederic.danis.oss@gmail.com>
+Cc: robh@kernel.org, marcel@holtmann.org, sre@kernel.org,
+	loic.poulain@gmail.com, johan@kernel.org, lukas@wunner.de,
+	hdegoede@redhat.com, rafael@kernel.org, greg@kroah.com,
+	linux-bluetooth@vger.kernel.org, linux-serial@vger.kernel.org,
+	linux-acpi@vger.kernel.org
+Subject: Re: [PATCH v2 1/2] serdev: Add ACPI support
+Message-ID: <20171010153518.GM4269@localhost>
+References: <1507630365-26692-1-git-send-email-frederic.danis.oss@gmail.com>
+ <1507630365-26692-2-git-send-email-frederic.danis.oss@gmail.com>
 MIME-Version: 1.0
-Reply-To: yunhanw@nestlabs.com
-In-Reply-To: <CABBYNZ+EB6O9xQtjh-Um=Lvkf+M9dciAj0Sn=nMxF+obQsH2_w@mail.gmail.com>
-References: <CALvjcs8EHZWsNd+wwcQ_XgdstpgLCpVa-Je-Xuo0PYq=anrtuw@mail.gmail.com>
- <CALvjcs-RSrdJVpqNhU8tcGxO0CPL4OG83L=Mkjb_nFv2EgvBZQ@mail.gmail.com>
- <CABBYNZKiLm5x10Ax37eyP_DYVCtxaTS=4fnOuh8hmEN2=skknQ@mail.gmail.com>
- <CALvjcs8ERh1xD6cZQCW2vHUmzJjcBUkzfHwy4+4o3mCKsB5Kcg@mail.gmail.com> <CABBYNZ+EB6O9xQtjh-Um=Lvkf+M9dciAj0Sn=nMxF+obQsH2_w@mail.gmail.com>
-From: Yunhan Wang <yunhanw@nestlabs.com>
-Date: Tue, 10 Oct 2017 08:56:24 -0700
-Message-ID: <CALvjcs8XwaUzu9zLQO1MtWvdVGJOQaEoAfgVJRKrx4TycPybcg@mail.gmail.com>
-Subject: Re: notification has not yet been cleaned in server side when ble is disconnected.
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <1507630365-26692-2-git-send-email-frederic.danis.oss@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi, Luiz
+On Tue, Oct 10, 2017 at 12:12:44PM +0200, Frédéric Danis wrote:
+> This patch allows SerDev module to manage serial devices declared as
+> attached to an UART in ACPI table.
+> 
+> acpi_serdev_add_device() callback will only take into account entries
+> without enumerated flag set. This flags is set for all entries during
+> ACPI scan, except for SPI and I2C serial devices, and for UART with
+> 2nd patch in the series.
+> 
+> Check if a serdev device as been allocated during acpi_walk_namespace()
+> to prevent serdev controller registration instead of the tty-class device.
 
-On Tue, Oct 10, 2017 at 3:07 AM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi Yunhan,
->
-> On Tue, Oct 10, 2017 at 11:48 AM, Yunhan Wang <yunhanw@nestlabs.com> wrot=
-e:
->> Hi=EF=BC=8C Luiz
->>
->> Here there is no pair operation in our end. Our rough idea is the below.
->> 1. ble scan
->> 2. ble connect from central to peripheral.
->> 3. central app writes data in characteristic A offered by peripheral
->> 4. central app subscribes characteristic B offered by peripheral app,
->> which is used to receive indication data from peripheral.
->>
->> I am using 2 btvirt, one is 00:AA:01:00:00:23(peripheral), another is
->> 00:AA:01:01:00:24 (central)
->>
->> For previous reproduced step:
->> 1. Assume server has one characteristic A that is subscribed by client
->> and sending indication,
->> 2. Then ble connection is disconnected by client directly or
->> connection disappear without unsubscribing A.
->> 3. Client tries to connect to ble successfully
->> 4. Client fails to subscribe that characteristic A although ble
->> connection is ok.
->> 5. Another retry to make Ble connection and subscribe to A can work.
->>
->> The below logs in bluetoothd are from step 2: ble disconnect seems not
->> clean anything related to gatt notification.
->>
->> src/gatt-database.c:send_notification_to_device() GATT server sending in=
-dication
->> src/gatt-database.c:conf_cb() GATT server received confirmation
->> src/device.c:gatt_debug() Write Req - handle: 0x003f
->> src/gatt-database.c:send_notification_to_device() GATT server sending in=
-dication
->> src/gatt-database.c:conf_cb() GATT server received confirmation
->> src/service.c:change_state() 0x925b20: device 00:AA:01:00:00:23
->> profile gap-profile state changed: connected -> disconnecting (0)
->> src/service.c:change_state() 0x925b20: device 00:AA:01:00:00:23
->> profile gap-profile state changed: disconnecting -> disconnected (0)
->> src/adapter.c:dev_disconnected() Device 00:AA:01:00:00:23 disconnected, =
-reason 2
->> src/adapter.c:adapter_remove_connection()
->> plugins/policy.c:disconnect_cb() reason 2
->> src/adapter.c:bonding_attempt_complete() hci1 bdaddr 00:AA:01:00:00:23
->> type 1 status 0xe
->> src/device.c:device_bonding_complete() bonding (nil) status 0x0e
->> src/device.c:device_bonding_failed() status 14
->> src/adapter.c:resume_discovery()
->> src/device.c:att_disconnected_cb()
->> src/device.c:att_disconnected_cb() Connection reset by peer (104)
->> src/service.c:change_state() 0x9103e0: device 00:AA:01:01:00:24
->> profile gap-profile state changed: connected -> disconnecting (0)
->> src/service.c:change_state() 0x9103e0: device 00:AA:01:01:00:24
->> profile gap-profile state changed: disconnecting -> disconnected (0)
->> src/gatt-client.c:btd_gatt_client_disconnected() Device disconnected.
->> Cleaning up.
->> src/device.c:att_disconnected_cb() Automatic connection disabled
->> attrib/gattrib.c:g_attrib_unref() 0x91d190: g_attrib_unref=3D0
->> src/adapter.c:dev_disconnected() Device 00:AA:01:01:00:24 disconnected, =
-reason 3
->> src/adapter.c:adapter_remove_connection()
->> plugins/policy.c:disconnect_cb() reason 3
->> src/adapter.c:bonding_attempt_complete() hci0 bdaddr 00:AA:01:01:00:24
->> type 1 status 0xe
->> src/device.c:device_bonding_complete() bonding (nil) status 0x0e
->> src/device.c:device_bonding_failed() status 14
->> src/device.c:att_disconnected_cb()
->> src/device.c:att_disconnected_cb() Connection reset by peer (104)
->> src/gatt-client.c:btd_gatt_client_disconnected() Device disconnected.
->> Cleaning up.
->> src/device.c:att_disconnected_cb() Automatic connection disabled
->> attrib/gattrib.c:g_attrib_unref() 0x925000: g_attrib_unref=3D0
->>
->> The below logs in bluetoothd are from step 4: Client fails to
->> subscribe that characteristic A although ble connection is ok. from
->> the log, it seems it is cleaning gatt notification in
->> https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/src/gatt-databas=
-e.c#n2005
->
-> Looks like we are no cleanup up the subscription no matter if paired
-> or not which partially explain the problem here.
->
->> src/device.c:gatt_debug() start: 0x0001, end: 0x0005, uuid:
->> 00001800-0000-1000-8000-00805f9b34fb
->> src/device.c:gatt_debug() start: 0x0006, end: 0x0009, uuid:
->> 00001801-0000-1000-8000-00805f9b34fb
->> src/device.c:gatt_client_ready_cb() status: success, error: 10
->> src/gatt-client.c:create_services() Exporting objects for GATT
->> services: 00:AA:01:01:00:24
->> src/device.c:device_svc_resolved() /org/bluez/hci0/dev_00_AA_01_01_00_24=
- err 0
->> src/device.c:gatt_debug() Read Req - handle: 0x0003
->> src/gatt-database.c:gap_device_name_read_cb() GAP Device Name read reque=
-st
->> profiles/gap/gas.c:read_device_name_cb() GAP Device Name: N0002
->> src/device.c:btd_device_device_set_name()
->> /org/bluez/hci1/dev_00_AA_01_00_00_23 N0002
->> src/device.c:gatt_debug() Write Req - handle: 0x0009
->> src/gatt-database.c:gatt_ccc_write_cb() CCC write called for handle: 0x0=
-009
->> src/device.c:gatt_debug() Registered handler for "Service Changed": 1
->> src/device.c:gatt_debug() Read Req - handle: 0x0005
->> src/gatt-database.c:gap_appearance_read_cb() GAP Appearance read request
->> profiles/gap/gas.c:read_appearance_cb() GAP Appearance: 0x0000
->>
->> src/device.c:gatt_debug() Write Req - handle: 0x0039
->> src/gatt-client.c:notify_client_ref() owner :1.122201
->> src/device.c:gatt_debug() Write Req - handle: 0x0037
->> src/gatt-database.c:gatt_ccc_write_cb() CCC write called for handle: 0x0=
-037
->> src/gatt-client.c:notify_client_unref() owner :1.122201
->> src/gatt-client.c:notify_client_free() owner :1.122201
->> src/device.c:gatt_debug() Write Req - handle: 0x0037
->> src/gatt-database.c:gatt_ccc_write_cb() CCC write called for handle: 0x0=
-037
->> src/gatt-database.c:ccc_write_cb() External CCC write received with
->> value: 0x0000
->
-> Well this is an unsubscribe value:0x0000 so by itself this is no
-> wrong, please check with btmon if the remote is not unsubscribing
-> before subscribing again.
->
+Good that we caught that one before every ACPI serial port broke. ;)
 
-Yes, normally the remote needs to unsubscribe the characterstic
-gracefully, then everything would be fine, yes, i have done that in my
-end. However, if something wrong happens in the remote or someone
-moves the remote device far away from the peripheral, the client would
-be disconnected abnormally without unsubscribing, and the peripheral
-would fail to process the later ble connection if this connection is
-subscribing the same characteristic.
+> Signed-off-by: Frédéric Danis <frederic.danis.oss@gmail.com>
+> Reviewed-by: Rob Herring <robh@kernel.org>
+> Reviewed-by: Sebastian Reichel <sebastian.reichel@collabora.co.uk>
+> Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> ---
+>  drivers/tty/serdev/core.c | 106 +++++++++++++++++++++++++++++++++++++++++++---
+>  1 file changed, 99 insertions(+), 7 deletions(-)
+> 
+> diff --git a/drivers/tty/serdev/core.c b/drivers/tty/serdev/core.c
 
-I think we need cleanup functionality inside bluez when disconnect
-happens, in addition it seems there is no grace way to cleanup
-characteristic from application using any bluez dbus API.
+> @@ -385,6 +401,78 @@ static int of_serdev_register_devices(struct serdev_controller *ctrl)
+>  	return 0;
+>  }
+>  
+> +#ifdef CONFIG_ACPI
+> +static acpi_status acpi_serdev_register_device(struct serdev_controller *ctrl,
+> +					    struct acpi_device *adev)
+> +{
+> +	struct serdev_device *serdev = NULL;
+> +	int err;
+> +
+> +	if (acpi_bus_get_status(adev) || !adev->status.present ||
+> +	    acpi_device_enumerated(adev))
+> +		return AE_OK;
+> +
+> +	serdev = serdev_device_alloc(ctrl);
+> +	if (!serdev) {
+> +		dev_err(&ctrl->dev, "failed to allocate serdev device for %s\n",
+> +			dev_name(&adev->dev));
+> +		return AE_NO_MEMORY;
+> +	}
+> +
+> +	ACPI_COMPANION_SET(&serdev->dev, adev);
+> +	acpi_device_set_enumerated(adev);
 
-thanks
-best wishes
-yunhan
->> src/gatt-database.c:pipe_hup() 0x921290 closed
->> src/gatt-database.c:proxy_removed_cb() Proxy removed - removing
->> service: /org/bluez/xxxx/xxx
->> src/gatt-database.c:gatt_db_service_removed() Local GATT service removed
->> src/gatt-database.c:send_notification_to_device() GATT server sending in=
-dication
->> src/gatt-database.c:client_disconnect_cb() Client disconnected
->> src/advertising.c:client_disconnect_cb() Client disconnected
->> src/device.c:gatt_debug() Service Changed received - start: 0x0034 end: =
-0x0039
->> src/gatt-database.c:conf_cb() GATT server received confirmation
->> src/device.c:gatt_debug() Read By Grp Type - start: 0x0034 end: 0x0039
->> src/device.c:gatt_debug() Primary service discovery failed. ATT ECODE: 0=
-x0a
->> src/device.c:gatt_debug() Read By Grp Type - start: 0x0034 end: 0x0039
->> src/device.c:gatt_debug() Secondary service discovery failed. ATT ECODE:=
- 0x0a
->> src/device.c:gatt_debug() Read By Type - start: 0x0000 end: 0x0000
->> src/device.c:gatt_debug() service disappeared: start 0x0034 end 0x0039
->> src/device.c:gatt_service_removed() start: 0x0034, end: 0x0039
->>
->> Any idea?
->>
->> Thanks
->> Best wishes
->> Yunhan
->>
->> On Tue, Oct 10, 2017 at 1:19 AM, Luiz Augusto von Dentz
->> <luiz.dentz@gmail.com> wrote:
->>> Hi Yunhan,
->>>
->>> On Tue, Oct 10, 2017 at 11:02 AM, Yunhan Wang <yunhanw@nestlabs.com> wr=
-ote:
->>>> Hi, Luiz
->>>>
->>>> Please ignore the previous email.
->>>>
->>>> I am seeing a bluez gatt notification problem in gatt-database.c
->>>>
->>>> Here is scenario:
->>>>
->>>> 1. Assume server has one characteristic A that is subscribed by client
->>>> and sending notification,
->>>> 2. Then ble connection is disconnected by client directly or
->>>> connection disappear without unsubscribing A.
->>>> 3. Client tries to connect to ble successfully
->>>> 4. Client fails to subscribe that characteristic A although ble
->>>> connection is ok.
->>>> 5. Another retry to make Ble connection and subscribe to A can work.
->>>>
->>>> It seems ble disconnect at step 2 only disconnect ble connection and
->>>> does not cleanup notify_io and stop
->>>> notification in step 3 at code,
->>>> https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/src/gatt-datab=
-ase.c
->>>>
->>>> It seems retry in step 4 would trigger ccc_write_cb and release
->>>> notify_io and stop notification so that step 5 would succeed.
->>>> partial log from step 4:
->>>> ccc_write_cb() External CCC write received with value: 0x0000
->>>> pipe_hup() 0x921290 closed
->>>>
->>>> Any idea?
->>>
->>> Do you have the full logs, this might be a bug since perhaps we
->>> cleanup the notification itself though if the device is paired the
->>> subscription should be persisted.
->>>
->>> --
->>> Luiz Augusto von Dentz
->
->
->
-> --
-> Luiz Augusto von Dentz
+Looks like this flag needs to be cleared when the device is later
+deregistered or you will not be able to reprobe the device (mostly
+useful for development). Can probably done in a follow-up patch.
+
+> +
+> +	err = serdev_device_add(serdev);
+> +	if (err) {
+> +		dev_err(&serdev->dev,
+> +			"failure adding ACPI serdev device. status %d\n", err);
+> +		serdev_device_put(serdev);
+> +		ctrl->serdev = NULL;
+
+You should not clear this pointer here. This should be taken care of by
+serdev core when registration fails, something which would also address
+the problem with how to deal with multiple child nodes which is a
+problem for ACPI as well as DT (as I mentioned briefly at Kernel
+Recipes).
+
+I'll submit a fix for that shortly, but the NULL assignment above needs
+to go.
+
+> +	}
+> +
+> +	return AE_OK;
+> +}
+> +
+> +static acpi_status acpi_serdev_add_device(acpi_handle handle, u32 level,
+> +				       void *data, void **return_value)
+> +{
+> +	struct serdev_controller *ctrl = data;
+> +	struct acpi_device *adev;
+> +
+> +	if (acpi_bus_get_device(handle, &adev))
+> +		return AE_OK;
+> +
+> +	return acpi_serdev_register_device(ctrl, adev);
+> +}
+> +
+> +static int acpi_serdev_register_devices(struct serdev_controller *ctrl)
+> +{
+> +	acpi_status status;
+> +	acpi_handle handle;
+> +
+> +	handle = ACPI_HANDLE(ctrl->dev.parent);
+> +	if (!handle)
+> +		return -ENODEV;
+> +
+> +	status = acpi_walk_namespace(ACPI_TYPE_DEVICE, handle, 1,
+> +				     acpi_serdev_add_device, NULL, ctrl, NULL);
+> +	if (ACPI_FAILURE(status)) {
+> +		dev_dbg(&ctrl->dev, "failed to enumerate serdev slaves\n");
+
+So what if there are more than one child node defined? You could end up
+with an error here but with a slave still registered. And then when you
+return -ENODEV, that memory will leak.
+
+> +		return -ENODEV;
+
+Simply falling through here, and then return 0 or -ENODEV based on
+ctrl->serdev should suffice for now.
+
+> +	}
+> +
+> +	if (!ctrl->serdev)
+> +		return -ENODEV;
+> +
+> +	return 0;
+> +}
+> +#else
+> +static inline int acpi_serdev_register_devices(struct serdev_controller *ctrl)
+> +{
+> +	return -ENODEV;
+> +}
+> +#endif /* CONFIG_ACPI */
+> +
+>  /**
+>   * serdev_controller_add() - Add an serdev controller
+>   * @ctrl:	controller to be registered.
+> @@ -394,7 +482,7 @@ static int of_serdev_register_devices(struct serdev_controller *ctrl)
+>   */
+>  int serdev_controller_add(struct serdev_controller *ctrl)
+>  {
+> -	int ret;
+> +	int ret_of, ret_acpi, ret;
+>  
+>  	/* Can't register until after driver model init */
+>  	if (WARN_ON(!is_registered))
+> @@ -404,12 +492,16 @@ int serdev_controller_add(struct serdev_controller *ctrl)
+>  	if (ret)
+>  		return ret;
+>  
+> -	ret = of_serdev_register_devices(ctrl);
+> -	if (ret)
+> +	ret_of = of_serdev_register_devices(ctrl);
+> +	ret_acpi = acpi_serdev_register_devices(ctrl);
+> +	if (ret_of && ret_acpi) {
+> +		dev_dbg(&ctrl->dev, "no devices registered: of:%d acpi:%d\n",
+> +			ret_of, ret_acpi);
+> +		ret = -ENODEV;
+>  		goto out_dev_del;
+> +	}
+>  
+> -	dev_dbg(&ctrl->dev, "serdev%d registered: dev:%p\n",
+> -		ctrl->nr, &ctrl->dev);
+> +	dev_dbg(&ctrl->dev, "registered: dev:%p\n", &ctrl->dev);
+
+This change belongs in a separate patch. There seem to be a few more
+instances like this one, which can all be fixed in a later patch
+instead.
+
+>  	return 0;
+>  
+>  out_dev_del:
+
+Johan
