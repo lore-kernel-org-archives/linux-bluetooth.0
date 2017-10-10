@@ -1,59 +1,42 @@
-Return-Path: <jhovold@gmail.com>
-Sender: Johan Hovold <jhovold@gmail.com>
-Date: Tue, 10 Oct 2017 18:36:30 +0200
-From: Johan Hovold <johan@kernel.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Johan Hovold <johan@kernel.org>,
-	=?iso-8859-1?Q?Fr=E9d=E9ric?= Danis <frederic.danis.oss@gmail.com>,
-	robh@kernel.org, sre@kernel.org, loic.poulain@gmail.com,
-	lukas@wunner.de, hdegoede@redhat.com,
-	linux-bluetooth@vger.kernel.org, linux-serial@vger.kernel.org,
-	linux-acpi@vger.kernel.org
-Subject: Re: [PATCH 1/2] serdev: Add ACPI support
-Message-ID: <20171010163630.GO4269@localhost>
-References: <1507107090-15992-1-git-send-email-frederic.danis.oss@gmail.com>
- <1507107090-15992-2-git-send-email-frederic.danis.oss@gmail.com>
- <20171007151255.GH2618@localhost>
- <BC1C29B8-C76B-499D-B8BE-365B5D3A0065@holtmann.org>
- <20171010081528.GJ4269@localhost>
- <3F3CFF22-4FCE-4283-8A41-73A9A7944494@holtmann.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <3F3CFF22-4FCE-4283-8A41-73A9A7944494@holtmann.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Steve Brown <sbrown@cortland.com>
+Message-ID: <1507651475.5470.1.camel@ewol.com>
+Subject: meshctl: set-pub fails
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Tue, 10 Oct 2017 10:04:35 -0600
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, Oct 10, 2017 at 10:22:19AM +0200, Marcel Holtmann wrote:
+discover-unprovisioned, provision, add-appkey & bind work as expected.
+The meshctl's onoff client evokes expected behavior in zephyr's onoff
+server.
 
-> > Some of the above are minor nits that can be addressed by a follow-up
-> > patch indeed, but the handling of nodes with no child devices needs to
-> > be correct (or you could end up breaking normal serial-port support).
-> 
-> that sounds good to me as well. Lets get this feature into the ACPI
-> tree since I am going to push Hans’ patches into bluetooth-next as
-> soon as he re-submits the missing ID change. That hopefully gives us
-> then fully serdev support for ACPI and DT when it comes to Broadcom
-> Bluetooth controllers.
+The command being passed
 
-But with Hans's work these devices should continue to function using the
-platform-device hacks until the ACPI patch eventually lands in Linus's
-tree (via the acpi tree).
+set-pub 0100 c000 1 5 1000
 
-> Next step is to convert the Intel driver to also use ACPI based serdev
-> :)
-> 
-> And for the brave, I think there are Realtek based systems using ACPI
-> as well.
-> 
-> What I was wondering the other day is if we need a lsserdev tool or
-> some integration in lshw to be able to debug what serdev devices and
-> ID are present. The lsusb and /sys/kernel/debug/usb/devices is just
-> super powerful and easy when it comes to figuring out what people have
-> in their system. Maybe /sys/kernel/debug/serdev/devices could be
-> helpful as well. Just thinking out loud here.
+The length of the set-pub packet exceeded the size of the data array in
+struct mesh_pkt in net.c by 1. This stepped on the length field which
+followed. The transmit mostly failed. The zephyr server received
+nothing.
 
-Yeah, maybe. Since you'd typically only have small number of serdev
-devices (say, max 4), using /sys/bus/serial/devices directly should not
-be too bad meanwhile. Not that much common information we can expose
-either, at least not in comparison to USB. But I'll keep it mind. :)
+I extended the data array to 35. I now get consistent output. However,
+the zephyr server is unable to decrypt with devkey. Net decrypt works,
+but app decrypt fails. 
 
-Johan
+I looked at how config-client.c:cmd_set_pub handled the app key index.
+According to 4.3.2.16 (pg 158) of the Mesh Profile Spec, the app key
+index should be in the top 12 bits of octet 4 & 5. I shifted it up by
+4, but get the same results.
+
+I'm pretty sure the problem is on the meshctl side. I've used the
+Silabs Android app to successfully configure the zephyr server. It
+successfully sends a set-pub which the zephyr server correctly handles.
+
+Maybe this is a regression. Has set-pub worked in the past?
+
+Any idea of where to go next?
+
+Steve
