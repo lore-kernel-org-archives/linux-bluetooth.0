@@ -1,12 +1,10 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
 Reply-To: yunhanw@nestlabs.com
-In-Reply-To: <CALvjcs8EHZWsNd+wwcQ_XgdstpgLCpVa-Je-Xuo0PYq=anrtuw@mail.gmail.com>
-References: <CALvjcs8EHZWsNd+wwcQ_XgdstpgLCpVa-Je-Xuo0PYq=anrtuw@mail.gmail.com>
 From: Yunhan Wang <yunhanw@nestlabs.com>
-Date: Tue, 10 Oct 2017 01:02:01 -0700
-Message-ID: <CALvjcs-RSrdJVpqNhU8tcGxO0CPL4OG83L=Mkjb_nFv2EgvBZQ@mail.gmail.com>
-Subject: Re: notification has not yet been cleaned in server side when ble is disconnected.
+Date: Tue, 10 Oct 2017 00:57:20 -0700
+Message-ID: <CALvjcs8EHZWsNd+wwcQ_XgdstpgLCpVa-Je-Xuo0PYq=anrtuw@mail.gmail.com>
+Subject: notification has not yet been cleaned in server side when ble is disconnected.
 To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
         linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
@@ -14,8 +12,6 @@ Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi, Luiz
-
-Please ignore the previous email.
 
 I am seeing a bluez gatt notification problem in gatt-database.c
 
@@ -26,23 +22,15 @@ and sending notification,
 2. Then ble connection is disconnected by client directly or
 connection disappear without unsubscribing A.
 3. Client tries to connect to ble successfully
-4. Client fails to subscribe that characteristic A although ble
-connection is ok.
+4. Client fails to subscribe that characteristic A.
 5. Another retry to make Ble connection and subscribe to A can work.
 
-It seems ble disconnect at step 2 only disconnect ble connection and
-does not cleanup notify_io and stop
+It seems ble disconnect does not cleanup notify_io and stop
 notification in step 3 at code,
 https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/src/gatt-database.c
 
-It seems retry in step 4 would trigger ccc_write_cb and release
-notify_io and stop notification so that step 5 would succeed.
-partial log from step 4:
+It seems retry in step 5 would
+
 ccc_write_cb() External CCC write received with value: 0x0000
 pipe_hup() 0x921290 closed
-
-Any idea?
-
-Thanks
-Best wishes
-Yunhan
+gatt_ccc_write_cb() CCC write called for handle: 0x0037
