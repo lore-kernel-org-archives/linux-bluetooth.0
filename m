@@ -1,59 +1,48 @@
-Return-Path: <jhovold@gmail.com>
-Sender: Johan Hovold <jhovold@gmail.com>
-From: Johan Hovold <johan@kernel.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	linux-bluetooth@vger.kernel.org,
-	Sebastian Reichel <sebastian.reichel@collabora.co.uk>,
-	=?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis.oss@gmail.com>,
-	robh@kernel.org,
-	loic.poulain@gmail.com,
-	lukas@wunner.de,
-	hdegoede@redhat.com,
-	linux-serial@vger.kernel.org,
-	linux-acpi@vger.kernel.org,
-	Johan Hovold <johan@kernel.org>
-Subject: [PATCH] Bluetooth: avoid silent hci_bcm ACPI PM regression
-Date: Tue, 10 Oct 2017 10:01:52 +0200
-Message-Id: <20171010080152.18444-1-johan@kernel.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+MIME-Version: 1.0
+Reply-To: yunhanw@nestlabs.com
+In-Reply-To: <CALvjcs8EHZWsNd+wwcQ_XgdstpgLCpVa-Je-Xuo0PYq=anrtuw@mail.gmail.com>
+References: <CALvjcs8EHZWsNd+wwcQ_XgdstpgLCpVa-Je-Xuo0PYq=anrtuw@mail.gmail.com>
+From: Yunhan Wang <yunhanw@nestlabs.com>
+Date: Tue, 10 Oct 2017 01:02:01 -0700
+Message-ID: <CALvjcs-RSrdJVpqNhU8tcGxO0CPL4OG83L=Mkjb_nFv2EgvBZQ@mail.gmail.com>
+Subject: Re: notification has not yet been cleaned in server side when ble is disconnected.
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The hci_bcm platform-device hack which was used to implement
-power management for ACPI devices is being replaced by a
-serial-device-bus implementation.
+Hi, Luiz
 
-Unfortunately, when the corresponding change to the ACPI code lands (a
-change that will stop enumerating and registering the serial-device-node
-child as a platform device) PM will break silently unless serdev
-TTY-port controller support has been enabled. Specifically, hciattach
-(btattach) would still succeed, but power management would no longer
-work.
+Please ignore the previous email.
 
-Although this is strictly a runtime dependency, let's make the driver
-depend on SERIAL_DEV_CTRL_TTYPORT, which is the particular serdev
-controller implementation used by the ACPI devices currently managed by
-this driver, to avoid breaking PM without anyone noticing.
+I am seeing a bluez gatt notification problem in gatt-database.c
 
-Note that the driver already has a (build-time) dependency on the serdev
-bus code.
+Here is scenario:
 
-Signed-off-by: Johan Hovold <johan@kernel.org>
----
- drivers/bluetooth/Kconfig | 1 +
- 1 file changed, 1 insertion(+)
+1. Assume server has one characteristic A that is subscribed by client
+and sending notification,
+2. Then ble connection is disconnected by client directly or
+connection disappear without unsubscribing A.
+3. Client tries to connect to ble successfully
+4. Client fails to subscribe that characteristic A although ble
+connection is ok.
+5. Another retry to make Ble connection and subscribe to A can work.
 
-diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
-index fae5a74dc737..082e1c7329de 100644
---- a/drivers/bluetooth/Kconfig
-+++ b/drivers/bluetooth/Kconfig
-@@ -169,6 +169,7 @@ config BT_HCIUART_BCM
- 	bool "Broadcom protocol support"
- 	depends on BT_HCIUART
- 	depends on BT_HCIUART_SERDEV
-+	depends on (!ACPI || SERIAL_DEV_CTRL_TTYPORT)
- 	select BT_HCIUART_H4
- 	select BT_BCM
- 	help
--- 
-2.14.2
+It seems ble disconnect at step 2 only disconnect ble connection and
+does not cleanup notify_io and stop
+notification in step 3 at code,
+https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/src/gatt-database.c
+
+It seems retry in step 4 would trigger ccc_write_cb and release
+notify_io and stop notification so that step 5 would succeed.
+partial log from step 4:
+ccc_write_cb() External CCC write received with value: 0x0000
+pipe_hup() 0x921290 closed
+
+Any idea?
+
+Thanks
+Best wishes
+Yunhan
