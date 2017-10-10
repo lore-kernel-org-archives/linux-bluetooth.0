@@ -1,36 +1,52 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <ianwmorrison@gmail.com>
 MIME-Version: 1.0
-Reply-To: yunhanw@nestlabs.com
-From: Yunhan Wang <yunhanw@nestlabs.com>
-Date: Tue, 10 Oct 2017 00:57:20 -0700
-Message-ID: <CALvjcs8EHZWsNd+wwcQ_XgdstpgLCpVa-Je-Xuo0PYq=anrtuw@mail.gmail.com>
-Subject: notification has not yet been cleaned in server side when ble is disconnected.
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-bluetooth@vger.kernel.org
+In-Reply-To: <20171009080606.GO2618@localhost>
+References: <dc9cecc0-d9ef-109f-5f05-cf77ab16e60e@gmail.com>
+ <427a95f6-feda-e93e-9a0f-a05b7b339ee6@gmail.com> <20171009080606.GO2618@localhost>
+From: Ian W MORRISON <ianwmorrison@gmail.com>
+Date: Tue, 10 Oct 2017 18:16:46 +1100
+Message-ID: <CAFXWsS8=t9SfUdWPOSpmHt4-6cgdrVtQChryyzJ74XOQQP3-Ww@mail.gmail.com>
+Subject: Re: [PATCH v3 2/2] serdev: Update drivers/bluetooth/Kconfig for ACPI
+ serdev support
+To: Johan Hovold <johan@kernel.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>, "Gustavo F. Padovan" <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	"bluez mailin list (linux-bluetooth@vger.kernel.org)" <linux-bluetooth@vger.kernel.org>, Hans de Goede <hdegoede@redhat.com>,
+	=?UTF-8?B?RnLDqWTDqXJpYyBEYW5pcw==?= <frederic.danis.oss@gmail.com>,
+	Rob Herring <robh@kernel.org>, Sebastian Reichel <sre@kernel.org>, Loic Poulain <loic.poulain@gmail.com>,
+	Lukas Wunner <lukas@wunner.de>, linux-serial@vger.kernel.org, linux-acpi@vger.kernel.org,
+	"Rafael J. Wysocki" <rafael@kernel.org>, Greg Kroah-Hartman <greg@kroah.com>
 Content-Type: text/plain; charset="UTF-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi, Luiz
+On 9 October 2017 at 19:06, Johan Hovold <johan@kernel.org> wrote:
+> On Mon, Oct 09, 2017 at 11:43:31AM +1100, Ian W MORRISON wrote:
+<snip>
+>>
+>> This patch set addresses this by making BT_HCIUART_BCM dependent on
+>> SERIAL_DEV_CTRL_TTYPORT which in turn is dependent on SERIAL_DEV_BUS
+>> and ensures that if SERIAL_DEV_BUS is selected is the code is build it.
+>
+> Ok, so you didn't even bother to write two distinct commit messages for
+> your two patches, and my comments to the first patch apply also here.
+>
+<snip>
+>
+> Johan
 
-I am seeing a bluez gatt notification problem in gatt-database.c
+Hi Johan,
 
-Here is scenario:
+My experience in submitting patches is still limited and I am very
+much learning so thanks for the helpful comments and apologies for
+trying your patience. My keenness on submitting patches was to show
+that I had tested my suggestions so as to given them credibility
+rather than any attempt to own the patch.
 
-1. Assume server has one characteristic A that is subscribed by client
-and sending notification,
-2. Then ble connection is disconnected by client directly or
-connection disappear without unsubscribing A.
-3. Client tries to connect to ble successfully
-4. Client fails to subscribe that characteristic A.
-5. Another retry to make Ble connection and subscribe to A can work.
+What I was trying to do here was to suggested two patches with one
+requiring the other. Rather than keep as a single patch affecting two
+files I separated into two patches attempting to create a patch series
+with a single changelog. This was the wrong approach and I may have
+misled so apologies for that.
 
-It seems ble disconnect does not cleanup notify_io and stop
-notification in step 3 at code,
-https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/src/gatt-database.c
-
-It seems retry in step 5 would
-
-ccc_write_cb() External CCC write received with value: 0x0000
-pipe_hup() 0x921290 closed
-gatt_ccc_write_cb() CCC write called for handle: 0x0037
+Regards,
+Ian
