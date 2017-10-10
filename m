@@ -1,80 +1,73 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 11.0 \(3445.1.7\))
-Subject: Re: [PATCH v3 1/2] Bluetooth: hci_bcm: Add support for MINIX Z83-4
- based devices
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <30dae6f5-b69e-352f-072d-2e1272cbbca8@gmail.com>
-Date: Tue, 10 Oct 2017 10:13:34 +0200
-Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        "bluez mailin list (linux-bluetooth@vger.kernel.org)"
-        <linux-bluetooth@vger.kernel.org>, hdegoede@redhat.com,
-        =?utf-8?Q?Fr=C3=A9d=C3=A9ric_Danis?= <frederic.danis.oss@gmail.com>
-Message-Id: <8A4E38C1-B631-4D87-8357-9777DFEAC958@holtmann.org>
-References: <30dae6f5-b69e-352f-072d-2e1272cbbca8@gmail.com>
+Return-Path: <jhovold@gmail.com>
+Sender: Johan Hovold <jhovold@gmail.com>
+Date: Tue, 10 Oct 2017 10:11:53 +0200
+From: Johan Hovold <johan@kernel.org>
 To: Ian W MORRISON <ianwmorrison@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Cc: Johan Hovold <johan@kernel.org>, Marcel Holtmann <marcel@holtmann.org>,
+	"Gustavo F. Padovan" <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	"bluez mailin list (linux-bluetooth@vger.kernel.org)" <linux-bluetooth@vger.kernel.org>,
+	Hans de Goede <hdegoede@redhat.com>,
+	=?iso-8859-1?Q?Fr=E9d=E9ric?= Danis <frederic.danis.oss@gmail.com>,
+	Rob Herring <robh@kernel.org>, Sebastian Reichel <sre@kernel.org>,
+	Loic Poulain <loic.poulain@gmail.com>,
+	Lukas Wunner <lukas@wunner.de>, linux-serial@vger.kernel.org,
+	linux-acpi@vger.kernel.org, "Rafael J. Wysocki" <rafael@kernel.org>,
+	Greg Kroah-Hartman <greg@kroah.com>
+Subject: Re: [PATCH v3 2/2] serdev: Update drivers/bluetooth/Kconfig for ACPI
+ serdev support
+Message-ID: <20171010081153.GI4269@localhost>
+References: <dc9cecc0-d9ef-109f-5f05-cf77ab16e60e@gmail.com>
+ <427a95f6-feda-e93e-9a0f-a05b7b339ee6@gmail.com>
+ <20171009080606.GO2618@localhost>
+ <CAFXWsS8=t9SfUdWPOSpmHt4-6cgdrVtQChryyzJ74XOQQP3-Ww@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CAFXWsS8=t9SfUdWPOSpmHt4-6cgdrVtQChryyzJ74XOQQP3-Ww@mail.gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ian,
-
-> The MINIX NEO Z83-4 and MINIX NEO Z83-4 Pro devices use an AP6255 chip for wifi and bluetooth. Bluetooth requires an ACPI device id of BCM2EA4 with BCM4345 rev C0 firmware.
+On Tue, Oct 10, 2017 at 06:16:46PM +1100, Ian W MORRISON wrote:
+> On 9 October 2017 at 19:06, Johan Hovold <johan@kernel.org> wrote:
+> > On Mon, Oct 09, 2017 at 11:43:31AM +1100, Ian W MORRISON wrote:
+> <snip>
+> >>
+> >> This patch set addresses this by making BT_HCIUART_BCM dependent on
+> >> SERIAL_DEV_CTRL_TTYPORT which in turn is dependent on SERIAL_DEV_BUS
+> >> and ensures that if SERIAL_DEV_BUS is selected is the code is build it.
+> >
+> > Ok, so you didn't even bother to write two distinct commit messages for
+> > your two patches, and my comments to the first patch apply also here.
+> >
+> <snip>
+> >
+> > Johan
 > 
-> This patch adds the device id and to use trigger type IRQF_TRIGGER_FALLING as defined by 'GpioInt' in the ACPI DSDT table:
+> Hi Johan,
 > 
->    Device (BLT0)
->    {
->        Name (_HID, "BCM2EA4")  // _HID: Hardware ID
->        Method (_STA, 0, NotSerialized)  // _STA: Status
->        {
->            Return (0x0F)
->        }
-> 
->        Method (_CRS, 0, NotSerialized)  // _CRS: Current Resource Settings
->        {
->            Name (UBUF, ResourceTemplate ()
->            {
->                UartSerialBusV2 (0x0001C200, DataBitsEight, StopBitsOne,
->                    0xFC, LittleEndian, ParityTypeNone, FlowControlHardware,
->                    0x0020, 0x0020, "\\_SB.PCI0.URT1",
->                    0x00, ResourceConsumer, , Exclusive,
->                    )
->                GpioInt (Level, ActiveLow, Exclusive, PullNone, 0x0000,
->                    "\\_SB.GPO1", 0x00, ResourceConsumer, ,
->                    )
->                    {   // Pin list
->                        0x0005
->                    }
->                GpioIo (Exclusive, PullDefault, 0x0000, 0x0000, IoRestrictionOutputOnly,
->                    "\\_SB.GPO1", 0x00, ResourceConsumer, ,
->                    )
->                    {   // Pin list
->                        0x0007
->                    }
->                GpioIo (Exclusive, PullDefault, 0x0000, 0x0000, IoRestrictionOutputOnly,
->                    "\\_SB.GPO1", 0x00, ResourceConsumer, ,
->                    )
->                    {   // Pin list
->                        0x0004
->                    }
->            })
->            Return (UBUF) /* \_SB_.PCI0.URT1.BLT0._CRS.UBUF */
->        }
->    }
-> 
-> Signed-off-by: ianwmorrison <ianwmorrison@gmail.com>
-> ---
-> v2: make compatible with [PATCH v2 2/9] Bluetooth: hci_bcm: Fix setting of irq trigger type
-> v3: includes extract of ACPI DSDT table for BCM2EA4 device
-> ---
-> drivers/bluetooth/hci_bcm.c | 8 ++++++++
-> 1 file changed, 8 insertions(+)
+> My experience in submitting patches is still limited and I am very
+> much learning so thanks for the helpful comments and apologies for
+> trying your patience. My keenness on submitting patches was to show
+> that I had tested my suggestions so as to given them credibility
+> rather than any attempt to own the patch.
 
-patch has been applied to bluetooth-next tree.
+No worries. I can recommend taking a closer look at
 
-Regards
+	Documentation/process/submitting-patches.rst
 
-Marcel
+where some of the process is described.
 
+> What I was trying to do here was to suggested two patches with one
+> requiring the other. Rather than keep as a single patch affecting two
+> files I separated into two patches attempting to create a patch series
+> with a single changelog. This was the wrong approach and I may have
+> misled so apologies for that.
+
+So next, time just submit your patches as a series (consider using
+git-send-email to get the threading right), where each patch is
+self-contained and has a good commit message describing why that change
+is needed. It is implicit that a series is to be applied in order and
+that therefore later patches in a series can depend on earlier ones.
+When a patch series span multiple subsystems, things can gets more
+complicated, though...
+
+Johan
