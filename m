@@ -1,79 +1,54 @@
-Return-Path: <ianwmorrison@gmail.com>
-MIME-Version: 1.0
-In-Reply-To: <20171010163630.GO4269@localhost>
-References: <1507107090-15992-1-git-send-email-frederic.danis.oss@gmail.com>
- <1507107090-15992-2-git-send-email-frederic.danis.oss@gmail.com>
- <20171007151255.GH2618@localhost> <BC1C29B8-C76B-499D-B8BE-365B5D3A0065@holtmann.org>
- <20171010081528.GJ4269@localhost> <3F3CFF22-4FCE-4283-8A41-73A9A7944494@holtmann.org>
- <20171010163630.GO4269@localhost>
-From: Ian W MORRISON <ianwmorrison@gmail.com>
-Date: Wed, 11 Oct 2017 10:13:25 +1100
-Message-ID: <CAFXWsS9Mm6bEhrfWYHovUYOTjSmknLZ3KxLieteh3_2n14qNwA@mail.gmail.com>
-Subject: Re: [PATCH 1/2] serdev: Add ACPI support
-To: Johan Hovold <johan@kernel.org>, Marcel Holtmann <marcel@holtmann.org>
-Cc: =?UTF-8?B?RnLDqWTDqXJpYyBEYW5pcw==?= <frederic.danis.oss@gmail.com>,
-	Rob Herring <robh@kernel.org>, Sebastian Reichel <sre@kernel.org>, Loic Poulain <loic.poulain@gmail.com>,
-	Lukas Wunner <lukas@wunner.de>, Hans de Goede <hdegoede@redhat.com>,
-	"bluez mailin list (linux-bluetooth@vger.kernel.org)" <linux-bluetooth@vger.kernel.org>, linux-serial@vger.kernel.org,
-	linux-acpi@vger.kernel.org
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Steve Brown <sbrown@cortland.com>
+Message-ID: <1507674601.5470.3.camel@ewol.com>
+Subject: Re: meshctl: set-pub fails
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Tue, 10 Oct 2017 16:30:01 -0600
+In-Reply-To: <1507651475.5470.1.camel@ewol.com>
+References: <1507651475.5470.1.camel@ewol.com>
 Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-T24gMTEgT2N0b2JlciAyMDE3IGF0IDAzOjM2LCBKb2hhbiBIb3ZvbGQgPGpvaGFuQGtlcm5lbC5v
-cmc+IHdyb3RlOg0KPiBPbiBUdWUsIE9jdCAxMCwgMjAxNyBhdCAxMDoyMjoxOUFNICswMjAwLCBN
-YXJjZWwgSG9sdG1hbm4gd3JvdGU6DQo+Pg0KPj4gV2hhdCBJIHdhcyB3b25kZXJpbmcgdGhlIG90
-aGVyIGRheSBpcyBpZiB3ZSBuZWVkIGEgbHNzZXJkZXYgdG9vbCBvcg0KPj4gc29tZSBpbnRlZ3Jh
-dGlvbiBpbiBsc2h3IHRvIGJlIGFibGUgdG8gZGVidWcgd2hhdCBzZXJkZXYgZGV2aWNlcyBhbmQN
-Cj4+IElEIGFyZSBwcmVzZW50LiBUaGUgbHN1c2IgYW5kIC9zeXMva2VybmVsL2RlYnVnL3VzYi9k
-ZXZpY2VzIGlzIGp1c3QNCj4+IHN1cGVyIHBvd2VyZnVsIGFuZCBlYXN5IHdoZW4gaXQgY29tZXMg
-dG8gZmlndXJpbmcgb3V0IHdoYXQgcGVvcGxlIGhhdmUNCj4+IGluIHRoZWlyIHN5c3RlbS4gTWF5
-YmUgL3N5cy9rZXJuZWwvZGVidWcvc2VyZGV2L2RldmljZXMgY291bGQgYmUNCj4+IGhlbHBmdWwg
-YXMgd2VsbC4gSnVzdCB0aGlua2luZyBvdXQgbG91ZCBoZXJlLg0KPg0KPiBZZWFoLCBtYXliZS4g
-U2luY2UgeW91J2QgdHlwaWNhbGx5IG9ubHkgaGF2ZSBzbWFsbCBudW1iZXIgb2Ygc2VyZGV2DQo+
-IGRldmljZXMgKHNheSwgbWF4IDQpLCB1c2luZyAvc3lzL2J1cy9zZXJpYWwvZGV2aWNlcyBkaXJl
-Y3RseSBzaG91bGQgbm90DQo+IGJlIHRvbyBiYWQgbWVhbndoaWxlLiBOb3QgdGhhdCBtdWNoIGNv
-bW1vbiBpbmZvcm1hdGlvbiB3ZSBjYW4gZXhwb3NlDQo+IGVpdGhlciwgYXQgbGVhc3Qgbm90IGlu
-IGNvbXBhcmlzb24gdG8gVVNCLiBCdXQgSSdsbCBrZWVwIGl0IG1pbmQuIDopDQo+DQoNClllcyBp
-biB0aGUgaW50ZXJpbSwgaWYgeW91IGhhdmUgJ3RyZWUnIGluc3RhbGxlZCB0aGVuIGZvciBleGFt
-cGxlDQoNCiQgYWxpYXMgbHNzZXJkZXY9J3RyZWUgL3N5cy9idXMvc2VyaWFsL2RldmljZXMvKi0w
-Jw0KJCBsc3NlcmRldg0KL3N5cy9idXMvc2VyaWFsL2RldmljZXMvc2VyaWFsMC0wDQrilJzilIDi
-lIAgYmx1ZXRvb3RoDQrilIIgICDilJTilIDilIAgaGNpMA0K4pSCICAgICAgIOKUnOKUgOKUgCBk
-ZXZpY2UgLT4gLi4vLi4vLi4vc2VyaWFsMC0wDQrilIIgICAgICAg4pSc4pSA4pSAIHBvd2VyDQri
-lIIgICAgICAg4pSCICAg4pSc4pSA4pSAIGFzeW5jDQrilIIgICAgICAg4pSCICAg4pSc4pSA4pSA
-IGF1dG9zdXNwZW5kX2RlbGF5X21zDQrilIIgICAgICAg4pSCICAg4pSc4pSA4pSAIGNvbnRyb2wN
-CuKUgiAgICAgICDilIIgICDilJzilIDilIAgcnVudGltZV9hY3RpdmVfa2lkcw0K4pSCICAgICAg
-IOKUgiAgIOKUnOKUgOKUgCBydW50aW1lX2FjdGl2ZV90aW1lDQrilIIgICAgICAg4pSCICAg4pSc
-4pSA4pSAIHJ1bnRpbWVfZW5hYmxlZA0K4pSCICAgICAgIOKUgiAgIOKUnOKUgOKUgCBydW50aW1l
-X3N0YXR1cw0K4pSCICAgICAgIOKUgiAgIOKUnOKUgOKUgCBydW50aW1lX3N1c3BlbmRlZF90aW1l
-DQrilIIgICAgICAg4pSCICAg4pSU4pSA4pSAIHJ1bnRpbWVfdXNhZ2UNCuKUgiAgICAgICDilJzi
-lIDilIAgcmZraWxsMA0K4pSCICAgICAgIOKUgiAgIOKUnOKUgOKUgCBkZXZpY2UgLT4gLi4vLi4v
-aGNpMA0K4pSCICAgICAgIOKUgiAgIOKUnOKUgOKUgCBoYXJkDQrilIIgICAgICAg4pSCICAg4pSc
-4pSA4pSAIGluZGV4DQrilIIgICAgICAg4pSCICAg4pSc4pSA4pSAIG5hbWUNCuKUgiAgICAgICDi
-lIIgICDilJzilIDilIAgcGVyc2lzdGVudA0K4pSCICAgICAgIOKUgiAgIOKUnOKUgOKUgCBwb3dl
-cg0K4pSCICAgICAgIOKUgiAgIOKUgiAgIOKUnOKUgOKUgCBhc3luYw0K4pSCICAgICAgIOKUgiAg
-IOKUgiAgIOKUnOKUgOKUgCBhdXRvc3VzcGVuZF9kZWxheV9tcw0K4pSCICAgICAgIOKUgiAgIOKU
-giAgIOKUnOKUgOKUgCBjb250cm9sDQrilIIgICAgICAg4pSCICAg4pSCICAg4pSc4pSA4pSAIHJ1
-bnRpbWVfYWN0aXZlX2tpZHMNCuKUgiAgICAgICDilIIgICDilIIgICDilJzilIDilIAgcnVudGlt
-ZV9hY3RpdmVfdGltZQ0K4pSCICAgICAgIOKUgiAgIOKUgiAgIOKUnOKUgOKUgCBydW50aW1lX2Vu
-YWJsZWQNCuKUgiAgICAgICDilIIgICDilIIgICDilJzilIDilIAgcnVudGltZV9zdGF0dXMNCuKU
-giAgICAgICDilIIgICDilIIgICDilJzilIDilIAgcnVudGltZV9zdXNwZW5kZWRfdGltZQ0K4pSC
-ICAgICAgIOKUgiAgIOKUgiAgIOKUlOKUgOKUgCBydW50aW1lX3VzYWdlDQrilIIgICAgICAg4pSC
-ICAg4pSc4pSA4pSAIHNvZnQNCuKUgiAgICAgICDilIIgICDilJzilIDilIAgc3RhdGUNCuKUgiAg
-ICAgICDilIIgICDilJzilIDilIAgc3Vic3lzdGVtIC0+IC4uLy4uLy4uLy4uLy4uLy4uLy4uLy4u
-L2NsYXNzL3Jma2lsbA0K4pSCICAgICAgIOKUgiAgIOKUnOKUgOKUgCB0eXBlDQrilIIgICAgICAg
-4pSCICAg4pSU4pSA4pSAIHVldmVudA0K4pSCICAgICAgIOKUnOKUgOKUgCBzdWJzeXN0ZW0gLT4g
-Li4vLi4vLi4vLi4vLi4vLi4vLi4vY2xhc3MvYmx1ZXRvb3RoDQrilIIgICAgICAg4pSU4pSA4pSA
-IHVldmVudA0K4pSc4pSA4pSAIGRyaXZlciAtPiAuLi8uLi8uLi8uLi8uLi9idXMvc2VyaWFsL2Ry
-aXZlcnMvaGNpX3VhcnRfYmNtDQrilJzilIDilIAgZmlybXdhcmVfbm9kZSAtPg0KLi4vLi4vLi4v
-Li4vTE5YU1lTVE06MDAvTE5YU1lCVVM6MDAvUE5QMEEwODowMC84MDg2MjI4QTowMC9CQ00yRUE0
-OjAwDQrilJzilIDilIAgbW9kYWxpYXMNCuKUnOKUgOKUgCBwb3dlcg0K4pSCICAg4pSc4pSA4pSA
-IGFzeW5jDQrilIIgICDilJzilIDilIAgYXV0b3N1c3BlbmRfZGVsYXlfbXMNCuKUgiAgIOKUnOKU
-gOKUgCBjb250cm9sDQrilIIgICDilJzilIDilIAgcnVudGltZV9hY3RpdmVfa2lkcw0K4pSCICAg
-4pSc4pSA4pSAIHJ1bnRpbWVfYWN0aXZlX3RpbWUNCuKUgiAgIOKUnOKUgOKUgCBydW50aW1lX2Vu
-YWJsZWQNCuKUgiAgIOKUnOKUgOKUgCBydW50aW1lX3N0YXR1cw0K4pSCICAg4pSc4pSA4pSAIHJ1
-bnRpbWVfc3VzcGVuZGVkX3RpbWUNCuKUgiAgIOKUlOKUgOKUgCBydW50aW1lX3VzYWdlDQrilJzi
-lIDilIAgc3Vic3lzdGVtIC0+IC4uLy4uLy4uLy4uLy4uL2J1cy9zZXJpYWwNCuKUlOKUgOKUgCB1
-ZXZlbnQNCg0KMTMgZGlyZWN0b3JpZXMsIDM4IGZpbGVzDQokDQoNCkl0IGlzIGEgYml0IHNoYWJi
-eSB3aGVuIHRoZXJlIGlzIG5vdGhpbmcgdG8gcmVwb3J0DQoNCiQgbHNzZXJkZXYNCi9zeXMvYnVz
-L3NlcmlhbC9kZXZpY2VzLyotMCBbZXJyb3Igb3BlbmluZyBkaXJdDQoNCjAgZGlyZWN0b3JpZXMs
-IDAgZmlsZXMNCiQNCg==
+On Tue, 2017-10-10 at 10:04 -0600, Steve Brown wrote:
+> discover-unprovisioned, provision, add-appkey & bind work as
+> expected.
+> The meshctl's onoff client evokes expected behavior in zephyr's onoff
+> server.
+> 
+> The command being passed
+> 
+> set-pub 0100 c000 1 5 1000
+> 
+> The length of the set-pub packet exceeded the size of the data array
+> in
+> struct mesh_pkt in net.c by 1. This stepped on the length field which
+> followed. The transmit mostly failed. The zephyr server received
+> nothing.
+> 
+> I extended the data array to 35. I now get consistent output.
+> However,
+> the zephyr server is unable to decrypt with devkey. Net decrypt
+> works,
+> but app decrypt fails. 
+> 
+> I looked at how config-client.c:cmd_set_pub handled the app key
+> index.
+> According to 4.3.2.16 (pg 158) of the Mesh Profile Spec, the app key
+> index should be in the top 12 bits of octet 4 & 5. I shifted it up by
+> 4, but get the same results.
+> 
+> I'm pretty sure the problem is on the meshctl side. I've used the
+> Silabs Android app to successfully configure the zephyr server. It
+> successfully sends a set-pub which the zephyr server correctly
+> handles.
+> 
+> Maybe this is a regression. Has set-pub worked in the past?
+> 
+There is no problem with the placement of the app key index. The
+figures in the spec are variously big and little endian. I misread the
+figure. 
+
+Steve
+
