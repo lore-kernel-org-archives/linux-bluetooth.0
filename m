@@ -1,10 +1,9 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Subject: [BlueZ PATCH 1/3] android: Do not fail if empty keyset cannot be
- loaded
+Subject: [BlueZ PATCH 2/3] android: Get max advertising instances from kernel
 To: linux-bluetooth@vger.kernel.org
 From: Martin Fuzzey <mfuzzey@parkeon.com>
-Date: Tue, 10 Oct 2017 11:27:51 +0200
-Message-ID: <20171010092751.30705.10296.stgit@localhost>
+Date: Tue, 10 Oct 2017 11:27:53 +0200
+Message-ID: <20171010092753.30705.21331.stgit@localhost>
 In-Reply-To: <20171010092748.30705.23283.stgit@localhost>
 References: <20171010092748.30705.23283.stgit@localhost>
 MIME-Version: 1.0
@@ -12,86 +11,73 @@ Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On startup the keys are loaded, even if the keyset is empty.
-As mentionned in a  comment says this is to erase any keys in the kernel.
-
-However BLE only devices do not support loading keys (the operation always
-returns unsupported error code).
-
-So, if we get an unsupported operation error, and if the keyset is empty,
-ignore and continue.
+Use the mgmnt "advinfo" operation to obtain the number of advertising
+instances supported by the kernel.
 
 Signed-off-by: Martin Fuzzey <mfuzzey@parkeon.com>
 ---
- android/bluetooth.c |   23 ++++++++++++++++++-----
- 1 file changed, 18 insertions(+), 5 deletions(-)
+ android/bluetooth.c |   43 ++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 42 insertions(+), 1 deletion(-)
 
 diff --git a/android/bluetooth.c b/android/bluetooth.c
-index 51a31fe..8ea521e 100644
+index 8ea521e..ba8f405 100644
 --- a/android/bluetooth.c
 +++ b/android/bluetooth.c
-@@ -2531,13 +2531,18 @@ static void register_mgmt_handlers(void)
- 								NULL, NULL);
+@@ -3345,6 +3345,37 @@ static void clear_auto_connect_list(void)
+ 	error("Could not clear auto connect list");
  }
  
-+struct load_link_keys_userdata {
-+	bt_bluetooth_ready cb;
-+	size_t key_count;
-+};
++static void read_adv_features_complete(uint8_t status, uint16_t length,
++					const void *param, void *user_data)
++{
++	const struct mgmt_rp_read_adv_features *rp = param;
++	bt_bluetooth_ready cb = user_data;
++	int err;
 +
- static void load_link_keys_complete(uint8_t status, uint16_t length,
++	if (status) {
++		error("Failed to read advertising features for index %u: %s (0x%02x)",
++				adapter.index, mgmt_errstr(status), status);
++		err = -EIO;
++		goto failed;
++	}
++
++	if (length < sizeof(*rp)) {
++		error("Too small read advertising features response");
++		err = -EIO;
++		goto failed;
++	}
++
++	adapter.max_advert_instance = rp->max_instances;
++	info("Max LE advertising instances: %d", adapter.max_advert_instance);
++
++	load_devices_info(cb);
++
++	return;
++
++failed:
++	cb(err, NULL);
++}
++
+ static void read_info_complete(uint8_t status, uint16_t length,
  					const void *param, void *user_data)
  {
--	bt_bluetooth_ready cb = user_data;
-+	struct load_link_keys_userdata *ud = user_data;
- 	int err;
+@@ -3416,7 +3447,17 @@ static void read_info_complete(uint8_t status, uint16_t length,
+ 	if (missing_settings & MGMT_SETTING_BONDABLE)
+ 		set_mode(MGMT_OP_SET_BONDABLE, 0x01);
  
--	if (status) {
-+	if (status && !((status == MGMT_STATUS_NOT_SUPPORTED &&  ud->key_count == 0))) {
- 		error("Failed to load link keys for index %u: %s (0x%02x)",
- 				adapter.index, mgmt_errstr(status), status);
- 		err = -EIO;
-@@ -2546,17 +2551,20 @@ static void load_link_keys_complete(uint8_t status, uint16_t length,
- 
- 	DBG("status %u", status);
- 
--	cb(0, &adapter.bdaddr);
-+	ud->cb(0, &adapter.bdaddr);
-+	g_free(ud);
- 	return;
- 
- failed:
--	cb(err, NULL);
-+	ud->cb(err, NULL);
-+	g_free(ud);
- }
- 
- static void load_link_keys(GSList *keys, bt_bluetooth_ready cb)
- {
- 	struct mgmt_cp_load_link_keys *cp;
- 	struct mgmt_link_key_info *key;
-+	struct load_link_keys_userdata *req_ud;
- 	size_t key_count, cp_size;
- 	unsigned int id;
- 
-@@ -2578,13 +2586,18 @@ static void load_link_keys(GSList *keys, bt_bluetooth_ready cb)
- 	for (key = cp->keys; keys != NULL; keys = g_slist_next(keys), key++)
- 		memcpy(key, keys->data, sizeof(*key));
- 
-+	req_ud = g_malloc0(sizeof(*req_ud));
-+	req_ud->cb = cb;
-+	req_ud->key_count = key_count;
+-	load_devices_info(cb);
++	if (adapter.supported_settings & MGMT_SETTING_LE) {
++		if (mgmt_send(mgmt_if, MGMT_OP_READ_ADV_FEATURES, adapter.index, 0, NULL,
++				read_adv_features_complete, cb, NULL) == 0) {
++			error("Cannot get LE adv features");
++			err = -EIO;
++			goto failed;
++		}
++	} else {
++		load_devices_info(cb);
++	}
 +
- 	id = mgmt_send(mgmt_if, MGMT_OP_LOAD_LINK_KEYS, adapter.index,
--			cp_size, cp, load_link_keys_complete, cb, NULL);
-+			cp_size, cp, load_link_keys_complete, req_ud, NULL);
+ 	load_devices_cache();
  
- 	g_free(cp);
- 
- 	if (id == 0) {
- 		error("Failed to load link keys");
-+		g_free(req_ud);
- 		cb(-EIO, NULL);
- 	}
- }
+ 	return;
 
