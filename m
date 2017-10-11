@@ -1,99 +1,112 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: "Gix, Brian" <brian.gix@intel.com>
-To: Steve Brown <sbrown@cortland.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: meshctl: set-pub fails
-Date: Wed, 11 Oct 2017 16:48:45 +0000
-Message-ID: <DEBB0CAA2616974FAE35E4B560B9A4373E1E3D53@ORSMSX103.amr.corp.intel.com>
+From: Steve Brown <sbrown@cortland.com>
+Message-ID: <1507733091.5470.5.camel@ewol.com>
+Subject: Re: meshctl: set-pub fails
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Wed, 11 Oct 2017 08:44:51 -0600
+In-Reply-To: <1507674601.5470.3.camel@ewol.com>
 References: <1507651475.5470.1.camel@ewol.com>
-         <1507674601.5470.3.camel@ewol.com> <1507733091.5470.5.camel@ewol.com>
-In-Reply-To: <1507733091.5470.5.camel@ewol.com>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
+         <1507674601.5470.3.camel@ewol.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgU3RldmUsDQoNCkkgYmVsaWV2ZSB5b3UgaGF2ZSBpZGVudGlmaWVkIGEgbGVnaXRpbWF0ZSBi
-dWcuDQoNCkhvd2V2ZXIsIHRoaXMgaXMgdGhlIG9ubHkgcGFydCBvZiB5b3VyIGZpeCB0aGF0IEkg
-dGhpbmsgaXMgdmFsaWQ6DQo+IC0Jc2VnTiA9IFNFR19NQVgobGVuKTsNCj4gKwlzZWdOID0gU0VH
-X01BWChsZW4gKyBzaXplb2YodWludDMyX3QpKTsNCg0KbGVuIGF0IHRoaXMgcG9pbnQgaXMgdGhl
-IHVuZW5jcnlwdGVkIGxlbmd0aCBvZiB0aGUgb3V0Z29pbmcgcGF5bG9hZCwgYW5kIHNvIGl0IGRv
-ZXMgaW5kZWVkIG5lZWQgdGhlIHNpemUgb2YgdGhlIE1JQyB0YWtlbiBpbnRvIGNvbnNpZGVyYXRp
-b24gYmVmb3JlIGRldGVybWluaW5nIG5ldHdvcmsgU2VnbWVudGF0aW9uLiAgQXMgdGhlIFNldCBQ
-dWJsaWNhdGlvbiBtZXNzYWdlIGlzIG5vdyAxMiBvY3RldHMgbG9uZywgaW5jbHVkaW5nIHRoZSBv
-cGNvZGUsIHRoaXMgaXMgb25lIGJ5dGUgdG9vIG1hbnkgZm9yIGFuIHVuc2VnbWVudGVkIG1lc3Nh
-Z2UsIHNvIHNlZ04gc2hvdWxkIGluIGZhY3QgYmUgMSAoYSB0d28gc2VnbWVudCBtZXNzYWdlKS4N
-Cg0KSG93ZXZlciwgdGhlIG90aGVyIGFkanVzdG1lbnRzIGFyZSBpbmNvcnJlY3QuIFRoZSBsZW5n
-dGggb2YgImRhdGEiIGluIHRoZSBtZXNoIHBrdCBpcyAzMCBvY3RldHMgYmVjYXVzZSBvdmVyIHRo
-ZSBBRFYgYmVhcmVyLCB0aGUgTWF4aW1pbXVtIHBheWxvYWQgaXMgMjkgb2N0ZXRzLiAgVGhlIGV4
-dHJhIDEgb2N0ZXQgYXQgdGhlIGZyb250IGlzIHRoZSBNZXNoIChHQVQpIFByb3h5IHNlZ21lbnRh
-dGlvbiAobm90IHRvIGJlIGNvbmZ1c2VkIHdpdGggTWVzaCBUcmFuc3BvcnQgc2VnbWVudGF0aW9u
-KS4gIFNvIHRoZSBtYXhpbXVtIHNpemUgb2YgdGhlIG1lc2hfcGt0IGRhdGEgaXMgMzAuIEJlY2F1
-c2UgdGhpcyBpcyBqdXN0IGEgUHJveHkgdHJhbnNwb3J0LCB3ZSBzdGlsbCBoYXZlIHRvIG9iZXkg
-dGhlIEFEViBzaXplIGxpbWl0YXRpb24uDQoNCkZpeGluZyB0aGUgc2VnTiBsZW5ndGggaW4gbmV0
-X2FjY2Vzc19sYXllcl9zZW5kKCkgc2hvdWxkIGJlIGVub3VnaCB0byBmaXggeW91ciBwcm9ibGVt
-LCBhbmQgeW91IHNob3VsZCBzZWUgKnR3byogc2VnbWVudHMgZ29pbmcgb3V0IGR1ZSB0byB0aGlz
-IG1lc3NhZ2UsIGFuZCB5b3Ugc2hvdWxkIHJlY2VpdmUgYSBTRUcgQUNLIGluIHJlc3BvbnNlIHNo
-b3dpbmcgMiBzZWdtZW50cyBBQ0tlZC4NCg0KDQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0t
-LS0NCj4gRnJvbTogbGludXgtYmx1ZXRvb3RoLW93bmVyQHZnZXIua2VybmVsLm9yZyBbbWFpbHRv
-OmxpbnV4LWJsdWV0b290aC0NCj4gb3duZXJAdmdlci5rZXJuZWwub3JnXSBPbiBCZWhhbGYgT2Yg
-U3RldmUgQnJvd24NCj4gU2VudDogV2VkbmVzZGF5LCBPY3RvYmVyIDExLCAyMDE3IDc6NDUgQU0N
-Cj4gVG86IGxpbnV4LWJsdWV0b290aEB2Z2VyLmtlcm5lbC5vcmcNCj4gU3ViamVjdDogUmU6IG1l
-c2hjdGw6IHNldC1wdWIgZmFpbHMNCj4gDQo+IE9uIFR1ZSwgMjAxNy0xMC0xMCBhdCAxNjozMCAt
-MDYwMCwgU3RldmUgQnJvd24gd3JvdGU6DQo+ID4gT24gVHVlLCAyMDE3LTEwLTEwIGF0IDEwOjA0
-IC0wNjAwLCBTdGV2ZSBCcm93biB3cm90ZToNCj4gPiA+IGRpc2NvdmVyLXVucHJvdmlzaW9uZWQs
-IHByb3Zpc2lvbiwgYWRkLWFwcGtleSAmIGJpbmQgd29yayBhcw0KPiA+ID4gZXhwZWN0ZWQuDQo+
-ID4gPiBUaGUgbWVzaGN0bCdzIG9ub2ZmIGNsaWVudCBldm9rZXMgZXhwZWN0ZWQgYmVoYXZpb3Ig
-aW4gemVwaHlyJ3MNCj4gPiA+IG9ub2ZmIHNlcnZlci4NCj4gPiA+DQo+ID4gPiBUaGUgY29tbWFu
-ZCBiZWluZyBwYXNzZWQNCj4gPiA+DQo+ID4gPiBzZXQtcHViIDAxMDAgYzAwMCAxIDUgMTAwMA0K
-PiA+ID4NCj4gPiA+IFRoZSBsZW5ndGggb2YgdGhlIHNldC1wdWIgcGFja2V0IGV4Y2VlZGVkIHRo
-ZSBzaXplIG9mIHRoZSBkYXRhIGFycmF5DQo+ID4gPiBpbiBzdHJ1Y3QgbWVzaF9wa3QgaW4gbmV0
-LmMgYnkgMS4gVGhpcyBzdGVwcGVkIG9uIHRoZSBsZW5ndGggZmllbGQNCj4gPiA+IHdoaWNoIGZv
-bGxvd2VkLiBUaGUgdHJhbnNtaXQgbW9zdGx5IGZhaWxlZC4gVGhlIHplcGh5ciBzZXJ2ZXINCj4g
-PiA+IHJlY2VpdmVkIG5vdGhpbmcuDQo+ID4gPg0KPiA+ID4gSSBleHRlbmRlZCB0aGUgZGF0YSBh
-cnJheSB0byAzNS4gSSBub3cgZ2V0IGNvbnNpc3RlbnQgb3V0cHV0Lg0KPiA+ID4gSG93ZXZlciwN
-Cj4gPiA+IHRoZSB6ZXBoeXIgc2VydmVyIGlzIHVuYWJsZSB0byBkZWNyeXB0IHdpdGggZGV2a2V5
-LiBOZXQgZGVjcnlwdA0KPiA+ID4gd29ya3MsIGJ1dCBhcHAgZGVjcnlwdCBmYWlscy4NCj4gPiA+
-DQo+ID4gPiBJIGxvb2tlZCBhdCBob3cgY29uZmlnLWNsaWVudC5jOmNtZF9zZXRfcHViIGhhbmRs
-ZWQgdGhlIGFwcCBrZXkNCj4gPiA+IGluZGV4Lg0KPiA+ID4gQWNjb3JkaW5nIHRvIDQuMy4yLjE2
-IChwZyAxNTgpIG9mIHRoZSBNZXNoIFByb2ZpbGUgU3BlYywgdGhlIGFwcCBrZXkNCj4gPiA+IGlu
-ZGV4IHNob3VsZCBiZSBpbiB0aGUgdG9wIDEyIGJpdHMgb2Ygb2N0ZXQgNCAmIDUuIEkgc2hpZnRl
-ZCBpdCB1cA0KPiA+ID4gYnkgNCwgYnV0IGdldCB0aGUgc2FtZSByZXN1bHRzLg0KPiA+ID4NCj4g
-PiA+IEknbSBwcmV0dHkgc3VyZSB0aGUgcHJvYmxlbSBpcyBvbiB0aGUgbWVzaGN0bCBzaWRlLiBJ
-J3ZlIHVzZWQgdGhlDQo+ID4gPiBTaWxhYnMgQW5kcm9pZCBhcHAgdG8gc3VjY2Vzc2Z1bGx5IGNv
-bmZpZ3VyZSB0aGUgemVwaHlyIHNlcnZlci4gSXQNCj4gPiA+IHN1Y2Nlc3NmdWxseSBzZW5kcyBh
-IHNldC1wdWIgd2hpY2ggdGhlIHplcGh5ciBzZXJ2ZXIgY29ycmVjdGx5DQo+ID4gPiBoYW5kbGVz
-Lg0KPiA+ID4NCj4gPiA+IE1heWJlIHRoaXMgaXMgYSByZWdyZXNzaW9uLiBIYXMgc2V0LXB1YiB3
-b3JrZWQgaW4gdGhlIHBhc3Q/DQo+ID4gPg0KPiA+DQo+ID4gVGhlcmUgaXMgbm8gcHJvYmxlbSB3
-aXRoIHRoZSBwbGFjZW1lbnQgb2YgdGhlIGFwcCBrZXkgaW5kZXguIFRoZQ0KPiA+IGZpZ3VyZXMg
-aW4gdGhlIHNwZWMgYXJlIHZhcmlvdXNseSBiaWcgYW5kIGxpdHRsZSBlbmRpYW4uIEkgbWlzcmVh
-ZCB0aGUNCj4gPiBmaWd1cmUuDQo+ID4NCj4gPiBTdGV2ZQ0KPiANCj4gU29ycnkgdG8gYmUgY29u
-dGludWFsbHkgcmVwbHlpbmcgdG8gbXkgb3duIHBvc3RzLg0KPiANCj4gVGhlcmUgd2VyZSAyIHBy
-b2JsZW1zOg0KPiANCj4gMS4gbWVzaF9wa3QncyBkYXRhIGFyZWEgd2FzIHRvbyBzbWFsbC4gVGhl
-IGZpbmFsIG1lc3NhZ2Ugd2FzIDMxIGJ5dGVzLg0KPiBJIGFkZGVkIDUgYnl0ZXMgYW5kIGFuIGFz
-c2VydC4gSSdtIG5vdCBzdXJlIHdoYXQgdGhlIG1heCBtaWdodCBiZS4NCj4gDQo+IDIuIFRoZSBT
-RUdfTUFYIHRlc3Qgd2FzIG9uIHRoZSB3cm9uZyBsZW5ndGguIEl0IHNob3VsZCBoYXZlIGJlZW4g
-b24NCj4gc2FyLT5sZW4sIG5vdCBsZW4uIFRoZSBtZXNzYWdlIHNob3VsZCBoYXZlIGJlZW4gc2Vn
-bWVudGVkLCBidXQgd2FzIG5vdC4NCj4gDQo+IFdpdGggdGhpcyBwYXRjaCwgdGhlIHNldC1wdWIg
-YmVsb3cgcmV0dXJucyBzdWNjZXNzLg0KPiANCj4gc2V0LXB1YiAwMTAwIGMwMDAgMSAwIDEwMDAN
-Cj4gDQo+IENvdWxkIHNvbWVib2R5IGZhbWlsaWFyIHdpdGggdGhlIGNvZGUgY29tbWVudD8NCj4g
-DQo+IGRpZmYgLS1naXQgYS9tZXNoL25ldC5jIGIvbWVzaC9uZXQuYw0KPiBpbmRleCAyZDc1YzRm
-N2QuLjg5ZDIyYzk5YiAxMDA2NDQNCj4gLS0tIGEvbWVzaC9uZXQuYw0KPiArKysgYi9tZXNoL25l
-dC5jDQo+IEBAIC0xMTAsNyArMTEwLDcgQEAgc3RydWN0IG1lc2hfdmlydF9hZGRyIHsgIH07DQo+
-IA0KPiAgc3RydWN0IG1lc2hfcGt0IHsNCj4gLQl1aW50OF90CQlkYXRhWzMwXTsNCj4gKwl1aW50
-OF90CQlkYXRhWzM1XTsNCj4gIAl1aW50OF90CQlsZW47DQo+ICB9Ow0KPiANCj4gQEAgLTEzMDgs
-NiArMTMwOCw5IEBAIHN0YXRpYyB2b2lkIHNlbmRfc2VnKHN0cnVjdCBtZXNoX3Nhcl9tc2cgKnNh
-ciwNCj4gdWludDhfdCBzZWcpDQo+ICAJfQ0KPiANCj4gIAlwa3QtPmxlbiArPSAoc2FyLT5jdGwg
-PyA4IDogNCk7DQo+ICsNCj4gKwlnX2Fzc2VydCghKHBrdC0+bGVuID4gc2l6ZW9mKHBrdC0+ZGF0
-YSkpKTsNCj4gKw0KPiAgCW1lc2hfY3J5cHRvX3BhY2tldF9lbmNvZGUoZGF0YSwgcGt0LT5sZW4s
-DQo+ICAJCQlwYXJ0LT5lbmNfa2V5LA0KPiAgCQkJc2FyLT5pdl9pbmRleCwNCj4gQEAgLTIwOTgs
-NyArMjEwMSw3IEBAIGJvb2wgbmV0X2FjY2Vzc19sYXllcl9zZW5kKHVpbnQ4X3QgdHRsLCB1aW50
-MTZfdA0KPiBzcmMsIHVpbnQzMl90IGRzdCwNCj4gIAlpZiAoIXJlc3VsdCkNCj4gIAkJcmV0dXJu
-IGZhbHNlOw0KPiANCj4gLQlzZWdOID0gU0VHX01BWChsZW4pOw0KPiArCXNlZ04gPSBTRUdfTUFY
-KGxlbiArIHNpemVvZih1aW50MzJfdCkpOw0KPiANCj4gIAkvKiBPbmx5IG9uZSBBQ0sgcmVxdWly
-ZWQgU0FSIG1lc3NhZ2UgcGVyIGRlc3RpbmF0aW9uIGF0IGEgdGltZSAqLw0KPiAgCWlmIChzZWdO
-ICYmIElTX1VOSUNBU1QoZHN0KSkgew0KPiANCj4gLS0NCj4gVG8gdW5zdWJzY3JpYmUgZnJvbSB0
-aGlzIGxpc3Q6IHNlbmQgdGhlIGxpbmUgInVuc3Vic2NyaWJlIGxpbnV4LWJsdWV0b290aCIgaW4N
-Cj4gdGhlIGJvZHkgb2YgYSBtZXNzYWdlIHRvIG1ham9yZG9tb0B2Z2VyLmtlcm5lbC5vcmcgTW9y
-ZSBtYWpvcmRvbW8NCj4gaW5mbyBhdCAgaHR0cDovL3ZnZXIua2VybmVsLm9yZy9tYWpvcmRvbW8t
-aW5mby5odG1sDQo=
+On Tue, 2017-10-10 at 16:30 -0600, Steve Brown wrote:
+> On Tue, 2017-10-10 at 10:04 -0600, Steve Brown wrote:
+> > discover-unprovisioned, provision, add-appkey & bind work as
+> > expected.
+> > The meshctl's onoff client evokes expected behavior in zephyr's
+> > onoff
+> > server.
+> > 
+> > The command being passed
+> > 
+> > set-pub 0100 c000 1 5 1000
+> > 
+> > The length of the set-pub packet exceeded the size of the data
+> > array
+> > in
+> > struct mesh_pkt in net.c by 1. This stepped on the length field
+> > which
+> > followed. The transmit mostly failed. The zephyr server received
+> > nothing.
+> > 
+> > I extended the data array to 35. I now get consistent output.
+> > However,
+> > the zephyr server is unable to decrypt with devkey. Net decrypt
+> > works,
+> > but app decrypt fails. 
+> > 
+> > I looked at how config-client.c:cmd_set_pub handled the app key
+> > index.
+> > According to 4.3.2.16 (pg 158) of the Mesh Profile Spec, the app
+> > key
+> > index should be in the top 12 bits of octet 4 & 5. I shifted it up
+> > by
+> > 4, but get the same results.
+> > 
+> > I'm pretty sure the problem is on the meshctl side. I've used the
+> > Silabs Android app to successfully configure the zephyr server. It
+> > successfully sends a set-pub which the zephyr server correctly
+> > handles.
+> > 
+> > Maybe this is a regression. Has set-pub worked in the past?
+> > 
+> 
+> There is no problem with the placement of the app key index. The
+> figures in the spec are variously big and little endian. I misread
+> the
+> figure. 
+> 
+> Steve
+
+Sorry to be continually replying to my own posts.
+
+There were 2 problems:
+
+1. mesh_pkt's data area was too small. The final message was 31 bytes.
+I added 5 bytes and an assert. I'm not sure what the max might be.
+
+2. The SEG_MAX test was on the wrong length. It should have been on
+sar->len, not len. The message should have been segmented, but was not.
+
+With this patch, the set-pub below returns success. 
+
+set-pub 0100 c000 1 0 1000
+
+Could somebody familiar with the code comment?
+
+diff --git a/mesh/net.c b/mesh/net.c
+index 2d75c4f7d..89d22c99b 100644
+--- a/mesh/net.c
++++ b/mesh/net.c
+@@ -110,7 +110,7 @@ struct mesh_virt_addr {
+ };
+ 
+ struct mesh_pkt {
+-	uint8_t		data[30];
++	uint8_t		data[35];
+ 	uint8_t		len;
+ };
+ 
+@@ -1308,6 +1308,9 @@ static void send_seg(struct mesh_sar_msg *sar, uint8_t seg)
+ 	}
+ 
+ 	pkt->len += (sar->ctl ? 8 : 4);
++
++	g_assert(!(pkt->len > sizeof(pkt->data)));
++
+ 	mesh_crypto_packet_encode(data, pkt->len,
+ 			part->enc_key,
+ 			sar->iv_index,
+@@ -2098,7 +2101,7 @@ bool net_access_layer_send(uint8_t ttl, uint16_t src, uint32_t dst,
+ 	if (!result)
+ 		return false;
+ 
+-	segN = SEG_MAX(len);
++	segN = SEG_MAX(len + sizeof(uint32_t));
+ 
+ 	/* Only one ACK required SAR message per destination at a time */
+ 	if (segN && IS_UNICAST(dst)) {
+
