@@ -1,144 +1,36 @@
-Return-Path: <luiz.dentz@gmail.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Date: Wed, 11 Oct 2017 22:21:33 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Steve Brown <sbrown@cortland.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: mesh: Correct segmentation logic
+Message-ID: <20171011192133.GA26896@x1c.home>
+References: <20171011190624.2093-1-sbrown@cortland.com>
 MIME-Version: 1.0
-In-Reply-To: <20171011190307.28570-1-brian.gix@intel.com>
-References: <20171011190307.28570-1-brian.gix@intel.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 11 Oct 2017 22:39:01 +0300
-Message-ID: <CABBYNZ+P_Ph+uhhSewCA+wMN0JKwctfQN4d-11qouci3h_bPeA@mail.gmail.com>
-Subject: Re: [PATCH v2] Add Mesh management API
-To: Brian Gix <brian.gix@intel.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20171011190624.2093-1-sbrown@cortland.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Brian,
+Hi Steve,
 
-On Wed, Oct 11, 2017 at 10:03 PM, Brian Gix <brian.gix@intel.com> wrote:
-> Version 2 of patch that fixes compile errors
+On Wed, Oct 11, 2017, Steve Brown wrote:
+> The decision whether to segment or not didn't consider the size of the MIC
+> 
+> diff --git a/mesh/net.c b/mesh/net.c
+> index 2d75c4f7d..96e82fe1c 100644
+> --- a/mesh/net.c
+> +++ b/mesh/net.c
+> @@ -2098,7 +2098,7 @@ bool net_access_layer_send(uint8_t ttl, uint16_t src, uint32_t dst,
+>  	if (!result)
+>  		return false;
+>  
+> -	segN = SEG_MAX(len);
+> +	segN = SEG_MAX(len + sizeof(uint32_t));
+>  
+>  	/* Only one ACK required SAR message per destination at a time */
+>  	if (segN && IS_UNICAST(dst)) {
 
-I guess a better start for this set would be to add the documentation
-to userspace.
+Applied, thanks.
 
-> ---
->  include/net/bluetooth/mgmt.h | 91 ++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 91 insertions(+)
->
-> diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-> index 72a456b..6bfee19 100644
-> --- a/include/net/bluetooth/mgmt.h
-> +++ b/include/net/bluetooth/mgmt.h
-> @@ -604,6 +604,82 @@ struct mgmt_cp_set_appearance {
->  } __packed;
->  #define MGMT_SET_APPEARANCE_SIZE       2
->
-> +#define MGMT_OP_MESH_GET_OPTIONS       0x0044
-> +#define MGMT_MESH_GET_OPTIONS_SIZE     0
-> +struct mgmt_rp_mesh_get_options {
-> +       __u8     revision;
-> +       __u8     channel_map;
-> +       __s8     min_tx_power;
-> +       __s8     max_tx_power;
-> +       __u8     max_scan_filter;
-> +       __u8     max_filter_pattern;
-> +       __u8     max_adv_slot;
-> +} __packed;
-> +
-> +#define MGMT_OP_MESH_SET_SCAN_FILTER   0x0045
-> +struct mgmt_cp_set_scan_filter {
-> +       __u8     filter_id;
-> +       __u8     num_patterns;
-> +       __u8     patterns[30];
-> +} __packed;
-> +#define MGMT_MESH_SET_SCAN_FILTER_SIZE 32
-> +struct mgmt_rp_set_scan_filter {
-> +       __u8     filter_id;
-> +} __packed;
-> +
-> +#define MGMT_OP_MESH_SCAN              0x0046
-> +struct mgmt_cp_mesh_scan {
-> +       __u8     enable;
-> +       __u8     channel_map;
-> +       __u8     filter_id;
-> +} __packed;
-> +#define MGMT_MESH_SCAN_SIZE            3
-> +
-> +#define MGMT_OP_MESH_SEND              0x0047
-> +struct mgmt_cp_mesh_send {
-> +       __u8     adv_slot;
-> +       __u8     addr_type;
-> +       __u8     channel_map;
-> +       __s8     tx_power;
-> +       __u8     retx_count;
-> +       __u8     retx_interval;
-> +       __u8     scan_duration;
-> +       __u8     scan_delay;
-> +       __u8     scan_filter;
-> +       __u8     data_len;
-> +       __u8     data[31];
-> +} __packed;
-> +#define MGMT_MESH_SEND_SIZE            41
-> +struct mgmt_rp_mesh_send {
-> +       __u8     adv_slot;
-> +} __packed;
-> +
-> +#define MGMT_OP_MESH_SEND_TIMED                0x0048
-> +struct mgmt_cp_mesh_send_timed {
-> +       __u8     adv_slot;
-> +       __u8     addr_type;
-> +       __u8     channel_map;
-> +       __s8     tx_power;
-> +       __le32   instant;
-> +       __u8     tx_delay;
-> +       __u8     tx_window;
-> +       __u8     data_len;
-> +       __u8     data[31];
-> +} __packed;
-> +#define MGMT_MESH_SEND_TIMED_SIZE      42
-> +struct mgmt_rp_mesh_send_timed {
-> +       __u8     adv_slot;
-> +} __packed;
-> +
-> +#define MGMT_OP_MESH_SEND_CANCEL       0x0049
-> +struct mgmt_cp_mesh_send_cancel {
-> +       __u8     adv_slot;
-> +} __packed;
-> +#define MGMT_MESH_SEND_CANCEL_SIZE     1
-> +struct mgmt_rp_mesh_send_cancel {
-> +       __u8     adv_slot;
-> +} __packed;
-> +
->  #define MGMT_EV_CMD_COMPLETE           0x0001
->  struct mgmt_ev_cmd_complete {
->         __le16  opcode;
-> @@ -824,3 +900,18 @@ struct mgmt_ev_ext_info_changed {
->         __le16  eir_len;
->         __u8    eir[0];
->  } __packed;
-> +
-> +#define MGMT_EV_MESH_SEND_COMPLETE     0x0026
-> +struct mgmt_ev_mesh_send_complete {
-> +       __u8    adv_slot;
-> +} __packed;
-> +
-> +#define MGMT_EV_MESH_SCAN_REPORT       0x0027
-> +struct mgmt_ev_mesh_scan_report {
-> +       __u8    num_reports;
-> +       __u8    channel;
-> +       __s8    rssi;
-> +       __le32  instant;
-> +       __u8    data_len;
-> +       __u8    data[31];
-> +} __packed;
-> --
-> 2.9.5
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-
--- 
-Luiz Augusto von Dentz
+Johan
