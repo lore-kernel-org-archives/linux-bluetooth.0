@@ -1,84 +1,75 @@
 Return-Path: <hdegoede@redhat.com>
-Subject: Re: [PATCH 2/2] Bluetooth: BT_HCIUART now depends on SERIAL_DEV_BUS
+Subject: Re: [PATCH 1/2] Bluetooth: hci_bcm: fix build error without CONFIG_PM
 To: Arnd Bergmann <arnd@arndb.de>, Marcel Holtmann <marcel@holtmann.org>,
  Gustavo Padovan <gustavo@padovan.org>,
  Johan Hedberg <johan.hedberg@gmail.com>
-Cc: Sebastian Reichel <sre@kernel.org>,
- Tobias Regnery <tobias.regnery@gmail.com>, linux-bluetooth@vger.kernel.org,
+Cc: Loic Poulain <loic.poulain@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, linux-bluetooth@vger.kernel.org,
  linux-kernel@vger.kernel.org
 References: <20171011134640.3152236-1-arnd@arndb.de>
- <20171011134805.3207569-1-arnd@arndb.de>
 From: Hans de Goede <hdegoede@redhat.com>
-Message-ID: <ff49535c-61e1-f6da-8b2c-490dc55d5982@redhat.com>
-Date: Wed, 11 Oct 2017 16:33:37 +0200
+Message-ID: <e76549b8-f4eb-f7a9-6614-23fb28e6f44a@redhat.com>
+Date: Wed, 11 Oct 2017 16:29:13 +0200
 MIME-Version: 1.0
-In-Reply-To: <20171011134805.3207569-1-arnd@arndb.de>
+In-Reply-To: <20171011134640.3152236-1-arnd@arndb.de>
 Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
 
-On 11-10-17 15:47, Arnd Bergmann wrote:
-> It is no longer possible to build BT_HCIUART into the kernel
-> when SERIAL_DEV_BUS is a loadable module, even if none of the
-> SERIAL_DEV_BUS based implementations are selected:
+On 11-10-17 15:46, Arnd Bergmann wrote:
+> This was introduced by the rework adding PM support:
 > 
-> drivers/bluetooth/hci_ldisc.o: In function `hci_uart_set_flow_control':
-> hci_ldisc.c:(.text+0xb40): undefined reference to `serdev_device_set_flow_control'
-> hci_ldisc.c:(.text+0xb5c): undefined reference to `serdev_device_set_tiocm'
+> drivers/bluetooth/hci_bcm.c: In function 'bcm_device_exists':
+> drivers/bluetooth/hci_bcm.c:156:22: error: 'struct bcm_device' has no member named 'hu'
+>    if (device && device->hu && device->hu->serdev)
+>                        ^~
 > 
-> This adds a dependency to avoid the broken configuration.
+> The pointer is not available otherwise, so I'm enclosing
+> all references in an #ifdef here.
 > 
-> Fixes: 7841d554809b ("Bluetooth: hci_uart_set_flow_control: Fix NULL deref when using serdev")
+> Fixes: 8a92056837fd ("Bluetooth: hci_bcm: Add (runtime)pm support to the serdev driver")
 > Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 
-Another one I have on my TODO after the buildbot errors. In this case
-I do not believe this is the proper fix though.
+I had this on my TODO after the buildbot errors, thank you for fixing
+this.
 
-As pointed out in another thread discussing the series introducing
-this problem, hci_ldisc.c really should not depend on serdev,
-so the proper fix would be to have hci_bcm.c directly call
-the serdev flowcontrol and rts functions when the hci is
-backed by a serdev device, like hci_bcm.c is already doing
-when setting the baudrate, see host_set_baudrate in hci_bcm.c,
-so a similar host_set_flow_control should be added after which
-the changes to hci_ldisc.c can be reverted.
+The fix looks good to me:
 
-If I understood Marcel correctly he prefers a single patch
-fixing this which also removes the changes from hci_ldisc.c,
-rather then a separate revert.
-
-As said I've this on my todo, but feel free to beat me to it,
-I likely will not get around to this before Friday anyways.
+Reviewed-by: Hans de Goede <hdegoede@redhat.com>
 
 Regards,
 
 Hans
 
-
-
 > ---
->   drivers/bluetooth/Kconfig | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
+>   drivers/bluetooth/hci_bcm.c | 4 ++++
+>   1 file changed, 4 insertions(+)
 > 
-> diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
-> index fae5a74dc737..4427d54b7331 100644
-> --- a/drivers/bluetooth/Kconfig
-> +++ b/drivers/bluetooth/Kconfig
-> @@ -65,6 +65,7 @@ config BT_HCIBTSDIO
+> diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
+> index ab1455e63b92..089bd0473451 100644
+> --- a/drivers/bluetooth/hci_bcm.c
+> +++ b/drivers/bluetooth/hci_bcm.c
+> @@ -152,9 +152,11 @@ static bool bcm_device_exists(struct bcm_device *device)
+>   {
+>   	struct list_head *p;
 >   
->   config BT_HCIUART
->   	tristate "HCI UART driver"
-> +	depends on SERIAL_DEV_BUS || !SERIAL_DEV_BUS
->   	depends on TTY
->   	help
->   	  Bluetooth HCI UART driver.
-> @@ -79,7 +80,6 @@ config BT_HCIUART
->   config BT_HCIUART_SERDEV
->   	bool
->   	depends on SERIAL_DEV_BUS && BT_HCIUART
-> -	depends on SERIAL_DEV_BUS=y || SERIAL_DEV_BUS=BT_HCIUART
->   	default y
+> +#ifdef CONFIG_PM
+>   	/* Devices using serdev always exist */
+>   	if (device && device->hu && device->hu->serdev)
+>   		return true;
+> +#endif
 >   
->   config BT_HCIUART_H4
+>   	list_for_each(p, &bcm_device_list) {
+>   		struct bcm_device *dev = list_entry(p, struct bcm_device, list);
+> @@ -965,7 +967,9 @@ static int bcm_serdev_probe(struct serdev_device *serdev)
+>   		return -ENOMEM;
+>   
+>   	bcmdev->dev = &serdev->dev;
+> +#ifdef CONFIG_PM
+>   	bcmdev->hu = &bcmdev->serdev_hu;
+> +#endif
+>   	bcmdev->serdev_hu.serdev = serdev;
+>   	serdev_device_set_drvdata(serdev, bcmdev);
+>   
 > 
