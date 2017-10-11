@@ -1,81 +1,144 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-From: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
-Subject: [PATCH BlueZ] core: Remove defunct option AutoConnectTimeout
-Message-ID: <6d4a8197-bb65-d327-5c75-e84d52207b19@jp.fujitsu.com>
-Date: Thu, 12 Oct 2017 17:06:24 +0900
+Return-Path: <luiz.dentz@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <20171011190307.28570-1-brian.gix@intel.com>
+References: <20171011190307.28570-1-brian.gix@intel.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Wed, 11 Oct 2017 22:39:01 +0300
+Message-ID: <CABBYNZ+P_Ph+uhhSewCA+wMN0JKwctfQN4d-11qouci3h_bPeA@mail.gmail.com>
+Subject: Re: [PATCH v2] Add Mesh management API
+To: Brian Gix <brian.gix@intel.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Remove the useless option AutoConnectTimeout since the commit dd3f4ca901
-("plugins: remove unmaintained plugins") removed
-btd_adapter_enable_auto_connect() for which this option was only intended.
----
- src/hcid.h    |  1 -
- src/main.c    | 11 -----------
- src/main.conf |  6 ------
- 3 files changed, 18 deletions(-)
+Hi Brian,
 
-diff --git a/src/hcid.h b/src/hcid.h
-index 552d63bc..62e2bd6 100644
---- a/src/hcid.h
-+++ b/src/hcid.h
-@@ -38,7 +38,6 @@ typedef enum {
- struct main_opts {
- 	char		*name;
- 	uint32_t	class;
--	uint16_t	autoto;
- 	uint32_t	pairto;
- 	uint32_t	discovto;
- 	uint8_t		privacy;
-diff --git a/src/main.c b/src/main.c
-index fc50bbd..21f0b14 100644
---- a/src/main.c
-+++ b/src/main.c
-@@ -82,7 +82,6 @@ static const char *supported_options[] = {
- 	"Class",
- 	"DiscoverableTimeout",
- 	"PairableTimeout",
--	"AutoConnectTimeout",
- 	"DeviceID",
- 	"ReverseServiceDiscovery",
- 	"NameResolving",
-@@ -297,16 +296,6 @@ static void parse_config(GKeyFile *config)
- 		main_opts.pairto = val;
- 	}
- 
--	val = g_key_file_get_integer(config, "General", "AutoConnectTimeout",
--									&err);
--	if (err) {
--		DBG("%s", err->message);
--		g_clear_error(&err);
--	} else {
--		DBG("auto_to=%d", val);
--		main_opts.autoto = val;
--	}
--
- 	str = g_key_file_get_string(config, "General", "Privacy", &err);
- 	if (err) {
- 		DBG("%s", err->message);
-diff --git a/src/main.conf b/src/main.conf
-index ba17405..21986b3 100644
---- a/src/main.conf
-+++ b/src/main.conf
-@@ -18,12 +18,6 @@
- # 0 = disable timer, i.e. stay pairable forever
- #PairableTimeout = 0
- 
--# Automatic connection for bonded devices driven by platform/user events.
--# If a platform plugin uses this mechanism, automatic connections will be
--# enabled during the interval defined below. Initially, this feature
--# intends to be used to establish connections to ATT channels. Default is 60.
--#AutoConnectTimeout = 60
--
- # Use vendor id source (assigner), vendor, product and version information for
- # DID profile support. The values are separated by ":" and assigner, VID, PID
- # and version.
+On Wed, Oct 11, 2017 at 10:03 PM, Brian Gix <brian.gix@intel.com> wrote:
+> Version 2 of patch that fixes compile errors
+
+I guess a better start for this set would be to add the documentation
+to userspace.
+
+> ---
+>  include/net/bluetooth/mgmt.h | 91 ++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 91 insertions(+)
+>
+> diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+> index 72a456b..6bfee19 100644
+> --- a/include/net/bluetooth/mgmt.h
+> +++ b/include/net/bluetooth/mgmt.h
+> @@ -604,6 +604,82 @@ struct mgmt_cp_set_appearance {
+>  } __packed;
+>  #define MGMT_SET_APPEARANCE_SIZE       2
+>
+> +#define MGMT_OP_MESH_GET_OPTIONS       0x0044
+> +#define MGMT_MESH_GET_OPTIONS_SIZE     0
+> +struct mgmt_rp_mesh_get_options {
+> +       __u8     revision;
+> +       __u8     channel_map;
+> +       __s8     min_tx_power;
+> +       __s8     max_tx_power;
+> +       __u8     max_scan_filter;
+> +       __u8     max_filter_pattern;
+> +       __u8     max_adv_slot;
+> +} __packed;
+> +
+> +#define MGMT_OP_MESH_SET_SCAN_FILTER   0x0045
+> +struct mgmt_cp_set_scan_filter {
+> +       __u8     filter_id;
+> +       __u8     num_patterns;
+> +       __u8     patterns[30];
+> +} __packed;
+> +#define MGMT_MESH_SET_SCAN_FILTER_SIZE 32
+> +struct mgmt_rp_set_scan_filter {
+> +       __u8     filter_id;
+> +} __packed;
+> +
+> +#define MGMT_OP_MESH_SCAN              0x0046
+> +struct mgmt_cp_mesh_scan {
+> +       __u8     enable;
+> +       __u8     channel_map;
+> +       __u8     filter_id;
+> +} __packed;
+> +#define MGMT_MESH_SCAN_SIZE            3
+> +
+> +#define MGMT_OP_MESH_SEND              0x0047
+> +struct mgmt_cp_mesh_send {
+> +       __u8     adv_slot;
+> +       __u8     addr_type;
+> +       __u8     channel_map;
+> +       __s8     tx_power;
+> +       __u8     retx_count;
+> +       __u8     retx_interval;
+> +       __u8     scan_duration;
+> +       __u8     scan_delay;
+> +       __u8     scan_filter;
+> +       __u8     data_len;
+> +       __u8     data[31];
+> +} __packed;
+> +#define MGMT_MESH_SEND_SIZE            41
+> +struct mgmt_rp_mesh_send {
+> +       __u8     adv_slot;
+> +} __packed;
+> +
+> +#define MGMT_OP_MESH_SEND_TIMED                0x0048
+> +struct mgmt_cp_mesh_send_timed {
+> +       __u8     adv_slot;
+> +       __u8     addr_type;
+> +       __u8     channel_map;
+> +       __s8     tx_power;
+> +       __le32   instant;
+> +       __u8     tx_delay;
+> +       __u8     tx_window;
+> +       __u8     data_len;
+> +       __u8     data[31];
+> +} __packed;
+> +#define MGMT_MESH_SEND_TIMED_SIZE      42
+> +struct mgmt_rp_mesh_send_timed {
+> +       __u8     adv_slot;
+> +} __packed;
+> +
+> +#define MGMT_OP_MESH_SEND_CANCEL       0x0049
+> +struct mgmt_cp_mesh_send_cancel {
+> +       __u8     adv_slot;
+> +} __packed;
+> +#define MGMT_MESH_SEND_CANCEL_SIZE     1
+> +struct mgmt_rp_mesh_send_cancel {
+> +       __u8     adv_slot;
+> +} __packed;
+> +
+>  #define MGMT_EV_CMD_COMPLETE           0x0001
+>  struct mgmt_ev_cmd_complete {
+>         __le16  opcode;
+> @@ -824,3 +900,18 @@ struct mgmt_ev_ext_info_changed {
+>         __le16  eir_len;
+>         __u8    eir[0];
+>  } __packed;
+> +
+> +#define MGMT_EV_MESH_SEND_COMPLETE     0x0026
+> +struct mgmt_ev_mesh_send_complete {
+> +       __u8    adv_slot;
+> +} __packed;
+> +
+> +#define MGMT_EV_MESH_SCAN_REPORT       0x0027
+> +struct mgmt_ev_mesh_scan_report {
+> +       __u8    num_reports;
+> +       __u8    channel;
+> +       __s8    rssi;
+> +       __le32  instant;
+> +       __u8    data_len;
+> +       __u8    data[31];
+> +} __packed;
+> --
+> 2.9.5
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
 -- 
-2.7.4
-
+Luiz Augusto von Dentz
