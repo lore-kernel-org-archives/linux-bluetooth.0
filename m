@@ -1,60 +1,57 @@
-Return-Path: <arnd@arndb.de>
-From: Arnd Bergmann <arnd@arndb.de>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>
-Cc: Arnd Bergmann <arnd@arndb.de>,
-	Hans de Goede <hdegoede@redhat.com>,
-	Loic Poulain <loic.poulain@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 1/2] Bluetooth: hci_bcm: fix build error without CONFIG_PM
-Date: Wed, 11 Oct 2017 15:46:21 +0200
-Message-Id: <20171011134640.3152236-1-arnd@arndb.de>
+Return-Path: <rjwysocki@gmail.com>
+MIME-Version: 1.0
+Sender: rjwysocki@gmail.com
+In-Reply-To: <20171011090354.GS4269@localhost>
+References: <1507710734-32520-1-git-send-email-frederic.danis.oss@gmail.com> <20171011090354.GS4269@localhost>
+From: "Rafael J. Wysocki" <rafael@kernel.org>
+Date: Wed, 11 Oct 2017 15:09:12 +0200
+Message-ID: <CAJZ5v0jPEg5Ow4p0DzPJ9Md7RUTPhZZqCzqP5zmX-pPf9N80=g@mail.gmail.com>
+Subject: Re: [PATCH v3 0/2] ACPI serdev support
+To: Johan Hovold <johan@kernel.org>
+Cc: =?UTF-8?B?RnLDqWTDqXJpYyBEYW5pcw==?= <frederic.danis.oss@gmail.com>,
+	"Rafael J. Wysocki" <rafael@kernel.org>, Rob Herring <robh@kernel.org>,
+	Marcel Holtmann <marcel@holtmann.org>, Sebastian Reichel <sre@kernel.org>,
+	Loic Poulain <loic.poulain@gmail.com>, Lukas Wunner <lukas@wunner.de>,
+	Hans de Goede <hdegoede@redhat.com>, Greg Kroah-Hartman <greg@kroah.com>,
+	"open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+	"linux-serial@vger.kernel.org" <linux-serial@vger.kernel.org>,
+	ACPI Devel Maling List <linux-acpi@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This was introduced by the rework adding PM support:
+On Wed, Oct 11, 2017 at 11:03 AM, Johan Hovold <johan@kernel.org> wrote:
+> On Wed, Oct 11, 2017 at 10:32:12AM +0200, Fr=C3=A9d=C3=A9ric Danis wrote:
+>> Add ACPI support for serial attached devices.
+>>
+>> Currently, serial devices are not set as enumerated during ACPI scan for=
+ SPI
+>> or i2c buses (but not for UART). This should also be done for UART seria=
+l
+>> devices.
+>> I renamed *spi_i2c_slave* to *serial_bus_slave* to reflect this.
+>>
+>> This needs Johan Hovold's "serdev: fix registration of second slave" pat=
+ch.
+>
+> In theory this series could go in through the acpi-tree without my
+> fix. It would only affect an error case where an unlikely failure to
+> register an ACPI serdev device, would prevent the tty-class device from
+> being registered instead of the controller. That is, something we can
+> live with until this all converges in 4.15-rc1 if needed.
+>
+> That said, I think we should consider taking all serdev changes, and
+> therefore also the ACPI patch, through the tty tree instead in order to
+> avoid merge conflicts. Rafael?
 
-drivers/bluetooth/hci_bcm.c: In function 'bcm_device_exists':
-drivers/bluetooth/hci_bcm.c:156:22: error: 'struct bcm_device' has no member named 'hu'
-  if (device && device->hu && device->hu->serdev)
-                      ^~
+OK
 
-The pointer is not available otherwise, so I'm enclosing
-all references in an #ifdef here.
+Please feel free to add
 
-Fixes: 8a92056837fd ("Bluetooth: hci_bcm: Add (runtime)pm support to the serdev driver")
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
----
- drivers/bluetooth/hci_bcm.c | 4 ++++
- 1 file changed, 4 insertions(+)
+Acked-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
 
-diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
-index ab1455e63b92..089bd0473451 100644
---- a/drivers/bluetooth/hci_bcm.c
-+++ b/drivers/bluetooth/hci_bcm.c
-@@ -152,9 +152,11 @@ static bool bcm_device_exists(struct bcm_device *device)
- {
- 	struct list_head *p;
- 
-+#ifdef CONFIG_PM
- 	/* Devices using serdev always exist */
- 	if (device && device->hu && device->hu->serdev)
- 		return true;
-+#endif
- 
- 	list_for_each(p, &bcm_device_list) {
- 		struct bcm_device *dev = list_entry(p, struct bcm_device, list);
-@@ -965,7 +967,9 @@ static int bcm_serdev_probe(struct serdev_device *serdev)
- 		return -ENOMEM;
- 
- 	bcmdev->dev = &serdev->dev;
-+#ifdef CONFIG_PM
- 	bcmdev->hu = &bcmdev->serdev_hu;
-+#endif
- 	bcmdev->serdev_hu.serdev = serdev;
- 	serdev_device_set_drvdata(serdev, bcmdev);
- 
--- 
-2.9.0
+to the ACPI core change.
+
+And I will assume that this series will go in via the tty tree.
+
+Thanks,
+Rafael
