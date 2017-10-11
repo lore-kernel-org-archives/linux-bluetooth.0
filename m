@@ -1,21 +1,19 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <brian.gix@intel.com>
 From: Brian Gix <brian.gix@intel.com>
-To: marcel@holtmann.org, linux-bluetooth@vger.kernel.org
+To: marcel@holtmann.org,
+	linux-bluetooth@vger.kernel.org
 Cc: Brian Gix <brian.gix@intel.com>
-Subject: [PATCH v2] Add Mesh management API
-Date: Wed, 11 Oct 2017 12:03:07 -0700
-Message-Id: <20171011190307.28570-1-brian.gix@intel.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Subject: [PATCH 1/1] Add Mesh management API
+Date: Wed, 11 Oct 2017 11:47:43 -0700
+Message-Id: <20171011184743.24039-1-brian.gix@intel.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
-
-Version 2 of patch that fixes compile errors
 
 ---
  include/net/bluetooth/mgmt.h | 91 ++++++++++++++++++++++++++++++++++++++++++++
  1 file changed, 91 insertions(+)
 
 diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-index 72a456b..6bfee19 100644
+index 72a456b..c98da20 100644
 --- a/include/net/bluetooth/mgmt.h
 +++ b/include/net/bluetooth/mgmt.h
 @@ -604,6 +604,82 @@ struct mgmt_cp_set_appearance {
@@ -46,7 +44,7 @@ index 72a456b..6bfee19 100644
 +} __packed;
 +
 +#define MGMT_OP_MESH_SCAN		0x0046
-+struct mgmt_cp_mesh_scan {
++struct mgmt_cp_set_scan_filter {
 +	__u8	 enable;
 +	__u8	 channel_map;
 +	__u8     filter_id;
@@ -116,10 +114,9 @@ index 72a456b..6bfee19 100644
 +	__u8	num_reports;
 +	__u8	channel;
 +	__s8	rssi;
-+	__le32	instant;
++	__le328	instant;
 +	__u8	data_len;
 +	__u8	data[31];
 +} __packed;
 -- 
 2.9.5
-
