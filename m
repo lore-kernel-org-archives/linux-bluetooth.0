@@ -1,122 +1,64 @@
-Return-Path: <brian.gix@intel.com>
-From: Brian Gix <brian.gix@intel.com>
-To: marcel@holtmann.org,
-	linux-bluetooth@vger.kernel.org
-Cc: Brian Gix <brian.gix@intel.com>
-Subject: [PATCH 1/1] Add Mesh management API
-Date: Wed, 11 Oct 2017 11:47:43 -0700
-Message-Id: <20171011184743.24039-1-brian.gix@intel.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 11.0 \(3445.1.7\))
+Subject: Re: [PATCH v3 0/2] ACPI serdev support
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <CAJZ5v0jPEg5Ow4p0DzPJ9Md7RUTPhZZqCzqP5zmX-pPf9N80=g@mail.gmail.com>
+Date: Wed, 11 Oct 2017 20:32:06 +0200
+Cc: Johan Hovold <johan@kernel.org>,
+        =?utf-8?Q?Fr=C3=A9d=C3=A9ric_Danis?= <frederic.danis.oss@gmail.com>,
+        Rob Herring <robh@kernel.org>,
+        Sebastian Reichel <sre@kernel.org>,
+        Loic Poulain <loic.poulain@gmail.com>,
+        Lukas Wunner <lukas@wunner.de>,
+        Hans de Goede <hdegoede@redhat.com>,
+        Greg Kroah-Hartman <greg@kroah.com>,
+        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+        "linux-serial@vger.kernel.org" <linux-serial@vger.kernel.org>,
+        ACPI Devel Maling List <linux-acpi@vger.kernel.org>
+Message-Id: <AA38D4FD-5A35-460D-85CF-380BAB933448@holtmann.org>
+References: <1507710734-32520-1-git-send-email-frederic.danis.oss@gmail.com>
+ <20171011090354.GS4269@localhost>
+ <CAJZ5v0jPEg5Ow4p0DzPJ9Md7RUTPhZZqCzqP5zmX-pPf9N80=g@mail.gmail.com>
+To: "Rafael J. Wysocki" <rafael@kernel.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- include/net/bluetooth/mgmt.h | 91 ++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 91 insertions(+)
+Hi Greg,
 
-diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-index 72a456b..c98da20 100644
---- a/include/net/bluetooth/mgmt.h
-+++ b/include/net/bluetooth/mgmt.h
-@@ -604,6 +604,82 @@ struct mgmt_cp_set_appearance {
- } __packed;
- #define MGMT_SET_APPEARANCE_SIZE	2
- 
-+#define MGMT_OP_MESH_GET_OPTIONS	0x0044
-+#define MGMT_MESH_GET_OPTIONS_SIZE	0
-+struct mgmt_rp_mesh_get_options {
-+	__u8     revision;
-+	__u8     channel_map;
-+	__s8	 min_tx_power;
-+	__s8	 max_tx_power;
-+	__u8     max_scan_filter;
-+	__u8     max_filter_pattern;
-+	__u8     max_adv_slot;
-+} __packed;
-+
-+#define MGMT_OP_MESH_SET_SCAN_FILTER	0x0045
-+struct mgmt_cp_set_scan_filter {
-+	__u8	 filter_id;
-+	__u8	 num_patterns;
-+	__u8     patterns[30];
-+} __packed;
-+#define MGMT_MESH_SET_SCAN_FILTER_SIZE	32
-+struct mgmt_rp_set_scan_filter {
-+	__u8     filter_id;
-+} __packed;
-+
-+#define MGMT_OP_MESH_SCAN		0x0046
-+struct mgmt_cp_set_scan_filter {
-+	__u8	 enable;
-+	__u8	 channel_map;
-+	__u8     filter_id;
-+} __packed;
-+#define MGMT_MESH_SCAN_SIZE		3
-+
-+#define MGMT_OP_MESH_SEND		0x0047
-+struct mgmt_cp_mesh_send {
-+	__u8	 adv_slot;
-+	__u8	 addr_type;
-+	__u8	 channel_map;
-+	__s8	 tx_power;
-+	__u8	 retx_count;
-+	__u8	 retx_interval;
-+	__u8	 scan_duration;
-+	__u8	 scan_delay;
-+	__u8	 scan_filter;
-+	__u8	 data_len;
-+	__u8	 data[31];
-+} __packed;
-+#define MGMT_MESH_SEND_SIZE		41
-+struct mgmt_rp_mesh_send {
-+	__u8     adv_slot;
-+} __packed;
-+
-+#define MGMT_OP_MESH_SEND_TIMED		0x0048
-+struct mgmt_cp_mesh_send_timed {
-+	__u8	 adv_slot;
-+	__u8	 addr_type;
-+	__u8	 channel_map;
-+	__s8	 tx_power;
-+	__le32	 instant;
-+	__u8	 tx_delay;
-+	__u8	 tx_window;
-+	__u8	 data_len;
-+	__u8	 data[31];
-+} __packed;
-+#define MGMT_MESH_SEND_TIMED_SIZE	42
-+struct mgmt_rp_mesh_send_timed {
-+	__u8     adv_slot;
-+} __packed;
-+
-+#define MGMT_OP_MESH_SEND_CANCEL	0x0049
-+struct mgmt_cp_mesh_send_cancel {
-+	__u8	 adv_slot;
-+} __packed;
-+#define MGMT_MESH_SEND_CANCEL_SIZE	1
-+struct mgmt_rp_mesh_send_cancel {
-+	__u8     adv_slot;
-+} __packed;
-+
- #define MGMT_EV_CMD_COMPLETE		0x0001
- struct mgmt_ev_cmd_complete {
- 	__le16	opcode;
-@@ -824,3 +900,18 @@ struct mgmt_ev_ext_info_changed {
- 	__le16	eir_len;
- 	__u8	eir[0];
- } __packed;
-+
-+#define MGMT_EV_MESH_SEND_COMPLETE	0x0026
-+struct mgmt_ev_mesh_send_complete {
-+	__u8	adv_slot;
-+} __packed;
-+
-+#define MGMT_EV_MESH_SCAN_REPORT	0x0027
-+struct mgmt_ev_mesh_scan_report {
-+	__u8	num_reports;
-+	__u8	channel;
-+	__s8	rssi;
-+	__le328	instant;
-+	__u8	data_len;
-+	__u8	data[31];
-+} __packed;
--- 
-2.9.5
+>>> Add ACPI support for serial attached devices.
+>>> 
+>>> Currently, serial devices are not set as enumerated during ACPI scan for SPI
+>>> or i2c buses (but not for UART). This should also be done for UART serial
+>>> devices.
+>>> I renamed *spi_i2c_slave* to *serial_bus_slave* to reflect this.
+>>> 
+>>> This needs Johan Hovold's "serdev: fix registration of second slave" patch.
+>> 
+>> In theory this series could go in through the acpi-tree without my
+>> fix. It would only affect an error case where an unlikely failure to
+>> register an ACPI serdev device, would prevent the tty-class device from
+>> being registered instead of the controller. That is, something we can
+>> live with until this all converges in 4.15-rc1 if needed.
+>> 
+>> That said, I think we should consider taking all serdev changes, and
+>> therefore also the ACPI patch, through the tty tree instead in order to
+>> avoid merge conflicts. Rafael?
+> 
+> OK
+> 
+> Please feel free to add
+> 
+> Acked-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+> 
+> to the ACPI core change.
+> 
+> And I will assume that this series will go in via the tty tree.
+
+you have to take these two patches now via the TTY tree now. In case you already marked them as someone else problem ;)
+
+Regards
+
+Marcel
+
