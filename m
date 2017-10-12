@@ -1,78 +1,81 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Subject: Re: [PATCH BlueZ 1/2] tools/btmgmt: Add readline support to stop-find
-From: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
 To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-References: <5f2959f9-9888-1ac5-6991-106f12d651fe@jp.fujitsu.com>
-Message-ID: <c8b994b4-3f42-7f15-7dbc-bf90e1bcc95f@jp.fujitsu.com>
-Date: Thu, 12 Oct 2017 17:16:00 +0900
+From: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
+Subject: [PATCH BlueZ] core: Remove defunct option AutoConnectTimeout
+Message-ID: <6d4a8197-bb65-d327-5c75-e84d52207b19@jp.fujitsu.com>
+Date: Thu, 12 Oct 2017 17:06:24 +0900
 MIME-Version: 1.0
-In-Reply-To: <5f2959f9-9888-1ac5-6991-106f12d651fe@jp.fujitsu.com>
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Remove the useless option AutoConnectTimeout since the commit dd3f4ca901
+("plugins: remove unmaintained plugins") removed
+btd_adapter_enable_auto_connect() for which this option was only intended.
+---
+ src/hcid.h    |  1 -
+ src/main.c    | 11 -----------
+ src/main.conf |  6 ------
+ 3 files changed, 18 deletions(-)
 
-Could you please help to have a review?
-
-Regards,
-Eramoto
-
-On 10/06/2017 01:12 PM, ERAMOTO Masaya wrote:
-> So can continue to run btmgmt even if using 'stop-find --help' in the 
-> interactive mode.
-> ---
->  tools/btmgmt.c | 13 ++++++-------
->  1 file changed, 6 insertions(+), 7 deletions(-)
-> 
-> diff --git a/tools/btmgmt.c b/tools/btmgmt.c
-> index e454d86..0f21f48 100644
-> --- a/tools/btmgmt.c
-> +++ b/tools/btmgmt.c
-> @@ -2357,13 +2357,12 @@ static void stop_find_rsp(uint8_t status, uint16_t len, const void *param,
->  							void *user_data)
->  {
->  	if (status != 0) {
-> -		fprintf(stderr,
-> -			"Stop Discovery failed: status 0x%02x (%s)\n",
-> +		error("Stop Discovery failed: status 0x%02x (%s)",
->  						status, mgmt_errstr(status));
->  		return noninteractive_quit(EXIT_SUCCESS);
->  	}
->  
-> -	printf("Discovery stopped\n");
-> +	print("Discovery stopped");
->  	discovery = false;
->  
->  	noninteractive_quit(EXIT_SUCCESS);
-> @@ -2371,7 +2370,7 @@ static void stop_find_rsp(uint8_t status, uint16_t len, const void *param,
->  
->  static void stop_find_usage(void)
->  {
-> -	printf("Usage: btmgmt stop-find [-l|-b]>\n");
-> +	print("Usage: btmgmt stop-find [-l|-b]");
->  }
->  
->  static struct option stop_find_options[] = {
-> @@ -2406,7 +2405,7 @@ static void cmd_stop_find(struct mgmt *mgmt, uint16_t index, int argc,
->  		default:
->  			stop_find_usage();
->  			optind = 0;
-> -			exit(EXIT_SUCCESS);
-> +			return noninteractive_quit(EXIT_SUCCESS);
->  		}
->  	}
->  
-> @@ -2419,8 +2418,8 @@ static void cmd_stop_find(struct mgmt *mgmt, uint16_t index, int argc,
->  
->  	if (mgmt_send(mgmt, MGMT_OP_STOP_DISCOVERY, index, sizeof(cp), &cp,
->  					     stop_find_rsp, NULL, NULL) == 0) {
-> -		fprintf(stderr, "Unable to send stop_discovery cmd\n");
-> -		exit(EXIT_FAILURE);
-> +		error("Unable to send stop_discovery cmd");
-> +		return noninteractive_quit(EXIT_FAILURE);
->  	}
->  }
->  
-> 
+diff --git a/src/hcid.h b/src/hcid.h
+index 552d63bc..62e2bd6 100644
+--- a/src/hcid.h
++++ b/src/hcid.h
+@@ -38,7 +38,6 @@ typedef enum {
+ struct main_opts {
+ 	char		*name;
+ 	uint32_t	class;
+-	uint16_t	autoto;
+ 	uint32_t	pairto;
+ 	uint32_t	discovto;
+ 	uint8_t		privacy;
+diff --git a/src/main.c b/src/main.c
+index fc50bbd..21f0b14 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -82,7 +82,6 @@ static const char *supported_options[] = {
+ 	"Class",
+ 	"DiscoverableTimeout",
+ 	"PairableTimeout",
+-	"AutoConnectTimeout",
+ 	"DeviceID",
+ 	"ReverseServiceDiscovery",
+ 	"NameResolving",
+@@ -297,16 +296,6 @@ static void parse_config(GKeyFile *config)
+ 		main_opts.pairto = val;
+ 	}
+ 
+-	val = g_key_file_get_integer(config, "General", "AutoConnectTimeout",
+-									&err);
+-	if (err) {
+-		DBG("%s", err->message);
+-		g_clear_error(&err);
+-	} else {
+-		DBG("auto_to=%d", val);
+-		main_opts.autoto = val;
+-	}
+-
+ 	str = g_key_file_get_string(config, "General", "Privacy", &err);
+ 	if (err) {
+ 		DBG("%s", err->message);
+diff --git a/src/main.conf b/src/main.conf
+index ba17405..21986b3 100644
+--- a/src/main.conf
++++ b/src/main.conf
+@@ -18,12 +18,6 @@
+ # 0 = disable timer, i.e. stay pairable forever
+ #PairableTimeout = 0
+ 
+-# Automatic connection for bonded devices driven by platform/user events.
+-# If a platform plugin uses this mechanism, automatic connections will be
+-# enabled during the interval defined below. Initially, this feature
+-# intends to be used to establish connections to ATT channels. Default is 60.
+-#AutoConnectTimeout = 60
+-
+ # Use vendor id source (assigner), vendor, product and version information for
+ # DID profile support. The values are separated by ":" and assigner, VID, PID
+ # and version.
+-- 
+2.7.4
 
