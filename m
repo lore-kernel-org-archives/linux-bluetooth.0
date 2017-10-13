@@ -1,10 +1,9 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Subject: [PATCH V2 BLueZ 2/3] android: Get max advertising instances from
- kernel
+Subject: [PATCH V2 BLueZ 1/3] android: Skip key loading for LE only devices.
 To: linux-bluetooth@vger.kernel.org
 From: Martin Fuzzey <mfuzzey@parkeon.com>
-Date: Fri, 13 Oct 2017 16:02:08 +0200
-Message-ID: <20171013140208.19524.92748.stgit@localhost>
+Date: Fri, 13 Oct 2017 16:02:06 +0200
+Message-ID: <20171013140206.19524.46398.stgit@localhost>
 In-Reply-To: <20171013140204.19524.68439.stgit@localhost>
 References: <20171013140204.19524.68439.stgit@localhost>
 MIME-Version: 1.0
@@ -12,72 +11,26 @@ Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Use the mgmnt "advinfo" operation to obtain the number of advertising
-instances supported by the kernel.
+Key loading is not supported for LE only devices.
 ---
- android/bluetooth.c |   44 +++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 43 insertions(+), 1 deletion(-)
+ android/bluetooth.c |    6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
 diff --git a/android/bluetooth.c b/android/bluetooth.c
-index c3ad5ce..b5a2eab 100644
+index 51a31fe..c3ad5ce 100644
 --- a/android/bluetooth.c
 +++ b/android/bluetooth.c
-@@ -3336,6 +3336,37 @@ static void clear_auto_connect_list(void)
- 	error("Could not clear auto connect list");
- }
+@@ -3265,7 +3265,11 @@ static void load_devices_info(bt_bluetooth_ready cb)
+ 	load_irks(irks);
+ 	g_slist_free_full(irks, g_free);
  
-+static void read_adv_features_complete(uint8_t status, uint16_t length,
-+					const void *param, void *user_data)
-+{
-+	const struct mgmt_rp_read_adv_features *rp = param;
-+	bt_bluetooth_ready cb = user_data;
-+	int err;
+-	load_link_keys(keys, cb);
++	if (adapter.supported_settings & MGMT_SETTING_BREDR)
++		load_link_keys(keys, cb);
++	else
++		cb(0, &adapter.bdaddr);
 +
-+	if (status) {
-+		error("Failed to read advertising features for index %u: %s (0x%02x)",
-+				adapter.index, mgmt_errstr(status), status);
-+		err = -EIO;
-+		goto failed;
-+	}
-+
-+	if (length < sizeof(*rp)) {
-+		error("Too small read advertising features response");
-+		err = -EIO;
-+		goto failed;
-+	}
-+
-+	adapter.max_advert_instance = rp->max_instances;
-+	info("Max LE advertising instances: %d", adapter.max_advert_instance);
-+
-+	load_devices_info(cb);
-+
-+	return;
-+
-+failed:
-+	cb(err, NULL);
-+}
-+
- static void read_info_complete(uint8_t status, uint16_t length,
- 					const void *param, void *user_data)
- {
-@@ -3407,7 +3438,18 @@ static void read_info_complete(uint8_t status, uint16_t length,
- 	if (missing_settings & MGMT_SETTING_BONDABLE)
- 		set_mode(MGMT_OP_SET_BONDABLE, 0x01);
+ 	g_slist_free_full(keys, g_free);
  
--	load_devices_info(cb);
-+	if (adapter.supported_settings & MGMT_SETTING_LE) {
-+		if (mgmt_send(mgmt_if, MGMT_OP_READ_ADV_FEATURES, adapter.index,
-+			      0, NULL,
-+			      read_adv_features_complete, cb, NULL) == 0) {
-+			error("Cannot get LE adv features");
-+			err = -EIO;
-+			goto failed;
-+		}
-+	} else {
-+		load_devices_info(cb);
-+	}
-+
- 	load_devices_cache();
- 
- 	return;
+ 	g_strfreev(devs);
 
