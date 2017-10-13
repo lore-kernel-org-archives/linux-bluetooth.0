@@ -6,80 +6,31 @@ To: Marcel Holtmann <marcel@holtmann.org>,
 Cc: Hans de Goede <hdegoede@redhat.com>,
 	linux-bluetooth@vger.kernel.org,
 	linux-acpi@vger.kernel.org
-Subject: [PATCH resend 3/3] Revert "Bluetooth: btusb: Add workaround for Broadcom devices without product id"
-Date: Fri, 13 Oct 2017 17:54:03 +0200
-Message-Id: <20171013155403.27060-4-hdegoede@redhat.com>
+Subject: [PATCH resend 2/3] Bluetooth: hci_bcm: Add support for BCM2E7E
+Date: Fri, 13 Oct 2017 17:54:02 +0200
+Message-Id: <20171013155403.27060-3-hdegoede@redhat.com>
 In-Reply-To: <20171013155403.27060-1-hdegoede@redhat.com>
 References: <20171013155403.27060-1-hdegoede@redhat.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Commit 9834e586fa66 ("Bluetooth: btusb: Add workaround for Broadcom devices
-without product id") was added to deal with the BT part of the BCM4356A2
-on GPD pocket laptops having an usb vid:pid of 0000:0000.
-
-After another commit to add support for the BCM UART connected BT ACPI-id
-BCM2E7E used on the GPD win, it turns out that the BT on the GPD pocket is
-connected via both USB and UART. Adding support for the BCM2E7E ACPI-id
-causes it to switch to UART mode.
-
-The Windows shipped with the device is using it in UART mode and the
-presence of the BCM2E7E ACPI-id combined with the all 0 USB vid:pid
-indicates that the BT part was never meant to be used in USB mode.
-
-With the recent patches to use serdev device enumeration / instantiation
-for UART attached ACPI enumerated BT devices, everything work OOTB in UART
-mode and the workaround for the all 0 USB vid:pid is no longer needed.
-
-This reverts commit 9834e586fa ("Bluetooth: btusb: Add workaround for
-Broadcom devices without product id").
+Tested on a GPD win with a BCM4356 PCI-E wifi/bt combo card.
 
 Signed-off-by: Hans de Goede <hdegoede@redhat.com>
 ---
- drivers/bluetooth/btusb.c | 18 ------------------
- 1 file changed, 18 deletions(-)
+ drivers/bluetooth/hci_bcm.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 7a5c06aaa181..c054d7bce490 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -66,7 +66,6 @@ static struct usb_driver btusb_driver;
- #define BTUSB_BCM2045		0x40000
- #define BTUSB_IFNUM_2		0x80000
- #define BTUSB_CW6622		0x100000
--#define BTUSB_BCM_NO_PRODID	0x200000
- 
- static const struct usb_device_id btusb_table[] = {
- 	/* Generic Bluetooth USB device */
-@@ -171,10 +170,6 @@ static const struct usb_device_id btusb_table[] = {
- 	{ USB_VENDOR_AND_INTERFACE_INFO(0x0930, 0xff, 0x01, 0x01),
- 	  .driver_info = BTUSB_BCM_PATCHRAM },
- 
--	/* Broadcom devices with missing product id */
--	{ USB_DEVICE_AND_INTERFACE_INFO(0x0000, 0x0000, 0xff, 0x01, 0x01),
--	  .driver_info = BTUSB_BCM_PATCHRAM | BTUSB_BCM_NO_PRODID },
--
- 	/* Intel Bluetooth USB Bootloader (RAM module) */
- 	{ USB_DEVICE(0x8087, 0x0a5a),
- 	  .driver_info = BTUSB_INTEL_BOOT | BTUSB_BROKEN_ISOC },
-@@ -2909,19 +2904,6 @@ static int btusb_probe(struct usb_interface *intf,
- 	if (id->driver_info == BTUSB_IGNORE)
- 		return -ENODEV;
- 
--	if (id->driver_info & BTUSB_BCM_NO_PRODID) {
--		struct usb_device *udev = interface_to_usbdev(intf);
--
--		/* For the broken Broadcom devices that show 0000:0000
--		 * as USB vendor and product information, check that the
--		 * manufacturer string identifies them as Broadcom based
--		 * devices.
--		 */
--		if (!udev->manufacturer ||
--		    strcmp(udev->manufacturer, "Broadcom Corp"))
--			return -ENODEV;
--	}
--
- 	if (id->driver_info & BTUSB_ATH3012) {
- 		struct usb_device *udev = interface_to_usbdev(intf);
- 
+diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
+index c69da0e8b79f..707c2d1b84c7 100644
+--- a/drivers/bluetooth/hci_bcm.c
++++ b/drivers/bluetooth/hci_bcm.c
+@@ -941,6 +941,7 @@ static const struct acpi_device_id bcm_acpi_match[] = {
+ 	{ "BCM2E71", (kernel_ulong_t)&acpi_bcm_int_last_gpios },
+ 	{ "BCM2E7B", (kernel_ulong_t)&acpi_bcm_int_last_gpios },
+ 	{ "BCM2E7C", (kernel_ulong_t)&acpi_bcm_int_last_gpios },
++	{ "BCM2E7E", (kernel_ulong_t)&acpi_bcm_int_first_gpios },
+ 	{ "BCM2E95", (kernel_ulong_t)&acpi_bcm_int_first_gpios },
+ 	{ "BCM2E96", (kernel_ulong_t)&acpi_bcm_int_first_gpios },
+ 	{ "BCM2EA4", (kernel_ulong_t)&acpi_bcm_int_first_gpios },
 -- 
 2.14.2
