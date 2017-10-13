@@ -1,36 +1,25 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Subject: [PATCH V2 BLueZ 1/3] android: Skip key loading for LE only devices.
+Subject: [PATCH V2 BlueZ 0/3] android: Add LE Peripheral role support
 To: linux-bluetooth@vger.kernel.org
 From: Martin Fuzzey <mfuzzey@parkeon.com>
-Date: Fri, 13 Oct 2017 16:02:06 +0200
-Message-ID: <20171013140206.19524.46398.stgit@localhost>
-In-Reply-To: <20171013140204.19524.68439.stgit@localhost>
-References: <20171013140204.19524.68439.stgit@localhost>
+Date: Fri, 13 Oct 2017 16:02:04 +0200
+Message-ID: <20171013140204.19524.68439.stgit@localhost>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Key loading is not supported for LE only devices.
----
- android/bluetooth.c |    6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+This series adds a few missing pieces for Peripheral role support on Android 5.
 
-diff --git a/android/bluetooth.c b/android/bluetooth.c
-index 51a31fe..c3ad5ce 100644
---- a/android/bluetooth.c
-+++ b/android/bluetooth.c
-@@ -3265,7 +3265,11 @@ static void load_devices_info(bt_bluetooth_ready cb)
- 	load_irks(irks);
- 	g_slist_free_full(irks, g_free);
- 
--	load_link_keys(keys, cb);
-+	if (adapter.supported_settings & MGMT_SETTING_BREDR)
-+		load_link_keys(keys, cb);
-+	else
-+		cb(0, &adapter.bdaddr);
-+
- 	g_slist_free_full(keys, g_free);
- 
- 	g_strfreev(devs);
+This has been tested in the following configuration:
+- Android 5.1.1
+- Kernel 4.4
+- nRF52 chip running Apache Newt firmware
+
+Changes for V2:
+- Only load keys if BRDE supported rather than always trying and ignoring error
+- Use the bt_ad_* helper functions rather than open coding advertisement data
+- free_adv_instance() accepts NULL like the other free family members
+- Style fixes
+- Remove SOBs
 
