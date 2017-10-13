@@ -1,37 +1,85 @@
-Return-Path: <linux-kernel-owner@vger.kernel.org>
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 11.0 \(3445.1.7\))
-Subject: Re: [PATCH] Bluetooth: mark expected switch fall-throughs
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20171012222402.GA31769@embeddedor.com>
-Date: Sat, 14 Oct 2017 09:26:45 +0200
-Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Message-Id: <DE14B971-2E3F-4A4B-994E-7B2793CE1383@holtmann.org>
-References: <20171012222402.GA31769@embeddedor.com>
-To: "Gustavo A. R. Silva" <garsilva@embeddedor.com>
-Sender: linux-kernel-owner@vger.kernel.org
+Return-Path: <hdegoede@redhat.com>
+From: Hans de Goede <hdegoede@redhat.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>
+Cc: Hans de Goede <hdegoede@redhat.com>,
+	linux-bluetooth@vger.kernel.org,
+	linux-acpi@vger.kernel.org
+Subject: [PATCH resend 3/3] Revert "Bluetooth: btusb: Add workaround for Broadcom devices without product id"
+Date: Fri, 13 Oct 2017 17:54:03 +0200
+Message-Id: <20171013155403.27060-4-hdegoede@redhat.com>
+In-Reply-To: <20171013155403.27060-1-hdegoede@redhat.com>
+References: <20171013155403.27060-1-hdegoede@redhat.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+Commit 9834e586fa66 ("Bluetooth: btusb: Add workaround for Broadcom devices
+without product id") was added to deal with the BT part of the BCM4356A2
+on GPD pocket laptops having an usb vid:pid of 0000:0000.
 
-> In preparation to enabling -Wimplicit-fallthrough, mark switch cases
-> where we are expecting to fall through.
-> 
-> In this particular case, notice that I replaced the
-> "deliberate fall-through..." comment with a "fall through"
-> comment, which is what GCC is expecting to find.
-> 
-> Signed-off-by: Gustavo A. R. Silva <garsilva@embeddedor.com>
-> ---
-> drivers/bluetooth/bcm203x.c | 2 +-
-> drivers/bluetooth/hci_ll.c  | 2 +-
-> 2 files changed, 2 insertions(+), 2 deletions(-)
+After another commit to add support for the BCM UART connected BT ACPI-id
+BCM2E7E used on the GPD win, it turns out that the BT on the GPD pocket is
+connected via both USB and UART. Adding support for the BCM2E7E ACPI-id
+causes it to switch to UART mode.
 
-patch has been applied to bluetooth-next tree.
+The Windows shipped with the device is using it in UART mode and the
+presence of the BCM2E7E ACPI-id combined with the all 0 USB vid:pid
+indicates that the BT part was never meant to be used in USB mode.
 
-Regards
+With the recent patches to use serdev device enumeration / instantiation
+for UART attached ACPI enumerated BT devices, everything work OOTB in UART
+mode and the workaround for the all 0 USB vid:pid is no longer needed.
 
-Marcel
+This reverts commit 9834e586fa ("Bluetooth: btusb: Add workaround for
+Broadcom devices without product id").
+
+Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+---
+ drivers/bluetooth/btusb.c | 18 ------------------
+ 1 file changed, 18 deletions(-)
+
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 7a5c06aaa181..c054d7bce490 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -66,7 +66,6 @@ static struct usb_driver btusb_driver;
+ #define BTUSB_BCM2045		0x40000
+ #define BTUSB_IFNUM_2		0x80000
+ #define BTUSB_CW6622		0x100000
+-#define BTUSB_BCM_NO_PRODID	0x200000
+ 
+ static const struct usb_device_id btusb_table[] = {
+ 	/* Generic Bluetooth USB device */
+@@ -171,10 +170,6 @@ static const struct usb_device_id btusb_table[] = {
+ 	{ USB_VENDOR_AND_INTERFACE_INFO(0x0930, 0xff, 0x01, 0x01),
+ 	  .driver_info = BTUSB_BCM_PATCHRAM },
+ 
+-	/* Broadcom devices with missing product id */
+-	{ USB_DEVICE_AND_INTERFACE_INFO(0x0000, 0x0000, 0xff, 0x01, 0x01),
+-	  .driver_info = BTUSB_BCM_PATCHRAM | BTUSB_BCM_NO_PRODID },
+-
+ 	/* Intel Bluetooth USB Bootloader (RAM module) */
+ 	{ USB_DEVICE(0x8087, 0x0a5a),
+ 	  .driver_info = BTUSB_INTEL_BOOT | BTUSB_BROKEN_ISOC },
+@@ -2909,19 +2904,6 @@ static int btusb_probe(struct usb_interface *intf,
+ 	if (id->driver_info == BTUSB_IGNORE)
+ 		return -ENODEV;
+ 
+-	if (id->driver_info & BTUSB_BCM_NO_PRODID) {
+-		struct usb_device *udev = interface_to_usbdev(intf);
+-
+-		/* For the broken Broadcom devices that show 0000:0000
+-		 * as USB vendor and product information, check that the
+-		 * manufacturer string identifies them as Broadcom based
+-		 * devices.
+-		 */
+-		if (!udev->manufacturer ||
+-		    strcmp(udev->manufacturer, "Broadcom Corp"))
+-			return -ENODEV;
+-	}
+-
+ 	if (id->driver_info & BTUSB_ATH3012) {
+ 		struct usb_device *udev = interface_to_usbdev(intf);
+ 
+-- 
+2.14.2
