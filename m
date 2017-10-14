@@ -1,43 +1,30 @@
-Return-Path: <foo00@h08.hostsharing.net>
-Date: Sun, 15 Oct 2017 11:57:23 +0200
-From: Lukas Wunner <lukas@wunner.de>
-To: =?iso-8859-1?Q?Fr=E9d=E9ric?= Danis <frederic.danis.oss@gmail.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: robh@kernel.org, marcel@holtmann.org, sre@kernel.org,
-	loic.poulain@gmail.com, johan@kernel.org, hdegoede@redhat.com,
-	rafael@kernel.org, linux-bluetooth@vger.kernel.org,
-	linux-serial@vger.kernel.org, linux-acpi@vger.kernel.org,
-	Ronald =?iso-8859-1?Q?Tschal=E4r?= <ronald@innovation.ch>,
-	"Peter Y. Chuang" <peteryuchuang@gmail.com>
-Subject: Re: [PATCH v3 2/2] ACPI / scan: Fix enumeration for special UART
- devices
-Message-ID: <20171015095723.GA15524@wunner.de>
-References: <1507710734-32520-1-git-send-email-frederic.danis.oss@gmail.com>
- <1507710734-32520-3-git-send-email-frederic.danis.oss@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <1507710734-32520-3-git-send-email-frederic.danis.oss@gmail.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 11.0 \(3445.1.7\))
+Subject: Re: [PATCH resend 0/3] Add support for BCM2E7E ACPI PNP id
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20171013155403.27060-1-hdegoede@redhat.com>
+Date: Sat, 14 Oct 2017 09:26:47 +0200
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        "bluez mailin list (linux-bluetooth@vger.kernel.org)"
+        <linux-bluetooth@vger.kernel.org>, linux-acpi@vger.kernel.org
+Message-Id: <CAAE7080-1068-4984-825C-405EDB80CC2D@holtmann.org>
+References: <20171013155403.27060-1-hdegoede@redhat.com>
+To: Hans de Goede <hdegoede@redhat.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, Oct 11, 2017 at 10:32:14AM +0200, Frédéric Danis wrote:
-> UART devices is expected to be enumerated by SerDev subsystem.
-> 
-> During ACPI scan, serial devices behind SPI, I2C or UART buses are not
-> enumerated, allowing them to be enumerated by their respective parents.
-> 
-> Rename *spi_i2c_slave* to *serial_bus_slave* as this will be used for serial
-> devices on serial buses (SPI, I2C or UART).
-> 
-> On Macs an empty ResourceTemplate is returned for uart slaves.
-> Instead the device properties "baud", "parity", "dataBits", "stopBits" are
-> provided. Add a check for "baud" in acpi_is_serial_bus_slave().
+Hi Hans,
 
-Tested-by: Ronald Tschalär <ronald@innovation.ch>
-Tested-by: Peter Y. Chuang <peteryuchuang@gmail.com>
+> As requested here is a resend of my patches to add support for the
+> BCM2E7E ACPI PNP id and to revert the workaround for the all 0
+> USB id.
 
-Ronald and Peter both report success for the above-mentioned Mac-specific
-change on GitHub: https://github.com/l1k/linux/pull/1#issuecomment-336126330
+all 3 patches have been applied to bluetooth-next tree.
 
-Thanks,
+Regards
 
-Lukas
+Marcel
+
