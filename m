@@ -1,27 +1,63 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Anitha Chandrasekar <anitha.chandrasekar@sasken.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Need info on factory reset api in Bluez
-Date: Tue, 17 Oct 2017 11:52:50 +0000
-Message-ID: <7B53A3173656CB4190908401FE75F4F860077BD9@exgmbxfz02.sasken.com>
-Content-Type: text/plain; charset="us-ascii"
+From: Szymon Janc <szymon.janc@codecoup.pl>
+To: Bastien Nocera <hadess@hadess.net>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] autopair: Don't handle the iCade
+Date: Tue, 17 Oct 2017 11:53:23 +0200
+Message-ID: <3018510.RSqAULb6OW@ix>
+In-Reply-To: <20170904175446.4798-1-hadess@hadess.net>
+References: <20170904175446.4798-1-hadess@hadess.net>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Bastien,
 
-We are using bluez stack apis for developing BLE client.Our device has an option of factory reset.
-I have tried using rfkill etc to reset the controller, but I see that devices are not getting deleted from gatt database.
+On Monday, 4 September 2017 19:54:46 CEST Bastien Nocera wrote:
+> We can't easily enter digits other than 1 through 4 (inclusive)
+> so leave it up to the agent to figure out a good passcode
+> for the iCade.
+> 
+> Note that we can not use the VID/PID of the device, as it is not
+> yet known at that point.
+> ---
+>  plugins/autopair.c | 13 ++++++++++++-
+>  1 file changed, 12 insertions(+), 1 deletion(-)
+> 
+> diff --git a/plugins/autopair.c b/plugins/autopair.c
+> index d44cf539b..a9d2a930a 100644
+> --- a/plugins/autopair.c
+> +++ b/plugins/autopair.c
+> @@ -60,13 +60,24 @@ static ssize_t autopair_pincb(struct btd_adapter
+> *adapter, {
+>  	char addr[18];
+>  	char pinstr[7];
+> +	char name[25];
+>  	uint32_t class;
+> 
+>  	ba2str(device_get_address(device), addr);
+> 
+>  	class = btd_device_get_class(device);
+> 
+> -	DBG("device %s 0x%x", addr, class);
+> +	device_get_name(device, name, sizeof(name));
+> +	name[sizeof(name) - 1] = 0;
+> +
+> +	DBG("device '%s' (%s) class: 0x%x vid/pid: 0x%X/0x%X",
+> +		name, addr, class,
+> +		btd_device_get_vendor (device),
+> +		btd_device_get_product (device));
+> +
+> +	/* The iCade shouldn't use random PINs like normal keyboards */
+> +	if (name != NULL && strstr(name, "iCade") != NULL)
+> +		return 0;
+> 
+>  	/* This is a class-based pincode guesser. Ignore devices with an
+>  	 * unknown class.
 
-Is there any single api call, which is used for factory reset in Bluez?
+Applied, thanks.
 
-Regards,
-Anitha
-
-________________________________
-
-SASKEN BUSINESS DISCLAIMER: This message may contain confidential, proprietary or legally privileged information. In case you are not the original intended Recipient of the message, you must not, directly or indirectly, use, disclose, distribute, print, or copy any part of this message and you are requested to delete it and inform the sender. Any views expressed in this message are those of the individual sender unless otherwise stated. Nothing contained in this message shall be construed as an offer or acceptance of any offer by Sasken Technologies Limited ( formerly known as "Sasken Communication Technologies Limited" ) unless sent with that express intent and with due authority of Sasken. Sasken has taken enough precautions to prevent the spread of viruses. However the company accepts no liability for any damage caused by any virus transmitted by this email.
-Read Disclaimer at http://www.sasken.com/mail-disclaimer/
-
-________________________________
+-- 
+pozdrawiam
+Szymon Janc
