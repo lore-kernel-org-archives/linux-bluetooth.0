@@ -1,43 +1,27 @@
-Return-Path: <konrad.zapalowicz@canonical.com>
-From: Konrad Zapalowicz <konrad.zapalowicz@canonical.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: luiz.dentz@gmail.com,
-	marcel@holtmann.org,
-	=?UTF-8?q?Konrad=20Zapa=C5=82owicz?= <konrad.zapalowicz@canonical.com>
-Subject: [PATCH] bluetooth: increase timeout for le auto connections
-Date: Tue, 17 Oct 2017 15:53:49 +0200
-Message-Id: <1508248429-19415-1-git-send-email-konrad.zapalowicz@canonical.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Anitha Chandrasekar <anitha.chandrasekar@sasken.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Need info on factory reset api in Bluez
+Date: Tue, 17 Oct 2017 11:52:50 +0000
+Message-ID: <7B53A3173656CB4190908401FE75F4F860077BD9@exgmbxfz02.sasken.com>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Konrad Zapałowicz <konrad.zapalowicz@canonical.com>
+Hi,
 
-This patch increases the connection timeout for LE connections that are
-triggered by the advertising report to 4 seconds.
+We are using bluez stack apis for developing BLE client.Our device has an option of factory reset.
+I have tried using rfkill etc to reset the controller, but I see that devices are not getting deleted from gatt database.
 
-It has been observed that devices equipped with wifi+bt combo SoC fail
-to create a connection with BLE devices due to their coexistence issues.
-Increasing this timeout gives them enough time to complete the
-connection with success.
+Is there any single api call, which is used for factory reset in Bluez?
 
-Signed-off-by: Konrad Zapałowicz <konrad.zapalowicz@canonical.com>
----
- include/net/bluetooth/hci.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Regards,
+Anitha
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index fe98f0a..1668211 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -273,7 +273,7 @@ enum {
- #define HCI_AUTO_OFF_TIMEOUT	msecs_to_jiffies(2000)	/* 2 seconds */
- #define HCI_POWER_OFF_TIMEOUT	msecs_to_jiffies(5000)	/* 5 seconds */
- #define HCI_LE_CONN_TIMEOUT	msecs_to_jiffies(20000)	/* 20 seconds */
--#define HCI_LE_AUTOCONN_TIMEOUT	msecs_to_jiffies(2000)	/* 2 seconds */
-+#define HCI_LE_AUTOCONN_TIMEOUT	msecs_to_jiffies(4000)	/* 4 seconds */
- 
- /* HCI data types */
- #define HCI_COMMAND_PKT		0x01
--- 
-2.7.4
+________________________________
+
+SASKEN BUSINESS DISCLAIMER: This message may contain confidential, proprietary or legally privileged information. In case you are not the original intended Recipient of the message, you must not, directly or indirectly, use, disclose, distribute, print, or copy any part of this message and you are requested to delete it and inform the sender. Any views expressed in this message are those of the individual sender unless otherwise stated. Nothing contained in this message shall be construed as an offer or acceptance of any offer by Sasken Technologies Limited ( formerly known as "Sasken Communication Technologies Limited" ) unless sent with that express intent and with due authority of Sasken. Sasken has taken enough precautions to prevent the spread of viruses. However the company accepts no liability for any damage caused by any virus transmitted by this email.
+Read Disclaimer at http://www.sasken.com/mail-disclaimer/
+
+________________________________
