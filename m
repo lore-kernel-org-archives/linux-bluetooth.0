@@ -1,10 +1,10 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Anitha Chandrasekar <anitha.chandrasekar@sasken.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Subject: RE: Need info on factory reset api in Bluez
-Date: Wed, 18 Oct 2017 11:18:23 +0000
-Message-ID: <7B53A3173656CB4190908401FE75F4F860078CD6@exgmbxfz02.sasken.com>
+Date: Wed, 18 Oct 2017 11:16:36 +0000
+Message-ID: <7B53A3173656CB4190908401FE75F4F860078CC1@exgmbxfz02.sasken.com>
 References: <7B53A3173656CB4190908401FE75F4F860077BD9@exgmbxfz02.sasken.com>,<CABBYNZKz3ScfkX_5NeQgBeGhA4T_O-AhroD4nkLxrtN63w76+Q@mail.gmail.com>
 In-Reply-To: <CABBYNZKz3ScfkX_5NeQgBeGhA4T_O-AhroD4nkLxrtN63w76+Q@mail.gmail.com>
 Content-Type: text/plain; charset="us-ascii"
@@ -12,9 +12,7 @@ MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
-
-Great!! Thanks for the quick reply.
+Great!!, Thanks for the quick reply.
 
 Regards,
 Anitha
