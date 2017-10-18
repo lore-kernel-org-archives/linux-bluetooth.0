@@ -2,265 +2,133 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Bastien Nocera <hadess@hadess.net>
 To: linux-bluetooth@vger.kernel.org
 Cc: Bastien Nocera <hadess@hadess.net>
-Subject: [PATCH v2 03/11] plugins/sixaxis: Move device discovery to shared header
-Date: Wed, 18 Oct 2017 03:58:07 +0200
-Message-Id: <20171018015815.10045-3-hadess@hadess.net>
+Subject: [PATCH v2 10/11] plugins/sixaxis: Add cable pairing for PS3 Keypads
+Date: Wed, 18 Oct 2017 03:58:14 +0200
+Message-Id: <20171018015815.10045-10-hadess@hadess.net>
 In-Reply-To: <20171018015815.10045-1-hadess@hadess.net>
 References: <20171018015815.10045-1-hadess@hadess.net>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Move the struct containing the Sixaxis-compatible devices to a
-header shared with the input profiles code, so as to reduce device
-declaration.
-
-Adding support for new devices should be as easy as adding the device's
-declaration in profiles/input/sixaxis.h
+As documented in qtsixa's sixpair_kbd.c, from unknown origin:
+https://github.com/falkTX/qtsixa/blob/master/utils/sixpair_kbd.c
 ---
- plugins/sixaxis.c        | 82 +++++++++++++++++++++-------------------------
- profiles/input/sixaxis.h | 85 ++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 122 insertions(+), 45 deletions(-)
- create mode 100644 profiles/input/sixaxis.h
+ plugins/sixaxis.c | 68 ++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 67 insertions(+), 1 deletion(-)
 
 diff --git a/plugins/sixaxis.c b/plugins/sixaxis.c
-index cee2263a1..1bc64e1c4 100644
+index a05e95c1f..a2946f864 100644
 --- a/plugins/sixaxis.c
 +++ b/plugins/sixaxis.c
-@@ -48,29 +48,7 @@
- #include "src/plugin.h"
- #include "src/log.h"
- #include "src/shared/util.h"
--
--static const struct {
--	const char *name;
--	uint16_t source;
--	uint16_t vid;
--	uint16_t pid;
--	uint16_t version;
--} devices[] = {
--	{
--		.name = "Sony PLAYSTATION(R)3 Controller",
--		.source = 0x0002,
--		.vid = 0x054c,
--		.pid = 0x0268,
--		.version = 0x0000,
--	},
--	{
--		.name = "Navigation Controller",
--		.source = 0x0002,
--		.vid = 0x054c,
--		.pid = 0x042f,
--		.version = 0x0000,
--	},
--};
-+#include "profiles/input/sixaxis.h"
- 
- struct authentication_closure {
- 	struct btd_adapter *adapter;
-@@ -180,7 +158,13 @@ error:
- 	g_free(closure);
+@@ -127,10 +127,33 @@ static int ds4_get_device_bdaddr(int fd, bdaddr_t *bdaddr)
+ 	return 0;
  }
  
--static bool setup_device(int fd, int index, struct btd_adapter *adapter)
-+static bool setup_device(int fd,
-+				const char *name,
-+				uint16_t source,
-+				uint16_t vid,
-+				uint16_t pid,
-+				uint16_t version,
-+				struct btd_adapter *adapter)
++static int ps3_keypad_get_device_bdaddr(int fd, bdaddr_t *bdaddr)
++{
++	uint8_t buf[16];
++	int ret;
++
++	memset(buf, 0, sizeof(buf));
++
++	buf[0] = 0x4;
++
++	ret = ioctl(fd, HIDIOCGFEATURE(sizeof(buf)), buf);
++	if (ret < 0) {
++		error("sixaxis: failed to read device address (%s)",
++							strerror(errno));
++		return ret;
++	}
++
++	baswap(bdaddr, (bdaddr_t *) (buf + 1));
++
++	return 0;
++}
++
+ static int get_device_bdaddr(int fd, bdaddr_t *bdaddr, CablePairingType type)
  {
- 	bdaddr_t device_bdaddr;
- 	const bdaddr_t *adapter_bdaddr;
-@@ -209,9 +193,8 @@ static bool setup_device(int fd, int index, struct btd_adapter *adapter)
- 
- 	info("sixaxis: setting up new device");
- 
--	btd_device_device_set_name(device, devices[index].name);
--	btd_device_set_pnpid(device, devices[index].source, devices[index].vid,
--				devices[index].pid, devices[index].version);
-+	btd_device_device_set_name(device, name);
-+	btd_device_set_pnpid(device, source, vid, pid, version);
- 	btd_device_set_temporary(device, true);
- 
- 	closure = g_new0(struct authentication_closure, 1);
-@@ -230,12 +213,16 @@ static bool setup_device(int fd, int index, struct btd_adapter *adapter)
- 	return true;
+ 	if (type == CABLE_PAIRING_SIXAXIS)
+ 		return sixaxis_get_device_bdaddr(fd, bdaddr);
++	else if (type == CABLE_PAIRING_PS3_WIRELESS_KEYPAD)
++		return ps3_keypad_get_device_bdaddr(fd, bdaddr);
+ 	else if (type == CABLE_PAIRING_DS4)
+ 		return ds4_get_device_bdaddr(fd, bdaddr);
+ 	return -1;
+@@ -179,10 +202,33 @@ static int ds4_get_master_bdaddr(int fd, bdaddr_t *bdaddr)
+ 	return 0;
  }
  
--static int get_supported_device(struct udev_device *udevice, uint16_t *bus)
-+static CablePairingType get_pairing_type_for_device(struct udev_device *udevice,
-+								uint16_t  *bus,
-+								uint16_t  *vid,
-+								uint16_t  *pid,
-+								char     **name,
-+								uint16_t  *source,
-+								uint16_t  *version)
++static int ps3_keypad_get_master_bdaddr(int fd, bdaddr_t *bdaddr)
++{
++	uint8_t buf[16];
++	int ret;
++
++	memset(buf, 0, sizeof(buf));
++
++	buf[0] = 0x4;
++
++	ret = ioctl(fd, HIDIOCGFEATURE(sizeof(buf)), buf);
++	if (ret < 0) {
++		error("sixaxis: failed to read master address (%s)",
++							strerror(errno));
++		return ret;
++	}
++
++	bacpy(bdaddr, (bdaddr_t *) (buf + 10));
++
++	return 0;
++}
++
+ static int get_master_bdaddr(int fd, bdaddr_t *bdaddr, CablePairingType type)
  {
- 	struct udev_device *hid_parent;
--	uint16_t vid, pid;
- 	const char *hid_id;
--	guint i;
- 
- 	hid_parent = udev_device_get_parent_with_subsystem_devtype(udevice,
- 								"hid", NULL);
-@@ -244,45 +231,50 @@ static int get_supported_device(struct udev_device *udevice, uint16_t *bus)
- 
- 	hid_id = udev_device_get_property_value(hid_parent, "HID_ID");
- 
--	if (sscanf(hid_id, "%hx:%hx:%hx", bus, &vid, &pid) != 3)
-+	if (sscanf(hid_id, "%hx:%hx:%hx", bus, vid, pid) != 3)
- 		return -1;
- 
--	for (i = 0; i < G_N_ELEMENTS(devices); i++) {
--		if (devices[i].vid == vid && devices[i].pid == pid)
--			return i;
--	}
--
--	return -1;
-+	return get_pairing_type(*vid, *pid, name, source, version);
+ 	if (type == CABLE_PAIRING_SIXAXIS)
+ 		return sixaxis_get_master_bdaddr(fd, bdaddr);
++	else if (type == CABLE_PAIRING_PS3_WIRELESS_KEYPAD)
++		return ps3_keypad_get_master_bdaddr(fd, bdaddr);
+ 	else if (type == CABLE_PAIRING_DS4)
+ 		return ds4_get_master_bdaddr(fd, bdaddr);
+ 	return -1;
+@@ -226,11 +272,30 @@ static int ds4_set_master_bdaddr(int fd, const bdaddr_t *bdaddr)
+ 	return ret;
  }
  
- static void device_added(struct udev_device *udevice)
++static int ps3_keypad_set_master_bdaddr(int fd, const bdaddr_t *bdaddr)
++{
++	uint8_t buf[7];
++	int ret;
++
++	buf[0] = 0x05;
++
++	baswap((bdaddr_t*) (buf + 1), bdaddr);
++
++	ret = ioctl(fd, HIDIOCSFEATURE(sizeof(buf)), buf);
++	if (ret < 0)
++		error("sixaxis: failed to write PS3 Keypad master address (%s)",
++							strerror(errno));
++
++	return ret;
++}
++
+ static int set_master_bdaddr(int fd, const bdaddr_t *bdaddr,
+ 					CablePairingType type)
  {
- 	struct btd_adapter *adapter;
--	uint16_t bus;
--	int index;
-+	uint16_t bus, vid, pid, source, version;
-+	char *name = NULL;
-+	CablePairingType type;
- 	int fd;
- 
- 	adapter = btd_adapter_get_default();
- 	if (!adapter)
- 		return;
- 
--	index = get_supported_device(udevice, &bus);
--	if (index < 0)
-+	type = get_pairing_type_for_device(udevice,
-+						&bus,
-+						&vid,
-+						&pid,
-+						&name,
-+						&source,
-+						&version);
-+	if (type != CABLE_PAIRING_SIXAXIS)
+ 	if (type == CABLE_PAIRING_SIXAXIS)
+ 		return sixaxis_set_master_bdaddr(fd, bdaddr);
++	else if (type == CABLE_PAIRING_PS3_WIRELESS_KEYPAD)
++		return ps3_keypad_set_master_bdaddr(fd, bdaddr);
+ 	else if (type == CABLE_PAIRING_DS4)
+ 		return ds4_set_master_bdaddr(fd, bdaddr);
+ 	return -1;
+@@ -424,7 +489,8 @@ static void device_added(struct udev_device *udevice)
+ 						&source,
+ 						&version);
+ 	if (type != CABLE_PAIRING_SIXAXIS &&
+-	    type != CABLE_PAIRING_DS4)
++	    type != CABLE_PAIRING_DS4 &&
++	    type != CABLE_PAIRING_PS3_WIRELESS_KEYPAD)
  		return;
  	if (bus != BUS_USB)
  		return;
- 
- 	info("sixaxis: compatible device connected: %s (%04X:%04X)",
--				devices[index].name, devices[index].vid,
--				devices[index].pid);
-+				name, vid, pid);
- 
- 	fd = open(udev_device_get_devnode(udevice), O_RDWR);
--	if (fd < 0)
-+	if (fd < 0) {
-+		g_free(name);
- 		return;
-+	}
- 
- 	/* Only close the fd if an authentication is not pending */
--	if (!setup_device(fd, index, adapter))
-+	if (!setup_device(fd, name, source, vid, pid, version, adapter))
- 		close(fd);
-+
-+	g_free(name);
- }
- 
- static gboolean monitor_watch(GIOChannel *source, GIOCondition condition,
-diff --git a/profiles/input/sixaxis.h b/profiles/input/sixaxis.h
-new file mode 100644
-index 000000000..0b3c4e397
---- /dev/null
-+++ b/profiles/input/sixaxis.h
-@@ -0,0 +1,85 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2009,2017  Bastien Nocera <hadess@hadess.net>
-+ *  Copyright (C) 2011  Antonio Ospite <ospite@studenti.unina.it>
-+ *  Copyright (C) 2013  Szymon Janc <szymon.janc@gmail.com>
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+#ifndef _SIXAXIS_H_
-+#define _SIXAXIS_H_
-+
-+typedef enum {
-+	CABLE_PAIRING_UNSUPPORTED = 0,
-+	CABLE_PAIRING_SIXAXIS,
-+} CablePairingType;
-+
-+static inline CablePairingType get_pairing_type(uint16_t   vid,
-+						 uint16_t   pid,
-+						 char     **name,
-+						 uint16_t  *source,
-+						 uint16_t  *version)
-+{
-+	static const struct {
-+		const char *name;
-+		uint16_t source;
-+		uint16_t vid;
-+		uint16_t pid;
-+		uint16_t version;
-+		CablePairingType type;
-+	} devices[] = {
-+		{
-+			.name = "Sony PLAYSTATION(R)3 Controller",
-+			.source = 0x0002,
-+			.vid = 0x054c,
-+			.pid = 0x0268,
-+			.version = 0x0000,
-+			.type = CABLE_PAIRING_SIXAXIS,
-+		},
-+		{
-+			.name = "Navigation Controller",
-+			.source = 0x0002,
-+			.vid = 0x054c,
-+			.pid = 0x042f,
-+			.version = 0x0000,
-+			.type = CABLE_PAIRING_SIXAXIS,
-+		},
-+	};
-+	guint i;
-+
-+	for (i = 0; i < G_N_ELEMENTS(devices); i++) {
-+		if (devices[i].vid != vid)
-+			continue;
-+		if (devices[i].pid != pid)
-+			continue;
-+
-+		if (name)
-+			*name = g_strdup(devices[i].name);
-+		if (source)
-+			*source = devices[i].source;
-+		if (version)
-+			*version = devices[i].version;
-+		return devices[i].type;
-+	}
-+
-+	return CABLE_PAIRING_UNSUPPORTED;
-+}
-+
-+#endif /* _SIXAXIS_H_ */
 -- 
 2.14.2
 
