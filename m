@@ -1,74 +1,148 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Bastien Nocera <hadess@hadess.net>
 To: linux-bluetooth@vger.kernel.org
-Cc: Bastien Nocera <hadess@hadess.net>
-Subject: [PATCH v2 05/11] profiles/input: Add DS4 devices to the shared header
-Date: Wed, 18 Oct 2017 03:58:09 +0200
-Message-Id: <20171018015815.10045-5-hadess@hadess.net>
+Cc: Juha Kuikka <juha.kuikka@gmail.com>
+Subject: [PATCH v2 07/11] plugins/sixaxis: Add support for DualShock 4/PS4 cable pairing
+Date: Wed, 18 Oct 2017 03:58:11 +0200
+Message-Id: <20171018015815.10045-7-hadess@hadess.net>
 In-Reply-To: <20171018015815.10045-1-hadess@hadess.net>
 References: <20171018015815.10045-1-hadess@hadess.net>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-And simplify the detection code in server.c some more.
----
- profiles/input/server.c  |  7 ++-----
- profiles/input/sixaxis.h | 17 +++++++++++++++++
- 2 files changed, 19 insertions(+), 5 deletions(-)
+From: Juha Kuikka <juha.kuikka@gmail.com>
 
-diff --git a/profiles/input/server.c b/profiles/input/server.c
-index 121c334d3..ef428fefe 100644
---- a/profiles/input/server.c
-+++ b/profiles/input/server.c
-@@ -134,11 +134,8 @@ static bool dev_is_sixaxis(const bdaddr_t *src, const bdaddr_t *dst)
- 	pid = btd_device_get_product(device);
+This patch adds support for "pairing" a Dualshock4 controller over USB
+into the sixaxis plugin, similarly to what the Sixaxis/PS3 controller
+supported.
+
+Actual bonding happens on first connection, but the device will be
+marked as trusted when the agent replies.
+
+This patch is based on DS4 supprt for sixpair tool by t0xicCode:
+https://github.com/t0xicCode/sixpair/commit/975c38cb6cd61a2f0be350714f0f64cef5f0432c
+---
+ plugins/sixaxis.c | 73 ++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 72 insertions(+), 1 deletion(-)
+
+diff --git a/plugins/sixaxis.c b/plugins/sixaxis.c
+index 69b1041e1..a3e8749da 100644
+--- a/plugins/sixaxis.c
++++ b/plugins/sixaxis.c
+@@ -83,10 +83,34 @@ static int sixaxis_get_device_bdaddr(int fd, bdaddr_t *bdaddr)
+ 	return 0;
+ }
  
- 	type = get_pairing_type(vid, pid, NULL, NULL, NULL);
--	if (type == CABLE_PAIRING_SIXAXIS)
--		return true;
--
--	/* DualShock 4 */
--	if (vid == 0x054c && pid == 0x05c4)
-+	if (type == CABLE_PAIRING_SIXAXIS ||
-+	    type == CABLE_PAIRING_DS4)
- 		return true;
++static int ds4_get_device_bdaddr(int fd, bdaddr_t *bdaddr)
++{
++	uint8_t buf[7];
++	int ret;
++
++	memset(buf, 0, sizeof(buf));
++
++	buf[0] = 0x81;
++
++	ret = ioctl(fd, HIDIOCGFEATURE(sizeof(buf)), buf);
++	if (ret < 0) {
++		error("sixaxis: failed to read DS4 device address (%s)",
++		      strerror(errno));
++		return ret;
++	}
++
++	/* address is little-endian on DS4 */
++	bacpy(bdaddr, (bdaddr_t*) (buf + 1));
++
++	return 0;
++}
++
+ static int get_device_bdaddr(int fd, bdaddr_t *bdaddr, CablePairingType type)
+ {
+ 	if (type == CABLE_PAIRING_SIXAXIS)
+ 		return sixaxis_get_device_bdaddr(fd, bdaddr);
++	else if (type == CABLE_PAIRING_DS4)
++		return ds4_get_device_bdaddr(fd, bdaddr);
+ 	return -1;
+ }
  
- 	return false;
-diff --git a/profiles/input/sixaxis.h b/profiles/input/sixaxis.h
-index 0b3c4e397..17a7dc3f7 100644
---- a/profiles/input/sixaxis.h
-+++ b/profiles/input/sixaxis.h
-@@ -29,6 +29,7 @@
- typedef enum {
- 	CABLE_PAIRING_UNSUPPORTED = 0,
- 	CABLE_PAIRING_SIXAXIS,
-+	CABLE_PAIRING_DS4,
- } CablePairingType;
+@@ -111,10 +135,34 @@ static int sixaxis_get_master_bdaddr(int fd, bdaddr_t *bdaddr)
+ 	return 0;
+ }
  
- static inline CablePairingType get_pairing_type(uint16_t   vid,
-@@ -61,6 +62,22 @@ static inline CablePairingType get_pairing_type(uint16_t   vid,
- 			.version = 0x0000,
- 			.type = CABLE_PAIRING_SIXAXIS,
- 		},
-+		{
-+			.name = "Wireless Controller",
-+			.source = 0x0002,
-+			.vid = 0x054c,
-+			.pid = 0x05c4,
-+			.version = 0x0001,
-+			.type = CABLE_PAIRING_DS4,
-+		},
-+		{
-+			.name = "Wireless Controller",
-+			.source = 0x0002,
-+			.vid = 0x054c,
-+			.pid = 0x09cc,
-+			.version = 0x0001,
-+			.type = CABLE_PAIRING_DS4,
-+		},
- 	};
- 	guint i;
++static int ds4_get_master_bdaddr(int fd, bdaddr_t *bdaddr)
++{
++	uint8_t buf[16];
++	int ret;
++
++	memset(buf, 0, sizeof(buf));
++
++	buf[0] = 0x12;
++
++	ret = ioctl(fd, HIDIOCGFEATURE(sizeof(buf)), buf);
++	if (ret < 0) {
++		error("sixaxis: failed to read DS4 master address (%s)",
++		      strerror(errno));
++		return ret;
++	}
++
++	/* address is little-endian on DS4 */
++	bacpy(bdaddr, (bdaddr_t*) (buf + 10));
++
++	return 0;
++}
++
+ static int get_master_bdaddr(int fd, bdaddr_t *bdaddr, CablePairingType type)
+ {
+ 	if (type == CABLE_PAIRING_SIXAXIS)
+ 		return sixaxis_get_master_bdaddr(fd, bdaddr);
++	else if (type == CABLE_PAIRING_DS4)
++		return ds4_get_master_bdaddr(fd, bdaddr);
+ 	return -1;
+ }
  
+@@ -136,11 +184,33 @@ static int sixaxis_set_master_bdaddr(int fd, const bdaddr_t *bdaddr)
+ 	return ret;
+ }
+ 
++static int ds4_set_master_bdaddr(int fd, const bdaddr_t *bdaddr)
++{
++	uint8_t buf[23];
++	int ret;
++
++	buf[0] = 0x13;
++	bacpy((bdaddr_t*) (buf + 1), bdaddr);
++	/* TODO: we could put the key here but
++	   there is no way to force a re-loading
++	   of link keys to the kernel from here. */
++	memset(buf + 7, 0, 16);
++
++	ret = ioctl(fd, HIDIOCSFEATURE(sizeof(buf)), buf);
++	if (ret < 0)
++		error("sixaxis: failed to write DS4 master address (%s)",
++		      strerror(errno));
++
++	return ret;
++}
++
+ static int set_master_bdaddr(int fd, const bdaddr_t *bdaddr,
+ 					CablePairingType type)
+ {
+ 	if (type == CABLE_PAIRING_SIXAXIS)
+ 		return sixaxis_set_master_bdaddr(fd, bdaddr);
++	else if (type == CABLE_PAIRING_DS4)
++		return ds4_set_master_bdaddr(fd, bdaddr);
+ 	return -1;
+ }
+ 
+@@ -281,7 +351,8 @@ static void device_added(struct udev_device *udevice)
+ 						&name,
+ 						&source,
+ 						&version);
+-	if (type != CABLE_PAIRING_SIXAXIS)
++	if (type != CABLE_PAIRING_SIXAXIS &&
++	    type != CABLE_PAIRING_DS4)
+ 		return;
+ 	if (bus != BUS_USB)
+ 		return;
 -- 
 2.14.2
 
