@@ -1,152 +1,27 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Message-ID: <1508291480.5910.76.camel@hadess.net>
+Subject: Re: [PATCH 8/9] plugins/sixaxis: Add support for DualShock 4/PS4
+ cable pairing
 From: Bastien Nocera <hadess@hadess.net>
-To: linux-bluetooth@vger.kernel.org
-Cc: Bastien Nocera <hadess@hadess.net>
-Subject: [PATCH v2 01/11] adapter: Add btd_request_authorization_cable_configured()
-Date: Wed, 18 Oct 2017 03:58:05 +0200
-Message-Id: <20171018015815.10045-1-hadess@hadess.net>
+To: Szymon Janc <szymon.janc@codecoup.pl>
+Cc: linux-bluetooth@vger.kernel.org,
+        Juha Kuikka <juha.kuikka@gmail.com>
+Date: Wed, 18 Oct 2017 03:51:20 +0200
+In-Reply-To: <8659915.mKjsMy947m@ix>
+References: <20170904181212.5639-1-hadess@hadess.net>
+         <20170904181212.5639-8-hadess@hadess.net> <8659915.mKjsMy947m@ix>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add btd_request_authorization_cable_configured() function to allow
-cable configured devices to ask the user straight away about whether the
-device should be allowed to connect to the computer.
+On Wed, 2017-09-27 at 11:12 +0200, Szymon Janc wrote:
+> Hi Bastien,
+> 
+> On Monday, 4 September 2017 20:12:11 CEST Bastien Nocera wrote:
+> > <snip>
+> 
+> Lets prefix all sixaxis error/info logs with "sixaxis:"
 
-This allows us to ask the user at the time of the USB connection and
-initial setup, rather than when the first Bluetooth connection is made.
-
-The fact that the device might not be connected to the adapter when
-this event is triggered is mentioned in the Agent API docs.
----
- doc/agent-api.txt |  5 ++++-
- src/adapter.c     | 42 ++++++++++++++++++++++++++++++++++++------
- src/adapter.h     |  2 ++
- 3 files changed, 42 insertions(+), 7 deletions(-)
-
-diff --git a/doc/agent-api.txt b/doc/agent-api.txt
-index 801ccb665..0d9347cab 100644
---- a/doc/agent-api.txt
-+++ b/doc/agent-api.txt
-@@ -163,7 +163,10 @@ Methods		void Release()
- 			This method gets called to request the user to
- 			authorize an incoming pairing attempt which
- 			would in other circumstances trigger the just-works
--			model.
-+			model, or when the user plugged in a device that
-+			implements cable pairing. In the latter case, the
-+			device would not be connected to the adapter via
-+			Bluetooth yet.
- 
- 			Possible errors: org.bluez.Error.Rejected
- 			                 org.bluez.Error.Canceled
-diff --git a/src/adapter.c b/src/adapter.c
-index 19205ed07..32a89d533 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -266,6 +266,11 @@ struct btd_adapter {
- 	bool is_default;		/* true if adapter is default one */
- };
- 
-+typedef enum {
-+	ADAPTER_AUTHORIZE_DISCONNECTED = 0,
-+	ADAPTER_AUTHORIZE_CHECK_CONNECTED
-+} adapter_authorize_type;
-+
- static struct btd_adapter *btd_adapter_lookup(uint16_t index)
- {
- 	GList *list;
-@@ -6136,8 +6141,9 @@ static void svc_complete(struct btd_device *dev, int err, void *user_data)
- }
- 
- static int adapter_authorize(struct btd_adapter *adapter, const bdaddr_t *dst,
--					const char *uuid, service_auth_cb cb,
--					void *user_data)
-+					const char *uuid,
-+					adapter_authorize_type check_for_connection,
-+					service_auth_cb cb, void *user_data)
- {
- 	struct service_auth *auth;
- 	struct btd_device *device;
-@@ -6153,7 +6159,7 @@ static int adapter_authorize(struct btd_adapter *adapter, const bdaddr_t *dst,
- 	}
- 
- 	/* Device connected? */
--	if (!g_slist_find(adapter->connections, device))
-+	if (check_for_connection && !g_slist_find(adapter->connections, device))
- 		btd_error(adapter->dev_id,
- 			"Authorization request for non-connected device!?");
- 
-@@ -6167,7 +6173,12 @@ static int adapter_authorize(struct btd_adapter *adapter, const bdaddr_t *dst,
- 	auth->device = device;
- 	auth->adapter = adapter;
- 	auth->id = ++id;
--	auth->svc_id = device_wait_for_svc_complete(device, svc_complete, auth);
-+	if (check_for_connection)
-+		auth->svc_id = device_wait_for_svc_complete(device, svc_complete, auth);
-+	else {
-+		if (adapter->auth_idle_id == 0)
-+			adapter->auth_idle_id = g_idle_add(process_auth_queue, adapter);
-+	}
- 
- 	g_queue_push_tail(adapter->auths, auth);
- 
-@@ -6186,7 +6197,8 @@ guint btd_request_authorization(const bdaddr_t *src, const bdaddr_t *dst,
- 		if (!adapter)
- 			return 0;
- 
--		return adapter_authorize(adapter, dst, uuid, cb, user_data);
-+		return adapter_authorize(adapter, dst, uuid,
-+				ADAPTER_AUTHORIZE_CHECK_CONNECTED, cb, user_data);
- 	}
- 
- 	for (l = adapters; l != NULL; l = g_slist_next(l)) {
-@@ -6194,7 +6206,8 @@ guint btd_request_authorization(const bdaddr_t *src, const bdaddr_t *dst,
- 
- 		adapter = l->data;
- 
--		id = adapter_authorize(adapter, dst, uuid, cb, user_data);
-+		id = adapter_authorize(adapter, dst, uuid,
-+				ADAPTER_AUTHORIZE_CHECK_CONNECTED, cb, user_data);
- 		if (id != 0)
- 			return id;
- 	}
-@@ -6202,6 +6215,23 @@ guint btd_request_authorization(const bdaddr_t *src, const bdaddr_t *dst,
- 	return 0;
- }
- 
-+guint btd_request_authorization_cable_configured(const bdaddr_t *src, const bdaddr_t *dst,
-+						const char *uuid, service_auth_cb cb,
-+						void *user_data)
-+{
-+	struct btd_adapter *adapter;
-+
-+	if (bacmp(src, BDADDR_ANY) == 0)
-+		return 0;
-+
-+	adapter = adapter_find(src);
-+	if (!adapter)
-+		return 0;
-+
-+	return adapter_authorize(adapter, dst, uuid,
-+			ADAPTER_AUTHORIZE_DISCONNECTED, cb, user_data);
-+}
-+
- static struct service_auth *find_authorization(guint id)
- {
- 	GSList *l;
-diff --git a/src/adapter.h b/src/adapter.h
-index f9178d59e..a85327cd1 100644
---- a/src/adapter.h
-+++ b/src/adapter.h
-@@ -120,6 +120,8 @@ int btd_register_adapter_driver(struct btd_adapter_driver *driver);
- void btd_unregister_adapter_driver(struct btd_adapter_driver *driver);
- guint btd_request_authorization(const bdaddr_t *src, const bdaddr_t *dst,
- 		const char *uuid, service_auth_cb cb, void *user_data);
-+guint btd_request_authorization_cable_configured(const bdaddr_t *src, const bdaddr_t *dst,
-+		const char *uuid, service_auth_cb cb, void *user_data);
- int btd_cancel_authorization(guint id);
- 
- int btd_adapter_restore_powered(struct btd_adapter *adapter);
--- 
-2.14.2
-
+Sure. I've reformulated the error messages so we know which type of
+device we're printing an error about.
