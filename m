@@ -1,53 +1,37 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Anitha Chandrasekar <anitha.chandrasekar@sasken.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: Need info on factory reset api in Bluez
-Date: Wed, 18 Oct 2017 11:16:36 +0000
-Message-ID: <7B53A3173656CB4190908401FE75F4F860078CC1@exgmbxfz02.sasken.com>
-References: <7B53A3173656CB4190908401FE75F4F860077BD9@exgmbxfz02.sasken.com>,<CABBYNZKz3ScfkX_5NeQgBeGhA4T_O-AhroD4nkLxrtN63w76+Q@mail.gmail.com>
-In-Reply-To: <CABBYNZKz3ScfkX_5NeQgBeGhA4T_O-AhroD4nkLxrtN63w76+Q@mail.gmail.com>
-Content-Type: text/plain; charset="us-ascii"
+Date: Wed, 18 Oct 2017 14:16:11 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Bastien Nocera <hadess@hadess.net>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: Surface 3 Pen (BLE HID) not sending events
+Message-ID: <20171018111611.GA8301@x1c.lan>
+References: <1508258502.5910.68.camel@hadess.net>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1508258502.5910.68.camel@hadess.net>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Great!!, Thanks for the quick reply.
+Hi Bastien,
 
-Regards,
-Anitha
-________________________________________
-From: linux-bluetooth-owner@vger.kernel.org [linux-bluetooth-owner@vger.kernel.org] on behalf of Luiz Augusto von Dentz [luiz.dentz@gmail.com]
-Sent: Wednesday, October 18, 2017 2:49 PM
-To: Anitha Chandrasekar
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: Need info on factory reset api in Bluez
+On Tue, Oct 17, 2017, Bastien Nocera wrote:
+> The Surface 3 pen (part of the 2nd generation of Surface pens[1]) uses
+> Bluetooth LE for its top button, which one can assign to a function,
+> usually a note taking application on Windows.
+> 
+> After pairing, bluez throws away all the characteristics, UUIDs and
+> other properties it gathered[2].
+> 
+> Subsequent attempts at pressing the pen button just throws a wobbly[3].
+> 
+> Any ideas? This apparently used to work, and there's some very hacky
+> solutions for those devices:
 
-Hi Anitha,
+Do you happen to have a btmon log of the pairing? The reason could e.g.
+be that the device doesn't set the bonding flag (in which case our
+discarding of information is at least specification-wise correct). The
+HCI log you posted seems to be a reconnection when pairing has already
+happened. Also, please avoid using hcidump since it does a worse job of
+decoding stuff (especially newer protocol features).
 
-On Tue, Oct 17, 2017 at 2:52 PM, Anitha Chandrasekar
-<anitha.chandrasekar@sasken.com> wrote:
-> Hi,
->
-> We are using bluez stack apis for developing BLE client.Our device has an option of factory reset.
-> I have tried using rfkill etc to reset the controller, but I see that devices are not getting deleted from gatt database.
->
-> Is there any single api call, which is used for factory reset in Bluez?
-
-Usually, this is implemented by wiping the storage which is under
-/var/lib/bluetooth.
-
-
---
-Luiz Augusto von Dentz
---
-To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-the body of a message to majordomo@vger.kernel.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-________________________________
-
-SASKEN BUSINESS DISCLAIMER: This message may contain confidential, proprietary or legally privileged information. In case you are not the original intended Recipient of the message, you must not, directly or indirectly, use, disclose, distribute, print, or copy any part of this message and you are requested to delete it and inform the sender. Any views expressed in this message are those of the individual sender unless otherwise stated. Nothing contained in this message shall be construed as an offer or acceptance of any offer by Sasken Technologies Limited ( formerly known as "Sasken Communication Technologies Limited" ) unless sent with that express intent and with due authority of Sasken. Sasken has taken enough precautions to prevent the spread of viruses. However the company accepts no liability for any damage caused by any virus transmitted by this email.
-Read Disclaimer at http://www.sasken.com/mail-disclaimer/
-
-________________________________
+Johan
