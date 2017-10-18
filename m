@@ -2,60 +2,61 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Bastien Nocera <hadess@hadess.net>
 To: linux-bluetooth@vger.kernel.org
 Cc: Bastien Nocera <hadess@hadess.net>
-Subject: [PATCH v2 04/11] profiles/input: Use sixaxis header to simplify device detection
-Date: Wed, 18 Oct 2017 03:58:08 +0200
-Message-Id: <20171018015815.10045-4-hadess@hadess.net>
+Subject: [PATCH v2 09/11] profiles/input: Add support for detecting PS3 Keypads
+Date: Wed, 18 Oct 2017 03:58:13 +0200
+Message-Id: <20171018015815.10045-9-hadess@hadess.net>
 In-Reply-To: <20171018015815.10045-1-hadess@hadess.net>
 References: <20171018015815.10045-1-hadess@hadess.net>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Use the shared header to recognise whether a device is a Sixaxis device
-or not.
+Add device information about the PS3 wireless keypads and consider those
+as "sixaxis" devices.
 ---
- profiles/input/server.c | 10 ++++------
- 1 file changed, 4 insertions(+), 6 deletions(-)
+ profiles/input/server.c  | 3 ++-
+ profiles/input/sixaxis.h | 9 +++++++++
+ 2 files changed, 11 insertions(+), 1 deletion(-)
 
 diff --git a/profiles/input/server.c b/profiles/input/server.c
-index eb3fcf843..121c334d3 100644
+index ef428fefe..41d7b3ccf 100644
 --- a/profiles/input/server.c
 +++ b/profiles/input/server.c
-@@ -43,6 +43,7 @@
- #include "src/device.h"
- #include "src/profile.h"
+@@ -135,7 +135,8 @@ static bool dev_is_sixaxis(const bdaddr_t *src, const bdaddr_t *dst)
  
-+#include "sixaxis.h"
- #include "device.h"
- #include "server.h"
- 
-@@ -123,6 +124,7 @@ static bool dev_is_sixaxis(const bdaddr_t *src, const bdaddr_t *dst)
- {
- 	struct btd_device *device;
- 	uint16_t vid, pid;
-+	CablePairingType type;
- 
- 	device = btd_adapter_find_device(adapter_find(src), dst, BDADDR_BREDR);
- 	if (!device)
-@@ -131,18 +133,14 @@ static bool dev_is_sixaxis(const bdaddr_t *src, const bdaddr_t *dst)
- 	vid = btd_device_get_vendor(device);
- 	pid = btd_device_get_product(device);
- 
--	/* DualShock 3 */
--	if (vid == 0x054c && pid == 0x0268)
-+	type = get_pairing_type(vid, pid, NULL, NULL, NULL);
-+	if (type == CABLE_PAIRING_SIXAXIS)
+ 	type = get_pairing_type(vid, pid, NULL, NULL, NULL);
+ 	if (type == CABLE_PAIRING_SIXAXIS ||
+-	    type == CABLE_PAIRING_DS4)
++	    type == CABLE_PAIRING_DS4 ||
++	    type == CABLE_PAIRING_PS3_WIRELESS_KEYPAD)
  		return true;
  
- 	/* DualShock 4 */
- 	if (vid == 0x054c && pid == 0x05c4)
- 		return true;
- 
--	/* Navigation Controller */
--	if (vid == 0x054c && pid == 0x042f)
--		return true;
--
  	return false;
- }
+diff --git a/profiles/input/sixaxis.h b/profiles/input/sixaxis.h
+index 17a7dc3f7..497a3f2a5 100644
+--- a/profiles/input/sixaxis.h
++++ b/profiles/input/sixaxis.h
+@@ -30,6 +30,7 @@ typedef enum {
+ 	CABLE_PAIRING_UNSUPPORTED = 0,
+ 	CABLE_PAIRING_SIXAXIS,
+ 	CABLE_PAIRING_DS4,
++	CABLE_PAIRING_PS3_WIRELESS_KEYPAD
+ } CablePairingType;
+ 
+ static inline CablePairingType get_pairing_type(uint16_t   vid,
+@@ -78,6 +79,14 @@ static inline CablePairingType get_pairing_type(uint16_t   vid,
+ 			.version = 0x0001,
+ 			.type = CABLE_PAIRING_DS4,
+ 		},
++		{
++			.name = "Wireless Keypad",
++			.source = 0x0002,
++			.vid = 0x054c,
++			.pid = 0x03a0,
++			.version = 0x0001,
++			.type = CABLE_PAIRING_PS3_WIRELESS_KEYPAD
++		},
+ 	};
+ 	guint i;
  
 -- 
 2.14.2
