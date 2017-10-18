@@ -1,65 +1,44 @@
-Return-Path: <frederic.danis.oss@gmail.com>
-Subject: Re: [PATCH v3 0/2] ACPI serdev support
-To: Marcel Holtmann <marcel@holtmann.org>,
- "Rafael J. Wysocki" <rafael@kernel.org>, Greg Kroah-Hartman <greg@kroah.com>
-Cc: Johan Hovold <johan@kernel.org>, Rob Herring <robh@kernel.org>,
- Sebastian Reichel <sre@kernel.org>, Loic Poulain <loic.poulain@gmail.com>,
- Lukas Wunner <lukas@wunner.de>, Hans de Goede <hdegoede@redhat.com>,
- "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
- "linux-serial@vger.kernel.org" <linux-serial@vger.kernel.org>,
- ACPI Devel Maling List <linux-acpi@vger.kernel.org>
-References: <1507710734-32520-1-git-send-email-frederic.danis.oss@gmail.com>
- <20171011090354.GS4269@localhost>
- <CAJZ5v0jPEg5Ow4p0DzPJ9Md7RUTPhZZqCzqP5zmX-pPf9N80=g@mail.gmail.com>
- <AA38D4FD-5A35-460D-85CF-380BAB933448@holtmann.org>
-From: =?UTF-8?Q?Fr=c3=a9d=c3=a9ric_Danis?= <frederic.danis.oss@gmail.com>
-Message-ID: <ac53458d-c910-2d0a-a2ad-e7d21f8a5be7@gmail.com>
-Date: Wed, 18 Oct 2017 16:46:05 +0200
-MIME-Version: 1.0
-In-Reply-To: <AA38D4FD-5A35-460D-85CF-380BAB933448@holtmann.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 11.0 \(3445.1.7\))
+Subject: Re: UART baud rate to 3M within btattach
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <6AEB9243C1923B41A52689D49F0E099ED2F713@insys-exchange.INSYS-GROUP.LAN>
+Date: Wed, 18 Oct 2017 16:31:20 +0200
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Message-Id: <E66B264E-BFE6-485C-A756-50DA72931AF8@holtmann.org>
+References: <6AEB9243C1923B41A52689D49F0E099ED2F6AC@insys-exchange.INSYS-GROUP.LAN>
+ <B688E807-F368-4359-AE46-85CF3931198F@holtmann.org>
+ <6AEB9243C1923B41A52689D49F0E099ED2F6DE@insys-exchange.INSYS-GROUP.LAN>
+ <91F67C0D-356B-4CBB-BA32-899B0BB30DC4@holtmann.org>
+ <6AEB9243C1923B41A52689D49F0E099ED2F713@insys-exchange.INSYS-GROUP.LAN>
+To: Libor Peltan <lpeltan@insys-tec.de>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Greg, Rafael, Marcel,
+Hi Libor,
 
-Le 11/10/2017 à 20:32, Marcel Holtmann a écrit :
-> Hi Greg,
->
->>>> Add ACPI support for serial attached devices.
->>>>
->>>> Currently, serial devices are not set as enumerated during ACPI scan for SPI
->>>> or i2c buses (but not for UART). This should also be done for UART serial
->>>> devices.
->>>> I renamed *spi_i2c_slave* to *serial_bus_slave* to reflect this.
->>>>
->>>> This needs Johan Hovold's "serdev: fix registration of second slave" patch.
->>> In theory this series could go in through the acpi-tree without my
->>> fix. It would only affect an error case where an unlikely failure to
->>> register an ACPI serdev device, would prevent the tty-class device from
->>> being registered instead of the controller. That is, something we can
->>> live with until this all converges in 4.15-rc1 if needed.
->>>
->>> That said, I think we should consider taking all serdev changes, and
->>> therefore also the ACPI patch, through the tty tree instead in order to
->>> avoid merge conflicts. Rafael?
->> OK
->>
->> Please feel free to add
->>
->> Acked-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
->>
->> to the ACPI core change.
->>
->> And I will assume that this series will go in via the tty tree.
-> you have to take these two patches now via the TTY tree now. In case you already marked them as someone else problem ;)
->
-> Regards
->
-> Marcel
+> Thank you Marcel, your suggestion solved my issue:
+> 
+> I had to compile the kernel with CONFIG_BT_HCIUART_QCA.
+> I must also call following at the bootup:
+> 
+> btattach -S 3000000 -P qca
+> sleep 1
+> killall btattach
+> sleep 1
+> btattach -S 3000000 -P h4
+> bluetoothd
+> 
+> ...otherwise bluetoothd doesn't work (=finds 0 adapters).
+> But I'm glad to have this workaround :)
 
-Is there any problem I missed with those patches?
-Do I have to re-send them?
+actually only one btattach command should be needed. If this doesn't work, we should fix hci_qca.c to support it. Since after loading the firmware and configuring the UART speed, the QCA protocol will automatically run H4. No need to kill btattach and restart it with a different protocol.
 
-Regards,
+Can you share "btmon -w trace.log" traces?
 
-Fred
+Regards
+
+Marcel
+
