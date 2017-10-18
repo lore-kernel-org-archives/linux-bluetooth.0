@@ -1,31 +1,55 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Libor Peltan <lpeltan@insys-tec.de>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: UART baud rate to 3M within btattach
-Date: Wed, 18 Oct 2017 11:36:54 +0000
-Message-ID: <6AEB9243C1923B41A52689D49F0E099ED2F6AC@insys-exchange.INSYS-GROUP.LAN>
+From: Anitha Chandrasekar <anitha.chandrasekar@sasken.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Subject: RE: Need info on factory reset api in Bluez
+Date: Wed, 18 Oct 2017 11:18:23 +0000
+Message-ID: <7B53A3173656CB4190908401FE75F4F860078CD6@exgmbxfz02.sasken.com>
+References: <7B53A3173656CB4190908401FE75F4F860077BD9@exgmbxfz02.sasken.com>,<CABBYNZKz3ScfkX_5NeQgBeGhA4T_O-AhroD4nkLxrtN63w76+Q@mail.gmail.com>
+In-Reply-To: <CABBYNZKz3ScfkX_5NeQgBeGhA4T_O-AhroD4nkLxrtN63w76+Q@mail.gmail.com>
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi everyone,
+Hi Luiz,
 
-my setup: Linux 4.14rc2, bluez 5.47. SoC + Qualcomm BT chip, connected via UART.
-The default speed of the UART is 115200 bps, which is obviously slow, need 3M bps.
+Great!! Thanks for the quick reply.
 
-I already found out, how to do it: send a HCI command
-0x01 0x48 0xFC 0x01 0x0E
-In other words: OGF=0x3F, OCF=0x0048, plen=1, pdata=0xE
-...and reset the UART after 300 millis with new speed.
+Regards,
+Anitha
+________________________________________
+From: linux-bluetooth-owner@vger.kernel.org [linux-bluetooth-owner@vger.kernel.org] on behalf of Luiz Augusto von Dentz [luiz.dentz@gmail.com]
+Sent: Wednesday, October 18, 2017 2:49 PM
+To: Anitha Chandrasekar
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: Need info on factory reset api in Bluez
 
-This is possible via 'hcitool', but it breaks running instances of btattach...
+Hi Anitha,
 
-I would like to make btattach to do it for me at startup. Is there a way to configure it?
+On Tue, Oct 17, 2017 at 2:52 PM, Anitha Chandrasekar
+<anitha.chandrasekar@sasken.com> wrote:
+> Hi,
+>
+> We are using bluez stack apis for developing BLE client.Our device has an option of factory reset.
+> I have tried using rfkill etc to reset the controller, but I see that devices are not getting deleted from gatt database.
+>
+> Is there any single api call, which is used for factory reset in Bluez?
 
-It seems that hciattach had this possibility, but dunno if not already deprecated in bluez 5.47 and how to use it.
+Usually, this is implemented by wiping the storage which is under
+/var/lib/bluetooth.
 
-Thanks for any suggestions!!
 
-Libor
+--
+Luiz Augusto von Dentz
+--
+To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
+________________________________
+
+SASKEN BUSINESS DISCLAIMER: This message may contain confidential, proprietary or legally privileged information. In case you are not the original intended Recipient of the message, you must not, directly or indirectly, use, disclose, distribute, print, or copy any part of this message and you are requested to delete it and inform the sender. Any views expressed in this message are those of the individual sender unless otherwise stated. Nothing contained in this message shall be construed as an offer or acceptance of any offer by Sasken Technologies Limited ( formerly known as "Sasken Communication Technologies Limited" ) unless sent with that express intent and with due authority of Sasken. Sasken has taken enough precautions to prevent the spread of viruses. However the company accepts no liability for any damage caused by any virus transmitted by this email.
+Read Disclaimer at http://www.sasken.com/mail-disclaimer/
+
+________________________________
