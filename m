@@ -1,176 +1,136 @@
-Return-Path: <linux-kernel-owner@vger.kernel.org>
-Date: Tue, 17 Oct 2017 19:00:35 -0700
-From: "Life is hard, and then you die" <ronald@innovation.ch>
-To: Dean Jenkins <Dean_Jenkins@mentor.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-        Gustavo Padovan <gustavo@padovan.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Lukas Wunner <lukas@wunner.de>,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: hci_ldisc: Allow sleeping while proto locks
- are held.
-Message-ID: <20171018020035.GB12182@innovation.ch>
-References: <20171015104045.GA25513@innovation.ch>
- <b7b223ca-4d7b-adfe-d1e9-fc1b45da653c@mentor.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <b7b223ca-4d7b-adfe-d1e9-fc1b45da653c@mentor.com>
-Sender: linux-kernel-owner@vger.kernel.org
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Bastien Nocera <hadess@hadess.net>
+To: linux-bluetooth@vger.kernel.org
+Cc: Bastien Nocera <hadess@hadess.net>
+Subject: [PATCH v2 06/11] plugins/sixaxis: Rename sixaxis specific functions
+Date: Wed, 18 Oct 2017 03:58:10 +0200
+Message-Id: <20171018015815.10045-6-hadess@hadess.net>
+In-Reply-To: <20171018015815.10045-1-hadess@hadess.net>
+References: <20171018015815.10045-1-hadess@hadess.net>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+And provide wrappers to prepare for the addition of other device types.
+---
+ plugins/sixaxis.c | 39 ++++++++++++++++++++++++++++++++-------
+ 1 file changed, 32 insertions(+), 7 deletions(-)
 
-  Hi Dean,
-
-apologies for the slow reply, and thank you for the detailed response.
-
-On Mon, Oct 16, 2017 at 06:08:37PM +0100, Dean Jenkins wrote:
-> 
-> On 15/10/17 11:40, =?UTF-8?q?Ronald=20Tschal=C3=A4r?= wrote:
-> >Lastly, the read-lock in the hci_uart_tx_wakeup() callback now needed
-> >to be removed because that function is called from an IRQ context. But
-> >since it doesn't actually call any proto functions, instead just
-> >queueing the work, and the other operations are atomic bit operations,
-> >this is ok.
-[snip]
-> There is at least 1 race condition to consider. The atomic variables do not
-> help because the codeblock as a whole is not atomic. Hence locking is needed
-> as follows.
-> 
-> The issue is that hci_uart_tty_close() runs asynchronously to
-> hci_uart_tx_wakeup() which is shown below (assuming a SMP system).
-> 
-> int hci_uart_tx_wakeup(struct hci_uart *hu)
-> {
->         read_lock(&hu->proto_lock);
-> 
-> In parallel, hci_uart_tty_close() can be running here:
-> 
->         if (!test_bit(HCI_UART_PROTO_READY, &hu->flags))
->                 goto no_schedule;
-> 
-> In parallel, hci_uart_tty_close() can be running here:
-> 
->         if (test_and_set_bit(HCI_UART_SENDING, &hu->tx_state)) {
-> 
-> In parallel, hci_uart_tty_close() can be running here:
-> 
->                 set_bit(HCI_UART_TX_WAKEUP, &hu->tx_state);
->                 goto no_schedule;
->         }
-> 
->         BT_DBG("");
-> 
-> In parallel, hci_uart_tty_close() can be running here:
-> 
->         schedule_work(&hu->write_work);
-> 
-> In parallel, hci_uart_tty_close() can be running here:
-> 
-> no_schedule:
->         read_unlock(&hu->proto_lock);
-> 
->         return 0;
-> }
-> 
-> hci_uart_tty_close() progressively removes the resources needed by the
-> scheduled work queue hu->write_work which runs hci_uart_write_work(). Also
-> there is a delay between the scheduling and hci_uart_write_work actually
-> running. This means hci_uart_write_work() can race with
-> hci_uart_tty_close(), sometimes causing hci_uart_tty_close() to crash, for
-> example due to the write buffer no longer being there.
-> 
-> static void hci_uart_write_work(struct work_struct *work)
-> {
-> <snipped>
->         set_bit(TTY_DO_WRITE_WAKEUP, &tty->flags);
->         len = tty->ops->write(tty, skb->data, skb->len);    <== can crash
-> inside the write function pointer as the write buffer is no longer valid
->         hdev->stat.byte_tx += len;    <== can crash here as hdev now invalid
-> <snipped>
-> }
-> 
-> Therefore, a robust solution is to lock out hci_uart_tty_close() when
-> hci_uart_tx_wakeup() runs, that is the reason why read_lock(&hu->proto_lock)
-> is used in hci_uart_write_work(). The atomic flag HCI_UART_PROTO_READY is
-> prevented from being cleared whilst hci_uart_tx_wakeup() runs.
-
-Got it, thanks. So to summarize, the core issue is that in
-hci_uart_tx_wakeup() these two need to be atomic
-
-        if (!test_bit(HCI_UART_PROTO_READY, &hu->flags))
-                goto no_schedule;
-
-        schedule_work(&hu->write_work);
-
-so that new work won't be scheduled after close.
-
-I think then that this can fixed by using the trylock variants here:
-
- int hci_uart_tx_wakeup(struct hci_uart *hu)
+diff --git a/plugins/sixaxis.c b/plugins/sixaxis.c
+index 1bc64e1c4..69b1041e1 100644
+--- a/plugins/sixaxis.c
++++ b/plugins/sixaxis.c
+@@ -55,13 +55,14 @@ struct authentication_closure {
+ 	struct btd_device *device;
+ 	int fd;
+ 	bdaddr_t bdaddr; /* device bdaddr */
++	CablePairingType type;
+ };
+ 
+ static struct udev *ctx = NULL;
+ static struct udev_monitor *monitor = NULL;
+ static guint watch_id = 0;
+ 
+-static int get_device_bdaddr(int fd, bdaddr_t *bdaddr)
++static int sixaxis_get_device_bdaddr(int fd, bdaddr_t *bdaddr)
  {
--       read_lock(&hu->proto_lock);
-+       /* This may be called in an IRQ context, so we can't sleep. Therefore
-+        * we only try to acquire the lock, and if that fails we assume the
-+        * tty is being closed because that is the only time the write lock is
-+        * acquired. If, however, at some point in the future the write lock
-+        * is also acquired in other situations, then this must be revisited.
-+        */
-+       if (!percpu_down_read_trylock(&hu->proto_lock))
-+               return 0;
-
-        if (!test_bit(HCI_UART_PROTO_READY, &hu->flags))
-                goto no_schedule;
-@@ -145,8 +143,6 @@ int hci_uart_tx_wakeup(struct hci_uart *hu)
-        schedule_work(&hu->write_work);
-
- no_schedule:
--       read_unlock(&hu->proto_lock);
-+       percpu_up_read(&hu->proto_lock);
-
-        return 0;
+ 	uint8_t buf[18];
+ 	int ret;
+@@ -82,7 +83,14 @@ static int get_device_bdaddr(int fd, bdaddr_t *bdaddr)
+ 	return 0;
  }
+ 
+-static int get_master_bdaddr(int fd, bdaddr_t *bdaddr)
++static int get_device_bdaddr(int fd, bdaddr_t *bdaddr, CablePairingType type)
++{
++	if (type == CABLE_PAIRING_SIXAXIS)
++		return sixaxis_get_device_bdaddr(fd, bdaddr);
++	return -1;
++}
++
++static int sixaxis_get_master_bdaddr(int fd, bdaddr_t *bdaddr)
+ {
+ 	uint8_t buf[8];
+ 	int ret;
+@@ -103,7 +111,14 @@ static int get_master_bdaddr(int fd, bdaddr_t *bdaddr)
+ 	return 0;
+ }
+ 
+-static int set_master_bdaddr(int fd, const bdaddr_t *bdaddr)
++static int get_master_bdaddr(int fd, bdaddr_t *bdaddr, CablePairingType type)
++{
++	if (type == CABLE_PAIRING_SIXAXIS)
++		return sixaxis_get_master_bdaddr(fd, bdaddr);
++	return -1;
++}
++
++static int sixaxis_set_master_bdaddr(int fd, const bdaddr_t *bdaddr)
+ {
+ 	uint8_t buf[8];
+ 	int ret;
+@@ -121,6 +136,14 @@ static int set_master_bdaddr(int fd, const bdaddr_t *bdaddr)
+ 	return ret;
+ }
+ 
++static int set_master_bdaddr(int fd, const bdaddr_t *bdaddr,
++					CablePairingType type)
++{
++	if (type == CABLE_PAIRING_SIXAXIS)
++		return sixaxis_set_master_bdaddr(fd, bdaddr);
++	return -1;
++}
++
+ static void agent_auth_cb(DBusError *derr,
+ 				void *user_data)
+ {
+@@ -136,12 +159,12 @@ static void agent_auth_cb(DBusError *derr,
+ 
+ 	btd_device_set_temporary(closure->device, false);
+ 
+-	if (get_master_bdaddr(closure->fd, &master_bdaddr) < 0)
++	if (get_master_bdaddr(closure->fd, &master_bdaddr, closure->type) < 0)
+ 		goto error;
+ 
+ 	adapter_bdaddr = btd_adapter_get_address(closure->adapter);
+ 	if (bacmp(adapter_bdaddr, &master_bdaddr)) {
+-		if (set_master_bdaddr(closure->fd, adapter_bdaddr) < 0)
++		if (set_master_bdaddr(closure->fd, adapter_bdaddr, closure->type) < 0)
+ 			goto error;
+ 	}
+ 
+@@ -164,6 +187,7 @@ static bool setup_device(int fd,
+ 				uint16_t vid,
+ 				uint16_t pid,
+ 				uint16_t version,
++				CablePairingType type,
+ 				struct btd_adapter *adapter)
+ {
+ 	bdaddr_t device_bdaddr;
+@@ -171,7 +195,7 @@ static bool setup_device(int fd,
+ 	struct btd_device *device;
+ 	struct authentication_closure *closure;
+ 
+-	if (get_device_bdaddr(fd, &device_bdaddr) < 0)
++	if (get_device_bdaddr(fd, &device_bdaddr, type) < 0)
+ 		return false;
+ 
+ 	/* This can happen if controller was plugged while already connected
+@@ -206,6 +230,7 @@ static bool setup_device(int fd,
+ 	closure->device = device;
+ 	closure->fd = fd;
+ 	bacpy(&closure->bdaddr, &device_bdaddr);
++	closure->type = type;
+ 	adapter_bdaddr = btd_adapter_get_address(adapter);
+ 	btd_request_authorization_cable_configured(adapter_bdaddr, &device_bdaddr,
+ 				HID_UUID, agent_auth_cb, closure);
+@@ -271,7 +296,7 @@ static void device_added(struct udev_device *udevice)
+ 	}
+ 
+ 	/* Only close the fd if an authentication is not pending */
+-	if (!setup_device(fd, name, source, vid, pid, version, adapter))
++	if (!setup_device(fd, name, source, vid, pid, version, type, adapter))
+ 		close(fd);
+ 
+ 	g_free(name);
+-- 
+2.14.2
 
-
-> In fact, hci_uart_tty_close() is really a bit of a mess because it
-> progressively removes resources. It is is based on old code which has been
-> patched over the many years. Therefore it has kept code which is probably
-> obsolete or duplicated. Ideally, hci_uart_tty_close() should be rewritten.
-> 
-> For example, there is a call
-> cancel_work_sync(&hu->write_work);
-> in  hci_uart_tty_close() which at first glance seems to be helpful but it is
-> flawed because hci_uart_tx_wakeup() can schedule a new work item AFTER
-> cancel_work_sync(&hu->write_work) runs. Therefore, locking is needed to
-> prevent hci_uart_tx_wakeup() from being scheduled whilst
-> HCI_UART_PROTO_READY is being cleared in hci_uart_tty_close().
-
-Actually, I think there's still problem: in hci_uart_tty_close()
-cancel_work_sync() is called before the HCI_UART_PROTO_READY flag is
-cleared, opening the following race:
-
-           P1                                P2
-    cancel_work_sync()
-                                       hci_uart_tx_wakeup()
-    clear_bit(HCI_UART_PROTO_READY)
-    clean up
-                                       hci_uart_write_work()
-
-So AFAICT cancel_work_sync() needs to be done after clearing the flag:
-
-        if (test_bit(HCI_UART_PROTO_READY, &hu->flags)) {
-                write_lock_irqsave(&hu->proto_lock, flags);
-                clear_bit(HCI_UART_PROTO_READY, &hu->flags);
-                write_unlock_irqrestore(&hu->proto_lock, flags);
-
-                cancel_work_sync(&hu->write_work);      // <---
-
-                if (hdev) {
-
-(if HCI_UART_PROTO_READY is already clear, then no work can be pending,
-so no need to cancel work in that case).
-
-
-
-  Cheers,
-
-  Ronald
