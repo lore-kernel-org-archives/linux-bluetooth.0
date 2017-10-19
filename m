@@ -1,61 +1,80 @@
-Return-Path: <linux-wpan-owner@vger.kernel.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: patrik.flykt@linux.intel.com, linux-wpan@vger.kernel.org
-Subject: [RFC 0/7] 6LoWPAN userspace support
-Date: Fri, 20 Oct 2017 13:22:29 +0300
-Message-Id: <20171020102236.17499-1-luiz.dentz@gmail.com>
-Sender: linux-wpan-owner@vger.kernel.org
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+MIME-Version: 1.0
+In-Reply-To: <CABBYNZLZFNkS9KNAyOmuFhrQS7jW6sCq9WtbWj_GEmUqzO=SAA@mail.gmail.com>
+References: <CAOVXOEbDLdQ75i4=1rNW+8TP5TkN8ounvf=nKm5xQbbf2efNZQ@mail.gmail.com>
+ <66df77f7-90e1-ff00-3aa0-51a82d3c4351@jp.fujitsu.com> <CABBYNZLZFNkS9KNAyOmuFhrQS7jW6sCq9WtbWj_GEmUqzO=SAA@mail.gmail.com>
+From: Michael Simon <michael.simon.at@gmail.com>
+Date: Thu, 19 Oct 2017 22:53:51 +0200
+Message-ID: <CAOVXOEbvA=4n1GgGJsZkDDR-mFaEJQiyZQ+nAKJ8E5tSu3A90w@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] dbus: Fix for unused parameter in WriteValue
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Luiz,
 
-This introduces support for 6LoWPAN userspace interface creation along
-with IPSP plugin which takes care of L2CAP channel creation.
 
-The bt_6lo instance handles all the details to create the network
-interface and also attach channels to it so any io is automatically
-forward to the right path. The plugin make use of bt_6lo and create
-interfaces for each adapter available using "bt" as prefix followed by
-adapter index.
+2017-10-19 10:22 GMT+02:00 Luiz Augusto von Dentz <luiz.dentz@gmail.com>:
+> Hi Michael,
+>
+> On Tue, Oct 17, 2017 at 7:30 AM, ERAMOTO Masaya
+> <eramoto.masaya@jp.fujitsu.com> wrote:
+>> Hi Michael,
+>>
+>> On 10/16/2017 10:47 PM, Michael Simon wrote:
+>>> The glib iterator was not moved to the second array,
+>>> which contains the parameter.
+>>> ---
+>>>  src/gatt-client.c | 4 ++++
+>>>  1 file changed, 4 insertions(+)
+>>>
+>>> diff --git a/src/gatt-client.c b/src/gatt-client.c
+>>> index 32b3a87..58f14b8 100644
+>>> --- a/src/gatt-client.c
+>>> +++ b/src/gatt-client.c
+>>> @@ -596,6 +596,8 @@ static DBusMessage
+>>> *descriptor_write_value(DBusConnection *conn,
+>>>         if (parse_value_arg(&iter, &value, &value_len))
+>>>                 return btd_error_invalid_args(msg);
+>>>
+>>> +        dbus_message_iter_next (&iter);
+>>> +
+>>>         if (parse_options(&iter, &offset))
+>>>                 return btd_error_invalid_args(msg);
+>>>
+>>> @@ -986,6 +988,8 @@ static DBusMessage
+>>> *characteristic_write_value(DBusConnection *conn,
+>>>         if (parse_value_arg(&iter, &value, &value_len))
+>>>                 return btd_error_invalid_args(msg);
+>>>
+>>> +        dbus_message_iter_next (&iter);
+>>> +
+>>>         if (parse_options(&iter, &offset))
+>>>                 return btd_error_invalid_args(msg);
+>>>
+>>
+>> This patch can not be applied, and the following messages output:
+>>
+>>   Applying: dbus: Fix for unused parameter in WriteValue
+>>   fatal: corrupt patch at line 10
+>>   Patch failed at 0001 dbus: Fix for unused parameter in WriteValue
+>>
+>> Since this patch perhaps has extra line feeds and uses spaces as indent.
+>
+> I went ahead pushed the patch after fixing the patch myself, not sure
+> why the patch got malformed perhaps your mail client is mangling it or
+> something.
+>
+> --
+> Luiz Augusto von Dentz
 
-At the current stage only router/central role is supported since
-peripheral role may actually need to be enabled via advertisement which
-perhaps will require a D-Bus to be triggered on demand.
+thanks for fixing this.
+I will try to find out what went wrong, my guess would be that
+something went wrong as i copied the text from the virtual machine to
+the host.
 
-Since the IPSP plugins does actually register a proper profile driver
-Device.Connect can now attempt to connect the IPSP channel and then
-proceed to attach the channel to interface, so it is well integrated
-with existing D-Bus APIs.
-
-Note that this all depends on TUN/TAP changes proposed here:
-http://www.spinics.net/lists/linux-bluetooth/msg72471.html
-
-Luiz Augusto von Dentz (7):
-  shared/io: Add io_recv
-  shared: Add initial code for 6LoWPAN
-  unit: Add initial test for bt_6lo
-  uuid: Add IPSP UUID
-  build: Add IPSP plugin
-  ipsp: Connect to IPSP PSM
-  ipsp: Add support for bt_6lo
-
- Makefile.am             |   8 +-
- Makefile.plugins        |   5 +
- configure.ac            |   4 +
- lib/uuid.h              |   2 +
- profiles/network/ipsp.c | 318 +++++++++++++++++++++++++++++++
- src/shared/6lo.c        | 493 ++++++++++++++++++++++++++++++++++++++++++++++++
- src/shared/6lo.h        |  40 ++++
- src/shared/io-glib.c    |  20 ++
- src/shared/io.h         |   1 +
- unit/test-6lo.c         | 271 ++++++++++++++++++++++++++
- 10 files changed, 1161 insertions(+), 1 deletion(-)
- create mode 100644 profiles/network/ipsp.c
- create mode 100644 src/shared/6lo.c
- create mode 100644 src/shared/6lo.h
- create mode 100644 unit/test-6lo.c
-
--- 
-2.13.6
-
+Regards,
+Michael
