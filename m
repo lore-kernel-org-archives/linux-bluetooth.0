@@ -1,24 +1,68 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <6AEB9243C1923B41A52689D49F0E099ED2F75E@insys-exchange.INSYS-GROUP.LAN>
-References: <CAPeBu71a96x2ciRKRqGis7SOeKvxEVTpRejhv+W64YONANC+2w@mail.gmail.com>
- <6AEB9243C1923B41A52689D49F0E099ED2F75E@insys-exchange.INSYS-GROUP.LAN>
-From: Matthew Hazley <lists@matthazley.com>
-Date: Thu, 19 Oct 2017 11:19:49 +0100
-Message-ID: <CAPeBu723rVqA2AwPLU+qSxak+z9d1cCgEGU3iBeUVbCAE6A-OQ@mail.gmail.com>
-Subject: Re: BlueZ Peripheral: Detect Connection from Remote Device and Read RSSI
-To: Libor Peltan <lpeltan@insys-tec.de>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <66df77f7-90e1-ff00-3aa0-51a82d3c4351@jp.fujitsu.com>
+References: <CAOVXOEbDLdQ75i4=1rNW+8TP5TkN8ounvf=nKm5xQbbf2efNZQ@mail.gmail.com>
+ <66df77f7-90e1-ff00-3aa0-51a82d3c4351@jp.fujitsu.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Thu, 19 Oct 2017 11:22:31 +0300
+Message-ID: <CABBYNZLZFNkS9KNAyOmuFhrQS7jW6sCq9WtbWj_GEmUqzO=SAA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] dbus: Fix for unused parameter in WriteValue
+To: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
+Cc: Michael Simon <michael.simon.at@gmail.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Thanks for your comment.
+Hi Michael,
 
-> It seems to me that all the events and value changes result in DBus messages around. You can watch them with dbus-monitor first, and write your own app listening and filtering them later.
+On Tue, Oct 17, 2017 at 7:30 AM, ERAMOTO Masaya
+<eramoto.masaya@jp.fujitsu.com> wrote:
+> Hi Michael,
+>
+> On 10/16/2017 10:47 PM, Michael Simon wrote:
+>> The glib iterator was not moved to the second array,
+>> which contains the parameter.
+>> ---
+>>  src/gatt-client.c | 4 ++++
+>>  1 file changed, 4 insertions(+)
+>>
+>> diff --git a/src/gatt-client.c b/src/gatt-client.c
+>> index 32b3a87..58f14b8 100644
+>> --- a/src/gatt-client.c
+>> +++ b/src/gatt-client.c
+>> @@ -596,6 +596,8 @@ static DBusMessage
+>> *descriptor_write_value(DBusConnection *conn,
+>>         if (parse_value_arg(&iter, &value, &value_len))
+>>                 return btd_error_invalid_args(msg);
+>>
+>> +        dbus_message_iter_next (&iter);
+>> +
+>>         if (parse_options(&iter, &offset))
+>>                 return btd_error_invalid_args(msg);
+>>
+>> @@ -986,6 +988,8 @@ static DBusMessage
+>> *characteristic_write_value(DBusConnection *conn,
+>>         if (parse_value_arg(&iter, &value, &value_len))
+>>                 return btd_error_invalid_args(msg);
+>>
+>> +        dbus_message_iter_next (&iter);
+>> +
+>>         if (parse_options(&iter, &offset))
+>>                 return btd_error_invalid_args(msg);
+>>
+>
+> This patch can not be applied, and the following messages output:
+>
+>   Applying: dbus: Fix for unused parameter in WriteValue
+>   fatal: corrupt patch at line 10
+>   Patch failed at 0001 dbus: Fix for unused parameter in WriteValue
+>
+> Since this patch perhaps has extra line feeds and uses spaces as indent.
 
-I will play with this idea but I am unsure if any dbus messages make
-it into userspace before a characteristic interaction takes place.
+I went ahead pushed the patch after fixing the patch myself, not sure
+why the patch got malformed perhaps your mail client is mangling it or
+something.
 
-Regards,
-Matt
+-- 
+Luiz Augusto von Dentz
