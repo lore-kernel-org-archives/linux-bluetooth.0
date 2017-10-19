@@ -1,80 +1,100 @@
-Return-Path: <jhovold@gmail.com>
-Sender: Johan Hovold <jhovold@gmail.com>
-Date: Thu, 19 Oct 2017 16:23:54 +0200
-From: Johan Hovold <johan@kernel.org>
-To: Greg Kroah-Hartman <greg@kroah.com>
-Cc: =?iso-8859-1?Q?Fr=E9d=E9ric?= Danis <frederic.danis.oss@gmail.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Johan Hovold <johan@kernel.org>, Rob Herring <robh@kernel.org>,
-	Sebastian Reichel <sre@kernel.org>,
-	Loic Poulain <loic.poulain@gmail.com>,
-	Lukas Wunner <lukas@wunner.de>, Hans de Goede <hdegoede@redhat.com>,
-	"open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-	"linux-serial@vger.kernel.org" <linux-serial@vger.kernel.org>,
-	ACPI Devel Maling List <linux-acpi@vger.kernel.org>
-Subject: Re: [PATCH v3 0/2] ACPI serdev support
-Message-ID: <20171019142354.GE5638@localhost>
-References: <1507710734-32520-1-git-send-email-frederic.danis.oss@gmail.com>
- <20171011090354.GS4269@localhost>
- <CAJZ5v0jPEg5Ow4p0DzPJ9Md7RUTPhZZqCzqP5zmX-pPf9N80=g@mail.gmail.com>
- <AA38D4FD-5A35-460D-85CF-380BAB933448@holtmann.org>
- <ac53458d-c910-2d0a-a2ad-e7d21f8a5be7@gmail.com>
- <20171018145608.GB27138@kroah.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <20171018145608.GB27138@kroah.com>
+Return-Path: <loic.poulain@linaro.org>
+From: Loic Poulain <loic.poulain@linaro.org>
+To: marcel@holtmann.org,
+	johan.hedberg@gmail.com
+Cc: linux-bluetooth@vger.kernel.org,
+	Loic Poulain <loic.poulain@linaro.org>
+Subject: [PATCH] Bluetooth: hci_ath: Add ath_vendor_cmd helper
+Date: Thu, 19 Oct 2017 14:29:10 +0200
+Message-Id: <1508416150-26259-1-git-send-email-loic.poulain@linaro.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, Oct 18, 2017 at 04:56:08PM +0200, Greg Kroah-Hartman wrote:
-> On Wed, Oct 18, 2017 at 04:46:05PM +0200, Frédéric Danis wrote:
+Introduce ath_vendor_cmd function which can be used to
+configure 'tags' and patch the firmware.
 
-> > Le 11/10/2017 à 20:32, Marcel Holtmann a écrit :
+ATH vendor command has the following format:
+| OPCODE (u8) | INDEX (LE16) | DLEN (U8) | DATA (U8 * DLEN) |
 
-> > > > > > Add ACPI support for serial attached devices.
-> > > > > > 
-> > > > > > Currently, serial devices are not set as enumerated during
-> > > > > > ACPI scan for SPI or i2c buses (but not for UART). This
-> > > > > > should also be done for UART serial devices.  I renamed
-> > > > > > *spi_i2c_slave* to *serial_bus_slave* to reflect this.
-> > > > > > 
-> > > > > > This needs Johan Hovold's "serdev: fix registration of
-> > > > > > second slave" patch.
-> > > > > In theory this series could go in through the acpi-tree
-> > > > > without my fix. It would only affect an error case where an
-> > > > > unlikely failure to register an ACPI serdev device, would
-> > > > > prevent the tty-class device from being registered instead of
-> > > > > the controller. That is, something we can live with until this
-> > > > > all converges in 4.15-rc1 if needed.
-> > > > > 
-> > > > > That said, I think we should consider taking all serdev
-> > > > > changes, and therefore also the ACPI patch, through the tty
-> > > > > tree instead in order to avoid merge conflicts. Rafael?
-> > > > OK
-> > > > 
-> > > > Please feel free to add
-> > > > 
-> > > > Acked-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
-> > > > 
-> > > > to the ACPI core change.
-> > > > 
-> > > > And I will assume that this series will go in via the tty tree.
-> > > you have to take these two patches now via the TTY tree now. In
-> > > case you already marked them as someone else problem ;)
+BD address configuration tag is at index 0x0001.
 
-> > Is there any problem I missed with those patches?
-> > Do I have to re-send them?
-> 
-> No, they are in my queue, still catching up...
+Signed-off-by: Loic Poulain <loic.poulain@linaro.org>
+---
+ drivers/bluetooth/hci_ath.c | 49 +++++++++++++++++++++++++++++----------------
+ 1 file changed, 32 insertions(+), 17 deletions(-)
 
-I just realised that we cannot merge this series (the second acpi patch)
-until the hci_intel driver gains serdev support or otherwise PM will
-break for those devices.
-
-Specifically, the hci_intel driver uses similar hacks as the hci_bcm
-driver does for PM, so we need something like Hans's hci_bcm series also
-for hci_intel before we can do the switch.
-
-Hopefully there are no more of these...
-
-Johan
+diff --git a/drivers/bluetooth/hci_ath.c b/drivers/bluetooth/hci_ath.c
+index 0ccf6bf..5f17ec3 100644
+--- a/drivers/bluetooth/hci_ath.c
++++ b/drivers/bluetooth/hci_ath.c
+@@ -50,6 +50,17 @@ struct ath_struct {
+ 	struct work_struct ctxtsw;
+ };
+ 
++#define OP_WRITE_TAG	0x01
++
++#define INDEX_BDADDR	0x01
++
++struct ath_vendor_cmd {
++	__u8 opcode;
++	__le16 index;
++	__u8 len;
++	__u8 data[251];
++} __packed;
++
+ static int ath_wakeup_ar3k(struct tty_struct *tty)
+ {
+ 	int status = tty->driver->ops->tiocmget(tty);
+@@ -144,30 +155,34 @@ static int ath_flush(struct hci_uart *hu)
+ 	return 0;
+ }
+ 
+-static int ath_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr)
++static int ath_vendor_cmd(struct hci_dev *hdev, uint8_t opcode, uint16_t index,
++			  const void *data, size_t dlen)
+ {
+ 	struct sk_buff *skb;
+-	u8 buf[10];
+-	int err;
+-
+-	buf[0] = 0x01;
+-	buf[1] = 0x01;
+-	buf[2] = 0x00;
+-	buf[3] = sizeof(bdaddr_t);
+-	memcpy(buf + 4, bdaddr, sizeof(bdaddr_t));
+-
+-	skb = __hci_cmd_sync(hdev, 0xfc0b, sizeof(buf), buf, HCI_INIT_TIMEOUT);
+-	if (IS_ERR(skb)) {
+-		err = PTR_ERR(skb);
+-		BT_ERR("%s: Change address command failed (%d)",
+-		       hdev->name, err);
+-		return err;
+-	}
++	struct ath_vendor_cmd cmd;
++
++	if (dlen > sizeof(cmd.data))
++		return -EINVAL;
++
++	cmd.opcode = opcode;
++	cmd.index = cpu_to_le16(index);
++	cmd.len = dlen;
++	memcpy(cmd.data, data, dlen);
++
++	skb = __hci_cmd_sync(hdev, 0xfc0b, dlen + 4, &cmd, HCI_INIT_TIMEOUT);
++	if (IS_ERR(skb))
++		return PTR_ERR(skb);
+ 	kfree_skb(skb);
+ 
+ 	return 0;
+ }
+ 
++static int ath_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr)
++{
++	return ath_vendor_cmd(hdev, OP_WRITE_TAG, INDEX_BDADDR, bdaddr,
++			      sizeof(*bdaddr));
++}
++
+ static int ath_setup(struct hci_uart *hu)
+ {
+ 	BT_DBG("hu %p", hu);
+-- 
+2.7.4
