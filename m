@@ -1,68 +1,61 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <lpeltan@insys-tec.de>
+From: Libor Peltan <lpeltan@insys-tec.de>
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: AW: UART baud rate to 3M within btattach
+Date: Thu, 19 Oct 2017 07:54:32 +0000
+Message-ID: <6AEB9243C1923B41A52689D49F0E099ED2F775@insys-exchange.INSYS-GROUP.LAN>
+References: <6AEB9243C1923B41A52689D49F0E099ED2F6AC@insys-exchange.INSYS-GROUP.LAN>
+ <B688E807-F368-4359-AE46-85CF3931198F@holtmann.org>
+ <6AEB9243C1923B41A52689D49F0E099ED2F6DE@insys-exchange.INSYS-GROUP.LAN>
+ <91F67C0D-356B-4CBB-BA32-899B0BB30DC4@holtmann.org>
+ <6AEB9243C1923B41A52689D49F0E099ED2F713@insys-exchange.INSYS-GROUP.LAN>
+ <E66B264E-BFE6-485C-A756-50DA72931AF8@holtmann.org>
+In-Reply-To: <E66B264E-BFE6-485C-A756-50DA72931AF8@holtmann.org>
+Content-Type: text/plain; charset="iso-8859-1"
 MIME-Version: 1.0
-In-Reply-To: <66df77f7-90e1-ff00-3aa0-51a82d3c4351@jp.fujitsu.com>
-References: <CAOVXOEbDLdQ75i4=1rNW+8TP5TkN8ounvf=nKm5xQbbf2efNZQ@mail.gmail.com>
- <66df77f7-90e1-ff00-3aa0-51a82d3c4351@jp.fujitsu.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 19 Oct 2017 11:22:31 +0300
-Message-ID: <CABBYNZLZFNkS9KNAyOmuFhrQS7jW6sCq9WtbWj_GEmUqzO=SAA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] dbus: Fix for unused parameter in WriteValue
-To: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
-Cc: Michael Simon <michael.simon.at@gmail.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Michael,
+Hi Marcel,
+I tried to log what's going on both in case of my btattach-kill-btattach wo=
+rkaround case, and in case i run only 'btattach -P qca' and bluetoothd is n=
+ot working afterwards. You can find the logs at
+http://stuff.krakonos.org/files/btmonSee.tar.bz2
+I'm not really able to understand the output myself :(
+Thank you for further comments,
+Libor
 
-On Tue, Oct 17, 2017 at 7:30 AM, ERAMOTO Masaya
-<eramoto.masaya@jp.fujitsu.com> wrote:
-> Hi Michael,
->
-> On 10/16/2017 10:47 PM, Michael Simon wrote:
->> The glib iterator was not moved to the second array,
->> which contains the parameter.
->> ---
->>  src/gatt-client.c | 4 ++++
->>  1 file changed, 4 insertions(+)
->>
->> diff --git a/src/gatt-client.c b/src/gatt-client.c
->> index 32b3a87..58f14b8 100644
->> --- a/src/gatt-client.c
->> +++ b/src/gatt-client.c
->> @@ -596,6 +596,8 @@ static DBusMessage
->> *descriptor_write_value(DBusConnection *conn,
->>         if (parse_value_arg(&iter, &value, &value_len))
->>                 return btd_error_invalid_args(msg);
->>
->> +        dbus_message_iter_next (&iter);
->> +
->>         if (parse_options(&iter, &offset))
->>                 return btd_error_invalid_args(msg);
->>
->> @@ -986,6 +988,8 @@ static DBusMessage
->> *characteristic_write_value(DBusConnection *conn,
->>         if (parse_value_arg(&iter, &value, &value_len))
->>                 return btd_error_invalid_args(msg);
->>
->> +        dbus_message_iter_next (&iter);
->> +
->>         if (parse_options(&iter, &offset))
->>                 return btd_error_invalid_args(msg);
->>
->
-> This patch can not be applied, and the following messages output:
->
->   Applying: dbus: Fix for unused parameter in WriteValue
->   fatal: corrupt patch at line 10
->   Patch failed at 0001 dbus: Fix for unused parameter in WriteValue
->
-> Since this patch perhaps has extra line feeds and uses spaces as indent.
+-----Urspr=FCngliche Nachricht-----
+Von: Marcel Holtmann [mailto:marcel@holtmann.org]=20
+Gesendet: Mittwoch, 18. Oktober 2017 16:31
+An: Libor Peltan <lpeltan@insys-tec.de>
+Cc: linux-bluetooth@vger.kernel.org
+Betreff: Re: UART baud rate to 3M within btattach
 
-I went ahead pushed the patch after fixing the patch myself, not sure
-why the patch got malformed perhaps your mail client is mangling it or
-something.
+Hi Libor,
 
--- 
-Luiz Augusto von Dentz
+> Thank you Marcel, your suggestion solved my issue:
+>=20
+> I had to compile the kernel with CONFIG_BT_HCIUART_QCA.
+> I must also call following at the bootup:
+>=20
+> btattach -S 3000000 -P qca
+> sleep 1
+> killall btattach
+> sleep 1
+> btattach -S 3000000 -P h4
+> bluetoothd
+>=20
+> ...otherwise bluetoothd doesn't work (=3Dfinds 0 adapters).
+> But I'm glad to have this workaround :)
+
+actually only one btattach command should be needed. If this doesn't work, =
+we should fix hci_qca.c to support it. Since after loading the firmware and=
+ configuring the UART speed, the QCA protocol will automatically run H4. No=
+ need to kill btattach and restart it with a different protocol.
+
+Can you share "btmon -w trace.log" traces?
+
+Regards
+
+Marcel
