@@ -1,80 +1,84 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <hdegoede@redhat.com>
+Subject: Re: [PATCH v3 0/2] ACPI serdev support
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Loic Poulain <loic.poulain@linaro.org>, Johan Hovold <johan@kernel.org>,
+ Greg Kroah-Hartman <greg@kroah.com>,
+ =?UTF-8?Q?Fr=c3=a9d=c3=a9ric_Danis?= <frederic.danis.oss@gmail.com>,
+ "Rafael J. Wysocki" <rafael@kernel.org>, Rob Herring <robh@kernel.org>,
+ Sebastian Reichel <sre@kernel.org>, Loic Poulain <loic.poulain@gmail.com>,
+ Lukas Wunner <lukas@wunner.de>,
+ "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+ "linux-serial@vger.kernel.org" <linux-serial@vger.kernel.org>,
+ ACPI Devel Maling List <linux-acpi@vger.kernel.org>
+References: <1507710734-32520-1-git-send-email-frederic.danis.oss@gmail.com>
+ <20171011090354.GS4269@localhost>
+ <CAJZ5v0jPEg5Ow4p0DzPJ9Md7RUTPhZZqCzqP5zmX-pPf9N80=g@mail.gmail.com>
+ <AA38D4FD-5A35-460D-85CF-380BAB933448@holtmann.org>
+ <ac53458d-c910-2d0a-a2ad-e7d21f8a5be7@gmail.com>
+ <20171018145608.GB27138@kroah.com> <20171019142354.GE5638@localhost>
+ <877ea825-eec5-d982-f962-d67067749009@redhat.com>
+ <115502FA-19DE-439C-A171-3CD5E6D92338@holtmann.org>
+ <1503e15d-6199-221a-542f-3766a69577e5@redhat.com>
+ <CAMZdPi_ZpNrdjJPnS_rQ9t3oYe6+en9oHQMjmMjx_xHL-WWZKQ@mail.gmail.com>
+ <28b99df9-de22-4542-055e-d9fa585aba8f@redhat.com>
+ <FFD85CA6-6BD9-45AA-B3C2-898212711C0C@holtmann.org>
+From: Hans de Goede <hdegoede@redhat.com>
+Message-ID: <0046719b-648f-556d-2dd5-ac695d843103@redhat.com>
+Date: Thu, 19 Oct 2017 21:05:06 +0200
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZLZFNkS9KNAyOmuFhrQS7jW6sCq9WtbWj_GEmUqzO=SAA@mail.gmail.com>
-References: <CAOVXOEbDLdQ75i4=1rNW+8TP5TkN8ounvf=nKm5xQbbf2efNZQ@mail.gmail.com>
- <66df77f7-90e1-ff00-3aa0-51a82d3c4351@jp.fujitsu.com> <CABBYNZLZFNkS9KNAyOmuFhrQS7jW6sCq9WtbWj_GEmUqzO=SAA@mail.gmail.com>
-From: Michael Simon <michael.simon.at@gmail.com>
-Date: Thu, 19 Oct 2017 22:53:51 +0200
-Message-ID: <CAOVXOEbvA=4n1GgGJsZkDDR-mFaEJQiyZQ+nAKJ8E5tSu3A90w@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] dbus: Fix for unused parameter in WriteValue
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <FFD85CA6-6BD9-45AA-B3C2-898212711C0C@holtmann.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi,
 
+On 19-10-17 21:00, Marcel Holtmann wrote:
+> Hi Hans,
+> 
+>>>             Hmm, I've never actually seen any hardware use an intel BT HCI connected
+>>>             to a serdev, but I guess people did not write that code for fun, so those
+>>>             do exist ?
+>>>         they are all ACPI based and could now start using serdev. Previously they were all driven by btattach.
+>>>     I understand, I was just wondering if anyone is aware of any hardware
+>>>     actually using Intel BT devices in this manner, because it is going
+>>>     to be tricky to do a similar series if we cannot test it.
+>>> Yeah this driver supports Lightning-Peak iBT 3.0 UART controller.
+>>> I remember this controller comes (at least) with Atom x3-c3440 / x3-c3445 SoCs.
+>>> However I don't have the hardware anymore.
+>>
+>> Ah, those are the Rockchip manufactured Atom based SoCs which
+>> come with Mali graphics, I don't think anyone is trying to run
+>> mainline on those and not a whole lot of those have shipped to
+>> begin with (the line has been canceled).
+>>
+>> I've an Apollo Lake based laptop with Intel Bluetooth, I just
+>> checked and that is simply using USB.
+>>
+>> So I don't think we are actually going to break anything by
+>> just moving forward as planned. This reminds me of the axp288
+>> driver where Intel's "embedded" engineering team upstreamed
+>> parts of the axp288 PMIC code, but in a way where the driver
+>> could not work as it would not load with platform_data which
+>> was never provided by the mainline kernel.
+>>
+>> As such it might actually be good to break this and if no-one
+>> complains we can just remove the hci_intel.c code altogether.
+> 
+> I think we can go forward with what we have. I am not going to remove hci_intel.c since the firmware loading code etc. is pretty generic to all Intel UART based chips. However we just take the PM pieces out or maybe someone is going to fix them.
 
-2017-10-19 10:22 GMT+02:00 Luiz Augusto von Dentz <luiz.dentz@gmail.com>:
-> Hi Michael,
->
-> On Tue, Oct 17, 2017 at 7:30 AM, ERAMOTO Masaya
-> <eramoto.masaya@jp.fujitsu.com> wrote:
->> Hi Michael,
->>
->> On 10/16/2017 10:47 PM, Michael Simon wrote:
->>> The glib iterator was not moved to the second array,
->>> which contains the parameter.
->>> ---
->>>  src/gatt-client.c | 4 ++++
->>>  1 file changed, 4 insertions(+)
->>>
->>> diff --git a/src/gatt-client.c b/src/gatt-client.c
->>> index 32b3a87..58f14b8 100644
->>> --- a/src/gatt-client.c
->>> +++ b/src/gatt-client.c
->>> @@ -596,6 +596,8 @@ static DBusMessage
->>> *descriptor_write_value(DBusConnection *conn,
->>>         if (parse_value_arg(&iter, &value, &value_len))
->>>                 return btd_error_invalid_args(msg);
->>>
->>> +        dbus_message_iter_next (&iter);
->>> +
->>>         if (parse_options(&iter, &offset))
->>>                 return btd_error_invalid_args(msg);
->>>
->>> @@ -986,6 +988,8 @@ static DBusMessage
->>> *characteristic_write_value(DBusConnection *conn,
->>>         if (parse_value_arg(&iter, &value, &value_len))
->>>                 return btd_error_invalid_args(msg);
->>>
->>> +        dbus_message_iter_next (&iter);
->>> +
->>>         if (parse_options(&iter, &offset))
->>>                 return btd_error_invalid_args(msg);
->>>
->>
->> This patch can not be applied, and the following messages output:
->>
->>   Applying: dbus: Fix for unused parameter in WriteValue
->>   fatal: corrupt patch at line 10
->>   Patch failed at 0001 dbus: Fix for unused parameter in WriteValue
->>
->> Since this patch perhaps has extra line feeds and uses spaces as indent.
->
-> I went ahead pushed the patch after fixing the patch myself, not sure
-> why the patch got malformed perhaps your mail client is mangling it or
-> something.
->
-> --
-> Luiz Augusto von Dentz
+Ok.
 
-thanks for fixing this.
-I will try to find out what went wrong, my guess would be that
-something went wrong as i copied the text from the virtual machine to
-the host.
+>> The alternative would be to revert 2 if the 3 patches of
+>> my last series for making the BT on the GPD win / pocket
+>> (and likely other devices) work in uart mode. Then someone
+>> (me?) would need to do a completely untested series for
+>> hci_intel.c, and get that + reverts of the reverts into 4.16,
+>> which is not the best way forward IMHO.
+> 
+> I am not doing that. We have to make progress towards serdev. So if things really turn out badly, then we have to deal with it, but that should not hold up getting things in the direction this needs to go.
+
+Sounds good to me.
 
 Regards,
-Michael
+
+Hans
