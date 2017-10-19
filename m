@@ -1,61 +1,40 @@
-Return-Path: <lpeltan@insys-tec.de>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Libor Peltan <lpeltan@insys-tec.de>
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: AW: UART baud rate to 3M within btattach
-Date: Thu, 19 Oct 2017 07:54:32 +0000
-Message-ID: <6AEB9243C1923B41A52689D49F0E099ED2F775@insys-exchange.INSYS-GROUP.LAN>
-References: <6AEB9243C1923B41A52689D49F0E099ED2F6AC@insys-exchange.INSYS-GROUP.LAN>
- <B688E807-F368-4359-AE46-85CF3931198F@holtmann.org>
- <6AEB9243C1923B41A52689D49F0E099ED2F6DE@insys-exchange.INSYS-GROUP.LAN>
- <91F67C0D-356B-4CBB-BA32-899B0BB30DC4@holtmann.org>
- <6AEB9243C1923B41A52689D49F0E099ED2F713@insys-exchange.INSYS-GROUP.LAN>
- <E66B264E-BFE6-485C-A756-50DA72931AF8@holtmann.org>
-In-Reply-To: <E66B264E-BFE6-485C-A756-50DA72931AF8@holtmann.org>
-Content-Type: text/plain; charset="iso-8859-1"
+To: Matthew Hazley <lists@matthazley.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: AW: BlueZ Peripheral: Detect Connection from Remote Device and Read
+ RSSI
+Date: Thu, 19 Oct 2017 07:01:55 +0000
+Message-ID: <6AEB9243C1923B41A52689D49F0E099ED2F75E@insys-exchange.INSYS-GROUP.LAN>
+References: <CAPeBu71a96x2ciRKRqGis7SOeKvxEVTpRejhv+W64YONANC+2w@mail.gmail.com>
+In-Reply-To: <CAPeBu71a96x2ciRKRqGis7SOeKvxEVTpRejhv+W64YONANC+2w@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
-I tried to log what's going on both in case of my btattach-kill-btattach wo=
-rkaround case, and in case i run only 'btattach -P qca' and bluetoothd is n=
-ot working afterwards. You can find the logs at
-http://stuff.krakonos.org/files/btmonSee.tar.bz2
-I'm not really able to understand the output myself :(
-Thank you for further comments,
-Libor
-
------Urspr=FCngliche Nachricht-----
-Von: Marcel Holtmann [mailto:marcel@holtmann.org]=20
-Gesendet: Mittwoch, 18. Oktober 2017 16:31
-An: Libor Peltan <lpeltan@insys-tec.de>
-Cc: linux-bluetooth@vger.kernel.org
-Betreff: Re: UART baud rate to 3M within btattach
-
-Hi Libor,
-
-> Thank you Marcel, your suggestion solved my issue:
->=20
-> I had to compile the kernel with CONFIG_BT_HCIUART_QCA.
-> I must also call following at the bootup:
->=20
-> btattach -S 3000000 -P qca
-> sleep 1
-> killall btattach
-> sleep 1
-> btattach -S 3000000 -P h4
-> bluetoothd
->=20
-> ...otherwise bluetoothd doesn't work (=3Dfinds 0 adapters).
-> But I'm glad to have this workaround :)
-
-actually only one btattach command should be needed. If this doesn't work, =
-we should fix hci_qca.c to support it. Since after loading the firmware and=
- configuring the UART speed, the QCA protocol will automatically run H4. No=
- need to kill btattach and restart it with a different protocol.
-
-Can you share "btmon -w trace.log" traces?
-
-Regards
-
-Marcel
+SGkgTWF0dCwNCkknbSBhIG5vb2IgaGVyZSwgYnV0IGp1c3QgYW4gaWRlYTogaG93IGFib3V0IGlu
+dm9sdmluZyBEQnVzPw0KDQpJdCBzZWVtcyB0byBtZSB0aGF0IGFsbCB0aGUgZXZlbnRzIGFuZCB2
+YWx1ZSBjaGFuZ2VzIHJlc3VsdCBpbiBEQnVzIG1lc3NhZ2VzIGFyb3VuZC4gWW91IGNhbiB3YXRj
+aCB0aGVtIHdpdGggZGJ1cy1tb25pdG9yIGZpcnN0LCBhbmQgd3JpdGUgeW91ciBvd24gYXBwIGxp
+c3RlbmluZyBhbmQgZmlsdGVyaW5nIHRoZW0gbGF0ZXIuDQoNCkFueWJvZHkgbW9yZSBleHBlcmll
+bmNlZCwgbWF5IGdpdmUgeW91IGJldHRlciBhbnN3ZXIgOikNCg0KTGlib3INCg0KLS0tLS1VcnNw
+csO8bmdsaWNoZSBOYWNocmljaHQtLS0tLQ0KVm9uOiBsaW51eC1ibHVldG9vdGgtb3duZXJAdmdl
+ci5rZXJuZWwub3JnIFttYWlsdG86bGludXgtYmx1ZXRvb3RoLW93bmVyQHZnZXIua2VybmVsLm9y
+Z10gSW0gQXVmdHJhZyB2b24gTWF0dGhldyBIYXpsZXkNCkdlc2VuZGV0OiBNaXR0d29jaCwgMTgu
+IE9rdG9iZXIgMjAxNyAxNzowMQ0KQW46IGxpbnV4LWJsdWV0b290aEB2Z2VyLmtlcm5lbC5vcmcN
+CkJldHJlZmY6IEJsdWVaIFBlcmlwaGVyYWw6IERldGVjdCBDb25uZWN0aW9uIGZyb20gUmVtb3Rl
+IERldmljZSBhbmQgUmVhZCBSU1NJDQoNCkhpIGV2ZXJ5b25lLA0KDQpJIGhhdmUgYSBzaW1wbGUs
+IEJMRSBwZXJpcGhlcmFsIHVzaW5nIEJsdWVaIDUuNDcsIGl0cyB3cml0dGVuIGluIFB5dGhvbi4N
+Cg0KTXkgcXVlc3Rpb24gaXMgdGhpcyAtIHdoZW4gdXNpbmcgQmx1ZVogYW5kIG9wZXJhdGluZyBh
+cyBhIHBlcmlwaGVyYWwsIGlzIHRoZXJlIGEgd2F5IHRvIGRldGVjdCB0aGF0IGEgY2VudHJhbCBo
+YXMgY29ubmVjdGVkIHRvIG1lPyBJcyB0aGVyZSBhIHdheSB0byByZWFkIHRoZSBSU1NJIG9mIHRo
+ZSBjb25uZWN0aW9uIGJldHdlZW4gdXM/DQoNClJlZ2FyZGluZyB0aGUgUlNTSSwgSSBkaWQgdHJ5
+IGV4ZWN1dGluZyB0aGUgZm9sbG93aW5nOg0KDQoiaGNpdG9vbCByc3NpIDxjZW50cmFsLWJkYWRk
+cj4iDQoNCndoZW4gSSBrbmV3IHRoZSBjZW50cmFsIHdhcyBjb25uZWN0ZWQgdG8gbWUgYnV0IHRo
+aXMgZmFpbGVkIGFuZCByZXBsaWVkICJHZXQgY29ubmVjdGlvbiBpbmZvIGZhaWxlZDogTm8gc3Vj
+aCBmaWxlIG9yIGRpcmVjdG9yeS4iDQoNCkFueSBoZWxwIGFwcHJlY2lhdGVkLg0KDQpSZWdhcmRz
+LA0KTWF0dA0KLS0NClRvIHVuc3Vic2NyaWJlIGZyb20gdGhpcyBsaXN0OiBzZW5kIHRoZSBsaW5l
+ICJ1bnN1YnNjcmliZSBsaW51eC1ibHVldG9vdGgiIGluIHRoZSBib2R5IG9mIGEgbWVzc2FnZSB0
+byBtYWpvcmRvbW9Admdlci5rZXJuZWwub3JnIE1vcmUgbWFqb3Jkb21vIGluZm8gYXQgIGh0dHA6
+Ly92Z2VyLmtlcm5lbC5vcmcvbWFqb3Jkb21vLWluZm8uaHRtbA0K
