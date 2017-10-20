@@ -1,37 +1,62 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-From: Alan Martinovic <alan.martinovic@senic.com>
-Date: Fri, 20 Oct 2017 16:22:20 +0200
-Message-ID: <CAOT_U5ZawnuYH3b9DVcAXC-Lpo=CdvhrgQ3qrrKT=JGid9697A@mail.gmail.com>
-Subject: Attaching a UART device without crypto dependency
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Subject: [PATCH BlueZ] gatt: Clear subscriptions for device not paired
+Date: Fri, 20 Oct 2017 15:21:14 +0300
+Message-Id: <20171020122114.11887-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
-I'm attaching a Zephyr based Bluetooth controller that exposes an hci interface.
-To make the Linux host part understand the controller i run:
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-~# sudo btattach -B /dev/ttyACM0 -S 1000000
+If the device is no longer valid or is not considered bonded anymore
+clear its CCC states before removing otherwise application may continue
+to notify when there are no devices listening.
+---
+ src/gatt-database.c | 22 +++++++++++++++++++++-
+ 1 file changed, 21 insertions(+), 1 deletion(-)
 
+diff --git a/src/gatt-database.c b/src/gatt-database.c
+index 47304704a..d6d1e4d13 100644
+--- a/src/gatt-database.c
++++ b/src/gatt-database.c
+@@ -891,6 +891,23 @@ static void conf_cb(void *user_data)
+ 	}
+ }
+ 
++static void clear_ccc_state(void *data, void *user_data)
++{
++	struct ccc_state *ccc = data;
++	struct btd_gatt_database *db = user_data;
++	struct ccc_cb_data *ccc_cb;
++
++	if (!ccc->value[0])
++		return;
++
++	ccc_cb = queue_find(db->ccc_callbacks, ccc_cb_match_handle,
++						UINT_TO_PTR(ccc->handle));
++	if (!ccc_cb)
++		return;
++
++	ccc_cb->callback(NULL, 0, ccc_cb->user_data);
++}
++
+ static void send_notification_to_device(void *data, void *user_data)
+ {
+ 	struct device_state *device_state = data;
+@@ -940,8 +957,11 @@ static void send_notification_to_device(void *data, void *user_data)
+ 
+ remove:
+ 	/* Remove device state if device no longer exists or is not paired */
+-	if (queue_remove(notify->database->device_states, device_state))
++	if (queue_remove(notify->database->device_states, device_state)) {
++		queue_foreach(device_state->ccc_states, clear_ccc_state,
++						notify->database);
+ 		device_state_free(device_state);
++	}
+ }
+ 
+ static void send_notification_to_devices(struct btd_gatt_database *database,
+-- 
+2.13.6
 
-I can see messages being exchanged in btmon but eventually it ends
-with the following error:
-
-= bluetoothd: Failed to open crypto
-                     3.879748
-= bluetoothd: No Bluetooth address for index 0
-              [hci0] 3.879916
-
-
-Am assuming two things here:
-1. The underlying embedded device doesn't have the appropriate crypto
-hardware. This results in errors when trying to open an crypto socket.
-I've enabled all the crypto related settings in the kernel config.
-
-2. The only thing crypto is used here is to generate the address for
-the controller, but besides that isn't essential.
-
-Is there a way to disable the crypto dependency, generate it in
-software or set the address manually?
