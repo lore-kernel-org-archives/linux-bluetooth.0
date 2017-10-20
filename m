@@ -1,33 +1,37 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Bastien Nocera <hadess@hadess.net>
+MIME-Version: 1.0
+From: Alan Martinovic <alan.martinovic@senic.com>
+Date: Fri, 20 Oct 2017 16:22:20 +0200
+Message-ID: <CAOT_U5ZawnuYH3b9DVcAXC-Lpo=CdvhrgQ3qrrKT=JGid9697A@mail.gmail.com>
+Subject: Attaching a UART device without crypto dependency
 To: linux-bluetooth@vger.kernel.org
-Cc: Bastien Nocera <hadess@hadess.net>
-Subject: [PATCH 1/3] battery: Add BT SIG reserved numbers used by Battery Service
-Date: Sat, 21 Oct 2017 01:03:02 +0200
-Message-Id: <20171020230304.21173-1-hadess@hadess.net>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add the Battery Level and Battery Power State UUIDs as per:
-https://www.bluetooth.com/specifications/gatt/viewer?attributeXmlFile=org.bluetooth.characteristic.battery_level.xml
-https://www.bluetooth.com/specifications/gatt/viewer?attributeXmlFile=org.bluetooth.characteristic.battery_power_state.xml
----
- lib/uuid.h | 2 ++
- 1 file changed, 2 insertions(+)
+Hi,
+I'm attaching a Zephyr based Bluetooth controller that exposes an hci interface.
+To make the Linux host part understand the controller i run:
 
-diff --git a/lib/uuid.h b/lib/uuid.h
-index 2c57a3378..614b3c4e4 100644
---- a/lib/uuid.h
-+++ b/lib/uuid.h
-@@ -119,6 +119,8 @@ extern "C" {
- #define GATT_CHARAC_RECONNECTION_ADDRESS		0x2A03
- #define GATT_CHARAC_PERIPHERAL_PREF_CONN		0x2A04
- #define GATT_CHARAC_SERVICE_CHANGED			0x2A05
-+#define GATT_CHARAC_BATTERY_LEVEL			0x2A19
-+#define GATT_CHARAC_BATTERY_POWER_STATE			0x2A1A
- #define GATT_CHARAC_SYSTEM_ID				0x2A23
- #define GATT_CHARAC_MODEL_NUMBER_STRING			0x2A24
- #define GATT_CHARAC_SERIAL_NUMBER_STRING		0x2A25
--- 
-2.14.2
+~# sudo btattach -B /dev/ttyACM0 -S 1000000
 
+
+I can see messages being exchanged in btmon but eventually it ends
+with the following error:
+
+= bluetoothd: Failed to open crypto
+                     3.879748
+= bluetoothd: No Bluetooth address for index 0
+              [hci0] 3.879916
+
+
+Am assuming two things here:
+1. The underlying embedded device doesn't have the appropriate crypto
+hardware. This results in errors when trying to open an crypto socket.
+I've enabled all the crypto related settings in the kernel config.
+
+2. The only thing crypto is used here is to generate the address for
+the controller, but besides that isn't essential.
+
+Is there a way to disable the crypto dependency, generate it in
+software or set the address manually?
