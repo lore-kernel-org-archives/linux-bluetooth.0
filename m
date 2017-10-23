@@ -1,33 +1,28 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Message-ID: <1508766916.28409.2.camel@hadess.net>
+Subject: Re: [PATCH 2/3] profiles/battery: Add Bluetooth LE Battery service
 From: Bastien Nocera <hadess@hadess.net>
 To: linux-bluetooth@vger.kernel.org
-Cc: Bastien Nocera <hadess@hadess.net>
-Subject: [PATCH v2 1/3] battery: Add BT SIG reserved numbers used by Battery Service
-Date: Mon, 23 Oct 2017 17:48:12 +0200
-Message-Id: <20171023154814.20607-1-hadess@hadess.net>
+Date: Mon, 23 Oct 2017 15:55:16 +0200
+In-Reply-To: <20171020230304.21173-2-hadess@hadess.net>
+References: <20171020230304.21173-1-hadess@hadess.net>
+         <20171020230304.21173-2-hadess@hadess.net>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add the Battery Level and Battery Power State UUIDs as per:
-https://www.bluetooth.com/specifications/gatt/viewer?attributeXmlFile=org.bluetooth.characteristic.battery_level.xml
-https://www.bluetooth.com/specifications/gatt/viewer?attributeXmlFile=org.bluetooth.characteristic.battery_power_state.xml
----
- lib/uuid.h | 2 ++
- 1 file changed, 2 insertions(+)
+On Sat, 2017-10-21 at 01:03 +0200, Bastien Nocera wrote:
+> Only the Battery Level characteristic was tested with a
+> Microsoft Arc Touch Mouse SE.
+> 
+> This patch however hopes to support both the Battery Level and
+> the Battery Power State characteristics.
 
-diff --git a/lib/uuid.h b/lib/uuid.h
-index 2c57a3378..614b3c4e4 100644
---- a/lib/uuid.h
-+++ b/lib/uuid.h
-@@ -119,6 +119,8 @@ extern "C" {
- #define GATT_CHARAC_RECONNECTION_ADDRESS		0x2A03
- #define GATT_CHARAC_PERIPHERAL_PREF_CONN		0x2A04
- #define GATT_CHARAC_SERVICE_CHANGED			0x2A05
-+#define GATT_CHARAC_BATTERY_LEVEL			0x2A19
-+#define GATT_CHARAC_BATTERY_POWER_STATE			0x2A1A
- #define GATT_CHARAC_SYSTEM_ID				0x2A23
- #define GATT_CHARAC_MODEL_NUMBER_STRING			0x2A24
- #define GATT_CHARAC_SERIAL_NUMBER_STRING		0x2A25
--- 
-2.14.2
+There might be a bug somewhere in this code which caused devices not to
+send updated "Connected" properties when disconnected, I'm debugging
+this now.
 
+Comments on the API would be appreciated though.
+
+Cheers
