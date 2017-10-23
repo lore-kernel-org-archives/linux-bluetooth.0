@@ -1,574 +1,340 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20171023154814.20607-3-hadess@hadess.net>
-References: <20171023154814.20607-1-hadess@hadess.net> <20171023154814.20607-3-hadess@hadess.net>
+In-Reply-To: <CALvjcs9i_J5H2jbVWToQbc4xNo9+N3jxrHh3FTo7LKjRN1E=Wg@mail.gmail.com>
+References: <20171023111723.20729-1-luiz.dentz@gmail.com> <20171023111723.20729-2-luiz.dentz@gmail.com>
+ <CALvjcs9i_J5H2jbVWToQbc4xNo9+N3jxrHh3FTo7LKjRN1E=Wg@mail.gmail.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 23 Oct 2017 23:39:15 +0300
-Message-ID: <CABBYNZLJabUx4LJK-bhMekYx1SNS79U1y0J+7KcSCN6g8X_wYQ@mail.gmail.com>
-Subject: Re: [PATCH v2 3/3] profiles/battery: Remove unused bas.[ch]
-To: Bastien Nocera <hadess@hadess.net>
+Date: Mon, 23 Oct 2017 23:29:22 +0300
+Message-ID: <CABBYNZKgHAUTipjRzxN=_sWH=ooRs3PHnhKaotc33epHQ7efhA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 2/3] gatt: Clear subscriptions for device not paired
+To: Yunhan Wang <yunhanw@nestlabs.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bastian,
+Hi Yunhan,
 
-On Mon, Oct 23, 2017 at 6:48 PM, Bastien Nocera <hadess@hadess.net> wrote:
-> The Battery Service characteristics are not children of the HoG
-> characteristics, so there's nothing to consume in the input profile.
-> Remove that code which duplicated most of the battery profile plugin.
+On Mon, Oct 23, 2017 at 11:26 PM, Yunhan Wang <yunhanw@nestlabs.com> wrote:
+> Hi Luiz
+>
+> WIth latest bluez master, I am seeing segmentation fault in bluetoothd
+> when ble disconnection happens. I think it related to this patch.
+>
+> The backtract is as below,
+> #0  0x0000000000000000 in ?? ()
+> #1  0x0000000000481b4d in queue_foreach (queue=0x6fe4e0,
+> function=function@entry=0x442d40 <clear_ccc_state>,
+> user_data=0x6ee630) at src/shared/queue.c:220
+> #2  0x00000000004436c9 in att_disconnected (err=<optimized out>,
+> user_data=0x6fe4b0) at src/gatt-database.c:310
+> #3  0x0000000000481b4d in queue_foreach (queue=0x705b70,
+> function=function@entry=0x485280 <disconn_handler>, user_data=0x68) at
+> src/shared/queue.c:220
+> #4  0x0000000000486632 in disconnect_cb (io=<optimized out>,
+> user_data=0x70b140) at src/shared/att.c:590
+> #5  0x000000000048fbc5 in watch_callback (channel=<optimized out>,
+> cond=<optimized out>, user_data=<optimized out>) at
+> src/shared/io-glib.c:170
+> #6  0x00007ffff7b1ace5 in g_main_context_dispatch () from
+> /lib/x86_64-linux-gnu/libglib-2.0.so.0
+> #7  0x00007ffff7b1b048 in ?? () from /lib/x86_64-linux-gnu/libglib-2.0.so.0
+> #8  0x00007ffff7b1b30a in g_main_loop_run () from
+> /lib/x86_64-linux-gnu/libglib-2.0.so.0
+> #9  0x000000000040b51b in main (argc=1, argv=0x7fffffffe618) at src/main.c:770
 
-Id rather not do this, we actually do intend the maintain a small
-helper library that can be unit tested, what bt_bas lacks is just
-proper support of bt_gatt_client nothing else. Also for the record
-this would probably break BfA HoG qualification which requires battery
-service to be supported as well, Android code does not have any other
-bas implementation.
+There is a patch for this issue:
 
-> ---
->  Makefile.am              |   1 -
->  Makefile.plugins         |   1 -
->  android/Android.mk       |   1 -
->  android/Makefile.am      |   1 -
->  profiles/battery/bas.c   | 340 -----------------------------------------------
->  profiles/battery/bas.h   |  32 -----
->  profiles/input/hog-lib.c |  25 +---
->  7 files changed, 1 insertion(+), 400 deletions(-)
->  delete mode 100644 profiles/battery/bas.c
->  delete mode 100644 profiles/battery/bas.h
+https://git.kernel.org/pub/scm/bluetooth/bluez.git/commit/?id=261cf78db4be79a0f7d44798a57730b159c9be91
+
+> thanks
+> best wishes
+> yunhan
 >
-> diff --git a/Makefile.am b/Makefile.am
-> index 8faabf44b..46358c7e9 100644
-> --- a/Makefile.am
-> +++ b/Makefile.am
-> @@ -404,7 +404,6 @@ unit_test_hog_SOURCES = unit/test-hog.c \
->                         $(btio_sources) \
->                         profiles/input/hog-lib.h profiles/input/hog-lib.c \
->                         profiles/scanparam/scpp.h profiles/scanparam/scpp.c \
-> -                       profiles/battery/bas.h profiles/battery/bas.c \
->                         profiles/deviceinfo/dis.h profiles/deviceinfo/dis.c \
->                         src/log.h src/log.c \
->                         attrib/att.h attrib/att.c \
-> diff --git a/Makefile.plugins b/Makefile.plugins
-> index 1f3b5b552..7416ad6bf 100644
-> --- a/Makefile.plugins
-> +++ b/Makefile.plugins
-> @@ -66,7 +66,6 @@ builtin_modules += hog
->  builtin_sources += profiles/input/hog.c profiles/input/uhid_copy.h \
->                         profiles/input/hog-lib.c profiles/input/hog-lib.h \
->                         profiles/deviceinfo/dis.c profiles/deviceinfo/dis.h \
-> -                       profiles/battery/bas.c profiles/battery/bas.h \
->                         profiles/scanparam/scpp.c profiles/scanparam/scpp.h \
->                         profiles/input/suspend.h profiles/input/suspend-none.c
->
-> diff --git a/android/Android.mk b/android/Android.mk
-> index 38ef4aa97..7b70d0129 100644
-> --- a/android/Android.mk
-> +++ b/android/Android.mk
-> @@ -41,7 +41,6 @@ LOCAL_SRC_FILES := \
->         bluez/android/bluetooth.c \
->         bluez/profiles/scanparam/scpp.c \
->         bluez/profiles/deviceinfo/dis.c \
-> -       bluez/profiles/battery/bas.c \
->         bluez/profiles/input/hog-lib.c \
->         bluez/android/hidhost.c \
->         bluez/android/socket.c \
-> diff --git a/android/Makefile.am b/android/Makefile.am
-> index 154f8db56..35d6e1e9d 100644
-> --- a/android/Makefile.am
-> +++ b/android/Makefile.am
-> @@ -32,7 +32,6 @@ android_bluetoothd_SOURCES = android/main.c \
->                                 profiles/scanparam/scpp.c \
->                                 profiles/deviceinfo/dis.h \
->                                 profiles/deviceinfo/dis.c \
-> -                               profiles/battery/bas.h profiles/battery/bas.c \
->                                 profiles/input/hog-lib.h \
->                                 profiles/input/hog-lib.c \
->                                 android/ipc-common.h \
-> diff --git a/profiles/battery/bas.c b/profiles/battery/bas.c
-> deleted file mode 100644
-> index de369fd3c..000000000
-> --- a/profiles/battery/bas.c
-> +++ /dev/null
-> @@ -1,340 +0,0 @@
-> -/*
-> - *
-> - *  BlueZ - Bluetooth protocol stack for Linux
-> - *
-> - *  Copyright (C) 2014  Intel Corporation. All rights reserved.
-> - *
-> - *
-> - *  This library is free software; you can rebastribute it and/or
-> - *  modify it under the terms of the GNU Lesser General Public
-> - *  License as published by the Free Software Foundation; either
-> - *  version 2.1 of the License, or (at your option) any later version.
-> - *
-> - *  This library is bastributed in the hope that it will be useful,
-> - *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-> - *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-> - *  Lesser General Public License for more details.
-> - *
-> - *  You should have received a copy of the GNU Lesser General Public
-> - *  License along with this library; if not, write to the Free Software
-> - *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-> - *
-> - */
-> -
-> -#ifdef HAVE_CONFIG_H
-> -#include <config.h>
-> -#endif
-> -
-> -#include <stdbool.h>
-> -#include <errno.h>
-> -
-> -#include <glib.h>
-> -
-> -#include "src/log.h"
-> -
-> -#include "lib/bluetooth.h"
-> -#include "lib/sdp.h"
-> -#include "lib/uuid.h"
-> -
-> -#include "src/shared/util.h"
-> -#include "src/shared/queue.h"
-> -
-> -#include "attrib/gattrib.h"
-> -#include "attrib/att.h"
-> -#include "attrib/gatt.h"
-> -
-> -#include "profiles/battery/bas.h"
-> -
-> -#define ATT_NOTIFICATION_HEADER_SIZE 3
-> -#define ATT_READ_RESPONSE_HEADER_SIZE 1
-> -
-> -struct bt_bas {
-> -       int ref_count;
-> -       GAttrib *attrib;
-> -       struct gatt_primary *primary;
-> -       uint16_t handle;
-> -       uint16_t ccc_handle;
-> -       guint id;
-> -       struct queue *gatt_op;
-> -};
-> -
-> -struct gatt_request {
-> -       unsigned int id;
-> -       struct bt_bas *bas;
-> -       void *user_data;
-> -};
-> -
-> -static void destroy_gatt_req(struct gatt_request *req)
-> -{
-> -       queue_remove(req->bas->gatt_op, req);
-> -       bt_bas_unref(req->bas);
-> -       free(req);
-> -}
-> -
-> -static void bas_free(struct bt_bas *bas)
-> -{
-> -       bt_bas_detach(bas);
-> -
-> -       g_free(bas->primary);
-> -       queue_destroy(bas->gatt_op, (void *) destroy_gatt_req);
-> -       free(bas);
-> -}
-> -
-> -struct bt_bas *bt_bas_new(void *primary)
-> -{
-> -       struct bt_bas *bas;
-> -
-> -       bas = new0(struct bt_bas, 1);
-> -       bas->gatt_op = queue_new();
-> -
-> -       if (primary)
-> -               bas->primary = g_memdup(primary, sizeof(*bas->primary));
-> -
-> -       return bt_bas_ref(bas);
-> -}
-> -
-> -struct bt_bas *bt_bas_ref(struct bt_bas *bas)
-> -{
-> -       if (!bas)
-> -               return NULL;
-> -
-> -       __sync_fetch_and_add(&bas->ref_count, 1);
-> -
-> -       return bas;
-> -}
-> -
-> -void bt_bas_unref(struct bt_bas *bas)
-> -{
-> -       if (!bas)
-> -               return;
-> -
-> -       if (__sync_sub_and_fetch(&bas->ref_count, 1))
-> -               return;
-> -
-> -       bas_free(bas);
-> -}
-> -
-> -static struct gatt_request *create_request(struct bt_bas *bas,
-> -                                                       void *user_data)
-> -{
-> -       struct gatt_request *req;
-> -
-> -       req = new0(struct gatt_request, 1);
-> -       req->user_data = user_data;
-> -       req->bas = bt_bas_ref(bas);
-> -
-> -       return req;
-> -}
-> -
-> -static void set_and_store_gatt_req(struct bt_bas *bas,
-> -                                               struct gatt_request *req,
-> -                                               unsigned int id)
-> -{
-> -       req->id = id;
-> -       queue_push_head(bas->gatt_op, req);
-> -}
-> -
-> -static void write_char(struct bt_bas *bas, GAttrib *attrib, uint16_t handle,
-> -                                       const uint8_t *value, size_t vlen,
-> -                                       GAttribResultFunc func,
-> -                                       gpointer user_data)
-> -{
-> -       struct gatt_request *req;
-> -       unsigned int id;
-> -
-> -       req = create_request(bas, user_data);
-> -
-> -       id = gatt_write_char(attrib, handle, value, vlen, func, req);
-> -
-> -       set_and_store_gatt_req(bas, req, id);
-> -}
-> -
-> -static void read_char(struct bt_bas *bas, GAttrib *attrib, uint16_t handle,
-> -                               GAttribResultFunc func, gpointer user_data)
-> -{
-> -       struct gatt_request *req;
-> -       unsigned int id;
-> -
-> -       req = create_request(bas, user_data);
-> -
-> -       id = gatt_read_char(attrib, handle, func, req);
-> -
-> -       set_and_store_gatt_req(bas, req, id);
-> -}
-> -
-> -static void discover_char(struct bt_bas *bas, GAttrib *attrib,
-> -                                               uint16_t start, uint16_t end,
-> -                                               bt_uuid_t *uuid, gatt_cb_t func,
-> -                                               gpointer user_data)
-> -{
-> -       struct gatt_request *req;
-> -       unsigned int id;
-> -
-> -       req = create_request(bas, user_data);
-> -
-> -       id = gatt_discover_char(attrib, start, end, uuid, func, req);
-> -
-> -       set_and_store_gatt_req(bas, req, id);
-> -}
-> -
-> -static void discover_desc(struct bt_bas *bas, GAttrib *attrib,
-> -                               uint16_t start, uint16_t end, bt_uuid_t *uuid,
-> -                               gatt_cb_t func, gpointer user_data)
-> -{
-> -       struct gatt_request *req;
-> -       unsigned int id;
-> -
-> -       req = create_request(bas, user_data);
-> -
-> -       id = gatt_discover_desc(attrib, start, end, uuid, func, req);
-> -       set_and_store_gatt_req(bas, req, id);
-> -}
-> -
-> -static void notification_cb(const guint8 *pdu, guint16 len, gpointer user_data)
-> -{
-> -       DBG("Battery Level at %u", pdu[ATT_NOTIFICATION_HEADER_SIZE]);
-> -}
-> -
-> -static void read_value_cb(guint8 status, const guint8 *pdu, guint16 len,
-> -                                       gpointer user_data)
-> -{
-> -       DBG("Battery Level at %u", pdu[ATT_READ_RESPONSE_HEADER_SIZE]);
-> -}
-> -
-> -static void ccc_written_cb(guint8 status, const guint8 *pdu,
-> -                                       guint16 plen, gpointer user_data)
-> -{
-> -       struct gatt_request *req = user_data;
-> -       struct bt_bas *bas = req->user_data;
-> -
-> -       destroy_gatt_req(req);
-> -
-> -       if (status != 0) {
-> -               error("Write Scan Refresh CCC failed: %s",
-> -                                               att_ecode2str(status));
-> -               return;
-> -       }
-> -
-> -       DBG("Battery Level: notification enabled");
-> -
-> -       bas->id = g_attrib_register(bas->attrib, ATT_OP_HANDLE_NOTIFY,
-> -                                       bas->handle, notification_cb, bas,
-> -                                       NULL);
-> -}
-> -
-> -static void write_ccc(struct bt_bas *bas, GAttrib *attrib, uint16_t handle,
-> -                                                       void *user_data)
-> -{
-> -       uint8_t value[2];
-> -
-> -       put_le16(GATT_CLIENT_CHARAC_CFG_NOTIF_BIT, value);
-> -
-> -       write_char(bas, attrib, handle, value, sizeof(value), ccc_written_cb,
-> -                                                               user_data);
-> -}
-> -
-> -static void ccc_read_cb(guint8 status, const guint8 *pdu, guint16 len,
-> -                                                       gpointer user_data)
-> -{
-> -       struct gatt_request *req = user_data;
-> -       struct bt_bas *bas = req->user_data;
-> -
-> -       destroy_gatt_req(req);
-> -
-> -       if (status != 0) {
-> -               error("Error reading CCC value: %s", att_ecode2str(status));
-> -               return;
-> -       }
-> -
-> -       write_ccc(bas, bas->attrib, bas->ccc_handle, bas);
-> -}
-> -
-> -static void discover_descriptor_cb(uint8_t status, GSList *descs,
-> -                                                               void *user_data)
-> -{
-> -       struct gatt_request *req = user_data;
-> -       struct bt_bas *bas = req->user_data;
-> -       struct gatt_desc *desc;
-> -
-> -       destroy_gatt_req(req);
-> -
-> -       if (status != 0) {
-> -               error("Discover descriptors failed: %s", att_ecode2str(status));
-> -               return;
-> -       }
-> -
-> -       /* There will be only one descriptor on list and it will be CCC */
-> -       desc = descs->data;
-> -       bas->ccc_handle = desc->handle;
-> -
-> -       read_char(bas, bas->attrib, desc->handle, ccc_read_cb, bas);
-> -}
-> -
-> -static void bas_discovered_cb(uint8_t status, GSList *chars, void *user_data)
-> -{
-> -       struct gatt_request *req = user_data;
-> -       struct bt_bas *bas = req->user_data;
-> -       struct gatt_char *chr;
-> -       uint16_t start, end;
-> -       bt_uuid_t uuid;
-> -
-> -       destroy_gatt_req(req);
-> -
-> -       if (status) {
-> -               error("Battery: %s", att_ecode2str(status));
-> -               return;
-> -       }
-> -
-> -       chr = chars->data;
-> -       bas->handle = chr->value_handle;
-> -
-> -       DBG("Battery handle: 0x%04x", bas->handle);
-> -
-> -       read_char(bas, bas->attrib, bas->handle, read_value_cb, bas);
-> -
-> -       start = chr->value_handle + 1;
-> -       end = bas->primary->range.end;
-> -
-> -       bt_uuid16_create(&uuid, GATT_CLIENT_CHARAC_CFG_UUID);
-> -
-> -       discover_desc(bas, bas->attrib, start, end, &uuid,
-> -                                               discover_descriptor_cb, bas);
-> -}
-> -
-> -bool bt_bas_attach(struct bt_bas *bas, void *attrib)
-> -{
-> -       if (!bas || bas->attrib || !bas->primary)
-> -               return false;
-> -
-> -       bas->attrib = g_attrib_ref(attrib);
-> -
-> -       if (bas->handle > 0)
-> -               return true;
-> -
-> -       discover_char(bas, bas->attrib, bas->primary->range.start,
-> -                                       bas->primary->range.end, NULL,
-> -                                       bas_discovered_cb, bas);
-> -
-> -       return true;
-> -}
-> -
-> -static void cancel_gatt_req(struct gatt_request *req)
-> -{
-> -       if (g_attrib_cancel(req->bas->attrib, req->id))
-> -               destroy_gatt_req(req);
-> -}
-> -
-> -void bt_bas_detach(struct bt_bas *bas)
-> -{
-> -       if (!bas || !bas->attrib)
-> -               return;
-> -
-> -       if (bas->id > 0) {
-> -               g_attrib_unregister(bas->attrib, bas->id);
-> -               bas->id = 0;
-> -       }
-> -
-> -       queue_foreach(bas->gatt_op, (void *) cancel_gatt_req, NULL);
-> -       g_attrib_unref(bas->attrib);
-> -       bas->attrib = NULL;
-> -}
-> diff --git a/profiles/battery/bas.h b/profiles/battery/bas.h
-> deleted file mode 100644
-> index 3e175b5b5..000000000
-> --- a/profiles/battery/bas.h
-> +++ /dev/null
-> @@ -1,32 +0,0 @@
-> -/*
-> - *
-> - *  BlueZ - Bluetooth protocol stack for Linux
-> - *
-> - *  Copyright (C) 2014  Intel Corporation. All rights reserved.
-> - *
-> - *
-> - *  This library is free software; you can rebastribute it and/or
-> - *  modify it under the terms of the GNU Lesser General Public
-> - *  License as published by the Free Software Foundation; either
-> - *  version 2.1 of the License, or (at your option) any later version.
-> - *
-> - *  This library is bastributed in the hope that it will be useful,
-> - *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-> - *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-> - *  Lesser General Public License for more details.
-> - *
-> - *  You should have received a copy of the GNU Lesser General Public
-> - *  License along with this library; if not, write to the Free Software
-> - *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-> - *
-> - */
-> -
-> -struct bt_bas;
-> -
-> -struct bt_bas *bt_bas_new(void *primary);
-> -
-> -struct bt_bas *bt_bas_ref(struct bt_bas *bas);
-> -void bt_bas_unref(struct bt_bas *bas);
-> -
-> -bool bt_bas_attach(struct bt_bas *bas, void *gatt);
-> -void bt_bas_detach(struct bt_bas *bas);
-> diff --git a/profiles/input/hog-lib.c b/profiles/input/hog-lib.c
-> index dab385fe7..7b0097cb6 100644
-> --- a/profiles/input/hog-lib.c
-> +++ b/profiles/input/hog-lib.c
-> @@ -57,7 +57,6 @@
->
->  #include "profiles/scanparam/scpp.h"
->  #include "profiles/deviceinfo/dis.h"
-> -#include "profiles/battery/bas.h"
->  #include "profiles/input/hog-lib.h"
->
->  #define HOG_UUID               "00001812-0000-1000-8000-00805f9b34fb"
-> @@ -105,7 +104,6 @@ struct bt_hog {
->         uint16_t                setrep_id;
->         struct bt_scpp          *scpp;
->         struct bt_dis           *dis;
-> -       struct queue            *bas;
->         GSList                  *instances;
->         struct queue            *gatt_op;
->  };
-> @@ -1174,7 +1172,6 @@ static void hog_free(void *data)
->
->         bt_hog_detach(hog);
->
-> -       queue_destroy(hog->bas, (void *) bt_bas_unref);
->         g_slist_free_full(hog->instances, hog_free);
->
->         bt_scpp_unref(hog->scpp);
-> @@ -1323,7 +1320,6 @@ static struct bt_hog *hog_new(int fd, const char *name, uint16_t vendor,
->                 return NULL;
->
->         hog->gatt_op = queue_new();
-> -       hog->bas = queue_new();
->
->         if (fd < 0)
->                 hog->uhid = bt_uhid_new_default();
-> @@ -1332,7 +1328,7 @@ static struct bt_hog *hog_new(int fd, const char *name, uint16_t vendor,
->
->         hog->uhid_fd = fd;
->
-> -       if (!hog->gatt_op || !hog->bas || !hog->uhid) {
-> +       if (!hog->gatt_op || !hog->uhid) {
->                 hog_free(hog);
->                 return NULL;
->         }
-> @@ -1483,16 +1479,6 @@ static void hog_attach_dis(struct bt_hog *hog, struct gatt_primary *primary)
->         }
->  }
->
-> -static void hog_attach_bas(struct bt_hog *hog, struct gatt_primary *primary)
-> -{
-> -       struct bt_bas *instance;
-> -
-> -       instance = bt_bas_new(primary);
-> -
-> -       bt_bas_attach(instance, hog->attrib);
-> -       queue_push_head(hog->bas, instance);
-> -}
-> -
->  static void hog_attach_hog(struct bt_hog *hog, struct gatt_primary *primary)
->  {
->         struct bt_hog *instance;
-> @@ -1555,11 +1541,6 @@ static void primary_cb(uint8_t status, GSList *services, void *user_data)
->                         continue;
->                 }
->
-> -               if (strcmp(primary->uuid, BATTERY_UUID) == 0) {
-> -                       hog_attach_bas(hog, primary);
-> -                       continue;
-> -               }
-> -
->                 if (strcmp(primary->uuid, HOG_UUID) == 0)
->                         hog_attach_hog(hog, primary);
->         }
-> @@ -1585,8 +1566,6 @@ bool bt_hog_attach(struct bt_hog *hog, void *gatt)
->         if (hog->dis)
->                 bt_dis_attach(hog->dis, gatt);
->
-> -       queue_foreach(hog->bas, (void *) bt_bas_attach, gatt);
-> -
->         for (l = hog->instances; l; l = l->next) {
->                 struct bt_hog *instance = l->data;
->
-> @@ -1625,8 +1604,6 @@ void bt_hog_detach(struct bt_hog *hog)
->         if (!hog->attrib)
->                 return;
->
-> -       queue_foreach(hog->bas, (void *) bt_bas_detach, NULL);
-> -
->         for (l = hog->instances; l; l = l->next) {
->                 struct bt_hog *instance = l->data;
->
-> --
-> 2.14.2
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> On Mon, Oct 23, 2017 at 4:17 AM, Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+>> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>>
+>> If the device is no longer valid or is not considered bonded anymore
+>> clear its CCC states before removing otherwise application may continue
+>> to notify when there are no devices listening.
+>> ---
+>>  src/gatt-database.c | 155 ++++++++++++++++++++++++++++++++++------------------
+>>  1 file changed, 103 insertions(+), 52 deletions(-)
+>>
+>> diff --git a/src/gatt-database.c b/src/gatt-database.c
+>> index 47304704a..6784998c3 100644
+>> --- a/src/gatt-database.c
+>> +++ b/src/gatt-database.c
+>> @@ -150,8 +150,10 @@ struct pending_op {
+>>  };
+>>
+>>  struct device_state {
+>> +       struct btd_gatt_database *db;
+>>         bdaddr_t bdaddr;
+>>         uint8_t bdaddr_type;
+>> +       unsigned int disc_id;
+>>         struct queue *ccc_states;
+>>  };
+>>
+>> @@ -245,12 +247,14 @@ static struct ccc_state *find_ccc_state(struct device_state *dev_state,
+>>                                                         UINT_TO_PTR(handle));
+>>  }
+>>
+>> -static struct device_state *device_state_create(bdaddr_t *bdaddr,
+>> +static struct device_state *device_state_create(struct btd_gatt_database *db,
+>> +                                                       bdaddr_t *bdaddr,
+>>                                                         uint8_t bdaddr_type)
+>>  {
+>>         struct device_state *dev_state;
+>>
+>>         dev_state = new0(struct device_state, 1);
+>> +       dev_state->db = db;
+>>         dev_state->ccc_states = queue_new();
+>>         bacpy(&dev_state->bdaddr, bdaddr);
+>>         dev_state->bdaddr_type = bdaddr_type;
+>> @@ -258,36 +262,117 @@ static struct device_state *device_state_create(bdaddr_t *bdaddr,
+>>         return dev_state;
+>>  }
+>>
+>> +static void device_state_free(void *data)
+>> +{
+>> +       struct device_state *state = data;
+>> +
+>> +       queue_destroy(state->ccc_states, free);
+>> +       free(state);
+>> +}
+>> +
+>> +static void clear_ccc_state(void *data, void *user_data)
+>> +{
+>> +       struct ccc_state *ccc = data;
+>> +       struct btd_gatt_database *db = user_data;
+>> +       struct ccc_cb_data *ccc_cb;
+>> +
+>> +       if (!ccc->value[0])
+>> +               return;
+>> +
+>> +       ccc_cb = queue_find(db->ccc_callbacks, ccc_cb_match_handle,
+>> +                                               UINT_TO_PTR(ccc->handle));
+>> +       if (!ccc_cb)
+>> +               return;
+>> +
+>> +       ccc_cb->callback(NULL, 0, ccc_cb->user_data);
+>> +}
+>> +
+>> +static void att_disconnected(int err, void *user_data)
+>> +{
+>> +       struct device_state *state = user_data;
+>> +       struct btd_device *device;
+>> +
+>> +       DBG("");
+>> +
+>> +       state->disc_id = 0;
+>> +
+>> +       device = btd_adapter_get_device(state->db->adapter, &state->bdaddr,
+>> +                                       state->bdaddr_type);
+>> +       if (!device)
+>> +               goto remove;
+>> +
+>> +       if (device_is_paired(device, state->bdaddr_type))
+>> +               return;
+>> +
+>> +remove:
+>> +       /* Remove device state if device no longer exists or is not paired */
+>> +       if (queue_remove(state->db->device_states, state)) {
+>> +               queue_foreach(state->ccc_states, clear_ccc_state, state->db);
+>> +               device_state_free(state);
+>> +       }
+>> +}
+>> +
+>> +static bool get_dst_info(struct bt_att *att, bdaddr_t *dst, uint8_t *dst_type)
+>> +{
+>> +       GIOChannel *io = NULL;
+>> +       GError *gerr = NULL;
+>> +
+>> +       io = g_io_channel_unix_new(bt_att_get_fd(att));
+>> +       if (!io)
+>> +               return false;
+>> +
+>> +       bt_io_get(io, &gerr, BT_IO_OPT_DEST_BDADDR, dst,
+>> +                                               BT_IO_OPT_DEST_TYPE, dst_type,
+>> +                                               BT_IO_OPT_INVALID);
+>> +       if (gerr) {
+>> +               error("gatt: bt_io_get: %s", gerr->message);
+>> +               g_error_free(gerr);
+>> +               g_io_channel_unref(io);
+>> +               return false;
+>> +       }
+>> +
+>> +       g_io_channel_unref(io);
+>> +       return true;
+>> +}
+>> +
+>>  static struct device_state *get_device_state(struct btd_gatt_database *database,
+>> -                                                       bdaddr_t *bdaddr,
+>> -                                                       uint8_t bdaddr_type)
+>> +                                               struct bt_att *att)
+>>  {
+>>         struct device_state *dev_state;
+>> +       bdaddr_t bdaddr;
+>> +       uint8_t bdaddr_type;
+>> +
+>> +       if (!get_dst_info(att, &bdaddr, &bdaddr_type))
+>> +               return NULL;
+>>
+>>         /*
+>>          * Find and return a device state. If a matching state doesn't exist,
+>>          * then create a new one.
+>>          */
+>> -       dev_state = find_device_state(database, bdaddr, bdaddr_type);
+>> +       dev_state = find_device_state(database, &bdaddr, bdaddr_type);
+>>         if (dev_state)
+>> -               return dev_state;
+>> +               goto done;
+>>
+>> -       dev_state = device_state_create(bdaddr, bdaddr_type);
+>> +       dev_state = device_state_create(database, &bdaddr, bdaddr_type);
+>>
+>>         queue_push_tail(database->device_states, dev_state);
+>>
+>> +done:
+>> +       dev_state->disc_id = bt_att_register_disconnect(att, att_disconnected,
+>> +                                                       dev_state, NULL);
+>> +
+>>         return dev_state;
+>>  }
+>>
+>>  static struct ccc_state *get_ccc_state(struct btd_gatt_database *database,
+>> -                                                       bdaddr_t *bdaddr,
+>> -                                                       uint8_t bdaddr_type,
+>> -                                                       uint16_t handle)
+>> +                                       struct bt_att *att, uint16_t handle)
+>>  {
+>>         struct device_state *dev_state;
+>>         struct ccc_state *ccc;
+>>
+>> -       dev_state = get_device_state(database, bdaddr, bdaddr_type);
+>> +       dev_state = get_device_state(database, att);
+>> +       if (!dev_state)
+>> +               return NULL;
+>>
+>>         ccc = find_ccc_state(dev_state, handle);
+>>         if (ccc)
+>> @@ -300,14 +385,6 @@ static struct ccc_state *get_ccc_state(struct btd_gatt_database *database,
+>>         return ccc;
+>>  }
+>>
+>> -static void device_state_free(void *data)
+>> -{
+>> -       struct device_state *state = data;
+>> -
+>> -       queue_destroy(state->ccc_states, free);
+>> -       free(state);
+>> -}
+>> -
+>>  static void cancel_pending_read(void *data)
+>>  {
+>>         struct pending_op *op = data;
+>> @@ -690,29 +767,6 @@ static void populate_gap_service(struct btd_gatt_database *database)
+>>         gatt_db_service_set_active(service, true);
+>>  }
+>>
+>> -static bool get_dst_info(struct bt_att *att, bdaddr_t *dst, uint8_t *dst_type)
+>> -{
+>> -       GIOChannel *io = NULL;
+>> -       GError *gerr = NULL;
+>> -
+>> -       io = g_io_channel_unix_new(bt_att_get_fd(att));
+>> -       if (!io)
+>> -               return false;
+>> -
+>> -       bt_io_get(io, &gerr, BT_IO_OPT_DEST_BDADDR, dst,
+>> -                                               BT_IO_OPT_DEST_TYPE, dst_type,
+>> -                                               BT_IO_OPT_INVALID);
+>> -       if (gerr) {
+>> -               error("gatt: bt_io_get: %s", gerr->message);
+>> -               g_error_free(gerr);
+>> -               g_io_channel_unref(io);
+>> -               return false;
+>> -       }
+>> -
+>> -       g_io_channel_unref(io);
+>> -       return true;
+>> -}
+>> -
+>>  static void gatt_ccc_read_cb(struct gatt_db_attribute *attrib,
+>>                                         unsigned int id, uint16_t offset,
+>>                                         uint8_t opcode, struct bt_att *att,
+>> @@ -724,8 +778,6 @@ static void gatt_ccc_read_cb(struct gatt_db_attribute *attrib,
+>>         uint8_t ecode = 0;
+>>         const uint8_t *value = NULL;
+>>         size_t len = 0;
+>> -       bdaddr_t bdaddr;
+>> -       uint8_t bdaddr_type;
+>>
+>>         handle = gatt_db_attribute_get_handle(attrib);
+>>
+>> @@ -736,13 +788,12 @@ static void gatt_ccc_read_cb(struct gatt_db_attribute *attrib,
+>>                 goto done;
+>>         }
+>>
+>> -       if (!get_dst_info(att, &bdaddr, &bdaddr_type)) {
+>> +       ccc = get_ccc_state(database, att, handle);
+>> +       if (!ccc) {
+>>                 ecode = BT_ATT_ERROR_UNLIKELY;
+>>                 goto done;
+>>         }
+>>
+>> -       ccc = get_ccc_state(database, &bdaddr, bdaddr_type, handle);
+>> -
+>>         len = 2 - offset;
+>>         value = len ? &ccc->value[offset] : NULL;
+>>
+>> @@ -761,8 +812,6 @@ static void gatt_ccc_write_cb(struct gatt_db_attribute *attrib,
+>>         struct ccc_cb_data *ccc_cb;
+>>         uint16_t handle;
+>>         uint8_t ecode = 0;
+>> -       bdaddr_t bdaddr;
+>> -       uint8_t bdaddr_type;
+>>
+>>         handle = gatt_db_attribute_get_handle(attrib);
+>>
+>> @@ -778,13 +827,12 @@ static void gatt_ccc_write_cb(struct gatt_db_attribute *attrib,
+>>                 goto done;
+>>         }
+>>
+>> -       if (!get_dst_info(att, &bdaddr, &bdaddr_type)) {
+>> +       ccc = get_ccc_state(database, att, handle);
+>> +       if (!ccc) {
+>>                 ecode = BT_ATT_ERROR_UNLIKELY;
+>>                 goto done;
+>>         }
+>>
+>> -       ccc = get_ccc_state(database, &bdaddr, bdaddr_type, handle);
+>> -
+>>         ccc_cb = queue_find(database->ccc_callbacks, ccc_cb_match_handle,
+>>                         UINT_TO_PTR(gatt_db_attribute_get_handle(attrib)));
+>>         if (!ccc_cb) {
+>> @@ -940,8 +988,11 @@ static void send_notification_to_device(void *data, void *user_data)
+>>
+>>  remove:
+>>         /* Remove device state if device no longer exists or is not paired */
+>> -       if (queue_remove(notify->database->device_states, device_state))
+>> +       if (queue_remove(notify->database->device_states, device_state)) {
+>> +               queue_foreach(device_state->ccc_states, clear_ccc_state,
+>> +                                               notify->database);
+>>                 device_state_free(device_state);
+>> +       }
+>>  }
+>>
+>>  static void send_notification_to_devices(struct btd_gatt_database *database,
+>> --
+>> 2.13.6
+>>
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
 
 
