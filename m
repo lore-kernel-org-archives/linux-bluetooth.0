@@ -1,86 +1,68 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 11.0 \(3445.1.7\))
+Subject: Re: Macbook Pro 2015, Bluetooth USB Host Controller bugfix (Looking
+ for advice)
 From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: btusb: Fix isochronous interface assignments
-Date: Tue, 24 Oct 2017 19:42:45 +0200
-Message-Id: <20171024174245.34605-1-marcel@holtmann.org>
+In-Reply-To: <CABYdM+0mQj_kLC0NHAjb=RFrX4Hnhz-qKL1s92gu0MSN6V4v7A@mail.gmail.com>
+Date: Tue, 24 Oct 2017 16:06:08 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <3AC23F0A-5562-4759-A957-DCF0B97E886B@holtmann.org>
+References: <CABYdM+0mQj_kLC0NHAjb=RFrX4Hnhz-qKL1s92gu0MSN6V4v7A@mail.gmail.com>
+To: VOID 001 <zhangjianqiu13@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The recent MacBook's with multi-function USB interfaces for HID and
-Bluetooth operation have the isochronous interface on number 3 instead
-of number 1. Store the interface number and use it.
+Hi,
 
-P:  Vendor=05ac ProdID=8290 Rev= 1.40
-S:  Manufacturer=Broadcom Corp.
-S:  Product=Bluetooth USB Host Controller
-C:* #Ifs= 6 Cfg#= 1 Atr=e0 MxPwr=  0mA
-A:  FirstIf#= 2 IfCount= 4 Cls=ff(vend.) Sub=01 Prot=01
-I:* If#= 0 Alt= 0 #EPs= 1 Cls=03(HID  ) Sub=01 Prot=01 Driver=usbhid
-E:  Ad=85(I) Atr=03(Int.) MxPS=   8 Ivl=10ms
-I:* If#= 1 Alt= 0 #EPs= 1 Cls=03(HID  ) Sub=01 Prot=02 Driver=usbhid
-E:  Ad=86(I) Atr=03(Int.) MxPS=   8 Ivl=10ms
-I:* If#= 2 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
-E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-I:* If#= 3 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-I:  If#= 3 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-I:  If#= 3 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-I:  If#= 3 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-I:  If#= 3 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-I:  If#= 3 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-I:* If#= 4 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=btusb
-E:  Ad=84(I) Atr=02(Bulk) MxPS=  32 Ivl=0ms
-E:  Ad=04(O) Atr=02(Bulk) MxPS=  32 Ivl=0ms
-I:* If#= 5 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
+> I submitted a bug on Bugzilla before, about Macbook pro  2015 Bluetooth issue
+> 
+> Device
+> ID 05ac:8290 Apple, Inc. Bluetooth Host Controller
+> 
+> 
+> https://bugzilla.kernel.org/show_bug.cgi?id=197295
+> 
+> I tried to fix it myself first. And it seems that my fix works. Now no
+> error message reported, and my Bluetooth speaker can produce sound
+> 
+> I am new to both kernel develop and Bluetooth / USB driver develop, so
+> I spend some time investigating and finally I end up with a patch like
+> this (necessary debugging code truncated)
+> 
+> 
+> 
+> @@ -1360,11 +1367,14 @@ static inline int __set_isoc_interface(struct
+> hci_dev *hdev, int altsetting)
+>       struct usb_interface *intf = data->isoc;
+>       struct usb_endpoint_descriptor *ep_desc;
+>       int i, err;
+> +    /* Here isoc_tx_ep is not initialized */
+> +    BT_INFO("[VOID]-__set_isoc_interface(3) called, altsetting = %d
+> isoc_tx_ep = %p", altsetting, data->isoc_tx_ep);
+> 
+>       if (!data->isoc)
+>               return -ENODEV;
+> 
+> -       err = usb_set_interface(data->udev, 1, altsetting);
+> +    /* Here is what I changed */
+> +       err = usb_set_interface(data->udev, 3, altsetting);
+> 
+> Then it works now. But obviously, it's a workaround not a bugfix. And
+> I do not have other test cases (I only have one Bluetooth speaker)
+> Could you please give me some advice on the following questions?
+> 
+> 1. Is this bug a Macbook Bluetooth USB Driver (btusb) bug? Or it's a
+> Bluetooth device bug (Xiaomi Bluetooth speaker) I think it's a btusb
+> bug, am I right?
+> 2. Does this fix make sense?
+> 3. Where can I get the specification of the certain device(i.e: ID =
+> 05ac:8290) To see it's interface and altsetting definition
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
----
- drivers/bluetooth/btusb.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+can you include the corresponding part for your device from /sys/kernel/debug/usb/devices. If you run this on a MacBook, then there should be some MacBook adapter specific printouts in dmesg. Can you include these as well.
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index c054d7bce490..c85022efce92 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -396,6 +396,7 @@ struct btusb_data {
- 	struct usb_interface *intf;
- 	struct usb_interface *isoc;
- 	struct usb_interface *diag;
-+	unsigned isoc_ifnum;
- 
- 	unsigned long flags;
- 
-@@ -1359,7 +1360,7 @@ static inline int __set_isoc_interface(struct hci_dev *hdev, int altsetting)
- 	if (!data->isoc)
- 		return -ENODEV;
- 
--	err = usb_set_interface(data->udev, 1, altsetting);
-+	err = usb_set_interface(data->udev, data->isoc_ifnum, altsetting);
- 	if (err < 0) {
- 		BT_ERR("%s setting interface failed (%d)", hdev->name, -err);
- 		return err;
-@@ -3106,6 +3107,7 @@ static int btusb_probe(struct usb_interface *intf,
- 	} else {
- 		/* Interface orders are hardcoded in the specification */
- 		data->isoc = usb_ifnum_to_if(data->udev, ifnum_base + 1);
-+		data->isoc_ifnum = ifnum_base + 1;
- 	}
- 
- 	if (!reset)
--- 
-2.13.6
+Regards
+
+Marcel
 
