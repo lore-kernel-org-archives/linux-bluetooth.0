@@ -1,47 +1,107 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 11.0 \(3445.1.7\))
-Subject: Re: [PATCH] Bluetooth: Fix potential memory leak
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20171024085831.GA3889@x1c>
-Date: Tue, 24 Oct 2017 14:43:25 +0200
-Cc: Jaganath Kanakkassery <jaganath.k.os@gmail.com>,
-        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-        Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
-Message-Id: <7127E793-A2AE-413D-AA65-239B23229380@holtmann.org>
-References: <1508830195-13824-1-git-send-email-jaganathx.kanakkassery@intel.com>
- <F0B9BF0A-BC07-4074-923E-518E6A227DF0@holtmann.org>
- <20171024085831.GA3889@x1c>
-To: Johan Hedberg <johan.hedberg@gmail.com>
+Message-ID: <1508848208.28409.22.camel@hadess.net>
+Subject: Re: [PATCH 2/3] profiles/battery: Add Bluetooth LE Battery service
+From: Bastien Nocera <hadess@hadess.net>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Tue, 24 Oct 2017 14:30:08 +0200
+In-Reply-To: <CABBYNZLRHvKuLqL5T8yY7CCUq5-gzc-Y3LzKr6XQWbbvJT1Gdg@mail.gmail.com>
+References: <20171020230304.21173-1-hadess@hadess.net>
+         <20171020230304.21173-2-hadess@hadess.net>
+         <CABBYNZLRHvKuLqL5T8yY7CCUq5-gzc-Y3LzKr6XQWbbvJT1Gdg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
-
->>> index 1fba2a0..58045ee 100644
->>> --- a/net/bluetooth/mgmt.c
->>> +++ b/net/bluetooth/mgmt.c
->>> @@ -6383,6 +6383,7 @@ static int remove_advertising(struct sock *sk, struct hci_dev *hdev,
->>> 	if (skb_queue_empty(&req.cmd_q) ||
->>> 	    !hdev_is_powered(hdev) ||
->>> 	    hci_dev_test_flag(hdev, HCI_ADVERTISING)) {
->>> +		skb_queue_purge(&req.cmd_q);
->>> 		rp.instance = cp->instance;
->>> 		err = mgmt_cmd_complete(sk, hdev->id,
->>> 					MGMT_OP_REMOVE_ADVERTISING,
->> 
->> this does not look right to me. It most likely has side affects. The
->> fix must be differently if there is a memory leak.
+On Tue, 2017-10-24 at 14:58 +0300, Luiz Augusto von Dentz wrote:
+> Hi Bastien,
 > 
-> Actually, it looks like the right fix to me. We don't have a separate
-> helper to clean up a hci_request that never got used, and
-> skb_queue_purge is what other places in the code seem to be doing in
-> this kind of cases.
+> On Sat, Oct 21, 2017 at 2:03 AM, Bastien Nocera <hadess@hadess.net>
+> wrote:
+> > Only the Battery Level characteristic was tested with a
+> > Microsoft Arc Touch Mouse SE.
+> > 
+> > This patch however hopes to support both the Battery Level and
+> > the Battery Power State characteristics.
+> > ---
+> >  Makefile.plugins           |   3 +
+> >  doc/battery-api.txt        |  36 +++
+> >  profiles/battery/battery.c | 568
+> > +++++++++++++++++++++++++++++++++++++++++++++
+> >  3 files changed, 607 insertions(+)
+> >  create mode 100644 doc/battery-api.txt
+> >  create mode 100644 profiles/battery/battery.c
+> > 
+> > diff --git a/Makefile.plugins b/Makefile.plugins
+> > index 73377e532..1f3b5b552 100644
+> > --- a/Makefile.plugins
+> > +++ b/Makefile.plugins
+> > @@ -100,6 +100,9 @@ builtin_sources += profiles/midi/midi.c \
+> >  builtin_ldadd += @ALSA_LIBS@
+> >  endif
+> > 
+> > +builtin_modules += battery
+> > +builtin_sources += profiles/battery/battery.c
+> > +
+> >  if SIXAXIS
+> >  plugin_LTLIBRARIES += plugins/sixaxis.la
+> >  plugins_sixaxis_la_SOURCES = plugins/sixaxis.c
+> > diff --git a/doc/battery-api.txt b/doc/battery-api.txt
+> > new file mode 100644
+> > index 000000000..6d28f7b17
+> > --- /dev/null
+> > +++ b/doc/battery-api.txt
+> > @@ -0,0 +1,36 @@
+> > +BlueZ D-Bus Battery API description
+> > +***********************************
+> > +
+> > +
+> > +Battery hierarchy
+> > +=================
+> > +
+> > +Service                org.bluez
+> > +Interface      org.bluez.Battery1
+> > +Object path    [variable
+> > prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX
+> > +
+> > +Properties     boolean Present [readonly]
+> > +
+> > +                       Whether the device has a battery present.
+> 
+> Not sure why would we have this as a property, if the battery is not
+> present then we should not even publish the interface.
 
-then we need a helper to do this. This is pretty bad style if we hook into the queue directly with a skb_queue_purge. Since that cmd_q should be a hidden detail.
+UPower has a "present" property as well, so this matches both the
+service and the UPower properties. It avoids logic bugs where the
+battery presence changes but we'd forget to export/unexport the
+interface (or races). Finally, it's useful information for devices
+which have another means of power (I can imagine some devices having
+batteries, but also working wired, with a removable battery).
 
-Regards
+> > +               boolean Rechargeable [readonly]
+> > +
+> > +                       Whether the battery built into the device
+> > is rechargeable
+> > +                       or not.
 
-Marcel
+We wouldn't be able to export this property either if the battery
+wasn't present above, and we did hide the interface.
+<snip>
+> > +       /* Values explained at:
+> > +        * https://www.bluetooth.com/specifications/gatt/viewer?att
+> > ributeXmlFile=org.bluetooth.characteristic.battery_power_state.xml
+> > */
+> 
+> I guess it is better to quote the actual text instead of the link
+> here.
 
+Sure. I'll send an updated patch with that.
+
+<snip>
+> > --
+> > 2.14.2
+> 
+> Otherwise looks good.
+
+Great!
