@@ -1,40 +1,376 @@
-Return-Path: <johan.hedberg@gmail.com>
-Date: Tue, 24 Oct 2017 10:58:31 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Jaganath Kanakkassery <jaganath.k.os@gmail.com>,
-	"open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-	Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
-Subject: Re: [PATCH] Bluetooth: Fix potential memory leak
-Message-ID: <20171024085831.GA3889@x1c>
-References: <1508830195-13824-1-git-send-email-jaganathx.kanakkassery@intel.com>
- <F0B9BF0A-BC07-4074-923E-518E6A227DF0@holtmann.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <F0B9BF0A-BC07-4074-923E-518E6A227DF0@holtmann.org>
+In-Reply-To: <CALvjcs-SbR8JXDEvKRxD1Eq08PyN9D5zEDjc9P8puDMJDwJr=w@mail.gmail.com>
+References: <20171023111723.20729-1-luiz.dentz@gmail.com> <20171023111723.20729-2-luiz.dentz@gmail.com>
+ <CALvjcs9i_J5H2jbVWToQbc4xNo9+N3jxrHh3FTo7LKjRN1E=Wg@mail.gmail.com>
+ <CABBYNZKgHAUTipjRzxN=_sWH=ooRs3PHnhKaotc33epHQ7efhA@mail.gmail.com> <CALvjcs-SbR8JXDEvKRxD1Eq08PyN9D5zEDjc9P8puDMJDwJr=w@mail.gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Tue, 24 Oct 2017 11:10:57 +0300
+Message-ID: <CABBYNZJuyZOEzLV0fkU8xTpPWuzc76CeYBLUR9DNq2c4pVPN5w@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 2/3] gatt: Clear subscriptions for device not paired
+To: Yunhan Wang <yunhanw@nestlabs.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Yunhan,
 
-On Tue, Oct 24, 2017, Marcel Holtmann wrote:
-> > index 1fba2a0..58045ee 100644
-> > --- a/net/bluetooth/mgmt.c
-> > +++ b/net/bluetooth/mgmt.c
-> > @@ -6383,6 +6383,7 @@ static int remove_advertising(struct sock *sk, struct hci_dev *hdev,
-> > 	if (skb_queue_empty(&req.cmd_q) ||
-> > 	    !hdev_is_powered(hdev) ||
-> > 	    hci_dev_test_flag(hdev, HCI_ADVERTISING)) {
-> > +		skb_queue_purge(&req.cmd_q);
-> > 		rp.instance = cp->instance;
-> > 		err = mgmt_cmd_complete(sk, hdev->id,
-> > 					MGMT_OP_REMOVE_ADVERTISING,
-> 
-> this does not look right to me. It most likely has side affects. The
-> fix must be differently if there is a memory leak.
+On Mon, Oct 23, 2017 at 11:59 PM, Yunhan Wang <yunhanw@nestlabs.com> wrote:
+> Hi, Luiz
+>
+> I have tried this, I think the issue is still there with your patch.
 
-Actually, it looks like the right fix to me. We don't have a separate
-helper to clean up a hci_request that never got used, and
-skb_queue_purge is what other places in the code seem to be doing in
-this kind of cases.
+I don't see any problem:
 
-Johan
+bluetoothd[13968]: src/device.c:att_disconnected_cb() Software caused
+connection abort (103)
+bluetoothd[13968]: src/gatt-client.c:btd_gatt_client_disconnected()
+Device disconnected. Cleaning up.
+bluetoothd[13968]: src/device.c:att_disconnected_cb() Automatic
+connection disabled
+bluetoothd[13968]: attrib/gattrib.c:g_attrib_unref() 0x8897600: g_attrib_unref=0
+bluetoothd[13968]: src/gatt-database.c:att_disconnected()
+bluetoothd[13968]: src/gatt-database.c:ccc_write_cb() External CCC
+write received with value: 0x0000
+
+Could you try running under valgrind?
+
+> thanks
+> best wishes
+> yunhan
+>
+> On Mon, Oct 23, 2017 at 1:29 PM, Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+>> Hi Yunhan,
+>>
+>> On Mon, Oct 23, 2017 at 11:26 PM, Yunhan Wang <yunhanw@nestlabs.com> wrote:
+>>> Hi Luiz
+>>>
+>>> WIth latest bluez master, I am seeing segmentation fault in bluetoothd
+>>> when ble disconnection happens. I think it related to this patch.
+>>>
+>>> The backtract is as below,
+>>> #0  0x0000000000000000 in ?? ()
+>>> #1  0x0000000000481b4d in queue_foreach (queue=0x6fe4e0,
+>>> function=function@entry=0x442d40 <clear_ccc_state>,
+>>> user_data=0x6ee630) at src/shared/queue.c:220
+>>> #2  0x00000000004436c9 in att_disconnected (err=<optimized out>,
+>>> user_data=0x6fe4b0) at src/gatt-database.c:310
+>>> #3  0x0000000000481b4d in queue_foreach (queue=0x705b70,
+>>> function=function@entry=0x485280 <disconn_handler>, user_data=0x68) at
+>>> src/shared/queue.c:220
+>>> #4  0x0000000000486632 in disconnect_cb (io=<optimized out>,
+>>> user_data=0x70b140) at src/shared/att.c:590
+>>> #5  0x000000000048fbc5 in watch_callback (channel=<optimized out>,
+>>> cond=<optimized out>, user_data=<optimized out>) at
+>>> src/shared/io-glib.c:170
+>>> #6  0x00007ffff7b1ace5 in g_main_context_dispatch () from
+>>> /lib/x86_64-linux-gnu/libglib-2.0.so.0
+>>> #7  0x00007ffff7b1b048 in ?? () from /lib/x86_64-linux-gnu/libglib-2.0.so.0
+>>> #8  0x00007ffff7b1b30a in g_main_loop_run () from
+>>> /lib/x86_64-linux-gnu/libglib-2.0.so.0
+>>> #9  0x000000000040b51b in main (argc=1, argv=0x7fffffffe618) at src/main.c:770
+>>
+>> There is a patch for this issue:
+>>
+>> https://git.kernel.org/pub/scm/bluetooth/bluez.git/commit/?id=261cf78db4be79a0f7d44798a57730b159c9be91
+>>
+>>> thanks
+>>> best wishes
+>>> yunhan
+>>>
+>>> On Mon, Oct 23, 2017 at 4:17 AM, Luiz Augusto von Dentz
+>>> <luiz.dentz@gmail.com> wrote:
+>>>> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>>>>
+>>>> If the device is no longer valid or is not considered bonded anymore
+>>>> clear its CCC states before removing otherwise application may continue
+>>>> to notify when there are no devices listening.
+>>>> ---
+>>>>  src/gatt-database.c | 155 ++++++++++++++++++++++++++++++++++------------------
+>>>>  1 file changed, 103 insertions(+), 52 deletions(-)
+>>>>
+>>>> diff --git a/src/gatt-database.c b/src/gatt-database.c
+>>>> index 47304704a..6784998c3 100644
+>>>> --- a/src/gatt-database.c
+>>>> +++ b/src/gatt-database.c
+>>>> @@ -150,8 +150,10 @@ struct pending_op {
+>>>>  };
+>>>>
+>>>>  struct device_state {
+>>>> +       struct btd_gatt_database *db;
+>>>>         bdaddr_t bdaddr;
+>>>>         uint8_t bdaddr_type;
+>>>> +       unsigned int disc_id;
+>>>>         struct queue *ccc_states;
+>>>>  };
+>>>>
+>>>> @@ -245,12 +247,14 @@ static struct ccc_state *find_ccc_state(struct device_state *dev_state,
+>>>>                                                         UINT_TO_PTR(handle));
+>>>>  }
+>>>>
+>>>> -static struct device_state *device_state_create(bdaddr_t *bdaddr,
+>>>> +static struct device_state *device_state_create(struct btd_gatt_database *db,
+>>>> +                                                       bdaddr_t *bdaddr,
+>>>>                                                         uint8_t bdaddr_type)
+>>>>  {
+>>>>         struct device_state *dev_state;
+>>>>
+>>>>         dev_state = new0(struct device_state, 1);
+>>>> +       dev_state->db = db;
+>>>>         dev_state->ccc_states = queue_new();
+>>>>         bacpy(&dev_state->bdaddr, bdaddr);
+>>>>         dev_state->bdaddr_type = bdaddr_type;
+>>>> @@ -258,36 +262,117 @@ static struct device_state *device_state_create(bdaddr_t *bdaddr,
+>>>>         return dev_state;
+>>>>  }
+>>>>
+>>>> +static void device_state_free(void *data)
+>>>> +{
+>>>> +       struct device_state *state = data;
+>>>> +
+>>>> +       queue_destroy(state->ccc_states, free);
+>>>> +       free(state);
+>>>> +}
+>>>> +
+>>>> +static void clear_ccc_state(void *data, void *user_data)
+>>>> +{
+>>>> +       struct ccc_state *ccc = data;
+>>>> +       struct btd_gatt_database *db = user_data;
+>>>> +       struct ccc_cb_data *ccc_cb;
+>>>> +
+>>>> +       if (!ccc->value[0])
+>>>> +               return;
+>>>> +
+>>>> +       ccc_cb = queue_find(db->ccc_callbacks, ccc_cb_match_handle,
+>>>> +                                               UINT_TO_PTR(ccc->handle));
+>>>> +       if (!ccc_cb)
+>>>> +               return;
+>>>> +
+>>>> +       ccc_cb->callback(NULL, 0, ccc_cb->user_data);
+>>>> +}
+>>>> +
+>>>> +static void att_disconnected(int err, void *user_data)
+>>>> +{
+>>>> +       struct device_state *state = user_data;
+>>>> +       struct btd_device *device;
+>>>> +
+>>>> +       DBG("");
+>>>> +
+>>>> +       state->disc_id = 0;
+>>>> +
+>>>> +       device = btd_adapter_get_device(state->db->adapter, &state->bdaddr,
+>>>> +                                       state->bdaddr_type);
+>>>> +       if (!device)
+>>>> +               goto remove;
+>>>> +
+>>>> +       if (device_is_paired(device, state->bdaddr_type))
+>>>> +               return;
+>>>> +
+>>>> +remove:
+>>>> +       /* Remove device state if device no longer exists or is not paired */
+>>>> +       if (queue_remove(state->db->device_states, state)) {
+>>>> +               queue_foreach(state->ccc_states, clear_ccc_state, state->db);
+>>>> +               device_state_free(state);
+>>>> +       }
+>>>> +}
+>>>> +
+>>>> +static bool get_dst_info(struct bt_att *att, bdaddr_t *dst, uint8_t *dst_type)
+>>>> +{
+>>>> +       GIOChannel *io = NULL;
+>>>> +       GError *gerr = NULL;
+>>>> +
+>>>> +       io = g_io_channel_unix_new(bt_att_get_fd(att));
+>>>> +       if (!io)
+>>>> +               return false;
+>>>> +
+>>>> +       bt_io_get(io, &gerr, BT_IO_OPT_DEST_BDADDR, dst,
+>>>> +                                               BT_IO_OPT_DEST_TYPE, dst_type,
+>>>> +                                               BT_IO_OPT_INVALID);
+>>>> +       if (gerr) {
+>>>> +               error("gatt: bt_io_get: %s", gerr->message);
+>>>> +               g_error_free(gerr);
+>>>> +               g_io_channel_unref(io);
+>>>> +               return false;
+>>>> +       }
+>>>> +
+>>>> +       g_io_channel_unref(io);
+>>>> +       return true;
+>>>> +}
+>>>> +
+>>>>  static struct device_state *get_device_state(struct btd_gatt_database *database,
+>>>> -                                                       bdaddr_t *bdaddr,
+>>>> -                                                       uint8_t bdaddr_type)
+>>>> +                                               struct bt_att *att)
+>>>>  {
+>>>>         struct device_state *dev_state;
+>>>> +       bdaddr_t bdaddr;
+>>>> +       uint8_t bdaddr_type;
+>>>> +
+>>>> +       if (!get_dst_info(att, &bdaddr, &bdaddr_type))
+>>>> +               return NULL;
+>>>>
+>>>>         /*
+>>>>          * Find and return a device state. If a matching state doesn't exist,
+>>>>          * then create a new one.
+>>>>          */
+>>>> -       dev_state = find_device_state(database, bdaddr, bdaddr_type);
+>>>> +       dev_state = find_device_state(database, &bdaddr, bdaddr_type);
+>>>>         if (dev_state)
+>>>> -               return dev_state;
+>>>> +               goto done;
+>>>>
+>>>> -       dev_state = device_state_create(bdaddr, bdaddr_type);
+>>>> +       dev_state = device_state_create(database, &bdaddr, bdaddr_type);
+>>>>
+>>>>         queue_push_tail(database->device_states, dev_state);
+>>>>
+>>>> +done:
+>>>> +       dev_state->disc_id = bt_att_register_disconnect(att, att_disconnected,
+>>>> +                                                       dev_state, NULL);
+>>>> +
+>>>>         return dev_state;
+>>>>  }
+>>>>
+>>>>  static struct ccc_state *get_ccc_state(struct btd_gatt_database *database,
+>>>> -                                                       bdaddr_t *bdaddr,
+>>>> -                                                       uint8_t bdaddr_type,
+>>>> -                                                       uint16_t handle)
+>>>> +                                       struct bt_att *att, uint16_t handle)
+>>>>  {
+>>>>         struct device_state *dev_state;
+>>>>         struct ccc_state *ccc;
+>>>>
+>>>> -       dev_state = get_device_state(database, bdaddr, bdaddr_type);
+>>>> +       dev_state = get_device_state(database, att);
+>>>> +       if (!dev_state)
+>>>> +               return NULL;
+>>>>
+>>>>         ccc = find_ccc_state(dev_state, handle);
+>>>>         if (ccc)
+>>>> @@ -300,14 +385,6 @@ static struct ccc_state *get_ccc_state(struct btd_gatt_database *database,
+>>>>         return ccc;
+>>>>  }
+>>>>
+>>>> -static void device_state_free(void *data)
+>>>> -{
+>>>> -       struct device_state *state = data;
+>>>> -
+>>>> -       queue_destroy(state->ccc_states, free);
+>>>> -       free(state);
+>>>> -}
+>>>> -
+>>>>  static void cancel_pending_read(void *data)
+>>>>  {
+>>>>         struct pending_op *op = data;
+>>>> @@ -690,29 +767,6 @@ static void populate_gap_service(struct btd_gatt_database *database)
+>>>>         gatt_db_service_set_active(service, true);
+>>>>  }
+>>>>
+>>>> -static bool get_dst_info(struct bt_att *att, bdaddr_t *dst, uint8_t *dst_type)
+>>>> -{
+>>>> -       GIOChannel *io = NULL;
+>>>> -       GError *gerr = NULL;
+>>>> -
+>>>> -       io = g_io_channel_unix_new(bt_att_get_fd(att));
+>>>> -       if (!io)
+>>>> -               return false;
+>>>> -
+>>>> -       bt_io_get(io, &gerr, BT_IO_OPT_DEST_BDADDR, dst,
+>>>> -                                               BT_IO_OPT_DEST_TYPE, dst_type,
+>>>> -                                               BT_IO_OPT_INVALID);
+>>>> -       if (gerr) {
+>>>> -               error("gatt: bt_io_get: %s", gerr->message);
+>>>> -               g_error_free(gerr);
+>>>> -               g_io_channel_unref(io);
+>>>> -               return false;
+>>>> -       }
+>>>> -
+>>>> -       g_io_channel_unref(io);
+>>>> -       return true;
+>>>> -}
+>>>> -
+>>>>  static void gatt_ccc_read_cb(struct gatt_db_attribute *attrib,
+>>>>                                         unsigned int id, uint16_t offset,
+>>>>                                         uint8_t opcode, struct bt_att *att,
+>>>> @@ -724,8 +778,6 @@ static void gatt_ccc_read_cb(struct gatt_db_attribute *attrib,
+>>>>         uint8_t ecode = 0;
+>>>>         const uint8_t *value = NULL;
+>>>>         size_t len = 0;
+>>>> -       bdaddr_t bdaddr;
+>>>> -       uint8_t bdaddr_type;
+>>>>
+>>>>         handle = gatt_db_attribute_get_handle(attrib);
+>>>>
+>>>> @@ -736,13 +788,12 @@ static void gatt_ccc_read_cb(struct gatt_db_attribute *attrib,
+>>>>                 goto done;
+>>>>         }
+>>>>
+>>>> -       if (!get_dst_info(att, &bdaddr, &bdaddr_type)) {
+>>>> +       ccc = get_ccc_state(database, att, handle);
+>>>> +       if (!ccc) {
+>>>>                 ecode = BT_ATT_ERROR_UNLIKELY;
+>>>>                 goto done;
+>>>>         }
+>>>>
+>>>> -       ccc = get_ccc_state(database, &bdaddr, bdaddr_type, handle);
+>>>> -
+>>>>         len = 2 - offset;
+>>>>         value = len ? &ccc->value[offset] : NULL;
+>>>>
+>>>> @@ -761,8 +812,6 @@ static void gatt_ccc_write_cb(struct gatt_db_attribute *attrib,
+>>>>         struct ccc_cb_data *ccc_cb;
+>>>>         uint16_t handle;
+>>>>         uint8_t ecode = 0;
+>>>> -       bdaddr_t bdaddr;
+>>>> -       uint8_t bdaddr_type;
+>>>>
+>>>>         handle = gatt_db_attribute_get_handle(attrib);
+>>>>
+>>>> @@ -778,13 +827,12 @@ static void gatt_ccc_write_cb(struct gatt_db_attribute *attrib,
+>>>>                 goto done;
+>>>>         }
+>>>>
+>>>> -       if (!get_dst_info(att, &bdaddr, &bdaddr_type)) {
+>>>> +       ccc = get_ccc_state(database, att, handle);
+>>>> +       if (!ccc) {
+>>>>                 ecode = BT_ATT_ERROR_UNLIKELY;
+>>>>                 goto done;
+>>>>         }
+>>>>
+>>>> -       ccc = get_ccc_state(database, &bdaddr, bdaddr_type, handle);
+>>>> -
+>>>>         ccc_cb = queue_find(database->ccc_callbacks, ccc_cb_match_handle,
+>>>>                         UINT_TO_PTR(gatt_db_attribute_get_handle(attrib)));
+>>>>         if (!ccc_cb) {
+>>>> @@ -940,8 +988,11 @@ static void send_notification_to_device(void *data, void *user_data)
+>>>>
+>>>>  remove:
+>>>>         /* Remove device state if device no longer exists or is not paired */
+>>>> -       if (queue_remove(notify->database->device_states, device_state))
+>>>> +       if (queue_remove(notify->database->device_states, device_state)) {
+>>>> +               queue_foreach(device_state->ccc_states, clear_ccc_state,
+>>>> +                                               notify->database);
+>>>>                 device_state_free(device_state);
+>>>> +       }
+>>>>  }
+>>>>
+>>>>  static void send_notification_to_devices(struct btd_gatt_database *database,
+>>>> --
+>>>> 2.13.6
+>>>>
+>>>> --
+>>>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>>>> the body of a message to majordomo@vger.kernel.org
+>>>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>>
+>>
+>>
+>> --
+>> Luiz Augusto von Dentz
+
+
+
+-- 
+Luiz Augusto von Dentz
