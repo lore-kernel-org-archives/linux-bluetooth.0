@@ -1,9 +1,9 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 6/7] ipsp: Connect to IPSP PSM
-Date: Tue, 24 Oct 2017 16:24:58 +0300
-Message-Id: <20171024132459.14206-6-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 3/7] unit: Add initial test for bt_6lo
+Date: Tue, 24 Oct 2017 16:24:55 +0300
+Message-Id: <20171024132459.14206-3-luiz.dentz@gmail.com>
 In-Reply-To: <20171024132459.14206-1-luiz.dentz@gmail.com>
 References: <20171024132459.14206-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,163 +11,306 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-In case the remote device has IPSP service connect attempt to the IPSP
-L2CAP PSM.
 ---
- profiles/network/ipsp.c | 101 ++++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 98 insertions(+), 3 deletions(-)
+ Makefile.am     |   6 ++
+ unit/test-6lo.c | 271 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 277 insertions(+)
+ create mode 100644 unit/test-6lo.c
 
-diff --git a/profiles/network/ipsp.c b/profiles/network/ipsp.c
-index 2645b0598..28683f4b6 100644
---- a/profiles/network/ipsp.c
-+++ b/profiles/network/ipsp.c
-@@ -34,6 +34,7 @@
- #include "lib/sdp.h"
- #include "lib/uuid.h"
+diff --git a/Makefile.am b/Makefile.am
+index bb5a77408..3ba1a8dab 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -430,6 +430,12 @@ unit_test_midi_LDADD = src/libshared-glib.la \
+ 			@GLIB_LIBS@ @ALSA_LIBS@
+ endif
  
-+#include "btio/btio.h"
- #include "src/shared/util.h"
- #include "src/shared/att.h"
- #include "src/shared/queue.h"
-@@ -47,6 +48,28 @@
- #include "src/log.h"
- 
- #define IPSP_UUID16 0x1820
-+#define IPSP_PSM 0x0023
-+#define IPSP_MTU 1280
++unit_tests += unit/test-6lo
 +
-+struct ipsp_session {
-+	GIOChannel *io;
-+	unsigned int id;
++unit_test_6lo_SOURCES = unit/test-6lo.c
++unit_test_6lo_LDADD = src/libshared-glib.la \
++				lib/libbluetooth-internal.la @GLIB_LIBS@
++
+ if MAINTAINER_MODE
+ noinst_PROGRAMS += $(unit_tests)
+ endif
+diff --git a/unit/test-6lo.c b/unit/test-6lo.c
+new file mode 100644
+index 000000000..77f24e795
+--- /dev/null
++++ b/unit/test-6lo.c
+@@ -0,0 +1,271 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2017  Intel Corporation. All rights reserved.
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
++
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++
++#include <unistd.h>
++#include <stdlib.h>
++#include <stdbool.h>
++#include <inttypes.h>
++#include <string.h>
++#include <errno.h>
++#include <fcntl.h>
++#include <sys/socket.h>
++
++#include <glib.h>
++
++#include "src/shared/6lo.h"
++#include "src/shared/util.h"
++
++#include "src/shared/tester.h"
++
++struct test_pdu {
++	bool valid;
++	const uint8_t *data;
++	size_t size;
 +};
 +
-+static void ipsp_cleanup(struct btd_service *service)
++struct test_data {
++	char *test_name;
++	struct test_pdu *pdu_list;
++};
++
++struct context {
++	struct bt_6lo *lo;
++	guint source;
++	guint process;
++	int fd;
++	unsigned int pdu_offset;
++	const struct test_data *data;
++};
++
++#define data(args...) ((const unsigned char[]) { args })
++
++#define raw_pdu(args...)					\
++	{							\
++		.valid = true,					\
++		.data = data(args),				\
++		.size = sizeof(data(args)),			\
++	}
++
++#define define_test(name, function, args...)				\
++	do {								\
++		const struct test_pdu pdus[] = {			\
++			args, { }					\
++		};							\
++		static struct test_data data;				\
++		data.test_name = g_strdup(name);			\
++		data.pdu_list = g_memdup(pdus, sizeof(pdus));		\
++		tester_add(name, &data, NULL, function, NULL);		\
++	} while (0)
++
++static const uint8_t src[] = { 0xac, 0x9f, 0xa0, 0xf3, 0x42, 0x42 };
++static const uint8_t dst[] = { 0xac, 0x9f, 0xa0, 0xf3, 0x42, 0x43 };
++
++static void test_debug(const char *str, void *user_data)
 +{
-+	struct ipsp_session *session = btd_service_get_user_data(service);
++	const char *prefix = user_data;
 +
-+	if (!session)
-+		return;
-+
-+	btd_service_set_user_data(service, NULL);
-+
-+	if (session->id > 0)
-+		g_source_remove(session->id);
-+
-+	g_io_channel_unref(session->io);
-+}
- 
- static int ipsp_probe(struct btd_service *service)
- {
-@@ -64,6 +87,49 @@ static void ipsp_remove(struct btd_service *service)
- 	const char *path = device_get_path(device);
- 
- 	DBG("path %s", path);
-+
-+	ipsp_cleanup(service);
++	tester_debug("%s%s\n", prefix, str);
 +}
 +
-+static gboolean ipsp_session(GIOChannel *chan, GIOCondition cond,
-+				gpointer data)
++static void test_free(gconstpointer user_data)
 +{
-+	struct btd_service *service = data;
++	const struct test_data *data = user_data;
 +
-+	if (cond & G_IO_NVAL)
++	g_free(data->test_name);
++	g_free(data->pdu_list);
++}
++
++static void destroy_context(struct context *context)
++{
++	if (context->source > 0)
++		g_source_remove(context->source);
++
++	bt_6lo_unref(context->lo);
++
++	test_free(context->data);
++	g_free(context);
++}
++
++static gboolean context_quit(gpointer user_data)
++{
++	struct context *context = user_data;
++
++	if (context == NULL)
 +		return FALSE;
 +
-+	if (cond & (G_IO_HUP | G_IO_ERR)) {
-+		DBG("IPSP session disconnected");
-+		ipsp_cleanup(service);
++	if (context->process > 0)
++		g_source_remove(context->process);
++
++	destroy_context(context);
++	tester_test_passed();
++
++	return FALSE;
++}
++
++static gboolean send_pdu(gpointer user_data)
++{
++	struct context *context = user_data;
++	const struct test_pdu *pdu;
++	ssize_t len;
++
++	pdu = &context->data->pdu_list[context->pdu_offset++];
++
++	len = write(context->fd, pdu->data, pdu->size);
++
++	util_hexdump('<', pdu->data, len, test_debug, "6lo: ");
++
++	g_assert_cmpint(len, ==, pdu->size);
++
++	context->process = 0;
++	return FALSE;
++}
++
++static void context_process(struct context *context)
++{
++	if (!context->data->pdu_list[context->pdu_offset].valid) {
++		context_quit(context);
++		return;
++	}
++
++	context->process = g_idle_add(send_pdu, context);
++}
++
++static gboolean test_handler(GIOChannel *channel, GIOCondition cond,
++							gpointer user_data)
++{
++	struct context *context = user_data;
++	const struct test_pdu *pdu;
++	unsigned char buf[1280];
++	ssize_t len;
++	int fd;
++
++	pdu = &context->data->pdu_list[context->pdu_offset++];
++
++	if (cond & (G_IO_NVAL | G_IO_ERR | G_IO_HUP)) {
++		context->source = 0;
++		g_print("%s: cond %x\n", __func__, cond);
 +		return FALSE;
 +	}
++
++	fd = g_io_channel_unix_get_fd(channel);
++
++	len = read(fd, buf, sizeof(buf));
++
++	g_assert(len > 0);
++
++	util_hexdump('>', buf, len, test_debug, "6lo: ");
++
++	g_assert_cmpint(len, ==, pdu->size);
++
++	g_assert(memcmp(buf, pdu->data, pdu->size) == 0);
++
++	context_process(context);
 +
 +	return TRUE;
 +}
 +
-+static void ipsp_connect(GIOChannel *io, GError *err, gpointer user_data)
++static struct context *create_context(gconstpointer data)
 +{
-+	struct btd_service *service = user_data;
-+	struct ipsp_session *session = btd_service_get_user_data(service);
++	struct bt_6lo *lo;
++	struct context *context;
++	int err = 0;
 +
-+	if (err) {
-+		DBG("%s", err->message);
++	lo = bt_6lo_new_default();
++	if (!lo) {
++		err = -ENOTSUP;
++		goto fail;
++	}
 +
-+		ipsp_cleanup(service);
++	err = bt_6lo_add(lo, "bt0", src);
++	if (err < 0) {
++		bt_6lo_unref(lo);
++		goto fail;
++	}
 +
-+		btd_service_connecting_complete(service, -EIO);
++	context = g_new0(struct context, 1);
++	context->lo = lo;
++
++	context->data = data;
++
++	return context;
++
++fail:
++	tester_warn("Failed to setup bt_6lo: %s", strerror(-err));
++	return NULL;
++}
++
++static void attach_client(struct context *context)
++{
++	GIOChannel *channel;
++	int err, sv[2];
++
++	err = socketpair(AF_UNIX, SOCK_SEQPACKET | SOCK_CLOEXEC, 0, sv);
++	g_assert(err == 0);
++
++	err = bt_6lo_attach(context->lo, src, sv[0], dst);
++	g_assert(err == 0);
++
++	channel = g_io_channel_unix_new(sv[1]);
++
++	g_io_channel_set_close_on_unref(channel, TRUE);
++	g_io_channel_set_encoding(channel, NULL, NULL);
++	g_io_channel_set_buffered(channel, FALSE);
++
++	context->source = g_io_add_watch(channel,
++				G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL,
++				test_handler, context);
++	g_assert(context->source > 0);
++
++	g_io_channel_unref(channel);
++
++	context->fd = sv[1];
++}
++
++static void test_run(gconstpointer data)
++{
++	struct context *context = create_context(data);
++
++	if (!context) {
++		tester_test_abort();
 +		return;
 +	}
 +
-+	session->id = g_io_add_watch(io,
-+				G_IO_IN | G_IO_ERR | G_IO_HUP | G_IO_NVAL,
-+				(GIOFunc) ipsp_session, service);
++	if (!g_str_equal(context->data->test_name, "/6lo/init"))
++		attach_client(context);
 +
-+	g_io_channel_unref(session->io);
-+	session->io = NULL;
++	context_quit(context);
++}
 +
-+	btd_service_connecting_complete(service, 0);
- }
- 
- static void foreach_ipsp_service(struct gatt_db_attribute *attr,
-@@ -77,12 +143,13 @@ static void foreach_ipsp_service(struct gatt_db_attribute *attr,
- static int ipsp_accept(struct btd_service *service)
- {
- 	struct btd_device *device = btd_service_get_device(service);
-+	struct btd_adapter *adapter = device_get_adapter(device);
- 	struct gatt_db *db = btd_device_get_gatt_db(device);
--	const char *path = device_get_path(device);
- 	bool found = false;
- 	bt_uuid_t ipsp_uuid;
-+	struct ipsp_session *session;
- 
--	DBG("path %s", path);
-+	DBG("path %s", device_get_path(device));
- 
- 	/* Handle the IPSP services */
- 	bt_uuid16_create(&ipsp_uuid, IPSP_UUID16);
-@@ -92,7 +159,33 @@ static int ipsp_accept(struct btd_service *service)
- 		return -EINVAL;
- 	}
- 
--	btd_service_connecting_complete(service, 0);
-+	session = g_new0(struct ipsp_session, 1);
-+	if (!session) {
-+		error("Unable to allocate IPSP session");
-+		return -ENOMEM;
-+	}
++int main(int argc, char *argv[])
++{
++	tester_init(&argc, &argv);
 +
-+	/* Connect L2CAP channel */
-+	session->io = bt_io_connect(ipsp_connect, service, NULL, NULL,
-+				BT_IO_OPT_SOURCE_BDADDR,
-+				btd_adapter_get_address(adapter),
-+				BT_IO_OPT_SOURCE_TYPE,
-+				btd_adapter_get_address_type(adapter),
-+				BT_IO_OPT_DEST_BDADDR,
-+				device_get_address(device),
-+				BT_IO_OPT_DEST_TYPE,
-+				btd_device_get_bdaddr_type(device),
-+				BT_IO_OPT_PSM, IPSP_PSM,
-+				BT_IO_OPT_IMTU, IPSP_MTU,
-+				BT_IO_OPT_INVALID);
-+	if (!session->io) {
-+		error("Unable create IPSP connection");
-+		g_free(session);
-+		return -EIO;
-+	}
++	define_test("/6lo/init", test_run, raw_pdu());
++	define_test("/6lo/attach", test_run, raw_pdu());
 +
-+	/* Attach session to the service */
-+	btd_service_set_user_data(service, session);
- 
- 	return 0;
- }
-@@ -104,6 +197,8 @@ static int ipsp_disconnect(struct btd_service *service)
- 
- 	DBG("path %s", path);
- 
-+	ipsp_cleanup(service);
-+
- 	btd_service_disconnecting_complete(service, 0);
- 
- 	return 0;
++	return tester_run();
++}
 -- 
 2.13.6
 
