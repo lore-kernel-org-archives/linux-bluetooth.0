@@ -1,42 +1,48 @@
-Return-Path: <jikos@kernel.org>
-Date: Wed, 25 Oct 2017 11:15:45 +0200 (CEST)
-From: Jiri Kosina <jikos@kernel.org>
-To: Niels Skou Olsen <nolsen@jabra.com>
-cc: Benjamin Tissoires <benjamin.tissoires@redhat.com>,
-    Marcel Holtmann <marcel@holtmann.org>,
-    "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-    "linux-input@vger.kernel.org" <linux-input@vger.kernel.org>,
-    "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Return-Path: <nolsen@jabra.com>
+From: Niels Skou Olsen <nolsen@jabra.com>
+To: Benjamin Tissoires <benjamin.tissoires@redhat.com>, Jiri Kosina
+	<jikos@kernel.org>, Marcel Holtmann <marcel@holtmann.org>
+CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-input@vger.kernel.org" <linux-input@vger.kernel.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Subject: RE: [PATCH v2 0/4] Quirks cleanup and hid-generic niceness
-In-Reply-To: <VI1PR0701MB2991B256AEAD1B643B4A7527DA440@VI1PR0701MB2991.eurprd07.prod.outlook.com>
-Message-ID: <nycvar.YFH.7.76.1710251115040.9294@jbgna.fhfr.qr>
-References: <20171003145729.3135-1-benjamin.tissoires@redhat.com>  <VI1PR0701MB2991B256AEAD1B643B4A7527DA440@VI1PR0701MB2991.eurprd07.prod.outlook.com>
+Date: Wed, 25 Oct 2017 08:24:10 +0000
+Message-ID: <VI1PR0701MB2991B256AEAD1B643B4A7527DA440@VI1PR0701MB2991.eurprd07.prod.outlook.com>
+References: <20171003145729.3135-1-benjamin.tissoires@redhat.com> 
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, 25 Oct 2017, Niels Skou Olsen wrote:
+On Oct 4, 2017, nolsen@jabra.com wrote:
 
-> > > Niels found an issue with v1 of the series, while compiling the usbhid
-> > > module as a separate .ko.
-> > >
-> > > Sending a v2 with the proper From: field fixed now.
-> > >
+> On Oct 3, 2017, benjamin.tissoires@redhat.com wrote:
+>
+> > Niels found an issue with v1 of the series, while compiling the usbhid
+> > module as a separate .ko.
 > >
-> > I have built it on for-next and tested it with no apparent issues. Also, I have
-> > Rebased/simplified my 2 pending patches on top of it, and will submit v2s shortly.
-> 
-> Tested-by: Niels Skou Olsen <nolsen@jabra.com>
-> 
-> Sorry for pinging this. I know the patch is touching core HID, so the 
-> reviewer candidates are probably few.
-> 
-> Has anyone had time to look at this?
+> > Sending a v2 with the proper From: field fixed now.
+> >
+>
+> I have built it on for-next and tested it with no apparent issues. Also, =
+I have
+> Rebased/simplified my 2 pending patches on top of it, and will submit v2s=
+ shortly.
 
-It's one the first things I'd like to process once kernel summit is over.
+Tested-by: Niels Skou Olsen <nolsen@jabra.com>
 
-Thanks for patience,
+Sorry for pinging this. I know the patch is touching core HID, so the revie=
+wer candidates are probably few.
 
--- 
-Jiri Kosina
-SUSE Labs
+Has anyone had time to look at this?
+
+Thanks,
+Niels
+**** GN GROUP NOTICE - AUTOMATICALLY INSERTED**** The information in this e=
+-mail (including attachments, if any) is considered confidential and is int=
+ended only for the recipient(s) listed above. Any review, use, disclosure, =
+distribution or copying of this e-mail is prohibited except by or on behalf=
+ of the intended recipient. If you have received this email in error, pleas=
+e notify me immediately by reply e-mail, delete this e-mail, and do not dis=
+close its contents to anyone. Any opinions expressed in this e-mail are tho=
+se of the individual and not necessarily the GN group. Thank you. *********=
+*********** DISCLAIMER END ************************
