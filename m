@@ -1,65 +1,48 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Anupam Roy <anupam.r@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: sachin.dev@samsung.com, Anupam Roy <anupam.r@samsung.com>
-Subject: [PATCH BlueZ] client: Fix segmentation fault while fetching
- advertising data
-Date: Wed, 25 Oct 2017 12:09:32 +0530
-Message-id: <1508913572-10746-1-git-send-email-anupam.r@samsung.com>
-References: <CGME20171025063956epcas1p226e935dfc7347c738230c125c340766b@epcas1p2.samsung.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <jaganath.k.os@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <7127E793-A2AE-413D-AA65-239B23229380@holtmann.org>
+References: <1508830195-13824-1-git-send-email-jaganathx.kanakkassery@intel.com>
+ <F0B9BF0A-BC07-4074-923E-518E6A227DF0@holtmann.org> <20171024085831.GA3889@x1c>
+ <7127E793-A2AE-413D-AA65-239B23229380@holtmann.org>
+From: Jaganath K <jaganath.k.os@gmail.com>
+Date: Wed, 25 Oct 2017 11:14:42 +0530
+Message-ID: <CAJzH+brrT25AQw_EDRxPCqc2P+eeKfs4AsdPzf0CAjghHMG8OA@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: Fix potential memory leak
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Johan Hedberg <johan.hedberg@gmail.com>,
+	"open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+	Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-While testing advertisement, I encountered Seg fault in client, when bluetoothd
-tries to fetch the Adv data set by client. It can happen either while fetching
-Manufacturer specific data or Service data. Backtrace is provided below for reference
-After fix is applied, advertisement works fine for me. I am sending the following patch
-your review. Thank you.
+Hi Marcel, Johan,
 
-Passing val instead of &val in dbus_message_iter_append_fixed_array
-DBUS API causes segmentation fault while fecthing Manufacturer
-data or service data set by client.
+On Tue, Oct 24, 2017 at 6:13 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Johan,
+>
+>>>> index 1fba2a0..58045ee 100644
+>>>> --- a/net/bluetooth/mgmt.c
+>>>> +++ b/net/bluetooth/mgmt.c
+>>>> @@ -6383,6 +6383,7 @@ static int remove_advertising(struct sock *sk, struct hci_dev *hdev,
+>>>>     if (skb_queue_empty(&req.cmd_q) ||
+>>>>         !hdev_is_powered(hdev) ||
+>>>>         hci_dev_test_flag(hdev, HCI_ADVERTISING)) {
+>>>> +           skb_queue_purge(&req.cmd_q);
+>>>>             rp.instance = cp->instance;
+>>>>             err = mgmt_cmd_complete(sk, hdev->id,
+>>>>                                     MGMT_OP_REMOVE_ADVERTISING,
+>>>
+>>> this does not look right to me. It most likely has side affects. The
+>>> fix must be differently if there is a memory leak.
+>>
+>> Actually, it looks like the right fix to me. We don't have a separate
+>> helper to clean up a hci_request that never got used, and
+>> skb_queue_purge is what other places in the code seem to be doing in
+>> this kind of cases.
+>
+> then we need a helper to do this. This is pretty bad style if we hook into the queue directly with a skb_queue_purge. Since that cmd_q should be a hidden detail.
 
-BT Before Fix:
-[bluetooth]# set-advertise-name Test
-[bluetooth]# set-advertise-uuids 0x1824
-[bluetooth]# set-advertise-manufacturer 0x75 0x02 0x03 0x04
-[bluetooth]# advertise on
+I have raised v1 with the suggested changes.
 
-Program received signal SIGSEGV, Segmentation fault.
-in append_array_variant(iter=iter@entry=0x7fffffffd780,
-val=val@entry=0x62485a <ad+90>, n_elements=n_elements@entry=3, type=121) at client/advertising.c:178
-in dict_append_basic_array(type=121, n_elements=3,
-val=0x62485a <ad+90>, key=0x624858 <ad+88>, key_type=113, dict=0x7fffffffd730) at client/advertising.c:205
-get_manufacturer_data(property=<optimized out>, iter=0x7fffffffd840,
-user_data=<optimized out>) at client/advertising.c:253
-
-After Fix:
-[bluetooth]# set-advertise-name Test
-[bluetooth]# set-advertise-uuids 0x1824
-[bluetooth]# set-advertise-manufacturer 0x75 0x02 0x03 0x04
-[bluetooth]# advertise on
-[CHG] Controller 00:19:0E:11:55:44 SupportedInstances: 0x04
-[CHG] Controller 00:19:0E:11:55:44 ActiveInstances: 0x01
-Advertising object registered
-[bluetooth]#
----
- client/advertising.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/client/advertising.c b/client/advertising.c
-index 76cee3d..7d98ae3 100644
---- a/client/advertising.c
-+++ b/client/advertising.c
-@@ -175,7 +175,7 @@ static void append_array_variant(DBusMessageIter *iter, int type, void *val,
- 						type_sig, &array);
- 
- 	if (dbus_type_is_fixed(type) == TRUE) {
--		dbus_message_iter_append_fixed_array(&array, type, val,
-+		dbus_message_iter_append_fixed_array(&array, type, &val,
- 							n_elements);
- 	} else if (type == DBUS_TYPE_STRING || type == DBUS_TYPE_OBJECT_PATH) {
- 		const char ***str_array = val;
--- 
-1.9.1
-
+Thanks,
+Jaganath
