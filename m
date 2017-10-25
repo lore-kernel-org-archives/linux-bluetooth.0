@@ -1,92 +1,42 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <jikos@kernel.org>
+Date: Wed, 25 Oct 2017 11:15:45 +0200 (CEST)
+From: Jiri Kosina <jikos@kernel.org>
+To: Niels Skou Olsen <nolsen@jabra.com>
+cc: Benjamin Tissoires <benjamin.tissoires@redhat.com>,
+    Marcel Holtmann <marcel@holtmann.org>,
+    "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+    "linux-input@vger.kernel.org" <linux-input@vger.kernel.org>,
+    "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: RE: [PATCH v2 0/4] Quirks cleanup and hid-generic niceness
+In-Reply-To: <VI1PR0701MB2991B256AEAD1B643B4A7527DA440@VI1PR0701MB2991.eurprd07.prod.outlook.com>
+Message-ID: <nycvar.YFH.7.76.1710251115040.9294@jbgna.fhfr.qr>
+References: <20171003145729.3135-1-benjamin.tissoires@redhat.com>  <VI1PR0701MB2991B256AEAD1B643B4A7527DA440@VI1PR0701MB2991.eurprd07.prod.outlook.com>
 MIME-Version: 1.0
-In-Reply-To: <CALvjcs-HuvDjGo3ynvnxx47yXX4DJF1SFzdYkE1BY8VKcQD5Ng@mail.gmail.com>
-References: <20171023111723.20729-1-luiz.dentz@gmail.com> <20171023111723.20729-2-luiz.dentz@gmail.com>
- <CALvjcs9i_J5H2jbVWToQbc4xNo9+N3jxrHh3FTo7LKjRN1E=Wg@mail.gmail.com>
- <CABBYNZKgHAUTipjRzxN=_sWH=ooRs3PHnhKaotc33epHQ7efhA@mail.gmail.com>
- <CALvjcs-SbR8JXDEvKRxD1Eq08PyN9D5zEDjc9P8puDMJDwJr=w@mail.gmail.com>
- <CABBYNZJuyZOEzLV0fkU8xTpPWuzc76CeYBLUR9DNq2c4pVPN5w@mail.gmail.com> <CALvjcs-HuvDjGo3ynvnxx47yXX4DJF1SFzdYkE1BY8VKcQD5Ng@mail.gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 25 Oct 2017 16:27:22 +0300
-Message-ID: <CABBYNZ+WCNvJHgzM2JU2NxeNvUsDmThxw_Ly1uX83S7=tcNN4g@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 2/3] gatt: Clear subscriptions for device not paired
-To: Yunhan Wang <yunhanw@nestlabs.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Yunhan,
+On Wed, 25 Oct 2017, Niels Skou Olsen wrote:
 
-On Wed, Oct 25, 2017 at 10:58 AM, Yunhan Wang <yunhanw@nestlabs.com> wrote:
-> Hi, Luiz
->
-> On Tue, Oct 24, 2017 at 1:10 AM, Luiz Augusto von Dentz
-> <luiz.dentz@gmail.com> wrote:
->> Hi Yunhan,
->>
->> On Mon, Oct 23, 2017 at 11:59 PM, Yunhan Wang <yunhanw@nestlabs.com> wrote:
->>> Hi, Luiz
->>>
->>> I have tried this, I think the issue is still there with your patch.
->>
->> I don't see any problem:
->>
->> bluetoothd[13968]: src/device.c:att_disconnected_cb() Software caused
->> connection abort (103)
->> bluetoothd[13968]: src/gatt-client.c:btd_gatt_client_disconnected()
->> Device disconnected. Cleaning up.
->> bluetoothd[13968]: src/device.c:att_disconnected_cb() Automatic
->> connection disabled
->> bluetoothd[13968]: attrib/gattrib.c:g_attrib_unref() 0x8897600: g_attrib_unref=0
->> bluetoothd[13968]: src/gatt-database.c:att_disconnected()
->> bluetoothd[13968]: src/gatt-database.c:ccc_write_cb() External CCC
->> write received with value: 0x0000
->>
->> Could you try running under valgrind?
->>
-> Yes, just tried under valgrind, the issue is constantly reprodcued.
-> Btw, I am currently using btvirt -L -l2, one client, one server, then
-> bluetoothd crash after client issue ble disconnect. I am using bluez
-> lateset master.
->
-> sudo valgrind ./src/bluetoothd --experimental --debug
-> ==31609== Jump to the invalid address stated on the next line
-> ==31609==    at 0x0: ???
-> ==31609==    by 0x481B4C: queue_foreach (queue.c:220)
-> ==31609==    by 0x4436C8: att_disconnected (gatt-database.c:310)
-> ==31609==    by 0x481B4C: queue_foreach (queue.c:220)
-> ==31609==    by 0x486631: disconnect_cb (att.c:590)
-> ==31609==    by 0x48FBC4: watch_callback (io-glib.c:170)
-> ==31609==    by 0x4E7FCE4: g_main_context_dispatch (in
-> /lib/x86_64-linux-gnu/libglib-2.0.so.0.4002.0)
-> ==31609==    by 0x4E80047: ??? (in
-> /lib/x86_64-linux-gnu/libglib-2.0.so.0.4002.0)
-> ==31609==    by 0x4E80309: g_main_loop_run (in
-> /lib/x86_64-linux-gnu/libglib-2.0.so.0.4002.0)
-> ==31609==    by 0x40B51A: main (main.c:770)
-> ==31609==  Address 0x0 is not stack'd, malloc'd or (recently) free'd
+> > > Niels found an issue with v1 of the series, while compiling the usbhid
+> > > module as a separate .ko.
+> > >
+> > > Sending a v2 with the proper From: field fixed now.
+> > >
+> >
+> > I have built it on for-next and tested it with no apparent issues. Also, I have
+> > Rebased/simplified my 2 pending patches on top of it, and will submit v2s shortly.
+> 
+> Tested-by: Niels Skou Olsen <nolsen@jabra.com>
+> 
+> Sorry for pinging this. I know the patch is touching core HID, so the 
+> reviewer candidates are probably few.
+> 
+> Has anyone had time to look at this?
 
-It turns out the ccc_cb->callback could be NULL in case of
-svc_changed, though I not sure why in our case it did not have the
-last call pointing to clear_ccc_state:
+It's one the first things I'd like to process once kernel summit is over.
 
-      at 0x0: ???
-      by 0x475C7C: clear_ccc_state (gatt-database.c:287)
-      by 0x4D28CF: queue_foreach (queue.c:220)
-      by 0x475FE7: att_disconnected (gatt-database.c:310)
-      by 0x4D7255: disconn_handler (att.c:538)
-      by 0x4D28CF: queue_foreach (queue.c:220)
-      by 0x4D8F39: disconnect_cb (att.c:590)
-      by 0x4E6B3A: watch_callback (io-glib.c:170)
-      by 0x50CD246: g_main_context_dispatch (in
-/usr/lib64/libglib-2.0.so.0.5200.3)
-      by 0x50CD5E7: ??? (in /usr/lib64/libglib-2.0.so.0.5200.3)
-      by 0x50CD901: g_main_loop_run (in /usr/lib64/libglib-2.0.so.0.5200.3)
-      by 0x40CD90: main (main.c:770)
-    Address 0x0 is not stack'd, malloc'd or (recently) free'd
-
-Anyway now this should fixed upstream, thanks for the report.
+Thanks for patience,
 
 -- 
-Luiz Augusto von Dentz
+Jiri Kosina
+SUSE Labs
