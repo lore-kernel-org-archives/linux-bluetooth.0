@@ -3,8 +3,8 @@ MIME-Version: 1.0
 In-Reply-To: <20171024174245.34605-1-marcel@holtmann.org>
 References: <20171024174245.34605-1-marcel@holtmann.org>
 From: VOID 001 <zhangjianqiu13@gmail.com>
-Date: Wed, 25 Oct 2017 10:06:29 +0800
-Message-ID: <CABYdM+3deBn7B3Vz-Asv=SS62yFHAGJP4yfQWTjrE58Sb1sjaw@mail.gmail.com>
+Date: Wed, 25 Oct 2017 10:01:00 +0800
+Message-ID: <CABYdM+1aUFrYfig+0q+t_o8JSdpWASM+jT6naRNC+kQFiAzpYg@mail.gmail.com>
 Subject: Re: [PATCH] Bluetooth: btusb: Fix isochronous interface assignments
 To: Marcel Holtmann <marcel@holtmann.org>
 Cc: linux-bluetooth@vger.kernel.org
@@ -94,12 +94,11 @@ On Wed, Oct 25, 2017 at 1:42 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
 > the body of a message to majordomo@vger.kernel.org
 > More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-Hi Holtmann(sorry for the previous impolite call and a mistake in
-emailing the mail to your personal mailbox),
+Hi Marcel,
 
-Glad to see my advice helps
+Glad to see my advise helps
 I am interested in kernel develop, Willing to send patches for kernel
-(In fact, this one is my first attempt, but I found the patch format
+(In fact this one is my first attempt, but I found the patch format
 and email recipient is incorrect)
 Are there any tasks I can work on in Bluetooth / USB module? Could you
 please give me some advise / task to work on?
