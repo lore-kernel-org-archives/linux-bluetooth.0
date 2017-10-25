@@ -1,464 +1,1897 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-Reply-To: yunhanw@nestlabs.com
-In-Reply-To: <CABBYNZJuyZOEzLV0fkU8xTpPWuzc76CeYBLUR9DNq2c4pVPN5w@mail.gmail.com>
-References: <20171023111723.20729-1-luiz.dentz@gmail.com> <20171023111723.20729-2-luiz.dentz@gmail.com>
- <CALvjcs9i_J5H2jbVWToQbc4xNo9+N3jxrHh3FTo7LKjRN1E=Wg@mail.gmail.com>
- <CABBYNZKgHAUTipjRzxN=_sWH=ooRs3PHnhKaotc33epHQ7efhA@mail.gmail.com>
- <CALvjcs-SbR8JXDEvKRxD1Eq08PyN9D5zEDjc9P8puDMJDwJr=w@mail.gmail.com> <CABBYNZJuyZOEzLV0fkU8xTpPWuzc76CeYBLUR9DNq2c4pVPN5w@mail.gmail.com>
-From: Yunhan Wang <yunhanw@nestlabs.com>
-Date: Wed, 25 Oct 2017 00:58:47 -0700
-Message-ID: <CALvjcs-HuvDjGo3ynvnxx47yXX4DJF1SFzdYkE1BY8VKcQD5Ng@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 2/3] gatt: Clear subscriptions for device not paired
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+From: Marcel Holtmann <marcel@holtmann.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Use bt_dev_err and bt_dev_info when possible
+Date: Wed, 25 Oct 2017 08:59:21 +0200
+Message-Id: <20171025065921.1632-1-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi, Luiz
+In case of using BT_ERR and BT_INFO, convert to bt_dev_err and
+bt_dev_info when possible. This allows for controller specific
+reporting.
 
-On Tue, Oct 24, 2017 at 1:10 AM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi Yunhan,
->
-> On Mon, Oct 23, 2017 at 11:59 PM, Yunhan Wang <yunhanw@nestlabs.com> wrote:
->> Hi, Luiz
->>
->> I have tried this, I think the issue is still there with your patch.
->
-> I don't see any problem:
->
-> bluetoothd[13968]: src/device.c:att_disconnected_cb() Software caused
-> connection abort (103)
-> bluetoothd[13968]: src/gatt-client.c:btd_gatt_client_disconnected()
-> Device disconnected. Cleaning up.
-> bluetoothd[13968]: src/device.c:att_disconnected_cb() Automatic
-> connection disabled
-> bluetoothd[13968]: attrib/gattrib.c:g_attrib_unref() 0x8897600: g_attrib_unref=0
-> bluetoothd[13968]: src/gatt-database.c:att_disconnected()
-> bluetoothd[13968]: src/gatt-database.c:ccc_write_cb() External CCC
-> write received with value: 0x0000
->
-> Could you try running under valgrind?
->
-Yes, just tried under valgrind, the issue is constantly reprodcued.
-Btw, I am currently using btvirt -L -l2, one client, one server, then
-bluetoothd crash after client issue ble disconnect. I am using bluez
-lateset master.
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ drivers/bluetooth/bpa10x.c        |  15 ++--
+ drivers/bluetooth/bt3c_cs.c       |   2 +-
+ drivers/bluetooth/btbcm.c         | 103 ++++++++++++-------------
+ drivers/bluetooth/btintel.c       |  42 +++++------
+ drivers/bluetooth/btqca.c         |   6 +-
+ drivers/bluetooth/btrtl.c         |  21 +++---
+ drivers/bluetooth/btusb.c         | 155 ++++++++++++++++++--------------------
+ drivers/bluetooth/hci_ath.c       |   2 +-
+ drivers/bluetooth/hci_h4.c        |   2 +-
+ drivers/bluetooth/hci_qca.c       |  12 +--
+ drivers/bluetooth/hci_serdev.c    |   9 +--
+ include/net/bluetooth/bluetooth.h |   3 +
+ net/bluetooth/a2mp.c              |   2 +-
+ net/bluetooth/amp.c               |   4 +-
+ net/bluetooth/hci_conn.c          |   4 +-
+ net/bluetooth/hci_core.c          |  35 +++++----
+ net/bluetooth/hci_event.c         |  46 +++++------
+ net/bluetooth/hci_request.c       |  16 ++--
+ net/bluetooth/hci_sysfs.c         |   2 +-
+ net/bluetooth/mgmt.c              |  56 +++++++-------
+ net/bluetooth/smp.c               |  22 +++---
+ 21 files changed, 279 insertions(+), 280 deletions(-)
 
-sudo valgrind ./src/bluetoothd --experimental --debug
-==31609== Memcheck, a memory error detector
-==31609== Copyright (C) 2002-2013, and GNU GPL'd, by Julian Seward et al.
-==31609== Using Valgrind-3.10.1 and LibVEX; rerun with -h for copyright info
-==31609== Command: ./src/bluetoothd --experimental --debug
-==31609==
-==31609== Syscall param socketcall.bind(my_addr.rc_bdaddr) points to
-uninitialised byte(s)
-==31609==    at 0x588EDA7: bind (syscall-template.S:81)
-==31609==    by 0x43A805: logging_open (log.c:76)
-==31609==    by 0x43A805: __btd_log_init (log.c:314)
-==31609==    by 0x40ADCD: main (main.c:688)
-==31609==  Address 0xfff0003d6 is on thread 1's stack
-==31609==  in frame #1, created by __btd_log_init (log.c:306)
-==31609==
-==31609== Syscall param socketcall.bind(my_addr.rc_channel) points to
-uninitialised byte(s)
-==31609==    at 0x588EDA7: bind (syscall-template.S:81)
-==31609==    by 0x43A805: logging_open (log.c:76)
-==31609==    by 0x43A805: __btd_log_init (log.c:314)
-==31609==    by 0x40ADCD: main (main.c:688)
-==31609==  Address 0xfff0003d8 is on thread 1's stack
-==31609==  in frame #1, created by __btd_log_init (log.c:306)
-==31609==
-==31609== Jump to the invalid address stated on the next line
-==31609==    at 0x0: ???
-==31609==    by 0x481B4C: queue_foreach (queue.c:220)
-==31609==    by 0x4436C8: att_disconnected (gatt-database.c:310)
-==31609==    by 0x481B4C: queue_foreach (queue.c:220)
-==31609==    by 0x486631: disconnect_cb (att.c:590)
-==31609==    by 0x48FBC4: watch_callback (io-glib.c:170)
-==31609==    by 0x4E7FCE4: g_main_context_dispatch (in
-/lib/x86_64-linux-gnu/libglib-2.0.so.0.4002.0)
-==31609==    by 0x4E80047: ??? (in
-/lib/x86_64-linux-gnu/libglib-2.0.so.0.4002.0)
-==31609==    by 0x4E80309: g_main_loop_run (in
-/lib/x86_64-linux-gnu/libglib-2.0.so.0.4002.0)
-==31609==    by 0x40B51A: main (main.c:770)
-==31609==  Address 0x0 is not stack'd, malloc'd or (recently) free'd
-==31609==
-==31609==
-==31609== Process terminating with default action of signal 11 (SIGSEGV)
-==31609==  Bad permissions for mapped region at address 0x0
-==31609==    at 0x0: ???
-==31609==    by 0x481B4C: queue_foreach (queue.c:220)
-==31609==    by 0x4436C8: att_disconnected (gatt-database.c:310)
-==31609==    by 0x481B4C: queue_foreach (queue.c:220)
-==31609==    by 0x486631: disconnect_cb (att.c:590)
-==31609==    by 0x48FBC4: watch_callback (io-glib.c:170)
-==31609==    by 0x4E7FCE4: g_main_context_dispatch (in
-/lib/x86_64-linux-gnu/libglib-2.0.so.0.4002.0)
-==31609==    by 0x4E80047: ??? (in
-/lib/x86_64-linux-gnu/libglib-2.0.so.0.4002.0)
-==31609==    by 0x4E80309: g_main_loop_run (in
-/lib/x86_64-linux-gnu/libglib-2.0.so.0.4002.0)
-==31609==    by 0x40B51A: main (main.c:770)
-==31609==
-==31609== HEAP SUMMARY:
-==31609==     in use at exit: 131,062 bytes in 2,228 blocks
-==31609==   total heap usage: 16,067 allocs, 13,839 frees, 4,489,304
-bytes allocated
-==31609==
-==31609== LEAK SUMMARY:
-==31609==    definitely lost: 0 bytes in 0 blocks
-==31609==    indirectly lost: 0 bytes in 0 blocks
-==31609==      possibly lost: 0 bytes in 0 blocks
-==31609==    still reachable: 131,062 bytes in 2,228 blocks
-==31609==         suppressed: 0 bytes in 0 blocks
-==31609== Rerun with --leak-check=full to see details of leaked memory
-==31609==
-==31609== For counts of detected and suppressed errors, rerun with: -v
-==31609== Use --track-origins=yes to see where uninitialised values come from
-==31609== ERROR SUMMARY: 3 errors from 3 contexts (suppressed: 0 from 0)
+diff --git a/drivers/bluetooth/bpa10x.c b/drivers/bluetooth/bpa10x.c
+index 48d10cb5c9a1..7971bfbd4321 100644
+--- a/drivers/bluetooth/bpa10x.c
++++ b/drivers/bluetooth/bpa10x.c
+@@ -117,7 +117,7 @@ static void bpa10x_rx_complete(struct urb *urb)
+ 						bpa10x_recv_pkts,
+ 						ARRAY_SIZE(bpa10x_recv_pkts));
+ 		if (IS_ERR(data->rx_skb[idx])) {
+-			BT_ERR("%s corrupted event packet", hdev->name);
++			bt_dev_err(hdev, "corrupted event packet");
+ 			hdev->stat.err_rx++;
+ 			data->rx_skb[idx] = NULL;
+ 		}
+@@ -127,8 +127,7 @@ static void bpa10x_rx_complete(struct urb *urb)
+ 
+ 	err = usb_submit_urb(urb, GFP_ATOMIC);
+ 	if (err < 0) {
+-		BT_ERR("%s urb %p failed to resubmit (%d)",
+-						hdev->name, urb, -err);
++		bt_dev_err(hdev, "urb %p failed to resubmit (%d)", urb, -err);
+ 		usb_unanchor_urb(urb);
+ 	}
+ }
+@@ -164,8 +163,7 @@ static inline int bpa10x_submit_intr_urb(struct hci_dev *hdev)
+ 
+ 	err = usb_submit_urb(urb, GFP_KERNEL);
+ 	if (err < 0) {
+-		BT_ERR("%s urb %p submission failed (%d)",
+-						hdev->name, urb, -err);
++		bt_dev_err(hdev, "urb %p submission failed (%d)", urb, -err);
+ 		usb_unanchor_urb(urb);
+ 	}
+ 
+@@ -205,8 +203,7 @@ static inline int bpa10x_submit_bulk_urb(struct hci_dev *hdev)
+ 
+ 	err = usb_submit_urb(urb, GFP_KERNEL);
+ 	if (err < 0) {
+-		BT_ERR("%s urb %p submission failed (%d)",
+-						hdev->name, urb, -err);
++		bt_dev_err(hdev, "urb %p submission failed (%d)", urb, -err);
+ 		usb_unanchor_urb(urb);
+ 	}
+ 
+@@ -272,7 +269,7 @@ static int bpa10x_setup(struct hci_dev *hdev)
+ 	if (IS_ERR(skb))
+ 		return PTR_ERR(skb);
+ 
+-	BT_INFO("%s: %s", hdev->name, (char *)(skb->data + 1));
++	bt_dev_info(hdev, "%s", (char *)(skb->data + 1));
+ 
+ 	hci_set_fw_info(hdev, "%s", skb->data + 1);
+ 
+@@ -348,7 +345,7 @@ static int bpa10x_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
+ 
+ 	err = usb_submit_urb(urb, GFP_ATOMIC);
+ 	if (err < 0) {
+-		BT_ERR("%s urb %p submission failed", hdev->name, urb);
++		bt_dev_err(hdev, "urb %p submission failed", urb);
+ 		kfree(urb->setup_packet);
+ 		usb_unanchor_urb(urb);
+ 	}
+diff --git a/drivers/bluetooth/bt3c_cs.c b/drivers/bluetooth/bt3c_cs.c
+index 194788739a83..25b0cf952b91 100644
+--- a/drivers/bluetooth/bt3c_cs.c
++++ b/drivers/bluetooth/bt3c_cs.c
+@@ -355,7 +355,7 @@ static irqreturn_t bt3c_interrupt(int irq, void *dev_inst)
+ 		} else if ((stat & 0xff) != 0xff) {
+ 			if (stat & 0x0020) {
+ 				int status = bt3c_read(iobase, 0x7002) & 0x10;
+-				BT_INFO("%s: Antenna %s", info->hdev->name,
++				bt_dev_info(info->hdev, "Antenna %s",
+ 							status ? "out" : "in");
+ 			}
+ 			if (stat & 0x0001)
+diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
+index ae1fa390f508..afa4cb3b16e3 100644
+--- a/drivers/bluetooth/btbcm.c
++++ b/drivers/bluetooth/btbcm.c
+@@ -45,13 +45,12 @@ int btbcm_check_bdaddr(struct hci_dev *hdev)
+ 			     HCI_INIT_TIMEOUT);
+ 	if (IS_ERR(skb)) {
+ 		int err = PTR_ERR(skb);
+-		BT_ERR("%s: BCM: Reading device address failed (%d)",
+-		       hdev->name, err);
++		bt_dev_err(hdev, "BCM: Reading device address failed (%d)", err);
+ 		return err;
+ 	}
+ 
+ 	if (skb->len != sizeof(*bda)) {
+-		BT_ERR("%s: BCM: Device address length mismatch", hdev->name);
++		bt_dev_err(hdev, "BCM: Device address length mismatch");
+ 		kfree_skb(skb);
+ 		return -EIO;
+ 	}
+@@ -74,8 +73,8 @@ int btbcm_check_bdaddr(struct hci_dev *hdev)
+ 	if (!bacmp(&bda->bdaddr, BDADDR_BCM20702A0) ||
+ 	    !bacmp(&bda->bdaddr, BDADDR_BCM4324B3) ||
+ 	    !bacmp(&bda->bdaddr, BDADDR_BCM4330B1)) {
+-		BT_INFO("%s: BCM: Using default device address (%pMR)",
+-			hdev->name, &bda->bdaddr);
++		bt_dev_info(hdev, "BCM: Using default device address (%pMR)",
++			    &bda->bdaddr);
+ 		set_bit(HCI_QUIRK_INVALID_BDADDR, &hdev->quirks);
+ 	}
+ 
+@@ -93,8 +92,7 @@ int btbcm_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr)
+ 	skb = __hci_cmd_sync(hdev, 0xfc01, 6, bdaddr, HCI_INIT_TIMEOUT);
+ 	if (IS_ERR(skb)) {
+ 		err = PTR_ERR(skb);
+-		BT_ERR("%s: BCM: Change address command failed (%d)",
+-		       hdev->name, err);
++		bt_dev_err(hdev, "BCM: Change address command failed (%d)", err);
+ 		return err;
+ 	}
+ 	kfree_skb(skb);
+@@ -116,8 +114,8 @@ int btbcm_patchram(struct hci_dev *hdev, const struct firmware *fw)
+ 	skb = __hci_cmd_sync(hdev, 0xfc2e, 0, NULL, HCI_INIT_TIMEOUT);
+ 	if (IS_ERR(skb)) {
+ 		err = PTR_ERR(skb);
+-		BT_ERR("%s: BCM: Download Minidrv command failed (%d)",
+-		       hdev->name, err);
++		bt_dev_err(hdev, "BCM: Download Minidrv command failed (%d)",
++			   err);
+ 		goto done;
+ 	}
+ 	kfree_skb(skb);
+@@ -136,7 +134,7 @@ int btbcm_patchram(struct hci_dev *hdev, const struct firmware *fw)
+ 		fw_size -= sizeof(*cmd);
+ 
+ 		if (fw_size < cmd->plen) {
+-			BT_ERR("%s: BCM: Patch is corrupted", hdev->name);
++			bt_dev_err(hdev, "BCM: Patch is corrupted");
+ 			err = -EINVAL;
+ 			goto done;
+ 		}
+@@ -151,8 +149,8 @@ int btbcm_patchram(struct hci_dev *hdev, const struct firmware *fw)
+ 				     HCI_INIT_TIMEOUT);
+ 		if (IS_ERR(skb)) {
+ 			err = PTR_ERR(skb);
+-			BT_ERR("%s: BCM: Patch command %04x failed (%d)",
+-			       hdev->name, opcode, err);
++			bt_dev_err(hdev, "BCM: Patch command %04x failed (%d)",
++				   opcode, err);
+ 			goto done;
+ 		}
+ 		kfree_skb(skb);
+@@ -173,7 +171,7 @@ static int btbcm_reset(struct hci_dev *hdev)
+ 	skb = __hci_cmd_sync(hdev, HCI_OP_RESET, 0, NULL, HCI_INIT_TIMEOUT);
+ 	if (IS_ERR(skb)) {
+ 		int err = PTR_ERR(skb);
+-		BT_ERR("%s: BCM: Reset failed (%d)", hdev->name, err);
++		bt_dev_err(hdev, "BCM: Reset failed (%d)", err);
+ 		return err;
+ 	}
+ 	kfree_skb(skb);
+@@ -191,13 +189,13 @@ static struct sk_buff *btbcm_read_local_name(struct hci_dev *hdev)
+ 	skb = __hci_cmd_sync(hdev, HCI_OP_READ_LOCAL_NAME, 0, NULL,
+ 			     HCI_INIT_TIMEOUT);
+ 	if (IS_ERR(skb)) {
+-		BT_ERR("%s: BCM: Reading local name failed (%ld)",
+-		       hdev->name, PTR_ERR(skb));
++		bt_dev_err(hdev, "BCM: Reading local name failed (%ld)",
++			   PTR_ERR(skb));
+ 		return skb;
+ 	}
+ 
+ 	if (skb->len != sizeof(struct hci_rp_read_local_name)) {
+-		BT_ERR("%s: BCM: Local name length mismatch", hdev->name);
++		bt_dev_err(hdev, "BCM: Local name length mismatch");
+ 		kfree_skb(skb);
+ 		return ERR_PTR(-EIO);
+ 	}
+@@ -212,13 +210,13 @@ static struct sk_buff *btbcm_read_local_version(struct hci_dev *hdev)
+ 	skb = __hci_cmd_sync(hdev, HCI_OP_READ_LOCAL_VERSION, 0, NULL,
+ 			     HCI_INIT_TIMEOUT);
+ 	if (IS_ERR(skb)) {
+-		BT_ERR("%s: BCM: Reading local version info failed (%ld)",
+-		       hdev->name, PTR_ERR(skb));
++		bt_dev_err(hdev, "BCM: Reading local version info failed (%ld)",
++			   PTR_ERR(skb));
+ 		return skb;
+ 	}
+ 
+ 	if (skb->len != sizeof(struct hci_rp_read_local_version)) {
+-		BT_ERR("%s: BCM: Local version length mismatch", hdev->name);
++		bt_dev_err(hdev, "BCM: Local version length mismatch");
+ 		kfree_skb(skb);
+ 		return ERR_PTR(-EIO);
+ 	}
+@@ -232,13 +230,13 @@ static struct sk_buff *btbcm_read_verbose_config(struct hci_dev *hdev)
+ 
+ 	skb = __hci_cmd_sync(hdev, 0xfc79, 0, NULL, HCI_INIT_TIMEOUT);
+ 	if (IS_ERR(skb)) {
+-		BT_ERR("%s: BCM: Read verbose config info failed (%ld)",
+-		       hdev->name, PTR_ERR(skb));
++		bt_dev_err(hdev, "BCM: Read verbose config info failed (%ld)",
++			   PTR_ERR(skb));
+ 		return skb;
+ 	}
+ 
+ 	if (skb->len != 7) {
+-		BT_ERR("%s: BCM: Verbose config length mismatch", hdev->name);
++		bt_dev_err(hdev, "BCM: Verbose config length mismatch");
+ 		kfree_skb(skb);
+ 		return ERR_PTR(-EIO);
+ 	}
+@@ -252,14 +250,13 @@ static struct sk_buff *btbcm_read_controller_features(struct hci_dev *hdev)
+ 
+ 	skb = __hci_cmd_sync(hdev, 0xfc6e, 0, NULL, HCI_INIT_TIMEOUT);
+ 	if (IS_ERR(skb)) {
+-		BT_ERR("%s: BCM: Read controller features failed (%ld)",
+-		       hdev->name, PTR_ERR(skb));
++		bt_dev_err(hdev, "BCM: Read controller features failed (%ld)",
++			   PTR_ERR(skb));
+ 		return skb;
+ 	}
+ 
+ 	if (skb->len != 9) {
+-		BT_ERR("%s: BCM: Controller features length mismatch",
+-		       hdev->name);
++		bt_dev_err(hdev, "BCM: Controller features length mismatch");
+ 		kfree_skb(skb);
+ 		return ERR_PTR(-EIO);
+ 	}
+@@ -273,13 +270,13 @@ static struct sk_buff *btbcm_read_usb_product(struct hci_dev *hdev)
+ 
+ 	skb = __hci_cmd_sync(hdev, 0xfc5a, 0, NULL, HCI_INIT_TIMEOUT);
+ 	if (IS_ERR(skb)) {
+-		BT_ERR("%s: BCM: Read USB product info failed (%ld)",
+-		       hdev->name, PTR_ERR(skb));
++		bt_dev_err(hdev, "BCM: Read USB product info failed (%ld)",
++			   PTR_ERR(skb));
+ 		return skb;
+ 	}
+ 
+ 	if (skb->len != 5) {
+-		BT_ERR("%s: BCM: USB product length mismatch", hdev->name);
++		bt_dev_err(hdev, "BCM: USB product length mismatch");
+ 		kfree_skb(skb);
+ 		return ERR_PTR(-EIO);
+ 	}
+@@ -296,7 +293,7 @@ static int btbcm_read_info(struct hci_dev *hdev)
+ 	if (IS_ERR(skb))
+ 		return PTR_ERR(skb);
+ 
+-	BT_INFO("%s: BCM: chip id %u", hdev->name, skb->data[1]);
++	bt_dev_info(hdev, "BCM: chip id %u", skb->data[1]);
+ 	kfree_skb(skb);
+ 
+ 	/* Read Controller Features */
+@@ -304,7 +301,7 @@ static int btbcm_read_info(struct hci_dev *hdev)
+ 	if (IS_ERR(skb))
+ 		return PTR_ERR(skb);
+ 
+-	BT_INFO("%s: BCM: features 0x%2.2x", hdev->name, skb->data[1]);
++	bt_dev_info(hdev, "BCM: features 0x%2.2x", skb->data[1]);
+ 	kfree_skb(skb);
+ 
+ 	/* Read Local Name */
+@@ -312,7 +309,7 @@ static int btbcm_read_info(struct hci_dev *hdev)
+ 	if (IS_ERR(skb))
+ 		return PTR_ERR(skb);
+ 
+-	BT_INFO("%s: %s", hdev->name, (char *)(skb->data + 1));
++	bt_dev_info(hdev, "%s", (char *)(skb->data + 1));
+ 	kfree_skb(skb);
+ 
+ 	return 0;
+@@ -378,9 +375,9 @@ int btbcm_initialize(struct hci_dev *hdev, char *fw_name, size_t len)
+ 		return 0;
+ 	}
+ 
+-	BT_INFO("%s: %s (%3.3u.%3.3u.%3.3u) build %4.4u", hdev->name,
+-		hw_name ? : "BCM", (subver & 0xe000) >> 13,
+-		(subver & 0x1f00) >> 8, (subver & 0x00ff), rev & 0x0fff);
++	bt_dev_info(hdev, "%s (%3.3u.%3.3u.%3.3u) build %4.4u",
++		    hw_name ? : "BCM", (subver & 0xe000) >> 13,
++		    (subver & 0x1f00) >> 8, (subver & 0x00ff), rev & 0x0fff);
+ 
+ 	return 0;
+ }
+@@ -408,9 +405,9 @@ int btbcm_finalize(struct hci_dev *hdev)
+ 	subver = le16_to_cpu(ver->lmp_subver);
+ 	kfree_skb(skb);
+ 
+-	BT_INFO("%s: BCM (%3.3u.%3.3u.%3.3u) build %4.4u", hdev->name,
+-		(subver & 0xe000) >> 13, (subver & 0x1f00) >> 8,
+-		(subver & 0x00ff), rev & 0x0fff);
++	bt_dev_info(hdev, "BCM (%3.3u.%3.3u.%3.3u) build %4.4u",
++		    (subver & 0xe000) >> 13, (subver & 0x1f00) >> 8,
++		    (subver & 0x00ff), rev & 0x0fff);
+ 
+ 	btbcm_check_bdaddr(hdev);
+ 
+@@ -505,13 +502,13 @@ int btbcm_setup_patchram(struct hci_dev *hdev)
+ 		return 0;
+ 	}
+ 
+-	BT_INFO("%s: %s (%3.3u.%3.3u.%3.3u) build %4.4u", hdev->name,
+-		hw_name ? : "BCM", (subver & 0xe000) >> 13,
+-		(subver & 0x1f00) >> 8, (subver & 0x00ff), rev & 0x0fff);
++	bt_dev_info(hdev, "%s (%3.3u.%3.3u.%3.3u) build %4.4u",
++		    hw_name ? : "BCM", (subver & 0xe000) >> 13,
++		    (subver & 0x1f00) >> 8, (subver & 0x00ff), rev & 0x0fff);
+ 
+ 	err = request_firmware(&fw, fw_name, &hdev->dev);
+ 	if (err < 0) {
+-		BT_INFO("%s: BCM: Patch %s not found", hdev->name, fw_name);
++		bt_dev_info(hdev, "BCM: Patch %s not found", fw_name);
+ 		goto done;
+ 	}
+ 
+@@ -534,16 +531,16 @@ int btbcm_setup_patchram(struct hci_dev *hdev)
+ 	subver = le16_to_cpu(ver->lmp_subver);
+ 	kfree_skb(skb);
+ 
+-	BT_INFO("%s: %s (%3.3u.%3.3u.%3.3u) build %4.4u", hdev->name,
+-		hw_name ? : "BCM", (subver & 0xe000) >> 13,
+-		(subver & 0x1f00) >> 8, (subver & 0x00ff), rev & 0x0fff);
++	bt_dev_info(hdev, "%s (%3.3u.%3.3u.%3.3u) build %4.4u",
++		    hw_name ? : "BCM", (subver & 0xe000) >> 13,
++		    (subver & 0x1f00) >> 8, (subver & 0x00ff), rev & 0x0fff);
+ 
+ 	/* Read Local Name */
+ 	skb = btbcm_read_local_name(hdev);
+ 	if (IS_ERR(skb))
+ 		return PTR_ERR(skb);
+ 
+-	BT_INFO("%s: %s", hdev->name, (char *)(skb->data + 1));
++	bt_dev_info(hdev, "%s", (char *)(skb->data + 1));
+ 	kfree_skb(skb);
+ 
+ done:
+@@ -568,31 +565,31 @@ int btbcm_setup_apple(struct hci_dev *hdev)
+ 	/* Read Verbose Config Version Info */
+ 	skb = btbcm_read_verbose_config(hdev);
+ 	if (!IS_ERR(skb)) {
+-		BT_INFO("%s: BCM: chip id %u build %4.4u", hdev->name,
+-			skb->data[1], get_unaligned_le16(skb->data + 5));
++		bt_dev_info(hdev, "BCM: chip id %u build %4.4u",
++			    skb->data[1], get_unaligned_le16(skb->data + 5));
+ 		kfree_skb(skb);
+ 	}
+ 
+ 	/* Read USB Product Info */
+ 	skb = btbcm_read_usb_product(hdev);
+ 	if (!IS_ERR(skb)) {
+-		BT_INFO("%s: BCM: product %4.4x:%4.4x", hdev->name,
+-			get_unaligned_le16(skb->data + 1),
+-			get_unaligned_le16(skb->data + 3));
++		bt_dev_info(hdev, "BCM: product %4.4x:%4.4x",
++			    get_unaligned_le16(skb->data + 1),
++			    get_unaligned_le16(skb->data + 3));
+ 		kfree_skb(skb);
+ 	}
+ 
+ 	/* Read Controller Features */
+ 	skb = btbcm_read_controller_features(hdev);
+ 	if (!IS_ERR(skb)) {
+-		BT_INFO("%s: BCM: features 0x%2.2x", hdev->name, skb->data[1]);
++		bt_dev_info(hdev, "BCM: features 0x%2.2x", skb->data[1]);
+ 		kfree_skb(skb);
+ 	}
+ 
+ 	/* Read Local Name */
+ 	skb = btbcm_read_local_name(hdev);
+ 	if (!IS_ERR(skb)) {
+-		BT_INFO("%s: %s", hdev->name, (char *)(skb->data + 1));
++		bt_dev_info(hdev, "%s", (char *)(skb->data + 1));
+ 		kfree_skb(skb);
+ 	}
+ 
+diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
+index d32e109bd5cb..4459555c9d88 100644
+--- a/drivers/bluetooth/btintel.c
++++ b/drivers/bluetooth/btintel.c
+@@ -43,13 +43,13 @@ int btintel_check_bdaddr(struct hci_dev *hdev)
+ 			     HCI_INIT_TIMEOUT);
+ 	if (IS_ERR(skb)) {
+ 		int err = PTR_ERR(skb);
+-		BT_ERR("%s: Reading Intel device address failed (%d)",
+-		       hdev->name, err);
++		bt_dev_err(hdev, "Reading Intel device address failed (%d)",
++			   err);
+ 		return err;
+ 	}
+ 
+ 	if (skb->len != sizeof(*bda)) {
+-		BT_ERR("%s: Intel device address length mismatch", hdev->name);
++		bt_dev_err(hdev, "Intel device address length mismatch");
+ 		kfree_skb(skb);
+ 		return -EIO;
+ 	}
+@@ -62,8 +62,8 @@ int btintel_check_bdaddr(struct hci_dev *hdev)
+ 	 * and that in turn can cause problems with Bluetooth operation.
+ 	 */
+ 	if (!bacmp(&bda->bdaddr, BDADDR_INTEL)) {
+-		BT_ERR("%s: Found Intel default device address (%pMR)",
+-		       hdev->name, &bda->bdaddr);
++		bt_dev_err(hdev, "Found Intel default device address (%pMR)",
++			   &bda->bdaddr);
+ 		set_bit(HCI_QUIRK_INVALID_BDADDR, &hdev->quirks);
+ 	}
+ 
+@@ -123,8 +123,8 @@ int btintel_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr)
+ 	skb = __hci_cmd_sync(hdev, 0xfc31, 6, bdaddr, HCI_INIT_TIMEOUT);
+ 	if (IS_ERR(skb)) {
+ 		err = PTR_ERR(skb);
+-		BT_ERR("%s: Changing Intel device address failed (%d)",
+-		       hdev->name, err);
++		bt_dev_err(hdev, "Changing Intel device address failed (%d)",
++			   err);
+ 		return err;
+ 	}
+ 	kfree_skb(skb);
+@@ -154,8 +154,8 @@ int btintel_set_diag(struct hci_dev *hdev, bool enable)
+ 		err = PTR_ERR(skb);
+ 		if (err == -ENODATA)
+ 			goto done;
+-		BT_ERR("%s: Changing Intel diagnostic mode failed (%d)",
+-		       hdev->name, err);
++		bt_dev_err(hdev, "Changing Intel diagnostic mode failed (%d)",
++			   err);
+ 		return err;
+ 	}
+ 	kfree_skb(skb);
+@@ -189,30 +189,30 @@ void btintel_hw_error(struct hci_dev *hdev, u8 code)
+ 	struct sk_buff *skb;
+ 	u8 type = 0x00;
+ 
+-	BT_ERR("%s: Hardware error 0x%2.2x", hdev->name, code);
++	bt_dev_err(hdev, "Hardware error 0x%2.2x", code);
+ 
+ 	skb = __hci_cmd_sync(hdev, HCI_OP_RESET, 0, NULL, HCI_INIT_TIMEOUT);
+ 	if (IS_ERR(skb)) {
+-		BT_ERR("%s: Reset after hardware error failed (%ld)",
+-		       hdev->name, PTR_ERR(skb));
++		bt_dev_err(hdev, "Reset after hardware error failed (%ld)",
++			   PTR_ERR(skb));
+ 		return;
+ 	}
+ 	kfree_skb(skb);
+ 
+ 	skb = __hci_cmd_sync(hdev, 0xfc22, 1, &type, HCI_INIT_TIMEOUT);
+ 	if (IS_ERR(skb)) {
+-		BT_ERR("%s: Retrieving Intel exception info failed (%ld)",
+-		       hdev->name, PTR_ERR(skb));
++		bt_dev_err(hdev, "Retrieving Intel exception info failed (%ld)",
++			   PTR_ERR(skb));
+ 		return;
+ 	}
+ 
+ 	if (skb->len != 13) {
+-		BT_ERR("%s: Exception info size mismatch", hdev->name);
++		bt_dev_err(hdev, "Exception info size mismatch");
+ 		kfree_skb(skb);
+ 		return;
+ 	}
+ 
+-	BT_ERR("%s: Exception info %s", hdev->name, (char *)(skb->data + 1));
++	bt_dev_err(hdev, "Exception info %s", (char *)(skb->data + 1));
+ 
+ 	kfree_skb(skb);
+ }
+@@ -233,9 +233,10 @@ void btintel_version_info(struct hci_dev *hdev, struct intel_version *ver)
+ 		return;
+ 	}
+ 
+-	BT_INFO("%s: %s revision %u.%u build %u week %u %u", hdev->name,
+-		variant, ver->fw_revision >> 4, ver->fw_revision & 0x0f,
+-		ver->fw_build_num, ver->fw_build_ww, 2000 + ver->fw_build_yy);
++	bt_dev_info(hdev, "%s revision %u.%u build %u week %u %u",
++		    variant, ver->fw_revision >> 4, ver->fw_revision & 0x0f,
++		    ver->fw_build_num, ver->fw_build_ww,
++		    2000 + ver->fw_build_yy);
+ }
+ EXPORT_SYMBOL_GPL(btintel_version_info);
+ 
+@@ -321,8 +322,7 @@ int btintel_set_event_mask(struct hci_dev *hdev, bool debug)
+ 	skb = __hci_cmd_sync(hdev, 0xfc52, 8, mask, HCI_INIT_TIMEOUT);
+ 	if (IS_ERR(skb)) {
+ 		err = PTR_ERR(skb);
+-		BT_ERR("%s: Setting Intel event mask failed (%d)",
+-		       hdev->name, err);
++		bt_dev_err(hdev, "Setting Intel event mask failed (%d)", err);
+ 		return err;
+ 	}
+ 	kfree_skb(skb);
+diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
+index 0bbdfcef2aa8..2793d4180d2f 100644
+--- a/drivers/bluetooth/btqca.c
++++ b/drivers/bluetooth/btqca.c
+@@ -287,7 +287,7 @@ static int rome_download_firmware(struct hci_dev *hdev,
+ 	const struct firmware *fw;
+ 	int ret;
+ 
+-	BT_INFO("%s: ROME Downloading %s", hdev->name, config->fwname);
++	bt_dev_info(hdev, "ROME Downloading %s", config->fwname);
+ 
+ 	ret = request_firmware(&fw, config->fwname, &hdev->dev);
+ 	if (ret) {
+@@ -351,7 +351,7 @@ int qca_uart_setup_rome(struct hci_dev *hdev, uint8_t baudrate)
+ 		return err;
+ 	}
+ 
+-	BT_INFO("%s: ROME controller version 0x%08x", hdev->name, rome_ver);
++	bt_dev_info(hdev, "ROME controller version 0x%08x", rome_ver);
+ 
+ 	/* Download rampatch file */
+ 	config.type = TLV_TYPE_PATCH;
+@@ -380,7 +380,7 @@ int qca_uart_setup_rome(struct hci_dev *hdev, uint8_t baudrate)
+ 		return err;
+ 	}
+ 
+-	BT_INFO("%s: ROME setup on UART is completed", hdev->name);
++	bt_dev_info(hdev, "ROME setup on UART is completed");
+ 
+ 	return 0;
+ }
+diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
+index d9a99b4302ea..6e2ad748abba 100644
+--- a/drivers/bluetooth/btrtl.c
++++ b/drivers/bluetooth/btrtl.c
+@@ -55,8 +55,8 @@ static int rtl_read_rom_version(struct hci_dev *hdev, u8 *version)
+ 	}
+ 
+ 	rom_version = (struct rtl_rom_version_evt *)skb->data;
+-	BT_INFO("%s: rom_version status=%x version=%x",
+-		hdev->name, rom_version->status, rom_version->version);
++	bt_dev_info(hdev, "rom_version status=%x version=%x",
++		    rom_version->status, rom_version->version);
+ 
+ 	*version = rom_version->version;
+ 
+@@ -273,7 +273,7 @@ static int rtl_load_config(struct hci_dev *hdev, const char *name, u8 **buff)
+ 	const struct firmware *fw;
+ 	int ret;
+ 
+-	BT_INFO("%s: rtl: loading %s", hdev->name, name);
++	bt_dev_info(hdev, "rtl: loading %s", name);
+ 	ret = request_firmware(&fw, name, &hdev->dev);
+ 	if (ret < 0)
+ 		return ret;
+@@ -292,7 +292,7 @@ static int btrtl_setup_rtl8723a(struct hci_dev *hdev)
+ 	const struct firmware *fw;
+ 	int ret;
+ 
+-	BT_INFO("%s: rtl: loading rtl_bt/rtl8723a_fw.bin", hdev->name);
++	bt_dev_info(hdev, "rtl: loading rtl_bt/rtl8723a_fw.bin");
+ 	ret = request_firmware(&fw, "rtl_bt/rtl8723a_fw.bin", &hdev->dev);
+ 	if (ret < 0) {
+ 		BT_ERR("%s: Failed to load rtl_bt/rtl8723a_fw.bin", hdev->name);
+@@ -363,7 +363,7 @@ static int btrtl_setup_rtl8723b(struct hci_dev *hdev, u16 lmp_subver,
+ 	} else
+ 		cfg_sz = 0;
+ 
+-	BT_INFO("%s: rtl: loading %s", hdev->name, fw_name);
++	bt_dev_info(hdev, "rtl: loading %s", fw_name);
+ 	ret = request_firmware(&fw, fw_name, &hdev->dev);
+ 	if (ret < 0) {
+ 		BT_ERR("%s: Failed to load %s", hdev->name, fw_name);
+@@ -390,7 +390,7 @@ static int btrtl_setup_rtl8723b(struct hci_dev *hdev, u16 lmp_subver,
+ 		fw_data = tbuff;
+ 	}
+ 
+-	BT_INFO("cfg_sz %d, total size %d", cfg_sz, ret);
++	bt_dev_info(hdev, "cfg_sz %d, total size %d", cfg_sz, ret);
+ 
+ 	ret = rtl_download_firmware(hdev, fw_data, ret);
+ 
+@@ -436,9 +436,10 @@ int btrtl_setup_realtek(struct hci_dev *hdev)
+ 		return -PTR_ERR(skb);
+ 
+ 	resp = (struct hci_rp_read_local_version *)skb->data;
+-	BT_INFO("%s: rtl: examining hci_ver=%02x hci_rev=%04x lmp_ver=%02x "
+-		"lmp_subver=%04x", hdev->name, resp->hci_ver, resp->hci_rev,
+-		resp->lmp_ver, resp->lmp_subver);
++	bt_dev_info(hdev, "rtl: examining hci_ver=%02x hci_rev=%04x "
++		    "lmp_ver=%02x lmp_subver=%04x",
++		    resp->hci_ver, resp->hci_rev,
++		    resp->lmp_ver, resp->lmp_subver);
+ 
+ 	lmp_subver = le16_to_cpu(resp->lmp_subver);
+ 	kfree_skb(skb);
+@@ -466,7 +467,7 @@ int btrtl_setup_realtek(struct hci_dev *hdev)
+ 		return btrtl_setup_rtl8723b(hdev, lmp_subver,
+ 					    "rtl_bt/rtl8822b_fw.bin");
+ 	default:
+-		BT_INFO("rtl: assuming no firmware upload needed.");
++		bt_dev_info(hdev, "rtl: assuming no firmware upload needed");
+ 		return 0;
+ 	}
+ }
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index c054d7bce490..b50037fdcfc8 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -642,7 +642,7 @@ static void btusb_intr_complete(struct urb *urb)
+ 
+ 		if (btusb_recv_intr(data, urb->transfer_buffer,
+ 				    urb->actual_length) < 0) {
+-			BT_ERR("%s corrupted event packet", hdev->name);
++			bt_dev_err(hdev, "corrupted event packet");
+ 			hdev->stat.err_rx++;
+ 		}
+ 	} else if (urb->status == -ENOENT) {
+@@ -662,8 +662,8 @@ static void btusb_intr_complete(struct urb *urb)
+ 		 * -ENODEV: device got disconnected
+ 		 */
+ 		if (err != -EPERM && err != -ENODEV)
+-			BT_ERR("%s urb %p failed to resubmit (%d)",
+-			       hdev->name, urb, -err);
++			bt_dev_err(hdev, "urb %p failed to resubmit (%d)",
++				   urb, -err);
+ 		usb_unanchor_urb(urb);
+ 	}
+ }
+@@ -705,8 +705,8 @@ static int btusb_submit_intr_urb(struct hci_dev *hdev, gfp_t mem_flags)
+ 	err = usb_submit_urb(urb, mem_flags);
+ 	if (err < 0) {
+ 		if (err != -EPERM && err != -ENODEV)
+-			BT_ERR("%s urb %p submission failed (%d)",
+-			       hdev->name, urb, -err);
++			bt_dev_err(hdev, "urb %p submission failed (%d)",
++				   urb, -err);
+ 		usb_unanchor_urb(urb);
+ 	}
+ 
+@@ -732,7 +732,7 @@ static void btusb_bulk_complete(struct urb *urb)
+ 
+ 		if (data->recv_bulk(data, urb->transfer_buffer,
+ 				    urb->actual_length) < 0) {
+-			BT_ERR("%s corrupted ACL packet", hdev->name);
++			bt_dev_err(hdev, "corrupted ACL packet");
+ 			hdev->stat.err_rx++;
+ 		}
+ 	} else if (urb->status == -ENOENT) {
+@@ -752,8 +752,8 @@ static void btusb_bulk_complete(struct urb *urb)
+ 		 * -ENODEV: device got disconnected
+ 		 */
+ 		if (err != -EPERM && err != -ENODEV)
+-			BT_ERR("%s urb %p failed to resubmit (%d)",
+-			       hdev->name, urb, -err);
++			bt_dev_err(hdev, "urb %p failed to resubmit (%d)",
++				   urb, -err);
+ 		usb_unanchor_urb(urb);
+ 	}
+ }
+@@ -794,8 +794,8 @@ static int btusb_submit_bulk_urb(struct hci_dev *hdev, gfp_t mem_flags)
+ 	err = usb_submit_urb(urb, mem_flags);
+ 	if (err < 0) {
+ 		if (err != -EPERM && err != -ENODEV)
+-			BT_ERR("%s urb %p submission failed (%d)",
+-			       hdev->name, urb, -err);
++			bt_dev_err(hdev, "urb %p submission failed (%d)",
++				   urb, -err);
+ 		usb_unanchor_urb(urb);
+ 	}
+ 
+@@ -828,7 +828,7 @@ static void btusb_isoc_complete(struct urb *urb)
+ 
+ 			if (btusb_recv_isoc(data, urb->transfer_buffer + offset,
+ 					    length) < 0) {
+-				BT_ERR("%s corrupted SCO packet", hdev->name);
++				bt_dev_err(hdev, "corrupted SCO packet");
+ 				hdev->stat.err_rx++;
+ 			}
+ 		}
+@@ -848,8 +848,8 @@ static void btusb_isoc_complete(struct urb *urb)
+ 		 * -ENODEV: device got disconnected
+ 		 */
+ 		if (err != -EPERM && err != -ENODEV)
+-			BT_ERR("%s urb %p failed to resubmit (%d)",
+-			       hdev->name, urb, -err);
++			bt_dev_err(hdev, "urb %p failed to resubmit (%d)",
++				   urb, -err);
+ 		usb_unanchor_urb(urb);
+ 	}
+ }
+@@ -916,8 +916,8 @@ static int btusb_submit_isoc_urb(struct hci_dev *hdev, gfp_t mem_flags)
+ 	err = usb_submit_urb(urb, mem_flags);
+ 	if (err < 0) {
+ 		if (err != -EPERM && err != -ENODEV)
+-			BT_ERR("%s urb %p submission failed (%d)",
+-			       hdev->name, urb, -err);
++			bt_dev_err(hdev, "urb %p submission failed (%d)",
++				   urb, -err);
+ 		usb_unanchor_urb(urb);
+ 	}
+ 
+@@ -961,8 +961,8 @@ static void btusb_diag_complete(struct urb *urb)
+ 		 * -ENODEV: device got disconnected
+ 		 */
+ 		if (err != -EPERM && err != -ENODEV)
+-			BT_ERR("%s urb %p failed to resubmit (%d)",
+-			       hdev->name, urb, -err);
++			bt_dev_err(hdev, "urb %p failed to resubmit (%d)",
++				   urb, -err);
+ 		usb_unanchor_urb(urb);
+ 	}
+ }
+@@ -1003,8 +1003,8 @@ static int btusb_submit_diag_urb(struct hci_dev *hdev, gfp_t mem_flags)
+ 	err = usb_submit_urb(urb, mem_flags);
+ 	if (err < 0) {
+ 		if (err != -EPERM && err != -ENODEV)
+-			BT_ERR("%s urb %p submission failed (%d)",
+-			       hdev->name, urb, -err);
++			bt_dev_err(hdev, "urb %p submission failed (%d)",
++				   urb, -err);
+ 		usb_unanchor_urb(urb);
+ 	}
+ 
+@@ -1265,8 +1265,8 @@ static int submit_tx_urb(struct hci_dev *hdev, struct urb *urb)
+ 	err = usb_submit_urb(urb, GFP_KERNEL);
+ 	if (err < 0) {
+ 		if (err != -EPERM && err != -ENODEV)
+-			BT_ERR("%s urb %p submission failed (%d)",
+-			       hdev->name, urb, -err);
++			bt_dev_err(hdev, "urb %p submission failed (%d)",
++				   urb, -err);
+ 		kfree(urb->setup_packet);
+ 		usb_unanchor_urb(urb);
+ 	} else {
+@@ -1361,7 +1361,7 @@ static inline int __set_isoc_interface(struct hci_dev *hdev, int altsetting)
+ 
+ 	err = usb_set_interface(data->udev, 1, altsetting);
+ 	if (err < 0) {
+-		BT_ERR("%s setting interface failed (%d)", hdev->name, -err);
++		bt_dev_err(hdev, "setting interface failed (%d)", -err);
+ 		return err;
+ 	}
+ 
+@@ -1385,7 +1385,7 @@ static inline int __set_isoc_interface(struct hci_dev *hdev, int altsetting)
+ 	}
+ 
+ 	if (!data->isoc_tx_ep || !data->isoc_rx_ep) {
+-		BT_ERR("%s invalid SCO descriptors", hdev->name);
++		bt_dev_err(hdev, "invalid SCO descriptors");
+ 		return -ENODEV;
+ 	}
+ 
+@@ -1480,7 +1480,7 @@ static int btusb_setup_bcm92035(struct hci_dev *hdev)
+ 
+ 	skb = __hci_cmd_sync(hdev, 0xfc3b, 1, &val, HCI_INIT_TIMEOUT);
+ 	if (IS_ERR(skb))
+-		BT_ERR("BCM92035 command failed (%ld)", -PTR_ERR(skb));
++		bt_dev_err(hdev, "BCM92035 command failed (%ld)", PTR_ERR(skb));
+ 	else
+ 		kfree_skb(skb);
+ 
+@@ -1498,12 +1498,12 @@ static int btusb_setup_csr(struct hci_dev *hdev)
+ 			     HCI_INIT_TIMEOUT);
+ 	if (IS_ERR(skb)) {
+ 		int err = PTR_ERR(skb);
+-		BT_ERR("%s: CSR: Local version failed (%d)", hdev->name, err);
++		bt_dev_err(hdev, "CSR: Local version failed (%d)", err);
+ 		return err;
+ 	}
+ 
+ 	if (skb->len != sizeof(struct hci_rp_read_local_version)) {
+-		BT_ERR("%s: CSR: Local version length mismatch", hdev->name);
++		bt_dev_err(hdev, "CSR: Local version length mismatch");
+ 		kfree_skb(skb);
+ 		return -EIO;
+ 	}
+@@ -1565,7 +1565,7 @@ static const struct firmware *btusb_setup_intel_get_fw(struct hci_dev *hdev,
+ 		}
+ 	}
+ 
+-	BT_INFO("%s: Intel Bluetooth firmware file: %s", hdev->name, fwname);
++	bt_dev_info(hdev, "Intel Bluetooth firmware file: %s", fwname);
+ 
+ 	return fw;
+ }
+@@ -1721,18 +1721,18 @@ static int btusb_setup_intel(struct hci_dev *hdev)
+ 	if (err)
+ 		return err;
+ 
+-	BT_INFO("%s: read Intel version: %02x%02x%02x%02x%02x%02x%02x%02x%02x",
+-		hdev->name, ver.hw_platform, ver.hw_variant, ver.hw_revision,
+-		ver.fw_variant,  ver.fw_revision, ver.fw_build_num,
+-		ver.fw_build_ww, ver.fw_build_yy, ver.fw_patch_num);
++	bt_dev_info(hdev, "read Intel version: %02x%02x%02x%02x%02x%02x%02x%02x%02x",
++		    ver.hw_platform, ver.hw_variant, ver.hw_revision,
++		    ver.fw_variant,  ver.fw_revision, ver.fw_build_num,
++		    ver.fw_build_ww, ver.fw_build_yy, ver.fw_patch_num);
+ 
+ 	/* fw_patch_num indicates the version of patch the device currently
+ 	 * have. If there is no patch data in the device, it is always 0x00.
+ 	 * So, if it is other than 0x00, no need to patch the device again.
+ 	 */
+ 	if (ver.fw_patch_num) {
+-		BT_INFO("%s: Intel device is already patched. patch num: %02x",
+-			hdev->name, ver.fw_patch_num);
++		bt_dev_info(hdev, "Intel device is already patched. "
++			    "patch num: %02x", ver.fw_patch_num);
+ 		goto complete;
+ 	}
+ 
+@@ -1800,8 +1800,7 @@ static int btusb_setup_intel(struct hci_dev *hdev)
+ 	if (err)
+ 		return err;
+ 
+-	BT_INFO("%s: Intel Bluetooth firmware patch completed and activated",
+-		hdev->name);
++	bt_dev_info(hdev, "Intel firmware patch completed and activated");
+ 
+ 	goto complete;
+ 
+@@ -1811,7 +1810,7 @@ static int btusb_setup_intel(struct hci_dev *hdev)
+ 	if (err)
+ 		return err;
+ 
+-	BT_INFO("%s: Intel Bluetooth firmware patch completed", hdev->name);
++	bt_dev_info(hdev, "Intel firmware patch completed");
+ 
+ 	goto complete;
+ 
+@@ -1825,8 +1824,7 @@ static int btusb_setup_intel(struct hci_dev *hdev)
+ 	if (err)
+ 		return err;
+ 
+-	BT_INFO("%s: Intel Bluetooth firmware patch completed and deactivated",
+-		hdev->name);
++	bt_dev_info(hdev, "Intel firmware patch completed and deactivated");
+ 
+ complete:
+ 	/* Set the event mask for Intel specific vendor events. This enables
+@@ -2107,24 +2105,24 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
+ 
+ 	params = (struct intel_boot_params *)skb->data;
+ 
+-	BT_INFO("%s: Device revision is %u", hdev->name,
+-		le16_to_cpu(params->dev_revid));
++	bt_dev_info(hdev, "Device revision is %u",
++		    le16_to_cpu(params->dev_revid));
+ 
+-	BT_INFO("%s: Secure boot is %s", hdev->name,
+-		params->secure_boot ? "enabled" : "disabled");
++	bt_dev_info(hdev, "Secure boot is %s",
++		    params->secure_boot ? "enabled" : "disabled");
+ 
+-	BT_INFO("%s: OTP lock is %s", hdev->name,
+-		params->otp_lock ? "enabled" : "disabled");
++	bt_dev_info(hdev, "OTP lock is %s",
++		    params->otp_lock ? "enabled" : "disabled");
+ 
+-	BT_INFO("%s: API lock is %s", hdev->name,
+-		params->api_lock ? "enabled" : "disabled");
++	bt_dev_info(hdev, "API lock is %s",
++		    params->api_lock ? "enabled" : "disabled");
+ 
+-	BT_INFO("%s: Debug lock is %s", hdev->name,
+-		params->debug_lock ? "enabled" : "disabled");
++	bt_dev_info(hdev, "Debug lock is %s",
++		    params->debug_lock ? "enabled" : "disabled");
+ 
+-	BT_INFO("%s: Minimum firmware build %u week %u %u", hdev->name,
+-		params->min_fw_build_nn, params->min_fw_build_cw,
+-		2000 + params->min_fw_build_yy);
++	bt_dev_info(hdev, "Minimum firmware build %u week %u %u",
++		    params->min_fw_build_nn, params->min_fw_build_cw,
++		    2000 + params->min_fw_build_yy);
+ 
+ 	/* It is required that every single firmware fragment is acknowledged
+ 	 * with a command complete event. If the boot parameters indicate
+@@ -2141,7 +2139,7 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
+ 	 * also be no valid address for the operational firmware.
+ 	 */
+ 	if (!bacmp(&params->otp_bdaddr, BDADDR_ANY)) {
+-		BT_INFO("%s: No device address configured", hdev->name);
++		bt_dev_info(hdev, "No device address configured");
+ 		set_bit(HCI_QUIRK_INVALID_BDADDR, &hdev->quirks);
+ 	}
+ 
+@@ -2168,7 +2166,7 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
+ 		return err;
+ 	}
+ 
+-	BT_INFO("%s: Found device firmware: %s", hdev->name, fwname);
++	bt_dev_info(hdev, "Found device firmware: %s", fwname);
+ 
+ 	/* Save the DDC file name for later use to apply once the firmware
+ 	 * downloading is done.
+@@ -2249,7 +2247,7 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
+ 
+ 	set_bit(BTUSB_FIRMWARE_LOADED, &data->flags);
+ 
+-	BT_INFO("%s: Waiting for firmware download to complete", hdev->name);
++	bt_dev_info(hdev, "Waiting for firmware download to complete");
+ 
+ 	/* Before switching the device into operational mode and with that
+ 	 * booting the loaded firmware, wait for the bootloader notification
+@@ -2286,7 +2284,7 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
+ 	delta = ktime_sub(rettime, calltime);
+ 	duration = (unsigned long long) ktime_to_ns(delta) >> 10;
+ 
+-	BT_INFO("%s: Firmware loaded in %llu usecs", hdev->name, duration);
++	bt_dev_info(hdev, "Firmware loaded in %llu usecs", duration);
+ 
+ done:
+ 	release_firmware(fw);
+@@ -2312,7 +2310,7 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
+ 	 * 1 second. However if that happens, then just fail the setup
+ 	 * since something went wrong.
+ 	 */
+-	BT_INFO("%s: Waiting for device to boot", hdev->name);
++	bt_dev_info(hdev, "Waiting for device to boot");
+ 
+ 	err = wait_on_bit_timeout(&data->flags, BTUSB_BOOTING,
+ 				  TASK_INTERRUPTIBLE,
+@@ -2332,7 +2330,7 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
+ 	delta = ktime_sub(rettime, calltime);
+ 	duration = (unsigned long long) ktime_to_ns(delta) >> 10;
+ 
+-	BT_INFO("%s: Device booted in %llu usecs", hdev->name, duration);
++	bt_dev_info(hdev, "Device booted in %llu usecs", duration);
+ 
+ 	clear_bit(BTUSB_BOOTLOADER, &data->flags);
+ 
+@@ -2435,8 +2433,8 @@ static int btusb_set_bdaddr_marvell(struct hci_dev *hdev,
+ 	skb = __hci_cmd_sync(hdev, 0xfc22, sizeof(buf), buf, HCI_INIT_TIMEOUT);
+ 	if (IS_ERR(skb)) {
+ 		ret = PTR_ERR(skb);
+-		BT_ERR("%s: changing Marvell device address failed (%ld)",
+-		       hdev->name, ret);
++		bt_dev_err(hdev, "changing Marvell device address failed (%ld)",
++			   ret);
+ 		return ret;
+ 	}
+ 	kfree_skb(skb);
+@@ -2460,8 +2458,7 @@ static int btusb_set_bdaddr_ath3012(struct hci_dev *hdev,
+ 	skb = __hci_cmd_sync(hdev, 0xfc0b, sizeof(buf), buf, HCI_INIT_TIMEOUT);
+ 	if (IS_ERR(skb)) {
+ 		ret = PTR_ERR(skb);
+-		BT_ERR("%s: Change address command failed (%ld)",
+-		       hdev->name, ret);
++		bt_dev_err(hdev, "Change address command failed (%ld)", ret);
+ 		return ret;
+ 	}
+ 	kfree_skb(skb);
+@@ -2527,7 +2524,7 @@ static int btusb_qca_send_vendor_req(struct hci_dev *hdev, u8 request,
+ 	err = usb_control_msg(udev, pipe, request, USB_TYPE_VENDOR | USB_DIR_IN,
+ 			      0, 0, buf, size, USB_CTRL_SET_TIMEOUT);
+ 	if (err < 0) {
+-		BT_ERR("%s: Failed to access otp area (%d)", hdev->name, err);
++		bt_dev_err(hdev, "Failed to access otp area (%d)", err);
+ 		goto done;
+ 	}
+ 
+@@ -2567,7 +2564,7 @@ static int btusb_setup_qca_download_fw(struct hci_dev *hdev,
+ 	err = usb_control_msg(udev, pipe, QCA_DFU_DOWNLOAD, USB_TYPE_VENDOR,
+ 			      0, 0, buf, size, USB_CTRL_SET_TIMEOUT);
+ 	if (err < 0) {
+-		BT_ERR("%s: Failed to send headers (%d)", hdev->name, err);
++		bt_dev_err(hdev, "Failed to send headers (%d)", err);
+ 		goto done;
+ 	}
+ 
+@@ -2583,13 +2580,13 @@ static int btusb_setup_qca_download_fw(struct hci_dev *hdev,
+ 		err = usb_bulk_msg(udev, pipe, buf, size, &len,
+ 				   QCA_DFU_TIMEOUT);
+ 		if (err < 0) {
+-			BT_ERR("%s: Failed to send body at %zd of %zd (%d)",
+-			       hdev->name, sent, firmware->size, err);
++			bt_dev_err(hdev, "Failed to send body at %zd of %zd (%d)",
++				   sent, firmware->size, err);
+ 			break;
+ 		}
+ 
+ 		if (size != len) {
+-			BT_ERR("%s: Failed to get bulk buffer", hdev->name);
++			bt_dev_err(hdev, "Failed to get bulk buffer");
+ 			err = -EILSEQ;
+ 			break;
+ 		}
+@@ -2621,24 +2618,23 @@ static int btusb_setup_qca_load_rampatch(struct hci_dev *hdev,
+ 
+ 	err = request_firmware(&fw, fwname, &hdev->dev);
+ 	if (err) {
+-		BT_ERR("%s: failed to request rampatch file: %s (%d)",
+-		       hdev->name, fwname, err);
++		bt_dev_err(hdev, "failed to request rampatch file: %s (%d)",
++			   fwname, err);
+ 		return err;
+ 	}
+ 
+-	BT_INFO("%s: using rampatch file: %s", hdev->name, fwname);
++	bt_dev_info(hdev, "using rampatch file: %s", fwname);
+ 
+ 	rver = (struct qca_rampatch_version *)(fw->data + info->ver_offset);
+ 	rver_rom = le16_to_cpu(rver->rom_version);
+ 	rver_patch = le16_to_cpu(rver->patch_version);
+ 
+-	BT_INFO("%s: QCA: patch rome 0x%x build 0x%x, firmware rome 0x%x "
+-		"build 0x%x", hdev->name, rver_rom, rver_patch, ver_rom,
+-		ver_patch);
++	bt_dev_info(hdev, "QCA: patch rome 0x%x build 0x%x, "
++		    "firmware rome 0x%x build 0x%x",
++		    rver_rom, rver_patch, ver_rom, ver_patch);
+ 
+ 	if (rver_rom != ver_rom || rver_patch <= ver_patch) {
+-		BT_ERR("%s: rampatch file version did not match with firmware",
+-		       hdev->name);
++		bt_dev_err(hdev, "rampatch file version did not match with firmware");
+ 		err = -EINVAL;
+ 		goto done;
+ 	}
+@@ -2664,12 +2660,12 @@ static int btusb_setup_qca_load_nvm(struct hci_dev *hdev,
+ 
+ 	err = request_firmware(&fw, fwname, &hdev->dev);
+ 	if (err) {
+-		BT_ERR("%s: failed to request NVM file: %s (%d)",
+-		       hdev->name, fwname, err);
++		bt_dev_err(hdev, "failed to request NVM file: %s (%d)",
++			   fwname, err);
+ 		return err;
+ 	}
+ 
+-	BT_INFO("%s: using NVM file: %s", hdev->name, fwname);
++	bt_dev_info(hdev, "using NVM file: %s", fwname);
+ 
+ 	err = btusb_setup_qca_download_fw(hdev, fw, info->nvm_hdr);
+ 
+@@ -2697,8 +2693,7 @@ static int btusb_setup_qca(struct hci_dev *hdev)
+ 			info = &qca_devices_table[i];
+ 	}
+ 	if (!info) {
+-		BT_ERR("%s: don't support firmware rome 0x%x", hdev->name,
+-		       ver_rom);
++		bt_dev_err(hdev, "don't support firmware rome 0x%x", ver_rom);
+ 		return -ENODEV;
+ 	}
+ 
+@@ -2752,7 +2747,7 @@ static inline int __set_diag_interface(struct hci_dev *hdev)
+ 	}
+ 
+ 	if (!data->diag_tx_ep || !data->diag_rx_ep) {
+-		BT_ERR("%s invalid diagnostic descriptors", hdev->name);
++		bt_dev_err(hdev, "invalid diagnostic descriptors");
+ 		return -ENODEV;
+ 	}
+ 
+diff --git a/drivers/bluetooth/hci_ath.c b/drivers/bluetooth/hci_ath.c
+index 0ccf6bf01ed4..329c2a0266e6 100644
+--- a/drivers/bluetooth/hci_ath.c
++++ b/drivers/bluetooth/hci_ath.c
+@@ -191,7 +191,7 @@ static int ath_recv(struct hci_uart *hu, const void *data, int count)
+ 				  ath_recv_pkts, ARRAY_SIZE(ath_recv_pkts));
+ 	if (IS_ERR(ath->rx_skb)) {
+ 		int err = PTR_ERR(ath->rx_skb);
+-		BT_ERR("%s: Frame reassembly failed (%d)", hu->hdev->name, err);
++		bt_dev_err(hu->hdev, "Frame reassembly failed (%d)", err);
+ 		ath->rx_skb = NULL;
+ 		return err;
+ 	}
+diff --git a/drivers/bluetooth/hci_h4.c b/drivers/bluetooth/hci_h4.c
+index 3b82a87224a9..fb97a3bf069b 100644
+--- a/drivers/bluetooth/hci_h4.c
++++ b/drivers/bluetooth/hci_h4.c
+@@ -132,7 +132,7 @@ static int h4_recv(struct hci_uart *hu, const void *data, int count)
+ 				 h4_recv_pkts, ARRAY_SIZE(h4_recv_pkts));
+ 	if (IS_ERR(h4->rx_skb)) {
+ 		int err = PTR_ERR(h4->rx_skb);
+-		BT_ERR("%s: Frame reassembly failed (%d)", hu->hdev->name, err);
++		bt_dev_err(hu->hdev, "Frame reassembly failed (%d)", err);
+ 		h4->rx_skb = NULL;
+ 		return err;
+ 	}
+diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+index 4a949bb60394..bbd7db7384e6 100644
+--- a/drivers/bluetooth/hci_qca.c
++++ b/drivers/bluetooth/hci_qca.c
+@@ -800,7 +800,7 @@ static int qca_recv(struct hci_uart *hu, const void *data, int count)
+ 				  qca_recv_pkts, ARRAY_SIZE(qca_recv_pkts));
+ 	if (IS_ERR(qca->rx_skb)) {
+ 		int err = PTR_ERR(qca->rx_skb);
+-		BT_ERR("%s: Frame reassembly failed (%d)", hu->hdev->name, err);
++		bt_dev_err(hu->hdev, "Frame reassembly failed (%d)", err);
+ 		qca->rx_skb = NULL;
+ 		return err;
+ 	}
+@@ -863,7 +863,7 @@ static int qca_set_baudrate(struct hci_dev *hdev, uint8_t baudrate)
+ 
+ 	skb = bt_skb_alloc(sizeof(cmd), GFP_ATOMIC);
+ 	if (!skb) {
+-		BT_ERR("Failed to allocate memory for baudrate packet");
++		bt_dev_err(hdev, "Failed to allocate baudrate packet");
+ 		return -ENOMEM;
+ 	}
+ 
+@@ -892,7 +892,7 @@ static int qca_setup(struct hci_uart *hu)
+ 	unsigned int speed, qca_baudrate = QCA_BAUDRATE_115200;
+ 	int ret;
+ 
+-	BT_INFO("%s: ROME setup", hdev->name);
++	bt_dev_info(hdev, "ROME setup");
+ 
+ 	/* Patch downloading has to be done without IBS mode */
+ 	clear_bit(STATE_IN_BAND_SLEEP_ENABLED, &qca->flags);
+@@ -917,11 +917,11 @@ static int qca_setup(struct hci_uart *hu)
+ 	if (speed) {
+ 		qca_baudrate = qca_get_baudrate_value(speed);
+ 
+-		BT_INFO("%s: Set UART speed to %d", hdev->name, speed);
++		bt_dev_info(hdev, "Set UART speed to %d", speed);
+ 		ret = qca_set_baudrate(hdev, qca_baudrate);
+ 		if (ret) {
+-			BT_ERR("%s: Failed to change the baud rate (%d)",
+-			       hdev->name, ret);
++			bt_dev_err(hdev, "Failed to change the baud rate (%d)",
++				   ret);
+ 			return ret;
+ 		}
+ 		hci_uart_set_baudrate(hu, speed);
+diff --git a/drivers/bluetooth/hci_serdev.c b/drivers/bluetooth/hci_serdev.c
+index b725ac4f7ff6..71664b22ec9d 100644
+--- a/drivers/bluetooth/hci_serdev.c
++++ b/drivers/bluetooth/hci_serdev.c
+@@ -185,7 +185,7 @@ static int hci_uart_setup(struct hci_dev *hdev)
+ 	if (hu->proto->set_baudrate && speed) {
+ 		err = hu->proto->set_baudrate(hu, speed);
+ 		if (err)
+-			BT_ERR("%s: failed to set baudrate", hdev->name);
++			bt_dev_err(hdev, "Failed to set baudrate");
+ 		else
+ 			serdev_device_set_baudrate(hu->serdev, speed);
+ 	}
+@@ -199,14 +199,13 @@ static int hci_uart_setup(struct hci_dev *hdev)
+ 	skb = __hci_cmd_sync(hdev, HCI_OP_READ_LOCAL_VERSION, 0, NULL,
+ 			     HCI_INIT_TIMEOUT);
+ 	if (IS_ERR(skb)) {
+-		BT_ERR("%s: Reading local version information failed (%ld)",
+-		       hdev->name, PTR_ERR(skb));
++		bt_dev_err(hdev, "Reading local version info failed (%ld)",
++			   PTR_ERR(skb));
+ 		return 0;
+ 	}
+ 
+ 	if (skb->len != sizeof(*ver)) {
+-		BT_ERR("%s: Event length mismatch for version information",
+-		       hdev->name);
++		bt_dev_err(hdev, "Event length mismatch for version info");
+ 	}
+ 
+ 	kfree_skb(skb);
+diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+index 020142bb9735..e89cff0c4c23 100644
+--- a/include/net/bluetooth/bluetooth.h
++++ b/include/net/bluetooth/bluetooth.h
+@@ -147,6 +147,9 @@ void bt_err_ratelimited(const char *fmt, ...);
+ #define bt_dev_dbg(hdev, fmt, ...)				\
+ 	BT_DBG("%s: " fmt, (hdev)->name, ##__VA_ARGS__)
+ 
++#define bt_dev_err_ratelimited(hdev, fmt, ...)			\
++	BT_ERR_RATELIMITED("%s: " fmt, (hdev)->name, ##__VA_ARGS__)
++
+ /* Connection and socket states */
+ enum {
+ 	BT_CONNECTED = 1, /* Equal to TCP_ESTABLISHED to make net code happy */
+diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
+index aad994edd3bb..51c2cf2d8923 100644
+--- a/net/bluetooth/a2mp.c
++++ b/net/bluetooth/a2mp.c
+@@ -573,7 +573,7 @@ static int a2mp_discphyslink_req(struct amp_mgr *mgr, struct sk_buff *skb,
+ 	hcon = hci_conn_hash_lookup_ba(hdev, AMP_LINK,
+ 				       &mgr->l2cap_conn->hcon->dst);
+ 	if (!hcon) {
+-		BT_ERR("No phys link exist");
++		bt_dev_err(hdev, "no phys link exist");
+ 		rsp.status = A2MP_STATUS_NO_PHYSICAL_LINK_EXISTS;
+ 		goto clean;
+ 	}
+diff --git a/net/bluetooth/amp.c b/net/bluetooth/amp.c
+index ebcab5bbadd7..78bec8df8525 100644
+--- a/net/bluetooth/amp.c
++++ b/net/bluetooth/amp.c
+@@ -187,7 +187,7 @@ int phylink_gen_key(struct hci_conn *conn, u8 *data, u8 *len, u8 *type)
+ 
+ 	/* Legacy key */
+ 	if (conn->key_type < 3) {
+-		BT_ERR("Legacy key type %d", conn->key_type);
++		bt_dev_err(hdev, "legacy key type %d", conn->key_type);
+ 		return -EACCES;
+ 	}
+ 
+@@ -207,7 +207,7 @@ int phylink_gen_key(struct hci_conn *conn, u8 *data, u8 *len, u8 *type)
+ 	/* Derive Generic AMP Link Key (gamp) */
+ 	err = hmac_sha256(keybuf, HCI_AMP_LINK_KEY_SIZE, "gamp", 4, gamp_key);
+ 	if (err) {
+-		BT_ERR("Could not derive Generic AMP Key: err %d", err);
++		bt_dev_err(hdev, "could not derive Generic AMP Key: err %d", err);
+ 		return err;
+ 	}
+ 
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index dc59eae54717..4d51ad3eca2e 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -729,8 +729,8 @@ static void create_le_conn_complete(struct hci_dev *hdev, u8 status, u16 opcode)
+ 		goto done;
+ 	}
+ 
+-	BT_ERR("HCI request failed to create LE connection: status 0x%2.2x",
+-	       status);
++	bt_dev_err(hdev, "request failed to create LE connection: "
++		   "status 0x%2.2x", status);
+ 
+ 	if (!conn)
+ 		goto done;
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 6bc679cd3481..40d260f2bea5 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -267,7 +267,7 @@ static int hci_init1_req(struct hci_request *req, unsigned long opt)
+ 		amp_init1(req);
+ 		break;
+ 	default:
+-		BT_ERR("Unknown device type %d", hdev->dev_type);
++		bt_dev_err(hdev, "Unknown device type %d", hdev->dev_type);
+ 		break;
+ 	}
+ 
+@@ -2150,8 +2150,7 @@ static void hci_error_reset(struct work_struct *work)
+ 	if (hdev->hw_error)
+ 		hdev->hw_error(hdev, hdev->hw_error_code);
+ 	else
+-		BT_ERR("%s hardware error 0x%2.2x", hdev->name,
+-		       hdev->hw_error_code);
++		bt_dev_err(hdev, "hardware error 0x%2.2x", hdev->hw_error_code);
+ 
+ 	if (hci_dev_do_close(hdev))
+ 		return;
+@@ -2524,9 +2523,9 @@ static void hci_cmd_timeout(struct work_struct *work)
+ 		struct hci_command_hdr *sent = (void *) hdev->sent_cmd->data;
+ 		u16 opcode = __le16_to_cpu(sent->opcode);
+ 
+-		BT_ERR("%s command 0x%4.4x tx timeout", hdev->name, opcode);
++		bt_dev_err(hdev, "command 0x%4.4x tx timeout", opcode);
+ 	} else {
+-		BT_ERR("%s command tx timeout", hdev->name);
++		bt_dev_err(hdev, "command tx timeout");
+ 	}
+ 
+ 	atomic_set(&hdev->cmd_cnt, 1);
+@@ -2858,7 +2857,7 @@ struct hci_conn_params *hci_conn_params_add(struct hci_dev *hdev,
+ 
+ 	params = kzalloc(sizeof(*params), GFP_KERNEL);
+ 	if (!params) {
+-		BT_ERR("Out of memory");
++		bt_dev_err(hdev, "out of memory");
+ 		return NULL;
+ 	}
+ 
+@@ -3393,7 +3392,7 @@ static void hci_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
+ 
+ 	err = hdev->send(hdev, skb);
+ 	if (err < 0) {
+-		BT_ERR("%s sending frame failed (%d)", hdev->name, err);
++		bt_dev_err(hdev, "sending frame failed (%d)", err);
+ 		kfree_skb(skb);
+ 	}
+ }
+@@ -3408,7 +3407,7 @@ int hci_send_cmd(struct hci_dev *hdev, __u16 opcode, __u32 plen,
+ 
+ 	skb = hci_prepare_cmd(hdev, opcode, plen, param);
+ 	if (!skb) {
+-		BT_ERR("%s no memory for command", hdev->name);
++		bt_dev_err(hdev, "no memory for command");
+ 		return -ENOMEM;
+ 	}
+ 
+@@ -3493,7 +3492,7 @@ static void hci_queue_acl(struct hci_chan *chan, struct sk_buff_head *queue,
+ 		hci_add_acl_hdr(skb, chan->handle, flags);
+ 		break;
+ 	default:
+-		BT_ERR("%s unknown dev_type %d", hdev->name, hdev->dev_type);
++		bt_dev_err(hdev, "unknown dev_type %d", hdev->dev_type);
+ 		return;
+ 	}
+ 
+@@ -3618,7 +3617,7 @@ static struct hci_conn *hci_low_sent(struct hci_dev *hdev, __u8 type,
+ 			break;
+ 		default:
+ 			cnt = 0;
+-			BT_ERR("Unknown link type");
++			bt_dev_err(hdev, "unknown link type %d", conn->type);
+ 		}
+ 
+ 		q = cnt / num;
+@@ -3635,15 +3634,15 @@ static void hci_link_tx_to(struct hci_dev *hdev, __u8 type)
+ 	struct hci_conn_hash *h = &hdev->conn_hash;
+ 	struct hci_conn *c;
+ 
+-	BT_ERR("%s link tx timeout", hdev->name);
++	bt_dev_err(hdev, "link tx timeout");
+ 
+ 	rcu_read_lock();
+ 
+ 	/* Kill stalled connections */
+ 	list_for_each_entry_rcu(c, &h->list, list) {
+ 		if (c->type == type && c->sent) {
+-			BT_ERR("%s killing stalled connection %pMR",
+-			       hdev->name, &c->dst);
++			bt_dev_err(hdev, "killing stalled connection %pMR",
++				   &c->dst);
+ 			hci_disconnect(c, HCI_ERROR_REMOTE_USER_TERM);
+ 		}
+ 	}
+@@ -3724,7 +3723,7 @@ static struct hci_chan *hci_chan_sent(struct hci_dev *hdev, __u8 type,
+ 		break;
+ 	default:
+ 		cnt = 0;
+-		BT_ERR("Unknown link type");
++		bt_dev_err(hdev, "unknown link type %d", chan->conn->type);
+ 	}
+ 
+ 	q = cnt / num;
+@@ -4066,8 +4065,8 @@ static void hci_acldata_packet(struct hci_dev *hdev, struct sk_buff *skb)
+ 		l2cap_recv_acldata(conn, skb, flags);
+ 		return;
+ 	} else {
+-		BT_ERR("%s ACL packet for unknown connection handle %d",
+-		       hdev->name, handle);
++		bt_dev_err(hdev, "ACL packet for unknown connection handle %d",
++			   handle);
+ 	}
+ 
+ 	kfree_skb(skb);
+@@ -4097,8 +4096,8 @@ static void hci_scodata_packet(struct hci_dev *hdev, struct sk_buff *skb)
+ 		sco_recv_scodata(conn, skb);
+ 		return;
+ 	} else {
+-		BT_ERR("%s SCO packet for unknown connection handle %d",
+-		       hdev->name, handle);
++		bt_dev_err(hdev, "SCO packet for unknown connection handle %d",
++			   handle);
+ 	}
+ 
+ 	kfree_skb(skb);
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 0b4dba08a14e..cd3bbb766c24 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -1188,7 +1188,8 @@ static void hci_cc_le_set_scan_enable(struct hci_dev *hdev,
+ 		break;
+ 
+ 	default:
+-		BT_ERR("Used reserved LE_Scan_Enable param %d", cp->enable);
++		bt_dev_err(hdev, "use of reserved LE_Scan_Enable param %d",
++			   cp->enable);
+ 		break;
+ 	}
+ 
+@@ -1485,7 +1486,7 @@ static void hci_cs_create_conn(struct hci_dev *hdev, __u8 status)
+ 			conn = hci_conn_add(hdev, ACL_LINK, &cp->bdaddr,
+ 					    HCI_ROLE_MASTER);
+ 			if (!conn)
+-				BT_ERR("No memory for new connection");
++				bt_dev_err(hdev, "no memory for new connection");
+ 		}
+ 	}
+ 
+@@ -2269,7 +2270,7 @@ static void hci_conn_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 		conn = hci_conn_add(hdev, ev->link_type, &ev->bdaddr,
+ 				    HCI_ROLE_SLAVE);
+ 		if (!conn) {
+-			BT_ERR("No memory for new connection");
++			bt_dev_err(hdev, "no memory for new connection");
+ 			hci_dev_unlock(hdev);
+ 			return;
+ 		}
+@@ -2431,7 +2432,7 @@ static void hci_auth_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 
+ 		if (!hci_conn_ssp_enabled(conn) &&
+ 		    test_bit(HCI_CONN_REAUTH_PEND, &conn->flags)) {
+-			BT_INFO("re-auth of legacy device is not possible.");
++			bt_dev_info(hdev, "re-auth of legacy device is not possible.");
+ 		} else {
+ 			set_bit(HCI_CONN_AUTH, &conn->flags);
+ 			conn->sec_level = conn->pending_sec_level;
+@@ -2535,8 +2536,7 @@ static void read_enc_key_size_complete(struct hci_dev *hdev, u8 status,
+ 	BT_DBG("%s status 0x%02x", hdev->name, status);
+ 
+ 	if (!skb || skb->len < sizeof(*rp)) {
+-		BT_ERR("%s invalid HCI Read Encryption Key Size response",
+-		       hdev->name);
++		bt_dev_err(hdev, "invalid read key size response");
+ 		return;
+ 	}
+ 
+@@ -2554,8 +2554,8 @@ static void read_enc_key_size_complete(struct hci_dev *hdev, u8 status,
+ 	 * supported.
+ 	 */
+ 	if (rp->status) {
+-		BT_ERR("%s failed to read key size for handle %u", hdev->name,
+-		       handle);
++		bt_dev_err(hdev, "failed to read key size for handle %u",
++			   handle);
+ 		conn->enc_key_size = HCI_LINK_KEY_SIZE;
+ 	} else {
+ 		conn->enc_key_size = rp->key_size;
+@@ -2664,7 +2664,7 @@ static void hci_encrypt_change_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 		hci_req_add(&req, HCI_OP_READ_ENC_KEY_SIZE, sizeof(cp), &cp);
+ 
+ 		if (hci_req_run_skb(&req, read_enc_key_size_complete)) {
+-			BT_ERR("Sending HCI Read Encryption Key Size failed");
++			bt_dev_err(hdev, "sending read key size failed");
+ 			conn->enc_key_size = HCI_LINK_KEY_SIZE;
+ 			goto notify;
+ 		}
+@@ -3197,7 +3197,7 @@ static void hci_num_comp_pkts_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 	int i;
+ 
+ 	if (hdev->flow_ctl_mode != HCI_FLOW_CTL_MODE_PACKET_BASED) {
+-		BT_ERR("Wrong event for mode %d", hdev->flow_ctl_mode);
++		bt_dev_err(hdev, "wrong event for mode %d", hdev->flow_ctl_mode);
+ 		return;
+ 	}
+ 
+@@ -3249,7 +3249,8 @@ static void hci_num_comp_pkts_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 			break;
+ 
+ 		default:
+-			BT_ERR("Unknown type %d conn %p", conn->type, conn);
++			bt_dev_err(hdev, "unknown type %d conn %p",
++				   conn->type, conn);
+ 			break;
+ 		}
+ 	}
+@@ -3271,7 +3272,7 @@ static struct hci_conn *__hci_conn_lookup_handle(struct hci_dev *hdev,
+ 			return chan->conn;
+ 		break;
+ 	default:
+-		BT_ERR("%s unknown dev_type %d", hdev->name, hdev->dev_type);
++		bt_dev_err(hdev, "unknown dev_type %d", hdev->dev_type);
+ 		break;
+ 	}
+ 
+@@ -3284,7 +3285,7 @@ static void hci_num_comp_blocks_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 	int i;
+ 
+ 	if (hdev->flow_ctl_mode != HCI_FLOW_CTL_MODE_BLOCK_BASED) {
+-		BT_ERR("Wrong event for mode %d", hdev->flow_ctl_mode);
++		bt_dev_err(hdev, "wrong event for mode %d", hdev->flow_ctl_mode);
+ 		return;
+ 	}
+ 
+@@ -3320,7 +3321,8 @@ static void hci_num_comp_blocks_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 			break;
+ 
+ 		default:
+-			BT_ERR("Unknown type %d conn %p", conn->type, conn);
++			bt_dev_err(hdev, "unknown type %d conn %p",
++				   conn->type, conn);
+ 			break;
+ 		}
+ 	}
+@@ -4479,7 +4481,7 @@ static void hci_le_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 	if (!conn) {
+ 		conn = hci_conn_add(hdev, LE_LINK, &ev->bdaddr, ev->role);
+ 		if (!conn) {
+-			BT_ERR("No memory for new connection");
++			bt_dev_err(hdev, "no memory for new connection");
+ 			goto unlock;
+ 		}
+ 
+@@ -4749,8 +4751,8 @@ static void process_adv_report(struct hci_dev *hdev, u8 type, bdaddr_t *bdaddr,
+ 	case LE_ADV_SCAN_RSP:
+ 		break;
+ 	default:
+-		BT_ERR_RATELIMITED("Unknown advertising packet type: 0x%02x",
+-				   type);
++		bt_dev_err_ratelimited(hdev, "unknown advertising packet "
++				       "type: 0x%02x", type);
+ 		return;
+ 	}
+ 
+@@ -4769,8 +4771,7 @@ static void process_adv_report(struct hci_dev *hdev, u8 type, bdaddr_t *bdaddr,
+ 
+ 	/* Adjust for actual length */
+ 	if (len != real_len) {
+-		BT_ERR_RATELIMITED("%s advertising data length corrected",
+-				   hdev->name);
++		bt_dev_err_ratelimited(hdev, "advertising data len corrected");
+ 		len = real_len;
+ 	}
+ 
+@@ -5192,7 +5193,7 @@ static bool hci_get_cmd_complete(struct hci_dev *hdev, u16 opcode,
+ 		return false;
+ 
+ 	if (skb->len < sizeof(*hdr)) {
+-		BT_ERR("Too short HCI event");
++		bt_dev_err(hdev, "too short HCI event");
+ 		return false;
+ 	}
+ 
+@@ -5206,12 +5207,13 @@ static bool hci_get_cmd_complete(struct hci_dev *hdev, u16 opcode,
+ 	}
+ 
+ 	if (hdr->evt != HCI_EV_CMD_COMPLETE) {
+-		BT_DBG("Last event is not cmd complete (0x%2.2x)", hdr->evt);
++		bt_dev_err(hdev, "last event is not cmd complete (0x%2.2x)",
++			   hdr->evt);
+ 		return false;
+ 	}
+ 
+ 	if (skb->len < sizeof(*ev)) {
+-		BT_ERR("Too short cmd_complete event");
++		bt_dev_err(hdev, "too short cmd_complete event");
+ 		return false;
+ 	}
+ 
+diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
+index b73ac149de34..f4a025f0317d 100644
+--- a/net/bluetooth/hci_request.c
++++ b/net/bluetooth/hci_request.c
+@@ -331,8 +331,8 @@ void hci_req_add_ev(struct hci_request *req, u16 opcode, u32 plen,
+ 
+ 	skb = hci_prepare_cmd(hdev, opcode, plen, param);
+ 	if (!skb) {
+-		BT_ERR("%s no memory for command (opcode 0x%4.4x)",
+-		       hdev->name, opcode);
++		bt_dev_err(hdev, "no memory for command (opcode 0x%4.4x)",
++			   opcode);
+ 		req->err = -ENOMEM;
+ 		return;
+ 	}
+@@ -1421,7 +1421,7 @@ int hci_update_random_address(struct hci_request *req, bool require_privacy,
+ 
+ 		err = smp_generate_rpa(hdev, hdev->irk, &hdev->rpa);
+ 		if (err < 0) {
+-			BT_ERR("%s failed to generate new RPA", hdev->name);
++			bt_dev_err(hdev, "failed to generate new RPA");
+ 			return err;
+ 		}
+ 
+@@ -1783,7 +1783,7 @@ int hci_abort_conn(struct hci_conn *conn, u8 reason)
+ 
+ 	err = hci_req_run(&req, abort_conn_complete);
+ 	if (err && err != -ENODATA) {
+-		BT_ERR("Failed to run HCI request: err %d", err);
++		bt_dev_err(conn->hdev, "failed to run HCI request: err %d", err);
+ 		return err;
+ 	}
+ 
+@@ -1867,7 +1867,8 @@ static void le_scan_disable_work(struct work_struct *work)
+ 
+ 	hci_req_sync(hdev, le_scan_disable, 0, HCI_CMD_TIMEOUT, &status);
+ 	if (status) {
+-		BT_ERR("Failed to disable LE scan: status 0x%02x", status);
++		bt_dev_err(hdev, "failed to disable LE scan: status 0x%02x",
++			   status);
+ 		return;
+ 	}
+ 
+@@ -1898,7 +1899,7 @@ static void le_scan_disable_work(struct work_struct *work)
+ 	hci_req_sync(hdev, bredr_inquiry, DISCOV_INTERLEAVED_INQUIRY_LEN,
+ 		     HCI_CMD_TIMEOUT, &status);
+ 	if (status) {
+-		BT_ERR("Inquiry failed: status 0x%02x", status);
++		bt_dev_err(hdev, "inquiry failed: status 0x%02x", status);
+ 		goto discov_stopped;
+ 	}
+ 
+@@ -1940,7 +1941,8 @@ static void le_scan_restart_work(struct work_struct *work)
+ 
+ 	hci_req_sync(hdev, le_scan_restart, 0, HCI_CMD_TIMEOUT, &status);
+ 	if (status) {
+-		BT_ERR("Failed to restart LE scan: status %d", status);
++		bt_dev_err(hdev, "failed to restart LE scan: status %d",
++			   status);
+ 		return;
+ 	}
+ 
+diff --git a/net/bluetooth/hci_sysfs.c b/net/bluetooth/hci_sysfs.c
+index aa300f3a0d51..34aaa2340ac8 100644
+--- a/net/bluetooth/hci_sysfs.c
++++ b/net/bluetooth/hci_sysfs.c
+@@ -50,7 +50,7 @@ void hci_conn_add_sysfs(struct hci_conn *conn)
+ 	dev_set_name(&conn->dev, "%s:%d", hdev->name, conn->handle);
+ 
+ 	if (device_add(&conn->dev) < 0) {
+-		BT_ERR("Failed to register connection device");
++		bt_dev_err(hdev, "failed to register connection device");
+ 		return;
+ 	}
+ 
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 1fba2a03f8ae..fb9cd9e975f7 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -2159,8 +2159,8 @@ static int load_link_keys(struct sock *sk, struct hci_dev *hdev, void *data,
+ 
+ 	key_count = __le16_to_cpu(cp->key_count);
+ 	if (key_count > max_key_count) {
+-		BT_ERR("load_link_keys: too big key_count value %u",
+-		       key_count);
++		bt_dev_err(hdev, "load_link_keys: too big key_count value %u",
++			   key_count);
+ 		return mgmt_cmd_status(sk, hdev->id, MGMT_OP_LOAD_LINK_KEYS,
+ 				       MGMT_STATUS_INVALID_PARAMS);
+ 	}
+@@ -2168,8 +2168,8 @@ static int load_link_keys(struct sock *sk, struct hci_dev *hdev, void *data,
+ 	expected_len = sizeof(*cp) + key_count *
+ 					sizeof(struct mgmt_link_key_info);
+ 	if (expected_len != len) {
+-		BT_ERR("load_link_keys: expected %u bytes, got %u bytes",
+-		       expected_len, len);
++		bt_dev_err(hdev, "load_link_keys: expected %u bytes, got %u bytes",
++			   expected_len, len);
+ 		return mgmt_cmd_status(sk, hdev->id, MGMT_OP_LOAD_LINK_KEYS,
+ 				       MGMT_STATUS_INVALID_PARAMS);
+ 	}
+@@ -2561,7 +2561,7 @@ static int pin_code_reply(struct sock *sk, struct hci_dev *hdev, void *data,
+ 
+ 		memcpy(&ncp.addr, &cp->addr, sizeof(ncp.addr));
+ 
+-		BT_ERR("PIN code is not 16 bytes long");
++		bt_dev_err(hdev, "PIN code is not 16 bytes long");
+ 
+ 		err = send_pin_code_neg_reply(sk, hdev, &ncp);
+ 		if (err >= 0)
+@@ -3391,7 +3391,8 @@ static int add_remote_oob_data(struct sock *sk, struct hci_dev *hdev,
+ 					MGMT_OP_ADD_REMOTE_OOB_DATA,
+ 					status, &cp->addr, sizeof(cp->addr));
+ 	} else {
+-		BT_ERR("add_remote_oob_data: invalid length of %u bytes", len);
++		bt_dev_err(hdev, "add_remote_oob_data: invalid len of %u bytes",
++			   len);
+ 		err = mgmt_cmd_status(sk, hdev->id, MGMT_OP_ADD_REMOTE_OOB_DATA,
+ 				      MGMT_STATUS_INVALID_PARAMS);
+ 	}
+@@ -3604,8 +3605,8 @@ static int start_service_discovery(struct sock *sk, struct hci_dev *hdev,
+ 
+ 	uuid_count = __le16_to_cpu(cp->uuid_count);
+ 	if (uuid_count > max_uuid_count) {
+-		BT_ERR("service_discovery: too big uuid_count value %u",
+-		       uuid_count);
++		bt_dev_err(hdev, "service_discovery: too big uuid_count value %u",
++			   uuid_count);
+ 		err = mgmt_cmd_complete(sk, hdev->id,
+ 					MGMT_OP_START_SERVICE_DISCOVERY,
+ 					MGMT_STATUS_INVALID_PARAMS, &cp->type,
+@@ -3615,8 +3616,8 @@ static int start_service_discovery(struct sock *sk, struct hci_dev *hdev,
+ 
+ 	expected_len = sizeof(*cp) + uuid_count * 16;
+ 	if (expected_len != len) {
+-		BT_ERR("service_discovery: expected %u bytes, got %u bytes",
+-		       expected_len, len);
++		bt_dev_err(hdev, "service_discovery: expected %u bytes, got %u bytes",
++			   expected_len, len);
+ 		err = mgmt_cmd_complete(sk, hdev->id,
+ 					MGMT_OP_START_SERVICE_DISCOVERY,
+ 					MGMT_STATUS_INVALID_PARAMS, &cp->type,
+@@ -3943,7 +3944,7 @@ static void set_advertising_complete(struct hci_dev *hdev, u8 status,
+ 		err = hci_req_run(&req, enable_advertising_instance);
+ 
+ 	if (err)
+-		BT_ERR("Failed to re-configure advertising");
++		bt_dev_err(hdev, "failed to re-configure advertising");
+ 
+ unlock:
+ 	hci_dev_unlock(hdev);
+@@ -4664,15 +4665,16 @@ static int load_irks(struct sock *sk, struct hci_dev *hdev, void *cp_data,
+ 
+ 	irk_count = __le16_to_cpu(cp->irk_count);
+ 	if (irk_count > max_irk_count) {
+-		BT_ERR("load_irks: too big irk_count value %u", irk_count);
++		bt_dev_err(hdev, "load_irks: too big irk_count value %u",
++			   irk_count);
+ 		return mgmt_cmd_status(sk, hdev->id, MGMT_OP_LOAD_IRKS,
+ 				       MGMT_STATUS_INVALID_PARAMS);
+ 	}
+ 
+ 	expected_len = sizeof(*cp) + irk_count * sizeof(struct mgmt_irk_info);
+ 	if (expected_len != len) {
+-		BT_ERR("load_irks: expected %u bytes, got %u bytes",
+-		       expected_len, len);
++		bt_dev_err(hdev, "load_irks: expected %u bytes, got %u bytes",
++			   expected_len, len);
+ 		return mgmt_cmd_status(sk, hdev->id, MGMT_OP_LOAD_IRKS,
+ 				       MGMT_STATUS_INVALID_PARAMS);
+ 	}
+@@ -4745,7 +4747,8 @@ static int load_long_term_keys(struct sock *sk, struct hci_dev *hdev,
+ 
+ 	key_count = __le16_to_cpu(cp->key_count);
+ 	if (key_count > max_key_count) {
+-		BT_ERR("load_ltks: too big key_count value %u", key_count);
++		bt_dev_err(hdev, "load_ltks: too big key_count value %u",
++			   key_count);
+ 		return mgmt_cmd_status(sk, hdev->id, MGMT_OP_LOAD_LONG_TERM_KEYS,
+ 				       MGMT_STATUS_INVALID_PARAMS);
+ 	}
+@@ -4753,8 +4756,8 @@ static int load_long_term_keys(struct sock *sk, struct hci_dev *hdev,
+ 	expected_len = sizeof(*cp) + key_count *
+ 					sizeof(struct mgmt_ltk_info);
+ 	if (expected_len != len) {
+-		BT_ERR("load_keys: expected %u bytes, got %u bytes",
+-		       expected_len, len);
++		bt_dev_err(hdev, "load_keys: expected %u bytes, got %u bytes",
++			   expected_len, len);
+ 		return mgmt_cmd_status(sk, hdev->id, MGMT_OP_LOAD_LONG_TERM_KEYS,
+ 				       MGMT_STATUS_INVALID_PARAMS);
+ 	}
+@@ -4873,14 +4876,15 @@ static void conn_info_refresh_complete(struct hci_dev *hdev, u8 hci_status,
+ 	}
+ 
+ 	if (!cp) {
+-		BT_ERR("invalid sent_cmd in conn_info response");
++		bt_dev_err(hdev, "invalid sent_cmd in conn_info response");
+ 		goto unlock;
+ 	}
+ 
+ 	handle = __le16_to_cpu(cp->handle);
+ 	conn = hci_conn_hash_lookup_handle(hdev, handle);
+ 	if (!conn) {
+-		BT_ERR("unknown handle (%d) in conn_info response", handle);
++		bt_dev_err(hdev, "unknown handle (%d) in conn_info response",
++			   handle);
+ 		goto unlock;
+ 	}
+ 
+@@ -5477,8 +5481,8 @@ static int load_conn_param(struct sock *sk, struct hci_dev *hdev, void *data,
+ 
+ 	param_count = __le16_to_cpu(cp->param_count);
+ 	if (param_count > max_param_count) {
+-		BT_ERR("load_conn_param: too big param_count value %u",
+-		       param_count);
++		bt_dev_err(hdev, "load_conn_param: too big param_count value %u",
++			   param_count);
+ 		return mgmt_cmd_status(sk, hdev->id, MGMT_OP_LOAD_CONN_PARAM,
+ 				       MGMT_STATUS_INVALID_PARAMS);
+ 	}
+@@ -5486,8 +5490,8 @@ static int load_conn_param(struct sock *sk, struct hci_dev *hdev, void *data,
+ 	expected_len = sizeof(*cp) + param_count *
+ 					sizeof(struct mgmt_conn_param);
+ 	if (expected_len != len) {
+-		BT_ERR("load_conn_param: expected %u bytes, got %u bytes",
+-		       expected_len, len);
++		bt_dev_err(hdev, "load_conn_param: expected %u bytes, got %u bytes",
++			   expected_len, len);
+ 		return mgmt_cmd_status(sk, hdev->id, MGMT_OP_LOAD_CONN_PARAM,
+ 				       MGMT_STATUS_INVALID_PARAMS);
+ 	}
+@@ -5512,7 +5516,7 @@ static int load_conn_param(struct sock *sk, struct hci_dev *hdev, void *data,
+ 		} else if (param->addr.type == BDADDR_LE_RANDOM) {
+ 			addr_type = ADDR_LE_DEV_RANDOM;
+ 		} else {
+-			BT_ERR("Ignoring invalid connection parameters");
++			bt_dev_err(hdev, "ignoring invalid connection parameters");
+ 			continue;
+ 		}
+ 
+@@ -5525,14 +5529,14 @@ static int load_conn_param(struct sock *sk, struct hci_dev *hdev, void *data,
+ 		       min, max, latency, timeout);
+ 
+ 		if (hci_check_conn_params(min, max, latency, timeout) < 0) {
+-			BT_ERR("Ignoring invalid connection parameters");
++			bt_dev_err(hdev, "ignoring invalid connection parameters");
+ 			continue;
+ 		}
+ 
+ 		hci_param = hci_conn_params_add(hdev, &param->addr.bdaddr,
+ 						addr_type);
+ 		if (!hci_param) {
+-			BT_ERR("Failed to add connection parameters");
++			bt_dev_err(hdev, "failed to add connection parameters");
+ 			continue;
+ 		}
+ 
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index d41449b9e9d6..01117ae84f1d 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -996,7 +996,8 @@ static u8 smp_random(struct smp_chan *smp)
+ 		return SMP_UNSPECIFIED;
+ 
+ 	if (crypto_memneq(smp->pcnf, confirm, sizeof(smp->pcnf))) {
+-		BT_ERR("Pairing failed (confirmation values mismatch)");
++		bt_dev_err(hcon->hdev, "pairing failed "
++			   "(confirmation values mismatch)");
+ 		return SMP_CONFIRM_FAILED;
+ 	}
+ 
+@@ -1210,7 +1211,7 @@ static void sc_generate_ltk(struct smp_chan *smp)
+ 
+ 	key = hci_find_link_key(hdev, &hcon->dst);
+ 	if (!key) {
+-		BT_ERR("%s No Link Key found to generate LTK", hdev->name);
++		bt_dev_err(hdev, "no Link Key found to generate LTK");
+ 		return;
+ 	}
+ 
+@@ -2067,11 +2068,11 @@ static int fixup_sc_false_positive(struct smp_chan *smp)
+ 		return SMP_UNSPECIFIED;
+ 
+ 	if (hci_dev_test_flag(hdev, HCI_SC_ONLY)) {
+-		BT_ERR("Refusing SMP SC -> legacy fallback in SC-only mode");
++		bt_dev_err(hdev, "refusing legacy fallback in SC-only mode");
+ 		return SMP_UNSPECIFIED;
+ 	}
+ 
+-	BT_ERR("Trying to fall back to legacy SMP");
++	bt_dev_err(hdev, "trying to fall back to legacy SMP");
+ 
+ 	req = (void *) &smp->preq[1];
+ 	rsp = (void *) &smp->prsp[1];
+@@ -2082,7 +2083,7 @@ static int fixup_sc_false_positive(struct smp_chan *smp)
+ 	auth = req->auth_req & AUTH_REQ_MASK(hdev);
+ 
+ 	if (tk_request(conn, 0, auth, rsp->io_capability, req->io_capability)) {
+-		BT_ERR("Failed to fall back to legacy SMP");
++		bt_dev_err(hdev, "failed to fall back to legacy SMP");
+ 		return SMP_UNSPECIFIED;
+ 	}
+ 
+@@ -2355,7 +2356,7 @@ int smp_conn_security(struct hci_conn *hcon, __u8 sec_level)
+ 
+ 	chan = conn->smp;
+ 	if (!chan) {
+-		BT_ERR("SMP security requested but not available");
++		bt_dev_err(hcon->hdev, "security requested but not available");
+ 		return 1;
+ 	}
+ 
+@@ -2548,7 +2549,7 @@ static int smp_cmd_ident_addr_info(struct l2cap_conn *conn,
+ 	 */
+ 	if (!bacmp(&info->bdaddr, BDADDR_ANY) ||
+ 	    !hci_is_identity_address(&info->bdaddr, info->addr_type)) {
+-		BT_ERR("Ignoring IRK with no identity address");
++		bt_dev_err(hcon->hdev, "ignoring IRK with no identity address");
+ 		goto distribute;
+ 	}
+ 
+@@ -2953,8 +2954,8 @@ static int smp_sig_channel(struct l2cap_chan *chan, struct sk_buff *skb)
+ 	return err;
+ 
+ drop:
+-	BT_ERR("%s unexpected SMP command 0x%02x from %pMR", hcon->hdev->name,
+-	       code, &hcon->dst);
++	bt_dev_err(hcon->hdev, "unexpected SMP command 0x%02x from %pMR",
++		   code, &hcon->dst);
+ 	kfree_skb(skb);
+ 	return 0;
+ }
+@@ -3021,8 +3022,7 @@ static void bredr_pairing(struct l2cap_chan *chan)
+ 
+ 	smp = smp_chan_create(conn);
+ 	if (!smp) {
+-		BT_ERR("%s unable to create SMP context for BR/EDR",
+-		       hdev->name);
++		bt_dev_err(hdev, "unable to create SMP context for BR/EDR");
+ 		return;
+ 	}
+ 
+-- 
+2.13.6
 
-thanks
-best wishes
-yunhan
->> thanks
->> best wishes
->> yunhan
->>
->> On Mon, Oct 23, 2017 at 1:29 PM, Luiz Augusto von Dentz
->> <luiz.dentz@gmail.com> wrote:
->>> Hi Yunhan,
->>>
->>> On Mon, Oct 23, 2017 at 11:26 PM, Yunhan Wang <yunhanw@nestlabs.com> wrote:
->>>> Hi Luiz
->>>>
->>>> WIth latest bluez master, I am seeing segmentation fault in bluetoothd
->>>> when ble disconnection happens. I think it related to this patch.
->>>>
->>>> The backtract is as below,
->>>> #0  0x0000000000000000 in ?? ()
->>>> #1  0x0000000000481b4d in queue_foreach (queue=0x6fe4e0,
->>>> function=function@entry=0x442d40 <clear_ccc_state>,
->>>> user_data=0x6ee630) at src/shared/queue.c:220
->>>> #2  0x00000000004436c9 in att_disconnected (err=<optimized out>,
->>>> user_data=0x6fe4b0) at src/gatt-database.c:310
->>>> #3  0x0000000000481b4d in queue_foreach (queue=0x705b70,
->>>> function=function@entry=0x485280 <disconn_handler>, user_data=0x68) at
->>>> src/shared/queue.c:220
->>>> #4  0x0000000000486632 in disconnect_cb (io=<optimized out>,
->>>> user_data=0x70b140) at src/shared/att.c:590
->>>> #5  0x000000000048fbc5 in watch_callback (channel=<optimized out>,
->>>> cond=<optimized out>, user_data=<optimized out>) at
->>>> src/shared/io-glib.c:170
->>>> #6  0x00007ffff7b1ace5 in g_main_context_dispatch () from
->>>> /lib/x86_64-linux-gnu/libglib-2.0.so.0
->>>> #7  0x00007ffff7b1b048 in ?? () from /lib/x86_64-linux-gnu/libglib-2.0.so.0
->>>> #8  0x00007ffff7b1b30a in g_main_loop_run () from
->>>> /lib/x86_64-linux-gnu/libglib-2.0.so.0
->>>> #9  0x000000000040b51b in main (argc=1, argv=0x7fffffffe618) at src/main.c:770
->>>
->>> There is a patch for this issue:
->>>
->>> https://git.kernel.org/pub/scm/bluetooth/bluez.git/commit/?id=261cf78db4be79a0f7d44798a57730b159c9be91
->>>
->>>> thanks
->>>> best wishes
->>>> yunhan
->>>>
->>>> On Mon, Oct 23, 2017 at 4:17 AM, Luiz Augusto von Dentz
->>>> <luiz.dentz@gmail.com> wrote:
->>>>> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->>>>>
->>>>> If the device is no longer valid or is not considered bonded anymore
->>>>> clear its CCC states before removing otherwise application may continue
->>>>> to notify when there are no devices listening.
->>>>> ---
->>>>>  src/gatt-database.c | 155 ++++++++++++++++++++++++++++++++++------------------
->>>>>  1 file changed, 103 insertions(+), 52 deletions(-)
->>>>>
->>>>> diff --git a/src/gatt-database.c b/src/gatt-database.c
->>>>> index 47304704a..6784998c3 100644
->>>>> --- a/src/gatt-database.c
->>>>> +++ b/src/gatt-database.c
->>>>> @@ -150,8 +150,10 @@ struct pending_op {
->>>>>  };
->>>>>
->>>>>  struct device_state {
->>>>> +       struct btd_gatt_database *db;
->>>>>         bdaddr_t bdaddr;
->>>>>         uint8_t bdaddr_type;
->>>>> +       unsigned int disc_id;
->>>>>         struct queue *ccc_states;
->>>>>  };
->>>>>
->>>>> @@ -245,12 +247,14 @@ static struct ccc_state *find_ccc_state(struct device_state *dev_state,
->>>>>                                                         UINT_TO_PTR(handle));
->>>>>  }
->>>>>
->>>>> -static struct device_state *device_state_create(bdaddr_t *bdaddr,
->>>>> +static struct device_state *device_state_create(struct btd_gatt_database *db,
->>>>> +                                                       bdaddr_t *bdaddr,
->>>>>                                                         uint8_t bdaddr_type)
->>>>>  {
->>>>>         struct device_state *dev_state;
->>>>>
->>>>>         dev_state = new0(struct device_state, 1);
->>>>> +       dev_state->db = db;
->>>>>         dev_state->ccc_states = queue_new();
->>>>>         bacpy(&dev_state->bdaddr, bdaddr);
->>>>>         dev_state->bdaddr_type = bdaddr_type;
->>>>> @@ -258,36 +262,117 @@ static struct device_state *device_state_create(bdaddr_t *bdaddr,
->>>>>         return dev_state;
->>>>>  }
->>>>>
->>>>> +static void device_state_free(void *data)
->>>>> +{
->>>>> +       struct device_state *state = data;
->>>>> +
->>>>> +       queue_destroy(state->ccc_states, free);
->>>>> +       free(state);
->>>>> +}
->>>>> +
->>>>> +static void clear_ccc_state(void *data, void *user_data)
->>>>> +{
->>>>> +       struct ccc_state *ccc = data;
->>>>> +       struct btd_gatt_database *db = user_data;
->>>>> +       struct ccc_cb_data *ccc_cb;
->>>>> +
->>>>> +       if (!ccc->value[0])
->>>>> +               return;
->>>>> +
->>>>> +       ccc_cb = queue_find(db->ccc_callbacks, ccc_cb_match_handle,
->>>>> +                                               UINT_TO_PTR(ccc->handle));
->>>>> +       if (!ccc_cb)
->>>>> +               return;
->>>>> +
->>>>> +       ccc_cb->callback(NULL, 0, ccc_cb->user_data);
->>>>> +}
->>>>> +
->>>>> +static void att_disconnected(int err, void *user_data)
->>>>> +{
->>>>> +       struct device_state *state = user_data;
->>>>> +       struct btd_device *device;
->>>>> +
->>>>> +       DBG("");
->>>>> +
->>>>> +       state->disc_id = 0;
->>>>> +
->>>>> +       device = btd_adapter_get_device(state->db->adapter, &state->bdaddr,
->>>>> +                                       state->bdaddr_type);
->>>>> +       if (!device)
->>>>> +               goto remove;
->>>>> +
->>>>> +       if (device_is_paired(device, state->bdaddr_type))
->>>>> +               return;
->>>>> +
->>>>> +remove:
->>>>> +       /* Remove device state if device no longer exists or is not paired */
->>>>> +       if (queue_remove(state->db->device_states, state)) {
->>>>> +               queue_foreach(state->ccc_states, clear_ccc_state, state->db);
->>>>> +               device_state_free(state);
->>>>> +       }
->>>>> +}
->>>>> +
->>>>> +static bool get_dst_info(struct bt_att *att, bdaddr_t *dst, uint8_t *dst_type)
->>>>> +{
->>>>> +       GIOChannel *io = NULL;
->>>>> +       GError *gerr = NULL;
->>>>> +
->>>>> +       io = g_io_channel_unix_new(bt_att_get_fd(att));
->>>>> +       if (!io)
->>>>> +               return false;
->>>>> +
->>>>> +       bt_io_get(io, &gerr, BT_IO_OPT_DEST_BDADDR, dst,
->>>>> +                                               BT_IO_OPT_DEST_TYPE, dst_type,
->>>>> +                                               BT_IO_OPT_INVALID);
->>>>> +       if (gerr) {
->>>>> +               error("gatt: bt_io_get: %s", gerr->message);
->>>>> +               g_error_free(gerr);
->>>>> +               g_io_channel_unref(io);
->>>>> +               return false;
->>>>> +       }
->>>>> +
->>>>> +       g_io_channel_unref(io);
->>>>> +       return true;
->>>>> +}
->>>>> +
->>>>>  static struct device_state *get_device_state(struct btd_gatt_database *database,
->>>>> -                                                       bdaddr_t *bdaddr,
->>>>> -                                                       uint8_t bdaddr_type)
->>>>> +                                               struct bt_att *att)
->>>>>  {
->>>>>         struct device_state *dev_state;
->>>>> +       bdaddr_t bdaddr;
->>>>> +       uint8_t bdaddr_type;
->>>>> +
->>>>> +       if (!get_dst_info(att, &bdaddr, &bdaddr_type))
->>>>> +               return NULL;
->>>>>
->>>>>         /*
->>>>>          * Find and return a device state. If a matching state doesn't exist,
->>>>>          * then create a new one.
->>>>>          */
->>>>> -       dev_state = find_device_state(database, bdaddr, bdaddr_type);
->>>>> +       dev_state = find_device_state(database, &bdaddr, bdaddr_type);
->>>>>         if (dev_state)
->>>>> -               return dev_state;
->>>>> +               goto done;
->>>>>
->>>>> -       dev_state = device_state_create(bdaddr, bdaddr_type);
->>>>> +       dev_state = device_state_create(database, &bdaddr, bdaddr_type);
->>>>>
->>>>>         queue_push_tail(database->device_states, dev_state);
->>>>>
->>>>> +done:
->>>>> +       dev_state->disc_id = bt_att_register_disconnect(att, att_disconnected,
->>>>> +                                                       dev_state, NULL);
->>>>> +
->>>>>         return dev_state;
->>>>>  }
->>>>>
->>>>>  static struct ccc_state *get_ccc_state(struct btd_gatt_database *database,
->>>>> -                                                       bdaddr_t *bdaddr,
->>>>> -                                                       uint8_t bdaddr_type,
->>>>> -                                                       uint16_t handle)
->>>>> +                                       struct bt_att *att, uint16_t handle)
->>>>>  {
->>>>>         struct device_state *dev_state;
->>>>>         struct ccc_state *ccc;
->>>>>
->>>>> -       dev_state = get_device_state(database, bdaddr, bdaddr_type);
->>>>> +       dev_state = get_device_state(database, att);
->>>>> +       if (!dev_state)
->>>>> +               return NULL;
->>>>>
->>>>>         ccc = find_ccc_state(dev_state, handle);
->>>>>         if (ccc)
->>>>> @@ -300,14 +385,6 @@ static struct ccc_state *get_ccc_state(struct btd_gatt_database *database,
->>>>>         return ccc;
->>>>>  }
->>>>>
->>>>> -static void device_state_free(void *data)
->>>>> -{
->>>>> -       struct device_state *state = data;
->>>>> -
->>>>> -       queue_destroy(state->ccc_states, free);
->>>>> -       free(state);
->>>>> -}
->>>>> -
->>>>>  static void cancel_pending_read(void *data)
->>>>>  {
->>>>>         struct pending_op *op = data;
->>>>> @@ -690,29 +767,6 @@ static void populate_gap_service(struct btd_gatt_database *database)
->>>>>         gatt_db_service_set_active(service, true);
->>>>>  }
->>>>>
->>>>> -static bool get_dst_info(struct bt_att *att, bdaddr_t *dst, uint8_t *dst_type)
->>>>> -{
->>>>> -       GIOChannel *io = NULL;
->>>>> -       GError *gerr = NULL;
->>>>> -
->>>>> -       io = g_io_channel_unix_new(bt_att_get_fd(att));
->>>>> -       if (!io)
->>>>> -               return false;
->>>>> -
->>>>> -       bt_io_get(io, &gerr, BT_IO_OPT_DEST_BDADDR, dst,
->>>>> -                                               BT_IO_OPT_DEST_TYPE, dst_type,
->>>>> -                                               BT_IO_OPT_INVALID);
->>>>> -       if (gerr) {
->>>>> -               error("gatt: bt_io_get: %s", gerr->message);
->>>>> -               g_error_free(gerr);
->>>>> -               g_io_channel_unref(io);
->>>>> -               return false;
->>>>> -       }
->>>>> -
->>>>> -       g_io_channel_unref(io);
->>>>> -       return true;
->>>>> -}
->>>>> -
->>>>>  static void gatt_ccc_read_cb(struct gatt_db_attribute *attrib,
->>>>>                                         unsigned int id, uint16_t offset,
->>>>>                                         uint8_t opcode, struct bt_att *att,
->>>>> @@ -724,8 +778,6 @@ static void gatt_ccc_read_cb(struct gatt_db_attribute *attrib,
->>>>>         uint8_t ecode = 0;
->>>>>         const uint8_t *value = NULL;
->>>>>         size_t len = 0;
->>>>> -       bdaddr_t bdaddr;
->>>>> -       uint8_t bdaddr_type;
->>>>>
->>>>>         handle = gatt_db_attribute_get_handle(attrib);
->>>>>
->>>>> @@ -736,13 +788,12 @@ static void gatt_ccc_read_cb(struct gatt_db_attribute *attrib,
->>>>>                 goto done;
->>>>>         }
->>>>>
->>>>> -       if (!get_dst_info(att, &bdaddr, &bdaddr_type)) {
->>>>> +       ccc = get_ccc_state(database, att, handle);
->>>>> +       if (!ccc) {
->>>>>                 ecode = BT_ATT_ERROR_UNLIKELY;
->>>>>                 goto done;
->>>>>         }
->>>>>
->>>>> -       ccc = get_ccc_state(database, &bdaddr, bdaddr_type, handle);
->>>>> -
->>>>>         len = 2 - offset;
->>>>>         value = len ? &ccc->value[offset] : NULL;
->>>>>
->>>>> @@ -761,8 +812,6 @@ static void gatt_ccc_write_cb(struct gatt_db_attribute *attrib,
->>>>>         struct ccc_cb_data *ccc_cb;
->>>>>         uint16_t handle;
->>>>>         uint8_t ecode = 0;
->>>>> -       bdaddr_t bdaddr;
->>>>> -       uint8_t bdaddr_type;
->>>>>
->>>>>         handle = gatt_db_attribute_get_handle(attrib);
->>>>>
->>>>> @@ -778,13 +827,12 @@ static void gatt_ccc_write_cb(struct gatt_db_attribute *attrib,
->>>>>                 goto done;
->>>>>         }
->>>>>
->>>>> -       if (!get_dst_info(att, &bdaddr, &bdaddr_type)) {
->>>>> +       ccc = get_ccc_state(database, att, handle);
->>>>> +       if (!ccc) {
->>>>>                 ecode = BT_ATT_ERROR_UNLIKELY;
->>>>>                 goto done;
->>>>>         }
->>>>>
->>>>> -       ccc = get_ccc_state(database, &bdaddr, bdaddr_type, handle);
->>>>> -
->>>>>         ccc_cb = queue_find(database->ccc_callbacks, ccc_cb_match_handle,
->>>>>                         UINT_TO_PTR(gatt_db_attribute_get_handle(attrib)));
->>>>>         if (!ccc_cb) {
->>>>> @@ -940,8 +988,11 @@ static void send_notification_to_device(void *data, void *user_data)
->>>>>
->>>>>  remove:
->>>>>         /* Remove device state if device no longer exists or is not paired */
->>>>> -       if (queue_remove(notify->database->device_states, device_state))
->>>>> +       if (queue_remove(notify->database->device_states, device_state)) {
->>>>> +               queue_foreach(device_state->ccc_states, clear_ccc_state,
->>>>> +                                               notify->database);
->>>>>                 device_state_free(device_state);
->>>>> +       }
->>>>>  }
->>>>>
->>>>>  static void send_notification_to_devices(struct btd_gatt_database *database,
->>>>> --
->>>>> 2.13.6
->>>>>
->>>>> --
->>>>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->>>>> the body of a message to majordomo@vger.kernel.org
->>>>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->>>
->>>
->>>
->>> --
->>> Luiz Augusto von Dentz
->
->
->
-> --
-> Luiz Augusto von Dentz
