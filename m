@@ -1,34 +1,92 @@
-Return-Path: <linux-kernel-owner@vger.kernel.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-From: Bartosz Chronowski <ext.bartosz.chronowski@tieto.com>
-Date: Wed, 25 Oct 2017 16:05:34 +0200
-Message-ID: <CAJH2EMzpFJ0cOrBu7hfNRn1JqKUuQdQhO36MNqWXOceqF5i21w@mail.gmail.com>
-Subject: [PATCH] Bluetooth: btusb: Add new NFA344A entry.
-To: marcel@holtmann.org, linux-bluetooth@vger.kernel.org,
-        gustavo@padovan.org, johan.hedberg@gmail.com
-Cc: linux-kernel@vger.kernel.org
+In-Reply-To: <CALvjcs-HuvDjGo3ynvnxx47yXX4DJF1SFzdYkE1BY8VKcQD5Ng@mail.gmail.com>
+References: <20171023111723.20729-1-luiz.dentz@gmail.com> <20171023111723.20729-2-luiz.dentz@gmail.com>
+ <CALvjcs9i_J5H2jbVWToQbc4xNo9+N3jxrHh3FTo7LKjRN1E=Wg@mail.gmail.com>
+ <CABBYNZKgHAUTipjRzxN=_sWH=ooRs3PHnhKaotc33epHQ7efhA@mail.gmail.com>
+ <CALvjcs-SbR8JXDEvKRxD1Eq08PyN9D5zEDjc9P8puDMJDwJr=w@mail.gmail.com>
+ <CABBYNZJuyZOEzLV0fkU8xTpPWuzc76CeYBLUR9DNq2c4pVPN5w@mail.gmail.com> <CALvjcs-HuvDjGo3ynvnxx47yXX4DJF1SFzdYkE1BY8VKcQD5Ng@mail.gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Wed, 25 Oct 2017 16:27:22 +0300
+Message-ID: <CABBYNZ+WCNvJHgzM2JU2NxeNvUsDmThxw_Ly1uX83S7=tcNN4g@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 2/3] gatt: Clear subscriptions for device not paired
+To: Yunhan Wang <yunhanw@nestlabs.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Sender: linux-kernel-owner@vger.kernel.org
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This change allows proper low power mode entry in suspend.
+Hi Yunhan,
 
-Signed-off-by: Bartosz Chronowski <ext.bartosz.chronowski@tieto.com>
----
- drivers/bluetooth/btusb.c | 1 +
- 1 file changed, 1 insertion(+)
+On Wed, Oct 25, 2017 at 10:58 AM, Yunhan Wang <yunhanw@nestlabs.com> wrote:
+> Hi, Luiz
+>
+> On Tue, Oct 24, 2017 at 1:10 AM, Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+>> Hi Yunhan,
+>>
+>> On Mon, Oct 23, 2017 at 11:59 PM, Yunhan Wang <yunhanw@nestlabs.com> wrote:
+>>> Hi, Luiz
+>>>
+>>> I have tried this, I think the issue is still there with your patch.
+>>
+>> I don't see any problem:
+>>
+>> bluetoothd[13968]: src/device.c:att_disconnected_cb() Software caused
+>> connection abort (103)
+>> bluetoothd[13968]: src/gatt-client.c:btd_gatt_client_disconnected()
+>> Device disconnected. Cleaning up.
+>> bluetoothd[13968]: src/device.c:att_disconnected_cb() Automatic
+>> connection disabled
+>> bluetoothd[13968]: attrib/gattrib.c:g_attrib_unref() 0x8897600: g_attrib_unref=0
+>> bluetoothd[13968]: src/gatt-database.c:att_disconnected()
+>> bluetoothd[13968]: src/gatt-database.c:ccc_write_cb() External CCC
+>> write received with value: 0x0000
+>>
+>> Could you try running under valgrind?
+>>
+> Yes, just tried under valgrind, the issue is constantly reprodcued.
+> Btw, I am currently using btvirt -L -l2, one client, one server, then
+> bluetoothd crash after client issue ble disconnect. I am using bluez
+> lateset master.
+>
+> sudo valgrind ./src/bluetoothd --experimental --debug
+> ==31609== Jump to the invalid address stated on the next line
+> ==31609==    at 0x0: ???
+> ==31609==    by 0x481B4C: queue_foreach (queue.c:220)
+> ==31609==    by 0x4436C8: att_disconnected (gatt-database.c:310)
+> ==31609==    by 0x481B4C: queue_foreach (queue.c:220)
+> ==31609==    by 0x486631: disconnect_cb (att.c:590)
+> ==31609==    by 0x48FBC4: watch_callback (io-glib.c:170)
+> ==31609==    by 0x4E7FCE4: g_main_context_dispatch (in
+> /lib/x86_64-linux-gnu/libglib-2.0.so.0.4002.0)
+> ==31609==    by 0x4E80047: ??? (in
+> /lib/x86_64-linux-gnu/libglib-2.0.so.0.4002.0)
+> ==31609==    by 0x4E80309: g_main_loop_run (in
+> /lib/x86_64-linux-gnu/libglib-2.0.so.0.4002.0)
+> ==31609==    by 0x40B51A: main (main.c:770)
+> ==31609==  Address 0x0 is not stack'd, malloc'd or (recently) free'd
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 7a5c06a..513a7a5 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -272,6 +272,7 @@ static const struct usb_device_id blacklist_table[] = {
-  { USB_DEVICE(0x0cf3, 0xe301), .driver_info = BTUSB_QCA_ROME },
-  { USB_DEVICE(0x0cf3, 0xe360), .driver_info = BTUSB_QCA_ROME },
-  { USB_DEVICE(0x0489, 0xe092), .driver_info = BTUSB_QCA_ROME },
-+ { USB_DEVICE(0x0489, 0xe09f), .driver_info = BTUSB_QCA_ROME },
-  { USB_DEVICE(0x0489, 0xe0a2), .driver_info = BTUSB_QCA_ROME },
-  { USB_DEVICE(0x04ca, 0x3011), .driver_info = BTUSB_QCA_ROME },
-  { USB_DEVICE(0x04ca, 0x3016), .driver_info = BTUSB_QCA_ROME },
+It turns out the ccc_cb->callback could be NULL in case of
+svc_changed, though I not sure why in our case it did not have the
+last call pointing to clear_ccc_state:
+
+      at 0x0: ???
+      by 0x475C7C: clear_ccc_state (gatt-database.c:287)
+      by 0x4D28CF: queue_foreach (queue.c:220)
+      by 0x475FE7: att_disconnected (gatt-database.c:310)
+      by 0x4D7255: disconn_handler (att.c:538)
+      by 0x4D28CF: queue_foreach (queue.c:220)
+      by 0x4D8F39: disconnect_cb (att.c:590)
+      by 0x4E6B3A: watch_callback (io-glib.c:170)
+      by 0x50CD246: g_main_context_dispatch (in
+/usr/lib64/libglib-2.0.so.0.5200.3)
+      by 0x50CD5E7: ??? (in /usr/lib64/libglib-2.0.so.0.5200.3)
+      by 0x50CD901: g_main_loop_run (in /usr/lib64/libglib-2.0.so.0.5200.3)
+      by 0x40CD90: main (main.c:770)
+    Address 0x0 is not stack'd, malloc'd or (recently) free'd
+
+Anyway now this should fixed upstream, thanks for the report.
+
 -- 
-2.7.4
+Luiz Augusto von Dentz
