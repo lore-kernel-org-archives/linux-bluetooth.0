@@ -1,161 +1,131 @@
-Return-Path: <linux-wpan-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <20171018122705.25478-1-patrik.flykt@linux.intel.com>
-References: <20171018120615.24126-3-patrik.flykt@linux.intel.com>
- <20171018120615.24126-4-patrik.flykt@linux.intel.com> <20171018122705.25478-1-patrik.flykt@linux.intel.com>
-From: Alexander Aring <aring@mojatatu.com>
-Date: Thu, 26 Oct 2017 10:54:01 -0400
-Message-ID: <CAOHTApijss4n7r6tr7oMdGGduzVs-Hx=s0r5uL4+ACX1d=ePFw@mail.gmail.com>
-Subject: Re: [RFC 3/3] tun: Add 6LoWPAN compression/decompression to tun driver
-To: Patrik Flykt <patrik.flykt@linux.intel.com>
-Cc: linux-bluetooth@vger.kernel.org,
-        linux-wpan - ML <linux-wpan@vger.kernel.org>,
-        luiz.von.dentz@intel.com, Jamal Hadi Salim <hadi@mojatatu.com>,
-        Stefan Schmidt <stefan@osg.samsung.com>, mcr@sandelman.ca
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Message-ID: <1509029222.28409.47.camel@hadess.net>
+Subject: Re: [PATCH 2/3] profiles/battery: Add Bluetooth LE Battery service
+From: Bastien Nocera <hadess@hadess.net>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Thu, 26 Oct 2017 16:47:02 +0200
+In-Reply-To: <CABBYNZK6x550AODT1Ci+ROxS_G5HqR7fwRBpafxF_oN0q0RQiA@mail.gmail.com>
+References: <20171020230304.21173-1-hadess@hadess.net>
+         <20171020230304.21173-2-hadess@hadess.net>
+         <CABBYNZLRHvKuLqL5T8yY7CCUq5-gzc-Y3LzKr6XQWbbvJT1Gdg@mail.gmail.com>
+         <1508848208.28409.22.camel@hadess.net>
+         <CABBYNZJw_TTOgBJsB-q8T=BVx6L=VbpOp9Fp8zTXdeEseA2zdg@mail.gmail.com>
+         <CABBYNZK6x550AODT1Ci+ROxS_G5HqR7fwRBpafxF_oN0q0RQiA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Sender: linux-wpan-owner@vger.kernel.org
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+On Thu, 2017-10-26 at 16:36 +0300, Luiz Augusto von Dentz wrote:
+> Hi Bastien,
+> 
+> On Thu, Oct 26, 2017 at 4:19 PM, Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+> > Hi Bastien,
+> > 
+> > On Tue, Oct 24, 2017 at 3:30 PM, Bastien Nocera <hadess@hadess.net>
+> > wrote:
+> > > On Tue, 2017-10-24 at 14:58 +0300, Luiz Augusto von Dentz wrote:
+> > > > Hi Bastien,
+> > > > 
+> > > > On Sat, Oct 21, 2017 at 2:03 AM, Bastien Nocera <hadess@hadess.
+> > > > net>
+> > > > wrote:
+> > > > > Only the Battery Level characteristic was tested with a
+> > > > > Microsoft Arc Touch Mouse SE.
+> > > > > 
+> > > > > This patch however hopes to support both the Battery Level
+> > > > > and
+> > > > > the Battery Power State characteristics.
+> > > > > ---
+> > > > >  Makefile.plugins           |   3 +
+> > > > >  doc/battery-api.txt        |  36 +++
+> > > > >  profiles/battery/battery.c | 568
+> > > > > +++++++++++++++++++++++++++++++++++++++++++++
+> > > > >  3 files changed, 607 insertions(+)
+> > > > >  create mode 100644 doc/battery-api.txt
+> > > > >  create mode 100644 profiles/battery/battery.c
+> > > > > 
+> > > > > diff --git a/Makefile.plugins b/Makefile.plugins
+> > > > > index 73377e532..1f3b5b552 100644
+> > > > > --- a/Makefile.plugins
+> > > > > +++ b/Makefile.plugins
+> > > > > @@ -100,6 +100,9 @@ builtin_sources += profiles/midi/midi.c \
+> > > > >  builtin_ldadd += @ALSA_LIBS@
+> > > > >  endif
+> > > > > 
+> > > > > +builtin_modules += battery
+> > > > > +builtin_sources += profiles/battery/battery.c
+> > > > > +
+> > > > >  if SIXAXIS
+> > > > >  plugin_LTLIBRARIES += plugins/sixaxis.la
+> > > > >  plugins_sixaxis_la_SOURCES = plugins/sixaxis.c
+> > > > > diff --git a/doc/battery-api.txt b/doc/battery-api.txt
+> > > > > new file mode 100644
+> > > > > index 000000000..6d28f7b17
+> > > > > --- /dev/null
+> > > > > +++ b/doc/battery-api.txt
+> > > > > @@ -0,0 +1,36 @@
+> > > > > +BlueZ D-Bus Battery API description
+> > > > > +***********************************
+> > > > > +
+> > > > > +
+> > > > > +Battery hierarchy
+> > > > > +=================
+> > > > > +
+> > > > > +Service                org.bluez
+> > > > > +Interface      org.bluez.Battery1
+> > > > > +Object path    [variable
+> > > > > prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX
+> > > > > +
+> > > > > +Properties     boolean Present [readonly]
+> > > > > +
+> > > > > +                       Whether the device has a battery
+> > > > > present.
+> > > > 
+> > > > Not sure why would we have this as a property, if the battery
+> > > > is not
+> > > > present then we should not even publish the interface.
+> > > 
+> > > UPower has a "present" property as well, so this matches both the
+> > > service and the UPower properties. It avoids logic bugs where the
+> > > battery presence changes but we'd forget to export/unexport the
+> > > interface (or races). Finally, it's useful information for
+> > > devices
+> > > which have another means of power (I can imagine some devices
+> > > having
+> > > batteries, but also working wired, with a removable battery).
+> > 
+> > Not sure what another power source has to do with it? Power and
+> > battery are 2 different things. About race conditions, if you do
+> > have
+> > the interface it means it is battery powered if we do set its
+> > presence
+> > to false all other properties should be invalidated as well and the
+> > same should go when battery is plugged again all properties have to
+> > be
+> > fetched once again, so imo it easier to add and remove the entire
+> > interface to avoid having properties in inconsistent state. Btw,
+> > forgetting to export/unexport may happen either way if the device
+> > decides to remove the entire service that is what should happen, in
+> > fact is what I would do if implementing the service so there is no
+> > chance the remote side would maintain a subscription for something
+> > that is not actually present anymore.
+> 
+> Btw, the battery state don't seem to be even mentioned in the spec,
+> also the service declaration don't mention it only the battery level:
+> 
+> https://www.bluetooth.com/specifications/gatt/viewer?attributeXmlFile
+> =org.bluetooth.service.battery_service.xml
 
-First: I always asked myself: 6LoTUN makes no sense because 6LoWPAN
-depends on MAC information and TUN interfaces works because IPv6
-doesn't depend on MAC information. Now everything is more clear, this
-has nothing todo with TUN it's TAP because you use ethernet MAC
-information to do 6LoWPAN stuff.
+You're looking at the wrong spec. There's 2 different set of
+characteristics, one called "Battery Level", which pretty much only
+exports the percentage, and "Battery State" which has a presence value:
+https://www.bluetooth.com/specifications/gatt/viewer?attributeXmlFile=org.bluetooth.characteristic.battery_power_state.xml
 
-On Wed, Oct 18, 2017 at 8:27 AM, Patrik Flykt
-<patrik.flykt@linux.intel.com> wrote:
-> Define a new IFF_6LO flag for the tun/tap driver that enables 6LoWPAN
-> compression/decompression for tap devices. This is achieved by calling
-> lowpan_header_compress once the sk_buff is destined for user space and
-> calling lowpan_header_decompress when the user space writes packets to
-> kernel. A copy of the ethernet MAC headers are needed both ways, as
-> the 6LoWPAN compression may end up expanding the header size by one
-> byte in the worst case.
->
-> LOWPAN_IPHC_MAX_HC_BUF_LEN more bytes are added to sk_buff headroom
-> to ensure there will be enough bytes to push headers to. This is
-> probably an overkill and probably done wrongly anyway.
->
-This define should be removed because there exists no case where the
-compression will be larger than the ipv6 header and vice versa.
+I don't know whether it's actually an adopted spec, or whether it's
+used, and I'm fine simply removing the support for the time being. Or
+we could implement it and see whether it breaks anything :)
 
-
-> An ethernet MAC header is added in front of the (compressed) IPv6
-> datagram in both directions; no such transport exists for 6LoWPAN,
-> but this is just an example implementation trying to explain the
-> idea behind the BTLE handling in user space and the 6LoWPAN
-> compression and decompression in kernel space. Thus the tun/tap
-> driver comes in handy as the victim of the demonstration.
->
-
-Sorry but this really scares me. The kernel use 6LoWPAN IPHC for
-ethernet (as mac header information) and you doing BTLE/L2CAP stuff in
-user space which is not anymore for your original use-case which is
-"ethernet".
-This might work for now, because only address handling is used in IPHC
-as MAC header information and eth/btle use the same address length
-(besides that the address is not always the same and BTLE is not a
-EUI-48 address with multicast bit etc.)
-You cannot simple use MAC X handling in kernelspace and use then MAC
-handling Y in userspace - this will not work for long time. I already
-fight with UDP based protocols in 802.15.4 6LoWPAN who depends on
-802.15.4 MAC information which are not just addressing information. If
-they need more bluetooth related information there you have no
-possibility to get them. The same for next header compression which
-might want more MAC information than just addressing for bluetooth.
-
-> Signed-off-by: Patrik Flykt <patrik.flykt@linux.intel.com>
-> ---
->
->         Hi,
->
-> This is the one applying on fac72b24.
->
->
->      Patrik
->
->
->  drivers/net/tun.c           | 61 +++++++++++++++++++++++++++++++++++++++++++--
->  include/uapi/linux/if_tun.h |  1 +
->  2 files changed, 60 insertions(+), 2 deletions(-)
->
-> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
-> index 57e4c31fa84a..11b6494bb7ca 100644
-> --- a/drivers/net/tun.c
-> +++ b/drivers/net/tun.c
-> @@ -66,6 +66,7 @@
->  #include <linux/nsproxy.h>
->  #include <linux/virtio_net.h>
->  #include <linux/rcupdate.h>
-> +#include <net/6lowpan.h>
->  #include <net/net_namespace.h>
->  #include <net/netns/generic.h>
->  #include <net/rtnetlink.h>
-> @@ -231,6 +232,8 @@ struct tun_struct {
->         u32 rx_batched;
->         struct tun_pcpu_stats __percpu *pcpu_stats;
->         struct bpf_prog __rcu *xdp_prog;
-> +
-> +       struct lowpan_dev       ldev;
->  };
->
->  static int tun_napi_receive(struct napi_struct *napi, int budget)
-> @@ -1071,6 +1074,9 @@ static void tun_set_headroom(struct net_device *dev, int new_hr)
->                 new_hr = NET_SKB_PAD;
->
->         tun->align = new_hr;
-> +
-> +       if ((tun->flags & (IFF_TAP|IFF_6LO)) == (IFF_TAP|IFF_6LO))
-> +               tun->align += LOWPAN_IPHC_MAX_HC_BUF_LEN;
->  }
->
->  static void
-> @@ -1697,6 +1703,27 @@ static ssize_t tun_get_user(struct tun_struct *tun, struct tun_file *tfile,
->                 skb->dev = tun->dev;
->                 break;
->         case IFF_TAP:
-> +               if (tun->flags & IFF_6LO) {
-> +                       struct ethhdr eth;
-> +
-> +                       skb_reset_mac_header(skb);
-> +                       memcpy(&eth, skb_mac_header(skb), sizeof(eth));
-> +
-> +                       skb_pull(skb, sizeof(struct ethhdr));
-> +                       skb_reset_network_header(skb);
-> +
-> +                       if (lowpan_header_decompress(skb, &tun->ldev,
-> +                                                       tun->dev->dev_addr,
-> +                                                       &eth.h_source) < 0) {
-
-This will make a module dependency of 6lowpan_iphc for the tap driver.
-I am pretty sure that the tap driver people doesn't like that. Which
-brings me to another issue with this patch:
-Why you don't create a virtual lowpan interface on top of the tap
-device. This handling is _incredibly_ against our design to have a
-6LoWPAN interface device type for the user space.
-Now we have will have a tap device which makes internally 6LoWPAN
-handling but is not visible as 6LoWPAN interface in the user space,
-this will confuse 6LoWPAN user space applications.
-
-What our design is (just to remember):
- - Ethernet interface (MAC/6LoWPAN view, before adaption)
- - 6LoWPAN interface (IPv6 view, after adaption)
-
-I am pretty sure you can run your above changes transparently
-separated of TAP driver by adding a 6LoWPAN interface on top. This
-will also make no dependency to the TAP driver.
-
-I guess what you want is a TAP interface which is NOT ethernet. It
-need to get some special MAC information for your subsystem which is
-BTLE. Not using ethernet here. To have the assumption here "it will
-work because the address length is the same" is simple wrong, they
-will be more use-cases where upper-layers need to have special MAC
-information belongs to your link-layer subsystem.
-So, my guess, the bluetooth subsystem need some TAP like
-interface(hci) maybe? 6LoWPAN has nothing to do with ethernet yet. You
-need to put more logic in your link-layer subsystem to adapt ideas
-from other link-layer subsystems which has no 6LoWPAN support at all.
-
-- Alex
+Cheers
