@@ -1,87 +1,142 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZL9o_86J5LcobiJJMN7E8BAOaJAHBUbtF68D1e4=q1qBA@mail.gmail.com>
-References: <CGME20171025063956epcas1p226e935dfc7347c738230c125c340766b@epcas1p2.samsung.com>
- <1508913572-10746-1-git-send-email-anupam.r@samsung.com> <CABBYNZL9o_86J5LcobiJJMN7E8BAOaJAHBUbtF68D1e4=q1qBA@mail.gmail.com>
+In-Reply-To: <CABBYNZJw_TTOgBJsB-q8T=BVx6L=VbpOp9Fp8zTXdeEseA2zdg@mail.gmail.com>
+References: <20171020230304.21173-1-hadess@hadess.net> <20171020230304.21173-2-hadess@hadess.net>
+ <CABBYNZLRHvKuLqL5T8yY7CCUq5-gzc-Y3LzKr6XQWbbvJT1Gdg@mail.gmail.com>
+ <1508848208.28409.22.camel@hadess.net> <CABBYNZJw_TTOgBJsB-q8T=BVx6L=VbpOp9Fp8zTXdeEseA2zdg@mail.gmail.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 26 Oct 2017 16:58:58 +0300
-Message-ID: <CABBYNZLqH8tOoBM5U0Yp1C2rjS48tZVVBsz9uW+L8tyYNDt3zw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] client: Fix segmentation fault while fetching
- advertising data
-To: Anupam Roy <anupam.r@samsung.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        sachin.dev@samsung.com
+Date: Thu, 26 Oct 2017 16:36:59 +0300
+Message-ID: <CABBYNZK6x550AODT1Ci+ROxS_G5HqR7fwRBpafxF_oN0q0RQiA@mail.gmail.com>
+Subject: Re: [PATCH 2/3] profiles/battery: Add Bluetooth LE Battery service
+To: Bastien Nocera <hadess@hadess.net>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Anupam,
+Hi Bastien,
 
-On Thu, Oct 26, 2017 at 3:29 PM, Luiz Augusto von Dentz
+On Thu, Oct 26, 2017 at 4:19 PM, Luiz Augusto von Dentz
 <luiz.dentz@gmail.com> wrote:
-> Hi Anupam,
+> Hi Bastien,
 >
-> On Wed, Oct 25, 2017 at 9:39 AM, Anupam Roy <anupam.r@samsung.com> wrote:
->> While testing advertisement, I encountered Seg fault in client, when bluetoothd
->> tries to fetch the Adv data set by client. It can happen either while fetching
->> Manufacturer specific data or Service data. Backtrace is provided below for reference
->> After fix is applied, advertisement works fine for me. I am sending the following patch
->> your review. Thank you.
+> On Tue, Oct 24, 2017 at 3:30 PM, Bastien Nocera <hadess@hadess.net> wrote:
+>> On Tue, 2017-10-24 at 14:58 +0300, Luiz Augusto von Dentz wrote:
+>>> Hi Bastien,
+>>>
+>>> On Sat, Oct 21, 2017 at 2:03 AM, Bastien Nocera <hadess@hadess.net>
+>>> wrote:
+>>> > Only the Battery Level characteristic was tested with a
+>>> > Microsoft Arc Touch Mouse SE.
+>>> >
+>>> > This patch however hopes to support both the Battery Level and
+>>> > the Battery Power State characteristics.
+>>> > ---
+>>> >  Makefile.plugins           |   3 +
+>>> >  doc/battery-api.txt        |  36 +++
+>>> >  profiles/battery/battery.c | 568
+>>> > +++++++++++++++++++++++++++++++++++++++++++++
+>>> >  3 files changed, 607 insertions(+)
+>>> >  create mode 100644 doc/battery-api.txt
+>>> >  create mode 100644 profiles/battery/battery.c
+>>> >
+>>> > diff --git a/Makefile.plugins b/Makefile.plugins
+>>> > index 73377e532..1f3b5b552 100644
+>>> > --- a/Makefile.plugins
+>>> > +++ b/Makefile.plugins
+>>> > @@ -100,6 +100,9 @@ builtin_sources += profiles/midi/midi.c \
+>>> >  builtin_ldadd += @ALSA_LIBS@
+>>> >  endif
+>>> >
+>>> > +builtin_modules += battery
+>>> > +builtin_sources += profiles/battery/battery.c
+>>> > +
+>>> >  if SIXAXIS
+>>> >  plugin_LTLIBRARIES += plugins/sixaxis.la
+>>> >  plugins_sixaxis_la_SOURCES = plugins/sixaxis.c
+>>> > diff --git a/doc/battery-api.txt b/doc/battery-api.txt
+>>> > new file mode 100644
+>>> > index 000000000..6d28f7b17
+>>> > --- /dev/null
+>>> > +++ b/doc/battery-api.txt
+>>> > @@ -0,0 +1,36 @@
+>>> > +BlueZ D-Bus Battery API description
+>>> > +***********************************
+>>> > +
+>>> > +
+>>> > +Battery hierarchy
+>>> > +=================
+>>> > +
+>>> > +Service                org.bluez
+>>> > +Interface      org.bluez.Battery1
+>>> > +Object path    [variable
+>>> > prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX
+>>> > +
+>>> > +Properties     boolean Present [readonly]
+>>> > +
+>>> > +                       Whether the device has a battery present.
+>>>
+>>> Not sure why would we have this as a property, if the battery is not
+>>> present then we should not even publish the interface.
 >>
->> Passing val instead of &val in dbus_message_iter_append_fixed_array
->> DBUS API causes segmentation fault while fecthing Manufacturer
->> data or service data set by client.
->>
->> BT Before Fix:
->> [bluetooth]# set-advertise-name Test
->> [bluetooth]# set-advertise-uuids 0x1824
->> [bluetooth]# set-advertise-manufacturer 0x75 0x02 0x03 0x04
->> [bluetooth]# advertise on
->>
->> Program received signal SIGSEGV, Segmentation fault.
->> in append_array_variant(iter=iter@entry=0x7fffffffd780,
->> val=val@entry=0x62485a <ad+90>, n_elements=n_elements@entry=3, type=121) at client/advertising.c:178
->> in dict_append_basic_array(type=121, n_elements=3,
->> val=0x62485a <ad+90>, key=0x624858 <ad+88>, key_type=113, dict=0x7fffffffd730) at client/advertising.c:205
->> get_manufacturer_data(property=<optimized out>, iter=0x7fffffffd840,
->> user_data=<optimized out>) at client/advertising.c:253
->>
->> After Fix:
->> [bluetooth]# set-advertise-name Test
->> [bluetooth]# set-advertise-uuids 0x1824
->> [bluetooth]# set-advertise-manufacturer 0x75 0x02 0x03 0x04
->> [bluetooth]# advertise on
->> [CHG] Controller 00:19:0E:11:55:44 SupportedInstances: 0x04
->> [CHG] Controller 00:19:0E:11:55:44 ActiveInstances: 0x01
->> Advertising object registered
->> [bluetooth]#
->> ---
->>  client/advertising.c | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/client/advertising.c b/client/advertising.c
->> index 76cee3d..7d98ae3 100644
->> --- a/client/advertising.c
->> +++ b/client/advertising.c
->> @@ -175,7 +175,7 @@ static void append_array_variant(DBusMessageIter *iter, int type, void *val,
->>                                                 type_sig, &array);
->>
->>         if (dbus_type_is_fixed(type) == TRUE) {
->> -               dbus_message_iter_append_fixed_array(&array, type, val,
->> +               dbus_message_iter_append_fixed_array(&array, type, &val,
->>                                                         n_elements);
->>         } else if (type == DBUS_TYPE_STRING || type == DBUS_TYPE_OBJECT_PATH) {
->>                 const char ***str_array = val;
->> --
->> 1.9.1
+>> UPower has a "present" property as well, so this matches both the
+>> service and the UPower properties. It avoids logic bugs where the
+>> battery presence changes but we'd forget to export/unexport the
+>> interface (or races). Finally, it's useful information for devices
+>> which have another means of power (I can imagine some devices having
+>> batteries, but also working wired, with a removable battery).
 >
-> Thanks for the patch but the proper fix is to call dict_append_array
-> with correct pointer otherwise this API will not be consistent with
-> libdbus, so we may want to have pointer to &ad->data and then pass its
-> address there.
+> Not sure what another power source has to do with it? Power and
+> battery are 2 different things. About race conditions, if you do have
+> the interface it means it is battery powered if we do set its presence
+> to false all other properties should be invalidated as well and the
+> same should go when battery is plugged again all properties have to be
+> fetched once again, so imo it easier to add and remove the entire
+> interface to avoid having properties in inconsistent state. Btw,
+> forgetting to export/unexport may happen either way if the device
+> decides to remove the entire service that is what should happen, in
+> fact is what I would do if implementing the service so there is no
+> chance the remote side would maintain a subscription for something
+> that is not actually present anymore.
 
-I went ahead and made the changes suggested above and applied it.
-Thanks for the patch.
+Btw, the battery state don't seem to be even mentioned in the spec,
+also the service declaration don't mention it only the battery level:
+
+https://www.bluetooth.com/specifications/gatt/viewer?attributeXmlFile=org.bluetooth.service.battery_service.xml
+
+>>> > +               boolean Rechargeable [readonly]
+>>> > +
+>>> > +                       Whether the battery built into the device
+>>> > is rechargeable
+>>> > +                       or not.
+>>
+>> We wouldn't be able to export this property either if the battery
+>> wasn't present above, and we did hide the interface.
+>> <snip>
+>>> > +       /* Values explained at:
+>>> > +        * https://www.bluetooth.com/specifications/gatt/viewer?att
+>>> > ributeXmlFile=org.bluetooth.characteristic.battery_power_state.xml
+>>> > */
+>>>
+>>> I guess it is better to quote the actual text instead of the link
+>>> here.
+>>
+>> Sure. I'll send an updated patch with that.
+>>
+>> <snip>
+>>> > --
+>>> > 2.14.2
+>>>
+>>> Otherwise looks good.
+>>
+>> Great!
+>
+>
+>
+> --
+> Luiz Augusto von Dentz
+
+
 
 -- 
 Luiz Augusto von Dentz
