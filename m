@@ -1,88 +1,113 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <1508913572-10746-1-git-send-email-anupam.r@samsung.com>
-References: <CGME20171025063956epcas1p226e935dfc7347c738230c125c340766b@epcas1p2.samsung.com>
- <1508913572-10746-1-git-send-email-anupam.r@samsung.com>
+In-Reply-To: <0ff16352-9a23-f0b1-5691-d521b36dcd8c@jp.fujitsu.com>
+References: <0ff16352-9a23-f0b1-5691-d521b36dcd8c@jp.fujitsu.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 26 Oct 2017 15:29:30 +0300
-Message-ID: <CABBYNZL9o_86J5LcobiJJMN7E8BAOaJAHBUbtF68D1e4=q1qBA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] client: Fix segmentation fault while fetching
- advertising data
-To: Anupam Roy <anupam.r@samsung.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        sachin.dev@samsung.com
+Date: Thu, 26 Oct 2017 15:05:23 +0300
+Message-ID: <CABBYNZL6v0qiMJ-73MQmB9nrQhNbq8h0e6fqyBtncRRfTB2E1g@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] obexd: Fix compile error due to lack of header
+To: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Anupam,
+Hi Eramoto,
 
-On Wed, Oct 25, 2017 at 9:39 AM, Anupam Roy <anupam.r@samsung.com> wrote:
-> While testing advertisement, I encountered Seg fault in client, when bluetoothd
-> tries to fetch the Adv data set by client. It can happen either while fetching
-> Manufacturer specific data or Service data. Backtrace is provided below for reference
-> After fix is applied, advertisement works fine for me. I am sending the following patch
-> your review. Thank you.
->
-> Passing val instead of &val in dbus_message_iter_append_fixed_array
-> DBUS API causes segmentation fault while fecthing Manufacturer
-> data or service data set by client.
->
-> BT Before Fix:
-> [bluetooth]# set-advertise-name Test
-> [bluetooth]# set-advertise-uuids 0x1824
-> [bluetooth]# set-advertise-manufacturer 0x75 0x02 0x03 0x04
-> [bluetooth]# advertise on
->
-> Program received signal SIGSEGV, Segmentation fault.
-> in append_array_variant(iter=iter@entry=0x7fffffffd780,
-> val=val@entry=0x62485a <ad+90>, n_elements=n_elements@entry=3, type=121) at client/advertising.c:178
-> in dict_append_basic_array(type=121, n_elements=3,
-> val=0x62485a <ad+90>, key=0x624858 <ad+88>, key_type=113, dict=0x7fffffffd730) at client/advertising.c:205
-> get_manufacturer_data(property=<optimized out>, iter=0x7fffffffd840,
-> user_data=<optimized out>) at client/advertising.c:253
->
-> After Fix:
-> [bluetooth]# set-advertise-name Test
-> [bluetooth]# set-advertise-uuids 0x1824
-> [bluetooth]# set-advertise-manufacturer 0x75 0x02 0x03 0x04
-> [bluetooth]# advertise on
-> [CHG] Controller 00:19:0E:11:55:44 SupportedInstances: 0x04
-> [CHG] Controller 00:19:0E:11:55:44 ActiveInstances: 0x01
-> Advertising object registered
-> [bluetooth]#
+On Thu, Oct 26, 2017 at 9:05 AM, ERAMOTO Masaya
+<eramoto.masaya@jp.fujitsu.com> wrote:
+> When compiling with gcc 7.2.0, gcc outputs the following messages.
+> This patch adds the header stdlib.h to each obex-related header including
+> functions with the type ssize_t, so the same problem does not also happen
+> in case using there headers individually.
+
+Weird this is just happening now, so what did change in 7.2? Usually
+we have stdlib.h included in the c file not in the header.
+
+>   In file included from obexd/plugins/mas.c:41:0:
+>   ./obexd/src/obex.h:37:1: error: unknown type name =E2=80=98ssize_t=E2=
+=80=99; did you mean =E2=80=98size_t=E2=80=99?
+>    ssize_t obex_get_size(struct obex_session *os);
+>    ^~~~~~~
+>    size_t
+>   ./obexd/src/obex.h:45:1: error: unknown type name =E2=80=98ssize_t=E2=
+=80=99; did you mean =E2=80=98size_t=E2=80=99?
+>    ssize_t obex_get_apparam(struct obex_session *os, const uint8_t **buff=
+er);
+>    ^~~~~~~
+>    size_t
+>   ./obexd/src/obex.h:46:1: error: unknown type name =E2=80=98ssize_t=E2=
+=80=99; did you mean =E2=80=98size_t=E2=80=99?
+>    ssize_t obex_get_non_header_data(struct obex_session *os,
+>    ^~~~~~~
+>    size_t
+>   In file included from obexd/plugins/mas.c:43:0:
+>   ./obexd/src/mimetype.h:36:2: error: expected specifier-qualifier-list b=
+efore =E2=80=98ssize_t=E2=80=99
+>     ssize_t (*get_next_header)(void *object, void *buf, size_t mtu,
+>     ^~~~~~~
+>   In file included from obexd/plugins/mas.c:46:0:
+>   obexd/plugins/filesystem.h:24:1: error: unknown type name =E2=80=98ssiz=
+e_t=E2=80=99; did you mean =E2=80=98size_t=E2=80=99?
+>    ssize_t string_read(void *object, void *buf, size_t count);
+>    ^~~~~~~
+>    size_t
 > ---
->  client/advertising.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  obexd/plugins/filesystem.h | 2 ++
+>  obexd/src/mimetype.h       | 2 ++
+>  obexd/src/obex.h           | 2 ++
+>  3 files changed, 6 insertions(+)
 >
-> diff --git a/client/advertising.c b/client/advertising.c
-> index 76cee3d..7d98ae3 100644
-> --- a/client/advertising.c
-> +++ b/client/advertising.c
-> @@ -175,7 +175,7 @@ static void append_array_variant(DBusMessageIter *iter, int type, void *val,
->                                                 type_sig, &array);
+> diff --git a/obexd/plugins/filesystem.h b/obexd/plugins/filesystem.h
+> index f95773beb..441b377a2 100644
+> --- a/obexd/plugins/filesystem.h
+> +++ b/obexd/plugins/filesystem.h
+> @@ -21,6 +21,8 @@
+>   *
+>   */
 >
->         if (dbus_type_is_fixed(type) == TRUE) {
-> -               dbus_message_iter_append_fixed_array(&array, type, val,
-> +               dbus_message_iter_append_fixed_array(&array, type, &val,
->                                                         n_elements);
->         } else if (type == DBUS_TYPE_STRING || type == DBUS_TYPE_OBJECT_PATH) {
->                 const char ***str_array = val;
+> +#include <stdlib.h>
+> +
+>  ssize_t string_read(void *object, void *buf, size_t count);
+>  gboolean is_filename(const char *name);
+>  int verify_path(const char *path);
+> diff --git a/obexd/src/mimetype.h b/obexd/src/mimetype.h
+> index 79529b890..52b544073 100644
+> --- a/obexd/src/mimetype.h
+> +++ b/obexd/src/mimetype.h
+> @@ -21,6 +21,8 @@
+>   *
+>   */
+>
+> +#include <stdlib.h>
+> +
+>  typedef gboolean (*obex_object_io_func) (void *object, int flags, int er=
+r,
+>                                                         void *user_data);
+>
+> diff --git a/obexd/src/obex.h b/obexd/src/obex.h
+> index fc1674755..769bbcd8a 100644
+> --- a/obexd/src/obex.h
+> +++ b/obexd/src/obex.h
+> @@ -22,6 +22,8 @@
+>   *
+>   */
+>
+> +#include <stdlib.h>
+> +
+>  #define OBJECT_SIZE_UNKNOWN -1
+>  #define OBJECT_SIZE_DELETE -2
+>
 > --
-> 1.9.1
-
-Thanks for the patch but the proper fix is to call dict_append_array
-with correct pointer otherwise this API will not be consistent with
-libdbus, so we may want to have pointer to &ad->data and then pass its
-address there.
-
+> 2.14.1
 >
 > --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth=
+" in
 > the body of a message to majordomo@vger.kernel.org
 > More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
 
 
--- 
+--=20
 Luiz Augusto von Dentz
