@@ -1,62 +1,127 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 3/3] avctp: Retry control PDU if timeout
-Date: Thu, 26 Oct 2017 15:02:23 +0300
-Message-Id: <20171026120223.18492-3-luiz.dentz@gmail.com>
-In-Reply-To: <20171026120223.18492-1-luiz.dentz@gmail.com>
-References: <20171026120223.18492-1-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 1/3] avctp: Don't queue control request without callback
+Date: Thu, 26 Oct 2017 15:02:21 +0300
+Message-Id: <20171026120223.18492-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This attempts to resend a control PDU is not passthrough as the control
-channel is considered unreliable packets may be lost.
+If no callback is set that means the request don't care about the
+response, so instead of putting such request into the pending queue
+this proceeds to send them immediately.
 ---
- profiles/audio/avctp.c | 13 ++++++++++++-
- 1 file changed, 12 insertions(+), 1 deletion(-)
+ profiles/audio/avctp.c | 67 +++++++++++++++++++++++++++++++-------------------
+ 1 file changed, 42 insertions(+), 25 deletions(-)
 
 diff --git a/profiles/audio/avctp.c b/profiles/audio/avctp.c
-index 174f401d6..0d395814c 100644
+index daf39a782..f8ec19c9c 100644
 --- a/profiles/audio/avctp.c
 +++ b/profiles/audio/avctp.c
-@@ -157,6 +157,7 @@ struct avctp_pending_req {
- 	struct avctp_channel *chan;
- 	uint8_t transaction;
- 	guint timeout;
-+	bool retry;
- 	int err;
- 	avctp_process_cb process;
- 	void *data;
-@@ -775,9 +776,16 @@ static gboolean req_timeout(gpointer user_data)
- 	struct avctp_channel *chan = user_data;
- 	struct avctp_pending_req *p = chan->p;
+@@ -617,6 +617,39 @@ static void avctp_set_state(struct avctp *session, avctp_state_t new_state,
+ 	}
+ }
  
--	DBG("transaction %u", p->transaction);
-+	DBG("transaction %u retry %s", p->transaction, p->retry ? "true" :
-+								"false");
- 
- 	p->timeout = 0;
++static uint8_t chan_get_transaction(struct avctp_channel *chan)
++{
++	GSList *l, *tmp;
++	uint8_t transaction;
 +
-+	if (p->retry) {
-+		p->process(p->data);
-+		return FALSE;
++	if (!chan->processed)
++		goto done;
++
++	tmp = g_slist_copy(chan->processed);
++
++	/* Find first unused transaction id */
++	for (l = tmp; l; l = g_slist_next(l)) {
++		struct avctp_pending_req *req = l->data;
++
++		if (req->transaction == chan->transaction) {
++			chan->transaction++;
++			chan->transaction %= 16;
++			tmp = g_slist_delete_link(tmp, l);
++			l = tmp;
++		}
 +	}
 +
- 	p->err = -ETIMEDOUT;
- 
- 	pending_destroy(p, NULL);
-@@ -801,6 +809,9 @@ static int process_control(void *data)
- 	if (ret < 0)
- 		return ret;
- 
-+	if (req->op != AVC_OP_PASSTHROUGH)
-+		p->retry = !p->retry;
++	g_slist_free(tmp);
 +
- 	p->timeout = g_timeout_add_seconds(CONTROL_TIMEOUT, req_timeout,
- 								p->chan);
++done:
++	transaction = chan->transaction;
++
++	chan->transaction++;
++	chan->transaction %= 16;
++
++	return transaction;
++}
++
+ static int avctp_send(struct avctp_channel *control, uint8_t transaction,
+ 				uint8_t cr, uint8_t code,
+ 				uint8_t subunit, uint8_t opcode,
+@@ -643,6 +676,9 @@ static int avctp_send(struct avctp_channel *control, uint8_t transaction,
+ 	avctp = (void *) control->buffer;
+ 	avc = (void *) avctp + sizeof(*avctp);
  
++	if (transaction > 16)
++		transaction = chan_get_transaction(control);
++
+ 	avctp->transaction = transaction;
+ 	avctp->packet_type = AVCTP_PACKET_SINGLE;
+ 	avctp->cr = cr;
+@@ -1556,38 +1592,14 @@ static struct avctp_pending_req *pending_create(struct avctp_channel *chan,
+ 						GDestroyNotify destroy)
+ {
+ 	struct avctp_pending_req *p;
+-	GSList *l, *tmp;
+-
+-	if (!chan->processed)
+-		goto done;
+-
+-	tmp = g_slist_copy(chan->processed);
+-
+-	/* Find first unused transaction id */
+-	for (l = tmp; l; l = g_slist_next(l)) {
+-		struct avctp_pending_req *req = l->data;
+-
+-		if (req->transaction == chan->transaction) {
+-			chan->transaction++;
+-			chan->transaction %= 16;
+-			tmp = g_slist_delete_link(tmp, l);
+-			l = tmp;
+-		}
+-	}
+ 
+-	g_slist_free(tmp);
+-
+-done:
+ 	p = g_new0(struct avctp_pending_req, 1);
+ 	p->chan = chan;
+-	p->transaction = chan->transaction;
++	p->transaction = chan_get_transaction(chan);
+ 	p->process = process;
+ 	p->data = data;
+ 	p->destroy = destroy;
+ 
+-	chan->transaction++;
+-	chan->transaction %= 16;
+-
+ 	return p;
+ }
+ 
+@@ -1603,6 +1615,11 @@ static int avctp_send_req(struct avctp *session, uint8_t code,
+ 	if (control == NULL)
+ 		return -ENOTCONN;
+ 
++	/* If the request set a callback send it directly */
++	if (!func)
++		return avctp_send(session->control, -1, AVCTP_COMMAND,
++				code, subunit, opcode, operands, operand_count);
++
+ 	req = g_new0(struct avctp_control_req, 1);
+ 	req->code = code;
+ 	req->subunit = subunit;
 -- 
 2.13.6
 
