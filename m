@@ -1,63 +1,62 @@
-Return-Path: <linux-wpan-owner@vger.kernel.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: patrik.flykt@linux.intel.com, linux-wpan@vger.kernel.org
-Subject: [PATCH v2 0/7] 6LoWPAN userspace support
-Date: Thu, 26 Oct 2017 12:30:19 +0300
-Message-Id: <20171026093026.27952-1-luiz.dentz@gmail.com>
-Sender: linux-wpan-owner@vger.kernel.org
+Return-Path: <ext.bartosz.chronowski@tieto.com>
+From: Bartosz Chronowski <ext.bartosz.chronowski@tieto.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	Bartosz Chronowski <ext.bartosz.chronowski@tieto.com>
+Subject: [PATCH] Bluetooth: btusb: Add new NFA344A entry.
+Date: Thu, 26 Oct 2017 10:22:43 +0200
+Message-Id: <1509006163-14274-1-git-send-email-ext.bartosz.chronowski@tieto.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+This change allows proper low power mode entry in suspend.
 
-This introduces support for 6LoWPAN userspace interface creation along
-with IPSP plugin which takes care of L2CAP channel creation.
+/sys/kernel/debug/usb/devices entry:
+T:  Bus=01 Lev=01 Prnt=01 Port=05 Cnt=03 Dev#=  3 Spd=12   MxCh= 0
+D:  Ver= 2.01 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=0489 ProdID=e09f Rev= 0.01
+C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
+I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
 
-The bt_6lo instance handles all the details to create the network
-interface and also attach channels to it so any io is automatically
-forward to the right path. The plugin make use of bt_6lo and create
-interfaces for each adapter available using "bt" as prefix followed by
-adapter index.
+Signed-off-by: Bartosz Chronowski <ext.bartosz.chronowski@tieto.com>
+---
+ drivers/bluetooth/btusb.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-At the current stage only router/central role is supported since
-peripheral role may actually need to be enabled via advertisement which
-perhaps will require a D-Bus to be triggered on demand.
-
-Since the IPSP plugins does actually register a proper profile driver
-Device.Connect can now attempt to connect the IPSP channel and then
-proceed to attach the channel to interface, so it is well integrated
-with existing D-Bus APIs.
-
-Note that this all depends on TUN/TAP changes proposed here:
-http://www.spinics.net/lists/linux-bluetooth/msg72471.html
-
-v2: Fix not setting protocol type as ETHERTYPE_IPV6
-
-Luiz Augusto von Dentz (7):
-  shared/io: Add io_recv
-  shared: Add initial code for 6LoWPAN
-  unit: Add initial test for bt_6lo
-  uuid: Add IPSP UUID
-  build: Add IPSP plugin
-  ipsp: Connect to IPSP PSM
-  ipsp: Add support for bt_6lo
-
- Makefile.am             |   8 +-
- Makefile.plugins        |   5 +
- configure.ac            |   4 +
- lib/uuid.h              |   2 +
- profiles/network/ipsp.c | 318 ++++++++++++++++++++++++++++
- src/shared/6lo.c        | 540 ++++++++++++++++++++++++++++++++++++++++++++++++
- src/shared/6lo.h        |  40 ++++
- src/shared/io-glib.c    |  20 ++
- src/shared/io.h         |   1 +
- unit/test-6lo.c         | 271 ++++++++++++++++++++++++
- 10 files changed, 1208 insertions(+), 1 deletion(-)
- create mode 100644 profiles/network/ipsp.c
- create mode 100644 src/shared/6lo.c
- create mode 100644 src/shared/6lo.h
- create mode 100644 unit/test-6lo.c
-
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 7a5c06a..513a7a5 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -272,6 +272,7 @@ static const struct usb_device_id blacklist_table[] = {
+ 	{ USB_DEVICE(0x0cf3, 0xe301), .driver_info = BTUSB_QCA_ROME },
+ 	{ USB_DEVICE(0x0cf3, 0xe360), .driver_info = BTUSB_QCA_ROME },
+ 	{ USB_DEVICE(0x0489, 0xe092), .driver_info = BTUSB_QCA_ROME },
++	{ USB_DEVICE(0x0489, 0xe09f), .driver_info = BTUSB_QCA_ROME },
+ 	{ USB_DEVICE(0x0489, 0xe0a2), .driver_info = BTUSB_QCA_ROME },
+ 	{ USB_DEVICE(0x04ca, 0x3011), .driver_info = BTUSB_QCA_ROME },
+ 	{ USB_DEVICE(0x04ca, 0x3016), .driver_info = BTUSB_QCA_ROME },
 -- 
-2.13.6
-
+2.7.4
