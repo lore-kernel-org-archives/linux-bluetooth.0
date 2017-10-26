@@ -1,127 +1,56 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/3] avctp: Don't queue control request without callback
-Date: Thu, 26 Oct 2017 15:02:21 +0300
-Message-Id: <20171026120223.18492-1-luiz.dentz@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <ronald@innovation.ch>
+Date: Thu, 26 Oct 2017 02:47:49 -0700
+From: "Life is hard, and then you die" <ronald@innovation.ch>
+To: Lukas Wunner <lukas@wunner.de>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Dean Jenkins <Dean_Jenkins@mentor.com>,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] Bluetooth: hci_ldisc: Allow sleeping while proto
+ locks are held.
+Message-ID: <20171026094749.GA15996@innovation.ch>
+References: <20171026051453.GA15910@innovation.ch>
+ <20171026065828.GB6487@wunner.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <20171026065828.GB6487@wunner.de>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-If no callback is set that means the request don't care about the
-response, so instead of putting such request into the pending queue
-this proceeds to send them immediately.
----
- profiles/audio/avctp.c | 67 +++++++++++++++++++++++++++++++-------------------
- 1 file changed, 42 insertions(+), 25 deletions(-)
+On Thu, Oct 26, 2017 at 08:58:28AM +0200, Lukas Wunner wrote:
+> On Wed, Oct 25, 2017 at 10:14:53PM -0700, =?UTF-8?q?Ronald=20Tschal=C3=A4r?= wrote:
+> > Commit dec2c92880cc5435381d50e3045ef018a762a917 ("Bluetooth: hci_ldisc:
+> > Use rwlocking to avoid closing proto races") introduced locks in
+> > hci_ldisc that are held while calling the proto functions. These locks
+> > are rwlock's, and hence do not allow sleeping while they are held.
+> > However, the proto functions that hci_bcm registers use mutexes and
+> > hence need to be able to sleep.
+> [...]
+> > We can't replace the mutex in hci_bcm, because there are other calls
+> > there that might sleep. Therefore this replaces the rwlock's in
+> > hci_ldisc with rw_semaphore's (which allow sleeping). This is a safer
+> > approach anyway as it reduces the restrictions on the proto callbacks.
+> > Also, because acquiring write-lock is very rare compared to acquiring
+> > the read-lock, the percpu variant of rw_semaphore is used.
+> 
+> The percpu_rw_semaphore is unusual (if fine I guess), it's only used
+> by cgroups, uprobes and ext4 so far and I was unaware of its existence.
 
-diff --git a/profiles/audio/avctp.c b/profiles/audio/avctp.c
-index daf39a782..f8ec19c9c 100644
---- a/profiles/audio/avctp.c
-+++ b/profiles/audio/avctp.c
-@@ -617,6 +617,39 @@ static void avctp_set_state(struct avctp *session, avctp_state_t new_state,
- 	}
- }
- 
-+static uint8_t chan_get_transaction(struct avctp_channel *chan)
-+{
-+	GSList *l, *tmp;
-+	uint8_t transaction;
-+
-+	if (!chan->processed)
-+		goto done;
-+
-+	tmp = g_slist_copy(chan->processed);
-+
-+	/* Find first unused transaction id */
-+	for (l = tmp; l; l = g_slist_next(l)) {
-+		struct avctp_pending_req *req = l->data;
-+
-+		if (req->transaction == chan->transaction) {
-+			chan->transaction++;
-+			chan->transaction %= 16;
-+			tmp = g_slist_delete_link(tmp, l);
-+			l = tmp;
-+		}
-+	}
-+
-+	g_slist_free(tmp);
-+
-+done:
-+	transaction = chan->transaction;
-+
-+	chan->transaction++;
-+	chan->transaction %= 16;
-+
-+	return transaction;
-+}
-+
- static int avctp_send(struct avctp_channel *control, uint8_t transaction,
- 				uint8_t cr, uint8_t code,
- 				uint8_t subunit, uint8_t opcode,
-@@ -643,6 +676,9 @@ static int avctp_send(struct avctp_channel *control, uint8_t transaction,
- 	avctp = (void *) control->buffer;
- 	avc = (void *) avctp + sizeof(*avctp);
- 
-+	if (transaction > 16)
-+		transaction = chan_get_transaction(control);
-+
- 	avctp->transaction = transaction;
- 	avctp->packet_type = AVCTP_PACKET_SINGLE;
- 	avctp->cr = cr;
-@@ -1556,38 +1592,14 @@ static struct avctp_pending_req *pending_create(struct avctp_channel *chan,
- 						GDestroyNotify destroy)
- {
- 	struct avctp_pending_req *p;
--	GSList *l, *tmp;
--
--	if (!chan->processed)
--		goto done;
--
--	tmp = g_slist_copy(chan->processed);
--
--	/* Find first unused transaction id */
--	for (l = tmp; l; l = g_slist_next(l)) {
--		struct avctp_pending_req *req = l->data;
--
--		if (req->transaction == chan->transaction) {
--			chan->transaction++;
--			chan->transaction %= 16;
--			tmp = g_slist_delete_link(tmp, l);
--			l = tmp;
--		}
--	}
- 
--	g_slist_free(tmp);
--
--done:
- 	p = g_new0(struct avctp_pending_req, 1);
- 	p->chan = chan;
--	p->transaction = chan->transaction;
-+	p->transaction = chan_get_transaction(chan);
- 	p->process = process;
- 	p->data = data;
- 	p->destroy = destroy;
- 
--	chan->transaction++;
--	chan->transaction %= 16;
--
- 	return p;
- }
- 
-@@ -1603,6 +1615,11 @@ static int avctp_send_req(struct avctp *session, uint8_t code,
- 	if (control == NULL)
- 		return -ENOTCONN;
- 
-+	/* If the request set a callback send it directly */
-+	if (!func)
-+		return avctp_send(session->control, -1, AVCTP_COMMAND,
-+				code, subunit, opcode, operands, operand_count);
-+
- 	req = g_new0(struct avctp_control_req, 1);
- 	req->code = code;
- 	req->subunit = subunit;
--- 
-2.13.6
+I mainly took my cue from the documentation, which indicated this was
+better in scenarios where writes are rare. But if there are concerns
+about it's use, or there is some use-case where tty's are opened and
+close a lot without doing much in between, then it can be trivially
+replaced with the non-percpu variant.
 
+> I don't have the hardware to test this but the rationale and patch itself
+> LGTM, so:
+> 
+> Reviewed-by: Lukas Wunner <lukas@wunner.de>
+
+Thanks!
+
+
+  Cheers,
+
+  Ronald
