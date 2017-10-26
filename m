@@ -1,62 +1,40 @@
-Return-Path: <ext.bartosz.chronowski@tieto.com>
-From: Bartosz Chronowski <ext.bartosz.chronowski@tieto.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
+Return-Path: <foo00@h08.hostsharing.net>
+Date: Thu, 26 Oct 2017 08:58:28 +0200
+From: Lukas Wunner <lukas@wunner.de>
+To: =?us-ascii?B?PT9VVEYtOD9xP1JvbmFsZD0yMFRzY2hhbD1DMz1BNHI/PQ==?= <ronald@innovation.ch>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
 	Gustavo Padovan <gustavo@padovan.org>,
 	Johan Hedberg <johan.hedberg@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	Bartosz Chronowski <ext.bartosz.chronowski@tieto.com>
-Subject: [PATCH] Bluetooth: btusb: Add new NFA344A entry.
-Date: Thu, 26 Oct 2017 10:22:43 +0200
-Message-Id: <1509006163-14274-1-git-send-email-ext.bartosz.chronowski@tieto.com>
+	Dean Jenkins <Dean_Jenkins@mentor.com>,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] Bluetooth: hci_ldisc: Allow sleeping while proto
+ locks are held.
+Message-ID: <20171026065828.GB6487@wunner.de>
+References: <20171026051453.GA15910@innovation.ch>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20171026051453.GA15910@innovation.ch>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This change allows proper low power mode entry in suspend.
+On Wed, Oct 25, 2017 at 10:14:53PM -0700, =?UTF-8?q?Ronald=20Tschal=C3=A4r?= wrote:
+> Commit dec2c92880cc5435381d50e3045ef018a762a917 ("Bluetooth: hci_ldisc:
+> Use rwlocking to avoid closing proto races") introduced locks in
+> hci_ldisc that are held while calling the proto functions. These locks
+> are rwlock's, and hence do not allow sleeping while they are held.
+> However, the proto functions that hci_bcm registers use mutexes and
+> hence need to be able to sleep.
+[...]
+> We can't replace the mutex in hci_bcm, because there are other calls
+> there that might sleep. Therefore this replaces the rwlock's in
+> hci_ldisc with rw_semaphore's (which allow sleeping). This is a safer
+> approach anyway as it reduces the restrictions on the proto callbacks.
+> Also, because acquiring write-lock is very rare compared to acquiring
+> the read-lock, the percpu variant of rw_semaphore is used.
 
-/sys/kernel/debug/usb/devices entry:
-T:  Bus=01 Lev=01 Prnt=01 Port=05 Cnt=03 Dev#=  3 Spd=12   MxCh= 0
-D:  Ver= 2.01 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=0489 ProdID=e09f Rev= 0.01
-C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
-I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+The percpu_rw_semaphore is unusual (if fine I guess), it's only used
+by cgroups, uprobes and ext4 so far and I was unaware of its existence.
 
-Signed-off-by: Bartosz Chronowski <ext.bartosz.chronowski@tieto.com>
----
- drivers/bluetooth/btusb.c | 1 +
- 1 file changed, 1 insertion(+)
+I don't have the hardware to test this but the rationale and patch itself
+LGTM, so:
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 7a5c06a..513a7a5 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -272,6 +272,7 @@ static const struct usb_device_id blacklist_table[] = {
- 	{ USB_DEVICE(0x0cf3, 0xe301), .driver_info = BTUSB_QCA_ROME },
- 	{ USB_DEVICE(0x0cf3, 0xe360), .driver_info = BTUSB_QCA_ROME },
- 	{ USB_DEVICE(0x0489, 0xe092), .driver_info = BTUSB_QCA_ROME },
-+	{ USB_DEVICE(0x0489, 0xe09f), .driver_info = BTUSB_QCA_ROME },
- 	{ USB_DEVICE(0x0489, 0xe0a2), .driver_info = BTUSB_QCA_ROME },
- 	{ USB_DEVICE(0x04ca, 0x3011), .driver_info = BTUSB_QCA_ROME },
- 	{ USB_DEVICE(0x04ca, 0x3016), .driver_info = BTUSB_QCA_ROME },
--- 
-2.7.4
+Reviewed-by: Lukas Wunner <lukas@wunner.de>
