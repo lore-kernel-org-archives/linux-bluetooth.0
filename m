@@ -1,205 +1,166 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Szymon Janc <szymon.janc@codecoup.pl>
+To: Bastien Nocera <hadess@hadess.net>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v2 01/11] adapter: Add btd_request_authorization_cable_configured()
+Date: Fri, 27 Oct 2017 10:00:34 +0200
+Message-ID: <2420304.WZtTGuyavg@ix>
+In-Reply-To: <20171018015815.10045-1-hadess@hadess.net>
+References: <20171018015815.10045-1-hadess@hadess.net>
 MIME-Version: 1.0
-In-Reply-To: <CAOHTApijss4n7r6tr7oMdGGduzVs-Hx=s0r5uL4+ACX1d=ePFw@mail.gmail.com>
-References: <20171018120615.24126-3-patrik.flykt@linux.intel.com>
- <20171018120615.24126-4-patrik.flykt@linux.intel.com> <20171018122705.25478-1-patrik.flykt@linux.intel.com>
- <CAOHTApijss4n7r6tr7oMdGGduzVs-Hx=s0r5uL4+ACX1d=ePFw@mail.gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Fri, 27 Oct 2017 11:35:42 +0300
-Message-ID: <CABBYNZLh-sFFnQpkFZHfY4CyW6rXgf9F62=QOF_YR+k==t_47g@mail.gmail.com>
-Subject: Re: [RFC 3/3] tun: Add 6LoWPAN compression/decompression to tun driver
-To: Alexander Aring <aring@mojatatu.com>
-Cc: Patrik Flykt <patrik.flykt@linux.intel.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        linux-wpan - ML <linux-wpan@vger.kernel.org>,
-        Luiz Augusto Von Dentz <luiz.von.dentz@intel.com>,
-        Jamal Hadi Salim <hadi@mojatatu.com>,
-        Stefan Schmidt <stefan@osg.samsung.com>,
-        Michael Richardson <mcr@sandelman.ca>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alex,
+Hi Bastien,
 
-On Thu, Oct 26, 2017 at 5:54 PM, Alexander Aring <aring@mojatatu.com> wrote:
-> Hi,
->
-> First: I always asked myself: 6LoTUN makes no sense because 6LoWPAN
-> depends on MAC information and TUN interfaces works because IPv6
-> doesn't depend on MAC information. Now everything is more clear, this
-> has nothing todo with TUN it's TAP because you use ethernet MAC
-> information to do 6LoWPAN stuff.
->
-> On Wed, Oct 18, 2017 at 8:27 AM, Patrik Flykt
-> <patrik.flykt@linux.intel.com> wrote:
->> Define a new IFF_6LO flag for the tun/tap driver that enables 6LoWPAN
->> compression/decompression for tap devices. This is achieved by calling
->> lowpan_header_compress once the sk_buff is destined for user space and
->> calling lowpan_header_decompress when the user space writes packets to
->> kernel. A copy of the ethernet MAC headers are needed both ways, as
->> the 6LoWPAN compression may end up expanding the header size by one
->> byte in the worst case.
->>
->> LOWPAN_IPHC_MAX_HC_BUF_LEN more bytes are added to sk_buff headroom
->> to ensure there will be enough bytes to push headers to. This is
->> probably an overkill and probably done wrongly anyway.
->>
-> This define should be removed because there exists no case where the
-> compression will be larger than the ipv6 header and vice versa.
->
->
->> An ethernet MAC header is added in front of the (compressed) IPv6
->> datagram in both directions; no such transport exists for 6LoWPAN,
->> but this is just an example implementation trying to explain the
->> idea behind the BTLE handling in user space and the 6LoWPAN
->> compression and decompression in kernel space. Thus the tun/tap
->> driver comes in handy as the victim of the demonstration.
->>
->
-> Sorry but this really scares me. The kernel use 6LoWPAN IPHC for
-> ethernet (as mac header information) and you doing BTLE/L2CAP stuff in
-> user space which is not anymore for your original use-case which is
-> "ethernet".
+On Wednesday, 18 October 2017 03:58:05 CEST Bastien Nocera wrote:
+> Add btd_request_authorization_cable_configured() function to allow
+> cable configured devices to ask the user straight away about whether the
+> device should be allowed to connect to the computer.
+> 
+> This allows us to ask the user at the time of the USB connection and
+> initial setup, rather than when the first Bluetooth connection is made.
+> 
+> The fact that the device might not be connected to the adapter when
+> this event is triggered is mentioned in the Agent API docs.
+> ---
+>  doc/agent-api.txt |  5 ++++-
+>  src/adapter.c     | 42 ++++++++++++++++++++++++++++++++++++------
+>  src/adapter.h     |  2 ++
+>  3 files changed, 42 insertions(+), 7 deletions(-)
+> 
+> diff --git a/doc/agent-api.txt b/doc/agent-api.txt
+> index 801ccb665..0d9347cab 100644
+> --- a/doc/agent-api.txt
+> +++ b/doc/agent-api.txt
+> @@ -163,7 +163,10 @@ Methods		void Release()
+>  			This method gets called to request the user to
+>  			authorize an incoming pairing attempt which
+>  			would in other circumstances trigger the just-works
+> -			model.
+> +			model, or when the user plugged in a device that
+> +			implements cable pairing. In the latter case, the
+> +			device would not be connected to the adapter via
+> +			Bluetooth yet.
+> 
+>  			Possible errors: org.bluez.Error.Rejected
+>  			                 org.bluez.Error.Canceled
+> diff --git a/src/adapter.c b/src/adapter.c
+> index 19205ed07..32a89d533 100644
+> --- a/src/adapter.c
+> +++ b/src/adapter.c
+> @@ -266,6 +266,11 @@ struct btd_adapter {
+>  	bool is_default;		/* true if adapter is default one */
+>  };
+> 
+> +typedef enum {
+> +	ADAPTER_AUTHORIZE_DISCONNECTED = 0,
+> +	ADAPTER_AUTHORIZE_CHECK_CONNECTED
+> +} adapter_authorize_type;
+> +
+>  static struct btd_adapter *btd_adapter_lookup(uint16_t index)
+>  {
+>  	GList *list;
+> @@ -6136,8 +6141,9 @@ static void svc_complete(struct btd_device *dev, int
+> err, void *user_data) }
+> 
+>  static int adapter_authorize(struct btd_adapter *adapter, const bdaddr_t
+> *dst, -					const char *uuid, service_auth_cb cb,
+> -					void *user_data)
+> +					const char *uuid,
+> +					adapter_authorize_type check_for_connection,
+> +					service_auth_cb cb, void *user_data)
+>  {
+>  	struct service_auth *auth;
+>  	struct btd_device *device;
+> @@ -6153,7 +6159,7 @@ static int adapter_authorize(struct btd_adapter
+> *adapter, const bdaddr_t *dst, }
+> 
+>  	/* Device connected? */
+> -	if (!g_slist_find(adapter->connections, device))
+> +	if (check_for_connection && !g_slist_find(adapter->connections, device))
+>  		btd_error(adapter->dev_id,
+>  			"Authorization request for non-connected device!?");
+> 
+> @@ -6167,7 +6173,12 @@ static int adapter_authorize(struct btd_adapter
+> *adapter, const bdaddr_t *dst, auth->device = device;
+>  	auth->adapter = adapter;
+>  	auth->id = ++id;
+> -	auth->svc_id = device_wait_for_svc_complete(device, svc_complete, auth);
+> +	if (check_for_connection)
+> +		auth->svc_id = device_wait_for_svc_complete(device, svc_complete, 
+auth);
+> +	else {
+> +		if (adapter->auth_idle_id == 0)
+> +			adapter->auth_idle_id = g_idle_add(process_auth_queue, adapter);
+> +	}
+> 
+>  	g_queue_push_tail(adapter->auths, auth);
+> 
+> @@ -6186,7 +6197,8 @@ guint btd_request_authorization(const bdaddr_t *src,
+> const bdaddr_t *dst, if (!adapter)
+>  			return 0;
+> 
+> -		return adapter_authorize(adapter, dst, uuid, cb, user_data);
+> +		return adapter_authorize(adapter, dst, uuid,
+> +				ADAPTER_AUTHORIZE_CHECK_CONNECTED, cb, user_data);
+>  	}
+> 
+>  	for (l = adapters; l != NULL; l = g_slist_next(l)) {
+> @@ -6194,7 +6206,8 @@ guint btd_request_authorization(const bdaddr_t *src,
+> const bdaddr_t *dst,
+> 
+>  		adapter = l->data;
+> 
+> -		id = adapter_authorize(adapter, dst, uuid, cb, user_data);
+> +		id = adapter_authorize(adapter, dst, uuid,
+> +				ADAPTER_AUTHORIZE_CHECK_CONNECTED, cb, user_data);
+>  		if (id != 0)
+>  			return id;
+>  	}
+> @@ -6202,6 +6215,23 @@ guint btd_request_authorization(const bdaddr_t *src,
+> const bdaddr_t *dst, return 0;
+>  }
+> 
+> +guint btd_request_authorization_cable_configured(const bdaddr_t *src, const
+> bdaddr_t *dst, +						const char *uuid, service_auth_cb cb,
+> +						void *user_data)
+> +{
+> +	struct btd_adapter *adapter;
+> +
+> +	if (bacmp(src, BDADDR_ANY) == 0)
+> +		return 0;
+> +
+> +	adapter = adapter_find(src);
+> +	if (!adapter)
+> +		return 0;
+> +
+> +	return adapter_authorize(adapter, dst, uuid,
+> +			ADAPTER_AUTHORIZE_DISCONNECTED, cb, user_data);
+> +}
+> +
+>  static struct service_auth *find_authorization(guint id)
+>  {
+>  	GSList *l;
+> diff --git a/src/adapter.h b/src/adapter.h
+> index f9178d59e..a85327cd1 100644
+> --- a/src/adapter.h
+> +++ b/src/adapter.h
+> @@ -120,6 +120,8 @@ int btd_register_adapter_driver(struct
+> btd_adapter_driver *driver); void btd_unregister_adapter_driver(struct
+> btd_adapter_driver *driver); guint btd_request_authorization(const bdaddr_t
+> *src, const bdaddr_t *dst, const char *uuid, service_auth_cb cb, void
+> *user_data);
+> +guint btd_request_authorization_cable_configured(const bdaddr_t *src, const
+> bdaddr_t *dst, +		const char *uuid, service_auth_cb cb, void 
+*user_data);
+>  int btd_cancel_authorization(guint id);
+> 
+>  int btd_adapter_restore_powered(struct btd_adapter *adapter);
 
-You should check what TUNSETLINK does, it does accept changing the
-dev->type which are setting to ARPHRD_6LOWPAN:
-
-https://marc.info/?l=linux-bluetooth&m=150901023927589&w=2
-
-We could perhaps even replace the ether_header with something else if
-we detect this change, perhaps even set ARPHRD_6LOWPAN by default if
-IFF_6LO is set, anyway if you are claiming TAP = Ethernet I don't
-think this is valid in the light of TUNSETLINK.
-
-> This might work for now, because only address handling is used in IPHC
-> as MAC header information and eth/btle use the same address length
-> (besides that the address is not always the same and BTLE is not a
-> EUI-48 address with multicast bit etc.)
-
-When the dev->type is ARPHRD_6LOWPAN the IID will be generated
-properly, but we might change the frame format to not reuse the
-ethernet header if there is interest in using 6LoWPAN with other
-tecnologies.
-
-> You cannot simple use MAC X handling in kernelspace and use then MAC
-> handling Y in userspace - this will not work for long time. I already
-> fight with UDP based protocols in 802.15.4 6LoWPAN who depends on
-> 802.15.4 MAC information which are not just addressing information. If
-> they need more bluetooth related information there you have no
-> possibility to get them. The same for next header compression which
-> might want more MAC information than just addressing for bluetooth.
-
-Not sure I follow this comment, what the MAC has to do with IP protocols?
-
->> Signed-off-by: Patrik Flykt <patrik.flykt@linux.intel.com>
->> ---
->>
->>         Hi,
->>
->> This is the one applying on fac72b24.
->>
->>
->>      Patrik
->>
->>
->>  drivers/net/tun.c           | 61 +++++++++++++++++++++++++++++++++++++++++++--
->>  include/uapi/linux/if_tun.h |  1 +
->>  2 files changed, 60 insertions(+), 2 deletions(-)
->>
->> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
->> index 57e4c31fa84a..11b6494bb7ca 100644
->> --- a/drivers/net/tun.c
->> +++ b/drivers/net/tun.c
->> @@ -66,6 +66,7 @@
->>  #include <linux/nsproxy.h>
->>  #include <linux/virtio_net.h>
->>  #include <linux/rcupdate.h>
->> +#include <net/6lowpan.h>
->>  #include <net/net_namespace.h>
->>  #include <net/netns/generic.h>
->>  #include <net/rtnetlink.h>
->> @@ -231,6 +232,8 @@ struct tun_struct {
->>         u32 rx_batched;
->>         struct tun_pcpu_stats __percpu *pcpu_stats;
->>         struct bpf_prog __rcu *xdp_prog;
->> +
->> +       struct lowpan_dev       ldev;
->>  };
->>
->>  static int tun_napi_receive(struct napi_struct *napi, int budget)
->> @@ -1071,6 +1074,9 @@ static void tun_set_headroom(struct net_device *dev, int new_hr)
->>                 new_hr = NET_SKB_PAD;
->>
->>         tun->align = new_hr;
->> +
->> +       if ((tun->flags & (IFF_TAP|IFF_6LO)) == (IFF_TAP|IFF_6LO))
->> +               tun->align += LOWPAN_IPHC_MAX_HC_BUF_LEN;
->>  }
->>
->>  static void
->> @@ -1697,6 +1703,27 @@ static ssize_t tun_get_user(struct tun_struct *tun, struct tun_file *tfile,
->>                 skb->dev = tun->dev;
->>                 break;
->>         case IFF_TAP:
->> +               if (tun->flags & IFF_6LO) {
->> +                       struct ethhdr eth;
->> +
->> +                       skb_reset_mac_header(skb);
->> +                       memcpy(&eth, skb_mac_header(skb), sizeof(eth));
->> +
->> +                       skb_pull(skb, sizeof(struct ethhdr));
->> +                       skb_reset_network_header(skb);
->> +
->> +                       if (lowpan_header_decompress(skb, &tun->ldev,
->> +                                                       tun->dev->dev_addr,
->> +                                                       &eth.h_source) < 0) {
->
-> This will make a module dependency of 6lowpan_iphc for the tap driver.
-> I am pretty sure that the tap driver people doesn't like that.
-
-This is a valid concern that we should address.
-
-> Which
-> brings me to another issue with this patch:
-> Why you don't create a virtual lowpan interface on top of the tap
-> device. This handling is _incredibly_ against our design to have a
-> 6LoWPAN interface device type for the user space.
-> Now we have will have a tap device which makes internally 6LoWPAN
-> handling but is not visible as 6LoWPAN interface in the user space,
-> this will confuse 6LoWPAN user space applications.
->
-> What our design is (just to remember):
->  - Ethernet interface (MAC/6LoWPAN view, before adaption)
->  - 6LoWPAN interface (IPv6 view, after adaption)
-
-Except that for Bluetooth we have a _tunnel_, not a netdev, so I don't
-think we necessarily need this stacking of interfaces just to do
-header compression. Also when it comes to IoT devices we don't want to
-spend memory on things we don't necessarily need.
-
-> I am pretty sure you can run your above changes transparently
-> separated of TAP driver by adding a 6LoWPAN interface on top. This
-> will also make no dependency to the TAP driver.
-
-There might be other ways as well, like detecting if 6lowpan has been
-enabled, etc, which is less expensive than the interface stacking.
-
-> I guess what you want is a TAP interface which is NOT ethernet. It
-> need to get some special MAC information for your subsystem which is
-> BTLE. Not using ethernet here. To have the assumption here "it will
-> work because the address length is the same" is simple wrong, they
-> will be more use-cases where upper-layers need to have special MAC
-> information belongs to your link-layer subsystem.
-> So, my guess, the bluetooth subsystem need some TAP like
-> interface(hci) maybe? 6LoWPAN has nothing to do with ethernet yet. You
-> need to put more logic in your link-layer subsystem to adapt ideas
-> from other link-layer subsystems which has no 6LoWPAN support at all.
-
-TUN/TAP are meant for _tunnels_ which is exactly what IPSP is, it is a
-Bluetooth L2CAP channel and I don't see anyone suggesting doing a
-netdev based on TCP socket which is analogous to L2CAP in Bluetooth
-world, or do we?
+Patches 1-8 are now applied, thanks.
 
 -- 
-Luiz Augusto von Dentz
+pozdrawiam
+Szymon Janc
