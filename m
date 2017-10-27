@@ -1,148 +1,168 @@
-Return-Path: <aford173@gmail.com>
-MIME-Version: 1.0
-In-Reply-To: <CAL_Jsq+wJfepPRbpL-_BWtD2Nyviy0q2UW9s7MrNr392W8D0cA@mail.gmail.com>
-References: <20170405183005.20570-1-robh@kernel.org> <CAHCN7xJUxZm1qKAxT0kaK6qoDg+HWOJK7sTH-q9za4HJuUwe8Q@mail.gmail.com>
- <20170430160430.rmyuo6sdrkrjxjg6@earth> <CAHCN7x+Mq=b6RN-ezU0400W=H=D7DR+Es1FHtT4GyozpVd8ALA@mail.gmail.com>
- <CAL_JsqKBAPUPRtn+pEtz8B8pCrA=45RkEq6X_0i_HYoWsVmtyw@mail.gmail.com>
- <20170509044837.oje2tfodytyuuuur@sapphire.tkos.co.il> <CAL_Jsq+wJfepPRbpL-_BWtD2Nyviy0q2UW9s7MrNr392W8D0cA@mail.gmail.com>
-From: Adam Ford <aford173@gmail.com>
-Date: Fri, 27 Oct 2017 05:55:31 -0500
-Message-ID: <CAHCN7xKNWa2yrquvYg41CtTWa7aqETNx_08SPgsxv6QC4GK_Rw@mail.gmail.com>
-Subject: Re: [PATCH 0/4] TI Bluetooth serdev support
-To: Rob Herring <robh@kernel.org>
-Cc: Baruch Siach <baruch@tkos.co.il>, Mark Rutland <mark.rutland@arm.com>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, Johan Hedberg <johan.hedberg@gmail.com>,
-	Gustavo Padovan <gustavo@padovan.org>, Marcel Holtmann <marcel@holtmann.org>,
-	Sebastian Reichel <sre@kernel.org>, Wei Xu <xuwei5@hisilicon.com>,
-	"open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>, Eyal Reizer <eyalr@ti.com>,
-	netdev <netdev@vger.kernel.org>, Satish Patel <satish.patel@linaro.org>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Message-ID: <1509099550.18015.13.camel@linux.intel.com>
+Subject: Re: [RFC 3/3] tun: Add 6LoWPAN compression/decompression to tun
+ driver
+From: Patrik Flykt <patrik.flykt@linux.intel.com>
+To: Alexander Aring <aring@mojatatu.com>
+Cc: linux-bluetooth@vger.kernel.org,
+        linux-wpan - ML <linux-wpan@vger.kernel.org>,
+        luiz.von.dentz@intel.com, Jamal Hadi Salim <hadi@mojatatu.com>,
+        Stefan Schmidt <stefan@osg.samsung.com>, mcr@sandelman.ca
+Date: Fri, 27 Oct 2017 13:19:10 +0300
+In-Reply-To: <CAOHTApijss4n7r6tr7oMdGGduzVs-Hx=s0r5uL4+ACX1d=ePFw@mail.gmail.com>
+References: <20171018120615.24126-3-patrik.flykt@linux.intel.com>
+         <20171018120615.24126-4-patrik.flykt@linux.intel.com>
+         <20171018122705.25478-1-patrik.flykt@linux.intel.com>
+         <CAOHTApijss4n7r6tr7oMdGGduzVs-Hx=s0r5uL4+ACX1d=ePFw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, May 9, 2017 at 9:14 AM, Rob Herring <robh@kernel.org> wrote:
-> On Mon, May 8, 2017 at 11:48 PM, Baruch Siach <baruch@tkos.co.il> wrote:
->> Hi Rob,
->>
->> On Mon, May 08, 2017 at 04:12:16PM -0500, Rob Herring wrote:
->>> On Fri, May 5, 2017 at 9:51 AM, Adam Ford <aford173@gmail.com> wrote:
->>> > On Sun, Apr 30, 2017 at 11:04 AM, Sebastian Reichel <sre@kernel.org> wrote:
->>> >> On Sun, Apr 30, 2017 at 10:14:20AM -0500, Adam Ford wrote:
->>> >>> On Wed, Apr 5, 2017 at 1:30 PM, Rob Herring <robh@kernel.org> wrote:
->>> >>> > This series adds serdev support to the HCI LL protocol used on TI BT
->>> >>> > modules and enables support on HiKey board with with the WL1835 module.
->>> >>> > With this the custom TI UIM daemon and btattach are no longer needed.
->>> >>>
->>> >>> Without UIM daemon, what instruction do you use to load the BT firmware?
->>> >>>
->>> >>> I was thinking 'hciattach' but I was having trouble.  I was hoping you
->>> >>> might have some insight.
->>> >>>
->>> >>>  hciattach -t 30 -s 115200 /dev/ttymxc1 texas 3000000 flow  Just
->>> >>> returns a timeout.
->>> >>>
->>> >>> I modified my i.MX6 device tree per the binding documentation and
->>> >>> setup the regulators and enable GPIO pins.
->>> >>
->>> >> If you configured everything correctly no userspace interaction is
->>> >> required. The driver should request the firmware automatically once
->>> >> you power up the bluetooth device.
->>> >>
->>> >> Apart from DT changes make sure, that the following options are
->>> >> enabled and check dmesg for any hints.
->>> >>
->>> >> CONFIG_SERIAL_DEV_BUS
->>> >> CONFIG_SERIAL_DEV_CTRL_TTYPORT
->>> >> CONFIG_BT_HCIUART
->>> >> CONFIG_BT_HCIUART_LL
->>> >
->>> > I have enabled those flags, and I have updated my device tree.
->>> > I am testing this on an OMAP3630 (DM3730) board with a WL1283.  I am
->>> > getting a lot of timeout errors.  I tested this against the original
->>> > implemention I had in pdata-quirks.c using the ti-st driver, uim & and
->>> > the btwilink driver.
->>> >
->>> > I pulled in some of the newer patches to enable the wl1283-st, but I
->>> > am obviously missing something.
->>> >
->>> > I   58.717651] Bluetooth: hci0: Reading TI version information failed
->>> > (-110)
->>> > [   58.724853] Bluetooth: hci0: download firmware failed, retrying...
->>> > [   60.957641] Bluetooth: hci0 command 0x1001 tx timeout
->>> > [   68.957641] Bluetooth: hci0: Reading TI version information failed
->>> > (-110)
->>> > [   68.964843] Bluetooth: hci0: download firmware failed, retrying...
->>> > [   69.132171] Bluetooth: Unknown HCI packet type 06
->>> > [   69.138244] Bluetooth: Unknown HCI packet type 0c
->>> > [   69.143249] Bluetooth: Unknown HCI packet type 40
->>> > [   69.148498] Bluetooth: Unknown HCI packet type 20
->>> > [   69.153533] Bluetooth: Data length is too large
->>> > [   69.158569] Bluetooth: Unknown HCI packet type a0
->>> > [   69.163574] Bluetooth: Unknown HCI packet type 00
->>> > [   69.168731] Bluetooth: Unknown HCI packet type 00
->>> > [   69.173736] Bluetooth: Unknown HCI packet type 34
->>> > [   69.178924] Bluetooth: Unknown HCI packet type 91
->>> > [   71.197631] Bluetooth: hci0 command 0x1001 tx timeout
->>> > [   79.197662] Bluetooth: hci0: Reading TI version information failed (-110)
->>>
->>> There's a bug in serdev_device_write(), so if you have that function
->>> you need either the fix I sent or the patch to make
->>> serdev_device_writebuf atomic again. Both are on the linux-serial
->>> list, but not in any tree yet.
->>
->> You refer to the patches below, right?
->>
->>   [PATCH] tty: serdev: fix serdev_device_write return value,
->>   http://www.spinics.net/lists/linux-serial/msg26117.html
->>
->>   [PATCH] serdev: Restore serdev_device_write_buf for atomic context,
->>   http://www.spinics.net/lists/linux-serial/msg26113.html
->
-> Yes, either one will fix the issue.
 
-I am finally getting back to testing these on my DM3730 board, since
-it appears most of the patches appear upstream.  I am having trouble
-remembering how to load this.
+	Hi Alex,
 
-# modprobe hci_uart
-[   31.639892] Bluetooth: Core ver 2.22
-[   31.643890] NET: Registered protocol family 31
-[   31.648559] Bluetooth: HCI device and connection manager initialized
-[   31.655975] Bluetooth: HCI socket layer initialized
-[   31.661315] Bluetooth: L2CAP socket layer initialized
-[   31.667175] Bluetooth: SCO socket layer initialized
-[   31.700408] Bluetooth: HCI UART driver ver 2.3
-[   31.705108] Bluetooth: HCI UART protocol H4 registered
-[   31.710632] Bluetooth: HCI UART protocol BCSP registered
-[   31.716217] Bluetooth: HCI UART protocol Three-wire (H5) registered
-#
+On Thu, 2017-10-26 at 10:54 -0400, Alexander Aring wrote:
+> LOWPAN_IPHC_MAX_HC_BUF_LEN more bytes are added to sk_buff headroom
+> > to ensure there will be enough bytes to push headers to. This is
+> > probably an overkill and probably done wrongly anyway.
+> > 
+> 
+> This define should be removed because there exists no case where the
+> compression will be larger than the ipv6 header and vice versa.
 
-Unfortunately, any attempt to access the HCI device (ie hciconfig up
-hci0) fail.
+Ok, good to know. I could not convince myself otherwise, so I took a
+shot at it with a really big cannon. I will remove this from any future
+iterations.
 
-I have those configs enabled:
-CONFIG_SERIAL_DEV_BUS
-CONFIG_SERIAL_DEV_CTRL_TTYPORT
-CONFIG_BT_HCIUART
-CONFIG_BT_HCIUART_LL
+> > An ethernet MAC header is added in front of the (compressed) IPv6
+> > datagram in both directions; no such transport exists for 6LoWPAN,
+> > but this is just an example implementation trying to explain the
+> > idea behind the BTLE handling in user space and the 6LoWPAN
+> > compression and decompression in kernel space. Thus the tun/tap
+> > driver comes in handy as the victim of the demonstration.
+> 
+> Sorry but this really scares me.
 
-I can see that sysfs shows new files appear:
+The header format should of course take 802.15.4 and Bluetooth into
+account, but for the time being this was the easiest wrt time that I
+could implement and simplest to understand. See 
+https://marc.info/?l=linux-wpan&m=150849496308755&w=2 how it is all
+used together in Luiz' patch set.
 
-/sys/class/bluetooth
-/sys/firmware/devicetree/base/ocp@68000000/serial@4806c000/bluetooth
-/sys/firmware/devicetree/base/ocp@68000000/serial@4806c000/bluetooth/compatible
-/sys/firmware/devicetree/base/ocp@68000000/serial@4806c000/bluetooth/enable-gpios
-/sys/firmware/devicetree/base/ocp@68000000/serial@4806c000/bluetooth/name
+Do we have a user space entity for 802.15.4 similar to Bluez that needs
+to do the same thing? If yes, the different address lengths will then
+mandate a new header format to be used that fits both technologies and
+8, 6 and 2 byte MAC addresses.
 
-(and more)
-So it appears to me like it has loaded, and I don't see any errors during load.
+> The kernel use 6LoWPAN IPHC for
+> ethernet (as mac header information) and you doing BTLE/L2CAP stuff
+> in user space which is not anymore for your original use-case which
+> is "ethernet".
 
-Since this worked under pdata quirks and the older shared transport
-driver and UIM, I'm sure it's software and not hardware.  I just can't
-figure out what I am missing.
+It's actually the other way round. BTLE/IPSP requires 6LoWPAN
+copmression in RFC 7668. Those BTLE/IPSP encapsulated 6LoWPAN
+compressed IPv6 packets need to end up somewhere, and as Bluetooth uses
+otherwise "ethernet compatible" MAC addresses, it's really easy to
+write an ethernet header in front and have the rest of the Linux kernel
+to forward it, be it via a bridge or plain IP routing.
 
-thanks
+> This might work for now, because only address handling is used in
+> IPHC as MAC header information and eth/btle use the same address
+> length (besides that the address is not always the same and BTLE is
+> not a EUI-48 address with multicast bit etc.)
 
-adam
->
-> Rob
+Yes, the address generation is different from 802.15.4, see RFC 7668,
+Section 3.2.2.
+
+> You cannot simple use MAC X handling in kernelspace and use then MAC
+> handling Y in userspace - this will not work for long time.
+
+Sending ethernet frames stuffed with 6LoWPAN is not a generally good
+idea, its just easy for demonstration purposes. As above, a new header
+format of expressing MAC addresses is probably the way to go?
+
+> I already
+> fight with UDP based protocols in 802.15.4 6LoWPAN who depends on
+> 802.15.4 MAC information which are not just addressing information. 
+
+Quickly looking into UDP header compression didn't reveal any further
+dependencies on MAC addressing, which specification did you have in
+mind wrt UDP or similar layer headers?
+ 
+> If they need more bluetooth related information there you have no
+> possibility to get them. The same for next header compression which
+> might want more MAC information than just addressing for bluetooth.
+
+There are no additional dependencies or even planned ones from 6LoWPAN
+to Bluetooth that I'm aware of. So I'd go with the assumption that
+6LoWPAN will know only of the MAC addresses and the (MAC layer) data
+length, with the rest of the information being on IP(v6) level.
+
+> > +                       if (lowpan_header_decompress(skb, &tun-
+> > >ldev,
+> > +                                                       tun->dev-
+> > >dev_addr,
+> > +                                                       &eth.h_sour
+> > ce) < 0) {
+> 
+> This will make a module dependency of 6lowpan_iphc for the tap
+> driver. I am pretty sure that the tap driver people doesn't like
+> that.
+
+Ok, needs to be adressed.
+
+> Which
+> brings me to another issue with this patch:
+> Why you don't create a virtual lowpan interface on top of the tap
+> device. This handling is _incredibly_ against our design to have a
+> 6LoWPAN interface device type for the user space.
+> Now we have will have a tap device which makes internally 6LoWPAN
+> handling but is not visible as 6LoWPAN interface in the user space,
+> this will confuse 6LoWPAN user space applications.
+
+The only user space application that will know of 6LoWPAN compression
+being applied is Bluez. There are zero parameters that can be tuned, as
+Bluetooth specifies no configurable knobs for the 6LoWPAN IPv6
+datagrams that are transported over BTLE/IPSP. The Bluetooth
+specification relies on RFC 7668 getting the IPv6 details in sync end
+to end.
+
+What, if any, user space application would be able to manipulate a
+Bluetooth 6LoWPAN interface and why? Much like a VPN with compression,
+Bluetooth is by its nature tunneling 6LoWPAN IPv6 over BTLE/IPSP so
+there is no inherent need of a device driver specific for handling
+6LoWPAN.
+
+> What our design is (just to remember):
+>  - Ethernet interface (MAC/6LoWPAN view, before adaption)
+>  - 6LoWPAN interface (IPv6 view, after adaption)
+> 
+> I am pretty sure you can run your above changes transparently
+> separated of TAP driver by adding a 6LoWPAN interface on top. This
+> will also make no dependency to the TAP driver.
+
+Probably. But that also means there is some other user space
+application that can somehow manipulate such an interface. But for
+Bluetooth there already is Bluez that takes care of setting up and
+tearing down connections, si there isn't much need of any other
+application to control or configure BTLE/IPSP interfaces?
+
+> I guess what you want is a TAP interface which is NOT ethernet. It
+> need to get some special MAC information for your subsystem which is
+> BTLE. Not using ethernet here. To have the assumption here "it will
+> work because the address length is the same" is simple wrong, they
+> will be more use-cases where upper-layers need to have special MAC
+> information belongs to your link-layer subsystem.
+
+So it does sound like we do want a decent header for 6LowPAN traffic
+which can take both 802.15.4 and Bluetooth systems into account when
+dealing with the TAP file descriptor pulling the packets to/from user
+space, right? The end result in the kernel should be ethernet MAC
+frames for Bluetooth for maximum compatibility with all other
+networking subsystems, and with 802.15.4 frames for IEEE 802.15.4?
+
+
+Cheers,
+
+	Patrik
