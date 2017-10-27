@@ -1,68 +1,33 @@
-Return-Path: <zwindl@protonmail.com>
-Date: Sat, 28 Oct 2017 01:16:15 -0400
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-From: Zwindl <zwindl@protonmail.com>
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Larry Finger <Larry.Finger@lwfinger.net>, "gustavo@padovan.org" <gustavo@padovan.org>, "johan.hedberg@gmail.com" <johan.hedberg@gmail.com>, "marcel@holtmann.org" <marcel@holtmann.org>
-Reply-To: Zwindl <zwindl@protonmail.com>
-Subject: Bluetooth with RTL8192EE wireless card doesn't work
-Message-ID: <z5-4g29gJfygrfpdB_jMpqLD5F6Jz2hmeNEs__MZU86070l58P44SmkuXVzSIOys4zFQOPShwGHFHJ3wIDh24RU6ZXgSxM84H8qtJO4eaGQ=@protonmail.com>
-MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="b1_3c7d1afbcff567536fcdc5c4aa66135d"
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Message-ID: <1509104058.19297.5.camel@hadess.net>
+Subject: Re: [PATCH v2 01/11] adapter: Add
+ btd_request_authorization_cable_configured()
+From: Bastien Nocera <hadess@hadess.net>
+To: Szymon Janc <szymon.janc@codecoup.pl>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Fri, 27 Oct 2017 13:34:18 +0200
+In-Reply-To: <2420304.WZtTGuyavg@ix>
+References: <20171018015815.10045-1-hadess@hadess.net>
+         <2420304.WZtTGuyavg@ix>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is a multi-part message in MIME format.
+On Fri, 2017-10-27 at 10:00 +0200, Szymon Janc wrote:
+> Hi Bastien,
+> 
+> <snip>
+> 
+> Patches 1-8 are now applied, thanks.
 
---b1_3c7d1afbcff567536fcdc5c4aa66135d
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: base64
+For those following along on the mailing-list, I asked Szymon not to
+commit the Wireless Keypad patches as they don't use pairing at all,
+making it insecure.
 
-RGVhciBCbHVldG9vaCBEZXZzOgpJIGdvdCBwcm9ibGVtcyBvbiBibHVldG9vdGggd2l0aCBteSBU
-aGlua1BhZCBMNDQwIGxhcHRvcCwgaXQncyB1c2luZyBSVEw4MTkyZWUgd2lyZWxlc3MgY2FyZCB0
-byBoYW5kbGUgdGhlIGJsdWV0b290aCBjb21tdW5pY2F0aW9uLCBhbmQgc2V2ZXJhbCBkYXlzIGFn
-bywgSSBmb3VuZCBpdCBjYW4ndCBlbmFibGUgYmx1ZXRvb3RoIHdoYXRldmVyIEkgZGlkIChhY3R1
-YWxseSBJIGhhdm4ndCB1c2UgYmx1ZXRvb3RoIHNpbmNlIGEgbG9uZyB0aW1lIGFnbywgbWF5IGJl
-IHllYXJzKS4KTXkgZGlzdHJvIGlzIEFyY2ggTGludXggd2l0aCB0ZXN0aW5nIHJlcG8gb24sIGFu
-ZCBpdCdzIHVwIHRvIGRhdGUsIHRoZSBrZXJuZWwgdmVyc2lvbiBpcyA0LjEzLjEwLgpBZnRlciBJ
-IGxvZ2luIHRvIHRoZSBzeXN0ZW0sIEkgcmFuIHRoZSBgZG1lc2cgfCBncmVwICdbYkJdbHVlJ2Ag
-Y29tbWFuZCwgYW5kIGhlcmUncyB0aGUgcmVzdWx0IGh0dHBzOi8vcHRwYi5wdy9hUmhDClRoZSBg
-c3lzdGVtY3RsIHN0YXR1cyBibHVldG9vdGguc2VydmljZWAgcmVzdWx0IGlzIGh0dHBzOi8vcHRw
-Yi5wdy81MGRVICwgYnV0IGFmdGVyIEkgdHJpZWQgdG8gZW5hYmxlIGJsdWV0b290aCB3aXRoIGNv
-bW1hbmQgYHBvd2VyIG9uYCBhbmQgYHNjYW4gb25gIGluIGBibHVldG9vdGhjdGxgLCBibHVldG9v
-dGggcHJpbnRzIGBGYWlsZWQgdG8gc3RhcnQgZGlzY292ZXJ5OiBvcmcuYmx1ZXouRXJyb3IuTm90
-UmVhZHlgIGFuZCB0aGUgc3lzdGVtY3RsIHN0YXR1cyByZXN1bHQgY2hhbmdlZCB0byBodHRwczov
-L3B0cGIucHcvNmJORyAuCldoYXQgc2hvdWxkIEkgZG8gb3IgcHJvdmlkZSB0byBoZWxwIHRvIHNv
-bHZlIHRoYXQ/ClRoYW5rcwpaV2luZEw=
+It's possible to pair the PS3 Wireless keypad properly, like a normal
+keyboard, by turning it on with the blue button (left trigger) pressed.
+I'll see whether we can support cable pairing with actual pairing, in a
+way that makes it easier for the user.
 
-
---b1_3c7d1afbcff567536fcdc5c4aa66135d
-Content-Type: text/html; charset=UTF-8
-Content-Transfer-Encoding: base64
-
-PGRpdj5EZWFyIEJsdWV0b29oIERldnM6PGJyPjwvZGl2PjxkaXY+SSBnb3QgcHJvYmxlbXMgb24g
-Ymx1ZXRvb3RoIHdpdGggbXkgVGhpbmtQYWQgTDQ0MCBsYXB0b3AsIGl0J3MgdXNpbmcgUlRMODE5
-MmVlIHdpcmVsZXNzIGNhcmQgdG8gaGFuZGxlIHRoZSBibHVldG9vdGggY29tbXVuaWNhdGlvbiwg
-YW5kIHNldmVyYWwgZGF5cyBhZ28sIEkgZm91bmQgaXQgY2FuJ3QgZW5hYmxlIGJsdWV0b290aCB3
-aGF0ZXZlciBJIGRpZCAoYWN0dWFsbHkgSSBoYXZuJ3QgdXNlIGJsdWV0b290aCBzaW5jZSBhIGxv
-bmcgdGltZSBhZ28sIG1heSBiZSB5ZWFycykuPGJyPjwvZGl2PjxkaXY+TXkgZGlzdHJvIGlzIEFy
-Y2ggTGludXggd2l0aCB0ZXN0aW5nIHJlcG8gb24sIGFuZCBpdCdzIHVwIHRvIGRhdGUsIHRoZSBr
-ZXJuZWwgdmVyc2lvbiBpcyA0LjEzLjEwLjxicj48L2Rpdj48ZGl2PkFmdGVyIEkgbG9naW4gdG8g
-dGhlIHN5c3RlbSwgSSByYW4gdGhlIGBkbWVzZyB8IGdyZXAgJ1tiQl1sdWUnYCBjb21tYW5kLCBh
-bmQgaGVyZSdzIHRoZSByZXN1bHQgPGEgaHJlZj0iaHR0cHM6Ly9wdHBiLnB3L2FSaEMiPmh0dHBz
-Oi8vcHRwYi5wdy9hUmhDPC9hPjxicj48L2Rpdj48ZGl2PlRoZSBgc3lzdGVtY3RsIHN0YXR1cyBi
-bHVldG9vdGguc2VydmljZWAgcmVzdWx0IGlzIDxhIGhyZWY9Imh0dHBzOi8vcHRwYi5wdy81MGRV
-Ij5odHRwczovL3B0cGIucHcvNTBkVTwvYT4gLCBidXQgYWZ0ZXIgSSB0cmllZCB0byBlbmFibGUg
-Ymx1ZXRvb3RoIHdpdGggY29tbWFuZCBgcG93ZXIgb25gIGFuZCBgc2NhbiBvbmAgaW4gYGJsdWV0
-b290aGN0bGAsIGJsdWV0b290aCBwcmludHMgYEZhaWxlZCB0byBzdGFydCBkaXNjb3Zlcnk6IG9y
-Zy5ibHVlei5FcnJvci5Ob3RSZWFkeWAgYW5kIHRoZSBzeXN0ZW1jdGwgc3RhdHVzIHJlc3VsdCBj
-aGFuZ2VkIHRvIDxhIGhyZWY9Imh0dHBzOi8vcHRwYi5wdy82Yk5HIj5odHRwczovL3B0cGIucHcv
-NmJORzwvYT4gLjxicj48L2Rpdj48ZGl2PldoYXQgc2hvdWxkIEkgZG8gb3IgcHJvdmlkZSB0byBo
-ZWxwIHRvIHNvbHZlIHRoYXQ/PGJyPjwvZGl2PjxkaXY+VGhhbmtzPGJyPjwvZGl2PjxkaXY+Wldp
-bmRMPGJyPjwvZGl2PjxkaXY+PGJyPjwvZGl2PjxkaXYgY2xhc3M9InByb3Rvbm1haWxfc2lnbmF0
-dXJlX2Jsb2NrIj48ZGl2IGNsYXNzPSJwcm90b25tYWlsX3NpZ25hdHVyZV9ibG9jay1wcm90b24g
-cHJvdG9ubWFpbF9zaWduYXR1cmVfYmxvY2stZW1wdHkiPjxicj48L2Rpdj48L2Rpdj48ZGl2Pjxi
-cj48L2Rpdj4=
-
-
-
---b1_3c7d1afbcff567536fcdc5c4aa66135d--
+Cheers
