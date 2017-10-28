@@ -1,155 +1,68 @@
-Return-Path: <aford173@gmail.com>
+Return-Path: <zwindl@protonmail.com>
+Date: Sat, 28 Oct 2017 07:09:37 -0400
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+From: Zwindl <zwindl@protonmail.com>
+Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Larry Finger <Larry.Finger@lwfinger.net>, "gustavo@padovan.org" <gustavo@padovan.org>, "johan.hedberg@gmail.com" <johan.hedberg@gmail.com>, "marcel@holtmann.org" <marcel@holtmann.org>
+Reply-To: Zwindl <zwindl@protonmail.com>
+Subject: Bluetooth with RTL8192EE wireless card doesn't work
+Message-ID: <4W0QKBxSLU6TTnny3itGXSfQhs5PgaTeDiy3sbL4-RZ005oQdbC_hvLHoO6_IQWvJ28pgZfDI_hsvR2EhsG-4Sj2KQx98DuilgAhuHFCuy4=@protonmail.com>
+In-Reply-To: <z5-4g29gJfygrfpdB_jMpqLD5F6Jz2hmeNEs__MZU86070l58P44SmkuXVzSIOys4zFQOPShwGHFHJ3wIDh24RU6ZXgSxM84H8qtJO4eaGQ=@protonmail.com>
+References: <z5-4g29gJfygrfpdB_jMpqLD5F6Jz2hmeNEs__MZU86070l58P44SmkuXVzSIOys4zFQOPShwGHFHJ3wIDh24RU6ZXgSxM84H8qtJO4eaGQ=@protonmail.com>
 MIME-Version: 1.0
-In-Reply-To: <CAHCN7xKNWa2yrquvYg41CtTWa7aqETNx_08SPgsxv6QC4GK_Rw@mail.gmail.com>
-References: <20170405183005.20570-1-robh@kernel.org> <CAHCN7xJUxZm1qKAxT0kaK6qoDg+HWOJK7sTH-q9za4HJuUwe8Q@mail.gmail.com>
- <20170430160430.rmyuo6sdrkrjxjg6@earth> <CAHCN7x+Mq=b6RN-ezU0400W=H=D7DR+Es1FHtT4GyozpVd8ALA@mail.gmail.com>
- <CAL_JsqKBAPUPRtn+pEtz8B8pCrA=45RkEq6X_0i_HYoWsVmtyw@mail.gmail.com>
- <20170509044837.oje2tfodytyuuuur@sapphire.tkos.co.il> <CAL_Jsq+wJfepPRbpL-_BWtD2Nyviy0q2UW9s7MrNr392W8D0cA@mail.gmail.com>
- <CAHCN7xKNWa2yrquvYg41CtTWa7aqETNx_08SPgsxv6QC4GK_Rw@mail.gmail.com>
-From: Adam Ford <aford173@gmail.com>
-Date: Sat, 28 Oct 2017 06:33:58 -0500
-Message-ID: <CAHCN7xKTqJ4ZkvUg_4xHYPF+bvjXT=zGbYFP_DKii0S3WQeKew@mail.gmail.com>
-Subject: Re: [PATCH 0/4] TI Bluetooth serdev support
-To: Rob Herring <robh@kernel.org>
-Cc: Baruch Siach <baruch@tkos.co.il>, Mark Rutland <mark.rutland@arm.com>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, Johan Hedberg <johan.hedberg@gmail.com>,
-	Gustavo Padovan <gustavo@padovan.org>, Marcel Holtmann <marcel@holtmann.org>,
-	Sebastian Reichel <sre@kernel.org>, Wei Xu <xuwei5@hisilicon.com>,
-	"open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>, Eyal Reizer <eyalr@ti.com>,
-	netdev <netdev@vger.kernel.org>, Satish Patel <satish.patel@linaro.org>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/alternative;
+	boundary="b1_c84eae9bf0c137798c68c067c9eaf815"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, Oct 27, 2017 at 5:55 AM, Adam Ford <aford173@gmail.com> wrote:
-> On Tue, May 9, 2017 at 9:14 AM, Rob Herring <robh@kernel.org> wrote:
->> On Mon, May 8, 2017 at 11:48 PM, Baruch Siach <baruch@tkos.co.il> wrote:
->>> Hi Rob,
->>>
->>> On Mon, May 08, 2017 at 04:12:16PM -0500, Rob Herring wrote:
->>>> On Fri, May 5, 2017 at 9:51 AM, Adam Ford <aford173@gmail.com> wrote:
->>>> > On Sun, Apr 30, 2017 at 11:04 AM, Sebastian Reichel <sre@kernel.org> wrote:
->>>> >> On Sun, Apr 30, 2017 at 10:14:20AM -0500, Adam Ford wrote:
->>>> >>> On Wed, Apr 5, 2017 at 1:30 PM, Rob Herring <robh@kernel.org> wrote:
->>>> >>> > This series adds serdev support to the HCI LL protocol used on TI BT
->>>> >>> > modules and enables support on HiKey board with with the WL1835 module.
->>>> >>> > With this the custom TI UIM daemon and btattach are no longer needed.
->>>> >>>
->>>> >>> Without UIM daemon, what instruction do you use to load the BT firmware?
->>>> >>>
->>>> >>> I was thinking 'hciattach' but I was having trouble.  I was hoping you
->>>> >>> might have some insight.
->>>> >>>
->>>> >>>  hciattach -t 30 -s 115200 /dev/ttymxc1 texas 3000000 flow  Just
->>>> >>> returns a timeout.
->>>> >>>
->>>> >>> I modified my i.MX6 device tree per the binding documentation and
->>>> >>> setup the regulators and enable GPIO pins.
->>>> >>
->>>> >> If you configured everything correctly no userspace interaction is
->>>> >> required. The driver should request the firmware automatically once
->>>> >> you power up the bluetooth device.
->>>> >>
->>>> >> Apart from DT changes make sure, that the following options are
->>>> >> enabled and check dmesg for any hints.
->>>> >>
->>>> >> CONFIG_SERIAL_DEV_BUS
->>>> >> CONFIG_SERIAL_DEV_CTRL_TTYPORT
->>>> >> CONFIG_BT_HCIUART
->>>> >> CONFIG_BT_HCIUART_LL
->>>> >
->>>> > I have enabled those flags, and I have updated my device tree.
->>>> > I am testing this on an OMAP3630 (DM3730) board with a WL1283.  I am
->>>> > getting a lot of timeout errors.  I tested this against the original
->>>> > implemention I had in pdata-quirks.c using the ti-st driver, uim & and
->>>> > the btwilink driver.
->>>> >
->>>> > I pulled in some of the newer patches to enable the wl1283-st, but I
->>>> > am obviously missing something.
->>>> >
->>>> > I   58.717651] Bluetooth: hci0: Reading TI version information failed
->>>> > (-110)
->>>> > [   58.724853] Bluetooth: hci0: download firmware failed, retrying...
->>>> > [   60.957641] Bluetooth: hci0 command 0x1001 tx timeout
->>>> > [   68.957641] Bluetooth: hci0: Reading TI version information failed
->>>> > (-110)
->>>> > [   68.964843] Bluetooth: hci0: download firmware failed, retrying...
->>>> > [   69.132171] Bluetooth: Unknown HCI packet type 06
->>>> > [   69.138244] Bluetooth: Unknown HCI packet type 0c
->>>> > [   69.143249] Bluetooth: Unknown HCI packet type 40
->>>> > [   69.148498] Bluetooth: Unknown HCI packet type 20
->>>> > [   69.153533] Bluetooth: Data length is too large
->>>> > [   69.158569] Bluetooth: Unknown HCI packet type a0
->>>> > [   69.163574] Bluetooth: Unknown HCI packet type 00
->>>> > [   69.168731] Bluetooth: Unknown HCI packet type 00
->>>> > [   69.173736] Bluetooth: Unknown HCI packet type 34
->>>> > [   69.178924] Bluetooth: Unknown HCI packet type 91
->>>> > [   71.197631] Bluetooth: hci0 command 0x1001 tx timeout
->>>> > [   79.197662] Bluetooth: hci0: Reading TI version information failed (-110)
->>>>
->>>> There's a bug in serdev_device_write(), so if you have that function
->>>> you need either the fix I sent or the patch to make
->>>> serdev_device_writebuf atomic again. Both are on the linux-serial
->>>> list, but not in any tree yet.
->>>
->>> You refer to the patches below, right?
->>>
->>>   [PATCH] tty: serdev: fix serdev_device_write return value,
->>>   http://www.spinics.net/lists/linux-serial/msg26117.html
->>>
->>>   [PATCH] serdev: Restore serdev_device_write_buf for atomic context,
->>>   http://www.spinics.net/lists/linux-serial/msg26113.html
->>
->> Yes, either one will fix the issue.
->
-> I am finally getting back to testing these on my DM3730 board, since
-> it appears most of the patches appear upstream.  I am having trouble
-> remembering how to load this.
->
-> # modprobe hci_uart
-> [   31.639892] Bluetooth: Core ver 2.22
-> [   31.643890] NET: Registered protocol family 31
-> [   31.648559] Bluetooth: HCI device and connection manager initialized
-> [   31.655975] Bluetooth: HCI socket layer initialized
-> [   31.661315] Bluetooth: L2CAP socket layer initialized
-> [   31.667175] Bluetooth: SCO socket layer initialized
-> [   31.700408] Bluetooth: HCI UART driver ver 2.3
-> [   31.705108] Bluetooth: HCI UART protocol H4 registered
-> [   31.710632] Bluetooth: HCI UART protocol BCSP registered
-> [   31.716217] Bluetooth: HCI UART protocol Three-wire (H5) registered
-> #
->
-> Unfortunately, any attempt to access the HCI device (ie hciconfig up
-> hci0) fail.
->
-> I have those configs enabled:
-> CONFIG_SERIAL_DEV_BUS
-> CONFIG_SERIAL_DEV_CTRL_TTYPORT
-> CONFIG_BT_HCIUART
-> CONFIG_BT_HCIUART_LL
->
-> I can see that sysfs shows new files appear:
->
-> /sys/class/bluetooth
-> /sys/firmware/devicetree/base/ocp@68000000/serial@4806c000/bluetooth
-> /sys/firmware/devicetree/base/ocp@68000000/serial@4806c000/bluetooth/compatible
-> /sys/firmware/devicetree/base/ocp@68000000/serial@4806c000/bluetooth/enable-gpios
-> /sys/firmware/devicetree/base/ocp@68000000/serial@4806c000/bluetooth/name
->
-> (and more)
-> So it appears to me like it has loaded, and I don't see any errors during load.
->
-> Since this worked under pdata quirks and the older shared transport
-> driver and UIM, I'm sure it's software and not hardware.  I just can't
-> figure out what I am missing.
->
+This is a multi-part message in MIME format.
 
-Nevermind. Sorry for the noise, I got past this part.  I had a typo in
-my device tree.
+--b1_c84eae9bf0c137798c68c067c9eaf815
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: base64
+
+RGVhciBCbHVldG9vaCBEZXZzOgoKSSBnb3QgcHJvYmxlbXMgb24gYmx1ZXRvb3RoIHdpdGggbXkg
+VGhpbmtQYWQgTDQ0MCBsYXB0b3AsIGl0J3MgdXNpbmcgUlRMODE5MmVlIHdpcmVsZXNzIGNhcmQg
+dG8gaGFuZGxlIHRoZSBibHVldG9vdGggY29tbXVuaWNhdGlvbiwgYW5kIHNldmVyYWwgZGF5cyBh
+Z28sIEkgZm91bmQgaXQgY2FuJ3QgZW5hYmxlIGJsdWV0b290aCB3aGF0ZXZlciBJIGRpZCAoYWN0
+dWFsbHkgSSBoYXZuJ3QgdXNlIGJsdWV0b290aCBzaW5jZSBhIGxvbmcgdGltZSBhZ28sIG1heSBi
+ZSB5ZWFycykuCgpNeSBkaXN0cm8gaXMgQXJjaCBMaW51eCB3aXRoIHRlc3RpbmcgcmVwbyBvbiwg
+YW5kIGl0J3MgdXAgdG8gZGF0ZSwgdGhlIGtlcm5lbCB2ZXJzaW9uIGlzIDQuMTMuMTAuCgpBZnRl
+ciBJIGxvZ2luIHRvIHRoZSBzeXN0ZW0sIEkgcmFuIHRoZSBgZG1lc2cgfCBncmVwICdbYkJdbHVl
+J2AgY29tbWFuZCwgYW5kIGhlcmUncyB0aGUgcmVzdWx0IHB0cGIucHcvYVJoQwoKVGhlIGBzeXN0
+ZW1jdGwgc3RhdHVzIGJsdWV0b290aC5zZXJ2aWNlYCByZXN1bHQgaXMgcHRwYi5wdy81MGRVICwg
+YnV0IGFmdGVyIEkgdHJpZWQgdG8gZW5hYmxlIGJsdWV0b290aCB3aXRoIGNvbW1hbmQgYHBvd2Vy
+IG9uYCBhbmQgYHNjYW4gb25gIGluIGBibHVldG9vdGhjdGxgLCBibHVldG9vdGggcHJpbnRzIGBG
+YWlsZWQgdG8gc3RhcnQgZGlzY292ZXJ5OiBvcmcuYmx1ZXouRXJyb3IuTm90UmVhZHlgIGFuZCB0
+aGUgc3lzdGVtY3RsIHN0YXR1cyByZXN1bHQgY2hhbmdlZCB0byBwdHBiLnB3LzZiTkcgLgoKV2hh
+dCBzaG91bGQgSSBkbyBvciBwcm92aWRlIHRvIGhlbHAgdG8gc29sdmUgdGhhdD8KClRoYW5rcwoK
+WldpbmRM
 
 
-> thanks
->
-> adam
->>
->> Rob
+--b1_c84eae9bf0c137798c68c067c9eaf815
+Content-Type: text/html; charset=UTF-8
+Content-Transfer-Encoding: base64
+
+PGRpdj5EZWFyIEJsdWV0b29oIERldnM6PGJyPjwvZGl2PjxkaXY+PGJyPjwvZGl2PjxkaXY+SSBn
+b3QgcHJvYmxlbXMgb24gYmx1ZXRvb3RoIHdpdGggbXkgVGhpbmtQYWQgTDQ0MCBsYXB0b3AsIGl0
+J3MgdXNpbmcgUlRMODE5MmVlIHdpcmVsZXNzIGNhcmQgdG8gaGFuZGxlIHRoZSBibHVldG9vdGgg
+Y29tbXVuaWNhdGlvbiwgYW5kIHNldmVyYWwgZGF5cyBhZ28sIEkgZm91bmQgaXQgY2FuJ3QgZW5h
+YmxlIGJsdWV0b290aCB3aGF0ZXZlciBJIGRpZCAoYWN0dWFsbHkgSSBoYXZuJ3QgdXNlIGJsdWV0
+b290aCBzaW5jZSBhIGxvbmcgdGltZSBhZ28sIG1heSBiZSB5ZWFycykuPGJyPjwvZGl2PjxkaXY+
+PGJyPjwvZGl2PjxkaXY+TXkgZGlzdHJvIGlzIEFyY2ggTGludXggd2l0aCB0ZXN0aW5nIHJlcG8g
+b24sIGFuZCBpdCdzIHVwIHRvIGRhdGUsIHRoZSBrZXJuZWwgdmVyc2lvbiBpcyA0LjEzLjEwLjxi
+cj48L2Rpdj48ZGl2Pjxicj48L2Rpdj48ZGl2PkFmdGVyIEkgbG9naW4gdG8gdGhlIHN5c3RlbSwg
+SSByYW4gdGhlIGBkbWVzZyB8IGdyZXAgJ1tiQl1sdWUnYCBjb21tYW5kLCBhbmQgaGVyZSdzIHRo
+ZSByZXN1bHQgPGEgaHJlZj0iaHR0cDovL3B0cGIucHcvYVJoQyI+cHRwYi5wdy9hUmhDPC9hPjxi
+cj48L2Rpdj48ZGl2Pjxicj48L2Rpdj48ZGl2PlRoZSBgc3lzdGVtY3RsIHN0YXR1cyBibHVldG9v
+dGguc2VydmljZWAgcmVzdWx0IGlzIDxhIGhyZWY9Imh0dHA6Ly9wdHBiLnB3LzUwZFUiPnB0cGIu
+cHcvNTBkVTwvYT4gLCBidXQgYWZ0ZXIgSSB0cmllZCB0byBlbmFibGUgYmx1ZXRvb3RoIHdpdGgg
+Y29tbWFuZCBgcG93ZXIgb25gIGFuZCBgc2NhbiBvbmAgaW4gYGJsdWV0b290aGN0bGAsIGJsdWV0
+b290aCBwcmludHMgYEZhaWxlZCB0byBzdGFydCBkaXNjb3Zlcnk6IG9yZy5ibHVlei5FcnJvci5O
+b3RSZWFkeWAgYW5kIHRoZSBzeXN0ZW1jdGwgc3RhdHVzIHJlc3VsdCBjaGFuZ2VkIHRvIDxhIGhy
+ZWY9Imh0dHA6Ly9wdHBiLnB3LzZiTkciPnB0cGIucHcvNmJORzwvYT4gLjxicj48L2Rpdj48ZGl2
+Pjxicj48L2Rpdj48ZGl2PldoYXQgc2hvdWxkIEkgZG8gb3IgcHJvdmlkZSB0byBoZWxwIHRvIHNv
+bHZlIHRoYXQ/PGJyPjwvZGl2PjxkaXY+PGJyPjwvZGl2PjxkaXY+VGhhbmtzPGJyPjwvZGl2Pjxk
+aXY+PGJyPjwvZGl2PjxkaXY+WldpbmRMPGJyPjwvZGl2PjxkaXY+PGJyPjwvZGl2Pg==
+
+
+
+--b1_c84eae9bf0c137798c68c067c9eaf815--
