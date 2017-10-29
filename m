@@ -1,33 +1,33 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 Content-Type: text/plain;
-        charset=utf-8
+        charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 11.0 \(3445.1.7\))
-Subject: Re: [PATCH] bluetooth: increase timeout for le auto connections
+Subject: Re: [PATCH] Bluetooth: hci_ath: Add ath_vendor_cmd helper
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1508248429-19415-1-git-send-email-konrad.zapalowicz@canonical.com>
-Date: Sun, 29 Oct 2017 14:11:06 +0100
-Cc: linux-bluetooth@vger.kernel.org,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Message-Id: <6C8F5FB6-C23C-42BB-A64F-097384BDE8C0@holtmann.org>
-References: <1508248429-19415-1-git-send-email-konrad.zapalowicz@canonical.com>
-To: Konrad Zapalowicz <konrad.zapalowicz@canonical.com>
+In-Reply-To: <1508416150-26259-1-git-send-email-loic.poulain@linaro.org>
+Date: Sun, 29 Oct 2017 14:09:47 +0100
+Cc: Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-bluetooth@vger.kernel.org
+Message-Id: <EE4BE2B9-0548-4FBC-8F48-AB0DBFE14411@holtmann.org>
+References: <1508416150-26259-1-git-send-email-loic.poulain@linaro.org>
+To: Loic Poulain <loic.poulain@linaro.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Konrad,
+Hi Loic,
 
-> This patch increases the connection timeout for LE connections that are
-> triggered by the advertising report to 4 seconds.
+> Introduce ath_vendor_cmd function which can be used to
+> configure 'tags' and patch the firmware.
 > 
-> It has been observed that devices equipped with wifi+bt combo SoC fail
-> to create a connection with BLE devices due to their coexistence issues.
-> Increasing this timeout gives them enough time to complete the
-> connection with success.
+> ATH vendor command has the following format:
+> | OPCODE (u8) | INDEX (LE16) | DLEN (U8) | DATA (U8 * DLEN) |
 > 
-> Signed-off-by: Konrad Zapałowicz <konrad.zapalowicz@canonical.com>
+> BD address configuration tag is at index 0x0001.
+> 
+> Signed-off-by: Loic Poulain <loic.poulain@linaro.org>
 > ---
-> include/net/bluetooth/hci.h | 2 +-
-> 1 file changed, 1 insertion(+), 1 deletion(-)
+> drivers/bluetooth/hci_ath.c | 49 +++++++++++++++++++++++++++++----------------
+> 1 file changed, 32 insertions(+), 17 deletions(-)
 
 patch has been applied to bluetooth-next tree.
 
