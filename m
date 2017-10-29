@@ -1,51 +1,37 @@
-Return-Path: <linux-kernel-owner@vger.kernel.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 Content-Type: text/plain;
-        charset=us-ascii
+        charset=utf-8
 Mime-Version: 1.0 (Mac OS X Mail 11.0 \(3445.1.7\))
-Subject: Re: [PATCH] Bluetooth: avoid recursive locking in
- hci_send_to_channel()
+Subject: Re: [PATCH] bluetooth: increase timeout for le auto connections
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20170921135123.rgzacdgfonqftlu7@linutronix.de>
-Date: Mon, 30 Oct 2017 09:05:02 +0100
-Cc: Mart van de Wege <mvdwege@gmail.com>,
-        Johan Hedberg <johan.hedberg@intel.com>,
-        "Gustavo F. Padovan" <gustavo@padovan.org>,
-        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-rt-users@vger.kernel.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Peter Zijlstra <peterz@infradead.org>
-Message-Id: <19282780-42CE-43C9-928E-73F4135D359A@holtmann.org>
-References: <86val4928u.fsf@gaheris.avalon.lan>
- <20170831145211.xlu6cvocqdkzevsl@linutronix.de>
- <20170921135123.rgzacdgfonqftlu7@linutronix.de>
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Sender: linux-kernel-owner@vger.kernel.org
+In-Reply-To: <1508248429-19415-1-git-send-email-konrad.zapalowicz@canonical.com>
+Date: Sun, 29 Oct 2017 14:11:06 +0100
+Cc: linux-bluetooth@vger.kernel.org,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Message-Id: <6C8F5FB6-C23C-42BB-A64F-097384BDE8C0@holtmann.org>
+References: <1508248429-19415-1-git-send-email-konrad.zapalowicz@canonical.com>
+To: Konrad Zapalowicz <konrad.zapalowicz@canonical.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Sebastian,
+Hi Konrad,
 
-> Mart reported a deadlock in -RT in the call path:
->  hci_send_monitor_ctrl_event() -> hci_send_to_channel()
+> This patch increases the connection timeout for LE connections that are
+> triggered by the advertising report to 4 seconds.
 > 
-> because both functions acquire the same read lock hci_sk_list.lock. This
-> is also a mainline issue because the qrwlock implementation is writer
-> fair (the traditional rwlock implementation is reader biased).
+> It has been observed that devices equipped with wifi+bt combo SoC fail
+> to create a connection with BLE devices due to their coexistence issues.
+> Increasing this timeout gives them enough time to complete the
+> connection with success.
 > 
-> To avoid the deadlock there is now __hci_send_to_channel() which expects
-> the readlock to be held.
-> 
-> Cc: Marcel Holtmann <marcel@holtmann.org>
-> Cc: Johan Hedberg <johan.hedberg@intel.com>
-> Fixes: 38ceaa00d02d ("Bluetooth: Add support for sending MGMT commands and events to monitor")
-> Reported-by: Mart van de Wege <mvdwege@gmail.com>
-> Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+> Signed-off-by: Konrad Zapałowicz <konrad.zapalowicz@canonical.com>
 > ---
-> net/bluetooth/hci_sock.c | 17 +++++++++++------
-> 1 file changed, 11 insertions(+), 6 deletions(-)
+> include/net/bluetooth/hci.h | 2 +-
+> 1 file changed, 1 insertion(+), 1 deletion(-)
 
 patch has been applied to bluetooth-next tree.
 
 Regards
 
 Marcel
+
