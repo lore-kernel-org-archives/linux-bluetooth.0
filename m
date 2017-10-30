@@ -1,48 +1,44 @@
-Return-Path: <johan.hedberg@gmail.com>
-Date: Mon, 30 Oct 2017 14:00:00 +0200
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Date: Mon, 30 Oct 2017 12:31:54 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2] Bluetooth: Use bt_dev_err and bt_dev_info when
- possible
-Message-ID: <20171030120000.GA10743@x1c.lan>
-References: <20171030090441.21322-1-marcel@holtmann.org>
+To: "jaya.p.g" <jaya.p.g@linux.intel.com>
+Cc: linux-bluetooth@vger.kernel.org, "An, Tedd" <tedd.an@intel.com>,
+        anand.kalyanakrishnan@intel.com, ravishankar.srivatsa@intel.com,
+        amit.k.bag@intel.com, sukumar.ghorai@intel.com
+Subject: Re: [PATCH] Bluetooth: btusb: Update firmware filename for Intel
+ 9x60 and,later
+Message-ID: <20171030103154.GB30418@x1c.lan>
+References: <59B7D929.7060908@linux.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20171030090441.21322-1-marcel@holtmann.org>
+In-Reply-To: <59B7D929.7060908@linux.intel.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Jaya,
 
-On Mon, Oct 30, 2017, Marcel Holtmann wrote:
-> In case of using BT_ERR and BT_INFO, convert to bt_dev_err and
-> bt_dev_info when possible. This allows for controller specific
-> reporting.
+On Tue, Sep 12, 2017, jaya.p.g wrote:
+> From: Jaya P G <jaya.p.g@intel.com>
+> Date: Wed, 6 Sep 2017 19:51:26 +0530
+> Subject: [PATCH] Bluetooth: btusb: Update firmware filename for Intel 9x60 and
+>  later
 > 
-> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+> The format of Intel Bluetooth firmware for bootloader product is
+> ibt-<hw_variant>-<device_revision_id>.sfi and .ddc.
+> 
+> But for the SKU's 9x60, there a 3 variants of FW, which cannot be
+> differentiated just with hw_variant and devision_revision_id.
+> So to pick the appropriate FW file for 9x60 SKU's, it will be
+> differentiated using hw_variant, hw_revision and fw_revision rather
+> than hw_variant and device_revision_id only.
+> 
+> Format will be like this:
+> ibt-<hw_variant>-<hw_revision>-<fw_revision>.sfi and .ddc
+> 
+> Signed-off-by: Jaya P G <jaya.p.g@intel.com>
 > ---
->  drivers/bluetooth/bpa10x.c        |  15 ++--
->  drivers/bluetooth/bt3c_cs.c       |   2 +-
->  drivers/bluetooth/btbcm.c         | 103 ++++++++++++-------------
->  drivers/bluetooth/btintel.c       |  42 +++++------
->  drivers/bluetooth/btqca.c         |   6 +-
->  drivers/bluetooth/btrtl.c         |  21 +++---
->  drivers/bluetooth/btusb.c         | 155 ++++++++++++++++++--------------------
->  drivers/bluetooth/hci_ath.c       |   2 +-
->  drivers/bluetooth/hci_h4.c        |   2 +-
->  drivers/bluetooth/hci_qca.c       |  12 +--
->  drivers/bluetooth/hci_serdev.c    |   9 +--
->  include/net/bluetooth/bluetooth.h |   3 +
->  net/bluetooth/a2mp.c              |   2 +-
->  net/bluetooth/amp.c               |   4 +-
->  net/bluetooth/hci_conn.c          |   4 +-
->  net/bluetooth/hci_core.c          |  35 +++++----
->  net/bluetooth/hci_event.c         |  46 +++++------
->  net/bluetooth/hci_request.c       |  16 ++--
->  net/bluetooth/hci_sysfs.c         |   2 +-
->  net/bluetooth/mgmt.c              |  56 +++++++-------
->  net/bluetooth/smp.c               |  22 +++---
->  21 files changed, 279 insertions(+), 280 deletions(-)
+>  drivers/bluetooth/btusb.c | 40 +++++++++++++++++++++++++++++++---------
+>  1 file changed, 31 insertions(+), 9 deletions(-)
 
 Applied to bluetooth-next. Thanks.
 
