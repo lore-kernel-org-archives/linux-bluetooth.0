@@ -1,116 +1,40 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: "Stotland, Inga" <inga.stotland@intel.com>
-To: "sbrown@cortland.com" <sbrown@cortland.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: mesh: meshctl - How to access the functions in config-server.c?
-Date: Mon, 30 Oct 2017 19:12:53 +0000
-Message-ID: <1509390771.5672.14.camel@intel.com>
-References: <1509382210.18029.1.camel@cortland.com>
-In-Reply-To: <1509382210.18029.1.camel@cortland.com>
-Content-Type: multipart/signed; micalg=sha-1;
-        protocol="application/x-pkcs7-signature"; boundary="=-uwA00qHOVNVsYNmEm5Wy"
-MIME-Version: 1.0
+From: Inga Stotland <inga.stotland@intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Inga Stotland <inga.stotland@intel.com>
+Subject: [PATCH BlueZ] mesh: Add config server response for loopback
+Date: Mon, 30 Oct 2017 11:56:38 -0700
+Message-Id: <20171030185638.20168-1-inga.stotland@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---=-uwA00qHOVNVsYNmEm5Wy
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+---
+ mesh/config-server.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
 
-Hi Steve,
+diff --git a/mesh/config-server.c b/mesh/config-server.c
+index 8a88645e4..938ec2275 100644
+--- a/mesh/config-server.c
++++ b/mesh/config-server.c
+@@ -141,10 +141,17 @@ static bool server_msg_recvd(uint16_t src, uint8_t *data,
+ 		break;
+ 	}
+ 
++	if (!n)
++		return true;
++
+ 	primary = node_get_primary(node);
+-	if (n && src != primary)
++	if (src != primary)
+ 		net_access_layer_send(node_get_default_ttl(node), primary,
+ 					src, APP_IDX_DEV, msg, n);
++	else
++		node_local_data_handler(primary, src, node_get_iv_index(node),
++					node_get_sequence_number(node),
++					APP_IDX_DEV, msg, n);
+ 	return true;
+ }
+ 
+-- 
+2.13.6
 
-On Mon, 2017-10-30 at 12:50 -0400, Steve Brown wrote:
-> The unicast address for meshctl is 0077.=20
->=20
-> But the command "configure 0077" doesn't appear to be the answer.
->=20
-"configure 0077" does result in routing config commands to itself.
-For example, "set-ttl" will result in change to local-node.json
-
-However, the local config server does not send a status message back.
-I submitted a patch to take care of that ([PATCH BlueZ] mesh: Add
-config server response for loopback).
-
-> Is it possible to route meshctl commands to itself?
->=20
-> Thanks,
->=20
-> Steve
->=20
->=20
-
-
-I should mention that the implemented functionality in local config
-server is very scarce: only get/set ttl and set publication are
-currently handled.
-
-Regards,
-
-Inga
-
---=-uwA00qHOVNVsYNmEm5Wy
-Content-Type: application/x-pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
-
-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
-s+FjFlMZRl+6tAsU6MKgNPjqLZM/5/UApupmE4I4+I7tJzH7J+/PQP756UTWANxeOFXXAgMBAAGj
-ggIxMIICLTAdBgNVHQ4EFgQUGgH+hmVcYfkjP42Io/H7dyFj/xEwHwYDVR0jBBgwFoAUHmkqtNwo
-/kcYTiELP7ysES/wmPUwZQYDVR0fBF4wXDBaoFigVoZUaHR0cDovL3d3dy5pbnRlbC5jb20vcmVw
-b3NpdG9yeS9DUkwvSW50ZWwlMjBFeHRlcm5hbCUyMEJhc2ljJTIwSXNzdWluZyUyMENBJTIwNEEu
-Y3JsMIGfBggrBgEFBQcBAQSBkjCBjzBpBggrBgEFBQcwAoZdaHR0cDovL3d3dy5pbnRlbC5jb20v
-cmVwb3NpdG9yeS9jZXJ0aWZpY2F0ZXMvSW50ZWwlMjBFeHRlcm5hbCUyMEJhc2ljJTIwSXNzdWlu
-ZyUyMENBJTIwNEEuY3J0MCIGCCsGAQUFBzABhhZodHRwOi8vb2NzcC5pbnRlbC5jb20vMAsGA1Ud
-DwQEAwIHgDA8BgkrBgEEAYI3FQcELzAtBiUrBgEEAYI3FQiGw4x1hJnlUYP9gSiFjp9TgpHACWeB
-3r05lfBDAgFkAgEJMB8GA1UdJQQYMBYGCCsGAQUFBwMEBgorBgEEAYI3CgMMMCkGCSsGAQQBgjcV
-CgQcMBowCgYIKwYBBQUHAwQwDAYKKwYBBAGCNwoDDDBLBgNVHREERDBCoCcGCisGAQQBgjcUAgOg
-GQwXaW5nYS5zdG90bGFuZEBpbnRlbC5jb22BF2luZ2Euc3RvdGxhbmRAaW50ZWwuY29tMA0GCSqG
-SIb3DQEBBQUAA4IBAQBL46xSWeaTcedNEVjOvWuiMQNz8rRju5xKMBBA6PlBi7C3pe2oPLrn5fuy
-93vXsrFtVyxQs+rp19FwjthhpLl743f7SLWA8AGL+Mm2Uq8WSwhpgUBWjbqSZuyEZUvrLNMLIMch
-eNbju3KeUiY/cMt6ovGcAGrZG1KMRpL8DC9i/dwDMGFXmIiOrMTqZFSj3i+Fn05WVkRRRUmxoKWi
-KQpGTgKtfHEfKcns+tJssBGYoop4jdF1voX59gnxpIjIO97LpTd5mYWjSufKLAXZ4E3JBwLs2nYA
-hPjGOjiW4KniOu8alYzWYdXUNG7HCHZq+V/EKgLxNYrhwDF1meav+rMRMYICFzCCAhMCAQEwgZAw
-eTELMAkGA1UEBhMCVVMxCzAJBgNVBAgTAkNBMRQwEgYDVQQHEwtTYW50YSBDbGFyYTEaMBgGA1UE
-ChMRSW50ZWwgQ29ycG9yYXRpb24xKzApBgNVBAMTIkludGVsIEV4dGVybmFsIEJhc2ljIElzc3Vp
-bmcgQ0EgNEECEzMAAKB78iXkGFQW8ngAAAAAoHswCQYFKw4DAhoFAKBdMBgGCSqGSIb3DQEJAzEL
-BgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTE3MTAzMDE5MTI1MVowIwYJKoZIhvcNAQkEMRYE
-FIWuhfKeTuIGbFCsNsE334vEgOcDMA0GCSqGSIb3DQEBAQUABIIBAMO5ej7sSEgQ4kxgGQAsManE
-4KZ/KmBBRILcDzYRI+HFi33fEHqKOnFSm5Uw5cRoXQbkP9QT+bcnOEt6bspqjb4Uhnb3LwFaSrId
-lZ6bzF94k6xI9oiB1VDR0X6S+Ev8n9O5oiuQBDke5OZ7qP7sDI0BdVL39NLf5euk8eJF7Lp4qsQj
-cSrmr5u9/V65SYrZ8/bk9C6I+AUMzh7VhUJ1+3vDKv1PUrBj8pSNXT1+5Tm7cleTsUJEwvMyj2Jt
-LYCMIkCUHVckwzGStmojkaLKVWTyNI6Q6deqe1OUJ11mmCQrCQND1stHNwjp9afPjJmbSrYPNb4M
-a2hOWgbP9xTsdI4AAAAAAAA=
-
-
---=-uwA00qHOVNVsYNmEm5Wy--
