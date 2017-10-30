@@ -1,31 +1,22 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Bastien Nocera <hadess@hadess.net>
-To: linux-bluetooth@vger.kernel.org
-Cc: Bastien Nocera <hadess@hadess.net>
-Subject: [PATCH v4 1/2] battery: Add BT SIG reserved number used by Battery Service
-Date: Mon, 30 Oct 2017 17:55:37 +0100
-Message-Id: <20171030165538.21253-1-hadess@hadess.net>
+Message-ID: <1509382210.18029.1.camel@cortland.com>
+Subject: mesh: meshctl - How to access the functions in config-server.c?
+From: Steve Brown <sbrown@cortland.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Mon, 30 Oct 2017 12:50:10 -0400
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add the Battery Level UUID as per:
-https://www.bluetooth.com/specifications/gatt/viewer?attributeXmlFile=org.bluetooth.characteristic.battery_level.xml
----
- lib/uuid.h | 1 +
- 1 file changed, 1 insertion(+)
+The unicast address for meshctl is 0077. 
 
-diff --git a/lib/uuid.h b/lib/uuid.h
-index 2c57a3378..7e13e0fda 100644
---- a/lib/uuid.h
-+++ b/lib/uuid.h
-@@ -119,6 +119,7 @@ extern "C" {
- #define GATT_CHARAC_RECONNECTION_ADDRESS		0x2A03
- #define GATT_CHARAC_PERIPHERAL_PREF_CONN		0x2A04
- #define GATT_CHARAC_SERVICE_CHANGED			0x2A05
-+#define GATT_CHARAC_BATTERY_LEVEL			0x2A19
- #define GATT_CHARAC_SYSTEM_ID				0x2A23
- #define GATT_CHARAC_MODEL_NUMBER_STRING			0x2A24
- #define GATT_CHARAC_SERIAL_NUMBER_STRING		0x2A25
--- 
-2.14.2
+But the command "configure 0077" doesn't appear to be the answer.
+
+Is it possible to route meshctl commands to itself?
+
+Thanks,
+
+Steve
+
 
