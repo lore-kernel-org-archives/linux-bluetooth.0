@@ -1,40 +1,445 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Inga Stotland <inga.stotland@intel.com>
+From: Bastien Nocera <hadess@hadess.net>
 To: linux-bluetooth@vger.kernel.org
-Cc: Inga Stotland <inga.stotland@intel.com>
-Subject: [PATCH BlueZ] mesh: Add config server response for loopback
-Date: Mon, 30 Oct 2017 11:56:38 -0700
-Message-Id: <20171030185638.20168-1-inga.stotland@intel.com>
+Cc: Bastien Nocera <hadess@hadess.net>
+Subject: [PATCH v4 2/2] profiles/battery: Add Bluetooth LE Battery service
+Date: Mon, 30 Oct 2017 17:55:38 +0100
+Message-Id: <20171030165538.21253-2-hadess@hadess.net>
+In-Reply-To: <20171030165538.21253-1-hadess@hadess.net>
+References: <20171030165538.21253-1-hadess@hadess.net>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- mesh/config-server.c | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+The Battery Level characteristic was tested with a
+Microsoft Arc Touch Mouse SE.
 
-diff --git a/mesh/config-server.c b/mesh/config-server.c
-index 8a88645e4..938ec2275 100644
---- a/mesh/config-server.c
-+++ b/mesh/config-server.c
-@@ -141,10 +141,17 @@ static bool server_msg_recvd(uint16_t src, uint8_t *data,
- 		break;
- 	}
+The Battery1 interface is now exported for Bluetooth LE devices which
+support the Battery Level characteristic, providing a single
+"Percentage" value to other integration points in the OS, such as UPower
+for consumption on most free desktops.
+
+See https://bugs.freedesktop.org/show_bug.cgi?id=92370
+---
+ Makefile.plugins           |   3 +
+ doc/battery-api.txt        |  14 ++
+ profiles/battery/battery.c | 373 +++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 390 insertions(+)
+ create mode 100644 doc/battery-api.txt
+ create mode 100644 profiles/battery/battery.c
+
+diff --git a/Makefile.plugins b/Makefile.plugins
+index 73377e532..1f3b5b552 100644
+--- a/Makefile.plugins
++++ b/Makefile.plugins
+@@ -100,6 +100,9 @@ builtin_sources += profiles/midi/midi.c \
+ builtin_ldadd += @ALSA_LIBS@
+ endif
  
-+	if (!n)
-+		return true;
++builtin_modules += battery
++builtin_sources += profiles/battery/battery.c
 +
- 	primary = node_get_primary(node);
--	if (n && src != primary)
-+	if (src != primary)
- 		net_access_layer_send(node_get_default_ttl(node), primary,
- 					src, APP_IDX_DEV, msg, n);
-+	else
-+		node_local_data_handler(primary, src, node_get_iv_index(node),
-+					node_get_sequence_number(node),
-+					APP_IDX_DEV, msg, n);
- 	return true;
- }
- 
+ if SIXAXIS
+ plugin_LTLIBRARIES += plugins/sixaxis.la
+ plugins_sixaxis_la_SOURCES = plugins/sixaxis.c
+diff --git a/doc/battery-api.txt b/doc/battery-api.txt
+new file mode 100644
+index 000000000..623929851
+--- /dev/null
++++ b/doc/battery-api.txt
+@@ -0,0 +1,14 @@
++BlueZ D-Bus Battery API description
++***********************************
++
++
++Battery hierarchy
++=================
++
++Service		org.bluez
++Interface	org.bluez.Battery1
++Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX
++
++Properties	uint16 Percentage [readonly]
++
++			The percentage of battery left.
+diff --git a/profiles/battery/battery.c b/profiles/battery/battery.c
+new file mode 100644
+index 000000000..8dd0d0fa3
+--- /dev/null
++++ b/profiles/battery/battery.c
+@@ -0,0 +1,373 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2012  Instituto Nokia de Tecnologia - INdT
++ *  Copyright (C) 2014  Google Inc.
++ *  Copyright (C) 2017  Red Hat Inc.
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ */
++
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++
++#include <ctype.h>
++#include <stdbool.h>
++#include <stdlib.h>
++#include <sys/types.h>
++#include <sys/stat.h>
++#include <fcntl.h>
++#include <errno.h>
++
++#include <glib.h>
++
++#include "gdbus/gdbus.h"
++
++#include "lib/bluetooth.h"
++#include "lib/hci.h"
++#include "lib/sdp.h"
++#include "lib/uuid.h"
++
++#include "src/dbus-common.h"
++#include "src/shared/util.h"
++#include "src/shared/att.h"
++#include "src/shared/queue.h"
++#include "src/shared/gatt-db.h"
++#include "src/shared/gatt-client.h"
++#include "src/plugin.h"
++#include "src/adapter.h"
++#include "src/device.h"
++#include "src/profile.h"
++#include "src/service.h"
++#include "src/log.h"
++#include "attrib/att.h"
++
++#define BATTERY_INTERFACE "org.bluez.Battery1"
++
++#define BATT_UUID16 0x180f
++
++/* Generic Attribute/Access Service */
++struct batt {
++	char *path; /* D-Bus path of device */
++	struct btd_device *device;
++	struct gatt_db *db;
++	struct bt_gatt_client *client;
++	struct gatt_db_attribute *attr;
++
++	unsigned int batt_level_cb_id;
++	uint16_t batt_level_io_handle;
++
++	uint8_t *initial_value;
++	guint16 percentage;
++};
++
++static void batt_free(struct batt *batt)
++{
++	gatt_db_unref(batt->db);
++	bt_gatt_client_unref(batt->client);
++	btd_device_unref(batt->device);
++	g_free (batt->initial_value);
++	g_free(batt);
++}
++
++static void batt_reset(struct batt *batt)
++{
++	batt->attr = NULL;
++	gatt_db_unref(batt->db);
++	batt->db = NULL;
++	bt_gatt_client_unregister_notify(batt->client, batt->batt_level_cb_id);
++	bt_gatt_client_cancel_all(batt->client);
++	bt_gatt_client_unref(batt->client);
++	batt->client = NULL;
++	g_free (batt->initial_value);
++	batt->initial_value = NULL;
++	if (batt->path) {
++		g_dbus_unregister_interface(btd_get_dbus_connection(),
++					    batt->path, BATTERY_INTERFACE);
++		g_free(batt->path);
++		batt->path = NULL;
++	}
++	btd_device_unref(batt->device);
++}
++
++static void parse_battery_level(struct batt *batt,
++				const uint8_t *value)
++{
++	uint8_t percentage;
++
++	percentage = value[0];
++	if (batt->percentage != percentage) {
++		batt->percentage = percentage;
++		DBG("Battery Level updated: %d%%", percentage);
++		g_dbus_emit_property_changed(btd_get_dbus_connection(), batt->path,
++						BATTERY_INTERFACE, "Percentage");
++	}
++}
++
++static void batt_io_value_cb(uint16_t value_handle, const uint8_t *value,
++                             uint16_t length, void *user_data)
++{
++	struct batt *batt = user_data;
++
++	if (value_handle == batt->batt_level_io_handle) {
++		parse_battery_level(batt, value);
++	} else {
++		g_assert_not_reached();
++	}
++}
++
++static gboolean property_get_percentage(
++					const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *data)
++{
++	struct batt *batt = data;
++
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_UINT16, &batt->percentage);
++
++	return TRUE;
++}
++
++static const GDBusPropertyTable battery_properties[] = {
++	{ "Percentage", "q", property_get_percentage },
++	{ }
++};
++
++static void batt_io_ccc_written_cb(uint16_t att_ecode, void *user_data)
++{
++	struct batt *batt = user_data;
++
++	if (att_ecode != 0) {
++		error("Battery Level: notifications not enabled %s",
++		      att_ecode2str(att_ecode));
++		return;
++	}
++
++	if (g_dbus_register_interface(btd_get_dbus_connection(),
++					batt->path, BATTERY_INTERFACE,
++					NULL, NULL,
++					battery_properties, batt,
++					NULL) == FALSE) {
++		error("Unable to register %s interface for %s",
++			BATTERY_INTERFACE, batt->path);
++		batt_reset(batt);
++		return;
++	}
++
++	parse_battery_level(batt, batt->initial_value);
++	g_free (batt->initial_value);
++	batt->initial_value = NULL;
++
++	DBG("Battery Level: notification enabled");
++}
++
++static void read_initial_battery_level_cb(bool success,
++						uint8_t att_ecode,
++						const uint8_t *value,
++						uint16_t length,
++						void *user_data)
++{
++	struct batt *batt = user_data;
++
++	if (!success) {
++		DBG("Reading battery level failed with ATT errror: %u",
++								att_ecode);
++		return;
++	}
++
++	if (!length)
++		return;
++
++	batt->initial_value = g_memdup(value, length);
++
++	/* request notify */
++	batt->batt_level_cb_id =
++		bt_gatt_client_register_notify(batt->client,
++		                               batt->batt_level_io_handle,
++		                               batt_io_ccc_written_cb,
++		                               batt_io_value_cb,
++		                               batt,
++		                               NULL);
++}
++
++static void handle_battery_level(struct batt *batt, uint16_t value_handle)
++{
++	batt->batt_level_io_handle = value_handle;
++
++	if (!bt_gatt_client_read_value(batt->client, batt->batt_level_io_handle,
++						read_initial_battery_level_cb, batt, NULL))
++		DBG("Failed to send request to read battery level");
++}
++
++static bool uuid_cmp(uint16_t u16, const bt_uuid_t *uuid)
++{
++	bt_uuid_t lhs;
++
++	bt_uuid16_create(&lhs, u16);
++
++	return bt_uuid_cmp(&lhs, uuid) == 0;
++}
++
++static void handle_characteristic(struct gatt_db_attribute *attr,
++								void *user_data)
++{
++	struct batt *batt = user_data;
++	uint16_t value_handle;
++	bt_uuid_t uuid;
++
++	if (!gatt_db_attribute_get_char_data(attr, NULL, &value_handle, NULL,
++								NULL, &uuid)) {
++		error("Failed to obtain characteristic data");
++		return;
++	}
++
++	if (uuid_cmp(GATT_CHARAC_BATTERY_LEVEL, &uuid)) {
++		handle_battery_level(batt, value_handle);
++	} else {
++		char uuid_str[MAX_LEN_UUID_STR];
++
++		bt_uuid_to_string(&uuid, uuid_str, sizeof(uuid_str));
++		DBG("Unsupported characteristic: %s", uuid_str);
++	}
++}
++
++static void handle_batt_service(struct batt *batt)
++{
++	gatt_db_service_foreach_char(batt->attr, handle_characteristic, batt);
++}
++
++static int batt_probe(struct btd_service *service)
++{
++	struct btd_device *device = btd_service_get_device(service);
++	struct batt *batt = btd_service_get_user_data(service);
++	char addr[18];
++
++	ba2str(device_get_address(device), addr);
++	DBG("BATT profile probe (%s)", addr);
++
++	/* Ignore, if we were probed for this device already */
++	if (batt) {
++		error("Profile probed twice for the same device!");
++		return -1;
++	}
++
++	batt = g_new0(struct batt, 1);
++	if (!batt)
++		return -1;
++
++	batt->percentage = -1;
++	batt->device = btd_device_ref(device);
++	btd_service_set_user_data(service, batt);
++
++	return 0;
++}
++
++static void batt_remove(struct btd_service *service)
++{
++	struct btd_device *device = btd_service_get_device(service);
++	struct batt *batt;
++	char addr[18];
++
++	ba2str(device_get_address(device), addr);
++	DBG("BATT profile remove (%s)", addr);
++
++	batt = btd_service_get_user_data(service);
++	if (!batt) {
++		error("BATT service not handled by profile");
++		return;
++	}
++
++	batt_free(batt);
++}
++
++static void foreach_batt_service(struct gatt_db_attribute *attr, void *user_data)
++{
++	struct batt *batt = user_data;
++
++	if (batt->attr) {
++		error("More than one BATT service exists for this device");
++		return;
++	}
++
++	batt->attr = attr;
++	handle_batt_service(batt);
++}
++
++static int batt_accept(struct btd_service *service)
++{
++	struct btd_device *device = btd_service_get_device(service);
++	struct gatt_db *db = btd_device_get_gatt_db(device);
++	struct bt_gatt_client *client = btd_device_get_gatt_client(device);
++	struct batt *batt = btd_service_get_user_data(service);
++	char addr[18];
++	bt_uuid_t batt_uuid;
++
++	ba2str(device_get_address(device), addr);
++	DBG("BATT profile accept (%s)", addr);
++
++	if (!batt) {
++		error("BATT service not handled by profile");
++		return -1;
++	}
++
++	batt->db = gatt_db_ref(db);
++	batt->client = bt_gatt_client_clone(client);
++
++	/* Handle the BATT services */
++	bt_uuid16_create(&batt_uuid, BATT_UUID16);
++	gatt_db_foreach_service(db, &batt_uuid, foreach_batt_service, batt);
++
++	if (!batt->attr) {
++		error("BATT attribute not found");
++		batt_reset(batt);
++		return -1;
++	}
++
++	batt->path = g_strdup (device_get_path(device));
++
++	btd_service_connecting_complete(service, 0);
++
++	return 0;
++}
++
++static int batt_disconnect(struct btd_service *service)
++{
++	struct batt *batt = btd_service_get_user_data(service);
++
++	batt_reset(batt);
++
++	btd_service_disconnecting_complete(service, 0);
++
++	return 0;
++}
++
++static struct btd_profile batt_profile = {
++	.name		= "batt-profile",
++	.remote_uuid	= BATTERY_UUID,
++	.device_probe	= batt_probe,
++	.device_remove	= batt_remove,
++	.accept		= batt_accept,
++	.disconnect	= batt_disconnect,
++};
++
++static int batt_init(void)
++{
++	return btd_profile_register(&batt_profile);
++}
++
++static void batt_exit(void)
++{
++	btd_profile_unregister(&batt_profile);
++}
++
++BLUETOOTH_PLUGIN_DEFINE(battery, VERSION, BLUETOOTH_PLUGIN_PRIORITY_DEFAULT,
++							batt_init, batt_exit)
 -- 
-2.13.6
+2.14.2
 
