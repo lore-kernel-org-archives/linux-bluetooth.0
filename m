@@ -1,27 +1,24 @@
-Return-Path: <netdev-owner@vger.kernel.org>
-Date: Wed, 01 Nov 2017 22:09:06 +0900 (KST)
-Message-Id: <20171101.220906.1150403540779627670.davem@davemloft.net>
-To: johan.hedberg@gmail.com
-Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: pull request: bluetooth-next 2017-11-01
-From: David Miller <davem@davemloft.net>
-In-Reply-To: <20171101083213.GA20632@x1c.lan>
-References: <20171101083213.GA20632@x1c.lan>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Sender: netdev-owner@vger.kernel.org
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Date: Wed, 1 Nov 2017 15:03:47 +0200
+From: Johan Hedberg <johan.hedberg@intel.com>
+To: Inga Stotland <inga.stotland@intel.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ] mesh: Add config server response for loopback
+Message-ID: <20171101130347.GA3361@x1c.lan>
+References: <20171030185638.20168-1-inga.stotland@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20171030185638.20168-1-inga.stotland@intel.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@gmail.com>
-Date: Wed, 1 Nov 2017 10:32:13 +0200
+Hi Inga,
 
-> Here's one more bluetooth-next pull request for the 4.15 kernel.
-> 
->  - New NFA344A device entry for btusb drvier
->  - Fix race conditions in hci_ldisc
->  - Fix for isochronous interface assignments in btusb driver
->  - A few other smaller fixes & improvements
-> 
-> Please let me know if there are any issues pulling. Thanks.
+On Mon, Oct 30, 2017, Inga Stotland wrote:
+> ---
+>  mesh/config-server.c | 9 ++++++++-
+>  1 file changed, 8 insertions(+), 1 deletion(-)
 
-Pulled, thanks Johan.
+Applied. Thanks.
+
+Johan
