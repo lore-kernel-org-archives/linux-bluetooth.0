@@ -1,43 +1,45 @@
-Return-Path: <hdegoede@redhat.com>
-From: Hans de Goede <hdegoede@redhat.com>
-Subject: Enabling autosuspend for btusb by default
-To: Marcel Holtmann <marcel@holtmann.org>,
- Gustavo Padovan <gustavo@padovan.org>,
- Johan Hedberg <johan.hedberg@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Message-ID: <9629d543-a8e2-27d2-21e5-7f6a21395e3c@redhat.com>
-Date: Wed, 1 Nov 2017 15:31:37 +0100
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Gustavo Padovan <gustavo@padovan.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Gustavo Padovan <gustavo.padovan@collabora.com>
+Subject: [PATCH] Bluetooth: Remove myself from the MAINTAINERS file
+Date: Wed,  1 Nov 2017 11:31:49 -0200
+Message-Id: <20171101133149.16542-1-gustavo@padovan.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-<resend with a bunch of To and Cc address added, sorry?
+From: Gustavo Padovan <gustavo.padovan@collabora.com>
 
-Hi All,
+It's been sometime I'm not involved in Bluetooth anymore but I never
+got around to remove my name from it. Doing it now.
 
-I'm working on trying to improve the OOTB power-consumption
-of Linux (Fedora Workstation) on laptops.
+Thanks for all the fish! :)
 
-One of the easy wins here is enabling runtime-pm / autosuspend
-for btusb, since on many laptops the USB bluetooth device is
-the only USB device not using autosuspend, enabling this will
-not only allow suspending the USB bluetooth device but also to
-USB HCI, leading to a significant saving in power consumption
-of aprox. 0.4W.
+Signed-off-by: Gustavo Padovan <gustavo.padovan@collabora.com>
+---
+ MAINTAINERS | 2 --
+ 1 file changed, 2 deletions(-)
 
-So I would like to look into enabling runtime-pm / autosuspend
-for btusb by default.
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 6671f375f7fc..042c8ecd9a94 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -2674,7 +2674,6 @@ F:	drivers/mtd/devices/block2mtd.c
+ 
+ BLUETOOTH DRIVERS
+ M:	Marcel Holtmann <marcel@holtmann.org>
+-M:	Gustavo Padovan <gustavo@padovan.org>
+ M:	Johan Hedberg <johan.hedberg@gmail.com>
+ L:	linux-bluetooth@vger.kernel.org
+ W:	http://www.bluez.org/
+@@ -2685,7 +2684,6 @@ F:	drivers/bluetooth/
+ 
+ BLUETOOTH SUBSYSTEM
+ M:	Marcel Holtmann <marcel@holtmann.org>
+-M:	Gustavo Padovan <gustavo@padovan.org>
+ M:	Johan Hedberg <johan.hedberg@gmail.com>
+ L:	linux-bluetooth@vger.kernel.org
+ W:	http://www.bluez.org/
+-- 
+2.13.6
 
-Question, are there any known issues with enabling runtime-pm ?
-
-I realize that simply enabling it for all btusb devices is a bit
-of a big hammer and might be a bad idea since there will probably
-be some devices out there which do not support this properly.
-
-I was thinking that instead of enabling runtime-pm for all btusb
-devices, maybe this is something which we can do a vendor-id
-basis, starting with Intel and Broadcom devices ?
-
-Regards,
-
-Hans
