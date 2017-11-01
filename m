@@ -1,45 +1,27 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Gustavo Padovan <gustavo@padovan.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Gustavo Padovan <gustavo.padovan@collabora.com>
-Subject: [PATCH] Bluetooth: Remove myself from the MAINTAINERS file
-Date: Wed,  1 Nov 2017 11:31:49 -0200
-Message-Id: <20171101133149.16542-1-gustavo@padovan.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <netdev-owner@vger.kernel.org>
+Date: Wed, 01 Nov 2017 22:09:06 +0900 (KST)
+Message-Id: <20171101.220906.1150403540779627670.davem@davemloft.net>
+To: johan.hedberg@gmail.com
+Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: pull request: bluetooth-next 2017-11-01
+From: David Miller <davem@davemloft.net>
+In-Reply-To: <20171101083213.GA20632@x1c.lan>
+References: <20171101083213.GA20632@x1c.lan>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Sender: netdev-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Gustavo Padovan <gustavo.padovan@collabora.com>
+From: Johan Hedberg <johan.hedberg@gmail.com>
+Date: Wed, 1 Nov 2017 10:32:13 +0200
 
-It's been sometime I'm not involved in Bluetooth anymore but I never
-got around to remove my name from it. Doing it now.
+> Here's one more bluetooth-next pull request for the 4.15 kernel.
+> 
+>  - New NFA344A device entry for btusb drvier
+>  - Fix race conditions in hci_ldisc
+>  - Fix for isochronous interface assignments in btusb driver
+>  - A few other smaller fixes & improvements
+> 
+> Please let me know if there are any issues pulling. Thanks.
 
-Thanks for all the fish! :)
-
-Signed-off-by: Gustavo Padovan <gustavo.padovan@collabora.com>
----
- MAINTAINERS | 2 --
- 1 file changed, 2 deletions(-)
-
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 6671f375f7fc..042c8ecd9a94 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -2674,7 +2674,6 @@ F:	drivers/mtd/devices/block2mtd.c
- 
- BLUETOOTH DRIVERS
- M:	Marcel Holtmann <marcel@holtmann.org>
--M:	Gustavo Padovan <gustavo@padovan.org>
- M:	Johan Hedberg <johan.hedberg@gmail.com>
- L:	linux-bluetooth@vger.kernel.org
- W:	http://www.bluez.org/
-@@ -2685,7 +2684,6 @@ F:	drivers/bluetooth/
- 
- BLUETOOTH SUBSYSTEM
- M:	Marcel Holtmann <marcel@holtmann.org>
--M:	Gustavo Padovan <gustavo@padovan.org>
- M:	Johan Hedberg <johan.hedberg@gmail.com>
- L:	linux-bluetooth@vger.kernel.org
- W:	http://www.bluez.org/
--- 
-2.13.6
-
+Pulled, thanks Johan.
