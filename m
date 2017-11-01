@@ -1,62 +1,124 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] gatt: Fix crash while disconnecting ATT
-Date: Wed,  1 Nov 2017 12:31:23 +0200
-Message-Id: <20171101103123.12041-1-luiz.dentz@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <netdev-owner@vger.kernel.org>
+Date: Wed, 1 Nov 2017 10:32:13 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: davem@davemloft.net
+Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Subject: pull request: bluetooth-next 2017-11-01
+Message-ID: <20171101083213.GA20632@x1c.lan>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+        protocol="application/pgp-signature"; boundary="6TrnltStXW4iwmi0"
+Sender: netdev-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Since get_ccc_state can be called from both read and write callbacks it
-was causing the disconnect handler to be register twice causing the
-following crash:
+--6TrnltStXW4iwmi0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-bluetoothd[31312]: src/gatt-database.c:att_disconnected()
-bluetoothd[31312]: src/gatt-database.c:ccc_write_cb() External CCC write received with value: 0x0000
-bluetoothd[31312]: src/gatt-database.c:att_disconnected()
-Invalid read of size 8
-   at 0x475639: att_disconnected (gatt-database.c:301)
-   by 0x4D6C75: disconn_handler (att.c:538)
-   by 0x4D22EF: queue_foreach (queue.c:220)
-   by 0x4D8959: disconnect_cb (att.c:590)
-   by 0x4E559A: watch_callback (io-glib.c:170)
-   by 0x50CD246: g_main_context_dispatch (in /usr/lib64/libglib-2.0.so.0.5200.3)
-   by 0x50CD5E7: ??? (in /usr/lib64/libglib-2.0.so.0.5200.3)
-   by 0x50CD901: g_main_loop_run (in /usr/lib64/libglib-2.0.so.0.5200.3)
-   by 0x40CD10: main (main.c:770)
- Address 0x8e30250 is 0 bytes inside a block of size 32 free'd
-   at 0x4C2FD18: free (vg_replace_malloc.c:530)
-   by 0x4756D5: device_state_free (gatt-database.c:271)
-   by 0x4756D5: att_disconnected (gatt-database.c:313)
-   by 0x4D6C75: disconn_handler (att.c:538)
-   by 0x4D22EF: queue_foreach (queue.c:220)
-   by 0x4D8959: disconnect_cb (att.c:590)
-   by 0x4E559A: watch_callback (io-glib.c:170)
-   by 0x50CD246: g_main_context_dispatch (in /usr/lib64/libglib-2.0.so.0.5200.3)
-   by 0x50CD5E7: ??? (in /usr/lib64/libglib-2.0.so.0.5200.3)
-   by 0x50CD901: g_main_loop_run (in /usr/lib64/libglib-2.0.so.0.5200.3)
-   by 0x40CD10: main (main.c:770)
+Hi Dave,
+
+Here's one more bluetooth-next pull request for the 4.15 kernel.
+
+ - New NFA344A device entry for btusb drvier
+ - Fix race conditions in hci_ldisc
+ - Fix for isochronous interface assignments in btusb driver
+ - A few other smaller fixes & improvements
+
+Please let me know if there are any issues pulling. Thanks.
+
+Johan
+
 ---
- src/gatt-database.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+The following changes since commit fac72b243cc789bb209e6eca824919b42d98cfe2:
 
-diff --git a/src/gatt-database.c b/src/gatt-database.c
-index 1d262ccd4..3e10c901c 100644
---- a/src/gatt-database.c
-+++ b/src/gatt-database.c
-@@ -360,7 +360,9 @@ static struct device_state *get_device_state(struct btd_gatt_database *database,
- 	queue_push_tail(database->device_states, dev_state);
- 
- done:
--	dev_state->disc_id = bt_att_register_disconnect(att, att_disconnected,
-+	if (!dev_state->disc_id)
-+		dev_state->disc_id = bt_att_register_disconnect(att,
-+							att_disconnected,
- 							dev_state, NULL);
- 
- 	return dev_state;
--- 
-2.13.6
+  Bluetooth: mark expected switch fall-throughs (2017-10-14 09:25:51 +0200)
 
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.gi=
+t for-upstream
+
+for you to fetch changes up to 0338b1b393ec7910898e8f7b25b3bf31a7282e16:
+
+  Bluetooth: hci_ldisc: Fix another race when closing the tty. (2017-10-30 =
+15:48:32 +0100)
+
+----------------------------------------------------------------
+Bartosz Chronowski (1):
+      Bluetooth: btusb: Add new NFA344A entry.
+
+Jaganath Kanakkassery (1):
+      Bluetooth: Fix potential memory leak
+
+Jaya P G (1):
+      Bluetooth: btusb: Update firmware filename for Intel 9x60 and later
+
+Konrad Zapa=C5=82owicz (1):
+      Bluetooth: increase timeout for le auto connections
+
+Loic Poulain (1):
+      Bluetooth: hci_ath: Add ath_vendor_cmd helper
+
+Marcel Holtmann (2):
+      Bluetooth: Use bt_dev_err and bt_dev_info when possible
+      Bluetooth: btusb: Fix isochronous interface assignments
+
+Ronald Tschal=C3=A4r (2):
+      Bluetooth: hci_ldisc: Allow sleeping while proto locks are held.
+      Bluetooth: hci_ldisc: Fix another race when closing the tty.
+
+Sebastian Andrzej Siewior (1):
+      Bluetooth: avoid recursive locking in hci_send_to_channel()
+
+ drivers/bluetooth/bpa10x.c        |  15 ++-
+ drivers/bluetooth/bt3c_cs.c       |   2 +-
+ drivers/bluetooth/btbcm.c         | 103 +++++++++---------
+ drivers/bluetooth/btintel.c       |  42 ++++----
+ drivers/bluetooth/btqca.c         |   6 +-
+ drivers/bluetooth/btrtl.c         |  21 ++--
+ drivers/bluetooth/btusb.c         | 214 ++++++++++++++++++++++------------=
+----
+ drivers/bluetooth/hci_ath.c       |  51 +++++----
+ drivers/bluetooth/hci_h4.c        |   2 +-
+ drivers/bluetooth/hci_ldisc.c     |  42 ++++----
+ drivers/bluetooth/hci_qca.c       |  12 +--
+ drivers/bluetooth/hci_serdev.c    |   9 +-
+ drivers/bluetooth/hci_uart.h      |   2 +-
+ include/net/bluetooth/bluetooth.h |   3 +
+ include/net/bluetooth/hci.h       |   2 +-
+ net/bluetooth/a2mp.c              |   2 +-
+ net/bluetooth/amp.c               |   4 +-
+ net/bluetooth/hci_conn.c          |   6 +-
+ net/bluetooth/hci_core.c          |  35 +++----
+ net/bluetooth/hci_event.c         |  46 ++++----
+ net/bluetooth/hci_request.c       |  21 ++--
+ net/bluetooth/hci_request.h       |   1 +
+ net/bluetooth/hci_sock.c          |  17 +--
+ net/bluetooth/hci_sysfs.c         |   2 +-
+ net/bluetooth/mgmt.c              |  57 +++++-----
+ net/bluetooth/smp.c               |  22 ++--
+ 26 files changed, 407 insertions(+), 332 deletions(-)
+
+--6TrnltStXW4iwmi0
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIcBAEBAgAGBQJZ+YaNAAoJECQj9vv5qNQSaUgP/A90NqpZrBbB/ZSh4Iev94Yp
+3PAPdAnyF3JUZmfg0kpdGRdhUZj+o1UyyQeMJoeJxdFqVk47FLmAJNnCduHqsihb
+9mY8YUMTTmQ/+g4Mq12pvdUptznL4z2qwCZp9IFRMo0CaXJcwto6JIOCq3xIncl6
+Y/2A+TeVHH8bCp52Mtk23Puard2inFWICocnIplYjoeRM+TJOY3gQAIvHfHTRhsz
+Cwo1lUwQF1FM2ZvTGW3Gvsjl7TyQ0CIOhLo5VeGLQy9l0ZTha24+5CCDM6Dcmcl1
+ALlMQ1V++4O99tBSJUqd8OL/mFr665EGAxQMydFPAc2igH8ZXL96pL5Lxg8OrXiF
+eYdvzHzxLVVYWuKsncPsSSXgypQpRRJsaVAjsmsclPhvMaELdXBmRBTXAv+t6dfA
+vijmsy1+lHzyEFNTA0HI1uV6zhmPjpYzLFuHcdgfE4OVAnFHLPKw1/EB40dRthIB
+P1dEuOfT2TS6LWnmo+McJBxKgSXRue8NeAL57bYQ8qSU4IYSUi59NJvaTmWg2iy+
+Oz8dEBj40gyliA5o/1EzMglgnsO3aPHO3jdwvLfILne3RxauLrqmHJR6w7Ngb/mr
+uB037SEe9etc3+U5HdaDnpb8yCU5sgHnbYAmiZvdThQLplzEO7geVciYK18SF0fZ
+pcj+2m3/1t06r7kdPiuo
+=CL9F
+-----END PGP SIGNATURE-----
+
+--6TrnltStXW4iwmi0--
