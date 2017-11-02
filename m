@@ -1,295 +1,213 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Travis Griggs <travisgriggs@gmail.com>
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 11.0 \(3445.1.7\))
-Subject: Re: Feedback on BlueZ DBus API
-Date: Thu, 2 Nov 2017 14:37:19 -0700
-References: <CAAu3APaxNENrLz0cp+3kk3FEgExw2bhrrRypUYYwPWXqFJkvqw@mail.gmail.com>
- <CABBYNZLKBwLZz69GYTT=w4Ldoz9sZidTtMixDqFcZHR9XGAP=g@mail.gmail.com>
- <CAAu3APbuGmfrH5iNQo2BdaqroBak=3fUvScRgL2wotQHRQGXVw@mail.gmail.com>
-To: Bluez mailing list <linux-bluetooth@vger.kernel.org>
-In-Reply-To: <CAAu3APbuGmfrH5iNQo2BdaqroBak=3fUvScRgL2wotQHRQGXVw@mail.gmail.com>
-Message-Id: <63A1858D-0254-499A-8BFA-595BDB0AE35F@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <CALvjcs84PCsT0upCdp7H0QKfaK8KUbHEP5W6C3Dk65uhPZbLPg@mail.gmail.com>
+References: <20171023111723.20729-1-luiz.dentz@gmail.com> <20171023111723.20729-2-luiz.dentz@gmail.com>
+ <CALvjcs9i_J5H2jbVWToQbc4xNo9+N3jxrHh3FTo7LKjRN1E=Wg@mail.gmail.com>
+ <CABBYNZKgHAUTipjRzxN=_sWH=ooRs3PHnhKaotc33epHQ7efhA@mail.gmail.com>
+ <CALvjcs-SbR8JXDEvKRxD1Eq08PyN9D5zEDjc9P8puDMJDwJr=w@mail.gmail.com>
+ <CABBYNZJuyZOEzLV0fkU8xTpPWuzc76CeYBLUR9DNq2c4pVPN5w@mail.gmail.com>
+ <CALvjcs-HuvDjGo3ynvnxx47yXX4DJF1SFzdYkE1BY8VKcQD5Ng@mail.gmail.com>
+ <CABBYNZ+WCNvJHgzM2JU2NxeNvUsDmThxw_Ly1uX83S7=tcNN4g@mail.gmail.com>
+ <CALvjcs8Nzske0yzYQKEX6MNd_DQo05SExFqsVAgsM7_e65TR3w@mail.gmail.com> <CALvjcs84PCsT0upCdp7H0QKfaK8KUbHEP5W6C3Dk65uhPZbLPg@mail.gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Thu, 2 Nov 2017 20:07:39 +0200
+Message-ID: <CABBYNZ+WejgDWjpszASFE5xRgPNVL174Sa92nEFLkKFYyCxNCg@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 2/3] gatt: Clear subscriptions for device not paired
+To: Yunhan Wang <yunhanw@google.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Yunhan,
+
+On Thu, Nov 2, 2017 at 7:45 PM, Yunhan Wang <yunhanw@google.com> wrote:
+> Hi Luiz
+>
+> It is working now with your latest fix.
+
+Great, hopefully this will settle things for server notifications.
+
+> Thanks
+> Best wishes
+> Yunhan
+>
+> On Mon, Oct 30, 2017 at 2:44 PM, Yunhan Wang <yunhanw@google.com> wrote:
+>> Hi, Luiz
+>>
+>> I am still consistently seeing multiple segmentation faults happening
+>> on this feature via bluetoothctl. I am using latest bluez master.
+>>
+>> Here are the full reproduced details using bluetoothctl
+>> Terminal 1(Bluetoothd):
+>> sudo gdb --args ./src/bluetoothd --experimental --debug
+>> run
+>>
+>> Terminal 2(btvirt 2 interface):
+>> sudo ./emulator/btvirt -L -l2
+>>
+>> Terminal 3(Peripheral):
+>> select 00:AA:01:00:00:23
+>> power on
+>> register-service 00001820-0000-1000-8000-00805f9b34fb
+>> register-characteristic 00002a06-0000-1000-8000-00805f9b34fb read,indicate
+>> register-application
+>> advertise on
+>>
+>> Terminal 4(Central):
+>> select 00:AA:01:01:00:24
+>> power on
+>> scan on
+>> scan off
+>> connect 00:AA:01:00:00:23
+>> select-attribute /org/bluez/hci1/dev_00_AA_01_00_00_23/service000a/char000b
+>> notify on
+>> disconnect
+>>
+>> Then one of segmentation faults happen
+>>
+>> Program received signal SIGSEGV, Segmentation fault.
+>> queue_remove (queue=0x30, data=data@entry=0x70b6c0) at src/shared/queue.c:256
+>> 256 for (entry = queue->head, prev = NULL; entry;
+>> (gdb) bt
+>> #0  queue_remove (queue=0x30, data=data@entry=0x70b6c0)
+>>     at src/shared/queue.c:256
+>> #1  0x00000000004437bb in att_disconnected (err=<optimized out>,
+>>     user_data=0x70b6c0) at src/gatt-database.c:310
+>> #2  0x0000000000481d6d in queue_foreach (queue=0x6f1d50,
+>>     function=function@entry=0x4854a0 <disconn_handler>, user_data=0x68)
+>>     at src/shared/queue.c:220
+>> #3  0x0000000000486852 in disconnect_cb (io=<optimized out>,
+>>     user_data=0x704ce0) at src/shared/att.c:590
+>> #4  0x000000000048fde5 in watch_callback (channel=<optimized out>,
+>>     cond=<optimized out>, user_data=<optimized out>)
+>>     at src/shared/io-glib.c:170
+>> #5  0x00007ffff7b1ace5 in g_main_context_dispatch ()
+>>    from /lib/x86_64-linux-gnu/libglib-2.0.so.0
+>> #6  0x00007ffff7b1b048 in ?? () from /lib/x86_64-linux-gnu/libglib-2.0.so.0
+>> #7  0x00007ffff7b1b30a in g_main_loop_run ()
+>>    from /lib/x86_64-linux-gnu/libglib-2.0.so.0
+>> #8  0x000000000040b56b in main (argc=1, argv=0x7fffffffe618) at src/main.c:770
+>>
+>> some of other faults:
+>> 1.
+>> Program received signal SIGSEGV, Segmentation fault.
+>> att_disconnected (err=<optimized out>, user_data=0x703270)
+>>     at src/gatt-database.c:300
+>> 300 if (!state->db->adapter)
+>> (gdb)
+>> (gdb) bt
+>> #0  att_disconnected (err=<optimized out>, user_data=0x703270)
+>>     at src/gatt-database.c:300
+>> #1  0x0000000000481ccd in queue_foreach (queue=0x6fd7e0,
+>>     function=function@entry=0x485400 <disconn_handler>, user_data=0x68)
+>>     at src/shared/queue.c:220
+>> #2  0x00000000004867b2 in disconnect_cb (io=<optimized out>,
+>>     user_data=0x6ee310) at src/shared/att.c:590
+>> #3  0x000000000048fd45 in watch_callback (channel=<optimized out>,
+>>     cond=<optimized out>, user_data=<optimized out>)
+>>     at src/shared/io-glib.c:170
+>> #4  0x00007ffff7b1ace5 in g_main_context_dispatch ()
+>>    from /lib/x86_64-linux-gnu/libglib-2.0.so.0
+>> #5  0x00007ffff7b1b048 in ?? () from /lib/x86_64-linux-gnu/libglib-2.0.so.0
+>> #6  0x00007ffff7b1b30a in g_main_loop_run ()
+>>    from /lib/x86_64-linux-gnu/libglib-2.0.so.0
+>> #7  0x000000000040b56b in main (argc=1, argv=0x7fffffffe618) at src/main.c:770
+>> (gdb) print state
+>> $1 = (struct device_state *) 0x703270
+>> (gdb) print state->db
+>> $2 = (struct btd_gatt_database *) 0x0
+>>
+>> 2.
+>> Program received signal SIGSEGV, Segmentation fault.
+>> btd_adapter_find_device (adapter=0x2a, dst=dst@entry=0x70a2e8,
+>>     bdaddr_type=0 '\000') at src/adapter.c:821
+>> 821 list = g_slist_find_custom(adapter->devices, &addr,
+>> (gdb) quit
+>>
+>>
+>> Thanks
+>> Best wishes
+>> Yunhan
+>>
+>> On Wed, Oct 25, 2017 at 6:27 AM, Luiz Augusto von Dentz
+>> <luiz.dentz@gmail.com> wrote:
+>>> Hi Yunhan,
+>>>
+>>> On Wed, Oct 25, 2017 at 10:58 AM, Yunhan Wang <yunhanw@nestlabs.com> wrote:
+>>>> Hi, Luiz
+>>>>
+>>>> On Tue, Oct 24, 2017 at 1:10 AM, Luiz Augusto von Dentz
+>>>> <luiz.dentz@gmail.com> wrote:
+>>>>> Hi Yunhan,
+>>>>>
+>>>>> On Mon, Oct 23, 2017 at 11:59 PM, Yunhan Wang <yunhanw@nestlabs.com> wrote:
+>>>>>> Hi, Luiz
+>>>>>>
+>>>>>> I have tried this, I think the issue is still there with your patch.
+>>>>>
+>>>>> I don't see any problem:
+>>>>>
+>>>>> bluetoothd[13968]: src/device.c:att_disconnected_cb() Software caused
+>>>>> connection abort (103)
+>>>>> bluetoothd[13968]: src/gatt-client.c:btd_gatt_client_disconnected()
+>>>>> Device disconnected. Cleaning up.
+>>>>> bluetoothd[13968]: src/device.c:att_disconnected_cb() Automatic
+>>>>> connection disabled
+>>>>> bluetoothd[13968]: attrib/gattrib.c:g_attrib_unref() 0x8897600: g_attrib_unref=0
+>>>>> bluetoothd[13968]: src/gatt-database.c:att_disconnected()
+>>>>> bluetoothd[13968]: src/gatt-database.c:ccc_write_cb() External CCC
+>>>>> write received with value: 0x0000
+>>>>>
+>>>>> Could you try running under valgrind?
+>>>>>
+>>>> Yes, just tried under valgrind, the issue is constantly reprodcued.
+>>>> Btw, I am currently using btvirt -L -l2, one client, one server, then
+>>>> bluetoothd crash after client issue ble disconnect. I am using bluez
+>>>> lateset master.
+>>>>
+>>>> sudo valgrind ./src/bluetoothd --experimental --debug
+>>>> ==31609== Jump to the invalid address stated on the next line
+>>>> ==31609==    at 0x0: ???
+>>>> ==31609==    by 0x481B4C: queue_foreach (queue.c:220)
+>>>> ==31609==    by 0x4436C8: att_disconnected (gatt-database.c:310)
+>>>> ==31609==    by 0x481B4C: queue_foreach (queue.c:220)
+>>>> ==31609==    by 0x486631: disconnect_cb (att.c:590)
+>>>> ==31609==    by 0x48FBC4: watch_callback (io-glib.c:170)
+>>>> ==31609==    by 0x4E7FCE4: g_main_context_dispatch (in
+>>>> /lib/x86_64-linux-gnu/libglib-2.0.so.0.4002.0)
+>>>> ==31609==    by 0x4E80047: ??? (in
+>>>> /lib/x86_64-linux-gnu/libglib-2.0.so.0.4002.0)
+>>>> ==31609==    by 0x4E80309: g_main_loop_run (in
+>>>> /lib/x86_64-linux-gnu/libglib-2.0.so.0.4002.0)
+>>>> ==31609==    by 0x40B51A: main (main.c:770)
+>>>> ==31609==  Address 0x0 is not stack'd, malloc'd or (recently) free'd
+>>>
+>>> It turns out the ccc_cb->callback could be NULL in case of
+>>> svc_changed, though I not sure why in our case it did not have the
+>>> last call pointing to clear_ccc_state:
+>>>
+>>>       at 0x0: ???
+>>>       by 0x475C7C: clear_ccc_state (gatt-database.c:287)
+>>>       by 0x4D28CF: queue_foreach (queue.c:220)
+>>>       by 0x475FE7: att_disconnected (gatt-database.c:310)
+>>>       by 0x4D7255: disconn_handler (att.c:538)
+>>>       by 0x4D28CF: queue_foreach (queue.c:220)
+>>>       by 0x4D8F39: disconnect_cb (att.c:590)
+>>>       by 0x4E6B3A: watch_callback (io-glib.c:170)
+>>>       by 0x50CD246: g_main_context_dispatch (in
+>>> /usr/lib64/libglib-2.0.so.0.5200.3)
+>>>       by 0x50CD5E7: ??? (in /usr/lib64/libglib-2.0.so.0.5200.3)
+>>>       by 0x50CD901: g_main_loop_run (in /usr/lib64/libglib-2.0.so.0.5200.3)
+>>>       by 0x40CD90: main (main.c:770)
+>>>     Address 0x0 is not stack'd, malloc'd or (recently) free'd
+>>>
+>>> Anyway now this should fixed upstream, thanks for the report.
+>>>
+>>> --
+>>> Luiz Augusto von Dentz
 
 
-> On Aug 11, 2017, at 6:14 AM, Barry Byford <31baz66@gmail.com> wrote:
->=20
-> Hi Luiz,
->=20
-> Thanks for the prompt reply.
->=20
-> On 11 August 2017 at 11:57, Luiz Augusto von Dentz =
-<luiz.dentz@gmail.com> wrote:
->> Hi Barry,
->>=20
->> On Thu, Aug 10, 2017 at 8:07 PM, Barry Byford <31baz66@gmail.com> =
-wrote:
->>> Hello,
->>>=20
->>>=20
->>> Over the last couple of years I=E2=80=99ve been doing some work with =
-accessing
->>> BlueZ from the Python programming language. More recently I=E2=80=99ve=
- been
->>> trying to create a library to lower the barrier to getting started
->>> with Bluetooth on Linux. On that library we have recently done a
->>> retrospective of where we are.
->>>=20
->>> (TL;DR https://github.com/ukBaz/python-bluezero/issues/126)
->>>=20
->>> The discussion spilled over to twitter where there was a suggestion
->>> that some of our concerns should be shared back to the BlueZ =
-project.
->>> https://twitter.com/sandeepmistry/status/891836962952314880
->>>=20
->>>=20
->>> I am not sure how relevant our feedback is to the broader user base =
-of
->>> the BlueZ project. However, it is true that we can=E2=80=99t =
-complain that our
->>> needs aren=E2=80=99t being addressed by BlueZ if we don=E2=80=99t =
-give feedback.
->>=20
->> That is really a good start.
->>=20
->>>=20
->>> I also accept that part of the issue here is with me as I don=E2=80=99=
-t come
->>> from a background where I know about the low level details of
->>> Bluetooth and the C language. I am coming at this from the direction
->>> of learning enough to rapidly prototype Python applications that
->>> contain some Bluetooth functionality.
->>=20
->> That shouldn't prevent you to give us feedback on our APIs, which btw
->> I have been updating recently.
->=20
-> I can see the updates coming and they all look like they are going int
-> the right direction. Maybe my feedback could be summarised as barriers
-> to accessing this great new stuff.
->=20
->>>=20
->>> Context:
->>>=20
->>> In my volunteering role as a STEM ambassador I have been a mentor on =
-a
->>> few school projects for engineering challenges where Bluetooth
->>> functionality would have been helpful.
->>>=20
->>> These school projects typically use hardware like Raspberry Pi=E2=80=99=
-s, BBC
->>> micro:bits and tablets/phones where Bluetooth hardware is readily
->>> available.
->>>=20
->>> My goal is to be able to create workshops that can be run at =
-schools,
->>> STEM fairs and community maker events that help people get started
->>> exploring what is possible with Bluetooth and Python.
->>>=20
->>>=20
->>> Building =46rom Source:
->>>=20
->>> My first bit of feedback is that things with BlueZ are a lot better
->>> now than they were a few short years ago. However this is the first
->>> challenge as it takes a long time for updates to appear in operating
->>> systems.
->>>=20
->>> The default Raspberry Pi OS is still shipping with BlueZ 5.23 which
->>> isn=E2=80=99t much use for BLE. Even when Raspbian moves to being a =
-Debian
->>> Stretch based release, it will be BlueZ 5.43. This means that much =
-of
->>> the DBus API will be behind the experimental flag and will be =
-missing
->>> some of the great recent updates such as AcquireWrite, AcquireNotify
->>> and set name in scan response.
->>>=20
->>> While building from source is something I=E2=80=99ve become =
-comfortable with,
->>> getting organisers of workshop machines and users to do this is =
-often
->>> too large a barrier to entry.
->>=20
->> Can't you build a package using the latest changes? That would be
->> beneficial to BlueZ as we get more exposure to different user.
->=20
-> Building a Debian package is something I've looked into as it is good
-> idea. However, I always have to patch my builds to get them working on
-> the Raspberry Pi 3 and along with a few other concerns I am not sure
-> that I have enough confidence to share it widely.
-> Is building the Debian package something that could be done as part of
-> BlueZ releases?
->=20
->>=20
->>>=20
->>> Python DBus Library:
->>>=20
->>> As I=E2=80=99ve written about before on this list, there is not an =
-obvious
->>> choice when it comes to a Python DBus library. I think the BlueZ
->>> =E2=80=98test=E2=80=99 Python examples use the dbus-python library. =
-There seems to be
->>> concerns about this Python library. Pydbus seems to be a recommended
->>> library although there seems to be several holes in it for use with
->>> BlueZ. The owner of the library appears to have moved on to another
->>> project so updates (or merging of pull requests) seems to be =
-sporadic.
->>>=20
->>=20
->> Im not familiar with the differences between the D-Bus bindings, I
->> guess we started doing the tests in whatever binding existed at that
->> point and we never bothered changing it. Anyway you could in theory
->> have your own binding if that really becomes the bottleneck.
->=20
-> Not having a good Python DBus library is a barrier to using BlueZ.
-> Creating my own is probably beyond me in a reasonable timeframe.
-> For your reference dbus-python is listed under Obsolete libraries on
-> https://www.freedesktop.org/wiki/Software/DBusBindings/
->=20
-> I am happy to help improve the bindings but too quickly it goes off
-> into the world of C and so again I am probably not best placed to make
-> updates.
->=20
->>=20
->>>=20
->>> Beacons:
->>>=20
->>> Again another topic that has been discussed on this mailing list
->>> before. There seems to have been a number of people that want to =
-have
->>> a Linux SBC continuously passively scan for beacons. This is =
-something
->>> that is not supported by the BlueZ DBus API. I believe the concern =
-is
->>> with flooding the bus. Could something similar to AcquireNotify be
->>> done to solve this?
->>=20
->> I guess you are suggesting disabling the duplicated filtering, this =
-is
->> something I wish we discuss more in the list since we now also have
->> mesh that uses the advertising as protocol transport. Depending on =
-the
->> system it might be alright, but in Linux distribution it might =
-consume
->> too much power.
->=20
-> Not sure I understand the 'too much power' comment in the context I
-> want to use this.
->=20
-> I also thought the issue was more than turning off the duplicates
-> filter. I thought the issues was if you were constantly scanning for
-> beacons then there was an issue with delays going through DBus. That
-> is why I thought that the notifications for new beacon updates could
-> go through a socket.
->=20
->>=20
->>>=20
->>> Testing:
->>>=20
->>> It would be good to be able to test the Python apps without real
->>> hardware. It would be good if BlueZ could provide some way of
->>> mock/fake/stub so that unit testing could be easily done.
->>>=20
->>> The library python-dbusmock showed some promise however the =
-bluez5.py
->>> template needs some work.
->>=20
->> BlueZ/Linux support emulated controllers for a while, have a look at:
->>=20
->> https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/emulator
->>=20
->> We should probably add some documentation for it since it may not be
->> very clear how to use btvirt, etc.
->=20
-> Yes, some documentation would be greatly appreciated as this sounds =
-promising.
->=20
->>>=20
->>> Our New Direction - Python Only Solution:
->>>=20
->>> Because of the issues raised above, investigation has started on =
-using
->>> only Python standard libraries to find a solution for our library.
->>> This will allow our library to move faster than OS updates allow as =
-it
->>> will be easy to install directly from PyPI with fewer dependencies.
->>>=20
->>> The current investigation is looking to by-pass bluetoothd by using
->>> HCI. What we have so far can be seen at:
->>> https://github.com/TheBubbleworks/python-hcipy
->>=20
->> I guess that would also break any application and tools using BlueZ
->> APIs in the system, but you probably already know that, not to =
-mention
->> having to have root access to use raw sockets, or making all python
->> scripts to run with cap_net_raw:
->>=20
->> sudo setcap cap_net_raw+eip $(eval readlink -f `which python`)
->> sudo setcap cap_net_raw+eip $(eval readlink -f `which python3`)
->>=20
->> I can give a lot more examples where this will lead to, but Im not
->> sure the communities you are referring to will be able to listen. Far
->> too many times Ive seen people disregard BlueZ to do its own thing,
->> which end up in many different partial solutions like bleno,
->> pygattlib... and there probably many many more to come, none is =
-really
->> a complete a BLE stack:
->>=20
->> https://github.com/sandeepmistry/bleno/issues/110
->>=20
->> At least with bleno Ive tried to make it use the D-Bus APIs but there
->> was no interest, it seems it preferable to disable all other =
-Bluetooth
->> functionality, like pairing, authorization, etc, just to have GATT =
-and
->> Advertisement implemented natively, where only one simple process can
->> access them, without ensuring this solution can pass a Bluetooth
->> qualification.
->>=20
->> That said I know BlueZ is not perfect, we took way too long to make
->> the GATT APIs stable and that possible cause this many solutions
->> around BLE, but if instead of creating their own solution this effort
->> was put into getting BlueZ GATT APIs tested we wouldn't be talking
->> about it now and the Advertising API would probably have been adopted
->> as well.
->=20
-> Again, I agree that the BlueZ DBus API is getting better all the time
-> and is definitely going in the right direction.
-> The central role with pydbus is working well. When the next release of
-> Raspbian based on Debian Stretch is available this should mike it
-> easily accessible to all.
-> However doing applications for beacon, scanner and peripheral continue
-> to be painful.
->=20
-> I want to help make the BlueZ DBus interface better I just don't know
-> how. For me the barrier to working on BlueZ or pydbus directly is too
-> high. I think this is why people go off and create their own solutions
-> as it appears 'easier' or 'quicker for them in the short term.
->=20
-> I am happy to take suggestions of how I can help.
->=20
 
-(text only resend in case last one didn=E2=80=99t really make it =
-through)
-
-I=E2=80=99m =E2=80=9Ccatching up=E2=80=9D on my bluez mailing list =
-reading=E2=80=A6 I recognize that I=E2=80=99m 3 months late here. But =
-I=E2=80=99d just like to chime in belatedly with this discussion. I =
-agree with Barry wholeheartedly. And I agree with Luis too. I think at =
-the end of the day Barry, you=E2=80=99re going to regret trying to go =
-your own route. I *assume* the motivation for using dbus (instead of a =
-classical C lib approach) was in part to be more language agnostic.
-
-We have a working prototype of an irrigation controller that acts as BLE =
-peripheral running on a small SBC, but it is probably the most difficult =
-part of the stack to understand and deal with. I share Barry=E2=80=99s =
-appreciation for making something possible, and parallel frustration =
-with figuring out how to do it. The obsolescence of the pydbus package =
-is worrying for me as well.
-
-Maybe, as I catch up farther, these concerns have been better solved in =
-the last 3 months.
-
+-- 
+Luiz Augusto von Dentz
