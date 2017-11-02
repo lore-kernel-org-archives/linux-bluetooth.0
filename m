@@ -2,43 +2,47 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Bastien Nocera <hadess@hadess.net>
 To: linux-bluetooth@vger.kernel.org
 Cc: Bastien Nocera <hadess@hadess.net>
-Subject: [PATCH] obexd: Fix compilation error on newer glibc
-Date: Thu,  2 Nov 2017 15:11:00 +0100
-Message-Id: <20171102141100.21883-1-hadess@hadess.net>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Subject: [PATCH 2/2] obex: Work-around compilation failure
+Date: Thu,  2 Nov 2017 15:09:53 +0100
+Message-Id: <20171102140953.21684-2-hadess@hadess.net>
+In-Reply-To: <20171102140953.21684-1-hadess@hadess.net>
+References: <20171102140953.21684-1-hadess@hadess.net>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Since this glibc commit:
-https://sourceware.org/git/gitweb.cgi?p=glibc.git;a=commitdiff;h=37f802f86400684c8d13403958b2c598721d6360
-
-glibc doesn't include declare ssize_t when fcntl.h is included (fcntl.h
-included <bits/uio.h> which includes <sys/types.h>).
-
-This fixes the following compile-time error:
-
-In file included from obexd/plugins/mas.c:41:0:
-./obexd/src/obex.h:37:1: error: unknown type name ‘ssize_t’; did you mean ‘size_t’?
- ssize_t obex_get_size(struct obex_session *os);
- ^~~~~~~
+obexd/plugins/bluetooth.c: In function 'register_profile':
+obexd/plugins/bluetooth.c:310:7: error: format not a string literal, argument types not checked [-Werror=format-nonliteral]
+       profile->driver->port);
+       ^~~~~~~
+obexd/plugins/bluetooth.c:314:7: error: format not a string literal, argument types not checked [-Werror=format-nonliteral]
+       profile->driver->name);
+       ^~~~~~~
 ---
- obexd/src/obex.h | 2 ++
- 1 file changed, 2 insertions(+)
+ obexd/plugins/bluetooth.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/obexd/src/obex.h b/obexd/src/obex.h
-index fc1674755..67593f11b 100644
---- a/obexd/src/obex.h
-+++ b/obexd/src/obex.h
-@@ -22,6 +22,8 @@
-  *
-  */
- 
-+#include <unistd.h>
+diff --git a/obexd/plugins/bluetooth.c b/obexd/plugins/bluetooth.c
+index 3ee54325f..3e31eaef6 100644
+--- a/obexd/plugins/bluetooth.c
++++ b/obexd/plugins/bluetooth.c
+@@ -302,6 +302,9 @@ static int register_profile(struct bluetooth_profile *profile)
+ 					&opt);
+ 	dict_append_entry(&opt, "AutoConnect", DBUS_TYPE_BOOLEAN,
+ 								&auto_connect);
 +
- #define OBJECT_SIZE_UNKNOWN -1
- #define OBJECT_SIZE_DELETE -2
- 
++#pragma GCC diagnostic push
++#pragma GCC diagnostic ignored "-Wformat-nonliteral"
+ 	if (profile->driver->record) {
+ 		if (profile->driver->port != 0)
+ 			xml = g_markup_printf_escaped(profile->driver->record,
+@@ -312,6 +315,7 @@ static int register_profile(struct bluetooth_profile *profile)
+ 			xml = g_markup_printf_escaped(profile->driver->record,
+ 						profile->driver->channel,
+ 						profile->driver->name);
++#pragma GCC diagnostic pop
+ 		dict_append_entry(&opt, "ServiceRecord", DBUS_TYPE_STRING,
+ 								&xml);
+ 		g_free(xml);
 -- 
 2.14.3
 
