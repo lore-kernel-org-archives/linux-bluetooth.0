@@ -1,9 +1,9 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 7/7] tests: Remove test-thermometer
-Date: Thu,  2 Nov 2017 16:15:19 +0200
-Message-Id: <20171102141519.28446-7-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 6/7] core: Cleanup bluetooth.conf
+Date: Thu,  2 Nov 2017 16:15:18 +0200
+Message-Id: <20171102141519.28446-6-luiz.dentz@gmail.com>
 In-Reply-To: <20171102141519.28446-1-luiz.dentz@gmail.com>
 References: <20171102141519.28446-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,117 +11,27 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Thermomether interfaces no longer exists.
+This removes interfaces that no longer exists.
 ---
- test/test-thermometer | 99 ---------------------------------------------------
- 1 file changed, 99 deletions(-)
- delete mode 100755 test/test-thermometer
+ src/bluetooth.conf | 4 ----
+ 1 file changed, 4 deletions(-)
 
-diff --git a/test/test-thermometer b/test/test-thermometer
-deleted file mode 100755
-index 7e67c234d..000000000
---- a/test/test-thermometer
-+++ /dev/null
-@@ -1,99 +0,0 @@
--#!/usr/bin/python
--
--from __future__ import absolute_import, print_function, unicode_literals
--
--'''
--Thermometer test script
--'''
--
--from optparse import OptionParser, make_option
--import sys
--import dbus
--import dbus.service
--import dbus.mainloop.glib
--try:
--  from gi.repository import GObject
--except ImportError:
--  import gobject as GObject
--import bluezutils
--
--BUS_NAME = 'org.bluez'
--THERMOMETER_MANAGER_INTERFACE = 'org.bluez.ThermometerManager1'
--THERMOMETER_WATCHER_INTERFACE = 'org.bluez.ThermometerWatcher1'
--THERMOMETER_INTERFACE = 'org.bluez.Thermometer1'
--
--class Watcher(dbus.service.Object):
--	@dbus.service.method(THERMOMETER_WATCHER_INTERFACE,
--					in_signature="oa{sv}", out_signature="")
--	def MeasurementReceived(self, device, measure):
--		print("%s measurement received from %s" % (measure["Measurement"], device))
--		print("Exponent: ", measure["Exponent"])
--		print("Mantissa: ", measure["Mantissa"])
--		print("Unit: ", measure["Unit"])
--
--		if "Time" in measure:
--			print("Time: ", measure["Time"])
--
--		if "Type" in measure:
--			print("Type: ", measure["Type"])
--
--def properties_changed(interface, changed, invalidated):
--	if interface != THERMOMETER_INTERFACE:
--		return
--	for name, value in changed.iteritems():
--		print("Property %s changed:  %s" % (name, str(value)))
--
--if __name__ == "__main__":
--	dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
--
--	bus = dbus.SystemBus()
--
--	option_list = [
--		make_option("-i", "--adapter", action="store",
--			type="string", dest="adapter"),
--		make_option("-b", "--device", action="store",
--			type="string", dest="address"),
--		]
--
--	parser = OptionParser(option_list=option_list)
--
--	(options, args) = parser.parse_args()
--
--	if not options.address:
--		print("Usage: %s [-i <adapter>] -b <bdaddr> [command]" % (sys.argv[0]))
--		print("Possible commands:")
--		print("\tEnableIntermediateMeasurement")
--		sys.exit(1)
--
--	managed_objects = bluezutils.get_managed_objects()
--	adapter = bluezutils.find_adapter_in_objects(managed_objects,
--								options.adapter)
--	adapter_path = adapter.object_path
--
--	thermometer_manager = dbus.Interface(bus.get_object(BUS_NAME,
--				adapter_path), THERMOMETER_MANAGER_INTERFACE)
--
--	device = bluezutils.find_device_in_objects(managed_objects,
--								options.address,
--								options.adapter)
--	device_path = device.object_path
--
--	bus.add_signal_receiver(properties_changed, bus_name=BUS_NAME,
--			path=device_path,
--			dbus_interface="org.freedesktop.DBus.Properties",
--			signal_name="PropertiesChanged")
--
--	path = "/test/watcher"
--	watcher = Watcher(bus, path)
--
--	thermometer_manager.RegisterWatcher(path)
--
--	if len(args) > 0:
--		if args[0] == "EnableIntermediateMeasurement":
--			thermometer_manager.EnableIntermediateMeasurement(path)
--		else:
--			print("unknown command")
--			sys.exit(1)
--
--	mainloop = GObject.MainLoop()
--	mainloop.run()
+diff --git a/src/bluetooth.conf b/src/bluetooth.conf
+index 74a2d3147..0c0b221bb 100644
+--- a/src/bluetooth.conf
++++ b/src/bluetooth.conf
+@@ -13,11 +13,7 @@
+     <allow send_interface="org.bluez.Agent1"/>
+     <allow send_interface="org.bluez.MediaEndpoint1"/>
+     <allow send_interface="org.bluez.MediaPlayer1"/>
+-    <allow send_interface="org.bluez.ThermometerWatcher1"/>
+-    <allow send_interface="org.bluez.AlertAgent1"/>
+     <allow send_interface="org.bluez.Profile1"/>
+-    <allow send_interface="org.bluez.HeartRateWatcher1"/>
+-    <allow send_interface="org.bluez.CyclingSpeedWatcher1"/>
+     <allow send_interface="org.bluez.GattCharacteristic1"/>
+     <allow send_interface="org.bluez.GattDescriptor1"/>
+     <allow send_interface="org.bluez.LEAdvertisement1"/>
 -- 
 2.13.6
 
