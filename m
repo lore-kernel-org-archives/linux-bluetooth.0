@@ -1,40 +1,44 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Alex Blasche <alexander.blasche@qt.io>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: Runtime retrieval of bluetoothd version
-Date: Thu, 2 Nov 2017 08:47:32 +0000
-Message-ID: <DB6PR0201MB219730A45D69A9EC0163B0B5E75C0@DB6PR0201MB2197.eurprd02.prod.outlook.com>
-References: <AM4PR0201MB2196BB85B60661BDEA615EFEE75F0@AM4PR0201MB2196.eurprd02.prod.outlook.com>
- <CABBYNZK3YcGK-qONbFbZEhM5xRnRAuXeQUtPVj9OUgzqLzgszg@mail.gmail.com>
-In-Reply-To: <CABBYNZK3YcGK-qONbFbZEhM5xRnRAuXeQUtPVj9OUgzqLzgszg@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
+Subject: [PATCH BlueZ 2/2] client: Clear ad manufacturer/service data when too
+ much data
+From: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+References: <64c3c710-09a3-2379-9a5f-51f9001f2cc4@jp.fujitsu.com>
+Message-ID: <5a1bab61-58a1-0bcf-2e70-568d6eb5b7e9@jp.fujitsu.com>
+Date: Thu, 2 Nov 2017 16:50:32 +0900
 MIME-Version: 1.0
+In-Reply-To: <64c3c710-09a3-2379-9a5f-51f9001f2cc4@jp.fujitsu.com>
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgTHVpeiwNCg0KPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBMdWl6IEF1
-Z3VzdG8gdm9uIERlbnR6IFttYWlsdG86bHVpei5kZW50ekBnbWFpbC5jb21dDQoNCj4gV2hpbGUg
-SSB1bmRlcnN0YW5kIHdoYXQgeW91IGFyZSBhdCBhZGRpbmcgdGhlIHZlcnNpb24gd291bGQgb25s
-eSBhZmZlY3QNCj4gdXBjb21pbmcgcmVsZWFzZXMgc28gSSBkb24ndCBob3cgaXQgd291bGQgZml4
-IHRoZSBwcm9ibGVtLg0KDQpPaywgdGhlcmUgaXMgbm90aGluZy4gTWlnaHQgSSBhc2sgZm9yIGEg
-bmV3IHZlcnNpb24gdGFnIHNvbWV3aGVyZT8gQWZ0ZXIgYWxsIEFQSSdzIHdpbGwgYWx3YXlzIGJl
-IGFkZGVkIG9yIGNoYW5nZWQuIEl0IHdvdWxkIGJlIGFuIGludmVzdG1lbnQgaW50byB0aGUgZnV0
-dXJlLg0KDQo+ID4gVGhlIG9ubHkgcmVsaWFibGUgd2F5IEkgaGF2ZSBzZWVuIHNvIGZhciBpcyBi
-bHVldG9vdGhkIC0tdmVyc2lvbiB3aGljaCBhc3N1bWVzDQo+IHRoYXQgb25lIGtub3dzIHdoZXJl
-IGJsdWV0b290aGQgaXMgbG9jYXRlZC4gQXQgbGVhc3QgaW4gc291cmNlIEkgY291bGQgbm90IGZp
-bmQNCj4gYW55IG90aGVyIHdheS4NCg0KSSB3YXMgZmVhcmluZyB0aGF0LiBTdWNoIGlzIGxpZmUg
-Li4uIEkgd2lsbCBmaW5kIHNvbWUgaGV1cmlzdGljcyBoZXJlLiBUaGFuayB5b3UuDQoNCj4gQnR3
-LCBpZiB5b3UgYXJlIGxvb2tpbmcgZm9yIG90aGVyIGhpbnRzIHlvdSBjb3VsZCB0cnkgYmluZC9s
-aXN0ZW4gb24gR0FUVCBjaWQsIGFzDQo+IGZhciBHQVRUIGdvZXMgdGhpcyBzaG91bGQgaW5kaWNh
-dGUgYmx1ZXRvb3RoZCBpcyBsaXN0ZW5pbmcgb24gaXQuDQoNClRoYXQncyB3aGF0IG15IGV4aXN0
-aW5nIGFsdGVybmF0aXZlIGJhY2tlbmQgY29ubmVjdHMgdG8gYW5kIHdoZXJlIEkgcmFuIGFuIGVu
-dGlyZSAoRylBVFQgc3RhY2suIE9idmlvdXNseSwgdGhpcyBjb21wbGV0ZWx5IGJ5cGFzc2VzIGJs
-dWV0b290aGQgKHRoYXQncyB0aGUgc3RhY2sgSSB3YW50IHRvIHN3YXAgb3V0IGlmIGJsdWV0b290
-aGQgaXMgcmVjZW50IGVub3VnaCkuIFdoYXQgSSBkb24ndCB1bmRlcnN0YW5kIGlzIGhvdyB0aGlz
-IGNvdWxkIGhlbHAgbWUgdG8gZmlndXJlIG91dCB3aGF0IHZlcnNpb24gb2YgYmx1ZXRvb3RoZCBp
-cyBydW5uaW5nLiBUaGUgdGVzdCB0byBjaGVjayB3aGV0aGVyIEJsdWV0b290aCBpcyBydW5uaW5n
-IGlzIGRvYWJsZSB2aWEgZGJ1cyBhbHJlYWR5IGFuZCBsZXNzIG9mIGEgcHJvYmxlbS4gSSB0aGVy
-ZSBhIGNvcnJlbGF0aW9uIGJldHdlZW4gYmx1ZXRvb3RoZCB2ZXJzaW9uIGFuZCBibHVldG9vdGhk
-IGFsd2F5cyBiZWluZyBjb25uZWN0ZWQgdG8gdGhlIEdBVFQgY2lkPyBXaGF0IGFtIEkgbWlzc2lu
-Zz8NCg0KLS0NCkFsZXgNCg0KDQo=
+When data is too much, the data may include values not making sense, so
+this patch clears the advertising manufacturer/service data corresponding
+to the running command.
+---
+ client/advertising.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/client/advertising.c b/client/advertising.c
+index 76eda3c97..e950aa278 100644
+--- a/client/advertising.c
++++ b/client/advertising.c
+@@ -456,6 +456,7 @@ void ad_advertise_service(DBusConnection *conn, const char *arg)
+ 
+ 		if (i >= G_N_ELEMENTS(data->data)) {
+ 			rl_printf("Too much data\n");
++			ad_clear_service();
+ 			goto done;
+ 		}
+ 
+@@ -511,6 +512,7 @@ void ad_advertise_manufacturer(DBusConnection *conn, const char *arg)
+ 	for (i = 1; i < w.we_wordc; i++) {
+ 		if (i >= G_N_ELEMENTS(data->data)) {
+ 			rl_printf("Too much data\n");
++			ad_clear_manufacturer();
+ 			goto done;
+ 		}
+ 
+-- 
+2.14.1
+
