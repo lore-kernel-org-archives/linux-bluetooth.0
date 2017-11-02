@@ -1,9 +1,9 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 6/7] core: Cleanup bluetooth.conf
-Date: Thu,  2 Nov 2017 16:43:51 +0200
-Message-Id: <20171102144352.32353-6-luiz.dentz@gmail.com>
+Subject: [PATCH v2 4/7] advertising: Use client proxy to release
+Date: Thu,  2 Nov 2017 16:43:49 +0200
+Message-Id: <20171102144352.32353-4-luiz.dentz@gmail.com>
 In-Reply-To: <20171102144352.32353-1-luiz.dentz@gmail.com>
 References: <20171102144352.32353-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,27 +11,39 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This removes interfaces that no longer exists.
+This uses g_dbus_proxy_method_call instead of build the message
+manually.
 ---
- src/bluetooth.conf | 4 ----
- 1 file changed, 4 deletions(-)
+ src/advertising.c | 13 ++-----------
+ 1 file changed, 2 insertions(+), 11 deletions(-)
 
-diff --git a/src/bluetooth.conf b/src/bluetooth.conf
-index 74a2d3147..0c0b221bb 100644
---- a/src/bluetooth.conf
-+++ b/src/bluetooth.conf
-@@ -13,11 +13,7 @@
-     <allow send_interface="org.bluez.Agent1"/>
-     <allow send_interface="org.bluez.MediaEndpoint1"/>
-     <allow send_interface="org.bluez.MediaPlayer1"/>
--    <allow send_interface="org.bluez.ThermometerWatcher1"/>
--    <allow send_interface="org.bluez.AlertAgent1"/>
-     <allow send_interface="org.bluez.Profile1"/>
--    <allow send_interface="org.bluez.HeartRateWatcher1"/>
--    <allow send_interface="org.bluez.CyclingSpeedWatcher1"/>
-     <allow send_interface="org.bluez.GattCharacteristic1"/>
-     <allow send_interface="org.bluez.GattDescriptor1"/>
-     <allow send_interface="org.bluez.LEAdvertisement1"/>
+diff --git a/src/advertising.c b/src/advertising.c
+index 31a5fff5c..94a8c4050 100644
+--- a/src/advertising.c
++++ b/src/advertising.c
+@@ -137,20 +137,11 @@ static gboolean client_free_idle_cb(void *data)
+ static void client_release(void *data)
+ {
+ 	struct btd_adv_client *client = data;
+-	DBusMessage *message;
+ 
+ 	DBG("Releasing advertisement %s, %s", client->owner, client->path);
+ 
+-	message = dbus_message_new_method_call(client->owner, client->path,
+-							LE_ADVERTISEMENT_IFACE,
+-							"Release");
+-
+-	if (!message) {
+-		error("Couldn't allocate D-Bus message");
+-		return;
+-	}
+-
+-	g_dbus_send_message(btd_get_dbus_connection(), message);
++	g_dbus_proxy_method_call(client->proxy, "Release", NULL, NULL, NULL,
++									NULL);
+ }
+ 
+ static void client_destroy(void *data)
 -- 
 2.13.6
 
