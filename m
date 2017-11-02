@@ -1,56 +1,127 @@
-Return-Path: <hadess@hadess.net>
-Message-ID: <1509632265.2869.65.camel@hadess.net>
-Subject: Re: Enabling autosuspend for btusb by default
-From: Bastien Nocera <hadess@hadess.net>
-To: Hans de Goede <hdegoede@redhat.com>, Marcel Holtmann
- <marcel@holtmann.org>,  Johan Hedberg <johan.hedberg@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Thu, 02 Nov 2017 15:17:45 +0100
-In-Reply-To: <9629d543-a8e2-27d2-21e5-7f6a21395e3c@redhat.com>
-References: <9629d543-a8e2-27d2-21e5-7f6a21395e3c@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 7/7] tests: Remove test-thermometer
+Date: Thu,  2 Nov 2017 16:15:19 +0200
+Message-Id: <20171102141519.28446-7-luiz.dentz@gmail.com>
+In-Reply-To: <20171102141519.28446-1-luiz.dentz@gmail.com>
+References: <20171102141519.28446-1-luiz.dentz@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, 2017-11-01 at 15:31 +0100, Hans de Goede wrote:
-> <resend with a bunch of To and Cc address added, sorry?
-> 
-> Hi All,
-> 
-> I'm working on trying to improve the OOTB power-consumption
-> of Linux (Fedora Workstation) on laptops.
-> 
-> One of the easy wins here is enabling runtime-pm / autosuspend
-> for btusb, since on many laptops the USB bluetooth device is
-> the only USB device not using autosuspend, enabling this will
-> not only allow suspending the USB bluetooth device but also to
-> USB HCI, leading to a significant saving in power consumption
-> of aprox. 0.4W.
-> 
-> So I would like to look into enabling runtime-pm / autosuspend
-> for btusb by default.
-> 
-> Question, are there any known issues with enabling runtime-pm ?
-> 
-> I realize that simply enabling it for all btusb devices is a bit
-> of a big hammer and might be a bad idea since there will probably
-> be some devices out there which do not support this properly.
-> 
-> I was thinking that instead of enabling runtime-pm for all btusb
-> devices, maybe this is something which we can do a vendor-id
-> basis, starting with Intel and Broadcom devices ?
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-(Removed Gustavo from the CC:)
+Thermomether interfaces no longer exists.
+---
+ test/test-thermometer | 99 ---------------------------------------------------
+ 1 file changed, 99 deletions(-)
+ delete mode 100755 test/test-thermometer
 
-Is there any benefit doing this in the kernel rather than in user-
-space?
+diff --git a/test/test-thermometer b/test/test-thermometer
+deleted file mode 100755
+index 7e67c234d..000000000
+--- a/test/test-thermometer
++++ /dev/null
+@@ -1,99 +0,0 @@
+-#!/usr/bin/python
+-
+-from __future__ import absolute_import, print_function, unicode_literals
+-
+-'''
+-Thermometer test script
+-'''
+-
+-from optparse import OptionParser, make_option
+-import sys
+-import dbus
+-import dbus.service
+-import dbus.mainloop.glib
+-try:
+-  from gi.repository import GObject
+-except ImportError:
+-  import gobject as GObject
+-import bluezutils
+-
+-BUS_NAME = 'org.bluez'
+-THERMOMETER_MANAGER_INTERFACE = 'org.bluez.ThermometerManager1'
+-THERMOMETER_WATCHER_INTERFACE = 'org.bluez.ThermometerWatcher1'
+-THERMOMETER_INTERFACE = 'org.bluez.Thermometer1'
+-
+-class Watcher(dbus.service.Object):
+-	@dbus.service.method(THERMOMETER_WATCHER_INTERFACE,
+-					in_signature="oa{sv}", out_signature="")
+-	def MeasurementReceived(self, device, measure):
+-		print("%s measurement received from %s" % (measure["Measurement"], device))
+-		print("Exponent: ", measure["Exponent"])
+-		print("Mantissa: ", measure["Mantissa"])
+-		print("Unit: ", measure["Unit"])
+-
+-		if "Time" in measure:
+-			print("Time: ", measure["Time"])
+-
+-		if "Type" in measure:
+-			print("Type: ", measure["Type"])
+-
+-def properties_changed(interface, changed, invalidated):
+-	if interface != THERMOMETER_INTERFACE:
+-		return
+-	for name, value in changed.iteritems():
+-		print("Property %s changed:  %s" % (name, str(value)))
+-
+-if __name__ == "__main__":
+-	dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
+-
+-	bus = dbus.SystemBus()
+-
+-	option_list = [
+-		make_option("-i", "--adapter", action="store",
+-			type="string", dest="adapter"),
+-		make_option("-b", "--device", action="store",
+-			type="string", dest="address"),
+-		]
+-
+-	parser = OptionParser(option_list=option_list)
+-
+-	(options, args) = parser.parse_args()
+-
+-	if not options.address:
+-		print("Usage: %s [-i <adapter>] -b <bdaddr> [command]" % (sys.argv[0]))
+-		print("Possible commands:")
+-		print("\tEnableIntermediateMeasurement")
+-		sys.exit(1)
+-
+-	managed_objects = bluezutils.get_managed_objects()
+-	adapter = bluezutils.find_adapter_in_objects(managed_objects,
+-								options.adapter)
+-	adapter_path = adapter.object_path
+-
+-	thermometer_manager = dbus.Interface(bus.get_object(BUS_NAME,
+-				adapter_path), THERMOMETER_MANAGER_INTERFACE)
+-
+-	device = bluezutils.find_device_in_objects(managed_objects,
+-								options.address,
+-								options.adapter)
+-	device_path = device.object_path
+-
+-	bus.add_signal_receiver(properties_changed, bus_name=BUS_NAME,
+-			path=device_path,
+-			dbus_interface="org.freedesktop.DBus.Properties",
+-			signal_name="PropertiesChanged")
+-
+-	path = "/test/watcher"
+-	watcher = Watcher(bus, path)
+-
+-	thermometer_manager.RegisterWatcher(path)
+-
+-	if len(args) > 0:
+-		if args[0] == "EnableIntermediateMeasurement":
+-			thermometer_manager.EnableIntermediateMeasurement(path)
+-		else:
+-			print("unknown command")
+-			sys.exit(1)
+-
+-	mainloop = GObject.MainLoop()
+-	mainloop.run()
+-- 
+2.13.6
 
-Do you have a set test procedure that would allow checking whether the
-device remains working?
-
-I could see having this as a user-space toggle being useful if we ever
-want to disable the runtime PM/autosuspend so Bluetooth keyboards can
-wake up desktop machines from sleep. It's a long-standing RFE, which we
-still haven't handled.
-
-Cheers
