@@ -1,65 +1,78 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Alex Blasche <alexander.blasche@qt.io>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: Runtime retrieval of bluetoothd version
-Date: Thu, 2 Nov 2017 10:03:24 +0000
-Message-ID: <DB6PR0201MB2197B885638BD4A61D50D85FE75C0@DB6PR0201MB2197.eurprd02.prod.outlook.com>
-References: <AM4PR0201MB2196BB85B60661BDEA615EFEE75F0@AM4PR0201MB2196.eurprd02.prod.outlook.com>
- <CABBYNZK3YcGK-qONbFbZEhM5xRnRAuXeQUtPVj9OUgzqLzgszg@mail.gmail.com>
- <DB6PR0201MB219730A45D69A9EC0163B0B5E75C0@DB6PR0201MB2197.eurprd02.prod.outlook.com>
- <CABBYNZKvh6kc7QnS=8Y-i-vHODPheYpqRJ-EzGbB1kqo=+y8oQ@mail.gmail.com>
-In-Reply-To: <CABBYNZKvh6kc7QnS=8Y-i-vHODPheYpqRJ-EzGbB1kqo=+y8oQ@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
+In-Reply-To: <DB6PR0201MB219730A45D69A9EC0163B0B5E75C0@DB6PR0201MB2197.eurprd02.prod.outlook.com>
+References: <AM4PR0201MB2196BB85B60661BDEA615EFEE75F0@AM4PR0201MB2196.eurprd02.prod.outlook.com>
+ <CABBYNZK3YcGK-qONbFbZEhM5xRnRAuXeQUtPVj9OUgzqLzgszg@mail.gmail.com> <DB6PR0201MB219730A45D69A9EC0163B0B5E75C0@DB6PR0201MB2197.eurprd02.prod.outlook.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Thu, 2 Nov 2017 11:15:34 +0200
+Message-ID: <CABBYNZKvh6kc7QnS=8Y-i-vHODPheYpqRJ-EzGbB1kqo=+y8oQ@mail.gmail.com>
+Subject: Re: Runtime retrieval of bluetoothd version
+To: Alex Blasche <alexander.blasche@qt.io>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogTHVpeiBBdWd1c3RvIHZv
-biBEZW50eiBbbWFpbHRvOmx1aXouZGVudHpAZ21haWwuY29tXQ0KPiA+IEkgd2FzIGZlYXJpbmcg
-dGhhdC4gU3VjaCBpcyBsaWZlIC4uLiBJIHdpbGwgZmluZCBzb21lIGhldXJpc3RpY3MgaGVyZS4g
-VGhhbmsgeW91Lg0KPiANCj4gWW91IGNhbiBjaGVjayBob3cgZC1mZWV0IGRvZXMgdG8gcmV0cmll
-dmUgdGhlIHBpZCBhbmQgYmluYXJ5IHBhdGgsDQo+IHRoYW4geW91IGNhbiBpc3N1ZSBhIC0tdmVy
-c2lvbiB0byBpdCBhbmQgcGFyc2UgdGhlIG91dHB1dC4NCg0KVGhhbmsgeW91IGZvciB0aGUgaGlu
-dC4gSSB3aWxsIGNoZWNrIGl0IG91dC4NCg0KPiA+PiBCdHcsIGlmIHlvdSBhcmUgbG9va2luZyBm
-b3Igb3RoZXIgaGludHMgeW91IGNvdWxkIHRyeSBiaW5kL2xpc3RlbiBvbiBHQVRUIGNpZCwNCj4g
-YXMNCj4gPj4gZmFyIEdBVFQgZ29lcyB0aGlzIHNob3VsZCBpbmRpY2F0ZSBibHVldG9vdGhkIGlz
-IGxpc3RlbmluZyBvbiBpdC4NCj4gPg0KPiA+IFRoYXQncyB3aGF0IG15IGV4aXN0aW5nIGFsdGVy
-bmF0aXZlIGJhY2tlbmQgY29ubmVjdHMgdG8gYW5kIHdoZXJlIEkgcmFuIGFuDQo+IGVudGlyZSAo
-RylBVFQgc3RhY2suIE9idmlvdXNseSwgdGhpcyBjb21wbGV0ZWx5IGJ5cGFzc2VzIGJsdWV0b290
-aGQgKHRoYXQncyB0aGUNCj4gc3RhY2sgSSB3YW50IHRvIHN3YXAgb3V0IGlmIGJsdWV0b290aGQg
-aXMgcmVjZW50IGVub3VnaCkuIFdoYXQgSSBkb24ndA0KPiB1bmRlcnN0YW5kIGlzIGhvdyB0aGlz
-IGNvdWxkIGhlbHAgbWUgdG8gZmlndXJlIG91dCB3aGF0IHZlcnNpb24gb2YgYmx1ZXRvb3RoZCBp
-cw0KPiBydW5uaW5nLiBUaGUgdGVzdCB0byBjaGVjayB3aGV0aGVyIEJsdWV0b290aCBpcyBydW5u
-aW5nIGlzIGRvYWJsZSB2aWEgZGJ1cw0KPiBhbHJlYWR5IGFuZCBsZXNzIG9mIGEgcHJvYmxlbS4g
-SSB0aGVyZSBhIGNvcnJlbGF0aW9uIGJldHdlZW4gYmx1ZXRvb3RoZCB2ZXJzaW9uDQo+IGFuZCBi
-bHVldG9vdGhkIGFsd2F5cyBiZWluZyBjb25uZWN0ZWQgdG8gdGhlIEdBVFQgY2lkPyBXaGF0IGFt
-IEkgbWlzc2luZz8NCj4gDQo+IFdoaWNoIGFuIGFwcGxpY2F0aW9uIHdhcyBuZXZlciBzdXBwb3Nl
-ZCB0byBkbywgc3BlY2lhbGx5IHdoZW4gd2UgYXJlDQo+IHRhbGtpbmcgYWJvdXQgYSBmaXhlZCBj
-aGFubmVsLCBidXQgSSBndWVzcyB5b3UgYXJlIGtub3cgbGVhcm5pbmcgaXQNCj4gdGhlIGhhcmQg
-d2F5LiANCg0KSSBrbmV3IHRoYXQgZnJvbSB0aGUgYmVnaW5uaW5nLiBQcm9ibGVtIGlzIHRoYXQg
-UXQgaGFkIHRvIHN1cHBvcnQgQlRMRSBmcm9tDQpCbHVleiA0LjEwMSBvbndhcmRzLiBPbmx5IG5v
-dyB0aGF0IEJsdWV6IGlzIGZpbmFsbHkgY2F0Y2hpbmcgdXAgKHN0aWxsIG5vdCB0aGVyZSB5ZXQp
-DQpJIGNhbiBjb25zaWRlciBzaGlmdGluZyB0aGUgYnVyZGVuLg0KDQo+IFdoYXQgSSB3YXMgc3Vn
-Z2VzdGluZyBpcyBkZXRlY3QgaWYgYmx1ZXRvb3RoZCBpcyBhbHJlYWR5DQo+IGhhbmRsaW5nIHRo
-ZSBBVFQgY2lkIGJ1dCBwZXJoYXBzIHRoYXQgaXMgbm90IGVub3VnaCBnaXZlbiB0aGVyZSBhcmUN
-Cj4gbWFueSB2ZXJzaW9ucyB3aGVyZSB0aGUgR0FUVCBpbXBsZW1lbnRhdGlvbiBtYXkgbm90IGJl
-IGZ1bGx5DQo+IG9wZXJhdGlvbmFsIG9yIGlzIHN0aWxsIG1hcmtlZCBleHBlcmltZW50YWwuDQoN
-CkZyb20gd2hhdCBJIGNhbiB0ZWxsIHRoaXMgaXMgb25seSB0cnVlIGlmIGEgY29ubmVjdGlvbiB0
-byBhIHJlbW90ZSBkZXZpY2UgZXhpc3RzLCByaWdodD8NCkF0IGxlYXN0IG15IHRlc3RzIHNob3cg
-dGhhdCB0aGUgc29ja2V0IGNvbm5lY3Rpb24gaXMgbm90IGFsd2F5cyBvcGVuLg0KDQo+IElmIEkg
-d2hlcmUgdG8gbWFrZSB0aGlzIGNoYW5nZXMgSSB3b3VsZCBqdXN0IHJlbW92ZSBhbnkgaW1wbGVt
-ZW50YXRpb24NCj4gb2YgR0FUVC9BVFQgYW5kIHN0YXJ0IG92ZXIgZGVwZW5kaW5nIG9uIHRoZSB1
-cGNvbWluZyBCbHVlWiByZWxlYXNlDQo+IHdoaWNoIHNob3VsZCBjb3ZlciBib3RoIGNlbnRyYWwg
-YW5kIHBlcmlwaGVyYWwgcm9sZXMsIGJ1dCBwZXJoYXBzIHlvdQ0KPiBjYW5ub3QgZG8gdGhhdCBi
-ZWNhdXNlIHRoYXQgd291bGQgbGVhdmUgc3lzdGVtcyB0aGF0IGNhbm5vdCB1cGRhdGUNCj4gQmx1
-ZVogdW5hYmxlIHRvIHVwZGF0ZSBRdCBhcyB3ZWxsLg0KDQpJZiBsaWZlIHdvdWxkIGFsd2F5cyB0
-aGlzIGVhc3kuLi4gWW91IGd1ZXNzZWQgcmlnaHQuIEkgY2Fubm90IGN1dCBzdXBwb3J0IGZvciBC
-bHVleiB2ZXJzaW9ucw0KYmVsb3cgNS40MiAoZmlyc3QgdmVyc2lvbiBvZiBCbHVleiB0aGF0IGhh
-ZCBub24tZXhwZXJpbWVudGFsIEJUTEUgQVBJcykuIFNlY29uZCByZWFzb24gaXMNCnRoYXQgZXNw
-ZWNpYWxseSBvbiB0aGUgcGVyaXBoZXJhbCBzaWRlIEJsdWV6IGlzIHN0aWxsIGV4cGVyaW1lbnRh
-bCBhbmQgc29tZSB0aGluZ3Mgc3VjaCBhcw0KdmFyaW91cyBhZHZlcnRpc2luZyBwYXJhbWV0ZXJz
-IChlLmcuIHdoaXRlIGxpc3RzICYgaW50ZXJ2YWxzKSBhcmUgbm90IGF2YWlsYWJsZSB5ZXQuIEVz
-cGVjaWFsbHkNCnRoZSBpbnRlcnZhbHMgYXJlIGEgYmlnIHByb2JsZW1zIChoaW50IGhpbnQg8J+Y
-iSkuIEZvciB0aGUgdGltZSBiZWluZyBJIGhhdmUgdG8gcnVuIGJvdGggc3RhY2tzIC0NCmJ1dCBC
-bHVleiBhbmQgUXQgd2lsbCBnZXQgdGhlcmUuDQoNCi0tDQpBbGV4DQo=
+Hi Alex,
+
+On Thu, Nov 2, 2017 at 10:47 AM, Alex Blasche <alexander.blasche@qt.io> wro=
+te:
+> Hi Luiz,
+>
+>> -----Original Message-----
+>> From: Luiz Augusto von Dentz [mailto:luiz.dentz@gmail.com]
+>
+>> While I understand what you are at adding the version would only affect
+>> upcoming releases so I don't how it would fix the problem.
+>
+> Ok, there is nothing. Might I ask for a new version tag somewhere? After =
+all API's will always be added or changed. It would be an investment into t=
+he future.
+>
+>> > The only reliable way I have seen so far is bluetoothd --version which=
+ assumes
+>> that one knows where bluetoothd is located. At least in source I could n=
+ot find
+>> any other way.
+>
+> I was fearing that. Such is life ... I will find some heuristics here. Th=
+ank you.
+
+You can check how d-feet does to retrieve the pid and binary path,
+than you can issue a --version to it and parse the output.
+
+>> Btw, if you are looking for other hints you could try bind/listen on GAT=
+T cid, as
+>> far GATT goes this should indicate bluetoothd is listening on it.
+>
+> That's what my existing alternative backend connects to and where I ran a=
+n entire (G)ATT stack. Obviously, this completely bypasses bluetoothd (that=
+'s the stack I want to swap out if bluetoothd is recent enough). What I don=
+'t understand is how this could help me to figure out what version of bluet=
+oothd is running. The test to check whether Bluetooth is running is doable =
+via dbus already and less of a problem. I there a correlation between bluet=
+oothd version and bluetoothd always being connected to the GATT cid? What a=
+m I missing?
+
+Which an application was never supposed to do, specially when we are
+talking about a fixed channel, but I guess you are know learning it
+the hard way. What I was suggesting is detect if bluetoothd is already
+handling the ATT cid but perhaps that is not enough given there are
+many versions where the GATT implementation may not be fully
+operational or is still marked experimental.
+
+If I where to make this changes I would just remove any implementation
+of GATT/ATT and start over depending on the upcoming BlueZ release
+which should cover both central and peripheral roles, but perhaps you
+cannot do that because that would leave systems that cannot update
+BlueZ unable to update Qt as well.
+
+> --
+> Alex
+>
+>
+
+
+
+--=20
+Luiz Augusto von Dentz
