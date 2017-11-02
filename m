@@ -1,35 +1,26 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Message-ID: <1509632009.2869.61.camel@hadess.net>
-Subject: Re: [PATCH BlueZ] obexd: Fix compile error due to lack of header
+Message-ID: <1509631905.2869.58.camel@hadess.net>
+Subject: Re: [PATCH 1/2] tools/csr_usb: Fix compilation failure
 From: Bastien Nocera <hadess@hadess.net>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Thu, 02 Nov 2017 15:13:29 +0100
-In-Reply-To: <CABBYNZL6v0qiMJ-73MQmB9nrQhNbq8h0e6fqyBtncRRfTB2E1g@mail.gmail.com>
-References: <0ff16352-9a23-f0b1-5691-d521b36dcd8c@jp.fujitsu.com>
-         <CABBYNZL6v0qiMJ-73MQmB9nrQhNbq8h0e6fqyBtncRRfTB2E1g@mail.gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Date: Thu, 02 Nov 2017 15:11:45 +0100
+In-Reply-To: <20171102140953.21684-1-hadess@hadess.net>
+References: <20171102140953.21684-1-hadess@hadess.net>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, 2017-10-26 at 15:05 +0300, Luiz Augusto von Dentz wrote:
-> Hi Eramoto,
+On Thu, 2017-11-02 at 15:09 +0100, Bastien Nocera wrote:
+> GCC's "format-nonliteral" security check is enabled as an error in
+> recent versions of Fedora. Given the limited formats, pass a boolean
+> to switch between the 2 different formats.
 > 
-> On Thu, Oct 26, 2017 at 9:05 AM, ERAMOTO Masaya
-> <eramoto.masaya@jp.fujitsu.com> wrote:
-> > When compiling with gcc 7.2.0, gcc outputs the following messages.
-> > This patch adds the header stdlib.h to each obex-related header
-> > including
-> > functions with the type ssize_t, so the same problem does not also
-> > happen
-> > in case using there headers individually.
-> 
-> Weird this is just happening now, so what did change in 7.2? Usually
-> we have stdlib.h included in the c file not in the header.
+> tools/csr_usb.c: In function 'read_value':
+> tools/csr_usb.c:82:2: error: format not a string literal, argument
+> types not checked [-Werror=format-nonliteral]
+>   n = fscanf(file, format, &value);
+>   ^
 
-It's not a gcc change, but a glibc change. See the patch labelled "Fix
-compilation error on newer glibc" I just sent.
-
-Cheers
+Sorry, those are re-send because of a command-line typo. They're still
+applicable though.
