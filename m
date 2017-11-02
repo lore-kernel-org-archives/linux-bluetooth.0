@@ -1,11 +1,11 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20171101143152.30642-1-luiz.dentz@gmail.com>
-References: <20171101143152.30642-1-luiz.dentz@gmail.com>
+In-Reply-To: <20171101103123.12041-1-luiz.dentz@gmail.com>
+References: <20171101103123.12041-1-luiz.dentz@gmail.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 2 Nov 2017 14:09:50 +0200
-Message-ID: <CABBYNZ+bv4hqSVzcizEmibn=NRKd_=cBmFMQtwCTsbRm0cHc-Q@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/2] doc/advertising-api: Mark LEAdvertisingManager1 stable
+Date: Thu, 2 Nov 2017 14:09:30 +0200
+Message-ID: <CABBYNZLrDawOz7_v_zpMaanOjqHiuvCs857F-WfcJgbrWKdK=g@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] gatt: Fix crash while disconnecting ATT
 To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -13,87 +13,58 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
 
-On Wed, Nov 1, 2017 at 4:31 PM, Luiz Augusto von Dentz
+On Wed, Nov 1, 2017 at 12:31 PM, Luiz Augusto von Dentz
 <luiz.dentz@gmail.com> wrote:
 > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 >
-> All features supported over management are supported.
+> Since get_ccc_state can be called from both read and write callbacks it
+> was causing the disconnect handler to be register twice causing the
+> following crash:
+>
+> bluetoothd[31312]: src/gatt-database.c:att_disconnected()
+> bluetoothd[31312]: src/gatt-database.c:ccc_write_cb() External CCC write received with value: 0x0000
+> bluetoothd[31312]: src/gatt-database.c:att_disconnected()
+> Invalid read of size 8
+>    at 0x475639: att_disconnected (gatt-database.c:301)
+>    by 0x4D6C75: disconn_handler (att.c:538)
+>    by 0x4D22EF: queue_foreach (queue.c:220)
+>    by 0x4D8959: disconnect_cb (att.c:590)
+>    by 0x4E559A: watch_callback (io-glib.c:170)
+>    by 0x50CD246: g_main_context_dispatch (in /usr/lib64/libglib-2.0.so.0.5200.3)
+>    by 0x50CD5E7: ??? (in /usr/lib64/libglib-2.0.so.0.5200.3)
+>    by 0x50CD901: g_main_loop_run (in /usr/lib64/libglib-2.0.so.0.5200.3)
+>    by 0x40CD10: main (main.c:770)
+>  Address 0x8e30250 is 0 bytes inside a block of size 32 free'd
+>    at 0x4C2FD18: free (vg_replace_malloc.c:530)
+>    by 0x4756D5: device_state_free (gatt-database.c:271)
+>    by 0x4756D5: att_disconnected (gatt-database.c:313)
+>    by 0x4D6C75: disconn_handler (att.c:538)
+>    by 0x4D22EF: queue_foreach (queue.c:220)
+>    by 0x4D8959: disconnect_cb (att.c:590)
+>    by 0x4E559A: watch_callback (io-glib.c:170)
+>    by 0x50CD246: g_main_context_dispatch (in /usr/lib64/libglib-2.0.so.0.5200.3)
+>    by 0x50CD5E7: ??? (in /usr/lib64/libglib-2.0.so.0.5200.3)
+>    by 0x50CD901: g_main_loop_run (in /usr/lib64/libglib-2.0.so.0.5200.3)
+>    by 0x40CD10: main (main.c:770)
 > ---
->  doc/advertising-api.txt |  2 +-
->  src/adapter.c           | 15 ++++++---------
->  src/advertising.c       | 13 +++++--------
->  3 files changed, 12 insertions(+), 18 deletions(-)
+>  src/gatt-database.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
 >
-> diff --git a/doc/advertising-api.txt b/doc/advertising-api.txt
-> index 7cc183043..b10010a19 100644
-> --- a/doc/advertising-api.txt
-> +++ b/doc/advertising-api.txt
-> @@ -92,7 +92,7 @@ Data which should be broadcast to devices.  Advertisement Data elements must
->  follow the API for LE Advertisement Data described above.
+> diff --git a/src/gatt-database.c b/src/gatt-database.c
+> index 1d262ccd4..3e10c901c 100644
+> --- a/src/gatt-database.c
+> +++ b/src/gatt-database.c
+> @@ -360,7 +360,9 @@ static struct device_state *get_device_state(struct btd_gatt_database *database,
+>         queue_push_tail(database->device_states, dev_state);
 >
->  Service                org.bluez
-> -Interface      org.bluez.LEAdvertisingManager1 [Experimental]
-> +Interface      org.bluez.LEAdvertisingManager1
->  Object path    /org/bluez/{hci0,hci1,...}
+>  done:
+> -       dev_state->disc_id = bt_att_register_disconnect(att, att_disconnected,
+> +       if (!dev_state->disc_id)
+> +               dev_state->disc_id = bt_att_register_disconnect(att,
+> +                                                       att_disconnected,
+>                                                         dev_state, NULL);
 >
->  Methods                RegisterAdvertisement(object advertisement, dict options)
-> diff --git a/src/adapter.c b/src/adapter.c
-> index 32a89d533..1c751b1d4 100644
-> --- a/src/adapter.c
-> +++ b/src/adapter.c
-> @@ -7722,15 +7722,12 @@ static int adapter_register(struct btd_adapter *adapter)
->                 return -EINVAL;
->         }
->
-> -       if (g_dbus_get_flags() & G_DBUS_FLAG_ENABLE_EXPERIMENTAL) {
-> -               /* Don't start advertising managers on non-LE controllers. */
-> -               if (adapter->supported_settings & MGMT_SETTING_LE) {
-> -                       adapter->adv_manager = btd_adv_manager_new(adapter);
-> -               } else {
-> -                       btd_info(adapter->dev_id,
-> -                               "LEAdvertisingManager skipped, LE unavailable");
-> -               }
-> -       }
-> +       /* Don't start advertising managers on non-LE controllers. */
-> +       if (adapter->supported_settings & MGMT_SETTING_LE)
-> +               adapter->adv_manager = btd_adv_manager_new(adapter);
-> +       else
-> +               btd_info(adapter->dev_id,
-> +                       "LEAdvertisingManager skipped, LE unavailable");
->
->         db = btd_gatt_database_get_db(adapter->database);
->         adapter->db_id = gatt_db_register(db, services_modified,
-> diff --git a/src/advertising.c b/src/advertising.c
-> index b03c36fb6..d4d95c1c3 100644
-> --- a/src/advertising.c
-> +++ b/src/advertising.c
-> @@ -936,21 +936,18 @@ static gboolean get_supported_includes(const GDBusPropertyTable *property,
->  }
->
->  static const GDBusPropertyTable properties[] = {
-> -       { "ActiveInstances", "y", get_active_instances, NULL, NULL,
-> -                                       G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
-> -       { "SupportedInstances", "y", get_instances, NULL, NULL,
-> -                                       G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
-> -       { "SupportedIncludes", "as", get_supported_includes, NULL, NULL,
-> -                                       G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
-> +       { "ActiveInstances", "y", get_active_instances, NULL, NULL },
-> +       { "SupportedInstances", "y", get_instances, NULL, NULL },
-> +       { "SupportedIncludes", "as", get_supported_includes, NULL, NULL },
->         { }
->  };
->
->  static const GDBusMethodTable methods[] = {
-> -       { GDBUS_EXPERIMENTAL_ASYNC_METHOD("RegisterAdvertisement",
-> +       { GDBUS_ASYNC_METHOD("RegisterAdvertisement",
->                                         GDBUS_ARGS({ "advertisement", "o" },
->                                                         { "options", "a{sv}" }),
->                                         NULL, register_advertisement) },
-> -       { GDBUS_EXPERIMENTAL_ASYNC_METHOD("UnregisterAdvertisement",
-> +       { GDBUS_ASYNC_METHOD("UnregisterAdvertisement",
->                                                 GDBUS_ARGS({ "service", "o" }),
->                                                 NULL,
->                                                 unregister_advertisement) },
+>         return dev_state;
 > --
 > 2.13.6
 
