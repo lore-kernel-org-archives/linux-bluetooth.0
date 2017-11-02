@@ -1,9 +1,9 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 3/7] client: Add set-advertise-{duration, timeout}
-Date: Thu,  2 Nov 2017 16:43:48 +0200
-Message-Id: <20171102144352.32353-3-luiz.dentz@gmail.com>
+Subject: [PATCH v2 2/7] advertising: Add implementation of Duration and Timeout
+Date: Thu,  2 Nov 2017 16:43:47 +0200
+Message-Id: <20171102144352.32353-2-luiz.dentz@gmail.com>
 In-Reply-To: <20171102144352.32353-1-luiz.dentz@gmail.com>
 References: <20171102144352.32353-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,172 +11,112 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds the following command which can be used to control the
-advertisement intervals:
+This adds implementation of Duration and Timeout property and properly
+set them in Add Advertising:
 
-[bluetooth]# set-advertise-duration 4
-[bluetooth]# set-advertise-timeout 4
-[bluetooth]# advertise on
-[CHG] Controller B8:8A:60:D8:17:D7 SupportedInstances: 0x04
-[CHG] Controller B8:8A:60:D8:17:D7 ActiveInstances: 0x01
-Advertising object registered
-[CHG] Controller B8:8A:60:D8:17:D7 SupportedInstances: 0x05
-[CHG] Controller B8:8A:60:D8:17:D7 ActiveInstances: 0x00
+@ MGMT Command: Add Advertising (0x003e) plen 11
+        Instance: 1
+        Flags: 0x00000003
+          Switch into Connectable mode
+          Advertise as Discoverable
+        Duration: 4
+        Timeout: 0
+        Advertising data length: 0
+        Scan response length: 0
 ---
- client/advertising.c | 50 ++++++++++++++++++++++++++++++++++++++++++++++++++
- client/advertising.h |  2 ++
- client/main.c        | 42 ++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 94 insertions(+)
+ src/advertising.c | 51 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 51 insertions(+)
 
-diff --git a/client/advertising.c b/client/advertising.c
-index e950aa278..56093f387 100644
---- a/client/advertising.c
-+++ b/client/advertising.c
-@@ -59,6 +59,8 @@ static struct ad {
- 	char *type;
- 	char *local_name;
- 	uint16_t local_appearance;
+diff --git a/src/advertising.c b/src/advertising.c
+index d4d95c1c3..31a5fff5c 100644
+--- a/src/advertising.c
++++ b/src/advertising.c
+@@ -64,6 +64,9 @@ struct btd_adv_client {
+ 	char *path;
+ 	char *name;
+ 	uint16_t appearance;
 +	uint16_t duration;
 +	uint16_t timeout;
- 	char **uuids;
- 	size_t uuids_len;
- 	struct service_data service;
-@@ -323,6 +325,32 @@ static gboolean get_appearance(const GDBusPropertyTable *property,
- 	return TRUE;
++	unsigned int to_id;
+ 	GDBusClient *client;
+ 	GDBusProxy *proxy;
+ 	DBusMessage *reg;
+@@ -97,6 +100,9 @@ static void client_free(void *data)
+ {
+ 	struct btd_adv_client *client = data;
+ 
++	if (client->to_id > 0)
++		g_source_remove(client->to_id);
++
+ 	if (client->client) {
+ 		g_dbus_client_set_disconnect_watch(client->client, NULL, NULL);
+ 		g_dbus_client_unref(client->client);
+@@ -491,6 +497,48 @@ static bool parse_appearance(DBusMessageIter *iter,
+ 	return true;
  }
  
-+static gboolean duration_exits(const GDBusPropertyTable *property, void *data)
++static bool parse_duration(DBusMessageIter *iter,
++					struct btd_adv_client *client)
 +{
-+	return ad.duration;
++	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_UINT16)
++		return false;
++
++	dbus_message_iter_get_basic(iter, &client->duration);
++
++	return true;
 +}
 +
-+static gboolean get_duration(const GDBusPropertyTable *property,
-+				DBusMessageIter *iter, void *user_data)
++static gboolean client_timeout(void *user_data)
 +{
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_UINT16, &ad.duration);
++	struct btd_adv_client *client = user_data;
 +
-+	return TRUE;
++	DBG("");
++
++	client->to_id = 0;
++
++	client_release(client);
++	client_remove(client);
++
++	return FALSE;
 +}
 +
-+static gboolean timeout_exits(const GDBusPropertyTable *property, void *data)
++static bool parse_timeout(DBusMessageIter *iter,
++					struct btd_adv_client *client)
 +{
-+	return ad.timeout;
++	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_UINT16)
++		return false;
++
++	dbus_message_iter_get_basic(iter, &client->timeout);
++
++	if (client->to_id)
++		g_source_remove(client->to_id);
++
++	client->to_id = g_timeout_add_seconds(client->timeout, client_timeout,
++								client);
++
++	return true;
 +}
 +
-+static gboolean get_timeout(const GDBusPropertyTable *property,
-+				DBusMessageIter *iter, void *user_data)
-+{
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_UINT16, &ad.timeout);
-+
-+	return TRUE;
-+}
-+
- static const GDBusPropertyTable ad_props[] = {
- 	{ "Type", "s", get_type },
- 	{ "ServiceUUIDs", "as", get_uuids, NULL, uuids_exists },
-@@ -332,6 +360,8 @@ static const GDBusPropertyTable ad_props[] = {
- 	{ "Includes", "as", get_includes, NULL, includes_exists },
- 	{ "LocalName", "s", get_local_name, NULL, local_name_exits },
- 	{ "Appearance", "q", get_appearance, NULL, appearance_exits },
-+	{ "Duration", "q", get_duration, NULL, duration_exits },
-+	{ "Timeout", "q", get_timeout, NULL, timeout_exits },
- 	{ }
+ static struct adv_parser {
+ 	const char *name;
+ 	bool (*func)(DBusMessageIter *iter, struct btd_adv_client *client);
+@@ -503,6 +551,8 @@ static struct adv_parser {
+ 	{ "Includes", parse_includes },
+ 	{ "LocalName", parse_local_name },
+ 	{ "Appearance", parse_appearance },
++	{ "Duration", parse_duration },
++	{ "Timeout", parse_timeout },
+ 	{ },
  };
  
-@@ -592,3 +622,23 @@ void ad_advertise_local_appearance(DBusConnection *conn, uint16_t value)
+@@ -611,6 +661,7 @@ static int refresh_adv(struct btd_adv_client *client, mgmt_request_func_t func)
  
- 	g_dbus_emit_property_changed(conn, AD_PATH, AD_IFACE, "Appearance");
- }
-+
-+void ad_advertise_duration(DBusConnection *conn, uint16_t value)
-+{
-+	if (ad.duration == value)
-+		return;
-+
-+	ad.duration = value;
-+
-+	g_dbus_emit_property_changed(conn, AD_PATH, AD_IFACE, "Duration");
-+}
-+
-+void ad_advertise_timeout(DBusConnection *conn, uint16_t value)
-+{
-+	if (ad.timeout == value)
-+		return;
-+
-+	ad.timeout = value;
-+
-+	g_dbus_emit_property_changed(conn, AD_PATH, AD_IFACE, "Timeout");
-+}
-diff --git a/client/advertising.h b/client/advertising.h
-index 6868518e7..bb9aed210 100644
---- a/client/advertising.h
-+++ b/client/advertising.h
-@@ -32,3 +32,5 @@ void ad_advertise_name(DBusConnection *conn, bool value);
- void ad_advertise_appearance(DBusConnection *conn, bool value);
- void ad_advertise_local_name(DBusConnection *conn, const char *name);
- void ad_advertise_local_appearance(DBusConnection *conn, uint16_t value);
-+void ad_advertise_duration(DBusConnection *conn, uint16_t value);
-+void ad_advertise_timeout(DBusConnection *conn, uint16_t value);
-diff --git a/client/main.c b/client/main.c
-index 3536c9524..37a411ba9 100644
---- a/client/main.c
-+++ b/client/main.c
-@@ -2376,6 +2376,44 @@ static void cmd_set_advertise_appearance(const char *arg)
- 	ad_advertise_local_appearance(dbus_conn, value);
- }
- 
-+static void cmd_set_advertise_duration(const char *arg)
-+{
-+	long int value;
-+	char *endptr = NULL;
-+
-+	if (arg == NULL || strlen(arg) == 0) {
-+		rl_printf("Missing value argument\n");
-+		return;
-+	}
-+
-+	value = strtol(arg, &endptr, 0);
-+	if (!endptr || *endptr != '\0' || value > UINT16_MAX) {
-+		rl_printf("Invalid argument\n");
-+		return;
-+	}
-+
-+	ad_advertise_duration(dbus_conn, value);
-+}
-+
-+static void cmd_set_advertise_timeout(const char *arg)
-+{
-+	long int value;
-+	char *endptr = NULL;
-+
-+	if (arg == NULL || strlen(arg) == 0) {
-+		rl_printf("Missing value argument\n");
-+		return;
-+	}
-+
-+	value = strtol(arg, &endptr, 0);
-+	if (!endptr || *endptr != '\0' || value > UINT16_MAX) {
-+		rl_printf("Invalid argument\n");
-+		return;
-+	}
-+
-+	ad_advertise_timeout(dbus_conn, value);
-+}
-+
- static const struct {
- 	const char *cmd;
- 	const char *arg;
-@@ -2428,6 +2466,10 @@ static const struct {
- 			"Enable/disable local name to be advertised" },
- 	{ "set-advertise-appearance", "<value>", cmd_set_advertise_appearance,
- 			"Set custom appearance to be advertised" },
-+	{ "set-advertise-duration", "<seconds>", cmd_set_advertise_duration,
-+			"Set advertise duration" },
-+	{ "set-advertise-timeout", "<seconds>", cmd_set_advertise_timeout,
-+			"Set advertise timeout" },
- 	{ "set-scan-filter-uuids", "[uuid1 uuid2 ...]",
- 			cmd_set_scan_filter_uuids, "Set scan filter uuids" },
- 	{ "set-scan-filter-rssi", "[rssi]", cmd_set_scan_filter_rssi,
+ 	cp->flags = htobl(flags);
+ 	cp->instance = client->instance;
++	cp->duration = client->duration;
+ 	cp->adv_data_len = adv_data_len;
+ 	cp->scan_rsp_len = scan_rsp_len;
+ 	memcpy(cp->data, adv_data, adv_data_len);
 -- 
 2.13.6
 
