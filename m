@@ -1,53 +1,45 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20171030125925.17784-1-luiz.dentz@gmail.com>
-References: <20171030125925.17784-1-luiz.dentz@gmail.com>
+In-Reply-To: <64c3c710-09a3-2379-9a5f-51f9001f2cc4@jp.fujitsu.com>
+References: <64c3c710-09a3-2379-9a5f-51f9001f2cc4@jp.fujitsu.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 2 Nov 2017 14:09:11 +0200
-Message-ID: <CABBYNZ+HjBixUo4zkpEfRFcXHgriOuQvN3fTjA6jkrxkx7Sdtw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/2] doc/gatt-api: Add link option
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Thu, 2 Nov 2017 14:08:36 +0200
+Message-ID: <CABBYNZJRG_qmTO_L_EHtRA-BmjELRB1W1izvXKHLXJZn0KjPsQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/2] client: Fix clearing advertising service data
+To: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Eramoto,
 
-On Mon, Oct 30, 2017 at 2:59 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> This adds link option to ReadValue and WriteValue so the application
-> can determine which bearer the request is coming from.
+On Thu, Nov 2, 2017 at 9:46 AM, ERAMOTO Masaya
+<eramoto.masaya@jp.fujitsu.com> wrote:
+> Even if running set-advertise-manufacturer with data having an invalid
+> value, client does not clear the advertising service data and clears the
+> advertising manufacturer data.
 > ---
->  doc/gatt-api.txt | 2 ++
->  1 file changed, 2 insertions(+)
+>  client/advertising.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >
-> diff --git a/doc/gatt-api.txt b/doc/gatt-api.txt
-> index 400470631..8a367783c 100644
-> --- a/doc/gatt-api.txt
-> +++ b/doc/gatt-api.txt
-> @@ -264,6 +264,7 @@ Methods             array{byte} ReadValue(dict flags)
+> diff --git a/client/advertising.c b/client/advertising.c
+> index 7e4bb3643..76eda3c97 100644
+> --- a/client/advertising.c
+> +++ b/client/advertising.c
+> @@ -517,7 +517,7 @@ void ad_advertise_manufacturer(DBusConnection *conn, const char *arg)
+>                 val = strtol(w.we_wordv[i], &endptr, 0);
+>                 if (!endptr || *endptr != '\0' || val > UINT8_MAX) {
+>                         rl_printf("Invalid value at index %d\n", i);
+> -                       ad_clear_service();
+> +                       ad_clear_manufacturer();
+>                         goto done;
+>                 }
 >
->                         Possible options: "offset": Start offset
->                                           "device": Device path (Server only)
-> +                                         "link": Link type (Server only)
->
->                         Possible Errors: org.bluez.Error.Failed
->                                          org.bluez.Error.InProgress
-> @@ -278,6 +279,7 @@ Methods             array{byte} ReadValue(dict flags)
->
->                         Possible options: "offset": Start offset
->                                           "device": Device path (Server only)
-> +                                         "link": Link type (Server only)
->
->                         Possible Errors: org.bluez.Error.Failed
->                                          org.bluez.Error.InProgress
 > --
-> 2.13.6
+> 2.14.1
 
-Applied.
-
+Applied, thanks.
 
 -- 
 Luiz Augusto von Dentz
