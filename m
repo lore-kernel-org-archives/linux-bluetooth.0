@@ -1,45 +1,56 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Szymon Janc <szymon.janc@codecoup.pl>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Return-Path: <hadess@hadess.net>
+Message-ID: <1509632265.2869.65.camel@hadess.net>
+Subject: Re: Enabling autosuspend for btusb by default
+From: Bastien Nocera <hadess@hadess.net>
+To: Hans de Goede <hdegoede@redhat.com>, Marcel Holtmann
+ <marcel@holtmann.org>,  Johan Hedberg <johan.hedberg@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ 5/7] core: Add LEAdvertising1 to bluetooth.conf
-Date: Thu, 02 Nov 2017 15:24:15 +0100
-Message-ID: <15892817.n9M0BT5LRN@ix>
-In-Reply-To: <20171102141519.28446-5-luiz.dentz@gmail.com>
-References: <20171102141519.28446-1-luiz.dentz@gmail.com> <20171102141519.28446-5-luiz.dentz@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Thu, 02 Nov 2017 15:17:45 +0100
+In-Reply-To: <9629d543-a8e2-27d2-21e5-7f6a21395e3c@redhat.com>
+References: <9629d543-a8e2-27d2-21e5-7f6a21395e3c@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
-
-On Thursday, 2 November 2017 15:15:17 CET Luiz Augusto von Dentz wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+On Wed, 2017-11-01 at 15:31 +0100, Hans de Goede wrote:
+> <resend with a bunch of To and Cc address added, sorry?
 > 
-> LEAdvertising1 must be included in order to be able to call Release.
-> ---
->  src/bluetooth.conf | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> Hi All,
 > 
-> diff --git a/src/bluetooth.conf b/src/bluetooth.conf
-> index 60e75955c..74a2d3147 100644
-> --- a/src/bluetooth.conf
-> +++ b/src/bluetooth.conf
-> @@ -20,7 +20,7 @@
->      <allow send_interface="org.bluez.CyclingSpeedWatcher1"/>
->      <allow send_interface="org.bluez.GattCharacteristic1"/>
->      <allow send_interface="org.bluez.GattDescriptor1"/>
-> -    <allow send_interface="org.bluez.LEAdvertisement1"/>
-> +    <allow send_interface="org.bluez.LEAdvertisement1"/>
->      <allow send_interface="org.freedesktop.DBus.ObjectManager"/>
->      <allow send_interface="org.freedesktop.DBus.Properties"/>
->    </policy>
+> I'm working on trying to improve the OOTB power-consumption
+> of Linux (Fedora Workstation) on laptops.
+> 
+> One of the easy wins here is enabling runtime-pm / autosuspend
+> for btusb, since on many laptops the USB bluetooth device is
+> the only USB device not using autosuspend, enabling this will
+> not only allow suspending the USB bluetooth device but also to
+> USB HCI, leading to a significant saving in power consumption
+> of aprox. 0.4W.
+> 
+> So I would like to look into enabling runtime-pm / autosuspend
+> for btusb by default.
+> 
+> Question, are there any known issues with enabling runtime-pm ?
+> 
+> I realize that simply enabling it for all btusb devices is a bit
+> of a big hammer and might be a bad idea since there will probably
+> be some devices out there which do not support this properly.
+> 
+> I was thinking that instead of enabling runtime-pm for all btusb
+> devices, maybe this is something which we can do a vendor-id
+> basis, starting with Intel and Broadcom devices ?
 
-Some rebase issue with this and patch 4/7 ?
+(Removed Gustavo from the CC:)
 
-Also subject has a typo LEAdvertis_ing_1
+Is there any benefit doing this in the kernel rather than in user-
+space?
 
--- 
-pozdrawiam
-Szymon Janc
+Do you have a set test procedure that would allow checking whether the
+device remains working?
+
+I could see having this as a user-space toggle being useful if we ever
+want to disable the runtime PM/autosuspend so Bluetooth keyboards can
+wake up desktop machines from sleep. It's a long-standing RFE, which we
+still haven't handled.
+
+Cheers
