@@ -1,55 +1,49 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <20171102144352.32353-1-luiz.dentz@gmail.com>
-References: <20171102144352.32353-1-luiz.dentz@gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Fri, 3 Nov 2017 13:21:44 +0200
-Message-ID: <CABBYNZJY9DuiDdE9KnxPgmCkgDu6MwvHMSh0v+9JfFSY6unrpg@mail.gmail.com>
-Subject: Re: [PATCH v2 1/7] doc/advertising-api: Add Duration and Timeout
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+From: Bastien Nocera <hadess@hadess.net>
+To: linux-bluetooth@vger.kernel.org
+Cc: Bastien Nocera <hadess@hadess.net>
+Subject: [PATCH] autopair: Add more common PIN codes for audio devices
+Date: Fri,  3 Nov 2017 11:55:42 +0100
+Message-Id: <20171103105542.1271-1-hadess@hadess.net>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+PIN codes "1111", and "1234" are fairly common PIN codes used for audio
+devices such as speakers and headsets. This replaces similar quirks
+already present in gnome-bluetooth's PIN database.
+---
+ plugins/autopair.c | 18 ++++++++++++++----
+ 1 file changed, 14 insertions(+), 4 deletions(-)
 
-On Thu, Nov 2, 2017 at 4:43 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> This adds duration and timeout so application can control the periods
-> which the advertisement stays active.
-> ---
->  doc/advertising-api.txt | 11 +++++++++++
->  1 file changed, 11 insertions(+)
->
-> diff --git a/doc/advertising-api.txt b/doc/advertising-api.txt
-> index b10010a19..15e64d38a 100644
-> --- a/doc/advertising-api.txt
-> +++ b/doc/advertising-api.txt
-> @@ -84,6 +84,17 @@ Properties   string Type
->
->                         Possible values: as found on GAP Service.
->
-> +               uint16_t Duration
-> +
-> +                       Duration of the advertisement in seconds. If there are
-> +                       other applications advertising no duration is set the
-> +                       default is 2 seconds.
-> +
-> +               uint16_t Timeout
-> +
-> +                       Timeout of the advertisement in seconds. This defines
-> +                       the lifetime of the advertisement.
-> +
->  LE Advertising Manager hierarchy
->  ================================
->
-> --
-> 2.13.6
-
-Applied.
-
-
+diff --git a/plugins/autopair.c b/plugins/autopair.c
+index 6980b0a64..70e19930e 100644
+--- a/plugins/autopair.c
++++ b/plugins/autopair.c
+@@ -92,10 +92,20 @@ static ssize_t autopair_pincb(struct btd_adapter *adapter,
+ 		case 0x06:		/* Headphones */
+ 		case 0x07:		/* Portable Audio */
+ 		case 0x0a:		/* HiFi Audio Device */
+-			if (attempt > 1)
+-				return 0;
+-			memcpy(pinbuf, "0000", 4);
+-			return 4;
++			{
++				const char *pincodes[] = {
++					"0000",
++					"1234",
++					"1111"
++				};
++				const char *pincode;
++
++				if (attempt > G_N_ELEMENTS(pincodes))
++					return 0;
++				pincode = pincodes[attempt - 1];
++				memcpy(pinbuf, pincode, strlen(pincode));
++				return strlen(pincode);
++			}
+ 		}
+ 		break;
+ 
 -- 
-Luiz Augusto von Dentz
+2.14.3
+
