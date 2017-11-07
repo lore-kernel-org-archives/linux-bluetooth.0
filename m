@@ -1,51 +1,32 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] a2dp: Do not attempt to connect if there are no available SEPs
-Date: Tue,  7 Nov 2017 15:14:18 +0200
-Message-Id: <20171107131418.17244-1-luiz.dentz@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <chiu@endlessm.com>
+MIME-Version: 1.0
+From: Chris Chiu <chiu@endlessm.com>
+Date: Tue, 7 Nov 2017 12:42:36 +0800
+Message-ID: <CAB4CAwc9GiF9EdzoZ2wUxvXqaB1y97-7UuitaQV9h2poiXXE3A@mail.gmail.com>
+Subject: Bluetooth is not working on Intel new wifi/bt module 9462NGW
+To: johannes.berg@intel.com, marcel@holtmann.org, gustavo@padovan.org,
+	linux-bluetooth@vger.kernel.org, Linux Upstreaming Team <linux@endlessm.com>
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi,
+    We just have the Intel new WiFi/BT module 9462NGW from Acer and
+tried to verify if it works on the latest linux kernel. The BT is not
+working because of the missing firmware.
 
-If all SEPs are taken do not even attempt to connect AVDTP since
-no stream can be created.
----
- profiles/audio/a2dp.c | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+[   18.249144] Bluetooth: hci0: Bootloader revision 0.1 build 42 week 52 2015
+[   18.250036] Bluetooth: hci0: Device revision is 2
+[   18.250037] Bluetooth: hci0: Secure boot is enabled
+[   18.250038] Bluetooth: hci0: OTP lock is disabled
+[   18.250038] Bluetooth: hci0: API lock is enabled
+[   18.250039] Bluetooth: hci0: Debug lock is disabled
+[   18.250040] Bluetooth: hci0: Minimum firmware build 1 week 10 2014
+[   18.293902] bluetooth hci0: Direct firmware load for
+intel/ibt-17-2.sfi failed with error -2
+[   18.293907] Bluetooth: hci0: Failed to load Intel firmware file (-2)
 
-diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
-index 5ecdab73c..35b9e9d11 100644
---- a/profiles/audio/a2dp.c
-+++ b/profiles/audio/a2dp.c
-@@ -1399,11 +1399,26 @@ struct avdtp *a2dp_avdtp_get(struct btd_device *device)
- {
- 	struct a2dp_server *server;
- 	struct a2dp_channel *chan;
-+	const struct queue_entry *entry;
- 
- 	server = find_server(servers, device_get_adapter(device));
- 	if (server == NULL)
- 		return NULL;
- 
-+	/* Check if there is any SEP available */
-+	for (entry = queue_get_entries(server->seps); entry;
-+					entry = entry->next) {
-+		struct a2dp_sep *sep = entry->data;
-+
-+		if (avdtp_sep_get_state(sep->lsep) == AVDTP_STATE_IDLE)
-+			goto found;
-+	}
-+
-+	DBG("Unable to find any available SEP");
-+
-+	return NULL;
-+
-+found:
- 	chan = queue_find(server->channels, match_by_device, device);
- 	if (!chan) {
- 		chan = channel_new(server, device, NULL);
--- 
-2.13.6
+I'm not able to find these missing files in linux-firmware.git and any
+other possible place. What's the status of supporting this 9462NGW?
+Please let me know if any more information required. Thanks
 
+Chris
