@@ -1,80 +1,39 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Bastien Nocera <hadess@hadess.net>
 To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@codecoup.pl>
-Subject: [PATCH 2/3] core/device: Add support for setting SDP record
-Date: Tue,  7 Nov 2017 19:23:55 +0100
-Message-Id: <20171107182356.15683-2-hadess@hadess.net>
-In-Reply-To: <20171107182356.15683-1-hadess@hadess.net>
-References: <20171107182356.15683-1-hadess@hadess.net>
+Cc: Bastien Nocera <hadess@hadess.net>
+Subject: [PATCH 1/3] plugins/sixaxis: Fix cable pairing not working
+Date: Tue,  7 Nov 2017 19:23:54 +0100
+Message-Id: <20171107182356.15683-1-hadess@hadess.net>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Szymon Janc <szymon.janc@codecoup.pl>
+In 6c467e9, get_pairing_type() was modified to return a structure that's
+allocated on the stack. While not a problem for the direct callers,
+as the function is defined as "inline", function that expected to return
+this structure themselves would fail, as the stack would be trampled
+upon on function exit.
 
-This allows to set SDP record for device without resolving services
-over SDP. After SDP is provided profiles are probed.
+Make such a function (get_pairing_type_for_device()) in the sixaxis
+plugin be inline as well so that its caller doesn't get garbage inside
+of cable pairing information from a struct.
 ---
- src/device.c | 31 +++++++++++++++++++++++++++++++
- src/device.h |  3 +++
- 2 files changed, 34 insertions(+)
+ plugins/sixaxis.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/src/device.c b/src/device.c
-index fd7a64134..f01c8a137 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -6072,6 +6072,37 @@ static sdp_list_t *read_device_records(struct btd_device *device)
- 	return recs;
+diff --git a/plugins/sixaxis.c b/plugins/sixaxis.c
+index 89cd8f1f5..9d0fdb5d3 100644
+--- a/plugins/sixaxis.c
++++ b/plugins/sixaxis.c
+@@ -435,7 +435,7 @@ static bool setup_device(int fd, const char *sysfs_path,
+ 	return true;
  }
  
-+void btd_device_set_record(struct btd_device *device, const char *uuid,
-+							sdp_record_t *rec)
-+{
-+	/* This API is only used for BR/EDR */
-+	struct bearer_state *state = &device->bredr_state;
-+	struct browse_req *req;
-+	sdp_list_t *recs = NULL;
-+
-+	if (!rec)
-+		return;
-+
-+	req = browse_request_new(device, BROWSE_SDP, NULL);
-+	if (!req)
-+		return;
-+
-+	recs = sdp_list_append(recs, rec);
-+	update_bredr_services(req, recs);
-+	sdp_list_free(recs, NULL);
-+
-+	device->svc_refreshed = true;
-+	state->svc_resolved = true;
-+
-+	device_probe_profiles(device, req->profiles_added);
-+
-+	/* Propagate services changes */
-+	g_dbus_emit_property_changed(dbus_conn, req->device->path,
-+						DEVICE_INTERFACE, "UUIDs");
-+
-+	device_svc_resolved(device, BROWSE_SDP, device->bdaddr_type, 0);
-+}
-+
- const sdp_record_t *btd_device_get_record(struct btd_device *device,
- 							const char *uuid)
+-static const struct cable_pairing *
++static inline const struct cable_pairing *
+ get_pairing_type_for_device(struct udev_device *udevice, uint16_t *bus,
+ 						char **sysfs_path)
  {
-diff --git a/src/device.h b/src/device.h
-index 850561729..406cd908e 100644
---- a/src/device.h
-+++ b/src/device.h
-@@ -62,6 +62,9 @@ struct device_addr_type {
- int device_addr_type_cmp(gconstpointer a, gconstpointer b);
- GSList *btd_device_get_uuids(struct btd_device *device);
- void device_probe_profiles(struct btd_device *device, GSList *profiles);
-+
-+void btd_device_set_record(struct btd_device *device, const char *uuid,
-+							sdp_record_t *rec);
- const sdp_record_t *btd_device_get_record(struct btd_device *device,
- 						const char *uuid);
- struct gatt_primary *btd_device_get_primary(struct btd_device *device,
 -- 
 2.14.3
 
