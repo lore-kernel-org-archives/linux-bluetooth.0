@@ -1,80 +1,26 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Bastien Nocera <hadess@hadess.net>
-To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@codecoup.pl>
-Subject: [PATCH v2 1/2] core/device: Add support for setting SDP record
-Date: Wed,  8 Nov 2017 20:38:27 +0100
-Message-Id: <20171108193828.5471-1-hadess@hadess.net>
+From: Dogiel Pawel <Pawel.Dogiel@tieto.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: 6loWPAN IPSP devices fail to communicate (bluetooth-next 4.14.0-rc7 )
+Date: Wed, 8 Nov 2017 12:40:00 +0000
+Message-ID: <AMSPR04MB2967B540C13E7F755F74E7E9B560@AMSPR04MB296.eurprd04.prod.outlook.com>
+Content-Type: text/plain; charset="iso-8859-2"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Szymon Janc <szymon.janc@codecoup.pl>
+Hello,
 
-This allows to set SDP record for device without resolving services
-over SDP. After SDP is provided profiles are probed.
----
- src/device.c | 33 +++++++++++++++++++++++++++++++++
- src/device.h |  3 +++
- 2 files changed, 36 insertions(+)
+I have issue with IPSP devices over 6loWPAN on kernel 4.14.0-rc7.
 
-diff --git a/src/device.c b/src/device.c
-index c12407a73..e8118112e 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -6073,6 +6073,39 @@ static sdp_list_t *read_device_records(struct btd_device *device)
- 	return recs;
- }
- 
-+void btd_device_set_record(struct btd_device *device, const char *uuid,
-+							const char *record)
-+{
-+	/* This API is only used for BR/EDR */
-+	struct bearer_state *state = &device->bredr_state;
-+	struct browse_req *req;
-+	sdp_list_t *recs = NULL;
-+	sdp_record_t *rec;
-+
-+	if (!record)
-+		return;
-+
-+	req = browse_request_new(device, BROWSE_SDP, NULL);
-+	if (!req)
-+		return;
-+
-+	rec = record_from_string(record);
-+	recs = sdp_list_append(recs, rec);
-+	update_bredr_services(req, recs);
-+	sdp_list_free(recs, NULL);
-+
-+	device->svc_refreshed = true;
-+	state->svc_resolved = true;
-+
-+	device_probe_profiles(device, req->profiles_added);
-+
-+	/* Propagate services changes */
-+	g_dbus_emit_property_changed(dbus_conn, req->device->path,
-+						DEVICE_INTERFACE, "UUIDs");
-+
-+	device_svc_resolved(device, BROWSE_SDP, device->bdaddr_type, 0);
-+}
-+
- const sdp_record_t *btd_device_get_record(struct btd_device *device,
- 							const char *uuid)
- {
-diff --git a/src/device.h b/src/device.h
-index 850561729..32f8edce5 100644
---- a/src/device.h
-+++ b/src/device.h
-@@ -62,6 +62,9 @@ struct device_addr_type {
- int device_addr_type_cmp(gconstpointer a, gconstpointer b);
- GSList *btd_device_get_uuids(struct btd_device *device);
- void device_probe_profiles(struct btd_device *device, GSList *profiles);
-+
-+void btd_device_set_record(struct btd_device *device, const char *uuid,
-+							const char *record);
- const sdp_record_t *btd_device_get_record(struct btd_device *device,
- 						const char *uuid);
- struct gatt_primary *btd_device_get_primary(struct btd_device *device,
--- 
-2.14.3
+The thing is that when i connect My Linux machine (with forwarding enabled)=
+ to one IPSP device using 'debugfs' interface the communication is OK. Ping=
+s are working, the CoAP Server responds well.
+But when second IPSP device is connected (CoAP client in this example) then=
+ neither CoAP Server is responding nor pings are working on any IPSP device=
+ ('resource unreachable').
 
+Please help
+
+Regards,
+Pawel
