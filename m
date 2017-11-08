@@ -2,45 +2,63 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Bastien Nocera <hadess@hadess.net>
 To: linux-bluetooth@vger.kernel.org
 Cc: Bastien Nocera <hadess@hadess.net>
-Subject: [PATCH] device: Fix possible runtime warning
-Date: Wed,  8 Nov 2017 12:24:59 +0100
-Message-Id: <20171108112459.9811-1-hadess@hadess.net>
+Subject: [PATCH] plugins/sixaxis: Don't ignore previously setup devices
+Date: Wed,  8 Nov 2017 12:24:52 +0100
+Message-Id: <20171108112452.9703-1-hadess@hadess.net>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This g_source_remove() doesn't have its argument check for validity
-which can lead to a runtime warning.
+1. Setup PS3 controller through cable pairing
+2. Remove device from BlueZ's database
+3. Plug original PS3 controller back
 
-bluetoothd[14785]: GLib: g_source_remove: assertion 'tag > 0' failed
-bluetoothd[14785]: ++++++++ backtrace ++++++++
-bluetoothd[14785]: #1  g_logv+0x25d (/usr/lib64/libglib-2.0.so.0.5400.1) [0x50d5a7d]
-bluetoothd[14785]: #2  g_log+0x8f (/usr/lib64/libglib-2.0.so.0.5400.1) [0x50d5bef]
-bluetoothd[14785]: #3  g_source_remove+0x24 (/usr/lib64/libglib-2.0.so.0.5400.1) [0x50cd884]
-bluetoothd[14785]: #4  device_remove+0xfb (src/device.c:4054) [0x4756cb]
-bluetoothd[14785]: #5  adapter_remove+0x4a (src/adapter.c:5485) [0x45e0ea]
-bluetoothd[14785]: #6  adapter_cleanup+0x2b (src/adapter.c:8681) [0x466abb]
-bluetoothd[14785]: #7  main+0x867 (src/main.c:784) [0x40bdc7]
-bluetoothd[14785]: #8  __libc_start_main+0xe7 (../csu/libc-start.c:340) [0x5d12187]
-bluetoothd[14785]: #9  _start+0x2a (/home/hadess/Projects/jhbuild/bluez/src/bluetoothd) [0x40c5ca]
-bluetoothd[14785]: +++++++++++++++++++++++++++
+As we don't change the master bdaddr on the device itself, the joypad
+will likely be trying to connect to BlueZ, and fail to connect after a
+small period of time. But the device will appear connected just long
+enough for the cable pairing to say "hey, I already have this setup".
+
+Ideally, we would test for whether the device is temporary, or already
+trusted, but testing for whether we've setup its internal services *and*
+it's connected, rather than *or*, is sufficient.
 ---
- src/device.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ plugins/sixaxis.c | 15 +++++++--------
+ 1 file changed, 7 insertions(+), 8 deletions(-)
 
-diff --git a/src/device.c b/src/device.c
-index f01c8a137..e8409caf9 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -4050,7 +4050,8 @@ void device_remove(struct btd_device *device, gboolean remove_stored)
- 	device->pending = NULL;
+diff --git a/plugins/sixaxis.c b/plugins/sixaxis.c
+index 4e714e72d..47750969b 100644
+--- a/plugins/sixaxis.c
++++ b/plugins/sixaxis.c
+@@ -561,16 +561,13 @@ static bool setup_device(int fd, const char *sysfs_path,
+ 	if (get_device_bdaddr(fd, &device_bdaddr, cp->type) < 0)
+ 		return false;
  
- 	if (btd_device_is_connected(device)) {
--		g_source_remove(device->disconn_timer);
-+		if (device->disconn_timer > 0)
-+			g_source_remove(device->disconn_timer);
- 		disconnect_all(device);
+-	/* This can happen if controller was plugged while already connected
+-	 * eg. to charge up battery. */
++	/* This can happen if controller was plugged while already setup and
++	 * connected eg. to charge up battery. */
+ 	device = btd_adapter_find_device(adapter, &device_bdaddr,
+ 							BDADDR_BREDR);
+-	if (device && btd_device_is_connected(device))
+-		return false;
+-
+-	device = btd_adapter_get_device(adapter, &device_bdaddr, BDADDR_BREDR);
+-
+-	if (g_slist_find_custom(btd_device_get_uuids(device), HID_UUID,
++	if (device != NULL &&
++		btd_device_is_connected(device) &&
++		g_slist_find_custom(btd_device_get_uuids(device), HID_UUID,
+ 						(GCompareFunc)strcasecmp)) {
+ 		char device_addr[18];
+ 		ba2str(&device_bdaddr, device_addr);
+@@ -578,6 +575,8 @@ static bool setup_device(int fd, const char *sysfs_path,
+ 		return false;
  	}
  
++	device = btd_adapter_get_device(adapter, &device_bdaddr, BDADDR_BREDR);
++
+ 	info("sixaxis: setting up new device");
+ 
+ 	btd_device_device_set_name(device, cp->name);
 -- 
 2.14.3
 
