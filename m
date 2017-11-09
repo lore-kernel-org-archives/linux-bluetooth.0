@@ -1,98 +1,487 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Travis Griggs <travisgriggs@gmail.com>
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
-Subject: Re: Get Name in Scan Response?
-Date: Thu, 9 Nov 2017 11:41:51 -0800
-References: <87796201-DEA7-4158-8822-F461BAF68B78@gmail.com>
- <CABBYNZLnnausCF9ERTQrNQqbODSG5Yt7cuiMzysS22iOddd1MA@mail.gmail.com>
-To: Bluez mailing list <linux-bluetooth@vger.kernel.org>
-In-Reply-To: <CABBYNZLnnausCF9ERTQrNQqbODSG5Yt7cuiMzysS22iOddd1MA@mail.gmail.com>
-Message-Id: <9DBC1F63-E158-448C-AB5E-93E0465A1CF6@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <luiz.dentz@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <86C44C21-CFF8-4D5D-B46A-053EBFB4B913@holtmann.org>
+References: <20171109152940.14546-1-luiz.dentz@gmail.com> <86C44C21-CFF8-4D5D-B46A-053EBFB4B913@holtmann.org>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Thu, 9 Nov 2017 21:18:31 +0200
+Message-ID: <CABBYNZJ9hE7rQ=q=md-6ozsLv7t40zzTya3hozzPcAne_AHMhg@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/2] shared/shell: Add initial implementation
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Marcel,
+
+On Thu, Nov 9, 2017 at 5:37 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Luiz,
+>
+>> This add initial bt_shell helper which can be used to create shell-like
+>> command line tools.
+>> ---
+>> Makefile.tools     |   3 +-
+>> src/shared/shell.c | 567 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+>> src/shared/shell.h |  67 +++++++
+>> 3 files changed, 636 insertions(+), 1 deletion(-)
+>> create mode 100644 src/shared/shell.c
+>> create mode 100644 src/shared/shell.h
+>>
+>> diff --git a/Makefile.tools b/Makefile.tools
+>> index 561302fa1..dc2902cb7 100644
+>> --- a/Makefile.tools
+>> +++ b/Makefile.tools
+>> @@ -8,7 +8,8 @@ client_bluetoothctl_SOURCES = client/main.c \
+>>                                       client/advertising.h \
+>>                                       client/advertising.c \
+>>                                       client/gatt.h client/gatt.c \
+>> -                                     monitor/uuid.h monitor/uuid.c
+>> +                                     monitor/uuid.h monitor/uuid.c \
+>> +                                     src/shared/shell.h src/shared/shell.c
+>> client_bluetoothctl_LDADD = gdbus/libgdbus-internal.la src/libshared-glib.la \
+>>                               @GLIB_LIBS@ @DBUS_LIBS@ -lreadline
+>> endif
+>> diff --git a/src/shared/shell.c b/src/shared/shell.c
+>> new file mode 100644
+>> index 000000000..2cd1ea3fb
+>> --- /dev/null
+>> +++ b/src/shared/shell.c
+>> @@ -0,0 +1,567 @@
+>> +/*
+>> + *
+>> + *  BlueZ - Bluetooth protocol stack for Linux
+>> + *
+>> + *  Copyright (C) 2017  Intel Corporation. All rights reserved.
+>> + *
+>> + *
+>> + *  This library is free software; you can redistribute it and/or
+>> + *  modify it under the terms of the GNU Lesser General Public
+>> + *  License as published by the Free Software Foundation; either
+>> + *  version 2.1 of the License, or (at your option) any later version.
+>> + *
+>> + *  This library is distributed in the hope that it will be useful,
+>> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+>> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+>> + *  Lesser General Public License for more details.
+>> + *
+>> + *  You should have received a copy of the GNU Lesser General Public
+>> + *  License along with this library; if not, write to the Free Software
+>> + *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+>> + *
+>> + */
+>> +
+>> +#ifdef HAVE_CONFIG_H
+>> +#include <config.h>
+>> +#endif
+>> +
+>> +#include <stdio.h>
+>> +#include <errno.h>
+>> +#include <unistd.h>
+>> +#include <stdlib.h>
+>> +#include <stdbool.h>
+>> +#include <signal.h>
+>> +#include <sys/signalfd.h>
+>> +
+>> +#include <readline/readline.h>
+>> +#include <readline/history.h>
+>> +#include <glib.h>
+>> +
+>> +#include "src/shared/util.h"
+>> +#include "src/shared/queue.h"
+>> +#include "src/shared/shell.h"
+>> +
+>> +#define CMD_LENGTH   48
+>> +#define print_text(color, fmt, args...) \
+>> +             printf(color fmt COLOR_OFF "\n", ## args)
+>> +#define print_menu(cmd, args, desc) \
+>> +             printf(COLOR_HIGHLIGHT "%s %-*s " COLOR_OFF "%s\n", \
+>> +                     cmd, (int)(CMD_LENGTH - strlen(cmd)), args, desc)
+>> +
+>> +static GMainLoop *main_loop;
+>> +static gboolean option_version = FALSE;
+>> +
+>> +static struct {
+>> +     unsigned int input;
+>> +
+>> +     bool saved_prompt;
+>> +     bt_shell_prompt_input_func saved_func;
+>> +     void *saved_user_data;
+>> +
+>> +     const struct bt_shell_menu_entry *current;
+>> +     /* TODO: Add submenus support */
+>> +} data;
+>> +
+>> +static void shell_print_menu(void);
+>> +
+>> +static void cmd_version(const char *arg)
+>> +{
+>> +     bt_shell_printf("Version %s\n", VERSION);
+>> +}
+>> +
+>> +static void cmd_quit(const char *arg)
+>> +{
+>> +     g_main_loop_quit(main_loop);
+>> +}
+>> +
+>> +static void cmd_help(const char *arg)
+>> +{
+>> +     shell_print_menu();
+>> +}
+>> +
+>> +static const struct bt_shell_menu_entry cmd_table[] = {
+>> +     { "version",      NULL,       cmd_version, "Display version" },
+>> +     { "quit",         NULL,       cmd_quit, "Quit program" },
+>> +     { "exit",         NULL,       cmd_quit, "Quit program" },
+>> +     { "help",         NULL,       cmd_help,
+>> +                                     "Display help about this program" },
+>> +     { }
+>> +};
+>> +
+>> +static void shell_print_menu(void)
+>> +{
+>> +     const struct bt_shell_menu_entry *entry;
+>> +
+>> +     if (!data.current)
+>> +             return;
+>> +
+>> +     print_text(COLOR_HIGHLIGHT, "Available commands:");
+>> +     print_text(COLOR_HIGHLIGHT, "-------------------");
+>> +     for (entry = data.current; entry->cmd; entry++) {
+>> +             print_menu(entry->cmd, entry->arg ? : "", entry->desc ? : "");
+>> +     }
+>> +
+>> +     for (entry = cmd_table; entry->cmd; entry++) {
+>> +             print_menu(entry->cmd, entry->arg ? : "", entry->desc ? : "");
+>> +     }
+>> +}
+>> +
+>> +static void shell_exec(const char *cmd, const char *arg)
+>> +{
+>> +     const struct bt_shell_menu_entry *entry;
+>> +
+>> +     if (!data.current || !cmd)
+>> +             return;
+>> +
+>> +     for (entry = data.current; entry->cmd; entry++) {
+>> +             if (strcmp(cmd, entry->cmd))
+>> +                     continue;
+>> +
+>> +             if (entry->func) {
+>> +                     entry->func(arg);
+>> +                     return;
+>> +             }
+>> +     }
+>> +
+>> +     for (entry = cmd_table; entry->cmd; entry++) {
+>> +             if (strcmp(cmd, entry->cmd))
+>> +                     continue;
+>> +
+>> +             if (entry->func) {
+>> +                     entry->func(arg);
+>> +                     return;
+>> +             }
+>> +     }
+>> +
+>> +     print_text(COLOR_HIGHLIGHT, "Invalid command");
+>> +}
+>> +
+>> +void bt_shell_printf(const char *fmt, ...)
+>> +{
+>> +     va_list args;
+>> +     bool save_input;
+>> +     char *saved_line;
+>> +     int saved_point;
+>> +
+>> +     save_input = !RL_ISSTATE(RL_STATE_DONE) && !data.saved_prompt;
+>> +
+>> +     if (save_input) {
+>> +             saved_point = rl_point;
+>> +             saved_line = rl_copy_text(0, rl_end);
+>> +             rl_save_prompt();
+>> +             rl_replace_line("", 0);
+>> +             rl_redisplay();
+>> +     }
+>> +
+>> +     va_start(args, fmt);
+>> +     vprintf(fmt, args);
+>> +     va_end(args);
+>> +
+>> +     if (save_input) {
+>> +             rl_restore_prompt();
+>> +             rl_replace_line(saved_line, 0);
+>> +             rl_point = saved_point;
+>> +             rl_forced_update_display();
+>> +             free(saved_line);
+>> +     }
+>> +}
+>> +
+>> +void bt_shell_hexdump(const unsigned char *buf, size_t len)
+>> +{
+>> +     static const char hexdigits[] = "0123456789abcdef";
+>> +     char str[68];
+>> +     size_t i;
+>> +
+>> +     if (!len)
+>> +             return;
+>> +
+>> +     str[0] = ' ';
+>> +
+>> +     for (i = 0; i < len; i++) {
+>> +             str[((i % 16) * 3) + 1] = ' ';
+>> +             str[((i % 16) * 3) + 2] = hexdigits[buf[i] >> 4];
+>> +             str[((i % 16) * 3) + 3] = hexdigits[buf[i] & 0xf];
+>> +             str[(i % 16) + 51] = isprint(buf[i]) ? buf[i] : '.';
+>> +
+>> +             if ((i + 1) % 16 == 0) {
+>> +                     str[49] = ' ';
+>> +                     str[50] = ' ';
+>> +                     str[67] = '\0';
+>> +                     bt_shell_printf("%s\n", str);
+>> +                     str[0] = ' ';
+>> +             }
+>> +     }
+>> +
+>> +     if (i % 16 > 0) {
+>> +             size_t j;
+>> +             for (j = (i % 16); j < 16; j++) {
+>> +                     str[(j * 3) + 1] = ' ';
+>> +                     str[(j * 3) + 2] = ' ';
+>> +                     str[(j * 3) + 3] = ' ';
+>> +                     str[j + 51] = ' ';
+>> +             }
+>> +             str[49] = ' ';
+>> +             str[50] = ' ';
+>> +             str[67] = '\0';
+>> +             bt_shell_printf("%s\n", str);
+>> +     }
+>> +}
+>> +
+>> +void bt_shell_prompt_input(const char *label, const char *msg,
+>> +                     bt_shell_prompt_input_func func, void *user_data)
+>> +{
+>> +     /* Normal use should not prompt for user input to the value a second
+>> +      * time before it releases the prompt, but we take a safe action. */
+>> +     if (data.saved_prompt)
+>> +             return;
+>> +
+>> +     rl_save_prompt();
+>> +     rl_clear_message();
+>> +     rl_message(COLOR_RED "[%s]" COLOR_OFF " %s ", label, msg);
+>> +
+>> +     data.saved_prompt = true;
+>> +     data.saved_func = func;
+>> +     data.saved_user_data = user_data;
+>> +}
+>> +
+>> +int bt_shell_release_prompt(const char *input)
+>> +{
+>> +     bt_shell_prompt_input_func func;
+>> +     void *user_data;
+>> +
+>> +     if (!data.saved_prompt)
+>> +             return -1;
+>> +
+>> +     data.saved_prompt = false;
+>> +
+>> +     rl_restore_prompt();
+>> +
+>> +     func = data.saved_func;
+>> +     user_data = data.saved_user_data;
+>> +
+>> +     data.saved_func = NULL;
+>> +     data.saved_user_data = NULL;
+>> +
+>> +     func(input, user_data);
+>> +
+>> +     return 0;
+>> +}
+>> +
+>> +static void rl_handler(char *input)
+>> +{
+>> +     char *cmd, *arg;
+>> +
+>> +     if (!input) {
+>> +             rl_insert_text("quit");
+>> +             rl_redisplay();
+>> +             rl_crlf();
+>> +             g_main_loop_quit(main_loop);
+>> +             return;
+>> +     }
+>> +
+>> +     if (!strlen(input))
+>> +             goto done;
+>> +
+>> +     if (!bt_shell_release_prompt(input))
+>> +             goto done;
+>> +
+>> +     if (history_search(input, -1))
+>> +             add_history(input);
+>> +
+>> +     cmd = strtok_r(input, " ", &arg);
+>> +     if (!cmd)
+>> +             goto done;
+>> +
+>> +     if (arg) {
+>> +             int len = strlen(arg);
+>> +             if (len > 0 && arg[len - 1] == ' ')
+>> +                     arg[len - 1] = '\0';
+>> +     }
+>> +
+>> +     shell_exec(cmd, arg);
+>> +done:
+>> +     free(input);
+>> +}
+>> +
+>> +static char *cmd_generator(const char *text, int state)
+>> +{
+>> +     const struct bt_shell_menu_entry *entry;
+>> +     static int index, len;
+>> +     const char *cmd;
+>> +
+>> +     entry = data.current;
+>> +
+>> +     if (!state) {
+>> +             index = 0;
+>> +             len = strlen(text);
+>> +     }
+>> +
+>> +     while ((cmd = entry[index].cmd)) {
+>> +             index++;
+>> +
+>> +             if (!strncmp(cmd, text, len))
+>> +                     return strdup(cmd);
+>> +     }
+>> +
+>> +     return NULL;
+>> +}
+>> +
+>> +static char **shell_completion(const char *text, int start, int end)
+>> +{
+>> +     char **matches = NULL;
+>> +
+>> +     if (!data.current)
+>> +             return NULL;
+>> +
+>> +     if (start > 0) {
+>> +             const struct bt_shell_menu_entry *entry;
+>> +             char *input_cmd;
+>> +
+>> +             input_cmd = strndup(rl_line_buffer, start - 1);
+>> +             for (entry = data.current; entry->cmd; entry++) {
+>> +                     if (strcmp(entry->cmd, input_cmd))
+>> +                             continue;
+>> +
+>> +                     if (!entry->gen)
+>> +                             continue;
+>> +
+>> +                     rl_completion_display_matches_hook = entry->disp;
+>> +                     matches = rl_completion_matches(text, entry->gen);
+>> +                     break;
+>> +             }
+>> +
+>> +             free(input_cmd);
+>> +     } else {
+>> +             rl_completion_display_matches_hook = NULL;
+>> +             matches = rl_completion_matches(text, cmd_generator);
+>> +     }
+>> +
+>> +     if (!matches)
+>> +             rl_attempted_completion_over = 1;
+>> +
+>> +     return matches;
+>> +}
+>> +
+>> +static gboolean signal_handler(GIOChannel *channel, GIOCondition condition,
+>> +                                                     gpointer user_data)
+>> +{
+>> +     static bool terminated = false;
+>> +     struct signalfd_siginfo si;
+>> +     ssize_t result;
+>> +     int fd;
+>> +
+>> +     if (condition & (G_IO_NVAL | G_IO_ERR | G_IO_HUP)) {
+>> +             g_main_loop_quit(main_loop);
+>> +             return FALSE;
+>> +     }
+>> +
+>> +     fd = g_io_channel_unix_get_fd(channel);
+>> +
+>> +     result = read(fd, &si, sizeof(si));
+>> +     if (result != sizeof(si))
+>> +             return FALSE;
+>> +
+>> +     switch (si.ssi_signo) {
+>> +     case SIGINT:
+>> +             if (data.input) {
+>> +                     rl_replace_line("", 0);
+>> +                     rl_crlf();
+>> +                     rl_on_new_line();
+>> +                     rl_redisplay();
+>> +                     break;
+>> +             }
+>> +
+>> +             /*
+>> +              * If input was not yet setup up that means signal was received
+>> +              * while daemon was not yet running. Since user is not able
+>> +              * to terminate client by CTRL-D or typing exit treat this as
+>> +              * exit and fall through.
+>> +              */
+>> +
+>> +             /* fall through */
+>> +     case SIGTERM:
+>> +             if (!terminated) {
+>> +                     rl_replace_line("", 0);
+>> +                     rl_crlf();
+>> +                     g_main_loop_quit(main_loop);
+>> +             }
+>> +
+>> +             terminated = true;
+>> +             break;
+>> +     }
+>> +
+>> +     return TRUE;
+>> +}
+>> +
+>> +static guint setup_signalfd(void)
+>> +{
+>> +     GIOChannel *channel;
+>> +     guint source;
+>> +     sigset_t mask;
+>> +     int fd;
+>> +
+>> +     sigemptyset(&mask);
+>> +     sigaddset(&mask, SIGINT);
+>> +     sigaddset(&mask, SIGTERM);
+>> +
+>> +     if (sigprocmask(SIG_BLOCK, &mask, NULL) < 0) {
+>> +             perror("Failed to set signal mask");
+>> +             return 0;
+>> +     }
+>> +
+>> +     fd = signalfd(-1, &mask, 0);
+>> +     if (fd < 0) {
+>> +             perror("Failed to create signal descriptor");
+>> +             return 0;
+>> +     }
+>> +
+>> +     channel = g_io_channel_unix_new(fd);
+>> +
+>> +     g_io_channel_set_close_on_unref(channel, TRUE);
+>> +     g_io_channel_set_encoding(channel, NULL, NULL);
+>> +     g_io_channel_set_buffered(channel, FALSE);
+>
+> any reason you are not using struct io here? You can still link it with Glib, but it would be easier to convert to our internal mainloop.
+
+I endup forget about converting it since in the end I moved more and
+more stuff internally, anyway it should be no problem to convert to
+our internal mainloop and io. As for the concept I guess you are fine
+and I can convert all other readline tools as well?
+
+> Regards
+>
+> Marcel
+>
 
 
-> On Nov 3, 2017, at 1:52 AM, Luiz Augusto von Dentz =
-<luiz.dentz@gmail.com> wrote:
->=20
-> Hi Travis,
->=20
-> On Fri, Nov 3, 2017 at 12:35 AM, Travis Griggs =
-<travisgriggs@gmail.com> wrote:
->> We=E2=80=99ve been developing products using BlueNRG chips, that act =
-as BLE peripherals and are connected via Android/iOS devices acting as =
-centrals to control/configure them. It is desirable to be able to =
-discover nearby devices and then connect to them. Because of heinous =
-caching strategies in both Android and iOS just using a previously =
-connected devices name (derived from the name characteristic). The most =
-reliable thing to do at the iOS/Droid level is capture the name from the =
-advertising data and associate that with the device. This is the only =
-reliable way to have a device determine its name programmatically and =
-advertise that reliably.
->>=20
->> I=E2=80=99m trying to do a product with a Pi like SBC that runs BlueZ =
-with a BLE dongle. I set the device=E2=80=99s alias with:
->>=20
->>    adapterProperties.Set('org.bluez.Adapter1', 'Alias', bleName())
->>=20
->> Where bleName() returns the string I want to use for the device. If I =
-connect a time or two and reboot a time or two, this will eventually =
-show up as the name property in Android/iOS. But if I try to get it from =
-the advertising data, there doesn=E2=80=99t seem to be a name in there. =
-Is this name not set as part of either the advertisement or scan =
-response packet? I know that when doing a custom service UUID, there is =
-not enough room in the advertisement packet to have both service UUID =
-and name, so it has to go in the scan response packet. Can any bluez =
-developers confirm what I should be expecting to happen with setting the =
-Alias property?
->>=20
->> Is there a way to achieve what I want to do? I have an Advertisement =
-interface that I worked up from the examples that I use to do the =
-solicitID in. Do I need to shove the name in there somehow additionally?
->>=20
->=20
-> You actually need to set the include option in the advertisement,
-> otherwise the kernel won't include the name on the scan response:
->=20
-> =
-https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/doc/advertising-ap=
-i.txt#n147
-> =
-https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/doc/advertising-ap=
-i.txt#n64
->=20
-> You can check how it works with:
-> bluetoothctl> set-advertise-name on
->=20
-> Alternatively, you can set a local name for the advertisement:
-> =
-https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/doc/advertising-ap=
-i.txt#n72
 
-I tried this second approach, I believe. I have an Advertisement class =
-that is pretty much a direct copy of the one example-advertisement.py in =
-bluez/test. I noticed that since I had last =E2=80=9Ccopied=E2=80=9D the =
-class, the local_name property/add_local_name had been added. So I added =
-that and then attempted to use it, just like the TestAdvertisment =
-subclass in the example. When I did that, it just quit showing up at =
-all. I=E2=80=99m not sure where to look to get to the bottom of that. I =
-am already setting a long service UUID as part of the advertisment.
-
-I=E2=80=99m not enough of a dbus guy to know how to interpret the first =
-two links. My basic problem, is that I don=E2=80=99t really know dbus. I =
-kinda get it at a high level. But I see what is likely great =
-documentation in the first two links and then ask =E2=80=9Cbut what do I =
-do with this?=E2=80=9D I would love the idiots guide to dbus/bluez, but =
-no one has seemed interested in writing that. For application level =
-programmers, who have lots of C experience, file system experience, =
-command line experience, etc, trying to set up Linux as a bluetooth =
-peripheral, this is likely their first exposure to dbus.
-
-Working from the example-advertise.py file, what would the first =
-suggestion look like? Or do the two alternates end up doing the same =
-thing? If they=E2=80=99re two different ways of getting at the same =
-thing, then the suggestion doesn=E2=80=99t work sadly.
-
+-- 
+Luiz Augusto von Dentz
