@@ -1,684 +1,273 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/2] shared/shell: Add initial implementation
-Date: Thu,  9 Nov 2017 17:29:39 +0200
-Message-Id: <20171109152940.14546-1-luiz.dentz@gmail.com>
+Message-ID: <1510240298.2624.23.camel@hadess.net>
+Subject: Re: Can't connect a Xbox one controller
+From: Bastien Nocera <hadess@hadess.net>
+To: Vinicius Costa Gomes <vinicius.gomes@intel.com>,
+        Anthony Bourguignon <contact@toniob.net>,
+        linux-bluetooth@vger.kernel.org
+Date: Thu, 09 Nov 2017 16:11:38 +0100
+In-Reply-To: <1510237731.2624.19.camel@hadess.net>
+References: <1471515072.4976.10.camel@toniob.net> <8760qwy6vv.fsf@intel.com>
+         <1471642506.3626.5.camel@toniob.net> <87zio8wcya.fsf@intel.com>
+         <1471697662.3650.1.camel@toniob.net> <87inuqw9gs.fsf@intel.com>
+         <1510235357.2624.9.camel@hadess.net> <1510237731.2624.19.camel@hadess.net>
+Content-Type: multipart/mixed; boundary="=-dnY4ifinSihb01ckPRDo"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This add initial bt_shell helper which can be used to create shell-like
-command line tools.
----
- Makefile.tools     |   3 +-
- src/shared/shell.c | 567 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- src/shared/shell.h |  67 +++++++
- 3 files changed, 636 insertions(+), 1 deletion(-)
- create mode 100644 src/shared/shell.c
- create mode 100644 src/shared/shell.h
+--=-dnY4ifinSihb01ckPRDo
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
 
-diff --git a/Makefile.tools b/Makefile.tools
-index 561302fa1..dc2902cb7 100644
---- a/Makefile.tools
-+++ b/Makefile.tools
-@@ -8,7 +8,8 @@ client_bluetoothctl_SOURCES = client/main.c \
- 					client/advertising.h \
- 					client/advertising.c \
- 					client/gatt.h client/gatt.c \
--					monitor/uuid.h monitor/uuid.c
-+					monitor/uuid.h monitor/uuid.c \
-+					src/shared/shell.h src/shared/shell.c
- client_bluetoothctl_LDADD = gdbus/libgdbus-internal.la src/libshared-glib.la \
- 				@GLIB_LIBS@ @DBUS_LIBS@ -lreadline
- endif
-diff --git a/src/shared/shell.c b/src/shared/shell.c
-new file mode 100644
-index 000000000..2cd1ea3fb
---- /dev/null
-+++ b/src/shared/shell.c
-@@ -0,0 +1,567 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2017  Intel Corporation. All rights reserved.
-+ *
-+ *
-+ *  This library is free software; you can redistribute it and/or
-+ *  modify it under the terms of the GNU Lesser General Public
-+ *  License as published by the Free Software Foundation; either
-+ *  version 2.1 of the License, or (at your option) any later version.
-+ *
-+ *  This library is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ *  Lesser General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU Lesser General Public
-+ *  License along with this library; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+#include <stdio.h>
-+#include <errno.h>
-+#include <unistd.h>
-+#include <stdlib.h>
-+#include <stdbool.h>
-+#include <signal.h>
-+#include <sys/signalfd.h>
-+
-+#include <readline/readline.h>
-+#include <readline/history.h>
-+#include <glib.h>
-+
-+#include "src/shared/util.h"
-+#include "src/shared/queue.h"
-+#include "src/shared/shell.h"
-+
-+#define CMD_LENGTH	48
-+#define print_text(color, fmt, args...) \
-+		printf(color fmt COLOR_OFF "\n", ## args)
-+#define print_menu(cmd, args, desc) \
-+		printf(COLOR_HIGHLIGHT "%s %-*s " COLOR_OFF "%s\n", \
-+			cmd, (int)(CMD_LENGTH - strlen(cmd)), args, desc)
-+
-+static GMainLoop *main_loop;
-+static gboolean option_version = FALSE;
-+
-+static struct {
-+	unsigned int input;
-+
-+	bool saved_prompt;
-+	bt_shell_prompt_input_func saved_func;
-+	void *saved_user_data;
-+
-+	const struct bt_shell_menu_entry *current;
-+	/* TODO: Add submenus support */
-+} data;
-+
-+static void shell_print_menu(void);
-+
-+static void cmd_version(const char *arg)
-+{
-+	bt_shell_printf("Version %s\n", VERSION);
-+}
-+
-+static void cmd_quit(const char *arg)
-+{
-+	g_main_loop_quit(main_loop);
-+}
-+
-+static void cmd_help(const char *arg)
-+{
-+	shell_print_menu();
-+}
-+
-+static const struct bt_shell_menu_entry cmd_table[] = {
-+	{ "version",      NULL,       cmd_version, "Display version" },
-+	{ "quit",         NULL,       cmd_quit, "Quit program" },
-+	{ "exit",         NULL,       cmd_quit, "Quit program" },
-+	{ "help",         NULL,       cmd_help,
-+					"Display help about this program" },
-+	{ }
-+};
-+
-+static void shell_print_menu(void)
-+{
-+	const struct bt_shell_menu_entry *entry;
-+
-+	if (!data.current)
-+		return;
-+
-+	print_text(COLOR_HIGHLIGHT, "Available commands:");
-+	print_text(COLOR_HIGHLIGHT, "-------------------");
-+	for (entry = data.current; entry->cmd; entry++) {
-+		print_menu(entry->cmd, entry->arg ? : "", entry->desc ? : "");
-+	}
-+
-+	for (entry = cmd_table; entry->cmd; entry++) {
-+		print_menu(entry->cmd, entry->arg ? : "", entry->desc ? : "");
-+	}
-+}
-+
-+static void shell_exec(const char *cmd, const char *arg)
-+{
-+	const struct bt_shell_menu_entry *entry;
-+
-+	if (!data.current || !cmd)
-+		return;
-+
-+	for (entry = data.current; entry->cmd; entry++) {
-+		if (strcmp(cmd, entry->cmd))
-+			continue;
-+
-+		if (entry->func) {
-+			entry->func(arg);
-+			return;
-+		}
-+	}
-+
-+	for (entry = cmd_table; entry->cmd; entry++) {
-+		if (strcmp(cmd, entry->cmd))
-+			continue;
-+
-+		if (entry->func) {
-+			entry->func(arg);
-+			return;
-+		}
-+	}
-+
-+	print_text(COLOR_HIGHLIGHT, "Invalid command");
-+}
-+
-+void bt_shell_printf(const char *fmt, ...)
-+{
-+	va_list args;
-+	bool save_input;
-+	char *saved_line;
-+	int saved_point;
-+
-+	save_input = !RL_ISSTATE(RL_STATE_DONE) && !data.saved_prompt;
-+
-+	if (save_input) {
-+		saved_point = rl_point;
-+		saved_line = rl_copy_text(0, rl_end);
-+		rl_save_prompt();
-+		rl_replace_line("", 0);
-+		rl_redisplay();
-+	}
-+
-+	va_start(args, fmt);
-+	vprintf(fmt, args);
-+	va_end(args);
-+
-+	if (save_input) {
-+		rl_restore_prompt();
-+		rl_replace_line(saved_line, 0);
-+		rl_point = saved_point;
-+		rl_forced_update_display();
-+		free(saved_line);
-+	}
-+}
-+
-+void bt_shell_hexdump(const unsigned char *buf, size_t len)
-+{
-+	static const char hexdigits[] = "0123456789abcdef";
-+	char str[68];
-+	size_t i;
-+
-+	if (!len)
-+		return;
-+
-+	str[0] = ' ';
-+
-+	for (i = 0; i < len; i++) {
-+		str[((i % 16) * 3) + 1] = ' ';
-+		str[((i % 16) * 3) + 2] = hexdigits[buf[i] >> 4];
-+		str[((i % 16) * 3) + 3] = hexdigits[buf[i] & 0xf];
-+		str[(i % 16) + 51] = isprint(buf[i]) ? buf[i] : '.';
-+
-+		if ((i + 1) % 16 == 0) {
-+			str[49] = ' ';
-+			str[50] = ' ';
-+			str[67] = '\0';
-+			bt_shell_printf("%s\n", str);
-+			str[0] = ' ';
-+		}
-+	}
-+
-+	if (i % 16 > 0) {
-+		size_t j;
-+		for (j = (i % 16); j < 16; j++) {
-+			str[(j * 3) + 1] = ' ';
-+			str[(j * 3) + 2] = ' ';
-+			str[(j * 3) + 3] = ' ';
-+			str[j + 51] = ' ';
-+		}
-+		str[49] = ' ';
-+		str[50] = ' ';
-+		str[67] = '\0';
-+		bt_shell_printf("%s\n", str);
-+	}
-+}
-+
-+void bt_shell_prompt_input(const char *label, const char *msg,
-+			bt_shell_prompt_input_func func, void *user_data)
-+{
-+	/* Normal use should not prompt for user input to the value a second
-+	 * time before it releases the prompt, but we take a safe action. */
-+	if (data.saved_prompt)
-+		return;
-+
-+	rl_save_prompt();
-+	rl_clear_message();
-+	rl_message(COLOR_RED "[%s]" COLOR_OFF " %s ", label, msg);
-+
-+	data.saved_prompt = true;
-+	data.saved_func = func;
-+	data.saved_user_data = user_data;
-+}
-+
-+int bt_shell_release_prompt(const char *input)
-+{
-+	bt_shell_prompt_input_func func;
-+	void *user_data;
-+
-+	if (!data.saved_prompt)
-+		return -1;
-+
-+	data.saved_prompt = false;
-+
-+	rl_restore_prompt();
-+
-+	func = data.saved_func;
-+	user_data = data.saved_user_data;
-+
-+	data.saved_func = NULL;
-+	data.saved_user_data = NULL;
-+
-+	func(input, user_data);
-+
-+	return 0;
-+}
-+
-+static void rl_handler(char *input)
-+{
-+	char *cmd, *arg;
-+
-+	if (!input) {
-+		rl_insert_text("quit");
-+		rl_redisplay();
-+		rl_crlf();
-+		g_main_loop_quit(main_loop);
-+		return;
-+	}
-+
-+	if (!strlen(input))
-+		goto done;
-+
-+	if (!bt_shell_release_prompt(input))
-+		goto done;
-+
-+	if (history_search(input, -1))
-+		add_history(input);
-+
-+	cmd = strtok_r(input, " ", &arg);
-+	if (!cmd)
-+		goto done;
-+
-+	if (arg) {
-+		int len = strlen(arg);
-+		if (len > 0 && arg[len - 1] == ' ')
-+			arg[len - 1] = '\0';
-+	}
-+
-+	shell_exec(cmd, arg);
-+done:
-+	free(input);
-+}
-+
-+static char *cmd_generator(const char *text, int state)
-+{
-+	const struct bt_shell_menu_entry *entry;
-+	static int index, len;
-+	const char *cmd;
-+
-+	entry = data.current;
-+
-+	if (!state) {
-+		index = 0;
-+		len = strlen(text);
-+	}
-+
-+	while ((cmd = entry[index].cmd)) {
-+		index++;
-+
-+		if (!strncmp(cmd, text, len))
-+			return strdup(cmd);
-+	}
-+
-+	return NULL;
-+}
-+
-+static char **shell_completion(const char *text, int start, int end)
-+{
-+	char **matches = NULL;
-+
-+	if (!data.current)
-+		return NULL;
-+
-+	if (start > 0) {
-+		const struct bt_shell_menu_entry *entry;
-+		char *input_cmd;
-+
-+		input_cmd = strndup(rl_line_buffer, start - 1);
-+		for (entry = data.current; entry->cmd; entry++) {
-+			if (strcmp(entry->cmd, input_cmd))
-+				continue;
-+
-+			if (!entry->gen)
-+				continue;
-+
-+			rl_completion_display_matches_hook = entry->disp;
-+			matches = rl_completion_matches(text, entry->gen);
-+			break;
-+		}
-+
-+		free(input_cmd);
-+	} else {
-+		rl_completion_display_matches_hook = NULL;
-+		matches = rl_completion_matches(text, cmd_generator);
-+	}
-+
-+	if (!matches)
-+		rl_attempted_completion_over = 1;
-+
-+	return matches;
-+}
-+
-+static gboolean signal_handler(GIOChannel *channel, GIOCondition condition,
-+							gpointer user_data)
-+{
-+	static bool terminated = false;
-+	struct signalfd_siginfo si;
-+	ssize_t result;
-+	int fd;
-+
-+	if (condition & (G_IO_NVAL | G_IO_ERR | G_IO_HUP)) {
-+		g_main_loop_quit(main_loop);
-+		return FALSE;
-+	}
-+
-+	fd = g_io_channel_unix_get_fd(channel);
-+
-+	result = read(fd, &si, sizeof(si));
-+	if (result != sizeof(si))
-+		return FALSE;
-+
-+	switch (si.ssi_signo) {
-+	case SIGINT:
-+		if (data.input) {
-+			rl_replace_line("", 0);
-+			rl_crlf();
-+			rl_on_new_line();
-+			rl_redisplay();
-+			break;
-+		}
-+
-+		/*
-+		 * If input was not yet setup up that means signal was received
-+		 * while daemon was not yet running. Since user is not able
-+		 * to terminate client by CTRL-D or typing exit treat this as
-+		 * exit and fall through.
-+		 */
-+
-+		/* fall through */
-+	case SIGTERM:
-+		if (!terminated) {
-+			rl_replace_line("", 0);
-+			rl_crlf();
-+			g_main_loop_quit(main_loop);
-+		}
-+
-+		terminated = true;
-+		break;
-+	}
-+
-+	return TRUE;
-+}
-+
-+static guint setup_signalfd(void)
-+{
-+	GIOChannel *channel;
-+	guint source;
-+	sigset_t mask;
-+	int fd;
-+
-+	sigemptyset(&mask);
-+	sigaddset(&mask, SIGINT);
-+	sigaddset(&mask, SIGTERM);
-+
-+	if (sigprocmask(SIG_BLOCK, &mask, NULL) < 0) {
-+		perror("Failed to set signal mask");
-+		return 0;
-+	}
-+
-+	fd = signalfd(-1, &mask, 0);
-+	if (fd < 0) {
-+		perror("Failed to create signal descriptor");
-+		return 0;
-+	}
-+
-+	channel = g_io_channel_unix_new(fd);
-+
-+	g_io_channel_set_close_on_unref(channel, TRUE);
-+	g_io_channel_set_encoding(channel, NULL, NULL);
-+	g_io_channel_set_buffered(channel, FALSE);
-+
-+	source = g_io_add_watch(channel,
-+				G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL,
-+				signal_handler, NULL);
-+
-+	g_io_channel_unref(channel);
-+
-+	return source;
-+}
-+
-+static GOptionEntry options[] = {
-+	{ "version", 'v', 0, G_OPTION_ARG_NONE, &option_version,
-+				"Show version information and exit" },
-+	{ NULL },
-+};
-+
-+static void rl_init(void)
-+{
-+	setlinebuf(stdout);
-+	rl_attempted_completion_function = shell_completion;
-+
-+	rl_erase_empty_line = 1;
-+	rl_callback_handler_install(NULL, rl_handler);
-+}
-+
-+void bt_shell_init(int *argc, char ***argv)
-+{
-+	GOptionContext *context;
-+	GError *error = NULL;
-+
-+	context = g_option_context_new(NULL);
-+	g_option_context_add_main_entries(context, options, NULL);
-+
-+	if (g_option_context_parse(context, argc, argv, &error) == FALSE) {
-+		if (error != NULL) {
-+			g_printerr("%s\n", error->message);
-+			g_error_free(error);
-+		} else
-+			g_printerr("An unknown error occurred\n");
-+		exit(1);
-+	}
-+
-+	g_option_context_free(context);
-+
-+	if (option_version == TRUE) {
-+		g_print("%s\n", VERSION);
-+		exit(EXIT_SUCCESS);
-+	}
-+
-+	main_loop = g_main_loop_new(NULL, FALSE);
-+
-+	rl_init();
-+}
-+
-+static void rl_cleanup(void)
-+{
-+	rl_message("");
-+	rl_callback_handler_remove();
-+}
-+
-+void bt_shell_run(void)
-+{
-+	guint signal;
-+
-+	signal = setup_signalfd();
-+
-+	g_main_loop_run(main_loop);
-+
-+	bt_shell_release_prompt("");
-+	bt_shell_detach();
-+
-+	g_source_remove(signal);
-+
-+	g_main_loop_unref(main_loop);
-+	main_loop = NULL;
-+
-+	rl_cleanup();
-+}
-+
-+bool bt_shell_set_menu(const struct bt_shell_menu_entry *menu)
-+{
-+	if (data.current || !menu)
-+		return false;
-+
-+	data.current = menu;
-+
-+	return true;
-+}
-+
-+void bt_shell_set_prompt(const char *string)
-+{
-+	if (!main_loop)
-+		return;
-+
-+	rl_set_prompt(string);
-+	printf("\r");
-+	rl_on_new_line();
-+	rl_redisplay();
-+}
-+
-+static gboolean input_handler(GIOChannel *channel, GIOCondition condition,
-+							gpointer user_data)
-+{
-+	if (condition & G_IO_IN) {
-+		rl_callback_read_char();
-+		return TRUE;
-+	}
-+
-+	if (condition & (G_IO_HUP | G_IO_ERR | G_IO_NVAL)) {
-+		g_main_loop_quit(main_loop);
-+		return FALSE;
-+	}
-+
-+	return TRUE;
-+}
-+
-+bool bt_shell_attach(int fd)
-+{
-+	GIOChannel *channel;
-+
-+	/* TODO: Allow more than one input? */
-+	if (data.input > 0)
-+		return false;
-+
-+	channel = g_io_channel_unix_new(fd);
-+
-+	data.input = g_io_add_watch(channel,
-+				G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL,
-+				input_handler, NULL);
-+
-+	g_io_channel_unref(channel);
-+
-+	return data.input > 0;
-+}
-+
-+bool bt_shell_detach(void)
-+{
-+	if (!data.input)
-+		return false;
-+
-+	g_source_remove(data.input);
-+	data.input = 0;
-+
-+	return true;
-+}
-diff --git a/src/shared/shell.h b/src/shared/shell.h
-new file mode 100644
-index 000000000..843335784
---- /dev/null
-+++ b/src/shared/shell.h
-@@ -0,0 +1,67 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2017  Intel Corporation. All rights reserved.
-+ *
-+ *
-+ *  This library is free software; you can redistribute it and/or
-+ *  modify it under the terms of the GNU Lesser General Public
-+ *  License as published by the Free Software Foundation; either
-+ *  version 2.1 of the License, or (at your option) any later version.
-+ *
-+ *  This library is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ *  Lesser General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU Lesser General Public
-+ *  License along with this library; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+#define COLOR_OFF	"\x1B[0m"
-+#define COLOR_RED	"\x1B[0;91m"
-+#define COLOR_GREEN	"\x1B[0;92m"
-+#define COLOR_YELLOW	"\x1B[0;93m"
-+#define COLOR_BLUE	"\x1B[0;94m"
-+#define COLOR_BOLDGRAY	"\x1B[1;30m"
-+#define COLOR_BOLDWHITE	"\x1B[1;37m"
-+#define COLOR_HIGHLIGHT	"\x1B[1;39m"
-+
-+typedef void (*bt_shell_menu_cb_t)(const char *arg);
-+typedef char * (*bt_shell_menu_gen_t)(const char *text, int state);
-+typedef void (*bt_shell_menu_disp_t) (char **matches, int num_matches,
-+							int max_length);
-+typedef void (*bt_shell_prompt_input_func) (const char *input, void *user_data);
-+
-+struct bt_shell_menu_entry {
-+	const char *cmd;
-+	const char *arg;
-+	bt_shell_menu_cb_t func;
-+	const char *desc;
-+	bt_shell_menu_gen_t gen;
-+	bt_shell_menu_disp_t disp;
-+};
-+
-+void bt_shell_init(int *argc, char ***argv);
-+
-+void bt_shell_run(void);
-+
-+bool bt_shell_set_menu(const struct bt_shell_menu_entry *menu);
-+
-+void bt_shell_set_prompt(const char *string);
-+
-+void bt_shell_printf(const char *fmt,
-+				...) __attribute__((format(printf, 1, 2)));
-+void bt_shell_hexdump(const unsigned char *buf, size_t len);
-+
-+void bt_shell_prompt_input(const char *label, const char *msg,
-+			bt_shell_prompt_input_func func, void *user_data);
-+int bt_shell_release_prompt(const char *input);
-+
-+bool bt_shell_attach(int fd);
-+bool bt_shell_detach(void);
-+
-+void bt_shell_cleanup(void);
--- 
-2.13.6
+On Thu, 2017-11-09 at 15:28 +0100, Bastien Nocera wrote:
+> 
+<snip>
+> Here's the btmon output of a pairing attempt.
+
+And this is a pairing attempt with disable_ertm set to 1.
+
+You will see a gap of about a minute between 2 events:
+@ MGMT Event: Device Disconnected (0x000c) plen 8                                                                                                                                        {0x0001} [hci0] 12.103542
+        BR/EDR Address: C8:3F:26:80:BA:71 (Microsoft Corporation)
+        Reason: Connection terminated by local host (0x02)
+> HCI Event: Connect Request (0x04) plen 10                                                                                                                                                   #77 [hci0] 81.172351
+        Address: C8:3F:26:80:BA:71 (Microsoft Corporation)
+        Class: 0x000508
+          Major class: Peripheral (mouse, joystick, keyboards)
+          Minor class: 0x02
+        Link type: ACL (0x01)
+
+The pad carried on blinking expecting "something". I turned the pad off
+by long pressing on the "XBox" button, and turned it on again. I got a
+service authentication request:
+[CHG] Device C8:3F:26:80:BA:71 Connected: yes
+Authorize service
+[agent] Authorize service 00001124-0000-1000-8000-00805f9b34fb (yes/no): yes
+
+And it's now connected and working.
+--=-dnY4ifinSihb01ckPRDo
+Content-Disposition: attachment; filename="trace.log"
+Content-Transfer-Encoding: base64
+Content-Type: text/x-log; name="trace.log"; charset="UTF-8"
+
+YnRzbm9vcAAAAAABAAAH0QAAADsAAAA7//8ADAAAAAAA4jtBM8gt0UxpbnV4IHZlcnNpb24gNC4x
+NC4wLTAucmM4LmdpdDEuMS5idDIuZmMyOC54ODZfNjQgKHg4Nl82NCkAAAAAIQAAACH//wAMAAAA
+AADiO0EzyC3WQmx1ZXRvb3RoIHN1YnN5c3RlbSB2ZXJzaW9uIDIuMjIAAAAAEAAAABAAAAAAAAAA
+AADiO0EzyC3XAAH4qx4AhURoY2kwAAAAAAAAAAAAAAAAAAAACAAAAAAA4jtBM8gt2AAAAAgAAAAI
+AAAACgAAAAAA4jtBM8gt2firHgCFRAIAAAAAHgAAAB7//wAOAAAAAADiO0EzyC3aAgAAAAIAAQ4A
+AQAAABBtZW1jaGVjay1hbWQ2NC0AAAAAHgAAAB7//wAOAAAAAADiO0EzyC3bAQAAAAIAAQ4AAQAA
+ABBtZW1jaGVjay1hbWQ2NC0AAAAAHgAAAB7//wAOAAAAAADiO0EzyC6nAwAAAAIAAQ4AAQAAABBi
+dG1vbgAAAAAAAAAAAAAAAAAAQQAAAEH//wANAAAAAADiO0Ez89VbBwtibHVldG9vdGhkAHNyYy9k
+ZXZpY2UuYzpidGRfZGV2aWNlX3NldF90ZW1wb3JhcnkoKSB0ZW1wb3JhcnkgMAAAAAA2AAAANv//
+AA0AAAAAAOI7QTPz2NgHC2JsdWV0b290aGQAc3JjL2FnZW50LmM6YWdlbnRfcmVmKCkgMHg4NTg4
+ZWQwOiByZWY9MgAAAABZAAAAWf//AA0AAAAAAOI7QTPz21MHC2JsdWV0b290aGQAc3JjL2Rldmlj
+ZS5jOmJvbmRpbmdfcmVxdWVzdF9uZXcoKSBSZXF1ZXN0aW5nIGJvbmRpbmcgZm9yIEM4OjNGOjI2
+OjgwOkJBOjcxAAAAADYAAAA2//8ADQAAAAAA4jtBM/PdpgcLYmx1ZXRvb3RoZABzcmMvYWdlbnQu
+YzphZ2VudF9yZWYoKSAweDg1ODhlZDA6IHJlZj0zAAAAADgAAAA4//8ADQAAAAAA4jtBM/PfuAcL
+Ymx1ZXRvb3RoZABzcmMvYWdlbnQuYzphZ2VudF91bnJlZigpIDB4ODU4OGVkMDogcmVmPTIAAAAA
+MAAAADD//wANAAAAAADiO0Ez8+IjBwtibHVldG9vdGhkAHNyYy9hZGFwdGVyLmM6c3VzcGVuZF9k
+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
+LP9wMwpxuoAmP8iEPwIAAAAACQAAAAkAAAACAAAAAADiO0E0LQAALAQGcbqAJj/IAAAADAAAAAwA
+AAADAAAAAADiO0E0LQMEDgoBLAQAcbqAJj/IAAAACQAAAAkAAAADAAAAAADiO0E0MmJSNgcAcbqA
+Jj/IAAAAGQAAABkAAAADAAAAAADiO0E0MyWUGBdxuoAmP8iZ0n2Oxaq+vLW+baBoDUGCBAAAACAA
+AAAgAAAAEQAAAAAA4jtBNDMl1wMAAAAJAAFxuoAmP8gABJnSfY7Fqr68tb5toGgNQYIAAAAAIAAA
+ACAAAAARAAAAAADiO0E0MyXXAgAAAAkAAXG6gCY/yAAEmdJ9jsWqvry1vm2gaA1BggAAAAAgAAAA
+IAAAABEAAAAAAOI7QTQzJdcBAAAACQABcbqAJj/IAASZ0n2Oxaq+vLW+baBoDUGCAAAAAHQAAAB0
+//8ADQAAAAAA4jtBNDMpEAcLYmx1ZXRvb3RoZABzcmMvYWRhcHRlci5jOm5ld19saW5rX2tleV9j
+YWxsYmFjaygpIGhjaTAgbmV3IGtleSBmb3IgQzg6M0Y6MjY6ODA6QkE6NzEgdHlwZSA0IHBpbl9s
+ZW4gMCBzdG9yZV9oaW50IDEAAAAABQAAAAUAAAADAAAAAADiO0E0MykdBgMAAAEAAAAGAAAABgAA
+AAIAAAAAAOI7QTQzKVoTBAMAAQEAAAAGAAAABgAAAAMAAAAAAOI7QTQzLQUPBAABEwQAAAAvAAAA
+L///AA0AAAAAAOI7QTQza/sHC2JsdWV0b290aGQAc3JjL2RldmljZS5jOmRldmljZV9zZXRfYm9u
+ZGVkKCkgAAAAAFIAAABS//8ADQAAAAAA4jtBNDNtGAcLYmx1ZXRvb3RoZABzcmMvZGV2aWNlLmM6
+ZGV2aWNlX2JvbmRpbmdfY29tcGxldGUoKSBib25kaW5nIDB4OTE3NzM2MCBzdGF0dXMgMHgwMAAA
+AABWAAAAVv//AA0AAAAAAOI7QTQzbhUHC2JsdWV0b290aGQAc3JjL2RldmljZS5jOmRldmljZV9i
+b25kaW5nX2NvbXBsZXRlKCkgUHJvY2VlZGluZyB3aXRoIHNlcnZpY2UgZGlzY292ZXJ5AAAAADgA
+AAA4//8ADQAAAAAA4jtBNDNxKwcLYmx1ZXRvb3RoZABzcmMvYWdlbnQuYzphZ2VudF91bnJlZigp
+IDB4ODU4OGVkMDogcmVmPTEAAAAALwAAAC///wANAAAAAADiO0E0M3IGBwtibHVldG9vdGhkAHNy
+Yy9hZGFwdGVyLmM6cmVzdW1lX2Rpc2NvdmVyeSgpIAAAAAAGAAAABgAAAAMAAAAAAOI7QTQzf1oI
+BAAAAQEAAAAFAAAABQAAAAIAAAAAAOI7QTQzf6EIFAIAAQAAAAkAAAAJAAAAAwAAAAAA4jtBNDOD
+Qw4HAQgUAAABEAAAABAAAAAQAAAAEQAAAAAA4jtBNDODlAEAAAABABkAAHG6gCY/yAAAAAAOAAAA
+DgAAAAQAAAAAAOI7QTQzg6kAAQoABgABAAoBAgACAAAAAEEAAABB//8ADQAAAAAA4jtBNDOGCAcL
+Ymx1ZXRvb3RoZABzcmMvYWRhcHRlci5jOnBhaXJfZGV2aWNlX2NvbXBsZXRlKCkgU3VjY2VzcyAo
+MHgwMCkAAAAAZgAAAGb//wANAAAAAADiO0E0M4e1BwtibHVldG9vdGhkAHNyYy9hZGFwdGVyLmM6
+Ym9uZGluZ19hdHRlbXB0X2NvbXBsZXRlKCkgaGNpMCBiZGFkZHIgQzg6M0Y6MjY6ODA6QkE6NzEg
+dHlwZSAwIHN0YXR1cyAweDAAAAAATgAAAE7//wANAAAAAADiO0E0M4kqBwtibHVldG9vdGhkAHNy
+Yy9kZXZpY2UuYzpkZXZpY2VfYm9uZGluZ19jb21wbGV0ZSgpIGJvbmRpbmcgKG5pbCkgc3RhdHVz
+IDB4MDAAAAAALwAAAC///wANAAAAAADiO0E0M4pLBwtibHVldG9vdGhkAHNyYy9hZGFwdGVyLmM6
+cmVzdW1lX2Rpc2NvdmVyeSgpIAAAAAAHAAAABwAAAAMAAAAAAOI7QTQ0UlATBQEAAQEAAAAAFAAA
+ABQAAAAFAAAAAADiO0E0NFWzACEQAAwAAQALAQgAAgAAABAAAAAAAAAQAAAAEAAAAAQAAAAAAOI7
+QTQ0VfoAAQwACAABAAICBAABAEAAAAAABwAAAAcAAAADAAAAAADiO0E0NGXdEwUBAAEBAAAAABQA
+AAAUAAAABQAAAAAA4jtBNDRpEgAhEAAMAAEAAwIIAEAAQAAAAAAAAAAAEAAAABAAAAAEAAAAAADi
+O0E0NGlrAAEMAAgAAQAEAwQAQAAAAAAAABQAAAAUAAAABQAAAAAA4jtBNDRuJQAhEAAMAAEABAEI
+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
+JQEACQECJQEACQIACQEDCQIBCQReCQICCQLgCQIBBgAAAB0AAAAdAAAABAAAAAAA4jtBNDclogAB
+GQAVAEAABgAHABA1AxkSAP//NQUKAAD//wEGAAAABwAAAAcAAAADAAAAAADiO0E0NzRIEwUBAAEB
+AAAAAB8AAAAfAAAABQAAAAAA4jtBNDc1fAAhGwAXAEAABwAHABIADwMJCQMJAgQoAQkCBQkAAgAA
+AABgAAAAYP//AA0AAAAAAOI7QTQ3fnoHC2JsdWV0b290aGQAc3JjL2RldmljZS5jOmRldmljZV9w
+cm9iZV9wcm9maWxlcygpIFByb2JpbmcgcHJvZmlsZXMgZm9yIGRldmljZSBDODozRjoyNjo4MDpC
+QTo3MQAAAABjAAAAY///AA0AAAAAAOI7QTQ3hYoHC2JsdWV0b290aGQAcHJvZmlsZXMvaW5wdXQv
+ZGV2aWNlLmM6aW5wdXRfZGV2aWNlX3JlZ2lzdGVyKCkgL29yZy9ibHVlei9oY2kwL2Rldl9DOF8z
+Rl8yNl84MF9CQV83MQAAAAA+AAAAPv//AA0AAAAAAOI7QTQ3hycHC2JsdWV0b290aGQAc3JjL3Nl
+cnZpY2UuYzpidGRfc2VydmljZV9yZWYoKSAweDkyNDc2MDA6IHJlZj0yAAAAAI8AAACP//8ADQAA
+AAAA4jtBNDeJcAcLYmx1ZXRvb3RoZABzcmMvc2VydmljZS5jOmNoYW5nZV9zdGF0ZSgpIDB4OTI0
+NzYwMDogZGV2aWNlIEM4OjNGOjI2OjgwOkJBOjcxIHByb2ZpbGUgaW5wdXQtaGlkIHN0YXRlIGNo
+YW5nZWQ6IHVuYXZhaWxhYmxlIC0+IGRpc2Nvbm5lY3RlZCAoMCkAAAAAXAAAAFz//wANAAAAAADi
+O0E0N5CuBwtibHVldG9vdGhkAHNyYy9kZXZpY2UuYzpkZXZpY2Vfc3ZjX3Jlc29sdmVkKCkgL29y
+Zy9ibHVlei9oY2kwL2Rldl9DOF8zRl8yNl84MF9CQV83MSBlcnIgMAAAAAAQAAAAEAAAAAQAAAAA
+AOI7QTRbVssAAQwACAABAAYEBABAAEAAAAAABwAAAAcAAAADAAAAAADiO0E0W2ZLEwUBAAEBAAAA
+ABAAAAAQAAAABQAAAAAA4jtBNFvGCwAhDAAIAAEABwQEAEAAQAAAAAAGAAAABgAAAAIAAAAAAOI7
+QTR7GjoGBAMAARMAAAAGAAAABgAAAAMAAAAAAOI7QTR7H0MPBAABBgQAAAAGAAAABgAAAAMAAAAA
+AOI7QTR8niQFBAAAARYAAAAOAAAADgAAABEAAAAAAOI7QTR8nnYDAAAADABxuoAmP8gAAgAAAA4A
+AAAOAAAAEQAAAAAA4jtBNHyedgIAAAAMAHG6gCY/yAACAAAADgAAAA4AAAARAAAAAADiO0E0fJ52
+AQAAAAwAcbqAJj/IAAIAAABeAAAAXv//AA0AAAAAAOI7QTR8oykHC2JsdWV0b290aGQAc3JjL2Fk
+YXB0ZXIuYzpkZXZfZGlzY29ubmVjdGVkKCkgRGV2aWNlIEM4OjNGOjI2OjgwOkJBOjcxIGRpc2Nv
+bm5lY3RlZCwgcmVhc29uIDIAAAAAOAAAADj//wANAAAAAADiO0E0fKWmBwtibHVldG9vdGhkAHNy
+Yy9hZGFwdGVyLmM6YWRhcHRlcl9yZW1vdmVfY29ubmVjdGlvbigpIAAAAAA3AAAAN///AA0AAAAA
+AOI7QTR8qywHC2JsdWV0b290aGQAcGx1Z2lucy9wb2xpY3kuYzpkaXNjb25uZWN0X2NiKCkgcmVh
+c29uIDIAAAAAZgAAAGb//wANAAAAAADiO0E0fK5OBwtibHVldG9vdGhkAHNyYy9hZGFwdGVyLmM6
+Ym9uZGluZ19hdHRlbXB0X2NvbXBsZXRlKCkgaGNpMCBiZGFkZHIgQzg6M0Y6MjY6ODA6QkE6NzEg
+dHlwZSAwIHN0YXR1cyAweGUAAAAATgAAAE7//wANAAAAAADiO0E0fLFJBwtibHVldG9vdGhkAHNy
+Yy9kZXZpY2UuYzpkZXZpY2VfYm9uZGluZ19jb21wbGV0ZSgpIGJvbmRpbmcgKG5pbCkgc3RhdHVz
+IDB4MGUAAAAAPAAAADz//wANAAAAAADiO0E0fLN0BwtibHVldG9vdGhkAHNyYy9kZXZpY2UuYzpk
+ZXZpY2VfYm9uZGluZ19mYWlsZWQoKSBzdGF0dXMgMTQAAAAALwAAAC///wANAAAAAADiO0E0fLWt
+BwtibHVldG9vdGhkAHNyYy9hZGFwdGVyLmM6cmVzdW1lX2Rpc2NvdmVyeSgpIAAAAAAMAAAADAAA
+AAMAAAAAAOI7QTiahn8ECnG6gCY/yAgFAAEAAAAKAAAACgAAAAIAAAAAAOI7QTiahzkJBAdxuoAm
+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
+AgoAQAAAAAAAAQLIBQAAABIAAAASAAAABQAAAAAA4jtBOKICPwAhDgAKAAEABQMGAEAAAAAAAAAA
+AG0AAABt//8ADQAAAAAA4jtBOKIFXAcLYmx1ZXRvb3RoZABwcm9maWxlcy9pbnB1dC9zZXJ2ZXIu
+Yzpjb25uZWN0X2V2ZW50X2NiKCkgSW5jb21pbmcgY29ubmVjdGlvbiBmcm9tIEM4OjNGOjI2Ojgw
+OkJBOjcxIG9uIFBTTSAxNwAAAABWAAAAVv//AA0AAAAAAOI7QTiiBrQHC2JsdWV0b290aGQAcHJv
+ZmlsZXMvaW5wdXQvZGV2aWNlLmM6aW5wdXRfZGV2aWNlX3NldF9jaGFubmVsKCkgaWRldiAweDky
+NDllZjAgcHNtIDE3AAAAAAcAAAAHAAAAAwAAAAAA4jtBOKIL9hMFAQABAQAAAAAQAAAAEAAAAAUA
+AAAAAOI7QTiibc4AIQwACAABAAIDBAATAEEAAAAAFAAAABQAAAAEAAAAAADiO0E4om4yAAEQAAwA
+AQADAwgAQQBBAAEAAgAAAAA5AAAAOf//AA0AAAAAAOI7QTiicJwHC2JsdWV0b290aGQAcHJvZmls
+ZXMvaW5wdXQvc2VydmVyLmM6Y29uZmlybV9ldmVudF9jYigpIAAAAAA2AAAANv//AA0AAAAAAOI7
+QTiidEEHC2JsdWV0b290aGQAc3JjL2FnZW50LmM6YWdlbnRfcmVmKCkgMHg4NTg4ZWQwOiByZWY9
+MgAAAACAAAAAgP//AA0AAAAAAOI7QTiifesHC2JsdWV0b290aGQAc3JjL2FnZW50LmM6YWdlbnRf
+YXV0aG9yaXplX3NlcnZpY2UoKSBhdXRob3JpemUgc2VydmljZSByZXF1ZXN0IHdhcyBzZW50IGZv
+ciAvb3JnL2JsdWV6L2hjaTAvZGV2X0M4XzNGXzI2XzgwX0JBXzcxAAAAAAcAAAAHAAAAAwAAAAAA
+4jtBOKKgdhMFAQABAQAAAAA2AAAANv//AA0AAAAAAOI7QTjYzwUHC2JsdWV0b290aGQAc3JjL2Fn
+ZW50LmM6YWdlbnRfcmVmKCkgMHg4NTg4ZWQwOiByZWY9MwAAAAAUAAAAFAAAAAQAAAAAAOI7QTjY
+0DoAARAADAABAAMDCABBAEEAAAAAAAAAABAAAAAQAAAABAAAAAAA4jtBONjQbwABDAAIAAEABAQE
+AEEAAAAAAAA4AAAAOP//AA0AAAAAAOI7QTjY048HC2JsdWV0b290aGQAc3JjL2FnZW50LmM6YWdl
+bnRfdW5yZWYoKSAweDg1ODhlZDA6IHJlZj0yAAAAADgAAAA4//8ADQAAAAAA4jtBONjU3AcLYmx1
+ZXRvb3RoZABzcmMvYWdlbnQuYzphZ2VudF91bnJlZigpIDB4ODU4OGVkMDogcmVmPTEAAAAABwAA
+AAcAAAADAAAAAADiO0E42NtCEwUBAAEBAAAAABQAAAAUAAAABQAAAAAA4jtBONjenAAhEAAMAAEA
+BAQIAEEAAAABAsgFAAAAFgAAABYAAAAEAAAAAADiO0E42N7VAAESAA4AAQAFBAoAQQAAAAAAAQLI
+BQAAAAcAAAAHAAAAAwAAAAAA4jtBONje+hMFAQABAQAAAAASAAAAEgAAAAUAAAAAAOI7QTjY4i8A
+IQ4ACgABAAUEBgBBAAAAAAAAAABtAAAAbf//AA0AAAAAAOI7QTjY5PIHC2JsdWV0b290aGQAcHJv
+ZmlsZXMvaW5wdXQvc2VydmVyLmM6Y29ubmVjdF9ldmVudF9jYigpIEluY29taW5nIGNvbm5lY3Rp
+b24gZnJvbSBDODozRjoyNjo4MDpCQTo3MSBvbiBQU00gMTkAAAAAVgAAAFb//wANAAAAAADiO0E4
+2OZeBwtibHVldG9vdGhkAHByb2ZpbGVzL2lucHV0L2RldmljZS5jOmlucHV0X2RldmljZV9zZXRf
+Y2hhbm5lbCgpIGlkZXYgMHg5MjQ5ZWYwIHBzbSAxOQAAAAAHAAAABwAAAAMAAAAAAOI7QTjY7pQT
+BQEAAQEAAAAAjQAAAI3//wANAAAAAADiO0E42PKlBwtibHVldG9vdGhkAHNyYy9zZXJ2aWNlLmM6
+Y2hhbmdlX3N0YXRlKCkgMHg5MjQ3NjAwOiBkZXZpY2UgQzg6M0Y6MjY6ODA6QkE6NzEgcHJvZmls
+ZSBpbnB1dC1oaWQgc3RhdGUgY2hhbmdlZDogZGlzY29ubmVjdGVkIC0+IGNvbm5lY3RlZCAoMCkA
+AAAAPgAAAD7//wANAAAAAADiO0E42PPXBwtibHVldG9vdGhkAHNyYy9zZXJ2aWNlLmM6YnRkX3Nl
+cnZpY2VfcmVmKCkgMHg5MjQ3NjAwOiByZWY9MwAAAABHAAAAR///AA0AAAAAAOI7QTjY9kcHC2Js
+dWV0b290aGQAcGx1Z2lucy9wb2xpY3kuYzpzZXJ2aWNlX2NiKCkgQWRkZWQgaW5wdXQtaGlkIHJl
+Y29ubmVjdCAwAAAAADcAAAA3//8ADQAAAAAA4jtBONj4RQcLYmx1ZXRvb3RoZABwcm9maWxlcy9p
+bnB1dC9kZXZpY2UuYzplbmNyeXB0X25vdGlmeSgpIAAAAAAFAAAABQAAAAMAAAAAAOI7QTjY+lEb
+AwABAQAAABkAAAAZAAAABQAAAAAA4jtBONlYLQAhFQARAEEAoQHAi998b3kyiAAAAAAAAAAAAAAZ
+AAAAGQAAAAUAAAAAAOI7QTjZYPMAIRUAEQBBAKEBwIvffG95MogAAAAAAAAAAAAACAAAAAgAAAAD
+AAAAAADiO0E42WPFFAYAAAECDAAAAAALAAAACwAAAAUAAAAAAOI7QTjx8y4AIQcAAwBBAKEEhgAA
+AAsAAAALAAAABQAAAAAA4jtBOiNlFgAhBwADAEEAoQSG
+
+
+--=-dnY4ifinSihb01ckPRDo--
 
