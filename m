@@ -1,40 +1,41 @@
-Return-Path: <larry.finger@gmail.com>
-Sender: Larry Finger <larry.finger@gmail.com>
-From: Larry Finger <Larry.Finger@lwfinger.net>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>
-Cc: linux-kernel@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org,
-	Larry Finger <Larry.Finger@lwfinger.net>,
-	Hon Weng Chong <honwchong@gmail.com>
-Subject: [PATCH] bluetooth: btusb: Add device ID for RTL8822BE
-Date: Sat, 11 Nov 2017 11:43:26 -0600
-Message-Id: <20171111174326.9243-1-Larry.Finger@lwfinger.net>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Thomas Green <TGreen2@Sorenson.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: porting from bluez4
+Date: Fri, 10 Nov 2017 17:51:15 +0000
+Message-ID: <C2BC44D770753C45AAAC42695FB5BE020125718348@SLC-EXMB01.CORP.SRELAY.COM>
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The Asus Z370-I contains a Realtek RTL8822BE device with an associated
-BT chip using a USB ID of 0b05:185c. This device is added to the driver.
+All,
 
-Signed-off-by: Hon Weng Chong <honwchong@gmail.com>
-Signed-off-by: Larry Finger <Larry.Finger@lwfinger.net>
----
- drivers/bluetooth/btusb.c | 3 +++
- 1 file changed, 3 insertions(+)
+I'm porting our company's application from bluez4 to bluez5.  I'm currently=
+ using bluez5.42  (I'm nervous about using higher than that because I've ha=
+d to backport many kernel changes to support this recent version (what else=
+ do I need to backport?)).  I have most things working, but there are two i=
+ssues I've not yet been able to resolve.  The first is devices reconnecting=
+ when they come back into range.  For example, I am testing with a Jawbone =
+from Jambox.  When coming back into range (or powering back on), I watch it=
+ attempt to connect, and it fails.  If I have bluetoothctl up I see the sta=
+tus change from connected to unconnected about three or four times before t=
+he Jambox quits trying and powers back down.   I have a BTLE keyboard that =
+comes back into range and will not connect until I hit a key and the connec=
+tion happens.   I have other BTLE devices that attempt to reconnect, but fa=
+il as well.
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 7a5c06aaa181..c265ef63cab7 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -373,6 +373,9 @@ static const struct usb_device_id blacklist_table[] = {
- 	{ USB_DEVICE(0x13d3, 0x3461), .driver_info = BTUSB_REALTEK },
- 	{ USB_DEVICE(0x13d3, 0x3462), .driver_info = BTUSB_REALTEK },
- 
-+	/* Additional Realtek 8822BE Bluetooth devices */
-+	{ USB_DEVICE(0x0b05, 0x1185c), .driver_info = BTUSB_REALTEK },
-+
- 	/* Silicon Wave based devices */
- 	{ USB_DEVICE(0x0c10, 0x0000), .driver_info = BTUSB_SWAVE },
- 
--- 
-2.15.0
+The second issue is that of  headset devices.  In Bluez4 there was a headse=
+t 'profile' and the IndicateCall method that could be invoked.  In bluez5 t=
+here is the Alert1 interface with the NewAlert call, but it is deprecated c=
+ode, so what should I be using?  As a matter of interest, if I try to use t=
+he NewAlert method what is the proper use?  I've tried:
+
+root# dbus-send --print-reply --system --dest=3Dorg.bluez --type=3Dmethod_c=
+all /org/bluez org.bluez.Alert1.NewAlert string:"ringer" uint16:1 string:"a=
+ctive"
+Error org.bluez.Error.InvalidArguments: Invalid arguments in method call
+
+TIA,
+
+Tom
