@@ -1,49 +1,55 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Message-ID: <1510299481.1995.2.camel@zoho.eu>
-Subject: Re: invalid packet size with bluetooth keyboard
-From: Bbo Wuff <bbo2adwuff@zoho.eu>
+From: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
+Subject: Re: [PATCH v2 3/7] client: Add set-advertise-{duration, timeout}
 To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Fri, 10 Nov 2017 08:38:01 +0100
-In-Reply-To: <CABBYNZ+txiExp7Fjc4XHd+Xhbp9WLtrfbEGM8YErAU_9zibUOg@mail.gmail.com>
-References: <1510226875.1765.5.camel@zoho.eu>
-         <CABBYNZ+txiExp7Fjc4XHd+Xhbp9WLtrfbEGM8YErAU_9zibUOg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+CC: <linux-bluetooth@vger.kernel.org>
+References: <20171102144352.32353-1-luiz.dentz@gmail.com>
+ <20171102144352.32353-3-luiz.dentz@gmail.com>
+Message-ID: <93ffd973-dcb0-8d19-dc12-8f959911d127@jp.fujitsu.com>
+Date: Fri, 10 Nov 2017 15:40:13 +0900
+MIME-Version: 1.0
+In-Reply-To: <20171102144352.32353-3-luiz.dentz@gmail.com>
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Luiz,
 
-You are right, not bluez bug.
+With the latest bluez master branch, when sets a advertise timeout and
+times out, bluetoothctl fails to run "advertise off" as below:
 
-See the firmware bug reports:
-https://bugzilla.kernel.org/show_bug.cgi?id=197147
-https://bugzilla.kernel.org/show_bug.cgi?id=197807
+  [bluetooth]# set-advertise-duration 4
+  [bluetooth]# set-advertise-timeout 4
+  [bluetooth]# advertise on
+  [CHG] Controller 00:09:DD:40:CA:12 SupportedInstances: 0x04
+  [CHG] Controller 00:09:DD:40:CA:12 ActiveInstances: 0x01
+  Advertising object registered
+  [CHG] Controller 00:09:DD:40:CA:12 SupportedInstances: 0x05
+  [CHG] Controller 00:09:DD:40:CA:12 ActiveInstances: 0x00
+  [bluetooth]# advertise off 
+  Failed to unregister advertisement: org.bluez.Error.DoesNotExist
 
-Sorry for the noise! Invalid packet size was the only error in the logs
-that I saw.
 
-Thanks!
-Wuff
+Regards,
+Eramoto
 
-
-On Thu, 2017-11-09 at 21:15 +0200, Luiz Augusto von Dentz wrote:
-> Hi,
+On 11/02/2017 11:43 PM, Luiz Augusto von Dentz wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 > 
-> On Thu, Nov 9, 2017 at 1:27 PM, Bbo Wuff <bbo2adwuff@zoho.eu> wrote:
-> > Dear all,
-> > 
-> > I have a Microsoft Sculpt Mobile Keyboard, which is a bluetooth
-> > keyboard. It worked fine before, but since bluez 5.47 not anymore.
-> > And
-> > I don't seem to be the only one:
-> > https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=878181#15
+> This adds the following command which can be used to control the
+> advertisement intervals:
 > 
-> This seems a hardware fault, are you sure it is not due to a new
-> firmware or something? We haven't done any changes to HIDP in quite
-> some time, which btw is in the kernel so there is very little the
-> userspace can do to affect it.
-> 
-> 
+> [bluetooth]# set-advertise-duration 4
+> [bluetooth]# set-advertise-timeout 4
+> [bluetooth]# advertise on
+> [CHG] Controller B8:8A:60:D8:17:D7 SupportedInstances: 0x04
+> [CHG] Controller B8:8A:60:D8:17:D7 ActiveInstances: 0x01
+> Advertising object registered
+> [CHG] Controller B8:8A:60:D8:17:D7 SupportedInstances: 0x05
+> [CHG] Controller B8:8A:60:D8:17:D7 ActiveInstances: 0x00
+> ---
+>  client/advertising.c | 50 ++++++++++++++++++++++++++++++++++++++++++++++++++
+>  client/advertising.h |  2 ++
+>  client/main.c        | 42 ++++++++++++++++++++++++++++++++++++++++++
+>  3 files changed, 94 insertions(+)
 
