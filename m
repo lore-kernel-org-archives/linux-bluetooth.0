@@ -1,56 +1,54 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: bugzilla-daemon@bugzilla.kernel.org
-To: linux-bluetooth@kernel.org
-Subject: [Bug 197855] New: btbcm can use uninitialized stack fw_name to try &
- report firmware
-Date: Sun, 12 Nov 2017 01:07:29 +0000
-Message-ID: <bug-197855-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
+Return-Path: <larry.finger@gmail.com>
+Sender: Larry Finger <larry.finger@gmail.com>
+Subject: Re: [PATCH] bluetooth: btusb: Add device ID for RTL8822BE
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>,
+ Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+ linux-bluetooth@vger.kernel.org, Hon Weng Chong <honwchong@gmail.com>
+References: <20171111174326.9243-1-Larry.Finger@lwfinger.net>
+ <82ACB0CF-DD2F-4A44-A2F0-75D1C1B3DA9C@holtmann.org>
+From: Larry Finger <Larry.Finger@lwfinger.net>
+Message-ID: <a2c8efa7-6acb-fc97-8401-87bbc9e3d618@lwfinger.net>
+Date: Sat, 11 Nov 2017 13:10:08 -0600
 MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <82ACB0CF-DD2F-4A44-A2F0-75D1C1B3DA9C@holtmann.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-https://bugzilla.kernel.org/show_bug.cgi?id=197855
+On 11/11/2017 12:51 PM, Marcel Holtmann wrote:
+> Hi Larry,
+> 
+>> The Asus Z370-I contains a Realtek RTL8822BE device with an associated
+>> BT chip using a USB ID of 0b05:185c. This device is added to the driver.
+>>
+>> Signed-off-by: Hon Weng Chong <honwchong@gmail.com>
+>> Signed-off-by: Larry Finger <Larry.Finger@lwfinger.net>
+>> ---
+>> drivers/bluetooth/btusb.c | 3 +++
+>> 1 file changed, 3 insertions(+)
+>>
+>> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+>> index 7a5c06aaa181..c265ef63cab7 100644
+>> --- a/drivers/bluetooth/btusb.c
+>> +++ b/drivers/bluetooth/btusb.c
+>> @@ -373,6 +373,9 @@ static const struct usb_device_id blacklist_table[] = {
+>> 	{ USB_DEVICE(0x13d3, 0x3461), .driver_info = BTUSB_REALTEK },
+>> 	{ USB_DEVICE(0x13d3, 0x3462), .driver_info = BTUSB_REALTEK },
+>>
+>> +	/* Additional Realtek 8822BE Bluetooth devices */
+>> +	{ USB_DEVICE(0x0b05, 0x1185c), .driver_info = BTUSB_REALTEK },
+>> +
+> 
+> I prefer to have /sys/kernel/debug/usb/devices for the device included in the commit message.
+> 
+> Regards
+> 
+> Marcel
+> 
+> 
+Hon,
 
-            Bug ID: 197855
-           Summary: btbcm can use uninitialized stack fw_name to try &
-                    report firmware
-           Product: Drivers
-           Version: 2.5
-    Kernel Version: <=4.14-rc8
-          Hardware: All
-                OS: Linux
-              Tree: Mainline
-            Status: NEW
-          Severity: normal
-          Priority: P1
-         Component: Bluetooth
-          Assignee: linux-bluetooth@vger.kernel.org
-          Reporter: mahatma@bspu.unibel.by
-        Regression: No
+Please provide the data.
 
-Created attachment 260623
-  --> https://bugzilla.kernel.org/attachment.cgi?id=260623&action=edit
-pre-init fw_name in btbcm_initialize by hw id
-
-btbcm can use uninitialized stack fw_name to try & report firmware. fw_name
-first declared in hci_bcm.c bcm_setup(), must be filled in btbcm.c
-btbcm_initialize().
-
-Real hw: Lenovo Thinkpad 10 2nd, device BCM4354A2, uart. It defined later for
-USB, but IMHO in this tablet it assembled on different wifi/bt/buses
-combination, so calling uart from btattach cause messages like "BCM: Patch ...
-not found", where "..." random stack garbage. I solve this problem by simple
-init fw_name in btbcm.c. Unsure about style of this patch (it can cause too
-agnostic silent firmware usage on new devices), but it just work for my device
-- after googling & renaming BCM4354A2.hcd to BCM-unknown-uart-230f-2.hcd, so I
-even don't try to add & report device ID to bcm_uart_subver_table (like
-bcm_usb_subver_table).
-
-PS I don't deep analyze a bit changed linux-next, but quick looks same (patch
-fuzzy applied). Patch for 4.14.rc8. Also I don't check btbcm_setup_patchram()
-for same problem.
-
--- 
-You are receiving this mail because:
-You are the assignee for the bug.
+Larry
