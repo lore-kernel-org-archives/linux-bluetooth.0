@@ -1,25 +1,31 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: bugzilla-daemon@bugzilla.kernel.org
-To: linux-bluetooth@kernel.org
-Subject: [Bug 197855] btbcm can use uninitialized stack fw_name to try &
- report firmware
-Date: Sun, 12 Nov 2017 20:29:57 +0000
-Message-ID: <bug-197855-62941-Yr9N0C5QVp@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-197855-62941@https.bugzilla.kernel.org/>
-References: <bug-197855-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
+Return-Path: <bjorn@mork.no>
+From: =?utf-8?Q?Bj=C3=B8rn_Mork?= <bjorn@mork.no>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Larry Finger <Larry.Finger@lwfinger.net>,
+        "Gustavo F. Padovan" <gustavo@padovan.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-bluetooth@vger.kernel.org, Hon Weng Chong <honwchong@gmail.com>
+Subject: Re: [PATCH] bluetooth: btusb: Add device ID for RTL8822BE
+References: <20171111174326.9243-1-Larry.Finger@lwfinger.net>
+	<82ACB0CF-DD2F-4A44-A2F0-75D1C1B3DA9C@holtmann.org>
+Date: Sun, 12 Nov 2017 14:45:50 +0100
+In-Reply-To: <82ACB0CF-DD2F-4A44-A2F0-75D1C1B3DA9C@holtmann.org> (Marcel
+	Holtmann's message of "Sat, 11 Nov 2017 19:51:36 +0100")
+Message-ID: <87k1yvip9t.fsf@miraculix.mork.no>
 MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-https://bugzilla.kernel.org/show_bug.cgi?id=197855
+Marcel Holtmann <marcel@holtmann.org> writes:
 
-Dzianis Kahanovich (mahatma@bspu.unibel.by) changed:
+>> +	{ USB_DEVICE(0x0b05, 0x1185c), .driver_info =3D BTUSB_REALTEK },
+>> +
+>
+> I prefer to have /sys/kernel/debug/usb/devices for the device included in=
+ the commit message.
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-     Kernel Version|<=4.14-rc8                  |4.14
+...and 0x1185c is a typp
 
--- 
-You are receiving this mail because:
-You are the assignee for the bug.
+
+Bj=C3=B8rn
