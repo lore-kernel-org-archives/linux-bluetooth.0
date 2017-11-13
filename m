@@ -1,36 +1,54 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <26467B30-3820-4CBF-98DB-DC7CAF669A73@icloud.com>
-References: <26467B30-3820-4CBF-98DB-DC7CAF669A73@icloud.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 13 Nov 2017 17:36:07 +0200
-Message-ID: <CABBYNZKUj4n=_6bFdmNVxbL7pNQx5iSXKND6H120rDWc8R7q4g@mail.gmail.com>
-Subject: Re: How connect two headphones two Bluez5
-To: =?UTF-8?B?0KDRg9GB0LvQsNC9INCa0YPQt9GM0LzQuNC9?=
-        <kuzminruslan@icloud.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
+Subject: Re: [PATCH v2] Bluetooth: btusb: Add a Kconfig option to enable USB
+ autosuspend by default
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20171113134416.31886-1-hdegoede@redhat.com>
+Date: Mon, 13 Nov 2017 16:11:29 +0100
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-bluetooth@vger.kernel.org
+Message-Id: <B2AB4064-D3B3-42A7-8CE6-01179F1DF52E@holtmann.org>
+References: <20171113134416.31886-1-hdegoede@redhat.com>
+To: Hans de Goede <hdegoede@redhat.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ruslan,
+Hi Hans,
 
-On Mon, Nov 13, 2017 at 10:44 AM, =D0=A0=D1=83=D1=81=D0=BB=D0=B0=D0=BD =D0=
-=9A=D1=83=D0=B7=D1=8C=D0=BC=D0=B8=D0=BD
-<kuzminruslan@icloud.com> wrote:
-> Excuse me for my English.I am developer.My task connect two Bluetooth hea=
-dphones to one Bluetooth adapter.I know in Windows and in bluez4 this featu=
-re worked.In bluez5 in connection with pulseaudio created only one virtual =
-A2DP speaker.
-> Long time I am searched reason in pulseaudio (more precisely in pulseaudi=
-o sources) but how I knowed what dbus send from bluez to pulseaudio command=
- ClearConfiguration when I am trying connect second headphone. I want to kn=
-ow where in sources of bluez5 limited count of working A2DP profiles.May I =
-am write self hook for pulseaudio for two Bluetooth A2DP headphones?
+> On many laptops the btusb device is the only USB device not having USB
+> autosuspend enabled, this causes not only the HCI but also the USB
+> controller to stay awake, together using aprox. 0.4W of power.
+> 
+> Modern ultrabooks idle around 6W (at 50% screen brightness), 3.5W for
+> Apollo Lake devices. 0.4W is a significant chunk of this (7 / 11%).
+> 
+> The btusb driver already contains code to allow enabling USB autosuspend,
+> but currently leaves it up to the user / userspace to enable it. This
+> means that for most people it will not be enabled, leading to an
+> unnecessarily high power consumption.
+> 
+> Since enabling it is not entirely without risk of regressions, this
+> commit adds a Kconfig option so that Linux distributions can choose to
+> enable it by default. This commit also adds a module option so that when
+> distros receive bugs they can easily ask the user to disable it again
+> for easy debugging.
+> 
+> Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+> ---
+> Changes in v2:
+> -s/BT_USB_AUTOSUSPEND/BT_HCIBTUSB_AUTOSUSPEND/
+> -s/enable_usb_autosuspend/enable_autosuspend/
+> ---
+> drivers/bluetooth/Kconfig | 10 ++++++++++
+> drivers/bluetooth/btusb.c |  7 +++++++
+> 2 files changed, 17 insertions(+)
 
-PulseAudio is currently registering only one source, you will probably
-need to introduce an option in default.pa in order to add more
-endpoints to connect multiple devices.
+patch has been applied to bluetooth-next tree.
 
---=20
-Luiz Augusto von Dentz
+Regards
+
+Marcel
+
