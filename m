@@ -2,52 +2,47 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Jaganath Kanakkassery <jaganath.k.os@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
-Subject: [PATCH 1/3] doc/mgmt-api: Add support for Get supported phys command
-Date: Tue, 14 Nov 2017 16:02:16 +0530
-Message-Id: <1510655538-12883-3-git-send-email-jaganathx.kanakkassery@intel.com>
+Subject: [PATCH] Bluetooth: Define l2cap sock option for LE PHYs
+Date: Tue, 14 Nov 2017 16:02:15 +0530
+Message-Id: <1510655538-12883-2-git-send-email-jaganathx.kanakkassery@intel.com>
 In-Reply-To: <1510655538-12883-1-git-send-email-jaganathx.kanakkassery@intel.com>
 References: <1510655538-12883-1-git-send-email-jaganathx.kanakkassery@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- doc/mgmt-api.txt | 23 +++++++++++++++++++++++
- 1 file changed, 23 insertions(+)
+This defines two socket options, BT_LE_PHY and BT_LE_SUPPORTED_PHYS.
 
-diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
-index 8e7de14..80edb14 100644
---- a/doc/mgmt-api.txt
-+++ b/doc/mgmt-api.txt
-@@ -2916,6 +2916,29 @@ Set Appearance Command
- 				Invalid Parameters
- 				Invalid Index
+BT_LE_SUPPORTED_PHYS cab ne used to get supported phys of the peer devices.
+
+BT_LE_PHY can be used to get the current phy of the connection and also
+to switch phy for the connection.
+
+Signed-off-by: Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
+---
+ include/net/bluetooth/bluetooth.h | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+index e89cff0..f9271d1 100644
+--- a/include/net/bluetooth/bluetooth.h
++++ b/include/net/bluetooth/bluetooth.h
+@@ -122,6 +122,16 @@ struct bt_voice {
+ #define BT_SNDMTU		12
+ #define BT_RCVMTU		13
  
-+Get Supported PHYs Command
-+==========================
++/* This can be used for both set/get the current phy */
++#define BT_LE_PHY	14
 +
-+	Command Code:		0x0043
-+	Controller Index:	<controller id>
-+	Command Parameters:
-+	Return Parameters:	Supported_phys (1 Octet)
++#define BT_LE_PHY_1M 		0
++#define BT_LE_PHY_2M		1
++#define BT_LE_PHY_CODED		2
 +
-+	This command is used to retrieve the supported phys by the
-+	controller.
++/* This can be used only for get peer supported phys */
++#define BT_LE_SUPPORTED_PHYS 15
 +
-+	Supported_phys is a bitmask with the following bits.
-+		0	LE 1M
-+		1	LE 2M
-+		2	LE CODED (LR)
-+
-+	LE 1M would be supported by default.
-+
-+	This command is only available for LE capable controllers.
-+	It will return Not Supported otherwise.
-+
-+	Possible errors:	Not Supported
-+				Invalid Index
- 
- Command Complete Event
- ======================
+ __printf(1, 2)
+ void bt_info(const char *fmt, ...);
+ __printf(1, 2)
 -- 
 2.7.4
 
