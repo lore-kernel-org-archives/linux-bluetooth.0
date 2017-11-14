@@ -1,37 +1,23 @@
-Return-Path: <valdis.kletnieks@vt.edu>
-From: valdis.kletnieks@vt.edu
-To: Hans de Goede <hdegoede@redhat.com>, Marcel Holtmann <marcel@holtmann.org>
-cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: linux-next: Kconfig warning in drivers/bluetooth/Kconfig
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Date: Tue, 14 Nov 2017 14:36:22 -0500
-Message-ID: <59126.1510688182@turing-police.cc.vt.edu>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Thomas Green <TGreen2@Sorenson.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: porting to bluez5
+Date: Tue, 14 Nov 2017 17:38:40 +0000
+Message-ID: <C2BC44D770753C45AAAC42695FB5BE020125718A8C@SLC-EXMB01.CORP.SRELAY.COM>
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-commit 86be3c232877b59f08561b256ff7e73ad39b0785
-Author: Hans de Goede <hdegoede@redhat.com>
-Date:   Mon Nov 13 14:44:16 2017 +0100
+As a follow up to my question before, one of the devices that I'm testing w=
+ith is a Jawbone by Jambox.  In bluez 4.101 when the device would come back=
+ into range it would re-connect and be available for use.  Currently it con=
+nects and in about 700 milliseconds btmon says the remote user terminated t=
+he connection.  Not sure why this would be.   Again, this device worked fin=
+e in bluez4.101.   btmon log for this connection is found at https://pasteb=
+in.com/bkYbNURy
 
-    Bluetooth: btusb: Add a Kconfig option to enable USB autosuspend by default
+Any clues?  And again, what should I use to send a ring indication to a hea=
+dset device as the Alert1 interface has been deprecated?
 
-causes a warning message due to a missing double qupte:
-
-drivers/bluetooth/Kconfig:35:warning: multi-line strings not supported
-
-Signed-off-by: Valdis Kletnieks <valdis.kletnieks@vt.edu>
-
----
-diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
-index eb4101aee787..b44ab176418e 100644
---- a/drivers/bluetooth/Kconfig
-+++ b/drivers/bluetooth/Kconfig
-@@ -32,7 +32,7 @@ config BT_HCIBTUSB
- 	  kernel or say M to compile it as module (btusb).
- 
- config BT_HCIBTUSB_AUTOSUSPEND
--	bool "Enable USB autosuspend for Bluetooth USB devices by default.
-+	bool "Enable USB autosuspend for Bluetooth USB devices by default."
- 	depends on BT_HCIBTUSB
- 	help
- 	  Say Y here to enable USB autosuspend for Bluetooth USB devices by
+Tom
