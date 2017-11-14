@@ -1,33 +1,32 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-From: Alan Martinovic <alan.martinovic@senic.com>
-Date: Tue, 14 Nov 2017 17:48:02 +0100
-Message-ID: <CAOT_U5bHPVAfQsuNqsgD-i=UnNAXp5n981FTqWmuDgC-escT+A@mail.gmail.com>
-Subject: Self qualification of BlueZ with LaunchStudio and Profile Tuning
- Suite (PTS)
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
+Subject: Re: AR3011 Device Under Test
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <CAHuuS6G0JCOHUiohpzzskg7x6kib-Y-ToibjX6vf4vTbwYkLcQ@mail.gmail.com>
+Date: Tue, 14 Nov 2017 15:49:27 +0100
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <9DD19A09-6011-49DC-9B03-05D783C3DC61@holtmann.org>
+References: <CAHuuS6G0JCOHUiohpzzskg7x6kib-Y-ToibjX6vf4vTbwYkLcQ@mail.gmail.com>
+To: Julien Massot <massot.julien@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-It seems like PTS can do the testing automatically with the DUT, a
-dongle from BTSIG (https://bluetoothstore.org/) and the right test
-description from Launch Studio
-(https://www.bluetooth.com/develop-with-bluetooth/test-tools/profile-tuning-suite).
+Hi Julien,
 
-If anyone self qualified the BlueZ host on a product using this
-method, could she/he please share the steps and experiences?
+> I have an usb AR3011 bluetooth chipset in one of my product, and I need to do
+> some radio testing for certification purpose.
+> 
+> I firstly talked to my bluetooth card vendor to get help, but didn't
+> had any reply.
+> 
+> Does anyone already succeed to put an AR3011 (managed by ATH3K driver),
+> under radio test condition ?
 
-How does one work out what elements of the BT standards are required
-in the product?
-(to know what to include in the ICS)
+you can use the HCI commands for test mode.
 
-Is it sufficient to say:
+Regards
 
-"We want to be a Central device that connects to Peripherals, and
-interprets GATT commands" and based on that select "Central" and
-"GATT" in the Launch Studio project, and fix all
-conflicts/dependencies in the ICS generation step?
+Marcel
 
-Be Well,
-Alan
