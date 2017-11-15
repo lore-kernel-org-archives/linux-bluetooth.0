@@ -1,63 +1,101 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: "ruslan.kuzmin@nami.ru" <ruslan.kuzmin@nami.ru>
-To: "luiz.dents@gmail.com" <luiz.dents@gmail.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re : Re: How connect to bluez two headphones
-Date: Wed, 15 Nov 2017 11:55:55 +0000
-Message-ID: <1510746956433.43869@nami.ru>
-Content-Type: text/plain; charset="koi8-r"
 MIME-Version: 1.0
+In-Reply-To: <CADU0VqyM081pHYtNWTxM+ajg-f2-jcs=F_5wCnV5L2_mOQ_TvQ@mail.gmail.com>
+References: <CADU0VqyM081pHYtNWTxM+ajg-f2-jcs=F_5wCnV5L2_mOQ_TvQ@mail.gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Wed, 15 Nov 2017 13:39:09 +0200
+Message-ID: <CABBYNZJKYniLeC3oGn7QgDyVN27VzjY2g=oeauHkQGSqAUfK+w@mail.gmail.com>
+Subject: Re: Security block and Bluez 5.47
+To: John Klug <ski.brimson@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
- нояб. 2017 г. в 07:36 Luiz Augusto von Dentz <luiz.dentz@gmail.com> написал(а):
+Hi John,
 
-	Hi Ruslan,
+On Tue, Nov 14, 2017 at 11:45 PM, John Klug <ski.brimson@gmail.com> wrote:
+> I have tried unblock, and nothing seems to help.
+>
+> Frequently when I connect my Android phone to my bluez 5.47 device I
+> see (btmon):
+>
+>  > HCI Event: Number of Completed Packets (0x13) plen 5
+>
+>                                                             #36 [hci0]
+> 5.709020
+>          Num handles: 1
+>          Handle: 1
+>          Count: 1
+>  < ACL Data TX: Handle 1 flags 0x00 dlen 16
+>
+>                                                             #37 [hci0]
+> 5.714589
+>        L2CAP: Connection Response (0x03) ident 4 len 8
+>          Destination CID: 64
+>          Source CID: 81
+>          Result: Connection refused - security block (0x0003)
+>          Status: No further information available (0x0000)
+>
+> This is using connecting from Android 7 to Bluez 5.47.
 
-	On Mon, Nov 13, 2017 at 10:44 AM, Руслан Кузьмин
-	<kuzminruslan@icloud.com> wrote:
-	Excuse me for my English.I am developer.My task connect two Bluetooth headphones to one Bluetooth adapter.I know in Windows and in bluez4 this feature worked.In bluez5 in connection with pulseaudio created only one virtual A2DP speaker.
-	Long time I am searched reason in pulseaudio (more precisely in pulseaudio sources) but how I knowed what dbus send from bluez to pulseaudio command ClearConfiguration when I am trying connect second headphone. I want to know where in sources of bluez5 limited count of working A2DP profiles.May I am write self hook for pulseaudio for two Bluetooth A2DP headphones?
+I think this might be due to not having a default agent set which is
+needed if the devices is not trusted so it would require agent
+authorization.
 
-	PulseAudio is currently registering only one source, you will probably
-	need to introduce an option in default.pa in order to add more
-	endpoints to connect multiple devices.
+>
+>  [bluetooth]# info DC:74:A8:05:39:77
+>  Device DC:74:A8:05:39:77
+>          Name: John Cell Phone
+>          Alias: John Cell Phone
+>          Class: 0x005a020c
+>          Icon: phone
+>          Paired: yes
+>          Trusted: yes
+>          Blocked: no
+>          Connected: no
+>          LegacyPairing: no
+>          UUID: OBEX Object Push          (00001105-0000-1000-8000-00805f9b34fb)
+>          UUID: Audio Source              (0000110a-0000-1000-8000-00805f9b34fb)
+>          UUID: A/V Remote Control Target (0000110c-0000-1000-8000-00805f9b34fb)
+>          UUID: Headset AG                (00001112-0000-1000-8000-00805f9b34fb)
+>          UUID: PANU                      (00001115-0000-1000-8000-00805f9b34fb)
+>          UUID: NAP                       (00001116-0000-1000-8000-00805f9b34fb)
+>          UUID: Handsfree Audio Gateway   (0000111f-0000-1000-8000-00805f9b34fb)
+>          UUID: Phonebook Access Server   (0000112f-0000-1000-8000-00805f9b34fb)
+>          UUID: Message Access Server     (00001132-0000-1000-8000-00805f9b34fb)
+>          UUID: PnP Information           (00001200-0000-1000-8000-00805f9b34fb)
+>          UUID: Generic Access Profile    (00001800-0000-1000-8000-00805f9b34fb)
+>          UUID: Generic Attribute Profile (00001801-0000-1000-8000-00805f9b34fb)
+>          UUID: Vendor specific           (936da01f-9abd-4d9d-80c7-02af85c822a8)
+>          Modalias: bluetooth:v0075p0100d0200
+>
+>  [bluetooth]# show
+>  Controller 00:23:A7:49:67:FB
+>          Name: MTCDT-pan-Bluez
+>          Alias: MTCDT-pan-Bluez
+>          Class: 0x00020000
+>          Powered: yes
+>          Discoverable: yes
+>          Pairable: yes
+>          UUID: Generic Attribute Profile (00001801-0000-1000-8000-00805f9b34fb)
+>          UUID: NAP                       (00001116-0000-1000-8000-00805f9b34fb)
+>          UUID: A/V Remote Control        (0000110e-0000-1000-8000-00805f9b34fb)
+>          UUID: PnP Information           (00001200-0000-1000-8000-00805f9b34fb)
+>          UUID: Generic Access Profile    (00001800-0000-1000-8000-00805f9b34fb)
+>          UUID: A/V Remote Control Target (0000110c-0000-1000-8000-00805f9b34fb)
+>          Modalias: usb:v1D6Bp0246d052F
+>          Discovering: no
+>
+>  $ bluetoothctl -v
+>  5.47
+> ======================================================
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-	-- 
-	Luiz Augusto von Dentz
-	--
-
-In my default.pa i have only this lines bound with bluetooth :
 
 
-### Automatically load driver modules for Bluetooth hardware
-ifexists module-bluetooth-policy.so
-load-module module-bluetooth-policy
-endif
-
-ifexists module-bluetooth-discover.so
-load-module module-bluetooth-discover headset=ofono
-endif
- 
-
-In file pulseaudio-11.0/src/modules/bluetooth/module-bluez5-policy.c list args:
-
-
-PA_MODULE_USAGE(
-"auto_switch=<Switch between hsp and a2dp profile? (0 - never, 1 - media.role=phone, 2 - heuristic> "
-"a2dp_source=<Handle a2dp_source card profile (sink role)?> "
-"ag=<Handle headset_audio_gateway card profile (headset role)?> "
-"hfgw=<Handle hfgw card profile (headset role)?> DEPRECATED");
-
-
-In file pulseaudio-11.0/src/modules/bluetooth/module-bluetooth-discover.c args:
-
-
-PA_MODULE_USAGE(
-"headset=ofono|native|auto (bluez 5 only)"
-"autodetect_mtu=<boolean> (bluez 5 only)"
-);
-
-How with that args do more endpoints?
-Excuse me for letter from another email - Server vger.kernel.org think what in letter HTML and adding letter in SPAM
-Regards ,Ruslan.
+-- 
+Luiz Augusto von Dentz
