@@ -1,74 +1,78 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-From: John Klug <ski.brimson@gmail.com>
-Date: Wed, 15 Nov 2017 11:03:40 -0600
-Message-ID: <CADU0VqzNOZraF0Gptccz+Hu=1mZEc4ki9Nm96Spexf4h6M2wfg@mail.gmail.com>
-Subject: When can I trust with bluetoothctl and 5.47?
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <larry.finger@gmail.com>
+Sender: Larry Finger <larry.finger@gmail.com>
+From: Larry Finger <Larry.Finger@lwfinger.net>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>
+Cc: linux-kernel@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org,
+	Larry Finger <Larry.Finger@lwfinger.net>,
+	Hon Weng Chong <honwchong@gmail.com>
+Subject: [PATCHi V2] bluetooth: btusb: Add device ID for RTL8822BE
+Date: Wed, 15 Nov 2017 09:45:07 -0600
+Message-Id: <20171115154507.22685-1-Larry.Finger@lwfinger.net>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Over and over again it says device is not available.  When does it
-become available?  Is there a way to do this deterministically?  I
-quickly entered trust (it was saved from previous executions
-unsuccessfully) after pairing.  Then after connecting, all to no
-avail.
+The Asus Z370-I contains a Realtek RTL8822BE device with an associated
+BT chip using a USB ID of 0b05:185c. This device is added to the driver.
+The output of /sys/kernel/debug/usb/devices for this device is as follows:
 
-Is there documentation on this?
+T:  Bus=01 Lev=01 Prnt=01 Port=13 Cnt=07 Dev#= 14 Spd=12   MxCh= 0
+D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=0b05 ProdID=185c Rev= 1.10
+S:  Manufacturer=Realtek 
+S:  Product=Bluetooth Radio 
+S:  SerialNumber=00e04c000001
+C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=500mA
+I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
 
-The remote in this case is Broadcom 6.5.1.6000 stack.
 
-[agent] Confirm passkey 702629 (yes/no): yes
-[CHG] Device 5C:F3:70:74:04:AF UUIDs: 00001000-0000-1000-8000-00805f9b34fb
-[CHG] Device 5C:F3:70:74:04:AF UUIDs: 00001115-0000-1000-8000-00805f9b34fb
-[CHG] Device 5C:F3:70:74:04:AF ServicesResolved: yes
-[CHG] Device 5C:F3:70:74:04:AF Paired: yes
-[John Conduit Klug (SGH-M919)]# trust  5C:F3:70:74:04:AF
-Device  5C:F3:70:74:04:AF not available
-[CHG] Device 5C:F3:70:74:04:AF ServicesResolved: no
-[CHG] Device 5C:F3:70:74:04:AF Connected: no
-[John Conduit Klug (SGH-M919)]# trust  5C:F3:70:74:04:AF
-Device  5C:F3:70:74:04:AF not available
-[John Conduit Klug (SGH-M919)]# devices
-Device BC:44:86:56:6B:95 John Conduit Klug (SGH-M919)
-Device 5C:F3:70:74:04:AF CALMQUIST-L1
-[John Conduit Klug (SGH-M919)]# info 5C:F3:70:74:04:AF
-Device 5C:F3:70:74:04:AF
-    Name: CALMQUIST-L1
-    Alias: CALMQUIST-L1
-    Class: 0x0002010c
-    Icon: computer
-    Paired: yes
-    Trusted: no
-    Blocked: no
-    Connected: no
-    LegacyPairing: no
-    UUID: Service Discovery Serve.. (00001000-0000-1000-8000-00805f9b34fb)
-    UUID: PANU                      (00001115-0000-1000-8000-00805f9b34fb)
-[John Conduit Klug (SGH-M919)]# trust  5C:F3:70:74:04:AF
-Device  5C:F3:70:74:04:AF not available
-[CHG] Device BC:44:86:56:6B:95 Connected: no
-[bluetooth]# trust  5C:F3:70:74:04:AF
-Device  5C:F3:70:74:04:AF not available
-[bluetooth]# devices
-Device BC:44:86:56:6B:95 John Conduit Klug (SGH-M919)
-Device 5C:F3:70:74:04:AF CALMQUIST-L1
-[CHG] Device 5C:F3:70:74:04:AF Connected: yes
-Authorize service
-[agent] Authorize service 0000000f-0000-1000-8000-00805f9b34fb (yes/no): yes
-[CALMQUIST-L1]# trust  5C:F3:70:74:04:AF
-Device  5C:F3:70:74:04:AF not available
-[CALMQUIST-L1]# info 5C:F3:70:74:04:AF
-Device 5C:F3:70:74:04:AF
-    Name: CALMQUIST-L1
-    Alias: CALMQUIST-L1
-    Class: 0x0002010c
-    Icon: computer
-    Paired: yes
-    Trusted: no
-    Blocked: no
-    Connected: yes
-    LegacyPairing: no
-    UUID: Service Discovery Serve.. (00001000-0000-1000-8000-00805f9b34fb)
-    UUID: PANU                      (00001115-0000-1000-8000-0080
+
+Signed-off-by: Hon Weng Chong <honwchong@gmail.com>
+Signed-off-by: Larry Finger <Larry.Finger@lwfinger.net>
+---
+
+V2 - Added output from /sys/kernel/debug/usb/devices
+     Fixed typo in PID
+
+---
+ drivers/bluetooth/btusb.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 7a5c06aaa181..c265ef63cab7 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -373,6 +373,9 @@ static const struct usb_device_id blacklist_table[] = {
+ 	{ USB_DEVICE(0x13d3, 0x3461), .driver_info = BTUSB_REALTEK },
+ 	{ USB_DEVICE(0x13d3, 0x3462), .driver_info = BTUSB_REALTEK },
+ 
++	/* Additional Realtek 8822BE Bluetooth devices */
++	{ USB_DEVICE(0x0b05, 0x185c), .driver_info = BTUSB_REALTEK },
++
+ 	/* Silicon Wave based devices */
+ 	{ USB_DEVICE(0x0c10, 0x0000), .driver_info = BTUSB_SWAVE },
+ 
+-- 
+2.15.0
