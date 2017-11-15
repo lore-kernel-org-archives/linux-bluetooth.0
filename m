@@ -1,32 +1,55 @@
-Return-Path: <massot.julien@gmail.com>
-MIME-Version: 1.0
-In-Reply-To: <9DD19A09-6011-49DC-9B03-05D783C3DC61@holtmann.org>
-References: <CAHuuS6G0JCOHUiohpzzskg7x6kib-Y-ToibjX6vf4vTbwYkLcQ@mail.gmail.com>
- <9DD19A09-6011-49DC-9B03-05D783C3DC61@holtmann.org>
-From: Julien Massot <massot.julien@gmail.com>
-Date: Wed, 15 Nov 2017 09:06:50 +0100
-Message-ID: <CAHuuS6FJUF0mO1DRe9mzC2h7Nx_LXL26wHSFzgVgeH8ZcN4jzQ@mail.gmail.com>
-Subject: Re: AR3011 Device Under Test
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Return-Path: <amitkarwar@gmail.com>
+From: Amitkumar Karwar <amitkarwar@gmail.com>
+To: Kalle Valo <kvalo@codeaurora.org>,
+	marcel@holtmann.org
+Cc: linux-wireless@vger.kernel.org,
+	Amitkumar Karwar <amit.karwar@redpinesignals.com>,
+	Prameela Rani Garnepudi <prameela.j04cs@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Subject: [PATCH 8/8] rsi: sdio changes to support BT
+Date: Wed, 15 Nov 2017 12:50:44 +0530
+Message-Id: <1510730444-3237-9-git-send-email-amitkarwar@gmail.com>
+In-Reply-To: <1510730444-3237-1-git-send-email-amitkarwar@gmail.com>
+References: <1510730444-3237-1-git-send-email-amitkarwar@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+From: Prameela Rani Garnepudi <prameela.j04cs@gmail.com>
 
->> Does anyone already succeed to put an AR3011 (managed by ATH3K driver),
->> under radio test condition ?
->
-> you can use the HCI commands for test mode.
+Queue number is correctly updated for BT traffic. Also, kzalloc
+instead of kmalloc is used for Rx packet allocation.
 
-Thanks a lot, I didn't search the right way, and the solution was in bluetooth
-specification.
+Signed-off-by: Prameela Rani Garnepudi <prameela.j04cs@gmail.com>
+Signed-off-by: Amitkumar Karwar <amit.karwar@redpinesignals.com>
+---
+ drivers/net/wireless/rsi/rsi_91x_sdio.c     | 2 ++
+ drivers/net/wireless/rsi/rsi_91x_sdio_ops.c | 2 +-
+ 2 files changed, 3 insertions(+), 1 deletion(-)
 
-Was stuck on WiFi way of thinking in which any constructor have it's own way.
-
-So for future people looking at this topic please read
-BLUETOOTH SPECIFICATION Version 2.0 + EDR [vol 3]
-"7.6.3 Enable Device Under Test Mode Command"
-
-Best Regards,
-Julien
+diff --git a/drivers/net/wireless/rsi/rsi_91x_sdio.c b/drivers/net/wireless/rsi/rsi_91x_sdio.c
+index 5722736..beb18d0 100644
+--- a/drivers/net/wireless/rsi/rsi_91x_sdio.c
++++ b/drivers/net/wireless/rsi/rsi_91x_sdio.c
+@@ -763,6 +763,8 @@ static int rsi_sdio_host_intf_write_pkt(struct rsi_hw *adapter,
+ 	int status;
+ 
+ 	queueno = ((pkt[1] >> 4) & 0xf);
++	if (queueno == RSI_BT_MGMT_Q || queueno == RSI_BT_DATA_Q)
++		queueno = RSI_BT_Q;
+ 
+ 	num_blocks = len / block_size;
+ 
+diff --git a/drivers/net/wireless/rsi/rsi_91x_sdio_ops.c b/drivers/net/wireless/rsi/rsi_91x_sdio_ops.c
+index 26abe51..83652bd 100644
+--- a/drivers/net/wireless/rsi/rsi_91x_sdio_ops.c
++++ b/drivers/net/wireless/rsi/rsi_91x_sdio_ops.c
+@@ -103,7 +103,7 @@ static int rsi_process_pkt(struct rsi_common *common)
+ 
+ 	rcv_pkt_len = (num_blks * 256);
+ 
+-	common->rx_data_pkt = kmalloc(rcv_pkt_len, GFP_KERNEL);
++	common->rx_data_pkt = kzalloc(rcv_pkt_len, GFP_KERNEL);
+ 	if (!common->rx_data_pkt) {
+ 		rsi_dbg(ERR_ZONE, "%s: Failed in memory allocation\n",
+ 			__func__);
+-- 
+2.7.4
