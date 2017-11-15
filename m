@@ -1,49 +1,39 @@
-Return-Path: <linux-kernel-owner@vger.kernel.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
-Subject: Re: [PATCH] Bluettoth: btusb: Prevent USB devices to autosuspend
- while setting interface
+Subject: Re: AR3011 Device Under Test
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1510747888-13912-1-git-send-email-abhijeet.kumar@intel.com>
-Date: Wed, 15 Nov 2017 14:54:45 +0100
-Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Message-Id: <395C47EC-9D79-451D-B774-9F6D6555F100@holtmann.org>
-References: <1510747888-13912-1-git-send-email-abhijeet.kumar@intel.com>
-To: abhijeet.kumar@intel.com
-Sender: linux-kernel-owner@vger.kernel.org
+In-Reply-To: <CAHuuS6FJUF0mO1DRe9mzC2h7Nx_LXL26wHSFzgVgeH8ZcN4jzQ@mail.gmail.com>
+Date: Wed, 15 Nov 2017 14:53:41 +0100
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <3F85D5AE-FCCF-47C7-A520-6D2DFCCBA458@holtmann.org>
+References: <CAHuuS6G0JCOHUiohpzzskg7x6kib-Y-ToibjX6vf4vTbwYkLcQ@mail.gmail.com>
+ <9DD19A09-6011-49DC-9B03-05D783C3DC61@holtmann.org>
+ <CAHuuS6FJUF0mO1DRe9mzC2h7Nx_LXL26wHSFzgVgeH8ZcN4jzQ@mail.gmail.com>
+To: Julien Massot <massot.julien@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Abhijeet,
+Hi Julien,
 
-> Runtime resume USB device in order to ensure that PM framework knows
-> that the we might be using the device in a short time and doesn't
-> autosuspend the device while we update it's interface.
+>>> Does anyone already succeed to put an AR3011 (managed by ATH3K driver),
+>>> under radio test condition ?
+>> 
+>> you can use the HCI commands for test mode.
 > 
-> Signed-off-by: Abhijeet Kumar <abhijeet.kumar@intel.com>
-> ---
-> drivers/bluetooth/btusb.c | 6 ++++++
-> 1 file changed, 6 insertions(+)
+> Thanks a lot, I didn't search the right way, and the solution was in bluetooth
+> specification.
 > 
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index 7a5c06aaa181..588aabf991be 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -1444,6 +1444,12 @@ static void btusb_work(struct work_struct *work)
-> 			data->sco_skb = NULL;
-> 			spin_unlock_irqrestore(&data->rxlock, flags);
+> Was stuck on WiFi way of thinking in which any constructor have it's own way.
 > 
-> +			 /*
-> +			  *Letting runtime PM know that we wish to use
-> +			  *the device in a short time.
-> +			  */
-> +			  pm_runtime_get(&data->udev->dev);
-> +
+> So for future people looking at this topic please read
+> BLUETOOTH SPECIFICATION Version 2.0 + EDR [vol 3]
+> "7.6.3 Enable Device Under Test Mode Command"
 
-the indentation is wrong here and the comment coding style if off. Please fix.
+I think that I added /sys/kernel/debug/bluetooth/hci0/dut_mode or something like that.
 
 Regards
 
 Marcel
+
