@@ -1,49 +1,51 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Date: Wed, 15 Nov 2017 16:09:10 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: John Klug <ski.brimson@gmail.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: Security block and Bluez 5.47
-Message-ID: <20171115140910.GA19963@x1c.lan>
-References: <CADU0VqyM081pHYtNWTxM+ajg-f2-jcs=F_5wCnV5L2_mOQ_TvQ@mail.gmail.com>
- <CABBYNZJKYniLeC3oGn7QgDyVN27VzjY2g=oeauHkQGSqAUfK+w@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <CABBYNZJKYniLeC3oGn7QgDyVN27VzjY2g=oeauHkQGSqAUfK+w@mail.gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <hadess@hadess.net>
+Message-ID: <1510754477.2510.23.camel@hadess.net>
+Subject: Re: [PATCH] Bluettoth: btusb: Prevent USB devices to autosuspend
+ while setting interface
+From: Bastien Nocera <hadess@hadess.net>
+To: Marcel Holtmann <marcel@holtmann.org>, abhijeet.kumar@intel.com
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>, Johan Hedberg
+	 <johan.hedberg@gmail.com>, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Date: Wed, 15 Nov 2017 15:01:17 +0100
+In-Reply-To: <395C47EC-9D79-451D-B774-9F6D6555F100@holtmann.org>
+References: <1510747888-13912-1-git-send-email-abhijeet.kumar@intel.com>
+	 <395C47EC-9D79-451D-B774-9F6D6555F100@holtmann.org>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
-
-On Wed, Nov 15, 2017, Luiz Augusto von Dentz wrote:
-> > Frequently when I connect my Android phone to my bluez 5.47 device I
-> > see (btmon):
-> >
-> >  > HCI Event: Number of Completed Packets (0x13) plen 5
-> >
-> >                                                             #36 [hci0]
-> > 5.709020
-> >          Num handles: 1
-> >          Handle: 1
-> >          Count: 1
-> >  < ACL Data TX: Handle 1 flags 0x00 dlen 16
-> >
-> >                                                             #37 [hci0]
-> > 5.714589
-> >        L2CAP: Connection Response (0x03) ident 4 len 8
-> >          Destination CID: 64
-> >          Source CID: 81
-> >          Result: Connection refused - security block (0x0003)
-> >          Status: No further information available (0x0000)
-> >
-> > This is using connecting from Android 7 to Bluez 5.47.
+On Wed, 2017-11-15 at 14:54 +0100, Marcel Holtmann wrote:
+> Hi Abhijeet,
 > 
-> I think this might be due to not having a default agent set which is
-> needed if the devices is not trusted so it would require agent
-> authorization.
+> > Runtime resume USB device in order to ensure that PM framework
+> > knows
+> > that the we might be using the device in a short time and doesn't
+> > autosuspend the device while we update it's interface.
+> > 
+> > Signed-off-by: Abhijeet Kumar <abhijeet.kumar@intel.com>
+> > ---
+> > drivers/bluetooth/btusb.c | 6 ++++++
+> > 1 file changed, 6 insertions(+)
+> > 
+> > diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> > index 7a5c06aaa181..588aabf991be 100644
+> > --- a/drivers/bluetooth/btusb.c
+> > +++ b/drivers/bluetooth/btusb.c
+> > @@ -1444,6 +1444,12 @@ static void btusb_work(struct work_struct
+> > *work)
+> > 			data->sco_skb = NULL;
+> > 			spin_unlock_irqrestore(&data->rxlock, flags);
+> > 
+> > +			 /*
+> > +			  *Letting runtime PM know that we wish to
+> > use
+> > +			  *the device in a short time.
+> > +			  */
+> > +			  pm_runtime_get(&data->udev->dev);
+> > +
+> 
+> the indentation is wrong here and the comment coding style if off.
+> Please fix.
 
-It could also be the USB HCI race between ACL data and HCI events. It's
-hard to say for sure though since the complete HCI log was not provided.
-
-Johan
+And there's a typo in the commit message ("its interface").
