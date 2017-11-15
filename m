@@ -1,97 +1,32 @@
-Return-Path: <arend.vanspriel@broadcom.com>
-Subject: Re: [PATCH 7/8] rsi: add module parameter operating mode
-To: Amitkumar Karwar <amitkarwar@gmail.com>, Kalle Valo
- <kvalo@codeaurora.org>, marcel@holtmann.org
-References: <1510730444-3237-1-git-send-email-amitkarwar@gmail.com>
- <1510730444-3237-8-git-send-email-amitkarwar@gmail.com>
-Cc: linux-wireless@vger.kernel.org,
- Amitkumar Karwar <amit.karwar@redpinesignals.com>,
- Prameela Rani Garnepudi <prameela.j04cs@gmail.com>,
- linux-bluetooth@vger.kernel.org,
- Siva Rebbagondla <siva.rebbagondla@redpinesignals.com>
-From: Arend van Spriel <arend.vanspriel@broadcom.com>
-Message-ID: <5A0C013F.2080103@broadcom.com>
-Date: Wed, 15 Nov 2017 09:56:31 +0100
+Return-Path: <massot.julien@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <1510730444-3237-8-git-send-email-amitkarwar@gmail.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+In-Reply-To: <9DD19A09-6011-49DC-9B03-05D783C3DC61@holtmann.org>
+References: <CAHuuS6G0JCOHUiohpzzskg7x6kib-Y-ToibjX6vf4vTbwYkLcQ@mail.gmail.com>
+ <9DD19A09-6011-49DC-9B03-05D783C3DC61@holtmann.org>
+From: Julien Massot <massot.julien@gmail.com>
+Date: Wed, 15 Nov 2017 09:06:50 +0100
+Message-ID: <CAHuuS6FJUF0mO1DRe9mzC2h7Nx_LXL26wHSFzgVgeH8ZcN4jzQ@mail.gmail.com>
+Subject: Re: AR3011 Device Under Test
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 11/15/2017 8:20 AM, Amitkumar Karwar wrote:
-> From: Prameela Rani Garnepudi <prameela.j04cs@gmail.com>
+Hi Marcel,
+
+>> Does anyone already succeed to put an AR3011 (managed by ATH3K driver),
+>> under radio test condition ?
 >
-> Operating mode determines the support for other protocols.
-> This is made as module parameter for better usage.
->
-> Signed-off-by: Prameela Rani Garnepudi <prameela.j04cs@gmail.com>
-> Signed-off-by: Siva Rebbagondla <siva.rebbagondla@redpinesignals.com>
-> Signed-off-by: Amitkumar Karwar <amit.karwar@redpinesignals.com>
-> ---
+> you can use the HCI commands for test mode.
 
-[...]
+Thanks a lot, I didn't search the right way, and the solution was in bluetooth
+specification.
 
-> -struct rsi_hw *rsi_91x_init(void)
-> +struct rsi_hw *rsi_91x_init(u16 oper_mode)
->   {
->   	struct rsi_hw *adapter = NULL;
->   	struct rsi_common *common = NULL;
-> @@ -320,11 +336,34 @@ struct rsi_hw *rsi_91x_init(void)
->   	spin_lock_init(&adapter->ps_lock);
->   	timer_setup(&common->roc_timer, rsi_roc_timeout, 0);
->   	init_completion(&common->wlan_init_completion);
-> +	common->oper_mode = oper_mode;
->   	common->init_done = true;
-> -
-> -	common->coex_mode = RSI_DEV_COEX_MODE_WIFI_ALONE;
-> -	common->oper_mode = RSI_DEV_OPMODE_WIFI_ALONE;
->   	adapter->device_model = RSI_DEV_9113;
+Was stuck on WiFi way of thinking in which any constructor have it's own way.
 
-Seems there are definitions for coex_mode....
-> +
-> +	/* Determine coex mode */
-> +	switch (common->oper_mode) {
-> +	case DEV_OPMODE_STA_BT_DUAL:
-> +	case DEV_OPMODE_STA_BT:
-> +	case DEV_OPMODE_STA_BT_LE:
-> +	case DEV_OPMODE_BT_ALONE:
-> +	case DEV_OPMODE_BT_LE_ALONE:
-> +	case DEV_OPMODE_BT_DUAL:
-> +		common->coex_mode = 2;
+So for future people looking at this topic please read
+BLUETOOTH SPECIFICATION Version 2.0 + EDR [vol 3]
+"7.6.3 Enable Device Under Test Mode Command"
 
-... why use magic values here ?
-
-> +		break;
-> +	case DEV_OPMODE_AP_BT_DUAL:
-> +	case DEV_OPMODE_AP_BT:
-> +		common->coex_mode = 4;
-> +		break;
-> +	case DEV_OPMODE_WIFI_ALONE:
-> +		common->coex_mode = 1;
-> +		break;
-> +	default:
-> +		common->oper_mode = 1;
-> +		common->coex_mode = 1;
-> +	}
-> +	rsi_dbg(INFO_ZONE, "%s: oper_mode = %d, coex_mode = %d\n",
-> +		__func__, common->oper_mode, common->coex_mode);
-> +
->   	if (common->coex_mode > 1) {
->   		if (rsi_coex_attach(common)) {
->   			rsi_dbg(ERR_ZONE, "Failed to init coex module\n");
-> @@ -359,10 +398,13 @@ void rsi_91x_deinit(struct rsi_hw *adapter)
->   	for (ii = 0; ii < NUM_SOFT_QUEUES; ii++)
->   		skb_queue_purge(&common->tx_queue[ii]);
->
-> -	common->init_done = false;
-> -
-> -	if (common->coex_mode > 1)
-> +	if (common->coex_mode > 1) {
->   		rsi_coex_detach(common);
-> +		if (g_proto_ops.bt_ops->detach)
-> +			g_proto_ops.bt_ops->detach(common->bt_adapter);
-> +	}
-> +
-> +	common->init_done = false;
-
-Regards,
-Arend
+Best Regards,
+Julien
