@@ -1,33 +1,40 @@
-Return-Path: <amitkarwar@gmail.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Date: Wed, 15 Nov 2017 19:44:19 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: John Klug <ski.brimson@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: When can I trust with bluetoothctl and 5.47?
+Message-ID: <20171115174419.GA1019@x1c.home>
+References: <CADU0VqzNOZraF0Gptccz+Hu=1mZEc4ki9Nm96Spexf4h6M2wfg@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <440EED52-0556-4919-9727-078B2A7192D6@holtmann.org>
-References: <1510730444-3237-1-git-send-email-amitkarwar@gmail.com>
- <1510730444-3237-3-git-send-email-amitkarwar@gmail.com> <440EED52-0556-4919-9727-078B2A7192D6@holtmann.org>
-From: Amitkumar Karwar <amitkarwar@gmail.com>
-Date: Thu, 16 Nov 2017 10:42:27 +0530
-Message-ID: <CAEhWJFn+t69YL6vXjSeRZw1hPggReOSFP6g0xTv8qYPiJv=UDg@mail.gmail.com>
-Subject: Re: [PATCH 2/8] rsi: add bluetooth rx endpoint
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Kalle Valo <kvalo@codeaurora.org>, linux-wireless <linux-wireless@vger.kernel.org>,
-	Amitkumar Karwar <amit.karwar@redpinesignals.com>,
-	Prameela Rani Garnepudi <prameela.j04cs@gmail.com>,
-	"open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-	Siva Rebbagondla <siva.rebbagondla@redpinesignals.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CADU0VqzNOZraF0Gptccz+Hu=1mZEc4ki9Nm96Spexf4h6M2wfg@mail.gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, Nov 15, 2017 at 8:53 PM, Marcel Holtmann <marcel@holtmann.org> wrot=
-e:
-> Hi Amitkumar,
->
->> USB endpoint 1 is used for WLAN which is presently in use.
->> USB endpoint 2 is introduced for BT Rx traffic. Enumeration
->> of Rx BT endpoint and submitting Rx BT URB are added.
->
-> wouldn=E2=80=99t it be good to include the /sys/kernel/debug/usb/devices =
-part here that shows how the USB device=E2=80=99s layout.
+Hi John,
 
-Sure. We will do this in updated version.
+On Wed, Nov 15, 2017, John Klug wrote:
+> Over and over again it says device is not available.  When does it
+> become available?  Is there a way to do this deterministically?  I
+> quickly entered trust (it was saved from previous executions
+> unsuccessfully) after pairing.  Then after connecting, all to no
+> avail.
+> 
+> Is there documentation on this?
+> 
+> The remote in this case is Broadcom 6.5.1.6000 stack.
+> 
+> [agent] Confirm passkey 702629 (yes/no): yes
+> [CHG] Device 5C:F3:70:74:04:AF UUIDs: 00001000-0000-1000-8000-00805f9b34fb
+> [CHG] Device 5C:F3:70:74:04:AF UUIDs: 00001115-0000-1000-8000-00805f9b34fb
+> [CHG] Device 5C:F3:70:74:04:AF ServicesResolved: yes
+> [CHG] Device 5C:F3:70:74:04:AF Paired: yes
+> [John Conduit Klug (SGH-M919)]# trust  5C:F3:70:74:04:AF
+> Device  5C:F3:70:74:04:AF not available
 
-Regards,
-Amitkumar
+I think bluetoothctl has a bug where it doesn't strip whitespace from
+the beginning of arguments. In your case you have two spaces between
+trust and the address. Try removing one.
+
+Johan
