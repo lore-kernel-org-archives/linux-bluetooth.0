@@ -1,687 +1,536 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 1/2] shared/shell: Add initial implementation
-Date: Wed, 15 Nov 2017 14:18:57 +0200
-Message-Id: <20171115121858.11597-1-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ] avctp: Use different queues for passthrough and vendor PDUs
+Date: Wed, 15 Nov 2017 14:07:13 +0200
+Message-Id: <20171115120713.7888-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This add initial bt_shell helper which can be used to create shell-like
-command line tools.
+passthrough commands comes from a different specification which can
+have more specific rules regarding timeout, etc, so this moves button
+presses to their own queue which should enable them to be send in
+parallel to other command on the control channel.
 ---
- Makefile.tools     |   3 +-
- src/shared/shell.c | 570 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- src/shared/shell.h |  67 +++++++
- 3 files changed, 639 insertions(+), 1 deletion(-)
- create mode 100644 src/shared/shell.c
- create mode 100644 src/shared/shell.h
+ profiles/audio/avctp.c | 225 +++++++++++++++++++++++++++++++++----------------
+ 1 file changed, 152 insertions(+), 73 deletions(-)
 
-diff --git a/Makefile.tools b/Makefile.tools
-index 561302fa1..dc2902cb7 100644
---- a/Makefile.tools
-+++ b/Makefile.tools
-@@ -8,7 +8,8 @@ client_bluetoothctl_SOURCES = client/main.c \
- 					client/advertising.h \
- 					client/advertising.c \
- 					client/gatt.h client/gatt.c \
--					monitor/uuid.h monitor/uuid.c
-+					monitor/uuid.h monitor/uuid.c \
-+					src/shared/shell.h src/shared/shell.c
- client_bluetoothctl_LDADD = gdbus/libgdbus-internal.la src/libshared-glib.la \
- 				@GLIB_LIBS@ @DBUS_LIBS@ -lreadline
- endif
-diff --git a/src/shared/shell.c b/src/shared/shell.c
-new file mode 100644
-index 000000000..7db629bf1
---- /dev/null
-+++ b/src/shared/shell.c
-@@ -0,0 +1,570 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2017  Intel Corporation. All rights reserved.
-+ *
-+ *
-+ *  This library is free software; you can redistribute it and/or
-+ *  modify it under the terms of the GNU Lesser General Public
-+ *  License as published by the Free Software Foundation; either
-+ *  version 2.1 of the License, or (at your option) any later version.
-+ *
-+ *  This library is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ *  Lesser General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU Lesser General Public
-+ *  License along with this library; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+#include <stdio.h>
-+#include <errno.h>
-+#include <unistd.h>
-+#include <stdlib.h>
-+#include <stdbool.h>
-+#include <signal.h>
-+#include <sys/signalfd.h>
-+
-+#include <readline/readline.h>
-+#include <readline/history.h>
-+#include <glib.h>
-+
-+#include "src/shared/io.h"
-+#include "src/shared/util.h"
-+#include "src/shared/queue.h"
-+#include "src/shared/shell.h"
-+
-+#define CMD_LENGTH	48
-+#define print_text(color, fmt, args...) \
-+		printf(color fmt COLOR_OFF "\n", ## args)
-+#define print_menu(cmd, args, desc) \
-+		printf(COLOR_HIGHLIGHT "%s %-*s " COLOR_OFF "%s\n", \
-+			cmd, (int)(CMD_LENGTH - strlen(cmd)), args, desc)
-+
-+static GMainLoop *main_loop;
-+static gboolean option_version = FALSE;
-+
-+static struct {
-+	struct io *input;
-+
-+	bool saved_prompt;
-+	bt_shell_prompt_input_func saved_func;
-+	void *saved_user_data;
-+
-+	const struct bt_shell_menu_entry *menu;
-+	/* TODO: Add submenus support */
-+} data;
-+
-+static void shell_print_menu(void);
-+
-+static void cmd_version(const char *arg)
-+{
-+	bt_shell_printf("Version %s\n", VERSION);
-+}
-+
-+static void cmd_quit(const char *arg)
-+{
-+	g_main_loop_quit(main_loop);
-+}
-+
-+static void cmd_help(const char *arg)
-+{
-+	shell_print_menu();
-+}
-+
-+static const struct bt_shell_menu_entry default_menu[] = {
-+	{ "version",      NULL,       cmd_version, "Display version" },
-+	{ "quit",         NULL,       cmd_quit, "Quit program" },
-+	{ "exit",         NULL,       cmd_quit, "Quit program" },
-+	{ "help",         NULL,       cmd_help,
-+					"Display help about this program" },
-+	{ }
+diff --git a/profiles/audio/avctp.c b/profiles/audio/avctp.c
+index 0d395814c..43309a020 100644
+--- a/profiles/audio/avctp.c
++++ b/profiles/audio/avctp.c
+@@ -61,7 +61,7 @@
+  */
+ #define AVC_PRESS_TIMEOUT	2
+ 
+-#define CONTROL_TIMEOUT		AVC_PRESS_TIMEOUT
++#define CONTROL_TIMEOUT		10
+ #define BROWSING_TIMEOUT	10
+ 
+ #define QUIRK_NO_RELEASE 1 << 0
+@@ -154,7 +154,7 @@ struct avctp_browsing_req {
+ typedef int (*avctp_process_cb) (void *data);
+ 
+ struct avctp_pending_req {
+-	struct avctp_channel *chan;
++	struct avctp_queue *queue;
+ 	uint8_t transaction;
+ 	guint timeout;
+ 	bool retry;
+@@ -164,6 +164,13 @@ struct avctp_pending_req {
+ 	GDestroyNotify destroy;
+ };
+ 
++struct avctp_queue {
++	struct avctp_channel *chan;
++	struct avctp_pending_req *p;
++	GQueue *queue;
++	guint process_id;
 +};
 +
-+static void shell_print_menu(void)
+ struct avctp_channel {
+ 	struct avctp *session;
+ 	GIOChannel *io;
+@@ -173,10 +180,8 @@ struct avctp_channel {
+ 	uint16_t omtu;
+ 	uint8_t *buffer;
+ 	GSList *handlers;
+-	struct avctp_pending_req *p;
+-	GQueue *queue;
++	GSList *queues;
+ 	GSList *processed;
+-	guint process_id;
+ 	GDestroyNotify destroy;
+ };
+ 
+@@ -514,6 +519,21 @@ static void pending_destroy(gpointer data, gpointer user_data)
+ 	g_free(req);
+ }
+ 
++static void avctp_queue_destroy(void *data)
 +{
-+	const struct bt_shell_menu_entry *entry;
++	struct avctp_queue *queue = data;
 +
-+	if (!data.menu)
-+		return;
++	if (queue->process_id > 0)
++		g_source_remove(queue->process_id);
 +
-+	print_text(COLOR_HIGHLIGHT, "Available commands:");
-+	print_text(COLOR_HIGHLIGHT, "-------------------");
-+	for (entry = data.menu; entry->cmd; entry++) {
-+		print_menu(entry->cmd, entry->arg ? : "", entry->desc ? : "");
-+	}
++	if (queue->p)
++		pending_destroy(queue->p, NULL);
 +
-+	for (entry = default_menu; entry->cmd; entry++) {
-+		print_menu(entry->cmd, entry->arg ? : "", entry->desc ? : "");
-+	}
++	g_queue_foreach(queue->queue, pending_destroy, NULL);
++	g_queue_free(queue->queue);
++	g_free(queue);
 +}
 +
-+static void shell_exec(const char *cmd, const char *arg)
+ static void avctp_channel_destroy(struct avctp_channel *chan)
+ {
+ 	g_io_channel_shutdown(chan->io, TRUE, NULL);
+@@ -522,18 +542,11 @@ static void avctp_channel_destroy(struct avctp_channel *chan)
+ 	if (chan->watch)
+ 		g_source_remove(chan->watch);
+ 
+-	if (chan->p)
+-		pending_destroy(chan->p, NULL);
+-
+-	if (chan->process_id > 0)
+-		g_source_remove(chan->process_id);
+-
+ 	if (chan->destroy)
+ 		chan->destroy(chan);
+ 
+ 	g_free(chan->buffer);
+-	g_queue_foreach(chan->queue, pending_destroy, NULL);
+-	g_queue_free(chan->queue);
++	g_slist_free_full(chan->queues, avctp_queue_destroy);
+ 	g_slist_foreach(chan->processed, pending_destroy, NULL);
+ 	g_slist_free(chan->processed);
+ 	g_slist_free_full(chan->handlers, g_free);
+@@ -700,10 +713,11 @@ static int avctp_send(struct avctp_channel *control, uint8_t transaction,
+ 	return err;
+ }
+ 
+-static int avctp_browsing_send(struct avctp_channel *browsing,
++static int avctp_browsing_send(struct avctp_queue *queue,
+ 				uint8_t transaction, uint8_t cr,
+ 				uint8_t *operands, size_t operand_count)
+ {
++	struct avctp_channel *browsing = queue->chan;
+ 	struct avctp_header *avctp;
+ 	struct msghdr msg;
+ 	struct iovec iov[2];
+@@ -742,7 +756,7 @@ static void control_req_destroy(void *data)
+ {
+ 	struct avctp_control_req *req = data;
+ 	struct avctp_pending_req *p = req->p;
+-	struct avctp *session = p->chan->session;
++	struct avctp *session = p->queue->chan->session;
+ 
+ 	if (p->err == 0 || req->func == NULL)
+ 		goto done;
+@@ -759,7 +773,7 @@ static void browsing_req_destroy(void *data)
+ {
+ 	struct avctp_browsing_req *req = data;
+ 	struct avctp_pending_req *p = req->p;
+-	struct avctp *session = p->chan->session;
++	struct avctp *session = p->queue->chan->session;
+ 
+ 	if (p->err == 0 || req->func == NULL)
+ 		goto done;
+@@ -773,8 +787,8 @@ done:
+ 
+ static gboolean req_timeout(gpointer user_data)
+ {
+-	struct avctp_channel *chan = user_data;
+-	struct avctp_pending_req *p = chan->p;
++	struct avctp_queue *queue = user_data;
++	struct avctp_pending_req *p = queue->p;
+ 
+ 	DBG("transaction %u retry %s", p->transaction, p->retry ? "true" :
+ 								"false");
+@@ -789,31 +803,48 @@ static gboolean req_timeout(gpointer user_data)
+ 	p->err = -ETIMEDOUT;
+ 
+ 	pending_destroy(p, NULL);
+-	chan->p = NULL;
++	queue->p = NULL;
+ 
+-	if (chan->process_id == 0)
+-		chan->process_id = g_idle_add(process_queue, chan);
++	if (queue->process_id == 0)
++		queue->process_id = g_idle_add(process_queue, queue);
+ 
+ 	return FALSE;
+ }
+ 
++static int process_passthrough(void *data)
 +{
-+	const struct bt_shell_menu_entry *entry;
++	struct avctp_control_req *req = data;
++	struct avctp_pending_req *p = req->p;
++	int ret;
 +
-+	if (!data.menu || !cmd)
-+		return;
++	ret = avctp_send(p->queue->chan, p->transaction, AVCTP_COMMAND,
++			req->code, req->subunit, req->op, req->operands,
++			req->operand_count);
++	if (ret < 0)
++		return ret;
 +
-+	for (entry = data.menu; entry->cmd; entry++) {
-+		if (strcmp(cmd, entry->cmd))
-+			continue;
-+
-+		if (entry->func) {
-+			entry->func(arg);
-+			return;
-+		}
-+	}
-+
-+	for (entry = default_menu; entry->cmd; entry++) {
-+		if (strcmp(cmd, entry->cmd))
-+			continue;
-+
-+		if (entry->func) {
-+			entry->func(arg);
-+			return;
-+		}
-+	}
-+
-+	print_text(COLOR_HIGHLIGHT, "Invalid command");
-+}
-+
-+void bt_shell_printf(const char *fmt, ...)
-+{
-+	va_list args;
-+	bool save_input;
-+	char *saved_line;
-+	int saved_point;
-+
-+	save_input = !RL_ISSTATE(RL_STATE_DONE);
-+
-+	if (save_input) {
-+		saved_point = rl_point;
-+		saved_line = rl_copy_text(0, rl_end);
-+		if (!data.saved_prompt) {
-+			rl_save_prompt();
-+			rl_replace_line("", 0);
-+			rl_redisplay();
-+		}
-+	}
-+
-+	va_start(args, fmt);
-+	vprintf(fmt, args);
-+	va_end(args);
-+
-+	if (save_input) {
-+		if (!data.saved_prompt)
-+			rl_restore_prompt();
-+		rl_replace_line(saved_line, 0);
-+		rl_point = saved_point;
-+		rl_forced_update_display();
-+		free(saved_line);
-+	}
-+}
-+
-+void bt_shell_hexdump(const unsigned char *buf, size_t len)
-+{
-+	static const char hexdigits[] = "0123456789abcdef";
-+	char str[68];
-+	size_t i;
-+
-+	if (!len)
-+		return;
-+
-+	str[0] = ' ';
-+
-+	for (i = 0; i < len; i++) {
-+		str[((i % 16) * 3) + 1] = ' ';
-+		str[((i % 16) * 3) + 2] = hexdigits[buf[i] >> 4];
-+		str[((i % 16) * 3) + 3] = hexdigits[buf[i] & 0xf];
-+		str[(i % 16) + 51] = isprint(buf[i]) ? buf[i] : '.';
-+
-+		if ((i + 1) % 16 == 0) {
-+			str[49] = ' ';
-+			str[50] = ' ';
-+			str[67] = '\0';
-+			bt_shell_printf("%s\n", str);
-+			str[0] = ' ';
-+		}
-+	}
-+
-+	if (i % 16 > 0) {
-+		size_t j;
-+		for (j = (i % 16); j < 16; j++) {
-+			str[(j * 3) + 1] = ' ';
-+			str[(j * 3) + 2] = ' ';
-+			str[(j * 3) + 3] = ' ';
-+			str[j + 51] = ' ';
-+		}
-+		str[49] = ' ';
-+		str[50] = ' ';
-+		str[67] = '\0';
-+		bt_shell_printf("%s\n", str);
-+	}
-+}
-+
-+void bt_shell_prompt_input(const char *label, const char *msg,
-+			bt_shell_prompt_input_func func, void *user_data)
-+{
-+	/* Normal use should not prompt for user input to the value a second
-+	 * time before it releases the prompt, but we take a safe action. */
-+	if (data.saved_prompt)
-+		return;
-+
-+	rl_save_prompt();
-+	rl_message(COLOR_RED "[%s]" COLOR_OFF " %s ", label, msg);
-+
-+	data.saved_prompt = true;
-+	data.saved_func = func;
-+	data.saved_user_data = user_data;
-+}
-+
-+int bt_shell_release_prompt(const char *input)
-+{
-+	bt_shell_prompt_input_func func;
-+	void *user_data;
-+
-+	if (!data.saved_prompt)
-+		return -1;
-+
-+	data.saved_prompt = false;
-+
-+	rl_restore_prompt();
-+
-+	func = data.saved_func;
-+	user_data = data.saved_user_data;
-+
-+	data.saved_func = NULL;
-+	data.saved_user_data = NULL;
-+
-+	func(input, user_data);
++	p->timeout = g_timeout_add_seconds(AVC_PRESS_TIMEOUT, req_timeout,
++								p->queue);
 +
 +	return 0;
 +}
 +
-+static void rl_handler(char *input)
-+{
-+	char *cmd, *arg;
+ static int process_control(void *data)
+ {
+ 	struct avctp_control_req *req = data;
+ 	struct avctp_pending_req *p = req->p;
+ 	int ret;
+ 
+-	ret = avctp_send(p->chan, p->transaction, AVCTP_COMMAND, req->code,
+-			req->subunit, req->op, req->operands,
++	ret = avctp_send(p->queue->chan, p->transaction, AVCTP_COMMAND,
++			req->code, req->subunit, req->op, req->operands,
+ 			req->operand_count);
+ 	if (ret < 0)
+ 		return ret;
+ 
+-	if (req->op != AVC_OP_PASSTHROUGH)
+-		p->retry = !p->retry;
++	p->retry = !p->retry;
+ 
+ 	p->timeout = g_timeout_add_seconds(CONTROL_TIMEOUT, req_timeout,
+-								p->chan);
++								p->queue);
+ 
+ 	return 0;
+ }
+@@ -824,28 +855,28 @@ static int process_browsing(void *data)
+ 	struct avctp_pending_req *p = req->p;
+ 	int ret;
+ 
+-	ret = avctp_browsing_send(p->chan, p->transaction, AVCTP_COMMAND,
++	ret = avctp_browsing_send(p->queue, p->transaction, AVCTP_COMMAND,
+ 					req->operands, req->operand_count);
+ 	if (ret < 0)
+ 		return ret;
+ 
+ 	p->timeout = g_timeout_add_seconds(BROWSING_TIMEOUT, req_timeout,
+-								p->chan);
++								p->queue);
+ 
+ 	return 0;
+ }
+ 
+ static gboolean process_queue(void *user_data)
+ {
+-	struct avctp_channel *chan = user_data;
+-	struct avctp_pending_req *p = chan->p;
++	struct avctp_queue *queue = user_data;
++	struct avctp_pending_req *p = queue->p;
+ 
+-	chan->process_id = 0;
++	queue->process_id = 0;
+ 
+ 	if (p != NULL)
+ 		return FALSE;
+ 
+-	while ((p = g_queue_pop_head(chan->queue))) {
++	while ((p = g_queue_pop_head(queue->queue))) {
+ 
+ 		if (p->process(p->data) == 0)
+ 			break;
+@@ -856,7 +887,7 @@ static gboolean process_queue(void *user_data)
+ 	if (p == NULL)
+ 		return FALSE;
+ 
+-	chan->p = p;
++	queue->p = p;
+ 
+ 	return FALSE;
+ 
+@@ -868,27 +899,36 @@ static void control_response(struct avctp_channel *control,
+ 					uint8_t *operands,
+ 					size_t operand_count)
+ {
+-	struct avctp_pending_req *p = control->p;
++	struct avctp_pending_req *p;
+ 	struct avctp_control_req *req;
+ 	GSList *l;
+ 
+-	if (p && p->transaction == avctp->transaction) {
+-		req = p->data;
+-		if (req->op != avc->opcode)
+-			goto done;
++	for (l = control->queues; l; l = g_slist_next(l)) {
++		struct avctp_queue *queue = l->data;
+ 
+-		control->processed = g_slist_prepend(control->processed, p);
++		p = queue->p;
+ 
+-		if (p->timeout > 0) {
+-			g_source_remove(p->timeout);
+-			p->timeout = 0;
+-		}
++		if (p && p->transaction == avctp->transaction) {
++			req = p->data;
++			if (req->op != avc->opcode)
++				goto done;
 +
-+	if (!input) {
-+		rl_insert_text("quit");
-+		rl_redisplay();
-+		rl_crlf();
-+		g_main_loop_quit(main_loop);
-+		return;
-+	}
++			control->processed = g_slist_prepend(control->processed,
++									p);
+ 
+-		control->p = NULL;
++			if (p->timeout > 0) {
++				g_source_remove(p->timeout);
++				p->timeout = 0;
++			}
 +
-+	if (!strlen(input))
-+		goto done;
++			queue->p = NULL;
+ 
+-		if (control->process_id == 0)
+-			control->process_id = g_idle_add(process_queue,
+-								control);
++			if (queue->process_id == 0)
++				queue->process_id = g_idle_add(process_queue,
++								queue);
 +
-+	if (!bt_shell_release_prompt(input))
-+		goto done;
-+
-+	if (history_search(input, -1))
-+		add_history(input);
-+
-+	cmd = strtok_r(input, " ", &arg);
-+	if (!cmd)
-+		goto done;
-+
-+	if (arg) {
-+		int len = strlen(arg);
-+		if (len > 0 && arg[len - 1] == ' ')
-+			arg[len - 1] = '\0';
-+	}
-+
-+	shell_exec(cmd, arg);
-+done:
-+	free(input);
-+}
-+
-+static char *cmd_generator(const char *text, int state)
-+{
-+	static const struct bt_shell_menu_entry *entry;
-+	static int index, len;
-+	const char *cmd;
-+
-+	if (!state) {
-+		entry = default_menu;
-+		index = 0;
-+		len = strlen(text);
-+	}
-+
-+	while ((cmd = entry[index].cmd)) {
-+		index++;
-+
-+		if (!strncmp(cmd, text, len))
-+			return strdup(cmd);
-+	}
-+
-+	if (state)
-+		return NULL;
-+
-+	entry = data.menu;
-+	index = 0;
-+
-+	return cmd_generator(text, 1);
-+}
-+
-+static char **menu_completion(const struct bt_shell_menu_entry *entry,
-+				const char *text, char *input_cmd)
-+{
-+	char **matches = NULL;
-+
-+	for (entry = data.menu; entry->cmd; entry++) {
-+		if (strcmp(entry->cmd, input_cmd))
-+			continue;
-+
-+		if (!entry->gen)
-+			continue;
-+
-+		rl_completion_display_matches_hook = entry->disp;
-+		matches = rl_completion_matches(text, entry->gen);
-+		break;
-+	}
-+
-+	return matches;
-+}
-+
-+static char **shell_completion(const char *text, int start, int end)
-+{
-+	char **matches = NULL;
-+
-+	if (!data.menu)
-+		return NULL;
-+
-+	if (start > 0) {
-+		char *input_cmd;
-+
-+		input_cmd = strndup(rl_line_buffer, start - 1);
-+		matches = menu_completion(default_menu, text, input_cmd);
-+		if (!matches)
-+			matches = menu_completion(data.menu, text,
-+							input_cmd);
-+
-+		free(input_cmd);
-+	} else {
-+		rl_completion_display_matches_hook = NULL;
-+		matches = rl_completion_matches(text, cmd_generator);
-+	}
-+
-+	if (!matches)
-+		rl_attempted_completion_over = 1;
-+
-+	return matches;
-+}
-+
-+static bool io_hup(struct io *io, void *user_data)
-+{
-+	g_main_loop_quit(main_loop);
-+
-+	return false;
-+}
-+
-+static bool signal_read(struct io *io, void *user_data)
-+{
-+	static bool terminated = false;
-+	struct signalfd_siginfo si;
-+	ssize_t result;
-+	int fd;
-+
-+	fd = io_get_fd(io);
-+
-+	result = read(fd, &si, sizeof(si));
-+	if (result != sizeof(si))
-+		return false;
-+
-+	switch (si.ssi_signo) {
-+	case SIGINT:
-+		if (data.input) {
-+			rl_replace_line("", 0);
-+			rl_crlf();
-+			rl_on_new_line();
-+			rl_redisplay();
 +			break;
 +		}
+ 	}
+ 
+ done:
+@@ -920,11 +960,18 @@ static void browsing_response(struct avctp_channel *browsing,
+ 					uint8_t *operands,
+ 					size_t operand_count)
+ {
+-	struct avctp_pending_req *p = browsing->p;
++	struct avctp_pending_req *p;
+ 	struct avctp_browsing_req *req;
+ 	GSList *l;
+ 
+-	if (p && p->transaction == avctp->transaction) {
++	for (l = browsing->queues; l; l = g_slist_next(l)) {
++		struct avctp_queue *queue = l->data;
 +
-+		/*
-+		 * If input was not yet setup up that means signal was received
-+		 * while daemon was not yet running. Since user is not able
-+		 * to terminate client by CTRL-D or typing exit treat this as
-+		 * exit and fall through.
-+		 */
++		p = queue->p;
 +
-+		/* fall through */
-+	case SIGTERM:
-+		if (!terminated) {
-+			rl_replace_line("", 0);
-+			rl_crlf();
-+			g_main_loop_quit(main_loop);
-+		}
++		if (!p || p->transaction != avctp->transaction)
++			continue;
 +
-+		terminated = true;
+ 		browsing->processed = g_slist_prepend(browsing->processed, p);
+ 
+ 		if (p->timeout > 0) {
+@@ -932,11 +979,12 @@ static void browsing_response(struct avctp_channel *browsing,
+ 			p->timeout = 0;
+ 		}
+ 
+-		browsing->p = NULL;
++		queue->p = NULL;
+ 
+-		if (browsing->process_id == 0)
+-			browsing->process_id = g_idle_add(process_queue,
+-								browsing);
++		if (queue->process_id == 0)
++			queue->process_id = g_idle_add(process_queue, queue);
++
 +		break;
+ 	}
+ 
+ 	for (l = browsing->processed; l; l = l->next) {
+@@ -1193,8 +1241,20 @@ static void init_uinput(struct avctp *session)
+ 		DBG("AVRCP: uinput initialized for %s", address);
+ }
+ 
++static struct avctp_queue *avctp_queue_create(struct avctp_channel *chan)
++{
++	struct avctp_queue *queue;
++
++	queue = g_new0(struct avctp_queue, 1);
++	queue->chan = chan;
++	queue->queue = g_queue_new();
++
++	return queue;
++}
++
+ static struct avctp_channel *avctp_channel_create(struct avctp *session,
+ 							GIOChannel *io,
++							int queues,
+ 							GDestroyNotify destroy)
+ {
+ 	struct avctp_channel *chan;
+@@ -1202,9 +1262,15 @@ static struct avctp_channel *avctp_channel_create(struct avctp *session,
+ 	chan = g_new0(struct avctp_channel, 1);
+ 	chan->session = session;
+ 	chan->io = g_io_channel_ref(io);
+-	chan->queue = g_queue_new();
+ 	chan->destroy = destroy;
+ 
++	while (queues--) {
++		struct avctp_queue *queue;
++
++		queue = avctp_queue_create(chan);
++		chan->queues = g_slist_prepend(chan->queues, queue);
 +	}
 +
-+	return false;
-+}
-+
-+static struct io *setup_signalfd(void)
-+{
-+	struct io *io;
-+	sigset_t mask;
-+	int fd;
-+
-+	sigemptyset(&mask);
-+	sigaddset(&mask, SIGINT);
-+	sigaddset(&mask, SIGTERM);
-+
-+	if (sigprocmask(SIG_BLOCK, &mask, NULL) < 0) {
-+		perror("Failed to set signal mask");
-+		return 0;
+ 	return chan;
+ }
+ 
+@@ -1232,6 +1298,7 @@ static void avctp_connect_browsing_cb(GIOChannel *chan, GError *err,
+ {
+ 	struct avctp *session = data;
+ 	struct avctp_channel *browsing = session->browsing;
++	struct avctp_queue *queue;
+ 	char address[18];
+ 	uint16_t imtu, omtu;
+ 	GError *gerr = NULL;
+@@ -1257,7 +1324,7 @@ static void avctp_connect_browsing_cb(GIOChannel *chan, GError *err,
+ 	DBG("AVCTP Browsing: connected to %s", address);
+ 
+ 	if (browsing == NULL) {
+-		browsing = avctp_channel_create(session, chan,
++		browsing = avctp_channel_create(session, chan, 1,
+ 						avctp_destroy_browsing);
+ 		session->browsing = browsing;
+ 	}
+@@ -1272,8 +1339,9 @@ static void avctp_connect_browsing_cb(GIOChannel *chan, GError *err,
+ 	avctp_set_state(session, AVCTP_STATE_BROWSING_CONNECTED, 0);
+ 
+ 	/* Process any request that was pending the connection to complete */
+-	if (browsing->process_id == 0 && !g_queue_is_empty(browsing->queue))
+-		browsing->process_id = g_idle_add(process_queue, browsing);
++	queue = g_slist_nth_data(browsing->queues, 0);
++	if (queue->process_id == 0 && !g_queue_is_empty(queue->queue))
++		queue->process_id = g_idle_add(process_queue, queue);
+ 
+ 	return;
+ 
+@@ -1314,7 +1382,7 @@ static void avctp_connect_cb(GIOChannel *chan, GError *err, gpointer data)
+ 	DBG("AVCTP: connected to %s", address);
+ 
+ 	if (session->control == NULL)
+-		session->control = avctp_channel_create(session, chan, NULL);
++		session->control = avctp_channel_create(session, chan, 2, NULL);
+ 
+ 	session->control->imtu = imtu;
+ 	session->control->omtu = omtu;
+@@ -1436,7 +1504,7 @@ static void avctp_control_confirm(struct avctp *session, GIOChannel *chan,
+ 	}
+ 
+ 	avctp_set_state(session, AVCTP_STATE_CONNECTING, 0);
+-	session->control = avctp_channel_create(session, chan, NULL);
++	session->control = avctp_channel_create(session, chan, 2, NULL);
+ 
+ 	src = btd_adapter_get_address(device_get_adapter(dev));
+ 	dst = device_get_address(dev);
+@@ -1606,7 +1674,7 @@ void avctp_unregister(struct btd_adapter *adapter)
+ 	g_free(server);
+ }
+ 
+-static struct avctp_pending_req *pending_create(struct avctp_channel *chan,
++static struct avctp_pending_req *pending_create(struct avctp_queue *queue,
+ 						avctp_process_cb process,
+ 						void *data,
+ 						GDestroyNotify destroy)
+@@ -1614,8 +1682,8 @@ static struct avctp_pending_req *pending_create(struct avctp_channel *chan,
+ 	struct avctp_pending_req *p;
+ 
+ 	p = g_new0(struct avctp_pending_req, 1);
+-	p->chan = chan;
+-	p->transaction = chan_get_transaction(chan);
++	p->queue = queue;
++	p->transaction = chan_get_transaction(queue->chan);
+ 	p->process = process;
+ 	p->data = data;
+ 	p->destroy = destroy;
+@@ -1629,6 +1697,7 @@ static int avctp_send_req(struct avctp *session, uint8_t code,
+ 				avctp_rsp_cb func, void *user_data)
+ {
+ 	struct avctp_channel *control = session->control;
++	struct avctp_queue *queue;
+ 	struct avctp_pending_req *p;
+ 	struct avctp_control_req *req;
+ 
+@@ -1649,14 +1718,22 @@ static int avctp_send_req(struct avctp *session, uint8_t code,
+ 	req->operand_count = operand_count;
+ 	req->user_data = user_data;
+ 
+-	p = pending_create(control, process_control, req, control_req_destroy);
++	if (opcode == AVC_OP_PASSTHROUGH) {
++		queue = g_slist_nth_data(control->queues, 0);
++		p = pending_create(queue, process_passthrough, req,
++					control_req_destroy);
++	} else {
++		queue = g_slist_nth_data(control->queues, 1);
++		p = pending_create(queue, process_control, req,
++					control_req_destroy);
 +	}
+ 
+ 	req->p = p;
+ 
+-	g_queue_push_tail(control->queue, p);
++	g_queue_push_tail(queue->queue, p);
+ 
+-	if (control->process_id == 0)
+-		control->process_id = g_idle_add(process_queue, control);
++	if (queue->process_id == 0)
++		queue->process_id = g_idle_add(process_queue, queue);
+ 
+ 	return 0;
+ }
+@@ -1666,6 +1743,7 @@ int avctp_send_browsing_req(struct avctp *session,
+ 				avctp_browsing_rsp_cb func, void *user_data)
+ {
+ 	struct avctp_channel *browsing = session->browsing;
++	struct avctp_queue *queue;
+ 	struct avctp_pending_req *p;
+ 	struct avctp_browsing_req *req;
+ 
+@@ -1678,19 +1756,20 @@ int avctp_send_browsing_req(struct avctp *session,
+ 	req->operand_count = operand_count;
+ 	req->user_data = user_data;
+ 
+-	p = pending_create(browsing, process_browsing, req,
+-			browsing_req_destroy);
++	queue = g_slist_nth_data(browsing->queues, 0);
 +
-+	fd = signalfd(-1, &mask, 0);
-+	if (fd < 0) {
-+		perror("Failed to create signal descriptor");
-+		return 0;
-+	}
-+
-+	io = io_new(fd);
-+
-+	io_set_close_on_destroy(io, true);
-+	io_set_read_handler(io, signal_read, NULL, NULL);
-+	io_set_disconnect_handler(io, io_hup, NULL, NULL);
-+
-+	return io;
-+}
-+
-+static GOptionEntry options[] = {
-+	{ "version", 'v', 0, G_OPTION_ARG_NONE, &option_version,
-+				"Show version information and exit" },
-+	{ NULL },
-+};
-+
-+static void rl_init(void)
-+{
-+	setlinebuf(stdout);
-+	rl_attempted_completion_function = shell_completion;
-+
-+	rl_erase_empty_line = 1;
-+	rl_callback_handler_install(NULL, rl_handler);
-+}
-+
-+void bt_shell_init(int *argc, char ***argv)
-+{
-+	GOptionContext *context;
-+	GError *error = NULL;
-+
-+	context = g_option_context_new(NULL);
-+	g_option_context_add_main_entries(context, options, NULL);
-+
-+	if (g_option_context_parse(context, argc, argv, &error) == FALSE) {
-+		if (error != NULL) {
-+			g_printerr("%s\n", error->message);
-+			g_error_free(error);
-+		} else
-+			g_printerr("An unknown error occurred\n");
-+		exit(1);
-+	}
-+
-+	g_option_context_free(context);
-+
-+	if (option_version == TRUE) {
-+		g_print("%s\n", VERSION);
-+		exit(EXIT_SUCCESS);
-+	}
-+
-+	main_loop = g_main_loop_new(NULL, FALSE);
-+
-+	rl_init();
-+}
-+
-+static void rl_cleanup(void)
-+{
-+	rl_message("");
-+	rl_callback_handler_remove();
-+}
-+
-+void bt_shell_run(void)
-+{
-+	struct io *signal;
-+
-+	signal = setup_signalfd();
-+
-+	g_main_loop_run(main_loop);
-+
-+	bt_shell_release_prompt("");
-+	bt_shell_detach();
-+
-+	io_destroy(signal);
-+
-+	g_main_loop_unref(main_loop);
-+	main_loop = NULL;
-+
-+	rl_cleanup();
-+}
-+
-+bool bt_shell_set_menu(const struct bt_shell_menu_entry *menu)
-+{
-+	if (data.menu || !menu)
-+		return false;
-+
-+	data.menu = menu;
-+
-+	return true;
-+}
-+
-+void bt_shell_set_prompt(const char *string)
-+{
-+	if (!main_loop)
-+		return;
-+
-+	rl_set_prompt(string);
-+	printf("\r");
-+	rl_on_new_line();
-+	rl_redisplay();
-+}
-+
-+static bool input_read(struct io *io, void *user_data)
-+{
-+	rl_callback_read_char();
-+	return true;
-+}
-+
-+bool bt_shell_attach(int fd)
-+{
-+	struct io *io;
-+
-+	/* TODO: Allow more than one input? */
-+	if (data.input)
-+		return false;
-+
-+	io = io_new(fd);
-+
-+	io_set_read_handler(io, input_read, NULL, NULL);
-+	io_set_disconnect_handler(io, io_hup, NULL, NULL);
-+
-+	data.input = io;
-+
-+	return true;
-+}
-+
-+bool bt_shell_detach(void)
-+{
-+	if (!data.input)
-+		return false;
-+
-+	io_destroy(data.input);
-+	data.input = NULL;
-+
-+	return true;
-+}
-diff --git a/src/shared/shell.h b/src/shared/shell.h
-new file mode 100644
-index 000000000..843335784
---- /dev/null
-+++ b/src/shared/shell.h
-@@ -0,0 +1,67 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2017  Intel Corporation. All rights reserved.
-+ *
-+ *
-+ *  This library is free software; you can redistribute it and/or
-+ *  modify it under the terms of the GNU Lesser General Public
-+ *  License as published by the Free Software Foundation; either
-+ *  version 2.1 of the License, or (at your option) any later version.
-+ *
-+ *  This library is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ *  Lesser General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU Lesser General Public
-+ *  License along with this library; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+#define COLOR_OFF	"\x1B[0m"
-+#define COLOR_RED	"\x1B[0;91m"
-+#define COLOR_GREEN	"\x1B[0;92m"
-+#define COLOR_YELLOW	"\x1B[0;93m"
-+#define COLOR_BLUE	"\x1B[0;94m"
-+#define COLOR_BOLDGRAY	"\x1B[1;30m"
-+#define COLOR_BOLDWHITE	"\x1B[1;37m"
-+#define COLOR_HIGHLIGHT	"\x1B[1;39m"
-+
-+typedef void (*bt_shell_menu_cb_t)(const char *arg);
-+typedef char * (*bt_shell_menu_gen_t)(const char *text, int state);
-+typedef void (*bt_shell_menu_disp_t) (char **matches, int num_matches,
-+							int max_length);
-+typedef void (*bt_shell_prompt_input_func) (const char *input, void *user_data);
-+
-+struct bt_shell_menu_entry {
-+	const char *cmd;
-+	const char *arg;
-+	bt_shell_menu_cb_t func;
-+	const char *desc;
-+	bt_shell_menu_gen_t gen;
-+	bt_shell_menu_disp_t disp;
-+};
-+
-+void bt_shell_init(int *argc, char ***argv);
-+
-+void bt_shell_run(void);
-+
-+bool bt_shell_set_menu(const struct bt_shell_menu_entry *menu);
-+
-+void bt_shell_set_prompt(const char *string);
-+
-+void bt_shell_printf(const char *fmt,
-+				...) __attribute__((format(printf, 1, 2)));
-+void bt_shell_hexdump(const unsigned char *buf, size_t len);
-+
-+void bt_shell_prompt_input(const char *label, const char *msg,
-+			bt_shell_prompt_input_func func, void *user_data);
-+int bt_shell_release_prompt(const char *input);
-+
-+bool bt_shell_attach(int fd);
-+bool bt_shell_detach(void);
-+
-+void bt_shell_cleanup(void);
++	p = pending_create(queue, process_browsing, req, browsing_req_destroy);
+ 
+ 	req->p = p;
+ 
+-	g_queue_push_tail(browsing->queue, p);
++	g_queue_push_tail(queue->queue, p);
+ 
+ 	/* Connection did not complete, delay process of the request */
+ 	if (browsing->watch == 0)
+ 		return 0;
+ 
+-	if (browsing->process_id == 0)
+-		browsing->process_id = g_idle_add(process_queue, browsing);
++	if (queue->process_id == 0)
++		queue->process_id = g_idle_add(process_queue, queue);
+ 
+ 	return 0;
+ }
+@@ -2058,7 +2137,7 @@ struct avctp *avctp_connect(struct btd_device *device)
+ 		return NULL;
+ 	}
+ 
+-	session->control = avctp_channel_create(session, io, NULL);
++	session->control = avctp_channel_create(session, io, 2, NULL);
+ 	session->initiator = true;
+ 	g_io_channel_unref(io);
+ 
+@@ -2095,7 +2174,7 @@ int avctp_connect_browsing(struct avctp *session)
+ 		return -EIO;
+ 	}
+ 
+-	session->browsing = avctp_channel_create(session, io,
++	session->browsing = avctp_channel_create(session, io, 1,
+ 						avctp_destroy_browsing);
+ 	g_io_channel_unref(io);
+ 
 -- 
 2.13.6
 
