@@ -1,101 +1,97 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <arend.vanspriel@broadcom.com>
+Subject: Re: [PATCH 7/8] rsi: add module parameter operating mode
+To: Amitkumar Karwar <amitkarwar@gmail.com>, Kalle Valo
+ <kvalo@codeaurora.org>, marcel@holtmann.org
+References: <1510730444-3237-1-git-send-email-amitkarwar@gmail.com>
+ <1510730444-3237-8-git-send-email-amitkarwar@gmail.com>
+Cc: linux-wireless@vger.kernel.org,
+ Amitkumar Karwar <amit.karwar@redpinesignals.com>,
+ Prameela Rani Garnepudi <prameela.j04cs@gmail.com>,
+ linux-bluetooth@vger.kernel.org,
+ Siva Rebbagondla <siva.rebbagondla@redpinesignals.com>
+From: Arend van Spriel <arend.vanspriel@broadcom.com>
+Message-ID: <5A0C013F.2080103@broadcom.com>
+Date: Wed, 15 Nov 2017 09:56:31 +0100
 MIME-Version: 1.0
-In-Reply-To: <CADU0VqyM081pHYtNWTxM+ajg-f2-jcs=F_5wCnV5L2_mOQ_TvQ@mail.gmail.com>
-References: <CADU0VqyM081pHYtNWTxM+ajg-f2-jcs=F_5wCnV5L2_mOQ_TvQ@mail.gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 15 Nov 2017 13:39:09 +0200
-Message-ID: <CABBYNZJKYniLeC3oGn7QgDyVN27VzjY2g=oeauHkQGSqAUfK+w@mail.gmail.com>
-Subject: Re: Security block and Bluez 5.47
-To: John Klug <ski.brimson@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1510730444-3237-8-git-send-email-amitkarwar@gmail.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi John,
+On 11/15/2017 8:20 AM, Amitkumar Karwar wrote:
+> From: Prameela Rani Garnepudi <prameela.j04cs@gmail.com>
+>
+> Operating mode determines the support for other protocols.
+> This is made as module parameter for better usage.
+>
+> Signed-off-by: Prameela Rani Garnepudi <prameela.j04cs@gmail.com>
+> Signed-off-by: Siva Rebbagondla <siva.rebbagondla@redpinesignals.com>
+> Signed-off-by: Amitkumar Karwar <amit.karwar@redpinesignals.com>
+> ---
 
-On Tue, Nov 14, 2017 at 11:45 PM, John Klug <ski.brimson@gmail.com> wrote:
-> I have tried unblock, and nothing seems to help.
->
-> Frequently when I connect my Android phone to my bluez 5.47 device I
-> see (btmon):
->
->  > HCI Event: Number of Completed Packets (0x13) plen 5
->
->                                                             #36 [hci0]
-> 5.709020
->          Num handles: 1
->          Handle: 1
->          Count: 1
->  < ACL Data TX: Handle 1 flags 0x00 dlen 16
->
->                                                             #37 [hci0]
-> 5.714589
->        L2CAP: Connection Response (0x03) ident 4 len 8
->          Destination CID: 64
->          Source CID: 81
->          Result: Connection refused - security block (0x0003)
->          Status: No further information available (0x0000)
->
-> This is using connecting from Android 7 to Bluez 5.47.
+[...]
 
-I think this might be due to not having a default agent set which is
-needed if the devices is not trusted so it would require agent
-authorization.
+> -struct rsi_hw *rsi_91x_init(void)
+> +struct rsi_hw *rsi_91x_init(u16 oper_mode)
+>   {
+>   	struct rsi_hw *adapter = NULL;
+>   	struct rsi_common *common = NULL;
+> @@ -320,11 +336,34 @@ struct rsi_hw *rsi_91x_init(void)
+>   	spin_lock_init(&adapter->ps_lock);
+>   	timer_setup(&common->roc_timer, rsi_roc_timeout, 0);
+>   	init_completion(&common->wlan_init_completion);
+> +	common->oper_mode = oper_mode;
+>   	common->init_done = true;
+> -
+> -	common->coex_mode = RSI_DEV_COEX_MODE_WIFI_ALONE;
+> -	common->oper_mode = RSI_DEV_OPMODE_WIFI_ALONE;
+>   	adapter->device_model = RSI_DEV_9113;
 
+Seems there are definitions for coex_mode....
+> +
+> +	/* Determine coex mode */
+> +	switch (common->oper_mode) {
+> +	case DEV_OPMODE_STA_BT_DUAL:
+> +	case DEV_OPMODE_STA_BT:
+> +	case DEV_OPMODE_STA_BT_LE:
+> +	case DEV_OPMODE_BT_ALONE:
+> +	case DEV_OPMODE_BT_LE_ALONE:
+> +	case DEV_OPMODE_BT_DUAL:
+> +		common->coex_mode = 2;
+
+... why use magic values here ?
+
+> +		break;
+> +	case DEV_OPMODE_AP_BT_DUAL:
+> +	case DEV_OPMODE_AP_BT:
+> +		common->coex_mode = 4;
+> +		break;
+> +	case DEV_OPMODE_WIFI_ALONE:
+> +		common->coex_mode = 1;
+> +		break;
+> +	default:
+> +		common->oper_mode = 1;
+> +		common->coex_mode = 1;
+> +	}
+> +	rsi_dbg(INFO_ZONE, "%s: oper_mode = %d, coex_mode = %d\n",
+> +		__func__, common->oper_mode, common->coex_mode);
+> +
+>   	if (common->coex_mode > 1) {
+>   		if (rsi_coex_attach(common)) {
+>   			rsi_dbg(ERR_ZONE, "Failed to init coex module\n");
+> @@ -359,10 +398,13 @@ void rsi_91x_deinit(struct rsi_hw *adapter)
+>   	for (ii = 0; ii < NUM_SOFT_QUEUES; ii++)
+>   		skb_queue_purge(&common->tx_queue[ii]);
 >
->  [bluetooth]# info DC:74:A8:05:39:77
->  Device DC:74:A8:05:39:77
->          Name: John Cell Phone
->          Alias: John Cell Phone
->          Class: 0x005a020c
->          Icon: phone
->          Paired: yes
->          Trusted: yes
->          Blocked: no
->          Connected: no
->          LegacyPairing: no
->          UUID: OBEX Object Push          (00001105-0000-1000-8000-00805f9b34fb)
->          UUID: Audio Source              (0000110a-0000-1000-8000-00805f9b34fb)
->          UUID: A/V Remote Control Target (0000110c-0000-1000-8000-00805f9b34fb)
->          UUID: Headset AG                (00001112-0000-1000-8000-00805f9b34fb)
->          UUID: PANU                      (00001115-0000-1000-8000-00805f9b34fb)
->          UUID: NAP                       (00001116-0000-1000-8000-00805f9b34fb)
->          UUID: Handsfree Audio Gateway   (0000111f-0000-1000-8000-00805f9b34fb)
->          UUID: Phonebook Access Server   (0000112f-0000-1000-8000-00805f9b34fb)
->          UUID: Message Access Server     (00001132-0000-1000-8000-00805f9b34fb)
->          UUID: PnP Information           (00001200-0000-1000-8000-00805f9b34fb)
->          UUID: Generic Access Profile    (00001800-0000-1000-8000-00805f9b34fb)
->          UUID: Generic Attribute Profile (00001801-0000-1000-8000-00805f9b34fb)
->          UUID: Vendor specific           (936da01f-9abd-4d9d-80c7-02af85c822a8)
->          Modalias: bluetooth:v0075p0100d0200
->
->  [bluetooth]# show
->  Controller 00:23:A7:49:67:FB
->          Name: MTCDT-pan-Bluez
->          Alias: MTCDT-pan-Bluez
->          Class: 0x00020000
->          Powered: yes
->          Discoverable: yes
->          Pairable: yes
->          UUID: Generic Attribute Profile (00001801-0000-1000-8000-00805f9b34fb)
->          UUID: NAP                       (00001116-0000-1000-8000-00805f9b34fb)
->          UUID: A/V Remote Control        (0000110e-0000-1000-8000-00805f9b34fb)
->          UUID: PnP Information           (00001200-0000-1000-8000-00805f9b34fb)
->          UUID: Generic Access Profile    (00001800-0000-1000-8000-00805f9b34fb)
->          UUID: A/V Remote Control Target (0000110c-0000-1000-8000-00805f9b34fb)
->          Modalias: usb:v1D6Bp0246d052F
->          Discovering: no
->
->  $ bluetoothctl -v
->  5.47
-> ======================================================
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> -	common->init_done = false;
+> -
+> -	if (common->coex_mode > 1)
+> +	if (common->coex_mode > 1) {
+>   		rsi_coex_detach(common);
+> +		if (g_proto_ops.bt_ops->detach)
+> +			g_proto_ops.bt_ops->detach(common->bt_adapter);
+> +	}
+> +
+> +	common->init_done = false;
 
-
-
--- 
-Luiz Augusto von Dentz
+Regards,
+Arend
