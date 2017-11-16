@@ -1,91 +1,44 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Subject: Re: [PATCH 3/3 v1] doc/mgmt-api: Add advertising phys support to
- flags
-To: Jaganath Kanakkassery <jaganath.k.os@gmail.com>
-CC: <linux-bluetooth@vger.kernel.org>,
-        Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
-References: <1510809661-23067-1-git-send-email-jaganathx.kanakkassery@intel.com>
-From: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
-Message-ID: <0e524d27-13c7-be5c-a17a-2c62aab2a379@jp.fujitsu.com>
-Date: Fri, 17 Nov 2017 14:32:57 +0900
+Return-Path: <foo00@h08.hostsharing.net>
+Date: Fri, 17 Nov 2017 00:59:55 +0100
+From: Lukas Wunner <lukas@wunner.de>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Rob Herring <rob.herring@linaro.org>,
+	Johan Hovold <johan@kernel.org>
+Cc: Ronald Tschalaer <ronald@innovation.ch>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+	John Stultz <john.stultz@linaro.org>
+Subject: Re: [PATCH] Bluetooth: hci_serdev: Init hci_uart proto_lock to avoid
+ oops
+Message-ID: <20171116235955.GA27601@wunner.de>
+References: <CALAqxLVTff-XX7bbQ8a1Pihqe=QW1HDMKST3F3okCV8jY+wGqw@mail.gmail.com>
+ <CALAqxLW9gzcBrwy3TWB5x_OpKtcLTe7P8PX4KeUgvibbAaMX_A@mail.gmail.com>
+ <20171116213045.GA17506@wunner.de>
+ <20171116214504.GB17506@wunner.de>
+ <CALAqxLX-qp=rc8P7ynGrUwWHgP2EBAwoEES-aOOuehtnJSDR+A@mail.gmail.com>
+ <f181189de5fd4c75da4708425df99e70abc6a127.1510875912.git.lukas@wunner.de>
 MIME-Version: 1.0
-In-Reply-To: <1510809661-23067-1-git-send-email-jaganathx.kanakkassery@intel.com>
-Content-Type: text/plain; charset="utf-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <f181189de5fd4c75da4708425df99e70abc6a127.1510875912.git.lukas@wunner.de>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jaganath,
-
-On 11/16/2017 02:21 PM, Jaganath Kanakkassery wrote:
-> ---
->  doc/mgmt-api.txt | 22 ++++++++++++++++++++++
->  1 file changed, 22 insertions(+)
+On Fri, Nov 17, 2017 at 12:54:53AM +0100, Lukas Wunner wrote:
+> John Stultz reports a boot time crash with the HiKey board (which uses
+> hci_serdev) occurring in hci_uart_tx_wakeup().  That function is
+> contained in hci_ldisc.c, but also called from the newer hci_serdev.c.
+> It acquires the proto_lock in struct hci_uart and it turns out that we
+> forgot to init the lock in the serdev code path, thus causing the crash.
 > 
-> diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
-> index b59bf0c..c138f47 100644
-> --- a/doc/mgmt-api.txt
-> +++ b/doc/mgmt-api.txt
-> @@ -2504,6 +2504,9 @@ Read Advertising Features Command
->  		4	Add TX Power field to Adv_Data
->  		5	Add Appearance field to Scan_Rsp
->  		6	Add Local Name in Scan_Rsp
-> +		7	Secondary Channel with LE 1M
-> +		8	Secondary Channel with LE 2M
-> +		9	Secondary Channel with LE Coded
->  
->  	The Flags bit 0 indicates support for connectable advertising
->  	and for switching to connectable advertising independent of the
-> @@ -2553,6 +2556,15 @@ Read Advertising Features Command
->  	space is limited a short version or no name information. The
->  	Local Name will be added at the end of the scan response data.
->  
-> +	The Flags bit 7 indicates support for advertising in secondary
-> +	channel in LE 1M PHY.
-> +
-> +	The Flags bit 8 indicates support for advertising in secondary
-> +	channel in LE 2M PHY. Primary channel would be on 1M.
-> +
-> +	The Flags bit 9 indicates support for advertising in secondary
-> +	channel in LE CODED PHY.
-> +
->  	The valid range for Instance identifiers is 1-254. The value 0
->  	is reserved for internal use and the value 255 is reserved for
->  	future extensions. However the Max_Instances value for indicating
-> @@ -2613,6 +2625,9 @@ Add Advertising Command
->  		4	Add TX Power field to Adv_Data
->  		5	Add Appearance field to Scan_Rsp
->  		6	Add Local Name in Scan_Rsp
-> +		7	Secondary Channel with LE 1M
-> +		8	Secondary Channel with LE 2M
-> +		9	Secondary Channel with LE Coded
->  
->  	When the connectable flag is set, then the controller will use
->  	undirected connectable advertising. The value of the connectable
-> @@ -2640,6 +2655,13 @@ Add Advertising Command
->  	supported to provide less air traffic for devices implementing
->  	broadcaster role.
->  
-> +	Secondary channel flags can be used to avertise in secondary
-
-s/avertise/advertise/
-
-> +	channel with the corresponding PHYs. In case of 2M, the primary
-> +	channel used would be 1M. If none of them are set then secondary
-> +	channel advertising would be disable for this insance which is as
-
-Perhaps, s/insance/instance/
-
-> +	good as legacy adveritsing. Combining the sets would result in
-
-s/adveritsing/advertising/
-
-> +	multiple adv sets being created.
-> +
->  	The Duration parameter configures the length of an Instance. The
->  	value is in seconds.
->  
+> John bisected the crash to commit 67d2f8781b9f ("Bluetooth: hci_ldisc:
+> Allow sleeping while proto locks are held"), but the issue was present
+> before and the commit merely exposed it.  (Perhaps by luck, the crash
+> did not occur with rwlocks.)
 > 
+> Init the proto_lock in the serdev code path to avoid the oops.
 
-Regards,
-Eramoto
+Apologies, I botched Gustavo Padovan's and Johan Hedberg's e-mail
+address in the To: header, please fix up when replying.
 
+Lukas
