@@ -1,35 +1,163 @@
-Return-Path: <jikos@kernel.org>
-Date: Thu, 16 Nov 2017 13:59:53 +0100 (CET)
-From: Jiri Kosina <jikos@kernel.org>
-To: Benjamin Tissoires <benjamin.tissoires@redhat.com>
-cc: Marcel Holtmann <marcel@holtmann.org>, Niels Skou Olsen <nolsen@jabra.com>,
-    linux-kernel@vger.kernel.org, linux-input@vger.kernel.org,
-    linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2 0/4] Quirks cleanup and hid-generic niceness
-In-Reply-To: <20171003145729.3135-1-benjamin.tissoires@redhat.com>
-Message-ID: <nycvar.YFH.7.76.1711161358020.32604@cbobk.fhfr.pm>
-References: <20171003145729.3135-1-benjamin.tissoires@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v3 6/6] client: Move gatt related commands to a submenu
+Date: Thu, 16 Nov 2017 12:59:25 +0200
+Message-Id: <20171116105925.2117-6-luiz.dentz@gmail.com>
+In-Reply-To: <20171116105925.2117-1-luiz.dentz@gmail.com>
+References: <20171116105925.2117-1-luiz.dentz@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, 3 Oct 2017, Benjamin Tissoires wrote:
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-> Hi,
-> 
-> Niels found an issue with v1 of the series, while compiling the usbhid module
-> as a separate .ko.
-> 
-> Sending a v2 with the proper From: field fixed now.
-> 
-> I also use -M1 to show in 1/4 that usbhid/hid-quirks.c is basically moved to
-> hid-quirks.c.
+All commands related to gatt settings are now under gatt
+submenu:
 
-I am planning to queue this for 4.16; do you happen to have any followups 
-since you posted v2 in october?
+[bluetooth]# menu gatt
+Menu gatt:
+Available commands:
+-------------------
+list-attributes [dev]                             List attributes
+set-alias <alias>                                 Set device alias
+select-attribute <attribute/UUID>                 Select attribute
+attribute-info [attribute/UUID]                   Select attribute
+read                                              Read attribute value
+write <data=[xx xx ...]>                          Write attribute value
+acquire-write                                     Acquire Write file descriptor
+release-write                                     Release Write file descriptor
+acquire-notify                                    Acquire Notify file descriptor
+release-notify                                    Release Notify file descriptor
+notify <on/off>                                   Notify attribute value
+register-application [UUID ...]                   Register profile to connect
+unregister-application                            Unregister profile
+register-service <UUID>                           Register application service.
+unregister-service <UUID/object>                  Unregister application service
+register-characteristic <UUID> <Flags=read,write,notify...> Register application characteristic
+unregister-characteristic <UUID/object>           Unregister application characteristic
+register-descriptor <UUID> <Flags=read,write...>  Register application descriptor
+unregister-descriptor <UUID/object>               Unregister application descriptor
+back                                              Return to main menu
+version                                           Display version
+quit                                              Quit program
+exit                                              Quit program
+help                                              Display help about this program
+---
+ client/main.c | 87 ++++++++++++++++++++++++++++++++---------------------------
+ 1 file changed, 47 insertions(+), 40 deletions(-)
 
-Thanks,
-
+diff --git a/client/main.c b/client/main.c
+index a60228833..88d11bb29 100644
+--- a/client/main.c
++++ b/client/main.c
+@@ -2402,6 +2402,52 @@ static const struct bt_shell_menu scan_menu = {
+ 	{ } },
+ };
+ 
++static const struct bt_shell_menu gatt_menu = {
++	.name = "gatt",
++	.entries = {
++	{ "list-attributes", "[dev]", cmd_list_attributes, "List attributes",
++							dev_generator },
++	{ "set-alias",    "<alias>",  cmd_set_alias, "Set device alias" },
++	{ "select-attribute", "<attribute/UUID>",  cmd_select_attribute,
++				"Select attribute", attribute_generator },
++	{ "attribute-info", "[attribute/UUID]",  cmd_attribute_info,
++				"Select attribute", attribute_generator },
++	{ "read",         NULL,       cmd_read, "Read attribute value" },
++	{ "write",        "<data=[xx xx ...]>", cmd_write,
++						"Write attribute value" },
++	{ "acquire-write", NULL, cmd_acquire_write,
++					"Acquire Write file descriptor" },
++	{ "release-write", NULL, cmd_release_write,
++					"Release Write file descriptor" },
++	{ "acquire-notify", NULL, cmd_acquire_notify,
++					"Acquire Notify file descriptor" },
++	{ "release-notify", NULL, cmd_release_notify,
++					"Release Notify file descriptor" },
++	{ "notify",       "<on/off>", cmd_notify, "Notify attribute value",
++							mode_generator },
++	{ "register-application", "[UUID ...]", cmd_register_app,
++						"Register profile to connect" },
++	{ "unregister-application", NULL, cmd_unregister_app,
++						"Unregister profile" },
++	{ "register-service", "<UUID>", cmd_register_service,
++					"Register application service."  },
++	{ "unregister-service", "<UUID/object>", cmd_unregister_service,
++					"Unregister application service" },
++	{ "register-characteristic", "<UUID> <Flags=read,write,notify...>",
++					cmd_register_characteristic,
++					"Register application characteristic" },
++	{ "unregister-characteristic", "<UUID/object>",
++				cmd_unregister_characteristic,
++				"Unregister application characteristic" },
++	{ "register-descriptor", "<UUID> <Flags=read,write...>",
++					cmd_register_descriptor,
++					"Register application descriptor" },
++	{ "unregister-descriptor", "<UUID/object>",
++					cmd_unregister_descriptor,
++					"Unregister application descriptor" },
++	{ } },
++};
++
+ static const struct bt_shell_menu main_menu = {
+ 	.name = "main",
+ 	.entries = {
+@@ -2453,46 +2499,6 @@ static const struct bt_shell_menu main_menu = {
+ 							dev_generator },
+ 	{ "disconnect",   "[dev]",    cmd_disconn, "Disconnect device",
+ 							dev_generator },
+-	{ "list-attributes", "[dev]", cmd_list_attributes, "List attributes",
+-							dev_generator },
+-	{ "set-alias",    "<alias>",  cmd_set_alias, "Set device alias" },
+-	{ "select-attribute", "<attribute/UUID>",  cmd_select_attribute,
+-				"Select attribute", attribute_generator },
+-	{ "attribute-info", "[attribute/UUID]",  cmd_attribute_info,
+-				"Select attribute", attribute_generator },
+-	{ "read",         NULL,       cmd_read, "Read attribute value" },
+-	{ "write",        "<data=[xx xx ...]>", cmd_write,
+-						"Write attribute value" },
+-	{ "acquire-write", NULL, cmd_acquire_write,
+-					"Acquire Write file descriptor" },
+-	{ "release-write", NULL, cmd_release_write,
+-					"Release Write file descriptor" },
+-	{ "acquire-notify", NULL, cmd_acquire_notify,
+-					"Acquire Notify file descriptor" },
+-	{ "release-notify", NULL, cmd_release_notify,
+-					"Release Notify file descriptor" },
+-	{ "notify",       "<on/off>", cmd_notify, "Notify attribute value",
+-							mode_generator },
+-	{ "register-application", "[UUID ...]", cmd_register_app,
+-						"Register profile to connect" },
+-	{ "unregister-application", NULL, cmd_unregister_app,
+-						"Unregister profile" },
+-	{ "register-service", "<UUID>", cmd_register_service,
+-					"Register application service."  },
+-	{ "unregister-service", "<UUID/object>", cmd_unregister_service,
+-					"Unregister application service" },
+-	{ "register-characteristic", "<UUID> <Flags=read,write,notify...>",
+-					cmd_register_characteristic,
+-					"Register application characteristic" },
+-	{ "unregister-characteristic", "<UUID/object>",
+-				cmd_unregister_characteristic,
+-				"Unregister application characteristic" },
+-	{ "register-descriptor", "<UUID> <Flags=read,write...>",
+-					cmd_register_descriptor,
+-					"Register application descriptor" },
+-	{ "unregister-descriptor", "<UUID/object>",
+-					cmd_unregister_descriptor,
+-					"Unregister application descriptor" },
+ 	{ } },
+ };
+ 
+@@ -2545,6 +2551,7 @@ int main(int argc, char *argv[])
+ 	bt_shell_set_menu(&main_menu);
+ 	bt_shell_add_submenu(&advertise_menu);
+ 	bt_shell_add_submenu(&scan_menu);
++	bt_shell_add_submenu(&gatt_menu);
+ 	bt_shell_set_prompt(PROMPT_OFF);
+ 
+ 	dbus_conn = g_dbus_setup_bus(DBUS_BUS_SYSTEM, NULL, NULL);
 -- 
-Jiri Kosina
-SUSE Labs
+2.13.6
+
