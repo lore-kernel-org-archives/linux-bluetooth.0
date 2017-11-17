@@ -1,87 +1,74 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-From: John Klug <ski.brimson@gmail.com>
-Date: Fri, 17 Nov 2017 16:44:42 -0600
-Message-ID: <CADU0Vqzwvv9Y+SHe8EL9KTGAMD3pkpw=d-2WgNX2pfr_MXUprw@mail.gmail.com>
-Subject: Connection attempt timeout Android 4.4.4 to bluez5.47
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <martin.blumenstingl@googlemail.com>
+From: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
+To: robh+dt@kernel.org,
+	devicetree@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org,
+	linux-serial@vger.kernel.org
+Cc: mark.rutland@arm.com,
+	marcel@holtmann.org,
+	gustavo@padovan.org,
+	johan.hedberg@gmail.com,
+	gregkh@linuxfoundation.org,
+	jslaby@suse.com,
+	johan@kernel.org,
+	linux-sunxi@googlegroups.com,
+	linux-amlogic@lists.infradead.org,
+	Larry.Finger@lwfinger.net,
+	Martin Blumenstingl <martin.blumenstingl@googlemail.com>
+Subject: [RFC v1 8/8] dt-bindings: net: bluetooth: add support for Realtek Bluetooth chips
+Date: Fri, 17 Nov 2017 23:35:43 +0100
+Message-Id: <20171117223543.32429-9-martin.blumenstingl@googlemail.com>
+In-Reply-To: <20171117223543.32429-1-martin.blumenstingl@googlemail.com>
+References: <20171117223543.32429-1-martin.blumenstingl@googlemail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is with "trusted" enabled and I did set default-agent.  Devices
-were first paired, which was initiated from the Android device.
+This adds the documentation for Bluetooth functionality of the Realtek
+RTL8723BS and RTL8723DS.
+Both are SDIO wifi chips with an additional Bluetooth module which is
+connected via UART to the host.
 
-This was initiated from Android after pairing by selecting Internet
-Access (PAN):
+Signed-off-by: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
+---
+ .../devicetree/bindings/net/realtek-bluetooth.txt  | 31 ++++++++++++++++++++++
+ 1 file changed, 31 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/net/realtek-bluetooth.txt
 
-[bluetooth]# show
-Controller 00:23:A7:49:67:FB
-        Name: MTCDT-PAND-JAK
-        Alias: MTCDT-PAND-JAK
-        Class: 0x00020000
-        Powered: yes
-        Discoverable: yes
-        Pairable: yes
-        UUID: Generic Attribute Profile (00001801-0000-1000-8000-00805f9b34fb)
-        UUID: NAP                       (00001116-0000-1000-8000-00805f9b34fb)
-        UUID: A/V Remote Control        (0000110e-0000-1000-8000-00805f9b34fb)
-        UUID: PnP Information           (00001200-0000-1000-8000-00805f9b34fb)
-        UUID: Generic Access Profile    (00001800-0000-1000-8000-00805f9b34fb)
-        UUID: A/V Remote Control Target (0000110c-0000-1000-8000-00805f9b34fb)
-        Modalias: usb:v1D6Bp0246d052F
-        Discovering: no
-[bluetooth]# info BC:44:86:56:6B:95
-Device BC:44:86:56:6B:95
-        Name: John Conduit Klug (SGH-M919)
-        Alias: John Conduit Klug (SGH-M919)
-        Class: 0x005a020c
-        Icon: phone
-        Paired: yes
-        Trusted: yes
-        Blocked: no
-        Connected: no
-        LegacyPairing: no
-        UUID: OBEX Object Push          (00001105-0000-1000-8000-00805f9b34fb)
-        UUID: Audio Source              (0000110a-0000-1000-8000-00805f9b34fb)
-        UUID: A/V Remote Control Target (0000110c-0000-1000-8000-00805f9b34fb)
-        UUID: Headset AG                (00001112-0000-1000-8000-00805f9b34fb)
-        UUID: PANU                      (00001115-0000-1000-8000-00805f9b34fb)
-        UUID: Handsfree Audio Gateway   (0000111f-0000-1000-8000-00805f9b34fb)
-        UUID: Phonebook Access Server   (0000112f-0000-1000-8000-00805f9b34fb)
-        UUID: Message Access Server     (00001132-0000-1000-8000-00805f9b34fb)
-        UUID: PnP Information           (00001200-0000-1000-8000-00805f9b34fb)
-        UUID: Generic Access Profile    (00001800-0000-1000-8000-00805f9b34fb)
-        UUID: Generic Attribute Profile (00001801-0000-1000-8000-00805f9b34fb)
-        Modalias: bluetooth:v0075p0100d0200
-[bluetooth]# default-agent
-
-> HCI Event: Connect Request (0x04) plen 10                                                                                                                                  #6 [hci0] 107.758175
-        Address: BC:44:86:56:6B:95 (OUI BC-44-86)
-        Class: 0x5a020c
-          Major class: Phone (cellular, cordless, payphone, modem)
-          Minor class: Smart phone
-          Networking (LAN, Ad hoc)
-          Capturing (Scanner, Microphone)
-          Object Transfer (v-Inbox, v-Folder)
-          Telephony (Cordless telephony, Modem, Headset)
-        Link type: ACL (0x01)
-< HCI Command: Accept Connection Request (0x01|0x0009) plen 7
-
-                               #7 [hci0] 107.758365
-        Address: BC:44:86:56:6B:95 (OUI BC-44-86)
-        Role: Master (0x00)
-> HCI Event: Command Status (0x0f) plen 4                                                                                                                                    #8 [hci0] 107.762336
-      Accept Connection Request (0x01|0x0009) ncmd 1
-        Status: Success (0x00)
-> HCI Event: Role Change (0x12) plen 8                                                                                                                                       #9 [hci0] 107.924039
-        Status: Success (0x00)
-        Address: BC:44:86:56:6B:95 (OUI BC-44-86)
-        Role: Master (0x00)
-> HCI Event: Connect Complete (0x03) plen 11                                                                                                                                #10 [hci0] 113.931557
-        Status: Connection Timeout (0x08)
-        Handle: 0
-        Address: BC:44:86:56:6B:95 (OUI BC-44-86)
-        Link type: ACL (0x01)
-        Encryption: Disabled (0x00)
-@ Connect Failed: BC:44:86:56:6B:95 (0) status 0x08
+diff --git a/Documentation/devicetree/bindings/net/realtek-bluetooth.txt b/Documentation/devicetree/bindings/net/realtek-bluetooth.txt
+new file mode 100644
+index 000000000000..c919e06469f8
+--- /dev/null
++++ b/Documentation/devicetree/bindings/net/realtek-bluetooth.txt
+@@ -0,0 +1,31 @@
++Realtek Bluetooth Chips
++-----------------------
++
++This documents the binding structure and common properties for serial
++attached Realtek devices.
++
++Serial attached Realtek devices shall be a child node of the host UART
++device the slave device is attached to. See ../serial/slave-device.txt
++for more information
++
++Required properties:
++- compatible: should contain one of the following:
++    * "realtek,rtl8723bs-bluetooth"
++    * "realtek,rtl8723ds-bluetooth"
++
++Optional properties:
++- disable-gpios: GPIO specifier, used to enable/disable the BT module
++- reset-gpios: GPIO specifier, used to reset the BT module
++
++
++Example:
++
++&uart {
++	...
++
++	bluetooth {
++		compatible = "realtek,rtl8723bs-bluetooth";
++		disable-gpios = <&gpio 20 GPIO_ACTIVE_LOW>;
++		reset-gpios = <&gpio 11 GPIO_ACTIVE_HIGH>;
++	};
++};
+-- 
+2.15.0
