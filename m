@@ -1,71 +1,77 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+From: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
+Subject: [PATCH BlueZ] obexd: Fix fd which is left even after closing session
+Message-ID: <b15a118c-f975-1530-5c95-89c8db0a3d27@jp.fujitsu.com>
+Date: Fri, 17 Nov 2017 20:30:35 +0900
 MIME-Version: 1.0
-In-Reply-To: <77a36423-486e-7c95-6f86-3f10a0af0fc0@jp.fujitsu.com>
-References: <77a36423-486e-7c95-6f86-3f10a0af0fc0@jp.fujitsu.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Fri, 17 Nov 2017 16:10:47 +0200
-Message-ID: <CABBYNZKArL7Po8D7aYEuxfW5U3paKUXD4=p6FoRkeXcOVktjKg@mail.gmail.com>
-Subject: Re: [PATCH Bluez v2 1/2] tools/btmgmt: Introduce set_index()
-To: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Eramoto,
+A fd is duplicated if dbus type is unix fd, and then it is not closed
+even after the file is finished transporting. In the end obexd can not
+transport due to the limitation of open-able fd as below.
 
-On Fri, Nov 17, 2017 at 9:20 AM, ERAMOTO Masaya
-<eramoto.masaya@jp.fujitsu.com> wrote:
-> ---
-> Changes in v2:
-> - remove get_index()
-> - s/get_index()/mgmt_index/
->
->  tools/btmgmt.c | 19 ++++++++++++-------
->  1 file changed, 12 insertions(+), 7 deletions(-)
->
-> diff --git a/tools/btmgmt.c b/tools/btmgmt.c
-> index 552f74411..e218a87ff 100644
-> --- a/tools/btmgmt.c
-> +++ b/tools/btmgmt.c
-> @@ -88,6 +88,17 @@ static int pending_index = 0;
->
->  #define PROMPT_ON      COLOR_BLUE "[mgmt]" COLOR_OFF "# "
->
-> +static void set_index(char *arg)
-> +{
-> +       if (!arg || !strcmp(arg, "none") || !strcmp(arg, "any") ||
-> +                                               !strcmp(arg, "all"))
-> +               mgmt_index = MGMT_INDEX_NONE;
-> +       else if (!strncmp(arg, "hci", 3))
-> +               mgmt_index = atoi(&arg[3]);
-> +       else
-> +               mgmt_index = atoi(arg);
-> +}
-> +
->  static void update_prompt(uint16_t index)
->  {
->         char str[32];
-> @@ -4535,13 +4546,7 @@ static void cmd_select(struct mgmt *mgmt, uint16_t index,
->         mgmt_cancel_all(mgmt);
->         mgmt_unregister_all(mgmt);
->
-> -       if (!strcmp(argv[1], "none") || !strcmp(argv[1], "any") ||
-> -                                               !strcmp(argv[1], "all"))
-> -               mgmt_index = MGMT_INDEX_NONE;
-> -       else if (!strncmp(argv[1], "hci", 3))
-> -               mgmt_index = atoi(&argv[1][3]);
-> -       else
-> -               mgmt_index = atoi(argv[1]);
-> +       set_index(argv[1]);
->
->         register_mgmt_callbacks(mgmt, mgmt_index);
->
-> --
-> 2.14.1
+  Warning: invalid file descriptor 1031 in syscall fcntl(DUPFD_CLOEXEC)()
 
-Applied, thanks
+  FILE DESCRIPTORS: 1021 open at exit.
+  Open pf-31 socket 1023:
+     at 0x5061F1F: fcntl_common (fcntl.c:46)
+     by 0x5061F1F: fcntl (fcntl.c:79)
+     by 0x52A1C3D: _dbus_dup (in /lib/x86_64-linux-gnu/libdbus-1.so.3.14.13)
+     by 0x528C7B8: dbus_message_iter_get_basic (in /lib/x86_64-linux-gnu/libdbus-1.so.3.14.13)
+     by 0x149E04: profile_new_connection (bluetooth.c:136)
+     by 0x18AAF2: process_message.isra.3 (object.c:259)
+     by 0x18B364: generic_message (object.c:1079)
+     by 0x5290FD2: ??? (in /lib/x86_64-linux-gnu/libdbus-1.so.3.14.13)
+     by 0x5282623: dbus_connection_dispatch (in /lib/x86_64-linux-gnu/libdbus-1.so.3.14.13)
+     by 0x1852FF: message_dispatch (mainloop.c:72)
+     by 0x5505E24: g_main_context_dispatch (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.5400.1)
+     by 0x55061EF: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.5400.1)
+     by 0x5506501: g_main_loop_run (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.5400.1)
+---
+ obexd/plugins/bluetooth.c | 5 ++++-
+ obexd/src/obex.c          | 4 +++-
+ 2 files changed, 7 insertions(+), 2 deletions(-)
 
-
+diff --git a/obexd/plugins/bluetooth.c b/obexd/plugins/bluetooth.c
+index 3ee54325f..d6028d114 100644
+--- a/obexd/plugins/bluetooth.c
++++ b/obexd/plugins/bluetooth.c
+@@ -144,12 +144,15 @@ static DBusMessage *profile_new_connection(DBusConnection *conn,
+ 	if (fcntl(fd, F_GETFD) < 0) {
+ 		error("bluetooth: fcntl(%d, F_GETFD): %s (%d)", fd,
+ 						strerror(errno), errno);
++		close(fd);
+ 		return invalid_args(msg);
+ 	}
+ 
+ 	io = g_io_channel_unix_new(fd);
+-	if (io == NULL)
++	if (io == NULL) {
++		close(fd);
+ 		return invalid_args(msg);
++	}
+ 
+ 	DBG("device %s", device);
+ 
+diff --git a/obexd/src/obex.c b/obexd/src/obex.c
+index be79a778e..308e56d07 100644
+--- a/obexd/src/obex.c
++++ b/obexd/src/obex.c
+@@ -235,8 +235,10 @@ static void obex_session_free(struct obex_session *os)
+ {
+ 	sessions = g_slist_remove(sessions, os);
+ 
+-	if (os->io)
++	if (os->io) {
++		g_io_channel_shutdown(os->io, TRUE, NULL);
+ 		g_io_channel_unref(os->io);
++	}
+ 
+ 	if (os->obex)
+ 		g_obex_unref(os->obex);
 -- 
-Luiz Augusto von Dentz
+2.14.1
+
