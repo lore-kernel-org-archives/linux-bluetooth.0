@@ -1,84 +1,62 @@
-Return-Path: <linux-serial-owner@vger.kernel.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
-Subject: Re: [RFC v1 5/8] Bluetooth: btrtl: add support for the RTL8723BS and
- RTL8723DS chips
+Subject: Re: [RFC v1 7/8] Bluetooth: hci_serdev: remove the
+ HCI_UART_INIT_PENDING check
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20171117223543.32429-6-martin.blumenstingl@googlemail.com>
-Date: Sun, 19 Nov 2017 09:25:11 +0100
-Cc: robh+dt@kernel.org, devicetree@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, linux-serial@vger.kernel.org,
-        mark.rutland@arm.com, "Gustavo F. Padovan" <gustavo@padovan.org>,
+In-Reply-To: <20171117223543.32429-8-martin.blumenstingl@googlemail.com>
+Date: Sun, 19 Nov 2017 09:21:19 +0100
+Cc: Rob Herring <robh+dt@kernel.org>,
+        devicetree <devicetree@vger.kernel.org>,
+        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+        linux-serial@vger.kernel.org, Mark Rutland <mark.rutland@arm.com>,
+        "Gustavo F. Padovan" <gustavo@padovan.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
-        gregkh@linuxfoundation.org, jslaby@suse.com, johan@kernel.org,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Jiri Slaby <jslaby@suse.com>, Johan Hovold <johan@kernel.org>,
         linux-sunxi@googlegroups.com, linux-amlogic@lists.infradead.org,
         Larry.Finger@lwfinger.net
-Message-Id: <109FA59C-9875-4EAA-9DA5-EC811BAA77AE@holtmann.org>
+Message-Id: <56889A64-AFB2-454C-9889-FAA4C051168A@holtmann.org>
 References: <20171117223543.32429-1-martin.blumenstingl@googlemail.com>
- <20171117223543.32429-6-martin.blumenstingl@googlemail.com>
+ <20171117223543.32429-8-martin.blumenstingl@googlemail.com>
 To: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
-Sender: linux-serial-owner@vger.kernel.org
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Martin,
 
-> The Realtek RTL8723BS and RTL8723DS chipsets are SDIO wifi chips. They
-> also contain a Bluetooth module which is connected via UART to the host.
+> The three-wire (H5) protocol is the only protocol which uses
+> HCI_UART_INIT_PENDING.
+> Unfortunately the protocol implementation never receives data with this
+> check still in place. For the H5 protocol this means that the
+> initialization never completes and thus the firmware download never
+> starts. Even if the initialization would succeed later on the drivers
+> would call hci_uart_init_ready() which schedules the registration which
+> is currently not implemented by hci_serdev.c.
 > 
-> Realtek's userspace initialization tool (rtk_hciattach) differentiates
-> these two via the HCI version and revision returned by the
-> HCI_OP_READ_LOCAL_VERSION command.
-> Additionally we apply these checks only the for UART devices. Everything
-> else is assumed to be a "RTL8723B" which was originally supported by the
-> driver (communicating via USB).
+> Removing the HCI_UART_INIT_PENDING check makes the code easier to read
+> and also fixes the initalization of devices (implemented with the serdev
+> library) which use the H5 protocol.
 > 
 > Signed-off-by: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
 > ---
-> drivers/bluetooth/btrtl.c | 32 ++++++++++++++++++++++++++++++--
-> 1 file changed, 30 insertions(+), 2 deletions(-)
+> drivers/bluetooth/hci_serdev.c | 3 ---
+> 1 file changed, 3 deletions(-)
 > 
-> diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
-> index 45b872f5ad22..d896f9421250 100644
-> --- a/drivers/bluetooth/btrtl.c
-> +++ b/drivers/bluetooth/btrtl.c
-> @@ -418,9 +418,33 @@ struct btrtl_device_info *btrtl_initialize(struct hci_dev *hdev)
-> 		has_rom_version = false;
-> 		break;
-> 	case RTL_ROM_LMP_8723B:
-> -		fw_name = "rtl_bt/rtl8723b_fw.bin";
-> -		cfg_name = "rtl_bt/rtl8723b_config.bin";
-> +		/* all variants support reading the ROM version */
-> 		has_rom_version = true;
-> +
-> +		/*
-> +		 * RTL8723 devices exist in different variants:
-> +		 * - RTL8723BS (SDIO chip with UART Bluetooth)
-> +		 * - RTL8723DS (SDIO chip with UART Bluetooth)
-> +		 * - for backwards-compatibility everything else is assumed to
-> +		 *   be an RTL8723B communicating over USB
-> +		 *
-> +		 * Only UART devices really need the config because that
-> +		 * contains the UART speed / flow control settings.
-> +		 */
-> +		if (hdev->bus == HCI_UART && resp->hci_ver == 6 &&
-> +		    le16_to_cpu(resp->hci_rev) == 0xb) {
-> +			fw_name = "rtl_bt/rtl8723bs_fw.bin";
-> +			cfg_name = "rtl_bt/rtl8723bs_config.bin";
-> +			cfg_needed = true;
-> +		} else if (hdev->bus == HCI_UART && resp->hci_ver == 8 &&
-> +			   le16_to_cpu(resp->hci_rev) == 0xd) {
-> +			fw_name = "rtl_bt/rtl8723ds_fw.bin";
-> +			cfg_name = "rtl_bt/rtl872ds_config.bin";
-> +			cfg_needed = true;
-> +		} else {
-> +			fw_name = "rtl_bt/rtl8723b_fw.bin";
-> +			cfg_name = "rtl_bt/rtl8723b_config.bin";
-> +		}
+> diff --git a/drivers/bluetooth/hci_serdev.c b/drivers/bluetooth/hci_serdev.c
+> index e0e6461b9200..fe67eb6d4278 100644
+> --- a/drivers/bluetooth/hci_serdev.c
+> +++ b/drivers/bluetooth/hci_serdev.c
+> @@ -333,9 +333,6 @@ int hci_uart_register_device(struct hci_uart *hu,
+> 	else
+> 		hdev->dev_type = HCI_PRIMARY;
+> 
+> -	if (test_bit(HCI_UART_INIT_PENDING, &hu->hdev_flags))
+> -		return 0;
+> -
 
-so the main question is why is this a config file in the first place? So far all other drivers have expressed UART settings via DT (or even via ACPI). If we are just getting the baudrates, then better have this in DT. Since otherwise we end up with board specific filesystems again where different config files need to be installed. That is really not useful in the end.
-
-What is actually in these config files? Can we have some parsing and friendly display tool in bluez.git like we have for other manufactures.
+then lets also remove the flag definition itself. Or if that is still needed for some legacy operation, then describe this. For example I also see it used in hci_serdev.c and main question would be if it is used there as well or some legacy cruft.
 
 Regards
 
