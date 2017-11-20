@@ -1,37 +1,58 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Anitha Chandrasekar <anitha.chandrasekar@sasken.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Gdbus method reply cb not called for sleepy devices
-Date: Mon, 20 Nov 2017 13:57:24 +0000
-Message-ID: <7B53A3173656CB4190908401FE75F4F8600A4C64@exgmbxfz01.sasken.com>
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 2/2] device: Don't disable auto-connect for trusted devices
+Date: Mon, 20 Nov 2017 15:42:44 +0200
+Message-Id: <20171120134244.24548-2-luiz.dentz@gmail.com>
+In-Reply-To: <20171120134244.24548-1-luiz.dentz@gmail.com>
+References: <20171120134244.24548-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi All,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-We are using bluez stack to work as a GATT central device on a 32 bit processor. We are trying to call Bluez 5.46 read api. We see that at stack the callback method_call_reply(gdbus/client.c) is not being called, due to which it is unable to call our registered callback.
+Trusted shall indicate if the device is allowed connect in any
+circumstance, even if the user has called device.Disconnect.
+---
+ doc/device-api.txt | 6 +++---
+ src/device.c       | 6 +++---
+ 2 files changed, 6 insertions(+), 6 deletions(-)
 
-Few observations:
-1) This happens only when Gatt APIs such as read/disconnect/write etc are called, and the peripheral device is in sleep , disconnected.
-2) We have verified through dbus-monitor --system and the dbus has sent the message as NOT CONNECTED, but this is not reached to gdbus client.
-3) It perfectly works fine on a 64th bit processor , but not working on 32bit processor.
+diff --git a/doc/device-api.txt b/doc/device-api.txt
+index ac5604f9c..8b69c2ef3 100644
+--- a/doc/device-api.txt
++++ b/doc/device-api.txt
+@@ -52,9 +52,9 @@ Methods		void Connect()
+ 			This method can be also used to cancel a preceding
+ 			Connect call before a reply to it has been received.
+ 
+-			When connected over LE bearer calling this method will
+-			prevent incoming connections until Connect method is
+-			called again.
++			For non-trusted devices connected over LE bearer calling
++			this method will disable incoming connections until
++			Connect method is called again.
+ 
+ 			Possible errors: org.bluez.Error.NotConnected
+ 
+diff --git a/src/device.c b/src/device.c
+index e8118112e..a753d2140 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -1483,10 +1483,10 @@ static DBusMessage *dev_disconnect(DBusConnection *conn, DBusMessage *msg,
+ 	struct btd_device *device = user_data;
+ 
+ 	/*
+-	 * Disable connections through passive scanning until
+-	 * Device1.Connect is called
++	 * If device is not trusted disable connections through passive
++	 * scanning until Device1.Connect is called
+ 	 */
+-	if (device->auto_connect) {
++	if (device->auto_connect && !device->trusted) {
+ 		device->disable_auto_connect = TRUE;
+ 		device_set_auto_connect(device, FALSE);
+ 	}
+-- 
+2.13.6
 
-The dbus version used is 1.10.10. The bluez stack used is bluez5.46.Using x86, 32 bit processor.
-
-Any information will be of great help. Thanks!!
-
-Regards,
-Anitha
-
-________________________________
-
-SASKEN BUSINESS DISCLAIMER: This message may contain confidential, proprietary or legally privileged information. In case you are not the original intended Recipient of the message, you must not, directly or indirectly, use, disclose, distribute, print, or copy any part of this message and you are requested to delete it and inform the sender. Any views expressed in this message are those of the individual sender unless otherwise stated. Nothing contained in this message shall be construed as an offer or acceptance of any offer by Sasken Technologies Limited ( formerly known as "Sasken Communication Technologies Limited" ) unless sent with that express intent and with due authority of Sasken. Sasken has taken enough precautions to prevent the spread of viruses. However the company accepts no liability for any damage caused by any virus transmitted by this email.
-Read Disclaimer at http://www.sasken.com/mail-disclaimer/
-
-________________________________
---
-To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-the body of a message to majordomo@vger.kernel.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
