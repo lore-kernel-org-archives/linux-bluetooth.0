@@ -1,33 +1,44 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Anitha Chandrasekar <anitha.chandrasekar@sasken.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Facing issue with Bluez read API
-Date: Mon, 20 Nov 2017 11:55:31 +0000
-Message-ID: <7B53A3173656CB4190908401FE75F4F8600A3C34@exgmbxfz01.sasken.com>
-Content-Type: text/plain; charset="us-ascii"
+Return-Path: <benjamin.tissoires@redhat.com>
+Date: Mon, 20 Nov 2017 11:49:43 +0100
+From: Benjamin Tissoires <benjamin.tissoires@redhat.com>
+To: Jiri Kosina <jikos@kernel.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	Niels Skou Olsen <nolsen@jabra.com>, linux-kernel@vger.kernel.org,
+	linux-input@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v2 0/4] Quirks cleanup and hid-generic niceness
+Message-ID: <20171120104943.GK403@mail.corp.redhat.com>
+References: <20171003145729.3135-1-benjamin.tissoires@redhat.com>
+ <nycvar.YFH.7.76.1711161358020.32604@cbobk.fhfr.pm>
+ <20171116164417.GG403@mail.corp.redhat.com>
+ <nycvar.YFH.7.76.1711200924200.32604@cbobk.fhfr.pm>
 MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <nycvar.YFH.7.76.1711200924200.32604@cbobk.fhfr.pm>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi All,
+On Nov 20 2017 or thereabouts, Jiri Kosina wrote:
+> On Thu, 16 Nov 2017, Benjamin Tissoires wrote:
+> 
+> > > I am planning to queue this for 4.16; do you happen to have any followups 
+> > > since you posted v2 in october?
+> > 
+> > Cool. I did not updated it since, but if you want I can send a v3
+> > tomorrow based on your for-next branch.
+> 
+> Would be perfect; the sooner it gets into my tree the better, so that we 
+> could start basing other topic branches on it. That'd avoid a lot of merge 
+> conflicts later.
 
-We are using bluez stack to work as a GATT central device on a 32 bit processor. We are trying to call Bluez 5.46 read api. We see that at stack the callback method_call_reply(gdbus/client.c) is not being called, due to which it is unable to call our registered callback.
+Alright, freshly rebased from this morning, the v3 should be in your
+mailbox.
 
-Few observations:
-1) This happens only when read is called, and the peripheral device is in sleep.
-2) We have verified through dbus-monitor --system and the dbus has sent the message as NOT CONNECTED, but this is not reached to gdbus client.
-3) It perfectly works fine on a 64th bit processor , but not working on 32bit processor.
+Cheers,
+Benjamin
 
-The dbus version used is 1.10.10. The bluez stack used is bluez5.46.Using x86, 32 bit processor.
-
-Any information will be of great help. Thanks!!
-
-Regards,
-Anitha
-
-________________________________
-
-SASKEN BUSINESS DISCLAIMER: This message may contain confidential, proprietary or legally privileged information. In case you are not the original intended Recipient of the message, you must not, directly or indirectly, use, disclose, distribute, print, or copy any part of this message and you are requested to delete it and inform the sender. Any views expressed in this message are those of the individual sender unless otherwise stated. Nothing contained in this message shall be construed as an offer or acceptance of any offer by Sasken Technologies Limited ( formerly known as "Sasken Communication Technologies Limited" ) unless sent with that express intent and with due authority of Sasken. Sasken has taken enough precautions to prevent the spread of viruses. However the company accepts no liability for any damage caused by any virus transmitted by this email.
-Read Disclaimer at http://www.sasken.com/mail-disclaimer/
-
-________________________________
+> 
+> Thanks,
+> 
+> -- 
+> Jiri Kosina
+> SUSE Labs
+> 
