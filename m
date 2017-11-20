@@ -1,49 +1,35 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <20171120134244.24548-1-luiz.dentz@gmail.com>
+Message-ID: <1511187704.16347.17.camel@hadess.net>
+Subject: Re: [PATCH BlueZ 2/2] device: Don't disable auto-connect for
+ trusted devices
+From: Bastien Nocera <hadess@hadess.net>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        linux-bluetooth@vger.kernel.org
+Date: Mon, 20 Nov 2017 15:21:44 +0100
+In-Reply-To: <20171120134244.24548-2-luiz.dentz@gmail.com>
 References: <20171120134244.24548-1-luiz.dentz@gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 20 Nov 2017 17:13:02 +0200
-Message-ID: <CABBYNZKPoSmBBKoOgDsDEBrEG5HSpL7dybzAL7wrn13YLcYyyg@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/2] doc/device-api: Document behavior of Disconnect
- method with LE
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+         <20171120134244.24548-2-luiz.dentz@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
-
-On Mon, Nov 20, 2017 at 3:42 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
+On Mon, 2017-11-20 at 15:42 +0200, Luiz Augusto von Dentz wrote:
 > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> If and LE device is disconnected using device.Device method it won't
-> be able to reconnect by itself.
-> ---
->  doc/device-api.txt | 4 ++++
->  1 file changed, 4 insertions(+)
->
-> diff --git a/doc/device-api.txt b/doc/device-api.txt
-> index 13b28818e..ac5604f9c 100644
-> --- a/doc/device-api.txt
-> +++ b/doc/device-api.txt
-> @@ -52,6 +52,10 @@ Methods              void Connect()
->                         This method can be also used to cancel a preceding
->                         Connect call before a reply to it has been received.
->
-> +                       When connected over LE bearer calling this method will
-> +                       prevent incoming connections until Connect method is
-> +                       called again.
-> +
->                         Possible errors: org.bluez.Error.NotConnected
->
->                 void ConnectProfile(string uuid)
-> --
-> 2.13.6
+> 
+> Trusted shall indicate if the device is allowed connect in any
+> circumstance, even if the user has called device.Disconnect.
 
-Applied.
+This fixes my Bluetooth LE mouse not being able to reconnect to the
+computer at all after it was disconnected through a toggle switch,
+requiring removing the pairing on the computer, and pairing it again.
 
+But as the device is still able to disconnect, and the mouse just
+considers the disconnect a transient transport problem, it will
+reconnect straight away.
 
--- 
-Luiz Augusto von Dentz
+I might make some changes to the UI to make it clearer that we did
+manage to disconnect, and that the device reconnected, otherwise it
+looks like the switch didn't work.
+
+So, +1 from me!
