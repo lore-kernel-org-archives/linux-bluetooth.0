@@ -1,31 +1,32 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <jikos@kernel.org>
+Date: Mon, 20 Nov 2017 09:24:56 +0100 (CET)
+From: Jiri Kosina <jikos@kernel.org>
+To: Benjamin Tissoires <benjamin.tissoires@redhat.com>
+cc: Marcel Holtmann <marcel@holtmann.org>, Niels Skou Olsen <nolsen@jabra.com>,
+    linux-kernel@vger.kernel.org, linux-input@vger.kernel.org,
+    linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v2 0/4] Quirks cleanup and hid-generic niceness
+In-Reply-To: <20171116164417.GG403@mail.corp.redhat.com>
+Message-ID: <nycvar.YFH.7.76.1711200924200.32604@cbobk.fhfr.pm>
+References: <20171003145729.3135-1-benjamin.tissoires@redhat.com> <nycvar.YFH.7.76.1711161358020.32604@cbobk.fhfr.pm> <20171116164417.GG403@mail.corp.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20171119095806.Horde.RoDJIijadVKVaiRfz_99dX8@www.vfemail.net>
-References: <20171119095806.Horde.RoDJIijadVKVaiRfz_99dX8@www.vfemail.net>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 20 Nov 2017 11:07:43 +0200
-Message-ID: <CABBYNZK-eZX3DnAZRz_EeMedmgNWFGH_mAzLkDYDRm97UAL16A@mail.gmail.com>
-Subject: Re: [BlueZ] bluetoothctl Tab-Completion
-To: manday@openmail.cc
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Cedric,
+On Thu, 16 Nov 2017, Benjamin Tissoires wrote:
 
-On Sun, Nov 19, 2017 at 11:58 AM,  <manday@openmail.cc> wrote:
-> Hello,
->
-> I would like to point out that the helpful "Tab-Completion" feature in
-> bluetoothctl (with readline support, I suppose) misbehaves for the "pair"
-> command, where it suggests either "on" or "off" as argument, but not a
-> device.
->
-> Also, I have noticed that sometimes Tab-Completion drops dead alltogether,
-> though I couldn't see a reproducible pattern.
+> > I am planning to queue this for 4.16; do you happen to have any followups 
+> > since you posted v2 in october?
+> 
+> Cool. I did not updated it since, but if you want I can send a v3
+> tomorrow based on your for-next branch.
 
-Have you tried with latest upstream, I did fix a few things related to
-tab-completion, previously it would not ignore leading spaces but now
-that should work. I will check what is going one with pair, perhaps
-the wrong completion callback is being used.
+Would be perfect; the sooner it gets into my tree the better, so that we 
+could start basing other topic branches on it. That'd avoid a lot of merge 
+conflicts later.
+
+Thanks,
+
+-- 
+Jiri Kosina
+SUSE Labs
