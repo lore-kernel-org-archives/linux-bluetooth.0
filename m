@@ -1,43 +1,73 @@
-Return-Path: <benjamin.tissoires@redhat.com>
-From: Benjamin Tissoires <benjamin.tissoires@redhat.com>
-To: Jiri Kosina <jikos@kernel.org>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Niels Skou Olsen <nolsen@jabra.com>
-Cc: linux-kernel@vger.kernel.org,
-	linux-input@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org,
-	Benjamin Tissoires <benjamin.tissoires@redhat.com>
-Subject: [PATCH v3 0/4] Quirks cleanup and hid-generic niceness
-Date: Mon, 20 Nov 2017 11:48:40 +0100
-Message-Id: <20171120104844.31977-1-benjamin.tissoires@redhat.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Jaganath Kanakkassery <jaganath.k.os@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
+Subject: [PATCH 3/3 v2] doc/mgmt-api: Add advertising phys support to flags
+Date: Mon, 20 Nov 2017 15:56:57 +0530
+Message-Id: <1511173617-25442-4-git-send-email-jaganathx.kanakkassery@intel.com>
+In-Reply-To: <1511173617-25442-1-git-send-email-jaganathx.kanakkassery@intel.com>
+References: <1511173617-25442-1-git-send-email-jaganathx.kanakkassery@intel.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+---
+ doc/mgmt-api.txt | 22 ++++++++++++++++++++++
+ 1 file changed, 22 insertions(+)
 
-this is v3 rebased on top of for-next.
-There are no other changes.
-
-Cheers,
-Benjamin
-
-Benjamin Tissoires (4):
-  HID: core: move the dynamic quirks handling in core
-  HID: quirks: move the list of special devices into a quirk
-  HID: core: move the list of ignored devices in hid-quirks.c
-  HID: core: remove the absolute need of hid_have_special_driver[]
-
- drivers/hid/Makefile            |    2 +-
- drivers/hid/hid-core.c          |  932 ++---------------------------
- drivers/hid/hid-generic.c       |   68 ++-
- drivers/hid/hid-quirks.c        | 1248 +++++++++++++++++++++++++++++++++++++++
- drivers/hid/usbhid/Makefile     |    2 +-
- drivers/hid/usbhid/hid-core.c   |   10 +-
- drivers/hid/usbhid/hid-quirks.c |  402 -------------
- include/linux/hid.h             |   21 +-
- net/bluetooth/hidp/core.c       |    2 +-
- 9 files changed, 1395 insertions(+), 1292 deletions(-)
- create mode 100644 drivers/hid/hid-quirks.c
- delete mode 100644 drivers/hid/usbhid/hid-quirks.c
-
+diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
+index b59bf0c..c138f47 100644
+--- a/doc/mgmt-api.txt
++++ b/doc/mgmt-api.txt
+@@ -2504,6 +2504,9 @@ Read Advertising Features Command
+ 		4	Add TX Power field to Adv_Data
+ 		5	Add Appearance field to Scan_Rsp
+ 		6	Add Local Name in Scan_Rsp
++		7	Secondary Channel with LE 1M
++		8	Secondary Channel with LE 2M
++		9	Secondary Channel with LE Coded
+ 
+ 	The Flags bit 0 indicates support for connectable advertising
+ 	and for switching to connectable advertising independent of the
+@@ -2553,6 +2556,15 @@ Read Advertising Features Command
+ 	space is limited a short version or no name information. The
+ 	Local Name will be added at the end of the scan response data.
+ 
++	The Flags bit 7 indicates support for advertising in secondary
++	channel in LE 1M PHY.
++
++	The Flags bit 8 indicates support for advertising in secondary
++	channel in LE 2M PHY. Primary channel would be on 1M.
++
++	The Flags bit 9 indicates support for advertising in secondary
++	channel in LE CODED PHY.
++
+ 	The valid range for Instance identifiers is 1-254. The value 0
+ 	is reserved for internal use and the value 255 is reserved for
+ 	future extensions. However the Max_Instances value for indicating
+@@ -2613,6 +2625,9 @@ Add Advertising Command
+ 		4	Add TX Power field to Adv_Data
+ 		5	Add Appearance field to Scan_Rsp
+ 		6	Add Local Name in Scan_Rsp
++		7	Secondary Channel with LE 1M
++		8	Secondary Channel with LE 2M
++		9	Secondary Channel with LE Coded
+ 
+ 	When the connectable flag is set, then the controller will use
+ 	undirected connectable advertising. The value of the connectable
+@@ -2640,6 +2655,13 @@ Add Advertising Command
+ 	supported to provide less air traffic for devices implementing
+ 	broadcaster role.
+ 
++	Secondary channel flags can be used to advertise in secondary
++	channel with the corresponding PHYs. In case of 2M, the primary
++	channel used would be 1M. If none of them are set then secondary
++	channel advertising would be disabled for this instance which is as
++	good as legacy advertising. Combining the sets would result in
++	multiple advertising sets being created.
++
+ 	The Duration parameter configures the length of an Instance. The
+ 	value is in seconds.
+ 
 -- 
-2.14.3
+2.7.4
+
