@@ -1,87 +1,76 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-From: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
-Subject: [PATCH BlueZ] shared/shell: Fix command completion without character
-Message-ID: <ce49d596-5ea4-a2ff-0e42-a0b308eeaccd@jp.fujitsu.com>
-Date: Tue, 21 Nov 2017 16:14:11 +0900
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+From: Inga Stotland <inga.stotland@intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Inga Stotland <inga.stotland@intel.com>
+Subject: [PATCH BlueZ] mesh: validate configuration target
+Date: Mon, 20 Nov 2017 23:08:48 -0800
+Message-Id: <20171121070848.7305-1-inga.stotland@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If the command completion without any character is run, then only returns
-the commands of default menu since readline increases the variable state
-during each matching and tools specific menu is not compared.
+Require obtaining node composition prior to sending configuration
+commands that assume knowledge about the node's element/model layout.
 ---
- src/shared/shell.c | 44 +++++++++++++++++++++++++++++---------------
- 1 file changed, 29 insertions(+), 15 deletions(-)
+ mesh/config-client.c | 31 +++++++++++++++++++++++++------
+ 1 file changed, 25 insertions(+), 6 deletions(-)
 
-diff --git a/src/shared/shell.c b/src/shared/shell.c
-index 378c0c029..c271a53ee 100644
---- a/src/shared/shell.c
-+++ b/src/shared/shell.c
-@@ -390,32 +390,46 @@ done:
- 	free(input);
+diff --git a/mesh/config-client.c b/mesh/config-client.c
+index d80f784e6..782781602 100644
+--- a/mesh/config-client.c
++++ b/mesh/config-client.c
+@@ -461,16 +461,37 @@ static void cmd_del_app_key(const char *args)
+ 	cmd_app_key(args, OP_APPKEY_DELETE);
  }
  
--static char *cmd_generator(const char *text, int state)
-+static char *find_cmd(const char *text,
-+			const struct bt_shell_menu_entry *entry, int *index)
- {
--	static const struct bt_shell_menu_entry *entry;
--	static int index, len;
- 	const char *cmd;
-+	int len;
- 
--	if (!state) {
--		entry = default_menu;
--		index = 0;
--		len = strlen(text);
--	}
-+	len = strlen(text);
- 
--	while ((cmd = entry[index].cmd)) {
--		index++;
-+	while ((cmd = entry[*index].cmd)) {
-+		(*index)++;
- 
- 		if (!strncmp(cmd, text, len))
- 			return strdup(cmd);
- 	}
- 
--	if (state)
--		return NULL;
-+	return NULL;
-+}
- 
--	entry = data.menu->entries;
--	index = 0;
-+static char *cmd_generator(const char *text, int state)
++static bool verify_config_target(uint32_t dst)
 +{
-+	static int index;
-+	static bool default_menu_enabled;
-+	char *cmd;
++	struct mesh_node *node;
 +
-+	if (!state) {
-+		index = 0;
-+		default_menu_enabled = true;
++	if (IS_UNASSIGNED(dst)) {
++		rl_printf("Destination not set\n");
++		return false;
 +	}
 +
-+	if (default_menu_enabled) {
-+		cmd = find_cmd(text, default_menu, &index);
-+		if (cmd) {
-+			return cmd;
-+		} else {
-+			index = 0;
-+			default_menu_enabled = false;
-+		}
++	node = node_find_by_addr(dst);
++	if (!node) {
++		rl_printf("Node with unicast address %4.4x unknown\n", dst);
++		return false;
 +	}
++
++	if (!node_get_composition(node)) {
++		rl_printf("Node composition for %4.4x unknown\n", dst);
++		return false;
++	}
++
++	return true;
++}
++
+ static void cmd_bind(const char *args)
+ {
+ 	uint16_t n;
+ 	uint8_t msg[32];
+ 	int parm_cnt;
  
--	return cmd_generator(text, 1);
-+	return find_cmd(text, data.menu->entries, &index);
- }
+-	if (IS_UNASSIGNED(target)) {
+-		rl_printf("Destination not set\n");
++	if (!verify_config_target(target))
+ 		return;
+-	}
  
- static char **menu_completion(const struct bt_shell_menu_entry *entry,
+ 	parm_cnt = read_input_parameters(args);
+ 	if (parm_cnt != 3 && parm_cnt != 4) {
+@@ -529,10 +550,8 @@ static void cmd_set_pub(const char *args)
+ 	uint8_t msg[32];
+ 	int parm_cnt;
+ 
+-	if (IS_UNASSIGNED(target)) {
+-		rl_printf("Destination not set\n");
++	if (!verify_config_target(target))
+ 		return;
+-	}
+ 
+ 	n = mesh_opcode_set(OP_CONFIG_MODEL_PUB_SET, msg);
+ 
 -- 
-2.14.1
+2.13.6
 
