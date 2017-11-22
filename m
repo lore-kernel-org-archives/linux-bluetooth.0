@@ -1,11 +1,11 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <b15a118c-f975-1530-5c95-89c8db0a3d27@jp.fujitsu.com>
-References: <b15a118c-f975-1530-5c95-89c8db0a3d27@jp.fujitsu.com>
+In-Reply-To: <ce49d596-5ea4-a2ff-0e42-a0b308eeaccd@jp.fujitsu.com>
+References: <ce49d596-5ea4-a2ff-0e42-a0b308eeaccd@jp.fujitsu.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 22 Nov 2017 10:53:58 +0200
-Message-ID: <CABBYNZ+wqHxHHSepO9JcAcvK+9oYR0qStcZRjXbQtYot3pE80w@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] obexd: Fix fd which is left even after closing session
+Date: Wed, 22 Nov 2017 10:53:27 +0200
+Message-ID: <CABBYNZKVC0M-2OvkrzM6J1hvM9ZRosa1zgadip093C=g-OUMag@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] shared/shell: Fix command completion without character
 To: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
@@ -14,71 +14,81 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Eramoto,
 
-On Fri, Nov 17, 2017 at 1:30 PM, ERAMOTO Masaya
+On Tue, Nov 21, 2017 at 9:14 AM, ERAMOTO Masaya
 <eramoto.masaya@jp.fujitsu.com> wrote:
-> A fd is duplicated if dbus type is unix fd, and then it is not closed
-> even after the file is finished transporting. In the end obexd can not
-> transport due to the limitation of open-able fd as below.
->
->   Warning: invalid file descriptor 1031 in syscall fcntl(DUPFD_CLOEXEC)()
->
->   FILE DESCRIPTORS: 1021 open at exit.
->   Open pf-31 socket 1023:
->      at 0x5061F1F: fcntl_common (fcntl.c:46)
->      by 0x5061F1F: fcntl (fcntl.c:79)
->      by 0x52A1C3D: _dbus_dup (in /lib/x86_64-linux-gnu/libdbus-1.so.3.14.13)
->      by 0x528C7B8: dbus_message_iter_get_basic (in /lib/x86_64-linux-gnu/libdbus-1.so.3.14.13)
->      by 0x149E04: profile_new_connection (bluetooth.c:136)
->      by 0x18AAF2: process_message.isra.3 (object.c:259)
->      by 0x18B364: generic_message (object.c:1079)
->      by 0x5290FD2: ??? (in /lib/x86_64-linux-gnu/libdbus-1.so.3.14.13)
->      by 0x5282623: dbus_connection_dispatch (in /lib/x86_64-linux-gnu/libdbus-1.so.3.14.13)
->      by 0x1852FF: message_dispatch (mainloop.c:72)
->      by 0x5505E24: g_main_context_dispatch (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.5400.1)
->      by 0x55061EF: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.5400.1)
->      by 0x5506501: g_main_loop_run (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.5400.1)
+> If the command completion without any character is run, then only returns
+> the commands of default menu since readline increases the variable state
+> during each matching and tools specific menu is not compared.
 > ---
->  obexd/plugins/bluetooth.c | 5 ++++-
->  obexd/src/obex.c          | 4 +++-
->  2 files changed, 7 insertions(+), 2 deletions(-)
+>  src/shared/shell.c | 44 +++++++++++++++++++++++++++++---------------
+>  1 file changed, 29 insertions(+), 15 deletions(-)
 >
-> diff --git a/obexd/plugins/bluetooth.c b/obexd/plugins/bluetooth.c
-> index 3ee54325f..d6028d114 100644
-> --- a/obexd/plugins/bluetooth.c
-> +++ b/obexd/plugins/bluetooth.c
-> @@ -144,12 +144,15 @@ static DBusMessage *profile_new_connection(DBusConnection *conn,
->         if (fcntl(fd, F_GETFD) < 0) {
->                 error("bluetooth: fcntl(%d, F_GETFD): %s (%d)", fd,
->                                                 strerror(errno), errno);
-> +               close(fd);
->                 return invalid_args(msg);
+> diff --git a/src/shared/shell.c b/src/shared/shell.c
+> index 378c0c029..c271a53ee 100644
+> --- a/src/shared/shell.c
+> +++ b/src/shared/shell.c
+> @@ -390,32 +390,46 @@ done:
+>         free(input);
+>  }
+>
+> -static char *cmd_generator(const char *text, int state)
+> +static char *find_cmd(const char *text,
+> +                       const struct bt_shell_menu_entry *entry, int *index)
+>  {
+> -       static const struct bt_shell_menu_entry *entry;
+> -       static int index, len;
+>         const char *cmd;
+> +       int len;
+>
+> -       if (!state) {
+> -               entry = default_menu;
+> -               index = 0;
+> -               len = strlen(text);
+> -       }
+> +       len = strlen(text);
+>
+> -       while ((cmd = entry[index].cmd)) {
+> -               index++;
+> +       while ((cmd = entry[*index].cmd)) {
+> +               (*index)++;
+>
+>                 if (!strncmp(cmd, text, len))
+>                         return strdup(cmd);
 >         }
 >
->         io = g_io_channel_unix_new(fd);
-> -       if (io == NULL)
-> +       if (io == NULL) {
-> +               close(fd);
->                 return invalid_args(msg);
+> -       if (state)
+> -               return NULL;
+> +       return NULL;
+> +}
+>
+> -       entry = data.menu->entries;
+> -       index = 0;
+> +static char *cmd_generator(const char *text, int state)
+> +{
+> +       static int index;
+> +       static bool default_menu_enabled;
+> +       char *cmd;
+> +
+> +       if (!state) {
+> +               index = 0;
+> +               default_menu_enabled = true;
+> +       }
+> +
+> +       if (default_menu_enabled) {
+> +               cmd = find_cmd(text, default_menu, &index);
+> +               if (cmd) {
+> +                       return cmd;
+> +               } else {
+> +                       index = 0;
+> +                       default_menu_enabled = false;
+> +               }
 > +       }
 >
->         DBG("device %s", device);
+> -       return cmd_generator(text, 1);
+> +       return find_cmd(text, data.menu->entries, &index);
+>  }
 >
-> diff --git a/obexd/src/obex.c b/obexd/src/obex.c
-> index be79a778e..308e56d07 100644
-> --- a/obexd/src/obex.c
-> +++ b/obexd/src/obex.c
-> @@ -235,8 +235,10 @@ static void obex_session_free(struct obex_session *os)
->  {
->         sessions = g_slist_remove(sessions, os);
->
-> -       if (os->io)
-> +       if (os->io) {
-> +               g_io_channel_shutdown(os->io, TRUE, NULL);
->                 g_io_channel_unref(os->io);
-> +       }
->
->         if (os->obex)
->                 g_obex_unref(os->obex);
+>  static char **menu_completion(const struct bt_shell_menu_entry *entry,
 > --
 > 2.14.1
 
