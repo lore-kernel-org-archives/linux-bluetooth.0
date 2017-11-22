@@ -1,47 +1,143 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 3/3] client: Fix format of arguments of set-service and set-manufacturer
-Date: Wed, 22 Nov 2017 15:00:19 +0200
-Message-Id: <20171122130019.14173-3-luiz.dentz@gmail.com>
-In-Reply-To: <20171122130019.14173-1-luiz.dentz@gmail.com>
-References: <20171122130019.14173-1-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 1/3] shared/shell: Detect if the arguments are properly set
+Date: Wed, 22 Nov 2017 15:00:17 +0200
+Message-Id: <20171122130019.14173-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Optional arguments should contain only one set of '[' ']' otherwise
-wordexp won't be able to parse it.
+Parse arguments to detect if user has passed a valid number of
+arguments.
 ---
- client/main.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ src/shared/shell.c | 98 ++++++++++++++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 92 insertions(+), 6 deletions(-)
 
-diff --git a/client/main.c b/client/main.c
-index 38028c6c0..7661b33c0 100644
---- a/client/main.c
-+++ b/client/main.c
-@@ -2205,9 +2205,9 @@ static const struct bt_shell_menu advertise_menu = {
- 	.entries = {
- 	{ "set-uuids", "[uuid1 uuid2 ...]",
- 			cmd_set_advertise_uuids, "Set advertise uuids" },
--	{ "set-service", "[uuid][data=[xx xx ...]", cmd_set_advertise_service,
-+	{ "set-service", "[uuid] [data=xx xx ...]", cmd_set_advertise_service,
- 			"Set advertise service data" },
--	{ "set-manufacturer", "[id][data=[xx xx ...]",
-+	{ "set-manufacturer", "[id] [data=xx xx ...]",
- 			cmd_set_advertise_manufacturer,
- 			"Set advertise manufacturer data" },
- 	{ "set-tx-power", "<on/off>", cmd_set_advertise_tx_power,
-@@ -2254,7 +2254,7 @@ static const struct bt_shell_menu gatt_menu = {
- 	{ "attribute-info", "[attribute/UUID]",  cmd_attribute_info,
- 				"Select attribute", attribute_generator },
- 	{ "read",         NULL,       cmd_read, "Read attribute value" },
--	{ "write",        "<data=[xx xx ...]>", cmd_write,
-+	{ "write",        "<data=xx xx ...>", cmd_write,
- 						"Write attribute value" },
- 	{ "acquire-write", NULL, cmd_acquire_write,
- 					"Acquire Write file descriptor" },
+diff --git a/src/shared/shell.c b/src/shared/shell.c
+index c271a53ee..73aedaf79 100644
+--- a/src/shared/shell.c
++++ b/src/shared/shell.c
+@@ -207,6 +207,95 @@ static void shell_print_menu(void)
+ 	}
+ }
+ 
++static int parse_args(char *arg, wordexp_t *w, char *del, int flags)
++{
++	char *str;
++
++	str = g_strdelimit(arg, del, '"');
++
++	if (wordexp(str, w, flags)) {
++		g_free(str);
++		return -EINVAL;
++	}
++
++	/* If argument ends with ,,, set we_offs bypass strict checks */
++	if (w->we_wordc && g_str_has_suffix(w->we_wordv[w->we_wordc -1], "..."))
++		w->we_offs = 1;
++
++	g_free(str);
++
++	return 0;
++}
++
++static int cmd_exec(const struct bt_shell_menu_entry *entry,
++					int argc, char *argv[])
++{
++	wordexp_t w;
++	size_t len;
++	char *man, *opt;
++	int flags = WRDE_NOCMD;
++
++	if (!entry->arg || entry->arg[0] == '\0') {
++		if (argc) {
++			print_text(COLOR_HIGHLIGHT, "Too many arguments");
++			return -EINVAL;
++		}
++		goto exec;
++	}
++
++	/* Find last mandatory arguments */
++	man = strrchr(entry->arg, '>');
++	if (!man) {
++		opt = strdup(entry->arg);
++		goto optional;
++	}
++
++	len = man - entry->arg;
++	man = strndup(entry->arg, len + 1);
++
++	if (parse_args(man, &w, "<>", flags) < 0) {
++		print_text(COLOR_HIGHLIGHT,
++				"Unable to parse mandatory command arguments");
++		return -EINVAL;
++	}
++
++	/* Check if there are enough arguments */
++	if ((unsigned) argc < w.we_wordc && !w.we_offs) {
++		print_text(COLOR_HIGHLIGHT, "Missing %s argument",
++						w.we_wordv[argc]);
++		goto fail;
++	}
++
++	flags |= WRDE_APPEND;
++	opt = strdup(entry->arg + len + 1);
++
++optional:
++	if (parse_args(opt, &w, "<>", flags) < 0) {
++		print_text(COLOR_HIGHLIGHT,
++				"Unable to parse mandatory command arguments");
++		return -EINVAL;
++	}
++
++	/* Check if there are too many arguments */
++	if ((unsigned) argc > w.we_wordc && !w.we_offs) {
++		print_text(COLOR_HIGHLIGHT, "Too many arguments: %d > %zu",
++					argc, w.we_wordc);
++		goto fail;
++	}
++
++	wordfree(&w);
++
++exec:
++	if (entry->func)
++		entry->func(argc, argv);
++
++	return 0;
++
++fail:
++	wordfree(&w);
++	return -EINVAL;
++}
++
+ static int menu_exec(const struct bt_shell_menu_entry *entry,
+ 					int argc, char *argv[])
+ {
+@@ -222,10 +311,7 @@ static int menu_exec(const struct bt_shell_menu_entry *entry,
+ 		if (data.menu == data.main && !strcmp(entry->cmd, "back"))
+ 			continue;
+ 
+-		if (entry->func) {
+-			entry->func(argc - 1, ++argv);
+-			return 0;
+-		}
++		return cmd_exec(entry, --argc, ++argv);
+ 	}
+ 
+ 	return -ENOENT;
+@@ -236,8 +322,8 @@ static void shell_exec(int argc, char *argv[])
+ 	if (!data.menu || !argv[0])
+ 		return;
+ 
+-	if (menu_exec(default_menu, argc, argv) < 0) {
+-		if (menu_exec(data.menu->entries, argc, argv) < 0)
++	if (menu_exec(default_menu, argc, argv) == -ENOENT) {
++		if (menu_exec(data.menu->entries, argc, argv) == -ENOENT)
+ 			print_text(COLOR_HIGHLIGHT, "Invalid command");
+ 	}
+ }
 -- 
 2.13.6
 
