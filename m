@@ -1,143 +1,86 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+MIME-Version: 1.0
+In-Reply-To: <1511301906.16347.42.camel@hadess.net>
+References: <20171121200436.17576-1-luiz.dentz@gmail.com> <1511301906.16347.42.camel@hadess.net>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/3] shared/shell: Detect if the arguments are properly set
-Date: Wed, 22 Nov 2017 15:00:17 +0200
-Message-Id: <20171122130019.14173-1-luiz.dentz@gmail.com>
+Date: Wed, 22 Nov 2017 11:14:38 +0200
+Message-ID: <CABBYNZLy-ei67BuDApNvK4KWhtKPWM__4ynM9F8REgCWFgO7WA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] gdbus: Fix not emiting PropertiesChanged
+To: Bastien Nocera <hadess@hadess.net>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Bastien,
 
-Parse arguments to detect if user has passed a valid number of
-arguments.
----
- src/shared/shell.c | 98 ++++++++++++++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 92 insertions(+), 6 deletions(-)
+On Wed, Nov 22, 2017 at 12:05 AM, Bastien Nocera <hadess@hadess.net> wrote:
+>> Re: [PATCH BlueZ] gdbus: Fix not emiting PropertiesChanged
+>
+> emitting.
+>
+> On Tue, 2017-11-21 at 22:04 +0200, Luiz Augusto von Dentz wrote:
+>> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>>
+>> If and interface is removed while properties are pending it would cause
+>
+> "an interface".
+>
+>> process_properties_from_interface to clear data->pending_prop when it
+>> should only clear the iface->pending_prop.
+>
+> I prefer my version, which allows the pending properties to be cleared
+> out if the pending ones were for that interface. I also prefer the
+> subject line I used, describing the actual problem it fixes, and the
+> commit message going more into details.
 
-diff --git a/src/shared/shell.c b/src/shared/shell.c
-index c271a53ee..73aedaf79 100644
---- a/src/shared/shell.c
-+++ b/src/shared/shell.c
-@@ -207,6 +207,95 @@ static void shell_print_menu(void)
- 	}
- }
- 
-+static int parse_args(char *arg, wordexp_t *w, char *del, int flags)
-+{
-+	char *str;
-+
-+	str = g_strdelimit(arg, del, '"');
-+
-+	if (wordexp(str, w, flags)) {
-+		g_free(str);
-+		return -EINVAL;
-+	}
-+
-+	/* If argument ends with ,,, set we_offs bypass strict checks */
-+	if (w->we_wordc && g_str_has_suffix(w->we_wordv[w->we_wordc -1], "..."))
-+		w->we_offs = 1;
-+
-+	g_free(str);
-+
-+	return 0;
-+}
-+
-+static int cmd_exec(const struct bt_shell_menu_entry *entry,
-+					int argc, char *argv[])
-+{
-+	wordexp_t w;
-+	size_t len;
-+	char *man, *opt;
-+	int flags = WRDE_NOCMD;
-+
-+	if (!entry->arg || entry->arg[0] == '\0') {
-+		if (argc) {
-+			print_text(COLOR_HIGHLIGHT, "Too many arguments");
-+			return -EINVAL;
-+		}
-+		goto exec;
-+	}
-+
-+	/* Find last mandatory arguments */
-+	man = strrchr(entry->arg, '>');
-+	if (!man) {
-+		opt = strdup(entry->arg);
-+		goto optional;
-+	}
-+
-+	len = man - entry->arg;
-+	man = strndup(entry->arg, len + 1);
-+
-+	if (parse_args(man, &w, "<>", flags) < 0) {
-+		print_text(COLOR_HIGHLIGHT,
-+				"Unable to parse mandatory command arguments");
-+		return -EINVAL;
-+	}
-+
-+	/* Check if there are enough arguments */
-+	if ((unsigned) argc < w.we_wordc && !w.we_offs) {
-+		print_text(COLOR_HIGHLIGHT, "Missing %s argument",
-+						w.we_wordv[argc]);
-+		goto fail;
-+	}
-+
-+	flags |= WRDE_APPEND;
-+	opt = strdup(entry->arg + len + 1);
-+
-+optional:
-+	if (parse_args(opt, &w, "<>", flags) < 0) {
-+		print_text(COLOR_HIGHLIGHT,
-+				"Unable to parse mandatory command arguments");
-+		return -EINVAL;
-+	}
-+
-+	/* Check if there are too many arguments */
-+	if ((unsigned) argc > w.we_wordc && !w.we_offs) {
-+		print_text(COLOR_HIGHLIGHT, "Too many arguments: %d > %zu",
-+					argc, w.we_wordc);
-+		goto fail;
-+	}
-+
-+	wordfree(&w);
-+
-+exec:
-+	if (entry->func)
-+		entry->func(argc, argv);
-+
-+	return 0;
-+
-+fail:
-+	wordfree(&w);
-+	return -EINVAL;
-+}
-+
- static int menu_exec(const struct bt_shell_menu_entry *entry,
- 					int argc, char *argv[])
- {
-@@ -222,10 +311,7 @@ static int menu_exec(const struct bt_shell_menu_entry *entry,
- 		if (data.menu == data.main && !strcmp(entry->cmd, "back"))
- 			continue;
- 
--		if (entry->func) {
--			entry->func(argc - 1, ++argv);
--			return 0;
--		}
-+		return cmd_exec(entry, --argc, ++argv);
- 	}
- 
- 	return -ENOENT;
-@@ -236,8 +322,8 @@ static void shell_exec(int argc, char *argv[])
- 	if (!data.menu || !argv[0])
- 		return;
- 
--	if (menu_exec(default_menu, argc, argv) < 0) {
--		if (menu_exec(data.menu->entries, argc, argv) < 0)
-+	if (menu_exec(default_menu, argc, argv) == -ENOENT) {
-+		if (menu_exec(data.menu->entries, argc, argv) == -ENOENT)
- 			print_text(COLOR_HIGHLIGHT, "Invalid command");
- 	}
- }
+I guess this one is simpler to maintain, also notice that iterating in
+the data->interfaces to check if there are no other pending_prop has
+almost the same effect as process_property_changes, what would make a
+difference would be to prevent process_changes but that has to run
+anyway to propagate the interfaces added/removed. Also notice that
+data->pending_prop is clear earlier than the original fix for
+duplicated signals, the one that introduced this problem, that way we
+don't reintroduce the original problem.
+
+Regarding the commit message, we usually avoid BlueZ specific
+description there as gdbus is shared with other projects.
+
+>
+> But up to you.
+>
+> Cheers
+>
+>> ---
+>>  gdbus/object.c | 4 ++--
+>>  1 file changed, 2 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/gdbus/object.c b/gdbus/object.c
+>> index afb458764..5c8ad7a55 100644
+>> --- a/gdbus/object.c
+>> +++ b/gdbus/object.c
+>> @@ -1659,8 +1659,6 @@ static void
+>> process_properties_from_interface(struct generic_data *data,
+>>       DBusMessageIter iter, dict, array;
+>>       GSList *invalidated;
+>>
+>> -     data->pending_prop = FALSE;
+>> -
+>>       if (iface->pending_prop == NULL)
+>>               return;
+>>
+>> @@ -1722,6 +1720,8 @@ static void process_property_changes(struct
+>> generic_data *data)
+>>  {
+>>       GSList *l;
+>>
+>> +     data->pending_prop = FALSE;
+>> +
+>>       for (l = data->interfaces; l != NULL; l = l->next) {
+>>               struct interface_data *iface = l->data;
+>>
+
+
+
 -- 
-2.13.6
-
+Luiz Augusto von Dentz
