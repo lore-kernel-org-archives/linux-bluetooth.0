@@ -1,86 +1,47 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <1511301906.16347.42.camel@hadess.net>
-References: <20171121200436.17576-1-luiz.dentz@gmail.com> <1511301906.16347.42.camel@hadess.net>
+In-Reply-To: <C2BC44D770753C45AAAC42695FB5BE02012571A2DD@SLC-EXMB01.CORP.SRELAY.COM>
+References: <C2BC44D770753C45AAAC42695FB5BE02012571A2DD@SLC-EXMB01.CORP.SRELAY.COM>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 22 Nov 2017 11:14:38 +0200
-Message-ID: <CABBYNZLy-ei67BuDApNvK4KWhtKPWM__4ynM9F8REgCWFgO7WA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] gdbus: Fix not emiting PropertiesChanged
-To: Bastien Nocera <hadess@hadess.net>
+Date: Wed, 22 Nov 2017 11:01:51 +0200
+Message-ID: <CABBYNZKtRF3xmcyabvZrF0TmX8z=LfweAZ=meBH3tqL0-fMrKw@mail.gmail.com>
+Subject: Re: mtu negotiation issues
+To: Thomas Green <TGreen2@sorenson.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bastien,
+Hi Tom,
 
-On Wed, Nov 22, 2017 at 12:05 AM, Bastien Nocera <hadess@hadess.net> wrote:
->> Re: [PATCH BlueZ] gdbus: Fix not emiting PropertiesChanged
+On Wed, Nov 22, 2017 at 2:48 AM, Thomas Green <TGreen2@sorenson.com> wrote:
+> All,
 >
-> emitting.
->
-> On Tue, 2017-11-21 at 22:04 +0200, Luiz Augusto von Dentz wrote:
->> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->>
->> If and interface is removed while properties are pending it would cause
->
-> "an interface".
->
->> process_properties_from_interface to clear data->pending_prop when it
->> should only clear the iface->pending_prop.
->
-> I prefer my version, which allows the pending properties to be cleared
-> out if the pending ones were for that interface. I also prefer the
-> subject line I used, describing the actual problem it fixes, and the
-> commit message going more into details.
+> We are having a problem with negotiating the mtu of a device when re-conn=
+ecting.  If we try to re-connect the device and negotiate the mtu it fails =
+and after the supervisor timeout and the device requests the termination of=
+ the device.  Attached is a log of the process.   We are using bluez5.43.  =
+Is this a known issue and is there a patch for it?
 
-I guess this one is simpler to maintain, also notice that iterating in
-the data->interfaces to check if there are no other pending_prop has
-almost the same effect as process_property_changes, what would make a
-difference would be to prevent process_changes but that has to run
-anyway to propagate the interfaces added/removed. Also notice that
-data->pending_prop is clear earlier than the original fix for
-duplicated signals, the one that introduced this problem, that way we
-don't reintroduce the original problem.
+The only thing strange on the log is:
 
-Regarding the commit message, we usually avoid BlueZ specific
-description there as gdbus is shared with other projects.
 
+> ACL Data RX: Handle 1025 flags 0x02 dlen 6                               =
+     [hci0] 16348.382281
+      SMP: Security Request (0x0b) len 1
+        Authentication requirement: Bonding, No MITM, Legacy, No
+Keypresses (0x01)
+
+Which apparently we never respond, all the ATT/GATT traffic goes fine
+including the MTU exchange, perhaps the request leads to the
+disconnection though at that point it seems we are already encrypted
+so it is not clear why the remote is sending that request.
+
+> TIA,
 >
-> But up to you.
->
-> Cheers
->
->> ---
->>  gdbus/object.c | 4 ++--
->>  1 file changed, 2 insertions(+), 2 deletions(-)
->>
->> diff --git a/gdbus/object.c b/gdbus/object.c
->> index afb458764..5c8ad7a55 100644
->> --- a/gdbus/object.c
->> +++ b/gdbus/object.c
->> @@ -1659,8 +1659,6 @@ static void
->> process_properties_from_interface(struct generic_data *data,
->>       DBusMessageIter iter, dict, array;
->>       GSList *invalidated;
->>
->> -     data->pending_prop = FALSE;
->> -
->>       if (iface->pending_prop == NULL)
->>               return;
->>
->> @@ -1722,6 +1720,8 @@ static void process_property_changes(struct
->> generic_data *data)
->>  {
->>       GSList *l;
->>
->> +     data->pending_prop = FALSE;
->> +
->>       for (l = data->interfaces; l != NULL; l = l->next) {
->>               struct interface_data *iface = l->data;
->>
+> Tom
 
 
 
--- 
+--=20
 Luiz Augusto von Dentz
