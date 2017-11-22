@@ -1,73 +1,130 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Message-ID: <1511358531.16347.46.camel@hadess.net>
+Subject: Re: [PATCH BlueZ] gdbus: Fix not emiting PropertiesChanged
 From: Bastien Nocera <hadess@hadess.net>
-To: linux-bluetooth@vger.kernel.org
-Cc: Bastien Nocera <hadess@hadess.net>
-Subject: [PATCH] audio/control: Fix invalid read on exit
-Date: Wed, 22 Nov 2017 14:50:38 +0100
-Message-Id: <20171122135038.17555-1-hadess@hadess.net>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Wed, 22 Nov 2017 14:48:51 +0100
+In-Reply-To: <CABBYNZLwY+KHx95DXDLKFGcfxJK2n1Vpte=YtOYhZ2O4Q8To2Q@mail.gmail.com>
+References: <20171121200436.17576-1-luiz.dentz@gmail.com>
+         <1511301906.16347.42.camel@hadess.net>
+         <CABBYNZLy-ei67BuDApNvK4KWhtKPWM__4ynM9F8REgCWFgO7WA@mail.gmail.com>
+         <CABBYNZJbXm9Wy1b3L1pv_0YLyM5sDOrcAwRcpvGsi=PhOSVk6g@mail.gmail.com>
+         <1511357983.16347.44.camel@hadess.net>
+         <CABBYNZLwY+KHx95DXDLKFGcfxJK2n1Vpte=YtOYhZ2O4Q8To2Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Make control_disconnect() a no-op if control was already
-disconnected and freed.
+On Wed, 2017-11-22 at 15:43 +0200, Luiz Augusto von Dentz wrote:
+> Hi Bastien,
+> 
+> On Wed, Nov 22, 2017 at 3:39 PM, Bastien Nocera <hadess@hadess.net>
+> wrote:
+> > On Wed, 2017-11-22 at 15:38 +0200, Luiz Augusto von Dentz wrote:
+> > > Hi,
+> > > 
+> > > On Wed, Nov 22, 2017 at 11:14 AM, Luiz Augusto von Dentz
+> > > <luiz.dentz@gmail.com> wrote:
+> > > > Hi Bastien,
+> > > > 
+> > > > On Wed, Nov 22, 2017 at 12:05 AM, Bastien Nocera <hadess@hadess
+> > > > .net
+> > > > > wrote:
+> > > > > > Re: [PATCH BlueZ] gdbus: Fix not emiting PropertiesChanged
+> > > > > 
+> > > > > emitting.
+> > > > > 
+> > > > > On Tue, 2017-11-21 at 22:04 +0200, Luiz Augusto von Dentz
+> > > > > wrote:
+> > > > > > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> > > > > > 
+> > > > > > If and interface is removed while properties are pending it
+> > > > > > would cause
+> > > > > 
+> > > > > "an interface".
+> > > > > 
+> > > > > > process_properties_from_interface to clear data-
+> > > > > > >pending_prop
+> > > > > > when it
+> > > > > > should only clear the iface->pending_prop.
+> > > > > 
+> > > > > I prefer my version, which allows the pending properties to
+> > > > > be
+> > > > > cleared
+> > > > > out if the pending ones were for that interface. I also
+> > > > > prefer
+> > > > > the
+> > > > > subject line I used, describing the actual problem it fixes,
+> > > > > and
+> > > > > the
+> > > > > commit message going more into details.
+> > > > 
+> > > > I guess this one is simpler to maintain, also notice that
+> > > > iterating
+> > > > in
+> > > > the data->interfaces to check if there are no other
+> > > > pending_prop
+> > > > has
+> > > > almost the same effect as process_property_changes, what would
+> > > > make
+> > > > a
+> > > > difference would be to prevent process_changes but that has to
+> > > > run
+> > > > anyway to propagate the interfaces added/removed. Also notice
+> > > > that
+> > > > data->pending_prop is clear earlier than the original fix for
+> > > > duplicated signals, the one that introduced this problem, that
+> > > > way
+> > > > we
+> > > > don't reintroduce the original problem.
+> > > > 
+> > > > Regarding the commit message, we usually avoid BlueZ specific
+> > > > description there as gdbus is shared with other projects.
+> > > > 
+> > > > > 
+> > > > > But up to you.
+> > > > > 
+> > > > > Cheers
+> > > > > 
+> > > > > > ---
+> > > > > >  gdbus/object.c | 4 ++--
+> > > > > >  1 file changed, 2 insertions(+), 2 deletions(-)
+> > > > > > 
+> > > > > > diff --git a/gdbus/object.c b/gdbus/object.c
+> > > > > > index afb458764..5c8ad7a55 100644
+> > > > > > --- a/gdbus/object.c
+> > > > > > +++ b/gdbus/object.c
+> > > > > > @@ -1659,8 +1659,6 @@ static void
+> > > > > > process_properties_from_interface(struct generic_data
+> > > > > > *data,
+> > > > > >       DBusMessageIter iter, dict, array;
+> > > > > >       GSList *invalidated;
+> > > > > > 
+> > > > > > -     data->pending_prop = FALSE;
+> > > > > > -
+> > > > > >       if (iface->pending_prop == NULL)
+> > > > > >               return;
+> > > > > > 
+> > > > > > @@ -1722,6 +1720,8 @@ static void
+> > > > > > process_property_changes(struct
+> > > > > > generic_data *data)
+> > > > > >  {
+> > > > > >       GSList *l;
+> > > > > > 
+> > > > > > +     data->pending_prop = FALSE;
+> > > > > > +
+> > > > > >       for (l = data->interfaces; l != NULL; l = l->next) {
+> > > > > >               struct interface_data *iface = l->data;
+> > > > > > 
+> > > 
+> > > Applied.
+> > 
+> > You could at least have applied fixes to the 2 typos I mentioned :(
+> 
+> You mean the one typo in the description, and instead of an, or did I
+> miss something in the code?
 
-bluetoothd[8436]: profiles/audio/avrcp.c:avrcp_disconnect() path /org/bluez/hci0/dev_38_71_DE_C0_FC_26
-==8436== Invalid read of size 8
-==8436==    at 0x41FFB9: control_disconnect (control.c:130)
-==8436==    by 0x469E0A: service_remove (service.c:177)
-==8436==    by 0x475869: device_remove (device.c:4071)
-==8436==    by 0x45DEF9: adapter_remove (adapter.c:5485)
-==8436==    by 0x466B2A: adapter_cleanup (adapter.c:8679)
-==8436==    by 0x40BE16: main (main.c:782)
-==8436==  Address 0x84b8ac8 is 8 bytes inside a block of size 48 free'd
-==8436==    at 0x4C30D18: free (vg_replace_malloc.c:530)
-==8436==    by 0x50D44AD: g_free (in /usr/lib64/libglib-2.0.so.0.5400.2)
-==8436==    by 0x488AED: remove_interface (object.c:667)
-==8436==    by 0x488FE9: g_dbus_unregister_interface (object.c:1391)
-==8436==    by 0x469E20: service_remove (service.c:179)
-==8436==    by 0x475869: device_remove (device.c:4071)
-==8436==    by 0x45DEF9: adapter_remove (adapter.c:5485)
-==8436==    by 0x466B2A: adapter_cleanup (adapter.c:8679)
-==8436==    by 0x40BE16: main (main.c:782)
-==8436==  Block was alloc'd at
-==8436==    at 0x4C31A1E: calloc (vg_replace_malloc.c:711)
-==8436==    by 0x50D43F0: g_malloc0 (in /usr/lib64/libglib-2.0.so.0.5400.2)
-==8436==    by 0x41FC09: control_init (control.c:320)
-==8436==    by 0x42006D: control_init_remote (control.c:361)
-==8436==    by 0x469D59: service_probe (service.c:160)
-==8436==    by 0x46E464: probe_service (device.c:4207)
-==8436==    by 0x46E4C2: dev_probe (device.c:4226)
-==8436==    by 0x46989B: btd_profile_foreach (profile.c:708)
-==8436==    by 0x47239D: device_probe_profiles (device.c:4285)
-==8436==    by 0x50ED51C: g_slist_foreach (in /usr/lib64/libglib-2.0.so.0.5400.2)
-==8436==    by 0x50ED54A: g_slist_free_full (in /usr/lib64/libglib-2.0.so.0.5400.2)
-==8436==    by 0x45F1EE: load_devices (adapter.c:3864)
-==8436==    by 0x465E59: adapter_register (adapter.c:7741)
-==8436==    by 0x465E59: read_info_complete (adapter.c:8284)
-==8436==    by 0x48D277: request_complete (mgmt.c:261)
-==8436==    by 0x48DD44: can_read_data (mgmt.c:353)
-==8436==    by 0x4999A2: watch_callback (io-glib.c:170)
-==8436==    by 0x50CEBB6: g_main_context_dispatch (in /usr/lib64/libglib-2.0.so.0.5400.2)
-==8436==    by 0x50CEF5F: ??? (in /usr/lib64/libglib-2.0.so.0.5400.2)
-==8436==    by 0x50CF271: g_main_loop_run (in /usr/lib64/libglib-2.0.so.0.5400.2)
-==8436==    by 0x40BDE8: main (main.c:770)
----
- profiles/audio/control.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/profiles/audio/control.c b/profiles/audio/control.c
-index edc4a98ce..707276d29 100644
---- a/profiles/audio/control.c
-+++ b/profiles/audio/control.c
-@@ -127,7 +127,7 @@ int control_disconnect(struct btd_service *service)
- {
- 	struct control *control = btd_service_get_user_data(service);
- 
--	if (!control->session)
-+	if (!control || !control->session)
- 		return -ENOTCONN;
- 
- 	avctp_disconnect(control->session);
--- 
-2.14.3
-
+There's a typo in the commit subject and another in the commit body. I
+mentioned both of those in my initial review.
