@@ -1,82 +1,85 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20171122135038.17555-1-hadess@hadess.net>
-References: <20171122135038.17555-1-hadess@hadess.net>
+In-Reply-To: <20171121070848.7305-1-inga.stotland@intel.com>
+References: <20171121070848.7305-1-inga.stotland@intel.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 23 Nov 2017 12:23:53 +0200
-Message-ID: <CABBYNZK8u+N9HJfSZw26VVqXLGMM_tBHQavz7rrQkR52KOy3Bw@mail.gmail.com>
-Subject: Re: [PATCH] audio/control: Fix invalid read on exit
-To: Bastien Nocera <hadess@hadess.net>
+Date: Thu, 23 Nov 2017 12:19:41 +0200
+Message-ID: <CABBYNZLjP+SoVtSQnLrXyxqDvpv+be1nYbGktPdD_fMFDPKGxA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] mesh: validate configuration target
+To: Inga Stotland <inga.stotland@intel.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bastien,
+Hi Inga,
 
-On Wed, Nov 22, 2017 at 3:50 PM, Bastien Nocera <hadess@hadess.net> wrote:
-> Make control_disconnect() a no-op if control was already
-> disconnected and freed.
->
-> bluetoothd[8436]: profiles/audio/avrcp.c:avrcp_disconnect() path /org/bluez/hci0/dev_38_71_DE_C0_FC_26
-> ==8436== Invalid read of size 8
-> ==8436==    at 0x41FFB9: control_disconnect (control.c:130)
-> ==8436==    by 0x469E0A: service_remove (service.c:177)
-> ==8436==    by 0x475869: device_remove (device.c:4071)
-> ==8436==    by 0x45DEF9: adapter_remove (adapter.c:5485)
-> ==8436==    by 0x466B2A: adapter_cleanup (adapter.c:8679)
-> ==8436==    by 0x40BE16: main (main.c:782)
-> ==8436==  Address 0x84b8ac8 is 8 bytes inside a block of size 48 free'd
-> ==8436==    at 0x4C30D18: free (vg_replace_malloc.c:530)
-> ==8436==    by 0x50D44AD: g_free (in /usr/lib64/libglib-2.0.so.0.5400.2)
-> ==8436==    by 0x488AED: remove_interface (object.c:667)
-> ==8436==    by 0x488FE9: g_dbus_unregister_interface (object.c:1391)
-> ==8436==    by 0x469E20: service_remove (service.c:179)
-> ==8436==    by 0x475869: device_remove (device.c:4071)
-> ==8436==    by 0x45DEF9: adapter_remove (adapter.c:5485)
-> ==8436==    by 0x466B2A: adapter_cleanup (adapter.c:8679)
-> ==8436==    by 0x40BE16: main (main.c:782)
-> ==8436==  Block was alloc'd at
-> ==8436==    at 0x4C31A1E: calloc (vg_replace_malloc.c:711)
-> ==8436==    by 0x50D43F0: g_malloc0 (in /usr/lib64/libglib-2.0.so.0.5400.2)
-> ==8436==    by 0x41FC09: control_init (control.c:320)
-> ==8436==    by 0x42006D: control_init_remote (control.c:361)
-> ==8436==    by 0x469D59: service_probe (service.c:160)
-> ==8436==    by 0x46E464: probe_service (device.c:4207)
-> ==8436==    by 0x46E4C2: dev_probe (device.c:4226)
-> ==8436==    by 0x46989B: btd_profile_foreach (profile.c:708)
-> ==8436==    by 0x47239D: device_probe_profiles (device.c:4285)
-> ==8436==    by 0x50ED51C: g_slist_foreach (in /usr/lib64/libglib-2.0.so.0.5400.2)
-> ==8436==    by 0x50ED54A: g_slist_free_full (in /usr/lib64/libglib-2.0.so.0.5400.2)
-> ==8436==    by 0x45F1EE: load_devices (adapter.c:3864)
-> ==8436==    by 0x465E59: adapter_register (adapter.c:7741)
-> ==8436==    by 0x465E59: read_info_complete (adapter.c:8284)
-> ==8436==    by 0x48D277: request_complete (mgmt.c:261)
-> ==8436==    by 0x48DD44: can_read_data (mgmt.c:353)
-> ==8436==    by 0x4999A2: watch_callback (io-glib.c:170)
-> ==8436==    by 0x50CEBB6: g_main_context_dispatch (in /usr/lib64/libglib-2.0.so.0.5400.2)
-> ==8436==    by 0x50CEF5F: ??? (in /usr/lib64/libglib-2.0.so.0.5400.2)
-> ==8436==    by 0x50CF271: g_main_loop_run (in /usr/lib64/libglib-2.0.so.0.5400.2)
-> ==8436==    by 0x40BDE8: main (main.c:770)
+On Tue, Nov 21, 2017 at 9:08 AM, Inga Stotland <inga.stotland@intel.com> wrote:
+> Require obtaining node composition prior to sending configuration
+> commands that assume knowledge about the node's element/model layout.
 > ---
->  profiles/audio/control.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  mesh/config-client.c | 31 +++++++++++++++++++++++++------
+>  1 file changed, 25 insertions(+), 6 deletions(-)
 >
-> diff --git a/profiles/audio/control.c b/profiles/audio/control.c
-> index edc4a98ce..707276d29 100644
-> --- a/profiles/audio/control.c
-> +++ b/profiles/audio/control.c
-> @@ -127,7 +127,7 @@ int control_disconnect(struct btd_service *service)
+> diff --git a/mesh/config-client.c b/mesh/config-client.c
+> index d80f784e6..782781602 100644
+> --- a/mesh/config-client.c
+> +++ b/mesh/config-client.c
+> @@ -461,16 +461,37 @@ static void cmd_del_app_key(const char *args)
+>         cmd_app_key(args, OP_APPKEY_DELETE);
+>  }
+>
+> +static bool verify_config_target(uint32_t dst)
+> +{
+> +       struct mesh_node *node;
+> +
+> +       if (IS_UNASSIGNED(dst)) {
+> +               rl_printf("Destination not set\n");
+> +               return false;
+> +       }
+> +
+> +       node = node_find_by_addr(dst);
+> +       if (!node) {
+> +               rl_printf("Node with unicast address %4.4x unknown\n", dst);
+> +               return false;
+> +       }
+> +
+> +       if (!node_get_composition(node)) {
+> +               rl_printf("Node composition for %4.4x unknown\n", dst);
+> +               return false;
+> +       }
+> +
+> +       return true;
+> +}
+> +
+>  static void cmd_bind(const char *args)
 >  {
->         struct control *control = btd_service_get_user_data(service);
+>         uint16_t n;
+>         uint8_t msg[32];
+>         int parm_cnt;
 >
-> -       if (!control->session)
-> +       if (!control || !control->session)
->                 return -ENOTCONN;
+> -       if (IS_UNASSIGNED(target)) {
+> -               rl_printf("Destination not set\n");
+> +       if (!verify_config_target(target))
+>                 return;
+> -       }
 >
->         avctp_disconnect(control->session);
+>         parm_cnt = read_input_parameters(args);
+>         if (parm_cnt != 3 && parm_cnt != 4) {
+> @@ -529,10 +550,8 @@ static void cmd_set_pub(const char *args)
+>         uint8_t msg[32];
+>         int parm_cnt;
+>
+> -       if (IS_UNASSIGNED(target)) {
+> -               rl_printf("Destination not set\n");
+> +       if (!verify_config_target(target))
+>                 return;
+> -       }
+>
+>         n = mesh_opcode_set(OP_CONFIG_MODEL_PUB_SET, msg);
+>
 > --
-> 2.14.3
+> 2.13.6
 
 Applied, thanks.
 
