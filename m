@@ -7,45 +7,27 @@ To: Marcel Holtmann <marcel@holtmann.org>,
 	netdev@vger.kernel.org,
 	Randy Dunlap <rdunlap@infradead.org>
 Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Subject: [PATCH v2 1/2] seq_file: Introduce DEFINE_SHOW_ATTRIBUTE() helper macro
-Date: Thu, 23 Nov 2017 22:36:04 +0200
-Message-Id: <20171123203605.44954-2-andriy.shevchenko@linux.intel.com>
-In-Reply-To: <20171123203605.44954-1-andriy.shevchenko@linux.intel.com>
-References: <20171123203605.44954-1-andriy.shevchenko@linux.intel.com>
+Subject: [PATCH v2 0/2] seq_file, Bluetooth: introduce DEFINE_SHOW_ATTRIBUTE()
+Date: Thu, 23 Nov 2017 22:36:03 +0200
+Message-Id: <20171123203605.44954-1-andriy.shevchenko@linux.intel.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The DEFINE_SHOW_ATTRIBUTE() helper macro would be useful for current
-users, which are many of them, and for new comers to decrease code
-duplication.
+Introduce a helper macro for attributes that have only ->show() defined.
 
-Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
----
- include/linux/seq_file.h | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+P.S. I have few more clean ups locally, thus it would be nice to have an
+immutable branch for the rest patches which would like to utilize the new
+macro.
 
-diff --git a/include/linux/seq_file.h b/include/linux/seq_file.h
-index c32929802c25..73adc12ab773 100644
---- a/include/linux/seq_file.h
-+++ b/include/linux/seq_file.h
-@@ -144,6 +144,19 @@ void *__seq_open_private(struct file *, const struct seq_operations *, int);
- int seq_open_private(struct file *, const struct seq_operations *, int);
- int seq_release_private(struct inode *, struct file *);
- 
-+#define DEFINE_SHOW_ATTRIBUTE(__name)					      \
-+static int __name ## _open(struct inode *inode, struct file *file)	      \
-+{									      \
-+	return single_open(file, __name ## _show, inode->i_private);	      \
-+}									      \
-+									      \
-+static const struct file_operations __name ## _fops = {			      \
-+	.open		= __name ## _open,				      \
-+	.read		= seq_read,					      \
-+	.llseek		= seq_lseek,					      \
-+	.release	= single_release,				      \
-+}									      \
-+
- static inline struct user_namespace *seq_user_ns(struct seq_file *seq)
- {
- #ifdef CONFIG_USER_NS
+In v2:
+- introduce for all users followed by an example clean up of hci_debugfs.c
+
+Andy Shevchenko (2):
+  seq_file: Introduce DEFINE_SHOW_ATTRIBUTE() helper macro
+  Bluetooth: Re-use DEFINE_SHOW_ATTRIBUTE() macro
+
+ include/linux/seq_file.h    |  13 +++
+ net/bluetooth/hci_debugfs.c | 193 ++++----------------------------------------
+ 2 files changed, 29 insertions(+), 177 deletions(-)
+
 -- 
 2.15.0
