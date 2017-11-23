@@ -1,40 +1,43 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Matthias Schmidt <Matthias.Schmidt@diva-e.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: GATT Server ReadValue offset missing
-Date: Thu, 23 Nov 2017 15:05:22 +0000
-Message-ID: <614D22AE-E15E-4943-87E9-A52A84F85FB2@diva-e.com>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <andriy.shevchenko@linux.intel.com>
+Message-ID: <1511443090.25007.418.camel@linux.intel.com>
+Subject: Re: [PATCH v1] Bluetooth: introduce DEFINE_SHOW_ATTRIBUTE() macro
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: Randy Dunlap <rdunlap@infradead.org>, Marcel Holtmann
+ <marcel@holtmann.org>,  Johan Hedberg <johan.hedberg@gmail.com>,
+ linux-bluetooth@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+ netdev@vger.kernel.org
+Date: Thu, 23 Nov 2017 15:18:10 +0200
+In-Reply-To: <2404941a-6e4a-3665-f737-00b48819d204@infradead.org>
+References: <20171122211546.5682-1-andriy.shevchenko@linux.intel.com>
+	 <13210ec5-af8a-3b3e-0a1c-9ffa751651e8@infradead.org>
+	 <2404941a-6e4a-3665-f737-00b48819d204@infradead.org>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgKiwNCg0KZGVzcGl0ZSB0aGUgUmVhZFZhbHVlIERvY3VtZW50YXRpb246DQoNCk1ldGhvZHMg
-ICAgICAgICBhcnJheXtieXRlfSBSZWFkVmFsdWUoZGljdCBvcHRpb25zKQ0KDQogICAgICAgICAg
-ICAgICAgICAgICAgICBJc3N1ZXMgYSByZXF1ZXN0IHRvIHJlYWQgdGhlIHZhbHVlIG9mIHRoZQ0K
-ICAgICAgICAgICAgICAgICAgICAgICAgY2hhcmFjdGVyaXN0aWMgYW5kIHJldHVybnMgdGhlIHZh
-bHVlIGlmIHRoZQ0KICAgICAgICAgICAgICAgICAgICAgICAgb3BlcmF0aW9uIHdhcyBzdWNjZXNz
-ZnVsLg0KDQogICAgICAgICAgICAgICAgICAgICAgICBQb3NzaWJsZSBvcHRpb25zOiAib2Zmc2V0
-IjogdWludDE2IG9mZnNldA0KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgImRldmljZSI6IE9iamVjdCBEZXZpY2UgKFNlcnZlciBvbmx5KQ0KDQpXZSBkb27igJl0IGdl
-dCB0aGUgb2Zmc2V0IHZhbHVlLCBidXQgb25seSB0aGUgZGV2aWNlIGVudHJ5Og0KDQpLZXloYW5k
-bGluZy5SZWFkVmFsdWUoKSwgb3B0aW9ucz17J2RldmljZSc6ICcvb3JnL2JsdWV6L2hjaTAvZGV2
-XzQ1XzRBX0I4X0I4X0JBXzA5J30NCg0KV2UgYXJlIHJ1bm5pbmcgQmx1ZXogNS40NyBvbiBEZWJp
-YW4gU3RyZXRjaCBvbiBhcm12N2wuDQoNCldoYXQgaGF2ZSB3ZSBkb25lIHdyb25nPw0KDQpDaGVl
-cnMsDQoNCk1hdHRoaWFzDQoNCk1hdHRoaWFzIFNjaG1pZHQNClNlbmlvciBBcmNoaXRlY3QNCiAN
-CmRpdmEtZSBLYXJsc3J1aGUNCkx1ZHdpZy1FcmhhcmQtQWxsZWUgMjAsIDc2MTMxIEthcmxzcnVo
-ZSwgRGV1dHNjaGxhbmQNClQ6ICs0OSA3MjEgOTIwNjAgODIyDQpNOiArNDkgMTc1IDI2OTQyMTMN
-Cm1hdHRoaWFzLnNjaG1pZHRAZGl2YS1lLmNvbQ0KIA0KQ0UyNyBCRjU5IDM2NTEgMjYxOSA4QTVE
-ICAwOENBIDA4MzkgMkU5OSAzNDQ5IDRBMzINCg0KDQoNClB1YmxpYyBLZXk6IG1hdHRoaWFzLXNj
-aG1pZHQtZGl2YS1lLWNvbS0zNDQ5NEEzMi5hc2MgPGh0dHBzOi8vb3duY2xvdWQuZGl2YS1lLmNv
-bS9pbmRleC5waHAvcy9SSllESzlZcGZueHFzY2cvZG93bmxvYWQ+DQogDQp3d3cuZGl2YS1lLmNv
-bSA8aHR0cHM6Ly93d3cuZGl2YS1lLmNvbS8+IGZvbGxvdyB1czogdHdpdHRlciA8aHR0cHM6Ly90
-d2l0dGVyLmNvbS9kaXZhX2VudGVycHJpc2U+LCBmYWNlYm9vayA8aHR0cHM6Ly93d3cuZmFjZWJv
-b2suY29tL2RpZ2l0YWwudmFsdWUuZW50ZXJwcmlzZS8/cmVmPWhsPiwgTGlua2VkSW4gPGh0dHBz
-Oi8vd3d3LmxpbmtlZGluLmNvbS9jb21wYW55L2RpdmEtZS1kaWdpdGFsLXZhbHVlLWVudGVycHJp
-c2UtZ21iaD4sIFhpbmcgPGh0dHBzOi8vd3d3LnhpbmcuY29tL2NvbXBhbmllcy9kaXZhLWVkaWdp
-dGFsdmFsdWVlbnRlcnByaXNlZ21iaD4NCiANCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0NCmRpdmEtZSB8IE5ldHBpb25lZXIgR21iSCANCkx1ZHdpZy1F
-cmhhcmQtQWxsZWUgMjAsIDc2MTMxIEthcmxzcnVoZQ0KSFJCOiAxMDc1MjEgSGFuZGVsc3JlZ2lz
-dGVyIE1hbm5oZWltDQpHZXNjaMOkZnRzZsO8aHJ1bmc6IE1hcmNlbCBGdWhsbWFubiwgU3RlZmFu
-IE3DpHJrbGUsIEF4ZWwgSmFobg0KIA0KDQo=
+On Wed, 2017-11-22 at 14:13 -0800, Randy Dunlap wrote:
+> On 11/22/2017 02:04 PM, Randy Dunlap wrote:
+> > On 11/22/2017 01:15 PM, Andy Shevchenko wrote:
+> > > This macro deduplicates a lot of similar code across the
+> > > hci_debugfs.c
+> > > module. Targeting to be moved to seq_file.h eventually
+
+> > > +DEFINE_SHOW_ATTRIBUTE(__name)
+> > 
+> > eh?
+> 
+> OK, it's a continuation of the macro above it.
+> Sorry about that.
+
+NP.
+
+It's just for better looking patch, I can move code around of course,
+but as I stated in commit message I would like eventually to move it to
+seq_file.h for everyone to use (there are basically a lot of users
+already).
+
+> > > +> +#define DEFINE_SHOW_ATTRIBUTE(__name)
+
+-- 
+Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Intel Finland Oy
