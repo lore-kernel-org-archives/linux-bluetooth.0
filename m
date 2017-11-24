@@ -1,121 +1,145 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Matthias Schmidt <Matthias.Schmidt@diva-e.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: GATT Server ReadValue offset missing
-Date: Fri, 24 Nov 2017 10:55:44 +0000
-Message-ID: <1DE82F3B-558B-49EB-98AB-A8B610857018@diva-e.com>
-References: <614D22AE-E15E-4943-87E9-A52A84F85FB2@diva-e.com>
- <CABBYNZJ8vc0eB4np_0JeM00NaixTRb0OP9b7jvGA96iw0jgQsA@mail.gmail.com>
- <4231F418-005D-4592-AC1D-4CB11FC2DB4B@diva-e.com>
- <CABBYNZ+CUZF7dSPwp+tVXiOyQHOqV2m3TCTrjXk8Dq7dVGX4AA@mail.gmail.com>
-In-Reply-To: <CABBYNZ+CUZF7dSPwp+tVXiOyQHOqV2m3TCTrjXk8Dq7dVGX4AA@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
+In-Reply-To: <4231F418-005D-4592-AC1D-4CB11FC2DB4B@diva-e.com>
+References: <614D22AE-E15E-4943-87E9-A52A84F85FB2@diva-e.com>
+ <CABBYNZJ8vc0eB4np_0JeM00NaixTRb0OP9b7jvGA96iw0jgQsA@mail.gmail.com> <4231F418-005D-4592-AC1D-4CB11FC2DB4B@diva-e.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Fri, 24 Nov 2017 11:21:35 +0200
+Message-ID: <CABBYNZ+CUZF7dSPwp+tVXiOyQHOqV2m3TCTrjXk8Dq7dVGX4AA@mail.gmail.com>
+Subject: Re: GATT Server ReadValue offset missing
+To: Matthias Schmidt <Matthias.Schmidt@diva-e.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgTHVpeiwNCg0KdGhpcyB3YXMgb3VyIGZhdWx0LiBXZSBkbyBnZXQgdGhlIG9mZnNldCBpbiBm
-YWN0ICggaW4gdGhlIDJuZCsgcGFja2V0ICkgYnV0IG92ZXJsb29rZWQgaXQgYmVjYXVzZSB0aGUg
-Zmlyc3QgdGVzdGNhc2Ugd2FzIGJlbG93IHRoZSBNVFUuDQoNCldlbm4gc2VuZGluZyBiaWdnZXIg
-cGFja2V0cyB3ZSBnZXQgdGhlIG9mZnNldDoNCg0KS2V5aGFuZGxpbmcuUmVhZFZhbHVlKCksIG9w
-dGlvbnM9eydkZXZpY2UnOiAnL29yZy9ibHVlei9oY2kwL2Rldl80Ql80NV81OF9CRV9FQl83NSd9
-DQpLZXloYW5kbGluZy5SZWFkVmFsdWUoKSwgb3B0aW9ucz17J2RldmljZSc6ICcvb3JnL2JsdWV6
-L2hjaTAvZGV2XzRCXzQ1XzU4X0JFX0VCXzc1JywgJ29mZnNldCc6IDE4NH0NCktleWhhbmRsaW5n
-LlJlYWRWYWx1ZSgpLCBvcHRpb25zPXsnZGV2aWNlJzogJy9vcmcvYmx1ZXovaGNpMC9kZXZfNEJf
-NDVfNThfQkVfRUJfNzUnLCAnb2Zmc2V0JzogMzY4fQ0KDQpJdCBtaWdodCBiZSBpIGdvb2QgaWRl
-YSBpbiB0ZXJtcyBvZiB1c2FiaWxpdHkgdG8gc2VuZCB0aGUgb2Zmc2V0IHdpdGggdGhlIHZhbHVl
-PTAgaW4gdGhlIGZpcnN0IHBhY2tldCBhbnl3YXkuDQoNCnNvcnJ5IGZvcnQgaGUgbm9pc2UgJiB0
-aGFua3MgZm9yIHRoZSBoZWxwIQ0KDQpNYXR0aGlhcw0KDQpNYXR0aGlhcyBTY2htaWR0DQpTZW5p
-b3IgQXJjaGl0ZWN0DQogDQpkaXZhLWUgS2FybHNydWhlDQpMdWR3aWctRXJoYXJkLUFsbGVlIDIw
-LCA3NjEzMSBLYXJsc3J1aGUsIERldXRzY2hsYW5kDQpUOiArNDkgNzIxIDkyMDYwIDgyMg0KTTog
-KzQ5IDE3NSAyNjk0MjEzDQptYXR0aGlhcy5zY2htaWR0QGRpdmEtZS5jb20NCiANCkNFMjcgQkY1
-OSAzNjUxIDI2MTkgOEE1RCAgMDhDQSAwODM5IDJFOTkgMzQ0OSA0QTMyDQoNCg0KDQpQdWJsaWMg
-S2V5OiBtYXR0aGlhcy1zY2htaWR0LWRpdmEtZS1jb20tMzQ0OTRBMzIuYXNjIDxodHRwczovL293
-bmNsb3VkLmRpdmEtZS5jb20vaW5kZXgucGhwL3MvUkpZREs5WXBmbnhxc2NnL2Rvd25sb2FkPg0K
-IA0Kd3d3LmRpdmEtZS5jb20gPGh0dHBzOi8vd3d3LmRpdmEtZS5jb20vPiBmb2xsb3cgdXM6IHR3
-aXR0ZXIgPGh0dHBzOi8vdHdpdHRlci5jb20vZGl2YV9lbnRlcnByaXNlPiwgZmFjZWJvb2sgPGh0
-dHBzOi8vd3d3LmZhY2Vib29rLmNvbS9kaWdpdGFsLnZhbHVlLmVudGVycHJpc2UvP3JlZj1obD4s
-IExpbmtlZEluIDxodHRwczovL3d3dy5saW5rZWRpbi5jb20vY29tcGFueS9kaXZhLWUtZGlnaXRh
-bC12YWx1ZS1lbnRlcnByaXNlLWdtYmg+LCBYaW5nIDxodHRwczovL3d3dy54aW5nLmNvbS9jb21w
-YW5pZXMvZGl2YS1lZGlnaXRhbHZhbHVlZW50ZXJwcmlzZWdtYmg+DQogDQotLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tDQpkaXZhLWUgfCBOZXRwaW9uZWVy
-IEdtYkggDQpMdWR3aWctRXJoYXJkLUFsbGVlIDIwLCA3NjEzMSBLYXJsc3J1aGUNCkhSQjogMTA3
-NTIxIEhhbmRlbHNyZWdpc3RlciBNYW5uaGVpbQ0KR2VzY2jDpGZ0c2bDvGhydW5nOiBNYXJjZWwg
-RnVobG1hbm4sIFN0ZWZhbiBNw6Rya2xlLCBBeGVsIEphaG4NCiANCg0KQW0gMjQuMTEuMTcsIDEw
-OjIxIHNjaHJpZWIgIkx1aXogQXVndXN0byB2b24gRGVudHoiIDxsdWl6LmRlbnR6QGdtYWlsLmNv
-bT46DQoNCiAgICBIaSBNYXR0aGlhcywNCiAgICANCiAgICANCiAgICBPbiBGcmksIE5vdiAyNCwg
-MjAxNyBhdCAxMToxOCBBTSwgTWF0dGhpYXMgU2NobWlkdA0KICAgIDxNYXR0aGlhcy5TY2htaWR0
-QGRpdmEtZS5jb20+IHdyb3RlOg0KICAgID4gSGkgTHVpeiwNCiAgICA+DQogICAgPiB3ZSBuZXZl
-ciBnZXQgdGhlIG9mZnNldC4NCiAgICA+DQogICAgPiBOZXZlcnRoZWxlc3Mgd2UgZ2V0IHRoZSBj
-b3JyZWN0IG51bWJlciBvZiByZXF1ZXN0cyB0byB0cmFuc21pdCB0aGUgZGF0YSwgYnV0IG5ldmVy
-IGFueSBvZmZzZXQuDQogICAgDQogICAgTGV0cyBmaXJzdCBjaGVjayBpZiB0aGUgcmVtb3RlIGlz
-IHNlbmRpbmcgYW55IG9mZnNldCwgY2FuIHlvdSBjb2xsZWN0DQogICAgdGhlIHRyYWNlIHdpdGgg
-YnRtb24gYW5kIHBvc3QgaXQgaGVyZT8NCiAgICANCiAgICA+IEhUSCwNCiAgICA+DQogICAgPiBN
-YXR0aGlhcw0KICAgID4NCiAgICA+IE1hdHRoaWFzIFNjaG1pZHQNCiAgICA+IFNlbmlvciBBcmNo
-aXRlY3QNCiAgICA+DQogICAgPiBkaXZhLWUgS2FybHNydWhlDQogICAgPiBMdWR3aWctRXJoYXJk
-LUFsbGVlIDIwLCA3NjEzMSBLYXJsc3J1aGUsIERldXRzY2hsYW5kDQogICAgPiBUOiArNDkgNzIx
-IDkyMDYwIDgyMg0KICAgID4gTTogKzQ5IDE3NSAyNjk0MjEzDQogICAgPiBtYXR0aGlhcy5zY2ht
-aWR0QGRpdmEtZS5jb20NCiAgICA+DQogICAgPiBDRTI3IEJGNTkgMzY1MSAyNjE5IDhBNUQgIDA4
-Q0EgMDgzOSAyRTk5IDM0NDkgNEEzMg0KICAgID4NCiAgICA+DQogICAgPg0KICAgID4gUHVibGlj
-IEtleTogbWF0dGhpYXMtc2NobWlkdC1kaXZhLWUtY29tLTM0NDk0QTMyLmFzYyA8aHR0cHM6Ly9v
-d25jbG91ZC5kaXZhLWUuY29tL2luZGV4LnBocC9zL1JKWURLOVlwZm54cXNjZy9kb3dubG9hZD4N
-CiAgICA+DQogICAgPiB3d3cuZGl2YS1lLmNvbSA8aHR0cHM6Ly93d3cuZGl2YS1lLmNvbS8+IGZv
-bGxvdyB1czogdHdpdHRlciA8aHR0cHM6Ly90d2l0dGVyLmNvbS9kaXZhX2VudGVycHJpc2U+LCBm
-YWNlYm9vayA8aHR0cHM6Ly93d3cuZmFjZWJvb2suY29tL2RpZ2l0YWwudmFsdWUuZW50ZXJwcmlz
-ZS8/cmVmPWhsPiwgTGlua2VkSW4gPGh0dHBzOi8vd3d3LmxpbmtlZGluLmNvbS9jb21wYW55L2Rp
-dmEtZS1kaWdpdGFsLXZhbHVlLWVudGVycHJpc2UtZ21iaD4sIFhpbmcgPGh0dHBzOi8vd3d3Lnhp
-bmcuY29tL2NvbXBhbmllcy9kaXZhLWVkaWdpdGFsdmFsdWVlbnRlcnByaXNlZ21iaD4NCiAgICA+
-DQogICAgPiAtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-DQogICAgPiBkaXZhLWUgfCBOZXRwaW9uZWVyIEdtYkgNCiAgICA+IEx1ZHdpZy1FcmhhcmQtQWxs
-ZWUgMjAsIDc2MTMxIEthcmxzcnVoZQ0KICAgID4gSFJCOiAxMDc1MjEgSGFuZGVsc3JlZ2lzdGVy
-IE1hbm5oZWltDQogICAgPiBHZXNjaMOkZnRzZsO8aHJ1bmc6IE1hcmNlbCBGdWhsbWFubiwgU3Rl
-ZmFuIE3DpHJrbGUsIEF4ZWwgSmFobg0KICAgID4NCiAgICA+DQogICAgPiBBbSAyNC4xMS4xNywg
-MDk6Mjggc2NocmllYiAiTHVpeiBBdWd1c3RvIHZvbiBEZW50eiIgPGx1aXouZGVudHpAZ21haWwu
-Y29tPjoNCiAgICA+DQogICAgPiAgICAgSGkgTWF0dGhpYXMsDQogICAgPg0KICAgID4gICAgIE9u
-IFRodSwgTm92IDIzLCAyMDE3IGF0IDU6MDUgUE0sIE1hdHRoaWFzIFNjaG1pZHQNCiAgICA+ICAg
-ICA8TWF0dGhpYXMuU2NobWlkdEBkaXZhLWUuY29tPiB3cm90ZToNCiAgICA+ICAgICA+IEhpICos
-DQogICAgPiAgICAgPg0KICAgID4gICAgID4gZGVzcGl0ZSB0aGUgUmVhZFZhbHVlIERvY3VtZW50
-YXRpb246DQogICAgPiAgICAgPg0KICAgID4gICAgID4gTWV0aG9kcyAgICAgICAgIGFycmF5e2J5
-dGV9IFJlYWRWYWx1ZShkaWN0IG9wdGlvbnMpDQogICAgPiAgICAgPg0KICAgID4gICAgID4gICAg
-ICAgICAgICAgICAgICAgICAgICAgSXNzdWVzIGEgcmVxdWVzdCB0byByZWFkIHRoZSB2YWx1ZSBv
-ZiB0aGUNCiAgICA+ICAgICA+ICAgICAgICAgICAgICAgICAgICAgICAgIGNoYXJhY3RlcmlzdGlj
-IGFuZCByZXR1cm5zIHRoZSB2YWx1ZSBpZiB0aGUNCiAgICA+ICAgICA+ICAgICAgICAgICAgICAg
-ICAgICAgICAgIG9wZXJhdGlvbiB3YXMgc3VjY2Vzc2Z1bC4NCiAgICA+ICAgICA+DQogICAgPiAg
-ICAgPiAgICAgICAgICAgICAgICAgICAgICAgICBQb3NzaWJsZSBvcHRpb25zOiAib2Zmc2V0Ijog
-dWludDE2IG9mZnNldA0KICAgID4gICAgID4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgImRldmljZSI6IE9iamVjdCBEZXZpY2UgKFNlcnZlciBvbmx5KQ0KICAgID4g
-ICAgID4NCiAgICA+ICAgICA+IFdlIGRvbuKAmXQgZ2V0IHRoZSBvZmZzZXQgdmFsdWUsIGJ1dCBv
-bmx5IHRoZSBkZXZpY2UgZW50cnk6DQogICAgPiAgICAgPg0KICAgID4gICAgID4gS2V5aGFuZGxp
-bmcuUmVhZFZhbHVlKCksIG9wdGlvbnM9eydkZXZpY2UnOiAnL29yZy9ibHVlei9oY2kwL2Rldl80
-NV80QV9COF9COF9CQV8wOSd9DQogICAgPiAgICAgPg0KICAgID4gICAgID4gV2UgYXJlIHJ1bm5p
-bmcgQmx1ZXogNS40NyBvbiBEZWJpYW4gU3RyZXRjaCBvbiBhcm12N2wuDQogICAgPiAgICAgPg0K
-ICAgID4gICAgID4gV2hhdCBoYXZlIHdlIGRvbmUgd3Jvbmc/DQogICAgPg0KICAgID4gICAgIElz
-IHRoZSBvZmZzZXQgMD8gV2Ugb25seSBzZW5kIHRoZSBvZmZzZXQgaWYgaXQgaXMgZGlmZmVyZW50
-IHRoYW4gMDoNCiAgICA+DQogICAgPiAgICAgaHR0cHM6Ly9naXQua2VybmVsLm9yZy9wdWIvc2Nt
-L2JsdWV0b290aC9ibHVlei5naXQvdHJlZS9zcmMvZ2F0dC1kYXRhYmFzZS5jI24xNzE5DQogICAg
-Pg0KICAgID4gICAgID4gQ2hlZXJzLA0KICAgID4gICAgID4NCiAgICA+ICAgICA+IE1hdHRoaWFz
-DQogICAgPiAgICAgPg0KICAgID4gICAgID4gTWF0dGhpYXMgU2NobWlkdA0KICAgID4gICAgID4g
-U2VuaW9yIEFyY2hpdGVjdA0KICAgID4gICAgID4NCiAgICA+ICAgICA+IGRpdmEtZSBLYXJsc3J1
-aGUNCiAgICA+ICAgICA+IEx1ZHdpZy1FcmhhcmQtQWxsZWUgMjAsIDc2MTMxIEthcmxzcnVoZSwg
-RGV1dHNjaGxhbmQNCiAgICA+ICAgICA+IFQ6ICs0OSA3MjEgOTIwNjAgODIyDQogICAgPiAgICAg
-PiBNOiArNDkgMTc1IDI2OTQyMTMNCiAgICA+ICAgICA+IG1hdHRoaWFzLnNjaG1pZHRAZGl2YS1l
-LmNvbQ0KICAgID4gICAgID4NCiAgICA+ICAgICA+IENFMjcgQkY1OSAzNjUxIDI2MTkgOEE1RCAg
-MDhDQSAwODM5IDJFOTkgMzQ0OSA0QTMyDQogICAgPiAgICAgPg0KICAgID4gICAgID4NCiAgICA+
-ICAgICA+DQogICAgPiAgICAgPiBQdWJsaWMgS2V5OiBtYXR0aGlhcy1zY2htaWR0LWRpdmEtZS1j
-b20tMzQ0OTRBMzIuYXNjIDxodHRwczovL293bmNsb3VkLmRpdmEtZS5jb20vaW5kZXgucGhwL3Mv
-UkpZREs5WXBmbnhxc2NnL2Rvd25sb2FkPg0KICAgID4gICAgID4NCiAgICA+ICAgICA+IHd3dy5k
-aXZhLWUuY29tIDxodHRwczovL3d3dy5kaXZhLWUuY29tLz4gZm9sbG93IHVzOiB0d2l0dGVyIDxo
-dHRwczovL3R3aXR0ZXIuY29tL2RpdmFfZW50ZXJwcmlzZT4sIGZhY2Vib29rIDxodHRwczovL3d3
-dy5mYWNlYm9vay5jb20vZGlnaXRhbC52YWx1ZS5lbnRlcnByaXNlLz9yZWY9aGw+LCBMaW5rZWRJ
-biA8aHR0cHM6Ly93d3cubGlua2VkaW4uY29tL2NvbXBhbnkvZGl2YS1lLWRpZ2l0YWwtdmFsdWUt
-ZW50ZXJwcmlzZS1nbWJoPiwgWGluZyA8aHR0cHM6Ly93d3cueGluZy5jb20vY29tcGFuaWVzL2Rp
-dmEtZWRpZ2l0YWx2YWx1ZWVudGVycHJpc2VnbWJoPg0KICAgID4gICAgID4NCiAgICA+ICAgICA+
-IC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0NCiAgICA+
-ICAgICA+IGRpdmEtZSB8IE5ldHBpb25lZXIgR21iSA0KICAgID4gICAgID4gTHVkd2lnLUVyaGFy
-ZC1BbGxlZSAyMCwgNzYxMzEgS2FybHNydWhlDQogICAgPiAgICAgPiBIUkI6IDEwNzUyMSBIYW5k
-ZWxzcmVnaXN0ZXIgTWFubmhlaW0NCiAgICA+ICAgICA+IEdlc2Now6RmdHNmw7xocnVuZzogTWFy
-Y2VsIEZ1aGxtYW5uLCBTdGVmYW4gTcOkcmtsZSwgQXhlbCBKYWhuDQogICAgPiAgICAgPg0KICAg
-ID4gICAgID4NCiAgICA+DQogICAgPg0KICAgID4NCiAgICA+ICAgICAtLQ0KICAgID4gICAgIEx1
-aXogQXVndXN0byB2b24gRGVudHoNCiAgICA+DQogICAgPg0KICAgIA0KICAgIA0KICAgIA0KICAg
-IC0tIA0KICAgIEx1aXogQXVndXN0byB2b24gRGVudHoNCiAgICANCg0K
+Hi Matthias,
+
+
+On Fri, Nov 24, 2017 at 11:18 AM, Matthias Schmidt
+<Matthias.Schmidt@diva-e.com> wrote:
+> Hi Luiz,
+>
+> we never get the offset.
+>
+> Nevertheless we get the correct number of requests to transmit the data, =
+but never any offset.
+
+Lets first check if the remote is sending any offset, can you collect
+the trace with btmon and post it here?
+
+> HTH,
+>
+> Matthias
+>
+> Matthias Schmidt
+> Senior Architect
+>
+> diva-e Karlsruhe
+> Ludwig-Erhard-Allee 20, 76131 Karlsruhe, Deutschland
+> T: +49 721 92060 822
+> M: +49 175 2694213
+> matthias.schmidt@diva-e.com
+>
+> CE27 BF59 3651 2619 8A5D  08CA 0839 2E99 3449 4A32
+>
+>
+>
+> Public Key: matthias-schmidt-diva-e-com-34494A32.asc <https://owncloud.di=
+va-e.com/index.php/s/RJYDK9Ypfnxqscg/download>
+>
+> www.diva-e.com <https://www.diva-e.com/> follow us: twitter <https://twit=
+ter.com/diva_enterprise>, facebook <https://www.facebook.com/digital.value.=
+enterprise/?ref=3Dhl>, LinkedIn <https://www.linkedin.com/company/diva-e-di=
+gital-value-enterprise-gmbh>, Xing <https://www.xing.com/companies/diva-edi=
+gitalvalueenterprisegmbh>
+>
+> -------------------------------------------------
+> diva-e | Netpioneer GmbH
+> Ludwig-Erhard-Allee 20, 76131 Karlsruhe
+> HRB: 107521 Handelsregister Mannheim
+> Gesch=C3=A4ftsf=C3=BChrung: Marcel Fuhlmann, Stefan M=C3=A4rkle, Axel Jah=
+n
+>
+>
+> Am 24.11.17, 09:28 schrieb "Luiz Augusto von Dentz" <luiz.dentz@gmail.com=
+>:
+>
+>     Hi Matthias,
+>
+>     On Thu, Nov 23, 2017 at 5:05 PM, Matthias Schmidt
+>     <Matthias.Schmidt@diva-e.com> wrote:
+>     > Hi *,
+>     >
+>     > despite the ReadValue Documentation:
+>     >
+>     > Methods         array{byte} ReadValue(dict options)
+>     >
+>     >                         Issues a request to read the value of the
+>     >                         characteristic and returns the value if the
+>     >                         operation was successful.
+>     >
+>     >                         Possible options: "offset": uint16 offset
+>     >                                           "device": Object Device (=
+Server only)
+>     >
+>     > We don=E2=80=99t get the offset value, but only the device entry:
+>     >
+>     > Keyhandling.ReadValue(), options=3D{'device': '/org/bluez/hci0/dev_=
+45_4A_B8_B8_BA_09'}
+>     >
+>     > We are running Bluez 5.47 on Debian Stretch on armv7l.
+>     >
+>     > What have we done wrong?
+>
+>     Is the offset 0? We only send the offset if it is different than 0:
+>
+>     https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/src/gatt-data=
+base.c#n1719
+>
+>     > Cheers,
+>     >
+>     > Matthias
+>     >
+>     > Matthias Schmidt
+>     > Senior Architect
+>     >
+>     > diva-e Karlsruhe
+>     > Ludwig-Erhard-Allee 20, 76131 Karlsruhe, Deutschland
+>     > T: +49 721 92060 822
+>     > M: +49 175 2694213
+>     > matthias.schmidt@diva-e.com
+>     >
+>     > CE27 BF59 3651 2619 8A5D  08CA 0839 2E99 3449 4A32
+>     >
+>     >
+>     >
+>     > Public Key: matthias-schmidt-diva-e-com-34494A32.asc <https://owncl=
+oud.diva-e.com/index.php/s/RJYDK9Ypfnxqscg/download>
+>     >
+>     > www.diva-e.com <https://www.diva-e.com/> follow us: twitter <https:=
+//twitter.com/diva_enterprise>, facebook <https://www.facebook.com/digital.=
+value.enterprise/?ref=3Dhl>, LinkedIn <https://www.linkedin.com/company/div=
+a-e-digital-value-enterprise-gmbh>, Xing <https://www.xing.com/companies/di=
+va-edigitalvalueenterprisegmbh>
+>     >
+>     > -------------------------------------------------
+>     > diva-e | Netpioneer GmbH
+>     > Ludwig-Erhard-Allee 20, 76131 Karlsruhe
+>     > HRB: 107521 Handelsregister Mannheim
+>     > Gesch=C3=A4ftsf=C3=BChrung: Marcel Fuhlmann, Stefan M=C3=A4rkle, Ax=
+el Jahn
+>     >
+>     >
+>
+>
+>
+>     --
+>     Luiz Augusto von Dentz
+>
+>
+
+
+
+--=20
+Luiz Augusto von Dentz
