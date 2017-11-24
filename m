@@ -1,25 +1,43 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Message-ID: <1511532391.11411.7.camel@hadess.net>
-Subject: Re: [PATCH 1/2] tools/csr_usb: Fix compilation failure
-From: Bastien Nocera <hadess@hadess.net>
+From: Ilyas Keskin <ilyask92@gmx.de>
+Subject: Read configuration from bluetooth remote control
 To: linux-bluetooth@vger.kernel.org
-Date: Fri, 24 Nov 2017 15:06:31 +0100
-In-Reply-To: <20171102140953.21684-1-hadess@hadess.net>
-References: <20171102140953.21684-1-hadess@hadess.net>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Message-ID: <b78505b5-a5f3-e93d-fc03-f4bc7a74f298@gmx.de>
+Date: Fri, 24 Nov 2017 13:49:20 +0100
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, 2017-11-02 at 15:09 +0100, Bastien Nocera wrote:
-> GCC's "format-nonliteral" security check is enabled as an error in
-> recent versions of Fedora. Given the limited formats, pass a boolean
-> to switch between the 2 different formats.
-> 
-> tools/csr_usb.c: In function 'read_value':
-> tools/csr_usb.c:82:2: error: format not a string literal, argument
-> types not checked [-Werror=format-nonliteral]
->   n = fscanf(file, format, &value);
->   ^
+Hello,
 
-This still applies.
+I am currently working on emulating a remote control unit using the 
+raspberry pi 3s onboard bluetooth/wifi chip.
+I already installed bluez-stack and played around with 
+bluetoothctl/hcitool but could really establish a proper connection
+
+The chips used are:
+
+STB - Broadcom BCM43602KMLG (BT Classic)
+RCU - Broadcom BCM20734UA1
+
+Steps I tried: bluetoothctl --> power on --> agent on --> scan on --> 
+scan off --> devices. Unfortunately the STBs BT MAC address is not shown 
+there. Another problem is that the STB is running some kind of ARMv7l 
+Linux distro with proprietary BT implementation and I have not yet been 
+able to find the BT MAC address nor the actual BT stack implementation.
+
+My guess here is that the STB is expecting some special authentication 
+by the RCU.
+
+So my question is if there is the possiblity to read that 
+config/auth-information from the RCU and then spoof it using the rpi3.
+I think of something close to the process of "porgramming" one of these 
+old IR-remotes which read key map from TVs.
+
+
+Best regards,
+
+
+Ilyas Keskin
+
