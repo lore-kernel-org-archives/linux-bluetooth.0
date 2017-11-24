@@ -1,49 +1,95 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Message-ID: <1511546188.11411.26.camel@hadess.net>
-Subject: Re: [PATCH BlueZ] control: Fix invalid access
-From: Bastien Nocera <hadess@hadess.net>
+From: Steve Brown <sbrown@cortland.com>
+Message-ID: <1511540634.18754.8.camel@ewol.com>
+Subject: Re: [RFC]Mesh: meshctl configuration output fails in
+ gatt.c:pipe_write
 To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-bluetooth@vger.kernel.org
-Date: Fri, 24 Nov 2017 18:56:28 +0100
-In-Reply-To: <20171123130145.10480-1-luiz.dentz@gmail.com>
-References: <20171123130145.10480-1-luiz.dentz@gmail.com>
+        Steve Brown <sbrown@cortland.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Fri, 24 Nov 2017 09:23:54 -0700
+In-Reply-To: <CABBYNZKLGjucdGxWJ-771MPc6xZnE9GWnaPUpdqbUX=vCaz1aA@mail.gmail.com>
+References: <1511534342.16445.52.camel@ewol.com>
+         <CABBYNZKLGjucdGxWJ-771MPc6xZnE9GWnaPUpdqbUX=vCaz1aA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, 2017-11-23 at 15:01 +0200, Luiz Augusto von Dentz wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Luiz,
+
+On Fri, 2017-11-24 at 17:10 +0200, Luiz Augusto von Dentz wrote:
+> Hi Steve,
 > 
-> When both controller and target roles are supported by a device they
-> would share the same btd_service user_data pointer which would lead
-> to
-> use after free once either service is removed.
+> On Fri, Nov 24, 2017 at 4:39 PM, Steve Brown <sbrown@cortland.com>
+> wrote:
+> > If the first command output in a new connection exceeds 20 bytes,
+> > mesh_gatt_write sets the SAR to FIRST as the write_mtu is initially
+> > 0
+> > and the default is GATT_MTU-3 (20).
+> > 
+> > When pipe_write gets called, a new larger write_mtu has been set,
+> > but
+> > the SAR is still set to FIRST. It's assumed that data->gatt_len >
+> > max_len. However, it's not which causes lots of bogus output.
+> > 
+> > I've added code to reset the SAR and length in acquire_write_reply
+> > in
+> > case write_mtu might have changed.
+> > 
+> > This seems to work, but I'm sure there is a better way.
+> > 
+> > Steve
+> > 
+> > ---
+> > 
+> > 
+> > diff --git a/mesh/gatt.c b/mesh/gatt.c
+> > index 001eb17a8..3f59268f2 100644
+> > --- a/mesh/gatt.c
+> > +++ b/mesh/gatt.c
+> > @@ -358,6 +362,7 @@ static void acquire_write_reply(DBusMessage
+> > *message, void *user_data)
+> >         struct write_data *data = user_data;
+> >         DBusError error;
+> >         int fd;
+> > +       uint8_t max_len;
+> > 
+> >         dbus_error_init(&error);
+> > 
+> > @@ -383,6 +388,18 @@ static void acquire_write_reply(DBusMessage
+> > *message, void *user_data)
+> > 
+> >         write_io = pipe_io_new(fd);
+> > 
+> > +       /* Reset type and length as write_mtu may have changed */
+> > +       max_len = write_mtu ? write_mtu - 3 : GATT_MTU - 3;
+> > +       data->gatt_data[0] &= GATT_TYPE_MASK;
+> 
+> Ive never really liked the idea of putting the SAR byte into data but
+> it was required due to use of WriteValue, now perhaps we can even
+> remove that since AcquireWrite is stable the sar byte can be set in
+> an
+> independent variable in pipe_write so we can move this logic there.
+> 
+> > +       if (max_len < data->gatt_len) {
+> > +               data->iov.iov_len = max_len;
+> > +               data->gatt_data[0] |= GATT_SAR_FIRST;
+> > +       }
+> > +
+> > +       else
+> > +               data->iov.iov_len = data->gatt_len;
+> > +
+> >         pipe_write(write_io, data);
+> >  }
+> > 
 
-After this patch, I'm getting this backtrace when removing remote
-devices:
-bluetoothd[8327]: profiles/audio/control.c:path_unregister() Unregistered interface org.bluez.MediaControl1 on path /org/bluez/hci0/dev_38_71_DE_C0_FC_26
-bluetoothd[8327]: Assertion failed: (service->state == BTD_SERVICE_STATE_UNAVAILABLE) src/service.c:323 in btd_service_set_user_data
-bluetoothd[8327]: ++++++++ backtrace ++++++++
-bluetoothd[8327]: #1  btd_service_set_user_data+0x2c (src/service.c:324) [0x46a23c]
-bluetoothd[8327]: #2  path_unregister+0x33 (profiles/audio/control.c:280) [0x41fd13]
-bluetoothd[8327]: #3  remove_interface+0x53 (gdbus/object.c:668) [0x488b43]
-bluetoothd[8327]: #4  g_dbus_unregister_interface+0x3a (gdbus/object.c:1391) [0x48904a]
-bluetoothd[8327]: #5  service_remove+0x29 (src/service.c:177) [0x469ff9]
-bluetoothd[8327]: #6  device_remove+0x6a (src/device.c:4043) [0x4758ca]
-bluetoothd[8327]: #7  btd_adapter_remove_device+0x10d (src/adapter.c:1209) [0x461c4d]
-bluetoothd[8327]: #8  remove_device+0x73 (src/adapter.c:3034) [0x462963]
-bluetoothd[8327]: #9  process_message.isra.7+0x1b (gdbus/object.c:261) [0x4898cb]
-bluetoothd[8327]: #10 _dbus_object_tree_dispatch_and_unlock+0x170 (/usr/lib64/libdbus-1.so.3.19.2) [0x7f206c84d3e0]
-bluetoothd[8327]: #11 dbus_connection_dispatch+0x32a (/usr/lib64/libdbus-1.so.3.19.2) [0x7f206c83e20a]
-bluetoothd[8327]: #12 message_dispatch+0x10 (gdbus/mainloop.c:72) [0x4865a0]
-bluetoothd[8327]: #13 g_idle_dispatch+0x17 (/usr/lib64/libglib-2.0.so.0.5400.2) [0x7f206cabf597]
-bluetoothd[8327]: #14 g_main_context_dispatch+0x157 (/usr/lib64/libglib-2.0.so.0.5400.2) [0x7f206cac2bb7]
-bluetoothd[8327]: #15 g_main_context_iterate.isra.25+0x200 (/usr/lib64/libglib-2.0.so.0.5400.2) [0x7f206cac2f60]
-bluetoothd[8327]: #16 g_main_loop_run+0xc2 (/usr/lib64/libglib-2.0.so.0.5400.2) [0x7f206cac3272]
-bluetoothd[8327]: #17 main+0x839 (src/main.c:772) [0x40bd99]
-bluetoothd[8327]: #18 __libc_start_main+0xe7 (../csu/libc-start.c:340) [0x7f206bd5c187]
-bluetoothd[8327]: #19 _start+0x2a (/home/hadess/Projects/jhbuild/bluez/src/bluetoothd) [0x40c5ca]
-bluetoothd[8327]: +++++++++++++++++++++++++++
+Thanks for your quick response.
 
-This is with git master + an irrelevant patch to the autopair plugin
+I've just started reading the gatt-api doc. I might be ready to have at
+this sometime in the spring. 
+
+I discovered the problem while trying to configure the new zephyr
+mesh_shell. It should probably be fixed sooner than later. I best defer
+to somebody more experienced.
+
+Steve
