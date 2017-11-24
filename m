@@ -1,75 +1,56 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Matthias Schmidt <Matthias.Schmidt@diva-e.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: GATT Server ReadValue offset missing
-Date: Fri, 24 Nov 2017 09:18:19 +0000
-Message-ID: <4231F418-005D-4592-AC1D-4CB11FC2DB4B@diva-e.com>
-References: <614D22AE-E15E-4943-87E9-A52A84F85FB2@diva-e.com>
- <CABBYNZJ8vc0eB4np_0JeM00NaixTRb0OP9b7jvGA96iw0jgQsA@mail.gmail.com>
-In-Reply-To: <CABBYNZJ8vc0eB4np_0JeM00NaixTRb0OP9b7jvGA96iw0jgQsA@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
+In-Reply-To: <20171123130145.10480-1-luiz.dentz@gmail.com>
+References: <20171123130145.10480-1-luiz.dentz@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Fri, 24 Nov 2017 11:12:12 +0200
+Message-ID: <CABBYNZKuAnKDMLc3C2QqZVm8kac9bBYOvLtNajRS9MiZR+20yg@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] control: Fix invalid access
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgTHVpeiwNCg0Kd2UgbmV2ZXIgZ2V0IHRoZSBvZmZzZXQuDQoNCk5ldmVydGhlbGVzcyB3ZSBn
-ZXQgdGhlIGNvcnJlY3QgbnVtYmVyIG9mIHJlcXVlc3RzIHRvIHRyYW5zbWl0IHRoZSBkYXRhLCBi
-dXQgbmV2ZXIgYW55IG9mZnNldC4NCg0KSFRILA0KDQpNYXR0aGlhcw0KDQpNYXR0aGlhcyBTY2ht
-aWR0DQpTZW5pb3IgQXJjaGl0ZWN0DQogDQpkaXZhLWUgS2FybHNydWhlDQpMdWR3aWctRXJoYXJk
-LUFsbGVlIDIwLCA3NjEzMSBLYXJsc3J1aGUsIERldXRzY2hsYW5kDQpUOiArNDkgNzIxIDkyMDYw
-IDgyMg0KTTogKzQ5IDE3NSAyNjk0MjEzDQptYXR0aGlhcy5zY2htaWR0QGRpdmEtZS5jb20NCiAN
-CkNFMjcgQkY1OSAzNjUxIDI2MTkgOEE1RCAgMDhDQSAwODM5IDJFOTkgMzQ0OSA0QTMyDQoNCg0K
-DQpQdWJsaWMgS2V5OiBtYXR0aGlhcy1zY2htaWR0LWRpdmEtZS1jb20tMzQ0OTRBMzIuYXNjIDxo
-dHRwczovL293bmNsb3VkLmRpdmEtZS5jb20vaW5kZXgucGhwL3MvUkpZREs5WXBmbnhxc2NnL2Rv
-d25sb2FkPg0KIA0Kd3d3LmRpdmEtZS5jb20gPGh0dHBzOi8vd3d3LmRpdmEtZS5jb20vPiBmb2xs
-b3cgdXM6IHR3aXR0ZXIgPGh0dHBzOi8vdHdpdHRlci5jb20vZGl2YV9lbnRlcnByaXNlPiwgZmFj
-ZWJvb2sgPGh0dHBzOi8vd3d3LmZhY2Vib29rLmNvbS9kaWdpdGFsLnZhbHVlLmVudGVycHJpc2Uv
-P3JlZj1obD4sIExpbmtlZEluIDxodHRwczovL3d3dy5saW5rZWRpbi5jb20vY29tcGFueS9kaXZh
-LWUtZGlnaXRhbC12YWx1ZS1lbnRlcnByaXNlLWdtYmg+LCBYaW5nIDxodHRwczovL3d3dy54aW5n
-LmNvbS9jb21wYW5pZXMvZGl2YS1lZGlnaXRhbHZhbHVlZW50ZXJwcmlzZWdtYmg+DQogDQotLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tDQpkaXZhLWUgfCBO
-ZXRwaW9uZWVyIEdtYkggDQpMdWR3aWctRXJoYXJkLUFsbGVlIDIwLCA3NjEzMSBLYXJsc3J1aGUN
-CkhSQjogMTA3NTIxIEhhbmRlbHNyZWdpc3RlciBNYW5uaGVpbQ0KR2VzY2jDpGZ0c2bDvGhydW5n
-OiBNYXJjZWwgRnVobG1hbm4sIFN0ZWZhbiBNw6Rya2xlLCBBeGVsIEphaG4NCiANCg0KQW0gMjQu
-MTEuMTcsIDA5OjI4IHNjaHJpZWIgIkx1aXogQXVndXN0byB2b24gRGVudHoiIDxsdWl6LmRlbnR6
-QGdtYWlsLmNvbT46DQoNCiAgICBIaSBNYXR0aGlhcywNCiAgICANCiAgICBPbiBUaHUsIE5vdiAy
-MywgMjAxNyBhdCA1OjA1IFBNLCBNYXR0aGlhcyBTY2htaWR0DQogICAgPE1hdHRoaWFzLlNjaG1p
-ZHRAZGl2YS1lLmNvbT4gd3JvdGU6DQogICAgPiBIaSAqLA0KICAgID4NCiAgICA+IGRlc3BpdGUg
-dGhlIFJlYWRWYWx1ZSBEb2N1bWVudGF0aW9uOg0KICAgID4NCiAgICA+IE1ldGhvZHMgICAgICAg
-ICBhcnJheXtieXRlfSBSZWFkVmFsdWUoZGljdCBvcHRpb25zKQ0KICAgID4NCiAgICA+ICAgICAg
-ICAgICAgICAgICAgICAgICAgIElzc3VlcyBhIHJlcXVlc3QgdG8gcmVhZCB0aGUgdmFsdWUgb2Yg
-dGhlDQogICAgPiAgICAgICAgICAgICAgICAgICAgICAgICBjaGFyYWN0ZXJpc3RpYyBhbmQgcmV0
-dXJucyB0aGUgdmFsdWUgaWYgdGhlDQogICAgPiAgICAgICAgICAgICAgICAgICAgICAgICBvcGVy
-YXRpb24gd2FzIHN1Y2Nlc3NmdWwuDQogICAgPg0KICAgID4gICAgICAgICAgICAgICAgICAgICAg
-ICAgUG9zc2libGUgb3B0aW9uczogIm9mZnNldCI6IHVpbnQxNiBvZmZzZXQNCiAgICA+ICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICJkZXZpY2UiOiBPYmplY3QgRGV2
-aWNlIChTZXJ2ZXIgb25seSkNCiAgICA+DQogICAgPiBXZSBkb27igJl0IGdldCB0aGUgb2Zmc2V0
-IHZhbHVlLCBidXQgb25seSB0aGUgZGV2aWNlIGVudHJ5Og0KICAgID4NCiAgICA+IEtleWhhbmRs
-aW5nLlJlYWRWYWx1ZSgpLCBvcHRpb25zPXsnZGV2aWNlJzogJy9vcmcvYmx1ZXovaGNpMC9kZXZf
-NDVfNEFfQjhfQjhfQkFfMDknfQ0KICAgID4NCiAgICA+IFdlIGFyZSBydW5uaW5nIEJsdWV6IDUu
-NDcgb24gRGViaWFuIFN0cmV0Y2ggb24gYXJtdjdsLg0KICAgID4NCiAgICA+IFdoYXQgaGF2ZSB3
-ZSBkb25lIHdyb25nPw0KICAgIA0KICAgIElzIHRoZSBvZmZzZXQgMD8gV2Ugb25seSBzZW5kIHRo
-ZSBvZmZzZXQgaWYgaXQgaXMgZGlmZmVyZW50IHRoYW4gMDoNCiAgICANCiAgICBodHRwczovL2dp
-dC5rZXJuZWwub3JnL3B1Yi9zY20vYmx1ZXRvb3RoL2JsdWV6LmdpdC90cmVlL3NyYy9nYXR0LWRh
-dGFiYXNlLmMjbjE3MTkNCiAgICANCiAgICA+IENoZWVycywNCiAgICA+DQogICAgPiBNYXR0aGlh
-cw0KICAgID4NCiAgICA+IE1hdHRoaWFzIFNjaG1pZHQNCiAgICA+IFNlbmlvciBBcmNoaXRlY3QN
-CiAgICA+DQogICAgPiBkaXZhLWUgS2FybHNydWhlDQogICAgPiBMdWR3aWctRXJoYXJkLUFsbGVl
-IDIwLCA3NjEzMSBLYXJsc3J1aGUsIERldXRzY2hsYW5kDQogICAgPiBUOiArNDkgNzIxIDkyMDYw
-IDgyMg0KICAgID4gTTogKzQ5IDE3NSAyNjk0MjEzDQogICAgPiBtYXR0aGlhcy5zY2htaWR0QGRp
-dmEtZS5jb20NCiAgICA+DQogICAgPiBDRTI3IEJGNTkgMzY1MSAyNjE5IDhBNUQgIDA4Q0EgMDgz
-OSAyRTk5IDM0NDkgNEEzMg0KICAgID4NCiAgICA+DQogICAgPg0KICAgID4gUHVibGljIEtleTog
-bWF0dGhpYXMtc2NobWlkdC1kaXZhLWUtY29tLTM0NDk0QTMyLmFzYyA8aHR0cHM6Ly9vd25jbG91
-ZC5kaXZhLWUuY29tL2luZGV4LnBocC9zL1JKWURLOVlwZm54cXNjZy9kb3dubG9hZD4NCiAgICA+
-DQogICAgPiB3d3cuZGl2YS1lLmNvbSA8aHR0cHM6Ly93d3cuZGl2YS1lLmNvbS8+IGZvbGxvdyB1
-czogdHdpdHRlciA8aHR0cHM6Ly90d2l0dGVyLmNvbS9kaXZhX2VudGVycHJpc2U+LCBmYWNlYm9v
-ayA8aHR0cHM6Ly93d3cuZmFjZWJvb2suY29tL2RpZ2l0YWwudmFsdWUuZW50ZXJwcmlzZS8/cmVm
-PWhsPiwgTGlua2VkSW4gPGh0dHBzOi8vd3d3LmxpbmtlZGluLmNvbS9jb21wYW55L2RpdmEtZS1k
-aWdpdGFsLXZhbHVlLWVudGVycHJpc2UtZ21iaD4sIFhpbmcgPGh0dHBzOi8vd3d3LnhpbmcuY29t
-L2NvbXBhbmllcy9kaXZhLWVkaWdpdGFsdmFsdWVlbnRlcnByaXNlZ21iaD4NCiAgICA+DQogICAg
-PiAtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tDQogICAg
-PiBkaXZhLWUgfCBOZXRwaW9uZWVyIEdtYkgNCiAgICA+IEx1ZHdpZy1FcmhhcmQtQWxsZWUgMjAs
-IDc2MTMxIEthcmxzcnVoZQ0KICAgID4gSFJCOiAxMDc1MjEgSGFuZGVsc3JlZ2lzdGVyIE1hbm5o
-ZWltDQogICAgPiBHZXNjaMOkZnRzZsO8aHJ1bmc6IE1hcmNlbCBGdWhsbWFubiwgU3RlZmFuIE3D
-pHJrbGUsIEF4ZWwgSmFobg0KICAgID4NCiAgICA+DQogICAgDQogICAgDQogICAgDQogICAgLS0g
-DQogICAgTHVpeiBBdWd1c3RvIHZvbiBEZW50eg0KICAgIA0KDQo=
+Hi,
+
+On Thu, Nov 23, 2017 at 3:01 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> When both controller and target roles are supported by a device they
+> would share the same btd_service user_data pointer which would lead to
+> use after free once either service is removed.
+> ---
+>  profiles/audio/control.c | 8 ++++++--
+>  1 file changed, 6 insertions(+), 2 deletions(-)
+>
+> diff --git a/profiles/audio/control.c b/profiles/audio/control.c
+> index 707276d29..4ab1f9b0f 100644
+> --- a/profiles/audio/control.c
+> +++ b/profiles/audio/control.c
+> @@ -275,11 +275,15 @@ static void path_unregister(void *data)
+>
+>         avctp_remove_state_cb(control->avctp_id);
+>
+> -       if (control->target)
+> +       if (control->target) {
+> +               btd_service_set_user_data(control->target, NULL);
+>                 btd_service_unref(control->target);
+> +       }
+>
+> -       if (control->remote)
+> +       if (control->remote) {
+> +               btd_service_set_user_data(control->remote, NULL);
+>                 btd_service_unref(control->remote);
+> +       }
+>
+>         devices = g_slist_remove(devices, control);
+>         g_free(control);
+> --
+> 2.13.6
+
+Applied.
+
+
+-- 
+Luiz Augusto von Dentz
