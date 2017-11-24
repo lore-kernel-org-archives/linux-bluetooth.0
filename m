@@ -1,95 +1,64 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Steve Brown <sbrown@cortland.com>
-Message-ID: <1511540634.18754.8.camel@ewol.com>
-Subject: Re: [RFC]Mesh: meshctl configuration output fails in
- gatt.c:pipe_write
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Steve Brown <sbrown@cortland.com>
+Message-ID: <1511536979.11411.23.camel@hadess.net>
+Subject: Re: [PATCH 2/2] obex: Work-around compilation failure
+From: Bastien Nocera <hadess@hadess.net>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Fri, 24 Nov 2017 09:23:54 -0700
-In-Reply-To: <CABBYNZKLGjucdGxWJ-771MPc6xZnE9GWnaPUpdqbUX=vCaz1aA@mail.gmail.com>
-References: <1511534342.16445.52.camel@ewol.com>
-         <CABBYNZKLGjucdGxWJ-771MPc6xZnE9GWnaPUpdqbUX=vCaz1aA@mail.gmail.com>
+Date: Fri, 24 Nov 2017 16:22:59 +0100
+In-Reply-To: <CABBYNZ+SJ0maQVjyfxgawvqiV6z-RrpYaCwb0cdCQpw5dzvMuw@mail.gmail.com>
+References: <20171102140953.21684-1-hadess@hadess.net>
+         <20171102140953.21684-2-hadess@hadess.net>
+         <1511532398.11411.8.camel@hadess.net>
+         <CABBYNZ+SJ0maQVjyfxgawvqiV6z-RrpYaCwb0cdCQpw5dzvMuw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
-
-On Fri, 2017-11-24 at 17:10 +0200, Luiz Augusto von Dentz wrote:
-> Hi Steve,
+On Fri, 2017-11-24 at 16:48 +0200, Luiz Augusto von Dentz wrote:
+> Hi Bastien,
 > 
-> On Fri, Nov 24, 2017 at 4:39 PM, Steve Brown <sbrown@cortland.com>
+> On Fri, Nov 24, 2017 at 4:06 PM, Bastien Nocera <hadess@hadess.net>
 > wrote:
-> > If the first command output in a new connection exceeds 20 bytes,
-> > mesh_gatt_write sets the SAR to FIRST as the write_mtu is initially
-> > 0
-> > and the default is GATT_MTU-3 (20).
-> > 
-> > When pipe_write gets called, a new larger write_mtu has been set,
-> > but
-> > the SAR is still set to FIRST. It's assumed that data->gatt_len >
-> > max_len. However, it's not which causes lots of bogus output.
-> > 
-> > I've added code to reset the SAR and length in acquire_write_reply
-> > in
-> > case write_mtu might have changed.
-> > 
-> > This seems to work, but I'm sure there is a better way.
-> > 
-> > Steve
-> > 
-> > ---
+> > On Thu, 2017-11-02 at 15:09 +0100, Bastien Nocera wrote:
+> > > obexd/plugins/bluetooth.c: In function 'register_profile':
+> > > obexd/plugins/bluetooth.c:310:7: error: format not a string
+> > > literal,
+> > > argument types not checked [-Werror=format-nonliteral]
+> > >        profile->driver->port);
+> > >        ^~~~~~~
+> > > obexd/plugins/bluetooth.c:314:7: error: format not a string
+> > > literal,
+> > > argument types not checked [-Werror=format-nonliteral]
+> > >        profile->driver->name);
+> > >        ^~~~~~~
 > > 
 > > 
-> > diff --git a/mesh/gatt.c b/mesh/gatt.c
-> > index 001eb17a8..3f59268f2 100644
-> > --- a/mesh/gatt.c
-> > +++ b/mesh/gatt.c
-> > @@ -358,6 +362,7 @@ static void acquire_write_reply(DBusMessage
-> > *message, void *user_data)
-> >         struct write_data *data = user_data;
-> >         DBusError error;
-> >         int fd;
-> > +       uint8_t max_len;
-> > 
-> >         dbus_error_init(&error);
-> > 
-> > @@ -383,6 +388,18 @@ static void acquire_write_reply(DBusMessage
-> > *message, void *user_data)
-> > 
-> >         write_io = pipe_io_new(fd);
-> > 
-> > +       /* Reset type and length as write_mtu may have changed */
-> > +       max_len = write_mtu ? write_mtu - 3 : GATT_MTU - 3;
-> > +       data->gatt_data[0] &= GATT_TYPE_MASK;
+> > And so does this one.
 > 
-> Ive never really liked the idea of putting the SAR byte into data but
-> it was required due to use of WriteValue, now perhaps we can even
-> remove that since AcquireWrite is stable the sar byte can be set in
-> an
-> independent variable in pipe_write so we can move this logic there.
-> 
-> > +       if (max_len < data->gatt_len) {
-> > +               data->iov.iov_len = max_len;
-> > +               data->gatt_data[0] |= GATT_SAR_FIRST;
-> > +       }
-> > +
-> > +       else
-> > +               data->iov.iov_len = data->gatt_len;
-> > +
-> >         pipe_write(write_io, data);
-> >  }
-> > 
+> I really hope we can avoid GCC specific pragmas,
 
-Thanks for your quick response.
+I'm pretty sure it just won't do anything with other compilers.
 
-I've just started reading the gatt-api doc. I might be ready to have at
-this sometime in the spring. 
+>  there got to be a
+> better way avoid this error
 
-I discovered the problem while trying to configure the new zephyr
-mesh_shell. It should probably be fixed sooner than later. I best defer
-to somebody more experienced.
+A lot of code refactoring.
 
-Steve
+>  or just disable
+> -Werror=format-nonliteral, actually is that our error or
+> g_markup_printf_escaped?
+
+It's the g_markup_printf_escaped() usage that incorrect. The first
+argument of printf-style functions are supposed to be literals,
+otherwise the compiler doesn't know whether the arguments passed match
+the format.
+
+It's a potential security bug, depending on where the format comes
+from, and how it's generated.
+
+Removing the warning/error doesn't remove the bug, it just hides it.
+And so does this patch. I don't know the codebase enough to refactor
+it.
+
+Cheers
