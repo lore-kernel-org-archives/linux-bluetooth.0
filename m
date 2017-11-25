@@ -1,143 +1,241 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/4] shared/shell: Detect if the arguments are properly set
-Date: Sun, 26 Nov 2017 22:21:23 +0200
-Message-Id: <20171126202126.27783-1-luiz.dentz@gmail.com>
+From: Steve Brown <sbrown@cortland.com>
+Message-ID: <1511612372.30429.14.camel@ewol.com>
+Subject: [RFC V2]Mesh: meshctl configuration output fails in
+ gatt.c:pipe_write
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Sat, 25 Nov 2017 05:19:32 -0700
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+If the first command output in a new connection exceeds 20 bytes,
+mesh_gatt_write sets the SAR to FIRST as the write_mtu is initially 0
+and the default is GATT_MTU-3 (20).
 
-Parse arguments to detect if user has passed a valid number of
-arguments.
+When pipe_write gets called, a new larger write_mtu has been set, but
+the SAR is still set to FIRST. It's assumed that data->gatt_len >
+max_len. However, it's not which causes lots of bogus output.
+
 ---
- src/shared/shell.c | 98 ++++++++++++++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 92 insertions(+), 6 deletions(-)
 
-diff --git a/src/shared/shell.c b/src/shared/shell.c
-index c271a53ee..73aedaf79 100644
---- a/src/shared/shell.c
-+++ b/src/shared/shell.c
-@@ -207,6 +207,95 @@ static void shell_print_menu(void)
- 	}
+Here's an attempt to fix it following Luiz' comments.
+
+1. The WriteValue code has been removed
+2. The SAR logic has been moved to pipe_write
+
+It was tested against the zephyr mesh_shell and a small mtu to test the
+segmentation logic.
+
+diff --git a/mesh/gatt.c b/mesh/gatt.c
+index 001eb17a8..29273ba60 100644
+--- a/mesh/gatt.c
++++ b/mesh/gatt.c
+@@ -104,27 +104,6 @@ static void write_data_free(void *user_data)
+ 	free(data);
  }
  
-+static int parse_args(char *arg, wordexp_t *w, char *del, int flags)
-+{
-+	char *str;
-+
-+	str = g_strdelimit(arg, del, '"');
-+
-+	if (wordexp(str, w, flags)) {
-+		g_free(str);
-+		return -EINVAL;
-+	}
-+
-+	/* If argument ends with ,,, set we_offs bypass strict checks */
-+	if (w->we_wordc && g_str_has_suffix(w->we_wordv[w->we_wordc -1], "..."))
-+		w->we_offs = 1;
-+
-+	g_free(str);
-+
-+	return 0;
-+}
-+
-+static int cmd_exec(const struct bt_shell_menu_entry *entry,
-+					int argc, char *argv[])
-+{
-+	wordexp_t w;
-+	size_t len;
-+	char *man, *opt;
-+	int flags = WRDE_NOCMD;
-+
-+	if (!entry->arg || entry->arg[0] == '\0') {
-+		if (argc) {
-+			print_text(COLOR_HIGHLIGHT, "Too many arguments");
-+			return -EINVAL;
-+		}
-+		goto exec;
-+	}
-+
-+	/* Find last mandatory arguments */
-+	man = strrchr(entry->arg, '>');
-+	if (!man) {
-+		opt = strdup(entry->arg);
-+		goto optional;
-+	}
-+
-+	len = man - entry->arg;
-+	man = strndup(entry->arg, len + 1);
-+
-+	if (parse_args(man, &w, "<>", flags) < 0) {
-+		print_text(COLOR_HIGHLIGHT,
-+				"Unable to parse mandatory command arguments");
-+		return -EINVAL;
-+	}
-+
-+	/* Check if there are enough arguments */
-+	if ((unsigned) argc < w.we_wordc && !w.we_offs) {
-+		print_text(COLOR_HIGHLIGHT, "Missing %s argument",
-+						w.we_wordv[argc]);
-+		goto fail;
-+	}
-+
-+	flags |= WRDE_APPEND;
-+	opt = strdup(entry->arg + len + 1);
-+
-+optional:
-+	if (parse_args(opt, &w, "<>", flags) < 0) {
-+		print_text(COLOR_HIGHLIGHT,
-+				"Unable to parse mandatory command arguments");
-+		return -EINVAL;
-+	}
-+
-+	/* Check if there are too many arguments */
-+	if ((unsigned) argc > w.we_wordc && !w.we_offs) {
-+		print_text(COLOR_HIGHLIGHT, "Too many arguments: %d > %zu",
-+					argc, w.we_wordc);
-+		goto fail;
-+	}
-+
-+	wordfree(&w);
-+
-+exec:
-+	if (entry->func)
-+		entry->func(argc, argv);
-+
-+	return 0;
-+
-+fail:
-+	wordfree(&w);
-+	return -EINVAL;
-+}
-+
- static int menu_exec(const struct bt_shell_menu_entry *entry,
- 					int argc, char *argv[])
+-static void write_setup(DBusMessageIter *iter, void *user_data)
+-{
+-	struct write_data *data = user_data;
+-	struct iovec *iov = &data->iov;
+-	DBusMessageIter array, dict;
+-
+-	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY, "y", &array);
+-	dbus_message_iter_append_fixed_array(&array, DBUS_TYPE_BYTE,
+-						&iov->iov_base, iov->iov_len);
+-	dbus_message_iter_close_container(iter, &array);
+-
+-	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
+-					DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
+-					DBUS_TYPE_STRING_AS_STRING
+-					DBUS_TYPE_VARIANT_AS_STRING
+-					DBUS_DICT_ENTRY_END_CHAR_AS_STRING,
+-					&dict);
+-
+-	dbus_message_iter_close_container(iter, &dict);
+-}
+-
+ uint16_t mesh_gatt_sar(uint8_t **pkt, uint16_t size)
  {
-@@ -222,10 +311,7 @@ static int menu_exec(const struct bt_shell_menu_entry *entry,
- 		if (data.menu == data.main && !strcmp(entry->cmd, "back"))
- 			continue;
+ 	const uint8_t *data = *pkt;
+@@ -194,18 +173,26 @@ static bool pipe_write(struct io *io, void *user_data)
+ 	struct write_data *data = user_data;
+ 	struct iovec iov[2];
+ 	uint8_t sar;
+-	uint8_t max_len = write_mtu - 4;
++	uint8_t max_len;
  
--		if (entry->func) {
--			entry->func(argc - 1, ++argv);
--			return 0;
--		}
-+		return cmd_exec(entry, --argc, ++argv);
- 	}
+ 	if (data == NULL)
+ 		return true;
  
- 	return -ENOENT;
-@@ -236,8 +322,8 @@ static void shell_exec(int argc, char *argv[])
- 	if (!data.menu || !argv[0])
- 		return;
+-	print_byte_array("GATT-TX:\t", data->gatt_data, data->gatt_len);
++	max_len = write_mtu ? write_mtu - 3 - 1 : GATT_MTU - 3 - 1;
  
--	if (menu_exec(default_menu, argc, argv) < 0) {
--		if (menu_exec(data.menu->entries, argc, argv) < 0)
-+	if (menu_exec(default_menu, argc, argv) == -ENOENT) {
-+		if (menu_exec(data.menu->entries, argc, argv) == -ENOENT)
- 			print_text(COLOR_HIGHLIGHT, "Invalid command");
+-	sar = data->gatt_data[0];
++	print_byte_array("GATT-TX:\t", data->gatt_data, data->gatt_len);
+ 
+ 	data->iov.iov_base = data->gatt_data + 1;
+ 	data->iov.iov_len--;
+ 
++	sar = data->gatt_data[0] & GATT_TYPE_MASK;
++	data->gatt_len--;
++
++        if (data->gatt_len > max_len) {
++		sar |= GATT_SAR_FIRST;
++		data->iov.iov_len = max_len;
++	}
++
+ 	iov[0].iov_base = &sar;
+ 	iov[0].iov_len = sizeof(sar);
+ 
+@@ -247,73 +234,6 @@ static bool pipe_write(struct io *io, void *user_data)
  	}
  }
--- 
-2.13.6
+ 
+-static void write_reply(DBusMessage *message, void *user_data)
+-{
+-	struct write_data *data = user_data;
+-	struct write_data *tmp;
+-	uint8_t *dptr = data->gatt_data;
+-	uint8_t max_len = GATT_MTU - 3;
+-	uint8_t max_seg = GATT_MTU - 4;
+-	DBusError error;
+-
+-	dbus_error_init(&error);
+-
+-	if (dbus_set_error_from_message(&error, message) == TRUE) {
+-		rl_printf("Failed to write: %s\n", error.name);
+-		dbus_error_free(&error);
+-		return;
+-	}
+-
+-	if (data == NULL)
+-		return;
+-
+-	switch (data->gatt_data[0] & GATT_SAR_MASK) {
+-		case GATT_SAR_FIRST:
+-		case GATT_SAR_CONTINUE:
+-			tmp = g_new0(struct write_data, 1);
+-			if (!data)
+-				return;
+-
+-			*tmp = *data;
+-			tmp->gatt_data = g_malloc(data->gatt_len);
+-
+-			if (!tmp->gatt_data) {
+-				g_free(tmp);
+-				return;
+-			}
+-
+-			tmp->gatt_data[0] = dptr[0];
+-			data = tmp;
+-			memcpy(data->gatt_data + 1, dptr + max_len,
+-					data->gatt_len - max_seg);
+-			data->gatt_len -= max_seg;
+-			data->gatt_data[0] &= GATT_TYPE_MASK;
+-			data->iov.iov_base = data->gatt_data;
+-			if (max_len < data->gatt_len) {
+-				data->iov.iov_len = max_len;
+-				data->gatt_data[0] |= GATT_SAR_CONTINUE;
+-			} else {
+-				data->iov.iov_len = data->gatt_len;
+-				data->gatt_data[0] |= GATT_SAR_LAST;
+-			}
+-
+-			break;
+-
+-		default:
+-			if(data->cb)
+-				data->cb(message, data->user_data);
+-			return;
+-	}
+-
+-	if (g_dbus_proxy_method_call(data->proxy, "WriteValue", write_setup,
+-				write_reply, data, write_data_free) == FALSE) {
+-		rl_printf("Failed to write\n");
+-		write_data_free(data);
+-		return;
+-	}
+-
+-}
+-
+ static void write_io_destroy(void)
+ {
+ 	io_destroy(write_io);
+@@ -363,12 +283,8 @@ static void acquire_write_reply(DBusMessage *message, void *user_data)
+ 
+ 	if (dbus_set_error_from_message(&error, message) == TRUE) {
+ 		dbus_error_free(&error);
+-		if (g_dbus_proxy_method_call(data->proxy, "WriteValue",
+-				write_setup, write_reply, data,
+-				write_data_free) == FALSE) {
+-			rl_printf("Failed to write\n");
+-			write_data_free(data);
+-		}
++		rl_printf("Failed to write\n");
++		write_data_free(data);
+ 		return;
+ 	}
+ 
+@@ -404,8 +320,6 @@ bool mesh_gatt_write(GDBusProxy *proxy, uint8_t *buf, uint16_t len,
+ 			GDBusReturnFunction cb, void *user_data)
+ {
+ 	struct write_data *data;
+-	DBusMessageIter iter;
+-	uint8_t max_len;
+ 
+ 	if (!buf || !len)
+ 		return false;
+@@ -417,17 +331,10 @@ bool mesh_gatt_write(GDBusProxy *proxy, uint8_t *buf, uint16_t len,
+ 	if (!data)
+ 		return false;
+ 
+-	max_len = write_mtu ? write_mtu - 3 : GATT_MTU - 3;
+-
+ 	/* TODO: should keep in queue in case we need to cancel write? */
+ 
+ 	data->gatt_len = len;
+ 	data->gatt_data = g_memdup(buf, len);
+-	data->gatt_data[0] &= GATT_TYPE_MASK;
+-	if (max_len < len) {
+-		len = max_len;
+-		data->gatt_data[0] |= GATT_SAR_FIRST;
+-	}
+ 	data->iov.iov_base = data->gatt_data;
+ 	data->iov.iov_len = len;
+ 	data->proxy = proxy;
+@@ -437,25 +344,12 @@ bool mesh_gatt_write(GDBusProxy *proxy, uint8_t *buf, uint16_t len,
+ 	if (write_io)
+ 		return pipe_write(write_io, data);
+ 
+-	if (g_dbus_proxy_get_property(proxy, "WriteAcquired", &iter)) {
+-		if (g_dbus_proxy_method_call(proxy, "AcquireWrite",
+-					acquire_setup, acquire_write_reply,
+-					data, NULL) == FALSE) {
+-			rl_printf("Failed to AcquireWrite\n");
+-			write_data_free(data);
+-			return false;
+-		}
+-	} else {
+-		if (g_dbus_proxy_method_call(data->proxy, "WriteValue",
+-				write_setup, write_reply, data,
+-				write_data_free) == FALSE) {
+-			rl_printf("Failed to write\n");
+-			write_data_free(data);
+-			return false;
+-		}
+-		print_byte_array("GATT-TX: ", buf, len);
+-		rl_printf("Attempting to write %s\n",
+-						g_dbus_proxy_get_path(proxy));
++	if (g_dbus_proxy_method_call(proxy, "AcquireWrite",
++				acquire_setup, acquire_write_reply,
++				data, NULL) == FALSE) {
++		rl_printf("Failed to AcquireWrite\n");
++		write_data_free(data);
++		return false;
+ 	}
+ 
+ 	return true;
 
