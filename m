@@ -1,241 +1,64 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Steve Brown <sbrown@cortland.com>
-Message-ID: <1511612372.30429.14.camel@ewol.com>
-Subject: [RFC V2]Mesh: meshctl configuration output fails in
- gatt.c:pipe_write
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Sat, 25 Nov 2017 05:19:32 -0700
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+Subject: Re: Bluetooth mesh
+From: Michal Hobot <michal.hobot@silvair.com>
+In-Reply-To: <CAJCRAVEJOOr3g=+83kZ7G1HJ4xNcfXQgz5yAEKeNom_fkA9dUQ@mail.gmail.com>
+Date: Sat, 25 Nov 2017 10:20:08 +0100
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <CC03D1E8-79F7-454C-8FE1-DA4AF351B28F@silvair.com>
+References: <CAJCRAVEJOOr3g=+83kZ7G1HJ4xNcfXQgz5yAEKeNom_fkA9dUQ@mail.gmail.com>
+To: Pierre-Henri Wibaut <wibautph@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If the first command output in a new connection exceeds 20 bytes,
-mesh_gatt_write sets the SAR to FIRST as the write_mtu is initially 0
-and the default is GATT_MTU-3 (20).
+Pierre-Henri,
+The way Bluetooth mesh was designed to work is using advertising bearer. =
+This allows mesh nodes to communicate by sending short bursts of data, =
+allowing for effective and power-efficient communication.
+There is also another bearer, used by the devices that cannot send and =
+receive advertising packets in controlled way, like mobile phones. This =
+bearer uses GATT connection to the mesh node that offers a service =
+called GATT Proxy. Such a node is able to receive mesh messages tunneled =
+over GATT connection and forward it to the mesh network using ADV =
+bearer.
 
-When pipe_write gets called, a new larger write_mtu has been set, but
-the SAR is still set to FIRST. It's assumed that data->gatt_len >
-max_len. However, it's not which causes lots of bogus output.
+I'm not a BlueZ specialist but from what I can see, it supports just the =
+GATT bearer. So you can use it to talk to "real" mesh nodes, but not =
+really to be such a node.
 
----
+Hope this helps,
+Michal Hobot
 
-Here's an attempt to fix it following Luiz' comments.
-
-1. The WriteValue code has been removed
-2. The SAR logic has been moved to pipe_write
-
-It was tested against the zephyr mesh_shell and a small mtu to test the
-segmentation logic.
-
-diff --git a/mesh/gatt.c b/mesh/gatt.c
-index 001eb17a8..29273ba60 100644
---- a/mesh/gatt.c
-+++ b/mesh/gatt.c
-@@ -104,27 +104,6 @@ static void write_data_free(void *user_data)
- 	free(data);
- }
- 
--static void write_setup(DBusMessageIter *iter, void *user_data)
--{
--	struct write_data *data = user_data;
--	struct iovec *iov = &data->iov;
--	DBusMessageIter array, dict;
--
--	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY, "y", &array);
--	dbus_message_iter_append_fixed_array(&array, DBUS_TYPE_BYTE,
--						&iov->iov_base, iov->iov_len);
--	dbus_message_iter_close_container(iter, &array);
--
--	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
--					DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
--					DBUS_TYPE_STRING_AS_STRING
--					DBUS_TYPE_VARIANT_AS_STRING
--					DBUS_DICT_ENTRY_END_CHAR_AS_STRING,
--					&dict);
--
--	dbus_message_iter_close_container(iter, &dict);
--}
--
- uint16_t mesh_gatt_sar(uint8_t **pkt, uint16_t size)
- {
- 	const uint8_t *data = *pkt;
-@@ -194,18 +173,26 @@ static bool pipe_write(struct io *io, void *user_data)
- 	struct write_data *data = user_data;
- 	struct iovec iov[2];
- 	uint8_t sar;
--	uint8_t max_len = write_mtu - 4;
-+	uint8_t max_len;
- 
- 	if (data == NULL)
- 		return true;
- 
--	print_byte_array("GATT-TX:\t", data->gatt_data, data->gatt_len);
-+	max_len = write_mtu ? write_mtu - 3 - 1 : GATT_MTU - 3 - 1;
- 
--	sar = data->gatt_data[0];
-+	print_byte_array("GATT-TX:\t", data->gatt_data, data->gatt_len);
- 
- 	data->iov.iov_base = data->gatt_data + 1;
- 	data->iov.iov_len--;
- 
-+	sar = data->gatt_data[0] & GATT_TYPE_MASK;
-+	data->gatt_len--;
-+
-+        if (data->gatt_len > max_len) {
-+		sar |= GATT_SAR_FIRST;
-+		data->iov.iov_len = max_len;
-+	}
-+
- 	iov[0].iov_base = &sar;
- 	iov[0].iov_len = sizeof(sar);
- 
-@@ -247,73 +234,6 @@ static bool pipe_write(struct io *io, void *user_data)
- 	}
- }
- 
--static void write_reply(DBusMessage *message, void *user_data)
--{
--	struct write_data *data = user_data;
--	struct write_data *tmp;
--	uint8_t *dptr = data->gatt_data;
--	uint8_t max_len = GATT_MTU - 3;
--	uint8_t max_seg = GATT_MTU - 4;
--	DBusError error;
--
--	dbus_error_init(&error);
--
--	if (dbus_set_error_from_message(&error, message) == TRUE) {
--		rl_printf("Failed to write: %s\n", error.name);
--		dbus_error_free(&error);
--		return;
--	}
--
--	if (data == NULL)
--		return;
--
--	switch (data->gatt_data[0] & GATT_SAR_MASK) {
--		case GATT_SAR_FIRST:
--		case GATT_SAR_CONTINUE:
--			tmp = g_new0(struct write_data, 1);
--			if (!data)
--				return;
--
--			*tmp = *data;
--			tmp->gatt_data = g_malloc(data->gatt_len);
--
--			if (!tmp->gatt_data) {
--				g_free(tmp);
--				return;
--			}
--
--			tmp->gatt_data[0] = dptr[0];
--			data = tmp;
--			memcpy(data->gatt_data + 1, dptr + max_len,
--					data->gatt_len - max_seg);
--			data->gatt_len -= max_seg;
--			data->gatt_data[0] &= GATT_TYPE_MASK;
--			data->iov.iov_base = data->gatt_data;
--			if (max_len < data->gatt_len) {
--				data->iov.iov_len = max_len;
--				data->gatt_data[0] |= GATT_SAR_CONTINUE;
--			} else {
--				data->iov.iov_len = data->gatt_len;
--				data->gatt_data[0] |= GATT_SAR_LAST;
--			}
--
--			break;
--
--		default:
--			if(data->cb)
--				data->cb(message, data->user_data);
--			return;
--	}
--
--	if (g_dbus_proxy_method_call(data->proxy, "WriteValue", write_setup,
--				write_reply, data, write_data_free) == FALSE) {
--		rl_printf("Failed to write\n");
--		write_data_free(data);
--		return;
--	}
--
--}
--
- static void write_io_destroy(void)
- {
- 	io_destroy(write_io);
-@@ -363,12 +283,8 @@ static void acquire_write_reply(DBusMessage *message, void *user_data)
- 
- 	if (dbus_set_error_from_message(&error, message) == TRUE) {
- 		dbus_error_free(&error);
--		if (g_dbus_proxy_method_call(data->proxy, "WriteValue",
--				write_setup, write_reply, data,
--				write_data_free) == FALSE) {
--			rl_printf("Failed to write\n");
--			write_data_free(data);
--		}
-+		rl_printf("Failed to write\n");
-+		write_data_free(data);
- 		return;
- 	}
- 
-@@ -404,8 +320,6 @@ bool mesh_gatt_write(GDBusProxy *proxy, uint8_t *buf, uint16_t len,
- 			GDBusReturnFunction cb, void *user_data)
- {
- 	struct write_data *data;
--	DBusMessageIter iter;
--	uint8_t max_len;
- 
- 	if (!buf || !len)
- 		return false;
-@@ -417,17 +331,10 @@ bool mesh_gatt_write(GDBusProxy *proxy, uint8_t *buf, uint16_t len,
- 	if (!data)
- 		return false;
- 
--	max_len = write_mtu ? write_mtu - 3 : GATT_MTU - 3;
--
- 	/* TODO: should keep in queue in case we need to cancel write? */
- 
- 	data->gatt_len = len;
- 	data->gatt_data = g_memdup(buf, len);
--	data->gatt_data[0] &= GATT_TYPE_MASK;
--	if (max_len < len) {
--		len = max_len;
--		data->gatt_data[0] |= GATT_SAR_FIRST;
--	}
- 	data->iov.iov_base = data->gatt_data;
- 	data->iov.iov_len = len;
- 	data->proxy = proxy;
-@@ -437,25 +344,12 @@ bool mesh_gatt_write(GDBusProxy *proxy, uint8_t *buf, uint16_t len,
- 	if (write_io)
- 		return pipe_write(write_io, data);
- 
--	if (g_dbus_proxy_get_property(proxy, "WriteAcquired", &iter)) {
--		if (g_dbus_proxy_method_call(proxy, "AcquireWrite",
--					acquire_setup, acquire_write_reply,
--					data, NULL) == FALSE) {
--			rl_printf("Failed to AcquireWrite\n");
--			write_data_free(data);
--			return false;
--		}
--	} else {
--		if (g_dbus_proxy_method_call(data->proxy, "WriteValue",
--				write_setup, write_reply, data,
--				write_data_free) == FALSE) {
--			rl_printf("Failed to write\n");
--			write_data_free(data);
--			return false;
--		}
--		print_byte_array("GATT-TX: ", buf, len);
--		rl_printf("Attempting to write %s\n",
--						g_dbus_proxy_get_path(proxy));
-+	if (g_dbus_proxy_method_call(proxy, "AcquireWrite",
-+				acquire_setup, acquire_write_reply,
-+				data, NULL) == FALSE) {
-+		rl_printf("Failed to AcquireWrite\n");
-+		write_data_free(data);
-+		return false;
- 	}
- 
- 	return true;
+> Wiadomo=C5=9B=C4=87 napisana przez Pierre-Henri Wibaut =
+<wibautph@gmail.com> w dniu 22.11.2017, o godz. 16:04:
+>=20
+> Hi everyone,
+>=20
+> I=E2=80=99ve just seen that you added support for mesh in bluez. Nice!
+> I wanted to know if building a mesh network is tricky or not for the
+> moment. I already made a mesh network with NRF24L01 chips.
+> I would like to switch to BT and bluez for future work, but has no
+> experience in BT (anyway, always happy to learn).
+>=20
+> My setup would be meshing C.H.I.P
+> (https://docs.getchip.com/chip.html#chip-hardware) together (chipset
+> RTL8723BS)
+> And raspberry pi 3. Both looks like supported by bluez and are >=3D4.0
+> BT. Does it worth it to give it a try?
+>=20
+> Is the mesh specific to some hardware or any >=3D 4.0 chip does the =
+job?
+>=20
+> Thank you for your answers.
+>=20
+> kind regards
+>=20
+> Wibaut PH
+> Oxykube SCRL
+> --
+> To unsubscribe from this list: send the line "unsubscribe =
+linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
