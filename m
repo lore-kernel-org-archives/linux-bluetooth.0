@@ -1,9 +1,9 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 4/4] shared/shell: Add default argument generator
-Date: Sun, 26 Nov 2017 22:21:26 +0200
-Message-Id: <20171126202126.27783-4-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 3/4] client: Fix format of arguments of set-service and set-manufacturer
+Date: Sun, 26 Nov 2017 22:21:25 +0200
+Message-Id: <20171126202126.27783-3-luiz.dentz@gmail.com>
 In-Reply-To: <20171126202126.27783-1-luiz.dentz@gmail.com>
 References: <20171126202126.27783-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,50 +11,37 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds a default argument generator if the command don't provide
-one, the generator will print out the argument list so the user don't
-have to always resort to help for checking it.
+Optional arguments should contain only one set of '[' ']' otherwise
+wordexp won't be able to parse it.
 ---
- src/shared/shell.c | 19 +++++++++++++++++--
- 1 file changed, 17 insertions(+), 2 deletions(-)
+ client/main.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/src/shared/shell.c b/src/shared/shell.c
-index 73aedaf79..d0cd2e6fe 100644
---- a/src/shared/shell.c
-+++ b/src/shared/shell.c
-@@ -518,6 +518,17 @@ static char *cmd_generator(const char *text, int state)
- 	return find_cmd(text, data.menu->entries, &index);
- }
- 
-+static char *arg_generator(const char *text, int state)
-+{
-+	if (!text)
-+		return NULL;
-+
-+	if (!state)
-+		return strdup(text);
-+
-+	return NULL;
-+}
-+
- static char **menu_completion(const struct bt_shell_menu_entry *entry,
- 				const char *text, char *input_cmd)
- {
-@@ -527,8 +538,12 @@ static char **menu_completion(const struct bt_shell_menu_entry *entry,
- 		if (strcmp(entry->cmd, input_cmd))
- 			continue;
- 
--		if (!entry->gen)
--			continue;
-+		if (!entry->gen) {
-+			rl_completion_display_matches_hook = NULL;
-+			matches = rl_completion_matches(entry->arg,
-+							arg_generator);
-+			break;
-+		}
- 
- 		rl_completion_display_matches_hook = entry->disp;
- 		matches = rl_completion_matches(text, entry->gen);
+diff --git a/client/main.c b/client/main.c
+index 38028c6c0..7661b33c0 100644
+--- a/client/main.c
++++ b/client/main.c
+@@ -2205,9 +2205,9 @@ static const struct bt_shell_menu advertise_menu = {
+ 	.entries = {
+ 	{ "set-uuids", "[uuid1 uuid2 ...]",
+ 			cmd_set_advertise_uuids, "Set advertise uuids" },
+-	{ "set-service", "[uuid][data=[xx xx ...]", cmd_set_advertise_service,
++	{ "set-service", "[uuid] [data=xx xx ...]", cmd_set_advertise_service,
+ 			"Set advertise service data" },
+-	{ "set-manufacturer", "[id][data=[xx xx ...]",
++	{ "set-manufacturer", "[id] [data=xx xx ...]",
+ 			cmd_set_advertise_manufacturer,
+ 			"Set advertise manufacturer data" },
+ 	{ "set-tx-power", "<on/off>", cmd_set_advertise_tx_power,
+@@ -2254,7 +2254,7 @@ static const struct bt_shell_menu gatt_menu = {
+ 	{ "attribute-info", "[attribute/UUID]",  cmd_attribute_info,
+ 				"Select attribute", attribute_generator },
+ 	{ "read",         NULL,       cmd_read, "Read attribute value" },
+-	{ "write",        "<data=[xx xx ...]>", cmd_write,
++	{ "write",        "<data=xx xx ...>", cmd_write,
+ 						"Write attribute value" },
+ 	{ "acquire-write", NULL, cmd_acquire_write,
+ 					"Acquire Write file descriptor" },
 -- 
 2.13.6
 
