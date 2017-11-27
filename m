@@ -1,49 +1,52 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Bastien Nocera <hadess@hadess.net>
-To: linux-bluetooth@vger.kernel.org
-Cc: Bastien Nocera <hadess@hadess.net>
-Subject: [PATCH v2 1/2] autopair: Add more common PIN codes for audio devices
-Date: Mon, 27 Nov 2017 16:26:50 +0100
-Message-Id: <20171127152651.18997-1-hadess@hadess.net>
+MIME-Version: 1.0
+In-Reply-To: <20171127133930.GB24336@x1c.home>
+References: <1511173617-25442-1-git-send-email-jaganathx.kanakkassery@intel.com>
+ <1511173617-25442-2-git-send-email-jaganathx.kanakkassery@intel.com> <20171127133930.GB24336@x1c.home>
+From: Jaganath K <jaganath.k.os@gmail.com>
+Date: Mon, 27 Nov 2017 20:26:34 +0530
+Message-ID: <CAJzH+bpHN2w2RDL5GC5fuKNbVKr7_SZzXz70ckUUQbd=K3xphA@mail.gmail.com>
+Subject: Re: [PATCH 1/3 v2] doc/mgmt-api: Add support for Get PHY information command
+To: Jaganath Kanakkassery <jaganath.k.os@gmail.com>,
+        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+        Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-PIN codes "1111", and "1234" are fairly common PIN codes used for audio
-devices such as speakers and headsets. This replaces similar quirks
-already present in gnome-bluetooth's PIN database.
----
- plugins/autopair.c | 18 ++++++++++++++----
- 1 file changed, 14 insertions(+), 4 deletions(-)
+Hi Johan,
 
-diff --git a/plugins/autopair.c b/plugins/autopair.c
-index 6980b0a64..70e19930e 100644
---- a/plugins/autopair.c
-+++ b/plugins/autopair.c
-@@ -92,10 +92,20 @@ static ssize_t autopair_pincb(struct btd_adapter *adapter,
- 		case 0x06:		/* Headphones */
- 		case 0x07:		/* Portable Audio */
- 		case 0x0a:		/* HiFi Audio Device */
--			if (attempt > 1)
--				return 0;
--			memcpy(pinbuf, "0000", 4);
--			return 4;
-+			{
-+				const char *pincodes[] = {
-+					"0000",
-+					"1234",
-+					"1111"
-+				};
-+				const char *pincode;
-+
-+				if (attempt > G_N_ELEMENTS(pincodes))
-+					return 0;
-+				pincode = pincodes[attempt - 1];
-+				memcpy(pinbuf, pincode, strlen(pincode));
-+				return strlen(pincode);
-+			}
- 		}
- 		break;
- 
--- 
-2.14.3
+> Hi Jaganath,
+>
+> On Mon, Nov 20, 2017, Jaganath Kanakkassery wrote:
+>> +Get PHY Information Command
+>> +==========================
+>> +
+>> +     Command Code:           0x0043
+>> +     Controller Index:       <controller id>
+>> +     Command Parameters:
+>> +     Return Parameters:      Supported_phys (1 Octet)
+>> +                             Selected_phys (1 Octet)
+>
+> Shouldn't the command have "Default" in its name, to be consistent with
+> your second patch?
 
+I did not add "Default" since the API also returns the Supported PHYs by the
+controller. Will "Current_default_phys" be more intuitive than "Selected_phys"?
+
+> If it's not the default that this is returning, then
+> shouldn't there be a reference to which connection it applies to
+> (assuming this is intended to map to the HCI_LE_Set_PHY command)?
+>
+> What about the PHY_options HCI parameter, where is that planned to be
+> specified?
+>
+
+This API is not for any connection (and so not mapped to
+HCI_LE_Set_PHY command).
+For that we have L2CAP socket option for which i have already raised a patch
+"[PATCH] Bluetooth: Define l2cap sock option for LE PHYs"
+As you mentioned we would need to add support for PHY_options in that.
+
+Thanks,
+Jaganath
