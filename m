@@ -1,50 +1,54 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Subject: Re: [PATCH v2 4/4] shared/shell: Print usage when no argument
- generator is set
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-References: <20171127161704.14073-1-luiz.dentz@gmail.com>
- <20171127161704.14073-4-luiz.dentz@gmail.com>
-CC: <linux-bluetooth@vger.kernel.org>
-From: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
-Message-ID: <bd0b4257-fe3f-1a63-20fa-c5e28c11900b@jp.fujitsu.com>
-Date: Tue, 28 Nov 2017 10:47:05 +0900
 MIME-Version: 1.0
-In-Reply-To: <20171127161704.14073-4-luiz.dentz@gmail.com>
-Content-Type: text/plain; charset="utf-8"
+From: Ayke van Laethem <ayke@aykevl.nl>
+Date: Mon, 27 Nov 2017 21:13:37 +0100
+Message-ID: <CAHZoaj57_9QKDmuzjcS35tgHnTSYYNagAOKcAMdxueesVnocuA@mail.gmail.com>
+Subject: WriteValue succeeds without error when the connection breaks
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi all,
 
-Thank you for dealing with my request.
+I have an application (acting as BLE central device) which connects to
+a peripheral. The application does a write (using WriteValue) which
+causes a reset in the peripheral, thus breaking the connection.
+Strangely, the WriteValue command returns without exception, even
+though it takes a few seconds until it hits a timeout. A second
+WriteValue will return an error ("Not connected").
 
-On 11/28/2017 01:17 AM, Luiz Augusto von Dentz wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> This prints the command and arguments if the command don't provide
-> a generator so one don't have to always resort to help for checking it.
-> ---
->  src/shared/shell.c | 8 ++++++--
->  1 file changed, 6 insertions(+), 2 deletions(-)
-> 
-> diff --git a/src/shared/shell.c b/src/shared/shell.c
-> index 73aedaf79..bd5cf18fc 100644
-> --- a/src/shared/shell.c
-> +++ b/src/shared/shell.c
-> @@ -527,8 +527,12 @@ static char **menu_completion(const struct bt_shell_menu_entry *entry,
->  		if (strcmp(entry->cmd, input_cmd))
->  			continue;
->  
-> -		if (!entry->gen)
-> -			continue;
-> +		if (!entry->gen) {
-> +			if (text[0] == '\0')
-> +				bt_shell_printf("Usage: %s %s\n", entry->cmd,
-> +								entry->arg);
+The sequence:
 
-If entry->arg is NULL, it prints out "(null)" on my box.
+(connection is set up)
+central: sends a message to the peripheral (WriteValue)
+peripheral: receives message
+peripheral: resets, starts to advertise again
+central: waits a few seconds for a response which it never gets
+central: timeout, WriteValue returns without error
 
+I would expect it to generate some sort of error, something like "lost
+connection".
+A workaround is checking whether the device is still connected after a
+WriteValue command, which I've implemented in [1].
 
-Regards,
-Eramoto
+I have tested this on BlueZ 5.43 (Debian). I have checked all commits
+to src/gatt-client.c but could not find any commit that could fix this
+issue, so I believe it is still present. If necessary, I can try
+compiling the latest release from source but haven't done this before.
 
+What I'm testing is a BLE NUS console [2] running on a
+Bluetooth-enabled laptop which communicates with a Nordic chip running
+MicroPython [3]. Pressing Ctrl-D in the console will cause the device
+to reset, and the WriteValue is never acknowledged by the Nordic chip.
+The result (without workaround) is that the connection appears to
+still exist while it is actually broken, until the next char is sent
+(which returns a "not connected" error).
+
+I can provide logs (how?) and minimal sample code if needed.
+
+[1]: https://github.com/aykevl/pynus/blob/master/tealblue.py#L224
+[2]: https://github.com/aykevl/pynus/blob/master/pynus.py
+[3]: https://github.com/tralamazza/micropython
+
+Ayke van Laethem
