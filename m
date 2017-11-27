@@ -1,9 +1,9 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 3/4] client: Fix format of arguments of set-service and set-manufacturer
-Date: Mon, 27 Nov 2017 18:17:03 +0200
-Message-Id: <20171127161704.14073-3-luiz.dentz@gmail.com>
+Subject: [PATCH v2 4/4] shared/shell: Print usage when no argument generator is set
+Date: Mon, 27 Nov 2017 18:17:04 +0200
+Message-Id: <20171127161704.14073-4-luiz.dentz@gmail.com>
 In-Reply-To: <20171127161704.14073-1-luiz.dentz@gmail.com>
 References: <20171127161704.14073-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,37 +11,31 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Optional arguments should contain only one set of '[' ']' otherwise
-wordexp won't be able to parse it.
+This prints the command and arguments if the command don't provide
+a generator so one don't have to always resort to help for checking it.
 ---
- client/main.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ src/shared/shell.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/client/main.c b/client/main.c
-index 38028c6c0..7661b33c0 100644
---- a/client/main.c
-+++ b/client/main.c
-@@ -2205,9 +2205,9 @@ static const struct bt_shell_menu advertise_menu = {
- 	.entries = {
- 	{ "set-uuids", "[uuid1 uuid2 ...]",
- 			cmd_set_advertise_uuids, "Set advertise uuids" },
--	{ "set-service", "[uuid][data=[xx xx ...]", cmd_set_advertise_service,
-+	{ "set-service", "[uuid] [data=xx xx ...]", cmd_set_advertise_service,
- 			"Set advertise service data" },
--	{ "set-manufacturer", "[id][data=[xx xx ...]",
-+	{ "set-manufacturer", "[id] [data=xx xx ...]",
- 			cmd_set_advertise_manufacturer,
- 			"Set advertise manufacturer data" },
- 	{ "set-tx-power", "<on/off>", cmd_set_advertise_tx_power,
-@@ -2254,7 +2254,7 @@ static const struct bt_shell_menu gatt_menu = {
- 	{ "attribute-info", "[attribute/UUID]",  cmd_attribute_info,
- 				"Select attribute", attribute_generator },
- 	{ "read",         NULL,       cmd_read, "Read attribute value" },
--	{ "write",        "<data=[xx xx ...]>", cmd_write,
-+	{ "write",        "<data=xx xx ...>", cmd_write,
- 						"Write attribute value" },
- 	{ "acquire-write", NULL, cmd_acquire_write,
- 					"Acquire Write file descriptor" },
+diff --git a/src/shared/shell.c b/src/shared/shell.c
+index 73aedaf79..bd5cf18fc 100644
+--- a/src/shared/shell.c
++++ b/src/shared/shell.c
+@@ -527,8 +527,12 @@ static char **menu_completion(const struct bt_shell_menu_entry *entry,
+ 		if (strcmp(entry->cmd, input_cmd))
+ 			continue;
+ 
+-		if (!entry->gen)
+-			continue;
++		if (!entry->gen) {
++			if (text[0] == '\0')
++				bt_shell_printf("Usage: %s %s\n", entry->cmd,
++								entry->arg);
++			break;
++		}
+ 
+ 		rl_completion_display_matches_hook = entry->disp;
+ 		matches = rl_completion_matches(text, entry->gen);
 -- 
 2.13.6
 
