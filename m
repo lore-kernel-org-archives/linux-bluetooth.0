@@ -1,39 +1,111 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <1511173617-25442-1-git-send-email-jaganathx.kanakkassery@intel.com>
-References: <1511173617-25442-1-git-send-email-jaganathx.kanakkassery@intel.com>
-From: Jaganath K <jaganath.k.os@gmail.com>
-Date: Mon, 27 Nov 2017 16:21:09 +0530
-Message-ID: <CAJzH+bo+=MWO6X8=+12JHMw_08rqwSDAknHbSGWvv8EJ-e3rJg@mail.gmail.com>
-Subject: Re: [PATCH 0/3 v2] LE New PHYs kernel interfaces
-To: "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>
-Cc: Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <linux-serial-owner@vger.kernel.org>
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
+Subject: Re: [RFC v1 5/8] Bluetooth: btrtl: add support for the RTL8723BS and
+ RTL8723DS chips
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <CAFBinCD+P6kBOXjp9YZf8DbsetvF+q6yfp3X+OTRfN_Pv8R88w@mail.gmail.com>
+Date: Mon, 27 Nov 2017 11:00:52 +0100
+Cc: Rob Herring <robh+dt@kernel.org>,
+        devicetree <devicetree@vger.kernel.org>,
+        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+        linux-serial@vger.kernel.org, Mark Rutland <mark.rutland@arm.com>,
+        "Gustavo F. Padovan" <gustavo@padovan.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Jiri Slaby <jslaby@suse.com>, Johan Hovold <johan@kernel.org>,
+        linux-sunxi@googlegroups.com, linux-amlogic@lists.infradead.org,
+        Larry.Finger@lwfinger.net
+Message-Id: <B777FE38-EEFA-4B0F-A6EB-12B8286511F3@holtmann.org>
+References: <20171117223543.32429-1-martin.blumenstingl@googlemail.com>
+ <20171117223543.32429-6-martin.blumenstingl@googlemail.com>
+ <109FA59C-9875-4EAA-9DA5-EC811BAA77AE@holtmann.org>
+ <CAFBinCCtHUFMbbSOeKWYSJZKvFbNqhaMOrS-xgzr3E9hbkpnnw@mail.gmail.com>
+ <4B23C5B4-DCB8-4B1C-B1BF-A99B1E5E10B0@holtmann.org>
+ <CAFBinCD+P6kBOXjp9YZf8DbsetvF+q6yfp3X+OTRfN_Pv8R88w@mail.gmail.com>
+To: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
+Sender: linux-serial-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Martin,
 
-Ping
+>>>>> The Realtek RTL8723BS and RTL8723DS chipsets are SDIO wifi chips. They
+>>>>> also contain a Bluetooth module which is connected via UART to the host.
+>>>>> 
+>>>>> Realtek's userspace initialization tool (rtk_hciattach) differentiates
+>>>>> these two via the HCI version and revision returned by the
+>>>>> HCI_OP_READ_LOCAL_VERSION command.
+>>>>> Additionally we apply these checks only the for UART devices. Everything
+>>>>> else is assumed to be a "RTL8723B" which was originally supported by the
+>>>>> driver (communicating via USB).
+>>>>> 
+>>>>> Signed-off-by: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
+>>>>> ---
+>>>>> drivers/bluetooth/btrtl.c | 32 ++++++++++++++++++++++++++++++--
+>>>>> 1 file changed, 30 insertions(+), 2 deletions(-)
+>>>>> 
+>>>>> diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
+>>>>> index 45b872f5ad22..d896f9421250 100644
+>>>>> --- a/drivers/bluetooth/btrtl.c
+>>>>> +++ b/drivers/bluetooth/btrtl.c
+>>>>> @@ -418,9 +418,33 @@ struct btrtl_device_info *btrtl_initialize(struct hci_dev *hdev)
+>>>>>             has_rom_version = false;
+>>>>>             break;
+>>>>>     case RTL_ROM_LMP_8723B:
+>>>>> -             fw_name = "rtl_bt/rtl8723b_fw.bin";
+>>>>> -             cfg_name = "rtl_bt/rtl8723b_config.bin";
+>>>>> +             /* all variants support reading the ROM version */
+>>>>>             has_rom_version = true;
+>>>>> +
+>>>>> +             /*
+>>>>> +              * RTL8723 devices exist in different variants:
+>>>>> +              * - RTL8723BS (SDIO chip with UART Bluetooth)
+>>>>> +              * - RTL8723DS (SDIO chip with UART Bluetooth)
+>>>>> +              * - for backwards-compatibility everything else is assumed to
+>>>>> +              *   be an RTL8723B communicating over USB
+>>>>> +              *
+>>>>> +              * Only UART devices really need the config because that
+>>>>> +              * contains the UART speed / flow control settings.
+>>>>> +              */
+>>>>> +             if (hdev->bus == HCI_UART && resp->hci_ver == 6 &&
+>>>>> +                 le16_to_cpu(resp->hci_rev) == 0xb) {
+>>>>> +                     fw_name = "rtl_bt/rtl8723bs_fw.bin";
+>>>>> +                     cfg_name = "rtl_bt/rtl8723bs_config.bin";
+>>>>> +                     cfg_needed = true;
+>>>>> +             } else if (hdev->bus == HCI_UART && resp->hci_ver == 8 &&
+>>>>> +                        le16_to_cpu(resp->hci_rev) == 0xd) {
+>>>>> +                     fw_name = "rtl_bt/rtl8723ds_fw.bin";
+>>>>> +                     cfg_name = "rtl_bt/rtl872ds_config.bin";
+>>>>> +                     cfg_needed = true;
+>>>>> +             } else {
+>>>>> +                     fw_name = "rtl_bt/rtl8723b_fw.bin";
+>>>>> +                     cfg_name = "rtl_bt/rtl8723b_config.bin";
+>>>>> +             }
+>>>> 
+>>>> so the main question is why is this a config file in the first place? So far all other drivers have expressed UART settings via DT (or even via ACPI). If we are just getting the baudrates, then better have this in DT. Since otherwise we end up with board specific filesystems again where different config files need to be installed. That is really not useful in the end.
+>>> this is an excellent question (and also the reason why it's an "RFC" patch)!
+>>> I'll try to figure out whether:
+>>> a) we can skip the config file completely
+> skipping the config blob causes it to time out at the end of the
+> firmware download (where the config seems to be applied internally)
+> 
+>>> b) we can generate the config file in-memory
+> I tried this as well with a very minimal version (where only the
+> "known" bits are used)
+> unfortunately this shows the same symptoms as skipping the config blob
+> I'll try experimenting with this to see if I can get it to work somehow
+> 
+>>> c) we have to stick with this config file
+> I'm afraid this would be our last option if I can't get b) working
+> a datasheet for these chips or some advice from someone who has access
+> to the datasheet/knowledge about the internals would be of great help
 
-> These patches enables user to get the supported phys by the
-> controller and set preferred phy to be used in subsequent
-> scanning and connection initiation.
->
-> Also added flags to support user selection for phy to be
-> advertised.
->
-> v1: Applied Marcel's comments
-> v2: Applied Eramoto's comments
->
-> Jaganath Kanakkassery (3):
->   doc/mgmt-api: Add support for Get PHY information command
->   doc/mgmt-api: Add support for Set default Phy command
->   doc/mgmt-api: Add advertising phys support to flags
->
->  doc/mgmt-api.txt | 88 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 88 insertions(+)
->
+since they are all HCI commands, lets add tracing support in btmon for these and then check which one is needed and which one can be done via DT information. It might be as simple as that the chip needs a special reset command and the coded it in the config blob. I have seen some manufactures do that.
 
-Thanks,
-Jaganath
+For starters just run btmon -w trace.log before you load the module (or attach the device) and then see what goes on during loading phase.
+
+Regards
+
+Marcel
+
