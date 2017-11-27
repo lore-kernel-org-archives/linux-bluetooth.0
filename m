@@ -1,43 +1,35 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Date: Mon, 27 Nov 2017 10:53:25 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Michal Hobot <michal.hobot@silvair.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH BlueZ] mesh/onoff-model: Fix msec to sec conversion
-Message-ID: <20171127085325.GA21890@x1c.lan>
-References: <2C0A6DE1-E4B3-4728-B485-0A19BF3419CA@silvair.com>
+Subject: Re: [PATCH BlueZ 4/4] shared/shell: Add default argument generator
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+References: <20171126202126.27783-1-luiz.dentz@gmail.com>
+ <20171126202126.27783-4-luiz.dentz@gmail.com>
+CC: <linux-bluetooth@vger.kernel.org>
+From: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
+Message-ID: <3e3cdcc8-a641-34d1-dfbd-980cddfc8bad@jp.fujitsu.com>
+Date: Mon, 27 Nov 2017 13:17:10 +0900
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <2C0A6DE1-E4B3-4728-B485-0A19BF3419CA@silvair.com>
+In-Reply-To: <20171126202126.27783-4-luiz.dentz@gmail.com>
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Michal
+Hi Luiz,
 
-On Sat, Nov 25, 2017, Michal Hobot wrote:
-> There is an error in meshctl while displaying transition time. 1000 ms
-> is being presented as 16 sec, 40 ms. The reason is incorrect
-> conversion of milliseconds to seconds.  The fix is pretty trivial.
+On 11/27/2017 05:21 AM, Luiz Augusto von Dentz wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 > 
-> --- ../../bluez/mesh/onoff-model.c	2017-11-21 18:04:57.000000000 +0100
-> +++ onoff-model.c	2017-11-21 17:25:14.000000000 +0100
-> @@ -77,8 +77,8 @@ static void print_remaining_time(uint8_t
->  	switch (step) {
->  	case 0:
->  		msecs = 100 * count;
-> -		secs = msecs / 60;
-> -		msecs -= (secs * 60);
-> +		secs = msecs / 1000;
-> +		msecs -= (secs * 1000);
->  		break;
->  	case 1:
->  		secs = 1 * count;
+> This adds a default argument generator if the command don't provide
+> one, the generator will print out the argument list so the user don't
+> have to always resort to help for checking it.
 
-Thanks, the patch has been applied. I had to apply manually however and
-fix up the commit message to make sure it adheres to a max 72 line
-length. In the future, could you either try send patches using git
-send-email, or at least format them with the help of git format-patch,
-since what you sent now was unrecognizable to "git am" which is used for
-applying patches. Thanks.
+The generator complements the unusable string in the command input line.
+So we have to delete it for inputting a right value/string if the argument
+list is complemented.
 
-Johan
+I think that showing the usage/argument outside the command input line is
+better than complementing the argument list.
+
+
+Regards,
+Eramoto
+
