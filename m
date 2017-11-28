@@ -2,16 +2,16 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
-Subject: Re: [PATCH 1/3 v2] doc/mgmt-api: Add support for Get PHY information
- command
+Subject: Re: [PATCH 3/3 v2] doc/mgmt-api: Add advertising phys support to
+ flags
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1511173617-25442-2-git-send-email-jaganathx.kanakkassery@intel.com>
-Date: Tue, 28 Nov 2017 09:39:18 +0100
-Cc: linux-bluetooth@vger.kernel.org,
+In-Reply-To: <1511173617-25442-4-git-send-email-jaganathx.kanakkassery@intel.com>
+Date: Tue, 28 Nov 2017 08:43:40 +0100
+Cc: "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
         Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
-Message-Id: <93DFE8A8-13AB-46A0-9475-F9D5856FEFE2@holtmann.org>
+Message-Id: <2F81056C-FD07-43DB-AF9E-A767061341FD@holtmann.org>
 References: <1511173617-25442-1-git-send-email-jaganathx.kanakkassery@intel.com>
- <1511173617-25442-2-git-send-email-jaganathx.kanakkassery@intel.com>
+ <1511173617-25442-4-git-send-email-jaganathx.kanakkassery@intel.com>
 To: Jaganath Kanakkassery <jaganath.k.os@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
@@ -19,56 +19,66 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 Hi Jaganath,
 
 > ---
-> doc/mgmt-api.txt | 28 ++++++++++++++++++++++++++++
-> 1 file changed, 28 insertions(+)
+> doc/mgmt-api.txt | 22 ++++++++++++++++++++++
+> 1 file changed, 22 insertions(+)
 > 
 > diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
-> index 8e7de14..69e84cd 100644
+> index b59bf0c..c138f47 100644
 > --- a/doc/mgmt-api.txt
 > +++ b/doc/mgmt-api.txt
-> @@ -2871,6 +2871,7 @@ Read Extended Controller Information Command
-> 		13	Privacy
-> 		14	Controller Configuration
-> 		15	Static Address
-> +		16  	PHY configuration
+> @@ -2504,6 +2504,9 @@ Read Advertising Features Command
+> 		4	Add TX Power field to Adv_Data
+> 		5	Add Appearance field to Scan_Rsp
+> 		6	Add Local Name in Scan_Rsp
+> +		7	Secondary Channel with LE 1M
+> +		8	Secondary Channel with LE 2M
+> +		9	Secondary Channel with LE Coded
 > 
-> 	The EIR_Data field contains information about class of device,
-> 	local name and other values. Not all of them might be present. For
-> @@ -2916,6 +2917,33 @@ Set Appearance Command
-> 				Invalid Parameters
-> 				Invalid Index
+> 	The Flags bit 0 indicates support for connectable advertising
+> 	and for switching to connectable advertising independent of the
+> @@ -2553,6 +2556,15 @@ Read Advertising Features Command
+> 	space is limited a short version or no name information. The
+> 	Local Name will be added at the end of the scan response data.
 > 
-> +Get PHY Information Command
-> +==========================
+> +	The Flags bit 7 indicates support for advertising in secondary
+> +	channel in LE 1M PHY.
 > +
-> +	Command Code:		0x0043
-> +	Controller Index:	<controller id>
-> +	Command Parameters:
-> +	Return Parameters:	Supported_phys (1 Octet)
-> +				Selected_phys (1 Octet)
+> +	The Flags bit 8 indicates support for advertising in secondary
+> +	channel in LE 2M PHY. Primary channel would be on 1M.
 > +
-> +	This command is used to retrieve the supported PHYs and currently
-> +	selected PHYs.
+> +	The Flags bit 9 indicates support for advertising in secondary
+> +	channel in LE CODED PHY.
 > +
-> +	Supported_phys and Selected_phys is a bitmask with the following bits.
-> +		0	LE 1M TX
-> +		1	LE 1M RX
-> +		2	LE 2M TX
-> +		3	LE 2M RX
-> +		4	LE CODED TX
-> +		5	LE CODED RX
+> 	The valid range for Instance identifiers is 1-254. The value 0
+> 	is reserved for internal use and the value 255 is reserved for
+> 	future extensions. However the Max_Instances value for indicating
+> @@ -2613,6 +2625,9 @@ Add Advertising Command
+> 		4	Add TX Power field to Adv_Data
+> 		5	Add Appearance field to Scan_Rsp
+> 		6	Add Local Name in Scan_Rsp
+> +		7	Secondary Channel with LE 1M
+> +		8	Secondary Channel with LE 2M
+> +		9	Secondary Channel with LE Coded
+> 
+> 	When the connectable flag is set, then the controller will use
+> 	undirected connectable advertising. The value of the connectable
+> @@ -2640,6 +2655,13 @@ Add Advertising Command
+> 	supported to provide less air traffic for devices implementing
+> 	broadcaster role.
+> 
+> +	Secondary channel flags can be used to advertise in secondary
+> +	channel with the corresponding PHYs. In case of 2M, the primary
+> +	channel used would be 1M. If none of them are set then secondary
+> +	channel advertising would be disabled for this instance which is as
+> +	good as legacy advertising. Combining the sets would result in
+> +	multiple advertising sets being created.
 > +
-> +	LE 1M TX and LE 1M RX would be supported by default.
-> +
-> +	This command is only available for LE capable controllers.
-> +	It will return Not Supported otherwise.
-> +
-> +	Possible errors:	Not Supported
-> +				Invalid Index
 
-I think that I want to extend this command to also include BR/EDR PHY selection so that we have one command to drive all of these. So maybe the packet type selection of BR/EDR should be worked into this as well. Anyway, that should not stop us from implementing this for LE since BR/EDR can be added later.
+I changed my mind here. The behind the scenes creating multiple advertising sets is a bad idea. That is something the application should handle and not the kernel do in the background.
 
-My only question would be if we have TX/RX in the same octet or split into individual octets. In case we leave it like this, then we should make this a 2 octet value.
+So we should mark these bits as mutually exclusive and note that specifying more than one will result in an invalid params error. In addition we need to note that choosing LE 1M and LE 2M will result in using extended advertising with the primary channel being 1M. And choosing LE Coded will result in extended advertising with both primary and secondary channel in coded. This should be in the text description. Choosing none of these flags will result in legacy advertising.
+
+This just needs a bit of wordsmithing and then it should be fine.
 
 Regards
 
