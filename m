@@ -1,159 +1,68 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <20171127161704.14073-1-luiz.dentz@gmail.com>
-References: <20171127161704.14073-1-luiz.dentz@gmail.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 28 Nov 2017 13:11:59 +0200
-Message-ID: <CABBYNZKC0PxpHsSuyZw+bRUz_zszX8PBeDBu=ON2Qp+=Y5etLw@mail.gmail.com>
-Subject: Re: [PATCH v2 1/4] shared/shell: Detect if the arguments are properly set
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ] gdbus: Force service to start if proxy is created while not connected
+Date: Tue, 28 Nov 2017 12:57:46 +0200
+Message-Id: <20171128105746.13000-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Mon, Nov 27, 2017 at 6:17 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> Parse arguments to detect if user has passed a valid number of
-> arguments.
-> ---
-> v2: Just print the usage of the commands without auto-complete generator so it
-> does add the arguments into the input.
->
->  src/shared/shell.c | 98 ++++++++++++++++++++++++++++++++++++++++++++++++++----
->  1 file changed, 92 insertions(+), 6 deletions(-)
->
-> diff --git a/src/shared/shell.c b/src/shared/shell.c
-> index c271a53ee..73aedaf79 100644
-> --- a/src/shared/shell.c
-> +++ b/src/shared/shell.c
-> @@ -207,6 +207,95 @@ static void shell_print_menu(void)
->         }
->  }
->
-> +static int parse_args(char *arg, wordexp_t *w, char *del, int flags)
-> +{
-> +       char *str;
-> +
-> +       str = g_strdelimit(arg, del, '"');
-> +
-> +       if (wordexp(str, w, flags)) {
-> +               g_free(str);
-> +               return -EINVAL;
-> +       }
-> +
-> +       /* If argument ends with ,,, set we_offs bypass strict checks */
-> +       if (w->we_wordc && g_str_has_suffix(w->we_wordv[w->we_wordc -1], "..."))
-> +               w->we_offs = 1;
-> +
-> +       g_free(str);
-> +
-> +       return 0;
-> +}
-> +
-> +static int cmd_exec(const struct bt_shell_menu_entry *entry,
-> +                                       int argc, char *argv[])
-> +{
-> +       wordexp_t w;
-> +       size_t len;
-> +       char *man, *opt;
-> +       int flags = WRDE_NOCMD;
-> +
-> +       if (!entry->arg || entry->arg[0] == '\0') {
-> +               if (argc) {
-> +                       print_text(COLOR_HIGHLIGHT, "Too many arguments");
-> +                       return -EINVAL;
-> +               }
-> +               goto exec;
-> +       }
-> +
-> +       /* Find last mandatory arguments */
-> +       man = strrchr(entry->arg, '>');
-> +       if (!man) {
-> +               opt = strdup(entry->arg);
-> +               goto optional;
-> +       }
-> +
-> +       len = man - entry->arg;
-> +       man = strndup(entry->arg, len + 1);
-> +
-> +       if (parse_args(man, &w, "<>", flags) < 0) {
-> +               print_text(COLOR_HIGHLIGHT,
-> +                               "Unable to parse mandatory command arguments");
-> +               return -EINVAL;
-> +       }
-> +
-> +       /* Check if there are enough arguments */
-> +       if ((unsigned) argc < w.we_wordc && !w.we_offs) {
-> +               print_text(COLOR_HIGHLIGHT, "Missing %s argument",
-> +                                               w.we_wordv[argc]);
-> +               goto fail;
-> +       }
-> +
-> +       flags |= WRDE_APPEND;
-> +       opt = strdup(entry->arg + len + 1);
-> +
-> +optional:
-> +       if (parse_args(opt, &w, "<>", flags) < 0) {
-> +               print_text(COLOR_HIGHLIGHT,
-> +                               "Unable to parse mandatory command arguments");
-> +               return -EINVAL;
-> +       }
-> +
-> +       /* Check if there are too many arguments */
-> +       if ((unsigned) argc > w.we_wordc && !w.we_offs) {
-> +               print_text(COLOR_HIGHLIGHT, "Too many arguments: %d > %zu",
-> +                                       argc, w.we_wordc);
-> +               goto fail;
-> +       }
-> +
-> +       wordfree(&w);
-> +
-> +exec:
-> +       if (entry->func)
-> +               entry->func(argc, argv);
-> +
-> +       return 0;
-> +
-> +fail:
-> +       wordfree(&w);
-> +       return -EINVAL;
-> +}
-> +
->  static int menu_exec(const struct bt_shell_menu_entry *entry,
->                                         int argc, char *argv[])
->  {
-> @@ -222,10 +311,7 @@ static int menu_exec(const struct bt_shell_menu_entry *entry,
->                 if (data.menu == data.main && !strcmp(entry->cmd, "back"))
->                         continue;
->
-> -               if (entry->func) {
-> -                       entry->func(argc - 1, ++argv);
-> -                       return 0;
-> -               }
-> +               return cmd_exec(entry, --argc, ++argv);
->         }
->
->         return -ENOENT;
-> @@ -236,8 +322,8 @@ static void shell_exec(int argc, char *argv[])
->         if (!data.menu || !argv[0])
->                 return;
->
-> -       if (menu_exec(default_menu, argc, argv) < 0) {
-> -               if (menu_exec(data.menu->entries, argc, argv) < 0)
-> +       if (menu_exec(default_menu, argc, argv) == -ENOENT) {
-> +               if (menu_exec(data.menu->entries, argc, argv) == -ENOENT)
->                         print_text(COLOR_HIGHLIGHT, "Invalid command");
->         }
->  }
-> --
-> 2.13.6
+Because GetAll is no longer send right away the service may never be
+started.
+---
+ gdbus/client.c | 30 +++++++++++++++++++++++++++++-
+ 1 file changed, 29 insertions(+), 1 deletion(-)
 
-Applied after fixing the formatting of commands where .arg is NULL.
-
-
+diff --git a/gdbus/client.c b/gdbus/client.c
+index 9b0f7f7a9..3d7105ef8 100644
+--- a/gdbus/client.c
++++ b/gdbus/client.c
+@@ -484,6 +484,28 @@ static void proxy_remove(GDBusClient *client, const char *path,
+ 	}
+ }
+ 
++static void start_service(GDBusProxy *proxy)
++{
++	GDBusClient *client = proxy->client;
++	const char *service_name = client->service_name;
++	dbus_uint32_t flags = 0;
++	DBusMessage *msg;
++
++	msg = dbus_message_new_method_call(DBUS_SERVICE_DBUS, DBUS_PATH_DBUS,
++						DBUS_INTERFACE_DBUS,
++						"StartServiceByName");
++	if (msg == NULL)
++		return;
++
++	dbus_message_append_args(msg, DBUS_TYPE_STRING, &service_name,
++					DBUS_TYPE_UINT32, &flags,
++					DBUS_TYPE_INVALID);
++
++	g_dbus_send_message(client->dbus_conn, msg);
++	dbus_message_unref(msg);
++	return;
++}
++
+ GDBusProxy *g_dbus_proxy_new(GDBusClient *client, const char *path,
+ 							const char *interface)
+ {
+@@ -500,7 +522,13 @@ GDBusProxy *g_dbus_proxy_new(GDBusClient *client, const char *path,
+ 	if (proxy == NULL)
+ 		return NULL;
+ 
+-	if (client->connected && !client->get_objects_call)
++	if (!client->connected) {
++		/* Force service to start */
++		start_service(proxy);
++		return g_dbus_proxy_ref(proxy);
++	}
++
++	if (!client->get_objects_call)
+ 		get_all_properties(proxy);
+ 
+ 	return g_dbus_proxy_ref(proxy);
 -- 
-Luiz Augusto von Dentz
+2.13.6
+
