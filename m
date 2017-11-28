@@ -1,48 +1,101 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Anitha Chandrasekar <anitha.chandrasekar@sasken.com>
 To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-From: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
-Subject: [PATCH BlueZ] obexd: Fix crash when canceling without agent
-Message-ID: <3025382d-97b8-b4ca-2595-327060506f5b@jp.fujitsu.com>
-Date: Tue, 28 Nov 2017 15:42:06 +0900
+Subject: RE: Facing issue with Bluez read API
+Date: Tue, 28 Nov 2017 06:19:27 +0000
+Message-ID: <7B53A3173656CB4190908401FE75F4F8600AB3DF@exgmbxfz01.sasken.com>
+References: <7B53A3173656CB4190908401FE75F4F8600A3C34@exgmbxfz01.sasken.com>,<CABBYNZLLBq=ZDFhggp_gN7uXZQArHsBUAJgQJVb8uiJ8UxXNcw@mail.gmail.com>,<7B53A3173656CB4190908401FE75F4F8600A8D29@exgmbxfz01.sasken.com>,<7B53A3173656CB4190908401FE75F4F8600A8D47@exgmbxfz01.sasken.com>
+In-Reply-To: <7B53A3173656CB4190908401FE75F4F8600A8D47@exgmbxfz01.sasken.com>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When obexd is started with the option auto-accept or the agent is killed
-after starting to transfer a file, obexd crashes due to cancellation of
-the transfer from a client as below:
+Hi All,
 
-  Process terminating with default action of signal 11 (SIGSEGV)
-   Access not within mapped region at address 0x0
-     at 0x158A40: transfer_cancel (manager.c:272)
-     by 0x18A5D2: process_message.isra.4 (object.c:259)
-     by 0x18AE44: generic_message (object.c:1079)
-     by 0x5290FD2: ??? (in /lib/x86_64-linux-gnu/libdbus-1.so.3.14.13)
-     by 0x5282623: dbus_connection_dispatch (in /lib/x86_64-linux-gnu/libdbus-1.so.3.14.13)
-     by 0x184DBF: message_dispatch (mainloop.c:72)
-     by 0x5505E24: g_main_context_dispatch (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.5400.1)
-     by 0x55061EF: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.5400.1)
-     by 0x5506501: g_main_loop_run (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.5400.1)
-     by 0x137902: main (main.c:322)
----
- obexd/src/manager.c | 3 +++
- 1 file changed, 3 insertions(+)
+After experimenting for quite sometime, found that adding the 10ms delay in mainloop.c (gdbus/mainloop.c),callback method_call_reply(gdbus/client.c) is called all the time and it worked fine for us.
 
-diff --git a/obexd/src/manager.c b/obexd/src/manager.c
-index f84384ae4..78b138c85 100644
---- a/obexd/src/manager.c
-+++ b/obexd/src/manager.c
-@@ -265,6 +265,9 @@ static DBusMessage *transfer_cancel(DBusConnection *connection,
- 	struct obex_session *os = transfer->session;
- 	const char *sender;
- 
-+	if (!agent)
-+		return agent_does_not_exist(msg);
-+
- 	if (!os)
- 		return invalid_args(msg);
- 
--- 
-2.14.1
+usleep(10000);
+/* Dispatch messages */
+	while (dbus_connection_dispatch(conn) == DBUS_DISPATCH_DATA_REMAINS);
+usleep(10000);
 
+Any idea without modifying the bluez code, how we can achieve the same?
+
+Regards,
+Anitha
+________________________________________
+From: Anitha Chandrasekar
+Sent: Tuesday, November 21, 2017 2:32 PM
+To: linux-bluetooth@vger.kernel.org
+Subject: RE: Facing issue with Bluez read API
+
+Apologize, re-sending the correct btmon log.
+
+Regards,
+Anitha
+________________________________________
+From: linux-bluetooth-owner@vger.kernel.org [linux-bluetooth-owner@vger.kernel.org] on behalf of Anitha Chandrasekar [anitha.chandrasekar@sasken.com]
+Sent: Tuesday, November 21, 2017 1:22 PM
+To: linux-bluetooth@vger.kernel.org
+Subject: {Possibly Forged} RE: Facing issue with Bluez read API
+
+Hi Luiz,
+
+Thanks for the reply.Attached logs of bluetoothd, dbus and gdb logs(when breakpoints applied during failure case)
+This happens not only for read but also during disconnect/write when peripheral device is in sleep.
+One more point is, when I put the breakpoint in gdbus/mainloop.c then the flow is perfectly fine.
+But if I remove mainloop breakpoint and put it under /usr/src/debug/bluez5/5.46-r0/bluez-5.46/gdbus/client.c:831 (method_call_reply) alone ,then the breakpoint is not hit{We did not receive this callback}.
+
+Basically I am seeing the message is not dispatched via dbus to the gdbus/client.c.
+
+Any inputs would be helpful.
+
+Regards,
+Anitha
+________________________________________
+From: Luiz Augusto von Dentz [luiz.dentz@gmail.com]
+Sent: Monday, November 20, 2017 8:57 PM
+To: Anitha Chandrasekar
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: Facing issue with Bluez read API
+
+Hi Anitha,
+
+On Mon, Nov 20, 2017 at 1:55 PM, Anitha Chandrasekar
+<anitha.chandrasekar@sasken.com> wrote:
+> Hi All,
+>
+> We are using bluez stack to work as a GATT central device on a 32 bit processor. We are trying to call Bluez 5.46 read api. We see that at stack the callback method_call_reply(gdbus/client.c) is not being called, due to which it is unable to call our registered callback.
+>
+> Few observations:
+> 1) This happens only when read is called, and the peripheral device is in sleep.
+> 2) We have verified through dbus-monitor --system and the dbus has sent the message as NOT CONNECTED, but this is not reached to gdbus client.
+> 3) It perfectly works fine on a 64th bit processor , but not working on 32bit processor.
+>
+> The dbus version used is 1.10.10. The bluez stack used is bluez5.46.Using x86, 32 bit processor.
+
+If you could please send some logs of bluetoothd and btmon when this
+is happening.
+
+>
+> Any information will be of great help. Thanks!!
+>
+> Regards,
+> Anitha
+>
+> ________________________________
+>
+> SASKEN BUSINESS DISCLAIMER: This message may contain confidential, proprietary or legally privileged information. In case you are not the original intended Recipient of the message, you must not, directly or indirectly, use, disclose, distribute, print, or copy any part of this message and you are requested to delete it and inform the sender. Any views expressed in this message are those of the individual sender unless otherwise stated. Nothing contained in this message shall be construed as an offer or acceptance of any offer by Sasken Technologies Limited ( formerly known as "Sasken Communication Technologies Limited" ) unless sent with that express intent and with due authority of Sasken. Sasken has taken enough precautions to prevent the spread of viruses. However the company accepts no liability for any damage caused by any virus transmitted by this email.
+> Read Disclaimer at http://www.sasken.com/mail-disclaimer/
+>
+> ________________________________
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
+--
+Luiz Augusto von Dentz
