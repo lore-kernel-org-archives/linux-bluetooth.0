@@ -1,39 +1,90 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Message-ID: <1511876867.11411.41.camel@hadess.net>
-Subject: Re: [PATCH BlueZ] gdbus: Force service to start if proxy is created
- while not connected
-From: Bastien Nocera <hadess@hadess.net>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-bluetooth@vger.kernel.org
-Date: Tue, 28 Nov 2017 14:47:47 +0100
-In-Reply-To: <20171128105746.13000-1-luiz.dentz@gmail.com>
-References: <20171128105746.13000-1-luiz.dentz@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+From: Jaganath Kanakkassery <jaganath.k.os@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
+Subject: [PATCH 2/4 v3] doc/mgmt-api: Add support for Set Phy Configuration command
+Date: Tue, 28 Nov 2017 18:23:32 +0530
+Message-Id: <1511873614-18068-3-git-send-email-jaganathx.kanakkassery@intel.com>
+In-Reply-To: <1511873614-18068-1-git-send-email-jaganathx.kanakkassery@intel.com>
+References: <1511873614-18068-1-git-send-email-jaganathx.kanakkassery@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, 2017-11-28 at 12:57 +0200, Luiz Augusto von Dentz wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> Because GetAll is no longer send right away the service may never be
-> started.
+This also adds PHY Configuration Changed Event.
+---
+ doc/mgmt-api.txt | 52 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 52 insertions(+)
 
-Causes an assertion on startup on my machine.
+diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
+index c07c48c..628ff18 100644
+--- a/doc/mgmt-api.txt
++++ b/doc/mgmt-api.txt
+@@ -2940,9 +2940,46 @@ Get PHY Configuration Command
+ 	LE 1M TX and LE 1M RX would be supported by default.
+ 
+ 	This command is only available for LE capable controllers.
++        It will return Not Supported otherwise.
++
++        Possible errors:        Not Supported
++				Invalid Index
++
++Set PHY Configuration Command
++=============================
++
++	Command Code:		0x0044
++	Controller Index:	<controller id>
++	Command Parameters: 	Default_phys (2 Octet)
++	Return Parameters:
++
++	This command is used to set the default phy to the controller.
++
++	This will be stored and used for all the subsequent scanning
++	and connection initiation.
++
++	The list of supported PHYs can be retrieved via the
++	Get PHY Configuration command. Selecting unsupported PHYs will
++	result in an Invalid Parameters	error.
++
++	This can be called at any point to change the preferred PHYs.
++
++	Default_phy is a bitmask with the following bits.
++		0	LE 1M TX
++		1	LE 1M RX
++		2	LE 2M TX
++		3	LE 2M RX
++		4	LE CODED TX
++		5	LE CODED RX
++
++	This command generates a Command Complete event on success
++	or a Command Status event on failure.
++
++	This command is only available for LE capable controllers.
+ 	It will return Not Supported otherwise.
+ 
+ 	Possible errors:	Not Supported
++				Invalid Parameters
+ 				Invalid Index
+ 
+ Command Complete Event
+@@ -3810,3 +3847,18 @@ Extended Controller Information Changed Event
+ 
+ 	The event will only be sent to management sockets other than the
+ 	one through which the change was triggered.
++
++PHY Configuration Changed Event
++===============================
++
++	Event Code:		0x0026
++	Controller Index:	<controller id>
++	Event Parameters:	Selected_phys (2 Octets)
++
++	This event indicates that default PHYs have been updated.
++
++	This event will only be used after Set PHY Configuration
++	command has been used at least once.
++
++	The event will only be sent to management sockets other than the
++	one through which the change was triggered.
+-- 
+2.7.4
 
-dbus[12994]: arguments to dbus_message_unref() were incorrect, assertion "!message->in_cache" failed in file ../../dbus/dbus-message.c line 1718.
-
-#0  __GI_raise (sig=sig@entry=6) at ../sysdeps/unix/sysv/linux/raise.c:51
-#1  0x00007ffff6b752a7 in __GI_abort () at abort.c:90
-#2  0x00007ffff76618c4 in _dbus_abort () from /lib64/libdbus-1.so.3
-#3  0x00007ffff7658150 in _dbus_warn_check_failed () from /lib64/libdbus-1.so.3
-#4  0x000000000048b281 in start_service (proxy=0x70a4f0) at gdbus/client.c:505
-#5  g_dbus_proxy_new (client=<optimized out>, path=path@entry=0x49bcad "/org/freedesktop/hostname1", interface=interface@entry=0x49bcc8 "org.freedesktop.hostname1") at gdbus/client.c:527
-#6  0x000000000040cb9d in hostname_init () at plugins/hostname.c:287
-#7  0x000000000045617a in plugin_init (enable=<optimized out>, disable=<optimized out>) at src/plugin.c:200
-#8  0x000000000040bc9e in main (argc=<optimized out>, argv=<optimized out>) at src/main.c:744
-
-Looks like g_dbus_send_message() takes ownership of the reference to
-the message. Removing that call in your patch makes it work.
-
-Might want to double-check though.
