@@ -1,59 +1,70 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <3025382d-97b8-b4ca-2595-327060506f5b@jp.fujitsu.com>
-References: <3025382d-97b8-b4ca-2595-327060506f5b@jp.fujitsu.com>
+In-Reply-To: <1511877514.11411.49.camel@hadess.net>
+References: <20171128105746.13000-1-luiz.dentz@gmail.com> <1511876867.11411.41.camel@hadess.net>
+ <CABBYNZ+w3GPnU7DJtBRO2UoXZD=AnJNdgHqrJyJ_O3_1BcXMGQ@mail.gmail.com> <1511877514.11411.49.camel@hadess.net>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 28 Nov 2017 16:26:18 +0200
-Message-ID: <CABBYNZ+Uv-=ovXAFk4OHzZ=cth7c75NgneVTp0tWgGwsm-OAnA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] obexd: Fix crash when canceling without agent
-To: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
+Date: Tue, 28 Nov 2017 16:23:32 +0200
+Message-ID: <CABBYNZKeS6JpAszk71Vmp7AamaH8czDbXdtrwLq6zM96Tse1gg@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] gdbus: Force service to start if proxy is created
+ while not connected
+To: Bastien Nocera <hadess@hadess.net>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Eramoto,
+Hi,
 
-On Tue, Nov 28, 2017 at 8:42 AM, ERAMOTO Masaya
-<eramoto.masaya@jp.fujitsu.com> wrote:
-> When obexd is started with the option auto-accept or the agent is killed
-> after starting to transfer a file, obexd crashes due to cancellation of
-> the transfer from a client as below:
+On Tue, Nov 28, 2017 at 3:58 PM, Bastien Nocera <hadess@hadess.net> wrote:
+> On Tue, 2017-11-28 at 15:49 +0200, Luiz Augusto von Dentz wrote:
+>> Hi Bastien,
+>>
+>> On Tue, Nov 28, 2017 at 3:47 PM, Bastien Nocera <hadess@hadess.net>
+>> wrote:
+>> > On Tue, 2017-11-28 at 12:57 +0200, Luiz Augusto von Dentz wrote:
+>> > > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>> > >
+>> > > Because GetAll is no longer send right away the service may never
+>> > > be
+>> > > started.
+>> >
+>> > Causes an assertion on startup on my machine.
+>> >
+>> > dbus[12994]: arguments to dbus_message_unref() were incorrect,
+>> > assertion "!message->in_cache" failed in file ../../dbus/dbus-
+>> > message.c line 1718.
+>> >
+>> > #0  __GI_raise (sig=sig@entry=6) at
+>> > ../sysdeps/unix/sysv/linux/raise.c:51
+>> > #1  0x00007ffff6b752a7 in __GI_abort () at abort.c:90
+>> > #2  0x00007ffff76618c4 in _dbus_abort () from /lib64/libdbus-1.so.3
+>> > #3  0x00007ffff7658150 in _dbus_warn_check_failed () from
+>> > /lib64/libdbus-1.so.3
+>> > #4  0x000000000048b281 in start_service (proxy=0x70a4f0) at
+>> > gdbus/client.c:505
+>> > #5  g_dbus_proxy_new (client=<optimized out>, path=path@entry=0x49b
+>> > cad "/org/freedesktop/hostname1", interface=interface@entry=0x49bcc
+>> > 8 "org.freedesktop.hostname1") at gdbus/client.c:527
+>> > #6  0x000000000040cb9d in hostname_init () at
+>> > plugins/hostname.c:287
+>> > #7  0x000000000045617a in plugin_init (enable=<optimized out>,
+>> > disable=<optimized out>) at src/plugin.c:200
+>> > #8  0x000000000040bc9e in main (argc=<optimized out>,
+>> > argv=<optimized out>) at src/main.c:744
+>> >
+>> > Looks like g_dbus_send_message() takes ownership of the reference
+>> > to
+>> > the message. Removing that call in your patch makes it work.
+>> >
+>> > Might want to double-check though.
+>>
+>> Does it fixes the problem after that?
 >
->   Process terminating with default action of signal 11 (SIGSEGV)
->    Access not within mapped region at address 0x0
->      at 0x158A40: transfer_cancel (manager.c:272)
->      by 0x18A5D2: process_message.isra.4 (object.c:259)
->      by 0x18AE44: generic_message (object.c:1079)
->      by 0x5290FD2: ??? (in /lib/x86_64-linux-gnu/libdbus-1.so.3.14.13)
->      by 0x5282623: dbus_connection_dispatch (in /lib/x86_64-linux-gnu/libdbus-1.so.3.14.13)
->      by 0x184DBF: message_dispatch (mainloop.c:72)
->      by 0x5505E24: g_main_context_dispatch (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.5400.1)
->      by 0x55061EF: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.5400.1)
->      by 0x5506501: g_main_loop_run (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.5400.1)
->      by 0x137902: main (main.c:322)
-> ---
->  obexd/src/manager.c | 3 +++
->  1 file changed, 3 insertions(+)
->
-> diff --git a/obexd/src/manager.c b/obexd/src/manager.c
-> index f84384ae4..78b138c85 100644
-> --- a/obexd/src/manager.c
-> +++ b/obexd/src/manager.c
-> @@ -265,6 +265,9 @@ static DBusMessage *transfer_cancel(DBusConnection *connection,
->         struct obex_session *os = transfer->session;
->         const char *sender;
->
-> +       if (!agent)
-> +               return agent_does_not_exist(msg);
-> +
->         if (!os)
->                 return invalid_args(msg);
->
-> --
-> 2.14.1
+> Yes, the hostname plugin works correctly, and the adapter name matches
+> the hostname.
 
-Applied, thanks.
+Applied after removing the unref.
 
 -- 
 Luiz Augusto von Dentz
