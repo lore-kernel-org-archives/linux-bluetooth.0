@@ -2,74 +2,64 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Jaganath Kanakkassery <jaganath.k.os@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
-Subject: [PATCH 3/4 v3] doc/mgmt-api: Add advertising phys support to flags
-Date: Tue, 28 Nov 2017 18:23:33 +0530
-Message-Id: <1511873614-18068-4-git-send-email-jaganathx.kanakkassery@intel.com>
+Subject: [PATCH 1/4 v3] doc/mgmt-api: Add support for Get PHY Configuration command
+Date: Tue, 28 Nov 2017 18:23:31 +0530
+Message-Id: <1511873614-18068-2-git-send-email-jaganathx.kanakkassery@intel.com>
 In-Reply-To: <1511873614-18068-1-git-send-email-jaganathx.kanakkassery@intel.com>
 References: <1511873614-18068-1-git-send-email-jaganathx.kanakkassery@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- doc/mgmt-api.txt | 24 ++++++++++++++++++++++++
- 1 file changed, 24 insertions(+)
+ doc/mgmt-api.txt | 28 ++++++++++++++++++++++++++++
+ 1 file changed, 28 insertions(+)
 
 diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
-index 628ff18..e7453ea 100644
+index 8e7de14..c07c48c 100644
 --- a/doc/mgmt-api.txt
 +++ b/doc/mgmt-api.txt
-@@ -2504,6 +2504,9 @@ Read Advertising Features Command
- 		4	Add TX Power field to Adv_Data
- 		5	Add Appearance field to Scan_Rsp
- 		6	Add Local Name in Scan_Rsp
-+		8	Secondary Channel with LE 1M
-+		8	Secondary Channel with LE 2M
-+		9	Secondary Channel with LE Coded
+@@ -2871,6 +2871,7 @@ Read Extended Controller Information Command
+ 		13	Privacy
+ 		14	Controller Configuration
+ 		15	Static Address
++		16  	PHY configuration
  
- 	The Flags bit 0 indicates support for connectable advertising
- 	and for switching to connectable advertising independent of the
-@@ -2553,6 +2556,15 @@ Read Advertising Features Command
- 	space is limited a short version or no name information. The
- 	Local Name will be added at the end of the scan response data.
+ 	The EIR_Data field contains information about class of device,
+ 	local name and other values. Not all of them might be present. For
+@@ -2916,6 +2917,33 @@ Set Appearance Command
+ 				Invalid Parameters
+ 				Invalid Index
  
-+	The Flags bit 7 indicates support for advertising in secondary
-+	channel in LE 1M PHY.
++Get PHY Configuration Command
++==========================
 +
-+	The Flags bit 8 indicates support for advertising in secondary
-+	channel in LE 2M PHY. Primary channel would be on 1M.
++	Command Code:		0x0043
++	Controller Index:	<controller id>
++	Command Parameters:
++	Return Parameters:	Supported_phys (2 Octet)
++				Selected_phys (2 Octet)
 +
-+	The Flags bit 9 indicates support for advertising in secondary
-+	channel in LE CODED PHY.
++	This command is used to retrieve the supported PHYs and currently
++	selected PHYs.
 +
- 	The valid range for Instance identifiers is 1-254. The value 0
- 	is reserved for internal use and the value 255 is reserved for
- 	future extensions. However the Max_Instances value for indicating
-@@ -2613,6 +2625,9 @@ Add Advertising Command
- 		4	Add TX Power field to Adv_Data
- 		5	Add Appearance field to Scan_Rsp
- 		6	Add Local Name in Scan_Rsp
-+		7	Secondary Channel with LE 1M
-+		8	Secondary Channel with LE 2M
-+		9	Secondary Channel with LE Coded
- 
- 	When the connectable flag is set, then the controller will use
- 	undirected connectable advertising. The value of the connectable
-@@ -2640,6 +2655,15 @@ Add Advertising Command
- 	supported to provide less air traffic for devices implementing
- 	broadcaster role.
- 
-+	Secondary channel flags can be used to advertise in secondary
-+	channel with the corresponding PHYs. These flag bits are mutually
-+	exclusive and setting multiple will result in Invalid Parameter
-+	error. Choosing LE 1M and LE 2M will result in using extended
-+	advertising with the primary channel being 1M and secondary channel
-+	with the respective PHY. Choosing LE Coded will result in extended
-+	advertising with both primary and secondary channel in LE Coded.
-+	Choosing none of these flags will result in legacy advertising.
++	Supported_phys and Selected_phys is a bitmask with the following bits.
++		0	LE 1M TX
++		1	LE 1M RX
++		2	LE 2M TX
++		3	LE 2M RX
++		4	LE CODED TX
++		5	LE CODED RX
 +
- 	The Duration parameter configures the length of an Instance. The
- 	value is in seconds.
++	LE 1M TX and LE 1M RX would be supported by default.
++
++	This command is only available for LE capable controllers.
++	It will return Not Supported otherwise.
++
++	Possible errors:	Not Supported
++				Invalid Index
  
+ Command Complete Event
+ ======================
 -- 
 2.7.4
 
