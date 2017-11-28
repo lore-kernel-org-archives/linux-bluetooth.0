@@ -1,71 +1,108 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
-Subject: Re: [PATCH 2/3 v2] doc/mgmt-api: Add support for Set default Phy
- command
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CAJzH+boShmEL4+N0bWWx67ZVSEi4gds197bkVR=n0qNeYZFC9g@mail.gmail.com>
-Date: Tue, 28 Nov 2017 12:50:14 +0100
-Cc: "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-        Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
-Message-Id: <4817B42A-8E1D-448B-BD70-5583F2D3CDF9@holtmann.org>
-References: <1511173617-25442-1-git-send-email-jaganathx.kanakkassery@intel.com>
- <1511173617-25442-3-git-send-email-jaganathx.kanakkassery@intel.com>
- <DBCCCD9D-7CAC-45F6-89E2-9BE30B625FC6@holtmann.org>
- <CAJzH+boShmEL4+N0bWWx67ZVSEi4gds197bkVR=n0qNeYZFC9g@mail.gmail.com>
-To: Jaganath K <jaganath.k.os@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ] client: Fix not printing device address
+Date: Tue, 28 Nov 2017 13:42:11 +0200
+Message-Id: <20171128114211.20485-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jaganath,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
->>> ---
->>> doc/mgmt-api.txt | 38 ++++++++++++++++++++++++++++++++++++++
->>> 1 file changed, 38 insertions(+)
->>> 
->>> diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
->>> index 69e84cd..b59bf0c 100644
->>> --- a/doc/mgmt-api.txt
->>> +++ b/doc/mgmt-api.txt
->>> @@ -2940,9 +2940,47 @@ Get PHY Information Command
->>>      LE 1M TX and LE 1M RX would be supported by default.
->>> 
->>>      This command is only available for LE capable controllers.
->>> +        It will return Not Supported otherwise.
->>> +
->>> +        Possible errors:        Not Supported
->>> +                             Invalid Index
->>> +
->>> +Set Default PHY Command
->>> +==========================
->> 
->> I think the name “Set PHY Configuration” would be better.
->> 
->>> +
->>> +     Command Code:           0x0044
->>> +     Controller Index:       <controller id>
->>> +     Command Parameters:     Default_phy (1 Octet)
->>> +     Return Parameters:      Current_phys (1 Octet)
->> 
->> Returning the current selected PHYs is rather useless here. It would be exactly the same value we put in. However what might be useful is an event that indicates the change of the PHY Configuration.
->> 
-> 
-> I will remove Current_phys. But do we really need PHY Configuration
-> Changed event since it
-> can be changed only by Set PHY Configuration command and user can
-> understand the currently
-> selected_phys based on whether command is succeeded or failed?
+Commands which operate on the connected device shall not assume the
+address was passed as argument, instead this move the logic of
+retrieving the device address to common place and always uses the proxy
+instead of printing the input argument.
+---
+ client/main.c | 33 ++++++++++++++++++---------------
+ 1 file changed, 18 insertions(+), 15 deletions(-)
 
-and what about a 2nd mgmt user? We want to inform them that the configuration changed. They should be able to track selected PHYs without having to poll Get PHY Configuration.
-
-> We might need PHY changed event on a particular connection which
-> should correspond to
-> PHY Update Complete HCI Event.
-
-That is a different problem and I think that needs to be done via socket CMSG information.
-
-Regards
-
-Marcel
+diff --git a/client/main.c b/client/main.c
+index 7661b33c0..924da2fcd 100644
+--- a/client/main.c
++++ b/client/main.c
+@@ -1470,6 +1470,17 @@ static void pair_reply(DBusMessage *message, void *user_data)
+ 	bt_shell_printf("Pairing successful\n");
+ }
+ 
++static const char *device_addr(GDBusProxy *proxy)
++{
++	DBusMessageIter iter;
++	const char *addr = NULL;
++
++	if (g_dbus_proxy_get_property(proxy, "Address", &iter) == TRUE)
++		dbus_message_iter_get_basic(&iter, &addr);
++
++	return addr;
++}
++
+ static void cmd_pair(int argc, char *argv[])
+ {
+ 	GDBusProxy *proxy;
+@@ -1484,7 +1495,7 @@ static void cmd_pair(int argc, char *argv[])
+ 		return;
+ 	}
+ 
+-	bt_shell_printf("Attempting to pair with %s\n", argv[0]);
++	bt_shell_printf("Attempting to pair with %s", device_addr(proxy));
+ }
+ 
+ static void cmd_trust(int argc, char *argv[])
+@@ -1499,7 +1510,7 @@ static void cmd_trust(int argc, char *argv[])
+ 
+ 	trusted = TRUE;
+ 
+-	str = g_strdup_printf("%s trust", argv[0]);
++	str = g_strdup_printf("%s trust", device_addr(proxy));
+ 
+ 	if (g_dbus_proxy_set_property_basic(proxy, "Trusted",
+ 					DBUS_TYPE_BOOLEAN, &trusted,
+@@ -1521,7 +1532,7 @@ static void cmd_untrust(int argc, char *argv[])
+ 
+ 	trusted = FALSE;
+ 
+-	str = g_strdup_printf("%s untrust", argv[0]);
++	str = g_strdup_printf("%s untrust", device_addr(proxy));
+ 
+ 	if (g_dbus_proxy_set_property_basic(proxy, "Trusted",
+ 					DBUS_TYPE_BOOLEAN, &trusted,
+@@ -1543,7 +1554,7 @@ static void cmd_block(int argc, char *argv[])
+ 
+ 	blocked = TRUE;
+ 
+-	str = g_strdup_printf("%s block", argv[0]);
++	str = g_strdup_printf("%s block", device_addr(proxy));
+ 
+ 	if (g_dbus_proxy_set_property_basic(proxy, "Blocked",
+ 					DBUS_TYPE_BOOLEAN, &blocked,
+@@ -1565,7 +1576,7 @@ static void cmd_unblock(int argc, char *argv[])
+ 
+ 	blocked = FALSE;
+ 
+-	str = g_strdup_printf("%s unblock", argv[0]);
++	str = g_strdup_printf("%s unblock", device_addr(proxy));
+ 
+ 	if (g_dbus_proxy_set_property_basic(proxy, "Blocked",
+ 					DBUS_TYPE_BOOLEAN, &blocked,
+@@ -1718,16 +1729,8 @@ static void cmd_disconn(int argc, char *argv[])
+ 		return;
+ 	}
+ 
+-	if (!argc || strlen(argv[0]) == 0) {
+-		DBusMessageIter iter;
+-		const char *addr;
+-
+-		if (g_dbus_proxy_get_property(proxy, "Address", &iter) == TRUE)
+-			dbus_message_iter_get_basic(&iter, &addr);
+-
+-		bt_shell_printf("Attempting to disconnect from %s\n", addr);
+-	} else
+-		bt_shell_printf("Attempting to disconnect from %s\n", argv[0]);
++	bt_shell_printf("Attempting to disconnect from %s\n",
++					device_addr(proxy));
+ }
+ 
+ static void cmd_list_attributes(int argc, char *argv[])
+-- 
+2.13.6
 
