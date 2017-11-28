@@ -1,31 +1,63 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Date: Tue, 28 Nov 2017 16:09:01 +0200
-From: Johan Hedberg <johan.hedberg@intel.com>
-To: "michal.hobot@silvair.com" <michal.hobot@silvair.com>
-Cc: "Stotland, Inga" <inga.stotland@intel.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: meshctl cannot parse its own config file
-Message-ID: <20171128140901.GA27685@x1c.home>
-References: <D4221F5B-37CC-4BAA-88F3-C7B7F2E98DA2@silvair.com>
- <1511249147.6536.13.camel@intel.com>
- <3516B3B5-B03B-48BF-A0C0-227E5BF3FD9D@silvair.com>
- <1511808337.3924.2.camel@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <1511808337.3924.2.camel@intel.com>
+Message-ID: <1511877514.11411.49.camel@hadess.net>
+Subject: Re: [PATCH BlueZ] gdbus: Force service to start if proxy is created
+ while not connected
+From: Bastien Nocera <hadess@hadess.net>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Tue, 28 Nov 2017 14:58:34 +0100
+In-Reply-To: <CABBYNZ+w3GPnU7DJtBRO2UoXZD=AnJNdgHqrJyJ_O3_1BcXMGQ@mail.gmail.com>
+References: <20171128105746.13000-1-luiz.dentz@gmail.com>
+         <1511876867.11411.41.camel@hadess.net>
+         <CABBYNZ+w3GPnU7DJtBRO2UoXZD=AnJNdgHqrJyJ_O3_1BcXMGQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Michal,
-
-On Mon, Nov 27, 2017, Stotland, Inga wrote:
-> On Fri, 2017-11-24 at 22:13 +0100, Michał Hobot wrote:
-> > Btw, should I post an official patch? I'm new to this group.
+On Tue, 2017-11-28 at 15:49 +0200, Luiz Augusto von Dentz wrote:
+> Hi Bastien,
 > 
-> Yes, please go ahead and submit an official patch using git send-email.
+> On Tue, Nov 28, 2017 at 3:47 PM, Bastien Nocera <hadess@hadess.net>
+> wrote:
+> > On Tue, 2017-11-28 at 12:57 +0200, Luiz Augusto von Dentz wrote:
+> > > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> > > 
+> > > Because GetAll is no longer send right away the service may never
+> > > be
+> > > started.
+> > 
+> > Causes an assertion on startup on my machine.
+> > 
+> > dbus[12994]: arguments to dbus_message_unref() were incorrect,
+> > assertion "!message->in_cache" failed in file ../../dbus/dbus-
+> > message.c line 1718.
+> > 
+> > #0  __GI_raise (sig=sig@entry=6) at
+> > ../sysdeps/unix/sysv/linux/raise.c:51
+> > #1  0x00007ffff6b752a7 in __GI_abort () at abort.c:90
+> > #2  0x00007ffff76618c4 in _dbus_abort () from /lib64/libdbus-1.so.3
+> > #3  0x00007ffff7658150 in _dbus_warn_check_failed () from
+> > /lib64/libdbus-1.so.3
+> > #4  0x000000000048b281 in start_service (proxy=0x70a4f0) at
+> > gdbus/client.c:505
+> > #5  g_dbus_proxy_new (client=<optimized out>, path=path@entry=0x49b
+> > cad "/org/freedesktop/hostname1", interface=interface@entry=0x49bcc
+> > 8 "org.freedesktop.hostname1") at gdbus/client.c:527
+> > #6  0x000000000040cb9d in hostname_init () at
+> > plugins/hostname.c:287
+> > #7  0x000000000045617a in plugin_init (enable=<optimized out>,
+> > disable=<optimized out>) at src/plugin.c:200
+> > #8  0x000000000040bc9e in main (argc=<optimized out>,
+> > argv=<optimized out>) at src/main.c:744
+> > 
+> > Looks like g_dbus_send_message() takes ownership of the reference
+> > to
+> > the message. Removing that call in your patch makes it work.
+> > 
+> > Might want to double-check though.
+> 
+> Does it fixes the problem after that?
 
-Will you be submitting git-formatted patch for this? It's one of the
-last few remaining patches I'd like to get merged before we create a new
-BlueZ release.
-
-Johan
+Yes, the hostname plugin works correctly, and the adapter name matches
+the hostname.
