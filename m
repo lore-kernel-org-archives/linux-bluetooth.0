@@ -1,36 +1,59 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <netdev-owner@vger.kernel.org>
 Content-Type: text/plain;
-        charset=us-ascii
+        charset=utf-8
 Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
-Subject: Re: [PATCH] Bluetooth: btqcomsmd: Fix skb double free corruption
+Subject: Re: [PATCH v2 1/2] seq_file: Introduce DEFINE_SHOW_ATTRIBUTE() helper
+ macro
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1511359397-25523-1-git-send-email-loic.poulain@linaro.org>
-Date: Tue, 28 Nov 2017 09:44:58 +0100
+In-Reply-To: <20171123203605.44954-2-andriy.shevchenko@linux.intel.com>
+Date: Tue, 28 Nov 2017 09:43:43 +0100
 Cc: Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org
-Message-Id: <35EBE8FA-D41F-4447-8D37-88F42329225F@holtmann.org>
-References: <1511359397-25523-1-git-send-email-loic.poulain@linaro.org>
-To: Loic Poulain <loic.poulain@linaro.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Network Development <netdev@vger.kernel.org>,
+        Randy Dunlap <rdunlap@infradead.org>
+Message-Id: <F129B4E0-91B1-4B7B-AF5D-A5EA29486A6E@holtmann.org>
+References: <20171123203605.44954-1-andriy.shevchenko@linux.intel.com>
+ <20171123203605.44954-2-andriy.shevchenko@linux.intel.com>
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Sender: netdev-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Loic,
+Hi Andy,
 
-> In case of hci send frame failure, skb is still owned
-> by the caller (hci_core) and then should not be freed.
+> The DEFINE_SHOW_ATTRIBUTE() helper macro would be useful for current
+> users, which are many of them, and for new comers to decrease code
+> duplication.
 > 
-> This fixes crash on dragonboard-410c when sending SCO
-> packet. skb is freed by both btqcomsmd and hci_core.
-> 
-> Fixes: 1511cc750c3d ("Bluetooth: Introduce Qualcomm WCNSS SMD based HCI driver")
-> Signed-off-by: Loic Poulain <loic.poulain@linaro.org>
+> Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 > ---
-> drivers/bluetooth/btqcomsmd.c | 3 ++-
-> 1 file changed, 2 insertions(+), 1 deletion(-)
+> include/linux/seq_file.h | 13 +++++++++++++
+> 1 file changed, 13 insertions(+)
+> 
+> diff --git a/include/linux/seq_file.h b/include/linux/seq_file.h
+> index c32929802c25..73adc12ab773 100644
+> --- a/include/linux/seq_file.h
+> +++ b/include/linux/seq_file.h
+> @@ -144,6 +144,19 @@ void *__seq_open_private(struct file *, const struct seq_operations *, int);
+> int seq_open_private(struct file *, const struct seq_operations *, int);
+> int seq_release_private(struct inode *, struct file *);
+> 
+> +#define DEFINE_SHOW_ATTRIBUTE(__name)					      \
+> +static int __name ## _open(struct inode *inode, struct file *file)	      \
+> +{									      \
+> +	return single_open(file, __name ## _show, inode->i_private);	      \
+> +}									      \
+> +									      \
+> +static const struct file_operations __name ## _fops = {			      \
+> +	.open		= __name ## _open,				      \
+> +	.read		= seq_read,					      \
+> +	.llseek		= seq_lseek,					      \
+> +	.release	= single_release,				      \
+> +}									      \
+> +
 
-patch has been applied to bluetooth-next tree.
+can we define this in hci_debugfs.c first and get that patch merged into bluetooth-next. And only as a follow up patch try to generalize this in seq_file.h. I really don’t like to carry a patch for seq_file.h in the bluetooth-next tree.
 
 Regards
 
 Marcel
-
