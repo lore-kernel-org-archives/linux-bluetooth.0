@@ -1,89 +1,59 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Subject: Re: [PATCH 3/4 v3] doc/mgmt-api: Add advertising phys support to
- flags
-To: Jaganath Kanakkassery <jaganath.k.os@gmail.com>
-CC: <linux-bluetooth@vger.kernel.org>,
-        Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
-References: <1511873614-18068-1-git-send-email-jaganathx.kanakkassery@intel.com>
- <1511873614-18068-4-git-send-email-jaganathx.kanakkassery@intel.com>
-From: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
-Message-ID: <8982fe2a-9a69-df4b-9278-b08ac98a44ab@jp.fujitsu.com>
-Date: Wed, 29 Nov 2017 14:32:00 +0900
 MIME-Version: 1.0
-In-Reply-To: <1511873614-18068-4-git-send-email-jaganathx.kanakkassery@intel.com>
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <3025382d-97b8-b4ca-2595-327060506f5b@jp.fujitsu.com>
+References: <3025382d-97b8-b4ca-2595-327060506f5b@jp.fujitsu.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Tue, 28 Nov 2017 16:26:18 +0200
+Message-ID: <CABBYNZ+Uv-=ovXAFk4OHzZ=cth7c75NgneVTp0tWgGwsm-OAnA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] obexd: Fix crash when canceling without agent
+To: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jaganath,
+Hi Eramoto,
 
-On 11/28/2017 09:53 PM, Jaganath Kanakkassery wrote:
+On Tue, Nov 28, 2017 at 8:42 AM, ERAMOTO Masaya
+<eramoto.masaya@jp.fujitsu.com> wrote:
+> When obexd is started with the option auto-accept or the agent is killed
+> after starting to transfer a file, obexd crashes due to cancellation of
+> the transfer from a client as below:
+>
+>   Process terminating with default action of signal 11 (SIGSEGV)
+>    Access not within mapped region at address 0x0
+>      at 0x158A40: transfer_cancel (manager.c:272)
+>      by 0x18A5D2: process_message.isra.4 (object.c:259)
+>      by 0x18AE44: generic_message (object.c:1079)
+>      by 0x5290FD2: ??? (in /lib/x86_64-linux-gnu/libdbus-1.so.3.14.13)
+>      by 0x5282623: dbus_connection_dispatch (in /lib/x86_64-linux-gnu/libdbus-1.so.3.14.13)
+>      by 0x184DBF: message_dispatch (mainloop.c:72)
+>      by 0x5505E24: g_main_context_dispatch (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.5400.1)
+>      by 0x55061EF: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.5400.1)
+>      by 0x5506501: g_main_loop_run (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.5400.1)
+>      by 0x137902: main (main.c:322)
 > ---
->  doc/mgmt-api.txt | 24 ++++++++++++++++++++++++
->  1 file changed, 24 insertions(+)
-> 
-> diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
-> index 628ff18..e7453ea 100644
-> --- a/doc/mgmt-api.txt
-> +++ b/doc/mgmt-api.txt
-> @@ -2504,6 +2504,9 @@ Read Advertising Features Command
->  		4	Add TX Power field to Adv_Data
->  		5	Add Appearance field to Scan_Rsp
->  		6	Add Local Name in Scan_Rsp
-> +		8	Secondary Channel with LE 1M
-
-7 is correct.
-
-
-Regards,
-Eramoto
-
-> +		8	Secondary Channel with LE 2M
-> +		9	Secondary Channel with LE Coded
->  
->  	The Flags bit 0 indicates support for connectable advertising
->  	and for switching to connectable advertising independent of the
-> @@ -2553,6 +2556,15 @@ Read Advertising Features Command
->  	space is limited a short version or no name information. The
->  	Local Name will be added at the end of the scan response data.
->  
-> +	The Flags bit 7 indicates support for advertising in secondary
-> +	channel in LE 1M PHY.
+>  obexd/src/manager.c | 3 +++
+>  1 file changed, 3 insertions(+)
+>
+> diff --git a/obexd/src/manager.c b/obexd/src/manager.c
+> index f84384ae4..78b138c85 100644
+> --- a/obexd/src/manager.c
+> +++ b/obexd/src/manager.c
+> @@ -265,6 +265,9 @@ static DBusMessage *transfer_cancel(DBusConnection *connection,
+>         struct obex_session *os = transfer->session;
+>         const char *sender;
+>
+> +       if (!agent)
+> +               return agent_does_not_exist(msg);
 > +
-> +	The Flags bit 8 indicates support for advertising in secondary
-> +	channel in LE 2M PHY. Primary channel would be on 1M.
-> +
-> +	The Flags bit 9 indicates support for advertising in secondary
-> +	channel in LE CODED PHY.
-> +
->  	The valid range for Instance identifiers is 1-254. The value 0
->  	is reserved for internal use and the value 255 is reserved for
->  	future extensions. However the Max_Instances value for indicating
-> @@ -2613,6 +2625,9 @@ Add Advertising Command
->  		4	Add TX Power field to Adv_Data
->  		5	Add Appearance field to Scan_Rsp
->  		6	Add Local Name in Scan_Rsp
-> +		7	Secondary Channel with LE 1M
-> +		8	Secondary Channel with LE 2M
-> +		9	Secondary Channel with LE Coded
->  
->  	When the connectable flag is set, then the controller will use
->  	undirected connectable advertising. The value of the connectable
-> @@ -2640,6 +2655,15 @@ Add Advertising Command
->  	supported to provide less air traffic for devices implementing
->  	broadcaster role.
->  
-> +	Secondary channel flags can be used to advertise in secondary
-> +	channel with the corresponding PHYs. These flag bits are mutually
-> +	exclusive and setting multiple will result in Invalid Parameter
-> +	error. Choosing LE 1M and LE 2M will result in using extended
-> +	advertising with the primary channel being 1M and secondary channel
-> +	with the respective PHY. Choosing LE Coded will result in extended
-> +	advertising with both primary and secondary channel in LE Coded.
-> +	Choosing none of these flags will result in legacy advertising.
-> +
->  	The Duration parameter configures the length of an Instance. The
->  	value is in seconds.
->  
-> 
+>         if (!os)
+>                 return invalid_args(msg);
+>
+> --
+> 2.14.1
 
+Applied, thanks.
+
+-- 
+Luiz Augusto von Dentz
