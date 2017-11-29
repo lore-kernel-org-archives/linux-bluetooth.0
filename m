@@ -1,74 +1,64 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Szymon Janc <szymon.janc@codecoup.pl>
-To: Bastien Nocera <hadess@hadess.net>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] plugins/sixaxis: Don't ignore previously setup devices
-Date: Thu, 30 Nov 2017 09:56:30 +0100
-Message-ID: <6074862.bcrYxQAIsm@ix>
-In-Reply-To: <20171108112452.9703-1-hadess@hadess.net>
-References: <20171108112452.9703-1-hadess@hadess.net>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <hdegoede@redhat.com>
+From: Hans de Goede <hdegoede@redhat.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>
+Cc: Hans de Goede <hdegoede@redhat.com>,
+	linux-bluetooth@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: [PATCH] Bluetooth: btsdio: Do not bind to non-removable BCM43341
+Date: Wed, 29 Nov 2017 20:29:07 +0100
+Message-Id: <20171129192907.27969-1-hdegoede@redhat.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bastien,
+BCM43341 devices soldered onto the PCB (non-removable) always (AFAICT)
+use an UART connection for bluetooth. But they also advertise btsdio
+support on their 3th sdio function, this causes 2 problems:
 
-On Wednesday, 8 November 2017 12:24:52 CET Bastien Nocera wrote:
-> 1. Setup PS3 controller through cable pairing
-> 2. Remove device from BlueZ's database
-> 3. Plug original PS3 controller back
-> 
-> As we don't change the master bdaddr on the device itself, the joypad
-> will likely be trying to connect to BlueZ, and fail to connect after a
-> small period of time. But the device will appear connected just long
-> enough for the cable pairing to say "hey, I already have this setup".
-> 
-> Ideally, we would test for whether the device is temporary, or already
-> trusted, but testing for whether we've setup its internal services *and*
-> it's connected, rather than *or*, is sufficient.
-> ---
->  plugins/sixaxis.c | 15 +++++++--------
->  1 file changed, 7 insertions(+), 8 deletions(-)
-> 
-> diff --git a/plugins/sixaxis.c b/plugins/sixaxis.c
-> index 4e714e72d..47750969b 100644
-> --- a/plugins/sixaxis.c
-> +++ b/plugins/sixaxis.c
-> @@ -561,16 +561,13 @@ static bool setup_device(int fd, const char
-> *sysfs_path, if (get_device_bdaddr(fd, &device_bdaddr, cp->type) < 0)
->  		return false;
-> 
-> -	/* This can happen if controller was plugged while already connected
-> -	 * eg. to charge up battery. */
-> +	/* This can happen if controller was plugged while already setup and
-> +	 * connected eg. to charge up battery. */
->  	device = btd_adapter_find_device(adapter, &device_bdaddr,
->  							BDADDR_BREDR);
-> -	if (device && btd_device_is_connected(device))
-> -		return false;
-> -
-> -	device = btd_adapter_get_device(adapter, &device_bdaddr, BDADDR_BREDR);
-> -
-> -	if (g_slist_find_custom(btd_device_get_uuids(device), HID_UUID,
-> +	if (device != NULL &&
-> +		btd_device_is_connected(device) &&
-> +		g_slist_find_custom(btd_device_get_uuids(device), HID_UUID,
->  						(GCompareFunc)strcasecmp)) {
->  		char device_addr[18];
->  		ba2str(&device_bdaddr, device_addr);
-> @@ -578,6 +575,8 @@ static bool setup_device(int fd, const char *sysfs_path,
-> return false;
->  	}
-> 
-> +	device = btd_adapter_get_device(adapter, &device_bdaddr, BDADDR_BREDR);
-> +
->  	info("sixaxis: setting up new device");
-> 
->  	btd_device_device_set_name(device, cp->name);
+1) A non functioning BT HCI getting registered
 
-Patch applied, thanks.
+2) Since the btsdio driver does not have suspend/resume callbacks,
+mmc_sdio_pre_suspend will return -ENOSYS, causing mmc_pm_notify()
+to react as if the SDIO-card is removed and since the slot is
+marked as non-removable it will never get detected as inserted again.
+Which results in wifi no longer working after a suspend/resume.
 
+This commit fixes both by making btsdio ignore BCM43341 devices
+when connected to a slot which is marked non-removable.
+
+Cc: stable@vger.kernel.org
+Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+---
+ drivers/bluetooth/btsdio.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/drivers/bluetooth/btsdio.c b/drivers/bluetooth/btsdio.c
+index c8e945d19ffe..76c1405c7242 100644
+--- a/drivers/bluetooth/btsdio.c
++++ b/drivers/bluetooth/btsdio.c
+@@ -31,6 +31,7 @@
+ #include <linux/errno.h>
+ #include <linux/skbuff.h>
+ 
++#include <linux/mmc/host.h>
+ #include <linux/mmc/sdio_ids.h>
+ #include <linux/mmc/sdio_func.h>
+ 
+@@ -292,6 +293,15 @@ static int btsdio_probe(struct sdio_func *func,
+ 		tuple = tuple->next;
+ 	}
+ 
++	/*
++	 * BCM43341 devices soldered onto the PCB (non-removable) use an
++	 * uart connection for bluetooth, ignore the BT SDIO interface.
++	 */
++	if (func->vendor == SDIO_VENDOR_ID_BROADCOM &&
++	    func->device == SDIO_DEVICE_ID_BROADCOM_43341 &&
++	    !mmc_card_is_removable(func->card->host))
++		return -ENODEV;
++
+ 	data = devm_kzalloc(&func->dev, sizeof(*data), GFP_KERNEL);
+ 	if (!data)
+ 		return -ENOMEM;
 -- 
-pozdrawiam
-Szymon Janc
+2.14.3
