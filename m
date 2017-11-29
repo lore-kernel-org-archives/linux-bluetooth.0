@@ -7,110 +7,154 @@ Cc: linux-wireless@vger.kernel.org,
 	Prameela Rani Garnepudi <prameela.j04cs@gmail.com>,
 	linux-bluetooth@vger.kernel.org,
 	Siva Rebbagondla <siva.rebbagondla@redpinesignals.com>
-Subject: [v2 3/8] rsi: add header file rsi_header
-Date: Wed, 29 Nov 2017 18:15:08 +0530
-Message-Id: <1511959513-3902-4-git-send-email-amitkarwar@gmail.com>
+Subject: [v2 2/8] rsi: add bluetooth rx endpoint
+Date: Wed, 29 Nov 2017 18:15:07 +0530
+Message-Id: <1511959513-3902-3-git-send-email-amitkarwar@gmail.com>
 In-Reply-To: <1511959513-3902-1-git-send-email-amitkarwar@gmail.com>
 References: <1511959513-3902-1-git-send-email-amitkarwar@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Prameela Rani Garnepudi <prameela.j04cs@gmail.com>
+From: Siva Rebbagondla <siva.rebbagondla@redpinesignals.com>
 
-The common parameters used by wlan and bt modules are added
-to a new header file "rsi_header.h" defined in '/include/linux'
+USB endpoint 1 is used for WLAN which is presently in use.
+USB endpoint 2 is introduced for BT Rx traffic. Enumeration
+of Rx BT endpoint and submitting Rx BT URB are added.
 
-Signed-off-by: Prameela Rani Garnepudi <prameela.j04cs@gmail.com>
+>From /sys/kernel/debug/usb/devices,
+Ad=81(I) is for WLAN EP IN and Ad=01(O) is for Wlan EP OUT.
+Ad=82(I) is for BT EP IN and Ad=02(O) is for BT EP OUT.
+
+T:  Bus=01 Lev=01 Prnt=01 Port=09 Cnt=03 Dev#=  4 Spd=480  MxCh= 0
+D:  Ver= 2.00 Cls=00(>ifc ) Sub=00 Prot=00 MxPS=64 #Cfgs=  1
+P:  Vendor=1618 ProdID=9113 Rev= 0.02
+S:  Manufacturer=Redpine Signals, Inc.
+S:  Product=Wireless USB Network Module
+S:  SerialNumber=000000000001
+C:* #Ifs= 1 Cfg#= 1 Atr=c0 MxPwr=  2mA
+I:* If#= 0 Alt= 0 #EPs= 6 Cls=00(>ifc ) Sub=00 Prot=00 Driver=(none)
+E:  Ad=81(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=01(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=82(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=83(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=03(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+
 Signed-off-by: Siva Rebbagondla <siva.rebbagondla@redpinesignals.com>
+Signed-off-by: Prameela Rani Garnepudi <prameela.j04cs@gmail.com>
 Signed-off-by: Amitkumar Karwar <amit.karwar@redpinesignals.com>
 ---
- drivers/net/wireless/rsi/rsi_main.h | 12 ++----------
- include/linux/rsi_header.h          | 34 ++++++++++++++++++++++++++++++++++
- 2 files changed, 36 insertions(+), 10 deletions(-)
- create mode 100644 include/linux/rsi_header.h
+v2: Included '/sys/kernel/debug/usb/devices' info in patch description(Marcel)
+---
+ drivers/net/wireless/rsi/rsi_91x_usb.c | 37 ++++++++++++++++++++--------------
+ drivers/net/wireless/rsi/rsi_usb.h     |  6 +++---
+ 2 files changed, 25 insertions(+), 18 deletions(-)
 
-diff --git a/drivers/net/wireless/rsi/rsi_main.h b/drivers/net/wireless/rsi/rsi_main.h
-index ee469dc..ca02a4b 100644
---- a/drivers/net/wireless/rsi/rsi_main.h
-+++ b/drivers/net/wireless/rsi/rsi_main.h
-@@ -20,6 +20,7 @@
- #include <linux/string.h>
- #include <linux/skbuff.h>
- #include <net/mac80211.h>
-+#include <linux/rsi_header.h>
+diff --git a/drivers/net/wireless/rsi/rsi_91x_usb.c b/drivers/net/wireless/rsi/rsi_91x_usb.c
+index 147fcee2..b212a15 100644
+--- a/drivers/net/wireless/rsi/rsi_91x_usb.c
++++ b/drivers/net/wireless/rsi/rsi_91x_usb.c
+@@ -103,41 +103,42 @@ static int rsi_find_bulk_in_and_out_endpoints(struct usb_interface *interface,
+ 	struct usb_host_interface *iface_desc;
+ 	struct usb_endpoint_descriptor *endpoint;
+ 	__le16 buffer_size;
+-	int ii, bep_found = 0;
++	int ii, bin_found = 0, bout_found = 0;
  
- struct rsi_sta {
- 	struct ieee80211_sta *sta;
-@@ -85,10 +86,6 @@ extern __printf(2, 3) void rsi_dbg(u32 zone, const char *fmt, ...);
- #define MGMT_HW_Q			10
- #define BEACON_HW_Q			11
+ 	iface_desc = &(interface->altsetting[0]);
  
--/* Queue information */
--#define RSI_COEX_Q			0x0
--#define RSI_WIFI_MGMT_Q                 0x4
--#define RSI_WIFI_DATA_Q                 0x5
- #define IEEE80211_MGMT_FRAME            0x00
- #define IEEE80211_CTL_FRAME             0x04
+ 	for (ii = 0; ii < iface_desc->desc.bNumEndpoints; ++ii) {
+ 		endpoint = &(iface_desc->endpoint[ii].desc);
  
-@@ -293,11 +290,6 @@ struct rsi_common {
- 	struct ieee80211_vif *roc_vif;
- };
+-		if ((!(dev->bulkin_endpoint_addr)) &&
++		if (!dev->bulkin_endpoint_addr[bin_found] &&
+ 		    (endpoint->bEndpointAddress & USB_DIR_IN) &&
+-		    ((endpoint->bmAttributes &
+-		    USB_ENDPOINT_XFERTYPE_MASK) ==
++		    ((endpoint->bmAttributes & USB_ENDPOINT_XFERTYPE_MASK) ==
+ 		    USB_ENDPOINT_XFER_BULK)) {
+ 			buffer_size = endpoint->wMaxPacketSize;
+-			dev->bulkin_size = buffer_size;
+-			dev->bulkin_endpoint_addr =
++			dev->bulkin_size[bin_found] = buffer_size;
++			dev->bulkin_endpoint_addr[bin_found] =
+ 				endpoint->bEndpointAddress;
++			bin_found++;
+ 		}
  
--enum host_intf {
--	RSI_HOST_INTF_SDIO = 0,
--	RSI_HOST_INTF_USB
--};
--
- struct eepromrw_info {
- 	u32 offset;
- 	u32 length;
-@@ -322,7 +314,7 @@ struct rsi_hw {
- 	struct device *device;
- 	u8 sc_nvifs;
+-		if (!dev->bulkout_endpoint_addr[bep_found] &&
++		if (!dev->bulkout_endpoint_addr[bout_found] &&
+ 		    !(endpoint->bEndpointAddress & USB_DIR_IN) &&
+ 		    ((endpoint->bmAttributes & USB_ENDPOINT_XFERTYPE_MASK) ==
+-		      USB_ENDPOINT_XFER_BULK)) {
+-			dev->bulkout_endpoint_addr[bep_found] =
++		    USB_ENDPOINT_XFER_BULK)) {
++			buffer_size = endpoint->wMaxPacketSize;
++			dev->bulkout_endpoint_addr[bout_found] =
+ 				endpoint->bEndpointAddress;
+ 			buffer_size = endpoint->wMaxPacketSize;
+-			dev->bulkout_size[bep_found] = buffer_size;
+-			bep_found++;
++			dev->bulkout_size[bout_found] = buffer_size;
++			bout_found++;
+ 		}
  
--	enum host_intf rsi_host_intf;
-+	enum rsi_host_intf rsi_host_intf;
- 	u16 block_size;
- 	enum ps_state ps_state;
- 	struct rsi_ps_info ps_info;
-diff --git a/include/linux/rsi_header.h b/include/linux/rsi_header.h
-new file mode 100644
-index 0000000..16a447b
---- /dev/null
-+++ b/include/linux/rsi_header.h
-@@ -0,0 +1,34 @@
-+/**
-+ * Copyright (c) 2017 Redpine Signals Inc.
-+ *
-+ * Permission to use, copy, modify, and/or distribute this software for any
-+ * purpose with or without fee is hereby granted, provided that the above
-+ * copyright notice and this permission notice appear in all copies.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-+ * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-+ * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-+ * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-+ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-+ */
+-		if (bep_found >= MAX_BULK_EP)
++		if (bin_found >= MAX_BULK_EP || bout_found >= MAX_BULK_EP)
+ 			break;
+ 	}
+ 
+-	if (!(dev->bulkin_endpoint_addr) &&
+-	    (dev->bulkout_endpoint_addr[0]))
++	if (!(dev->bulkin_endpoint_addr[0]) &&
++	    dev->bulkout_endpoint_addr[0])
+ 		return -EINVAL;
+ 
+ 	return 0;
+@@ -273,7 +274,7 @@ static int rsi_rx_urb_submit(struct rsi_hw *adapter, u8 ep_num)
+ 	usb_fill_bulk_urb(urb,
+ 			  dev->usbdev,
+ 			  usb_rcvbulkpipe(dev->usbdev,
+-				dev->bulkin_endpoint_addr),
++			  dev->bulkin_endpoint_addr[ep_num - 1]),
+ 			  urb->transfer_buffer,
+ 			  3000,
+ 			  rsi_rx_done_handler,
+@@ -745,6 +746,12 @@ static int rsi_probe(struct usb_interface *pfunction,
+ 	if (status)
+ 		goto err1;
+ 
++	if (adapter->priv->coex_mode > 1) {
++		status = rsi_rx_urb_submit(adapter, BT_EP);
++		if (status)
++			goto err1;
++	}
 +
-+#ifndef __RSI_HEADER_H__
-+#define __RSI_HEADER_H__
-+
-+/* HAL queue information */
-+#define RSI_COEX_Q			0x0
-+#define RSI_BT_Q			0x2
-+#define RSI_WLAN_Q                      0x3
-+#define RSI_WIFI_MGMT_Q                 0x4
-+#define RSI_WIFI_DATA_Q                 0x5
-+#define RSI_BT_MGMT_Q			0x6
-+#define RSI_BT_DATA_Q			0x7
-+
-+enum rsi_host_intf {
-+	RSI_HOST_INTF_SDIO = 0,
-+	RSI_HOST_INTF_USB
-+};
-+
-+#endif
+ 	return 0;
+ err1:
+ 	rsi_deinit_usb_interface(adapter);
+diff --git a/drivers/net/wireless/rsi/rsi_usb.h b/drivers/net/wireless/rsi/rsi_usb.h
+index 7e781d5..0fda14c 100644
+--- a/drivers/net/wireless/rsi/rsi_usb.h
++++ b/drivers/net/wireless/rsi/rsi_usb.h
+@@ -31,7 +31,7 @@
+ #define USB_VENDOR_REGISTER_WRITE    0x16
+ #define RSI_USB_TX_HEAD_ROOM         128
+ 
+-#define MAX_RX_URBS                  1
++#define MAX_RX_URBS                  2
+ #define MAX_BULK_EP                  8
+ #define WLAN_EP                      1
+ #define BT_EP                        2
+@@ -54,8 +54,8 @@ struct rsi_91x_usbdev {
+ 	struct usb_interface *pfunction;
+ 	struct rx_usb_ctrl_block rx_cb[MAX_RX_URBS];
+ 	u8 *tx_buffer;
+-	__le16 bulkin_size;
+-	u8 bulkin_endpoint_addr;
++	__le16 bulkin_size[MAX_BULK_EP];
++	u8 bulkin_endpoint_addr[MAX_BULK_EP];
+ 	__le16 bulkout_size[MAX_BULK_EP];
+ 	u8 bulkout_endpoint_addr[MAX_BULK_EP];
+ 	u32 tx_blk_size;
 -- 
 2.7.4
