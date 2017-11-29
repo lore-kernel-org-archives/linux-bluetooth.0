@@ -1,29 +1,89 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Jaganath Kanakkassery <jaganath.k.os@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
-Subject: [PATCH 0/4 v4] LE New PHYs kernel interfaces
-Date: Wed, 29 Nov 2017 12:22:49 +0530
-Message-Id: <1511938373-22396-1-git-send-email-jaganathx.kanakkassery@intel.com>
+Subject: Re: [PATCH 3/4 v3] doc/mgmt-api: Add advertising phys support to
+ flags
+To: Jaganath Kanakkassery <jaganath.k.os@gmail.com>
+CC: <linux-bluetooth@vger.kernel.org>,
+        Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
+References: <1511873614-18068-1-git-send-email-jaganathx.kanakkassery@intel.com>
+ <1511873614-18068-4-git-send-email-jaganathx.kanakkassery@intel.com>
+From: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
+Message-ID: <8982fe2a-9a69-df4b-9278-b08ac98a44ab@jp.fujitsu.com>
+Date: Wed, 29 Nov 2017 14:32:00 +0900
+MIME-Version: 1.0
+In-Reply-To: <1511873614-18068-4-git-send-email-jaganathx.kanakkassery@intel.com>
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-These patches enables user to get the supported phys by the
-controller and set preferred phy to be used in subsequent
-scanning and connection initiation.
+Hi Jaganath,
 
-Also added flags to support user selection for phy to be
-advertised.
+On 11/28/2017 09:53 PM, Jaganath Kanakkassery wrote:
+> ---
+>  doc/mgmt-api.txt | 24 ++++++++++++++++++++++++
+>  1 file changed, 24 insertions(+)
+> 
+> diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
+> index 628ff18..e7453ea 100644
+> --- a/doc/mgmt-api.txt
+> +++ b/doc/mgmt-api.txt
+> @@ -2504,6 +2504,9 @@ Read Advertising Features Command
+>  		4	Add TX Power field to Adv_Data
+>  		5	Add Appearance field to Scan_Rsp
+>  		6	Add Local Name in Scan_Rsp
+> +		8	Secondary Channel with LE 1M
 
-Jaganath Kanakkassery (4):
-  doc/mgmt-api: Add support for Get PHY Configuration command
-  doc/mgmt-api: Add support for Set Phy Configuration command
-  doc/mgmt-api: Add advertising phys support to flags
-  doc/mgmt-api: Update Duration Parameter description of Add Advertising
+7 is correct.
 
- doc/mgmt-api.txt | 107 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 107 insertions(+)
 
--- 
-2.7.4
+Regards,
+Eramoto
+
+> +		8	Secondary Channel with LE 2M
+> +		9	Secondary Channel with LE Coded
+>  
+>  	The Flags bit 0 indicates support for connectable advertising
+>  	and for switching to connectable advertising independent of the
+> @@ -2553,6 +2556,15 @@ Read Advertising Features Command
+>  	space is limited a short version or no name information. The
+>  	Local Name will be added at the end of the scan response data.
+>  
+> +	The Flags bit 7 indicates support for advertising in secondary
+> +	channel in LE 1M PHY.
+> +
+> +	The Flags bit 8 indicates support for advertising in secondary
+> +	channel in LE 2M PHY. Primary channel would be on 1M.
+> +
+> +	The Flags bit 9 indicates support for advertising in secondary
+> +	channel in LE CODED PHY.
+> +
+>  	The valid range for Instance identifiers is 1-254. The value 0
+>  	is reserved for internal use and the value 255 is reserved for
+>  	future extensions. However the Max_Instances value for indicating
+> @@ -2613,6 +2625,9 @@ Add Advertising Command
+>  		4	Add TX Power field to Adv_Data
+>  		5	Add Appearance field to Scan_Rsp
+>  		6	Add Local Name in Scan_Rsp
+> +		7	Secondary Channel with LE 1M
+> +		8	Secondary Channel with LE 2M
+> +		9	Secondary Channel with LE Coded
+>  
+>  	When the connectable flag is set, then the controller will use
+>  	undirected connectable advertising. The value of the connectable
+> @@ -2640,6 +2655,15 @@ Add Advertising Command
+>  	supported to provide less air traffic for devices implementing
+>  	broadcaster role.
+>  
+> +	Secondary channel flags can be used to advertise in secondary
+> +	channel with the corresponding PHYs. These flag bits are mutually
+> +	exclusive and setting multiple will result in Invalid Parameter
+> +	error. Choosing LE 1M and LE 2M will result in using extended
+> +	advertising with the primary channel being 1M and secondary channel
+> +	with the respective PHY. Choosing LE Coded will result in extended
+> +	advertising with both primary and secondary channel in LE Coded.
+> +	Choosing none of these flags will result in legacy advertising.
+> +
+>  	The Duration parameter configures the length of an Instance. The
+>  	value is in seconds.
+>  
+> 
 
