@@ -1,32 +1,33 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Date: Wed, 29 Nov 2017 09:35:11 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Steve Brown <sbrown@cortland.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH BlueZ] mesh: Correct typo in config op defines
-Message-ID: <20171129073511.GA26973@x1c.lan>
-References: <1511801117.14298.4.camel@ewol.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1511801117.14298.4.camel@ewol.com>
+From: Jaganath Kanakkassery <jaganath.k.os@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
+Subject: [PATCH 4/4] doc/mgmt-api: Update Duration Parameter description of Add Advertising
+Date: Wed, 29 Nov 2017 12:22:53 +0530
+Message-Id: <1511938373-22396-5-git-send-email-jaganathx.kanakkassery@intel.com>
+In-Reply-To: <1511938373-22396-1-git-send-email-jaganathx.kanakkassery@intel.com>
+References: <1511938373-22396-1-git-send-email-jaganathx.kanakkassery@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Steve,
+---
+ doc/mgmt-api.txt | 3 +++
+ 1 file changed, 3 insertions(+)
 
-On Mon, Nov 27, 2017, Steve Brown wrote:
-> diff --git a/mesh/config-model.h b/mesh/config-model.h
-> index be7acabb9..d7ee5e61f 100644
-> --- a/mesh/config-model.h
-> +++ b/mesh/config-model.h
-> @@ -93,7 +93,7 @@
->  #define OP_NODE_RESET_STATUS			0x804A
->  #define OP_MODEL_APP_GET			0x804B
->  #define OP_MODEL_APP_LIST			0x804C
-> -#define OP_VEND_MODEL_APP_GET			0x804C
-> +#define OP_VEND_MODEL_APP_GET			0x804D
->  #define OP_VEND_MODEL_APP_LIST			0x804E
+diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
+index e7453ea..afc43da 100644
+--- a/doc/mgmt-api.txt
++++ b/doc/mgmt-api.txt
+@@ -2670,6 +2670,9 @@ Add Advertising Command
+ 	A value of 0 indicates a default value is chosen for the
+ 	Duration. The default is 2 seconds.
+ 
++	Duration parameter will be ignored if controller supports extended
++	advertising and instance scheduling will be done by the controller.
++
+ 	If only one advertising Instance has been added, then the Duration
+ 	value will be ignored. It only applies for the case where multiple
+ 	Instances are configured. In that case every Instance will be
+-- 
+2.7.4
 
-Applied. Thanks.
-
-Johan
