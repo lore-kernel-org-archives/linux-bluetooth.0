@@ -1,64 +1,67 @@
-Return-Path: <hdegoede@redhat.com>
-From: Hans de Goede <hdegoede@redhat.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>
-Cc: Hans de Goede <hdegoede@redhat.com>,
-	linux-bluetooth@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: [PATCH] Bluetooth: btsdio: Do not bind to non-removable BCM43341
-Date: Wed, 29 Nov 2017 20:29:07 +0100
-Message-Id: <20171129192907.27969-1-hdegoede@redhat.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: "ruslan.kuzmin@nami.ru" <ruslan.kuzmin@nami.ru>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+CC: "luiz.dents@gmail.com" <luiz.dents@gmail.com>
+Subject: How connect two headphones to one Bluetooth adapter.
+Date: Wed, 29 Nov 2017 15:36:00 +0000
+Message-ID: <1511969761135.29141@nami.ru>
+Content-Type: text/plain; charset="koi8-r"
+MIME-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-BCM43341 devices soldered onto the PCB (non-removable) always (AFAICT)
-use an UART connection for bluetooth. But they also advertise btsdio
-support on their 3th sdio function, this causes 2 problems:
+Hello Luiz.
+I am not registred in email-list because from that email to me from vger.kernel.org recieve error, but from my iphone email vger.kernel.org think i  am send HTML message - and add me a SPAM.
+If you may send your email to that email direct please.
 
-1) A non functioning BT HCI getting registered
+ Excuse me ,in last message i am did bad titile . My problem not "How connect two headphones to Bluetooth" , my problem How connect two headphones to ONE Bluetooth adapter.    
+ I am conducted a study source codes of Bluez. What  i  am understand.
 
-2) Since the btsdio driver does not have suspend/resume callbacks,
-mmc_sdio_pre_suspend will return -ENOSYS, causing mmc_pm_notify()
-to react as if the SDIO-card is removed and since the slot is
-marked as non-removable it will never get detected as inserted again.
-Which results in wifi no longer working after a suspend/resume.
 
-This commit fixes both by making btsdio ignore BCM43341 devices
-when connected to a slot which is marked non-removable.
+>From file  bluez-5.46/profiles/audio/avdtp.c :
+	if (lsep->info.inuse)
+		return NULL;
 
-Cc: stable@vger.kernel.org
-Signed-off-by: Hans de Goede <hdegoede@redhat.com>
----
- drivers/bluetooth/btsdio.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+How i am undestand count of endpoints for one Bluez adapter depend from count calling D-bus functions "RegisterEndpoint".
 
-diff --git a/drivers/bluetooth/btsdio.c b/drivers/bluetooth/btsdio.c
-index c8e945d19ffe..76c1405c7242 100644
---- a/drivers/bluetooth/btsdio.c
-+++ b/drivers/bluetooth/btsdio.c
-@@ -31,6 +31,7 @@
- #include <linux/errno.h>
- #include <linux/skbuff.h>
- 
-+#include <linux/mmc/host.h>
- #include <linux/mmc/sdio_ids.h>
- #include <linux/mmc/sdio_func.h>
- 
-@@ -292,6 +293,15 @@ static int btsdio_probe(struct sdio_func *func,
- 		tuple = tuple->next;
- 	}
- 
-+	/*
-+	 * BCM43341 devices soldered onto the PCB (non-removable) use an
-+	 * uart connection for bluetooth, ignore the BT SDIO interface.
-+	 */
-+	if (func->vendor == SDIO_VENDOR_ID_BROADCOM &&
-+	    func->device == SDIO_DEVICE_ID_BROADCOM_43341 &&
-+	    !mmc_card_is_removable(func->card->host))
-+		return -ENODEV;
-+
- 	data = devm_kzalloc(&func->dev, sizeof(*data), GFP_KERNEL);
- 	if (!data)
- 		return -ENOMEM;
--- 
-2.14.3
+
+
+>From file pulseaudio-11.0/src/modules/bluetooth/bluez-util5.c :
+ if (pa_streq(interface, BLUEZ_ADAPTER_INTERFACE)) {
+            pa_bluetooth_adapter *a;
+            if ((a = pa_hashmap_get(y->adapters, path))) {
+                pa_log_error("Found duplicated D-Bus path for adapter %s", path);
+                return;
+            } else
+            a = adapter_create(y, path);
+            pa_log_debug("Adapter %s found", path);
+            parse_adapter_properties(a, &iface_i, false);
+            if (!a->valid)
+                return;
+            register_endpoint(y, path, A2DP_SOURCE_ENDPOINT, PA_BLUETOOTH_UUID_A2DP_SOURCE);
+            register_endpoint(y, path, A2DP_SINK_ENDPOINT, PA_BLUETOOTH_UUID_A2DP_SINK);
+
+How i am undestand in pulseaudio for one adapter - only two endponts - one sink and one source 
+
+
+>From ADVANCED AUDIO DISTRIBUTION PROFILE SPECIFICATION  (2015-07-14):
+  - The profile does not support a synchronized point-to-multipoint distribution
+
+
+
+>From https://www.bluetooth.com/specifications:
+
+Bluetooth BR/EDR enables continuous wireless connections and uses a point-to-point (P2P) network topology to establish one-to-one (1:1) device communications. 
+
+
+
+
+My questions:
+1)  Am I right with my conclusions?
+2)  Bluez is it suitable for connecting two headphones to one adapter? - how i am seen : yes (queue for server sources and sinks)
+3)  Pulseaudio is it suitable for connecting two headphones to one adapter? - how i am seen : not (only two D-bus calls RegisterEndpoint - for sink and for source)
+4)  Why two headphones with one Bluetoth adapter working on Windows XP? ( https://www.youtube.com/watch?v=yOxg23jXSio&t=5s)
+
+Best regards,Ruslan.
+
+
