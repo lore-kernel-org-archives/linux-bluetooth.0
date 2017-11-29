@@ -1,38 +1,32 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-From: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
-Subject: [PATCH BlueZ] tools/obexctl: Fix display of size/time during transfer
-Message-ID: <bf9cb175-d8ae-6b6d-6a05-90b087ac4b49@jp.fujitsu.com>
-Date: Wed, 29 Nov 2017 17:29:23 +0900
+Date: Wed, 29 Nov 2017 09:35:11 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Steve Brown <sbrown@cortland.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH BlueZ] mesh: Correct typo in config op defines
+Message-ID: <20171129073511.GA26973@x1c.lan>
+References: <1511801117.14298.4.camel@ewol.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1511801117.14298.4.camel@ewol.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When obexctl is run after starting to transfer a file, the transferred
-size and the remaining time will be extreme values first as below:
+Hi Steve,
 
-  [NEW] Transfer /org/bluez/obex/server/session8/transfer6
-  [CHG] Transfer /org/bluez/obex/server/session8/transfer6 Transferred: 1670741 (@1670KB/s 03:52)
-  [CHG] Transfer /org/bluez/obex/server/session8/transfer6 Transferred: 1703502 (@32KB/s 197:14)
-  [CHG] Transfer /org/bluez/obex/server/session8/transfer6 Transferred: 1736263 (@32KB/s 197:13)
----
- tools/obexctl.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On Mon, Nov 27, 2017, Steve Brown wrote:
+> diff --git a/mesh/config-model.h b/mesh/config-model.h
+> index be7acabb9..d7ee5e61f 100644
+> --- a/mesh/config-model.h
+> +++ b/mesh/config-model.h
+> @@ -93,7 +93,7 @@
+>  #define OP_NODE_RESET_STATUS			0x804A
+>  #define OP_MODEL_APP_GET			0x804B
+>  #define OP_MODEL_APP_LIST			0x804C
+> -#define OP_VEND_MODEL_APP_GET			0x804C
+> +#define OP_VEND_MODEL_APP_GET			0x804D
+>  #define OP_VEND_MODEL_APP_LIST			0x804E
 
-diff --git a/tools/obexctl.c b/tools/obexctl.c
-index ece50f682..33ee180a3 100644
---- a/tools/obexctl.c
-+++ b/tools/obexctl.c
-@@ -2319,7 +2319,7 @@ static void transfer_added(GDBusProxy *proxy)
- 
- 	data = g_new0(struct transfer_data, 1);
- 
--	if (g_dbus_proxy_get_property(proxy, "Transfered", &iter))
-+	if (g_dbus_proxy_get_property(proxy, "Transferred", &iter))
- 		dbus_message_iter_get_basic(&iter, &data->transferred);
- 
- 	if (g_dbus_proxy_get_property(proxy, "Size", &iter))
--- 
-2.14.1
+Applied. Thanks.
 
+Johan
