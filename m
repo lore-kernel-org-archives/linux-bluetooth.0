@@ -1,521 +1,216 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <AA8592C7-1D9D-4D05-A6D4-12B2220BF5F3@holtmann.org>
-References: <1510730444-3237-1-git-send-email-amitkarwar@gmail.com>
- <1510730444-3237-6-git-send-email-amitkarwar@gmail.com> <6E0D3434-F2E9-4B4D-B66E-78DE921BB2CF@holtmann.org>
- <CAEhWJF=pvMSz5XRp0vPyej6KBnD-frDYFggy55jEJv3ciXim_Q@mail.gmail.com> <AA8592C7-1D9D-4D05-A6D4-12B2220BF5F3@holtmann.org>
-From: Amitkumar Karwar <amitkarwar@gmail.com>
-Date: Thu, 30 Nov 2017 19:53:13 +0530
-Message-ID: <CAEhWJFk3BsW972aOwKWreFD5wDedWZxVmBaV66orkVvnjjtV0g@mail.gmail.com>
-Subject: Re: [PATCH 5/8] Bluetooth: btrsi: add new rsi bluetooth driver
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Kalle Valo <kvalo@codeaurora.org>,
-        linux-wireless <linux-wireless@vger.kernel.org>,
-        Amitkumar Karwar <amit.karwar@redpinesignals.com>,
-        Prameela Rani Garnepudi <prameela.j04cs@gmail.com>,
-        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-        Siva Rebbagondla <siva.rebbagondla@redpinesignals.com>
+From: bugzilla-daemon@bugzilla.kernel.org
+To: linux-bluetooth@kernel.org
+Subject: [Bug 198043] New: Bluetooth mgmt api set powered causes kernel race
+ condition
+Date: Thu, 30 Nov 2017 13:22:45 +0000
+Message-ID: <bug-198043-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, Nov 29, 2017 at 7:03 PM, Marcel Holtmann <marcel@holtmann.org> wrot=
-e:
-> Hi Amitkumar,
->
->>>> Redpine bluetooth driver is a thin driver which depends on
->>>> 'rsi_91x' driver for transmitting and receiving packets
->>>> to/from device. It creates hci interface when attach() is
->>>> called from 'rsi_91x' module.
->>>>
->>>> Signed-off-by: Prameela Rani Garnepudi <prameela.j04cs@gmail.com>
->>>> Signed-off-by: Siva Rebbagondla <siva.rebbagondla@redpinesignals.com>
->>>> Signed-off-by: Amitkumar Karwar <amit.karwar@redpinesignals.com>
->>>> ---
->>>> drivers/bluetooth/Kconfig   |  12 ++
->>>> drivers/bluetooth/Makefile  |   2 +
->>>> drivers/bluetooth/btrsi.c   | 268 ++++++++++++++++++++++++++++++++++++=
-++++++++
->>>> drivers/bluetooth/rsi_hci.h |  51 +++++++++
->>>> 4 files changed, 333 insertions(+)
->>>> create mode 100644 drivers/bluetooth/btrsi.c
->>>> create mode 100644 drivers/bluetooth/rsi_hci.h
->>>>
->>>> diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
->>>> index 60e1c7d..ca58d74 100644
->>>> --- a/drivers/bluetooth/Kconfig
->>>> +++ b/drivers/bluetooth/Kconfig
->>>> @@ -378,4 +378,16 @@ config BT_QCOMSMD
->>>>        Say Y here to compile support for HCI over Qualcomm SMD into th=
-e
->>>>        kernel or say M to compile as a module.
->>>>
->>>> +config BT_RSI
->>>> +     tristate "Redpine HCI support"
->>>> +     depends on BT && BT_RFCOMM
->>>
->>> the depends on BT_RFCOMM is wrong. And even the depends on BT is unneed=
-ed since that is already covered with the above menu clause.
->>>
->>>
->>>> +     default m
->>>
->>> No. New drivers are by default off.
->>
->> We made it by default on, as RSI core module depends on this.
->>
->>>
->>>> +     help
->>>> +       Redpine BT driver.
->>>> +       This driver handles BT traffic from upper layers and pass
->>>> +       to the RSI_91x coex module for further scheduling to device
->>>> +
->>>> +       Say Y here to compile support for HCI over Qualcomm SMD into t=
-he
->>>> +       kernel or say M to compile as a module.
->>>> +
->>>
->>> What I am missing is the depends on the RSI core piece that is needed.
->>
->> Actually RSI core module depends on RSI BT module as per our design.
->> As soon as firmware is downloaded by RSI core module, we get WLAN and
->> BT card ready frames from firmware. BT initialization has to happen at
->> this point. So btrsi module should be loaded first.
->
-> that should be solved by the dependencies and not by a default m.
+https://bugzilla.kernel.org/show_bug.cgi?id=198043
 
-Understood. I will take care of it and submit v3.
+            Bug ID: 198043
+           Summary: Bluetooth mgmt api set powered causes kernel race
+                    condition
+           Product: Drivers
+           Version: 2.5
+    Kernel Version: 4.10
+          Hardware: Other
+                OS: Linux
+              Tree: Mainline
+            Status: NEW
+          Severity: blocking
+          Priority: P1
+         Component: Bluetooth
+          Assignee: linux-bluetooth@vger.kernel.org
+          Reporter: matias.karhumaa@gmail.com
+        Regression: No
 
->
->>
->>>
->>>> endmenu
->>>> diff --git a/drivers/bluetooth/Makefile b/drivers/bluetooth/Makefile
->>>> index 4e4e44d..712af83a 100644
->>>> --- a/drivers/bluetooth/Makefile
->>>> +++ b/drivers/bluetooth/Makefile
->>>> @@ -28,6 +28,8 @@ obj-$(CONFIG_BT_QCA)                +=3D btqca.o
->>>>
->>>> obj-$(CONFIG_BT_HCIUART_NOKIA)        +=3D hci_nokia.o
->>>>
->>>> +obj-$(CONFIG_BT_RSI)         +=3D btrsi.o
->>>> +
->>>> btmrvl-y                      :=3D btmrvl_main.o
->>>> btmrvl-$(CONFIG_DEBUG_FS)     +=3D btmrvl_debugfs.o
->>>>
->>>> diff --git a/drivers/bluetooth/btrsi.c b/drivers/bluetooth/btrsi.c
->>>> new file mode 100644
->>>> index 0000000..c52f418
->>>> --- /dev/null
->>>> +++ b/drivers/bluetooth/btrsi.c
->>>> @@ -0,0 +1,268 @@
->>>> +/**
->>>> + * Copyright (c) 2017 Redpine Signals Inc.
->>>> + *
->>>> + * Permission to use, copy, modify, and/or distribute this software f=
-or any
->>>> + * purpose with or without fee is hereby granted, provided that the a=
-bove
->>>> + * copyright notice and this permission notice appear in all copies.
->>>> + *
->>>> + * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARR=
-ANTIES
->>>> + * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
->>>> + * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABL=
-E FOR
->>>> +e* ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAM=
-AGES
->>>> + * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN=
- AN
->>>> + * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O=
-UT OF
->>>> + * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
->>>> + */
->>>> +#include <linux/version.h>
->>>> +#include <linux/module.h>
->>>> +#include <linux/kernel.h>
->>>> +#include "rsi_hci.h"
->>>> +
->>>> +static struct rsi_mod_ops rsi_bt_ops =3D {
->>>> +     .attach =3D rsi_hci_attach,
->>>> +     .detach =3D rsi_hci_detach,
->>>> +     .recv_pkt =3D rsi_hci_recv_pkt,
->>>> +};
->>>> +
->>>> +static int rsi_hci_open(struct hci_dev *hdev)
->>>> +{
->>>> +     BT_INFO("%s open\n", hdev->name);
->>>
->>> No BT_INFO here. We are not spamming dmesg with pointless information. =
-And this applies to all of these.
->>>
->>>> +
->>>> +     return 0;
->>>> +}
->>>> +
->>>> +static int rsi_hci_close(struct hci_dev *hdev)
->>>> +{
->>>> +     BT_INFO("%s closed\n", hdev->name);
->>>> +
->>>> +     return 0;
->>>> +}
->>>> +
->>>> +static int rsi_hci_flush(struct hci_dev *hdev)
->>>> +{
->>>> +     BT_ERR("%s flush\n", hdev->name);
->>>> +
->>>> +     return 0;
->>>> +}
->>>> +
->>>> +static int rsi_hci_send_pkt(struct hci_dev *hdev, struct sk_buff *skb=
-)
->>>> +{
->>>> +     struct rsi_hci_adapter *h_adapter;
->>>
->>>                                        =3D hci_get_drvdata(dev);
->>>
->>> There is no need to do that separate.
->>>
->>>> +     struct sk_buff *new_skb =3D NULL;
->>>> +
->>>> +     int status =3D 0;
->>>> +
->>>> +     h_adapter =3D hci_get_drvdata(hdev);
->>>> +     if (!h_adapter) {
->>>> +             status =3D -EFAULT;
->>>> +             goto fail;
->>>> +     }
->>>
->>> And this error check seems unneeded since the Bluetooth core will never=
- call ->send unless it is all correctly set up.
->>>
->>>> +
->>>> +     if (h_adapter->fsm_state !=3D RSI_BT_FSM_DEVICE_READY) {
->>>> +             BT_INFO("BT Device not ready\n");
->>>> +             status =3D -ENODEV;
->>>> +             goto fail;
->>>> +     }
->>>
->>> Why are we registering a HCI device that might not be ready. This will =
-be a massive bug in the whole system. Also one that is not recoverable. If =
-something goes wrong, then lets unregister the HCI device.
->>>
->>>> +
->>>> +     if (!test_bit(HCI_RUNNING, &hdev->flags)) {
->>>> +             status =3D -EBUSY;
->>>> +             goto fail;
->>>> +     }
->>>
->>> This should no longer be needed. We moved this into the core and beside=
-s some old USB drivers, nobody is using this anymore.
->>>
->>>> +
->>>> +     switch (bt_cb(skb)->pkt_type) {
->>>> +     case HCI_COMMAND_PKT:
->>>> +             hdev->stat.cmd_tx++;
->>>> +             break;
->>>> +
->>>> +     case HCI_ACLDATA_PKT:
->>>> +             hdev->stat.acl_tx++;
->>>> +             break;
->>>> +
->>>> +     case HCI_SCODATA_PKT:
->>>> +             hdev->stat.sco_tx++;
->>>> +             break;
->>>> +
->>>> +     default:
->>>> +             dev_kfree_skb(skb);
->>>
->>> Don=E2=80=99t use dev_kfree_skb() here. I think the Bluetooth subsystem=
- is not ready for that.
->>>
->>>> +             status =3D -EILSEQ;
->>>> +             goto fail;
->>>> +     }
->>>> +
->>>> +     if (skb_headroom(skb) < RSI_HEADROOM_FOR_BT_HAL) {
->>>> +             /* Re-allocate one more skb with sufficent headroom */
->>>> +             /* Space for Descriptor (16 bytes) is required in head r=
-oom */
->>>> +             u16 new_len =3D skb->len + RSI_HEADROOM_FOR_BT_HAL;
->>>> +
->>>> +             new_skb =3D dev_alloc_skb(new_len);
->>>> +             if (!new_skb) {
->>>> +                     dev_kfree_skb(skb);
->>>> +                     return -ENOMEM;
->>>> +             }
->>>> +             skb_reserve(new_skb, RSI_HEADROOM_FOR_BT_HAL);
->>>> +             skb_put(new_skb, skb->len);
->>>> +             memcpy(new_skb->data, skb->data, skb->len);
->>>> +             bt_cb(new_skb)->pkt_type =3D bt_cb(skb)->pkt_type;
->>>> +             dev_kfree_skb(skb);
->>>> +             skb =3D new_skb;
->>>
->>> Just allocate a new skb with proper headroom. The data part can be shar=
-ed. Doing this fully manual is just a bad idea.
->>>
->>> I also get the feeling that long term we want to change the Bluetooth d=
-rivers to specify the required SKB headroom so that they always get SKBs th=
-at are large enough for their needs.
->>>
->>>> +     }
->>>> +     if (h_adapter->proto_ops->coex_send_pkt)
->>>> +             return h_adapter->proto_ops->coex_send_pkt(h_adapter->pr=
-iv, skb,
->>>> +                                                       RSI_BT_Q);
->>>
->>> This is worrisome. You need to send. If this callback is not available,=
- then better not register the HCI device at all.
->>>
->>>> +
->>>> +fail:
->>>> +     dev_kfree_skb(skb);
->>>> +     return status;
->>>> +}
->>>> +
->>>> +int rsi_hci_recv_pkt(void *priv, u8 *pkt)
->>>> +{
->>>> +     struct rsi_hci_adapter *h_adapter =3D (struct rsi_hci_adapter *)=
-priv;
->>>> +     struct hci_dev *hdev =3D NULL;
->>>> +     struct sk_buff *skb;
->>>> +     int pkt_len =3D (le16_to_cpu(*(__le16 *)pkt)) & 0x0fff;
->>>> +     u8 queue_no =3D (le16_to_cpu(*(__le16 *)pkt) & 0x7000) >> 12;
->>>
->>> We have get_unaligned_le16 helpers for this.
->>>
->>>> +
->>>> +     if (h_adapter->fsm_state !=3D RSI_BT_FSM_DEVICE_READY) {
->>>> +             BT_INFO("BT Device not ready\n");
->>>> +             return 0;
->>>> +     }
->>>
->>> Why call this function if the device is not ready? Can that not be chec=
-ked and the HCI device not be registered.
->>>
->>>> +
->>>> +     if (queue_no =3D=3D RSI_BT_MGMT_Q) {
->>>> +             u8 msg_type =3D pkt[14] & 0xFF;
->>>> +
->>>> +             switch (msg_type) {
->>>> +             case RSI_RESULT_CONFIRM:
->>>> +                     BT_INFO("BT Result Confirm\n");
->>>> +                     return 0;
->>>> +             case RSI_BT_BER:
->>>> +                     BT_INFO("BT Ber\n");
->>>> +                     return 0;
->>>> +             case RSI_BT_CW:
->>>> +                     BT_INFO("BT CW\n");
->>>> +                     return 0;
->>>> +             default:
->>>> +                     break;
->>>> +             }
->>>> +     }
->>>
->>> How noisy is this? Also no \n required for the BT_INFO functions. And h=
-ere bt_dev_info is preferred anyway.
->>>
->>>> +
->>>> +     skb =3D dev_alloc_skb(pkt_len);
->>>> +     if (!skb)
->>>> +             return -ENOMEM;
->>>> +
->>>> +     hdev =3D h_adapter->hdev;
->>>> +     memcpy(skb->data, pkt + RSI_FRAME_DESC_SIZE, pkt_len);
->>>> +     skb_put(skb, pkt_len);
->>>> +     h_adapter->hdev->stat.byte_rx +=3D skb->len;
->>>> +
->>>> +     skb->dev =3D (void *)hdev;
->>>> +     bt_cb(skb)->pkt_type =3D pkt[14];
->>>> +
->>>> +     return hci_recv_frame(hdev, skb);
->>>> +}
->>>> +EXPORT_SYMBOL_GPL(rsi_hci_recv_pkt);
->>>> +
->>>> +int rsi_hci_attach(void *priv, struct rsi_proto_ops *ops)
->>>> +{
->>>> +     struct rsi_hci_adapter *h_adapter =3D NULL;
->>>> +     struct hci_dev *hdev;
->>>> +     int status =3D 0;
->>>> +
->>>> +     h_adapter =3D kzalloc(sizeof(*h_adapter), GFP_KERNEL);
->>>> +     if (!h_adapter)
->>>> +             return -ENOMEM;
->>>> +
->>>> +     h_adapter->priv =3D priv;
->>>> +     ops->set_bt_context(priv, h_adapter);
->>>> +     h_adapter->proto_ops =3D ops;
->>>> +     ops->bt_ops =3D &rsi_bt_ops;
->>>> +     h_adapter->fsm_state =3D RSI_BT_FSM_DEVICE_READY;
->>>> +
->>>> +     hdev =3D hci_alloc_dev();
->>>> +     if (!hdev) {
->>>> +             BT_ERR("Failed to alloc HCI device\n");
->>>> +             goto err;
->>>> +     }
->>>> +     h_adapter->hdev =3D hdev;
->>>> +
->>>> +     if (ops->get_host_intf(priv) =3D=3D RSI_HOST_INTF_SDIO)
->>>> +             hdev->bus =3D HCI_SDIO;
->>>> +     else
->>>> +             hdev->bus =3D HCI_USB;
->>>> +
->>>> +     hci_set_drvdata(hdev, h_adapter);
->>>> +     hdev->dev_type =3D HCI_PRIMARY;
->>>> +     hdev->open =3D rsi_hci_open;
->>>> +     hdev->close =3D rsi_hci_close;
->>>> +     hdev->flush =3D rsi_hci_flush;
->>>> +     hdev->send =3D rsi_hci_send_pkt;
->>>> +
->>>> +     status =3D hci_register_dev(hdev);
->>>> +     if (status < 0) {
->>>> +             BT_ERR("%s: HCI registration failed with errcode %d\n",
->>>> +                    __func__, status);
->>>> +             goto err;
->>>> +     }
->>>> +
->>>> +     BT_INFO("%s interface created\n", hdev->name);
->>>> +
->>>> +     h_adapter->fsm_state =3D RSI_BT_FSM_DEVICE_READY;
->>>> +
->>>> +     return 0;
->>>> +
->>>> +err:
->>>> +     if (hdev) {
->>>> +             hci_unregister_dev(hdev);
->>>> +             hci_free_dev(hdev);
->>>> +             h_adapter->hdev =3D NULL;
->>>> +     }
->>>> +     kfree(h_adapter);
->>>> +
->>>> +     return -EINVAL;
->>>> +}
->>>> +
->>>> +void rsi_hci_detach(void *priv)
->>>> +{
->>>> +     struct rsi_hci_adapter *h_adapter =3D (struct rsi_hci_adapter *)=
-priv;
->>>> +     struct hci_dev *hdev;
->>>> +
->>>> +     if (!h_adapter)
->>>> +             return;
->>>> +
->>>> +     hdev =3D h_adapter->hdev;
->>>> +
->>>> +     BT_INFO("Detaching %s\n", hdev->name);
->>>> +
->>>> +     if (hdev) {
->>>> +             hci_unregister_dev(hdev);
->>>> +             hci_free_dev(hdev);
->>>> +             h_adapter->hdev =3D NULL;
->>>> +     }
->>>> +
->>>> +     kfree(h_adapter);
->>>> +     h_adapter->fsm_state =3D RSI_BT_FSM_DEVICE_NOT_READY;
->>>> +}
->>>> +
->>>> +struct rsi_mod_ops *rsi_get_hci_ops(void)
->>>> +{
->>>> +     return &rsi_bt_ops;
->>>> +};
->>>> +EXPORT_SYMBOL_GPL(rsi_get_hci_ops);
->>>> +
->>>> +static int rsi_91x_bt_module_init(void)
->>>> +{
->>>> +     BT_INFO("%s: BT Module init called\n", __func__);
->>>> +
->>>> +     return 0;
->>>> +}
->>>> +
->>>> +static void rsi_91x_bt_module_exit(void)
->>>> +{
->>>> +     BT_INFO("%s: BT Module exit called\n", __func__);
->>>> +}
->>>> +
->>>> +module_init(rsi_91x_bt_module_init);
->>>> +module_exit(rsi_91x_bt_module_exit);
->>>> +MODULE_AUTHOR("Redpine Signals Inc");
->>>> +MODULE_DESCRIPTION("RSI BT driver");
->>>> +MODULE_SUPPORTED_DEVICE("RSI-BT");
->>>> +MODULE_LICENSE("Dual BSD/GPL");
->>>> diff --git a/drivers/bluetooth/rsi_hci.h b/drivers/bluetooth/rsi_hci.h
->>>> new file mode 100644
->>>> index 0000000..6f44231
->>>> --- /dev/null
->>>> +++ b/drivers/bluetooth/rsi_hci.h
->>>> @@ -0,0 +1,51 @@
->>>> +/**
->>>> + * Copyright (c) 2017 Redpine Signals Inc.
->>>> + *
->>>> + * Permission to use, copy, modify, and/or distribute this software f=
-or any
->>>> + * purpose with or without fee is hereby granted, provided that the a=
-bove
->>>> + * copyright notice and this permission notice appear in all copies.
->>>> + *
->>>> + * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARR=
-ANTIES
->>>> + * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
->>>> + * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABL=
-E FOR
->>>> + * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAM=
-AGES
->>>> + * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN=
- AN
->>>> + * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O=
-UT OF
->>>> + * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
->>>> + */
->>>> +
->>>> +#ifndef __RSI_HCI_H__
->>>> +#define __RSI_HCI_H__
->>>> +
->>>> +#include <net/bluetooth/bluetooth.h>
->>>> +#include <net/bluetooth/hci_core.h>
->>>> +#include <linux/rsi_header.h>
->>>> +#include <net/genetlink.h>
->>>> +
->>>> +/* RX frame types */
->>>> +#define RSI_RESULT_CONFIRM                   0x80
->>>> +#define RSI_BT_PER                           0x10
->>>> +#define RSI_BT_BER                           0x11
->>>> +#define RSI_BT_CW                            0x12
->>>> +
->>>> +#define RSI_HEADROOM_FOR_BT_HAL      16
->>>> +
->>>> +enum bt_fsm_state {
->>>> +     RSI_BT_FSM_DEVICE_NOT_READY =3D 0,
->>>> +     RSI_BT_FSM_DEVICE_READY,
->>>> +};
->>>> +
->>>> +struct rsi_hci_adapter {
->>>> +     void *priv;
->>>> +     struct rsi_proto_ops *proto_ops;
->>>> +     enum bt_fsm_state fsm_state;
->>>> +     struct hci_dev *hdev;
->>>> +};
->>>
->>> If they are btrsi.c specific, they should be in btrsi.c and not in a he=
-ader file.
->>>
->>>> +
->>>> +#define RSI_FRAME_DESC_SIZE          16
->>>> +
->>>> +int rsi_hci_attach(void *priv, struct rsi_proto_ops *ops);
->>>> +void rsi_hci_detach(void *priv);
->>>> +int rsi_hci_recv_pkt(void *data, u8 *pkt);
->>>
->>> And this is the part I do not get. What is the deal with the rsi_bt_ops=
-. Having both exported is pointless.
->>
->> rsi core module initializes rsi_bt_ops by calling exported function
->> rsi_get_hci_ops().
->
-> Still exporting both is pointless. There are a few too many exports / pub=
-lic functions here. Make as much static as possible.
+It seems that Bluetooth management api set powered command and socket close may
+cause some kind of race condition in kernel. I used CSR 8510 Nanosira Bluetooth
+dongle on Ubuntu 16.04.3 LTS, Linux 4.10.0-40-generic #44~16.04.1-Ubuntu SMP
+Thu Nov 9 15:37:44 UTC 2017. I am able to reproduce this with simple proof of
+concept code by just looping following sequence:
 
-Sure. I have now removed unnecessary exports. I will submit v3 patch series=
-.
+* Open management socket
+* send Set Powered off command
+* send Set Powered on command
+* close management socket
 
-Regards,
-Amitkumar
+Running btmon at a same time causes hang too but gives different call trace.
+
+Here is a original snippet from kern.log:
+
+Nov 30 08:11:45 makarhum-e6330 kernel: [86926.837240] NMI watchdog: BUG: soft
+lockup - CPU#0 stuck for 22s! [java:22267]
+Nov 30 08:11:45 makarhum-e6330 kernel: [86926.837243] Modules linked in:
+nfnetlink_queue nfnetlink_log pci_stub vboxpci(OE) vboxnetadp(OE)
+vboxnetflt(OE) vboxdrv(OE) ipt_MASQUERADE nf_na
+t_masquerade_ipv4 nf_conntrack_netlink nfnetlink xfrm_user xfrm_algo
+iptable_nat nf_conntrack_ipv4 nf_defrag_ipv4 nf_nat_ipv4 xt_addrtype
+iptable_filter ip_tables xt_conntrack x_tables n
+f_nat nf_conntrack libcrc32c br_netfilter bridge stp llc aufs bnep binfmt_misc
+nls_iso8859_1 dm_crypt dell_wmi sparse_keymap intel_rapl x86_pkg_temp_thermal
+intel_powerclamp coretemp kvm
+_intel snd_hda_codec_hdmi kvm irqbypass crct10dif_pclmul crc32_pclmul
+ghash_clmulni_intel pcbc dell_laptop dell_smbios dcdbas snd_hda_codec_idt
+snd_hda_codec_generic dell_smm_hwmon snd_h
+da_intel btusb btrtl snd_hda_codec btbcm btintel snd_hda_core snd_hwdep
+bluetooth snd_pcm aesni_intel arc4
+Nov 30 08:11:45 makarhum-e6330 kernel: [86926.837268]  aes_x86_64 crypto_simd
+glue_helper cryptd snd_seq_midi snd_seq_midi_event snd_rawmidi intel_cstate
+intel_rapl_perf iwldvm joydev in
+put_leds mac80211 serio_raw snd_seq iwlwifi snd_seq_device snd_timer cfg80211
+snd lpc_ich soundcore mei_me mei shpchp mac_hid dell_rbtn dell_smo8800
+parport_pc ppdev lp parport autofs4 i
+915 psmouse i2c_algo_bit drm_kms_helper syscopyarea ahci sysfillrect sysimgblt
+e1000e fb_sys_fops libahci sdhci_pci drm sdhci ptp pps_core wmi fjes video
+Nov 30 08:11:45 makarhum-e6330 kernel: [86926.837287] CPU: 0 PID: 22267 Comm:
+java Tainted: G           OE   4.10.0-40-generic #44~16.04.1-Ubuntu
+Nov 30 08:11:45 makarhum-e6330 kernel: [86926.837287] Hardware name: Dell Inc.
+Latitude E6330/0JTDD3, BIOS A08 12/10/2012
+Nov 30 08:11:45 makarhum-e6330 kernel: [86926.837288] task: ffff8b40d08ac380
+task.stack: ffffa3aac3634000
+Nov 30 08:11:45 makarhum-e6330 kernel: [86926.837292] RIP:
+0010:queued_write_lock_slowpath+0x55/0x90
+Nov 30 08:11:45 makarhum-e6330 kernel: [86926.837292] RSP:
+0018:ffffa3aac3637dd0 EFLAGS: 00000206 ORIG_RAX: ffffffffffffff10
+Nov 30 08:11:45 makarhum-e6330 kernel: [86926.837293] RAX: 0000000000000101
+RBX: ffffffffc09badc8 RCX: 0000000000000000
+Nov 30 08:11:45 makarhum-e6330 kernel: [86926.837294] RDX: 00000000000000ff
+RSI: ffff8b40cb16b800 RDI: ffffffffc09badc8
+Nov 30 08:11:45 makarhum-e6330 kernel: [86926.837294] RBP: ffffa3aac3637de0
+R08: 0000000000000000 R09: 0000000000000000
+Nov 30 08:11:45 makarhum-e6330 kernel: [86926.837295] R10: 0000000000000002
+R11: ffff8b40169ebc00 R12: ffffffffc09badcc
+Nov 30 08:11:45 makarhum-e6330 kernel: [86926.837295] R13: ffff8b4077cb3c00
+R14: ffff8b40d49aef20 R15: ffff8b4071989a80
+Nov 30 08:11:45 makarhum-e6330 kernel: [86926.837296] FS: 
+00007f4af269c700(0000) GS:ffff8b40de200000(0000) knlGS:0000000000000000
+Nov 30 08:11:45 makarhum-e6330 kernel: [86926.837297] CS:  0010 DS: 0000 ES:
+0000 CR0: 0000000080050033
+Nov 30 08:11:45 makarhum-e6330 kernel: [86926.837297] CR2: 00007f4af1443040
+CR3: 000000018def9000 CR4: 00000000001406f0
+Nov 30 08:11:45 makarhum-e6330 kernel: [86926.837298] Call Trace:
+Nov 30 08:11:45 makarhum-e6330 kernel: [86926.837302] 
+_raw_write_lock+0x1e/0x20
+Nov 30 08:11:45 makarhum-e6330 kernel: [86926.837314]  bt_sock_unlink+0x1b/0x70
+[bluetooth]
+Nov 30 08:11:45 makarhum-e6330 kernel: [86926.837323] 
+hci_sock_release+0x57/0x1c0 [bluetooth]
+Nov 30 08:11:45 makarhum-e6330 kernel: [86926.837324]  sock_release+0x1f/0x80
+Nov 30 08:11:45 makarhum-e6330 kernel: [86926.837325]  sock_close+0x12/0x20
+Nov 30 08:11:45 makarhum-e6330 kernel: [86926.837327]  __fput+0xe7/0x220
+Nov 30 08:11:45 makarhum-e6330 kernel: [86926.837328]  ____fput+0xe/0x10
+Nov 30 08:11:45 makarhum-e6330 kernel: [86926.837329]  task_work_run+0x7e/0xa0
+Nov 30 08:11:45 makarhum-e6330 kernel: [86926.837331] 
+exit_to_usermode_loop+0xaa/0xb0
+Nov 30 08:11:45 makarhum-e6330 kernel: [86926.837332] 
+syscall_return_slowpath+0x59/0x60
+Nov 30 08:11:45 makarhum-e6330 kernel: [86926.837333] 
+entry_SYSCALL_64_fastpath+0xab/0xad
+Nov 30 08:11:45 makarhum-e6330 kernel: [86926.837334] RIP: 0033:0x7f4b11b2b8dd
+Nov 30 08:11:45 makarhum-e6330 kernel: [86926.837335] RSP:
+002b:00007f4af269ac50 EFLAGS: 00000293 ORIG_RAX: 0000000000000003
+Nov 30 08:11:45 makarhum-e6330 kernel: [86926.837335] RAX: 0000000000000000
+RBX: 00007f4af269ac80 RCX: 00007f4b11b2b8dd
+Nov 30 08:11:45 makarhum-e6330 kernel: [86926.837336] RDX: 00007f4aa0024df0
+RSI: 00007f4aa0000028 RDI: 0000000000000020
+Nov 30 08:11:45 makarhum-e6330 kernel: [86926.837336] RBP: 00007f4af269ac80
+R08: 00007f4aa0025070 R09: 00007f4ac04a0400
+Nov 30 08:11:45 makarhum-e6330 kernel: [86926.837337] R10: 00000000000003e9
+R11: 0000000000000293 R12: 00007f4aa0025070
+Nov 30 08:11:45 makarhum-e6330 kernel: [86926.837337] R13: 00007f4aa0024e00
+R14: 00007f4af269ad58 R15: 00007f4ac04b9800
+Nov 30 08:11:45 makarhum-e6330 kernel: [86926.837338] Code: ff 00 00 00 f0 0f
+b1 13 85 c0 74 31 ba 01 00 00 00 eb 02 f3 90 0f b6 03 84 c0 75 f7 f0 0f b0 13
+84 c0 75 ef ba ff 00 00 00 eb
+02 <f3> 90 8b 03 83 f8 01 75 f7 f0 0f b1 13 83 f8 01 75 ee 4c 89 e7
+Nov 30 08:11:45 makarhum-e6330 kernel: [86926.845241] NMI watchdog: BUG: soft
+lockup - CPU#3 stuck for 22s! [kworker/u9:2:13920]
+Nov 30 08:11:45 makarhum-e6330 kernel: [86926.845244] Modules linked in:
+nfnetlink_queue nfnetlink_log pci_stub vboxpci(OE) vboxnetadp(OE)
+vboxnetflt(OE) vboxdrv(OE) ipt_MASQUERADE nf_na
+t_masquerade_ipv4 nf_conntrack_netlink nfnetlink xfrm_user xfrm_algo
+iptable_nat nf_conntrack_ipv4 nf_defrag_ipv4 nf_nat_ipv4 xt_addrtype
+iptable_filter ip_tables xt_conntrack x_tables n
+f_nat nf_conntrack libcrc32c br_netfilter bridge stp llc aufs bnep binfmt_misc
+nls_iso8859_1 dm_crypt dell_wmi sparse_keymap intel_rapl x86_pkg_temp_thermal
+intel_powerclamp coretemp kvm
+_intel snd_hda_codec_hdmi kvm irqbypass crct10dif_pclmul crc32_pclmul
+ghash_clmulni_intel pcbc dell_laptop dell_smbios dcdbas snd_hda_codec_idt
+snd_hda_codec_generic dell_smm_hwmon snd_hda_intel btusb btrtl snd_hda_codec
+btbcm btintel snd_hda_core snd_hwdep bluetooth snd_pcm aesni_intel arc4
+Nov 30 08:11:45 makarhum-e6330 kernel: [86926.845270]  aes_x86_64 crypto_simd
+glue_helper cryptd snd_seq_midi snd_seq_midi_event snd_rawmidi intel_cstate
+intel_rapl_perf iwldvm joydev input_leds mac80211 serio_raw snd_seq iwlwifi
+snd_seq_device snd_timer cfg80211 snd lpc_ich soundcore mei_me mei shpchp
+mac_hid dell_rbtn dell_smo8800 parport_pc ppdev lp parport autofs4 i915 psmouse
+i2c_algo_bit drm_kms_helper syscopyarea ahci sysfillrect sysimgblt e1000e
+fb_sys_fops libahci sdhci_pci drm sdhci ptp pps_core wmi fjes video
+Nov 30 08:11:45 makarhum-e6330 kernel: [86926.845288] CPU: 3 PID: 13920 Comm:
+kworker/u9:2 Tainted: G           OEL  4.10.0-40-generic #44~16.04.1-Ubuntu
+Nov 30 08:11:45 makarhum-e6330 kernel: [86926.845289] Hardware name: Dell Inc.
+Latitude E6330/0JTDD3, BIOS A08 12/10/2012
+Nov 30 08:11:45 makarhum-e6330 kernel: [86926.845304] Workqueue: hci0
+hci_power_off [bluetooth]
+Nov 30 08:11:45 makarhum-e6330 kernel: [86926.845305] task: ffff8b40cd149680
+task.stack: ffffa3aac0e4c000
+Nov 30 08:11:45 makarhum-e6330 kernel: [86926.845308] RIP:
+0010:native_queued_spin_lock_slowpath+0x178/0x1a0
+Nov 30 08:11:45 makarhum-e6330 kernel: [86926.845308] RSP:
+0000:ffffa3aac0e4fc38 EFLAGS: 00000202 ORIG_RAX: ffffffffffffff10
+Nov 30 08:11:45 makarhum-e6330 kernel: [86926.845309] RAX: 0000000000000101
+RBX: ffffffffc09badc8 RCX: 0000000000000001
+Nov 30 08:11:45 makarhum-e6330 kernel: [86926.845310] RDX: 0000000000000101
+RSI: 0000000000000001 RDI: ffffffffc09badcc
+Nov 30 08:11:45 makarhum-e6330 kernel: [86926.845310] RBP: ffffa3aac0e4fc38
+R08: 0000000000000101 R09: ffff8b40d58032c0
+Nov 30 08:11:45 makarhum-e6330 kernel: [86926.845311] R10: ffff8b40d58032c0
+R11: ffff8b40159ece00 R12: ffffffffc09badcc
+Nov 30 08:11:45 makarhum-e6330 kernel: [86926.845311] R13: ffff8b40132a1600
+R14: 0000000000000000 R15: 0000000000000000
+Nov 30 08:11:45 makarhum-e6330 kernel: [86926.845312] FS: 
+0000000000000000(0000) GS:ffff8b40de380000(0000) knlGS:0000000000000000
+Nov 30 08:11:45 makarhum-e6330 kernel: [86926.845312] CS:  0010 DS: 0000 ES:
+0000 CR0: 0000000080050033
+Nov 30 08:11:45 makarhum-e6330 kernel: [86926.845313] CR2: 00007f4af9a7e09d
+CR3: 000000005c209000 CR4: 00000000001406e0
+Nov 30 08:11:45 makarhum-e6330 kernel: [86926.845314] Call Trace:
+Nov 30 08:11:45 makarhum-e6330 kernel: [86926.845316] 
+queued_read_lock_slowpath+0x8d/0xa0
+Nov 30 08:11:45 makarhum-e6330 kernel: [86926.845318]  _raw_read_lock+0x23/0x30
+Nov 30 08:11:45 makarhum-e6330 kernel: [86926.845328] 
+hci_send_to_channel+0x33/0xf0 [bluetooth]
+Nov 30 08:11:45 makarhum-e6330 kernel: [86926.845336] 
+hci_send_monitor_ctrl_event+0x167/0x1a0 [bluetooth]
+Nov 30 08:11:45 makarhum-e6330 kernel: [86926.845344] 
+mgmt_send_event+0x108/0x120 [bluetooth]
+Nov 30 08:11:45 makarhum-e6330 kernel: [86926.845352]  new_settings+0x53/0x70
+[bluetooth]
+Nov 30 08:11:45 makarhum-e6330 kernel: [86926.845360] 
+__mgmt_power_off+0xaf/0x120 [bluetooth]
+Nov 30 08:11:45 makarhum-e6330 kernel: [86926.845366] 
+hci_dev_do_close+0x4c8/0x500 [bluetooth]
+Nov 30 08:11:45 makarhum-e6330 kernel: [86926.845373]  hci_power_off+0x1e/0x50
+[bluetooth]
+Nov 30 08:11:45 makarhum-e6330 kernel: [86926.845375] 
+process_one_work+0x16b/0x4a0
+Nov 30 08:11:45 makarhum-e6330 kernel: [86926.845376]  worker_thread+0x4b/0x500
+Nov 30 08:11:45 makarhum-e6330 kernel: [86926.845377]  kthread+0x109/0x140
+Nov 30 08:11:45 makarhum-e6330 kernel: [86926.845378]  ?
+process_one_work+0x4a0/0x4a0
+Nov 30 08:11:45 makarhum-e6330 kernel: [86926.845380]  ?
+kthread_create_on_node+0x60/0x60
+Nov 30 08:11:45 makarhum-e6330 kernel: [86926.845381]  ret_from_fork+0x2c/0x40
+Nov 30 08:11:45 makarhum-e6330 kernel: [86926.845382] Code: 31 c0 41 39 c0 74
+e6 4d 85 c9 c6 07 01 74 30 41 c7 41 08 01 00 00 00 e9 51 ff ff ff 83 fa 01 0f
+84 af fe ff ff 8b 07 84 c0 74 08 <f3> 90 8b 07 84 c0 75 f8 b8 01 00 00 00 66 89
+07 5d c3 f3 90 4c
+
+-- 
+You are receiving this mail because:
+You are the assignee for the bug.
