@@ -1,53 +1,24 @@
-Return-Path: <david@lechnology.com>
-From: David Lechner <david@lechnology.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Date: Fri, 1 Dec 2017 11:46:42 -0800
+From: Kevin Snow <Kevin@MynaBay.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: David Lechner <david@lechnology.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] bluetooth: serdev: hci_ll: Wait for CTS instead of using msleep
-Date: Sat,  2 Dec 2017 20:43:55 -0600
-Message-Id: <1512269035-21710-1-git-send-email-david@lechnology.com>
+Message-ID: <etPan.5a21b1a2.4bcf8189.3551@mynabay.com>
+Subject: BlueZ Help
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When a TI Bluetooth chip is reset, it takes about 100ms for the RTS line of
-the chip to deassert. For my use case with a TI CC2560A chip, this delay
-was not long enough and caused the local UART to never transmit at all (TI
-AM1808 SoC UART2).
+ 
+We have a product using BlueZ. The device has both BLE and BR/EDR (for Audio). When attempting to make a BLE connection from some Android devices, the connection establishes as BR/EDR. Thus, our service UUID isn’t visible and can’t be accessed. I’ve been told this is per the Bluetooth Spec, although I’ve been unable to find it in the spec. Additionally,I don’t understand why the spec would do this as it effectively makes dual mode (both BLE and BR/EDR) worthless if the connection will be BR/EDR. This problem does not happen with Apple devices. They always connect as BLE. Many Android are fine too, just not all.  
 
-We can wait for the CTS signal using serdev_device_wait_for_cts() instead
-of trying to guess using msleep().
+One workaround would be to expose the BLE service via BR/EDR. Has anyone done this?  
 
-Also changed the comment to be more informative while we are touching this
-code.
+We’re very eager to wrap this up. Is there a BlueZ expert out there open to a short term contract to help us through this? Any modifications made to BlueZ would of course become part of the open source. We don’t want anything custom, just for our product to be completed.  
 
-Signed-off-by: David Lechner <david@lechnology.com>
----
- drivers/bluetooth/hci_ll.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+Thanks  
 
-diff --git a/drivers/bluetooth/hci_ll.c b/drivers/bluetooth/hci_ll.c
-index 1f6b933..b295cf8 100644
---- a/drivers/bluetooth/hci_ll.c
-+++ b/drivers/bluetooth/hci_ll.c
-@@ -674,11 +674,15 @@ static int ll_setup(struct hci_uart *hu)
- 	serdev_device_set_flow_control(serdev, true);
- 
- 	do {
--		/* Configure BT_EN to HIGH state */
-+		/* Reset the Bluetooth device */
- 		gpiod_set_value_cansleep(lldev->enable_gpio, 0);
- 		msleep(5);
- 		gpiod_set_value_cansleep(lldev->enable_gpio, 1);
--		msleep(100);
-+		err = serdev_device_wait_for_cts(serdev, true, 200);
-+		if (err) {
-+			bt_dev_err(hu->hdev, "Failed to get CTS");
-+			return err;
-+		}
- 
- 		err = download_firmware(lldev);
- 		if (!err)
--- 
-2.7.4
+Kevin Snow  
+kevin@mynabay.com
+
+
