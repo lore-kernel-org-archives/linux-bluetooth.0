@@ -1,67 +1,46 @@
-Return-Path: <amitkarwar@gmail.com>
-From: Amitkumar Karwar <amitkarwar@gmail.com>
-To: Kalle Valo <kvalo@codeaurora.org>,
-	marcel@holtmann.org
-Cc: linux-wireless@vger.kernel.org,
-	Amitkumar Karwar <amit.karwar@redpinesignals.com>,
-	Prameela Rani Garnepudi <prameela.j04cs@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Subject: [v3 0/8] rsi: add bluetooth and coex support
-Date: Fri,  1 Dec 2017 13:11:17 +0530
-Message-Id: <1512114085-2615-1-git-send-email-amitkarwar@gmail.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
+Subject: Re: [PATCH] Bluetooth: btsdio: Do not bind to non-removable BCM43341
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20171129192907.27969-1-hdegoede@redhat.com>
+Date: Fri, 1 Dec 2017 08:26:41 +0100
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-bluetooth@vger.kernel.org, stable@vger.kernel.org
+Message-Id: <A2528688-FC8C-4F80-9B29-80FD26329F7B@holtmann.org>
+References: <20171129192907.27969-1-hdegoede@redhat.com>
+To: Hans de Goede <hdegoede@redhat.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Amitkumar Karwar <amit.karwar@redpinesignals.com>
+Hi Hans,
 
-This patch series adds new bluetooth driver and coex enhancments
-in existing wlan driver for RSI chipsets.
-As per our architecture, both wlan and bluetooth drivers talk
-over same SDIO interface to device. Separate endpoint will be
-used in case of USB interface.
+> BCM43341 devices soldered onto the PCB (non-removable) always (AFAICT)
+> use an UART connection for bluetooth. But they also advertise btsdio
+> support on their 3th sdio function, this causes 2 problems:
+> 
+> 1) A non functioning BT HCI getting registered
+> 
+> 2) Since the btsdio driver does not have suspend/resume callbacks,
+> mmc_sdio_pre_suspend will return -ENOSYS, causing mmc_pm_notify()
+> to react as if the SDIO-card is removed and since the slot is
+> marked as non-removable it will never get detected as inserted again.
+> Which results in wifi no longer working after a suspend/resume.
+> 
+> This commit fixes both by making btsdio ignore BCM43341 devices
+> when connected to a slot which is marked non-removable.
+> 
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+> ---
+> drivers/bluetooth/btsdio.c | 10 ++++++++++
+> 1 file changed, 10 insertions(+)
 
-Changes in v3: 5/8 and 6/8 patches are modified
-Changes in v2: 2/8, 5/8 and 6/8 patches are modified
+patch has been applied to bluetooth-next tree.
 
-Prameela Rani Garnepudi (6):
-  rsi: add rx control block to handle rx packets in USB
-  rsi: add header file rsi_header
-  rsi: add coex support
-  Bluetooth: btrsi: add new rsi bluetooth driver
-  rsi: add module parameter operating mode
-  rsi: sdio changes to support BT
+Regards
 
-Siva Rebbagondla (2):
-  rsi: add bluetooth rx endpoint
-  rsi: handle BT traffic in driver
+Marcel
 
- drivers/bluetooth/Kconfig                   |  11 ++
- drivers/bluetooth/Makefile                  |   2 +
- drivers/bluetooth/btrsi.c                   | 211 ++++++++++++++++++++++++++++
- drivers/bluetooth/rsi_hci.h                 |  40 ++++++
- drivers/net/wireless/rsi/Kconfig            |   2 +-
- drivers/net/wireless/rsi/Makefile           |   1 +
- drivers/net/wireless/rsi/rsi_91x_coex.c     | 184 ++++++++++++++++++++++++
- drivers/net/wireless/rsi/rsi_91x_core.c     |  16 ++-
- drivers/net/wireless/rsi/rsi_91x_hal.c      |  56 ++++++--
- drivers/net/wireless/rsi/rsi_91x_main.c     | 110 ++++++++++++++-
- drivers/net/wireless/rsi/rsi_91x_mgmt.c     |   2 +-
- drivers/net/wireless/rsi/rsi_91x_sdio.c     |  13 +-
- drivers/net/wireless/rsi/rsi_91x_sdio_ops.c |   5 +-
- drivers/net/wireless/rsi/rsi_91x_usb.c      | 124 +++++++++++-----
- drivers/net/wireless/rsi/rsi_91x_usb_ops.c  |  35 +++--
- drivers/net/wireless/rsi/rsi_coex.h         |  38 +++++
- drivers/net/wireless/rsi/rsi_common.h       |   5 +-
- drivers/net/wireless/rsi/rsi_hal.h          |  21 +++
- drivers/net/wireless/rsi/rsi_main.h         |  20 +--
- drivers/net/wireless/rsi/rsi_mgmt.h         |   3 +
- drivers/net/wireless/rsi/rsi_usb.h          |  16 ++-
- include/linux/rsi_header.h                  |  56 ++++++++
- 22 files changed, 888 insertions(+), 83 deletions(-)
- create mode 100644 drivers/bluetooth/btrsi.c
- create mode 100644 drivers/bluetooth/rsi_hci.h
- create mode 100644 drivers/net/wireless/rsi/rsi_91x_coex.c
- create mode 100644 drivers/net/wireless/rsi/rsi_coex.h
- create mode 100644 include/linux/rsi_header.h
-
--- 
-2.7.4
