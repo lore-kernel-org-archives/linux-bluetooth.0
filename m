@@ -1,42 +1,41 @@
-Return-Path: <linux-kernel-owner@vger.kernel.org>
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
-Subject: Re: [PATCH] bluetooth: serdev: hci_ll: Wait for CTS instead of using
- msleep
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1512269035-21710-1-git-send-email-david@lechnology.com>
-Date: Sun, 3 Dec 2017 20:24:04 +0100
-Cc: "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-        "Gustavo F. Padovan" <gustavo@padovan.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-kernel@vger.kernel.org
-Message-Id: <F488D1A7-F38F-4930-979C-E30881E11AA9@holtmann.org>
-References: <1512269035-21710-1-git-send-email-david@lechnology.com>
-To: David Lechner <david@lechnology.com>
-Sender: linux-kernel-owner@vger.kernel.org
+Return-Path: <david@lechnology.com>
+From: David Lechner <david@lechnology.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: David Lechner <david@lechnology.com>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] bluetooth: hci_ll: remove \n from kernel messages
+Date: Sat,  2 Dec 2017 21:01:58 -0600
+Message-Id: <1512270118-31737-1-git-send-email-david@lechnology.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi David,
+The bt_* printk macros include a \n already, so we don't need extra ones
+here.
 
-> When a TI Bluetooth chip is reset, it takes about 100ms for the RTS line of
-> the chip to deassert. For my use case with a TI CC2560A chip, this delay
-> was not long enough and caused the local UART to never transmit at all (TI
-> AM1808 SoC UART2).
-> 
-> We can wait for the CTS signal using serdev_device_wait_for_cts() instead
-> of trying to guess using msleep().
-> 
-> Also changed the comment to be more informative while we are touching this
-> code.
-> 
-> Signed-off-by: David Lechner <david@lechnology.com>
-> ---
-> drivers/bluetooth/hci_ll.c | 8 ++++++--
-> 1 file changed, 6 insertions(+), 2 deletions(-)
+Signed-off-by: David Lechner <david@lechnology.com>
+---
+ drivers/bluetooth/hci_ll.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-patch has been applied to bluetooth-next tree.
-
-Regards
-
-Marcel
+diff --git a/drivers/bluetooth/hci_ll.c b/drivers/bluetooth/hci_ll.c
+index 42142be..0f0a3a2 100644
+--- a/drivers/bluetooth/hci_ll.c
++++ b/drivers/bluetooth/hci_ll.c
+@@ -628,11 +628,11 @@ static int download_firmware(struct ll_device *lldev)
+ 				break;
+ 			}
+ 			if (cmd->prefix != 1)
+-				bt_dev_dbg(lldev->hu.hdev, "command type %d\n", cmd->prefix);
++				bt_dev_dbg(lldev->hu.hdev, "command type %d", cmd->prefix);
+ 
+ 			skb = __hci_cmd_sync(lldev->hu.hdev, cmd->opcode, cmd->plen, &cmd->speed, HCI_INIT_TIMEOUT);
+ 			if (IS_ERR(skb)) {
+-				bt_dev_err(lldev->hu.hdev, "send command failed\n");
++				bt_dev_err(lldev->hu.hdev, "send command failed");
+ 				err = PTR_ERR(skb);
+ 				goto out_rel_fw;
+ 			}
+-- 
+2.7.4
