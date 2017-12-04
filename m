@@ -1,46 +1,49 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Date: Mon, 4 Dec 2017 14:36:06 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Steve Brown <sbrown@cortland.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: meshctl: Can't connect via Node Identity advertisement
-Message-ID: <20171204123606.GA29257@x1c.lan>
-References: <1512344374.16639.18.camel@ewol.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1512344374.16639.18.camel@ewol.com>
+In-Reply-To: <bf9cb175-d8ae-6b6d-6a05-90b087ac4b49@jp.fujitsu.com>
+References: <bf9cb175-d8ae-6b6d-6a05-90b087ac4b49@jp.fujitsu.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Mon, 4 Dec 2017 14:21:53 +0200
+Message-ID: <CABBYNZKgood+9Jcmu9RT5o2YfxS8e4BLDw5RXFMS20WKbs5jow@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] tools/obexctl: Fix display of size/time during transfer
+To: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Steve,
+Hi Eramoto,
 
-On Sun, Dec 03, 2017, Steve Brown wrote:
-> Connect via Net ID works without a problem.
-> 
-> I'm using meshctl with zephyr's mesh_shell (upstream version)
-> 
-> I provision the shell and turn on it's gatt-proxy. Then I exit meshctl,
-> run it again and issue a "connect 0". It reconnects to the mesh without
->  a problem.
-> 
-> If I turn off the shell's gatt-proxy, start meshctl, issue a 
-> "connect 0" and then issue a shell "ident". I get no connection. The
-> ident command only transmits advertisements for a short period of time.
-> 
-> The CONN_TYPE_IDENTITY path in parse_mesh_service_data() seems broken.
-> The comparison of data[0] and connection.type fails. The value of
-> data[0] is 1 (CONN_TYPE_IDENTITY) and the value of connection.type is
-> 0.
+On Wed, Nov 29, 2017 at 10:29 AM, ERAMOTO Masaya
+<eramoto.masaya@jp.fujitsu.com> wrote:
+> When obexctl is run after starting to transfer a file, the transferred
+> size and the remaining time will be extreme values first as below:
+>
+>   [NEW] Transfer /org/bluez/obex/server/session8/transfer6
+>   [CHG] Transfer /org/bluez/obex/server/session8/transfer6 Transferred: 1670741 (@1670KB/s 03:52)
+>   [CHG] Transfer /org/bluez/obex/server/session8/transfer6 Transferred: 1703502 (@32KB/s 197:14)
+>   [CHG] Transfer /org/bluez/obex/server/session8/transfer6 Transferred: 1736263 (@32KB/s 197:13)
+> ---
+>  tools/obexctl.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/tools/obexctl.c b/tools/obexctl.c
+> index ece50f682..33ee180a3 100644
+> --- a/tools/obexctl.c
+> +++ b/tools/obexctl.c
+> @@ -2319,7 +2319,7 @@ static void transfer_added(GDBusProxy *proxy)
+>
+>         data = g_new0(struct transfer_data, 1);
+>
+> -       if (g_dbus_proxy_get_property(proxy, "Transfered", &iter))
+> +       if (g_dbus_proxy_get_property(proxy, "Transferred", &iter))
+>                 dbus_message_iter_get_basic(&iter, &data->transferred);
+>
+>         if (g_dbus_proxy_get_property(proxy, "Size", &iter))
+> --
+> 2.14.1
 
-Looking at mesh/main.c it seems to me like the connect command is
-currently only desgined for connecting to Network Identity
-advertisements (which is also implied by the fact that it takes a NetKey
-Index as an optional parameter value).
+Applied, thanks.
 
-What would be needed is some command which takes an element address
-rather than a NetKey Index as input. Just thinking out loud, but maybe
-"connect" should be renamed to "connect-net" and then a new
-"connect-node" command could be introduced that would look for Node
-Identity advertisements?
-
-Johan
+-- 
+Luiz Augusto von Dentz
