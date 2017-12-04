@@ -1,59 +1,143 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <etPan.5a21b1a2.4bcf8189.3551@mynabay.com>
-References: <etPan.5a21b1a2.4bcf8189.3551@mynabay.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 4 Dec 2017 11:53:32 +0200
-Message-ID: <CABBYNZLk+Vkfj4wbXLjtmmehiXHq0jCpn1qOTnG6H8GSN-aQhg@mail.gmail.com>
-Subject: Re: BlueZ Help
-To: Kevin Snow <Kevin@mynabay.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+From: Jaganath Kanakkassery <jaganath.k.os@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
+Subject: [RFC 9/9] Bluetooth: Implement secondary advertising on different PHYs
+Date: Mon,  4 Dec 2017 13:37:53 +0530
+Message-Id: <1512374873-1956-10-git-send-email-jaganathx.kanakkassery@intel.com>
+In-Reply-To: <1512374873-1956-1-git-send-email-jaganathx.kanakkassery@intel.com>
+References: <1512374873-1956-1-git-send-email-jaganathx.kanakkassery@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Kevin,
+This patch adds support for advertising in primary and secondary
+channel on different PHYs. User can add the phy preference in
+the flag based on which phy type will be added in extended
+advertising parameter would be set.
 
-On Fri, Dec 1, 2017 at 9:46 PM, Kevin Snow <Kevin@mynabay.com> wrote:
->
-> We have a product using BlueZ. The device has both BLE and BR/EDR (for Au=
-dio). When attempting to make a BLE connection from some Android devices, t=
-he connection establishes as BR/EDR. Thus, our service UUID isn=E2=80=99t v=
-isible and can=E2=80=99t be accessed. I=E2=80=99ve been told this is per th=
-e Bluetooth Spec, although I=E2=80=99ve been unable to find it in the spec.=
- Additionally,I don=E2=80=99t understand why the spec would do this as it e=
-ffectively makes dual mode (both BLE and BR/EDR) worthless if the connectio=
-n will be BR/EDR. This problem does not happen with Apple devices. They alw=
-ays connect as BLE. Many Android are fine too, just not all.
+Signed-off-by: Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
+---
+ include/net/bluetooth/hci.h  |  6 +++++-
+ include/net/bluetooth/mgmt.h |  6 ++++++
+ net/bluetooth/hci_request.c  | 18 +++++++++++++++---
+ net/bluetooth/mgmt.c         | 18 ++++++++++++++++--
+ 4 files changed, 42 insertions(+), 6 deletions(-)
 
-I guess this depends on how old the Android is, previously 4.0 spec
-did not allow connecting on LE. Btw, how are you advertising?
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 1337fbf..40a22e2 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -398,6 +398,8 @@ enum {
+ #define HCI_LE_SLAVE_FEATURES		0x08
+ #define HCI_LE_PING			0x10
+ #define HCI_LE_DATA_LEN_EXT		0x20
++#define HCI_LE_PHY_2M			0x01
++#define HCI_LE_PHY_CODED		0x08
+ #define HCI_LE_EXT_ADV			0x10
+ #define HCI_LE_EXT_SCAN_POLICY		0x80
+ 
+@@ -1507,7 +1509,9 @@ struct hci_cp_le_set_ext_scan_params {
+         __u8	data[0];
+ } __packed;
+ 
+-#define LE_PHY_1M 0x01
++#define LE_PHY_1M 	0x01
++#define LE_PHY_2M 	0x02
++#define LE_PHY_CODED	0x03
+ 
+ struct hci_cp_le_scan_phy_params {
+         __u8	type;
+diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+index 72a456b..f1055dd 100644
+--- a/include/net/bluetooth/mgmt.h
++++ b/include/net/bluetooth/mgmt.h
+@@ -561,6 +561,12 @@ struct mgmt_rp_add_advertising {
+ #define MGMT_ADV_FLAG_TX_POWER		BIT(4)
+ #define MGMT_ADV_FLAG_APPEARANCE	BIT(5)
+ #define MGMT_ADV_FLAG_LOCAL_NAME	BIT(6)
++#define MGMT_ADV_FLAG_SEC_1M 		BIT(7)
++#define MGMT_ADV_FLAG_SEC_2M 		BIT(8)
++#define MGMT_ADV_FLAG_SEC_CODED 	BIT(9)
++
++#define MGMT_ADV_FLAG_SEC_MASK	(MGMT_ADV_FLAG_SEC_1M | MGMT_ADV_FLAG_SEC_2M | \
++				 MGMT_ADV_FLAG_SEC_CODED)
+ 
+ #define MGMT_OP_REMOVE_ADVERTISING	0x003F
+ struct mgmt_cp_remove_advertising {
+diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
+index 9d0a940..68c2f18 100644
+--- a/net/bluetooth/hci_request.c
++++ b/net/bluetooth/hci_request.c
+@@ -1590,7 +1590,8 @@ static void __hci_req_setup_ext_adv_instance(struct hci_request *req,
+ 		return;
+ 
+ 	secondary_adv = (adv_inst->adv_data_len > HCI_MAX_AD_LENGTH ||
+-			 adv_inst->scan_rsp_len > HCI_MAX_AD_LENGTH);
++			 adv_inst->scan_rsp_len > HCI_MAX_AD_LENGTH ||
++			 flags & MGMT_ADV_FLAG_SEC_MASK);
+ 
+ 	if (connectable) {
+ 		if (secondary_adv)
+@@ -1612,8 +1613,19 @@ static void __hci_req_setup_ext_adv_instance(struct hci_request *req,
+ 	cp.own_addr_type = own_addr_type;
+ 	cp.channel_map = hdev->le_adv_channel_map;
+ 	cp.tx_power = 127;
+-	cp.primary_phy = LE_PHY_1M;
+-	cp.secondary_phy = LE_PHY_1M;
++
++	if (flags & MGMT_ADV_FLAG_SEC_2M){
++		cp.primary_phy = LE_PHY_1M;
++		cp.secondary_phy = LE_PHY_2M;
++	} else if (flags & MGMT_ADV_FLAG_SEC_CODED) {
++		cp.primary_phy = LE_PHY_CODED;
++		cp.secondary_phy = LE_PHY_CODED;
++	} else {
++		/* In all other cases use 1M */
++		cp.primary_phy = LE_PHY_1M;
++		cp.secondary_phy = LE_PHY_1M;
++	}
++
+ 	cp.handle = instance;
+ 
+ 	hci_req_add(req, HCI_OP_LE_SET_EXT_ADV_PARAMS, sizeof(cp), &cp);
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 120da46..68cf080 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -5996,6 +5996,16 @@ static u32 get_supported_adv_flags(struct hci_dev *hdev)
+ 	flags |= MGMT_ADV_FLAG_APPEARANCE;
+ 	flags |= MGMT_ADV_FLAG_LOCAL_NAME;
+ 
++	if (ext_adv_capable(hdev)) {
++		flags |= MGMT_ADV_FLAG_SEC_1M;
++
++		if (hdev->le_features[1] & HCI_LE_PHY_2M)
++			flags |= MGMT_ADV_FLAG_SEC_2M;
++
++		if (hdev->le_features[1] & HCI_LE_PHY_CODED)
++			flags |= MGMT_ADV_FLAG_SEC_CODED;
++	}
++
+ 	if (hdev->adv_tx_power != HCI_TX_POWER_INVALID)
+ 		flags |= MGMT_ADV_FLAG_TX_POWER;
+ 
+@@ -6246,10 +6256,14 @@ static int add_advertising(struct sock *sk, struct hci_dev *hdev,
+ 	duration = __le16_to_cpu(cp->duration);
+ 
+ 	/* The current implementation only supports a subset of the specified
+-	 * flags.
++	 * flags. Also need to check mutual exclusiveness of sec flags.
+ 	 */
+ 	supported_flags = get_supported_adv_flags(hdev);
+-	if (flags & ~supported_flags)
++	if (flags & ~supported_flags ||
++	    ((flags & MGMT_ADV_FLAG_SEC_MASK) != 0 &&
++	     (flags & MGMT_ADV_FLAG_SEC_MASK) != MGMT_ADV_FLAG_SEC_1M &&
++	     (flags & MGMT_ADV_FLAG_SEC_MASK) != MGMT_ADV_FLAG_SEC_2M &&
++	     (flags & MGMT_ADV_FLAG_SEC_MASK) != MGMT_ADV_FLAG_SEC_CODED))
+ 		return mgmt_cmd_status(sk, hdev->id, MGMT_OP_ADD_ADVERTISING,
+ 				       MGMT_STATUS_INVALID_PARAMS);
+ 
+-- 
+2.7.4
 
-> One workaround would be to expose the BLE service via BR/EDR. Has anyone =
-done this?
-
-I suppose you are talking about GATT services, we will need to do some
-fixes in order to support this, I will have a look into this since
-that is mandatory for qualification.
-
-> We=E2=80=99re very eager to wrap this up. Is there a BlueZ expert out the=
-re open to a short term contract to help us through this? Any modifications=
- made to BlueZ would of course become part of the open source. We don=E2=80=
-=99t want anything custom, just for our product to be completed.
->
-> Thanks
->
-> Kevin Snow
-> kevin@mynabay.com
->
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth=
-" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-
---=20
-Luiz Augusto von Dentz
