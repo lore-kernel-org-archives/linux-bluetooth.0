@@ -1,38 +1,55 @@
-Return-Path: <netdev-owner@vger.kernel.org>
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
-Subject: Re: [PATCH 2/3] bluetooth: hci_ll: add constant for vendor-specific
- command
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1512357682-8911-3-git-send-email-david@lechnology.com>
-Date: Mon, 4 Dec 2017 07:23:13 +0100
-Cc: devicetree <devicetree@vger.kernel.org>,
-        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-        Rob Herring <robh+dt@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        "Gustavo F. Padovan" <gustavo@padovan.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Message-Id: <5C65FB74-D7FD-4653-993A-5A68AD844A41@holtmann.org>
-References: <1512357682-8911-1-git-send-email-david@lechnology.com>
- <1512357682-8911-3-git-send-email-david@lechnology.com>
-To: David Lechner <david@lechnology.com>
-Sender: netdev-owner@vger.kernel.org
+Return-Path: <chiu@endlessm.com>
+MIME-Version: 1.0
+In-Reply-To: <CAB4CAwePAWex=YHpNVc+j72r-hE7X0S+fZuDRO087zGXMZVf6A@mail.gmail.com>
+References: <CAB4CAwc9GiF9EdzoZ2wUxvXqaB1y97-7UuitaQV9h2poiXXE3A@mail.gmail.com>
+ <CAB4CAwcR0gOLeHq2RPP7z6+Kb4rmrE9qim+am8gsYiVOvO6DGg@mail.gmail.com> <CAB4CAwePAWex=YHpNVc+j72r-hE7X0S+fZuDRO087zGXMZVf6A@mail.gmail.com>
+From: Chris Chiu <chiu@endlessm.com>
+Date: Mon, 4 Dec 2017 14:21:10 +0800
+Message-ID: <CAB4CAwdcuOJ_zBRTSfO-6EeEYucbCPBWj5HZzTE9gbaDKMRd+g@mail.gmail.com>
+Subject: Re: Bluetooth is not working on Intel new wifi/bt module 9462NGW
+To: johannes.berg@intel.com, Marcel Holtmann <marcel@holtmann.org>, gustavo@padovan.org,
+	linux-bluetooth@vger.kernel.org, Linux Upstreaming Team <linux@endlessm.com>,
+	jaya.p.g@linux.intel.com
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi David,
+gentle ping,
 
-> This adds a #define for the vendor-specific HCI command to set the
-> baudrate instead of using the bare 0xff36 multiple times.
-> 
-> Signed-off-by: David Lechner <david@lechnology.com>
-> ---
-> drivers/bluetooth/hci_ll.c | 10 ++++++++--
-> 1 file changed, 8 insertions(+), 2 deletions(-)
+cheers.
 
-patch has been applied to bluetooth-next tree.
 
-Regards
 
-Marcel
+On Fri, Nov 17, 2017 at 1:38 PM, Chris Chiu <chiu@endlessm.com> wrote:
+> On Thu, Nov 9, 2017 at 11:28 AM, Chris Chiu <chiu@endlessm.com> wrote:
+>> Hi guys,
+>>     Any idea about where I can find the missing ibt-17-2.sfi firmware?
+>>
+>> Chris
+>>
+>> On Tue, Nov 7, 2017 at 12:42 PM, Chris Chiu <chiu@endlessm.com> wrote:
+>>> Hi,
+>>>     We just have the Intel new WiFi/BT module 9462NGW from Acer and
+>>> tried to verify if it works on the latest linux kernel. The BT is not
+>>> working because of the missing firmware.
+>>>
+>>> [   18.249144] Bluetooth: hci0: Bootloader revision 0.1 build 42 week 52 2015
+>>> [   18.250036] Bluetooth: hci0: Device revision is 2
+>>> [   18.250037] Bluetooth: hci0: Secure boot is enabled
+>>> [   18.250038] Bluetooth: hci0: OTP lock is disabled
+>>> [   18.250038] Bluetooth: hci0: API lock is enabled
+>>> [   18.250039] Bluetooth: hci0: Debug lock is disabled
+>>> [   18.250040] Bluetooth: hci0: Minimum firmware build 1 week 10 2014
+>>> [   18.293902] bluetooth hci0: Direct firmware load for
+>>> intel/ibt-17-2.sfi failed with error -2
+>>> [   18.293907] Bluetooth: hci0: Failed to load Intel firmware file (-2)
+>>>
+>>> I'm not able to find these missing files in linux-firmware.git and any
+>>> other possible place. What's the status of supporting this 9462NGW?
+>>> Please let me know if any more information required. Thanks
+>>>
+>>> Chris
+>
+> Hi Jaya,
+>     Any schedule for releasing the  ibt-17-2.sfi(ddc) for 9462NGW bluetooth?
+>
+> Chris
