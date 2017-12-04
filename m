@@ -10,55 +10,41 @@ Cc: David Lechner <david@lechnology.com>,
 	Johan Hedberg <johan.hedberg@gmail.com>,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 2/3] bluetooth: hci_ll: add constant for vendor-specific command
-Date: Sun,  3 Dec 2017 21:21:21 -0600
-Message-Id: <1512357682-8911-3-git-send-email-david@lechnology.com>
+Subject: [PATCH 1/3] dt-bindings: Add optional nvmem MAC address bindings to ti,wlink-st
+Date: Sun,  3 Dec 2017 21:21:20 -0600
+Message-Id: <1512357682-8911-2-git-send-email-david@lechnology.com>
 In-Reply-To: <1512357682-8911-1-git-send-email-david@lechnology.com>
 References: <1512357682-8911-1-git-send-email-david@lechnology.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This adds a #define for the vendor-specific HCI command to set the
-baudrate instead of using the bare 0xff36 multiple times.
+This adds optional nvmem consumer properties to the ti,wlink-st device tree
+bindings to allow specifying the Bluetooth MAC address.
 
 Signed-off-by: David Lechner <david@lechnology.com>
 ---
- drivers/bluetooth/hci_ll.c | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
+ Documentation/devicetree/bindings/net/ti,wilink-st.txt | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/drivers/bluetooth/hci_ll.c b/drivers/bluetooth/hci_ll.c
-index 447abea..974a788 100644
---- a/drivers/bluetooth/hci_ll.c
-+++ b/drivers/bluetooth/hci_ll.c
-@@ -56,6 +56,9 @@
+diff --git a/Documentation/devicetree/bindings/net/ti,wilink-st.txt b/Documentation/devicetree/bindings/net/ti,wilink-st.txt
+index 1649c1f..24eb897 100644
+--- a/Documentation/devicetree/bindings/net/ti,wilink-st.txt
++++ b/Documentation/devicetree/bindings/net/ti,wilink-st.txt
+@@ -32,6 +32,8 @@ Optional properties:
+    See ../clocks/clock-bindings.txt for details.
+  - clock-names : Must include the following entry:
+    "ext_clock" (External clock provided to the TI combo chip).
++ - nvmem-cells: phandle to nvmem data cell that contains a MAC address
++ - nvmem-cell-names: "mac-address" (required when nvmem-cells is specified)
  
- #include "hci_uart.h"
+ Example:
  
-+/* Vendor-specific HCI commands */
-+#define HCI_VS_UPDATE_UART_HCI_BAUDRATE		0xff36
-+
- /* HCILL commands */
- #define HCILL_GO_TO_SLEEP_IND	0x30
- #define HCILL_GO_TO_SLEEP_ACK	0x31
-@@ -620,7 +623,7 @@ static int download_firmware(struct ll_device *lldev)
- 		case ACTION_SEND_COMMAND:	/* action send */
- 			bt_dev_dbg(lldev->hu.hdev, "S");
- 			cmd = (struct hci_command *)action_ptr;
--			if (cmd->opcode == 0xff36) {
-+			if (cmd->opcode == HCI_VS_UPDATE_UART_HCI_BAUDRATE) {
- 				/* ignore remote change
- 				 * baud rate HCI VS command
- 				 */
-@@ -704,7 +707,10 @@ static int ll_setup(struct hci_uart *hu)
- 		speed = 0;
- 
- 	if (speed) {
--		struct sk_buff *skb = __hci_cmd_sync(hu->hdev, 0xff36, sizeof(speed), &speed, HCI_INIT_TIMEOUT);
-+		struct sk_buff *skb;
-+
-+		skb = __hci_cmd_sync(hu->hdev, HCI_VS_UPDATE_UART_HCI_BAUDRATE,
-+				     sizeof(speed), &speed, HCI_INIT_TIMEOUT);
- 		if (!IS_ERR(skb)) {
- 			kfree_skb(skb);
- 			serdev_device_set_baudrate(serdev, speed);
+@@ -43,5 +45,7 @@ Example:
+ 		enable-gpios = <&gpio1 7 GPIO_ACTIVE_HIGH>;
+ 		clocks = <&clk32k_wl18xx>;
+ 		clock-names = "ext_clock";
++		nvmem-cells: <&mac_address>
++		nvmem-cell-names "mac-address"
+ 	};
+ };
 -- 
 2.7.4
