@@ -1,89 +1,64 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <20171204121054.29186-1-luiz.dentz@gmail.com>
-References: <20171204121054.29186-1-luiz.dentz@gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 4 Dec 2017 19:48:14 +0200
-Message-ID: <CABBYNZJUZvumCS2kvJ7SEVaFpCcnvT6OQRG0jQDq3ifGo1kyJg@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/3] gatt: Make database_add_record detect the UUID
+From: Steve Brown <sbrown@cortland.com>
+Message-ID: <1512404933.29399.10.camel@ewol.com>
+Subject: [PATCH BlueZ]mesh: meshctl add Node Identity option to connect
+ command
 To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Mon, 04 Dec 2017 09:28:53 -0700
 Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+This adds the option to connect via either Node Identity or Network ID
+advertisements. Adding the node unicast address selects Node Identity.
 
-On Mon, Dec 4, 2017 at 2:10 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> gatt_db_attribute does carry the UUID so this make database_add_record
-> add it directly instead of taking as parameter.
-> ---
->  src/gatt-database.c | 24 +++++++++++++++++++-----
->  1 file changed, 19 insertions(+), 5 deletions(-)
->
-> diff --git a/src/gatt-database.c b/src/gatt-database.c
-> index 3e10c901c..fa94a83f8 100644
-> --- a/src/gatt-database.c
-> +++ b/src/gatt-database.c
-> @@ -707,15 +707,30 @@ static sdp_record_t *record_new(uuid_t *uuid, uint16_t start, uint16_t end)
->  }
->
->  static uint32_t database_add_record(struct btd_gatt_database *database,
-> -                                       uint16_t uuid,
->                                         struct gatt_db_attribute *attr,
->                                         const char *name)
->  {
->         sdp_record_t *record;
->         uint16_t start, end;
->         uuid_t svc, gap_uuid;
-> +       bt_uuid_t uuid;
-> +
-> +       gatt_db_attribute_get_service_uuid(attr, &uuid);
-> +
-> +       switch (uuid.type) {
-> +       case BT_UUID16:
-> +               sdp_uuid16_create(&svc, uuid.value.u16);
-> +               break;
-> +       case BT_UUID32:
-> +               sdp_uuid32_create(&svc, uuid.value.u32);
-> +               break;
-> +       case BT_UUID128:
-> +               sdp_uuid128_create(&svc, (void *) &uuid.value.u128);
-> +               break;
-> +       case BT_UUID_UNSPEC:
-> +               return 0;
-> +       }
->
-> -       sdp_uuid16_create(&svc, uuid);
->         gatt_db_attribute_get_service_handles(attr, &start, &end);
->
->         record = record_new(&svc, start, end);
-> @@ -747,7 +762,7 @@ static void populate_gap_service(struct btd_gatt_database *database)
->         /* Add the GAP service */
->         bt_uuid16_create(&uuid, UUID_GAP);
->         service = gatt_db_add_service(database->db, &uuid, true, 5);
-> -       database->gap_handle = database_add_record(database, UUID_GAP, service,
-> +       database->gap_handle = database_add_record(database, service,
->                                                 "Generic Access Profile");
->
->         /*
-> @@ -902,8 +917,7 @@ static void populate_gatt_service(struct btd_gatt_database *database)
->         /* Add the GATT service */
->         bt_uuid16_create(&uuid, UUID_GATT);
->         service = gatt_db_add_service(database->db, &uuid, true, 4);
-> -       database->gatt_handle = database_add_record(database, UUID_GATT,
-> -                                               service,
-> +       database->gatt_handle = database_add_record(database, service,
->                                                 "Generic Attribute Profile");
->
->         bt_uuid16_create(&uuid, GATT_CHARAC_SERVICE_CHANGED);
-> --
-> 2.13.6
+See Mesh Profile Specification 7.2.2.2 for further details.
 
-Applied.
+---
 
-
--- 
-Luiz Augusto von Dentz
+diff --git a/mesh/main.c b/mesh/main.c
+index d7e45e56b..e19b7f413 100644
+--- a/mesh/main.c
++++ b/mesh/main.c
+@@ -1773,6 +1774,8 @@ static void cmd_connect(const char *arg)
+ 			rl_printf("Invalid network index %s\n", arg);
+ 			return;
+ 		}
++
++		connection.unicast = strtol(end, NULL, 16);
+ 	}
+ 
+ 	if (discovering)
+@@ -1782,11 +1785,17 @@ static void cmd_connect(const char *arg)
+ 	set_scan_filter_uuids(MESH_PROXY_SVC_UUID);
+ 	discover_mesh = true;
+ 
+-	connection.type = CONN_TYPE_NETWORK;
+-
++	if (connection.unicast == UNASSIGNED_ADDRESS) {
++		connection.type = CONN_TYPE_NETWORK;
++		rl_printf("Looking for mesh network with net index %4.4x\n",
++				connection.net_idx);
++	} else {
++		connection.type = CONN_TYPE_IDENTITY;
++		rl_printf("Looking for node id %4.4x"
++				" on network with net index %4.4x\n",
++				connection.unicast, connection.net_idx);
++	}
+ 
+-	rl_printf("Looking for mesh network with net index %4.4x\n",
+-							connection.net_idx);
+ 
+ 	if (g_dbus_proxy_method_call(default_ctrl->proxy,
+ 			"StartDiscovery", NULL, start_discovery_reply,
+@@ -2005,7 +2014,8 @@ static const struct menu_entry meshctl_cmd_table[] = {
+ 	{ "security",     "[0(low)/1(medium)/2(high)]", cmd_security,
+ 				"Display or change provision security level"},
+ 	{ "info",         "[dev]",    cmd_info, "Device information"},
+-	{ "connect",      "[net_idx]",cmd_connect, "Connect to mesh network"},
++	{ "connect",      "[net_idx] [dst]",cmd_connect,
++				"Connect to mesh network or node on network"},
+ 	{ "discover-unprovisioned", "<on/off>", cmd_scan_unprovisioned_devices,
+ 					"Look for devices to provision" },
+ 	{ "provision",    "<uuid>",   cmd_start_prov, "Initiate provisioning"},
