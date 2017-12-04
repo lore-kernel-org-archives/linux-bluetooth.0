@@ -1,76 +1,59 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/3] gatt: Make database_add_record detect the UUID
-Date: Mon,  4 Dec 2017 10:10:52 -0200
-Message-Id: <20171204121054.29186-1-luiz.dentz@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <sergei.shtylyov@cogentembedded.com>
+Subject: Re: [PATCH 1/3] dt-bindings: Add optional nvmem MAC address bindings
+ to ti,wlink-st
+From: Sergei Shtylyov <sergei.shtylyov@cogentembedded.com>
+To: David Lechner <david@lechnology.com>, devicetree@vger.kernel.org,
+ linux-bluetooth@vger.kernel.org
+Cc: Rob Herring <robh+dt@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+ Marcel Holtmann <marcel@holtmann.org>, Gustavo Padovan
+ <gustavo@padovan.org>, Johan Hedberg <johan.hedberg@gmail.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <1512357682-8911-1-git-send-email-david@lechnology.com>
+ <1512357682-8911-2-git-send-email-david@lechnology.com>
+ <2dfb7130-e229-7429-0f30-11d7df553fdf@cogentembedded.com>
+Message-ID: <f50b5810-31ca-6ce8-ba1e-0484a3dd1d89@cogentembedded.com>
+Date: Mon, 4 Dec 2017 13:09:43 +0300
+MIME-Version: 1.0
+In-Reply-To: <2dfb7130-e229-7429-0f30-11d7df553fdf@cogentembedded.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+On 12/4/2017 12:54 PM, Sergei Shtylyov wrote:
 
-gatt_db_attribute does carry the UUID so this make database_add_record
-add it directly instead of taking as parameter.
----
- src/gatt-database.c | 24 +++++++++++++++++++-----
- 1 file changed, 19 insertions(+), 5 deletions(-)
+>> This adds optional nvmem consumer properties to the ti,wlink-st device tree
+>> bindings to allow specifying the Bluetooth MAC address.
+>>
+>> Signed-off-by: David Lechner <david@lechnology.com>
+>> ---
+>>   Documentation/devicetree/bindings/net/ti,wilink-st.txt | 4 ++++
+>>   1 file changed, 4 insertions(+)
+>>
+>> diff --git a/Documentation/devicetree/bindings/net/ti,wilink-st.txt 
+>> b/Documentation/devicetree/bindings/net/ti,wilink-st.txt
+>> index 1649c1f..24eb897 100644
+>> --- a/Documentation/devicetree/bindings/net/ti,wilink-st.txt
+>> +++ b/Documentation/devicetree/bindings/net/ti,wilink-st.txt
+>> @@ -32,6 +32,8 @@ Optional properties:
+>>      See ../clocks/clock-bindings.txt for details.
+>>    - clock-names : Must include the following entry:
+>>      "ext_clock" (External clock provided to the TI combo chip).
+>> + - nvmem-cells: phandle to nvmem data cell that contains a MAC address
+>> + - nvmem-cell-names: "mac-address" (required when nvmem-cells is specified)
+>>   Example:
+>> @@ -43,5 +45,7 @@ Example:
+>>           enable-gpios = <&gpio1 7 GPIO_ACTIVE_HIGH>;
+>>           clocks = <&clk32k_wl18xx>;
+>>           clock-names = "ext_clock";
+>> +        nvmem-cells: <&mac_address>
+> 
+>     s/:/ = /?
+> 
+>> +        nvmem-cell-names "mac-address"
+> 
+>     Where's =?
 
-diff --git a/src/gatt-database.c b/src/gatt-database.c
-index 3e10c901c..fa94a83f8 100644
---- a/src/gatt-database.c
-+++ b/src/gatt-database.c
-@@ -707,15 +707,30 @@ static sdp_record_t *record_new(uuid_t *uuid, uint16_t start, uint16_t end)
- }
- 
- static uint32_t database_add_record(struct btd_gatt_database *database,
--					uint16_t uuid,
- 					struct gatt_db_attribute *attr,
- 					const char *name)
- {
- 	sdp_record_t *record;
- 	uint16_t start, end;
- 	uuid_t svc, gap_uuid;
-+	bt_uuid_t uuid;
-+
-+	gatt_db_attribute_get_service_uuid(attr, &uuid);
-+
-+	switch (uuid.type) {
-+	case BT_UUID16:
-+		sdp_uuid16_create(&svc, uuid.value.u16);
-+		break;
-+	case BT_UUID32:
-+		sdp_uuid32_create(&svc, uuid.value.u32);
-+		break;
-+	case BT_UUID128:
-+		sdp_uuid128_create(&svc, (void *) &uuid.value.u128);
-+		break;
-+	case BT_UUID_UNSPEC:
-+		return 0;
-+	}
- 
--	sdp_uuid16_create(&svc, uuid);
- 	gatt_db_attribute_get_service_handles(attr, &start, &end);
- 
- 	record = record_new(&svc, start, end);
-@@ -747,7 +762,7 @@ static void populate_gap_service(struct btd_gatt_database *database)
- 	/* Add the GAP service */
- 	bt_uuid16_create(&uuid, UUID_GAP);
- 	service = gatt_db_add_service(database->db, &uuid, true, 5);
--	database->gap_handle = database_add_record(database, UUID_GAP, service,
-+	database->gap_handle = database_add_record(database, service,
- 						"Generic Access Profile");
- 
- 	/*
-@@ -902,8 +917,7 @@ static void populate_gatt_service(struct btd_gatt_database *database)
- 	/* Add the GATT service */
- 	bt_uuid16_create(&uuid, UUID_GATT);
- 	service = gatt_db_add_service(database->db, &uuid, true, 4);
--	database->gatt_handle = database_add_record(database, UUID_GATT,
--						service,
-+	database->gatt_handle = database_add_record(database, service,
- 						"Generic Attribute Profile");
- 
- 	bt_uuid16_create(&uuid, GATT_CHARAC_SERVICE_CHANGED);
--- 
-2.13.6
+    And ;? :-)
 
+[...]
+
+MBR, Sergei
