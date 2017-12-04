@@ -1,11 +1,11 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Steve Brown <sbrown@cortland.com>
-Message-ID: <1512395982.27418.14.camel@ewol.com>
+Message-ID: <1512392802.27418.8.camel@ewol.com>
 Subject: Re: meshctl: Can't connect via Node Identity advertisement
 To: Johan Hedberg <johan.hedberg@gmail.com>,
         Steve Brown <sbrown@cortland.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Mon, 04 Dec 2017 06:59:42 -0700
+Date: Mon, 04 Dec 2017 06:06:42 -0700
 In-Reply-To: <20171204123606.GA29257@x1c.lan>
 References: <1512344374.16639.18.camel@ewol.com>
          <20171204123606.GA29257@x1c.lan>
@@ -58,15 +58,11 @@ On Mon, 2017-12-04 at 14:36 +0200, Johan Hedberg wrote:
 > 
 > Johan
 
-I added the command as you suggested. 
-
-I had to change them to net-connect and node-connect because of command
-completion.
-
-If I issue a node-connect while the mesh-shell ident command is active,
-it connects.
-
-If you think there's interest, I'll post the patch.
+It's obvious after you pointed it out. I hadn't appreciated the
+distinction between the two types of advertisements. I'll try to do
+what you suggest.
 
 Steve
+
+
 
