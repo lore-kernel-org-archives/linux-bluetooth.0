@@ -1,59 +1,59 @@
-Return-Path: <sergei.shtylyov@cogentembedded.com>
-Subject: Re: [PATCH 1/3] dt-bindings: Add optional nvmem MAC address bindings
- to ti,wlink-st
-To: David Lechner <david@lechnology.com>, devicetree@vger.kernel.org,
- linux-bluetooth@vger.kernel.org
-Cc: Rob Herring <robh+dt@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
- Marcel Holtmann <marcel@holtmann.org>, Gustavo Padovan
- <gustavo@padovan.org>, Johan Hedberg <johan.hedberg@gmail.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <1512357682-8911-1-git-send-email-david@lechnology.com>
- <1512357682-8911-2-git-send-email-david@lechnology.com>
-From: Sergei Shtylyov <sergei.shtylyov@cogentembedded.com>
-Message-ID: <2dfb7130-e229-7429-0f30-11d7df553fdf@cogentembedded.com>
-Date: Mon, 4 Dec 2017 12:54:31 +0300
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <1512357682-8911-2-git-send-email-david@lechnology.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <etPan.5a21b1a2.4bcf8189.3551@mynabay.com>
+References: <etPan.5a21b1a2.4bcf8189.3551@mynabay.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Mon, 4 Dec 2017 11:53:32 +0200
+Message-ID: <CABBYNZLk+Vkfj4wbXLjtmmehiXHq0jCpn1qOTnG6H8GSN-aQhg@mail.gmail.com>
+Subject: Re: BlueZ Help
+To: Kevin Snow <Kevin@mynabay.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello!
+Hi Kevin,
 
-On 12/4/2017 6:21 AM, David Lechner wrote:
+On Fri, Dec 1, 2017 at 9:46 PM, Kevin Snow <Kevin@mynabay.com> wrote:
+>
+> We have a product using BlueZ. The device has both BLE and BR/EDR (for Au=
+dio). When attempting to make a BLE connection from some Android devices, t=
+he connection establishes as BR/EDR. Thus, our service UUID isn=E2=80=99t v=
+isible and can=E2=80=99t be accessed. I=E2=80=99ve been told this is per th=
+e Bluetooth Spec, although I=E2=80=99ve been unable to find it in the spec.=
+ Additionally,I don=E2=80=99t understand why the spec would do this as it e=
+ffectively makes dual mode (both BLE and BR/EDR) worthless if the connectio=
+n will be BR/EDR. This problem does not happen with Apple devices. They alw=
+ays connect as BLE. Many Android are fine too, just not all.
 
-> This adds optional nvmem consumer properties to the ti,wlink-st device tree
-> bindings to allow specifying the Bluetooth MAC address.
-> 
-> Signed-off-by: David Lechner <david@lechnology.com>
-> ---
->   Documentation/devicetree/bindings/net/ti,wilink-st.txt | 4 ++++
->   1 file changed, 4 insertions(+)
-> 
-> diff --git a/Documentation/devicetree/bindings/net/ti,wilink-st.txt b/Documentation/devicetree/bindings/net/ti,wilink-st.txt
-> index 1649c1f..24eb897 100644
-> --- a/Documentation/devicetree/bindings/net/ti,wilink-st.txt
-> +++ b/Documentation/devicetree/bindings/net/ti,wilink-st.txt
-> @@ -32,6 +32,8 @@ Optional properties:
->      See ../clocks/clock-bindings.txt for details.
->    - clock-names : Must include the following entry:
->      "ext_clock" (External clock provided to the TI combo chip).
-> + - nvmem-cells: phandle to nvmem data cell that contains a MAC address
-> + - nvmem-cell-names: "mac-address" (required when nvmem-cells is specified)
->   
->   Example:
->   
-> @@ -43,5 +45,7 @@ Example:
->   		enable-gpios = <&gpio1 7 GPIO_ACTIVE_HIGH>;
->   		clocks = <&clk32k_wl18xx>;
->   		clock-names = "ext_clock";
-> +		nvmem-cells: <&mac_address>
+I guess this depends on how old the Android is, previously 4.0 spec
+did not allow connecting on LE. Btw, how are you advertising?
 
-    s/:/ = /?
+> One workaround would be to expose the BLE service via BR/EDR. Has anyone =
+done this?
 
-> +		nvmem-cell-names "mac-address"
+I suppose you are talking about GATT services, we will need to do some
+fixes in order to support this, I will have a look into this since
+that is mandatory for qualification.
 
-    Where's =?
+> We=E2=80=99re very eager to wrap this up. Is there a BlueZ expert out the=
+re open to a short term contract to help us through this? Any modifications=
+ made to BlueZ would of course become part of the open source. We don=E2=80=
+=99t want anything custom, just for our product to be completed.
+>
+> Thanks
+>
+> Kevin Snow
+> kevin@mynabay.com
+>
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth=
+" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-[...]
 
-MBR, Sergei
+
+--=20
+Luiz Augusto von Dentz
