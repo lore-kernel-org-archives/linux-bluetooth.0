@@ -1,55 +1,109 @@
-Return-Path: <chiu@endlessm.com>
-MIME-Version: 1.0
-In-Reply-To: <CAB4CAwePAWex=YHpNVc+j72r-hE7X0S+fZuDRO087zGXMZVf6A@mail.gmail.com>
-References: <CAB4CAwc9GiF9EdzoZ2wUxvXqaB1y97-7UuitaQV9h2poiXXE3A@mail.gmail.com>
- <CAB4CAwcR0gOLeHq2RPP7z6+Kb4rmrE9qim+am8gsYiVOvO6DGg@mail.gmail.com> <CAB4CAwePAWex=YHpNVc+j72r-hE7X0S+fZuDRO087zGXMZVf6A@mail.gmail.com>
-From: Chris Chiu <chiu@endlessm.com>
-Date: Mon, 4 Dec 2017 14:21:10 +0800
-Message-ID: <CAB4CAwdcuOJ_zBRTSfO-6EeEYucbCPBWj5HZzTE9gbaDKMRd+g@mail.gmail.com>
-Subject: Re: Bluetooth is not working on Intel new wifi/bt module 9462NGW
-To: johannes.berg@intel.com, Marcel Holtmann <marcel@holtmann.org>, gustavo@padovan.org,
-	linux-bluetooth@vger.kernel.org, Linux Upstreaming Team <linux@endlessm.com>,
-	jaya.p.g@linux.intel.com
-Content-Type: text/plain; charset="UTF-8"
+Return-Path: <david@lechnology.com>
+From: David Lechner <david@lechnology.com>
+To: devicetree@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org
+Cc: David Lechner <david@lechnology.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 3/3] bluetooth: hci_ll: Add optional nvmem MAC address source
+Date: Sun,  3 Dec 2017 21:21:22 -0600
+Message-Id: <1512357682-8911-4-git-send-email-david@lechnology.com>
+In-Reply-To: <1512357682-8911-1-git-send-email-david@lechnology.com>
+References: <1512357682-8911-1-git-send-email-david@lechnology.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-gentle ping,
+This adds an optional nvmem consumer to get a MAC address from an external
+source. The MAC address is then set in the Bluetooth chip after the
+firmware has been loaded.
 
-cheers.
+This has been tested working with a TI CC2560A chip (in a LEGO MINDSTORMS
+EV3).
 
+Signed-off-by: David Lechner <david@lechnology.com>
+---
+ drivers/bluetooth/hci_ll.c | 33 +++++++++++++++++++++++++++++++++
+ 1 file changed, 33 insertions(+)
 
-
-On Fri, Nov 17, 2017 at 1:38 PM, Chris Chiu <chiu@endlessm.com> wrote:
-> On Thu, Nov 9, 2017 at 11:28 AM, Chris Chiu <chiu@endlessm.com> wrote:
->> Hi guys,
->>     Any idea about where I can find the missing ibt-17-2.sfi firmware?
->>
->> Chris
->>
->> On Tue, Nov 7, 2017 at 12:42 PM, Chris Chiu <chiu@endlessm.com> wrote:
->>> Hi,
->>>     We just have the Intel new WiFi/BT module 9462NGW from Acer and
->>> tried to verify if it works on the latest linux kernel. The BT is not
->>> working because of the missing firmware.
->>>
->>> [   18.249144] Bluetooth: hci0: Bootloader revision 0.1 build 42 week 52 2015
->>> [   18.250036] Bluetooth: hci0: Device revision is 2
->>> [   18.250037] Bluetooth: hci0: Secure boot is enabled
->>> [   18.250038] Bluetooth: hci0: OTP lock is disabled
->>> [   18.250038] Bluetooth: hci0: API lock is enabled
->>> [   18.250039] Bluetooth: hci0: Debug lock is disabled
->>> [   18.250040] Bluetooth: hci0: Minimum firmware build 1 week 10 2014
->>> [   18.293902] bluetooth hci0: Direct firmware load for
->>> intel/ibt-17-2.sfi failed with error -2
->>> [   18.293907] Bluetooth: hci0: Failed to load Intel firmware file (-2)
->>>
->>> I'm not able to find these missing files in linux-firmware.git and any
->>> other possible place. What's the status of supporting this 9462NGW?
->>> Please let me know if any more information required. Thanks
->>>
->>> Chris
->
-> Hi Jaya,
->     Any schedule for releasing the  ibt-17-2.sfi(ddc) for 9462NGW bluetooth?
->
-> Chris
+diff --git a/drivers/bluetooth/hci_ll.c b/drivers/bluetooth/hci_ll.c
+index 974a788..dd3b5c2 100644
+--- a/drivers/bluetooth/hci_ll.c
++++ b/drivers/bluetooth/hci_ll.c
+@@ -53,10 +53,12 @@
+ #include <net/bluetooth/bluetooth.h>
+ #include <net/bluetooth/hci_core.h>
+ #include <linux/gpio/consumer.h>
++#include <linux/nvmem-consumer.h>
+ 
+ #include "hci_uart.h"
+ 
+ /* Vendor-specific HCI commands */
++#define HCI_VS_WRITE_BD_ADDR			0xfc06
+ #define HCI_VS_UPDATE_UART_HCI_BAUDRATE		0xff36
+ 
+ /* HCILL commands */
+@@ -89,6 +91,7 @@ struct ll_device {
+ 	struct serdev_device *serdev;
+ 	struct gpio_desc *enable_gpio;
+ 	struct clk *ext_clk;
++	u8 *bdaddr;
+ };
+ 
+ struct ll_struct {
+@@ -698,6 +701,19 @@ static int ll_setup(struct hci_uart *hu)
+ 	if (err)
+ 		return err;
+ 
++	/* Set MAC address, if any */
++	if (lldev->bdaddr) {
++		struct sk_buff *skb;
++
++		skb = __hci_cmd_sync(hu->hdev, HCI_VS_WRITE_BD_ADDR, 6,
++				     lldev->bdaddr, HCI_INIT_TIMEOUT);
++		if (IS_ERR(skb))
++			bt_dev_err(hu->hdev, "Failed to set MAC address (%ld)",
++				   PTR_ERR(skb));
++		else
++			kfree_skb(skb);
++	}
++
+ 	/* Operational speed if any */
+ 	if (hu->oper_speed)
+ 		speed = hu->oper_speed;
+@@ -726,6 +742,7 @@ static int hci_ti_probe(struct serdev_device *serdev)
+ {
+ 	struct hci_uart *hu;
+ 	struct ll_device *lldev;
++	struct nvmem_cell *bdaddr_cell;
+ 	u32 max_speed = 3000000;
+ 
+ 	lldev = devm_kzalloc(&serdev->dev, sizeof(struct ll_device), GFP_KERNEL);
+@@ -747,6 +764,22 @@ static int hci_ti_probe(struct serdev_device *serdev)
+ 	of_property_read_u32(serdev->dev.of_node, "max-speed", &max_speed);
+ 	hci_uart_set_speeds(hu, 115200, max_speed);
+ 
++	/* optional MAC address from nvram */
++	bdaddr_cell = nvmem_cell_get(&serdev->dev, "mac-address");
++	if (IS_ERR(bdaddr_cell)) {
++		int err = PTR_ERR(bdaddr_cell);
++
++		if (err != -ENOENT) {
++			if (err != -EPROBE_DEFER)
++				dev_err(&serdev->dev,
++					"Failed to get \"mac-address\" nvmem cell\n");
++			return err;
++		}
++	} else {
++		lldev->bdaddr = nvmem_cell_read(bdaddr_cell, NULL);
++		nvmem_cell_put(bdaddr_cell);
++	}
++
+ 	return hci_uart_register_device(hu, &llp);
+ }
+ 
+-- 
+2.7.4
