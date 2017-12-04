@@ -1,64 +1,55 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Steve Brown <sbrown@cortland.com>
-Message-ID: <1512404933.29399.10.camel@ewol.com>
-Subject: [PATCH BlueZ]mesh: meshctl add Node Identity option to connect
- command
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Mon, 04 Dec 2017 09:28:53 -0700
+Message-ID: <1512400869.29399.1.camel@ewol.com>
+Subject: Re: meshctl: Can't connect via Node Identity advertisement
+To: Johan Hedberg <johan.hedberg@gmail.com>,
+        Steve Brown <sbrown@cortland.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Mon, 04 Dec 2017 08:21:09 -0700
+In-Reply-To: <20171204150502.GA30627@x1c.home>
+References: <1512344374.16639.18.camel@ewol.com>
+         <20171204123606.GA29257@x1c.lan> <1512395982.27418.14.camel@ewol.com>
+         <20171204150502.GA30627@x1c.home>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This adds the option to connect via either Node Identity or Network ID
-advertisements. Adding the node unicast address selects Node Identity.
+Hi Johan,
 
-See Mesh Profile Specification 7.2.2.2 for further details.
+On Mon, 2017-12-04 at 17:05 +0200, Johan Hedberg wrote:
+> Hi Steve,
+> 
+> On Mon, Dec 04, 2017, Steve Brown wrote:
+> > I added the command as you suggested. 
+> > 
+> > I had to change them to net-connect and node-connect because of
+> > command
+> > completion.
+> > 
+> > If I issue a node-connect while the mesh-shell ident command is
+> > active,
+> > it connects.
+> > 
+> > If you think there's interest, I'll post the patch.
+> 
+> I think we should definitely add support for this upstream, but after
+> thinking a bit more about it, maybe we could simply extend the
+> existing
+> connect command instead of adding a new one. Node Identity is always
+> in
+> the context of a given NetKey Index, so I think it'd be just as
+> natural
+> to have a second optional parameter to the existing connect command
+> which would be the element address. If only one parameter is given
+> then
+> meshctl looks for Net ID, if two are given it looks for Node ID.
+> Sounds
+> reasonable?
+> 
+> Johan
 
----
+I'll do that. Saves lots of duplicated code.
 
-diff --git a/mesh/main.c b/mesh/main.c
-index d7e45e56b..e19b7f413 100644
---- a/mesh/main.c
-+++ b/mesh/main.c
-@@ -1773,6 +1774,8 @@ static void cmd_connect(const char *arg)
- 			rl_printf("Invalid network index %s\n", arg);
- 			return;
- 		}
-+
-+		connection.unicast = strtol(end, NULL, 16);
- 	}
- 
- 	if (discovering)
-@@ -1782,11 +1785,17 @@ static void cmd_connect(const char *arg)
- 	set_scan_filter_uuids(MESH_PROXY_SVC_UUID);
- 	discover_mesh = true;
- 
--	connection.type = CONN_TYPE_NETWORK;
--
-+	if (connection.unicast == UNASSIGNED_ADDRESS) {
-+		connection.type = CONN_TYPE_NETWORK;
-+		rl_printf("Looking for mesh network with net index %4.4x\n",
-+				connection.net_idx);
-+	} else {
-+		connection.type = CONN_TYPE_IDENTITY;
-+		rl_printf("Looking for node id %4.4x"
-+				" on network with net index %4.4x\n",
-+				connection.unicast, connection.net_idx);
-+	}
- 
--	rl_printf("Looking for mesh network with net index %4.4x\n",
--							connection.net_idx);
- 
- 	if (g_dbus_proxy_method_call(default_ctrl->proxy,
- 			"StartDiscovery", NULL, start_discovery_reply,
-@@ -2005,7 +2014,8 @@ static const struct menu_entry meshctl_cmd_table[] = {
- 	{ "security",     "[0(low)/1(medium)/2(high)]", cmd_security,
- 				"Display or change provision security level"},
- 	{ "info",         "[dev]",    cmd_info, "Device information"},
--	{ "connect",      "[net_idx]",cmd_connect, "Connect to mesh network"},
-+	{ "connect",      "[net_idx] [dst]",cmd_connect,
-+				"Connect to mesh network or node on network"},
- 	{ "discover-unprovisioned", "<on/off>", cmd_scan_unprovisioned_devices,
- 					"Look for devices to provision" },
- 	{ "provision",    "<uuid>",   cmd_start_prov, "Initiate provisioning"},
+Steve
+
