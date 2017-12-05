@@ -1,9 +1,9 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 4/4] tools/bluetooth-player: Use bt_shell helpers
-Date: Tue,  5 Dec 2017 16:33:27 -0200
-Message-Id: <20171205183327.853-4-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 3/4] tools/obexctl: Use bt_shell helpers
+Date: Tue,  5 Dec 2017 16:33:26 -0200
+Message-Id: <20171205183327.853-3-luiz.dentz@gmail.com>
 In-Reply-To: <20171205183327.853-1-luiz.dentz@gmail.com>
 References: <20171205183327.853-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,40 +11,43 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This makes bluetooth-player use bt_shell to manage the menus and
-command handling.
+This makes obexctl use bt_shell to manage the menus and command
+handling.
 ---
- Makefile.tools           |   4 +-
- tools/bluetooth-player.c | 473 +++++++++++------------------------------------
- 2 files changed, 111 insertions(+), 366 deletions(-)
+ Makefile.tools  |   5 +-
+ tools/obexctl.c | 609 ++++++++++++++++----------------------------------------
+ 2 files changed, 175 insertions(+), 439 deletions(-)
 
 diff --git a/Makefile.tools b/Makefile.tools
-index 1cf19035d..8074a536d 100644
+index ba717e6cf..1cf19035d 100644
 --- a/Makefile.tools
 +++ b/Makefile.tools
-@@ -389,9 +389,9 @@ tools_obex_server_tool_SOURCES = $(gobex_sources) $(btio_sources) \
- 						tools/obex-server-tool.c
- tools_obex_server_tool_LDADD = lib/libbluetooth-internal.la @GLIB_LIBS@
- 
--tools_bluetooth_player_SOURCES = tools/bluetooth-player.c \
--				client/display.h client/display.c
-+tools_bluetooth_player_SOURCES = tools/bluetooth-player.c
+@@ -394,9 +394,8 @@ tools_bluetooth_player_SOURCES = tools/bluetooth-player.c \
  tools_bluetooth_player_LDADD = gdbus/libgdbus-internal.la \
-+				src/libshared-glib.la \
  				@GLIB_LIBS@ @DBUS_LIBS@ -lreadline
  
- tools_obexctl_SOURCES = tools/obexctl.c
-diff --git a/tools/bluetooth-player.c b/tools/bluetooth-player.c
-index c95b7497f..2a8cc49c3 100644
---- a/tools/bluetooth-player.c
-+++ b/tools/bluetooth-player.c
-@@ -30,15 +30,12 @@
+-tools_obexctl_SOURCES = tools/obexctl.c \
+-				client/display.h client/display.c
+-tools_obexctl_LDADD = gdbus/libgdbus-internal.la \
++tools_obexctl_SOURCES = tools/obexctl.c
++tools_obexctl_LDADD = gdbus/libgdbus-internal.la src/libshared-glib.la \
+ 				@GLIB_LIBS@ @DBUS_LIBS@ -lreadline
+ 
+ tools_btmgmt_SOURCES = tools/btmgmt.c src/uuid-helper.c client/display.c
+diff --git a/tools/obexctl.c b/tools/obexctl.c
+index 33ee180a3..546fc34c4 100644
+--- a/tools/obexctl.c
++++ b/tools/obexctl.c
+@@ -30,17 +30,15 @@
  #include <errno.h>
  #include <unistd.h>
  #include <stdlib.h>
 -#include <signal.h>
 -#include <sys/signalfd.h>
 +#include <string.h>
+ #include <inttypes.h>
+ #include <wordexp.h>
++#include <ctype.h>
  
 -#include <readline/readline.h>
 -#include <readline/history.h>
@@ -56,7 +59,15 @@ index c95b7497f..2a8cc49c3 100644
  
  /* String display constants */
  #define COLORED_NEW	COLOR_GREEN "NEW" COLOR_OFF
-@@ -61,18 +58,12 @@ static GSList *items = NULL;
+@@ -59,7 +57,6 @@
+ #define OBEX_MAP_INTERFACE "org.bluez.obex.MessageAccess1"
+ #define OBEX_MSG_INTERFACE "org.bluez.obex.Message1"
+ 
+-static GMainLoop *main_loop;
+ static DBusConnection *dbus_conn;
+ static GDBusProxy *default_session;
+ static GSList *sessions = NULL;
+@@ -78,23 +75,12 @@ struct transfer_data {
  
  static void connect_handler(DBusConnection *connection, void *user_data)
  {
@@ -73,385 +84,114 @@ index c95b7497f..2a8cc49c3 100644
 -	printf("\r");
 -	rl_on_new_line();
 -	rl_redisplay();
+-}
+-
+-static void cmd_quit(int argc, char *argv[])
+-{
+-	g_main_loop_quit(main_loop);
 +	bt_shell_set_prompt(PROMPT_OFF);
  }
  
- static void cmd_quit(int argc, char *argv[])
-@@ -83,7 +74,7 @@ static void cmd_quit(int argc, char *argv[])
- static bool check_default_player(void)
- {
- 	if (!default_player) {
--		rl_printf("No default player available\n");
-+		bt_shell_printf("No default player available\n");
- 		return FALSE;
- 	}
- 
-@@ -97,12 +88,12 @@ static void play_reply(DBusMessage *message, void *user_data)
+ static void connect_reply(DBusMessage *message, void *user_data)
+@@ -104,12 +90,12 @@ static void connect_reply(DBusMessage *message, void *user_data)
  	dbus_error_init(&error);
  
  	if (dbus_set_error_from_message(&error, message) == TRUE) {
--		rl_printf("Failed to play: %s\n", error.name);
-+		bt_shell_printf("Failed to play: %s\n", error.name);
+-		rl_printf("Failed to connect: %s\n", error.name);
++		bt_shell_printf("Failed to connect: %s\n", error.name);
  		dbus_error_free(&error);
  		return;
  	}
  
--	rl_printf("Play successful\n");
-+	bt_shell_printf("Play successful\n");
+-	rl_printf("Connection successful\n");
++	bt_shell_printf("Connection successful\n");
  }
  
- static GDBusProxy *find_item(const char *path)
-@@ -125,17 +116,17 @@ static void cmd_play_item(int argc, char *argv[])
+ static void append_variant(DBusMessageIter *iter, int type, void *val)
+@@ -188,12 +174,12 @@ static void cmd_connect(int argc, char *argv[])
+ 	const char *target = "opp";
  
- 	proxy = find_item(argv[1]);
+ 	if (argc < 2) {
+-		rl_printf("Missing device address argument\n");
++		bt_shell_printf("Missing device address argument\n");
+ 		return;
+ 	}
+ 
+ 	if (!client) {
+-		rl_printf("Client proxy not available\n");
++		bt_shell_printf("Client proxy not available\n");
+ 		return;
+ 	}
+ 
+@@ -206,11 +192,11 @@ static void cmd_connect(int argc, char *argv[])
+ 
+ 	if (g_dbus_proxy_method_call(client, "CreateSession", connect_setup,
+ 			connect_reply, args, connect_args_free) == FALSE) {
+-		rl_printf("Failed to connect\n");
++		bt_shell_printf("Failed to connect\n");
+ 		return;
+ 	}
+ 
+-	rl_printf("Attempting to connect to %s\n", argv[1]);
++	bt_shell_printf("Attempting to connect to %s\n", argv[1]);
+ }
+ 
+ static void disconnect_reply(DBusMessage *message, void *user_data)
+@@ -220,12 +206,12 @@ static void disconnect_reply(DBusMessage *message, void *user_data)
+ 	dbus_error_init(&error);
+ 
+ 	if (dbus_set_error_from_message(&error, message) == TRUE) {
+-		rl_printf("Failed to disconnect: %s\n", error.name);
++		bt_shell_printf("Failed to disconnect: %s\n", error.name);
+ 		dbus_error_free(&error);
+ 		return;
+ 	}
+ 
+-	rl_printf("Disconnection successful\n");
++	bt_shell_printf("Disconnection successful\n");
+ }
+ 
+ static void disconnect_setup(DBusMessageIter *iter, void *user_data)
+@@ -262,17 +248,17 @@ static void cmd_disconnect(int argc, char *argv[])
+ 		proxy = default_session;
+ 
  	if (proxy == NULL) {
--		rl_printf("Item %s not available\n", argv[1]);
-+		bt_shell_printf("Item %s not available\n", argv[1]);
+-		rl_printf("Session not available\n");
++		bt_shell_printf("Session not available\n");
  		return;
  	}
  
- 	if (g_dbus_proxy_method_call(proxy, "Play", NULL, play_reply,
- 							NULL, NULL) == FALSE) {
--		rl_printf("Failed to play\n");
-+		bt_shell_printf("Failed to play\n");
+ 	if (g_dbus_proxy_method_call(client, "RemoveSession", disconnect_setup,
+ 				disconnect_reply, proxy, NULL) == FALSE) {
+-		rl_printf("Failed to disconnect\n");
++		bt_shell_printf("Failed to disconnect\n");
  		return;
  	}
  
--	rl_printf("Attempting to play %s\n", argv[1]);
-+	bt_shell_printf("Attempting to play %s\n", argv[1]);
+-	rl_printf("Attempting to disconnect to %s\n",
++	bt_shell_printf("Attempting to disconnect to %s\n",
+ 						g_dbus_proxy_get_path(proxy));
  }
  
- static void cmd_play(int argc, char *argv[])
-@@ -148,11 +139,11 @@ static void cmd_play(int argc, char *argv[])
+@@ -297,7 +283,7 @@ static void print_proxy(GDBusProxy *proxy, const char *title,
  
- 	if (g_dbus_proxy_method_call(default_player, "Play", NULL, play_reply,
- 							NULL, NULL) == FALSE) {
--		rl_printf("Failed to play\n");
-+		bt_shell_printf("Failed to play\n");
- 		return;
- 	}
+ 	str = proxy_description(proxy, title, description);
  
--	rl_printf("Attempting to play\n");
-+	bt_shell_printf("Attempting to play\n");
- }
- 
- static void pause_reply(DBusMessage *message, void *user_data)
-@@ -162,12 +153,12 @@ static void pause_reply(DBusMessage *message, void *user_data)
- 	dbus_error_init(&error);
- 
- 	if (dbus_set_error_from_message(&error, message) == TRUE) {
--		rl_printf("Failed to pause: %s\n", error.name);
-+		bt_shell_printf("Failed to pause: %s\n", error.name);
- 		dbus_error_free(&error);
- 		return;
- 	}
- 
--	rl_printf("Pause successful\n");
-+	bt_shell_printf("Pause successful\n");
- }
- 
- static void cmd_pause(int argc, char *argv[])
-@@ -177,11 +168,11 @@ static void cmd_pause(int argc, char *argv[])
- 
- 	if (g_dbus_proxy_method_call(default_player, "Pause", NULL,
- 					pause_reply, NULL, NULL) == FALSE) {
--		rl_printf("Failed to play\n");
-+		bt_shell_printf("Failed to play\n");
- 		return;
- 	}
- 
--	rl_printf("Attempting to pause\n");
-+	bt_shell_printf("Attempting to pause\n");
- }
- 
- static void stop_reply(DBusMessage *message, void *user_data)
-@@ -191,12 +182,12 @@ static void stop_reply(DBusMessage *message, void *user_data)
- 	dbus_error_init(&error);
- 
- 	if (dbus_set_error_from_message(&error, message) == TRUE) {
--		rl_printf("Failed to stop: %s\n", error.name);
-+		bt_shell_printf("Failed to stop: %s\n", error.name);
- 		dbus_error_free(&error);
- 		return;
- 	}
- 
--	rl_printf("Stop successful\n");
-+	bt_shell_printf("Stop successful\n");
- }
- 
- static void cmd_stop(int argc, char *argv[])
-@@ -206,11 +197,11 @@ static void cmd_stop(int argc, char *argv[])
- 
- 	if (g_dbus_proxy_method_call(default_player, "Stop", NULL, stop_reply,
- 							NULL, NULL) == FALSE) {
--		rl_printf("Failed to stop\n");
-+		bt_shell_printf("Failed to stop\n");
- 		return;
- 	}
- 
--	rl_printf("Attempting to stop\n");
-+	bt_shell_printf("Attempting to stop\n");
- }
- 
- static void next_reply(DBusMessage *message, void *user_data)
-@@ -220,12 +211,12 @@ static void next_reply(DBusMessage *message, void *user_data)
- 	dbus_error_init(&error);
- 
- 	if (dbus_set_error_from_message(&error, message) == TRUE) {
--		rl_printf("Failed to jump to next: %s\n", error.name);
-+		bt_shell_printf("Failed to jump to next: %s\n", error.name);
- 		dbus_error_free(&error);
- 		return;
- 	}
- 
--	rl_printf("Next successful\n");
-+	bt_shell_printf("Next successful\n");
- }
- 
- static void cmd_next(int argc, char *argv[])
-@@ -235,11 +226,11 @@ static void cmd_next(int argc, char *argv[])
- 
- 	if (g_dbus_proxy_method_call(default_player, "Next", NULL, next_reply,
- 							NULL, NULL) == FALSE) {
--		rl_printf("Failed to jump to next\n");
-+		bt_shell_printf("Failed to jump to next\n");
- 		return;
- 	}
- 
--	rl_printf("Attempting to jump to next\n");
-+	bt_shell_printf("Attempting to jump to next\n");
- }
- 
- static void previous_reply(DBusMessage *message, void *user_data)
-@@ -249,12 +240,12 @@ static void previous_reply(DBusMessage *message, void *user_data)
- 	dbus_error_init(&error);
- 
- 	if (dbus_set_error_from_message(&error, message) == TRUE) {
--		rl_printf("Failed to jump to previous: %s\n", error.name);
-+		bt_shell_printf("Failed to jump to previous: %s\n", error.name);
- 		dbus_error_free(&error);
- 		return;
- 	}
- 
--	rl_printf("Previous successful\n");
-+	bt_shell_printf("Previous successful\n");
- }
- 
- static void cmd_previous(int argc, char *argv[])
-@@ -264,11 +255,11 @@ static void cmd_previous(int argc, char *argv[])
- 
- 	if (g_dbus_proxy_method_call(default_player, "Previous", NULL,
- 					previous_reply, NULL, NULL) == FALSE) {
--		rl_printf("Failed to jump to previous\n");
-+		bt_shell_printf("Failed to jump to previous\n");
- 		return;
- 	}
- 
--	rl_printf("Attempting to jump to previous\n");
-+	bt_shell_printf("Attempting to jump to previous\n");
- }
- 
- static void fast_forward_reply(DBusMessage *message, void *user_data)
-@@ -278,12 +269,12 @@ static void fast_forward_reply(DBusMessage *message, void *user_data)
- 	dbus_error_init(&error);
- 
- 	if (dbus_set_error_from_message(&error, message) == TRUE) {
--		rl_printf("Failed to fast forward: %s\n", error.name);
-+		bt_shell_printf("Failed to fast forward: %s\n", error.name);
- 		dbus_error_free(&error);
- 		return;
- 	}
- 
--	rl_printf("FastForward successful\n");
-+	bt_shell_printf("FastForward successful\n");
- }
- 
- static void cmd_fast_forward(int argc, char *argv[])
-@@ -293,11 +284,11 @@ static void cmd_fast_forward(int argc, char *argv[])
- 
- 	if (g_dbus_proxy_method_call(default_player, "FastForward", NULL,
- 				fast_forward_reply, NULL, NULL) == FALSE) {
--		rl_printf("Failed to jump to previous\n");
-+		bt_shell_printf("Failed to jump to previous\n");
- 		return;
- 	}
- 
--	rl_printf("Fast forward playback\n");
-+	bt_shell_printf("Fast forward playback\n");
- }
- 
- static void rewind_reply(DBusMessage *message, void *user_data)
-@@ -307,12 +298,12 @@ static void rewind_reply(DBusMessage *message, void *user_data)
- 	dbus_error_init(&error);
- 
- 	if (dbus_set_error_from_message(&error, message) == TRUE) {
--		rl_printf("Failed to rewind: %s\n", error.name);
-+		bt_shell_printf("Failed to rewind: %s\n", error.name);
- 		dbus_error_free(&error);
- 		return;
- 	}
- 
--	rl_printf("Rewind successful\n");
-+	bt_shell_printf("Rewind successful\n");
- }
- 
- static void cmd_rewind(int argc, char *argv[])
-@@ -322,11 +313,11 @@ static void cmd_rewind(int argc, char *argv[])
- 
- 	if (g_dbus_proxy_method_call(default_player, "Rewind", NULL,
- 					rewind_reply, NULL, NULL) == FALSE) {
--		rl_printf("Failed to rewind\n");
-+		bt_shell_printf("Failed to rewind\n");
- 		return;
- 	}
- 
--	rl_printf("Rewind playback\n");
-+	bt_shell_printf("Rewind playback\n");
- }
- 
- static void generic_callback(const DBusError *error, void *user_data)
-@@ -334,9 +325,9 @@ static void generic_callback(const DBusError *error, void *user_data)
- 	char *str = user_data;
- 
- 	if (dbus_error_is_set(error))
--		rl_printf("Failed to set %s: %s\n", str, error->name);
-+		bt_shell_printf("Failed to set %s: %s\n", str, error->name);
- 	else
--		rl_printf("Changing %s succeeded\n", str);
-+		bt_shell_printf("Changing %s succeeded\n", str);
- }
- 
- static void cmd_equalizer(int argc, char *argv[])
-@@ -348,12 +339,12 @@ static void cmd_equalizer(int argc, char *argv[])
- 		return;
- 
- 	if (argc < 2) {
--		rl_printf("Missing on/off argument\n");
-+		bt_shell_printf("Missing on/off argument\n");
- 		return;
- 	}
- 
- 	if (!g_dbus_proxy_get_property(default_player, "Equalizer", &iter)) {
--		rl_printf("Operation not supported\n");
-+		bt_shell_printf("Operation not supported\n");
- 		return;
- 	}
- 
-@@ -363,12 +354,12 @@ static void cmd_equalizer(int argc, char *argv[])
- 						DBUS_TYPE_STRING, &value,
- 						generic_callback, value,
- 						g_free) == FALSE) {
--		rl_printf("Failed to setting equalizer\n");
-+		bt_shell_printf("Failed to setting equalizer\n");
- 		g_free(value);
- 		return;
- 	}
- 
--	rl_printf("Attempting to set equalizer\n");
-+	bt_shell_printf("Attempting to set equalizer\n");
- }
- 
- static void cmd_repeat(int argc, char *argv[])
-@@ -380,12 +371,12 @@ static void cmd_repeat(int argc, char *argv[])
- 		return;
- 
- 	if (argc < 2) {
--		rl_printf("Missing mode argument\n");
-+		bt_shell_printf("Missing mode argument\n");
- 		return;
- 	}
- 
- 	if (!g_dbus_proxy_get_property(default_player, "Repeat", &iter)) {
--		rl_printf("Operation not supported\n");
-+		bt_shell_printf("Operation not supported\n");
- 		return;
- 	}
- 
-@@ -395,12 +386,12 @@ static void cmd_repeat(int argc, char *argv[])
- 						DBUS_TYPE_STRING, &value,
- 						generic_callback, value,
- 						g_free) == FALSE) {
--		rl_printf("Failed to set repeat\n");
-+		bt_shell_printf("Failed to set repeat\n");
- 		g_free(value);
- 		return;
- 	}
- 
--	rl_printf("Attempting to set repeat\n");
-+	bt_shell_printf("Attempting to set repeat\n");
- }
- 
- static void cmd_shuffle(int argc, char *argv[])
-@@ -412,12 +403,12 @@ static void cmd_shuffle(int argc, char *argv[])
- 		return;
- 
- 	if (argc < 2) {
--		rl_printf("Missing mode argument\n");
-+		bt_shell_printf("Missing mode argument\n");
- 		return;
- 	}
- 
- 	if (!g_dbus_proxy_get_property(default_player, "Shuffle", &iter)) {
--		rl_printf("Operation not supported\n");
-+		bt_shell_printf("Operation not supported\n");
- 		return;
- 	}
- 
-@@ -427,12 +418,12 @@ static void cmd_shuffle(int argc, char *argv[])
- 						DBUS_TYPE_STRING, &value,
- 						generic_callback, value,
- 						g_free) == FALSE) {
--		rl_printf("Failed to set shuffle\n");
-+		bt_shell_printf("Failed to set shuffle\n");
- 		g_free(value);
- 		return;
- 	}
- 
--	rl_printf("Attempting to set shuffle\n");
-+	bt_shell_printf("Attempting to set shuffle\n");
- }
- 
- static void cmd_scan(int argc, char *argv[])
-@@ -444,12 +435,12 @@ static void cmd_scan(int argc, char *argv[])
- 		return;
- 
- 	if (argc < 2) {
--		rl_printf("Missing mode argument\n");
-+		bt_shell_printf("Missing mode argument\n");
- 		return;
- 	}
- 
- 	if (!g_dbus_proxy_get_property(default_player, "Shuffle", &iter)) {
--		rl_printf("Operation not supported\n");
-+		bt_shell_printf("Operation not supported\n");
- 		return;
- 	}
- 
-@@ -459,12 +450,12 @@ static void cmd_scan(int argc, char *argv[])
- 						DBUS_TYPE_STRING, &value,
- 						generic_callback, value,
- 						g_free) == FALSE) {
--		rl_printf("Failed to set scan\n");
-+		bt_shell_printf("Failed to set scan\n");
- 		g_free(value);
- 		return;
- 	}
- 
--	rl_printf("Attempting to set scan\n");
-+	bt_shell_printf("Attempting to set scan\n");
- }
- 
- static char *proxy_description(GDBusProxy *proxy, const char *title,
-@@ -487,7 +478,7 @@ static void print_player(GDBusProxy *proxy, const char *description)
- 
- 	str = proxy_description(proxy, "Player", description);
- 
--	rl_printf("%s%s\n", str, default_player == proxy ? "[default]" : "");
-+	bt_shell_printf("%s%s\n", str, default_player == proxy ? "[default]" : "");
+-	rl_printf("%s%s\n", str, default_session == proxy ? "[default]" : "");
++	bt_shell_printf("%s%s\n", str, default_session == proxy ? "[default]" : "");
  
  	g_free(str);
  }
-@@ -527,35 +518,35 @@ static void print_iter(const char *label, const char *name,
+@@ -315,7 +301,7 @@ static void cmd_list(int argc, char *arg[])
+ static bool check_default_session(void)
+ {
+ 	if (!default_session) {
+-		rl_printf("No default session available\n");
++		bt_shell_printf("No default session available\n");
+ 		return FALSE;
+ 	}
+ 
+@@ -334,39 +320,39 @@ static void print_iter(const char *label, const char *name,
  	DBusMessageIter subiter;
  
  	if (iter == NULL) {
@@ -477,10 +217,15 @@ index c95b7497f..2a8cc49c3 100644
 +		bt_shell_printf("%s%s: %s\n", label, name,
  					valbool == TRUE ? "yes" : "no");
  		break;
+ 	case DBUS_TYPE_UINT64:
+ 		dbus_message_iter_get_basic(iter, &valu64);
+-		rl_printf("%s%s: %" PRIu64 "\n", label, name, valu64);
++		bt_shell_printf("%s%s: %" PRIu64 "\n", label, name, valu64);
+ 		break;
  	case DBUS_TYPE_UINT32:
  		dbus_message_iter_get_basic(iter, &valu32);
--		rl_printf("%s%s: 0x%06x\n", label, name, valu32);
-+		bt_shell_printf("%s%s: 0x%06x\n", label, name, valu32);
+-		rl_printf("%s%s: 0x%08x\n", label, name, valu32);
++		bt_shell_printf("%s%s: 0x%08x\n", label, name, valu32);
  		break;
  	case DBUS_TYPE_UINT16:
  		dbus_message_iter_get_basic(iter, &valu16);
@@ -494,7 +239,7 @@ index c95b7497f..2a8cc49c3 100644
  		break;
  	case DBUS_TYPE_VARIANT:
  		dbus_message_iter_recurse(iter, &subiter);
-@@ -576,7 +567,7 @@ static void print_iter(const char *label, const char *name,
+@@ -387,7 +373,7 @@ static void print_iter(const char *label, const char *name,
  		print_iter(label, valstr, &subiter);
  		break;
  	default:
@@ -503,82 +248,326 @@ index c95b7497f..2a8cc49c3 100644
  		break;
  	}
  }
-@@ -610,17 +601,17 @@ static void cmd_show_item(int argc, char *argv[])
- 	GDBusProxy *proxy;
- 
- 	if (argc < 2) {
--		rl_printf("Missing item address argument\n");
-+		bt_shell_printf("Missing item address argument\n");
- 		return;
- 	}
- 
- 	proxy = find_item(argv[1]);
- 	if (!proxy) {
--		rl_printf("Item %s not available\n", argv[1]);
-+		bt_shell_printf("Item %s not available\n", argv[1]);
- 		return;
- 	}
- 
--	rl_printf("Item %s\n", g_dbus_proxy_get_path(proxy));
-+	bt_shell_printf("Item %s\n", g_dbus_proxy_get_path(proxy));
- 
- 	print_property(proxy, "Player");
- 	print_property(proxy, "Name");
-@@ -646,12 +637,12 @@ static void cmd_show(int argc, char *argv[])
+@@ -414,12 +400,12 @@ static void cmd_show(int argc, char *argv[])
  	} else {
- 		proxy = find_player(argv[1]);
+ 		proxy = find_session(argv[1]);
  		if (!proxy) {
--			rl_printf("Player %s not available\n", argv[1]);
-+			bt_shell_printf("Player %s not available\n", argv[1]);
+-			rl_printf("Session %s not available\n", argv[1]);
++			bt_shell_printf("Session %s not available\n", argv[1]);
  			return;
  		}
  	}
  
--	rl_printf("Player %s\n", g_dbus_proxy_get_path(proxy));
-+	bt_shell_printf("Player %s\n", g_dbus_proxy_get_path(proxy));
+-	rl_printf("Session %s\n", g_dbus_proxy_get_path(proxy));
++	bt_shell_printf("Session %s\n", g_dbus_proxy_get_path(proxy));
  
- 	print_property(proxy, "Name");
- 	print_property(proxy, "Repeat");
-@@ -666,7 +657,7 @@ static void cmd_show(int argc, char *argv[])
- 	if (folder == NULL)
- 		return;
+ 	print_property(proxy, "Destination");
+ 	print_property(proxy, "Target");
+@@ -441,8 +427,7 @@ static void set_default_session(GDBusProxy *proxy)
+ 	desc = g_strdup_printf(COLOR_BLUE "[%s]" COLOR_OFF "# ", desc);
  
--	rl_printf("Folder %s\n", g_dbus_proxy_get_path(proxy));
-+	bt_shell_printf("Folder %s\n", g_dbus_proxy_get_path(proxy));
- 
- 	print_property(folder, "Name");
- 	print_property(folder, "NumberOfItems");
-@@ -680,7 +671,7 @@ static void cmd_show(int argc, char *argv[])
- 	if (item == NULL)
- 		return;
- 
--	rl_printf("Playlist %s\n", path);
-+	bt_shell_printf("Playlist %s\n", path);
- 
- 	print_property(item, "Name");
+ done:
+-	rl_set_prompt(desc);
+-	rl_redisplay();
++	bt_shell_set_prompt(desc);
+ 	g_free(desc);
  }
-@@ -690,13 +681,13 @@ static void cmd_select(int argc, char *argv[])
+ 
+@@ -451,13 +436,13 @@ static void cmd_select(int argc, char *argv[])
  	GDBusProxy *proxy;
  
  	if (argc < 2) {
--		rl_printf("Missing player address argument\n");
-+		bt_shell_printf("Missing player address argument\n");
+-		rl_printf("Missing session address argument\n");
++		bt_shell_printf("Missing session address argument\n");
  		return;
  	}
  
- 	proxy = find_player(argv[1]);
+ 	proxy = find_session(argv[1]);
  	if (proxy == NULL) {
--		rl_printf("Player %s not available\n", argv[1]);
-+		bt_shell_printf("Player %s not available\n", argv[1]);
+-		rl_printf("Session %s not available\n", argv[1]);
++		bt_shell_printf("Session %s not available\n", argv[1]);
  		return;
  	}
  
-@@ -714,12 +705,12 @@ static void change_folder_reply(DBusMessage *message, void *user_data)
+@@ -499,7 +484,7 @@ static GDBusProxy *find_message(const char *path)
+ 
+ static void transfer_info(GDBusProxy *proxy, int argc, char *argv[])
+ {
+-	rl_printf("Transfer %s\n", g_dbus_proxy_get_path(proxy));
++	bt_shell_printf("Transfer %s\n", g_dbus_proxy_get_path(proxy));
+ 
+ 	print_property(proxy, "Session");
+ 	print_property(proxy, "Name");
+@@ -513,7 +498,7 @@ static void transfer_info(GDBusProxy *proxy, int argc, char *argv[])
+ 
+ static void message_info(GDBusProxy *proxy, int argc, char *argv[])
+ {
+-	rl_printf("Message %s\n", g_dbus_proxy_get_path(proxy));
++	bt_shell_printf("Message %s\n", g_dbus_proxy_get_path(proxy));
+ 
+ 	print_property(proxy, "Folder");
+ 	print_property(proxy, "Subject");
+@@ -538,7 +523,7 @@ static void cmd_info(int argc, char *argv[])
+ 	GDBusProxy *proxy;
+ 
+ 	if (argc < 2) {
+-		rl_printf("Missing object path argument\n");
++		bt_shell_printf("Missing object path argument\n");
+ 		return;
+ 	}
+ 
+@@ -554,7 +539,7 @@ static void cmd_info(int argc, char *argv[])
+ 		return;
+ 	}
+ 
+-	rl_printf("Object %s not available\n", argv[1]);
++	bt_shell_printf("Object %s not available\n", argv[1]);
+ }
+ 
+ static void cancel_reply(DBusMessage *message, void *user_data)
+@@ -564,12 +549,12 @@ static void cancel_reply(DBusMessage *message, void *user_data)
  	dbus_error_init(&error);
  
  	if (dbus_set_error_from_message(&error, message) == TRUE) {
--		rl_printf("Failed to change folder: %s\n", error.name);
-+		bt_shell_printf("Failed to change folder: %s\n", error.name);
+-		rl_printf("Failed to cancel: %s\n", error.name);
++		bt_shell_printf("Failed to cancel: %s\n", error.name);
+ 		dbus_error_free(&error);
+ 		return;
+ 	}
+ 
+-	rl_printf("Cancel successful\n");
++	bt_shell_printf("Cancel successful\n");
+ }
+ 
+ static void cmd_cancel(int argc, char *argv[])
+@@ -577,23 +562,23 @@ static void cmd_cancel(int argc, char *argv[])
+ 	GDBusProxy *proxy;
+ 
+ 	if (argc < 2) {
+-		rl_printf("Missing transfer address argument\n");
++		bt_shell_printf("Missing transfer address argument\n");
+ 		return;
+ 	}
+ 
+ 	proxy = find_transfer(argv[1]);
+ 	if (!proxy) {
+-		rl_printf("Transfer %s not available\n", argv[1]);
++		bt_shell_printf("Transfer %s not available\n", argv[1]);
+ 		return;
+ 	}
+ 
+ 	if (g_dbus_proxy_method_call(proxy, "Cancel", NULL, cancel_reply, NULL,
+ 							NULL) == FALSE) {
+-		rl_printf("Failed to cancel transfer\n");
++		bt_shell_printf("Failed to cancel transfer\n");
+ 		return;
+ 	}
+ 
+-	rl_printf("Attempting to cancel transfer %s\n",
++	bt_shell_printf("Attempting to cancel transfer %s\n",
+ 						g_dbus_proxy_get_path(proxy));
+ }
+ 
+@@ -604,12 +589,12 @@ static void suspend_reply(DBusMessage *message, void *user_data)
+ 	dbus_error_init(&error);
+ 
+ 	if (dbus_set_error_from_message(&error, message) == TRUE) {
+-		rl_printf("Failed to suspend: %s\n", error.name);
++		bt_shell_printf("Failed to suspend: %s\n", error.name);
+ 		dbus_error_free(&error);
+ 		return;
+ 	}
+ 
+-	rl_printf("Suspend successful\n");
++	bt_shell_printf("Suspend successful\n");
+ }
+ 
+ static void cmd_suspend(int argc, char *argv[])
+@@ -617,23 +602,23 @@ static void cmd_suspend(int argc, char *argv[])
+ 	GDBusProxy *proxy;
+ 
+ 	if (argc < 2) {
+-		rl_printf("Missing transfer address argument\n");
++		bt_shell_printf("Missing transfer address argument\n");
+ 		return;
+ 	}
+ 
+ 	proxy = find_transfer(argv[1]);
+ 	if (!proxy) {
+-		rl_printf("Transfer %s not available\n", argv[1]);
++		bt_shell_printf("Transfer %s not available\n", argv[1]);
+ 		return;
+ 	}
+ 
+ 	if (g_dbus_proxy_method_call(proxy, "Suspend", NULL, suspend_reply,
+ 						NULL, NULL) == FALSE) {
+-		rl_printf("Failed to suspend transfer\n");
++		bt_shell_printf("Failed to suspend transfer\n");
+ 		return;
+ 	}
+ 
+-	rl_printf("Attempting to suspend transfer %s\n",
++	bt_shell_printf("Attempting to suspend transfer %s\n",
+ 						g_dbus_proxy_get_path(proxy));
+ }
+ 
+@@ -644,12 +629,12 @@ static void resume_reply(DBusMessage *message, void *user_data)
+ 	dbus_error_init(&error);
+ 
+ 	if (dbus_set_error_from_message(&error, message) == TRUE) {
+-		rl_printf("Failed to resume: %s\n", error.name);
++		bt_shell_printf("Failed to resume: %s\n", error.name);
+ 		dbus_error_free(&error);
+ 		return;
+ 	}
+ 
+-	rl_printf("Resume successful\n");
++	bt_shell_printf("Resume successful\n");
+ }
+ 
+ static void cmd_resume(int argc, char *argv[])
+@@ -657,23 +642,23 @@ static void cmd_resume(int argc, char *argv[])
+ 	GDBusProxy *proxy;
+ 
+ 	if (argc < 2) {
+-		rl_printf("Missing transfer address argument\n");
++		bt_shell_printf("Missing transfer address argument\n");
+ 		return;
+ 	}
+ 
+ 	proxy = find_transfer(argv[1]);
+ 	if (!proxy) {
+-		rl_printf("Transfer %s not available\n", argv[1]);
++		bt_shell_printf("Transfer %s not available\n", argv[1]);
+ 		return;
+ 	}
+ 
+ 	if (g_dbus_proxy_method_call(proxy, "Resume", NULL, resume_reply,
+ 						NULL, NULL) == FALSE) {
+-		rl_printf("Failed to resume transfer\n");
++		bt_shell_printf("Failed to resume transfer\n");
+ 		return;
+ 	}
+ 
+-	rl_printf("Attempting to resume transfer %s\n",
++	bt_shell_printf("Attempting to resume transfer %s\n",
+ 						g_dbus_proxy_get_path(proxy));
+ }
+ 
+@@ -743,7 +728,7 @@ static void print_transfer_iter(DBusMessageIter *iter)
+ 
+ 	dbus_message_iter_get_basic(iter, &path);
+ 
+-	rl_printf("Transfer %s\n", path);
++	bt_shell_printf("Transfer %s\n", path);
+ 
+ 	dbus_message_iter_next(iter);
+ 
+@@ -758,7 +743,7 @@ static void send_reply(DBusMessage *message, void *user_data)
+ 	dbus_error_init(&error);
+ 
+ 	if (dbus_set_error_from_message(&error, message) == TRUE) {
+-		rl_printf("Failed to send/pull: %s\n", error.name);
++		bt_shell_printf("Failed to send/pull: %s\n", error.name);
+ 		dbus_error_free(&error);
+ 		return;
+ 	}
+@@ -778,34 +763,34 @@ static void send_setup(DBusMessageIter *iter, void *user_data)
+ static void opp_send(GDBusProxy *proxy, int argc, char *argv[])
+ {
+ 	if (argc < 2) {
+-		rl_printf("Missing file argument\n");
++		bt_shell_printf("Missing file argument\n");
+ 		return;
+ 	}
+ 
+ 	if (g_dbus_proxy_method_call(proxy, "SendFile", send_setup, send_reply,
+ 					g_strdup(argv[1]), g_free) == FALSE) {
+-		rl_printf("Failed to send\n");
++		bt_shell_printf("Failed to send\n");
+ 		return;
+ 	}
+ 
+-	rl_printf("Attempting to send %s to %s\n", argv[1],
++	bt_shell_printf("Attempting to send %s to %s\n", argv[1],
+ 						g_dbus_proxy_get_path(proxy));
+ }
+ 
+ static void opp_pull(GDBusProxy *proxy, int argc, char *argv[])
+ {
+ 	if (argc < 2) {
+-		rl_printf("Missing file argument\n");
++		bt_shell_printf("Missing file argument\n");
+ 		return;
+ 	}
+ 
+ 	if (g_dbus_proxy_method_call(proxy, "PullBusinessCard", send_setup,
+ 			send_reply, g_strdup(argv[1]), g_free) == FALSE) {
+-		rl_printf("Failed to pull\n");
++		bt_shell_printf("Failed to pull\n");
+ 		return;
+ 	}
+ 
+-	rl_printf("Attempting to pull %s from %s\n", argv[1],
++	bt_shell_printf("Attempting to pull %s from %s\n", argv[1],
+ 						g_dbus_proxy_get_path(proxy));
+ }
+ 
+@@ -817,7 +802,7 @@ static void push_reply(DBusMessage *message, void *user_data)
+ 	dbus_error_init(&error);
+ 
+ 	if (dbus_set_error_from_message(&error, message) == TRUE) {
+-		rl_printf("Failed to PushMessage: %s\n", error.name);
++		bt_shell_printf("Failed to PushMessage: %s\n", error.name);
+ 		dbus_error_free(&error);
+ 		return;
+ 	}
+@@ -849,18 +834,18 @@ static void push_setup(DBusMessageIter *iter, void *user_data)
+ static void map_send(GDBusProxy *proxy, int argc, char *argv[])
+ {
+ 	if (argc < 2) {
+-		rl_printf("Missing file argument\n");
++		bt_shell_printf("Missing file argument\n");
+ 		return;
+ 	}
+ 
+ 	if (g_dbus_proxy_method_call(proxy, "PushMessage", push_setup,
+ 					push_reply, g_strdup(argv[1]),
+ 					g_free) == FALSE) {
+-		rl_printf("Failed to send\n");
++		bt_shell_printf("Failed to send\n");
+ 		return;
+ 	}
+ 
+-	rl_printf("Attempting to send %s to %s\n", argv[1],
++	bt_shell_printf("Attempting to send %s to %s\n", argv[1],
+ 						g_dbus_proxy_get_path(proxy));
+ }
+ 
+@@ -883,7 +868,7 @@ static void cmd_send(int argc, char *argv[])
+ 		return;
+ 	}
+ 
+-	rl_printf("Command not supported\n");
++	bt_shell_printf("Command not supported\n");
+ }
+ 
+ static void cmd_pull(int argc, char *argv[])
+@@ -899,7 +884,7 @@ static void cmd_pull(int argc, char *argv[])
+ 		return;
+ 	}
+ 
+-	rl_printf("Command not supported\n");
++	bt_shell_printf("Command not supported\n");
+ }
+ 
+ static void change_folder_reply(DBusMessage *message, void *user_data)
+@@ -909,12 +894,12 @@ static void change_folder_reply(DBusMessage *message, void *user_data)
+ 	dbus_error_init(&error);
+ 
+ 	if (dbus_set_error_from_message(&error, message) == TRUE) {
+-		rl_printf("Failed to ChangeFolder: %s\n", error.name);
++		bt_shell_printf("Failed to ChangeFolder: %s\n", error.name);
  		dbus_error_free(&error);
  		return;
  	}
@@ -588,188 +577,664 @@ index c95b7497f..2a8cc49c3 100644
  }
  
  static void change_folder_setup(DBusMessageIter *iter, void *user_data)
-@@ -734,12 +725,12 @@ static void cmd_change_folder(int argc, char *argv[])
- 	GDBusProxy *proxy;
+@@ -932,14 +917,14 @@ static void select_reply(DBusMessage *message, void *user_data)
+ 	dbus_error_init(&error);
  
+ 	if (dbus_set_error_from_message(&error, message) == TRUE) {
+-		rl_printf("Failed to Select: %s\n", error.name);
++		bt_shell_printf("Failed to Select: %s\n", error.name);
+ 		dbus_error_free(&error);
+ 		return;
+ 	}
+ 
+ 	dbus_message_iter_init(message, &iter);
+ 
+-	rl_printf("Select successful\n");
++	bt_shell_printf("Select successful\n");
+ }
+ 
+ static void select_setup(DBusMessageIter *iter, void *user_data)
+@@ -958,12 +943,12 @@ static void setfolder_reply(DBusMessage *message, void *user_data)
+ 	dbus_error_init(&error);
+ 
+ 	if (dbus_set_error_from_message(&error, message) == TRUE) {
+-		rl_printf("Failed to SetFolder: %s\n", error.name);
++		bt_shell_printf("Failed to SetFolder: %s\n", error.name);
+ 		dbus_error_free(&error);
+ 		return;
+ 	}
+ 
+-	rl_printf("SetFolder successful\n");
++	bt_shell_printf("SetFolder successful\n");
+ }
+ 
+ static void setfolder_setup(DBusMessageIter *iter, void *user_data)
+@@ -1004,52 +989,52 @@ static GDBusProxy *find_pbap(const char *path)
+ static void ftp_cd(GDBusProxy *proxy, int argc, char *argv[])
+ {
  	if (argc < 2) {
--		rl_printf("Missing item argument\n");
-+		bt_shell_printf("Missing item argument\n");
- 		return;
- 	}
- 
- 	if (dbus_validate_path(argv[1], NULL) == FALSE) {
--		rl_printf("Not a valid path\n");
-+		bt_shell_printf("Not a valid path\n");
- 		return;
- 	}
- 
-@@ -748,17 +739,17 @@ static void cmd_change_folder(int argc, char *argv[])
- 
- 	proxy = find_folder(g_dbus_proxy_get_path(default_player));
- 	if (proxy == NULL) {
--		rl_printf("Operation not supported\n");
-+		bt_shell_printf("Operation not supported\n");
+-		rl_printf("Missing path argument\n");
++		bt_shell_printf("Missing path argument\n");
  		return;
  	}
  
  	if (g_dbus_proxy_method_call(proxy, "ChangeFolder", change_folder_setup,
- 				change_folder_reply, argv[1], NULL) == FALSE) {
--		rl_printf("Failed to change current folder\n");
-+		bt_shell_printf("Failed to change current folder\n");
+ 					change_folder_reply, g_strdup(argv[1]),
+ 					g_free) == FALSE) {
+-		rl_printf("Failed to ChangeFolder\n");
++		bt_shell_printf("Failed to ChangeFolder\n");
  		return;
  	}
  
--	rl_printf("Attempting to change folder\n");
-+	bt_shell_printf("Attempting to change folder\n");
+-	rl_printf("Attempting to ChangeFolder to %s\n", argv[1]);
++	bt_shell_printf("Attempting to ChangeFolder to %s\n", argv[1]);
  }
  
- static void append_variant(DBusMessageIter *iter, int type, void *val)
-@@ -832,12 +823,12 @@ static void list_items_reply(DBusMessage *message, void *user_data)
- 	dbus_error_init(&error);
- 
- 	if (dbus_set_error_from_message(&error, message) == TRUE) {
--		rl_printf("Failed to list items: %s\n", error.name);
-+		bt_shell_printf("Failed to list items: %s\n", error.name);
- 		dbus_error_free(&error);
- 		return;
- 	}
- 
--	rl_printf("ListItems successful\n");
-+	bt_shell_printf("ListItems successful\n");
- }
- 
- static void cmd_list_items(int argc, char *argv[])
-@@ -850,7 +841,7 @@ static void cmd_list_items(int argc, char *argv[])
- 
- 	proxy = find_folder(g_dbus_proxy_get_path(default_player));
- 	if (proxy == NULL) {
--		rl_printf("Operation not supported\n");
-+		bt_shell_printf("Operation not supported\n");
- 		return;
- 	}
- 
-@@ -864,7 +855,7 @@ static void cmd_list_items(int argc, char *argv[])
- 	errno = 0;
- 	args->start = strtol(argv[1], NULL, 10);
- 	if (errno != 0) {
--		rl_printf("%s(%d)\n", strerror(errno), errno);
-+		bt_shell_printf("%s(%d)\n", strerror(errno), errno);
- 		g_free(args);
- 		return;
- 	}
-@@ -875,7 +866,7 @@ static void cmd_list_items(int argc, char *argv[])
- 	errno = 0;
- 	args->end = strtol(argv[2], NULL, 10);
- 	if (errno != 0) {
--		rl_printf("%s(%d)\n", strerror(errno), errno);
-+		bt_shell_printf("%s(%d)\n", strerror(errno), errno);
- 		g_free(args);
- 		return;
- 	}
-@@ -883,12 +874,12 @@ static void cmd_list_items(int argc, char *argv[])
- done:
- 	if (g_dbus_proxy_method_call(proxy, "ListItems", list_items_setup,
- 				list_items_reply, args, g_free) == FALSE) {
--		rl_printf("Failed to change current folder\n");
-+		bt_shell_printf("Failed to change current folder\n");
- 		g_free(args);
- 		return;
- 	}
- 
--	rl_printf("Attempting to list items\n");
-+	bt_shell_printf("Attempting to list items\n");
- }
- 
- static void search_setup(DBusMessageIter *iter, void *user_data)
-@@ -915,12 +906,12 @@ static void search_reply(DBusMessage *message, void *user_data)
- 	dbus_error_init(&error);
- 
- 	if (dbus_set_error_from_message(&error, message) == TRUE) {
--		rl_printf("Failed to search: %s\n", error.name);
-+		bt_shell_printf("Failed to search: %s\n", error.name);
- 		dbus_error_free(&error);
- 		return;
- 	}
- 
--	rl_printf("Search successful\n");
-+	bt_shell_printf("Search successful\n");
- }
- 
- static void cmd_search(int argc, char *argv[])
-@@ -929,7 +920,7 @@ static void cmd_search(int argc, char *argv[])
- 	char *string;
- 
+ static void pbap_cd(GDBusProxy *proxy, int argc, char *argv[])
+ {
  	if (argc < 2) {
--		rl_printf("Missing string argument\n");
-+		bt_shell_printf("Missing string argument\n");
+-		rl_printf("Missing path argument\n");
++		bt_shell_printf("Missing path argument\n");
  		return;
  	}
  
-@@ -938,7 +929,7 @@ static void cmd_search(int argc, char *argv[])
- 
- 	proxy = find_folder(g_dbus_proxy_get_path(default_player));
- 	if (proxy == NULL) {
--		rl_printf("Operation not supported\n");
-+		bt_shell_printf("Operation not supported\n");
+ 	if (g_dbus_proxy_method_call(proxy, "Select", select_setup,
+ 					select_reply, g_strdup(argv[1]),
+ 					g_free) == FALSE) {
+-		rl_printf("Failed to Select\n");
++		bt_shell_printf("Failed to Select\n");
  		return;
  	}
  
-@@ -946,12 +937,12 @@ static void cmd_search(int argc, char *argv[])
+-	rl_printf("Attempting to Select to %s\n", argv[1]);
++	bt_shell_printf("Attempting to Select to %s\n", argv[1]);
+ }
  
+ static void map_cd(GDBusProxy *proxy, int argc, char *argv[])
+ {
+ 	if (argc < 2) {
+-		rl_printf("Missing path argument\n");
++		bt_shell_printf("Missing path argument\n");
+ 		return;
+ 	}
+ 
+ 	if (g_dbus_proxy_method_call(proxy, "SetFolder", setfolder_setup,
+ 					setfolder_reply, g_strdup(argv[1]),
+ 					g_free) == FALSE) {
+-		rl_printf("Failed to SetFolder\n");
++		bt_shell_printf("Failed to SetFolder\n");
+ 		return;
+ 	}
+ 
+-	rl_printf("Attempting to SetFolder to %s\n", argv[1]);
++	bt_shell_printf("Attempting to SetFolder to %s\n", argv[1]);
+ }
+ 
+ static void cmd_cd(int argc, char *argv[])
+@@ -1077,7 +1062,7 @@ static void cmd_cd(int argc, char *argv[])
+ 		return;
+ 	}
+ 
+-	rl_printf("Command not supported\n");
++	bt_shell_printf("Command not supported\n");
+ }
+ 
+ static void list_folder_reply(DBusMessage *message, void *user_data)
+@@ -1088,7 +1073,7 @@ static void list_folder_reply(DBusMessage *message, void *user_data)
+ 	dbus_error_init(&error);
+ 
+ 	if (dbus_set_error_from_message(&error, message) == TRUE) {
+-		rl_printf("Failed to ListFolder: %s\n", error.name);
++		bt_shell_printf("Failed to ListFolder: %s\n", error.name);
+ 		dbus_error_free(&error);
+ 		return;
+ 	}
+@@ -1111,11 +1096,11 @@ static void ftp_ls(GDBusProxy *proxy, int argc, char *argv[])
+ 	if (g_dbus_proxy_method_call(proxy, "ListFolder", NULL,
+ 						list_folder_reply, NULL,
+ 						NULL) == FALSE) {
+-		rl_printf("Failed to ls\n");
++		bt_shell_printf("Failed to ls\n");
+ 		return;
+ 	}
+ 
+-	rl_printf("Attempting to ListFolder\n");
++	bt_shell_printf("Attempting to ListFolder\n");
+ }
+ 
+ static void parse_list_reply(DBusMessage *message)
+@@ -1152,7 +1137,7 @@ static void list_reply(DBusMessage *message, void *user_data)
+ 	dbus_error_init(&error);
+ 
+ 	if (dbus_set_error_from_message(&error, message) == TRUE) {
+-		rl_printf("Failed to List: %s\n", error.name);
++		bt_shell_printf("Failed to List: %s\n", error.name);
+ 		dbus_error_free(&error);
+ 		return;
+ 	}
+@@ -1181,7 +1166,7 @@ static void search_reply(DBusMessage *message, void *user_data)
+ 	dbus_error_init(&error);
+ 
+ 	if (dbus_set_error_from_message(&error, message) == TRUE) {
+-		rl_printf("Failed to Search: %s\n", error.name);
++		bt_shell_printf("Failed to Search: %s\n", error.name);
+ 		dbus_error_free(&error);
+ 		return;
+ 	}
+@@ -1215,11 +1200,11 @@ static void pbap_search(GDBusProxy *proxy, int argc, char *argv[])
  	if (g_dbus_proxy_method_call(proxy, "Search", search_setup,
- 				search_reply, string, g_free) == FALSE) {
--		rl_printf("Failed to search\n");
-+		bt_shell_printf("Failed to search\n");
- 		g_free(string);
+ 					search_reply, g_strdup(argv[1]),
+ 					g_free) == FALSE) {
+-		rl_printf("Failed to Search\n");
++		bt_shell_printf("Failed to Search\n");
  		return;
  	}
  
--	rl_printf("Attempting to search\n");
-+	bt_shell_printf("Attempting to search\n");
+-	rl_printf("Attempting to Search\n");
++	bt_shell_printf("Attempting to Search\n");
  }
  
- static void add_to_nowplaying_reply(DBusMessage *message, void *user_data)
-@@ -961,12 +952,12 @@ static void add_to_nowplaying_reply(DBusMessage *message, void *user_data)
+ static void list_folders_reply(DBusMessage *message, void *user_data)
+@@ -1230,7 +1215,7 @@ static void list_folders_reply(DBusMessage *message, void *user_data)
  	dbus_error_init(&error);
  
  	if (dbus_set_error_from_message(&error, message) == TRUE) {
--		rl_printf("Failed to queue: %s\n", error.name);
-+		bt_shell_printf("Failed to queue: %s\n", error.name);
+-		rl_printf("Failed to ListFolders: %s\n", error.name);
++		bt_shell_printf("Failed to ListFolders: %s\n", error.name);
+ 		dbus_error_free(&error);
+ 		return;
+ 	}
+@@ -1270,7 +1255,7 @@ static void list_messages_reply(DBusMessage *message, void *user_data)
+ 	dbus_error_init(&error);
+ 
+ 	if (dbus_set_error_from_message(&error, message) == TRUE) {
+-		rl_printf("Failed to ListFolders: %s\n", error.name);
++		bt_shell_printf("Failed to ListFolders: %s\n", error.name);
+ 		dbus_error_free(&error);
+ 		return;
+ 	}
+@@ -1289,7 +1274,7 @@ static void list_messages_reply(DBusMessage *message, void *user_data)
+ 
+ 		dbus_message_iter_recurse(&array, &entry);
+ 		dbus_message_iter_get_basic(&entry, &obj);
+-		rl_printf("\t%s\n", obj);
++		bt_shell_printf("\t%s\n", obj);
+ 		dbus_message_iter_next(&array);
+ 	}
+ }
+@@ -1318,11 +1303,11 @@ static void pbap_list(GDBusProxy *proxy, int argc, char *argv[])
+ {
+ 	if (g_dbus_proxy_method_call(proxy, "List", list_setup, list_reply,
+ 						NULL, NULL) == FALSE) {
+-		rl_printf("Failed to List\n");
++		bt_shell_printf("Failed to List\n");
+ 		return;
+ 	}
+ 
+-	rl_printf("Attempting to List\n");
++	bt_shell_printf("Attempting to List\n");
+ }
+ 
+ static void get_size_reply(DBusMessage *message, void *user_data)
+@@ -1334,7 +1319,7 @@ static void get_size_reply(DBusMessage *message, void *user_data)
+ 	dbus_error_init(&error);
+ 
+ 	if (dbus_set_error_from_message(&error, message) == TRUE) {
+-		rl_printf("Failed to GetSize: %s\n", error.name);
++		bt_shell_printf("Failed to GetSize: %s\n", error.name);
+ 		dbus_error_free(&error);
+ 		return;
+ 	}
+@@ -1350,11 +1335,11 @@ static void pbap_get_size(GDBusProxy *proxy, int argc, char *argv[])
+ {
+ 	if (g_dbus_proxy_method_call(proxy, "GetSize", NULL, get_size_reply,
+ 						proxy, NULL) == FALSE) {
+-		rl_printf("Failed to GetSize\n");
++		bt_shell_printf("Failed to GetSize\n");
+ 		return;
+ 	}
+ 
+-	rl_printf("Attempting to GetSize\n");
++	bt_shell_printf("Attempting to GetSize\n");
+ }
+ 
+ static void pbap_ls(GDBusProxy *proxy, int argc, char *argv[])
+@@ -1375,11 +1360,11 @@ static void map_ls_messages(GDBusProxy *proxy, int argc, char *argv[])
+ 	if (g_dbus_proxy_method_call(proxy, "ListMessages", list_messages_setup,
+ 					list_messages_reply, g_strdup(argv[1]),
+ 					g_free) == FALSE) {
+-		rl_printf("Failed to ListMessages\n");
++		bt_shell_printf("Failed to ListMessages\n");
+ 		return;
+ 	}
+ 
+-	rl_printf("Attempting to ListMessages\n");
++	bt_shell_printf("Attempting to ListMessages\n");
+ }
+ 
+ static void map_ls(GDBusProxy *proxy, int argc, char *argv[])
+@@ -1392,11 +1377,11 @@ static void map_ls(GDBusProxy *proxy, int argc, char *argv[])
+ 	if (g_dbus_proxy_method_call(proxy, "ListFolders", list_folders_setup,
+ 						list_folders_reply, NULL,
+ 						NULL) == FALSE) {
+-		rl_printf("Failed to ListFolders\n");
++		bt_shell_printf("Failed to ListFolders\n");
+ 		return;
+ 	}
+ 
+-	rl_printf("Attempting to ListFolders\n");
++	bt_shell_printf("Attempting to ListFolders\n");
+ }
+ 
+ static void cmd_ls(int argc, char *argv[])
+@@ -1424,7 +1409,7 @@ static void cmd_ls(int argc, char *argv[])
+ 		return;
+ 	}
+ 
+-	rl_printf("Command not supported\n");
++	bt_shell_printf("Command not supported\n");
+ }
+ 
+ struct cp_args {
+@@ -1481,12 +1466,12 @@ static void copy_file_reply(DBusMessage *message, void *user_data)
+ 	dbus_error_init(&error);
+ 
+ 	if (dbus_set_error_from_message(&error, message) == TRUE) {
+-		rl_printf("Failed to CopyFile: %s\n", error.name);
++		bt_shell_printf("Failed to CopyFile: %s\n", error.name);
  		dbus_error_free(&error);
  		return;
  	}
  
--	rl_printf("AddToNowPlaying successful\n");
-+	bt_shell_printf("AddToNowPlaying successful\n");
+-	rl_printf("CopyFile successful\n");
++	bt_shell_printf("CopyFile successful\n");
  }
  
- static void cmd_queue(int argc, char *argv[])
-@@ -974,32 +965,29 @@ static void cmd_queue(int argc, char *argv[])
- 	GDBusProxy *proxy;
+ static void ftp_copy(GDBusProxy *proxy, int argc, char *argv[])
+@@ -1497,11 +1482,11 @@ static void ftp_copy(GDBusProxy *proxy, int argc, char *argv[])
+ 
+ 	if (g_dbus_proxy_method_call(proxy, "CopyFile", cp_setup,
+ 				copy_file_reply, args, cp_free) == FALSE) {
+-		rl_printf("Failed to CopyFile\n");
++		bt_shell_printf("Failed to CopyFile\n");
+ 		return;
+ 	}
+ 
+-	rl_printf("Attempting to CopyFile\n");
++	bt_shell_printf("Attempting to CopyFile\n");
+ }
+ 
+ static void get_file_reply(DBusMessage *message, void *user_data)
+@@ -1512,7 +1497,7 @@ static void get_file_reply(DBusMessage *message, void *user_data)
+ 	dbus_error_init(&error);
+ 
+ 	if (dbus_set_error_from_message(&error, message) == TRUE) {
+-		rl_printf("Failed to GetFile: %s\n", error.name);
++		bt_shell_printf("Failed to GetFile: %s\n", error.name);
+ 		dbus_error_free(&error);
+ 		return;
+ 	}
+@@ -1541,11 +1526,11 @@ static void ftp_get(GDBusProxy *proxy, int argc, char *argv[])
+ 
+ 	if (g_dbus_proxy_method_call(proxy, "GetFile", get_file_setup,
+ 				get_file_reply, args, cp_free) == FALSE) {
+-		rl_printf("Failed to GetFile\n");
++		bt_shell_printf("Failed to GetFile\n");
+ 		return;
+ 	}
+ 
+-	rl_printf("Attempting to GetFile\n");
++	bt_shell_printf("Attempting to GetFile\n");
+ }
+ 
+ static void put_file_reply(DBusMessage *message, void *user_data)
+@@ -1556,7 +1541,7 @@ static void put_file_reply(DBusMessage *message, void *user_data)
+ 	dbus_error_init(&error);
+ 
+ 	if (dbus_set_error_from_message(&error, message) == TRUE) {
+-		rl_printf("Failed to PutFile: %s\n", error.name);
++		bt_shell_printf("Failed to PutFile: %s\n", error.name);
+ 		dbus_error_free(&error);
+ 		return;
+ 	}
+@@ -1571,7 +1556,7 @@ static void ftp_put(GDBusProxy *proxy, int argc, char *argv[])
+ 	struct cp_args *args;
+ 
+ 	if (rindex(argv[2], ':') != NULL) {
+-		rl_printf("Invalid target file argument\n");
++		bt_shell_printf("Invalid target file argument\n");
+ 		return;
+ 	}
+ 
+@@ -1579,22 +1564,22 @@ static void ftp_put(GDBusProxy *proxy, int argc, char *argv[])
+ 
+ 	if (g_dbus_proxy_method_call(proxy, "PutFile", cp_setup, put_file_reply,
+ 						args, cp_free) == FALSE) {
+-		rl_printf("Failed to PutFile\n");
++		bt_shell_printf("Failed to PutFile\n");
+ 		return;
+ 	}
+ 
+-	rl_printf("Attempting to PutFile\n");
++	bt_shell_printf("Attempting to PutFile\n");
+ }
+ 
+ static void ftp_cp(GDBusProxy *proxy, int argc, char *argv[])
+ {
+ 	if (argc < 2) {
+-		rl_printf("Missing source file argument\n");
++		bt_shell_printf("Missing source file argument\n");
+ 		return;
+ 	}
+ 
+ 	if (argc < 3) {
+-		rl_printf("Missing target file argument\n");
++		bt_shell_printf("Missing target file argument\n");
+ 		return;
+ 	}
+ 
+@@ -1611,13 +1596,13 @@ static void pull_all_reply(DBusMessage *message, void *user_data)
+ 	dbus_error_init(&error);
+ 
+ 	if (dbus_set_error_from_message(&error, message) == TRUE) {
+-		rl_printf("Failed to PullAll: %s\n", error.name);
++		bt_shell_printf("Failed to PullAll: %s\n", error.name);
+ 		dbus_error_free(&error);
+ 		return;
+ 	}
+ 
+ 
+-	rl_printf("PullAll successful\n");
++	bt_shell_printf("PullAll successful\n");
+ }
+ 
+ static void pull_all_setup(DBusMessageIter *iter, void *user_data)
+@@ -1642,11 +1627,11 @@ static void pbap_pull_all(GDBusProxy *proxy, int argc, char *argv[])
+ 	if (g_dbus_proxy_method_call(proxy, "PullAll", pull_all_setup,
+ 					pull_all_reply, g_strdup(argv[2]),
+ 					g_free) == FALSE) {
+-		rl_printf("Failed to PullAll\n");
++		bt_shell_printf("Failed to PullAll\n");
+ 		return;
+ 	}
+ 
+-	rl_printf("Attempting to PullAll\n");
++	bt_shell_printf("Attempting to PullAll\n");
+ }
+ 
+ static void pull_reply(DBusMessage *message, void *user_data)
+@@ -1656,13 +1641,13 @@ static void pull_reply(DBusMessage *message, void *user_data)
+ 	dbus_error_init(&error);
+ 
+ 	if (dbus_set_error_from_message(&error, message) == TRUE) {
+-		rl_printf("Failed to Pull: %s\n", error.name);
++		bt_shell_printf("Failed to Pull: %s\n", error.name);
+ 		dbus_error_free(&error);
+ 		return;
+ 	}
+ 
+ 
+-	rl_printf("Pull successful\n");
++	bt_shell_printf("Pull successful\n");
+ }
+ 
+ static void pull_setup(DBusMessageIter *iter, void *user_data)
+@@ -1691,22 +1676,22 @@ static void pbap_pull(GDBusProxy *proxy, int argc, char *argv[])
+ 
+ 	if (g_dbus_proxy_method_call(proxy, "Pull", pull_setup, pull_reply,
+ 						args, cp_free) == FALSE) {
+-		rl_printf("Failed to Pull\n");
++		bt_shell_printf("Failed to Pull\n");
+ 		return;
+ 	}
+ 
+-	rl_printf("Attempting to Pull\n");
++	bt_shell_printf("Attempting to Pull\n");
+ }
+ 
+ static void pbap_cp(GDBusProxy *proxy, int argc, char *argv[])
+ {
+ 	if (argc < 2) {
+-		rl_printf("Missing source file argument\n");
++		bt_shell_printf("Missing source file argument\n");
+ 		return;
+ 	}
+ 
+ 	if (argc < 3) {
+-		rl_printf("Missing target file argument\n");
++		bt_shell_printf("Missing target file argument\n");
+ 		return;
+ 	}
+ 
+@@ -1724,7 +1709,7 @@ static void get_reply(DBusMessage *message, void *user_data)
+ 	dbus_error_init(&error);
+ 
+ 	if (dbus_set_error_from_message(&error, message) == TRUE) {
+-		rl_printf("Failed to Get: %s\n", error.name);
++		bt_shell_printf("Failed to Get: %s\n", error.name);
+ 		dbus_error_free(&error);
+ 		return;
+ 	}
+@@ -1748,28 +1733,28 @@ static void map_cp(GDBusProxy *proxy, int argc, char *argv[])
+ 	GDBusProxy *obj;
  
  	if (argc < 2) {
--		rl_printf("Missing item address argument\n");
-+		bt_shell_printf("Missing item address argument\n");
+-		rl_printf("Missing message argument\n");
++		bt_shell_printf("Missing message argument\n");
  		return;
  	}
  
- 	proxy = find_item(argv[1]);
+ 	obj = find_message(argv[1]);
+ 	if (obj == NULL) {
+-		rl_printf("Invalid message argument\n");
++		bt_shell_printf("Invalid message argument\n");
+ 		return;
+ 	}
+ 
+ 	if (argc < 3) {
+-		rl_printf("Missing target file argument\n");
++		bt_shell_printf("Missing target file argument\n");
+ 		return;
+ 	}
+ 
+ 	if (g_dbus_proxy_method_call(obj, "Get", get_setup, get_reply,
+ 					g_strdup(argv[2]), g_free) == FALSE) {
+-		rl_printf("Failed to Get\n");
++		bt_shell_printf("Failed to Get\n");
+ 		return;
+ 	}
+ 
+-	rl_printf("Attempting to Get\n");
++	bt_shell_printf("Attempting to Get\n");
+ }
+ 
+ static void cmd_cp(int argc, char *argv[])
+@@ -1798,7 +1783,7 @@ static void cmd_cp(int argc, char *argv[])
+ 		return;
+ 	}
+ 
+-	rl_printf("Command not supported\n");
++	bt_shell_printf("Command not supported\n");
+ }
+ 
+ static void move_file_reply(DBusMessage *message, void *user_data)
+@@ -1808,12 +1793,12 @@ static void move_file_reply(DBusMessage *message, void *user_data)
+ 	dbus_error_init(&error);
+ 
+ 	if (dbus_set_error_from_message(&error, message) == TRUE) {
+-		rl_printf("Failed to MoveFile: %s\n", error.name);
++		bt_shell_printf("Failed to MoveFile: %s\n", error.name);
+ 		dbus_error_free(&error);
+ 		return;
+ 	}
+ 
+-	rl_printf("MoveFile successful\n");
++	bt_shell_printf("MoveFile successful\n");
+ }
+ 
+ static void cmd_mv(int argc, char *argv[])
+@@ -1825,18 +1810,18 @@ static void cmd_mv(int argc, char *argv[])
+ 		return;
+ 
+ 	if (argc < 2) {
+-		rl_printf("Missing source file argument\n");
++		bt_shell_printf("Missing source file argument\n");
+ 		return;
+ 	}
+ 
+ 	if (argc < 3) {
+-		rl_printf("Missing target file argument\n");
++		bt_shell_printf("Missing target file argument\n");
+ 		return;
+ 	}
+ 
+ 	proxy = find_ftp(g_dbus_proxy_get_path(default_session));
  	if (proxy == NULL) {
--		rl_printf("Item %s not available\n", argv[1]);
-+		bt_shell_printf("Item %s not available\n", argv[1]);
+-		rl_printf("Command not supported\n");
++		bt_shell_printf("Command not supported\n");
  		return;
  	}
  
- 	if (g_dbus_proxy_method_call(proxy, "AddtoNowPlaying", NULL,
- 					add_to_nowplaying_reply, NULL,
- 					NULL) == FALSE) {
--		rl_printf("Failed to play\n");
-+		bt_shell_printf("Failed to play\n");
+@@ -1844,11 +1829,11 @@ static void cmd_mv(int argc, char *argv[])
+ 
+ 	if (g_dbus_proxy_method_call(proxy, "MoveFile", cp_setup,
+ 				move_file_reply, args, cp_free) == FALSE) {
+-		rl_printf("Failed to MoveFile\n");
++		bt_shell_printf("Failed to MoveFile\n");
  		return;
  	}
  
--	rl_printf("Attempting to queue %s\n", argv[1]);
-+	bt_shell_printf("Attempting to queue %s\n", argv[1]);
+-	rl_printf("Attempting to MoveFile\n");
++	bt_shell_printf("Attempting to MoveFile\n");
+ }
+ 
+ static void delete_reply(DBusMessage *message, void *user_data)
+@@ -1858,12 +1843,12 @@ static void delete_reply(DBusMessage *message, void *user_data)
+ 	dbus_error_init(&error);
+ 
+ 	if (dbus_set_error_from_message(&error, message) == TRUE) {
+-		rl_printf("Failed to Delete: %s\n", error.name);
++		bt_shell_printf("Failed to Delete: %s\n", error.name);
+ 		dbus_error_free(&error);
+ 		return;
+ 	}
+ 
+-	rl_printf("Delete successful\n");
++	bt_shell_printf("Delete successful\n");
+ }
+ 
+ static void delete_setup(DBusMessageIter *iter, void *user_data)
+@@ -1876,26 +1861,26 @@ static void delete_setup(DBusMessageIter *iter, void *user_data)
+ static void ftp_rm(GDBusProxy *proxy, int argc, char *argv[])
+ {
+ 	if (argc < 2) {
+-		rl_printf("Missing file argument\n");
++		bt_shell_printf("Missing file argument\n");
+ 		return;
+ 	}
+ 
+ 	if (g_dbus_proxy_method_call(proxy, "Delete", delete_setup,
+ 					delete_reply, g_strdup(argv[1]),
+ 					g_free) == FALSE) {
+-		rl_printf("Failed to Delete\n");
++		bt_shell_printf("Failed to Delete\n");
+ 		return;
+ 	}
+ 
+-	rl_printf("Attempting to Delete\n");
++	bt_shell_printf("Attempting to Delete\n");
+ }
+ 
+ static void set_delete_reply(const DBusError *error, void *user_data)
+ {
+ 	if (dbus_error_is_set(error))
+-		rl_printf("Failed to set Deleted: %s\n", error->name);
++		bt_shell_printf("Failed to set Deleted: %s\n", error->name);
+ 	else
+-		rl_printf("Set Deleted successful\n");
++		bt_shell_printf("Set Deleted successful\n");
+ }
+ 
+ static void map_rm(GDBusProxy *proxy, int argc, char *argv[])
+@@ -1904,24 +1889,24 @@ static void map_rm(GDBusProxy *proxy, int argc, char *argv[])
+ 	dbus_bool_t value = TRUE;
+ 
+ 	if (argc < 2) {
+-		rl_printf("Missing message argument\n");
++		bt_shell_printf("Missing message argument\n");
+ 		return;
+ 	}
+ 
+ 	msg = find_message(argv[1]);
+ 	if (msg == NULL) {
+-		rl_printf("Invalid message argument\n");
++		bt_shell_printf("Invalid message argument\n");
+ 		return;
+ 	}
+ 
+ 	if (g_dbus_proxy_set_property_basic(msg, "Deleted", DBUS_TYPE_BOOLEAN,
+ 						&value, set_delete_reply,
+ 						NULL, NULL) == FALSE) {
+-		rl_printf("Failed to set Deleted\n");
++		bt_shell_printf("Failed to set Deleted\n");
+ 		return;
+ 	}
+ 
+-	rl_printf("Attempting to set Deleted\n");
++	bt_shell_printf("Attempting to set Deleted\n");
+ }
+ 
+ static void cmd_rm(int argc, char *argv[])
+@@ -1943,7 +1928,7 @@ static void cmd_rm(int argc, char *argv[])
+ 		return;
+ 	}
+ 
+-	rl_printf("Command not supported\n");
++	bt_shell_printf("Command not supported\n");
+ }
+ 
+ static void create_folder_reply(DBusMessage *message, void *user_data)
+@@ -1953,12 +1938,12 @@ static void create_folder_reply(DBusMessage *message, void *user_data)
+ 	dbus_error_init(&error);
+ 
+ 	if (dbus_set_error_from_message(&error, message) == TRUE) {
+-		rl_printf("Failed to CreateFolder: %s\n", error.name);
++		bt_shell_printf("Failed to CreateFolder: %s\n", error.name);
+ 		dbus_error_free(&error);
+ 		return;
+ 	}
+ 
+-	rl_printf("CreateFolder successful\n");
++	bt_shell_printf("CreateFolder successful\n");
+ }
+ 
+ static void create_folder_setup(DBusMessageIter *iter, void *user_data)
+@@ -1976,32 +1961,29 @@ static void cmd_mkdir(int argc, char *argv[])
+ 		return;
+ 
+ 	if (argc < 2) {
+-		rl_printf("Missing folder argument\n");
++		bt_shell_printf("Missing folder argument\n");
+ 		return;
+ 	}
+ 
+ 	proxy = find_ftp(g_dbus_proxy_get_path(default_session));
+ 	if (proxy == NULL) {
+-		rl_printf("Command not supported\n");
++		bt_shell_printf("Command not supported\n");
+ 		return;
+ 	}
+ 
+ 	if (g_dbus_proxy_method_call(proxy, "CreateFolder", create_folder_setup,
+ 					create_folder_reply, g_strdup(argv[1]),
+ 					g_free) == FALSE) {
+-		rl_printf("Failed to CreateFolder\n");
++		bt_shell_printf("Failed to CreateFolder\n");
+ 		return;
+ 	}
+ 
+-	rl_printf("Attempting to CreateFolder\n");
++	bt_shell_printf("Attempting to CreateFolder\n");
  }
  
 -static const struct {
@@ -781,17 +1246,19 @@ index c95b7497f..2a8cc49c3 100644
 +static const struct bt_shell_menu main_menu = {
 +	.name = "main",
 +	.entries = {
- 	{ "list",         NULL,       cmd_list, "List available players" },
- 	{ "show",         "[player]", cmd_show, "Player information" },
- 	{ "select",       "<player>", cmd_select, "Select default player" },
-@@ -1030,218 +1018,9 @@ static const struct {
- 	{ "quit",         NULL,       cmd_quit, "Quit program" },
- 	{ "exit",         NULL,       cmd_quit },
- 	{ "help" },
+ 	{ "connect",      "<dev> [uuid]", cmd_connect, "Connect session" },
+ 	{ "disconnect",   "[session]", cmd_disconnect, "Disconnect session" },
+ 	{ "list",         NULL,       cmd_list, "List available sessions" },
+@@ -2022,221 +2004,9 @@ static const struct {
+ 				"Move source file to destination file" },
+ 	{ "rm",          "<file>",    cmd_rm, "Delete file" },
+ 	{ "mkdir",       "<folder>",    cmd_mkdir, "Create folder" },
+-	{ "quit",         NULL,       cmd_quit, "Quit program" },
+-	{ "exit",         NULL,       cmd_quit },
+-	{ "help" },
 -	{}
-+	{} },
- };
- 
+-};
+-
 -static char *cmd_generator(const char *text, int state)
 -{
 -	static int index, len;
@@ -829,8 +1296,9 @@ index c95b7497f..2a8cc49c3 100644
 -
 -static void rl_handler(char *input)
 -{
+-	wordexp_t w;
 -	int argc;
--	char **argv = NULL;
+-	char **argv;
 -	int i;
 -
 -	if (!input) {
@@ -844,20 +1312,17 @@ index c95b7497f..2a8cc49c3 100644
 -	if (!strlen(input))
 -		goto done;
 -
--	g_strstrip(input);
--
 -	if (history_search(input, -1))
 -		add_history(input);
 -
--	argv = g_strsplit(input, " ", -1);
--	if (argv == NULL)
+-	if (wordexp(input, &w, WRDE_NOCMD))
 -		goto done;
 -
--	for (argc = 0; argv[argc];)
--		argc++;
+-	if (w.we_wordc == 0)
+-		goto free_we;
 -
--	if (argc == 0)
--		goto done;
+-	argv = w.we_wordv;
+-	argc = w.we_wordc;
 -
 -	for (i = 0; cmd_table[i].cmd; i++) {
 -		if (strcmp(argv[0], cmd_table[i].cmd))
@@ -865,26 +1330,28 @@ index c95b7497f..2a8cc49c3 100644
 -
 -		if (cmd_table[i].func) {
 -			cmd_table[i].func(argc, argv);
--			goto done;
+-			goto free_we;
 -		}
 -	}
 -
 -	if (strcmp(argv[0], "help")) {
 -		printf("Invalid command\n");
--		goto done;
+-		goto free_we;
 -	}
 -
 -	printf("Available commands:\n");
 -
 -	for (i = 0; cmd_table[i].cmd; i++) {
 -		if (cmd_table[i].desc)
--			printf("\t%s %s\t%s\n", cmd_table[i].cmd,
--						cmd_table[i].arg ? : "    ",
--						cmd_table[i].desc);
+-			printf("  %s %-*s %s\n", cmd_table[i].cmd,
+-					(int)(25 - strlen(cmd_table[i].cmd)),
+-					cmd_table[i].arg ? : "",
+-					cmd_table[i].desc ? : "");
 -	}
 -
+-free_we:
+-	wordfree(&w);
 -done:
--	g_strfreev(argv);
 -	free(input);
 -}
 -
@@ -894,8 +1361,9 @@ index c95b7497f..2a8cc49c3 100644
 -	{ "version", 'v', 0, G_OPTION_ARG_NONE, &option_version,
 -				"Show version information and exit" },
 -	{ NULL },
--};
--
++	{} },
+ };
+ 
 -static gboolean signal_handler(GIOChannel *channel, GIOCondition condition,
 -							gpointer user_data)
 -{
@@ -1001,28 +1469,32 @@ index c95b7497f..2a8cc49c3 100644
 -	return source;
 -}
 -
- static void player_added(GDBusProxy *proxy)
+ static void client_added(GDBusProxy *proxy)
  {
- 	players = g_slist_append(players, proxy);
-@@ -1258,7 +1037,7 @@ static void print_folder(GDBusProxy *proxy, const char *description)
+ 	if (client == NULL)
+@@ -2267,16 +2037,17 @@ static void print_transferred(struct transfer_data *data, const char *str,
+ 	data->transferred = valu64;
  
- 	path = g_dbus_proxy_get_path(proxy);
+ 	if (data->size == 0) {
+-		rl_printf("%sTransferred: %" PRIu64 " (@%" PRIu64 "KB/s)\n",
+-						str, valu64, speed / 1000);
++		bt_shell_printf("%sTransferred: %" PRIu64 " (@%" PRIu64
++				"KB/s)\n", str, valu64, speed / 1000);
+ 		return;
+ 	}
  
--	rl_printf("%s%s%sFolder %s\n", description ? "[" : "",
-+	bt_shell_printf("%s%s%sFolder %s\n", description ? "[" : "",
- 					description ? : "",
- 					description ? "] " : "",
- 					path);
-@@ -1283,7 +1062,7 @@ static void print_item(GDBusProxy *proxy, const char *description)
- 	else
- 		name = "<unknown>";
+ 	seconds = (data->size - data->transferred) / speed;
+ 	minutes = seconds / 60;
+ 	seconds %= 60;
+-	rl_printf("%sTransferred: %" PRIu64 " (@%" PRIu64 "KB/s %02u:%02u)\n",
+-				str, valu64, speed / 1000, minutes, seconds);
++	bt_shell_printf("%sTransferred: %" PRIu64 " (@%" PRIu64 
++			"KB/s %02u:%02u)\n", str, valu64, speed / 1000,
++			minutes, seconds);
+ }
  
--	rl_printf("%s%s%sItem %s %s\n", description ? "[" : "",
-+	bt_shell_printf("%s%s%sItem %s %s\n", description ? "[" : "",
- 					description ? : "",
- 					description ? "] " : "",
- 					path, name);
-@@ -1395,43 +1174,15 @@ static void property_changed(GDBusProxy *proxy, const char *name,
+ static void transfer_property_changed(GDBusProxy *proxy, const char *name,
+@@ -2495,43 +2266,15 @@ static void property_changed(GDBusProxy *proxy, const char *name,
  
  int main(int argc, char *argv[])
  {
@@ -1055,7 +1527,7 @@ index c95b7497f..2a8cc49c3 100644
 -	}
 -
 -	main_loop = g_main_loop_new(NULL, FALSE);
- 	dbus_conn = g_dbus_setup_bus(DBUS_BUS_SYSTEM, NULL, NULL);
+ 	dbus_conn = g_dbus_setup_bus(DBUS_BUS_SESSION, NULL, NULL);
  
 -	rl_attempted_completion_function = cmd_completion;
 -
@@ -1067,10 +1539,10 @@ index c95b7497f..2a8cc49c3 100644
 -
 -	input = setup_standard_input();
 -	signal = setup_signalfd();
- 	client = g_dbus_client_new(dbus_conn, "org.bluez", "/org/bluez");
+ 	client = g_dbus_client_new(dbus_conn, "org.bluez.obex",
+ 							"/org/bluez/obex");
  
- 	g_dbus_client_set_connect_watch(client, connect_handler, NULL);
-@@ -1440,17 +1191,11 @@ int main(int argc, char *argv[])
+@@ -2541,17 +2284,11 @@ int main(int argc, char *argv[])
  	g_dbus_client_set_proxy_handlers(client, proxy_added, proxy_removed,
  							property_changed, NULL);
  
