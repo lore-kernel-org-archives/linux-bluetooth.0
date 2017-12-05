@@ -1,54 +1,107 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Date: Tue, 5 Dec 2017 14:35:23 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2] mesh: Make meshctl use bt_shell helpers
-Message-ID: <20171205123523.GA15993@x1c.lan>
-References: <20171205112626.11210-1-luiz.dentz@gmail.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+From: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
+Subject: [PATCH BlueZ] shared/shell: Fix no version output with option
+Message-ID: <c4eddf56-ffe9-ac1c-86c0-5fdca37a6477@jp.fujitsu.com>
+Date: Tue, 5 Dec 2017 21:23:48 +0900
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20171205112626.11210-1-luiz.dentz@gmail.com>
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+bluetoothctl does output the following error message with the option
+-v/--version.
 
-On Tue, Dec 05, 2017, Luiz Augusto von Dentz wrote:
-> This makes meshctl use bt_shell to manage the menus and command
-> handling.
-> ---
->  mesh/config-client.c | 187 ++++++++---------
->  mesh/config-model.h  |   1 -
->  mesh/main.c          | 571 +++++++++++++++------------------------------------
->  mesh/onoff-model.c   |  88 +++-----
->  mesh/util.c          | 155 +-------------
->  mesh/util.h          |  16 +-
->  6 files changed, 278 insertions(+), 740 deletions(-)
+  $ bluetoothctl --version
+  Unknown option --version
+---
+ client/agent.c     |  2 ++
+ client/main.c      | 18 +-----------------
+ src/shared/shell.c |  5 ++++-
+ src/shared/shell.h |  2 +-
+ 4 files changed, 8 insertions(+), 19 deletions(-)
 
-There's still something broken. Did you test this at all?
+diff --git a/client/agent.c b/client/agent.c
+index e8ca4dd19..70c3248c0 100644
+--- a/client/agent.c
++++ b/client/agent.c
+@@ -31,6 +31,8 @@
+ #include <unistd.h>
+ #include <string.h>
+ 
++#include <glib.h>
++
+ #include "src/shared/shell.h"
+ #include "gdbus/gdbus.h"
+ #include "agent.h"
+diff --git a/client/main.c b/client/main.c
+index 7661b33c0..98123d53a 100644
+--- a/client/main.c
++++ b/client/main.c
+@@ -2369,27 +2369,11 @@ static void client_ready(GDBusClient *client, void *user_data)
+ 
+ int main(int argc, char *argv[])
+ {
+-	GOptionContext *context;
+-	GError *error = NULL;
+ 	GDBusClient *client;
+ 
+ 	auto_register_agent = g_strdup("");
+ 
+-	context = g_option_context_new(NULL);
+-	g_option_context_add_main_entries(context, options, NULL);
+-
+-	if (g_option_context_parse(context, &argc, &argv, &error) == FALSE) {
+-		if (error != NULL) {
+-			g_printerr("%s\n", error->message);
+-			g_error_free(error);
+-		} else
+-			g_printerr("An unknown error occurred\n");
+-		exit(1);
+-	}
+-
+-	g_option_context_free(context);
+-
+-	bt_shell_init(&argc, &argv);
++	bt_shell_init(&argc, &argv, options);
+ 	bt_shell_set_menu(&main_menu);
+ 	bt_shell_add_submenu(&advertise_menu);
+ 	bt_shell_add_submenu(&scan_menu);
+diff --git a/src/shared/shell.c b/src/shared/shell.c
+index e22d664f7..f108e6de3 100644
+--- a/src/shared/shell.c
++++ b/src/shared/shell.c
+@@ -669,13 +669,16 @@ static void rl_init(void)
+ 	rl_callback_handler_install(NULL, rl_handler);
+ }
+ 
+-void bt_shell_init(int *argc, char ***argv)
++void bt_shell_init(int *argc, char ***argv, GOptionEntry *user_options)
+ {
+ 	GOptionContext *context;
+ 	GError *error = NULL;
+ 
+ 	context = g_option_context_new(NULL);
+ 	g_option_context_add_main_entries(context, options, NULL);
++	if (user_options)
++		g_option_context_add_main_entries(context,
++							user_options, NULL);
+ 
+ 	if (g_option_context_parse(context, argc, argv, &error) == FALSE) {
+ 		if (error != NULL) {
+diff --git a/src/shared/shell.h b/src/shared/shell.h
+index 57b67cbbc..727c9382a 100644
+--- a/src/shared/shell.h
++++ b/src/shared/shell.h
+@@ -50,7 +50,7 @@ struct bt_shell_menu {
+ 	const struct bt_shell_menu_entry entries[];
+ };
+ 
+-void bt_shell_init(int *argc, char ***argv);
++void bt_shell_init(int *argc, char ***argv, GOptionEntry *user_options);
+ 
+ void bt_shell_run(void);
+ 
+-- 
+2.14.1
 
-If I issue "connect 1 2" right after starting meshctl I get this:
-
-[meshctl]# connect 1 2
-==16599== Invalid read of size 1
-==16599==    at 0x4C32B82: strlen (vg_replace_strmem.c:458)
-==16599==    by 0x4EA5962: g_strdup (in /usr/lib64/libglib-2.0.so.0.5400.2)
-==16599==    by 0x4EA7404: g_strdupv (in /usr/lib64/libglib-2.0.so.0.5400.2)
-==16599==    by 0x40861F: set_scan_filter_uuids.constprop.14 (main.c:1613)
-==16599==    by 0x4086E2: cmd_connect (main.c:1729)
-==16599==    by 0x41C8F7: cmd_exec (shell.c:290)
-==16599==    by 0x41C8F7: menu_exec (shell.c:314)
-==16599==    by 0x41D1B2: shell_exec (shell.c:326)
-==16599==    by 0x41D1B2: rl_handler (shell.c:473)
-==16599==    by 0x55DB8BD: rl_callback_read_char (in /usr/lib64/libreadline.so.7.0)
-==16599==    by 0x41C4E8: input_read (shell.c:765)
-==16599==    by 0x41D672: watch_callback (io-glib.c:170)
-==16599==    by 0x4E86BB6: g_main_context_dispatch (in /usr/lib64/libglib-2.0.so.0.5400.2)
-==16599==    by 0x4E86F5F: ??? (in /usr/lib64/libglib-2.0.so.0.5400.2)
-==16599==  Address 0x2 is not stack'd, malloc'd or (recently) free'd
-
-It looks like the cause might be the new UUID string arrays which are
-expected to be NULL terminated.
-
-Johan
