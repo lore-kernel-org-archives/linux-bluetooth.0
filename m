@@ -1,66 +1,46 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Steve Brown <sbrown@cortland.com>
-Message-ID: <1512572530.14268.55.camel@ewol.com>
-Subject: Re: [RFC]Mesh: meshctl configuration output fails in
- gatt.c:pipe_write
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Steve Brown <sbrown@cortland.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Wed, 06 Dec 2017 08:02:10 -0700
-In-Reply-To: <CABBYNZKLGjucdGxWJ-771MPc6xZnE9GWnaPUpdqbUX=vCaz1aA@mail.gmail.com>
-References: <1511534342.16445.52.camel@ewol.com>
-         <CABBYNZKLGjucdGxWJ-771MPc6xZnE9GWnaPUpdqbUX=vCaz1aA@mail.gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <20171206065119.GA10541@x1c.home>
+References: <20171205183327.853-1-luiz.dentz@gmail.com> <20171205183327.853-3-luiz.dentz@gmail.com>
+ <fb1a7761-4b4a-a647-d9f9-ab9634eb1266@jp.fujitsu.com> <20171206065119.GA10541@x1c.home>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Wed, 6 Dec 2017 14:15:08 +0200
+Message-ID: <CABBYNZ++Kh8bF3+iEhZTem+a4-SEB2Z2zp0Oq4aG_9kcOELG5g@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 3/4] tools/obexctl: Use bt_shell helpers
+To: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Eramoto, Johan,
 
-On Fri, 2017-11-24 at 17:10 +0200, Luiz Augusto von Dentz wrote:
-> Hi Steve,
-> 
-> On Fri, Nov 24, 2017 at 4:39 PM, Steve Brown <sbrown@cortland.com>
-> wrote:
-> > If the first command output in a new connection exceeds 20 bytes,
-> > mesh_gatt_write sets the SAR to FIRST as the write_mtu is initially
-> > 0
-> > and the default is GATT_MTU-3 (20).
-> > 
-> > When pipe_write gets called, a new larger write_mtu has been set,
-> > but
-> > the SAR is still set to FIRST. It's assumed that data->gatt_len >
-> > max_len. However, it's not which causes lots of bogus output.
-> > 
-> > I've added code to reset the SAR and length in acquire_write_reply
-> > in
-> > case write_mtu might have changed.
-> > 
-> > This seems to work, but I'm sure there is a better way.
-> > 
-> > Steve
-> > 
+On Wed, Dec 6, 2017 at 8:51 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi,
+>
+> On Wed, Dec 06, 2017, ERAMOTO Masaya wrote:
+>> On 12/06/2017 03:33 AM, Luiz Augusto von Dentz wrote:
+>> > This makes obexctl use bt_shell to manage the menus and command
+>> > handling.
+>> > ---
+>> >  Makefile.tools  |   5 +-
+>> >  tools/obexctl.c | 609 ++++++++++++++++----------------------------------------
+>> >  2 files changed, 175 insertions(+), 439 deletions(-)
+>>
+>> The previous obexctl gives arguments included a command name to the command, but
+>> bt_shell gives arguments excluded a command name. So you should fix argc/argv
+>> related processes in each command. Also bt_shell automatically checks passed
+>> arguments.
+>> You can refer to the attached patch about these things.
+>
+> If you ask me, I think we should keep this consistent with obexctl and
+> e.g. how main() gets called. I.e. argv[0] is the command. An added
+> benefit of this is that two very similar commands (taking the same
+> parameters) can use the same command handler, since they'll be able to
+> distuinguish which command was used.
 
-> Ive never really liked the idea of putting the SAR byte into data but
-> it was required due to use of WriteValue, now perhaps we can even
-> remove that since AcquireWrite is stable the sar byte can be set in
-> an
-> independent variable in pipe_write so we can move this logic there.
-> 
-> 
-> 
+Yep, lets keep the command name then and fix bluetoothctl.
 
-Have you had a chance to review my changes to gatt.c?
-
-http://www.spinics.net/lists/linux-bluetooth/msg72981.html
-
-I removed the WriteValue code and moved the sar logic to pipe_write as
-you requested. The latter fixed the bug I reported. If you have no
-additional comments, let me know and I'll submit it as a patch.
-
-I'm working on some additional commands for meshctl and they won't work
-without the bug fixed.
-
-Thanks,
-
-Steve
+-- 
+Luiz Augusto von Dentz
