@@ -1,46 +1,55 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <20171206065119.GA10541@x1c.home>
-References: <20171205183327.853-1-luiz.dentz@gmail.com> <20171205183327.853-3-luiz.dentz@gmail.com>
- <fb1a7761-4b4a-a647-d9f9-ab9634eb1266@jp.fujitsu.com> <20171206065119.GA10541@x1c.home>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 6 Dec 2017 14:15:08 +0200
-Message-ID: <CABBYNZ++Kh8bF3+iEhZTem+a4-SEB2Z2zp0Oq4aG_9kcOELG5g@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 3/4] tools/obexctl: Use bt_shell helpers
-To: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <amitkarwar@gmail.com>
+From: Amitkumar Karwar <amitkarwar@gmail.com>
+To: Kalle Valo <kvalo@codeaurora.org>,
+	marcel@holtmann.org
+Cc: linux-wireless@vger.kernel.org,
+	Amitkumar Karwar <amit.karwar@redpinesignals.com>,
+	Prameela Rani Garnepudi <prameela.j04cs@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Subject: [v4 8/8] rsi: sdio changes to support BT
+Date: Wed,  6 Dec 2017 15:26:37 +0530
+Message-Id: <1512554197-19664-9-git-send-email-amitkarwar@gmail.com>
+In-Reply-To: <1512554197-19664-1-git-send-email-amitkarwar@gmail.com>
+References: <1512554197-19664-1-git-send-email-amitkarwar@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Eramoto, Johan,
+From: Prameela Rani Garnepudi <prameela.j04cs@gmail.com>
 
-On Wed, Dec 6, 2017 at 8:51 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> Hi,
->
-> On Wed, Dec 06, 2017, ERAMOTO Masaya wrote:
->> On 12/06/2017 03:33 AM, Luiz Augusto von Dentz wrote:
->> > This makes obexctl use bt_shell to manage the menus and command
->> > handling.
->> > ---
->> >  Makefile.tools  |   5 +-
->> >  tools/obexctl.c | 609 ++++++++++++++++----------------------------------------
->> >  2 files changed, 175 insertions(+), 439 deletions(-)
->>
->> The previous obexctl gives arguments included a command name to the command, but
->> bt_shell gives arguments excluded a command name. So you should fix argc/argv
->> related processes in each command. Also bt_shell automatically checks passed
->> arguments.
->> You can refer to the attached patch about these things.
->
-> If you ask me, I think we should keep this consistent with obexctl and
-> e.g. how main() gets called. I.e. argv[0] is the command. An added
-> benefit of this is that two very similar commands (taking the same
-> parameters) can use the same command handler, since they'll be able to
-> distuinguish which command was used.
+Queue number is correctly updated for BT traffic. Also, kzalloc
+instead of kmalloc is used for Rx packet allocation.
 
-Yep, lets keep the command name then and fix bluetoothctl.
+Signed-off-by: Prameela Rani Garnepudi <prameela.j04cs@gmail.com>
+Signed-off-by: Amitkumar Karwar <amit.karwar@redpinesignals.com>
+---
+ drivers/net/wireless/rsi/rsi_91x_sdio.c     | 2 ++
+ drivers/net/wireless/rsi/rsi_91x_sdio_ops.c | 2 +-
+ 2 files changed, 3 insertions(+), 1 deletion(-)
 
+diff --git a/drivers/net/wireless/rsi/rsi_91x_sdio.c b/drivers/net/wireless/rsi/rsi_91x_sdio.c
+index 5722736..beb18d0 100644
+--- a/drivers/net/wireless/rsi/rsi_91x_sdio.c
++++ b/drivers/net/wireless/rsi/rsi_91x_sdio.c
+@@ -763,6 +763,8 @@ static int rsi_sdio_host_intf_write_pkt(struct rsi_hw *adapter,
+ 	int status;
+ 
+ 	queueno = ((pkt[1] >> 4) & 0xf);
++	if (queueno == RSI_BT_MGMT_Q || queueno == RSI_BT_DATA_Q)
++		queueno = RSI_BT_Q;
+ 
+ 	num_blocks = len / block_size;
+ 
+diff --git a/drivers/net/wireless/rsi/rsi_91x_sdio_ops.c b/drivers/net/wireless/rsi/rsi_91x_sdio_ops.c
+index 26abe51..83652bd 100644
+--- a/drivers/net/wireless/rsi/rsi_91x_sdio_ops.c
++++ b/drivers/net/wireless/rsi/rsi_91x_sdio_ops.c
+@@ -103,7 +103,7 @@ static int rsi_process_pkt(struct rsi_common *common)
+ 
+ 	rcv_pkt_len = (num_blks * 256);
+ 
+-	common->rx_data_pkt = kmalloc(rcv_pkt_len, GFP_KERNEL);
++	common->rx_data_pkt = kzalloc(rcv_pkt_len, GFP_KERNEL);
+ 	if (!common->rx_data_pkt) {
+ 		rsi_dbg(ERR_ZONE, "%s: Failed in memory allocation\n",
+ 			__func__);
 -- 
-Luiz Augusto von Dentz
+2.7.4
