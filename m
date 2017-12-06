@@ -1,38 +1,66 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Date: Wed, 6 Dec 2017 14:33:53 -0800
-From: Kyle McMartin <kyle@infradead.org>
-To: Josh Boyer <jwboyer@kernel.org>
-Cc: Tedd Ho-Jeong An <tedd.an@intel.com>,
-        Thomas Backlund <tmb@mageia.org>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "Bag, Amit K" <amit.k.bag@intel.com>,
-        "matt.chen@intel.com" <matt.chen@intel.com>,
-        linux-firmware@kernel.org
-Subject: Re: [PATCH 1/4] linux-firmware: Add firmware file for Intel
- Bluetooth 9560
-Message-ID: <20171206223353.GC1875@bombadil.infradead.org>
-References: <20171130101838.69b51124@tedd-ubuntu-vm>
- <CA+5PVA5ViRVRG53TSvUDOKcTx8pFV2FcmNaVcuEebB22xqE9eg@mail.gmail.com>
- <CA+5PVA4B3p4JVwbGktzZtj9u1D337LdiQz1WavJO-U9NiGa4fg@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <CA+5PVA4B3p4JVwbGktzZtj9u1D337LdiQz1WavJO-U9NiGa4fg@mail.gmail.com>
+From: Steve Brown <sbrown@cortland.com>
+Message-ID: <1512572530.14268.55.camel@ewol.com>
+Subject: Re: [RFC]Mesh: meshctl configuration output fails in
+ gatt.c:pipe_write
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Steve Brown <sbrown@cortland.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Wed, 06 Dec 2017 08:02:10 -0700
+In-Reply-To: <CABBYNZKLGjucdGxWJ-771MPc6xZnE9GWnaPUpdqbUX=vCaz1aA@mail.gmail.com>
+References: <1511534342.16445.52.camel@ewol.com>
+         <CABBYNZKLGjucdGxWJ-771MPc6xZnE9GWnaPUpdqbUX=vCaz1aA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, Dec 05, 2017 at 05:25:58PM -0500, Josh Boyer wrote:
-> Kyle, Ben, do you have any ideas on this?
+Hi Luiz,
+
+On Fri, 2017-11-24 at 17:10 +0200, Luiz Augusto von Dentz wrote:
+> Hi Steve,
+> 
+> On Fri, Nov 24, 2017 at 4:39 PM, Steve Brown <sbrown@cortland.com>
+> wrote:
+> > If the first command output in a new connection exceeds 20 bytes,
+> > mesh_gatt_write sets the SAR to FIRST as the write_mtu is initially
+> > 0
+> > and the default is GATT_MTU-3 (20).
+> > 
+> > When pipe_write gets called, a new larger write_mtu has been set,
+> > but
+> > the SAR is still set to FIRST. It's assumed that data->gatt_len >
+> > max_len. However, it's not which causes lots of bogus output.
+> > 
+> > I've added code to reset the SAR and length in acquire_write_reply
+> > in
+> > case write_mtu might have changed.
+> > 
+> > This seems to work, but I'm sure there is a better way.
+> > 
+> > Steve
+> > 
+
+> Ive never really liked the idea of putting the SAR byte into data but
+> it was required due to use of WriteValue, now perhaps we can even
+> remove that since AcquireWrite is stable the sar byte can be set in
+> an
+> independent variable in pipe_write so we can move this logic there.
+> 
+> 
 > 
 
-As I mentioned on IRC, this has happened before. (I'm inclined to blame
-Intel's mail servers. ;-)
+Have you had a chance to review my changes to gatt.c?
 
-The problem is with the GIT binary patch headers, which look for the
-format to be preserved, but some newlines are in the wrong place in
-Tedd's email.
+http://www.spinics.net/lists/linux-bluetooth/msg72981.html
 
-I'll revert and fix these up, and then work on the back log.
+I removed the WriteValue code and moved the sar logic to pipe_write as
+you requested. The latter fixed the bug I reported. If you have no
+additional comments, let me know and I'll submit it as a patch.
 
-Thanks for your help and voluteering, Josh!
+I'm working on some additional commands for meshctl and they won't work
+without the bug fixed.
 
---kyle
+Thanks,
+
+Steve
