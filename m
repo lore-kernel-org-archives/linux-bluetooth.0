@@ -1,48 +1,38 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: bugzilla-daemon@bugzilla.kernel.org
-To: linux-bluetooth@kernel.org
-Subject: [Bug 198099] Bluetooth crash in dmesg when switching wifi network
- from 5Ghz to 2.4Ghz on intel 8265
-Date: Thu, 07 Dec 2017 21:38:20 +0000
-Message-ID: <bug-198099-62941-53bxT8b5nF@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-198099-62941@https.bugzilla.kernel.org/>
-References: <bug-198099-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
+Return-Path: <david@lechnology.com>
+Subject: Re: [PATCH 2/3] bluetooth: hci_ll: add constant for vendor-specific
+ command
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: devicetree <devicetree@vger.kernel.org>,
+ "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+ Rob Herring <robh+dt@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+ "Gustavo F. Padovan" <gustavo@padovan.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <1512357682-8911-1-git-send-email-david@lechnology.com>
+ <1512357682-8911-3-git-send-email-david@lechnology.com>
+ <5C65FB74-D7FD-4653-993A-5A68AD844A41@holtmann.org>
+From: David Lechner <david@lechnology.com>
+Message-ID: <55fff19a-c30f-88f0-afb2-6c0b9bad25a7@lechnology.com>
+Date: Thu, 7 Dec 2017 15:29:02 -0600
 MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <5C65FB74-D7FD-4653-993A-5A68AD844A41@holtmann.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-https://bugzilla.kernel.org/show_bug.cgi?id=198099
+On 12/04/2017 12:23 AM, Marcel Holtmann wrote:
+> Hi David,
+> 
+>> This adds a #define for the vendor-specific HCI command to set the
+>> baudrate instead of using the bare 0xff36 multiple times.
+>>
+>> Signed-off-by: David Lechner <david@lechnology.com>
+>> ---
+>> drivers/bluetooth/hci_ll.c | 10 ++++++++--
+>> 1 file changed, 8 insertions(+), 2 deletions(-)
+> 
+> patch has been applied to bluetooth-next tree.
+> 
 
-Egor (e.vakhromtsev@gmail.com) changed:
-
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-             Status|NEW                         |RESOLVED
-         Resolution|---                         |CODE_FIX
-
---- Comment #1 from Egor (e.vakhromtsev@gmail.com) ---
-I have tried updated firmware
-(https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/commit/?id=9a843a1ce31c162d337b9edce0749c4806fbcd36)
-and now all works fine. Wifi works with bluetooth devices on both 2.4Gz and
-5Ghz networks.
-
-btmon log has updated Firmware build:
-
-< HCI Command: Intel Read Version (0x3f|0x0005) plen 0
-> HCI Event: Command Complete (0x0e) plen 13          
-      Intel Read Version (0x3f|0x0005) ncmd 1
-        Status: Success (0x00)
-        Hardware platform: 0x37
-        Hardware variant: 0x0c
-        Hardware revision: 1.2
-        Firmware variant: 0x23
-        Firmware revision: 0.1
-        Firmware build: 173-45.2017
-        Firmware patch: 0
-
-Thanks you all involved people :)
-
--- 
-You are receiving this mail because:
-You are the assignee for the bug.
+I am new to the bluetooth tree, so just to be sure... does this mean I 
+should not include this patch in v2 of this series since this patch has 
+been applied?
