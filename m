@@ -1,53 +1,69 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-To: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc: Jukka Rissanen <jukka.rissanen@linux.intel.com>,
-        linux-bluetooth@vger.kernel.org
-From: Michael Scott <michael@opensourcefoundries.com>
-Subject: Re: [PATCH] Bluetooth: 6lowpan: Fix multi-link setup
-Message-ID: <b17ba8fb-0ed2-a237-06c3-75ab0addbd86@opensourcefoundries.com>
-Date: Thu, 7 Dec 2017 10:26:53 -0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20171207142143.27324-5-szymon.janc@codecoup.pl>
+References: <20171207142143.27324-1-szymon.janc@codecoup.pl> <20171207142143.27324-5-szymon.janc@codecoup.pl>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Thu, 7 Dec 2017 15:42:55 -0200
+Message-ID: <CABBYNZ+Nw0KLgbEfU6F9f6kE4FAgTPspphFO5yW3Qs47hh05Sg@mail.gmail.com>
+Subject: Re: [PATCH 4/9] tools/btpclient: Store index along with adapter proxy
+To: Szymon Janc <szymon.janc@codecoup.pl>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz (and linux-bluetooth),
+Hi Szymon,
 
-On Wed, 2017-09-20 at 12:52 +0300, Luiz Augusto von Dentz wrote:
->/From: Luiz Augusto von Dentz <luiz.von.dentz@xxxxxxxxx>/
->//
->/If there are more than one node connected and there isn't any route/
->/information attempt to check if destination address matches any of/
->/the/
->/link-local peer addresses./
->//
->/Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@xxxxxxxxx>/
->/---/
->/net/bluetooth/6lowpan.c | 2 +-/
->/1 file changed, 1 insertion(+), 1 deletion(-)/
->//
->/diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c/
->/index 4e2576fc0c59..55370c330386 100644/
->/--- a/net/bluetooth/6lowpan.c/
->/+++ b/net/bluetooth/6lowpan.c/
->/@@ -190,7 +190,7 @@ static inline struct lowpan_peer/
->/*peer_lookup_dst(struct lowpan_btle_dev *dev,/
->/nexthop = &lowpan_cb(skb)->gw;/
->//
->/if (ipv6_addr_any(nexthop))/
->/- return NULL;/
->/+ nexthop = daddr;/
->/} else {/
->/nexthop = rt6_nexthop(rt, daddr);/
->//
+On Thu, Dec 7, 2017 at 12:21 PM, Szymon Janc <szymon.janc@codecoup.pl> wrote:
+> ---
+>  tools/btpclient.c | 10 ++++++++++
+>  1 file changed, 10 insertions(+)
+>
+> diff --git a/tools/btpclient.c b/tools/btpclient.c
+> index c7ff239b0..3a4971eeb 100644
+> --- a/tools/btpclient.c
+> +++ b/tools/btpclient.c
+> @@ -37,6 +37,7 @@
+>
+>  struct btp_adapter {
+>         struct l_dbus_proxy *proxy;
+> +       unsigned int index;
+>  };
+>
+>  struct btp_device {
+> @@ -157,9 +158,18 @@ static void proxy_added(struct l_dbus_proxy *proxy, void *user_data)
+>
+>         if (!strcmp(interface, "org.bluez.Adapter1")) {
+>                 struct btp_adapter *adapter;
+> +               unsigned int index;
+> +
+> +               /* TODO should we rely on path for index or use other mapping
+> +                * like queue size?
+> +                */
+> +               if (sscanf(l_dbus_proxy_get_path(proxy), "/org/bluez/hci%u",
+> +                                                               &index) != 1)
+> +                       return;
 
-Was there any plan to bring this into the longterm 4.14 tree?  I saw 
-that Jukka ACKed the patch.
+Usually, we don't operate by index over D-Bus so if all operation are
+over D-Bus knowing the index shall not be needed, if this is for BTP
+then we could perhaps just map directly to the queue directly but Im
+not sure why would BTP have an adapter index?
 
-Using 4.14, connecting more than 1 node via 6lowpan is completely 
-broken.  This fairly simple patch restores connectivity for multiple 
-6lowpan devices.
+>                 adapter = l_new(struct btp_adapter, 1);
+>                 adapter->proxy = proxy;
+> +               adapter->index = index;
+>
+>                 l_queue_push_tail(adapters, adapter);
+>                 return;
+> --
+> 2.14.3
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-Question: Are there any hidden downsides to using this patch?
 
-- Mike
+
+-- 
+Luiz Augusto von Dentz
