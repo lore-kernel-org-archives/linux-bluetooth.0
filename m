@@ -1,43 +1,44 @@
-Return-Path: <david@lechnology.com>
-From: David Lechner <david@lechnology.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: David Lechner <david@lechnology.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] Bluetooth: hci_ll: Add endianness conversion when setting baudrate
-Date: Thu,  7 Dec 2017 20:22:19 -0600
-Message-Id: <1512699739-22162-1-git-send-email-david@lechnology.com>
+Return-Path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
+Subject: Re: [PATCH 2/3] bluetooth: hci_ll: add constant for vendor-specific
+ command
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <55fff19a-c30f-88f0-afb2-6c0b9bad25a7@lechnology.com>
+Date: Thu, 7 Dec 2017 22:43:18 +0100
+Cc: devicetree <devicetree@vger.kernel.org>,
+        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+        Rob Herring <robh+dt@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        "Gustavo F. Padovan" <gustavo@padovan.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Network Development <netdev@vger.kernel.org>,
+        linux-kernel@vger.kernel.org
+Message-Id: <C76378A5-AAAF-42A6-BD74-119E4863D813@holtmann.org>
+References: <1512357682-8911-1-git-send-email-david@lechnology.com>
+ <1512357682-8911-3-git-send-email-david@lechnology.com>
+ <5C65FB74-D7FD-4653-993A-5A68AD844A41@holtmann.org>
+ <55fff19a-c30f-88f0-afb2-6c0b9bad25a7@lechnology.com>
+To: David Lechner <david@lechnology.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This adds an endianness conversion when setting the baudrate using a
-vendor-specific command. Otherwise, bad things might happen on a big-
-endian system.
+Hi David,
 
-Suggested-by: Marcel Holtmann <marcel@holtmann.org>
-Signed-off-by: David Lechner <david@lechnology.com>
----
- drivers/bluetooth/hci_ll.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+>>> This adds a #define for the vendor-specific HCI command to set the
+>>> baudrate instead of using the bare 0xff36 multiple times.
+>>> 
+>>> Signed-off-by: David Lechner <david@lechnology.com>
+>>> ---
+>>> drivers/bluetooth/hci_ll.c | 10 ++++++++--
+>>> 1 file changed, 8 insertions(+), 2 deletions(-)
+>> patch has been applied to bluetooth-next tree.
+> 
+> I am new to the bluetooth tree, so just to be sure... does this mean I should not include this patch in v2 of this series since this patch has been applied?
 
-diff --git a/drivers/bluetooth/hci_ll.c b/drivers/bluetooth/hci_ll.c
-index 944cdd2..486b4ea 100644
---- a/drivers/bluetooth/hci_ll.c
-+++ b/drivers/bluetooth/hci_ll.c
-@@ -739,10 +739,12 @@ static int ll_setup(struct hci_uart *hu)
- 		speed = 0;
- 
- 	if (speed) {
-+		__le32 speed_le = cpu_to_le32(speed);
- 		struct sk_buff *skb;
- 
- 		skb = __hci_cmd_sync(hu->hdev, HCI_VS_UPDATE_UART_HCI_BAUDRATE,
--				     sizeof(speed), &speed, HCI_INIT_TIMEOUT);
-+				     sizeof(speed_le), &speed_le,
-+				     HCI_INIT_TIMEOUT);
- 		if (!IS_ERR(skb)) {
- 			kfree_skb(skb);
- 			serdev_device_set_baudrate(serdev, speed);
--- 
-2.7.4
+please don’t include already applied patches. Base everything against bluetooth-next tree.
+
+Regards
+
+Marcel
