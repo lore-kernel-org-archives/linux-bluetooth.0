@@ -1,241 +1,364 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <CAJzH+brsHG0A7dxF94yBQ-xy-nF8XP9PD7keAFm3KnEMFeNfYQ@mail.gmail.com>
-References: <1512374873-1956-1-git-send-email-jaganathx.kanakkassery@intel.com>
- <1512374873-1956-2-git-send-email-jaganathx.kanakkassery@intel.com>
- <CABBYNZ+4cbbOHuN0qLK2ONuK5Ocd69mWZf38KNB6SCDVvjuimw@mail.gmail.com> <CAJzH+brsHG0A7dxF94yBQ-xy-nF8XP9PD7keAFm3KnEMFeNfYQ@mail.gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 7 Dec 2017 08:42:59 -0200
-Message-ID: <CABBYNZLOkvT3pfv+iC_u50JhLnu30X-VcaSCKfC=Fc1NMQp2=g@mail.gmail.com>
-Subject: Re: [RFC 1/9] Bluetooth: Read no of adv sets during init
-To: Jaganath K <jaganath.k.os@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <linux-wireless-owner@vger.kernel.org>
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
+Subject: Re: [v4 5/8] Bluetooth: btrsi: add new rsi bluetooth driver
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1512554197-19664-6-git-send-email-amitkarwar@gmail.com>
+Date: Thu, 7 Dec 2017 10:09:22 +0100
+Cc: Kalle Valo <kvalo@codeaurora.org>, linux-wireless@vger.kernel.org,
+        Amitkumar Karwar <amit.karwar@redpinesignals.com>,
+        Prameela Rani Garnepudi <prameela.j04cs@gmail.com>,
+        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+        Siva Rebbagondla <siva.rebbagondla@redpinesignals.com>
+Message-Id: <282AE144-205D-4FF2-B28C-3E348D227342@holtmann.org>
+References: <1512554197-19664-1-git-send-email-amitkarwar@gmail.com>
+ <1512554197-19664-6-git-send-email-amitkarwar@gmail.com>
+To: Amitkumar Karwar <amitkarwar@gmail.com>
+Sender: linux-wireless-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jaganath,
+Hi Amitkumar,
 
-On Thu, Dec 7, 2017 at 5:57 AM, Jaganath K <jaganath.k.os@gmail.com> wrote:
-> Hi Luiz,
->
->> Hi Jaganath,
->>
->> On Mon, Dec 4, 2017 at 10:07 AM, Jaganath Kanakkassery
->> <jaganath.k.os@gmail.com> wrote:
->>> This patch reads the number of advertising sets in the controller
->>> during init and save it in hdev.
->>>
->>> Currently host only supports upto HCI_MAX_ADV_INSTANCES (5).
->>>
->>> Instance 0 is reserved for "Set Advertising" which means that
->>> multi adv is supported only for total sets - 1.
->>>
->>> Signed-off-by: Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
->>> ---
->>>  include/net/bluetooth/hci.h      |  7 +++++++
->>>  include/net/bluetooth/hci_core.h |  4 ++++
->>>  net/bluetooth/hci_core.c         | 11 +++++++++--
->>>  net/bluetooth/hci_event.c        | 20 ++++++++++++++++++++
->>>  net/bluetooth/mgmt.c             |  6 +++---
->>>  5 files changed, 43 insertions(+), 5 deletions(-)
->>>
->>> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
->>> index f0868df..59df823 100644
->>> --- a/include/net/bluetooth/hci.h
->>> +++ b/include/net/bluetooth/hci.h
->>> @@ -398,6 +398,7 @@ enum {
->>>  #define HCI_LE_SLAVE_FEATURES          0x08
->>>  #define HCI_LE_PING                    0x10
->>>  #define HCI_LE_DATA_LEN_EXT            0x20
->>> +#define HCI_LE_EXT_ADV                 0x10
->>>  #define HCI_LE_EXT_SCAN_POLICY         0x80
->>>
->>>  /* Connection modes */
->>> @@ -1543,6 +1544,12 @@ struct hci_cp_le_ext_conn_param {
->>>          __le16 max_ce_len;
->>>  } __packed;
->>>
->>> +#define HCI_OP_LE_READ_NUM_SUPPORTED_ADV_SETS  0x203b
->>> +struct hci_rp_le_read_num_supported_adv_sets {
->>> +       __u8  status;
->>> +       __u8  num_of_sets;
->>> +} __packed;
->>> +
->>>  /* ---- HCI Events ---- */
->>>  #define HCI_EV_INQUIRY_COMPLETE                0x01
->>>
->>> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
->>> index 554671c..4a7a4ae 100644
->>> --- a/include/net/bluetooth/hci_core.h
->>> +++ b/include/net/bluetooth/hci_core.h
->>> @@ -219,6 +219,7 @@ struct hci_dev {
->>>         __u8            features[HCI_MAX_PAGES][8];
->>>         __u8            le_features[8];
->>>         __u8            le_white_list_size;
->>> +       __u8            le_no_of_adv_sets;
->>
->> I was expecting some flag that indicates if the instances would be
->> maintained by the controller or not, but perhaps this is covered in
->> other patches.
->
-> Actually le_no_of_adv_sets is initialized to HCI_MAX_ADV_INSTANCES
-> and if extended adv is supported it will be overwritten with the no of instances
-> supported by the controller.
+> Redpine bluetooth driver is a thin driver which depends on
+> 'rsi_91x' driver for transmitting and receiving packets
+> to/from device. It creates hci interface when attach() is
+> called from 'rsi_91x' module.
+> 
+> Signed-off-by: Prameela Rani Garnepudi <prameela.j04cs@gmail.com>
+> Signed-off-by: Siva Rebbagondla <siva.rebbagondla@redpinesignals.com>
+> Signed-off-by: Amitkumar Karwar <amit.karwar@redpinesignals.com>
+> ---
+> v4: Removed rsi_hci.h file. Made the functions static(Marcel)
+> v3: Made BT_RSI module by default off(Marcel)
+>    Removed redundant exported function rsi_get_hci_ops()(Marcel)
+> v2: Addressed review comments from Marcel
+>    Removed unnecessary 'depends on BT && BT_RFOMM' line in Kconfig
+>    Removed redundant BT_INFO messages
+>    h_adapter initialization and declaration in a single line.
+>    Removed unnecessary error checks for HCI_RUNNING and fsm_state
+>    Allocated new skb with skb_realloc_headroom() API if headroom is not sufficient
+>    Used get_unaligned_le16 helpers
+>    Moved a structure and union from header file to btrsi.c file
+> ---
+> drivers/bluetooth/Kconfig  |  11 +++
+> drivers/bluetooth/Makefile |   2 +
+> drivers/bluetooth/btrsi.c  | 224 +++++++++++++++++++++++++++++++++++++++++++++
+> include/linux/rsi_header.h |   2 +
+> 4 files changed, 239 insertions(+)
+> create mode 100644 drivers/bluetooth/btrsi.c
+> 
+> diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
+> index 60e1c7d..33d7514 100644
+> --- a/drivers/bluetooth/Kconfig
+> +++ b/drivers/bluetooth/Kconfig
+> @@ -378,4 +378,15 @@ config BT_QCOMSMD
+> 	  Say Y here to compile support for HCI over Qualcomm SMD into the
+> 	  kernel or say M to compile as a module.
+> 
+> +config BT_RSI
+> +	tristate "Redpine HCI support"
+> +	default n
+> +	help
+> +	  Redpine BT driver.
+> +	  This driver handles BT traffic from upper layers and pass
+> +	  to the RSI_91x coex module for further scheduling to device
+> +
+> +	  Say Y here to compile support for HCI over Redpine into the
+> +	  kernel or say M to compile as a module.
+> +
+> endmenu
+> diff --git a/drivers/bluetooth/Makefile b/drivers/bluetooth/Makefile
+> index 4e4e44d..712af83a 100644
+> --- a/drivers/bluetooth/Makefile
+> +++ b/drivers/bluetooth/Makefile
+> @@ -28,6 +28,8 @@ obj-$(CONFIG_BT_QCA)		+= btqca.o
+> 
+> obj-$(CONFIG_BT_HCIUART_NOKIA)	+= hci_nokia.o
+> 
+> +obj-$(CONFIG_BT_RSI)		+= btrsi.o
+> +
+> btmrvl-y			:= btmrvl_main.o
+> btmrvl-$(CONFIG_DEBUG_FS)	+= btmrvl_debugfs.o
+> 
+> diff --git a/drivers/bluetooth/btrsi.c b/drivers/bluetooth/btrsi.c
+> new file mode 100644
+> index 0000000..f76ae4d
+> --- /dev/null
+> +++ b/drivers/bluetooth/btrsi.c
+> @@ -0,0 +1,224 @@
+> +/**
+> + * Copyright (c) 2017 Redpine Signals Inc.
+> + *
+> + * Permission to use, copy, modify, and/or distribute this software for any
+> + * purpose with or without fee is hereby granted, provided that the above
+> + * copyright notice and this permission notice appear in all copies.
+> + *
+> + * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+> + * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+> + * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+> + * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+> + * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+> + * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+> + * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+> + */
+> +#include <linux/version.h>
+> +#include <linux/module.h>
+> +#include <linux/kernel.h>
+> +#include <net/bluetooth/bluetooth.h>
+> +#include <net/bluetooth/hci_core.h>
+> +#include <linux/unaligned/le_byteshift.h>
+> +#include <linux/rsi_header.h>
+> +#include <net/genetlink.h>
+> +
+> +/* RX frame types */
+> +#define RSI_RESULT_CONFIRM			0x80
+> +#define RSI_BT_PER				0x10
+> +#define RSI_BT_BER				0x11
+> +#define RSI_BT_CW				0x12
+> +
+> +#define RSI_HEADROOM_FOR_BT_HAL	16
+> +#define RSI_FRAME_DESC_SIZE	16
+> +
+> +static struct rsi_hci_adapter {
+> +	void *priv;
+> +	struct rsi_proto_ops *proto_ops;
+> +	struct hci_dev *hdev;
+> +};
+> +
+> +static int rsi_hci_open(struct hci_dev *hdev)
+> +{
+> +	return 0;
+> +}
+> +
+> +static int rsi_hci_close(struct hci_dev *hdev)
+> +{
+> +	return 0;
+> +}
+> +
+> +static int rsi_hci_flush(struct hci_dev *hdev)
+> +{
+> +	return 0;
+> +}
+> +
+> +static int rsi_hci_send_pkt(struct hci_dev *hdev, struct sk_buff *skb)
+> +{
+> +	struct rsi_hci_adapter *h_adapter = hci_get_drvdata(hdev);
+> +	struct sk_buff *new_skb = NULL;
+> +
+> +	switch (bt_cb(skb)->pkt_type) {
+> +	case HCI_COMMAND_PKT:
+> +		hdev->stat.cmd_tx++;
+> +		break;
+> +
+> +	case HCI_ACLDATA_PKT:
+> +		hdev->stat.acl_tx++;
+> +		break;
+> +
+> +	case HCI_SCODATA_PKT:
+> +		hdev->stat.sco_tx++;
+> +		break;
+> +	}
 
-Which is exactly what Ive commented, since you overwrite how can you
-tell what scheduler shall be used? For instance if the command fails
-le_no_of_adv_sets would be left with default but those instances are
-from the host not the controller.
+Scrab these empty lines before the break. No need to bloat this up.
 
->>
->>>         __u8            le_states[8];
->>>         __u8            commands[64];
->>>         __u8            hci_ver;
->>> @@ -1154,6 +1155,9 @@ void hci_conn_del_sysfs(struct hci_conn *conn);
->>>  #define bredr_sc_enabled(dev)  (lmp_sc_capable(dev) && \
->>>                                 hci_dev_test_flag(dev, HCI_SC_ENABLED))
->>>
->>> +/* Extended advertising support */
->>> +#define ext_adv_capable(dev) ((dev)->le_features[1] & HCI_LE_EXT_ADV)
->>> +
->>>  /* ----- HCI protocols ----- */
->>>  #define HCI_PROTO_DEFER             0x01
->>>
->>> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
->>> index a91a09a..3472572 100644
->>> --- a/net/bluetooth/hci_core.c
->>> +++ b/net/bluetooth/hci_core.c
->>> @@ -716,6 +716,12 @@ static int hci_init3_req(struct hci_request *req, unsigned long opt)
->>>                         hci_req_add(req, HCI_OP_LE_READ_DEF_DATA_LEN, 0, NULL);
->>>                 }
->>>
->>> +               if (ext_adv_capable(hdev)) {
->>> +                       /* Read LE Number of Supported Advertising Sets */
->>> +                       hci_req_add(req, HCI_OP_LE_READ_NUM_SUPPORTED_ADV_SETS,
->>> +                                   0, NULL);
->>> +               }
->>> +
->>>                 hci_set_le_support(req);
->>>         }
->>>
->>> @@ -2676,8 +2682,8 @@ int hci_add_adv_instance(struct hci_dev *hdev, u8 instance, u32 flags,
->>>                 memset(adv_instance->scan_rsp_data, 0,
->>>                        sizeof(adv_instance->scan_rsp_data));
->>>         } else {
->>> -               if (hdev->adv_instance_cnt >= HCI_MAX_ADV_INSTANCES ||
->>> -                   instance < 1 || instance > HCI_MAX_ADV_INSTANCES)
->>> +               if (hdev->adv_instance_cnt >= hdev->le_no_of_adv_sets ||
->>> +                   instance < 1 || instance > hdev->le_no_of_adv_sets)
->>>                         return -EOVERFLOW;
->>>
->>>                 adv_instance = kzalloc(sizeof(*adv_instance), GFP_KERNEL);
->>> @@ -2972,6 +2978,7 @@ struct hci_dev *hci_alloc_dev(void)
->>>         hdev->le_max_tx_time = 0x0148;
->>>         hdev->le_max_rx_len = 0x001b;
->>>         hdev->le_max_rx_time = 0x0148;
->>> +       hdev->le_no_of_adv_sets = HCI_MAX_ADV_INSTANCES;
->>>
->>>         hdev->rpa_timeout = HCI_DEFAULT_RPA_TIMEOUT;
->>>         hdev->discov_interleaved_timeout = DISCOV_INTERLEAVED_TIMEOUT;
->>> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
->>> index a26ae80..06d8c1b 100644
->>> --- a/net/bluetooth/hci_event.c
->>> +++ b/net/bluetooth/hci_event.c
->>> @@ -1243,6 +1243,22 @@ static void hci_cc_le_set_ext_scan_enable(struct hci_dev *hdev,
->>>         le_set_scan_enable_complete(hdev, cp->enable);
->>>  }
->>>
->>> +static void hci_cc_le_read_num_adv_sets(struct hci_dev *hdev,
->>> +                                     struct sk_buff *skb)
->>> +{
->>> +       struct hci_rp_le_read_num_supported_adv_sets *rp = (void *) skb->data;
->>> +
->>> +       BT_DBG("%s status 0x%2.2x No of Adv sets %u", hdev->name, rp->status,
->>> +              rp->num_of_sets);
->>> +
->>> +       if (rp->status)
->>> +               return;
->>> +
->>> +       /* Instance 0 is reserved for Set Advertising */
->>> +       hdev->le_no_of_adv_sets = min_t(u8, rp->num_of_sets - 1,
->>> +                                       HCI_MAX_ADV_INSTANCES);
->>
->> Id say if the controller cannot support as many instances as the host
->> stack then we should keep using the software based scheduler, another
->> option would be to let the user select what scheduler it wants to use
->> since with host based scheduler it may get a much more consistent
->> behavior than with controller based which is especially important for
->> beacons.
->>
->
-> So do we need a new mgmt API for selecting the scheduler (host or controller) ?
+> +
+> +	if (skb_headroom(skb) < RSI_HEADROOM_FOR_BT_HAL) {
+> +		/* Insufficient skb headroom - allocate a new skb */
+> +		new_skb = skb_realloc_headroom(skb, RSI_HEADROOM_FOR_BT_HAL);
+> +		if (unlikely(!new_skb))
+> +			return -ENOMEM;
+> +		bt_cb(new_skb)->pkt_type = bt_cb(skb)->pkt_type;
+> +		kfree_skb(skb);
+> +		skb = new_skb;
+> +	}
+> +
+> +	return h_adapter->proto_ops->coex_send_pkt(h_adapter->priv, skb,
+> +						   RSI_BT_Q);
+> +}
+> +
+> +static int rsi_hci_recv_pkt(void *priv, u8 *pkt)
 
-I think it could possible work by having a global preference setting
-rather than having it per instance, which means we would have an entry
-in main.conf telling if the platforms wants to use the controller
-implementation or not which we may use not only for advertising API
-but other controller features that may have bugs or vary on behavior
-from vendor to vendor.
+Why is it not const u8 *pkt?
 
-It is really a pity that there is no duration in the HCI commands
-since otherwise we could maintain the existing instance and just
-rotate them, without it seems impossible to tell if each instance got
-any air time to rotate to next set.
+> +{
+> +	struct rsi_hci_adapter *h_adapter = (struct rsi_hci_adapter *)priv;
 
->>> +}
->>> +
->>>  static void hci_cc_le_read_white_list_size(struct hci_dev *hdev,
->>>                                            struct sk_buff *skb)
->>>  {
->>> @@ -3128,6 +3144,10 @@ static void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *skb,
->>>                 hci_cc_le_set_ext_scan_enable(hdev, skb);
->>>                 break;
->>>
->>> +       case HCI_OP_LE_READ_NUM_SUPPORTED_ADV_SETS:
->>> +               hci_cc_le_read_num_adv_sets(hdev, skb);
->>> +               break;
->>> +
->>>         default:
->>>                 BT_DBG("%s opcode 0x%4.4x", hdev->name, *opcode);
->>>                 break;
->>> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
->>> index 07a3cc2..ffd5f7b 100644
->>> --- a/net/bluetooth/mgmt.c
->>> +++ b/net/bluetooth/mgmt.c
->>> @@ -5998,7 +5998,7 @@ static int read_adv_features(struct sock *sk, struct hci_dev *hdev,
->>>         rp->supported_flags = cpu_to_le32(supported_flags);
->>>         rp->max_adv_data_len = HCI_MAX_AD_LENGTH;
->>>         rp->max_scan_rsp_len = HCI_MAX_AD_LENGTH;
->>> -       rp->max_instances = HCI_MAX_ADV_INSTANCES;
->>> +       rp->max_instances = hdev->le_no_of_adv_sets;
->>>         rp->num_instances = hdev->adv_instance_cnt;
->>>
->>>         instance = rp->instance;
->>> @@ -6187,7 +6187,7 @@ static int add_advertising(struct sock *sk, struct hci_dev *hdev,
->>>                 return mgmt_cmd_status(sk, hdev->id, MGMT_OP_ADD_ADVERTISING,
->>>                                        status);
->>>
->>> -       if (cp->instance < 1 || cp->instance > HCI_MAX_ADV_INSTANCES)
->>> +       if (cp->instance < 1 || cp->instance > hdev->le_no_of_adv_sets)
->>>                 return mgmt_cmd_status(sk, hdev->id, MGMT_OP_ADD_ADVERTISING,
->>>                                        MGMT_STATUS_INVALID_PARAMS);
->>>
->>> @@ -6422,7 +6422,7 @@ static int get_adv_size_info(struct sock *sk, struct hci_dev *hdev,
->>>                 return mgmt_cmd_status(sk, hdev->id, MGMT_OP_GET_ADV_SIZE_INFO,
->>>                                        MGMT_STATUS_REJECTED);
->>>
->>> -       if (cp->instance < 1 || cp->instance > HCI_MAX_ADV_INSTANCES)
->>> +       if (cp->instance < 1 || cp->instance > hdev->le_no_of_adv_sets)
->>>                 return mgmt_cmd_status(sk, hdev->id, MGMT_OP_GET_ADV_SIZE_INFO,
->>>                                        MGMT_STATUS_INVALID_PARAMS);
->>>
->
-> Thanks,
-> Jaganath
+The cast here is not needed since *priv is a void pointer.
 
+> +	struct hci_dev *hdev = h_adapter->hdev;
+> +	struct sk_buff *skb;
+> +
+> +	int pkt_len = get_unaligned_le16(pkt) & 0x0fff;
+> +	u8 queue_no = (get_unaligned_le16(pkt) & 0x7000) >> 12;
 
+Why you are not doing get_unaligned_le16 once?
 
--- 
-Luiz Augusto von Dentz
+> +
+> +	if (queue_no == RSI_BT_MGMT_Q) {
+> +		u8 msg_type = pkt[14] & 0xFF;
+> +
+> +		switch (msg_type) {
+> +		case RSI_RESULT_CONFIRM:
+> +			bt_dev_info(hdev, "BT Result Confirm");
+> +			return 0;
+> +		case RSI_BT_BER:
+> +			bt_dev_info(hdev, "BT Ber");
+> +			return 0;
+> +		case RSI_BT_CW:
+> +			bt_dev_info(hdev, "BT CW");
+> +			return 0;
+> +		default:
+> +			break;
+> +		}
+> +	}
+
+Aren’t these above debug messages? How often 
+
+> +
+> +	skb = dev_alloc_skb(pkt_len);
+> +	if (!skb)
+> +		return -ENOMEM;
+> +
+> +	memcpy(skb->data, pkt + RSI_FRAME_DESC_SIZE, pkt_len);
+> +	skb_put(skb, pkt_len);
+> +	h_adapter->hdev->stat.byte_rx += skb->len;
+> +
+> +	skb->dev = (void *)hdev;
+
+That above is no longer needed.
+
+> +	bt_cb(skb)->pkt_type = pkt[14];
+
+Please hci_skb_pkt_type here.
+
+> +
+> +	return hci_recv_frame(hdev, skb);
+> +}
+> +
+> +static int rsi_hci_attach(void *priv, struct rsi_proto_ops *ops)
+> +{
+> +	struct rsi_hci_adapter *h_adapter = NULL;
+> +	struct hci_dev *hdev;
+> +	int status = 0;
+> +
+> +	h_adapter = kzalloc(sizeof(*h_adapter), GFP_KERNEL);
+> +	if (!h_adapter)
+> +		return -ENOMEM;
+> +
+> +	h_adapter->priv = priv;
+> +	ops->set_bt_context(priv, h_adapter);
+> +	h_adapter->proto_ops = ops;
+> +
+> +	hdev = hci_alloc_dev();
+> +	if (!hdev) {
+> +		BT_ERR("Failed to alloc HCI device\n”);
+
+No \n at the end for the BT_ and bt_ ones.
+
+> +		goto err;
+> +	}
+> +
+> +	h_adapter->hdev = hdev;
+> +
+> +	if (ops->get_host_intf(priv) == RSI_HOST_INTF_SDIO)
+> +		hdev->bus = HCI_SDIO;
+> +	else
+> +		hdev->bus = HCI_USB;
+> +
+> +	hci_set_drvdata(hdev, h_adapter);
+> +	hdev->dev_type = HCI_PRIMARY;
+> +	hdev->open = rsi_hci_open;
+> +	hdev->close = rsi_hci_close;
+> +	hdev->flush = rsi_hci_flush;
+> +	hdev->send = rsi_hci_send_pkt;
+> +
+> +	status = hci_register_dev(hdev);
+> +	if (status < 0) {
+> +		BT_ERR("%s: HCI registration failed with errcode %d\n",
+> +		       __func__, status);
+
+The __func__ part is pointless here. And I would use err instead of status as variable.
+
+> +		goto err;
+> +	}
+> +
+> +	return 0;
+> +err:
+> +	if (hdev) {
+> +		hci_unregister_dev(hdev);
+
+That is wrong here. Nothing is registered.
+
+> +		hci_free_dev(hdev);
+> +		h_adapter->hdev = NULL;
+> +	}
+
+And I would use two error labels or just do it right in the error cases. It is actually simpler in the error cases since it is cleaner.
+
+> +	kfree(h_adapter);
+> +
+> +	return -EINVAL;
+> +}
+> +
+> +static void rsi_hci_detach(void *priv)
+> +{
+> +	struct rsi_hci_adapter *h_adapter = (struct rsi_hci_adapter *)priv;
+> +	struct hci_dev *hdev;
+> +
+> +	if (!h_adapter)
+> +		return;
+> +
+> +	hdev = h_adapter->hdev;
+> +	if (hdev) {
+> +		hci_unregister_dev(hdev);
+> +		hci_free_dev(hdev);
+> +		h_adapter->hdev = NULL;
+> +	}
+> +
+> +	kfree(h_adapter);
+> +}
+> +
+> +const struct rsi_mod_ops rsi_bt_ops = {
+> +	.attach	= rsi_hci_attach,
+> +	.detach	= rsi_hci_detach,
+> +	.recv_pkt = rsi_hci_recv_pkt,
+> +};
+> +EXPORT_SYMBOL(rsi_bt_ops);
+> +
+> +static int rsi_91x_bt_module_init(void)
+> +{
+> +	BT_INFO("%s: BT Module init called\n", __func__);
+
+Scarp this BT_INFO, both of them are pointless.
+
+> +
+> +	return 0;
+> +}
+> +
+> +static void rsi_91x_bt_module_exit(void)
+> +{
+> +	BT_INFO("%s: BT Module exit called\n", __func__);
+> +}
+> +
+> +module_init(rsi_91x_bt_module_init);
+> +module_exit(rsi_91x_bt_module_exit);
+> +MODULE_AUTHOR("Redpine Signals Inc");
+> +MODULE_DESCRIPTION("RSI BT driver");
+> +MODULE_SUPPORTED_DEVICE("RSI-BT");
+> +MODULE_LICENSE("Dual BSD/GPL");
+> diff --git a/include/linux/rsi_header.h b/include/linux/rsi_header.h
+> index 737ab4e..07d9574 100644
+> --- a/include/linux/rsi_header.h
+> +++ b/include/linux/rsi_header.h
+> @@ -51,4 +51,6 @@ struct rsi_mod_ops {
+> 	void (*detach)(void *priv);
+> 	int (*recv_pkt)(void *priv, u8 *msg);
+> };
+> +
+> +extern const struct rsi_mod_ops rsi_bt_ops;
+> #endif
+
+Regards
+
+Marcel
