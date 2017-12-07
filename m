@@ -2,176 +2,82 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Szymon Janc <szymon.janc@codecoup.pl>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@codecoup.pl>
-Subject: [PATCH 9/9] tools/btpclient: Add support for configuring adapter settings
-Date: Thu,  7 Dec 2017 15:21:43 +0100
-Message-Id: <20171207142143.27324-10-szymon.janc@codecoup.pl>
+Subject: [PATCH 7/9] tools/btpclient: Get initial values for adapter setttings
+Date: Thu,  7 Dec 2017 15:21:41 +0100
+Message-Id: <20171207142143.27324-8-szymon.janc@codecoup.pl>
 In-Reply-To: <20171207142143.27324-1-szymon.janc@codecoup.pl>
 References: <20171207142143.27324-1-szymon.janc@codecoup.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This allows to configure Powered, Discoverable and Pairable options.
 ---
- tools/btpclient.c | 139 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 139 insertions(+)
+ tools/btpclient.c | 46 ++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 46 insertions(+)
 
 diff --git a/tools/btpclient.c b/tools/btpclient.c
-index 2c7c40241..7a3bb80c3 100644
+index 7db65b8b4..5f7fb85f1 100644
 --- a/tools/btpclient.c
 +++ b/tools/btpclient.c
-@@ -175,6 +175,136 @@ failed:
- 	btp_send_error(btp, BTP_GAP_SERVICE, index, status);
+@@ -326,6 +326,49 @@ static void btp_device_free(struct btp_device *device)
+ 	l_free(device);
  }
  
-+struct set_setting_data {
-+	struct btp_adapter *adapter;
-+	uint8_t opcode;
-+	uint32_t setting;
-+	bool value;
-+};
-+
-+static void set_setting_reply(struct l_dbus_proxy *proxy,
-+				struct l_dbus_message *result, void *user_data)
++static void extract_settings(struct l_dbus_proxy *proxy, uint32_t *current,
++						uint32_t *supported)
 +{
-+	struct set_setting_data *data = user_data;
-+	struct btp_adapter *adapter = data->adapter;
-+	uint32_t settings;
++	bool prop;
 +
-+	if (l_dbus_message_is_error(result)) {
-+		btp_send_error(btp, BTP_GAP_SERVICE, data->adapter->index,
-+								BTP_ERROR_FAIL);
-+		return;
-+	}
++	*supported = 0;
++	*current = 0;
 +
-+	if (data->value)
-+		adapter->current_settings |= data->setting;
-+	else
-+		adapter->current_settings &= ~data->setting;
++	/* TODO not all info is available via D-Bus API */
++	*supported |=  BTP_GAP_SETTING_POWERED;
++	*supported |=  BTP_GAP_SETTING_CONNECTABLE;
++	*supported |=  BTP_GAP_SETTING_DISCOVERABLE;
++	*supported |=  BTP_GAP_SETTING_BONDABLE;
++	*supported |=  BTP_GAP_SETTING_SSP;
++	*supported |=  BTP_GAP_SETTING_BREDR;
++	*supported |=  BTP_GAP_SETTING_LE;
++	*supported |=  BTP_GAP_SETTING_ADVERTISING;
++	*supported |=  BTP_GAP_SETTING_SC;
++	*supported |=  BTP_GAP_SETTING_PRIVACY;
++	/* *supported |=  BTP_GAP_SETTING_STATIC_ADDRESS; */
 +
-+	settings = L_CPU_TO_LE32(adapter->current_settings);
++	/* TODO not all info is availbe via D-Bus API so some are assumed to be
++	 * enabled by bluetoothd or simply hardcoded until API is extended
++	 */
++	*current |=  BTP_GAP_SETTING_CONNECTABLE;
++	*current |=  BTP_GAP_SETTING_SSP;
++	*current |=  BTP_GAP_SETTING_BREDR;
++	*current |=  BTP_GAP_SETTING_LE;
++	*current |=  BTP_GAP_SETTING_PRIVACY;
++	*current |=  BTP_GAP_SETTING_SC;
++	/* *supported |=  BTP_GAP_SETTING_STATIC_ADDRESS; */
 +
-+	btp_send(btp, BTP_GAP_SERVICE, data->opcode, adapter->index,
-+						sizeof(settings), &settings);
++	if (l_dbus_proxy_get_property(proxy, "Powered", "b", &prop) && prop)
++		*current |=  BTP_GAP_SETTING_POWERED;
++
++	if (l_dbus_proxy_get_property(proxy, "Discoverable", "b", &prop) &&
++									prop)
++		*current |=  BTP_GAP_SETTING_DISCOVERABLE;
++
++	if (l_dbus_proxy_get_property(proxy, "Pairable", "b", &prop) && prop)
++		*current |=  BTP_GAP_SETTING_BONDABLE;
 +}
 +
-+static void btp_gap_set_powered(uint16_t index, const void *param,
-+					uint16_t length, void *user_data)
-+{
-+	struct btp_adapter *adapter = find_adapter_by_index(index);
-+	const struct btp_gap_set_powered_cp *cp = param;
-+	uint8_t status = BTP_ERROR_FAIL;
-+	struct set_setting_data *data;
-+
-+	if (length < sizeof(*cp))
-+		goto failed;
-+
-+	if (!adapter) {
-+		status = BTP_ERROR_INVALID_INDEX;
-+		goto failed;
-+	}
-+
-+	data = l_new(struct set_setting_data, 1);
-+	data->adapter = adapter;
-+	data->opcode = BTP_OP_GAP_SET_POWERED;
-+	data->setting = BTP_GAP_SETTING_POWERED;
-+	data->value = cp->powered;
-+
-+	if (l_dbus_proxy_set_property(adapter->proxy, set_setting_reply,
-+					data, l_free, "Powered", "b",
-+					&data->value))
-+		return;
-+
-+	l_free(data);
-+
-+failed:
-+	btp_send_error(btp, BTP_GAP_SERVICE, index, status);
-+}
-+
-+static void btp_gap_set_discoverable(uint16_t index, const void *param,
-+					uint16_t length, void *user_data)
-+{
-+	struct btp_adapter *adapter = find_adapter_by_index(index);
-+	const struct btp_gap_set_discoverable_cp *cp = param;
-+	uint8_t status = BTP_ERROR_FAIL;
-+	struct set_setting_data *data;
-+
-+	if (length < sizeof(*cp))
-+		goto failed;
-+
-+	if (!adapter) {
-+		status = BTP_ERROR_INVALID_INDEX;
-+		goto failed;
-+	}
-+
-+	data = l_new(struct set_setting_data, 1);
-+	data->adapter = adapter;
-+	data->opcode = BTP_OP_GAP_SET_DISCOVERABLE;
-+	data->setting = BTP_GAP_SETTING_DISCOVERABLE;
-+	data->value = cp->discoverable;
-+
-+	if (l_dbus_proxy_set_property(adapter->proxy, set_setting_reply,
-+					data, l_free, "Discoverable", "b",
-+					&data->value))
-+		return;
-+
-+	l_free(data);
-+
-+failed:
-+	btp_send_error(btp, BTP_GAP_SERVICE, index, status);
-+}
-+
-+static void btp_gap_set_bondable(uint16_t index, const void *param,
-+					uint16_t length, void *user_data)
-+{
-+	struct btp_adapter *adapter = find_adapter_by_index(index);
-+	const struct btp_gap_set_bondable_cp *cp = param;
-+	uint8_t status = BTP_ERROR_FAIL;
-+	struct set_setting_data *data;
-+
-+	if (length < sizeof(*cp))
-+		goto failed;
-+
-+	if (!adapter) {
-+		status = BTP_ERROR_INVALID_INDEX;
-+		goto failed;
-+	}
-+
-+	data = l_new(struct set_setting_data, 1);
-+	data->adapter = adapter;
-+	data->opcode = BTP_OP_GAP_SET_BONDABLE;
-+	data->setting = BTP_GAP_SETTING_BONDABLE;
-+	data->value = cp->bondable;
-+
-+	if (l_dbus_proxy_set_property(adapter->proxy, set_setting_reply,
-+					data, l_free, "Pairable", "b",
-+					&data->value))
-+		return;
-+
-+	l_free(data);
-+
-+failed:
-+	btp_send_error(btp, BTP_GAP_SERVICE, index, status);
-+}
-+
- static void register_gap_service(void)
+ static void proxy_added(struct l_dbus_proxy *proxy, void *user_data)
  {
- 	btp_register(btp, BTP_GAP_SERVICE, BTP_OP_GAP_READ_SUPPORTED_COMMANDS,
-@@ -186,6 +316,15 @@ static void register_gap_service(void)
+ 	const char *interface = l_dbus_proxy_get_interface(proxy);
+@@ -348,6 +391,9 @@ static void proxy_added(struct l_dbus_proxy *proxy, void *user_data)
+ 		adapter->proxy = proxy;
+ 		adapter->index = index;
  
- 	btp_register(btp, BTP_GAP_SERVICE, BTP_OP_GAP_READ_COTROLLER_INFO,
- 						btp_gap_read_info, NULL, NULL);
++		extract_settings(proxy, &adapter->current_settings,
++						&adapter->supported_settings);
 +
-+	btp_register(btp, BTP_GAP_SERVICE, BTP_OP_GAP_SET_POWERED,
-+					btp_gap_set_powered, NULL, NULL);
-+
-+	btp_register(btp, BTP_GAP_SERVICE, BTP_OP_GAP_SET_DISCOVERABLE,
-+					btp_gap_set_discoverable, NULL, NULL);
-+
-+	btp_register(btp, BTP_GAP_SERVICE, BTP_OP_GAP_SET_BONDABLE,
-+					btp_gap_set_bondable, NULL, NULL);
- }
- 
- static void btp_core_read_commands(uint16_t index, const void *param,
+ 		l_queue_push_tail(adapters, adapter);
+ 		return;
+ 	}
 -- 
 2.14.3
 
