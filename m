@@ -1,54 +1,34 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Szymon Janc <szymon.janc@codecoup.pl>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@codecoup.pl>
-Subject: [PATCH 0/9] Initial code for BTP client
-Date: Thu,  7 Dec 2017 15:21:34 +0100
-Message-Id: <20171207142143.27324-1-szymon.janc@codecoup.pl>
+Subject: [PATCH BlueZ 6/7] tools/bluetooth-player: Fix arg format for search command
+Date: Thu,  7 Dec 2017 10:21:51 -0200
+Message-Id: <20171207122152.29743-6-luiz.dentz@gmail.com>
+In-Reply-To: <20171207122152.29743-1-luiz.dentz@gmail.com>
+References: <20171207122152.29743-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds initial code for BTP client. BTP stands for Bluetooth Tester
-Protocol and aims at automated testing of BT stack. BTP is binary
-protocol and is already implemented in Zephyr Project. This adds
-similar client to BlueZ tree. BTP specification is available at [1].
+Mandatory command should always be quoted with <>.
+---
+ tools/bluetooth-player.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Notable thing about this serie is that it doesn't use glib, gdbus or
-utils from src/shared folder. Instead it makes use of Embedded Linux
-Library which is available at [2].
-
-Comments are welcome.
-
-BR
-Szymon Janc
-
-[1] https://github.com/zephyrproject-rtos/zephyr/blob/master/tests/bluetooth/tester/btp_spec.txt
-[2] https://git.kernel.org/pub/scm/libs/ell/ell.git/
-
-Szymon Janc (9):
-  shared/btp: Add initial code for library
-  tools/btpclient: Add initial code
-  shared/btp: Add definitions for GAP service
-  tools/btpclient: Store index along with adapter proxy
-  tools/btpclient: Add initial support for GAP service
-  tools/btpclient: Add initial support for read controller info command
-  tools/btpclient: Get initial values for adapter setttings
-  tools/btpclient: Add support for tracking mutable adapter settings
-  tools/btpclient: Add support for configuring adapter settings
-
- .gitignore        |   1 +
- Makefile.tools    |   8 +
- configure.ac      |  11 +
- src/shared/btp.c  | 385 ++++++++++++++++++++++++++
- src/shared/btp.h  | 321 ++++++++++++++++++++++
- tools/btpclient.c | 788 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 6 files changed, 1514 insertions(+)
- create mode 100644 src/shared/btp.c
- create mode 100644 src/shared/btp.h
- create mode 100644 tools/btpclient.c
-
+diff --git a/tools/bluetooth-player.c b/tools/bluetooth-player.c
+index f13d8187f..92235ac8e 100644
+--- a/tools/bluetooth-player.c
++++ b/tools/bluetooth-player.c
+@@ -967,7 +967,7 @@ static const struct bt_shell_menu main_menu = {
+ 						"Change current folder" },
+ 	{ "list-items", "[start] [end]",  cmd_list_items,
+ 					"List items of current folder" },
+-	{ "search",     "string",     cmd_search,
++	{ "search",     "<string>",   cmd_search,
+ 					"Search items containing string" },
+ 	{ "queue",       "<item>",    cmd_queue, "Add item to playlist queue" },
+ 	{ "show-item",   "<item>",    cmd_show_item, "Show item information" },
 -- 
-2.14.3
+2.13.6
 
