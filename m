@@ -1,83 +1,179 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-From: Alan Martinovic <alan.martinovic@senic.com>
-Date: Thu, 7 Dec 2017 16:25:26 +0100
-Message-ID: <CAOT_U5bjPoHRYdeOZp91JpwkqsDXxEx8o85NjJfKqAc6Y3h7kA@mail.gmail.com>
-Subject: LE Create Connection always triggers LE Read Remote Used Features
+From: Szymon Janc <szymon.janc@codecoup.pl>
 To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Cc: Szymon Janc <szymon.janc@codecoup.pl>
+Subject: [PATCH 5/9] tools/btpclient: Add initial support for GAP service
+Date: Thu,  7 Dec 2017 15:21:39 +0100
+Message-Id: <20171207142143.27324-6-szymon.janc@codecoup.pl>
+In-Reply-To: <20171207142143.27324-1-szymon.janc@codecoup.pl>
+References: <20171207142143.27324-1-szymon.janc@codecoup.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
-For troubleshooting purposes I need to execute only:
+This allows to get list of supported commands and present adapters.
+---
+ tools/btpclient.c | 116 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 116 insertions(+)
 
-LE Create Connection
+diff --git a/tools/btpclient.c b/tools/btpclient.c
+index 3a4971eeb..e63159824 100644
+--- a/tools/btpclient.c
++++ b/tools/btpclient.c
+@@ -49,6 +49,69 @@ static struct l_queue *devices;
+ static char *socket_path;
+ static struct btp *btp;
+ 
++static bool gap_service_registered;
++
++static void btp_gap_read_commands(uint16_t index, const void *param,
++					uint16_t length, void *user_data)
++{
++	uint16_t commands = 0;
++
++	if (index != BTP_INDEX_NON_CONTROLLER) {
++		btp_send_error(btp, BTP_GAP_SERVICE, index,
++						BTP_ERROR_INVALID_INDEX);
++		return;
++	}
++
++	commands |= (1 << BTP_OP_GAP_READ_SUPPORTED_COMMANDS);
++	commands |= (1 << BTP_OP_GAP_READ_CONTROLLER_INDEX_LIST);
++
++	commands = L_CPU_TO_LE16(commands);
++
++	btp_send(btp, BTP_GAP_SERVICE, BTP_OP_GAP_READ_SUPPORTED_COMMANDS,
++			BTP_INDEX_NON_CONTROLLER, sizeof(commands), &commands);
++}
++
++static void btp_gap_read_controller_index(uint16_t index, const void *param,
++					uint16_t length, void *user_data)
++{
++	const struct l_queue_entry *entry;
++	struct btp_gap_read_index_rp *rp;
++	uint8_t cnt;
++	int i;
++
++	if (index != BTP_INDEX_NON_CONTROLLER) {
++		btp_send_error(btp, BTP_GAP_SERVICE, index,
++						BTP_ERROR_INVALID_INDEX);
++		return;
++	}
++
++	cnt = l_queue_length(adapters);
++
++	rp = l_malloc(sizeof(*rp) + cnt);
++
++	rp->num = cnt;
++
++	for (i = 0, entry = l_queue_get_entries(adapters); entry;
++						i++, entry = entry->next) {
++		struct btp_adapter *adapter = entry->data;
++
++		rp->indexes[i] = adapter->index;
++	}
++
++	btp_send(btp, BTP_GAP_SERVICE, BTP_OP_GAP_READ_CONTROLLER_INDEX_LIST,
++			BTP_INDEX_NON_CONTROLLER, sizeof(*rp) + cnt, rp);
++}
++
++static void register_gap_service(void)
++{
++	btp_register(btp, BTP_GAP_SERVICE, BTP_OP_GAP_READ_SUPPORTED_COMMANDS,
++					btp_gap_read_commands, NULL, NULL);
++
++	btp_register(btp, BTP_GAP_SERVICE,
++				BTP_OP_GAP_READ_CONTROLLER_INDEX_LIST,
++				btp_gap_read_controller_index, NULL, NULL);
++}
++
+ static void btp_core_read_commands(uint16_t index, const void *param,
+ 					uint16_t length, void *user_data)
+ {
+@@ -81,6 +144,7 @@ static void btp_core_read_services(uint16_t index, const void *param,
+ 	}
+ 
+ 	services |= (1 << BTP_CORE_SERVICE);
++	services |= (1 << BTP_GAP_SERVICE);
+ 
+ 	btp_send(btp, BTP_CORE_SERVICE, BTP_OP_CORE_READ_SUPPORTED_SERVICES,
+ 			BTP_INDEX_NON_CONTROLLER, sizeof(services), &services);
+@@ -89,24 +153,76 @@ static void btp_core_read_services(uint16_t index, const void *param,
+ static void btp_core_register(uint16_t index, const void *param,
+ 					uint16_t length, void *user_data)
+ {
++	const struct btp_core_register_cp  *cp = param;
++
++	if (length < sizeof(*cp))
++		goto failed;
++
+ 	if (index != BTP_INDEX_NON_CONTROLLER) {
+ 		btp_send_error(btp, BTP_CORE_SERVICE, index,
+ 						BTP_ERROR_INVALID_INDEX);
+ 		return;
+ 	}
+ 
++	switch (cp->service_id) {
++	case BTP_GAP_SERVICE:
++		if (gap_service_registered)
++			goto failed;
++
++		register_gap_service();
++		gap_service_registered = true;
++		break;
++	case BTP_GATT_SERVICE:
++	case BTP_L2CAP_SERVICE:
++	case BTP_MESH_NODE_SERVICE:
++	case BTP_CORE_SERVICE:
++	default:
++		goto failed;
++	}
++
++	btp_send(btp, BTP_CORE_SERVICE, BTP_OP_CORE_REGISTER,
++					BTP_INDEX_NON_CONTROLLER, 0, NULL);
++	return;
++
++failed:
+ 	btp_send_error(btp, BTP_CORE_SERVICE, index, BTP_ERROR_FAIL);
+ }
+ 
+ static void btp_core_unregister(uint16_t index, const void *param,
+ 					uint16_t length, void *user_data)
+ {
++	const struct btp_core_unregister_cp  *cp = param;
++
++	if (length < sizeof(*cp))
++		goto failed;
++
+ 	if (index != BTP_INDEX_NON_CONTROLLER) {
+ 		btp_send_error(btp, BTP_CORE_SERVICE, index,
+ 						BTP_ERROR_INVALID_INDEX);
+ 		return;
+ 	}
+ 
++	switch (cp->service_id) {
++	case BTP_GAP_SERVICE:
++		if (!gap_service_registered)
++			goto failed;
++
++		btp_unregister_service(btp, BTP_GAP_SERVICE);
++		gap_service_registered = false;
++		break;
++	case BTP_GATT_SERVICE:
++	case BTP_L2CAP_SERVICE:
++	case BTP_MESH_NODE_SERVICE:
++	case BTP_CORE_SERVICE:
++	default:
++		goto failed;
++	}
++
++	btp_send(btp, BTP_CORE_SERVICE, BTP_OP_CORE_UNREGISTER,
++					BTP_INDEX_NON_CONTROLLER, 0, NULL);
++	return;
++
++failed:
+ 	btp_send_error(btp, BTP_CORE_SERVICE, index, BTP_ERROR_FAIL);
+ }
+ 
+-- 
+2.14.3
 
- command and no other.
-The d-bus interface doesn't provide this low level
-functionality so I resulted to htctool.
-The command translates to:
-
-sudo hcitool -i hci1 cmd 08 000d 60 00 60 00 00 01 C2 49 C4 72 88 E0
-00 18 00 28 00 00 00 2a 00 00 00 00 00
-
-Which results in a correct command but triggers a
-LE Read Remote Used Features
-which is exactly what I want to avoid.
-
-How to prevent the triggering?
-
-Version:
-Bluetooth monitor ver 5.47
-= Note: Linux version 4.10.0-40-generic (x86_64)
-= Note: Bluetooth subsystem version 2.22
-
-
-btmon output:
-
-< HCI Command: LE Create Connection (0x08|0x000d) plen 25
-        Scan interval: 60.000 msec (0x0060)
-        Scan window: 60.000 msec (0x0060)
-        Filter policy: White list is not used (0x00)
-        Peer address type: Random (0x01)
-        Peer address: E0:88:72:C4:49:C2 (Static)
-        Own address type: Public (0x00)
-        Min connection interval: 30.00 msec (0x0018)
-        Max connection interval: 50.00 msec (0x0028)
-        Connection latency: 0 (0x0000)
-        Supervision timeout: 420 msec (0x002a)
-        Min connection length: 0.000 msec (0x0000)
-        Max connection length: 0.000 msec (0x0000)
-> HCI Event: Command Status (0x0f) plen 4
-      LE Create Connection (0x08|0x000d) ncmd 1
-        Status: Success (0x00)
-@ RAW Close: hcitool
-> HCI Event: LE Meta Event (0x3e) plen 19
-      LE Connection Complete (0x01)
-        Status: Success (0x00)
-        Handle: 1
-        Role: Master (0x00)
-        Peer address type: Random (0x01)
-        Peer address: E0:88:72:C4:49:C2 (Static)
-        Connection interval: 50.00 msec (0x0028)
-        Connection latency: 0 (0x0000)
-        Supervision timeout: 420 msec (0x002a)
-        Master clock accuracy: 0x00
-@ MGMT Event: Device Connected (0x000b) plen 13
-        LE Address: E0:88:72:C4:49:C2 (Static)
-        Flags: 0x00000000
-        Data length: 0
-@ MGMT Event: Device Connected (0x000b) plen 13
-        LE Address: E0:88:72:C4:49:C2 (Static)
-        Flags: 0x00000000
-        Data length: 0
-< HCI Command: LE Read Remote Used Features (0x08|0x0016) plen 2
-        Handle: 1
-> HCI Event: Command Status (0x0f) plen 4
-      LE Read Remote Used Features (0x08|0x0016) ncmd 1
-        Status: Success (0x00)
-> HCI Event: Disconnect Complete (0x05) plen 4
-        Status: Success (0x00)
-        Handle: 1
-        Reason: Connection Timeout (0x08)
