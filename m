@@ -1,9 +1,9 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 6/7] tools/bluetooth-player: Fix arg format for search command
-Date: Thu,  7 Dec 2017 10:21:51 -0200
-Message-Id: <20171207122152.29743-6-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 7/7] client: Fix arguments of set-filter-clear
+Date: Thu,  7 Dec 2017 10:21:52 -0200
+Message-Id: <20171207122152.29743-7-luiz.dentz@gmail.com>
 In-Reply-To: <20171207122152.29743-1-luiz.dentz@gmail.com>
 References: <20171207122152.29743-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,24 +11,24 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Mandatory command should always be quoted with <>.
+Commands with no arguments shall use NULL not empty string.
 ---
- tools/bluetooth-player.c | 2 +-
+ client/main.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/tools/bluetooth-player.c b/tools/bluetooth-player.c
-index f13d8187f..92235ac8e 100644
---- a/tools/bluetooth-player.c
-+++ b/tools/bluetooth-player.c
-@@ -967,7 +967,7 @@ static const struct bt_shell_menu main_menu = {
- 						"Change current folder" },
- 	{ "list-items", "[start] [end]",  cmd_list_items,
- 					"List items of current folder" },
--	{ "search",     "string",     cmd_search,
-+	{ "search",     "<string>",   cmd_search,
- 					"Search items containing string" },
- 	{ "queue",       "<item>",    cmd_queue, "Add item to playlist queue" },
- 	{ "show-item",   "<item>",    cmd_show_item, "Show item information" },
+diff --git a/client/main.c b/client/main.c
+index 3534bd329..f0f62fe2a 100644
+--- a/client/main.c
++++ b/client/main.c
+@@ -2239,7 +2239,7 @@ static const struct bt_shell_menu scan_menu = {
+ 				cmd_set_scan_filter_duplicate_data,
+ 				"Set scan filter duplicate data",
+ 				mode_generator },
+-	{ "set-filter-clear", "", cmd_set_scan_filter_clear,
++	{ "set-filter-clear", NULL, cmd_set_scan_filter_clear,
+ 				"Clears discovery filter." },
+ 	{ } },
+ };
 -- 
 2.13.6
 
