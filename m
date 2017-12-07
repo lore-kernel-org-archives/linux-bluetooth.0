@@ -1,38 +1,66 @@
-Return-Path: <david@lechnology.com>
-Subject: Re: [PATCH 2/3] bluetooth: hci_ll: add constant for vendor-specific
- command
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: devicetree <devicetree@vger.kernel.org>,
- "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
- Rob Herring <robh+dt@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
- "Gustavo F. Padovan" <gustavo@padovan.org>,
- Johan Hedberg <johan.hedberg@gmail.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <1512357682-8911-1-git-send-email-david@lechnology.com>
- <1512357682-8911-3-git-send-email-david@lechnology.com>
- <5C65FB74-D7FD-4653-993A-5A68AD844A41@holtmann.org>
-From: David Lechner <david@lechnology.com>
-Message-ID: <55fff19a-c30f-88f0-afb2-6c0b9bad25a7@lechnology.com>
-Date: Thu, 7 Dec 2017 15:29:02 -0600
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <5C65FB74-D7FD-4653-993A-5A68AD844A41@holtmann.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <b17ba8fb-0ed2-a237-06c3-75ab0addbd86@opensourcefoundries.com>
+References: <b17ba8fb-0ed2-a237-06c3-75ab0addbd86@opensourcefoundries.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Thu, 7 Dec 2017 16:55:51 -0200
+Message-ID: <CABBYNZL2=8K9HeF=G42mkROacmDRfraaoBoP1hc8-hQDMCVMjw@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: 6lowpan: Fix multi-link setup
+To: Michael Scott <michael@opensourcefoundries.com>
+Cc: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+        Jukka Rissanen <jukka.rissanen@linux.intel.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 12/04/2017 12:23 AM, Marcel Holtmann wrote:
-> Hi David,
-> 
->> This adds a #define for the vendor-specific HCI command to set the
->> baudrate instead of using the bare 0xff36 multiple times.
->>
->> Signed-off-by: David Lechner <david@lechnology.com>
->> ---
->> drivers/bluetooth/hci_ll.c | 10 ++++++++--
->> 1 file changed, 8 insertions(+), 2 deletions(-)
-> 
-> patch has been applied to bluetooth-next tree.
-> 
+Hi Michael,
 
-I am new to the bluetooth tree, so just to be sure... does this mean I 
-should not include this patch in v2 of this series since this patch has 
-been applied?
+On Thu, Dec 7, 2017 at 4:26 PM, Michael Scott
+<michael@opensourcefoundries.com> wrote:
+> Hi Luiz (and linux-bluetooth),
+>
+> On Wed, 2017-09-20 at 12:52 +0300, Luiz Augusto von Dentz wrote:
+>>
+>> /From: Luiz Augusto von Dentz <luiz.von.dentz@xxxxxxxxx>/
+>> //
+>> /If there are more than one node connected and there isn't any route/
+>> /information attempt to check if destination address matches any of/
+>> /the/
+>> /link-local peer addresses./
+>> //
+>> /Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@xxxxxxxxx>/
+>> /---/
+>> /net/bluetooth/6lowpan.c | 2 +-/
+>> /1 file changed, 1 insertion(+), 1 deletion(-)/
+>> //
+>> /diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c/
+>> /index 4e2576fc0c59..55370c330386 100644/
+>> /--- a/net/bluetooth/6lowpan.c/
+>> /+++ b/net/bluetooth/6lowpan.c/
+>> /@@ -190,7 +190,7 @@ static inline struct lowpan_peer/
+>> /*peer_lookup_dst(struct lowpan_btle_dev *dev,/
+>> /nexthop = &lowpan_cb(skb)->gw;/
+>> //
+>> /if (ipv6_addr_any(nexthop))/
+>> /- return NULL;/
+>> /+ nexthop = daddr;/
+>> /} else {/
+>> /nexthop = rt6_nexthop(rt, daddr);/
+>> //
+>
+>
+> Was there any plan to bring this into the longterm 4.14 tree?  I saw that
+> Jukka ACKed the patch.
+>
+> Using 4.14, connecting more than 1 node via 6lowpan is completely broken.
+> This fairly simple patch restores connectivity for multiple 6lowpan devices.
+>
+> Question: Are there any hidden downsides to using this patch?
+
+No really, we are just going to deprecated the debugfs interface thus
+this got deprioritized, but perhaps we should apply one last fix
+before moving on.
+
+-- 
+Luiz Augusto von Dentz
