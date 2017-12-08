@@ -10,48 +10,69 @@ Cc: David Lechner <david@lechnology.com>,
 	Johan Hedberg <johan.hedberg@gmail.com>,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 2/3] dt-bindings: Add optional nvmem BD address bindings to ti,wlink-st
-Date: Thu,  7 Dec 2017 20:57:39 -0600
-Message-Id: <1512701860-8321-3-git-send-email-david@lechnology.com>
+Subject: [PATCH v2 1/3] Bluetooth: hci_ll: add support for setting public address
+Date: Thu,  7 Dec 2017 20:57:38 -0600
+Message-Id: <1512701860-8321-2-git-send-email-david@lechnology.com>
 In-Reply-To: <1512701860-8321-1-git-send-email-david@lechnology.com>
 References: <1512701860-8321-1-git-send-email-david@lechnology.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This adds optional nvmem consumer properties to the ti,wlink-st device tree
-bindings to allow specifying the BD address.
+This adds support for setting the public address on Texas Instruments
+Bluetooth chips using a vendor-specific command.
+
+This has been tested on a CC2560A. The TI wiki also indicates that this
+command should work on TI WL17xx/WL18xx Bluetooth chips.
 
 Signed-off-by: David Lechner <david@lechnology.com>
 ---
 
 v2 changes:
-* Renamed "mac-address" to "bd-address"
-* Fixed typos in example
-* Specify byte order of "bd-address"
+* This is a new patch in v2
 
- Documentation/devicetree/bindings/net/ti,wilink-st.txt | 5 +++++
- 1 file changed, 5 insertions(+)
+ drivers/bluetooth/hci_ll.c | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
 
-diff --git a/Documentation/devicetree/bindings/net/ti,wilink-st.txt b/Documentation/devicetree/bindings/net/ti,wilink-st.txt
-index 1649c1f..a45a508 100644
---- a/Documentation/devicetree/bindings/net/ti,wilink-st.txt
-+++ b/Documentation/devicetree/bindings/net/ti,wilink-st.txt
-@@ -32,6 +32,9 @@ Optional properties:
-    See ../clocks/clock-bindings.txt for details.
-  - clock-names : Must include the following entry:
-    "ext_clock" (External clock provided to the TI combo chip).
-+ - nvmem-cells: phandle to nvmem data cell that contains a 6 byte BD address
-+   with the most significant byte first (big-endian).
-+ - nvmem-cell-names: "bd-address" (required when nvmem-cells is specified)
+diff --git a/drivers/bluetooth/hci_ll.c b/drivers/bluetooth/hci_ll.c
+index 974a788..b732004 100644
+--- a/drivers/bluetooth/hci_ll.c
++++ b/drivers/bluetooth/hci_ll.c
+@@ -57,6 +57,7 @@
+ #include "hci_uart.h"
  
- Example:
+ /* Vendor-specific HCI commands */
++#define HCI_VS_WRITE_BD_ADDR			0xfc06
+ #define HCI_VS_UPDATE_UART_HCI_BAUDRATE		0xff36
  
-@@ -43,5 +46,7 @@ Example:
- 		enable-gpios = <&gpio1 7 GPIO_ACTIVE_HIGH>;
- 		clocks = <&clk32k_wl18xx>;
- 		clock-names = "ext_clock";
-+		nvmem-cells = <&bd_address>;
-+		nvmem-cell-names = "bd-address";
- 	};
- };
+ /* HCILL commands */
+@@ -662,6 +663,20 @@ static int download_firmware(struct ll_device *lldev)
+ 	return err;
+ }
+ 
++static int ll_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr)
++{
++	bdaddr_t bdaddr_swapped;
++	struct sk_buff *skb;
++
++	baswap(&bdaddr_swapped, bdaddr);
++	skb = __hci_cmd_sync(hdev, HCI_VS_WRITE_BD_ADDR, sizeof(bdaddr_t),
++			     &bdaddr_swapped, HCI_INIT_TIMEOUT);
++	if (!IS_ERR(skb))
++		kfree_skb(skb);
++	
++	return PTR_ERR_OR_ZERO(skb);
++}
++
+ static int ll_setup(struct hci_uart *hu)
+ {
+ 	int err, retry = 3;
+@@ -674,6 +689,8 @@ static int ll_setup(struct hci_uart *hu)
+ 
+ 	lldev = serdev_device_get_drvdata(serdev);
+ 
++	hu->hdev->set_bdaddr = ll_set_bdaddr;
++
+ 	serdev_device_set_flow_control(serdev, true);
+ 
+ 	do {
 -- 
 2.7.4
