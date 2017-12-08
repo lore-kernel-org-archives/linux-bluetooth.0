@@ -1,36 +1,35 @@
-Return-Path: <linux-kernel-owner@vger.kernel.org>
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
-Subject: Re: [PATCH] Bluetooth: hci_ll: Add endianness conversion when setting
- baudrate
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1512699739-22162-1-git-send-email-david@lechnology.com>
-Date: Fri, 8 Dec 2017 09:00:56 +0100
-Cc: "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-        "Gustavo F. Padovan" <gustavo@padovan.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-kernel@vger.kernel.org
-Message-Id: <87878C4D-90C2-4469-A827-C54516B052B1@holtmann.org>
-References: <1512699739-22162-1-git-send-email-david@lechnology.com>
-To: David Lechner <david@lechnology.com>
-Sender: linux-kernel-owner@vger.kernel.org
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Date: Fri, 8 Dec 2017 09:01:34 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ 3/7] mesh: Make meshctl use bt_shell helpers
+Message-ID: <20171208070134.GA29604@x1c.home>
+References: <20171207122152.29743-1-luiz.dentz@gmail.com>
+ <20171207122152.29743-3-luiz.dentz@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20171207122152.29743-3-luiz.dentz@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi David,
+Hi Luiz,
 
-> This adds an endianness conversion when setting the baudrate using a
-> vendor-specific command. Otherwise, bad things might happen on a big-
-> endian system.
-> 
-> Suggested-by: Marcel Holtmann <marcel@holtmann.org>
-> Signed-off-by: David Lechner <david@lechnology.com>
-> ---
-> drivers/bluetooth/hci_ll.c | 4 +++-
-> 1 file changed, 3 insertions(+), 1 deletion(-)
+On Thu, Dec 07, 2017, Luiz Augusto von Dentz wrote:
+> -static void set_scan_filter_uuids(const char *arg)
+> +static void set_scan_filter_uuids(int argc, char *argv[])
+>  {
+>  	g_strfreev(filtered_scan_uuids);
+>  	filtered_scan_uuids = NULL;
+>  	filtered_scan_uuids_len = 0;
+>  
+> -	if (!arg || !strlen(arg))
+> +	if (argc < 2 || !strlen(argv[1]))
 
-patch has been applied to bluetooth-next tree.
+This function seems to be called for string arrays like { UUID, NULL },
+with argc == 1, so the above check looks broken to me. Actually, it
+seems like this function is not used as a normal command handler, so why
+is it dressed up like one (just causes confusion and potential bugs like
+this)?
 
-Regards
-
-Marcel
+Johan
