@@ -1,9 +1,9 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 09/10] mesh: Rework set_scan_filter_uuids parameters
-Date: Fri,  8 Dec 2017 08:52:55 -0200
-Message-Id: <20171208105256.18635-9-luiz.dentz@gmail.com>
+Subject: [PATCH v2 10/10] mesh: Remove cmd_scan
+Date: Fri,  8 Dec 2017 08:52:56 -0200
+Message-Id: <20171208105256.18635-10-luiz.dentz@gmail.com>
 In-Reply-To: <20171208105256.18635-1-luiz.dentz@gmail.com>
 References: <20171208105256.18635-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,63 +11,92 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-set_scan_filter_uuids is not a command handler which means it doesn't
-need to take argc and argv instead just pass the filter array.
+cmd_scan is only used internally by discover-unprovisioned.
 ---
- mesh/main.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ mesh/main.c | 45 ++++++++++++++++-----------------------------
+ 1 file changed, 16 insertions(+), 29 deletions(-)
 
 diff --git a/mesh/main.c b/mesh/main.c
-index 4d63c5751..4b9d65d6f 100644
+index 4b9d65d6f..9360481f8 100644
 --- a/mesh/main.c
 +++ b/mesh/main.c
-@@ -1596,16 +1596,16 @@ static void set_scan_filter_commit(void)
- 	}
+@@ -1398,32 +1398,6 @@ static void cmd_power(int argc, char *argv[])
+ 	g_free(str);
  }
  
--static void set_scan_filter_uuids(int argc, char *argv[])
-+static void set_scan_filter_uuids(char *filters[])
+-static void cmd_scan(int argc, char *argv[])
+-{
+-	dbus_bool_t enable;
+-	const char *method;
+-
+-	if (parse_argument_on_off(argc, argv, &enable) == FALSE)
+-		return;
+-
+-	if (check_default_ctrl() == FALSE)
+-		return;
+-
+-	if (enable == TRUE) {
+-		method = "StartDiscovery";
+-	} else {
+-		method = "StopDiscovery";
+-	}
+-
+-	if (g_dbus_proxy_method_call(default_ctrl->proxy, method,
+-				NULL, start_discovery_reply,
+-				GUINT_TO_POINTER(enable), NULL) == FALSE) {
+-		bt_shell_printf("Failed to %s discovery\n",
+-					enable == TRUE ? "start" : "stop");
+-		return;
+-	}
+-}
+-
+ static void append_variant(DBusMessageIter *iter, int type, void *val)
  {
- 	g_strfreev(filtered_scan_uuids);
- 	filtered_scan_uuids = NULL;
- 	filtered_scan_uuids_len = 0;
+ 	DBusMessageIter value;
+@@ -1617,19 +1591,32 @@ commit:
+ 	set_scan_filter_commit();
+ }
  
--	if (!argc || !strlen(argv[0]))
-+	if (!filters)
- 		goto commit;
+-static void cmd_scan_unprovisioned_devices(int argc, char *argv[])
++static void cmd_scan_unprovisioned(int argc, char *argv[])
+ {
+ 	dbus_bool_t enable;
+ 	char *filters[] = { MESH_PROV_SVC_UUID, NULL };
++	const char *method;
  
--	filtered_scan_uuids = g_strdupv(argv);
-+	filtered_scan_uuids = g_strdupv(filters);
- 	if (!filtered_scan_uuids) {
- 		bt_shell_printf("Failed to parse input\n");
+ 	if (parse_argument_on_off(argc, argv, &enable) == FALSE)
  		return;
-@@ -1627,7 +1627,7 @@ static void cmd_scan_unprovisioned_devices(int argc, char *argv[])
  
++	if (check_default_ctrl() == FALSE)
++		return;
++
  	if (enable == TRUE) {
  		discover_mesh = false;
--		set_scan_filter_uuids(1, filters);
-+		set_scan_filter_uuids(filters);
+ 		set_scan_filter_uuids(filters);
++		method = "StartDiscovery";
++	} else {
++		method = "StopDiscovery";
++	}
++
++	if (g_dbus_proxy_method_call(default_ctrl->proxy, method,
++				NULL, start_discovery_reply,
++				GUINT_TO_POINTER(enable), NULL) == FALSE) {
++		bt_shell_printf("Failed to %s discovery\n",
++					enable == TRUE ? "start" : "stop");
  	}
- 	cmd_scan(argc, argv);
+-	cmd_scan(argc, argv);
  }
-@@ -1721,7 +1721,7 @@ static void cmd_connect(int argc, char *argv[])
- 		g_dbus_proxy_method_call(default_ctrl->proxy, "StopDiscovery",
- 						NULL, NULL, NULL, NULL);
  
--	set_scan_filter_uuids(1, filters);
-+	set_scan_filter_uuids(filters);
- 	discover_mesh = true;
- 
- 	if (connection.unicast == UNASSIGNED_ADDRESS) {
-@@ -1761,7 +1761,7 @@ static void prov_disconn_reply(DBusMessage *message, void *user_data)
- 
- 	set_connected_device(NULL);
- 
--	set_scan_filter_uuids(1, filters);
-+	set_scan_filter_uuids(filters);
- 	discover_mesh = true;
- 
- 	connection.type = CONN_TYPE_IDENTITY;
+ static void cmd_info(int argc, char *argv[])
+@@ -1912,7 +1899,7 @@ static const struct bt_shell_menu main_menu = {
+ 	{ "info",         "[dev]",    cmd_info, "Device information"},
+ 	{ "connect",      "[net_idx] [dst]", cmd_connect,
+ 				"Connect to mesh network or node on network"},
+-	{ "discover-unprovisioned", "<on/off>", cmd_scan_unprovisioned_devices,
++	{ "discover-unprovisioned", "<on/off>", cmd_scan_unprovisioned,
+ 					"Look for devices to provision" },
+ 	{ "provision",    "<uuid>",   cmd_start_prov, "Initiate provisioning"},
+ 	{ "power",        "<on/off>", cmd_power, "Set controller power" },
 -- 
 2.13.6
 
