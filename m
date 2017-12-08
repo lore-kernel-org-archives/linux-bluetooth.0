@@ -2,122 +2,178 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Szymon Janc <szymon.janc@codecoup.pl>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@codecoup.pl>
-Subject: [PATCH V2 07/10] tools/btpclient: Add support for tracking mutable adapter settings
-Date: Fri,  8 Dec 2017 15:03:46 +0100
-Message-Id: <20171208140348.30342-8-szymon.janc@codecoup.pl>
+Subject: [PATCH V2 04/10] tools/btpclient: Add initial support for GAP service
+Date: Fri,  8 Dec 2017 15:03:43 +0100
+Message-Id: <20171208140348.30342-5-szymon.janc@codecoup.pl>
 In-Reply-To: <20171208140348.30342-1-szymon.janc@codecoup.pl>
 References: <20171208140348.30342-1-szymon.janc@codecoup.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+This allows to get list of supported commands and present adapters.
 ---
- tools/btpclient.c | 83 +++++++++++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 81 insertions(+), 2 deletions(-)
+ tools/btpclient.c | 116 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 116 insertions(+)
 
 diff --git a/tools/btpclient.c b/tools/btpclient.c
-index b0bc0ab30..482d1e380 100644
+index bde59406c..17a9c8a23 100644
 --- a/tools/btpclient.c
 +++ b/tools/btpclient.c
-@@ -52,6 +52,21 @@ static struct btp *btp;
+@@ -48,6 +48,69 @@ static struct l_queue *devices;
+ static char *socket_path;
+ static struct btp *btp;
  
- static bool gap_service_registered;
- 
-+static struct btp_adapter *find_adapter_by_proxy(struct l_dbus_proxy *proxy)
++static bool gap_service_registered;
++
++static void btp_gap_read_commands(uint8_t index, const void *param,
++					uint16_t length, void *user_data)
 +{
-+	const struct l_queue_entry *entry;
++	uint16_t commands = 0;
 +
-+	for (entry = l_queue_get_entries(adapters); entry;
-+							entry = entry->next) {
-+		struct btp_adapter *adapter = entry->data;
-+
-+		if (adapter->proxy == proxy)
-+			return adapter;
-+	}
-+
-+	return NULL;
-+}
-+
- static struct btp_adapter *find_adapter_by_index(uint8_t index)
- {
- 	const struct l_queue_entry *entry;
-@@ -428,11 +443,75 @@ static void proxy_removed(struct l_dbus_proxy *proxy, void *user_data)
- 	}
- }
- 
-+static void update_current_settings(struct btp_adapter *adapter,
-+							uint32_t new_settings)
-+{
-+	struct btp_new_settings_ev ev;
-+
-+	adapter->current_settings = new_settings;
-+
-+	ev.current_settings = L_CPU_TO_LE32(adapter->current_settings);
-+
-+	btp_send(btp, BTP_GAP_SERVICE, BTP_EV_GAP_NEW_SETTINGS, adapter->index,
-+							sizeof(ev), &ev);
-+}
-+
- static void property_changed(struct l_dbus_proxy *proxy, const char *name,
- 				struct l_dbus_message *msg, void *user_data)
- {
--	l_info("property_changed %s %s %s", name, l_dbus_proxy_get_path(proxy),
--			l_dbus_proxy_get_interface(proxy));
-+	const char *interface = l_dbus_proxy_get_interface(proxy);
-+	const char *path = l_dbus_proxy_get_path(proxy);
-+
-+	l_info("property_changed %s %s %s", name, path, interface);
-+
-+	if (!strcmp(interface, "org.bluez.Adapter1")) {
-+		struct btp_adapter *adapter = find_adapter_by_proxy(proxy);
-+		uint32_t new_settings;
-+
-+		if (!adapter)
-+			return;
-+
-+		new_settings = adapter->current_settings;
-+
-+		if (!strcmp(name, "Powered")) {
-+			bool prop;
-+
-+			if (!l_dbus_message_get_arguments(msg, "b", &prop))
-+				return;
-+
-+			if (prop)
-+				new_settings |= BTP_GAP_SETTING_POWERED;
-+			else
-+				new_settings &= ~BTP_GAP_SETTING_POWERED;
-+		} else if (!strcmp(name, "Discoverable")) {
-+			bool prop;
-+
-+			if (!l_dbus_message_get_arguments(msg, "b", &prop))
-+				return;
-+
-+			if (prop)
-+				new_settings |= BTP_GAP_SETTING_DISCOVERABLE;
-+			else
-+				new_settings &= ~BTP_GAP_SETTING_DISCOVERABLE;
-+		}
-+
-+		if (!strcmp(name, "Pairable")) {
-+			bool prop;
-+
-+			if (!l_dbus_message_get_arguments(msg, "b", &prop))
-+				return;
-+
-+			if (prop)
-+				new_settings |= BTP_GAP_SETTING_BONDABLE;
-+			else
-+				new_settings &= ~BTP_GAP_SETTING_BONDABLE;
-+		}
-+
-+		if (new_settings != adapter->current_settings)
-+			update_current_settings(adapter, new_settings);
-+
++	if (index != BTP_INDEX_NON_CONTROLLER) {
++		btp_send_error(btp, BTP_GAP_SERVICE, index,
++						BTP_ERROR_INVALID_INDEX);
 +		return;
 +	}
++
++	commands |= (1 << BTP_OP_GAP_READ_SUPPORTED_COMMANDS);
++	commands |= (1 << BTP_OP_GAP_READ_CONTROLLER_INDEX_LIST);
++
++	commands = L_CPU_TO_LE16(commands);
++
++	btp_send(btp, BTP_GAP_SERVICE, BTP_OP_GAP_READ_SUPPORTED_COMMANDS,
++			BTP_INDEX_NON_CONTROLLER, sizeof(commands), &commands);
++}
++
++static void btp_gap_read_controller_index(uint8_t index, const void *param,
++					uint16_t length, void *user_data)
++{
++	const struct l_queue_entry *entry;
++	struct btp_gap_read_index_rp *rp;
++	uint8_t cnt;
++	int i;
++
++	if (index != BTP_INDEX_NON_CONTROLLER) {
++		btp_send_error(btp, BTP_GAP_SERVICE, index,
++						BTP_ERROR_INVALID_INDEX);
++		return;
++	}
++
++	cnt = l_queue_length(adapters);
++
++	rp = l_malloc(sizeof(*rp) + cnt);
++
++	rp->num = cnt;
++
++	for (i = 0, entry = l_queue_get_entries(adapters); entry;
++						i++, entry = entry->next) {
++		struct btp_adapter *adapter = entry->data;
++
++		rp->indexes[i] = adapter->index;
++	}
++
++	btp_send(btp, BTP_GAP_SERVICE, BTP_OP_GAP_READ_CONTROLLER_INDEX_LIST,
++			BTP_INDEX_NON_CONTROLLER, sizeof(*rp) + cnt, rp);
++}
++
++static void register_gap_service(void)
++{
++	btp_register(btp, BTP_GAP_SERVICE, BTP_OP_GAP_READ_SUPPORTED_COMMANDS,
++					btp_gap_read_commands, NULL, NULL);
++
++	btp_register(btp, BTP_GAP_SERVICE,
++				BTP_OP_GAP_READ_CONTROLLER_INDEX_LIST,
++				btp_gap_read_controller_index, NULL, NULL);
++}
++
+ static void btp_core_read_commands(uint8_t index, const void *param,
+ 					uint16_t length, void *user_data)
+ {
+@@ -80,6 +143,7 @@ static void btp_core_read_services(uint8_t index, const void *param,
+ 	}
+ 
+ 	services |= (1 << BTP_CORE_SERVICE);
++	services |= (1 << BTP_GAP_SERVICE);
+ 
+ 	btp_send(btp, BTP_CORE_SERVICE, BTP_OP_CORE_READ_SUPPORTED_SERVICES,
+ 			BTP_INDEX_NON_CONTROLLER, sizeof(services), &services);
+@@ -88,24 +152,76 @@ static void btp_core_read_services(uint8_t index, const void *param,
+ static void btp_core_register(uint8_t index, const void *param,
+ 					uint16_t length, void *user_data)
+ {
++	const struct btp_core_register_cp  *cp = param;
++
++	if (length < sizeof(*cp))
++		goto failed;
++
+ 	if (index != BTP_INDEX_NON_CONTROLLER) {
+ 		btp_send_error(btp, BTP_CORE_SERVICE, index,
+ 						BTP_ERROR_INVALID_INDEX);
+ 		return;
+ 	}
+ 
++	switch (cp->service_id) {
++	case BTP_GAP_SERVICE:
++		if (gap_service_registered)
++			goto failed;
++
++		register_gap_service();
++		gap_service_registered = true;
++		break;
++	case BTP_GATT_SERVICE:
++	case BTP_L2CAP_SERVICE:
++	case BTP_MESH_NODE_SERVICE:
++	case BTP_CORE_SERVICE:
++	default:
++		goto failed;
++	}
++
++	btp_send(btp, BTP_CORE_SERVICE, BTP_OP_CORE_REGISTER,
++					BTP_INDEX_NON_CONTROLLER, 0, NULL);
++	return;
++
++failed:
+ 	btp_send_error(btp, BTP_CORE_SERVICE, index, BTP_ERROR_FAIL);
  }
  
- static void client_connected(struct l_dbus *dbus, void *user_data)
+ static void btp_core_unregister(uint8_t index, const void *param,
+ 					uint16_t length, void *user_data)
+ {
++	const struct btp_core_unregister_cp  *cp = param;
++
++	if (length < sizeof(*cp))
++		goto failed;
++
+ 	if (index != BTP_INDEX_NON_CONTROLLER) {
+ 		btp_send_error(btp, BTP_CORE_SERVICE, index,
+ 						BTP_ERROR_INVALID_INDEX);
+ 		return;
+ 	}
+ 
++	switch (cp->service_id) {
++	case BTP_GAP_SERVICE:
++		if (!gap_service_registered)
++			goto failed;
++
++		btp_unregister_service(btp, BTP_GAP_SERVICE);
++		gap_service_registered = false;
++		break;
++	case BTP_GATT_SERVICE:
++	case BTP_L2CAP_SERVICE:
++	case BTP_MESH_NODE_SERVICE:
++	case BTP_CORE_SERVICE:
++	default:
++		goto failed;
++	}
++
++	btp_send(btp, BTP_CORE_SERVICE, BTP_OP_CORE_UNREGISTER,
++					BTP_INDEX_NON_CONTROLLER, 0, NULL);
++	return;
++
++failed:
+ 	btp_send_error(btp, BTP_CORE_SERVICE, index, BTP_ERROR_FAIL);
+ }
+ 
 -- 
 2.14.3
 
