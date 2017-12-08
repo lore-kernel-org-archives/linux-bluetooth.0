@@ -2,254 +2,423 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Szymon Janc <szymon.janc@codecoup.pl>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@codecoup.pl>
-Subject: [PATCH V2 03/10] shared/btp: Add definitions for GAP service
-Date: Fri,  8 Dec 2017 15:03:42 +0100
-Message-Id: <20171208140348.30342-4-szymon.janc@codecoup.pl>
+Subject: [PATCH V2 02/10] tools/btpclient: Add initial code
+Date: Fri,  8 Dec 2017 15:03:41 +0100
+Message-Id: <20171208140348.30342-3-szymon.janc@codecoup.pl>
 In-Reply-To: <20171208140348.30342-1-szymon.janc@codecoup.pl>
 References: <20171208140348.30342-1-szymon.janc@codecoup.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- src/shared/btp.h | 225 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 225 insertions(+)
+This adds initial code for BTP client tool that allows for automated
+(binary protocol ) control of BlueZ stack. Currently this tool depends
+only on Embedded Linux Library and requires master branch of ELL.
+When 0.3 is released dependencies will be bumped.
 
-diff --git a/src/shared/btp.h b/src/shared/btp.h
-index 66f29ba73..5044de822 100644
---- a/src/shared/btp.h
-+++ b/src/shared/btp.h
-@@ -70,6 +70,231 @@ struct btp_core_unregister_cp {
+Initial code allows to connect D-Bus client, discover objects and keep
+proxies for it. It also implements basics for BTP core service.
+---
+ .gitignore        |   1 +
+ Makefile.tools    |   8 ++
+ configure.ac      |  11 ++
+ tools/btpclient.c | 338 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 358 insertions(+)
+ create mode 100644 tools/btpclient.c
+
+diff --git a/.gitignore b/.gitignore
+index af205ec6a..393735e0f 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -116,6 +116,7 @@ tools/btattach
+ tools/btconfig
+ tools/btmgmt
+ tools/btsnoop
++tools/btpclient
+ peripheral/btsensor
+ monitor/btmon
+ emulator/btvirt
+diff --git a/Makefile.tools b/Makefile.tools
+index 561302fa1..c4fea3d49 100644
+--- a/Makefile.tools
++++ b/Makefile.tools
+@@ -446,3 +446,11 @@ test_scripts += test/sap_client.py test/bluezutils.py \
+ 		test/pbap-client test/map-client test/example-advertisement \
+ 		test/example-gatt-server test/example-gatt-client \
+ 		test/test-gatt-profile
++
++if BTPCLIENT
++noinst_PROGRAMS += tools/btpclient
++
++tools_btpclient_SOURCES = tools/btpclient.c src/shared/btp.c src/shared/btp.h
++tools_btpclient_CFLAGS = $(AM_CFLAGS) @ELL_CFLAGS@
++tools_btpclient_LDADD = @ELL_LIBS@
++endif
+diff --git a/configure.ac b/configure.ac
+index 964101412..fcba28543 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -244,6 +244,17 @@ if (test "${enable_obex}" != "no"); then
+ fi
+ AM_CONDITIONAL(OBEX, test "${enable_obex}" != "no")
  
- #define BTP_EV_CORE_READY			0x80
- 
-+#define BTP_OP_GAP_READ_SUPPORTED_COMMANDS	0x01
++AC_ARG_ENABLE(btpclient, AC_HELP_STRING([--enable-btpclient],
++		[enable BTP client]), [enable_btpclient=${enableval}])
++AM_CONDITIONAL(BTPCLIENT, test "${enable_btpclient}" = "yes")
 +
-+#define BTP_OP_GAP_READ_CONTROLLER_INDEX_LIST	0x02
-+struct btp_gap_read_index_rp {
-+	uint8_t num;
-+	uint8_t indexes[0];
-+} __packed;
++if (test "${enable_btpclient}" = "yes"); then
++	PKG_CHECK_MODULES(ELL, ell >= 0.2, dummy=yes,
++			  AC_MSG_ERROR(ell library >= 0.2 is required))
++	AC_SUBST(ELL_CFLAGS)
++	AC_SUBST(ELL_LIBS)
++fi
 +
-+#define BTP_GAP_SETTING_POWERED			0x00000001
-+#define BTP_GAP_SETTING_CONNECTABLE		0x00000002
-+#define BTP_GAP_SETTING_FAST_CONNECTABLE	0x00000004
-+#define BTP_GAP_SETTING_DISCOVERABLE		0x00000008
-+#define BTP_GAP_SETTING_BONDABLE		0x00000010
-+#define BTP_GAP_SETTING_LL_SECURITY		0x00000020
-+#define BTP_GAP_SETTING_SSP			0x00000040
-+#define BTP_GAP_SETTING_BREDR			0x00000080
-+#define BTP_GAP_SETTING_HS			0x00000100
-+#define BTP_GAP_SETTING_LE			0x00000200
-+#define BTP_GAP_SETTING_ADVERTISING		0x00000400
-+#define BTP_GAP_SETTING_SC			0x00000800
-+#define BTP_GAP_SETTING_DEBUG_KEYS		0x00001000
-+#define BTP_GAP_SETTING_PRIVACY			0x00002000
-+#define BTP_GAP_SETTING_CONTROLLER_CONF		0x00004000
-+#define BTP_GAP_SETTING_STATIC_ADDRESS		0x00008000
+ AC_ARG_ENABLE(client, AC_HELP_STRING([--disable-client],
+ 		[disable command line client]), [enable_client=${enableval}])
+ AM_CONDITIONAL(CLIENT, test "${enable_client}" != "no")
+diff --git a/tools/btpclient.c b/tools/btpclient.c
+new file mode 100644
+index 000000000..bde59406c
+--- /dev/null
++++ b/tools/btpclient.c
+@@ -0,0 +1,338 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2011-2017  Intel Corporation. All rights reserved.
++ *
++ *  This library is free software; you can redistribute it and/or
++ *  modify it under the terms of the GNU Lesser General Public
++ *  License as published by the Free Software Foundation; either
++ *  version 2.1 of the License, or (at your option) any later version.
++ *
++ *  This library is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ *  Lesser General Public License for more details.
++ *
++ *  You should have received a copy of the GNU Lesser General Public
++ *  License along with this library; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
 +
-+#define BTP_OP_GAP_READ_COTROLLER_INFO		0x03
-+struct btp_gap_read_info_rp {
-+	uint8_t address[6];
-+	uint32_t supported_settings;
-+	uint32_t current_settings;
-+	uint8_t cod[3];
-+	uint8_t name[249];
-+	uint8_t short_name[11];
-+} __packed;
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
 +
-+#define BTP_OP_GAP_RESET			0x04
-+struct btp_gap_reset_rp {
-+	uint32_t current_settings;
-+} __packed;
++#include <stdio.h>
++#include <unistd.h>
++#include <stdlib.h>
++#include <assert.h>
++#include <getopt.h>
 +
-+#define BTP_OP_GAP_SET_POWERED			0x05
-+struct btp_gap_set_powered_cp {
-+	uint8_t powered;
-+} __packed;
++#include <ell/ell.h>
 +
-+struct btp_gap_set_powered_rp {
-+	uint32_t current_settings;
-+} __packed;
++#include "src/shared/btp.h"
 +
-+#define BTP_OP_GAP_SET_CONNECTABLE		0x06
-+struct btp_gap_set_connectable_cp {
-+	uint8_t connectable;
-+} __packed;
++struct btp_adapter {
++	struct l_dbus_proxy *proxy;
++	uint8_t index;
++};
 +
-+struct btp_gap_set_connectable_rp {
-+	uint32_t current_settings;
-+} __packed;
++struct btp_device {
++	struct l_dbus_proxy *proxy;
++};
 +
-+#define BTP_OP_GAP_SET_FAST_CONNECTABLE		0x07
-+struct btp_gap_set_fast_connectable_cp {
-+	uint8_t fast_connectable;
-+} __packed;
++static struct l_queue *adapters;
++static struct l_queue *devices;
++static char *socket_path;
++static struct btp *btp;
 +
-+struct btp_gap_set_fast_connectable_rp {
-+	uint32_t current_settings;
-+} __packed;
++static void btp_core_read_commands(uint8_t index, const void *param,
++					uint16_t length, void *user_data)
++{
++	uint8_t commands = 0;
 +
-+#define BTP_OP_GAP_SET_DISCOVERABLE		0x08
-+struct btp_gap_set_discoverable_cp {
-+	uint8_t discoverable;
-+} __packed;
++	if (index != BTP_INDEX_NON_CONTROLLER) {
++		btp_send_error(btp, BTP_CORE_SERVICE, index,
++						BTP_ERROR_INVALID_INDEX);
++		return;
++	}
 +
-+struct btp_gap_set_discoverable_rp {
-+	uint32_t current_settings;
-+} __packed;
++	commands |= (1 << BTP_OP_CORE_READ_SUPPORTED_COMMANDS);
++	commands |= (1 << BTP_OP_CORE_READ_SUPPORTED_SERVICES);
++	commands |= (1 << BTP_OP_CORE_REGISTER);
++	commands |= (1 << BTP_OP_CORE_UNREGISTER);
 +
-+#define BTP_OP_GAP_SET_BONDABLE			0x09
-+struct btp_gap_set_bondable_cp {
-+	uint8_t bondable;
-+} __packed;
++	btp_send(btp, BTP_CORE_SERVICE, BTP_OP_CORE_READ_SUPPORTED_COMMANDS,
++			BTP_INDEX_NON_CONTROLLER, sizeof(commands), &commands);
++}
 +
-+struct btp_gap_set_bondable_rp {
-+	uint32_t current_settings;
-+} __packed;
++static void btp_core_read_services(uint8_t index, const void *param,
++					uint16_t length, void *user_data)
++{
++	uint8_t services = 0;
 +
-+#define BTP_OP_GAP_START_ADVERTISING		0x0a
-+struct btp_gap_start_adv_cp {
-+	uint8_t adv_data_len;
-+	uint8_t scan_rsp_len;
-+	uint8_t data[0];
-+} __packed;
++	if (index != BTP_INDEX_NON_CONTROLLER) {
++		btp_send_error(btp, BTP_CORE_SERVICE, index,
++						BTP_ERROR_INVALID_INDEX);
++		return;
++	}
 +
-+struct btp_gap_start_adv_rp {
-+	uint32_t current_settings;
-+} __packed;
++	services |= (1 << BTP_CORE_SERVICE);
 +
-+#define BTP_OP_GAP_STOP_ADVERTISING		0x0b
-+struct btp_gap_stop_adv_rp {
-+	uint32_t current_settings;
-+} __packed;
++	btp_send(btp, BTP_CORE_SERVICE, BTP_OP_CORE_READ_SUPPORTED_SERVICES,
++			BTP_INDEX_NON_CONTROLLER, sizeof(services), &services);
++}
 +
-+#define BTP_GAP_DISCOVERY_FLAG_LE		0x01
-+#define BTP_GAP_DISCOVERY_FLAG_BREDR		0x02
-+#define BTP_GAP_DISCOVERY_FLAG_LIMITED		0x04
-+#define BTP_GAP_DISCOVERY_FLAG_ACTIVE		0x08
-+#define BTP_GAP_DISCOVERY_FLAG_OBSERVATION	0x10
++static void btp_core_register(uint8_t index, const void *param,
++					uint16_t length, void *user_data)
++{
++	if (index != BTP_INDEX_NON_CONTROLLER) {
++		btp_send_error(btp, BTP_CORE_SERVICE, index,
++						BTP_ERROR_INVALID_INDEX);
++		return;
++	}
 +
-+#define BTP_OP_GAP_START_DISCOVERY		0x0c
-+struct btp_gap_start_discovery_cp {
-+	uint8_t flags;
-+} __packed;
++	btp_send_error(btp, BTP_CORE_SERVICE, index, BTP_ERROR_FAIL);
++}
 +
-+#define BTP_OP_GAP_STOP_DISCOVERY		0x0d
++static void btp_core_unregister(uint8_t index, const void *param,
++					uint16_t length, void *user_data)
++{
++	if (index != BTP_INDEX_NON_CONTROLLER) {
++		btp_send_error(btp, BTP_CORE_SERVICE, index,
++						BTP_ERROR_INVALID_INDEX);
++		return;
++	}
 +
-+#define BTP_GAP_ADDR_PUBLIC			0x00
-+#define BTP_GAP_ADDR_RANDOM			0x01
++	btp_send_error(btp, BTP_CORE_SERVICE, index, BTP_ERROR_FAIL);
++}
 +
-+#define BTP_OP_GAP_CONNECT			0x0e
-+struct btp_gap_connect_cp {
-+	uint8_t address_type;
-+	uint8_t address[6];
-+} __packed;
++static void register_core_service(void)
++{
++	btp_register(btp, BTP_CORE_SERVICE,
++					BTP_OP_CORE_READ_SUPPORTED_COMMANDS,
++					btp_core_read_commands, NULL, NULL);
 +
-+#define BTP_OP_GAP_DISCONNECT			0x0f
-+struct btp_gap_disconnect_cp {
-+	uint8_t address_type;
-+	uint8_t address[6];
-+} __packed;
++	btp_register(btp, BTP_CORE_SERVICE,
++					BTP_OP_CORE_READ_SUPPORTED_SERVICES,
++					btp_core_read_services, NULL, NULL);
 +
-+#define BTP_GAP_IOCAPA_DISPLAY_ONLY		0x00
-+#define BTP_GAP_IOCAPA_DISPLAY_YESNO		0x01
-+#define BTP_GAP_IOCAPA_KEYBOARD_ONLY		0x02
-+#define BTP_GAP_IOCAPA_NO_INPUT_NO_OUTPUT	0x03
-+#define BTP_GAP_IOCAPA_KEYBOARD_DISPLAY		0x04
++	btp_register(btp, BTP_CORE_SERVICE, BTP_OP_CORE_REGISTER,
++						btp_core_register, NULL, NULL);
 +
-+#define BTP_OP_GAP_SET_IO_CAPA			0x10
-+struct btp_gap_set_io_capa_cp {
-+	uint8_t capa;
-+} __packed;
++	btp_register(btp, BTP_CORE_SERVICE, BTP_OP_CORE_UNREGISTER,
++					btp_core_unregister, NULL, NULL);
++}
 +
-+#define BTP_OP_GAP_PAIR				0x11
-+struct btp_gap_pair_cp {
-+	uint8_t address_type;
-+	uint8_t address[6];
-+} __packed;
++static void signal_handler(struct l_signal *signal, uint32_t signo,
++							void *user_data)
++{
++	switch (signo) {
++	case SIGINT:
++	case SIGTERM:
++		l_info("Terminating");
++		l_main_quit();
++		break;
++	}
++}
 +
-+#define BTP_OP_GAP_UNPAIR			0x12
-+struct btp_gap_unpair_cp {
-+	uint8_t address_type;
-+	uint8_t address[6];
-+} __packed;
++static void btp_adapter_free(struct btp_adapter *adapter)
++{
++	l_free(adapter);
++}
 +
-+#define BTP_OP_GAP_PASSKEY_ENTRY_RSP		0x13
-+struct btp_gap_passkey_entry_rsp_cp {
-+	uint8_t address_type;
-+	uint8_t address[6];
-+	uint32_t passkey;
-+} __packed;
++static void btp_device_free(struct btp_device *device)
++{
++	l_free(device);
++}
 +
-+#define BTP_OP_GAP_PASSKEY_CONFIRM_RSP		0x14
-+struct btp_gap_passkey_confirm_rsp_cp {
-+	uint8_t address_type;
-+	uint8_t address[6];
-+	uint8_t match;
-+} __packed;
++static void proxy_added(struct l_dbus_proxy *proxy, void *user_data)
++{
++	const char *interface = l_dbus_proxy_get_interface(proxy);
++	const char *path = l_dbus_proxy_get_path(proxy);
 +
-+#define BTP_EV_GAP_NEW_SETTINGS			0x80
-+struct btp_new_settings_ev {
-+	uint32_t current_settings;
-+} __packed;
++	l_info("Proxy added: %s (%s)", interface, path);
 +
-+#define BTP_EV_GAP_DEVICE_FOUND_FLAG_RSSI	0x00
-+#define BTP_EV_GAP_DEVICE_FOUND_FLAG_AD		0x01
-+#define BTP_EV_GAP_DEVICE_FOUND_FLAG_SR		0x02
++	if (!strcmp(interface, "org.bluez.Adapter1")) {
++		struct btp_adapter *adapter;
 +
-+#define BTP_EV_GAP_DEVICE_FOUND			0x81
-+struct btp_device_found_ev {
-+	uint8_t address[6];
-+	uint8_t address_type;
-+	int8_t rssi;
-+	uint8_t flags;
-+	uint16_t eir_len;
-+	uint8_t eir[0];
-+} __packed;
++		adapter = l_new(struct btp_adapter, 1);
++		adapter->proxy = proxy;
++		adapter->index = l_queue_length(adapters);
 +
-+#define BTP_EV_GAP_DEVICE_CONNECTED		0x82
-+struct btp_gap_device_connected_ev {
-+	uint8_t address_type;
-+	uint8_t address[6];
-+} __packed;
++		l_queue_push_tail(adapters, adapter);
++		return;
++	}
 +
-+#define BTP_EV_GAP_DEVICE_DISCONNECTED		0x83
-+struct btp_gap_device_disconnected_ev {
-+	uint8_t address_type;
-+	uint8_t address[6];
-+} __packed;
++	if (!strcmp(interface, "org.bluez.Device1")) {
++		struct btp_device *device;
 +
-+#define BTP_EV_GAP_PASSKEY_DISPLAY		0x84
-+struct btp_gap_passkey_display_ev {
-+	uint8_t address_type;
-+	uint8_t address[6];
-+	uint32_t passkey;
-+} __packed;
++		device = l_new(struct btp_device, 1);
++		device->proxy = proxy;
 +
-+#define BTP_EV_GAP_PASSKEY_REQUEST		0x85
-+struct btp_gap_passkey_req_ev {
-+	uint8_t address_type;
-+	uint8_t address[6];
-+} __packed;
++		l_queue_push_tail(devices, device);
++		return;
++	}
++}
 +
-+#define BTP_EV_GAP_PASSKEY_CONFIRM		0x86
-+struct btp_gap_passkey_confirm_ev {
-+	uint8_t address_type;
-+	uint8_t address[6];
-+	uint32_t passkey;
-+} __packed;
++static bool device_match_by_proxy(const void *a, const void *b)
++{
++	const struct btp_device *device = a;
++	const struct l_dbus_proxy *proxy = b;
 +
-+#define BTP_EV_GAP_IDENTITY_RESOLVED		0x87
-+struct btp_gap_identity_resolved_ev {
-+	uint8_t address_type;
-+	uint8_t address[6];
-+	uint8_t identity_address_type;
-+	uint8_t identity_address[6];
-+} __packed;
++	return device->proxy == proxy;
++}
 +
- struct btp;
- 
- typedef void (*btp_destroy_func_t)(void *user_data);
++static void proxy_removed(struct l_dbus_proxy *proxy, void *user_data)
++{
++	const char *interface = l_dbus_proxy_get_interface(proxy);
++	const char *path = l_dbus_proxy_get_path(proxy);
++
++	l_info("Proxy removed: %s (%s)", interface, path);
++
++	if (!strcmp(interface, "org.bluez.Adapter1")) {
++		l_info("Adapter removed, terminating.");
++		l_main_quit();
++		return;
++	}
++
++	if (!strcmp(interface, "org.bluez.Device1")) {
++		l_queue_remove_if(devices, device_match_by_proxy, proxy);
++
++		return;
++	}
++}
++
++static void property_changed(struct l_dbus_proxy *proxy, const char *name,
++				struct l_dbus_message *msg, void *user_data)
++{
++	l_info("property_changed %s %s %s", name, l_dbus_proxy_get_path(proxy),
++			l_dbus_proxy_get_interface(proxy));
++}
++
++static void client_connected(struct l_dbus *dbus, void *user_data)
++{
++	l_info("D-Bus client connected");
++}
++
++static void client_disconnected(struct l_dbus *dbus, void *user_data)
++{
++	l_info("D-Bus client disconnected, terminated");
++	l_main_quit();
++}
++
++static void client_ready(struct l_dbus_client *client, void *user_data)
++{
++	l_info("D-Bus client ready, connecting BTP");
++
++	btp = btp_new(socket_path);
++	if (!btp) {
++		l_error("Failed to connect BTP, terminating");
++		l_main_quit();
++		return;
++	}
++
++	register_core_service();
++
++	btp_send(btp, BTP_CORE_SERVICE, BTP_EV_CORE_READY,
++					BTP_INDEX_NON_CONTROLLER, 0, NULL);
++}
++
++static void usage(void)
++{
++	l_info("btpclient - Bluetooth tester");
++	l_info("Usage:");
++	l_info("\tbtpclient [options]");
++	l_info("options:\n"
++	"\t-s, --socket <socket>  Socket to use for BTP\n"
++	"\t-q, --quiet            Don't emit any logs\n"
++	"\t-v, --version          Show version\n"
++	"\t-h, --help             Show help options");
++}
++
++static const struct option options[] = {
++	{ "socket",	1, 0, 's' },
++	{ "quiet",	0, 0, 'q' },
++	{ "version",	0, 0, 'v' },
++	{ "help",	0, 0, 'h' },
++	{ 0, 0, 0, 0 }
++};
++
++int main(int argc, char *argv[])
++{
++	struct l_dbus_client *client;
++	struct l_signal *signal;
++	struct l_dbus *dbus;
++	sigset_t mask;
++	int opt;
++
++	l_log_set_stderr();
++
++	while ((opt = getopt_long(argc, argv, "+hs:vq", options, NULL)) != -1) {
++		switch (opt) {
++		case 's':
++			socket_path = l_strdup(optarg);
++			break;
++		case 'q':
++			l_log_set_null();
++			break;
++		case 'd':
++			break;
++		case 'v':
++			l_info("%s", VERSION);
++			return EXIT_SUCCESS;
++		case 'h':
++		default:
++			usage();
++			return EXIT_SUCCESS;
++		}
++	}
++
++	if (!socket_path) {
++		l_info("Socket option is required");
++		l_info("Type --help for usage");
++		return EXIT_FAILURE;
++	}
++
++	if (!l_main_init())
++		return EXIT_FAILURE;
++
++
++	adapters = l_queue_new();
++	devices = l_queue_new();
++
++	sigemptyset(&mask);
++	sigaddset(&mask, SIGINT);
++	sigaddset(&mask, SIGTERM);
++	signal = l_signal_create(&mask, signal_handler, NULL, NULL);
++
++	dbus = l_dbus_new_default(L_DBUS_SYSTEM_BUS);
++	client = l_dbus_client_new(dbus, "org.bluez", "/org/bluez");
++
++	l_dbus_client_set_connect_handler(client, client_connected, NULL, NULL);
++	l_dbus_client_set_disconnect_handler(client, client_disconnected, NULL,
++									NULL);
++
++	l_dbus_client_set_proxy_handlers(client, proxy_added, proxy_removed,
++						property_changed, NULL, NULL);
++
++	l_dbus_client_set_ready_handler(client, client_ready, NULL, NULL);
++
++	l_main_run();
++
++	l_dbus_client_destroy(client);
++	l_dbus_destroy(dbus);
++	l_signal_remove(signal);
++	btp_cleanup(btp);
++
++	l_queue_destroy(devices, (l_queue_destroy_func_t)btp_device_free);
++	l_queue_destroy(adapters, (l_queue_destroy_func_t)btp_adapter_free);
++
++	l_free(socket_path);
++
++	l_main_exit();
++
++	return EXIT_SUCCESS;
++}
 -- 
 2.14.3
 
