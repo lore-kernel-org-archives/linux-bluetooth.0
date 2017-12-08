@@ -1,75 +1,82 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Steve Brown <sbrown@cortland.com>
-Message-ID: <1512903519.27989.19.camel@ewol.com>
-Subject: Re: [PATCH v2] mesh: Fix crash while reading input parameters
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-bluetooth@vger.kernel.org
-Date: Sun, 10 Dec 2017 03:58:39 -0700
-In-Reply-To: <20171208171230.11069-1-luiz.dentz@gmail.com>
-References: <20171208171230.11069-1-luiz.dentz@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
+Subject: Re: [PATCH v2 1/3] Bluetooth: hci_ll: add support for setting public
+ address
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1a106ed6-1408-4d0b-9c9d-5a3058d6df2d@lechnology.com>
+Date: Fri, 8 Dec 2017 20:24:02 +0100
+Cc: devicetree <devicetree@vger.kernel.org>,
+        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+        Rob Herring <robh+dt@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        "Gustavo F. Padovan" <gustavo@padovan.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Network Development <netdev@vger.kernel.org>,
+        linux-kernel@vger.kernel.org
+Message-Id: <FC836ADA-E8DF-4E69-9F2D-89E0F18FC1DE@holtmann.org>
+References: <1512701860-8321-1-git-send-email-david@lechnology.com>
+ <1512701860-8321-2-git-send-email-david@lechnology.com>
+ <8B6C3CFA-35C6-4A9B-90AB-22834B9AE2C4@holtmann.org>
+ <1a106ed6-1408-4d0b-9c9d-5a3058d6df2d@lechnology.com>
+To: David Lechner <david@lechnology.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi David,
 
-On Fri, 2017-12-08 at 15:12 -0200, Luiz Augusto von Dentz wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>>> This adds support for setting the public address on Texas Instruments
+>>> Bluetooth chips using a vendor-specific command.
+>>> 
+>>> This has been tested on a CC2560A. The TI wiki also indicates that this
+>>> command should work on TI WL17xx/WL18xx Bluetooth chips.
+>>> 
+>>> Signed-off-by: David Lechner <david@lechnology.com>
+>>> ---
+>>> 
+>>> v2 changes:
+>>> * This is a new patch in v2
+>>> 
+>>> drivers/bluetooth/hci_ll.c | 17 +++++++++++++++++
+>>> 1 file changed, 17 insertions(+)
+>>> 
+>>> diff --git a/drivers/bluetooth/hci_ll.c b/drivers/bluetooth/hci_ll.c
+>>> index 974a788..b732004 100644
+>>> --- a/drivers/bluetooth/hci_ll.c
+>>> +++ b/drivers/bluetooth/hci_ll.c
+>>> @@ -57,6 +57,7 @@
+>>> #include "hci_uart.h"
+>>> 
+>>> /* Vendor-specific HCI commands */
+>>> +#define HCI_VS_WRITE_BD_ADDR			0xfc06
+>>> #define HCI_VS_UPDATE_UART_HCI_BAUDRATE		0xff36
+>>> 
+>>> /* HCILL commands */
+>>> @@ -662,6 +663,20 @@ static int download_firmware(struct ll_device *lldev)
+>>> 	return err;
+>>> }
+>>> 
+>>> +static int ll_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr)
+>>> +{
+>>> +	bdaddr_t bdaddr_swapped;
+>>> +	struct sk_buff *skb;
+>>> +
+>>> +	baswap(&bdaddr_swapped, bdaddr);
+>>> +	skb = __hci_cmd_sync(hdev, HCI_VS_WRITE_BD_ADDR, sizeof(bdaddr_t),
+>>> +			     &bdaddr_swapped, HCI_INIT_TIMEOUT);
+>>> +	if (!IS_ERR(skb))
+>>> +		kfree_skb(skb);
+>>> +	
+>> You have a trailing whitespace here.
+>> Does the HCI command really expect the BD_ADDR in the swapped order. The caller of hdev->set_bdaddr while provide it in the same order as the HCI Read BD Address command and everything in HCI. So it seems odd that you have to swap it for the vendor command.
+>> So have you actually tested this with btmgmt public-add <xx:xx..> and checked that the address comes out correctly. I think ll_set_bdaddr should function correctly for the mgmt interface. And if needed any other caller outside of mgmt has to do the swapping.
 > 
-> read_input_parameters skips the command argument thus arg[0] shall be
-> considerer the fist argument.
-> ---
->  mesh/config-client.c | 5 ++++-
->  mesh/onoff-model.c   | 5 ++++-
->  2 files changed, 8 insertions(+), 2 deletions(-)
-> 
-> diff --git a/mesh/config-client.c b/mesh/config-client.c
-> index 7aabe6ce7..3d618b6a6 100644
-> --- a/mesh/config-client.c
-> +++ b/mesh/config-client.c
-> @@ -229,10 +229,13 @@ static uint32_t read_input_parameters(int argc,
-> char *argv[])
->  {
->  	uint32_t i;
->  
-> +	if (!argc)
-> +		return 0;
-> +
->  	--argc;
->  	++argv;
->  
-> -	if (!argc || argv[1][0] == '\0')
-> +	if (!argc || argv[0][0] == '\0')
->  		return 0;
->  
->  	memset(parms, 0xff, sizeof(parms));
-> diff --git a/mesh/onoff-model.c b/mesh/onoff-model.c
-> index 9c8869414..fc0d64617 100644
-> --- a/mesh/onoff-model.c
-> +++ b/mesh/onoff-model.c
-> @@ -152,10 +152,13 @@ static uint32_t read_input_parameters(int argc,
-> char *argv[])
->  {
->  	uint32_t i;
->  
-> +	if (!argc)
-> +		return 0;
-> +
->  	--argc;
->  	++argv;
->  
-> -	if (!argc || argv[1][0] == '\0')
-> +	if (!argc || argv[0][0] == '\0')
->  		return 0;
->  
->  	memset(parms, 0xff, sizeof(parms));
+> I did test using btmgmt public-address 00:11:22:33:44:55, which is how I found out that the order needed to be swapped. Like you, I was surprised. I couldn't find any documentation from TI saying what the order is supposed to be, so I can only assume that because this works, it is indeed correct as-is.
 
-I tested both config and onoff.
+then please add a comment for that and I would appreciate to have the parts from btmon showing the public-addr command and the following HCI Read BD Address command as part of the commit message. Just for being able to dig this out at some later point if needed.
 
-Both fixed.
+Regards
 
-Thanks,
-
-Steve
+Marcel
 
