@@ -1,128 +1,20 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20171208124057.32162-1-lukasz.rymanowski@codecoup.pl>
-References: <20171208124057.32162-1-lukasz.rymanowski@codecoup.pl>
-From: =?UTF-8?Q?=C5=81ukasz_Rymanowski?= <lukasz.rymanowski@codecoup.pl>
-Date: Tue, 12 Dec 2017 08:49:06 +0100
-Message-ID: <CAExxLLAkVuj9gi70FVPsLjjDMdgQx_X-HFc9qeEhs7LyyiVu_A@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: Add support to advertise when connected
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Cc: =?UTF-8?Q?=C5=81ukasz_Rymanowski?= <lukasz.rymanowski@codecoup.pl>
+From: John Klug <ski.brimson@gmail.com>
+Date: Mon, 11 Dec 2017 17:44:09 -0600
+Message-ID: <CADU0VqyJxZo2QDOY0FgOTSFNRGCgXbPuZhL7viuAV_ucFOoPkg@mail.gmail.com>
+Subject: RFCOMM server and current Bluez
+To: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-hi,
+Would anyone know of any public examples of using RFCOMM with current
+methods, or does RFCOMM require compatibility mode and SPD?
 
-On 8 December 2017 at 13:40, =C5=81ukasz Rymanowski
-<lukasz.rymanowski@codecoup.pl> wrote:
-> So far, kernel did not allow to advertise when there was a connection
-> established. With this patch kernel does allow it if controller
-> supports it.
->
-> If controller supports non-connectable advertising when connected, then
-> only non-connectable advertising instances will be advertised.
->
-> Signed-off-by: =C5=81ukasz Rymanowski <lukasz.rymanowski@codecoup.pl>
-> ---
->  net/bluetooth/hci_request.c | 55 +++++++++++++++++++++++++++++++++++++--=
-------
->  1 file changed, 46 insertions(+), 9 deletions(-)
->
-> diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
-> index abc0f3224dd1..f0ab3a772949 100644
-> --- a/net/bluetooth/hci_request.c
-> +++ b/net/bluetooth/hci_request.c
-> @@ -919,6 +919,43 @@ static bool adv_use_rpa(struct hci_dev *hdev, uint32=
-_t flags)
->         return true;
->  }
->
-> +static bool is_advertising_allowed(struct hci_dev *hdev, bool connectabl=
-e)
-> +{
-> +       /* If there is no connection we are OK to advertise. */
-> +       if (hci_conn_num(hdev, LE_LINK) =3D=3D 0)
-> +               return true;
-> +
-> +       /* Check le_states if there is any connection in slave role. */
-> +       if (hdev->conn_hash.le_num_slave > 0) {
-> +               /* Slave connection state and non connectable mode bit 20=
-. */
-> +               if (!connectable && !(hdev->le_states[2] & 0x10))
-> +                       return false;
-> +
-> +               /* Slave connection state and connectable mode bit 38
-> +                * and scannable bit 21.
-> +                */
-> +               if (connectable && (!(hdev->le_states[4] & 0x01) ||
-> +                                   !(hdev->le_states[2] & 0x40)))
-> +                       return false;
-> +       }
-> +
-> +       /* Check le_states if there is any connection in master role. */
-> +       if (hci_conn_num(hdev, LE_LINK) !=3D hdev->conn_hash.le_num_slave=
-) {
-> +               /* Master connection state and non connectable mode bit 1=
-8. */
-> +               if (!connectable && !(hdev->le_states[2] & 0x02))
-> +                       return false;
-> +
-> +               /* Master connection state and connectable mode bit 35 an=
-d
-> +                * scannable 19.
-> +                */
-> +               if (connectable && (!(hdev->le_states[4] & 0x10) ||
-> +                                   !(hdev->le_states[2] & 0x08)))
-> +                       return false;
-> +       }
-> +
-> +       return true;
-> +}
-> +
->  void __hci_req_enable_advertising(struct hci_request *req)
->  {
->         struct hci_dev *hdev =3D req->hdev;
-> @@ -927,7 +964,15 @@ void __hci_req_enable_advertising(struct hci_request=
- *req)
->         bool connectable;
->         u32 flags;
->
-> -       if (hci_conn_num(hdev, LE_LINK) > 0)
-> +       flags =3D get_adv_instance_flags(hdev, hdev->cur_adv_instance);
-> +
-> +       /* If the "connectable" instance flag was not set, then choose be=
-tween
-> +        * ADV_IND and ADV_NONCONN_IND based on the global connectable se=
-tting.
-> +        */
-> +       connectable =3D (flags & MGMT_ADV_FLAG_CONNECTABLE) ||
-> +                     mgmt_get_connectable(hdev);
-> +
-> +       if (!is_advertising_allowed(hdev, connectable))
->                 return;
->
->         if (hci_dev_test_flag(hdev, HCI_LE_ADV))
-> @@ -940,14 +985,6 @@ void __hci_req_enable_advertising(struct hci_request=
- *req)
->          */
->         hci_dev_clear_flag(hdev, HCI_LE_ADV);
->
-> -       flags =3D get_adv_instance_flags(hdev, hdev->cur_adv_instance);
-> -
-> -       /* If the "connectable" instance flag was not set, then choose be=
-tween
-> -        * ADV_IND and ADV_NONCONN_IND based on the global connectable se=
-tting.
-> -        */
-> -       connectable =3D (flags & MGMT_ADV_FLAG_CONNECTABLE) ||
-> -                     mgmt_get_connectable(hdev);
-> -
->         /* Set require_privacy to true only when non-connectable
->          * advertising is used. In that case it is fine to use a
->          * non-resolvable private address.
-> --
-> 2.14.1
->
+There does not seem to be any RFCOMM server examples included with Bluez.
 
-ping
+Or would there be any detailed documentation on how an RFCOMM server
+would be written?
+
+Thanks.
