@@ -1,27 +1,22 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Date: Mon, 11 Dec 2017 11:20:28 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2] mesh: Fix crash while reading input parameters
-Message-ID: <20171211092028.GA802@x1c>
-References: <20171208171230.11069-1-luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+From: liyj1 <liyj1@nationalchip.com>
+Subject: raspberry bluez ble.Question?
+Message-ID: <6ae1dbd2-284e-5bd8-aa69-6b37f3caf286@nationalchip.com>
+Date: Mon, 11 Dec 2017 17:00:45 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20171208171230.11069-1-luiz.dentz@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+hello!
 
-On Fri, Dec 08, 2017, Luiz Augusto von Dentz wrote:
-> read_input_parameters skips the command argument thus arg[0] shall be
-> considerer the fist argument.
-> ---
->  mesh/config-client.c | 5 ++++-
->  mesh/onoff-model.c   | 5 ++++-
->  2 files changed, 8 insertions(+), 2 deletions(-)
+     I am a man who  use BLE. I want to use bluez. but I dont't know how 
+to do it.either in raspberry or in openwrt.
 
-Applied. Thanks.
+https://stackoverflow.com/questions/47385023/bluez-5-43-raspberry-pi-3b-how-to-creat-gatt-in-pi3b-with-bluez-5-43-bluez-5-43
 
-Johan
+   I  asked in stack overflow. any advices will help.
+
+God bless you. Good man live long.
+
