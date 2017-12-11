@@ -1,22 +1,36 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-To: linux-bluetooth@vger.kernel.org
-From: liyj1 <liyj1@nationalchip.com>
-Subject: raspberry bluez ble.Question?
-Message-ID: <6ae1dbd2-284e-5bd8-aa69-6b37f3caf286@nationalchip.com>
-Date: Mon, 11 Dec 2017 17:00:45 +0800
+Subject: [PATCH BlueZ 4/4] shared/shell: Fix auto-completion of invalid
+ commands
+From: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+References: <8b962f05-12c2-8bd9-31ca-1700a45bbdae@jp.fujitsu.com>
+Message-ID: <36e33345-4ff0-766d-cf97-90deaf4b56b0@jp.fujitsu.com>
+Date: Mon, 11 Dec 2017 16:18:10 +0900
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8; format=flowed
+In-Reply-To: <8b962f05-12c2-8bd9-31ca-1700a45bbdae@jp.fujitsu.com>
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-hello!
+bt_shell always complements the invalid commands, which are the menu/back
+command.
+---
+ src/shared/shell.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-     I am a man who  use BLE. I want to use bluez. but I dont't know how 
-to do it.either in raspberry or in openwrt.
-
-https://stackoverflow.com/questions/47385023/bluez-5-43-raspberry-pi-3b-how-to-creat-gatt-in-pi3b-with-bluez-5-43-bluez-5-43
-
-   I  asked in stack overflow. any advices will help.
-
-God bless you. Good man live long.
+diff --git a/src/shared/shell.c b/src/shared/shell.c
+index 26194f758..f20c74901 100644
+--- a/src/shared/shell.c
++++ b/src/shared/shell.c
+@@ -498,7 +498,7 @@ static char *find_cmd(const char *text,
+ 	while ((cmd = entry[*index].cmd)) {
+ 		(*index)++;
+ 
+-		if (!strncmp(cmd, text, len))
++		if (!strncmp(cmd, text, len) && !command_isskipped(cmd))
+ 			return strdup(cmd);
+ 	}
+ 
+-- 
+2.14.1
 
