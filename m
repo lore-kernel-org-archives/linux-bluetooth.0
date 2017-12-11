@@ -1,71 +1,38 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <20171211103837.25150-1-szymon.janc@codecoup.pl>
-References: <20171211103837.25150-1-szymon.janc@codecoup.pl>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 11 Dec 2017 09:59:18 -0200
-Message-ID: <CABBYNZKfjvPhOfb+f934JsD7xzHqZFEMwHhzzXEfynhQ63ML5g@mail.gmail.com>
-Subject: Re: [RFC 1/4] Add LEAddressType property for Adapter1 and Device1 interfaces
-To: Szymon Janc <szymon.janc@codecoup.pl>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+From: Steve Brown <sbrown@cortland.com>
+Message-ID: <1512993166.4454.5.camel@ewol.com>
+Subject: Re: raspberry bluez ble.Question?
+To: liyj1 <liyj1@nationalchip.com>, linux-bluetooth@vger.kernel.org
+Date: Mon, 11 Dec 2017 04:52:46 -0700
+In-Reply-To: <6ae1dbd2-284e-5bd8-aa69-6b37f3caf286@nationalchip.com>
+References: <6ae1dbd2-284e-5bd8-aa69-6b37f3caf286@nationalchip.com>
 Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+On Mon, 2017-12-11 at 17:00 +0800, liyj1 wrote:
+> hello!
+> 
+>      I am a man who  use BLE. I want to use bluez. but I dont't know
+> how 
+> to do it.either in raspberry or in openwrt.
+> 
+> https://stackoverflow.com/questions/47385023/bluez-5-43-raspberry-pi-
+> 3b-how-to-creat-gatt-in-pi3b-with-bluez-5-43-bluez-5-43
+> 
+>    I  asked in stack overflow. any advices will help.
+> 
+> God bless you. Good man live long.
+> 
+> 
+I've been running it on an rpi3 for a few months. Works fine. Raspbian
+has development tools where as openwrt doesn't. I think you would spend
+lots of time integrating it into the openwrt build system. With the
+rpi3, I cloned the git repository, compiled and installed it.
 
-On Mon, Dec 11, 2017 at 8:38 AM, Szymon Janc <szymon.janc@codecoup.pl> wrote:
-> This provides information about LE Identity Address Type used. This
-> information is needed for L2CAP sockets and for PTS testing purposes.
-> ---
->  doc/adapter-api.txt | 9 +++++++++
->  doc/device-api.txt  | 9 +++++++++
->  2 files changed, 18 insertions(+)
->
-> diff --git a/doc/adapter-api.txt b/doc/adapter-api.txt
-> index d852aa6b9..b5abdda39 100644
-> --- a/doc/adapter-api.txt
-> +++ b/doc/adapter-api.txt
-> @@ -149,6 +149,15 @@ Properties string Address [readonly]
->
->                         The Bluetooth device address.
->
-> +               string LEAddressType [readonly, optional]
-> +
-> +                       The Bluetooth device LE Identity Address Type. This is
-> +                       present only if LE is supported by adapter.
-> +
-> +                       Possible values:
-> +                               "public" - Public address
-> +                               "static" - Static Random address
-> +
->                 string Name [readonly]
->
->                         The Bluetooth system name (pretty hostname).
-> diff --git a/doc/device-api.txt b/doc/device-api.txt
-> index 8b69c2ef3..dfeca305c 100644
-> --- a/doc/device-api.txt
-> +++ b/doc/device-api.txt
-> @@ -124,6 +124,15 @@ Properties string Address [readonly]
->
->                         The Bluetooth device address of the remote device.
->
-> +               string LEAddressType [readonly, optional]
-> +
-> +                       The Bluetooth device LE Identity Address Type. This is
-> +                       present only if device supports LE.
-> +
-> +                       Possible values:
-> +                               "public" - Public address
-> +                               "static" - Static Random address
-> +
->                 string Name [readonly, optional]
->
->                         The Bluetooth remote name. This value can not be
-> --
-> 2.14.3
+There's an older version in the Raspbian distribution, but was too out-
+of-date for what I wanted to do.
 
-Shouldn't we invest in a proper LE device interface then?
-
--- 
-Luiz Augusto von Dentz
+Steve
+ 
